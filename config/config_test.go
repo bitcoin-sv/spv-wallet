@@ -47,7 +47,8 @@ func TestAppConfig_Validate(t *testing.T) {
 	})
 
 	t.Run("validate test config json", func(t *testing.T) {
-		app, _, txn := baseTestConfig(t)
+		app, services, txn := baseTestConfig(t)
+		require.NotNil(t, services)
 		err := app.Validate(txn)
 		assert.NoError(t, err)
 	})

@@ -172,14 +172,14 @@ func (p *PaymailInterface) getPaymailInformation(ctx context.Context, alias,
 
 	paymailAddress, err := p.getPaymailAddress(ctx, alias, domain)
 	if err != nil {
-		return nil, "", nil, nil
+		return nil, "", nil, err
 	}
 
 	var xPub *bux.Xpub
 	if xPub, err = p.client.GetXpubByID(
 		ctx, paymailAddress.XPubID,
 	); err != nil {
-		return nil, "", nil, nil
+		return nil, "", nil, err
 	}
 
 	pubKey, address, lockingScript, keyErr := p.getPaymailKeys(
@@ -187,7 +187,7 @@ func (p *PaymailInterface) getPaymailInformation(ctx context.Context, alias,
 		xPub.NextExternalNum,
 	)
 	if keyErr != nil {
-		return nil, "", nil, nil
+		return nil, "", nil, keyErr
 	}
 
 	// create a new destination, based on the External xPub child
@@ -210,13 +210,13 @@ func (p *PaymailInterface) getPaymailInformation(ctx context.Context, alias,
 	}
 
 	if err = destination.Save(ctx); err != nil {
-		return nil, "", nil, nil
+		return nil, "", nil, err
 	}
 
 	xPub.NextExternalNum++
 
 	if err = xPub.Save(ctx); err != nil {
-		return nil, "", nil, nil
+		return nil, "", nil, err
 	}
 
 	return paymailAddress, pubKey, destination, nil

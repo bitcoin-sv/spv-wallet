@@ -22,7 +22,7 @@ func (a *Action) list(w http.ResponseWriter, req *http.Request, _ httprouter.Par
 	var metadata *bux.Metadata
 	if len(metadataReq) > 0 {
 		// marshal the metadata into the Metadata model
-		metaJSON, _ := json.Marshal(metadataReq)
+		metaJSON, _ := json.Marshal(metadataReq) // nolint: errchkjson // ignore for now
 		_ = json.Unmarshal(metaJSON, &metadata)
 	}
 
