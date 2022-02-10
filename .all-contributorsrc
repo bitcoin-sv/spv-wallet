@@ -1,0 +1,28 @@
+{
+  "projectName": "go-template",
+  "projectOwner": "mrz1836",
+  "repoType": "github",
+  "repoHost": "https://github.com",
+  "files": [
+    "README.md"
+  ],
+  "imageSize": 100,
+  "commit": false,
+  "commitConvention": "none",
+  "contributorsPerLine": 7,
+  "contributorsSortAlphabetically": false,
+  "contributors": [
+      {
+        "login": "mrz1836",
+        "name": "Mr. Z",
+        "avatar_url": "https://avatars.githubusercontent.com/u/3743002?v=4",
+        "profile": "https://mrz1818.com",
+        "contributions": [
+          "infra",
+          "code",
+          "maintenance",
+          "security"
+        ]
+      }
+    ]
+}

@@ -1,0 +1,36 @@
+name: Question
+description: Do you have a question, comment or concern?
+title: "[Question]: "
+labels: [question]
+assignees:
+  - mrz1836
+body:
+  - type: textarea
+    id: question
+    attributes:
+      label: What's your question?
+      description: A clear and concise question using references to specific regions of code if applicable.
+    validations:
+      required: true
+  - type: checkboxes
+    id: search
+    attributes:
+      label: Search
+      options:
+        - label: I did search for other open and closed issues before opening this.
+          required: true
+  - type: checkboxes
+    id: terms
+    attributes:
+      label: Code of Conduct
+      description: By submitting this issue, you agree to follow our Code of Conduct (located in `.github/`)
+      options:
+        - label: I agree to follow this project's Code of Conduct
+          required: true
+  - type: textarea
+    id: ctx
+    attributes:
+      label: Additional context
+      description: Anything else you would like to add
+    validations:
+      required: false

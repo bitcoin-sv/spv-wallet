@@ -1,0 +1,42 @@
+# Reference: https://docs.codecov.com/docs/codecovyml-reference
+# ----------------------
+codecov:
+  require_ci_to_pass: true
+
+# Coverage configuration
+# ----------------------
+coverage:
+  status:
+    patch: false
+  range: 70..90     # First number represents red, and second represents green
+  # (default is 70..100)
+  round: down       # up, down, or nearest
+  precision: 2      # Number of decimal places, between 0 and 5
+
+# Ignoring Paths
+# --------------
+# which folders/files to ignore
+ignore:
+  - "*/.make/.*"
+  - "*/.github/.*"
+  - "*/examples/.*"
+  - "*/tools/.*"
+
+# Parsers
+# --------------
+parsers:
+  gcov:
+    branch_detection:
+      conditional: yes
+      loop: yes
+      method: no
+      macro: no
+
+# Pull request comments:
+# ----------------------
+# Diff is the Coverage Diff of the pull request.
+# Files are the files impacted by the pull request
+comment:
+  layout: "reach,diff,flags,files,footer"
+  behavior: default
+  require_changes: false

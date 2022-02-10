@@ -1,0 +1,36 @@
+name: Feature request
+description: Got a new feature, improvment or idea?
+title: "[Feature]: "
+labels: [feature]
+assignees:
+  - mrz1836
+body:
+  - type: textarea
+    id: what-feature
+    attributes:
+      label: What's the feature
+      description: What is it, how does it work, why should it exist?
+    validations:
+      required: true
+  - type: checkboxes
+    id: search
+    attributes:
+      label: Search
+      options:
+        - label: I did search for other open and closed issues before opening this.
+          required: true
+  - type: checkboxes
+    id: terms
+    attributes:
+      label: Code of Conduct
+      description: By submitting this issue, you agree to follow our Code of Conduct (located in `.github/`)
+      options:
+        - label: I agree to follow this project's Code of Conduct
+          required: true
+  - type: textarea
+    id: ctx
+    attributes:
+      label: Additional context
+      description: Anything else you would like to add
+    validations:
+      required: false

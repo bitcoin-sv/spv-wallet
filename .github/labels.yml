@@ -1,0 +1,54 @@
+- color: 0075ca
+  description: "Improvements or additions to documentation"
+  name: "documentation"
+- color: b23128
+  description: "Highest rated bug or issue, affects all"
+  name: "bug-P1"
+- color: de3d32
+  description: "Medium rated bug, affects a few"
+  name: "bug-P2"
+- color: f44336
+  description: "Lowest rated bug, affects nearly none or low-impact"
+  name: "bug-P3"
+- color: 0e8a16
+  description: "Any new significant addition"
+  name: "feature"
+- color: b60205
+  description: "Urgent or important fix/patch"
+  name: "hot-fix"
+- color: cccccc
+  description: "Any idea, suggestion"
+  name: "idea"
+- color: d4c5f9
+  description: "Experimental - can break!"
+  name: "prototype"
+- color: cc317c
+  description: "Any question or concern"
+  name: "question"
+- color: c2e0c6
+  description: "Unit tests, mocking, integration testing"
+  name: "test"
+- color: fbca04
+  description: "Anything GUI related"
+  name: "ui-ux"
+- color: 006b75
+  description: "Simple updates or version bumps"
+  name: "chore"
+- color: 006b75
+  description: "Dependency updates"
+  name: "dependencies"
+- color: 006b75
+  description: "General updates"
+  name: "update"
+- color: FFA500
+  description: "Any significant refactoring"
+  name: "refactor"
+- color: FEF2C0
+  description: "Used for automatic merging"
+  name: "automerge"
+- color: FBCA04
+  description: "Used for denoting a WIP, stops auto-merge"
+  name: "work-in-progress"
+- color: c2e0c6
+  description: "Old, unused, stale"
+  name: "stale"
