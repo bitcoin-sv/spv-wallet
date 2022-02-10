@@ -6,12 +6,12 @@ include .make/go.mk
 
 ## Not defined? Use default repo name which is the application
 ifeq ($(REPO_NAME),)
-	REPO_NAME="go-template"
+	REPO_NAME="bux-server"
 endif
 
 ## Not defined? Use default repo owner
 ifeq ($(REPO_OWNER),)
-	REPO_OWNER="mrz1836"
+	REPO_OWNER="BuxOrg"
 endif
 
 .PHONY: clean install-all-contributors update-contributors
@@ -25,6 +25,9 @@ clean: ## Remove previous builds and any cached data
 	@$(MAKE) clean-mods
 	@test $(DISTRIBUTIONS_DIR)
 	@if [ -d $(DISTRIBUTIONS_DIR) ]; then rm -r $(DISTRIBUTIONS_DIR); fi
+
+graphql: ## Generates the graphql schemas
+	@go run github.com/99designs/gqlgen generate
 
 install-all-contributors: ## Installs all contributors locally
 	@echo "installing all-contributors cli tool..."

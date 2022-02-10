@@ -8,7 +8,7 @@
 
 Vulnerabilities can be reported by getting in touch with the project stakeholder(s):
 
-- [project maintainers](mailto:mrz1818@pm.me)
+- [project maintainers](mailto:security@getbux.io)
 
 Please include the requested information listed below (as much as you can provide) to help us better understand the nature and scope of the possible issue:
 

@@ -17,7 +17,7 @@
   description: "Urgent or important fix/patch"
   name: "hot-fix"
 - color: cccccc
-  description: "Any idea, suggestion"
+  description: "Any idea, suggestion or opinion"
   name: "idea"
 - color: d4c5f9
   description: "Experimental - can break!"

@@ -1,0 +1,224 @@
+# GraphQL schema example
+#
+# https://gqlgen.com/getting-started/
+
+scalar Time
+scalar NullBool
+scalar NullTime
+scalar NullString
+scalar Uint
+scalar Uint32
+scalar Uint64
+scalar Int16
+scalar Int32
+scalar Int64
+scalar Map
+scalar Metadata
+scalar DraftStatus
+scalar ChangeStrategy
+scalar TransactionDirection
+
+type Xpub {
+    CreatedAt:           Time
+    UpdatedAt:           Time
+    DeletedAt:           NullTime
+    ID:                  String
+    CurrentBalance:      Uint64
+    NextInternalNum:     Uint32
+    NextExternalNum:     Uint32
+    Metadata:            Metadata
+}
+
+type Destination {
+    CreatedAt:     Time
+    UpdatedAt:     Time
+    DeletedAt:     NullTime
+    ID:            String
+    XpubID:        String
+    LockingScript: String
+    Type:          String
+    Chain:         Uint32
+    Num:           Uint32
+    Address:       String
+    DraftID:       String
+    Metadata:      Metadata
+}
+
+type Transaction {
+    CreatedAt:       Time
+    UpdatedAt:       Time
+    DeletedAt:       NullTime
+    ID:              String
+    Hex:             String
+    BlockHash:       String
+    BlockHeight:     Uint64
+    Fee:             Uint64
+    NumberOfInputs:  Uint32
+    NumberOfOutputs: Uint32
+    TotalValue:      Uint64
+    Metadata:        Metadata
+    OutputValue:     Int64
+    Direction:       TransactionDirection
+}
+
+type PaymailP4 {
+    Alias:           String
+    Domain:          String
+    FromPaymail:     String
+    Note:            String
+    PubKey:          String
+    ReceiveEndpoint: String
+    ReferenceID:     String
+    ResolutionType:  String
+}
+
+type OpReturnMap {
+    App:  String
+    Type: String
+    Keys: Map
+}
+
+type OpReturn {
+    Hex:         String
+    HexParts:    [String]
+    StringParts: [String]
+    Map:         OpReturnMap
+}
+
+type TransactionOutput {
+    PaymailP4: PaymailP4
+    Satoshis:  Uint64
+    Scripts:   [ScriptOutput]
+    To:        String
+    OpReturn:  OpReturn
+}
+
+type Utxo {
+    ID:            String
+    TransactionID: String
+    XpubID:        String
+    OutputIndex:   Uint32
+    Satoshis:      Uint64
+    ScriptPubKey:  String
+    Type:          String
+    DraftID:       NullString
+    ReservedAt:    NullTime
+    SpendingTxID:  NullString
+}
+
+type DraftTransaction {
+    ID:            String
+    XpubID:        String
+    ExpiresAt:     Time
+    Configuration: TransactionConfig
+    Status:        DraftStatus
+    Hex:           String
+
+}
+
+type TransactionInput {
+    ID:            String
+    TransactionID: String
+    XpubID:        String
+    OutputIndex:   Uint32
+    Satoshis:      Uint64
+    ScriptPubKey:  String
+    Type:          String
+    DraftID:       NullString
+    ReservedAt:    NullTime
+    SpendingTxID:  NullString
+    Destination:   Destination
+}
+
+type FeeUnit {
+    Satoshis: Int
+    Bytes:    Int
+}
+
+type TransactionConfig {
+    ChangeDestinations:         [Destination]
+    ChangeSatoshis:             Uint64
+    ChangeDestinationsStrategy: ChangeStrategy
+    ChangeNumberOfDestinations: Int
+    ChangeMinimumSatoshis:      Uint64
+    FeeUnit:                    FeeUnit
+    Fee:                        Uint64
+    Inputs:                     [TransactionInput]
+    Outputs:                    [TransactionOutput]
+}
+
+type ScriptOutput {
+    Address:  String
+    Satoshis: Uint64
+    Script:   String
+}
+
+input OpReturnMapInput {
+    App:  String
+    Type: String
+    Keys: Map
+}
+
+input OpReturnInput {
+    Hex:         String
+    HexParts:    [String]
+    StringParts: [String]
+    Map:         OpReturnMapInput
+}
+
+input TransactionOutputInput {
+    To:       String
+    OpReturn: OpReturnInput
+    Satoshis: Uint64
+}
+
+input UtxoPointer {
+    TransactionID: String
+    OutputIndex:   Uint32
+}
+
+input TransactionConfigInput {
+    Outputs:                    [TransactionOutputInput]
+    SendAllTo:                  String
+    FromUtxos:                  [UtxoPointer]
+    ChangeDestinationsStrategy: ChangeStrategy
+    ChangeNumberOfDestinations: Int
+    ChangeMinimumSatoshis:      Uint64
+}
+
+type Query {
+    xpub: Xpub
+    transaction(
+        txId: String!
+    ): Transaction
+    transactions(
+        metadata: Metadata
+        conditions: Map
+    ): [Transaction]
+    destination(
+        lockingScript: String!
+    ): Destination
+    destinations(
+        metadata: Metadata
+    ): [Destination]
+}
+
+type Mutation {
+    xpub(
+        xpub: String!,
+        metadata: Map
+    ): Xpub
+    transaction(
+        hex: String!,
+        draftID: String,
+        metadata: Map
+    ): Transaction
+    newTransaction(
+        transactionConfig: TransactionConfigInput!,
+        metadata: Map
+    ): DraftTransaction
+    destination(
+        destinationType: String,
+        metadata: Map
+    ): Destination
+}

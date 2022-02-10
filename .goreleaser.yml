@@ -43,7 +43,7 @@ announce:
   # See more at: https://goreleaser.com/customization/announce/#slack
   slack:
     enabled: true
-    message_template: '{{ .ProjectName }} {{ .Tag }} is out! Changelog: https://github.com/mrz1836/{{ .ProjectName }}/releases/tag/{{ .Tag }}'
+    message_template: '{{ .ProjectName }} {{ .Tag }} is out! Changelog: https://github.com/BuxOrg/{{ .ProjectName }}/releases/tag/{{ .Tag }}'
     channel: '#test_slack'
     # username: ''
     # icon_emoji: ''
@@ -73,6 +73,6 @@ announce:
     # Username for your Reddit account
     username: ""
     # Defaults to `{{ .GitURL }}/releases/tag/{{ .Tag }}`
-    # url_template: 'https://github.com/mrz1836/{{ .ProjectName }}/releases/tag/{{ .Tag }}'
+    # url_template: 'https://github.com/BuxOrg/{{ .ProjectName }}/releases/tag/{{ .Tag }}'
     # Defaults to `{{ .ProjectName }} {{ .Tag }} is out!`
     title_template: '{{ .ProjectName }} {{ .Tag }} is out!'

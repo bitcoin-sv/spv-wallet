@@ -1,23 +1,22 @@
-# go-template
-> Robust starter template for a new Go library
+# bux-server
+> Complete stand-alone server using the BUX engine (UTXOs, xPubs, Paymail & More!)
 
-[![Release](https://img.shields.io/github/release-pre/mrz1836/go-template.svg?logo=github&style=flat&v=1)](https://github.com/mrz1836/go-template/releases)
-[![Build Status](https://img.shields.io/github/workflow/status/mrz1836/go-template/run-go-tests?logo=github&v=1)](https://github.com/mrz1836/go-template/actions)
-[![Report](https://goreportcard.com/badge/github.com/mrz1836/go-template?style=flat&v=1)](https://goreportcard.com/report/github.com/mrz1836/go-template)
-[![codecov](https://codecov.io/gh/mrz1836/go-template/branch/master/graph/badge.svg?v=1)](https://codecov.io/gh/mrz1836/go-template)
-[![Mergify Status](https://img.shields.io/endpoint.svg?url=https://gh.mergify.io/badges/mrz1836/go-template&style=flat&v=1)](https://mergify.io)
-[![Go](https://img.shields.io/github/go-mod/go-version/mrz1836/go-template?v=1)](https://golang.org/)
+[![Release](https://img.shields.io/github/release-pre/BuxOrg/bux-server.svg?logo=github&style=flat&v=1)](https://github.com/BuxOrg/bux-server/releases)
+[![Build Status](https://img.shields.io/github/workflow/status/BuxOrg/bux-server/run-go-tests?logo=github&v=1)](https://github.com/BuxOrg/bux-server/actions)
+[![Report](https://goreportcard.com/badge/github.com/BuxOrg/bux-server?style=flat&v=1)](https://goreportcard.com/report/github.com/BuxOrg/bux-server)
+[![codecov](https://codecov.io/gh/BuxOrg/bux-server/branch/master/graph/badge.svg?v=1)](https://codecov.io/gh/BuxOrg/bux-server)
+[![Mergify Status](https://img.shields.io/endpoint.svg?url=https://gh.mergify.io/badges/BuxOrg/bux-server&style=flat&v=1)](https://mergify.io)
+[![Go](https://img.shields.io/github/go-mod/go-version/BuxOrg/bux-server?v=1)](https://golang.org/)
 <br>
-[![Gitpod Ready-to-Code](https://img.shields.io/badge/Gitpod-ready--to--code-blue?logo=gitpod)](https://gitpod.io/#https://github.com/mrz1836/go-template)
+[![Gitpod Ready-to-Code](https://img.shields.io/badge/Gitpod-ready--to--code-blue?logo=gitpod)](https://gitpod.io/#https://github.com/BuxOrg/bux-server)
 [![standard-readme compliant](https://img.shields.io/badge/readme%20style-standard-brightgreen.svg?style=flat)](https://github.com/RichardLitt/standard-readme)
 [![Makefile Included](https://img.shields.io/badge/Makefile-Supported%20-brightgreen?=flat&logo=probot)](Makefile)
-[![Sponsor](https://img.shields.io/badge/sponsor-mrz1836-181717.svg?logo=github&style=flat&v=1)](https://github.com/sponsors/mrz1836)
-[![Donate](https://img.shields.io/badge/donate-bitcoin-ff9900.svg?logo=bitcoin&style=flat&v=1)](https://gobitcoinsv.com/#sponsor?utm_source=github&utm_medium=sponsor-link&utm_campaign=go-template&utm_term=go-template&utm_content=go-template)
+[![Sponsor](https://img.shields.io/badge/sponsor-mrz1836-181717.svg?logo=github&style=flat&v=1)](https://github.com/sponsors/BuxOrg)
+[![Donate](https://img.shields.io/badge/donate-bitcoin-ff9900.svg?logo=bitcoin&style=flat&v=1)](https://gobitcoinsv.com/#sponsor?utm_source=github&utm_medium=sponsor-link&utm_campaign=bux-server&utm_term=bux-server&utm_content=bux-server)
 
 <br/>
 
 ## Table of Contents
-- [About](#about)
 - [Installation](#installation)
 - [Documentation](#documentation)
 - [Examples & Tests](#examples--tests)
@@ -29,60 +28,19 @@
 
 <br/>
 
-## About
-This is a GitHub repository starter template for a Go library. It has been created for anyone who wants to:
-
-- Quickly get into Go without losing too much time on environment setup
-- Create a new repository with basic Continuous Integration
-- Cheat codes for all the popular Go patterns
-- **[See: All 15+ Repository Features](#documentation)**
-
-<br/>
-
 ## Installation
 
-**go-template** requires a [supported release of Go](https://golang.org/doc/devel/release.html#policy).
+**bux-server** requires a [supported release of Go](https://golang.org/doc/devel/release.html#policy).
 ```shell script
-go get -u github.com/mrz1836/go-template
+go get -u github.com/BuxOrg/bux-server
 ```
 
 <br/>
 
-<!-- remove-this-section:start -->
-
-#### Template Instructions (Temporary Section)
-1. Sign up on [Codecov](https://codecov.io/) and configure [Codecov GitHub Application](https://github.com/apps/codecov) for all repositories
-2. Click the `Use this template` button (alt. clone or download this repository)
-3. Replace all occurrences of `mrz1836/go-template` to `your_org/repo_name` in all files
-4. Replace all occurrences of `go-template` to `repo_name` in all files
-5. Replace all occurrences of `mrz1836` to `repo_owner` in all files
-6. Remove or update the [`go-share-image.png`](.github/IMAGES/go-share-image.png) and add to your Github repo (in settings)
-7. Update the following files:
-    - [LICENSE](LICENSE)
-    - [README.md](README.md)
-    - [SECURITY.md](.github/SECURITY.md)
-
-#### (Optional) Slack Message on New Release
-1. Create a new [Incoming Webhook](https://api.slack.com/messaging/webhooks)
-2. Set an environment variable in Github: `SLACK_WEBHOOK`
-
-#### (Optional) Discord, Twitter or Reddit on New Release
-Follow the instructions on [GoReleaser's documentation](https://goreleaser.com/customization/announce/#discord)
-
-#### (Optional) Set up: All Contributors Integration
-1. Follow these [instructions](https://allcontributors.org/docs/en/bot/installation)
-2. Install the local CLI: `make install-all-contributors`
-3. Modify the [.all-contributorsrc](.all-contributorsrc) file
-4. Run `make update-contributors` to update the list of contributors
-
-<br/>
-
-<!-- remove-this-section:end -->
-
 ## Documentation
-View the generated [documentation](https://pkg.go.dev/github.com/mrz1836/go-template)
+View the generated [documentation](https://pkg.go.dev/github.com/BuxOrg/bux-server)
 
-[![GoDoc](https://godoc.org/github.com/mrz1836/go-template?status.svg&style=flat&v=1)](https://pkg.go.dev/github.com/mrz1836/go-template)
+[![GoDoc](https://godoc.org/github.com/BuxOrg/bux-server?status.svg&style=flat&v=1)](https://pkg.go.dev/github.com/BuxOrg/bux-server)
 
 <br/>
 
@@ -172,6 +130,7 @@ coverage                      Shows the test coverage
 diff                          Show the git diff
 generate                      Runs the go generate command in the base of the repo
 godocs                        Sync the latest tag with GoDocs
+graphql                       Generates the graphql schemas
 help                          Show this help message
 install                       Install the application
 install-all-contributors      Installs all contributors locally
@@ -203,8 +162,8 @@ vet                           Run the Go vet application
 <br/>
 
 ## Examples & Tests
-All unit tests and [examples](examples) run via [Github Actions](https://github.com/mrz1836/go-template/actions) and
-uses [Go version 1.16.x](https://golang.org/doc/go1.16). View the [configuration file](.github/workflows/run-tests.yml).
+All unit tests and [examples](examples) run via [Github Actions](https://github.com/BuxOrg/bux-server/actions) and
+uses [Go version 1.17.x](https://golang.org/doc/go1.17). View the [configuration file](.github/workflows/run-tests.yml).
 
 <br/>
 
@@ -248,10 +207,10 @@ View the [contributing guidelines](.github/CONTRIBUTING.md) and follow the [code
 ### How can I help?
 All kinds of contributions are welcome :raised_hands:!
 The most basic way to show your support is to star :star2: the project, or to raise issues :speech_balloon:.
-You can also support this project by [becoming a sponsor on GitHub](https://github.com/sponsors/mrz1836) :clap:
-or by making a [**bitcoin donation**](https://gobitcoinsv.com/#sponsor?utm_source=github&utm_medium=sponsor-link&utm_campaign=go-template&utm_term=go-template&utm_content=go-template) to ensure this journey continues indefinitely! :rocket:
-
-[![Stars](https://img.shields.io/github/stars/mrz1836/go-template?label=Please%20like%20us&style=social)](https://github.com/mrz1836/go-template/stargazers)
+You can also support this project by [becoming a sponsor on GitHub](https://github.com/sponsors/BuxOrg) :clap:
+or by making a [**bitcoin donation**](https://gobitcoinsv.com/#sponsor?utm_source=github&utm_medium=sponsor-link&utm_campaign=bux-server&utm_term=bux-server&utm_content=bux-server) to ensure this journey continues indefinitely! :rocket:
+                                             
+[![Stars](https://img.shields.io/github/stars/BuxOrg/bux-server?label=Please%20like%20us&style=social)](https://github.com/BuxOrg/bux-server/stargazers)
 
 <br/>
 
@@ -263,7 +222,9 @@ Thank you to these wonderful people ([emoji key](https://allcontributors.org/doc
 <!-- markdownlint-disable -->
 <table>
   <tr>
-    <td align="center"><a href="https://mrz1818.com"><img src="https://avatars.githubusercontent.com/u/3743002?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Mr. Z</b></sub></a><br /><a href="#infra-mrz1836" title="Infrastructure (Hosting, Build-Tools, etc)">🚇</a> <a href="https://github.com/mrz1836/go-template/commits?author=mrz1836" title="Code">💻</a> <a href="#maintenance-mrz1836" title="Maintenance">🚧</a> <a href="#security-mrz1836" title="Security">🛡️</a></td>
+    <td align="center"><a href="https://mrz1818.com"><img src="https://avatars.githubusercontent.com/u/3743002?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Mr. Z</b></sub></a><br /><a href="#infra-mrz1836" title="Infrastructure (Hosting, Build-Tools, etc)">🚇</a> <a href="https://github.com/BuxOrg/bux-server/commits?author=mrz1836" title="Code">💻</a> <a href="#maintenance-mrz1836" title="Maintenance">🚧</a> <a href="#security-mrz1836" title="Security">🛡️</a></td>
+    <td align="center"><a href="https://github.com/icellan"><img src="https://avatars.githubusercontent.com/u/4411176?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Siggi</b></sub></a><br /><a href="#infra-icellan" title="Infrastructure (Hosting, Build-Tools, etc)">🚇</a> <a href="https://github.com/BuxOrg/bux-server/commits?author=icellan" title="Code">💻</a> <a href="#security-icellan" title="Security">🛡️</a></td>
+    <td align="center"><a href="https://github.com/galt-tr"><img src="https://avatars.githubusercontent.com/u/64976002?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Dylan</b></sub></a><br /><a href="#infra-galt-tr" title="Infrastructure (Hosting, Build-Tools, etc)">🚇</a> <a href="https://github.com/BuxOrg/bux-server/commits?author=galt-tr" title="Code">💻</a></td>
   </tr>
 </table>
 
@@ -278,4 +239,4 @@ Thank you to these wonderful people ([emoji key](https://allcontributors.org/doc
 
 ## License
 
-[![License](https://img.shields.io/github/license/mrz1836/go-template.svg?style=flat&v=1)](LICENSE)
+[![License](https://img.shields.io/github/license/BuxOrg/bux-server.svg?style=flat&v=1)](LICENSE)

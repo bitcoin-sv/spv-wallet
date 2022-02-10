@@ -1,6 +1,6 @@
 {
-  "projectName": "go-template",
-  "projectOwner": "mrz1836",
+  "projectName": "bux-server",
+  "projectOwner": "BuxOrg",
   "repoType": "github",
   "repoHost": "https://github.com",
   "files": [
@@ -23,6 +23,27 @@
           "maintenance",
           "security"
         ]
+      },
+      {
+        "login": "icellan",
+        "name": "Siggi",
+        "avatar_url": "https://avatars.githubusercontent.com/u/4411176?v=4",
+        "profile": "https://github.com/icellan",
+        "contributions": [
+            "infra",
+            "code",
+            "security"
+        ]
+      },
+      {
+          "login": "galt-tr",
+          "name": "Dylan",
+          "avatar_url": "https://avatars.githubusercontent.com/u/64976002?v=4",
+          "profile": "https://github.com/galt-tr",
+          "contributions": [
+              "infra",
+              "code"
+          ]
       }
     ]
 }

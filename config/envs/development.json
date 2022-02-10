@@ -1,0 +1,90 @@
+{
+  "debug": true,
+  "debug_profiling": false,
+  "disable_itc": false,
+  "environment": "development",
+  "gdpr_compliance": false,
+  "authentication": {
+    "admin_key": "1234567",
+    "require_signing": false,
+    "scheme": "xpub",
+    "signing_disabled": false
+  },
+  "cache": {
+    "engine": "redis"
+  },
+  "datastore": {
+    "auto_migrate": true,
+    "engine": "sqlite",
+    "debug": true,
+    "table_prefix": "bux"
+  },
+  "graphql": {
+    "debug": true,
+    "enabled": true,
+    "server_path": "/graphql",
+    "playground_path": "/graphiql",
+    "require_signing": false
+  },
+  "mongodb": {
+    "database_name": "bux",
+    "transactions": false,
+    "uri": "mongodb://localhost:27017/bux"
+  },
+  "new_relic": {
+    "domain_name": "domain.com",
+    "enabled": false,
+    "license_key": "BOGUS-LICENSE-KEY-1234567890987654321234"
+  },
+  "paymail": {
+    "enabled": true,
+    "default_from_paymail": "from@domain.com",
+    "default_note": "bux Address Resolution",
+    "domains": [
+      "localhost"
+    ],
+    "sender_validation_enabled": false
+  },
+  "redis": {
+    "dependency_mode": true,
+    "max_active_connections": 0,
+    "max_connection_lifetime": "60s",
+    "max_idle_connections": 10,
+    "max_idle_timeout": "10s",
+    "url": "redis://localhost:6379",
+    "use_tls": false
+  },
+  "ristretto": {
+    "buffer_items": 64,
+    "ignore_internal_cost": false,
+    "max_cost": 1073741824,
+    "metrics": false,
+    "num_counters": 1e7
+  },
+  "server": {
+    "idle_timeout": "60s",
+    "port": "3003",
+    "read_timeout": "15s",
+    "write_timeout": "15s"
+  },
+  "sql": {
+    "host": "localhost",
+    "name": "bux",
+    "password": "",
+    "port": "3306",
+    "replica": false,
+    "skip_initialize_with_version": true,
+    "time_zone": "UTC",
+    "tx_timeout": "10s",
+    "user": "root"
+  },
+  "sqlite": {
+    "database_path": "",
+    "shared": true
+  },
+  "task_manager": {
+    "engine": "taskq",
+    "factory": "memory",
+    "queue_name": "development_queue"
+  }
+}

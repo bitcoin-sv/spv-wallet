@@ -1,0 +1,91 @@
+{
+  "debug": false,
+  "debug_profiling": false,
+  "disable_itc": false,
+  "environment": "production",
+  "gdpr_compliance": false,
+  "authentication": {
+    "admin_key": "1234567",
+    "require_signing": true,
+    "scheme": "xpub",
+    "signing_disabled": false
+  },
+  "cache": {
+    "engine": "redis"
+  },
+  "datastore": {
+    "auto_migrate": false,
+    "engine": "sqlite",
+    "debug": true,
+    "table_prefix": "bux"
+  },
+  "graphql": {
+    "debug": false,
+    "enabled": false,
+    "server_path": "/graphql",
+    "playground_path": "/graphiql",
+    "require_signing": false
+  },
+  "mongodb": {
+    "database_name": "bux",
+    "transactions": false,
+    "uri": "mongodb://localhost:27017/bux"
+  },
+  "new_relic": {
+    "domain_name": "domain.com",
+    "enabled": true,
+    "license_key": "BOGUS-LICENSE-KEY-1234567890987654321234"
+  },
+  "paymail": {
+    "enabled": false,
+    "default_from_paymail": "from@domain.com",
+    "default_note": "bux Address Resolution",
+    "domains": [
+      "localhost"
+    ],
+    "sender_validation_enabled": false
+  },
+  "redis": {
+    "dependency_mode": true,
+    "max_active_connections": 0,
+    "max_connection_idle_time": "360s",
+    "max_connection_lifetime": "20s",
+    "max_idle_connections": 5,
+    "max_idle_timeout": "20s",
+    "url": "redis://buxcache.production.tonicpow.com:6379",
+    "use_tls": false
+  },
+  "ristretto": {
+    "buffer_items": 64,
+    "ignore_internal_cost": false,
+    "max_cost": 1073741824,
+    "metrics": false,
+    "num_counters": 1e7
+  },
+  "server": {
+    "idle_timeout": "60s",
+    "port": "3003",
+    "read_timeout": "15s",
+    "write_timeout": "15s"
+  },
+  "sql": {
+    "host": "localhost",
+    "name": "bux",
+    "password": "",
+    "port": "3306",
+    "replica": false,
+    "skip_initialize_with_version": true,
+    "time_zone": "UTC",
+    "tx_timeout": "10s",
+    "user": "root"
+  },
+  "sqlite": {
+    "database_path": "",
+    "shared": true
+  },
+  "task_manager": {
+    "engine": "taskq",
+    "factory": "memory",
+    "queue_name": "production_queue"
+  }
+}
