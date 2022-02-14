@@ -9,7 +9,7 @@ import (
 	apirouter "github.com/mrz1836/go-api-router"
 )
 
-// list will fetch a list of destinations
+// list will fetch a list of transactions
 func (a *Action) list(w http.ResponseWriter, req *http.Request, _ httprouter.Params) {
 
 	reqXPub, _ := bux.GetXpubFromRequest(req)
