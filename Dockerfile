@@ -1,5 +1,5 @@
 # Get Golang
-FROM golang:1.17.6-alpine
+FROM golang:1.17.7-alpine
 
 # Version
 LABEL version="1.0" name="BuxServer"
