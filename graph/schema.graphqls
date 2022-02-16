@@ -19,184 +19,186 @@ scalar ChangeStrategy
 scalar TransactionDirection
 
 type Xpub {
-    CreatedAt:           Time
-    UpdatedAt:           Time
-    DeletedAt:           NullTime
-    ID:                  String
-    CurrentBalance:      Uint64
-    NextInternalNum:     Uint32
-    NextExternalNum:     Uint32
-    Metadata:            Metadata
+    created_at:        Time
+    updated_at:        Time
+    deleted_at:        NullTime
+    id:                String
+    current_balance:   Uint64
+    next_internal_num: Uint32
+    next_external_num: Uint32
+    metadata:          Metadata
 }
 
 type Destination {
-    CreatedAt:     Time
-    UpdatedAt:     Time
-    DeletedAt:     NullTime
-    ID:            String
-    XpubID:        String
-    LockingScript: String
-    Type:          String
-    Chain:         Uint32
-    Num:           Uint32
-    Address:       String
-    DraftID:       String
-    Metadata:      Metadata
+    created_at:     Time
+    updated_at:     Time
+    deleted_at:     NullTime
+    id:             String
+    xpub_id:        String
+    locking_script: String
+    type:           String
+    chain:          Uint32
+    num:            Uint32
+    address:        String
+    draft_id:       String
+    metadata:       Metadata
 }
 
 type Transaction {
-    CreatedAt:       Time
-    UpdatedAt:       Time
-    DeletedAt:       NullTime
-    ID:              String
-    Hex:             String
-    BlockHash:       String
-    BlockHeight:     Uint64
-    Fee:             Uint64
-    NumberOfInputs:  Uint32
-    NumberOfOutputs: Uint32
-    TotalValue:      Uint64
-    Metadata:        Metadata
-    OutputValue:     Int64
-    Direction:       TransactionDirection
+    created_at:        Time
+    updated_at:        Time
+    deleted_at:        NullTime
+    id:                String
+    hex:               String
+    block_hash:        String
+    block_height:      Uint64
+    fee:               Uint64
+    number_of_inputs:  Uint32
+    number_of_outputs: Uint32
+    total_value:       Uint64
+    metadata:          Metadata
+    output_value:      Int64
+    direction:         TransactionDirection
 }
 
 type PaymailP4 {
-    Alias:           String
-    Domain:          String
-    FromPaymail:     String
-    Note:            String
-    PubKey:          String
-    ReceiveEndpoint: String
-    ReferenceID:     String
-    ResolutionType:  String
+    alias:            String
+    domain:           String
+    from_paymail:     String
+    note:             String
+    pub_key:          String
+    receive_endpoint: String
+    reference_id:     String
+    resolution_type:  String
 }
 
 type OpReturnMap {
-    App:  String
-    Type: String
-    Keys: Map
+    app:  String
+    type: String
+    keys: Map
 }
 
 type OpReturn {
-    Hex:         String
-    HexParts:    [String]
-    StringParts: [String]
-    Map:         OpReturnMap
+    hex:          String
+    hex_parts:    [String]
+    string_parts: [String]
+    map:          OpReturnMap
 }
 
 type TransactionOutput {
-    PaymailP4: PaymailP4
-    Satoshis:  Uint64
-    Scripts:   [ScriptOutput]
-    To:        String
-    OpReturn:  OpReturn
+    paymail_p4: PaymailP4
+    satoshis:   Uint64
+    scripts:    [ScriptOutput]
+    to:         String
+    op_return:  OpReturn
 }
 
 type Utxo {
-    ID:            String
-    TransactionID: String
-    XpubID:        String
-    OutputIndex:   Uint32
-    Satoshis:      Uint64
-    ScriptPubKey:  String
-    Type:          String
-    DraftID:       NullString
-    ReservedAt:    NullTime
-    SpendingTxID:  NullString
+    id:             String
+    transaction_id: String
+    xpub_id:        String
+    output_index:   Uint32
+    satoshis:       Uint64
+    script_pub_key: String
+    type:           String
+    draft_id:       NullString
+    reserved_at:    NullTime
+    spending_tx_id: NullString
+    metadata:       Metadata
 }
 
 type DraftTransaction {
-    ID:            String
-    XpubID:        String
-    ExpiresAt:     Time
-    Configuration: TransactionConfig
-    Status:        DraftStatus
-    Hex:           String
+    id:            String
+    xpub_id:       String
+    expires_at:    Time
+    configuration: TransactionConfig
+    status:        DraftStatus
+    hex:           String
+    metadata:      Metadata
 
 }
 
 type TransactionInput {
-    ID:            String
-    TransactionID: String
-    XpubID:        String
-    OutputIndex:   Uint32
-    Satoshis:      Uint64
-    ScriptPubKey:  String
-    Type:          String
-    DraftID:       NullString
-    ReservedAt:    NullTime
-    SpendingTxID:  NullString
-    Destination:   Destination
+    id:             String
+    transaction_id: String
+    xpub_id:        String
+    output_index:   Uint32
+    satoshis:       Uint64
+    script_pub_key: String
+    type:           String
+    draft_id:       NullString
+    reserved_at:    NullTime
+    spending_tx_id: NullString
+    destination:    Destination
 }
 
 type FeeUnit {
-    Satoshis: Int
-    Bytes:    Int
+    satoshis: Int
+    bytes:    Int
 }
 
 type TransactionConfig {
-    ChangeDestinations:         [Destination]
-    ChangeSatoshis:             Uint64
-    ChangeDestinationsStrategy: ChangeStrategy
-    ChangeNumberOfDestinations: Int
-    ChangeMinimumSatoshis:      Uint64
-    FeeUnit:                    FeeUnit
-    Fee:                        Uint64
-    Inputs:                     [TransactionInput]
-    Outputs:                    [TransactionOutput]
+    change_destinations:           [Destination]
+    change_satoshis:               Uint64
+    change_destinations_strategy:  ChangeStrategy
+    change_number_of_destinations: Int
+    change_minimum_satoshis:       Uint64
+    fee_unit:                      FeeUnit
+    fee:                           Uint64
+    inputs:                        [TransactionInput]
+    outputs:                       [TransactionOutput]
 }
 
 type ScriptOutput {
-    Address:  String
-    Satoshis: Uint64
-    Script:   String
+    address:  String
+    satoshis: Uint64
+    script:   String
 }
 
 input OpReturnMapInput {
-    App:  String
-    Type: String
-    Keys: Map
+    app:  String
+    type: String
+    keys: Map
 }
 
 input OpReturnInput {
-    Hex:         String
-    HexParts:    [String]
-    StringParts: [String]
-    Map:         OpReturnMapInput
+    hex:          String
+    hex_parts:    [String]
+    string_parts: [String]
+    map:          OpReturnMapInput
 }
 
 input TransactionOutputInput {
-    To:       String
-    OpReturn: OpReturnInput
-    Satoshis: Uint64
+    to:        String
+    op_return: OpReturnInput
+    satoshis:  Uint64
 }
 
 input UtxoPointer {
-    TransactionID: String
-    OutputIndex:   Uint32
+    transaction_id: String
+    output_index:   Uint32
 }
 
 input TransactionConfigInput {
-    Outputs:                    [TransactionOutputInput]
-    SendAllTo:                  String
-    FromUtxos:                  [UtxoPointer]
-    ChangeDestinationsStrategy: ChangeStrategy
-    ChangeNumberOfDestinations: Int
-    ChangeMinimumSatoshis:      Uint64
+    outputs:                       [TransactionOutputInput]
+    send_all_to:                   String
+    from_utxos:                    [UtxoPointer]
+    change_destinations_strategy:  ChangeStrategy
+    change_number_of_destinations: Int
+    change_minimum_satoshis:       Uint64
 }
 
 type Query {
     xpub: Xpub
     transaction(
-        txId: String!
+        tx_id: String!
     ): Transaction
     transactions(
         metadata: Metadata
         conditions: Map
     ): [Transaction]
     destination(
-        lockingScript: String!
+        locking_script: String!
     ): Destination
     destinations(
         metadata: Metadata
@@ -210,15 +212,15 @@ type Mutation {
     ): Xpub
     transaction(
         hex: String!,
-        draftID: String,
+        draft_id: String,
         metadata: Map
     ): Transaction
-    newTransaction(
-        transactionConfig: TransactionConfigInput!,
+    new_transaction(
+        transaction_config: TransactionConfigInput!,
         metadata: Map
     ): DraftTransaction
     destination(
-        destinationType: String,
+        destination_type: String,
         metadata: Map
     ): Destination
 }

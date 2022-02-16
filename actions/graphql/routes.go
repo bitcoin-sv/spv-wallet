@@ -18,6 +18,13 @@ import (
 	"github.com/mrz1836/go-logger"
 )
 
+const (
+	allowCredentialsHeader string = "Access-Control-Allow-Credentials"
+	allowHeadersHeader     string = "Access-Control-Allow-Headers"
+	allowMethodsHeader     string = "Access-Control-Allow-Methods"
+	allowOriginHeader      string = "Access-Control-Allow-Origin"
+)
+
 // RegisterRoutes register all the package specific routes
 func RegisterRoutes(router *apirouter.Router, appConfig *config.AppConfig, services *config.AppServices) {
 
@@ -82,10 +89,10 @@ func wrapHandler(router *apirouter.Router, appConfig *config.AppConfig, services
 	h http.Handler, withAuth bool) httprouter.Handle {
 	return func(w http.ResponseWriter, req *http.Request, ps httprouter.Params) {
 
-		// needs to come from a central location
-		w.Header().Set("Access-Control-Allow-Credentials", fmt.Sprintf("%t", router.CrossOriginAllowCredentials))
-		w.Header().Set("Access-Control-Allow-Methods", router.CrossOriginAllowMethods)
-		w.Header().Set("Access-Control-Allow-Headers", router.CrossOriginAllowHeaders)
+		w.Header().Set(allowCredentialsHeader, fmt.Sprintf("%t", router.CrossOriginAllowCredentials))
+		w.Header().Set(allowMethodsHeader, router.CrossOriginAllowMethods)
+		w.Header().Set(allowHeadersHeader, router.CrossOriginAllowHeaders)
+		w.Header().Set(allowOriginHeader, router.CrossOriginAllowOrigin)
 
 		if withAuth {
 			var knownErr dictionary.ErrorMessage

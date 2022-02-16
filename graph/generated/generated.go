@@ -65,6 +65,7 @@ type ComplexityRoot struct {
 		ExpiresAt     func(childComplexity int) int
 		Hex           func(childComplexity int) int
 		ID            func(childComplexity int) int
+		Metadata      func(childComplexity int) int
 		Status        func(childComplexity int) int
 		XpubID        func(childComplexity int) int
 	}
@@ -173,6 +174,7 @@ type ComplexityRoot struct {
 	Utxo struct {
 		DraftID       func(childComplexity int) int
 		ID            func(childComplexity int) int
+		Metadata      func(childComplexity int) int
 		OutputIndex   func(childComplexity int) int
 		ReservedAt    func(childComplexity int) int
 		Satoshis      func(childComplexity int) int
@@ -224,140 +226,147 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 	_ = ec
 	switch typeName + "." + field {
 
-	case "Destination.Address":
+	case "Destination.address":
 		if e.complexity.Destination.Address == nil {
 			break
 		}
 
 		return e.complexity.Destination.Address(childComplexity), true
 
-	case "Destination.Chain":
+	case "Destination.chain":
 		if e.complexity.Destination.Chain == nil {
 			break
 		}
 
 		return e.complexity.Destination.Chain(childComplexity), true
 
-	case "Destination.CreatedAt":
+	case "Destination.created_at":
 		if e.complexity.Destination.CreatedAt == nil {
 			break
 		}
 
 		return e.complexity.Destination.CreatedAt(childComplexity), true
 
-	case "Destination.DeletedAt":
+	case "Destination.deleted_at":
 		if e.complexity.Destination.DeletedAt == nil {
 			break
 		}
 
 		return e.complexity.Destination.DeletedAt(childComplexity), true
 
-	case "Destination.DraftID":
+	case "Destination.draft_id":
 		if e.complexity.Destination.DraftID == nil {
 			break
 		}
 
 		return e.complexity.Destination.DraftID(childComplexity), true
 
-	case "Destination.ID":
+	case "Destination.id":
 		if e.complexity.Destination.ID == nil {
 			break
 		}
 
 		return e.complexity.Destination.ID(childComplexity), true
 
-	case "Destination.LockingScript":
+	case "Destination.locking_script":
 		if e.complexity.Destination.LockingScript == nil {
 			break
 		}
 
 		return e.complexity.Destination.LockingScript(childComplexity), true
 
-	case "Destination.Metadata":
+	case "Destination.metadata":
 		if e.complexity.Destination.Metadata == nil {
 			break
 		}
 
 		return e.complexity.Destination.Metadata(childComplexity), true
 
-	case "Destination.Num":
+	case "Destination.num":
 		if e.complexity.Destination.Num == nil {
 			break
 		}
 
 		return e.complexity.Destination.Num(childComplexity), true
 
-	case "Destination.Type":
+	case "Destination.type":
 		if e.complexity.Destination.Type == nil {
 			break
 		}
 
 		return e.complexity.Destination.Type(childComplexity), true
 
-	case "Destination.UpdatedAt":
+	case "Destination.updated_at":
 		if e.complexity.Destination.UpdatedAt == nil {
 			break
 		}
 
 		return e.complexity.Destination.UpdatedAt(childComplexity), true
 
-	case "Destination.XpubID":
+	case "Destination.xpub_id":
 		if e.complexity.Destination.XpubID == nil {
 			break
 		}
 
 		return e.complexity.Destination.XpubID(childComplexity), true
 
-	case "DraftTransaction.Configuration":
+	case "DraftTransaction.configuration":
 		if e.complexity.DraftTransaction.Configuration == nil {
 			break
 		}
 
 		return e.complexity.DraftTransaction.Configuration(childComplexity), true
 
-	case "DraftTransaction.ExpiresAt":
+	case "DraftTransaction.expires_at":
 		if e.complexity.DraftTransaction.ExpiresAt == nil {
 			break
 		}
 
 		return e.complexity.DraftTransaction.ExpiresAt(childComplexity), true
 
-	case "DraftTransaction.Hex":
+	case "DraftTransaction.hex":
 		if e.complexity.DraftTransaction.Hex == nil {
 			break
 		}
 
 		return e.complexity.DraftTransaction.Hex(childComplexity), true
 
-	case "DraftTransaction.ID":
+	case "DraftTransaction.id":
 		if e.complexity.DraftTransaction.ID == nil {
 			break
 		}
 
 		return e.complexity.DraftTransaction.ID(childComplexity), true
 
-	case "DraftTransaction.Status":
+	case "DraftTransaction.metadata":
+		if e.complexity.DraftTransaction.Metadata == nil {
+			break
+		}
+
+		return e.complexity.DraftTransaction.Metadata(childComplexity), true
+
+	case "DraftTransaction.status":
 		if e.complexity.DraftTransaction.Status == nil {
 			break
 		}
 
 		return e.complexity.DraftTransaction.Status(childComplexity), true
 
-	case "DraftTransaction.XpubID":
+	case "DraftTransaction.xpub_id":
 		if e.complexity.DraftTransaction.XpubID == nil {
 			break
 		}
 
 		return e.complexity.DraftTransaction.XpubID(childComplexity), true
 
-	case "FeeUnit.Bytes":
+	case "FeeUnit.bytes":
 		if e.complexity.FeeUnit.Bytes == nil {
 			break
 		}
 
 		return e.complexity.FeeUnit.Bytes(childComplexity), true
 
-	case "FeeUnit.Satoshis":
+	case "FeeUnit.satoshis":
 		if e.complexity.FeeUnit.Satoshis == nil {
 			break
 		}
@@ -374,19 +383,19 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.Mutation.Destination(childComplexity, args["destinationType"].(*string), args["metadata"].(map[string]interface{})), true
+		return e.complexity.Mutation.Destination(childComplexity, args["destination_type"].(*string), args["metadata"].(map[string]interface{})), true
 
-	case "Mutation.newTransaction":
+	case "Mutation.new_transaction":
 		if e.complexity.Mutation.NewTransaction == nil {
 			break
 		}
 
-		args, err := ec.field_Mutation_newTransaction_args(context.TODO(), rawArgs)
+		args, err := ec.field_Mutation_new_transaction_args(context.TODO(), rawArgs)
 		if err != nil {
 			return 0, false
 		}
 
-		return e.complexity.Mutation.NewTransaction(childComplexity, args["transactionConfig"].(bux.TransactionConfig), args["metadata"].(map[string]interface{})), true
+		return e.complexity.Mutation.NewTransaction(childComplexity, args["transaction_config"].(bux.TransactionConfig), args["metadata"].(map[string]interface{})), true
 
 	case "Mutation.transaction":
 		if e.complexity.Mutation.Transaction == nil {
@@ -398,7 +407,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.Mutation.Transaction(childComplexity, args["hex"].(string), args["draftID"].(*string), args["metadata"].(map[string]interface{})), true
+		return e.complexity.Mutation.Transaction(childComplexity, args["hex"].(string), args["draft_id"].(*string), args["metadata"].(map[string]interface{})), true
 
 	case "Mutation.xpub":
 		if e.complexity.Mutation.Xpub == nil {
@@ -412,105 +421,105 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Mutation.Xpub(childComplexity, args["xpub"].(string), args["metadata"].(map[string]interface{})), true
 
-	case "OpReturn.Hex":
+	case "OpReturn.hex":
 		if e.complexity.OpReturn.Hex == nil {
 			break
 		}
 
 		return e.complexity.OpReturn.Hex(childComplexity), true
 
-	case "OpReturn.HexParts":
+	case "OpReturn.hex_parts":
 		if e.complexity.OpReturn.HexParts == nil {
 			break
 		}
 
 		return e.complexity.OpReturn.HexParts(childComplexity), true
 
-	case "OpReturn.Map":
+	case "OpReturn.map":
 		if e.complexity.OpReturn.Map == nil {
 			break
 		}
 
 		return e.complexity.OpReturn.Map(childComplexity), true
 
-	case "OpReturn.StringParts":
+	case "OpReturn.string_parts":
 		if e.complexity.OpReturn.StringParts == nil {
 			break
 		}
 
 		return e.complexity.OpReturn.StringParts(childComplexity), true
 
-	case "OpReturnMap.App":
+	case "OpReturnMap.app":
 		if e.complexity.OpReturnMap.App == nil {
 			break
 		}
 
 		return e.complexity.OpReturnMap.App(childComplexity), true
 
-	case "OpReturnMap.Keys":
+	case "OpReturnMap.keys":
 		if e.complexity.OpReturnMap.Keys == nil {
 			break
 		}
 
 		return e.complexity.OpReturnMap.Keys(childComplexity), true
 
-	case "OpReturnMap.Type":
+	case "OpReturnMap.type":
 		if e.complexity.OpReturnMap.Type == nil {
 			break
 		}
 
 		return e.complexity.OpReturnMap.Type(childComplexity), true
 
-	case "PaymailP4.Alias":
+	case "PaymailP4.alias":
 		if e.complexity.PaymailP4.Alias == nil {
 			break
 		}
 
 		return e.complexity.PaymailP4.Alias(childComplexity), true
 
-	case "PaymailP4.Domain":
+	case "PaymailP4.domain":
 		if e.complexity.PaymailP4.Domain == nil {
 			break
 		}
 
 		return e.complexity.PaymailP4.Domain(childComplexity), true
 
-	case "PaymailP4.FromPaymail":
+	case "PaymailP4.from_paymail":
 		if e.complexity.PaymailP4.FromPaymail == nil {
 			break
 		}
 
 		return e.complexity.PaymailP4.FromPaymail(childComplexity), true
 
-	case "PaymailP4.Note":
+	case "PaymailP4.note":
 		if e.complexity.PaymailP4.Note == nil {
 			break
 		}
 
 		return e.complexity.PaymailP4.Note(childComplexity), true
 
-	case "PaymailP4.PubKey":
+	case "PaymailP4.pub_key":
 		if e.complexity.PaymailP4.PubKey == nil {
 			break
 		}
 
 		return e.complexity.PaymailP4.PubKey(childComplexity), true
 
-	case "PaymailP4.ReceiveEndpoint":
+	case "PaymailP4.receive_endpoint":
 		if e.complexity.PaymailP4.ReceiveEndpoint == nil {
 			break
 		}
 
 		return e.complexity.PaymailP4.ReceiveEndpoint(childComplexity), true
 
-	case "PaymailP4.ReferenceID":
+	case "PaymailP4.reference_id":
 		if e.complexity.PaymailP4.ReferenceID == nil {
 			break
 		}
 
 		return e.complexity.PaymailP4.ReferenceID(childComplexity), true
 
-	case "PaymailP4.ResolutionType":
+	case "PaymailP4.resolution_type":
 		if e.complexity.PaymailP4.ResolutionType == nil {
 			break
 		}
@@ -527,7 +536,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.Query.Destination(childComplexity, args["lockingScript"].(string)), true
+		return e.complexity.Query.Destination(childComplexity, args["locking_script"].(string)), true
 
 	case "Query.destinations":
 		if e.complexity.Query.Destinations == nil {
@@ -551,7 +560,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.Query.Transaction(childComplexity, args["txId"].(string)), true
+		return e.complexity.Query.Transaction(childComplexity, args["tx_id"].(string)), true
 
 	case "Query.transactions":
 		if e.complexity.Query.Transactions == nil {
@@ -572,420 +581,427 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Query.Xpub(childComplexity), true
 
-	case "ScriptOutput.Address":
+	case "ScriptOutput.address":
 		if e.complexity.ScriptOutput.Address == nil {
 			break
 		}
 
 		return e.complexity.ScriptOutput.Address(childComplexity), true
 
-	case "ScriptOutput.Satoshis":
+	case "ScriptOutput.satoshis":
 		if e.complexity.ScriptOutput.Satoshis == nil {
 			break
 		}
 
 		return e.complexity.ScriptOutput.Satoshis(childComplexity), true
 
-	case "ScriptOutput.Script":
+	case "ScriptOutput.script":
 		if e.complexity.ScriptOutput.Script == nil {
 			break
 		}
 
 		return e.complexity.ScriptOutput.Script(childComplexity), true
 
-	case "Transaction.BlockHash":
+	case "Transaction.block_hash":
 		if e.complexity.Transaction.BlockHash == nil {
 			break
 		}
 
 		return e.complexity.Transaction.BlockHash(childComplexity), true
 
-	case "Transaction.BlockHeight":
+	case "Transaction.block_height":
 		if e.complexity.Transaction.BlockHeight == nil {
 			break
 		}
 
 		return e.complexity.Transaction.BlockHeight(childComplexity), true
 
-	case "Transaction.CreatedAt":
+	case "Transaction.created_at":
 		if e.complexity.Transaction.CreatedAt == nil {
 			break
 		}
 
 		return e.complexity.Transaction.CreatedAt(childComplexity), true
 
-	case "Transaction.DeletedAt":
+	case "Transaction.deleted_at":
 		if e.complexity.Transaction.DeletedAt == nil {
 			break
 		}
 
 		return e.complexity.Transaction.DeletedAt(childComplexity), true
 
-	case "Transaction.Direction":
+	case "Transaction.direction":
 		if e.complexity.Transaction.Direction == nil {
 			break
 		}
 
 		return e.complexity.Transaction.Direction(childComplexity), true
 
-	case "Transaction.Fee":
+	case "Transaction.fee":
 		if e.complexity.Transaction.Fee == nil {
 			break
 		}
 
 		return e.complexity.Transaction.Fee(childComplexity), true
 
-	case "Transaction.Hex":
+	case "Transaction.hex":
 		if e.complexity.Transaction.Hex == nil {
 			break
 		}
 
 		return e.complexity.Transaction.Hex(childComplexity), true
 
-	case "Transaction.ID":
+	case "Transaction.id":
 		if e.complexity.Transaction.ID == nil {
 			break
 		}
 
 		return e.complexity.Transaction.ID(childComplexity), true
 
-	case "Transaction.Metadata":
+	case "Transaction.metadata":
 		if e.complexity.Transaction.Metadata == nil {
 			break
 		}
 
 		return e.complexity.Transaction.Metadata(childComplexity), true
 
-	case "Transaction.NumberOfInputs":
+	case "Transaction.number_of_inputs":
 		if e.complexity.Transaction.NumberOfInputs == nil {
 			break
 		}
 
 		return e.complexity.Transaction.NumberOfInputs(childComplexity), true
 
-	case "Transaction.NumberOfOutputs":
+	case "Transaction.number_of_outputs":
 		if e.complexity.Transaction.NumberOfOutputs == nil {
 			break
 		}
 
 		return e.complexity.Transaction.NumberOfOutputs(childComplexity), true
 
-	case "Transaction.OutputValue":
+	case "Transaction.output_value":
 		if e.complexity.Transaction.OutputValue == nil {
 			break
 		}
 
 		return e.complexity.Transaction.OutputValue(childComplexity), true
 
-	case "Transaction.TotalValue":
+	case "Transaction.total_value":
 		if e.complexity.Transaction.TotalValue == nil {
 			break
 		}
 
 		return e.complexity.Transaction.TotalValue(childComplexity), true
 
-	case "Transaction.UpdatedAt":
+	case "Transaction.updated_at":
 		if e.complexity.Transaction.UpdatedAt == nil {
 			break
 		}
 
 		return e.complexity.Transaction.UpdatedAt(childComplexity), true
 
-	case "TransactionConfig.ChangeDestinations":
+	case "TransactionConfig.change_destinations":
 		if e.complexity.TransactionConfig.ChangeDestinations == nil {
 			break
 		}
 
 		return e.complexity.TransactionConfig.ChangeDestinations(childComplexity), true
 
-	case "TransactionConfig.ChangeDestinationsStrategy":
+	case "TransactionConfig.change_destinations_strategy":
 		if e.complexity.TransactionConfig.ChangeDestinationsStrategy == nil {
 			break
 		}
 
 		return e.complexity.TransactionConfig.ChangeDestinationsStrategy(childComplexity), true
 
-	case "TransactionConfig.ChangeMinimumSatoshis":
+	case "TransactionConfig.change_minimum_satoshis":
 		if e.complexity.TransactionConfig.ChangeMinimumSatoshis == nil {
 			break
 		}
 
 		return e.complexity.TransactionConfig.ChangeMinimumSatoshis(childComplexity), true
 
-	case "TransactionConfig.ChangeNumberOfDestinations":
+	case "TransactionConfig.change_number_of_destinations":
 		if e.complexity.TransactionConfig.ChangeNumberOfDestinations == nil {
 			break
 		}
 
 		return e.complexity.TransactionConfig.ChangeNumberOfDestinations(childComplexity), true
 
-	case "TransactionConfig.ChangeSatoshis":
+	case "TransactionConfig.change_satoshis":
 		if e.complexity.TransactionConfig.ChangeSatoshis == nil {
 			break
 		}
 
 		return e.complexity.TransactionConfig.ChangeSatoshis(childComplexity), true
 
-	case "TransactionConfig.Fee":
+	case "TransactionConfig.fee":
 		if e.complexity.TransactionConfig.Fee == nil {
 			break
 		}
 
 		return e.complexity.TransactionConfig.Fee(childComplexity), true
 
-	case "TransactionConfig.FeeUnit":
+	case "TransactionConfig.fee_unit":
 		if e.complexity.TransactionConfig.FeeUnit == nil {
 			break
 		}
 
 		return e.complexity.TransactionConfig.FeeUnit(childComplexity), true
 
-	case "TransactionConfig.Inputs":
+	case "TransactionConfig.inputs":
 		if e.complexity.TransactionConfig.Inputs == nil {
 			break
 		}
 
 		return e.complexity.TransactionConfig.Inputs(childComplexity), true
 
-	case "TransactionConfig.Outputs":
+	case "TransactionConfig.outputs":
 		if e.complexity.TransactionConfig.Outputs == nil {
 			break
 		}
 
 		return e.complexity.TransactionConfig.Outputs(childComplexity), true
 
-	case "TransactionInput.Destination":
+	case "TransactionInput.destination":
 		if e.complexity.TransactionInput.Destination == nil {
 			break
 		}
 
 		return e.complexity.TransactionInput.Destination(childComplexity), true
 
-	case "TransactionInput.DraftID":
+	case "TransactionInput.draft_id":
 		if e.complexity.TransactionInput.DraftID == nil {
 			break
 		}
 
 		return e.complexity.TransactionInput.DraftID(childComplexity), true
 
-	case "TransactionInput.ID":
+	case "TransactionInput.id":
 		if e.complexity.TransactionInput.ID == nil {
 			break
 		}
 
 		return e.complexity.TransactionInput.ID(childComplexity), true
 
-	case "TransactionInput.OutputIndex":
+	case "TransactionInput.output_index":
 		if e.complexity.TransactionInput.OutputIndex == nil {
 			break
 		}
 
 		return e.complexity.TransactionInput.OutputIndex(childComplexity), true
 
-	case "TransactionInput.ReservedAt":
+	case "TransactionInput.reserved_at":
 		if e.complexity.TransactionInput.ReservedAt == nil {
 			break
 		}
 
 		return e.complexity.TransactionInput.ReservedAt(childComplexity), true
 
-	case "TransactionInput.Satoshis":
+	case "TransactionInput.satoshis":
 		if e.complexity.TransactionInput.Satoshis == nil {
 			break
 		}
 
 		return e.complexity.TransactionInput.Satoshis(childComplexity), true
 
-	case "TransactionInput.ScriptPubKey":
+	case "TransactionInput.script_pub_key":
 		if e.complexity.TransactionInput.ScriptPubKey == nil {
 			break
 		}
 
 		return e.complexity.TransactionInput.ScriptPubKey(childComplexity), true
 
-	case "TransactionInput.SpendingTxID":
+	case "TransactionInput.spending_tx_id":
 		if e.complexity.TransactionInput.SpendingTxID == nil {
 			break
 		}
 
 		return e.complexity.TransactionInput.SpendingTxID(childComplexity), true
 
-	case "TransactionInput.TransactionID":
+	case "TransactionInput.transaction_id":
 		if e.complexity.TransactionInput.TransactionID == nil {
 			break
 		}
 
 		return e.complexity.TransactionInput.TransactionID(childComplexity), true
 
-	case "TransactionInput.Type":
+	case "TransactionInput.type":
 		if e.complexity.TransactionInput.Type == nil {
 			break
 		}
 
 		return e.complexity.TransactionInput.Type(childComplexity), true
 
-	case "TransactionInput.XpubID":
+	case "TransactionInput.xpub_id":
 		if e.complexity.TransactionInput.XpubID == nil {
 			break
 		}
 
 		return e.complexity.TransactionInput.XpubID(childComplexity), true
 
-	case "TransactionOutput.OpReturn":
+	case "TransactionOutput.op_return":
 		if e.complexity.TransactionOutput.OpReturn == nil {
 			break
 		}
 
 		return e.complexity.TransactionOutput.OpReturn(childComplexity), true
 
-	case "TransactionOutput.PaymailP4":
+	case "TransactionOutput.paymail_p4":
 		if e.complexity.TransactionOutput.PaymailP4 == nil {
 			break
 		}
 
 		return e.complexity.TransactionOutput.PaymailP4(childComplexity), true
 
-	case "TransactionOutput.Satoshis":
+	case "TransactionOutput.satoshis":
 		if e.complexity.TransactionOutput.Satoshis == nil {
 			break
 		}
 
 		return e.complexity.TransactionOutput.Satoshis(childComplexity), true
 
-	case "TransactionOutput.Scripts":
+	case "TransactionOutput.scripts":
 		if e.complexity.TransactionOutput.Scripts == nil {
 			break
 		}
 
 		return e.complexity.TransactionOutput.Scripts(childComplexity), true
 
-	case "TransactionOutput.To":
+	case "TransactionOutput.to":
 		if e.complexity.TransactionOutput.To == nil {
 			break
 		}
 
 		return e.complexity.TransactionOutput.To(childComplexity), true
 
-	case "Utxo.DraftID":
+	case "Utxo.draft_id":
 		if e.complexity.Utxo.DraftID == nil {
 			break
 		}
 
 		return e.complexity.Utxo.DraftID(childComplexity), true
 
-	case "Utxo.ID":
+	case "Utxo.id":
 		if e.complexity.Utxo.ID == nil {
 			break
 		}
 
 		return e.complexity.Utxo.ID(childComplexity), true
 
-	case "Utxo.OutputIndex":
+	case "Utxo.metadata":
+		if e.complexity.Utxo.Metadata == nil {
+			break
+		}
+
+		return e.complexity.Utxo.Metadata(childComplexity), true
+
+	case "Utxo.output_index":
 		if e.complexity.Utxo.OutputIndex == nil {
 			break
 		}
 
 		return e.complexity.Utxo.OutputIndex(childComplexity), true
 
-	case "Utxo.ReservedAt":
+	case "Utxo.reserved_at":
 		if e.complexity.Utxo.ReservedAt == nil {
 			break
 		}
 
 		return e.complexity.Utxo.ReservedAt(childComplexity), true
 
-	case "Utxo.Satoshis":
+	case "Utxo.satoshis":
 		if e.complexity.Utxo.Satoshis == nil {
 			break
 		}
 
 		return e.complexity.Utxo.Satoshis(childComplexity), true
 
-	case "Utxo.ScriptPubKey":
+	case "Utxo.script_pub_key":
 		if e.complexity.Utxo.ScriptPubKey == nil {
 			break
 		}
 
 		return e.complexity.Utxo.ScriptPubKey(childComplexity), true
 
-	case "Utxo.SpendingTxID":
+	case "Utxo.spending_tx_id":
 		if e.complexity.Utxo.SpendingTxID == nil {
 			break
 		}
 
 		return e.complexity.Utxo.SpendingTxID(childComplexity), true
 
-	case "Utxo.TransactionID":
+	case "Utxo.transaction_id":
 		if e.complexity.Utxo.TransactionID == nil {
 			break
 		}
 
 		return e.complexity.Utxo.TransactionID(childComplexity), true
 
-	case "Utxo.Type":
+	case "Utxo.type":
 		if e.complexity.Utxo.Type == nil {
 			break
 		}
 
 		return e.complexity.Utxo.Type(childComplexity), true
 
-	case "Utxo.XpubID":
+	case "Utxo.xpub_id":
 		if e.complexity.Utxo.XpubID == nil {
 			break
 		}
 
 		return e.complexity.Utxo.XpubID(childComplexity), true
 
-	case "Xpub.CreatedAt":
+	case "Xpub.created_at":
 		if e.complexity.Xpub.CreatedAt == nil {
 			break
 		}
 
 		return e.complexity.Xpub.CreatedAt(childComplexity), true
 
-	case "Xpub.CurrentBalance":
+	case "Xpub.current_balance":
 		if e.complexity.Xpub.CurrentBalance == nil {
 			break
 		}
 
 		return e.complexity.Xpub.CurrentBalance(childComplexity), true
 
-	case "Xpub.DeletedAt":
+	case "Xpub.deleted_at":
 		if e.complexity.Xpub.DeletedAt == nil {
 			break
 		}
 
 		return e.complexity.Xpub.DeletedAt(childComplexity), true
 
-	case "Xpub.ID":
+	case "Xpub.id":
 		if e.complexity.Xpub.ID == nil {
 			break
 		}
 
 		return e.complexity.Xpub.ID(childComplexity), true
 
-	case "Xpub.Metadata":
+	case "Xpub.metadata":
 		if e.complexity.Xpub.Metadata == nil {
 			break
 		}
 
 		return e.complexity.Xpub.Metadata(childComplexity), true
 
-	case "Xpub.NextExternalNum":
+	case "Xpub.next_external_num":
 		if e.complexity.Xpub.NextExternalNum == nil {
 			break
 		}
 
 		return e.complexity.Xpub.NextExternalNum(childComplexity), true
 
-	case "Xpub.NextInternalNum":
+	case "Xpub.next_internal_num":
 		if e.complexity.Xpub.NextInternalNum == nil {
 			break
 		}
 
 		return e.complexity.Xpub.NextInternalNum(childComplexity), true
 
-	case "Xpub.UpdatedAt":
+	case "Xpub.updated_at":
 		if e.complexity.Xpub.UpdatedAt == nil {
 			break
 		}
@@ -1077,184 +1093,186 @@ scalar ChangeStrategy
 scalar TransactionDirection
 
 type Xpub {
-    CreatedAt:           Time
-    UpdatedAt:           Time
-    DeletedAt:           NullTime
-    ID:                  String
-    CurrentBalance:      Uint64
-    NextInternalNum:     Uint32
-    NextExternalNum:     Uint32
-    Metadata:            Metadata
+    created_at:        Time
+    updated_at:        Time
+    deleted_at:        NullTime
+    id:                String
+    current_balance:   Uint64
+    next_internal_num: Uint32
+    next_external_num: Uint32
+    metadata:          Metadata
 }
 
 type Destination {
-    CreatedAt:     Time
-    UpdatedAt:     Time
-    DeletedAt:     NullTime
-    ID:            String
-    XpubID:        String
-    LockingScript: String
-    Type:          String
-    Chain:         Uint32
-    Num:           Uint32
-    Address:       String
-    DraftID:       String
-    Metadata:      Metadata
+    created_at:     Time
+    updated_at:     Time
+    deleted_at:     NullTime
+    id:             String
+    xpub_id:        String
+    locking_script: String
+    type:           String
+    chain:          Uint32
+    num:            Uint32
+    address:        String
+    draft_id:       String
+    metadata:       Metadata
 }
 
 type Transaction {
-    CreatedAt:       Time
-    UpdatedAt:       Time
-    DeletedAt:       NullTime
-    ID:              String
-    Hex:             String
-    BlockHash:       String
-    BlockHeight:     Uint64
-    Fee:             Uint64
-    NumberOfInputs:  Uint32
-    NumberOfOutputs: Uint32
-    TotalValue:      Uint64
-    Metadata:        Metadata
-    OutputValue:     Int64
-    Direction:       TransactionDirection
+    created_at:        Time
+    updated_at:        Time
+    deleted_at:        NullTime
+    id:                String
+    hex:               String
+    block_hash:        String
+    block_height:      Uint64
+    fee:               Uint64
+    number_of_inputs:  Uint32
+    number_of_outputs: Uint32
+    total_value:       Uint64
+    metadata:          Metadata
+    output_value:      Int64
+    direction:         TransactionDirection
 }
 
 type PaymailP4 {
-    Alias:           String
-    Domain:          String
-    FromPaymail:     String
-    Note:            String
-    PubKey:          String
-    ReceiveEndpoint: String
-    ReferenceID:     String
-    ResolutionType:  String
+    alias:            String
+    domain:           String
+    from_paymail:     String
+    note:             String
+    pub_key:          String
+    receive_endpoint: String
+    reference_id:     String
+    resolution_type:  String
 }
 
 type OpReturnMap {
-    App:  String
-    Type: String
-    Keys: Map
+    app:  String
+    type: String
+    keys: Map
 }
 
 type OpReturn {
-    Hex:         String
-    HexParts:    [String]
-    StringParts: [String]
-    Map:         OpReturnMap
+    hex:          String
+    hex_parts:    [String]
+    string_parts: [String]
+    map:          OpReturnMap
 }
 
 type TransactionOutput {
-    PaymailP4: PaymailP4
-    Satoshis:  Uint64
-    Scripts:   [ScriptOutput]
-    To:        String
-    OpReturn:  OpReturn
+    paymail_p4: PaymailP4
+    satoshis:   Uint64
+    scripts:    [ScriptOutput]
+    to:         String
+    op_return:  OpReturn
 }
 
 type Utxo {
-    ID:            String
-    TransactionID: String
-    XpubID:        String
-    OutputIndex:   Uint32
-    Satoshis:      Uint64
-    ScriptPubKey:  String
-    Type:          String
-    DraftID:       NullString
-    ReservedAt:    NullTime
-    SpendingTxID:  NullString
+    id:             String
+    transaction_id: String
+    xpub_id:        String
+    output_index:   Uint32
+    satoshis:       Uint64
+    script_pub_key: String
+    type:           String
+    draft_id:       NullString
+    reserved_at:    NullTime
+    spending_tx_id: NullString
+    metadata:       Metadata
 }
 
 type DraftTransaction {
-    ID:            String
-    XpubID:        String
-    ExpiresAt:     Time
-    Configuration: TransactionConfig
-    Status:        DraftStatus
-    Hex:           String
+    id:            String
+    xpub_id:       String
+    expires_at:    Time
+    configuration: TransactionConfig
+    status:        DraftStatus
+    hex:           String
+    metadata:      Metadata
 
 }
 
 type TransactionInput {
-    ID:            String
-    TransactionID: String
-    XpubID:        String
-    OutputIndex:   Uint32
-    Satoshis:      Uint64
-    ScriptPubKey:  String
-    Type:          String
-    DraftID:       NullString
-    ReservedAt:    NullTime
-    SpendingTxID:  NullString
-    Destination:   Destination
+    id:             String
+    transaction_id: String
+    xpub_id:        String
+    output_index:   Uint32
+    satoshis:       Uint64
+    script_pub_key: String
+    type:           String
+    draft_id:       NullString
+    reserved_at:    NullTime
+    spending_tx_id: NullString
+    destination:    Destination
 }
 
 type FeeUnit {
-    Satoshis: Int
-    Bytes:    Int
+    satoshis: Int
+    bytes:    Int
 }
 
 type TransactionConfig {
-    ChangeDestinations:         [Destination]
-    ChangeSatoshis:             Uint64
-    ChangeDestinationsStrategy: ChangeStrategy
-    ChangeNumberOfDestinations: Int
-    ChangeMinimumSatoshis:      Uint64
-    FeeUnit:                    FeeUnit
-    Fee:                        Uint64
-    Inputs:                     [TransactionInput]
-    Outputs:                    [TransactionOutput]
+    change_destinations:           [Destination]
+    change_satoshis:               Uint64
+    change_destinations_strategy:  ChangeStrategy
+    change_number_of_destinations: Int
+    change_minimum_satoshis:       Uint64
+    fee_unit:                      FeeUnit
+    fee:                           Uint64
+    inputs:                        [TransactionInput]
+    outputs:                       [TransactionOutput]
 }
 
 type ScriptOutput {
-    Address:  String
-    Satoshis: Uint64
-    Script:   String
+    address:  String
+    satoshis: Uint64
+    script:   String
 }
 
 input OpReturnMapInput {
-    App:  String
-    Type: String
-    Keys: Map
+    app:  String
+    type: String
+    keys: Map
 }
 
 input OpReturnInput {
-    Hex:         String
-    HexParts:    [String]
-    StringParts: [String]
-    Map:         OpReturnMapInput
+    hex:          String
+    hex_parts:    [String]
+    string_parts: [String]
+    map:          OpReturnMapInput
 }
 
 input TransactionOutputInput {
-    To:       String
-    OpReturn: OpReturnInput
-    Satoshis: Uint64
+    to:        String
+    op_return: OpReturnInput
+    satoshis:  Uint64
 }
 
 input UtxoPointer {
-    TransactionID: String
-    OutputIndex:   Uint32
+    transaction_id: String
+    output_index:   Uint32
 }
 
 input TransactionConfigInput {
-    Outputs:                    [TransactionOutputInput]
-    SendAllTo:                  String
-    FromUtxos:                  [UtxoPointer]
-    ChangeDestinationsStrategy: ChangeStrategy
-    ChangeNumberOfDestinations: Int
-    ChangeMinimumSatoshis:      Uint64
+    outputs:                       [TransactionOutputInput]
+    send_all_to:                   String
+    from_utxos:                    [UtxoPointer]
+    change_destinations_strategy:  ChangeStrategy
+    change_number_of_destinations: Int
+    change_minimum_satoshis:       Uint64
 }
 
 type Query {
     xpub: Xpub
     transaction(
-        txId: String!
+        tx_id: String!
     ): Transaction
     transactions(
         metadata: Metadata
         conditions: Map
     ): [Transaction]
     destination(
-        lockingScript: String!
+        locking_script: String!
     ): Destination
     destinations(
         metadata: Metadata
@@ -1268,15 +1286,15 @@ type Mutation {
     ): Xpub
     transaction(
         hex: String!,
-        draftID: String,
+        draft_id: String,
         metadata: Map
     ): Transaction
-    newTransaction(
-        transactionConfig: TransactionConfigInput!,
+    new_transaction(
+        transaction_config: TransactionConfigInput!,
         metadata: Map
     ): DraftTransaction
     destination(
-        destinationType: String,
+        destination_type: String,
         metadata: Map
     ): Destination
 }
@@ -1292,14 +1310,14 @@ func (ec *executionContext) field_Mutation_destination_args(ctx context.Context,
 	var err error
 	args := map[string]interface{}{}
 	var arg0 *string
-	if tmp, ok := rawArgs["destinationType"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("destinationType"))
+	if tmp, ok := rawArgs["destination_type"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("destination_type"))
 		arg0, err = ec.unmarshalOString2ᚖstring(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
 	}
-	args["destinationType"] = arg0
+	args["destination_type"] = arg0
 	var arg1 map[string]interface{}
 	if tmp, ok := rawArgs["metadata"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("metadata"))
@@ -1312,18 +1330,18 @@ func (ec *executionContext) field_Mutation_destination_args(ctx context.Context,
 	return args, nil
 }
 
-func (ec *executionContext) field_Mutation_newTransaction_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+func (ec *executionContext) field_Mutation_new_transaction_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
 	var arg0 bux.TransactionConfig
-	if tmp, ok := rawArgs["transactionConfig"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("transactionConfig"))
+	if tmp, ok := rawArgs["transaction_config"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("transaction_config"))
 		arg0, err = ec.unmarshalNTransactionConfigInput2githubᚗcomᚋBuxOrgᚋbuxᚐTransactionConfig(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
 	}
-	args["transactionConfig"] = arg0
+	args["transaction_config"] = arg0
 	var arg1 map[string]interface{}
 	if tmp, ok := rawArgs["metadata"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("metadata"))
@@ -1349,14 +1367,14 @@ func (ec *executionContext) field_Mutation_transaction_args(ctx context.Context,
 	}
 	args["hex"] = arg0
 	var arg1 *string
-	if tmp, ok := rawArgs["draftID"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("draftID"))
+	if tmp, ok := rawArgs["draft_id"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("draft_id"))
 		arg1, err = ec.unmarshalOString2ᚖstring(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
 	}
-	args["draftID"] = arg1
+	args["draft_id"] = arg1
 	var arg2 map[string]interface{}
 	if tmp, ok := rawArgs["metadata"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("metadata"))
@@ -1412,14 +1430,14 @@ func (ec *executionContext) field_Query_destination_args(ctx context.Context, ra
 	var err error
 	args := map[string]interface{}{}
 	var arg0 string
-	if tmp, ok := rawArgs["lockingScript"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("lockingScript"))
+	if tmp, ok := rawArgs["locking_script"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("locking_script"))
 		arg0, err = ec.unmarshalNString2string(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
 	}
-	args["lockingScript"] = arg0
+	args["locking_script"] = arg0
 	return args, nil
 }
 
@@ -1442,14 +1460,14 @@ func (ec *executionContext) field_Query_transaction_args(ctx context.Context, ra
 	var err error
 	args := map[string]interface{}{}
 	var arg0 string
-	if tmp, ok := rawArgs["txId"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("txId"))
+	if tmp, ok := rawArgs["tx_id"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("tx_id"))
 		arg0, err = ec.unmarshalNString2string(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
 	}
-	args["txId"] = arg0
+	args["tx_id"] = arg0
 	return args, nil
 }
 
@@ -1530,7 +1548,7 @@ func (ec *executionContext) field___Type_fields_args(ctx context.Context, rawArg
 
 // region    **************************** field.gotpl *****************************
 
-func (ec *executionContext) _Destination_CreatedAt(ctx context.Context, field graphql.CollectedField, obj *bux.Destination) (ret graphql.Marshaler) {
+func (ec *executionContext) _Destination_created_at(ctx context.Context, field graphql.CollectedField, obj *bux.Destination) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -1562,7 +1580,7 @@ func (ec *executionContext) _Destination_CreatedAt(ctx context.Context, field gr
 	return ec.marshalOTime2timeᚐTime(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _Destination_UpdatedAt(ctx context.Context, field graphql.CollectedField, obj *bux.Destination) (ret graphql.Marshaler) {
+func (ec *executionContext) _Destination_updated_at(ctx context.Context, field graphql.CollectedField, obj *bux.Destination) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -1594,7 +1612,7 @@ func (ec *executionContext) _Destination_UpdatedAt(ctx context.Context, field gr
 	return ec.marshalOTime2timeᚐTime(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _Destination_DeletedAt(ctx context.Context, field graphql.CollectedField, obj *bux.Destination) (ret graphql.Marshaler) {
+func (ec *executionContext) _Destination_deleted_at(ctx context.Context, field graphql.CollectedField, obj *bux.Destination) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -1626,7 +1644,7 @@ func (ec *executionContext) _Destination_DeletedAt(ctx context.Context, field gr
 	return ec.marshalONullTime2githubᚗcomᚋBuxOrgᚋbuxᚋutilsᚐNullTime(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _Destination_ID(ctx context.Context, field graphql.CollectedField, obj *bux.Destination) (ret graphql.Marshaler) {
+func (ec *executionContext) _Destination_id(ctx context.Context, field graphql.CollectedField, obj *bux.Destination) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -1658,7 +1676,7 @@ func (ec *executionContext) _Destination_ID(ctx context.Context, field graphql.C
 	return ec.marshalOString2string(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _Destination_XpubID(ctx context.Context, field graphql.CollectedField, obj *bux.Destination) (ret graphql.Marshaler) {
+func (ec *executionContext) _Destination_xpub_id(ctx context.Context, field graphql.CollectedField, obj *bux.Destination) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -1690,7 +1708,7 @@ func (ec *executionContext) _Destination_XpubID(ctx context.Context, field graph
 	return ec.marshalOString2string(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _Destination_LockingScript(ctx context.Context, field graphql.CollectedField, obj *bux.Destination) (ret graphql.Marshaler) {
+func (ec *executionContext) _Destination_locking_script(ctx context.Context, field graphql.CollectedField, obj *bux.Destination) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -1722,7 +1740,7 @@ func (ec *executionContext) _Destination_LockingScript(ctx context.Context, fiel
 	return ec.marshalOString2string(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _Destination_Type(ctx context.Context, field graphql.CollectedField, obj *bux.Destination) (ret graphql.Marshaler) {
+func (ec *executionContext) _Destination_type(ctx context.Context, field graphql.CollectedField, obj *bux.Destination) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -1754,7 +1772,7 @@ func (ec *executionContext) _Destination_Type(ctx context.Context, field graphql
 	return ec.marshalOString2string(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _Destination_Chain(ctx context.Context, field graphql.CollectedField, obj *bux.Destination) (ret graphql.Marshaler) {
+func (ec *executionContext) _Destination_chain(ctx context.Context, field graphql.CollectedField, obj *bux.Destination) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -1786,7 +1804,7 @@ func (ec *executionContext) _Destination_Chain(ctx context.Context, field graphq
 	return ec.marshalOUint322uint32(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _Destination_Num(ctx context.Context, field graphql.CollectedField, obj *bux.Destination) (ret graphql.Marshaler) {
+func (ec *executionContext) _Destination_num(ctx context.Context, field graphql.CollectedField, obj *bux.Destination) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -1818,7 +1836,7 @@ func (ec *executionContext) _Destination_Num(ctx context.Context, field graphql.
 	return ec.marshalOUint322uint32(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _Destination_Address(ctx context.Context, field graphql.CollectedField, obj *bux.Destination) (ret graphql.Marshaler) {
+func (ec *executionContext) _Destination_address(ctx context.Context, field graphql.CollectedField, obj *bux.Destination) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -1850,7 +1868,7 @@ func (ec *executionContext) _Destination_Address(ctx context.Context, field grap
 	return ec.marshalOString2string(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _Destination_DraftID(ctx context.Context, field graphql.CollectedField, obj *bux.Destination) (ret graphql.Marshaler) {
+func (ec *executionContext) _Destination_draft_id(ctx context.Context, field graphql.CollectedField, obj *bux.Destination) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -1882,7 +1900,7 @@ func (ec *executionContext) _Destination_DraftID(ctx context.Context, field grap
 	return ec.marshalOString2string(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _Destination_Metadata(ctx context.Context, field graphql.CollectedField, obj *bux.Destination) (ret graphql.Marshaler) {
+func (ec *executionContext) _Destination_metadata(ctx context.Context, field graphql.CollectedField, obj *bux.Destination) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -1914,7 +1932,7 @@ func (ec *executionContext) _Destination_Metadata(ctx context.Context, field gra
 	return ec.marshalOMetadata2githubᚗcomᚋBuxOrgᚋbuxᚐMetadata(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _DraftTransaction_ID(ctx context.Context, field graphql.CollectedField, obj *bux.DraftTransaction) (ret graphql.Marshaler) {
+func (ec *executionContext) _DraftTransaction_id(ctx context.Context, field graphql.CollectedField, obj *bux.DraftTransaction) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -1946,7 +1964,7 @@ func (ec *executionContext) _DraftTransaction_ID(ctx context.Context, field grap
 	return ec.marshalOString2string(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _DraftTransaction_XpubID(ctx context.Context, field graphql.CollectedField, obj *bux.DraftTransaction) (ret graphql.Marshaler) {
+func (ec *executionContext) _DraftTransaction_xpub_id(ctx context.Context, field graphql.CollectedField, obj *bux.DraftTransaction) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -1978,7 +1996,7 @@ func (ec *executionContext) _DraftTransaction_XpubID(ctx context.Context, field 
 	return ec.marshalOString2string(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _DraftTransaction_ExpiresAt(ctx context.Context, field graphql.CollectedField, obj *bux.DraftTransaction) (ret graphql.Marshaler) {
+func (ec *executionContext) _DraftTransaction_expires_at(ctx context.Context, field graphql.CollectedField, obj *bux.DraftTransaction) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -2010,7 +2028,7 @@ func (ec *executionContext) _DraftTransaction_ExpiresAt(ctx context.Context, fie
 	return ec.marshalOTime2timeᚐTime(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _DraftTransaction_Configuration(ctx context.Context, field graphql.CollectedField, obj *bux.DraftTransaction) (ret graphql.Marshaler) {
+func (ec *executionContext) _DraftTransaction_configuration(ctx context.Context, field graphql.CollectedField, obj *bux.DraftTransaction) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -2042,7 +2060,7 @@ func (ec *executionContext) _DraftTransaction_Configuration(ctx context.Context,
 	return ec.marshalOTransactionConfig2githubᚗcomᚋBuxOrgᚋbuxᚐTransactionConfig(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _DraftTransaction_Status(ctx context.Context, field graphql.CollectedField, obj *bux.DraftTransaction) (ret graphql.Marshaler) {
+func (ec *executionContext) _DraftTransaction_status(ctx context.Context, field graphql.CollectedField, obj *bux.DraftTransaction) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -2074,7 +2092,7 @@ func (ec *executionContext) _DraftTransaction_Status(ctx context.Context, field 
 	return ec.marshalODraftStatus2githubᚗcomᚋBuxOrgᚋbuxᚐDraftStatus(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _DraftTransaction_Hex(ctx context.Context, field graphql.CollectedField, obj *bux.DraftTransaction) (ret graphql.Marshaler) {
+func (ec *executionContext) _DraftTransaction_hex(ctx context.Context, field graphql.CollectedField, obj *bux.DraftTransaction) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -2106,7 +2124,39 @@ func (ec *executionContext) _DraftTransaction_Hex(ctx context.Context, field gra
 	return ec.marshalOString2string(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _FeeUnit_Satoshis(ctx context.Context, field graphql.CollectedField, obj *utils.FeeUnit) (ret graphql.Marshaler) {
+func (ec *executionContext) _DraftTransaction_metadata(ctx context.Context, field graphql.CollectedField, obj *bux.DraftTransaction) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "DraftTransaction",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Metadata, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(bux.Metadata)
+	fc.Result = res
+	return ec.marshalOMetadata2githubᚗcomᚋBuxOrgᚋbuxᚐMetadata(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _FeeUnit_satoshis(ctx context.Context, field graphql.CollectedField, obj *utils.FeeUnit) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -2138,7 +2188,7 @@ func (ec *executionContext) _FeeUnit_Satoshis(ctx context.Context, field graphql
 	return ec.marshalOInt2int(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _FeeUnit_Bytes(ctx context.Context, field graphql.CollectedField, obj *utils.FeeUnit) (ret graphql.Marshaler) {
+func (ec *executionContext) _FeeUnit_bytes(ctx context.Context, field graphql.CollectedField, obj *utils.FeeUnit) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -2234,7 +2284,7 @@ func (ec *executionContext) _Mutation_transaction(ctx context.Context, field gra
 	fc.Args = args
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().Transaction(rctx, args["hex"].(string), args["draftID"].(*string), args["metadata"].(map[string]interface{}))
+		return ec.resolvers.Mutation().Transaction(rctx, args["hex"].(string), args["draft_id"].(*string), args["metadata"].(map[string]interface{}))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -2248,7 +2298,7 @@ func (ec *executionContext) _Mutation_transaction(ctx context.Context, field gra
 	return ec.marshalOTransaction2ᚖgithubᚗcomᚋBuxOrgᚋbuxᚐTransaction(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _Mutation_newTransaction(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+func (ec *executionContext) _Mutation_new_transaction(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -2265,7 +2315,7 @@ func (ec *executionContext) _Mutation_newTransaction(ctx context.Context, field 
 
 	ctx = graphql.WithFieldContext(ctx, fc)
 	rawArgs := field.ArgumentMap(ec.Variables)
-	args, err := ec.field_Mutation_newTransaction_args(ctx, rawArgs)
+	args, err := ec.field_Mutation_new_transaction_args(ctx, rawArgs)
 	if err != nil {
 		ec.Error(ctx, err)
 		return graphql.Null
@@ -2273,7 +2323,7 @@ func (ec *executionContext) _Mutation_newTransaction(ctx context.Context, field 
 	fc.Args = args
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().NewTransaction(rctx, args["transactionConfig"].(bux.TransactionConfig), args["metadata"].(map[string]interface{}))
+		return ec.resolvers.Mutation().NewTransaction(rctx, args["transaction_config"].(bux.TransactionConfig), args["metadata"].(map[string]interface{}))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -2312,7 +2362,7 @@ func (ec *executionContext) _Mutation_destination(ctx context.Context, field gra
 	fc.Args = args
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().Destination(rctx, args["destinationType"].(*string), args["metadata"].(map[string]interface{}))
+		return ec.resolvers.Mutation().Destination(rctx, args["destination_type"].(*string), args["metadata"].(map[string]interface{}))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -2326,7 +2376,7 @@ func (ec *executionContext) _Mutation_destination(ctx context.Context, field gra
 	return ec.marshalODestination2ᚖgithubᚗcomᚋBuxOrgᚋbuxᚐDestination(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _OpReturn_Hex(ctx context.Context, field graphql.CollectedField, obj *bux.OpReturn) (ret graphql.Marshaler) {
+func (ec *executionContext) _OpReturn_hex(ctx context.Context, field graphql.CollectedField, obj *bux.OpReturn) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -2358,7 +2408,7 @@ func (ec *executionContext) _OpReturn_Hex(ctx context.Context, field graphql.Col
 	return ec.marshalOString2string(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _OpReturn_HexParts(ctx context.Context, field graphql.CollectedField, obj *bux.OpReturn) (ret graphql.Marshaler) {
+func (ec *executionContext) _OpReturn_hex_parts(ctx context.Context, field graphql.CollectedField, obj *bux.OpReturn) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -2390,7 +2440,7 @@ func (ec *executionContext) _OpReturn_HexParts(ctx context.Context, field graphq
 	return ec.marshalOString2ᚕstring(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _OpReturn_StringParts(ctx context.Context, field graphql.CollectedField, obj *bux.OpReturn) (ret graphql.Marshaler) {
+func (ec *executionContext) _OpReturn_string_parts(ctx context.Context, field graphql.CollectedField, obj *bux.OpReturn) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -2422,7 +2472,7 @@ func (ec *executionContext) _OpReturn_StringParts(ctx context.Context, field gra
 	return ec.marshalOString2ᚕstring(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _OpReturn_Map(ctx context.Context, field graphql.CollectedField, obj *bux.OpReturn) (ret graphql.Marshaler) {
+func (ec *executionContext) _OpReturn_map(ctx context.Context, field graphql.CollectedField, obj *bux.OpReturn) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -2454,7 +2504,7 @@ func (ec *executionContext) _OpReturn_Map(ctx context.Context, field graphql.Col
 	return ec.marshalOOpReturnMap2ᚖgithubᚗcomᚋBuxOrgᚋbuxᚐMapProtocol(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _OpReturnMap_App(ctx context.Context, field graphql.CollectedField, obj *bux.MapProtocol) (ret graphql.Marshaler) {
+func (ec *executionContext) _OpReturnMap_app(ctx context.Context, field graphql.CollectedField, obj *bux.MapProtocol) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -2486,7 +2536,7 @@ func (ec *executionContext) _OpReturnMap_App(ctx context.Context, field graphql.
 	return ec.marshalOString2string(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _OpReturnMap_Type(ctx context.Context, field graphql.CollectedField, obj *bux.MapProtocol) (ret graphql.Marshaler) {
+func (ec *executionContext) _OpReturnMap_type(ctx context.Context, field graphql.CollectedField, obj *bux.MapProtocol) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -2518,7 +2568,7 @@ func (ec *executionContext) _OpReturnMap_Type(ctx context.Context, field graphql
 	return ec.marshalOString2string(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _OpReturnMap_Keys(ctx context.Context, field graphql.CollectedField, obj *bux.MapProtocol) (ret graphql.Marshaler) {
+func (ec *executionContext) _OpReturnMap_keys(ctx context.Context, field graphql.CollectedField, obj *bux.MapProtocol) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -2550,7 +2600,7 @@ func (ec *executionContext) _OpReturnMap_Keys(ctx context.Context, field graphql
 	return ec.marshalOMap2map(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _PaymailP4_Alias(ctx context.Context, field graphql.CollectedField, obj *bux.PaymailP4) (ret graphql.Marshaler) {
+func (ec *executionContext) _PaymailP4_alias(ctx context.Context, field graphql.CollectedField, obj *bux.PaymailP4) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -2582,7 +2632,7 @@ func (ec *executionContext) _PaymailP4_Alias(ctx context.Context, field graphql.
 	return ec.marshalOString2string(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _PaymailP4_Domain(ctx context.Context, field graphql.CollectedField, obj *bux.PaymailP4) (ret graphql.Marshaler) {
+func (ec *executionContext) _PaymailP4_domain(ctx context.Context, field graphql.CollectedField, obj *bux.PaymailP4) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -2614,7 +2664,7 @@ func (ec *executionContext) _PaymailP4_Domain(ctx context.Context, field graphql
 	return ec.marshalOString2string(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _PaymailP4_FromPaymail(ctx context.Context, field graphql.CollectedField, obj *bux.PaymailP4) (ret graphql.Marshaler) {
+func (ec *executionContext) _PaymailP4_from_paymail(ctx context.Context, field graphql.CollectedField, obj *bux.PaymailP4) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -2646,7 +2696,7 @@ func (ec *executionContext) _PaymailP4_FromPaymail(ctx context.Context, field gr
 	return ec.marshalOString2string(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _PaymailP4_Note(ctx context.Context, field graphql.CollectedField, obj *bux.PaymailP4) (ret graphql.Marshaler) {
+func (ec *executionContext) _PaymailP4_note(ctx context.Context, field graphql.CollectedField, obj *bux.PaymailP4) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -2678,7 +2728,7 @@ func (ec *executionContext) _PaymailP4_Note(ctx context.Context, field graphql.C
 	return ec.marshalOString2string(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _PaymailP4_PubKey(ctx context.Context, field graphql.CollectedField, obj *bux.PaymailP4) (ret graphql.Marshaler) {
+func (ec *executionContext) _PaymailP4_pub_key(ctx context.Context, field graphql.CollectedField, obj *bux.PaymailP4) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -2710,7 +2760,7 @@ func (ec *executionContext) _PaymailP4_PubKey(ctx context.Context, field graphql
 	return ec.marshalOString2string(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _PaymailP4_ReceiveEndpoint(ctx context.Context, field graphql.CollectedField, obj *bux.PaymailP4) (ret graphql.Marshaler) {
+func (ec *executionContext) _PaymailP4_receive_endpoint(ctx context.Context, field graphql.CollectedField, obj *bux.PaymailP4) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -2742,7 +2792,7 @@ func (ec *executionContext) _PaymailP4_ReceiveEndpoint(ctx context.Context, fiel
 	return ec.marshalOString2string(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _PaymailP4_ReferenceID(ctx context.Context, field graphql.CollectedField, obj *bux.PaymailP4) (ret graphql.Marshaler) {
+func (ec *executionContext) _PaymailP4_reference_id(ctx context.Context, field graphql.CollectedField, obj *bux.PaymailP4) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -2774,7 +2824,7 @@ func (ec *executionContext) _PaymailP4_ReferenceID(ctx context.Context, field gr
 	return ec.marshalOString2string(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _PaymailP4_ResolutionType(ctx context.Context, field graphql.CollectedField, obj *bux.PaymailP4) (ret graphql.Marshaler) {
+func (ec *executionContext) _PaymailP4_resolution_type(ctx context.Context, field graphql.CollectedField, obj *bux.PaymailP4) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -2863,7 +2913,7 @@ func (ec *executionContext) _Query_transaction(ctx context.Context, field graphq
 	fc.Args = args
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Query().Transaction(rctx, args["txId"].(string))
+		return ec.resolvers.Query().Transaction(rctx, args["tx_id"].(string))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -2941,7 +2991,7 @@ func (ec *executionContext) _Query_destination(ctx context.Context, field graphq
 	fc.Args = args
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Query().Destination(rctx, args["lockingScript"].(string))
+		return ec.resolvers.Query().Destination(rctx, args["locking_script"].(string))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -3065,7 +3115,7 @@ func (ec *executionContext) _Query___schema(ctx context.Context, field graphql.C
 	return ec.marshalO__Schema2ᚖgithubᚗcomᚋ99designsᚋgqlgenᚋgraphqlᚋintrospectionᚐSchema(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _ScriptOutput_Address(ctx context.Context, field graphql.CollectedField, obj *bux.ScriptOutput) (ret graphql.Marshaler) {
+func (ec *executionContext) _ScriptOutput_address(ctx context.Context, field graphql.CollectedField, obj *bux.ScriptOutput) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -3097,7 +3147,7 @@ func (ec *executionContext) _ScriptOutput_Address(ctx context.Context, field gra
 	return ec.marshalOString2string(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _ScriptOutput_Satoshis(ctx context.Context, field graphql.CollectedField, obj *bux.ScriptOutput) (ret graphql.Marshaler) {
+func (ec *executionContext) _ScriptOutput_satoshis(ctx context.Context, field graphql.CollectedField, obj *bux.ScriptOutput) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -3129,7 +3179,7 @@ func (ec *executionContext) _ScriptOutput_Satoshis(ctx context.Context, field gr
 	return ec.marshalOUint642uint64(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _ScriptOutput_Script(ctx context.Context, field graphql.CollectedField, obj *bux.ScriptOutput) (ret graphql.Marshaler) {
+func (ec *executionContext) _ScriptOutput_script(ctx context.Context, field graphql.CollectedField, obj *bux.ScriptOutput) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -3161,7 +3211,7 @@ func (ec *executionContext) _ScriptOutput_Script(ctx context.Context, field grap
 	return ec.marshalOString2string(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _Transaction_CreatedAt(ctx context.Context, field graphql.CollectedField, obj *bux.Transaction) (ret graphql.Marshaler) {
+func (ec *executionContext) _Transaction_created_at(ctx context.Context, field graphql.CollectedField, obj *bux.Transaction) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -3193,7 +3243,7 @@ func (ec *executionContext) _Transaction_CreatedAt(ctx context.Context, field gr
 	return ec.marshalOTime2timeᚐTime(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _Transaction_UpdatedAt(ctx context.Context, field graphql.CollectedField, obj *bux.Transaction) (ret graphql.Marshaler) {
+func (ec *executionContext) _Transaction_updated_at(ctx context.Context, field graphql.CollectedField, obj *bux.Transaction) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -3225,7 +3275,7 @@ func (ec *executionContext) _Transaction_UpdatedAt(ctx context.Context, field gr
 	return ec.marshalOTime2timeᚐTime(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _Transaction_DeletedAt(ctx context.Context, field graphql.CollectedField, obj *bux.Transaction) (ret graphql.Marshaler) {
+func (ec *executionContext) _Transaction_deleted_at(ctx context.Context, field graphql.CollectedField, obj *bux.Transaction) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -3257,7 +3307,7 @@ func (ec *executionContext) _Transaction_DeletedAt(ctx context.Context, field gr
 	return ec.marshalONullTime2githubᚗcomᚋBuxOrgᚋbuxᚋutilsᚐNullTime(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _Transaction_ID(ctx context.Context, field graphql.CollectedField, obj *bux.Transaction) (ret graphql.Marshaler) {
+func (ec *executionContext) _Transaction_id(ctx context.Context, field graphql.CollectedField, obj *bux.Transaction) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -3289,7 +3339,7 @@ func (ec *executionContext) _Transaction_ID(ctx context.Context, field graphql.C
 	return ec.marshalOString2string(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _Transaction_Hex(ctx context.Context, field graphql.CollectedField, obj *bux.Transaction) (ret graphql.Marshaler) {
+func (ec *executionContext) _Transaction_hex(ctx context.Context, field graphql.CollectedField, obj *bux.Transaction) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -3321,7 +3371,7 @@ func (ec *executionContext) _Transaction_Hex(ctx context.Context, field graphql.
 	return ec.marshalOString2string(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _Transaction_BlockHash(ctx context.Context, field graphql.CollectedField, obj *bux.Transaction) (ret graphql.Marshaler) {
+func (ec *executionContext) _Transaction_block_hash(ctx context.Context, field graphql.CollectedField, obj *bux.Transaction) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -3353,7 +3403,7 @@ func (ec *executionContext) _Transaction_BlockHash(ctx context.Context, field gr
 	return ec.marshalOString2string(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _Transaction_BlockHeight(ctx context.Context, field graphql.CollectedField, obj *bux.Transaction) (ret graphql.Marshaler) {
+func (ec *executionContext) _Transaction_block_height(ctx context.Context, field graphql.CollectedField, obj *bux.Transaction) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -3385,7 +3435,7 @@ func (ec *executionContext) _Transaction_BlockHeight(ctx context.Context, field 
 	return ec.marshalOUint642uint64(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _Transaction_Fee(ctx context.Context, field graphql.CollectedField, obj *bux.Transaction) (ret graphql.Marshaler) {
+func (ec *executionContext) _Transaction_fee(ctx context.Context, field graphql.CollectedField, obj *bux.Transaction) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -3417,7 +3467,7 @@ func (ec *executionContext) _Transaction_Fee(ctx context.Context, field graphql.
 	return ec.marshalOUint642uint64(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _Transaction_NumberOfInputs(ctx context.Context, field graphql.CollectedField, obj *bux.Transaction) (ret graphql.Marshaler) {
+func (ec *executionContext) _Transaction_number_of_inputs(ctx context.Context, field graphql.CollectedField, obj *bux.Transaction) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -3449,7 +3499,7 @@ func (ec *executionContext) _Transaction_NumberOfInputs(ctx context.Context, fie
 	return ec.marshalOUint322uint32(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _Transaction_NumberOfOutputs(ctx context.Context, field graphql.CollectedField, obj *bux.Transaction) (ret graphql.Marshaler) {
+func (ec *executionContext) _Transaction_number_of_outputs(ctx context.Context, field graphql.CollectedField, obj *bux.Transaction) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -3481,7 +3531,7 @@ func (ec *executionContext) _Transaction_NumberOfOutputs(ctx context.Context, fi
 	return ec.marshalOUint322uint32(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _Transaction_TotalValue(ctx context.Context, field graphql.CollectedField, obj *bux.Transaction) (ret graphql.Marshaler) {
+func (ec *executionContext) _Transaction_total_value(ctx context.Context, field graphql.CollectedField, obj *bux.Transaction) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -3513,7 +3563,7 @@ func (ec *executionContext) _Transaction_TotalValue(ctx context.Context, field g
 	return ec.marshalOUint642uint64(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _Transaction_Metadata(ctx context.Context, field graphql.CollectedField, obj *bux.Transaction) (ret graphql.Marshaler) {
+func (ec *executionContext) _Transaction_metadata(ctx context.Context, field graphql.CollectedField, obj *bux.Transaction) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -3545,7 +3595,7 @@ func (ec *executionContext) _Transaction_Metadata(ctx context.Context, field gra
 	return ec.marshalOMetadata2githubᚗcomᚋBuxOrgᚋbuxᚐMetadata(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _Transaction_OutputValue(ctx context.Context, field graphql.CollectedField, obj *bux.Transaction) (ret graphql.Marshaler) {
+func (ec *executionContext) _Transaction_output_value(ctx context.Context, field graphql.CollectedField, obj *bux.Transaction) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -3577,7 +3627,7 @@ func (ec *executionContext) _Transaction_OutputValue(ctx context.Context, field 
 	return ec.marshalOInt642int64(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _Transaction_Direction(ctx context.Context, field graphql.CollectedField, obj *bux.Transaction) (ret graphql.Marshaler) {
+func (ec *executionContext) _Transaction_direction(ctx context.Context, field graphql.CollectedField, obj *bux.Transaction) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -3609,7 +3659,7 @@ func (ec *executionContext) _Transaction_Direction(ctx context.Context, field gr
 	return ec.marshalOTransactionDirection2githubᚗcomᚋBuxOrgᚋbuxᚐTransactionDirection(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _TransactionConfig_ChangeDestinations(ctx context.Context, field graphql.CollectedField, obj *bux.TransactionConfig) (ret graphql.Marshaler) {
+func (ec *executionContext) _TransactionConfig_change_destinations(ctx context.Context, field graphql.CollectedField, obj *bux.TransactionConfig) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -3641,7 +3691,7 @@ func (ec *executionContext) _TransactionConfig_ChangeDestinations(ctx context.Co
 	return ec.marshalODestination2ᚕᚖgithubᚗcomᚋBuxOrgᚋbuxᚐDestination(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _TransactionConfig_ChangeSatoshis(ctx context.Context, field graphql.CollectedField, obj *bux.TransactionConfig) (ret graphql.Marshaler) {
+func (ec *executionContext) _TransactionConfig_change_satoshis(ctx context.Context, field graphql.CollectedField, obj *bux.TransactionConfig) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -3673,7 +3723,7 @@ func (ec *executionContext) _TransactionConfig_ChangeSatoshis(ctx context.Contex
 	return ec.marshalOUint642uint64(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _TransactionConfig_ChangeDestinationsStrategy(ctx context.Context, field graphql.CollectedField, obj *bux.TransactionConfig) (ret graphql.Marshaler) {
+func (ec *executionContext) _TransactionConfig_change_destinations_strategy(ctx context.Context, field graphql.CollectedField, obj *bux.TransactionConfig) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -3705,7 +3755,7 @@ func (ec *executionContext) _TransactionConfig_ChangeDestinationsStrategy(ctx co
 	return ec.marshalOChangeStrategy2githubᚗcomᚋBuxOrgᚋbuxᚐChangeStrategy(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _TransactionConfig_ChangeNumberOfDestinations(ctx context.Context, field graphql.CollectedField, obj *bux.TransactionConfig) (ret graphql.Marshaler) {
+func (ec *executionContext) _TransactionConfig_change_number_of_destinations(ctx context.Context, field graphql.CollectedField, obj *bux.TransactionConfig) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -3737,7 +3787,7 @@ func (ec *executionContext) _TransactionConfig_ChangeNumberOfDestinations(ctx co
 	return ec.marshalOInt2int(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _TransactionConfig_ChangeMinimumSatoshis(ctx context.Context, field graphql.CollectedField, obj *bux.TransactionConfig) (ret graphql.Marshaler) {
+func (ec *executionContext) _TransactionConfig_change_minimum_satoshis(ctx context.Context, field graphql.CollectedField, obj *bux.TransactionConfig) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -3769,7 +3819,7 @@ func (ec *executionContext) _TransactionConfig_ChangeMinimumSatoshis(ctx context
 	return ec.marshalOUint642uint64(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _TransactionConfig_FeeUnit(ctx context.Context, field graphql.CollectedField, obj *bux.TransactionConfig) (ret graphql.Marshaler) {
+func (ec *executionContext) _TransactionConfig_fee_unit(ctx context.Context, field graphql.CollectedField, obj *bux.TransactionConfig) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -3801,7 +3851,7 @@ func (ec *executionContext) _TransactionConfig_FeeUnit(ctx context.Context, fiel
 	return ec.marshalOFeeUnit2ᚖgithubᚗcomᚋBuxOrgᚋbuxᚋutilsᚐFeeUnit(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _TransactionConfig_Fee(ctx context.Context, field graphql.CollectedField, obj *bux.TransactionConfig) (ret graphql.Marshaler) {
+func (ec *executionContext) _TransactionConfig_fee(ctx context.Context, field graphql.CollectedField, obj *bux.TransactionConfig) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -3833,7 +3883,7 @@ func (ec *executionContext) _TransactionConfig_Fee(ctx context.Context, field gr
 	return ec.marshalOUint642uint64(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _TransactionConfig_Inputs(ctx context.Context, field graphql.CollectedField, obj *bux.TransactionConfig) (ret graphql.Marshaler) {
+func (ec *executionContext) _TransactionConfig_inputs(ctx context.Context, field graphql.CollectedField, obj *bux.TransactionConfig) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -3865,7 +3915,7 @@ func (ec *executionContext) _TransactionConfig_Inputs(ctx context.Context, field
 	return ec.marshalOTransactionInput2ᚕᚖgithubᚗcomᚋBuxOrgᚋbuxᚐTransactionInput(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _TransactionConfig_Outputs(ctx context.Context, field graphql.CollectedField, obj *bux.TransactionConfig) (ret graphql.Marshaler) {
+func (ec *executionContext) _TransactionConfig_outputs(ctx context.Context, field graphql.CollectedField, obj *bux.TransactionConfig) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -3897,7 +3947,7 @@ func (ec *executionContext) _TransactionConfig_Outputs(ctx context.Context, fiel
 	return ec.marshalOTransactionOutput2ᚕᚖgithubᚗcomᚋBuxOrgᚋbuxᚐTransactionOutput(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _TransactionInput_ID(ctx context.Context, field graphql.CollectedField, obj *bux.TransactionInput) (ret graphql.Marshaler) {
+func (ec *executionContext) _TransactionInput_id(ctx context.Context, field graphql.CollectedField, obj *bux.TransactionInput) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -3929,7 +3979,7 @@ func (ec *executionContext) _TransactionInput_ID(ctx context.Context, field grap
 	return ec.marshalOString2string(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _TransactionInput_TransactionID(ctx context.Context, field graphql.CollectedField, obj *bux.TransactionInput) (ret graphql.Marshaler) {
+func (ec *executionContext) _TransactionInput_transaction_id(ctx context.Context, field graphql.CollectedField, obj *bux.TransactionInput) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -3961,7 +4011,7 @@ func (ec *executionContext) _TransactionInput_TransactionID(ctx context.Context,
 	return ec.marshalOString2string(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _TransactionInput_XpubID(ctx context.Context, field graphql.CollectedField, obj *bux.TransactionInput) (ret graphql.Marshaler) {
+func (ec *executionContext) _TransactionInput_xpub_id(ctx context.Context, field graphql.CollectedField, obj *bux.TransactionInput) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -3993,7 +4043,7 @@ func (ec *executionContext) _TransactionInput_XpubID(ctx context.Context, field 
 	return ec.marshalOString2string(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _TransactionInput_OutputIndex(ctx context.Context, field graphql.CollectedField, obj *bux.TransactionInput) (ret graphql.Marshaler) {
+func (ec *executionContext) _TransactionInput_output_index(ctx context.Context, field graphql.CollectedField, obj *bux.TransactionInput) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -4025,7 +4075,7 @@ func (ec *executionContext) _TransactionInput_OutputIndex(ctx context.Context, f
 	return ec.marshalOUint322uint32(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _TransactionInput_Satoshis(ctx context.Context, field graphql.CollectedField, obj *bux.TransactionInput) (ret graphql.Marshaler) {
+func (ec *executionContext) _TransactionInput_satoshis(ctx context.Context, field graphql.CollectedField, obj *bux.TransactionInput) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -4057,7 +4107,7 @@ func (ec *executionContext) _TransactionInput_Satoshis(ctx context.Context, fiel
 	return ec.marshalOUint642uint64(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _TransactionInput_ScriptPubKey(ctx context.Context, field graphql.CollectedField, obj *bux.TransactionInput) (ret graphql.Marshaler) {
+func (ec *executionContext) _TransactionInput_script_pub_key(ctx context.Context, field graphql.CollectedField, obj *bux.TransactionInput) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -4089,7 +4139,7 @@ func (ec *executionContext) _TransactionInput_ScriptPubKey(ctx context.Context, 
 	return ec.marshalOString2string(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _TransactionInput_Type(ctx context.Context, field graphql.CollectedField, obj *bux.TransactionInput) (ret graphql.Marshaler) {
+func (ec *executionContext) _TransactionInput_type(ctx context.Context, field graphql.CollectedField, obj *bux.TransactionInput) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -4121,7 +4171,7 @@ func (ec *executionContext) _TransactionInput_Type(ctx context.Context, field gr
 	return ec.marshalOString2string(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _TransactionInput_DraftID(ctx context.Context, field graphql.CollectedField, obj *bux.TransactionInput) (ret graphql.Marshaler) {
+func (ec *executionContext) _TransactionInput_draft_id(ctx context.Context, field graphql.CollectedField, obj *bux.TransactionInput) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -4153,7 +4203,7 @@ func (ec *executionContext) _TransactionInput_DraftID(ctx context.Context, field
 	return ec.marshalONullString2githubᚗcomᚋBuxOrgᚋbuxᚋutilsᚐNullString(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _TransactionInput_ReservedAt(ctx context.Context, field graphql.CollectedField, obj *bux.TransactionInput) (ret graphql.Marshaler) {
+func (ec *executionContext) _TransactionInput_reserved_at(ctx context.Context, field graphql.CollectedField, obj *bux.TransactionInput) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -4185,7 +4235,7 @@ func (ec *executionContext) _TransactionInput_ReservedAt(ctx context.Context, fi
 	return ec.marshalONullTime2githubᚗcomᚋBuxOrgᚋbuxᚋutilsᚐNullTime(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _TransactionInput_SpendingTxID(ctx context.Context, field graphql.CollectedField, obj *bux.TransactionInput) (ret graphql.Marshaler) {
+func (ec *executionContext) _TransactionInput_spending_tx_id(ctx context.Context, field graphql.CollectedField, obj *bux.TransactionInput) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -4217,7 +4267,7 @@ func (ec *executionContext) _TransactionInput_SpendingTxID(ctx context.Context, 
 	return ec.marshalONullString2githubᚗcomᚋBuxOrgᚋbuxᚋutilsᚐNullString(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _TransactionInput_Destination(ctx context.Context, field graphql.CollectedField, obj *bux.TransactionInput) (ret graphql.Marshaler) {
+func (ec *executionContext) _TransactionInput_destination(ctx context.Context, field graphql.CollectedField, obj *bux.TransactionInput) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -4249,7 +4299,7 @@ func (ec *executionContext) _TransactionInput_Destination(ctx context.Context, f
 	return ec.marshalODestination2githubᚗcomᚋBuxOrgᚋbuxᚐDestination(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _TransactionOutput_PaymailP4(ctx context.Context, field graphql.CollectedField, obj *bux.TransactionOutput) (ret graphql.Marshaler) {
+func (ec *executionContext) _TransactionOutput_paymail_p4(ctx context.Context, field graphql.CollectedField, obj *bux.TransactionOutput) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -4281,7 +4331,7 @@ func (ec *executionContext) _TransactionOutput_PaymailP4(ctx context.Context, fi
 	return ec.marshalOPaymailP42ᚖgithubᚗcomᚋBuxOrgᚋbuxᚐPaymailP4(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _TransactionOutput_Satoshis(ctx context.Context, field graphql.CollectedField, obj *bux.TransactionOutput) (ret graphql.Marshaler) {
+func (ec *executionContext) _TransactionOutput_satoshis(ctx context.Context, field graphql.CollectedField, obj *bux.TransactionOutput) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -4313,7 +4363,7 @@ func (ec *executionContext) _TransactionOutput_Satoshis(ctx context.Context, fie
 	return ec.marshalOUint642uint64(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _TransactionOutput_Scripts(ctx context.Context, field graphql.CollectedField, obj *bux.TransactionOutput) (ret graphql.Marshaler) {
+func (ec *executionContext) _TransactionOutput_scripts(ctx context.Context, field graphql.CollectedField, obj *bux.TransactionOutput) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -4345,7 +4395,7 @@ func (ec *executionContext) _TransactionOutput_Scripts(ctx context.Context, fiel
 	return ec.marshalOScriptOutput2ᚕᚖgithubᚗcomᚋBuxOrgᚋbuxᚐScriptOutput(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _TransactionOutput_To(ctx context.Context, field graphql.CollectedField, obj *bux.TransactionOutput) (ret graphql.Marshaler) {
+func (ec *executionContext) _TransactionOutput_to(ctx context.Context, field graphql.CollectedField, obj *bux.TransactionOutput) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -4377,7 +4427,7 @@ func (ec *executionContext) _TransactionOutput_To(ctx context.Context, field gra
 	return ec.marshalOString2string(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _TransactionOutput_OpReturn(ctx context.Context, field graphql.CollectedField, obj *bux.TransactionOutput) (ret graphql.Marshaler) {
+func (ec *executionContext) _TransactionOutput_op_return(ctx context.Context, field graphql.CollectedField, obj *bux.TransactionOutput) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -4409,7 +4459,7 @@ func (ec *executionContext) _TransactionOutput_OpReturn(ctx context.Context, fie
 	return ec.marshalOOpReturn2ᚖgithubᚗcomᚋBuxOrgᚋbuxᚐOpReturn(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _Utxo_ID(ctx context.Context, field graphql.CollectedField, obj *bux.Utxo) (ret graphql.Marshaler) {
+func (ec *executionContext) _Utxo_id(ctx context.Context, field graphql.CollectedField, obj *bux.Utxo) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -4441,7 +4491,7 @@ func (ec *executionContext) _Utxo_ID(ctx context.Context, field graphql.Collecte
 	return ec.marshalOString2string(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _Utxo_TransactionID(ctx context.Context, field graphql.CollectedField, obj *bux.Utxo) (ret graphql.Marshaler) {
+func (ec *executionContext) _Utxo_transaction_id(ctx context.Context, field graphql.CollectedField, obj *bux.Utxo) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -4473,7 +4523,7 @@ func (ec *executionContext) _Utxo_TransactionID(ctx context.Context, field graph
 	return ec.marshalOString2string(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _Utxo_XpubID(ctx context.Context, field graphql.CollectedField, obj *bux.Utxo) (ret graphql.Marshaler) {
+func (ec *executionContext) _Utxo_xpub_id(ctx context.Context, field graphql.CollectedField, obj *bux.Utxo) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -4505,7 +4555,7 @@ func (ec *executionContext) _Utxo_XpubID(ctx context.Context, field graphql.Coll
 	return ec.marshalOString2string(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _Utxo_OutputIndex(ctx context.Context, field graphql.CollectedField, obj *bux.Utxo) (ret graphql.Marshaler) {
+func (ec *executionContext) _Utxo_output_index(ctx context.Context, field graphql.CollectedField, obj *bux.Utxo) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -4537,7 +4587,7 @@ func (ec *executionContext) _Utxo_OutputIndex(ctx context.Context, field graphql
 	return ec.marshalOUint322uint32(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _Utxo_Satoshis(ctx context.Context, field graphql.CollectedField, obj *bux.Utxo) (ret graphql.Marshaler) {
+func (ec *executionContext) _Utxo_satoshis(ctx context.Context, field graphql.CollectedField, obj *bux.Utxo) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -4569,7 +4619,7 @@ func (ec *executionContext) _Utxo_Satoshis(ctx context.Context, field graphql.Co
 	return ec.marshalOUint642uint64(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _Utxo_ScriptPubKey(ctx context.Context, field graphql.CollectedField, obj *bux.Utxo) (ret graphql.Marshaler) {
+func (ec *executionContext) _Utxo_script_pub_key(ctx context.Context, field graphql.CollectedField, obj *bux.Utxo) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -4601,7 +4651,7 @@ func (ec *executionContext) _Utxo_ScriptPubKey(ctx context.Context, field graphq
 	return ec.marshalOString2string(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _Utxo_Type(ctx context.Context, field graphql.CollectedField, obj *bux.Utxo) (ret graphql.Marshaler) {
+func (ec *executionContext) _Utxo_type(ctx context.Context, field graphql.CollectedField, obj *bux.Utxo) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -4633,7 +4683,7 @@ func (ec *executionContext) _Utxo_Type(ctx context.Context, field graphql.Collec
 	return ec.marshalOString2string(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _Utxo_DraftID(ctx context.Context, field graphql.CollectedField, obj *bux.Utxo) (ret graphql.Marshaler) {
+func (ec *executionContext) _Utxo_draft_id(ctx context.Context, field graphql.CollectedField, obj *bux.Utxo) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -4665,7 +4715,7 @@ func (ec *executionContext) _Utxo_DraftID(ctx context.Context, field graphql.Col
 	return ec.marshalONullString2githubᚗcomᚋBuxOrgᚋbuxᚋutilsᚐNullString(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _Utxo_ReservedAt(ctx context.Context, field graphql.CollectedField, obj *bux.Utxo) (ret graphql.Marshaler) {
+func (ec *executionContext) _Utxo_reserved_at(ctx context.Context, field graphql.CollectedField, obj *bux.Utxo) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -4697,7 +4747,7 @@ func (ec *executionContext) _Utxo_ReservedAt(ctx context.Context, field graphql.
 	return ec.marshalONullTime2githubᚗcomᚋBuxOrgᚋbuxᚋutilsᚐNullTime(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _Utxo_SpendingTxID(ctx context.Context, field graphql.CollectedField, obj *bux.Utxo) (ret graphql.Marshaler) {
+func (ec *executionContext) _Utxo_spending_tx_id(ctx context.Context, field graphql.CollectedField, obj *bux.Utxo) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -4729,7 +4779,39 @@ func (ec *executionContext) _Utxo_SpendingTxID(ctx context.Context, field graphq
 	return ec.marshalONullString2githubᚗcomᚋBuxOrgᚋbuxᚋutilsᚐNullString(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _Xpub_CreatedAt(ctx context.Context, field graphql.CollectedField, obj *bux.Xpub) (ret graphql.Marshaler) {
+func (ec *executionContext) _Utxo_metadata(ctx context.Context, field graphql.CollectedField, obj *bux.Utxo) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Utxo",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Metadata, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(bux.Metadata)
+	fc.Result = res
+	return ec.marshalOMetadata2githubᚗcomᚋBuxOrgᚋbuxᚐMetadata(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Xpub_created_at(ctx context.Context, field graphql.CollectedField, obj *bux.Xpub) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -4761,7 +4843,7 @@ func (ec *executionContext) _Xpub_CreatedAt(ctx context.Context, field graphql.C
 	return ec.marshalOTime2timeᚐTime(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _Xpub_UpdatedAt(ctx context.Context, field graphql.CollectedField, obj *bux.Xpub) (ret graphql.Marshaler) {
+func (ec *executionContext) _Xpub_updated_at(ctx context.Context, field graphql.CollectedField, obj *bux.Xpub) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -4793,7 +4875,7 @@ func (ec *executionContext) _Xpub_UpdatedAt(ctx context.Context, field graphql.C
 	return ec.marshalOTime2timeᚐTime(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _Xpub_DeletedAt(ctx context.Context, field graphql.CollectedField, obj *bux.Xpub) (ret graphql.Marshaler) {
+func (ec *executionContext) _Xpub_deleted_at(ctx context.Context, field graphql.CollectedField, obj *bux.Xpub) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -4825,7 +4907,7 @@ func (ec *executionContext) _Xpub_DeletedAt(ctx context.Context, field graphql.C
 	return ec.marshalONullTime2githubᚗcomᚋBuxOrgᚋbuxᚋutilsᚐNullTime(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _Xpub_ID(ctx context.Context, field graphql.CollectedField, obj *bux.Xpub) (ret graphql.Marshaler) {
+func (ec *executionContext) _Xpub_id(ctx context.Context, field graphql.CollectedField, obj *bux.Xpub) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -4857,7 +4939,7 @@ func (ec *executionContext) _Xpub_ID(ctx context.Context, field graphql.Collecte
 	return ec.marshalOString2string(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _Xpub_CurrentBalance(ctx context.Context, field graphql.CollectedField, obj *bux.Xpub) (ret graphql.Marshaler) {
+func (ec *executionContext) _Xpub_current_balance(ctx context.Context, field graphql.CollectedField, obj *bux.Xpub) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -4889,7 +4971,7 @@ func (ec *executionContext) _Xpub_CurrentBalance(ctx context.Context, field grap
 	return ec.marshalOUint642uint64(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _Xpub_NextInternalNum(ctx context.Context, field graphql.CollectedField, obj *bux.Xpub) (ret graphql.Marshaler) {
+func (ec *executionContext) _Xpub_next_internal_num(ctx context.Context, field graphql.CollectedField, obj *bux.Xpub) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -4921,7 +5003,7 @@ func (ec *executionContext) _Xpub_NextInternalNum(ctx context.Context, field gra
 	return ec.marshalOUint322uint32(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _Xpub_NextExternalNum(ctx context.Context, field graphql.CollectedField, obj *bux.Xpub) (ret graphql.Marshaler) {
+func (ec *executionContext) _Xpub_next_external_num(ctx context.Context, field graphql.CollectedField, obj *bux.Xpub) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -4953,7 +5035,7 @@ func (ec *executionContext) _Xpub_NextExternalNum(ctx context.Context, field gra
 	return ec.marshalOUint322uint32(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _Xpub_Metadata(ctx context.Context, field graphql.CollectedField, obj *bux.Xpub) (ret graphql.Marshaler) {
+func (ec *executionContext) _Xpub_metadata(ctx context.Context, field graphql.CollectedField, obj *bux.Xpub) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -6123,34 +6205,34 @@ func (ec *executionContext) unmarshalInputOpReturnInput(ctx context.Context, obj
 
 	for k, v := range asMap {
 		switch k {
-		case "Hex":
+		case "hex":
 			var err error
 
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("Hex"))
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("hex"))
 			it.Hex, err = ec.unmarshalOString2string(ctx, v)
 			if err != nil {
 				return it, err
 			}
-		case "HexParts":
+		case "hex_parts":
 			var err error
 
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("HexParts"))
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("hex_parts"))
 			it.HexParts, err = ec.unmarshalOString2ᚕstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
-		case "StringParts":
+		case "string_parts":
 			var err error
 
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("StringParts"))
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("string_parts"))
 			it.StringParts, err = ec.unmarshalOString2ᚕstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
-		case "Map":
+		case "map":
 			var err error
 
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("Map"))
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("map"))
 			it.Map, err = ec.unmarshalOOpReturnMapInput2ᚖgithubᚗcomᚋBuxOrgᚋbuxᚐMapProtocol(ctx, v)
 			if err != nil {
 				return it, err
@@ -6170,26 +6252,26 @@ func (ec *executionContext) unmarshalInputOpReturnMapInput(ctx context.Context, 
 
 	for k, v := range asMap {
 		switch k {
-		case "App":
+		case "app":
 			var err error
 
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("App"))
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("app"))
 			it.App, err = ec.unmarshalOString2string(ctx, v)
 			if err != nil {
 				return it, err
 			}
-		case "Type":
+		case "type":
 			var err error
 
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("Type"))
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("type"))
 			it.Type, err = ec.unmarshalOString2string(ctx, v)
 			if err != nil {
 				return it, err
 			}
-		case "Keys":
+		case "keys":
 			var err error
 
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("Keys"))
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("keys"))
 			it.Keys, err = ec.unmarshalOMap2map(ctx, v)
 			if err != nil {
 				return it, err
@@ -6209,50 +6291,50 @@ func (ec *executionContext) unmarshalInputTransactionConfigInput(ctx context.Con
 
 	for k, v := range asMap {
 		switch k {
-		case "Outputs":
+		case "outputs":
 			var err error
 
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("Outputs"))
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("outputs"))
 			it.Outputs, err = ec.unmarshalOTransactionOutputInput2ᚕᚖgithubᚗcomᚋBuxOrgᚋbuxᚐTransactionOutput(ctx, v)
 			if err != nil {
 				return it, err
 			}
-		case "SendAllTo":
+		case "send_all_to":
 			var err error
 
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("SendAllTo"))
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("send_all_to"))
 			it.SendAllTo, err = ec.unmarshalOString2string(ctx, v)
 			if err != nil {
 				return it, err
 			}
-		case "FromUtxos":
+		case "from_utxos":
 			var err error
 
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("FromUtxos"))
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("from_utxos"))
 			it.FromUtxos, err = ec.unmarshalOUtxoPointer2ᚕᚖgithubᚗcomᚋBuxOrgᚋbuxᚐUtxoPointer(ctx, v)
 			if err != nil {
 				return it, err
 			}
-		case "ChangeDestinationsStrategy":
+		case "change_destinations_strategy":
 			var err error
 
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("ChangeDestinationsStrategy"))
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("change_destinations_strategy"))
 			it.ChangeDestinationsStrategy, err = ec.unmarshalOChangeStrategy2githubᚗcomᚋBuxOrgᚋbuxᚐChangeStrategy(ctx, v)
 			if err != nil {
 				return it, err
 			}
-		case "ChangeNumberOfDestinations":
+		case "change_number_of_destinations":
 			var err error
 
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("ChangeNumberOfDestinations"))
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("change_number_of_destinations"))
 			it.ChangeNumberOfDestinations, err = ec.unmarshalOInt2int(ctx, v)
 			if err != nil {
 				return it, err
 			}
-		case "ChangeMinimumSatoshis":
+		case "change_minimum_satoshis":
 			var err error
 
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("ChangeMinimumSatoshis"))
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("change_minimum_satoshis"))
 			it.ChangeMinimumSatoshis, err = ec.unmarshalOUint642uint64(ctx, v)
 			if err != nil {
 				return it, err
@@ -6272,26 +6354,26 @@ func (ec *executionContext) unmarshalInputTransactionOutputInput(ctx context.Con
 
 	for k, v := range asMap {
 		switch k {
-		case "To":
+		case "to":
 			var err error
 
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("To"))
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("to"))
 			it.To, err = ec.unmarshalOString2string(ctx, v)
 			if err != nil {
 				return it, err
 			}
-		case "OpReturn":
+		case "op_return":
 			var err error
 
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("OpReturn"))
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("op_return"))
 			it.OpReturn, err = ec.unmarshalOOpReturnInput2ᚖgithubᚗcomᚋBuxOrgᚋbuxᚐOpReturn(ctx, v)
 			if err != nil {
 				return it, err
 			}
-		case "Satoshis":
+		case "satoshis":
 			var err error
 
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("Satoshis"))
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("satoshis"))
 			it.Satoshis, err = ec.unmarshalOUint642uint64(ctx, v)
 			if err != nil {
 				return it, err
@@ -6311,18 +6393,18 @@ func (ec *executionContext) unmarshalInputUtxoPointer(ctx context.Context, obj i
 
 	for k, v := range asMap {
 		switch k {
-		case "TransactionID":
+		case "transaction_id":
 			var err error
 
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("TransactionID"))
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("transaction_id"))
 			it.TransactionID, err = ec.unmarshalOString2string(ctx, v)
 			if err != nil {
 				return it, err
 			}
-		case "OutputIndex":
+		case "output_index":
 			var err error
 
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("OutputIndex"))
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("output_index"))
 			it.OutputIndex, err = ec.unmarshalOUint322uint32(ctx, v)
 			if err != nil {
 				return it, err
@@ -6351,86 +6433,86 @@ func (ec *executionContext) _Destination(ctx context.Context, sel ast.SelectionS
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("Destination")
-		case "CreatedAt":
+		case "created_at":
 			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
-				return ec._Destination_CreatedAt(ctx, field, obj)
+				return ec._Destination_created_at(ctx, field, obj)
 			}
 
 			out.Values[i] = innerFunc(ctx)
 
-		case "UpdatedAt":
+		case "updated_at":
 			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
-				return ec._Destination_UpdatedAt(ctx, field, obj)
+				return ec._Destination_updated_at(ctx, field, obj)
 			}
 
 			out.Values[i] = innerFunc(ctx)
 
-		case "DeletedAt":
+		case "deleted_at":
 			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
-				return ec._Destination_DeletedAt(ctx, field, obj)
+				return ec._Destination_deleted_at(ctx, field, obj)
 			}
 
 			out.Values[i] = innerFunc(ctx)
 
-		case "ID":
+		case "id":
 			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
-				return ec._Destination_ID(ctx, field, obj)
+				return ec._Destination_id(ctx, field, obj)
 			}
 
 			out.Values[i] = innerFunc(ctx)
 
-		case "XpubID":
+		case "xpub_id":
 			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
-				return ec._Destination_XpubID(ctx, field, obj)
+				return ec._Destination_xpub_id(ctx, field, obj)
 			}
 
 			out.Values[i] = innerFunc(ctx)
 
-		case "LockingScript":
+		case "locking_script":
 			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
-				return ec._Destination_LockingScript(ctx, field, obj)
+				return ec._Destination_locking_script(ctx, field, obj)
 			}
 
 			out.Values[i] = innerFunc(ctx)
 
-		case "Type":
+		case "type":
 			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
-				return ec._Destination_Type(ctx, field, obj)
+				return ec._Destination_type(ctx, field, obj)
 			}
 
 			out.Values[i] = innerFunc(ctx)
 
-		case "Chain":
+		case "chain":
 			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
-				return ec._Destination_Chain(ctx, field, obj)
+				return ec._Destination_chain(ctx, field, obj)
 			}
 
 			out.Values[i] = innerFunc(ctx)
 
-		case "Num":
+		case "num":
 			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
-				return ec._Destination_Num(ctx, field, obj)
+				return ec._Destination_num(ctx, field, obj)
 			}
 
 			out.Values[i] = innerFunc(ctx)
 
-		case "Address":
+		case "address":
 			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
-				return ec._Destination_Address(ctx, field, obj)
+				return ec._Destination_address(ctx, field, obj)
 			}
 
 			out.Values[i] = innerFunc(ctx)
 
-		case "DraftID":
+		case "draft_id":
 			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
-				return ec._Destination_DraftID(ctx, field, obj)
+				return ec._Destination_draft_id(ctx, field, obj)
 			}
 
 			out.Values[i] = innerFunc(ctx)
 
-		case "Metadata":
+		case "metadata":
 			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
-				return ec._Destination_Metadata(ctx, field, obj)
+				return ec._Destination_metadata(ctx, field, obj)
 			}
 
 			out.Values[i] = innerFunc(ctx)
@@ -6456,44 +6538,51 @@ func (ec *executionContext) _DraftTransaction(ctx context.Context, sel ast.Selec
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("DraftTransaction")
-		case "ID":
+		case "id":
 			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
-				return ec._DraftTransaction_ID(ctx, field, obj)
+				return ec._DraftTransaction_id(ctx, field, obj)
 			}
 
 			out.Values[i] = innerFunc(ctx)
 
-		case "XpubID":
+		case "xpub_id":
 			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
-				return ec._DraftTransaction_XpubID(ctx, field, obj)
+				return ec._DraftTransaction_xpub_id(ctx, field, obj)
 			}
 
 			out.Values[i] = innerFunc(ctx)
 
-		case "ExpiresAt":
+		case "expires_at":
 			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
-				return ec._DraftTransaction_ExpiresAt(ctx, field, obj)
+				return ec._DraftTransaction_expires_at(ctx, field, obj)
 			}
 
 			out.Values[i] = innerFunc(ctx)
 
-		case "Configuration":
+		case "configuration":
 			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
-				return ec._DraftTransaction_Configuration(ctx, field, obj)
+				return ec._DraftTransaction_configuration(ctx, field, obj)
 			}
 
 			out.Values[i] = innerFunc(ctx)
 
-		case "Status":
+		case "status":
 			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
-				return ec._DraftTransaction_Status(ctx, field, obj)
+				return ec._DraftTransaction_status(ctx, field, obj)
 			}
 
 			out.Values[i] = innerFunc(ctx)
 
-		case "Hex":
+		case "hex":
 			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
-				return ec._DraftTransaction_Hex(ctx, field, obj)
+				return ec._DraftTransaction_hex(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
+		case "metadata":
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._DraftTransaction_metadata(ctx, field, obj)
 			}
 
 			out.Values[i] = innerFunc(ctx)
@@ -6519,16 +6608,16 @@ func (ec *executionContext) _FeeUnit(ctx context.Context, sel ast.SelectionSet, 
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("FeeUnit")
-		case "Satoshis":
+		case "satoshis":
 			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
-				return ec._FeeUnit_Satoshis(ctx, field, obj)
+				return ec._FeeUnit_satoshis(ctx, field, obj)
 			}
 
 			out.Values[i] = innerFunc(ctx)
 
-		case "Bytes":
+		case "bytes":
 			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
-				return ec._FeeUnit_Bytes(ctx, field, obj)
+				return ec._FeeUnit_bytes(ctx, field, obj)
 			}
 
 			out.Values[i] = innerFunc(ctx)
@@ -6577,9 +6666,9 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, innerFunc)
 
-		case "newTransaction":
+		case "new_transaction":
 			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
-				return ec._Mutation_newTransaction(ctx, field)
+				return ec._Mutation_new_transaction(ctx, field)
 			}
 
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, innerFunc)
@@ -6612,30 +6701,30 @@ func (ec *executionContext) _OpReturn(ctx context.Context, sel ast.SelectionSet,
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("OpReturn")
-		case "Hex":
+		case "hex":
 			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
-				return ec._OpReturn_Hex(ctx, field, obj)
+				return ec._OpReturn_hex(ctx, field, obj)
 			}
 
 			out.Values[i] = innerFunc(ctx)
 
-		case "HexParts":
+		case "hex_parts":
 			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
-				return ec._OpReturn_HexParts(ctx, field, obj)
+				return ec._OpReturn_hex_parts(ctx, field, obj)
 			}
 
 			out.Values[i] = innerFunc(ctx)
 
-		case "StringParts":
+		case "string_parts":
 			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
-				return ec._OpReturn_StringParts(ctx, field, obj)
+				return ec._OpReturn_string_parts(ctx, field, obj)
 			}
 
 			out.Values[i] = innerFunc(ctx)
 
-		case "Map":
+		case "map":
 			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
-				return ec._OpReturn_Map(ctx, field, obj)
+				return ec._OpReturn_map(ctx, field, obj)
 			}
 
 			out.Values[i] = innerFunc(ctx)
@@ -6661,23 +6750,23 @@ func (ec *executionContext) _OpReturnMap(ctx context.Context, sel ast.SelectionS
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("OpReturnMap")
-		case "App":
+		case "app":
 			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
-				return ec._OpReturnMap_App(ctx, field, obj)
+				return ec._OpReturnMap_app(ctx, field, obj)
 			}
 
 			out.Values[i] = innerFunc(ctx)
 
-		case "Type":
+		case "type":
 			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
-				return ec._OpReturnMap_Type(ctx, field, obj)
+				return ec._OpReturnMap_type(ctx, field, obj)
 			}
 
 			out.Values[i] = innerFunc(ctx)
 
-		case "Keys":
+		case "keys":
 			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
-				return ec._OpReturnMap_Keys(ctx, field, obj)
+				return ec._OpReturnMap_keys(ctx, field, obj)
 			}
 
 			out.Values[i] = innerFunc(ctx)
@@ -6703,58 +6792,58 @@ func (ec *executionContext) _PaymailP4(ctx context.Context, sel ast.SelectionSet
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("PaymailP4")
-		case "Alias":
+		case "alias":
 			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
-				return ec._PaymailP4_Alias(ctx, field, obj)
+				return ec._PaymailP4_alias(ctx, field, obj)
 			}
 
 			out.Values[i] = innerFunc(ctx)
 
-		case "Domain":
+		case "domain":
 			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
-				return ec._PaymailP4_Domain(ctx, field, obj)
+				return ec._PaymailP4_domain(ctx, field, obj)
 			}
 
 			out.Values[i] = innerFunc(ctx)
 
-		case "FromPaymail":
+		case "from_paymail":
 			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
-				return ec._PaymailP4_FromPaymail(ctx, field, obj)
+				return ec._PaymailP4_from_paymail(ctx, field, obj)
 			}
 
 			out.Values[i] = innerFunc(ctx)
 
-		case "Note":
+		case "note":
 			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
-				return ec._PaymailP4_Note(ctx, field, obj)
+				return ec._PaymailP4_note(ctx, field, obj)
 			}
 
 			out.Values[i] = innerFunc(ctx)
 
-		case "PubKey":
+		case "pub_key":
 			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
-				return ec._PaymailP4_PubKey(ctx, field, obj)
+				return ec._PaymailP4_pub_key(ctx, field, obj)
 			}
 
 			out.Values[i] = innerFunc(ctx)
 
-		case "ReceiveEndpoint":
+		case "receive_endpoint":
 			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
-				return ec._PaymailP4_ReceiveEndpoint(ctx, field, obj)
+				return ec._PaymailP4_receive_endpoint(ctx, field, obj)
 			}
 
 			out.Values[i] = innerFunc(ctx)
 
-		case "ReferenceID":
+		case "reference_id":
 			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
-				return ec._PaymailP4_ReferenceID(ctx, field, obj)
+				return ec._PaymailP4_reference_id(ctx, field, obj)
 			}
 
 			out.Values[i] = innerFunc(ctx)
 
-		case "ResolutionType":
+		case "resolution_type":
 			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
-				return ec._PaymailP4_ResolutionType(ctx, field, obj)
+				return ec._PaymailP4_resolution_type(ctx, field, obj)
 			}
 
 			out.Values[i] = innerFunc(ctx)
@@ -6924,23 +7013,23 @@ func (ec *executionContext) _ScriptOutput(ctx context.Context, sel ast.Selection
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("ScriptOutput")
-		case "Address":
+		case "address":
 			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
-				return ec._ScriptOutput_Address(ctx, field, obj)
+				return ec._ScriptOutput_address(ctx, field, obj)
 			}
 
 			out.Values[i] = innerFunc(ctx)
 
-		case "Satoshis":
+		case "satoshis":
 			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
-				return ec._ScriptOutput_Satoshis(ctx, field, obj)
+				return ec._ScriptOutput_satoshis(ctx, field, obj)
 			}
 
 			out.Values[i] = innerFunc(ctx)
 
-		case "Script":
+		case "script":
 			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
-				return ec._ScriptOutput_Script(ctx, field, obj)
+				return ec._ScriptOutput_script(ctx, field, obj)
 			}
 
 			out.Values[i] = innerFunc(ctx)
@@ -6966,100 +7055,100 @@ func (ec *executionContext) _Transaction(ctx context.Context, sel ast.SelectionS
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("Transaction")
-		case "CreatedAt":
+		case "created_at":
 			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
-				return ec._Transaction_CreatedAt(ctx, field, obj)
+				return ec._Transaction_created_at(ctx, field, obj)
 			}
 
 			out.Values[i] = innerFunc(ctx)
 
-		case "UpdatedAt":
+		case "updated_at":
 			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
-				return ec._Transaction_UpdatedAt(ctx, field, obj)
+				return ec._Transaction_updated_at(ctx, field, obj)
 			}
 
 			out.Values[i] = innerFunc(ctx)
 
-		case "DeletedAt":
+		case "deleted_at":
 			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
-				return ec._Transaction_DeletedAt(ctx, field, obj)
+				return ec._Transaction_deleted_at(ctx, field, obj)
 			}
 
 			out.Values[i] = innerFunc(ctx)
 
-		case "ID":
+		case "id":
 			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
-				return ec._Transaction_ID(ctx, field, obj)
+				return ec._Transaction_id(ctx, field, obj)
 			}
 
 			out.Values[i] = innerFunc(ctx)
 
-		case "Hex":
+		case "hex":
 			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
-				return ec._Transaction_Hex(ctx, field, obj)
+				return ec._Transaction_hex(ctx, field, obj)
 			}
 
 			out.Values[i] = innerFunc(ctx)
 
-		case "BlockHash":
+		case "block_hash":
 			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
-				return ec._Transaction_BlockHash(ctx, field, obj)
+				return ec._Transaction_block_hash(ctx, field, obj)
 			}
 
 			out.Values[i] = innerFunc(ctx)
 
-		case "BlockHeight":
+		case "block_height":
 			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
-				return ec._Transaction_BlockHeight(ctx, field, obj)
+				return ec._Transaction_block_height(ctx, field, obj)
 			}
 
 			out.Values[i] = innerFunc(ctx)
 
-		case "Fee":
+		case "fee":
 			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
-				return ec._Transaction_Fee(ctx, field, obj)
+				return ec._Transaction_fee(ctx, field, obj)
 			}
 
 			out.Values[i] = innerFunc(ctx)
 
-		case "NumberOfInputs":
+		case "number_of_inputs":
 			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
-				return ec._Transaction_NumberOfInputs(ctx, field, obj)
+				return ec._Transaction_number_of_inputs(ctx, field, obj)
 			}
 
 			out.Values[i] = innerFunc(ctx)
 
-		case "NumberOfOutputs":
+		case "number_of_outputs":
 			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
-				return ec._Transaction_NumberOfOutputs(ctx, field, obj)
+				return ec._Transaction_number_of_outputs(ctx, field, obj)
 			}
 
 			out.Values[i] = innerFunc(ctx)
 
-		case "TotalValue":
+		case "total_value":
 			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
-				return ec._Transaction_TotalValue(ctx, field, obj)
+				return ec._Transaction_total_value(ctx, field, obj)
 			}
 
 			out.Values[i] = innerFunc(ctx)
 
-		case "Metadata":
+		case "metadata":
 			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
-				return ec._Transaction_Metadata(ctx, field, obj)
+				return ec._Transaction_metadata(ctx, field, obj)
 			}
 
 			out.Values[i] = innerFunc(ctx)
 
-		case "OutputValue":
+		case "output_value":
 			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
-				return ec._Transaction_OutputValue(ctx, field, obj)
+				return ec._Transaction_output_value(ctx, field, obj)
 			}
 
 			out.Values[i] = innerFunc(ctx)
 
-		case "Direction":
+		case "direction":
 			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
-				return ec._Transaction_Direction(ctx, field, obj)
+				return ec._Transaction_direction(ctx, field, obj)
 			}
 
 			out.Values[i] = innerFunc(ctx)
@@ -7085,65 +7174,65 @@ func (ec *executionContext) _TransactionConfig(ctx context.Context, sel ast.Sele
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("TransactionConfig")
-		case "ChangeDestinations":
+		case "change_destinations":
 			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
-				return ec._TransactionConfig_ChangeDestinations(ctx, field, obj)
+				return ec._TransactionConfig_change_destinations(ctx, field, obj)
 			}
 
 			out.Values[i] = innerFunc(ctx)
 
-		case "ChangeSatoshis":
+		case "change_satoshis":
 			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
-				return ec._TransactionConfig_ChangeSatoshis(ctx, field, obj)
+				return ec._TransactionConfig_change_satoshis(ctx, field, obj)
 			}
 
 			out.Values[i] = innerFunc(ctx)
 
-		case "ChangeDestinationsStrategy":
+		case "change_destinations_strategy":
 			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
-				return ec._TransactionConfig_ChangeDestinationsStrategy(ctx, field, obj)
+				return ec._TransactionConfig_change_destinations_strategy(ctx, field, obj)
 			}
 
 			out.Values[i] = innerFunc(ctx)
 
-		case "ChangeNumberOfDestinations":
+		case "change_number_of_destinations":
 			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
-				return ec._TransactionConfig_ChangeNumberOfDestinations(ctx, field, obj)
+				return ec._TransactionConfig_change_number_of_destinations(ctx, field, obj)
 			}
 
 			out.Values[i] = innerFunc(ctx)
 
-		case "ChangeMinimumSatoshis":
+		case "change_minimum_satoshis":
 			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
-				return ec._TransactionConfig_ChangeMinimumSatoshis(ctx, field, obj)
+				return ec._TransactionConfig_change_minimum_satoshis(ctx, field, obj)
 			}
 
 			out.Values[i] = innerFunc(ctx)
 
-		case "FeeUnit":
+		case "fee_unit":
 			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
-				return ec._TransactionConfig_FeeUnit(ctx, field, obj)
+				return ec._TransactionConfig_fee_unit(ctx, field, obj)
 			}
 
 			out.Values[i] = innerFunc(ctx)
 
-		case "Fee":
+		case "fee":
 			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
-				return ec._TransactionConfig_Fee(ctx, field, obj)
+				return ec._TransactionConfig_fee(ctx, field, obj)
 			}
 
 			out.Values[i] = innerFunc(ctx)
 
-		case "Inputs":
+		case "inputs":
 			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
-				return ec._TransactionConfig_Inputs(ctx, field, obj)
+				return ec._TransactionConfig_inputs(ctx, field, obj)
 			}
 
 			out.Values[i] = innerFunc(ctx)
 
-		case "Outputs":
+		case "outputs":
 			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
-				return ec._TransactionConfig_Outputs(ctx, field, obj)
+				return ec._TransactionConfig_outputs(ctx, field, obj)
 			}
 
 			out.Values[i] = innerFunc(ctx)
@@ -7169,79 +7258,79 @@ func (ec *executionContext) _TransactionInput(ctx context.Context, sel ast.Selec
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("TransactionInput")
-		case "ID":
+		case "id":
 			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
-				return ec._TransactionInput_ID(ctx, field, obj)
+				return ec._TransactionInput_id(ctx, field, obj)
 			}
 
 			out.Values[i] = innerFunc(ctx)
 
-		case "TransactionID":
+		case "transaction_id":
 			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
-				return ec._TransactionInput_TransactionID(ctx, field, obj)
+				return ec._TransactionInput_transaction_id(ctx, field, obj)
 			}
 
 			out.Values[i] = innerFunc(ctx)
 
-		case "XpubID":
+		case "xpub_id":
 			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
-				return ec._TransactionInput_XpubID(ctx, field, obj)
+				return ec._TransactionInput_xpub_id(ctx, field, obj)
 			}
 
 			out.Values[i] = innerFunc(ctx)
 
-		case "OutputIndex":
+		case "output_index":
 			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
-				return ec._TransactionInput_OutputIndex(ctx, field, obj)
+				return ec._TransactionInput_output_index(ctx, field, obj)
 			}
 
 			out.Values[i] = innerFunc(ctx)
 
-		case "Satoshis":
+		case "satoshis":
 			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
-				return ec._TransactionInput_Satoshis(ctx, field, obj)
+				return ec._TransactionInput_satoshis(ctx, field, obj)
 			}
 
 			out.Values[i] = innerFunc(ctx)
 
-		case "ScriptPubKey":
+		case "script_pub_key":
 			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
-				return ec._TransactionInput_ScriptPubKey(ctx, field, obj)
+				return ec._TransactionInput_script_pub_key(ctx, field, obj)
 			}
 
 			out.Values[i] = innerFunc(ctx)
 
-		case "Type":
+		case "type":
 			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
-				return ec._TransactionInput_Type(ctx, field, obj)
+				return ec._TransactionInput_type(ctx, field, obj)
 			}
 
 			out.Values[i] = innerFunc(ctx)
 
-		case "DraftID":
+		case "draft_id":
 			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
-				return ec._TransactionInput_DraftID(ctx, field, obj)
+				return ec._TransactionInput_draft_id(ctx, field, obj)
 			}
 
 			out.Values[i] = innerFunc(ctx)
 
-		case "ReservedAt":
+		case "reserved_at":
 			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
-				return ec._TransactionInput_ReservedAt(ctx, field, obj)
+				return ec._TransactionInput_reserved_at(ctx, field, obj)
 			}
 
 			out.Values[i] = innerFunc(ctx)
 
-		case "SpendingTxID":
+		case "spending_tx_id":
 			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
-				return ec._TransactionInput_SpendingTxID(ctx, field, obj)
+				return ec._TransactionInput_spending_tx_id(ctx, field, obj)
 			}
 
 			out.Values[i] = innerFunc(ctx)
 
-		case "Destination":
+		case "destination":
 			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
-				return ec._TransactionInput_Destination(ctx, field, obj)
+				return ec._TransactionInput_destination(ctx, field, obj)
 			}
 
 			out.Values[i] = innerFunc(ctx)
@@ -7267,37 +7356,37 @@ func (ec *executionContext) _TransactionOutput(ctx context.Context, sel ast.Sele
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("TransactionOutput")
-		case "PaymailP4":
+		case "paymail_p4":
 			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
-				return ec._TransactionOutput_PaymailP4(ctx, field, obj)
+				return ec._TransactionOutput_paymail_p4(ctx, field, obj)
 			}
 
 			out.Values[i] = innerFunc(ctx)
 
-		case "Satoshis":
+		case "satoshis":
 			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
-				return ec._TransactionOutput_Satoshis(ctx, field, obj)
+				return ec._TransactionOutput_satoshis(ctx, field, obj)
 			}
 
 			out.Values[i] = innerFunc(ctx)
 
-		case "Scripts":
+		case "scripts":
 			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
-				return ec._TransactionOutput_Scripts(ctx, field, obj)
+				return ec._TransactionOutput_scripts(ctx, field, obj)
 			}
 
 			out.Values[i] = innerFunc(ctx)
 
-		case "To":
+		case "to":
 			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
-				return ec._TransactionOutput_To(ctx, field, obj)
+				return ec._TransactionOutput_to(ctx, field, obj)
 			}
 
 			out.Values[i] = innerFunc(ctx)
 
-		case "OpReturn":
+		case "op_return":
 			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
-				return ec._TransactionOutput_OpReturn(ctx, field, obj)
+				return ec._TransactionOutput_op_return(ctx, field, obj)
 			}
 
 			out.Values[i] = innerFunc(ctx)
@@ -7323,72 +7412,79 @@ func (ec *executionContext) _Utxo(ctx context.Context, sel ast.SelectionSet, obj
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("Utxo")
-		case "ID":
+		case "id":
 			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
-				return ec._Utxo_ID(ctx, field, obj)
+				return ec._Utxo_id(ctx, field, obj)
 			}
 
 			out.Values[i] = innerFunc(ctx)
 
-		case "TransactionID":
+		case "transaction_id":
 			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
-				return ec._Utxo_TransactionID(ctx, field, obj)
+				return ec._Utxo_transaction_id(ctx, field, obj)
 			}
 
 			out.Values[i] = innerFunc(ctx)
 
-		case "XpubID":
+		case "xpub_id":
 			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
-				return ec._Utxo_XpubID(ctx, field, obj)
+				return ec._Utxo_xpub_id(ctx, field, obj)
 			}
 
 			out.Values[i] = innerFunc(ctx)
 
-		case "OutputIndex":
+		case "output_index":
 			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
-				return ec._Utxo_OutputIndex(ctx, field, obj)
+				return ec._Utxo_output_index(ctx, field, obj)
 			}
 
 			out.Values[i] = innerFunc(ctx)
 
-		case "Satoshis":
+		case "satoshis":
 			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
-				return ec._Utxo_Satoshis(ctx, field, obj)
+				return ec._Utxo_satoshis(ctx, field, obj)
 			}
 
 			out.Values[i] = innerFunc(ctx)
 
-		case "ScriptPubKey":
+		case "script_pub_key":
 			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
-				return ec._Utxo_ScriptPubKey(ctx, field, obj)
+				return ec._Utxo_script_pub_key(ctx, field, obj)
 			}
 
 			out.Values[i] = innerFunc(ctx)
 
-		case "Type":
+		case "type":
 			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
-				return ec._Utxo_Type(ctx, field, obj)
+				return ec._Utxo_type(ctx, field, obj)
 			}
 
 			out.Values[i] = innerFunc(ctx)
 
-		case "DraftID":
+		case "draft_id":
 			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
-				return ec._Utxo_DraftID(ctx, field, obj)
+				return ec._Utxo_draft_id(ctx, field, obj)
 			}
 
 			out.Values[i] = innerFunc(ctx)
 
-		case "ReservedAt":
+		case "reserved_at":
 			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
-				return ec._Utxo_ReservedAt(ctx, field, obj)
+				return ec._Utxo_reserved_at(ctx, field, obj)
 			}
 
 			out.Values[i] = innerFunc(ctx)
 
-		case "SpendingTxID":
+		case "spending_tx_id":
 			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
-				return ec._Utxo_SpendingTxID(ctx, field, obj)
+				return ec._Utxo_spending_tx_id(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
+		case "metadata":
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Utxo_metadata(ctx, field, obj)
 			}
 
 			out.Values[i] = innerFunc(ctx)
@@ -7414,58 +7510,58 @@ func (ec *executionContext) _Xpub(ctx context.Context, sel ast.SelectionSet, obj
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("Xpub")
-		case "CreatedAt":
+		case "created_at":
 			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
-				return ec._Xpub_CreatedAt(ctx, field, obj)
+				return ec._Xpub_created_at(ctx, field, obj)
 			}
 
 			out.Values[i] = innerFunc(ctx)
 
-		case "UpdatedAt":
+		case "updated_at":
 			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
-				return ec._Xpub_UpdatedAt(ctx, field, obj)
+				return ec._Xpub_updated_at(ctx, field, obj)
 			}
 
 			out.Values[i] = innerFunc(ctx)
 
-		case "DeletedAt":
+		case "deleted_at":
 			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
-				return ec._Xpub_DeletedAt(ctx, field, obj)
+				return ec._Xpub_deleted_at(ctx, field, obj)
 			}
 
 			out.Values[i] = innerFunc(ctx)
 
-		case "ID":
+		case "id":
 			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
-				return ec._Xpub_ID(ctx, field, obj)
+				return ec._Xpub_id(ctx, field, obj)
 			}
 
 			out.Values[i] = innerFunc(ctx)
 
-		case "CurrentBalance":
+		case "current_balance":
 			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
-				return ec._Xpub_CurrentBalance(ctx, field, obj)
+				return ec._Xpub_current_balance(ctx, field, obj)
 			}
 
 			out.Values[i] = innerFunc(ctx)
 
-		case "NextInternalNum":
+		case "next_internal_num":
 			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
-				return ec._Xpub_NextInternalNum(ctx, field, obj)
+				return ec._Xpub_next_internal_num(ctx, field, obj)
 			}
 
 			out.Values[i] = innerFunc(ctx)
 
-		case "NextExternalNum":
+		case "next_external_num":
 			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
-				return ec._Xpub_NextExternalNum(ctx, field, obj)
+				return ec._Xpub_next_external_num(ctx, field, obj)
 			}
 
 			out.Values[i] = innerFunc(ctx)
 
-		case "Metadata":
+		case "metadata":
 			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
-				return ec._Xpub_Metadata(ctx, field, obj)
+				return ec._Xpub_metadata(ctx, field, obj)
 			}
 
 			out.Values[i] = innerFunc(ctx)

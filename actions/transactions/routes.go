@@ -25,5 +25,6 @@ func RegisterRoutes(router *apirouter.Router, appConfig *config.AppConfig, servi
 	router.HTTPRouter.POST("/"+config.CurrentMajorVersion+"/transactions/record", router.Request(require.Wrap(action.record)))
 	router.HTTPRouter.POST("/"+config.CurrentMajorVersion+"/transactions/new", router.Request(require.Wrap(action.newTransaction)))
 	router.HTTPRouter.GET("/"+config.CurrentMajorVersion+"/transactions", router.Request(require.Wrap(action.list)))
+	router.HTTPRouter.POST("/"+config.CurrentMajorVersion+"/transactions", router.Request(require.Wrap(action.list)))
 	router.HTTPRouter.GET("/"+config.CurrentMajorVersion+"/transaction", router.Request(require.Wrap(action.get)))
 }
