@@ -91,10 +91,12 @@ func (s *Server) Handlers() *nrhttprouter.Router {
 	s.Router = apirouter.NewWithNewRelic(s.Services.NewRelic)
 	segment.End()
 
-	// Turned off all CORs - should be accessed outside a browser
-	s.Router.CrossOriginEnabled = false
-	s.Router.CrossOriginAllowCredentials = false
-	s.Router.CrossOriginAllowOriginAll = false
+	// Turned on all CORs - should be able to access in a browser
+	s.Router.CrossOriginEnabled = true
+	s.Router.CrossOriginAllowCredentials = true
+	s.Router.CrossOriginAllowOrigin = "*"
+	s.Router.CrossOriginAllowMethods = "POST,GET,OPTIONS"
+	s.Router.CrossOriginAllowHeaders = "*"
 
 	// Start the segment
 	defer txn.StartSegment("register_handlers").End()

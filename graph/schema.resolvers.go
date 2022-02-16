@@ -175,6 +175,9 @@ func (r *queryResolver) Transaction(ctx context.Context, txID string) (*bux.Tran
 	if err != nil {
 		return nil, err
 	}
+	if tx == nil {
+		return nil, nil
+	}
 
 	return bux.DisplayModels(tx).(*bux.Transaction), nil
 }
@@ -189,6 +192,9 @@ func (r *queryResolver) Transactions(ctx context.Context, metadata bux.Metadata,
 	tx, err = c.Services.Bux.GetTransactions(ctx, c.XPub, &metadata, ConditionsParseGraphQL(conditions))
 	if err != nil {
 		return nil, err
+	}
+	if tx == nil {
+		return nil, nil
 	}
 
 	return bux.DisplayModels(tx).([]*bux.Transaction), nil

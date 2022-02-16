@@ -25,6 +25,8 @@ func (a *Action) get(w http.ResponseWriter, req *http.Request, ps httprouter.Par
 	if err != nil {
 		apirouter.ReturnResponse(w, req, http.StatusExpectationFailed, err.Error())
 		return
+	} else if transaction == nil {
+		apirouter.ReturnResponse(w, req, http.StatusNotFound, "")
 	} else if !transaction.IsXpubAssociated(reqXPub) {
 		apirouter.ReturnResponse(w, req, http.StatusForbidden, "unauthorized")
 		return
