@@ -96,16 +96,23 @@ func wrapHandler(router *apirouter.Router, appConfig *config.AppConfig, services
 
 		if withAuth {
 			var knownErr dictionary.ErrorMessage
-			if req, knownErr = actions.CheckAuthentication(appConfig, services.Bux, req, false); knownErr.Code > 0 {
+			// the graphql cannot check the signature using the bux check, will add extra checks in the endpoints
+			if req, knownErr = actions.CheckAuthentication(appConfig, services.Bux, req, false, false); knownErr.Code > 0 {
 				actions.ReturnErrorResponse(w, req, knownErr, "")
 				return
 			}
+		}
+
+		signed := req.Context().Value("auth_signed")
+		if signed == nil {
+			signed = false
 		}
 
 		// Create the context
 		ctx := context.WithValue(req.Context(), config.GraphConfigKey, &graph.GQLConfig{
 			AppConfig: appConfig,
 			Services:  services,
+			Signed:    signed.(bool),
 			XPub:      req.Header.Get(bux.AuthHeader),
 		})
 

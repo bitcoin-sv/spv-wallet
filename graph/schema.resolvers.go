@@ -46,7 +46,7 @@ func (r *mutationResolver) Xpub(ctx context.Context, xpub string, metadata map[s
 }
 
 func (r *mutationResolver) Transaction(ctx context.Context, hex string, draftID *string, metadata map[string]interface{}) (*bux.Transaction, error) {
-	c, err := GetConfigFromContext(ctx)
+	c, err := GetConfigFromContextSigned(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -107,7 +107,7 @@ func (r *mutationResolver) Transaction(ctx context.Context, hex string, draftID 
 }
 
 func (r *mutationResolver) NewTransaction(ctx context.Context, transactionConfig bux.TransactionConfig, metadata map[string]interface{}) (*bux.DraftTransaction, error) {
-	c, err := GetConfigFromContext(ctx)
+	c, err := GetConfigFromContextSigned(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -122,7 +122,7 @@ func (r *mutationResolver) NewTransaction(ctx context.Context, transactionConfig
 }
 
 func (r *mutationResolver) Destination(ctx context.Context, destinationType *string, metadata map[string]interface{}) (*bux.Destination, error) {
-	c, err := GetConfigFromContext(ctx)
+	c, err := GetConfigFromContextSigned(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -159,6 +159,13 @@ func (r *queryResolver) Xpub(ctx context.Context) (*bux.Xpub, error) {
 	xPub, err = c.Services.Bux.GetXpub(ctx, c.XPub)
 	if err != nil {
 		return nil, err
+	}
+
+	if !c.Signed {
+		// remove private data from the returned xPub
+		xPub.NextExternalNum = 0
+		xPub.NextInternalNum = 0
+		xPub.Metadata = nil
 	}
 
 	return bux.DisplayModels(xPub).(*bux.Xpub), nil
@@ -201,7 +208,7 @@ func (r *queryResolver) Transactions(ctx context.Context, metadata bux.Metadata,
 }
 
 func (r *queryResolver) Destination(ctx context.Context, lockingScript string) (*bux.Destination, error) {
-	c, err := GetConfigFromContext(ctx)
+	c, err := GetConfigFromContextSigned(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -216,7 +223,7 @@ func (r *queryResolver) Destination(ctx context.Context, lockingScript string) (
 }
 
 func (r *queryResolver) Destinations(ctx context.Context, metadata bux.Metadata) ([]*bux.Destination, error) {
-	c, err := GetConfigFromContext(ctx)
+	c, err := GetConfigFromContextSigned(ctx)
 	if err != nil {
 		return nil, err
 	}
