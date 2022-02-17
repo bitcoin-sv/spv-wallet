@@ -162,10 +162,7 @@ func (r *queryResolver) Xpub(ctx context.Context) (*bux.Xpub, error) {
 	}
 
 	if !c.Signed {
-		// remove private data from the returned xPub
-		xPub.NextExternalNum = 0
-		xPub.NextInternalNum = 0
-		xPub.Metadata = nil
+		xPub.RemovePrivateData()
 	}
 
 	return bux.DisplayModels(xPub).(*bux.Xpub), nil

@@ -36,10 +36,7 @@ func (a *Action) get(w http.ResponseWriter, req *http.Request, _ httprouter.Para
 
 	signed := req.Context().Value("auth_signed")
 	if signed == nil || !signed.(bool) {
-		// remove private data from the returned xPub
-		xPub.NextExternalNum = 0
-		xPub.NextInternalNum = 0
-		xPub.Metadata = nil
+		xPub.RemovePrivateData()
 	}
 
 	// Return response
