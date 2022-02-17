@@ -21,6 +21,7 @@ type Resolver struct{}
 type GQLConfig struct {
 	AppConfig *config.AppConfig
 	Services  *config.AppServices
+	Signed    bool
 	XPub      string
 	Auth      *bux.AuthPayload
 }
@@ -30,6 +31,21 @@ func GetConfigFromContext(ctx context.Context) (*GQLConfig, error) {
 	ctxConfig := ctx.Value(config.GraphConfigKey).(*GQLConfig)
 	if ctxConfig == nil {
 		return nil, errors.New("could not find config in context")
+	}
+
+	return ctxConfig, nil
+}
+
+// GetConfigFromContextSigned get the AppConfig, Services and rawXPubKey from the context
+// require that the request is properly signed
+func GetConfigFromContextSigned(ctx context.Context) (*GQLConfig, error) {
+	ctxConfig := ctx.Value(config.GraphConfigKey).(*GQLConfig)
+	if ctxConfig == nil {
+		return nil, errors.New("could not find config in context")
+	}
+
+	if !ctxConfig.Signed {
+		return nil, bux.ErrMissingSignature
 	}
 
 	return ctxConfig, nil

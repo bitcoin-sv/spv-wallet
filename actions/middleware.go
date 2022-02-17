@@ -28,7 +28,23 @@ func (a *Action) RequireAuthentication(fn httprouter.Handle) httprouter.Handle {
 
 		// Check the authentication
 		var knownErr dictionary.ErrorMessage
-		if req, knownErr = CheckAuthentication(a.AppConfig, a.Services.Bux, req, false); knownErr.Code > 0 {
+		if req, knownErr = CheckAuthentication(a.AppConfig, a.Services.Bux, req, false, true); knownErr.Code > 0 {
+			ReturnErrorResponse(w, req, knownErr, "")
+			return
+		}
+
+		// Continue to next method
+		fn(w, req, p)
+	}
+}
+
+// RequireBasicAuthentication checks and requires authentication for the related method, but does not require signing
+func (a *Action) RequireBasicAuthentication(fn httprouter.Handle) httprouter.Handle {
+	return func(w http.ResponseWriter, req *http.Request, p httprouter.Params) {
+
+		// Check the authentication
+		var knownErr dictionary.ErrorMessage
+		if req, knownErr = CheckAuthentication(a.AppConfig, a.Services.Bux, req, false, false); knownErr.Code > 0 {
 			ReturnErrorResponse(w, req, knownErr, "")
 			return
 		}
@@ -44,7 +60,7 @@ func (a *Action) RequireAdminAuthentication(fn httprouter.Handle) httprouter.Han
 
 		// Check the authentication
 		var knownErr dictionary.ErrorMessage
-		if req, knownErr = CheckAuthentication(a.AppConfig, a.Services.Bux, req, true); knownErr.Code > 0 {
+		if req, knownErr = CheckAuthentication(a.AppConfig, a.Services.Bux, req, true, true); knownErr.Code > 0 {
 			ReturnErrorResponse(w, req, knownErr, "")
 			return
 		}
@@ -55,7 +71,7 @@ func (a *Action) RequireAdminAuthentication(fn httprouter.Handle) httprouter.Han
 }
 
 // CheckAuthentication will check the authentication
-func CheckAuthentication(appConfig *config.AppConfig, bux bux.ClientInterface, req *http.Request, adminRequired bool) (*http.Request, dictionary.ErrorMessage) {
+func CheckAuthentication(appConfig *config.AppConfig, bux bux.ClientInterface, req *http.Request, adminRequired bool, requireSigning bool) (*http.Request, dictionary.ErrorMessage) {
 
 	// Bad/Unknown scheme
 	if appConfig.Authentication.Scheme != config.AuthenticationSchemeXpub {
@@ -67,7 +83,7 @@ func CheckAuthentication(appConfig *config.AppConfig, bux bux.ClientInterface, r
 	if req, err = bux.AuthenticateRequest(
 		req.Context(),
 		req, []string{appConfig.Authentication.AdminKey}, adminRequired,
-		appConfig.Authentication.RequireSigning,
+		requireSigning && appConfig.Authentication.RequireSigning,
 		appConfig.Authentication.SigningDisabled,
 	); err != nil {
 		return req, dictionary.GetError(dictionary.ErrorAuthenticationError, err.Error())
