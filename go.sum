@@ -884,8 +884,9 @@ github.com/tidwall/pretty v1.0.0/go.mod h1:XNkn88O1ChpSDQmQeStsy+sBenx6DDtFZJxhV
 github.com/tmc/grpc-websocket-proxy v0.0.0-20170815181823-89b8d40f7ca8/go.mod h1:ncp9v5uamzpCO7NfCPTXjqaC+bZgJeR0sMTm6dMHP7U=
 github.com/tonicpow/go-minercraft v0.7.0 h1:tM5BGoGPP0EeDc1+P214JANnSUxQJJ0dbGmYfexRbtA=
 github.com/tonicpow/go-minercraft v0.7.0/go.mod h1:RVy/Ch5za9xi8M+jheMpTZgg3hPGmISKXNrRLrCf2lg=
-github.com/tonicpow/go-paymail v0.7.1 h1:oO0Aja8F6qH45D9G/zqGI2BLCfbgSJSAFyJ30bIffKU=
 github.com/tonicpow/go-paymail v0.7.1/go.mod h1:j+lqgkYSxZdpDfKlE9E/M/BYcXwBuq4tW9C//xhZzyc=
+github.com/tonicpow/go-paymail v0.7.2 h1:WUlC0K1SgPZxMOdexpu4sIiaPkN5fRomvrSBwghlEIE=
+github.com/tonicpow/go-paymail v0.7.2/go.mod h1:tRDJ1sTixonGoxJc19KpBoaLX6KYAAjZyfgb13YR+RE=
 github.com/tryvium-travels/memongo v0.4.0 h1:eJtDxLbjzsAdXA6XWaCUZClWRAXZ72j6jb3mKY+ZTSk=
 github.com/tryvium-travels/memongo v0.4.0/go.mod h1:TKLvXhrZIqe1meEsWofcM6EmWawRdhFRGazUhiYsaUM=
 github.com/tv42/httpunix v0.0.0-20150427012821-b75d8614f926/go.mod h1:9ESjWnEqriFuLhtthL60Sar/7RFoluCcXsuvEwTV5KM=

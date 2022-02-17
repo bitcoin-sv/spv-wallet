@@ -22,7 +22,7 @@ require (
 	github.com/spf13/viper v1.10.1
 	github.com/stretchr/testify v1.7.0
 	github.com/tonicpow/go-minercraft v0.7.0
-	github.com/tonicpow/go-paymail v0.7.1
+	github.com/tonicpow/go-paymail v0.7.2
 	github.com/vektah/gqlparser/v2 v2.3.1
 )
 
