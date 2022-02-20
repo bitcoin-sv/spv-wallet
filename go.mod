@@ -129,17 +129,17 @@ require (
 	golang.org/x/text v0.3.7 // indirect
 	golang.org/x/tools v0.1.9 // indirect
 	golang.org/x/xerrors v0.0.0-20200804184101-5ec99f83aff1 // indirect
-	google.golang.org/genproto v0.0.0-20220217155828-d576998c0009 // indirect
+	google.golang.org/genproto v0.0.0-20220218161850-94dd64e39d7c // indirect
 	google.golang.org/grpc v1.44.0 // indirect
 	google.golang.org/protobuf v1.27.1 // indirect
 	gopkg.in/ini.v1 v1.66.4 // indirect
 	gopkg.in/src-d/go-errors.v1 v1.0.0 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
 	gopkg.in/yaml.v3 v3.0.0-20210107192922-496545a6307b // indirect
-	gorm.io/driver/mysql v1.2.3 // indirect
-	gorm.io/driver/postgres v1.2.3 // indirect
-	gorm.io/driver/sqlite v1.2.6 // indirect
-	gorm.io/gorm v1.22.5 // indirect
+	gorm.io/driver/mysql v1.3.2 // indirect
+	gorm.io/driver/postgres v1.3.1 // indirect
+	gorm.io/driver/sqlite v1.3.1 // indirect
+	gorm.io/gorm v1.23.1 // indirect
 	gorm.io/plugin/dbresolver v1.1.0 // indirect
 )
 
