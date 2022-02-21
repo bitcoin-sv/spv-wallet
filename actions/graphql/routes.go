@@ -103,9 +103,14 @@ func wrapHandler(router *apirouter.Router, appConfig *config.AppConfig, services
 			}
 		}
 
-		signed := req.Context().Value("auth_signed")
+		signed := req.Context().Value(bux.ParamAuthSigned)
 		if signed == nil {
 			signed = false
+		}
+
+		xPubID := req.Context().Value(bux.ParamXPubHashKey)
+		if xPubID == nil {
+			xPubID = ""
 		}
 
 		// Create the context
@@ -114,6 +119,7 @@ func wrapHandler(router *apirouter.Router, appConfig *config.AppConfig, services
 			Services:  services,
 			Signed:    signed.(bool),
 			XPub:      req.Header.Get(bux.AuthHeader),
+			XPubID:    xPubID.(string),
 		})
 
 		// Call your original http.Handler

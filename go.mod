@@ -2,9 +2,11 @@ module github.com/BuxOrg/bux-server
 
 go 1.17
 
+replace github.com/BuxOrg/bux => ../bux
+
 require (
 	github.com/99designs/gqlgen v0.16.0
-	github.com/BuxOrg/bux v0.1.2-0.20220217190228-f3dec4b4d95d
+	github.com/BuxOrg/bux v0.1.2-0.20220220132221-13649531b5cd
 	github.com/bitcoinschema/go-bitcoin/v2 v2.0.0-alpha.2
 	github.com/dgraph-io/ristretto v0.1.0
 	github.com/go-ozzo/ozzo-validation v3.6.0+incompatible
