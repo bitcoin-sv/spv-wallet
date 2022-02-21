@@ -4,6 +4,7 @@ import (
 	"net/http"
 
 	"github.com/BuxOrg/bux"
+	"github.com/BuxOrg/bux-server/actions"
 	"github.com/julienschmidt/httprouter"
 	apirouter "github.com/mrz1836/go-api-router"
 )
@@ -16,7 +17,7 @@ func (a *Action) create(w http.ResponseWriter, req *http.Request, _ httprouter.P
 
 	// params
 	key := params.GetString("key")
-	metadata := params.GetJSON("metadata")
+	metadata := params.GetJSON(actions.MetadataField)
 
 	// Create a new xPub
 	xPub, err := a.Services.Bux.NewXpub(

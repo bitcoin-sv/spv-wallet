@@ -7,6 +7,11 @@ import (
 	apirouter "github.com/mrz1836/go-api-router"
 )
 
+const (
+	// MetadataField is the field name used for metadata (params)
+	MetadataField = "metadata"
+)
+
 // ReturnErrorResponse will return a response using a dictionary.
 // Error (using standard error responses)
 //

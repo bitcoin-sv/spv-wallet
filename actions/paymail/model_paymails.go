@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/BuxOrg/bux"
+	"github.com/BuxOrg/bux-server/actions"
 	"github.com/BuxOrg/bux/datastore"
 	"github.com/BuxOrg/bux/utils"
 	"github.com/tonicpow/go-paymail"
@@ -25,7 +26,7 @@ type PaymailAddress struct {
 
 // ModelPaymail model paymail
 const ModelPaymail = "paymail"
-const tablePaymails = "paymails"
+const tablePaymails = "paymail_addresses"
 
 const (
 	defaultGetTimeout       = 10 * time.Second
@@ -101,5 +102,5 @@ func (p *PaymailAddress) BeforeCreating(_ context.Context) (err error) {
 
 // Migrate model specific migration
 func (p *PaymailAddress) Migrate(client datastore.ClientInterface) error {
-	return client.IndexMetadata(client.GetTableName("paymail_addresses"), "metadata")
+	return client.IndexMetadata(client.GetTableName(tablePaymails), actions.MetadataField)
 }

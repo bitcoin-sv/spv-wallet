@@ -5,6 +5,7 @@ import (
 	"net/http"
 
 	"github.com/BuxOrg/bux"
+	"github.com/BuxOrg/bux-server/actions"
 	"github.com/julienschmidt/httprouter"
 	apirouter "github.com/mrz1836/go-api-router"
 )
@@ -17,7 +18,7 @@ func (a *Action) list(w http.ResponseWriter, req *http.Request, _ httprouter.Par
 	// Parse the params
 	params := apirouter.GetParams(req)
 
-	metadataReq := params.GetJSON("metadata")
+	metadataReq := params.GetJSON(actions.MetadataField)
 	var metadata *bux.Metadata
 	if len(metadataReq) > 0 {
 		// marshal the metadata into the Metadata model
