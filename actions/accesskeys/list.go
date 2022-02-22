@@ -1,4 +1,4 @@
-package access_keys
+package accesskeys
 
 import (
 	"encoding/json"
