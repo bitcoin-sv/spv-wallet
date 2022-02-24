@@ -45,6 +45,40 @@ func (r *mutationResolver) Xpub(ctx context.Context, xpub string, metadata map[s
 	return bux.DisplayModels(xPub).(*bux.Xpub), nil
 }
 
+func (r *mutationResolver) AccessKey(ctx context.Context, metadata map[string]interface{}) (*bux.AccessKey, error) {
+	c, err := GetConfigFromContextSigned(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	// Create a new accessKey
+	var accessKey *bux.AccessKey
+	accessKey, err = c.Services.Bux.NewAccessKey(
+		ctx,
+		c.XPub,
+		bux.WithMetadatas(metadata),
+	)
+
+	return bux.DisplayModels(accessKey).(*bux.AccessKey), nil
+}
+
+func (r *mutationResolver) AccessKeyRevoke(ctx context.Context, id *string) (*bux.AccessKey, error) {
+	c, err := GetConfigFromContextSigned(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	// Revoke an accessKey
+	var accessKey *bux.AccessKey
+	accessKey, err = c.Services.Bux.RevokeAccessKey(
+		ctx,
+		c.XPub,
+		*id,
+	)
+
+	return bux.DisplayModels(accessKey).(*bux.AccessKey), nil
+}
+
 func (r *mutationResolver) Transaction(ctx context.Context, hex string, draftID *string, metadata map[string]interface{}) (*bux.Transaction, error) {
 	c, err := GetConfigFromContextSigned(ctx)
 	if err != nil {
@@ -166,6 +200,36 @@ func (r *queryResolver) Xpub(ctx context.Context) (*bux.Xpub, error) {
 	}
 
 	return bux.DisplayModels(xPub).(*bux.Xpub), nil
+}
+
+func (r *queryResolver) AccessKey(ctx context.Context, key string) (*bux.AccessKey, error) {
+	c, err := GetConfigFromContextSigned(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	var accessKey *bux.AccessKey
+	accessKey, err = c.Services.Bux.GetAccessKey(ctx, c.XPub, key)
+	if err != nil {
+		return nil, err
+	}
+
+	return bux.DisplayModels(accessKey).(*bux.AccessKey), nil
+}
+
+func (r *queryResolver) AccessKeys(ctx context.Context, metadata bux.Metadata) ([]*bux.AccessKey, error) {
+	c, err := GetConfigFromContextSigned(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	var accessKeys []*bux.AccessKey
+	accessKeys, err = c.Services.Bux.GetAccessKeys(ctx, c.XPubID, &metadata)
+	if err != nil {
+		return nil, err
+	}
+
+	return bux.DisplayModels(accessKeys).([]*bux.AccessKey), nil
 }
 
 func (r *queryResolver) Transaction(ctx context.Context, txID string) (*bux.Transaction, error) {

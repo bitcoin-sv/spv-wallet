@@ -23,6 +23,7 @@ type GQLConfig struct {
 	Services  *config.AppServices
 	Signed    bool
 	XPub      string
+	XPubID    string
 	Auth      *bux.AuthPayload
 }
 
@@ -44,7 +45,7 @@ func GetConfigFromContextSigned(ctx context.Context) (*GQLConfig, error) {
 		return nil, errors.New("could not find config in context")
 	}
 
-	if !ctxConfig.Signed {
+	if !ctxConfig.Signed && !ctxConfig.AppConfig.Authentication.SigningDisabled {
 		return nil, bux.ErrMissingSignature
 	}
 

@@ -43,6 +43,8 @@ resolver:
 # modelgen, the others will be allowed when binding to fields. Configure them to
 # your liking
 models:
+  AccessKey:
+    model: github.com/BuxOrg/bux.AccessKey
   ChangeStrategy:
     model: github.com/BuxOrg/bux.ChangeStrategy
   Destination:
