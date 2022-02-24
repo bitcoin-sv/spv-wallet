@@ -16,9 +16,9 @@ import (
 type PaymailAddress struct {
 	bux.Model       `bson:",inline"` // Base bux model
 	ID              string           `json:"id" toml:"id" yaml:"id" gorm:"<-:create;type:char(64);primaryKey;comment:This is the unique paymail record id" bson:"_id"`                                                         // Unique identifier
-	Alias           string           `json:"alias" toml:"alias" yaml:"alias" gorm:"<-:create;type:varchar(64);uniqueIndex:idx_paymail_address;comment:This is alias@" bson:"alias"`                                            // Alias part of the paymail
-	Domain          string           `json:"domain" toml:"domain" yaml:"domain" gorm:"<-:create;type:varchar(255);uniqueIndex:idx_paymail_address;comment:This is @domain.com" bson:"domain"`                                  // Domain of the paymail
-	Username        string           `json:"username" toml:"username" yaml:"username" gorm:"<-;type:varchar(255);comment:This is username" bson:"username"`                                                                    // Full username
+	Alias           string           `json:"alias" toml:"alias" yaml:"alias" gorm:"<-;type:varchar(64);uniqueIndex:idx_paymail_address;comment:This is alias@" bson:"alias"`                                                   // Alias part of the paymail
+	Domain          string           `json:"domain" toml:"domain" yaml:"domain" gorm:"<-;type:varchar(255);uniqueIndex:idx_paymail_address;comment:This is @domain.com" bson:"domain"`                                         // Domain of the paymail
+	Username        string           `json:"username" toml:"username" yaml:"username" gorm:"<-;type:varchar(255);uniqueIndex;comment:This is username" bson:"username"`                                                        // Full username
 	Avatar          string           `json:"avatar" toml:"avatar" yaml:"avatar" gorm:"<-;type:text;comment:This is avatar url" bson:"avatar"`                                                                                  // This is the url of the user (public profile)
 	ExternalXPubKey string           `json:"external_xpub_key" toml:"external_xpub_key" yaml:"external_xpub_key" gorm:"<-:create;type:varchar(111);index;comment:This is full xPub for external use" bson:"external_xpub_key"` // PublicKey hex encoded
 	XPubID          string           `json:"xpub_id" toml:"xpub_id" yaml:"xpub_id" gorm:"<-:create;type:char(64);index;comment:This is the related xPub" bson:"xpub_id"`                                                       // PublicKey hex encoded
@@ -39,13 +39,60 @@ const (
 func NewPaymail(paymailAddress string, opts ...bux.ModelOps) *PaymailAddress {
 
 	// Standardize and sanitize!
-	alias, domain, address := paymail.SanitizePaymail(paymailAddress)
+	alias, domain, _ := paymail.SanitizePaymail(paymailAddress)
+	id, _ := utils.RandomHex(32)
 	return &PaymailAddress{
 		Model:  *bux.NewBaseModel(ModelPaymail, opts...),
 		Alias:  alias,
 		Domain: domain,
-		ID:     utils.Hash(address),
+		ID:     id,
 	}
+}
+
+// GetPaymail will get the paymail with the given conditions
+func GetPaymail(ctx context.Context, address string, opts ...bux.ModelOps) (*PaymailAddress, error) {
+
+	alias, domain, _ := paymail.SanitizePaymail(address)
+	// Get the record
+	paymailAddress := &PaymailAddress{
+		Model: *bux.NewBaseModel(bux.ModelXPub, opts...),
+	}
+
+	conditions := map[string]interface{}{
+		"alias":  alias,
+		"domain": domain,
+	}
+
+	if err := bux.Get(
+		ctx, paymailAddress, conditions, false, defaultGetTimeout,
+	); err != nil {
+		if errors.Is(err, datastore.ErrNoResults) {
+			return nil, nil
+		}
+		return nil, err
+	}
+
+	return paymailAddress, nil
+}
+
+// GetPaymailByID will get the paymail with the given ID
+func GetPaymailByID(ctx context.Context, id string, opts ...bux.ModelOps) (*PaymailAddress, error) {
+
+	// Get the record
+	paymailAddress := &PaymailAddress{
+		ID:    id,
+		Model: *bux.NewBaseModel(bux.ModelXPub, opts...),
+	}
+	if err := bux.Get(
+		ctx, paymailAddress, nil, false, defaultGetTimeout,
+	); err != nil {
+		if errors.Is(err, datastore.ErrNoResults) {
+			return nil, nil
+		}
+		return nil, err
+	}
+
+	return paymailAddress, nil
 }
 
 // GetModelName returns the model name
@@ -77,23 +124,23 @@ func (p *PaymailAddress) BeforeCreating(_ context.Context) (err error) {
 	}
 
 	if p.ID == "" {
-		return errors.New("missing id in paymail")
+		return ErrMissingPaymailID
 	}
 
 	if len(p.Alias) == 0 {
-		return errors.New("missing alias in paymail")
+		return ErrMissingPaymailAddress
 	}
 
 	if len(p.Domain) == 0 {
-		return errors.New("missing domain in paymail")
+		return ErrMissingPaymailDomain
 	}
 
 	if len(p.ExternalXPubKey) == 0 {
-		return errors.New("missing external xPub in paymail")
+		return ErrMissingPaymailExternalXPub
 	}
 
 	if len(p.XPubID) == 0 {
-		return errors.New("missing xpub_id in paymail")
+		return ErrMissingPaymailXPubID
 	}
 
 	p.DebugLog("end: " + p.Name() + " BeforeCreating hook")
