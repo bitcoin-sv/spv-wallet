@@ -53,11 +53,13 @@ func (r *mutationResolver) AccessKey(ctx context.Context, metadata map[string]in
 
 	// Create a new accessKey
 	var accessKey *bux.AccessKey
-	accessKey, err = c.Services.Bux.NewAccessKey(
+	if accessKey, err = c.Services.Bux.NewAccessKey(
 		ctx,
 		c.XPub,
 		bux.WithMetadatas(metadata),
-	)
+	); err != nil {
+		return nil, err
+	}
 
 	return bux.DisplayModels(accessKey).(*bux.AccessKey), nil
 }
@@ -70,11 +72,13 @@ func (r *mutationResolver) AccessKeyRevoke(ctx context.Context, id *string) (*bu
 
 	// Revoke an accessKey
 	var accessKey *bux.AccessKey
-	accessKey, err = c.Services.Bux.RevokeAccessKey(
+	if accessKey, err = c.Services.Bux.RevokeAccessKey(
 		ctx,
 		c.XPub,
 		*id,
-	)
+	); err != nil {
+		return nil, err
+	}
 
 	return bux.DisplayModels(accessKey).(*bux.AccessKey), nil
 }

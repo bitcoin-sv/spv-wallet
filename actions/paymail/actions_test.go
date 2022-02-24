@@ -18,7 +18,7 @@ func Test_newPaymailAddress(t *testing.T) {
 
 		paymail := ""
 		_, err := newPaymailAddress(ctx, testXPub, paymail, client.DefaultModelOptions()...)
-		require.ErrorIs(t, err, ErrMissingPaymailID)
+		require.ErrorIs(t, err, ErrMissingPaymailAddress)
 	})
 
 	t.Run("new paymail address", func(t *testing.T) {
@@ -73,7 +73,7 @@ func Test_deletePaymailAddress(t *testing.T) {
 		err = deletePaymailAddress(ctx, testPaymail, client.DefaultModelOptions()...)
 		require.NoError(t, err)
 
-		//time.Sleep(1 * time.Second)
+		// time.Sleep(1 * time.Second)
 
 		var p2 *PaymailAddress
 		p2, err = GetPaymail(ctx, testPaymail, client.DefaultModelOptions()...)

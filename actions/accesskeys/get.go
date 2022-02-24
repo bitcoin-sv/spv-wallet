@@ -3,9 +3,8 @@ package accesskeys
 import (
 	"net/http"
 
-	"github.com/BuxOrg/bux/utils"
-
 	"github.com/BuxOrg/bux"
+	"github.com/BuxOrg/bux/utils"
 	"github.com/julienschmidt/httprouter"
 	apirouter "github.com/mrz1836/go-api-router"
 )
@@ -24,7 +23,7 @@ func (a *Action) get(w http.ResponseWriter, req *http.Request, _ httprouter.Para
 		return
 	}
 
-	// Get an access key
+	// Get access key
 	accessKey, err := a.Services.Bux.GetAccessKey(
 		req.Context(), reqXPub, id,
 	)
