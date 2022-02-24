@@ -2,11 +2,9 @@ module github.com/BuxOrg/bux-server
 
 go 1.17
 
-replace github.com/BuxOrg/bux => ../bux
-
 require (
 	github.com/99designs/gqlgen v0.16.0
-	github.com/BuxOrg/bux v0.1.2-0.20220220132221-13649531b5cd
+	github.com/BuxOrg/bux v0.1.3
 	github.com/bitcoinschema/go-bitcoin/v2 v2.0.0-alpha.2
 	github.com/dgraph-io/ristretto v0.1.0
 	github.com/go-ozzo/ozzo-validation v3.6.0+incompatible
@@ -81,7 +79,7 @@ require (
 	github.com/lestrrat-go/strftime v1.0.5 // indirect
 	github.com/lib/pq v1.10.4 // indirect
 	github.com/libsv/go-bt v1.0.4 // indirect
-	github.com/magiconair/properties v1.8.5 // indirect
+	github.com/magiconair/properties v1.8.6 // indirect
 	github.com/matryer/respond v1.0.1 // indirect
 	github.com/mattn/go-sqlite3 v1.14.11 // indirect
 	github.com/miekg/dns v1.1.46 // indirect
@@ -127,7 +125,7 @@ require (
 	golang.org/x/mod v0.5.1 // indirect
 	golang.org/x/net v0.0.0-20220127200216-cd36cc0744dd // indirect
 	golang.org/x/sync v0.0.0-20210220032951-036812b2e83c // indirect
-	golang.org/x/sys v0.0.0-20220223155357-96fed51e1446 // indirect
+	golang.org/x/sys v0.0.0-20220224120231-95c6836cb0e7 // indirect
 	golang.org/x/text v0.3.7 // indirect
 	golang.org/x/tools v0.1.9 // indirect
 	golang.org/x/xerrors v0.0.0-20200804184101-5ec99f83aff1 // indirect
