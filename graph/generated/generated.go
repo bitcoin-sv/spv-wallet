@@ -45,6 +45,13 @@ type DirectiveRoot struct {
 }
 
 type ComplexityRoot struct {
+	AccessKey struct {
+		ID        func(childComplexity int) int
+		Key       func(childComplexity int) int
+		RevokedAt func(childComplexity int) int
+		XpubID    func(childComplexity int) int
+	}
+
 	Destination struct {
 		Address       func(childComplexity int) int
 		Chain         func(childComplexity int) int
@@ -76,10 +83,12 @@ type ComplexityRoot struct {
 	}
 
 	Mutation struct {
-		Destination    func(childComplexity int, destinationType *string, metadata map[string]interface{}) int
-		NewTransaction func(childComplexity int, transactionConfig bux.TransactionConfig, metadata map[string]interface{}) int
-		Transaction    func(childComplexity int, hex string, draftID *string, metadata map[string]interface{}) int
-		Xpub           func(childComplexity int, xpub string, metadata map[string]interface{}) int
+		AccessKey       func(childComplexity int, metadata map[string]interface{}) int
+		AccessKeyRevoke func(childComplexity int, id *string) int
+		Destination     func(childComplexity int, destinationType *string, metadata map[string]interface{}) int
+		NewTransaction  func(childComplexity int, transactionConfig bux.TransactionConfig, metadata map[string]interface{}) int
+		Transaction     func(childComplexity int, hex string, draftID *string, metadata map[string]interface{}) int
+		Xpub            func(childComplexity int, xpub string, metadata map[string]interface{}) int
 	}
 
 	OpReturn struct {
@@ -107,6 +116,8 @@ type ComplexityRoot struct {
 	}
 
 	Query struct {
+		AccessKey    func(childComplexity int, key string) int
+		AccessKeys   func(childComplexity int, metadata bux.Metadata) int
 		Destination  func(childComplexity int, lockingScript string) int
 		Destinations func(childComplexity int, metadata bux.Metadata) int
 		Transaction  func(childComplexity int, txID string) int
@@ -199,12 +210,16 @@ type ComplexityRoot struct {
 
 type MutationResolver interface {
 	Xpub(ctx context.Context, xpub string, metadata map[string]interface{}) (*bux.Xpub, error)
+	AccessKey(ctx context.Context, metadata map[string]interface{}) (*bux.AccessKey, error)
+	AccessKeyRevoke(ctx context.Context, id *string) (*bux.AccessKey, error)
 	Transaction(ctx context.Context, hex string, draftID *string, metadata map[string]interface{}) (*bux.Transaction, error)
 	NewTransaction(ctx context.Context, transactionConfig bux.TransactionConfig, metadata map[string]interface{}) (*bux.DraftTransaction, error)
 	Destination(ctx context.Context, destinationType *string, metadata map[string]interface{}) (*bux.Destination, error)
 }
 type QueryResolver interface {
 	Xpub(ctx context.Context) (*bux.Xpub, error)
+	AccessKey(ctx context.Context, key string) (*bux.AccessKey, error)
+	AccessKeys(ctx context.Context, metadata bux.Metadata) ([]*bux.AccessKey, error)
 	Transaction(ctx context.Context, txID string) (*bux.Transaction, error)
 	Transactions(ctx context.Context, metadata bux.Metadata, conditions map[string]interface{}) ([]*bux.Transaction, error)
 	Destination(ctx context.Context, lockingScript string) (*bux.Destination, error)
@@ -225,6 +240,34 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 	ec := executionContext{nil, e}
 	_ = ec
 	switch typeName + "." + field {
+
+	case "AccessKey.id":
+		if e.complexity.AccessKey.ID == nil {
+			break
+		}
+
+		return e.complexity.AccessKey.ID(childComplexity), true
+
+	case "AccessKey.key":
+		if e.complexity.AccessKey.Key == nil {
+			break
+		}
+
+		return e.complexity.AccessKey.Key(childComplexity), true
+
+	case "AccessKey.revoked_at":
+		if e.complexity.AccessKey.RevokedAt == nil {
+			break
+		}
+
+		return e.complexity.AccessKey.RevokedAt(childComplexity), true
+
+	case "AccessKey.xpub_id":
+		if e.complexity.AccessKey.XpubID == nil {
+			break
+		}
+
+		return e.complexity.AccessKey.XpubID(childComplexity), true
 
 	case "Destination.address":
 		if e.complexity.Destination.Address == nil {
@@ -372,6 +415,30 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.FeeUnit.Satoshis(childComplexity), true
+
+	case "Mutation.access_key":
+		if e.complexity.Mutation.AccessKey == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_access_key_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.AccessKey(childComplexity, args["metadata"].(map[string]interface{})), true
+
+	case "Mutation.access_key_revoke":
+		if e.complexity.Mutation.AccessKeyRevoke == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_access_key_revoke_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.AccessKeyRevoke(childComplexity, args["id"].(*string)), true
 
 	case "Mutation.destination":
 		if e.complexity.Mutation.Destination == nil {
@@ -525,6 +592,30 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.PaymailP4.ResolutionType(childComplexity), true
+
+	case "Query.access_key":
+		if e.complexity.Query.AccessKey == nil {
+			break
+		}
+
+		args, err := ec.field_Query_access_key_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Query.AccessKey(childComplexity, args["key"].(string)), true
+
+	case "Query.access_keys":
+		if e.complexity.Query.AccessKeys == nil {
+			break
+		}
+
+		args, err := ec.field_Query_access_keys_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Query.AccessKeys(childComplexity, args["metadata"].(bux.Metadata)), true
 
 	case "Query.destination":
 		if e.complexity.Query.Destination == nil {
@@ -1092,6 +1183,13 @@ scalar DraftStatus
 scalar ChangeStrategy
 scalar TransactionDirection
 
+type AccessKey {
+    id:         String
+    xpub_id:    String
+    revoked_at: NullTime
+    key:        String
+}
+
 type Xpub {
     created_at:        Time
     updated_at:        Time
@@ -1264,6 +1362,12 @@ input TransactionConfigInput {
 
 type Query {
     xpub: Xpub
+    access_key(
+        key: String!
+    ): AccessKey
+    access_keys(
+        metadata: Metadata
+    ): [AccessKey]
     transaction(
         tx_id: String!
     ): Transaction
@@ -1284,6 +1388,12 @@ type Mutation {
         xpub: String!,
         metadata: Map
     ): Xpub
+    access_key(
+        metadata: Map
+    ): AccessKey
+    access_key_revoke(
+        id: String
+    ): AccessKey
     transaction(
         hex: String!,
         draft_id: String,
@@ -1305,6 +1415,36 @@ var parsedSchema = gqlparser.MustLoadSchema(sources...)
 // endregion ************************** generated!.gotpl **************************
 
 // region    ***************************** args.gotpl *****************************
+
+func (ec *executionContext) field_Mutation_access_key_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 map[string]interface{}
+	if tmp, ok := rawArgs["metadata"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("metadata"))
+		arg0, err = ec.unmarshalOMap2map(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["metadata"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Mutation_access_key_revoke_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 *string
+	if tmp, ok := rawArgs["id"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
+		arg0, err = ec.unmarshalOString2ᚖstring(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["id"] = arg0
+	return args, nil
+}
 
 func (ec *executionContext) field_Mutation_destination_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
@@ -1423,6 +1563,36 @@ func (ec *executionContext) field_Query___type_args(ctx context.Context, rawArgs
 		}
 	}
 	args["name"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Query_access_key_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 string
+	if tmp, ok := rawArgs["key"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("key"))
+		arg0, err = ec.unmarshalNString2string(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["key"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Query_access_keys_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 bux.Metadata
+	if tmp, ok := rawArgs["metadata"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("metadata"))
+		arg0, err = ec.unmarshalOMetadata2githubᚗcomᚋBuxOrgᚋbuxᚐMetadata(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["metadata"] = arg0
 	return args, nil
 }
 
@@ -1547,6 +1717,134 @@ func (ec *executionContext) field___Type_fields_args(ctx context.Context, rawArg
 // endregion ************************** directives.gotpl **************************
 
 // region    **************************** field.gotpl *****************************
+
+func (ec *executionContext) _AccessKey_id(ctx context.Context, field graphql.CollectedField, obj *bux.AccessKey) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "AccessKey",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ID, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalOString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _AccessKey_xpub_id(ctx context.Context, field graphql.CollectedField, obj *bux.AccessKey) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "AccessKey",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.XpubID, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalOString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _AccessKey_revoked_at(ctx context.Context, field graphql.CollectedField, obj *bux.AccessKey) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "AccessKey",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.RevokedAt, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(utils.NullTime)
+	fc.Result = res
+	return ec.marshalONullTime2githubᚗcomᚋBuxOrgᚋbuxᚋutilsᚐNullTime(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _AccessKey_key(ctx context.Context, field graphql.CollectedField, obj *bux.AccessKey) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "AccessKey",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Key, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalOString2string(ctx, field.Selections, res)
+}
 
 func (ec *executionContext) _Destination_created_at(ctx context.Context, field graphql.CollectedField, obj *bux.Destination) (ret graphql.Marshaler) {
 	defer func() {
@@ -2259,6 +2557,84 @@ func (ec *executionContext) _Mutation_xpub(ctx context.Context, field graphql.Co
 	return ec.marshalOXpub2ᚖgithubᚗcomᚋBuxOrgᚋbuxᚐXpub(ctx, field.Selections, res)
 }
 
+func (ec *executionContext) _Mutation_access_key(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   true,
+		IsResolver: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Mutation_access_key_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().AccessKey(rctx, args["metadata"].(map[string]interface{}))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*bux.AccessKey)
+	fc.Result = res
+	return ec.marshalOAccessKey2ᚖgithubᚗcomᚋBuxOrgᚋbuxᚐAccessKey(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Mutation_access_key_revoke(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   true,
+		IsResolver: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Mutation_access_key_revoke_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().AccessKeyRevoke(rctx, args["id"].(*string))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*bux.AccessKey)
+	fc.Result = res
+	return ec.marshalOAccessKey2ᚖgithubᚗcomᚋBuxOrgᚋbuxᚐAccessKey(ctx, field.Selections, res)
+}
+
 func (ec *executionContext) _Mutation_transaction(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
@@ -2886,6 +3262,84 @@ func (ec *executionContext) _Query_xpub(ctx context.Context, field graphql.Colle
 	res := resTmp.(*bux.Xpub)
 	fc.Result = res
 	return ec.marshalOXpub2ᚖgithubᚗcomᚋBuxOrgᚋbuxᚐXpub(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Query_access_key(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Query",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   true,
+		IsResolver: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Query_access_key_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Query().AccessKey(rctx, args["key"].(string))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*bux.AccessKey)
+	fc.Result = res
+	return ec.marshalOAccessKey2ᚖgithubᚗcomᚋBuxOrgᚋbuxᚐAccessKey(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Query_access_keys(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Query",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   true,
+		IsResolver: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Query_access_keys_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Query().AccessKeys(rctx, args["metadata"].(bux.Metadata))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.([]*bux.AccessKey)
+	fc.Result = res
+	return ec.marshalOAccessKey2ᚕᚖgithubᚗcomᚋBuxOrgᚋbuxᚐAccessKey(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Query_transaction(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -6423,6 +6877,55 @@ func (ec *executionContext) unmarshalInputUtxoPointer(ctx context.Context, obj i
 
 // region    **************************** object.gotpl ****************************
 
+var accessKeyImplementors = []string{"AccessKey"}
+
+func (ec *executionContext) _AccessKey(ctx context.Context, sel ast.SelectionSet, obj *bux.AccessKey) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, accessKeyImplementors)
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("AccessKey")
+		case "id":
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._AccessKey_id(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
+		case "xpub_id":
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._AccessKey_xpub_id(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
+		case "revoked_at":
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._AccessKey_revoked_at(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
+		case "key":
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._AccessKey_key(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
 var destinationImplementors = []string{"Destination"}
 
 func (ec *executionContext) _Destination(ctx context.Context, sel ast.SelectionSet, obj *bux.Destination) graphql.Marshaler {
@@ -6659,6 +7162,20 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, innerFunc)
 
+		case "access_key":
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_access_key(ctx, field)
+			}
+
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, innerFunc)
+
+		case "access_key_revoke":
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_access_key_revoke(ctx, field)
+			}
+
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, innerFunc)
+
 		case "transaction":
 			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Mutation_transaction(ctx, field)
@@ -6888,6 +7405,46 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 					}
 				}()
 				res = ec._Query_xpub(ctx, field)
+				return res
+			}
+
+			rrm := func(ctx context.Context) graphql.Marshaler {
+				return ec.OperationContext.RootResolverMiddleware(ctx, innerFunc)
+			}
+
+			out.Concurrently(i, func() graphql.Marshaler {
+				return rrm(innerCtx)
+			})
+		case "access_key":
+			field := field
+
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_access_key(ctx, field)
+				return res
+			}
+
+			rrm := func(ctx context.Context) graphql.Marshaler {
+				return ec.OperationContext.RootResolverMiddleware(ctx, innerFunc)
+			}
+
+			out.Concurrently(i, func() graphql.Marshaler {
+				return rrm(innerCtx)
+			})
+		case "access_keys":
+			field := field
+
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_access_keys(ctx, field)
 				return res
 			}
 
@@ -8272,6 +8829,54 @@ func (ec *executionContext) marshalN__TypeKind2string(ctx context.Context, sel a
 		}
 	}
 	return res
+}
+
+func (ec *executionContext) marshalOAccessKey2ᚕᚖgithubᚗcomᚋBuxOrgᚋbuxᚐAccessKey(ctx context.Context, sel ast.SelectionSet, v []*bux.AccessKey) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	ret := make(graphql.Array, len(v))
+	var wg sync.WaitGroup
+	isLen1 := len(v) == 1
+	if !isLen1 {
+		wg.Add(len(v))
+	}
+	for i := range v {
+		i := i
+		fc := &graphql.FieldContext{
+			Index:  &i,
+			Result: &v[i],
+		}
+		ctx := graphql.WithFieldContext(ctx, fc)
+		f := func(i int) {
+			defer func() {
+				if r := recover(); r != nil {
+					ec.Error(ctx, ec.Recover(ctx, r))
+					ret = nil
+				}
+			}()
+			if !isLen1 {
+				defer wg.Done()
+			}
+			ret[i] = ec.marshalOAccessKey2ᚖgithubᚗcomᚋBuxOrgᚋbuxᚐAccessKey(ctx, sel, v[i])
+		}
+		if isLen1 {
+			f(i)
+		} else {
+			go f(i)
+		}
+
+	}
+	wg.Wait()
+
+	return ret
+}
+
+func (ec *executionContext) marshalOAccessKey2ᚖgithubᚗcomᚋBuxOrgᚋbuxᚐAccessKey(ctx context.Context, sel ast.SelectionSet, v *bux.AccessKey) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return ec._AccessKey(ctx, sel, v)
 }
 
 func (ec *executionContext) unmarshalOBoolean2bool(ctx context.Context, v interface{}) (bool, error) {

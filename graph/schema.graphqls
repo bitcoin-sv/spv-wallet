@@ -18,6 +18,13 @@ scalar DraftStatus
 scalar ChangeStrategy
 scalar TransactionDirection
 
+type AccessKey {
+    id:         String
+    xpub_id:    String
+    revoked_at: NullTime
+    key:        String
+}
+
 type Xpub {
     created_at:        Time
     updated_at:        Time
@@ -190,6 +197,12 @@ input TransactionConfigInput {
 
 type Query {
     xpub: Xpub
+    access_key(
+        key: String!
+    ): AccessKey
+    access_keys(
+        metadata: Metadata
+    ): [AccessKey]
     transaction(
         tx_id: String!
     ): Transaction
@@ -210,6 +223,12 @@ type Mutation {
         xpub: String!,
         metadata: Map
     ): Xpub
+    access_key(
+        metadata: Map
+    ): AccessKey
+    access_key_revoke(
+        id: String
+    ): AccessKey
     transaction(
         hex: String!,
         draft_id: String,
