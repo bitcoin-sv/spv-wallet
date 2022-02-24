@@ -15,13 +15,13 @@ func (a *Action) revoke(w http.ResponseWriter, req *http.Request, _ httprouter.P
 
 	// Parse the params
 	params := apirouter.GetParams(req)
-	key := params.GetString("key")
+	id := params.GetString("id")
 
 	// Create a new accessKey
 	accessKey, err := a.Services.Bux.RevokeAccessKey(
 		req.Context(),
 		reqXPub,
-		key,
+		id,
 	)
 	if err != nil {
 		apirouter.ReturnResponse(w, req, http.StatusUnprocessableEntity, err.Error())

@@ -17,18 +17,23 @@ func (a *Action) get(w http.ResponseWriter, req *http.Request, _ httprouter.Para
 
 	// Parse the params
 	params := apirouter.GetParams(req)
-	key := params.GetString("key")
+	id := params.GetString("id")
+
+	if id == "" {
+		apirouter.ReturnResponse(w, req, http.StatusExpectationFailed, bux.ErrMissingFieldID)
+		return
+	}
 
 	// Get an access key
 	accessKey, err := a.Services.Bux.GetAccessKey(
-		req.Context(), reqXPub, key,
+		req.Context(), reqXPub, id,
 	)
 	if err != nil {
 		apirouter.ReturnResponse(w, req, http.StatusExpectationFailed, err.Error())
 		return
 	}
 
-	if accessKey.XpubID == utils.Hash(reqXPub) {
+	if accessKey.XpubID != utils.Hash(reqXPub) {
 		apirouter.ReturnResponse(w, req, http.StatusForbidden, "unauthorized")
 		return
 	}

@@ -23,6 +23,7 @@ func RegisterRoutes(router *apirouter.Router, appConfig *config.AppConfig, servi
 
 	// V1 Requests
 	router.HTTPRouter.GET("/"+config.CurrentMajorVersion+"/access-key", router.Request(require.Wrap(action.get)))
+	router.HTTPRouter.GET("/"+config.CurrentMajorVersion+"/access-keys", router.Request(require.Wrap(action.list)))
 	router.HTTPRouter.POST("/"+config.CurrentMajorVersion+"/access-keys", router.Request(require.Wrap(action.create)))
 	router.HTTPRouter.DELETE("/"+config.CurrentMajorVersion+"/access-key", router.Request(require.Wrap(action.revoke)))
 }
