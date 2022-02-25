@@ -51,7 +51,9 @@ func TestNewPaymail(t *testing.T) {
 		err = p.Save(ctx)
 		require.NoError(t, err)
 
-		p2 := NewPaymail(paymail, client.DefaultModelOptions()...)
+		p2 := &PaymailAddress{
+			Model: *bux.NewBaseModel(ModelPaymail, client.DefaultModelOptions()...),
+		}
 		conditions := map[string]interface{}{
 			"alias":  p.Alias,
 			"domain": p.Domain,

@@ -42,6 +42,12 @@ func (a *Action) create(w http.ResponseWriter, req *http.Request, _ httprouter.P
 		metadata[bux.ReferenceIDField] = referenceID
 	}
 
+	opts := a.Services.Bux.DefaultModelOptions()
+
+	if metadata != nil {
+		opts = append(opts, bux.WithMetadatas(metadata))
+	}
+
 	// Get a new destination
 	var destination *bux.Destination
 	if destination, err = a.Services.Bux.NewDestination(
@@ -49,7 +55,7 @@ func (a *Action) create(w http.ResponseWriter, req *http.Request, _ httprouter.P
 		xPub.RawXpub(),
 		uint32(0), // todo: use a constant? protect this?
 		scriptType,
-		&metadata, // todo: check this exists before using a pointer?
+		opts...,
 	); err != nil {
 		apirouter.ReturnResponse(w, req, http.StatusUnprocessableEntity, err.Error())
 		return

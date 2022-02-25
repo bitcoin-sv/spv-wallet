@@ -224,7 +224,9 @@ func (p *PaymailInterface) getPaymailInformation(ctx context.Context, alias,
 
 // getPaymailAddress will get a paymail address
 func (p *PaymailInterface) getPaymailAddress(ctx context.Context, alias, domain string) (*PaymailAddress, error) {
-	paymailAddress := NewPaymail(alias+"@"+domain, p.client.DefaultModelOptions()...)
+	paymailAddress := &PaymailAddress{
+		Model: *bux.NewBaseModel(ModelPaymail, p.client.DefaultModelOptions()...),
+	}
 	conditions := map[string]interface{}{
 		"alias":  alias,
 		"domain": domain,

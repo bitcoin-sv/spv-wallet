@@ -73,8 +73,6 @@ func Test_deletePaymailAddress(t *testing.T) {
 		err = deletePaymailAddress(ctx, testPaymail, client.DefaultModelOptions()...)
 		require.NoError(t, err)
 
-		// time.Sleep(1 * time.Second)
-
 		var p2 *PaymailAddress
 		p2, err = GetPaymail(ctx, testPaymail, client.DefaultModelOptions()...)
 		require.NoError(t, err)
