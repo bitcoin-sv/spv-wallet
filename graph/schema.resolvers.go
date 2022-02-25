@@ -150,8 +150,13 @@ func (r *mutationResolver) NewTransaction(ctx context.Context, transactionConfig
 		return nil, err
 	}
 
+	opts := c.Services.Bux.DefaultModelOptions()
+	if metadata != nil {
+		opts = append(opts, bux.WithMetadatas(metadata))
+	}
+
 	var draftTransaction *bux.DraftTransaction
-	draftTransaction, err = c.Services.Bux.NewTransaction(ctx, c.XPub, &transactionConfig, metadata)
+	draftTransaction, err = c.Services.Bux.NewTransaction(ctx, c.XPub, &transactionConfig, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -172,13 +177,18 @@ func (r *mutationResolver) Destination(ctx context.Context, destinationType *str
 		useDestinationType = utils.ScriptTypePubKeyHash
 	}
 
+	opts := c.Services.Bux.DefaultModelOptions()
+	if metadata != nil {
+		opts = append(opts, bux.WithMetadatas(metadata))
+	}
+
 	var destination *bux.Destination
 	destination, err = c.Services.Bux.NewDestination(
 		ctx,
 		c.XPub,
 		utils.ChainExternal,
 		useDestinationType,
-		&metadata,
+		opts...,
 	)
 	if err != nil {
 		return nil, err

@@ -49,14 +49,19 @@ func (a *Action) newTransaction(w http.ResponseWriter, req *http.Request, _ http
 		return
 	}
 
+	metadata := params.GetJSON(bux.ModelMetadata.String())
+	opts := a.Services.Bux.DefaultModelOptions()
+	if metadata != nil {
+		opts = append(opts, bux.WithMetadatas(metadata))
+	}
+
 	// Record a new transaction (get the hex from parameters)
 	var transaction *bux.DraftTransaction
 	if transaction, err = a.Services.Bux.NewTransaction(
 		req.Context(),
 		xPub.RawXpub(),
 		&txConfig,
-		params.GetJSON(bux.ModelMetadata.String()), // todo: why is this not a point? see other uses of metadata
-		// todo: also why is metadata a field? Should use WithMetadata()
+		opts...,
 	); err != nil {
 		apirouter.ReturnResponse(w, req, http.StatusUnprocessableEntity, err.Error())
 		return
