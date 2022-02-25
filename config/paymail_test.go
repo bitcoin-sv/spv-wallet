@@ -11,7 +11,7 @@ func TestPaymailConfig_Validate(t *testing.T) {
 	t.Parallel()
 
 	t.Run("no domains", func(t *testing.T) {
-		p := paymailConfig{
+		p := PaymailConfig{
 			Domains: nil,
 			Enabled: true,
 		}
@@ -20,7 +20,7 @@ func TestPaymailConfig_Validate(t *testing.T) {
 	})
 
 	t.Run("zero domains", func(t *testing.T) {
-		p := paymailConfig{
+		p := PaymailConfig{
 			Domains: []string{},
 			Enabled: true,
 		}
@@ -29,7 +29,7 @@ func TestPaymailConfig_Validate(t *testing.T) {
 	})
 
 	t.Run("empty domains", func(t *testing.T) {
-		p := paymailConfig{
+		p := PaymailConfig{
 			Domains: []string{""},
 			Enabled: true,
 		}
@@ -38,7 +38,7 @@ func TestPaymailConfig_Validate(t *testing.T) {
 	})
 
 	t.Run("invalid hostname", func(t *testing.T) {
-		p := paymailConfig{
+		p := PaymailConfig{
 			Domains: []string{"..."},
 			Enabled: true,
 		}
@@ -47,7 +47,7 @@ func TestPaymailConfig_Validate(t *testing.T) {
 	})
 
 	t.Run("spaces in hostname", func(t *testing.T) {
-		p := paymailConfig{
+		p := PaymailConfig{
 			Domains: []string{"spaces in domain"},
 			Enabled: true,
 		}
@@ -56,7 +56,7 @@ func TestPaymailConfig_Validate(t *testing.T) {
 	})
 
 	t.Run("valid domains", func(t *testing.T) {
-		p := paymailConfig{
+		p := PaymailConfig{
 			Domains: []string{"test.com", "domain.com"},
 			Enabled: true,
 		}

@@ -13,7 +13,7 @@ const (
 // TestAuthenticationConfig_IsAdmin will test the method IsAdmin()
 func TestAuthenticationConfig_IsAdmin(t *testing.T) {
 	t.Run("admin valid", func(t *testing.T) {
-		a := authenticationConfig{
+		a := AuthenticationConfig{
 			Scheme:   AuthenticationSchemeXpub,
 			AdminKey: testAdminKey,
 		}
@@ -21,7 +21,7 @@ func TestAuthenticationConfig_IsAdmin(t *testing.T) {
 	})
 
 	t.Run("admin invalid", func(t *testing.T) {
-		a := authenticationConfig{
+		a := AuthenticationConfig{
 			Scheme:   AuthenticationSchemeXpub,
 			AdminKey: testAdminKey,
 		}
@@ -35,7 +35,7 @@ func TestAuthenticationConfig_Validate(t *testing.T) {
 	t.Parallel()
 
 	t.Run("valid scheme and admin key", func(t *testing.T) {
-		a := authenticationConfig{
+		a := AuthenticationConfig{
 			Scheme:   AuthenticationSchemeXpub,
 			AdminKey: testAdminKey,
 		}
@@ -43,7 +43,7 @@ func TestAuthenticationConfig_Validate(t *testing.T) {
 	})
 
 	t.Run("empty scheme", func(t *testing.T) {
-		a := authenticationConfig{
+		a := AuthenticationConfig{
 			Scheme:   "",
 			AdminKey: testAdminKey,
 		}
@@ -51,7 +51,7 @@ func TestAuthenticationConfig_Validate(t *testing.T) {
 	})
 
 	t.Run("invalid scheme", func(t *testing.T) {
-		a := authenticationConfig{
+		a := AuthenticationConfig{
 			Scheme:   "invalid",
 			AdminKey: testAdminKey,
 		}
@@ -59,7 +59,7 @@ func TestAuthenticationConfig_Validate(t *testing.T) {
 	})
 
 	t.Run("invalid admin key (missing)", func(t *testing.T) {
-		a := authenticationConfig{
+		a := AuthenticationConfig{
 			Scheme:   AuthenticationSchemeXpub,
 			AdminKey: "",
 		}
@@ -67,7 +67,7 @@ func TestAuthenticationConfig_Validate(t *testing.T) {
 	})
 
 	t.Run("invalid admin key (to short)", func(t *testing.T) {
-		a := authenticationConfig{
+		a := AuthenticationConfig{
 			Scheme:   AuthenticationSchemeXpub,
 			AdminKey: "1234567",
 		}

@@ -6,7 +6,7 @@ import (
 )
 
 // Validate checks the configuration for specific rules
-func (s *serverConfig) Validate() error {
+func (s *ServerConfig) Validate() error {
 
 	// Set defaults
 	if s.IdleTimeout.String() == "0s" {

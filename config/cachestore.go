@@ -7,7 +7,7 @@ import (
 )
 
 // Validate checks the configuration for specific rules
-func (c *cachestoreConfig) Validate() error {
+func (c *CachestoreConfig) Validate() error {
 
 	// Valid engine
 	if c.Engine == cachestore.Empty || c.Engine == "" {

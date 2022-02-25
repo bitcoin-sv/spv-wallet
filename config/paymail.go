@@ -8,7 +8,7 @@ import (
 )
 
 // Validate checks the configuration for specific rules
-func (p *paymailConfig) Validate() error {
+func (p *PaymailConfig) Validate() error {
 
 	// Only if enabled
 	if p.Enabled {

@@ -12,7 +12,7 @@ func TestDatastoreConfig_Validate(t *testing.T) {
 	t.Parallel()
 
 	t.Run("valid datastore config", func(t *testing.T) {
-		d := datastoreConfig{
+		d := DatastoreConfig{
 			Engine: datastore.SQLite,
 		}
 		require.NotNil(t, d)
@@ -22,7 +22,7 @@ func TestDatastoreConfig_Validate(t *testing.T) {
 	})
 
 	t.Run("empty datastore", func(t *testing.T) {
-		d := datastoreConfig{
+		d := DatastoreConfig{
 			Engine: datastore.Empty,
 		}
 		require.NotNil(t, d)
@@ -32,7 +32,7 @@ func TestDatastoreConfig_Validate(t *testing.T) {
 	})
 
 	t.Run("invalid datastore engine", func(t *testing.T) {
-		d := datastoreConfig{
+		d := DatastoreConfig{
 			Engine: "",
 		}
 		require.NotNil(t, d)
