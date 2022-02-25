@@ -4,7 +4,7 @@ go 1.17
 
 require (
 	github.com/99designs/gqlgen v0.16.0
-	github.com/BuxOrg/bux v0.1.3
+	github.com/BuxOrg/bux v0.1.4
 	github.com/bitcoinschema/go-bitcoin/v2 v2.0.0-alpha.2
 	github.com/dgraph-io/ristretto v0.1.0
 	github.com/go-ozzo/ozzo-validation v3.6.0+incompatible
