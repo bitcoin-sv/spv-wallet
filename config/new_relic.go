@@ -7,7 +7,7 @@ import (
 )
 
 // Validate checks the configuration for specific rules
-func (n *newRelicConfig) Validate() error {
+func (n *NewRelicConfig) Validate() error {
 
 	// If it's enabled
 	if n.Enabled {

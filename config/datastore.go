@@ -7,7 +7,7 @@ import (
 )
 
 // Validate checks the configuration for specific rules
-func (d *datastoreConfig) Validate() error {
+func (d *DatastoreConfig) Validate() error {
 
 	// Valid engine
 	if d.Engine == datastore.Empty || d.Engine == "" {

@@ -11,7 +11,7 @@ func TestServerConfig_Validate(t *testing.T) {
 	t.Parallel()
 
 	t.Run("port is required", func(t *testing.T) {
-		s := serverConfig{
+		s := ServerConfig{
 			IdleTimeout:  0,
 			ReadTimeout:  0,
 			WriteTimeout: 0,
@@ -22,7 +22,7 @@ func TestServerConfig_Validate(t *testing.T) {
 	})
 
 	t.Run("port is too big", func(t *testing.T) {
-		s := serverConfig{
+		s := ServerConfig{
 			IdleTimeout:  0,
 			ReadTimeout:  0,
 			WriteTimeout: 0,
@@ -33,7 +33,7 @@ func TestServerConfig_Validate(t *testing.T) {
 	})
 
 	t.Run("valid server config", func(t *testing.T) {
-		s := serverConfig{
+		s := ServerConfig{
 			IdleTimeout:  0,
 			ReadTimeout:  0,
 			WriteTimeout: 0,
@@ -44,7 +44,7 @@ func TestServerConfig_Validate(t *testing.T) {
 	})
 
 	t.Run("default timeouts", func(t *testing.T) {
-		s := serverConfig{
+		s := ServerConfig{
 			IdleTimeout:  0,
 			ReadTimeout:  0,
 			WriteTimeout: 0,

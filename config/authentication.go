@@ -10,12 +10,12 @@ const (
 )
 
 // IsAdmin will check if the key is an admin key
-func (a *authenticationConfig) IsAdmin(key string) bool {
+func (a *AuthenticationConfig) IsAdmin(key string) bool {
 	return a.AdminKey == key
 }
 
 // Validate checks the configuration for specific rules
-func (a *authenticationConfig) Validate() error {
+func (a *AuthenticationConfig) Validate() error {
 	return validation.ValidateStruct(a,
 		validation.Field(&a.AdminKey, validation.Required, validation.Length(32, 111)),
 		validation.Field(&a.Scheme, validation.Required, validation.In(AuthenticationSchemeXpub)),

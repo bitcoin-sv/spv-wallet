@@ -11,7 +11,7 @@ func TestNewRelicConfig_Validate(t *testing.T) {
 	t.Parallel()
 
 	t.Run("valid new relic", func(t *testing.T) {
-		n := newRelicConfig{
+		n := NewRelicConfig{
 			Enabled:    true,
 			LicenseKey: "1234567890123456789012345678901234567890",
 			DomainName: "domain.com",
@@ -20,7 +20,7 @@ func TestNewRelicConfig_Validate(t *testing.T) {
 	})
 
 	t.Run("not enabled", func(t *testing.T) {
-		n := newRelicConfig{
+		n := NewRelicConfig{
 			Enabled:    false,
 			DomainName: "domain.com",
 			LicenseKey: "1234567890123456789012345678901234567890",
@@ -29,7 +29,7 @@ func TestNewRelicConfig_Validate(t *testing.T) {
 	})
 
 	t.Run("missing domain", func(t *testing.T) {
-		n := newRelicConfig{
+		n := NewRelicConfig{
 			Enabled:    true,
 			DomainName: "",
 			LicenseKey: "1234567890123456789012345678901234567890",
@@ -38,7 +38,7 @@ func TestNewRelicConfig_Validate(t *testing.T) {
 	})
 
 	t.Run("invalid key", func(t *testing.T) {
-		n := newRelicConfig{
+		n := NewRelicConfig{
 			Enabled:    true,
 			DomainName: "domain.com",
 			LicenseKey: "1234567",
