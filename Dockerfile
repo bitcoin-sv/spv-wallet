@@ -1,24 +1,25 @@
-# Get Golang
-FROM golang:1.17.7-alpine
-
-# Version
-LABEL version="1.0" name="BuxServer"
-
-# Set the timezone to UTC
-RUN apk update && \
-    apk add -U tzdata build-base && \
-    cp /usr/share/zoneinfo/EST5EDT /etc/localtime && \
-    echo "UTC" > /etc/timezone
+# Get Golang for builder
+FROM golang:1.17.7 as builder
 
 # Set the working directory
-WORKDIR /go/bin
+WORKDIR /go/src/github.com/BuxOrg/bux-server
 
-# Expose the port to the server
-EXPOSE 3003
+COPY . ./
 
-# Move the current files into the directory
-COPY . $GOPATH/bin/
+# Build binary
+RUN GOOS=linux go build -o bux cmd/server/main.go
 
-# Run the application
-RUN chmod +x main
-CMD ["main"]
+# Get runtime image
+FROM registry.access.redhat.com/ubi8-minimal
+
+# Version
+LABEL version="1.0" name="Bux"
+
+# Set working directory
+WORKDIR /
+
+# Copy binary to runner
+COPY --from=builder /go/src/github.com/BuxOrg/bux-server/bux .
+
+# Set entrypoint
+ENTRYPOINT ["/bux"]
