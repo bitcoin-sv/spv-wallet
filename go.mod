@@ -23,7 +23,7 @@ require (
 	github.com/stretchr/testify v1.7.0
 	github.com/tonicpow/go-minercraft v0.7.1
 	github.com/tonicpow/go-paymail v0.7.2
-	github.com/vektah/gqlparser/v2 v2.4.0
+	github.com/vektah/gqlparser/v2 v2.4.1
 )
 
 require (
