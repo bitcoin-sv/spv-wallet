@@ -96,7 +96,7 @@ func (s *Server) Handlers() *nrhttprouter.Router {
 	s.Router.CrossOriginEnabled = true
 	s.Router.CrossOriginAllowCredentials = true
 	s.Router.CrossOriginAllowOrigin = "*"
-	s.Router.CrossOriginAllowMethods = "POST,GET,OPTIONS"
+	s.Router.CrossOriginAllowMethods = "POST,GET,OPTIONS,DELETE"
 	s.Router.CrossOriginAllowHeaders = "*"
 
 	// Start the segment

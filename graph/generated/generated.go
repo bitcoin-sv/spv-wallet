@@ -46,9 +46,13 @@ type DirectiveRoot struct {
 
 type ComplexityRoot struct {
 	AccessKey struct {
+		CreatedAt func(childComplexity int) int
+		DeletedAt func(childComplexity int) int
 		ID        func(childComplexity int) int
 		Key       func(childComplexity int) int
+		Metadata  func(childComplexity int) int
 		RevokedAt func(childComplexity int) int
+		UpdatedAt func(childComplexity int) int
 		XpubID    func(childComplexity int) int
 	}
 
@@ -83,12 +87,12 @@ type ComplexityRoot struct {
 	}
 
 	Mutation struct {
-		AccessKey       func(childComplexity int, metadata map[string]interface{}) int
+		AccessKey       func(childComplexity int, metadata bux.Metadata) int
 		AccessKeyRevoke func(childComplexity int, id *string) int
-		Destination     func(childComplexity int, destinationType *string, metadata map[string]interface{}) int
-		NewTransaction  func(childComplexity int, transactionConfig bux.TransactionConfig, metadata map[string]interface{}) int
-		Transaction     func(childComplexity int, hex string, draftID *string, metadata map[string]interface{}) int
-		Xpub            func(childComplexity int, xpub string, metadata map[string]interface{}) int
+		Destination     func(childComplexity int, destinationType *string, metadata bux.Metadata) int
+		NewTransaction  func(childComplexity int, transactionConfig bux.TransactionConfig, metadata bux.Metadata) int
+		Transaction     func(childComplexity int, hex string, draftID *string, metadata bux.Metadata) int
+		Xpub            func(childComplexity int, xpub string, metadata bux.Metadata) int
 	}
 
 	OpReturn struct {
@@ -118,7 +122,7 @@ type ComplexityRoot struct {
 	Query struct {
 		AccessKey    func(childComplexity int, key string) int
 		AccessKeys   func(childComplexity int, metadata bux.Metadata) int
-		Destination  func(childComplexity int, lockingScript string) int
+		Destination  func(childComplexity int, id *string, address *string, lockingScript *string) int
 		Destinations func(childComplexity int, metadata bux.Metadata) int
 		Transaction  func(childComplexity int, txID string) int
 		Transactions func(childComplexity int, metadata bux.Metadata, conditions map[string]interface{}) int
@@ -209,12 +213,12 @@ type ComplexityRoot struct {
 }
 
 type MutationResolver interface {
-	Xpub(ctx context.Context, xpub string, metadata map[string]interface{}) (*bux.Xpub, error)
-	AccessKey(ctx context.Context, metadata map[string]interface{}) (*bux.AccessKey, error)
+	Xpub(ctx context.Context, xpub string, metadata bux.Metadata) (*bux.Xpub, error)
+	AccessKey(ctx context.Context, metadata bux.Metadata) (*bux.AccessKey, error)
 	AccessKeyRevoke(ctx context.Context, id *string) (*bux.AccessKey, error)
-	Transaction(ctx context.Context, hex string, draftID *string, metadata map[string]interface{}) (*bux.Transaction, error)
-	NewTransaction(ctx context.Context, transactionConfig bux.TransactionConfig, metadata map[string]interface{}) (*bux.DraftTransaction, error)
-	Destination(ctx context.Context, destinationType *string, metadata map[string]interface{}) (*bux.Destination, error)
+	Transaction(ctx context.Context, hex string, draftID *string, metadata bux.Metadata) (*bux.Transaction, error)
+	NewTransaction(ctx context.Context, transactionConfig bux.TransactionConfig, metadata bux.Metadata) (*bux.DraftTransaction, error)
+	Destination(ctx context.Context, destinationType *string, metadata bux.Metadata) (*bux.Destination, error)
 }
 type QueryResolver interface {
 	Xpub(ctx context.Context) (*bux.Xpub, error)
@@ -222,7 +226,7 @@ type QueryResolver interface {
 	AccessKeys(ctx context.Context, metadata bux.Metadata) ([]*bux.AccessKey, error)
 	Transaction(ctx context.Context, txID string) (*bux.Transaction, error)
 	Transactions(ctx context.Context, metadata bux.Metadata, conditions map[string]interface{}) ([]*bux.Transaction, error)
-	Destination(ctx context.Context, lockingScript string) (*bux.Destination, error)
+	Destination(ctx context.Context, id *string, address *string, lockingScript *string) (*bux.Destination, error)
 	Destinations(ctx context.Context, metadata bux.Metadata) ([]*bux.Destination, error)
 }
 
@@ -241,6 +245,20 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 	_ = ec
 	switch typeName + "." + field {
 
+	case "AccessKey.created_at":
+		if e.complexity.AccessKey.CreatedAt == nil {
+			break
+		}
+
+		return e.complexity.AccessKey.CreatedAt(childComplexity), true
+
+	case "AccessKey.deleted_at":
+		if e.complexity.AccessKey.DeletedAt == nil {
+			break
+		}
+
+		return e.complexity.AccessKey.DeletedAt(childComplexity), true
+
 	case "AccessKey.id":
 		if e.complexity.AccessKey.ID == nil {
 			break
@@ -255,12 +273,26 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.AccessKey.Key(childComplexity), true
 
+	case "AccessKey.metadata":
+		if e.complexity.AccessKey.Metadata == nil {
+			break
+		}
+
+		return e.complexity.AccessKey.Metadata(childComplexity), true
+
 	case "AccessKey.revoked_at":
 		if e.complexity.AccessKey.RevokedAt == nil {
 			break
 		}
 
 		return e.complexity.AccessKey.RevokedAt(childComplexity), true
+
+	case "AccessKey.updated_at":
+		if e.complexity.AccessKey.UpdatedAt == nil {
+			break
+		}
+
+		return e.complexity.AccessKey.UpdatedAt(childComplexity), true
 
 	case "AccessKey.xpub_id":
 		if e.complexity.AccessKey.XpubID == nil {
@@ -426,7 +458,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.Mutation.AccessKey(childComplexity, args["metadata"].(map[string]interface{})), true
+		return e.complexity.Mutation.AccessKey(childComplexity, args["metadata"].(bux.Metadata)), true
 
 	case "Mutation.access_key_revoke":
 		if e.complexity.Mutation.AccessKeyRevoke == nil {
@@ -450,7 +482,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.Mutation.Destination(childComplexity, args["destination_type"].(*string), args["metadata"].(map[string]interface{})), true
+		return e.complexity.Mutation.Destination(childComplexity, args["destination_type"].(*string), args["metadata"].(bux.Metadata)), true
 
 	case "Mutation.new_transaction":
 		if e.complexity.Mutation.NewTransaction == nil {
@@ -462,7 +494,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.Mutation.NewTransaction(childComplexity, args["transaction_config"].(bux.TransactionConfig), args["metadata"].(map[string]interface{})), true
+		return e.complexity.Mutation.NewTransaction(childComplexity, args["transaction_config"].(bux.TransactionConfig), args["metadata"].(bux.Metadata)), true
 
 	case "Mutation.transaction":
 		if e.complexity.Mutation.Transaction == nil {
@@ -474,7 +506,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.Mutation.Transaction(childComplexity, args["hex"].(string), args["draft_id"].(*string), args["metadata"].(map[string]interface{})), true
+		return e.complexity.Mutation.Transaction(childComplexity, args["hex"].(string), args["draft_id"].(*string), args["metadata"].(bux.Metadata)), true
 
 	case "Mutation.xpub":
 		if e.complexity.Mutation.Xpub == nil {
@@ -486,7 +518,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.Mutation.Xpub(childComplexity, args["xpub"].(string), args["metadata"].(map[string]interface{})), true
+		return e.complexity.Mutation.Xpub(childComplexity, args["xpub"].(string), args["metadata"].(bux.Metadata)), true
 
 	case "OpReturn.hex":
 		if e.complexity.OpReturn.Hex == nil {
@@ -627,7 +659,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.Query.Destination(childComplexity, args["locking_script"].(string)), true
+		return e.complexity.Query.Destination(childComplexity, args["id"].(*string), args["address"].(*string), args["locking_script"].(*string)), true
 
 	case "Query.destinations":
 		if e.complexity.Query.Destinations == nil {
@@ -1186,8 +1218,12 @@ scalar TransactionDirection
 type AccessKey {
     id:         String
     xpub_id:    String
-    revoked_at: NullTime
     key:        String
+    metadata:   Metadata
+    created_at: Time
+    updated_at: Time
+    deleted_at: NullTime
+    revoked_at: NullTime
 }
 
 type Xpub {
@@ -1376,7 +1412,9 @@ type Query {
         conditions: Map
     ): [Transaction]
     destination(
-        locking_script: String!
+        id: String
+        address: String
+        locking_script: String
     ): Destination
     destinations(
         metadata: Metadata
@@ -1386,10 +1424,10 @@ type Query {
 type Mutation {
     xpub(
         xpub: String!,
-        metadata: Map
+        metadata: Metadata
     ): Xpub
     access_key(
-        metadata: Map
+        metadata: Metadata
     ): AccessKey
     access_key_revoke(
         id: String
@@ -1397,15 +1435,15 @@ type Mutation {
     transaction(
         hex: String!,
         draft_id: String,
-        metadata: Map
+        metadata: Metadata
     ): Transaction
     new_transaction(
         transaction_config: TransactionConfigInput!,
-        metadata: Map
+        metadata: Metadata
     ): DraftTransaction
     destination(
         destination_type: String,
-        metadata: Map
+        metadata: Metadata
     ): Destination
 }
 `, BuiltIn: false},
@@ -1419,10 +1457,10 @@ var parsedSchema = gqlparser.MustLoadSchema(sources...)
 func (ec *executionContext) field_Mutation_access_key_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
-	var arg0 map[string]interface{}
+	var arg0 bux.Metadata
 	if tmp, ok := rawArgs["metadata"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("metadata"))
-		arg0, err = ec.unmarshalOMap2map(ctx, tmp)
+		arg0, err = ec.unmarshalOMetadata2githubᚗcomᚋBuxOrgᚋbuxᚐMetadata(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -1458,10 +1496,10 @@ func (ec *executionContext) field_Mutation_destination_args(ctx context.Context,
 		}
 	}
 	args["destination_type"] = arg0
-	var arg1 map[string]interface{}
+	var arg1 bux.Metadata
 	if tmp, ok := rawArgs["metadata"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("metadata"))
-		arg1, err = ec.unmarshalOMap2map(ctx, tmp)
+		arg1, err = ec.unmarshalOMetadata2githubᚗcomᚋBuxOrgᚋbuxᚐMetadata(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -1482,10 +1520,10 @@ func (ec *executionContext) field_Mutation_new_transaction_args(ctx context.Cont
 		}
 	}
 	args["transaction_config"] = arg0
-	var arg1 map[string]interface{}
+	var arg1 bux.Metadata
 	if tmp, ok := rawArgs["metadata"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("metadata"))
-		arg1, err = ec.unmarshalOMap2map(ctx, tmp)
+		arg1, err = ec.unmarshalOMetadata2githubᚗcomᚋBuxOrgᚋbuxᚐMetadata(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -1515,10 +1553,10 @@ func (ec *executionContext) field_Mutation_transaction_args(ctx context.Context,
 		}
 	}
 	args["draft_id"] = arg1
-	var arg2 map[string]interface{}
+	var arg2 bux.Metadata
 	if tmp, ok := rawArgs["metadata"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("metadata"))
-		arg2, err = ec.unmarshalOMap2map(ctx, tmp)
+		arg2, err = ec.unmarshalOMetadata2githubᚗcomᚋBuxOrgᚋbuxᚐMetadata(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -1539,10 +1577,10 @@ func (ec *executionContext) field_Mutation_xpub_args(ctx context.Context, rawArg
 		}
 	}
 	args["xpub"] = arg0
-	var arg1 map[string]interface{}
+	var arg1 bux.Metadata
 	if tmp, ok := rawArgs["metadata"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("metadata"))
-		arg1, err = ec.unmarshalOMap2map(ctx, tmp)
+		arg1, err = ec.unmarshalOMetadata2githubᚗcomᚋBuxOrgᚋbuxᚐMetadata(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -1599,15 +1637,33 @@ func (ec *executionContext) field_Query_access_keys_args(ctx context.Context, ra
 func (ec *executionContext) field_Query_destination_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
-	var arg0 string
-	if tmp, ok := rawArgs["locking_script"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("locking_script"))
-		arg0, err = ec.unmarshalNString2string(ctx, tmp)
+	var arg0 *string
+	if tmp, ok := rawArgs["id"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
+		arg0, err = ec.unmarshalOString2ᚖstring(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
 	}
-	args["locking_script"] = arg0
+	args["id"] = arg0
+	var arg1 *string
+	if tmp, ok := rawArgs["address"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("address"))
+		arg1, err = ec.unmarshalOString2ᚖstring(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["address"] = arg1
+	var arg2 *string
+	if tmp, ok := rawArgs["locking_script"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("locking_script"))
+		arg2, err = ec.unmarshalOString2ᚖstring(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["locking_script"] = arg2
 	return args, nil
 }
 
@@ -1782,38 +1838,6 @@ func (ec *executionContext) _AccessKey_xpub_id(ctx context.Context, field graphq
 	return ec.marshalOString2string(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _AccessKey_revoked_at(ctx context.Context, field graphql.CollectedField, obj *bux.AccessKey) (ret graphql.Marshaler) {
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	fc := &graphql.FieldContext{
-		Object:     "AccessKey",
-		Field:      field,
-		Args:       nil,
-		IsMethod:   false,
-		IsResolver: false,
-	}
-
-	ctx = graphql.WithFieldContext(ctx, fc)
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.RevokedAt, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(utils.NullTime)
-	fc.Result = res
-	return ec.marshalONullTime2githubᚗcomᚋBuxOrgᚋbuxᚋutilsᚐNullTime(ctx, field.Selections, res)
-}
-
 func (ec *executionContext) _AccessKey_key(ctx context.Context, field graphql.CollectedField, obj *bux.AccessKey) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
@@ -1844,6 +1868,166 @@ func (ec *executionContext) _AccessKey_key(ctx context.Context, field graphql.Co
 	res := resTmp.(string)
 	fc.Result = res
 	return ec.marshalOString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _AccessKey_metadata(ctx context.Context, field graphql.CollectedField, obj *bux.AccessKey) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "AccessKey",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Metadata, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(bux.Metadata)
+	fc.Result = res
+	return ec.marshalOMetadata2githubᚗcomᚋBuxOrgᚋbuxᚐMetadata(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _AccessKey_created_at(ctx context.Context, field graphql.CollectedField, obj *bux.AccessKey) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "AccessKey",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.CreatedAt, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(time.Time)
+	fc.Result = res
+	return ec.marshalOTime2timeᚐTime(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _AccessKey_updated_at(ctx context.Context, field graphql.CollectedField, obj *bux.AccessKey) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "AccessKey",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.UpdatedAt, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(time.Time)
+	fc.Result = res
+	return ec.marshalOTime2timeᚐTime(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _AccessKey_deleted_at(ctx context.Context, field graphql.CollectedField, obj *bux.AccessKey) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "AccessKey",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.DeletedAt, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(utils.NullTime)
+	fc.Result = res
+	return ec.marshalONullTime2githubᚗcomᚋBuxOrgᚋbuxᚋutilsᚐNullTime(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _AccessKey_revoked_at(ctx context.Context, field graphql.CollectedField, obj *bux.AccessKey) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "AccessKey",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.RevokedAt, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(utils.NullTime)
+	fc.Result = res
+	return ec.marshalONullTime2githubᚗcomᚋBuxOrgᚋbuxᚋutilsᚐNullTime(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Destination_created_at(ctx context.Context, field graphql.CollectedField, obj *bux.Destination) (ret graphql.Marshaler) {
@@ -2543,7 +2727,7 @@ func (ec *executionContext) _Mutation_xpub(ctx context.Context, field graphql.Co
 	fc.Args = args
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().Xpub(rctx, args["xpub"].(string), args["metadata"].(map[string]interface{}))
+		return ec.resolvers.Mutation().Xpub(rctx, args["xpub"].(string), args["metadata"].(bux.Metadata))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -2582,7 +2766,7 @@ func (ec *executionContext) _Mutation_access_key(ctx context.Context, field grap
 	fc.Args = args
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().AccessKey(rctx, args["metadata"].(map[string]interface{}))
+		return ec.resolvers.Mutation().AccessKey(rctx, args["metadata"].(bux.Metadata))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -2660,7 +2844,7 @@ func (ec *executionContext) _Mutation_transaction(ctx context.Context, field gra
 	fc.Args = args
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().Transaction(rctx, args["hex"].(string), args["draft_id"].(*string), args["metadata"].(map[string]interface{}))
+		return ec.resolvers.Mutation().Transaction(rctx, args["hex"].(string), args["draft_id"].(*string), args["metadata"].(bux.Metadata))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -2699,7 +2883,7 @@ func (ec *executionContext) _Mutation_new_transaction(ctx context.Context, field
 	fc.Args = args
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().NewTransaction(rctx, args["transaction_config"].(bux.TransactionConfig), args["metadata"].(map[string]interface{}))
+		return ec.resolvers.Mutation().NewTransaction(rctx, args["transaction_config"].(bux.TransactionConfig), args["metadata"].(bux.Metadata))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -2738,7 +2922,7 @@ func (ec *executionContext) _Mutation_destination(ctx context.Context, field gra
 	fc.Args = args
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().Destination(rctx, args["destination_type"].(*string), args["metadata"].(map[string]interface{}))
+		return ec.resolvers.Mutation().Destination(rctx, args["destination_type"].(*string), args["metadata"].(bux.Metadata))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -3445,7 +3629,7 @@ func (ec *executionContext) _Query_destination(ctx context.Context, field graphq
 	fc.Args = args
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Query().Destination(rctx, args["locking_script"].(string))
+		return ec.resolvers.Query().Destination(rctx, args["id"].(*string), args["address"].(*string), args["locking_script"].(*string))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -6901,16 +7085,44 @@ func (ec *executionContext) _AccessKey(ctx context.Context, sel ast.SelectionSet
 
 			out.Values[i] = innerFunc(ctx)
 
-		case "revoked_at":
+		case "key":
 			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
-				return ec._AccessKey_revoked_at(ctx, field, obj)
+				return ec._AccessKey_key(ctx, field, obj)
 			}
 
 			out.Values[i] = innerFunc(ctx)
 
-		case "key":
+		case "metadata":
 			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
-				return ec._AccessKey_key(ctx, field, obj)
+				return ec._AccessKey_metadata(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
+		case "created_at":
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._AccessKey_created_at(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
+		case "updated_at":
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._AccessKey_updated_at(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
+		case "deleted_at":
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._AccessKey_deleted_at(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
+		case "revoked_at":
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._AccessKey_revoked_at(ctx, field, obj)
 			}
 
 			out.Values[i] = innerFunc(ctx)

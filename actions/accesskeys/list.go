@@ -5,6 +5,7 @@ import (
 	"net/http"
 
 	"github.com/BuxOrg/bux"
+	"github.com/BuxOrg/bux/utils"
 	"github.com/julienschmidt/httprouter"
 	apirouter "github.com/mrz1836/go-api-router"
 )
@@ -29,7 +30,7 @@ func (a *Action) list(w http.ResponseWriter, req *http.Request, _ httprouter.Par
 	var accessKeys []*bux.AccessKey
 	if accessKeys, err = a.Services.Bux.GetAccessKeys(
 		req.Context(),
-		reqXPub,
+		utils.Hash(reqXPub),
 		metadata,
 	); err != nil {
 		apirouter.ReturnResponse(w, req, http.StatusExpectationFailed, err.Error())

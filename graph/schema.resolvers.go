@@ -13,7 +13,7 @@ import (
 	"github.com/BuxOrg/bux/utils"
 )
 
-func (r *mutationResolver) Xpub(ctx context.Context, xpub string, metadata map[string]interface{}) (*bux.Xpub, error) {
+func (r *mutationResolver) Xpub(ctx context.Context, xpub string, metadata bux.Metadata) (*bux.Xpub, error) {
 	// including admin check
 	c, err := GetConfigFromContextAdmin(ctx)
 	if err != nil {
@@ -45,7 +45,7 @@ func (r *mutationResolver) Xpub(ctx context.Context, xpub string, metadata map[s
 	return bux.DisplayModels(xPub).(*bux.Xpub), nil
 }
 
-func (r *mutationResolver) AccessKey(ctx context.Context, metadata map[string]interface{}) (*bux.AccessKey, error) {
+func (r *mutationResolver) AccessKey(ctx context.Context, metadata bux.Metadata) (*bux.AccessKey, error) {
 	c, err := GetConfigFromContextSigned(ctx)
 	if err != nil {
 		return nil, err
@@ -83,7 +83,7 @@ func (r *mutationResolver) AccessKeyRevoke(ctx context.Context, id *string) (*bu
 	return bux.DisplayModels(accessKey).(*bux.AccessKey), nil
 }
 
-func (r *mutationResolver) Transaction(ctx context.Context, hex string, draftID *string, metadata map[string]interface{}) (*bux.Transaction, error) {
+func (r *mutationResolver) Transaction(ctx context.Context, hex string, draftID *string, metadata bux.Metadata) (*bux.Transaction, error) {
 	c, err := GetConfigFromContextSigned(ctx)
 	if err != nil {
 		return nil, err
@@ -144,7 +144,7 @@ func (r *mutationResolver) Transaction(ctx context.Context, hex string, draftID 
 	return bux.DisplayModels(transaction).(*bux.Transaction), nil
 }
 
-func (r *mutationResolver) NewTransaction(ctx context.Context, transactionConfig bux.TransactionConfig, metadata map[string]interface{}) (*bux.DraftTransaction, error) {
+func (r *mutationResolver) NewTransaction(ctx context.Context, transactionConfig bux.TransactionConfig, metadata bux.Metadata) (*bux.DraftTransaction, error) {
 	c, err := GetConfigFromContextSigned(ctx)
 	if err != nil {
 		return nil, err
@@ -164,7 +164,7 @@ func (r *mutationResolver) NewTransaction(ctx context.Context, transactionConfig
 	return bux.DisplayModels(draftTransaction).(*bux.DraftTransaction), nil
 }
 
-func (r *mutationResolver) Destination(ctx context.Context, destinationType *string, metadata map[string]interface{}) (*bux.Destination, error) {
+func (r *mutationResolver) Destination(ctx context.Context, destinationType *string, metadata bux.Metadata) (*bux.Destination, error) {
 	c, err := GetConfigFromContextSigned(ctx)
 	if err != nil {
 		return nil, err
@@ -282,14 +282,22 @@ func (r *queryResolver) Transactions(ctx context.Context, metadata bux.Metadata,
 	return bux.DisplayModels(tx).([]*bux.Transaction), nil
 }
 
-func (r *queryResolver) Destination(ctx context.Context, lockingScript string) (*bux.Destination, error) {
+func (r *queryResolver) Destination(ctx context.Context, id *string, address *string, lockingScript *string) (*bux.Destination, error) {
 	c, err := GetConfigFromContextSigned(ctx)
 	if err != nil {
 		return nil, err
 	}
 
 	var destination *bux.Destination
-	destination, err = c.Services.Bux.GetDestinationByLockingScript(ctx, c.XPub, lockingScript)
+	if id != nil {
+		destination, err = c.Services.Bux.GetDestinationByID(ctx, c.XPub, *id)
+	} else if address != nil {
+		destination, err = c.Services.Bux.GetDestinationByAddress(ctx, c.XPub, *address)
+	} else if lockingScript != nil {
+		destination, err = c.Services.Bux.GetDestinationByLockingScript(ctx, c.XPub, *lockingScript)
+	} else {
+		return nil, bux.ErrMissingFieldID
+	}
 	if err != nil {
 		return nil, err
 	}
