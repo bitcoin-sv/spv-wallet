@@ -12,7 +12,7 @@ import (
 func (ts *TestSuite) TestXPubRegisterRoutes() {
 	ts.T().Run("test routes", func(t *testing.T) {
 
-		handle, _, _ := ts.Router.HTTPRouter.Lookup(http.MethodPost, "/"+config.CurrentMajorVersion+"/xpubs")
+		handle, _, _ := ts.Router.HTTPRouter.Lookup(http.MethodPost, "/"+config.CurrentMajorVersion+"/xpub")
 		assert.NotNil(t, handle)
 
 		handle, _, _ = ts.Router.HTTPRouter.Lookup(http.MethodGet, "/"+config.CurrentMajorVersion+"/xpub")

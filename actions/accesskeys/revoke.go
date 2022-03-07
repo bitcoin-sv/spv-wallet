@@ -17,6 +17,11 @@ func (a *Action) revoke(w http.ResponseWriter, req *http.Request, _ httprouter.P
 	params := apirouter.GetParams(req)
 	id := params.GetString("id")
 
+	if id == "" {
+		apirouter.ReturnResponse(w, req, http.StatusExpectationFailed, bux.ErrMissingFieldID)
+		return
+	}
+
 	// Create a new accessKey
 	accessKey, err := a.Services.Bux.RevokeAccessKey(
 		req.Context(),

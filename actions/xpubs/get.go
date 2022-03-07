@@ -12,6 +12,7 @@ import (
 func (a *Action) get(w http.ResponseWriter, req *http.Request, _ httprouter.Params) {
 
 	reqXPub, _ := bux.GetXpubFromRequest(req)
+	reqXPubID, _ := bux.GetXpubIDFromRequest(req)
 
 	// Parse the params
 	params := apirouter.GetParams(req)
@@ -26,9 +27,17 @@ func (a *Action) get(w http.ResponseWriter, req *http.Request, _ httprouter.Para
 	}
 
 	// Get an xPub
-	xPub, err := a.Services.Bux.GetXpub(
-		req.Context(), key,
-	)
+	var xPub *bux.Xpub
+	var err error
+	if key != "" {
+		xPub, err = a.Services.Bux.GetXpub(
+			req.Context(), key,
+		)
+	} else {
+		xPub, err = a.Services.Bux.GetXpubByID(
+			req.Context(), reqXPubID,
+		)
+	}
 	if err != nil {
 		apirouter.ReturnResponse(w, req, http.StatusExpectationFailed, err.Error())
 		return

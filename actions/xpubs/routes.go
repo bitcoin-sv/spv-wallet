@@ -27,5 +27,5 @@ func RegisterRoutes(router *apirouter.Router, appConfig *config.AppConfig, servi
 
 	// V1 Requests
 	router.HTTPRouter.GET("/"+config.CurrentMajorVersion+"/xpub", router.Request(requireBasic.Wrap(action.get)))
-	router.HTTPRouter.POST("/"+config.CurrentMajorVersion+"/xpubs", router.Request(requireAdmin.Wrap(action.create)))
+	router.HTTPRouter.POST("/"+config.CurrentMajorVersion+"/xpub", router.Request(requireAdmin.Wrap(action.create)))
 }

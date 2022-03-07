@@ -125,7 +125,7 @@ func checkCreatedDestination(ctx context.Context, t *testing.T, client bux.Clien
 	external, paymailMetaSignature string) *bux.Destination {
 
 	// check that the destination was created properly
-	destination, err := client.GetDestinationByAddress(ctx, testXPub, external)
+	destination, err := client.GetDestinationByAddress(ctx, testXPubID, external)
 	require.NoError(t, err)
 
 	assert.IsType(t, bux.Destination{}, *destination)
