@@ -1,4 +1,4 @@
-package accesskeys
+package accessKeys
 
 import (
 	"github.com/BuxOrg/bux-server/actions"
@@ -22,9 +22,9 @@ func RegisterRoutes(router *apirouter.Router, appConfig *config.AppConfig, servi
 	action := &Action{actions.Action{AppConfig: a.AppConfig, Services: a.Services}}
 
 	// V1 Requests
-	router.HTTPRouter.GET("/"+config.CurrentMajorVersion+"/access-key", router.Request(require.Wrap(action.get)))
-	router.HTTPRouter.GET("/"+config.CurrentMajorVersion+"/access-keys", router.Request(require.Wrap(action.search)))
-	router.HTTPRouter.POST("/"+config.CurrentMajorVersion+"/access-keys", router.Request(require.Wrap(action.search)))
-	router.HTTPRouter.POST("/"+config.CurrentMajorVersion+"/access-key", router.Request(require.Wrap(action.create)))
-	router.HTTPRouter.DELETE("/"+config.CurrentMajorVersion+"/access-key", router.Request(require.Wrap(action.revoke)))
+	router.HTTPRouter.DELETE("/"+config.CurrentMajorVersion+"/access_key", router.Request(require.Wrap(action.revoke)))
+	router.HTTPRouter.GET("/"+config.CurrentMajorVersion+"/access_key", router.Request(require.Wrap(action.get)))
+	router.HTTPRouter.GET("/"+config.CurrentMajorVersion+"/access_keys", router.Request(require.Wrap(action.search)))
+	router.HTTPRouter.POST("/"+config.CurrentMajorVersion+"/access_key", router.Request(require.Wrap(action.create)))
+	router.HTTPRouter.POST("/"+config.CurrentMajorVersion+"/access_keys", router.Request(require.Wrap(action.search)))
 }

@@ -1,4 +1,4 @@
-package accesskeys
+package accessKeys
 
 import (
 	"net/http"
