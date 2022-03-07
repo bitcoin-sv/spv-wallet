@@ -204,7 +204,7 @@ func (r *queryResolver) Xpub(ctx context.Context) (*bux.Xpub, error) {
 	}
 
 	var xPub *bux.Xpub
-	xPub, err = c.Services.Bux.GetXpub(ctx, c.XPub)
+	xPub, err = c.Services.Bux.GetXpubByID(ctx, c.XPubID)
 	if err != nil {
 		return nil, err
 	}
@@ -223,7 +223,7 @@ func (r *queryResolver) AccessKey(ctx context.Context, key string) (*bux.AccessK
 	}
 
 	var accessKey *bux.AccessKey
-	accessKey, err = c.Services.Bux.GetAccessKey(ctx, c.XPub, key)
+	accessKey, err = c.Services.Bux.GetAccessKey(ctx, c.XPubID, key)
 	if err != nil {
 		return nil, err
 	}
@@ -253,7 +253,7 @@ func (r *queryResolver) Transaction(ctx context.Context, txID string) (*bux.Tran
 	}
 
 	var tx *bux.Transaction
-	tx, err = c.Services.Bux.GetTransaction(ctx, c.XPub, txID)
+	tx, err = c.Services.Bux.GetTransaction(ctx, c.XPubID, txID)
 	if err != nil {
 		return nil, err
 	}
@@ -271,7 +271,7 @@ func (r *queryResolver) Transactions(ctx context.Context, metadata bux.Metadata,
 	}
 
 	var tx []*bux.Transaction
-	tx, err = c.Services.Bux.GetTransactions(ctx, c.XPub, &metadata, ConditionsParseGraphQL(conditions))
+	tx, err = c.Services.Bux.GetTransactions(ctx, c.XPubID, &metadata, ConditionsParseGraphQL(conditions))
 	if err != nil {
 		return nil, err
 	}
@@ -290,11 +290,11 @@ func (r *queryResolver) Destination(ctx context.Context, id *string, address *st
 
 	var destination *bux.Destination
 	if id != nil {
-		destination, err = c.Services.Bux.GetDestinationByID(ctx, c.XPub, *id)
+		destination, err = c.Services.Bux.GetDestinationByID(ctx, c.XPubID, *id)
 	} else if address != nil {
-		destination, err = c.Services.Bux.GetDestinationByAddress(ctx, c.XPub, *address)
+		destination, err = c.Services.Bux.GetDestinationByAddress(ctx, c.XPubID, *address)
 	} else if lockingScript != nil {
-		destination, err = c.Services.Bux.GetDestinationByLockingScript(ctx, c.XPub, *lockingScript)
+		destination, err = c.Services.Bux.GetDestinationByLockingScript(ctx, c.XPubID, *lockingScript)
 	} else {
 		return nil, bux.ErrMissingFieldID
 	}
@@ -312,7 +312,7 @@ func (r *queryResolver) Destinations(ctx context.Context, metadata bux.Metadata)
 	}
 
 	var destinations []*bux.Destination
-	destinations, err = c.Services.Bux.GetDestinations(ctx, c.XPub, &metadata)
+	destinations, err = c.Services.Bux.GetDestinations(ctx, c.XPubID, &metadata)
 	if err != nil {
 		return nil, err
 	}
