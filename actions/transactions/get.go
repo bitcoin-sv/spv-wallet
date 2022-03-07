@@ -14,12 +14,12 @@ func (a *Action) get(w http.ResponseWriter, req *http.Request, ps httprouter.Par
 	params := apirouter.GetParams(req)
 
 	// Get the xPub from the request (via authentication)
-	reqXPub, _ := bux.GetXpubFromRequest(req)
+	reqXPubID, _ := bux.GetXpubIDFromRequest(req)
 
 	// Get a transaction by ID
 	transaction, err := a.Services.Bux.GetTransaction(
 		req.Context(),
-		reqXPub,
+		reqXPubID,
 		params.GetString("id"),
 	)
 	if err != nil {
@@ -27,7 +27,7 @@ func (a *Action) get(w http.ResponseWriter, req *http.Request, ps httprouter.Par
 		return
 	} else if transaction == nil {
 		apirouter.ReturnResponse(w, req, http.StatusNotFound, "")
-	} else if !transaction.IsXpubAssociated(reqXPub) {
+	} else if !transaction.IsXpubIDAssociated(reqXPubID) {
 		apirouter.ReturnResponse(w, req, http.StatusForbidden, "unauthorized")
 		return
 	}

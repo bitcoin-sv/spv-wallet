@@ -4,7 +4,6 @@ import (
 	"net/http"
 
 	"github.com/BuxOrg/bux"
-	"github.com/BuxOrg/bux/utils"
 	"github.com/julienschmidt/httprouter"
 	apirouter "github.com/mrz1836/go-api-router"
 )
@@ -12,7 +11,7 @@ import (
 // get will get an existing model
 func (a *Action) get(w http.ResponseWriter, req *http.Request, _ httprouter.Params) {
 
-	reqXPub, _ := bux.GetXpubFromRequest(req)
+	reqXPubID, _ := bux.GetXpubIDFromRequest(req)
 
 	// Parse the params
 	params := apirouter.GetParams(req)
@@ -25,14 +24,14 @@ func (a *Action) get(w http.ResponseWriter, req *http.Request, _ httprouter.Para
 
 	// Get access key
 	accessKey, err := a.Services.Bux.GetAccessKey(
-		req.Context(), reqXPub, id,
+		req.Context(), reqXPubID, id,
 	)
 	if err != nil {
 		apirouter.ReturnResponse(w, req, http.StatusExpectationFailed, err.Error())
 		return
 	}
 
-	if accessKey.XpubID != utils.Hash(reqXPub) {
+	if accessKey.XpubID != reqXPubID {
 		apirouter.ReturnResponse(w, req, http.StatusForbidden, "unauthorized")
 		return
 	}

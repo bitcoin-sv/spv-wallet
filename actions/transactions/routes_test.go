@@ -12,13 +12,13 @@ import (
 func (ts *TestSuite) TestTransactionRegisterRoutes() {
 	ts.T().Run("test routes", func(t *testing.T) {
 
-		handle, _, _ := ts.Router.HTTPRouter.Lookup(http.MethodPost, "/"+config.CurrentMajorVersion+"/transactions/new")
+		handle, _, _ := ts.Router.HTTPRouter.Lookup(http.MethodPost, "/"+config.CurrentMajorVersion+"/transaction")
 		assert.NotNil(t, handle)
 
-		handle, _, _ = ts.Router.HTTPRouter.Lookup(http.MethodPost, "/"+config.CurrentMajorVersion+"/transactions/record")
+		handle, _, _ = ts.Router.HTTPRouter.Lookup(http.MethodPost, "/"+config.CurrentMajorVersion+"/transaction/record")
 		assert.NotNil(t, handle)
 
-		handle, _, _ = ts.Router.HTTPRouter.Lookup(http.MethodGet, "/"+config.CurrentMajorVersion+"/transactions")
+		handle, _, _ = ts.Router.HTTPRouter.Lookup(http.MethodGet, "/"+config.CurrentMajorVersion+"/transaction")
 		assert.NotNil(t, handle)
 	})
 }

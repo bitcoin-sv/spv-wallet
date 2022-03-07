@@ -22,6 +22,8 @@ func RegisterRoutes(router *apirouter.Router, appConfig *config.AppConfig, servi
 	action := &Action{actions.Action{AppConfig: a.AppConfig, Services: a.Services}}
 
 	// V1 Requests
-	router.HTTPRouter.GET("/"+config.CurrentMajorVersion+"/destinations", router.Request(require.Wrap(action.list)))
-	router.HTTPRouter.POST("/"+config.CurrentMajorVersion+"/destinations", router.Request(require.Wrap(action.create)))
+	router.HTTPRouter.GET("/"+config.CurrentMajorVersion+"/destination", router.Request(require.Wrap(action.get)))
+	router.HTTPRouter.GET("/"+config.CurrentMajorVersion+"/destination/search", router.Request(require.Wrap(action.search)))
+	router.HTTPRouter.POST("/"+config.CurrentMajorVersion+"/destination/search", router.Request(require.Wrap(action.search)))
+	router.HTTPRouter.POST("/"+config.CurrentMajorVersion+"/destination", router.Request(require.Wrap(action.create)))
 }

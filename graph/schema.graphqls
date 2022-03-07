@@ -21,8 +21,12 @@ scalar TransactionDirection
 type AccessKey {
     id:         String
     xpub_id:    String
-    revoked_at: NullTime
     key:        String
+    metadata:   Metadata
+    created_at: Time
+    updated_at: Time
+    deleted_at: NullTime
+    revoked_at: NullTime
 }
 
 type Xpub {
@@ -211,7 +215,9 @@ type Query {
         conditions: Map
     ): [Transaction]
     destination(
-        locking_script: String!
+        id: String
+        address: String
+        locking_script: String
     ): Destination
     destinations(
         metadata: Metadata
@@ -221,10 +227,10 @@ type Query {
 type Mutation {
     xpub(
         xpub: String!,
-        metadata: Map
+        metadata: Metadata
     ): Xpub
     access_key(
-        metadata: Map
+        metadata: Metadata
     ): AccessKey
     access_key_revoke(
         id: String
@@ -232,14 +238,14 @@ type Mutation {
     transaction(
         hex: String!,
         draft_id: String,
-        metadata: Map
+        metadata: Metadata
     ): Transaction
     new_transaction(
         transaction_config: TransactionConfigInput!,
-        metadata: Map
+        metadata: Metadata
     ): DraftTransaction
     destination(
         destination_type: String,
-        metadata: Map
+        metadata: Metadata
     ): Destination
 }

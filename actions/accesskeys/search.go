@@ -9,10 +9,10 @@ import (
 	apirouter "github.com/mrz1836/go-api-router"
 )
 
-// list will fetch a list of access keys
-func (a *Action) list(w http.ResponseWriter, req *http.Request, _ httprouter.Params) {
+// search will fetch a list of access keys filtered by metadata
+func (a *Action) search(w http.ResponseWriter, req *http.Request, _ httprouter.Params) {
 
-	reqXPub, _ := bux.GetXpubFromRequest(req)
+	reqXPubID, _ := bux.GetXpubIDFromRequest(req)
 
 	// Parse the params
 	params := apirouter.GetParams(req)
@@ -29,7 +29,7 @@ func (a *Action) list(w http.ResponseWriter, req *http.Request, _ httprouter.Par
 	var accessKeys []*bux.AccessKey
 	if accessKeys, err = a.Services.Bux.GetAccessKeys(
 		req.Context(),
-		reqXPub,
+		reqXPubID,
 		metadata,
 	); err != nil {
 		apirouter.ReturnResponse(w, req, http.StatusExpectationFailed, err.Error())
