@@ -19,7 +19,7 @@ func (a *Action) delete(w http.ResponseWriter, req *http.Request, _ httprouter.P
 	opts := a.Services.Bux.DefaultModelOptions()
 
 	// Create a new paymail address
-	err := deletePaymailAddress(
+	err := a.Services.Bux.DeletePaymailAddress(
 		req.Context(), address, opts...,
 	)
 	if err != nil {

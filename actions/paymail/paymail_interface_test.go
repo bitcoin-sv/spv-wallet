@@ -171,7 +171,7 @@ func initPaymailTesting(t *testing.T) (context.Context, bux.ClientInterface, fun
 	externalXPubKey := hex.EncodeToString(externalPaymailXPub.SerialiseCompressed())
 
 	// todo: this needs a function or cleanup?
-	savePaymailAddress := &PaymailAddress{
+	savePaymailAddress := &bux.PaymailAddress{
 		Alias:           alias,
 		Avatar:          "img url",
 		Domain:          domain,
