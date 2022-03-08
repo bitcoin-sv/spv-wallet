@@ -44,7 +44,7 @@ func (a *Action) get(w http.ResponseWriter, req *http.Request, _ httprouter.Para
 	}
 
 	signed := req.Context().Value("auth_signed")
-	if signed == nil || !signed.(bool) {
+	if signed == nil || !signed.(bool) || reqXPub == "" {
 		xPub.RemovePrivateData()
 	}
 

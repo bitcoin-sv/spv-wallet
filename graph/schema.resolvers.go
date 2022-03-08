@@ -209,7 +209,7 @@ func (r *queryResolver) Xpub(ctx context.Context) (*bux.Xpub, error) {
 		return nil, err
 	}
 
-	if !c.Signed {
+	if !c.Signed || c.XPub == "" {
 		xPub.RemovePrivateData()
 	}
 
@@ -283,7 +283,7 @@ func (r *queryResolver) Transactions(ctx context.Context, metadata bux.Metadata,
 }
 
 func (r *queryResolver) Destination(ctx context.Context, id *string, address *string, lockingScript *string) (*bux.Destination, error) {
-	c, err := GetConfigFromContextSigned(ctx)
+	c, err := GetConfigFromContext(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -306,7 +306,7 @@ func (r *queryResolver) Destination(ctx context.Context, id *string, address *st
 }
 
 func (r *queryResolver) Destinations(ctx context.Context, metadata bux.Metadata) ([]*bux.Destination, error) {
-	c, err := GetConfigFromContextSigned(ctx)
+	c, err := GetConfigFromContext(ctx)
 	if err != nil {
 		return nil, err
 	}
