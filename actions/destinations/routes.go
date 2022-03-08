@@ -18,12 +18,16 @@ func RegisterRoutes(router *apirouter.Router, appConfig *config.AppConfig, servi
 	a, require := actions.NewStack(appConfig, services)
 	require.Use(a.RequireAuthentication)
 
+	// Use the authentication middleware wrapper - this will only check for a valid xPub
+	a, requireBasic := actions.NewStack(appConfig, services)
+	requireBasic.Use(a.RequireBasicAuthentication)
+
 	// Load the actions and set the services
 	action := &Action{actions.Action{AppConfig: a.AppConfig, Services: a.Services}}
 
 	// V1 Requests
-	router.HTTPRouter.GET("/"+config.CurrentMajorVersion+"/destination", router.Request(require.Wrap(action.get)))
-	router.HTTPRouter.GET("/"+config.CurrentMajorVersion+"/destination/search", router.Request(require.Wrap(action.search)))
-	router.HTTPRouter.POST("/"+config.CurrentMajorVersion+"/destination/search", router.Request(require.Wrap(action.search)))
+	router.HTTPRouter.GET("/"+config.CurrentMajorVersion+"/destination", router.Request(requireBasic.Wrap(action.get)))
+	router.HTTPRouter.GET("/"+config.CurrentMajorVersion+"/destination/search", router.Request(requireBasic.Wrap(action.search)))
+	router.HTTPRouter.POST("/"+config.CurrentMajorVersion+"/destination/search", router.Request(requireBasic.Wrap(action.search)))
 	router.HTTPRouter.POST("/"+config.CurrentMajorVersion+"/destination", router.Request(require.Wrap(action.create)))
 }
