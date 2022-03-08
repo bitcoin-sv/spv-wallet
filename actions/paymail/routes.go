@@ -3,6 +3,7 @@ package pmail
 import (
 	"context"
 
+	"github.com/BuxOrg/bux"
 	"github.com/BuxOrg/bux-server/actions"
 	"github.com/BuxOrg/bux-server/config"
 	apirouter "github.com/mrz1836/go-api-router"
@@ -26,7 +27,7 @@ func RegisterRoutes(router *apirouter.Router, appConfig *config.AppConfig, servi
 
 	// Add the additional models
 	// todo: ideally, this should be in Services or on-load (cyclical dep issue)
-	if err := services.Bux.AddModels(context.Background(), true, &PaymailAddress{}); err != nil {
+	if err := services.Bux.AddModels(context.Background(), true, &bux.PaymailAddress{}); err != nil {
 		// todo: handle this error (avoid using a panic)
 		panic(err)
 	}

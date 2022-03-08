@@ -25,7 +25,7 @@ func (a *Action) create(w http.ResponseWriter, req *http.Request, _ httprouter.P
 		opts = append(opts, bux.WithMetadatas(metadata))
 	}
 
-	paymailAddress, err := newPaymailAddress(req.Context(), key, address, opts...)
+	paymailAddress, err := a.Services.Bux.NewPaymailAddress(req.Context(), key, address, opts...)
 	if err != nil {
 		apirouter.ReturnResponse(w, req, http.StatusUnprocessableEntity, err.Error())
 		return

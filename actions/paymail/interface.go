@@ -3,6 +3,7 @@ package pmail
 import (
 	"context"
 	"encoding/hex"
+	"time"
 
 	"github.com/BuxOrg/bux"
 	"github.com/BuxOrg/bux-server/config"
@@ -13,6 +14,13 @@ import (
 	"github.com/libsv/go-bt/v2/bscript"
 	"github.com/tonicpow/go-paymail"
 	"github.com/tonicpow/go-paymail/server"
+)
+
+const (
+	paymailMetadataField    = "metadata"
+	paymailRequestField     = "paymail_request"
+	paymailP2PMetadataField = "p2p_tx_metadata"
+	defaultGetTimeout       = 10 * time.Second
 )
 
 // PaymailInterface is an interface for overriding the paymail functions
@@ -166,7 +174,7 @@ func (p *PaymailInterface) RecordTransaction(ctx context.Context,
 
 // getPaymailInformation will get the paymail information
 func (p *PaymailInterface) getPaymailInformation(ctx context.Context, alias,
-	domain string, metadata *bux.Metadata) (*PaymailAddress, string, *bux.Destination, error) {
+	domain string, metadata *bux.Metadata) (*bux.PaymailAddress, string, *bux.Destination, error) {
 
 	// todo xPub locking?
 
@@ -223,9 +231,9 @@ func (p *PaymailInterface) getPaymailInformation(ctx context.Context, alias,
 }
 
 // getPaymailAddress will get a paymail address
-func (p *PaymailInterface) getPaymailAddress(ctx context.Context, alias, domain string) (*PaymailAddress, error) {
-	paymailAddress := &PaymailAddress{
-		Model: *bux.NewBaseModel(ModelPaymail, p.client.DefaultModelOptions()...),
+func (p *PaymailInterface) getPaymailAddress(ctx context.Context, alias, domain string) (*bux.PaymailAddress, error) {
+	paymailAddress := &bux.PaymailAddress{
+		Model: *bux.NewBaseModel(bux.ModelPaymail, p.client.DefaultModelOptions()...),
 	}
 	conditions := map[string]interface{}{
 		"alias":  alias,
