@@ -169,6 +169,8 @@ pull_request_rules:
           - author!=mergify[bot]
           - author!=allcontributors[bot]
           - author!=mrz1836
+          - author!=icellan
+          - author!=galt-tr
     actions:
       comment:
         message: "Welcome to our open-source project @{{author}}! 💘"
