@@ -1,5 +1,5 @@
-# bux-server
-> Complete stand-alone server using the BUX engine (UTXOs, xPubs, Paymail & More!)
+# BUX: Server
+> Get started using [BUX](https://getbux.io) in five minutes
 
 [![Release](https://img.shields.io/github/release-pre/BuxOrg/bux-server.svg?logo=github&style=flat&v=1)](https://github.com/BuxOrg/bux-server/releases)
 [![Build Status](https://img.shields.io/github/workflow/status/BuxOrg/bux-server/run-go-tests?logo=github&v=1)](https://github.com/BuxOrg/bux-server/actions)
@@ -17,6 +17,7 @@
 <br/>
 
 ## Table of Contents
+- [What is BUX?](#what-is-bux)
 - [Installation](#installation)
 - [Documentation](#documentation)
 - [Examples & Tests](#examples--tests)
@@ -25,6 +26,11 @@
 - [Usage](#usage)
 - [Contributing](#contributing)
 - [License](#license)
+
+<br/>
+
+## What is BUX?
+[Read more about BUX](https://getbux.io)
 
 <br/>
 
