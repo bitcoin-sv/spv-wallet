@@ -7,7 +7,7 @@ import (
 	apirouter "github.com/mrz1836/go-api-router"
 )
 
-// create will make a new model using the services defined in the action object
+// delete will remove the intended model
 func (a *Action) delete(w http.ResponseWriter, req *http.Request, _ httprouter.Params) {
 
 	// Parse the params
@@ -18,7 +18,7 @@ func (a *Action) delete(w http.ResponseWriter, req *http.Request, _ httprouter.P
 
 	opts := a.Services.Bux.DefaultModelOptions()
 
-	// Create a new paymail address
+	// Delete a new paymail address
 	err := a.Services.Bux.DeletePaymailAddress(
 		req.Context(), address, opts...,
 	)
@@ -28,5 +28,5 @@ func (a *Action) delete(w http.ResponseWriter, req *http.Request, _ httprouter.P
 	}
 
 	// Return response
-	apirouter.ReturnResponse(w, req, http.StatusCreated, nil)
+	apirouter.ReturnResponse(w, req, http.StatusOK, nil)
 }
