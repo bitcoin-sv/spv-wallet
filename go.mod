@@ -20,7 +20,7 @@ require (
 	github.com/newrelic/go-agent/v3 v3.15.2
 	github.com/newrelic/go-agent/v3/integrations/nrhttprouter v1.0.1
 	github.com/spf13/viper v1.10.1
-	github.com/stretchr/testify v1.7.0
+	github.com/stretchr/testify v1.7.1
 	github.com/tonicpow/go-minercraft v0.7.1
 	github.com/tonicpow/go-paymail v0.7.2
 	github.com/vektah/gqlparser/v2 v2.4.1
