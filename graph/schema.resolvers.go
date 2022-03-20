@@ -188,6 +188,7 @@ func (r *mutationResolver) Destination(ctx context.Context, destinationType *str
 		c.XPub,
 		utils.ChainExternal,
 		useDestinationType,
+		false,
 		opts...,
 	)
 	if err != nil {

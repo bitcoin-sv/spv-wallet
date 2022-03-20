@@ -212,9 +212,9 @@ func initPaymailTesting(t *testing.T) (context.Context, bux.ClientInterface, fun
 func getPaymailClient(t *testing.T) (context.Context, bux.ClientInterface, func()) {
 	ctx := context.Background()
 	client, err := bux.NewClient(ctx,
-		bux.WithSQLite(tester.SQLiteTestConfig(t, true, false)),
+		bux.WithSQLite(tester.SQLiteTestConfig(true, false)),
 		bux.WithRistretto(cachestore.DefaultRistrettoConfig()),
-		bux.WithTaskQ(taskmanager.DefaultTaskQConfig(tester.RandomTablePrefix(t)+"_queue"), taskmanager.FactoryMemory),
+		bux.WithTaskQ(taskmanager.DefaultTaskQConfig(tester.RandomTablePrefix()+"_queue"), taskmanager.FactoryMemory),
 		bux.WithDebugging(),
 		bux.WithAutoMigrate(append(bux.BaseModels, &bux.PaymailAddress{})...),
 	)
