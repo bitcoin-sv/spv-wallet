@@ -4,8 +4,8 @@ go 1.17
 
 require (
 	github.com/99designs/gqlgen v0.17.1
-	github.com/BuxOrg/bux v0.1.7
-	github.com/bitcoinschema/go-bitcoin/v2 v2.0.0-alpha.2
+	github.com/BuxOrg/bux v0.1.8
+	github.com/bitcoinschema/go-bitcoin/v2 v2.0.0-alpha.3
 	github.com/dgraph-io/ristretto v0.1.0
 	github.com/go-ozzo/ozzo-validation v3.6.0+incompatible
 	github.com/go-redis/redis/v8 v8.11.5
@@ -74,15 +74,15 @@ require (
 	github.com/jackc/pgx/v4 v4.15.0 // indirect
 	github.com/jarcoal/httpmock v1.1.0 // indirect
 	github.com/jinzhu/inflection v1.0.0 // indirect
-	github.com/jinzhu/now v1.1.4 // indirect
-	github.com/klauspost/compress v1.15.0 // indirect
+	github.com/jinzhu/now v1.1.5 // indirect
+	github.com/klauspost/compress v1.15.1 // indirect
 	github.com/lestrrat-go/strftime v1.0.5 // indirect
 	github.com/lib/pq v1.10.4 // indirect
-	github.com/libsv/go-bt v1.0.4 // indirect
+	github.com/libsv/go-bt v1.0.6 // indirect
 	github.com/magiconair/properties v1.8.6 // indirect
 	github.com/matryer/respond v1.0.1 // indirect
 	github.com/mattn/go-sqlite3 v1.14.12 // indirect
-	github.com/miekg/dns v1.1.46 // indirect
+	github.com/miekg/dns v1.1.47 // indirect
 	github.com/mitchellh/hashstructure v1.1.0 // indirect
 	github.com/mitchellh/mapstructure v1.4.3 // indirect
 	github.com/mrz1836/go-cache v0.6.5 // indirect
@@ -100,7 +100,7 @@ require (
 	github.com/robfig/cron/v3 v3.0.1 // indirect
 	github.com/shopspring/decimal v1.3.1 // indirect
 	github.com/sirupsen/logrus v1.8.1 // indirect
-	github.com/spf13/afero v1.8.1 // indirect
+	github.com/spf13/afero v1.8.2 // indirect
 	github.com/spf13/cast v1.4.1 // indirect
 	github.com/spf13/jwalterweatherman v1.1.0 // indirect
 	github.com/spf13/pflag v1.0.5 // indirect
@@ -121,15 +121,15 @@ require (
 	github.com/xi2/xz v0.0.0-20171230120015-48954b6210f8 // indirect
 	github.com/youmark/pkcs8 v0.0.0-20201027041543-1326539a0a0a // indirect
 	go.mongodb.org/mongo-driver v1.8.4 // indirect
-	golang.org/x/crypto v0.0.0-20220307211146-efcb8507fb70 // indirect
-	golang.org/x/mod v0.5.1 // indirect
+	golang.org/x/crypto v0.0.0-20220315160706-3147a52a75dd // indirect
+	golang.org/x/mod v0.6.0-dev.0.20220106191415-9b9b3d81d5e3 // indirect
 	golang.org/x/net v0.0.0-20220225172249-27dd8689420f // indirect
 	golang.org/x/sync v0.0.0-20210220032951-036812b2e83c // indirect
-	golang.org/x/sys v0.0.0-20220310020820-b874c991c1a5 // indirect
+	golang.org/x/sys v0.0.0-20220319134239-a9b59b0215f8 // indirect
 	golang.org/x/text v0.3.7 // indirect
-	golang.org/x/tools v0.1.9 // indirect
+	golang.org/x/tools v0.1.10 // indirect
 	golang.org/x/xerrors v0.0.0-20200804184101-5ec99f83aff1 // indirect
-	google.golang.org/genproto v0.0.0-20220308174144-ae0e22291548 // indirect
+	google.golang.org/genproto v0.0.0-20220317150908-0efb43f6373e // indirect
 	google.golang.org/grpc v1.45.0 // indirect
 	google.golang.org/protobuf v1.27.1 // indirect
 	gopkg.in/ini.v1 v1.66.4 // indirect
@@ -139,7 +139,7 @@ require (
 	gorm.io/driver/mysql v1.3.2 // indirect
 	gorm.io/driver/postgres v1.3.1 // indirect
 	gorm.io/driver/sqlite v1.3.1 // indirect
-	gorm.io/gorm v1.23.2 // indirect
+	gorm.io/gorm v1.23.3 // indirect
 	gorm.io/plugin/dbresolver v1.1.0 // indirect
 )
 

@@ -55,6 +55,7 @@ func (a *Action) create(w http.ResponseWriter, req *http.Request, _ httprouter.P
 		xPub.RawXpub(),
 		uint32(0), // todo: use a constant? protect this?
 		scriptType,
+		false,
 		opts...,
 	); err != nil {
 		apirouter.ReturnResponse(w, req, http.StatusUnprocessableEntity, err.Error())
