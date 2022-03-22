@@ -3,7 +3,7 @@ module github.com/BuxOrg/bux-server
 go 1.17
 
 require (
-	github.com/99designs/gqlgen v0.17.1
+	github.com/99designs/gqlgen v0.17.2
 	github.com/BuxOrg/bux v0.1.8
 	github.com/bitcoinschema/go-bitcoin/v2 v2.0.0-alpha.3
 	github.com/dgraph-io/ristretto v0.1.0
