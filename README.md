@@ -205,6 +205,22 @@ Checkout all the [examples](examples)!
 
 <br/>
 
+## Docker Compose Quickstart
+To get started with development, `bux-server` provides a `docker-compose.yml`
+file which starts up Bux Server with Redis and PostgreSQL. To start, we need to
+tweak the `config/envs/development.json` file with the proper configuration.
+First:
+```
+$ cp config/envs/docker-compose.json config/envs/development.json
+```
+
+Then, we need to update the `admin_key` with your xpub. Modify
+`config/envs/development.json` with your admin key. Now we can start the
+containers:
+```
+$ docker-compose up
+```
+
 ## Contributing
 View the [contributing guidelines](.github/CONTRIBUTING.md) and follow the [code of conduct](.github/CODE_OF_CONDUCT.md).
 

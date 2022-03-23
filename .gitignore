@@ -32,3 +32,6 @@ dist
 
 # Code coverage
 coverage.txt
+
+# Development data dir
+data/
