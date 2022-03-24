@@ -229,6 +229,11 @@ type Mutation {
         xpub: String!,
         metadata: Metadata
     ): Xpub
+    xpub_with_token(
+        xpub: String!,
+        token: String!,
+        metadata: Metadata
+    ): Xpub
     access_key(
         metadata: Metadata
     ): AccessKey

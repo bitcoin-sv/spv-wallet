@@ -45,6 +45,43 @@ func (r *mutationResolver) Xpub(ctx context.Context, xpub string, metadata bux.M
 	return bux.DisplayModels(xPub).(*bux.Xpub), nil
 }
 
+func (r *mutationResolver) XpubWithToken(ctx context.Context, xpub string, token string, metadata bux.Metadata) (*bux.Xpub, error) {
+	c, err := GetConfigFromContextSigned(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	var existingXpub *bux.Xpub
+	existingXpub, err = c.Services.Bux.GetXpub(ctx, xpub)
+	if err != nil && !errors.Is(err, bux.ErrMissingXpub) {
+		return nil, err
+	}
+	if existingXpub != nil {
+		return nil, errors.New("xpub already exists")
+	}
+
+	// check token
+	// TODO: this is temporary during testing, tokens still need to be fleshed out
+	if token != "61zOLgJNf7q4apobdwRPfFAbGTD1zferPt-kpAexlGq" { //nolint:gosec // only temp
+		return nil, errors.New("invalid token given")
+	}
+
+	opts := make([]bux.ModelOps, 0)
+	for key, value := range metadata {
+		opts = append(opts, bux.WithMetadata(key, value))
+	}
+
+	// Create a new xPub
+	var xPub *bux.Xpub
+	if xPub, err = c.Services.Bux.NewXpub(
+		ctx, xpub, opts...,
+	); err != nil {
+		return nil, err
+	}
+
+	return bux.DisplayModels(xPub).(*bux.Xpub), nil
+}
+
 func (r *mutationResolver) AccessKey(ctx context.Context, metadata bux.Metadata) (*bux.AccessKey, error) {
 	c, err := GetConfigFromContextSigned(ctx)
 	if err != nil {
