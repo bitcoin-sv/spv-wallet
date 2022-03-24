@@ -55,7 +55,7 @@ func (a *Action) create(w http.ResponseWriter, req *http.Request, _ httprouter.P
 		xPub.RawXpub(),
 		uint32(0), // todo: use a constant? protect this?
 		scriptType,
-		false,
+		true, // monitor this address as it was created by request of a user to share
 		opts...,
 	); err != nil {
 		apirouter.ReturnResponse(w, req, http.StatusUnprocessableEntity, err.Error())
