@@ -12,12 +12,6 @@ import (
 	"github.com/newrelic/go-agent/v3/newrelic"
 )
 
-// Global variables for managing the configuration across multiple packages
-var (
-// _appConfig *AppConfig
-// _services *AppServices
-)
-
 // Config constants used for optimization and value testing
 const (
 	ApplicationName                = "BuxServer"
@@ -33,7 +27,7 @@ const (
 	EnvironmentStaging             = "staging"
 	EnvironmentTest                = "test"
 	HealthRequestPath              = "health"
-	Version                        = "v0.0.1"
+	Version                        = "v0.1.0"
 )
 
 // Local variables for configuration
