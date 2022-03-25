@@ -276,9 +276,6 @@ func (r *queryResolver) Transactions(ctx context.Context, metadata bux.Metadata,
 	if err != nil {
 		return nil, err
 	}
-	if tx == nil {
-		return nil, nil
-	}
 
 	return bux.DisplayModels(tx).([]*bux.Transaction), nil
 }
