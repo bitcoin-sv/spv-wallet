@@ -5,7 +5,7 @@ services:
     environment:
       - BUX_ENVIRONMENT=development
     ports:
-      - "3003:30003"
+      - "3003:3003"
     volumes:
       - ./config:/config:Z
     links:
