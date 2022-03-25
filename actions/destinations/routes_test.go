@@ -12,10 +12,20 @@ import (
 func (ts *TestSuite) TestDestinationRegisterRoutes() {
 	ts.T().Run("test routes", func(t *testing.T) {
 
+		// get destination
 		handle, _, _ := ts.Router.HTTPRouter.Lookup(http.MethodGet, "/"+config.CurrentMajorVersion+"/destination")
 		assert.NotNil(t, handle)
 
+		// new destination
 		handle, _, _ = ts.Router.HTTPRouter.Lookup(http.MethodPost, "/"+config.CurrentMajorVersion+"/destination")
+		assert.NotNil(t, handle)
+
+		// search destination
+		handle, _, _ = ts.Router.HTTPRouter.Lookup(http.MethodGet, "/"+config.CurrentMajorVersion+"/destination/search")
+		assert.NotNil(t, handle)
+
+		// search destination
+		handle, _, _ = ts.Router.HTTPRouter.Lookup(http.MethodPost, "/"+config.CurrentMajorVersion+"/destination/search")
 		assert.NotNil(t, handle)
 	})
 }

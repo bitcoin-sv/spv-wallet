@@ -12,7 +12,7 @@ import (
 func (ts *TestSuite) TestUtxoRegisterRoutes() {
 	ts.T().Run("test routes", func(t *testing.T) {
 
-		// Test request exists
+		// get utxo
 		handle, _, _ := ts.Router.HTTPRouter.Lookup(http.MethodGet, "/"+config.CurrentMajorVersion+"/utxo")
 		assert.NotNil(t, handle)
 	})
