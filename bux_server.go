@@ -1,4 +1,4 @@
-// Package buxServer is a complete stand-alone server using the Bux Engine
+// Package buxServer is a complete stand-alone server using the BUX Engine
 //
 // Run: go run cmd/server/main.go
 //

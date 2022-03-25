@@ -71,7 +71,8 @@ func (a *Action) RequireAdminAuthentication(fn httprouter.Handle) httprouter.Han
 }
 
 // CheckAuthentication will check the authentication
-func CheckAuthentication(appConfig *config.AppConfig, bux bux.ClientInterface, req *http.Request, adminRequired bool, requireSigning bool) (*http.Request, dictionary.ErrorMessage) {
+func CheckAuthentication(appConfig *config.AppConfig, bux bux.ClientInterface, req *http.Request,
+	adminRequired bool, requireSigning bool) (*http.Request, dictionary.ErrorMessage) {
 
 	// Bad/Unknown scheme
 	if appConfig.Authentication.Scheme != config.AuthenticationSchemeXpub {
