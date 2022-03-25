@@ -2,6 +2,7 @@ package graphql
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"net/http"
 
@@ -94,12 +95,12 @@ func wrapHandler(router *apirouter.Router, appConfig *config.AppConfig, services
 		w.Header().Set(allowHeadersHeader, router.CrossOriginAllowHeaders)
 		w.Header().Set(allowOriginHeader, router.CrossOriginAllowOrigin)
 
+		var err error
 		if withAuth {
 			var knownErr dictionary.ErrorMessage
 			// the graphql cannot check the signature using the bux check, will add extra checks in the endpoints
 			if req, knownErr = actions.CheckAuthentication(appConfig, services.Bux, req, false, false); knownErr.Code > 0 {
-				actions.ReturnErrorResponse(w, req, knownErr, "")
-				return
+				err = errors.New(knownErr.PublicMessage)
 			}
 		}
 
@@ -120,6 +121,7 @@ func wrapHandler(router *apirouter.Router, appConfig *config.AppConfig, services
 			Signed:    signed.(bool),
 			XPub:      req.Header.Get(bux.AuthHeader),
 			XPubID:    xPubID.(string),
+			AuthError: err,
 		})
 
 		// Call your original http.Handler

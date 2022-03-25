@@ -25,6 +25,7 @@ type GQLConfig struct {
 	XPub      string
 	XPubID    string
 	Auth      *bux.AuthPayload
+	AuthError error
 }
 
 // GetConfigFromContext get the AppConfig, Services and rawXPubKey from the context
@@ -32,6 +33,9 @@ func GetConfigFromContext(ctx context.Context) (*GQLConfig, error) {
 	ctxConfig := ctx.Value(config.GraphConfigKey).(*GQLConfig)
 	if ctxConfig == nil {
 		return nil, errors.New("could not find config in context")
+	}
+	if ctxConfig.AuthError != nil {
+		return nil, ctxConfig.AuthError
 	}
 
 	return ctxConfig, nil
@@ -43,6 +47,9 @@ func GetConfigFromContextSigned(ctx context.Context) (*GQLConfig, error) {
 	ctxConfig := ctx.Value(config.GraphConfigKey).(*GQLConfig)
 	if ctxConfig == nil {
 		return nil, errors.New("could not find config in context")
+	}
+	if ctxConfig.AuthError != nil {
+		return nil, ctxConfig.AuthError
 	}
 
 	if !ctxConfig.Signed && !ctxConfig.AppConfig.Authentication.SigningDisabled {
@@ -57,6 +64,9 @@ func GetConfigFromContextAdmin(ctx context.Context) (*GQLConfig, error) {
 	ctxConfig, err := GetConfigFromContext(ctx)
 	if err != nil {
 		return nil, err
+	}
+	if ctxConfig.AuthError != nil {
+		return nil, ctxConfig.AuthError
 	}
 
 	// Check that we are the right key
