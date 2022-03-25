@@ -48,7 +48,7 @@ func TestAppConfig_GetUserAgent(t *testing.T) {
 		ac := newTestConfig(t)
 		require.NotNil(t, ac)
 		agent := ac.GetUserAgent()
-		assert.Equal(t, "BuxServer "+EnvironmentTest+" "+Version, agent)
+		assert.Equal(t, "BUX-Server "+EnvironmentTest+" "+Version, agent)
 	})
 }
 

@@ -149,7 +149,7 @@ type (
 
 // GetUserAgent will return the outgoing user agent
 func (a *AppConfig) GetUserAgent() string {
-	return "BuxServer " + a.Environment + " " + Version
+	return "BUX-Server " + a.Environment + " " + Version
 }
 
 // Validate checks the configuration for specific rules
