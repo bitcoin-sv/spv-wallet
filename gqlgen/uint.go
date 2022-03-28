@@ -28,6 +28,9 @@ func UnmarshalUint(v interface{}) (uint, error) {
 		return uint(v), nil
 	case json.Number:
 		u64, err := strconv.ParseUint(string(v), 10, 64)
+		if err != nil {
+			return 0, err
+		}
 		return uint(u64), err
 	default:
 		return 0, fmt.Errorf("%T is not an uint", v)

@@ -30,6 +30,9 @@ func UnmarshalInt16(v interface{}) (int16, error) {
 		return int16(v), nil
 	case json.Number:
 		u64, err := strconv.ParseUint(string(v), 10, 16)
+		if err != nil {
+			return 0, err
+		}
 		return int16(u64), err
 	default:
 		return 0, fmt.Errorf("%T is not an int16", v)
