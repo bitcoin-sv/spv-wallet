@@ -30,4 +30,5 @@ func RegisterRoutes(router *apirouter.Router, appConfig *config.AppConfig, servi
 	router.HTTPRouter.GET("/"+config.CurrentMajorVersion+"/destination/search", router.Request(requireBasic.Wrap(action.search)))
 	router.HTTPRouter.POST("/"+config.CurrentMajorVersion+"/destination/search", router.Request(requireBasic.Wrap(action.search)))
 	router.HTTPRouter.POST("/"+config.CurrentMajorVersion+"/destination", router.Request(require.Wrap(action.create)))
+	router.HTTPRouter.PATCH("/"+config.CurrentMajorVersion+"/destination", router.Request(require.Wrap(action.update)))
 }

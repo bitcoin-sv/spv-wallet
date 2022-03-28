@@ -22,27 +22,9 @@ func (a *Action) update(w http.ResponseWriter, req *http.Request, _ httprouter.P
 	// Get an xPub
 	var xPub *bux.Xpub
 	var err error
-	xPub, err = a.Services.Bux.GetXpubByID(
-		req.Context(), reqXPubID,
+	xPub, err = a.Services.Bux.UpdateXpubMetadata(
+		req.Context(), reqXPubID, metadata,
 	)
-	if err != nil {
-		apirouter.ReturnResponse(w, req, http.StatusExpectationFailed, err.Error())
-		return
-	}
-
-	if xPub.Metadata == nil {
-		xPub.Metadata = make(bux.Metadata)
-	}
-
-	for key, value := range metadata {
-		if value == nil {
-			delete(xPub.Metadata, key)
-		} else {
-			xPub.Metadata[key] = value
-		}
-	}
-
-	err = xPub.Save(req.Context())
 	if err != nil {
 		apirouter.ReturnResponse(w, req, http.StatusExpectationFailed, err.Error())
 		return

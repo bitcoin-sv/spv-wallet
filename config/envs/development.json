@@ -1,35 +1,35 @@
 {
   "debug": true,
   "debug_profiling": false,
-  "disable_itc": false,
+  "disable_itc": true,
   "environment": "development",
   "gdpr_compliance": false,
   "authentication": {
-    "admin_key": "1234567",
+    "admin_key": "xpub661MyMwAqRbcFrBJbKwBGCB7d3fr2SaAuXGM95BA62X41m6eW2ehRQGW4xLi9wkEXUGnQZYxVVj4PxXnyrLk7jdqvBAs1Qq9gf6ykMvjR7J",
     "require_signing": false,
     "scheme": "xpub",
-    "signing_disabled": false
+    "signing_disabled": true
   },
   "cache": {
     "engine": "redis"
   },
   "datastore": {
     "auto_migrate": true,
-    "engine": "sqlite",
-    "debug": true,
-    "table_prefix": "bux"
+    "engine": "mongodb",
+    "debug": false,
+    "table_prefix": "xapi"
   },
   "graphql": {
     "debug": true,
     "enabled": true,
     "server_path": "/graphql",
-    "playground_path": "/graphiql",
-    "require_signing": false
+    "playground_path": "/graphiql"
   },
   "mongodb": {
-    "database_name": "bux",
+    "debug": true,
+    "database_name": "xapi",
     "transactions": false,
-    "uri": "mongodb://localhost:27017/bux"
+    "uri": "mongodb://localhost:27017/xapi"
   },
   "new_relic": {
     "domain_name": "domain.com",
@@ -48,6 +48,7 @@
   "redis": {
     "dependency_mode": true,
     "max_active_connections": 0,
+    "max_open_connections": 200,
     "max_connection_lifetime": "60s",
     "max_idle_connections": 10,
     "max_idle_timeout": "10s",
@@ -69,17 +70,18 @@
   },
   "sql": {
     "host": "localhost",
-    "name": "bux",
+    "name": "xapi",
     "password": "",
-    "port": "3306",
+    "_port": "3306",
+    "port": "5432",
     "replica": false,
     "skip_initialize_with_version": true,
     "time_zone": "UTC",
     "tx_timeout": "10s",
-    "user": "root"
+    "user": "postgres"
   },
   "sqlite": {
-    "database_path": "",
+    "database_path": "./test-json.db",
     "shared": true
   },
   "task_manager": {
