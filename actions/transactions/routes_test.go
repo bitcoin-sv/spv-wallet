@@ -31,5 +31,9 @@ func (ts *TestSuite) TestTransactionRegisterRoutes() {
 		// search transaction
 		handle, _, _ = ts.Router.HTTPRouter.Lookup(http.MethodPost, "/"+config.CurrentMajorVersion+"/transaction/search")
 		assert.NotNil(t, handle)
+
+		// update transaction
+		handle, _, _ = ts.Router.HTTPRouter.Lookup(http.MethodPatch, "/"+config.CurrentMajorVersion+"/transaction")
+		assert.NotNil(t, handle)
 	})
 }

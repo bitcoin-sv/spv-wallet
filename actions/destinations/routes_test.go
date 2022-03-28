@@ -27,5 +27,9 @@ func (ts *TestSuite) TestDestinationRegisterRoutes() {
 		// search destination
 		handle, _, _ = ts.Router.HTTPRouter.Lookup(http.MethodPost, "/"+config.CurrentMajorVersion+"/destination/search")
 		assert.NotNil(t, handle)
+
+		// update destination
+		handle, _, _ = ts.Router.HTTPRouter.Lookup(http.MethodPatch, "/"+config.CurrentMajorVersion+"/destination")
+		assert.NotNil(t, handle)
 	})
 }

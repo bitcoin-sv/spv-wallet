@@ -28,8 +28,8 @@ func RegisterRoutes(router *apirouter.Router, appConfig *config.AppConfig, servi
 	// V1 Requests
 	router.HTTPRouter.GET("/"+config.CurrentMajorVersion+"/transaction", router.Request(requireBasic.Wrap(action.get)))
 	router.HTTPRouter.GET("/"+config.CurrentMajorVersion+"/transaction/search", router.Request(requireBasic.Wrap(action.search)))
-	router.HTTPRouter.POST("/"+config.CurrentMajorVersion+"/transaction/search", router.Request(requireBasic.Wrap(action.search)))
+	router.HTTPRouter.PATCH("/"+config.CurrentMajorVersion+"/transaction", router.Request(requireBasic.Wrap(action.update)))
 	router.HTTPRouter.POST("/"+config.CurrentMajorVersion+"/transaction", router.Request(require.Wrap(action.newTransaction)))
 	router.HTTPRouter.POST("/"+config.CurrentMajorVersion+"/transaction/record", router.Request(require.Wrap(action.record)))
-	router.HTTPRouter.PATCH("/"+config.CurrentMajorVersion+"/transaction", router.Request(requireBasic.Wrap(action.update)))
+	router.HTTPRouter.POST("/"+config.CurrentMajorVersion+"/transaction/search", router.Request(requireBasic.Wrap(action.search)))
 }
