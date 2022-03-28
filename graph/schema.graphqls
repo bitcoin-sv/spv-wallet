@@ -229,6 +229,9 @@ type Mutation {
         xpub: String!,
         metadata: Metadata
     ): Xpub
+    xpub_metadata(
+        metadata: Metadata!
+    ): Xpub
     access_key(
         metadata: Metadata
     ): AccessKey
@@ -240,6 +243,10 @@ type Mutation {
         draft_id: String,
         metadata: Metadata
     ): Transaction
+    transaction_metadata(
+        tx_id: String!
+        metadata: Metadata!
+    ): Transaction
     new_transaction(
         transaction_config: TransactionConfigInput!,
         metadata: Metadata
@@ -247,5 +254,11 @@ type Mutation {
     destination(
         destination_type: String,
         metadata: Metadata
+    ): Destination
+    destination_metadata(
+        id: String
+        address: String
+        locking_script: String
+        metadata: Metadata!
     ): Destination
 }
