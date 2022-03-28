@@ -45,6 +45,25 @@ func (r *mutationResolver) Xpub(ctx context.Context, xpub string, metadata bux.M
 	return bux.DisplayModels(xPub).(*bux.Xpub), nil
 }
 
+func (r *mutationResolver) XpubMetadata(ctx context.Context, metadata bux.Metadata) (*bux.Xpub, error) {
+	c, err := GetConfigFromContext(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	var xPub *bux.Xpub
+	xPub, err = c.Services.Bux.UpdateXpubMetadata(ctx, c.XPubID, metadata)
+	if err != nil {
+		return nil, err
+	}
+
+	if !c.Signed || c.XPub == "" {
+		xPub.RemovePrivateData()
+	}
+
+	return bux.DisplayModels(xPub).(*bux.Xpub), nil
+}
+
 func (r *mutationResolver) AccessKey(ctx context.Context, metadata bux.Metadata) (*bux.AccessKey, error) {
 	c, err := GetConfigFromContextSigned(ctx)
 	if err != nil {
@@ -144,6 +163,24 @@ func (r *mutationResolver) Transaction(ctx context.Context, hex string, draftID 
 	return bux.DisplayModels(transaction).(*bux.Transaction), nil
 }
 
+func (r *mutationResolver) TransactionMetadata(ctx context.Context, txID string, metadata bux.Metadata) (*bux.Transaction, error) {
+	c, err := GetConfigFromContext(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	var tx *bux.Transaction
+	tx, err = c.Services.Bux.UpdateTransactionMetadata(ctx, c.XPubID, txID, metadata)
+	if err != nil {
+		return nil, err
+	}
+	if tx == nil {
+		return nil, nil
+	}
+
+	return bux.DisplayModels(tx).(*bux.Transaction), nil
+}
+
 func (r *mutationResolver) NewTransaction(ctx context.Context, transactionConfig bux.TransactionConfig, metadata bux.Metadata) (*bux.DraftTransaction, error) {
 	c, err := GetConfigFromContextSigned(ctx)
 	if err != nil {
@@ -191,6 +228,42 @@ func (r *mutationResolver) Destination(ctx context.Context, destinationType *str
 		true, // monitor this address as it was created by request of a user to share
 		opts...,
 	)
+	if err != nil {
+		return nil, err
+	}
+
+	return bux.DisplayModels(destination).(*bux.Destination), nil
+}
+
+func (r *mutationResolver) DestinationMetadata(ctx context.Context, id *string, address *string, lockingScript *string, metadata bux.Metadata) (*bux.Destination, error) {
+	c, err := GetConfigFromContextSigned(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	var destination *bux.Destination
+	if id != nil {
+		destination, err = c.Services.Bux.UpdateDestinationMetadataByID(
+			ctx,
+			c.XPubID,
+			*id,
+			metadata,
+		)
+	} else if address != nil {
+		destination, err = c.Services.Bux.UpdateDestinationMetadataByAddress(
+			ctx,
+			c.XPubID,
+			*address,
+			metadata,
+		)
+	} else if lockingScript != nil {
+		destination, err = c.Services.Bux.UpdateDestinationMetadataByLockingScript(
+			ctx,
+			c.XPubID,
+			*lockingScript,
+			metadata,
+		)
+	}
 	if err != nil {
 		return nil, err
 	}
