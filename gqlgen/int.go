@@ -2,8 +2,10 @@ package gqlgen
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
+	"math"
 	"strconv"
 
 	"github.com/99designs/gqlgen/graphql"
@@ -33,7 +35,10 @@ func UnmarshalInt16(v interface{}) (int16, error) {
 		if err != nil {
 			return 0, err
 		}
-		return int16(u64), err
+		if u64 <= math.MaxUint16 {
+			return int16(u64), err
+		}
+		return 0, errors.New("value is > math.MaxUint16")
 	default:
 		return 0, fmt.Errorf("%T is not an int16", v)
 	}

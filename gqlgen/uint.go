@@ -2,8 +2,10 @@ package gqlgen
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
+	"math"
 	"strconv"
 
 	"github.com/99designs/gqlgen/graphql"
@@ -31,7 +33,10 @@ func UnmarshalUint(v interface{}) (uint, error) {
 		if err != nil {
 			return 0, err
 		}
-		return uint(u64), err
+		if u64 <= math.MaxUint {
+			return uint(u64), err
+		}
+		return 0, errors.New("value is > math.MaxUint")
 	default:
 		return 0, fmt.Errorf("%T is not an uint", v)
 	}
