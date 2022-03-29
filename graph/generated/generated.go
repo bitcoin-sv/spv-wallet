@@ -93,7 +93,7 @@ type ComplexityRoot struct {
 		DestinationMetadata func(childComplexity int, id *string, address *string, lockingScript *string, metadata bux.Metadata) int
 		NewTransaction      func(childComplexity int, transactionConfig bux.TransactionConfig, metadata bux.Metadata) int
 		Transaction         func(childComplexity int, hex string, draftID *string, metadata bux.Metadata) int
-		TransactionMetadata func(childComplexity int, txID string, metadata bux.Metadata) int
+		TransactionMetadata func(childComplexity int, id string, metadata bux.Metadata) int
 		Xpub                func(childComplexity int, xpub string, metadata bux.Metadata) int
 		XpubMetadata        func(childComplexity int, metadata bux.Metadata) int
 	}
@@ -127,7 +127,7 @@ type ComplexityRoot struct {
 		AccessKeys   func(childComplexity int, metadata bux.Metadata) int
 		Destination  func(childComplexity int, id *string, address *string, lockingScript *string) int
 		Destinations func(childComplexity int, metadata bux.Metadata) int
-		Transaction  func(childComplexity int, txID string) int
+		Transaction  func(childComplexity int, id string) int
 		Transactions func(childComplexity int, metadata bux.Metadata, conditions map[string]interface{}) int
 		Xpub         func(childComplexity int) int
 	}
@@ -221,7 +221,7 @@ type MutationResolver interface {
 	AccessKey(ctx context.Context, metadata bux.Metadata) (*bux.AccessKey, error)
 	AccessKeyRevoke(ctx context.Context, id *string) (*bux.AccessKey, error)
 	Transaction(ctx context.Context, hex string, draftID *string, metadata bux.Metadata) (*bux.Transaction, error)
-	TransactionMetadata(ctx context.Context, txID string, metadata bux.Metadata) (*bux.Transaction, error)
+	TransactionMetadata(ctx context.Context, id string, metadata bux.Metadata) (*bux.Transaction, error)
 	NewTransaction(ctx context.Context, transactionConfig bux.TransactionConfig, metadata bux.Metadata) (*bux.DraftTransaction, error)
 	Destination(ctx context.Context, destinationType *string, metadata bux.Metadata) (*bux.Destination, error)
 	DestinationMetadata(ctx context.Context, id *string, address *string, lockingScript *string, metadata bux.Metadata) (*bux.Destination, error)
@@ -230,7 +230,7 @@ type QueryResolver interface {
 	Xpub(ctx context.Context) (*bux.Xpub, error)
 	AccessKey(ctx context.Context, key string) (*bux.AccessKey, error)
 	AccessKeys(ctx context.Context, metadata bux.Metadata) ([]*bux.AccessKey, error)
-	Transaction(ctx context.Context, txID string) (*bux.Transaction, error)
+	Transaction(ctx context.Context, id string) (*bux.Transaction, error)
 	Transactions(ctx context.Context, metadata bux.Metadata, conditions map[string]interface{}) ([]*bux.Transaction, error)
 	Destination(ctx context.Context, id *string, address *string, lockingScript *string) (*bux.Destination, error)
 	Destinations(ctx context.Context, metadata bux.Metadata) ([]*bux.Destination, error)
@@ -536,7 +536,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.Mutation.TransactionMetadata(childComplexity, args["tx_id"].(string), args["metadata"].(bux.Metadata)), true
+		return e.complexity.Mutation.TransactionMetadata(childComplexity, args["id"].(string), args["metadata"].(bux.Metadata)), true
 
 	case "Mutation.xpub":
 		if e.complexity.Mutation.Xpub == nil {
@@ -725,7 +725,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.Query.Transaction(childComplexity, args["tx_id"].(string)), true
+		return e.complexity.Query.Transaction(childComplexity, args["id"].(string)), true
 
 	case "Query.transactions":
 		if e.complexity.Query.Transactions == nil {
@@ -1447,7 +1447,7 @@ type Query {
         metadata: Metadata
     ): [AccessKey]
     transaction(
-        tx_id: String!
+        id: String!
     ): Transaction
     transactions(
         metadata: Metadata
@@ -1483,7 +1483,7 @@ type Mutation {
         metadata: Metadata
     ): Transaction
     transaction_metadata(
-        tx_id: String!
+        id: String!
         metadata: Metadata!
     ): Transaction
     new_transaction(
@@ -1666,14 +1666,14 @@ func (ec *executionContext) field_Mutation_transaction_metadata_args(ctx context
 	var err error
 	args := map[string]interface{}{}
 	var arg0 string
-	if tmp, ok := rawArgs["tx_id"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("tx_id"))
+	if tmp, ok := rawArgs["id"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
 		arg0, err = ec.unmarshalNString2string(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
 	}
-	args["tx_id"] = arg0
+	args["id"] = arg0
 	var arg1 bux.Metadata
 	if tmp, ok := rawArgs["metadata"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("metadata"))
@@ -1822,14 +1822,14 @@ func (ec *executionContext) field_Query_transaction_args(ctx context.Context, ra
 	var err error
 	args := map[string]interface{}{}
 	var arg0 string
-	if tmp, ok := rawArgs["tx_id"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("tx_id"))
+	if tmp, ok := rawArgs["id"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
 		arg0, err = ec.unmarshalNString2string(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
 	}
-	args["tx_id"] = arg0
+	args["id"] = arg0
 	return args, nil
 }
 
@@ -3043,7 +3043,7 @@ func (ec *executionContext) _Mutation_transaction_metadata(ctx context.Context, 
 	fc.Args = args
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().TransactionMetadata(rctx, args["tx_id"].(string), args["metadata"].(bux.Metadata))
+		return ec.resolvers.Mutation().TransactionMetadata(rctx, args["id"].(string), args["metadata"].(bux.Metadata))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -3789,7 +3789,7 @@ func (ec *executionContext) _Query_transaction(ctx context.Context, field graphq
 	fc.Args = args
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Query().Transaction(rctx, args["tx_id"].(string))
+		return ec.resolvers.Query().Transaction(rctx, args["id"].(string))
 	})
 	if err != nil {
 		ec.Error(ctx, err)

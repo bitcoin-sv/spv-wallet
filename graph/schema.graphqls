@@ -208,7 +208,7 @@ type Query {
         metadata: Metadata
     ): [AccessKey]
     transaction(
-        tx_id: String!
+        id: String!
     ): Transaction
     transactions(
         metadata: Metadata
@@ -244,7 +244,7 @@ type Mutation {
         metadata: Metadata
     ): Transaction
     transaction_metadata(
-        tx_id: String!
+        id: String!
         metadata: Metadata!
     ): Transaction
     new_transaction(
