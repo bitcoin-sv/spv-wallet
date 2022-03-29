@@ -163,14 +163,14 @@ func (r *mutationResolver) Transaction(ctx context.Context, hex string, draftID 
 	return bux.DisplayModels(transaction).(*bux.Transaction), nil
 }
 
-func (r *mutationResolver) TransactionMetadata(ctx context.Context, txID string, metadata bux.Metadata) (*bux.Transaction, error) {
+func (r *mutationResolver) TransactionMetadata(ctx context.Context, id string, metadata bux.Metadata) (*bux.Transaction, error) {
 	c, err := GetConfigFromContext(ctx)
 	if err != nil {
 		return nil, err
 	}
 
 	var tx *bux.Transaction
-	tx, err = c.Services.Bux.UpdateTransactionMetadata(ctx, c.XPubID, txID, metadata)
+	tx, err = c.Services.Bux.UpdateTransactionMetadata(ctx, c.XPubID, id, metadata)
 	if err != nil {
 		return nil, err
 	}
@@ -320,14 +320,14 @@ func (r *queryResolver) AccessKeys(ctx context.Context, metadata bux.Metadata) (
 	return bux.DisplayModels(accessKeys).([]*bux.AccessKey), nil
 }
 
-func (r *queryResolver) Transaction(ctx context.Context, txID string) (*bux.Transaction, error) {
+func (r *queryResolver) Transaction(ctx context.Context, id string) (*bux.Transaction, error) {
 	c, err := GetConfigFromContext(ctx)
 	if err != nil {
 		return nil, err
 	}
 
 	var tx *bux.Transaction
-	tx, err = c.Services.Bux.GetTransaction(ctx, c.XPubID, txID)
+	tx, err = c.Services.Bux.GetTransaction(ctx, c.XPubID, id)
 	if err != nil {
 		return nil, err
 	}
