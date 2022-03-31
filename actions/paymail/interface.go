@@ -185,13 +185,13 @@ func (p *PaymailInterface) getPaymailInformation(ctx context.Context, alias,
 
 	var xPub *bux.Xpub
 	if xPub, err = p.client.GetXpubByID(
-		ctx, paymailAddress.XPubID,
+		ctx, paymailAddress.XpubID,
 	); err != nil {
 		return nil, "", nil, err
 	}
 
 	pubKey, address, lockingScript, keyErr := p.getPaymailKeys(
-		paymailAddress.ExternalXPubKey,
+		paymailAddress.ExternalXpubKey,
 		xPub.NextExternalNum,
 	)
 	if keyErr != nil {
@@ -211,7 +211,7 @@ func (p *PaymailInterface) getPaymailInformation(ctx context.Context, alias,
 		LockingScript: lockingScript,
 		Num:           xPub.NextExternalNum,
 		Type:          utils.ScriptTypePubKeyHash,
-		XpubID:        paymailAddress.XPubID,
+		XpubID:        paymailAddress.XpubID,
 	}
 	if len(*metadata) > 0 {
 		destination.Metadata = *metadata
@@ -244,7 +244,7 @@ func (p *PaymailInterface) getPaymailAddress(ctx context.Context, alias, domain 
 	); err != nil {
 		return nil, err
 	}
-	if paymailAddress.ExternalXPubKey == "" {
+	if paymailAddress.ExternalXpubKey == "" {
 		// could not find paymail record
 		return nil, bux.ErrMissingXpub
 	}

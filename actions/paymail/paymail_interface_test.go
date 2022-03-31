@@ -185,11 +185,11 @@ func initPaymailTesting(t *testing.T) (context.Context, bux.ClientInterface, fun
 		Alias:           alias,
 		Avatar:          "img url",
 		Domain:          domain,
-		ExternalXPubKey: paymailKey.String(),
+		ExternalXpubKey: paymailKey.String(),
 		ID:              utils.Hash(fullPaymail),
 		Model:           *bux.NewBaseModel(bux.ModelPaymail, client.DefaultModelOptions()...),
 		Username:        "Tester",
-		XPubID:          xPub.ID,
+		XpubID:          xPub.ID,
 	}
 	err = savePaymailAddress.Save(ctx)
 	require.NoError(t, err)
