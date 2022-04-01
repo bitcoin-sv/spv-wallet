@@ -7,6 +7,8 @@ import (
 	"strings"
 	"time"
 
+	"github.com/BuxOrg/bux/chainstate"
+
 	"github.com/BuxOrg/bux"
 	"github.com/BuxOrg/bux/cachestore"
 	"github.com/BuxOrg/bux/datastore"
@@ -196,6 +198,19 @@ func (s *AppServices) loadBux(ctx context.Context, appConfig *AppConfig) (err er
 		} else {
 			options = append(options, bux.WithTaskQ(config, appConfig.TaskManager.Factory))
 		}
+	}
+
+	if appConfig.Monitor != nil && appConfig.Monitor.Enabled {
+		if appConfig.Monitor.CentrifugeServer == "" {
+			err = errors.New("CentrifugeServer is required for monitoring to work")
+			return
+		}
+		options = append(options, bux.WithMonitoring(ctx, &chainstate.MonitorOptions{
+			CentrifugeServer:        appConfig.Monitor.CentrifugeServer,
+			MonitorDays:             appConfig.Monitor.MonitorDays,
+			FalsePositiveRate:       appConfig.Monitor.FalsePositiveRate,
+			MaxNumberOfDestinations: appConfig.Monitor.MaxNumberOfDestinations,
+		}))
 	}
 
 	// Create the new client

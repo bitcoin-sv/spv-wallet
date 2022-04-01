@@ -914,6 +914,8 @@ github.com/tonicpow/go-paymail v0.7.5/go.mod h1:YtNTj6gJQ7+CjrjIotk6iJOf2be1zch6
 github.com/tryvium-travels/memongo v0.5.0 h1:Snai8FKpLWs23+IIXLJl99u+mFqz7kZBkrP6M7H1cAA=
 github.com/tryvium-travels/memongo v0.5.0/go.mod h1:TKLvXhrZIqe1meEsWofcM6EmWawRdhFRGazUhiYsaUM=
 github.com/tv42/httpunix v0.0.0-20150427012821-b75d8614f926/go.mod h1:9ESjWnEqriFuLhtthL60Sar/7RFoluCcXsuvEwTV5KM=
+github.com/tylertreat/BoomFilters v0.0.0-20210315201527-1a82519a3e43 h1:QEePdg0ty2r0t1+qwfZmQ4OOl/MB2UXIeJSpIZv56lg=
+github.com/tylertreat/BoomFilters v0.0.0-20210315201527-1a82519a3e43/go.mod h1:OYRfF6eb5wY9VRFkXJH8FFBi3plw2v+giaIu7P054pM=
 github.com/ugorji/go v1.2.6/go.mod h1:anCg0y61KIhDlPZmnH+so+RQbysYVyDko0IMgJv0Nn0=
 github.com/ugorji/go v1.2.7 h1:qYhyWUUd6WbiM+C6JZAUkIJt/1WrjzNHY9+KCIjVqTo=
 github.com/ugorji/go v1.2.7/go.mod h1:nF9osbDWLy6bDVv/Rtoh6QgnvNDpmCalQV5urGCCS6M=
