@@ -55,6 +55,7 @@ type (
 		GDPRCompliance   bool                     `json:"gdpr_compliance" mapstructure:"gdpr_compliance"`
 		GraphQL          *GraphqlConfig           `json:"graphql" mapstructure:"graphql"`
 		Mongo            *datastore.MongoDBConfig `json:"mongodb" mapstructure:"mongodb"`
+		Monitor          *MonitorOptions          `json:"monitor" mapstructure:"monitor"`
 		NewRelic         *NewRelicConfig          `json:"new_relic" mapstructure:"new_relic"`
 		Paymail          *PaymailConfig           `json:"paymail" mapstructure:"paymail"`
 		Redis            *RedisConfig             `json:"redis" mapstructure:"redis"`
@@ -72,6 +73,11 @@ type (
 		RequireSigning  bool   `json:"require_signing" mapstructure:"require_signing"`   // if the signing is required
 		Scheme          string `json:"scheme" mapstructure:"scheme"`                     // authentication scheme to use (default is: xpub)
 		SigningDisabled bool   `json:"signing_disabled" mapstructure:"signing_disabled"` // NOTE: Only for development (turns off signing)
+	}
+
+	// BlockHeadersConfiguration is the configuration for blockheader monitoring
+	BlockHeadersConfiguration struct {
+		Enabled bool `json:"enabled" mapstructure:"enabled"` // true/false
 	}
 
 	// CachestoreConfig is a configuration for cachestore
@@ -92,6 +98,20 @@ type (
 		Enabled        bool   `json:"enabled" mapstructure:"enabled"`                 // true/false
 		PlaygroundPath string `json:"playground_path" mapstructure:"playground_path"` // playground path i.e. "/graphiql"
 		ServerPath     string `json:"server_path" mapstructure:"server_path"`         // server path i.e. "/graphql"
+	}
+
+	// MonitorOptions is the configuration for blockchain monitoring
+	MonitorOptions struct {
+		Enabled                 bool     `json:"enabled" mapstructure:"enabled"`                                       // true/false
+		CentrifugeServer        string   `json:"centrifuge_server" mapstructure:"centrifuge_server"`                   // url of the centrifuge server
+		MonitorDays             int      `json:"monitor_days" mapstructure:"monitor_days"`                             // how many days in the past should we monitor an address (default: 7)
+		FalsePositiveRate       float64  `json:"false_positive_rate" mapstructure:"false_positive_rate"`               // how many false positives do we except (default: 0.01)
+		MaxNumberOfDestinations int      `json:"max_number_of_destinations" mapstructure:"max_number_of_destinations"` // how many destinations can the filter hold (default: 100,000)
+		SaveDestinations        bool     `json:"save_destinations" mapstructure:"save_destinations"`                   // Whether or not to save destinations that pass monitor filter
+		FilterType              string   `json:"filter_type" mapstructure:"filter_type"`                               // type of locking scripts in monitor filter
+		Filters                 []string `json:"filters" mapstructure:"filters"'`                                      // Array of filters to start bux with
+		RegexCheckOnly          bool     `json:"regex_check_only" mapstructure:"regex_check_only"`                     // Only do regex check on filter
+
 	}
 
 	// NewRelicConfig is the configuration for New Relic

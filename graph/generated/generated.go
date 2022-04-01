@@ -38,6 +38,7 @@ type Config struct {
 
 type ResolverRoot interface {
 	Mutation() MutationResolver
+	PaymailAddress() PaymailAddressResolver
 	Query() QueryResolver
 }
 
@@ -238,6 +239,9 @@ type MutationResolver interface {
 	DestinationMetadata(ctx context.Context, id *string, address *string, lockingScript *string, metadata bux.Metadata) (*bux.Destination, error)
 	PaymailCreate(ctx context.Context, address string, publicName *string, avatar *string, metadata bux.Metadata) (*bux.PaymailAddress, error)
 	PaymailDelete(ctx context.Context, address string) (bool, error)
+}
+type PaymailAddressResolver interface {
+	PublicName(ctx context.Context, obj *bux.PaymailAddress) (*string, error)
 }
 type QueryResolver interface {
 	Xpub(ctx context.Context) (*bux.Xpub, error)
@@ -3744,14 +3748,14 @@ func (ec *executionContext) _PaymailAddress_public_name(ctx context.Context, fie
 		Object:     "PaymailAddress",
 		Field:      field,
 		Args:       nil,
-		IsMethod:   false,
-		IsResolver: false,
+		IsMethod:   true,
+		IsResolver: true,
 	}
 
 	ctx = graphql.WithFieldContext(ctx, fc)
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.PublicName, nil
+		return ec.resolvers.PaymailAddress().PublicName(rctx, obj)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -3760,9 +3764,9 @@ func (ec *executionContext) _PaymailAddress_public_name(ctx context.Context, fie
 	if resTmp == nil {
 		return graphql.Null
 	}
-	res := resTmp.(string)
+	res := resTmp.(*string)
 	fc.Result = res
-	return ec.marshalOString2string(ctx, field.Selections, res)
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _PaymailAddress_avatar(ctx context.Context, field graphql.CollectedField, obj *bux.PaymailAddress) (ret graphql.Marshaler) {
@@ -8307,12 +8311,22 @@ func (ec *executionContext) _PaymailAddress(ctx context.Context, sel ast.Selecti
 			out.Values[i] = innerFunc(ctx)
 
 		case "public_name":
+			field := field
+
 			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
-				return ec._PaymailAddress_public_name(ctx, field, obj)
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._PaymailAddress_public_name(ctx, field, obj)
+				return res
 			}
 
-			out.Values[i] = innerFunc(ctx)
+			out.Concurrently(i, func() graphql.Marshaler {
+				return innerFunc(ctx)
 
+			})
 		case "avatar":
 			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._PaymailAddress_avatar(ctx, field, obj)

@@ -1,7 +1,7 @@
 {
   "debug": true,
   "debug_profiling": false,
-  "disable_itc": true,
+  "disable_itc": false,
   "environment": "development",
   "gdpr_compliance": false,
   "authentication": {
@@ -15,9 +15,9 @@
   },
   "datastore": {
     "auto_migrate": true,
-    "engine": "mongodb",
+    "engine": "sqlite",
     "debug": false,
-    "table_prefix": "xapi"
+    "table_prefix": "bux"
   },
   "graphql": {
     "debug": true,
@@ -27,9 +27,13 @@
   },
   "mongodb": {
     "debug": true,
-    "database_name": "xapi",
+    "database_name": "bux",
     "transactions": false,
     "uri": "mongodb://localhost:27017/xapi"
+  },
+  "monitor": {
+    "enabled": true,
+    "centrifuge_server": "wss://socket.whatsonchain.com/mempool"
   },
   "new_relic": {
     "domain_name": "domain.com",

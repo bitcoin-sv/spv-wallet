@@ -2,12 +2,17 @@ module github.com/BuxOrg/bux-server
 
 go 1.17
 
+replace github.com/BuxOrg/bux => /git/bux
+
 require (
 	github.com/99designs/gqlgen v0.17.2
 	github.com/BuxOrg/bux v0.2.4
+	github.com/bitcoinschema/go-bitcoin/v2 v2.0.0-alpha.3
 	github.com/go-ozzo/ozzo-validation v3.6.0+incompatible
 	github.com/go-redis/redis/v8 v8.11.5
 	github.com/julienschmidt/httprouter v1.3.0
+	github.com/libsv/go-bk v0.1.6
+	github.com/libsv/go-bt/v2 v2.1.0-beta.2.0.20211221142324-0d686850c5e0
 	github.com/mrz1836/go-api-router v0.4.11
 	github.com/mrz1836/go-logger v0.2.5
 	github.com/mrz1836/go-sanitize v1.1.5
@@ -16,13 +21,13 @@ require (
 	github.com/newrelic/go-agent/v3/integrations/nrhttprouter v1.0.1
 	github.com/spf13/viper v1.10.1
 	github.com/stretchr/testify v1.7.1
+	github.com/tonicpow/go-paymail v0.7.5
 	github.com/vektah/gqlparser/v2 v2.4.1
 )
 
 require (
 	github.com/agnivade/levenshtein v1.1.1 // indirect
 	github.com/asaskevich/govalidator v0.0.0-20210307081110-f21760c49a8d // indirect
-	github.com/bitcoinschema/go-bitcoin/v2 v2.0.0-alpha.3 // indirect
 	github.com/bitcoinschema/go-bob v0.1.9 // indirect
 	github.com/bitcoinschema/go-map v0.0.14 // indirect
 	github.com/bitcoinsv/bsvd v0.0.0-20190609155523-4c29707f7173 // indirect
@@ -66,10 +71,10 @@ require (
 	github.com/josharian/intern v1.0.0 // indirect
 	github.com/jpillora/backoff v1.0.0 // indirect
 	github.com/klauspost/compress v1.15.1 // indirect
+	github.com/korovkin/limiter v0.0.0-20220321204241-2880bd9cecaf // indirect
 	github.com/kr/text v0.2.0 // indirect
-	github.com/libsv/go-bk v0.1.6 // indirect
+	github.com/libsv/go-bc v0.1.9 // indirect
 	github.com/libsv/go-bt v1.0.6 // indirect
-	github.com/libsv/go-bt/v2 v2.1.0-beta.2.0.20211221142324-0d686850c5e0 // indirect
 	github.com/magiconair/properties v1.8.6 // indirect
 	github.com/mailru/easyjson v0.7.7 // indirect
 	github.com/matryer/respond v1.0.1 // indirect
@@ -99,7 +104,7 @@ require (
 	github.com/tidwall/match v1.1.1 // indirect
 	github.com/tidwall/pretty v1.2.0 // indirect
 	github.com/tonicpow/go-minercraft v0.7.1 // indirect
-	github.com/tonicpow/go-paymail v0.7.5 // indirect
+	github.com/tylertreat/BoomFilters v0.0.0-20210315201527-1a82519a3e43 // indirect
 	github.com/ugorji/go/codec v1.2.7 // indirect
 	github.com/valyala/bytebufferpool v1.0.0 // indirect
 	github.com/vmihailenco/msgpack/v5 v5.3.5 // indirect
@@ -114,7 +119,7 @@ require (
 	golang.org/x/mod v0.6.0-dev.0.20220106191415-9b9b3d81d5e3 // indirect
 	golang.org/x/net v0.0.0-20220407224826-aac1ed45d8e3 // indirect
 	golang.org/x/sync v0.0.0-20210220032951-036812b2e83c // indirect
-	golang.org/x/sys v0.0.0-20220408201424-a24fb2fb8a0f // indirect
+	golang.org/x/sys v0.0.0-20220412071739-889880a91fd5 // indirect
 	golang.org/x/text v0.3.7 // indirect
 	golang.org/x/tools v0.1.10 // indirect
 	golang.org/x/xerrors v0.0.0-20200804184101-5ec99f83aff1 // indirect

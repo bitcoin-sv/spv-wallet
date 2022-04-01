@@ -6,6 +6,7 @@ package graph
 import (
 	"context"
 	"errors"
+	"fmt"
 
 	"github.com/BuxOrg/bux"
 	"github.com/BuxOrg/bux-server/graph/generated"
@@ -271,6 +272,10 @@ func (r *mutationResolver) DestinationMetadata(ctx context.Context, id *string, 
 	return bux.DisplayModels(destination).(*bux.Destination), nil
 }
 
+func (r *paymailAddressResolver) PublicName(ctx context.Context, obj *bux.PaymailAddress) (*string, error) {
+	panic(fmt.Errorf("not implemented"))
+}
+
 func (r *queryResolver) Xpub(ctx context.Context) (*bux.Xpub, error) {
 	c, err := GetConfigFromContext(ctx)
 	if err != nil {
@@ -394,8 +399,14 @@ func (r *queryResolver) Destinations(ctx context.Context, metadata bux.Metadata)
 // Mutation returns generated.MutationResolver implementation.
 func (r *Resolver) Mutation() generated.MutationResolver { return &mutationResolver{r} }
 
+// PaymailAddress returns generated.PaymailAddressResolver implementation.
+func (r *Resolver) PaymailAddress() generated.PaymailAddressResolver {
+	return &paymailAddressResolver{r}
+}
+
 // Query returns generated.QueryResolver implementation.
 func (r *Resolver) Query() generated.QueryResolver { return &queryResolver{r} }
 
 type mutationResolver struct{ *Resolver }
+type paymailAddressResolver struct{ *Resolver }
 type queryResolver struct{ *Resolver }
