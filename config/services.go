@@ -221,6 +221,63 @@ func (s *AppServices) loadBux(ctx context.Context, appConfig *AppConfig, testMod
 		options = append(options, bux.WithNotifications(appConfig.Notifications.WebhookEndpoint))
 	}
 
+	if appConfig.Monitor != nil && appConfig.Monitor.Enabled {
+		if appConfig.Monitor.CentrifugeServer == "" {
+			err = errors.New("CentrifugeServer is required for monitoring to work")
+			return
+		}
+		options = append(options, bux.WithMonitoring(ctx, &chainstate.MonitorOptions{
+			CentrifugeServer:        appConfig.Monitor.CentrifugeServer,
+			MonitorDays:             appConfig.Monitor.MonitorDays,
+			FalsePositiveRate:       appConfig.Monitor.FalsePositiveRate,
+			MaxNumberOfDestinations: appConfig.Monitor.MaxNumberOfDestinations,
+		}))
+	}
+
+	// Create the new client
+	s.Bux, err = bux.NewClient(ctx, options...)
+
+	return
+}
+
+// loadTestBux will create a bux for testing purposes
+func (s *AppServices) loadTestBux(ctx context.Context, appConfig *AppConfig) (err error) {
+	var options []bux.ClientOps
+
+	// New relic
+	if appConfig.NewRelic.Enabled {
+		options = append(options, bux.WithNewRelic(s.NewRelic))
+	}
+
+	// Set if the feature is disabled
+	if appConfig.DisableITC {
+		options = append(options, bux.WithITCDisabled())
+	}
+
+	// Custom user agent
+	options = append(options, bux.WithUserAgent(appConfig.GetUserAgent()))
+
+	// Use in-memory caching
+	options = append(options, bux.WithFreeCache())
+
+	// Use in-memory TaskQ
+	// todo: read from JSON in buxServer config
+	options = append(options, bux.WithTaskQ(
+		// todo: use a custom queue name from the test or the appConfig?
+		taskmanager.DefaultTaskQConfig(appConfig.Datastore.TablePrefix+"_queue"),
+		taskmanager.FactoryMemory,
+	))
+
+	// Turn on debugging
+	if appConfig.Debug {
+		options = append(options, bux.WithDebugging())
+	}
+
+	// Set the unique table prefix
+	if appConfig.SQLite.TablePrefix, err = utils.RandomHex(8); err != nil {
+		return err
+	}
+
 	// Load the monitor
 	if appConfig.Monitor != nil && appConfig.Monitor.Enabled {
 		if appConfig.Monitor.BuxAgentURL == "" {
