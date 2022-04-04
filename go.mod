@@ -2,6 +2,8 @@ module github.com/BuxOrg/bux-server
 
 go 1.17
 
+// replace github.com/BuxOrg/bux => ../bux
+
 require (
 	github.com/99designs/gqlgen v0.17.5
 	github.com/BuxOrg/bux v0.2.19-0.20220502170204-cc77a95709a1
@@ -71,6 +73,9 @@ require (
 	github.com/kr/text v0.2.0 // indirect
 	github.com/libsv/go-bc v0.1.11 // indirect
 	github.com/libsv/go-bk v0.1.6 // indirect
+	github.com/lestrrat-go/strftime v1.0.5 // indirect
+	github.com/lib/pq v1.10.4 // indirect
+	github.com/libsv/go-bc v0.1.9 // indirect
 	github.com/libsv/go-bt v1.0.6 // indirect
 	github.com/libsv/go-bt/v2 v2.1.0-beta.2.0.20211221142324-0d686850c5e0 // indirect
 	github.com/magiconair/properties v1.8.6 // indirect
