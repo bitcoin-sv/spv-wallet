@@ -99,7 +99,7 @@ type (
 	// MonitorOptions is the configuration for blockchain monitoring
 	MonitorOptions struct {
 		Enabled                 bool    `json:"enabled" mapstructure:"enabled"`                                       // true/false
-		CentrifugeServer        string  `json:"centrifuge_server" mapstructure:"centrifuge_server"`                   // how many days in the past should we monitor an address (default: 7)
+		CentrifugeServer        string  `json:"centrifuge_server" mapstructure:"centrifuge_server"`                   // The server url address
 		MonitorDays             int     `json:"monitor_days" mapstructure:"monitor_days"`                             // how many days in the past should we monitor an address (default: 7)
 		FalsePositiveRate       float64 `json:"false_positive_rate" mapstructure:"false_positive_rate"`               // how many false positives do we except (default: 0.01)
 		MaxNumberOfDestinations int     `json:"max_number_of_destinations" mapstructure:"max_number_of_destinations"` // how many destinations can the filter hold (default: 100,000)

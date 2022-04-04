@@ -12,7 +12,7 @@
     "signing_disabled": false
   },
   "cache": {
-    "engine": "ristretto"
+    "engine": "freecache"
   },
   "datastore": {
     "auto_migrate": true,
