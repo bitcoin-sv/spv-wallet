@@ -2,9 +2,11 @@ module github.com/BuxOrg/bux-server
 
 go 1.17
 
+// replace github.com/BuxOrg/bux => ../bux
+
 require (
 	github.com/99designs/gqlgen v0.17.2
-	github.com/BuxOrg/bux v0.2.6
+	github.com/bitcoinschema/go-bitcoin/v2 v2.0.0-alpha.3
 	github.com/go-ozzo/ozzo-validation v3.6.0+incompatible
 	github.com/go-redis/redis/v8 v8.11.5
 	github.com/julienschmidt/httprouter v1.3.0
@@ -36,6 +38,9 @@ require (
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/dgryski/go-farm v0.0.0-20200201041132-a6ae2369ad13 // indirect
 	github.com/dgryski/go-rendezvous v0.0.0-20200823014737-9f7001d12a5f // indirect
+	github.com/dolthub/go-mysql-server v0.11.1-0.20211214000816-612f47e4b4cf // indirect
+	github.com/dolthub/vitess v0.0.0-20211210194914-4566b1ebcad8 // indirect
+	github.com/fergusstrange/embedded-postgres v1.15.0 // indirect
 	github.com/fsnotify/fsnotify v1.5.1 // indirect
 	github.com/go-redis/redis_rate/v9 v9.1.2 // indirect
 	github.com/go-resty/resty/v2 v2.7.0 // indirect
@@ -67,7 +72,9 @@ require (
 	github.com/jpillora/backoff v1.0.0 // indirect
 	github.com/klauspost/compress v1.15.1 // indirect
 	github.com/kr/text v0.2.0 // indirect
-	github.com/libsv/go-bk v0.1.6 // indirect
+	github.com/lestrrat-go/strftime v1.0.5 // indirect
+	github.com/lib/pq v1.10.4 // indirect
+	github.com/libsv/go-bc v0.1.9 // indirect
 	github.com/libsv/go-bt v1.0.6 // indirect
 	github.com/libsv/go-bt/v2 v2.1.0-beta.2.0.20211221142324-0d686850c5e0 // indirect
 	github.com/magiconair/properties v1.8.6 // indirect
@@ -101,7 +108,7 @@ require (
 	github.com/tidwall/pretty v1.2.0 // indirect
 	github.com/tonicpow/go-minercraft v0.7.1 // indirect
 	github.com/tonicpow/go-paymail v0.7.5 // indirect
-	github.com/tryvium-travels/memongo v0.4.0 // indirect
+	github.com/tryvium-travels/memongo v0.5.0 // indirect
 	github.com/tylertreat/BoomFilters v0.0.0-20210315201527-1a82519a3e43 // indirect
 	github.com/ugorji/go/codec v1.2.7 // indirect
 	github.com/valyala/bytebufferpool v1.0.0 // indirect
