@@ -231,6 +231,7 @@ func (s *AppServices) loadBux(ctx context.Context, appConfig *AppConfig, testMod
 			MonitorDays:             appConfig.Monitor.MonitorDays,
 			FalsePositiveRate:       appConfig.Monitor.FalsePositiveRate,
 			MaxNumberOfDestinations: appConfig.Monitor.MaxNumberOfDestinations,
+			ProcessMempoolOnConnect: appConfig.Monitor.ProcessMempoolOnConnect,
 		}))
 	}
 
