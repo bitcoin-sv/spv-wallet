@@ -103,6 +103,7 @@ type (
 		MonitorDays             int     `json:"monitor_days" mapstructure:"monitor_days"`                             // how many days in the past should we monitor an address (default: 7)
 		FalsePositiveRate       float64 `json:"false_positive_rate" mapstructure:"false_positive_rate"`               // how many false positives do we except (default: 0.01)
 		MaxNumberOfDestinations int     `json:"max_number_of_destinations" mapstructure:"max_number_of_destinations"` // how many destinations can the filter hold (default: 100,000)
+		ProcessMempoolOnConnect bool    `json:"process_mempool_on_connect" mapstructure:"process_mempool_on_connect"` // Whether to process all transactions in the mempool when connecting to centrifuge server
 	}
 
 	// NewRelicConfig is the configuration for New Relic

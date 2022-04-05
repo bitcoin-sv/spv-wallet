@@ -7,10 +7,9 @@ import (
 	"strings"
 	"time"
 
-	"github.com/BuxOrg/bux/chainstate"
-
 	"github.com/BuxOrg/bux"
 	"github.com/BuxOrg/bux/cachestore"
+	"github.com/BuxOrg/bux/chainstate"
 	"github.com/BuxOrg/bux/datastore"
 	"github.com/BuxOrg/bux/taskmanager"
 	"github.com/BuxOrg/bux/utils"
@@ -215,6 +214,7 @@ func (s *AppServices) loadBux(ctx context.Context, appConfig *AppConfig) (err er
 			MonitorDays:             appConfig.Monitor.MonitorDays,
 			FalsePositiveRate:       appConfig.Monitor.FalsePositiveRate,
 			MaxNumberOfDestinations: appConfig.Monitor.MaxNumberOfDestinations,
+			ProcessMempoolOnConnect: appConfig.Monitor.ProcessMempoolOnConnect,
 		}))
 	}
 
