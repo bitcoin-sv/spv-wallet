@@ -86,13 +86,10 @@ This repository was created using [MrZ's `go-template`](https://github.com/mrz18
 
 - [BitcoinSchema/go-bitcoin](https://github.com/BitcoinSchema/go-bitcoin)
 - [BuxOrg/bux](https://github.com/BuxOrg/bux)
-- [libsv/go-bk](https://github.com/libsv/go-bk)
-- [libsv/go-bt](https://github.com/libsv/go-bt)
 - [mrz1836/go-api-router](https://github.com/mrz1836/go-api-router)
 - [mrz1836/go-logger](https://github.com/mrz1836/go-logger)
 - [mrz1836/go-sanitize](https://github.com/mrz1836/go-sanitize)
 - [stretchr/testify](https://github.com/stretchr/testify)
-- [tonicpow/go-minercraft](https://github.com/tonicpow/go-minercraft)
 - [tonicpow/go-paymail](https://github.com/tonicpow/go-paymail)
 - [See all dependencies](go.mod)
 </details>
