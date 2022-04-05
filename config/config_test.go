@@ -136,48 +136,9 @@ func TestAppConfig_Validate(t *testing.T) {
 		assert.Error(t, err)
 	})
 
-	t.Run("cachestore - invalid ristretto config", func(t *testing.T) {
+	t.Run("cachestore - valid freecache", func(t *testing.T) {
 		app, _, txn := baseTestConfig(t)
-		app.Cachestore.Engine = cachestore.Ristretto
-		app.Ristretto = nil
-		err := app.Validate(txn)
-		assert.Error(t, err)
-	})
-
-	t.Run("cachestore - invalid ristretto num counters", func(t *testing.T) {
-		app, _, txn := baseTestConfig(t)
-		app.Cachestore.Engine = cachestore.Ristretto
-		app.Ristretto.NumCounters = 0
-		err := app.Validate(txn)
-		assert.Error(t, err)
-	})
-
-	t.Run("cachestore - invalid ristretto max cost", func(t *testing.T) {
-		app, _, txn := baseTestConfig(t)
-		app.Cachestore.Engine = cachestore.Ristretto
-		app.Ristretto.MaxCost = 0
-		err := app.Validate(txn)
-		assert.Error(t, err)
-	})
-
-	t.Run("cachestore - invalid ristretto buffer items", func(t *testing.T) {
-		app, _, txn := baseTestConfig(t)
-		app.Cachestore.Engine = cachestore.Ristretto
-		app.Ristretto.BufferItems = 0
-		err := app.Validate(txn)
-		assert.Error(t, err)
-	})
-
-	t.Run("cachestore - valid mcache", func(t *testing.T) {
-		app, _, txn := baseTestConfig(t)
-		app.Cachestore.Engine = cachestore.MCache
-		err := app.Validate(txn)
-		assert.NoError(t, err)
-	})
-
-	t.Run("cachestore - missing engine", func(t *testing.T) {
-		app, _, txn := baseTestConfig(t)
-		app.Cachestore.Engine = cachestore.MCache
+		app.Cachestore.Engine = cachestore.FreeCache
 		err := app.Validate(txn)
 		assert.NoError(t, err)
 	})

@@ -232,16 +232,6 @@ func (a *AppConfig) validateCachestore() error {
 		} else if len(a.Redis.URL) == 0 {
 			return errors.New("missing redis url")
 		}
-	} else if a.Cachestore.Engine == cachestore.Ristretto {
-		if a.Ristretto == nil {
-			return errors.New("missing ristretto config")
-		} else if a.Ristretto.NumCounters <= 0 {
-			return errors.New("missing ristretto num counter value")
-		} else if a.Ristretto.MaxCost <= 0 {
-			return errors.New("missing ristretto max cost value")
-		} else if a.Ristretto.BufferItems <= 0 {
-			return errors.New("missing ristretto buffer items value")
-		}
 	}
 	return nil
 }

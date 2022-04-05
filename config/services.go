@@ -13,7 +13,6 @@ import (
 	"github.com/BuxOrg/bux/datastore"
 	"github.com/BuxOrg/bux/taskmanager"
 	"github.com/BuxOrg/bux/utils"
-	"github.com/dgraph-io/ristretto"
 	"github.com/go-redis/redis/v8"
 	"github.com/go-resty/resty/v2"
 	"github.com/mrz1836/go-logger"
@@ -224,16 +223,8 @@ func (s *AppServices) loadBux(ctx context.Context, appConfig *AppConfig) (err er
 			URL:                   appConfig.Redis.URL,
 			UseTLS:                appConfig.Redis.UseTLS,
 		}))
-	} else if appConfig.Cachestore.Engine == cachestore.MCache {
-		options = append(options, bux.WithMcache())
-	} else if appConfig.Cachestore.Engine == cachestore.Ristretto {
-		options = append(options, bux.WithRistretto(&ristretto.Config{
-			NumCounters:        appConfig.Ristretto.NumCounters,
-			MaxCost:            appConfig.Ristretto.MaxCost,
-			BufferItems:        appConfig.Ristretto.BufferItems,
-			Metrics:            appConfig.Ristretto.Metrics,
-			IgnoreInternalCost: appConfig.Ristretto.IgnoreInternalCost,
-		}))
+	} else if appConfig.Cachestore.Engine == cachestore.FreeCache {
+		options = append(options, bux.WithFreeCache())
 	}
 
 	// Set the datastore
@@ -332,13 +323,7 @@ func (s *AppServices) loadTestBux(ctx context.Context, appConfig *AppConfig) (er
 	options = append(options, bux.WithUserAgent(appConfig.GetUserAgent()))
 
 	// Use in-memory caching
-	options = append(options, bux.WithRistretto(&ristretto.Config{
-		NumCounters:        appConfig.Ristretto.NumCounters,
-		MaxCost:            appConfig.Ristretto.MaxCost,
-		BufferItems:        appConfig.Ristretto.BufferItems,
-		Metrics:            appConfig.Ristretto.Metrics,
-		IgnoreInternalCost: appConfig.Ristretto.IgnoreInternalCost,
-	}))
+	options = append(options, bux.WithFreeCache())
 
 	// Use in-memory TaskQ
 	// todo: read from JSON in buxServer config

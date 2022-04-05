@@ -7,7 +7,6 @@ import (
 	"testing"
 
 	"github.com/BuxOrg/bux"
-	"github.com/BuxOrg/bux/cachestore"
 	"github.com/BuxOrg/bux/taskmanager"
 	"github.com/BuxOrg/bux/tester"
 	"github.com/BuxOrg/bux/utils"
@@ -213,7 +212,7 @@ func getPaymailClient(t *testing.T) (context.Context, bux.ClientInterface, func(
 	ctx := context.Background()
 	client, err := bux.NewClient(ctx,
 		bux.WithSQLite(tester.SQLiteTestConfig(true, false)),
-		bux.WithRistretto(cachestore.DefaultRistrettoConfig()),
+		bux.WithFreeCache(),
 		bux.WithTaskQ(taskmanager.DefaultTaskQConfig(tester.RandomTablePrefix()+"_queue"), taskmanager.FactoryMemory),
 		bux.WithDebugging(),
 		bux.WithAutoMigrate(append(bux.BaseModels, &bux.PaymailAddress{})...),

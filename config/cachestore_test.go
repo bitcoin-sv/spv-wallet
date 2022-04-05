@@ -13,7 +13,7 @@ func TestCachestoreConfig_Validate(t *testing.T) {
 
 	t.Run("valid datastore config", func(t *testing.T) {
 		c := CachestoreConfig{
-			Engine: cachestore.MCache,
+			Engine: cachestore.FreeCache,
 		}
 		require.NotNil(t, c)
 
