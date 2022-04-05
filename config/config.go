@@ -56,6 +56,7 @@ type (
 		GraphQL          *GraphqlConfig           `json:"graphql" mapstructure:"graphql"`
 		Mongo            *datastore.MongoDBConfig `json:"mongodb" mapstructure:"mongodb"`
 		NewRelic         *NewRelicConfig          `json:"new_relic" mapstructure:"new_relic"`
+		Notifications    *NotificationsConfig     `json:"notifications" mapstructure:"notifications"`
 		Paymail          *PaymailConfig           `json:"paymail" mapstructure:"paymail"`
 		Redis            *RedisConfig             `json:"redis" mapstructure:"redis"`
 		Ristretto        *RistrettoConfig         `json:"ristretto" mapstructure:"ristretto"`
@@ -99,6 +100,12 @@ type (
 		DomainName string `json:"domain_name" mapstructure:"domain_name"` // used for hostname display
 		Enabled    bool   `json:"enabled" mapstructure:"enabled"`         // true/false
 		LicenseKey string `json:"license_key" mapstructure:"license_key"` // 2342-3423523-62
+	}
+
+	// NotificationsConfig is the configuration for notifications
+	NotificationsConfig struct {
+		Enabled         bool   `json:"enabled" mapstructure:"enabled"` // true/false
+		WebhookEndpoint string `json:"webhook_endpoint" mapstructure:"webhook_endpoint"`
 	}
 
 	// PaymailConfig is the configuration for the built-in Paymail server

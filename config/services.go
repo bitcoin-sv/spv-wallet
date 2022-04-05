@@ -270,6 +270,11 @@ func (s *AppServices) loadBux(ctx context.Context, appConfig *AppConfig) (err er
 		}
 	}
 
+	if appConfig.Notifications != nil && appConfig.Notifications.Enabled {
+		// configure the default notification handler
+		options = append(options, bux.WithNotifications(appConfig.Notifications.WebhookEndpoint))
+	}
+
 	// Create the new client
 	s.Bux, err = bux.NewClient(ctx, options...)
 
