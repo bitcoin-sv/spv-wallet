@@ -4,7 +4,6 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"net/http"
 	"strings"
 	"time"
 
@@ -14,21 +13,15 @@ import (
 	"github.com/BuxOrg/bux/taskmanager"
 	"github.com/BuxOrg/bux/utils"
 	"github.com/go-redis/redis/v8"
-	"github.com/go-resty/resty/v2"
 	"github.com/mrz1836/go-logger"
 	"github.com/newrelic/go-agent/v3/newrelic"
-	"github.com/tonicpow/go-minercraft"
-	"github.com/tonicpow/go-paymail/server"
 )
 
 // AppServices is the loaded services via config
 type (
 	AppServices struct {
-		HTTPClient *http.Client
-		MinerCraft minercraft.ClientInterface
-		NewRelic   *newrelic.Application
-		Resty      *resty.Client
-		Bux        bux.ClientInterface
+		Bux      bux.ClientInterface
+		NewRelic *newrelic.Application
 	}
 )
 
@@ -49,18 +42,7 @@ func (a *AppConfig) LoadServices(ctx context.Context) (*AppServices, error) {
 	ctx = newrelic.NewContext(ctx, txn)
 	defer txn.End()
 
-	// Create a new Resty Client
-	_services.loadResty(txn)
-
-	// Create an HTTP Client
-	_services.loadHTTPClient(txn)
-
-	// Start MinerCraft
-	if err = _services.loadMinerCraft(txn); err != nil {
-		return nil, fmt.Errorf("loadMinerCraft: %w", err)
-	}
-
-	// Load bux
+	// Load BUX
 	if err = _services.loadBux(ctx, a); err != nil {
 		return nil, err
 	}
@@ -84,17 +66,6 @@ func (a *AppConfig) LoadTestServices(ctx context.Context) (*AppServices, error) 
 	// Start the NewRelic Tx
 	txn := _services.NewRelic.StartTransaction("services_load_test")
 	defer txn.End()
-
-	// Create a new Resty Client
-	_services.loadResty(txn)
-
-	// Create an HTTP Client
-	_services.loadHTTPClient(txn)
-
-	// Start MinerCraft
-	if err = _services.loadMinerCraft(txn); err != nil {
-		return nil, fmt.Errorf("loadMinerCraft: %w", err)
-	}
 
 	// Load bux for testing
 	if err = _services.loadTestBux(ctx, a); err != nil {
@@ -150,44 +121,6 @@ func (s *AppServices) CloseAll(ctx context.Context) {
 	logger.Data(2, logger.DEBUG, "all services have been closed")
 }
 
-// loadResty will load a resty client
-func (s *AppServices) loadResty(txn *newrelic.Transaction) {
-	defer txn.StartSegment("load_resty").End()
-	s.Resty = s.NewRestyClient()
-}
-
-// NewRestyClient will return a new default resty client
-func (s *AppServices) NewRestyClient() (restyClient *resty.Client) {
-	restyClient = resty.New()
-	restyClient.SetTimeout(DefaultHTTPRequestReadTimeout)
-	restyClient.SetRetryCount(2)
-	return
-}
-
-// loadHTTPClient will load the HTTP client
-func (s *AppServices) loadHTTPClient(txn *newrelic.Transaction) {
-	defer txn.StartSegment("load_http_client").End()
-	s.HTTPClient = s.NewHTTPClient()
-}
-
-// NewHTTPClient will return a new default HTTP client
-func (s *AppServices) NewHTTPClient() *http.Client {
-	return &http.Client{
-		Timeout: DefaultHTTPRequestWriteTimeout,
-	}
-}
-
-// loadMinerCraft loads the MinerCraft service
-func (s *AppServices) loadMinerCraft(txn *newrelic.Transaction) (err error) {
-	defer txn.StartSegment("load_miner_craft").End()
-	s.MinerCraft, err = minercraft.NewClient(
-		nil,
-		s.HTTPClient,
-		nil,
-	)
-	return
-}
-
 // loadBux will load the bux client (including CacheStore and DataStore)
 func (s *AppServices) loadBux(ctx context.Context, appConfig *AppConfig) (err error) {
 	var options []bux.ClientOps
@@ -235,11 +168,13 @@ func (s *AppServices) loadBux(ctx context.Context, appConfig *AppConfig) (err er
 	// Set the Paymail server if enabled
 	if appConfig.Paymail.Enabled {
 
-		// Append the server config (run LoadPaymailServer())
-		options = append(options, bux.WithPaymailServer(
-			nil,
+		// Append the server config
+		options = append(options, bux.WithPaymailSupport(
+			appConfig.Paymail.Domains,
 			appConfig.Paymail.DefaultFromPaymail,
 			appConfig.Paymail.DefaultNote,
+			appConfig.Paymail.DomainValidationEnabled,
+			appConfig.Paymail.SenderValidationEnabled,
 		))
 	}
 
@@ -263,44 +198,6 @@ func (s *AppServices) loadBux(ctx context.Context, appConfig *AppConfig) (err er
 
 	// Create the new client
 	s.Bux, err = bux.NewClient(ctx, options...)
-
-	return
-}
-
-// SetPaymailServer will modify the bux client with the Paymail server configuration
-func (s *AppServices) SetPaymailServer(appConfig *AppConfig, serviceProvider server.PaymailServiceProvider) (err error) {
-
-	// Set the Paymail server configuration if enabled
-	if !appConfig.Paymail.Enabled {
-		return
-	}
-
-	// Add each domain
-	opts := make([]server.ConfigOps, 0)
-	for _, domain := range appConfig.Paymail.Domains {
-		opts = append(opts, server.WithDomain(domain))
-	}
-
-	// If sender validation is enabled
-	if appConfig.Paymail.SenderValidationEnabled {
-		opts = append(opts, server.WithSenderValidation())
-	}
-
-	// Create the paymail server configuration
-	var config *server.Configuration
-	if config, err = server.NewConfig(
-		serviceProvider,
-		append(opts, server.WithGenericCapabilities())...,
-	); err != nil {
-		return
-	}
-
-	// Modify the server configuration
-	s.Bux.ModifyPaymailConfig(
-		config,
-		appConfig.Paymail.DefaultFromPaymail,
-		appConfig.Paymail.DefaultNote,
-	)
 
 	return
 }

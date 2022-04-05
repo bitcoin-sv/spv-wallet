@@ -106,6 +106,7 @@ type (
 		DefaultFromPaymail      string   `json:"default_from_paymail" mapstructure:"default_from_paymail"`           // IE: from@domain.com
 		DefaultNote             string   `json:"default_note" mapstructure:"default_note"`                           // IE: message needed for address resolution
 		Domains                 []string `json:"domains" mapstructure:"domains"`                                     // List of allowed domains
+		DomainValidationEnabled bool     `json:"domain_validation_enabled" mapstructure:"domain_validation_enabled"` // Turn off if hosted domain is not paymail related
 		Enabled                 bool     `json:"enabled" mapstructure:"enabled"`                                     // Flag for enabling the Paymail Server Service
 		SenderValidationEnabled bool     `json:"sender_validation_enabled" mapstructure:"sender_validation_enabled"` // Turn on extra security
 	}

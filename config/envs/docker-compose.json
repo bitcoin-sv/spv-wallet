@@ -40,6 +40,7 @@
     "enabled": true,
     "default_from_paymail": "from@domain.com",
     "default_note": "bux Address Resolution",
+    "domain_validation_enabled": false,
     "domains": [
       "localhost"
     ],

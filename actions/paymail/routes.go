@@ -1,9 +1,6 @@
 package pmail
 
 import (
-	"context"
-
-	"github.com/BuxOrg/bux"
 	"github.com/BuxOrg/bux-server/actions"
 	"github.com/BuxOrg/bux-server/config"
 	apirouter "github.com/mrz1836/go-api-router"
@@ -22,16 +19,10 @@ func RegisterRoutes(router *apirouter.Router, appConfig *config.AppConfig, servi
 	a, requireAdmin := actions.NewStack(appConfig, services)
 	requireAdmin.Use(a.RequireAdminAuthentication)
 
-	// Register the routes
-	services.Bux.PaymailServerConfig().RegisterRoutes(router)
+	// Register the custom Paymail routes
+	services.Bux.GetPaymailConfig().RegisterRoutes(router)
 
-	// Add the additional models
-	// todo: ideally, this should be in Services or on-load (cyclical dep issue)
-	if err := services.Bux.AddModels(context.Background(), true, &bux.PaymailAddress{}); err != nil {
-		// todo: handle this error (avoid using a panic)
-		panic(err)
-	}
-
+	// Create the action
 	action := &Action{actions.Action{AppConfig: a.AppConfig, Services: a.Services}}
 
 	// V1 Requests

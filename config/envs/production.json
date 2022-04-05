@@ -39,6 +39,7 @@
   "paymail": {
     "enabled": false,
     "default_from_paymail": "from@domain.com",
+    "domain_validation_enabled": true,
     "default_note": "bux Address Resolution",
     "domains": [
       "localhost"

@@ -10,7 +10,6 @@ import (
 	"os/signal"
 	"time"
 
-	pmail "github.com/BuxOrg/bux-server/actions/paymail"
 	"github.com/BuxOrg/bux-server/config"
 	"github.com/BuxOrg/bux-server/dictionary"
 	"github.com/BuxOrg/bux-server/server"
@@ -34,15 +33,6 @@ func main() {
 		return
 	}
 
-	// Set the Paymail Server Configuration (if enabled)
-	if err = services.SetPaymailServer(
-		appConfig,
-		pmail.NewServiceProvider(services.Bux, appConfig),
-	); err != nil {
-		logger.Fatalf(dictionary.GetInternalMessage(dictionary.ErrorLoadingService), config.ApplicationName, err.Error())
-		return
-	}
-
 	// @mrz New Relic is ready at this point
 	txn := services.NewRelic.StartTransaction("load_server")
 
@@ -55,8 +45,14 @@ func main() {
 	// (debugging: show services that are enabled or not)
 	if appConfig.Debug {
 		logger.Data(2, logger.DEBUG,
-			fmt.Sprintf("new_relic service: %t",
+			fmt.Sprintf("datastore: %s | cachestore: %s | taskmanager: %s [%s] | new_relic: %t | paymail: %t | graphql: %t",
+				appConfig.Datastore.Engine.String(),
+				appConfig.Cachestore.Engine.String(),
+				appConfig.TaskManager.Engine.String(),
+				appConfig.TaskManager.Factory.String(),
 				appConfig.NewRelic.Enabled,
+				appConfig.Paymail.Enabled,
+				appConfig.GraphQL.Enabled,
 			),
 		)
 	}
