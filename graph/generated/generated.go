@@ -92,6 +92,8 @@ type ComplexityRoot struct {
 		Destination         func(childComplexity int, destinationType *string, metadata bux.Metadata) int
 		DestinationMetadata func(childComplexity int, id *string, address *string, lockingScript *string, metadata bux.Metadata) int
 		NewTransaction      func(childComplexity int, transactionConfig bux.TransactionConfig, metadata bux.Metadata) int
+		PaymailCreate       func(childComplexity int, address string, publicName *string, avatar *string, metadata bux.Metadata) int
+		PaymailDelete       func(childComplexity int, address string) int
 		Transaction         func(childComplexity int, hex string, draftID *string, metadata bux.Metadata) int
 		TransactionMetadata func(childComplexity int, id string, metadata bux.Metadata) int
 		Xpub                func(childComplexity int, xpub string, metadata bux.Metadata) int
@@ -109,6 +111,15 @@ type ComplexityRoot struct {
 		App  func(childComplexity int) int
 		Keys func(childComplexity int) int
 		Type func(childComplexity int) int
+	}
+
+	PaymailAddress struct {
+		Alias           func(childComplexity int) int
+		Avatar          func(childComplexity int) int
+		Domain          func(childComplexity int) int
+		ExternalXpubKey func(childComplexity int) int
+		ID              func(childComplexity int) int
+		PublicName      func(childComplexity int) int
 	}
 
 	PaymailP4 struct {
@@ -225,6 +236,8 @@ type MutationResolver interface {
 	NewTransaction(ctx context.Context, transactionConfig bux.TransactionConfig, metadata bux.Metadata) (*bux.DraftTransaction, error)
 	Destination(ctx context.Context, destinationType *string, metadata bux.Metadata) (*bux.Destination, error)
 	DestinationMetadata(ctx context.Context, id *string, address *string, lockingScript *string, metadata bux.Metadata) (*bux.Destination, error)
+	PaymailCreate(ctx context.Context, address string, publicName *string, avatar *string, metadata bux.Metadata) (*bux.PaymailAddress, error)
+	PaymailDelete(ctx context.Context, address string) (bool, error)
 }
 type QueryResolver interface {
 	Xpub(ctx context.Context) (*bux.Xpub, error)
@@ -514,6 +527,30 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Mutation.NewTransaction(childComplexity, args["transaction_config"].(bux.TransactionConfig), args["metadata"].(bux.Metadata)), true
 
+	case "Mutation.paymail_create":
+		if e.complexity.Mutation.PaymailCreate == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_paymail_create_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.PaymailCreate(childComplexity, args["address"].(string), args["public_name"].(*string), args["avatar"].(*string), args["metadata"].(bux.Metadata)), true
+
+	case "Mutation.paymail_delete":
+		if e.complexity.Mutation.PaymailDelete == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_paymail_delete_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.PaymailDelete(childComplexity, args["address"].(string)), true
+
 	case "Mutation.transaction":
 		if e.complexity.Mutation.Transaction == nil {
 			break
@@ -610,6 +647,48 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.OpReturnMap.Type(childComplexity), true
+
+	case "PaymailAddress.alias":
+		if e.complexity.PaymailAddress.Alias == nil {
+			break
+		}
+
+		return e.complexity.PaymailAddress.Alias(childComplexity), true
+
+	case "PaymailAddress.avatar":
+		if e.complexity.PaymailAddress.Avatar == nil {
+			break
+		}
+
+		return e.complexity.PaymailAddress.Avatar(childComplexity), true
+
+	case "PaymailAddress.domain":
+		if e.complexity.PaymailAddress.Domain == nil {
+			break
+		}
+
+		return e.complexity.PaymailAddress.Domain(childComplexity), true
+
+	case "PaymailAddress.external_xpub_key":
+		if e.complexity.PaymailAddress.ExternalXpubKey == nil {
+			break
+		}
+
+		return e.complexity.PaymailAddress.ExternalXpubKey(childComplexity), true
+
+	case "PaymailAddress.id":
+		if e.complexity.PaymailAddress.ID == nil {
+			break
+		}
+
+		return e.complexity.PaymailAddress.ID(childComplexity), true
+
+	case "PaymailAddress.public_name":
+		if e.complexity.PaymailAddress.PublicName == nil {
+			break
+		}
+
+		return e.complexity.PaymailAddress.PublicName(childComplexity), true
 
 	case "PaymailP4.alias":
 		if e.complexity.PaymailP4.Alias == nil {
@@ -1237,6 +1316,19 @@ func (ec *executionContext) introspectType(name string) (*introspection.Type, er
 }
 
 var sources = []*ast.Source{
+	{Name: "graph/admin.graphqls", Input: `
+extend type Mutation {
+    paymail_create(
+        address: String!
+        public_name: String
+        avatar: String
+        metadata: Metadata
+    ): PaymailAddress
+    paymail_delete(
+        address: String!
+    ): Boolean!
+}
+`, BuiltIn: false},
 	{Name: "graph/schema.graphqls", Input: `# GraphQL schema example
 #
 # https://gqlgen.com/getting-started/
@@ -1309,6 +1401,15 @@ type Transaction {
     metadata:          Metadata
     output_value:      Int64
     direction:         TransactionDirection
+}
+
+type PaymailAddress {
+    id:                String
+    alias:             String
+    domain:            String
+    public_name:       String
+    avatar:            String
+    external_xpub_key: String
 }
 
 type PaymailP4 {
@@ -1626,6 +1727,63 @@ func (ec *executionContext) field_Mutation_new_transaction_args(ctx context.Cont
 		}
 	}
 	args["metadata"] = arg1
+	return args, nil
+}
+
+func (ec *executionContext) field_Mutation_paymail_create_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 string
+	if tmp, ok := rawArgs["address"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("address"))
+		arg0, err = ec.unmarshalNString2string(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["address"] = arg0
+	var arg1 *string
+	if tmp, ok := rawArgs["public_name"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("public_name"))
+		arg1, err = ec.unmarshalOString2ᚖstring(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["public_name"] = arg1
+	var arg2 *string
+	if tmp, ok := rawArgs["avatar"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("avatar"))
+		arg2, err = ec.unmarshalOString2ᚖstring(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["avatar"] = arg2
+	var arg3 bux.Metadata
+	if tmp, ok := rawArgs["metadata"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("metadata"))
+		arg3, err = ec.unmarshalOMetadata2githubᚗcomᚋBuxOrgᚋbuxᚐMetadata(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["metadata"] = arg3
+	return args, nil
+}
+
+func (ec *executionContext) field_Mutation_paymail_delete_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 string
+	if tmp, ok := rawArgs["address"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("address"))
+		arg0, err = ec.unmarshalNString2string(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["address"] = arg0
 	return args, nil
 }
 
@@ -3174,6 +3332,87 @@ func (ec *executionContext) _Mutation_destination_metadata(ctx context.Context, 
 	return ec.marshalODestination2ᚖgithubᚗcomᚋBuxOrgᚋbuxᚐDestination(ctx, field.Selections, res)
 }
 
+func (ec *executionContext) _Mutation_paymail_create(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   true,
+		IsResolver: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Mutation_paymail_create_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().PaymailCreate(rctx, args["address"].(string), args["public_name"].(*string), args["avatar"].(*string), args["metadata"].(bux.Metadata))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*bux.PaymailAddress)
+	fc.Result = res
+	return ec.marshalOPaymailAddress2ᚖgithubᚗcomᚋBuxOrgᚋbuxᚐPaymailAddress(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Mutation_paymail_delete(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   true,
+		IsResolver: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Mutation_paymail_delete_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().PaymailDelete(rctx, args["address"].(string))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(bool)
+	fc.Result = res
+	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
+}
+
 func (ec *executionContext) _OpReturn_hex(ctx context.Context, field graphql.CollectedField, obj *bux.OpReturn) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
@@ -3396,6 +3635,198 @@ func (ec *executionContext) _OpReturnMap_keys(ctx context.Context, field graphql
 	res := resTmp.(map[string]interface{})
 	fc.Result = res
 	return ec.marshalOMap2map(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _PaymailAddress_id(ctx context.Context, field graphql.CollectedField, obj *bux.PaymailAddress) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "PaymailAddress",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ID, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalOString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _PaymailAddress_alias(ctx context.Context, field graphql.CollectedField, obj *bux.PaymailAddress) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "PaymailAddress",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Alias, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalOString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _PaymailAddress_domain(ctx context.Context, field graphql.CollectedField, obj *bux.PaymailAddress) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "PaymailAddress",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Domain, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalOString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _PaymailAddress_public_name(ctx context.Context, field graphql.CollectedField, obj *bux.PaymailAddress) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "PaymailAddress",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.PublicName, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalOString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _PaymailAddress_avatar(ctx context.Context, field graphql.CollectedField, obj *bux.PaymailAddress) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "PaymailAddress",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Avatar, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalOString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _PaymailAddress_external_xpub_key(ctx context.Context, field graphql.CollectedField, obj *bux.PaymailAddress) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "PaymailAddress",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ExternalXpubKey, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalOString2string(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _PaymailP4_alias(ctx context.Context, field graphql.CollectedField, obj *bux.PaymailP4) (ret graphql.Marshaler) {
@@ -7725,6 +8156,23 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, innerFunc)
 
+		case "paymail_create":
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_paymail_create(ctx, field)
+			}
+
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, innerFunc)
+
+		case "paymail_delete":
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_paymail_delete(ctx, field)
+			}
+
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, innerFunc)
+
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -7812,6 +8260,69 @@ func (ec *executionContext) _OpReturnMap(ctx context.Context, sel ast.SelectionS
 		case "keys":
 			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._OpReturnMap_keys(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
+var paymailAddressImplementors = []string{"PaymailAddress"}
+
+func (ec *executionContext) _PaymailAddress(ctx context.Context, sel ast.SelectionSet, obj *bux.PaymailAddress) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, paymailAddressImplementors)
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("PaymailAddress")
+		case "id":
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._PaymailAddress_id(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
+		case "alias":
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._PaymailAddress_alias(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
+		case "domain":
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._PaymailAddress_domain(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
+		case "public_name":
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._PaymailAddress_public_name(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
+		case "avatar":
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._PaymailAddress_avatar(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
+		case "external_xpub_key":
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._PaymailAddress_external_xpub_key(ctx, field, obj)
 			}
 
 			out.Values[i] = innerFunc(ctx)
@@ -9656,6 +10167,13 @@ func (ec *executionContext) unmarshalOOpReturnMapInput2ᚖgithubᚗcomᚋBuxOrg�
 	}
 	res, err := ec.unmarshalInputOpReturnMapInput(ctx, v)
 	return &res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalOPaymailAddress2ᚖgithubᚗcomᚋBuxOrgᚋbuxᚐPaymailAddress(ctx context.Context, sel ast.SelectionSet, v *bux.PaymailAddress) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return ec._PaymailAddress(ctx, sel, v)
 }
 
 func (ec *executionContext) marshalOPaymailP42ᚖgithubᚗcomᚋBuxOrgᚋbuxᚐPaymailP4(ctx context.Context, sel ast.SelectionSet, v *bux.PaymailP4) graphql.Marshaler {

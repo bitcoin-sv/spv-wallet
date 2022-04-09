@@ -65,6 +65,8 @@ models:
     model: github.com/BuxOrg/bux.OpReturn
   OpReturnInput:
     model: github.com/BuxOrg/bux.OpReturn
+  PaymailAddress:
+    model: github.com/BuxOrg/bux.PaymailAddress
   PaymailP4:
     model: github.com/BuxOrg/bux.PaymailP4
   Transaction:

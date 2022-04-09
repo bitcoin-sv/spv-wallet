@@ -1,0 +1,12 @@
+
+extend type Mutation {
+    paymail_create(
+        address: String!
+        public_name: String
+        avatar: String
+        metadata: Metadata
+    ): PaymailAddress
+    paymail_delete(
+        address: String!
+    ): Boolean!
+}
