@@ -15,9 +15,11 @@ func (a *Action) create(w http.ResponseWriter, req *http.Request, _ httprouter.P
 	params := apirouter.GetParams(req)
 
 	// params
-	key := params.GetString("key")         // the rawXPubKey
-	address := params.GetString("address") // the full paymail address
-	metadata := params.GetJSON("metadata") // optional metadata
+	key := params.GetString("key")                // the rawXPubKey
+	address := params.GetString("address")        // the full paymail address
+	publicName := params.GetString("public_name") // the public name
+	avatar := params.GetString("avatar")          // the avatar
+	metadata := params.GetJSON("metadata")        // optional metadata
 
 	opts := a.Services.Bux.DefaultModelOptions()
 
@@ -25,7 +27,7 @@ func (a *Action) create(w http.ResponseWriter, req *http.Request, _ httprouter.P
 		opts = append(opts, bux.WithMetadatas(metadata))
 	}
 
-	paymailAddress, err := a.Services.Bux.NewPaymailAddress(req.Context(), key, address, opts...)
+	paymailAddress, err := a.Services.Bux.NewPaymailAddress(req.Context(), key, address, publicName, avatar, opts...)
 	if err != nil {
 		apirouter.ReturnResponse(w, req, http.StatusUnprocessableEntity, err.Error())
 		return
