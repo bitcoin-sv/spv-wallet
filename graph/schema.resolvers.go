@@ -29,7 +29,7 @@ func (r *mutationResolver) Xpub(ctx context.Context, xpub string, metadata bux.M
 		return nil, errors.New("xpub already exists")
 	}
 
-	opts := make([]bux.ModelOps, 0)
+	opts := c.Services.Bux.DefaultModelOptions()
 	for key, value := range metadata {
 		opts = append(opts, bux.WithMetadata(key, value))
 	}
@@ -108,7 +108,7 @@ func (r *mutationResolver) Transaction(ctx context.Context, hex string, draftID 
 		return nil, err
 	}
 
-	opts := make([]bux.ModelOps, 0)
+	opts := c.Services.Bux.DefaultModelOptions()
 	for key, value := range metadata {
 		opts = append(opts, bux.WithMetadata(key, value))
 	}
