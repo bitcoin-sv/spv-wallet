@@ -58,7 +58,6 @@ type (
 		NewRelic         *NewRelicConfig          `json:"new_relic" mapstructure:"new_relic"`
 		Paymail          *PaymailConfig           `json:"paymail" mapstructure:"paymail"`
 		Redis            *RedisConfig             `json:"redis" mapstructure:"redis"`
-		Ristretto        *RistrettoConfig         `json:"ristretto" mapstructure:"ristretto"`
 		Server           *ServerConfig            `json:"server" mapstructure:"server"`
 		SQL              *datastore.SQLConfig     `json:"sql" mapstructure:"sql"`
 		SQLite           *datastore.SQLiteConfig  `json:"sqlite" mapstructure:"sqlite"`
@@ -128,15 +127,6 @@ type (
 		Engine    taskmanager.Engine  `json:"engine" mapstructure:"engine"`         // taskq, machinery
 		Factory   taskmanager.Factory `json:"factory" mapstructure:"factory"`       // Factory (memory, redis)
 		QueueName string              `json:"queue_name" mapstructure:"queue_name"` // test_queue
-	}
-
-	// RistrettoConfig is the configuration for the Ristretto cachestore
-	RistrettoConfig struct {
-		BufferItems        int64 `json:"buffer_items" mapstructure:"buffer_items"`                 // See: ristretto.Config in cache.go
-		IgnoreInternalCost bool  `json:"ignore_internal_cost" mapstructure:"ignore_internal_cost"` // See: ristretto.Config in cache.go
-		MaxCost            int64 `json:"max_cost" mapstructure:"max_cost"`                         // See: ristretto.Config in cache.go
-		Metrics            bool  `json:"metrics" mapstructure:"metrics"`                           // See: ristretto.Config in cache.go
-		NumCounters        int64 `json:"num_counters" mapstructure:"num_counters"`                 // See: ristretto.Config in cache.go
 	}
 
 	// ServerConfig is a configuration for the HTTP Server

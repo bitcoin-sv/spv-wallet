@@ -138,6 +138,8 @@ func (s *AppServices) loadBux(ctx context.Context, appConfig *AppConfig) (err er
 		options = append(options, bux.WithITCDisabled())
 	}
 
+	// todo: customize the logger
+
 	// todo: feature: override the config from JSON env (side-load your own /envs/custom-config.json
 
 	// Debugging
@@ -261,9 +263,6 @@ func loadDatastore(options []bux.ClientOps, appConfig *AppConfig) ([]bux.ClientO
 	// Select the datastore
 	if appConfig.Datastore.Engine == datastore.SQLite {
 		debug := appConfig.Datastore.Debug
-		if appConfig.SQLite.Debug {
-			debug = appConfig.SQLite.Debug
-		}
 		tablePrefix := appConfig.Datastore.TablePrefix
 		if len(appConfig.SQLite.TablePrefix) > 0 {
 			tablePrefix = appConfig.SQLite.TablePrefix
@@ -277,11 +276,7 @@ func loadDatastore(options []bux.ClientOps, appConfig *AppConfig) ([]bux.ClientO
 			Shared:       appConfig.SQLite.Shared,
 		}))
 	} else if appConfig.Datastore.Engine == datastore.MySQL || appConfig.Datastore.Engine == datastore.PostgreSQL {
-
 		debug := appConfig.Datastore.Debug
-		if appConfig.SQL.Debug {
-			debug = appConfig.SQL.Debug
-		}
 		tablePrefix := appConfig.Datastore.TablePrefix
 		if len(appConfig.SQL.TablePrefix) > 0 {
 			tablePrefix = appConfig.SQL.TablePrefix
@@ -309,9 +304,6 @@ func loadDatastore(options []bux.ClientOps, appConfig *AppConfig) ([]bux.ClientO
 	} else if appConfig.Datastore.Engine == datastore.MongoDB {
 
 		debug := appConfig.Datastore.Debug
-		if appConfig.Mongo.Debug {
-			debug = appConfig.Mongo.Debug
-		}
 		tablePrefix := appConfig.Datastore.TablePrefix
 		if len(appConfig.Mongo.TablePrefix) > 0 {
 			tablePrefix = appConfig.Mongo.TablePrefix

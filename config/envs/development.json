@@ -26,7 +26,6 @@
     "playground_path": "/graphiql"
   },
   "mongodb": {
-    "debug": true,
     "database_name": "xapi",
     "transactions": false,
     "uri": "mongodb://localhost:27017/xapi"
@@ -55,13 +54,6 @@
     "max_idle_timeout": "10s",
     "url": "redis://localhost:6379",
     "use_tls": false
-  },
-  "ristretto": {
-    "buffer_items": 64,
-    "ignore_internal_cost": false,
-    "max_cost": 1073741824,
-    "metrics": false,
-    "num_counters": 1e7
   },
   "server": {
     "idle_timeout": "60s",
