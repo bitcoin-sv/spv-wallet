@@ -4,6 +4,7 @@
   "disable_itc": false,
   "environment": "development",
   "gdpr_compliance": false,
+  "request_logging": true,
   "authentication": {
     "admin_key": "1234567",
     "require_signing": false,

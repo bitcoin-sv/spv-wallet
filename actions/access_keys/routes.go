@@ -22,9 +22,10 @@ func RegisterRoutes(router *apirouter.Router, appConfig *config.AppConfig, servi
 	action := &Action{actions.Action{AppConfig: a.AppConfig, Services: a.Services}}
 
 	// V1 Requests
-	router.HTTPRouter.GET("/"+config.CurrentMajorVersion+"/access-key", router.Request(require.Wrap(action.get)))
-	router.HTTPRouter.GET("/"+config.CurrentMajorVersion+"/access-key/search", router.Request(require.Wrap(action.search)))
-	router.HTTPRouter.POST("/"+config.CurrentMajorVersion+"/access-key/search", router.Request(require.Wrap(action.search)))
-	router.HTTPRouter.POST("/"+config.CurrentMajorVersion+"/access-key", router.Request(require.Wrap(action.create)))
-	router.HTTPRouter.DELETE("/"+config.CurrentMajorVersion+"/access-key", router.Request(require.Wrap(action.revoke)))
+	router.HTTPRouter.GET("/"+config.CurrentMajorVersion+"/access-key", action.Request(router, require.Wrap(action.get)))
+	router.HTTPRouter.GET("/"+config.CurrentMajorVersion+"/access-key/search", action.Request(router, require.Wrap(action.search)))
+	router.HTTPRouter.POST("/"+config.CurrentMajorVersion+"/access-key/search", action.Request(router, require.Wrap(action.search)))
+	router.HTTPRouter.POST("/"+config.CurrentMajorVersion+"/access-key", action.Request(router, require.Wrap(action.create)))
+	router.HTTPRouter.DELETE("/"+config.CurrentMajorVersion+"/access-key", action.Request(router, require.Wrap(action.revoke)))
+
 }

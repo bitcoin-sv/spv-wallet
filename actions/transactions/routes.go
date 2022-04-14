@@ -19,17 +19,17 @@ func RegisterRoutes(router *apirouter.Router, appConfig *config.AppConfig, servi
 	require.Use(a.RequireAuthentication)
 
 	// Use the authentication middleware wrapper - this will only check for a valid xPub
-	a, requireBasic := actions.NewStack(appConfig, services)
-	requireBasic.Use(a.RequireBasicAuthentication)
+	aBasic, requireBasic := actions.NewStack(appConfig, services)
+	requireBasic.Use(aBasic.RequireBasicAuthentication)
 
 	// Load the actions and set the services
 	action := &Action{actions.Action{AppConfig: a.AppConfig, Services: a.Services}}
 
 	// V1 Requests
-	router.HTTPRouter.GET("/"+config.CurrentMajorVersion+"/transaction", router.Request(requireBasic.Wrap(action.get)))
-	router.HTTPRouter.GET("/"+config.CurrentMajorVersion+"/transaction/search", router.Request(requireBasic.Wrap(action.search)))
-	router.HTTPRouter.PATCH("/"+config.CurrentMajorVersion+"/transaction", router.Request(requireBasic.Wrap(action.update)))
-	router.HTTPRouter.POST("/"+config.CurrentMajorVersion+"/transaction", router.Request(require.Wrap(action.newTransaction)))
-	router.HTTPRouter.POST("/"+config.CurrentMajorVersion+"/transaction/record", router.Request(require.Wrap(action.record)))
-	router.HTTPRouter.POST("/"+config.CurrentMajorVersion+"/transaction/search", router.Request(requireBasic.Wrap(action.search)))
+	router.HTTPRouter.GET("/"+config.CurrentMajorVersion+"/transaction", action.Request(router, requireBasic.Wrap(action.get)))
+	router.HTTPRouter.GET("/"+config.CurrentMajorVersion+"/transaction/search", action.Request(router, requireBasic.Wrap(action.search)))
+	router.HTTPRouter.PATCH("/"+config.CurrentMajorVersion+"/transaction", action.Request(router, requireBasic.Wrap(action.update)))
+	router.HTTPRouter.POST("/"+config.CurrentMajorVersion+"/transaction", action.Request(router, require.Wrap(action.newTransaction)))
+	router.HTTPRouter.POST("/"+config.CurrentMajorVersion+"/transaction/record", action.Request(router, require.Wrap(action.record)))
+	router.HTTPRouter.POST("/"+config.CurrentMajorVersion+"/transaction/search", action.Request(router, requireBasic.Wrap(action.search)))
 }

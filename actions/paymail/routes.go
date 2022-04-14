@@ -26,8 +26,8 @@ func RegisterRoutes(router *apirouter.Router, appConfig *config.AppConfig, servi
 	action := &Action{actions.Action{AppConfig: a.AppConfig, Services: a.Services}}
 
 	// V1 Requests
-	router.HTTPRouter.POST("/"+config.CurrentMajorVersion+"/paymail", router.Request(requireAdmin.Wrap(action.create)))
-	router.HTTPRouter.DELETE("/"+config.CurrentMajorVersion+"/paymail", router.Request(requireAdmin.Wrap(action.delete)))
+	router.HTTPRouter.POST("/"+config.CurrentMajorVersion+"/paymail", action.Request(router, requireAdmin.Wrap(action.create)))
+	router.HTTPRouter.DELETE("/"+config.CurrentMajorVersion+"/paymail", action.Request(router, requireAdmin.Wrap(action.delete)))
 
 	if appConfig.Debug {
 		logger.Data(2, logger.DEBUG, "registered paymail routes and model")

@@ -21,7 +21,7 @@ func RegisterRoutes(router *apirouter.Router, appConfig *config.AppConfig, servi
 	action := &Action{actions.Action{AppConfig: appConfig, Services: services}}
 
 	// Set the main index page (navigating to slash)
-	router.HTTPRouter.GET("/", router.Request(index))
+	router.HTTPRouter.GET("/", action.Request(router, router.Request(index)))
 	router.HTTPRouter.OPTIONS("/", router.SetCrossOriginHeaders)
 	router.HTTPRouter.HEAD("/", actions.Head)
 

@@ -19,15 +19,14 @@ func RegisterRoutes(router *apirouter.Router, appConfig *config.AppConfig, servi
 	requireAdmin.Use(a.RequireAdminAuthentication)
 
 	// Use the authentication middleware wrapper - this will only check for a valid xPub
-	var requireBasic *apirouter.InternalStack
-	a, requireBasic = actions.NewStack(appConfig, services)
-	requireBasic.Use(a.RequireBasicAuthentication)
+	aBasic, requireBasic := actions.NewStack(appConfig, services)
+	requireBasic.Use(aBasic.RequireBasicAuthentication)
 
 	// Load the actions and set the services
 	action := &Action{actions.Action{AppConfig: a.AppConfig, Services: a.Services}}
 
 	// V1 Requests
-	router.HTTPRouter.GET("/"+config.CurrentMajorVersion+"/xpub", router.Request(requireBasic.Wrap(action.get)))
-	router.HTTPRouter.POST("/"+config.CurrentMajorVersion+"/xpub", router.Request(requireAdmin.Wrap(action.create)))
-	router.HTTPRouter.PATCH("/"+config.CurrentMajorVersion+"/xpub", router.Request(requireAdmin.Wrap(action.update)))
+	router.HTTPRouter.GET("/"+config.CurrentMajorVersion+"/xpub", action.Request(router, requireBasic.Wrap(action.get)))
+	router.HTTPRouter.POST("/"+config.CurrentMajorVersion+"/xpub", action.Request(router, requireAdmin.Wrap(action.create)))
+	router.HTTPRouter.PATCH("/"+config.CurrentMajorVersion+"/xpub", action.Request(router, requireAdmin.Wrap(action.update)))
 }

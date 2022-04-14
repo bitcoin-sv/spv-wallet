@@ -70,6 +70,15 @@ func (a *Action) RequireAdminAuthentication(fn httprouter.Handle) httprouter.Han
 	}
 }
 
+// Request will process the request in the router
+func (a *Action) Request(router *apirouter.Router, h httprouter.Handle) httprouter.Handle {
+	if a.AppConfig.RequestLogging {
+		return router.Request(h)
+	} else {
+		return router.RequestNoLogging(h)
+	}
+}
+
 // CheckAuthentication will check the authentication
 func CheckAuthentication(appConfig *config.AppConfig, bux bux.ClientInterface, req *http.Request,
 	adminRequired bool, requireSigning bool) (*http.Request, dictionary.ErrorMessage) {

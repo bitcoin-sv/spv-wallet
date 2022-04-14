@@ -58,6 +58,7 @@ type (
 		NewRelic         *NewRelicConfig          `json:"new_relic" mapstructure:"new_relic"`
 		Paymail          *PaymailConfig           `json:"paymail" mapstructure:"paymail"`
 		Redis            *RedisConfig             `json:"redis" mapstructure:"redis"`
+		RequestLogging   bool                     `json:"request_logging" mapstructure:"request_logging"`
 		Server           *ServerConfig            `json:"server" mapstructure:"server"`
 		SQL              *datastore.SQLConfig     `json:"sql" mapstructure:"sql"`
 		SQLite           *datastore.SQLiteConfig  `json:"sqlite" mapstructure:"sqlite"`
