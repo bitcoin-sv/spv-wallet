@@ -74,9 +74,8 @@ func (a *Action) RequireAdminAuthentication(fn httprouter.Handle) httprouter.Han
 func (a *Action) Request(router *apirouter.Router, h httprouter.Handle) httprouter.Handle {
 	if a.AppConfig.RequestLogging {
 		return router.Request(h)
-	} else {
-		return router.RequestNoLogging(h)
 	}
+	return router.RequestNoLogging(h)
 }
 
 // CheckAuthentication will check the authentication
