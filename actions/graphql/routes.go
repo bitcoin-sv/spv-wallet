@@ -5,7 +5,9 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
+	"regexp"
 
+	"github.com/99designs/gqlgen/graphql"
 	"github.com/99designs/gqlgen/graphql/handler"
 	"github.com/99designs/gqlgen/graphql/playground"
 	"github.com/BuxOrg/bux"
@@ -14,6 +16,7 @@ import (
 	"github.com/BuxOrg/bux-server/dictionary"
 	"github.com/BuxOrg/bux-server/graph"
 	"github.com/BuxOrg/bux-server/graph/generated"
+	"github.com/gofrs/uuid"
 	"github.com/julienschmidt/httprouter"
 	apirouter "github.com/mrz1836/go-api-router"
 	"github.com/mrz1836/go-logger"
@@ -25,6 +28,14 @@ const (
 	allowMethodsHeader     string = "Access-Control-Allow-Methods"
 	allowOriginHeader      string = "Access-Control-Allow-Origin"
 )
+
+type requestInfo struct {
+	id        uuid.UUID
+	method    string
+	path      string
+	ip        string
+	userAgent string
+}
 
 // RegisterRoutes register all the package specific routes
 func RegisterRoutes(router *apirouter.Router, appConfig *config.AppConfig, services *config.AppServices) {
@@ -39,12 +50,28 @@ func RegisterRoutes(router *apirouter.Router, appConfig *config.AppConfig, servi
 		serverPath = defaultServerPath
 	}
 
+	srv := handler.NewDefaultServer(generated.NewExecutableSchema(generated.Config{Resolvers: &graph.Resolver{}}))
+	if appConfig.RequestLogging {
+		re := regexp.MustCompile(`[\r?\n|\s+]`)
+		srv.AroundOperations(func(ctx context.Context, next graphql.OperationHandler) graphql.ResponseHandler {
+			oc := graphql.GetOperationContext(ctx)
+			reqInfo := ctx.Value(config.GraphRequestInfo).(requestInfo)
+			params := map[string]interface{}{
+				"query":     re.ReplaceAllString(oc.RawQuery, " "),
+				"variables": oc.Variables,
+			}
+			// LogParamsFormat  "request_id=\"%s\" method=\"%s\" path=\"%s\" ip_address=\"%s\" user_agent=\"%s\" params=\"%v\"\n"
+			logger.NoFilePrintf(apirouter.LogParamsFormat, reqInfo.id, reqInfo.method, reqInfo.path, reqInfo.ip, reqInfo.userAgent, params)
+			return next(ctx)
+		})
+	}
+
 	// Set the handle
 	h := require.Wrap(wrapHandler(
 		router,
 		a.AppConfig,
 		a.Services,
-		handler.NewDefaultServer(generated.NewExecutableSchema(generated.Config{Resolvers: &graph.Resolver{}})),
+		srv,
 		true,
 	))
 
@@ -122,6 +149,15 @@ func wrapHandler(router *apirouter.Router, appConfig *config.AppConfig, services
 			XPub:      req.Header.Get(bux.AuthHeader),
 			XPubID:    xPubID.(string),
 			AuthError: err,
+		})
+
+		guid, _ := uuid.NewV4()
+		ctx = context.WithValue(ctx, config.GraphRequestInfo, requestInfo{
+			id:        guid,
+			method:    req.Method,
+			path:      req.RequestURI,
+			ip:        req.RemoteAddr,
+			userAgent: req.UserAgent(),
 		})
 
 		// Call your original http.Handler
