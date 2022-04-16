@@ -31,6 +31,12 @@
     "transactions": false,
     "uri": "mongodb://localhost:27017/xapi"
   },
+  "monitor": {
+    "enabled": true,
+    "centrifuge_server": "ws://localhost:8000/websocket",
+    "token": "",
+    "processMempoolOnConnect": true
+  },
   "new_relic": {
     "domain_name": "domain.com",
     "enabled": false,
