@@ -97,13 +97,16 @@ type (
 
 	// MonitorOptions is the configuration for blockchain monitoring
 	MonitorOptions struct {
-		Enabled                 bool    `json:"enabled" mapstructure:"enabled"`                                       // true/false
-		CentrifugeServer        string  `json:"centrifuge_server" mapstructure:"centrifuge_server"`                   // The server url address
-		Token                   string  `json:"token" mapstructure:"token"`                                           // Token to connect to the server with
-		MonitorDays             int     `json:"monitor_days" mapstructure:"monitor_days"`                             // how many days in the past should we monitor an address (default: 7)
-		FalsePositiveRate       float64 `json:"false_positive_rate" mapstructure:"false_positive_rate"`               // how many false positives do we except (default: 0.01)
-		MaxNumberOfDestinations int     `json:"max_number_of_destinations" mapstructure:"max_number_of_destinations"` // how many destinations can the filter hold (default: 100,000)
-		ProcessMempoolOnConnect bool    `json:"process_mempool_on_connect" mapstructure:"process_mempool_on_connect"` // Whether to process all transactions in the mempool when connecting to centrifuge server
+		Enabled                     bool    `json:"enabled" mapstructure:"enabled"`                                             // true/false
+		CentrifugeServer            string  `json:"centrifuge_server" mapstructure:"centrifuge_server"`                         // The server url address
+		Token                       string  `json:"token" mapstructure:"token"`                                                 // Token to connect to the server with
+		MonitorDays                 int     `json:"monitor_days" mapstructure:"monitor_days"`                                   // how many days in the past should we monitor an address (default: 7)
+		FalsePositiveRate           float64 `json:"false_positive_rate" mapstructure:"false_positive_rate"`                     // how many false positives do we except (default: 0.01)
+		SaveTransactionDestinations bool    `json:"save_transaction_destinations" mapstructure:"save_transaction_destinations"` // Whether to save destinations on monitored transactions
+		ProcessorType               string  `json:"processor_type" mapstructure:"processor_type"`                               // Type of processor to start monitor with. Default: bloom
+		LoadMonitoredDestinations   bool    `json:"load_monitored_destinations" mapstructure:"load_monitored_destinations" // Whehter to load monitored destinations`
+		MaxNumberOfDestinations     int     `json:"max_number_of_destinations" mapstructure:"max_number_of_destinations"` // how many destinations can the filter hold (default: 100,000)
+		ProcessMempoolOnConnect     bool    `json:"process_mempool_on_connect" mapstructure:"process_mempool_on_connect"` // Whether to process all transactions in the mempool when connecting to centrifuge server
 	}
 
 	// NewRelicConfig is the configuration for New Relic

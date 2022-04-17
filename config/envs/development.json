@@ -35,7 +35,9 @@
     "enabled": true,
     "centrifuge_server": "ws://localhost:8000/websocket",
     "token": "",
-    "processMempoolOnConnect": true
+    "processMempoolOnConnect": true,
+    "load_monitored_destinations": false,
+    "save_destinations": true
   },
   "new_relic": {
     "domain_name": "domain.com",
