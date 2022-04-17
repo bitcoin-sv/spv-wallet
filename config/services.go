@@ -210,12 +210,14 @@ func (s *AppServices) loadBux(ctx context.Context, appConfig *AppConfig) (err er
 			return
 		}
 		options = append(options, bux.WithMonitoring(ctx, &chainstate.MonitorOptions{
-			CentrifugeServer:        appConfig.Monitor.CentrifugeServer,
-			MonitorDays:             appConfig.Monitor.MonitorDays,
-			Token:                   appConfig.Monitor.Token,
-			FalsePositiveRate:       appConfig.Monitor.FalsePositiveRate,
-			MaxNumberOfDestinations: appConfig.Monitor.MaxNumberOfDestinations,
-			ProcessMempoolOnConnect: appConfig.Monitor.ProcessMempoolOnConnect,
+			CentrifugeServer:            appConfig.Monitor.CentrifugeServer,
+			MonitorDays:                 appConfig.Monitor.MonitorDays,
+			Token:                       appConfig.Monitor.Token,
+			FalsePositiveRate:           appConfig.Monitor.FalsePositiveRate,
+			MaxNumberOfDestinations:     appConfig.Monitor.MaxNumberOfDestinations,
+			SaveTransactionDestinations: appConfig.Monitor.SaveTransactionDestinations,
+			LoadMonitoredDestinations:   appConfig.Monitor.LoadMonitoredDestinations,
+			ProcessMempoolOnConnect:     appConfig.Monitor.ProcessMempoolOnConnect,
 		}))
 	}
 
