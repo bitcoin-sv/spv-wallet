@@ -139,6 +139,11 @@ func (s *AppServices) loadBux(ctx context.Context, appConfig *AppConfig) (err er
 		options = append(options, bux.WithITCDisabled())
 	}
 
+	// Set if the feature is disabled
+	if appConfig.ImportBlockHeaders != "" {
+		options = append(options, bux.WithImportBlockHeaders(appConfig.ImportBlockHeaders))
+	}
+
 	// todo: customize the logger
 
 	// todo: feature: override the config from JSON env (side-load your own /envs/custom-config.json
@@ -205,6 +210,7 @@ func (s *AppServices) loadBux(ctx context.Context, appConfig *AppConfig) (err er
 			return
 		}
 		options = append(options, bux.WithMonitoring(ctx, &chainstate.MonitorOptions{
+			Debug:                       appConfig.Monitor.Debug,
 			CentrifugeServer:            appConfig.Monitor.CentrifugeServer,
 			MonitorDays:                 appConfig.Monitor.MonitorDays,
 			Token:                       appConfig.Monitor.Token,
