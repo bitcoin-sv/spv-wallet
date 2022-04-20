@@ -2,8 +2,6 @@ module github.com/BuxOrg/bux-server
 
 go 1.17
 
-// replace github.com/BuxOrg/bux => ../bux
-
 require (
 	github.com/99designs/gqlgen v0.17.2
 	github.com/BuxOrg/bux v0.2.7
@@ -79,9 +77,11 @@ require (
 	github.com/jpillora/backoff v1.0.0 // indirect
 	github.com/klauspost/compress v1.15.1 // indirect
 	github.com/korovkin/limiter v0.0.0-20220321204241-2880bd9cecaf // indirect
+	github.com/kr/text v0.2.0 // indirect
 	github.com/lestrrat-go/strftime v1.0.5 // indirect
 	github.com/lib/pq v1.10.5 // indirect
 	github.com/libsv/go-bc v0.1.10 // indirect
+	github.com/libsv/go-bk v0.1.6 // indirect
 	github.com/libsv/go-bt v1.0.6 // indirect
 	github.com/libsv/go-bt/v2 v2.1.0-beta.2.0.20211221142324-0d686850c5e0 // indirect
 	github.com/magiconair/properties v1.8.6 // indirect
@@ -97,6 +97,7 @@ require (
 	github.com/mrz1836/go-parameters v0.2.8 // indirect
 	github.com/mrz1836/go-whatsonchain v0.10.4 // indirect
 	github.com/newrelic/go-agent/v3/integrations/nrmongo v1.0.2 // indirect
+	github.com/niemeyer/pretty v0.0.0-20200227124842-a10e7caefd8e // indirect
 	github.com/oliveagle/jsonpath v0.0.0-20180606110733-2e52cf6e6852 // indirect
 	github.com/opentracing/opentracing-go v1.2.0 // indirect
 	github.com/pelletier/go-toml v1.9.4 // indirect

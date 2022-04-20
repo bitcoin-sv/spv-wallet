@@ -107,9 +107,9 @@ type (
 		FalsePositiveRate           float64 `json:"false_positive_rate" mapstructure:"false_positive_rate"`                     // how many false positives do we except (default: 0.01)
 		SaveTransactionDestinations bool    `json:"save_transaction_destinations" mapstructure:"save_transaction_destinations"` // Whether to save destinations on monitored transactions
 		ProcessorType               string  `json:"processor_type" mapstructure:"processor_type"`                               // Type of processor to start monitor with. Default: bloom
-		LoadMonitoredDestinations   bool    `json:"load_monitored_destinations" mapstructure:"load_monitored_destinations" // Whehter to load monitored destinations`
-		MaxNumberOfDestinations     int     `json:"max_number_of_destinations" mapstructure:"max_number_of_destinations"` // how many destinations can the filter hold (default: 100,000)
-		ProcessMempoolOnConnect     bool    `json:"process_mempool_on_connect" mapstructure:"process_mempool_on_connect"` // Whether to process all transactions in the mempool when connecting to centrifuge server
+		LoadMonitoredDestinations   bool    `json:"load_monitored_destinations" mapstructure:"load_monitored_destinations"`     // Whehter to load monitored destinations`
+		MaxNumberOfDestinations     int     `json:"max_number_of_destinations" mapstructure:"max_number_of_destinations"`       // how many destinations can the filter hold (default: 100,000)
+		ProcessMempoolOnConnect     bool    `json:"process_mempool_on_connect" mapstructure:"process_mempool_on_connect"`       // Whether to process all transactions in the mempool when connecting to centrifuge server
 	}
 
 	// NewRelicConfig is the configuration for New Relic
