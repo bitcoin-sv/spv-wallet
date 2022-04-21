@@ -32,6 +32,14 @@
     "transactions": false,
     "uri": "mongodb://localhost:27017/bux"
   },
+  "monitor": {
+    "enabled": true,
+    "centrifuge_server_url": "ws://localhost:8000/websocket",
+    "auth_token": "",
+    "processMempoolOnConnect": true,
+    "load_monitored_destinations": false,
+    "save_destinations": true
+  },
   "new_relic": {
     "domain_name": "domain.com",
     "enabled": true,

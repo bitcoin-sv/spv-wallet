@@ -204,26 +204,26 @@ func (s *AppServices) loadBux(ctx context.Context, appConfig *AppConfig) (err er
 		}
 	}
 
+	// Load the notifications
 	if appConfig.Notifications != nil && appConfig.Notifications.Enabled {
-		// configure the default notification handler
 		options = append(options, bux.WithNotifications(appConfig.Notifications.WebhookEndpoint))
 	}
 
+	// Load the monitor
 	if appConfig.Monitor != nil && appConfig.Monitor.Enabled {
-		if appConfig.Monitor.CentrifugeServer == "" {
-			err = errors.New("CentrifugeServer is required for monitoring to work")
-			return
+		if appConfig.Monitor.CentrifugeServerURL == "" {
+			return errors.New("CentrifugeServerURL is required for monitoring to work")
 		}
 		options = append(options, bux.WithMonitoring(ctx, &chainstate.MonitorOptions{
+			CentrifugeServer:            appConfig.Monitor.CentrifugeServerURL,
 			Debug:                       appConfig.Monitor.Debug,
-			CentrifugeServer:            appConfig.Monitor.CentrifugeServer,
-			MonitorDays:                 appConfig.Monitor.MonitorDays,
-			Token:                       appConfig.Monitor.Token,
 			FalsePositiveRate:           appConfig.Monitor.FalsePositiveRate,
-			MaxNumberOfDestinations:     appConfig.Monitor.MaxNumberOfDestinations,
-			SaveTransactionDestinations: appConfig.Monitor.SaveTransactionDestinations,
 			LoadMonitoredDestinations:   appConfig.Monitor.LoadMonitoredDestinations,
+			MaxNumberOfDestinations:     appConfig.Monitor.MaxNumberOfDestinations,
+			MonitorDays:                 appConfig.Monitor.MonitorDays,
 			ProcessMempoolOnConnect:     appConfig.Monitor.ProcessMempoolOnConnect,
+			SaveTransactionDestinations: appConfig.Monitor.SaveTransactionDestinations,
+			Token:                       appConfig.Monitor.AuthToken,
 		}))
 	}
 
@@ -278,6 +278,29 @@ func (s *AppServices) loadTestBux(ctx context.Context, appConfig *AppConfig) (er
 	// Set the datastore
 	if options, err = loadDatastore(options, appConfig); err != nil {
 		return err
+	}
+
+	// Load the notifications
+	if appConfig.Notifications != nil && appConfig.Notifications.Enabled {
+		options = append(options, bux.WithNotifications(appConfig.Notifications.WebhookEndpoint))
+	}
+
+	// Load the monitor
+	if appConfig.Monitor != nil && appConfig.Monitor.Enabled {
+		if appConfig.Monitor.CentrifugeServerURL == "" {
+			return errors.New("CentrifugeServerURL is required for monitoring to work")
+		}
+		options = append(options, bux.WithMonitoring(ctx, &chainstate.MonitorOptions{
+			CentrifugeServer:            appConfig.Monitor.CentrifugeServerURL,
+			Debug:                       appConfig.Monitor.Debug,
+			FalsePositiveRate:           appConfig.Monitor.FalsePositiveRate,
+			LoadMonitoredDestinations:   appConfig.Monitor.LoadMonitoredDestinations,
+			MaxNumberOfDestinations:     appConfig.Monitor.MaxNumberOfDestinations,
+			MonitorDays:                 appConfig.Monitor.MonitorDays,
+			ProcessMempoolOnConnect:     appConfig.Monitor.ProcessMempoolOnConnect,
+			SaveTransactionDestinations: appConfig.Monitor.SaveTransactionDestinations,
+			Token:                       appConfig.Monitor.AuthToken,
+		}))
 	}
 
 	// Create the client

@@ -37,6 +37,14 @@
     "enabled": false,
     "license_key": "BOGUS-LICENSE-KEY-1234567890987654321234"
   },
+  "monitor": {
+    "enabled": false,
+    "centrifuge_server_url": "ws://localhost:8000/websocket",
+    "auth_token": "",
+    "processMempoolOnConnect": true,
+    "load_monitored_destinations": false,
+    "save_destinations": true
+  },
   "paymail": {
     "enabled": false,
     "default_from_paymail": "from@domain.com",
