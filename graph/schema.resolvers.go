@@ -305,14 +305,14 @@ func (r *queryResolver) AccessKey(ctx context.Context, key string) (*bux.AccessK
 	return bux.DisplayModels(accessKey).(*bux.AccessKey), nil
 }
 
-func (r *queryResolver) AccessKeys(ctx context.Context, metadata bux.Metadata) ([]*bux.AccessKey, error) {
+func (r *queryResolver) AccessKeys(ctx context.Context, metadata bux.Metadata, conditions map[string]interface{}, params *datastore.QueryParams) ([]*bux.AccessKey, error) {
 	c, err := GetConfigFromContextSigned(ctx)
 	if err != nil {
 		return nil, err
 	}
 
 	var accessKeys []*bux.AccessKey
-	accessKeys, err = c.Services.Bux.GetAccessKeys(ctx, c.XPubID, &metadata)
+	accessKeys, err = c.Services.Bux.GetAccessKeys(ctx, c.XPubID, &metadata, ConditionsParseGraphQL(conditions), params)
 	if err != nil {
 		return nil, err
 	}
@@ -338,14 +338,14 @@ func (r *queryResolver) Transaction(ctx context.Context, id string) (*bux.Transa
 	return bux.DisplayModels(tx).(*bux.Transaction), nil
 }
 
-func (r *queryResolver) Transactions(ctx context.Context, metadata bux.Metadata, conditions map[string]interface{}) ([]*bux.Transaction, error) {
+func (r *queryResolver) Transactions(ctx context.Context, metadata bux.Metadata, conditions map[string]interface{}, params *datastore.QueryParams) ([]*bux.Transaction, error) {
 	c, err := GetConfigFromContext(ctx)
 	if err != nil {
 		return nil, err
 	}
 
 	var tx []*bux.Transaction
-	tx, err = c.Services.Bux.GetTransactions(ctx, c.XPubID, &metadata, ConditionsParseGraphQL(conditions))
+	tx, err = c.Services.Bux.GetTransactions(ctx, c.XPubID, &metadata, ConditionsParseGraphQL(conditions), params)
 	if err != nil {
 		return nil, err
 	}
@@ -376,14 +376,14 @@ func (r *queryResolver) Destination(ctx context.Context, id *string, address *st
 	return bux.DisplayModels(destination).(*bux.Destination), nil
 }
 
-func (r *queryResolver) Destinations(ctx context.Context, metadata bux.Metadata) ([]*bux.Destination, error) {
+func (r *queryResolver) Destinations(ctx context.Context, metadata bux.Metadata, conditions map[string]interface{}, params *datastore.QueryParams) ([]*bux.Destination, error) {
 	c, err := GetConfigFromContext(ctx)
 	if err != nil {
 		return nil, err
 	}
 
 	var destinations []*bux.Destination
-	destinations, err = c.Services.Bux.GetDestinations(ctx, c.XPubID, &metadata)
+	destinations, err = c.Services.Bux.GetDestinations(ctx, c.XPubID, &metadata, ConditionsParseGraphQL(conditions), params)
 	if err != nil {
 		return nil, err
 	}

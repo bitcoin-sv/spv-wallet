@@ -69,6 +69,8 @@ models:
     model: github.com/BuxOrg/bux.PaymailAddress
   PaymailP4:
     model: github.com/BuxOrg/bux.PaymailP4
+  QueryParams:
+    model: github.com/BuxOrg/bux/datastore.QueryParams
   Transaction:
     model: github.com/BuxOrg/bux.Transaction
   TransactionConfig:

@@ -4,6 +4,7 @@ import (
 	"net/http"
 
 	"github.com/BuxOrg/bux"
+	"github.com/BuxOrg/bux/utils"
 	"github.com/julienschmidt/httprouter"
 	apirouter "github.com/mrz1836/go-api-router"
 )
@@ -18,7 +19,10 @@ func (a *Action) get(w http.ResponseWriter, req *http.Request, _ httprouter.Para
 	var utxos []*bux.Utxo
 	if utxos, err = a.Services.Bux.GetUtxos(
 		req.Context(),
-		params.GetString("key"),
+		utils.Hash(params.GetString("key")),
+		nil,
+		nil,
+		nil,
 	); err != nil {
 		apirouter.ReturnResponse(w, req, http.StatusExpectationFailed, err.Error())
 		return

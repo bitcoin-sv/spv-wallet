@@ -1,4 +1,4 @@
-package accessKeys
+package utxos
 
 import (
 	"net/http"
@@ -9,7 +9,7 @@ import (
 	apirouter "github.com/mrz1836/go-api-router"
 )
 
-// search will fetch a list of access keys filtered by metadata
+// search will fetch a list of transactions filtered on conditions and metadata
 func (a *Action) search(w http.ResponseWriter, req *http.Request, _ httprouter.Params) {
 
 	reqXPubID, _ := bux.GetXpubIDFromRequest(req)
@@ -23,8 +23,8 @@ func (a *Action) search(w http.ResponseWriter, req *http.Request, _ httprouter.P
 	}
 
 	// Record a new transaction (get the hex from parameters)a
-	var accessKeys []*bux.AccessKey
-	if accessKeys, err = a.Services.Bux.GetAccessKeys(
+	var utxos []*bux.Utxo
+	if utxos, err = a.Services.Bux.GetUtxos(
 		req.Context(),
 		reqXPubID,
 		metadata,
@@ -36,5 +36,5 @@ func (a *Action) search(w http.ResponseWriter, req *http.Request, _ httprouter.P
 	}
 
 	// Return response
-	apirouter.ReturnResponse(w, req, http.StatusOK, bux.DisplayModels(accessKeys))
+	apirouter.ReturnResponse(w, req, http.StatusOK, bux.DisplayModels(utxos))
 }
