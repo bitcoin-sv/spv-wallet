@@ -9,6 +9,7 @@ import (
 
 	"github.com/BuxOrg/bux"
 	"github.com/BuxOrg/bux/cachestore"
+	"github.com/BuxOrg/bux/chainstate"
 	"github.com/BuxOrg/bux/datastore"
 	"github.com/BuxOrg/bux/taskmanager"
 	"github.com/BuxOrg/bux/utils"
@@ -138,6 +139,11 @@ func (s *AppServices) loadBux(ctx context.Context, appConfig *AppConfig) (err er
 		options = append(options, bux.WithITCDisabled())
 	}
 
+	// Set if the feature is disabled
+	if appConfig.ImportBlockHeaders != "" {
+		options = append(options, bux.WithImportBlockHeaders(appConfig.ImportBlockHeaders))
+	}
+
 	// todo: customize the logger
 
 	// todo: feature: override the config from JSON env (side-load your own /envs/custom-config.json
@@ -201,6 +207,24 @@ func (s *AppServices) loadBux(ctx context.Context, appConfig *AppConfig) (err er
 	if appConfig.Notifications != nil && appConfig.Notifications.Enabled {
 		// configure the default notification handler
 		options = append(options, bux.WithNotifications(appConfig.Notifications.WebhookEndpoint))
+	}
+
+	if appConfig.Monitor != nil && appConfig.Monitor.Enabled {
+		if appConfig.Monitor.CentrifugeServer == "" {
+			err = errors.New("CentrifugeServer is required for monitoring to work")
+			return
+		}
+		options = append(options, bux.WithMonitoring(ctx, &chainstate.MonitorOptions{
+			Debug:                       appConfig.Monitor.Debug,
+			CentrifugeServer:            appConfig.Monitor.CentrifugeServer,
+			MonitorDays:                 appConfig.Monitor.MonitorDays,
+			Token:                       appConfig.Monitor.Token,
+			FalsePositiveRate:           appConfig.Monitor.FalsePositiveRate,
+			MaxNumberOfDestinations:     appConfig.Monitor.MaxNumberOfDestinations,
+			SaveTransactionDestinations: appConfig.Monitor.SaveTransactionDestinations,
+			LoadMonitoredDestinations:   appConfig.Monitor.LoadMonitoredDestinations,
+			ProcessMempoolOnConnect:     appConfig.Monitor.ProcessMempoolOnConnect,
+		}))
 	}
 
 	// Create the new client

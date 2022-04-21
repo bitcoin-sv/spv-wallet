@@ -84,7 +84,6 @@ require (
 	github.com/mrz1836/go-nownodes v0.0.5 // indirect
 	github.com/mrz1836/go-whatsonchain v0.10.4 // indirect
 	github.com/newrelic/go-agent/v3/integrations/nrmongo v1.0.2 // indirect
-	github.com/niemeyer/pretty v0.0.0-20200227124842-a10e7caefd8e // indirect
 	github.com/pelletier/go-toml v1.9.4 // indirect
 	github.com/pelletier/go-toml/v2 v2.0.0-beta.8 // indirect
 	github.com/pkg/errors v0.9.1 // indirect
@@ -125,7 +124,6 @@ require (
 	google.golang.org/genproto v0.0.0-20220420195807-44278fea765b // indirect
 	google.golang.org/grpc v1.45.0 // indirect
 	google.golang.org/protobuf v1.28.0 // indirect
-	gopkg.in/check.v1 v1.0.0-20200902074654-038fdea0a05b // indirect
 	gopkg.in/ini.v1 v1.66.4 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
 	gopkg.in/yaml.v3 v3.0.0-20210107192922-496545a6307b // indirect

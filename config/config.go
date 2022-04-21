@@ -45,26 +45,28 @@ type (
 
 	// AppConfig is the configuration values and associated env vars
 	AppConfig struct {
-		Authentication   *AuthenticationConfig    `json:"authentication" mapstructure:"authentication"`
-		Cachestore       *CachestoreConfig        `json:"cache" mapstructure:"cache"`
-		Datastore        *DatastoreConfig         `json:"datastore" mapstructure:"datastore"`
-		Debug            bool                     `json:"debug" mapstructure:"debug"`
-		DebugProfiling   bool                     `json:"debug_profiling" mapstructure:"debug_profiling"`
-		DisableITC       bool                     `json:"disable_itc" mapstructure:"disable_itc"`
-		Environment      string                   `json:"environment" mapstructure:"environment"`
-		GDPRCompliance   bool                     `json:"gdpr_compliance" mapstructure:"gdpr_compliance"`
-		GraphQL          *GraphqlConfig           `json:"graphql" mapstructure:"graphql"`
-		Mongo            *datastore.MongoDBConfig `json:"mongodb" mapstructure:"mongodb"`
-		NewRelic         *NewRelicConfig          `json:"new_relic" mapstructure:"new_relic"`
+		Authentication     *AuthenticationConfig    `json:"authentication" mapstructure:"authentication"`
+		Cachestore         *CachestoreConfig        `json:"cache" mapstructure:"cache"`
+		Datastore          *DatastoreConfig         `json:"datastore" mapstructure:"datastore"`
+		Debug              bool                     `json:"debug" mapstructure:"debug"`
+		DebugProfiling     bool                     `json:"debug_profiling" mapstructure:"debug_profiling"`
+		DisableITC         bool                     `json:"disable_itc" mapstructure:"disable_itc"`
+		Environment        string                   `json:"environment" mapstructure:"environment"`
+		GDPRCompliance     bool                     `json:"gdpr_compliance" mapstructure:"gdpr_compliance"`
+		GraphQL            *GraphqlConfig           `json:"graphql" mapstructure:"graphql"`
+		ImportBlockHeaders string                   `json:"import_block_headers" mapstructure:"import_block_headers"`
+		Mongo              *datastore.MongoDBConfig `json:"mongodb" mapstructure:"mongodb"`
+		Monitor            *MonitorOptions          `json:"monitor" mapstructure:"monitor"`
+		NewRelic           *NewRelicConfig          `json:"new_relic" mapstructure:"new_relic"`
 		Notifications    *NotificationsConfig     `json:"notifications" mapstructure:"notifications"`
-		Paymail          *PaymailConfig           `json:"paymail" mapstructure:"paymail"`
-		Redis            *RedisConfig             `json:"redis" mapstructure:"redis"`
-		RequestLogging   bool                     `json:"request_logging" mapstructure:"request_logging"`
-		Server           *ServerConfig            `json:"server" mapstructure:"server"`
-		SQL              *datastore.SQLConfig     `json:"sql" mapstructure:"sql"`
-		SQLite           *datastore.SQLiteConfig  `json:"sqlite" mapstructure:"sqlite"`
-		TaskManager      *TaskManagerConfig       `json:"task_manager" mapstructure:"task_manager"`
-		WorkingDirectory string                   `json:"working_directory" mapstructure:"working_directory"`
+		Paymail            *PaymailConfig           `json:"paymail" mapstructure:"paymail"`
+		Redis              *RedisConfig             `json:"redis" mapstructure:"redis"`
+		RequestLogging     bool                     `json:"request_logging" mapstructure:"request_logging"`
+		Server             *ServerConfig            `json:"server" mapstructure:"server"`
+		SQL                *datastore.SQLConfig     `json:"sql" mapstructure:"sql"`
+		SQLite             *datastore.SQLiteConfig  `json:"sqlite" mapstructure:"sqlite"`
+		TaskManager        *TaskManagerConfig       `json:"task_manager" mapstructure:"task_manager"`
+		WorkingDirectory   string                   `json:"working_directory" mapstructure:"working_directory"`
 	}
 
 	// AuthenticationConfig is the configuration for Authentication
@@ -93,6 +95,21 @@ type (
 		Enabled        bool   `json:"enabled" mapstructure:"enabled"`                 // true/false
 		PlaygroundPath string `json:"playground_path" mapstructure:"playground_path"` // playground path i.e. "/graphiql"
 		ServerPath     string `json:"server_path" mapstructure:"server_path"`         // server path i.e. "/graphql"
+	}
+
+	// MonitorOptions is the configuration for blockchain monitoring
+	MonitorOptions struct {
+		Debug                       bool    `json:"debug" mapstructure:"debug"`                                                 // true/false
+		Enabled                     bool    `json:"enabled" mapstructure:"enabled"`                                             // true/false
+		CentrifugeServer            string  `json:"centrifuge_server" mapstructure:"centrifuge_server"`                         // The server url address
+		Token                       string  `json:"token" mapstructure:"token"`                                                 // Token to connect to the server with
+		MonitorDays                 int     `json:"monitor_days" mapstructure:"monitor_days"`                                   // how many days in the past should we monitor an address (default: 7)
+		FalsePositiveRate           float64 `json:"false_positive_rate" mapstructure:"false_positive_rate"`                     // how many false positives do we except (default: 0.01)
+		SaveTransactionDestinations bool    `json:"save_transaction_destinations" mapstructure:"save_transaction_destinations"` // Whether to save destinations on monitored transactions
+		ProcessorType               string  `json:"processor_type" mapstructure:"processor_type"`                               // Type of processor to start monitor with. Default: bloom
+		LoadMonitoredDestinations   bool    `json:"load_monitored_destinations" mapstructure:"load_monitored_destinations"`     // Whehter to load monitored destinations`
+		MaxNumberOfDestinations     int     `json:"max_number_of_destinations" mapstructure:"max_number_of_destinations"`       // how many destinations can the filter hold (default: 100,000)
+		ProcessMempoolOnConnect     bool    `json:"process_mempool_on_connect" mapstructure:"process_mempool_on_connect"`       // Whether to process all transactions in the mempool when connecting to centrifuge server
 	}
 
 	// NewRelicConfig is the configuration for New Relic
