@@ -212,18 +212,19 @@ func (s *AppServices) loadBux(ctx context.Context, appConfig *AppConfig) (err er
 	// Load the monitor
 	if appConfig.Monitor != nil && appConfig.Monitor.Enabled {
 		if appConfig.Monitor.BuxAgentURL == "" {
-			return errors.New("CentrifugeServerURL is required for monitoring to work")
+			return errors.New("BuxAgentURL is required for monitoring")
 		}
 		options = append(options, bux.WithMonitoring(ctx, &chainstate.MonitorOptions{
-			CentrifugeServer:            appConfig.Monitor.BuxAgentURL,
+			AuthToken:                   appConfig.Monitor.AuthToken,
+			BuxAgentURL:                 appConfig.Monitor.BuxAgentURL,
 			Debug:                       appConfig.Monitor.Debug,
 			FalsePositiveRate:           appConfig.Monitor.FalsePositiveRate,
 			LoadMonitoredDestinations:   appConfig.Monitor.LoadMonitoredDestinations,
 			MaxNumberOfDestinations:     appConfig.Monitor.MaxNumberOfDestinations,
 			MonitorDays:                 appConfig.Monitor.MonitorDays,
 			ProcessMempoolOnConnect:     appConfig.Monitor.ProcessMempoolOnConnect,
+			ProcessorType:               appConfig.Monitor.ProcessorType,
 			SaveTransactionDestinations: appConfig.Monitor.SaveTransactionDestinations,
-			Token:                       appConfig.Monitor.AuthToken,
 		}))
 	}
 
@@ -291,7 +292,8 @@ func (s *AppServices) loadTestBux(ctx context.Context, appConfig *AppConfig) (er
 			return errors.New("BUX Agent URL is required for monitoring")
 		}
 		options = append(options, bux.WithMonitoring(ctx, &chainstate.MonitorOptions{
-			CentrifugeServer:            appConfig.Monitor.BuxAgentURL,
+			AuthToken:                   appConfig.Monitor.AuthToken,
+			BuxAgentURL:                 appConfig.Monitor.BuxAgentURL,
 			Debug:                       appConfig.Monitor.Debug,
 			FalsePositiveRate:           appConfig.Monitor.FalsePositiveRate,
 			LoadMonitoredDestinations:   appConfig.Monitor.LoadMonitoredDestinations,
@@ -300,7 +302,6 @@ func (s *AppServices) loadTestBux(ctx context.Context, appConfig *AppConfig) (er
 			ProcessMempoolOnConnect:     appConfig.Monitor.ProcessMempoolOnConnect,
 			ProcessorType:               appConfig.Monitor.ProcessorType,
 			SaveTransactionDestinations: appConfig.Monitor.SaveTransactionDestinations,
-			Token:                       appConfig.Monitor.AuthToken,
 		}))
 	}
 
