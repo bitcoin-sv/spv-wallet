@@ -11,6 +11,7 @@ require (
 	github.com/julienschmidt/httprouter v1.3.0
 	github.com/mrz1836/go-api-router v0.4.12
 	github.com/mrz1836/go-logger v0.2.5
+	github.com/mrz1836/go-parameters v0.2.8
 	github.com/mrz1836/go-sanitize v1.1.5
 	github.com/mrz1836/go-validate v0.2.0
 	github.com/newrelic/go-agent/v3 v3.15.2
@@ -81,7 +82,6 @@ require (
 	github.com/mrz1836/go-cache v0.6.5 // indirect
 	github.com/mrz1836/go-mattercloud v0.5.3 // indirect
 	github.com/mrz1836/go-nownodes v0.0.5 // indirect
-	github.com/mrz1836/go-parameters v0.2.8 // indirect
 	github.com/mrz1836/go-whatsonchain v0.10.4 // indirect
 	github.com/newrelic/go-agent/v3/integrations/nrmongo v1.0.2 // indirect
 	github.com/niemeyer/pretty v0.0.0-20200227124842-a10e7caefd8e // indirect
