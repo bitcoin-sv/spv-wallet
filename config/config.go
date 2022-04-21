@@ -100,7 +100,7 @@ type (
 	// MonitorOptions is the configuration for blockchain monitoring
 	MonitorOptions struct {
 		AuthToken                   string  `json:"auth_token" mapstructure:"auth_token"`                                       // Token to connect to the server with
-		CentrifugeServerURL         string  `json:"centrifuge_server_url" mapstructure:"centrifuge_server_url"`                 // The server url address
+		BuxAgentURL                 string  `json:"bux_agent_url" mapstructure:"bux_agent_url"`                                 // The BUX agent server url address
 		Debug                       bool    `json:"debug" mapstructure:"debug"`                                                 // true/false
 		Enabled                     bool    `json:"enabled" mapstructure:"enabled"`                                             // true/false
 		FalsePositiveRate           float64 `json:"false_positive_rate" mapstructure:"false_positive_rate"`                     // how many false positives do we except (default: 0.01)
