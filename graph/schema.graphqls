@@ -16,6 +16,7 @@ scalar Map
 scalar Metadata
 scalar DraftStatus
 scalar ChangeStrategy
+scalar QueryParams
 scalar TransactionDirection
 
 type AccessKey {
@@ -214,14 +215,17 @@ type Query {
         key: String!
     ): AccessKey
     access_keys(
-        metadata: Metadata
+        metadata: Metadata,
+        conditions: Map,
+        params: QueryParams
     ): [AccessKey]
     transaction(
         id: String!
     ): Transaction
     transactions(
         metadata: Metadata
-        conditions: Map
+        conditions: Map,
+        params: QueryParams
     ): [Transaction]
     destination(
         id: String
@@ -229,7 +233,9 @@ type Query {
         locking_script: String
     ): Destination
     destinations(
-        metadata: Metadata
+        metadata: Metadata,
+        conditions: Map,
+        params: QueryParams
     ): [Destination]
 }
 

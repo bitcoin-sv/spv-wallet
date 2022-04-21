@@ -4,13 +4,14 @@ go 1.17
 
 require (
 	github.com/99designs/gqlgen v0.17.3
-	github.com/BuxOrg/bux v0.2.7
+	github.com/BuxOrg/bux v0.2.8
 	github.com/go-ozzo/ozzo-validation v3.6.0+incompatible
 	github.com/go-redis/redis/v8 v8.11.5
 	github.com/gofrs/uuid v4.2.0+incompatible
 	github.com/julienschmidt/httprouter v1.3.0
 	github.com/mrz1836/go-api-router v0.4.12
 	github.com/mrz1836/go-logger v0.2.5
+	github.com/mrz1836/go-parameters v0.2.8
 	github.com/mrz1836/go-sanitize v1.1.5
 	github.com/mrz1836/go-validate v0.2.0
 	github.com/newrelic/go-agent/v3 v3.15.2
@@ -81,7 +82,6 @@ require (
 	github.com/mrz1836/go-cache v0.6.5 // indirect
 	github.com/mrz1836/go-mattercloud v0.5.3 // indirect
 	github.com/mrz1836/go-nownodes v0.0.5 // indirect
-	github.com/mrz1836/go-parameters v0.2.8 // indirect
 	github.com/mrz1836/go-whatsonchain v0.10.4 // indirect
 	github.com/newrelic/go-agent/v3/integrations/nrmongo v1.0.2 // indirect
 	github.com/niemeyer/pretty v0.0.0-20200227124842-a10e7caefd8e // indirect
@@ -116,13 +116,13 @@ require (
 	go.mongodb.org/mongo-driver v1.9.0 // indirect
 	golang.org/x/crypto v0.0.0-20220411220226-7b82a4e95df4 // indirect
 	golang.org/x/mod v0.6.0-dev.0.20220106191415-9b9b3d81d5e3 // indirect
-	golang.org/x/net v0.0.0-20220418201149-a630d4f3e7a2 // indirect
+	golang.org/x/net v0.0.0-20220420153159-1850ba15e1be // indirect
 	golang.org/x/sync v0.0.0-20210220032951-036812b2e83c // indirect
 	golang.org/x/sys v0.0.0-20220412211240-33da011f77ad // indirect
 	golang.org/x/text v0.3.7 // indirect
 	golang.org/x/tools v0.1.10 // indirect
 	golang.org/x/xerrors v0.0.0-20220411194840-2f41105eb62f // indirect
-	google.golang.org/genproto v0.0.0-20220414192740-2d67ff6cf2b4 // indirect
+	google.golang.org/genproto v0.0.0-20220420195807-44278fea765b // indirect
 	google.golang.org/grpc v1.45.0 // indirect
 	google.golang.org/protobuf v1.28.0 // indirect
 	gopkg.in/check.v1 v1.0.0-20200902074654-038fdea0a05b // indirect
