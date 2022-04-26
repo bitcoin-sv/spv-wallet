@@ -44,7 +44,7 @@ func (a *AppConfig) LoadServices(ctx context.Context) (*AppServices, error) {
 	defer txn.End()
 
 	// Load BUX
-	if err = _services.loadBux(ctx, a); err != nil {
+	if err = _services.loadBux(ctx, a, false); err != nil {
 		return nil, err
 	}
 
@@ -69,7 +69,7 @@ func (a *AppConfig) LoadTestServices(ctx context.Context) (*AppServices, error) 
 	defer txn.End()
 
 	// Load bux for testing
-	if err = _services.loadTestBux(ctx, a); err != nil {
+	if err = _services.loadBux(ctx, a, true); err != nil {
 		return nil, err
 	}
 
@@ -123,7 +123,7 @@ func (s *AppServices) CloseAll(ctx context.Context) {
 }
 
 // loadBux will load the bux client (including CacheStore and DataStore)
-func (s *AppServices) loadBux(ctx context.Context, appConfig *AppConfig) (err error) {
+func (s *AppServices) loadBux(ctx context.Context, appConfig *AppConfig, testMode bool) (err error) {
 	var options []bux.ClientOps
 
 	// Set new relic if enabled
@@ -166,6 +166,18 @@ func (s *AppServices) loadBux(ctx context.Context, appConfig *AppConfig) (err er
 		}))
 	} else if appConfig.Cachestore.Engine == cachestore.FreeCache {
 		options = append(options, bux.WithFreeCache())
+	}
+
+	// Set the datastore options
+	if testMode {
+		// Set the unique table prefix
+		if appConfig.SQLite.TablePrefix, err = utils.RandomHex(8); err != nil {
+			return err
+		}
+
+		// Defaults for safe thread testing
+		appConfig.SQLite.MaxIdleConnections = 1
+		appConfig.SQLite.MaxOpenConnections = 1
 	}
 
 	// Set the datastore
@@ -229,83 +241,6 @@ func (s *AppServices) loadBux(ctx context.Context, appConfig *AppConfig) (err er
 	}
 
 	// Create the new client
-	s.Bux, err = bux.NewClient(ctx, options...)
-
-	return
-}
-
-// loadTestBux will create a bux for testing purposes
-func (s *AppServices) loadTestBux(ctx context.Context, appConfig *AppConfig) (err error) {
-	var options []bux.ClientOps
-
-	// New relic
-	if appConfig.NewRelic.Enabled {
-		options = append(options, bux.WithNewRelic(s.NewRelic))
-	}
-
-	// Set if the feature is disabled
-	if appConfig.DisableITC {
-		options = append(options, bux.WithITCDisabled())
-	}
-
-	// Custom user agent
-	options = append(options, bux.WithUserAgent(appConfig.GetUserAgent()))
-
-	// Use in-memory caching
-	options = append(options, bux.WithFreeCache())
-
-	// Use in-memory TaskQ
-	// todo: read from JSON in buxServer config
-	options = append(options, bux.WithTaskQ(
-		// todo: use a custom queue name from the test or the appConfig?
-		taskmanager.DefaultTaskQConfig(appConfig.Datastore.TablePrefix+"_queue"),
-		taskmanager.FactoryMemory,
-	))
-
-	// Turn on debugging
-	if appConfig.Debug {
-		options = append(options, bux.WithDebugging())
-	}
-
-	// Set the unique table prefix
-	if appConfig.SQLite.TablePrefix, err = utils.RandomHex(8); err != nil {
-		return err
-	}
-
-	// Defaults for safe thread testing
-	appConfig.SQLite.MaxIdleConnections = 1
-	appConfig.SQLite.MaxOpenConnections = 1
-
-	// Set the datastore
-	if options, err = loadDatastore(options, appConfig); err != nil {
-		return err
-	}
-
-	// Load the notifications
-	if appConfig.Notifications != nil && appConfig.Notifications.Enabled {
-		options = append(options, bux.WithNotifications(appConfig.Notifications.WebhookEndpoint))
-	}
-
-	// Load the monitor
-	if appConfig.Monitor != nil && appConfig.Monitor.Enabled {
-		if appConfig.Monitor.BuxAgentURL == "" {
-			return errors.New("BUX Agent URL is required for monitoring")
-		}
-		options = append(options, bux.WithMonitoring(ctx, &chainstate.MonitorOptions{
-			AuthToken:                   appConfig.Monitor.AuthToken,
-			BuxAgentURL:                 appConfig.Monitor.BuxAgentURL,
-			Debug:                       appConfig.Monitor.Debug,
-			FalsePositiveRate:           appConfig.Monitor.FalsePositiveRate,
-			LoadMonitoredDestinations:   appConfig.Monitor.LoadMonitoredDestinations,
-			MaxNumberOfDestinations:     appConfig.Monitor.MaxNumberOfDestinations,
-			MonitorDays:                 appConfig.Monitor.MonitorDays,
-			ProcessMempoolOnConnect:     appConfig.Monitor.ProcessMempoolOnConnect,
-			ProcessorType:               appConfig.Monitor.ProcessorType,
-			SaveTransactionDestinations: appConfig.Monitor.SaveTransactionDestinations,
-		}))
-	}
-
-	// Create the client
 	s.Bux, err = bux.NewClient(ctx, options...)
 
 	return
