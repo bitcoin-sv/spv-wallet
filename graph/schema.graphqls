@@ -74,12 +74,15 @@ type Transaction {
 }
 
 type PaymailAddress {
-    id:                String
-    alias:             String
-    domain:            String
-    public_name:       String
-    avatar:            String
-    external_xpub_key: String
+    id:          String
+    xpub_id:     String
+    alias:       String
+    domain:      String
+    public_name: String
+    avatar:      String
+    created_at:  Time
+    updated_at:  Time
+    deleted_at:  NullTime
 }
 
 type PaymailP4 {
@@ -219,6 +222,10 @@ type Query {
         conditions: Map,
         params: QueryParams
     ): [AccessKey]
+    access_keys_count(
+        metadata: Metadata
+        conditions: Map,
+    ): Int64
     transaction(
         id: String!
     ): Transaction
@@ -227,6 +234,10 @@ type Query {
         conditions: Map,
         params: QueryParams
     ): [Transaction]
+    transactions_count(
+        metadata: Metadata
+        conditions: Map,
+    ): Int64
     destination(
         id: String
         address: String
@@ -237,6 +248,10 @@ type Query {
         conditions: Map,
         params: QueryParams
     ): [Destination]
+    destinations_count(
+        metadata: Metadata
+        conditions: Map,
+    ): Int64
 }
 
 type Mutation {

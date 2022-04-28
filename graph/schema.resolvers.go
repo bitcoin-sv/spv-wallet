@@ -320,6 +320,21 @@ func (r *queryResolver) AccessKeys(ctx context.Context, metadata bux.Metadata, c
 	return bux.DisplayModels(accessKeys).([]*bux.AccessKey), nil
 }
 
+func (r *queryResolver) AccessKeysCount(ctx context.Context, metadata bux.Metadata, conditions map[string]interface{}) (*int64, error) {
+	c, err := GetConfigFromContext(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	var count int64
+	count, err = c.Services.Bux.GetAccessKeysCount(ctx, c.XPubID, &metadata, ConditionsParseGraphQL(conditions))
+	if err != nil {
+		return nil, err
+	}
+
+	return &count, nil
+}
+
 func (r *queryResolver) Transaction(ctx context.Context, id string) (*bux.Transaction, error) {
 	c, err := GetConfigFromContext(ctx)
 	if err != nil {
@@ -351,6 +366,21 @@ func (r *queryResolver) Transactions(ctx context.Context, metadata bux.Metadata,
 	}
 
 	return bux.DisplayModels(tx).([]*bux.Transaction), nil
+}
+
+func (r *queryResolver) TransactionsCount(ctx context.Context, metadata bux.Metadata, conditions map[string]interface{}) (*int64, error) {
+	c, err := GetConfigFromContext(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	var count int64
+	count, err = c.Services.Bux.GetTransactionsCount(ctx, c.XPubID, &metadata, ConditionsParseGraphQL(conditions))
+	if err != nil {
+		return nil, err
+	}
+
+	return &count, nil
 }
 
 func (r *queryResolver) Destination(ctx context.Context, id *string, address *string, lockingScript *string) (*bux.Destination, error) {
@@ -389,6 +419,21 @@ func (r *queryResolver) Destinations(ctx context.Context, metadata bux.Metadata,
 	}
 
 	return bux.DisplayModels(destinations).([]*bux.Destination), nil
+}
+
+func (r *queryResolver) DestinationsCount(ctx context.Context, metadata bux.Metadata, conditions map[string]interface{}) (*int64, error) {
+	c, err := GetConfigFromContext(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	var count int64
+	count, err = c.Services.Bux.GetDestinationsCount(ctx, c.XPubID, &metadata, ConditionsParseGraphQL(conditions))
+	if err != nil {
+		return nil, err
+	}
+
+	return &count, nil
 }
 
 // Mutation returns generated.MutationResolver implementation.

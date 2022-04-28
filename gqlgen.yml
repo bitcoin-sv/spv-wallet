@@ -45,6 +45,8 @@ resolver:
 models:
   AccessKey:
     model: github.com/BuxOrg/bux.AccessKey
+  AdminStats:
+    model: github.com/BuxOrg/bux.AdminStats
   ChangeStrategy:
     model: github.com/BuxOrg/bux.ChangeStrategy
   Destination:
