@@ -4,7 +4,7 @@ go 1.17
 
 require (
 	github.com/99designs/gqlgen v0.17.4
-	github.com/BuxOrg/bux v0.2.16
+	github.com/BuxOrg/bux v0.2.17
 	github.com/go-ozzo/ozzo-validation v3.6.0+incompatible
 	github.com/go-redis/redis/v8 v8.11.5
 	github.com/gofrs/uuid v4.2.0+incompatible
@@ -69,7 +69,7 @@ require (
 	github.com/klauspost/compress v1.15.2 // indirect
 	github.com/korovkin/limiter v0.0.0-20220422174850-01f593e64cf7 // indirect
 	github.com/kr/text v0.2.0 // indirect
-	github.com/libsv/go-bc v0.1.10 // indirect
+	github.com/libsv/go-bc v0.1.11 // indirect
 	github.com/libsv/go-bk v0.1.6 // indirect
 	github.com/libsv/go-bt v1.0.6 // indirect
 	github.com/libsv/go-bt/v2 v2.1.0-beta.2.0.20211221142324-0d686850c5e0 // indirect
@@ -89,7 +89,7 @@ require (
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
 	github.com/robfig/cron/v3 v3.0.1 // indirect
-	github.com/segmentio/asm v1.1.4 // indirect
+	github.com/segmentio/asm v1.1.5 // indirect
 	github.com/segmentio/encoding v0.3.5 // indirect
 	github.com/spf13/afero v1.8.2 // indirect
 	github.com/spf13/cast v1.4.1 // indirect
@@ -113,7 +113,7 @@ require (
 	github.com/xdg-go/stringprep v1.0.3 // indirect
 	github.com/youmark/pkcs8 v0.0.0-20201027041543-1326539a0a0a // indirect
 	go.mongodb.org/mongo-driver v1.9.0 // indirect
-	golang.org/x/crypto v0.0.0-20220411220226-7b82a4e95df4 // indirect
+	golang.org/x/crypto v0.0.0-20220427172511-eb4f295cb31f // indirect
 	golang.org/x/mod v0.6.0-dev.0.20220106191415-9b9b3d81d5e3 // indirect
 	golang.org/x/net v0.0.0-20220425223048-2871e0cb64e4 // indirect
 	golang.org/x/sync v0.0.0-20210220032951-036812b2e83c // indirect
