@@ -312,7 +312,7 @@ func (r *queryResolver) AccessKeys(ctx context.Context, metadata bux.Metadata, c
 	}
 
 	var accessKeys []*bux.AccessKey
-	accessKeys, err = c.Services.Bux.GetAccessKeys(ctx, c.XPubID, &metadata, ConditionsParseGraphQL(conditions), params)
+	accessKeys, err = c.Services.Bux.GetAccessKeysByXPubID(ctx, c.XPubID, &metadata, ConditionsParseGraphQL(conditions), params)
 	if err != nil {
 		return nil, err
 	}
@@ -327,7 +327,7 @@ func (r *queryResolver) AccessKeysCount(ctx context.Context, metadata bux.Metada
 	}
 
 	var count int64
-	count, err = c.Services.Bux.GetAccessKeysCount(ctx, c.XPubID, &metadata, ConditionsParseGraphQL(conditions))
+	count, err = c.Services.Bux.GetAccessKeysByXPubIDCount(ctx, c.XPubID, &metadata, ConditionsParseGraphQL(conditions))
 	if err != nil {
 		return nil, err
 	}
@@ -360,7 +360,7 @@ func (r *queryResolver) Transactions(ctx context.Context, metadata bux.Metadata,
 	}
 
 	var tx []*bux.Transaction
-	tx, err = c.Services.Bux.GetTransactions(ctx, c.XPubID, &metadata, ConditionsParseGraphQL(conditions), params)
+	tx, err = c.Services.Bux.GetTransactionsByXpubID(ctx, c.XPubID, &metadata, ConditionsParseGraphQL(conditions), params)
 	if err != nil {
 		return nil, err
 	}
@@ -375,7 +375,7 @@ func (r *queryResolver) TransactionsCount(ctx context.Context, metadata bux.Meta
 	}
 
 	var count int64
-	count, err = c.Services.Bux.GetTransactionsCount(ctx, c.XPubID, &metadata, ConditionsParseGraphQL(conditions))
+	count, err = c.Services.Bux.GetTransactionsByXpubIDCount(ctx, c.XPubID, &metadata, ConditionsParseGraphQL(conditions))
 	if err != nil {
 		return nil, err
 	}
@@ -413,7 +413,7 @@ func (r *queryResolver) Destinations(ctx context.Context, metadata bux.Metadata,
 	}
 
 	var destinations []*bux.Destination
-	destinations, err = c.Services.Bux.GetDestinations(ctx, c.XPubID, &metadata, ConditionsParseGraphQL(conditions), params)
+	destinations, err = c.Services.Bux.GetDestinationsByXpubID(ctx, c.XPubID, &metadata, ConditionsParseGraphQL(conditions), params)
 	if err != nil {
 		return nil, err
 	}
@@ -428,7 +428,7 @@ func (r *queryResolver) DestinationsCount(ctx context.Context, metadata bux.Meta
 	}
 
 	var count int64
-	count, err = c.Services.Bux.GetDestinationsCount(ctx, c.XPubID, &metadata, ConditionsParseGraphQL(conditions))
+	count, err = c.Services.Bux.GetDestinationsByXpubIDCount(ctx, c.XPubID, &metadata, ConditionsParseGraphQL(conditions))
 	if err != nil {
 		return nil, err
 	}

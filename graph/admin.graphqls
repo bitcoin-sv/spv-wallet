@@ -9,27 +9,81 @@ type AdminStats {
 extend type Query {
     admin_get_status: Boolean
     admin_get_stats: AdminStats
+    admin_access_keys_list (
+        metadata: Metadata
+        conditions: Map
+        params: QueryParams
+    ): [AccessKey]
+    admin_access_keys_count (
+        metadata: Metadata
+        conditions: Map
+    ): Int64
+    admin_block_headers_list (
+        metadata: Metadata
+        conditions: Map
+        params: QueryParams
+    ): [BlockHeader]
+    admin_block_headers_count (
+        metadata: Metadata
+        conditions: Map
+    ): Int64
+    admin_destinations_list (
+        metadata: Metadata
+        conditions: Map
+        params: QueryParams
+    ): [Destination]
+    admin_destinations_count (
+        metadata: Metadata
+        conditions: Map
+    ): Int64
+    admin_draft_transactions_list (
+        metadata: Metadata
+        conditions: Map
+        params: QueryParams
+    ): [DraftTransaction]
+    admin_draft_transactions_count (
+        metadata: Metadata
+        conditions: Map
+    ): Int64
     admin_paymail_get (
         address: String!
     ): PaymailAddress
-    admin_paymail_list (
+    admin_paymail_get_by_xpub_id (
+        xpub_id: String!
+    ): [PaymailAddress]
+    admin_paymails_list (
         metadata: Metadata
         conditions: Map
         params: QueryParams
     ): [PaymailAddress]
-    admin_paymail_count (
+    admin_paymails_count (
         metadata: Metadata
         conditions: Map
     ): Int64
-    admin_paymail_get_by_xpub_id (
-        xpub_id: String!
-    ): [PaymailAddress]
-    admin_xpub_list (
+    admin_transactions_list (
+        metadata: Metadata
+        conditions: Map
+        params: QueryParams
+    ): [Transaction]
+    admin_transactions_count (
+        metadata: Metadata
+        conditions: Map
+    ): Int64
+    admin_utxos_list (
+        metadata: Metadata
+        conditions: Map
+        params: QueryParams
+    ): [Utxo]
+    admin_utxos_count (
+        metadata: Metadata
+        conditions: Map
+    ): Int64
+    admin_xpubs_list (
         metadata: Metadata
         conditions: Map
         params: QueryParams
     ): [Xpub]
-    admin_xpub_count (
+    admin_xpubs_count (
         metadata: Metadata
         conditions: Map
     ): Int64

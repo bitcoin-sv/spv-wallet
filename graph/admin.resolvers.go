@@ -80,6 +80,130 @@ func (r *queryResolver) AdminGetStats(ctx context.Context) (*bux.AdminStats, err
 	panic(fmt.Errorf("not implemented"))
 }
 
+func (r *queryResolver) AdminAccessKeysList(ctx context.Context, metadata bux.Metadata, conditions map[string]interface{}, params *datastore.QueryParams) ([]*bux.AccessKey, error) {
+	// including admin check
+	c, err := GetConfigFromContextAdmin(ctx)
+	if err != nil {
+		return nil, err
+	}
+	var accessKeys []*bux.AccessKey
+	accessKeys, err = c.Services.Bux.GetAccessKeys(ctx, &metadata, &conditions, params)
+	if err != nil {
+		return nil, err
+	}
+
+	return accessKeys, nil
+}
+
+func (r *queryResolver) AdminAccessKeysCount(ctx context.Context, metadata bux.Metadata, conditions map[string]interface{}) (*int64, error) {
+	// including admin check
+	c, err := GetConfigFromContextAdmin(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	var count int64
+	count, err = c.Services.Bux.GetAccessKeysCount(ctx, &metadata, &conditions)
+	if err != nil {
+		return nil, err
+	}
+
+	return &count, nil
+}
+
+func (r *queryResolver) AdminBlockHeadersList(ctx context.Context, metadata bux.Metadata, conditions map[string]interface{}, params *datastore.QueryParams) ([]*bux.BlockHeader, error) {
+	// including admin check
+	c, err := GetConfigFromContextAdmin(ctx)
+	if err != nil {
+		return nil, err
+	}
+	var blockHeaders []*bux.BlockHeader
+	blockHeaders, err = c.Services.Bux.GetBlockHeaders(ctx, &metadata, &conditions, params)
+	if err != nil {
+		return nil, err
+	}
+
+	return blockHeaders, nil
+}
+
+func (r *queryResolver) AdminBlockHeadersCount(ctx context.Context, metadata bux.Metadata, conditions map[string]interface{}) (*int64, error) {
+	// including admin check
+	c, err := GetConfigFromContextAdmin(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	var count int64
+	count, err = c.Services.Bux.GetBlockHeadersCount(ctx, &metadata, &conditions)
+	if err != nil {
+		return nil, err
+	}
+
+	return &count, nil
+}
+
+func (r *queryResolver) AdminDestinationsList(ctx context.Context, metadata bux.Metadata, conditions map[string]interface{}, params *datastore.QueryParams) ([]*bux.Destination, error) {
+	// including admin check
+	c, err := GetConfigFromContextAdmin(ctx)
+	if err != nil {
+		return nil, err
+	}
+	var destinations []*bux.Destination
+	destinations, err = c.Services.Bux.GetDestinations(ctx, &metadata, &conditions, params)
+	if err != nil {
+		return nil, err
+	}
+
+	return destinations, nil
+}
+
+func (r *queryResolver) AdminDestinationsCount(ctx context.Context, metadata bux.Metadata, conditions map[string]interface{}) (*int64, error) {
+	// including admin check
+	c, err := GetConfigFromContextAdmin(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	var count int64
+	count, err = c.Services.Bux.GetDestinationsCount(ctx, &metadata, &conditions)
+	if err != nil {
+		return nil, err
+	}
+
+	return &count, nil
+}
+
+func (r *queryResolver) AdminDraftTransactionsList(ctx context.Context, metadata bux.Metadata, conditions map[string]interface{}, params *datastore.QueryParams) ([]*bux.DraftTransaction, error) {
+	// including admin check
+	c, err := GetConfigFromContextAdmin(ctx)
+	if err != nil {
+		return nil, err
+	}
+	var draftTransactions []*bux.DraftTransaction
+	draftTransactions, err = c.Services.Bux.GetDraftTransactions(ctx, &metadata, &conditions, params)
+	if err != nil {
+		return nil, err
+	}
+
+	return draftTransactions, nil
+}
+
+func (r *queryResolver) AdminDraftTransactionsCount(ctx context.Context, metadata bux.Metadata, conditions map[string]interface{}) (*int64, error) {
+	// including admin check
+	c, err := GetConfigFromContextAdmin(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	var count int64
+	count, err = c.Services.Bux.GetDraftTransactionsCount(ctx, &metadata, &conditions)
+	if err != nil {
+		return nil, err
+	}
+
+	return &count, nil
+}
+
 func (r *queryResolver) AdminPaymailGet(ctx context.Context, address string) (*bux.PaymailAddress, error) {
 	// including admin check
 	c, err := GetConfigFromContextAdmin(ctx)
@@ -98,38 +222,6 @@ func (r *queryResolver) AdminPaymailGet(ctx context.Context, address string) (*b
 	return paymailAddress, nil
 }
 
-func (r *queryResolver) AdminPaymailList(ctx context.Context, metadata bux.Metadata, conditions map[string]interface{}, params *datastore.QueryParams) ([]*bux.PaymailAddress, error) {
-	// including admin check
-	c, err := GetConfigFromContextAdmin(ctx)
-	if err != nil {
-		return nil, err
-	}
-
-	var paymailAddresses []*bux.PaymailAddress
-	paymailAddresses, err = c.Services.Bux.GetPaymailAddresses(ctx, &metadata, &conditions, nil)
-	if err != nil {
-		return nil, err
-	}
-
-	return paymailAddresses, nil
-}
-
-func (r *queryResolver) AdminPaymailCount(ctx context.Context, metadata bux.Metadata, conditions map[string]interface{}) (*int64, error) {
-	// including admin check
-	c, err := GetConfigFromContextAdmin(ctx)
-	if err != nil {
-		return nil, err
-	}
-
-	var count int64
-	count, err = c.Services.Bux.GetPaymailAddressesCount(ctx, &metadata, &conditions)
-	if err != nil {
-		return nil, err
-	}
-
-	return &count, nil
-}
-
 func (r *queryResolver) AdminPaymailGetByXpubID(ctx context.Context, xpubID string) ([]*bux.PaymailAddress, error) {
 	// including admin check
 	c, err := GetConfigFromContextAdmin(ctx)
@@ -146,23 +238,116 @@ func (r *queryResolver) AdminPaymailGetByXpubID(ctx context.Context, xpubID stri
 	return paymailAddresses, nil
 }
 
-func (r *queryResolver) AdminXpubList(ctx context.Context, metadata bux.Metadata, conditions map[string]interface{}, params *datastore.QueryParams) ([]*bux.Xpub, error) {
+func (r *queryResolver) AdminPaymailsList(ctx context.Context, metadata bux.Metadata, conditions map[string]interface{}, params *datastore.QueryParams) ([]*bux.PaymailAddress, error) {
 	// including admin check
 	c, err := GetConfigFromContextAdmin(ctx)
 	if err != nil {
 		return nil, err
 	}
 
-	var xPubs []*bux.Xpub
-	xPubs, err = c.Services.Bux.GetXPubs(ctx, &metadata, &conditions, params)
+	var paymailAddresses []*bux.PaymailAddress
+	paymailAddresses, err = c.Services.Bux.GetPaymailAddresses(ctx, &metadata, &conditions, nil)
 	if err != nil {
 		return nil, err
 	}
 
-	return xPubs, nil
+	return paymailAddresses, nil
 }
 
-func (r *queryResolver) AdminXpubCount(ctx context.Context, metadata bux.Metadata, conditions map[string]interface{}) (*int64, error) {
+func (r *queryResolver) AdminPaymailsCount(ctx context.Context, metadata bux.Metadata, conditions map[string]interface{}) (*int64, error) {
+	// including admin check
+	c, err := GetConfigFromContextAdmin(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	var count int64
+	count, err = c.Services.Bux.GetPaymailAddressesCount(ctx, &metadata, &conditions)
+	if err != nil {
+		return nil, err
+	}
+
+	return &count, nil
+}
+
+func (r *queryResolver) AdminTransactionsList(ctx context.Context, metadata bux.Metadata, conditions map[string]interface{}, params *datastore.QueryParams) ([]*bux.Transaction, error) {
+	// including admin check
+	c, err := GetConfigFromContextAdmin(ctx)
+	if err != nil {
+		return nil, err
+	}
+	var transactions []*bux.Transaction
+	transactions, err = c.Services.Bux.GetTransactions(ctx, &metadata, &conditions, params)
+	if err != nil {
+		return nil, err
+	}
+
+	return transactions, nil
+}
+
+func (r *queryResolver) AdminTransactionsCount(ctx context.Context, metadata bux.Metadata, conditions map[string]interface{}) (*int64, error) {
+	// including admin check
+	c, err := GetConfigFromContextAdmin(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	var count int64
+	count, err = c.Services.Bux.GetTransactionsCount(ctx, &metadata, &conditions)
+	if err != nil {
+		return nil, err
+	}
+
+	return &count, nil
+}
+
+func (r *queryResolver) AdminUtxosList(ctx context.Context, metadata bux.Metadata, conditions map[string]interface{}, params *datastore.QueryParams) ([]*bux.Utxo, error) {
+	// including admin check
+	c, err := GetConfigFromContextAdmin(ctx)
+	if err != nil {
+		return nil, err
+	}
+	var utxos []*bux.Utxo
+	utxos, err = c.Services.Bux.GetUtxos(ctx, &metadata, &conditions, params)
+	if err != nil {
+		return nil, err
+	}
+
+	return utxos, nil
+}
+
+func (r *queryResolver) AdminUtxosCount(ctx context.Context, metadata bux.Metadata, conditions map[string]interface{}) (*int64, error) {
+	// including admin check
+	c, err := GetConfigFromContextAdmin(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	var count int64
+	count, err = c.Services.Bux.GetUtxosCount(ctx, &metadata, &conditions)
+	if err != nil {
+		return nil, err
+	}
+
+	return &count, nil
+}
+
+func (r *queryResolver) AdminXpubsList(ctx context.Context, metadata bux.Metadata, conditions map[string]interface{}, params *datastore.QueryParams) ([]*bux.Xpub, error) {
+	// including admin check
+	c, err := GetConfigFromContextAdmin(ctx)
+	if err != nil {
+		return nil, err
+	}
+	var xpubs []*bux.Xpub
+	xpubs, err = c.Services.Bux.GetXPubs(ctx, &metadata, &conditions, params)
+	if err != nil {
+		return nil, err
+	}
+
+	return xpubs, nil
+}
+
+func (r *queryResolver) AdminXpubsCount(ctx context.Context, metadata bux.Metadata, conditions map[string]interface{}) (*int64, error) {
 	// including admin check
 	c, err := GetConfigFromContextAdmin(ctx)
 	if err != nil {

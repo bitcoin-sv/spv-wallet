@@ -47,6 +47,8 @@ models:
     model: github.com/BuxOrg/bux.AccessKey
   AdminStats:
     model: github.com/BuxOrg/bux.AdminStats
+  BlockHeader:
+    model: github.com/BuxOrg/bux.BlockHeader
   ChangeStrategy:
     model: github.com/BuxOrg/bux.ChangeStrategy
   Destination:
