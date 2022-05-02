@@ -39,7 +39,6 @@ type Config struct {
 }
 
 type ResolverRoot interface {
-	AdminStats() AdminStatsResolver
 	Mutation() MutationResolver
 	Query() QueryResolver
 }
@@ -60,7 +59,14 @@ type ComplexityRoot struct {
 	}
 
 	AdminStats struct {
-		ID func(childComplexity int) int
+		Balance            func(childComplexity int) int
+		Destinations       func(childComplexity int) int
+		Paymails           func(childComplexity int) int
+		Transactions       func(childComplexity int) int
+		TransactionsPerDay func(childComplexity int) int
+		Utxos              func(childComplexity int) int
+		UtxosPerType       func(childComplexity int) int
+		XPubs              func(childComplexity int) int
 	}
 
 	BlockHeader struct {
@@ -280,9 +286,6 @@ type ComplexityRoot struct {
 	}
 }
 
-type AdminStatsResolver interface {
-	ID(ctx context.Context, obj *bux.AdminStats) (*string, error)
-}
 type MutationResolver interface {
 	Xpub(ctx context.Context, xpub string, metadata bux.Metadata) (*bux.Xpub, error)
 	XpubMetadata(ctx context.Context, metadata bux.Metadata) (*bux.Xpub, error)
@@ -400,12 +403,61 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.AccessKey.XpubID(childComplexity), true
 
-	case "AdminStats.id":
-		if e.complexity.AdminStats.ID == nil {
+	case "AdminStats.balance":
+		if e.complexity.AdminStats.Balance == nil {
 			break
 		}
 
-		return e.complexity.AdminStats.ID(childComplexity), true
+		return e.complexity.AdminStats.Balance(childComplexity), true
+
+	case "AdminStats.destinations":
+		if e.complexity.AdminStats.Destinations == nil {
+			break
+		}
+
+		return e.complexity.AdminStats.Destinations(childComplexity), true
+
+	case "AdminStats.paymails":
+		if e.complexity.AdminStats.Paymails == nil {
+			break
+		}
+
+		return e.complexity.AdminStats.Paymails(childComplexity), true
+
+	case "AdminStats.transactions":
+		if e.complexity.AdminStats.Transactions == nil {
+			break
+		}
+
+		return e.complexity.AdminStats.Transactions(childComplexity), true
+
+	case "AdminStats.transactions_per_day":
+		if e.complexity.AdminStats.TransactionsPerDay == nil {
+			break
+		}
+
+		return e.complexity.AdminStats.TransactionsPerDay(childComplexity), true
+
+	case "AdminStats.utxos":
+		if e.complexity.AdminStats.Utxos == nil {
+			break
+		}
+
+		return e.complexity.AdminStats.Utxos(childComplexity), true
+
+	case "AdminStats.utxos_per_type":
+		if e.complexity.AdminStats.UtxosPerType == nil {
+			break
+		}
+
+		return e.complexity.AdminStats.UtxosPerType(childComplexity), true
+
+	case "AdminStats.xpubs":
+		if e.complexity.AdminStats.XPubs == nil {
+			break
+		}
+
+		return e.complexity.AdminStats.XPubs(childComplexity), true
 
 	case "BlockHeader.bits":
 		if e.complexity.BlockHeader.Bits == nil {
@@ -1821,7 +1873,14 @@ var sources = []*ast.Source{
 # https://gqlgen.com/getting-started/
 
 type AdminStats {
-    id: String
+    balance:              Int64
+    destinations:         Int64
+    transactions:         Int64
+    paymails:             Int64
+    utxos:                Int64
+    xpubs:                Int64
+    transactions_per_day: Map
+    utxos_per_type:       Map
 }
 
 extend type Query {
@@ -3625,8 +3684,8 @@ func (ec *executionContext) fieldContext_AccessKey_revoked_at(ctx context.Contex
 	return fc, nil
 }
 
-func (ec *executionContext) _AdminStats_id(ctx context.Context, field graphql.CollectedField, obj *bux.AdminStats) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_AdminStats_id(ctx, field)
+func (ec *executionContext) _AdminStats_balance(ctx context.Context, field graphql.CollectedField, obj *bux.AdminStats) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_AdminStats_balance(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -3639,7 +3698,7 @@ func (ec *executionContext) _AdminStats_id(ctx context.Context, field graphql.Co
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.AdminStats().ID(rctx, obj)
+		return obj.Balance, nil
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -3648,19 +3707,306 @@ func (ec *executionContext) _AdminStats_id(ctx context.Context, field graphql.Co
 	if resTmp == nil {
 		return graphql.Null
 	}
-	res := resTmp.(*string)
+	res := resTmp.(int64)
 	fc.Result = res
-	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+	return ec.marshalOInt642int64(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_AdminStats_id(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_AdminStats_balance(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "AdminStats",
 		Field:      field,
-		IsMethod:   true,
-		IsResolver: true,
+		IsMethod:   false,
+		IsResolver: false,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type String does not have child fields")
+			return nil, errors.New("field of type Int64 does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _AdminStats_destinations(ctx context.Context, field graphql.CollectedField, obj *bux.AdminStats) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_AdminStats_destinations(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Destinations, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(int64)
+	fc.Result = res
+	return ec.marshalOInt642int64(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_AdminStats_destinations(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "AdminStats",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int64 does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _AdminStats_transactions(ctx context.Context, field graphql.CollectedField, obj *bux.AdminStats) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_AdminStats_transactions(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Transactions, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(int64)
+	fc.Result = res
+	return ec.marshalOInt642int64(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_AdminStats_transactions(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "AdminStats",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int64 does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _AdminStats_paymails(ctx context.Context, field graphql.CollectedField, obj *bux.AdminStats) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_AdminStats_paymails(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Paymails, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(int64)
+	fc.Result = res
+	return ec.marshalOInt642int64(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_AdminStats_paymails(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "AdminStats",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int64 does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _AdminStats_utxos(ctx context.Context, field graphql.CollectedField, obj *bux.AdminStats) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_AdminStats_utxos(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Utxos, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(int64)
+	fc.Result = res
+	return ec.marshalOInt642int64(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_AdminStats_utxos(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "AdminStats",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int64 does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _AdminStats_xpubs(ctx context.Context, field graphql.CollectedField, obj *bux.AdminStats) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_AdminStats_xpubs(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.XPubs, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(int64)
+	fc.Result = res
+	return ec.marshalOInt642int64(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_AdminStats_xpubs(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "AdminStats",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int64 does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _AdminStats_transactions_per_day(ctx context.Context, field graphql.CollectedField, obj *bux.AdminStats) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_AdminStats_transactions_per_day(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.TransactionsPerDay, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(map[string]interface{})
+	fc.Result = res
+	return ec.marshalOMap2map(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_AdminStats_transactions_per_day(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "AdminStats",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Map does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _AdminStats_utxos_per_type(ctx context.Context, field graphql.CollectedField, obj *bux.AdminStats) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_AdminStats_utxos_per_type(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.UtxosPerType, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(map[string]interface{})
+	fc.Result = res
+	return ec.marshalOMap2map(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_AdminStats_utxos_per_type(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "AdminStats",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Map does not have child fields")
 		},
 	}
 	return fc, nil
@@ -7707,8 +8053,22 @@ func (ec *executionContext) fieldContext_Query_admin_get_stats(ctx context.Conte
 		IsResolver: true,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			switch field.Name {
-			case "id":
-				return ec.fieldContext_AdminStats_id(ctx, field)
+			case "balance":
+				return ec.fieldContext_AdminStats_balance(ctx, field)
+			case "destinations":
+				return ec.fieldContext_AdminStats_destinations(ctx, field)
+			case "transactions":
+				return ec.fieldContext_AdminStats_transactions(ctx, field)
+			case "paymails":
+				return ec.fieldContext_AdminStats_paymails(ctx, field)
+			case "utxos":
+				return ec.fieldContext_AdminStats_utxos(ctx, field)
+			case "xpubs":
+				return ec.fieldContext_AdminStats_xpubs(ctx, field)
+			case "transactions_per_day":
+				return ec.fieldContext_AdminStats_transactions_per_day(ctx, field)
+			case "utxos_per_type":
+				return ec.fieldContext_AdminStats_utxos_per_type(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type AdminStats", field.Name)
 		},
@@ -13828,23 +14188,38 @@ func (ec *executionContext) _AdminStats(ctx context.Context, sel ast.SelectionSe
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("AdminStats")
-		case "id":
-			field := field
+		case "balance":
 
-			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
-				defer func() {
-					if r := recover(); r != nil {
-						ec.Error(ctx, ec.Recover(ctx, r))
-					}
-				}()
-				res = ec._AdminStats_id(ctx, field, obj)
-				return res
-			}
+			out.Values[i] = ec._AdminStats_balance(ctx, field, obj)
 
-			out.Concurrently(i, func() graphql.Marshaler {
-				return innerFunc(ctx)
+		case "destinations":
 
-			})
+			out.Values[i] = ec._AdminStats_destinations(ctx, field, obj)
+
+		case "transactions":
+
+			out.Values[i] = ec._AdminStats_transactions(ctx, field, obj)
+
+		case "paymails":
+
+			out.Values[i] = ec._AdminStats_paymails(ctx, field, obj)
+
+		case "utxos":
+
+			out.Values[i] = ec._AdminStats_utxos(ctx, field, obj)
+
+		case "xpubs":
+
+			out.Values[i] = ec._AdminStats_xpubs(ctx, field, obj)
+
+		case "transactions_per_day":
+
+			out.Values[i] = ec._AdminStats_transactions_per_day(ctx, field, obj)
+
+		case "utxos_per_type":
+
+			out.Values[i] = ec._AdminStats_utxos_per_type(ctx, field, obj)
+
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}

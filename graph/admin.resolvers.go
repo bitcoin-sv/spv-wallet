@@ -5,16 +5,10 @@ package graph
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/BuxOrg/bux"
-	"github.com/BuxOrg/bux-server/graph/generated"
 	"github.com/BuxOrg/bux/datastore"
 )
-
-func (r *adminStatsResolver) ID(ctx context.Context, obj *bux.AdminStats) (*string, error) {
-	panic(fmt.Errorf("not implemented"))
-}
 
 func (r *mutationResolver) AdminPaymailCreate(ctx context.Context, xpub string, address string, publicName *string, avatar *string, metadata bux.Metadata) (*bux.PaymailAddress, error) {
 	// including admin check
@@ -84,7 +78,7 @@ func (r *queryResolver) AdminGetStats(ctx context.Context) (*bux.AdminStats, err
 	}
 
 	var accessKeys *bux.AdminStats
-	accessKeys, err = c.Services.Bux.GetStats(ctx, nil)
+	accessKeys, err = c.Services.Bux.GetStats(ctx, c.Services.Bux.DefaultModelOptions()...)
 	if err != nil {
 		return nil, err
 	}
@@ -374,8 +368,3 @@ func (r *queryResolver) AdminXpubsCount(ctx context.Context, metadata bux.Metada
 
 	return &count, nil
 }
-
-// AdminStats returns generated.AdminStatsResolver implementation.
-func (r *Resolver) AdminStats() generated.AdminStatsResolver { return &adminStatsResolver{r} }
-
-type adminStatsResolver struct{ *Resolver }

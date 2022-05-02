@@ -3,7 +3,14 @@
 # https://gqlgen.com/getting-started/
 
 type AdminStats {
-    id: String
+    balance:              Int64
+    destinations:         Int64
+    transactions:         Int64
+    paymails:             Int64
+    utxos:                Int64
+    xpubs:                Int64
+    transactions_per_day: Map
+    utxos_per_type:       Map
 }
 
 extend type Query {
