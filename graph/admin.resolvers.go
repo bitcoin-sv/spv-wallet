@@ -77,7 +77,19 @@ func (r *queryResolver) AdminGetStatus(ctx context.Context) (*bool, error) {
 }
 
 func (r *queryResolver) AdminGetStats(ctx context.Context) (*bux.AdminStats, error) {
-	panic(fmt.Errorf("not implemented"))
+	// including admin check
+	c, err := GetConfigFromContextAdmin(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	var accessKeys *bux.AdminStats
+	accessKeys, err = c.Services.Bux.GetStats(ctx, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return accessKeys, nil
 }
 
 func (r *queryResolver) AdminAccessKeysList(ctx context.Context, metadata bux.Metadata, conditions map[string]interface{}, params *datastore.QueryParams) ([]*bux.AccessKey, error) {
