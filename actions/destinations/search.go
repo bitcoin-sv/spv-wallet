@@ -24,7 +24,7 @@ func (a *Action) search(w http.ResponseWriter, req *http.Request, _ httprouter.P
 
 	// Record a new transaction (get the hex from parameters)a
 	var destinations []*bux.Destination
-	if destinations, err = a.Services.Bux.GetDestinations(
+	if destinations, err = a.Services.Bux.GetDestinationsByXpubID(
 		req.Context(),
 		reqXPubID,
 		metadata,

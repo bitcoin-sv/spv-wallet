@@ -312,7 +312,7 @@ linters:
     - bodyclose
     - revive
     - unconvert
-    - dupl
+    #- dupl
     - misspell
     - ineffassign
     - dogsled

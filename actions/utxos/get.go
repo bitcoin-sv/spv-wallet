@@ -17,7 +17,7 @@ func (a *Action) get(w http.ResponseWriter, req *http.Request, _ httprouter.Para
 	// Get a utxo using a xPub
 	var err error
 	var utxos []*bux.Utxo
-	if utxos, err = a.Services.Bux.GetUtxos(
+	if utxos, err = a.Services.Bux.GetUtxosByXpubID(
 		req.Context(),
 		utils.Hash(params.GetString("key")),
 		nil,

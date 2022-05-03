@@ -1,12 +1,110 @@
+# GraphQL schema example
+#
+# https://gqlgen.com/getting-started/
+
+type AdminStats {
+    balance:              Int64
+    destinations:         Int64
+    transactions:         Int64
+    paymails:             Int64
+    utxos:                Int64
+    xpubs:                Int64
+    transactions_per_day: Map
+    utxos_per_type:       Map
+}
+
+extend type Query {
+    admin_get_status: Boolean
+    admin_get_stats: AdminStats
+    admin_access_keys_list (
+        metadata: Metadata
+        conditions: Map
+        params: QueryParams
+    ): [AccessKey]
+    admin_access_keys_count (
+        metadata: Metadata
+        conditions: Map
+    ): Int64
+    admin_block_headers_list (
+        metadata: Metadata
+        conditions: Map
+        params: QueryParams
+    ): [BlockHeader]
+    admin_block_headers_count (
+        metadata: Metadata
+        conditions: Map
+    ): Int64
+    admin_destinations_list (
+        metadata: Metadata
+        conditions: Map
+        params: QueryParams
+    ): [Destination]
+    admin_destinations_count (
+        metadata: Metadata
+        conditions: Map
+    ): Int64
+    admin_draft_transactions_list (
+        metadata: Metadata
+        conditions: Map
+        params: QueryParams
+    ): [DraftTransaction]
+    admin_draft_transactions_count (
+        metadata: Metadata
+        conditions: Map
+    ): Int64
+    admin_paymail_get (
+        address: String!
+    ): PaymailAddress
+    admin_paymail_get_by_xpub_id (
+        xpub_id: String!
+    ): [PaymailAddress]
+    admin_paymails_list (
+        metadata: Metadata
+        conditions: Map
+        params: QueryParams
+    ): [PaymailAddress]
+    admin_paymails_count (
+        metadata: Metadata
+        conditions: Map
+    ): Int64
+    admin_transactions_list (
+        metadata: Metadata
+        conditions: Map
+        params: QueryParams
+    ): [Transaction]
+    admin_transactions_count (
+        metadata: Metadata
+        conditions: Map
+    ): Int64
+    admin_utxos_list (
+        metadata: Metadata
+        conditions: Map
+        params: QueryParams
+    ): [Utxo]
+    admin_utxos_count (
+        metadata: Metadata
+        conditions: Map
+    ): Int64
+    admin_xpubs_list (
+        metadata: Metadata
+        conditions: Map
+        params: QueryParams
+    ): [Xpub]
+    admin_xpubs_count (
+        metadata: Metadata
+        conditions: Map
+    ): Int64
+}
 
 extend type Mutation {
-    paymail_create(
+    admin_paymail_create (
+        xpub: String!
         address: String!
         public_name: String
         avatar: String
         metadata: Metadata
     ): PaymailAddress
-    paymail_delete(
+    admin_paymail_delete (
         address: String!
     ): Boolean!
 }

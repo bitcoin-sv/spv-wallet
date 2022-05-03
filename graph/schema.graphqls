@@ -30,21 +30,33 @@ type AccessKey {
     revoked_at: NullTime
 }
 
+type BlockHeader {
+    id:                  String
+    height:              Uint32
+    time:                Uint32
+    nonce:               Uint32
+    version:             Uint32
+    hash_previous_block: String
+    hash_merkle_root:    String
+    bits:                String
+    synced:              NullTime
+    created_at:          Time
+    updated_at:          Time
+    deleted_at:          NullTime
+}
+
 type Xpub {
-    created_at:        Time
-    updated_at:        Time
-    deleted_at:        NullTime
     id:                String
     current_balance:   Uint64
     next_internal_num: Uint32
     next_external_num: Uint32
     metadata:          Metadata
+    created_at:        Time
+    updated_at:        Time
+    deleted_at:        NullTime
 }
 
 type Destination {
-    created_at:     Time
-    updated_at:     Time
-    deleted_at:     NullTime
     id:             String
     xpub_id:        String
     locking_script: String
@@ -54,12 +66,12 @@ type Destination {
     address:        String
     draft_id:       String
     metadata:       Metadata
+    created_at:     Time
+    updated_at:     Time
+    deleted_at:     NullTime
 }
 
 type Transaction {
-    created_at:        Time
-    updated_at:        Time
-    deleted_at:        NullTime
     id:                String
     hex:               String
     block_hash:        String
@@ -71,15 +83,21 @@ type Transaction {
     metadata:          Metadata
     output_value:      Int64
     direction:         TransactionDirection
+    created_at:        Time
+    updated_at:        Time
+    deleted_at:        NullTime
 }
 
 type PaymailAddress {
-    id:                String
-    alias:             String
-    domain:            String
-    public_name:       String
-    avatar:            String
-    external_xpub_key: String
+    id:          String
+    xpub_id:     String
+    alias:       String
+    domain:      String
+    public_name: String
+    avatar:      String
+    created_at:  Time
+    updated_at:  Time
+    deleted_at:  NullTime
 }
 
 type PaymailP4 {
@@ -126,6 +144,9 @@ type Utxo {
     reserved_at:    NullTime
     spending_tx_id: NullString
     metadata:       Metadata
+    created_at:     Time
+    updated_at:     Time
+    deleted_at:     NullTime
 }
 
 type DraftTransaction {
@@ -136,7 +157,9 @@ type DraftTransaction {
     status:        DraftStatus
     hex:           String
     metadata:      Metadata
-
+    created_at:    Time
+    updated_at:    Time
+    deleted_at:    NullTime
 }
 
 type TransactionInput {
@@ -219,6 +242,10 @@ type Query {
         conditions: Map,
         params: QueryParams
     ): [AccessKey]
+    access_keys_count(
+        metadata: Metadata
+        conditions: Map,
+    ): Int64
     transaction(
         id: String!
     ): Transaction
@@ -227,6 +254,10 @@ type Query {
         conditions: Map,
         params: QueryParams
     ): [Transaction]
+    transactions_count(
+        metadata: Metadata
+        conditions: Map,
+    ): Int64
     destination(
         id: String
         address: String
@@ -237,6 +268,10 @@ type Query {
         conditions: Map,
         params: QueryParams
     ): [Destination]
+    destinations_count(
+        metadata: Metadata
+        conditions: Map,
+    ): Int64
 }
 
 type Mutation {

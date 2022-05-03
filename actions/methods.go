@@ -52,11 +52,24 @@ func MethodNotAllowed(w http.ResponseWriter, req *http.Request) {
 
 // GetQueryParameters get all filtering parameters related to the db query
 func GetQueryParameters(params *parameters.Params) (*datastore.QueryParams, *bux.Metadata, *map[string]interface{}, error) {
-	queryParams := &datastore.QueryParams{
-		Page:          params.GetInt("page"),
-		PageSize:      params.GetInt("page_size"),
-		OrderByField:  params.GetString("order_by_field"),
-		SortDirection: params.GetString("sort_direction"),
+	var queryParams *datastore.QueryParams
+	jsonQueryParams, ok := params.GetJSONOk("params")
+	if ok {
+		p, err := json.Marshal(jsonQueryParams)
+		if err != nil {
+			return nil, nil, nil, err
+		}
+		err = json.Unmarshal(p, &queryParams)
+		if err != nil {
+			return nil, nil, nil, err
+		}
+	} else {
+		queryParams = &datastore.QueryParams{
+			Page:          params.GetInt("page"),
+			PageSize:      params.GetInt("page_size"),
+			OrderByField:  params.GetString("order_by_field"),
+			SortDirection: params.GetString("sort_direction"),
+		}
 	}
 
 	metadataReq := params.GetJSON(MetadataField)

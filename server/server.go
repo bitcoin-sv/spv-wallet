@@ -6,6 +6,7 @@ import (
 	"net/http"
 
 	accessKeys "github.com/BuxOrg/bux-server/actions/access_keys"
+	"github.com/BuxOrg/bux-server/actions/admin"
 	"github.com/BuxOrg/bux-server/actions/base"
 	"github.com/BuxOrg/bux-server/actions/destinations"
 	"github.com/BuxOrg/bux-server/actions/graphql"
@@ -104,6 +105,7 @@ func (s *Server) Handlers() *nrhttprouter.Router {
 
 	// Register all handlers (actions / routes)
 	base.RegisterRoutes(s.Router, s.AppConfig, s.Services)
+	admin.RegisterRoutes(s.Router, s.AppConfig, s.Services)
 	accessKeys.RegisterRoutes(s.Router, s.AppConfig, s.Services)
 	destinations.RegisterRoutes(s.Router, s.AppConfig, s.Services)
 	transactions.RegisterRoutes(s.Router, s.AppConfig, s.Services)
