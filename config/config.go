@@ -58,6 +58,7 @@ type (
 		Mongo              *datastore.MongoDBConfig `json:"mongodb" mapstructure:"mongodb"`
 		Monitor            *MonitorOptions          `json:"monitor" mapstructure:"monitor"`
 		NewRelic           *NewRelicConfig          `json:"new_relic" mapstructure:"new_relic"`
+		Notifications      *NotificationsConfig     `json:"notifications" mapstructure:"notifications"`
 		Paymail            *PaymailConfig           `json:"paymail" mapstructure:"paymail"`
 		Redis              *RedisConfig             `json:"redis" mapstructure:"redis"`
 		RequestLogging     bool                     `json:"request_logging" mapstructure:"request_logging"`

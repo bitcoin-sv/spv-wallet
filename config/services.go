@@ -222,15 +222,15 @@ func (s *AppServices) loadBux(ctx context.Context, appConfig *AppConfig, testMod
 	}
 
 	if appConfig.Monitor != nil && appConfig.Monitor.Enabled {
-		if appConfig.Monitor.CentrifugeServer == "" {
+		if appConfig.Monitor.BuxAgentURL == "" {
 			err = errors.New("CentrifugeServer is required for monitoring to work")
 			return
 		}
 		options = append(options, bux.WithMonitoring(ctx, &chainstate.MonitorOptions{
 			Debug:                       appConfig.Monitor.Debug,
-			CentrifugeServer:            appConfig.Monitor.CentrifugeServer,
+			BuxAgentURL:                 appConfig.Monitor.BuxAgentURL,
 			MonitorDays:                 appConfig.Monitor.MonitorDays,
-			Token:                       appConfig.Monitor.Token,
+			AuthToken:                   appConfig.Monitor.AuthToken,
 			FalsePositiveRate:           appConfig.Monitor.FalsePositiveRate,
 			MaxNumberOfDestinations:     appConfig.Monitor.MaxNumberOfDestinations,
 			SaveTransactionDestinations: appConfig.Monitor.SaveTransactionDestinations,
