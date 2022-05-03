@@ -221,22 +221,21 @@ func (s *AppServices) loadBux(ctx context.Context, appConfig *AppConfig, testMod
 		options = append(options, bux.WithNotifications(appConfig.Notifications.WebhookEndpoint))
 	}
 
-	// Load the monitor
 	if appConfig.Monitor != nil && appConfig.Monitor.Enabled {
 		if appConfig.Monitor.BuxAgentURL == "" {
-			return errors.New("BuxAgentURL is required for monitoring")
+			err = errors.New("CentrifugeServer is required for monitoring to work")
+			return
 		}
 		options = append(options, bux.WithMonitoring(ctx, &chainstate.MonitorOptions{
-			AuthToken:                   appConfig.Monitor.AuthToken,
-			BuxAgentURL:                 appConfig.Monitor.BuxAgentURL,
 			Debug:                       appConfig.Monitor.Debug,
-			FalsePositiveRate:           appConfig.Monitor.FalsePositiveRate,
-			LoadMonitoredDestinations:   appConfig.Monitor.LoadMonitoredDestinations,
-			MaxNumberOfDestinations:     appConfig.Monitor.MaxNumberOfDestinations,
+			BuxAgentURL:                 appConfig.Monitor.BuxAgentURL,
 			MonitorDays:                 appConfig.Monitor.MonitorDays,
-			ProcessMempoolOnConnect:     appConfig.Monitor.ProcessMempoolOnConnect,
-			ProcessorType:               appConfig.Monitor.ProcessorType,
+			AuthToken:                   appConfig.Monitor.AuthToken,
+			FalsePositiveRate:           appConfig.Monitor.FalsePositiveRate,
+			MaxNumberOfDestinations:     appConfig.Monitor.MaxNumberOfDestinations,
 			SaveTransactionDestinations: appConfig.Monitor.SaveTransactionDestinations,
+			LoadMonitoredDestinations:   appConfig.Monitor.LoadMonitoredDestinations,
+			ProcessMempoolOnConnect:     appConfig.Monitor.ProcessMempoolOnConnect,
 		}))
 	}
 
