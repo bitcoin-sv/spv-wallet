@@ -4,7 +4,7 @@ go 1.17
 
 require (
 	github.com/99designs/gqlgen v0.17.5
-	github.com/BuxOrg/bux v0.2.19-0.20220503161152-b03a0fa5290b
+	github.com/BuxOrg/bux v0.2.20
 	github.com/go-ozzo/ozzo-validation v3.6.0+incompatible
 	github.com/go-redis/redis/v8 v8.11.5
 	github.com/gofrs/uuid v4.2.0+incompatible
