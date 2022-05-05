@@ -6,6 +6,7 @@ package graph
 import (
 	"context"
 	"errors"
+	"time"
 
 	"github.com/BuxOrg/bux"
 	"github.com/BuxOrg/bux-server/graph/generated"
@@ -436,11 +437,27 @@ func (r *queryResolver) DestinationsCount(ctx context.Context, metadata bux.Meta
 	return &count, nil
 }
 
+func (r *transactionConfigInputResolver) Inputs(ctx context.Context, obj *bux.TransactionConfig, data []map[string]interface{}) error {
+	// do nothing with inputs
+	return nil
+}
+
+func (r *transactionConfigInputResolver) ExpiresIn(ctx context.Context, obj *bux.TransactionConfig, data *uint64) error {
+	obj.ExpiresIn = time.Duration(*data) * time.Second
+	return nil
+}
+
 // Mutation returns generated.MutationResolver implementation.
 func (r *Resolver) Mutation() generated.MutationResolver { return &mutationResolver{r} }
 
 // Query returns generated.QueryResolver implementation.
 func (r *Resolver) Query() generated.QueryResolver { return &queryResolver{r} }
 
+// TransactionConfigInput returns generated.TransactionConfigInputResolver implementation.
+func (r *Resolver) TransactionConfigInput() generated.TransactionConfigInputResolver {
+	return &transactionConfigInputResolver{r}
+}
+
 type mutationResolver struct{ *Resolver }
 type queryResolver struct{ *Resolver }
+type transactionConfigInputResolver struct{ *Resolver }

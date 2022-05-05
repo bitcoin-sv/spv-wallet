@@ -20,6 +20,7 @@ import (
 	"github.com/julienschmidt/httprouter"
 	apirouter "github.com/mrz1836/go-api-router"
 	"github.com/mrz1836/go-logger"
+	"github.com/vektah/gqlparser/v2/gqlerror"
 )
 
 const (
@@ -60,9 +61,18 @@ func RegisterRoutes(router *apirouter.Router, appConfig *config.AppConfig, servi
 				"query":     re.ReplaceAllString(oc.RawQuery, " "),
 				"variables": oc.Variables,
 			}
-			// LogParamsFormat  "request_id=\"%s\" method=\"%s\" path=\"%s\" ip_address=\"%s\" user_agent=\"%s\" params=\"%v\"\n"
+			// LogParamsFormat "request_id=\"%s\" method=\"%s\" path=\"%s\" ip_address=\"%s\" user_agent=\"%s\" params=\"%v\"\n"
 			logger.NoFilePrintf(apirouter.LogParamsFormat, reqInfo.id, reqInfo.method, reqInfo.path, reqInfo.ip, reqInfo.userAgent, params)
 			return next(ctx)
+		})
+		srv.SetErrorPresenter(func(ctx context.Context, err error) *gqlerror.Error {
+			// LogErrorFormat "request_id=\"%s\" ip_address=\"%s\" type=\"%s\" internal_message=\"%s\" code=%d\n"
+			reqInfo := ctx.Value(config.GraphRequestInfo).(requestInfo)
+			logger.NoFilePrintf(apirouter.LogErrorFormat, reqInfo.id, reqInfo.ip, "GraphQL", err.Error(), 500)
+			return &gqlerror.Error{
+				Message: "presented: " + err.Error(),
+				Path:    graphql.GetPath(ctx),
+			}
 		})
 	}
 

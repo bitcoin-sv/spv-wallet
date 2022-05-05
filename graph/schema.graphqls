@@ -191,6 +191,14 @@ type TransactionConfig {
     fee:                           Uint64
     inputs:                        [TransactionInput]
     outputs:                       [TransactionOutput]
+    sync:                          SyncConfig
+}
+
+type SyncConfig {
+    broadcast: Boolean
+    broadcast_instant: Boolean
+    paymail_p2p: Boolean
+    sync_on_chain: Boolean
 }
 
 type ScriptOutput {
@@ -212,10 +220,17 @@ input OpReturnInput {
     map:          OpReturnMapInput
 }
 
+input ScriptOutputInput {
+    address:  String
+    satoshis: Uint64
+    script:   String
+}
+
 input TransactionOutputInput {
     to:        String
-    op_return: OpReturnInput
     satoshis:  Uint64
+    scripts:    [ScriptOutputInput]
+    op_return:  OpReturnInput
 }
 
 input UtxoPointer {
@@ -223,13 +238,48 @@ input UtxoPointer {
     output_index:   Uint32
 }
 
+input DestinationInput {
+    id:             String
+    xpub_id:        String
+    locking_script: String
+    type:           String
+    chain:          Uint32
+    num:            Uint32
+    address:        String
+    draft_id:       String
+    metadata:       Metadata
+    created_at:     Time
+    updated_at:     Time
+    deleted_at:     NullTime
+}
+
+input FeeUnitInput {
+    satoshis: Int
+    bytes:    Int
+}
+
+input SyncConfigInput {
+    broadcast: Boolean
+    broadcast_instant: Boolean
+    paymail_p2p: Boolean
+    sync_on_chain: Boolean
+}
+
 input TransactionConfigInput {
-    outputs:                       [TransactionOutputInput]
-    send_all_to:                   String
-    from_utxos:                    [UtxoPointer]
+    change_satoshis:               Uint64
+    change_destinations:           [DestinationInput]
     change_destinations_strategy:  ChangeStrategy
     change_number_of_destinations: Int
     change_minimum_satoshis:       Uint64
+    include_utxos:                 [UtxoPointer]
+    inputs:                        [Map]
+    expires_in:                    Uint64
+    fee:                           Uint64
+    fee_unit:                      FeeUnitInput
+    from_utxos:                    [UtxoPointer]
+    outputs:                       [TransactionOutputInput]
+    send_all_to:                   TransactionOutputInput
+    sync:                          SyncConfigInput
 }
 
 type Query {
