@@ -41,6 +41,7 @@ type Config struct {
 type ResolverRoot interface {
 	Mutation() MutationResolver
 	Query() QueryResolver
+	TransactionConfigInput() TransactionConfigInputResolver
 }
 
 type DirectiveRoot struct {
@@ -206,6 +207,13 @@ type ComplexityRoot struct {
 		Script   func(childComplexity int) int
 	}
 
+	SyncConfig struct {
+		Broadcast        func(childComplexity int) int
+		BroadcastInstant func(childComplexity int) int
+		PaymailP2P       func(childComplexity int) int
+		SyncOnChain      func(childComplexity int) int
+	}
+
 	Transaction struct {
 		BlockHash       func(childComplexity int) int
 		BlockHeight     func(childComplexity int) int
@@ -233,6 +241,7 @@ type ComplexityRoot struct {
 		FeeUnit                    func(childComplexity int) int
 		Inputs                     func(childComplexity int) int
 		Outputs                    func(childComplexity int) int
+		Sync                       func(childComplexity int) int
 	}
 
 	TransactionInput struct {
@@ -330,6 +339,11 @@ type QueryResolver interface {
 	AdminUtxosCount(ctx context.Context, metadata bux.Metadata, conditions map[string]interface{}) (*int64, error)
 	AdminXpubsList(ctx context.Context, metadata bux.Metadata, conditions map[string]interface{}, params *datastore.QueryParams) ([]*bux.Xpub, error)
 	AdminXpubsCount(ctx context.Context, metadata bux.Metadata, conditions map[string]interface{}) (*int64, error)
+}
+
+type TransactionConfigInputResolver interface {
+	Inputs(ctx context.Context, obj *bux.TransactionConfig, data []map[string]interface{}) error
+	ExpiresIn(ctx context.Context, obj *bux.TransactionConfig, data *uint64) error
 }
 
 type executableSchema struct {
@@ -1377,6 +1391,34 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.ScriptOutput.Script(childComplexity), true
 
+	case "SyncConfig.broadcast":
+		if e.complexity.SyncConfig.Broadcast == nil {
+			break
+		}
+
+		return e.complexity.SyncConfig.Broadcast(childComplexity), true
+
+	case "SyncConfig.broadcast_instant":
+		if e.complexity.SyncConfig.BroadcastInstant == nil {
+			break
+		}
+
+		return e.complexity.SyncConfig.BroadcastInstant(childComplexity), true
+
+	case "SyncConfig.paymail_p2p":
+		if e.complexity.SyncConfig.PaymailP2P == nil {
+			break
+		}
+
+		return e.complexity.SyncConfig.PaymailP2P(childComplexity), true
+
+	case "SyncConfig.sync_on_chain":
+		if e.complexity.SyncConfig.SyncOnChain == nil {
+			break
+		}
+
+		return e.complexity.SyncConfig.SyncOnChain(childComplexity), true
+
 	case "Transaction.block_hash":
 		if e.complexity.Transaction.BlockHash == nil {
 			break
@@ -1537,6 +1579,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.TransactionConfig.Outputs(childComplexity), true
+
+	case "TransactionConfig.sync":
+		if e.complexity.TransactionConfig.Sync == nil {
+			break
+		}
+
+		return e.complexity.TransactionConfig.Sync(childComplexity), true
 
 	case "TransactionInput.destination":
 		if e.complexity.TransactionInput.Destination == nil {
@@ -1812,8 +1861,12 @@ func (e *executableSchema) Exec(ctx context.Context) graphql.ResponseHandler {
 	rc := graphql.GetOperationContext(ctx)
 	ec := executionContext{rc, e}
 	inputUnmarshalMap := graphql.BuildUnmarshalerMap(
+		ec.unmarshalInputDestinationInput,
+		ec.unmarshalInputFeeUnitInput,
 		ec.unmarshalInputOpReturnInput,
 		ec.unmarshalInputOpReturnMapInput,
+		ec.unmarshalInputScriptOutputInput,
+		ec.unmarshalInputSyncConfigInput,
 		ec.unmarshalInputTransactionConfigInput,
 		ec.unmarshalInputTransactionOutputInput,
 		ec.unmarshalInputUtxoPointer,
@@ -2181,6 +2234,14 @@ type TransactionConfig {
     fee:                           Uint64
     inputs:                        [TransactionInput]
     outputs:                       [TransactionOutput]
+    sync:                          SyncConfig
+}
+
+type SyncConfig {
+    broadcast: Boolean
+    broadcast_instant: Boolean
+    paymail_p2p: Boolean
+    sync_on_chain: Boolean
 }
 
 type ScriptOutput {
@@ -2202,10 +2263,17 @@ input OpReturnInput {
     map:          OpReturnMapInput
 }
 
+input ScriptOutputInput {
+    address:  String
+    satoshis: Uint64
+    script:   String
+}
+
 input TransactionOutputInput {
     to:        String
-    op_return: OpReturnInput
     satoshis:  Uint64
+    scripts:    [ScriptOutputInput]
+    op_return:  OpReturnInput
 }
 
 input UtxoPointer {
@@ -2213,13 +2281,48 @@ input UtxoPointer {
     output_index:   Uint32
 }
 
+input DestinationInput {
+    id:             String
+    xpub_id:        String
+    locking_script: String
+    type:           String
+    chain:          Uint32
+    num:            Uint32
+    address:        String
+    draft_id:       String
+    metadata:       Metadata
+    created_at:     Time
+    updated_at:     Time
+    deleted_at:     NullTime
+}
+
+input FeeUnitInput {
+    satoshis: Int
+    bytes:    Int
+}
+
+input SyncConfigInput {
+    broadcast: Boolean
+    broadcast_instant: Boolean
+    paymail_p2p: Boolean
+    sync_on_chain: Boolean
+}
+
 input TransactionConfigInput {
-    outputs:                       [TransactionOutputInput]
-    send_all_to:                   String
-    from_utxos:                    [UtxoPointer]
+    change_satoshis:               Uint64
+    change_destinations:           [DestinationInput]
     change_destinations_strategy:  ChangeStrategy
     change_number_of_destinations: Int
     change_minimum_satoshis:       Uint64
+    include_utxos:                 [UtxoPointer]
+    inputs:                        [Map]
+    expires_in:                    Uint64
+    fee:                           Uint64
+    fee_unit:                      FeeUnitInput
+    from_utxos:                    [UtxoPointer]
+    outputs:                       [TransactionOutputInput]
+    send_all_to:                   TransactionOutputInput
+    sync:                          SyncConfigInput
 }
 
 type Query {
@@ -5182,6 +5285,8 @@ func (ec *executionContext) fieldContext_DraftTransaction_configuration(ctx cont
 				return ec.fieldContext_TransactionConfig_inputs(ctx, field)
 			case "outputs":
 				return ec.fieldContext_TransactionConfig_outputs(ctx, field)
+			case "sync":
+				return ec.fieldContext_TransactionConfig_sync(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type TransactionConfig", field.Name)
 		},
@@ -9503,6 +9608,170 @@ func (ec *executionContext) fieldContext_ScriptOutput_script(ctx context.Context
 	return fc, nil
 }
 
+func (ec *executionContext) _SyncConfig_broadcast(ctx context.Context, field graphql.CollectedField, obj *bux.SyncConfig) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_SyncConfig_broadcast(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Broadcast, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(bool)
+	fc.Result = res
+	return ec.marshalOBoolean2bool(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_SyncConfig_broadcast(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "SyncConfig",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Boolean does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _SyncConfig_broadcast_instant(ctx context.Context, field graphql.CollectedField, obj *bux.SyncConfig) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_SyncConfig_broadcast_instant(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.BroadcastInstant, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(bool)
+	fc.Result = res
+	return ec.marshalOBoolean2bool(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_SyncConfig_broadcast_instant(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "SyncConfig",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Boolean does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _SyncConfig_paymail_p2p(ctx context.Context, field graphql.CollectedField, obj *bux.SyncConfig) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_SyncConfig_paymail_p2p(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.PaymailP2P, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(bool)
+	fc.Result = res
+	return ec.marshalOBoolean2bool(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_SyncConfig_paymail_p2p(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "SyncConfig",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Boolean does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _SyncConfig_sync_on_chain(ctx context.Context, field graphql.CollectedField, obj *bux.SyncConfig) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_SyncConfig_sync_on_chain(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.SyncOnChain, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(bool)
+	fc.Result = res
+	return ec.marshalOBoolean2bool(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_SyncConfig_sync_on_chain(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "SyncConfig",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Boolean does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _Transaction_id(ctx context.Context, field graphql.CollectedField, obj *bux.Transaction) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Transaction_id(ctx, field)
 	if err != nil {
@@ -10509,6 +10778,57 @@ func (ec *executionContext) fieldContext_TransactionConfig_outputs(ctx context.C
 				return ec.fieldContext_TransactionOutput_op_return(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type TransactionOutput", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _TransactionConfig_sync(ctx context.Context, field graphql.CollectedField, obj *bux.TransactionConfig) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_TransactionConfig_sync(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Sync, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*bux.SyncConfig)
+	fc.Result = res
+	return ec.marshalOSyncConfig2ᚖgithubᚗcomᚋBuxOrgᚋbuxᚐSyncConfig(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_TransactionConfig_sync(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "TransactionConfig",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "broadcast":
+				return ec.fieldContext_SyncConfig_broadcast(ctx, field)
+			case "broadcast_instant":
+				return ec.fieldContext_SyncConfig_broadcast_instant(ctx, field)
+			case "paymail_p2p":
+				return ec.fieldContext_SyncConfig_paymail_p2p(ctx, field)
+			case "sync_on_chain":
+				return ec.fieldContext_SyncConfig_sync_on_chain(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type SyncConfig", field.Name)
 		},
 	}
 	return fc, nil
@@ -13907,6 +14227,148 @@ func (ec *executionContext) fieldContext___Type_specifiedByURL(ctx context.Conte
 
 // region    **************************** input.gotpl *****************************
 
+func (ec *executionContext) unmarshalInputDestinationInput(ctx context.Context, obj interface{}) (bux.Destination, error) {
+	var it bux.Destination
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
+
+	for k, v := range asMap {
+		switch k {
+		case "id":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
+			it.ID, err = ec.unmarshalOString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "xpub_id":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("xpub_id"))
+			it.XpubID, err = ec.unmarshalOString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "locking_script":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("locking_script"))
+			it.LockingScript, err = ec.unmarshalOString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "type":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("type"))
+			it.Type, err = ec.unmarshalOString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "chain":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("chain"))
+			it.Chain, err = ec.unmarshalOUint322uint32(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "num":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("num"))
+			it.Num, err = ec.unmarshalOUint322uint32(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "address":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("address"))
+			it.Address, err = ec.unmarshalOString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "draft_id":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("draft_id"))
+			it.DraftID, err = ec.unmarshalOString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "metadata":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("metadata"))
+			it.Metadata, err = ec.unmarshalOMetadata2githubᚗcomᚋBuxOrgᚋbuxᚐMetadata(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "created_at":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("created_at"))
+			it.CreatedAt, err = ec.unmarshalOTime2timeᚐTime(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "updated_at":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("updated_at"))
+			it.UpdatedAt, err = ec.unmarshalOTime2timeᚐTime(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "deleted_at":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("deleted_at"))
+			it.DeletedAt, err = ec.unmarshalONullTime2githubᚗcomᚋBuxOrgᚋbuxᚋutilsᚐNullTime(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		}
+	}
+
+	return it, nil
+}
+
+func (ec *executionContext) unmarshalInputFeeUnitInput(ctx context.Context, obj interface{}) (utils.FeeUnit, error) {
+	var it utils.FeeUnit
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
+
+	for k, v := range asMap {
+		switch k {
+		case "satoshis":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("satoshis"))
+			it.Satoshis, err = ec.unmarshalOInt2int(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "bytes":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("bytes"))
+			it.Bytes, err = ec.unmarshalOInt2int(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		}
+	}
+
+	return it, nil
+}
+
 func (ec *executionContext) unmarshalInputOpReturnInput(ctx context.Context, obj interface{}) (bux.OpReturn, error) {
 	var it bux.OpReturn
 	asMap := map[string]interface{}{}
@@ -13993,6 +14455,92 @@ func (ec *executionContext) unmarshalInputOpReturnMapInput(ctx context.Context, 
 	return it, nil
 }
 
+func (ec *executionContext) unmarshalInputScriptOutputInput(ctx context.Context, obj interface{}) (bux.ScriptOutput, error) {
+	var it bux.ScriptOutput
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
+
+	for k, v := range asMap {
+		switch k {
+		case "address":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("address"))
+			it.Address, err = ec.unmarshalOString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "satoshis":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("satoshis"))
+			it.Satoshis, err = ec.unmarshalOUint642uint64(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "script":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("script"))
+			it.Script, err = ec.unmarshalOString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		}
+	}
+
+	return it, nil
+}
+
+func (ec *executionContext) unmarshalInputSyncConfigInput(ctx context.Context, obj interface{}) (bux.SyncConfig, error) {
+	var it bux.SyncConfig
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
+
+	for k, v := range asMap {
+		switch k {
+		case "broadcast":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("broadcast"))
+			it.Broadcast, err = ec.unmarshalOBoolean2bool(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "broadcast_instant":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("broadcast_instant"))
+			it.BroadcastInstant, err = ec.unmarshalOBoolean2bool(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "paymail_p2p":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("paymail_p2p"))
+			it.PaymailP2P, err = ec.unmarshalOBoolean2bool(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "sync_on_chain":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("sync_on_chain"))
+			it.SyncOnChain, err = ec.unmarshalOBoolean2bool(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		}
+	}
+
+	return it, nil
+}
+
 func (ec *executionContext) unmarshalInputTransactionConfigInput(ctx context.Context, obj interface{}) (bux.TransactionConfig, error) {
 	var it bux.TransactionConfig
 	asMap := map[string]interface{}{}
@@ -14002,27 +14550,19 @@ func (ec *executionContext) unmarshalInputTransactionConfigInput(ctx context.Con
 
 	for k, v := range asMap {
 		switch k {
-		case "outputs":
+		case "change_satoshis":
 			var err error
 
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("outputs"))
-			it.Outputs, err = ec.unmarshalOTransactionOutputInput2ᚕᚖgithubᚗcomᚋBuxOrgᚋbuxᚐTransactionOutput(ctx, v)
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("change_satoshis"))
+			it.ChangeSatoshis, err = ec.unmarshalOUint642uint64(ctx, v)
 			if err != nil {
 				return it, err
 			}
-		case "send_all_to":
+		case "change_destinations":
 			var err error
 
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("send_all_to"))
-			it.SendAllTo, err = ec.unmarshalOString2string(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		case "from_utxos":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("from_utxos"))
-			it.FromUtxos, err = ec.unmarshalOUtxoPointer2ᚕᚖgithubᚗcomᚋBuxOrgᚋbuxᚐUtxoPointer(ctx, v)
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("change_destinations"))
+			it.ChangeDestinations, err = ec.unmarshalODestinationInput2ᚕᚖgithubᚗcomᚋBuxOrgᚋbuxᚐDestination(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -14050,6 +14590,84 @@ func (ec *executionContext) unmarshalInputTransactionConfigInput(ctx context.Con
 			if err != nil {
 				return it, err
 			}
+		case "include_utxos":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("include_utxos"))
+			it.IncludeUtxos, err = ec.unmarshalOUtxoPointer2ᚕᚖgithubᚗcomᚋBuxOrgᚋbuxᚐUtxoPointer(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "inputs":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("inputs"))
+			data, err := ec.unmarshalOMap2ᚕmap(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			if err = ec.resolvers.TransactionConfigInput().Inputs(ctx, &it, data); err != nil {
+				return it, err
+			}
+		case "expires_in":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("expires_in"))
+			data, err := ec.unmarshalOUint642ᚖuint64(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			if err = ec.resolvers.TransactionConfigInput().ExpiresIn(ctx, &it, data); err != nil {
+				return it, err
+			}
+		case "fee":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("fee"))
+			it.Fee, err = ec.unmarshalOUint642uint64(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "fee_unit":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("fee_unit"))
+			it.FeeUnit, err = ec.unmarshalOFeeUnitInput2ᚖgithubᚗcomᚋBuxOrgᚋbuxᚋutilsᚐFeeUnit(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "from_utxos":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("from_utxos"))
+			it.FromUtxos, err = ec.unmarshalOUtxoPointer2ᚕᚖgithubᚗcomᚋBuxOrgᚋbuxᚐUtxoPointer(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "outputs":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("outputs"))
+			it.Outputs, err = ec.unmarshalOTransactionOutputInput2ᚕᚖgithubᚗcomᚋBuxOrgᚋbuxᚐTransactionOutput(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "send_all_to":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("send_all_to"))
+			it.SendAllTo, err = ec.unmarshalOTransactionOutputInput2ᚖgithubᚗcomᚋBuxOrgᚋbuxᚐTransactionOutput(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "sync":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("sync"))
+			it.Sync, err = ec.unmarshalOSyncConfigInput2ᚖgithubᚗcomᚋBuxOrgᚋbuxᚐSyncConfig(ctx, v)
+			if err != nil {
+				return it, err
+			}
 		}
 	}
 
@@ -14073,19 +14691,27 @@ func (ec *executionContext) unmarshalInputTransactionOutputInput(ctx context.Con
 			if err != nil {
 				return it, err
 			}
-		case "op_return":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("op_return"))
-			it.OpReturn, err = ec.unmarshalOOpReturnInput2ᚖgithubᚗcomᚋBuxOrgᚋbuxᚐOpReturn(ctx, v)
-			if err != nil {
-				return it, err
-			}
 		case "satoshis":
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("satoshis"))
 			it.Satoshis, err = ec.unmarshalOUint642uint64(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "scripts":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("scripts"))
+			it.Scripts, err = ec.unmarshalOScriptOutputInput2ᚕᚖgithubᚗcomᚋBuxOrgᚋbuxᚐScriptOutput(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "op_return":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("op_return"))
+			it.OpReturn, err = ec.unmarshalOOpReturnInput2ᚖgithubᚗcomᚋBuxOrgᚋbuxᚐOpReturn(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -15422,6 +16048,43 @@ func (ec *executionContext) _ScriptOutput(ctx context.Context, sel ast.Selection
 	return out
 }
 
+var syncConfigImplementors = []string{"SyncConfig"}
+
+func (ec *executionContext) _SyncConfig(ctx context.Context, sel ast.SelectionSet, obj *bux.SyncConfig) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, syncConfigImplementors)
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("SyncConfig")
+		case "broadcast":
+
+			out.Values[i] = ec._SyncConfig_broadcast(ctx, field, obj)
+
+		case "broadcast_instant":
+
+			out.Values[i] = ec._SyncConfig_broadcast_instant(ctx, field, obj)
+
+		case "paymail_p2p":
+
+			out.Values[i] = ec._SyncConfig_paymail_p2p(ctx, field, obj)
+
+		case "sync_on_chain":
+
+			out.Values[i] = ec._SyncConfig_sync_on_chain(ctx, field, obj)
+
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
 var transactionImplementors = []string{"Transaction"}
 
 func (ec *executionContext) _Transaction(ctx context.Context, sel ast.SelectionSet, obj *bux.Transaction) graphql.Marshaler {
@@ -15544,6 +16207,10 @@ func (ec *executionContext) _TransactionConfig(ctx context.Context, sel ast.Sele
 		case "outputs":
 
 			out.Values[i] = ec._TransactionConfig_outputs(ctx, field, obj)
+
+		case "sync":
+
+			out.Values[i] = ec._TransactionConfig_sync(ctx, field, obj)
 
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
@@ -16611,6 +17278,34 @@ func (ec *executionContext) marshalODestination2ᚖgithubᚗcomᚋBuxOrgᚋbux�
 	return ec._Destination(ctx, sel, v)
 }
 
+func (ec *executionContext) unmarshalODestinationInput2ᚕᚖgithubᚗcomᚋBuxOrgᚋbuxᚐDestination(ctx context.Context, v interface{}) ([]*bux.Destination, error) {
+	if v == nil {
+		return nil, nil
+	}
+	var vSlice []interface{}
+	if v != nil {
+		vSlice = graphql.CoerceList(v)
+	}
+	var err error
+	res := make([]*bux.Destination, len(vSlice))
+	for i := range vSlice {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithIndex(i))
+		res[i], err = ec.unmarshalODestinationInput2ᚖgithubᚗcomᚋBuxOrgᚋbuxᚐDestination(ctx, vSlice[i])
+		if err != nil {
+			return nil, err
+		}
+	}
+	return res, nil
+}
+
+func (ec *executionContext) unmarshalODestinationInput2ᚖgithubᚗcomᚋBuxOrgᚋbuxᚐDestination(ctx context.Context, v interface{}) (*bux.Destination, error) {
+	if v == nil {
+		return nil, nil
+	}
+	res, err := ec.unmarshalInputDestinationInput(ctx, v)
+	return &res, graphql.ErrorOnPath(ctx, err)
+}
+
 func (ec *executionContext) unmarshalODraftStatus2githubᚗcomᚋBuxOrgᚋbuxᚐDraftStatus(ctx context.Context, v interface{}) (bux.DraftStatus, error) {
 	tmp, err := graphql.UnmarshalString(v)
 	res := bux.DraftStatus(tmp)
@@ -16677,6 +17372,14 @@ func (ec *executionContext) marshalOFeeUnit2ᚖgithubᚗcomᚋBuxOrgᚋbuxᚋuti
 	return ec._FeeUnit(ctx, sel, v)
 }
 
+func (ec *executionContext) unmarshalOFeeUnitInput2ᚖgithubᚗcomᚋBuxOrgᚋbuxᚋutilsᚐFeeUnit(ctx context.Context, v interface{}) (*utils.FeeUnit, error) {
+	if v == nil {
+		return nil, nil
+	}
+	res, err := ec.unmarshalInputFeeUnitInput(ctx, v)
+	return &res, graphql.ErrorOnPath(ctx, err)
+}
+
 func (ec *executionContext) unmarshalOInt2int(ctx context.Context, v interface{}) (int, error) {
 	res, err := graphql.UnmarshalInt(v)
 	return res, graphql.ErrorOnPath(ctx, err)
@@ -16727,6 +17430,38 @@ func (ec *executionContext) marshalOMap2map(ctx context.Context, sel ast.Selecti
 	}
 	res := graphql.MarshalMap(v)
 	return res
+}
+
+func (ec *executionContext) unmarshalOMap2ᚕmap(ctx context.Context, v interface{}) ([]map[string]interface{}, error) {
+	if v == nil {
+		return nil, nil
+	}
+	var vSlice []interface{}
+	if v != nil {
+		vSlice = graphql.CoerceList(v)
+	}
+	var err error
+	res := make([]map[string]interface{}, len(vSlice))
+	for i := range vSlice {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithIndex(i))
+		res[i], err = ec.unmarshalOMap2map(ctx, vSlice[i])
+		if err != nil {
+			return nil, err
+		}
+	}
+	return res, nil
+}
+
+func (ec *executionContext) marshalOMap2ᚕmap(ctx context.Context, sel ast.SelectionSet, v []map[string]interface{}) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	ret := make(graphql.Array, len(v))
+	for i := range v {
+		ret[i] = ec.marshalOMap2map(ctx, sel, v[i])
+	}
+
+	return ret
 }
 
 func (ec *executionContext) unmarshalOMetadata2githubᚗcomᚋBuxOrgᚋbuxᚐMetadata(ctx context.Context, v interface{}) (bux.Metadata, error) {
@@ -16914,6 +17649,34 @@ func (ec *executionContext) marshalOScriptOutput2ᚖgithubᚗcomᚋBuxOrgᚋbux�
 	return ec._ScriptOutput(ctx, sel, v)
 }
 
+func (ec *executionContext) unmarshalOScriptOutputInput2ᚕᚖgithubᚗcomᚋBuxOrgᚋbuxᚐScriptOutput(ctx context.Context, v interface{}) ([]*bux.ScriptOutput, error) {
+	if v == nil {
+		return nil, nil
+	}
+	var vSlice []interface{}
+	if v != nil {
+		vSlice = graphql.CoerceList(v)
+	}
+	var err error
+	res := make([]*bux.ScriptOutput, len(vSlice))
+	for i := range vSlice {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithIndex(i))
+		res[i], err = ec.unmarshalOScriptOutputInput2ᚖgithubᚗcomᚋBuxOrgᚋbuxᚐScriptOutput(ctx, vSlice[i])
+		if err != nil {
+			return nil, err
+		}
+	}
+	return res, nil
+}
+
+func (ec *executionContext) unmarshalOScriptOutputInput2ᚖgithubᚗcomᚋBuxOrgᚋbuxᚐScriptOutput(ctx context.Context, v interface{}) (*bux.ScriptOutput, error) {
+	if v == nil {
+		return nil, nil
+	}
+	res, err := ec.unmarshalInputScriptOutputInput(ctx, v)
+	return &res, graphql.ErrorOnPath(ctx, err)
+}
+
 func (ec *executionContext) unmarshalOString2string(ctx context.Context, v interface{}) (string, error) {
 	res, err := graphql.UnmarshalString(v)
 	return res, graphql.ErrorOnPath(ctx, err)
@@ -16970,6 +17733,21 @@ func (ec *executionContext) marshalOString2ᚖstring(ctx context.Context, sel as
 	}
 	res := graphql.MarshalString(*v)
 	return res
+}
+
+func (ec *executionContext) marshalOSyncConfig2ᚖgithubᚗcomᚋBuxOrgᚋbuxᚐSyncConfig(ctx context.Context, sel ast.SelectionSet, v *bux.SyncConfig) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return ec._SyncConfig(ctx, sel, v)
+}
+
+func (ec *executionContext) unmarshalOSyncConfigInput2ᚖgithubᚗcomᚋBuxOrgᚋbuxᚐSyncConfig(ctx context.Context, v interface{}) (*bux.SyncConfig, error) {
+	if v == nil {
+		return nil, nil
+	}
+	res, err := ec.unmarshalInputSyncConfigInput(ctx, v)
+	return &res, graphql.ErrorOnPath(ctx, err)
 }
 
 func (ec *executionContext) unmarshalOTime2timeᚐTime(ctx context.Context, v interface{}) (time.Time, error) {
@@ -17186,6 +17964,22 @@ func (ec *executionContext) unmarshalOUint642uint64(ctx context.Context, v inter
 
 func (ec *executionContext) marshalOUint642uint64(ctx context.Context, sel ast.SelectionSet, v uint64) graphql.Marshaler {
 	res := gqlgen.MarshalUint64(v)
+	return res
+}
+
+func (ec *executionContext) unmarshalOUint642ᚖuint64(ctx context.Context, v interface{}) (*uint64, error) {
+	if v == nil {
+		return nil, nil
+	}
+	res, err := gqlgen.UnmarshalUint64(v)
+	return &res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalOUint642ᚖuint64(ctx context.Context, sel ast.SelectionSet, v *uint64) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	res := gqlgen.MarshalUint64(*v)
 	return res
 }
 

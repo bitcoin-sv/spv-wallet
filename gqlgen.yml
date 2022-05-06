@@ -53,11 +53,15 @@ models:
     model: github.com/BuxOrg/bux.ChangeStrategy
   Destination:
     model: github.com/BuxOrg/bux.Destination
+  DestinationInput:
+    model: github.com/BuxOrg/bux.Destination
   DraftStatus:
     model: github.com/BuxOrg/bux.DraftStatus
   DraftTransaction:
     model: github.com/BuxOrg/bux.DraftTransaction
   FeeUnit:
+    model: github.com/BuxOrg/bux/utils.FeeUnit
+  FeeUnitInput:
     model: github.com/BuxOrg/bux/utils.FeeUnit
   Metadata:
     model: github.com/BuxOrg/bux.Metadata
@@ -75,6 +79,10 @@ models:
     model: github.com/BuxOrg/bux.PaymailP4
   QueryParams:
     model: github.com/BuxOrg/bux/datastore.QueryParams
+  SyncConfig:
+    model: github.com/BuxOrg/bux.SyncConfig
+  SyncConfigInput:
+    model: github.com/BuxOrg/bux.SyncConfig
   Transaction:
     model: github.com/BuxOrg/bux.Transaction
   TransactionConfig:
@@ -84,6 +92,8 @@ models:
   TransactionInput:
     model: github.com/BuxOrg/bux.TransactionInput
   ScriptOutput:
+    model: github.com/BuxOrg/bux.ScriptOutput
+  ScriptOutputInput:
     model: github.com/BuxOrg/bux.ScriptOutput
   Scripts:
     model: github.com/BuxOrg/bux.Scripts
