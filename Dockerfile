@@ -1,5 +1,5 @@
 # Get Golang for builder
-FROM golang:1.18.1 as builder
+FROM golang:1.18.2 as builder
 
 # Set the working directory
 WORKDIR /go/src/github.com/BuxOrg/bux-server
