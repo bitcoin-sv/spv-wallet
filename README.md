@@ -2,18 +2,18 @@
 
 > Get started using [BUX](https://getbux.io) in five minutes
 
-[![Release](https://img.shields.io/github/release-pre/BuxOrg/bux-server.svg?logo=github&style=flat&v=2)](https://github.com/BuxOrg/bux-server/releases)
-[![Build Status](https://img.shields.io/github/workflow/status/BuxOrg/bux-server/run-go-tests?logo=github&v=2)](https://github.com/BuxOrg/bux-server/actions)
-[![Report](https://goreportcard.com/badge/github.com/BuxOrg/bux-server?style=flat&v=2)](https://goreportcard.com/report/github.com/BuxOrg/bux-server)
-[![codecov](https://codecov.io/gh/BuxOrg/bux-server/branch/master/graph/badge.svg?v=2)](https://codecov.io/gh/BuxOrg/bux-server)
-[![Mergify Status](https://img.shields.io/endpoint.svg?url=https://gh.mergify.io/badges/BuxOrg/bux-server&style=flat&v=2)](https://mergify.io)
-[![Go](https://img.shields.io/github/go-mod/go-version/BuxOrg/bux-server?v=2)](https://golang.org/)
+[![Release](https://img.shields.io/github/release-pre/BuxOrg/bux-server.svg?logo=github&style=flat&v=3)](https://github.com/BuxOrg/bux-server/releases)
+[![Build Status](https://img.shields.io/github/workflow/status/BuxOrg/bux-server/run-go-tests?logo=github&v=3)](https://github.com/BuxOrg/bux-server/actions)
+[![Report](https://goreportcard.com/badge/github.com/BuxOrg/bux-server?style=flat&v=3)](https://goreportcard.com/report/github.com/BuxOrg/bux-server)
+[![codecov](https://codecov.io/gh/BuxOrg/bux-server/branch/master/graph/badge.svg?v=3)](https://codecov.io/gh/BuxOrg/bux-server)
+[![Mergify Status](https://img.shields.io/endpoint.svg?url=https://api.mergify.com/v1/badges/BuxOrg/bux-server&style=flat&v=3)](https://mergify.io)
+[![Go](https://img.shields.io/github/go-mod/go-version/BuxOrg/bux-server?v=3)](https://golang.org/)
 <br>
-[![Gitpod Ready-to-Code](https://img.shields.io/badge/Gitpod-ready--to--code-blue?logo=gitpod&v=2)](https://gitpod.io/#https://github.com/BuxOrg/bux-server)
-[![standard-readme compliant](https://img.shields.io/badge/readme%20style-standard-brightgreen.svg?style=flat&v=2)](https://github.com/RichardLitt/standard-readme)
-[![Makefile Included](https://img.shields.io/badge/Makefile-Supported%20-brightgreen?=flat&logo=probot&v=2)](Makefile)
-[![Sponsor](https://img.shields.io/badge/sponsor-mrz1836-181717.svg?logo=github&style=flat&v=2)](https://github.com/sponsors/BuxOrg)
-[![Donate](https://img.shields.io/badge/donate-bitcoin-ff9900.svg?logo=bitcoin&style=flat&v=2)](https://gobitcoinsv.com/#sponsor?utm_source=github&utm_medium=sponsor-link&utm_campaign=bux-server&utm_term=bux-server&utm_content=bux-server)
+[![Gitpod Ready-to-Code](https://img.shields.io/badge/Gitpod-ready--to--code-blue?logo=gitpod&v=3)](https://gitpod.io/#https://github.com/BuxOrg/bux-server)
+[![standard-readme compliant](https://img.shields.io/badge/readme%20style-standard-brightgreen.svg?style=flat&v=3)](https://github.com/RichardLitt/standard-readme)
+[![Makefile Included](https://img.shields.io/badge/Makefile-Supported%20-brightgreen?=flat&logo=probot&v=3)](Makefile)
+[![Sponsor](https://img.shields.io/badge/sponsor-mrz1836-181717.svg?logo=github&style=flat&v=3)](https://github.com/sponsors/BuxOrg)
+[![Donate](https://img.shields.io/badge/donate-bitcoin-ff9900.svg?logo=bitcoin&style=flat&v=3)](https://gobitcoinsv.com/#sponsor?utm_source=github&utm_medium=sponsor-link&utm_campaign=bux-server&utm_term=bux-server&utm_content=bux-server)
 
 <br/>
 
@@ -85,7 +85,7 @@ go build -o bux-server cmd/server/*
 
 View the generated [documentation](https://pkg.go.dev/github.com/BuxOrg/bux-server)
 
-[![GoDoc](https://godoc.org/github.com/BuxOrg/bux-server?status.svg&style=flat&v=2)](https://pkg.go.dev/github.com/BuxOrg/bux-server)
+[![GoDoc](https://godoc.org/github.com/BuxOrg/bux-server?status.svg&style=flat&v=3)](https://pkg.go.dev/github.com/BuxOrg/bux-server)
 
 <br/>
 
@@ -298,7 +298,7 @@ The most basic way to show your support is to star :star2: the project, or to ra
 You can also support this project by [becoming a sponsor on GitHub](https://github.com/sponsors/BuxOrg) :clap:
 or by making a [**bitcoin donation**](https://gobitcoinsv.com/#sponsor?utm_source=github&utm_medium=sponsor-link&utm_campaign=bux-server&utm_term=bux-server&utm_content=bux-server) to ensure this journey continues indefinitely! :rocket:
 
-[![Stars](https://img.shields.io/github/stars/BuxOrg/bux-server?label=Please%20like%20us&style=social&v=2)](https://github.com/BuxOrg/bux-server/stargazers)
+[![Stars](https://img.shields.io/github/stars/BuxOrg/bux-server?label=Please%20like%20us&style=social&v=3)](https://github.com/BuxOrg/bux-server/stargazers)
 
 <br/>
 
@@ -328,4 +328,4 @@ Thank you to these wonderful people ([emoji key](https://allcontributors.org/doc
 
 ## License
 
-[![License](https://img.shields.io/github/license/BuxOrg/bux-server.svg?style=flat&v=2)](LICENSE)
+[![License](https://img.shields.io/github/license/BuxOrg/bux-server.svg?style=flat&v=3)](LICENSE)
