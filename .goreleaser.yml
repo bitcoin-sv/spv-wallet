@@ -42,9 +42,9 @@ announce:
 
   # See more at: https://goreleaser.com/customization/announce/#slack
   slack:
-    enabled: false
+    enabled: true
     message_template: '{{ .ProjectName }} {{ .Tag }} is out! Changelog: https://github.com/BuxOrg/{{ .ProjectName }}/releases/tag/{{ .Tag }}'
-    channel: '#test_slack'
+    channel: '#bux'
     # username: ''
     # icon_emoji: ''
     # icon_url: ''
