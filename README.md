@@ -43,7 +43,7 @@
 | Variable name                         | Description                   |
 | ------------------------------------- | ----------------------------- |
 | BUX_ENVIRONMENT                       | development or production     |
-| BUX_AUTHENTICATION\*\*ADMIN_KEY       | <your-admin-xpriv>            |
+| BUX_AUTHENTICATION\*\*ADMIN_KEY       | [your-admin-xpriv]            |
 | BUX_AUTHENTICATION\*\*REQUIRE_SIGNING | 1 or 0                        |
 | BUX_DATASTORE\*\*ENGINE               | mongodb, sqlite, mysql        |
 | BUX_MONGODB\*\*URI                    | mongodb://localhost:27017/bux |
@@ -57,7 +57,7 @@
 | BUX_NEW_RELIC\*\*ENABLED              | 1 or 0                        |
 | BUX_NEW_RELIC\*\*ENABLED              | 1 or 0                        |
 | BUX_NEW_RELIC\*\*DOMAIN_NAME          | tonicpow-bux-nyc1.bux.ninja   |
-| BUX_NEW_RELIC\*\*LICENSE_KEY          | <your-key>                    |
+| BUX_NEW_RELIC\*\*LICENSE_KEY          | [your-key]                    |
 
 ## Installation
 
