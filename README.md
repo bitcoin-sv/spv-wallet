@@ -1,4 +1,5 @@
 # BUX: Server
+
 > Get started using [BUX](https://getbux.io) in five minutes
 
 [![Release](https://img.shields.io/github/release-pre/BuxOrg/bux-server.svg?logo=github&style=flat&v=2)](https://github.com/BuxOrg/bux-server/releases)
@@ -17,26 +18,51 @@
 <br/>
 
 ## Table of Contents
-- [What is BUX?](#what-is-bux)
-- [Installation](#installation)
-- [Documentation](#documentation)
-- [Examples & Tests](#examples--tests)
-- [Benchmarks](#benchmarks)
-- [Code Standards](#code-standards)
-- [Usage](#usage)
-- [Contributing](#contributing)
-- [License](#license)
+
+-   [What is BUX?](#what-is-bux)
+-   [Environment Variables](#environment-variables)
+-   [Installation](#installation)
+-   [Documentation](#documentation)
+-   [Examples & Tests](#examples--tests)
+-   [Benchmarks](#benchmarks)
+-   [Code Standards](#code-standards)
+-   [Usage](#usage)
+-   [Contributing](#contributing)
+-   [License](#license)
 
 <br/>
 
 ## What is BUX?
+
 [Read more about BUX](https://getbux.io)
 
 <br/>
 
+## Environment Variables
+
+| Variable name                         | Description                   |
+| ------------------------------------- | ----------------------------- |
+| BUX_ENVIRONMENT                       | development or production     |
+| BUX_AUTHENTICATION\*\*ADMIN_KEY       | <your-admin-xpriv>            |
+| BUX_AUTHENTICATION\*\*REQUIRE_SIGNING | 1 or 0                        |
+| BUX_DATASTORE\*\*ENGINE               | mongodb, sqlite, mysql        |
+| BUX_MONGODB\*\*URI                    | mongodb://localhost:27017/bux |
+| BUX_MONGODB\*\*DATABASE_NAME          | bux                           |
+| BUX_DATASTORE\*\*AUTO_MIGRATE         | 1 or 0                        |
+| BUX_CACHE\*\*ENGINE                   | freecache or redis            |
+| BUX_REDIS\*\*URL                      | redis://localhost:6379        |
+| BUX_MONITOR\*\*ENABLED                | 1 or 0                        |
+| BUX_GRAPHQL\*\*ENABLED                | 1 or 0                        |
+| BUX_DEBUG                             | 1 or 0                        |
+| BUX_NEW_RELIC\*\*ENABLED              | 1 or 0                        |
+| BUX_NEW_RELIC\*\*ENABLED              | 1 or 0                        |
+| BUX_NEW_RELIC\*\*DOMAIN_NAME          | tonicpow-bux-nyc1.bux.ninja   |
+| BUX_NEW_RELIC\*\*LICENSE_KEY          | <your-key>                    |
+
 ## Installation
 
 **bux-server** requires a [supported release of Go](https://golang.org/doc/devel/release.html#policy).
+
 ```shell script
 go get -u github.com/BuxOrg/bux-server
 ```
@@ -44,6 +70,7 @@ go get -u github.com/BuxOrg/bux-server
 <br/>
 
 ## Documentation
+
 View the generated [documentation](https://pkg.go.dev/github.com/BuxOrg/bux-server)
 
 [![GoDoc](https://godoc.org/github.com/BuxOrg/bux-server?status.svg&style=flat&v=2)](https://pkg.go.dev/github.com/BuxOrg/bux-server)
@@ -57,26 +84,27 @@ View the generated [documentation](https://pkg.go.dev/github.com/BuxOrg/bux-serv
 This repository was created using [MrZ's `go-template`](https://github.com/mrz1836/go-template#about)
 
 #### Built-in Features
-- Continuous integration via [GitHub Actions](https://github.com/features/actions)
-- Build automation via [Make](https://www.gnu.org/software/make)
-- Dependency management using [Go Modules](https://github.com/golang/go/wiki/Modules)
-- Code formatting using [gofumpt](https://github.com/mvdan/gofumpt) and linting with [golangci-lint](https://github.com/golangci/golangci-lint) and [yamllint](https://yamllint.readthedocs.io/en/stable/index.html)
-- Unit testing with [testify](https://github.com/stretchr/testify), [race detector](https://blog.golang.org/race-detector), code coverage [HTML report](https://blog.golang.org/cover) and [Codecov report](https://codecov.io/)
-- Releasing using [GoReleaser](https://github.com/goreleaser/goreleaser) on [new Tag](https://git-scm.com/book/en/v2/Git-Basics-Tagging)
-- Dependency scanning and updating thanks to [Dependabot](https://dependabot.com) and [Nancy](https://github.com/sonatype-nexus-community/nancy)
-- Security code analysis using [CodeQL Action](https://docs.github.com/en/github/finding-security-vulnerabilities-and-errors-in-your-code/about-code-scanning)
-- Automatic syndication to [pkg.go.dev](https://pkg.go.dev/) on every release
-- Generic templates for [Issues and Pull Requests](https://docs.github.com/en/communities/using-templates-to-encourage-useful-issues-and-pull-requests/configuring-issue-templates-for-your-repository) in Github
-- All standard Github files such as `LICENSE`, `CONTRIBUTING.md`, `CODE_OF_CONDUCT.md`, and `SECURITY.md`
-- Code [ownership configuration](.github/CODEOWNERS) for Github
-- All your ignore files for [vs-code](.editorconfig), [docker](.dockerignore) and [git](.gitignore)
-- Automatic sync for [labels](.github/labels.yml) into Github using a pre-defined [configuration](.github/labels.yml)
-- Built-in powerful merging rules using [Mergify](https://mergify.io/)
-- Welcome [new contributors](.github/mergify.yml) on their first Pull-Request
-- Follows the [standard-readme](https://github.com/RichardLitt/standard-readme/blob/master/spec.md) specification
-- [Visual Studio Code](https://code.visualstudio.com) configuration with [Go](https://code.visualstudio.com/docs/languages/go)
-- (Optional) [Slack](https://slack.com), [Discord](https://discord.com) or [Twitter](https://twitter.com) announcements on new Github Releases
-- (Optional) Easily add [contributors](https://allcontributors.org/docs/en/bot/installation) in any Issue or Pull-Request
+
+-   Continuous integration via [GitHub Actions](https://github.com/features/actions)
+-   Build automation via [Make](https://www.gnu.org/software/make)
+-   Dependency management using [Go Modules](https://github.com/golang/go/wiki/Modules)
+-   Code formatting using [gofumpt](https://github.com/mvdan/gofumpt) and linting with [golangci-lint](https://github.com/golangci/golangci-lint) and [yamllint](https://yamllint.readthedocs.io/en/stable/index.html)
+-   Unit testing with [testify](https://github.com/stretchr/testify), [race detector](https://blog.golang.org/race-detector), code coverage [HTML report](https://blog.golang.org/cover) and [Codecov report](https://codecov.io/)
+-   Releasing using [GoReleaser](https://github.com/goreleaser/goreleaser) on [new Tag](https://git-scm.com/book/en/v2/Git-Basics-Tagging)
+-   Dependency scanning and updating thanks to [Dependabot](https://dependabot.com) and [Nancy](https://github.com/sonatype-nexus-community/nancy)
+-   Security code analysis using [CodeQL Action](https://docs.github.com/en/github/finding-security-vulnerabilities-and-errors-in-your-code/about-code-scanning)
+-   Automatic syndication to [pkg.go.dev](https://pkg.go.dev/) on every release
+-   Generic templates for [Issues and Pull Requests](https://docs.github.com/en/communities/using-templates-to-encourage-useful-issues-and-pull-requests/configuring-issue-templates-for-your-repository) in Github
+-   All standard Github files such as `LICENSE`, `CONTRIBUTING.md`, `CODE_OF_CONDUCT.md`, and `SECURITY.md`
+-   Code [ownership configuration](.github/CODEOWNERS) for Github
+-   All your ignore files for [vs-code](.editorconfig), [docker](.dockerignore) and [git](.gitignore)
+-   Automatic sync for [labels](.github/labels.yml) into Github using a pre-defined [configuration](.github/labels.yml)
+-   Built-in powerful merging rules using [Mergify](https://mergify.io/)
+-   Welcome [new contributors](.github/mergify.yml) on their first Pull-Request
+-   Follows the [standard-readme](https://github.com/RichardLitt/standard-readme/blob/master/spec.md) specification
+-   [Visual Studio Code](https://code.visualstudio.com) configuration with [Go](https://code.visualstudio.com/docs/languages/go)
+-   (Optional) [Slack](https://slack.com), [Discord](https://discord.com) or [Twitter](https://twitter.com) announcements on new Github Releases
+-   (Optional) Easily add [contributors](https://allcontributors.org/docs/en/bot/installation) in any Issue or Pull-Request
 
 </details>
 
@@ -84,14 +112,14 @@ This repository was created using [MrZ's `go-template`](https://github.com/mrz18
 <summary><strong><code>Package Dependencies</code></strong></summary>
 <br/>
 
-- [BitcoinSchema/go-bitcoin](https://github.com/BitcoinSchema/go-bitcoin)
-- [BuxOrg/bux](https://github.com/BuxOrg/bux)
-- [mrz1836/go-api-router](https://github.com/mrz1836/go-api-router)
-- [mrz1836/go-logger](https://github.com/mrz1836/go-logger)
-- [mrz1836/go-sanitize](https://github.com/mrz1836/go-sanitize)
-- [stretchr/testify](https://github.com/stretchr/testify)
-- [tonicpow/go-paymail](https://github.com/tonicpow/go-paymail)
-- [See all dependencies](go.mod)
+-   [BitcoinSchema/go-bitcoin](https://github.com/BitcoinSchema/go-bitcoin)
+-   [BuxOrg/bux](https://github.com/BuxOrg/bux)
+-   [mrz1836/go-api-router](https://github.com/mrz1836/go-api-router)
+-   [mrz1836/go-logger](https://github.com/mrz1836/go-logger)
+-   [mrz1836/go-sanitize](https://github.com/mrz1836/go-sanitize)
+-   [stretchr/testify](https://github.com/stretchr/testify)
+-   [tonicpow/go-paymail](https://github.com/tonicpow/go-paymail)
+-   [See all dependencies](go.mod)
 </details>
 
 <details>
@@ -103,15 +131,18 @@ Releases are automatically created when you create a new [git tag](https://git-s
 If you want to manually make releases, please install GoReleaser:
 
 [goreleaser](https://github.com/goreleaser/goreleaser) for easy binary or library deployment to Github and can be installed:
-- **using make:** `make install-releaser`
-- **using brew:** `brew install goreleaser`
+
+-   **using make:** `make install-releaser`
+-   **using brew:** `brew install goreleaser`
 
 The [.goreleaser.yml](.goreleaser.yml) file is used to configure [goreleaser](https://github.com/goreleaser/goreleaser).
 
 <br/>
 
 ### Automatic Releases on Tag Creation (recommended)
+
 Automatic releases via [Github Actions](.github/workflows/release.yml) from creating a new tag:
+
 ```shell
 make tag version=1.2.3
 ```
@@ -119,6 +150,7 @@ make tag version=1.2.3
 <br/>
 
 ### Manual Releases (optional)
+
 Use `make release-snap` to create a snapshot version of the release, and finally `make release` to ship to production (manually).
 
 <br/>
@@ -130,11 +162,13 @@ Use `make release-snap` to create a snapshot version of the release, and finally
 <br/>
 
 View all `makefile` commands
+
 ```shell script
 make help
 ```
 
 List of all current commands:
+
 ```text
 all                           Runs multiple commands
 clean                         Remove previous builds and any cached data
@@ -170,17 +204,20 @@ update-contributors           Regenerates the contributors html/list
 update-linter                 Update the golangci-lint package (macOS only)
 vet                           Run the Go vet application
 ```
+
 </details>
 
 <br/>
 
 ## Examples & Tests
+
 All unit tests and [examples](examples) run via [Github Actions](https://github.com/BuxOrg/bux-server/actions) and
 uses [Go version 1.17.x](https://golang.org/doc/go1.17). View the [configuration file](.github/workflows/run-tests.yml).
 
 <br/>
 
 Run all tests (including integration tests)
+
 ```shell script
 make test
 ```
@@ -188,6 +225,7 @@ make test
 <br/>
 
 Run tests (excluding integration tests)
+
 ```shell script
 make test-short
 ```
@@ -195,7 +233,9 @@ make test-short
 <br/>
 
 ## Benchmarks
+
 Run the Go benchmarks:
+
 ```shell script
 make bench
 ```
@@ -203,20 +243,24 @@ make bench
 <br/>
 
 ## Code Standards
+
 Read more about this Go project's [code standards](.github/CODE_STANDARDS.md).
 
 <br/>
 
 ## Usage
+
 Checkout all the [examples](examples)!
 
 <br/>
 
 ## Docker Compose Quickstart
+
 To get started with development, `bux-server` provides a `docker-compose.yml`
 file which starts up Bux Server with Redis and PostgreSQL. To start, we need to
 tweak the `config/envs/development.json` file with the proper configuration.
 First:
+
 ```
 $ cp config/envs/docker-compose.json config/envs/development.json
 ```
@@ -224,26 +268,30 @@ $ cp config/envs/docker-compose.json config/envs/development.json
 Then, we need to update the `admin_key` with your xpub. Modify
 `config/envs/development.json` with your admin key. Now we can start the
 containers:
+
 ```
 $ docker-compose up
 ```
 
 ## Contributing
+
 View the [contributing guidelines](.github/CONTRIBUTING.md) and follow the [code of conduct](.github/CODE_OF_CONDUCT.md).
 
 <br/>
 
 ### How can I help?
+
 All kinds of contributions are welcome :raised_hands:!
 The most basic way to show your support is to star :star2: the project, or to raise issues :speech_balloon:.
 You can also support this project by [becoming a sponsor on GitHub](https://github.com/sponsors/BuxOrg) :clap:
 or by making a [**bitcoin donation**](https://gobitcoinsv.com/#sponsor?utm_source=github&utm_medium=sponsor-link&utm_campaign=bux-server&utm_term=bux-server&utm_content=bux-server) to ensure this journey continues indefinitely! :rocket:
-                                             
+
 [![Stars](https://img.shields.io/github/stars/BuxOrg/bux-server?label=Please%20like%20us&style=social&v=2)](https://github.com/BuxOrg/bux-server/stargazers)
 
 <br/>
 
 ### Contributors ✨
+
 Thank you to these wonderful people ([emoji key](https://allcontributors.org/docs/en/emoji-key)):
 
 <!-- ALL-CONTRIBUTORS-LIST:START - Do not remove or modify this section -->
