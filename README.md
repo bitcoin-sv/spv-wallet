@@ -69,6 +69,18 @@ go get -u github.com/BuxOrg/bux-server
 
 <br/>
 
+#### build
+
+```shell script
+go build -o bux-server cmd/server/*
+```
+
+#### run
+
+```shell script
+./bux-server
+```
+
 ## Documentation
 
 View the generated [documentation](https://pkg.go.dev/github.com/BuxOrg/bux-server)
