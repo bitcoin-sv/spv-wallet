@@ -5,12 +5,12 @@
 type AdminStats {
     balance:              Int64
     destinations:         Int64
+    paymail_addresses:    Int64
     transactions:         Int64
-    paymails:             Int64
-    utxos:                Int64
-    xpubs:                Int64
     transactions_per_day: Map
+    utxos:                Int64
     utxos_per_type:       Map
+    xpubs:                Int64
 }
 
 extend type Query {
