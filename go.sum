@@ -729,8 +729,9 @@ github.com/nats-io/nkeys v0.3.0/go.mod h1:gvUNGjVcM2IPr5rCsRsC6Wb3Hr2CQAm08dsxtV
 github.com/nats-io/nuid v1.0.1/go.mod h1:19wcPz3Ph3q0Jbyiqsd0kePYG7A95tJPxeL+1OSON2c=
 github.com/newrelic/go-agent/v3 v3.0.0/go.mod h1:H28zDNUC0U/b7kLoY4EFOhuth10Xu/9dchozUiOseQQ=
 github.com/newrelic/go-agent/v3 v3.6.0/go.mod h1:1A1dssWBwzB7UemzRU6ZVaGDsI+cEn5/bNxI0wiYlIc=
-github.com/newrelic/go-agent/v3 v3.15.2 h1:NEpksu2AhuZncbwkDqUg2IvUJst3JQ/TemYfK4WdS/Y=
 github.com/newrelic/go-agent/v3 v3.15.2/go.mod h1:1A1dssWBwzB7UemzRU6ZVaGDsI+cEn5/bNxI0wiYlIc=
+github.com/newrelic/go-agent/v3 v3.16.0 h1:/pUT4912s/G1CNZqoAyEau6171VPcTgn2YCNu7R9fiI=
+github.com/newrelic/go-agent/v3 v3.16.0/go.mod h1:1A1dssWBwzB7UemzRU6ZVaGDsI+cEn5/bNxI0wiYlIc=
 github.com/newrelic/go-agent/v3/integrations/nrhttprouter v1.0.1 h1:7OyJ+5MXP8YppKsWAdrdB8z5Ei3skk86ONJ+Vb9fSlo=
 github.com/newrelic/go-agent/v3/integrations/nrhttprouter v1.0.1/go.mod h1:CkLa4BKOGaiFbWHsv7zOspG+zXrfjsNXDxsDGvdhT+s=
 github.com/newrelic/go-agent/v3/integrations/nrmongo v1.0.2 h1:1yI2B9BRMqLWhMIY5EE5fzuKkuT7rZxxvLVi+uFSwl4=
