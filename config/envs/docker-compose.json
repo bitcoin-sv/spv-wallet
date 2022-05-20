@@ -36,7 +36,7 @@
     "auth_token": "",
     "bux_agent_url": "ws://localhost:8000/websocket",
     "debug": false,
-    "enabled": true,
+    "enabled": false,
     "false_positive_rate": 0.01,
     "load_monitored_destinations": false,
     "max_number_of_destinations": 100000,
