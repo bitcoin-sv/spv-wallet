@@ -11,6 +11,11 @@ services:
     links:
       - redis
       - db
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
   redis:
     image: redis
   db:
