@@ -33,7 +33,7 @@ jobs:
         run: go list -json -m all > go.list
       - name: Ask Nancy
         uses: sonatype-nexus-community/nancy-github-action@v1.0.2
-        # continue-on-error: true
+        continue-on-error: true
   test:
     needs: [yamllint, asknancy]
     strategy:
