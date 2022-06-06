@@ -4,7 +4,7 @@ go 1.17
 
 require (
 	github.com/99designs/gqlgen v0.17.9
-	github.com/BuxOrg/bux v0.2.28
+	github.com/BuxOrg/bux v0.2.29
 	github.com/go-ozzo/ozzo-validation v3.6.0+incompatible
 	github.com/go-redis/redis/v8 v8.11.5
 	github.com/gofrs/uuid v4.2.0+incompatible
@@ -25,7 +25,7 @@ require (
 	github.com/agnivade/levenshtein v1.1.1 // indirect
 	github.com/asaskevich/govalidator v0.0.0-20210307081110-f21760c49a8d // indirect
 	github.com/bitcoinschema/go-bitcoin/v2 v2.0.0-alpha.3 // indirect
-	github.com/bitcoinschema/go-bob v0.1.9 // indirect
+	github.com/bitcoinschema/go-bob v0.1.10 // indirect
 	github.com/bitcoinschema/go-map v0.0.14 // indirect
 	github.com/bitcoinsv/bsvd v0.0.0-20190609155523-4c29707f7173 // indirect
 	github.com/bitcoinsv/bsvutil v0.0.0-20181216182056-1d77cf353ea9 // indirect
@@ -79,8 +79,7 @@ require (
 	github.com/miekg/dns v1.1.49 // indirect
 	github.com/mitchellh/mapstructure v1.5.0 // indirect
 	github.com/mrz1836/go-cache v0.6.5 // indirect
-	github.com/mrz1836/go-mattercloud v0.5.3 // indirect
-	github.com/mrz1836/go-nownodes v0.0.5 // indirect
+	github.com/mrz1836/go-nownodes v0.0.6 // indirect
 	github.com/mrz1836/go-whatsonchain v0.10.4 // indirect
 	github.com/newrelic/go-agent/v3/integrations/nrmongo v1.0.2 // indirect
 	github.com/niemeyer/pretty v0.0.0-20200227124842-a10e7caefd8e // indirect
@@ -96,7 +95,7 @@ require (
 	github.com/spf13/jwalterweatherman v1.1.0 // indirect
 	github.com/spf13/pflag v1.0.5 // indirect
 	github.com/stretchr/objx v0.4.0 // indirect
-	github.com/subosito/gotenv v1.3.0 // indirect
+	github.com/subosito/gotenv v1.4.0 // indirect
 	github.com/tidwall/gjson v1.14.1 // indirect
 	github.com/tidwall/match v1.1.1 // indirect
 	github.com/tidwall/pretty v1.2.0 // indirect
