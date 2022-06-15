@@ -107,4 +107,7 @@ extend type Mutation {
     admin_paymail_delete (
         address: String!
     ): Boolean!
+    admin_transaction(
+        hex: String!,
+    ): Transaction
 }

@@ -5,6 +5,7 @@ package graph
 
 import (
 	"context"
+	"errors"
 
 	"github.com/BuxOrg/bux"
 	"github.com/BuxOrg/bux/datastore"
@@ -57,6 +58,28 @@ func (r *mutationResolver) AdminPaymailDelete(ctx context.Context, address strin
 	}
 
 	return true, nil
+}
+
+func (r *mutationResolver) AdminTransaction(ctx context.Context, hex string) (*bux.Transaction, error) {
+	// including admin check
+	c, err := GetConfigFromContextAdmin(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	opts := c.Services.Bux.DefaultModelOptions()
+
+	var transaction *bux.Transaction
+	transaction, err = c.Services.Bux.RecordRawTransaction(
+		ctx, hex, opts...,
+	)
+	if err != nil {
+		if !errors.Is(err, datastore.ErrDuplicateKey) {
+			return nil, err
+		}
+	}
+
+	return bux.DisplayModels(transaction).(*bux.Transaction), nil
 }
 
 func (r *queryResolver) AdminGetStatus(ctx context.Context) (*bool, error) {

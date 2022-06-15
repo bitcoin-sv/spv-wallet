@@ -123,6 +123,7 @@ type ComplexityRoot struct {
 		AccessKeyRevoke     func(childComplexity int, id *string) int
 		AdminPaymailCreate  func(childComplexity int, xpub string, address string, publicName *string, avatar *string, metadata bux.Metadata) int
 		AdminPaymailDelete  func(childComplexity int, address string) int
+		AdminTransaction    func(childComplexity int, hex string) int
 		Destination         func(childComplexity int, destinationType *string, metadata bux.Metadata) int
 		DestinationMetadata func(childComplexity int, id *string, address *string, lockingScript *string, metadata bux.Metadata) int
 		NewTransaction      func(childComplexity int, transactionConfig bux.TransactionConfig, metadata bux.Metadata) int
@@ -307,6 +308,7 @@ type MutationResolver interface {
 	DestinationMetadata(ctx context.Context, id *string, address *string, lockingScript *string, metadata bux.Metadata) (*bux.Destination, error)
 	AdminPaymailCreate(ctx context.Context, xpub string, address string, publicName *string, avatar *string, metadata bux.Metadata) (*bux.PaymailAddress, error)
 	AdminPaymailDelete(ctx context.Context, address string) (bool, error)
+	AdminTransaction(ctx context.Context, hex string) (*bux.Transaction, error)
 }
 type QueryResolver interface {
 	Xpub(ctx context.Context) (*bux.Xpub, error)
@@ -772,6 +774,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Mutation.AdminPaymailDelete(childComplexity, args["address"].(string)), true
+
+	case "Mutation.admin_transaction":
+		if e.complexity.Mutation.AdminTransaction == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_admin_transaction_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.AdminTransaction(childComplexity, args["hex"].(string)), true
 
 	case "Mutation.destination":
 		if e.complexity.Mutation.Destination == nil {
@@ -1930,7 +1944,7 @@ func (ec *executionContext) introspectType(name string) (*introspection.Type, er
 }
 
 var sources = []*ast.Source{
-	{Name: "graph/admin.graphqls", Input: `# GraphQL schema example
+	{Name: "../admin.graphqls", Input: `# GraphQL schema example
 #
 # https://gqlgen.com/getting-started/
 
@@ -2039,9 +2053,12 @@ extend type Mutation {
     admin_paymail_delete (
         address: String!
     ): Boolean!
+    admin_transaction(
+        hex: String!,
+    ): Transaction
 }
 `, BuiltIn: false},
-	{Name: "graph/schema.graphqls", Input: `# GraphQL schema example
+	{Name: "../schema.graphqls", Input: `# GraphQL schema example
 #
 # https://gqlgen.com/getting-started/
 
@@ -2506,6 +2523,21 @@ func (ec *executionContext) field_Mutation_admin_paymail_delete_args(ctx context
 		}
 	}
 	args["address"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Mutation_admin_transaction_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 string
+	if tmp, ok := rawArgs["hex"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("hex"))
+		arg0, err = ec.unmarshalNString2string(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["hex"] = arg0
 	return args, nil
 }
 
@@ -6417,6 +6449,88 @@ func (ec *executionContext) fieldContext_Mutation_admin_paymail_delete(ctx conte
 	}()
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Mutation_admin_paymail_delete_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Mutation_admin_transaction(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Mutation_admin_transaction(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().AdminTransaction(rctx, fc.Args["hex"].(string))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*bux.Transaction)
+	fc.Result = res
+	return ec.marshalOTransaction2ᚖgithubᚗcomᚋBuxOrgᚋbuxᚐTransaction(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Mutation_admin_transaction(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_Transaction_id(ctx, field)
+			case "hex":
+				return ec.fieldContext_Transaction_hex(ctx, field)
+			case "block_hash":
+				return ec.fieldContext_Transaction_block_hash(ctx, field)
+			case "block_height":
+				return ec.fieldContext_Transaction_block_height(ctx, field)
+			case "fee":
+				return ec.fieldContext_Transaction_fee(ctx, field)
+			case "number_of_inputs":
+				return ec.fieldContext_Transaction_number_of_inputs(ctx, field)
+			case "number_of_outputs":
+				return ec.fieldContext_Transaction_number_of_outputs(ctx, field)
+			case "total_value":
+				return ec.fieldContext_Transaction_total_value(ctx, field)
+			case "metadata":
+				return ec.fieldContext_Transaction_metadata(ctx, field)
+			case "output_value":
+				return ec.fieldContext_Transaction_output_value(ctx, field)
+			case "direction":
+				return ec.fieldContext_Transaction_direction(ctx, field)
+			case "created_at":
+				return ec.fieldContext_Transaction_created_at(ctx, field)
+			case "updated_at":
+				return ec.fieldContext_Transaction_updated_at(ctx, field)
+			case "deleted_at":
+				return ec.fieldContext_Transaction_deleted_at(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type Transaction", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_admin_transaction_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
 		return
 	}
@@ -15182,6 +15296,12 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
+		case "admin_transaction":
+
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_admin_transaction(ctx, field)
+			})
+
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
