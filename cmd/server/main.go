@@ -1,5 +1,5 @@
 /*
-Package main is the core service layer for the xAPI service
+Package main is the core service layer for the BUX Server
 */
 package main
 
@@ -16,7 +16,7 @@ import (
 	"github.com/mrz1836/go-logger"
 )
 
-// main method starts everything for the xAPI service
+// main method starts everything for the BUX Server
 func main() {
 
 	// Load the Application Configuration
