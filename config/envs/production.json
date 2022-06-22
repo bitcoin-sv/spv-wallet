@@ -67,7 +67,7 @@
     "max_connection_lifetime": "20s",
     "max_idle_connections": 5,
     "max_idle_timeout": "20s",
-    "url": "redis://buxcache.production.tonicpow.com:6379",
+    "url": "redis://buxcache.production.getbux.io:6379",
     "use_tls": false
   },
   "server": {

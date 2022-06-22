@@ -41,7 +41,7 @@
 ## Environment Variables
 
 | Variable name                         | Description                   |
-| ------------------------------------- | ----------------------------- |
+|---------------------------------------|-------------------------------|
 | BUX_ENVIRONMENT                       | development or production     |
 | BUX_AUTHENTICATION\*\*ADMIN_KEY       | [your-admin-xpriv]            |
 | BUX_AUTHENTICATION\*\*REQUIRE_SIGNING | 1 or 0                        |
@@ -56,7 +56,7 @@
 | BUX_DEBUG                             | 1 or 0                        |
 | BUX_NEW_RELIC\*\*ENABLED              | 1 or 0                        |
 | BUX_NEW_RELIC\*\*ENABLED              | 1 or 0                        |
-| BUX_NEW_RELIC\*\*DOMAIN_NAME          | tonicpow-bux-nyc1.bux.ninja   |
+| BUX_NEW_RELIC\*\*DOMAIN_NAME          | bux-nyc1.bux.ninja            |
 | BUX_NEW_RELIC\*\*LICENSE_KEY          | [your-key]                    |
 
 ## Installation
