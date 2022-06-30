@@ -437,6 +437,88 @@ func (r *queryResolver) DestinationsCount(ctx context.Context, metadata bux.Meta
 	return &count, nil
 }
 
+func (r *queryResolver) Utxo(ctx context.Context, txID string, outputIndex uint32) (*bux.Utxo, error) {
+	c, err := GetConfigFromContext(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	var utxo *bux.Utxo
+	if utxo, err = c.Services.Bux.GetUtxo(
+		ctx,
+		c.XPubID,
+		txID,
+		outputIndex,
+	); err != nil {
+		return nil, err
+	}
+
+	return utxo, nil
+}
+
+func (r *queryResolver) Utxos(ctx context.Context, metadata bux.Metadata, conditions map[string]interface{}, params *datastore.QueryParams) ([]*bux.Utxo, error) {
+	c, err := GetConfigFromContext(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	var utxos []*bux.Utxo
+	if utxos, err = c.Services.Bux.GetUtxosByXpubID(
+		ctx,
+		c.XPubID,
+		&metadata,
+		&conditions,
+		params,
+	); err != nil {
+		return nil, err
+	}
+
+	return utxos, nil
+}
+
+func (r *queryResolver) UtxosCount(ctx context.Context, metadata bux.Metadata, conditions map[string]interface{}) (*int64, error) {
+	c, err := GetConfigFromContext(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	var dbConditions = map[string]interface{}{}
+	if conditions != nil {
+		dbConditions = conditions
+	}
+	// force the xpub_id of the current user on query
+	dbConditions["xpub_id"] = c.XPubID
+
+	var count int64
+	if count, err = c.Services.Bux.GetUtxosCount(
+		ctx,
+		&metadata,
+		&dbConditions,
+	); err != nil {
+		return nil, err
+	}
+
+	return &count, nil
+}
+
+func (r *utxoResolver) Transaction(ctx context.Context, obj *bux.Utxo) (*bux.Transaction, error) {
+	c, err := GetConfigFromContext(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	var tx *bux.Transaction
+	tx, err = c.Services.Bux.GetTransaction(ctx, obj.XpubID, obj.ID)
+	if err != nil {
+		return nil, err
+	}
+	if tx == nil {
+		return nil, nil
+	}
+
+	return tx, nil
+}
+
 func (r *transactionConfigInputResolver) Inputs(ctx context.Context, obj *bux.TransactionConfig, data []map[string]interface{}) error {
 	// do nothing with inputs
 	return nil
@@ -453,6 +535,9 @@ func (r *Resolver) Mutation() generated.MutationResolver { return &mutationResol
 // Query returns generated.QueryResolver implementation.
 func (r *Resolver) Query() generated.QueryResolver { return &queryResolver{r} }
 
+// Utxo returns generated.UtxoResolver implementation.
+func (r *Resolver) Utxo() generated.UtxoResolver { return &utxoResolver{r} }
+
 // TransactionConfigInput returns generated.TransactionConfigInputResolver implementation.
 func (r *Resolver) TransactionConfigInput() generated.TransactionConfigInputResolver {
 	return &transactionConfigInputResolver{r}
@@ -460,4 +545,5 @@ func (r *Resolver) TransactionConfigInput() generated.TransactionConfigInputReso
 
 type mutationResolver struct{ *Resolver }
 type queryResolver struct{ *Resolver }
+type utxoResolver struct{ *Resolver }
 type transactionConfigInputResolver struct{ *Resolver }

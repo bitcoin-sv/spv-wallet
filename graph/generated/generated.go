@@ -41,6 +41,7 @@ type Config struct {
 type ResolverRoot interface {
 	Mutation() MutationResolver
 	Query() QueryResolver
+	Utxo() UtxoResolver
 	TransactionConfigInput() TransactionConfigInputResolver
 }
 
@@ -199,6 +200,9 @@ type ComplexityRoot struct {
 		Transaction                 func(childComplexity int, id string) int
 		Transactions                func(childComplexity int, metadata bux.Metadata, conditions map[string]interface{}, params *datastore.QueryParams) int
 		TransactionsCount           func(childComplexity int, metadata bux.Metadata, conditions map[string]interface{}) int
+		Utxo                        func(childComplexity int, txID string, outputIndex uint32) int
+		Utxos                       func(childComplexity int, metadata bux.Metadata, conditions map[string]interface{}, params *datastore.QueryParams) int
+		UtxosCount                  func(childComplexity int, metadata bux.Metadata, conditions map[string]interface{}) int
 		Xpub                        func(childComplexity int) int
 	}
 
@@ -278,6 +282,7 @@ type ComplexityRoot struct {
 		Satoshis      func(childComplexity int) int
 		ScriptPubKey  func(childComplexity int) int
 		SpendingTxID  func(childComplexity int) int
+		Transaction   func(childComplexity int) int
 		TransactionID func(childComplexity int) int
 		Type          func(childComplexity int) int
 		UpdatedAt     func(childComplexity int) int
@@ -321,6 +326,9 @@ type QueryResolver interface {
 	Destination(ctx context.Context, id *string, address *string, lockingScript *string) (*bux.Destination, error)
 	Destinations(ctx context.Context, metadata bux.Metadata, conditions map[string]interface{}, params *datastore.QueryParams) ([]*bux.Destination, error)
 	DestinationsCount(ctx context.Context, metadata bux.Metadata, conditions map[string]interface{}) (*int64, error)
+	Utxo(ctx context.Context, txID string, outputIndex uint32) (*bux.Utxo, error)
+	Utxos(ctx context.Context, metadata bux.Metadata, conditions map[string]interface{}, params *datastore.QueryParams) ([]*bux.Utxo, error)
+	UtxosCount(ctx context.Context, metadata bux.Metadata, conditions map[string]interface{}) (*int64, error)
 	AdminGetStatus(ctx context.Context) (*bool, error)
 	AdminGetStats(ctx context.Context) (*bux.AdminStats, error)
 	AdminAccessKeysList(ctx context.Context, metadata bux.Metadata, conditions map[string]interface{}, params *datastore.QueryParams) ([]*bux.AccessKey, error)
@@ -341,6 +349,9 @@ type QueryResolver interface {
 	AdminUtxosCount(ctx context.Context, metadata bux.Metadata, conditions map[string]interface{}) (*int64, error)
 	AdminXpubsList(ctx context.Context, metadata bux.Metadata, conditions map[string]interface{}, params *datastore.QueryParams) ([]*bux.Xpub, error)
 	AdminXpubsCount(ctx context.Context, metadata bux.Metadata, conditions map[string]interface{}) (*int64, error)
+}
+type UtxoResolver interface {
+	Transaction(ctx context.Context, obj *bux.Utxo) (*bux.Transaction, error)
 }
 
 type TransactionConfigInputResolver interface {
@@ -1377,6 +1388,42 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Query.TransactionsCount(childComplexity, args["metadata"].(bux.Metadata), args["conditions"].(map[string]interface{})), true
 
+	case "Query.utxo":
+		if e.complexity.Query.Utxo == nil {
+			break
+		}
+
+		args, err := ec.field_Query_utxo_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Query.Utxo(childComplexity, args["tx_id"].(string), args["output_index"].(uint32)), true
+
+	case "Query.utxos":
+		if e.complexity.Query.Utxos == nil {
+			break
+		}
+
+		args, err := ec.field_Query_utxos_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Query.Utxos(childComplexity, args["metadata"].(bux.Metadata), args["conditions"].(map[string]interface{}), args["params"].(*datastore.QueryParams)), true
+
+	case "Query.utxos_count":
+		if e.complexity.Query.UtxosCount == nil {
+			break
+		}
+
+		args, err := ec.field_Query_utxos_count_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Query.UtxosCount(childComplexity, args["metadata"].(bux.Metadata), args["conditions"].(map[string]interface{})), true
+
 	case "Query.xpub":
 		if e.complexity.Query.Xpub == nil {
 			break
@@ -1782,6 +1829,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Utxo.SpendingTxID(childComplexity), true
+
+	case "Utxo.transaction":
+		if e.complexity.Utxo.Transaction == nil {
+			break
+		}
+
+		return e.complexity.Utxo.Transaction(childComplexity), true
 
 	case "Utxo.transaction_id":
 		if e.complexity.Utxo.TransactionID == nil {
@@ -2204,6 +2258,7 @@ type Utxo {
     reserved_at:    NullTime
     spending_tx_id: NullString
     metadata:       Metadata
+    transaction:    Transaction # originating transaction, this is needed to spend the utxo
     created_at:     Time
     updated_at:     Time
     deleted_at:     NullTime
@@ -2379,6 +2434,19 @@ type Query {
         params: QueryParams
     ): [Destination]
     destinations_count(
+        metadata: Metadata
+        conditions: Map,
+    ): Int64
+    utxo (
+        tx_id: String!
+        output_index: Uint32!
+    ): Utxo
+    utxos (
+        metadata: Metadata,
+        conditions: Map,
+        params: QueryParams
+    ): [Utxo]
+    utxos_count (
         metadata: Metadata
         conditions: Map,
     ): Int64
@@ -3439,6 +3507,87 @@ func (ec *executionContext) field_Query_transactions_args(ctx context.Context, r
 }
 
 func (ec *executionContext) field_Query_transactions_count_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 bux.Metadata
+	if tmp, ok := rawArgs["metadata"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("metadata"))
+		arg0, err = ec.unmarshalOMetadata2githubᚗcomᚋBuxOrgᚋbuxᚐMetadata(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["metadata"] = arg0
+	var arg1 map[string]interface{}
+	if tmp, ok := rawArgs["conditions"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("conditions"))
+		arg1, err = ec.unmarshalOMap2map(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["conditions"] = arg1
+	return args, nil
+}
+
+func (ec *executionContext) field_Query_utxo_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 string
+	if tmp, ok := rawArgs["tx_id"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("tx_id"))
+		arg0, err = ec.unmarshalNString2string(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["tx_id"] = arg0
+	var arg1 uint32
+	if tmp, ok := rawArgs["output_index"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("output_index"))
+		arg1, err = ec.unmarshalNUint322uint32(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["output_index"] = arg1
+	return args, nil
+}
+
+func (ec *executionContext) field_Query_utxos_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 bux.Metadata
+	if tmp, ok := rawArgs["metadata"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("metadata"))
+		arg0, err = ec.unmarshalOMetadata2githubᚗcomᚋBuxOrgᚋbuxᚐMetadata(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["metadata"] = arg0
+	var arg1 map[string]interface{}
+	if tmp, ok := rawArgs["conditions"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("conditions"))
+		arg1, err = ec.unmarshalOMap2map(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["conditions"] = arg1
+	var arg2 *datastore.QueryParams
+	if tmp, ok := rawArgs["params"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("params"))
+		arg2, err = ec.unmarshalOQueryParams2ᚖgithubᚗcomᚋBuxOrgᚋbuxᚋdatastoreᚐQueryParams(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["params"] = arg2
+	return args, nil
+}
+
+func (ec *executionContext) field_Query_utxos_count_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
 	var arg0 bux.Metadata
@@ -8204,6 +8353,226 @@ func (ec *executionContext) fieldContext_Query_destinations_count(ctx context.Co
 	return fc, nil
 }
 
+func (ec *executionContext) _Query_utxo(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Query_utxo(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Query().Utxo(rctx, fc.Args["tx_id"].(string), fc.Args["output_index"].(uint32))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*bux.Utxo)
+	fc.Result = res
+	return ec.marshalOUtxo2ᚖgithubᚗcomᚋBuxOrgᚋbuxᚐUtxo(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Query_utxo(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Query",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_Utxo_id(ctx, field)
+			case "transaction_id":
+				return ec.fieldContext_Utxo_transaction_id(ctx, field)
+			case "xpub_id":
+				return ec.fieldContext_Utxo_xpub_id(ctx, field)
+			case "output_index":
+				return ec.fieldContext_Utxo_output_index(ctx, field)
+			case "satoshis":
+				return ec.fieldContext_Utxo_satoshis(ctx, field)
+			case "script_pub_key":
+				return ec.fieldContext_Utxo_script_pub_key(ctx, field)
+			case "type":
+				return ec.fieldContext_Utxo_type(ctx, field)
+			case "draft_id":
+				return ec.fieldContext_Utxo_draft_id(ctx, field)
+			case "reserved_at":
+				return ec.fieldContext_Utxo_reserved_at(ctx, field)
+			case "spending_tx_id":
+				return ec.fieldContext_Utxo_spending_tx_id(ctx, field)
+			case "metadata":
+				return ec.fieldContext_Utxo_metadata(ctx, field)
+			case "transaction":
+				return ec.fieldContext_Utxo_transaction(ctx, field)
+			case "created_at":
+				return ec.fieldContext_Utxo_created_at(ctx, field)
+			case "updated_at":
+				return ec.fieldContext_Utxo_updated_at(ctx, field)
+			case "deleted_at":
+				return ec.fieldContext_Utxo_deleted_at(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type Utxo", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Query_utxo_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Query_utxos(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Query_utxos(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Query().Utxos(rctx, fc.Args["metadata"].(bux.Metadata), fc.Args["conditions"].(map[string]interface{}), fc.Args["params"].(*datastore.QueryParams))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.([]*bux.Utxo)
+	fc.Result = res
+	return ec.marshalOUtxo2ᚕᚖgithubᚗcomᚋBuxOrgᚋbuxᚐUtxo(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Query_utxos(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Query",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_Utxo_id(ctx, field)
+			case "transaction_id":
+				return ec.fieldContext_Utxo_transaction_id(ctx, field)
+			case "xpub_id":
+				return ec.fieldContext_Utxo_xpub_id(ctx, field)
+			case "output_index":
+				return ec.fieldContext_Utxo_output_index(ctx, field)
+			case "satoshis":
+				return ec.fieldContext_Utxo_satoshis(ctx, field)
+			case "script_pub_key":
+				return ec.fieldContext_Utxo_script_pub_key(ctx, field)
+			case "type":
+				return ec.fieldContext_Utxo_type(ctx, field)
+			case "draft_id":
+				return ec.fieldContext_Utxo_draft_id(ctx, field)
+			case "reserved_at":
+				return ec.fieldContext_Utxo_reserved_at(ctx, field)
+			case "spending_tx_id":
+				return ec.fieldContext_Utxo_spending_tx_id(ctx, field)
+			case "metadata":
+				return ec.fieldContext_Utxo_metadata(ctx, field)
+			case "transaction":
+				return ec.fieldContext_Utxo_transaction(ctx, field)
+			case "created_at":
+				return ec.fieldContext_Utxo_created_at(ctx, field)
+			case "updated_at":
+				return ec.fieldContext_Utxo_updated_at(ctx, field)
+			case "deleted_at":
+				return ec.fieldContext_Utxo_deleted_at(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type Utxo", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Query_utxos_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Query_utxos_count(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Query_utxos_count(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Query().UtxosCount(rctx, fc.Args["metadata"].(bux.Metadata), fc.Args["conditions"].(map[string]interface{}))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*int64)
+	fc.Result = res
+	return ec.marshalOInt642ᚖint64(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Query_utxos_count(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Query",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int64 does not have child fields")
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Query_utxos_count_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _Query_admin_get_status(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Query_admin_get_status(ctx, field)
 	if err != nil {
@@ -9272,6 +9641,8 @@ func (ec *executionContext) fieldContext_Query_admin_utxos_list(ctx context.Cont
 				return ec.fieldContext_Utxo_spending_tx_id(ctx, field)
 			case "metadata":
 				return ec.fieldContext_Utxo_metadata(ctx, field)
+			case "transaction":
+				return ec.fieldContext_Utxo_transaction(ctx, field)
 			case "created_at":
 				return ec.fieldContext_Utxo_created_at(ctx, field)
 			case "updated_at":
@@ -12112,6 +12483,77 @@ func (ec *executionContext) fieldContext_Utxo_metadata(ctx context.Context, fiel
 		IsResolver: false,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			return nil, errors.New("field of type Metadata does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Utxo_transaction(ctx context.Context, field graphql.CollectedField, obj *bux.Utxo) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Utxo_transaction(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Utxo().Transaction(rctx, obj)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*bux.Transaction)
+	fc.Result = res
+	return ec.marshalOTransaction2ᚖgithubᚗcomᚋBuxOrgᚋbuxᚐTransaction(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Utxo_transaction(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Utxo",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_Transaction_id(ctx, field)
+			case "hex":
+				return ec.fieldContext_Transaction_hex(ctx, field)
+			case "block_hash":
+				return ec.fieldContext_Transaction_block_hash(ctx, field)
+			case "block_height":
+				return ec.fieldContext_Transaction_block_height(ctx, field)
+			case "fee":
+				return ec.fieldContext_Transaction_fee(ctx, field)
+			case "number_of_inputs":
+				return ec.fieldContext_Transaction_number_of_inputs(ctx, field)
+			case "number_of_outputs":
+				return ec.fieldContext_Transaction_number_of_outputs(ctx, field)
+			case "total_value":
+				return ec.fieldContext_Transaction_total_value(ctx, field)
+			case "metadata":
+				return ec.fieldContext_Transaction_metadata(ctx, field)
+			case "output_value":
+				return ec.fieldContext_Transaction_output_value(ctx, field)
+			case "direction":
+				return ec.fieldContext_Transaction_direction(ctx, field)
+			case "created_at":
+				return ec.fieldContext_Transaction_created_at(ctx, field)
+			case "updated_at":
+				return ec.fieldContext_Transaction_updated_at(ctx, field)
+			case "deleted_at":
+				return ec.fieldContext_Transaction_deleted_at(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type Transaction", field.Name)
 		},
 	}
 	return fc, nil
@@ -15712,6 +16154,66 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 			out.Concurrently(i, func() graphql.Marshaler {
 				return rrm(innerCtx)
 			})
+		case "utxo":
+			field := field
+
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_utxo(ctx, field)
+				return res
+			}
+
+			rrm := func(ctx context.Context) graphql.Marshaler {
+				return ec.OperationContext.RootResolverMiddleware(ctx, innerFunc)
+			}
+
+			out.Concurrently(i, func() graphql.Marshaler {
+				return rrm(innerCtx)
+			})
+		case "utxos":
+			field := field
+
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_utxos(ctx, field)
+				return res
+			}
+
+			rrm := func(ctx context.Context) graphql.Marshaler {
+				return ec.OperationContext.RootResolverMiddleware(ctx, innerFunc)
+			}
+
+			out.Concurrently(i, func() graphql.Marshaler {
+				return rrm(innerCtx)
+			})
+		case "utxos_count":
+			field := field
+
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_utxos_count(ctx, field)
+				return res
+			}
+
+			rrm := func(ctx context.Context) graphql.Marshaler {
+				return ec.OperationContext.RootResolverMiddleware(ctx, innerFunc)
+			}
+
+			out.Concurrently(i, func() graphql.Marshaler {
+				return rrm(innerCtx)
+			})
 		case "admin_get_status":
 			field := field
 
@@ -16503,6 +17005,23 @@ func (ec *executionContext) _Utxo(ctx context.Context, sel ast.SelectionSet, obj
 
 			out.Values[i] = ec._Utxo_metadata(ctx, field, obj)
 
+		case "transaction":
+			field := field
+
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Utxo_transaction(ctx, field, obj)
+				return res
+			}
+
+			out.Concurrently(i, func() graphql.Marshaler {
+				return innerFunc(ctx)
+
+			})
 		case "created_at":
 
 			out.Values[i] = ec._Utxo_created_at(ctx, field, obj)
@@ -16951,6 +17470,21 @@ func (ec *executionContext) marshalNString2string(ctx context.Context, sel ast.S
 func (ec *executionContext) unmarshalNTransactionConfigInput2githubᚗcomᚋBuxOrgᚋbuxᚐTransactionConfig(ctx context.Context, v interface{}) (bux.TransactionConfig, error) {
 	res, err := ec.unmarshalInputTransactionConfigInput(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) unmarshalNUint322uint32(ctx context.Context, v interface{}) (uint32, error) {
+	res, err := gqlgen.UnmarshalUint32(v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalNUint322uint32(ctx context.Context, sel ast.SelectionSet, v uint32) graphql.Marshaler {
+	res := gqlgen.MarshalUint32(v)
+	if res == graphql.Null {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+	}
+	return res
 }
 
 func (ec *executionContext) marshalN__Directive2githubᚗcomᚋ99designsᚋgqlgenᚋgraphqlᚋintrospectionᚐDirective(ctx context.Context, sel ast.SelectionSet, v introspection.Directive) graphql.Marshaler {
