@@ -3,7 +3,7 @@ module github.com/BuxOrg/bux-server
 go 1.17
 
 require (
-	github.com/99designs/gqlgen v0.17.10
+	github.com/99designs/gqlgen v0.17.11
 	github.com/BuxOrg/bux v0.2.32
 	github.com/go-ozzo/ozzo-validation v3.6.0+incompatible
 	github.com/go-redis/redis/v8 v8.11.5
@@ -18,7 +18,7 @@ require (
 	github.com/newrelic/go-agent/v3/integrations/nrhttprouter v1.0.1
 	github.com/spf13/viper v1.12.0
 	github.com/stretchr/testify v1.8.0
-	github.com/vektah/gqlparser/v2 v2.4.5
+	github.com/vektah/gqlparser/v2 v2.4.6
 )
 
 require (
