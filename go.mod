@@ -1,10 +1,10 @@
 module github.com/BuxOrg/bux-server
 
-go 1.17
+go 1.18
 
 require (
 	github.com/99designs/gqlgen v0.17.12
-	github.com/BuxOrg/bux v0.2.33
+	github.com/BuxOrg/bux v0.2.34
 	github.com/go-ozzo/ozzo-validation v3.6.0+incompatible
 	github.com/go-redis/redis/v8 v8.11.5
 	github.com/gofrs/uuid v4.2.0+incompatible
@@ -32,7 +32,7 @@ require (
 	github.com/bsm/redislock v0.7.2 // indirect
 	github.com/capnm/sysinfo v0.0.0-20130621111458-5909a53897f3 // indirect
 	github.com/centrifugal/centrifuge-go v0.8.3 // indirect
-	github.com/centrifugal/protocol v0.8.8 // indirect
+	github.com/centrifugal/protocol v0.8.9 // indirect
 	github.com/cespare/xxhash/v2 v2.1.2 // indirect
 	github.com/coocood/freecache v1.2.1 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
@@ -47,7 +47,7 @@ require (
 	github.com/gojektech/valkyrie v0.0.0-20190210220504-8f62c1e7ba45 // indirect
 	github.com/golang/protobuf v1.5.2 // indirect
 	github.com/golang/snappy v0.0.4 // indirect
-	github.com/gomodule/redigo v1.8.8 // indirect
+	github.com/gomodule/redigo v1.8.9 // indirect
 	github.com/google/uuid v1.3.0 // indirect
 	github.com/gorilla/mux v1.8.0 // indirect
 	github.com/gorilla/websocket v1.5.0 // indirect
@@ -119,7 +119,7 @@ require (
 	golang.org/x/sys v0.0.0-20220704084225-05e143d24a9e // indirect
 	golang.org/x/text v0.3.7 // indirect
 	golang.org/x/tools v0.1.11 // indirect
-	google.golang.org/genproto v0.0.0-20220630174209-ad1d48641aa7 // indirect
+	google.golang.org/genproto v0.0.0-20220706132729-d86698d07c53 // indirect
 	google.golang.org/grpc v1.47.0 // indirect
 	google.golang.org/protobuf v1.28.0 // indirect
 	gopkg.in/check.v1 v1.0.0-20200902074654-038fdea0a05b // indirect
@@ -127,8 +127,8 @@ require (
 	gopkg.in/yaml.v2 v2.4.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 	gorm.io/driver/mysql v1.3.4 // indirect
-	gorm.io/driver/postgres v1.3.7 // indirect
-	gorm.io/driver/sqlite v1.3.5 // indirect
+	gorm.io/driver/postgres v1.3.8 // indirect
+	gorm.io/driver/sqlite v1.3.6 // indirect
 	gorm.io/gorm v1.23.7 // indirect
 	gorm.io/plugin/dbresolver v1.2.1 // indirect
 )
