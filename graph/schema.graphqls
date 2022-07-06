@@ -144,6 +144,7 @@ type Utxo {
     reserved_at:    NullTime
     spending_tx_id: NullString
     metadata:       Metadata
+    transaction:    Transaction # originating transaction, this is needed to spend the utxo
     created_at:     Time
     updated_at:     Time
     deleted_at:     NullTime
@@ -319,6 +320,19 @@ type Query {
         params: QueryParams
     ): [Destination]
     destinations_count(
+        metadata: Metadata
+        conditions: Map,
+    ): Int64
+    utxo (
+        tx_id: String!
+        output_index: Uint32!
+    ): Utxo
+    utxos (
+        metadata: Metadata,
+        conditions: Map,
+        params: QueryParams
+    ): [Utxo]
+    utxos_count (
         metadata: Metadata
         conditions: Map,
     ): Int64
