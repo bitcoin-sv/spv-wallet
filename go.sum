@@ -670,8 +670,9 @@ github.com/mrz1836/go-api-router v0.4.13 h1:7SsHaboj5DBDes6RGFNaqgqMCypwZ2dUDRPh
 github.com/mrz1836/go-api-router v0.4.13/go.mod h1:qJjVrFNHyqsUeucQjmXtPlMOQtQ+e+5z5U38u2ywEYs=
 github.com/mrz1836/go-cache v0.6.6 h1:xb65dIKbcFLAbENp0NiqFBppohuMHJX0u53S9QVdh5M=
 github.com/mrz1836/go-cache v0.6.6/go.mod h1:of3Ku0HjiRQrTvcjNb/ZZrCEUjrqO7L7I1Hx7dHGx5U=
-github.com/mrz1836/go-logger v0.2.5 h1:n4yQKHalut4MYoZsk9pXVf7bIcW9J/vdl9zYJAE67ts=
 github.com/mrz1836/go-logger v0.2.5/go.mod h1:E4gFkyzOlEb2MmaLaTYO0KUKKcsXB1KeMPhcJIGD5F4=
+github.com/mrz1836/go-logger v0.2.6 h1:qqctw2o0G3D/FSaeOrfKbyXgouBuaDvGu7g61FG0Los=
+github.com/mrz1836/go-logger v0.2.6/go.mod h1:Lk0xAOob/tuA8vJptnvLDZIbgl/B3rMhD+28M7pW7mM=
 github.com/mrz1836/go-nownodes v0.0.6 h1:RxXOUEYromY8uJeOiphFZ/60zfYoaHj86Bgy7faYir0=
 github.com/mrz1836/go-nownodes v0.0.6/go.mod h1:QMrAPr+OMqUnzcqKmlXWGSI7Xh2TKcwp9tsnTKC4XaA=
 github.com/mrz1836/go-parameters v0.2.8 h1:TfirO5GgS0RxYc3X36zbGds00c3U+BUgkfqyDFNcVBM=
