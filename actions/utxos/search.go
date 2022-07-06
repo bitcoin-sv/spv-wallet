@@ -9,7 +9,7 @@ import (
 	apirouter "github.com/mrz1836/go-api-router"
 )
 
-// search will fetch a list of transactions filtered on conditions and metadata
+// search will fetch a list of utxos filtered on conditions and metadata
 func (a *Action) search(w http.ResponseWriter, req *http.Request, _ httprouter.Params) {
 
 	reqXPubID, _ := bux.GetXpubIDFromRequest(req)

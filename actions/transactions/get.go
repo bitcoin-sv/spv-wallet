@@ -9,7 +9,7 @@ import (
 )
 
 // get will fetch a transaction
-func (a *Action) get(w http.ResponseWriter, req *http.Request, ps httprouter.Params) {
+func (a *Action) get(w http.ResponseWriter, req *http.Request, _ httprouter.Params) {
 	// Parse the params
 	params := apirouter.GetParams(req)
 
