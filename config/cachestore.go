@@ -3,7 +3,7 @@ package config
 import (
 	"errors"
 
-	"github.com/BuxOrg/bux/cachestore"
+	"github.com/mrz1836/go-cachestore"
 )
 
 // Validate checks the configuration for specific rules

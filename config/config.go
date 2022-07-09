@@ -5,10 +5,10 @@ import (
 	"errors"
 	"time"
 
-	"github.com/BuxOrg/bux/cachestore"
 	"github.com/BuxOrg/bux/datastore"
 	"github.com/BuxOrg/bux/taskmanager"
 	validation "github.com/go-ozzo/ozzo-validation"
+	"github.com/mrz1836/go-cachestore"
 	"github.com/newrelic/go-agent/v3/newrelic"
 )
 
@@ -27,7 +27,7 @@ const (
 	EnvironmentStaging             = "staging"
 	EnvironmentTest                = "test"
 	HealthRequestPath              = "health"
-	Version                        = "v0.2.1"
+	Version                        = "v0.2.2"
 )
 
 // Local variables for configuration

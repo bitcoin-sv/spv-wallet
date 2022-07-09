@@ -3,7 +3,7 @@ package config
 import (
 	"testing"
 
-	"github.com/BuxOrg/bux/cachestore"
+	"github.com/mrz1836/go-cachestore"
 	"github.com/stretchr/testify/require"
 )
 

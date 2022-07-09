@@ -8,12 +8,12 @@ import (
 	"time"
 
 	"github.com/BuxOrg/bux"
-	"github.com/BuxOrg/bux/cachestore"
 	"github.com/BuxOrg/bux/chainstate"
 	"github.com/BuxOrg/bux/datastore"
 	"github.com/BuxOrg/bux/taskmanager"
 	"github.com/BuxOrg/bux/utils"
 	"github.com/go-redis/redis/v8"
+	"github.com/mrz1836/go-cachestore"
 	"github.com/mrz1836/go-logger"
 	"github.com/newrelic/go-agent/v3/newrelic"
 )
