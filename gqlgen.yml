@@ -78,7 +78,7 @@ models:
   PaymailP4:
     model: github.com/BuxOrg/bux.PaymailP4
   QueryParams:
-    model: github.com/BuxOrg/bux/datastore.QueryParams
+    model: github.com/mrz1836/go-datastore.QueryParams
   SyncConfig:
     model: github.com/BuxOrg/bux.SyncConfig
   SyncConfigInput:
@@ -132,7 +132,7 @@ models:
       - github.com/BuxOrg/bux-server/gqlgen.Uint64
   NullString:
     model:
-      - github.com/BuxOrg/bux/utils.NullString
+      - github.com/mrz1836/go-datastore/customTypes.NullString
   NullTime:
     model:
-      - github.com/BuxOrg/bux/utils.NullTime
+      - github.com/mrz1836/go-datastore/customTypes.NullTime

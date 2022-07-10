@@ -10,8 +10,8 @@ import (
 
 	"github.com/BuxOrg/bux"
 	"github.com/BuxOrg/bux-server/graph/generated"
-	"github.com/BuxOrg/bux/datastore"
 	"github.com/BuxOrg/bux/utils"
+	"github.com/mrz1836/go-datastore"
 )
 
 func (r *mutationResolver) Xpub(ctx context.Context, xpub string, metadata bux.Metadata) (*bux.Xpub, error) {

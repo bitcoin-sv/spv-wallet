@@ -8,7 +8,7 @@ import (
 	"errors"
 
 	"github.com/BuxOrg/bux"
-	"github.com/BuxOrg/bux/datastore"
+	"github.com/mrz1836/go-datastore"
 )
 
 func (r *mutationResolver) AdminPaymailCreate(ctx context.Context, xpub string, address string, publicName *string, avatar *string, metadata bux.Metadata) (*bux.PaymailAddress, error) {

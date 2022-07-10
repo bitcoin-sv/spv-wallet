@@ -3,7 +3,7 @@ package config
 import (
 	"testing"
 
-	"github.com/BuxOrg/bux/datastore"
+	"github.com/mrz1836/go-datastore"
 	"github.com/stretchr/testify/require"
 )
 
