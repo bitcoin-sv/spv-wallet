@@ -4,7 +4,7 @@ go 1.18
 
 require (
 	github.com/99designs/gqlgen v0.17.12
-	github.com/BuxOrg/bux v0.3.1
+	github.com/BuxOrg/bux v0.4.0
 	github.com/go-ozzo/ozzo-validation v3.6.0+incompatible
 	github.com/go-redis/redis/v8 v8.11.5
 	github.com/gofrs/uuid v4.2.0+incompatible
@@ -80,6 +80,7 @@ require (
 	github.com/miekg/dns v1.1.50 // indirect
 	github.com/mitchellh/mapstructure v1.5.0 // indirect
 	github.com/mrz1836/go-cache v0.7.0 // indirect
+	github.com/mrz1836/go-datastore v0.1.0 // indirect
 	github.com/mrz1836/go-nownodes v0.0.6 // indirect
 	github.com/mrz1836/go-whatsonchain v0.11.0 // indirect
 	github.com/newrelic/go-agent/v3/integrations/nrmongo v1.0.2 // indirect
