@@ -132,7 +132,7 @@ models:
       - github.com/BuxOrg/bux-server/gqlgen.Uint64
   NullString:
     model:
-      - github.com/mrz1836/go-datastore/customTypes.NullString
+      - github.com/mrz1836/go-datastore/custom_types.NullString
   NullTime:
     model:
-      - github.com/mrz1836/go-datastore/customTypes.NullTime
+      - github.com/mrz1836/go-datastore/custom_types.NullTime
