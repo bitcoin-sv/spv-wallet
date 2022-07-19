@@ -11,7 +11,7 @@ import (
 func TestCachestoreConfig_Validate(t *testing.T) {
 	t.Parallel()
 
-	t.Run("valid datastore config", func(t *testing.T) {
+	t.Run("valid cachestore config", func(t *testing.T) {
 		c := CachestoreConfig{
 			Engine: cachestore.FreeCache,
 		}
@@ -21,7 +21,7 @@ func TestCachestoreConfig_Validate(t *testing.T) {
 		require.NoError(t, err)
 	})
 
-	t.Run("empty datastore", func(t *testing.T) {
+	t.Run("empty cachestore", func(t *testing.T) {
 		c := CachestoreConfig{
 			Engine: cachestore.Empty,
 		}
@@ -31,7 +31,7 @@ func TestCachestoreConfig_Validate(t *testing.T) {
 		require.Error(t, err)
 	})
 
-	t.Run("invalid datastore engine", func(t *testing.T) {
+	t.Run("invalid cachestore engine", func(t *testing.T) {
 		c := CachestoreConfig{
 			Engine: "",
 		}

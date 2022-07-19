@@ -79,7 +79,7 @@ type (
 
 	// CachestoreConfig is a configuration for cachestore
 	CachestoreConfig struct {
-		Engine cachestore.Engine `json:"engine" mapstructure:"engine"` // Cache engine to use (redis, mcache, ristretto)
+		Engine cachestore.Engine `json:"engine" mapstructure:"engine"` // Cache engine to use (redis, freecache)
 	}
 
 	// DatastoreConfig is a configuration for the datastore
