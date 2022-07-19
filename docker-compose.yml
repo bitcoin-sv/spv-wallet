@@ -18,6 +18,8 @@ services:
         condition: service_healthy
   redis:
     image: redis
+    healthcheck:
+      test: ["CMD", "redis-cli","ping"]
   db:
     image: postgres
     volumes:
@@ -26,3 +28,7 @@ services:
       - POSTGRES_NAME=bux
       - POSTGRES_USER=bux
       - POSTGRES_PASSWORD=postgres
+    healthcheck:
+      test: ["CMD", "pg_isready"]
+      timeout: 5s
+      retries: 3
