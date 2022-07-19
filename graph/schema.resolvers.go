@@ -10,10 +10,11 @@ import (
 
 	"github.com/BuxOrg/bux"
 	"github.com/BuxOrg/bux-server/graph/generated"
-	"github.com/BuxOrg/bux/datastore"
 	"github.com/BuxOrg/bux/utils"
+	"github.com/mrz1836/go-datastore"
 )
 
+// Xpub is the resolver for the xpub field.
 func (r *mutationResolver) Xpub(ctx context.Context, xpub string, metadata bux.Metadata) (*bux.Xpub, error) {
 	// including admin check
 	c, err := GetConfigFromContextAdmin(ctx)
@@ -46,6 +47,7 @@ func (r *mutationResolver) Xpub(ctx context.Context, xpub string, metadata bux.M
 	return bux.DisplayModels(xPub).(*bux.Xpub), nil
 }
 
+// XpubMetadata is the resolver for the xpub_metadata field.
 func (r *mutationResolver) XpubMetadata(ctx context.Context, metadata bux.Metadata) (*bux.Xpub, error) {
 	c, err := GetConfigFromContext(ctx)
 	if err != nil {
@@ -65,6 +67,7 @@ func (r *mutationResolver) XpubMetadata(ctx context.Context, metadata bux.Metada
 	return bux.DisplayModels(xPub).(*bux.Xpub), nil
 }
 
+// AccessKey is the resolver for the access_key field.
 func (r *mutationResolver) AccessKey(ctx context.Context, metadata bux.Metadata) (*bux.AccessKey, error) {
 	c, err := GetConfigFromContextSigned(ctx)
 	if err != nil {
@@ -84,6 +87,7 @@ func (r *mutationResolver) AccessKey(ctx context.Context, metadata bux.Metadata)
 	return bux.DisplayModels(accessKey).(*bux.AccessKey), nil
 }
 
+// AccessKeyRevoke is the resolver for the access_key_revoke field.
 func (r *mutationResolver) AccessKeyRevoke(ctx context.Context, id *string) (*bux.AccessKey, error) {
 	c, err := GetConfigFromContextSigned(ctx)
 	if err != nil {
@@ -103,6 +107,7 @@ func (r *mutationResolver) AccessKeyRevoke(ctx context.Context, id *string) (*bu
 	return bux.DisplayModels(accessKey).(*bux.AccessKey), nil
 }
 
+// Transaction is the resolver for the transaction field.
 func (r *mutationResolver) Transaction(ctx context.Context, hex string, draftID *string, metadata bux.Metadata) (*bux.Transaction, error) {
 	c, err := GetConfigFromContextSigned(ctx)
 	if err != nil {
@@ -164,6 +169,7 @@ func (r *mutationResolver) Transaction(ctx context.Context, hex string, draftID 
 	return bux.DisplayModels(transaction).(*bux.Transaction), nil
 }
 
+// TransactionMetadata is the resolver for the transaction_metadata field.
 func (r *mutationResolver) TransactionMetadata(ctx context.Context, id string, metadata bux.Metadata) (*bux.Transaction, error) {
 	c, err := GetConfigFromContext(ctx)
 	if err != nil {
@@ -182,6 +188,7 @@ func (r *mutationResolver) TransactionMetadata(ctx context.Context, id string, m
 	return bux.DisplayModels(tx).(*bux.Transaction), nil
 }
 
+// NewTransaction is the resolver for the new_transaction field.
 func (r *mutationResolver) NewTransaction(ctx context.Context, transactionConfig bux.TransactionConfig, metadata bux.Metadata) (*bux.DraftTransaction, error) {
 	c, err := GetConfigFromContextSigned(ctx)
 	if err != nil {
@@ -202,6 +209,7 @@ func (r *mutationResolver) NewTransaction(ctx context.Context, transactionConfig
 	return bux.DisplayModels(draftTransaction).(*bux.DraftTransaction), nil
 }
 
+// Destination is the resolver for the destination field.
 func (r *mutationResolver) Destination(ctx context.Context, destinationType *string, metadata bux.Metadata) (*bux.Destination, error) {
 	c, err := GetConfigFromContextSigned(ctx)
 	if err != nil {
@@ -236,6 +244,7 @@ func (r *mutationResolver) Destination(ctx context.Context, destinationType *str
 	return bux.DisplayModels(destination).(*bux.Destination), nil
 }
 
+// DestinationMetadata is the resolver for the destination_metadata field.
 func (r *mutationResolver) DestinationMetadata(ctx context.Context, id *string, address *string, lockingScript *string, metadata bux.Metadata) (*bux.Destination, error) {
 	c, err := GetConfigFromContextSigned(ctx)
 	if err != nil {
@@ -272,6 +281,7 @@ func (r *mutationResolver) DestinationMetadata(ctx context.Context, id *string, 
 	return bux.DisplayModels(destination).(*bux.Destination), nil
 }
 
+// Xpub is the resolver for the xpub field.
 func (r *queryResolver) Xpub(ctx context.Context) (*bux.Xpub, error) {
 	c, err := GetConfigFromContext(ctx)
 	if err != nil {
@@ -291,6 +301,7 @@ func (r *queryResolver) Xpub(ctx context.Context) (*bux.Xpub, error) {
 	return bux.DisplayModels(xPub).(*bux.Xpub), nil
 }
 
+// AccessKey is the resolver for the access_key field.
 func (r *queryResolver) AccessKey(ctx context.Context, key string) (*bux.AccessKey, error) {
 	c, err := GetConfigFromContextSigned(ctx)
 	if err != nil {
@@ -306,6 +317,7 @@ func (r *queryResolver) AccessKey(ctx context.Context, key string) (*bux.AccessK
 	return bux.DisplayModels(accessKey).(*bux.AccessKey), nil
 }
 
+// AccessKeys is the resolver for the access_keys field.
 func (r *queryResolver) AccessKeys(ctx context.Context, metadata bux.Metadata, conditions map[string]interface{}, params *datastore.QueryParams) ([]*bux.AccessKey, error) {
 	c, err := GetConfigFromContextSigned(ctx)
 	if err != nil {
@@ -321,6 +333,7 @@ func (r *queryResolver) AccessKeys(ctx context.Context, metadata bux.Metadata, c
 	return bux.DisplayModels(accessKeys).([]*bux.AccessKey), nil
 }
 
+// AccessKeysCount is the resolver for the access_keys_count field.
 func (r *queryResolver) AccessKeysCount(ctx context.Context, metadata bux.Metadata, conditions map[string]interface{}) (*int64, error) {
 	c, err := GetConfigFromContext(ctx)
 	if err != nil {
@@ -336,6 +349,7 @@ func (r *queryResolver) AccessKeysCount(ctx context.Context, metadata bux.Metada
 	return &count, nil
 }
 
+// Transaction is the resolver for the transaction field.
 func (r *queryResolver) Transaction(ctx context.Context, id string) (*bux.Transaction, error) {
 	c, err := GetConfigFromContext(ctx)
 	if err != nil {
@@ -354,6 +368,7 @@ func (r *queryResolver) Transaction(ctx context.Context, id string) (*bux.Transa
 	return bux.DisplayModels(tx).(*bux.Transaction), nil
 }
 
+// Transactions is the resolver for the transactions field.
 func (r *queryResolver) Transactions(ctx context.Context, metadata bux.Metadata, conditions map[string]interface{}, params *datastore.QueryParams) ([]*bux.Transaction, error) {
 	c, err := GetConfigFromContext(ctx)
 	if err != nil {
@@ -369,6 +384,7 @@ func (r *queryResolver) Transactions(ctx context.Context, metadata bux.Metadata,
 	return bux.DisplayModels(tx).([]*bux.Transaction), nil
 }
 
+// TransactionsCount is the resolver for the transactions_count field.
 func (r *queryResolver) TransactionsCount(ctx context.Context, metadata bux.Metadata, conditions map[string]interface{}) (*int64, error) {
 	c, err := GetConfigFromContext(ctx)
 	if err != nil {
@@ -384,6 +400,7 @@ func (r *queryResolver) TransactionsCount(ctx context.Context, metadata bux.Meta
 	return &count, nil
 }
 
+// Destination is the resolver for the destination field.
 func (r *queryResolver) Destination(ctx context.Context, id *string, address *string, lockingScript *string) (*bux.Destination, error) {
 	c, err := GetConfigFromContext(ctx)
 	if err != nil {
@@ -407,6 +424,7 @@ func (r *queryResolver) Destination(ctx context.Context, id *string, address *st
 	return bux.DisplayModels(destination).(*bux.Destination), nil
 }
 
+// Destinations is the resolver for the destinations field.
 func (r *queryResolver) Destinations(ctx context.Context, metadata bux.Metadata, conditions map[string]interface{}, params *datastore.QueryParams) ([]*bux.Destination, error) {
 	c, err := GetConfigFromContext(ctx)
 	if err != nil {
@@ -422,6 +440,7 @@ func (r *queryResolver) Destinations(ctx context.Context, metadata bux.Metadata,
 	return bux.DisplayModels(destinations).([]*bux.Destination), nil
 }
 
+// DestinationsCount is the resolver for the destinations_count field.
 func (r *queryResolver) DestinationsCount(ctx context.Context, metadata bux.Metadata, conditions map[string]interface{}) (*int64, error) {
 	c, err := GetConfigFromContext(ctx)
 	if err != nil {
@@ -437,6 +456,7 @@ func (r *queryResolver) DestinationsCount(ctx context.Context, metadata bux.Meta
 	return &count, nil
 }
 
+// Utxo is the resolver for the utxo field.
 func (r *queryResolver) Utxo(ctx context.Context, txID string, outputIndex uint32) (*bux.Utxo, error) {
 	c, err := GetConfigFromContext(ctx)
 	if err != nil {
@@ -456,6 +476,7 @@ func (r *queryResolver) Utxo(ctx context.Context, txID string, outputIndex uint3
 	return utxo, nil
 }
 
+// Utxos is the resolver for the utxos field.
 func (r *queryResolver) Utxos(ctx context.Context, metadata bux.Metadata, conditions map[string]interface{}, params *datastore.QueryParams) ([]*bux.Utxo, error) {
 	c, err := GetConfigFromContext(ctx)
 	if err != nil {
@@ -476,6 +497,7 @@ func (r *queryResolver) Utxos(ctx context.Context, metadata bux.Metadata, condit
 	return utxos, nil
 }
 
+// UtxosCount is the resolver for the utxos_count field.
 func (r *queryResolver) UtxosCount(ctx context.Context, metadata bux.Metadata, conditions map[string]interface{}) (*int64, error) {
 	c, err := GetConfigFromContext(ctx)
 	if err != nil {
@@ -501,29 +523,13 @@ func (r *queryResolver) UtxosCount(ctx context.Context, metadata bux.Metadata, c
 	return &count, nil
 }
 
-func (r *utxoResolver) Transaction(ctx context.Context, obj *bux.Utxo) (*bux.Transaction, error) {
-	c, err := GetConfigFromContext(ctx)
-	if err != nil {
-		return nil, err
-	}
-
-	var tx *bux.Transaction
-	tx, err = c.Services.Bux.GetTransaction(ctx, obj.XpubID, obj.ID)
-	if err != nil {
-		return nil, err
-	}
-	if tx == nil {
-		return nil, nil
-	}
-
-	return tx, nil
-}
-
+// Inputs is the resolver for the inputs field.
 func (r *transactionConfigInputResolver) Inputs(ctx context.Context, obj *bux.TransactionConfig, data []map[string]interface{}) error {
 	// do nothing with inputs
 	return nil
 }
 
+// ExpiresIn is the resolver for the expires_in field.
 func (r *transactionConfigInputResolver) ExpiresIn(ctx context.Context, obj *bux.TransactionConfig, data *uint64) error {
 	obj.ExpiresIn = time.Duration(*data) * time.Second
 	return nil
@@ -535,9 +541,6 @@ func (r *Resolver) Mutation() generated.MutationResolver { return &mutationResol
 // Query returns generated.QueryResolver implementation.
 func (r *Resolver) Query() generated.QueryResolver { return &queryResolver{r} }
 
-// Utxo returns generated.UtxoResolver implementation.
-func (r *Resolver) Utxo() generated.UtxoResolver { return &utxoResolver{r} }
-
 // TransactionConfigInput returns generated.TransactionConfigInputResolver implementation.
 func (r *Resolver) TransactionConfigInput() generated.TransactionConfigInputResolver {
 	return &transactionConfigInputResolver{r}
@@ -545,5 +548,4 @@ func (r *Resolver) TransactionConfigInput() generated.TransactionConfigInputReso
 
 type mutationResolver struct{ *Resolver }
 type queryResolver struct{ *Resolver }
-type utxoResolver struct{ *Resolver }
 type transactionConfigInputResolver struct{ *Resolver }

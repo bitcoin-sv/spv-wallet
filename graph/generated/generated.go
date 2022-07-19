@@ -15,8 +15,9 @@ import (
 	"github.com/99designs/gqlgen/graphql/introspection"
 	"github.com/BuxOrg/bux"
 	"github.com/BuxOrg/bux-server/gqlgen"
-	"github.com/BuxOrg/bux/datastore"
 	"github.com/BuxOrg/bux/utils"
+	"github.com/mrz1836/go-datastore"
+	customTypes "github.com/mrz1836/go-datastore/custom_types"
 	gqlparser "github.com/vektah/gqlparser/v2"
 	"github.com/vektah/gqlparser/v2/ast"
 )
@@ -41,7 +42,6 @@ type Config struct {
 type ResolverRoot interface {
 	Mutation() MutationResolver
 	Query() QueryResolver
-	Utxo() UtxoResolver
 	TransactionConfigInput() TransactionConfigInputResolver
 }
 
@@ -349,9 +349,6 @@ type QueryResolver interface {
 	AdminUtxosCount(ctx context.Context, metadata bux.Metadata, conditions map[string]interface{}) (*int64, error)
 	AdminXpubsList(ctx context.Context, metadata bux.Metadata, conditions map[string]interface{}, params *datastore.QueryParams) ([]*bux.Xpub, error)
 	AdminXpubsCount(ctx context.Context, metadata bux.Metadata, conditions map[string]interface{}) (*int64, error)
-}
-type UtxoResolver interface {
-	Transaction(ctx context.Context, obj *bux.Utxo) (*bux.Transaction, error)
 }
 
 type TransactionConfigInputResolver interface {
@@ -2849,7 +2846,7 @@ func (ec *executionContext) field_Query_access_keys_args(ctx context.Context, ra
 	var arg2 *datastore.QueryParams
 	if tmp, ok := rawArgs["params"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("params"))
-		arg2, err = ec.unmarshalOQueryParams2ᚖgithubᚗcomᚋBuxOrgᚋbuxᚋdatastoreᚐQueryParams(ctx, tmp)
+		arg2, err = ec.unmarshalOQueryParams2ᚖgithubᚗcomᚋmrz1836ᚋgoᚑdatastoreᚐQueryParams(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -2930,7 +2927,7 @@ func (ec *executionContext) field_Query_admin_access_keys_list_args(ctx context.
 	var arg2 *datastore.QueryParams
 	if tmp, ok := rawArgs["params"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("params"))
-		arg2, err = ec.unmarshalOQueryParams2ᚖgithubᚗcomᚋBuxOrgᚋbuxᚋdatastoreᚐQueryParams(ctx, tmp)
+		arg2, err = ec.unmarshalOQueryParams2ᚖgithubᚗcomᚋmrz1836ᚋgoᚑdatastoreᚐQueryParams(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -2987,7 +2984,7 @@ func (ec *executionContext) field_Query_admin_block_headers_list_args(ctx contex
 	var arg2 *datastore.QueryParams
 	if tmp, ok := rawArgs["params"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("params"))
-		arg2, err = ec.unmarshalOQueryParams2ᚖgithubᚗcomᚋBuxOrgᚋbuxᚋdatastoreᚐQueryParams(ctx, tmp)
+		arg2, err = ec.unmarshalOQueryParams2ᚖgithubᚗcomᚋmrz1836ᚋgoᚑdatastoreᚐQueryParams(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -3044,7 +3041,7 @@ func (ec *executionContext) field_Query_admin_destinations_list_args(ctx context
 	var arg2 *datastore.QueryParams
 	if tmp, ok := rawArgs["params"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("params"))
-		arg2, err = ec.unmarshalOQueryParams2ᚖgithubᚗcomᚋBuxOrgᚋbuxᚋdatastoreᚐQueryParams(ctx, tmp)
+		arg2, err = ec.unmarshalOQueryParams2ᚖgithubᚗcomᚋmrz1836ᚋgoᚑdatastoreᚐQueryParams(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -3101,7 +3098,7 @@ func (ec *executionContext) field_Query_admin_draft_transactions_list_args(ctx c
 	var arg2 *datastore.QueryParams
 	if tmp, ok := rawArgs["params"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("params"))
-		arg2, err = ec.unmarshalOQueryParams2ᚖgithubᚗcomᚋBuxOrgᚋbuxᚋdatastoreᚐQueryParams(ctx, tmp)
+		arg2, err = ec.unmarshalOQueryParams2ᚖgithubᚗcomᚋmrz1836ᚋgoᚑdatastoreᚐQueryParams(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -3188,7 +3185,7 @@ func (ec *executionContext) field_Query_admin_paymails_list_args(ctx context.Con
 	var arg2 *datastore.QueryParams
 	if tmp, ok := rawArgs["params"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("params"))
-		arg2, err = ec.unmarshalOQueryParams2ᚖgithubᚗcomᚋBuxOrgᚋbuxᚋdatastoreᚐQueryParams(ctx, tmp)
+		arg2, err = ec.unmarshalOQueryParams2ᚖgithubᚗcomᚋmrz1836ᚋgoᚑdatastoreᚐQueryParams(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -3245,7 +3242,7 @@ func (ec *executionContext) field_Query_admin_transactions_list_args(ctx context
 	var arg2 *datastore.QueryParams
 	if tmp, ok := rawArgs["params"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("params"))
-		arg2, err = ec.unmarshalOQueryParams2ᚖgithubᚗcomᚋBuxOrgᚋbuxᚋdatastoreᚐQueryParams(ctx, tmp)
+		arg2, err = ec.unmarshalOQueryParams2ᚖgithubᚗcomᚋmrz1836ᚋgoᚑdatastoreᚐQueryParams(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -3302,7 +3299,7 @@ func (ec *executionContext) field_Query_admin_utxos_list_args(ctx context.Contex
 	var arg2 *datastore.QueryParams
 	if tmp, ok := rawArgs["params"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("params"))
-		arg2, err = ec.unmarshalOQueryParams2ᚖgithubᚗcomᚋBuxOrgᚋbuxᚋdatastoreᚐQueryParams(ctx, tmp)
+		arg2, err = ec.unmarshalOQueryParams2ᚖgithubᚗcomᚋmrz1836ᚋgoᚑdatastoreᚐQueryParams(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -3359,7 +3356,7 @@ func (ec *executionContext) field_Query_admin_xpubs_list_args(ctx context.Contex
 	var arg2 *datastore.QueryParams
 	if tmp, ok := rawArgs["params"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("params"))
-		arg2, err = ec.unmarshalOQueryParams2ᚖgithubᚗcomᚋBuxOrgᚋbuxᚋdatastoreᚐQueryParams(ctx, tmp)
+		arg2, err = ec.unmarshalOQueryParams2ᚖgithubᚗcomᚋmrz1836ᚋgoᚑdatastoreᚐQueryParams(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -3425,7 +3422,7 @@ func (ec *executionContext) field_Query_destinations_args(ctx context.Context, r
 	var arg2 *datastore.QueryParams
 	if tmp, ok := rawArgs["params"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("params"))
-		arg2, err = ec.unmarshalOQueryParams2ᚖgithubᚗcomᚋBuxOrgᚋbuxᚋdatastoreᚐQueryParams(ctx, tmp)
+		arg2, err = ec.unmarshalOQueryParams2ᚖgithubᚗcomᚋmrz1836ᚋgoᚑdatastoreᚐQueryParams(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -3497,7 +3494,7 @@ func (ec *executionContext) field_Query_transactions_args(ctx context.Context, r
 	var arg2 *datastore.QueryParams
 	if tmp, ok := rawArgs["params"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("params"))
-		arg2, err = ec.unmarshalOQueryParams2ᚖgithubᚗcomᚋBuxOrgᚋbuxᚋdatastoreᚐQueryParams(ctx, tmp)
+		arg2, err = ec.unmarshalOQueryParams2ᚖgithubᚗcomᚋmrz1836ᚋgoᚑdatastoreᚐQueryParams(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -3578,7 +3575,7 @@ func (ec *executionContext) field_Query_utxos_args(ctx context.Context, rawArgs 
 	var arg2 *datastore.QueryParams
 	if tmp, ok := rawArgs["params"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("params"))
-		arg2, err = ec.unmarshalOQueryParams2ᚖgithubᚗcomᚋBuxOrgᚋbuxᚋdatastoreᚐQueryParams(ctx, tmp)
+		arg2, err = ec.unmarshalOQueryParams2ᚖgithubᚗcomᚋmrz1836ᚋgoᚑdatastoreᚐQueryParams(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -3918,9 +3915,9 @@ func (ec *executionContext) _AccessKey_deleted_at(ctx context.Context, field gra
 	if resTmp == nil {
 		return graphql.Null
 	}
-	res := resTmp.(utils.NullTime)
+	res := resTmp.(customTypes.NullTime)
 	fc.Result = res
-	return ec.marshalONullTime2githubᚗcomᚋBuxOrgᚋbuxᚋutilsᚐNullTime(ctx, field.Selections, res)
+	return ec.marshalONullTime2githubᚗcomᚋmrz1836ᚋgoᚑdatastoreᚋcustom_typesᚐNullTime(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_AccessKey_deleted_at(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -3959,9 +3956,9 @@ func (ec *executionContext) _AccessKey_revoked_at(ctx context.Context, field gra
 	if resTmp == nil {
 		return graphql.Null
 	}
-	res := resTmp.(utils.NullTime)
+	res := resTmp.(customTypes.NullTime)
 	fc.Result = res
-	return ec.marshalONullTime2githubᚗcomᚋBuxOrgᚋbuxᚋutilsᚐNullTime(ctx, field.Selections, res)
+	return ec.marshalONullTime2githubᚗcomᚋmrz1836ᚋgoᚑdatastoreᚋcustom_typesᚐNullTime(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_AccessKey_revoked_at(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -4656,9 +4653,9 @@ func (ec *executionContext) _BlockHeader_synced(ctx context.Context, field graph
 	if resTmp == nil {
 		return graphql.Null
 	}
-	res := resTmp.(utils.NullTime)
+	res := resTmp.(customTypes.NullTime)
 	fc.Result = res
-	return ec.marshalONullTime2githubᚗcomᚋBuxOrgᚋbuxᚋutilsᚐNullTime(ctx, field.Selections, res)
+	return ec.marshalONullTime2githubᚗcomᚋmrz1836ᚋgoᚑdatastoreᚋcustom_typesᚐNullTime(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_BlockHeader_synced(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -4779,9 +4776,9 @@ func (ec *executionContext) _BlockHeader_deleted_at(ctx context.Context, field g
 	if resTmp == nil {
 		return graphql.Null
 	}
-	res := resTmp.(utils.NullTime)
+	res := resTmp.(customTypes.NullTime)
 	fc.Result = res
-	return ec.marshalONullTime2githubᚗcomᚋBuxOrgᚋbuxᚋutilsᚐNullTime(ctx, field.Selections, res)
+	return ec.marshalONullTime2githubᚗcomᚋmrz1836ᚋgoᚑdatastoreᚋcustom_typesᚐNullTime(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_BlockHeader_deleted_at(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -5271,9 +5268,9 @@ func (ec *executionContext) _Destination_deleted_at(ctx context.Context, field g
 	if resTmp == nil {
 		return graphql.Null
 	}
-	res := resTmp.(utils.NullTime)
+	res := resTmp.(customTypes.NullTime)
 	fc.Result = res
-	return ec.marshalONullTime2githubᚗcomᚋBuxOrgᚋbuxᚋutilsᚐNullTime(ctx, field.Selections, res)
+	return ec.marshalONullTime2githubᚗcomᚋmrz1836ᚋgoᚑdatastoreᚋcustom_typesᚐNullTime(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Destination_deleted_at(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -5703,9 +5700,9 @@ func (ec *executionContext) _DraftTransaction_deleted_at(ctx context.Context, fi
 	if resTmp == nil {
 		return graphql.Null
 	}
-	res := resTmp.(utils.NullTime)
+	res := resTmp.(customTypes.NullTime)
 	fc.Result = res
-	return ec.marshalONullTime2githubᚗcomᚋBuxOrgᚋbuxᚋutilsᚐNullTime(ctx, field.Selections, res)
+	return ec.marshalONullTime2githubᚗcomᚋmrz1836ᚋgoᚑdatastoreᚋcustom_typesᚐNullTime(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_DraftTransaction_deleted_at(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -7332,9 +7329,9 @@ func (ec *executionContext) _PaymailAddress_deleted_at(ctx context.Context, fiel
 	if resTmp == nil {
 		return graphql.Null
 	}
-	res := resTmp.(utils.NullTime)
+	res := resTmp.(customTypes.NullTime)
 	fc.Result = res
-	return ec.marshalONullTime2githubᚗcomᚋBuxOrgᚋbuxᚋutilsᚐNullTime(ctx, field.Selections, res)
+	return ec.marshalONullTime2githubᚗcomᚋmrz1836ᚋgoᚑdatastoreᚋcustom_typesᚐNullTime(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_PaymailAddress_deleted_at(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -10813,9 +10810,9 @@ func (ec *executionContext) _Transaction_deleted_at(ctx context.Context, field g
 	if resTmp == nil {
 		return graphql.Null
 	}
-	res := resTmp.(utils.NullTime)
+	res := resTmp.(customTypes.NullTime)
 	fc.Result = res
-	return ec.marshalONullTime2githubᚗcomᚋBuxOrgᚋbuxᚋutilsᚐNullTime(ctx, field.Selections, res)
+	return ec.marshalONullTime2githubᚗcomᚋmrz1836ᚋgoᚑdatastoreᚋcustom_typesᚐNullTime(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Transaction_deleted_at(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -11629,9 +11626,9 @@ func (ec *executionContext) _TransactionInput_draft_id(ctx context.Context, fiel
 	if resTmp == nil {
 		return graphql.Null
 	}
-	res := resTmp.(utils.NullString)
+	res := resTmp.(customTypes.NullString)
 	fc.Result = res
-	return ec.marshalONullString2githubᚗcomᚋBuxOrgᚋbuxᚋutilsᚐNullString(ctx, field.Selections, res)
+	return ec.marshalONullString2githubᚗcomᚋmrz1836ᚋgoᚑdatastoreᚋcustom_typesᚐNullString(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_TransactionInput_draft_id(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -11670,9 +11667,9 @@ func (ec *executionContext) _TransactionInput_reserved_at(ctx context.Context, f
 	if resTmp == nil {
 		return graphql.Null
 	}
-	res := resTmp.(utils.NullTime)
+	res := resTmp.(customTypes.NullTime)
 	fc.Result = res
-	return ec.marshalONullTime2githubᚗcomᚋBuxOrgᚋbuxᚋutilsᚐNullTime(ctx, field.Selections, res)
+	return ec.marshalONullTime2githubᚗcomᚋmrz1836ᚋgoᚑdatastoreᚋcustom_typesᚐNullTime(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_TransactionInput_reserved_at(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -11711,9 +11708,9 @@ func (ec *executionContext) _TransactionInput_spending_tx_id(ctx context.Context
 	if resTmp == nil {
 		return graphql.Null
 	}
-	res := resTmp.(utils.NullString)
+	res := resTmp.(customTypes.NullString)
 	fc.Result = res
-	return ec.marshalONullString2githubᚗcomᚋBuxOrgᚋbuxᚋutilsᚐNullString(ctx, field.Selections, res)
+	return ec.marshalONullString2githubᚗcomᚋmrz1836ᚋgoᚑdatastoreᚋcustom_typesᚐNullString(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_TransactionInput_spending_tx_id(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -12347,9 +12344,9 @@ func (ec *executionContext) _Utxo_draft_id(ctx context.Context, field graphql.Co
 	if resTmp == nil {
 		return graphql.Null
 	}
-	res := resTmp.(utils.NullString)
+	res := resTmp.(customTypes.NullString)
 	fc.Result = res
-	return ec.marshalONullString2githubᚗcomᚋBuxOrgᚋbuxᚋutilsᚐNullString(ctx, field.Selections, res)
+	return ec.marshalONullString2githubᚗcomᚋmrz1836ᚋgoᚑdatastoreᚋcustom_typesᚐNullString(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Utxo_draft_id(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -12388,9 +12385,9 @@ func (ec *executionContext) _Utxo_reserved_at(ctx context.Context, field graphql
 	if resTmp == nil {
 		return graphql.Null
 	}
-	res := resTmp.(utils.NullTime)
+	res := resTmp.(customTypes.NullTime)
 	fc.Result = res
-	return ec.marshalONullTime2githubᚗcomᚋBuxOrgᚋbuxᚋutilsᚐNullTime(ctx, field.Selections, res)
+	return ec.marshalONullTime2githubᚗcomᚋmrz1836ᚋgoᚑdatastoreᚋcustom_typesᚐNullTime(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Utxo_reserved_at(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -12429,9 +12426,9 @@ func (ec *executionContext) _Utxo_spending_tx_id(ctx context.Context, field grap
 	if resTmp == nil {
 		return graphql.Null
 	}
-	res := resTmp.(utils.NullString)
+	res := resTmp.(customTypes.NullString)
 	fc.Result = res
-	return ec.marshalONullString2githubᚗcomᚋBuxOrgᚋbuxᚋutilsᚐNullString(ctx, field.Selections, res)
+	return ec.marshalONullString2githubᚗcomᚋmrz1836ᚋgoᚑdatastoreᚋcustom_typesᚐNullString(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Utxo_spending_tx_id(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -12502,7 +12499,7 @@ func (ec *executionContext) _Utxo_transaction(ctx context.Context, field graphql
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Utxo().Transaction(rctx, obj)
+		return obj.Transaction, nil
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -12520,8 +12517,8 @@ func (ec *executionContext) fieldContext_Utxo_transaction(ctx context.Context, f
 	fc = &graphql.FieldContext{
 		Object:     "Utxo",
 		Field:      field,
-		IsMethod:   true,
-		IsResolver: true,
+		IsMethod:   false,
+		IsResolver: false,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			switch field.Name {
 			case "id":
@@ -12664,9 +12661,9 @@ func (ec *executionContext) _Utxo_deleted_at(ctx context.Context, field graphql.
 	if resTmp == nil {
 		return graphql.Null
 	}
-	res := resTmp.(utils.NullTime)
+	res := resTmp.(customTypes.NullTime)
 	fc.Result = res
-	return ec.marshalONullTime2githubᚗcomᚋBuxOrgᚋbuxᚋutilsᚐNullTime(ctx, field.Selections, res)
+	return ec.marshalONullTime2githubᚗcomᚋmrz1836ᚋgoᚑdatastoreᚋcustom_typesᚐNullTime(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Utxo_deleted_at(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -12992,9 +12989,9 @@ func (ec *executionContext) _Xpub_deleted_at(ctx context.Context, field graphql.
 	if resTmp == nil {
 		return graphql.Null
 	}
-	res := resTmp.(utils.NullTime)
+	res := resTmp.(customTypes.NullTime)
 	fc.Result = res
-	return ec.marshalONullTime2githubᚗcomᚋBuxOrgᚋbuxᚋutilsᚐNullTime(ctx, field.Selections, res)
+	return ec.marshalONullTime2githubᚗcomᚋmrz1836ᚋgoᚑdatastoreᚋcustom_typesᚐNullTime(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Xpub_deleted_at(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -14790,7 +14787,12 @@ func (ec *executionContext) unmarshalInputDestinationInput(ctx context.Context, 
 		asMap[k] = v
 	}
 
-	for k, v := range asMap {
+	fieldsInOrder := [...]string{"id", "xpub_id", "locking_script", "type", "chain", "num", "address", "draft_id", "metadata", "created_at", "updated_at", "deleted_at"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
 		switch k {
 		case "id":
 			var err error
@@ -14884,7 +14886,7 @@ func (ec *executionContext) unmarshalInputDestinationInput(ctx context.Context, 
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("deleted_at"))
-			it.DeletedAt, err = ec.unmarshalONullTime2githubᚗcomᚋBuxOrgᚋbuxᚋutilsᚐNullTime(ctx, v)
+			it.DeletedAt, err = ec.unmarshalONullTime2githubᚗcomᚋmrz1836ᚋgoᚑdatastoreᚋcustom_typesᚐNullTime(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -14901,7 +14903,12 @@ func (ec *executionContext) unmarshalInputFeeUnitInput(ctx context.Context, obj 
 		asMap[k] = v
 	}
 
-	for k, v := range asMap {
+	fieldsInOrder := [...]string{"satoshis", "bytes"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
 		switch k {
 		case "satoshis":
 			var err error
@@ -14932,7 +14939,12 @@ func (ec *executionContext) unmarshalInputOpReturnInput(ctx context.Context, obj
 		asMap[k] = v
 	}
 
-	for k, v := range asMap {
+	fieldsInOrder := [...]string{"hex", "hex_parts", "string_parts", "map"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
 		switch k {
 		case "hex":
 			var err error
@@ -14979,7 +14991,12 @@ func (ec *executionContext) unmarshalInputOpReturnMapInput(ctx context.Context, 
 		asMap[k] = v
 	}
 
-	for k, v := range asMap {
+	fieldsInOrder := [...]string{"app", "type", "keys"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
 		switch k {
 		case "app":
 			var err error
@@ -15018,7 +15035,12 @@ func (ec *executionContext) unmarshalInputScriptOutputInput(ctx context.Context,
 		asMap[k] = v
 	}
 
-	for k, v := range asMap {
+	fieldsInOrder := [...]string{"address", "satoshis", "script"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
 		switch k {
 		case "address":
 			var err error
@@ -15057,7 +15079,12 @@ func (ec *executionContext) unmarshalInputSyncConfigInput(ctx context.Context, o
 		asMap[k] = v
 	}
 
-	for k, v := range asMap {
+	fieldsInOrder := [...]string{"broadcast", "broadcast_instant", "paymail_p2p", "sync_on_chain"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
 		switch k {
 		case "broadcast":
 			var err error
@@ -15104,7 +15131,12 @@ func (ec *executionContext) unmarshalInputTransactionConfigInput(ctx context.Con
 		asMap[k] = v
 	}
 
-	for k, v := range asMap {
+	fieldsInOrder := [...]string{"change_satoshis", "change_destinations", "change_destinations_strategy", "change_number_of_destinations", "change_minimum_satoshis", "include_utxos", "inputs", "expires_in", "fee", "fee_unit", "from_utxos", "outputs", "send_all_to", "sync"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
 		switch k {
 		case "change_satoshis":
 			var err error
@@ -15237,7 +15269,12 @@ func (ec *executionContext) unmarshalInputTransactionOutputInput(ctx context.Con
 		asMap[k] = v
 	}
 
-	for k, v := range asMap {
+	fieldsInOrder := [...]string{"to", "satoshis", "scripts", "op_return"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
 		switch k {
 		case "to":
 			var err error
@@ -15284,7 +15321,12 @@ func (ec *executionContext) unmarshalInputUtxoPointer(ctx context.Context, obj i
 		asMap[k] = v
 	}
 
-	for k, v := range asMap {
+	fieldsInOrder := [...]string{"transaction_id", "output_index"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
 		switch k {
 		case "transaction_id":
 			var err error
@@ -17006,22 +17048,9 @@ func (ec *executionContext) _Utxo(ctx context.Context, sel ast.SelectionSet, obj
 			out.Values[i] = ec._Utxo_metadata(ctx, field, obj)
 
 		case "transaction":
-			field := field
 
-			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
-				defer func() {
-					if r := recover(); r != nil {
-						ec.Error(ctx, ec.Recover(ctx, r))
-					}
-				}()
-				res = ec._Utxo_transaction(ctx, field, obj)
-				return res
-			}
+			out.Values[i] = ec._Utxo_transaction(ctx, field, obj)
 
-			out.Concurrently(i, func() graphql.Marshaler {
-				return innerFunc(ctx)
-
-			})
 		case "created_at":
 
 			out.Values[i] = ec._Utxo_created_at(ctx, field, obj)
@@ -18134,23 +18163,23 @@ func (ec *executionContext) marshalOMetadata2githubᚗcomᚋBuxOrgᚋbuxᚐMetad
 	return res
 }
 
-func (ec *executionContext) unmarshalONullString2githubᚗcomᚋBuxOrgᚋbuxᚋutilsᚐNullString(ctx context.Context, v interface{}) (utils.NullString, error) {
-	res, err := utils.UnmarshalNullString(v)
+func (ec *executionContext) unmarshalONullString2githubᚗcomᚋmrz1836ᚋgoᚑdatastoreᚋcustom_typesᚐNullString(ctx context.Context, v interface{}) (customTypes.NullString, error) {
+	res, err := customTypes.UnmarshalNullString(v)
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) marshalONullString2githubᚗcomᚋBuxOrgᚋbuxᚋutilsᚐNullString(ctx context.Context, sel ast.SelectionSet, v utils.NullString) graphql.Marshaler {
-	res := utils.MarshalNullString(v)
+func (ec *executionContext) marshalONullString2githubᚗcomᚋmrz1836ᚋgoᚑdatastoreᚋcustom_typesᚐNullString(ctx context.Context, sel ast.SelectionSet, v customTypes.NullString) graphql.Marshaler {
+	res := customTypes.MarshalNullString(v)
 	return res
 }
 
-func (ec *executionContext) unmarshalONullTime2githubᚗcomᚋBuxOrgᚋbuxᚋutilsᚐNullTime(ctx context.Context, v interface{}) (utils.NullTime, error) {
-	res, err := utils.UnmarshalNullTime(v)
+func (ec *executionContext) unmarshalONullTime2githubᚗcomᚋmrz1836ᚋgoᚑdatastoreᚋcustom_typesᚐNullTime(ctx context.Context, v interface{}) (customTypes.NullTime, error) {
+	res, err := customTypes.UnmarshalNullTime(v)
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) marshalONullTime2githubᚗcomᚋBuxOrgᚋbuxᚋutilsᚐNullTime(ctx context.Context, sel ast.SelectionSet, v utils.NullTime) graphql.Marshaler {
-	res := utils.MarshalNullTime(v)
+func (ec *executionContext) marshalONullTime2githubᚗcomᚋmrz1836ᚋgoᚑdatastoreᚋcustom_typesᚐNullTime(ctx context.Context, sel ast.SelectionSet, v customTypes.NullTime) graphql.Marshaler {
+	res := customTypes.MarshalNullTime(v)
 	return res
 }
 
@@ -18239,7 +18268,7 @@ func (ec *executionContext) marshalOPaymailP42ᚖgithubᚗcomᚋBuxOrgᚋbuxᚐP
 	return ec._PaymailP4(ctx, sel, v)
 }
 
-func (ec *executionContext) unmarshalOQueryParams2ᚖgithubᚗcomᚋBuxOrgᚋbuxᚋdatastoreᚐQueryParams(ctx context.Context, v interface{}) (*datastore.QueryParams, error) {
+func (ec *executionContext) unmarshalOQueryParams2ᚖgithubᚗcomᚋmrz1836ᚋgoᚑdatastoreᚐQueryParams(ctx context.Context, v interface{}) (*datastore.QueryParams, error) {
 	if v == nil {
 		return nil, nil
 	}
@@ -18247,7 +18276,7 @@ func (ec *executionContext) unmarshalOQueryParams2ᚖgithubᚗcomᚋBuxOrgᚋbux
 	return &res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) marshalOQueryParams2ᚖgithubᚗcomᚋBuxOrgᚋbuxᚋdatastoreᚐQueryParams(ctx context.Context, sel ast.SelectionSet, v *datastore.QueryParams) graphql.Marshaler {
+func (ec *executionContext) marshalOQueryParams2ᚖgithubᚗcomᚋmrz1836ᚋgoᚑdatastoreᚐQueryParams(ctx context.Context, sel ast.SelectionSet, v *datastore.QueryParams) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
 	}

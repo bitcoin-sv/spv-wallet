@@ -5,8 +5,8 @@ import (
 	"os"
 	"testing"
 
-	"github.com/BuxOrg/bux/datastore"
 	"github.com/mrz1836/go-cachestore"
+	"github.com/mrz1836/go-datastore"
 	"github.com/newrelic/go-agent/v3/newrelic"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"

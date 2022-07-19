@@ -8,9 +8,10 @@ import (
 	"errors"
 
 	"github.com/BuxOrg/bux"
-	"github.com/BuxOrg/bux/datastore"
+	"github.com/mrz1836/go-datastore"
 )
 
+// AdminPaymailCreate is the resolver for the admin_paymail_create field.
 func (r *mutationResolver) AdminPaymailCreate(ctx context.Context, xpub string, address string, publicName *string, avatar *string, metadata bux.Metadata) (*bux.PaymailAddress, error) {
 	// including admin check
 	c, err := GetConfigFromContextAdmin(ctx)
@@ -42,6 +43,7 @@ func (r *mutationResolver) AdminPaymailCreate(ctx context.Context, xpub string, 
 	return paymailAddress, nil
 }
 
+// AdminPaymailDelete is the resolver for the admin_paymail_delete field.
 func (r *mutationResolver) AdminPaymailDelete(ctx context.Context, address string) (bool, error) {
 	// including admin check
 	c, err := GetConfigFromContextAdmin(ctx)
@@ -60,6 +62,7 @@ func (r *mutationResolver) AdminPaymailDelete(ctx context.Context, address strin
 	return true, nil
 }
 
+// AdminTransaction is the resolver for the admin_transaction field.
 func (r *mutationResolver) AdminTransaction(ctx context.Context, hex string) (*bux.Transaction, error) {
 	// including admin check
 	c, err := GetConfigFromContextAdmin(ctx)
@@ -82,6 +85,7 @@ func (r *mutationResolver) AdminTransaction(ctx context.Context, hex string) (*b
 	return bux.DisplayModels(transaction).(*bux.Transaction), nil
 }
 
+// AdminGetStatus is the resolver for the admin_get_status field.
 func (r *queryResolver) AdminGetStatus(ctx context.Context) (*bool, error) {
 	// including admin check
 	_, err := GetConfigFromContextAdmin(ctx)
@@ -93,6 +97,7 @@ func (r *queryResolver) AdminGetStatus(ctx context.Context) (*bool, error) {
 	return &success, nil
 }
 
+// AdminGetStats is the resolver for the admin_get_stats field.
 func (r *queryResolver) AdminGetStats(ctx context.Context) (*bux.AdminStats, error) {
 	// including admin check
 	c, err := GetConfigFromContextAdmin(ctx)
@@ -109,6 +114,7 @@ func (r *queryResolver) AdminGetStats(ctx context.Context) (*bux.AdminStats, err
 	return accessKeys, nil
 }
 
+// AdminAccessKeysList is the resolver for the admin_access_keys_list field.
 func (r *queryResolver) AdminAccessKeysList(ctx context.Context, metadata bux.Metadata, conditions map[string]interface{}, params *datastore.QueryParams) ([]*bux.AccessKey, error) {
 	// including admin check
 	c, err := GetConfigFromContextAdmin(ctx)
@@ -124,6 +130,7 @@ func (r *queryResolver) AdminAccessKeysList(ctx context.Context, metadata bux.Me
 	return accessKeys, nil
 }
 
+// AdminAccessKeysCount is the resolver for the admin_access_keys_count field.
 func (r *queryResolver) AdminAccessKeysCount(ctx context.Context, metadata bux.Metadata, conditions map[string]interface{}) (*int64, error) {
 	// including admin check
 	c, err := GetConfigFromContextAdmin(ctx)
@@ -140,6 +147,7 @@ func (r *queryResolver) AdminAccessKeysCount(ctx context.Context, metadata bux.M
 	return &count, nil
 }
 
+// AdminBlockHeadersList is the resolver for the admin_block_headers_list field.
 func (r *queryResolver) AdminBlockHeadersList(ctx context.Context, metadata bux.Metadata, conditions map[string]interface{}, params *datastore.QueryParams) ([]*bux.BlockHeader, error) {
 	// including admin check
 	c, err := GetConfigFromContextAdmin(ctx)
@@ -155,6 +163,7 @@ func (r *queryResolver) AdminBlockHeadersList(ctx context.Context, metadata bux.
 	return blockHeaders, nil
 }
 
+// AdminBlockHeadersCount is the resolver for the admin_block_headers_count field.
 func (r *queryResolver) AdminBlockHeadersCount(ctx context.Context, metadata bux.Metadata, conditions map[string]interface{}) (*int64, error) {
 	// including admin check
 	c, err := GetConfigFromContextAdmin(ctx)
@@ -171,6 +180,7 @@ func (r *queryResolver) AdminBlockHeadersCount(ctx context.Context, metadata bux
 	return &count, nil
 }
 
+// AdminDestinationsList is the resolver for the admin_destinations_list field.
 func (r *queryResolver) AdminDestinationsList(ctx context.Context, metadata bux.Metadata, conditions map[string]interface{}, params *datastore.QueryParams) ([]*bux.Destination, error) {
 	// including admin check
 	c, err := GetConfigFromContextAdmin(ctx)
@@ -186,6 +196,7 @@ func (r *queryResolver) AdminDestinationsList(ctx context.Context, metadata bux.
 	return destinations, nil
 }
 
+// AdminDestinationsCount is the resolver for the admin_destinations_count field.
 func (r *queryResolver) AdminDestinationsCount(ctx context.Context, metadata bux.Metadata, conditions map[string]interface{}) (*int64, error) {
 	// including admin check
 	c, err := GetConfigFromContextAdmin(ctx)
@@ -202,6 +213,7 @@ func (r *queryResolver) AdminDestinationsCount(ctx context.Context, metadata bux
 	return &count, nil
 }
 
+// AdminDraftTransactionsList is the resolver for the admin_draft_transactions_list field.
 func (r *queryResolver) AdminDraftTransactionsList(ctx context.Context, metadata bux.Metadata, conditions map[string]interface{}, params *datastore.QueryParams) ([]*bux.DraftTransaction, error) {
 	// including admin check
 	c, err := GetConfigFromContextAdmin(ctx)
@@ -217,6 +229,7 @@ func (r *queryResolver) AdminDraftTransactionsList(ctx context.Context, metadata
 	return draftTransactions, nil
 }
 
+// AdminDraftTransactionsCount is the resolver for the admin_draft_transactions_count field.
 func (r *queryResolver) AdminDraftTransactionsCount(ctx context.Context, metadata bux.Metadata, conditions map[string]interface{}) (*int64, error) {
 	// including admin check
 	c, err := GetConfigFromContextAdmin(ctx)
@@ -233,6 +246,7 @@ func (r *queryResolver) AdminDraftTransactionsCount(ctx context.Context, metadat
 	return &count, nil
 }
 
+// AdminPaymailGet is the resolver for the admin_paymail_get field.
 func (r *queryResolver) AdminPaymailGet(ctx context.Context, address string) (*bux.PaymailAddress, error) {
 	// including admin check
 	c, err := GetConfigFromContextAdmin(ctx)
@@ -251,6 +265,7 @@ func (r *queryResolver) AdminPaymailGet(ctx context.Context, address string) (*b
 	return paymailAddress, nil
 }
 
+// AdminPaymailGetByXpubID is the resolver for the admin_paymail_get_by_xpub_id field.
 func (r *queryResolver) AdminPaymailGetByXpubID(ctx context.Context, xpubID string) ([]*bux.PaymailAddress, error) {
 	// including admin check
 	c, err := GetConfigFromContextAdmin(ctx)
@@ -267,6 +282,7 @@ func (r *queryResolver) AdminPaymailGetByXpubID(ctx context.Context, xpubID stri
 	return paymailAddresses, nil
 }
 
+// AdminPaymailsList is the resolver for the admin_paymails_list field.
 func (r *queryResolver) AdminPaymailsList(ctx context.Context, metadata bux.Metadata, conditions map[string]interface{}, params *datastore.QueryParams) ([]*bux.PaymailAddress, error) {
 	// including admin check
 	c, err := GetConfigFromContextAdmin(ctx)
@@ -283,6 +299,7 @@ func (r *queryResolver) AdminPaymailsList(ctx context.Context, metadata bux.Meta
 	return paymailAddresses, nil
 }
 
+// AdminPaymailsCount is the resolver for the admin_paymails_count field.
 func (r *queryResolver) AdminPaymailsCount(ctx context.Context, metadata bux.Metadata, conditions map[string]interface{}) (*int64, error) {
 	// including admin check
 	c, err := GetConfigFromContextAdmin(ctx)
@@ -299,6 +316,7 @@ func (r *queryResolver) AdminPaymailsCount(ctx context.Context, metadata bux.Met
 	return &count, nil
 }
 
+// AdminTransactionsList is the resolver for the admin_transactions_list field.
 func (r *queryResolver) AdminTransactionsList(ctx context.Context, metadata bux.Metadata, conditions map[string]interface{}, params *datastore.QueryParams) ([]*bux.Transaction, error) {
 	// including admin check
 	c, err := GetConfigFromContextAdmin(ctx)
@@ -314,6 +332,7 @@ func (r *queryResolver) AdminTransactionsList(ctx context.Context, metadata bux.
 	return transactions, nil
 }
 
+// AdminTransactionsCount is the resolver for the admin_transactions_count field.
 func (r *queryResolver) AdminTransactionsCount(ctx context.Context, metadata bux.Metadata, conditions map[string]interface{}) (*int64, error) {
 	// including admin check
 	c, err := GetConfigFromContextAdmin(ctx)
@@ -330,6 +349,7 @@ func (r *queryResolver) AdminTransactionsCount(ctx context.Context, metadata bux
 	return &count, nil
 }
 
+// AdminUtxosList is the resolver for the admin_utxos_list field.
 func (r *queryResolver) AdminUtxosList(ctx context.Context, metadata bux.Metadata, conditions map[string]interface{}, params *datastore.QueryParams) ([]*bux.Utxo, error) {
 	// including admin check
 	c, err := GetConfigFromContextAdmin(ctx)
@@ -345,6 +365,7 @@ func (r *queryResolver) AdminUtxosList(ctx context.Context, metadata bux.Metadat
 	return utxos, nil
 }
 
+// AdminUtxosCount is the resolver for the admin_utxos_count field.
 func (r *queryResolver) AdminUtxosCount(ctx context.Context, metadata bux.Metadata, conditions map[string]interface{}) (*int64, error) {
 	// including admin check
 	c, err := GetConfigFromContextAdmin(ctx)
@@ -361,6 +382,7 @@ func (r *queryResolver) AdminUtxosCount(ctx context.Context, metadata bux.Metada
 	return &count, nil
 }
 
+// AdminXpubsList is the resolver for the admin_xpubs_list field.
 func (r *queryResolver) AdminXpubsList(ctx context.Context, metadata bux.Metadata, conditions map[string]interface{}, params *datastore.QueryParams) ([]*bux.Xpub, error) {
 	// including admin check
 	c, err := GetConfigFromContextAdmin(ctx)
@@ -376,6 +398,7 @@ func (r *queryResolver) AdminXpubsList(ctx context.Context, metadata bux.Metadat
 	return xpubs, nil
 }
 
+// AdminXpubsCount is the resolver for the admin_xpubs_count field.
 func (r *queryResolver) AdminXpubsCount(ctx context.Context, metadata bux.Metadata, conditions map[string]interface{}) (*int64, error) {
 	// including admin check
 	c, err := GetConfigFromContextAdmin(ctx)

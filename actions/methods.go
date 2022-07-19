@@ -6,8 +6,8 @@ import (
 
 	"github.com/BuxOrg/bux"
 	"github.com/BuxOrg/bux-server/dictionary"
-	"github.com/BuxOrg/bux/datastore"
 	"github.com/julienschmidt/httprouter"
+	"github.com/mrz1836/go-datastore"
 	"github.com/mrz1836/go-parameters"
 	"github.com/newrelic/go-agent/v3/newrelic"
 )

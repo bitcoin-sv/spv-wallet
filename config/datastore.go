@@ -3,7 +3,7 @@ package config
 import (
 	"errors"
 
-	"github.com/BuxOrg/bux/datastore"
+	"github.com/mrz1836/go-datastore"
 )
 
 // Validate checks the configuration for specific rules
