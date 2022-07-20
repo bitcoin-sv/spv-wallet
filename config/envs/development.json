@@ -66,7 +66,7 @@
     "max_connection_lifetime": "60s",
     "max_idle_connections": 10,
     "max_idle_timeout": "10s",
-    "url": "redis:6379",
+    "url": "redis://localhost:6379",
     "use_tls": false
   },
   "server": {
