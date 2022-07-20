@@ -19,7 +19,7 @@ services:
   redis:
     image: redis
     healthcheck:
-      test: ["CMD", "redis-cli","ping"]
+      test: ["CMD", "redis-cli", "ping"]
   db:
     image: postgres
     volumes:
