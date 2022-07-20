@@ -41,11 +41,12 @@ func (s *Server) Serve() {
 
 	// Load the server defaults
 	s.WebServer = &http.Server{
-		Addr:         ":" + s.AppConfig.Server.Port,
-		Handler:      s.Handlers(),
-		IdleTimeout:  s.AppConfig.Server.IdleTimeout,
-		ReadTimeout:  s.AppConfig.Server.ReadTimeout,
-		WriteTimeout: s.AppConfig.Server.WriteTimeout,
+		Addr:              ":" + s.AppConfig.Server.Port,
+		Handler:           s.Handlers(),
+		IdleTimeout:       s.AppConfig.Server.IdleTimeout,
+		ReadTimeout:       s.AppConfig.Server.ReadTimeout,
+		ReadHeaderTimeout: s.AppConfig.Server.ReadTimeout,
+		WriteTimeout:      s.AppConfig.Server.WriteTimeout,
 		TLSConfig: &tls.Config{
 			NextProtos:       []string{"h2", "http/1.1"},
 			MinVersion:       tls.VersionTLS12,
