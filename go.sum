@@ -397,8 +397,8 @@ github.com/mrz1836/go-cache v0.7.1 h1:VP8Gfz5rrSH8mQf4OhW+rERItYbPbxCYHsHppy4+vY
 github.com/mrz1836/go-cache v0.7.1/go.mod h1:4wLN+hnILoRY9RV31VbilwDrZ5EVI0x/vqRAcvGvvOw=
 github.com/mrz1836/go-cachestore v0.1.1 h1:3pbZdohJRURUgThQ9s9EZ6WuwobAB3ORDBCKVpXX+BA=
 github.com/mrz1836/go-cachestore v0.1.1/go.mod h1:GIAaq0o0h4wdUFoLz7xWA/FFBtjjaxCacYdvmkhQzoA=
-github.com/mrz1836/go-datastore v0.1.1 h1:QugMxBXGt0qFZPO23wmcF+qiYdtKDKYEoWjpdROBzQw=
-github.com/mrz1836/go-datastore v0.1.1/go.mod h1:hA+UK7X2igAP+iH4noRsgio45JsL1hOyMcPiovsvF20=
+github.com/mrz1836/go-datastore v0.1.2 h1:aaiWIaJyVo8Rtb3JxBvoXw8mfJQQ/GK1ELfp58C6UOI=
+github.com/mrz1836/go-datastore v0.1.2/go.mod h1:kJ6G+zMUALn49+FXW3fv1S9askiugQ28D0qt20GSuAg=
 github.com/mrz1836/go-logger v0.2.6/go.mod h1:Lk0xAOob/tuA8vJptnvLDZIbgl/B3rMhD+28M7pW7mM=
 github.com/mrz1836/go-logger v0.3.1 h1:I0MleBuec5gy76dD0M8k8w9F1271NXR8CfwytWeBiVc=
 github.com/mrz1836/go-logger v0.3.1/go.mod h1:wvnL9EjhtiMOgABtr0Q8EwO4YNVTBTDMLlvKAXjSEy0=
@@ -559,8 +559,8 @@ github.com/yuin/goldmark v1.4.13/go.mod h1:6yULJ656Px+3vBD8DxQVa3kxgyrAnzto9xy5t
 github.com/yuin/gopher-lua v0.0.0-20210529063254-f4c35e4016d9 h1:k/gmLsJDWwWqbLCur2yWnJzwQEKRcAHXo6seXGuSwWw=
 github.com/zenazn/goji v0.9.0/go.mod h1:7S9M489iMyHBNxwZnk9/EHS098H4/F6TATF2mIxtB1Q=
 go.mongodb.org/mongo-driver v1.0.0/go.mod h1:u7ryQJ+DOzQmeO7zB6MHyr8jkEQvC8vH7qLUO4lqsUM=
-go.mongodb.org/mongo-driver v1.10.0 h1:UtV6N5k14upNp4LTduX0QCufG124fSu25Wz9tu94GLg=
-go.mongodb.org/mongo-driver v1.10.0/go.mod h1:wsihk0Kdgv8Kqu1Anit4sfK+22vSFbUrAVEYRhCXrA8=
+go.mongodb.org/mongo-driver v1.10.1 h1:NujsPveKwHaWuKUer/ceo9DzEe7HIj1SlJ6uvXZG0S4=
+go.mongodb.org/mongo-driver v1.10.1/go.mod h1:z4XpeoU6w+9Vht+jAFyLgVrD+jGSQQe0+CBWFHNiHt8=
 go.opencensus.io v0.21.0/go.mod h1:mSImk1erAIZhrmZN+AvHh14ztQfjbGwt4TtuofqLduU=
 go.opencensus.io v0.22.0/go.mod h1:+kGneAE2xo2IficOXnaByMWTGM9T73dGwxeWcUqIpI8=
 go.opencensus.io v0.22.2/go.mod h1:yxeiOL68Rb0Xd1ddK5vPZ/oVn4vY4Ynel7k9FzqtOIw=
