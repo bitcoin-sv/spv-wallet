@@ -11,7 +11,7 @@ require (
 	github.com/julienschmidt/httprouter v1.3.0
 	github.com/mrz1836/go-api-router v0.4.15
 	github.com/mrz1836/go-cachestore v0.1.1
-	github.com/mrz1836/go-datastore v0.1.1
+	github.com/mrz1836/go-datastore v0.1.2
 	github.com/mrz1836/go-logger v0.3.1
 	github.com/mrz1836/go-parameters v0.2.9
 	github.com/mrz1836/go-sanitize v1.1.5
@@ -113,7 +113,7 @@ require (
 	github.com/xdg-go/scram v1.1.1 // indirect
 	github.com/xdg-go/stringprep v1.0.3 // indirect
 	github.com/youmark/pkcs8 v0.0.0-20201027041543-1326539a0a0a // indirect
-	go.mongodb.org/mongo-driver v1.10.0 // indirect
+	go.mongodb.org/mongo-driver v1.10.1 // indirect
 	golang.org/x/crypto v0.0.0-20220722155217-630584e8d5aa // indirect
 	golang.org/x/mod v0.6.0-dev.0.20220419223038-86c51ed26bb4 // indirect
 	golang.org/x/net v0.0.0-20220802222814-0bcc04d9c69b // indirect
