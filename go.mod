@@ -20,7 +20,7 @@ require (
 	github.com/newrelic/go-agent/v3/integrations/nrhttprouter v1.0.1
 	github.com/spf13/viper v1.12.0
 	github.com/stretchr/testify v1.8.0
-	github.com/vektah/gqlparser/v2 v2.4.7
+	github.com/vektah/gqlparser/v2 v2.4.8
 )
 
 require (
