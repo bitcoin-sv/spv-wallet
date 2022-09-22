@@ -31,7 +31,7 @@ require (
 	github.com/bitcoinschema/go-map v0.0.14 // indirect
 	github.com/bitcoinsv/bsvd v0.0.0-20190609155523-4c29707f7173 // indirect
 	github.com/bitcoinsv/bsvutil v0.0.0-20181216182056-1d77cf353ea9 // indirect
-	github.com/bsm/redislock v0.7.2 // indirect
+	github.com/bsm/redislock v0.8.0 // indirect
 	github.com/capnm/sysinfo v0.0.0-20130621111458-5909a53897f3 // indirect
 	github.com/centrifugal/centrifuge-go v0.9.0 // indirect
 	github.com/centrifugal/protocol v0.8.11 // indirect
@@ -41,6 +41,7 @@ require (
 	github.com/dgryski/go-farm v0.0.0-20200201041132-a6ae2369ad13 // indirect
 	github.com/dgryski/go-rendezvous v0.0.0-20200823014737-9f7001d12a5f // indirect
 	github.com/fsnotify/fsnotify v1.5.4 // indirect
+	github.com/go-redis/redis/v9 v9.0.0-beta.2 // indirect
 	github.com/go-redis/redis_rate/v9 v9.1.2 // indirect
 	github.com/go-resty/resty/v2 v2.7.0 // indirect
 	github.com/go-sql-driver/mysql v1.6.0 // indirect
@@ -83,7 +84,7 @@ require (
 	github.com/mrz1836/go-cache v0.7.3 // indirect
 	github.com/mrz1836/go-nownodes v0.0.7 // indirect
 	github.com/mrz1836/go-whatsonchain v0.11.0 // indirect
-	github.com/newrelic/go-agent/v3/integrations/nrmongo v1.0.2 // indirect
+	github.com/newrelic/go-agent/v3/integrations/nrmongo v1.0.3 // indirect
 	github.com/pelletier/go-toml v1.9.5 // indirect
 	github.com/pelletier/go-toml/v2 v2.0.5 // indirect
 	github.com/pkg/errors v0.9.1 // indirect
@@ -116,12 +117,12 @@ require (
 	go.mongodb.org/mongo-driver v1.10.2 // indirect
 	golang.org/x/crypto v0.0.0-20220919173607-35f4265a4bc0 // indirect
 	golang.org/x/mod v0.6.0-dev.0.20220419223038-86c51ed26bb4 // indirect
-	golang.org/x/net v0.0.0-20220920203100-d0c6ba3f52d9 // indirect
+	golang.org/x/net v0.0.0-20220921203646-d300de134e69 // indirect
 	golang.org/x/sync v0.0.0-20220907140024-f12130a52804 // indirect
 	golang.org/x/sys v0.0.0-20220919091848-fb04ddd9f9c8 // indirect
 	golang.org/x/text v0.3.7 // indirect
 	golang.org/x/tools v0.1.12 // indirect
-	google.golang.org/genproto v0.0.0-20220920201722-2b89144ce006 // indirect
+	google.golang.org/genproto v0.0.0-20220921223823-23cae91e6737 // indirect
 	google.golang.org/grpc v1.49.0 // indirect
 	google.golang.org/protobuf v1.28.1 // indirect
 	gopkg.in/ini.v1 v1.67.0 // indirect
@@ -130,9 +131,12 @@ require (
 	gorm.io/driver/mysql v1.3.6 // indirect
 	gorm.io/driver/postgres v1.3.10 // indirect
 	gorm.io/driver/sqlite v1.3.6 // indirect
-	gorm.io/gorm v1.23.9 // indirect
+	gorm.io/gorm v1.23.10 // indirect
 	gorm.io/plugin/dbresolver v1.2.3 // indirect
 )
+
+// Issue with redislock package
+replace github.com/bsm/redislock => github.com/bsm/redislock v0.7.2
 
 // replace github.com/dgrijalva/jwt-go => github.com/dgrijalva/jwt-go v4.0.0-preview1
 replace github.com/dgrijalva/jwt-go => github.com/golang-jwt/jwt/v4 v4.4.2
