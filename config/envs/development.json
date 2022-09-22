@@ -14,6 +14,14 @@
   "cache": {
     "engine": "redis"
   },
+  "_cluster": {
+    "prefix": "bux_cluster_",
+    "coordinator": "redis",
+    "redis": {
+      "url": "localhost:6379",
+      "use_tls": false
+    }
+  },
   "datastore": {
     "auto_migrate": true,
     "engine": "mongodb",
