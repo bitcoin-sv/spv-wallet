@@ -41,7 +41,6 @@ require (
 	github.com/dgryski/go-farm v0.0.0-20200201041132-a6ae2369ad13 // indirect
 	github.com/dgryski/go-rendezvous v0.0.0-20200823014737-9f7001d12a5f // indirect
 	github.com/fsnotify/fsnotify v1.5.4 // indirect
-	github.com/go-redis/redis/v9 v9.0.0-beta.2 // indirect
 	github.com/go-redis/redis_rate/v9 v9.1.2 // indirect
 	github.com/go-resty/resty/v2 v2.7.0 // indirect
 	github.com/go-sql-driver/mysql v1.6.0 // indirect
@@ -137,6 +136,9 @@ require (
 
 // Issue with redislock package
 replace github.com/bsm/redislock => github.com/bsm/redislock v0.7.2
+
+// Issue with using wrong version of Redigo
+replace github.com/gomodule/redigo => github.com/gomodule/redigo v1.8.9
 
 // replace github.com/dgrijalva/jwt-go => github.com/dgrijalva/jwt-go v4.0.0-preview1
 replace github.com/dgrijalva/jwt-go => github.com/golang-jwt/jwt/v4 v4.4.2
