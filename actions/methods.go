@@ -30,7 +30,7 @@ func Head(w http.ResponseWriter, req *http.Request, _ httprouter.Params) {
 func NotFound(w http.ResponseWriter, req *http.Request) {
 	txn := newrelic.FromContext(req.Context())
 	txn.Ignore()
-	req = newrelic.RequestWithTransactionContext(req, txn)
+	req = newrelic.RequestWithTransactionContext(req, txn) //nolint:contextcheck // false positive
 	ReturnErrorResponse(
 		w, req,
 		dictionary.GetError(dictionary.ErrorRequestNotFound, req.RequestURI),
@@ -42,7 +42,7 @@ func NotFound(w http.ResponseWriter, req *http.Request) {
 func MethodNotAllowed(w http.ResponseWriter, req *http.Request) {
 	txn := newrelic.FromContext(req.Context())
 	txn.Ignore()
-	req = newrelic.RequestWithTransactionContext(req, txn)
+	req = newrelic.RequestWithTransactionContext(req, txn) //nolint:contextcheck // false positive
 	ReturnErrorResponse(
 		w, req,
 		dictionary.GetError(dictionary.ErrorMethodNotAllowed, req.Method, req.RequestURI),
@@ -76,7 +76,7 @@ func GetQueryParameters(params *parameters.Params) (*datastore.QueryParams, *bux
 	var metadata *bux.Metadata
 	if len(metadataReq) > 0 {
 		// marshal the metadata into the Metadata model
-		metaJSON, _ := json.Marshal(metadataReq) // nolint: errchkjson // ignore for now
+		metaJSON, _ := json.Marshal(metadataReq) //nolint:errchkjson // ignore for now
 		if err := json.Unmarshal(metaJSON, &metadata); err != nil {
 			return nil, nil, nil, err
 		}
@@ -85,7 +85,7 @@ func GetQueryParameters(params *parameters.Params) (*datastore.QueryParams, *bux
 	var conditions *map[string]interface{}
 	if len(conditionsReq) > 0 {
 		// marshal the conditions into the Map
-		conditionsJSON, _ := json.Marshal(conditionsReq) // nolint: errchkjson // ignore for now
+		conditionsJSON, _ := json.Marshal(conditionsReq) //nolint:errchkjson // ignore for now
 		if err := json.Unmarshal(conditionsJSON, &conditions); err != nil {
 			return nil, nil, nil, err
 		}

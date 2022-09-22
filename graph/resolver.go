@@ -82,7 +82,7 @@ func GetConfigFromContextAdmin(ctx context.Context) (*GQLConfig, error) {
 // ConditionsParseGraphQL parse the conditions passed from GraphQL
 func ConditionsParseGraphQL(conditions map[string]interface{}) *map[string]interface{} {
 
-	c, _ := json.Marshal(conditions) // nolint: errchkjson // ignore for now
+	c, _ := json.Marshal(conditions) //nolint:errchkjson // ignore for now
 
 	// string replace all keys "__...." -> "$..."
 	m := regexp.MustCompile("\"__")

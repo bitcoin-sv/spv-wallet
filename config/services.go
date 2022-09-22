@@ -36,7 +36,7 @@ func (a *AppConfig) LoadServices(ctx context.Context) (*AppServices, error) {
 	var err error
 
 	// Load NewRelic first - used for Application debugging & tracking
-	if err = a.loadNewRelic(_services); err != nil {
+	if err = a.loadNewRelic(_services); err != nil { //nolint:contextcheck // false positive
 		return nil, fmt.Errorf("error with loadNewRelic: " + err.Error())
 	}
 
@@ -61,7 +61,7 @@ func (a *AppConfig) LoadTestServices(ctx context.Context) (*AppServices, error) 
 	_services := new(AppServices)
 
 	// Load New Relic
-	err := a.loadNewRelic(_services)
+	err := a.loadNewRelic(_services) //nolint:contextcheck // false positive
 	if err != nil {
 		return nil, err
 	}
@@ -240,7 +240,7 @@ func (s *AppServices) loadBux(ctx context.Context, appConfig *AppConfig, testMod
 		if appConfig.TaskManager.Factory == taskmanager.FactoryRedis {
 			options = append(
 				options,
-				bux.WithTaskQUsingRedis(
+				bux.WithTaskQUsingRedis( //nolint:contextcheck // false positive
 					config,
 					&redis.Options{
 						Addr: strings.Replace(appConfig.Redis.URL, "redis://", "", -1),
