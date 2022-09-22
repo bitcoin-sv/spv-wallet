@@ -1,3 +1,4 @@
+// Package actions is for our Action functionality
 package actions
 
 import (

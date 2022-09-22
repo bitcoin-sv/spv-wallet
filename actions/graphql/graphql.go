@@ -1,3 +1,4 @@
+// Package graphql is for the Actions
 package graphql
 
 const (

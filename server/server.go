@@ -1,3 +1,4 @@
+// Package server is for all the BUX server settings and HTTP server
 package server
 
 import (

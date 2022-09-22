@@ -1,3 +1,4 @@
+// Package dictionary is for our standardized error responses
 package dictionary
 
 import (
