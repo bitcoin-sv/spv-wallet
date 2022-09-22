@@ -5,6 +5,7 @@ import (
 	"errors"
 	"time"
 
+	"github.com/BuxOrg/bux/cluster"
 	"github.com/BuxOrg/bux/taskmanager"
 	validation "github.com/go-ozzo/ozzo-validation"
 	"github.com/mrz1836/go-cachestore"
@@ -47,6 +48,7 @@ type (
 	AppConfig struct {
 		Authentication     *AuthenticationConfig    `json:"authentication" mapstructure:"authentication"`
 		Cachestore         *CachestoreConfig        `json:"cache" mapstructure:"cache"`
+		ClusterConfig      *ClusterConfig           `json:"cluster" mapstructure:"cluster"`
 		Datastore          *DatastoreConfig         `json:"datastore" mapstructure:"datastore"`
 		Debug              bool                     `json:"debug" mapstructure:"debug"`
 		DebugProfiling     bool                     `json:"debug_profiling" mapstructure:"debug_profiling"`
@@ -80,6 +82,13 @@ type (
 	// CachestoreConfig is a configuration for cachestore
 	CachestoreConfig struct {
 		Engine cachestore.Engine `json:"engine" mapstructure:"engine"` // Cache engine to use (redis, freecache)
+	}
+
+	// ClusterConfig is a configuration for the Bux cluster
+	ClusterConfig struct {
+		Coordinator cluster.Coordinator `json:"coordinator" mapstructure:"coordinator"` // redis or memory (default)
+		Prefix      string              `json:"prefix" mapstructure:"prefix"`           // prefix string to use for all cluster keys, "bux" by default
+		Redis       *RedisConfig        `json:"redis" mapstrcuture:"redis"`             // will use cache config if redis is set and this is empty
 	}
 
 	// DatastoreConfig is a configuration for the datastore

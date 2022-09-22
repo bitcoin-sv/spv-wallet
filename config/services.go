@@ -2,6 +2,7 @@ package config
 
 import (
 	"context"
+	"crypto/tls"
 	"errors"
 	"fmt"
 	"strings"
@@ -9,6 +10,7 @@ import (
 
 	"github.com/BuxOrg/bux"
 	"github.com/BuxOrg/bux/chainstate"
+	"github.com/BuxOrg/bux/cluster"
 	"github.com/BuxOrg/bux/taskmanager"
 	"github.com/BuxOrg/bux/utils"
 	"github.com/go-redis/redis/v8"
@@ -166,6 +168,39 @@ func (s *AppServices) loadBux(ctx context.Context, appConfig *AppConfig, testMod
 		}))
 	} else if appConfig.Cachestore.Engine == cachestore.FreeCache {
 		options = append(options, bux.WithFreeCache())
+	}
+
+	if appConfig.ClusterConfig != nil {
+		if appConfig.ClusterConfig.Coordinator == cluster.CoordinatorRedis {
+			var redisOptions *redis.Options
+			if appConfig.ClusterConfig.Redis != nil {
+				redisOptions = &redis.Options{
+					Addr:        appConfig.ClusterConfig.Redis.URL,
+					IdleTimeout: appConfig.ClusterConfig.Redis.MaxIdleTimeout,
+				}
+				if appConfig.ClusterConfig.Redis.UseTLS {
+					redisOptions.TLSConfig = &tls.Config{
+						MinVersion: tls.VersionTLS12,
+					}
+				}
+			} else if appConfig.Redis != nil {
+				redisOptions = &redis.Options{
+					Addr:        appConfig.Redis.URL,
+					IdleTimeout: appConfig.Redis.MaxIdleTimeout,
+				}
+				if appConfig.Redis.UseTLS {
+					redisOptions.TLSConfig = &tls.Config{
+						MinVersion: tls.VersionTLS12,
+					}
+				}
+			} else {
+				return errors.New("could not load redis cluster coordinator")
+			}
+			options = append(options, bux.WithClusterRedis(redisOptions))
+		}
+		if appConfig.ClusterConfig.Prefix != "" {
+			options = append(options, bux.WithClusterKeyPrefix(appConfig.ClusterConfig.Prefix))
+		}
 	}
 
 	// Set the datastore options
