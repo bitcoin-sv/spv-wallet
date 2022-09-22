@@ -77,7 +77,12 @@ func (r *mutationResolver) AdminTransaction(ctx context.Context, hex string) (*b
 		ctx, hex, opts...,
 	)
 	if err != nil {
-		if !errors.Is(err, datastore.ErrDuplicateKey) {
+		// already registered, just return the registered transaction
+		if errors.Is(err, datastore.ErrDuplicateKey) {
+			if transaction, err = c.Services.Bux.GetTransactionByHex(ctx, hex); err != nil {
+				return nil, err
+			}
+		} else {
 			return nil, err
 		}
 	}
