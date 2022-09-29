@@ -251,6 +251,11 @@ func (s *AppServices) loadBux(ctx context.Context, appConfig *AppConfig, testMod
 		}
 	}
 
+	// Load the frontend endpoints and code for the console
+	if appConfig.ConsoleConfig != nil && appConfig.ConsoleConfig.Enabled {
+
+	}
+
 	// Load the notifications
 	if appConfig.Notifications != nil && appConfig.Notifications.Enabled {
 		options = append(options, bux.WithNotifications(appConfig.Notifications.WebhookEndpoint))

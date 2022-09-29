@@ -49,6 +49,7 @@ type (
 		Authentication     *AuthenticationConfig    `json:"authentication" mapstructure:"authentication"`
 		Cachestore         *CachestoreConfig        `json:"cache" mapstructure:"cache"`
 		ClusterConfig      *ClusterConfig           `json:"cluster" mapstructure:"cluster"`
+		ConsoleConfig      *ConsoleConfig           `json:"console" mapstructure:"console"`
 		Datastore          *DatastoreConfig         `json:"datastore" mapstructure:"datastore"`
 		Debug              bool                     `json:"debug" mapstructure:"debug"`
 		DebugProfiling     bool                     `json:"debug_profiling" mapstructure:"debug_profiling"`
@@ -89,6 +90,11 @@ type (
 		Coordinator cluster.Coordinator `json:"coordinator" mapstructure:"coordinator"` // redis or memory (default)
 		Prefix      string              `json:"prefix" mapstructure:"prefix"`           // prefix string to use for all cluster keys, "bux" by default
 		Redis       *RedisConfig        `json:"redis" mapstrcuture:"redis"`             // will use cache config if redis is set and this is empty
+	}
+
+	// ConsoleConfig is a configuration for the Bux console
+	ConsoleConfig struct {
+		Enabled bool `json:"enabled" mapstructure:"enabled"` // true/false
 	}
 
 	// DatastoreConfig is a configuration for the datastore

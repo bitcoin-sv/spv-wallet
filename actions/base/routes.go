@@ -20,10 +20,12 @@ func RegisterRoutes(router *apirouter.Router, appConfig *config.AppConfig, servi
 	// Load the actions and set the services
 	action := &Action{actions.Action{AppConfig: appConfig, Services: services}}
 
-	// Set the main index page (navigating to slash)
-	router.HTTPRouter.GET("/", action.Request(router, router.Request(index)))
-	router.HTTPRouter.OPTIONS("/", router.SetCrossOriginHeaders)
-	router.HTTPRouter.HEAD("/", actions.Head)
+	// Set the main index page (navigating to slash), but only if the console is not turned on
+	if appConfig.ConsoleConfig == nil || !appConfig.ConsoleConfig.Enabled {
+		router.HTTPRouter.GET("/", action.Request(router, router.Request(index)))
+		router.HTTPRouter.OPTIONS("/", router.SetCrossOriginHeaders)
+		router.HTTPRouter.HEAD("/", actions.Head)
+	}
 
 	// Set the health request (used for load balancers)
 	router.HTTPRouter.GET("/"+config.HealthRequestPath, router.RequestNoLogging(actions.Health))

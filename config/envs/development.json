@@ -22,6 +22,9 @@
       "use_tls": false
     }
   },
+  "console": {
+    "enabled": true
+  },
   "datastore": {
     "auto_migrate": true,
     "engine": "mongodb",

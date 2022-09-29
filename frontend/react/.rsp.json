@@ -1,0 +1,8 @@
+{
+  "port": 3300,
+  "buildDirectory": "./build",
+  "outputDirectory": "./build/static-html",
+  "routes": [
+    "/"
+  ]
+}

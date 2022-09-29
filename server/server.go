@@ -16,6 +16,7 @@ import (
 	"github.com/BuxOrg/bux-server/actions/utxos"
 	"github.com/BuxOrg/bux-server/actions/xpubs"
 	"github.com/BuxOrg/bux-server/config"
+	"github.com/BuxOrg/bux-server/frontend"
 	apirouter "github.com/mrz1836/go-api-router"
 	"github.com/mrz1836/go-logger"
 	"github.com/newrelic/go-agent/v3/integrations/nrhttprouter"
@@ -122,6 +123,11 @@ func (s *Server) Handlers() *nrhttprouter.Router {
 	// Load Paymail
 	if s.AppConfig.Paymail.Enabled {
 		pmail.RegisterRoutes(s.Router, s.AppConfig, s.Services)
+	}
+
+	// Load frontend
+	if s.AppConfig.ConsoleConfig != nil && s.AppConfig.ConsoleConfig.Enabled {
+		frontend.RegisterRoutes(s.Router)
 	}
 
 	// Return the router
