@@ -30,7 +30,7 @@ func Head(w http.ResponseWriter, req *http.Request, _ httprouter.Params) {
 func NotFound(w http.ResponseWriter, req *http.Request) {
 	txn := newrelic.FromContext(req.Context())
 	txn.Ignore()
-	req = newrelic.RequestWithTransactionContext(req, txn) //nolint:contextcheck // false positive
+	req = newrelic.RequestWithTransactionContext(req, txn)
 	ReturnErrorResponse(
 		w, req,
 		dictionary.GetError(dictionary.ErrorRequestNotFound, req.RequestURI),
@@ -42,7 +42,7 @@ func NotFound(w http.ResponseWriter, req *http.Request) {
 func MethodNotAllowed(w http.ResponseWriter, req *http.Request) {
 	txn := newrelic.FromContext(req.Context())
 	txn.Ignore()
-	req = newrelic.RequestWithTransactionContext(req, txn) //nolint:contextcheck // false positive
+	req = newrelic.RequestWithTransactionContext(req, txn)
 	ReturnErrorResponse(
 		w, req,
 		dictionary.GetError(dictionary.ErrorMethodNotAllowed, req.Method, req.RequestURI),
