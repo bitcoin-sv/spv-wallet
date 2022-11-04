@@ -40,7 +40,7 @@ require (
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/dgryski/go-farm v0.0.0-20200201041132-a6ae2369ad13 // indirect
 	github.com/dgryski/go-rendezvous v0.0.0-20200823014737-9f7001d12a5f // indirect
-	github.com/fsnotify/fsnotify v1.5.4 // indirect
+	github.com/fsnotify/fsnotify v1.6.0 // indirect
 	github.com/go-redis/redis_rate/v9 v9.1.2 // indirect
 	github.com/go-resty/resty/v2 v2.7.0 // indirect
 	github.com/go-sql-driver/mysql v1.6.0 // indirect
