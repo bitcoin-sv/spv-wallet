@@ -10,7 +10,7 @@ require (
 	github.com/gofrs/uuid v4.3.1+incompatible
 	github.com/julienschmidt/httprouter v1.3.0
 	github.com/mrz1836/go-api-router v0.4.16
-	github.com/mrz1836/go-cachestore v0.1.4
+	github.com/mrz1836/go-cachestore v0.1.5
 	github.com/mrz1836/go-datastore v0.1.9
 	github.com/mrz1836/go-logger v0.3.1
 	github.com/mrz1836/go-parameters v0.2.9
@@ -80,7 +80,7 @@ require (
 	github.com/miekg/dns v1.1.50 // indirect
 	github.com/mitchellh/mapstructure v1.5.0 // indirect
 	github.com/montanaflynn/stats v0.6.6 // indirect
-	github.com/mrz1836/go-cache v0.7.3 // indirect
+	github.com/mrz1836/go-cache v0.8.0 // indirect
 	github.com/mrz1836/go-nownodes v0.0.8 // indirect
 	github.com/mrz1836/go-whatsonchain v0.11.0 // indirect
 	github.com/newrelic/go-agent/v3/integrations/nrmongo v1.0.3 // indirect
@@ -116,12 +116,12 @@ require (
 	go.mongodb.org/mongo-driver v1.11.0 // indirect
 	golang.org/x/crypto v0.1.0 // indirect
 	golang.org/x/mod v0.6.0 // indirect
-	golang.org/x/net v0.1.0 // indirect
+	golang.org/x/net v0.2.0 // indirect
 	golang.org/x/sync v0.1.0 // indirect
-	golang.org/x/sys v0.1.0 // indirect
+	golang.org/x/sys v0.2.0 // indirect
 	golang.org/x/text v0.4.0 // indirect
 	golang.org/x/tools v0.2.0 // indirect
-	google.golang.org/genproto v0.0.0-20221027153422-115e99e71e1c // indirect
+	google.golang.org/genproto v0.0.0-20221114212237-e4508ebdbee1 // indirect
 	google.golang.org/grpc v1.50.1 // indirect
 	google.golang.org/protobuf v1.28.1 // indirect
 	gopkg.in/ini.v1 v1.67.0 // indirect
