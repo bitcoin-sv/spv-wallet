@@ -385,8 +385,8 @@ github.com/mrz1836/go-nownodes v0.0.8 h1:aQ/PF6hcFE58tIPgnpCOaSnQhQbuJJ/ywDYTepY
 github.com/mrz1836/go-nownodes v0.0.8/go.mod h1:U7RoRWxmGYp2RlX3zklJkNVTfLHgLgcGS2bDMKg1Vp4=
 github.com/mrz1836/go-parameters v0.2.9 h1:Aqh0wPXYIn5sEsEv7FQI/Mr+hu/gYaQxBT3l7bRt46U=
 github.com/mrz1836/go-parameters v0.2.9/go.mod h1:GEdOPlL+jDhIPPQ3SDWoMwsboiwXIdVsOHy5PPLzz9E=
-github.com/mrz1836/go-sanitize v1.1.5 h1:LOywG3ijK/B/D9ik3hsniyIzA1JVZlM2wmp3Q/CBk88=
-github.com/mrz1836/go-sanitize v1.1.5/go.mod h1:HnnbbJTcBhbr770WyRL4SA95I4FFOnGg/RTLJybsuN8=
+github.com/mrz1836/go-sanitize v1.2.0 h1:B8HkDSXSkDa6VG49NWWJPVWh6TA8pffnqcB4M1pvRKI=
+github.com/mrz1836/go-sanitize v1.2.0/go.mod h1:5gWo0KQ+acEyiXYM17QSWT7c2E27xaO5hCTSDW6+vbk=
 github.com/mrz1836/go-validate v0.2.0 h1:F8AcgJRW0B/hUNFAXijrN/EGqYlAIkIIpMDkIMMRUho=
 github.com/mrz1836/go-validate v0.2.0/go.mod h1:IoGAb4rTAL6KgAxOiWL4ICwLqxGbKCKT1GyaSuE/4bk=
 github.com/mrz1836/go-whatsonchain v0.12.0 h1:OKCP59qQ3WC1usFxWx50iOiRA2g66HZ9YXMEttRKUxQ=
