@@ -10,7 +10,7 @@ require (
 	github.com/gofrs/uuid v4.3.1+incompatible
 	github.com/julienschmidt/httprouter v1.3.0
 	github.com/mrz1836/go-api-router v0.5.0
-	github.com/mrz1836/go-cachestore v0.1.6
+	github.com/mrz1836/go-cachestore v0.2.0
 	github.com/mrz1836/go-datastore v0.1.11
 	github.com/mrz1836/go-logger v0.3.1
 	github.com/mrz1836/go-parameters v0.2.9
@@ -121,7 +121,7 @@ require (
 	golang.org/x/sys v0.4.0 // indirect
 	golang.org/x/text v0.6.0 // indirect
 	golang.org/x/tools v0.4.0 // indirect
-	google.golang.org/genproto v0.0.0-20221227171554-f9683d7f8bef // indirect
+	google.golang.org/genproto v0.0.0-20230123190316-2c411cf9d197 // indirect
 	google.golang.org/grpc v1.52.0 // indirect
 	google.golang.org/protobuf v1.28.1 // indirect
 	gopkg.in/ini.v1 v1.67.0 // indirect
