@@ -4,7 +4,7 @@ go 1.18
 
 require (
 	github.com/99designs/gqlgen v0.17.24
-	github.com/BuxOrg/bux v0.4.14
+	github.com/BuxOrg/bux v0.4.16
 	github.com/go-ozzo/ozzo-validation v3.6.0+incompatible
 	github.com/go-redis/redis/v8 v8.11.5
 	github.com/gofrs/uuid v4.4.0+incompatible
@@ -27,14 +27,15 @@ require (
 	github.com/agnivade/levenshtein v1.1.1 // indirect
 	github.com/asaskevich/govalidator v0.0.0-20210307081110-f21760c49a8d // indirect
 	github.com/bitcoinschema/go-bitcoin/v2 v2.0.0-alpha.3 // indirect
-	github.com/bitcoinschema/go-bob v0.1.11 // indirect
+	github.com/bitcoinschema/go-bob v0.3.1 // indirect
+	github.com/bitcoinschema/go-bpu v0.0.3 // indirect
 	github.com/bitcoinschema/go-map v0.0.14 // indirect
 	github.com/bitcoinsv/bsvd v0.0.0-20190609155523-4c29707f7173 // indirect
 	github.com/bitcoinsv/bsvutil v0.0.0-20181216182056-1d77cf353ea9 // indirect
-	github.com/bsm/redislock v0.8.0 // indirect
+	github.com/bsm/redislock v0.8.2 // indirect
 	github.com/capnm/sysinfo v0.0.0-20130621111458-5909a53897f3 // indirect
-	github.com/centrifugal/centrifuge-go v0.9.3 // indirect
-	github.com/centrifugal/protocol v0.8.11 // indirect
+	github.com/centrifugal/centrifuge-go v0.9.4 // indirect
+	github.com/centrifugal/protocol v0.9.1 // indirect
 	github.com/cespare/xxhash/v2 v2.2.0 // indirect
 	github.com/coocood/freecache v1.2.3 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
@@ -64,7 +65,7 @@ require (
 	github.com/josharian/intern v1.0.0 // indirect
 	github.com/jpillora/backoff v1.0.0 // indirect
 	github.com/klauspost/compress v1.15.15 // indirect
-	github.com/korovkin/limiter v0.0.0-20221015170604-22eb1ceceddc // indirect
+	github.com/korovkin/limiter v0.0.0-20230101005513-bfac7ca56b5a // indirect
 	github.com/libsv/go-bc v0.1.11 // indirect
 	github.com/libsv/go-bk v0.1.6 // indirect
 	github.com/libsv/go-bt v1.0.8 // indirect
@@ -78,7 +79,7 @@ require (
 	github.com/montanaflynn/stats v0.7.0 // indirect
 	github.com/mrz1836/go-cache v0.8.0 // indirect
 	github.com/mrz1836/go-nownodes v0.0.8 // indirect
-	github.com/mrz1836/go-whatsonchain v0.12.0 // indirect
+	github.com/mrz1836/go-whatsonchain v0.12.1 // indirect
 	github.com/newrelic/go-agent/v3/integrations/nrmongo v1.0.3 // indirect
 	github.com/pelletier/go-toml/v2 v2.0.6 // indirect
 	github.com/pkg/errors v0.9.1 // indirect
@@ -97,9 +98,9 @@ require (
 	github.com/tidwall/match v1.1.1 // indirect
 	github.com/tidwall/pretty v1.2.1 // indirect
 	github.com/tonicpow/go-minercraft v0.9.0 // indirect
-	github.com/tonicpow/go-paymail v0.8.1 // indirect
+	github.com/tonicpow/go-paymail v0.8.2 // indirect
 	github.com/tylertreat/BoomFilters v0.0.0-20210315201527-1a82519a3e43 // indirect
-	github.com/ugorji/go/codec v1.2.7 // indirect
+	github.com/ugorji/go/codec v1.2.8 // indirect
 	github.com/valyala/bytebufferpool v1.0.0 // indirect
 	github.com/vmihailenco/msgpack/v5 v5.3.5 // indirect
 	github.com/vmihailenco/tagparser/v2 v2.0.0 // indirect
@@ -115,9 +116,9 @@ require (
 	golang.org/x/sync v0.1.0 // indirect
 	golang.org/x/sys v0.4.0 // indirect
 	golang.org/x/text v0.6.0 // indirect
-	golang.org/x/tools v0.4.0 // indirect
-	google.golang.org/genproto v0.0.0-20230123190316-2c411cf9d197 // indirect
-	google.golang.org/grpc v1.52.0 // indirect
+	golang.org/x/tools v0.5.0 // indirect
+	google.golang.org/genproto v0.0.0-20230125152338-dcaf20b6aeaa // indirect
+	google.golang.org/grpc v1.52.3 // indirect
 	google.golang.org/protobuf v1.28.1 // indirect
 	gopkg.in/ini.v1 v1.67.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
