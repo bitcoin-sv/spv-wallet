@@ -28,7 +28,6 @@ require (
 	github.com/asaskevich/govalidator v0.0.0-20210307081110-f21760c49a8d // indirect
 	github.com/bitcoinschema/go-bitcoin/v2 v2.0.0-alpha.3 // indirect
 	github.com/bitcoinschema/go-bob v0.3.1 // indirect
-	github.com/bitcoinschema/go-bpu v0.0.3 // indirect
 	github.com/bitcoinschema/go-map v0.0.14 // indirect
 	github.com/bitcoinsv/bsvd v0.0.0-20190609155523-4c29707f7173 // indirect
 	github.com/bitcoinsv/bsvutil v0.0.0-20181216182056-1d77cf353ea9 // indirect
@@ -117,7 +116,7 @@ require (
 	golang.org/x/sys v0.4.0 // indirect
 	golang.org/x/text v0.6.0 // indirect
 	golang.org/x/tools v0.5.0 // indirect
-	google.golang.org/genproto v0.0.0-20230125152338-dcaf20b6aeaa // indirect
+	google.golang.org/genproto v0.0.0-20230127162408-596548ed4efa // indirect
 	google.golang.org/grpc v1.52.3 // indirect
 	google.golang.org/protobuf v1.28.1 // indirect
 	gopkg.in/ini.v1 v1.67.0 // indirect
@@ -135,8 +134,11 @@ replace github.com/bsm/redislock => github.com/bsm/redislock v0.7.2
 // Issue with using wrong version of Redigo
 replace github.com/gomodule/redigo => github.com/gomodule/redigo v1.8.9
 
-// replace github.com/dgrijalva/jwt-go => github.com/dgrijalva/jwt-go v4.0.0-preview1
-replace github.com/dgrijalva/jwt-go => github.com/golang-jwt/jwt/v4 v4.4.2
+// Issue with Ask Nancy on related packages
+replace github.com/dgrijalva/jwt-go => github.com/golang-jwt/jwt/v4 v4.4.3
 
 // Breaking changes - needs a full refactor in WOC and BUX
 replace github.com/centrifugal/centrifuge-go => github.com/centrifugal/centrifuge-go v0.8.3
+
+// Bad version of go-bob, failing tests etc
+replace github.com/bitcoinschema/go-bob => github.com/bitcoinschema/go-bob v0.2.1
