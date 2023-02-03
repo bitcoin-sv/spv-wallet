@@ -4,14 +4,14 @@ go 1.18
 
 require (
 	github.com/99designs/gqlgen v0.17.24
-	github.com/BuxOrg/bux v0.4.16
+	github.com/BuxOrg/bux v0.4.17
 	github.com/go-ozzo/ozzo-validation v3.6.0+incompatible
 	github.com/go-redis/redis/v8 v8.11.5
 	github.com/gofrs/uuid v4.4.0+incompatible
 	github.com/julienschmidt/httprouter v1.3.0
 	github.com/mrz1836/go-api-router v0.5.0
 	github.com/mrz1836/go-cachestore v0.2.0
-	github.com/mrz1836/go-datastore v0.2.0
+	github.com/mrz1836/go-datastore v0.2.1
 	github.com/mrz1836/go-logger v0.3.1
 	github.com/mrz1836/go-parameters v0.2.9
 	github.com/mrz1836/go-sanitize v1.2.0
@@ -31,7 +31,7 @@ require (
 	github.com/bitcoinschema/go-map v0.0.14 // indirect
 	github.com/bitcoinsv/bsvd v0.0.0-20190609155523-4c29707f7173 // indirect
 	github.com/bitcoinsv/bsvutil v0.0.0-20181216182056-1d77cf353ea9 // indirect
-	github.com/bsm/redislock v0.8.2 // indirect
+	github.com/bsm/redislock v0.9.0 // indirect
 	github.com/capnm/sysinfo v0.0.0-20130621111458-5909a53897f3 // indirect
 	github.com/centrifugal/centrifuge-go v0.9.4 // indirect
 	github.com/centrifugal/protocol v0.9.1 // indirect
@@ -116,7 +116,7 @@ require (
 	golang.org/x/sys v0.4.0 // indirect
 	golang.org/x/text v0.6.0 // indirect
 	golang.org/x/tools v0.5.0 // indirect
-	google.golang.org/genproto v0.0.0-20230127162408-596548ed4efa // indirect
+	google.golang.org/genproto v0.0.0-20230131230820-1c016267d619 // indirect
 	google.golang.org/grpc v1.52.3 // indirect
 	google.golang.org/protobuf v1.28.1 // indirect
 	gopkg.in/ini.v1 v1.67.0 // indirect
@@ -124,8 +124,8 @@ require (
 	gorm.io/driver/mysql v1.4.5 // indirect
 	gorm.io/driver/postgres v1.4.6 // indirect
 	gorm.io/driver/sqlite v1.4.4 // indirect
-	gorm.io/gorm v1.24.3 // indirect
-	gorm.io/plugin/dbresolver v1.4.0 // indirect
+	gorm.io/gorm v1.24.4 // indirect
+	gorm.io/plugin/dbresolver v1.4.1 // indirect
 )
 
 // Issue with redislock package
