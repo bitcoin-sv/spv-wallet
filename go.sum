@@ -41,8 +41,8 @@ github.com/99designs/gqlgen v0.17.24/go.mod h1:BMhYIhe4bp7OlCo5I2PnowSK/Wimpv/Yl
 github.com/BurntSushi/toml v0.3.1/go.mod h1:xHWCNGjB5oqiDr8zfno3MHue2Ht5sIBksp03qcyfWMU=
 github.com/BurntSushi/toml v1.1.0/go.mod h1:CxXYINrC8qIiEnFrOxCa7Jy5BFHlXnUU2pbicEuybxQ=
 github.com/BurntSushi/xgb v0.0.0-20160522181843-27f122750802/go.mod h1:IVnqGOEym/WlBOVXweHU+Q+/VP0lqqI8lqeDx9IjBqo=
-github.com/BuxOrg/bux v0.4.18 h1:WjG97Zk0TbyLXR8MMI2l90ZMO4ovgGmnsxuxAXPANbk=
-github.com/BuxOrg/bux v0.4.18/go.mod h1:1VyqqDp9zXxWL1K84z+4qlZ4mM2fpqVPEa+ZLLwhU90=
+github.com/BuxOrg/bux v0.4.19 h1:Cm4fE9wnNRaJgP+YU8gj6eLKIzuw8SuyV9d/Z2qiO0I=
+github.com/BuxOrg/bux v0.4.19/go.mod h1:lo7dhQ5r6uVtOjpw1tliyLDOgYD03ld7nYQHCvcG9i4=
 github.com/DATA-DOG/go-sqlmock v1.5.0 h1:Shsta01QNfFxHCfpW6YH2STWB0MudeXXEWMr20OEh60=
 github.com/DataDog/datadog-go v3.7.1+incompatible/go.mod h1:LButxg5PwREeZtORoXG3tL4fMGNddJ+vMq1mwgfaqoQ=
 github.com/acobaugh/osrelease v0.1.0 h1:Yb59HQDGGNhCj4suHaFQQfBps5wyoKLSSX/J/+UifRE=
@@ -64,8 +64,10 @@ github.com/bitcoinschema/go-bitcoin/v2 v2.0.2 h1:EVwIPdZU3P1u0jLWfHkoRP1KJydALwY
 github.com/bitcoinschema/go-bitcoin/v2 v2.0.2/go.mod h1:W27VU8elCcugGuA1pvhMQ4PjMPBRirdovkgoeKTjLg0=
 github.com/bitcoinschema/go-bob v0.2.1 h1:acdSqbwOX40q6ajfgcZWVprGqUMoFeOGvD0eLpw4eSk=
 github.com/bitcoinschema/go-bob v0.2.1/go.mod h1:NcIEEdVKxlDaplqyCfmqrBwqQDxtlEqpCZ5fNqUrrC4=
-github.com/bitcoinschema/go-map v0.0.14 h1:j2DTrmCduTofeUl8UuB+DxSuhAPrNg+P+jl4Bi7iYZs=
-github.com/bitcoinschema/go-map v0.0.14/go.mod h1:UlOEpL00BBDxQPvh2jEsdkuvO81FKJCva1KDNsbgzBc=
+github.com/bitcoinschema/go-bpu v0.0.3 h1:Lz5BU36DYmod0lVPrMFO2NIG650PXRcC6e3SQhvpeeQ=
+github.com/bitcoinschema/go-bpu v0.0.3/go.mod h1:i41D9NP5KIk/oCt8XrRhN27YerZCUG6vjScXDhNn5Us=
+github.com/bitcoinschema/go-map v0.0.15 h1:2mN5qfRd298AtSAEF9HTqkltxQZKQrM264LAe/Dvo18=
+github.com/bitcoinschema/go-map v0.0.15/go.mod h1:UATfKAVX5ILxhzCg0xOg9liqzGcY5Sz6XrH+V+CIbpY=
 github.com/bitcoinsv/bsvd v0.0.0-20190609155523-4c29707f7173 h1:2yTIV9u7H0BhRDGXH5xrAwAz7XibWJtX2dNezMeNsUo=
 github.com/bitcoinsv/bsvd v0.0.0-20190609155523-4c29707f7173/go.mod h1:BZ1UcC9+tmcDEcdVXgpt13hMczwJxWzpAn68wNs7zRA=
 github.com/bitcoinsv/bsvutil v0.0.0-20181216182056-1d77cf353ea9 h1:hFI8rT84FCA0FFy3cFrkW5Nz4FyNKlIdCvEvvTNySKg=
@@ -242,7 +244,7 @@ github.com/jackc/pgservicefile v0.0.0-20221227161230-091c0ba34f0a/go.mod h1:5TJZ
 github.com/jackc/pgx/v5 v5.2.0 h1:NdPpngX0Y6z6XDFKqmFQaE+bCtkqzvQIOt1wvBlAqs8=
 github.com/jackc/pgx/v5 v5.2.0/go.mod h1:Ptn7zmohNsWEsdxRawMzk3gaKma2obW+NWTnKa0S4nk=
 github.com/jackc/puddle/v2 v2.1.2/go.mod h1:2lpufsF5mRHO6SuZkm0fNYxM6SWHfvyFj62KwNzgels=
-github.com/jarcoal/httpmock v1.2.0 h1:gSvTxxFR/MEMfsGrvRbdfpRUMBStovlSRLw0Ep1bwwc=
+github.com/jarcoal/httpmock v1.3.0 h1:2RJ8GP0IIaWwcC9Fp2BmVi8Kog3v2Hn7VXM3fTd+nuc=
 github.com/jinzhu/inflection v1.0.0 h1:K317FqzuhWc8YvSVlFMCCUb36O/S9MCKRDI7QkRKD/E=
 github.com/jinzhu/inflection v1.0.0/go.mod h1:h+uFLlag+Qp1Va5pdKtLDYj+kHp5pxUVkryuEj+Srlc=
 github.com/jinzhu/now v1.1.4/go.mod h1:d3SSVoowX0Lcu0IBviAWJpolVfI5UJVZZ7cO71lE/z8=
@@ -308,8 +310,8 @@ github.com/mitchellh/mapstructure v1.5.0/go.mod h1:bFUtVrKA4DC2yAKiSyO/QUcy7e+RR
 github.com/montanaflynn/stats v0.0.0-20171201202039-1bf9dbcd8cbe/go.mod h1:wL8QJuTMNUDYhXwkmfOly8iTdp5TEcJFWZD2D7SIkUc=
 github.com/montanaflynn/stats v0.7.0 h1:r3y12KyNxj/Sb/iOE46ws+3mS1+MZca1wlHQFPsY/JU=
 github.com/montanaflynn/stats v0.7.0/go.mod h1:etXPPgVO6n31NxCd9KQUMvCM+ve0ruNzt6R8Bnaayow=
-github.com/mrz1836/go-api-router v0.5.0 h1:c1T47uuQl+4UE20Q3PJoTkYAeF6qb14zFHRfDsCjYlo=
-github.com/mrz1836/go-api-router v0.5.0/go.mod h1:30bzDZMWc7Jx82YMNn7pbwJbXqfKbOW7NYbsKewO9A4=
+github.com/mrz1836/go-api-router v0.5.1 h1:JoJ4GdwXs58DTQ/Xal6sv2LlY6YOz4lhZ5vHFJCnYb8=
+github.com/mrz1836/go-api-router v0.5.1/go.mod h1:F3Qlg2meHDaJavXCzeM9RmMV8q1/k71j35gmfbHw1Os=
 github.com/mrz1836/go-cache v0.8.0 h1:+vBuTa9+aQ5rBj5c3pHFECOzTbQ6ocyo36UdFKrSFpw=
 github.com/mrz1836/go-cache v0.8.0/go.mod h1:J/dAcNjByP33eIo/h2U3JnL+B9iAifS1PiVqQTz9fLY=
 github.com/mrz1836/go-cachestore v0.2.0 h1:lQ228SMo9QWiu0D6hnX9Ja110ruajToErJlu6VreFCU=
@@ -320,8 +322,8 @@ github.com/mrz1836/go-logger v0.3.1 h1:I0MleBuec5gy76dD0M8k8w9F1271NXR8CfwytWeBi
 github.com/mrz1836/go-logger v0.3.1/go.mod h1:wvnL9EjhtiMOgABtr0Q8EwO4YNVTBTDMLlvKAXjSEy0=
 github.com/mrz1836/go-nownodes v0.0.8 h1:aQ/PF6hcFE58tIPgnpCOaSnQhQbuJJ/ywDYTepYWiFY=
 github.com/mrz1836/go-nownodes v0.0.8/go.mod h1:U7RoRWxmGYp2RlX3zklJkNVTfLHgLgcGS2bDMKg1Vp4=
-github.com/mrz1836/go-parameters v0.2.9 h1:Aqh0wPXYIn5sEsEv7FQI/Mr+hu/gYaQxBT3l7bRt46U=
-github.com/mrz1836/go-parameters v0.2.9/go.mod h1:GEdOPlL+jDhIPPQ3SDWoMwsboiwXIdVsOHy5PPLzz9E=
+github.com/mrz1836/go-parameters v0.3.0 h1:+EbUmyf0MFX6aZCS+6WxrPZ7sWQ1jTn4Ejs0eLGFd8Q=
+github.com/mrz1836/go-parameters v0.3.0/go.mod h1:E3qlPxhpR/nAMsmNqAR9vi0PBYfiz/wpB6m+iNZstJM=
 github.com/mrz1836/go-sanitize v1.2.0 h1:B8HkDSXSkDa6VG49NWWJPVWh6TA8pffnqcB4M1pvRKI=
 github.com/mrz1836/go-sanitize v1.2.0/go.mod h1:5gWo0KQ+acEyiXYM17QSWT7c2E27xaO5hCTSDW6+vbk=
 github.com/mrz1836/go-validate v0.2.0 h1:F8AcgJRW0B/hUNFAXijrN/EGqYlAIkIIpMDkIMMRUho=
@@ -423,8 +425,6 @@ github.com/tonicpow/go-paymail v0.8.2/go.mod h1:cNhkZn1CtK1uwjiwM3cuZrnx/2GrHHXs
 github.com/tryvium-travels/memongo v0.9.0 h1:k5kuTHSDdITN+aMaNoKr1nzTyNvhwOXtb9SnrMjRg+I=
 github.com/tylertreat/BoomFilters v0.0.0-20210315201527-1a82519a3e43 h1:QEePdg0ty2r0t1+qwfZmQ4OOl/MB2UXIeJSpIZv56lg=
 github.com/tylertreat/BoomFilters v0.0.0-20210315201527-1a82519a3e43/go.mod h1:OYRfF6eb5wY9VRFkXJH8FFBi3plw2v+giaIu7P054pM=
-github.com/ugorji/go v1.2.7/go.mod h1:nF9osbDWLy6bDVv/Rtoh6QgnvNDpmCalQV5urGCCS6M=
-github.com/ugorji/go/codec v1.2.7/go.mod h1:WGN1fab3R1fzQlVQTkfxVtIBhWDRqOviHU95kRgeqEY=
 github.com/ugorji/go/codec v1.2.9 h1:rmenucSohSTiyL09Y+l2OCk+FrMxGMzho2+tjr5ticU=
 github.com/ugorji/go/codec v1.2.9/go.mod h1:UNopzCgEMSXjBc6AOMqYvWC1ktqTAfzJZUZgYf6w6lg=
 github.com/urfave/cli/v2 v2.8.1/go.mod h1:Z41J9TPoffeoqP0Iza0YbAhGvymRdZAd2uPmZ5JxRdY=
@@ -645,8 +645,8 @@ golang.org/x/sys v0.0.0-20220722155257-8c9f86f7a55f/go.mod h1:oPkhp1MJrh7nUepCBc
 golang.org/x/sys v0.0.0-20220811171246-fbc7d0a398ab/go.mod h1:oPkhp1MJrh7nUepCBck5+mAzfO9JrbApNNgaTdGDITg=
 golang.org/x/sys v0.0.0-20220908164124-27713097b956/go.mod h1:oPkhp1MJrh7nUepCBck5+mAzfO9JrbApNNgaTdGDITg=
 golang.org/x/sys v0.3.0/go.mod h1:oPkhp1MJrh7nUepCBck5+mAzfO9JrbApNNgaTdGDITg=
-golang.org/x/sys v0.4.0 h1:Zr2JFtRQNX3BCZ8YtxRE9hNJYC8J6I1MVbMg6owUp18=
-golang.org/x/sys v0.4.0/go.mod h1:oPkhp1MJrh7nUepCBck5+mAzfO9JrbApNNgaTdGDITg=
+golang.org/x/sys v0.5.0 h1:MUK/U/4lj1t1oPg0HfuXDN/Z1wv31ZJ/YcPiGccS4DU=
+golang.org/x/sys v0.5.0/go.mod h1:oPkhp1MJrh7nUepCBck5+mAzfO9JrbApNNgaTdGDITg=
 golang.org/x/term v0.0.0-20201117132131-f5c789dd3221/go.mod h1:Nr5EML6q2oocZ2LXRh80K7BxOlk5/8JxuGnuhpl+muw=
 golang.org/x/term v0.0.0-20201126162022-7de9c90e9dd1/go.mod h1:bj7SfCRtBDWHUb9snDiAeCFNEtKQo2Wmx5Cou7ajbmo=
 golang.org/x/term v0.0.0-20210927222741-03fcf44c2211/go.mod h1:jbD1KX2456YbFQfuXm/mYQcufACuNUgVhRMnK/tPxf8=
