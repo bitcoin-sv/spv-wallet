@@ -10,8 +10,7 @@ import (
 	apirouter "github.com/mrz1836/go-api-router"
 )
 
-// new will make a new model
-// todo: possible duplicate of record.go
+// newTransaction will create a new transaction
 func (a *Action) newTransaction(w http.ResponseWriter, req *http.Request, _ httprouter.Params) {
 
 	// Parse the params
