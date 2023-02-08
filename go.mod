@@ -4,16 +4,16 @@ go 1.18
 
 require (
 	github.com/99designs/gqlgen v0.17.24
-	github.com/BuxOrg/bux v0.4.18
+	github.com/BuxOrg/bux v0.4.19
 	github.com/go-ozzo/ozzo-validation v3.6.0+incompatible
 	github.com/go-redis/redis/v8 v8.11.5
 	github.com/gofrs/uuid v4.4.0+incompatible
 	github.com/julienschmidt/httprouter v1.3.0
-	github.com/mrz1836/go-api-router v0.5.0
+	github.com/mrz1836/go-api-router v0.5.1
 	github.com/mrz1836/go-cachestore v0.2.0
 	github.com/mrz1836/go-datastore v0.2.1
 	github.com/mrz1836/go-logger v0.3.1
-	github.com/mrz1836/go-parameters v0.2.9
+	github.com/mrz1836/go-parameters v0.3.0
 	github.com/mrz1836/go-sanitize v1.2.0
 	github.com/mrz1836/go-validate v0.2.0
 	github.com/newrelic/go-agent/v3 v3.20.3
@@ -27,8 +27,8 @@ require (
 	github.com/agnivade/levenshtein v1.1.1 // indirect
 	github.com/asaskevich/govalidator v0.0.0-20210307081110-f21760c49a8d // indirect
 	github.com/bitcoinschema/go-bitcoin/v2 v2.0.2 // indirect
-	github.com/bitcoinschema/go-bob v0.3.1 // indirect
-	github.com/bitcoinschema/go-map v0.0.14 // indirect
+	github.com/bitcoinschema/go-bpu v0.0.3 // indirect
+	github.com/bitcoinschema/go-map v0.0.15 // indirect
 	github.com/bitcoinsv/bsvd v0.0.0-20190609155523-4c29707f7173 // indirect
 	github.com/bitcoinsv/bsvutil v0.0.0-20181216182056-1d77cf353ea9 // indirect
 	github.com/bsm/redislock v0.9.0 // indirect
@@ -113,7 +113,7 @@ require (
 	golang.org/x/mod v0.7.0 // indirect
 	golang.org/x/net v0.5.0 // indirect
 	golang.org/x/sync v0.1.0 // indirect
-	golang.org/x/sys v0.4.0 // indirect
+	golang.org/x/sys v0.5.0 // indirect
 	golang.org/x/text v0.6.0 // indirect
 	golang.org/x/tools v0.5.0 // indirect
 	google.golang.org/genproto v0.0.0-20230202175211-008b39050e57 // indirect
