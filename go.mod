@@ -13,7 +13,7 @@ require (
 	github.com/mrz1836/go-cachestore v0.2.0
 	github.com/mrz1836/go-datastore v0.2.1
 	github.com/mrz1836/go-logger v0.3.1
-	github.com/mrz1836/go-parameters v0.2.9
+	github.com/mrz1836/go-parameters v0.3.0
 	github.com/mrz1836/go-sanitize v1.2.0
 	github.com/mrz1836/go-validate v0.2.0
 	github.com/newrelic/go-agent/v3 v3.20.3
