@@ -11,7 +11,7 @@ require (
 	github.com/julienschmidt/httprouter v1.3.0
 	github.com/mrz1836/go-api-router v0.5.1
 	github.com/mrz1836/go-cachestore v0.2.0
-	github.com/mrz1836/go-datastore v0.2.1
+	github.com/mrz1836/go-datastore v0.2.2
 	github.com/mrz1836/go-logger v0.3.1
 	github.com/mrz1836/go-parameters v0.3.0
 	github.com/mrz1836/go-sanitize v1.2.0
@@ -28,7 +28,7 @@ require (
 	github.com/asaskevich/govalidator v0.0.0-20210307081110-f21760c49a8d // indirect
 	github.com/bitcoinschema/go-bitcoin/v2 v2.0.2 // indirect
 	github.com/bitcoinschema/go-bpu v0.0.3 // indirect
-	github.com/bitcoinschema/go-map v0.0.15 // indirect
+	github.com/bitcoinschema/go-map v0.0.16 // indirect
 	github.com/bitcoinsv/bsvd v0.0.0-20190609155523-4c29707f7173 // indirect
 	github.com/bitcoinsv/bsvutil v0.0.0-20181216182056-1d77cf353ea9 // indirect
 	github.com/bsm/redislock v0.9.0 // indirect
@@ -110,19 +110,19 @@ require (
 	github.com/youmark/pkcs8 v0.0.0-20201027041543-1326539a0a0a // indirect
 	go.mongodb.org/mongo-driver v1.11.1 // indirect
 	golang.org/x/crypto v0.5.0 // indirect
-	golang.org/x/mod v0.7.0 // indirect
+	golang.org/x/mod v0.8.0 // indirect
 	golang.org/x/net v0.5.0 // indirect
 	golang.org/x/sync v0.1.0 // indirect
 	golang.org/x/sys v0.5.0 // indirect
 	golang.org/x/text v0.6.0 // indirect
 	golang.org/x/tools v0.5.0 // indirect
 	google.golang.org/genproto v0.0.0-20230202175211-008b39050e57 // indirect
-	google.golang.org/grpc v1.52.3 // indirect
+	google.golang.org/grpc v1.53.0 // indirect
 	google.golang.org/protobuf v1.28.1 // indirect
 	gopkg.in/ini.v1 v1.67.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
-	gorm.io/driver/mysql v1.4.5 // indirect
-	gorm.io/driver/postgres v1.4.6 // indirect
+	gorm.io/driver/mysql v1.4.6 // indirect
+	gorm.io/driver/postgres v1.4.7 // indirect
 	gorm.io/driver/sqlite v1.4.4 // indirect
 	gorm.io/gorm v1.24.5 // indirect
 	gorm.io/plugin/dbresolver v1.4.1 // indirect
