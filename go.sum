@@ -41,8 +41,8 @@ github.com/99designs/gqlgen v0.17.24/go.mod h1:BMhYIhe4bp7OlCo5I2PnowSK/Wimpv/Yl
 github.com/BurntSushi/toml v0.3.1/go.mod h1:xHWCNGjB5oqiDr8zfno3MHue2Ht5sIBksp03qcyfWMU=
 github.com/BurntSushi/toml v1.1.0/go.mod h1:CxXYINrC8qIiEnFrOxCa7Jy5BFHlXnUU2pbicEuybxQ=
 github.com/BurntSushi/xgb v0.0.0-20160522181843-27f122750802/go.mod h1:IVnqGOEym/WlBOVXweHU+Q+/VP0lqqI8lqeDx9IjBqo=
-github.com/BuxOrg/bux v0.4.20 h1:dCFHmIV5MhhVBlWSo5SS9qh/eO8uteNeJc26geijctI=
-github.com/BuxOrg/bux v0.4.20/go.mod h1:OpwjuPWSybq+PiRd9EE6w+KKO6/hxNRerZIkgUiZca8=
+github.com/BuxOrg/bux v0.4.21 h1:k1CDFgAuHVtsJmyHQE/uo8RnXBB7D6TNzmspXp9V68c=
+github.com/BuxOrg/bux v0.4.21/go.mod h1:OpwjuPWSybq+PiRd9EE6w+KKO6/hxNRerZIkgUiZca8=
 github.com/DATA-DOG/go-sqlmock v1.5.0 h1:Shsta01QNfFxHCfpW6YH2STWB0MudeXXEWMr20OEh60=
 github.com/DataDog/datadog-go v3.7.1+incompatible/go.mod h1:LButxg5PwREeZtORoXG3tL4fMGNddJ+vMq1mwgfaqoQ=
 github.com/acobaugh/osrelease v0.1.0 h1:Yb59HQDGGNhCj4suHaFQQfBps5wyoKLSSX/J/+UifRE=
