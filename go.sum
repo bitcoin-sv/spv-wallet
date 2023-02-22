@@ -321,8 +321,8 @@ github.com/mrz1836/go-logger v0.3.1 h1:I0MleBuec5gy76dD0M8k8w9F1271NXR8CfwytWeBi
 github.com/mrz1836/go-logger v0.3.1/go.mod h1:wvnL9EjhtiMOgABtr0Q8EwO4YNVTBTDMLlvKAXjSEy0=
 github.com/mrz1836/go-nownodes v0.0.8 h1:aQ/PF6hcFE58tIPgnpCOaSnQhQbuJJ/ywDYTepYWiFY=
 github.com/mrz1836/go-nownodes v0.0.8/go.mod h1:U7RoRWxmGYp2RlX3zklJkNVTfLHgLgcGS2bDMKg1Vp4=
-github.com/mrz1836/go-parameters v0.3.0 h1:+EbUmyf0MFX6aZCS+6WxrPZ7sWQ1jTn4Ejs0eLGFd8Q=
-github.com/mrz1836/go-parameters v0.3.0/go.mod h1:E3qlPxhpR/nAMsmNqAR9vi0PBYfiz/wpB6m+iNZstJM=
+github.com/mrz1836/go-parameters v0.3.1 h1:tGfDEMnzqKfI5x0y+ZwMYfSSjQm0NFoaEcESGnbFYr4=
+github.com/mrz1836/go-parameters v0.3.1/go.mod h1:ceRTTC2WzJqSCproV8+smxvUgTSqQGNGjqYFPDiUq0k=
 github.com/mrz1836/go-sanitize v1.2.0 h1:B8HkDSXSkDa6VG49NWWJPVWh6TA8pffnqcB4M1pvRKI=
 github.com/mrz1836/go-sanitize v1.2.0/go.mod h1:5gWo0KQ+acEyiXYM17QSWT7c2E27xaO5hCTSDW6+vbk=
 github.com/mrz1836/go-validate v0.2.0 h1:F8AcgJRW0B/hUNFAXijrN/EGqYlAIkIIpMDkIMMRUho=
@@ -424,8 +424,8 @@ github.com/tonicpow/go-paymail v0.8.3/go.mod h1:Bc/WmMOvKSrdlGexcFD3m9QTP6WPbq8m
 github.com/tryvium-travels/memongo v0.9.0 h1:k5kuTHSDdITN+aMaNoKr1nzTyNvhwOXtb9SnrMjRg+I=
 github.com/tylertreat/BoomFilters v0.0.0-20210315201527-1a82519a3e43 h1:QEePdg0ty2r0t1+qwfZmQ4OOl/MB2UXIeJSpIZv56lg=
 github.com/tylertreat/BoomFilters v0.0.0-20210315201527-1a82519a3e43/go.mod h1:OYRfF6eb5wY9VRFkXJH8FFBi3plw2v+giaIu7P054pM=
-github.com/ugorji/go/codec v1.2.9 h1:rmenucSohSTiyL09Y+l2OCk+FrMxGMzho2+tjr5ticU=
-github.com/ugorji/go/codec v1.2.9/go.mod h1:UNopzCgEMSXjBc6AOMqYvWC1ktqTAfzJZUZgYf6w6lg=
+github.com/ugorji/go/codec v1.2.10 h1:eimT6Lsr+2lzmSZxPhLFoOWFmQqwk0fllJJ5hEbTXtQ=
+github.com/ugorji/go/codec v1.2.10/go.mod h1:UNopzCgEMSXjBc6AOMqYvWC1ktqTAfzJZUZgYf6w6lg=
 github.com/urfave/cli/v2 v2.8.1/go.mod h1:Z41J9TPoffeoqP0Iza0YbAhGvymRdZAd2uPmZ5JxRdY=
 github.com/valyala/bytebufferpool v1.0.0 h1:GqA5TC/0021Y/b9FG4Oi9Mr3q7XYx6KllzawFIhcdPw=
 github.com/valyala/bytebufferpool v1.0.0/go.mod h1:6bBcMArwyJ5K/AmCkWv1jt77kVWyCJ6HpOuEn7z0Csc=
