@@ -13,7 +13,7 @@ require (
 	github.com/mrz1836/go-cachestore v0.2.0
 	github.com/mrz1836/go-datastore v0.2.3
 	github.com/mrz1836/go-logger v0.3.1
-	github.com/mrz1836/go-parameters v0.3.0
+	github.com/mrz1836/go-parameters v0.3.1
 	github.com/mrz1836/go-sanitize v1.2.0
 	github.com/mrz1836/go-validate v0.2.0
 	github.com/newrelic/go-agent/v3 v3.20.3
@@ -99,7 +99,7 @@ require (
 	github.com/tonicpow/go-minercraft v0.9.0 // indirect
 	github.com/tonicpow/go-paymail v0.8.3 // indirect
 	github.com/tylertreat/BoomFilters v0.0.0-20210315201527-1a82519a3e43 // indirect
-	github.com/ugorji/go/codec v1.2.9 // indirect
+	github.com/ugorji/go/codec v1.2.10 // indirect
 	github.com/valyala/bytebufferpool v1.0.0 // indirect
 	github.com/vmihailenco/msgpack/v5 v5.3.5 // indirect
 	github.com/vmihailenco/tagparser/v2 v2.0.0 // indirect
