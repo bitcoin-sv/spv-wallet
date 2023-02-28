@@ -317,8 +317,8 @@ github.com/mrz1836/go-cachestore v0.2.0 h1:lQ228SMo9QWiu0D6hnX9Ja110ruajToErJlu6
 github.com/mrz1836/go-cachestore v0.2.0/go.mod h1:NAeSJjmrcJj58iCpTaafpdsZDtAnBhWF8D+xdqPK9PE=
 github.com/mrz1836/go-datastore v0.2.3 h1:OOAc4pq5kkTjday07i1zW0DCi0d2AEXzMF8Qm6BVKh8=
 github.com/mrz1836/go-datastore v0.2.3/go.mod h1:ajoBY1T456aYlw20s6Xl4/huTR3MWX82K3XVpUeQ2ic=
-github.com/mrz1836/go-logger v0.3.1 h1:I0MleBuec5gy76dD0M8k8w9F1271NXR8CfwytWeBiVc=
-github.com/mrz1836/go-logger v0.3.1/go.mod h1:wvnL9EjhtiMOgABtr0Q8EwO4YNVTBTDMLlvKAXjSEy0=
+github.com/mrz1836/go-logger v0.3.2 h1:bjd23NwVaLWncXgXAyxAwWLQ02of0Ci3iJIZZEakkFU=
+github.com/mrz1836/go-logger v0.3.2/go.mod h1:8gWPdqxOAFNJOHDXS2ducgsokUOf0wWtAAM3LXPrhYo=
 github.com/mrz1836/go-nownodes v0.0.8 h1:aQ/PF6hcFE58tIPgnpCOaSnQhQbuJJ/ywDYTepYWiFY=
 github.com/mrz1836/go-nownodes v0.0.8/go.mod h1:U7RoRWxmGYp2RlX3zklJkNVTfLHgLgcGS2bDMKg1Vp4=
 github.com/mrz1836/go-parameters v0.3.1 h1:tGfDEMnzqKfI5x0y+ZwMYfSSjQm0NFoaEcESGnbFYr4=

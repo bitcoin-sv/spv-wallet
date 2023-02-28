@@ -12,7 +12,7 @@ require (
 	github.com/mrz1836/go-api-router v0.5.1
 	github.com/mrz1836/go-cachestore v0.2.0
 	github.com/mrz1836/go-datastore v0.2.3
-	github.com/mrz1836/go-logger v0.3.1
+	github.com/mrz1836/go-logger v0.3.2
 	github.com/mrz1836/go-parameters v0.3.1
 	github.com/mrz1836/go-sanitize v1.2.0
 	github.com/mrz1836/go-validate v0.2.0
