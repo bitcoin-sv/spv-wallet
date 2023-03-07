@@ -173,19 +173,19 @@ func (s *AppServices) loadBux(ctx context.Context, appConfig *AppConfig, testMod
 
 	if appConfig.ClusterConfig != nil {
 		if appConfig.ClusterConfig.Coordinator == cluster.CoordinatorRedis {
-			var redisUrl *url.URL
-			redisUrl, err = url.Parse(appConfig.ClusterConfig.Redis.URL)
+			var redisURL *url.URL
+			redisURL, err = url.Parse(appConfig.ClusterConfig.Redis.URL)
 			if err != nil {
-				return fmt.Errorf("error parsing redis url: %s", err.Error())
+				return fmt.Errorf("error parsing redis url: %w", err)
 			}
 
 			var redisOptions *redis.Options
 			if appConfig.ClusterConfig.Redis != nil {
 				// parse redis url
-				password, _ := redisUrl.User.Password()
+				password, _ := redisURL.User.Password()
 				redisOptions = &redis.Options{
-					Addr:        fmt.Sprintf("%s:%s", redisUrl.Hostname(), redisUrl.Port()),
-					Username:    redisUrl.User.Username(),
+					Addr:        fmt.Sprintf("%s:%s", redisURL.Hostname(), redisURL.Port()),
+					Username:    redisURL.User.Username(),
 					Password:    password,
 					IdleTimeout: appConfig.ClusterConfig.Redis.MaxIdleTimeout,
 				}
