@@ -5,6 +5,7 @@ import (
 	"crypto/tls"
 	"errors"
 	"fmt"
+	"net/url"
 	"strings"
 	"time"
 
@@ -172,10 +173,20 @@ func (s *AppServices) loadBux(ctx context.Context, appConfig *AppConfig, testMod
 
 	if appConfig.ClusterConfig != nil {
 		if appConfig.ClusterConfig.Coordinator == cluster.CoordinatorRedis {
+			var redisUrl *url.URL
+			redisUrl, err = url.Parse(appConfig.ClusterConfig.Redis.URL)
+			if err != nil {
+				return fmt.Errorf("error parsing redis url: %s", err.Error())
+			}
+
 			var redisOptions *redis.Options
 			if appConfig.ClusterConfig.Redis != nil {
+				// parse redis url
+				password, _ := redisUrl.User.Password()
 				redisOptions = &redis.Options{
-					Addr:        appConfig.ClusterConfig.Redis.URL,
+					Addr:        fmt.Sprintf("%s:%s", redisUrl.Hostname(), redisUrl.Port()),
+					Username:    redisUrl.User.Username(),
+					Password:    password,
 					IdleTimeout: appConfig.ClusterConfig.Redis.MaxIdleTimeout,
 				}
 				if appConfig.ClusterConfig.Redis.UseTLS {
