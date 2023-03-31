@@ -16,7 +16,7 @@ require (
 	github.com/mrz1836/go-parameters v0.3.1
 	github.com/mrz1836/go-sanitize v1.2.1
 	github.com/mrz1836/go-validate v0.2.0
-	github.com/newrelic/go-agent/v3 v3.20.4
+	github.com/newrelic/go-agent/v3 v3.21.0
 	github.com/newrelic/go-agent/v3/integrations/nrhttprouter v1.0.1
 	github.com/spf13/viper v1.15.0
 	github.com/stretchr/testify v1.8.2
