@@ -3,7 +3,7 @@ module github.com/BuxOrg/bux-server
 go 1.18
 
 require (
-	github.com/99designs/gqlgen v0.17.27
+	github.com/99designs/gqlgen v0.17.28
 	github.com/BuxOrg/bux v0.4.22
 	github.com/go-ozzo/ozzo-validation v3.6.0+incompatible
 	github.com/go-redis/redis/v8 v8.11.5
