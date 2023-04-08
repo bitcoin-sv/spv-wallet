@@ -288,7 +288,7 @@ func (r *queryResolver) AdminPaymailGetByXpubID(ctx context.Context, xpubID stri
 }
 
 // AdminPaymailsList is the resolver for the admin_paymails_list field.
-func (r *queryResolver) AdminPaymailsList(ctx context.Context, metadata bux.Metadata, conditions map[string]interface{}, params *datastore.QueryParams) ([]*bux.PaymailAddress, error) {
+func (r *queryResolver) AdminPaymailsList(ctx context.Context, metadata bux.Metadata, conditions map[string]interface{}, _ *datastore.QueryParams) ([]*bux.PaymailAddress, error) {
 	// including admin check
 	c, err := GetConfigFromContextAdmin(ctx)
 	if err != nil {

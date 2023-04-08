@@ -10,7 +10,7 @@ import (
 )
 
 // get will fetch a transaction
-func (a *Action) update(w http.ResponseWriter, req *http.Request, ps httprouter.Params) {
+func (a *Action) update(w http.ResponseWriter, req *http.Request, _ httprouter.Params) {
 
 	// Get the xPub from the request (via authentication)
 	reqXPubID, _ := bux.GetXpubIDFromRequest(req)

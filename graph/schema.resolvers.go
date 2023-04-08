@@ -524,13 +524,13 @@ func (r *queryResolver) UtxosCount(ctx context.Context, metadata bux.Metadata, c
 }
 
 // Inputs is the resolver for the inputs field.
-func (r *transactionConfigInputResolver) Inputs(ctx context.Context, obj *bux.TransactionConfig, data []map[string]interface{}) error {
+func (r *transactionConfigInputResolver) Inputs(_ context.Context, _ *bux.TransactionConfig, _ []map[string]interface{}) error {
 	// do nothing with inputs
 	return nil
 }
 
 // ExpiresIn is the resolver for the expires_in field.
-func (r *transactionConfigInputResolver) ExpiresIn(ctx context.Context, obj *bux.TransactionConfig, data *uint64) error {
+func (r *transactionConfigInputResolver) ExpiresIn(_ context.Context, obj *bux.TransactionConfig, data *uint64) error {
 	obj.ExpiresIn = time.Duration(*data) * time.Second
 	return nil
 }
