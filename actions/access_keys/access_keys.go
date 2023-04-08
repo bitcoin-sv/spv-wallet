@@ -1,2 +1,2 @@
-// Package accessKeys is for the Actions
-package accessKeys
+// Package accesskeys is for the Actions
+package accesskeys
