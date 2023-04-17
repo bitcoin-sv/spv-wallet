@@ -4,7 +4,7 @@ go 1.18
 
 require (
 	github.com/99designs/gqlgen v0.17.29
-	github.com/BuxOrg/bux v0.4.23
+	github.com/BuxOrg/bux v0.4.24
 	github.com/go-ozzo/ozzo-validation v3.6.0+incompatible
 	github.com/go-redis/redis/v8 v8.11.5
 	github.com/gofrs/uuid v4.4.0+incompatible
@@ -69,7 +69,7 @@ require (
 	github.com/libsv/go-bc v0.1.11 // indirect
 	github.com/libsv/go-bk v0.1.6 // indirect
 	github.com/libsv/go-bt v1.0.8 // indirect
-	github.com/libsv/go-bt/v2 v2.2.0 // indirect
+	github.com/libsv/go-bt/v2 v2.2.1 // indirect
 	github.com/magiconair/properties v1.8.7 // indirect
 	github.com/mailru/easyjson v0.7.7 // indirect
 	github.com/matryer/respond v1.0.1 // indirect
@@ -125,7 +125,7 @@ require (
 	gorm.io/driver/mysql v1.4.7 // indirect
 	gorm.io/driver/postgres v1.5.0 // indirect
 	gorm.io/driver/sqlite v1.4.4 // indirect
-	gorm.io/gorm v1.24.7-0.20230306060331-85eaf9eeda11 // indirect
+	gorm.io/gorm v1.25.0 // indirect
 	gorm.io/plugin/dbresolver v1.4.1 // indirect
 )
 
