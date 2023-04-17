@@ -78,6 +78,7 @@ const (
 	ErrorAuthenticationError              = 16
 	ErrorAuthenticationScheme             = 17
 	ErrorAuthenticationNotAdmin           = 18
+	ErrorLoadingBuxLibrary                = 19
 
 	errorCodeLast = iota
 )
@@ -89,7 +90,6 @@ func (e ErrorCode) IsValid() bool {
 
 // Load all error messages on init
 func init() {
-
 	// Create all the standard error messages
 	errorMessages = make(map[ErrorCode]ErrorMessage, errorCodeLast)
 
@@ -122,4 +122,7 @@ func init() {
 	errorMessages[ErrorAuthenticationError] = ErrorMessage{Code: ErrorAuthenticationError, InternalMessage: "authentication error: %s", PublicMessage: "authentication failed", StatusCode: http.StatusUnauthorized}
 	errorMessages[ErrorAuthenticationScheme] = ErrorMessage{Code: ErrorAuthenticationScheme, InternalMessage: "authentication scheme unknown: %s", PublicMessage: "authentication failed", StatusCode: http.StatusUnauthorized}
 	errorMessages[ErrorAuthenticationNotAdmin] = ErrorMessage{Code: ErrorAuthenticationNotAdmin, InternalMessage: "xpub provided is not an admin key: %s", PublicMessage: "authentication failed", StatusCode: http.StatusUnauthorized}
+
+	// Bux
+	errorMessages[ErrorLoadingBuxLibrary] = ErrorMessage{Code: ErrorLoadingBuxLibrary, InternalMessage: "error loading bux library: %s", PublicMessage: "error loading bux library", StatusCode: http.StatusExpectationFailed}
 }

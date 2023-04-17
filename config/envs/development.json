@@ -1,5 +1,6 @@
 {
   "debug": true,
+  "use_local_bux_library_instance": false,
   "debug_profiling": false,
   "disable_itc": true,
   "environment": "development",

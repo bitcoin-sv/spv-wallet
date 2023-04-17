@@ -18,12 +18,19 @@ import (
 
 // main method starts everything for the BUX Server
 func main() {
-
 	// Load the Application Configuration
 	appConfig, err := config.Load("")
 	if err != nil {
 		logger.Fatalf(dictionary.GetInternalMessage(dictionary.ErrorLoadingConfig), err.Error())
 		return
+	}
+
+	if appConfig.UseLocalBuxLibraryInstance {
+		// Load the local Bux library
+		if err = appConfig.LoadLocalBuxLibrary(); err != nil {
+			logger.Fatalf(dictionary.GetInternalMessage(dictionary.ErrorLoadingBuxLibrary), err.Error())
+			return
+		}
 	}
 
 	// Load the Application Services

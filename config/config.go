@@ -3,6 +3,7 @@ package config
 
 import (
 	"errors"
+	"os/exec"
 	"time"
 
 	"github.com/BuxOrg/bux/cluster"
@@ -46,29 +47,30 @@ type (
 
 	// AppConfig is the configuration values and associated env vars
 	AppConfig struct {
-		Authentication     *AuthenticationConfig    `json:"authentication" mapstructure:"authentication"`
-		Cachestore         *CachestoreConfig        `json:"cache" mapstructure:"cache"`
-		ClusterConfig      *ClusterConfig           `json:"cluster" mapstructure:"cluster"`
-		Datastore          *DatastoreConfig         `json:"datastore" mapstructure:"datastore"`
-		Debug              bool                     `json:"debug" mapstructure:"debug"`
-		DebugProfiling     bool                     `json:"debug_profiling" mapstructure:"debug_profiling"`
-		DisableITC         bool                     `json:"disable_itc" mapstructure:"disable_itc"`
-		Environment        string                   `json:"environment" mapstructure:"environment"`
-		GDPRCompliance     bool                     `json:"gdpr_compliance" mapstructure:"gdpr_compliance"`
-		GraphQL            *GraphqlConfig           `json:"graphql" mapstructure:"graphql"`
-		ImportBlockHeaders string                   `json:"import_block_headers" mapstructure:"import_block_headers"`
-		Mongo              *datastore.MongoDBConfig `json:"mongodb" mapstructure:"mongodb"`
-		Monitor            *MonitorOptions          `json:"monitor" mapstructure:"monitor"`
-		NewRelic           *NewRelicConfig          `json:"new_relic" mapstructure:"new_relic"`
-		Notifications      *NotificationsConfig     `json:"notifications" mapstructure:"notifications"`
-		Paymail            *PaymailConfig           `json:"paymail" mapstructure:"paymail"`
-		Redis              *RedisConfig             `json:"redis" mapstructure:"redis"`
-		RequestLogging     bool                     `json:"request_logging" mapstructure:"request_logging"`
-		Server             *ServerConfig            `json:"server" mapstructure:"server"`
-		SQL                *datastore.SQLConfig     `json:"sql" mapstructure:"sql"`
-		SQLite             *datastore.SQLiteConfig  `json:"sqlite" mapstructure:"sqlite"`
-		TaskManager        *TaskManagerConfig       `json:"task_manager" mapstructure:"task_manager"`
-		WorkingDirectory   string                   `json:"working_directory" mapstructure:"working_directory"`
+		Authentication             *AuthenticationConfig    `json:"authentication" mapstructure:"authentication"`
+		Cachestore                 *CachestoreConfig        `json:"cache" mapstructure:"cache"`
+		ClusterConfig              *ClusterConfig           `json:"cluster" mapstructure:"cluster"`
+		Datastore                  *DatastoreConfig         `json:"datastore" mapstructure:"datastore"`
+		Debug                      bool                     `json:"debug" mapstructure:"debug"`
+		UseLocalBuxLibraryInstance bool                     `json:"use_local_bux_library_instance" mapstructure:"use_local_bux_library_instance"`
+		DebugProfiling             bool                     `json:"debug_profiling" mapstructure:"debug_profiling"`
+		DisableITC                 bool                     `json:"disable_itc" mapstructure:"disable_itc"`
+		Environment                string                   `json:"environment" mapstructure:"environment"`
+		GDPRCompliance             bool                     `json:"gdpr_compliance" mapstructure:"gdpr_compliance"`
+		GraphQL                    *GraphqlConfig           `json:"graphql" mapstructure:"graphql"`
+		ImportBlockHeaders         string                   `json:"import_block_headers" mapstructure:"import_block_headers"`
+		Mongo                      *datastore.MongoDBConfig `json:"mongodb" mapstructure:"mongodb"`
+		Monitor                    *MonitorOptions          `json:"monitor" mapstructure:"monitor"`
+		NewRelic                   *NewRelicConfig          `json:"new_relic" mapstructure:"new_relic"`
+		Notifications              *NotificationsConfig     `json:"notifications" mapstructure:"notifications"`
+		Paymail                    *PaymailConfig           `json:"paymail" mapstructure:"paymail"`
+		Redis                      *RedisConfig             `json:"redis" mapstructure:"redis"`
+		RequestLogging             bool                     `json:"request_logging" mapstructure:"request_logging"`
+		Server                     *ServerConfig            `json:"server" mapstructure:"server"`
+		SQL                        *datastore.SQLConfig     `json:"sql" mapstructure:"sql"`
+		SQLite                     *datastore.SQLiteConfig  `json:"sqlite" mapstructure:"sqlite"`
+		TaskManager                *TaskManagerConfig       `json:"task_manager" mapstructure:"task_manager"`
+		WorkingDirectory           string                   `json:"working_directory" mapstructure:"working_directory"`
 	}
 
 	// AuthenticationConfig is the configuration for Authentication
@@ -172,6 +174,17 @@ type (
 	}
 )
 
+// LoadLocalBuxLibrary will inject the local bux library path into the go.mod file
+func (a *AppConfig) LoadLocalBuxLibrary() error {
+	cmd := exec.Command("go", "mod", "edit", "-replace=github.com/BuxOrg/bux=../bux")
+	err := cmd.Run()
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
 // GetUserAgent will return the outgoing user agent
 func (a *AppConfig) GetUserAgent() string {
 	return "BUX-Server " + a.Environment + " " + Version
@@ -179,7 +192,6 @@ func (a *AppConfig) GetUserAgent() string {
 
 // Validate checks the configuration for specific rules
 func (a *AppConfig) Validate(txn *newrelic.Transaction) error {
-
 	var err error
 	defer txn.StartSegment("config_validation").End()
 
