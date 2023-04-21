@@ -20,6 +20,9 @@ import (
 // main method starts everything for the BUX Server
 // @title           BUX: Server
 // @version         v0.4.0
+// @securityDefinitions.apikey bux-auth-xpub
+// @in header
+// @name bux-auth-xpub
 func main() {
 
 	// Load the Application Configuration

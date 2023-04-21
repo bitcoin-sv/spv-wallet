@@ -2,5 +2,29 @@ info:
   contact: {}
   title: 'BUX: Server'
   version: v0.4.0
-paths: {}
+paths:
+  /v1/xpub:
+    get:
+      description: Get xPub
+      parameters:
+      - description: xPub
+        in: query
+        name: xpub
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+      security:
+      - bux-auth-xpub: []
+      summary: Get xPub
+      tags:
+      - xPub
+securityDefinitions:
+  bux-auth-xpub:
+    in: header
+    name: bux-auth-xpub
+    type: apiKey
 swagger: "2.0"

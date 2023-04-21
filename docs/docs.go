@@ -14,7 +14,46 @@ const docTemplate = `{
     },
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
-    "paths": {}
+    "paths": {
+        "/v1/xpub": {
+            "get": {
+                "security": [
+                    {
+                        "bux-auth-xpub": []
+                    }
+                ],
+                "description": "Get xPub",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "xPub"
+                ],
+                "summary": "Get xPub",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "xPub",
+                        "name": "xpub",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                }
+            }
+        }
+    },
+    "securityDefinitions": {
+        "bux-auth-xpub": {
+            "type": "apiKey",
+            "name": "bux-auth-xpub",
+            "in": "header"
+        }
+    }
 }`
 
 // SwaggerInfo holds exported Swagger Info so clients can modify it
