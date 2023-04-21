@@ -12,11 +12,14 @@ import (
 
 	"github.com/BuxOrg/bux-server/config"
 	"github.com/BuxOrg/bux-server/dictionary"
+	_ "github.com/BuxOrg/bux-server/docs"
 	"github.com/BuxOrg/bux-server/server"
 	"github.com/mrz1836/go-logger"
 )
 
 // main method starts everything for the BUX Server
+// @title           BUX: Server
+// @version         v0.4.0
 func main() {
 
 	// Load the Application Configuration
