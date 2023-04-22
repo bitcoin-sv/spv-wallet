@@ -158,3 +158,5 @@ replace github.com/centrifugal/protocol => github.com/centrifugal/protocol v0.9.
 
 // Bad version of go-bob, failing tests etc
 replace github.com/bitcoinschema/go-bob => github.com/bitcoinschema/go-bob v0.2.1
+
+replace github.com/BuxOrg/bux => ../../bux

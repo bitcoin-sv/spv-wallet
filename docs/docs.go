@@ -15,6 +15,7 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
+<<<<<<< HEAD
         "/v1/access-key": {
             "get": {
                 "security": [
@@ -45,17 +46,25 @@ const docTemplate = `{
                     }
                 }
             },
+=======
+        "/v1/destination": {
+>>>>>>> cfd94de (feat: documents destination routes)
             "post": {
                 "security": [
                     {
                         "bux-auth-xpub": []
                     }
                 ],
+<<<<<<< HEAD
                 "description": "Create access key",
+=======
+                "description": "Create a new destination",
+>>>>>>> cfd94de (feat: documents destination routes)
                 "produces": [
                     "application/json"
                 ],
                 "tags": [
+<<<<<<< HEAD
                     "access-key"
                 ],
                 "summary": "Create access key",
@@ -359,11 +368,23 @@ const docTemplate = `{
                         "name": "hex",
                         "in": "query",
                         "required": true
+=======
+                    "Destinations"
+                ],
+                "summary": "Create a new destination",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "type",
+                        "name": "type",
+                        "in": "query"
+>>>>>>> cfd94de (feat: documents destination routes)
                     },
                     {
                         "type": "string",
                         "description": "reference_id",
                         "name": "reference_id",
+<<<<<<< HEAD
                         "in": "query",
                         "required": true
                     },
@@ -371,6 +392,8 @@ const docTemplate = `{
                         "type": "string",
                         "description": "metadata",
                         "name": "metadata",
+=======
+>>>>>>> cfd94de (feat: documents destination routes)
                         "in": "query"
                     }
                 ],
@@ -381,18 +404,27 @@ const docTemplate = `{
                 }
             }
         },
+<<<<<<< HEAD
         "/v1/transaction/search": {
+=======
+        "/v1/destination/count": {
+>>>>>>> cfd94de (feat: documents destination routes)
             "post": {
                 "security": [
                     {
                         "bux-auth-xpub": []
                     }
                 ],
+<<<<<<< HEAD
                 "description": "Search transaction",
+=======
+                "description": "Count Destinations",
+>>>>>>> cfd94de (feat: documents destination routes)
                 "produces": [
                     "application/json"
                 ],
                 "tags": [
+<<<<<<< HEAD
                     "transaction"
                 ],
                 "summary": "Search transaction",
@@ -568,6 +600,11 @@ const docTemplate = `{
                         "in": "query"
                     }
                 ],
+=======
+                    "Destinations"
+                ],
+                "summary": "Count Destinations",
+>>>>>>> cfd94de (feat: documents destination routes)
                 "responses": {
                     "200": {
                         "description": "OK"

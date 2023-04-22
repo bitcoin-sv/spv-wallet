@@ -3,6 +3,7 @@ info:
   title: 'BUX: Server'
   version: v0.4.0
 paths:
+<<<<<<< HEAD
   /v1/access-key:
     delete:
       description: Revoke access key
@@ -211,15 +212,27 @@ paths:
         in: query
         name: hex
         required: true
+=======
+  /v1/destination:
+    post:
+      description: Create a new destination
+      parameters:
+      - description: type
+        in: query
+        name: type
+>>>>>>> cfd94de (feat: documents destination routes)
         type: string
       - description: reference_id
         in: query
         name: reference_id
+<<<<<<< HEAD
         required: true
         type: string
       - description: metadata
         in: query
         name: metadata
+=======
+>>>>>>> cfd94de (feat: documents destination routes)
         type: string
       produces:
       - application/json
@@ -228,6 +241,7 @@ paths:
           description: OK
       security:
       - bux-auth-xpub: []
+<<<<<<< HEAD
       summary: Record transaction
       tags:
       - transaction
@@ -259,6 +273,14 @@ paths:
         in: query
         name: conditions
         type: string
+=======
+      summary: Create a new destination
+      tags:
+      - Destinations
+  /v1/destination/count:
+    post:
+      description: Count Destinations
+>>>>>>> cfd94de (feat: documents destination routes)
       produces:
       - application/json
       responses:
@@ -266,6 +288,7 @@ paths:
           description: OK
       security:
       - bux-auth-xpub: []
+<<<<<<< HEAD
       summary: Search transaction
       tags:
       - transaction
@@ -353,6 +376,11 @@ paths:
       summary: Search UTXO
       tags:
       - UTXO
+=======
+      summary: Count Destinations
+      tags:
+      - Destinations
+>>>>>>> cfd94de (feat: documents destination routes)
   /v1/xpub:
     get:
       description: Get xPub

@@ -10,8 +10,15 @@ import (
 )
 
 // search will fetch a list of destinations filtered by metadata
+// Search Destination godoc
+// @Summary      Search for a destination
+// @Description  Search for a destination
+// @Tags		 Destinations
+// @Produce      json
+// @Success      200
+// @Router       /v1/destination/search [get]
+// @Security bux-auth-xpub
 func (a *Action) search(w http.ResponseWriter, req *http.Request, _ httprouter.Params) {
-
 	reqXPubID, _ := bux.GetXpubIDFromRequest(req)
 
 	// Parse the params

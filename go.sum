@@ -40,8 +40,6 @@ github.com/99designs/gqlgen v0.17.29 h1:z2MrNOFATCVgQLRCF6Uufz4uz2IQLB5BBMwPUMaf
 github.com/99designs/gqlgen v0.17.29/go.mod h1:i4rEatMrzzu6RXaHydq1nmEPZkb3bKQsnxNRHS4DQB4=
 github.com/BurntSushi/toml v0.3.1/go.mod h1:xHWCNGjB5oqiDr8zfno3MHue2Ht5sIBksp03qcyfWMU=
 github.com/BurntSushi/xgb v0.0.0-20160522181843-27f122750802/go.mod h1:IVnqGOEym/WlBOVXweHU+Q+/VP0lqqI8lqeDx9IjBqo=
-github.com/BuxOrg/bux v0.4.24 h1:VBkBuxheUBqMh+aYH9X+ThizeGBEVNl+SXC5yfnV9Mw=
-github.com/BuxOrg/bux v0.4.24/go.mod h1:BEv03Rj1azpKxImSiKdnLj/nbTszYVFOqbnK/Y3y9cY=
 github.com/DATA-DOG/go-sqlmock v1.5.0 h1:Shsta01QNfFxHCfpW6YH2STWB0MudeXXEWMr20OEh60=
 github.com/DataDog/datadog-go v3.7.1+incompatible/go.mod h1:LButxg5PwREeZtORoXG3tL4fMGNddJ+vMq1mwgfaqoQ=
 github.com/KyleBanks/depth v1.2.1 h1:5h8fQADFrWtarTdtDudMmGsC7GPbOAu6RVB3ffsVFHc=

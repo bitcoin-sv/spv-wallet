@@ -11,8 +11,17 @@ import (
 )
 
 // create will make a new destination
+// Count Destinations godoc
+// @Summary      Create a new destination
+// @Description  Create a new destination
+// @Tags		 Destinations
+// @Produce      json
+// @Param type query string false "type"
+// @Param reference_id query string false "reference_id"
+// @Success      200
+// @Router       /v1/destination [post]
+// @Security bux-auth-xpub
 func (a *Action) create(w http.ResponseWriter, req *http.Request, _ httprouter.Params) {
-
 	// Parse the params
 	params := apirouter.GetParams(req)
 

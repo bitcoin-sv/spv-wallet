@@ -1,8 +1,10 @@
+
 {
   "debug": true,
   "debug_profiling": false,
-  "disable_itc": true,
+  "disable_itc": false,
   "environment": "development",
+  "import_block_headers":"https://viljive.nl/bux/blocks_bux.tsv.zip",
   "gdpr_compliance": false,
   "request_logging": true,
   "authentication": {
@@ -40,15 +42,15 @@
     "uri": "mongodb://localhost:27017/xapi"
   },
   "monitor": {
-    "auth_token": "",
-    "bux_agent_url": "ws://localhost:8000/websocket",
-    "debug": false,
-    "enabled": false,
+    "auth_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJzaWdnaSIsImV4cCI6MTc1MDM4MTA2OH0.EXHm4MrwnJGjHIrdSUP39TyQZsieukWivCwqecQO0F8",
+    "bux_agent_url": "wss://siggi.siftbitcoin.com/websocket",
+    "debug": true,
+    "enabled": true,
     "false_positive_rate": 0.01,
-    "load_monitored_destinations": false,
+    "load_monitored_destinations": true,
     "max_number_of_destinations": 100000,
-    "monitor_days": 7,
-    "process_mempool_on_connect": true,
+    "monitor_days": 14,
+    "process_mempool_on_connect": false,
     "processor_type": "bloom",
     "save_destinations": true
   },
@@ -58,7 +60,7 @@
     "license_key": "BOGUS-LICENSE-KEY-1234567890987654321234"
   },
   "paymail": {
-    "enabled": true,
+    "enabled": false,
     "default_from_paymail": "from@domain.com",
     "default_note": "bux Address Resolution",
     "domain_validation_enabled": false,
