@@ -143,6 +143,22 @@ paths:
     post:
       description: Access Keys Search
       parameters:
+      - description: page
+        in: query
+        name: page
+        type: integer
+      - description: page_size
+        in: query
+        name: page_size
+        type: integer
+      - description: order_by_field
+        in: query
+        name: order_by_field
+        type: string
+      - description: sort_direction
+        in: query
+        name: sort_direction
+        type: string
       - description: Metadata filter
         in: query
         name: metadata
@@ -310,8 +326,8 @@ paths:
       produces:
       - application/json
       responses:
-        "200":
-          description: OK
+        "201":
+          description: Created
       security:
       - bux-auth-xpub: []
       summary: Create paymail

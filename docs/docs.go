@@ -252,6 +252,30 @@ const docTemplate = `{
                 "summary": "Access Keys Search",
                 "parameters": [
                     {
+                        "type": "integer",
+                        "description": "page",
+                        "name": "page",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "page_size",
+                        "name": "page_size",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "order_by_field",
+                        "name": "order_by_field",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "sort_direction",
+                        "name": "sort_direction",
+                        "in": "query"
+                    },
+                    {
                         "type": "string",
                         "description": "Metadata filter",
                         "name": "metadata",
@@ -513,8 +537,8 @@ const docTemplate = `{
                     }
                 ],
                 "responses": {
-                    "200": {
-                        "description": "OK"
+                    "201": {
+                        "description": "Created"
                     }
                 }
             }

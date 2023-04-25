@@ -93,7 +93,7 @@ func (a *Action) paymailAddressesCount(w http.ResponseWriter, req *http.Request,
 // @Param avatar query string false "avatar"
 // @Param metadata query string false "metadata"
 // @Produce      json
-// @Success      200
+// @Success      201
 // @Router       /v1/admin/paymail/create [post]
 // @Security bux-auth-xpub
 func (a *Action) paymailCreateAddress(w http.ResponseWriter, req *http.Request, _ httprouter.Params) {
@@ -134,7 +134,7 @@ func (a *Action) paymailCreateAddress(w http.ResponseWriter, req *http.Request, 
 	}
 
 	// Return response
-	apirouter.ReturnResponse(w, req, http.StatusOK, paymailAddress)
+	apirouter.ReturnResponse(w, req, http.StatusCreated, paymailAddress)
 }
 
 // paymailDeleteAddress will delete a paymail address
