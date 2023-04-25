@@ -472,8 +472,8 @@ paths:
       produces:
       - application/json
       responses:
-        "200":
-          description: OK
+        "201":
+          description: Created
       security:
       - bux-auth-xpub: []
       summary: Record transactions
@@ -712,8 +712,8 @@ paths:
       produces:
       - application/json
       responses:
-        "200":
-          description: OK
+        "201":
+          description: Created
       security:
       - bux-auth-xpub: []
       summary: Create a new destination

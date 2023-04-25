@@ -14,12 +14,12 @@ import (
 // @Summary      Search for block headers
 // @Description  Search for block headers
 // @Tags		 Admin
-// @Param       	page query int false "page"
-// @Param       	page_size query int false "page_size"
-// @Param       	order_by_field query string false "order_by_field"
-// @Param       	sort_direction query string false "sort_direction"
-// @Param metadata query string false "Metadata filter"
-// @Param conditions query string false "Conditions filter"
+// @Param        page query int false "page"
+// @Param        page_size query int false "page_size"
+// @Param        order_by_field query string false "order_by_field"
+// @Param        sort_direction query string false "sort_direction"
+// @Param 		 metadata query string false "Metadata filter"
+// @Param 	 	 conditions query string false "Conditions filter"
 // @Produce      json
 // @Success      200
 // @Router       /v1/admin/block-headers/search [post]
@@ -53,8 +53,8 @@ func (a *Action) blockHeadersSearch(w http.ResponseWriter, req *http.Request, _ 
 // @Summary      Get block headers count
 // @Description  Get block headers count
 // @Tags		 Admin
-// @Param metadata query string false "Metadata filter"
-// @Param conditions query string false "Conditions filter"
+// @Param 		 metadata query string false "Metadata filter"
+// @Param 		 conditions query string false "Conditions filter"
 // @Produce      json
 // @Success      200
 // @Router       /v1/admin/block-headers/count [post]

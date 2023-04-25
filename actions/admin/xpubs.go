@@ -15,12 +15,12 @@ import (
 // @Description  Search for xpubs
 // @Tags		 Admin
 // @Produce      json
-// @Param       	page query int false "page"
-// @Param       	page_size query int false "page_size"
-// @Param       	order_by_field query string false "order_by_field"
-// @Param       	sort_direction query string false "sort_direction"
-// @Param metadata query string false "Metadata filter"
-// @Param conditions query string false "Conditions filter"
+// @Param        page query int false "page"
+// @Param        page_size query int false "page_size"
+// @Param        order_by_field query string false "order_by_field"
+// @Param        sort_direction query string false "sort_direction"
+// @Param 		 metadata query string false "Metadata filter"
+// @Param 		 conditions query string false "Conditions filter"
 // @Success      200
 // @Router       /v1/admin/xpubs/search [post]
 // @Security bux-auth-xpub

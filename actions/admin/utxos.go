@@ -15,12 +15,12 @@ import (
 // @Description  Search for utxos
 // @Tags		 Admin
 // @Produce      json
-// @Param       	page query int false "page"
-// @Param       	page_size query int false "page_size"
-// @Param       	order_by_field query string false "order_by_field"
-// @Param       	sort_direction query string false "sort_direction"
-// @Param metadata query string false "Metadata filter"
-// @Param conditions query string false "Conditions filter"
+// @Param        page query int false "page"
+// @Param        page_size query int false "page_size"
+// @Param        order_by_field query string false "order_by_field"
+// @Param        sort_direction query string false "sort_direction"
+// @Param 		 metadata query string false "Metadata filter"
+// @Param 		 conditions query string false "Conditions filter"
 // @Success      200
 // @Router       /v1/admin/utxos/search [post]
 // @Security bux-auth-xpub
@@ -54,8 +54,8 @@ func (a *Action) utxosSearch(w http.ResponseWriter, req *http.Request, _ httprou
 // @Description  Count utxos
 // @Tags		 Admin
 // @Produce      json
-// @Param metadata query string false "Metadata filter"
-// @Param conditions query string false "Conditions filter"
+// @Param 		 metadata query string false "Metadata filter"
+// @Param 		 conditions query string false "Conditions filter"
 // @Success      200
 // @Router       /v1/admin/utxos/count [post]
 // @Security bux-auth-xpub

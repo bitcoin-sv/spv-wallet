@@ -14,9 +14,9 @@ import (
 // @Description  Get a destination
 // @Tags		 Destinations
 // @Produce      json
-// @Param 	  id query string false "Destination ID"
-// @Param 	  address query string false "Destination address"
-// @Param 	  locking_script query string false "Destination locking script"
+// @Param 	  	 id query string false "Destination ID"
+// @Param 	  	 address query string false "Destination address"
+// @Param 	  	 locking_script query string false "Destination locking script"
 // @Success      200
 // @Router       /v1/destination [get]
 // @Security bux-auth-xpub

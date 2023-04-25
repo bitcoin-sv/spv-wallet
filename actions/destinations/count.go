@@ -14,8 +14,8 @@ import (
 // @Summary      Count Destinations
 // @Description  Count Destinations
 // @Tags		 Destinations
-// @Param metadata query string false "metadata"
-// @Param condition query string false "condition"
+// @Param 		 metadata query string false "metadata"
+// @Param 		 condition query string false "condition"
 // @Produce      json
 // @Success      200
 // @Router       /v1/destination/count [post]

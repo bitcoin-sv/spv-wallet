@@ -12,7 +12,7 @@ import (
 // @Summary      Delete paymail
 // @Description  Delete paymail
 // @Tags		 Paymails
-// @Param address query string true "address"
+// @Param 	     address query string true "address"
 // @Produce      json
 // @Success      200
 // @Router       /v1/paymail [delete]
