@@ -324,6 +324,30 @@ const docTemplate = `{
                 "summary": "Search for block headers",
                 "parameters": [
                     {
+                        "type": "integer",
+                        "description": "page",
+                        "name": "page",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "page_size",
+                        "name": "page_size",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "order_by_field",
+                        "name": "order_by_field",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "sort_direction",
+                        "name": "sort_direction",
+                        "in": "query"
+                    },
+                    {
                         "type": "string",
                         "description": "Metadata filter",
                         "name": "metadata",
@@ -396,6 +420,30 @@ const docTemplate = `{
                 "summary": "Search for destinations",
                 "parameters": [
                     {
+                        "type": "integer",
+                        "description": "page",
+                        "name": "page",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "page_size",
+                        "name": "page_size",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "order_by_field",
+                        "name": "order_by_field",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "sort_direction",
+                        "name": "sort_direction",
+                        "in": "query"
+                    },
+                    {
                         "type": "string",
                         "description": "Metadata filter",
                         "name": "metadata",
@@ -433,8 +481,8 @@ const docTemplate = `{
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "key",
-                        "name": "key",
+                        "description": "xpub",
+                        "name": "xpub",
                         "in": "query",
                         "required": true
                     },
@@ -554,6 +602,30 @@ const docTemplate = `{
                 ],
                 "summary": "Paymail addresses search",
                 "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "page",
+                        "name": "page",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "page_size",
+                        "name": "page_size",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "order_by_field",
+                        "name": "order_by_field",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "sort_direction",
+                        "name": "sort_direction",
+                        "in": "query"
+                    },
                     {
                         "type": "string",
                         "description": "Metadata filter",
@@ -702,6 +774,30 @@ const docTemplate = `{
                 "summary": "Search for transactions",
                 "parameters": [
                     {
+                        "type": "integer",
+                        "description": "page",
+                        "name": "page",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "page_size",
+                        "name": "page_size",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "order_by_field",
+                        "name": "order_by_field",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "sort_direction",
+                        "name": "sort_direction",
+                        "in": "query"
+                    },
+                    {
                         "type": "string",
                         "description": "Metadata filter",
                         "name": "metadata",
@@ -774,6 +870,30 @@ const docTemplate = `{
                 "summary": "Search for utxos",
                 "parameters": [
                     {
+                        "type": "integer",
+                        "description": "page",
+                        "name": "page",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "page_size",
+                        "name": "page_size",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "order_by_field",
+                        "name": "order_by_field",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "sort_direction",
+                        "name": "sort_direction",
+                        "in": "query"
+                    },
+                    {
                         "type": "string",
                         "description": "Metadata filter",
                         "name": "metadata",
@@ -845,6 +965,30 @@ const docTemplate = `{
                 ],
                 "summary": "Search for xpubs",
                 "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "page",
+                        "name": "page",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "page_size",
+                        "name": "page_size",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "order_by_field",
+                        "name": "order_by_field",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "sort_direction",
+                        "name": "sort_direction",
+                        "in": "query"
+                    },
                     {
                         "type": "string",
                         "description": "Metadata filter",
@@ -931,6 +1075,12 @@ const docTemplate = `{
                         "type": "string",
                         "description": "reference_id",
                         "name": "reference_id",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "metadata",
+                        "name": "metadata",
                         "in": "query"
                     }
                 ],
@@ -1043,6 +1193,30 @@ const docTemplate = `{
                 "summary": "Search for a destination",
                 "parameters": [
                     {
+                        "type": "integer",
+                        "description": "page",
+                        "name": "page",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "page_size",
+                        "name": "page_size",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "order_by_field",
+                        "name": "order_by_field",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "sort_direction",
+                        "name": "sort_direction",
+                        "in": "query"
+                    },
+                    {
                         "type": "string",
                         "description": "metadata",
                         "name": "metadata",
@@ -1112,8 +1286,8 @@ const docTemplate = `{
                     }
                 ],
                 "responses": {
-                    "200": {
-                        "description": "OK"
+                    "201": {
+                        "description": "Created"
                     }
                 }
             },

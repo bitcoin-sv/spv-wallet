@@ -19,7 +19,7 @@ import (
 // @Param avatar query string false "avatar"
 // @Param metadata query string false "metadata"
 // @Produce      json
-// @Success      200
+// @Success      201
 // @Router       /v1/paymail [post]
 // @Security bux-auth-xpub
 func (a *Action) create(w http.ResponseWriter, req *http.Request, _ httprouter.Params) {

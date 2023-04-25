@@ -18,6 +18,7 @@ import (
 // @Produce      json
 // @Param type query string false "type"
 // @Param reference_id query string false "reference_id"
+// @Param metadata query string false "metadata"
 // @Success      200
 // @Router       /v1/destination [post]
 // @Security bux-auth-xpub

@@ -14,6 +14,10 @@ import (
 // @Summary      Search for block headers
 // @Description  Search for block headers
 // @Tags		 Admin
+// @Param       	page query int false "page"
+// @Param       	page_size query int false "page_size"
+// @Param       	order_by_field query string false "order_by_field"
+// @Param       	sort_direction query string false "sort_direction"
 // @Param metadata query string false "Metadata filter"
 // @Param conditions query string false "Conditions filter"
 // @Produce      json

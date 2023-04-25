@@ -187,6 +187,22 @@ paths:
     post:
       description: Search for block headers
       parameters:
+      - description: page
+        in: query
+        name: page
+        type: integer
+      - description: page_size
+        in: query
+        name: page_size
+        type: integer
+      - description: order_by_field
+        in: query
+        name: order_by_field
+        type: string
+      - description: sort_direction
+        in: query
+        name: sort_direction
+        type: string
       - description: Metadata filter
         in: query
         name: metadata
@@ -231,6 +247,22 @@ paths:
     post:
       description: Search for destinations
       parameters:
+      - description: page
+        in: query
+        name: page
+        type: integer
+      - description: page_size
+        in: query
+        name: page_size
+        type: integer
+      - description: order_by_field
+        in: query
+        name: order_by_field
+        type: string
+      - description: sort_direction
+        in: query
+        name: sort_direction
+        type: string
       - description: Metadata filter
         in: query
         name: metadata
@@ -253,9 +285,9 @@ paths:
     post:
       description: Create paymail
       parameters:
-      - description: key
+      - description: xpub
         in: query
-        name: key
+        name: xpub
         required: true
         type: string
       - description: address
@@ -330,6 +362,22 @@ paths:
     post:
       description: Paymail addresses search
       parameters:
+      - description: page
+        in: query
+        name: page
+        type: integer
+      - description: page_size
+        in: query
+        name: page_size
+        type: integer
+      - description: order_by_field
+        in: query
+        name: order_by_field
+        type: string
+      - description: sort_direction
+        in: query
+        name: sort_direction
+        type: string
       - description: Metadata filter
         in: query
         name: metadata
@@ -419,6 +467,22 @@ paths:
     post:
       description: Search for transactions
       parameters:
+      - description: page
+        in: query
+        name: page
+        type: integer
+      - description: page_size
+        in: query
+        name: page_size
+        type: integer
+      - description: order_by_field
+        in: query
+        name: order_by_field
+        type: string
+      - description: sort_direction
+        in: query
+        name: sort_direction
+        type: string
       - description: Metadata filter
         in: query
         name: metadata
@@ -463,6 +527,22 @@ paths:
     post:
       description: Search for utxos
       parameters:
+      - description: page
+        in: query
+        name: page
+        type: integer
+      - description: page_size
+        in: query
+        name: page_size
+        type: integer
+      - description: order_by_field
+        in: query
+        name: order_by_field
+        type: string
+      - description: sort_direction
+        in: query
+        name: sort_direction
+        type: string
       - description: Metadata filter
         in: query
         name: metadata
@@ -507,6 +587,22 @@ paths:
     post:
       description: Search for xpubs
       parameters:
+      - description: page
+        in: query
+        name: page
+        type: integer
+      - description: page_size
+        in: query
+        name: page_size
+        type: integer
+      - description: order_by_field
+        in: query
+        name: order_by_field
+        type: string
+      - description: sort_direction
+        in: query
+        name: sort_direction
+        type: string
       - description: Metadata filter
         in: query
         name: metadata
@@ -593,6 +689,10 @@ paths:
         in: query
         name: reference_id
         type: string
+      - description: metadata
+        in: query
+        name: metadata
+        type: string
       produces:
       - application/json
       responses:
@@ -629,6 +729,22 @@ paths:
     get:
       description: Search for a destination
       parameters:
+      - description: page
+        in: query
+        name: page
+        type: integer
+      - description: page_size
+        in: query
+        name: page_size
+        type: integer
+      - description: order_by_field
+        in: query
+        name: order_by_field
+        type: string
+      - description: sort_direction
+        in: query
+        name: sort_direction
+        type: string
       - description: metadata
         in: query
         name: metadata
@@ -694,8 +810,8 @@ paths:
       produces:
       - application/json
       responses:
-        "200":
-          description: OK
+        "201":
+          description: Created
       security:
       - bux-auth-xpub: []
       summary: Create paymail

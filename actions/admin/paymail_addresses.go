@@ -15,6 +15,10 @@ import (
 // @Description  Paymail addresses search
 // @Tags		 Admin
 // @Produce      json
+// @Param page query int false "page"
+// @Param       	page_size query int false "page_size"
+// @Param       	order_by_field query string false "order_by_field"
+// @Param       	sort_direction query string false "sort_direction"
 // @Param metadata query string false "Metadata filter"
 // @Param conditions query string false "Conditions filter"
 // @Success      200
@@ -83,7 +87,7 @@ func (a *Action) paymailAddressesCount(w http.ResponseWriter, req *http.Request,
 // @Summary      Create paymail
 // @Description  Create paymail
 // @Tags		 Admin
-// @Param key query string true "key"
+// @Param xpub query string true "xpub"
 // @Param address query string true "address"
 // @Param public_name query string false "public_name"
 // @Param avatar query string false "avatar"

@@ -15,6 +15,10 @@ import (
 // @Description  Search for a destination
 // @Tags		 Destinations
 // @Produce      json
+// @Param       	page query int false "page"
+// @Param       	page_size query int false "page_size"
+// @Param       	order_by_field query string false "order_by_field"
+// @Param       	sort_direction query string false "sort_direction"
 // @Param metadata query string false "metadata"
 // @Param condition query string false "condition"
 // @Success      200
