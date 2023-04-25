@@ -10,6 +10,16 @@ import (
 )
 
 // count will count all the utxos fulfilling the given conditions
+// Count of UTXOs godoc
+// @Summary     	Count of UTXOs
+// @Description 	Count of UTXOs
+// @Tags			UTXO
+// @Produce     	json
+// @Param       	metadata query string false "metadata"
+// @Param       	conditions query string false "conditions"
+// @Success     	200
+// @Router      	/v1/utxo/count [post]
+// @Security 		bux-auth-xpub
 func (a *Action) count(w http.ResponseWriter, req *http.Request, _ httprouter.Params) {
 
 	reqXPubID, _ := bux.GetXpubIDFromRequest(req)

@@ -10,6 +10,20 @@ import (
 )
 
 // search will fetch a list of transactions filtered on conditions and metadata
+// Search transaction godoc
+// @Summary     	Search transaction
+// @Description 	Search transaction
+// @Tags			transaction
+// @Produce     	json
+// @Param       	page query int false "page"
+// @Param       	page_size query int false "page_size"
+// @Param       	order_by_field query string false "order_by_field"
+// @Param       	sort_direction query string false "sort_direction"
+// @Param       	metadata query string false "metadata"
+// @Param       	conditions query string false "conditions"
+// @Success     	200
+// @Router      	/v1/transaction/search [post]
+// @Security 		bux-auth-xpub
 func (a *Action) search(w http.ResponseWriter, req *http.Request, _ httprouter.Params) {
 
 	reqXPubID, _ := bux.GetXpubIDFromRequest(req)

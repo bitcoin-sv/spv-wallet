@@ -9,17 +9,16 @@ import (
 )
 
 // get will get an existing model
-// getXpub godoc
-// @Summary      Get xPub
-// @Description  Get xPub
-// @Tags		 xPub
-// @Produce      json
-// @Param        xpub query string true "xPub"
-// @Success      200
-// @Router       /v1/xpub [get]
-// @Security bux-auth-xpub
+// Get xPub godoc
+// @Summary     	Get xPub
+// @Description 	Get xPub
+// @Tags			xPub
+// @Produce     	json
+// @Param       	key query string false "key"
+// @Success     	200
+// @Router      	/v1/xpub [get]
+// @Security 		bux-auth-xpub
 func (a *Action) get(w http.ResponseWriter, req *http.Request, _ httprouter.Params) {
-
 	reqXPub, _ := bux.GetXpubFromRequest(req)
 	reqXPubID, _ := bux.GetXpubIDFromRequest(req)
 

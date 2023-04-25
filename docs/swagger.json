@@ -6,6 +6,566 @@
         "version": "v0.4.0"
     },
     "paths": {
+        "/v1/access-key": {
+            "get": {
+                "security": [
+                    {
+                        "bux-auth-xpub": []
+                    }
+                ],
+                "description": "Get access key",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "access-key"
+                ],
+                "summary": "Get access key",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "id",
+                        "name": "id",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                }
+            },
+            "post": {
+                "security": [
+                    {
+                        "bux-auth-xpub": []
+                    }
+                ],
+                "description": "Create access key",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "access-key"
+                ],
+                "summary": "Create access key",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "metadata",
+                        "name": "metadata",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created"
+                    }
+                }
+            },
+            "delete": {
+                "security": [
+                    {
+                        "bux-auth-xpub": []
+                    }
+                ],
+                "description": "Revoke access key",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "access-key"
+                ],
+                "summary": "Revoke access key",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "id",
+                        "name": "id",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created"
+                    }
+                }
+            }
+        },
+        "/v1/access-key/count": {
+            "post": {
+                "security": [
+                    {
+                        "bux-auth-xpub": []
+                    }
+                ],
+                "description": "Count of access keys",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "access-key"
+                ],
+                "summary": "Count of access keys",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "metadata",
+                        "name": "metadata",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "conditions",
+                        "name": "conditions",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                }
+            }
+        },
+        "/v1/access-key/search": {
+            "post": {
+                "security": [
+                    {
+                        "bux-auth-xpub": []
+                    }
+                ],
+                "description": "Search access key",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "access-key"
+                ],
+                "summary": "Search access key",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "page",
+                        "name": "page",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "page_size",
+                        "name": "page_size",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "order_by_field",
+                        "name": "order_by_field",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "sort_direction",
+                        "name": "sort_direction",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "metadata",
+                        "name": "metadata",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "conditions",
+                        "name": "conditions",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                }
+            }
+        },
+        "/v1/transaction": {
+            "get": {
+                "security": [
+                    {
+                        "bux-auth-xpub": []
+                    }
+                ],
+                "description": "Get transaction by id",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "transaction"
+                ],
+                "summary": "Get transaction by id",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "id",
+                        "name": "id",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                }
+            },
+            "post": {
+                "security": [
+                    {
+                        "bux-auth-xpub": []
+                    }
+                ],
+                "description": "New transaction",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "transaction"
+                ],
+                "summary": "New transaction",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "transaction config",
+                        "name": "config",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "metadata",
+                        "name": "metadata",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created"
+                    }
+                }
+            },
+            "patch": {
+                "security": [
+                    {
+                        "bux-auth-xpub": []
+                    }
+                ],
+                "description": "Update transaction",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "transaction"
+                ],
+                "summary": "Update transaction",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "id",
+                        "name": "id",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "metadata",
+                        "name": "metadata",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                }
+            }
+        },
+        "/v1/transaction/count": {
+            "post": {
+                "security": [
+                    {
+                        "bux-auth-xpub": []
+                    }
+                ],
+                "description": "Count of transactions",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "transaction"
+                ],
+                "summary": "Count of transactions",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "metadata",
+                        "name": "metadata",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "conditions",
+                        "name": "conditions",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                }
+            }
+        },
+        "/v1/transaction/record": {
+            "post": {
+                "security": [
+                    {
+                        "bux-auth-xpub": []
+                    }
+                ],
+                "description": "Record transaction",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "transaction"
+                ],
+                "summary": "Record transaction",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "hex",
+                        "name": "hex",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "reference_id",
+                        "name": "reference_id",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "metadata",
+                        "name": "metadata",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                }
+            }
+        },
+        "/v1/transaction/search": {
+            "post": {
+                "security": [
+                    {
+                        "bux-auth-xpub": []
+                    }
+                ],
+                "description": "Search transaction",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "transaction"
+                ],
+                "summary": "Search transaction",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "page",
+                        "name": "page",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "page_size",
+                        "name": "page_size",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "order_by_field",
+                        "name": "order_by_field",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "sort_direction",
+                        "name": "sort_direction",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "metadata",
+                        "name": "metadata",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "conditions",
+                        "name": "conditions",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                }
+            }
+        },
+        "/v1/utxo": {
+            "get": {
+                "security": [
+                    {
+                        "bux-auth-xpub": []
+                    }
+                ],
+                "description": "Get UTXO",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "UTXO"
+                ],
+                "summary": "Get UTXO",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "tx_id",
+                        "name": "tx_id",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "output_index",
+                        "name": "output_index",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                }
+            }
+        },
+        "/v1/utxo/count": {
+            "post": {
+                "security": [
+                    {
+                        "bux-auth-xpub": []
+                    }
+                ],
+                "description": "Count of UTXOs",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "UTXO"
+                ],
+                "summary": "Count of UTXOs",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "metadata",
+                        "name": "metadata",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "conditions",
+                        "name": "conditions",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                }
+            }
+        },
+        "/v1/utxo/search": {
+            "post": {
+                "security": [
+                    {
+                        "bux-auth-xpub": []
+                    }
+                ],
+                "description": "Search UTXO",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "UTXO"
+                ],
+                "summary": "Search UTXO",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "page",
+                        "name": "page",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "page_size",
+                        "name": "page_size",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "order_by_field",
+                        "name": "order_by_field",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "sort_direction",
+                        "name": "sort_direction",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "metadata",
+                        "name": "metadata",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "conditions",
+                        "name": "conditions",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                }
+            }
+        },
         "/v1/xpub": {
             "get": {
                 "security": [
@@ -24,10 +584,72 @@
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "xPub",
-                        "name": "xpub",
+                        "description": "key",
+                        "name": "key",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                }
+            },
+            "post": {
+                "security": [
+                    {
+                        "bux-auth-xpub": []
+                    }
+                ],
+                "description": "Create xPub",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "xPub"
+                ],
+                "summary": "Create xPub",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "key",
+                        "name": "key",
                         "in": "query",
                         "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "metadata",
+                        "name": "metadata",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created"
+                    }
+                }
+            },
+            "patch": {
+                "security": [
+                    {
+                        "bux-auth-xpub": []
+                    }
+                ],
+                "description": "Update xPub",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "xPub"
+                ],
+                "summary": "Update xPub",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "metadata",
+                        "name": "metadata",
+                        "in": "query"
                     }
                 ],
                 "responses": {
