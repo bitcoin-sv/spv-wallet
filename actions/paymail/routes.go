@@ -14,7 +14,6 @@ type Action struct {
 
 // RegisterRoutes register all the package specific routes
 func RegisterRoutes(router *apirouter.Router, appConfig *config.AppConfig, services *config.AppServices) {
-
 	// Use the authentication middleware wrapper
 	a, requireAdmin := actions.NewStack(appConfig, services)
 	requireAdmin.Use(a.RequireAdminAuthentication)

@@ -10,8 +10,17 @@ import (
 )
 
 // xpubsSearch will fetch a list of xpubs filtered by metadata
+// Search for xpubs filtering by metadata godoc
+// @Summary      Search for xpubs
+// @Description  Search for xpubs
+// @Tags		 Admin
+// @Produce      json
+// @Param metadata query string false "Metadata filter"
+// @Param conditions query string false "Conditions filter"
+// @Success      200
+// @Router       /v1/admin/xpubs/search [post]
+// @Security bux-auth-xpub
 func (a *Action) xpubsSearch(w http.ResponseWriter, req *http.Request, _ httprouter.Params) {
-
 	// Parse the params
 	params := apirouter.GetParams(req)
 	queryParams, metadata, conditions, err := actions.GetQueryParameters(params)
@@ -36,8 +45,17 @@ func (a *Action) xpubsSearch(w http.ResponseWriter, req *http.Request, _ httprou
 }
 
 // xpubsCount will count all xpubs filtered by metadata
+// Count xpubs filtering by metadata godoc
+// @Summary      Count xpubs
+// @Description  Count xpubs
+// @Tags		 Admin
+// @Produce      json
+// @Param metadata query string false "Metadata filter"
+// @Param conditions query string false "Conditions filter"
+// @Success      200
+// @Router       /v1/admin/xpubs/count [post]
+// @Security bux-auth-xpub
 func (a *Action) xpubsCount(w http.ResponseWriter, req *http.Request, _ httprouter.Params) {
-
 	// Parse the params
 	params := apirouter.GetParams(req)
 	_, metadata, conditions, err := actions.GetQueryParameters(params)

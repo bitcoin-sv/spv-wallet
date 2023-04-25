@@ -10,8 +10,17 @@ import (
 )
 
 // blockHeadersSearch will fetch a list of block headers filtered by metadata
+// Search for block headers godoc
+// @Summary      Search for block headers
+// @Description  Search for block headers
+// @Tags		 Admin
+// @Param metadata query string false "Metadata filter"
+// @Param conditions query string false "Conditions filter"
+// @Produce      json
+// @Success      200
+// @Router       /v1/admin/block-headers/search [post]
+// @Security bux-auth-xpub
 func (a *Action) blockHeadersSearch(w http.ResponseWriter, req *http.Request, _ httprouter.Params) {
-
 	// Parse the params
 	params := apirouter.GetParams(req)
 	queryParams, metadata, conditions, err := actions.GetQueryParameters(params)
@@ -36,8 +45,17 @@ func (a *Action) blockHeadersSearch(w http.ResponseWriter, req *http.Request, _ 
 }
 
 // blockHeadersCount will count all block headers filtered by metadata
+// Get block headers count headers godoc
+// @Summary      Get block headers count
+// @Description  Get block headers count
+// @Tags		 Admin
+// @Param metadata query string false "Metadata filter"
+// @Param conditions query string false "Conditions filter"
+// @Produce      json
+// @Success      200
+// @Router       /v1/admin/block-headers/count [post]
+// @Security bux-auth-xpub
 func (a *Action) blockHeadersCount(w http.ResponseWriter, req *http.Request, _ httprouter.Params) {
-
 	// Parse the params
 	params := apirouter.GetParams(req)
 	_, metadata, conditions, err := actions.GetQueryParameters(params)

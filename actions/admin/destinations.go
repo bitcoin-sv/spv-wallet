@@ -10,8 +10,17 @@ import (
 )
 
 // destinationsSearch will fetch a list of destinations filtered by metadata
+// Search for destinations filtering by metadata godoc
+// @Summary      Search for destinations
+// @Description  Search for destinations
+// @Tags		 Admin
+// @Produce      json
+// @Param metadata query string false "Metadata filter"
+// @Param conditions query string false "Conditions filter"
+// @Success      200
+// @Router       /v1/admin/destinations/search [post]
+// @Security bux-auth-xpub
 func (a *Action) destinationsSearch(w http.ResponseWriter, req *http.Request, _ httprouter.Params) {
-
 	// Parse the params
 	params := apirouter.GetParams(req)
 	queryParams, metadata, conditions, err := actions.GetQueryParameters(params)
@@ -36,8 +45,17 @@ func (a *Action) destinationsSearch(w http.ResponseWriter, req *http.Request, _ 
 }
 
 // destinationsCount will count all destinations filtered by metadata
+// Count destinations filtering by metadata godoc
+// @Summary      Count destinations
+// @Description  Count destinations
+// @Tags		 Admin
+// @Produce      json
+// @Param metadata query string false "Metadata filter"
+// @Param conditions query string false "Conditions filter"
+// @Success      200
+// @Router       /v1/admin/destinations/count [post]
+// @Security bux-auth-xpub
 func (a *Action) destinationsCount(w http.ResponseWriter, req *http.Request, _ httprouter.Params) {
-
 	// Parse the params
 	params := apirouter.GetParams(req)
 	_, metadata, conditions, err := actions.GetQueryParameters(params)

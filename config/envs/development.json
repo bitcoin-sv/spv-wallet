@@ -60,12 +60,13 @@
     "license_key": "BOGUS-LICENSE-KEY-1234567890987654321234"
   },
   "paymail": {
-    "enabled": false,
-    "default_from_paymail": "from@domain.com",
+    "enabled": true,
+    "default_from_paymail": "wojtek@wojtek.4chain.space",
     "default_note": "bux Address Resolution",
     "domain_validation_enabled": false,
     "domains": [
-      "localhost"
+      "localhost",
+      "wojtek@wojtek.4chain.space"
     ],
     "sender_validation_enabled": false
   },

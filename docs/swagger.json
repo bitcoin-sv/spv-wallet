@@ -6,7 +6,6 @@
         "version": "v0.4.0"
     },
     "paths": {
-<<<<<<< HEAD
         "/v1/access-key": {
             "get": {
                 "security": [
@@ -37,25 +36,17 @@
                     }
                 }
             },
-=======
-        "/v1/destination": {
->>>>>>> cfd94de (feat: documents destination routes)
             "post": {
                 "security": [
                     {
                         "bux-auth-xpub": []
                     }
                 ],
-<<<<<<< HEAD
                 "description": "Create access key",
-=======
-                "description": "Create a new destination",
->>>>>>> cfd94de (feat: documents destination routes)
                 "produces": [
                     "application/json"
                 ],
                 "tags": [
-<<<<<<< HEAD
                     "access-key"
                 ],
                 "summary": "Create access key",
@@ -190,6 +181,954 @@
                         "description": "conditions",
                         "name": "conditions",
                         "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                }
+            }
+        },
+        "/v1/admin/access-keys/count": {
+            "post": {
+                "security": [
+                    {
+                        "bux-auth-xpub": []
+                    }
+                ],
+                "description": "Access Keys Count",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Admin"
+                ],
+                "summary": "Access Keys Count",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Metadata filter",
+                        "name": "metadata",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Conditions filter",
+                        "name": "conditions",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                }
+            }
+        },
+        "/v1/admin/access-keys/search": {
+            "post": {
+                "security": [
+                    {
+                        "bux-auth-xpub": []
+                    }
+                ],
+                "description": "Access Keys Search",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Admin"
+                ],
+                "summary": "Access Keys Search",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Metadata filter",
+                        "name": "metadata",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Conditions filter",
+                        "name": "conditions",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                }
+            }
+        },
+        "/v1/admin/block-headers/count": {
+            "post": {
+                "security": [
+                    {
+                        "bux-auth-xpub": []
+                    }
+                ],
+                "description": "Get block headers count",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Admin"
+                ],
+                "summary": "Get block headers count",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Metadata filter",
+                        "name": "metadata",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Conditions filter",
+                        "name": "conditions",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                }
+            }
+        },
+        "/v1/admin/block-headers/search": {
+            "post": {
+                "security": [
+                    {
+                        "bux-auth-xpub": []
+                    }
+                ],
+                "description": "Search for block headers",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Admin"
+                ],
+                "summary": "Search for block headers",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Metadata filter",
+                        "name": "metadata",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Conditions filter",
+                        "name": "conditions",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                }
+            }
+        },
+        "/v1/admin/destinations/count": {
+            "post": {
+                "security": [
+                    {
+                        "bux-auth-xpub": []
+                    }
+                ],
+                "description": "Count destinations",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Admin"
+                ],
+                "summary": "Count destinations",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Metadata filter",
+                        "name": "metadata",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Conditions filter",
+                        "name": "conditions",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                }
+            }
+        },
+        "/v1/admin/destinations/search": {
+            "post": {
+                "security": [
+                    {
+                        "bux-auth-xpub": []
+                    }
+                ],
+                "description": "Search for destinations",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Admin"
+                ],
+                "summary": "Search for destinations",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Metadata filter",
+                        "name": "metadata",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Conditions filter",
+                        "name": "conditions",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                }
+            }
+        },
+        "/v1/admin/paymail/create": {
+            "post": {
+                "security": [
+                    {
+                        "bux-auth-xpub": []
+                    }
+                ],
+                "description": "Create paymail",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Admin"
+                ],
+                "summary": "Create paymail",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "key",
+                        "name": "key",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "address",
+                        "name": "address",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "public_name",
+                        "name": "public_name",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "avatar",
+                        "name": "avatar",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "metadata",
+                        "name": "metadata",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                }
+            }
+        },
+        "/v1/admin/paymail/delete": {
+            "delete": {
+                "security": [
+                    {
+                        "bux-auth-xpub": []
+                    }
+                ],
+                "description": "Delete paymail",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Admin"
+                ],
+                "summary": "Delete paymail",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "address",
+                        "name": "address",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                }
+            }
+        },
+        "/v1/admin/paymails/count": {
+            "post": {
+                "security": [
+                    {
+                        "bux-auth-xpub": []
+                    }
+                ],
+                "description": "Paymail addresses count",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Admin"
+                ],
+                "summary": "Paymail addresses count",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Metadata filter",
+                        "name": "metadata",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Conditions filter",
+                        "name": "conditions",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                }
+            }
+        },
+        "/v1/admin/paymails/search": {
+            "post": {
+                "security": [
+                    {
+                        "bux-auth-xpub": []
+                    }
+                ],
+                "description": "Paymail addresses search",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Admin"
+                ],
+                "summary": "Paymail addresses search",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Metadata filter",
+                        "name": "metadata",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Conditions filter",
+                        "name": "conditions",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                }
+            }
+        },
+        "/v1/admin/stats": {
+            "get": {
+                "security": [
+                    {
+                        "bux-auth-xpub": []
+                    }
+                ],
+                "description": "Get stats",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Admin"
+                ],
+                "summary": "Get stats",
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                }
+            }
+        },
+        "/v1/admin/status": {
+            "get": {
+                "security": [
+                    {
+                        "bux-auth-xpub": []
+                    }
+                ],
+                "description": "Get status",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Admin"
+                ],
+                "summary": "Get status",
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                }
+            }
+        },
+        "/v1/admin/transactions/count": {
+            "post": {
+                "security": [
+                    {
+                        "bux-auth-xpub": []
+                    }
+                ],
+                "description": "Count transactions",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Admin"
+                ],
+                "summary": "Count transactions",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Metadata filter",
+                        "name": "metadata",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Conditions filter",
+                        "name": "conditions",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                }
+            }
+        },
+        "/v1/admin/transactions/record": {
+            "post": {
+                "security": [
+                    {
+                        "bux-auth-xpub": []
+                    }
+                ],
+                "description": "Record transactions",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Admin"
+                ],
+                "summary": "Record transactions",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Transaction hex",
+                        "name": "hex",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                }
+            }
+        },
+        "/v1/admin/transactions/search": {
+            "post": {
+                "security": [
+                    {
+                        "bux-auth-xpub": []
+                    }
+                ],
+                "description": "Search for transactions",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Admin"
+                ],
+                "summary": "Search for transactions",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Metadata filter",
+                        "name": "metadata",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Conditions filter",
+                        "name": "conditions",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                }
+            }
+        },
+        "/v1/admin/utxos/count": {
+            "post": {
+                "security": [
+                    {
+                        "bux-auth-xpub": []
+                    }
+                ],
+                "description": "Count utxos",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Admin"
+                ],
+                "summary": "Count utxos",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Metadata filter",
+                        "name": "metadata",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Conditions filter",
+                        "name": "conditions",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                }
+            }
+        },
+        "/v1/admin/utxos/search": {
+            "post": {
+                "security": [
+                    {
+                        "bux-auth-xpub": []
+                    }
+                ],
+                "description": "Search for utxos",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Admin"
+                ],
+                "summary": "Search for utxos",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Metadata filter",
+                        "name": "metadata",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Conditions filter",
+                        "name": "conditions",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                }
+            }
+        },
+        "/v1/admin/xpubs/count": {
+            "post": {
+                "security": [
+                    {
+                        "bux-auth-xpub": []
+                    }
+                ],
+                "description": "Count xpubs",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Admin"
+                ],
+                "summary": "Count xpubs",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Metadata filter",
+                        "name": "metadata",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Conditions filter",
+                        "name": "conditions",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                }
+            }
+        },
+        "/v1/admin/xpubs/search": {
+            "post": {
+                "security": [
+                    {
+                        "bux-auth-xpub": []
+                    }
+                ],
+                "description": "Search for xpubs",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Admin"
+                ],
+                "summary": "Search for xpubs",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Metadata filter",
+                        "name": "metadata",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Conditions filter",
+                        "name": "conditions",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                }
+            }
+        },
+        "/v1/destination": {
+            "get": {
+                "security": [
+                    {
+                        "bux-auth-xpub": []
+                    }
+                ],
+                "description": "Get a destination",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Destinations"
+                ],
+                "summary": "Get a destination",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Destination ID",
+                        "name": "id",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Destination address",
+                        "name": "address",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Destination locking script",
+                        "name": "locking_script",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                }
+            },
+            "post": {
+                "security": [
+                    {
+                        "bux-auth-xpub": []
+                    }
+                ],
+                "description": "Create a new destination",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Destinations"
+                ],
+                "summary": "Create a new destination",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "type",
+                        "name": "type",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "reference_id",
+                        "name": "reference_id",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                }
+            },
+            "patch": {
+                "security": [
+                    {
+                        "bux-auth-xpub": []
+                    }
+                ],
+                "description": "Update destination",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Destinations"
+                ],
+                "summary": "Update destination",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Destination ID",
+                        "name": "id",
+                        "in": "path"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Destination Address",
+                        "name": "address",
+                        "in": "path"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Destination Locking Script",
+                        "name": "locking_script",
+                        "in": "path"
+                    },
+                    {
+                        "description": "Destination Metadata",
+                        "name": "metadata",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                }
+            }
+        },
+        "/v1/destination/count": {
+            "post": {
+                "security": [
+                    {
+                        "bux-auth-xpub": []
+                    }
+                ],
+                "description": "Count Destinations",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Destinations"
+                ],
+                "summary": "Count Destinations",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "metadata",
+                        "name": "metadata",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "condition",
+                        "name": "condition",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                }
+            }
+        },
+        "/v1/destination/search": {
+            "get": {
+                "security": [
+                    {
+                        "bux-auth-xpub": []
+                    }
+                ],
+                "description": "Search for a destination",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Destinations"
+                ],
+                "summary": "Search for a destination",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "metadata",
+                        "name": "metadata",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "condition",
+                        "name": "condition",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                }
+            }
+        },
+        "/v1/paymail": {
+            "post": {
+                "security": [
+                    {
+                        "bux-auth-xpub": []
+                    }
+                ],
+                "description": "Create paymail",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Paymails"
+                ],
+                "summary": "Create paymail",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "key",
+                        "name": "key",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "address",
+                        "name": "address",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "public_name",
+                        "name": "public_name",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "avatar",
+                        "name": "avatar",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "metadata",
+                        "name": "metadata",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                }
+            },
+            "delete": {
+                "security": [
+                    {
+                        "bux-auth-xpub": []
+                    }
+                ],
+                "description": "Delete paymail",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Paymails"
+                ],
+                "summary": "Delete paymail",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "address",
+                        "name": "address",
+                        "in": "query",
+                        "required": true
                     }
                 ],
                 "responses": {
@@ -359,23 +1298,11 @@
                         "name": "hex",
                         "in": "query",
                         "required": true
-=======
-                    "Destinations"
-                ],
-                "summary": "Create a new destination",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "type",
-                        "name": "type",
-                        "in": "query"
->>>>>>> cfd94de (feat: documents destination routes)
                     },
                     {
                         "type": "string",
                         "description": "reference_id",
                         "name": "reference_id",
-<<<<<<< HEAD
                         "in": "query",
                         "required": true
                     },
@@ -383,8 +1310,6 @@
                         "type": "string",
                         "description": "metadata",
                         "name": "metadata",
-=======
->>>>>>> cfd94de (feat: documents destination routes)
                         "in": "query"
                     }
                 ],
@@ -395,27 +1320,18 @@
                 }
             }
         },
-<<<<<<< HEAD
         "/v1/transaction/search": {
-=======
-        "/v1/destination/count": {
->>>>>>> cfd94de (feat: documents destination routes)
             "post": {
                 "security": [
                     {
                         "bux-auth-xpub": []
                     }
                 ],
-<<<<<<< HEAD
                 "description": "Search transaction",
-=======
-                "description": "Count Destinations",
->>>>>>> cfd94de (feat: documents destination routes)
                 "produces": [
                     "application/json"
                 ],
                 "tags": [
-<<<<<<< HEAD
                     "transaction"
                 ],
                 "summary": "Search transaction",
@@ -591,11 +1507,6 @@
                         "in": "query"
                     }
                 ],
-=======
-                    "Destinations"
-                ],
-                "summary": "Count Destinations",
->>>>>>> cfd94de (feat: documents destination routes)
                 "responses": {
                     "200": {
                         "description": "OK"

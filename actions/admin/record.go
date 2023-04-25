@@ -11,8 +11,16 @@ import (
 )
 
 // transactionRecord will save and complete a transaction directly, without any checks
+// Record transactions godoc
+// @Summary      Record transactions
+// @Description  Record transactions
+// @Tags		 Admin
+// @Produce      json
+// @Param hex query string true "Transaction hex"
+// @Success      200
+// @Router       /v1/admin/transactions/record [post]
+// @Security bux-auth-xpub
 func (a *Action) transactionRecord(w http.ResponseWriter, req *http.Request, _ httprouter.Params) {
-
 	// Parse the params
 	params := apirouter.GetParams(req)
 

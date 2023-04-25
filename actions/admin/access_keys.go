@@ -10,8 +10,17 @@ import (
 )
 
 // accessKeysSearch will fetch a list of access keys filtered by metadata
+// Access Keys Search godoc
+// @Summary      Access Keys Search
+// @Description  Access Keys Search
+// @Tags		 Admin
+// @Produce      json
+// @Param metadata query string false "Metadata filter"
+// @Param conditions query string false "Conditions filter"
+// @Success      200
+// @Router       /v1/admin/access-keys/search [post]
+// @Security bux-auth-xpub
 func (a *Action) accessKeysSearch(w http.ResponseWriter, req *http.Request, _ httprouter.Params) {
-
 	// Parse the params
 	params := apirouter.GetParams(req)
 	queryParams, metadata, conditions, err := actions.GetQueryParameters(params)
@@ -36,8 +45,17 @@ func (a *Action) accessKeysSearch(w http.ResponseWriter, req *http.Request, _ ht
 }
 
 // accessKeysCount will count all access keys filtered by metadata
+// Access Keys Count godoc
+// @Summary      Access Keys Count
+// @Description  Access Keys Count
+// @Tags		 Admin
+// @Produce      json
+// @Param metadata query string false "Metadata filter"
+// @Param conditions query string false "Conditions filter"
+// @Success      200
+// @Router       /v1/admin/access-keys/count [post]
+// @Security bux-auth-xpub
 func (a *Action) accessKeysCount(w http.ResponseWriter, req *http.Request, _ httprouter.Params) {
-
 	// Parse the params
 	params := apirouter.GetParams(req)
 	_, metadata, conditions, err := actions.GetQueryParameters(params)

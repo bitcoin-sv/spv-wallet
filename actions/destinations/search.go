@@ -15,6 +15,8 @@ import (
 // @Description  Search for a destination
 // @Tags		 Destinations
 // @Produce      json
+// @Param metadata query string false "metadata"
+// @Param condition query string false "condition"
 // @Success      200
 // @Router       /v1/destination/search [get]
 // @Security bux-auth-xpub
