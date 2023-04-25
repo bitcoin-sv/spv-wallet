@@ -10,6 +10,16 @@ import (
 )
 
 // create will make a new model using the services defined in the action object
+// Create xPub godoc
+// @Summary     	Create xPub
+// @Description 	Create xPub
+// @Tags			xPub
+// @Produce     	json
+// @Param       	key query string true "key"
+// @Param       	metadata query string false "metadata"
+// @Success     	201
+// @Router      	/v1/xpub [post]
+// @Security 		bux-auth-xpub
 func (a *Action) create(w http.ResponseWriter, req *http.Request, _ httprouter.Params) {
 
 	// Parse the params

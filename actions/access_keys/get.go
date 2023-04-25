@@ -9,6 +9,15 @@ import (
 )
 
 // get will get an existing model
+// Get access key godoc
+// @Summary     	Get access key
+// @Description 	Get access key
+// @Tags			access-key
+// @Produce     	json
+// @Param       	id query string true "id"
+// @Success     	200
+// @Router      	/v1/access-key [get]
+// @Security 		bux-auth-xpub
 func (a *Action) get(w http.ResponseWriter, req *http.Request, _ httprouter.Params) {
 
 	reqXPubID, _ := bux.GetXpubIDFromRequest(req)

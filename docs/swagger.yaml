@@ -3,13 +3,31 @@ info:
   title: 'BUX: Server'
   version: v0.4.0
 paths:
-  /v1/xpub:
-    get:
-      description: Get xPub
+  /v1/access-key:
+    delete:
+      description: Revoke access key
       parameters:
-      - description: xPub
+      - description: id
         in: query
-        name: xpub
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+      security:
+      - bux-auth-xpub: []
+      summary: Revoke access key
+      tags:
+      - access-key
+    get:
+      description: Get access key
+      parameters:
+      - description: id
+        in: query
+        name: id
         required: true
         type: string
       produces:
@@ -19,7 +37,377 @@ paths:
           description: OK
       security:
       - bux-auth-xpub: []
+      summary: Get access key
+      tags:
+      - access-key
+    post:
+      description: Create access key
+      parameters:
+      - description: metadata
+        in: query
+        name: metadata
+        type: string
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+      security:
+      - bux-auth-xpub: []
+      summary: Create access key
+      tags:
+      - access-key
+  /v1/access-key/count:
+    post:
+      description: Count of access keys
+      parameters:
+      - description: metadata
+        in: query
+        name: metadata
+        type: string
+      - description: conditions
+        in: query
+        name: conditions
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+      security:
+      - bux-auth-xpub: []
+      summary: Count of access keys
+      tags:
+      - access-key
+  /v1/access-key/search:
+    post:
+      description: Search access key
+      parameters:
+      - description: page
+        in: query
+        name: page
+        type: integer
+      - description: page_size
+        in: query
+        name: page_size
+        type: integer
+      - description: order_by_field
+        in: query
+        name: order_by_field
+        type: string
+      - description: sort_direction
+        in: query
+        name: sort_direction
+        type: string
+      - description: metadata
+        in: query
+        name: metadata
+        type: string
+      - description: conditions
+        in: query
+        name: conditions
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+      security:
+      - bux-auth-xpub: []
+      summary: Search access key
+      tags:
+      - access-key
+  /v1/transaction:
+    get:
+      description: Get transaction by id
+      parameters:
+      - description: id
+        in: query
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+      security:
+      - bux-auth-xpub: []
+      summary: Get transaction by id
+      tags:
+      - transaction
+    patch:
+      description: Update transaction
+      parameters:
+      - description: id
+        in: query
+        name: id
+        required: true
+        type: string
+      - description: metadata
+        in: query
+        name: metadata
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+      security:
+      - bux-auth-xpub: []
+      summary: Update transaction
+      tags:
+      - transaction
+    post:
+      description: New transaction
+      parameters:
+      - description: transaction config
+        in: query
+        name: config
+        required: true
+        type: string
+      - description: metadata
+        in: query
+        name: metadata
+        type: string
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+      security:
+      - bux-auth-xpub: []
+      summary: New transaction
+      tags:
+      - transaction
+  /v1/transaction/count:
+    post:
+      description: Count of transactions
+      parameters:
+      - description: metadata
+        in: query
+        name: metadata
+        type: string
+      - description: conditions
+        in: query
+        name: conditions
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+      security:
+      - bux-auth-xpub: []
+      summary: Count of transactions
+      tags:
+      - transaction
+  /v1/transaction/record:
+    post:
+      description: Record transaction
+      parameters:
+      - description: hex
+        in: query
+        name: hex
+        required: true
+        type: string
+      - description: reference_id
+        in: query
+        name: reference_id
+        required: true
+        type: string
+      - description: metadata
+        in: query
+        name: metadata
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+      security:
+      - bux-auth-xpub: []
+      summary: Record transaction
+      tags:
+      - transaction
+  /v1/transaction/search:
+    post:
+      description: Search transaction
+      parameters:
+      - description: page
+        in: query
+        name: page
+        type: integer
+      - description: page_size
+        in: query
+        name: page_size
+        type: integer
+      - description: order_by_field
+        in: query
+        name: order_by_field
+        type: string
+      - description: sort_direction
+        in: query
+        name: sort_direction
+        type: string
+      - description: metadata
+        in: query
+        name: metadata
+        type: string
+      - description: conditions
+        in: query
+        name: conditions
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+      security:
+      - bux-auth-xpub: []
+      summary: Search transaction
+      tags:
+      - transaction
+  /v1/utxo:
+    get:
+      description: Get UTXO
+      parameters:
+      - description: tx_id
+        in: query
+        name: tx_id
+        required: true
+        type: string
+      - description: output_index
+        in: query
+        name: output_index
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+      security:
+      - bux-auth-xpub: []
+      summary: Get UTXO
+      tags:
+      - UTXO
+  /v1/utxo/count:
+    post:
+      description: Count of UTXOs
+      parameters:
+      - description: metadata
+        in: query
+        name: metadata
+        type: string
+      - description: conditions
+        in: query
+        name: conditions
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+      security:
+      - bux-auth-xpub: []
+      summary: Count of UTXOs
+      tags:
+      - UTXO
+  /v1/utxo/search:
+    post:
+      description: Search UTXO
+      parameters:
+      - description: page
+        in: query
+        name: page
+        type: integer
+      - description: page_size
+        in: query
+        name: page_size
+        type: integer
+      - description: order_by_field
+        in: query
+        name: order_by_field
+        type: string
+      - description: sort_direction
+        in: query
+        name: sort_direction
+        type: string
+      - description: metadata
+        in: query
+        name: metadata
+        type: string
+      - description: conditions
+        in: query
+        name: conditions
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+      security:
+      - bux-auth-xpub: []
+      summary: Search UTXO
+      tags:
+      - UTXO
+  /v1/xpub:
+    get:
+      description: Get xPub
+      parameters:
+      - description: key
+        in: query
+        name: key
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+      security:
+      - bux-auth-xpub: []
       summary: Get xPub
+      tags:
+      - xPub
+    patch:
+      description: Update xPub
+      parameters:
+      - description: metadata
+        in: query
+        name: metadata
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+      security:
+      - bux-auth-xpub: []
+      summary: Update xPub
+      tags:
+      - xPub
+    post:
+      description: Create xPub
+      parameters:
+      - description: key
+        in: query
+        name: key
+        required: true
+        type: string
+      - description: metadata
+        in: query
+        name: metadata
+        type: string
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+      security:
+      - bux-auth-xpub: []
+      summary: Create xPub
       tags:
       - xPub
 securityDefinitions:
