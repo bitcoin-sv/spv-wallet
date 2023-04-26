@@ -10,16 +10,15 @@ import (
 
 // create will make a new model using the services defined in the action object
 // Create access key godoc
-// @Summary     	Create access key
-// @Description 	Create access key
-// @Tags			access-key
-// @Produce     	json
-// @Param       	metadata query string false "metadata"
-// @Success     	201
-// @Router      	/v1/access-key [post]
-// @Security 		bux-auth-xpub
+// @Summary		Create access key
+// @Description	Create access key
+// @Tags		Access-key
+// @Produce		json
+// @Param		metadata query string false "metadata"
+// @Success		201
+// @Router		/v1/access-key [post]
+// @Security	bux-auth-xpub
 func (a *Action) create(w http.ResponseWriter, req *http.Request, _ httprouter.Params) {
-
 	reqXPub, _ := bux.GetXpubFromRequest(req)
 
 	// Parse the params

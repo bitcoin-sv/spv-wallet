@@ -9,13 +9,13 @@ import (
 
 // status will return the status of the admin login
 // Get stats godoc
-// @Summary      Get stats
-// @Description  Get stats
-// @Tags		 Admin
-// @Produce      json
-// @Success      200
-// @Router       /v1/admin/stats [get]
-// @Security bux-auth-xpub
+// @Summary		Get stats
+// @Description	Get stats
+// @Tags		Admin
+// @Produce		json
+// @Success		200
+// @Router		/v1/admin/stats [get]
+// @Security	bux-auth-xpub
 func (a *Action) stats(w http.ResponseWriter, req *http.Request, _ httprouter.Params) {
 	stats, err := a.Services.Bux.GetStats(req.Context())
 	if err != nil {

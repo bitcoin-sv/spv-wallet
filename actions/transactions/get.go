@@ -10,14 +10,14 @@ import (
 
 // get will fetch a transaction
 // Get transaction by id godoc
-// @Summary     	Get transaction by id
-// @Description 	Get transaction by id
-// @Tags			transaction
-// @Produce     	json
-// @Param       	id query string true "id"
-// @Success     	200
-// @Router      	/v1/transaction [get]
-// @Security 		bux-auth-xpub
+// @Summary		Get transaction by id
+// @Description	Get transaction by id
+// @Tags		Transactions
+// @Produce		json
+// @Param		id query string true "id"
+// @Success		200
+// @Router		/v1/transaction [get]
+// @Security	bux-auth-xpub
 func (a *Action) get(w http.ResponseWriter, req *http.Request, _ httprouter.Params) {
 	// Parse the params
 	params := apirouter.GetParams(req)

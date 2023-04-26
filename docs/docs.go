@@ -27,7 +27,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "access-key"
+                    "Access-key"
                 ],
                 "summary": "Get access key",
                 "parameters": [
@@ -56,7 +56,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "access-key"
+                    "Access-key"
                 ],
                 "summary": "Create access key",
                 "parameters": [
@@ -84,7 +84,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "access-key"
+                    "Access-key"
                 ],
                 "summary": "Revoke access key",
                 "parameters": [
@@ -115,7 +115,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "access-key"
+                    "Access-key"
                 ],
                 "summary": "Count of access keys",
                 "parameters": [
@@ -151,7 +151,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "access-key"
+                    "Access-key"
                 ],
                 "summary": "Search access key",
                 "parameters": [
@@ -1357,7 +1357,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "transaction"
+                    "Transactions"
                 ],
                 "summary": "Get transaction by id",
                 "parameters": [
@@ -1386,7 +1386,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "transaction"
+                    "Transactions"
                 ],
                 "summary": "New transaction",
                 "parameters": [
@@ -1421,7 +1421,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "transaction"
+                    "Transactions"
                 ],
                 "summary": "Update transaction",
                 "parameters": [
@@ -1459,7 +1459,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "transaction"
+                    "Transactions"
                 ],
                 "summary": "Count of transactions",
                 "parameters": [
@@ -1495,7 +1495,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "transaction"
+                    "Transactions"
                 ],
                 "summary": "Record transaction",
                 "parameters": [
@@ -1539,7 +1539,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "transaction"
+                    "Transactions"
                 ],
                 "summary": "Search transaction",
                 "parameters": [

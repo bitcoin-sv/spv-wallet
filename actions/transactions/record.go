@@ -11,18 +11,17 @@ import (
 
 // record will save and complete a transaction
 // Record transaction godoc
-// @Summary     	Record transaction
-// @Description 	Record transaction
-// @Tags			transaction
-// @Produce     	json
-// @Param       	hex query string true "hex"
-// @Param       	reference_id query string true "reference_id"
-// @Param       	metadata query string false "metadata"
-// @Success     	200
-// @Router      	/v1/transaction/record [post]
-// @Security 		bux-auth-xpub
+// @Summary		Record transaction
+// @Description	Record transaction
+// @Tags		Transactions
+// @Produce		json
+// @Param		hex query string true "hex"
+// @Param		reference_id query string true "reference_id"
+// @Param		metadata query string false "metadata"
+// @Success		200
+// @Router		/v1/transaction/record [post]
+// @Security	bux-auth-xpub
 func (a *Action) record(w http.ResponseWriter, req *http.Request, _ httprouter.Params) {
-
 	// Parse the params
 	params := apirouter.GetParams(req)
 

@@ -18,7 +18,7 @@
                     "application/json"
                 ],
                 "tags": [
-                    "access-key"
+                    "Access-key"
                 ],
                 "summary": "Get access key",
                 "parameters": [
@@ -47,7 +47,7 @@
                     "application/json"
                 ],
                 "tags": [
-                    "access-key"
+                    "Access-key"
                 ],
                 "summary": "Create access key",
                 "parameters": [
@@ -75,7 +75,7 @@
                     "application/json"
                 ],
                 "tags": [
-                    "access-key"
+                    "Access-key"
                 ],
                 "summary": "Revoke access key",
                 "parameters": [
@@ -106,7 +106,7 @@
                     "application/json"
                 ],
                 "tags": [
-                    "access-key"
+                    "Access-key"
                 ],
                 "summary": "Count of access keys",
                 "parameters": [
@@ -142,7 +142,7 @@
                     "application/json"
                 ],
                 "tags": [
-                    "access-key"
+                    "Access-key"
                 ],
                 "summary": "Search access key",
                 "parameters": [
@@ -1348,7 +1348,7 @@
                     "application/json"
                 ],
                 "tags": [
-                    "transaction"
+                    "Transactions"
                 ],
                 "summary": "Get transaction by id",
                 "parameters": [
@@ -1377,7 +1377,7 @@
                     "application/json"
                 ],
                 "tags": [
-                    "transaction"
+                    "Transactions"
                 ],
                 "summary": "New transaction",
                 "parameters": [
@@ -1412,7 +1412,7 @@
                     "application/json"
                 ],
                 "tags": [
-                    "transaction"
+                    "Transactions"
                 ],
                 "summary": "Update transaction",
                 "parameters": [
@@ -1450,7 +1450,7 @@
                     "application/json"
                 ],
                 "tags": [
-                    "transaction"
+                    "Transactions"
                 ],
                 "summary": "Count of transactions",
                 "parameters": [
@@ -1486,7 +1486,7 @@
                     "application/json"
                 ],
                 "tags": [
-                    "transaction"
+                    "Transactions"
                 ],
                 "summary": "Record transaction",
                 "parameters": [
@@ -1530,7 +1530,7 @@
                     "application/json"
                 ],
                 "tags": [
-                    "transaction"
+                    "Transactions"
                 ],
                 "summary": "Search transaction",
                 "parameters": [

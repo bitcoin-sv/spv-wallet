@@ -11,19 +11,19 @@ import (
 
 // accessKeysSearch will fetch a list of access keys filtered by metadata
 // Access Keys Search godoc
-// @Summary      Access Keys Search
-// @Description  Access Keys Search
-// @Tags		 Admin
-// @Produce      json
-// @Param 		 page query int false "page"
-// @Param 		 page_size query int false "page_size"
-// @Param 		 order_by_field query string false "order_by_field"
-// @Param 		 sort_direction query string false "sort_direction"
-// @Param 		 metadata query string false "Metadata filter"
-// @Param 		 conditions query string false "Conditions filter"
-// @Success      200
-// @Router       /v1/admin/access-keys/search [post]
-// @Security bux-auth-xpub
+// @Summary		Access Keys Search
+// @Description	Access Keys Search
+// @Tags		Admin
+// @Produce		json
+// @Param		page query int false "page"
+// @Param		page_size query int false "page_size"
+// @Param		order_by_field query string false "order_by_field"
+// @Param		sort_direction query string false "sort_direction"
+// @Param		metadata query string false "Metadata filter"
+// @Param		conditions query string false "Conditions filter"
+// @Success		200
+// @Router		/v1/admin/access-keys/search [post]
+// @Security	bux-auth-xpub
 func (a *Action) accessKeysSearch(w http.ResponseWriter, req *http.Request, _ httprouter.Params) {
 	// Parse the params
 	params := apirouter.GetParams(req)
@@ -50,15 +50,15 @@ func (a *Action) accessKeysSearch(w http.ResponseWriter, req *http.Request, _ ht
 
 // accessKeysCount will count all access keys filtered by metadata
 // Access Keys Count godoc
-// @Summary      Access Keys Count
-// @Description  Access Keys Count
-// @Tags		 Admin
-// @Produce      json
-// @Param metadata query string false "Metadata filter"
-// @Param conditions query string false "Conditions filter"
-// @Success      200
-// @Router       /v1/admin/access-keys/count [post]
-// @Security bux-auth-xpub
+// @Summary		Access Keys Count
+// @Description	Access Keys Count
+// @Tags		Admin
+// @Produce		json
+// @Param		metadata query string false "Metadata filter"
+// @Param		conditions query string false "Conditions filter"
+// @Success		200
+// @Router		/v1/admin/access-keys/count [post]
+// @Security	bux-auth-xpub
 func (a *Action) accessKeysCount(w http.ResponseWriter, req *http.Request, _ httprouter.Params) {
 	// Parse the params
 	params := apirouter.GetParams(req)

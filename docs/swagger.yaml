@@ -21,7 +21,7 @@ paths:
       - bux-auth-xpub: []
       summary: Revoke access key
       tags:
-      - access-key
+      - Access-key
     get:
       description: Get access key
       parameters:
@@ -39,7 +39,7 @@ paths:
       - bux-auth-xpub: []
       summary: Get access key
       tags:
-      - access-key
+      - Access-key
     post:
       description: Create access key
       parameters:
@@ -56,7 +56,7 @@ paths:
       - bux-auth-xpub: []
       summary: Create access key
       tags:
-      - access-key
+      - Access-key
   /v1/access-key/count:
     post:
       description: Count of access keys
@@ -78,7 +78,7 @@ paths:
       - bux-auth-xpub: []
       summary: Count of access keys
       tags:
-      - access-key
+      - Access-key
   /v1/access-key/search:
     post:
       description: Search access key
@@ -116,7 +116,7 @@ paths:
       - bux-auth-xpub: []
       summary: Search access key
       tags:
-      - access-key
+      - Access-key
   /v1/admin/access-keys/count:
     post:
       description: Access Keys Count
@@ -851,7 +851,7 @@ paths:
       - bux-auth-xpub: []
       summary: Get transaction by id
       tags:
-      - transaction
+      - Transactions
     patch:
       description: Update transaction
       parameters:
@@ -874,7 +874,7 @@ paths:
       - bux-auth-xpub: []
       summary: Update transaction
       tags:
-      - transaction
+      - Transactions
     post:
       description: New transaction
       parameters:
@@ -896,7 +896,7 @@ paths:
       - bux-auth-xpub: []
       summary: New transaction
       tags:
-      - transaction
+      - Transactions
   /v1/transaction/count:
     post:
       description: Count of transactions
@@ -918,7 +918,7 @@ paths:
       - bux-auth-xpub: []
       summary: Count of transactions
       tags:
-      - transaction
+      - Transactions
   /v1/transaction/record:
     post:
       description: Record transaction
@@ -946,7 +946,7 @@ paths:
       - bux-auth-xpub: []
       summary: Record transaction
       tags:
-      - transaction
+      - Transactions
   /v1/transaction/search:
     post:
       description: Search transaction
@@ -984,7 +984,7 @@ paths:
       - bux-auth-xpub: []
       summary: Search transaction
       tags:
-      - transaction
+      - Transactions
   /v1/utxo:
     get:
       description: Get UTXO

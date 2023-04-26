@@ -11,15 +11,15 @@ import (
 
 // count will fetch a count of destinations filtered by metadata
 // Count Destinations godoc
-// @Summary      Count Destinations
-// @Description  Count Destinations
-// @Tags		 Destinations
-// @Param 		 metadata query string false "metadata"
-// @Param 		 condition query string false "condition"
-// @Produce      json
-// @Success      200
-// @Router       /v1/destination/count [post]
-// @Security bux-auth-xpub
+// @Summary		Count Destinations
+// @Description	Count Destinations
+// @Tags		Destinations
+// @Param		metadata query string false "metadata"
+// @Param		condition query string false "condition"
+// @Produce		json
+// @Success		200
+// @Router		/v1/destination/count [post]
+// @Security	bux-auth-xpub
 func (a *Action) count(w http.ResponseWriter, req *http.Request, _ httprouter.Params) {
 	reqXPubID, _ := bux.GetXpubIDFromRequest(req)
 

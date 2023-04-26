@@ -11,19 +11,19 @@ import (
 
 // search will fetch a list of destinations filtered by metadata
 // Search Destination godoc
-// @Summary      Search for a destination
-// @Description  Search for a destination
-// @Tags		 Destinations
-// @Produce      json
-// @Param        page query int false "page"
-// @Param        page_size query int false "page_size"
-// @Param        order_by_field query string false "order_by_field"
-// @Param        sort_direction query string false "sort_direction"
-// @Param 	 	 metadata query string false "metadata"
-// @Param 		 condition query string false "condition"
-// @Success      200
-// @Router       /v1/destination/search [get]
-// @Security bux-auth-xpub
+// @Summary		Search for a destination
+// @Description	Search for a destination
+// @Tags		Destinations
+// @Produce		json
+// @Param		page query int false "page"
+// @Param		page_size query int false "page_size"
+// @Param		order_by_field query string false "order_by_field"
+// @Param		sort_direction query string false "sort_direction"
+// @Param		metadata query string false "metadata"
+// @Param		condition query string false "condition"
+// @Success		200
+// @Router		/v1/destination/search [get]
+// @Security	bux-auth-xpub
 func (a *Action) search(w http.ResponseWriter, req *http.Request, _ httprouter.Params) {
 	reqXPubID, _ := bux.GetXpubIDFromRequest(req)
 
