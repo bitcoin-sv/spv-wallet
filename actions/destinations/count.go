@@ -10,8 +10,17 @@ import (
 )
 
 // count will fetch a count of destinations filtered by metadata
+// Count Destinations godoc
+// @Summary      Count Destinations
+// @Description  Count Destinations
+// @Tags		 Destinations
+// @Param 		 metadata query string false "metadata"
+// @Param 		 condition query string false "condition"
+// @Produce      json
+// @Success      200
+// @Router       /v1/destination/count [post]
+// @Security bux-auth-xpub
 func (a *Action) count(w http.ResponseWriter, req *http.Request, _ httprouter.Params) {
-
 	reqXPubID, _ := bux.GetXpubIDFromRequest(req)
 
 	// Parse the params
@@ -22,7 +31,7 @@ func (a *Action) count(w http.ResponseWriter, req *http.Request, _ httprouter.Pa
 		return
 	}
 
-	// Record a new transaction (get the hex from parameters)a
+	// Record a new transaction (get the hex from parameters)
 	var count int64
 	if count, err = a.Services.Bux.GetDestinationsByXpubIDCount(
 		req.Context(),

@@ -117,6 +117,722 @@ paths:
       summary: Search access key
       tags:
       - access-key
+  /v1/admin/access-keys/count:
+    post:
+      description: Access Keys Count
+      parameters:
+      - description: Metadata filter
+        in: query
+        name: metadata
+        type: string
+      - description: Conditions filter
+        in: query
+        name: conditions
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+      security:
+      - bux-auth-xpub: []
+      summary: Access Keys Count
+      tags:
+      - Admin
+  /v1/admin/access-keys/search:
+    post:
+      description: Access Keys Search
+      parameters:
+      - description: page
+        in: query
+        name: page
+        type: integer
+      - description: page_size
+        in: query
+        name: page_size
+        type: integer
+      - description: order_by_field
+        in: query
+        name: order_by_field
+        type: string
+      - description: sort_direction
+        in: query
+        name: sort_direction
+        type: string
+      - description: Metadata filter
+        in: query
+        name: metadata
+        type: string
+      - description: Conditions filter
+        in: query
+        name: conditions
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+      security:
+      - bux-auth-xpub: []
+      summary: Access Keys Search
+      tags:
+      - Admin
+  /v1/admin/block-headers/count:
+    post:
+      description: Get block headers count
+      parameters:
+      - description: Metadata filter
+        in: query
+        name: metadata
+        type: string
+      - description: Conditions filter
+        in: query
+        name: conditions
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+      security:
+      - bux-auth-xpub: []
+      summary: Get block headers count
+      tags:
+      - Admin
+  /v1/admin/block-headers/search:
+    post:
+      description: Search for block headers
+      parameters:
+      - description: page
+        in: query
+        name: page
+        type: integer
+      - description: page_size
+        in: query
+        name: page_size
+        type: integer
+      - description: order_by_field
+        in: query
+        name: order_by_field
+        type: string
+      - description: sort_direction
+        in: query
+        name: sort_direction
+        type: string
+      - description: Metadata filter
+        in: query
+        name: metadata
+        type: string
+      - description: Conditions filter
+        in: query
+        name: conditions
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+      security:
+      - bux-auth-xpub: []
+      summary: Search for block headers
+      tags:
+      - Admin
+  /v1/admin/destinations/count:
+    post:
+      description: Count destinations
+      parameters:
+      - description: Metadata filter
+        in: query
+        name: metadata
+        type: string
+      - description: Conditions filter
+        in: query
+        name: conditions
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+      security:
+      - bux-auth-xpub: []
+      summary: Count destinations
+      tags:
+      - Admin
+  /v1/admin/destinations/search:
+    post:
+      description: Search for destinations
+      parameters:
+      - description: page
+        in: query
+        name: page
+        type: integer
+      - description: page_size
+        in: query
+        name: page_size
+        type: integer
+      - description: order_by_field
+        in: query
+        name: order_by_field
+        type: string
+      - description: sort_direction
+        in: query
+        name: sort_direction
+        type: string
+      - description: Metadata filter
+        in: query
+        name: metadata
+        type: string
+      - description: Conditions filter
+        in: query
+        name: conditions
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+      security:
+      - bux-auth-xpub: []
+      summary: Search for destinations
+      tags:
+      - Admin
+  /v1/admin/paymail/create:
+    post:
+      description: Create paymail
+      parameters:
+      - description: xpub
+        in: query
+        name: xpub
+        required: true
+        type: string
+      - description: address
+        in: query
+        name: address
+        required: true
+        type: string
+      - description: public_name
+        in: query
+        name: public_name
+        type: string
+      - description: avatar
+        in: query
+        name: avatar
+        type: string
+      - description: metadata
+        in: query
+        name: metadata
+        type: string
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+      security:
+      - bux-auth-xpub: []
+      summary: Create paymail
+      tags:
+      - Admin
+  /v1/admin/paymail/delete:
+    delete:
+      description: Delete paymail
+      parameters:
+      - description: address
+        in: query
+        name: address
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+      security:
+      - bux-auth-xpub: []
+      summary: Delete paymail
+      tags:
+      - Admin
+  /v1/admin/paymails/count:
+    post:
+      description: Paymail addresses count
+      parameters:
+      - description: Metadata filter
+        in: query
+        name: metadata
+        type: string
+      - description: Conditions filter
+        in: query
+        name: conditions
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+      security:
+      - bux-auth-xpub: []
+      summary: Paymail addresses count
+      tags:
+      - Admin
+  /v1/admin/paymails/search:
+    post:
+      description: Paymail addresses search
+      parameters:
+      - description: page
+        in: query
+        name: page
+        type: integer
+      - description: page_size
+        in: query
+        name: page_size
+        type: integer
+      - description: order_by_field
+        in: query
+        name: order_by_field
+        type: string
+      - description: sort_direction
+        in: query
+        name: sort_direction
+        type: string
+      - description: Metadata filter
+        in: query
+        name: metadata
+        type: string
+      - description: Conditions filter
+        in: query
+        name: conditions
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+      security:
+      - bux-auth-xpub: []
+      summary: Paymail addresses search
+      tags:
+      - Admin
+  /v1/admin/stats:
+    get:
+      description: Get stats
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+      security:
+      - bux-auth-xpub: []
+      summary: Get stats
+      tags:
+      - Admin
+  /v1/admin/status:
+    get:
+      description: Get status
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+      security:
+      - bux-auth-xpub: []
+      summary: Get status
+      tags:
+      - Admin
+  /v1/admin/transactions/count:
+    post:
+      description: Count transactions
+      parameters:
+      - description: Metadata filter
+        in: query
+        name: metadata
+        type: string
+      - description: Conditions filter
+        in: query
+        name: conditions
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+      security:
+      - bux-auth-xpub: []
+      summary: Count transactions
+      tags:
+      - Admin
+  /v1/admin/transactions/record:
+    post:
+      description: Record transactions
+      parameters:
+      - description: Transaction hex
+        in: query
+        name: hex
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+      security:
+      - bux-auth-xpub: []
+      summary: Record transactions
+      tags:
+      - Admin
+  /v1/admin/transactions/search:
+    post:
+      description: Search for transactions
+      parameters:
+      - description: page
+        in: query
+        name: page
+        type: integer
+      - description: page_size
+        in: query
+        name: page_size
+        type: integer
+      - description: order_by_field
+        in: query
+        name: order_by_field
+        type: string
+      - description: sort_direction
+        in: query
+        name: sort_direction
+        type: string
+      - description: Metadata filter
+        in: query
+        name: metadata
+        type: string
+      - description: Conditions filter
+        in: query
+        name: conditions
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+      security:
+      - bux-auth-xpub: []
+      summary: Search for transactions
+      tags:
+      - Admin
+  /v1/admin/utxos/count:
+    post:
+      description: Count utxos
+      parameters:
+      - description: Metadata filter
+        in: query
+        name: metadata
+        type: string
+      - description: Conditions filter
+        in: query
+        name: conditions
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+      security:
+      - bux-auth-xpub: []
+      summary: Count utxos
+      tags:
+      - Admin
+  /v1/admin/utxos/search:
+    post:
+      description: Search for utxos
+      parameters:
+      - description: page
+        in: query
+        name: page
+        type: integer
+      - description: page_size
+        in: query
+        name: page_size
+        type: integer
+      - description: order_by_field
+        in: query
+        name: order_by_field
+        type: string
+      - description: sort_direction
+        in: query
+        name: sort_direction
+        type: string
+      - description: Metadata filter
+        in: query
+        name: metadata
+        type: string
+      - description: Conditions filter
+        in: query
+        name: conditions
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+      security:
+      - bux-auth-xpub: []
+      summary: Search for utxos
+      tags:
+      - Admin
+  /v1/admin/xpubs/count:
+    post:
+      description: Count xpubs
+      parameters:
+      - description: Metadata filter
+        in: query
+        name: metadata
+        type: string
+      - description: Conditions filter
+        in: query
+        name: conditions
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+      security:
+      - bux-auth-xpub: []
+      summary: Count xpubs
+      tags:
+      - Admin
+  /v1/admin/xpubs/search:
+    post:
+      description: Search for xpubs
+      parameters:
+      - description: page
+        in: query
+        name: page
+        type: integer
+      - description: page_size
+        in: query
+        name: page_size
+        type: integer
+      - description: order_by_field
+        in: query
+        name: order_by_field
+        type: string
+      - description: sort_direction
+        in: query
+        name: sort_direction
+        type: string
+      - description: Metadata filter
+        in: query
+        name: metadata
+        type: string
+      - description: Conditions filter
+        in: query
+        name: conditions
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+      security:
+      - bux-auth-xpub: []
+      summary: Search for xpubs
+      tags:
+      - Admin
+  /v1/destination:
+    get:
+      description: Get a destination
+      parameters:
+      - description: Destination ID
+        in: query
+        name: id
+        type: string
+      - description: Destination address
+        in: query
+        name: address
+        type: string
+      - description: Destination locking script
+        in: query
+        name: locking_script
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+      security:
+      - bux-auth-xpub: []
+      summary: Get a destination
+      tags:
+      - Destinations
+    patch:
+      description: Update destination
+      parameters:
+      - description: Destination ID
+        in: path
+        name: id
+        type: string
+      - description: Destination Address
+        in: path
+        name: address
+        type: string
+      - description: Destination Locking Script
+        in: path
+        name: locking_script
+        type: string
+      - description: Destination Metadata
+        in: body
+        name: metadata
+        required: true
+        schema:
+          type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+      security:
+      - bux-auth-xpub: []
+      summary: Update destination
+      tags:
+      - Destinations
+    post:
+      description: Create a new destination
+      parameters:
+      - description: type
+        in: query
+        name: type
+        type: string
+      - description: reference_id
+        in: query
+        name: reference_id
+        type: string
+      - description: metadata
+        in: query
+        name: metadata
+        type: string
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+      security:
+      - bux-auth-xpub: []
+      summary: Create a new destination
+      tags:
+      - Destinations
+  /v1/destination/count:
+    post:
+      description: Count Destinations
+      parameters:
+      - description: metadata
+        in: query
+        name: metadata
+        type: string
+      - description: condition
+        in: query
+        name: condition
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+      security:
+      - bux-auth-xpub: []
+      summary: Count Destinations
+      tags:
+      - Destinations
+  /v1/destination/search:
+    get:
+      description: Search for a destination
+      parameters:
+      - description: page
+        in: query
+        name: page
+        type: integer
+      - description: page_size
+        in: query
+        name: page_size
+        type: integer
+      - description: order_by_field
+        in: query
+        name: order_by_field
+        type: string
+      - description: sort_direction
+        in: query
+        name: sort_direction
+        type: string
+      - description: metadata
+        in: query
+        name: metadata
+        type: string
+      - description: condition
+        in: query
+        name: condition
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+      security:
+      - bux-auth-xpub: []
+      summary: Search for a destination
+      tags:
+      - Destinations
+  /v1/paymail:
+    delete:
+      description: Delete paymail
+      parameters:
+      - description: address
+        in: query
+        name: address
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+      security:
+      - bux-auth-xpub: []
+      summary: Delete paymail
+      tags:
+      - Paymails
+    post:
+      description: Create paymail
+      parameters:
+      - description: key
+        in: query
+        name: key
+        required: true
+        type: string
+      - description: address
+        in: query
+        name: address
+        required: true
+        type: string
+      - description: public_name
+        in: query
+        name: public_name
+        type: string
+      - description: avatar
+        in: query
+        name: avatar
+        type: string
+      - description: metadata
+        in: query
+        name: metadata
+        type: string
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+      security:
+      - bux-auth-xpub: []
+      summary: Create paymail
+      tags:
+      - Paymails
   /v1/transaction:
     get:
       description: Get transaction by id

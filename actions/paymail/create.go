@@ -9,8 +9,20 @@ import (
 )
 
 // create will make a new model using the services defined in the action object
+// Create Paymail godoc
+// @Summary      Create paymail
+// @Description  Create paymail
+// @Tags		 Paymails
+// @Param 		 key query string true "key"
+// @Param 		 address query string true "address"
+// @Param 		 public_name query string false "public_name"
+// @Param 		 avatar query string false "avatar"
+// @Param 		 metadata query string false "metadata"
+// @Produce      json
+// @Success      201
+// @Router       /v1/paymail [post]
+// @Security bux-auth-xpub
 func (a *Action) create(w http.ResponseWriter, req *http.Request, _ httprouter.Params) {
-
 	// Parse the params
 	params := apirouter.GetParams(req)
 
