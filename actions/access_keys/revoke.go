@@ -8,7 +8,7 @@ import (
 	apirouter "github.com/mrz1836/go-api-router"
 )
 
-// create will make a new model using the services defined in the action object
+// revoke will revoke the intended model by id
 // Revoke access key godoc
 // @Summary		Revoke access key
 // @Description	Revoke access key
