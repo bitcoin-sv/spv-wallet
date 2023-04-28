@@ -23,6 +23,8 @@ rules:
     level: warning
   empty-lines: enable
   empty-values: disable
+  exclude:
+    - '*.swagger.yaml'
   hyphens: enable
   indentation: enable
   key-duplicates: enable
