@@ -7,7 +7,7 @@ yaml-files:
 
 ignore: |
   dist/
-  *.swagger.yaml
+  */swagger.yaml
 
 rules:
   braces: enable
@@ -23,8 +23,6 @@ rules:
     level: warning
   empty-lines: enable
   empty-values: disable
-  exclude:
-    - '*.swagger.yaml'
   hyphens: enable
   indentation: enable
   key-duplicates: enable
