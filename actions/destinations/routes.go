@@ -28,6 +28,7 @@ func RegisterRoutes(router *apirouter.Router, appConfig *config.AppConfig, servi
 	router.HTTPRouter.GET("/"+config.CurrentMajorVersion+"/destination", action.Request(router, requireBasic.Wrap(action.get)))
 	router.HTTPRouter.POST("/"+config.CurrentMajorVersion+"/destination/count", action.Request(router, requireBasic.Wrap(action.count)))
 	router.HTTPRouter.GET("/"+config.CurrentMajorVersion+"/destination/search", action.Request(router, requireBasic.Wrap(action.search)))
+	router.HTTPRouter.POST("/"+config.CurrentMajorVersion+"/destination/search", action.Request(router, requireBasic.Wrap(action.search)))
 	router.HTTPRouter.POST("/"+config.CurrentMajorVersion+"/destination", action.Request(router, require.Wrap(action.create)))
 	router.HTTPRouter.PATCH("/"+config.CurrentMajorVersion+"/destination", action.Request(router, require.Wrap(action.update)))
 }
