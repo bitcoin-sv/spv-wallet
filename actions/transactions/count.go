@@ -10,8 +10,17 @@ import (
 )
 
 // count will fetch a count of transactions filtered on conditions and metadata
+// Count of transactions godoc
+// @Summary		Count of transactions
+// @Description	Count of transactions
+// @Tags		Transactions
+// @Produce		json
+// @Param		metadata query string false "metadata"
+// @Param		conditions query string false "conditions"
+// @Success		200
+// @Router		/v1/transaction/count [post]
+// @Security	bux-auth-xpub
 func (a *Action) count(w http.ResponseWriter, req *http.Request, _ httprouter.Params) {
-
 	reqXPubID, _ := bux.GetXpubIDFromRequest(req)
 
 	// Parse the params

@@ -19,6 +19,7 @@ import (
 	apirouter "github.com/mrz1836/go-api-router"
 	"github.com/mrz1836/go-logger"
 	"github.com/newrelic/go-agent/v3/integrations/nrhttprouter"
+	httpSwagger "github.com/swaggo/http-swagger"
 )
 
 // Server is the configuration, services, and actual web server
@@ -93,6 +94,8 @@ func (s *Server) Handlers() *nrhttprouter.Router {
 	// Create a new router
 	segment := txn.StartSegment("create_router")
 	s.Router = apirouter.NewWithNewRelic(s.Services.NewRelic)
+	s.Router.HTTPRouter.Handler(http.MethodGet, "/swagger", http.RedirectHandler("/swagger/index.html", http.StatusMovedPermanently))
+	s.Router.HTTPRouter.Handler(http.MethodGet, "/swagger/*any", httpSwagger.WrapHandler)
 	segment.End()
 
 	// Turned on all CORs - should be able to access in a browser

@@ -11,8 +11,17 @@ import (
 )
 
 // newTransaction will create a new transaction
+// New transaction godoc
+// @Summary		New transaction
+// @Description	New transaction
+// @Tags		Transactions
+// @Produce		json
+// @Param		config query string true "transaction config"
+// @Param		metadata query string false "metadata"
+// @Success		201
+// @Router		/v1/transaction [post]
+// @Security	bux-auth-xpub
 func (a *Action) newTransaction(w http.ResponseWriter, req *http.Request, _ httprouter.Params) {
-
 	// Parse the params
 	params := apirouter.GetParams(req)
 

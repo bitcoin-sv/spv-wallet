@@ -13,7 +13,6 @@ type Action struct {
 
 // RegisterRoutes register all the package specific routes
 func RegisterRoutes(router *apirouter.Router, appConfig *config.AppConfig, services *config.AppServices) {
-
 	// Use the authentication middleware wrapper
 	a, require := actions.NewStack(appConfig, services)
 	require.Use(a.RequireAuthentication)

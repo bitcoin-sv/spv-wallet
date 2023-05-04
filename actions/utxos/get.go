@@ -9,8 +9,17 @@ import (
 )
 
 // get will fetch a given utxo according to conditions
+// Get UTXO godoc
+// @Summary		Get UTXO
+// @Description	Get UTXO
+// @Tags		UTXO
+// @Produce		json
+// @Param		tx_id query string true "tx_id"
+// @Param		output_index query int true "output_index"
+// @Success		200
+// @Router		/v1/utxo [get]
+// @Security	bux-auth-xpub
 func (a *Action) get(w http.ResponseWriter, req *http.Request, _ httprouter.Params) {
-
 	reqXPubID, _ := bux.GetXpubIDFromRequest(req)
 
 	// Parse the params

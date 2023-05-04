@@ -9,9 +9,18 @@ import (
 	apirouter "github.com/mrz1836/go-api-router"
 )
 
-// get will fetch a transaction
+// update will update a transaction
+// Update transaction godoc
+// @Summary		Update transaction
+// @Description	Update transaction
+// @Tags		Transactions
+// @Produce		json
+// @Param		id query string true "id"
+// @Param		metadata query string true "metadata"
+// @Success		200
+// @Router		/v1/transaction [patch]
+// @Security	bux-auth-xpub
 func (a *Action) update(w http.ResponseWriter, req *http.Request, _ httprouter.Params) {
-
 	// Get the xPub from the request (via authentication)
 	reqXPubID, _ := bux.GetXpubIDFromRequest(req)
 

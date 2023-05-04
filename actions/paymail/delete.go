@@ -8,8 +8,16 @@ import (
 )
 
 // delete will remove the intended model
+// Delete Paymail godoc
+// @Summary		Delete paymail
+// @Description	Delete paymail
+// @Tags		Paymails
+// @Param		address query string true "address"
+// @Produce		json
+// @Success		200
+// @Router		/v1/paymail [delete]
+// @Security	bux-auth-xpub
 func (a *Action) delete(w http.ResponseWriter, req *http.Request, _ httprouter.Params) {
-
 	// Parse the params
 	params := apirouter.GetParams(req)
 

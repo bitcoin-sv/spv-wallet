@@ -9,8 +9,18 @@ import (
 )
 
 // get will get an existing model
+// Get Destination godoc
+// @Summary		Get a destination
+// @Description	Get a destination
+// @Tags		Destinations
+// @Produce		json
+// @Param		id query string false "Destination ID"
+// @Param		address query string false "Destination address"
+// @Param		locking_script query string false "Destination locking script"
+// @Success		200
+// @Router		/v1/destination [get]
+// @Security	bux-auth-xpub
 func (a *Action) get(w http.ResponseWriter, req *http.Request, _ httprouter.Params) {
-
 	reqXPubID, _ := bux.GetXpubIDFromRequest(req)
 
 	// Parse the params

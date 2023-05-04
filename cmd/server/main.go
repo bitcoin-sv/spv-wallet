@@ -12,11 +12,17 @@ import (
 
 	"github.com/BuxOrg/bux-server/config"
 	"github.com/BuxOrg/bux-server/dictionary"
+	_ "github.com/BuxOrg/bux-server/docs"
 	"github.com/BuxOrg/bux-server/server"
 	"github.com/mrz1836/go-logger"
 )
 
 // main method starts everything for the BUX Server
+// @title           BUX: Server
+// @version         v0.4.0
+// @securityDefinitions.apikey bux-auth-xpub
+// @in header
+// @name bux-auth-xpub
 func main() {
 
 	// Load the Application Configuration

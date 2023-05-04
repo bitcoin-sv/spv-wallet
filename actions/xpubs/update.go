@@ -9,9 +9,17 @@ import (
 	apirouter "github.com/mrz1836/go-api-router"
 )
 
-// get will get an existing model
+// update will update an existing model
+// Update xPub godoc
+// @Summary		Update xPub
+// @Description	Update xPub
+// @Tags		xPub
+// @Produce		json
+// @Param		metadata query string false "metadata"
+// @Success		200
+// @Router		/v1/xpub [patch]
+// @Security	bux-auth-xpub
 func (a *Action) update(w http.ResponseWriter, req *http.Request, _ httprouter.Params) {
-
 	reqXPub, _ := bux.GetXpubFromRequest(req)
 	reqXPubID, _ := bux.GetXpubIDFromRequest(req)
 
