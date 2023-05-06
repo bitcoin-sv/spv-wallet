@@ -28,7 +28,7 @@ const (
 	EnvironmentStaging             = "staging"
 	EnvironmentTest                = "test"
 	HealthRequestPath              = "health"
-	Version                        = "v0.4.0"
+	Version                        = "v0.5.0"
 )
 
 // Local variables for configuration
