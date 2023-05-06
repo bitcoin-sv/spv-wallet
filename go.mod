@@ -1,10 +1,10 @@
 module github.com/BuxOrg/bux-server
 
-go 1.18
+go 1.19
 
 require (
-	github.com/99designs/gqlgen v0.17.30
-	github.com/BuxOrg/bux v0.4.24
+	github.com/99designs/gqlgen v0.17.31
+	github.com/BuxOrg/bux v0.5.0
 	github.com/go-ozzo/ozzo-validation v3.6.0+incompatible
 	github.com/go-redis/redis/v8 v8.11.5
 	github.com/gofrs/uuid v4.4.0+incompatible
@@ -26,12 +26,11 @@ require (
 
 require (
 	github.com/KyleBanks/depth v1.2.1 // indirect
-	github.com/go-openapi/jsonpointer v0.19.5 // indirect
-	github.com/go-openapi/jsonreference v0.20.0 // indirect
-	github.com/go-openapi/spec v0.20.6 // indirect
-	github.com/go-openapi/swag v0.19.15 // indirect
-	github.com/swaggo/files v0.0.0-20220610200504-28940afbdbfe // indirect
-	gopkg.in/yaml.v2 v2.4.0 // indirect
+	github.com/go-openapi/jsonpointer v0.19.6 // indirect
+	github.com/go-openapi/jsonreference v0.20.2 // indirect
+	github.com/go-openapi/spec v0.20.9 // indirect
+	github.com/go-openapi/swag v0.22.3 // indirect
+	github.com/swaggo/files v1.0.1 // indirect
 )
 
 require (
@@ -42,9 +41,9 @@ require (
 	github.com/bitcoinschema/go-map v0.0.17 // indirect
 	github.com/bitcoinsv/bsvd v0.0.0-20190609155523-4c29707f7173 // indirect
 	github.com/bitcoinsv/bsvutil v0.0.0-20181216182056-1d77cf353ea9 // indirect
-	github.com/bsm/redislock v0.9.2 // indirect
+	github.com/bsm/redislock v0.9.3 // indirect
 	github.com/capnm/sysinfo v0.0.0-20130621111458-5909a53897f3 // indirect
-	github.com/centrifugal/centrifuge-go v0.9.4 // indirect
+	github.com/centrifugal/centrifuge-go v0.9.6 // indirect
 	github.com/centrifugal/protocol v0.10.0 // indirect
 	github.com/cespare/xxhash/v2 v2.2.0 // indirect
 	github.com/coocood/freecache v1.2.3 // indirect
@@ -85,11 +84,11 @@ require (
 	github.com/mailru/easyjson v0.7.7 // indirect
 	github.com/matryer/respond v1.0.1 // indirect
 	github.com/mattn/go-sqlite3 v1.14.16 // indirect
-	github.com/miekg/dns v1.1.53 // indirect
+	github.com/miekg/dns v1.1.54 // indirect
 	github.com/mitchellh/mapstructure v1.5.0 // indirect
 	github.com/montanaflynn/stats v0.7.0 // indirect
 	github.com/mrz1836/go-cache v0.8.0 // indirect
-	github.com/mrz1836/go-nownodes v0.0.8 // indirect
+	github.com/mrz1836/go-nownodes v0.1.0 // indirect
 	github.com/mrz1836/go-whatsonchain v0.12.2 // indirect
 	github.com/newrelic/go-agent/v3/integrations/nrmongo v1.0.3 // indirect
 	github.com/pelletier/go-toml/v2 v2.0.7 // indirect
@@ -125,12 +124,12 @@ require (
 	golang.org/x/crypto v0.8.0 // indirect
 	golang.org/x/mod v0.10.0 // indirect
 	golang.org/x/net v0.9.0 // indirect
-	golang.org/x/sync v0.1.0 // indirect
-	golang.org/x/sys v0.7.0 // indirect
+	golang.org/x/sync v0.2.0 // indirect
+	golang.org/x/sys v0.8.0 // indirect
 	golang.org/x/text v0.9.0 // indirect
 	golang.org/x/tools v0.8.0 // indirect
 	google.golang.org/genproto v0.0.0-20230410155749-daa745c078e1 // indirect
-	google.golang.org/grpc v1.54.0 // indirect
+	google.golang.org/grpc v1.55.0 // indirect
 	google.golang.org/protobuf v1.30.0 // indirect
 	gopkg.in/ini.v1 v1.67.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
