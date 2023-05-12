@@ -44,7 +44,7 @@ announce:
   slack:
     enabled: true
     message_template: '{{ .ProjectName }} {{ .Tag }} is out! Changelog: https://github.com/BuxOrg/{{ .ProjectName }}/releases/tag/{{ .Tag }}'
-    channel: '#bux'
+    channel: '#ba-bux'
     # username: ''
     # icon_emoji: ''
     # icon_url: ''
