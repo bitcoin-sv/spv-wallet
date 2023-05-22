@@ -11,7 +11,7 @@ require (
 	github.com/julienschmidt/httprouter v1.3.0
 	github.com/mrz1836/go-api-router v0.5.1
 	github.com/mrz1836/go-cachestore v0.2.0
-	github.com/mrz1836/go-datastore v0.4.0
+	github.com/mrz1836/go-datastore v0.4.1
 	github.com/mrz1836/go-logger v0.3.2
 	github.com/mrz1836/go-parameters v0.3.1
 	github.com/mrz1836/go-sanitize v1.2.1
@@ -133,9 +133,9 @@ require (
 	google.golang.org/protobuf v1.30.0 // indirect
 	gopkg.in/ini.v1 v1.67.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
-	gorm.io/driver/mysql v1.5.0 // indirect
-	gorm.io/driver/postgres v1.5.0 // indirect
-	gorm.io/driver/sqlite v1.5.0 // indirect
+	gorm.io/driver/mysql v1.5.1 // indirect
+	gorm.io/driver/postgres v1.5.2 // indirect
+	gorm.io/driver/sqlite v1.5.1 // indirect
 	gorm.io/gorm v1.25.1 // indirect
 	gorm.io/plugin/dbresolver v1.4.1 // indirect
 )
