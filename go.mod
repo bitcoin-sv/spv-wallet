@@ -18,7 +18,7 @@ require (
 	github.com/mrz1836/go-validate v0.2.0
 	github.com/newrelic/go-agent/v3 v3.21.1
 	github.com/newrelic/go-agent/v3/integrations/nrhttprouter v1.0.1
-	github.com/spf13/viper v1.15.0
+	github.com/spf13/viper v1.16.0
 	github.com/stretchr/testify v1.8.3
 	github.com/swaggo/swag v1.16.1
 	github.com/vektah/gqlparser/v2 v2.5.1
@@ -91,7 +91,7 @@ require (
 	github.com/mrz1836/go-nownodes v0.1.0 // indirect
 	github.com/mrz1836/go-whatsonchain v0.12.2 // indirect
 	github.com/newrelic/go-agent/v3/integrations/nrmongo v1.0.3 // indirect
-	github.com/pelletier/go-toml/v2 v2.0.7 // indirect
+	github.com/pelletier/go-toml/v2 v2.0.8 // indirect
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
 	github.com/rafaeljusto/redigomock v2.4.0+incompatible // indirect
@@ -99,7 +99,7 @@ require (
 	github.com/segmentio/asm v1.2.0 // indirect
 	github.com/segmentio/encoding v0.3.6 // indirect
 	github.com/spf13/afero v1.9.5 // indirect
-	github.com/spf13/cast v1.5.0 // indirect
+	github.com/spf13/cast v1.5.1 // indirect
 	github.com/spf13/jwalterweatherman v1.1.0 // indirect
 	github.com/spf13/pflag v1.0.5 // indirect
 	github.com/stretchr/objx v0.5.0 // indirect
