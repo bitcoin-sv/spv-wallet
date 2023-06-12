@@ -172,6 +172,8 @@ pull_request_rules:
           - author!=icellan
           - author!=galt-tr
           - author!=klar
+          - author!=vitalibalashka
+          - author!=wregulski
     actions:
       comment:
         message: "Welcome to our open-source project @{{author}}! 💘"
