@@ -9,6 +9,7 @@ import (
 	"fmt"
 	"strconv"
 	"sync"
+	"sync/atomic"
 	"time"
 
 	"github.com/99designs/gqlgen/graphql"
@@ -17,7 +18,7 @@ import (
 	"github.com/BuxOrg/bux-server/gqlgen"
 	"github.com/BuxOrg/bux/utils"
 	"github.com/mrz1836/go-datastore"
-	customTypes "github.com/mrz1836/go-datastore/custom_types"
+	customtypes "github.com/mrz1836/go-datastore/custom_types"
 	gqlparser "github.com/vektah/gqlparser/v2"
 	"github.com/vektah/gqlparser/v2/ast"
 )
@@ -367,7 +368,7 @@ func (e *executableSchema) Schema() *ast.Schema {
 }
 
 func (e *executableSchema) Complexity(typeName, field string, childComplexity int, rawArgs map[string]interface{}) (int, bool) {
-	ec := executionContext{nil, e}
+	ec := executionContext{nil, e, 0, 0, nil}
 	_ = ec
 	switch typeName + "." + field {
 
@@ -1924,7 +1925,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 func (e *executableSchema) Exec(ctx context.Context) graphql.ResponseHandler {
 	rc := graphql.GetOperationContext(ctx)
-	ec := executionContext{rc, e}
+	ec := executionContext{rc, e, 0, 0, make(chan graphql.DeferredResult)}
 	inputUnmarshalMap := graphql.BuildUnmarshalerMap(
 		ec.unmarshalInputDestinationInput,
 		ec.unmarshalInputFeeUnitInput,
@@ -1941,18 +1942,33 @@ func (e *executableSchema) Exec(ctx context.Context) graphql.ResponseHandler {
 	switch rc.Operation.Operation {
 	case ast.Query:
 		return func(ctx context.Context) *graphql.Response {
-			if !first {
-				return nil
+			var response graphql.Response
+			var data graphql.Marshaler
+			if first {
+				first = false
+				ctx = graphql.WithUnmarshalerMap(ctx, inputUnmarshalMap)
+				data = ec._Query(ctx, rc.Operation.SelectionSet)
+			} else {
+				if atomic.LoadInt32(&ec.pendingDeferred) > 0 {
+					result := <-ec.deferredResults
+					atomic.AddInt32(&ec.pendingDeferred, -1)
+					data = result.Result
+					response.Path = result.Path
+					response.Label = result.Label
+					response.Errors = result.Errors
+				} else {
+					return nil
+				}
 			}
-			first = false
-			ctx = graphql.WithUnmarshalerMap(ctx, inputUnmarshalMap)
-			data := ec._Query(ctx, rc.Operation.SelectionSet)
 			var buf bytes.Buffer
 			data.MarshalGQL(&buf)
-
-			return &graphql.Response{
-				Data: buf.Bytes(),
+			response.Data = buf.Bytes()
+			if atomic.LoadInt32(&ec.deferred) > 0 {
+				hasNext := atomic.LoadInt32(&ec.pendingDeferred) > 0
+				response.HasNext = &hasNext
 			}
+
+			return &response
 		}
 	case ast.Mutation:
 		return func(ctx context.Context) *graphql.Response {
@@ -1978,6 +1994,28 @@ func (e *executableSchema) Exec(ctx context.Context) graphql.ResponseHandler {
 type executionContext struct {
 	*graphql.OperationContext
 	*executableSchema
+	deferred        int32
+	pendingDeferred int32
+	deferredResults chan graphql.DeferredResult
+}
+
+func (ec *executionContext) processDeferredGroup(dg graphql.DeferredGroup) {
+	atomic.AddInt32(&ec.pendingDeferred, 1)
+	go func() {
+		ctx := graphql.WithFreshResponseContext(dg.Context)
+		dg.FieldSet.Dispatch(ctx)
+		ds := graphql.DeferredResult{
+			Path:   dg.Path,
+			Label:  dg.Label,
+			Result: dg.FieldSet,
+			Errors: graphql.GetErrors(ctx),
+		}
+		// null fields should bubble up
+		if dg.FieldSet.Invalids > 0 {
+			ds.Result = graphql.Null
+		}
+		ec.deferredResults <- ds
+	}()
 }
 
 func (ec *executionContext) introspectSchema() (*introspection.Schema, error) {
@@ -3915,7 +3953,7 @@ func (ec *executionContext) _AccessKey_deleted_at(ctx context.Context, field gra
 	if resTmp == nil {
 		return graphql.Null
 	}
-	res := resTmp.(customTypes.NullTime)
+	res := resTmp.(customtypes.NullTime)
 	fc.Result = res
 	return ec.marshalONullTime2githubᚗcomᚋmrz1836ᚋgoᚑdatastoreᚋcustom_typesᚐNullTime(ctx, field.Selections, res)
 }
@@ -3956,7 +3994,7 @@ func (ec *executionContext) _AccessKey_revoked_at(ctx context.Context, field gra
 	if resTmp == nil {
 		return graphql.Null
 	}
-	res := resTmp.(customTypes.NullTime)
+	res := resTmp.(customtypes.NullTime)
 	fc.Result = res
 	return ec.marshalONullTime2githubᚗcomᚋmrz1836ᚋgoᚑdatastoreᚋcustom_typesᚐNullTime(ctx, field.Selections, res)
 }
@@ -4653,7 +4691,7 @@ func (ec *executionContext) _BlockHeader_synced(ctx context.Context, field graph
 	if resTmp == nil {
 		return graphql.Null
 	}
-	res := resTmp.(customTypes.NullTime)
+	res := resTmp.(customtypes.NullTime)
 	fc.Result = res
 	return ec.marshalONullTime2githubᚗcomᚋmrz1836ᚋgoᚑdatastoreᚋcustom_typesᚐNullTime(ctx, field.Selections, res)
 }
@@ -4776,7 +4814,7 @@ func (ec *executionContext) _BlockHeader_deleted_at(ctx context.Context, field g
 	if resTmp == nil {
 		return graphql.Null
 	}
-	res := resTmp.(customTypes.NullTime)
+	res := resTmp.(customtypes.NullTime)
 	fc.Result = res
 	return ec.marshalONullTime2githubᚗcomᚋmrz1836ᚋgoᚑdatastoreᚋcustom_typesᚐNullTime(ctx, field.Selections, res)
 }
@@ -5268,7 +5306,7 @@ func (ec *executionContext) _Destination_deleted_at(ctx context.Context, field g
 	if resTmp == nil {
 		return graphql.Null
 	}
-	res := resTmp.(customTypes.NullTime)
+	res := resTmp.(customtypes.NullTime)
 	fc.Result = res
 	return ec.marshalONullTime2githubᚗcomᚋmrz1836ᚋgoᚑdatastoreᚋcustom_typesᚐNullTime(ctx, field.Selections, res)
 }
@@ -5700,7 +5738,7 @@ func (ec *executionContext) _DraftTransaction_deleted_at(ctx context.Context, fi
 	if resTmp == nil {
 		return graphql.Null
 	}
-	res := resTmp.(customTypes.NullTime)
+	res := resTmp.(customtypes.NullTime)
 	fc.Result = res
 	return ec.marshalONullTime2githubᚗcomᚋmrz1836ᚋgoᚑdatastoreᚋcustom_typesᚐNullTime(ctx, field.Selections, res)
 }
@@ -7329,7 +7367,7 @@ func (ec *executionContext) _PaymailAddress_deleted_at(ctx context.Context, fiel
 	if resTmp == nil {
 		return graphql.Null
 	}
-	res := resTmp.(customTypes.NullTime)
+	res := resTmp.(customtypes.NullTime)
 	fc.Result = res
 	return ec.marshalONullTime2githubᚗcomᚋmrz1836ᚋgoᚑdatastoreᚋcustom_typesᚐNullTime(ctx, field.Selections, res)
 }
@@ -10810,7 +10848,7 @@ func (ec *executionContext) _Transaction_deleted_at(ctx context.Context, field g
 	if resTmp == nil {
 		return graphql.Null
 	}
-	res := resTmp.(customTypes.NullTime)
+	res := resTmp.(customtypes.NullTime)
 	fc.Result = res
 	return ec.marshalONullTime2githubᚗcomᚋmrz1836ᚋgoᚑdatastoreᚋcustom_typesᚐNullTime(ctx, field.Selections, res)
 }
@@ -11626,7 +11664,7 @@ func (ec *executionContext) _TransactionInput_draft_id(ctx context.Context, fiel
 	if resTmp == nil {
 		return graphql.Null
 	}
-	res := resTmp.(customTypes.NullString)
+	res := resTmp.(customtypes.NullString)
 	fc.Result = res
 	return ec.marshalONullString2githubᚗcomᚋmrz1836ᚋgoᚑdatastoreᚋcustom_typesᚐNullString(ctx, field.Selections, res)
 }
@@ -11667,7 +11705,7 @@ func (ec *executionContext) _TransactionInput_reserved_at(ctx context.Context, f
 	if resTmp == nil {
 		return graphql.Null
 	}
-	res := resTmp.(customTypes.NullTime)
+	res := resTmp.(customtypes.NullTime)
 	fc.Result = res
 	return ec.marshalONullTime2githubᚗcomᚋmrz1836ᚋgoᚑdatastoreᚋcustom_typesᚐNullTime(ctx, field.Selections, res)
 }
@@ -11708,7 +11746,7 @@ func (ec *executionContext) _TransactionInput_spending_tx_id(ctx context.Context
 	if resTmp == nil {
 		return graphql.Null
 	}
-	res := resTmp.(customTypes.NullString)
+	res := resTmp.(customtypes.NullString)
 	fc.Result = res
 	return ec.marshalONullString2githubᚗcomᚋmrz1836ᚋgoᚑdatastoreᚋcustom_typesᚐNullString(ctx, field.Selections, res)
 }
@@ -12344,7 +12382,7 @@ func (ec *executionContext) _Utxo_draft_id(ctx context.Context, field graphql.Co
 	if resTmp == nil {
 		return graphql.Null
 	}
-	res := resTmp.(customTypes.NullString)
+	res := resTmp.(customtypes.NullString)
 	fc.Result = res
 	return ec.marshalONullString2githubᚗcomᚋmrz1836ᚋgoᚑdatastoreᚋcustom_typesᚐNullString(ctx, field.Selections, res)
 }
@@ -12385,7 +12423,7 @@ func (ec *executionContext) _Utxo_reserved_at(ctx context.Context, field graphql
 	if resTmp == nil {
 		return graphql.Null
 	}
-	res := resTmp.(customTypes.NullTime)
+	res := resTmp.(customtypes.NullTime)
 	fc.Result = res
 	return ec.marshalONullTime2githubᚗcomᚋmrz1836ᚋgoᚑdatastoreᚋcustom_typesᚐNullTime(ctx, field.Selections, res)
 }
@@ -12426,7 +12464,7 @@ func (ec *executionContext) _Utxo_spending_tx_id(ctx context.Context, field grap
 	if resTmp == nil {
 		return graphql.Null
 	}
-	res := resTmp.(customTypes.NullString)
+	res := resTmp.(customtypes.NullString)
 	fc.Result = res
 	return ec.marshalONullString2githubᚗcomᚋmrz1836ᚋgoᚑdatastoreᚋcustom_typesᚐNullString(ctx, field.Selections, res)
 }
@@ -12661,7 +12699,7 @@ func (ec *executionContext) _Utxo_deleted_at(ctx context.Context, field graphql.
 	if resTmp == nil {
 		return graphql.Null
 	}
-	res := resTmp.(customTypes.NullTime)
+	res := resTmp.(customtypes.NullTime)
 	fc.Result = res
 	return ec.marshalONullTime2githubᚗcomᚋmrz1836ᚋgoᚑdatastoreᚋcustom_typesᚐNullTime(ctx, field.Selections, res)
 }
@@ -12989,7 +13027,7 @@ func (ec *executionContext) _Xpub_deleted_at(ctx context.Context, field graphql.
 	if resTmp == nil {
 		return graphql.Null
 	}
-	res := resTmp.(customTypes.NullTime)
+	res := resTmp.(customtypes.NullTime)
 	fc.Result = res
 	return ec.marshalONullTime2githubᚗcomᚋmrz1836ᚋgoᚑdatastoreᚋcustom_typesᚐNullTime(ctx, field.Selections, res)
 }
@@ -14798,98 +14836,110 @@ func (ec *executionContext) unmarshalInputDestinationInput(ctx context.Context, 
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
-			it.ID, err = ec.unmarshalOString2string(ctx, v)
+			data, err := ec.unmarshalOString2string(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.ID = data
 		case "xpub_id":
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("xpub_id"))
-			it.XpubID, err = ec.unmarshalOString2string(ctx, v)
+			data, err := ec.unmarshalOString2string(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.XpubID = data
 		case "locking_script":
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("locking_script"))
-			it.LockingScript, err = ec.unmarshalOString2string(ctx, v)
+			data, err := ec.unmarshalOString2string(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.LockingScript = data
 		case "type":
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("type"))
-			it.Type, err = ec.unmarshalOString2string(ctx, v)
+			data, err := ec.unmarshalOString2string(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Type = data
 		case "chain":
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("chain"))
-			it.Chain, err = ec.unmarshalOUint322uint32(ctx, v)
+			data, err := ec.unmarshalOUint322uint32(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Chain = data
 		case "num":
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("num"))
-			it.Num, err = ec.unmarshalOUint322uint32(ctx, v)
+			data, err := ec.unmarshalOUint322uint32(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Num = data
 		case "address":
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("address"))
-			it.Address, err = ec.unmarshalOString2string(ctx, v)
+			data, err := ec.unmarshalOString2string(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Address = data
 		case "draft_id":
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("draft_id"))
-			it.DraftID, err = ec.unmarshalOString2string(ctx, v)
+			data, err := ec.unmarshalOString2string(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.DraftID = data
 		case "metadata":
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("metadata"))
-			it.Metadata, err = ec.unmarshalOMetadata2githubᚗcomᚋBuxOrgᚋbuxᚐMetadata(ctx, v)
+			data, err := ec.unmarshalOMetadata2githubᚗcomᚋBuxOrgᚋbuxᚐMetadata(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Metadata = data
 		case "created_at":
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("created_at"))
-			it.CreatedAt, err = ec.unmarshalOTime2timeᚐTime(ctx, v)
+			data, err := ec.unmarshalOTime2timeᚐTime(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.CreatedAt = data
 		case "updated_at":
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("updated_at"))
-			it.UpdatedAt, err = ec.unmarshalOTime2timeᚐTime(ctx, v)
+			data, err := ec.unmarshalOTime2timeᚐTime(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.UpdatedAt = data
 		case "deleted_at":
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("deleted_at"))
-			it.DeletedAt, err = ec.unmarshalONullTime2githubᚗcomᚋmrz1836ᚋgoᚑdatastoreᚋcustom_typesᚐNullTime(ctx, v)
+			data, err := ec.unmarshalONullTime2githubᚗcomᚋmrz1836ᚋgoᚑdatastoreᚋcustom_typesᚐNullTime(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.DeletedAt = data
 		}
 	}
 
@@ -14914,18 +14964,20 @@ func (ec *executionContext) unmarshalInputFeeUnitInput(ctx context.Context, obj 
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("satoshis"))
-			it.Satoshis, err = ec.unmarshalOInt2int(ctx, v)
+			data, err := ec.unmarshalOInt2int(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Satoshis = data
 		case "bytes":
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("bytes"))
-			it.Bytes, err = ec.unmarshalOInt2int(ctx, v)
+			data, err := ec.unmarshalOInt2int(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Bytes = data
 		}
 	}
 
@@ -14950,34 +15002,38 @@ func (ec *executionContext) unmarshalInputOpReturnInput(ctx context.Context, obj
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("hex"))
-			it.Hex, err = ec.unmarshalOString2string(ctx, v)
+			data, err := ec.unmarshalOString2string(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Hex = data
 		case "hex_parts":
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("hex_parts"))
-			it.HexParts, err = ec.unmarshalOString2ᚕstring(ctx, v)
+			data, err := ec.unmarshalOString2ᚕstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.HexParts = data
 		case "string_parts":
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("string_parts"))
-			it.StringParts, err = ec.unmarshalOString2ᚕstring(ctx, v)
+			data, err := ec.unmarshalOString2ᚕstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.StringParts = data
 		case "map":
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("map"))
-			it.Map, err = ec.unmarshalOOpReturnMapInput2ᚖgithubᚗcomᚋBuxOrgᚋbuxᚐMapProtocol(ctx, v)
+			data, err := ec.unmarshalOOpReturnMapInput2ᚖgithubᚗcomᚋBuxOrgᚋbuxᚐMapProtocol(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Map = data
 		}
 	}
 
@@ -15002,26 +15058,29 @@ func (ec *executionContext) unmarshalInputOpReturnMapInput(ctx context.Context, 
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("app"))
-			it.App, err = ec.unmarshalOString2string(ctx, v)
+			data, err := ec.unmarshalOString2string(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.App = data
 		case "type":
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("type"))
-			it.Type, err = ec.unmarshalOString2string(ctx, v)
+			data, err := ec.unmarshalOString2string(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Type = data
 		case "keys":
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("keys"))
-			it.Keys, err = ec.unmarshalOMap2map(ctx, v)
+			data, err := ec.unmarshalOMap2map(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Keys = data
 		}
 	}
 
@@ -15046,26 +15105,29 @@ func (ec *executionContext) unmarshalInputScriptOutputInput(ctx context.Context,
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("address"))
-			it.Address, err = ec.unmarshalOString2string(ctx, v)
+			data, err := ec.unmarshalOString2string(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Address = data
 		case "satoshis":
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("satoshis"))
-			it.Satoshis, err = ec.unmarshalOUint642uint64(ctx, v)
+			data, err := ec.unmarshalOUint642uint64(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Satoshis = data
 		case "script":
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("script"))
-			it.Script, err = ec.unmarshalOString2string(ctx, v)
+			data, err := ec.unmarshalOString2string(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Script = data
 		}
 	}
 
@@ -15090,34 +15152,38 @@ func (ec *executionContext) unmarshalInputSyncConfigInput(ctx context.Context, o
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("broadcast"))
-			it.Broadcast, err = ec.unmarshalOBoolean2bool(ctx, v)
+			data, err := ec.unmarshalOBoolean2bool(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Broadcast = data
 		case "broadcast_instant":
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("broadcast_instant"))
-			it.BroadcastInstant, err = ec.unmarshalOBoolean2bool(ctx, v)
+			data, err := ec.unmarshalOBoolean2bool(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.BroadcastInstant = data
 		case "paymail_p2p":
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("paymail_p2p"))
-			it.PaymailP2P, err = ec.unmarshalOBoolean2bool(ctx, v)
+			data, err := ec.unmarshalOBoolean2bool(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.PaymailP2P = data
 		case "sync_on_chain":
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("sync_on_chain"))
-			it.SyncOnChain, err = ec.unmarshalOBoolean2bool(ctx, v)
+			data, err := ec.unmarshalOBoolean2bool(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.SyncOnChain = data
 		}
 	}
 
@@ -15142,50 +15208,56 @@ func (ec *executionContext) unmarshalInputTransactionConfigInput(ctx context.Con
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("change_satoshis"))
-			it.ChangeSatoshis, err = ec.unmarshalOUint642uint64(ctx, v)
+			data, err := ec.unmarshalOUint642uint64(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.ChangeSatoshis = data
 		case "change_destinations":
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("change_destinations"))
-			it.ChangeDestinations, err = ec.unmarshalODestinationInput2ᚕᚖgithubᚗcomᚋBuxOrgᚋbuxᚐDestination(ctx, v)
+			data, err := ec.unmarshalODestinationInput2ᚕᚖgithubᚗcomᚋBuxOrgᚋbuxᚐDestination(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.ChangeDestinations = data
 		case "change_destinations_strategy":
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("change_destinations_strategy"))
-			it.ChangeDestinationsStrategy, err = ec.unmarshalOChangeStrategy2githubᚗcomᚋBuxOrgᚋbuxᚐChangeStrategy(ctx, v)
+			data, err := ec.unmarshalOChangeStrategy2githubᚗcomᚋBuxOrgᚋbuxᚐChangeStrategy(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.ChangeDestinationsStrategy = data
 		case "change_number_of_destinations":
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("change_number_of_destinations"))
-			it.ChangeNumberOfDestinations, err = ec.unmarshalOInt2int(ctx, v)
+			data, err := ec.unmarshalOInt2int(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.ChangeNumberOfDestinations = data
 		case "change_minimum_satoshis":
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("change_minimum_satoshis"))
-			it.ChangeMinimumSatoshis, err = ec.unmarshalOUint642uint64(ctx, v)
+			data, err := ec.unmarshalOUint642uint64(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.ChangeMinimumSatoshis = data
 		case "include_utxos":
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("include_utxos"))
-			it.IncludeUtxos, err = ec.unmarshalOUtxoPointer2ᚕᚖgithubᚗcomᚋBuxOrgᚋbuxᚐUtxoPointer(ctx, v)
+			data, err := ec.unmarshalOUtxoPointer2ᚕᚖgithubᚗcomᚋBuxOrgᚋbuxᚐUtxoPointer(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.IncludeUtxos = data
 		case "inputs":
 			var err error
 
@@ -15212,50 +15284,56 @@ func (ec *executionContext) unmarshalInputTransactionConfigInput(ctx context.Con
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("fee"))
-			it.Fee, err = ec.unmarshalOUint642uint64(ctx, v)
+			data, err := ec.unmarshalOUint642uint64(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Fee = data
 		case "fee_unit":
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("fee_unit"))
-			it.FeeUnit, err = ec.unmarshalOFeeUnitInput2ᚖgithubᚗcomᚋBuxOrgᚋbuxᚋutilsᚐFeeUnit(ctx, v)
+			data, err := ec.unmarshalOFeeUnitInput2ᚖgithubᚗcomᚋBuxOrgᚋbuxᚋutilsᚐFeeUnit(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.FeeUnit = data
 		case "from_utxos":
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("from_utxos"))
-			it.FromUtxos, err = ec.unmarshalOUtxoPointer2ᚕᚖgithubᚗcomᚋBuxOrgᚋbuxᚐUtxoPointer(ctx, v)
+			data, err := ec.unmarshalOUtxoPointer2ᚕᚖgithubᚗcomᚋBuxOrgᚋbuxᚐUtxoPointer(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.FromUtxos = data
 		case "outputs":
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("outputs"))
-			it.Outputs, err = ec.unmarshalOTransactionOutputInput2ᚕᚖgithubᚗcomᚋBuxOrgᚋbuxᚐTransactionOutput(ctx, v)
+			data, err := ec.unmarshalOTransactionOutputInput2ᚕᚖgithubᚗcomᚋBuxOrgᚋbuxᚐTransactionOutput(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Outputs = data
 		case "send_all_to":
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("send_all_to"))
-			it.SendAllTo, err = ec.unmarshalOTransactionOutputInput2ᚖgithubᚗcomᚋBuxOrgᚋbuxᚐTransactionOutput(ctx, v)
+			data, err := ec.unmarshalOTransactionOutputInput2ᚖgithubᚗcomᚋBuxOrgᚋbuxᚐTransactionOutput(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.SendAllTo = data
 		case "sync":
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("sync"))
-			it.Sync, err = ec.unmarshalOSyncConfigInput2ᚖgithubᚗcomᚋBuxOrgᚋbuxᚐSyncConfig(ctx, v)
+			data, err := ec.unmarshalOSyncConfigInput2ᚖgithubᚗcomᚋBuxOrgᚋbuxᚐSyncConfig(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Sync = data
 		}
 	}
 
@@ -15280,34 +15358,38 @@ func (ec *executionContext) unmarshalInputTransactionOutputInput(ctx context.Con
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("to"))
-			it.To, err = ec.unmarshalOString2string(ctx, v)
+			data, err := ec.unmarshalOString2string(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.To = data
 		case "satoshis":
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("satoshis"))
-			it.Satoshis, err = ec.unmarshalOUint642uint64(ctx, v)
+			data, err := ec.unmarshalOUint642uint64(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Satoshis = data
 		case "scripts":
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("scripts"))
-			it.Scripts, err = ec.unmarshalOScriptOutputInput2ᚕᚖgithubᚗcomᚋBuxOrgᚋbuxᚐScriptOutput(ctx, v)
+			data, err := ec.unmarshalOScriptOutputInput2ᚕᚖgithubᚗcomᚋBuxOrgᚋbuxᚐScriptOutput(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Scripts = data
 		case "op_return":
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("op_return"))
-			it.OpReturn, err = ec.unmarshalOOpReturnInput2ᚖgithubᚗcomᚋBuxOrgᚋbuxᚐOpReturn(ctx, v)
+			data, err := ec.unmarshalOOpReturnInput2ᚖgithubᚗcomᚋBuxOrgᚋbuxᚐOpReturn(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.OpReturn = data
 		}
 	}
 
@@ -15332,18 +15414,20 @@ func (ec *executionContext) unmarshalInputUtxoPointer(ctx context.Context, obj i
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("transaction_id"))
-			it.TransactionID, err = ec.unmarshalOString2string(ctx, v)
+			data, err := ec.unmarshalOString2string(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.TransactionID = data
 		case "output_index":
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("output_index"))
-			it.OutputIndex, err = ec.unmarshalOUint322uint32(ctx, v)
+			data, err := ec.unmarshalOUint322uint32(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.OutputIndex = data
 		}
 	}
 
@@ -15362,52 +15446,49 @@ var accessKeyImplementors = []string{"AccessKey"}
 
 func (ec *executionContext) _AccessKey(ctx context.Context, sel ast.SelectionSet, obj *bux.AccessKey) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, accessKeyImplementors)
+
 	out := graphql.NewFieldSet(fields)
-	var invalids uint32
+	deferred := make(map[string]*graphql.FieldSet)
 	for i, field := range fields {
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("AccessKey")
 		case "id":
-
 			out.Values[i] = ec._AccessKey_id(ctx, field, obj)
-
 		case "xpub_id":
-
 			out.Values[i] = ec._AccessKey_xpub_id(ctx, field, obj)
-
 		case "key":
-
 			out.Values[i] = ec._AccessKey_key(ctx, field, obj)
-
 		case "metadata":
-
 			out.Values[i] = ec._AccessKey_metadata(ctx, field, obj)
-
 		case "created_at":
-
 			out.Values[i] = ec._AccessKey_created_at(ctx, field, obj)
-
 		case "updated_at":
-
 			out.Values[i] = ec._AccessKey_updated_at(ctx, field, obj)
-
 		case "deleted_at":
-
 			out.Values[i] = ec._AccessKey_deleted_at(ctx, field, obj)
-
 		case "revoked_at":
-
 			out.Values[i] = ec._AccessKey_revoked_at(ctx, field, obj)
-
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
 	}
-	out.Dispatch()
-	if invalids > 0 {
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
 		return graphql.Null
 	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
 	return out
 }
 
@@ -15415,52 +15496,49 @@ var adminStatsImplementors = []string{"AdminStats"}
 
 func (ec *executionContext) _AdminStats(ctx context.Context, sel ast.SelectionSet, obj *bux.AdminStats) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, adminStatsImplementors)
+
 	out := graphql.NewFieldSet(fields)
-	var invalids uint32
+	deferred := make(map[string]*graphql.FieldSet)
 	for i, field := range fields {
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("AdminStats")
 		case "balance":
-
 			out.Values[i] = ec._AdminStats_balance(ctx, field, obj)
-
 		case "destinations":
-
 			out.Values[i] = ec._AdminStats_destinations(ctx, field, obj)
-
 		case "paymail_addresses":
-
 			out.Values[i] = ec._AdminStats_paymail_addresses(ctx, field, obj)
-
 		case "transactions":
-
 			out.Values[i] = ec._AdminStats_transactions(ctx, field, obj)
-
 		case "transactions_per_day":
-
 			out.Values[i] = ec._AdminStats_transactions_per_day(ctx, field, obj)
-
 		case "utxos":
-
 			out.Values[i] = ec._AdminStats_utxos(ctx, field, obj)
-
 		case "utxos_per_type":
-
 			out.Values[i] = ec._AdminStats_utxos_per_type(ctx, field, obj)
-
 		case "xpubs":
-
 			out.Values[i] = ec._AdminStats_xpubs(ctx, field, obj)
-
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
 	}
-	out.Dispatch()
-	if invalids > 0 {
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
 		return graphql.Null
 	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
 	return out
 }
 
@@ -15468,68 +15546,57 @@ var blockHeaderImplementors = []string{"BlockHeader"}
 
 func (ec *executionContext) _BlockHeader(ctx context.Context, sel ast.SelectionSet, obj *bux.BlockHeader) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, blockHeaderImplementors)
+
 	out := graphql.NewFieldSet(fields)
-	var invalids uint32
+	deferred := make(map[string]*graphql.FieldSet)
 	for i, field := range fields {
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("BlockHeader")
 		case "id":
-
 			out.Values[i] = ec._BlockHeader_id(ctx, field, obj)
-
 		case "height":
-
 			out.Values[i] = ec._BlockHeader_height(ctx, field, obj)
-
 		case "time":
-
 			out.Values[i] = ec._BlockHeader_time(ctx, field, obj)
-
 		case "nonce":
-
 			out.Values[i] = ec._BlockHeader_nonce(ctx, field, obj)
-
 		case "version":
-
 			out.Values[i] = ec._BlockHeader_version(ctx, field, obj)
-
 		case "hash_previous_block":
-
 			out.Values[i] = ec._BlockHeader_hash_previous_block(ctx, field, obj)
-
 		case "hash_merkle_root":
-
 			out.Values[i] = ec._BlockHeader_hash_merkle_root(ctx, field, obj)
-
 		case "bits":
-
 			out.Values[i] = ec._BlockHeader_bits(ctx, field, obj)
-
 		case "synced":
-
 			out.Values[i] = ec._BlockHeader_synced(ctx, field, obj)
-
 		case "created_at":
-
 			out.Values[i] = ec._BlockHeader_created_at(ctx, field, obj)
-
 		case "updated_at":
-
 			out.Values[i] = ec._BlockHeader_updated_at(ctx, field, obj)
-
 		case "deleted_at":
-
 			out.Values[i] = ec._BlockHeader_deleted_at(ctx, field, obj)
-
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
 	}
-	out.Dispatch()
-	if invalids > 0 {
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
 		return graphql.Null
 	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
 	return out
 }
 
@@ -15537,68 +15604,57 @@ var destinationImplementors = []string{"Destination"}
 
 func (ec *executionContext) _Destination(ctx context.Context, sel ast.SelectionSet, obj *bux.Destination) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, destinationImplementors)
+
 	out := graphql.NewFieldSet(fields)
-	var invalids uint32
+	deferred := make(map[string]*graphql.FieldSet)
 	for i, field := range fields {
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("Destination")
 		case "id":
-
 			out.Values[i] = ec._Destination_id(ctx, field, obj)
-
 		case "xpub_id":
-
 			out.Values[i] = ec._Destination_xpub_id(ctx, field, obj)
-
 		case "locking_script":
-
 			out.Values[i] = ec._Destination_locking_script(ctx, field, obj)
-
 		case "type":
-
 			out.Values[i] = ec._Destination_type(ctx, field, obj)
-
 		case "chain":
-
 			out.Values[i] = ec._Destination_chain(ctx, field, obj)
-
 		case "num":
-
 			out.Values[i] = ec._Destination_num(ctx, field, obj)
-
 		case "address":
-
 			out.Values[i] = ec._Destination_address(ctx, field, obj)
-
 		case "draft_id":
-
 			out.Values[i] = ec._Destination_draft_id(ctx, field, obj)
-
 		case "metadata":
-
 			out.Values[i] = ec._Destination_metadata(ctx, field, obj)
-
 		case "created_at":
-
 			out.Values[i] = ec._Destination_created_at(ctx, field, obj)
-
 		case "updated_at":
-
 			out.Values[i] = ec._Destination_updated_at(ctx, field, obj)
-
 		case "deleted_at":
-
 			out.Values[i] = ec._Destination_deleted_at(ctx, field, obj)
-
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
 	}
-	out.Dispatch()
-	if invalids > 0 {
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
 		return graphql.Null
 	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
 	return out
 }
 
@@ -15606,60 +15662,53 @@ var draftTransactionImplementors = []string{"DraftTransaction"}
 
 func (ec *executionContext) _DraftTransaction(ctx context.Context, sel ast.SelectionSet, obj *bux.DraftTransaction) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, draftTransactionImplementors)
+
 	out := graphql.NewFieldSet(fields)
-	var invalids uint32
+	deferred := make(map[string]*graphql.FieldSet)
 	for i, field := range fields {
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("DraftTransaction")
 		case "id":
-
 			out.Values[i] = ec._DraftTransaction_id(ctx, field, obj)
-
 		case "xpub_id":
-
 			out.Values[i] = ec._DraftTransaction_xpub_id(ctx, field, obj)
-
 		case "expires_at":
-
 			out.Values[i] = ec._DraftTransaction_expires_at(ctx, field, obj)
-
 		case "configuration":
-
 			out.Values[i] = ec._DraftTransaction_configuration(ctx, field, obj)
-
 		case "status":
-
 			out.Values[i] = ec._DraftTransaction_status(ctx, field, obj)
-
 		case "hex":
-
 			out.Values[i] = ec._DraftTransaction_hex(ctx, field, obj)
-
 		case "metadata":
-
 			out.Values[i] = ec._DraftTransaction_metadata(ctx, field, obj)
-
 		case "created_at":
-
 			out.Values[i] = ec._DraftTransaction_created_at(ctx, field, obj)
-
 		case "updated_at":
-
 			out.Values[i] = ec._DraftTransaction_updated_at(ctx, field, obj)
-
 		case "deleted_at":
-
 			out.Values[i] = ec._DraftTransaction_deleted_at(ctx, field, obj)
-
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
 	}
-	out.Dispatch()
-	if invalids > 0 {
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
 		return graphql.Null
 	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
 	return out
 }
 
@@ -15667,28 +15716,37 @@ var feeUnitImplementors = []string{"FeeUnit"}
 
 func (ec *executionContext) _FeeUnit(ctx context.Context, sel ast.SelectionSet, obj *utils.FeeUnit) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, feeUnitImplementors)
+
 	out := graphql.NewFieldSet(fields)
-	var invalids uint32
+	deferred := make(map[string]*graphql.FieldSet)
 	for i, field := range fields {
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("FeeUnit")
 		case "satoshis":
-
 			out.Values[i] = ec._FeeUnit_satoshis(ctx, field, obj)
-
 		case "bytes":
-
 			out.Values[i] = ec._FeeUnit_bytes(ctx, field, obj)
-
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
 	}
-	out.Dispatch()
-	if invalids > 0 {
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
 		return graphql.Null
 	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
 	return out
 }
 
@@ -15701,7 +15759,7 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 	})
 
 	out := graphql.NewFieldSet(fields)
-	var invalids uint32
+	deferred := make(map[string]*graphql.FieldSet)
 	for i, field := range fields {
 		innerCtx := graphql.WithRootFieldContext(ctx, &graphql.RootFieldContext{
 			Object: field.Name,
@@ -15712,88 +15770,76 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("Mutation")
 		case "xpub":
-
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Mutation_xpub(ctx, field)
 			})
-
 		case "xpub_metadata":
-
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Mutation_xpub_metadata(ctx, field)
 			})
-
 		case "access_key":
-
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Mutation_access_key(ctx, field)
 			})
-
 		case "access_key_revoke":
-
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Mutation_access_key_revoke(ctx, field)
 			})
-
 		case "transaction":
-
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Mutation_transaction(ctx, field)
 			})
-
 		case "transaction_metadata":
-
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Mutation_transaction_metadata(ctx, field)
 			})
-
 		case "new_transaction":
-
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Mutation_new_transaction(ctx, field)
 			})
-
 		case "destination":
-
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Mutation_destination(ctx, field)
 			})
-
 		case "destination_metadata":
-
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Mutation_destination_metadata(ctx, field)
 			})
-
 		case "admin_paymail_create":
-
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Mutation_admin_paymail_create(ctx, field)
 			})
-
 		case "admin_paymail_delete":
-
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Mutation_admin_paymail_delete(ctx, field)
 			})
-
 			if out.Values[i] == graphql.Null {
-				invalids++
+				out.Invalids++
 			}
 		case "admin_transaction":
-
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Mutation_admin_transaction(ctx, field)
 			})
-
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
 	}
-	out.Dispatch()
-	if invalids > 0 {
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
 		return graphql.Null
 	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
 	return out
 }
 
@@ -15801,36 +15847,41 @@ var opReturnImplementors = []string{"OpReturn"}
 
 func (ec *executionContext) _OpReturn(ctx context.Context, sel ast.SelectionSet, obj *bux.OpReturn) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, opReturnImplementors)
+
 	out := graphql.NewFieldSet(fields)
-	var invalids uint32
+	deferred := make(map[string]*graphql.FieldSet)
 	for i, field := range fields {
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("OpReturn")
 		case "hex":
-
 			out.Values[i] = ec._OpReturn_hex(ctx, field, obj)
-
 		case "hex_parts":
-
 			out.Values[i] = ec._OpReturn_hex_parts(ctx, field, obj)
-
 		case "string_parts":
-
 			out.Values[i] = ec._OpReturn_string_parts(ctx, field, obj)
-
 		case "map":
-
 			out.Values[i] = ec._OpReturn_map(ctx, field, obj)
-
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
 	}
-	out.Dispatch()
-	if invalids > 0 {
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
 		return graphql.Null
 	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
 	return out
 }
 
@@ -15838,32 +15889,39 @@ var opReturnMapImplementors = []string{"OpReturnMap"}
 
 func (ec *executionContext) _OpReturnMap(ctx context.Context, sel ast.SelectionSet, obj *bux.MapProtocol) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, opReturnMapImplementors)
+
 	out := graphql.NewFieldSet(fields)
-	var invalids uint32
+	deferred := make(map[string]*graphql.FieldSet)
 	for i, field := range fields {
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("OpReturnMap")
 		case "app":
-
 			out.Values[i] = ec._OpReturnMap_app(ctx, field, obj)
-
 		case "type":
-
 			out.Values[i] = ec._OpReturnMap_type(ctx, field, obj)
-
 		case "keys":
-
 			out.Values[i] = ec._OpReturnMap_keys(ctx, field, obj)
-
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
 	}
-	out.Dispatch()
-	if invalids > 0 {
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
 		return graphql.Null
 	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
 	return out
 }
 
@@ -15871,56 +15929,51 @@ var paymailAddressImplementors = []string{"PaymailAddress"}
 
 func (ec *executionContext) _PaymailAddress(ctx context.Context, sel ast.SelectionSet, obj *bux.PaymailAddress) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, paymailAddressImplementors)
+
 	out := graphql.NewFieldSet(fields)
-	var invalids uint32
+	deferred := make(map[string]*graphql.FieldSet)
 	for i, field := range fields {
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("PaymailAddress")
 		case "id":
-
 			out.Values[i] = ec._PaymailAddress_id(ctx, field, obj)
-
 		case "xpub_id":
-
 			out.Values[i] = ec._PaymailAddress_xpub_id(ctx, field, obj)
-
 		case "alias":
-
 			out.Values[i] = ec._PaymailAddress_alias(ctx, field, obj)
-
 		case "domain":
-
 			out.Values[i] = ec._PaymailAddress_domain(ctx, field, obj)
-
 		case "public_name":
-
 			out.Values[i] = ec._PaymailAddress_public_name(ctx, field, obj)
-
 		case "avatar":
-
 			out.Values[i] = ec._PaymailAddress_avatar(ctx, field, obj)
-
 		case "created_at":
-
 			out.Values[i] = ec._PaymailAddress_created_at(ctx, field, obj)
-
 		case "updated_at":
-
 			out.Values[i] = ec._PaymailAddress_updated_at(ctx, field, obj)
-
 		case "deleted_at":
-
 			out.Values[i] = ec._PaymailAddress_deleted_at(ctx, field, obj)
-
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
 	}
-	out.Dispatch()
-	if invalids > 0 {
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
 		return graphql.Null
 	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
 	return out
 }
 
@@ -15928,52 +15981,49 @@ var paymailP4Implementors = []string{"PaymailP4"}
 
 func (ec *executionContext) _PaymailP4(ctx context.Context, sel ast.SelectionSet, obj *bux.PaymailP4) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, paymailP4Implementors)
+
 	out := graphql.NewFieldSet(fields)
-	var invalids uint32
+	deferred := make(map[string]*graphql.FieldSet)
 	for i, field := range fields {
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("PaymailP4")
 		case "alias":
-
 			out.Values[i] = ec._PaymailP4_alias(ctx, field, obj)
-
 		case "domain":
-
 			out.Values[i] = ec._PaymailP4_domain(ctx, field, obj)
-
 		case "from_paymail":
-
 			out.Values[i] = ec._PaymailP4_from_paymail(ctx, field, obj)
-
 		case "note":
-
 			out.Values[i] = ec._PaymailP4_note(ctx, field, obj)
-
 		case "pub_key":
-
 			out.Values[i] = ec._PaymailP4_pub_key(ctx, field, obj)
-
 		case "receive_endpoint":
-
 			out.Values[i] = ec._PaymailP4_receive_endpoint(ctx, field, obj)
-
 		case "reference_id":
-
 			out.Values[i] = ec._PaymailP4_reference_id(ctx, field, obj)
-
 		case "resolution_type":
-
 			out.Values[i] = ec._PaymailP4_resolution_type(ctx, field, obj)
-
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
 	}
-	out.Dispatch()
-	if invalids > 0 {
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
 		return graphql.Null
 	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
 	return out
 }
 
@@ -15986,7 +16036,7 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 	})
 
 	out := graphql.NewFieldSet(fields)
-	var invalids uint32
+	deferred := make(map[string]*graphql.FieldSet)
 	for i, field := range fields {
 		innerCtx := graphql.WithRootFieldContext(ctx, &graphql.RootFieldContext{
 			Object: field.Name,
@@ -15999,7 +16049,7 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 		case "xpub":
 			field := field
 
-			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
 				defer func() {
 					if r := recover(); r != nil {
 						ec.Error(ctx, ec.Recover(ctx, r))
@@ -16010,16 +16060,15 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 			}
 
 			rrm := func(ctx context.Context) graphql.Marshaler {
-				return ec.OperationContext.RootResolverMiddleware(ctx, innerFunc)
+				return ec.OperationContext.RootResolverMiddleware(ctx,
+					func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
 			}
 
-			out.Concurrently(i, func() graphql.Marshaler {
-				return rrm(innerCtx)
-			})
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
 		case "access_key":
 			field := field
 
-			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
 				defer func() {
 					if r := recover(); r != nil {
 						ec.Error(ctx, ec.Recover(ctx, r))
@@ -16030,16 +16079,15 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 			}
 
 			rrm := func(ctx context.Context) graphql.Marshaler {
-				return ec.OperationContext.RootResolverMiddleware(ctx, innerFunc)
+				return ec.OperationContext.RootResolverMiddleware(ctx,
+					func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
 			}
 
-			out.Concurrently(i, func() graphql.Marshaler {
-				return rrm(innerCtx)
-			})
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
 		case "access_keys":
 			field := field
 
-			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
 				defer func() {
 					if r := recover(); r != nil {
 						ec.Error(ctx, ec.Recover(ctx, r))
@@ -16050,16 +16098,15 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 			}
 
 			rrm := func(ctx context.Context) graphql.Marshaler {
-				return ec.OperationContext.RootResolverMiddleware(ctx, innerFunc)
+				return ec.OperationContext.RootResolverMiddleware(ctx,
+					func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
 			}
 
-			out.Concurrently(i, func() graphql.Marshaler {
-				return rrm(innerCtx)
-			})
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
 		case "access_keys_count":
 			field := field
 
-			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
 				defer func() {
 					if r := recover(); r != nil {
 						ec.Error(ctx, ec.Recover(ctx, r))
@@ -16070,16 +16117,15 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 			}
 
 			rrm := func(ctx context.Context) graphql.Marshaler {
-				return ec.OperationContext.RootResolverMiddleware(ctx, innerFunc)
+				return ec.OperationContext.RootResolverMiddleware(ctx,
+					func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
 			}
 
-			out.Concurrently(i, func() graphql.Marshaler {
-				return rrm(innerCtx)
-			})
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
 		case "transaction":
 			field := field
 
-			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
 				defer func() {
 					if r := recover(); r != nil {
 						ec.Error(ctx, ec.Recover(ctx, r))
@@ -16090,16 +16136,15 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 			}
 
 			rrm := func(ctx context.Context) graphql.Marshaler {
-				return ec.OperationContext.RootResolverMiddleware(ctx, innerFunc)
+				return ec.OperationContext.RootResolverMiddleware(ctx,
+					func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
 			}
 
-			out.Concurrently(i, func() graphql.Marshaler {
-				return rrm(innerCtx)
-			})
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
 		case "transactions":
 			field := field
 
-			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
 				defer func() {
 					if r := recover(); r != nil {
 						ec.Error(ctx, ec.Recover(ctx, r))
@@ -16110,16 +16155,15 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 			}
 
 			rrm := func(ctx context.Context) graphql.Marshaler {
-				return ec.OperationContext.RootResolverMiddleware(ctx, innerFunc)
+				return ec.OperationContext.RootResolverMiddleware(ctx,
+					func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
 			}
 
-			out.Concurrently(i, func() graphql.Marshaler {
-				return rrm(innerCtx)
-			})
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
 		case "transactions_count":
 			field := field
 
-			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
 				defer func() {
 					if r := recover(); r != nil {
 						ec.Error(ctx, ec.Recover(ctx, r))
@@ -16130,16 +16174,15 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 			}
 
 			rrm := func(ctx context.Context) graphql.Marshaler {
-				return ec.OperationContext.RootResolverMiddleware(ctx, innerFunc)
+				return ec.OperationContext.RootResolverMiddleware(ctx,
+					func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
 			}
 
-			out.Concurrently(i, func() graphql.Marshaler {
-				return rrm(innerCtx)
-			})
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
 		case "destination":
 			field := field
 
-			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
 				defer func() {
 					if r := recover(); r != nil {
 						ec.Error(ctx, ec.Recover(ctx, r))
@@ -16150,16 +16193,15 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 			}
 
 			rrm := func(ctx context.Context) graphql.Marshaler {
-				return ec.OperationContext.RootResolverMiddleware(ctx, innerFunc)
+				return ec.OperationContext.RootResolverMiddleware(ctx,
+					func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
 			}
 
-			out.Concurrently(i, func() graphql.Marshaler {
-				return rrm(innerCtx)
-			})
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
 		case "destinations":
 			field := field
 
-			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
 				defer func() {
 					if r := recover(); r != nil {
 						ec.Error(ctx, ec.Recover(ctx, r))
@@ -16170,16 +16212,15 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 			}
 
 			rrm := func(ctx context.Context) graphql.Marshaler {
-				return ec.OperationContext.RootResolverMiddleware(ctx, innerFunc)
+				return ec.OperationContext.RootResolverMiddleware(ctx,
+					func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
 			}
 
-			out.Concurrently(i, func() graphql.Marshaler {
-				return rrm(innerCtx)
-			})
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
 		case "destinations_count":
 			field := field
 
-			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
 				defer func() {
 					if r := recover(); r != nil {
 						ec.Error(ctx, ec.Recover(ctx, r))
@@ -16190,16 +16231,15 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 			}
 
 			rrm := func(ctx context.Context) graphql.Marshaler {
-				return ec.OperationContext.RootResolverMiddleware(ctx, innerFunc)
+				return ec.OperationContext.RootResolverMiddleware(ctx,
+					func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
 			}
 
-			out.Concurrently(i, func() graphql.Marshaler {
-				return rrm(innerCtx)
-			})
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
 		case "utxo":
 			field := field
 
-			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
 				defer func() {
 					if r := recover(); r != nil {
 						ec.Error(ctx, ec.Recover(ctx, r))
@@ -16210,16 +16250,15 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 			}
 
 			rrm := func(ctx context.Context) graphql.Marshaler {
-				return ec.OperationContext.RootResolverMiddleware(ctx, innerFunc)
+				return ec.OperationContext.RootResolverMiddleware(ctx,
+					func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
 			}
 
-			out.Concurrently(i, func() graphql.Marshaler {
-				return rrm(innerCtx)
-			})
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
 		case "utxos":
 			field := field
 
-			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
 				defer func() {
 					if r := recover(); r != nil {
 						ec.Error(ctx, ec.Recover(ctx, r))
@@ -16230,16 +16269,15 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 			}
 
 			rrm := func(ctx context.Context) graphql.Marshaler {
-				return ec.OperationContext.RootResolverMiddleware(ctx, innerFunc)
+				return ec.OperationContext.RootResolverMiddleware(ctx,
+					func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
 			}
 
-			out.Concurrently(i, func() graphql.Marshaler {
-				return rrm(innerCtx)
-			})
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
 		case "utxos_count":
 			field := field
 
-			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
 				defer func() {
 					if r := recover(); r != nil {
 						ec.Error(ctx, ec.Recover(ctx, r))
@@ -16250,16 +16288,15 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 			}
 
 			rrm := func(ctx context.Context) graphql.Marshaler {
-				return ec.OperationContext.RootResolverMiddleware(ctx, innerFunc)
+				return ec.OperationContext.RootResolverMiddleware(ctx,
+					func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
 			}
 
-			out.Concurrently(i, func() graphql.Marshaler {
-				return rrm(innerCtx)
-			})
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
 		case "admin_get_status":
 			field := field
 
-			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
 				defer func() {
 					if r := recover(); r != nil {
 						ec.Error(ctx, ec.Recover(ctx, r))
@@ -16270,16 +16307,15 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 			}
 
 			rrm := func(ctx context.Context) graphql.Marshaler {
-				return ec.OperationContext.RootResolverMiddleware(ctx, innerFunc)
+				return ec.OperationContext.RootResolverMiddleware(ctx,
+					func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
 			}
 
-			out.Concurrently(i, func() graphql.Marshaler {
-				return rrm(innerCtx)
-			})
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
 		case "admin_get_stats":
 			field := field
 
-			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
 				defer func() {
 					if r := recover(); r != nil {
 						ec.Error(ctx, ec.Recover(ctx, r))
@@ -16290,16 +16326,15 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 			}
 
 			rrm := func(ctx context.Context) graphql.Marshaler {
-				return ec.OperationContext.RootResolverMiddleware(ctx, innerFunc)
+				return ec.OperationContext.RootResolverMiddleware(ctx,
+					func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
 			}
 
-			out.Concurrently(i, func() graphql.Marshaler {
-				return rrm(innerCtx)
-			})
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
 		case "admin_access_keys_list":
 			field := field
 
-			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
 				defer func() {
 					if r := recover(); r != nil {
 						ec.Error(ctx, ec.Recover(ctx, r))
@@ -16310,16 +16345,15 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 			}
 
 			rrm := func(ctx context.Context) graphql.Marshaler {
-				return ec.OperationContext.RootResolverMiddleware(ctx, innerFunc)
+				return ec.OperationContext.RootResolverMiddleware(ctx,
+					func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
 			}
 
-			out.Concurrently(i, func() graphql.Marshaler {
-				return rrm(innerCtx)
-			})
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
 		case "admin_access_keys_count":
 			field := field
 
-			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
 				defer func() {
 					if r := recover(); r != nil {
 						ec.Error(ctx, ec.Recover(ctx, r))
@@ -16330,16 +16364,15 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 			}
 
 			rrm := func(ctx context.Context) graphql.Marshaler {
-				return ec.OperationContext.RootResolverMiddleware(ctx, innerFunc)
+				return ec.OperationContext.RootResolverMiddleware(ctx,
+					func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
 			}
 
-			out.Concurrently(i, func() graphql.Marshaler {
-				return rrm(innerCtx)
-			})
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
 		case "admin_block_headers_list":
 			field := field
 
-			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
 				defer func() {
 					if r := recover(); r != nil {
 						ec.Error(ctx, ec.Recover(ctx, r))
@@ -16350,16 +16383,15 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 			}
 
 			rrm := func(ctx context.Context) graphql.Marshaler {
-				return ec.OperationContext.RootResolverMiddleware(ctx, innerFunc)
+				return ec.OperationContext.RootResolverMiddleware(ctx,
+					func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
 			}
 
-			out.Concurrently(i, func() graphql.Marshaler {
-				return rrm(innerCtx)
-			})
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
 		case "admin_block_headers_count":
 			field := field
 
-			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
 				defer func() {
 					if r := recover(); r != nil {
 						ec.Error(ctx, ec.Recover(ctx, r))
@@ -16370,16 +16402,15 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 			}
 
 			rrm := func(ctx context.Context) graphql.Marshaler {
-				return ec.OperationContext.RootResolverMiddleware(ctx, innerFunc)
+				return ec.OperationContext.RootResolverMiddleware(ctx,
+					func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
 			}
 
-			out.Concurrently(i, func() graphql.Marshaler {
-				return rrm(innerCtx)
-			})
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
 		case "admin_destinations_list":
 			field := field
 
-			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
 				defer func() {
 					if r := recover(); r != nil {
 						ec.Error(ctx, ec.Recover(ctx, r))
@@ -16390,16 +16421,15 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 			}
 
 			rrm := func(ctx context.Context) graphql.Marshaler {
-				return ec.OperationContext.RootResolverMiddleware(ctx, innerFunc)
+				return ec.OperationContext.RootResolverMiddleware(ctx,
+					func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
 			}
 
-			out.Concurrently(i, func() graphql.Marshaler {
-				return rrm(innerCtx)
-			})
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
 		case "admin_destinations_count":
 			field := field
 
-			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
 				defer func() {
 					if r := recover(); r != nil {
 						ec.Error(ctx, ec.Recover(ctx, r))
@@ -16410,16 +16440,15 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 			}
 
 			rrm := func(ctx context.Context) graphql.Marshaler {
-				return ec.OperationContext.RootResolverMiddleware(ctx, innerFunc)
+				return ec.OperationContext.RootResolverMiddleware(ctx,
+					func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
 			}
 
-			out.Concurrently(i, func() graphql.Marshaler {
-				return rrm(innerCtx)
-			})
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
 		case "admin_draft_transactions_list":
 			field := field
 
-			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
 				defer func() {
 					if r := recover(); r != nil {
 						ec.Error(ctx, ec.Recover(ctx, r))
@@ -16430,16 +16459,15 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 			}
 
 			rrm := func(ctx context.Context) graphql.Marshaler {
-				return ec.OperationContext.RootResolverMiddleware(ctx, innerFunc)
+				return ec.OperationContext.RootResolverMiddleware(ctx,
+					func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
 			}
 
-			out.Concurrently(i, func() graphql.Marshaler {
-				return rrm(innerCtx)
-			})
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
 		case "admin_draft_transactions_count":
 			field := field
 
-			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
 				defer func() {
 					if r := recover(); r != nil {
 						ec.Error(ctx, ec.Recover(ctx, r))
@@ -16450,16 +16478,15 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 			}
 
 			rrm := func(ctx context.Context) graphql.Marshaler {
-				return ec.OperationContext.RootResolverMiddleware(ctx, innerFunc)
+				return ec.OperationContext.RootResolverMiddleware(ctx,
+					func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
 			}
 
-			out.Concurrently(i, func() graphql.Marshaler {
-				return rrm(innerCtx)
-			})
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
 		case "admin_paymail_get":
 			field := field
 
-			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
 				defer func() {
 					if r := recover(); r != nil {
 						ec.Error(ctx, ec.Recover(ctx, r))
@@ -16470,16 +16497,15 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 			}
 
 			rrm := func(ctx context.Context) graphql.Marshaler {
-				return ec.OperationContext.RootResolverMiddleware(ctx, innerFunc)
+				return ec.OperationContext.RootResolverMiddleware(ctx,
+					func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
 			}
 
-			out.Concurrently(i, func() graphql.Marshaler {
-				return rrm(innerCtx)
-			})
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
 		case "admin_paymail_get_by_xpub_id":
 			field := field
 
-			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
 				defer func() {
 					if r := recover(); r != nil {
 						ec.Error(ctx, ec.Recover(ctx, r))
@@ -16490,16 +16516,15 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 			}
 
 			rrm := func(ctx context.Context) graphql.Marshaler {
-				return ec.OperationContext.RootResolverMiddleware(ctx, innerFunc)
+				return ec.OperationContext.RootResolverMiddleware(ctx,
+					func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
 			}
 
-			out.Concurrently(i, func() graphql.Marshaler {
-				return rrm(innerCtx)
-			})
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
 		case "admin_paymails_list":
 			field := field
 
-			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
 				defer func() {
 					if r := recover(); r != nil {
 						ec.Error(ctx, ec.Recover(ctx, r))
@@ -16510,16 +16535,15 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 			}
 
 			rrm := func(ctx context.Context) graphql.Marshaler {
-				return ec.OperationContext.RootResolverMiddleware(ctx, innerFunc)
+				return ec.OperationContext.RootResolverMiddleware(ctx,
+					func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
 			}
 
-			out.Concurrently(i, func() graphql.Marshaler {
-				return rrm(innerCtx)
-			})
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
 		case "admin_paymails_count":
 			field := field
 
-			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
 				defer func() {
 					if r := recover(); r != nil {
 						ec.Error(ctx, ec.Recover(ctx, r))
@@ -16530,16 +16554,15 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 			}
 
 			rrm := func(ctx context.Context) graphql.Marshaler {
-				return ec.OperationContext.RootResolverMiddleware(ctx, innerFunc)
+				return ec.OperationContext.RootResolverMiddleware(ctx,
+					func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
 			}
 
-			out.Concurrently(i, func() graphql.Marshaler {
-				return rrm(innerCtx)
-			})
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
 		case "admin_transactions_list":
 			field := field
 
-			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
 				defer func() {
 					if r := recover(); r != nil {
 						ec.Error(ctx, ec.Recover(ctx, r))
@@ -16550,16 +16573,15 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 			}
 
 			rrm := func(ctx context.Context) graphql.Marshaler {
-				return ec.OperationContext.RootResolverMiddleware(ctx, innerFunc)
+				return ec.OperationContext.RootResolverMiddleware(ctx,
+					func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
 			}
 
-			out.Concurrently(i, func() graphql.Marshaler {
-				return rrm(innerCtx)
-			})
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
 		case "admin_transactions_count":
 			field := field
 
-			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
 				defer func() {
 					if r := recover(); r != nil {
 						ec.Error(ctx, ec.Recover(ctx, r))
@@ -16570,16 +16592,15 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 			}
 
 			rrm := func(ctx context.Context) graphql.Marshaler {
-				return ec.OperationContext.RootResolverMiddleware(ctx, innerFunc)
+				return ec.OperationContext.RootResolverMiddleware(ctx,
+					func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
 			}
 
-			out.Concurrently(i, func() graphql.Marshaler {
-				return rrm(innerCtx)
-			})
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
 		case "admin_utxos_list":
 			field := field
 
-			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
 				defer func() {
 					if r := recover(); r != nil {
 						ec.Error(ctx, ec.Recover(ctx, r))
@@ -16590,16 +16611,15 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 			}
 
 			rrm := func(ctx context.Context) graphql.Marshaler {
-				return ec.OperationContext.RootResolverMiddleware(ctx, innerFunc)
+				return ec.OperationContext.RootResolverMiddleware(ctx,
+					func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
 			}
 
-			out.Concurrently(i, func() graphql.Marshaler {
-				return rrm(innerCtx)
-			})
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
 		case "admin_utxos_count":
 			field := field
 
-			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
 				defer func() {
 					if r := recover(); r != nil {
 						ec.Error(ctx, ec.Recover(ctx, r))
@@ -16610,16 +16630,15 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 			}
 
 			rrm := func(ctx context.Context) graphql.Marshaler {
-				return ec.OperationContext.RootResolverMiddleware(ctx, innerFunc)
+				return ec.OperationContext.RootResolverMiddleware(ctx,
+					func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
 			}
 
-			out.Concurrently(i, func() graphql.Marshaler {
-				return rrm(innerCtx)
-			})
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
 		case "admin_xpubs_list":
 			field := field
 
-			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
 				defer func() {
 					if r := recover(); r != nil {
 						ec.Error(ctx, ec.Recover(ctx, r))
@@ -16630,16 +16649,15 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 			}
 
 			rrm := func(ctx context.Context) graphql.Marshaler {
-				return ec.OperationContext.RootResolverMiddleware(ctx, innerFunc)
+				return ec.OperationContext.RootResolverMiddleware(ctx,
+					func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
 			}
 
-			out.Concurrently(i, func() graphql.Marshaler {
-				return rrm(innerCtx)
-			})
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
 		case "admin_xpubs_count":
 			field := field
 
-			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
 				defer func() {
 					if r := recover(); r != nil {
 						ec.Error(ctx, ec.Recover(ctx, r))
@@ -16650,32 +16668,39 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 			}
 
 			rrm := func(ctx context.Context) graphql.Marshaler {
-				return ec.OperationContext.RootResolverMiddleware(ctx, innerFunc)
+				return ec.OperationContext.RootResolverMiddleware(ctx,
+					func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
 			}
 
-			out.Concurrently(i, func() graphql.Marshaler {
-				return rrm(innerCtx)
-			})
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
 		case "__type":
-
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Query___type(ctx, field)
 			})
-
 		case "__schema":
-
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Query___schema(ctx, field)
 			})
-
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
 	}
-	out.Dispatch()
-	if invalids > 0 {
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
 		return graphql.Null
 	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
 	return out
 }
 
@@ -16683,32 +16708,39 @@ var scriptOutputImplementors = []string{"ScriptOutput"}
 
 func (ec *executionContext) _ScriptOutput(ctx context.Context, sel ast.SelectionSet, obj *bux.ScriptOutput) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, scriptOutputImplementors)
+
 	out := graphql.NewFieldSet(fields)
-	var invalids uint32
+	deferred := make(map[string]*graphql.FieldSet)
 	for i, field := range fields {
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("ScriptOutput")
 		case "address":
-
 			out.Values[i] = ec._ScriptOutput_address(ctx, field, obj)
-
 		case "satoshis":
-
 			out.Values[i] = ec._ScriptOutput_satoshis(ctx, field, obj)
-
 		case "script":
-
 			out.Values[i] = ec._ScriptOutput_script(ctx, field, obj)
-
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
 	}
-	out.Dispatch()
-	if invalids > 0 {
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
 		return graphql.Null
 	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
 	return out
 }
 
@@ -16716,36 +16748,41 @@ var syncConfigImplementors = []string{"SyncConfig"}
 
 func (ec *executionContext) _SyncConfig(ctx context.Context, sel ast.SelectionSet, obj *bux.SyncConfig) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, syncConfigImplementors)
+
 	out := graphql.NewFieldSet(fields)
-	var invalids uint32
+	deferred := make(map[string]*graphql.FieldSet)
 	for i, field := range fields {
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("SyncConfig")
 		case "broadcast":
-
 			out.Values[i] = ec._SyncConfig_broadcast(ctx, field, obj)
-
 		case "broadcast_instant":
-
 			out.Values[i] = ec._SyncConfig_broadcast_instant(ctx, field, obj)
-
 		case "paymail_p2p":
-
 			out.Values[i] = ec._SyncConfig_paymail_p2p(ctx, field, obj)
-
 		case "sync_on_chain":
-
 			out.Values[i] = ec._SyncConfig_sync_on_chain(ctx, field, obj)
-
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
 	}
-	out.Dispatch()
-	if invalids > 0 {
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
 		return graphql.Null
 	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
 	return out
 }
 
@@ -16753,76 +16790,61 @@ var transactionImplementors = []string{"Transaction"}
 
 func (ec *executionContext) _Transaction(ctx context.Context, sel ast.SelectionSet, obj *bux.Transaction) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, transactionImplementors)
+
 	out := graphql.NewFieldSet(fields)
-	var invalids uint32
+	deferred := make(map[string]*graphql.FieldSet)
 	for i, field := range fields {
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("Transaction")
 		case "id":
-
 			out.Values[i] = ec._Transaction_id(ctx, field, obj)
-
 		case "hex":
-
 			out.Values[i] = ec._Transaction_hex(ctx, field, obj)
-
 		case "block_hash":
-
 			out.Values[i] = ec._Transaction_block_hash(ctx, field, obj)
-
 		case "block_height":
-
 			out.Values[i] = ec._Transaction_block_height(ctx, field, obj)
-
 		case "fee":
-
 			out.Values[i] = ec._Transaction_fee(ctx, field, obj)
-
 		case "number_of_inputs":
-
 			out.Values[i] = ec._Transaction_number_of_inputs(ctx, field, obj)
-
 		case "number_of_outputs":
-
 			out.Values[i] = ec._Transaction_number_of_outputs(ctx, field, obj)
-
 		case "total_value":
-
 			out.Values[i] = ec._Transaction_total_value(ctx, field, obj)
-
 		case "metadata":
-
 			out.Values[i] = ec._Transaction_metadata(ctx, field, obj)
-
 		case "output_value":
-
 			out.Values[i] = ec._Transaction_output_value(ctx, field, obj)
-
 		case "direction":
-
 			out.Values[i] = ec._Transaction_direction(ctx, field, obj)
-
 		case "created_at":
-
 			out.Values[i] = ec._Transaction_created_at(ctx, field, obj)
-
 		case "updated_at":
-
 			out.Values[i] = ec._Transaction_updated_at(ctx, field, obj)
-
 		case "deleted_at":
-
 			out.Values[i] = ec._Transaction_deleted_at(ctx, field, obj)
-
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
 	}
-	out.Dispatch()
-	if invalids > 0 {
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
 		return graphql.Null
 	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
 	return out
 }
 
@@ -16830,60 +16852,53 @@ var transactionConfigImplementors = []string{"TransactionConfig"}
 
 func (ec *executionContext) _TransactionConfig(ctx context.Context, sel ast.SelectionSet, obj *bux.TransactionConfig) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, transactionConfigImplementors)
+
 	out := graphql.NewFieldSet(fields)
-	var invalids uint32
+	deferred := make(map[string]*graphql.FieldSet)
 	for i, field := range fields {
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("TransactionConfig")
 		case "change_destinations":
-
 			out.Values[i] = ec._TransactionConfig_change_destinations(ctx, field, obj)
-
 		case "change_satoshis":
-
 			out.Values[i] = ec._TransactionConfig_change_satoshis(ctx, field, obj)
-
 		case "change_destinations_strategy":
-
 			out.Values[i] = ec._TransactionConfig_change_destinations_strategy(ctx, field, obj)
-
 		case "change_number_of_destinations":
-
 			out.Values[i] = ec._TransactionConfig_change_number_of_destinations(ctx, field, obj)
-
 		case "change_minimum_satoshis":
-
 			out.Values[i] = ec._TransactionConfig_change_minimum_satoshis(ctx, field, obj)
-
 		case "fee_unit":
-
 			out.Values[i] = ec._TransactionConfig_fee_unit(ctx, field, obj)
-
 		case "fee":
-
 			out.Values[i] = ec._TransactionConfig_fee(ctx, field, obj)
-
 		case "inputs":
-
 			out.Values[i] = ec._TransactionConfig_inputs(ctx, field, obj)
-
 		case "outputs":
-
 			out.Values[i] = ec._TransactionConfig_outputs(ctx, field, obj)
-
 		case "sync":
-
 			out.Values[i] = ec._TransactionConfig_sync(ctx, field, obj)
-
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
 	}
-	out.Dispatch()
-	if invalids > 0 {
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
 		return graphql.Null
 	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
 	return out
 }
 
@@ -16891,64 +16906,55 @@ var transactionInputImplementors = []string{"TransactionInput"}
 
 func (ec *executionContext) _TransactionInput(ctx context.Context, sel ast.SelectionSet, obj *bux.TransactionInput) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, transactionInputImplementors)
+
 	out := graphql.NewFieldSet(fields)
-	var invalids uint32
+	deferred := make(map[string]*graphql.FieldSet)
 	for i, field := range fields {
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("TransactionInput")
 		case "id":
-
 			out.Values[i] = ec._TransactionInput_id(ctx, field, obj)
-
 		case "transaction_id":
-
 			out.Values[i] = ec._TransactionInput_transaction_id(ctx, field, obj)
-
 		case "xpub_id":
-
 			out.Values[i] = ec._TransactionInput_xpub_id(ctx, field, obj)
-
 		case "output_index":
-
 			out.Values[i] = ec._TransactionInput_output_index(ctx, field, obj)
-
 		case "satoshis":
-
 			out.Values[i] = ec._TransactionInput_satoshis(ctx, field, obj)
-
 		case "script_pub_key":
-
 			out.Values[i] = ec._TransactionInput_script_pub_key(ctx, field, obj)
-
 		case "type":
-
 			out.Values[i] = ec._TransactionInput_type(ctx, field, obj)
-
 		case "draft_id":
-
 			out.Values[i] = ec._TransactionInput_draft_id(ctx, field, obj)
-
 		case "reserved_at":
-
 			out.Values[i] = ec._TransactionInput_reserved_at(ctx, field, obj)
-
 		case "spending_tx_id":
-
 			out.Values[i] = ec._TransactionInput_spending_tx_id(ctx, field, obj)
-
 		case "destination":
-
 			out.Values[i] = ec._TransactionInput_destination(ctx, field, obj)
-
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
 	}
-	out.Dispatch()
-	if invalids > 0 {
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
 		return graphql.Null
 	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
 	return out
 }
 
@@ -16956,40 +16962,43 @@ var transactionOutputImplementors = []string{"TransactionOutput"}
 
 func (ec *executionContext) _TransactionOutput(ctx context.Context, sel ast.SelectionSet, obj *bux.TransactionOutput) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, transactionOutputImplementors)
+
 	out := graphql.NewFieldSet(fields)
-	var invalids uint32
+	deferred := make(map[string]*graphql.FieldSet)
 	for i, field := range fields {
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("TransactionOutput")
 		case "paymail_p4":
-
 			out.Values[i] = ec._TransactionOutput_paymail_p4(ctx, field, obj)
-
 		case "satoshis":
-
 			out.Values[i] = ec._TransactionOutput_satoshis(ctx, field, obj)
-
 		case "scripts":
-
 			out.Values[i] = ec._TransactionOutput_scripts(ctx, field, obj)
-
 		case "to":
-
 			out.Values[i] = ec._TransactionOutput_to(ctx, field, obj)
-
 		case "op_return":
-
 			out.Values[i] = ec._TransactionOutput_op_return(ctx, field, obj)
-
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
 	}
-	out.Dispatch()
-	if invalids > 0 {
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
 		return graphql.Null
 	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
 	return out
 }
 
@@ -16997,80 +17006,63 @@ var utxoImplementors = []string{"Utxo"}
 
 func (ec *executionContext) _Utxo(ctx context.Context, sel ast.SelectionSet, obj *bux.Utxo) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, utxoImplementors)
+
 	out := graphql.NewFieldSet(fields)
-	var invalids uint32
+	deferred := make(map[string]*graphql.FieldSet)
 	for i, field := range fields {
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("Utxo")
 		case "id":
-
 			out.Values[i] = ec._Utxo_id(ctx, field, obj)
-
 		case "transaction_id":
-
 			out.Values[i] = ec._Utxo_transaction_id(ctx, field, obj)
-
 		case "xpub_id":
-
 			out.Values[i] = ec._Utxo_xpub_id(ctx, field, obj)
-
 		case "output_index":
-
 			out.Values[i] = ec._Utxo_output_index(ctx, field, obj)
-
 		case "satoshis":
-
 			out.Values[i] = ec._Utxo_satoshis(ctx, field, obj)
-
 		case "script_pub_key":
-
 			out.Values[i] = ec._Utxo_script_pub_key(ctx, field, obj)
-
 		case "type":
-
 			out.Values[i] = ec._Utxo_type(ctx, field, obj)
-
 		case "draft_id":
-
 			out.Values[i] = ec._Utxo_draft_id(ctx, field, obj)
-
 		case "reserved_at":
-
 			out.Values[i] = ec._Utxo_reserved_at(ctx, field, obj)
-
 		case "spending_tx_id":
-
 			out.Values[i] = ec._Utxo_spending_tx_id(ctx, field, obj)
-
 		case "metadata":
-
 			out.Values[i] = ec._Utxo_metadata(ctx, field, obj)
-
 		case "transaction":
-
 			out.Values[i] = ec._Utxo_transaction(ctx, field, obj)
-
 		case "created_at":
-
 			out.Values[i] = ec._Utxo_created_at(ctx, field, obj)
-
 		case "updated_at":
-
 			out.Values[i] = ec._Utxo_updated_at(ctx, field, obj)
-
 		case "deleted_at":
-
 			out.Values[i] = ec._Utxo_deleted_at(ctx, field, obj)
-
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
 	}
-	out.Dispatch()
-	if invalids > 0 {
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
 		return graphql.Null
 	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
 	return out
 }
 
@@ -17078,52 +17070,49 @@ var xpubImplementors = []string{"Xpub"}
 
 func (ec *executionContext) _Xpub(ctx context.Context, sel ast.SelectionSet, obj *bux.Xpub) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, xpubImplementors)
+
 	out := graphql.NewFieldSet(fields)
-	var invalids uint32
+	deferred := make(map[string]*graphql.FieldSet)
 	for i, field := range fields {
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("Xpub")
 		case "id":
-
 			out.Values[i] = ec._Xpub_id(ctx, field, obj)
-
 		case "current_balance":
-
 			out.Values[i] = ec._Xpub_current_balance(ctx, field, obj)
-
 		case "next_internal_num":
-
 			out.Values[i] = ec._Xpub_next_internal_num(ctx, field, obj)
-
 		case "next_external_num":
-
 			out.Values[i] = ec._Xpub_next_external_num(ctx, field, obj)
-
 		case "metadata":
-
 			out.Values[i] = ec._Xpub_metadata(ctx, field, obj)
-
 		case "created_at":
-
 			out.Values[i] = ec._Xpub_created_at(ctx, field, obj)
-
 		case "updated_at":
-
 			out.Values[i] = ec._Xpub_updated_at(ctx, field, obj)
-
 		case "deleted_at":
-
 			out.Values[i] = ec._Xpub_deleted_at(ctx, field, obj)
-
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
 	}
-	out.Dispatch()
-	if invalids > 0 {
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
 		return graphql.Null
 	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
 	return out
 }
 
@@ -17131,52 +17120,55 @@ var __DirectiveImplementors = []string{"__Directive"}
 
 func (ec *executionContext) ___Directive(ctx context.Context, sel ast.SelectionSet, obj *introspection.Directive) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, __DirectiveImplementors)
+
 	out := graphql.NewFieldSet(fields)
-	var invalids uint32
+	deferred := make(map[string]*graphql.FieldSet)
 	for i, field := range fields {
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("__Directive")
 		case "name":
-
 			out.Values[i] = ec.___Directive_name(ctx, field, obj)
-
 			if out.Values[i] == graphql.Null {
-				invalids++
+				out.Invalids++
 			}
 		case "description":
-
 			out.Values[i] = ec.___Directive_description(ctx, field, obj)
-
 		case "locations":
-
 			out.Values[i] = ec.___Directive_locations(ctx, field, obj)
-
 			if out.Values[i] == graphql.Null {
-				invalids++
+				out.Invalids++
 			}
 		case "args":
-
 			out.Values[i] = ec.___Directive_args(ctx, field, obj)
-
 			if out.Values[i] == graphql.Null {
-				invalids++
+				out.Invalids++
 			}
 		case "isRepeatable":
-
 			out.Values[i] = ec.___Directive_isRepeatable(ctx, field, obj)
-
 			if out.Values[i] == graphql.Null {
-				invalids++
+				out.Invalids++
 			}
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
 	}
-	out.Dispatch()
-	if invalids > 0 {
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
 		return graphql.Null
 	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
 	return out
 }
 
@@ -17184,42 +17176,47 @@ var __EnumValueImplementors = []string{"__EnumValue"}
 
 func (ec *executionContext) ___EnumValue(ctx context.Context, sel ast.SelectionSet, obj *introspection.EnumValue) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, __EnumValueImplementors)
+
 	out := graphql.NewFieldSet(fields)
-	var invalids uint32
+	deferred := make(map[string]*graphql.FieldSet)
 	for i, field := range fields {
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("__EnumValue")
 		case "name":
-
 			out.Values[i] = ec.___EnumValue_name(ctx, field, obj)
-
 			if out.Values[i] == graphql.Null {
-				invalids++
+				out.Invalids++
 			}
 		case "description":
-
 			out.Values[i] = ec.___EnumValue_description(ctx, field, obj)
-
 		case "isDeprecated":
-
 			out.Values[i] = ec.___EnumValue_isDeprecated(ctx, field, obj)
-
 			if out.Values[i] == graphql.Null {
-				invalids++
+				out.Invalids++
 			}
 		case "deprecationReason":
-
 			out.Values[i] = ec.___EnumValue_deprecationReason(ctx, field, obj)
-
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
 	}
-	out.Dispatch()
-	if invalids > 0 {
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
 		return graphql.Null
 	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
 	return out
 }
 
@@ -17227,56 +17224,57 @@ var __FieldImplementors = []string{"__Field"}
 
 func (ec *executionContext) ___Field(ctx context.Context, sel ast.SelectionSet, obj *introspection.Field) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, __FieldImplementors)
+
 	out := graphql.NewFieldSet(fields)
-	var invalids uint32
+	deferred := make(map[string]*graphql.FieldSet)
 	for i, field := range fields {
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("__Field")
 		case "name":
-
 			out.Values[i] = ec.___Field_name(ctx, field, obj)
-
 			if out.Values[i] == graphql.Null {
-				invalids++
+				out.Invalids++
 			}
 		case "description":
-
 			out.Values[i] = ec.___Field_description(ctx, field, obj)
-
 		case "args":
-
 			out.Values[i] = ec.___Field_args(ctx, field, obj)
-
 			if out.Values[i] == graphql.Null {
-				invalids++
+				out.Invalids++
 			}
 		case "type":
-
 			out.Values[i] = ec.___Field_type(ctx, field, obj)
-
 			if out.Values[i] == graphql.Null {
-				invalids++
+				out.Invalids++
 			}
 		case "isDeprecated":
-
 			out.Values[i] = ec.___Field_isDeprecated(ctx, field, obj)
-
 			if out.Values[i] == graphql.Null {
-				invalids++
+				out.Invalids++
 			}
 		case "deprecationReason":
-
 			out.Values[i] = ec.___Field_deprecationReason(ctx, field, obj)
-
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
 	}
-	out.Dispatch()
-	if invalids > 0 {
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
 		return graphql.Null
 	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
 	return out
 }
 
@@ -17284,42 +17282,47 @@ var __InputValueImplementors = []string{"__InputValue"}
 
 func (ec *executionContext) ___InputValue(ctx context.Context, sel ast.SelectionSet, obj *introspection.InputValue) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, __InputValueImplementors)
+
 	out := graphql.NewFieldSet(fields)
-	var invalids uint32
+	deferred := make(map[string]*graphql.FieldSet)
 	for i, field := range fields {
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("__InputValue")
 		case "name":
-
 			out.Values[i] = ec.___InputValue_name(ctx, field, obj)
-
 			if out.Values[i] == graphql.Null {
-				invalids++
+				out.Invalids++
 			}
 		case "description":
-
 			out.Values[i] = ec.___InputValue_description(ctx, field, obj)
-
 		case "type":
-
 			out.Values[i] = ec.___InputValue_type(ctx, field, obj)
-
 			if out.Values[i] == graphql.Null {
-				invalids++
+				out.Invalids++
 			}
 		case "defaultValue":
-
 			out.Values[i] = ec.___InputValue_defaultValue(ctx, field, obj)
-
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
 	}
-	out.Dispatch()
-	if invalids > 0 {
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
 		return graphql.Null
 	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
 	return out
 }
 
@@ -17327,53 +17330,54 @@ var __SchemaImplementors = []string{"__Schema"}
 
 func (ec *executionContext) ___Schema(ctx context.Context, sel ast.SelectionSet, obj *introspection.Schema) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, __SchemaImplementors)
+
 	out := graphql.NewFieldSet(fields)
-	var invalids uint32
+	deferred := make(map[string]*graphql.FieldSet)
 	for i, field := range fields {
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("__Schema")
 		case "description":
-
 			out.Values[i] = ec.___Schema_description(ctx, field, obj)
-
 		case "types":
-
 			out.Values[i] = ec.___Schema_types(ctx, field, obj)
-
 			if out.Values[i] == graphql.Null {
-				invalids++
+				out.Invalids++
 			}
 		case "queryType":
-
 			out.Values[i] = ec.___Schema_queryType(ctx, field, obj)
-
 			if out.Values[i] == graphql.Null {
-				invalids++
+				out.Invalids++
 			}
 		case "mutationType":
-
 			out.Values[i] = ec.___Schema_mutationType(ctx, field, obj)
-
 		case "subscriptionType":
-
 			out.Values[i] = ec.___Schema_subscriptionType(ctx, field, obj)
-
 		case "directives":
-
 			out.Values[i] = ec.___Schema_directives(ctx, field, obj)
-
 			if out.Values[i] == graphql.Null {
-				invalids++
+				out.Invalids++
 			}
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
 	}
-	out.Dispatch()
-	if invalids > 0 {
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
 		return graphql.Null
 	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
 	return out
 }
 
@@ -17381,63 +17385,56 @@ var __TypeImplementors = []string{"__Type"}
 
 func (ec *executionContext) ___Type(ctx context.Context, sel ast.SelectionSet, obj *introspection.Type) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, __TypeImplementors)
+
 	out := graphql.NewFieldSet(fields)
-	var invalids uint32
+	deferred := make(map[string]*graphql.FieldSet)
 	for i, field := range fields {
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("__Type")
 		case "kind":
-
 			out.Values[i] = ec.___Type_kind(ctx, field, obj)
-
 			if out.Values[i] == graphql.Null {
-				invalids++
+				out.Invalids++
 			}
 		case "name":
-
 			out.Values[i] = ec.___Type_name(ctx, field, obj)
-
 		case "description":
-
 			out.Values[i] = ec.___Type_description(ctx, field, obj)
-
 		case "fields":
-
 			out.Values[i] = ec.___Type_fields(ctx, field, obj)
-
 		case "interfaces":
-
 			out.Values[i] = ec.___Type_interfaces(ctx, field, obj)
-
 		case "possibleTypes":
-
 			out.Values[i] = ec.___Type_possibleTypes(ctx, field, obj)
-
 		case "enumValues":
-
 			out.Values[i] = ec.___Type_enumValues(ctx, field, obj)
-
 		case "inputFields":
-
 			out.Values[i] = ec.___Type_inputFields(ctx, field, obj)
-
 		case "ofType":
-
 			out.Values[i] = ec.___Type_ofType(ctx, field, obj)
-
 		case "specifiedByURL":
-
 			out.Values[i] = ec.___Type_specifiedByURL(ctx, field, obj)
-
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
 	}
-	out.Dispatch()
-	if invalids > 0 {
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
 		return graphql.Null
 	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
 	return out
 }
 
@@ -18163,23 +18160,23 @@ func (ec *executionContext) marshalOMetadata2githubᚗcomᚋBuxOrgᚋbuxᚐMetad
 	return res
 }
 
-func (ec *executionContext) unmarshalONullString2githubᚗcomᚋmrz1836ᚋgoᚑdatastoreᚋcustom_typesᚐNullString(ctx context.Context, v interface{}) (customTypes.NullString, error) {
-	res, err := customTypes.UnmarshalNullString(v)
+func (ec *executionContext) unmarshalONullString2githubᚗcomᚋmrz1836ᚋgoᚑdatastoreᚋcustom_typesᚐNullString(ctx context.Context, v interface{}) (customtypes.NullString, error) {
+	res, err := customtypes.UnmarshalNullString(v)
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) marshalONullString2githubᚗcomᚋmrz1836ᚋgoᚑdatastoreᚋcustom_typesᚐNullString(ctx context.Context, sel ast.SelectionSet, v customTypes.NullString) graphql.Marshaler {
-	res := customTypes.MarshalNullString(v)
+func (ec *executionContext) marshalONullString2githubᚗcomᚋmrz1836ᚋgoᚑdatastoreᚋcustom_typesᚐNullString(ctx context.Context, sel ast.SelectionSet, v customtypes.NullString) graphql.Marshaler {
+	res := customtypes.MarshalNullString(v)
 	return res
 }
 
-func (ec *executionContext) unmarshalONullTime2githubᚗcomᚋmrz1836ᚋgoᚑdatastoreᚋcustom_typesᚐNullTime(ctx context.Context, v interface{}) (customTypes.NullTime, error) {
-	res, err := customTypes.UnmarshalNullTime(v)
+func (ec *executionContext) unmarshalONullTime2githubᚗcomᚋmrz1836ᚋgoᚑdatastoreᚋcustom_typesᚐNullTime(ctx context.Context, v interface{}) (customtypes.NullTime, error) {
+	res, err := customtypes.UnmarshalNullTime(v)
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) marshalONullTime2githubᚗcomᚋmrz1836ᚋgoᚑdatastoreᚋcustom_typesᚐNullTime(ctx context.Context, sel ast.SelectionSet, v customTypes.NullTime) graphql.Marshaler {
-	res := customTypes.MarshalNullTime(v)
+func (ec *executionContext) marshalONullTime2githubᚗcomᚋmrz1836ᚋgoᚑdatastoreᚋcustom_typesᚐNullTime(ctx context.Context, sel ast.SelectionSet, v customtypes.NullTime) graphql.Marshaler {
+	res := customtypes.MarshalNullTime(v)
 	return res
 }
 
