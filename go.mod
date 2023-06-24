@@ -3,15 +3,15 @@ module github.com/BuxOrg/bux-server
 go 1.19
 
 require (
-	github.com/99designs/gqlgen v0.17.33
-	github.com/BuxOrg/bux v0.5.2
+	github.com/99designs/gqlgen v0.17.34
+	github.com/BuxOrg/bux v0.5.3
 	github.com/go-ozzo/ozzo-validation v3.6.0+incompatible
 	github.com/go-redis/redis/v8 v8.11.5
 	github.com/gofrs/uuid v4.4.0+incompatible
 	github.com/julienschmidt/httprouter v1.3.0
 	github.com/mrz1836/go-api-router v0.5.2
 	github.com/mrz1836/go-cachestore v0.2.1
-	github.com/mrz1836/go-datastore v0.4.2
+	github.com/mrz1836/go-datastore v0.4.3
 	github.com/mrz1836/go-logger v0.3.2
 	github.com/mrz1836/go-parameters v0.3.1
 	github.com/mrz1836/go-sanitize v1.3.0
@@ -21,25 +21,16 @@ require (
 	github.com/spf13/viper v1.16.0
 	github.com/stretchr/testify v1.8.4
 	github.com/swaggo/swag v1.16.1
-	github.com/vektah/gqlparser/v2 v2.5.3
+	github.com/vektah/gqlparser/v2 v2.5.4
 )
 
 require (
 	github.com/KyleBanks/depth v1.2.1 // indirect
-	github.com/go-openapi/jsonpointer v0.19.6 // indirect
-	github.com/go-openapi/jsonreference v0.20.2 // indirect
-	github.com/go-openapi/spec v0.20.9 // indirect
-	github.com/go-openapi/swag v0.22.4 // indirect
-	github.com/swaggo/files v1.0.1 // indirect
-	google.golang.org/genproto/googleapis/rpc v0.0.0-20230530153820-e85fd2cbaebc // indirect
-)
-
-require (
 	github.com/agnivade/levenshtein v1.1.1 // indirect
 	github.com/asaskevich/govalidator v0.0.0-20230301143203-a9d515a09cc2 // indirect
-	github.com/bitcoinschema/go-bitcoin/v2 v2.0.3 // indirect
-	github.com/bitcoinschema/go-bpu v0.0.8 // indirect
-	github.com/bitcoinschema/go-map v0.0.17 // indirect
+	github.com/bitcoinschema/go-bitcoin/v2 v2.0.4 // indirect
+	github.com/bitcoinschema/go-bpu v0.1.0 // indirect
+	github.com/bitcoinschema/go-map v0.1.0 // indirect
 	github.com/bitcoinsv/bsvd v0.0.0-20190609155523-4c29707f7173 // indirect
 	github.com/bitcoinsv/bsvutil v0.0.0-20181216182056-1d77cf353ea9 // indirect
 	github.com/bsm/redislock v0.9.3 // indirect
@@ -52,6 +43,10 @@ require (
 	github.com/dgryski/go-farm v0.0.0-20200201041132-a6ae2369ad13 // indirect
 	github.com/dgryski/go-rendezvous v0.0.0-20200823014737-9f7001d12a5f // indirect
 	github.com/fsnotify/fsnotify v1.6.0 // indirect
+	github.com/go-openapi/jsonpointer v0.19.6 // indirect
+	github.com/go-openapi/jsonreference v0.20.2 // indirect
+	github.com/go-openapi/spec v0.20.9 // indirect
+	github.com/go-openapi/swag v0.22.4 // indirect
 	github.com/go-redis/redis_rate/v9 v9.1.2 // indirect
 	github.com/go-resty/resty/v2 v2.7.0 // indirect
 	github.com/go-sql-driver/mysql v1.7.1 // indirect
@@ -65,7 +60,7 @@ require (
 	github.com/gorilla/mux v1.8.0 // indirect
 	github.com/gorilla/websocket v1.5.0 // indirect
 	github.com/hashicorp/golang-lru v0.5.4 // indirect
-	github.com/hashicorp/golang-lru/v2 v2.0.3 // indirect
+	github.com/hashicorp/golang-lru/v2 v2.0.4 // indirect
 	github.com/hashicorp/hcl v1.0.0 // indirect
 	github.com/iancoleman/strcase v0.2.0 // indirect
 	github.com/jackc/pgpassfile v1.0.0 // indirect
@@ -91,7 +86,7 @@ require (
 	github.com/mrz1836/go-cache v0.8.1 // indirect
 	github.com/mrz1836/go-nownodes v0.1.0 // indirect
 	github.com/mrz1836/go-whatsonchain v0.12.2 // indirect
-	github.com/newrelic/go-agent/v3/integrations/nrmongo v1.0.3 // indirect
+	github.com/newrelic/go-agent/v3/integrations/nrmongo v1.1.0 // indirect
 	github.com/pelletier/go-toml/v2 v2.0.8 // indirect
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
@@ -105,12 +100,13 @@ require (
 	github.com/spf13/pflag v1.0.5 // indirect
 	github.com/stretchr/objx v0.5.0 // indirect
 	github.com/subosito/gotenv v1.4.2 // indirect
+	github.com/swaggo/files v1.0.1 // indirect
 	github.com/swaggo/http-swagger v1.3.4
 	github.com/tidwall/gjson v1.14.4 // indirect
 	github.com/tidwall/match v1.1.1 // indirect
 	github.com/tidwall/pretty v1.2.1 // indirect
 	github.com/tonicpow/go-minercraft v0.9.2 // indirect
-	github.com/tonicpow/go-paymail v0.8.4 // indirect
+	github.com/tonicpow/go-paymail v0.9.0 // indirect
 	github.com/tylertreat/BoomFilters v0.0.0-20210315201527-1a82519a3e43 // indirect
 	github.com/ugorji/go/codec v1.2.11 // indirect
 	github.com/valyala/bytebufferpool v1.0.0 // indirect
@@ -121,7 +117,7 @@ require (
 	github.com/xdg-go/scram v1.1.2 // indirect
 	github.com/xdg-go/stringprep v1.0.4 // indirect
 	github.com/youmark/pkcs8 v0.0.0-20201027041543-1326539a0a0a // indirect
-	go.mongodb.org/mongo-driver v1.11.7 // indirect
+	go.mongodb.org/mongo-driver v1.12.0 // indirect
 	golang.org/x/crypto v0.10.0 // indirect
 	golang.org/x/mod v0.11.0 // indirect
 	golang.org/x/net v0.11.0 // indirect
@@ -129,7 +125,8 @@ require (
 	golang.org/x/sys v0.9.0 // indirect
 	golang.org/x/text v0.10.0 // indirect
 	golang.org/x/tools v0.10.0 // indirect
-	google.golang.org/grpc v1.56.0 // indirect
+	google.golang.org/genproto/googleapis/rpc v0.0.0-20230530153820-e85fd2cbaebc // indirect
+	google.golang.org/grpc v1.56.1 // indirect
 	google.golang.org/protobuf v1.30.0 // indirect
 	gopkg.in/ini.v1 v1.67.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
@@ -147,7 +144,7 @@ replace github.com/bsm/redislock => github.com/bsm/redislock v0.7.2
 replace github.com/gomodule/redigo => github.com/gomodule/redigo v1.8.9
 
 // Issue with Ask Nancy on related packages
-replace github.com/dgrijalva/jwt-go => github.com/golang-jwt/jwt/v4 v4.5.0
+// replace github.com/dgrijalva/jwt-go => github.com/golang-jwt/jwt/v4 v4.5.0
 
 // Breaking changes - needs a full refactor in WOC and BUX
 replace github.com/centrifugal/centrifuge-go => github.com/centrifugal/centrifuge-go v0.8.3
@@ -156,4 +153,7 @@ replace github.com/centrifugal/centrifuge-go => github.com/centrifugal/centrifug
 replace github.com/centrifugal/protocol => github.com/centrifugal/protocol v0.9.1
 
 // Bad version of go-bob, failing tests etc
-replace github.com/bitcoinschema/go-bob => github.com/bitcoinschema/go-bob v0.2.1
+// replace github.com/bitcoinschema/go-bob => github.com/bitcoinschema/go-bob v0.2.1
+
+// Issue: go.mongodb.org/mongo-driver/x/bsonx: cannot find module providing package go.mongodb.org/mongo-driver/x/bsonx
+replace go.mongodb.org/mongo-driver => go.mongodb.org/mongo-driver v1.11.7
