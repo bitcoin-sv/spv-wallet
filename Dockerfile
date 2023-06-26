@@ -6,6 +6,8 @@ WORKDIR /go/src/github.com/BuxOrg/bux-server
 
 COPY . ./
 
+ENV CGO_ENABLED=1
+
 # Build binary
 RUN GOOS=linux go build -o bux cmd/server/main.go
 
