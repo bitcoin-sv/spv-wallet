@@ -21,7 +21,7 @@ require (
 	github.com/spf13/viper v1.16.0
 	github.com/stretchr/testify v1.8.4
 	github.com/swaggo/swag v1.16.1
-	github.com/vektah/gqlparser/v2 v2.5.5
+	github.com/vektah/gqlparser/v2 v2.5.6
 )
 
 require (
