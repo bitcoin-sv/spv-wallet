@@ -69,6 +69,7 @@ type (
 		SQLite             *datastore.SQLiteConfig  `json:"sqlite" mapstructure:"sqlite"`
 		TaskManager        *TaskManagerConfig       `json:"task_manager" mapstructure:"task_manager"`
 		WorkingDirectory   string                   `json:"working_directory" mapstructure:"working_directory"`
+		UseMapiFeeQuotes   bool                     `json:"use_mapi_fee_quotes" mapstructure:"use_mapi_fee_quotes"`
 	}
 
 	// AuthenticationConfig is the configuration for Authentication
