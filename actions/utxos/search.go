@@ -5,6 +5,7 @@ import (
 
 	"github.com/BuxOrg/bux"
 	"github.com/BuxOrg/bux-server/actions"
+	"github.com/BuxOrg/bux-server/mappings"
 	"github.com/julienschmidt/httprouter"
 	apirouter "github.com/mrz1836/go-api-router"
 )
@@ -29,7 +30,8 @@ func (a *Action) search(w http.ResponseWriter, req *http.Request, _ httprouter.P
 
 	// Parse the params
 	params := apirouter.GetParams(req)
-	queryParams, metadata, conditions, err := actions.GetQueryParameters(params)
+	queryParams, modelMetadata, conditions, err := actions.GetQueryParameters(params)
+	metadata := mappings.MapToBuxMetadata(modelMetadata)
 	if err != nil {
 		apirouter.ReturnResponse(w, req, http.StatusExpectationFailed, err.Error())
 		return

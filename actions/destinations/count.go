@@ -5,6 +5,7 @@ import (
 
 	"github.com/BuxOrg/bux"
 	"github.com/BuxOrg/bux-server/actions"
+	"github.com/BuxOrg/bux-server/mappings"
 	"github.com/julienschmidt/httprouter"
 	apirouter "github.com/mrz1836/go-api-router"
 )
@@ -25,7 +26,8 @@ func (a *Action) count(w http.ResponseWriter, req *http.Request, _ httprouter.Pa
 
 	// Parse the params
 	params := apirouter.GetParams(req)
-	_, metadata, conditions, err := actions.GetQueryParameters(params)
+	_, metadataModels, conditions, err := actions.GetQueryParameters(params)
+	metadata := mappings.MapToBuxMetadata(metadataModels)
 	if err != nil {
 		apirouter.ReturnResponse(w, req, http.StatusExpectationFailed, err.Error())
 		return

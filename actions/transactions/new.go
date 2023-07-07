@@ -5,6 +5,7 @@ import (
 	"net/http"
 
 	"github.com/BuxOrg/bux"
+	buxmodels "github.com/BuxOrg/bux-models"
 	"github.com/BuxOrg/bux-server/actions"
 	"github.com/julienschmidt/httprouter"
 	apirouter "github.com/mrz1836/go-api-router"
@@ -51,7 +52,7 @@ func (a *Action) newTransaction(w http.ResponseWriter, req *http.Request, _ http
 		return
 	}
 
-	txConfig := bux.TransactionConfig{}
+	txConfig := buxmodels.TransactionConfig{}
 	if err = json.Unmarshal(configBytes, &txConfig); err != nil {
 		apirouter.ReturnResponse(w, req, http.StatusBadRequest, actions.ErrBadTxConfig.Error())
 		return
