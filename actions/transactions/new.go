@@ -7,6 +7,7 @@ import (
 	"github.com/BuxOrg/bux"
 	buxmodels "github.com/BuxOrg/bux-models"
 	"github.com/BuxOrg/bux-server/actions"
+	"github.com/BuxOrg/bux-server/mappings"
 	"github.com/julienschmidt/httprouter"
 	apirouter "github.com/mrz1836/go-api-router"
 )
@@ -52,8 +53,8 @@ func (a *Action) newTransaction(w http.ResponseWriter, req *http.Request, _ http
 		return
 	}
 
-	txConfig := buxmodels.TransactionConfig{}
-	if err = json.Unmarshal(configBytes, &txConfig); err != nil {
+	txContract := buxmodels.TransactionConfig{}
+	if err = json.Unmarshal(configBytes, &txContract); err != nil {
 		apirouter.ReturnResponse(w, req, http.StatusBadRequest, actions.ErrBadTxConfig.Error())
 		return
 	}
@@ -64,18 +65,22 @@ func (a *Action) newTransaction(w http.ResponseWriter, req *http.Request, _ http
 		opts = append(opts, bux.WithMetadatas(metadata))
 	}
 
+	txConfig := mappings.MapToTransactionConfigBux(&txContract)
+
 	// Record a new transaction (get the hex from parameters)
 	var transaction *bux.DraftTransaction
 	if transaction, err = a.Services.Bux.NewTransaction(
 		req.Context(),
 		xPub.RawXpub(),
-		&txConfig,
+		txConfig,
 		opts...,
 	); err != nil {
 		apirouter.ReturnResponse(w, req, http.StatusUnprocessableEntity, err.Error())
 		return
 	}
 
+	contract := mappings.MapToDraftTransactionContract(transaction)
+
 	// Return response
-	apirouter.ReturnResponse(w, req, http.StatusCreated, bux.DisplayModels(transaction))
+	apirouter.ReturnResponse(w, req, http.StatusCreated, bux.DisplayModels(contract))
 }

@@ -18,3 +18,29 @@ func MapToPaymailContract(pa *bux.PaymailAddress) *buxmodels.PaymailAddress {
 		ExternalXpubKey: pa.ExternalXpubKey,
 	}
 }
+
+func MapToPaymailP4Contract(p *bux.PaymailP4) *buxmodels.PaymailP4 {
+	return &buxmodels.PaymailP4{
+		Alias:           p.Alias,
+		Domain:          p.Domain,
+		FromPaymail:     p.FromPaymail,
+		Note:            p.Note,
+		PubKey:          p.PubKey,
+		ReceiveEndpoint: p.ReceiveEndpoint,
+		ReferenceID:     p.ReferenceID,
+		ResolutionType:  p.ResolutionType,
+	}
+}
+
+func MapToPaymailP4Bux(p *buxmodels.PaymailP4) *bux.PaymailP4 {
+	return &bux.PaymailP4{
+		Alias:           p.Alias,
+		Domain:          p.Domain,
+		FromPaymail:     p.FromPaymail,
+		Note:            p.Note,
+		PubKey:          p.PubKey,
+		ReceiveEndpoint: p.ReceiveEndpoint,
+		ReferenceID:     p.ReferenceID,
+		ResolutionType:  p.ResolutionType,
+	}
+}
