@@ -6,6 +6,7 @@ import (
 	"github.com/BuxOrg/bux-server/mappings/common"
 )
 
+// MapToTransactionContract will map the model from bux to the bux-models contract
 func MapToTransactionContract(t *bux.Transaction) *buxmodels.Transaction {
 	return &buxmodels.Transaction{
 		Model:                *common.MapToContract(&t.Model),
@@ -26,6 +27,7 @@ func MapToTransactionContract(t *bux.Transaction) *buxmodels.Transaction {
 	}
 }
 
+// MapToTransactionBux will map the model from bux-models to the bux contract
 func MapToTransactionBux(t *buxmodels.Transaction) *bux.Transaction {
 	return &bux.Transaction{
 		Model:           *common.MapToModel(&t.Model),
@@ -45,6 +47,7 @@ func MapToTransactionBux(t *buxmodels.Transaction) *bux.Transaction {
 	}
 }
 
+// MapToTransactionConfigBux will map the transaction-config model from bux to the bux-models contract
 func MapToTransactionConfigBux(tx *buxmodels.TransactionConfig) *bux.TransactionConfig {
 	destinations := make([]*bux.Destination, 0)
 	for _, destination := range tx.ChangeDestinations {
@@ -89,6 +92,7 @@ func MapToTransactionConfigBux(tx *buxmodels.TransactionConfig) *bux.Transaction
 	}
 }
 
+// MapToTransactionConfigContract will map the transaction-config model from bux-models to the bux contract
 func MapToTransactionConfigContract(tx *bux.TransactionConfig) *buxmodels.TransactionConfig {
 	destinations := make([]*buxmodels.Destination, 0)
 	for _, destination := range tx.ChangeDestinations {
@@ -132,6 +136,7 @@ func MapToTransactionConfigContract(tx *bux.TransactionConfig) *buxmodels.Transa
 	}
 }
 
+// MapToDraftTransactionContract will map the transaction-output model from bux to the bux-models contract
 func MapToDraftTransactionContract(tx *bux.DraftTransaction) *buxmodels.DraftTransaction {
 	return &buxmodels.DraftTransaction{
 		Model:         *common.MapToContract(&tx.Model),
@@ -143,6 +148,7 @@ func MapToDraftTransactionContract(tx *bux.DraftTransaction) *buxmodels.DraftTra
 	}
 }
 
+// MapToTransactionInputContract will map the transaction-output model from bux-models to the bux contract
 func MapToTransactionInputContract(inp *bux.TransactionInput) *buxmodels.TransactionInput {
 	return &buxmodels.TransactionInput{
 		Utxo:        *MapToUtxoContract(&inp.Utxo),
@@ -150,6 +156,7 @@ func MapToTransactionInputContract(inp *bux.TransactionInput) *buxmodels.Transac
 	}
 }
 
+// MapToTransactionInputBux will map the transaction-output model from bux to the bux-models contract
 func MapToTransactionInputBux(inp *buxmodels.TransactionInput) *bux.TransactionInput {
 	return &bux.TransactionInput{
 		Utxo:        *MapToUtxoBux(&inp.Utxo),
@@ -157,6 +164,7 @@ func MapToTransactionInputBux(inp *buxmodels.TransactionInput) *bux.TransactionI
 	}
 }
 
+// MapToTransactionOutputContract will map the transaction-output model from bux to the bux-models contract
 func MapToTransactionOutputContract(out *bux.TransactionOutput) *buxmodels.TransactionOutput {
 	scriptOutputs := make([]*buxmodels.ScriptOutput, 0)
 	for _, scriptOutput := range out.Scripts {
@@ -174,6 +182,7 @@ func MapToTransactionOutputContract(out *bux.TransactionOutput) *buxmodels.Trans
 	}
 }
 
+// MapToTransactionOutputBux will map the transaction-output model from bux-models to the bux contract
 func MapToTransactionOutputBux(out *buxmodels.TransactionOutput) *bux.TransactionOutput {
 	scriptOutputs := make([]*bux.ScriptOutput, 0)
 	for _, scriptOutput := range out.Scripts {
@@ -191,6 +200,7 @@ func MapToTransactionOutputBux(out *buxmodels.TransactionOutput) *bux.Transactio
 	}
 }
 
+// MapToMapProtocolContract will map the transaction-output model from bux to the bux-models contract
 func MapToMapProtocolContract(mp *bux.MapProtocol) *buxmodels.MapProtocol {
 	return &buxmodels.MapProtocol{
 		App:  mp.App,
@@ -199,6 +209,7 @@ func MapToMapProtocolContract(mp *bux.MapProtocol) *buxmodels.MapProtocol {
 	}
 }
 
+// MapToMapProtocolBux will map the transaction-output model from bux-models to the bux contract
 func MapToMapProtocolBux(mp *buxmodels.MapProtocol) *bux.MapProtocol {
 	return &bux.MapProtocol{
 		App:  mp.App,
@@ -207,6 +218,7 @@ func MapToMapProtocolBux(mp *buxmodels.MapProtocol) *bux.MapProtocol {
 	}
 }
 
+// MapToOpReturnContract will map the transaction-output model from bux to the bux-models contract
 func MapToOpReturnContract(op *bux.OpReturn) *buxmodels.OpReturn {
 	return &buxmodels.OpReturn{
 		Hex:         op.Hex,
@@ -216,6 +228,7 @@ func MapToOpReturnContract(op *bux.OpReturn) *buxmodels.OpReturn {
 	}
 }
 
+// MapToOpReturnBux will map the op-return model from bux-models to the bux contract
 func MapToOpReturnBux(op *buxmodels.OpReturn) *bux.OpReturn {
 	return &bux.OpReturn{
 		Hex:         op.Hex,

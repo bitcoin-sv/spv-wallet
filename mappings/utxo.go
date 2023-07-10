@@ -7,6 +7,7 @@ import (
 	customtypes "github.com/mrz1836/go-datastore/custom_types"
 )
 
+// MapToUtxoPointer will map the utxo-pointer model from bux to the bux-models contract
 func MapToUtxoPointer(u *bux.UtxoPointer) *buxmodels.UtxoPointer {
 	return &buxmodels.UtxoPointer{
 		TransactionID: u.TransactionID,
@@ -14,6 +15,7 @@ func MapToUtxoPointer(u *bux.UtxoPointer) *buxmodels.UtxoPointer {
 	}
 }
 
+// MapToUtxoPointerBux will map the utxo-pointer model from bux-models to the bux contract
 func MapToUtxoPointerBux(u *buxmodels.UtxoPointer) *bux.UtxoPointer {
 	return &bux.UtxoPointer{
 		TransactionID: u.TransactionID,
@@ -21,6 +23,7 @@ func MapToUtxoPointerBux(u *buxmodels.UtxoPointer) *bux.UtxoPointer {
 	}
 }
 
+// MapToUtxoContract will map the utxo model from bux to the bux-models contract
 func MapToUtxoContract(u *bux.Utxo) *buxmodels.Utxo {
 	return &buxmodels.Utxo{
 		Model:        *common.MapToContract(&u.Model),
@@ -36,6 +39,7 @@ func MapToUtxoContract(u *bux.Utxo) *buxmodels.Utxo {
 	}
 }
 
+// MapToUtxoBux will map the utxo model from bux-models to the bux contract
 func MapToUtxoBux(u *buxmodels.Utxo) *bux.Utxo {
 	var draftID customtypes.NullString
 	draftID.String = u.DraftID

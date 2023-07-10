@@ -5,6 +5,7 @@ import (
 	buxmodels "github.com/BuxOrg/bux-models"
 )
 
+// MapToAdminStatsContract will map the model from bux to the bux-models contract
 func MapToAdminStatsContract(s *bux.AdminStats) *buxmodels.AdminStats {
 	return &buxmodels.AdminStats{
 		Balance:            s.Balance,

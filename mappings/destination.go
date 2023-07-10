@@ -6,6 +6,7 @@ import (
 	"github.com/BuxOrg/bux-server/mappings/common"
 )
 
+// MapToDestinationContract will map the bux destination model to the bux-models contract
 func MapToDestinationContract(d *bux.Destination) *buxmodels.Destination {
 	return &buxmodels.Destination{
 		Model:         *common.MapToContract(&d.Model),
@@ -21,6 +22,7 @@ func MapToDestinationContract(d *bux.Destination) *buxmodels.Destination {
 	}
 }
 
+// MapToDestinationBux will map the bux-models destination contract to the bux destination model
 func MapToDestinationBux(d *buxmodels.Destination) *bux.Destination {
 	return &bux.Destination{
 		Model:         *common.MapToModel(&d.Model),

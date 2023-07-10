@@ -16,6 +16,7 @@ func MapToContract(m *bux.Model) *common.Model {
 	}
 }
 
+// MapToModel will map the bux-models contract to the common bux model
 func MapToModel(m *common.Model) *bux.Model {
 	return &bux.Model{
 		CreatedAt: m.CreatedAt,

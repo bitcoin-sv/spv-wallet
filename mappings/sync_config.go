@@ -5,6 +5,7 @@ import (
 	buxmodels "github.com/BuxOrg/bux-models"
 )
 
+// MapToSyncConfigContract will map the sync-config model from bux to the bux-models contract
 func MapToSyncConfigContract(sc *bux.SyncConfig) *buxmodels.SyncConfig {
 	return &buxmodels.SyncConfig{
 		Broadcast:        sc.Broadcast,
@@ -14,6 +15,7 @@ func MapToSyncConfigContract(sc *bux.SyncConfig) *buxmodels.SyncConfig {
 	}
 }
 
+// MapToSyncConfigBux will map the sync-config model from bux-models to the bux contract
 func MapToSyncConfigBux(sc *buxmodels.SyncConfig) *bux.SyncConfig {
 	return &bux.SyncConfig{
 		Broadcast:        sc.Broadcast,
