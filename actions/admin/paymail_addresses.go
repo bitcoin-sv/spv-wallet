@@ -5,6 +5,7 @@ import (
 
 	"github.com/BuxOrg/bux"
 	"github.com/BuxOrg/bux-server/actions"
+	"github.com/BuxOrg/bux-server/mappings"
 	"github.com/julienschmidt/httprouter"
 	apirouter "github.com/mrz1836/go-api-router"
 )
@@ -27,7 +28,8 @@ import (
 func (a *Action) paymailAddressesSearch(w http.ResponseWriter, req *http.Request, _ httprouter.Params) {
 	// Parse the params
 	params := apirouter.GetParams(req)
-	queryParams, metadata, conditions, err := actions.GetQueryParameters(params)
+	queryParams, metadataModel, conditions, err := actions.GetQueryParameters(params)
+	metadata := mappings.MapToBuxMetadata(metadataModel)
 	if err != nil {
 		apirouter.ReturnResponse(w, req, http.StatusExpectationFailed, err.Error())
 		return
@@ -62,7 +64,8 @@ func (a *Action) paymailAddressesSearch(w http.ResponseWriter, req *http.Request
 func (a *Action) paymailAddressesCount(w http.ResponseWriter, req *http.Request, _ httprouter.Params) {
 	// Parse the params
 	params := apirouter.GetParams(req)
-	_, metadata, conditions, err := actions.GetQueryParameters(params)
+	_, metadataModel, conditions, err := actions.GetQueryParameters(params)
+	metadata := mappings.MapToBuxMetadata(metadataModel)
 	if err != nil {
 		apirouter.ReturnResponse(w, req, http.StatusExpectationFailed, err.Error())
 		return

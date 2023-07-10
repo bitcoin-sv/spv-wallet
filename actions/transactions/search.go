@@ -4,7 +4,9 @@ import (
 	"net/http"
 
 	"github.com/BuxOrg/bux"
+	buxmodels "github.com/BuxOrg/bux-models"
 	"github.com/BuxOrg/bux-server/actions"
+	"github.com/BuxOrg/bux-server/mappings"
 	"github.com/julienschmidt/httprouter"
 	apirouter "github.com/mrz1836/go-api-router"
 )
@@ -29,7 +31,8 @@ func (a *Action) search(w http.ResponseWriter, req *http.Request, _ httprouter.P
 
 	// Parse the params
 	params := apirouter.GetParams(req)
-	queryParams, metadata, conditions, err := actions.GetQueryParameters(params)
+	queryParams, metadataModel, conditions, err := actions.GetQueryParameters(params)
+	metadata := mappings.MapToBuxMetadata(metadataModel)
 	if err != nil {
 		apirouter.ReturnResponse(w, req, http.StatusExpectationFailed, err.Error())
 		return
@@ -48,6 +51,11 @@ func (a *Action) search(w http.ResponseWriter, req *http.Request, _ httprouter.P
 		return
 	}
 
+	contracts := make([]*buxmodels.Transaction, 0)
+	for _, transaction := range transactions {
+		contracts = append(contracts, mappings.MapToTransactionContract(transaction))
+	}
+
 	// Return response
-	apirouter.ReturnResponse(w, req, http.StatusOK, bux.DisplayModels(transactions))
+	apirouter.ReturnResponse(w, req, http.StatusOK, bux.DisplayModels(contracts))
 }

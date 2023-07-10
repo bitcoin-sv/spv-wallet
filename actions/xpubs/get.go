@@ -4,6 +4,7 @@ import (
 	"net/http"
 
 	"github.com/BuxOrg/bux"
+	"github.com/BuxOrg/bux-server/mappings"
 	"github.com/julienschmidt/httprouter"
 	apirouter "github.com/mrz1836/go-api-router"
 )
@@ -56,6 +57,8 @@ func (a *Action) get(w http.ResponseWriter, req *http.Request, _ httprouter.Para
 		xPub.RemovePrivateData()
 	}
 
+	contract := mappings.MapToXpubContract(xPub)
+
 	// Return response
-	apirouter.ReturnResponse(w, req, http.StatusOK, bux.DisplayModels(xPub))
+	apirouter.ReturnResponse(w, req, http.StatusOK, bux.DisplayModels(contract))
 }

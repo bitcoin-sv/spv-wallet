@@ -5,6 +5,7 @@ import (
 	"net/http"
 
 	"github.com/BuxOrg/bux"
+	"github.com/BuxOrg/bux-server/mappings"
 	"github.com/julienschmidt/httprouter"
 	apirouter "github.com/mrz1836/go-api-router"
 	"github.com/mrz1836/go-datastore"
@@ -48,6 +49,8 @@ func (a *Action) transactionRecord(w http.ResponseWriter, req *http.Request, _ h
 		}
 	}
 
+	contract := mappings.MapToTransactionContract(transaction)
+
 	// Return response
-	apirouter.ReturnResponse(w, req, http.StatusCreated, bux.DisplayModels(transaction))
+	apirouter.ReturnResponse(w, req, http.StatusCreated, bux.DisplayModels(contract))
 }

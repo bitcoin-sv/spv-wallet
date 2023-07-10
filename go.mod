@@ -24,6 +24,8 @@ require (
 	github.com/vektah/gqlparser/v2 v2.5.6
 )
 
+require github.com/BuxOrg/bux-models v0.1.1 // indirect
+
 require (
 	github.com/KyleBanks/depth v1.2.1 // indirect
 	github.com/agnivade/levenshtein v1.1.1 // indirect

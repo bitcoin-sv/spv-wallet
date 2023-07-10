@@ -5,6 +5,7 @@ import (
 
 	"github.com/BuxOrg/bux"
 	"github.com/BuxOrg/bux-server/actions"
+	"github.com/BuxOrg/bux-server/mappings"
 	"github.com/BuxOrg/bux/utils"
 	"github.com/julienschmidt/httprouter"
 	apirouter "github.com/mrz1836/go-api-router"
@@ -72,6 +73,8 @@ func (a *Action) create(w http.ResponseWriter, req *http.Request, _ httprouter.P
 		return
 	}
 
+	contract := mappings.MapToDestinationContract(destination)
+
 	// Return response
-	apirouter.ReturnResponse(w, req, http.StatusCreated, bux.DisplayModels(destination))
+	apirouter.ReturnResponse(w, req, http.StatusCreated, bux.DisplayModels(contract))
 }

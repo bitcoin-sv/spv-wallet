@@ -3,6 +3,7 @@ package admin
 import (
 	"net/http"
 
+	"github.com/BuxOrg/bux-server/mappings"
 	"github.com/julienschmidt/httprouter"
 	apirouter "github.com/mrz1836/go-api-router"
 )
@@ -23,6 +24,8 @@ func (a *Action) stats(w http.ResponseWriter, req *http.Request, _ httprouter.Pa
 		return
 	}
 
+	contract := mappings.MapToAdminStatsContract(stats)
+
 	// Return response
-	apirouter.ReturnResponse(w, req, http.StatusOK, stats)
+	apirouter.ReturnResponse(w, req, http.StatusOK, contract)
 }

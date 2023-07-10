@@ -4,6 +4,7 @@ import (
 	"net/http"
 
 	"github.com/BuxOrg/bux"
+	"github.com/BuxOrg/bux-server/mappings"
 	"github.com/julienschmidt/httprouter"
 	apirouter "github.com/mrz1836/go-api-router"
 )
@@ -45,6 +46,8 @@ func (a *Action) create(w http.ResponseWriter, req *http.Request, _ httprouter.P
 		return
 	}
 
+	contract := mappings.MapToPaymailContract(paymailAddress)
+
 	// Return response
-	apirouter.ReturnResponse(w, req, http.StatusCreated, bux.DisplayModels(paymailAddress))
+	apirouter.ReturnResponse(w, req, http.StatusCreated, bux.DisplayModels(contract))
 }

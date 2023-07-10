@@ -4,7 +4,9 @@ import (
 	"net/http"
 
 	"github.com/BuxOrg/bux"
+	buxmodels "github.com/BuxOrg/bux-models"
 	"github.com/BuxOrg/bux-server/actions"
+	"github.com/BuxOrg/bux-server/mappings"
 	"github.com/julienschmidt/httprouter"
 	apirouter "github.com/mrz1836/go-api-router"
 )
@@ -27,7 +29,8 @@ import (
 func (a *Action) accessKeysSearch(w http.ResponseWriter, req *http.Request, _ httprouter.Params) {
 	// Parse the params
 	params := apirouter.GetParams(req)
-	queryParams, metadata, conditions, err := actions.GetQueryParameters(params)
+	queryParams, metadataModel, conditions, err := actions.GetQueryParameters(params)
+	metadata := mappings.MapToBuxMetadata(metadataModel)
 	if err != nil {
 		apirouter.ReturnResponse(w, req, http.StatusExpectationFailed, err.Error())
 		return
@@ -44,8 +47,13 @@ func (a *Action) accessKeysSearch(w http.ResponseWriter, req *http.Request, _ ht
 		return
 	}
 
+	accessKeyContracts := make([]*buxmodels.AccessKey, 0)
+	for _, accessKey := range accessKeys {
+		accessKeyContracts = append(accessKeyContracts, mappings.MapToAccessKeyContract(accessKey))
+	}
+
 	// Return response
-	apirouter.ReturnResponse(w, req, http.StatusOK, accessKeys)
+	apirouter.ReturnResponse(w, req, http.StatusOK, accessKeyContracts)
 }
 
 // accessKeysCount will count all access keys filtered by metadata
@@ -62,7 +70,8 @@ func (a *Action) accessKeysSearch(w http.ResponseWriter, req *http.Request, _ ht
 func (a *Action) accessKeysCount(w http.ResponseWriter, req *http.Request, _ httprouter.Params) {
 	// Parse the params
 	params := apirouter.GetParams(req)
-	_, metadata, conditions, err := actions.GetQueryParameters(params)
+	_, metadataModel, conditions, err := actions.GetQueryParameters(params)
+	metadata := mappings.MapToBuxMetadata(metadataModel)
 	if err != nil {
 		apirouter.ReturnResponse(w, req, http.StatusExpectationFailed, err.Error())
 		return
