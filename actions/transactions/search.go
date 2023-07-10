@@ -4,6 +4,7 @@ import (
 	"net/http"
 
 	"github.com/BuxOrg/bux"
+	buxmodels "github.com/BuxOrg/bux-models"
 	"github.com/BuxOrg/bux-server/actions"
 	"github.com/BuxOrg/bux-server/mappings"
 	"github.com/julienschmidt/httprouter"
@@ -50,6 +51,11 @@ func (a *Action) search(w http.ResponseWriter, req *http.Request, _ httprouter.P
 		return
 	}
 
+	contracts := make([]*buxmodels.Transaction, 0)
+	for _, transaction := range transactions {
+		contracts = append(contracts, mappings.MapToTransactionContract(transaction))
+	}
+
 	// Return response
-	apirouter.ReturnResponse(w, req, http.StatusOK, bux.DisplayModels(transactions))
+	apirouter.ReturnResponse(w, req, http.StatusOK, bux.DisplayModels(contracts))
 }
