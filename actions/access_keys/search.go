@@ -57,5 +57,5 @@ func (a *Action) search(w http.ResponseWriter, req *http.Request, _ httprouter.P
 	}
 
 	// Return response
-	apirouter.ReturnResponse(w, req, http.StatusOK, bux.DisplayModels(accessKeyContracts))
+	apirouter.ReturnResponse(w, req, http.StatusOK, accessKeyContracts)
 }

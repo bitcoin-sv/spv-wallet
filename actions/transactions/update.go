@@ -49,5 +49,5 @@ func (a *Action) update(w http.ResponseWriter, req *http.Request, _ httprouter.P
 	contract := mappings.MapToTransactionContract(transaction)
 
 	// Return response
-	apirouter.ReturnResponse(w, req, http.StatusOK, bux.DisplayModels(contract))
+	apirouter.ReturnResponse(w, req, http.StatusOK, contract)
 }
