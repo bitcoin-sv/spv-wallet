@@ -7,6 +7,10 @@ import (
 
 // MapToAdminStatsContract will map the model from bux to the bux-models contract
 func MapToAdminStatsContract(s *bux.AdminStats) *buxmodels.AdminStats {
+	if s == nil {
+		return nil
+	}
+
 	return &buxmodels.AdminStats{
 		Balance:            s.Balance,
 		Destinations:       s.Destinations,

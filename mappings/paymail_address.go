@@ -36,6 +36,10 @@ func MapToPaymailP4Contract(p *bux.PaymailP4) *buxmodels.PaymailP4 {
 
 // MapToPaymailP4Bux will map the bux-models paymail-address contract to the bux paymail-address model
 func MapToPaymailP4Bux(p *buxmodels.PaymailP4) *bux.PaymailP4 {
+	if p == nil {
+		return nil
+	}
+
 	return &bux.PaymailP4{
 		Alias:           p.Alias,
 		Domain:          p.Domain,

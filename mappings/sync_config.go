@@ -7,6 +7,10 @@ import (
 
 // MapToSyncConfigContract will map the sync-config model from bux to the bux-models contract
 func MapToSyncConfigContract(sc *bux.SyncConfig) *buxmodels.SyncConfig {
+	if sc == nil {
+		return nil
+	}
+
 	return &buxmodels.SyncConfig{
 		Broadcast:        sc.Broadcast,
 		BroadcastInstant: sc.BroadcastInstant,
@@ -17,6 +21,10 @@ func MapToSyncConfigContract(sc *bux.SyncConfig) *buxmodels.SyncConfig {
 
 // MapToSyncConfigBux will map the sync-config model from bux-models to the bux contract
 func MapToSyncConfigBux(sc *buxmodels.SyncConfig) *bux.SyncConfig {
+	if sc == nil {
+		return nil
+	}
+
 	return &bux.SyncConfig{
 		Broadcast:        sc.Broadcast,
 		BroadcastInstant: sc.BroadcastInstant,

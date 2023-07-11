@@ -9,6 +9,10 @@ import (
 
 // MapToUtxoPointer will map the utxo-pointer model from bux to the bux-models contract
 func MapToUtxoPointer(u *bux.UtxoPointer) *buxmodels.UtxoPointer {
+	if u == nil {
+		return nil
+	}
+
 	return &buxmodels.UtxoPointer{
 		TransactionID: u.TransactionID,
 		OutputIndex:   u.OutputIndex,
@@ -17,6 +21,10 @@ func MapToUtxoPointer(u *bux.UtxoPointer) *buxmodels.UtxoPointer {
 
 // MapToUtxoPointerBux will map the utxo-pointer model from bux-models to the bux contract
 func MapToUtxoPointerBux(u *buxmodels.UtxoPointer) *bux.UtxoPointer {
+	if u == nil {
+		return nil
+	}
+
 	return &bux.UtxoPointer{
 		TransactionID: u.TransactionID,
 		OutputIndex:   u.OutputIndex,
@@ -25,6 +33,10 @@ func MapToUtxoPointerBux(u *buxmodels.UtxoPointer) *bux.UtxoPointer {
 
 // MapToUtxoContract will map the utxo model from bux to the bux-models contract
 func MapToUtxoContract(u *bux.Utxo) *buxmodels.Utxo {
+	if u == nil {
+		return nil
+	}
+
 	return &buxmodels.Utxo{
 		Model:        *common.MapToContract(&u.Model),
 		UtxoPointer:  *MapToUtxoPointer(&u.UtxoPointer),
@@ -41,6 +53,10 @@ func MapToUtxoContract(u *bux.Utxo) *buxmodels.Utxo {
 
 // MapToUtxoBux will map the utxo model from bux-models to the bux contract
 func MapToUtxoBux(u *buxmodels.Utxo) *bux.Utxo {
+	if u == nil {
+		return nil
+	}
+
 	var draftID customtypes.NullString
 	draftID.String = u.DraftID
 
