@@ -19,7 +19,7 @@ import (
 
 // main method starts everything for the BUX Server
 // @title           BUX: Server
-// @version         v0.5.4
+// @version         v0.5.5
 // @securityDefinitions.apikey bux-auth-xpub
 // @in header
 // @name bux-auth-xpub
