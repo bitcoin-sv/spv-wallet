@@ -28,6 +28,10 @@ func MapToDestinationContract(d *bux.Destination) *buxmodels.Destination {
 
 // MapToDestinationBux will map the bux-models destination contract to the bux destination model
 func MapToDestinationBux(d *buxmodels.Destination) *bux.Destination {
+	if d == nil {
+		return nil
+	}
+
 	return &bux.Destination{
 		Model:         *common.MapToModel(&d.Model),
 		ID:            d.ID,
