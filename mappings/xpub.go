@@ -8,6 +8,10 @@ import (
 
 // MapToXpubContract will map the xpub model from bux to the bux-models contract
 func MapToXpubContract(xpub *bux.Xpub) *buxmodels.Xpub {
+	if xpub == nil {
+		return nil
+	}
+
 	return &buxmodels.Xpub{
 		Model:           *common.MapToContract(&xpub.Model),
 		ID:              xpub.ID,

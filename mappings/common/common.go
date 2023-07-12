@@ -8,6 +8,10 @@ import (
 
 // MapToContract will map the common model to the bux-models contract
 func MapToContract(m *bux.Model) *common.Model {
+	if m == nil {
+		return nil
+	}
+
 	return &common.Model{
 		CreatedAt: m.CreatedAt,
 		UpdatedAt: m.UpdatedAt,
@@ -18,6 +22,10 @@ func MapToContract(m *bux.Model) *common.Model {
 
 // MapToModel will map the bux-models contract to the common bux model
 func MapToModel(m *common.Model) *bux.Model {
+	if m == nil {
+		return nil
+	}
+
 	return &bux.Model{
 		CreatedAt: m.CreatedAt,
 		UpdatedAt: m.UpdatedAt,

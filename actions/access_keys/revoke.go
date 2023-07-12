@@ -45,5 +45,5 @@ func (a *Action) revoke(w http.ResponseWriter, req *http.Request, _ httprouter.P
 	contract := mappings.MapToAccessKeyContract(accessKey)
 
 	// Return response
-	apirouter.ReturnResponse(w, req, http.StatusCreated, bux.DisplayModels(contract))
+	apirouter.ReturnResponse(w, req, http.StatusCreated, contract)
 }

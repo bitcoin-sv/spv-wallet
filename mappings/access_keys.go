@@ -9,6 +9,10 @@ import (
 
 // MapToAccessKeyContract will map the access key to the bux-models contract
 func MapToAccessKeyContract(ac *bux.AccessKey) *buxmodels.AccessKey {
+	if ac == nil {
+		return nil
+	}
+
 	return &buxmodels.AccessKey{
 		Model:     *common.MapToContract(&ac.Model),
 		ID:        ac.ID,

@@ -8,6 +8,10 @@ import (
 
 // MapToPaymailContract will map the bux paymail-address model to the bux-models contract
 func MapToPaymailContract(pa *bux.PaymailAddress) *buxmodels.PaymailAddress {
+	if pa == nil {
+		return nil
+	}
+
 	return &buxmodels.PaymailAddress{
 		Model:           *common.MapToContract(&pa.Model),
 		ID:              pa.ID,
@@ -22,6 +26,10 @@ func MapToPaymailContract(pa *bux.PaymailAddress) *buxmodels.PaymailAddress {
 
 // MapToPaymailP4Contract will map the bux-models paymail-address contract to the bux paymail-address model
 func MapToPaymailP4Contract(p *bux.PaymailP4) *buxmodels.PaymailP4 {
+	if p == nil {
+		return nil
+	}
+
 	return &buxmodels.PaymailP4{
 		Alias:           p.Alias,
 		Domain:          p.Domain,
@@ -36,6 +44,10 @@ func MapToPaymailP4Contract(p *bux.PaymailP4) *buxmodels.PaymailP4 {
 
 // MapToPaymailP4Bux will map the bux-models paymail-address contract to the bux paymail-address model
 func MapToPaymailP4Bux(p *buxmodels.PaymailP4) *bux.PaymailP4 {
+	if p == nil {
+		return nil
+	}
+
 	return &bux.PaymailP4{
 		Alias:           p.Alias,
 		Domain:          p.Domain,

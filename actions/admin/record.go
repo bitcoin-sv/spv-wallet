@@ -52,5 +52,5 @@ func (a *Action) transactionRecord(w http.ResponseWriter, req *http.Request, _ h
 	contract := mappings.MapToTransactionContract(transaction)
 
 	// Return response
-	apirouter.ReturnResponse(w, req, http.StatusCreated, bux.DisplayModels(contract))
+	apirouter.ReturnResponse(w, req, http.StatusCreated, contract)
 }

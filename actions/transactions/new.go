@@ -82,5 +82,5 @@ func (a *Action) newTransaction(w http.ResponseWriter, req *http.Request, _ http
 	contract := mappings.MapToDraftTransactionContract(transaction)
 
 	// Return response
-	apirouter.ReturnResponse(w, req, http.StatusCreated, bux.DisplayModels(contract))
+	apirouter.ReturnResponse(w, req, http.StatusCreated, contract)
 }

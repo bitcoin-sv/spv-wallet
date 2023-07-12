@@ -7,6 +7,10 @@ import (
 
 // MapToFeeUnitContract will map the fee-unit model from bux to the bux-models contract
 func MapToFeeUnitContract(fu *utils.FeeUnit) (fc *buxmodels.FeeUnit) {
+	if fu == nil {
+		return nil
+	}
+
 	return &buxmodels.FeeUnit{
 		Satoshis: fu.Satoshis,
 		Bytes:    fu.Bytes,
@@ -15,6 +19,10 @@ func MapToFeeUnitContract(fu *utils.FeeUnit) (fc *buxmodels.FeeUnit) {
 
 // MapToFeeUnitBux will map the fee-unit model from bux-models to the bux contract
 func MapToFeeUnitBux(fu *buxmodels.FeeUnit) (fc *utils.FeeUnit) {
+	if fu == nil {
+		return nil
+	}
+
 	return &utils.FeeUnit{
 		Satoshis: fu.Satoshis,
 		Bytes:    fu.Bytes,

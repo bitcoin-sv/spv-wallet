@@ -58,5 +58,5 @@ func (a *Action) get(w http.ResponseWriter, req *http.Request, _ httprouter.Para
 	contract := mappings.MapToDestinationContract(destination)
 
 	// Return response
-	apirouter.ReturnResponse(w, req, http.StatusOK, bux.DisplayModels(contract))
+	apirouter.ReturnResponse(w, req, http.StatusOK, contract)
 }
