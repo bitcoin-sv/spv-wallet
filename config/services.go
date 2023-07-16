@@ -289,6 +289,11 @@ func (s *AppServices) loadBux(ctx context.Context, appConfig *AppConfig, testMod
 		options = append(options, bux.WithMapiFeeQuotes())
 	}
 
+	// Overrides mApiConfig
+	if appConfig.MAPIConfig != nil {
+		options = append(options, bux.WithOverridenMAPIConfig(appConfig.MAPIConfig))
+	}
+
 	// Create the new client
 	s.Bux, err = bux.NewClient(ctx, options...)
 

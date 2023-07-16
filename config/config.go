@@ -11,6 +11,7 @@ import (
 	"github.com/mrz1836/go-cachestore"
 	"github.com/mrz1836/go-datastore"
 	"github.com/newrelic/go-agent/v3/newrelic"
+	"github.com/tonicpow/go-minercraft"
 )
 
 // Config constants used for optimization and value testing
@@ -70,6 +71,7 @@ type (
 		TaskManager        *TaskManagerConfig       `json:"task_manager" mapstructure:"task_manager"`
 		WorkingDirectory   string                   `json:"working_directory" mapstructure:"working_directory"`
 		UseMapiFeeQuotes   bool                     `json:"use_mapi_fee_quotes" mapstructure:"use_mapi_fee_quotes"`
+		MAPIConfig         []*minercraft.Miner      `json:"custom_mapi_config" mapstructure:"custom_mapi_config"`
 	}
 
 	// AuthenticationConfig is the configuration for Authentication
