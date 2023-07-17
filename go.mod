@@ -3,7 +3,7 @@ module github.com/BuxOrg/bux-server
 go 1.19
 
 require (
-	github.com/99designs/gqlgen v0.17.34
+	github.com/99designs/gqlgen v0.17.35
 	github.com/BuxOrg/bux v0.5.6
 	github.com/BuxOrg/bux-models v0.1.1
 	github.com/go-ozzo/ozzo-validation v3.6.0+incompatible
@@ -22,7 +22,7 @@ require (
 	github.com/spf13/viper v1.16.0
 	github.com/stretchr/testify v1.8.4
 	github.com/swaggo/swag v1.16.1
-	github.com/vektah/gqlparser/v2 v2.5.6
+	github.com/vektah/gqlparser/v2 v2.5.7
 )
 
 require (
