@@ -247,6 +247,14 @@ if [ "$bux_server" == "true" ]; then
     else
         echo -e "\033[0;37mdocker compose up bux-server$reset"
         docker compose up bux-server
+
+        function cleanup {
+            echo -e "\033[0;31mStopping additional services...$reset"
+            docker compose stop
+            echo -e "\033[0;31mExiting program...$reset"
+        }
+
+        trap cleanup EXIT
     fi
 
 else
@@ -254,12 +262,3 @@ else
     echo -e "Additional services are working, remember to start Bux-server manually!$reset"
     exit 1
 fi
-
-
-function cleanup {
-    echo -e "\033[0;31mStopping additional services...$reset"
-    docker compose stop
-    echo -e "\033[0;31mExiting program...$reset"
-}
-
-trap cleanup EXIT
