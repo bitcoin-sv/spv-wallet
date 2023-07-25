@@ -4,7 +4,7 @@ go 1.19
 
 require (
 	github.com/99designs/gqlgen v0.17.35
-	github.com/BuxOrg/bux v0.5.7
+	github.com/BuxOrg/bux v0.5.8
 	github.com/BuxOrg/bux-models v0.1.1
 	github.com/go-ozzo/ozzo-validation v3.6.0+incompatible
 	github.com/go-redis/redis/v8 v8.11.5
@@ -24,6 +24,8 @@ require (
 	github.com/swaggo/swag v1.16.1
 	github.com/vektah/gqlparser/v2 v2.5.8
 )
+
+require github.com/tonicpow/go-minercraft/v2 v2.0.2 // indirect
 
 require (
 	github.com/KyleBanks/depth v1.2.1 // indirect
@@ -106,7 +108,6 @@ require (
 	github.com/tidwall/gjson v1.14.4 // indirect
 	github.com/tidwall/match v1.1.1 // indirect
 	github.com/tidwall/pretty v1.2.1 // indirect
-	github.com/tonicpow/go-minercraft v0.9.2 // indirect
 	github.com/tonicpow/go-paymail v0.9.0 // indirect
 	github.com/tylertreat/BoomFilters v0.0.0-20210315201527-1a82519a3e43 // indirect
 	github.com/ugorji/go/codec v1.2.11 // indirect
