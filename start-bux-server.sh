@@ -1,6 +1,45 @@
 #!/bin/bash
 
 reset='\033[0m'
+choice=''
+
+function ask_for_choice() {
+    local prompt="$1"
+    local options=("${@:2}")
+
+    echo -e "$prompt"
+    for (( i = 0; i < ${#options[@]}; i++ )); do
+        echo "$((i+1)). ${options[i]}"
+    done
+
+
+    read -p "> " choice
+
+    while ! [[ "$choice" =~ ^[0-9]+$ ]] || (( choice < 1 || choice > ${#options[@]} )); do
+        echo -e "\033[0;31mInvalid choice! Please select a valid option.$reset"
+        read -p "> " choice
+    done
+}
+
+function ask_for_yes_or_no() {
+    local prompt="$1"
+    echo -e "$prompt"
+
+    local response
+    read -p "(y/n)> " response
+
+    while ! [[ "$response" =~ ^(yes|no|y|n)$ ]]; do
+        echo -e "\033[0;31mInvalid response! Please enter 'yes' or 'no'.$reset"
+        read -p "> " response
+    done
+
+    if [[ "$response" =~ ^(yes|y)$ ]]; then
+        choice="true"
+    else
+        choice="false"
+    fi
+}
+
 
 # Welcome message
 echo -e "\033[0;33m\033[1mWelcome in Bux Server!$reset"
@@ -95,65 +134,51 @@ if [ "$load_config" == "true" ]; then
 fi
 
 if [ "$database" == "" ]; then
-    # Ask for database choice
-    echo -e "\033[1mSelect your database: $reset"
-    echo "1. postgresql"
-    echo "2. mongodb"
-    echo "3. sqlite"
-    echo -e "\033[4mAny other number ends the program $reset"
-    read -p "> " database_choice
+    database_options=("postgresql" "mongodb" "sqlite")
+    ask_for_choice "\033[1mSelect your database: $reset" "${database_options[@]}"
 
-    # Validate database choice
-    case $database_choice in
+    case $choice in
         1) database="postgresql";;
         2) database="mongodb";;
         3) database="sqlite";;
-        *) echo -e "\033[0;31mExiting program...$reset"; exit 1;;
     esac
 fi
 
 if [ "$cache" == "" ]; then
-    # Ask for cache storage choice
-    echo -e "\033[1mSelect your cache storage:$reset"
-    echo "1. freecache"
-    echo "2. redis"
-    echo -e "\033[4mAny other number ends the program $reset"
-    read -p "> " cache_storage_choice
+    cache_options=("freecache" "redis")
+    ask_for_choice "\033[1mSelect your cache storage:$reset" "${cache_options[@]}"
 
-    # Validate cache storage choice
-    case $cache_storage_choice in
+    case $choice in
         1) cache="freecache";;
         2) cache="redis";;
-        *) echo -e "\033[0;31mExiting program...$reset"; exit 1;;
     esac
 fi
 
 if [ "$load_config" != "true" ]; then
-# Create the .env.config file
-echo -e "\033[0;32mCreating .env.config file...$reset"
-cat << EOF > .env.config
+    # Create the .env.config file
+    echo -e "\033[0;32mCreating .env.config file...$reset"
+    cat << EOF > .env.config
 BUX_CACHE__ENGINE="$cache"
 BUX_DATASTORE__ENGINE="$database"
 EOF
 
-# Add additional settings to .env.config file based on the selected database
-if [ "$database" == "postgresql" ]; then
-    echo 'BUX_SQL__HOST="bux-postgresql"' >> .env.config
-    echo 'BUX_SQL__NAME="postgres"' >> .env.config
-    echo 'BUX_SQL__USER="postgres"' >> .env.config
-    echo 'BUX_SQL__PASSWORD="postgres"' >> .env.config
-fi
+    # Add additional settings to .env.config file based on the selected database
+    if [ "$database" == "postgresql" ]; then
+        echo 'BUX_SQL__HOST="bux-postgresql"' >> .env.config
+        echo 'BUX_SQL__NAME="postgres"' >> .env.config
+        echo 'BUX_SQL__USER="postgres"' >> .env.config
+        echo 'BUX_SQL__PASSWORD="postgres"' >> .env.config
+    fi
 
-# Add additional settings to .env.config file based on the selected database
-if [ "$database" == "mongodb" ]; then
-    echo 'BUX_MONGODB__URI="mongodb://mongo:mongo@bux-mongodb:27017/"' >> .env.config
-fi
+    # Add additional settings to .env.config file based on the selected database
+    if [ "$database" == "mongodb" ]; then
+        echo 'BUX_MONGODB__URI="mongodb://mongo:mongo@bux-mongodb:27017/"' >> .env.config
+    fi
 
-# Add additional settings to .env.config file based on the selected cache storage
-if [ "$cache" == "redis" ]; then
-    echo 'BUX_REDIS__URL="redis://redis:6379"' >> .env.config
-fi
-
+    # Add additional settings to .env.config file based on the selected cache storage
+    if [ "$cache" == "redis" ]; then
+        echo 'BUX_REDIS__URL="redis://redis:6379"' >> .env.config
+    fi
 fi
 
 echo -e "\033[0;32mStarting additional services with docker-compose...$reset"
@@ -166,19 +191,8 @@ else
 fi
 
 if [ "$bux_server" == "" ]; then
-    # Ask for bux-server choice
-    echo -e "\033[1mDo you want to run Bux-server?$reset"
-    echo "1. YES"
-    echo "2. NO"
-    echo -e "\033[4mAny other number ends the program $reset"
-    read -p "> " bux_server_choice
-
-    # Validate bux-server choice
-    case $bux_server_choice in
-        1) bux_server="true";;
-        2) bux_server="false";;
-        *) echo -e "\033[0;31mExiting program... Stopping additional services... $reset"; docker compose stop; exit 1;;
-    esac
+    ask_for_yes_or_no "\033[1mDo you want to run Bux-server?$reset"
+    bux_server=$choice
 fi
 
 if [ "$load_config" != "true" ]; then
@@ -187,20 +201,13 @@ fi
 
 if [ "$bux_server" == "true" ]; then
     if [ "$environment" == "" ]; then
-        # Ask for environment choice
-        echo -e "\033[1mSelect your environment:$reset"
-        echo "1. development"
-        echo "2. staging"
-        echo "3. production"
-        echo -e "\033[4mAny other number ends the program $reset"
-        read -p "> " environment_choice
+        environment_options=("development" "staging" "production")
+        ask_for_choice "\033[1mSelect your environment:$reset" "${environment_options[@]}"
 
-        # Validate environment choice
-        case $environment_choice in
+        case $choice in
             1) environment="development";;
             2) environment="staging";;
             3) environment="production";;
-            *) echo -e "\033[0;31mExiting program... Stopping additional services... $reset"; docker compose stop; exit 1;;
         esac
     fi
 
@@ -218,21 +225,9 @@ if [ "$bux_server" == "true" ]; then
     fi
 
     if [ "$background" == "" ]; then
-        # Ask for background choice
-        echo -e "\033[1mDo you want to run Bux-server in background? $reset"
-        echo "1. YES"
-        echo "2. NO"
-        echo -e "\033[4mAny other number ends the program $reset"
-        read -p "> " background_choice
-
-        # Validate background choice
-        case $background_choice in
-            1) background="true";;
-            2) background="false";;
-            *) echo -e "\033[0;31mExiting program... Stopping additional services... $reset"; docker compose stop; exit 1;;
-        esac
+        ask_for_yes_or_no "\033[1mDo you want to run Bux-server in background?$reset"
+        background=$choice
     fi
-
 
     if [ "$load_config" != "true" ]; then
         echo "BUX_ENVIRONMENT=\"$environment\"" >> .env.config
