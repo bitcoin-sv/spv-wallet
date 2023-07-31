@@ -267,22 +267,49 @@ Checkout the docker compose quickstart below for a quick way to get started.
 
 ## Docker Compose Quickstart
 
-To get started with development, `bux-server` provides a `docker-compose.yml`
-file which starts up Bux Server with Redis and PostgreSQL. To start, we need to
-tweak the `config/envs/development.json` file with the proper configuration.
-First:
+To get started with development, `bux-server` provides a `start-bux-server.sh` script
+which is using `docker-compose.yml` file to starts up Bux Server with selected database
+and cache storage. To start, we need to fill the config json which we want to use,
+for example: `config/envs/development.json`.
 
-```
-$ cp config/envs/docker-compose.json config/envs/development.json
-```
+Main configuration is done when running the script.
 
-Then, we need to update the `admin_key` with your xpub. Modify
-`config/envs/development.json` with your admin key. Now we can start the
-containers:
+There are two way of running this script:
+1. with manual configuration - Every option is displayed in terminal and user can choose
+   which database/cache storage use and configure how to run bux-server.
+  ```bash
+  ./start-bux-server.sh
+  ```
+2. with flags which define how to set up docker services. Ever option is displayed when
+   you ran the script with flag `-h` or `--help`. Possible options:
 
-```
-$ docker-compose up
-```
+  ```bash
+  ./start-bux-server.sh --help
+
+  Welcome in Bux Server!
+  Usage: ./start-bux-server.sh [OPTIONS]
+
+  This script helps you to run Bux server with your preferred database and cache storage.
+
+  Options:
+
+  -db,  --database       Define database - postgresql, mongodb, sqlite
+  -c,   --cache          Define cache storage - freecache(in-memory), redis
+  -bs,  --bux-server     Whether the bux-server should be run - true/false
+  -env, --environment    Define bux-server environment - development/staging/production
+  -b,   --background     Whether the bux-server should be run in background - true/false
+  -x,   --xpub           Define admin xPub
+  -l,   --load           Load .env.config file and run bux-server with its settings
+  ```
+
+  ```bash
+  ./start-bux-server.sh -db postgresql -c redis -bs true -env development -b false 
+  ```
+
+`-l/--load` option add possibility to use previously created `.env.config` file and run bux-server with simple command:
+  ```bash
+  ./start-bux-server.sh -l
+  ```
 
 ## Contributing
 
