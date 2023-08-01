@@ -286,7 +286,7 @@ func (s *AppServices) loadBux(ctx context.Context, appConfig *AppConfig, testMod
 	}
 
 	if appConfig.UseMapiFeeQuotes {
-		options = append(options, bux.WithMapiFeeQuotes())
+		options = append(options, bux.WithMAPI())
 	}
 
 	// Create the new client
