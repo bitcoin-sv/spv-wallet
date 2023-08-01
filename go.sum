@@ -341,8 +341,8 @@ github.com/mrz1836/go-validate v0.2.0/go.mod h1:IoGAb4rTAL6KgAxOiWL4ICwLqxGbKCKT
 github.com/mrz1836/go-whatsonchain v0.12.2 h1:aqqBK4Oi4TOB5kTSsNElKJhOUOKbs8X0J1zgM9yVO5E=
 github.com/mrz1836/go-whatsonchain v0.12.2/go.mod h1:tkHmnUDVCLCgitHrmtjW1u8RBHGDK01sQYBiJze4rfQ=
 github.com/newrelic/go-agent/v3 v3.0.0/go.mod h1:H28zDNUC0U/b7kLoY4EFOhuth10Xu/9dchozUiOseQQ=
-github.com/newrelic/go-agent/v3 v3.23.1 h1:n4CK4EEod2A47T74wQFztavh9g3wHxxmlndj53ksbVg=
-github.com/newrelic/go-agent/v3 v3.23.1/go.mod h1:dG7Q7yLUrqOo7SYVJADVDN9+P8c/87xp9axldPxmdHM=
+github.com/newrelic/go-agent/v3 v3.24.0 h1:DPfbd+p0akRjv6UpWzWJl+pfOMSs+QkAeNRUp0fPLZI=
+github.com/newrelic/go-agent/v3 v3.24.0/go.mod h1:7GnP0o5ZwEsnC001iDSoZRJ63jS6AtoAOggpg5XVJh8=
 github.com/newrelic/go-agent/v3/integrations/nrhttprouter v1.0.1 h1:7OyJ+5MXP8YppKsWAdrdB8z5Ei3skk86ONJ+Vb9fSlo=
 github.com/newrelic/go-agent/v3/integrations/nrhttprouter v1.0.1/go.mod h1:CkLa4BKOGaiFbWHsv7zOspG+zXrfjsNXDxsDGvdhT+s=
 github.com/newrelic/go-agent/v3/integrations/nrmongo v1.1.0 h1:o5Q7DH9Xr9pcEKk91cv8QcsWUG/tR2qCTVM6EvE5yPk=
