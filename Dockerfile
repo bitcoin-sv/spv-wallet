@@ -6,13 +6,11 @@ WORKDIR /go/src/github.com/BuxOrg/bux-server
 
 COPY . ./
 
-ENV CGO_ENABLED=1
-
 # Build binary
 RUN GOOS=linux go build -o bux cmd/server/main.go
 
 # Get runtime image
-FROM registry.access.redhat.com/ubi8-minimal
+FROM registry.access.redhat.com/ubi9-minimal
 
 # Version
 LABEL version="1.0" name="Bux"
