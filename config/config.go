@@ -11,6 +11,7 @@ import (
 	"github.com/mrz1836/go-cachestore"
 	"github.com/mrz1836/go-datastore"
 	"github.com/newrelic/go-agent/v3/newrelic"
+	"github.com/tonicpow/go-minercraft/v2"
 )
 
 // Config constants used for optimization and value testing
@@ -46,30 +47,32 @@ type (
 
 	// AppConfig is the configuration values and associated env vars
 	AppConfig struct {
-		Authentication     *AuthenticationConfig    `json:"authentication" mapstructure:"authentication"`
-		Cachestore         *CachestoreConfig        `json:"cache" mapstructure:"cache"`
-		ClusterConfig      *ClusterConfig           `json:"cluster" mapstructure:"cluster"`
-		Datastore          *DatastoreConfig         `json:"datastore" mapstructure:"datastore"`
-		Debug              bool                     `json:"debug" mapstructure:"debug"`
-		DebugProfiling     bool                     `json:"debug_profiling" mapstructure:"debug_profiling"`
-		DisableITC         bool                     `json:"disable_itc" mapstructure:"disable_itc"`
-		Environment        string                   `json:"environment" mapstructure:"environment"`
-		GDPRCompliance     bool                     `json:"gdpr_compliance" mapstructure:"gdpr_compliance"`
-		GraphQL            *GraphqlConfig           `json:"graphql" mapstructure:"graphql"`
-		ImportBlockHeaders string                   `json:"import_block_headers" mapstructure:"import_block_headers"`
-		Mongo              *datastore.MongoDBConfig `json:"mongodb" mapstructure:"mongodb"`
-		Monitor            *MonitorOptions          `json:"monitor" mapstructure:"monitor"`
-		NewRelic           *NewRelicConfig          `json:"new_relic" mapstructure:"new_relic"`
-		Notifications      *NotificationsConfig     `json:"notifications" mapstructure:"notifications"`
-		Paymail            *PaymailConfig           `json:"paymail" mapstructure:"paymail"`
-		Redis              *RedisConfig             `json:"redis" mapstructure:"redis"`
-		RequestLogging     bool                     `json:"request_logging" mapstructure:"request_logging"`
-		Server             *ServerConfig            `json:"server" mapstructure:"server"`
-		SQL                *datastore.SQLConfig     `json:"sql" mapstructure:"sql"`
-		SQLite             *datastore.SQLiteConfig  `json:"sqlite" mapstructure:"sqlite"`
-		TaskManager        *TaskManagerConfig       `json:"task_manager" mapstructure:"task_manager"`
-		WorkingDirectory   string                   `json:"working_directory" mapstructure:"working_directory"`
-		UseMapiFeeQuotes   bool                     `json:"use_mapi_fee_quotes" mapstructure:"use_mapi_fee_quotes"`
+		Authentication       *AuthenticationConfig    `json:"authentication" mapstructure:"authentication"`
+		Cachestore           *CachestoreConfig        `json:"cache" mapstructure:"cache"`
+		ClusterConfig        *ClusterConfig           `json:"cluster" mapstructure:"cluster"`
+		Datastore            *DatastoreConfig         `json:"datastore" mapstructure:"datastore"`
+		Debug                bool                     `json:"debug" mapstructure:"debug"`
+		DebugProfiling       bool                     `json:"debug_profiling" mapstructure:"debug_profiling"`
+		DisableITC           bool                     `json:"disable_itc" mapstructure:"disable_itc"`
+		Environment          string                   `json:"environment" mapstructure:"environment"`
+		GDPRCompliance       bool                     `json:"gdpr_compliance" mapstructure:"gdpr_compliance"`
+		GraphQL              *GraphqlConfig           `json:"graphql" mapstructure:"graphql"`
+		ImportBlockHeaders   string                   `json:"import_block_headers" mapstructure:"import_block_headers"`
+		Mongo                *datastore.MongoDBConfig `json:"mongodb" mapstructure:"mongodb"`
+		Monitor              *MonitorOptions          `json:"monitor" mapstructure:"monitor"`
+		NewRelic             *NewRelicConfig          `json:"new_relic" mapstructure:"new_relic"`
+		Notifications        *NotificationsConfig     `json:"notifications" mapstructure:"notifications"`
+		Paymail              *PaymailConfig           `json:"paymail" mapstructure:"paymail"`
+		Redis                *RedisConfig             `json:"redis" mapstructure:"redis"`
+		RequestLogging       bool                     `json:"request_logging" mapstructure:"request_logging"`
+		Server               *ServerConfig            `json:"server" mapstructure:"server"`
+		SQL                  *datastore.SQLConfig     `json:"sql" mapstructure:"sql"`
+		SQLite               *datastore.SQLiteConfig  `json:"sqlite" mapstructure:"sqlite"`
+		TaskManager          *TaskManagerConfig       `json:"task_manager" mapstructure:"task_manager"`
+		WorkingDirectory     string                   `json:"working_directory" mapstructure:"working_directory"`
+		UseMapiFeeQuotes     bool                     `json:"use_mapi_fee_quotes" mapstructure:"use_mapi_fee_quotes"`
+		MinercraftAPI        string                   `json:"minercraft_api" mapstructure:"minercraft_api"`
+		MinercraftCustomAPIs []*minercraft.MinerAPIs  `json:"minercraft_custom_apis" mapstructure:"minercraft_custom_apis"`
 	}
 
 	// AuthenticationConfig is the configuration for Authentication
