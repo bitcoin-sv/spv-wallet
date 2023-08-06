@@ -19,6 +19,7 @@ import (
 	"github.com/mrz1836/go-datastore"
 	"github.com/mrz1836/go-logger"
 	"github.com/newrelic/go-agent/v3/newrelic"
+	"github.com/tonicpow/go-minercraft/v2"
 )
 
 // AppServices is the loaded services via config
@@ -286,7 +287,19 @@ func (s *AppServices) loadBux(ctx context.Context, appConfig *AppConfig, testMod
 	}
 
 	if appConfig.UseMapiFeeQuotes {
+		options = append(options, bux.WithMinercraftFeeQuotes())
+	}
+
+	if strings.EqualFold(appConfig.MinercraftAPI, string(minercraft.MAPI)) {
 		options = append(options, bux.WithMAPI())
+	}
+
+	if strings.EqualFold(appConfig.MinercraftAPI, string(minercraft.Arc)) {
+		options = append(options, bux.WithArc())
+	}
+
+	if appConfig.MinercraftCustomAPIs != nil {
+		options = append(options, bux.WithMinercraftAPIs(appConfig.MinercraftCustomAPIs))
 	}
 
 	// Create the new client
