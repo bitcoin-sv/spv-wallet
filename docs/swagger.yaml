@@ -1,7 +1,7 @@
 info:
   contact: {}
   title: 'BUX: Server'
-  version: v0.5.6
+  version: v0.5.7
 paths:
   /v1/access-key:
     delete:
