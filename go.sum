@@ -341,11 +341,10 @@ github.com/mrz1836/go-validate v0.2.0 h1:F8AcgJRW0B/hUNFAXijrN/EGqYlAIkIIpMDkIMM
 github.com/mrz1836/go-validate v0.2.0/go.mod h1:IoGAb4rTAL6KgAxOiWL4ICwLqxGbKCKT1GyaSuE/4bk=
 github.com/mrz1836/go-whatsonchain v0.12.2 h1:aqqBK4Oi4TOB5kTSsNElKJhOUOKbs8X0J1zgM9yVO5E=
 github.com/mrz1836/go-whatsonchain v0.12.2/go.mod h1:tkHmnUDVCLCgitHrmtjW1u8RBHGDK01sQYBiJze4rfQ=
-github.com/newrelic/go-agent/v3 v3.0.0/go.mod h1:H28zDNUC0U/b7kLoY4EFOhuth10Xu/9dchozUiOseQQ=
-github.com/newrelic/go-agent/v3 v3.24.0 h1:DPfbd+p0akRjv6UpWzWJl+pfOMSs+QkAeNRUp0fPLZI=
-github.com/newrelic/go-agent/v3 v3.24.0/go.mod h1:7GnP0o5ZwEsnC001iDSoZRJ63jS6AtoAOggpg5XVJh8=
-github.com/newrelic/go-agent/v3/integrations/nrhttprouter v1.0.1 h1:7OyJ+5MXP8YppKsWAdrdB8z5Ei3skk86ONJ+Vb9fSlo=
-github.com/newrelic/go-agent/v3/integrations/nrhttprouter v1.0.1/go.mod h1:CkLa4BKOGaiFbWHsv7zOspG+zXrfjsNXDxsDGvdhT+s=
+github.com/newrelic/go-agent/v3 v3.24.1 h1:qJc+cKtc0v9vrsnMHuHy4r6Fh9iigNJj3O3KUKPOD0M=
+github.com/newrelic/go-agent/v3 v3.24.1/go.mod h1:29qGunRQA4+IGWn5WRiqVKA+pqYsCIk4ZK9nwygbKbc=
+github.com/newrelic/go-agent/v3/integrations/nrhttprouter v1.0.2 h1:Y+bKuryqCg+TAvBkBaEKwak+Boy5OdosQNdDGFwyDLo=
+github.com/newrelic/go-agent/v3/integrations/nrhttprouter v1.0.2/go.mod h1:lhRXsOMo2UYHbtvb2xdtbTdBaL4ovLAdhW8ky3NNyAQ=
 github.com/newrelic/go-agent/v3/integrations/nrmongo v1.1.0 h1:o5Q7DH9Xr9pcEKk91cv8QcsWUG/tR2qCTVM6EvE5yPk=
 github.com/newrelic/go-agent/v3/integrations/nrmongo v1.1.0/go.mod h1:n9+bSS8LOiIpBJ4gclBKY4Umh2h+/EAURoFhz0Nq4fo=
 github.com/niemeyer/pretty v0.0.0-20200227124842-a10e7caefd8e/go.mod h1:zD1mROLANZcx1PVRCS0qkT7pwLkGfwJo4zjcN/Tysno=
