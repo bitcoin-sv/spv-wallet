@@ -13,7 +13,6 @@ type Action struct {
 
 // RegisterRoutes register all the package specific routes
 func RegisterRoutes(router *apirouter.Router, appConfig *config.AppConfig, services *config.AppServices) {
-
 	// Use the authentication middleware wrapper
 	a, require := actions.NewStack(appConfig, services)
 	require.Use(a.RequireAuthentication)
@@ -25,4 +24,5 @@ func RegisterRoutes(router *apirouter.Router, appConfig *config.AppConfig, servi
 	router.HTTPRouter.GET("/"+config.CurrentMajorVersion+"/utxo", action.Request(router, require.Wrap(action.get)))
 	router.HTTPRouter.POST("/"+config.CurrentMajorVersion+"/utxo/count", action.Request(router, require.Wrap(action.count)))
 	router.HTTPRouter.POST("/"+config.CurrentMajorVersion+"/utxo/search", action.Request(router, require.Wrap(action.search)))
+	router.HTTPRouter.PATCH("/"+config.CurrentMajorVersion+"/utxo/unreserve", action.Request(router, require.Wrap(action.unreserve)))
 }
