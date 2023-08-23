@@ -5,6 +5,7 @@ import (
 	"crypto/tls"
 	"errors"
 	"fmt"
+	broadcast_client "github.com/bitcoin-sv/go-broadcast-client/broadcast/broadcast-client"
 	"net/url"
 	"strings"
 	"time"
@@ -302,6 +303,19 @@ func (s *AppServices) loadBux(ctx context.Context, appConfig *AppConfig, testMod
 		options = append(options, bux.WithMinercraftAPIs(appConfig.MinercraftCustomAPIs))
 	}
 
+	if appConfig.BroadcastClientAPIs != nil {
+		arcClientConfigs := splitBroadcastClientApis(appConfig.BroadcastClientAPIs)
+		fmt.Println("arcClientConfigs", arcClientConfigs)
+		options = append(options, bux.WithBroadcastClientAPIs(arcClientConfigs))
+
+		builder := broadcast_client.Builder()
+		for _, cfg := range arcClientConfigs {
+			builder.WithArc(cfg)
+		}
+		broadcastClient := builder.Build()
+		options = append(options, bux.WithBroadcastClient(broadcastClient))
+	}
+
 	// Create the new client
 	s.Bux, err = bux.NewClient(ctx, options...)
 
@@ -372,4 +386,26 @@ func loadDatastore(options []bux.ClientOps, appConfig *AppConfig) ([]bux.ClientO
 	}
 
 	return options, nil
+}
+
+// splitBroadcastClientApis splits the broadcast client apis into a list of broadcast_client.ArcClientConfig
+func splitBroadcastClientApis(apis []string) []broadcast_client.ArcClientConfig {
+	var arcClients []broadcast_client.ArcClientConfig
+	for _, api := range apis {
+		separatorIndex := strings.Index(api, "|")
+		if separatorIndex != -1 {
+			apiUrl := api[:separatorIndex]
+			token := api[separatorIndex+1:]
+
+			arcClients = append(arcClients, broadcast_client.ArcClientConfig{
+				APIUrl: apiUrl,
+				Token:  token,
+			})
+		} else {
+			arcClients = append(arcClients, broadcast_client.ArcClientConfig{
+				APIUrl: api,
+			})
+		}
+	}
+	return arcClients
 }
