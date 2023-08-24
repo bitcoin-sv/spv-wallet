@@ -138,6 +138,7 @@ require (
 	gorm.io/driver/sqlite v1.5.3 // indirect
 	gorm.io/gorm v1.25.4 // indirect
 	gorm.io/plugin/dbresolver v1.4.7 // indirect
+
 )
 
 // Issue with redislock package
