@@ -96,5 +96,8 @@
     "engine": "taskq",
     "factory": "memory",
     "queue_name": "test_queue"
-  }
+  },
+  "broadcast_client_apis": [
+    "url|token"
+  ]
 }

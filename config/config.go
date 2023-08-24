@@ -73,6 +73,7 @@ type (
 		UseMapiFeeQuotes     bool                     `json:"use_mapi_fee_quotes" mapstructure:"use_mapi_fee_quotes"`
 		MinercraftAPI        string                   `json:"minercraft_api" mapstructure:"minercraft_api"`
 		MinercraftCustomAPIs []*minercraft.MinerAPIs  `json:"minercraft_custom_apis" mapstructure:"minercraft_custom_apis"`
+		BroadcastClientAPIs  []string                 `json:"broadcast_client_apis" mapstructure:"broadcast_client_apis"`
 	}
 
 	// AuthenticationConfig is the configuration for Authentication
