@@ -394,11 +394,11 @@ func splitBroadcastClientApis(apis []string) []broadcast_client.ArcClientConfig 
 	for _, api := range apis {
 		separatorIndex := strings.Index(api, "|")
 		if separatorIndex != -1 {
-			apiUrl := api[:separatorIndex]
+			apiURL := api[:separatorIndex]
 			token := api[separatorIndex+1:]
 
 			arcClients = append(arcClients, broadcast_client.ArcClientConfig{
-				APIUrl: apiUrl,
+				APIUrl: apiURL,
 				Token:  token,
 			})
 		} else {
