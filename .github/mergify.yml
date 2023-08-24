@@ -10,22 +10,12 @@ pull_request_rules:
       - author~=^dependabot(|-preview)\[bot\]$
       - check-success='test (1.19.x, ubuntu-latest)'
       - check-success='Analyze (go)'
-      - title~=^Bump [^\s]+ from ([\d]+)\..+ to \1\.
     actions:
       review:
         type: APPROVE
         message: Automatically approving dependabot pull request
       merge:
         method: merge
-  - name: Alert on major version detection
-    conditions:
-      - author~=^dependabot(|-preview)\[bot\]$
-      - check-success='test (1.19.x, ubuntu-latest)'
-      - check-success='Analyze (go)'
-      - -title~=^Bump [^\s]+ from ([\d]+)\..+ to \1\.
-    actions:
-      comment:
-        message: "⚠️ @mrz1836: this is a major version bump and requires your attention"
 
   # ===============================================================================
   # AUTOMATIC MERGE (APPROVALS)
