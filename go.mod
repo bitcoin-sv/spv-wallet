@@ -4,7 +4,7 @@ go 1.19
 
 require (
 	github.com/99designs/gqlgen v0.17.36
-	github.com/BuxOrg/bux v0.5.11
+	github.com/BuxOrg/bux v0.5.12
 	github.com/BuxOrg/bux-models v0.1.1
 	github.com/go-ozzo/ozzo-validation v3.6.0+incompatible
 	github.com/go-redis/redis/v8 v8.11.5
@@ -24,6 +24,8 @@ require (
 	github.com/swaggo/swag v1.16.1
 	github.com/vektah/gqlparser/v2 v2.5.8
 )
+
+require github.com/bitcoin-sv/go-broadcast-client v0.0.0-20230822135329-75a90170644a // indirect
 
 require (
 	github.com/KyleBanks/depth v1.2.1 // indirect
@@ -57,7 +59,7 @@ require (
 	github.com/golang/protobuf v1.5.3 // indirect
 	github.com/golang/snappy v0.0.4 // indirect
 	github.com/gomodule/redigo v2.0.0+incompatible // indirect
-	github.com/google/uuid v1.3.0 // indirect
+	github.com/google/uuid v1.3.1 // indirect
 	github.com/gorilla/mux v1.8.0 // indirect
 	github.com/gorilla/websocket v1.5.0 // indirect
 	github.com/hashicorp/golang-lru v1.0.2 // indirect
@@ -126,7 +128,7 @@ require (
 	golang.org/x/sys v0.11.0 // indirect
 	golang.org/x/text v0.12.0 // indirect
 	golang.org/x/tools v0.12.0 // indirect
-	google.golang.org/genproto/googleapis/rpc v0.0.0-20230815205213-6bfd019c3878 // indirect
+	google.golang.org/genproto/googleapis/rpc v0.0.0-20230822172742-b8732ec3820d // indirect
 	google.golang.org/grpc v1.57.0 // indirect
 	google.golang.org/protobuf v1.31.0 // indirect
 	gopkg.in/ini.v1 v1.67.0 // indirect
@@ -134,8 +136,8 @@ require (
 	gorm.io/driver/mysql v1.5.1 // indirect
 	gorm.io/driver/postgres v1.5.2 // indirect
 	gorm.io/driver/sqlite v1.5.3 // indirect
-	gorm.io/gorm v1.25.3 // indirect
-	gorm.io/plugin/dbresolver v1.4.6 // indirect
+	gorm.io/gorm v1.25.4 // indirect
+	gorm.io/plugin/dbresolver v1.4.7 // indirect
 )
 
 // Issue with redislock package
