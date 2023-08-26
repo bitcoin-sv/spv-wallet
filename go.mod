@@ -63,7 +63,7 @@ require (
 	github.com/gorilla/mux v1.8.0 // indirect
 	github.com/gorilla/websocket v1.5.0 // indirect
 	github.com/hashicorp/golang-lru v1.0.2 // indirect
-	github.com/hashicorp/golang-lru/v2 v2.0.5 // indirect
+	github.com/hashicorp/golang-lru/v2 v2.0.6 // indirect
 	github.com/hashicorp/hcl v1.0.0 // indirect
 	github.com/iancoleman/strcase v0.3.0 // indirect
 	github.com/jackc/pgpassfile v1.0.0 // indirect
