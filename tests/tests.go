@@ -1,3 +1,4 @@
+// Package tests provides the base test suite for the entire package
 package tests
 
 import (
@@ -35,11 +36,11 @@ func (ts *TestSuite) BaseSetupSuite() {
 	var dir *os.File
 	pathPrefix := "../../"
 
-	if runtime.GOOS == "windows" {
+	if runtime.GOOS == "windows" { // todo: use go-Embed and remove this
 		pathPrefix = "../../../"
 	}
 
-	dir, err = os.Open(path.Join(dirname, pathPrefix))
+	dir, err = os.Open(path.Join(dirname, pathPrefix)) //nolint:gosec // todo: use go-Embed and remove this
 	require.NoError(ts.T(), err)
 
 	// Load the configuration
