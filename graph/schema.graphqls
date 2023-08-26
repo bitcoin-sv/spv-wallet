@@ -375,4 +375,7 @@ type Mutation {
         locking_script: String
         metadata: Metadata!
     ): Destination
+    utxos_unreserve(
+        draft_id: String!,
+    ): Boolean
 }
