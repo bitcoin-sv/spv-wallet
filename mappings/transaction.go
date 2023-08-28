@@ -30,6 +30,35 @@ func MapToTransactionContract(t *bux.Transaction) *buxmodels.Transaction {
 	}
 
 	processMetadata(t, t.XPubID, &model)
+	processOutputValue(t, t.XPubID, &model)
+
+	return &model
+}
+
+// MapToTransactionContractForAdmin will map the model from bux to the bux-models contract for admin
+func MapToTransactionContractForAdmin(t *bux.Transaction) *buxmodels.Transaction {
+	if t == nil {
+		return nil
+	}
+
+	model := buxmodels.Transaction{
+		Model:           *common.MapToContract(&t.Model),
+		ID:              t.ID,
+		Hex:             t.Hex,
+		XpubInIDs:       t.XpubInIDs,
+		XpubOutIDs:      t.XpubOutIDs,
+		BlockHash:       t.BlockHash,
+		BlockHeight:     t.BlockHeight,
+		Fee:             t.Fee,
+		NumberOfInputs:  t.NumberOfInputs,
+		NumberOfOutputs: t.NumberOfOutputs,
+		DraftID:         t.DraftID,
+		TotalValue:      t.TotalValue,
+		Status:          string(t.Status),
+		Outputs:         t.XpubOutputValue,
+	}
+
+	processMetadata(t, t.XPubID, &model)
 
 	return &model
 }
@@ -43,7 +72,9 @@ func processMetadata(t *bux.Transaction, xpubID string, model *buxmodels.Transac
 			model.Model.Metadata[key] = value
 		}
 	}
+}
 
+func processOutputValue(t *bux.Transaction, xpubID string, model *buxmodels.Transaction) {
 	model.OutputValue = int64(0)
 	if len(t.XpubOutputValue) > 0 && t.XpubOutputValue[xpubID] != 0 {
 		model.OutputValue = t.XpubOutputValue[xpubID]
