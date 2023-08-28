@@ -4,6 +4,7 @@ import (
 	"net/http"
 
 	"github.com/BuxOrg/bux"
+	buxmodels "github.com/BuxOrg/bux-models"
 	"github.com/BuxOrg/bux-server/actions"
 	"github.com/BuxOrg/bux-server/mappings"
 	"github.com/julienschmidt/httprouter"
@@ -46,8 +47,13 @@ func (a *Action) transactionsSearch(w http.ResponseWriter, req *http.Request, _ 
 		return
 	}
 
+	contracts := make([]*buxmodels.Transaction, 0)
+	for _, transaction := range transactions {
+		contracts = append(contracts, mappings.MapToTransactionContractForAdmin(transaction))
+	}
+
 	// Return response
-	apirouter.ReturnResponse(w, req, http.StatusOK, transactions)
+	apirouter.ReturnResponse(w, req, http.StatusOK, contracts)
 }
 
 // transactionsCount will count all transactions filtered by metadata
