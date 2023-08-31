@@ -25,7 +25,7 @@ require (
 	github.com/vektah/gqlparser/v2 v2.5.8
 )
 
-require github.com/bitcoin-sv/go-broadcast-client v0.1.0
+require github.com/bitcoin-sv/go-broadcast-client v0.1.1
 
 require (
 	github.com/KyleBanks/depth v1.2.1 // indirect
