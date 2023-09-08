@@ -2,6 +2,8 @@
 package mappings
 
 import (
+	"time"
+
 	"github.com/BuxOrg/bux"
 	buxmodels "github.com/BuxOrg/bux-models"
 	"github.com/BuxOrg/bux-server/mappings/common"
@@ -13,11 +15,16 @@ func MapToAccessKeyContract(ac *bux.AccessKey) *buxmodels.AccessKey {
 		return nil
 	}
 
+	var revokedAt *time.Time
+	if !ac.RevokedAt.IsZero() {
+		revokedAt = &ac.RevokedAt.Time
+	}
+
 	return &buxmodels.AccessKey{
 		Model:     *common.MapToContract(&ac.Model),
 		ID:        ac.ID,
 		XpubID:    ac.XpubID,
-		RevokedAt: ac.RevokedAt.Time,
+		RevokedAt: revokedAt,
 		Key:       ac.Key,
 	}
 }
