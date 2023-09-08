@@ -6,6 +6,7 @@ require (
 	github.com/99designs/gqlgen v0.17.36
 	github.com/BuxOrg/bux v0.5.12
 	github.com/BuxOrg/bux-models v0.2.0
+	github.com/bitcoin-sv/go-broadcast-client v0.1.1
 	github.com/go-ozzo/ozzo-validation v3.6.0+incompatible
 	github.com/go-redis/redis/v8 v8.11.5
 	github.com/gofrs/uuid v4.4.0+incompatible
@@ -22,10 +23,8 @@ require (
 	github.com/spf13/viper v1.16.0
 	github.com/stretchr/testify v1.8.4
 	github.com/swaggo/swag v1.16.2
-	github.com/vektah/gqlparser/v2 v2.5.8
+	github.com/vektah/gqlparser/v2 v2.5.9
 )
-
-require github.com/bitcoin-sv/go-broadcast-client v0.1.1
 
 require (
 	github.com/KyleBanks/depth v1.2.1 // indirect
@@ -78,7 +77,7 @@ require (
 	github.com/libsv/go-bc v0.1.11 // indirect
 	github.com/libsv/go-bk v0.1.6 // indirect
 	github.com/libsv/go-bt v1.0.8 // indirect
-	github.com/libsv/go-bt/v2 v2.2.3 // indirect
+	github.com/libsv/go-bt/v2 v2.2.5 // indirect
 	github.com/magiconair/properties v1.8.7 // indirect
 	github.com/mailru/easyjson v0.7.7 // indirect
 	github.com/matryer/respond v1.0.1 // indirect
@@ -90,7 +89,7 @@ require (
 	github.com/mrz1836/go-nownodes v0.1.0 // indirect
 	github.com/mrz1836/go-whatsonchain v0.13.0 // indirect
 	github.com/newrelic/go-agent/v3/integrations/nrmongo v1.1.1 // indirect
-	github.com/pelletier/go-toml/v2 v2.0.9 // indirect
+	github.com/pelletier/go-toml/v2 v2.1.0 // indirect
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
 	github.com/rafaeljusto/redigomock v2.4.0+incompatible // indirect
@@ -108,7 +107,7 @@ require (
 	github.com/tidwall/gjson v1.16.0 // indirect
 	github.com/tidwall/match v1.1.1 // indirect
 	github.com/tidwall/pretty v1.2.1 // indirect
-	github.com/tonicpow/go-minercraft/v2 v2.0.3
+	github.com/tonicpow/go-minercraft/v2 v2.0.4
 	github.com/tonicpow/go-paymail v0.9.3 // indirect
 	github.com/tylertreat/BoomFilters v0.0.0-20210315201527-1a82519a3e43 // indirect
 	github.com/ugorji/go/codec v1.2.11 // indirect
@@ -121,15 +120,15 @@ require (
 	github.com/xdg-go/stringprep v1.0.4 // indirect
 	github.com/youmark/pkcs8 v0.0.0-20201027041543-1326539a0a0a // indirect
 	go.mongodb.org/mongo-driver v1.12.1 // indirect
-	golang.org/x/crypto v0.12.0 // indirect
+	golang.org/x/crypto v0.13.0 // indirect
 	golang.org/x/mod v0.12.0 // indirect
-	golang.org/x/net v0.14.0 // indirect
+	golang.org/x/net v0.15.0 // indirect
 	golang.org/x/sync v0.3.0 // indirect
-	golang.org/x/sys v0.11.0 // indirect
-	golang.org/x/text v0.12.0 // indirect
-	golang.org/x/tools v0.12.0 // indirect
+	golang.org/x/sys v0.12.0 // indirect
+	golang.org/x/text v0.13.0 // indirect
+	golang.org/x/tools v0.13.0 // indirect
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20230822172742-b8732ec3820d // indirect
-	google.golang.org/grpc v1.57.0 // indirect
+	google.golang.org/grpc v1.58.0 // indirect
 	google.golang.org/protobuf v1.31.0 // indirect
 	gopkg.in/ini.v1 v1.67.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
