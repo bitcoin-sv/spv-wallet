@@ -3,7 +3,7 @@ module github.com/BuxOrg/bux-server
 go 1.19
 
 require (
-	github.com/99designs/gqlgen v0.17.36
+	github.com/99designs/gqlgen v0.17.37
 	github.com/BuxOrg/bux v0.5.12
 	github.com/BuxOrg/bux-models v0.2.0
 	github.com/bitcoin-sv/go-broadcast-client v0.1.1
