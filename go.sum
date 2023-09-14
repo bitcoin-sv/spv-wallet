@@ -42,8 +42,8 @@ github.com/BurntSushi/toml v0.3.1/go.mod h1:xHWCNGjB5oqiDr8zfno3MHue2Ht5sIBksp03
 github.com/BurntSushi/xgb v0.0.0-20160522181843-27f122750802/go.mod h1:IVnqGOEym/WlBOVXweHU+Q+/VP0lqqI8lqeDx9IjBqo=
 github.com/BuxOrg/bux v0.5.12 h1:lF75iwcR/VAQ5vjim3YJ2TsgtRSUUBrAbfgsFlhYIZY=
 github.com/BuxOrg/bux v0.5.12/go.mod h1:6iNxLzkECsFirgcIz6BIxqiBJUM+aGOqDKKqxxX4Jg8=
-github.com/BuxOrg/bux-models v0.2.0 h1:BC2Mcfa+3ZkZdHkFyP+8gFmJn6nRwzY5gzx///5drbU=
-github.com/BuxOrg/bux-models v0.2.0/go.mod h1:nH3MOdsIPPerBPOiEvwA01yTeArYtBk+PtDo7E+vPCk=
+github.com/BuxOrg/bux-models v0.2.1 h1:wgNTYCqisH3M+Z87hb0Jpbxc8MMdOEJ35mdw/WoZ73k=
+github.com/BuxOrg/bux-models v0.2.1/go.mod h1:nH3MOdsIPPerBPOiEvwA01yTeArYtBk+PtDo7E+vPCk=
 github.com/DATA-DOG/go-sqlmock v1.5.0 h1:Shsta01QNfFxHCfpW6YH2STWB0MudeXXEWMr20OEh60=
 github.com/DataDog/datadog-go v3.7.1+incompatible/go.mod h1:LButxg5PwREeZtORoXG3tL4fMGNddJ+vMq1mwgfaqoQ=
 github.com/KyleBanks/depth v1.2.1 h1:5h8fQADFrWtarTdtDudMmGsC7GPbOAu6RVB3ffsVFHc=
