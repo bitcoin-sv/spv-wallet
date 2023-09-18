@@ -6,7 +6,7 @@ require (
 	github.com/99designs/gqlgen v0.17.37
 	github.com/BuxOrg/bux v0.5.12
 	github.com/BuxOrg/bux-models v0.2.1
-	github.com/bitcoin-sv/go-broadcast-client v0.1.1
+	github.com/bitcoin-sv/go-broadcast-client v0.1.2
 	github.com/go-ozzo/ozzo-validation v3.6.0+incompatible
 	github.com/go-redis/redis/v8 v8.11.5
 	github.com/gofrs/uuid v4.4.0+incompatible
