@@ -18,12 +18,17 @@ require (
 	github.com/mrz1836/go-parameters v0.3.1
 	github.com/mrz1836/go-sanitize v1.3.1
 	github.com/mrz1836/go-validate v0.2.0
-	github.com/newrelic/go-agent/v3 v3.24.1
+	github.com/newrelic/go-agent/v3 v3.25.1
 	github.com/newrelic/go-agent/v3/integrations/nrhttprouter v1.0.2
 	github.com/spf13/viper v1.16.0
 	github.com/stretchr/testify v1.8.4
 	github.com/swaggo/swag v1.16.2
 	github.com/vektah/gqlparser/v2 v2.5.9
+)
+
+require (
+	github.com/andybalholm/brotli v1.0.5 // indirect
+	github.com/valyala/fasthttp v1.49.0 // indirect
 )
 
 require (
