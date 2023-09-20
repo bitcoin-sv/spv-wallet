@@ -19,7 +19,7 @@ func RegisterRoutes(router *apirouter.Router, appConfig *config.AppConfig, servi
 	requireAdmin.Use(a.RequireAdminAuthentication)
 
 	// Register the custom Paymail routes
-	services.Bux.GetPaymailConfig().RegisterRoutes(router)
+	services.Bux.GetPaymailConfig().RegisterRoutes(router.HTTPRouter)
 
 	// Create the action
 	action := &Action{actions.Action{AppConfig: a.AppConfig, Services: a.Services}}
