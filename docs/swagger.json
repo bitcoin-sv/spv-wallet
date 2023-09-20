@@ -3,7 +3,7 @@
     "info": {
         "title": "BUX: Server",
         "contact": {},
-        "version": "v0.5.10"
+        "version": "v0.5.11"
     },
     "paths": {
         "/v1/access-key": {
