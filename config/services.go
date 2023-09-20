@@ -246,6 +246,14 @@ func (s *AppServices) loadBux(ctx context.Context, appConfig *AppConfig, testMod
 		))
 	}
 
+	if len(appConfig.BroadcastClientAPIs) > 0 {
+		options = append(options, bux.WithPaymailBeefSupport())
+	}
+
+	if appConfig.PulseUrl != "" {
+		options = append(options, bux.WithPulse(appConfig.PulseUrl))
+	}
+
 	// Load task manager (redis or taskq)
 	// todo: this needs more improvement with redis options etc
 	if appConfig.TaskManager.Engine == taskmanager.TaskQ {

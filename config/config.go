@@ -74,6 +74,7 @@ type (
 		MinercraftAPI        string                   `json:"minercraft_api" mapstructure:"minercraft_api"`
 		MinercraftCustomAPIs []*minercraft.MinerAPIs  `json:"minercraft_custom_apis" mapstructure:"minercraft_custom_apis"`
 		BroadcastClientAPIs  []string                 `json:"broadcast_client_apis" mapstructure:"broadcast_client_apis"`
+		PulseUrl             string                   `json:"pulse_url" mapstructure:"pulse_url"`
 	}
 
 	// AuthenticationConfig is the configuration for Authentication
