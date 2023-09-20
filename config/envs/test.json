@@ -48,7 +48,6 @@
     "load_monitored_destinations": false,
     "max_number_of_destinations": 100000,
     "monitor_days": 7,
-    "process_mempool_on_connect": true,
     "processor_type": "bloom",
     "save_destinations": true
   },

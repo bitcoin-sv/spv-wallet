@@ -283,7 +283,6 @@ func (s *AppServices) loadBux(ctx context.Context, appConfig *AppConfig, testMod
 			MaxNumberOfDestinations:     appConfig.Monitor.MaxNumberOfDestinations,
 			SaveTransactionDestinations: appConfig.Monitor.SaveTransactionDestinations,
 			LoadMonitoredDestinations:   appConfig.Monitor.LoadMonitoredDestinations,
-			ProcessMempoolOnConnect:     appConfig.Monitor.ProcessMempoolOnConnect,
 		}))
 	}
 
