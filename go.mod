@@ -13,7 +13,7 @@ require (
 	github.com/julienschmidt/httprouter v1.3.0
 	github.com/mrz1836/go-api-router v0.5.2
 	github.com/mrz1836/go-cachestore v0.2.5
-	github.com/mrz1836/go-datastore v0.4.11
+	github.com/mrz1836/go-datastore v0.4.12
 	github.com/mrz1836/go-logger v0.3.2
 	github.com/mrz1836/go-parameters v0.3.1
 	github.com/mrz1836/go-sanitize v1.3.1
