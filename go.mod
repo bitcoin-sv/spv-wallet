@@ -12,7 +12,7 @@ require (
 	github.com/gofrs/uuid v4.4.0+incompatible
 	github.com/julienschmidt/httprouter v1.3.0
 	github.com/mrz1836/go-api-router v0.5.2
-	github.com/mrz1836/go-cachestore v0.2.4
+	github.com/mrz1836/go-cachestore v0.2.5
 	github.com/mrz1836/go-datastore v0.4.11
 	github.com/mrz1836/go-logger v0.3.2
 	github.com/mrz1836/go-parameters v0.3.1
@@ -42,7 +42,7 @@ require (
 	github.com/centrifugal/centrifuge-go v0.10.1 // indirect
 	github.com/centrifugal/protocol v0.10.0 // indirect
 	github.com/cespare/xxhash/v2 v2.2.0 // indirect
-	github.com/coocood/freecache v1.2.3 // indirect
+	github.com/coocood/freecache v1.2.4 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/dgryski/go-farm v0.0.0-20200201041132-a6ae2369ad13 // indirect
 	github.com/dgryski/go-rendezvous v0.0.0-20200823014737-9f7001d12a5f // indirect
@@ -124,8 +124,8 @@ require (
 	golang.org/x/sys v0.12.0 // indirect
 	golang.org/x/text v0.13.0 // indirect
 	golang.org/x/tools v0.13.0 // indirect
-	google.golang.org/genproto/googleapis/rpc v0.0.0-20230913181813-007df8e322eb // indirect
-	google.golang.org/grpc v1.58.1 // indirect
+	google.golang.org/genproto/googleapis/rpc v0.0.0-20230920204549-e6e6cdab5c13 // indirect
+	google.golang.org/grpc v1.58.2 // indirect
 	google.golang.org/protobuf v1.31.0 // indirect
 	gopkg.in/ini.v1 v1.67.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
