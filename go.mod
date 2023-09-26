@@ -4,7 +4,7 @@ go 1.19
 
 require (
 	github.com/99designs/gqlgen v0.17.38
-	github.com/BuxOrg/bux v0.5.14
+	github.com/BuxOrg/bux v0.5.15
 	github.com/BuxOrg/bux-models v0.2.1
 	github.com/bitcoin-sv/go-broadcast-client v0.3.0
 	github.com/go-ozzo/ozzo-validation v3.6.0+incompatible
@@ -31,7 +31,7 @@ require (
 	github.com/agnivade/levenshtein v1.1.1 // indirect
 	github.com/andybalholm/brotli v1.0.5 // indirect
 	github.com/asaskevich/govalidator v0.0.0-20230301143203-a9d515a09cc2 // indirect
-	github.com/bitcoin-sv/go-paymail v0.1.0 // indirect
+	github.com/bitcoin-sv/go-paymail v0.2.0 // indirect
 	github.com/bitcoinschema/go-bitcoin/v2 v2.0.5 // indirect
 	github.com/bitcoinschema/go-bpu v0.1.0 // indirect
 	github.com/bitcoinschema/go-map v0.1.0 // indirect
@@ -96,7 +96,7 @@ require (
 	github.com/robfig/cron/v3 v3.0.1 // indirect
 	github.com/segmentio/asm v1.2.0 // indirect
 	github.com/segmentio/encoding v0.3.6 // indirect
-	github.com/spf13/afero v1.9.5 // indirect
+	github.com/spf13/afero v1.10.0 // indirect
 	github.com/spf13/cast v1.5.1 // indirect
 	github.com/spf13/jwalterweatherman v1.1.0 // indirect
 	github.com/spf13/pflag v1.0.5 // indirect
