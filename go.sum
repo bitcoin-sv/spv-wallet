@@ -62,8 +62,8 @@ github.com/arbovm/levenshtein v0.0.0-20160628152529-48b4e1c0c4d0/go.mod h1:t2tdK
 github.com/asaskevich/govalidator v0.0.0-20230301143203-a9d515a09cc2 h1:DklsrG3dyBCFEj5IhUbnKptjxatkF07cF2ak3yi77so=
 github.com/asaskevich/govalidator v0.0.0-20230301143203-a9d515a09cc2/go.mod h1:WaHUgvxTVq04UNunO+XhnAqY/wQc+bxr74GqbsZ/Jqw=
 github.com/aws/aws-sdk-go v1.43.45 h1:2708Bj4uV+ym62MOtBnErm/CDX61C4mFe9V2gXy1caE=
-github.com/bitcoin-sv/go-broadcast-client v0.3.0 h1:IJvyUMffR2Nsaoh5aq8STPnlXFKNv5gxi+R8eOqcbEE=
-github.com/bitcoin-sv/go-broadcast-client v0.3.0/go.mod h1:EGTrUK2r81moZbgaNalEZJaIBYp7/kOVXy17J9AFQJQ=
+github.com/bitcoin-sv/go-broadcast-client v0.4.0 h1:mJhDarLljMancwX46B1Ta1BLngamBfJ350Mwpx0Gx04=
+github.com/bitcoin-sv/go-broadcast-client v0.4.0/go.mod h1:EGTrUK2r81moZbgaNalEZJaIBYp7/kOVXy17J9AFQJQ=
 github.com/bitcoin-sv/go-paymail v0.2.0 h1:9rlod0vJwvHvAXNxD2CPM5WMrMQVPu8Ryl6ktbPDUHs=
 github.com/bitcoin-sv/go-paymail v0.2.0/go.mod h1:/UsdMz72cml3j7P8+PPvvLSJJ//4DlHnA7bdimq9tY4=
 github.com/bitcoinschema/go-bitcoin/v2 v2.0.5 h1:Sgh5Eb746Zck/46rFDrZZEXZWyO53fMuWYhNoZa1tck=
