@@ -107,7 +107,6 @@ require (
 	github.com/subosito/gotenv v1.6.0 // indirect
 	github.com/swaggo/files v1.0.1 // indirect
 	github.com/swaggo/http-swagger v1.3.4
-	github.com/tidwall/gjson v1.16.0 // indirect
 	github.com/tonicpow/go-minercraft/v2 v2.0.5
 	github.com/tylertreat/BoomFilters v0.0.0-20210315201527-1a82519a3e43 // indirect
 	github.com/ugorji/go/codec v1.2.11 // indirect
@@ -157,7 +156,3 @@ replace github.com/centrifugal/protocol => github.com/centrifugal/protocol v0.9.
 
 // Issue: go.mongodb.org/mongo-driver/x/bsonx: cannot find module providing package go.mongodb.org/mongo-driver/x/bsonx
 replace go.mongodb.org/mongo-driver => go.mongodb.org/mongo-driver v1.11.7
-
-replace github.com/BuxOrg/bux => ../bux
-
-replace github.com/bitcoin-sv/go-paymail => ../go-paymail

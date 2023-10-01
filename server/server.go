@@ -124,7 +124,7 @@ func (s *Server) Handlers() *nrhttprouter.Router {
 
 	// Load Paymail
 	if s.AppConfig.Paymail.Enabled {
-		pmail.RegisterRoutes(s.Router.HTTPRouter, s.AppConfig, s.Services)
+		pmail.RegisterRoutes(s.Router, s.AppConfig, s.Services)
 	}
 
 	// Return the router

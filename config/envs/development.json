@@ -1,14 +1,14 @@
 {
   "debug": true,
   "debug_profiling": false,
-  "disable_itc": false,
+  "disable_itc": true,
   "environment": "development",
-  "import_block_headers": "https://viljive.nl/bux/blocks_bux.tsv.zip",
   "gdpr_compliance": false,
   "request_logging": true,
   "use_mapi_fee_quotes": true,
+  "minercraft_api": "mAPI",
   "authentication": {
-    "admin_key": "xpub661MyMwAqRbcFgfmdkPgE2m5UjHXu9dj124DbaGLSjaqVESTWfCD4VuNmEbVPkbYLCkykwVZvmA8Pbf8884TQr1FgdG2nPoHR8aB36YdDQh",
+    "admin_key": "xpub661MyMwAqRbcFrBJbKwBGCB7d3fr2SaAuXGM95BA62X41m6eW2ehRQGW4xLi9wkEXUGnQZYxVVj4PxXnyrLk7jdqvBAs1Qq9gf6ykMvjR7J",
     "require_signing": false,
     "scheme": "xpub",
     "signing_disabled": true
@@ -26,7 +26,7 @@
   },
   "datastore": {
     "auto_migrate": true,
-    "engine": "postgresql",
+    "engine": "sqlite",
     "debug": false,
     "table_prefix": "xapi"
   },
@@ -39,15 +39,15 @@
   "mongodb": {
     "database_name": "xapi",
     "transactions": false,
-    "uri": "mongodb://mongo:mongo@localhost:27017/"
+    "uri": "mongodb://localhost:27017/xapi"
   },
   "monitor": {
-    "auth_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJzaWdnaSIsImV4cCI6MTc1MDM4MTA2OH0.EXHm4MrwnJGjHIrdSUP39TyQZsieukWivCwqecQO0F8",
-    "bux_agent_url": "wss://siggi.siftbitcoin.com/websocket",
-    "debug": true,
+    "auth_token": "",
+    "bux_agent_url": "ws://localhost:8000/websocket",
+    "debug": false,
     "enabled": false,
     "false_positive_rate": 0.01,
-    "load_monitored_destinations": true,
+    "load_monitored_destinations": false,
     "max_number_of_destinations": 100000,
     "monitor_days": 7,
     "processor_type": "bloom",
@@ -60,12 +60,11 @@
   },
   "paymail": {
     "enabled": true,
-    "default_from_paymail": "bux@pawel.4chain.space",
+    "default_from_paymail": "from@domain.com",
     "default_note": "bux Address Resolution",
     "domain_validation_enabled": false,
     "domains": [
-      "localhost",
-      "pawel.4chain.space"
+      "localhost"
     ],
     "sender_validation_enabled": false
   },
@@ -82,13 +81,13 @@
   "server": {
     "idle_timeout": "60s",
     "port": "3003",
-    "read_timeout": "40s",
-    "write_timeout": "40s"
+    "read_timeout": "15s",
+    "write_timeout": "15s"
   },
   "sql": {
     "host": "localhost",
-    "name": "postgres",
-    "password": "postgres",
+    "name": "xapi",
+    "password": "",
     "_port": "3306",
     "port": "5432",
     "replica": false,
@@ -107,8 +106,6 @@
     "queue_name": "development_queue"
   },
   "broadcast_client_apis": [
-    "https://tapi.taal.com/arc|mainnet_3af382fadbc448b15cc4133242ac2621",
-    "https://arc.gorillapool.io"
-  ],
-  "pulse_url": "http://localhost:8080"
+    "url|token"
+  ]
 }

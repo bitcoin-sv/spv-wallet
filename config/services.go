@@ -250,8 +250,10 @@ func (s *AppServices) loadBux(ctx context.Context, appConfig *AppConfig, testMod
 		options = append(options, bux.WithPaymailBeefSupport())
 	}
 
-	if appConfig.PulseUrl != "" {
-		options = append(options, bux.WithPulse(appConfig.PulseUrl))
+	if appConfig.Pulse != nil {
+		fmt.Println(appConfig.Pulse.PulseURL)
+		fmt.Println(appConfig.Pulse.PulseAuthToken)
+		options = append(options, bux.WithPulse(appConfig.Pulse.PulseURL, appConfig.Pulse.PulseAuthToken))
 	}
 
 	// Load task manager (redis or taskq)
@@ -312,7 +314,6 @@ func (s *AppServices) loadBux(ctx context.Context, appConfig *AppConfig, testMod
 
 	if appConfig.BroadcastClientAPIs != nil {
 		arcClientConfigs := splitBroadcastClientApis(appConfig.BroadcastClientAPIs)
-		fmt.Println("arcClientConfigs", arcClientConfigs)
 		options = append(options, bux.WithBroadcastClientAPIs(arcClientConfigs))
 
 		builder := broadcast_client.Builder()
