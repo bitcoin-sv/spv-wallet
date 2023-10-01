@@ -74,6 +74,7 @@ type (
 		MinercraftAPI        string                   `json:"minercraft_api" mapstructure:"minercraft_api"`
 		MinercraftCustomAPIs []*minercraft.MinerAPIs  `json:"minercraft_custom_apis" mapstructure:"minercraft_custom_apis"`
 		BroadcastClientAPIs  []string                 `json:"broadcast_client_apis" mapstructure:"broadcast_client_apis"`
+		UseBeef              bool                     `json:"use_beef" mapstructure:"use_beef"`
 		Pulse                *PulseConfig             `json:"pulse" mapstructure:"pulse"`
 	}
 

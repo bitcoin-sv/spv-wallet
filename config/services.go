@@ -246,7 +246,7 @@ func (s *AppServices) loadBux(ctx context.Context, appConfig *AppConfig, testMod
 		))
 	}
 
-	if len(appConfig.BroadcastClientAPIs) > 0 {
+	if appConfig.UseBeef {
 		options = append(options, bux.WithPaymailBeefSupport())
 	}
 
