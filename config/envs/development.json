@@ -107,5 +107,10 @@
   },
   "broadcast_client_apis": [
     "url|token"
-  ]
+  ],
+  "use_beef": true,
+  "pulse": {
+    "pulse_url": "http://localhost:8000/api/v1/chain/merkleroot/verify",
+    "pulse_auth_token": "Bearer asd"
+  }
 }
