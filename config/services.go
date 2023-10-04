@@ -251,8 +251,6 @@ func (s *AppServices) loadBux(ctx context.Context, appConfig *AppConfig, testMod
 	}
 
 	if appConfig.Pulse != nil {
-		fmt.Println(appConfig.Pulse.PulseURL)
-		fmt.Println(appConfig.Pulse.PulseAuthToken)
 		options = append(options, bux.WithPulse(appConfig.Pulse.PulseURL, appConfig.Pulse.PulseAuthToken))
 	}
 
