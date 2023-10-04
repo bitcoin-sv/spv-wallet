@@ -1,52 +1,39 @@
-# Code of Merit
+# Code of Conduct
 
-1. The project creators, lead developers, core team, constitute
-the managing members of the project and have final say in every decision
-of the project, technical or otherwise, including overruling previous decisions.
-There are no limitations to this decisional power.
+## 1. Purpose
 
-2. Contributions are an expected result of your membership on the project.
-Don't expect others to do your work or help you with your work forever.
+The primary goal of this project is to foster an inclusive, respectful, and open community for everyone, regardless of their background or identity. This Code of Conduct outlines our expectations for participant behavior and the consequences for unacceptable behavior.
 
-3. All members have the same opportunities to seek any challenge they want
-within the project.
+## 2. Open Discussions & Respectful Feedback
 
-4. Authority or position in the project will be proportional
-to the accrued contribution. Seniority must be earned.
+- **Encourage Diverse Ideas:** Everyone brings a unique perspective. Encourage different viewpoints, and listen openly to each other’s ideas.
+  
+- **Constructive Feedback:** Focus on providing constructive feedback rather than criticizing individuals. Discuss ideas, not the person presenting them.
+  
+- **Avoid Harmful Language:** Refrain from using offensive or harmful language, including but not limited to sexist, racist, homophobic, transphobic, ableist, or discriminatory remarks.
 
-5. Software is evolutive: the better implementations must supersede lesser
-implementations. Technical advantage is the primary evaluation metric.
+## 3. No Politics or Off-topic Discussions
 
-6. This is a space for technical prowess; topics outside of the project
-will not be tolerated.
+- **Stay On Topic:** Keep discussions focused on the project and avoid bringing in off-topic or political discussions.
+  
+- **Respectful Discourse:** If discussions become heated, maintain a level of respect and understanding, and work towards a compromise.
 
-7. Non technical conflicts will be discussed in a separate space. Disruption
-of the project will not be allowed.
+## 4. Reporting & Enforcement
 
-8. Individual characteristics, including but not limited to,
-body, sex, sexual preference, race, language, religion, nationality,
-or political preferences are irrelevant in the scope of the project and
-will not be taken into account concerning your value or that of your contribution
-to the project.
+- **Report Violations:** If you observe a violation of this Code of Conduct, please report it by contacting the project team members.
+  
+- **Consequences:** Violations of this Code of Conduct may result in temporary or permanent banning from the project community.
 
-9. Discuss or debate the idea, not the person.
+## 5. Inclusion & Diversity
 
-10. There is no room for ambiguity: Ambiguity will be met with questioning;
-further ambiguity will be met with silence. It is the responsibility
-of the originator to provide requested context.
+- **Welcome Everyone:** Foster an environment where everyone feels welcome, regardless of their background, identity, or level of experience.
+  
+- **Help Newcomers:** Offer help and guidance to newcomers to make them feel welcome in our community.
 
-11. If something is illegal outside the scope of the project, it is illegal
-in the scope of the project. This Code of Merit does not take precedence over
-governing law.
+## 6. Be Kind & Courteous
 
-12. This Code of Merit governs the technical procedures of the project not the
-activities outside of it.
+- **Respect Time & Effort:** Recognize and respect the time and effort put in by contributors and maintainers.
+  
+- **Courtesy:** Be courteous and polite. Treat others as you would like to be treated.
 
-13. Participation on the project equates to agreement of this Code of Merit.
-
-14. No objectives beyond the stated objectives of this project are relevant
-to the project. Any intent to deviate the project from its original purpose
-of existence will constitute grounds for remedial action which may include
-expulsion from the project.
-
-This document is the Code of Merit (<del>`http://code-of-merit.org`</del>), version 1.0.
+By participating in this project, you agree to abide by this Code of Conduct. Let’s work together to make this community respectful and inclusive for everyone.
