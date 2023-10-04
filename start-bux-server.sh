@@ -40,6 +40,18 @@ function ask_for_yes_or_no() {
     fi
 }
 
+compose_plugin=false
+if command docker compose version &> /dev/null; then
+	compose_plugin=true
+fi
+
+function docker_compose_up() {
+    if [ compose_plugin == true ]; then
+        docker compose up $1
+    else
+        docker-compose up $1
+    fi
+}
 
 # Welcome message
 echo -e "\033[0;33m\033[1mWelcome in Bux Server!$reset"
@@ -184,12 +196,12 @@ fi
 echo -e "\033[0;32mStarting additional services with docker-compose...$reset"
 if [ "$cache" == "redis" ]; then
     echo -e "\033[0;37mdocker compose up -d bux-redis$reset"
-    docker compose up -d bux-redis
+    docker_compose_up "-d bux-redis"
 fi
 
 if [ "$database" != "sqlite" ]; then
-    echo -e "\033[0;37mdocker compose up -d bux-'$database'$reset"
-    docker compose up -d bux-"$database"
+    echo -e "\033[0;37mdocker compose up -d bux-$database$reset"
+    docker_compose_up "-d bux-$database"
 fi
 
 if [ "$bux_server" == "" ]; then
@@ -243,14 +255,18 @@ if [ "$bux_server" == "true" ]; then
     echo -e "\033[0;32mRunning Bux-server...$reset"
     if [ "$background" == "true" ]; then
         echo -e "\033[0;37mdocker compose up -d bux-server$reset"
-        docker compose up -d bux-server
+        docker_compose_up "-d bux-server"
     else
         echo -e "\033[0;37mdocker compose up bux-server$reset"
-        docker compose up bux-server
+        docker_compose_up "bux-server"
 
         function cleanup {
             echo -e "\033[0;31mStopping additional services...$reset"
-            docker compose stop
+            if [ compose_plugin == true ]; then
+                docker compose stop
+            else
+                docker-compose stop
+            fi
             echo -e "\033[0;31mExiting program...$reset"
         }
 
