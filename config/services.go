@@ -247,11 +247,12 @@ func (s *AppServices) loadBux(ctx context.Context, appConfig *AppConfig, testMod
 	}
 
 	if appConfig.UseBeef {
-		options = append(options, bux.WithPaymailBeefSupport())
-	}
 
-	if appConfig.Pulse != nil {
-		options = append(options, bux.WithPulse(appConfig.Pulse.PulseURL, appConfig.Pulse.PulseAuthToken))
+		if appConfig.Pulse == nil || appConfig.Pulse.PulseURL == "" || appConfig.Pulse.PulseAuthToken == "" {
+			err = errors.New("pulse is required for BEEF to work")
+			return
+		}
+		options = append(options, bux.WithPaymailBeefSupport(appConfig.Pulse.PulseURL, appConfig.Pulse.PulseAuthToken))
 	}
 
 	// Load task manager (redis or taskq)
