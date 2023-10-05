@@ -183,9 +183,11 @@ fi
 
 echo -e "\033[0;32mStarting additional services with docker-compose...$reset"
 if [ "$cache" == "redis" ]; then
-    echo -e "\033[0;37mdocker compose up -d bux-redis bux-'$database'$reset"
-    docker compose up -d bux-redis bux-"$database"
-else
+    echo -e "\033[0;37mdocker compose up -d bux-redis$reset"
+    docker compose up -d bux-redis
+fi
+
+if [ "$database" != "sqlite" ]; then
     echo -e "\033[0;37mdocker compose up -d bux-'$database'$reset"
     docker compose up -d bux-"$database"
 fi
@@ -254,7 +256,6 @@ if [ "$bux_server" == "true" ]; then
 
         trap cleanup EXIT
     fi
-
 else
     echo -e "\033[0;33m\033[1mThanks for using Bux configurator!"
     echo -e "Additional services are working, remember to start Bux-server manually!$reset"
