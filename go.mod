@@ -3,7 +3,7 @@ module github.com/BuxOrg/bux-server
 go 1.19
 
 require (
-	github.com/99designs/gqlgen v0.17.38
+	github.com/99designs/gqlgen v0.17.39
 	github.com/BuxOrg/bux v0.5.16
 	github.com/BuxOrg/bux-models v0.2.1
 	github.com/bitcoin-sv/go-broadcast-client v0.5.0
@@ -25,6 +25,8 @@ require (
 	github.com/swaggo/swag v1.16.2
 	github.com/vektah/gqlparser/v2 v2.5.10
 )
+
+require github.com/sosodev/duration v1.1.0 // indirect
 
 require (
 	github.com/KyleBanks/depth v1.2.1 // indirect
