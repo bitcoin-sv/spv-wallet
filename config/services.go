@@ -248,7 +248,7 @@ func (s *AppServices) loadBux(ctx context.Context, appConfig *AppConfig, testMod
 
 	if appConfig.UseBeef {
 
-		if appConfig.Pulse == nil || appConfig.Pulse.PulseURL == "" || appConfig.Pulse.PulseAuthToken == "" {
+		if appConfig.Pulse == nil || appConfig.Pulse.PulseURL == "" {
 			err = errors.New("pulse is required for BEEF to work")
 			return
 		}
