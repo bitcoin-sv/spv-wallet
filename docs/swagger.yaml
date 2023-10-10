@@ -352,6 +352,25 @@ paths:
       summary: Delete paymail
       tags:
       - Admin
+  /v1/admin/paymail/get:
+    get:
+      description: Get paymail
+      parameters:
+      - description: address
+        in: query
+        name: address
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+      security:
+      - bux-auth-xpub: []
+      summary: Get paymail
+      tags:
+      - Admin
   /v1/admin/paymails/count:
     post:
       description: Paymail addresses count
@@ -1067,6 +1086,22 @@ paths:
       security:
       - bux-auth-xpub: []
       summary: Search UTXO
+      tags:
+      - UTXO
+  /v1/utxo/unreserve:
+    patch:
+      description: Unreserve UTXOs
+      parameters:
+      - description: draft tx id
+        in: query
+        name: reference_id
+        type: string
+      responses:
+        "201":
+          description: Created
+      security:
+      - bux-auth-xpub: []
+      summary: Unreserve UTXOs
       tags:
       - UTXO
   /v1/xpub:

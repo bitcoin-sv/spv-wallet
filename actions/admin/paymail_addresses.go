@@ -10,6 +10,36 @@ import (
 	apirouter "github.com/mrz1836/go-api-router"
 )
 
+// paymailGetAddress will return a paymail address
+// Get Paymail godoc
+// @Summary		Get paymail
+// @Description	Get paymail
+// @Tags		Admin
+// @Param		address query string true "address"
+// @Produce		json
+// @Success		200
+// @Router		/v1/admin/paymail/get [get]
+// @Security	bux-auth-xpub
+func (a *Action) paymailGetAddress(w http.ResponseWriter, req *http.Request, _ httprouter.Params) {
+	params := apirouter.GetParams(req)
+	address := params.GetString("address")
+
+	if address == "" {
+		apirouter.ReturnResponse(w, req, http.StatusExpectationFailed, "address is required")
+		return
+	}
+
+	opts := a.Services.Bux.DefaultModelOptions()
+
+	paymailAddress, err := a.Services.Bux.GetPaymailAddress(req.Context(), address, opts...)
+	if err != nil {
+		apirouter.ReturnResponse(w, req, http.StatusExpectationFailed, err.Error())
+		return
+	}
+
+	apirouter.ReturnResponse(w, req, http.StatusOK, paymailAddress)
+}
+
 // paymailAddressesSearch will fetch a list of paymail addresses filtered by metadata
 // Paymail addresses search by metadata godoc
 // @Summary		Paymail addresses search

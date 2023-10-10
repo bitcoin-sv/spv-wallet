@@ -565,6 +565,37 @@
                 }
             }
         },
+        "/v1/admin/paymail/get": {
+            "get": {
+                "security": [
+                    {
+                        "bux-auth-xpub": []
+                    }
+                ],
+                "description": "Get paymail",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Admin"
+                ],
+                "summary": "Get paymail",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "address",
+                        "name": "address",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                }
+            }
+        },
         "/v1/admin/paymails/count": {
             "post": {
                 "security": [
@@ -1708,6 +1739,33 @@
                 "responses": {
                     "200": {
                         "description": "OK"
+                    }
+                }
+            }
+        },
+        "/v1/utxo/unreserve": {
+            "patch": {
+                "security": [
+                    {
+                        "bux-auth-xpub": []
+                    }
+                ],
+                "description": "Unreserve UTXOs",
+                "tags": [
+                    "UTXO"
+                ],
+                "summary": "Unreserve UTXOs",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "draft tx id",
+                        "name": "reference_id",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created"
                     }
                 }
             }
