@@ -29,6 +29,7 @@ func RegisterRoutes(router *apirouter.Router, appConfig *config.AppConfig, servi
 	router.HTTPRouter.POST("/"+config.CurrentMajorVersion+"/admin/block-headers/count", action.Request(router, require.Wrap(action.blockHeadersCount)))
 	router.HTTPRouter.POST("/"+config.CurrentMajorVersion+"/admin/destinations/search", action.Request(router, require.Wrap(action.destinationsSearch)))
 	router.HTTPRouter.POST("/"+config.CurrentMajorVersion+"/admin/destinations/count", action.Request(router, require.Wrap(action.destinationsCount)))
+	router.HTTPRouter.POST("/"+config.CurrentMajorVersion+"/admin/paymail/get", action.Request(router, require.Wrap(action.paymailGetAddress)))
 	router.HTTPRouter.POST("/"+config.CurrentMajorVersion+"/admin/paymails/search", action.Request(router, require.Wrap(action.paymailAddressesSearch)))
 	router.HTTPRouter.POST("/"+config.CurrentMajorVersion+"/admin/paymails/count", action.Request(router, require.Wrap(action.paymailAddressesCount)))
 	router.HTTPRouter.POST("/"+config.CurrentMajorVersion+"/admin/paymail/create", action.Request(router, require.Wrap(action.paymailCreateAddress)))
