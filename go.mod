@@ -4,7 +4,7 @@ go 1.19
 
 require (
 	github.com/99designs/gqlgen v0.17.39
-	github.com/BuxOrg/bux v0.5.16
+	github.com/BuxOrg/bux v0.5.17
 	github.com/BuxOrg/bux-models v0.2.1
 	github.com/bitcoin-sv/go-broadcast-client v0.5.0
 	github.com/go-ozzo/ozzo-validation v3.6.0+incompatible
@@ -41,7 +41,7 @@ require (
 	github.com/agnivade/levenshtein v1.1.1 // indirect
 	github.com/andybalholm/brotli v1.0.5 // indirect
 	github.com/asaskevich/govalidator v0.0.0-20230301143203-a9d515a09cc2 // indirect
-	github.com/bitcoin-sv/go-paymail v0.3.0 // indirect
+	github.com/bitcoin-sv/go-paymail v0.4.0 // indirect
 	github.com/bitcoinschema/go-bitcoin/v2 v2.0.5 // indirect
 	github.com/bitcoinschema/go-bpu v0.1.0 // indirect
 	github.com/bitcoinschema/go-map v0.1.0 // indirect
