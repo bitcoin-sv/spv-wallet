@@ -46,6 +46,8 @@ github.com/BuxOrg/bux-models v0.2.1 h1:wgNTYCqisH3M+Z87hb0Jpbxc8MMdOEJ35mdw/WoZ7
 github.com/BuxOrg/bux-models v0.2.1/go.mod h1:nH3MOdsIPPerBPOiEvwA01yTeArYtBk+PtDo7E+vPCk=
 github.com/DATA-DOG/go-sqlmock v1.5.0 h1:Shsta01QNfFxHCfpW6YH2STWB0MudeXXEWMr20OEh60=
 github.com/DataDog/datadog-go v3.7.1+incompatible/go.mod h1:LButxg5PwREeZtORoXG3tL4fMGNddJ+vMq1mwgfaqoQ=
+github.com/GorillaPool/go-junglebus v0.2.0 h1:ZePeZgQLEyYrJbBaHB6GKeMt+QOyw4EOtXxAyZvpkAk=
+github.com/GorillaPool/go-junglebus v0.2.0/go.mod h1:LigiSImLy9G/Tg9RKbn+pNYnuPbs5oLUprQZkxEr/2k=
 github.com/KyleBanks/depth v1.2.1 h1:5h8fQADFrWtarTdtDudMmGsC7GPbOAu6RVB3ffsVFHc=
 github.com/KyleBanks/depth v1.2.1/go.mod h1:jzSb9d0L43HxTQfT+oSA1EEp2q+ne2uh6XgeJcm8brE=
 github.com/acobaugh/osrelease v0.1.0 h1:Yb59HQDGGNhCj4suHaFQQfBps5wyoKLSSX/J/+UifRE=
@@ -62,8 +64,8 @@ github.com/arbovm/levenshtein v0.0.0-20160628152529-48b4e1c0c4d0/go.mod h1:t2tdK
 github.com/asaskevich/govalidator v0.0.0-20230301143203-a9d515a09cc2 h1:DklsrG3dyBCFEj5IhUbnKptjxatkF07cF2ak3yi77so=
 github.com/asaskevich/govalidator v0.0.0-20230301143203-a9d515a09cc2/go.mod h1:WaHUgvxTVq04UNunO+XhnAqY/wQc+bxr74GqbsZ/Jqw=
 github.com/aws/aws-sdk-go v1.43.45 h1:2708Bj4uV+ym62MOtBnErm/CDX61C4mFe9V2gXy1caE=
-github.com/bitcoin-sv/go-broadcast-client v0.5.0 h1:jRqiq/+iaL6BsgTf3XbiuoJvCy2+M/NHG85j1XQmmGA=
-github.com/bitcoin-sv/go-broadcast-client v0.5.0/go.mod h1:EGTrUK2r81moZbgaNalEZJaIBYp7/kOVXy17J9AFQJQ=
+github.com/bitcoin-sv/go-broadcast-client v0.6.0 h1:KTo4f2sHSHwcVZiZtK6Vbm4K1ulObh4Mp14TurI0ZaI=
+github.com/bitcoin-sv/go-broadcast-client v0.6.0/go.mod h1:hhbIvYiStl7YSH6MW8lWTFmScwVA7tlC8JSrclj//MA=
 github.com/bitcoin-sv/go-paymail v0.4.0 h1:j6N/jCvR+KmQSmih067DDgSoONyKn8tMVFgQvwl7cxY=
 github.com/bitcoin-sv/go-paymail v0.4.0/go.mod h1:/UsdMz72cml3j7P8+PPvvLSJJ//4DlHnA7bdimq9tY4=
 github.com/bitcoinschema/go-bitcoin/v2 v2.0.5 h1:Sgh5Eb746Zck/46rFDrZZEXZWyO53fMuWYhNoZa1tck=
