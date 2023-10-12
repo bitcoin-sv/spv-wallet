@@ -31,7 +31,7 @@ require (
 	github.com/agnivade/levenshtein v1.1.1 // indirect
 	github.com/andybalholm/brotli v1.0.5 // indirect
 	github.com/asaskevich/govalidator v0.0.0-20230301143203-a9d515a09cc2 // indirect
-	github.com/bitcoin-sv/go-paymail v0.4.0 // indirect
+	github.com/bitcoin-sv/go-paymail v0.5.0 // indirect
 	github.com/bitcoinschema/go-bitcoin/v2 v2.0.5 // indirect
 	github.com/bitcoinschema/go-bpu v0.1.0 // indirect
 	github.com/bitcoinschema/go-map v0.1.0 // indirect
@@ -52,7 +52,7 @@ require (
 	github.com/go-openapi/spec v0.20.9 // indirect
 	github.com/go-openapi/swag v0.22.4 // indirect
 	github.com/go-redis/redis_rate/v9 v9.1.2 // indirect
-	github.com/go-resty/resty/v2 v2.8.0 // indirect
+	github.com/go-resty/resty/v2 v2.9.1 // indirect
 	github.com/go-sql-driver/mysql v1.7.1 // indirect
 	github.com/gojektech/heimdall/v6 v6.1.0 // indirect
 	github.com/gojektech/valkyrie v0.0.0-20190210220504-8f62c1e7ba45 // indirect
@@ -124,12 +124,12 @@ require (
 	go.uber.org/multierr v1.9.0 // indirect
 	golang.org/x/crypto v0.14.0 // indirect
 	golang.org/x/exp v0.0.0-20230905200255-921286631fa9 // indirect
-	golang.org/x/mod v0.12.0 // indirect
+	golang.org/x/mod v0.13.0 // indirect
 	golang.org/x/net v0.17.0 // indirect
 	golang.org/x/sync v0.4.0 // indirect
 	golang.org/x/sys v0.13.0 // indirect
 	golang.org/x/text v0.13.0 // indirect
-	golang.org/x/tools v0.13.0 // indirect
+	golang.org/x/tools v0.14.0 // indirect
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20231009173412-8bfb1ae86b6c // indirect
 	google.golang.org/grpc v1.58.2 // indirect
 	google.golang.org/protobuf v1.31.0 // indirect
