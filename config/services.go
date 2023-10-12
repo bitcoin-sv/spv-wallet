@@ -246,6 +246,15 @@ func (s *AppServices) loadBux(ctx context.Context, appConfig *AppConfig, testMod
 		))
 	}
 
+	if appConfig.UseBeef {
+
+		if appConfig.Pulse == nil || appConfig.Pulse.PulseURL == "" {
+			err = errors.New("pulse is required for BEEF to work")
+			return
+		}
+		options = append(options, bux.WithPaymailBeefSupport(appConfig.Pulse.PulseURL, appConfig.Pulse.PulseAuthToken))
+	}
+
 	// Load task manager (redis or taskq)
 	// todo: this needs more improvement with redis options etc
 	if appConfig.TaskManager.Engine == taskmanager.TaskQ {
@@ -304,7 +313,6 @@ func (s *AppServices) loadBux(ctx context.Context, appConfig *AppConfig, testMod
 
 	if appConfig.BroadcastClientAPIs != nil {
 		arcClientConfigs := splitBroadcastClientApis(appConfig.BroadcastClientAPIs)
-		fmt.Println("arcClientConfigs", arcClientConfigs)
 		options = append(options, bux.WithBroadcastClientAPIs(arcClientConfigs))
 
 		builder := broadcast_client.Builder()

@@ -29,7 +29,7 @@ const (
 	EnvironmentStaging             = "staging"
 	EnvironmentTest                = "test"
 	HealthRequestPath              = "health"
-	Version                        = "v0.5.13"
+	Version                        = "v0.5.14"
 )
 
 // Local variables for configuration
@@ -74,6 +74,8 @@ type (
 		MinercraftAPI        string                   `json:"minercraft_api" mapstructure:"minercraft_api"`
 		MinercraftCustomAPIs []*minercraft.MinerAPIs  `json:"minercraft_custom_apis" mapstructure:"minercraft_custom_apis"`
 		BroadcastClientAPIs  []string                 `json:"broadcast_client_apis" mapstructure:"broadcast_client_apis"`
+		UseBeef              bool                     `json:"use_beef" mapstructure:"use_beef"`
+		Pulse                *PulseConfig             `json:"pulse" mapstructure:"pulse"`
 	}
 
 	// AuthenticationConfig is the configuration for Authentication
@@ -173,6 +175,12 @@ type (
 		ReadTimeout  time.Duration `json:"read_timeout" mapstructure:"read_timeout"`   // 15s
 		WriteTimeout time.Duration `json:"write_timeout" mapstructure:"write_timeout"` // 15s
 		Port         string        `json:"port" mapstructure:"port"`                   // 3003
+	}
+
+	// PulseConfig is a configuration for the Pulse service
+	PulseConfig struct {
+		PulseURL       string `json:"pulse_url" mapstructure:"pulse_url"`
+		PulseAuthToken string `json:"pulse_auth_token" mapstructure:"pulse_auth_token"`
 	}
 )
 
