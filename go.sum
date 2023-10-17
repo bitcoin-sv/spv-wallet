@@ -53,7 +53,7 @@ github.com/afex/hystrix-go v0.0.0-20180209013831-27fae8d30f1a/go.mod h1:SkGFH1ia
 github.com/agnivade/levenshtein v1.1.1 h1:QY8M92nrzkmr798gCo3kmMyqXFzdQVpxLlGPRBij0P8=
 github.com/agnivade/levenshtein v1.1.1/go.mod h1:veldBMzWxcCG2ZvUTKD2kJNRdCk5hVbJomOvKkmgYbo=
 github.com/alicebob/gopher-json v0.0.0-20230218143504-906a9b012302 h1:uvdUDbHQHO85qeSydJtItA4T55Pw6BtAejd0APRJOCE=
-github.com/alicebob/miniredis/v2 v2.30.5 h1:3r6kTHdKnuP4fkS8k2IrvSfxpxUTcW1SOL0wN7b7Dt0=
+github.com/alicebob/miniredis/v2 v2.31.0 h1:ObEFUNlJwoIiyjxdrYF0QIDE7qXcLc7D3WpSH4c22PU=
 github.com/andreyvit/diff v0.0.0-20170406064948-c7f18ee00883 h1:bvNMNQO63//z+xNgfBlViaCIJKLlCJ6/fmUseuG0wVQ=
 github.com/andybalholm/brotli v1.0.6 h1:Yf9fFpf49Zrxb9NlQaluyE92/+X7UVHlhMNJN2sxfOI=
 github.com/andybalholm/brotli v1.0.6/go.mod h1:fO7iG3H7G2nSZ7m0zPUDn85XEX2GTukHGRSepvi9Eig=
@@ -329,10 +329,10 @@ github.com/montanaflynn/stats v0.7.1 h1:etflOAAHORrCC44V+aR6Ftzort912ZU+YLiSTuV8
 github.com/montanaflynn/stats v0.7.1/go.mod h1:etXPPgVO6n31NxCd9KQUMvCM+ve0ruNzt6R8Bnaayow=
 github.com/mrz1836/go-api-router v0.6.0 h1:4wGH4hELDgU0d0cJs4oCQvUZPKcndzPQyiYZdH3fEjw=
 github.com/mrz1836/go-api-router v0.6.0/go.mod h1:aKZCuIERmP+t5f9eJnkdctxkvSmI1GCashwQHbwaYiU=
-github.com/mrz1836/go-cache v0.8.4 h1:XNctN+cMAy3cXONzaCaaG/BZIvnrScrrVQmRuDhGpsI=
-github.com/mrz1836/go-cache v0.8.4/go.mod h1:BfjqD9MW7+k/MWyMic4Yeb07VicEZ1HrOiQ0zqGsJL8=
-github.com/mrz1836/go-cachestore v0.2.7 h1:wjXzC/cXSjcRqyACoUfs0y0aP7OqmZaUs8PLW1g2Taw=
-github.com/mrz1836/go-cachestore v0.2.7/go.mod h1:tINpzZQrD7PoQPbrulC+F+VoPxgbeXllvYpeEYoSP6c=
+github.com/mrz1836/go-cache v0.9.0 h1:BDfbOLymU6ypCJKXek0Kq4Z51EC8vRZpbxvvcYW0JYg=
+github.com/mrz1836/go-cache v0.9.0/go.mod h1:Xdp2wmxzc3cZw18imDJW3UI/9En+ACtNT9uqG1+1xgE=
+github.com/mrz1836/go-cachestore v0.3.0 h1:8oKPvqxKNWuyOmJvnRtXD8kxdh/sYLhZM1ogB4FAoWM=
+github.com/mrz1836/go-cachestore v0.3.0/go.mod h1:GZQDG3XgHtmm7HTZ9csmsqtI2ImrIqEQkN5ip4PphTw=
 github.com/mrz1836/go-datastore v0.5.3 h1:cwhSMXljW6qe68Ip2i/1O30o25sp3hrdmLym5iq2ITQ=
 github.com/mrz1836/go-datastore v0.5.3/go.mod h1:lNBTDi9XYKrf/eApvm4OAKk3Hnnzg9f0VaB3J75INxc=
 github.com/mrz1836/go-logger v0.3.2 h1:bjd23NwVaLWncXgXAyxAwWLQ02of0Ci3iJIZZEakkFU=
