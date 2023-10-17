@@ -12,7 +12,7 @@ require (
 	github.com/gofrs/uuid v4.4.0+incompatible
 	github.com/julienschmidt/httprouter v1.3.0
 	github.com/mrz1836/go-api-router v0.6.0
-	github.com/mrz1836/go-cachestore v0.2.7
+	github.com/mrz1836/go-cachestore v0.3.0
 	github.com/mrz1836/go-datastore v0.5.3
 	github.com/mrz1836/go-logger v0.3.2
 	github.com/mrz1836/go-parameters v0.3.1
@@ -87,7 +87,7 @@ require (
 	github.com/miekg/dns v1.1.56 // indirect
 	github.com/mitchellh/mapstructure v1.5.0 // indirect
 	github.com/montanaflynn/stats v0.7.1 // indirect
-	github.com/mrz1836/go-cache v0.8.4 // indirect
+	github.com/mrz1836/go-cache v0.9.0 // indirect
 	github.com/newrelic/go-agent/v3/integrations/nrmongo v1.1.1 // indirect
 	github.com/pelletier/go-toml/v2 v2.1.0 // indirect
 	github.com/pkg/errors v0.9.1 // indirect
