@@ -44,7 +44,7 @@ pull_request_rules:
       - "#assignee=0"
     actions:
       assign:
-        users: ["mrz1836"]
+        users: ["arkadiuszos4chain"]
 
   # ===============================================================================
   # ALERTS
@@ -165,6 +165,7 @@ pull_request_rules:
           - author!=vitalibalashka
           - author!=wregulski
           - author!=dorzepowski
+          - author!=arkadiuszos4chain
     actions:
       comment:
         message: "Welcome to our open-source project @{{author}}! 💘"
