@@ -12,7 +12,7 @@ require (
 	github.com/gofrs/uuid v4.4.0+incompatible
 	github.com/julienschmidt/httprouter v1.3.0
 	github.com/mrz1836/go-api-router v0.6.0
-	github.com/mrz1836/go-cachestore v0.3.0
+	github.com/mrz1836/go-cachestore v0.3.1
 	github.com/mrz1836/go-datastore v0.5.3
 	github.com/mrz1836/go-logger v0.3.2
 	github.com/mrz1836/go-parameters v0.3.1
@@ -74,7 +74,7 @@ require (
 	github.com/jinzhu/now v1.1.5 // indirect
 	github.com/josharian/intern v1.0.0 // indirect
 	github.com/jpillora/backoff v1.0.0 // indirect
-	github.com/klauspost/compress v1.17.1 // indirect
+	github.com/klauspost/compress v1.17.2 // indirect
 	github.com/korovkin/limiter v0.0.0-20230307205149-3d4b2b34c99d // indirect
 	github.com/libsv/go-bc v0.1.18 // indirect
 	github.com/libsv/go-bk v0.1.6 // indirect
@@ -87,7 +87,7 @@ require (
 	github.com/miekg/dns v1.1.56 // indirect
 	github.com/mitchellh/mapstructure v1.5.0 // indirect
 	github.com/montanaflynn/stats v0.7.1 // indirect
-	github.com/mrz1836/go-cache v0.9.0 // indirect
+	github.com/mrz1836/go-cache v0.9.1 // indirect
 	github.com/newrelic/go-agent/v3/integrations/nrmongo v1.1.1 // indirect
 	github.com/pelletier/go-toml/v2 v2.1.0 // indirect
 	github.com/pkg/errors v0.9.1 // indirect
@@ -129,8 +129,8 @@ require (
 	golang.org/x/sys v0.13.0 // indirect
 	golang.org/x/text v0.13.0 // indirect
 	golang.org/x/tools v0.14.0 // indirect
-	google.golang.org/genproto/googleapis/rpc v0.0.0-20231012201019-e917dd12ba7a // indirect
-	google.golang.org/grpc v1.58.3 // indirect
+	google.golang.org/genproto/googleapis/rpc v0.0.0-20231016165738-49dd2c1f3d0b // indirect
+	google.golang.org/grpc v1.59.0 // indirect
 	google.golang.org/protobuf v1.31.0 // indirect
 	gopkg.in/ini.v1 v1.67.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
