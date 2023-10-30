@@ -11,7 +11,7 @@ require (
 	github.com/go-redis/redis/v8 v8.11.5
 	github.com/gofrs/uuid v4.4.0+incompatible
 	github.com/julienschmidt/httprouter v1.3.0
-	github.com/mrz1836/go-api-router v0.6.0
+	github.com/mrz1836/go-api-router v0.6.1
 	github.com/mrz1836/go-cachestore v0.3.1
 	github.com/mrz1836/go-datastore v0.5.3
 	github.com/mrz1836/go-logger v0.3.2
