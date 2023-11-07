@@ -11,11 +11,11 @@ require (
 	github.com/go-redis/redis/v8 v8.11.5
 	github.com/gofrs/uuid v4.4.0+incompatible
 	github.com/julienschmidt/httprouter v1.3.0
-	github.com/mrz1836/go-api-router v0.6.1
+	github.com/mrz1836/go-api-router v0.6.2
 	github.com/mrz1836/go-cachestore v0.3.1
 	github.com/mrz1836/go-datastore v0.5.4
 	github.com/mrz1836/go-logger v0.3.2
-	github.com/mrz1836/go-parameters v0.3.1
+	github.com/mrz1836/go-parameters v0.4.0
 	github.com/mrz1836/go-sanitize v1.3.1
 	github.com/mrz1836/go-validate v0.2.0
 	github.com/newrelic/go-agent/v3 v3.27.0
@@ -61,7 +61,7 @@ require (
 	github.com/golang/snappy v0.0.4 // indirect
 	github.com/gomodule/redigo v2.0.0+incompatible // indirect
 	github.com/google/uuid v1.4.0 // indirect
-	github.com/gorilla/mux v1.8.0 // indirect
+	github.com/gorilla/mux v1.8.1 // indirect
 	github.com/gorilla/websocket v1.5.0 // indirect
 	github.com/hashicorp/golang-lru v1.0.2 // indirect
 	github.com/hashicorp/golang-lru/v2 v2.0.7 // indirect
@@ -126,10 +126,10 @@ require (
 	golang.org/x/mod v0.13.0 // indirect
 	golang.org/x/net v0.17.0 // indirect
 	golang.org/x/sync v0.4.0 // indirect
-	golang.org/x/sys v0.13.0 // indirect
-	golang.org/x/text v0.13.0 // indirect
+	golang.org/x/sys v0.14.0 // indirect
+	golang.org/x/text v0.14.0 // indirect
 	golang.org/x/tools v0.14.0 // indirect
-	google.golang.org/genproto/googleapis/rpc v0.0.0-20231016165738-49dd2c1f3d0b // indirect
+	google.golang.org/genproto/googleapis/rpc v0.0.0-20231030173426-d783a09b4405 // indirect
 	google.golang.org/grpc v1.59.0 // indirect
 	google.golang.org/protobuf v1.31.0 // indirect
 	gopkg.in/ini.v1 v1.67.0 // indirect
