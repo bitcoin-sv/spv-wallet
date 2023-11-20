@@ -4,9 +4,9 @@ go 1.19
 
 require (
 	github.com/99designs/gqlgen v0.17.40
-	github.com/BuxOrg/bux v0.5.19
+	github.com/BuxOrg/bux v0.6.0
 	github.com/BuxOrg/bux-models v0.2.1
-	github.com/bitcoin-sv/go-broadcast-client v0.7.0
+	github.com/bitcoin-sv/go-broadcast-client v0.9.0
 	github.com/go-ozzo/ozzo-validation v3.6.0+incompatible
 	github.com/go-redis/redis/v8 v8.11.5
 	github.com/gofrs/uuid v4.4.0+incompatible
@@ -35,7 +35,7 @@ require (
 	github.com/KyleBanks/depth v1.2.1 // indirect
 	github.com/agnivade/levenshtein v1.1.1 // indirect
 	github.com/asaskevich/govalidator v0.0.0-20230301143203-a9d515a09cc2 // indirect
-	github.com/bitcoin-sv/go-paymail v0.5.0 // indirect
+	github.com/bitcoin-sv/go-paymail v0.7.2 // indirect
 	github.com/bitcoinschema/go-bitcoin/v2 v2.0.5 // indirect
 	github.com/bitcoinschema/go-bpu v0.1.0 // indirect
 	github.com/bitcoinschema/go-map v0.1.0 // indirect
@@ -56,7 +56,7 @@ require (
 	github.com/go-openapi/spec v0.20.9 // indirect
 	github.com/go-openapi/swag v0.22.4 // indirect
 	github.com/go-redis/redis_rate/v9 v9.1.2 // indirect
-	github.com/go-resty/resty/v2 v2.9.1 // indirect
+	github.com/go-resty/resty/v2 v2.10.0 // indirect
 	github.com/go-sql-driver/mysql v1.7.1 // indirect
 	github.com/gojektech/heimdall/v6 v6.1.0 // indirect
 	github.com/gojektech/valkyrie v0.0.0-20190210220504-8f62c1e7ba45 // indirect
