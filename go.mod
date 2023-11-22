@@ -80,7 +80,7 @@ require (
 	github.com/jpillora/backoff v1.0.0 // indirect
 	github.com/klauspost/compress v1.17.2 // indirect
 	github.com/korovkin/limiter v0.0.0-20230307205149-3d4b2b34c99d // indirect
-	github.com/libsv/go-bc v0.1.22 // indirect
+	github.com/libsv/go-bc v0.1.24 // indirect
 	github.com/libsv/go-bk v0.1.6 // indirect
 	github.com/libsv/go-bt v1.0.8 // indirect
 	github.com/libsv/go-bt/v2 v2.2.5 // indirect
@@ -111,7 +111,7 @@ require (
 	github.com/subosito/gotenv v1.6.0 // indirect
 	github.com/swaggo/files v1.0.1 // indirect
 	github.com/swaggo/http-swagger v1.3.4
-	github.com/tonicpow/go-minercraft/v2 v2.0.7
+	github.com/tonicpow/go-minercraft/v2 v2.0.8
 	github.com/tylertreat/BoomFilters v0.0.0-20210315201527-1a82519a3e43 // indirect
 	github.com/ugorji/go/codec v1.2.11 // indirect
 	github.com/valyala/bytebufferpool v1.0.0 // indirect
