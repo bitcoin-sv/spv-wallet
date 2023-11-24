@@ -3,5 +3,5 @@
 # This file is used to designate code owners for files and directories in this repository.
 # The code owner will automatically be requested for review on pull requests that modify the corresponding files.
 
-* @BuxOrg/developers
 * @BuxOrg/sr-engineers
+* @BuxOrg/developers
