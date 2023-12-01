@@ -15,7 +15,7 @@ require (
 	github.com/mrz1836/go-cachestore v0.3.2
 	github.com/mrz1836/go-datastore v0.5.7
 	github.com/mrz1836/go-logger v0.3.2
-	github.com/mrz1836/go-parameters v0.4.0
+	github.com/mrz1836/go-parameters v0.4.1
 	github.com/mrz1836/go-sanitize v1.3.1
 	github.com/mrz1836/go-validate v0.2.0
 	github.com/newrelic/go-agent/v3 v3.28.0
@@ -113,7 +113,7 @@ require (
 	github.com/swaggo/http-swagger v1.3.4
 	github.com/tonicpow/go-minercraft/v2 v2.0.8
 	github.com/tylertreat/BoomFilters v0.0.0-20210315201527-1a82519a3e43 // indirect
-	github.com/ugorji/go/codec v1.2.11 // indirect
+	github.com/ugorji/go/codec v1.2.12 // indirect
 	github.com/valyala/bytebufferpool v1.0.0 // indirect
 	github.com/vmihailenco/msgpack/v5 v5.4.0 // indirect
 	github.com/vmihailenco/tagparser/v2 v2.0.0 // indirect
