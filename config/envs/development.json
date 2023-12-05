@@ -8,7 +8,7 @@
   "use_mapi_fee_quotes": true,
   "minercraft_api": "mAPI",
   "authentication": {
-    "admin_key": "xpub661MyMwAqRbcFrBJbKwBGCB7d3fr2SaAuXGM95BA62X41m6eW2ehRQGW4xLi9wkEXUGnQZYxVVj4PxXnyrLk7jdqvBAs1Qq9gf6ykMvjR7J",
+    "admin_key": "xpub661MyMwAqRbcFaYeQLxmExXvTCjw9jjBRpifkoGggkAitXNNjva4TStLJuYjjEmU4AzXRPGwoECjXo3Rgqg8zQqW6UPVfkKtsrogGBw8xz7",
     "require_signing": false,
     "scheme": "xpub",
     "signing_disabled": true
