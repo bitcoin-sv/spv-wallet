@@ -9,6 +9,8 @@ import (
 	"os/signal"
 	"time"
 
+	"github.com/mrz1836/go-logger"
+
 	"github.com/BuxOrg/bux-server/config"
 	"github.com/BuxOrg/bux-server/dictionary"
 	_ "github.com/BuxOrg/bux-server/docs"
@@ -23,8 +25,8 @@ import (
 // @in header
 // @name bux-auth-xpub
 func main() {
-
 	defaultLogger := logging.GetDefaultLogger()
+
 	// Load the Application Configuration
 	appConfig, err := config.Load("")
 	if err != nil {

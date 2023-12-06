@@ -13,9 +13,9 @@ import (
 // Added a mutex lock for a race-condition
 var viperLock sync.Mutex
 
-// Load all environment variables
-func Load(customWorkingDirectory string) (appConfig *AppConfig, err error) {
-	setDefaults()
+// Load all AppConfig
+func Load(configFilePath string) (appConfig *AppConfig, err error) {
+	setDefaults(configFilePath)
 
 	// set flags
 
@@ -43,7 +43,7 @@ func envConfig() {
 }
 
 func loadFromFile() error {
-	configFilePath := viper.GetString("configFilePath") // TODO: extract to CONST
+	configFilePath := viper.GetString(ConfigFilePathKey)
 	viper.SetConfigFile(configFilePath)
 
 	if configFilePath != "" {

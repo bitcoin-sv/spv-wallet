@@ -23,39 +23,41 @@ const (
 	Version                        = "v0.5.16"
 )
 
+// ConfigFilePathKey is the viper key under which a config file path is stored
+const ConfigFilePathKey = "config_file"
+
 // AppConfig is the configuration values and associated env vars
 type AppConfig struct {
-	Authentication       *AuthenticationConfig    `json:"authentication" mapstructure:"authentication"`
-	Cachestore           *CachestoreConfig        `json:"cache" mapstructure:"cache"`
-	ClusterConfig        *ClusterConfig           `json:"cluster" mapstructure:"cluster"`
-	Datastore            *DatastoreConfig         `json:"datastore" mapstructure:"datastore"`
-	Debug                bool                     `json:"debug" mapstructure:"debug"`
-	DebugProfiling       bool                     `json:"debug_profiling" mapstructure:"debug_profiling"`
-	DisableITC           bool                     `json:"disable_itc" mapstructure:"disable_itc"`
-	Environment          string                   `json:"environment" mapstructure:"environment"`
-	GDPRCompliance       bool                     `json:"gdpr_compliance" mapstructure:"gdpr_compliance"`
-	GraphQL              *GraphqlConfig           `json:"graphql" mapstructure:"graphql"`
-	ImportBlockHeaders   string                   `json:"import_block_headers" mapstructure:"import_block_headers"`
-	Logging              *LoggingConfig           `json:"logging" mapstructure:"logging"`
-	Mongo                *datastore.MongoDBConfig `json:"mongodb" mapstructure:"mongodb"`
-	Monitor              *MonitorOptions          `json:"monitor" mapstructure:"monitor"`
-	NewRelic             *NewRelicConfig          `json:"new_relic" mapstructure:"new_relic"`
-	Notifications        *NotificationsConfig     `json:"notifications" mapstructure:"notifications"`
-	Paymail              *PaymailConfig           `json:"paymail" mapstructure:"paymail"`
-	Redis                *RedisConfig             `json:"redis" mapstructure:"redis"`
-	RequestLogging       bool                     `json:"request_logging" mapstructure:"request_logging"`
-	Server               *ServerConfig            `json:"server" mapstructure:"server"`
-	SQL                  *datastore.SQLConfig     `json:"sql" mapstructure:"sql"`
-	SQLite               *datastore.SQLiteConfig  `json:"sqlite" mapstructure:"sqlite"`
-	TaskManager          *TaskManagerConfig       `json:"task_manager" mapstructure:"task_manager"`
-	WorkingDirectory     string                   `json:"working_directory" mapstructure:"working_directory"`
-	UseMapiFeeQuotes     bool                     `json:"use_mapi_fee_quotes" mapstructure:"use_mapi_fee_quotes"`
-	MinercraftAPI        string                   `json:"minercraft_api" mapstructure:"minercraft_api"`
-	MinercraftCustomAPIs []*minercraft.MinerAPIs  `json:"minercraft_custom_apis" mapstructure:"minercraft_custom_apis"`
-	BroadcastClientAPIs  []string                 `json:"broadcast_client_apis" mapstructure:"broadcast_client_apis"`
-	UseBeef              bool                     `json:"use_beef" mapstructure:"use_beef"`
-	Pulse                *PulseConfig             `json:"pulse" mapstructure:"pulse"`
+	Authentication     *AuthenticationConfig `json:"auth" mapstructure:"auth"`
+	Beef               *BeefConfig           `json:"beef" mapstructure:"beef"`
+	Cachestore         *CachestoreConfig     `json:"cache" mapstructure:"cache"`
+	ClusterConfig      *ClusterConfig        `json:"cluster" mapstructure:"cluster"`
+	Db                 *DbConfig             `json:"db" mapstructure:"db"`
+	Debug              bool                  `json:"debug" mapstructure:"debug"`
+	DebugProfiling     bool                  `json:"debug_profiling" mapstructure:"debug_profiling"`
+	DisableITC         bool                  `json:"disable_itc" mapstructure:"disable_itc"`
+	GraphQL            *GraphqlConfig        `json:"graphql" mapstructure:"graphql"`
+	ImportBlockHeaders string                `json:"import_block_headers" mapstructure:"import_block_headers"`
+	Logging            *LoggingConfig        `json:"logging" mapstructure:"logging"`
+	Monitor            *MonitorOptions       `json:"monitor" mapstructure:"monitor"`
+	NewRelic           *NewRelicConfig       `json:"new_relic" mapstructure:"new_relic"`
+	Nodes              *NodesConfig          `json:"nodes" mapstructure:"nodes"`
+	Notifications      *NotificationsConfig  `json:"notifications" mapstructure:"notifications"`
+	Paymail            *PaymailConfig        `json:"paymail" mapstructure:"paymail"`
+	Redis              *RedisConfig          `json:"redis" mapstructure:"redis"`
+	RequestLogging     bool                  `json:"request_logging" mapstructure:"request_logging"`
+	Server             *ServerConfig         `json:"server" mapstructure:"server"`
+	TaskManager        *TaskManagerConfig    `json:"task_manager" mapstructure:"task_manager"`
 }
+
+// General config options keys for Viper
+const (
+	DebugKey              = "debug"
+	DebugProfilingKey     = "debug_profiling"
+	DisableITCKey         = "disable_itc"
+	ImportBlockHeadersKey = "import_block_headers"
+	RequestLoggingKey     = "request_logging"
+)
 
 // AuthenticationConfig is the configuration for Authentication
 type AuthenticationConfig struct {
@@ -65,12 +67,21 @@ type AuthenticationConfig struct {
 	SigningDisabled bool   `json:"signing_disabled" mapstructure:"signing_disabled"` // NOTE: Only for development (turns off signing)
 }
 
+// Authentication config option keys for Viper
 const (
 	AuthAdminKey        = "authentication.admin_key"
 	AuthRequireSigning  = "authentication.require_signing"
 	AuthScheme          = "authentication.scheme"
 	AuthSigningDisabled = "authentication.signing_disabled"
 )
+
+// BeefConfig consists of components requred to use beef, e.g. Pulse for merkle roots validation
+type BeefConfig struct {
+	UseBeef bool         `json:"use_beef" mapstructure:"use_beef"`
+	Pulse   *PulseConfig `json:"pulse" mapstructure:"pulse"`
+}
+
+const UseBeefKey = "beef.use_beef"
 
 // CachestoreConfig is a configuration for cachestore
 type CachestoreConfig struct {
@@ -91,8 +102,15 @@ type ClusterConfig struct {
 const (
 	ClusterCoordinatorKey = "cluster.coordinator"
 	ClusterPrefixKey      = "cluster.prefix"
-	ClusterRedisKey       = "cluster.redis"
 )
+
+// DbConfig consists of datastore config and specific dbs configs
+type DbConfig struct {
+	Datastore *DatastoreConfig         `json:"datastore" mapstructure:"datastore"`
+	Mongo     *datastore.MongoDBConfig `json:"mongodb" mapstructure:"mongodb"`
+	SQL       *datastore.SQLConfig     `json:"sql" mapstructure:"sql"`
+	SQLite    *datastore.SQLiteConfig  `json:"sqlite" mapstructure:"sqlite"`
+}
 
 // DatastoreConfig is a configuration for the datastore
 type DatastoreConfig struct {
@@ -103,10 +121,10 @@ type DatastoreConfig struct {
 }
 
 const (
-	DatastoreAutoMigrateKey = "datastore.auto_migrate"
-	DatastoreDebugKey       = "datastore.debug"
-	DatastoreEngineKey      = "datastore.engine"
-	DatastoreTablePrefix    = "datastore.table_prefix"
+	DatastoreAutoMigrateKey = "db.datastore.auto_migrate"
+	DatastoreDebugKey       = "db.datastore.debug"
+	DatastoreEngineKey      = "db.datastore.engine"
+	DatastoreTablePrefixKey = "db.datastore.table_prefix"
 )
 
 // GraphqlConfig is the configuration for the GraphQL server
@@ -160,6 +178,20 @@ const (
 	NewRelicDomainNameKey = "new_relic.domain_name"
 	NewRelicEnabledKey    = "new_relic.enabled"
 	NewRelicLicenseKeyKey = "new_relic.license_key"
+)
+
+// NodesConfig consists of blockchain nodes (such as Minercraft and Arc) configuration
+type NodesConfig struct {
+	UseMapiFeeQuotes     bool                    `json:"use_mapi_fee_quotes" mapstructure:"use_mapi_fee_quotes"`
+	MinercraftAPI        string                  `json:"minercraft_api" mapstructure:"minercraft_api"`
+	MinercraftCustomAPIs []*minercraft.MinerAPIs `json:"minercraft_custom_apis" mapstructure:"minercraft_custom_apis"`
+	BroadcastClientAPIs  []string                `json:"broadcast_client_apis" mapstructure:"broadcast_client_apis"`
+}
+
+const (
+	UseMapiFeeQuotesKey    = "nodes.use_mapi_fee_quotes"
+	MinercraftAPIKey       = "nodes.minercraft_api"
+	BroadcastClientAPIsKey = "nodes.broadcast_client_apis"
 )
 
 // NotificationsConfig is the configuration for notifications
@@ -252,16 +284,16 @@ const (
 
 // PulseConfig is a configuration for the Pulse service
 type PulseConfig struct {
-	PulseURL       string `json:"url" mapstructure:"url"`
-	PulseAuthToken string `json:"auth_token" mapstructure:"auth_token"`
+	PulseHeaderValidationURL string `json:"url" mapstructure:"url"`
+	PulseAuthToken           string `json:"auth_token" mapstructure:"auth_token"`
 }
 
 const (
-	PulseURLKey       = "pulse.url"
-	PulseAuthTokenKey = "pulse.auth_token"
+	PulseHeaderValidationURLKey = "pulse.url"
+	PulseAuthTokenKey           = "pulse.auth_token"
 )
 
 // GetUserAgent will return the outgoing user agent
 func (a *AppConfig) GetUserAgent() string {
-	return "BUX-Server " + a.Environment + " " + Version
+	return "BUX-Server " + Version
 }
