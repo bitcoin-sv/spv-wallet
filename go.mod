@@ -13,7 +13,7 @@ require (
 	github.com/julienschmidt/httprouter v1.3.0
 	github.com/mrz1836/go-api-router v0.7.0
 	github.com/mrz1836/go-cachestore v0.3.2
-	github.com/mrz1836/go-datastore v0.5.7
+	github.com/mrz1836/go-datastore v0.5.8
 	github.com/mrz1836/go-logger v0.3.2
 	github.com/mrz1836/go-parameters v0.4.1
 	github.com/mrz1836/go-sanitize v1.3.1
@@ -72,13 +72,13 @@ require (
 	github.com/hashicorp/hcl v1.0.0 // indirect
 	github.com/iancoleman/strcase v0.3.0 // indirect
 	github.com/jackc/pgpassfile v1.0.0 // indirect
-	github.com/jackc/pgservicefile v0.0.0-20221227161230-091c0ba34f0a // indirect
+	github.com/jackc/pgservicefile v0.0.0-20231201235250-de7065d80cb9 // indirect
 	github.com/jackc/pgx/v5 v5.5.0 // indirect
 	github.com/jinzhu/inflection v1.0.0 // indirect
 	github.com/jinzhu/now v1.1.5 // indirect
 	github.com/josharian/intern v1.0.0 // indirect
 	github.com/jpillora/backoff v1.0.0 // indirect
-	github.com/klauspost/compress v1.17.3 // indirect
+	github.com/klauspost/compress v1.17.4 // indirect
 	github.com/korovkin/limiter v0.0.0-20230307205149-3d4b2b34c99d // indirect
 	github.com/libsv/go-bc v0.1.24 // indirect
 	github.com/libsv/go-bk v0.1.6 // indirect
