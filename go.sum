@@ -335,8 +335,8 @@ github.com/mrz1836/go-api-router v0.7.0 h1:RTnU4g92IiTLDEHBUuftnTMfGRIc9/Q7y1wDU
 github.com/mrz1836/go-api-router v0.7.0/go.mod h1:zIj4Fe4mLx+VZjtWvxvPcfJMo9l8J/xEB5mDWh2oGQU=
 github.com/mrz1836/go-cache v0.9.2 h1:pQK3SJg6kfbn43oKW68R3qCWRILKSvSHs3qvwn8OzHc=
 github.com/mrz1836/go-cache v0.9.2/go.mod h1:IphLH8lmLdSI5N+8MswFEaqP1bJQ8800CxXre5nJD4M=
-github.com/mrz1836/go-cachestore v0.3.2 h1:10M2/i0qPMptKSpaonADivy0dW+12asQEgxPGPiWiTM=
-github.com/mrz1836/go-cachestore v0.3.2/go.mod h1:lbqHEmnRHF/TxW4avcMflARDpdUDI/Jh4XFnMqGRNuM=
+github.com/mrz1836/go-cachestore v0.3.3 h1:E9f1frV38iAfpJ7vYR8bJ/F3GEdmPUTTFwxDf8DZP/A=
+github.com/mrz1836/go-cachestore v0.3.3/go.mod h1:u1RyfM5lOOEWmYNmjrP2mKJwRahuvhapAP3vSSrXTmc=
 github.com/mrz1836/go-datastore v0.5.8 h1:OYbnoWZ5pZ5/zBgYOB8Aem1urAfMOs5UZvUomMk5aAI=
 github.com/mrz1836/go-datastore v0.5.8/go.mod h1:VvFsy+22wBpR/+tBn+rz0AKPt12xvPalV47KeranfEk=
 github.com/mrz1836/go-logger v0.3.2 h1:bjd23NwVaLWncXgXAyxAwWLQ02of0Ci3iJIZZEakkFU=
