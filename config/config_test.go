@@ -128,35 +128,11 @@ func TestAppConfig_Validate(t *testing.T) {
 		assert.Error(t, err)
 	})
 
-	t.Run("cachestore - invalid redis config", func(t *testing.T) {
-		app, _, txn := baseTestConfig(t)
-		app.Cachestore.Engine = cachestore.Redis
-		app.Redis = nil
-		err := app.Validate(txn)
-		assert.Error(t, err)
-	})
-
 	t.Run("cachestore - valid freecache", func(t *testing.T) {
 		app, _, txn := baseTestConfig(t)
 		app.Cachestore.Engine = cachestore.FreeCache
 		err := app.Validate(txn)
 		assert.NoError(t, err)
-	})
-
-	t.Run("datastore - invalid sqlite config", func(t *testing.T) {
-		app, _, txn := baseTestConfig(t)
-		app.Datastore.Engine = datastore.SQLite
-		app.SQLite = nil
-		err := app.Validate(txn)
-		assert.Error(t, err)
-	})
-
-	t.Run("datastore - invalid sql config", func(t *testing.T) {
-		app, _, txn := baseTestConfig(t)
-		app.Datastore.Engine = datastore.MySQL
-		app.SQL = nil
-		err := app.Validate(txn)
-		assert.Error(t, err)
 	})
 
 	t.Run("datastore - invalid sql user", func(t *testing.T) {
@@ -179,14 +155,6 @@ func TestAppConfig_Validate(t *testing.T) {
 		app, _, txn := baseTestConfig(t)
 		app.Datastore.Engine = datastore.MySQL
 		app.SQL.Host = ""
-		err := app.Validate(txn)
-		assert.Error(t, err)
-	})
-
-	t.Run("datastore - invalid mongo config", func(t *testing.T) {
-		app, _, txn := baseTestConfig(t)
-		app.Datastore.Engine = datastore.MongoDB
-		app.Mongo = nil
 		err := app.Validate(txn)
 		assert.Error(t, err)
 	})

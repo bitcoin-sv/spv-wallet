@@ -7,6 +7,7 @@ import (
 	"sync"
 
 	"github.com/BuxOrg/bux-server/dictionary"
+	"github.com/mrz1836/go-datastore"
 	"github.com/mrz1836/go-logger"
 	"github.com/spf13/viper"
 )
@@ -79,10 +80,25 @@ func Load(customWorkingDirectory string) (_appConfig *AppConfig, err error) {
 	logger.Data(2, logger.INFO, environment+" configuration env file processed in dir "+workingDirectory)
 
 	// Initialize
-	_appConfig = new(AppConfig)
+	_appConfigVal := AppConfig{
+		Authentication: AuthenticationConfig{},
+		Cachestore:     CachestoreConfig{},
+		ClusterConfig:  &ClusterConfig{},
+		Datastore:      DatastoreConfig{},
+		GraphQL:        GraphqlConfig{},
+		Mongo:          datastore.MongoDBConfig{},
+		Monitor:        MonitorOptions{},
+		NewRelic:       NewRelicConfig{},
+		Notifications:  NotificationsConfig{},
+		Paymail:        PaymailConfig{},
+		Redis:          RedisConfig{},
+		Server:         ServerConfig{},
+		TaskManager:    TaskManagerConfig{},
+		Pulse:          PulseConfig{},
+	}
 
 	// Unmarshal into values struct
-	if err = viper.Unmarshal(&_appConfig); err != nil {
+	if err = viper.Unmarshal(&_appConfigVal); err != nil {
 		err = fmt.Errorf(dictionary.GetInternalMessage(dictionary.ErrorViper), err.Error())
 		logger.Data(2, logger.ERROR, err.Error())
 		return
@@ -91,7 +107,8 @@ func Load(customWorkingDirectory string) (_appConfig *AppConfig, err error) {
 	viperLock.Unlock()
 
 	// Set working directory
-	_appConfig.WorkingDirectory = workingDirectory
+	_appConfigVal.WorkingDirectory = workingDirectory
+	_appConfig = &_appConfigVal
 
 	return
 }

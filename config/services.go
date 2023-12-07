@@ -14,7 +14,7 @@ import (
 	"github.com/BuxOrg/bux/cluster"
 	"github.com/BuxOrg/bux/taskmanager"
 	"github.com/BuxOrg/bux/utils"
-	broadcast_client "github.com/bitcoin-sv/go-broadcast-client/broadcast/broadcast-client"
+	broadcastclient "github.com/bitcoin-sv/go-broadcast-client/broadcast/broadcast-client"
 	"github.com/go-redis/redis/v8"
 	"github.com/mrz1836/go-cachestore"
 	"github.com/mrz1836/go-datastore"
@@ -196,7 +196,7 @@ func (s *AppServices) loadBux(ctx context.Context, appConfig *AppConfig, testMod
 						MinVersion: tls.VersionTLS12,
 					}
 				}
-			} else if appConfig.Redis != nil {
+			} else if appConfig.Redis.URL != "" {
 				redisOptions = &redis.Options{
 					Addr:        appConfig.Redis.URL,
 					IdleTimeout: appConfig.Redis.MaxIdleTimeout,
@@ -248,7 +248,7 @@ func (s *AppServices) loadBux(ctx context.Context, appConfig *AppConfig, testMod
 
 	if appConfig.UseBeef {
 
-		if appConfig.Pulse == nil || appConfig.Pulse.PulseURL == "" {
+		if appConfig.Pulse.PulseURL == "" {
 			err = errors.New("pulse is required for BEEF to work")
 			return
 		}
@@ -274,11 +274,11 @@ func (s *AppServices) loadBux(ctx context.Context, appConfig *AppConfig, testMod
 	}
 
 	// Load the notifications
-	if appConfig.Notifications != nil && appConfig.Notifications.Enabled {
+	if appConfig.Notifications.Enabled {
 		options = append(options, bux.WithNotifications(appConfig.Notifications.WebhookEndpoint))
 	}
 
-	if appConfig.Monitor != nil && appConfig.Monitor.Enabled {
+	if appConfig.Monitor.Enabled {
 		if appConfig.Monitor.BuxAgentURL == "" {
 			err = errors.New("CentrifugeServer is required for monitoring to work")
 			return
@@ -315,7 +315,7 @@ func (s *AppServices) loadBux(ctx context.Context, appConfig *AppConfig, testMod
 		arcClientConfigs := splitBroadcastClientApis(appConfig.BroadcastClientAPIs)
 		options = append(options, bux.WithBroadcastClientAPIs(arcClientConfigs))
 
-		builder := broadcast_client.Builder()
+		builder := broadcastclient.Builder()
 		for _, cfg := range arcClientConfigs {
 			builder.WithArc(cfg)
 		}
@@ -382,7 +382,7 @@ func loadDatastore(options []bux.ClientOps, appConfig *AppConfig) ([]bux.ClientO
 		}
 		appConfig.Mongo.Debug = debug
 		appConfig.Mongo.TablePrefix = tablePrefix
-		options = append(options, bux.WithMongoDB(appConfig.Mongo))
+		options = append(options, bux.WithMongoDB(&appConfig.Mongo))
 	} else {
 		return nil, errors.New("unsupported datastore engine: " + appConfig.Datastore.Engine.String())
 	}
@@ -396,20 +396,20 @@ func loadDatastore(options []bux.ClientOps, appConfig *AppConfig) ([]bux.ClientO
 }
 
 // splitBroadcastClientApis splits the broadcast client apis into a list of broadcast_client.ArcClientConfig
-func splitBroadcastClientApis(apis []string) []broadcast_client.ArcClientConfig {
-	var arcClients []broadcast_client.ArcClientConfig
+func splitBroadcastClientApis(apis []string) []broadcastclient.ArcClientConfig {
+	var arcClients []broadcastclient.ArcClientConfig
 	for _, api := range apis {
 		separatorIndex := strings.Index(api, "|")
 		if separatorIndex != -1 {
 			apiURL := api[:separatorIndex]
 			token := api[separatorIndex+1:]
 
-			arcClients = append(arcClients, broadcast_client.ArcClientConfig{
+			arcClients = append(arcClients, broadcastclient.ArcClientConfig{
 				APIUrl: apiURL,
 				Token:  token,
 			})
 		} else {
-			arcClients = append(arcClients, broadcast_client.ArcClientConfig{
+			arcClients = append(arcClients, broadcastclient.ArcClientConfig{
 				APIUrl: api,
 			})
 		}
