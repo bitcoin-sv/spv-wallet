@@ -4,7 +4,7 @@ import (
 	"github.com/spf13/viper"
 )
 
-// Default Config file path
+// DefaultConfigFilePath is in the root folder by default
 const DefaultConfigFilePath = "config.json"
 
 // General defaults
@@ -114,7 +114,7 @@ const (
 	NodesMinercraftAPIDefault    = "mAPI"
 )
 
-// Nodes defaults var
+// NodesBroadcastClientAPIsDefault is the default template of broadcast-client api tokens
 var NodesBroadcastClientAPIsDefault = []string{"url|token"}
 
 // Notification defaults
@@ -132,7 +132,7 @@ const (
 	PaymailSenderValidationEnabledDefault = true
 )
 
-// Paymail defaults var
+// PaymailDomainsDefault by default allows for localhost domain
 var PaymailDomainsDefault = []string{"localhost"}
 
 // Redis defaults

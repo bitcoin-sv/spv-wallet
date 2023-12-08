@@ -81,14 +81,14 @@ type BeefConfig struct {
 // PulseConfig is a configuration for the Pulse service
 type PulseConfig struct {
 	PulseHeaderValidationURL string `json:"url" mapstructure:"url"`
-	PulseAuthToken           string `json:"auth_token" mapstructure:"auth_token"` // #nosec G101
+	PulseAuthToken           string `json:"auth_token" mapstructure:"auth_token"`
 }
 
 // Beef config keys for Viper
 const (
 	UseBeefKey                  = "beef.use_beef"
 	PulseHeaderValidationURLKey = "beef.pulse.url"
-	PulseAuthTokenKey           = "beef.pulse.auth_token"
+	PulseAuthTokenKey           = "beef.pulse.auth_token" // #nosec G101
 )
 
 // CachestoreConfig is a configuration for cachestore
