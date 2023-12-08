@@ -20,7 +20,7 @@
 ## Table of Contents
 
 -   [What is BUX?](#what-is-bux)
--   [Environment Variables](#environment-variables)
+-   [Config Variables](#config-variables)
 -   [Installation](#installation)
 -   [Documentation](#documentation)
 -   [Examples & Tests](#examples--tests)
@@ -38,25 +38,117 @@
 
 <br/>
 
-## Environment Variables
+## Config Variables
 
-| Variable name                         | Description                   |
-|---------------------------------------|-------------------------------|
-| BUX_ENVIRONMENT                       | development or production     |
-| BUX_AUTHENTICATION\*\*ADMIN_KEY       | [your-admin-xpriv]            |
-| BUX_AUTHENTICATION\*\*REQUIRE_SIGNING | 1 or 0                        |
-| BUX_DATASTORE\*\*ENGINE               | mongodb, sqlite, mysql        |
-| BUX_MONGODB\*\*URI                    | mongodb://localhost:27017/bux |
-| BUX_MONGODB\*\*DATABASE_NAME          | bux                           |
-| BUX_DATASTORE\*\*AUTO_MIGRATE         | 1 or 0                        |
-| BUX_CACHE\*\*ENGINE                   | freecache or redis            |
-| BUX_REDIS\*\*URL                      | redis://localhost:6379        |
-| BUX_MONITOR\*\*ENABLED                | 1 or 0                        |
-| BUX_GRAPHQL\*\*ENABLED                | 1 or 0                        |
-| BUX_DEBUG                             | 1 or 0                        |
-| BUX_NEW_RELIC\*\*ENABLED              | 1 or 0                        |
-| BUX_NEW_RELIC\*\*DOMAIN_NAME          | bux-nyc1.bux.ninja            |
-| BUX_NEW_RELIC\*\*LICENSE_KEY          | [your-key]                    |
+Default config variables can be overridden by (in this order):
+1. Flags
+2. ENV variables
+3. Config file
+
+Available flags:
+
+```bash
+  -C, --config_file string                       custom config file path
+  -h, --help                                     show help
+  -v, --version                                  show version
+  -d, --dump_config                              dump config to file, specified by config_file flag
+      --debug                                    enable debug logging (default true)
+      --debug_profiling                          enable debug profiling (default true)
+      --disable_itc                              disable ITC - Incoming Transaction Checking (default true)
+      --import_block_headers string              path or URL to blockheaders file
+      --request_logging                          request logging from api routers (rest and graphql) (default true)
+      --auth.admin_key string                    key that is used for administrative requests (default "xpub661MyMwAqRbcFaYeQLxmExXvTCjw9jjBRpifkoGggkAitXNNjva4TStLJuYjjEmU4AzXRPGwoECjXo3Rgqg8zQqW6UPVfkKtsrogGBw8xz7")
+      --auth.require_signing                     require signing
+      --auth.scheme string                       authentication scheme to use (default "xpub")
+      --auth.signing_disabled                    NOTE: Only for development, turns off signing (default true)
+      --beef.use_beef                            enables BEEF transaction format, requires Pulse settings (default true)
+      --beef.pulse.url string                    pulse url for validating merkle roots (default "http://localhost:8000/api/v1/chain/merkleroot/verify")
+      --beef.pulse.auth_token string             authentication token for pulse (default "asd")
+      --cache.engine string                      cache engine: redis, freecache or empty (default "freecache")
+      --cluster.coordinator string               redis or memory (default "redis")
+      --cluster.prefix string                    prefix string to use for all cluster keys (default "bux_cluser_")
+      --cluster.redis.url string                 Redis URL for cluster coordinator, if redis is chosen (default "localhost:6379")
+      --cluster.redis.max_idle_timeout string    max idle timeout for redis for cluster, if redis is chosen (default "10s")
+      --cluster.redis.use_tls                    should redis cluster coordinator use tls, if redis is chosen
+      --db.datastore.auto_migrate                loads a blank database (default true)
+      --db.datastore.debug                       show sql statements
+      --db.datastore.engine string               mysql, sqlite, postgresql, mongodb, empty (default "sqlite")
+      --db.datastore.table_prefix string         prefix for all tables in db (default "xapi")
+      --db.mongodb.db_name string                database name for MongoDB (default "xapi")
+      --db.mongodb.transactions                  has transactions
+      --db.mongodb.uri string                    connection uri to MongoDB (default "mongodb://localhost:27017/xapi")
+      --db.sql.driver string                     mysql, postgresql (default "postgresql")
+      --db.sql.host string                       db host (default "localhost")
+      --db.sql.user string                       db user (default "postgres")
+      --db.sql.name string                       db name (default "xapi")
+      --db.sql.password string                   db password
+      --db.sql.port string                       db port (default "5432")
+      --db.sql.replica                           true if it's a replica (Read-Only)
+      --db.sql.skip_initialize_with_version      skip using MySQL in test mode (default true)
+      --db.sql.time_zone string                  time zone for db (default "UTC")
+      --db.sql.tx_timeout string                 timeout for transactions (default "10s")
+      --db.sqlite.database_path string           db path for sqlite (default "./test-json.db")
+      --db.sqlite.shared                         adds a shared param to the connection string (default true)
+      --graphql.enabled                          enable graphql (default true)
+      --graphql.playground_path string           playground path for graphql (default "/graphql")
+      --graphql.server_path string               server path (default "/graphql")
+      --monitor.auth_token string                token to connect to the server with
+      --monitor.bux_agent_url string             the bux agent server url address (default "ws://localhost:8000/websocket")
+      --monitor.debug                            enable debug
+      --monitor.enabled                          enable monitor
+      --monitor.false_positive_rate float        percentage of false positives to expect (default 0.01)
+      --monitor.load_monitored_destinations      load monitored destinations
+      --monitor.max_number_of_destinations int   number of destinations that the filter can hold (default 100000)
+      --monitor.monitor_days int                 number of days in the past that an address should be monitored for (default 7)
+      --monitor.processor_type string            type of processor to start monitor with (default "bloom")
+      --monitor.save_transaction_destinations    save destinations on monitored transactions (default true)
+      --new_relic.domain_name string             used for hostname display (default "domain.com")
+      --new_relic.enabled                        enable NewRelic
+      --new_relic.license_key string             license key (default "BOGUS-LICENSE-KEY-1234567890987654321234")
+      --nodes.use_mapi_fee_quotes                use mAPI fee quotes (default true)
+      --nodes.minercraft_api string              type of api to use by minercraft, arc of mapi (default "mAPI")
+      --nodes.broadcast_client_apis strings      go-broadcastClient api keys in fromat 'api_url|token' (default [url|token])
+      --notifications.enabled                    enable notifications
+      --notifications.webhook_endpoint string    webhook endpoint for notifications
+      --paymail.default_from_paymail string      default 'from:@domain.com' paymail (default "from@domain.com")
+      --paymail.default_note string              default paymail note, IE: message needed for address resolution (default "bux Address Resolution")
+      --paymail.domains strings                  list of allowed paymail domains (default [localhost])
+      --paymail.domain_validation_enabled        enable paymail domain validation, turn off if hosted domain is not paymail related
+      --paymail.enabled                          enable paymail (default true)
+      --paymail.sender_validation_enabled        enable paymail sender validation - extra security (default true)
+      --redis.dependency_mode                    only in Redis with script enabled (default true)
+      --redis.max_active_connections int         max active redis connections
+      --redis.max_connection_lifetime string     max redis connection lifetime (default "60s")
+      --redis.max_idle_connections int           max idle redis connections (default 10)
+      --redis.max_idle_timeout string            max idle redis timeout (default "10s")
+      --redis.url string                         redis url connections string (default "redis://localhost:6379")
+      --redis.use_tls                            enable redis TLS
+      --task_manager.engine string               tasq, machinery, empty (default "taskq")
+      --task_manager.factory string              memory, redis, empty (default "memory")
+      --task_manager.queue_name string           name of task manager queue (default "development_queue")
+      --server.idle_timeout string               server idle timeout (default "60s")
+      --server.read_timeout string               server read timeout (default "15s")
+      --server.write_timeout string              server write timout (default "15s")
+      --server.port string                       server port (default "3003")
+```
+
+To override with ENV variables, take the value and use the formula:
+- `BUX_` prefix
+- replace dot "." with underscore "\_"
+- all uppercase
+
+So for example, to override authentication key for admin, for which a path is `admin.auth_key`, do:
+```BUX_ADMIN_AUTH_KEY="auth123```
+
+To generate config file with defaults, use the --dump flag, or:
+```bash
+go run ./cmd/server/main.go -d
+```
+
+The default config file path is **project root**, and the default file name is **config.json**. This can be overridden by -C flag.
+```bash
+go run ./cmd/server/main.go -C /my/config.json
+```
 
 ## Installation
 
