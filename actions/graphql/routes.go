@@ -90,8 +90,8 @@ func RegisterRoutes(router *apirouter.Router, appConfig *config.AppConfig, servi
 	// Set the POST routes
 	router.HTTPRouter.POST(serverPath, h)
 
-	// only show in development mode
-	if appConfig.Environment == config.EnvironmentDevelopment {
+	// only show in debug mode
+	if appConfig.Debug {
 		playgroundPath := appConfig.GraphQL.PlaygroundPath
 		if len(playgroundPath) == 0 {
 			playgroundPath = defaultPlaygroundPath

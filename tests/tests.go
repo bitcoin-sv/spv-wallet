@@ -4,13 +4,12 @@ package tests
 import (
 	"context"
 	"os"
-	"path"
-	"runtime"
 
-	"github.com/BuxOrg/bux-server/config"
 	apirouter "github.com/mrz1836/go-api-router"
 	"github.com/stretchr/testify/require"
 	"github.com/stretchr/testify/suite"
+
+	"github.com/BuxOrg/bux-server/config"
 )
 
 // TestSuite is for testing the entire package using real/mocked services
@@ -23,28 +22,9 @@ type TestSuite struct {
 
 // BaseSetupSuite runs at the start of the suite
 func (ts *TestSuite) BaseSetupSuite() {
-	// Set the env to test
-	err := os.Setenv(config.EnvironmentKey, config.EnvironmentTest)
-	require.NoError(ts.T(), err)
-
-	// Get current working directory
-	var dirname string
-	dirname, err = os.Getwd()
-	require.NoError(ts.T(), err)
-
-	// Go up one package
-	var dir *os.File
-	pathPrefix := "../../"
-
-	if runtime.GOOS == "windows" { // todo: use go-Embed and remove this
-		pathPrefix = "../../../"
-	}
-
-	dir, err = os.Open(path.Join(dirname, pathPrefix)) //nolint:gosec // todo: use go-Embed and remove this
-	require.NoError(ts.T(), err)
-
 	// Load the configuration
-	ts.AppConfig, err = config.Load(dir.Name())
+	var err error
+	ts.AppConfig, err = config.Load("")
 	require.NoError(ts.T(), err)
 }
 

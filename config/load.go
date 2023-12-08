@@ -17,7 +17,7 @@ var viperLock sync.Mutex
 func Load(configFilePath string) (appConfig *AppConfig, err error) {
 	setDefaults(configFilePath)
 
-	// set flags
+	loadFlags()
 
 	envConfig()
 
@@ -49,8 +49,14 @@ func loadFromFile() error {
 	if configFilePath != "" {
 		viper.SetConfigFile(configFilePath)
 		if err := viper.ReadInConfig(); err != nil {
-			err = fmt.Errorf(dictionary.GetInternalMessage(dictionary.ErrorReadingConfig), err.Error())
-			return err
+			switch err.(type) {
+			case *viper.ConfigFileNotFoundError:
+				logger.Data(2, logger.INFO, "Config file not specified. Using defaults")
+			default:
+				err = fmt.Errorf(dictionary.GetInternalMessage(dictionary.ErrorReadingConfig), err.Error())
+				logger.Data(2, logger.ERROR, err.Error())
+				return err
+			}
 		}
 	}
 	return nil

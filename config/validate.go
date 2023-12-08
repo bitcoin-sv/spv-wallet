@@ -3,7 +3,6 @@ package config
 import (
 	"errors"
 
-	validation "github.com/go-ozzo/ozzo-validation"
 	"github.com/mrz1836/go-cachestore"
 	"github.com/mrz1836/go-datastore"
 	"github.com/newrelic/go-agent/v3/newrelic"
@@ -22,7 +21,7 @@ func (a *AppConfig) Validate(txn *newrelic.Transaction) error {
 		return err
 	}
 
-	if err = a.Datastore.Validate(); err != nil {
+	if err = a.Db.Datastore.Validate(); err != nil {
 		return err
 	}
 
@@ -46,34 +45,31 @@ func (a *AppConfig) Validate(txn *newrelic.Transaction) error {
 		return err
 	}
 
-	return validation.ValidateStruct(a,
-		validation.Field(&a.Environment, validation.Required, validation.In(environments...)),
-		validation.Field(&a.WorkingDirectory, validation.Required),
-	)
+	return nil
 }
 
 // validateDatastore will check the datastore and validate basic requirements
 func (a *AppConfig) validateDatastore() error {
-	if a.Datastore.Engine == datastore.SQLite {
-		if a.SQLite == nil {
+	if a.Db.Datastore.Engine == datastore.SQLite {
+		if a.Db.SQLite == nil {
 			return errors.New("missing sqlite config")
 		}
-	} else if a.Datastore.Engine == datastore.MySQL || a.Datastore.Engine == datastore.PostgreSQL {
-		if a.SQL == nil {
+	} else if a.Db.Datastore.Engine == datastore.MySQL || a.Db.Datastore.Engine == datastore.PostgreSQL {
+		if a.Db.SQL == nil {
 			return errors.New("missing sql config")
-		} else if len(a.SQL.Host) == 0 {
+		} else if len(a.Db.SQL.Host) == 0 {
 			return errors.New("missing sql host")
-		} else if len(a.SQL.User) == 0 {
+		} else if len(a.Db.SQL.User) == 0 {
 			return errors.New("missing sql username")
-		} else if len(a.SQL.Name) == 0 {
+		} else if len(a.Db.SQL.Name) == 0 {
 			return errors.New("missing sql db name")
 		}
-	} else if a.Datastore.Engine == datastore.MongoDB {
-		if a.Mongo == nil {
+	} else if a.Db.Datastore.Engine == datastore.MongoDB {
+		if a.Db.Mongo == nil {
 			return errors.New("missing mongo config")
-		} else if len(a.Mongo.URI) == 0 {
+		} else if len(a.Db.Mongo.URI) == 0 {
 			return errors.New("missing mongo uri")
-		} else if len(a.Mongo.DatabaseName) == 0 {
+		} else if len(a.Db.Mongo.DatabaseName) == 0 {
 			return errors.New("missing mongo database name")
 		}
 	}

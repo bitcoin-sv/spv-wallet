@@ -4,8 +4,6 @@ import (
 	"github.com/spf13/viper"
 )
 
-const ConfigFilePathDefault = "config/config.json"
-
 // General defaults
 const (
 	DebugDefault              = true
@@ -13,12 +11,7 @@ const (
 	DisableITCDefault         = true
 	ImportBlockHeadersDefault = ""
 	RequestLoggingDefault     = true
-	UseMapiFeeQuotesDefault   = true
-	MinercraftAPIDefault      = "mAPI"
-	UseBeefDefault            = true
 )
-
-var BroadcastClientAPIsDefault = []string{"url|token"}
 
 // Authentication defaults
 const (
@@ -28,6 +21,13 @@ const (
 	AuthSigningDisabledDefault = true
 )
 
+// Beef defaults
+const (
+	UseBeefDefault                  = true
+	PulseHeaderValidationURLDefault = "http://localhost:8000/api/v1/chain/merkleroot/verify"
+	PulseAuthTokenDefault           = "asd"
+)
+
 // Cachestore defaults
 const (
 	CacheEngineDefault = "freecache"
@@ -35,8 +35,11 @@ const (
 
 // Cluster defaults
 const (
-	ClusterCoordinatorDefault = "redis"
-	ClusterPrefixDefault      = "bux_cluser_"
+	ClusterCoordinatorDefault         = "redis"
+	ClusterPrefixDefault              = "bux_cluser_"
+	ClusterRedisUrlDefault            = "localhost:6379"
+	ClusterRedisMaxIdleTimeoutDefault = "10s"
+	ClusterRedisUseTlsDefault         = false
 )
 
 // Datastore defaults
@@ -45,6 +48,33 @@ const (
 	DatastoreDebugDefault       = false
 	DatastoreEngineDefault      = "sqlite"
 	DatastoreTablePrefixDefault = "xapi"
+)
+
+// MongoDB config keys
+const (
+	MongoDatabaseNameDefault = "xapi"
+	MongoTransactionsDefault = false
+	MongoUriDefault          = "mongodb://localhost:27017/xapi"
+)
+
+// SQL (MySQL, PostgreSQL) config keys
+const (
+	SqlDriverDefault                    = "postgresql"
+	SqlHostDefault                      = "localhost"
+	SqlNameDefault                      = "xapi"
+	SqlPasswordDefault                  = ""
+	SqlPortDefault                      = "5432"
+	SqlReplicaDefault                   = false
+	SqlSkipInitializeWithVersionDefault = true
+	SqlTimeZoneDefault                  = "UTC"
+	SqlTxTimeoutDefault                 = "10s"
+	SqlUserDefault                      = "postgres"
+)
+
+// SQLite config keys
+const (
+	SqliteDatabasePathDefault = "./test-json.db"
+	SqliteSharedDefault       = true
 )
 
 // Graphql defaults
@@ -75,6 +105,15 @@ const (
 	NewRelicLicenseKeyDefault = "BOGUS-LICENSE-KEY-1234567890987654321234"
 )
 
+// Nodes defaults
+const (
+	NodesUseMapiFeeQuotesDefault = true
+	NodesMinercraftAPIDefault    = "mAPI"
+)
+
+var NodesBroadcastClientAPIsDefault = []string{"url|token"}
+
+// Notification defaults
 const (
 	NotificationsEnabledDefault         = false
 	NotificationsWebhookEndpointDefault = ""
@@ -117,33 +156,19 @@ const (
 	ServerPortDefault         = "3003"
 )
 
-// Pulse defaults
-const (
-	PulseHeaderValidationURLDefault = "http://localhost:8000/api/v1/chain/merkleroot/verify"
-	PulseAuthTokenDefault           = "asd"
-)
-
 func setDefaults(configFilePath string) {
-	if configFilePath != "" {
-		viper.SetDefault(ConfigFilePathKey, configFilePath)
-	} else {
-		viper.SetDefault(ConfigFilePathKey, ConfigFilePathDefault)
-	}
+	viper.SetDefault(ConfigFilePathKey, configFilePath)
 
 	setGeneralDefaults()
 	setAuthDefaults()
 	setBeefDefaults()
 	setCachestoreDefaults()
 	setClusterDefaults()
-
 	setDbDefaults()
-
 	setGraphqlDefaults()
 	setMonitorDefaults()
 	setNewRelicDefaults()
-
 	setNodesDefaults()
-
 	setNotificationsDefaults()
 	setPaymailDefaults()
 	setRedisDefaults()
@@ -157,15 +182,13 @@ func setGeneralDefaults() {
 	viper.SetDefault(DisableITCKey, DisableITCDefault)
 	viper.SetDefault(ImportBlockHeadersKey, ImportBlockHeadersDefault)
 	viper.SetDefault(RequestLoggingKey, RequestLoggingDefault)
-	viper.SetDefault(UseMapiFeeQuotesKey, UseMapiFeeQuotesDefault)
-	viper.SetDefault(MinercraftAPIKey, MinercraftAPIDefault)
 }
 
 func setAuthDefaults() {
 	viper.SetDefault(AuthAdminKey, AuthAdminKeyDefault)
-	viper.SetDefault(AuthRequireSigning, AuthRequireSigningDefault)
-	viper.SetDefault(AuthScheme, AuthSchemeDefault)
-	viper.SetDefault(AuthSigningDisabled, AuthSigningDisabledDefault)
+	viper.SetDefault(AuthRequireSigningKey, AuthRequireSigningDefault)
+	viper.SetDefault(AuthSchemeKey, AuthSchemeDefault)
+	viper.SetDefault(AuthSigningDisabledKey, AuthSigningDisabledDefault)
 }
 
 func setBeefDefaults() {
@@ -181,6 +204,9 @@ func setCachestoreDefaults() {
 func setClusterDefaults() {
 	viper.SetDefault(ClusterCoordinatorKey, ClusterCoordinatorDefault)
 	viper.SetDefault(ClusterPrefixKey, ClusterPrefixDefault)
+	viper.SetDefault(ClusterRedisUrlKey, ClusterRedisUrlDefault)
+	viper.SetDefault(ClusterRedisMaxIdleTimeoutKey, ClusterRedisMaxIdleTimeoutDefault)
+	viper.SetDefault(ClusterRedisUseTlsKey, ClusterRedisUseTlsDefault)
 }
 
 func setDbDefaults() {
@@ -188,6 +214,24 @@ func setDbDefaults() {
 	viper.SetDefault(DatastoreDebugKey, DatastoreDebugDefault)
 	viper.SetDefault(DatastoreEngineKey, DatastoreEngineDefault)
 	viper.SetDefault(DatastoreTablePrefixKey, DatastoreTablePrefixDefault)
+
+	viper.SetDefault(MongoDatabaseNameKey, MongoDatabaseNameDefault)
+	viper.SetDefault(MongoTransactionsKey, MongoTransactionsDefault)
+	viper.SetDefault(MongoUriKey, MongoUriDefault)
+
+	viper.SetDefault(SqlDriverKey, SqlDriverDefault)
+	viper.SetDefault(SqlHostKey, SqlHostDefault)
+	viper.SetDefault(SqlNameKey, SqlNameDefault)
+	viper.SetDefault(SqlPasswordKey, SqlPasswordDefault)
+	viper.SetDefault(SqlPortKey, SqlPortDefault)
+	viper.SetDefault(SqlReplicaKey, SqlReplicaDefault)
+	viper.SetDefault(SqlSkipInitializeWithVersionKey, SqlSkipInitializeWithVersionDefault)
+	viper.SetDefault(SqlTimeZoneKey, SqlTimeZoneDefault)
+	viper.SetDefault(SqlTxTimeoutKey, SqlTxTimeoutDefault)
+	viper.SetDefault(SqlUserKey, SqlUserDefault)
+
+	viper.SetDefault(SqliteDatabasePathKey, SqliteDatabasePathDefault)
+	viper.SetDefault(SqliteSharedKey, SqliteSharedDefault)
 }
 
 func setGraphqlDefaults() {
@@ -216,9 +260,9 @@ func setNewRelicDefaults() {
 }
 
 func setNodesDefaults() {
-	viper.SetDefault(UseMapiFeeQuotesKey, UseMapiFeeQuotesDefault)
-	viper.SetDefault(MinercraftAPIKey, MinercraftAPIDefault)
-	viper.SetDefault(BroadcastClientAPIsKey, BroadcastClientAPIsDefault)
+	viper.SetDefault(NodesUseMapiFeeQuotesKey, NodesUseMapiFeeQuotesDefault)
+	viper.SetDefault(NodesMinercraftAPIKey, NodesMinercraftAPIDefault)
+	viper.SetDefault(NodesBroadcastClientAPIsKey, NodesBroadcastClientAPIsDefault)
 }
 
 func setNotificationsDefaults() {

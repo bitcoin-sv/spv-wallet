@@ -13,14 +13,11 @@ import (
 
 // Config constants used for optimization and value testing
 const (
-	ApplicationName                = "BuxServer"
-	CurrentMajorVersion            = "v1"
-	DefaultHTTPRequestIdleTimeout  = 60 * time.Second
-	DefaultHTTPRequestReadTimeout  = 15 * time.Second
-	DefaultHTTPRequestWriteTimeout = 15 * time.Second
-	DefaultNewRelicShutdown        = 10 * time.Second
-	HealthRequestPath              = "health"
-	Version                        = "v0.5.16"
+	ApplicationName         = "BuxServer"
+	CurrentMajorVersion     = "v1"
+	DefaultNewRelicShutdown = 10 * time.Second
+	HealthRequestPath       = "health"
+	Version                 = "v0.5.16"
 )
 
 // ConfigFilePathKey is the viper key under which a config file path is stored
@@ -69,10 +66,10 @@ type AuthenticationConfig struct {
 
 // Authentication config option keys for Viper
 const (
-	AuthAdminKey        = "authentication.admin_key"
-	AuthRequireSigning  = "authentication.require_signing"
-	AuthScheme          = "authentication.scheme"
-	AuthSigningDisabled = "authentication.signing_disabled"
+	AuthAdminKey           = "authentication.admin_key"
+	AuthRequireSigningKey  = "authentication.require_signing"
+	AuthSchemeKey          = "authentication.scheme"
+	AuthSigningDisabledKey = "authentication.signing_disabled"
 )
 
 // BeefConfig consists of components requred to use beef, e.g. Pulse for merkle roots validation
@@ -100,8 +97,11 @@ type ClusterConfig struct {
 }
 
 const (
-	ClusterCoordinatorKey = "cluster.coordinator"
-	ClusterPrefixKey      = "cluster.prefix"
+	ClusterCoordinatorKey         = "cluster.coordinator"
+	ClusterPrefixKey              = "cluster.prefix"
+	ClusterRedisUrlKey            = "cluster.redis.url"
+	ClusterRedisMaxIdleTimeoutKey = "cluster.redis.max_idle_timeout"
+	ClusterRedisUseTlsKey         = "cluster.redis.use_tls"
 )
 
 // DbConfig consists of datastore config and specific dbs configs
@@ -120,11 +120,39 @@ type DatastoreConfig struct {
 	TablePrefix string           `json:"table_prefix" mapstructure:"table_prefix"` // pre_users (pre)
 }
 
+// Common datastore config keys
 const (
 	DatastoreAutoMigrateKey = "db.datastore.auto_migrate"
 	DatastoreDebugKey       = "db.datastore.debug"
 	DatastoreEngineKey      = "db.datastore.engine"
 	DatastoreTablePrefixKey = "db.datastore.table_prefix"
+)
+
+// MongoDB config keys
+const (
+	MongoDatabaseNameKey = "db.mongodb.db_name"
+	MongoTransactionsKey = "db.mongodb.transactions"
+	MongoUriKey          = "db.mongodb.uri"
+)
+
+// SQL (MySQL, PostgreSQL) config keys
+const (
+	SqlDriverKey                    = "db.sql.driver"
+	SqlHostKey                      = "db.sql.host"
+	SqlNameKey                      = "db.sql.name"
+	SqlPasswordKey                  = "db.sql.password"
+	SqlPortKey                      = "db.sql.port"
+	SqlReplicaKey                   = "db.sql.replica"
+	SqlSkipInitializeWithVersionKey = "db.sql.skip_initialize_with_version"
+	SqlTimeZoneKey                  = "db.sql.time_zone"
+	SqlTxTimeoutKey                 = "db.sql.tx_timeout"
+	SqlUserKey                      = "db.sql.user"
+)
+
+// SQLite config keys
+const (
+	SqliteDatabasePathKey = "db.sqlite.database_path"
+	SqliteSharedKey       = "db.sqlite.shared"
 )
 
 // GraphqlConfig is the configuration for the GraphQL server
@@ -189,9 +217,9 @@ type NodesConfig struct {
 }
 
 const (
-	UseMapiFeeQuotesKey    = "nodes.use_mapi_fee_quotes"
-	MinercraftAPIKey       = "nodes.minercraft_api"
-	BroadcastClientAPIsKey = "nodes.broadcast_client_apis"
+	NodesUseMapiFeeQuotesKey    = "nodes.use_mapi_fee_quotes"
+	NodesMinercraftAPIKey       = "nodes.minercraft_api"
+	NodesBroadcastClientAPIsKey = "nodes.broadcast_client_apis"
 )
 
 // NotificationsConfig is the configuration for notifications

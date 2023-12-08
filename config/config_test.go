@@ -2,7 +2,6 @@ package config
 
 import (
 	"context"
-	"os"
 	"testing"
 
 	"github.com/mrz1836/go-cachestore"
@@ -14,10 +13,7 @@ import (
 
 // newTestConfig will make a new test config
 func newTestConfig(t *testing.T) (ac *AppConfig) {
-	err := os.Setenv(EnvironmentKey, EnvironmentTest)
-	require.NoError(t, err)
-
-	ac, err = Load("../")
+	ac, err := Load("")
 	require.NoError(t, err)
 	require.NotNil(t, ac)
 	return
@@ -26,7 +22,6 @@ func newTestConfig(t *testing.T) (ac *AppConfig) {
 func baseTestConfig(t *testing.T) (*AppConfig, *AppServices, *newrelic.Transaction) {
 	app := newTestConfig(t)
 	require.NotNil(t, app)
-	assert.Equal(t, EnvironmentTest, app.Environment)
 
 	services := newTestServices(context.Background(), t, app)
 	require.NotNil(t, services)
@@ -43,7 +38,6 @@ func TestAppConfig_Validate(t *testing.T) {
 	t.Run("new test config", func(t *testing.T) {
 		app := newTestConfig(t)
 		require.NotNil(t, app)
-		assert.Equal(t, EnvironmentTest, app.Environment)
 	})
 
 	t.Run("validate test config json", func(t *testing.T) {
@@ -76,7 +70,7 @@ func TestAppConfig_Validate(t *testing.T) {
 
 	t.Run("datastore - invalid engine", func(t *testing.T) {
 		app, _, txn := baseTestConfig(t)
-		app.Datastore.Engine = datastore.Empty
+		app.Db.Datastore.Engine = datastore.Empty
 		err := app.Validate(txn)
 		assert.Error(t, err)
 	})
@@ -135,56 +129,66 @@ func TestAppConfig_Validate(t *testing.T) {
 		assert.NoError(t, err)
 	})
 
+	t.Run("datastore - invalid sqlite config", func(t *testing.T) {
+		app, _, txn := baseTestConfig(t)
+		app.Db.Datastore.Engine = datastore.SQLite
+		app.Db.SQLite = nil
+		err := app.Validate(txn)
+		assert.Error(t, err)
+	})
+
+	t.Run("datastore - invalid sql config", func(t *testing.T) {
+		app, _, txn := baseTestConfig(t)
+		app.Db.Datastore.Engine = datastore.MySQL
+		app.Db.SQL = nil
+		err := app.Validate(txn)
+		assert.Error(t, err)
+	})
+
 	t.Run("datastore - invalid sql user", func(t *testing.T) {
 		app, _, txn := baseTestConfig(t)
-		app.Datastore.Engine = datastore.MySQL
-		app.SQL.User = ""
+		app.Db.Datastore.Engine = datastore.MySQL
+		app.Db.SQL.User = ""
 		err := app.Validate(txn)
 		assert.Error(t, err)
 	})
 
 	t.Run("datastore - invalid sql name", func(t *testing.T) {
 		app, _, txn := baseTestConfig(t)
-		app.Datastore.Engine = datastore.MySQL
-		app.SQL.Name = ""
+		app.Db.Datastore.Engine = datastore.MySQL
+		app.Db.SQL.Name = ""
 		err := app.Validate(txn)
 		assert.Error(t, err)
 	})
 
 	t.Run("datastore - invalid sql host", func(t *testing.T) {
 		app, _, txn := baseTestConfig(t)
-		app.Datastore.Engine = datastore.MySQL
-		app.SQL.Host = ""
+		app.Db.Datastore.Engine = datastore.MySQL
+		app.Db.SQL.Host = ""
+		err := app.Validate(txn)
+		assert.Error(t, err)
+	})
+
+	t.Run("datastore - invalid mongo config", func(t *testing.T) {
+		app, _, txn := baseTestConfig(t)
+		app.Db.Datastore.Engine = datastore.MongoDB
+		app.Db.Mongo = nil
 		err := app.Validate(txn)
 		assert.Error(t, err)
 	})
 
 	t.Run("datastore - invalid mongo uri", func(t *testing.T) {
 		app, _, txn := baseTestConfig(t)
-		app.Datastore.Engine = datastore.MongoDB
-		app.Mongo.URI = ""
+		app.Db.Datastore.Engine = datastore.MongoDB
+		app.Db.Mongo.URI = ""
 		err := app.Validate(txn)
 		assert.Error(t, err)
 	})
 
 	t.Run("datastore - invalid mongo database name", func(t *testing.T) {
 		app, _, txn := baseTestConfig(t)
-		app.Datastore.Engine = datastore.MongoDB
-		app.Mongo.DatabaseName = ""
-		err := app.Validate(txn)
-		assert.Error(t, err)
-	})
-
-	t.Run("config - invalid env", func(t *testing.T) {
-		app, _, txn := baseTestConfig(t)
-		app.Environment = ""
-		err := app.Validate(txn)
-		assert.Error(t, err)
-	})
-
-	t.Run("config - invalid working directory", func(t *testing.T) {
-		app, _, txn := baseTestConfig(t)
-		app.WorkingDirectory = ""
+		app.Db.Datastore.Engine = datastore.MongoDB
+		app.Db.Mongo.DatabaseName = ""
 		err := app.Validate(txn)
 		assert.Error(t, err)
 	})

@@ -2,6 +2,7 @@ package config
 
 import (
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/assert"
 )
@@ -53,8 +54,13 @@ func TestServerConfig_Validate(t *testing.T) {
 		err := s.Validate()
 		assert.NoError(t, err)
 
-		assert.Equal(t, DefaultHTTPRequestIdleTimeout, s.IdleTimeout)
-		assert.Equal(t, DefaultHTTPRequestWriteTimeout, s.WriteTimeout)
-		assert.Equal(t, DefaultHTTPRequestReadTimeout, s.ReadTimeout)
+		idleTimeout, _ := time.ParseDuration(ServerIdleTimeoutDefault)
+		assert.Equal(t, idleTimeout, s.IdleTimeout)
+
+		writeTimeout, _ := time.ParseDuration(ServerWriteTimeoutDefault)
+		assert.Equal(t, writeTimeout, s.WriteTimeout)
+
+		readTimeout, _ := time.ParseDuration(ServerReadTimeoutDefault)
+		assert.Equal(t, readTimeout, s.ReadTimeout)
 	})
 }
