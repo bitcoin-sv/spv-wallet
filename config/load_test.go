@@ -2,6 +2,7 @@ package config
 
 import (
 	"os"
+	"strings"
 	"testing"
 
 	"github.com/spf13/viper"
@@ -34,14 +35,17 @@ func TestLoadConfig(t *testing.T) {
 	t.Run("custom configFilePath overriden by ENV", func(t *testing.T) {
 		// given
 		path := "custom/config/file/path.json"
-		anotherPath := "newPath.json"
+		anotherPath := "anotherPath.json"
 
 		// when
-		os.Setenv(ConfigFilePathKey, anotherPath)
+		os.Setenv("BUX_"+strings.ToUpper(ConfigFilePathKey), anotherPath)
 		_, err := Load(path)
 
 		// then
 		assert.Equal(t, viper.GetString(ConfigFilePathKey), anotherPath)
 		assert.Error(t, err)
+
+		// cleanup
+		os.Unsetenv("BUX_" + strings.ToUpper(ConfigFilePathKey))
 	})
 }

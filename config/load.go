@@ -16,13 +16,14 @@ var viperLock sync.Mutex
 
 // Load all AppConfig
 func Load(configFilePath string) (appConfig *AppConfig, err error) {
+	viperLock.Lock()
+	defer viperLock.Unlock()
+
 	setDefaults(configFilePath)
 
 	loadFlags()
 
 	envConfig()
-
-	viperLock.Lock()
 
 	if err = loadFromFile(); err != nil {
 		return nil, err
@@ -32,8 +33,6 @@ func Load(configFilePath string) (appConfig *AppConfig, err error) {
 	if err = unmarshallToAppConfig(appConfig); err != nil {
 		return nil, err
 	}
-
-	viperLock.Unlock()
 
 	return appConfig, nil
 }

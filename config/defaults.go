@@ -9,7 +9,7 @@ const DefaultConfigFilePath = "config.json"
 // General defaults
 const (
 	DebugDefault              = true
-	DebugProfilingDefault     = false
+	DebugProfilingDefault     = true
 	DisableITCDefault         = true
 	ImportBlockHeadersDefault = ""
 	RequestLoggingDefault     = true
