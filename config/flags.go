@@ -18,21 +18,25 @@ type cliFlags struct {
 	dumpConfig  bool `mapstructure:"dump_config"`
 }
 
-func loadFlags() {
-	cliFlags := cliFlags{}
-	buxFlags := buxFlags{}
+func loadFlags() error {
+	cli := cliFlags{}
+	bux := buxFlags{}
 
-	buxFlags.initFlags(&cliFlags)
+	bux.initFlags(&cli)
 
-	err := buxFlags.Parse(os.Args[1:])
+	err := bux.Parse(os.Args[1:])
 	if err != nil {
 		fmt.Printf("Flags can't be parsed: %v\n", err)
 		os.Exit(1)
 	}
 
-	buxFlags.parseCliFlags(&cliFlags)
+	bux.parseCliFlags(&cli)
 
-	viper.BindPFlags(&buxFlags.FlagSet)
+	err = viper.BindPFlags(&bux.FlagSet)
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
 func (fs *buxFlags) initFlags(cliFlags *cliFlags) {
@@ -117,9 +121,9 @@ func (fs *buxFlags) initCachestoreFlags() {
 func (fs *buxFlags) initClusterFlags() {
 	fs.String(ClusterCoordinatorKey, ClusterCoordinatorDefault, "redis or memory")
 	fs.String(ClusterPrefixKey, ClusterPrefixDefault, "prefix string to use for all cluster keys")
-	fs.String(ClusterRedisUrlKey, ClusterRedisUrlDefault, "Redis URL for cluster coordinator, if redis is chosen")
+	fs.String(ClusterRedisURLKey, ClusterRedisURLDefault, "Redis URL for cluster coordinator, if redis is chosen")
 	fs.String(ClusterRedisMaxIdleTimeoutKey, ClusterRedisMaxIdleTimeoutDefault, "max idle timeout for redis for cluster, if redis is chosen")
-	fs.Bool(ClusterRedisUseTlsKey, ClusterRedisUseTlsDefault, "should redis cluster coordinator use tls, if redis is chosen")
+	fs.Bool(ClusterRedisUseTLSKey, ClusterRedisUseTLSDefault, "should redis cluster coordinator use tls, if redis is chosen")
 }
 
 func (fs *buxFlags) initDbFlags() {
@@ -130,21 +134,21 @@ func (fs *buxFlags) initDbFlags() {
 
 	fs.String(MongoDatabaseNameKey, MongoDatabaseNameDefault, "database name for MongoDB")
 	fs.Bool(MongoTransactionsKey, MongoTransactionsDefault, "has transactions")
-	fs.String(MongoUriKey, MongoUriDefault, "connection uri to MongoDB")
+	fs.String(MongoURIKey, MongoURIDefault, "connection uri to MongoDB")
 
-	fs.String(SqlDriverKey, SqlDriverDefault, "mysql, postgresql")
-	fs.String(SqlHostKey, SqlHostDefault, "db host")
-	fs.String(SqlUserKey, SqlUserDefault, "db user")
-	fs.String(SqlNameKey, SqlNameDefault, "db name")
-	fs.String(SqlPasswordKey, SqlPasswordDefault, "db password")
-	fs.String(SqlPortKey, SqlPortDefault, "db port")
-	fs.Bool(SqlReplicaKey, SqlReplicaDefault, "true if it's a replica (Read-Only)")
-	fs.Bool(SqlSkipInitializeWithVersionKey, SqlSkipInitializeWithVersionDefault, "skip using MySQL in test mode")
-	fs.String(SqlTimeZoneKey, SqlTimeZoneDefault, "time zone for db")
-	fs.String(SqlTxTimeoutKey, SqlTxTimeoutDefault, "timeout for transactions")
+	fs.String(SQLDriverKey, SQLDriverDefault, "mysql, postgresql")
+	fs.String(SQLHostKey, SQLHostDefault, "db host")
+	fs.String(SQLUserKey, SQLUserDefault, "db user")
+	fs.String(SQLNameKey, SQLNameDefault, "db name")
+	fs.String(SQLPasswordKey, SQLPasswordDefault, "db password")
+	fs.String(SQLPortKey, SQLPortDefault, "db port")
+	fs.Bool(SQLReplicaKey, SQLReplicaDefault, "true if it's a replica (Read-Only)")
+	fs.Bool(SQLSkipInitializeWithVersionKey, SQLSkipInitializeWithVersionDefault, "skip using MySQL in test mode")
+	fs.String(SQLTimeZoneKey, SQLTimeZoneDefault, "time zone for db")
+	fs.String(SQLTxTimeoutKey, SQLTxTimeoutDefault, "timeout for transactions")
 
-	fs.String(SqliteDatabasePathKey, SqliteDatabasePathDefault, "db path for sqlite")
-	fs.Bool(SqliteSharedKey, SqliteSharedDefault, "adds a shared param to the connection string")
+	fs.String(SQLiteDatabasePathKey, SQLiteDatabasePathDefault, "db path for sqlite")
+	fs.Bool(SQLiteSharedKey, SQLiteSharedDefault, "adds a shared param to the connection string")
 }
 
 func (fs *buxFlags) initGraphqlFlags() {
@@ -158,7 +162,7 @@ func (fs *buxFlags) initMonitorFlags() {
 	fs.String(MonitorBuxAgentURLKey, MonitorBuxAgentURLDefault, "the bux agent server url address")
 	fs.Bool(MonitorDebugKey, MonitorDebugDefault, "enable debug")
 	fs.Bool(MonitorEnabledKey, MonitorEnabledDefault, "enable monitor")
-	fs.Float64(MonitorFalsePositiveRateKey, MonitorFalsePositiveRateDefault, "precentage of false positives to expect")
+	fs.Float64(MonitorFalsePositiveRateKey, MonitorFalsePositiveRateDefault, "percentage of false positives to expect")
 	fs.Bool(MonitorLoadMonitoredDestinationsKey, MonitorLoadMonitoredDestinationsDefault, "load monitored destinations")
 	fs.Int(MonitorMaxNumberOfDestinationsKey, MonitorMaxNumberOfDestinationsDefault, "number of destinations that the filter can hold")
 	fs.Int(MonitorMonitorDaysKey, MonitorMonitorDaysDefault, "number of days in the past that an address should be monitored for")

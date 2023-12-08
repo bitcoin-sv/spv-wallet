@@ -32,7 +32,7 @@ func TestLoadConfig(t *testing.T) {
 		assert.Error(t, err)
 	})
 
-	t.Run("custom configFilePath overriden by ENV", func(t *testing.T) {
+	t.Run("custom configFilePath overridden by ENV", func(t *testing.T) {
 		// given
 		path := "custom/config/file/path.json"
 		anotherPath := "anotherPath.json"

@@ -21,7 +21,9 @@ func Load(configFilePath string) (appConfig *AppConfig, err error) {
 
 	setDefaults(configFilePath)
 
-	loadFlags()
+	if err = loadFlags(); err != nil {
+		return nil, err
+	}
 
 	envConfig()
 

@@ -188,7 +188,7 @@ func (s *AppServices) loadBux(ctx context.Context, appConfig *AppConfig, testMod
 		options = append(options, bux.WithNotifications(appConfig.Notifications.WebhookEndpoint))
 	}
 
-	if options, err = loadMonitor(appConfig, options, ctx); err != nil {
+	if options, err = loadMonitor(ctx, appConfig, options); err != nil {
 		return err
 	}
 
@@ -208,7 +208,7 @@ func (s *AppServices) loadBux(ctx context.Context, appConfig *AppConfig, testMod
 		options = append(options, bux.WithMinercraftAPIs(appConfig.Nodes.MinercraftCustomAPIs))
 	}
 
-	options = loadBroadcastClientApi(appConfig, options)
+	options = loadBroadcastClientAPI(appConfig, options)
 
 	// Create the new client
 	s.Bux, err = bux.NewClient(ctx, options...)
@@ -415,7 +415,7 @@ func loadTaskManager(appConfig *AppConfig, options []bux.ClientOps) []bux.Client
 	return options
 }
 
-func loadMonitor(appConfig *AppConfig, options []bux.ClientOps, ctx context.Context) ([]bux.ClientOps, error) {
+func loadMonitor(ctx context.Context, appConfig *AppConfig, options []bux.ClientOps) ([]bux.ClientOps, error) {
 	if appConfig.Monitor != nil && appConfig.Monitor.Enabled {
 		if appConfig.Monitor.BuxAgentURL == "" {
 			err := errors.New("CentrifugeServer is required for monitoring to work")
@@ -435,7 +435,7 @@ func loadMonitor(appConfig *AppConfig, options []bux.ClientOps, ctx context.Cont
 	return options, nil
 }
 
-func loadBroadcastClientApi(appConfig *AppConfig, options []bux.ClientOps) []bux.ClientOps {
+func loadBroadcastClientAPI(appConfig *AppConfig, options []bux.ClientOps) []bux.ClientOps {
 	if appConfig.Nodes.BroadcastClientAPIs != nil {
 		arcClientConfigs := splitBroadcastClientApis(appConfig.Nodes.BroadcastClientAPIs)
 		options = append(options, bux.WithBroadcastClientAPIs(arcClientConfigs))

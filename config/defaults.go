@@ -4,6 +4,7 @@ import (
 	"github.com/spf13/viper"
 )
 
+// Default Config file path
 const DefaultConfigFilePath = "config.json"
 
 // General defaults
@@ -39,9 +40,9 @@ const (
 const (
 	ClusterCoordinatorDefault         = "redis"
 	ClusterPrefixDefault              = "bux_cluser_"
-	ClusterRedisUrlDefault            = "localhost:6379"
+	ClusterRedisURLDefault            = "localhost:6379"
 	ClusterRedisMaxIdleTimeoutDefault = "10s"
-	ClusterRedisUseTlsDefault         = false
+	ClusterRedisUseTLSDefault         = false
 )
 
 // Datastore defaults
@@ -56,27 +57,27 @@ const (
 const (
 	MongoDatabaseNameDefault = "xapi"
 	MongoTransactionsDefault = false
-	MongoUriDefault          = "mongodb://localhost:27017/xapi"
+	MongoURIDefault          = "mongodb://localhost:27017/xapi"
 )
 
 // SQL (MySQL, PostgreSQL) config keys
 const (
-	SqlDriverDefault                    = "postgresql"
-	SqlHostDefault                      = "localhost"
-	SqlNameDefault                      = "xapi"
-	SqlPasswordDefault                  = ""
-	SqlPortDefault                      = "5432"
-	SqlReplicaDefault                   = false
-	SqlSkipInitializeWithVersionDefault = true
-	SqlTimeZoneDefault                  = "UTC"
-	SqlTxTimeoutDefault                 = "10s"
-	SqlUserDefault                      = "postgres"
+	SQLDriverDefault                    = "postgresql"
+	SQLHostDefault                      = "localhost"
+	SQLNameDefault                      = "xapi"
+	SQLPasswordDefault                  = ""
+	SQLPortDefault                      = "5432"
+	SQLReplicaDefault                   = false
+	SQLSkipInitializeWithVersionDefault = true
+	SQLTimeZoneDefault                  = "UTC"
+	SQLTxTimeoutDefault                 = "10s"
+	SQLUserDefault                      = "postgres"
 )
 
 // SQLite config keys
 const (
-	SqliteDatabasePathDefault = "./test-json.db"
-	SqliteSharedDefault       = true
+	SQLiteDatabasePathDefault = "./test-json.db"
+	SQLiteSharedDefault       = true
 )
 
 // Graphql defaults
@@ -113,6 +114,7 @@ const (
 	NodesMinercraftAPIDefault    = "mAPI"
 )
 
+// Nodes defaults var
 var NodesBroadcastClientAPIsDefault = []string{"url|token"}
 
 // Notification defaults
@@ -130,6 +132,7 @@ const (
 	PaymailSenderValidationEnabledDefault = true
 )
 
+// Paymail defaults var
 var PaymailDomainsDefault = []string{"localhost"}
 
 // Redis defaults
@@ -206,9 +209,9 @@ func setCachestoreDefaults() {
 func setClusterDefaults() {
 	viper.SetDefault(ClusterCoordinatorKey, ClusterCoordinatorDefault)
 	viper.SetDefault(ClusterPrefixKey, ClusterPrefixDefault)
-	viper.SetDefault(ClusterRedisUrlKey, ClusterRedisUrlDefault)
+	viper.SetDefault(ClusterRedisURLKey, ClusterRedisURLDefault)
 	viper.SetDefault(ClusterRedisMaxIdleTimeoutKey, ClusterRedisMaxIdleTimeoutDefault)
-	viper.SetDefault(ClusterRedisUseTlsKey, ClusterRedisUseTlsDefault)
+	viper.SetDefault(ClusterRedisUseTLSKey, ClusterRedisUseTLSDefault)
 }
 
 func setDbDefaults() {
@@ -219,21 +222,21 @@ func setDbDefaults() {
 
 	viper.SetDefault(MongoDatabaseNameKey, MongoDatabaseNameDefault)
 	viper.SetDefault(MongoTransactionsKey, MongoTransactionsDefault)
-	viper.SetDefault(MongoUriKey, MongoUriDefault)
+	viper.SetDefault(MongoURIKey, MongoURIDefault)
 
-	viper.SetDefault(SqlDriverKey, SqlDriverDefault)
-	viper.SetDefault(SqlHostKey, SqlHostDefault)
-	viper.SetDefault(SqlNameKey, SqlNameDefault)
-	viper.SetDefault(SqlPasswordKey, SqlPasswordDefault)
-	viper.SetDefault(SqlPortKey, SqlPortDefault)
-	viper.SetDefault(SqlReplicaKey, SqlReplicaDefault)
-	viper.SetDefault(SqlSkipInitializeWithVersionKey, SqlSkipInitializeWithVersionDefault)
-	viper.SetDefault(SqlTimeZoneKey, SqlTimeZoneDefault)
-	viper.SetDefault(SqlTxTimeoutKey, SqlTxTimeoutDefault)
-	viper.SetDefault(SqlUserKey, SqlUserDefault)
+	viper.SetDefault(SQLDriverKey, SQLDriverDefault)
+	viper.SetDefault(SQLHostKey, SQLHostDefault)
+	viper.SetDefault(SQLNameKey, SQLNameDefault)
+	viper.SetDefault(SQLPasswordKey, SQLPasswordDefault)
+	viper.SetDefault(SQLPortKey, SQLPortDefault)
+	viper.SetDefault(SQLReplicaKey, SQLReplicaDefault)
+	viper.SetDefault(SQLSkipInitializeWithVersionKey, SQLSkipInitializeWithVersionDefault)
+	viper.SetDefault(SQLTimeZoneKey, SQLTimeZoneDefault)
+	viper.SetDefault(SQLTxTimeoutKey, SQLTxTimeoutDefault)
+	viper.SetDefault(SQLUserKey, SQLUserDefault)
 
-	viper.SetDefault(SqliteDatabasePathKey, SqliteDatabasePathDefault)
-	viper.SetDefault(SqliteSharedKey, SqliteSharedDefault)
+	viper.SetDefault(SQLiteDatabasePathKey, SQLiteDatabasePathDefault)
+	viper.SetDefault(SQLiteSharedKey, SQLiteSharedDefault)
 }
 
 func setGraphqlDefaults() {

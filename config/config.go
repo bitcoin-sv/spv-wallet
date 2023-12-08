@@ -72,19 +72,31 @@ const (
 	AuthSigningDisabledKey = "auth.signing_disabled"
 )
 
-// BeefConfig consists of components requred to use beef, e.g. Pulse for merkle roots validation
+// BeefConfig consists of components required to use beef, e.g. Pulse for merkle roots validation
 type BeefConfig struct {
 	UseBeef bool         `json:"use_beef" mapstructure:"use_beef"`
 	Pulse   *PulseConfig `json:"pulse" mapstructure:"pulse"`
 }
 
-const UseBeefKey = "beef.use_beef"
+// PulseConfig is a configuration for the Pulse service
+type PulseConfig struct {
+	PulseHeaderValidationURL string `json:"url" mapstructure:"url"`
+	PulseAuthToken           string `json:"auth_token" mapstructure:"auth_token"` // #nosec G101
+}
+
+// Beef config keys for Viper
+const (
+	UseBeefKey                  = "beef.use_beef"
+	PulseHeaderValidationURLKey = "beef.pulse.url"
+	PulseAuthTokenKey           = "beef.pulse.auth_token"
+)
 
 // CachestoreConfig is a configuration for cachestore
 type CachestoreConfig struct {
 	Engine cachestore.Engine `json:"engine" mapstructure:"engine"` // Cache engine to use (redis, freecache)
 }
 
+// Cachestore config keys for Viper
 const (
 	CacheEngineKey = "cache.engine"
 )
@@ -96,12 +108,13 @@ type ClusterConfig struct {
 	Redis       *RedisConfig        `json:"redis" mapstrcuture:"redis"`             // will use cache config if redis is set and this is empty
 }
 
+// Cluster config keys for Viper
 const (
 	ClusterCoordinatorKey         = "cluster.coordinator"
 	ClusterPrefixKey              = "cluster.prefix"
-	ClusterRedisUrlKey            = "cluster.redis.url"
+	ClusterRedisURLKey            = "cluster.redis.url"
 	ClusterRedisMaxIdleTimeoutKey = "cluster.redis.max_idle_timeout"
-	ClusterRedisUseTlsKey         = "cluster.redis.use_tls"
+	ClusterRedisUseTLSKey         = "cluster.redis.use_tls"
 )
 
 // DbConfig consists of datastore config and specific dbs configs
@@ -132,27 +145,27 @@ const (
 const (
 	MongoDatabaseNameKey = "db.mongodb.db_name"
 	MongoTransactionsKey = "db.mongodb.transactions"
-	MongoUriKey          = "db.mongodb.uri"
+	MongoURIKey          = "db.mongodb.uri"
 )
 
 // SQL (MySQL, PostgreSQL) config keys
 const (
-	SqlDriverKey                    = "db.sql.driver"
-	SqlHostKey                      = "db.sql.host"
-	SqlNameKey                      = "db.sql.name"
-	SqlPasswordKey                  = "db.sql.password"
-	SqlPortKey                      = "db.sql.port"
-	SqlReplicaKey                   = "db.sql.replica"
-	SqlSkipInitializeWithVersionKey = "db.sql.skip_initialize_with_version"
-	SqlTimeZoneKey                  = "db.sql.time_zone"
-	SqlTxTimeoutKey                 = "db.sql.tx_timeout"
-	SqlUserKey                      = "db.sql.user"
+	SQLDriverKey                    = "db.sql.driver"
+	SQLHostKey                      = "db.sql.host"
+	SQLNameKey                      = "db.sql.name"
+	SQLPasswordKey                  = "db.sql.password"
+	SQLPortKey                      = "db.sql.port"
+	SQLReplicaKey                   = "db.sql.replica"
+	SQLSkipInitializeWithVersionKey = "db.sql.skip_initialize_with_version"
+	SQLTimeZoneKey                  = "db.sql.time_zone"
+	SQLTxTimeoutKey                 = "db.sql.tx_timeout"
+	SQLUserKey                      = "db.sql.user"
 )
 
 // SQLite config keys
 const (
-	SqliteDatabasePathKey = "db.sqlite.database_path"
-	SqliteSharedKey       = "db.sqlite.shared"
+	SQLiteDatabasePathKey = "db.sqlite.database_path"
+	SQLiteSharedKey       = "db.sqlite.shared"
 )
 
 // GraphqlConfig is the configuration for the GraphQL server
@@ -162,6 +175,7 @@ type GraphqlConfig struct {
 	ServerPath     string `json:"server_path" mapstructure:"server_path"`         // server path i.e. "/graphql"
 }
 
+// GraphQL config keys for Viper
 const (
 	GraphqlEnabledKey        = "graphql.enabled"
 	GraphqlPlaygroundPathKey = "graphql.playground_path"
@@ -182,8 +196,9 @@ type MonitorOptions struct {
 	SaveTransactionDestinations bool    `json:"save_transaction_destinations" mapstructure:"save_transaction_destinations"` // Whether to save destinations on monitored transactions
 }
 
+// Monitor config keys for Viper
 const (
-	MonitorAuthTokenKey                   = "monitor.auth_token"
+	MonitorAuthTokenKey                   = "monitor.auth_token" // #nosec G101
 	MonitorBuxAgentURLKey                 = "monitor.bux_agent_url"
 	MonitorDebugKey                       = "monitor.debug"
 	MonitorEnabledKey                     = "monitor.enabled"
@@ -202,6 +217,7 @@ type NewRelicConfig struct {
 	LicenseKey string `json:"license_key" mapstructure:"license_key"` // 2342-3423523-62
 }
 
+// NewRelic config keys for Viper
 const (
 	NewRelicDomainNameKey = "new_relic.domain_name"
 	NewRelicEnabledKey    = "new_relic.enabled"
@@ -216,6 +232,7 @@ type NodesConfig struct {
 	BroadcastClientAPIs  []string                `json:"broadcast_client_apis" mapstructure:"broadcast_client_apis"`
 }
 
+// Nodes config keys for viper
 const (
 	NodesUseMapiFeeQuotesKey    = "nodes.use_mapi_fee_quotes"
 	NodesMinercraftAPIKey       = "nodes.minercraft_api"
@@ -228,6 +245,7 @@ type NotificationsConfig struct {
 	WebhookEndpoint string `json:"webhook_endpoint" mapstructure:"webhook_endpoint"`
 }
 
+// Notification config keys for Viper
 const (
 	NotificationsEnabledKey         = "notifications.enabled"
 	NotificationsWebhookEndpointKey = "notifications.webhook_endpoint"
@@ -251,6 +269,7 @@ type PaymailConfig struct {
 	SenderValidationEnabled bool     `json:"sender_validation_enabled" mapstructure:"sender_validation_enabled"` // Turn on extra security
 }
 
+// Paymail config keys for Viper
 const (
 	PaymailDefaultFromPaymailKey      = "paymail.default_from_paymail"
 	PaymailDefaultNoteKey             = "paymail.default_note"
@@ -271,6 +290,7 @@ type RedisConfig struct {
 	UseTLS                bool          `json:"use_tls" mapstructure:"use_tls"`                                 // Flag for using TLS
 }
 
+// Redis config keys for Viper
 const (
 	RedisDependencyModeKey        = "redis.dependency_mode"
 	RedisMaxActiveConnectionsKey  = "redis.max_active_connections"
@@ -289,6 +309,7 @@ type TaskManagerConfig struct {
 	QueueName string              `json:"queue_name" mapstructure:"queue_name"` // test_queue
 }
 
+// TaskManager config keys for Viper
 const (
 	TaskManagerEngineKey    = "task_manager.engine"
 	TaskManagerFactoryKey   = "task_manager.factory"
@@ -303,22 +324,12 @@ type ServerConfig struct {
 	Port         string        `json:"port" mapstructure:"port"`                   // 3003
 }
 
+// Server config keys for Viper
 const (
 	ServerIdleTimeoutKey  = "server.idle_timeout"
 	ServerReadTimeoutKey  = "server.read_timeout"
 	ServerWriteTimeoutKey = "server.write_timeout"
 	ServerPortKey         = "server.port"
-)
-
-// PulseConfig is a configuration for the Pulse service
-type PulseConfig struct {
-	PulseHeaderValidationURL string `json:"url" mapstructure:"url"`
-	PulseAuthToken           string `json:"auth_token" mapstructure:"auth_token"`
-}
-
-const (
-	PulseHeaderValidationURLKey = "beef.pulse.url"
-	PulseAuthTokenKey           = "beef.pulse.auth_token"
 )
 
 // GetUserAgent will return the outgoing user agent
