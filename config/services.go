@@ -10,6 +10,7 @@ import (
 	"time"
 
 	"github.com/BuxOrg/bux"
+	"github.com/BuxOrg/bux-server"
 	"github.com/BuxOrg/bux/chainstate"
 	"github.com/BuxOrg/bux/cluster"
 	"github.com/BuxOrg/bux/taskmanager"
@@ -18,8 +19,8 @@ import (
 	"github.com/go-redis/redis/v8"
 	"github.com/mrz1836/go-cachestore"
 	"github.com/mrz1836/go-datastore"
-	"github.com/mrz1836/go-logger"
 	"github.com/newrelic/go-agent/v3/newrelic"
+	"github.com/rs/zerolog"
 	"github.com/tonicpow/go-minercraft/v2"
 )
 
@@ -28,6 +29,7 @@ type (
 	AppServices struct {
 		Bux      bux.ClientInterface
 		NewRelic *newrelic.Application
+		Logger   *zerolog.Logger
 	}
 )
 
@@ -48,8 +50,15 @@ func (a *AppConfig) LoadServices(ctx context.Context) (*AppServices, error) {
 	ctx = newrelic.NewContext(ctx, txn)
 	defer txn.End()
 
+	logger, err := buxserver.CreateLogger(a.Logging.InstanceName, a.Logging.Format, a.Logging.Level, a.Logging.LogOrigin)
+	if err != nil {
+		return nil, err
+	}
+
+	_services.Logger = logger
+
 	// Load BUX
-	if err = _services.loadBux(ctx, a, false); err != nil {
+	if err = _services.loadBux(ctx, a, false, logger); err != nil {
 		return nil, err
 	}
 
@@ -74,7 +83,7 @@ func (a *AppConfig) LoadTestServices(ctx context.Context) (*AppServices, error) 
 	defer txn.End()
 
 	// Load bux for testing
-	if err = _services.loadBux(ctx, a, true); err != nil {
+	if err = _services.loadBux(ctx, a, true, _services.Logger); err != nil {
 		return nil, err
 	}
 
@@ -124,11 +133,13 @@ func (s *AppServices) CloseAll(ctx context.Context) {
 	}
 
 	// All services closed!
-	logger.Data(2, logger.DEBUG, "all services have been closed")
+	if s.Logger != nil {
+		s.Logger.Debug().Msg("all services have been closed")
+	}
 }
 
 // loadBux will load the bux client (including CacheStore and DataStore)
-func (s *AppServices) loadBux(ctx context.Context, appConfig *AppConfig, testMode bool) (err error) {
+func (s *AppServices) loadBux(ctx context.Context, appConfig *AppConfig, testMode bool, logger *zerolog.Logger) (err error) {
 	var options []bux.ClientOps
 
 	// Set new relic if enabled
@@ -149,7 +160,10 @@ func (s *AppServices) loadBux(ctx context.Context, appConfig *AppConfig, testMod
 		options = append(options, bux.WithImportBlockHeaders(appConfig.ImportBlockHeaders))
 	}
 
-	// todo: customize the logger
+	if logger != nil {
+		buxLogger := logger.With().Str("service", "bux").Logger()
+		options = append(options, bux.WithLogger(&buxLogger))
+	}
 
 	// todo: feature: override the config from JSON env (side-load your own /envs/custom-config.json
 

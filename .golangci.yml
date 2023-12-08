@@ -332,7 +332,6 @@ linters:
     - testpackage
     - nestif
     - nlreturn
-    - testifylint
     - goconst
   disable-all: false
   presets:

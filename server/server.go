@@ -17,7 +17,6 @@ import (
 	"github.com/BuxOrg/bux-server/actions/xpubs"
 	"github.com/BuxOrg/bux-server/config"
 	apirouter "github.com/mrz1836/go-api-router"
-	"github.com/mrz1836/go-logger"
 	"github.com/newrelic/go-agent/v3/integrations/nrhttprouter"
 	httpSwagger "github.com/swaggo/http-swagger"
 )
@@ -70,11 +69,7 @@ func (s *Server) Serve() {
 
 	// Listen and serve
 	if err := s.WebServer.ListenAndServe(); err != nil {
-		logger.Data(
-			2,
-			logger.DEBUG,
-			"shutting down "+config.ApplicationName+" server ["+err.Error()+"]...",
-			logger.MakeParameter("port", s.AppConfig.Server.Port))
+		s.Services.Logger.Debug().Msgf("shutting down %s server [%s] on port %s...", config.ApplicationName, err.Error(), s.AppConfig.Server.Port)
 	}
 }
 

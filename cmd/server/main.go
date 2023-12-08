@@ -14,7 +14,7 @@ import (
 	"github.com/BuxOrg/bux-server/dictionary"
 	_ "github.com/BuxOrg/bux-server/docs"
 	"github.com/BuxOrg/bux-server/server"
-	"github.com/mrz1836/go-logger"
+	"github.com/BuxOrg/bux/logging"
 )
 
 // main method starts everything for the BUX Server
@@ -25,17 +25,18 @@ import (
 // @name bux-auth-xpub
 func main() {
 
+	defaultLogger := logging.GetDefaultLogger()
 	// Load the Application Configuration
 	appConfig, err := config.Load("")
 	if err != nil {
-		logger.Fatalf(dictionary.GetInternalMessage(dictionary.ErrorLoadingConfig), err.Error())
+		defaultLogger.Error().Msgf(dictionary.GetInternalMessage(dictionary.ErrorLoadingConfig), err.Error())
 		return
 	}
 
 	// Load the Application Services
 	var services *config.AppServices
 	if services, err = appConfig.LoadServices(context.Background()); err != nil {
-		logger.Fatalf(dictionary.GetInternalMessage(dictionary.ErrorLoadingService), config.ApplicationName, err.Error())
+		defaultLogger.Error().Msgf(dictionary.GetInternalMessage(dictionary.ErrorLoadingService), config.ApplicationName, err.Error())
 		return
 	}
 
@@ -44,13 +45,13 @@ func main() {
 
 	// Validate configuration (after services have been loaded)
 	if err = appConfig.Validate(txn); err != nil {
-		logger.Fatalf(dictionary.GetInternalMessage(dictionary.ErrorLoadingConfig), err.Error())
+		services.Logger.Error().Msgf(dictionary.GetInternalMessage(dictionary.ErrorLoadingConfig), err.Error())
 		return
 	}
 
 	// (debugging: show services that are enabled or not)
 	if appConfig.Debug {
-		logger.Data(2, logger.DEBUG,
+		services.Logger.Debug().Msg(
 			fmt.Sprintf("datastore: %s | cachestore: %s | taskmanager: %s [%s] | new_relic: %t | paymail: %t | graphql: %t",
 				appConfig.Datastore.Engine.String(),
 				appConfig.Cachestore.Engine.String(),
@@ -76,7 +77,7 @@ func main() {
 		ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 		defer cancel()
 		if err = appServer.Shutdown(ctx); err != nil {
-			logger.Fatalf("error shutting down: %s", err.Error())
+			services.Logger.Error().Msgf("error shutting down: %s", err.Error())
 		}
 
 		close(idleConnectionsClosed)
@@ -86,10 +87,7 @@ func main() {
 	txn.End()
 
 	// Listen and serve
-	logger.Data(2, logger.DEBUG,
-		"starting ["+appConfig.Environment+"] "+config.ApplicationName+" server...",
-		logger.MakeParameter("port", appConfig.Server.Port),
-	)
+	services.Logger.Debug().Msgf("starting [%s] %s server at port %s...", appConfig.Environment, config.ApplicationName, appConfig.Server.Port)
 	appServer.Serve()
 
 	<-idleConnectionsClosed
