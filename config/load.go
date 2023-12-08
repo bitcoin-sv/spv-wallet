@@ -2,6 +2,7 @@ package config
 
 import (
 	"fmt"
+	"github.com/mrz1836/go-datastore"
 	"os"
 	"strings"
 	"sync"
