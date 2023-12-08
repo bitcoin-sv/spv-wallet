@@ -2,6 +2,7 @@ package config
 
 import (
 	"fmt"
+	"os"
 	"strings"
 	"sync"
 
@@ -27,6 +28,7 @@ func Load(configFilePath string) (appConfig *AppConfig, err error) {
 		return nil, err
 	}
 
+	appConfig = new(AppConfig)
 	if err = unmarshallToAppConfig(appConfig); err != nil {
 		return nil, err
 	}
@@ -44,27 +46,28 @@ func envConfig() {
 
 func loadFromFile() error {
 	configFilePath := viper.GetString(ConfigFilePathKey)
-	viper.SetConfigFile(configFilePath)
 
-	if configFilePath != "" {
-		viper.SetConfigFile(configFilePath)
-		if err := viper.ReadInConfig(); err != nil {
-			switch err.(type) {
-			case *viper.ConfigFileNotFoundError:
-				logger.Data(2, logger.INFO, "Config file not specified. Using defaults")
-			default:
-				err = fmt.Errorf(dictionary.GetInternalMessage(dictionary.ErrorReadingConfig), err.Error())
-				logger.Data(2, logger.ERROR, err.Error())
-				return err
-			}
+	if configFilePath == "" {
+		_, err := os.Stat(DefaultConfigFilePath)
+		if os.IsNotExist(err) {
+			// if the config is not specified and no default config file exists, use defaults
+			logger.Data(2, logger.DEBUG, "Config file not specified. Using defaults")
+			return nil
 		}
+		configFilePath = DefaultConfigFilePath
 	}
+
+	viper.SetConfigFile(configFilePath)
+	if err := viper.ReadInConfig(); err != nil {
+		err = fmt.Errorf(dictionary.GetInternalMessage(dictionary.ErrorReadingConfig), err.Error())
+		logger.Data(2, logger.ERROR, err.Error())
+		return err
+	}
+
 	return nil
 }
 
 func unmarshallToAppConfig(appConfig *AppConfig) error {
-	appConfig = new(AppConfig) // TODO: does it need to be here?
-
 	if err := viper.Unmarshal(&appConfig); err != nil {
 		err = fmt.Errorf(dictionary.GetInternalMessage(dictionary.ErrorViper), err.Error())
 		return err

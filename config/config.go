@@ -66,10 +66,10 @@ type AuthenticationConfig struct {
 
 // Authentication config option keys for Viper
 const (
-	AuthAdminKey           = "authentication.admin_key"
-	AuthRequireSigningKey  = "authentication.require_signing"
-	AuthSchemeKey          = "authentication.scheme"
-	AuthSigningDisabledKey = "authentication.signing_disabled"
+	AuthAdminKey           = "auth.admin_key"
+	AuthRequireSigningKey  = "auth.require_signing"
+	AuthSchemeKey          = "auth.scheme"
+	AuthSigningDisabledKey = "auth.signing_disabled"
 )
 
 // BeefConfig consists of components requred to use beef, e.g. Pulse for merkle roots validation
@@ -317,8 +317,8 @@ type PulseConfig struct {
 }
 
 const (
-	PulseHeaderValidationURLKey = "pulse.url"
-	PulseAuthTokenKey           = "pulse.auth_token"
+	PulseHeaderValidationURLKey = "beef.pulse.url"
+	PulseAuthTokenKey           = "beef.pulse.auth_token"
 )
 
 // GetUserAgent will return the outgoing user agent

@@ -1,0 +1,125 @@
+{
+  "auth": {
+    "admin_key": "xpub661MyMwAqRbcFaYeQLxmExXvTCjw9jjBRpifkoGggkAitXNNjva4TStLJuYjjEmU4AzXRPGwoECjXo3Rgqg8zQqW6UPVfkKtsrogGBw8xz7",
+    "require_signing": false,
+    "scheme": "xpub",
+    "signing_disabled": true
+  },
+  "beef": {
+    "pulse": {
+      "auth_token": "asd",
+      "url": "http://localhost:8000/api/v1/chain/merkleroot/verify"
+    },
+    "use_beef": true
+  },
+  "cache": {
+    "engine": "freecache"
+  },
+  "cluster": {
+    "coordinator": "redis",
+    "prefix": "bux_cluser_",
+    "redis": {
+      "max_idle_timeout": "10s",
+      "url": "localhost:6379",
+      "use_tls": false
+    }
+  },
+  "config_file": "",
+  "db": {
+    "datastore": {
+      "auto_migrate": true,
+      "debug": false,
+      "engine": "sqlite",
+      "table_prefix": "xapi"
+    },
+    "mongodb": {
+      "db_name": "xapi",
+      "transactions": false,
+      "uri": "mongodb://localhost:27017/xapi"
+    },
+    "sql": {
+      "driver": "postgresql",
+      "host": "localhost",
+      "name": "xapi",
+      "password": "",
+      "port": "5432",
+      "replica": false,
+      "skip_initialize_with_version": true,
+      "time_zone": "UTC",
+      "tx_timeout": "10s",
+      "user": "postgres"
+    },
+    "sqlite": {
+      "database_path": "./test-json.db",
+      "shared": true
+    }
+  },
+  "debug": true,
+  "debug_profiling": false,
+  "disable_itc": true,
+  "graphql": {
+    "enabled": true,
+    "playground_path": "/graphql",
+    "server_path": "/graphql"
+  },
+  "import_block_headers": "",
+  "monitor": {
+    "auth_token": "",
+    "bux_agent_url": "ws://localhost:8000/websocket",
+    "debug": false,
+    "enabled": false,
+    "false_positive_rate": 0.01,
+    "load_monitored_destinations": false,
+    "max_number_of_destinations": 100000,
+    "monitor_days": 7,
+    "processor_type": "bloom",
+    "save_transaction_destinations": true
+  },
+  "new_relic": {
+    "domain_name": "domain.com",
+    "enabled": false,
+    "license_key": "BOGUS-LICENSE-KEY-1234567890987654321234"
+  },
+  "nodes": {
+    "broadcast_client_apis": [
+      "url|token"
+    ],
+    "minercraft_api": "mAPI",
+    "use_mapi_fee_quotes": true
+  },
+  "notifications": {
+    "enabled": false,
+    "webhook_endpoint": ""
+  },
+  "paymail": {
+    "default_from_paymail": "from@domain.com",
+    "default_note": "bux Address Resolution",
+    "domain_validation_enabled": false,
+    "domains": [
+      "localhost"
+    ],
+    "enabled": true,
+    "sender_validation_enabled": true
+  },
+  "redis": {
+    "dependency_mode": true,
+    "max_active_connections": 0,
+    "max_connection_lifetime": "60s",
+    "max_idle_connections": 10,
+    "max_idle_timeout": "10s",
+    "url": "redis://localhost:6379",
+    "use_tls": false
+  },
+  "request_logging": true,
+  "server": {
+    "idle_timeout": "60s",
+    "port": "3003",
+    "read_timeout": "15s",
+    "write_timeout": "15s"
+  },
+  "task_manager": {
+    "engine": "taskq",
+    "factory": "memory",
+    "queue_name": "development_queue"
+  }
+}

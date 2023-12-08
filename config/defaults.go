@@ -4,6 +4,8 @@ import (
 	"github.com/spf13/viper"
 )
 
+const DefaultConfigFilePath = "config.json"
+
 // General defaults
 const (
 	DebugDefault              = true

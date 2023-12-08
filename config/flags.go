@@ -6,17 +6,20 @@ import (
 
 	"github.com/spf13/pflag"
 	"github.com/spf13/viper"
-
-	"github.com/BuxOrg/bux-server/cli"
-	"github.com/BuxOrg/bux-server/cli/flags"
 )
 
 type buxFlags struct {
 	pflag.FlagSet
 }
 
+type cliFlags struct {
+	showVersion bool `mapstructure:"version"`
+	showHelp    bool `mapstructure:"help"`
+	dumpConfig  bool `mapstructure:"dump_config"`
+}
+
 func loadFlags() {
-	cliFlags := flags.CliFlags{}
+	cliFlags := cliFlags{}
 	buxFlags := buxFlags{}
 
 	buxFlags.initFlags(&cliFlags)
@@ -27,24 +30,62 @@ func loadFlags() {
 		os.Exit(1)
 	}
 
-	cli.ParseCliFlags(&cliFlags, Version, ConfigFilePathKey)
+	buxFlags.parseCliFlags(&cliFlags)
 
 	viper.BindPFlags(&buxFlags.FlagSet)
 }
 
-func (fs *buxFlags) initFlags(cliFlags *flags.CliFlags) {
+func (fs *buxFlags) initFlags(cliFlags *cliFlags) {
 	fs.StringP(ConfigFilePathKey, "C", "", "custom config file path")
 
 	fs.initCliFlags(cliFlags)
 
 	fs.initGeneralFlags()
+	fs.initAuthFlags()
+	fs.initBeefFlags()
+	fs.initCachestoreFlags()
+	fs.initClusterFlags()
+	fs.initDbFlags()
+	fs.initGraphqlFlags()
+	fs.initMonitorFlags()
+	fs.initNewRelicFlags()
+	fs.initNodesFlags()
+	fs.initNotificationFlags()
+	fs.initPaymailFlags()
+	fs.initRedisFlags()
+	fs.initTaskManagerFlags()
+	fs.initServerFlags()
 }
 
-func (fs *buxFlags) initCliFlags(cliFlags *flags.CliFlags) {
+func (fs *buxFlags) initCliFlags(cliFlags *cliFlags) {
 	if cliFlags != nil {
-		fs.BoolVarP(&cliFlags.ShowHelp, "help", "h", false, "show help")
-		fs.BoolVarP(&cliFlags.ShowVersion, "version", "v", false, "show version")
-		fs.BoolVarP(&cliFlags.DumpConfig, "dump_config", "d", false, "dump config to file, specified by config_file flag")
+		fs.BoolVarP(&cliFlags.showHelp, "help", "h", false, "show help")
+		fs.BoolVarP(&cliFlags.showVersion, "version", "v", false, "show version")
+		fs.BoolVarP(&cliFlags.dumpConfig, "dump_config", "d", false, "dump config to file, specified by config_file flag")
+	}
+}
+
+func (fs *buxFlags) parseCliFlags(cli *cliFlags) {
+	if cli.showHelp {
+		fs.PrintDefaults()
+		os.Exit(0)
+	}
+
+	if cli.showVersion {
+		fmt.Println("bux-sever", "version", Version)
+		os.Exit(0)
+	}
+
+	if cli.dumpConfig {
+		configPath := viper.GetString(ConfigFilePathKey)
+		if configPath == "" {
+			configPath = "config.json"
+		}
+		err := viper.SafeWriteConfigAs(configPath)
+		if err != nil {
+			fmt.Printf("error while dumping config: %v", err.Error())
+		}
+		os.Exit(0)
 	}
 }
 

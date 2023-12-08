@@ -5,6 +5,8 @@ package main
 
 import (
 	"context"
+	"encoding/json"
+	"fmt"
 	"os"
 	"os/signal"
 	"time"
@@ -33,6 +35,9 @@ func main() {
 		defaultLogger.Fatal().Msgf(dictionary.GetInternalMessage(dictionary.ErrorLoadingConfig), err.Error())
 		return
 	}
+
+	cfg, _ := json.MarshalIndent(appConfig, "", "  ")
+	fmt.Printf("appConfig: %s\n", cfg)
 
 	// Load the Application Services
 	var services *config.AppServices
