@@ -5,11 +5,10 @@ import (
 	"context"
 	"os"
 
+	"github.com/BuxOrg/bux-server/config"
 	apirouter "github.com/mrz1836/go-api-router"
 	"github.com/stretchr/testify/require"
 	"github.com/stretchr/testify/suite"
-
-	"github.com/BuxOrg/bux-server/config"
 )
 
 // TestSuite is for testing the entire package using real/mocked services
