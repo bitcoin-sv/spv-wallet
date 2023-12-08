@@ -1,4 +1,4 @@
-package buxserver
+package logging
 
 import (
 	"io"
@@ -32,7 +32,6 @@ func CreateLogger(instanceName, format, level string, logOrigin bool) (*zerolog.
 	}
 
 	logLevel := ecszerolog.Level(parsedLevel)
-	//var origin ecszerolog.Option
 	origin := ecszerolog.Origin()
 	var logger zerolog.Logger
 

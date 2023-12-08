@@ -5,12 +5,12 @@ import (
 	"crypto/tls"
 	"errors"
 	"fmt"
+	"github.com/BuxOrg/bux-server/logging"
 	"net/url"
 	"strings"
 	"time"
 
 	"github.com/BuxOrg/bux"
-	"github.com/BuxOrg/bux-server"
 	"github.com/BuxOrg/bux/chainstate"
 	"github.com/BuxOrg/bux/cluster"
 	"github.com/BuxOrg/bux/taskmanager"
@@ -50,7 +50,7 @@ func (a *AppConfig) LoadServices(ctx context.Context) (*AppServices, error) {
 	ctx = newrelic.NewContext(ctx, txn)
 	defer txn.End()
 
-	logger, err := buxserver.CreateLogger(a.Logging.InstanceName, a.Logging.Format, a.Logging.Level, a.Logging.LogOrigin)
+	logger, err := logging.CreateLogger(a.Logging.InstanceName, a.Logging.Format, a.Logging.Level, a.Logging.LogOrigin)
 	if err != nil {
 		return nil, err
 	}
