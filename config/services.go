@@ -174,12 +174,12 @@ func (s *AppServices) loadBux(ctx context.Context, appConfig *AppConfig, testMod
 
 	options = loadPaymail(appConfig, options)
 
-	if appConfig.Beef.UseBeef {
-		if appConfig.Beef.Pulse == nil || appConfig.Beef.Pulse.PulseHeaderValidationURL == "" {
+	if appConfig.Paymail.Beef.UseBeef {
+		if appConfig.Paymail.Beef.PulseHeaderValidationURL == "" {
 			err = errors.New("pulse is required for BEEF to work")
 			return err
 		}
-		options = append(options, bux.WithPaymailBeefSupport(appConfig.Beef.Pulse.PulseHeaderValidationURL, appConfig.Beef.Pulse.PulseAuthToken))
+		options = append(options, bux.WithPaymailBeefSupport(appConfig.Paymail.Beef.PulseHeaderValidationURL, appConfig.Paymail.Beef.PulseAuthToken))
 	}
 
 	options = loadTaskManager(appConfig, options)
@@ -217,17 +217,17 @@ func (s *AppServices) loadBux(ctx context.Context, appConfig *AppConfig, testMod
 }
 
 func loadCachestore(appConfig *AppConfig, options []bux.ClientOps) []bux.ClientOps {
-	if appConfig.Cachestore.Engine == cachestore.Redis {
+	if appConfig.Cache.Engine == cachestore.Redis {
 		options = append(options, bux.WithRedis(&cachestore.RedisConfig{
-			DependencyMode:        appConfig.Redis.DependencyMode,
-			MaxActiveConnections:  appConfig.Redis.MaxActiveConnections,
-			MaxConnectionLifetime: appConfig.Redis.MaxConnectionLifetime,
-			MaxIdleConnections:    appConfig.Redis.MaxIdleConnections,
-			MaxIdleTimeout:        appConfig.Redis.MaxIdleTimeout,
-			URL:                   appConfig.Redis.URL,
-			UseTLS:                appConfig.Redis.UseTLS,
+			DependencyMode:        appConfig.Cache.Redis.DependencyMode,
+			MaxActiveConnections:  appConfig.Cache.Redis.MaxActiveConnections,
+			MaxConnectionLifetime: appConfig.Cache.Redis.MaxConnectionLifetime,
+			MaxIdleConnections:    appConfig.Cache.Redis.MaxIdleConnections,
+			MaxIdleTimeout:        appConfig.Cache.Redis.MaxIdleTimeout,
+			URL:                   appConfig.Cache.Redis.URL,
+			UseTLS:                appConfig.Cache.Redis.UseTLS,
 		}))
-	} else if appConfig.Cachestore.Engine == cachestore.FreeCache {
+	} else if appConfig.Cache.Engine == cachestore.FreeCache {
 		options = append(options, bux.WithFreeCache())
 	}
 
@@ -235,12 +235,12 @@ func loadCachestore(appConfig *AppConfig, options []bux.ClientOps) []bux.ClientO
 }
 
 func loadCluster(appConfig *AppConfig, options []bux.ClientOps) ([]bux.ClientOps, error) {
-	if appConfig.ClusterConfig != nil {
-		if appConfig.ClusterConfig.Coordinator == cluster.CoordinatorRedis {
+	if appConfig.Cache.Cluster != nil {
+		if appConfig.Cache.Cluster.Coordinator == cluster.CoordinatorRedis {
 			var redisOptions *redis.Options
 
-			if appConfig.ClusterConfig.Redis != nil {
-				redisURL, err := url.Parse(appConfig.ClusterConfig.Redis.URL)
+			if appConfig.Cache.Cluster.Redis != nil {
+				redisURL, err := url.Parse(appConfig.Cache.Cluster.Redis.URL)
 				if err != nil {
 					return options, fmt.Errorf("error parsing redis url: %w", err)
 				}
@@ -249,19 +249,19 @@ func loadCluster(appConfig *AppConfig, options []bux.ClientOps) ([]bux.ClientOps
 					Addr:        fmt.Sprintf("%s:%s", redisURL.Hostname(), redisURL.Port()),
 					Username:    redisURL.User.Username(),
 					Password:    password,
-					IdleTimeout: appConfig.ClusterConfig.Redis.MaxIdleTimeout,
+					IdleTimeout: appConfig.Cache.Cluster.Redis.MaxIdleTimeout,
 				}
-				if appConfig.ClusterConfig.Redis.UseTLS {
+				if appConfig.Cache.Cluster.Redis.UseTLS {
 					redisOptions.TLSConfig = &tls.Config{
 						MinVersion: tls.VersionTLS12,
 					}
 				}
-			} else if appConfig.Redis.URL != "" {
+			} else if appConfig.Cache.Redis != nil {
 				redisOptions = &redis.Options{
-					Addr:        appConfig.Redis.URL,
-					IdleTimeout: appConfig.Redis.MaxIdleTimeout,
+					Addr:        appConfig.Cache.Redis.URL,
+					IdleTimeout: appConfig.Cache.Redis.MaxIdleTimeout,
 				}
-				if appConfig.Redis.UseTLS {
+				if appConfig.Cache.Redis.UseTLS {
 					redisOptions.TLSConfig = &tls.Config{
 						MinVersion: tls.VersionTLS12,
 					}
@@ -271,8 +271,8 @@ func loadCluster(appConfig *AppConfig, options []bux.ClientOps) ([]bux.ClientOps
 			}
 			options = append(options, bux.WithClusterRedis(redisOptions))
 		}
-		if appConfig.ClusterConfig.Prefix != "" {
-			options = append(options, bux.WithClusterKeyPrefix(appConfig.ClusterConfig.Prefix))
+		if appConfig.Cache.Cluster.Prefix != "" {
+			options = append(options, bux.WithClusterKeyPrefix(appConfig.Cache.Cluster.Prefix))
 		}
 	}
 
@@ -397,15 +397,15 @@ func splitBroadcastClientApis(apis []string) []broadcastclient.ArcClientConfig {
 func loadTaskManager(appConfig *AppConfig, options []bux.ClientOps) []bux.ClientOps {
 	// Load task manager (redis or taskq)
 	// todo: this needs more improvement with redis options etc
-	if appConfig.TaskManager.Engine == taskmanager.TaskQ {
-		config := taskmanager.DefaultTaskQConfig(appConfig.TaskManager.QueueName)
+	if TaskManagerEngine == taskmanager.TaskQ {
+		config := taskmanager.DefaultTaskQConfig(TaskManagerQueueName)
 		if appConfig.TaskManager.Factory == taskmanager.FactoryRedis {
 			options = append(
 				options,
 				bux.WithTaskQUsingRedis(
 					config,
 					&redis.Options{
-						Addr: strings.Replace(appConfig.Redis.URL, "redis://", "", -1),
+						Addr: strings.Replace(appConfig.Cache.Redis.URL, "redis://", "", -1),
 					},
 				))
 		} else {

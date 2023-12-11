@@ -23,7 +23,7 @@ type TestSuite struct {
 func (ts *TestSuite) BaseSetupSuite() {
 	// Load the configuration
 	var err error
-	ts.AppConfig, err = config.Load("")
+	ts.AppConfig, err = config.Load()
 	require.NoError(ts.T(), err)
 }
 

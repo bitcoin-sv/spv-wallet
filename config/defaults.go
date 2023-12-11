@@ -5,7 +5,7 @@ import (
 )
 
 // DefaultConfigFilePath is in the root folder by default
-const DefaultConfigFilePath = "config.json"
+const DefaultConfigFilePath = "config.yml"
 
 // General defaults
 const (
@@ -18,31 +18,27 @@ const (
 
 // Authentication defaults
 const (
-	AuthAdminKeyDefault        = "xpub661MyMwAqRbcFaYeQLxmExXvTCjw9jjBRpifkoGggkAitXNNjva4TStLJuYjjEmU4AzXRPGwoECjXo3Rgqg8zQqW6UPVfkKtsrogGBw8xz7"
+	AuthAdminKeyDefault        = "xpub661MyMwAqRbcFrBJbKwBGCB7d3fr2SaAuXGM95BA62X41m6eW2ehRQGW4xLi9wkEXUGnQZYxVVj4PxXnyrLk7jdqvBAs1Qq9gf6ykMvjR7J"
 	AuthRequireSigningDefault  = false
 	AuthSchemeDefault          = "xpub"
 	AuthSigningDisabledDefault = true
 )
 
-// Beef defaults
+// Cache defaults
 const (
-	UseBeefDefault                  = true
-	PulseHeaderValidationURLDefault = "http://localhost:8000/api/v1/chain/merkleroot/verify"
-	PulseAuthTokenDefault           = "asd"
-)
-
-// Cachestore defaults
-const (
-	CacheEngineDefault = "freecache"
-)
-
-// Cluster defaults
-const (
-	ClusterCoordinatorDefault         = "redis"
+	CacheEngineDefault                = "freecache"
+	ClusterCoordinatorDefault         = "memory"
 	ClusterPrefixDefault              = "bux_cluser_"
 	ClusterRedisURLDefault            = "localhost:6379"
 	ClusterRedisMaxIdleTimeoutDefault = "10s"
 	ClusterRedisUseTLSDefault         = false
+	RedisDependencyModeDefault        = true
+	RedisMaxActiveConnectionsDefault  = 0
+	RedisMaxConnectionLifetimeDefault = "60s"
+	RedisMaxIdleConnectionsDefault    = 10
+	RedisMaxIdleTimeoutDefault        = "10s"
+	RedisURLDefault                   = "redis://localhost:6379"
+	RedisUseTLSDefault                = false
 )
 
 // Datastore defaults
@@ -51,17 +47,13 @@ const (
 	DatastoreDebugDefault       = false
 	DatastoreEngineDefault      = "sqlite"
 	DatastoreTablePrefixDefault = "xapi"
-)
 
-// MongoDB config keys
-const (
+	// Mongo defaults
 	MongoDatabaseNameDefault = "xapi"
 	MongoTransactionsDefault = false
 	MongoURIDefault          = "mongodb://localhost:27017/xapi"
-)
 
-// SQL (MySQL, PostgreSQL) config keys
-const (
+	// SQL (MySQL, PostgreSQL) config keys
 	SQLDriverDefault                    = "postgresql"
 	SQLHostDefault                      = "localhost"
 	SQLNameDefault                      = "xapi"
@@ -72,19 +64,17 @@ const (
 	SQLTimeZoneDefault                  = "UTC"
 	SQLTxTimeoutDefault                 = "10s"
 	SQLUserDefault                      = "postgres"
-)
 
-// SQLite config keys
-const (
-	SQLiteDatabasePathDefault = "./test-json.db"
+	// SQLite config keys
+	SQLiteDatabasePathDefault = "./bux.db"
 	SQLiteSharedDefault       = true
 )
 
 // Graphql defaults
 const (
-	GraphqlEnabledDefault        = true
+	GraphqlEnabledDefault        = false
 	GraphqlPlaygroundPathDefault = "/graphql"
-	GraphqlServerPathDefault     = "/graphql"
+	GraphqlServerPathDefault     = "/graphiql"
 )
 
 // Monitor defaults
@@ -115,7 +105,7 @@ const (
 )
 
 // NodesBroadcastClientAPIsDefault is the default template of broadcast-client api tokens
-var NodesBroadcastClientAPIsDefault = []string{"url|token"}
+var NodesBroadcastClientAPIsDefault = []string{}
 
 // Notification defaults
 const (
@@ -125,26 +115,18 @@ const (
 
 // Paymail defaults
 const (
+	UseBeefDefault                        = false
+	PulseHeaderValidationURLDefault       = "http://localhost:8080/api/v1/chain/merkleroot/verify"
+	PulseAuthTokenDefault                 = "mQZQ6WmxURxWz5ch"
 	PaymailEnabledDefault                 = true
 	PaymailDefaultFromPaymailDefault      = "from@domain.com"
 	PaymailDefaultNoteDefault             = "bux Address Resolution"
-	PaymailDomainValidationEnabledDefault = false
+	PaymailDomainValidationEnabledDefault = true
 	PaymailSenderValidationEnabledDefault = true
 )
 
 // PaymailDomainsDefault by default allows for localhost domain
 var PaymailDomainsDefault = []string{"localhost"}
-
-// Redis defaults
-const (
-	RedisDependencyModeDefault        = true
-	RedisMaxActiveConnectionsDefault  = 0
-	RedisMaxConnectionLifetimeDefault = "60s"
-	RedisMaxIdleConnectionsDefault    = 10
-	RedisMaxIdleTimeoutDefault        = "10s"
-	RedisURLDefault                   = "redis://localhost:6379"
-	RedisUseTLSDefault                = false
-)
 
 // TaskManager defaults
 const (
@@ -161,8 +143,8 @@ const (
 	ServerPortDefault         = "3003"
 )
 
-func setDefaults(configFilePath string) {
-	viper.SetDefault(ConfigFilePathKey, configFilePath)
+func setDefaults() {
+	viper.SetDefault(ConfigFilePathKey, DefaultConfigFilePath)
 
 	setGeneralDefaults()
 	setAuthDefaults()
@@ -241,8 +223,6 @@ func setDbDefaults() {
 
 func setGraphqlDefaults() {
 	viper.SetDefault(GraphqlEnabledKey, GraphqlEnabledDefault)
-	viper.SetDefault(GraphqlPlaygroundPathKey, GraphqlPlaygroundPathDefault)
-	viper.SetDefault(GraphqlServerPathKey, GraphqlServerPathDefault)
 }
 
 func setMonitorDefaults() {
@@ -295,9 +275,7 @@ func setRedisDefaults() {
 }
 
 func setTaskManagerDefaults() {
-	viper.SetDefault(TaskManagerEngineKey, TaskManagerEngineDefault)
 	viper.SetDefault(TaskManagerFactoryKey, TaskManagerFactoryDefault)
-	viper.SetDefault(TaskManagerQueueNameKey, TaskManagerQueueNameDefault)
 }
 
 func setServerDefaults() {

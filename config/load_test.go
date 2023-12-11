@@ -13,33 +13,20 @@ import (
 func TestLoadConfig(t *testing.T) {
 	t.Run("empty configFilePath", func(t *testing.T) {
 		// when
-		_, err := Load("")
+		_, err := Load()
 
 		// then
 		assert.NoError(t, err)
-		assert.Equal(t, viper.GetString(ConfigFilePathKey), "")
-	})
-
-	t.Run("custom configFilePath", func(t *testing.T) {
-		// given
-		path := "custom/config/file/path.json"
-
-		// when
-		_, err := Load(path)
-
-		// then
-		assert.Equal(t, viper.GetString(ConfigFilePathKey), path)
-		assert.Error(t, err)
+		assert.Equal(t, viper.GetString(ConfigFilePathKey), DefaultConfigFilePath)
 	})
 
 	t.Run("custom configFilePath overridden by ENV", func(t *testing.T) {
 		// given
-		path := "custom/config/file/path.json"
-		anotherPath := "anotherPath.json"
+		anotherPath := "anotherPath.yml"
 
 		// when
 		os.Setenv("BUX_"+strings.ToUpper(ConfigFilePathKey), anotherPath)
-		_, err := Load(path)
+		_, err := Load()
 
 		// then
 		assert.Equal(t, viper.GetString(ConfigFilePathKey), anotherPath)

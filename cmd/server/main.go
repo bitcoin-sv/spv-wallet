@@ -10,11 +10,12 @@ import (
 	"os/signal"
 	"time"
 
+	"github.com/BuxOrg/bux/logging"
+
 	"github.com/BuxOrg/bux-server/config"
 	"github.com/BuxOrg/bux-server/dictionary"
 	_ "github.com/BuxOrg/bux-server/docs"
 	"github.com/BuxOrg/bux-server/server"
-	"github.com/BuxOrg/bux/logging"
 )
 
 // main method starts everything for the BUX Server
@@ -27,7 +28,7 @@ func main() {
 	defaultLogger := logging.GetDefaultLogger()
 
 	// Load the Application Configuration
-	appConfig, err := config.Load("")
+	appConfig, err := config.Load()
 	if err != nil {
 		defaultLogger.Fatal().Msgf(dictionary.GetInternalMessage(dictionary.ErrorLoadingConfig), err.Error())
 		return
@@ -53,9 +54,9 @@ func main() {
 	if appConfig.Debug {
 		services.Logger.Debug().Msgf(
 			"datastore: %s | cachestore: %s | taskmanager: %s [%s] | new_relic: %t | paymail: %t | graphql: %t",
-			appConfig.Datastore.Engine.String(),
-			appConfig.Cachestore.Engine.String(),
-			appConfig.TaskManager.Engine.String(),
+			appConfig.Db.Datastore.Engine.String(),
+			appConfig.Cache.Engine.String(),
+			config.TaskManagerEngine,
 			appConfig.TaskManager.Factory.String(),
 			appConfig.NewRelic.Enabled,
 			appConfig.Paymail.Enabled,

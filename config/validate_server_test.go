@@ -11,11 +11,15 @@ import (
 func TestServerConfig_Validate(t *testing.T) {
 	t.Parallel()
 
+	idleTimeout, _ := time.ParseDuration(ServerIdleTimeoutDefault)
+	readTimeout, _ := time.ParseDuration(ServerReadTimeoutDefault)
+	writeTimeout, _ := time.ParseDuration(ServerWriteTimeoutDefault)
+
 	t.Run("port is required", func(t *testing.T) {
 		s := ServerConfig{
-			IdleTimeout:  0,
-			ReadTimeout:  0,
-			WriteTimeout: 0,
+			IdleTimeout:  idleTimeout,
+			ReadTimeout:  readTimeout,
+			WriteTimeout: writeTimeout,
 			Port:         "",
 		}
 		err := s.Validate()
@@ -24,9 +28,9 @@ func TestServerConfig_Validate(t *testing.T) {
 
 	t.Run("port is too big", func(t *testing.T) {
 		s := ServerConfig{
-			IdleTimeout:  0,
-			ReadTimeout:  0,
-			WriteTimeout: 0,
+			IdleTimeout:  idleTimeout,
+			ReadTimeout:  readTimeout,
+			WriteTimeout: writeTimeout,
 			Port:         "1234567",
 		}
 		err := s.Validate()
@@ -35,9 +39,9 @@ func TestServerConfig_Validate(t *testing.T) {
 
 	t.Run("valid server config", func(t *testing.T) {
 		s := ServerConfig{
-			IdleTimeout:  0,
-			ReadTimeout:  0,
-			WriteTimeout: 0,
+			IdleTimeout:  idleTimeout,
+			ReadTimeout:  readTimeout,
+			WriteTimeout: writeTimeout,
 			Port:         "3000",
 		}
 		err := s.Validate()
@@ -52,15 +56,6 @@ func TestServerConfig_Validate(t *testing.T) {
 			Port:         "3000",
 		}
 		err := s.Validate()
-		assert.NoError(t, err)
-
-		idleTimeout, _ := time.ParseDuration(ServerIdleTimeoutDefault)
-		assert.Equal(t, idleTimeout, s.IdleTimeout)
-
-		writeTimeout, _ := time.ParseDuration(ServerWriteTimeoutDefault)
-		assert.Equal(t, writeTimeout, s.WriteTimeout)
-
-		readTimeout, _ := time.ParseDuration(ServerReadTimeoutDefault)
-		assert.Equal(t, readTimeout, s.ReadTimeout)
+		assert.Error(t, err)
 	})
 }

@@ -13,11 +13,11 @@ import (
 var viperLock sync.Mutex
 
 // Load all AppConfig
-func Load(configFilePath string) (appConfig *AppConfig, err error) {
+func Load() (appConfig *AppConfig, err error) {
 	viperLock.Lock()
 	defer viperLock.Unlock()
 
-	setDefaults(configFilePath)
+	setDefaults()
 
 	if err = loadFlags(); err != nil {
 		return nil, err
@@ -46,7 +46,7 @@ func envConfig() {
 func loadFromFile() error {
 	configFilePath := viper.GetString(ConfigFilePathKey)
 
-	if configFilePath == "" {
+	if configFilePath == DefaultConfigFilePath {
 		_, err := os.Stat(DefaultConfigFilePath)
 		if os.IsNotExist(err) {
 			// if the config is not specified and no default config file exists, use defaults

@@ -1,7 +1,7 @@
 package config
 
 import (
-	"time"
+	"errors"
 
 	validation "github.com/go-ozzo/ozzo-validation"
 	"github.com/go-ozzo/ozzo-validation/is"
@@ -11,25 +11,13 @@ import (
 func (s *ServerConfig) Validate() error {
 	// Set defaults
 	if s.IdleTimeout.String() == "0s" {
-		duration, err := time.ParseDuration(ServerIdleTimeoutDefault)
-		if err != nil {
-			return err
-		}
-		s.IdleTimeout = duration
+		return errors.New("Idle timeout needs to be set for server configuration")
 	}
 	if s.ReadTimeout.String() == "0s" {
-		duration, err := time.ParseDuration(ServerReadTimeoutDefault)
-		if err != nil {
-			return err
-		}
-		s.ReadTimeout = duration
+		return errors.New("Read timeout needs to be set for server configuration")
 	}
 	if s.WriteTimeout.String() == "0s" {
-		duration, err := time.ParseDuration(ServerWriteTimeoutDefault)
-		if err != nil {
-			return err
-		}
-		s.WriteTimeout = duration
+		return errors.New("Write timeout needs to be set for server configuration")
 	}
 
 	return validation.ValidateStruct(s,

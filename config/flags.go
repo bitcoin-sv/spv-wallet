@@ -19,6 +19,10 @@ type cliFlags struct {
 }
 
 func loadFlags() error {
+	if !anyFlagsPassed() {
+		return nil
+	}
+
 	cli := cliFlags{}
 	bux := buxFlags{}
 
@@ -37,6 +41,10 @@ func loadFlags() error {
 		return err
 	}
 	return nil
+}
+
+func anyFlagsPassed() bool {
+	return len(os.Args) > 1
 }
 
 func (fs *buxFlags) initFlags(cliFlags *cliFlags) {
@@ -83,7 +91,7 @@ func (fs *buxFlags) parseCliFlags(cli *cliFlags) {
 	if cli.dumpConfig {
 		configPath := viper.GetString(ConfigFilePathKey)
 		if configPath == "" {
-			configPath = "config.json"
+			configPath = DefaultConfigFilePath
 		}
 		err := viper.SafeWriteConfigAs(configPath)
 		if err != nil {
@@ -153,8 +161,6 @@ func (fs *buxFlags) initDbFlags() {
 
 func (fs *buxFlags) initGraphqlFlags() {
 	fs.Bool(GraphqlEnabledKey, GraphqlEnabledDefault, "enable graphql")
-	fs.String(GraphqlPlaygroundPathKey, GraphqlPlaygroundPathDefault, "playground path for graphql")
-	fs.String(GraphqlServerPathKey, GraphqlServerPathDefault, "server path")
 }
 
 func (fs *buxFlags) initMonitorFlags() {
@@ -207,9 +213,7 @@ func (fs *buxFlags) initRedisFlags() {
 }
 
 func (fs *buxFlags) initTaskManagerFlags() {
-	fs.String(TaskManagerEngineKey, TaskManagerEngineDefault, "tasq, machinery, empty")
 	fs.String(TaskManagerFactoryKey, TaskManagerFactoryDefault, "memory, redis, empty")
-	fs.String(TaskManagerQueueNameKey, TaskManagerQueueNameDefault, "name of task manager queue")
 }
 
 func (fs *buxFlags) initServerFlags() {

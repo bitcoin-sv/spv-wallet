@@ -26,9 +26,7 @@ const ConfigFilePathKey = "config_file"
 // AppConfig is the configuration values and associated env vars
 type AppConfig struct {
 	Authentication     *AuthenticationConfig `json:"auth" mapstructure:"auth"`
-	Beef               *BeefConfig           `json:"beef" mapstructure:"beef"`
-	Cachestore         *CachestoreConfig     `json:"cache" mapstructure:"cache"`
-	ClusterConfig      *ClusterConfig        `json:"cluster" mapstructure:"cluster"`
+	Cache              *CacheConfig          `json:"cache" mapstructure:"cache"`
 	Db                 *DbConfig             `json:"db" mapstructure:"db"`
 	Debug              bool                  `json:"debug" mapstructure:"debug"`
 	DebugProfiling     bool                  `json:"debug_profiling" mapstructure:"debug_profiling"`
@@ -41,7 +39,6 @@ type AppConfig struct {
 	Nodes              *NodesConfig          `json:"nodes" mapstructure:"nodes"`
 	Notifications      *NotificationsConfig  `json:"notifications" mapstructure:"notifications"`
 	Paymail            *PaymailConfig        `json:"paymail" mapstructure:"paymail"`
-	Redis              *RedisConfig          `json:"redis" mapstructure:"redis"`
 	RequestLogging     bool                  `json:"request_logging" mapstructure:"request_logging"`
 	Server             *ServerConfig         `json:"server" mapstructure:"server"`
 	TaskManager        *TaskManagerConfig    `json:"task_manager" mapstructure:"task_manager"`
@@ -72,34 +69,12 @@ const (
 	AuthSigningDisabledKey = "auth.signing_disabled"
 )
 
-// BeefConfig consists of components required to use beef, e.g. Pulse for merkle roots validation
-type BeefConfig struct {
-	UseBeef bool         `json:"use_beef" mapstructure:"use_beef"`
-	Pulse   *PulseConfig `json:"pulse" mapstructure:"pulse"`
-}
-
-// PulseConfig is a configuration for the Pulse service
-type PulseConfig struct {
-	PulseHeaderValidationURL string `json:"url" mapstructure:"url"`
-	PulseAuthToken           string `json:"auth_token" mapstructure:"auth_token"`
-}
-
-// Beef config keys for Viper
-const (
-	UseBeefKey                  = "beef.use_beef"
-	PulseHeaderValidationURLKey = "beef.pulse.url"
-	PulseAuthTokenKey           = "beef.pulse.auth_token" // #nosec G101
-)
-
 // CachestoreConfig is a configuration for cachestore
-type CachestoreConfig struct {
-	Engine cachestore.Engine `json:"engine" mapstructure:"engine"` // Cache engine to use (redis, freecache)
+type CacheConfig struct {
+	Engine  cachestore.Engine `json:"engine" mapstructure:"engine"` // Cache engine to use (redis, freecache)
+	Cluster *ClusterConfig    `json:"cluster" mapstructure:"cluster"`
+	Redis   *RedisConfig      `json:"redis" mapstructure:"redis"`
 }
-
-// Cachestore config keys for Viper
-const (
-	CacheEngineKey = "cache.engine"
-)
 
 // ClusterConfig is a configuration for the Bux cluster
 type ClusterConfig struct {
@@ -108,13 +83,32 @@ type ClusterConfig struct {
 	Redis       *RedisConfig        `json:"redis" mapstrcuture:"redis"`             // will use cache config if redis is set and this is empty
 }
 
-// Cluster config keys for Viper
+// RedisConfig is a configuration for Redis cachestore or taskmanager
+type RedisConfig struct {
+	DependencyMode        bool          `json:"dependency_mode" mapstructure:"dependency_mode"`                 // Only in Redis with script enabled
+	MaxActiveConnections  int           `json:"max_active_connections" mapstructure:"max_active_connections"`   // Max active connections
+	MaxConnectionLifetime time.Duration `json:"max_connection_lifetime" mapstructure:"max_connection_lifetime"` // Max connection lifetime
+	MaxIdleConnections    int           `json:"max_idle_connections" mapstructure:"max_idle_connections"`       // Max idle connections
+	MaxIdleTimeout        time.Duration `json:"max_idle_timeout" mapstructure:"max_idle_timeout"`               // Max idle timeout
+	URL                   string        `json:"url" mapstructure:"url"`                                         // Redis URL connection string
+	UseTLS                bool          `json:"use_tls" mapstructure:"use_tls"`                                 // Flag for using TLS
+}
+
+// Cache config keys for Viper
 const (
-	ClusterCoordinatorKey         = "cluster.coordinator"
-	ClusterPrefixKey              = "cluster.prefix"
-	ClusterRedisURLKey            = "cluster.redis.url"
-	ClusterRedisMaxIdleTimeoutKey = "cluster.redis.max_idle_timeout"
-	ClusterRedisUseTLSKey         = "cluster.redis.use_tls"
+	CacheEngineKey                = "cache.engine"
+	ClusterCoordinatorKey         = "cache.cluster.coordinator"
+	ClusterPrefixKey              = "cache.cluster.prefix"
+	ClusterRedisURLKey            = "cache.cluster.redis.url"
+	ClusterRedisMaxIdleTimeoutKey = "cache.cluster.redis.max_idle_timeout"
+	ClusterRedisUseTLSKey         = "cache.cluster.redis.use_tls"
+	RedisDependencyModeKey        = "cache.redis.dependency_mode"
+	RedisMaxActiveConnectionsKey  = "cache.redis.max_active_connections"
+	RedisMaxConnectionLifetimeKey = "cache.redis.max_connection_lifetime"
+	RedisMaxIdleConnectionsKey    = "cache.redis.max_idle_connections"
+	RedisMaxIdleTimeoutKey        = "cache.redis.max_idle_timeout"
+	RedisURLKey                   = "cache.redis.url"
+	RedisUseTLSKey                = "cache.redis.use_tls"
 )
 
 // DbConfig consists of datastore config and specific dbs configs
@@ -171,15 +165,11 @@ const (
 // GraphqlConfig is the configuration for the GraphQL server
 type GraphqlConfig struct {
 	Enabled        bool   `json:"enabled" mapstructure:"enabled"`                 // true/false
-	PlaygroundPath string `json:"playground_path" mapstructure:"playground_path"` // playground path i.e. "/graphiql"
-	ServerPath     string `json:"server_path" mapstructure:"server_path"`         // server path i.e. "/graphql"
 }
 
 // GraphQL config keys for Viper
 const (
 	GraphqlEnabledKey        = "graphql.enabled"
-	GraphqlPlaygroundPathKey = "graphql.playground_path"
-	GraphqlServerPathKey     = "graphql.server_path"
 )
 
 // MonitorOptions is the configuration for blockchain monitoring
@@ -241,7 +231,7 @@ const (
 
 // NotificationsConfig is the configuration for notifications
 type NotificationsConfig struct {
-	Enabled         bool   `json:"enabled" mapstructure:"enabled"` // true/false
+	Enabled         bool   `json:"enabled" mapstructure:"enabled"`
 	WebhookEndpoint string `json:"webhook_endpoint" mapstructure:"webhook_endpoint"`
 }
 
@@ -261,16 +251,27 @@ type LoggingConfig struct {
 
 // PaymailConfig is the configuration for the built-in Paymail server
 type PaymailConfig struct {
-	DefaultFromPaymail      string   `json:"default_from_paymail" mapstructure:"default_from_paymail"`           // IE: from@domain.com
-	DefaultNote             string   `json:"default_note" mapstructure:"default_note"`                           // IE: message needed for address resolution
-	Domains                 []string `json:"domains" mapstructure:"domains"`                                     // List of allowed domains
-	DomainValidationEnabled bool     `json:"domain_validation_enabled" mapstructure:"domain_validation_enabled"` // Turn off if hosted domain is not paymail related
-	Enabled                 bool     `json:"enabled" mapstructure:"enabled"`                                     // Flag for enabling the Paymail Server Service
-	SenderValidationEnabled bool     `json:"sender_validation_enabled" mapstructure:"sender_validation_enabled"` // Turn on extra security
+	Beef                    *BeefConfig `json:"beef" mapstructure:"beef"`                                           // Background Evaluation Extended Format (BEEF)
+	DefaultFromPaymail      string      `json:"default_from_paymail" mapstructure:"default_from_paymail"`           // IE: from@domain.com
+	DefaultNote             string      `json:"default_note" mapstructure:"default_note"`                           // IE: message needed for address resolution
+	Domains                 []string    `json:"domains" mapstructure:"domains"`                                     // List of allowed domains
+	DomainValidationEnabled bool        `json:"domain_validation_enabled" mapstructure:"domain_validation_enabled"` // Turn off if hosted domain is not paymail related
+	Enabled                 bool        `json:"enabled" mapstructure:"enabled"`                                     // Flag for enabling the Paymail Server Service
+	SenderValidationEnabled bool        `json:"sender_validation_enabled" mapstructure:"sender_validation_enabled"` // Turn on extra security
+}
+
+// BeefConfig consists of components required to use beef, e.g. Pulse for merkle roots validation
+type BeefConfig struct {
+	UseBeef                  bool   `json:"use_beef" mapstructure:"use_beef"`
+	PulseHeaderValidationURL string `json:"pulse_url" mapstructure:"pulse_url"`
+	PulseAuthToken           string `json:"pulse_auth_token" mapstructure:"pulse_auth_token"`
 }
 
 // Paymail config keys for Viper
 const (
+	UseBeefKey                        = "paymail.beef.use_beef"
+	PulseHeaderValidationURLKey       = "paymail.beef.pulse_url"
+	PulseAuthTokenKey                 = "paymail.beef.pulse_auth_token" // #nosec G101
 	PaymailDefaultFromPaymailKey      = "paymail.default_from_paymail"
 	PaymailDefaultNoteKey             = "paymail.default_note"
 	PaymailDomainsKey                 = "paymail.domains"
@@ -279,41 +280,15 @@ const (
 	PaymailSenderValidationEnabledKey = "paymail.sender_validation_enabled"
 )
 
-// RedisConfig is a configuration for Redis cachestore or taskmanager
-type RedisConfig struct {
-	DependencyMode        bool          `json:"dependency_mode" mapstructure:"dependency_mode"`                 // Only in Redis with script enabled
-	MaxActiveConnections  int           `json:"max_active_connections" mapstructure:"max_active_connections"`   // Max active connections
-	MaxConnectionLifetime time.Duration `json:"max_connection_lifetime" mapstructure:"max_connection_lifetime"` // Max connection lifetime
-	MaxIdleConnections    int           `json:"max_idle_connections" mapstructure:"max_idle_connections"`       // Max idle connections
-	MaxIdleTimeout        time.Duration `json:"max_idle_timeout" mapstructure:"max_idle_timeout"`               // Max idle timeout
-	URL                   string        `json:"url" mapstructure:"url"`                                         // Redis URL connection string
-	UseTLS                bool          `json:"use_tls" mapstructure:"use_tls"`                                 // Flag for using TLS
-}
-
-// Redis config keys for Viper
-const (
-	RedisDependencyModeKey        = "redis.dependency_mode"
-	RedisMaxActiveConnectionsKey  = "redis.max_active_connections"
-	RedisMaxConnectionLifetimeKey = "redis.max_connection_lifetime"
-	RedisMaxIdleConnectionsKey    = "redis.max_idle_connections"
-	RedisMaxIdleTimeoutKey        = "redis.max_idle_timeout"
-	RedisURLKey                   = "redis.url"
-	RedisUseTLSKey                = "redis.use_tls"
-)
-
 // TaskManagerConfig is a configuration for the taskmanager
 type TaskManagerConfig struct {
 	// QueueOptions *taskq.QueueOptions
-	Engine    taskmanager.Engine  `json:"engine" mapstructure:"engine"`         // taskq, machinery
 	Factory   taskmanager.Factory `json:"factory" mapstructure:"factory"`       // Factory (memory, redis)
-	QueueName string              `json:"queue_name" mapstructure:"queue_name"` // test_queue
 }
 
 // TaskManager config keys for Viper
 const (
-	TaskManagerEngineKey    = "task_manager.engine"
 	TaskManagerFactoryKey   = "task_manager.factory"
-	TaskManagerQueueNameKey = "task_manager.queue_name"
 )
 
 // ServerConfig is a configuration for the HTTP Server

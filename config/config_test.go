@@ -13,7 +13,7 @@ import (
 
 // newTestConfig will make a new test config
 func newTestConfig(t *testing.T) (ac *AppConfig) {
-	ac, err := Load("")
+	ac, err := Load()
 	require.NoError(t, err)
 	require.NotNil(t, ac)
 	return
@@ -63,7 +63,7 @@ func TestAppConfig_Validate(t *testing.T) {
 
 	t.Run("cachestore - invalid engine", func(t *testing.T) {
 		app, _, txn := baseTestConfig(t)
-		app.Cachestore.Engine = cachestore.Empty
+		app.Cache.Engine = cachestore.Empty
 		err := app.Validate(txn)
 		assert.Error(t, err)
 	})
@@ -116,15 +116,23 @@ func TestAppConfig_Validate(t *testing.T) {
 
 	t.Run("cachestore - invalid redis url", func(t *testing.T) {
 		app, _, txn := baseTestConfig(t)
-		app.Cachestore.Engine = cachestore.Redis
-		app.Redis.URL = ""
+		app.Cache.Engine = cachestore.Redis
+		app.Cache.Redis.URL = ""
+		err := app.Validate(txn)
+		assert.Error(t, err)
+	})
+
+	t.Run("cachestore - invalid redis config", func(t *testing.T) {
+		app, _, txn := baseTestConfig(t)
+		app.Cache.Engine = cachestore.Redis
+		app.Cache.Redis = nil
 		err := app.Validate(txn)
 		assert.Error(t, err)
 	})
 
 	t.Run("cachestore - valid freecache", func(t *testing.T) {
 		app, _, txn := baseTestConfig(t)
-		app.Cachestore.Engine = cachestore.FreeCache
+		app.Cache.Engine = cachestore.FreeCache
 		err := app.Validate(txn)
 		assert.NoError(t, err)
 	})
