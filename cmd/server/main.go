@@ -35,7 +35,7 @@ func main() {
 	// Load the Application Services
 	var services *config.AppServices
 	if services, err = appConfig.LoadServices(context.Background()); err != nil {
-		defaultLogger.Error().Msgf(dictionary.GetInternalMessage(dictionary.ErrorLoadingService), config.ApplicationName, err.Error())
+		defaultLogger.Fatal().Msgf(dictionary.GetInternalMessage(dictionary.ErrorLoadingService), config.ApplicationName, err.Error())
 		return
 	}
 
