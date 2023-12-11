@@ -364,10 +364,7 @@ func loadDatastore(options []bux.ClientOps, appConfig *AppConfig, testMode bool)
 		return nil, errors.New("unsupported datastore engine: " + appConfig.Db.Datastore.Engine.String())
 	}
 
-	// Add the auto migrate
-	if appConfig.Db.Datastore.AutoMigrate {
-		options = append(options, bux.WithAutoMigrate(bux.BaseModels...))
-	}
+	options = append(options, bux.WithAutoMigrate(bux.BaseModels...))
 
 	return options, nil
 }

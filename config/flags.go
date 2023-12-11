@@ -136,7 +136,6 @@ func (fs *buxFlags) initClusterFlags() {
 }
 
 func (fs *buxFlags) initDbFlags() {
-	fs.Bool(DatastoreAutoMigrateKey, DatastoreAutoMigrateDefault, "loads a blank database")
 	fs.Bool(DatastoreDebugKey, DatastoreDebugDefault, "show sql statements")
 	fs.String(DatastoreEngineKey, DatastoreEngineDefault, "mysql, sqlite, postgresql, mongodb, empty")
 	fs.String(DatastoreTablePrefixKey, DatastoreTablePrefixDefault, "prefix for all tables in db")

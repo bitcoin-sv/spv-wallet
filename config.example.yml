@@ -25,7 +25,6 @@ cache:
 config_file: config.example.yml
 db:
     datastore:
-        auto_migrate: true
         debug: false
         engine: sqlite
         table_prefix: xapi

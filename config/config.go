@@ -121,7 +121,6 @@ type DbConfig struct {
 
 // DatastoreConfig is a configuration for the datastore
 type DatastoreConfig struct {
-	AutoMigrate bool             `json:"auto_migrate" mapstructure:"auto_migrate"` // loads a blank database
 	Debug       bool             `json:"debug" mapstructure:"debug"`               // true for sql statements
 	Engine      datastore.Engine `json:"engine" mapstructure:"engine"`             // mysql, sqlite
 	TablePrefix string           `json:"table_prefix" mapstructure:"table_prefix"` // pre_users (pre)
@@ -129,7 +128,6 @@ type DatastoreConfig struct {
 
 // Common datastore config keys
 const (
-	DatastoreAutoMigrateKey = "db.datastore.auto_migrate"
 	DatastoreDebugKey       = "db.datastore.debug"
 	DatastoreEngineKey      = "db.datastore.engine"
 	DatastoreTablePrefixKey = "db.datastore.table_prefix"
