@@ -117,7 +117,7 @@ const (
 const (
 	UseBeefDefault                        = false
 	PulseHeaderValidationURLDefault       = "http://localhost:8080/api/v1/chain/merkleroot/verify"
-	PulseAuthTokenDefault                 = "mQZQ6WmxURxWz5ch"
+	PulseAuthTokenDefault                 = "mQZQ6WmxURxWz5ch" // #nosec G101
 	PaymailEnabledDefault                 = true
 	PaymailDefaultFromPaymailDefault      = "from@domain.com"
 	PaymailDefaultNoteDefault             = "bux Address Resolution"
