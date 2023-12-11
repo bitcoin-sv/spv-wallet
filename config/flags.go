@@ -34,12 +34,13 @@ func loadFlags() error {
 		os.Exit(1)
 	}
 
-	bux.parseCliFlags(&cli)
-
 	err = viper.BindPFlags(&bux.FlagSet)
 	if err != nil {
 		return err
 	}
+
+	bux.parseCliFlags(&cli)
+
 	return nil
 }
 

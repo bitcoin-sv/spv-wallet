@@ -1,5 +1,5 @@
 auth:
-    admin_key: xpub661MyMwAqRbcFaYeQLxmExXvTCjw9jjBRpifkoGggkAitXNNjva4TStLJuYjjEmU4AzXRPGwoECjXo3Rgqg8zQqW6UPVfkKtsrogGBw8xz7
+    admin_key: xpub661MyMwAqRbcFrBJbKwBGCB7d3fr2SaAuXGM95BA62X41m6eW2ehRQGW4xLi9wkEXUGnQZYxVVj4PxXnyrLk7jdqvBAs1Qq9gf6ykMvjR7J
     require_signing: false
     scheme: xpub
     signing_disabled: true
@@ -7,12 +7,14 @@ cache:
     cluster:
         coordinator: memory
         prefix: bux_cluser_
-        redis:
+        # Prefixed with "_", because it's unused by default
+        _redis:
             max_idle_timeout: 10s
             url: localhost:6379
             use_tls: false
     engine: freecache
-    redis:
+    # Prefixed with "_", because it's unused by default
+    _redis:
         dependency_mode: true
         max_active_connections: 0
         max_connection_lifetime: 60s
@@ -20,18 +22,20 @@ cache:
         max_idle_timeout: 10s
         url: redis://localhost:6379
         use_tls: false
-config_file: config.yml
+config_file: config.example.yml
 db:
     datastore:
         auto_migrate: true
         debug: false
         engine: sqlite
         table_prefix: xapi
-    mongodb:
+    # Prefixed with "_", because it's unused by default
+    _mongodb:
         db_name: xapi
         transactions: false
         uri: mongodb://localhost:27017/xapi
-    sql:
+    # Prefixed with "_", because it's unused by default
+    _sql:
         driver: postgresql
         host: localhost
         name: xapi
@@ -43,17 +47,17 @@ db:
         tx_timeout: 10s
         user: postgres
     sqlite:
-        database_path: ./test-json.db
+        database_path: ./bux.db
         shared: true
 debug: true
 debug_profiling: true
 disable_itc: true
-graphql:
-    enabled: true
-    playground_path: /graphql
-    server_path: /graphql
+# Prefixed with "_", because it's unused by default
+_graphql:
+    enabled: false
 import_block_headers: ""
-monitor:
+# Prefixed with "_", because it's unused by default
+_monitor:
     auth_token: ""
     bux_agent_url: ws://localhost:8000/websocket
     debug: false
@@ -72,17 +76,19 @@ nodes:
     broadcast_client_apis: []
     minercraft_api: mAPI
     use_mapi_fee_quotes: true
-notifications:
+# Prefixed with "_", because it's unused by default
+_notifications:
     enabled: false
     webhook_endpoint: ""
 paymail:
-    beef:
+    # Prefixed with "_", because it's unused by default
+    _beef:
         pulse_auth_token: mQZQ6WmxURxWz5ch
         pulse_url: http://localhost:8080/api/v1/chain/merkleroot/verify
         use_beef: false
     default_from_paymail: from@domain.com
     default_note: bux Address Resolution
-    domain_validation_enabled: false
+    domain_validation_enabled: true
     domains:
         - localhost
     enabled: true
@@ -94,6 +100,4 @@ server:
     read_timeout: 15s
     write_timeout: 15s
 task_manager:
-    engine: taskq
     factory: memory
-    queue_name: development_queue
