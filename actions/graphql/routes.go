@@ -108,10 +108,10 @@ func RegisterRoutes(router *apirouter.Router, appConfig *config.AppConfig, servi
 				),
 			)
 			if appConfig.Debug {
-				services.Logger.Debug().Msg("started graphql playground server on " + playgroundPath)
+				services.Logger.Debug().Msgf("started graphql playground server on %s", playgroundPath)
 			}
 		} else {
-			services.Logger.Error().Msg("Failed starting graphql playground server directory equals playground directory " + serverPath + " = " + playgroundPath)
+			services.Logger.Error().Msgf("Failed starting graphql playground server directory equals playground directory %s = %s", serverPath, playgroundPath)
 		}
 	}
 

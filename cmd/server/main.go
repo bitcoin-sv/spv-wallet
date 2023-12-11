@@ -5,7 +5,6 @@ package main
 
 import (
 	"context"
-	"fmt"
 	"os"
 	"os/signal"
 	"time"
@@ -51,16 +50,15 @@ func main() {
 
 	// (debugging: show services that are enabled or not)
 	if appConfig.Debug {
-		services.Logger.Debug().Msg(
-			fmt.Sprintf("datastore: %s | cachestore: %s | taskmanager: %s [%s] | new_relic: %t | paymail: %t | graphql: %t",
-				appConfig.Datastore.Engine.String(),
-				appConfig.Cachestore.Engine.String(),
-				appConfig.TaskManager.Engine.String(),
-				appConfig.TaskManager.Factory.String(),
-				appConfig.NewRelic.Enabled,
-				appConfig.Paymail.Enabled,
-				appConfig.GraphQL.Enabled,
-			),
+		services.Logger.Debug().Msgf(
+			"datastore: %s | cachestore: %s | taskmanager: %s [%s] | new_relic: %t | paymail: %t | graphql: %t",
+			appConfig.Datastore.Engine.String(),
+			appConfig.Cachestore.Engine.String(),
+			appConfig.TaskManager.Engine.String(),
+			appConfig.TaskManager.Factory.String(),
+			appConfig.NewRelic.Enabled,
+			appConfig.Paymail.Enabled,
+			appConfig.GraphQL.Enabled,
 		)
 	}
 
