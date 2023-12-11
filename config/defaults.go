@@ -197,7 +197,6 @@ func setClusterDefaults() {
 }
 
 func setDbDefaults() {
-	viper.SetDefault(DatastoreAutoMigrateKey, DatastoreAutoMigrateDefault)
 	viper.SetDefault(DatastoreDebugKey, DatastoreDebugDefault)
 	viper.SetDefault(DatastoreEngineKey, DatastoreEngineDefault)
 	viper.SetDefault(DatastoreTablePrefixKey, DatastoreTablePrefixDefault)
