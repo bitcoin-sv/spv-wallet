@@ -2,12 +2,12 @@ package config
 
 import (
 	"fmt"
-	"github.com/mrz1836/go-datastore"
 	"os"
 	"strings"
 	"sync"
 
 	"github.com/BuxOrg/bux-server/dictionary"
+	"github.com/mrz1836/go-datastore"
 	"github.com/spf13/viper"
 )
 

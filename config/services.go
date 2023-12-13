@@ -5,12 +5,12 @@ import (
 	"crypto/tls"
 	"errors"
 	"fmt"
-	"github.com/BuxOrg/bux-server/logging"
 	"net/url"
 	"strings"
 	"time"
 
 	"github.com/BuxOrg/bux"
+	"github.com/BuxOrg/bux-server/logging"
 	"github.com/BuxOrg/bux/chainstate"
 	"github.com/BuxOrg/bux/cluster"
 	"github.com/BuxOrg/bux/taskmanager"

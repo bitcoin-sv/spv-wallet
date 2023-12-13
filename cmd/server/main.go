@@ -28,7 +28,7 @@ func main() {
 	// Load the Application Configuration
 	appConfig, err := config.Load("")
 	if err != nil {
-		defaultLogger.Error().Msgf(dictionary.GetInternalMessage(dictionary.ErrorLoadingConfig), err.Error())
+		defaultLogger.Fatal().Msgf(dictionary.GetInternalMessage(dictionary.ErrorLoadingConfig), err.Error())
 		return
 	}
 
@@ -44,7 +44,7 @@ func main() {
 
 	// Validate configuration (after services have been loaded)
 	if err = appConfig.Validate(txn); err != nil {
-		services.Logger.Error().Msgf(dictionary.GetInternalMessage(dictionary.ErrorLoadingConfig), err.Error())
+		services.Logger.Fatal().Msgf(dictionary.GetInternalMessage(dictionary.ErrorLoadingConfig), err.Error())
 		return
 	}
 
@@ -75,7 +75,7 @@ func main() {
 		ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 		defer cancel()
 		if err = appServer.Shutdown(ctx); err != nil {
-			services.Logger.Error().Msgf("error shutting down: %s", err.Error())
+			services.Logger.Fatal().Msgf("error shutting down: %s", err.Error())
 		}
 
 		close(idleConnectionsClosed)

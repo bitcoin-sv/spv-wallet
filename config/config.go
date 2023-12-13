@@ -3,15 +3,15 @@ package config
 
 import (
 	"errors"
-	"github.com/mrz1836/go-cachestore"
-	"github.com/mrz1836/go-datastore"
-	"github.com/tonicpow/go-minercraft/v2"
 	"time"
 
 	"github.com/BuxOrg/bux/cluster"
 	"github.com/BuxOrg/bux/taskmanager"
 	validation "github.com/go-ozzo/ozzo-validation"
+	"github.com/mrz1836/go-cachestore"
+	"github.com/mrz1836/go-datastore"
 	"github.com/newrelic/go-agent/v3/newrelic"
+	"github.com/tonicpow/go-minercraft/v2"
 )
 
 // Config constants used for optimization and value testing
