@@ -26,7 +26,7 @@ func RegisterRoutes(router *apirouter.Router, appConfig *config.AppConfig, servi
 	action := &Action{actions.Action{AppConfig: a.AppConfig, Services: a.Services}}
 
 	// V1 Requests
-	router.HTTPRouter.GET("/"+config.ApiVersion+"/xpub", action.Request(router, requireBasic.Wrap(action.get)))
-	router.HTTPRouter.POST("/"+config.ApiVersion+"/xpub", action.Request(router, requireAdmin.Wrap(action.create)))
-	router.HTTPRouter.PATCH("/"+config.ApiVersion+"/xpub", action.Request(router, requireAdmin.Wrap(action.update)))
+	router.HTTPRouter.GET("/"+config.APIVersion+"/xpub", action.Request(router, requireBasic.Wrap(action.get)))
+	router.HTTPRouter.POST("/"+config.APIVersion+"/xpub", action.Request(router, requireAdmin.Wrap(action.create)))
+	router.HTTPRouter.PATCH("/"+config.APIVersion+"/xpub", action.Request(router, requireAdmin.Wrap(action.update)))
 }

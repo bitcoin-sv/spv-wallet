@@ -12,19 +12,19 @@ import (
 func (ts *TestSuite) TestUtxoRegisterRoutes() {
 	ts.T().Run("test routes", func(t *testing.T) {
 		// get utxo
-		handle, _, _ := ts.Router.HTTPRouter.Lookup(http.MethodGet, "/"+config.ApiVersion+"/utxo")
+		handle, _, _ := ts.Router.HTTPRouter.Lookup(http.MethodGet, "/"+config.APIVersion+"/utxo")
 		assert.NotNil(t, handle)
 
 		// count utxo
-		handle, _, _ = ts.Router.HTTPRouter.Lookup(http.MethodPost, "/"+config.ApiVersion+"/utxo/count")
+		handle, _, _ = ts.Router.HTTPRouter.Lookup(http.MethodPost, "/"+config.APIVersion+"/utxo/count")
 		assert.NotNil(t, handle)
 
 		// search utxo
-		handle, _, _ = ts.Router.HTTPRouter.Lookup(http.MethodPost, "/"+config.ApiVersion+"/utxo/search")
+		handle, _, _ = ts.Router.HTTPRouter.Lookup(http.MethodPost, "/"+config.APIVersion+"/utxo/search")
 		assert.NotNil(t, handle)
 
 		// unreserve utxo
-		handle, _, _ = ts.Router.HTTPRouter.Lookup(http.MethodPatch, "/"+config.ApiVersion+"/utxo/unreserve")
+		handle, _, _ = ts.Router.HTTPRouter.Lookup(http.MethodPatch, "/"+config.APIVersion+"/utxo/unreserve")
 		assert.NotNil(t, handle)
 	})
 }
