@@ -6,10 +6,9 @@ import (
 	"strings"
 	"sync"
 
+	"github.com/BuxOrg/bux-server/dictionary"
 	"github.com/mitchellh/mapstructure"
 	"github.com/spf13/viper"
-
-	"github.com/BuxOrg/bux-server/dictionary"
 )
 
 // Added a mutex lock for a race-condition
