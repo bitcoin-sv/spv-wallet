@@ -4,7 +4,7 @@ go 1.19
 
 require (
 	github.com/99designs/gqlgen v0.17.41
-	github.com/BuxOrg/bux v0.7.0
+	github.com/BuxOrg/bux v0.8.0
 	github.com/BuxOrg/bux-models v0.2.1
 	github.com/bitcoin-sv/go-broadcast-client v0.9.0
 	github.com/go-ozzo/ozzo-validation v3.6.0+incompatible
@@ -29,6 +29,10 @@ require (
 require (
 	github.com/jackc/puddle/v2 v2.2.1 // indirect
 	github.com/libsv/go-p2p v0.1.4 // indirect
+	github.com/mattn/go-colorable v0.1.13 // indirect
+	github.com/mattn/go-isatty v0.0.20 // indirect
+	github.com/rs/zerolog v1.31.0 // indirect
+	go.elastic.co/ecszerolog v0.2.0 // indirect
 )
 
 require (
