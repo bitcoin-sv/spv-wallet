@@ -320,6 +320,10 @@ func loadDatastore(options []bux.ClientOps, appConfig *AppConfig, testMode bool)
 			CommonConfig: datastore.CommonConfig{
 				Debug:       debug,
 				TablePrefix: tablePrefix,
+				MaxConnectionIdleTime: appConfig.Db.SQLite.MaxConnectionIdleTime,
+				MaxConnectionTime:     appConfig.Db.SQLite.MaxConnectionTime,
+				MaxIdleConnections:    appConfig.Db.SQLite.MaxIdleConnections,
+				MaxOpenConnections:    appConfig.Db.SQLite.MaxOpenConnections,
 			},
 			DatabasePath: appConfig.Db.SQLite.DatabasePath, // "" for in memory
 			Shared:       appConfig.Db.SQLite.Shared,

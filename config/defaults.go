@@ -1,285 +1,156 @@
 package config
 
 import (
-	"github.com/spf13/viper"
+	"time"
+
+	"github.com/mrz1836/go-datastore"
+	"github.com/tonicpow/go-minercraft/v2"
 )
 
-// DefaultConfigFilePath is in the root folder by default
-const DefaultConfigFilePath = "config.yml"
-
-// General defaults
-const (
-	DebugDefault              = true
-	DebugProfilingDefault     = true
-	DisableITCDefault         = true
-	ImportBlockHeadersDefault = ""
-	RequestLoggingDefault     = true
-)
-
-// Authentication defaults
-const (
-	AuthAdminKeyDefault        = "xpub661MyMwAqRbcFrBJbKwBGCB7d3fr2SaAuXGM95BA62X41m6eW2ehRQGW4xLi9wkEXUGnQZYxVVj4PxXnyrLk7jdqvBAs1Qq9gf6ykMvjR7J"
-	AuthRequireSigningDefault  = false
-	AuthSchemeDefault          = "xpub"
-	AuthSigningDisabledDefault = true
-)
-
-// Cache defaults
-const (
-	CacheEngineDefault                = "freecache"
-	ClusterCoordinatorDefault         = "memory"
-	ClusterPrefixDefault              = "bux_cluser_"
-	ClusterRedisURLDefault            = "localhost:6379"
-	ClusterRedisMaxIdleTimeoutDefault = "10s"
-	ClusterRedisUseTLSDefault         = false
-	RedisDependencyModeDefault        = true
-	RedisMaxActiveConnectionsDefault  = 0
-	RedisMaxConnectionLifetimeDefault = "60s"
-	RedisMaxIdleConnectionsDefault    = 10
-	RedisMaxIdleTimeoutDefault        = "10s"
-	RedisURLDefault                   = "redis://localhost:6379"
-	RedisUseTLSDefault                = false
-)
-
-// Datastore defaults
-const (
-	DatastoreAutoMigrateDefault = true
-	DatastoreDebugDefault       = false
-	DatastoreEngineDefault      = "sqlite"
-	DatastoreTablePrefixDefault = "xapi"
-
-	// Mongo defaults
-	MongoDatabaseNameDefault = "xapi"
-	MongoTransactionsDefault = false
-	MongoURIDefault          = "mongodb://localhost:27017/xapi"
-
-	// SQL (MySQL, PostgreSQL) config keys
-	SQLDriverDefault                    = "postgresql"
-	SQLHostDefault                      = "localhost"
-	SQLNameDefault                      = "xapi"
-	SQLPasswordDefault                  = ""
-	SQLPortDefault                      = "5432"
-	SQLReplicaDefault                   = false
-	SQLSkipInitializeWithVersionDefault = true
-	SQLTimeZoneDefault                  = "UTC"
-	SQLTxTimeoutDefault                 = "10s"
-	SQLUserDefault                      = "postgres"
-
-	// SQLite config keys
-	SQLiteDatabasePathDefault = "./bux.db"
-	SQLiteSharedDefault       = true
-)
-
-// Graphql defaults
-const (
-	GraphqlEnabledDefault        = false
-	GraphqlPlaygroundPathDefault = "/graphql"
-	GraphqlServerPathDefault     = "/graphiql"
-)
-
-// Monitor defaults
-const (
-	MonitorAuthTokenDefault                   = ""
-	MonitorBuxAgentURLDefault                 = "ws://localhost:8000/websocket"
-	MonitorDebugDefault                       = false
-	MonitorEnabledDefault                     = false
-	MonitorFalsePositiveRateDefault           = 0.01
-	MonitorLoadMonitoredDestinationsDefault   = false
-	MonitorMaxNumberOfDestinationsDefault     = 100000
-	MonitorMonitorDaysDefault                 = 7
-	MonitorProcessorTypeDefault               = "bloom"
-	MonitorSaveTransactionDestinationsDefault = true
-)
-
-// NewRelic defaults
-const (
-	NewRelicDomainNameDefault = "domain.com"
-	NewRelicEnabledDefault    = false
-	NewRelicLicenseKeyDefault = "BOGUS-LICENSE-KEY-1234567890987654321234"
-)
-
-// Nodes defaults
-const (
-	NodesUseMapiFeeQuotesDefault = true
-	NodesMinercraftAPIDefault    = "mAPI"
-)
-
-// NodesBroadcastClientAPIsDefault is the default template of broadcast-client api tokens
-var NodesBroadcastClientAPIsDefault = []string{}
-
-// Notification defaults
-const (
-	NotificationsEnabledDefault         = false
-	NotificationsWebhookEndpointDefault = ""
-)
-
-// Paymail defaults
-const (
-	UseBeefDefault                        = false
-	PulseHeaderValidationURLDefault       = "http://localhost:8080/api/v1/chain/merkleroot/verify"
-	PulseAuthTokenDefault                 = "mQZQ6WmxURxWz5ch" // #nosec G101
-	PaymailEnabledDefault                 = true
-	PaymailDefaultFromPaymailDefault      = "from@domain.com"
-	PaymailDefaultNoteDefault             = "bux Address Resolution"
-	PaymailDomainValidationEnabledDefault = true
-	PaymailSenderValidationEnabledDefault = true
-)
-
-// PaymailDomainsDefault by default allows for localhost domain
-var PaymailDomainsDefault = []string{"localhost"}
-
-// TaskManager defaults
-const (
-	TaskManagerEngineDefault    = "taskq"
-	TaskManagerFactoryDefault   = "memory"
-	TaskManagerQueueNameDefault = "development_queue"
-)
-
-// Server defaults
-const (
-	ServerIdleTimeoutDefault  = "60s"
-	ServerReadTimeoutDefault  = "15s"
-	ServerWriteTimeoutDefault = "15s"
-	ServerPortDefault         = "3003"
-)
-
-func setDefaults() {
-	viper.SetDefault(ConfigFilePathKey, DefaultConfigFilePath)
-
-	setGeneralDefaults()
-	setAuthDefaults()
-	setBeefDefaults()
-	setCachestoreDefaults()
-	setClusterDefaults()
-	setDbDefaults()
-	setGraphqlDefaults()
-	setMonitorDefaults()
-	setNewRelicDefaults()
-	setNodesDefaults()
-	setNotificationsDefaults()
-	setPaymailDefaults()
-	setRedisDefaults()
-	setTaskManagerDefaults()
-	setServerDefaults()
+// DefaultAppConfig is the default config for AppConfig
+var DefaultAppConfig = &AppConfig{
+	Authentication:     AuthConfigDefault,
+	Cache:              CacheDefault,
+	Db:                 DbDefaut,
+	Debug:              true,
+	DebugProfiling:     true,
+	DisableITC:         true,
+	GraphQL:            GraphqlDefault,
+	ImportBlockHeaders: "",
+	Monitor:            MonitorDefault,
+	NewRelic:           NewRelicDefault,
+	Nodes:              NodesDefault,
+	Notifications:      NotificationDefault,
+	Paymail:            PaymailDefault,
+	RequestLogging:     true,
+	Server:             ServerDefault,
+	TaskManager:        TaskManagerDefault,
 }
 
-func setGeneralDefaults() {
-	viper.SetDefault(DebugKey, DebugDefault)
-	viper.SetDefault(DebugProfilingKey, DebugProfilingDefault)
-	viper.SetDefault(DisableITCKey, DisableITCDefault)
-	viper.SetDefault(ImportBlockHeadersKey, ImportBlockHeadersDefault)
-	viper.SetDefault(RequestLoggingKey, RequestLoggingDefault)
+// AuthConfigDefault is the default config for AuthenticationConfig
+var AuthConfigDefault = &AuthenticationConfig{
+	AdminKey:        "xpub661MyMwAqRbcFrBJbKwBGCB7d3fr2SaAuXGM95BA62X41m6eW2ehRQGW4xLi9wkEXUGnQZYxVVj4PxXnyrLk7jdqvBAs1Qq9gf6ykMvjR7J",
+	RequireSigning:  false,
+	Scheme:          "xpub",
+	SigningDisabled: true,
 }
 
-func setAuthDefaults() {
-	viper.SetDefault(AuthAdminKey, AuthAdminKeyDefault)
-	viper.SetDefault(AuthRequireSigningKey, AuthRequireSigningDefault)
-	viper.SetDefault(AuthSchemeKey, AuthSchemeDefault)
-	viper.SetDefault(AuthSigningDisabledKey, AuthSigningDisabledDefault)
+// CacheDefault is the default config for CacheConfig
+var CacheDefault = &CacheConfig{
+	Engine: "freecache",
+	Cluster: &ClusterConfig{
+		Coordinator: "memory",
+		Prefix:      "bux_cluster_",
+		Redis:       nil,
+	},
+	Redis: &RedisConfig{
+		DependencyMode:        true,
+		MaxActiveConnections:  0,
+		MaxConnectionLifetime: 60 * time.Second,
+		MaxIdleConnections:    10,
+		MaxIdleTimeout:        10 * time.Second,
+		URL:                   "redis://localhost:6379",
+		UseTLS:                false,
+	},
 }
 
-func setBeefDefaults() {
-	viper.SetDefault(UseBeefKey, UseBeefDefault)
-	viper.SetDefault(PulseHeaderValidationURLKey, PulseHeaderValidationURLDefault)
-	viper.SetDefault(PulseAuthTokenKey, PulseAuthTokenDefault)
+// DbDefaut is the default config for DbConfig
+var DbDefaut = &DbConfig{
+	Datastore: &DatastoreConfig{
+		Debug:       false,
+		Engine:      "sqlite",
+		TablePrefix: "xapi",
+	},
+	Mongo: &datastore.MongoDBConfig{
+		DatabaseName:       "xapi",
+		ExistingConnection: nil,
+		Transactions:       false,
+		URI:                "mongodb://localhost:27017/xapi",
+	},
+	SQL: &datastore.SQLConfig{
+		Driver:                    "postgresql",
+		ExistingConnection:        nil,
+		Host:                      "localhost",
+		Name:                      "xapi",
+		Password:                  "",
+		Port:                      "5432",
+		Replica:                   false,
+		SkipInitializeWithVersion: true,
+		TimeZone:                  "UTC",
+		TxTimeout:                 10 * time.Second,
+		User:                      "postgres",
+	},
+	SQLite: &datastore.SQLiteConfig{
+		DatabasePath:       "./bux.db",
+		ExistingConnection: nil,
+		Shared:             true,
+	},
 }
 
-func setCachestoreDefaults() {
-	viper.SetDefault(CacheEngineKey, CacheEngineDefault)
+// GraphqlDefault is the default settings for GraphqlConfig
+var GraphqlDefault = &GraphqlConfig{
+	Enabled: false,
 }
 
-func setClusterDefaults() {
-	viper.SetDefault(ClusterCoordinatorKey, ClusterCoordinatorDefault)
-	viper.SetDefault(ClusterPrefixKey, ClusterPrefixDefault)
-	viper.SetDefault(ClusterRedisURLKey, ClusterRedisURLDefault)
-	viper.SetDefault(ClusterRedisMaxIdleTimeoutKey, ClusterRedisMaxIdleTimeoutDefault)
-	viper.SetDefault(ClusterRedisUseTLSKey, ClusterRedisUseTLSDefault)
+// MonitorDefault is the default settings for MonitorOptions
+var MonitorDefault = &MonitorOptions{
+	AuthToken:                   "",
+	BuxAgentURL:                 "ws://localhost:8000/websocket",
+	Debug:                       false,
+	Enabled:                     false,
+	FalsePositiveRate:           0.01,
+	LoadMonitoredDestinations:   false,
+	MaxNumberOfDestinations:     100000,
+	MonitorDays:                 7,
+	ProcessorType:               "bloom",
+	SaveTransactionDestinations: true,
 }
 
-func setDbDefaults() {
-	viper.SetDefault(DatastoreDebugKey, DatastoreDebugDefault)
-	viper.SetDefault(DatastoreEngineKey, DatastoreEngineDefault)
-	viper.SetDefault(DatastoreTablePrefixKey, DatastoreTablePrefixDefault)
-
-	viper.SetDefault(MongoDatabaseNameKey, MongoDatabaseNameDefault)
-	viper.SetDefault(MongoTransactionsKey, MongoTransactionsDefault)
-	viper.SetDefault(MongoURIKey, MongoURIDefault)
-
-	viper.SetDefault(SQLDriverKey, SQLDriverDefault)
-	viper.SetDefault(SQLHostKey, SQLHostDefault)
-	viper.SetDefault(SQLNameKey, SQLNameDefault)
-	viper.SetDefault(SQLPasswordKey, SQLPasswordDefault)
-	viper.SetDefault(SQLPortKey, SQLPortDefault)
-	viper.SetDefault(SQLReplicaKey, SQLReplicaDefault)
-	viper.SetDefault(SQLSkipInitializeWithVersionKey, SQLSkipInitializeWithVersionDefault)
-	viper.SetDefault(SQLTimeZoneKey, SQLTimeZoneDefault)
-	viper.SetDefault(SQLTxTimeoutKey, SQLTxTimeoutDefault)
-	viper.SetDefault(SQLUserKey, SQLUserDefault)
-
-	viper.SetDefault(SQLiteDatabasePathKey, SQLiteDatabasePathDefault)
-	viper.SetDefault(SQLiteSharedKey, SQLiteSharedDefault)
+// NewRelicDefault is the default settings for NewRelicConfig
+var NewRelicDefault = &NewRelicConfig{
+	DomainName: "domain.com",
+	Enabled:    false,
+	LicenseKey: "BOGUS-LICENSE-KEY-1234567890987654321234",
 }
 
-func setGraphqlDefaults() {
-	viper.SetDefault(GraphqlEnabledKey, GraphqlEnabledDefault)
+// NodesDefault is the default settings for NodesConfig
+var NodesDefault = &NodesConfig{
+	UseMapiFeeQuotes:     true,
+	MinercraftAPI:        "mAPI",
+	MinercraftCustomAPIs: []*minercraft.MinerAPIs{},
+	BroadcastClientAPIs:  []string{},
 }
 
-func setMonitorDefaults() {
-	viper.SetDefault(MonitorAuthTokenKey, MonitorAuthTokenDefault)
-	viper.SetDefault(MonitorBuxAgentURLKey, MonitorBuxAgentURLDefault)
-	viper.SetDefault(MonitorDebugKey, MonitorDebugDefault)
-	viper.SetDefault(MonitorEnabledKey, MonitorEnabledDefault)
-	viper.SetDefault(MonitorFalsePositiveRateKey, MonitorFalsePositiveRateDefault)
-	viper.SetDefault(MonitorLoadMonitoredDestinationsKey, MonitorLoadMonitoredDestinationsDefault)
-	viper.SetDefault(MonitorMaxNumberOfDestinationsKey, MonitorMaxNumberOfDestinationsDefault)
-	viper.SetDefault(MonitorMonitorDaysKey, MonitorMonitorDaysDefault)
-	viper.SetDefault(MonitorProcessorTypeKey, MonitorProcessorTypeDefault)
-	viper.SetDefault(MonitorSaveTransactionDestinationsKey, MonitorSaveTransactionDestinationsDefault)
+// NotificationDefault is the default settings for NotificationConfig
+var NotificationDefault = &NotificationsConfig{
+	Enabled:         false,
+	WebhookEndpoint: "",
 }
 
-func setNewRelicDefaults() {
-	viper.SetDefault(NewRelicDomainNameKey, NewRelicDomainNameDefault)
-	viper.SetDefault(NewRelicEnabledKey, NewRelicEnabledDefault)
-	viper.SetDefault(NewRelicLicenseKeyKey, NewRelicLicenseKeyDefault)
+// PaymailDefault is the default settings for PaymailConfig
+var PaymailDefault = &PaymailConfig{
+	Beef: &BeefConfig{
+		UseBeef:                  false,
+		PulseHeaderValidationURL: "http://localhost:8080/api/v1/chain/merkleroot/verify",
+		PulseAuthToken:           "mQZQ6WmxURxWz5ch", // #nosec G101
+	},
+	DefaultFromPaymail:      "from@domain.com",
+	DefaultNote:             "bux Address Resolution",
+	Domains:                 []string{"localhost"},
+	DomainValidationEnabled: true,
+	Enabled:                 true,
+	SenderValidationEnabled: true,
 }
 
-func setNodesDefaults() {
-	viper.SetDefault(NodesUseMapiFeeQuotesKey, NodesUseMapiFeeQuotesDefault)
-	viper.SetDefault(NodesMinercraftAPIKey, NodesMinercraftAPIDefault)
-	viper.SetDefault(NodesBroadcastClientAPIsKey, NodesBroadcastClientAPIsDefault)
+// TaskManagerDefault is the default settings for TaskManagerConfig
+var TaskManagerDefault = &TaskManagerConfig{
+	Factory: "memory",
 }
 
-func setNotificationsDefaults() {
-	viper.SetDefault(NotificationsEnabledKey, NotificationsEnabledDefault)
-	viper.SetDefault(NotificationsWebhookEndpointKey, NotificationsWebhookEndpointDefault)
-}
-
-func setPaymailDefaults() {
-	viper.SetDefault(PaymailEnabledKey, PaymailEnabledDefault)
-	viper.SetDefault(PaymailDefaultFromPaymailKey, PaymailDefaultFromPaymailDefault)
-	viper.SetDefault(PaymailDefaultNoteKey, PaymailDefaultNoteDefault)
-	viper.SetDefault(PaymailDomainValidationEnabledKey, PaymailDomainValidationEnabledDefault)
-	viper.SetDefault(PaymailSenderValidationEnabledKey, PaymailSenderValidationEnabledDefault)
-	viper.SetDefault(PaymailDomainsKey, PaymailDomainsDefault)
-}
-
-func setRedisDefaults() {
-	viper.SetDefault(RedisDependencyModeKey, RedisDependencyModeDefault)
-	viper.SetDefault(RedisMaxActiveConnectionsKey, RedisMaxActiveConnectionsDefault)
-	viper.SetDefault(RedisMaxConnectionLifetimeKey, RedisMaxConnectionLifetimeDefault)
-	viper.SetDefault(RedisMaxIdleConnectionsKey, RedisMaxIdleConnectionsDefault)
-	viper.SetDefault(RedisMaxIdleTimeoutKey, RedisMaxIdleTimeoutDefault)
-	viper.SetDefault(RedisURLKey, RedisURLDefault)
-	viper.SetDefault(RedisUseTLSKey, RedisUseTLSDefault)
-}
-
-func setTaskManagerDefaults() {
-	viper.SetDefault(TaskManagerFactoryKey, TaskManagerFactoryDefault)
-}
-
-func setServerDefaults() {
-	viper.SetDefault(ServerIdleTimeoutKey, ServerIdleTimeoutDefault)
-	viper.SetDefault(ServerReadTimeoutKey, ServerReadTimeoutDefault)
-	viper.SetDefault(ServerWriteTimeoutKey, ServerWriteTimeoutDefault)
-	viper.SetDefault(ServerPortKey, ServerPortDefault)
+// ServerDefault is the default settings for ServerConfig
+var ServerDefault = &ServerConfig{
+	IdleTimeout:  60 * time.Second,
+	ReadTimeout:  15 * time.Second,
+	WriteTimeout: 15 * time.Second,
+	Port:         "3003",
 }

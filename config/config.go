@@ -11,17 +11,17 @@ import (
 	"github.com/tonicpow/go-minercraft/v2"
 )
 
-// Config constants used for optimization and value testing
+// Config constants used for bux-server
 const (
 	ApplicationName         = "BuxServer"
 	CurrentMajorVersion     = "v1"
 	DefaultNewRelicShutdown = 10 * time.Second
 	HealthRequestPath       = "health"
 	Version                 = "v0.5.16"
+	ConfigFilePathKey       = "config_file"
+	DefaultConfigFilePath   = "config.yaml"
+	ConfigEnvPrefix         = "BUX_"
 )
-
-// ConfigFilePathKey is the viper key under which a config file path is stored
-const ConfigFilePathKey = "config_file"
 
 // AppConfig is the configuration values and associated env vars
 type AppConfig struct {
@@ -61,15 +61,6 @@ type AppConfig struct {
 	TaskManager *TaskManagerConfig `json:"task_manager" mapstructure:"task_manager"`
 }
 
-// General config options keys for Viper
-const (
-	DebugKey              = "debug"
-	DebugProfilingKey     = "debug_profiling"
-	DisableITCKey         = "disable_itc"
-	ImportBlockHeadersKey = "import_block_headers"
-	RequestLoggingKey     = "request_logging"
-)
-
 // AuthenticationConfig is the configuration for Authentication
 type AuthenticationConfig struct {
 	// AdminKey is used for administrative requests
@@ -81,14 +72,6 @@ type AuthenticationConfig struct {
 	// SigningDisabled turns off signing. NOTE: Only for development
 	SigningDisabled bool `json:"signing_disabled" mapstructure:"signing_disabled"`
 }
-
-// Authentication config option keys for Viper
-const (
-	AuthAdminKey           = "auth.admin_key"
-	AuthRequireSigningKey  = "auth.require_signing"
-	AuthSchemeKey          = "auth.scheme"
-	AuthSigningDisabledKey = "auth.signing_disabled"
-)
 
 // CacheConfig is a configuration for cachestore
 type CacheConfig struct {
@@ -128,23 +111,6 @@ type RedisConfig struct {
 	UseTLS bool `json:"use_tls" mapstructure:"use_tls"`
 }
 
-// Cache config keys for Viper
-const (
-	CacheEngineKey                = "cache.engine"
-	ClusterCoordinatorKey         = "cache.cluster.coordinator"
-	ClusterPrefixKey              = "cache.cluster.prefix"
-	ClusterRedisURLKey            = "cache.cluster.redis.url"
-	ClusterRedisMaxIdleTimeoutKey = "cache.cluster.redis.max_idle_timeout"
-	ClusterRedisUseTLSKey         = "cache.cluster.redis.use_tls"
-	RedisDependencyModeKey        = "cache.redis.dependency_mode"
-	RedisMaxActiveConnectionsKey  = "cache.redis.max_active_connections"
-	RedisMaxConnectionLifetimeKey = "cache.redis.max_connection_lifetime"
-	RedisMaxIdleConnectionsKey    = "cache.redis.max_idle_connections"
-	RedisMaxIdleTimeoutKey        = "cache.redis.max_idle_timeout"
-	RedisURLKey                   = "cache.redis.url"
-	RedisUseTLSKey                = "cache.redis.use_tls"
-)
-
 // DbConfig consists of datastore config and specific dbs configs
 type DbConfig struct {
 	// Datastore is a general go-datastore config.
@@ -167,50 +133,11 @@ type DatastoreConfig struct {
 	TablePrefix string `json:"table_prefix" mapstructure:"table_prefix"`
 }
 
-// Common datastore config keys
-const (
-	DatastoreDebugKey       = "db.datastore.debug"
-	DatastoreEngineKey      = "db.datastore.engine"
-	DatastoreTablePrefixKey = "db.datastore.table_prefix"
-)
-
-// MongoDB config keys
-const (
-	MongoDatabaseNameKey = "db.mongodb.db_name"
-	MongoTransactionsKey = "db.mongodb.transactions"
-	MongoURIKey          = "db.mongodb.uri"
-)
-
-// SQL (MySQL, PostgreSQL) config keys
-const (
-	SQLDriverKey                    = "db.sql.driver"
-	SQLHostKey                      = "db.sql.host"
-	SQLNameKey                      = "db.sql.name"
-	SQLPasswordKey                  = "db.sql.password"
-	SQLPortKey                      = "db.sql.port"
-	SQLReplicaKey                   = "db.sql.replica"
-	SQLSkipInitializeWithVersionKey = "db.sql.skip_initialize_with_version"
-	SQLTimeZoneKey                  = "db.sql.time_zone"
-	SQLTxTimeoutKey                 = "db.sql.tx_timeout"
-	SQLUserKey                      = "db.sql.user"
-)
-
-// SQLite config keys
-const (
-	SQLiteDatabasePathKey = "db.sqlite.database_path"
-	SQLiteSharedKey       = "db.sqlite.shared"
-)
-
 // GraphqlConfig is the configuration for the GraphQL server
 type GraphqlConfig struct {
 	// Enabled is a flag that says whether graphql should be enabled.
 	Enabled bool `json:"enabled" mapstructure:"enabled"`
 }
-
-// GraphQL config keys for Viper
-const (
-	GraphqlEnabledKey = "graphql.enabled"
-)
 
 // MonitorOptions is the configuration for blockchain monitoring
 type MonitorOptions struct {
@@ -236,20 +163,6 @@ type MonitorOptions struct {
 	SaveTransactionDestinations bool `json:"save_transaction_destinations" mapstructure:"save_transaction_destinations"`
 }
 
-// Monitor config keys for Viper
-const (
-	MonitorAuthTokenKey                   = "monitor.auth_token" // #nosec G101
-	MonitorBuxAgentURLKey                 = "monitor.bux_agent_url"
-	MonitorDebugKey                       = "monitor.debug"
-	MonitorEnabledKey                     = "monitor.enabled"
-	MonitorFalsePositiveRateKey           = "monitor.false_positive_rate"
-	MonitorLoadMonitoredDestinationsKey   = "monitor.load_monitored_destinations"
-	MonitorMaxNumberOfDestinationsKey     = "monitor.max_number_of_destinations"
-	MonitorMonitorDaysKey                 = "monitor.monitor_days"
-	MonitorProcessorTypeKey               = "monitor.processor_type"
-	MonitorSaveTransactionDestinationsKey = "monitor.save_transaction_destinations"
-)
-
 // NewRelicConfig is the configuration for New Relic
 type NewRelicConfig struct {
 	// DomainName is used for hostname display.
@@ -260,13 +173,6 @@ type NewRelicConfig struct {
 	LicenseKey string `json:"license_key" mapstructure:"license_key"`
 }
 
-// NewRelic config keys for Viper
-const (
-	NewRelicDomainNameKey = "new_relic.domain_name"
-	NewRelicEnabledKey    = "new_relic.enabled"
-	NewRelicLicenseKeyKey = "new_relic.license_key"
-)
-
 // NodesConfig consists of blockchain nodes (such as Minercraft and Arc) configuration
 type NodesConfig struct {
 	// UseMapiFeeQuotes is a flag that says whether bux should use fee quotes from mAPI.
@@ -275,15 +181,9 @@ type NodesConfig struct {
 	MinercraftAPI string `json:"minercraft_api" mapstructure:"minercraft_api"`
 	// MinercraftCustomAPIs is a slice of Minercraft custom miners APIs.
 	MinercraftCustomAPIs []*minercraft.MinerAPIs `json:"minercraft_custom_apis" mapstructure:"minercraft_custom_apis"`
-	BroadcastClientAPIs  []string                `json:"broadcast_client_apis" mapstructure:"broadcast_client_apis"`
+	// BroadcastClientAPIs is a slice of Broadcast Client custom miners APIs.
+	BroadcastClientAPIs []string `json:"broadcast_client_apis" mapstructure:"broadcast_client_apis"`
 }
-
-// Nodes config keys for viper
-const (
-	NodesUseMapiFeeQuotesKey    = "nodes.use_mapi_fee_quotes"
-	NodesMinercraftAPIKey       = "nodes.minercraft_api"
-	NodesBroadcastClientAPIsKey = "nodes.broadcast_client_apis"
-)
 
 // NotificationsConfig is the configuration for notifications
 type NotificationsConfig struct {
@@ -292,12 +192,6 @@ type NotificationsConfig struct {
 	// WebhookEndpoint is the endpoint for webhook registration.
 	WebhookEndpoint string `json:"webhook_endpoint" mapstructure:"webhook_endpoint"`
 }
-
-// Notification config keys for Viper
-const (
-	NotificationsEnabledKey         = "notifications.enabled"
-	NotificationsWebhookEndpointKey = "notifications.webhook_endpoint"
-)
 
 // LoggingConfig is a configuration for logging
 type LoggingConfig struct {
@@ -335,29 +229,11 @@ type BeefConfig struct {
 	PulseAuthToken string `json:"pulse_auth_token" mapstructure:"pulse_auth_token"`
 }
 
-// Paymail config keys for Viper
-const (
-	UseBeefKey                        = "paymail.beef.use_beef"
-	PulseHeaderValidationURLKey       = "paymail.beef.pulse_url"
-	PulseAuthTokenKey                 = "paymail.beef.pulse_auth_token" // #nosec G101
-	PaymailDefaultFromPaymailKey      = "paymail.default_from_paymail"
-	PaymailDefaultNoteKey             = "paymail.default_note"
-	PaymailDomainsKey                 = "paymail.domains"
-	PaymailDomainValidationEnabledKey = "paymail.domain_validation_enabled"
-	PaymailEnabledKey                 = "paymail.enabled"
-	PaymailSenderValidationEnabledKey = "paymail.sender_validation_enabled"
-)
-
 // TaskManagerConfig is a configuration for the taskmanager
 type TaskManagerConfig struct {
 	// Factory is the Task Manager factory, memory or redis.
 	Factory taskmanager.Factory `json:"factory" mapstructure:"factory"`
 }
-
-// TaskManager config keys for Viper
-const (
-	TaskManagerFactoryKey = "task_manager.factory"
-)
 
 // ServerConfig is a configuration for the HTTP Server
 type ServerConfig struct {
@@ -370,14 +246,6 @@ type ServerConfig struct {
 	// Port is the port that the server should use.
 	Port string `json:"port" mapstructure:"port"`
 }
-
-// Server config keys for Viper
-const (
-	ServerIdleTimeoutKey  = "server.idle_timeout"
-	ServerReadTimeoutKey  = "server.read_timeout"
-	ServerWriteTimeoutKey = "server.write_timeout"
-	ServerPortKey         = "server.port"
-)
 
 // GetUserAgent will return the outgoing user agent
 func (a *AppConfig) GetUserAgent() string {

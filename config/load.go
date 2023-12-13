@@ -6,7 +6,10 @@ import (
 	"strings"
 	"sync"
 
+	"github.com/mitchellh/mapstructure"
 	"github.com/spf13/viper"
+
+	"github.com/BuxOrg/bux-server/dictionary"
 )
 
 // Added a mutex lock for a race-condition
@@ -17,13 +20,15 @@ func Load() (appConfig *AppConfig, err error) {
 	viperLock.Lock()
 	defer viperLock.Unlock()
 
-	setDefaults()
-
-	if err = loadFlags(); err != nil {
+	if err = setDefaults(); err != nil {
 		return nil, err
 	}
 
 	envConfig()
+
+	if err = loadFlags(); err != nil {
+		return nil, err
+	}
 
 	if err = loadFromFile(); err != nil {
 		return nil, err
@@ -35,6 +40,21 @@ func Load() (appConfig *AppConfig, err error) {
 	}
 
 	return appConfig, nil
+}
+
+func setDefaults() error {
+	viper.SetDefault(ConfigFilePathKey, DefaultConfigFilePath)
+
+	defaultsMap := make(map[string]interface{})
+	if err := mapstructure.Decode(DefaultAppConfig, &defaultsMap); err != nil {
+		return err
+	}
+
+	for key, value := range defaultsMap {
+		viper.SetDefault(key, value)
+	}
+
+	return nil
 }
 
 func envConfig() {

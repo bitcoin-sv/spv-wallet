@@ -2,7 +2,6 @@ package config
 
 import (
 	"testing"
-	"time"
 
 	"github.com/stretchr/testify/assert"
 )
@@ -11,9 +10,9 @@ import (
 func TestServerConfig_Validate(t *testing.T) {
 	t.Parallel()
 
-	idleTimeout, _ := time.ParseDuration(ServerIdleTimeoutDefault)
-	readTimeout, _ := time.ParseDuration(ServerReadTimeoutDefault)
-	writeTimeout, _ := time.ParseDuration(ServerWriteTimeoutDefault)
+	idleTimeout := DefaultAppConfig.Server.IdleTimeout
+	readTimeout := DefaultAppConfig.Server.ReadTimeout
+	writeTimeout := DefaultAppConfig.Server.WriteTimeout
 
 	t.Run("port is required", func(t *testing.T) {
 		s := ServerConfig{

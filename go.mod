@@ -88,7 +88,7 @@ require (
 	github.com/mattn/go-isatty v0.0.20 // indirect
 	github.com/mattn/go-sqlite3 v1.14.18 // indirect
 	github.com/miekg/dns v1.1.57 // indirect
-	github.com/mitchellh/mapstructure v1.5.0 // indirect
+	github.com/mitchellh/mapstructure v1.5.0
 	github.com/montanaflynn/stats v0.7.1 // indirect
 	github.com/mrz1836/go-cache v0.9.2 // indirect
 	github.com/mrz1836/go-logger v0.3.2 // indirect
@@ -104,9 +104,9 @@ require (
 	github.com/segmentio/encoding v0.4.0 // indirect
 	github.com/sosodev/duration v1.2.0 // indirect
 	github.com/sourcegraph/conc v0.3.0 // indirect
-	github.com/spf13/afero v1.11.0 // indirect
-	github.com/spf13/cast v1.6.0 // indirect
-	github.com/spf13/pflag v1.0.5 // indirect
+	github.com/spf13/afero v1.10.0 // indirect
+	github.com/spf13/cast v1.5.1 // indirect
+	github.com/spf13/pflag v1.0.5
 	github.com/stretchr/objx v0.5.1 // indirect
 	github.com/subosito/gotenv v1.6.0 // indirect
 	github.com/swaggo/files v1.0.1 // indirect
