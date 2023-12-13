@@ -24,6 +24,9 @@ func TestLoadConfig(t *testing.T) {
 		anotherPath := "anotherPath.yml"
 
 		// when
+		// IMPORTANT! If you need to change the name of this variable, it means you're
+		// making backwards incompatible changes. Please inform all Bux adoptors and
+		// update your configs on all servers and scripts.
 		os.Setenv("BUX_CONFIG_FILE", anotherPath)
 		_, err := Load()
 
