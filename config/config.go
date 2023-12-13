@@ -76,6 +76,7 @@ type (
 		BroadcastClientAPIs  []string                `json:"broadcast_client_apis" mapstructure:"broadcast_client_apis"`
 		UseBeef              bool                    `json:"use_beef" mapstructure:"use_beef"`
 		Pulse                PulseConfig             `json:"pulse" mapstructure:"pulse"`
+		Logging              *LoggingConfig          `json:"logging" mapstructure:"logging"`
 	}
 
 	// AuthenticationConfig is the configuration for Authentication
@@ -181,6 +182,14 @@ type (
 	PulseConfig struct {
 		PulseURL       string `json:"pulse_url" mapstructure:"pulse_url"`
 		PulseAuthToken string `json:"pulse_auth_token" mapstructure:"pulse_auth_token"`
+	}
+
+	// LoggingConfig is a configuration for logging
+	LoggingConfig struct {
+		Level        string `json:"level" mapstructure:"level"`
+		Format       string `json:"format" mapstructure:"format"`
+		InstanceName string `json:"instance_name" mapstructure:"instance_name"`
+		LogOrigin    bool   `json:"log_origin" mapstructure:"log_origin"`
 	}
 )
 

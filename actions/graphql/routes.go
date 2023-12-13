@@ -19,7 +19,6 @@ import (
 	"github.com/gofrs/uuid"
 	"github.com/julienschmidt/httprouter"
 	apirouter "github.com/mrz1836/go-api-router"
-	"github.com/mrz1836/go-logger"
 	"github.com/vektah/gqlparser/v2/gqlerror"
 )
 
@@ -62,13 +61,13 @@ func RegisterRoutes(router *apirouter.Router, appConfig *config.AppConfig, servi
 				"variables": oc.Variables,
 			}
 			// LogParamsFormat "request_id=\"%s\" method=\"%s\" path=\"%s\" ip_address=\"%s\" user_agent=\"%s\" params=\"%v\"\n"
-			logger.NoFilePrintf(apirouter.LogParamsFormat, reqInfo.id, reqInfo.method, reqInfo.path, reqInfo.ip, reqInfo.userAgent, params)
+			services.Logger.Info().Msgf(apirouter.LogParamsFormat, reqInfo.id, reqInfo.method, reqInfo.path, reqInfo.ip, reqInfo.userAgent, params)
 			return next(ctx)
 		})
 		srv.SetErrorPresenter(func(ctx context.Context, err error) *gqlerror.Error {
 			// LogErrorFormat "request_id=\"%s\" ip_address=\"%s\" type=\"%s\" internal_message=\"%s\" code=%d\n"
 			reqInfo := ctx.Value(config.GraphRequestInfo).(requestInfo)
-			logger.NoFilePrintf(apirouter.LogErrorFormat, reqInfo.id, reqInfo.ip, "GraphQL", err.Error(), 500)
+			services.Logger.Info().Msgf(apirouter.LogErrorFormat, reqInfo.id, reqInfo.ip, "GraphQL", err.Error(), 500)
 			return &gqlerror.Error{
 				Message: "presented: " + err.Error(),
 				Path:    graphql.GetPath(ctx),
@@ -109,16 +108,16 @@ func RegisterRoutes(router *apirouter.Router, appConfig *config.AppConfig, servi
 				),
 			)
 			if appConfig.Debug {
-				logger.Data(2, logger.DEBUG, "started graphql playground server on "+playgroundPath)
+				services.Logger.Debug().Msgf("started graphql playground server on %s", playgroundPath)
 			}
 		} else {
-			logger.Data(2, logger.ERROR, "Failed starting graphql playground server directory equals playground directory "+serverPath+" = "+playgroundPath)
+			services.Logger.Error().Msgf("Failed starting graphql playground server directory equals playground directory %s = %s", serverPath, playgroundPath)
 		}
 	}
 
 	// Success on the routes
 	if appConfig.Debug {
-		logger.Data(2, logger.DEBUG, "registered graphql routes on "+serverPath)
+		services.Logger.Debug().Msg("registered graphql routes on " + serverPath)
 	}
 }
 

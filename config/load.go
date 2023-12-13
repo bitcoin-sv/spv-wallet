@@ -8,7 +8,6 @@ import (
 
 	"github.com/BuxOrg/bux-server/dictionary"
 	"github.com/mrz1836/go-datastore"
-	"github.com/mrz1836/go-logger"
 	"github.com/spf13/viper"
 )
 
@@ -37,12 +36,10 @@ var viperLock sync.Mutex
 
 // Load all environment variables
 func Load(customWorkingDirectory string) (_appConfig *AppConfig, err error) {
-
 	// Check the environment we are running
 	environment := os.Getenv(EnvironmentKey)
 	if !isValidEnvironment(environment) {
 		err = fmt.Errorf(dictionary.GetInternalMessage(dictionary.ErrorInvalidEnv), environment)
-		logger.Data(2, logger.ERROR, err.Error())
 		return
 	}
 
@@ -72,12 +69,8 @@ func Load(customWorkingDirectory string) (_appConfig *AppConfig, err error) {
 	// Read the configuration
 	if err = viper.ReadInConfig(); err != nil {
 		err = fmt.Errorf(dictionary.GetInternalMessage(dictionary.ErrorReadingConfig), err.Error())
-		logger.Data(2, logger.ERROR, err.Error())
 		return
 	}
-
-	// Log the configuration that was detected and where it was loaded from
-	logger.Data(2, logger.INFO, environment+" configuration env file processed in dir "+workingDirectory)
 
 	// Initialize
 	_appConfigVal := AppConfig{
@@ -100,7 +93,6 @@ func Load(customWorkingDirectory string) (_appConfig *AppConfig, err error) {
 	// Unmarshal into values struct
 	if err = viper.Unmarshal(&_appConfigVal); err != nil {
 		err = fmt.Errorf(dictionary.GetInternalMessage(dictionary.ErrorViper), err.Error())
-		logger.Data(2, logger.ERROR, err.Error())
 		return
 	}
 

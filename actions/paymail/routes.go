@@ -4,7 +4,6 @@ import (
 	"github.com/BuxOrg/bux-server/actions"
 	"github.com/BuxOrg/bux-server/config"
 	apirouter "github.com/mrz1836/go-api-router"
-	"github.com/mrz1836/go-logger"
 )
 
 // Action is an extension of actions.Action for this package
@@ -29,6 +28,6 @@ func RegisterRoutes(router *apirouter.Router, appConfig *config.AppConfig, servi
 	router.HTTPRouter.DELETE("/"+config.CurrentMajorVersion+"/paymail", action.Request(router, requireAdmin.Wrap(action.delete)))
 
 	if appConfig.Debug {
-		logger.Data(2, logger.DEBUG, "registered paymail routes and model")
+		services.Logger.Debug().Msg("registered paymail routes and model")
 	}
 }

@@ -112,5 +112,11 @@
   "pulse": {
     "pulse_url": "http://localhost:8000/api/v1/chain/merkleroot/verify",
     "pulse_auth_token": "asd"
+  },
+  "logging": {
+    "level": "debug",
+    "format": "console",
+    "instance_name": "bux-instance-development",
+    "log_origin": false
   }
 }
