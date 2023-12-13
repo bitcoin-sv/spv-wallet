@@ -7,36 +7,34 @@ import (
 	"github.com/tonicpow/go-minercraft/v2"
 )
 
-// DefaultAppConfig is the default config for AppConfig
+// DefaultAppConfig are the default values for AppConfig
 var DefaultAppConfig = &AppConfig{
-	Authentication:     AuthConfigDefault,
-	Cache:              CacheDefault,
-	Db:                 DbDefaut,
+	Authentication:     authConfigDefault,
+	Cache:              cacheDefault,
+	Db:                 dbDefaut,
 	Debug:              true,
 	DebugProfiling:     true,
 	DisableITC:         true,
-	GraphQL:            GraphqlDefault,
+	GraphQL:            graphqlDefault,
 	ImportBlockHeaders: "",
-	Monitor:            MonitorDefault,
-	NewRelic:           NewRelicDefault,
-	Nodes:              NodesDefault,
-	Notifications:      NotificationDefault,
-	Paymail:            PaymailDefault,
+	Monitor:            monitorDefault,
+	NewRelic:           newRelicDefault,
+	Nodes:              nodesDefault,
+	Notifications:      notificationDefault,
+	Paymail:            paymailDefault,
 	RequestLogging:     true,
-	Server:             ServerDefault,
-	TaskManager:        TaskManagerDefault,
+	Server:             serverDefault,
+	TaskManager:        taskManagerDefault,
 }
 
-// AuthConfigDefault is the default config for AuthenticationConfig
-var AuthConfigDefault = &AuthenticationConfig{
+var authConfigDefault = &AuthenticationConfig{
 	AdminKey:        "xpub661MyMwAqRbcFrBJbKwBGCB7d3fr2SaAuXGM95BA62X41m6eW2ehRQGW4xLi9wkEXUGnQZYxVVj4PxXnyrLk7jdqvBAs1Qq9gf6ykMvjR7J",
 	RequireSigning:  false,
 	Scheme:          "xpub",
 	SigningDisabled: true,
 }
 
-// CacheDefault is the default config for CacheConfig
-var CacheDefault = &CacheConfig{
+var cacheDefault = &CacheConfig{
 	Engine: "freecache",
 	Cluster: &ClusterConfig{
 		Coordinator: "memory",
@@ -54,8 +52,7 @@ var CacheDefault = &CacheConfig{
 	},
 }
 
-// DbDefaut is the default config for DbConfig
-var DbDefaut = &DbConfig{
+var dbDefaut = &DbConfig{
 	Datastore: &DatastoreConfig{
 		Debug:       false,
 		Engine:      "sqlite",
@@ -87,13 +84,11 @@ var DbDefaut = &DbConfig{
 	},
 }
 
-// GraphqlDefault is the default settings for GraphqlConfig
-var GraphqlDefault = &GraphqlConfig{
+var graphqlDefault = &GraphqlConfig{
 	Enabled: false,
 }
 
-// MonitorDefault is the default settings for MonitorOptions
-var MonitorDefault = &MonitorOptions{
+var monitorDefault = &MonitorOptions{
 	AuthToken:                   "",
 	BuxAgentURL:                 "ws://localhost:8000/websocket",
 	Debug:                       false,
@@ -106,29 +101,25 @@ var MonitorDefault = &MonitorOptions{
 	SaveTransactionDestinations: true,
 }
 
-// NewRelicDefault is the default settings for NewRelicConfig
-var NewRelicDefault = &NewRelicConfig{
+var newRelicDefault = &NewRelicConfig{
 	DomainName: "domain.com",
 	Enabled:    false,
 	LicenseKey: "BOGUS-LICENSE-KEY-1234567890987654321234",
 }
 
-// NodesDefault is the default settings for NodesConfig
-var NodesDefault = &NodesConfig{
+var nodesDefault = &NodesConfig{
 	UseMapiFeeQuotes:     true,
 	MinercraftAPI:        "mAPI",
 	MinercraftCustomAPIs: []*minercraft.MinerAPIs{},
 	BroadcastClientAPIs:  []string{},
 }
 
-// NotificationDefault is the default settings for NotificationConfig
-var NotificationDefault = &NotificationsConfig{
+var notificationDefault = &NotificationsConfig{
 	Enabled:         false,
 	WebhookEndpoint: "",
 }
 
-// PaymailDefault is the default settings for PaymailConfig
-var PaymailDefault = &PaymailConfig{
+var paymailDefault = &PaymailConfig{
 	Beef: &BeefConfig{
 		UseBeef:                  false,
 		PulseHeaderValidationURL: "http://localhost:8080/api/v1/chain/merkleroot/verify",
@@ -142,13 +133,11 @@ var PaymailDefault = &PaymailConfig{
 	SenderValidationEnabled: true,
 }
 
-// TaskManagerDefault is the default settings for TaskManagerConfig
-var TaskManagerDefault = &TaskManagerConfig{
+var taskManagerDefault = &TaskManagerConfig{
 	Factory: "memory",
 }
 
-// ServerDefault is the default settings for ServerConfig
-var ServerDefault = &ServerConfig{
+var serverDefault = &ServerConfig{
 	IdleTimeout:  60 * time.Second,
 	ReadTimeout:  15 * time.Second,
 	WriteTimeout: 15 * time.Second,

@@ -13,23 +13,23 @@ func (ts *TestSuite) TestDestinationRegisterRoutes() {
 	ts.T().Run("test routes", func(t *testing.T) {
 
 		// get destination
-		handle, _, _ := ts.Router.HTTPRouter.Lookup(http.MethodGet, "/"+config.CurrentMajorVersion+"/destination")
+		handle, _, _ := ts.Router.HTTPRouter.Lookup(http.MethodGet, "/"+config.ApiVersion+"/destination")
 		assert.NotNil(t, handle)
 
 		// new destination
-		handle, _, _ = ts.Router.HTTPRouter.Lookup(http.MethodPost, "/"+config.CurrentMajorVersion+"/destination")
+		handle, _, _ = ts.Router.HTTPRouter.Lookup(http.MethodPost, "/"+config.ApiVersion+"/destination")
 		assert.NotNil(t, handle)
 
 		// search destination
-		handle, _, _ = ts.Router.HTTPRouter.Lookup(http.MethodGet, "/"+config.CurrentMajorVersion+"/destination/search")
+		handle, _, _ = ts.Router.HTTPRouter.Lookup(http.MethodGet, "/"+config.ApiVersion+"/destination/search")
 		assert.NotNil(t, handle)
 
 		// search destination
-		handle, _, _ = ts.Router.HTTPRouter.Lookup(http.MethodPost, "/"+config.CurrentMajorVersion+"/destination/search")
+		handle, _, _ = ts.Router.HTTPRouter.Lookup(http.MethodPost, "/"+config.ApiVersion+"/destination/search")
 		assert.NotNil(t, handle)
 
 		// update destination
-		handle, _, _ = ts.Router.HTTPRouter.Lookup(http.MethodPatch, "/"+config.CurrentMajorVersion+"/destination")
+		handle, _, _ = ts.Router.HTTPRouter.Lookup(http.MethodPatch, "/"+config.ApiVersion+"/destination")
 		assert.NotNil(t, handle)
 	})
 }

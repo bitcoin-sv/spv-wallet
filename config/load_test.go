@@ -2,7 +2,6 @@ package config
 
 import (
 	"os"
-	"strings"
 	"testing"
 
 	"github.com/spf13/viper"
@@ -25,7 +24,7 @@ func TestLoadConfig(t *testing.T) {
 		anotherPath := "anotherPath.yml"
 
 		// when
-		os.Setenv("BUX_"+strings.ToUpper(ConfigFilePathKey), anotherPath)
+		os.Setenv("BUX_CONFIG_FILE", anotherPath)
 		_, err := Load()
 
 		// then
@@ -33,6 +32,6 @@ func TestLoadConfig(t *testing.T) {
 		assert.Error(t, err)
 
 		// cleanup
-		os.Unsetenv("BUX_" + strings.ToUpper(ConfigFilePathKey))
+		os.Unsetenv("BUX_CONFIG_FILE")
 	})
 }

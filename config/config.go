@@ -14,7 +14,7 @@ import (
 // Config constants used for bux-server
 const (
 	ApplicationName         = "BuxServer"
-	CurrentMajorVersion     = "v1"
+	ApiVersion              = "v1"
 	DefaultNewRelicShutdown = 10 * time.Second
 	HealthRequestPath       = "health"
 	Version                 = "v0.5.16"

@@ -26,11 +26,11 @@ func RegisterRoutes(router *apirouter.Router, appConfig *config.AppConfig, servi
 	action := &Action{actions.Action{AppConfig: a.AppConfig, Services: a.Services}}
 
 	// V1 Requests
-	router.HTTPRouter.GET("/"+config.CurrentMajorVersion+"/transaction", action.Request(router, requireBasic.Wrap(action.get)))
-	router.HTTPRouter.POST("/"+config.CurrentMajorVersion+"/transaction/count", action.Request(router, requireBasic.Wrap(action.count)))
-	router.HTTPRouter.GET("/"+config.CurrentMajorVersion+"/transaction/search", action.Request(router, requireBasic.Wrap(action.search)))
-	router.HTTPRouter.PATCH("/"+config.CurrentMajorVersion+"/transaction", action.Request(router, requireBasic.Wrap(action.update)))
-	router.HTTPRouter.POST("/"+config.CurrentMajorVersion+"/transaction", action.Request(router, require.Wrap(action.newTransaction)))
-	router.HTTPRouter.POST("/"+config.CurrentMajorVersion+"/transaction/record", action.Request(router, require.Wrap(action.record)))
-	router.HTTPRouter.POST("/"+config.CurrentMajorVersion+"/transaction/search", action.Request(router, requireBasic.Wrap(action.search)))
+	router.HTTPRouter.GET("/"+config.ApiVersion+"/transaction", action.Request(router, requireBasic.Wrap(action.get)))
+	router.HTTPRouter.POST("/"+config.ApiVersion+"/transaction/count", action.Request(router, requireBasic.Wrap(action.count)))
+	router.HTTPRouter.GET("/"+config.ApiVersion+"/transaction/search", action.Request(router, requireBasic.Wrap(action.search)))
+	router.HTTPRouter.PATCH("/"+config.ApiVersion+"/transaction", action.Request(router, requireBasic.Wrap(action.update)))
+	router.HTTPRouter.POST("/"+config.ApiVersion+"/transaction", action.Request(router, require.Wrap(action.newTransaction)))
+	router.HTTPRouter.POST("/"+config.ApiVersion+"/transaction/record", action.Request(router, require.Wrap(action.record)))
+	router.HTTPRouter.POST("/"+config.ApiVersion+"/transaction/search", action.Request(router, requireBasic.Wrap(action.search)))
 }

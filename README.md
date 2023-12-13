@@ -70,25 +70,17 @@ go run ./cmd/server/main.go -C /my/config.json
 
 To override any config variable with ENV, use the "BUX\_" prefix with mapstructure annotation path with "_" as a delimiter in all uppercase. Example:
 
-Let's take this fragment of AppConfig from `config/config.go`:
-```go
-type AppConfig struct {
-	Authentication *AuthenticationConfig `json:"auth" mapstructure:"auth"`
-	Cache *CacheConfig `json:"cache" mapstructure:"cache"`
-	Db *DbConfig `json:"db" mapstructure:"db"`
-	Debug bool `json:"debug" mapstructure:"debug"`
-    ...
-}
+Let's take this fragment of AppConfig from `config.example.yaml`:
 
-type AuthenticationConfig struct {
-	AdminKey string `json:"admin_key" mapstructure:"admin_key"`
-	RequireSigning bool `json:"require_signing" mapstructure:"require_signing"`
-	Scheme string `json:"scheme" mapstructure:"scheme"`
-	SigningDisabled bool `json:"signing_disabled" mapstructure:"signing_disabled"`
-}
+```yaml
+auth:
+    admin_key: xpub661MyMwAqRbcFrBJbKwBGCB7d3fr2SaAuXGM95BA62X41m6eW2ehRQGW4xLi9wkEXUGnQZYxVVj4PxXnyrLk7jdqvBAs1Qq9gf6ykMvjR7J
+    require_signing: false
+    scheme: xpub
+    signing_disabled: true
 ```
 
-To override AdminKey in AuthenticationConfig, use the path from mapstructure annotation keys (auth.admin_key) with "_" as a path delimiter and BUX\_ as prefix. So:
+To override admin_key in auth config, use the path with "_" as a path delimiter and BUX\_ as prefix. So:
 ```bash
 BUX_AUTH_ADMIN_KEY="admin_key"
 ```
