@@ -311,25 +311,23 @@ func loadDatastore(options []bux.ClientOps, appConfig *AppConfig, testMode bool)
 
 	// Select the datastore
 	if appConfig.Db.Datastore.Engine == datastore.SQLite {
-		debug := appConfig.Db.Datastore.Debug
 		tablePrefix := appConfig.Db.Datastore.TablePrefix
 		if len(appConfig.Db.SQLite.TablePrefix) > 0 {
 			tablePrefix = appConfig.Db.SQLite.TablePrefix
 		}
 		options = append(options, bux.WithSQLite(&datastore.SQLiteConfig{
 			CommonConfig: datastore.CommonConfig{
-				Debug:       debug,
+				Debug:                 appConfig.Db.Datastore.Debug,
 				MaxConnectionIdleTime: appConfig.Db.SQLite.MaxConnectionIdleTime,
 				MaxConnectionTime:     appConfig.Db.SQLite.MaxConnectionTime,
 				MaxIdleConnections:    appConfig.Db.SQLite.MaxIdleConnections,
 				MaxOpenConnections:    appConfig.Db.SQLite.MaxOpenConnections,
-				TablePrefix: tablePrefix,
+				TablePrefix:           tablePrefix,
 			},
 			DatabasePath: appConfig.Db.SQLite.DatabasePath, // "" for in memory
 			Shared:       appConfig.Db.SQLite.Shared,
 		}))
 	} else if appConfig.Db.Datastore.Engine == datastore.MySQL || appConfig.Db.Datastore.Engine == datastore.PostgreSQL {
-		debug := appConfig.Db.Datastore.Debug
 		tablePrefix := appConfig.Db.Datastore.TablePrefix
 		if len(appConfig.Db.SQL.TablePrefix) > 0 {
 			tablePrefix = appConfig.Db.SQL.TablePrefix
@@ -337,7 +335,7 @@ func loadDatastore(options []bux.ClientOps, appConfig *AppConfig, testMode bool)
 
 		options = append(options, bux.WithSQL(appConfig.Db.Datastore.Engine, &datastore.SQLConfig{
 			CommonConfig: datastore.CommonConfig{
-				Debug:                 debug,
+				Debug:                 appConfig.Db.Datastore.Debug,
 				MaxConnectionIdleTime: appConfig.Db.SQL.MaxConnectionIdleTime,
 				MaxConnectionTime:     appConfig.Db.SQL.MaxConnectionTime,
 				MaxIdleConnections:    appConfig.Db.SQL.MaxIdleConnections,
