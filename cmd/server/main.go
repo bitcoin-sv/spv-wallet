@@ -27,7 +27,7 @@ func main() {
 	defaultLogger := logging.GetDefaultLogger()
 
 	// Load the Application Configuration
-	appConfig, err := config.Load()
+	appConfig, err := config.Load(defaultLogger)
 	if err != nil {
 		defaultLogger.Fatal().Msgf(dictionary.GetInternalMessage(dictionary.ErrorLoadingConfig), err.Error())
 		return
