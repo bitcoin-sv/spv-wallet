@@ -1,8 +1,6 @@
 module github.com/BuxOrg/bux-server
 
-go 1.21.3
-
-toolchain go1.21.4
+go 1.19
 
 require (
 	github.com/99designs/gqlgen v0.17.41
@@ -50,7 +48,7 @@ require (
 	github.com/fsnotify/fsnotify v1.7.0 // indirect
 	github.com/go-openapi/jsonpointer v0.20.0 // indirect
 	github.com/go-openapi/jsonreference v0.20.2 // indirect
-	github.com/go-openapi/spec v0.20.9 // indirect
+	github.com/go-openapi/spec v0.20.11 // indirect
 	github.com/go-openapi/swag v0.22.4 // indirect
 	github.com/go-redis/redis_rate/v9 v9.1.2 // indirect
 	github.com/go-resty/resty/v2 v2.10.0 // indirect
@@ -95,7 +93,7 @@ require (
 	github.com/mrz1836/go-cache v0.9.2 // indirect
 	github.com/mrz1836/go-logger v0.3.2 // indirect
 	github.com/newrelic/go-agent/v3/integrations/nrmongo v1.1.2 // indirect
-	github.com/pelletier/go-toml/v2 v2.1.0 // indirect
+	github.com/pelletier/go-toml/v2 v2.1.1 // indirect
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/pmezard/go-difflib v1.0.1-0.20181226105442-5d4384ee4fb2 // indirect
 	github.com/rafaeljusto/redigomock v2.4.0+incompatible // indirect
@@ -128,7 +126,7 @@ require (
 	go.mongodb.org/mongo-driver v1.13.1 // indirect
 	go.uber.org/multierr v1.11.0 // indirect
 	golang.org/x/crypto v0.16.0 // indirect
-	golang.org/x/exp v0.0.0-20231006140011-7918f672742d // indirect
+	golang.org/x/exp v0.0.0-20231206192017-f3f8817b8deb // indirect
 	golang.org/x/mod v0.14.0 // indirect
 	golang.org/x/net v0.19.0 // indirect
 	golang.org/x/sync v0.5.0 // indirect
