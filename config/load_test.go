@@ -11,8 +11,11 @@ import (
 // TestLoadConfig will test the method Load()
 func TestLoadConfig(t *testing.T) {
 	t.Run("empty configFilePath", func(t *testing.T) {
+		// given
+		defaultLogger := logging.GetDefaultLogger()
+
 		// when
-		_, err := Load()
+		_, err := Load(defaultLogger)
 
 		// then
 		assert.NoError(t, err)
@@ -22,13 +25,14 @@ func TestLoadConfig(t *testing.T) {
 	t.Run("custom configFilePath overridden by ENV", func(t *testing.T) {
 		// given
 		anotherPath := "anotherPath.yml"
+		defaultLogger := logging.GetDefaultLogger()
 
 		// when
 		// IMPORTANT! If you need to change the name of this variable, it means you're
 		// making backwards incompatible changes. Please inform all Bux adoptors and
 		// update your configs on all servers and scripts.
 		os.Setenv("BUX_CONFIG_FILE", anotherPath)
-		_, err := Load()
+		_, err := Load(defaultLogger)
 
 		// then
 		assert.Equal(t, viper.GetString(ConfigFilePathKey), anotherPath)

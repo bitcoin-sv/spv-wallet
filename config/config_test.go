@@ -13,7 +13,8 @@ import (
 
 // newTestConfig will make a new test config
 func newTestConfig(t *testing.T) (ac *AppConfig) {
-	ac, err := Load()
+	defaultLogger := logging.GetDefaultLogger()
+	ac, err := Load(defaultLogger)
 	require.NoError(t, err)
 	require.NotNil(t, ac)
 	return
