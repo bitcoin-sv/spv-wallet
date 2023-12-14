@@ -9,11 +9,11 @@ import (
 	"os/signal"
 	"time"
 
-	"github.com/BuxOrg/bux/logging"
 	"github.com/BuxOrg/bux-server/config"
 	"github.com/BuxOrg/bux-server/dictionary"
 	_ "github.com/BuxOrg/bux-server/docs"
 	"github.com/BuxOrg/bux-server/server"
+	"github.com/BuxOrg/bux/logging"
 )
 
 // main method starts everything for the BUX Server
