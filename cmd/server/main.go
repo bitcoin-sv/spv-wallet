@@ -10,7 +10,6 @@ import (
 	"time"
 
 	"github.com/BuxOrg/bux/logging"
-
 	"github.com/BuxOrg/bux-server/config"
 	"github.com/BuxOrg/bux-server/dictionary"
 	_ "github.com/BuxOrg/bux-server/docs"
