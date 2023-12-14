@@ -1,6 +1,8 @@
 module github.com/BuxOrg/bux-server
 
-go 1.19
+go 1.21.3
+
+toolchain go1.21.4
 
 require (
 	github.com/99designs/gqlgen v0.17.41
@@ -104,8 +106,8 @@ require (
 	github.com/segmentio/encoding v0.4.0 // indirect
 	github.com/sosodev/duration v1.2.0 // indirect
 	github.com/sourcegraph/conc v0.3.0 // indirect
-	github.com/spf13/afero v1.10.0 // indirect
-	github.com/spf13/cast v1.5.1 // indirect
+	github.com/spf13/afero v1.11.0 // indirect
+	github.com/spf13/cast v1.6.0 // indirect
 	github.com/spf13/pflag v1.0.5
 	github.com/stretchr/objx v0.5.1 // indirect
 	github.com/subosito/gotenv v1.6.0 // indirect

@@ -439,7 +439,7 @@ func loadBroadcastClientAPI(appConfig *AppConfig, options []bux.ClientOps) []bux
 		arcClientConfigs := splitBroadcastClientApis(appConfig.Nodes.BroadcastClientAPIs)
 		options = append(options, bux.WithBroadcastClientAPIs(arcClientConfigs))
 
-		builder := broadcast_client.Builder()
+		builder := broadcastclient.Builder()
 		for _, cfg := range arcClientConfigs {
 			builder.WithArc(cfg)
 		}

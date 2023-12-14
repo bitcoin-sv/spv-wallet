@@ -5,7 +5,6 @@ package main
 
 import (
 	"context"
-	"fmt"
 	"os"
 	"os/signal"
 	"time"
@@ -87,7 +86,7 @@ func main() {
 	txn.End()
 
 	// Listen and serve
-	services.Logger.Debug().Msgf("starting [%s] %s server at port %s...", appConfig.Environment, config.ApplicationName, appConfig.Server.Port)
+	services.Logger.Debug().Msgf("starting %s server version %s at port %s...", config.ApplicationName, config.Version, appConfig.Server.Port)
 	appServer.Serve()
 
 	<-idleConnectionsClosed
