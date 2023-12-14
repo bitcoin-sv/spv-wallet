@@ -1,6 +1,8 @@
 module github.com/BuxOrg/bux-server
 
-go 1.19
+go 1.21.3
+
+toolchain go1.21.4
 
 require (
 	github.com/99designs/gqlgen v0.17.41
