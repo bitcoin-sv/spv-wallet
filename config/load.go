@@ -8,6 +8,7 @@ import (
 
 	"github.com/BuxOrg/bux-server/dictionary"
 	"github.com/mitchellh/mapstructure"
+	"github.com/rs/zerolog"
 	"github.com/spf13/viper"
 )
 
@@ -15,7 +16,7 @@ import (
 var viperLock sync.Mutex
 
 // Load all AppConfig
-func Load() (appConfig *AppConfig, err error) {
+func Load(logger *zerolog.Logger) (appConfig *AppConfig, err error) {
 	viperLock.Lock()
 	defer viperLock.Unlock()
 
@@ -29,7 +30,7 @@ func Load() (appConfig *AppConfig, err error) {
 		return nil, err
 	}
 
-	if err = loadFromFile(); err != nil {
+	if err = loadFromFile(logger); err != nil {
 		return nil, err
 	}
 
@@ -62,14 +63,13 @@ func envConfig() {
 	viper.AutomaticEnv()
 }
 
-func loadFromFile() error {
+func loadFromFile(logger *zerolog.Logger) error {
 	configFilePath := viper.GetString(ConfigFilePathKey)
 
 	if configFilePath == DefaultConfigFilePath {
 		_, err := os.Stat(DefaultConfigFilePath)
 		if os.IsNotExist(err) {
-			// if the config is not specified and no default config file exists, use defaults
-			logger.Data(2, logger.DEBUG, "Config file not specified. Using defaults")
+			logger.Debug().Msg("Config file not specified. Using defaults")
 			return nil
 		}
 		configFilePath = DefaultConfigFilePath
@@ -78,7 +78,7 @@ func loadFromFile() error {
 	viper.SetConfigFile(configFilePath)
 	if err := viper.ReadInConfig(); err != nil {
 		err = fmt.Errorf(dictionary.GetInternalMessage(dictionary.ErrorReadingConfig), err.Error())
-		logger.Data(2, logger.ERROR, err.Error())
+		logger.Error().Msg(err.Error())
 		return err
 	}
 

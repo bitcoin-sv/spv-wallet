@@ -17,6 +17,7 @@ var DefaultAppConfig = &AppConfig{
 	DisableITC:         true,
 	GraphQL:            graphqlDefault,
 	ImportBlockHeaders: "",
+	Logging:            loggingConfig,
 	Monitor:            monitorDefault,
 	NewRelic:           newRelicDefault,
 	Nodes:              nodesDefault,
@@ -86,6 +87,13 @@ var dbDefaut = &DbConfig{
 
 var graphqlDefault = &GraphqlConfig{
 	Enabled: false,
+}
+
+var loggingConfig = &LoggingConfig{
+	Level:        "debug",
+	Format:       "console",
+	InstanceName: "bux-server",
+	LogOrigin:    false,
 }
 
 var monitorDefault = &MonitorOptions{

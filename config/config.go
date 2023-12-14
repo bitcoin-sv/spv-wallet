@@ -41,7 +41,7 @@ type AppConfig struct {
 	GraphQL *GraphqlConfig `json:"graphql" mapstructure:"graphql"`
 	// ImportBlockHeaders is a URL from where the headers can be downloaded.
 	ImportBlockHeaders string `json:"import_block_headers" mapstructure:"import_block_headers"`
-	// Logging is the configuration for zerolog used in bux related components.
+	// Logging is the configuration for zerolog used in bux.
 	Logging *LoggingConfig `json:"logging" mapstructure:"logging"`
 	// Monitor is a monitor service related settings for legacy bitcoin addresses.
 	Monitor *MonitorOptions `json:"monitor" mapstructure:"monitor"`
@@ -195,10 +195,14 @@ type NotificationsConfig struct {
 
 // LoggingConfig is a configuration for logging
 type LoggingConfig struct {
-	Level        string `json:"level" mapstructure:"level"`
-	Format       string `json:"format" mapstructure:"format"`
+	// Level is the importance and amount of information printed: debug, info, warn, error, fatal, panic, etc.
+	Level string `json:"level" mapstructure:"level"`
+	// Format is the format of logs, json (for gathering eg. into elastic) or console (for stdout).
+	Format string `json:"format" mapstructure:"format"`
+	// InstanceName is the name of the zerolog instance.
 	InstanceName string `json:"instance_name" mapstructure:"instance_name"`
-	LogOrigin    bool   `json:"log_origin" mapstructure:"log_origin"`
+	// LogOrigin is the flag for whether the origin of logs should be printed.
+	LogOrigin bool `json:"log_origin" mapstructure:"log_origin"`
 }
 
 // PaymailConfig is the configuration for the built-in Paymail server
