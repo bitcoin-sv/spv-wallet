@@ -6,6 +6,7 @@ import (
 	"os"
 
 	"github.com/BuxOrg/bux-server/config"
+	"github.com/BuxOrg/bux-server/logging"
 	apirouter "github.com/mrz1836/go-api-router"
 	"github.com/stretchr/testify/require"
 	"github.com/stretchr/testify/suite"
@@ -22,8 +23,9 @@ type TestSuite struct {
 // BaseSetupSuite runs at the start of the suite
 func (ts *TestSuite) BaseSetupSuite() {
 	// Load the configuration
+	defaultLogger := logging.GetDefaultLogger()
 	var err error
-	ts.AppConfig, err = config.Load()
+	ts.AppConfig, err = config.Load(defaultLogger)
 	require.NoError(ts.T(), err)
 }
 
