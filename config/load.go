@@ -86,7 +86,7 @@ func loadFromFile(logger *zerolog.Logger) error {
 }
 
 func unmarshallToAppConfig(appConfig *AppConfig) error {
-	if err := viper.Unmarshal(&appConfig); err != nil {
+	if err := viper.Unmarshal(appConfig); err != nil {
 		err = fmt.Errorf(dictionary.GetInternalMessage(dictionary.ErrorViper), err.Error())
 		return err
 	}
