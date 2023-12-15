@@ -4,7 +4,7 @@ import (
 	"context"
 	"testing"
 
-	"github.com/BuxOrg/bux/logging"
+	"github.com/BuxOrg/bux-server/logging"
 	"github.com/mrz1836/go-cachestore"
 	"github.com/mrz1836/go-datastore"
 	"github.com/newrelic/go-agent/v3/newrelic"

@@ -4,7 +4,7 @@ import (
 	"os"
 	"testing"
 
-	"github.com/BuxOrg/bux/logging"
+	"github.com/BuxOrg/bux-server/logging"
 	"github.com/spf13/viper"
 	"github.com/stretchr/testify/assert"
 )

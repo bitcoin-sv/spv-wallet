@@ -6,10 +6,11 @@ import (
 	"strings"
 	"sync"
 
-	"github.com/BuxOrg/bux-server/dictionary"
 	"github.com/mitchellh/mapstructure"
 	"github.com/rs/zerolog"
 	"github.com/spf13/viper"
+
+	"github.com/BuxOrg/bux-server/dictionary"
 )
 
 // Added a mutex lock for a race-condition
@@ -34,12 +35,11 @@ func Load(logger *zerolog.Logger) (appConfig *AppConfig, err error) {
 		return nil, err
 	}
 
-	appConfig = new(AppConfig)
-	if err = unmarshallToAppConfig(appConfig); err != nil {
+	if err = unmarshallToAppConfig(DefaultAppConfig); err != nil {
 		return nil, err
 	}
 
-	return appConfig, nil
+	return DefaultAppConfig, nil
 }
 
 func setDefaults() error {
