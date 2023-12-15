@@ -10,9 +10,10 @@ import (
 func TestServerConfig_Validate(t *testing.T) {
 	t.Parallel()
 
-	idleTimeout := DefaultAppConfig.Server.IdleTimeout
-	readTimeout := DefaultAppConfig.Server.ReadTimeout
-	writeTimeout := DefaultAppConfig.Server.WriteTimeout
+	defaultAppConfig := getDefaultAppConfig()
+	idleTimeout := defaultAppConfig.Server.IdleTimeout
+	readTimeout := defaultAppConfig.Server.ReadTimeout
+	writeTimeout := defaultAppConfig.Server.WriteTimeout
 
 	t.Run("port is required", func(t *testing.T) {
 		s := ServerConfig{

@@ -34,18 +34,19 @@ func Load(logger *zerolog.Logger) (appConfig *AppConfig, err error) {
 		return nil, err
 	}
 
-	if err = unmarshallToAppConfig(DefaultAppConfig); err != nil {
+	appConfig = getDefaultAppConfig()
+	if err = unmarshallToAppConfig(appConfig); err != nil {
 		return nil, err
 	}
 
-	return DefaultAppConfig, nil
+	return appConfig, nil
 }
 
 func setDefaults() error {
 	viper.SetDefault(ConfigFilePathKey, DefaultConfigFilePath)
 
 	defaultsMap := make(map[string]interface{})
-	if err := mapstructure.Decode(DefaultAppConfig, &defaultsMap); err != nil {
+	if err := mapstructure.Decode(getDefaultAppConfig(), &defaultsMap); err != nil {
 		return err
 	}
 
