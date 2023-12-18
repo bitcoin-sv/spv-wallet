@@ -72,10 +72,6 @@ while [[ $# -gt 0 ]]; do
         bux_server="$2"
         shift
         ;;
-        -env|--environment)
-        environment="$2"
-        shift
-        ;;
         -b|--background)
         background="$2"
         shift
@@ -97,7 +93,6 @@ while [[ $# -gt 0 ]]; do
         echo -e "  -db,  --database\t Define database - postgresql, mongodb, sqlite$reset"
         echo -e "  -c,   --cache\t\t Define cache storage - freecache(in-memory), redis$reset"
         echo -e "  -bs,  --bux-server\t Whether the bux-server should be run - true/false$reset"
-        echo -e "  -env, --environment\t Define bux-server environment - development/staging/production$reset"
         echo -e "  -b,   --background\t Whether the bux-server should be run in background - true/false$reset"
         echo -e "  -x,   --xpub\t\t Define admin xPub$reset"
         echo -e "  -l,   --load\t\t Load .env.config file and run bux-server with its settings$reset"
@@ -115,11 +110,11 @@ if [ "$load_config" == "true" ]; then
         echo "File .env.config exists."
 
             while IFS= read -r line; do
-                if [[ "$line" =~ ^(BUX_DATASTORE__ENGINE=) ]]; then
+                if [[ "$line" =~ ^(BUX_DB_DATASTORE_ENGINE=) ]]; then
                     value="${line#*=}"
                     database="${value//\"}"
                 fi
-                if [[ "$line" =~ ^(BUX_CACHE__ENGINE=) ]]; then
+                if [[ "$line" =~ ^(BUX_CACHE_ENGINE=) ]]; then
                     value="${line#*=}"
                     cache="${value//\"}"
                 fi
@@ -127,15 +122,11 @@ if [ "$load_config" == "true" ]; then
                     value="${line#*=}"
                     bux_server="${value//\"}"
                 fi
-                if [[ "$line" =~ ^(BUX_ENVIRONMENT=) ]]; then
-                    value="${line#*=}"
-                    environment="${value//\"}"
-                fi
                 if [[ "$line" =~ ^(RUN_BUX_SERVER_BACKGROUND=) ]]; then
                     value="${line#*=}"
                     background="${value//\"}"
                 fi
-                if [[ "$line" =~ ^(BUX_AUTHENTICATION__ADMIN_KEY=) ]]; then
+                if [[ "$line" =~ ^(BUX_AUTH_ADMIN_KEY=) ]]; then
                     value="${line#*=}"
                     admin_xpub="${value//\"}"
                 fi
@@ -170,26 +161,26 @@ if [ "$load_config" != "true" ]; then
     # Create the .env.config file
     echo -e "\033[0;32mCreating .env.config file...$reset"
     cat << EOF > .env.config
-BUX_CACHE__ENGINE="$cache"
-BUX_DATASTORE__ENGINE="$database"
+BUX_CACHE_ENGINE="$cache"
+BUX_DB_DATASTORE_ENGINE="$database"
 EOF
 
     # Add additional settings to .env.config file based on the selected database
     if [ "$database" == "postgresql" ]; then
-        echo 'BUX_SQL__HOST="bux-postgresql"' >> .env.config
-        echo 'BUX_SQL__NAME="postgres"' >> .env.config
-        echo 'BUX_SQL__USER="postgres"' >> .env.config
-        echo 'BUX_SQL__PASSWORD="postgres"' >> .env.config
+        echo 'BUX_DB_SQL_HOST="bux-postgresql"' >> .env.config
+        echo 'BUX_DB_SQL_NAME="postgres"' >> .env.config
+        echo 'BUX_DB_SQL_USER="postgres"' >> .env.config
+        echo 'BUX_DB_SQL_PASSWORD="postgres"' >> .env.config
     fi
 
     # Add additional settings to .env.config file based on the selected database
     if [ "$database" == "mongodb" ]; then
-        echo 'BUX_MONGODB__URI="mongodb://mongo:mongo@bux-mongodb:27017/"' >> .env.config
+        echo 'BUX_DB_MONGODB_URI="mongodb://mongo:mongo@bux-mongodb:27017/"' >> .env.config
     fi
 
     # Add additional settings to .env.config file based on the selected cache storage
     if [ "$cache" == "redis" ]; then
-        echo 'BUX_REDIS__URL="redis://redis:6379"' >> .env.config
+        echo 'BUX_CACHE_REDIS_URL="redis://redis:6379"' >> .env.config
     fi
 fi
 
@@ -214,17 +205,6 @@ if [ "$load_config" != "true" ]; then
 fi
 
 if [ "$bux_server" == "true" ]; then
-    if [ "$environment" == "" ]; then
-        environment_options=("development" "staging" "production")
-        ask_for_choice "\033[1mSelect your environment:$reset" "${environment_options[@]}"
-
-        case $choice in
-            1) environment="development";;
-            2) environment="staging";;
-            3) environment="production";;
-        esac
-    fi
-
     if [ "$load_config" != "true" ]; then
         if [ "$admin_xpub" == "" ]; then
             # Ask for admin xPub choice
@@ -244,11 +224,10 @@ if [ "$bux_server" == "true" ]; then
     fi
 
     if [ "$load_config" != "true" ]; then
-        echo "BUX_ENVIRONMENT=\"$environment\"" >> .env.config
         echo "RUN_BUX_SERVER_BACKGROUND=\"$background\"" >> .env.config
 
         if [ "$admin_xpub" != "" ]; then
-            echo "BUX_AUTHENTICATION__ADMIN_KEY=\"$admin_xpub\"" >> .env.config
+            echo "BUX_AUTH_ADMIN_KEY=\"$admin_xpub\"" >> .env.config
         fi
     fi
 
