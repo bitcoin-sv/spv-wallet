@@ -12,7 +12,7 @@ func TestCachestoreConfig_Validate(t *testing.T) {
 	t.Parallel()
 
 	t.Run("valid cachestore config", func(t *testing.T) {
-		c := CachestoreConfig{
+		c := CacheConfig{
 			Engine: cachestore.FreeCache,
 		}
 		require.NotNil(t, c)
@@ -22,7 +22,7 @@ func TestCachestoreConfig_Validate(t *testing.T) {
 	})
 
 	t.Run("empty cachestore", func(t *testing.T) {
-		c := CachestoreConfig{
+		c := CacheConfig{
 			Engine: cachestore.Empty,
 		}
 		require.NotNil(t, c)
@@ -32,7 +32,7 @@ func TestCachestoreConfig_Validate(t *testing.T) {
 	})
 
 	t.Run("invalid cachestore engine", func(t *testing.T) {
-		c := CachestoreConfig{
+		c := CacheConfig{
 			Engine: "",
 		}
 		require.NotNil(t, c)

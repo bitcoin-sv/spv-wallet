@@ -20,7 +20,7 @@
 ## Table of Contents
 
 -   [What is BUX?](#what-is-bux)
--   [Environment Variables](#environment-variables)
+-   [Config Variables](#config-variables)
 -   [Installation](#installation)
 -   [Documentation](#documentation)
 -   [Examples & Tests](#examples--tests)
@@ -38,25 +38,52 @@
 
 <br/>
 
-## Environment Variables
+## Config Variables
 
-| Variable name                         | Description                   |
-|---------------------------------------|-------------------------------|
-| BUX_ENVIRONMENT                       | development or production     |
-| BUX_AUTHENTICATION\*\*ADMIN_KEY       | [your-admin-xpriv]            |
-| BUX_AUTHENTICATION\*\*REQUIRE_SIGNING | 1 or 0                        |
-| BUX_DATASTORE\*\*ENGINE               | mongodb, sqlite, mysql        |
-| BUX_MONGODB\*\*URI                    | mongodb://localhost:27017/bux |
-| BUX_MONGODB\*\*DATABASE_NAME          | bux                           |
-| BUX_DATASTORE\*\*AUTO_MIGRATE         | 1 or 0                        |
-| BUX_CACHE\*\*ENGINE                   | freecache or redis            |
-| BUX_REDIS\*\*URL                      | redis://localhost:6379        |
-| BUX_MONITOR\*\*ENABLED                | 1 or 0                        |
-| BUX_GRAPHQL\*\*ENABLED                | 1 or 0                        |
-| BUX_DEBUG                             | 1 or 0                        |
-| BUX_NEW_RELIC\*\*ENABLED              | 1 or 0                        |
-| BUX_NEW_RELIC\*\*DOMAIN_NAME          | bux-nyc1.bux.ninja            |
-| BUX_NEW_RELIC\*\*LICENSE_KEY          | [your-key]                    |
+Default config variables can be overridden by (in this order of importance):
+1. Flags (only the ones below)
+2. ENV variables
+3. Config file
+
+#### Flags
+
+Available flags:
+
+```bash
+  -C, --config_file string                       custom config file path
+  -h, --help                                     show help
+  -v, --version                                  show version
+  -d, --dump_config                              dump config to file, specified by config_file (-C) flag
+```
+
+To generate config file with defaults, use the --dump flag, or:
+```bash
+go run ./cmd/server/main.go -d
+```
+
+The default config file path is **project root**, and the default file name is **config.yaml**. This can be overridden by -C flag.
+```bash
+go run ./cmd/server/main.go -C /my/config.json
+```
+
+#### Environment variables
+
+To override any config variable with ENV, use the "BUX\_" prefix with mapstructure annotation path with "_" as a delimiter in all uppercase. Example:
+
+Let's take this fragment of AppConfig from `config.example.yaml`:
+
+```yaml
+auth:
+    admin_key: xpub661MyMwAqRbcFrBJbKwBGCB7d3fr2SaAuXGM95BA62X41m6eW2ehRQGW4xLi9wkEXUGnQZYxVVj4PxXnyrLk7jdqvBAs1Qq9gf6ykMvjR7J
+    require_signing: false
+    scheme: xpub
+    signing_disabled: true
+```
+
+To override admin_key in auth config, use the path with "_" as a path delimiter and BUX\_ as prefix. So:
+```bash
+BUX_AUTH_ADMIN_KEY="admin_key"
+```
 
 ## Installation
 

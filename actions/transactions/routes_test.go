@@ -13,27 +13,27 @@ func (ts *TestSuite) TestTransactionRegisterRoutes() {
 	ts.T().Run("test routes", func(t *testing.T) {
 
 		// new transaction
-		handle, _, _ := ts.Router.HTTPRouter.Lookup(http.MethodPost, "/"+config.CurrentMajorVersion+"/transaction")
+		handle, _, _ := ts.Router.HTTPRouter.Lookup(http.MethodPost, "/"+config.APIVersion+"/transaction")
 		assert.NotNil(t, handle)
 
 		// record transaction
-		handle, _, _ = ts.Router.HTTPRouter.Lookup(http.MethodPost, "/"+config.CurrentMajorVersion+"/transaction/record")
+		handle, _, _ = ts.Router.HTTPRouter.Lookup(http.MethodPost, "/"+config.APIVersion+"/transaction/record")
 		assert.NotNil(t, handle)
 
 		// get transaction
-		handle, _, _ = ts.Router.HTTPRouter.Lookup(http.MethodGet, "/"+config.CurrentMajorVersion+"/transaction")
+		handle, _, _ = ts.Router.HTTPRouter.Lookup(http.MethodGet, "/"+config.APIVersion+"/transaction")
 		assert.NotNil(t, handle)
 
 		// search transaction
-		handle, _, _ = ts.Router.HTTPRouter.Lookup(http.MethodGet, "/"+config.CurrentMajorVersion+"/transaction/search")
+		handle, _, _ = ts.Router.HTTPRouter.Lookup(http.MethodGet, "/"+config.APIVersion+"/transaction/search")
 		assert.NotNil(t, handle)
 
 		// search transaction
-		handle, _, _ = ts.Router.HTTPRouter.Lookup(http.MethodPost, "/"+config.CurrentMajorVersion+"/transaction/search")
+		handle, _, _ = ts.Router.HTTPRouter.Lookup(http.MethodPost, "/"+config.APIVersion+"/transaction/search")
 		assert.NotNil(t, handle)
 
 		// update transaction
-		handle, _, _ = ts.Router.HTTPRouter.Lookup(http.MethodPatch, "/"+config.CurrentMajorVersion+"/transaction")
+		handle, _, _ = ts.Router.HTTPRouter.Lookup(http.MethodPatch, "/"+config.APIVersion+"/transaction")
 		assert.NotNil(t, handle)
 	})
 }

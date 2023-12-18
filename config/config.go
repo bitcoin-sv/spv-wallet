@@ -2,272 +2,256 @@
 package config
 
 import (
-	"errors"
 	"time"
 
 	"github.com/BuxOrg/bux/cluster"
 	"github.com/BuxOrg/bux/taskmanager"
-	validation "github.com/go-ozzo/ozzo-validation"
 	"github.com/mrz1836/go-cachestore"
 	"github.com/mrz1836/go-datastore"
-	"github.com/newrelic/go-agent/v3/newrelic"
 	"github.com/tonicpow/go-minercraft/v2"
 )
 
-// Config constants used for optimization and value testing
+// Config constants used for bux-server
 const (
-	ApplicationName                = "BuxServer"
-	CurrentMajorVersion            = "v1"
-	DefaultHTTPRequestIdleTimeout  = 60 * time.Second
-	DefaultHTTPRequestReadTimeout  = 15 * time.Second
-	DefaultHTTPRequestWriteTimeout = 15 * time.Second
-	DefaultNewRelicShutdown        = 10 * time.Second
-	EnvironmentDevelopment         = "development"
-	EnvironmentKey                 = "BUX_ENVIRONMENT"
-	EnvironmentPrefix              = "bux"
-	EnvironmentProduction          = "production"
-	EnvironmentStaging             = "staging"
-	EnvironmentTest                = "test"
-	HealthRequestPath              = "health"
-	Version                        = "v0.5.16"
+	ApplicationName         = "BuxServer"
+	APIVersion              = "v1"
+	DefaultNewRelicShutdown = 10 * time.Second
+	HealthRequestPath       = "health"
+	Version                 = "v0.5.16"
+	ConfigFilePathKey       = "config_file"
+	DefaultConfigFilePath   = "config.yaml"
+	ConfigEnvPrefix         = "BUX_"
 )
 
-// Local variables for configuration
-var (
-	environments = []interface{}{
-		EnvironmentDevelopment,
-		EnvironmentProduction,
-		EnvironmentStaging,
-		EnvironmentTest,
-	}
-)
+// AppConfig is the configuration values and associated env vars
+type AppConfig struct {
+	// Authentication is the configuration for keys authentication in bux.
+	Authentication *AuthenticationConfig `json:"auth" mapstructure:"auth"`
+	// Cache is the configuration for cache, memory or redis, and cluster cache settings.
+	Cache *CacheConfig `json:"cache" mapstructure:"cache"`
+	// Db is the configuration for database related settings.
+	Db *DbConfig `json:"db" mapstructure:"db"`
+	// Debug is a flag for enabling additional information from bux.
+	Debug bool `json:"debug" mapstructure:"debug"`
+	// DebugProfiling is a flag for enabling additinal debug profiling.
+	DebugProfiling bool `json:"debug_profiling" mapstructure:"debug_profiling"`
+	// DisableITC is a flag for disabling Incoming Transaction Checking.
+	DisableITC bool `json:"disable_itc" mapstructure:"disable_itc"`
+	// GraphQL is GraphQL related settings.
+	GraphQL *GraphqlConfig `json:"graphql" mapstructure:"graphql"`
+	// ImportBlockHeaders is a URL from where the headers can be downloaded.
+	ImportBlockHeaders string `json:"import_block_headers" mapstructure:"import_block_headers"`
+	// Logging is the configuration for zerolog used in bux.
+	Logging *LoggingConfig `json:"logging" mapstructure:"logging"`
+	// Monitor is a monitor service related settings for legacy bitcoin addresses.
+	Monitor *MonitorOptions `json:"monitor" mapstructure:"monitor"`
+	// NewRelic is New Relic related settings.
+	NewRelic *NewRelicConfig `json:"new_relic" mapstructure:"new_relic"`
+	// Nodes is a config for BSV nodes, mAPI and Arc.
+	Nodes *NodesConfig `json:"nodes" mapstructure:"nodes"`
+	// Notifications is a config for Notification service.
+	Notifications *NotificationsConfig `json:"notifications" mapstructure:"notifications"`
+	// Paymail is a config for Paymail and BEEF.
+	Paymail *PaymailConfig `json:"paymail" mapstructure:"paymail"`
+	// RequestLogging is flag for enabling logging in go-api-router.
+	RequestLogging bool `json:"request_logging" mapstructure:"request_logging"`
+	// Server is a general configuration for bux-server.
+	Server *ServerConfig `json:"server" mapstructure:"server"`
+	// TaskManager is a configuration for Task Manager in bux.
+	TaskManager *TaskManagerConfig `json:"task_manager" mapstructure:"task_manager"`
+}
 
-// The global configuration settings
-type (
+// AuthenticationConfig is the configuration for Authentication
+type AuthenticationConfig struct {
+	// AdminKey is used for administrative requests
+	AdminKey string `json:"admin_key" mapstructure:"admin_key"`
+	// RequireSigning is the flag that decides if the signing is required
+	RequireSigning bool `json:"require_signing" mapstructure:"require_signing"`
+	// Scheme it the authentication scheme to use (default is: xpub)
+	Scheme string `json:"scheme" mapstructure:"scheme"`
+	// SigningDisabled turns off signing. NOTE: Only for development
+	SigningDisabled bool `json:"signing_disabled" mapstructure:"signing_disabled"`
+}
 
-	// AppConfig is the configuration values and associated env vars
-	AppConfig struct {
-		Authentication       AuthenticationConfig    `json:"authentication" mapstructure:"authentication"`
-		Cachestore           CachestoreConfig        `json:"cache" mapstructure:"cache"`
-		ClusterConfig        *ClusterConfig          `json:"cluster" mapstructure:"cluster"`
-		Datastore            DatastoreConfig         `json:"datastore" mapstructure:"datastore"`
-		Debug                bool                    `json:"debug" mapstructure:"debug"`
-		DebugProfiling       bool                    `json:"debug_profiling" mapstructure:"debug_profiling"`
-		DisableITC           bool                    `json:"disable_itc" mapstructure:"disable_itc"`
-		Environment          string                  `json:"environment" mapstructure:"environment"`
-		GDPRCompliance       bool                    `json:"gdpr_compliance" mapstructure:"gdpr_compliance"`
-		GraphQL              GraphqlConfig           `json:"graphql" mapstructure:"graphql"`
-		ImportBlockHeaders   string                  `json:"import_block_headers" mapstructure:"import_block_headers"`
-		Mongo                datastore.MongoDBConfig `json:"mongodb" mapstructure:"mongodb"`
-		Monitor              MonitorOptions          `json:"monitor" mapstructure:"monitor"`
-		NewRelic             NewRelicConfig          `json:"new_relic" mapstructure:"new_relic"`
-		Notifications        NotificationsConfig     `json:"notifications" mapstructure:"notifications"`
-		Paymail              PaymailConfig           `json:"paymail" mapstructure:"paymail"`
-		Redis                RedisConfig             `json:"redis" mapstructure:"redis"`
-		RequestLogging       bool                    `json:"request_logging" mapstructure:"request_logging"`
-		Server               ServerConfig            `json:"server" mapstructure:"server"`
-		SQL                  datastore.SQLConfig     `json:"sql" mapstructure:"sql"`
-		SQLite               datastore.SQLiteConfig  `json:"sqlite" mapstructure:"sqlite"`
-		TaskManager          TaskManagerConfig       `json:"task_manager" mapstructure:"task_manager"`
-		WorkingDirectory     string                  `json:"working_directory" mapstructure:"working_directory"`
-		UseMapiFeeQuotes     bool                    `json:"use_mapi_fee_quotes" mapstructure:"use_mapi_fee_quotes"`
-		MinercraftAPI        string                  `json:"minercraft_api" mapstructure:"minercraft_api"`
-		MinercraftCustomAPIs []*minercraft.MinerAPIs `json:"minercraft_custom_apis" mapstructure:"minercraft_custom_apis"`
-		BroadcastClientAPIs  []string                `json:"broadcast_client_apis" mapstructure:"broadcast_client_apis"`
-		UseBeef              bool                    `json:"use_beef" mapstructure:"use_beef"`
-		Pulse                PulseConfig             `json:"pulse" mapstructure:"pulse"`
-		Logging              *LoggingConfig          `json:"logging" mapstructure:"logging"`
-	}
+// CacheConfig is a configuration for cachestore
+type CacheConfig struct {
+	// Engine is the cache engine to use (redis, freecache).
+	Engine cachestore.Engine `json:"engine" mapstructure:"engine"`
+	// Cluster is the cluster-specific configuration for bux.
+	Cluster *ClusterConfig `json:"cluster" mapstructure:"cluster"`
+	// Redis is a general config for redis if the engine is set to it.
+	Redis *RedisConfig `json:"redis" mapstructure:"redis"`
+}
 
-	// AuthenticationConfig is the configuration for Authentication
-	AuthenticationConfig struct {
-		AdminKey        string `json:"admin_key" mapstructure:"admin_key"`               // key that is used for administrative requests
-		RequireSigning  bool   `json:"require_signing" mapstructure:"require_signing"`   // if the signing is required
-		Scheme          string `json:"scheme" mapstructure:"scheme"`                     // authentication scheme to use (default is: xpub)
-		SigningDisabled bool   `json:"signing_disabled" mapstructure:"signing_disabled"` // NOTE: Only for development (turns off signing)
-	}
+// ClusterConfig is a configuration for the Bux cluster
+type ClusterConfig struct {
+	// Coordinator is a cluster coordinator (redis or memory).
+	Coordinator cluster.Coordinator `json:"coordinator" mapstructure:"coordinator"`
+	// Prefix is the string to use for all cluster keys.
+	Prefix string `json:"prefix" mapstructure:"prefix"`
+	// Redis is cluster-specific redis config, will use cache config if this is unset.
+	Redis *RedisConfig `json:"redis" mapstrcuture:"redis"`
+}
 
-	// CachestoreConfig is a configuration for cachestore
-	CachestoreConfig struct {
-		Engine cachestore.Engine `json:"engine" mapstructure:"engine"` // Cache engine to use (redis, freecache)
-	}
+// RedisConfig is a configuration for Redis cachestore or taskmanager
+type RedisConfig struct {
+	// DependencyMode works only in Redis with script enabled.
+	DependencyMode bool `json:"dependency_mode" mapstructure:"dependency_mode"`
+	// MaxActiveConnections is maximum number of active redis connections.
+	MaxActiveConnections int `json:"max_active_connections" mapstructure:"max_active_connections"`
+	// MaxConnectionLifetime is the maximum duration of the connection.
+	MaxConnectionLifetime time.Duration `json:"max_connection_lifetime" mapstructure:"max_connection_lifetime"`
+	// MaxIdleConnections is the maximum number of idle connections.
+	MaxIdleConnections int `json:"max_idle_connections" mapstructure:"max_idle_connections"`
+	// MaxIdleTimeout is the maximum duration of idle redis connection before timeout.
+	MaxIdleTimeout time.Duration `json:"max_idle_timeout" mapstructure:"max_idle_timeout"`
+	// URL is Redis url connection string.
+	URL string `json:"url" mapstructure:"url"`
+	// UseTLS is a flag which decides whether to use TLS
+	UseTLS bool `json:"use_tls" mapstructure:"use_tls"`
+}
 
-	// ClusterConfig is a configuration for the Bux cluster
-	ClusterConfig struct {
-		Coordinator cluster.Coordinator `json:"coordinator" mapstructure:"coordinator"` // redis or memory (default)
-		Prefix      string              `json:"prefix" mapstructure:"prefix"`           // prefix string to use for all cluster keys, "bux" by default
-		Redis       *RedisConfig        `json:"redis" mapstructure:"redis"`             // will use cache config if redis is set and this is empty
-	}
+// DbConfig consists of datastore config and specific dbs configs
+type DbConfig struct {
+	// Datastore is a general go-datastore config.
+	Datastore *DatastoreConfig `json:"datastore" mapstructure:"datastore"`
+	// Mongo is a config for MongoDb. Works only if datastore engine is set to mongodb.
+	Mongo *datastore.MongoDBConfig `json:"mongodb" mapstructure:"mongodb"`
+	// SQL is a config for PostgreSQL or MySQL. Works only if datastore engine is set to postgresql or mysql.
+	SQL *datastore.SQLConfig `json:"sql" mapstructure:"sql"`
+	// SQLite is a config for SQLite. Works only if datastore engine is set to sqlite.
+	SQLite *datastore.SQLiteConfig `json:"sqlite" mapstructure:"sqlite"`
+}
 
-	// DatastoreConfig is a configuration for the datastore
-	DatastoreConfig struct {
-		AutoMigrate bool             `json:"auto_migrate" mapstructure:"auto_migrate"` // loads a blank database
-		Debug       bool             `json:"debug" mapstructure:"debug"`               // true for sql statements
-		Engine      datastore.Engine `json:"engine" mapstructure:"engine"`             // mysql, sqlite
-		TablePrefix string           `json:"table_prefix" mapstructure:"table_prefix"` // pre_users (pre)
-	}
+// DatastoreConfig is a configuration for the datastore
+type DatastoreConfig struct {
+	// Debug is a flag that decides whether additional output (such as sql statements) should be produced from datastore.
+	Debug bool `json:"debug" mapstructure:"debug"`
+	// Engine is the database to be used, mysql, sqlite, postgresql.
+	Engine datastore.Engine `json:"engine" mapstructure:"engine"`
+	// TablePrefix is the prefix for all table names in the database.
+	TablePrefix string `json:"table_prefix" mapstructure:"table_prefix"`
+}
 
-	// GraphqlConfig is the configuration for the GraphQL server
-	GraphqlConfig struct {
-		Enabled        bool   `json:"enabled" mapstructure:"enabled"`                 // true/false
-		PlaygroundPath string `json:"playground_path" mapstructure:"playground_path"` // playground path i.e. "/graphiql"
-		ServerPath     string `json:"server_path" mapstructure:"server_path"`         // server path i.e. "/graphql"
-	}
+// GraphqlConfig is the configuration for the GraphQL server
+type GraphqlConfig struct {
+	// Enabled is a flag that says whether graphql should be enabled.
+	Enabled bool `json:"enabled" mapstructure:"enabled"`
+}
 
-	// MonitorOptions is the configuration for blockchain monitoring
-	MonitorOptions struct {
-		AuthToken                   string  `json:"auth_token" mapstructure:"auth_token"`                                       // Token to connect to the server with
-		BuxAgentURL                 string  `json:"bux_agent_url" mapstructure:"bux_agent_url"`                                 // The BUX agent server url address
-		Debug                       bool    `json:"debug" mapstructure:"debug"`                                                 // true/false
-		Enabled                     bool    `json:"enabled" mapstructure:"enabled"`                                             // true/false
-		FalsePositiveRate           float64 `json:"false_positive_rate" mapstructure:"false_positive_rate"`                     // how many false positives do we except (default: 0.01)
-		LoadMonitoredDestinations   bool    `json:"load_monitored_destinations" mapstructure:"load_monitored_destinations"`     // Whether to load monitored destinations`
-		MaxNumberOfDestinations     int     `json:"max_number_of_destinations" mapstructure:"max_number_of_destinations"`       // how many destinations can the filter hold (default: 100,000)
-		MonitorDays                 int     `json:"monitor_days" mapstructure:"monitor_days"`                                   // how many days in the past should we monitor an address (default: 7)
-		ProcessorType               string  `json:"processor_type" mapstructure:"processor_type"`                               // Type of processor to start monitor with. Default: bloom
-		SaveTransactionDestinations bool    `json:"save_transaction_destinations" mapstructure:"save_transaction_destinations"` // Whether to save destinations on monitored transactions
-	}
+// MonitorOptions is the configuration for blockchain monitoring
+type MonitorOptions struct {
+	// AuthToken is a token to connect to the server with.
+	AuthToken string `json:"auth_token" mapstructure:"auth_token"`
+	// BuxAgentURL is the BUX agent server url address.
+	BuxAgentURL string `json:"bux_agent_url" mapstructure:"bux_agent_url"`
+	// Debug is the flag that says whether additional input from monitor should be produced.
+	Debug bool `json:"debug" mapstructure:"debug"`
+	// Enabled is the flag that enables monitor service.
+	Enabled bool `json:"enabled" mapstructure:"enabled"`
+	// FalsePositiveRate is the percentage of how many false positives we except.
+	FalsePositiveRate float64 `json:"false_positive_rate" mapstructure:"false_positive_rate"`
+	// LoadMonitoredDestinations is a flag that says whether to load monitored destinations.
+	LoadMonitoredDestinations bool `json:"load_monitored_destinations" mapstructure:"load_monitored_destinations"`
+	// MaxNumberOfDestinations is a number of destinations that the filter can hold (default: 100,000).
+	MaxNumberOfDestinations int `json:"max_number_of_destinations" mapstructure:"max_number_of_destinations"`
+	// MonitorDays is the number of days in the past that we should monitor an address (default: 7).
+	MonitorDays int `json:"monitor_days" mapstructure:"monitor_days"`
+	// ProcessorType is the type of processor to start monitor with. Default: bloom.
+	ProcessorType string `json:"processor_type" mapstructure:"processor_type"`
+	// SaveTransactionDestinations says whether to save destinations on monitored transactions.
+	SaveTransactionDestinations bool `json:"save_transaction_destinations" mapstructure:"save_transaction_destinations"`
+}
 
-	// NewRelicConfig is the configuration for New Relic
-	NewRelicConfig struct {
-		DomainName string `json:"domain_name" mapstructure:"domain_name"` // used for hostname display
-		Enabled    bool   `json:"enabled" mapstructure:"enabled"`         // true/false
-		LicenseKey string `json:"license_key" mapstructure:"license_key"` // 2342-3423523-62
-	}
+// NewRelicConfig is the configuration for New Relic
+type NewRelicConfig struct {
+	// DomainName is used for hostname display.
+	DomainName string `json:"domain_name" mapstructure:"domain_name"`
+	// Enabled is the flag that enables New Relic service.
+	Enabled bool `json:"enabled" mapstructure:"enabled"`
+	// LicenseKey is the New Relic license key.
+	LicenseKey string `json:"license_key" mapstructure:"license_key"`
+}
 
-	// NotificationsConfig is the configuration for notifications
-	NotificationsConfig struct {
-		Enabled         bool   `json:"enabled" mapstructure:"enabled"` // true/false
-		WebhookEndpoint string `json:"webhook_endpoint" mapstructure:"webhook_endpoint"`
-	}
+// NodesConfig consists of blockchain nodes (such as Minercraft and Arc) configuration
+type NodesConfig struct {
+	// UseMapiFeeQuotes is a flag that says whether bux should use fee quotes from mAPI.
+	UseMapiFeeQuotes bool `json:"use_mapi_fee_quotes" mapstructure:"use_mapi_fee_quotes"`
+	// MinercraftAPI is a string that holds the url of mAPI.
+	MinercraftAPI string `json:"minercraft_api" mapstructure:"minercraft_api"`
+	// MinercraftCustomAPIs is a slice of Minercraft custom miners APIs.
+	MinercraftCustomAPIs []*minercraft.MinerAPIs `json:"minercraft_custom_apis" mapstructure:"minercraft_custom_apis"`
+	// BroadcastClientAPIs is a slice of Broadcast Client custom miners APIs.
+	BroadcastClientAPIs []string `json:"broadcast_client_apis" mapstructure:"broadcast_client_apis"`
+}
 
-	// PaymailConfig is the configuration for the built-in Paymail server
-	PaymailConfig struct {
-		DefaultFromPaymail      string   `json:"default_from_paymail" mapstructure:"default_from_paymail"`           // IE: from@domain.com
-		DefaultNote             string   `json:"default_note" mapstructure:"default_note"`                           // IE: message needed for address resolution
-		Domains                 []string `json:"domains" mapstructure:"domains"`                                     // List of allowed domains
-		DomainValidationEnabled bool     `json:"domain_validation_enabled" mapstructure:"domain_validation_enabled"` // Turn off if hosted domain is not paymail related
-		Enabled                 bool     `json:"enabled" mapstructure:"enabled"`                                     // Flag for enabling the Paymail Server Service
-		SenderValidationEnabled bool     `json:"sender_validation_enabled" mapstructure:"sender_validation_enabled"` // Turn on extra security
-	}
+// NotificationsConfig is the configuration for notifications
+type NotificationsConfig struct {
+	// Enabled is the flag that enables notifications service.
+	Enabled bool `json:"enabled" mapstructure:"enabled"`
+	// WebhookEndpoint is the endpoint for webhook registration.
+	WebhookEndpoint string `json:"webhook_endpoint" mapstructure:"webhook_endpoint"`
+}
 
-	// RedisConfig is a configuration for Redis cachestore or taskmanager
-	RedisConfig struct {
-		DependencyMode        bool          `json:"dependency_mode" mapstructure:"dependency_mode"`                 // Only in Redis with script enabled
-		MaxActiveConnections  int           `json:"max_active_connections" mapstructure:"max_active_connections"`   // Max active connections
-		MaxConnectionLifetime time.Duration `json:"max_connection_lifetime" mapstructure:"max_connection_lifetime"` // Max connection lifetime
-		MaxIdleConnections    int           `json:"max_idle_connections" mapstructure:"max_idle_connections"`       // Max idle connections
-		MaxIdleTimeout        time.Duration `json:"max_idle_timeout" mapstructure:"max_idle_timeout"`               // Max idle timeout
-		URL                   string        `json:"url" mapstructure:"url"`                                         // Redis URL connection string
-		UseTLS                bool          `json:"use_tls" mapstructure:"use_tls"`                                 // Flag for using TLS
-	}
+// LoggingConfig is a configuration for logging
+type LoggingConfig struct {
+	// Level is the importance and amount of information printed: debug, info, warn, error, fatal, panic, etc.
+	Level string `json:"level" mapstructure:"level"`
+	// Format is the format of logs, json (for gathering eg. into elastic) or console (for stdout).
+	Format string `json:"format" mapstructure:"format"`
+	// InstanceName is the name of the zerolog instance.
+	InstanceName string `json:"instance_name" mapstructure:"instance_name"`
+	// LogOrigin is the flag for whether the origin of logs should be printed.
+	LogOrigin bool `json:"log_origin" mapstructure:"log_origin"`
+}
 
-	// TaskManagerConfig is a configuration for the taskmanager
-	TaskManagerConfig struct {
-		// QueueOptions *taskq.QueueOptions
-		Engine    taskmanager.Engine  `json:"engine" mapstructure:"engine"`         // taskq, machinery
-		Factory   taskmanager.Factory `json:"factory" mapstructure:"factory"`       // Factory (memory, redis)
-		QueueName string              `json:"queue_name" mapstructure:"queue_name"` // test_queue
-	}
+// PaymailConfig is the configuration for the built-in Paymail server
+type PaymailConfig struct {
+	// Beef is for Background Evaluation Extended Format (BEEF) config.
+	Beef *BeefConfig `json:"beef" mapstructure:"beef"`
+	// DefaultFromPaymail IE: from@domain.com.
+	DefaultFromPaymail string `json:"default_from_paymail" mapstructure:"default_from_paymail"`
+	// DefaultNote IE: message needed for address resolution.
+	DefaultNote string `json:"default_note" mapstructure:"default_note"`
+	// Domains is a list of allowed domains.
+	Domains []string `json:"domains" mapstructure:"domains"`
+	// DomainValidationEnabled should be turned off if hosted domain is not paymail related.
+	DomainValidationEnabled bool `json:"domain_validation_enabled" mapstructure:"domain_validation_enabled"`
+	// Enabled is a flag for enabling the Paymail Server Service.
+	Enabled bool `json:"enabled" mapstructure:"enabled"`
+	// SenderValidationEnabled should be turned on for extra security.
+	SenderValidationEnabled bool `json:"sender_validation_enabled" mapstructure:"sender_validation_enabled"`
+}
 
-	// ServerConfig is a configuration for the HTTP Server
-	ServerConfig struct {
-		IdleTimeout  time.Duration `json:"idle_timeout" mapstructure:"idle_timeout"`   // 60s
-		ReadTimeout  time.Duration `json:"read_timeout" mapstructure:"read_timeout"`   // 15s
-		WriteTimeout time.Duration `json:"write_timeout" mapstructure:"write_timeout"` // 15s
-		Port         string        `json:"port" mapstructure:"port"`                   // 3003
-	}
+// BeefConfig consists of components required to use beef, e.g. Pulse for merkle roots validation
+type BeefConfig struct {
+	// UseBeef is a flag for enabling BEEF transactions format.
+	UseBeef bool `json:"use_beef" mapstructure:"use_beef"`
+	// PulseHeaderValidationURL is the URL for headers validation in Pulse.
+	PulseHeaderValidationURL string `json:"pulse_url" mapstructure:"pulse_url"`
+	// PulseAuthToken is the authentication token for validating headers in Pulse.
+	PulseAuthToken string `json:"pulse_auth_token" mapstructure:"pulse_auth_token"`
+}
 
-	// PulseConfig is a configuration for the Pulse service
-	PulseConfig struct {
-		PulseURL       string `json:"pulse_url" mapstructure:"pulse_url"`
-		PulseAuthToken string `json:"pulse_auth_token" mapstructure:"pulse_auth_token"`
-	}
+// TaskManagerConfig is a configuration for the taskmanager
+type TaskManagerConfig struct {
+	// Factory is the Task Manager factory, memory or redis.
+	Factory taskmanager.Factory `json:"factory" mapstructure:"factory"`
+}
 
-	// LoggingConfig is a configuration for logging
-	LoggingConfig struct {
-		Level        string `json:"level" mapstructure:"level"`
-		Format       string `json:"format" mapstructure:"format"`
-		InstanceName string `json:"instance_name" mapstructure:"instance_name"`
-		LogOrigin    bool   `json:"log_origin" mapstructure:"log_origin"`
-	}
-)
+// ServerConfig is a configuration for the HTTP Server
+type ServerConfig struct {
+	// IdleTimeout is the maximum duration before server timeout.
+	IdleTimeout time.Duration `json:"idle_timeout" mapstructure:"idle_timeout"`
+	// ReadTimeout is the maximum duration for server read timeout.
+	ReadTimeout time.Duration `json:"read_timeout" mapstructure:"read_timeout"`
+	// WriteTimeout is the maximum duration for server write timeout.
+	WriteTimeout time.Duration `json:"write_timeout" mapstructure:"write_timeout"`
+	// Port is the port that the server should use.
+	Port string `json:"port" mapstructure:"port"`
+}
 
 // GetUserAgent will return the outgoing user agent
 func (a *AppConfig) GetUserAgent() string {
-	return "BUX-Server " + a.Environment + " " + Version
-}
-
-// Validate checks the configuration for specific rules
-func (a *AppConfig) Validate(txn *newrelic.Transaction) error {
-
-	var err error
-	defer txn.StartSegment("config_validation").End()
-
-	if err = a.Authentication.Validate(); err != nil {
-		return err
-	}
-
-	if err = a.Cachestore.Validate(); err != nil {
-		return err
-	}
-
-	if err = a.Datastore.Validate(); err != nil {
-		return err
-	}
-
-	if err = a.NewRelic.Validate(); err != nil {
-		return err
-	}
-
-	if err = a.Paymail.Validate(); err != nil {
-		return err
-	}
-
-	if err = a.Server.Validate(); err != nil {
-		return err
-	}
-
-	if err = a.validateCachestore(); err != nil {
-		return err
-	}
-
-	if err = a.validateDatastore(); err != nil {
-		return err
-	}
-
-	return validation.ValidateStruct(a,
-		validation.Field(&a.Environment, validation.Required, validation.In(environments...)),
-		validation.Field(&a.WorkingDirectory, validation.Required),
-	)
-}
-
-// validateDatastore will check the datastore and validate basic requirements
-func (a *AppConfig) validateDatastore() error {
-	if a.Datastore.Engine == datastore.MySQL || a.Datastore.Engine == datastore.PostgreSQL {
-		if len(a.SQL.Host) == 0 {
-			return errors.New("missing sql host")
-		} else if len(a.SQL.User) == 0 {
-			return errors.New("missing sql username")
-		} else if len(a.SQL.Name) == 0 {
-			return errors.New("missing sql db name")
-		}
-	} else if a.Datastore.Engine == datastore.MongoDB {
-		if len(a.Mongo.URI) == 0 {
-			return errors.New("missing mongo uri")
-		} else if len(a.Mongo.DatabaseName) == 0 {
-			return errors.New("missing mongo database name")
-		}
-	}
-	return nil
-}
-
-// validateCachestore will check the cachestore and validate basic requirements
-func (a *AppConfig) validateCachestore() error {
-	if a.Cachestore.Engine == cachestore.Redis {
-		if len(a.Redis.URL) == 0 {
-			return errors.New("missing redis url")
-		}
-	}
-	return nil
+	return "BUX-Server " + Version
 }

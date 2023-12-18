@@ -44,12 +44,6 @@ func RegisterRoutes(router *apirouter.Router, appConfig *config.AppConfig, servi
 	a, require := actions.NewStack(appConfig, services)
 	// require.Use(a.RequireAuthentication)
 
-	// Set the path
-	serverPath := appConfig.GraphQL.ServerPath
-	if len(serverPath) == 0 {
-		serverPath = defaultServerPath
-	}
-
 	srv := handler.NewDefaultServer(generated.NewExecutableSchema(generated.Config{Resolvers: &graph.Resolver{}}))
 	if appConfig.RequestLogging {
 		re := regexp.MustCompile(`[\r?\n|\s+]`)
@@ -90,12 +84,8 @@ func RegisterRoutes(router *apirouter.Router, appConfig *config.AppConfig, servi
 	// Set the POST routes
 	router.HTTPRouter.POST(serverPath, h)
 
-	// only show in development mode
-	if appConfig.Environment == config.EnvironmentDevelopment {
-		playgroundPath := appConfig.GraphQL.PlaygroundPath
-		if len(playgroundPath) == 0 {
-			playgroundPath = defaultPlaygroundPath
-		}
+	// only show in debug mode
+	if appConfig.Debug {
 		if serverPath != playgroundPath {
 			router.HTTPRouter.GET(
 				playgroundPath,

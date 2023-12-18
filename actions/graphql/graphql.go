@@ -2,6 +2,6 @@
 package graphql
 
 const (
-	defaultServerPath     = "/graphql"
-	defaultPlaygroundPath = "/graphiql"
+	serverPath     = "/graphql"
+	playgroundPath = "/graphiql"
 )

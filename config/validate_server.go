@@ -1,22 +1,23 @@
 package config
 
 import (
+	"errors"
+
 	validation "github.com/go-ozzo/ozzo-validation"
 	"github.com/go-ozzo/ozzo-validation/is"
 )
 
 // Validate checks the configuration for specific rules
 func (s *ServerConfig) Validate() error {
-
 	// Set defaults
 	if s.IdleTimeout.String() == "0s" {
-		s.IdleTimeout = DefaultHTTPRequestIdleTimeout
+		return errors.New("Idle timeout needs to be set for server configuration")
 	}
 	if s.ReadTimeout.String() == "0s" {
-		s.ReadTimeout = DefaultHTTPRequestReadTimeout
+		return errors.New("Read timeout needs to be set for server configuration")
 	}
 	if s.WriteTimeout.String() == "0s" {
-		s.WriteTimeout = DefaultHTTPRequestWriteTimeout
+		return errors.New("Write timeout needs to be set for server configuration")
 	}
 
 	return validation.ValidateStruct(s,

@@ -1,39 +1,45 @@
 package config
 
 import (
+	"os"
 	"testing"
 
+	"github.com/BuxOrg/bux-server/logging"
+	"github.com/spf13/viper"
 	"github.com/stretchr/testify/assert"
 )
 
-// TestIsValidEnvironment will test the method isValidEnvironment()
-func TestIsValidEnvironment(t *testing.T) {
-	t.Run("empty env", func(t *testing.T) {
-		valid := isValidEnvironment("")
-		assert.Equal(t, false, valid)
+// TestLoadConfig will test the method Load()
+func TestLoadConfig(t *testing.T) {
+	t.Run("empty configFilePath", func(t *testing.T) {
+		// given
+		defaultLogger := logging.GetDefaultLogger()
+
+		// when
+		_, err := Load(defaultLogger)
+
+		// then
+		assert.NoError(t, err)
+		assert.Equal(t, viper.GetString(ConfigFilePathKey), DefaultConfigFilePath)
 	})
 
-	t.Run("unknown env", func(t *testing.T) {
-		valid := isValidEnvironment("unknown")
-		assert.Equal(t, false, valid)
-	})
+	t.Run("custom configFilePath overridden by ENV", func(t *testing.T) {
+		// given
+		anotherPath := "anotherPath.yml"
+		defaultLogger := logging.GetDefaultLogger()
 
-	t.Run("different case of letters", func(t *testing.T) {
-		valid := isValidEnvironment("DEVELOPment")
-		assert.Equal(t, true, valid)
-	})
+		// when
+		// IMPORTANT! If you need to change the name of this variable, it means you're
+		// making backwards incompatible changes. Please inform all Bux adoptors and
+		// update your configs on all servers and scripts.
+		os.Setenv("BUX_CONFIG_FILE", anotherPath)
+		_, err := Load(defaultLogger)
 
-	t.Run("valid envs", func(t *testing.T) {
-		valid := isValidEnvironment(EnvironmentTest)
-		assert.Equal(t, true, valid)
+		// then
+		assert.Equal(t, viper.GetString(ConfigFilePathKey), anotherPath)
+		assert.Error(t, err)
 
-		valid = isValidEnvironment(EnvironmentDevelopment)
-		assert.Equal(t, true, valid)
-
-		valid = isValidEnvironment(EnvironmentStaging)
-		assert.Equal(t, true, valid)
-
-		valid = isValidEnvironment(EnvironmentProduction)
-		assert.Equal(t, true, valid)
+		// cleanup
+		os.Unsetenv("BUX_CONFIG_FILE")
 	})
 }

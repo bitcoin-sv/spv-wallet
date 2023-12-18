@@ -7,100 +7,88 @@ import (
 	"sync"
 
 	"github.com/BuxOrg/bux-server/dictionary"
-	"github.com/mrz1836/go-datastore"
+	"github.com/mitchellh/mapstructure"
+	"github.com/rs/zerolog"
 	"github.com/spf13/viper"
 )
-
-// isValidEnvironment will return true if the testEnv is a known valid environment
-func isValidEnvironment(testEnv string) bool {
-	testEnv = strings.ToLower(testEnv)
-	for _, env := range environments {
-		if env == testEnv {
-			return true
-		}
-	}
-	return false
-}
-
-// getWorkingDirectory will get the current working directory
-func getWorkingDirectory() string {
-	dir, err := os.Getwd()
-	if err != nil {
-		return ""
-	}
-	return dir
-}
 
 // Added a mutex lock for a race-condition
 var viperLock sync.Mutex
 
-// Load all environment variables
-func Load(customWorkingDirectory string) (_appConfig *AppConfig, err error) {
-	// Check the environment we are running
-	environment := os.Getenv(EnvironmentKey)
-	if !isValidEnvironment(environment) {
-		err = fmt.Errorf(dictionary.GetInternalMessage(dictionary.ErrorInvalidEnv), environment)
-		return
-	}
-
-	// Get the working directory
-	var workingDirectory string
-	if len(customWorkingDirectory) > 0 {
-		workingDirectory = customWorkingDirectory
-	} else {
-		workingDirectory = getWorkingDirectory()
-	}
-
+// Load all AppConfig
+func Load(logger *zerolog.Logger) (appConfig *AppConfig, err error) {
 	viperLock.Lock()
+	defer viperLock.Unlock()
 
-	// Load configuration from json based on the environment from our working directory
-	viper.SetConfigFile(workingDirectory + "/config/envs/" + environment + ".json") // For production (aws)
+	if err = setDefaults(); err != nil {
+		return nil, err
+	}
 
-	// Set a replacer for replacing double underscore with nested period
-	replacer := strings.NewReplacer(".", "__")
-	viper.SetEnvKeyReplacer(replacer)
+	envConfig()
 
-	// Set the prefix
-	viper.SetEnvPrefix(EnvironmentPrefix)
+	if err = loadFlags(); err != nil {
+		return nil, err
+	}
 
-	// Use env vars
+	if err = loadFromFile(logger); err != nil {
+		return nil, err
+	}
+
+	appConfig = getDefaultAppConfig()
+	if err = unmarshallToAppConfig(appConfig); err != nil {
+		return nil, err
+	}
+
+	return appConfig, nil
+}
+
+func setDefaults() error {
+	viper.SetDefault(ConfigFilePathKey, DefaultConfigFilePath)
+
+	defaultsMap := make(map[string]interface{})
+	if err := mapstructure.Decode(getDefaultAppConfig(), &defaultsMap); err != nil {
+		return err
+	}
+
+	for key, value := range defaultsMap {
+		viper.SetDefault(key, value)
+	}
+
+	return nil
+}
+
+func envConfig() {
+	viper.SetEnvPrefix("BUX")
+	viper.SetEnvKeyReplacer(strings.NewReplacer(".", "_"))
 	viper.AutomaticEnv()
+}
 
-	// Read the configuration
-	if err = viper.ReadInConfig(); err != nil {
+func loadFromFile(logger *zerolog.Logger) error {
+	configFilePath := viper.GetString(ConfigFilePathKey)
+
+	if configFilePath == DefaultConfigFilePath {
+		_, err := os.Stat(DefaultConfigFilePath)
+		if os.IsNotExist(err) {
+			logger.Debug().Msg("Config file not specified. Using defaults")
+			return nil
+		}
+		configFilePath = DefaultConfigFilePath
+	}
+
+	viper.SetConfigFile(configFilePath)
+	if err := viper.ReadInConfig(); err != nil {
 		err = fmt.Errorf(dictionary.GetInternalMessage(dictionary.ErrorReadingConfig), err.Error())
-		return
+		logger.Error().Msg(err.Error())
+		return err
 	}
 
-	// Initialize
-	_appConfigVal := AppConfig{
-		Authentication: AuthenticationConfig{},
-		Cachestore:     CachestoreConfig{},
-		ClusterConfig:  &ClusterConfig{},
-		Datastore:      DatastoreConfig{},
-		GraphQL:        GraphqlConfig{},
-		Mongo:          datastore.MongoDBConfig{},
-		Monitor:        MonitorOptions{},
-		NewRelic:       NewRelicConfig{},
-		Notifications:  NotificationsConfig{},
-		Paymail:        PaymailConfig{},
-		Redis:          RedisConfig{},
-		Server:         ServerConfig{},
-		TaskManager:    TaskManagerConfig{},
-		Pulse:          PulseConfig{},
-	}
+	return nil
+}
 
-	// Unmarshal into values struct
-	if err = viper.Unmarshal(&_appConfigVal); err != nil {
+func unmarshallToAppConfig(appConfig *AppConfig) error {
+	if err := viper.Unmarshal(appConfig); err != nil {
 		err = fmt.Errorf(dictionary.GetInternalMessage(dictionary.ErrorViper), err.Error())
-		return
+		return err
 	}
-
-	viperLock.Unlock()
-
-	// Set working directory
-	_appConfigVal.WorkingDirectory = workingDirectory
-	_appConfig = &_appConfigVal
-
-	return
+	return nil
 }

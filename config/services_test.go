@@ -10,7 +10,8 @@ import (
 
 // newTestServices will make a new test services
 func newTestServices(ctx context.Context, t *testing.T,
-	appConfig *AppConfig) *AppServices {
+	appConfig *AppConfig,
+) *AppServices {
 	s, err := appConfig.LoadTestServices(ctx)
 	require.NoError(t, err)
 	require.NotNil(t, s)
@@ -46,6 +47,6 @@ func TestAppConfig_GetUserAgent(t *testing.T) {
 		ac := newTestConfig(t)
 		require.NotNil(t, ac)
 		agent := ac.GetUserAgent()
-		assert.Equal(t, "BUX-Server "+EnvironmentTest+" "+Version, agent)
+		assert.Equal(t, "BUX-Server "+Version, agent)
 	})
 }

@@ -21,8 +21,8 @@ func RegisterRoutes(router *apirouter.Router, appConfig *config.AppConfig, servi
 	action := &Action{actions.Action{AppConfig: a.AppConfig, Services: a.Services}}
 
 	// V1 Requests
-	router.HTTPRouter.GET("/"+config.CurrentMajorVersion+"/utxo", action.Request(router, require.Wrap(action.get)))
-	router.HTTPRouter.POST("/"+config.CurrentMajorVersion+"/utxo/count", action.Request(router, require.Wrap(action.count)))
-	router.HTTPRouter.POST("/"+config.CurrentMajorVersion+"/utxo/search", action.Request(router, require.Wrap(action.search)))
-	router.HTTPRouter.PATCH("/"+config.CurrentMajorVersion+"/utxo/unreserve", action.Request(router, require.Wrap(action.unreserve)))
+	router.HTTPRouter.GET("/"+config.APIVersion+"/utxo", action.Request(router, require.Wrap(action.get)))
+	router.HTTPRouter.POST("/"+config.APIVersion+"/utxo/count", action.Request(router, require.Wrap(action.count)))
+	router.HTTPRouter.POST("/"+config.APIVersion+"/utxo/search", action.Request(router, require.Wrap(action.search)))
+	router.HTTPRouter.PATCH("/"+config.APIVersion+"/utxo/unreserve", action.Request(router, require.Wrap(action.unreserve)))
 }
