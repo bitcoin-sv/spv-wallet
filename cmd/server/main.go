@@ -51,10 +51,9 @@ func main() {
 	// (debugging: show services that are enabled or not)
 	if appConfig.Debug {
 		services.Logger.Debug().Msgf(
-			"datastore: %s | cachestore: %s | taskmanager: %s [%s] | new_relic: %t | paymail: %t | graphql: %t",
+			"datastore: %s | cachestore: %s | taskmanager: %s | new_relic: %t | paymail: %t | graphql: %t",
 			appConfig.Db.Datastore.Engine.String(),
 			appConfig.Cache.Engine.String(),
-			config.TaskManagerEngine,
 			appConfig.TaskManager.Factory.String(),
 			appConfig.NewRelic.Enabled,
 			appConfig.Paymail.Enabled,
