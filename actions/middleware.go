@@ -1,7 +1,6 @@
 package actions
 
 import (
-	"context"
 	"net/http"
 	"time"
 
@@ -117,10 +116,6 @@ func Request(h httprouter.Handle, a *Action) httprouter.Handle {
 			URL:            req.URL.String(),
 			UserAgent:      req.UserAgent(),
 		}
-
-		// Store key information into the request that can be used by other methods
-		req.WithContext(context.WithValue(req.Context(), "ip_address", writer.IPAddress))
-		req.WithContext(context.WithValue(req.Context(), "request_id", writer.RequestID))
 
 		// Start the log (timer)
 		start := time.Now()
