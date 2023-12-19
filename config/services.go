@@ -394,8 +394,12 @@ func splitBroadcastClientApis(apis []string) []broadcastclient.ArcClientConfig {
 }
 
 func loadTaskManager(appConfig *AppConfig, options []bux.ClientOps) []bux.ClientOps {
+	ops := []taskmanager.TasqOps{}
+	if appConfig.TaskManager.Factory == taskmanager.FactoryRedis {
+		ops = append(ops, taskmanager.WithRedis(appConfig.Cache.Redis.URL))
+	}
 	options = append(options, bux.WithTaskqConfig(
-		taskmanager.DefaultTaskQConfig(TaskManagerQueueName, taskmanager.WithRedis(appConfig.Cache.Redis.URL)),
+		taskmanager.DefaultTaskQConfig(TaskManagerQueueName, ops...),
 	))
 	return options
 }
