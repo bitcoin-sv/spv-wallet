@@ -127,7 +127,14 @@ func Request(h httprouter.Handle, a *Action) httprouter.Handle {
 		elapsed := time.Since(start)
 
 		if a.AppConfig.RequestLogging {
-			a.Services.Logger.Debug().Msgf("%d | %s | %s | %s | %s ", writer.Status, elapsed, req.RemoteAddr, req.Method, req.URL)
+			a.Services.Logger.Debug().
+				Str("logger", "http-request").
+				Int("status", writer.Status).
+				Str("remote", req.RemoteAddr).
+				Str("url", req.URL.String()).
+				Str("elapsed", elapsed.String()).
+				Str("remote_address", req.RemoteAddr).
+				Msgf("%d | %s | %s | %s | %s ", writer.Status, elapsed, req.RemoteAddr, req.Method, req.URL)
 		}
 	})
 }
