@@ -69,18 +69,6 @@ graphql:
     enabled: false
 import_block_headers: ""
 # Prefixed with "_", because it's unused by default
-_monitor:
-    auth_token: ""
-    bux_agent_url: ws://localhost:8000/websocket
-    debug: false
-    enabled: false
-    false_positive_rate: 0.01
-    load_monitored_destinations: false
-    max_number_of_destinations: 100000
-    monitor_days: 7
-    processor_type: bloom
-    save_transaction_destinations: true
-# Prefixed with "_", because it's unused by default
 _new_relic:
     domain_name: domain.com
     enabled: false
