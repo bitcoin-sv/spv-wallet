@@ -2,12 +2,15 @@ package actions
 
 import (
 	"net/http"
+	"time"
 
 	"github.com/BuxOrg/bux"
 	"github.com/BuxOrg/bux-server/config"
 	"github.com/BuxOrg/bux-server/dictionary"
+	"github.com/gofrs/uuid"
 	"github.com/julienschmidt/httprouter"
 	apirouter "github.com/mrz1836/go-api-router"
+	"github.com/mrz1836/go-parameters"
 )
 
 // Action is the configuration for the actions and related services
@@ -71,11 +74,8 @@ func (a *Action) RequireAdminAuthentication(fn httprouter.Handle) httprouter.Han
 }
 
 // Request will process the request in the router
-func (a *Action) Request(router *apirouter.Router, h httprouter.Handle) httprouter.Handle {
-	if a.AppConfig.RequestLogging {
-		return router.Request(h)
-	}
-	return router.RequestNoLogging(h)
+func (a *Action) Request(_ *apirouter.Router, h httprouter.Handle) httprouter.Handle {
+	return Request(h, a)
 }
 
 // CheckAuthentication will check the authentication
@@ -100,4 +100,41 @@ func CheckAuthentication(appConfig *config.AppConfig, bux bux.ClientInterface, r
 
 	// Return an empty error message
 	return req, dictionary.ErrorMessage{}
+}
+
+// Request will write the request to the logs before and after calling the handler
+func Request(h httprouter.Handle, a *Action) httprouter.Handle {
+	return parameters.MakeHTTPRouterParsedReq(func(w http.ResponseWriter, req *http.Request, ps httprouter.Params) {
+		// Start the custom response writer
+		guid, _ := uuid.NewV4()
+		writer := &apirouter.APIResponseWriter{
+			IPAddress:      apirouter.GetClientIPAddress(req),
+			Method:         req.Method,
+			RequestID:      guid.String(),
+			ResponseWriter: w,
+			Status:         0, // future use with E-tags
+			URL:            req.URL.String(),
+			UserAgent:      req.UserAgent(),
+		}
+
+		// Start the log (timer)
+		start := time.Now()
+
+		// Fire the request
+		h(writer, req, ps)
+
+		// Complete the timer and final log
+		elapsed := time.Since(start)
+
+		if a.AppConfig.RequestLogging {
+			a.Services.Logger.Debug().
+				Str("logger", "http-request").
+				Int("status", writer.Status).
+				Str("remote", req.RemoteAddr).
+				Str("url", req.URL.String()).
+				Str("elapsed", elapsed.String()).
+				Str("remote_address", req.RemoteAddr).
+				Msgf("%d | %s | %s | %s | %s ", writer.Status, elapsed, req.RemoteAddr, req.Method, req.URL)
+		}
+	})
 }
