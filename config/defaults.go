@@ -18,7 +18,6 @@ func getDefaultAppConfig() *AppConfig {
 		GraphQL:            getGraphqlDefaults(),
 		ImportBlockHeaders: "",
 		Logging:            getLoggingDefaults(),
-		Monitor:            getMonitorDefaults(),
 		NewRelic:           getNewRelicDefaults(),
 		Nodes:              getNodesDefaults(),
 		Notifications:      getNotificationDefaults(),
@@ -104,21 +103,6 @@ func getLoggingDefaults() *LoggingConfig {
 		Format:       "console",
 		InstanceName: "bux-server",
 		LogOrigin:    false,
-	}
-}
-
-func getMonitorDefaults() *MonitorOptions {
-	return &MonitorOptions{
-		AuthToken:                   "",
-		BuxAgentURL:                 "ws://localhost:8000/websocket",
-		Debug:                       false,
-		Enabled:                     false,
-		FalsePositiveRate:           0.01,
-		LoadMonitoredDestinations:   false,
-		MaxNumberOfDestinations:     100000,
-		MonitorDays:                 7,
-		ProcessorType:               "bloom",
-		SaveTransactionDestinations: true,
 	}
 }
 

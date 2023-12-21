@@ -11,7 +11,6 @@ import (
 
 	"github.com/BuxOrg/bux"
 	"github.com/BuxOrg/bux-server/logging"
-	"github.com/BuxOrg/bux/chainstate"
 	"github.com/BuxOrg/bux/cluster"
 	"github.com/BuxOrg/bux/taskmanager"
 	"github.com/BuxOrg/bux/utils"
@@ -186,10 +185,6 @@ func (s *AppServices) loadBux(ctx context.Context, appConfig *AppConfig, testMod
 
 	if appConfig.Notifications != nil && appConfig.Notifications.Enabled {
 		options = append(options, bux.WithNotifications(appConfig.Notifications.WebhookEndpoint))
-	}
-
-	if options, err = loadMonitor(ctx, appConfig, options); err != nil {
-		return err
 	}
 
 	if appConfig.Nodes.UseMapiFeeQuotes {
@@ -402,26 +397,6 @@ func loadTaskManager(appConfig *AppConfig, options []bux.ClientOps) []bux.Client
 		taskmanager.DefaultTaskQConfig(TaskManagerQueueName, ops...),
 	))
 	return options
-}
-
-func loadMonitor(ctx context.Context, appConfig *AppConfig, options []bux.ClientOps) ([]bux.ClientOps, error) {
-	if appConfig.Monitor != nil && appConfig.Monitor.Enabled {
-		if appConfig.Monitor.BuxAgentURL == "" {
-			err := errors.New("CentrifugeServer is required for monitoring to work")
-			return options, err
-		}
-		options = append(options, bux.WithMonitoring(ctx, &chainstate.MonitorOptions{
-			Debug:                       appConfig.Monitor.Debug,
-			BuxAgentURL:                 appConfig.Monitor.BuxAgentURL,
-			MonitorDays:                 appConfig.Monitor.MonitorDays,
-			AuthToken:                   appConfig.Monitor.AuthToken,
-			FalsePositiveRate:           appConfig.Monitor.FalsePositiveRate,
-			MaxNumberOfDestinations:     appConfig.Monitor.MaxNumberOfDestinations,
-			SaveTransactionDestinations: appConfig.Monitor.SaveTransactionDestinations,
-			LoadMonitoredDestinations:   appConfig.Monitor.LoadMonitoredDestinations,
-		}))
-	}
-	return options, nil
 }
 
 func loadBroadcastClientAPI(appConfig *AppConfig, options []bux.ClientOps) []bux.ClientOps {

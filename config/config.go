@@ -43,8 +43,6 @@ type AppConfig struct {
 	ImportBlockHeaders string `json:"import_block_headers" mapstructure:"import_block_headers"`
 	// Logging is the configuration for zerolog used in bux.
 	Logging *LoggingConfig `json:"logging" mapstructure:"logging"`
-	// Monitor is a monitor service related settings for legacy bitcoin addresses.
-	Monitor *MonitorOptions `json:"monitor" mapstructure:"monitor"`
 	// NewRelic is New Relic related settings.
 	NewRelic *NewRelicConfig `json:"new_relic" mapstructure:"new_relic"`
 	// Nodes is a config for BSV nodes, mAPI and Arc.
@@ -137,30 +135,6 @@ type DatastoreConfig struct {
 type GraphqlConfig struct {
 	// Enabled is a flag that says whether graphql should be enabled.
 	Enabled bool `json:"enabled" mapstructure:"enabled"`
-}
-
-// MonitorOptions is the configuration for blockchain monitoring
-type MonitorOptions struct {
-	// AuthToken is a token to connect to the server with.
-	AuthToken string `json:"auth_token" mapstructure:"auth_token"`
-	// BuxAgentURL is the BUX agent server url address.
-	BuxAgentURL string `json:"bux_agent_url" mapstructure:"bux_agent_url"`
-	// Debug is the flag that says whether additional input from monitor should be produced.
-	Debug bool `json:"debug" mapstructure:"debug"`
-	// Enabled is the flag that enables monitor service.
-	Enabled bool `json:"enabled" mapstructure:"enabled"`
-	// FalsePositiveRate is the percentage of how many false positives we except.
-	FalsePositiveRate float64 `json:"false_positive_rate" mapstructure:"false_positive_rate"`
-	// LoadMonitoredDestinations is a flag that says whether to load monitored destinations.
-	LoadMonitoredDestinations bool `json:"load_monitored_destinations" mapstructure:"load_monitored_destinations"`
-	// MaxNumberOfDestinations is a number of destinations that the filter can hold (default: 100,000).
-	MaxNumberOfDestinations int `json:"max_number_of_destinations" mapstructure:"max_number_of_destinations"`
-	// MonitorDays is the number of days in the past that we should monitor an address (default: 7).
-	MonitorDays int `json:"monitor_days" mapstructure:"monitor_days"`
-	// ProcessorType is the type of processor to start monitor with. Default: bloom.
-	ProcessorType string `json:"processor_type" mapstructure:"processor_type"`
-	// SaveTransactionDestinations says whether to save destinations on monitored transactions.
-	SaveTransactionDestinations bool `json:"save_transaction_destinations" mapstructure:"save_transaction_destinations"`
 }
 
 // NewRelicConfig is the configuration for New Relic
