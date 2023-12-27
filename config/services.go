@@ -402,7 +402,6 @@ func loadTaskManager(appConfig *AppConfig, options []bux.ClientOps) []bux.Client
 func loadBroadcastClientAPI(appConfig *AppConfig, options []bux.ClientOps) []bux.ClientOps {
 	if appConfig.Nodes.BroadcastClientAPIs != nil {
 		arcClientConfigs := splitBroadcastClientApis(appConfig.Nodes.BroadcastClientAPIs)
-		options = append(options, bux.WithBroadcastClientAPIs(arcClientConfigs))
 
 		builder := broadcastclient.Builder()
 		for _, cfg := range arcClientConfigs {
