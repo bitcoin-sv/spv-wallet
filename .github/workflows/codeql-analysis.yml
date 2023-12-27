@@ -36,6 +36,13 @@ jobs:
           # a pull request then we can check out the head.
           fetch-depth: 2
 
+      # GH Actions runner uses go1.20 by default, so we need to install our own version.
+      # https://github.com/github/codeql-action/issues/1842#issuecomment-1704398087
+      - name: Install Go from go.mod
+        uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+
       # If this run was triggered by a pull request event, then checkout
       # the head of the pull request instead of the merge commit.
       - run: git checkout HEAD^2
