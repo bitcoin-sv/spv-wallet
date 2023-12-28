@@ -366,28 +366,6 @@ func loadDatastore(options []bux.ClientOps, appConfig *AppConfig, testMode bool)
 	return options, nil
 }
 
-// splitBroadcastClientApis splits the broadcast client apis into a list of broadcast_client.ArcClientConfig
-func splitBroadcastClientApis(apis []string) []broadcastclient.ArcClientConfig {
-	var arcClients []broadcastclient.ArcClientConfig
-	for _, api := range apis {
-		separatorIndex := strings.Index(api, "|")
-		if separatorIndex != -1 {
-			apiURL := api[:separatorIndex]
-			token := api[separatorIndex+1:]
-
-			arcClients = append(arcClients, broadcastclient.ArcClientConfig{
-				APIUrl: apiURL,
-				Token:  token,
-			})
-		} else {
-			arcClients = append(arcClients, broadcastclient.ArcClientConfig{
-				APIUrl: api,
-			})
-		}
-	}
-	return arcClients
-}
-
 func loadTaskManager(appConfig *AppConfig, options []bux.ClientOps) []bux.ClientOps {
 	ops := []taskmanager.TasqOps{}
 	if appConfig.TaskManager.Factory == taskmanager.FactoryRedis {
@@ -401,11 +379,13 @@ func loadTaskManager(appConfig *AppConfig, options []bux.ClientOps) []bux.Client
 
 func loadBroadcastClientAPI(appConfig *AppConfig, options []bux.ClientOps) []bux.ClientOps {
 	if appConfig.Nodes.BroadcastClientAPIs != nil {
-		arcClientConfigs := splitBroadcastClientApis(appConfig.Nodes.BroadcastClientAPIs)
 
 		builder := broadcastclient.Builder()
-		for _, cfg := range arcClientConfigs {
-			builder.WithArc(cfg)
+		for _, cfg := range appConfig.Nodes.BroadcastClientAPIs {
+			builder.WithArc(broadcastclient.ArcClientConfig{
+				Token:  cfg.Token,
+				APIUrl: cfg.URL,
+			})
 		}
 		broadcastClient := builder.Build()
 		options = append(options, bux.WithBroadcastClient(broadcastClient))

@@ -119,7 +119,7 @@ func getNodesDefaults() *NodesConfig {
 		UseMapiFeeQuotes:     true,
 		MinercraftAPI:        "mAPI",
 		MinercraftCustomAPIs: []*minercraft.MinerAPIs{},
-		BroadcastClientAPIs:  []string{},
+		BroadcastClientAPIs:  []*BroadcastClientAPI{},
 	}
 }
 
