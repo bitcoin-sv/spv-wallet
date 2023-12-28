@@ -156,7 +156,13 @@ type NodesConfig struct {
 	// MinercraftCustomAPIs is a slice of Minercraft custom miners APIs.
 	MinercraftCustomAPIs []*minercraft.MinerAPIs `json:"minercraft_custom_apis" mapstructure:"minercraft_custom_apis"`
 	// BroadcastClientAPIs is a slice of Broadcast Client custom miners APIs.
-	BroadcastClientAPIs []string `json:"broadcast_client_apis" mapstructure:"broadcast_client_apis"`
+	BroadcastClientAPIs []*BroadcastClientAPI `json:"broadcast_client_apis" mapstructure:"broadcast_client_apis"`
+}
+
+// BroadcastClientAPI is a URL-Token pair for Broadcast Client; Token is optional
+type BroadcastClientAPI struct {
+	Token string `json:"token,omitempty"`
+	URL   string `json:"url,omitempty"`
 }
 
 // NotificationsConfig is the configuration for notifications
