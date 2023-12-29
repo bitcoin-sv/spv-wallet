@@ -54,7 +54,7 @@ type AppConfig struct {
 	// RequestLogging is flag for enabling logging in go-api-router.
 	RequestLogging bool `json:"request_logging" mapstructure:"request_logging"`
 	// Server is a general configuration for bux-server.
-	Server *ServerConfig `json:"server" mapstructure:"server"`
+	Server *ServerConfig `json:"server_config" mapstructure:"server_config"`
 	// TaskManager is a configuration for Task Manager in bux.
 	TaskManager *TaskManagerConfig `json:"task_manager" mapstructure:"task_manager"`
 }
