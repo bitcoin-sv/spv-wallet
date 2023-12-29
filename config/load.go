@@ -1,6 +1,7 @@
 package config
 
 import (
+	"encoding/json"
 	"fmt"
 	"os"
 	"strings"
@@ -10,6 +11,7 @@ import (
 	"github.com/mitchellh/mapstructure"
 	"github.com/rs/zerolog"
 	"github.com/spf13/viper"
+
 )
 
 // Added a mutex lock for a race-condition
@@ -37,6 +39,15 @@ func Load(logger *zerolog.Logger) (appConfig *AppConfig, err error) {
 	appConfig = getDefaultAppConfig()
 	if err = unmarshallToAppConfig(appConfig); err != nil {
 		return nil, err
+	}
+
+	if appConfig.Debug {
+		cfg, err := json.MarshalIndent(appConfig, "", "  ")
+		if err != nil {
+			logger.Error().Msg("Unable to decode App Config to json")
+		} else {
+			fmt.Printf("loaded config: %s", cfg)
+		}
 	}
 
 	return appConfig, nil

@@ -157,6 +157,6 @@ func getServerDefaults() *ServerConfig {
 		IdleTimeout:  60 * time.Second,
 		ReadTimeout:  15 * time.Second,
 		WriteTimeout: 15 * time.Second,
-		Port:         "3003",
+		Port:         3003,
 	}
 }

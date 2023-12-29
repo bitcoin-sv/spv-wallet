@@ -84,7 +84,7 @@ func main() {
 	txn.End()
 
 	// Listen and serve
-	services.Logger.Debug().Msgf("starting %s server version %s at port %s...", config.ApplicationName, config.Version, appConfig.Server.Port)
+	services.Logger.Debug().Msgf("starting %s server version %s at port %d...", config.ApplicationName, config.Version, appConfig.Server.Port)
 	appServer.Serve()
 
 	<-idleConnectionsClosed

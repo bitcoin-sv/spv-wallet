@@ -222,7 +222,7 @@ type ServerConfig struct {
 	// WriteTimeout is the maximum duration for server write timeout.
 	WriteTimeout time.Duration `json:"write_timeout" mapstructure:"write_timeout"`
 	// Port is the port that the server should use.
-	Port string `json:"port" mapstructure:"port"`
+	Port int `json:"port" mapstructure:"port"`
 }
 
 // GetUserAgent will return the outgoing user agent
