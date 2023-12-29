@@ -5,6 +5,7 @@ import (
 	"context"
 	"crypto/tls"
 	"net/http"
+	"strconv"
 
 	accessKeys "github.com/BuxOrg/bux-server/actions/access_keys"
 	"github.com/BuxOrg/bux-server/actions/admin"
@@ -42,7 +43,7 @@ func (s *Server) Serve() {
 
 	// Load the server defaults
 	s.WebServer = &http.Server{
-		Addr:              ":" + s.AppConfig.Server.Port,
+		Addr:              ":" + strconv.Itoa(s.AppConfig.Server.Port),
 		Handler:           s.Handlers(),
 		IdleTimeout:       s.AppConfig.Server.IdleTimeout,
 		ReadTimeout:       s.AppConfig.Server.ReadTimeout,
@@ -69,7 +70,7 @@ func (s *Server) Serve() {
 
 	// Listen and serve
 	if err := s.WebServer.ListenAndServe(); err != nil {
-		s.Services.Logger.Debug().Msgf("shutting down %s server [%s] on port %s...", config.ApplicationName, err.Error(), s.AppConfig.Server.Port)
+		s.Services.Logger.Debug().Msgf("shutting down %s server [%s] on port %d...", config.ApplicationName, err.Error(), s.AppConfig.Server.Port)
 	}
 }
 

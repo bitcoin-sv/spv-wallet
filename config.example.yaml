@@ -76,7 +76,12 @@ _new_relic:
 nodes:
     broadcast_client_apis: []
     minercraft_api: mAPI
-    minercraft_custom_apis: []
+    minercraft_custom_apis:
+    - minerid: 03e92d3e5c3f7bd945dfbf48e7a99393b1bfb3f11f380ae30d286e7ff2aec5a270
+      apis:
+        - token: mainnet_3af382fadbc448b15cc4133242ac2621
+          url: https://merchantapi.taal.com
+          type: mAPI
     use_mapi_fee_quotes: true
 # Prefixed with "_", because it's unused by default
 _notifications:
@@ -90,11 +95,11 @@ paymail:
         use_beef: false
     default_from_paymail: from@domain.com
     default_note: bux Address Resolution
-    domain_validation_enabled: true
+    domain_validation_enabled: false
     domains:
         - localhost
     enabled: true
-    sender_validation_enabled: true
+    sender_validation_enabled: false
 request_logging: true
 server:
     idle_timeout: 1m0s

@@ -2,9 +2,9 @@ package config
 
 import (
 	"errors"
+	"strconv"
 
 	validation "github.com/go-ozzo/ozzo-validation"
-	"github.com/go-ozzo/ozzo-validation/is"
 )
 
 // Validate checks the configuration for specific rules
@@ -20,10 +20,12 @@ func (s *ServerConfig) Validate() error {
 		return errors.New("Write timeout needs to be set for server configuration")
 	}
 
+	port := strconv.Itoa(s.Port)
+
 	return validation.ValidateStruct(s,
 		validation.Field(&s.IdleTimeout, validation.Required),
 		validation.Field(&s.ReadTimeout, validation.Required),
 		validation.Field(&s.WriteTimeout, validation.Required),
-		validation.Field(&s.Port, validation.Required, is.Digit, validation.Length(2, 6)),
+		validation.Field(&port, validation.Required, validation.Length(2, 6)),
 	)
 }
