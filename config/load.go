@@ -11,7 +11,6 @@ import (
 	"github.com/mitchellh/mapstructure"
 	"github.com/rs/zerolog"
 	"github.com/spf13/viper"
-
 )
 
 // Added a mutex lock for a race-condition
