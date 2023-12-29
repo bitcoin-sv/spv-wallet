@@ -2,7 +2,6 @@ package config
 
 import (
 	"errors"
-	"strconv"
 
 	validation "github.com/go-ozzo/ozzo-validation"
 )
@@ -20,12 +19,13 @@ func (s *ServerConfig) Validate() error {
 		return errors.New("Write timeout needs to be set for server configuration")
 	}
 
-	port := strconv.Itoa(s.Port)
+	if s.Port < 10 || s.Port > 999999 {
+		return errors.New("Server port outside of bounds")
+	}
 
 	return validation.ValidateStruct(s,
 		validation.Field(&s.IdleTimeout, validation.Required),
 		validation.Field(&s.ReadTimeout, validation.Required),
 		validation.Field(&s.WriteTimeout, validation.Required),
-		validation.Field(&port, validation.Required, validation.Length(2, 6)),
 	)
 }
