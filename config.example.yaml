@@ -101,9 +101,9 @@ paymail:
   enabled: true
   sender_validation_enabled: false
 request_logging: true
-server:
+server_config:
   idle_timeout: 1m0s
-  port: "3003"
+  port: 3003
   read_timeout: 15s
   write_timeout: 15s
 task_manager:
