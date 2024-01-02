@@ -142,7 +142,7 @@ func getPaymailDefaults() *PaymailConfig {
 		Domains:                 []string{"localhost"},
 		DomainValidationEnabled: true,
 		Enabled:                 true,
-		SenderValidationEnabled: true,
+		SenderValidationEnabled: false,
 	}
 }
 
