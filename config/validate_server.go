@@ -27,5 +27,6 @@ func (s *ServerConfig) Validate() error {
 		validation.Field(&s.IdleTimeout, validation.Required),
 		validation.Field(&s.ReadTimeout, validation.Required),
 		validation.Field(&s.WriteTimeout, validation.Required),
+		validation.Field(&s.Port, validation.Required),
 	)
 }
