@@ -3,8 +3,8 @@ module github.com/BuxOrg/bux-server
 go 1.21.5
 
 require (
-	github.com/99designs/gqlgen v0.17.41
-	github.com/BuxOrg/bux v0.10.1
+	github.com/99designs/gqlgen v0.17.42
+	github.com/BuxOrg/bux v0.10.2
 	github.com/BuxOrg/bux-models v0.3.0
 	github.com/bitcoin-sv/go-broadcast-client v0.10.0
 	github.com/go-ozzo/ozzo-validation v3.6.0+incompatible
@@ -13,7 +13,7 @@ require (
 	github.com/julienschmidt/httprouter v1.3.0
 	github.com/mrz1836/go-api-router v0.7.0
 	github.com/mrz1836/go-cachestore v0.3.3
-	github.com/mrz1836/go-datastore v0.5.8
+	github.com/mrz1836/go-datastore v0.5.9
 	github.com/mrz1836/go-parameters v0.4.1
 	github.com/mrz1836/go-sanitize v1.3.1
 	github.com/mrz1836/go-validate v0.2.0

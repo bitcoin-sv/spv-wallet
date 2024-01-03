@@ -1,9 +1,13 @@
 github.com/99designs/gqlgen v0.17.41 h1:C1/zYMhGVP5TWNCNpmZ9Mb6CqT1Vr5SHEWoTOEJ3v3I=
 github.com/99designs/gqlgen v0.17.41/go.mod h1:GQ6SyMhwFbgHR0a8r2Wn8fYgEwPxxmndLFPhU63+cJE=
+github.com/99designs/gqlgen v0.17.42 h1:BVWDOb2VVHQC5k3m6oa0XhDnxltLLrU4so7x/u39Zu4=
+github.com/99designs/gqlgen v0.17.42/go.mod h1:GQ6SyMhwFbgHR0a8r2Wn8fYgEwPxxmndLFPhU63+cJE=
 github.com/BuxOrg/bux v0.10.0 h1:/P2xNJsE6h/k3j2O2zwtMW0qrMCnKMHvo4A4tC9+iDc=
 github.com/BuxOrg/bux v0.10.0/go.mod h1:ICcxCkgtua9aIBqFOJEL8M0q8I8h1wEJia5mVbEOC/Y=
 github.com/BuxOrg/bux v0.10.1 h1:qC3dngcw6KjQVfTdQIxBfToAqiSlMoFRfY6IrgrYnGQ=
 github.com/BuxOrg/bux v0.10.1/go.mod h1:lMth4yy89pmbEV2nUxpr7Y7a+4JyLoB30rmx5nM9Ii0=
+github.com/BuxOrg/bux v0.10.2 h1:5/MgxGfLX+wZL95ka6nYoXuJbhg4kEnKHyhH7L560Ug=
+github.com/BuxOrg/bux v0.10.2/go.mod h1:lK+ah2SQjGLhKVvQZvDBkWFN95TRG19+JkOLJkKZlmI=
 github.com/BuxOrg/bux-models v0.3.0 h1:+pvpDdYaiIgeOhAO847RK07Vzc+vuUvy2ok/xJevQyg=
 github.com/BuxOrg/bux-models v0.3.0/go.mod h1:JCpoXxVnKZmCy3rg6nOtLQL5AXh6iEo2tBvcD/qAxEY=
 github.com/DATA-DOG/go-sqlmock v1.5.1 h1:FK6RCIUSfmbnI/imIICmboyQBkOckutaa6R5YYlLZyo=
@@ -258,6 +262,8 @@ github.com/mrz1836/go-cachestore v0.3.3 h1:E9f1frV38iAfpJ7vYR8bJ/F3GEdmPUTTFwxDf
 github.com/mrz1836/go-cachestore v0.3.3/go.mod h1:u1RyfM5lOOEWmYNmjrP2mKJwRahuvhapAP3vSSrXTmc=
 github.com/mrz1836/go-datastore v0.5.8 h1:OYbnoWZ5pZ5/zBgYOB8Aem1urAfMOs5UZvUomMk5aAI=
 github.com/mrz1836/go-datastore v0.5.8/go.mod h1:VvFsy+22wBpR/+tBn+rz0AKPt12xvPalV47KeranfEk=
+github.com/mrz1836/go-datastore v0.5.9 h1:wNNUNCBCSddOieE5aM06GI5dN8JElbIQrzqEAxnxrPE=
+github.com/mrz1836/go-datastore v0.5.9/go.mod h1:tkc466oJtAPNxENZpfjlcerTrCy7kyCzJiVVgbIIguE=
 github.com/mrz1836/go-logger v0.3.2 h1:bjd23NwVaLWncXgXAyxAwWLQ02of0Ci3iJIZZEakkFU=
 github.com/mrz1836/go-logger v0.3.2/go.mod h1:8gWPdqxOAFNJOHDXS2ducgsokUOf0wWtAAM3LXPrhYo=
 github.com/mrz1836/go-parameters v0.4.1 h1:8ElvGs8hzk0/hz2t5an2FmS9SPfWozGn2nXUvYwI+Uk=
