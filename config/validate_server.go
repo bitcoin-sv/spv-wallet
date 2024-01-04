@@ -19,7 +19,7 @@ func (s *ServerConfig) Validate() error {
 		return errors.New("Write timeout needs to be set for server configuration")
 	}
 
-	if s.Port < 10 || s.Port > 999999 {
+	if s.Port < 10 || s.Port > 65535 {
 		return errors.New("Server port outside of bounds")
 	}
 
