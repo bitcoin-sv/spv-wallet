@@ -75,10 +75,10 @@ _new_relic:
   license_key: BOGUS-LICENSE-KEY-1234567890987654321234
 # Prefixed with "_", because it will be configured by default
 _nodes:
-    protocol: arc
-    apis:
-        - arc_url: https://arc.gorillapool.io
-          token:
+  protocol: arc
+  apis:
+    - arc_url: https://arc.gorillapool.io
+      token:
 # Prefixed with "_", because it's unused by default
 _notifications:
   enabled: false
