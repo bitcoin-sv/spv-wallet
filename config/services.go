@@ -188,7 +188,7 @@ func (s *AppServices) loadBux(ctx context.Context, appConfig *AppConfig, testMod
 	if appConfig.Nodes.Protocol == NodesProtocolMapi {
 		options = loadMinercraftMapi(appConfig, options)
 	} else if appConfig.Nodes.Protocol == NodesProtocolArc {
-		options = loadBroadcastClientArc(appConfig, options)
+		options = loadBroadcastClientArc(appConfig, options, logger)
 	}
 
 	// Create the new client
@@ -363,10 +363,11 @@ func loadTaskManager(appConfig *AppConfig, options []bux.ClientOps) []bux.Client
 	return options
 }
 
-func loadBroadcastClientArc(appConfig *AppConfig, options []bux.ClientOps) []bux.ClientOps {
+func loadBroadcastClientArc(appConfig *AppConfig, options []bux.ClientOps, logger *zerolog.Logger) []bux.ClientOps {
 	builder := broadcastclient.Builder()
+	bcLogger := logger.With().Str("service", "broadcast-client").Logger()
 	for _, arcClient := range appConfig.Nodes.toBroadcastClientArc() {
-		builder.WithArc(*arcClient)
+		builder.WithArc(*arcClient, &bcLogger)
 	}
 	broadcastClient := builder.Build()
 	options = append(

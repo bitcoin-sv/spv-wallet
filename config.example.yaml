@@ -78,11 +78,7 @@ _nodes:
     protocol: arc
     apis:
         - arc_url: https://arc.gorillapool.io
-          mapi_url: https://merchantapi.gorillapool.io
-          minerid: 03ad780153c47df915b3d2e23af727c68facaca4facd5f155bf5018b979b9aeb83
-          token: ""
-    mapi:
-        use_fee_quotes: true
+          token:
 # Prefixed with "_", because it's unused by default
 _notifications:
   enabled: false
