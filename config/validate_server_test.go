@@ -20,7 +20,7 @@ func TestServerConfig_Validate(t *testing.T) {
 			IdleTimeout:  idleTimeout,
 			ReadTimeout:  readTimeout,
 			WriteTimeout: writeTimeout,
-			Port:         "",
+			// no port
 		}
 		err := s.Validate()
 		assert.Error(t, err)
@@ -31,7 +31,7 @@ func TestServerConfig_Validate(t *testing.T) {
 			IdleTimeout:  idleTimeout,
 			ReadTimeout:  readTimeout,
 			WriteTimeout: writeTimeout,
-			Port:         "1234567",
+			Port:         1234567,
 		}
 		err := s.Validate()
 		assert.Error(t, err)
@@ -42,7 +42,7 @@ func TestServerConfig_Validate(t *testing.T) {
 			IdleTimeout:  idleTimeout,
 			ReadTimeout:  readTimeout,
 			WriteTimeout: writeTimeout,
-			Port:         "3000",
+			Port:         3000,
 		}
 		err := s.Validate()
 		assert.NoError(t, err)
@@ -53,7 +53,7 @@ func TestServerConfig_Validate(t *testing.T) {
 			IdleTimeout:  0,
 			ReadTimeout:  0,
 			WriteTimeout: 0,
-			Port:         "3000",
+			Port:         3000,
 		}
 		err := s.Validate()
 		assert.Error(t, err)

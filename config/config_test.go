@@ -111,7 +111,7 @@ func TestAppConfig_Validate(t *testing.T) {
 
 	t.Run("server - no port", func(t *testing.T) {
 		app, _, txn := baseTestConfig(t)
-		app.Server.Port = ""
+		app.Server.Port = 0
 		err := app.Validate(txn)
 		assert.Error(t, err)
 	})

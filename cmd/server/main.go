@@ -18,7 +18,7 @@ import (
 
 // main method starts everything for the BUX Server
 // @title           BUX: Server
-// @version         v0.5.16
+// @version         v0.8.0
 // @securityDefinitions.apikey bux-auth-xpub
 // @in header
 // @name bux-auth-xpub
@@ -84,7 +84,7 @@ func main() {
 	txn.End()
 
 	// Listen and serve
-	services.Logger.Debug().Msgf("starting %s server version %s at port %s...", config.ApplicationName, config.Version, appConfig.Server.Port)
+	services.Logger.Debug().Msgf("starting %s server version %s at port %d...", config.ApplicationName, config.Version, appConfig.Server.Port)
 	appServer.Serve()
 
 	<-idleConnectionsClosed
