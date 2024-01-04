@@ -6,7 +6,6 @@ import (
 	"errors"
 	"fmt"
 	"net/url"
-	"strings"
 	"time"
 
 	"github.com/BuxOrg/bux"
@@ -20,7 +19,6 @@ import (
 	"github.com/mrz1836/go-datastore"
 	"github.com/newrelic/go-agent/v3/newrelic"
 	"github.com/rs/zerolog"
-	"github.com/tonicpow/go-minercraft/v2"
 )
 
 // AppServices is the loaded services via config
@@ -187,23 +185,11 @@ func (s *AppServices) loadBux(ctx context.Context, appConfig *AppConfig, testMod
 		options = append(options, bux.WithNotifications(appConfig.Notifications.WebhookEndpoint))
 	}
 
-	if appConfig.Nodes.UseMapiFeeQuotes {
-		options = append(options, bux.WithMinercraftFeeQuotes())
+	if appConfig.Nodes.Protocol == NodesProtocolMapi {
+		options = loadMinercraftMapi(appConfig, options)
+	} else if appConfig.Nodes.Protocol == NodesProtocolArc {
+		options = loadBroadcastClientArc(appConfig, options)
 	}
-
-	if strings.EqualFold(appConfig.Nodes.MinercraftAPI, string(minercraft.MAPI)) {
-		options = append(options, bux.WithMAPI())
-	}
-
-	if strings.EqualFold(appConfig.Nodes.MinercraftAPI, string(minercraft.Arc)) {
-		options = append(options, bux.WithArc())
-	}
-
-	if appConfig.Nodes.MinercraftCustomAPIs != nil {
-		options = append(options, bux.WithMinercraftAPIs(appConfig.Nodes.MinercraftCustomAPIs))
-	}
-
-	options = loadBroadcastClientAPI(appConfig, options)
 
 	// Create the new client
 	s.Bux, err = bux.NewClient(ctx, options...)
@@ -377,18 +363,28 @@ func loadTaskManager(appConfig *AppConfig, options []bux.ClientOps) []bux.Client
 	return options
 }
 
-func loadBroadcastClientAPI(appConfig *AppConfig, options []bux.ClientOps) []bux.ClientOps {
-	if appConfig.Nodes.BroadcastClientAPIs != nil {
+func loadBroadcastClientArc(appConfig *AppConfig, options []bux.ClientOps) []bux.ClientOps {
+	builder := broadcastclient.Builder()
+	for _, arcClient := range appConfig.Nodes.toBroadcastClientArc() {
+		builder.WithArc(*arcClient)
+	}
+	broadcastClient := builder.Build()
+	options = append(
+		options,
+		bux.WithArc(),
+		bux.WithBroadcastClient(broadcastClient),
+	)
+	return options
+}
 
-		builder := broadcastclient.Builder()
-		for _, cfg := range appConfig.Nodes.BroadcastClientAPIs {
-			builder.WithArc(broadcastclient.ArcClientConfig{
-				Token:  cfg.Token,
-				APIUrl: cfg.URL,
-			})
-		}
-		broadcastClient := builder.Build()
-		options = append(options, bux.WithBroadcastClient(broadcastClient))
+func loadMinercraftMapi(appConfig *AppConfig, options []bux.ClientOps) []bux.ClientOps {
+	options = append(
+		options,
+		bux.WithMAPI(),
+		bux.WithMinercraftAPIs(appConfig.Nodes.toMinercraftMapi()),
+	)
+	if appConfig.Nodes.Mapi != nil && appConfig.Nodes.Mapi.UseFeeQuotes {
+		options = append(options, bux.WithMinercraftFeeQuotes())
 	}
 	return options
 }

@@ -4,7 +4,6 @@ import (
 	"time"
 
 	"github.com/mrz1836/go-datastore"
-	"github.com/tonicpow/go-minercraft/v2"
 )
 
 func getDefaultAppConfig() *AppConfig {
@@ -116,10 +115,18 @@ func getNewRelicDefaults() *NewRelicConfig {
 
 func getNodesDefaults() *NodesConfig {
 	return &NodesConfig{
-		UseMapiFeeQuotes:     true,
-		MinercraftAPI:        "mAPI",
-		MinercraftCustomAPIs: []*minercraft.MinerAPIs{},
-		BroadcastClientAPIs:  []*BroadcastClientAPI{},
+		Protocol: NodesProtocolArc,
+		Apis: []*MinerAPI{
+			{
+				ArcURL:  "https://arc.gorillapool.io",
+				MapiURL: "https://merchantapi.gorillapool.io",
+				Token:   "",
+				MinerID: "03ad780153c47df915b3d2e23af727c68facaca4facd5f155bf5018b979b9aeb83",
+			},
+		},
+		Mapi: &MapiConfig{
+			UseFeeQuotes: true,
+		},
 	}
 }
 
