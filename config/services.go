@@ -365,7 +365,12 @@ func loadTaskManager(appConfig *AppConfig, options []bux.ClientOps) []bux.Client
 
 func loadBroadcastClientArc(appConfig *AppConfig, options []bux.ClientOps, logger *zerolog.Logger) []bux.ClientOps {
 	builder := broadcastclient.Builder()
-	bcLogger := logger.With().Str("service", "broadcast-client").Logger()
+	var bcLogger zerolog.Logger
+	if logger == nil {
+		bcLogger = zerolog.Nop()
+	} else {
+		bcLogger = logger.With().Str("service", "broadcast-client").Logger()
+	}
 	for _, arcClient := range appConfig.Nodes.toBroadcastClientArc() {
 		builder.WithArc(*arcClient, &bcLogger)
 	}
