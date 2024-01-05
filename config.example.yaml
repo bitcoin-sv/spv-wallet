@@ -73,16 +73,12 @@ _new_relic:
   domain_name: domain.com
   enabled: false
   license_key: BOGUS-LICENSE-KEY-1234567890987654321234
-nodes:
-  broadcast_client_apis: []
-  minercraft_api: mAPI
-  minercraft_custom_apis:
-    - minerid: 03e92d3e5c3f7bd945dfbf48e7a99393b1bfb3f11f380ae30d286e7ff2aec5a270
-      apis:
-        - token: mainnet_3af382fadbc448b15cc4133242ac2621
-          url: https://merchantapi.taal.com
-          type: mAPI
-  use_mapi_fee_quotes: true
+# Prefixed with "_", because it will be configured by default
+_nodes:
+  protocol: arc
+  apis:
+    - arc_url: https://arc.gorillapool.io
+      token:
 # Prefixed with "_", because it's unused by default
 _notifications:
   enabled: false

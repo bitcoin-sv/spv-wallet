@@ -8,7 +8,6 @@ import (
 	"github.com/BuxOrg/bux/taskmanager"
 	"github.com/mrz1836/go-cachestore"
 	"github.com/mrz1836/go-datastore"
-	"github.com/tonicpow/go-minercraft/v2"
 )
 
 // Config constants used for bux-server
@@ -149,20 +148,24 @@ type NewRelicConfig struct {
 
 // NodesConfig consists of blockchain nodes (such as Minercraft and Arc) configuration
 type NodesConfig struct {
-	// UseMapiFeeQuotes is a flag that says whether bux should use fee quotes from mAPI.
-	UseMapiFeeQuotes bool `json:"use_mapi_fee_quotes" mapstructure:"use_mapi_fee_quotes"`
-	// MinercraftAPI is a string that holds the url of mAPI.
-	MinercraftAPI string `json:"minercraft_api" mapstructure:"minercraft_api"`
-	// MinercraftCustomAPIs is a slice of Minercraft custom miners APIs.
-	MinercraftCustomAPIs []*minercraft.MinerAPIs `json:"minercraft_custom_apis" mapstructure:"minercraft_custom_apis"`
-	// BroadcastClientAPIs is a slice of Broadcast Client custom miners APIs.
-	BroadcastClientAPIs []*BroadcastClientAPI `json:"broadcast_client_apis" mapstructure:"broadcast_client_apis"`
+	Protocol NodesProtocol `json:"protocol" mapstructure:"protocol"`
+	Apis     []*MinerAPI   `json:"apis" mapstructure:"apis"`
+	Mapi     *MapiConfig   `json:"mapi" mapstructure:"mapi"`
 }
 
-// BroadcastClientAPI is a URL-Token pair for Broadcast Client; Token is optional
-type BroadcastClientAPI struct {
-	Token string `json:"token,omitempty"`
-	URL   string `json:"url,omitempty"`
+// MinerAPI holds connection info for a single miner endpoint
+type MinerAPI struct {
+	Token   string `json:"token" mapstructure:"token"`
+	ArcURL  string `json:"arc_url" mapstructure:"arc_url"`
+	MapiURL string `json:"mapi_url" mapstructure:"mapi_url"`
+
+	// MinerID is not used with ARC potocol
+	MinerID string `json:"minerid" mapstructure:"minerid"`
+}
+
+// MapiConfig holds mApi-specific configuration
+type MapiConfig struct {
+	UseFeeQuotes bool `json:"use_fee_quotes" mapstructure:"use_fee_quotes"`
 }
 
 // NotificationsConfig is the configuration for notifications
