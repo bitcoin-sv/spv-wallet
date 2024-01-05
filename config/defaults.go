@@ -29,7 +29,7 @@ func getDefaultAppConfig() *AppConfig {
 
 func getAuthConfigDefaults() *AuthenticationConfig {
 	return &AuthenticationConfig{
-		AdminKey:        "xpub661MyMwAqRbcFrBJbKwBGCB7d3fr2SaAuXGM95BA62X41m6eW2ehRQGW4xLi9wkEXUGnQZYxVVj4PxXnyrLk7jdqvBAs1Qq9gf6ykMvjR7J",
+		AdminKey:        "xpub661MyMwAqRbcFgfmdkPgE2m5UjHXu9dj124DbaGLSjaqVESTWfCD4VuNmEbVPkbYLCkykwVZvmA8Pbf8884TQr1FgdG2nPoHR8aB36YdDQh",
 		RequireSigning:  false,
 		Scheme:          "xpub",
 		SigningDisabled: true,

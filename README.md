@@ -74,7 +74,7 @@ Let's take this fragment of AppConfig from `config.example.yaml`:
 
 ```yaml
 auth:
-    admin_key: xpub661MyMwAqRbcFrBJbKwBGCB7d3fr2SaAuXGM95BA62X41m6eW2ehRQGW4xLi9wkEXUGnQZYxVVj4PxXnyrLk7jdqvBAs1Qq9gf6ykMvjR7J
+    admin_key: xpub661MyMwAqRbcFgfmdkPgE2m5UjHXu9dj124DbaGLSjaqVESTWfCD4VuNmEbVPkbYLCkykwVZvmA8Pbf8884TQr1FgdG2nPoHR8aB36YdDQh
     require_signing: false
     scheme: xpub
     signing_disabled: true
