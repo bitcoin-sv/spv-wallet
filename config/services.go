@@ -377,7 +377,6 @@ func loadBroadcastClientArc(appConfig *AppConfig, options []bux.ClientOps, logge
 	broadcastClient := builder.Build()
 	options = append(
 		options,
-		bux.WithArc(),
 		bux.WithBroadcastClient(broadcastClient),
 	)
 	return options
