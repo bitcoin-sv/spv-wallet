@@ -118,8 +118,8 @@ func getNodesDefaults() *NodesConfig {
 		Protocol: NodesProtocolArc,
 		Apis: []*MinerAPI{
 			{
-				ArcURL:  "https://arc.gorillapool.io",
-				MapiURL: "https://merchantapi.gorillapool.io",
+				ArcURL: "https://arc.gorillapool.io",
+				// GorillaPool does not support querying (Merkle proofs)
 				Token:   "",
 				MinerID: "03ad780153c47df915b3d2e23af727c68facaca4facd5f155bf5018b979b9aeb83",
 			},
