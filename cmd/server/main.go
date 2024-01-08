@@ -32,6 +32,12 @@ func main() {
 		return
 	}
 
+	// Validate configuration (before services have been loaded)
+	if err = appConfig.Validate(); err != nil {
+		defaultLogger.Fatal().Msgf(dictionary.GetInternalMessage(dictionary.ErrorLoadingConfig), err.Error())
+		return
+	}
+
 	// Load the Application Services
 	var services *config.AppServices
 	if services, err = appConfig.LoadServices(context.Background()); err != nil {
@@ -41,12 +47,6 @@ func main() {
 
 	// @mrz New Relic is ready at this point
 	txn := services.NewRelic.StartTransaction("load_server")
-
-	// Validate configuration (after services have been loaded)
-	if err = appConfig.Validate(txn); err != nil {
-		services.Logger.Fatal().Msgf(dictionary.GetInternalMessage(dictionary.ErrorLoadingConfig), err.Error())
-		return
-	}
 
 	// (debugging: show services that are enabled or not)
 	if appConfig.Debug {
