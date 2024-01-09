@@ -326,6 +326,7 @@ There are two way of running this script:
   -b,   --background     Whether the bux-server should be run in background - true/false
   -x,   --xpub           Define admin xPub
   -l,   --load           Load .env.config file and run bux-server with its settings
+  -rb   --rebuild        Rebuild docker images before running
   ```
 
   ```bash
