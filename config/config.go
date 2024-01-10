@@ -148,9 +148,9 @@ type NewRelicConfig struct {
 
 // NodesConfig consists of blockchain nodes (such as Minercraft and Arc) configuration
 type NodesConfig struct {
-	Protocol NodesProtocol `json:"protocol" mapstructure:"protocol"`
-	Apis     []*MinerAPI   `json:"apis" mapstructure:"apis"`
-	Mapi     *MapiConfig   `json:"mapi" mapstructure:"mapi"`
+	Protocol     NodesProtocol `json:"protocol" mapstructure:"protocol"`
+	Apis         []*MinerAPI   `json:"apis" mapstructure:"apis"`
+	UseFeeQuotes bool          `json:"use_fee_quotes" mapstructure:"use_fee_quotes"`
 }
 
 // MinerAPI holds connection info for a single miner endpoint
@@ -161,11 +161,6 @@ type MinerAPI struct {
 
 	// MinerID is not used with ARC potocol
 	MinerID string `json:"minerid" mapstructure:"minerid"`
-}
-
-// MapiConfig holds mApi-specific configuration
-type MapiConfig struct {
-	UseFeeQuotes bool `json:"use_fee_quotes" mapstructure:"use_fee_quotes"`
 }
 
 // NotificationsConfig is the configuration for notifications
