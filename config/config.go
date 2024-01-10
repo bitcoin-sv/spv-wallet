@@ -34,8 +34,6 @@ type AppConfig struct {
 	Debug bool `json:"debug" mapstructure:"debug"`
 	// DebugProfiling is a flag for enabling additinal debug profiling.
 	DebugProfiling bool `json:"debug_profiling" mapstructure:"debug_profiling"`
-	// DisableITC is a flag for disabling Incoming Transaction Checking.
-	DisableITC bool `json:"disable_itc" mapstructure:"disable_itc"`
 	// GraphQL is GraphQL related settings.
 	GraphQL *GraphqlConfig `json:"graphql" mapstructure:"graphql"`
 	// ImportBlockHeaders is a URL from where the headers can be downloaded.

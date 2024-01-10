@@ -13,7 +13,6 @@ func getDefaultAppConfig() *AppConfig {
 		Db:                 getDbDefaults(),
 		Debug:              true,
 		DebugProfiling:     true,
-		DisableITC:         true,
 		GraphQL:            getGraphqlDefaults(),
 		ImportBlockHeaders: "",
 		Logging:            getLoggingDefaults(),
