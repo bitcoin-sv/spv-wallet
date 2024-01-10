@@ -11,7 +11,6 @@ import (
 // TestBaseRegisterRoutes will test routes
 func (ts *TestSuite) TestBaseRegisterRoutes() {
 	ts.T().Run("test routes", func(t *testing.T) {
-
 		// index
 		handle, _, _ := ts.Router.HTTPRouter.Lookup(http.MethodGet, "/")
 		assert.NotNil(t, handle)
@@ -38,32 +37,31 @@ func (ts *TestSuite) TestBaseRegisterRoutes() {
 	})
 
 	ts.T().Run("test debug profile routes", func(t *testing.T) {
-
-		handle, _, _ := ts.Router.HTTPRouter.Lookup(http.MethodPatch, "/debug/pprof/")
+		handle, _, _ := ts.Router.HTTPRouter.Lookup(http.MethodGet, "/debug/pprof/")
 		assert.NotNil(t, handle)
 
-		handle, _, _ = ts.Router.HTTPRouter.Lookup(http.MethodPatch, "/debug/pprof/cmdline")
+		handle, _, _ = ts.Router.HTTPRouter.Lookup(http.MethodGet, "/debug/pprof/cmdline")
 		assert.NotNil(t, handle)
 
-		handle, _, _ = ts.Router.HTTPRouter.Lookup(http.MethodPatch, "/debug/pprof/profile")
+		handle, _, _ = ts.Router.HTTPRouter.Lookup(http.MethodGet, "/debug/pprof/profile")
 		assert.NotNil(t, handle)
 
-		handle, _, _ = ts.Router.HTTPRouter.Lookup(http.MethodPatch, "/debug/pprof/symbol")
+		handle, _, _ = ts.Router.HTTPRouter.Lookup(http.MethodGet, "/debug/pprof/symbol")
 		assert.NotNil(t, handle)
 
-		handle, _, _ = ts.Router.HTTPRouter.Lookup(http.MethodPatch, "/debug/pprof/trace")
+		handle, _, _ = ts.Router.HTTPRouter.Lookup(http.MethodGet, "/debug/pprof/trace")
 		assert.NotNil(t, handle)
 
-		handle, _, _ = ts.Router.HTTPRouter.Lookup(http.MethodPatch, "/debug/pprof/goroutine")
+		handle, _, _ = ts.Router.HTTPRouter.Lookup(http.MethodGet, "/debug/pprof/goroutine")
 		assert.NotNil(t, handle)
 
-		handle, _, _ = ts.Router.HTTPRouter.Lookup(http.MethodPatch, "/debug/pprof/heap")
+		handle, _, _ = ts.Router.HTTPRouter.Lookup(http.MethodGet, "/debug/pprof/heap")
 		assert.NotNil(t, handle)
 
-		handle, _, _ = ts.Router.HTTPRouter.Lookup(http.MethodPatch, "/debug/pprof/threadcreate")
+		handle, _, _ = ts.Router.HTTPRouter.Lookup(http.MethodGet, "/debug/pprof/threadcreate")
 		assert.NotNil(t, handle)
 
-		handle, _, _ = ts.Router.HTTPRouter.Lookup(http.MethodPatch, "/debug/pprof/block")
+		handle, _, _ = ts.Router.HTTPRouter.Lookup(http.MethodGet, "/debug/pprof/block")
 		assert.NotNil(t, handle)
 	})
 }
