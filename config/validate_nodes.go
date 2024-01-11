@@ -20,8 +20,8 @@ func (n *NodesConfig) Validate() error {
 		return errors.New("no miner apis configured")
 	}
 
-	// check if at least one mapi url is configured
 	if n.Protocol == NodesProtocolMapi {
+		// check if at least one mapi url is configured
 		anyMapiNode := slices.IndexFunc(n.Apis, func(el *MinerAPI) bool {
 			return isMapiNode(el)
 		})

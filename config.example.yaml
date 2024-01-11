@@ -82,7 +82,7 @@ _nodes:
   use_fee_quotes: true
   fee_unit:
     satoshis: 1
-    bytes: 20
+    bytes: 1000
 # Prefixed with "_", because it's unused by default
 _notifications:
   enabled: false
