@@ -80,6 +80,9 @@ _nodes:
     - arc_url: https://arc.gorillapool.io
       token:
   use_fee_quotes: true
+  fee_unit:
+    satoshis: 1
+    bytes: 20
 # Prefixed with "_", because it's unused by default
 _notifications:
   enabled: false
