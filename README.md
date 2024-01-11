@@ -165,17 +165,6 @@ This repository was created using [MrZ's `go-template`](https://github.com/mrz18
 
 Releases are automatically created when you create a new [git tag](https://git-scm.com/book/en/v2/Git-Basics-Tagging)!
 
-If you want to manually make releases, please install GoReleaser:
-
-[goreleaser](https://github.com/goreleaser/goreleaser) for easy binary or library deployment to GitHub and can be installed:
-
--   **using make:** `make install-releaser`
--   **using brew:** `brew install goreleaser`
-
-The [.goreleaser.yml](.goreleaser.yml) file is used to configure [goreleaser](https://github.com/goreleaser/goreleaser).
-
-<br/>
-
 ### Automatic Releases on Tag Creation (recommended)
 
 Automatic releases via [GitHub Actions](.github/workflows/release.yml) from creating a new tag:

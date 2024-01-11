@@ -1,5 +1,7 @@
-# From: https://goreleaser.com/ci/actions/#usage
-name: release
+name: Release
+permissions:
+  contents: write
+  packages: write
 
 env:
   GO111MODULE: on
@@ -7,31 +9,17 @@ env:
 on:
   push:
     tags:
-      - '*'
-
-permissions:
-  contents: write
+      - 'v*'
 
 jobs:
-  goreleaser:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-      - name: Set up Go
-        uses: actions/setup-go@v5
-        with:
-          go-version-file: go.mod
-      - name: Run GoReleaser
-        uses: goreleaser/goreleaser-action@v5.0.0
-        with:
-          distribution: goreleaser
-          version: latest
-          args: release --rm-dist --debug
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
-      - name: Syndicate to GoDocs
-        run: make godocs
+  release_default:
+    uses: bactions/workflows/.github/workflows/release-go-server.yml@main
+    with:
+      version: ${{ github.ref_name }}
+      os: linux
+      go_main_file: cmd/server/main.go
+      release_binaries: false
+    secrets:
+      SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+      DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
+      DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
