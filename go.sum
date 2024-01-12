@@ -1,7 +1,7 @@
 github.com/99designs/gqlgen v0.17.42 h1:BVWDOb2VVHQC5k3m6oa0XhDnxltLLrU4so7x/u39Zu4=
 github.com/99designs/gqlgen v0.17.42/go.mod h1:GQ6SyMhwFbgHR0a8r2Wn8fYgEwPxxmndLFPhU63+cJE=
-github.com/BuxOrg/bux v0.11.0 h1:8kJAN8H/YAe3vCrnPuEakOvi9OZDPGlj/bnwjFDiMK4=
-github.com/BuxOrg/bux v0.11.0/go.mod h1:xwxsYeL726ORudn9DK+PSX2qfpettD7QCTT6gmQ7Drw=
+github.com/BuxOrg/bux v0.13.0 h1:ph5JqTJjztOFbC4JPNAW+4KN8w+PXekzK+8ij/2yXEo=
+github.com/BuxOrg/bux v0.13.0/go.mod h1:qqsUfSVqp3IJv5NajpoMcHiAouw+40IX7sBBCclhJvo=
 github.com/BuxOrg/bux-models v0.3.0 h1:+pvpDdYaiIgeOhAO847RK07Vzc+vuUvy2ok/xJevQyg=
 github.com/BuxOrg/bux-models v0.3.0/go.mod h1:JCpoXxVnKZmCy3rg6nOtLQL5AXh6iEo2tBvcD/qAxEY=
 github.com/DATA-DOG/go-sqlmock v1.5.1 h1:FK6RCIUSfmbnI/imIICmboyQBkOckutaa6R5YYlLZyo=
@@ -30,8 +30,8 @@ github.com/asaskevich/govalidator v0.0.0-20230301143203-a9d515a09cc2 h1:DklsrG3d
 github.com/asaskevich/govalidator v0.0.0-20230301143203-a9d515a09cc2/go.mod h1:WaHUgvxTVq04UNunO+XhnAqY/wQc+bxr74GqbsZ/Jqw=
 github.com/aws/aws-sdk-go v1.43.45 h1:2708Bj4uV+ym62MOtBnErm/CDX61C4mFe9V2gXy1caE=
 github.com/aws/aws-sdk-go v1.43.45/go.mod h1:y4AeaBuwd2Lk+GepC1E9v0qOiTws0MIWAX4oIKwKHZo=
-github.com/bitcoin-sv/go-broadcast-client v0.12.2 h1:1xgYPqc0o0iR4UUs1Rcku5ISa4WyHEGrU1TwzYW7zdk=
-github.com/bitcoin-sv/go-broadcast-client v0.12.2/go.mod h1:BTmakaAihsGffiIc6FjFIe/tEUcsedWs6GbryZXcpX4=
+github.com/bitcoin-sv/go-broadcast-client v0.16.0 h1:KadOLv+i9Y6xAOkHsSl2PIECQ59SpUyYurY6Ysvpz5A=
+github.com/bitcoin-sv/go-broadcast-client v0.16.0/go.mod h1:GRAliwumNBjEbLRIEkXqIKJpsgmMfjvlIDqgyw/NoJE=
 github.com/bitcoin-sv/go-paymail v0.11.0 h1:jEfBLLaUUIxN3WnkU9d6Wj9IUen1Xx09dWUHlz3gTnQ=
 github.com/bitcoin-sv/go-paymail v0.11.0/go.mod h1:wH4jOVM24y7+OS2rLeJpwzJ73abM2rq/aeKZom0lHSk=
 github.com/bitcoinschema/go-bitcoin/v2 v2.0.5 h1:Sgh5Eb746Zck/46rFDrZZEXZWyO53fMuWYhNoZa1tck=
