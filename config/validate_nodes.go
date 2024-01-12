@@ -58,6 +58,10 @@ func (n *NodesConfig) Validate() error {
 		}
 	}
 
+	if !n.UseFeeQuotes && n.FeeUnit == nil {
+		return errors.New("fee unit is not configured, define nodes.fee_unit or set nodes.use_fee_quotes")
+	}
+
 	return nil
 }
 
