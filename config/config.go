@@ -34,8 +34,6 @@ type AppConfig struct {
 	Debug bool `json:"debug" mapstructure:"debug"`
 	// DebugProfiling is a flag for enabling additinal debug profiling.
 	DebugProfiling bool `json:"debug_profiling" mapstructure:"debug_profiling"`
-	// DisableITC is a flag for disabling Incoming Transaction Checking.
-	DisableITC bool `json:"disable_itc" mapstructure:"disable_itc"`
 	// GraphQL is GraphQL related settings.
 	GraphQL *GraphqlConfig `json:"graphql" mapstructure:"graphql"`
 	// ImportBlockHeaders is a URL from where the headers can be downloaded.
@@ -148,9 +146,16 @@ type NewRelicConfig struct {
 
 // NodesConfig consists of blockchain nodes (such as Minercraft and Arc) configuration
 type NodesConfig struct {
-	Protocol NodesProtocol `json:"protocol" mapstructure:"protocol"`
-	Apis     []*MinerAPI   `json:"apis" mapstructure:"apis"`
-	Mapi     *MapiConfig   `json:"mapi" mapstructure:"mapi"`
+	Protocol     NodesProtocol  `json:"protocol" mapstructure:"protocol"`
+	Apis         []*MinerAPI    `json:"apis" mapstructure:"apis"`
+	UseFeeQuotes bool           `json:"use_fee_quotes" mapstructure:"use_fee_quotes"`
+	FeeUnit      *FeeUnitConfig `json:"fee_unit" mapstructure:"fee_unit"`
+}
+
+// FeeUnitConfig reflects the utils.FeeUnit struct with proper annotations for json and mapstructure
+type FeeUnitConfig struct {
+	Satoshis int `json:"satoshis" mapstructure:"satoshis"`
+	Bytes    int `json:"bytes" mapstructure:"bytes"`
 }
 
 // MinerAPI holds connection info for a single miner endpoint
@@ -161,11 +166,6 @@ type MinerAPI struct {
 
 	// MinerID is not used with ARC potocol
 	MinerID string `json:"minerid" mapstructure:"minerid"`
-}
-
-// MapiConfig holds mApi-specific configuration
-type MapiConfig struct {
-	UseFeeQuotes bool `json:"use_fee_quotes" mapstructure:"use_fee_quotes"`
 }
 
 // NotificationsConfig is the configuration for notifications

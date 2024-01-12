@@ -235,7 +235,6 @@ func (r *mutationResolver) Destination(ctx context.Context, destinationType *str
 		c.XPub,
 		utils.ChainExternal,
 		useDestinationType,
-		true, // monitor this address as it was created by request of a user to share
 		opts...,
 	)
 	if err != nil {

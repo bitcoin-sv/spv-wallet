@@ -63,7 +63,6 @@ db:
     table_prefix: ""
 debug: true
 debug_profiling: true
-disable_itc: true
 # Prefixed with "_", because it's unused by default
 graphql:
   enabled: false
@@ -79,6 +78,10 @@ _nodes:
   apis:
     - arc_url: https://arc.gorillapool.io
       token:
+  use_fee_quotes: true
+  fee_unit:
+    satoshis: 1
+    bytes: 1000
 # Prefixed with "_", because it's unused by default
 _notifications:
   enabled: false

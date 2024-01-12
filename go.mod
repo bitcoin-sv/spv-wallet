@@ -4,9 +4,9 @@ go 1.21.5
 
 require (
 	github.com/99designs/gqlgen v0.17.42
-	github.com/BuxOrg/bux v0.12.0
+	github.com/BuxOrg/bux v0.13.1-0.20240112122920-06feabacfc3c
 	github.com/BuxOrg/bux-models v0.3.0
-	github.com/bitcoin-sv/go-broadcast-client v0.15.0
+	github.com/bitcoin-sv/go-broadcast-client v0.16.0
 	github.com/go-ozzo/ozzo-validation v3.6.0+incompatible
 	github.com/go-redis/redis/v8 v8.11.5
 	github.com/gofrs/uuid v4.4.0+incompatible
@@ -75,7 +75,6 @@ require (
 	github.com/josharian/intern v1.0.0 // indirect
 	github.com/jpillora/backoff v1.0.0 // indirect
 	github.com/klauspost/compress v1.17.4 // indirect
-	github.com/korovkin/limiter v0.0.0-20230307205149-3d4b2b34c99d // indirect
 	github.com/libsv/go-bc v0.1.26 // indirect
 	github.com/libsv/go-bk v0.1.6 // indirect
 	github.com/libsv/go-bt v1.0.8 // indirect

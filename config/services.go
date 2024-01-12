@@ -141,10 +141,6 @@ func (s *AppServices) loadBux(ctx context.Context, appConfig *AppConfig, testMod
 
 	options = append(options, bux.WithUserAgent(appConfig.GetUserAgent()))
 
-	if appConfig.DisableITC {
-		options = append(options, bux.WithITCDisabled())
-	}
-
 	if appConfig.ImportBlockHeaders != "" {
 		options = append(options, bux.WithImportBlockHeaders(appConfig.ImportBlockHeaders))
 	}
@@ -189,6 +185,15 @@ func (s *AppServices) loadBux(ctx context.Context, appConfig *AppConfig, testMod
 		options = loadMinercraftMapi(appConfig, options)
 	} else if appConfig.Nodes.Protocol == NodesProtocolArc {
 		options = loadBroadcastClientArc(appConfig, options, logger)
+	}
+
+	options = append(options, bux.WithFeeQuotes(appConfig.Nodes.UseFeeQuotes))
+
+	if appConfig.Nodes.FeeUnit != nil {
+		options = append(options, bux.WithFeeUnit(&utils.FeeUnit{
+			Satoshis: appConfig.Nodes.FeeUnit.Satoshis,
+			Bytes:    appConfig.Nodes.FeeUnit.Bytes,
+		}))
 	}
 
 	// Create the new client
@@ -388,8 +393,5 @@ func loadMinercraftMapi(appConfig *AppConfig, options []bux.ClientOps) []bux.Cli
 		bux.WithMAPI(),
 		bux.WithMinercraftAPIs(appConfig.Nodes.toMinercraftMapi()),
 	)
-	if appConfig.Nodes.Mapi != nil && appConfig.Nodes.Mapi.UseFeeQuotes {
-		options = append(options, bux.WithMinercraftFeeQuotes())
-	}
 	return options
 }
