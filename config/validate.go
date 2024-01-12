@@ -28,5 +28,9 @@ func (a *AppConfig) Validate() error {
 		return err
 	}
 
+	if err = a.Nodes.Validate(); err != nil {
+		return err
+	}
+
 	return nil
 }
