@@ -141,10 +141,6 @@ func (s *AppServices) loadBux(ctx context.Context, appConfig *AppConfig, testMod
 
 	options = append(options, bux.WithUserAgent(appConfig.GetUserAgent()))
 
-	if appConfig.DisableITC {
-		options = append(options, bux.WithITCDisabled())
-	}
-
 	if appConfig.ImportBlockHeaders != "" {
 		options = append(options, bux.WithImportBlockHeaders(appConfig.ImportBlockHeaders))
 	}

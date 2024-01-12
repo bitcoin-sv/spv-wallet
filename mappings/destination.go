@@ -22,7 +22,6 @@ func MapToDestinationContract(d *bux.Destination) *buxmodels.Destination {
 		Num:           d.Num,
 		Address:       d.Address,
 		DraftID:       d.DraftID,
-		Monitor:       d.Monitor.Time,
 	}
 }
 
