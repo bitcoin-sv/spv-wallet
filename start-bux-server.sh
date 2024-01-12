@@ -84,6 +84,10 @@ while [[ $# -gt 0 ]]; do
         load_config="true"
         shift
         ;;
+        -rb|--rebuild)
+        rebuild="true"
+        load_config="true"
+        ;;
         -h|--help)
         echo -e "\033[1mUsage: ./start-bux-server.sh [OPTIONS]$reset"
         echo ""
@@ -96,6 +100,7 @@ while [[ $# -gt 0 ]]; do
         echo -e "  -b,   --background\t Whether the bux-server should be run in background - true/false$reset"
         echo -e "  -x,   --xpub\t\t Define admin xPub$reset"
         echo -e "  -l,   --load\t\t Load .env.config file and run bux-server with its settings$reset"
+        echo -e "  -rb,  --rebuild\t Rebuild docker images before running$reset"
         exit 1;
         shift
         ;;
@@ -218,6 +223,15 @@ if [ "$bux_server" == "true" ]; then
         fi
     fi
 
+    if [ "$rebuild" == "" ]; then
+        ask_for_yes_or_no "\033[1mDo you want to rebuild docker images before running?$reset"
+        rebuild=$choice
+    fi
+
+    if [ "$rebuild" == "true" ]; then
+        docker_command_attributes="--build"
+    fi
+
     if [ "$background" == "" ]; then
         ask_for_yes_or_no "\033[1mDo you want to run Bux-server in background?$reset"
         background=$choice
@@ -233,11 +247,11 @@ if [ "$bux_server" == "true" ]; then
 
     echo -e "\033[0;32mRunning Bux-server...$reset"
     if [ "$background" == "true" ]; then
-        echo -e "\033[0;37mdocker compose up -d bux-server$reset"
-        docker_compose_up "-d bux-server"
+        echo -e "\033[0;37mdocker compose up $docker_command_attributes -d bux-server$reset"
+        docker_compose_up "$docker_command_attributes -d bux-server"
     else
-        echo -e "\033[0;37mdocker compose up bux-server$reset"
-        docker_compose_up "bux-server"
+        echo -e "\033[0;37mdocker compose up $docker_command_attributes bux-server$reset"
+        docker_compose_up "$docker_command_attributes bux-server"
 
         function cleanup {
             echo -e "\033[0;31mStopping additional services...$reset"

@@ -16,7 +16,7 @@ const (
 	APIVersion              = "v1"
 	DefaultNewRelicShutdown = 10 * time.Second
 	HealthRequestPath       = "health"
-	Version                 = "v0.5.16"
+	Version                 = "v0.10.0"
 	ConfigFilePathKey       = "config_file"
 	DefaultConfigFilePath   = "config.yaml"
 	ConfigEnvPrefix         = "BUX_"

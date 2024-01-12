@@ -16,7 +16,6 @@ type Action struct {
 
 // RegisterRoutes register all the package specific routes
 func RegisterRoutes(router *apirouter.Router, appConfig *config.AppConfig, services *config.AppServices) {
-
 	// Load the actions and set the services
 	action := &Action{actions.Action{AppConfig: appConfig, Services: services}}
 
@@ -32,15 +31,15 @@ func RegisterRoutes(router *apirouter.Router, appConfig *config.AppConfig, servi
 
 	// Debugging (shows all the Go profiler information)
 	if action.AppConfig.DebugProfiling {
-		router.HTTPRouter.HandlerFunc(http.MethodPatch, "/debug/pprof/", pprof.Index)
-		router.HTTPRouter.HandlerFunc(http.MethodPatch, "/debug/pprof/cmdline", pprof.Cmdline)
-		router.HTTPRouter.HandlerFunc(http.MethodPatch, "/debug/pprof/profile", pprof.Profile)
-		router.HTTPRouter.HandlerFunc(http.MethodPatch, "/debug/pprof/symbol", pprof.Symbol)
-		router.HTTPRouter.HandlerFunc(http.MethodPatch, "/debug/pprof/trace", pprof.Trace)
-		router.HTTPRouter.Handler(http.MethodPatch, "/debug/pprof/goroutine", pprof.Handler("goroutine"))
-		router.HTTPRouter.Handler(http.MethodPatch, "/debug/pprof/heap", pprof.Handler("heap"))
-		router.HTTPRouter.Handler(http.MethodPatch, "/debug/pprof/threadcreate", pprof.Handler("threadcreate"))
-		router.HTTPRouter.Handler(http.MethodPatch, "/debug/pprof/block", pprof.Handler("block"))
+		router.HTTPRouter.HandlerFunc(http.MethodGet, "/debug/pprof/", pprof.Index)
+		router.HTTPRouter.HandlerFunc(http.MethodGet, "/debug/pprof/cmdline", pprof.Cmdline)
+		router.HTTPRouter.HandlerFunc(http.MethodGet, "/debug/pprof/profile", pprof.Profile)
+		router.HTTPRouter.HandlerFunc(http.MethodGet, "/debug/pprof/symbol", pprof.Symbol)
+		router.HTTPRouter.HandlerFunc(http.MethodGet, "/debug/pprof/trace", pprof.Trace)
+		router.HTTPRouter.Handler(http.MethodGet, "/debug/pprof/goroutine", pprof.Handler("goroutine"))
+		router.HTTPRouter.Handler(http.MethodGet, "/debug/pprof/heap", pprof.Handler("heap"))
+		router.HTTPRouter.Handler(http.MethodGet, "/debug/pprof/threadcreate", pprof.Handler("threadcreate"))
+		router.HTTPRouter.Handler(http.MethodGet, "/debug/pprof/block", pprof.Handler("block"))
 	}
 
 	// Set the 404 handler (any request not detected)
