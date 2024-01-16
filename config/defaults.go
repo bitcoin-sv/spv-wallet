@@ -137,7 +137,6 @@ func getPaymailDefaults() *PaymailConfig {
 			PulseAuthToken:           "mQZQ6WmxURxWz5ch", // #nosec G101
 		},
 		DefaultFromPaymail:      "from@domain.com",
-		DefaultNote:             "bux Address Resolution",
 		Domains:                 []string{"localhost"},
 		DomainValidationEnabled: true,
 		SenderValidationEnabled: false,
