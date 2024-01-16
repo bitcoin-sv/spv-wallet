@@ -4,7 +4,7 @@ go 1.21.5
 
 require (
 	github.com/99designs/gqlgen v0.17.42
-	github.com/BuxOrg/bux v0.13.1-0.20240112122920-06feabacfc3c
+	github.com/BuxOrg/bux v0.13.1-0.20240116121339-e3456690d172
 	github.com/BuxOrg/bux-models v0.3.0
 	github.com/bitcoin-sv/go-broadcast-client v0.16.0
 	github.com/go-ozzo/ozzo-validation v3.6.0+incompatible

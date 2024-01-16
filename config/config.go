@@ -194,8 +194,6 @@ type PaymailConfig struct {
 	Beef *BeefConfig `json:"beef" mapstructure:"beef"`
 	// DefaultFromPaymail IE: from@domain.com.
 	DefaultFromPaymail string `json:"default_from_paymail" mapstructure:"default_from_paymail"`
-	// DefaultNote IE: message needed for address resolution.
-	DefaultNote string `json:"default_note" mapstructure:"default_note"`
 	// Domains is a list of allowed domains.
 	Domains []string `json:"domains" mapstructure:"domains"`
 	// DomainValidationEnabled should be turned off if hosted domain is not paymail related.
