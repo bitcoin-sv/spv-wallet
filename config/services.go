@@ -272,7 +272,6 @@ func loadPaymail(appConfig *AppConfig, options []bux.ClientOps) []bux.ClientOps 
 		options = append(options, bux.WithPaymailSupport(
 			appConfig.Paymail.Domains,
 			appConfig.Paymail.DefaultFromPaymail,
-			appConfig.Paymail.DefaultNote,
 			appConfig.Paymail.DomainValidationEnabled,
 			appConfig.Paymail.SenderValidationEnabled,
 		))
