@@ -8,21 +8,20 @@ import (
 
 func getDefaultAppConfig() *AppConfig {
 	return &AppConfig{
-		Authentication:     getAuthConfigDefaults(),
-		Cache:              getCacheDefaults(),
-		Db:                 getDbDefaults(),
-		Debug:              true,
-		DebugProfiling:     true,
-		GraphQL:            getGraphqlDefaults(),
-		ImportBlockHeaders: "",
-		Logging:            getLoggingDefaults(),
-		NewRelic:           getNewRelicDefaults(),
-		Nodes:              getNodesDefaults(),
-		Notifications:      getNotificationDefaults(),
-		Paymail:            getPaymailDefaults(),
-		RequestLogging:     true,
-		Server:             getServerDefaults(),
-		TaskManager:        getTaskManagerDefault(),
+		Authentication: getAuthConfigDefaults(),
+		Cache:          getCacheDefaults(),
+		Db:             getDbDefaults(),
+		Debug:          true,
+		DebugProfiling: true,
+		GraphQL:        getGraphqlDefaults(),
+		Logging:        getLoggingDefaults(),
+		NewRelic:       getNewRelicDefaults(),
+		Nodes:          getNodesDefaults(),
+		Notifications:  getNotificationDefaults(),
+		Paymail:        getPaymailDefaults(),
+		RequestLogging: true,
+		Server:         getServerDefaults(),
+		TaskManager:    getTaskManagerDefault(),
 	}
 }
 

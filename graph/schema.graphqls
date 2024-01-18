@@ -30,21 +30,6 @@ type AccessKey {
     revoked_at: NullTime
 }
 
-type BlockHeader {
-    id:                  String
-    height:              Uint32
-    time:                Uint32
-    nonce:               Uint32
-    version:             Uint32
-    hash_previous_block: String
-    hash_merkle_root:    String
-    bits:                String
-    synced:              NullTime
-    created_at:          Time
-    updated_at:          Time
-    deleted_at:          NullTime
-}
-
 type Xpub {
     id:                String
     current_balance:   Uint64

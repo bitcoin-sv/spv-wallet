@@ -36,8 +36,6 @@ type AppConfig struct {
 	DebugProfiling bool `json:"debug_profiling" mapstructure:"debug_profiling"`
 	// GraphQL is GraphQL related settings.
 	GraphQL *GraphqlConfig `json:"graphql" mapstructure:"graphql"`
-	// ImportBlockHeaders is a URL from where the headers can be downloaded.
-	ImportBlockHeaders string `json:"import_block_headers" mapstructure:"import_block_headers"`
 	// Logging is the configuration for zerolog used in bux.
 	Logging *LoggingConfig `json:"logging" mapstructure:"logging"`
 	// NewRelic is New Relic related settings.

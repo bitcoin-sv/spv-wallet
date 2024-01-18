@@ -28,6 +28,7 @@ import (
 // NewExecutableSchema creates an ExecutableSchema from the ResolverRoot interface.
 func NewExecutableSchema(cfg Config) graphql.ExecutableSchema {
 	return &executableSchema{
+		schema:     cfg.Schema,
 		resolvers:  cfg.Resolvers,
 		directives: cfg.Directives,
 		complexity: cfg.Complexity,
@@ -35,6 +36,7 @@ func NewExecutableSchema(cfg Config) graphql.ExecutableSchema {
 }
 
 type Config struct {
+	Schema     *ast.Schema
 	Resolvers  ResolverRoot
 	Directives DirectiveRoot
 	Complexity ComplexityRoot
@@ -70,21 +72,6 @@ type ComplexityRoot struct {
 		Utxos              func(childComplexity int) int
 		UtxosPerType       func(childComplexity int) int
 		XPubs              func(childComplexity int) int
-	}
-
-	BlockHeader struct {
-		Bits              func(childComplexity int) int
-		CreatedAt         func(childComplexity int) int
-		DeletedAt         func(childComplexity int) int
-		HashMerkleRoot    func(childComplexity int) int
-		HashPreviousBlock func(childComplexity int) int
-		Height            func(childComplexity int) int
-		ID                func(childComplexity int) int
-		Nonce             func(childComplexity int) int
-		Synced            func(childComplexity int) int
-		Time              func(childComplexity int) int
-		UpdatedAt         func(childComplexity int) int
-		Version           func(childComplexity int) int
 	}
 
 	Destination struct {
@@ -178,8 +165,6 @@ type ComplexityRoot struct {
 		AccessKeysCount             func(childComplexity int, metadata bux.Metadata, conditions map[string]interface{}) int
 		AdminAccessKeysCount        func(childComplexity int, metadata bux.Metadata, conditions map[string]interface{}) int
 		AdminAccessKeysList         func(childComplexity int, metadata bux.Metadata, conditions map[string]interface{}, params *datastore.QueryParams) int
-		AdminBlockHeadersCount      func(childComplexity int, metadata bux.Metadata, conditions map[string]interface{}) int
-		AdminBlockHeadersList       func(childComplexity int, metadata bux.Metadata, conditions map[string]interface{}, params *datastore.QueryParams) int
 		AdminDestinationsCount      func(childComplexity int, metadata bux.Metadata, conditions map[string]interface{}) int
 		AdminDestinationsList       func(childComplexity int, metadata bux.Metadata, conditions map[string]interface{}, params *datastore.QueryParams) int
 		AdminDraftTransactionsCount func(childComplexity int, metadata bux.Metadata, conditions map[string]interface{}) int
@@ -336,8 +321,6 @@ type QueryResolver interface {
 	AdminGetStats(ctx context.Context) (*bux.AdminStats, error)
 	AdminAccessKeysList(ctx context.Context, metadata bux.Metadata, conditions map[string]interface{}, params *datastore.QueryParams) ([]*bux.AccessKey, error)
 	AdminAccessKeysCount(ctx context.Context, metadata bux.Metadata, conditions map[string]interface{}) (*int64, error)
-	AdminBlockHeadersList(ctx context.Context, metadata bux.Metadata, conditions map[string]interface{}, params *datastore.QueryParams) ([]*bux.BlockHeader, error)
-	AdminBlockHeadersCount(ctx context.Context, metadata bux.Metadata, conditions map[string]interface{}) (*int64, error)
 	AdminDestinationsList(ctx context.Context, metadata bux.Metadata, conditions map[string]interface{}, params *datastore.QueryParams) ([]*bux.Destination, error)
 	AdminDestinationsCount(ctx context.Context, metadata bux.Metadata, conditions map[string]interface{}) (*int64, error)
 	AdminDraftTransactionsList(ctx context.Context, metadata bux.Metadata, conditions map[string]interface{}, params *datastore.QueryParams) ([]*bux.DraftTransaction, error)
@@ -360,12 +343,16 @@ type TransactionConfigInputResolver interface {
 }
 
 type executableSchema struct {
+	schema     *ast.Schema
 	resolvers  ResolverRoot
 	directives DirectiveRoot
 	complexity ComplexityRoot
 }
 
 func (e *executableSchema) Schema() *ast.Schema {
+	if e.schema != nil {
+		return e.schema
+	}
 	return parsedSchema
 }
 
@@ -485,90 +472,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.AdminStats.XPubs(childComplexity), true
-
-	case "BlockHeader.bits":
-		if e.complexity.BlockHeader.Bits == nil {
-			break
-		}
-
-		return e.complexity.BlockHeader.Bits(childComplexity), true
-
-	case "BlockHeader.created_at":
-		if e.complexity.BlockHeader.CreatedAt == nil {
-			break
-		}
-
-		return e.complexity.BlockHeader.CreatedAt(childComplexity), true
-
-	case "BlockHeader.deleted_at":
-		if e.complexity.BlockHeader.DeletedAt == nil {
-			break
-		}
-
-		return e.complexity.BlockHeader.DeletedAt(childComplexity), true
-
-	case "BlockHeader.hash_merkle_root":
-		if e.complexity.BlockHeader.HashMerkleRoot == nil {
-			break
-		}
-
-		return e.complexity.BlockHeader.HashMerkleRoot(childComplexity), true
-
-	case "BlockHeader.hash_previous_block":
-		if e.complexity.BlockHeader.HashPreviousBlock == nil {
-			break
-		}
-
-		return e.complexity.BlockHeader.HashPreviousBlock(childComplexity), true
-
-	case "BlockHeader.height":
-		if e.complexity.BlockHeader.Height == nil {
-			break
-		}
-
-		return e.complexity.BlockHeader.Height(childComplexity), true
-
-	case "BlockHeader.id":
-		if e.complexity.BlockHeader.ID == nil {
-			break
-		}
-
-		return e.complexity.BlockHeader.ID(childComplexity), true
-
-	case "BlockHeader.nonce":
-		if e.complexity.BlockHeader.Nonce == nil {
-			break
-		}
-
-		return e.complexity.BlockHeader.Nonce(childComplexity), true
-
-	case "BlockHeader.synced":
-		if e.complexity.BlockHeader.Synced == nil {
-			break
-		}
-
-		return e.complexity.BlockHeader.Synced(childComplexity), true
-
-	case "BlockHeader.time":
-		if e.complexity.BlockHeader.Time == nil {
-			break
-		}
-
-		return e.complexity.BlockHeader.Time(childComplexity), true
-
-	case "BlockHeader.updated_at":
-		if e.complexity.BlockHeader.UpdatedAt == nil {
-			break
-		}
-
-		return e.complexity.BlockHeader.UpdatedAt(childComplexity), true
-
-	case "BlockHeader.version":
-		if e.complexity.BlockHeader.Version == nil {
-			break
-		}
-
-		return e.complexity.BlockHeader.Version(childComplexity), true
 
 	case "Destination.address":
 		if e.complexity.Destination.Address == nil {
@@ -1121,30 +1024,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Query.AdminAccessKeysList(childComplexity, args["metadata"].(bux.Metadata), args["conditions"].(map[string]interface{}), args["params"].(*datastore.QueryParams)), true
-
-	case "Query.admin_block_headers_count":
-		if e.complexity.Query.AdminBlockHeadersCount == nil {
-			break
-		}
-
-		args, err := ec.field_Query_admin_block_headers_count_args(context.TODO(), rawArgs)
-		if err != nil {
-			return 0, false
-		}
-
-		return e.complexity.Query.AdminBlockHeadersCount(childComplexity, args["metadata"].(bux.Metadata), args["conditions"].(map[string]interface{})), true
-
-	case "Query.admin_block_headers_list":
-		if e.complexity.Query.AdminBlockHeadersList == nil {
-			break
-		}
-
-		args, err := ec.field_Query_admin_block_headers_list_args(context.TODO(), rawArgs)
-		if err != nil {
-			return 0, false
-		}
-
-		return e.complexity.Query.AdminBlockHeadersList(childComplexity, args["metadata"].(bux.Metadata), args["conditions"].(map[string]interface{}), args["params"].(*datastore.QueryParams)), true
 
 	case "Query.admin_destinations_count":
 		if e.complexity.Query.AdminDestinationsCount == nil {
@@ -2036,14 +1915,14 @@ func (ec *executionContext) introspectSchema() (*introspection.Schema, error) {
 	if ec.DisableIntrospection {
 		return nil, errors.New("introspection disabled")
 	}
-	return introspection.WrapSchema(parsedSchema), nil
+	return introspection.WrapSchema(ec.Schema()), nil
 }
 
 func (ec *executionContext) introspectType(name string) (*introspection.Type, error) {
 	if ec.DisableIntrospection {
 		return nil, errors.New("introspection disabled")
 	}
-	return introspection.WrapTypeFromDef(parsedSchema, parsedSchema.Types[name]), nil
+	return introspection.WrapTypeFromDef(ec.Schema(), ec.Schema().Types[name]), nil
 }
 
 var sources = []*ast.Source{
@@ -2071,15 +1950,6 @@ extend type Query {
         params: QueryParams
     ): [AccessKey]
     admin_access_keys_count (
-        metadata: Metadata
-        conditions: Map
-    ): Int64
-    admin_block_headers_list (
-        metadata: Metadata
-        conditions: Map
-        params: QueryParams
-    ): [BlockHeader]
-    admin_block_headers_count (
         metadata: Metadata
         conditions: Map
     ): Int64
@@ -2191,21 +2061,6 @@ type AccessKey {
     updated_at: Time
     deleted_at: NullTime
     revoked_at: NullTime
-}
-
-type BlockHeader {
-    id:                  String
-    height:              Uint32
-    time:                Uint32
-    nonce:               Uint32
-    version:             Uint32
-    hash_previous_block: String
-    hash_merkle_root:    String
-    bits:                String
-    synced:              NullTime
-    created_at:          Time
-    updated_at:          Time
-    deleted_at:          NullTime
 }
 
 type Xpub {
@@ -2974,63 +2829,6 @@ func (ec *executionContext) field_Query_admin_access_keys_count_args(ctx context
 }
 
 func (ec *executionContext) field_Query_admin_access_keys_list_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
-	var err error
-	args := map[string]interface{}{}
-	var arg0 bux.Metadata
-	if tmp, ok := rawArgs["metadata"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("metadata"))
-		arg0, err = ec.unmarshalOMetadata2githubᚗcomᚋBuxOrgᚋbuxᚐMetadata(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["metadata"] = arg0
-	var arg1 map[string]interface{}
-	if tmp, ok := rawArgs["conditions"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("conditions"))
-		arg1, err = ec.unmarshalOMap2map(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["conditions"] = arg1
-	var arg2 *datastore.QueryParams
-	if tmp, ok := rawArgs["params"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("params"))
-		arg2, err = ec.unmarshalOQueryParams2ᚖgithubᚗcomᚋmrz1836ᚋgoᚑdatastoreᚐQueryParams(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["params"] = arg2
-	return args, nil
-}
-
-func (ec *executionContext) field_Query_admin_block_headers_count_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
-	var err error
-	args := map[string]interface{}{}
-	var arg0 bux.Metadata
-	if tmp, ok := rawArgs["metadata"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("metadata"))
-		arg0, err = ec.unmarshalOMetadata2githubᚗcomᚋBuxOrgᚋbuxᚐMetadata(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["metadata"] = arg0
-	var arg1 map[string]interface{}
-	if tmp, ok := rawArgs["conditions"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("conditions"))
-		arg1, err = ec.unmarshalOMap2map(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["conditions"] = arg1
-	return args, nil
-}
-
-func (ec *executionContext) field_Query_admin_block_headers_list_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
 	var arg0 bux.Metadata
@@ -4367,498 +4165,6 @@ func (ec *executionContext) fieldContext_AdminStats_xpubs(ctx context.Context, f
 		IsResolver: false,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			return nil, errors.New("field of type Int64 does not have child fields")
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _BlockHeader_id(ctx context.Context, field graphql.CollectedField, obj *bux.BlockHeader) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_BlockHeader_id(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.ID, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(string)
-	fc.Result = res
-	return ec.marshalOString2string(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_BlockHeader_id(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "BlockHeader",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type String does not have child fields")
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _BlockHeader_height(ctx context.Context, field graphql.CollectedField, obj *bux.BlockHeader) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_BlockHeader_height(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.Height, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(uint32)
-	fc.Result = res
-	return ec.marshalOUint322uint32(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_BlockHeader_height(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "BlockHeader",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type Uint32 does not have child fields")
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _BlockHeader_time(ctx context.Context, field graphql.CollectedField, obj *bux.BlockHeader) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_BlockHeader_time(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.Time, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(uint32)
-	fc.Result = res
-	return ec.marshalOUint322uint32(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_BlockHeader_time(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "BlockHeader",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type Uint32 does not have child fields")
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _BlockHeader_nonce(ctx context.Context, field graphql.CollectedField, obj *bux.BlockHeader) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_BlockHeader_nonce(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.Nonce, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(uint32)
-	fc.Result = res
-	return ec.marshalOUint322uint32(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_BlockHeader_nonce(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "BlockHeader",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type Uint32 does not have child fields")
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _BlockHeader_version(ctx context.Context, field graphql.CollectedField, obj *bux.BlockHeader) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_BlockHeader_version(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.Version, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(uint32)
-	fc.Result = res
-	return ec.marshalOUint322uint32(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_BlockHeader_version(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "BlockHeader",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type Uint32 does not have child fields")
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _BlockHeader_hash_previous_block(ctx context.Context, field graphql.CollectedField, obj *bux.BlockHeader) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_BlockHeader_hash_previous_block(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.HashPreviousBlock, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(string)
-	fc.Result = res
-	return ec.marshalOString2string(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_BlockHeader_hash_previous_block(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "BlockHeader",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type String does not have child fields")
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _BlockHeader_hash_merkle_root(ctx context.Context, field graphql.CollectedField, obj *bux.BlockHeader) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_BlockHeader_hash_merkle_root(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.HashMerkleRoot, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(string)
-	fc.Result = res
-	return ec.marshalOString2string(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_BlockHeader_hash_merkle_root(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "BlockHeader",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type String does not have child fields")
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _BlockHeader_bits(ctx context.Context, field graphql.CollectedField, obj *bux.BlockHeader) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_BlockHeader_bits(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.Bits, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(string)
-	fc.Result = res
-	return ec.marshalOString2string(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_BlockHeader_bits(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "BlockHeader",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type String does not have child fields")
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _BlockHeader_synced(ctx context.Context, field graphql.CollectedField, obj *bux.BlockHeader) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_BlockHeader_synced(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.Synced, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(customtypes.NullTime)
-	fc.Result = res
-	return ec.marshalONullTime2githubᚗcomᚋmrz1836ᚋgoᚑdatastoreᚋcustom_typesᚐNullTime(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_BlockHeader_synced(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "BlockHeader",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type NullTime does not have child fields")
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _BlockHeader_created_at(ctx context.Context, field graphql.CollectedField, obj *bux.BlockHeader) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_BlockHeader_created_at(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.CreatedAt, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(time.Time)
-	fc.Result = res
-	return ec.marshalOTime2timeᚐTime(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_BlockHeader_created_at(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "BlockHeader",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type Time does not have child fields")
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _BlockHeader_updated_at(ctx context.Context, field graphql.CollectedField, obj *bux.BlockHeader) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_BlockHeader_updated_at(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.UpdatedAt, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(time.Time)
-	fc.Result = res
-	return ec.marshalOTime2timeᚐTime(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_BlockHeader_updated_at(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "BlockHeader",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type Time does not have child fields")
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _BlockHeader_deleted_at(ctx context.Context, field graphql.CollectedField, obj *bux.BlockHeader) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_BlockHeader_deleted_at(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.DeletedAt, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(customtypes.NullTime)
-	fc.Result = res
-	return ec.marshalONullTime2githubᚗcomᚋmrz1836ᚋgoᚑdatastoreᚋcustom_typesᚐNullTime(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_BlockHeader_deleted_at(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "BlockHeader",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type NullTime does not have child fields")
 		},
 	}
 	return fc, nil
@@ -8908,136 +8214,6 @@ func (ec *executionContext) fieldContext_Query_admin_access_keys_count(ctx conte
 	}()
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Query_admin_access_keys_count_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
-		ec.Error(ctx, err)
-		return fc, err
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _Query_admin_block_headers_list(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Query_admin_block_headers_list(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Query().AdminBlockHeadersList(rctx, fc.Args["metadata"].(bux.Metadata), fc.Args["conditions"].(map[string]interface{}), fc.Args["params"].(*datastore.QueryParams))
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.([]*bux.BlockHeader)
-	fc.Result = res
-	return ec.marshalOBlockHeader2ᚕᚖgithubᚗcomᚋBuxOrgᚋbuxᚐBlockHeader(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_Query_admin_block_headers_list(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "Query",
-		Field:      field,
-		IsMethod:   true,
-		IsResolver: true,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			switch field.Name {
-			case "id":
-				return ec.fieldContext_BlockHeader_id(ctx, field)
-			case "height":
-				return ec.fieldContext_BlockHeader_height(ctx, field)
-			case "time":
-				return ec.fieldContext_BlockHeader_time(ctx, field)
-			case "nonce":
-				return ec.fieldContext_BlockHeader_nonce(ctx, field)
-			case "version":
-				return ec.fieldContext_BlockHeader_version(ctx, field)
-			case "hash_previous_block":
-				return ec.fieldContext_BlockHeader_hash_previous_block(ctx, field)
-			case "hash_merkle_root":
-				return ec.fieldContext_BlockHeader_hash_merkle_root(ctx, field)
-			case "bits":
-				return ec.fieldContext_BlockHeader_bits(ctx, field)
-			case "synced":
-				return ec.fieldContext_BlockHeader_synced(ctx, field)
-			case "created_at":
-				return ec.fieldContext_BlockHeader_created_at(ctx, field)
-			case "updated_at":
-				return ec.fieldContext_BlockHeader_updated_at(ctx, field)
-			case "deleted_at":
-				return ec.fieldContext_BlockHeader_deleted_at(ctx, field)
-			}
-			return nil, fmt.Errorf("no field named %q was found under type BlockHeader", field.Name)
-		},
-	}
-	defer func() {
-		if r := recover(); r != nil {
-			err = ec.Recover(ctx, r)
-			ec.Error(ctx, err)
-		}
-	}()
-	ctx = graphql.WithFieldContext(ctx, fc)
-	if fc.Args, err = ec.field_Query_admin_block_headers_list_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
-		ec.Error(ctx, err)
-		return fc, err
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _Query_admin_block_headers_count(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Query_admin_block_headers_count(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Query().AdminBlockHeadersCount(rctx, fc.Args["metadata"].(bux.Metadata), fc.Args["conditions"].(map[string]interface{}))
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(*int64)
-	fc.Result = res
-	return ec.marshalOInt642ᚖint64(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_Query_admin_block_headers_count(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "Query",
-		Field:      field,
-		IsMethod:   true,
-		IsResolver: true,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type Int64 does not have child fields")
-		},
-	}
-	defer func() {
-		if r := recover(); r != nil {
-			err = ec.Recover(ctx, r)
-			ec.Error(ctx, err)
-		}
-	}()
-	ctx = graphql.WithFieldContext(ctx, fc)
-	if fc.Args, err = ec.field_Query_admin_block_headers_count_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
 		return fc, err
 	}
@@ -14917,8 +14093,6 @@ func (ec *executionContext) unmarshalInputDestinationInput(ctx context.Context, 
 		}
 		switch k {
 		case "id":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
 			data, err := ec.unmarshalOString2string(ctx, v)
 			if err != nil {
@@ -14926,8 +14100,6 @@ func (ec *executionContext) unmarshalInputDestinationInput(ctx context.Context, 
 			}
 			it.ID = data
 		case "xpub_id":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("xpub_id"))
 			data, err := ec.unmarshalOString2string(ctx, v)
 			if err != nil {
@@ -14935,8 +14107,6 @@ func (ec *executionContext) unmarshalInputDestinationInput(ctx context.Context, 
 			}
 			it.XpubID = data
 		case "locking_script":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("locking_script"))
 			data, err := ec.unmarshalOString2string(ctx, v)
 			if err != nil {
@@ -14944,8 +14114,6 @@ func (ec *executionContext) unmarshalInputDestinationInput(ctx context.Context, 
 			}
 			it.LockingScript = data
 		case "type":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("type"))
 			data, err := ec.unmarshalOString2string(ctx, v)
 			if err != nil {
@@ -14953,8 +14121,6 @@ func (ec *executionContext) unmarshalInputDestinationInput(ctx context.Context, 
 			}
 			it.Type = data
 		case "chain":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("chain"))
 			data, err := ec.unmarshalOUint322uint32(ctx, v)
 			if err != nil {
@@ -14962,8 +14128,6 @@ func (ec *executionContext) unmarshalInputDestinationInput(ctx context.Context, 
 			}
 			it.Chain = data
 		case "num":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("num"))
 			data, err := ec.unmarshalOUint322uint32(ctx, v)
 			if err != nil {
@@ -14971,8 +14135,6 @@ func (ec *executionContext) unmarshalInputDestinationInput(ctx context.Context, 
 			}
 			it.Num = data
 		case "address":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("address"))
 			data, err := ec.unmarshalOString2string(ctx, v)
 			if err != nil {
@@ -14980,8 +14142,6 @@ func (ec *executionContext) unmarshalInputDestinationInput(ctx context.Context, 
 			}
 			it.Address = data
 		case "draft_id":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("draft_id"))
 			data, err := ec.unmarshalOString2string(ctx, v)
 			if err != nil {
@@ -14989,8 +14149,6 @@ func (ec *executionContext) unmarshalInputDestinationInput(ctx context.Context, 
 			}
 			it.DraftID = data
 		case "metadata":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("metadata"))
 			data, err := ec.unmarshalOMetadata2githubᚗcomᚋBuxOrgᚋbuxᚐMetadata(ctx, v)
 			if err != nil {
@@ -14998,8 +14156,6 @@ func (ec *executionContext) unmarshalInputDestinationInput(ctx context.Context, 
 			}
 			it.Metadata = data
 		case "created_at":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("created_at"))
 			data, err := ec.unmarshalOTime2timeᚐTime(ctx, v)
 			if err != nil {
@@ -15007,8 +14163,6 @@ func (ec *executionContext) unmarshalInputDestinationInput(ctx context.Context, 
 			}
 			it.CreatedAt = data
 		case "updated_at":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("updated_at"))
 			data, err := ec.unmarshalOTime2timeᚐTime(ctx, v)
 			if err != nil {
@@ -15016,8 +14170,6 @@ func (ec *executionContext) unmarshalInputDestinationInput(ctx context.Context, 
 			}
 			it.UpdatedAt = data
 		case "deleted_at":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("deleted_at"))
 			data, err := ec.unmarshalONullTime2githubᚗcomᚋmrz1836ᚋgoᚑdatastoreᚋcustom_typesᚐNullTime(ctx, v)
 			if err != nil {
@@ -15045,8 +14197,6 @@ func (ec *executionContext) unmarshalInputFeeUnitInput(ctx context.Context, obj 
 		}
 		switch k {
 		case "satoshis":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("satoshis"))
 			data, err := ec.unmarshalOInt2int(ctx, v)
 			if err != nil {
@@ -15054,8 +14204,6 @@ func (ec *executionContext) unmarshalInputFeeUnitInput(ctx context.Context, obj 
 			}
 			it.Satoshis = data
 		case "bytes":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("bytes"))
 			data, err := ec.unmarshalOInt2int(ctx, v)
 			if err != nil {
@@ -15083,8 +14231,6 @@ func (ec *executionContext) unmarshalInputOpReturnInput(ctx context.Context, obj
 		}
 		switch k {
 		case "hex":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("hex"))
 			data, err := ec.unmarshalOString2string(ctx, v)
 			if err != nil {
@@ -15092,8 +14238,6 @@ func (ec *executionContext) unmarshalInputOpReturnInput(ctx context.Context, obj
 			}
 			it.Hex = data
 		case "hex_parts":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("hex_parts"))
 			data, err := ec.unmarshalOString2ᚕstring(ctx, v)
 			if err != nil {
@@ -15101,8 +14245,6 @@ func (ec *executionContext) unmarshalInputOpReturnInput(ctx context.Context, obj
 			}
 			it.HexParts = data
 		case "string_parts":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("string_parts"))
 			data, err := ec.unmarshalOString2ᚕstring(ctx, v)
 			if err != nil {
@@ -15110,8 +14252,6 @@ func (ec *executionContext) unmarshalInputOpReturnInput(ctx context.Context, obj
 			}
 			it.StringParts = data
 		case "map":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("map"))
 			data, err := ec.unmarshalOOpReturnMapInput2ᚖgithubᚗcomᚋBuxOrgᚋbuxᚐMapProtocol(ctx, v)
 			if err != nil {
@@ -15139,8 +14279,6 @@ func (ec *executionContext) unmarshalInputOpReturnMapInput(ctx context.Context, 
 		}
 		switch k {
 		case "app":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("app"))
 			data, err := ec.unmarshalOString2string(ctx, v)
 			if err != nil {
@@ -15148,8 +14286,6 @@ func (ec *executionContext) unmarshalInputOpReturnMapInput(ctx context.Context, 
 			}
 			it.App = data
 		case "type":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("type"))
 			data, err := ec.unmarshalOString2string(ctx, v)
 			if err != nil {
@@ -15157,8 +14293,6 @@ func (ec *executionContext) unmarshalInputOpReturnMapInput(ctx context.Context, 
 			}
 			it.Type = data
 		case "keys":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("keys"))
 			data, err := ec.unmarshalOMap2map(ctx, v)
 			if err != nil {
@@ -15186,8 +14320,6 @@ func (ec *executionContext) unmarshalInputScriptOutputInput(ctx context.Context,
 		}
 		switch k {
 		case "address":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("address"))
 			data, err := ec.unmarshalOString2string(ctx, v)
 			if err != nil {
@@ -15195,8 +14327,6 @@ func (ec *executionContext) unmarshalInputScriptOutputInput(ctx context.Context,
 			}
 			it.Address = data
 		case "satoshis":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("satoshis"))
 			data, err := ec.unmarshalOUint642uint64(ctx, v)
 			if err != nil {
@@ -15204,8 +14334,6 @@ func (ec *executionContext) unmarshalInputScriptOutputInput(ctx context.Context,
 			}
 			it.Satoshis = data
 		case "script":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("script"))
 			data, err := ec.unmarshalOString2string(ctx, v)
 			if err != nil {
@@ -15233,8 +14361,6 @@ func (ec *executionContext) unmarshalInputSyncConfigInput(ctx context.Context, o
 		}
 		switch k {
 		case "broadcast":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("broadcast"))
 			data, err := ec.unmarshalOBoolean2bool(ctx, v)
 			if err != nil {
@@ -15242,8 +14368,6 @@ func (ec *executionContext) unmarshalInputSyncConfigInput(ctx context.Context, o
 			}
 			it.Broadcast = data
 		case "broadcast_instant":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("broadcast_instant"))
 			data, err := ec.unmarshalOBoolean2bool(ctx, v)
 			if err != nil {
@@ -15251,8 +14375,6 @@ func (ec *executionContext) unmarshalInputSyncConfigInput(ctx context.Context, o
 			}
 			it.BroadcastInstant = data
 		case "paymail_p2p":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("paymail_p2p"))
 			data, err := ec.unmarshalOBoolean2bool(ctx, v)
 			if err != nil {
@@ -15260,8 +14382,6 @@ func (ec *executionContext) unmarshalInputSyncConfigInput(ctx context.Context, o
 			}
 			it.PaymailP2P = data
 		case "sync_on_chain":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("sync_on_chain"))
 			data, err := ec.unmarshalOBoolean2bool(ctx, v)
 			if err != nil {
@@ -15289,8 +14409,6 @@ func (ec *executionContext) unmarshalInputTransactionConfigInput(ctx context.Con
 		}
 		switch k {
 		case "change_satoshis":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("change_satoshis"))
 			data, err := ec.unmarshalOUint642uint64(ctx, v)
 			if err != nil {
@@ -15298,8 +14416,6 @@ func (ec *executionContext) unmarshalInputTransactionConfigInput(ctx context.Con
 			}
 			it.ChangeSatoshis = data
 		case "change_destinations":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("change_destinations"))
 			data, err := ec.unmarshalODestinationInput2ᚕᚖgithubᚗcomᚋBuxOrgᚋbuxᚐDestination(ctx, v)
 			if err != nil {
@@ -15307,8 +14423,6 @@ func (ec *executionContext) unmarshalInputTransactionConfigInput(ctx context.Con
 			}
 			it.ChangeDestinations = data
 		case "change_destinations_strategy":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("change_destinations_strategy"))
 			data, err := ec.unmarshalOChangeStrategy2githubᚗcomᚋBuxOrgᚋbuxᚐChangeStrategy(ctx, v)
 			if err != nil {
@@ -15316,8 +14430,6 @@ func (ec *executionContext) unmarshalInputTransactionConfigInput(ctx context.Con
 			}
 			it.ChangeDestinationsStrategy = data
 		case "change_number_of_destinations":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("change_number_of_destinations"))
 			data, err := ec.unmarshalOInt2int(ctx, v)
 			if err != nil {
@@ -15325,8 +14437,6 @@ func (ec *executionContext) unmarshalInputTransactionConfigInput(ctx context.Con
 			}
 			it.ChangeNumberOfDestinations = data
 		case "change_minimum_satoshis":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("change_minimum_satoshis"))
 			data, err := ec.unmarshalOUint642uint64(ctx, v)
 			if err != nil {
@@ -15334,8 +14444,6 @@ func (ec *executionContext) unmarshalInputTransactionConfigInput(ctx context.Con
 			}
 			it.ChangeMinimumSatoshis = data
 		case "include_utxos":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("include_utxos"))
 			data, err := ec.unmarshalOUtxoPointer2ᚕᚖgithubᚗcomᚋBuxOrgᚋbuxᚐUtxoPointer(ctx, v)
 			if err != nil {
@@ -15343,8 +14451,6 @@ func (ec *executionContext) unmarshalInputTransactionConfigInput(ctx context.Con
 			}
 			it.IncludeUtxos = data
 		case "inputs":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("inputs"))
 			data, err := ec.unmarshalOMap2ᚕmap(ctx, v)
 			if err != nil {
@@ -15354,8 +14460,6 @@ func (ec *executionContext) unmarshalInputTransactionConfigInput(ctx context.Con
 				return it, err
 			}
 		case "expires_in":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("expires_in"))
 			data, err := ec.unmarshalOUint642ᚖuint64(ctx, v)
 			if err != nil {
@@ -15365,8 +14469,6 @@ func (ec *executionContext) unmarshalInputTransactionConfigInput(ctx context.Con
 				return it, err
 			}
 		case "fee":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("fee"))
 			data, err := ec.unmarshalOUint642uint64(ctx, v)
 			if err != nil {
@@ -15374,8 +14476,6 @@ func (ec *executionContext) unmarshalInputTransactionConfigInput(ctx context.Con
 			}
 			it.Fee = data
 		case "fee_unit":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("fee_unit"))
 			data, err := ec.unmarshalOFeeUnitInput2ᚖgithubᚗcomᚋBuxOrgᚋbuxᚋutilsᚐFeeUnit(ctx, v)
 			if err != nil {
@@ -15383,8 +14483,6 @@ func (ec *executionContext) unmarshalInputTransactionConfigInput(ctx context.Con
 			}
 			it.FeeUnit = data
 		case "from_utxos":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("from_utxos"))
 			data, err := ec.unmarshalOUtxoPointer2ᚕᚖgithubᚗcomᚋBuxOrgᚋbuxᚐUtxoPointer(ctx, v)
 			if err != nil {
@@ -15392,8 +14490,6 @@ func (ec *executionContext) unmarshalInputTransactionConfigInput(ctx context.Con
 			}
 			it.FromUtxos = data
 		case "outputs":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("outputs"))
 			data, err := ec.unmarshalOTransactionOutputInput2ᚕᚖgithubᚗcomᚋBuxOrgᚋbuxᚐTransactionOutput(ctx, v)
 			if err != nil {
@@ -15401,8 +14497,6 @@ func (ec *executionContext) unmarshalInputTransactionConfigInput(ctx context.Con
 			}
 			it.Outputs = data
 		case "send_all_to":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("send_all_to"))
 			data, err := ec.unmarshalOTransactionOutputInput2ᚖgithubᚗcomᚋBuxOrgᚋbuxᚐTransactionOutput(ctx, v)
 			if err != nil {
@@ -15410,8 +14504,6 @@ func (ec *executionContext) unmarshalInputTransactionConfigInput(ctx context.Con
 			}
 			it.SendAllTo = data
 		case "sync":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("sync"))
 			data, err := ec.unmarshalOSyncConfigInput2ᚖgithubᚗcomᚋBuxOrgᚋbuxᚐSyncConfig(ctx, v)
 			if err != nil {
@@ -15439,8 +14531,6 @@ func (ec *executionContext) unmarshalInputTransactionOutputInput(ctx context.Con
 		}
 		switch k {
 		case "to":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("to"))
 			data, err := ec.unmarshalOString2string(ctx, v)
 			if err != nil {
@@ -15448,8 +14538,6 @@ func (ec *executionContext) unmarshalInputTransactionOutputInput(ctx context.Con
 			}
 			it.To = data
 		case "satoshis":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("satoshis"))
 			data, err := ec.unmarshalOUint642uint64(ctx, v)
 			if err != nil {
@@ -15457,8 +14545,6 @@ func (ec *executionContext) unmarshalInputTransactionOutputInput(ctx context.Con
 			}
 			it.Satoshis = data
 		case "scripts":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("scripts"))
 			data, err := ec.unmarshalOScriptOutputInput2ᚕᚖgithubᚗcomᚋBuxOrgᚋbuxᚐScriptOutput(ctx, v)
 			if err != nil {
@@ -15466,8 +14552,6 @@ func (ec *executionContext) unmarshalInputTransactionOutputInput(ctx context.Con
 			}
 			it.Scripts = data
 		case "op_return":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("op_return"))
 			data, err := ec.unmarshalOOpReturnInput2ᚖgithubᚗcomᚋBuxOrgᚋbuxᚐOpReturn(ctx, v)
 			if err != nil {
@@ -15495,8 +14579,6 @@ func (ec *executionContext) unmarshalInputUtxoPointer(ctx context.Context, obj i
 		}
 		switch k {
 		case "transaction_id":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("transaction_id"))
 			data, err := ec.unmarshalOString2string(ctx, v)
 			if err != nil {
@@ -15504,8 +14586,6 @@ func (ec *executionContext) unmarshalInputUtxoPointer(ctx context.Context, obj i
 			}
 			it.TransactionID = data
 		case "output_index":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("output_index"))
 			data, err := ec.unmarshalOUint322uint32(ctx, v)
 			if err != nil {
@@ -15603,64 +14683,6 @@ func (ec *executionContext) _AdminStats(ctx context.Context, sel ast.SelectionSe
 			out.Values[i] = ec._AdminStats_utxos_per_type(ctx, field, obj)
 		case "xpubs":
 			out.Values[i] = ec._AdminStats_xpubs(ctx, field, obj)
-		default:
-			panic("unknown field " + strconv.Quote(field.Name))
-		}
-	}
-	out.Dispatch(ctx)
-	if out.Invalids > 0 {
-		return graphql.Null
-	}
-
-	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
-
-	for label, dfs := range deferred {
-		ec.processDeferredGroup(graphql.DeferredGroup{
-			Label:    label,
-			Path:     graphql.GetPath(ctx),
-			FieldSet: dfs,
-			Context:  ctx,
-		})
-	}
-
-	return out
-}
-
-var blockHeaderImplementors = []string{"BlockHeader"}
-
-func (ec *executionContext) _BlockHeader(ctx context.Context, sel ast.SelectionSet, obj *bux.BlockHeader) graphql.Marshaler {
-	fields := graphql.CollectFields(ec.OperationContext, sel, blockHeaderImplementors)
-
-	out := graphql.NewFieldSet(fields)
-	deferred := make(map[string]*graphql.FieldSet)
-	for i, field := range fields {
-		switch field.Name {
-		case "__typename":
-			out.Values[i] = graphql.MarshalString("BlockHeader")
-		case "id":
-			out.Values[i] = ec._BlockHeader_id(ctx, field, obj)
-		case "height":
-			out.Values[i] = ec._BlockHeader_height(ctx, field, obj)
-		case "time":
-			out.Values[i] = ec._BlockHeader_time(ctx, field, obj)
-		case "nonce":
-			out.Values[i] = ec._BlockHeader_nonce(ctx, field, obj)
-		case "version":
-			out.Values[i] = ec._BlockHeader_version(ctx, field, obj)
-		case "hash_previous_block":
-			out.Values[i] = ec._BlockHeader_hash_previous_block(ctx, field, obj)
-		case "hash_merkle_root":
-			out.Values[i] = ec._BlockHeader_hash_merkle_root(ctx, field, obj)
-		case "bits":
-			out.Values[i] = ec._BlockHeader_bits(ctx, field, obj)
-		case "synced":
-			out.Values[i] = ec._BlockHeader_synced(ctx, field, obj)
-		case "created_at":
-			out.Values[i] = ec._BlockHeader_created_at(ctx, field, obj)
-		case "updated_at":
-			out.Values[i] = ec._BlockHeader_updated_at(ctx, field, obj)
-		case "deleted_at":
-			out.Values[i] = ec._BlockHeader_deleted_at(ctx, field, obj)
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -16448,44 +15470,6 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 					}
 				}()
 				res = ec._Query_admin_access_keys_count(ctx, field)
-				return res
-			}
-
-			rrm := func(ctx context.Context) graphql.Marshaler {
-				return ec.OperationContext.RootResolverMiddleware(ctx,
-					func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
-			}
-
-			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
-		case "admin_block_headers_list":
-			field := field
-
-			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
-				defer func() {
-					if r := recover(); r != nil {
-						ec.Error(ctx, ec.Recover(ctx, r))
-					}
-				}()
-				res = ec._Query_admin_block_headers_list(ctx, field)
-				return res
-			}
-
-			rrm := func(ctx context.Context) graphql.Marshaler {
-				return ec.OperationContext.RootResolverMiddleware(ctx,
-					func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
-			}
-
-			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
-		case "admin_block_headers_count":
-			field := field
-
-			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
-				defer func() {
-					if r := recover(); r != nil {
-						ec.Error(ctx, ec.Recover(ctx, r))
-					}
-				}()
-				res = ec._Query_admin_block_headers_count(ctx, field)
 				return res
 			}
 
@@ -17907,54 +16891,6 @@ func (ec *executionContext) marshalOAdminStats2ᚖgithubᚗcomᚋBuxOrgᚋbuxᚐ
 		return graphql.Null
 	}
 	return ec._AdminStats(ctx, sel, v)
-}
-
-func (ec *executionContext) marshalOBlockHeader2ᚕᚖgithubᚗcomᚋBuxOrgᚋbuxᚐBlockHeader(ctx context.Context, sel ast.SelectionSet, v []*bux.BlockHeader) graphql.Marshaler {
-	if v == nil {
-		return graphql.Null
-	}
-	ret := make(graphql.Array, len(v))
-	var wg sync.WaitGroup
-	isLen1 := len(v) == 1
-	if !isLen1 {
-		wg.Add(len(v))
-	}
-	for i := range v {
-		i := i
-		fc := &graphql.FieldContext{
-			Index:  &i,
-			Result: &v[i],
-		}
-		ctx := graphql.WithFieldContext(ctx, fc)
-		f := func(i int) {
-			defer func() {
-				if r := recover(); r != nil {
-					ec.Error(ctx, ec.Recover(ctx, r))
-					ret = nil
-				}
-			}()
-			if !isLen1 {
-				defer wg.Done()
-			}
-			ret[i] = ec.marshalOBlockHeader2ᚖgithubᚗcomᚋBuxOrgᚋbuxᚐBlockHeader(ctx, sel, v[i])
-		}
-		if isLen1 {
-			f(i)
-		} else {
-			go f(i)
-		}
-
-	}
-	wg.Wait()
-
-	return ret
-}
-
-func (ec *executionContext) marshalOBlockHeader2ᚖgithubᚗcomᚋBuxOrgᚋbuxᚐBlockHeader(ctx context.Context, sel ast.SelectionSet, v *bux.BlockHeader) graphql.Marshaler {
-	if v == nil {
-		return graphql.Null
-	}
-	return ec._BlockHeader(ctx, sel, v)
 }
 
 func (ec *executionContext) unmarshalOBoolean2bool(ctx context.Context, v interface{}) (bool, error) {

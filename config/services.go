@@ -141,10 +141,6 @@ func (s *AppServices) loadBux(ctx context.Context, appConfig *AppConfig, testMod
 
 	options = append(options, bux.WithUserAgent(appConfig.GetUserAgent()))
 
-	if appConfig.ImportBlockHeaders != "" {
-		options = append(options, bux.WithImportBlockHeaders(appConfig.ImportBlockHeaders))
-	}
-
 	if logger != nil {
 		buxLogger := logger.With().Str("service", "bux").Logger()
 		options = append(options, bux.WithLogger(&buxLogger))
