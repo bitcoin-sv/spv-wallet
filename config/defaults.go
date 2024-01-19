@@ -124,9 +124,7 @@ func getNodesDefaults() *NodesConfig {
 				MinerID: "03ad780153c47df915b3d2e23af727c68facaca4facd5f155bf5018b979b9aeb83",
 			},
 		},
-		Mapi: &MapiConfig{
-			UseFeeQuotes: true,
-		},
+		UseFeeQuotes: true,
 	}
 }
 

@@ -191,6 +191,15 @@ func (s *AppServices) loadBux(ctx context.Context, appConfig *AppConfig, testMod
 		options = loadBroadcastClientArc(appConfig, options, logger)
 	}
 
+	options = append(options, bux.WithFeeQuotes(appConfig.Nodes.UseFeeQuotes))
+
+	if appConfig.Nodes.FeeUnit != nil {
+		options = append(options, bux.WithFeeUnit(&utils.FeeUnit{
+			Satoshis: appConfig.Nodes.FeeUnit.Satoshis,
+			Bytes:    appConfig.Nodes.FeeUnit.Bytes,
+		}))
+	}
+
 	// Create the new client
 	s.Bux, err = bux.NewClient(ctx, options...)
 
@@ -388,8 +397,5 @@ func loadMinercraftMapi(appConfig *AppConfig, options []bux.ClientOps) []bux.Cli
 		bux.WithMAPI(),
 		bux.WithMinercraftAPIs(appConfig.Nodes.toMinercraftMapi()),
 	)
-	if appConfig.Nodes.Mapi != nil && appConfig.Nodes.Mapi.UseFeeQuotes {
-		options = append(options, bux.WithMinercraftFeeQuotes())
-	}
 	return options
 }
