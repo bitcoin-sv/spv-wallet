@@ -1,16 +1,22 @@
 auth:
+  # xpub used for admin api authentication
   admin_key: xpub661MyMwAqRbcFgfmdkPgE2m5UjHXu9dj124DbaGLSjaqVESTWfCD4VuNmEbVPkbYLCkykwVZvmA8Pbf8884TQr1FgdG2nPoHR8aB36YdDQh
+  # require checking signatures for all requests which was registered with RequireAuthentication method
   require_signing: false
+  # authentication scheme - xpub => using xPubs as tokens, currently the only option
   scheme: xpub
+  # disable signing for all requests !!! Use only for development !!!
   signing_disabled: true
 cache:
   cluster:
+    # cluster coordinator - redis/memory
     coordinator: memory
+    # prefix for channel names
     prefix: bux_cluster_
     redis: null
+  # cache engine - freecache/redis
   engine: freecache
-  # Prefixed with "_", because it's unused by default
-  _redis:
+  redis:
     dependency_mode: true
     max_active_connections: 0
     max_connection_lifetime: 1m0s
@@ -20,11 +26,13 @@ cache:
     use_tls: false
 db:
   datastore:
+    # enable datastore debug mode
     debug: false
+    # datastore engine - sqlite/postgres/mysql/mongodb
     engine: sqlite
+    # prefix for all tables
     table_prefix: xapi
-  # Prefixed with "_", because it's unused by default
-  _mongodb:
+  mongodb:
     database_name: xapi
     debug: false
     max_connection_idle_time: 0s
@@ -34,8 +42,7 @@ db:
     table_prefix: ""
     transactions: false
     uri: mongodb://localhost:27017/xapi
-  # Prefixed with "_", because it's unused by default
-  _sql:
+  sql:
     debug: false
     driver: postgresql
     host: localhost
@@ -61,51 +68,65 @@ db:
     max_open_connections: 0
     shared: true
     table_prefix: ""
+# enable debug mode
 debug: true
+# enable endpoints that provides profiling information
 debug_profiling: true
-logging:
-  level: info
+# enable (ITC) incoming transaction checking
 disable_itc: true
-# Prefixed with "_", because it's unused by default
-graphql:
-  enabled: false
+# url to import block headers
 import_block_headers: ""
-# Prefixed with "_", because it's unused by default
-_new_relic:
+new_relic:
+  # used for relic HostDisplayName
   domain_name: domain.com
   enabled: false
   license_key: BOGUS-LICENSE-KEY-1234567890987654321234
-# Prefixed with "_", because it will be configured by default
-_nodes:
+nodes:
+  # protocol - arc/mapi (arc is default)
   protocol: arc
+  # list of apis used for getting and broadcasting transactions
   apis:
     - arc_url: https://arc.gorillapool.io
       token:
+  # use fee quotes for transaction fee calculation
   use_fee_quotes: true
+  # used as the fee value if 'use_fee_quotes' is set to false
   fee_unit:
     satoshis: 1
     bytes: 1000
-# Prefixed with "_", because it's unused by default
-_notifications:
+notifications:
   enabled: false
+  # url to send notifications
   webhook_endpoint: ""
 paymail:
-  # Prefixed with "_", because it's unused by default
-  _beef:
+  beef:
     pulse_auth_token: mQZQ6WmxURxWz5ch
+    # url to pulse, used for merkle root verification
     pulse_url: http://localhost:8080/api/v1/chain/merkleroot/verify
-    use_beef: true
+    use_beef: false
+  # set is as a default sender paymail if account does not have one
   default_from_paymail: from@domain.com
+  # default note added into transactions - Deprecated
   default_note: bux Address Resolution
+  # enable paymail domain validation, paymail domain must be in domains list to be valid and that the transaction can be processed
   domain_validation_enabled: false
+  # list of domains used for paymail domain validation
   domains:
     - localhost
+  enabled: true
+  # validates sender signature during receiving transactions
   sender_validation_enabled: false
+# show logs about incoming requests
 request_logging: true
 server_config:
+  # maximum amount of time to wait for the next request when keep-alives are enabled. If IdleTimeout is zero, the value of ReadTimeout is used. If both are zero, there is no timeout
   idle_timeout: 1m0s
+  # port of the http server
   port: 3003
+  # maximum duration for reading the entire request, including the body. A zero or negative value means there will be no timeout
   read_timeout: 15s
+  # maximum duration before timing out writes of the response. A zero or negative value means there will be no timeout
   write_timeout: 15s
 task_manager:
+  # task manager factory - memory, redis
   factory: memory
