@@ -1,89 +1,44 @@
+<div align="center">
+
 # BUX: Server
 
-> Get started using [BUX](https://getbux.io) in five minutes
 
 [![Release](https://img.shields.io/github/release-pre/BuxOrg/bux-server.svg?logo=github&style=flat&v=3)](https://github.com/BuxOrg/bux-server/releases)
 [![Build Status](https://img.shields.io/github/actions/workflow/status/BuxOrg/bux-server/run-tests.yml?branch=master&v=3)](https://github.com/BuxOrg/bux-server/actions)
 [![Report](https://goreportcard.com/badge/github.com/BuxOrg/bux-server?style=flat&v=3)](https://goreportcard.com/report/github.com/BuxOrg/bux-server)
 [![codecov](https://codecov.io/gh/BuxOrg/bux-server/branch/master/graph/badge.svg?v=3)](https://codecov.io/gh/BuxOrg/bux-server)
 [![Mergify Status](https://img.shields.io/endpoint.svg?url=https://api.mergify.com/v1/badges/BuxOrg/bux-server&style=flat&v=3)](https://mergify.io)
-[![Go](https://img.shields.io/github/go-mod/go-version/BuxOrg/bux-server?v=3)](https://golang.org/)
 <br>
+
+[![Go](https://img.shields.io/github/go-mod/go-version/BuxOrg/bux-server?v=3)](https://golang.org/)
 [![Gitpod Ready-to-Code](https://img.shields.io/badge/Gitpod-ready--to--code-blue?logo=gitpod&v=3)](https://gitpod.io/#https://github.com/BuxOrg/bux-server)
 [![standard-readme compliant](https://img.shields.io/badge/readme%20style-standard-brightgreen.svg?style=flat&v=3)](https://github.com/RichardLitt/standard-readme)
 [![Makefile Included](https://img.shields.io/badge/Makefile-Supported%20-brightgreen?=flat&logo=probot&v=3)](Makefile)
-[![Sponsor](https://img.shields.io/badge/sponsor-mrz1836-181717.svg?logo=github&style=flat&v=3)](https://github.com/sponsors/BuxOrg)
-[![Donate](https://img.shields.io/badge/donate-bitcoin-ff9900.svg?logo=bitcoin&style=flat&v=3)](https://gobitcoinsv.com/#sponsor?utm_source=github&utm_medium=sponsor-link&utm_campaign=bux-server&utm_term=bux-server&utm_content=bux-server)
-
 <br/>
+</div>
+
+> Get started using [BUX](https://getbux.io) in five minutes
 
 ## Table of Contents
 
--   [What is BUX?](#what-is-bux)
--   [Config Variables](#config-variables)
--   [Installation](#installation)
--   [Documentation](#documentation)
--   [Examples & Tests](#examples--tests)
--   [Benchmarks](#benchmarks)
--   [Code Standards](#code-standards)
--   [Usage](#usage)
--   [Contributing](#contributing)
--   [License](#license)
+- [About](#about)
+- [Installation](#installation)
+- [Documentation](#documentation)
+- [Usage](#usage)
+  - [Config Variables](#config-variables)
+  - [Examples & Tests](#examples--tests)
+  - [Benchmarks](#benchmarks)
+- [Code Standards](#code-standards)
+- [Contributing](#contributing)
+- [License](#license)
 
 <br/>
 
-## What is BUX?
+## About
 
 [Read more about BUX](https://getbux.io)
 
 <br/>
-
-## Config Variables
-
-Default config variables can be overridden by (in this order of importance):
-1. Flags (only the ones below)
-2. ENV variables
-3. Config file
-
-#### Flags
-
-Available flags:
-
-```bash
-  -C, --config_file string                       custom config file path
-  -h, --help                                     show help
-  -v, --version                                  show version
-  -d, --dump_config                              dump config to file, specified by config_file (-C) flag
-```
-
-To generate config file with defaults, use the --dump flag, or:
-```bash
-go run ./cmd/server/main.go -d
-```
-
-The default config file path is **project root**, and the default file name is **config.yaml**. This can be overridden by -C flag.
-```bash
-go run ./cmd/server/main.go -C /my/config.json
-```
-
-#### Environment variables
-
-To override any config variable with ENV, use the "BUX\_" prefix with mapstructure annotation path with "_" as a delimiter in all uppercase. Example:
-
-Let's take this fragment of AppConfig from `config.example.yaml`:
-
-```yaml
-auth:
-    admin_key: xpub661MyMwAqRbcFgfmdkPgE2m5UjHXu9dj124DbaGLSjaqVESTWfCD4VuNmEbVPkbYLCkykwVZvmA8Pbf8884TQr1FgdG2nPoHR8aB36YdDQh
-    require_signing: false
-    scheme: xpub
-    signing_disabled: true
-```
-
-To override admin_key in auth config, use the path with "_" as a path delimiter and BUX\_ as prefix. So:
-```bash
-BUX_AUTH_ADMIN_KEY="admin_key"
-```
 
 ## Installation
 
@@ -92,8 +47,6 @@ BUX_AUTH_ADMIN_KEY="admin_key"
 ```shell script
 go get -u github.com/BuxOrg/bux-server
 ```
-
-<br/>
 
 #### build
 
@@ -106,6 +59,7 @@ go build -o bux-server cmd/server/*
 ```shell script
 ./bux-server
 ```
+<br/>
 
 ## Documentation
 
@@ -235,7 +189,57 @@ vet                           Run the Go vet application
 
 <br/>
 
-## Examples & Tests
+## Usage
+
+### Config Variables
+
+Default config variables can be overridden by (in this order of importance):
+1. Flags (only the ones below)
+2. ENV variables
+3. Config file
+
+#### Flags
+
+Available flags:
+
+```bash
+  -C, --config_file string                       custom config file path
+  -h, --help                                     show help
+  -v, --version                                  show version
+  -d, --dump_config                              dump config to file, specified by config_file (-C) flag
+```
+
+To generate config file with defaults, use the --dump flag, or:
+```bash
+go run ./cmd/server/main.go -d
+```
+
+The default config file path is **project root**, and the default file name is **config.yaml**. This can be overridden by -C flag.
+```bash
+go run ./cmd/server/main.go -C /my/config.json
+```
+
+#### Environment variables
+
+To override any config variable with ENV, use the "BUX\_" prefix with mapstructure annotation path with "_" as a delimiter in all uppercase. Example:
+
+Let's take this fragment of AppConfig from `config.example.yaml`:
+
+```yaml
+auth:
+    admin_key: xpub661MyMwAqRbcFgfmdkPgE2m5UjHXu9dj124DbaGLSjaqVESTWfCD4VuNmEbVPkbYLCkykwVZvmA8Pbf8884TQr1FgdG2nPoHR8aB36YdDQh
+    require_signing: false
+    scheme: xpub
+    signing_disabled: true
+```
+
+To override admin_key in auth config, use the path with "_" as a path delimiter and BUX\_ as prefix. So:
+```bash
+BUX_AUTH_ADMIN_KEY="admin_key"
+```
+<br/>
+
+### Examples & Tests
 
 All unit tests run via [GitHub Actions](https://github.com/BuxOrg/bux-server/actions) and
 uses [Go version 1.19.x](https://golang.org/doc/go1.19). View the [configuration file](.github/workflows/run-tests.yml).
@@ -255,10 +259,9 @@ Run tests (excluding integration tests)
 ```shell script
 make test-short
 ```
-
 <br/>
 
-## Benchmarks
+### Benchmarks
 
 Run the Go benchmarks:
 
@@ -268,19 +271,7 @@ make bench
 
 <br/>
 
-## Code Standards
-
-Read more about this Go project's [code standards](.github/CODE_STANDARDS.md).
-
-<br/>
-
-## Usage
-
-Checkout the docker compose quickstart below for a quick way to get started.
-
-<br/>
-
-## Docker Compose Quickstart
+### Docker Compose Quickstart
 
 To get started with development, `bux-server` provides a `start-bux-server.sh` script
 which is using `docker-compose.yml` file to starts up Bux Server with selected database
@@ -326,45 +317,19 @@ There are two way of running this script:
   ```bash
   ./start-bux-server.sh -l
   ```
+<br/>
+
+## Code Standards
+Read more about this Go project's [code standards](.github/CODE_STANDARDS.md).
+
+<br/>
 
 ## Contributing
-
-View the [contributing guidelines](.github/CONTRIBUTING.md) and follow the [code of conduct](.github/CODE_OF_CONDUCT.md).
-
+All kinds of contributions are welcome!
 <br/>
-
-### How can I help?
-
-All kinds of contributions are welcome :raised_hands:!
-The most basic way to show your support is to star :star2: the project, or to raise issues :speech_balloon:.
-You can also support this project by [becoming a sponsor on GitHub](https://github.com/sponsors/BuxOrg) :clap:
-or by making a [**bitcoin donation**](https://gobitcoinsv.com/#sponsor?utm_source=github&utm_medium=sponsor-link&utm_campaign=bux-server&utm_term=bux-server&utm_content=bux-server) to ensure this journey continues indefinitely! :rocket:
-
-[![Stars](https://img.shields.io/github/stars/BuxOrg/bux-server?label=Please%20like%20us&style=social&v=3)](https://github.com/BuxOrg/bux-server/stargazers)
-
+To get started, take a look at [code standards](.github/CODE_STANDARDS.md).
 <br/>
-
-### Contributors ✨
-
-Thank you to these wonderful people ([emoji key](https://allcontributors.org/docs/en/emoji-key)):
-
-<!-- ALL-CONTRIBUTORS-LIST:START - Do not remove or modify this section -->
-<!-- prettier-ignore-start -->
-<!-- markdownlint-disable -->
-<table>
-  <tr>
-    <td align="center"><a href="https://mrz1818.com"><img src="https://avatars.githubusercontent.com/u/3743002?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Mr. Z</b></sub></a><br /><a href="#infra-mrz1836" title="Infrastructure (Hosting, Build-Tools, etc)">🚇</a> <a href="https://github.com/BuxOrg/bux-server/commits?author=mrz1836" title="Code">💻</a> <a href="#maintenance-mrz1836" title="Maintenance">🚧</a> <a href="#security-mrz1836" title="Security">🛡️</a></td>
-    <td align="center"><a href="https://github.com/icellan"><img src="https://avatars.githubusercontent.com/u/4411176?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Siggi</b></sub></a><br /><a href="#infra-icellan" title="Infrastructure (Hosting, Build-Tools, etc)">🚇</a> <a href="https://github.com/BuxOrg/bux-server/commits?author=icellan" title="Code">💻</a> <a href="#security-icellan" title="Security">🛡️</a></td>
-    <td align="center"><a href="https://github.com/galt-tr"><img src="https://avatars.githubusercontent.com/u/64976002?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Dylan</b></sub></a><br /><a href="#infra-galt-tr" title="Infrastructure (Hosting, Build-Tools, etc)">🚇</a> <a href="https://github.com/BuxOrg/bux-server/commits?author=galt-tr" title="Code">💻</a></td>
-  </tr>
-</table>
-
-<!-- markdownlint-restore -->
-<!-- prettier-ignore-end -->
-
-<!-- ALL-CONTRIBUTORS-LIST:END -->
-
-> This project follows the [all-contributors](https://github.com/all-contributors/all-contributors) specification.
+View the [contributing guidelines](.github/CODE_STANDARDS.md#3-contributing) and follow the [code of conduct](.github/CODE_OF_CONDUCT.md).
 
 <br/>
 
