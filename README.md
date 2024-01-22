@@ -191,7 +191,7 @@ vet                           Run the Go vet application
 
 ## Usage
 
-> Every variable which is used and can be configured is described in [config.example.yaml](/config/config.example.yaml)
+> Every variable which is used and can be configured is described in [config.example.yaml](config.example.yaml)
 
 
 ### Defaults
