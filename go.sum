@@ -1,7 +1,7 @@
 github.com/99designs/gqlgen v0.17.42 h1:BVWDOb2VVHQC5k3m6oa0XhDnxltLLrU4so7x/u39Zu4=
 github.com/99designs/gqlgen v0.17.42/go.mod h1:GQ6SyMhwFbgHR0a8r2Wn8fYgEwPxxmndLFPhU63+cJE=
-github.com/BuxOrg/bux v0.14.0 h1:gmAEYbrCXHWOtUDpYEOPMVbjvA7us/NtBObHAxfjcRI=
-github.com/BuxOrg/bux v0.14.0/go.mod h1:k1wV8XudTf63Ka+YMAcZbXroiNut2N75dx6ahXpqIPo=
+github.com/BuxOrg/bux v0.14.1 h1:J83uOlqe6ZowjSCnCa1sKig4YtN5JGcoJd54h6A2Kf8=
+github.com/BuxOrg/bux v0.14.1/go.mod h1:Bdf2Nld2yrtvj9OTPr+bdhyv+lXEmTxldH03IPRGZIo=
 github.com/BuxOrg/bux-models v0.3.0 h1:+pvpDdYaiIgeOhAO847RK07Vzc+vuUvy2ok/xJevQyg=
 github.com/BuxOrg/bux-models v0.3.0/go.mod h1:JCpoXxVnKZmCy3rg6nOtLQL5AXh6iEo2tBvcD/qAxEY=
 github.com/DATA-DOG/go-sqlmock v1.5.2 h1:OcvFkGmslmlZibjAjaHm3L//6LiuBgolP7OputlJIzU=
@@ -11,8 +11,6 @@ github.com/KyleBanks/depth v1.2.1 h1:5h8fQADFrWtarTdtDudMmGsC7GPbOAu6RVB3ffsVFHc
 github.com/KyleBanks/depth v1.2.1/go.mod h1:jzSb9d0L43HxTQfT+oSA1EEp2q+ne2uh6XgeJcm8brE=
 github.com/PuerkitoBio/goquery v1.8.1 h1:uQxhNlArOIdbrH1tr0UXwdVFgDcZDrZVdcpygAcwmWM=
 github.com/PuerkitoBio/goquery v1.8.1/go.mod h1:Q8ICL1kNUJ2sXGoAhPGUdYDJvgQgHzJsnnd3H7Ho5jQ=
-github.com/PuerkitoBio/purell v1.1.1/go.mod h1:c11w/QuzBsJSee3cPx9rAFu61PvFxuPbtSwDGJws/X0=
-github.com/PuerkitoBio/urlesc v0.0.0-20170810143723-de5bf2ad4578/go.mod h1:uGdkoq3SwY9Y+13GIhn11/XLaGBb4BfwItxLd5jeuXE=
 github.com/acobaugh/osrelease v0.1.0 h1:Yb59HQDGGNhCj4suHaFQQfBps5wyoKLSSX/J/+UifRE=
 github.com/acobaugh/osrelease v0.1.0/go.mod h1:4bFEs0MtgHNHBrmHCt67gNisnabCRAlzdVasCEGHTWY=
 github.com/afex/hystrix-go v0.0.0-20180209013831-27fae8d30f1a/go.mod h1:SkGFH1ia65gfNATL8TAiHDNxPzPdmEL5uirI2Uyuz6c=
@@ -34,8 +32,8 @@ github.com/aws/aws-sdk-go v1.43.45 h1:2708Bj4uV+ym62MOtBnErm/CDX61C4mFe9V2gXy1ca
 github.com/aws/aws-sdk-go v1.43.45/go.mod h1:y4AeaBuwd2Lk+GepC1E9v0qOiTws0MIWAX4oIKwKHZo=
 github.com/bitcoin-sv/go-broadcast-client v0.16.0 h1:KadOLv+i9Y6xAOkHsSl2PIECQ59SpUyYurY6Ysvpz5A=
 github.com/bitcoin-sv/go-broadcast-client v0.16.0/go.mod h1:GRAliwumNBjEbLRIEkXqIKJpsgmMfjvlIDqgyw/NoJE=
-github.com/bitcoin-sv/go-paymail v0.12.0 h1:y9Kc89wovrObllz0vilG/7olbMrba97D0XJR9YDBw6s=
-github.com/bitcoin-sv/go-paymail v0.12.0/go.mod h1:/BGu//F4Ji7jIzvkcHxlwBB9vU90yVRx/tovX91Tbw0=
+github.com/bitcoin-sv/go-paymail v0.12.1 h1:MDdMFFOZalymT5O5WDUN0EVVWdn3ygo6EhKsWimkM/E=
+github.com/bitcoin-sv/go-paymail v0.12.1/go.mod h1:/BGu//F4Ji7jIzvkcHxlwBB9vU90yVRx/tovX91Tbw0=
 github.com/bitcoinschema/go-bitcoin/v2 v2.0.5 h1:Sgh5Eb746Zck/46rFDrZZEXZWyO53fMuWYhNoZa1tck=
 github.com/bitcoinschema/go-bitcoin/v2 v2.0.5/go.mod h1:JjO1ivfZv6vhK0uAXzyH08AAHlzNMAfnyK1Fiv9r4ZA=
 github.com/bitcoinschema/go-bob v0.4.0 h1:adsAEboLQCg0D6e9vwcJUJEJScszsouAYCYu35UAiGo=
