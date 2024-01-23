@@ -2,17 +2,29 @@
 
 - [Code Standards \& Contributing Guidelines](#code-standards--contributing-guidelines)
   - [Most important rules - Quick Checklist](#most-important-rules---quick-checklist)
-  - [1. Code style and formatting - official guidelines](#1-code-style-and-formatting---official-guidelines)
+  - [1 Code style and formatting - official guidelines](#1-code-style-and-formatting---official-guidelines)
     - [1.1 In GO applications or libraries, we follow the official guidelines](#11-in-go-applications-or-libraries-we-follow-the-official-guidelines)
       - [Additional useful resources with GO recommendations, best practices and the common mistakes](#additional-useful-resources-with-go-recommendations-best-practices-and-the-common-mistakes)
-  - [2. Code Rules](#2-code-rules)
-    - [2.1. Self-documenting code](#21-self-documenting-code)
+  - [2 Code Rules](#2-code-rules)
+    - [2.1 Self-documenting code](#21-self-documenting-code)
       - [As a Developer](#as-a-developer)
       - [As a PR Reviewer](#as-a-pr-reviewer)
-    - [2.2. Tests](#22-tests)
+    - [2.2 Tests](#22-tests)
       - [Principle](#principle)
       - [Guidelines for Writing Tests](#guidelines-for-writing-tests)
-        - [Pull request title with a scope and task number](#pull-request-title-with-a-scope-and-task-number)
+    - [2.3 Code Review](#23-Code-Review)
+      - [Code Review Checklist](#code-review-checklist)
+  - [3 Contributing](#3-contributing)
+    - [3.1 Pull Requests && Issues](#31-pull-requests--issues)
+    - [3.2 Conventional Commits & Pull Requests Naming](#32-conventional-commits--pull-requests-naming)
+      - [Overview](#overview)
+      - [Structure](#structure)
+      - [Types](#types)
+      - [Conventional Commits - Automatic Versioning](#conventional-commits---automatic-versioning)
+      - [Scope](#scope)
+      - [Further Reading](#further-reading)
+      - [Examples](#examples)
+      - [Pull request title with a scope and task number](#pull-request-title-with-a-scope-and-task-number)
     - [3.3 Branching](#33-branching)
       - [Choosing branch names](#choosing-branch-names)
       - [Descriptiveness](#descriptiveness)
@@ -20,15 +32,15 @@
       - [Deleting Branches After Merging](#deleting-branches-after-merging)
       - [Remove Remote Branches](#remove-remote-branches)
       - [Recommendation: Clean Local Branches](#recommendation-clean-local-branches)
-  - [4. Documentation Code Standards](#4-documentation-code-standards)
+  - [4 Documentation Code Standards](#4-documentation-code-standards)
     - [4.1 Overview](#41-overview)
     - [4.2 Principles](#42-principles)
     - [4.3 Feature Documentation](#43-feature-documentation)
-      - [4.3.1 Necessity](#431-necessity)
-      - [4.3.2 Examples](#432-examples)
+      - [Necessity](#necessity)
+      - [Examples](#examples)
     - [4.4 External Features](#44-external-features)
     - [4.5 Markdown usage](#45-markdown-usage)
-    - [4.5 Conclusion](#45-conclusion)
+    - [4.6 Conclusion](#46-conclusion)
 
 ## Most important rules - Quick Checklist
 
@@ -41,12 +53,12 @@
 - [ ] Keep documentation clear, concise, up-to-date, and accessible.
 - [ ] Branching - choose consistent naming conventions, include issue number, delete branches after merging.
 
-## 1. Code style and formatting - official guidelines
+## 1 Code style and formatting - official guidelines
 
 ### 1.1 In GO applications or libraries, we follow the official guidelines
 
 - [Effective Go](https://go.dev/doc/effective_go) - official Go guidelines
-- [Go Code Review Comments](https://github.com/golang/go/wiki/CodeReviewComments) - official Go code review comments
+- [Go Code Review Comments](https://go.dev/wiki/CodeReviewComments) - official Go code review comments
 - [Go Examples](https://pkg.go.dev/testing#hdr-Examples) - official Go examples - used in libraries to explain how to use their exposed features
 - [Go Test](https://pkg.go.dev/testing) - official Go testing package & recommendations
 - [Go Linter](https://golangci-lint.run/) - golangci-lint - only codestyle checks
@@ -57,9 +69,9 @@
 
 - [Go Styles by Google](https://google.github.io/styleguide/go/) - Google's Go Style Guide
 - [Uber Go Style Guide](https://github.com/uber-go/guide/blob/master/style.md) - Uber's Go Style Guide
-- [Go Common Mistakes](https://github.com/golang/go/wiki/CommonMistakes) - Common Mistakes in Go
+- [Go Common Mistakes](https://go.dev/wiki/CommonMistakes) - Common Mistakes in Go
 
-## 2. Code Rules
+## 2 Code Rules
 
 ### 2.1. Self-documenting code
 
@@ -75,7 +87,7 @@
 - Be vigilant of newly added comments during reviews. If a comment appears unnecessary, uninformative, or could be replaced with a function, do not hesitate to highlight this.
 - Assess the meaningfulness and clarity of function names, ensuring they contribute to self-documenting code.
 
-### 2.2. Tests
+### 2.2 Tests
 
 #### Principle
 
@@ -140,7 +152,7 @@ Of course not only error paths should be covered - **we should highlight the hap
 
 10. **Responsiveness**: Both authors and reviewers should be timely in their responses. Authors should address all review comments, and reviewers should re-review changes promptly.
 
-#### 2.3.3 Code Review Checklist
+#### Code Review Checklist
 
 - [ ] Does the code adhere to the project’s coding standards?
 - [ ] Are there sufficient tests, and do they cover a variety of cases?
@@ -155,7 +167,7 @@ Of course not only error paths should be covered - **we should highlight the hap
 
 This checklist serves as a guide to both authors and reviewers to ensure a thorough and effective code review process.
 
-## 3. Contributing
+## 3 Contributing
 
 ### 3.1 Pull Requests && Issues
 
@@ -163,11 +175,11 @@ We have separate templates for Pull Requests and Issues. Please use them when cr
 
 ### 3.2 Conventional Commits & Pull Requests Naming
 
-#### 3.2.1 Overview
+#### Overview
 
 In an effort to maintain clarity and coherence in our commit history, we are adopting the Conventional Commits style for all commit messages across our repositories. This uniform format not only enhances the readability of our commit history but also facilitates automated tools in generating changelogs and extracting valuable information effectively.
 
-#### 3.2.2 Structure
+#### Structure
 
 Conventional Commits follow a structured format: `type(scope): description`, where:
 
@@ -175,9 +187,10 @@ Conventional Commits follow a structured format: `type(scope): description`, whe
 - `scope`: Denotes the relevant module or issue.
 - `description`: Provides a brief explanation of the change.
 
-When introducing breaking changes, an `!` should be appended after the `type/scope`: `feat(#123)!: introduce a breaking change`.
+When introducing breaking changes, an `!` should be appended after the `type/scope`:<br/>
+`feat(#123)!: introduce a breaking change`.
 
-#### 3.2.3 Types
+#### Types
 
 - `feat`: Utilized when introducing a new feature to the codebase.
 - `fix`: Employed when resolving a bug or issue in the code.
@@ -191,20 +204,20 @@ When introducing breaking changes, an `!` should be appended after the `type/sco
 - `ci`: Applied to changes concerning the Continuous Integration (CI) configuration or scripts.
 - `deps`: Used when updating or modifying dependencies.
 
-#### 3.2.4 Conventional Commits - Automatic Versioning
+#### Conventional Commits - Automatic Versioning
 
 In our repositories, we use Conventional Commits to automatically generate the version number for our releases.
 
 It works like this:
 
-`fix: which represents bug fixes, and correlates to a SemVer patch.`
-`feat: which represents a new feature, and correlates to a SemVer minor.`
+`fix: which represents bug fixes, and correlates to a SemVer patch.`<br/>
+`feat: which represents a new feature, and correlates to a SemVer minor.`<br/>
 `feat!:, or fix!:, refactor!:, etc., which represent a breaking change (indicated by the !) and will result in a SemVer major.`
 
 Real life example:
 
-`feat(#123)!: introduce breaking change - 1.0.0 -> 2.0.0`
-`feat(#124): introduce new feature - 2.0.0 -> 2.1.0`
+`feat(#123)!: introduce breaking change - 1.0.0 -> 2.0.0`<br/>
+`feat(#124): introduce new feature - 2.0.0 -> 2.1.0`<br/>
 `fix(#125): fix a bug - 2.1.0 -> 2.1.1`
 
 Given a version number MAJOR.MINOR.PATCH, increment the:
@@ -216,17 +229,17 @@ Additional labels for pre-release and build metadata are available as extensions
 
 More about Semantic Versioning can be found [here](https://semver.org/).
 
-#### 3.2.5 Scope
+#### Scope
 
 We have standardized the use of JIRA/GitHub issue numbers as the `scope` in commits within our team. This practice aids in easily tracing the origin of changes.
 
 In the absence of an existing issue for your changes, please create one in the client’s JIRA system. If the change is not client-related, establish a GitHub issue in the repository.
 
-#### 3.2.6 Further Reading
+#### Further Reading
 
 Additional information and guidelines on Conventional Commits can be found [here](https://www.conventionalcommits.org/en/v1.0.0/).
 
-#### 3.2.7 Examples
+#### Examples
 
 ##### Commit message with scope
 
@@ -260,11 +273,13 @@ debugo feature - checkpoint full work
 #### Descriptiveness
 
 - Branch names should be descriptive and represent the task/feature at hand.
-- Use hyphens to separate words for readability, e.g., `feature/add-login-button`.
+- Use hyphens to separate words for readability, e.g.,<br/>
+ `feature/add-login-button`.
 
 #### Include Issue Number
 
-- If applicable, include the issue number in the branch name for easy tracking, e.g., `feature/123-add-login-button`.
+- If applicable, include the issue number in the branch name for easy tracking, e.g.,<br/>
+`feature/123-add-login-button`.
 
 #### Deleting Branches After Merging
 
@@ -275,9 +290,10 @@ debugo feature - checkpoint full work
 
 #### Recommendation: Clean Local Branches
 
-- Regularly prune local branches that have been deleted remotely with `git fetch -p && git branch -vv | grep 'origin/.*: gone]' | awk '{print $1}' | xargs git branch -d`.
+- Regularly prune local branches that have been deleted remotely with <br/>
+`git fetch -p && git branch -vv | grep 'origin/.*: gone]' | awk '{print $1}' | xargs git branch -d`.
 
-## 4. Documentation Code Standards
+## 4 Documentation Code Standards
 
 ### 4.1 Overview
 
@@ -291,11 +307,11 @@ A well-documented codebase is pivotal for both internal development and external
 
 ### 4.3 Feature Documentation
 
-#### 4.3.1 Necessity
+#### Necessity
 
 Every feature developed should be accompanied by adequate documentation. The necessity for documentation becomes even more pronounced for open-source projects, where clear instructions and examples facilitate easier adoption and contribution from the community.
 
-#### 4.3.2 Examples
+#### Examples
 
 - **Inclusion of Examples**: Where applicable, documentation should include practical examples demonstrating the feature’s usage and benefits. Examples act as a practical guide, aiding developers in understanding and implementing the feature correctly.
 - **Clarity of Examples**: Examples should be clear, concise, and relevant, illustrating the functionality of the feature effectively.
@@ -311,8 +327,8 @@ For projects exposing external features:
 
 We should write documentation in Markdown format. It allows us to write documentation in a simple and readable way. It's also easy to convert Markdown to HTML or PDF or create a website from it.
 
-[Markdown Guide](markdownguide.org) - Comprehensive guide to Markdown syntax.
+[Markdown Guide](https://markdownguide.org) - Comprehensive guide to Markdown syntax.
 
-### 4.5 Conclusion
+### 4.6 Conclusion
 
 Adhering to documentation code standards is integral for maintaining a healthy, understandable, and contributable codebase. By ensuring every feature is well-documented, with the inclusion of clear examples where necessary, we foster a conducive environment for development and community engagement, particularly in open-source projects.

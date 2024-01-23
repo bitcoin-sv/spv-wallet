@@ -98,7 +98,7 @@ func getGraphqlDefaults() *GraphqlConfig {
 
 func getLoggingDefaults() *LoggingConfig {
 	return &LoggingConfig{
-		Level:        "debug",
+		Level:        "info",
 		Format:       "console",
 		InstanceName: "bux-server",
 		LogOrigin:    false,
