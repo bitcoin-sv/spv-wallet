@@ -63,6 +63,8 @@ db:
     table_prefix: ""
 debug: true
 debug_profiling: true
+logging:
+  level: info
 disable_itc: true
 # Prefixed with "_", because it's unused by default
 graphql:
