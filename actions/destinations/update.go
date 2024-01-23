@@ -32,7 +32,7 @@ func (a *Action) update(w http.ResponseWriter, req *http.Request, _ httprouter.P
 	address := params.GetString("address")
 	lockingScript := params.GetString("locking_script")
 	if id == "" && address == "" && lockingScript == "" {
-		apirouter.ReturnResponse(w, req, http.StatusExpectationFailed, "One of the fields is missing: id, address or lockingScript")
+		apirouter.ReturnResponse(w, req, http.StatusExpectationFailed, "One of the fields is required: id, address or lockingScript")
 		return
 	}
 	metadata := params.GetJSON(actions.MetadataField)
