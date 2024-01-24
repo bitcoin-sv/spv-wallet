@@ -202,8 +202,6 @@ type PaymailConfig struct {
 	Domains []string `json:"domains" mapstructure:"domains"`
 	// DomainValidationEnabled should be turned off if hosted domain is not paymail related.
 	DomainValidationEnabled bool `json:"domain_validation_enabled" mapstructure:"domain_validation_enabled"`
-	// Enabled is a flag for enabling the Paymail Server Service.
-	Enabled bool `json:"enabled" mapstructure:"enabled"`
 	// SenderValidationEnabled should be turned on for extra security.
 	SenderValidationEnabled bool `json:"sender_validation_enabled" mapstructure:"sender_validation_enabled"`
 }
@@ -216,6 +214,10 @@ type BeefConfig struct {
 	PulseHeaderValidationURL string `json:"pulse_url" mapstructure:"pulse_url"`
 	// PulseAuthToken is the authentication token for validating headers in Pulse.
 	PulseAuthToken string `json:"pulse_auth_token" mapstructure:"pulse_auth_token"`
+}
+
+func (b *BeefConfig) enabled() bool {
+	return b != nil && b.UseBeef
 }
 
 // TaskManagerConfig is a configuration for the taskmanager

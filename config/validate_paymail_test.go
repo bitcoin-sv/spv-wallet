@@ -13,7 +13,6 @@ func TestPaymailConfig_Validate(t *testing.T) {
 	t.Run("no domains", func(t *testing.T) {
 		p := PaymailConfig{
 			Domains: nil,
-			Enabled: true,
 		}
 		err := p.Validate()
 		require.Error(t, err)
@@ -22,7 +21,6 @@ func TestPaymailConfig_Validate(t *testing.T) {
 	t.Run("zero domains", func(t *testing.T) {
 		p := PaymailConfig{
 			Domains: []string{},
-			Enabled: true,
 		}
 		err := p.Validate()
 		require.Error(t, err)
@@ -31,7 +29,6 @@ func TestPaymailConfig_Validate(t *testing.T) {
 	t.Run("empty domains", func(t *testing.T) {
 		p := PaymailConfig{
 			Domains: []string{""},
-			Enabled: true,
 		}
 		err := p.Validate()
 		require.Error(t, err)
@@ -40,7 +37,6 @@ func TestPaymailConfig_Validate(t *testing.T) {
 	t.Run("invalid hostname", func(t *testing.T) {
 		p := PaymailConfig{
 			Domains: []string{"..."},
-			Enabled: true,
 		}
 		err := p.Validate()
 		require.Error(t, err)
@@ -49,7 +45,6 @@ func TestPaymailConfig_Validate(t *testing.T) {
 	t.Run("spaces in hostname", func(t *testing.T) {
 		p := PaymailConfig{
 			Domains: []string{"spaces in domain"},
-			Enabled: true,
 		}
 		err := p.Validate()
 		require.Error(t, err)
@@ -58,10 +53,32 @@ func TestPaymailConfig_Validate(t *testing.T) {
 	t.Run("valid domains", func(t *testing.T) {
 		p := PaymailConfig{
 			Domains: []string{"test.com", "domain.com"},
-			Enabled: true,
 		}
 		err := p.Validate()
 		require.NoError(t, err)
 	})
 
+	t.Run("invalid beef", func(t *testing.T) {
+		p := PaymailConfig{
+			Domains: []string{"test.com", "domain.com"},
+			Beef: &BeefConfig{
+				UseBeef:                  true,
+				PulseHeaderValidationURL: "",
+			},
+		}
+		err := p.Validate()
+		require.Error(t, err)
+	})
+
+	t.Run("valid beef", func(t *testing.T) {
+		p := PaymailConfig{
+			Domains: []string{"test.com", "domain.com"},
+			Beef: &BeefConfig{
+				UseBeef:                  true,
+				PulseHeaderValidationURL: "http://localhost:8080/api/v1/chain/merkleroot/verify",
+			},
+		}
+		err := p.Validate()
+		require.NoError(t, err)
+	})
 }

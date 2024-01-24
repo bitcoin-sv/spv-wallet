@@ -171,14 +171,6 @@ func (s *AppServices) loadBux(ctx context.Context, appConfig *AppConfig, testMod
 
 	options = loadPaymail(appConfig, options)
 
-	if appConfig.Paymail.Beef.UseBeef {
-		if appConfig.Paymail.Beef.PulseHeaderValidationURL == "" {
-			err = errors.New("pulse is required for BEEF to work")
-			return err
-		}
-		options = append(options, bux.WithPaymailBeefSupport(appConfig.Paymail.Beef.PulseHeaderValidationURL, appConfig.Paymail.Beef.PulseAuthToken))
-	}
-
 	options = loadTaskManager(appConfig, options)
 
 	if appConfig.Notifications != nil && appConfig.Notifications.Enabled {
@@ -270,16 +262,16 @@ func loadCluster(appConfig *AppConfig, options []bux.ClientOps) ([]bux.ClientOps
 }
 
 func loadPaymail(appConfig *AppConfig, options []bux.ClientOps) []bux.ClientOps {
-	// Set the Paymail server if enabled
-	if appConfig.Paymail.Enabled {
-		// Append the server config
-		options = append(options, bux.WithPaymailSupport(
-			appConfig.Paymail.Domains,
-			appConfig.Paymail.DefaultFromPaymail,
-			appConfig.Paymail.DefaultNote,
-			appConfig.Paymail.DomainValidationEnabled,
-			appConfig.Paymail.SenderValidationEnabled,
-		))
+	pm := appConfig.Paymail
+	options = append(options, bux.WithPaymailSupport(
+		pm.Domains,
+		pm.DefaultFromPaymail,
+		pm.DefaultNote,
+		pm.DomainValidationEnabled,
+		pm.SenderValidationEnabled,
+	))
+	if pm.Beef.enabled() {
+		options = append(options, bux.WithPaymailBeefSupport(pm.Beef.PulseHeaderValidationURL, pm.Beef.PulseAuthToken))
 	}
 	return options
 }

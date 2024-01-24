@@ -146,7 +146,6 @@ func getPaymailDefaults() *PaymailConfig {
 		DefaultNote:             "bux Address Resolution",
 		Domains:                 []string{"localhost"},
 		DomainValidationEnabled: true,
-		Enabled:                 true,
 		SenderValidationEnabled: false,
 	}
 }
