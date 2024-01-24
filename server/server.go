@@ -40,7 +40,6 @@ func NewServer(appConfig *config.AppConfig, services *config.AppServices) *Serve
 
 // Serve will load a server and start serving
 func (s *Server) Serve() {
-
 	// Load the server defaults
 	s.WebServer = &http.Server{
 		Addr:              ":" + strconv.Itoa(s.AppConfig.Server.Port),
@@ -82,7 +81,6 @@ func (s *Server) Shutdown(ctx context.Context) error {
 
 // Handlers will return handlers
 func (s *Server) Handlers() *nrhttprouter.Router {
-
 	// Start a transaction for loading handlers
 	txn := s.Services.NewRelic.StartTransaction("load_handlers")
 	defer txn.End()
@@ -119,9 +117,7 @@ func (s *Server) Handlers() *nrhttprouter.Router {
 	}
 
 	// Load Paymail
-	if s.AppConfig.Paymail.Enabled {
-		pmail.RegisterRoutes(s.Router, s.AppConfig, s.Services)
-	}
+	pmail.RegisterRoutes(s.Router, s.AppConfig, s.Services)
 
 	// Return the router
 	return s.Router.HTTPRouter

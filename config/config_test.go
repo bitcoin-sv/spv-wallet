@@ -100,7 +100,6 @@ func TestAppConfig_Validate(t *testing.T) {
 
 	t.Run("paymail - no domains", func(t *testing.T) {
 		app, _ := baseTestConfig(t)
-		app.Paymail.Enabled = true
 		app.Paymail.Domains = nil
 		err := app.Validate()
 		assert.Error(t, err)

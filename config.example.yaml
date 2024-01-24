@@ -100,7 +100,6 @@ paymail:
   domain_validation_enabled: false
   domains:
     - localhost
-  enabled: true
   sender_validation_enabled: false
 request_logging: true
 server_config:
