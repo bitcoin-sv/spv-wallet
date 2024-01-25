@@ -45,6 +45,10 @@ func main() {
 		return
 	}
 
+	if appConfig.PulseEnabled() {
+		appConfig.CheckPulse(context.Background(), services.Logger)
+	}
+
 	// @mrz New Relic is ready at this point
 	txn := services.NewRelic.StartTransaction("load_server")
 
