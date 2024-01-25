@@ -53,7 +53,9 @@ func (config *AppConfig) CheckPulse(ctx context.Context, logger *zerolog.Logger)
 	client := &http.Client{}
 	res, err := client.Do(req)
 	if res != nil {
-		defer res.Body.Close() //nolint: all
+		defer func() {
+			_ = res.Body.Close()
+		}()
 	}
 
 	if err != nil {
