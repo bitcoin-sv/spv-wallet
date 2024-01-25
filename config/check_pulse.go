@@ -52,7 +52,7 @@ func (config *AppConfig) CheckPulse(ctx context.Context, logger *zerolog.Logger)
 		return
 	}
 	if res.StatusCode != http.StatusOK {
-		logger.Error().Msg(pulseIsOfflineWarning)
+		logger.Error().Msgf("%s Response statusCode: %d", pulseIsOfflineWarning, res.StatusCode)
 		return
 	}
 
