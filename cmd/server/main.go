@@ -45,6 +45,9 @@ func main() {
 		return
 	}
 
+	// Try to ping the pulse service if enabled
+	appConfig.CheckPulse(context.Background(), services.Logger)
+
 	// @mrz New Relic is ready at this point
 	txn := services.NewRelic.StartTransaction("load_server")
 

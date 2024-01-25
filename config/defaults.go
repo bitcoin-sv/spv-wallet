@@ -138,7 +138,7 @@ func getNotificationDefaults() *NotificationsConfig {
 func getPaymailDefaults() *PaymailConfig {
 	return &PaymailConfig{
 		Beef: &BeefConfig{
-			UseBeef:                  false,
+			UseBeef:                  true,
 			PulseHeaderValidationURL: "http://localhost:8080/api/v1/chain/merkleroot/verify",
 			PulseAuthToken:           "mQZQ6WmxURxWz5ch", // #nosec G101
 		},
