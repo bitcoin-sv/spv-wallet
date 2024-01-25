@@ -19,22 +19,31 @@ const pastMerkleRootsJSON = `[
 ]`
 
 const (
-	pulseIsOfflineWarning  = `Unable to connect to Pulse service at startup. Application will continue to operate but cannot receive transactions until Pulse is online. Please check Pulse configuration and service status.`
-	pulseIsNotReadyWarning = `Pulse is responding but is not ready to verify transactions. Application will continue to operate but cannot receive transactions until Pulse is ready.`
+	pleaseCheck            = "Please check Pulse configuration and service status."
+	appWillContinue        = "Application will continue to operate but cannot receive transactions until Pulse is online."
+	pulseIsOfflineWarning  = "Unable to connect to Pulse service at startup. " + appWillContinue + " " + pleaseCheck
+	unexpectedResponse     = "Unexpected response from Pulse service. " + pleaseCheck
+	pulseIsNotReadyWarning = "Pulse is responding but is not ready to verify transactions. " + appWillContinue
 )
 
-// CheckPulse tries to connect to the Pulse service and logs a warning if it fails
+// CheckPulse tries to make a request to the Pulse service to check if it is online and ready to verify transactions.
+// AppConfig should be validated before calling this method.
+// This method returns nothing, instead it logs either an error or a warning based on the state of the Pulse service.
 func (config *AppConfig) CheckPulse(ctx context.Context, logger *zerolog.Logger) {
+	if !config.PulseEnabled() {
+		// this method works only with Beef/Pulse enabled
+		return
+	}
 	b := config.Paymail.Beef
 
-	logger.Info().Msg("checking pulse")
+	logger.Info().Msg("checking Pulse")
 
 	timedCtx, cancel := context.WithTimeout(ctx, 5*time.Second)
 	defer cancel()
 
 	req, err := http.NewRequestWithContext(timedCtx, "POST", b.PulseHeaderValidationURL, bytes.NewBufferString(pastMerkleRootsJSON))
 	if err != nil {
-		logger.Error().Err(err).Msg("error checking pulse - failed to create request")
+		logger.Error().Err(err).Msg("error checking Pulse - failed to create request")
 		return
 	}
 
@@ -59,7 +68,7 @@ func (config *AppConfig) CheckPulse(ctx context.Context, logger *zerolog.Logger)
 	var responseModel chainstate.MerkleRootsConfirmationsResponse
 	err = json.NewDecoder(res.Body).Decode(&responseModel)
 	if err != nil {
-		logger.Error().Err(err).Msg(pulseIsOfflineWarning)
+		logger.Error().Err(err).Msg(unexpectedResponse)
 		return
 	}
 
@@ -71,7 +80,7 @@ func (config *AppConfig) CheckPulse(ctx context.Context, logger *zerolog.Logger)
 	logger.Info().Msg("Pulse is ready to verify transactions.")
 }
 
-// PulseEnabled returns true if the pulse service is enabled in the AppConfig
+// PulseEnabled returns true if the Pulse service is enabled in the AppConfig
 func (config *AppConfig) PulseEnabled() bool {
 	return config.Paymail != nil && config.Paymail.Beef.enabled()
 }
