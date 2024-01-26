@@ -23,7 +23,7 @@ func RegisterRoutes(router *apirouter.Router, appConfig *config.AppConfig, servi
 	// V1 Requests
 	router.HTTPRouter.GET("/"+config.APIVersion+"/admin/stats", action.Request(router, require.Wrap(action.stats)))
 	router.HTTPRouter.GET("/"+config.APIVersion+"/admin/status", action.Request(router, require.Wrap(action.status)))
-	router.HTTPRouter.POST("/"+config.APIVersion+"/admin/access-keys/search", action.Request(router, require.Wrap(action.accessKeysSearch)))
+	router.HTTPRouter.GET("/"+config.APIVersion+"/admin/access-keys/search", action.Request(router, require.Wrap(action.accessKeysSearch)))
 	router.HTTPRouter.POST("/"+config.APIVersion+"/admin/access-keys/count", action.Request(router, require.Wrap(action.accessKeysCount)))
 	router.HTTPRouter.POST("/"+config.APIVersion+"/admin/block-headers/search", action.Request(router, require.Wrap(action.blockHeadersSearch)))
 	router.HTTPRouter.POST("/"+config.APIVersion+"/admin/block-headers/count", action.Request(router, require.Wrap(action.blockHeadersCount)))
