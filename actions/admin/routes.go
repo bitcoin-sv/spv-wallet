@@ -37,7 +37,7 @@ func RegisterRoutes(router *apirouter.Router, appConfig *config.AppConfig, servi
 	router.HTTPRouter.POST("/"+config.APIVersion+"/admin/transactions/search", action.Request(router, require.Wrap(action.transactionsSearch)))
 	router.HTTPRouter.POST("/"+config.APIVersion+"/admin/transactions/count", action.Request(router, require.Wrap(action.transactionsCount)))
 	router.HTTPRouter.POST("/"+config.APIVersion+"/admin/transactions/record", action.Request(router, require.Wrap(action.transactionRecord)))
-	router.HTTPRouter.POST("/"+config.APIVersion+"/admin/utxos/search", action.Request(router, require.Wrap(action.utxosSearch)))
+	router.HTTPRouter.GET("/"+config.APIVersion+"/admin/utxos/search", action.Request(router, require.Wrap(action.utxosSearch)))
 	router.HTTPRouter.POST("/"+config.APIVersion+"/admin/utxos/count", action.Request(router, require.Wrap(action.utxosCount)))
 	router.HTTPRouter.POST("/"+config.APIVersion+"/admin/xpubs/search", action.Request(router, require.Wrap(action.xpubsSearch)))
 	router.HTTPRouter.POST("/"+config.APIVersion+"/admin/xpubs/count", action.Request(router, require.Wrap(action.xpubsCount)))
