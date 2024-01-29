@@ -191,6 +191,14 @@ vet                           Run the Go vet application
 
 ## Usage
 
+> Every variable which is used and can be configured is described in [config.example.yaml](config.example.yaml)
+
+
+### Defaults
+
+If you run Bux-Server without editing anything, it will use the default configuration from file [defaults.go](/config/defaults.go). It is set up to use _freecache_, _sqlite_ with enabled _paymail_ with _signing disabled_ and with _beef_.
+
+
 ### Config Variables
 
 Default config variables can be overridden by (in this order of importance):
