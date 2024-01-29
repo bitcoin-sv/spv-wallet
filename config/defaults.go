@@ -14,7 +14,6 @@ func getDefaultAppConfig() *AppConfig {
 		Debug:              true,
 		DebugProfiling:     true,
 		DisableITC:         true,
-		GraphQL:            getGraphqlDefaults(),
 		ImportBlockHeaders: "",
 		Logging:            getLoggingDefaults(),
 		NewRelic:           getNewRelicDefaults(),
@@ -87,12 +86,6 @@ func getDbDefaults() *DbConfig {
 			ExistingConnection: nil,
 			Shared:             true,
 		},
-	}
-}
-
-func getGraphqlDefaults() *GraphqlConfig {
-	return &GraphqlConfig{
-		Enabled: false,
 	}
 }
 
