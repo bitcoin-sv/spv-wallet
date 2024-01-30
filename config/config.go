@@ -140,10 +140,11 @@ type NewRelicConfig struct {
 
 // NodesConfig consists of blockchain nodes (such as Minercraft and Arc) configuration
 type NodesConfig struct {
-	Protocol     NodesProtocol  `json:"protocol" mapstructure:"protocol"`
-	Apis         []*MinerAPI    `json:"apis" mapstructure:"apis"`
-	UseFeeQuotes bool           `json:"use_fee_quotes" mapstructure:"use_fee_quotes"`
-	FeeUnit      *FeeUnitConfig `json:"fee_unit" mapstructure:"fee_unit"`
+	CallbackToken string         `json:"callback_token" mapstructure:"callback_token"`
+	Protocol      NodesProtocol  `json:"protocol" mapstructure:"protocol"`
+	Apis          []*MinerAPI    `json:"apis" mapstructure:"apis"`
+	UseFeeQuotes  bool           `json:"use_fee_quotes" mapstructure:"use_fee_quotes"`
+	FeeUnit       *FeeUnitConfig `json:"fee_unit" mapstructure:"fee_unit"`
 }
 
 // FeeUnitConfig reflects the utils.FeeUnit struct with proper annotations for json and mapstructure

@@ -1,0 +1,113 @@
+auth:
+  admin_key: xpub661MyMwAqRbcFgfmdkPgE2m5UjHXu9dj124DbaGLSjaqVESTWfCD4VuNmEbVPkbYLCkykwVZvmA8Pbf8884TQr1FgdG2nPoHR8aB36YdDQh
+  require_signing: false
+  scheme: xpub
+  signing_disabled: true
+cache:
+  cluster:
+    coordinator: memory
+    prefix: bux_cluster_
+    redis: null
+  engine: freecache
+  # Prefixed with "_", because it's unused by default
+  _redis:
+    dependency_mode: true
+    max_active_connections: 0
+    max_connection_lifetime: 1m0s
+    max_idle_connections: 10
+    max_idle_timeout: 10s
+    url: redis://localhost:6379
+    use_tls: false
+db:
+  datastore:
+    debug: false
+    engine: postgresql
+    table_prefix: xapi
+  # Prefixed with "_", because it's unused by default
+  _mongodb:
+    database_name: xapi
+    debug: false
+    max_connection_idle_time: 0s
+    max_connection_time: 0s
+    max_idle_connections: 0
+    max_open_connections: 0
+    table_prefix: ""
+    transactions: false
+    uri: mongodb://localhost:27017/xapi
+  # Prefixed with "_", because it's unused by default
+  sql:
+    debug: false
+    driver: postgresql
+    host: localhost
+    max_connection_idle_time: 0s
+    max_connection_time: 0s
+    max_idle_connections: 0
+    max_open_connections: 0
+    name: postgres
+    password: "postgres"
+    port: "5432"
+    replica: false
+    skip_initialize_with_version: true
+    table_prefix: ""
+    time_zone: UTC
+    tx_timeout: 10s
+    user: postgres
+  sqlite:
+    database_path: ./bux.db
+    debug: false
+    max_connection_idle_time: 0s
+    max_connection_time: 0s
+    max_idle_connections: 0
+    max_open_connections: 0
+    shared: true
+    table_prefix: ""
+debug: true
+debug_profiling: true
+logging:
+  level: info
+disable_itc: true
+# Prefixed with "_", because it's unused by default
+graphql:
+  enabled: false
+import_block_headers: ""
+# Prefixed with "_", because it's unused by default
+_new_relic:
+  domain_name: domain.com
+  enabled: false
+  license_key: BOGUS-LICENSE-KEY-1234567890987654321234
+# Prefixed with "_", because it will be configured by default
+nodes:
+  # Default callback token will be generated from the Admin Key
+  _callback_token: xyz
+  protocol: arc
+  apis:
+    - arc_url: https://api.taal.com/arc
+      token: mainnet_3af382fadbc448b15cc4133242ac2621
+  use_fee_quotes: true
+  fee_unit:
+    satoshis: 1
+    bytes: 1000
+# Prefixed with "_", because it's unused by default
+_notifications:
+  enabled: false
+  webhook_endpoint: ""
+paymail:
+  # Prefixed with "_", because it's unused by default
+  _beef:
+    pulse_auth_token: mQZQ6WmxURxWz5ch
+    pulse_url: http://localhost:8080/api/v1/chain/merkleroot/verify
+    use_beef: false
+  default_from_paymail: from@domain.com
+  default_note: bux Address Resolution
+  domain_validation_enabled: false
+  domains:
+    - wojtek.4chain.space
+  sender_validation_enabled: false
+request_logging: true
+server_config:
+  idle_timeout: 1m0s
+  port: 3003
+  read_timeout: 15s
+  write_timeout: 15s
+task_manager:
+  factory: memory

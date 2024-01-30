@@ -21,7 +21,7 @@ func Load(logger *zerolog.Logger) (appConfig *AppConfig, err error) {
 	viperLock.Lock()
 	defer viperLock.Unlock()
 
-	if err = setDefaults(); err != nil {
+	if err = setDefaults(logger); err != nil {
 		return nil, err
 	}
 
@@ -35,7 +35,7 @@ func Load(logger *zerolog.Logger) (appConfig *AppConfig, err error) {
 		return nil, err
 	}
 
-	appConfig = getDefaultAppConfig()
+	appConfig = getDefaultAppConfig(logger)
 	if err = unmarshallToAppConfig(appConfig); err != nil {
 		return nil, err
 	}
@@ -52,11 +52,11 @@ func Load(logger *zerolog.Logger) (appConfig *AppConfig, err error) {
 	return appConfig, nil
 }
 
-func setDefaults() error {
+func setDefaults(logger *zerolog.Logger) error {
 	viper.SetDefault(ConfigFilePathKey, DefaultConfigFilePath)
 
 	defaultsMap := make(map[string]interface{})
-	if err := mapstructure.Decode(getDefaultAppConfig(), &defaultsMap); err != nil {
+	if err := mapstructure.Decode(getDefaultAppConfig(logger), &defaultsMap); err != nil {
 		return err
 	}
 

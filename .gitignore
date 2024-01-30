@@ -38,3 +38,6 @@ data/
 
 # Configuration files
 .env.config
+
+# VSCode
+.vscode/

@@ -3,10 +3,14 @@ package config
 import (
 	"time"
 
+	"github.com/BuxOrg/bux/utils"
 	"github.com/mrz1836/go-datastore"
+	"github.com/rs/zerolog"
 )
 
-func getDefaultAppConfig() *AppConfig {
+const DefaultAdminXpub = "xpub661MyMwAqRbcFgfmdkPgE2m5UjHXu9dj124DbaGLSjaqVESTWfCD4VuNmEbVPkbYLCkykwVZvmA8Pbf8884TQr1FgdG2nPoHR8aB36YdDQh"
+
+func getDefaultAppConfig(logger *zerolog.Logger) *AppConfig {
 	return &AppConfig{
 		Authentication:     getAuthConfigDefaults(),
 		Cache:              getCacheDefaults(),
@@ -17,7 +21,7 @@ func getDefaultAppConfig() *AppConfig {
 		ImportBlockHeaders: "",
 		Logging:            getLoggingDefaults(),
 		NewRelic:           getNewRelicDefaults(),
-		Nodes:              getNodesDefaults(),
+		Nodes:              getNodesDefaults(logger),
 		Notifications:      getNotificationDefaults(),
 		Paymail:            getPaymailDefaults(),
 		RequestLogging:     true,
@@ -28,7 +32,7 @@ func getDefaultAppConfig() *AppConfig {
 
 func getAuthConfigDefaults() *AuthenticationConfig {
 	return &AuthenticationConfig{
-		AdminKey:        "xpub661MyMwAqRbcFgfmdkPgE2m5UjHXu9dj124DbaGLSjaqVESTWfCD4VuNmEbVPkbYLCkykwVZvmA8Pbf8884TQr1FgdG2nPoHR8aB36YdDQh",
+		AdminKey:        DefaultAdminXpub,
 		RequireSigning:  false,
 		Scheme:          "xpub",
 		SigningDisabled: true,
@@ -107,9 +111,15 @@ func getNewRelicDefaults() *NewRelicConfig {
 	}
 }
 
-func getNodesDefaults() *NodesConfig {
+func getNodesDefaults(logger *zerolog.Logger) *NodesConfig {
+	callbackToken, err := utils.HashAdler32(DefaultAdminXpub)
+	if err != nil {
+		logger.Err(err).Msg("unable to compute default callback token")
+	}
+
 	return &NodesConfig{
-		Protocol: NodesProtocolArc,
+		CallbackToken: callbackToken,
+		Protocol:      NodesProtocolArc,
 		Apis: []*MinerAPI{
 			{
 				ArcURL: "https://arc.gorillapool.io",

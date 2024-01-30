@@ -13,7 +13,6 @@ type Action struct {
 
 // RegisterRoutes register all the package specific routes
 func RegisterRoutes(router *apirouter.Router, appConfig *config.AppConfig, services *config.AppServices) {
-
 	// Use the authentication middleware wrapper
 	a, require := actions.NewStack(appConfig, services)
 	require.Use(a.RequireAuthentication)
@@ -21,6 +20,10 @@ func RegisterRoutes(router *apirouter.Router, appConfig *config.AppConfig, servi
 	// Use the authentication middleware wrapper - this will only check for a valid xPub
 	aBasic, requireBasic := actions.NewStack(appConfig, services)
 	requireBasic.Use(aBasic.RequireBasicAuthentication)
+
+	// Use the callback middleware wrapper
+	aCallback, requireCallback := actions.NewStack(appConfig, services)
+	requireCallback.Use(aCallback.RequireCallbackAuthentication)
 
 	// Load the actions and set the services
 	action := &Action{actions.Action{AppConfig: a.AppConfig, Services: a.Services}}
@@ -33,4 +36,5 @@ func RegisterRoutes(router *apirouter.Router, appConfig *config.AppConfig, servi
 	router.HTTPRouter.POST("/"+config.APIVersion+"/transaction", action.Request(router, require.Wrap(action.newTransaction)))
 	router.HTTPRouter.POST("/"+config.APIVersion+"/transaction/record", action.Request(router, require.Wrap(action.record)))
 	router.HTTPRouter.POST("/"+config.APIVersion+"/transaction/search", action.Request(router, requireBasic.Wrap(action.search)))
+	router.HTTPRouter.POST("/"+config.APIVersion+"/transaction/callback", action.Request(router, requireCallback.Wrap(action.callback)))
 }
