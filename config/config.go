@@ -36,8 +36,6 @@ type AppConfig struct {
 	DebugProfiling bool `json:"debug_profiling" mapstructure:"debug_profiling"`
 	// DisableITC is a flag for disabling Incoming Transaction Checking.
 	DisableITC bool `json:"disable_itc" mapstructure:"disable_itc"`
-	// GraphQL is GraphQL related settings.
-	GraphQL *GraphqlConfig `json:"graphql" mapstructure:"graphql"`
 	// ImportBlockHeaders is a URL from where the headers can be downloaded.
 	ImportBlockHeaders string `json:"import_block_headers" mapstructure:"import_block_headers"`
 	// Logging is the configuration for zerolog used in bux.
@@ -128,12 +126,6 @@ type DatastoreConfig struct {
 	Engine datastore.Engine `json:"engine" mapstructure:"engine"`
 	// TablePrefix is the prefix for all table names in the database.
 	TablePrefix string `json:"table_prefix" mapstructure:"table_prefix"`
-}
-
-// GraphqlConfig is the configuration for the GraphQL server
-type GraphqlConfig struct {
-	// Enabled is a flag that says whether graphql should be enabled.
-	Enabled bool `json:"enabled" mapstructure:"enabled"`
 }
 
 // NewRelicConfig is the configuration for New Relic

@@ -27,10 +27,6 @@ clean: ## Remove previous builds and any cached data
 	@test $(DISTRIBUTIONS_DIR)
 	@if [ -d $(DISTRIBUTIONS_DIR) ]; then rm -r $(DISTRIBUTIONS_DIR); fi
 
-.PHONY: graphql
-graphql: ## Generates the graphql schemas
-	@go run github.com/99designs/gqlgen generate
-
 .PHONY: install-all-contributors
 install-all-contributors: ## Installs all contributors locally
 	@echo "installing all-contributors cli tool..."

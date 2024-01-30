@@ -11,7 +11,6 @@ import (
 	"github.com/BuxOrg/bux-server/actions/admin"
 	"github.com/BuxOrg/bux-server/actions/base"
 	"github.com/BuxOrg/bux-server/actions/destinations"
-	"github.com/BuxOrg/bux-server/actions/graphql"
 	pmail "github.com/BuxOrg/bux-server/actions/paymail"
 	"github.com/BuxOrg/bux-server/actions/transactions"
 	"github.com/BuxOrg/bux-server/actions/utxos"
@@ -110,11 +109,6 @@ func (s *Server) Handlers() *nrhttprouter.Router {
 	transactions.RegisterRoutes(s.Router, s.AppConfig, s.Services)
 	utxos.RegisterRoutes(s.Router, s.AppConfig, s.Services)
 	xpubs.RegisterRoutes(s.Router, s.AppConfig, s.Services)
-
-	// Load GraphQL
-	if s.AppConfig.GraphQL.Enabled {
-		graphql.RegisterRoutes(s.Router, s.AppConfig, s.Services)
-	}
 
 	// Load Paymail
 	pmail.RegisterRoutes(s.Router, s.AppConfig, s.Services)
