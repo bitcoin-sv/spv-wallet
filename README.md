@@ -157,7 +157,6 @@ coverage                      Shows the test coverage
 diff                          Show the git diff
 generate                      Runs the go generate command in the base of the repo
 godocs                        Sync the latest tag with GoDocs
-graphql                       Generates the graphql schemas
 help                          Show this help message
 install                       Install the application
 install-all-contributors      Installs all contributors locally
