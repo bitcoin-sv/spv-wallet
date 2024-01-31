@@ -24,5 +24,4 @@ func RegisterRoutes(router *apirouter.Router, appConfig *config.AppConfig, servi
 	router.HTTPRouter.GET("/"+config.APIVersion+"/utxo", action.Request(router, require.Wrap(action.get)))
 	router.HTTPRouter.POST("/"+config.APIVersion+"/utxo/count", action.Request(router, require.Wrap(action.count)))
 	router.HTTPRouter.POST("/"+config.APIVersion+"/utxo/search", action.Request(router, require.Wrap(action.search)))
-	router.HTTPRouter.PATCH("/"+config.APIVersion+"/utxo/unreserve", action.Request(router, require.Wrap(action.unreserve)))
 }

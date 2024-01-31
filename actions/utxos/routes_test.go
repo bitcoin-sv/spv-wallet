@@ -22,9 +22,5 @@ func (ts *TestSuite) TestUtxoRegisterRoutes() {
 		// search utxo
 		handle, _, _ = ts.Router.HTTPRouter.Lookup(http.MethodPost, "/"+config.APIVersion+"/utxo/search")
 		assert.NotNil(t, handle)
-
-		// unreserve utxo
-		handle, _, _ = ts.Router.HTTPRouter.Lookup(http.MethodPatch, "/"+config.APIVersion+"/utxo/unreserve")
-		assert.NotNil(t, handle)
 	})
 }

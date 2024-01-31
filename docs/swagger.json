@@ -1743,33 +1743,6 @@
                 }
             }
         },
-        "/v1/utxo/unreserve": {
-            "patch": {
-                "security": [
-                    {
-                        "bux-auth-xpub": []
-                    }
-                ],
-                "description": "Unreserve UTXOs",
-                "tags": [
-                    "UTXO"
-                ],
-                "summary": "Unreserve UTXOs",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "draft tx id",
-                        "name": "reference_id",
-                        "in": "query"
-                    }
-                ],
-                "responses": {
-                    "201": {
-                        "description": "Created"
-                    }
-                }
-            }
-        },
         "/v1/xpub": {
             "get": {
                 "security": [

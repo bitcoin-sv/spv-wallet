@@ -1088,22 +1088,6 @@ paths:
       summary: Search UTXO
       tags:
       - UTXO
-  /v1/utxo/unreserve:
-    patch:
-      description: Unreserve UTXOs
-      parameters:
-      - description: draft tx id
-        in: query
-        name: reference_id
-        type: string
-      responses:
-        "201":
-          description: Created
-      security:
-      - bux-auth-xpub: []
-      summary: Unreserve UTXOs
-      tags:
-      - UTXO
   /v1/xpub:
     get:
       description: Get xPub
