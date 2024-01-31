@@ -2,6 +2,7 @@ package actions
 
 import (
 	"net/http"
+	"strings"
 	"time"
 
 	"github.com/BuxOrg/bux"
@@ -120,12 +121,15 @@ func VerifyCallbackToken(appConfig *config.AppConfig, req *http.Request) (*http.
 		return req, dictionary.GetError(dictionary.ErrorAuthenticationCallback, "missing auth header")
 	}
 
+	if !strings.HasPrefix(authHeader, BEARER_SCHEMA) || len(authHeader) <= len(BEARER_SCHEMA) {
+		return req, dictionary.GetError(dictionary.ErrorAuthenticationCallback, "invalid or missing bearer token")
+	}
+
 	providedToken := authHeader[len(BEARER_SCHEMA):]
 	if providedToken != appConfig.Nodes.CallbackToken {
 		return req, dictionary.GetError(dictionary.ErrorAuthenticationCallback, "invalid authorization token")
 	}
 
-	// Return an empty error message
 	return req, dictionary.ErrorMessage{}
 }
 
