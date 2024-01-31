@@ -3,7 +3,6 @@ package config
 import (
 	"time"
 
-	"github.com/BuxOrg/bux/utils"
 	"github.com/mrz1836/go-datastore"
 	"github.com/rs/zerolog"
 )
@@ -61,14 +60,9 @@ func getCacheDefaults() *CacheConfig {
 }
 
 func getCallbackDefaults(logger *zerolog.Logger) *CallbackConfig {
-	callbackToken, err := utils.HashAdler32(DefaultAdminXpub)
-	if err != nil {
-		logger.Err(err).Msg("unable to compute default callback token")
-	}
-
 	return &CallbackConfig{
 		CallbackHost:  "http://localhost:3003",
-		CallbackToken: callbackToken,
+		CallbackToken: "",
 	}
 }
 
