@@ -4,16 +4,15 @@ import (
 	"time"
 
 	"github.com/mrz1836/go-datastore"
-	"github.com/rs/zerolog"
 )
 
 const DefaultAdminXpub = "xpub661MyMwAqRbcFgfmdkPgE2m5UjHXu9dj124DbaGLSjaqVESTWfCD4VuNmEbVPkbYLCkykwVZvmA8Pbf8884TQr1FgdG2nPoHR8aB36YdDQh"
 
-func getDefaultAppConfig(logger *zerolog.Logger) *AppConfig {
+func getDefaultAppConfig() *AppConfig {
 	return &AppConfig{
 		Authentication:     getAuthConfigDefaults(),
 		Cache:              getCacheDefaults(),
-		Callback:           getCallbackDefaults(logger),
+		Callback:           getCallbackDefaults(),
 		Db:                 getDbDefaults(),
 		Debug:              true,
 		DebugProfiling:     true,
@@ -59,7 +58,7 @@ func getCacheDefaults() *CacheConfig {
 	}
 }
 
-func getCallbackDefaults(logger *zerolog.Logger) *CallbackConfig {
+func getCallbackDefaults() *CallbackConfig {
 	return &CallbackConfig{
 		CallbackHost:  "http://localhost:3003",
 		CallbackToken: "",

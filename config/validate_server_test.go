@@ -3,16 +3,14 @@ package config
 import (
 	"testing"
 
-	"github.com/BuxOrg/bux-server/logging"
 	"github.com/stretchr/testify/assert"
 )
 
 // TestServerConfig_Validate will test the method Validate()
 func TestServerConfig_Validate(t *testing.T) {
 	t.Parallel()
-	defLogger := logging.GetDefaultLogger()
 
-	defaultAppConfig := getDefaultAppConfig(defLogger)
+	defaultAppConfig := getDefaultAppConfig()
 	idleTimeout := defaultAppConfig.Server.IdleTimeout
 	readTimeout := defaultAppConfig.Server.ReadTimeout
 	writeTimeout := defaultAppConfig.Server.WriteTimeout
