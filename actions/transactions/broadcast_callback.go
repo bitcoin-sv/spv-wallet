@@ -2,7 +2,6 @@ package transactions
 
 import (
 	"encoding/json"
-	"fmt"
 	"net/http"
 
 	"github.com/bitcoin-sv/go-broadcast-client/broadcast"
@@ -31,9 +30,8 @@ func (a *Action) broadcastCallback(w http.ResponseWriter, req *http.Request, _ h
 
 	err = a.Services.Bux.UpdateTransaction(req.Context(), resp)
 	if err != nil {
-		msg := fmt.Sprintf("failed to update transaction - tx: %v", resp)
-		a.Services.Logger.Err(err).Msg(msg)
-		apirouter.ReturnResponse(w, req, http.StatusOK, "")
+		a.Services.Logger.Err(err).Msgf("failed to update transaction - tx: %v", resp)
+		apirouter.ReturnResponse(w, req, http.StatusInternalServerError, "")
 		return
 	}
 
