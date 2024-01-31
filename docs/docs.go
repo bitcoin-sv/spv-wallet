@@ -15,6 +15,35 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
+        "/transaction/broadcast/callback": {
+            "post": {
+                "security": [
+                    {
+                        "callback-auth": []
+                    }
+                ],
+                "tags": [
+                    "Transactions"
+                ],
+                "summary": "Broadcast Callback",
+                "parameters": [
+                    {
+                        "description": "transaction",
+                        "name": "transaction",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/broadcast.SubmittedTx"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                }
+            }
+        },
         "/v1/access-key": {
             "get": {
                 "security": [
@@ -1469,35 +1498,6 @@ const docTemplate = `{
                         "name": "metadata",
                         "in": "query",
                         "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK"
-                    }
-                }
-            }
-        },
-        "/v1/transaction/callback": {
-            "post": {
-                "security": [
-                    {
-                        "callback-auth": []
-                    }
-                ],
-                "tags": [
-                    "Transactions"
-                ],
-                "summary": "Broadcast Callback",
-                "parameters": [
-                    {
-                        "description": "transaction",
-                        "name": "transaction",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/broadcast.SubmittedTx"
-                        }
                     }
                 ],
                 "responses": {

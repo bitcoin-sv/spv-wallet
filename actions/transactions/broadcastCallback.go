@@ -2,7 +2,7 @@ package transactions
 
 import (
 	"encoding/json"
-	"log"
+	"fmt"
 	"net/http"
 
 	"github.com/bitcoin-sv/go-broadcast-client/broadcast"
@@ -10,18 +10,18 @@ import (
 	apirouter "github.com/mrz1836/go-api-router"
 )
 
-// callback will handle a callback call from the broadcast api
+// broadcastCallback will handle a broadcastCallback call from the broadcast api
 // Broadcast Callback godoc
 // @Summary		Broadcast Callback
 // @Tags		Transactions
 // @Param 		transaction body broadcast.SubmittedTx true "transaction"
 // @Success		200
-// @Router		/v1/transaction/callback [post]
+// @Router		/transaction/broadcast/callback [post]
 // @Security	callback-auth
-func (a *Action) callback(w http.ResponseWriter, req *http.Request, _ httprouter.Params) {
-	var transaction *broadcast.SubmittedTx
+func (a *Action) broadcastCallback(w http.ResponseWriter, req *http.Request, _ httprouter.Params) {
+	var resp *broadcast.SubmittedTx
 
-	err := json.NewDecoder(req.Body).Decode(&transaction)
+	err := json.NewDecoder(req.Body).Decode(&resp)
 	if err != nil {
 		apirouter.ReturnResponse(w, req, http.StatusExpectationFailed, err.Error())
 		return
@@ -29,7 +29,13 @@ func (a *Action) callback(w http.ResponseWriter, req *http.Request, _ httprouter
 
 	defer req.Body.Close()
 
-	log.Printf("Received Tx: %+v", transaction)
+	err = a.Services.Bux.UpdateTransaction(req.Context(), resp)
+	if err != nil {
+		msg := fmt.Sprintf("failed to update transaction - tx: %v", resp)
+		a.Services.Logger.Err(err).Msg(msg)
+		apirouter.ReturnResponse(w, req, http.StatusOK, "")
+		return
+	}
 
 	// Return response
 	apirouter.ReturnResponse(w, req, http.StatusOK, "")

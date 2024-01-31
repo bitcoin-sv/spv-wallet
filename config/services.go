@@ -175,6 +175,8 @@ func (s *AppServices) loadBux(ctx context.Context, appConfig *AppConfig, testMod
 		options = loadBroadcastClientArc(appConfig, options, logger)
 	}
 
+	options = append(options, bux.WithCallback(appConfig.Callback.CallbackHost+BroadcastCallbackRoute, appConfig.Callback.CallbackToken))
+
 	options = append(options, bux.WithFeeQuotes(appConfig.Nodes.UseFeeQuotes))
 
 	if appConfig.Nodes.FeeUnit != nil {

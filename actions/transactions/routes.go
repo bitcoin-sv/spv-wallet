@@ -36,5 +36,5 @@ func RegisterRoutes(router *apirouter.Router, appConfig *config.AppConfig, servi
 	router.HTTPRouter.POST("/"+config.APIVersion+"/transaction", action.Request(router, require.Wrap(action.newTransaction)))
 	router.HTTPRouter.POST("/"+config.APIVersion+"/transaction/record", action.Request(router, require.Wrap(action.record)))
 	router.HTTPRouter.POST("/"+config.APIVersion+"/transaction/search", action.Request(router, requireBasic.Wrap(action.search)))
-	router.HTTPRouter.POST("/"+config.APIVersion+"/transaction/callback", action.Request(router, requireCallback.Wrap(action.callback)))
+	router.HTTPRouter.POST(config.BroadcastCallbackRoute, action.Request(router, requireCallback.Wrap(action.broadcastCallback)))
 }

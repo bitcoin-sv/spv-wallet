@@ -14,6 +14,7 @@ func getDefaultAppConfig(logger *zerolog.Logger) *AppConfig {
 	return &AppConfig{
 		Authentication:     getAuthConfigDefaults(),
 		Cache:              getCacheDefaults(),
+		Callback:           getCallbackDefaults(logger),
 		Db:                 getDbDefaults(),
 		Debug:              true,
 		DebugProfiling:     true,
@@ -21,7 +22,7 @@ func getDefaultAppConfig(logger *zerolog.Logger) *AppConfig {
 		ImportBlockHeaders: "",
 		Logging:            getLoggingDefaults(),
 		NewRelic:           getNewRelicDefaults(),
-		Nodes:              getNodesDefaults(logger),
+		Nodes:              getNodesDefaults(),
 		Notifications:      getNotificationDefaults(),
 		Paymail:            getPaymailDefaults(),
 		RequestLogging:     true,
@@ -56,6 +57,18 @@ func getCacheDefaults() *CacheConfig {
 			URL:                   "redis://localhost:6379",
 			UseTLS:                false,
 		},
+	}
+}
+
+func getCallbackDefaults(logger *zerolog.Logger) *CallbackConfig {
+	callbackToken, err := utils.HashAdler32(DefaultAdminXpub)
+	if err != nil {
+		logger.Err(err).Msg("unable to compute default callback token")
+	}
+
+	return &CallbackConfig{
+		CallbackHost:  "http://localhost:3003",
+		CallbackToken: callbackToken,
 	}
 }
 
@@ -111,15 +124,9 @@ func getNewRelicDefaults() *NewRelicConfig {
 	}
 }
 
-func getNodesDefaults(logger *zerolog.Logger) *NodesConfig {
-	callbackToken, err := utils.HashAdler32(DefaultAdminXpub)
-	if err != nil {
-		logger.Err(err).Msg("unable to compute default callback token")
-	}
-
+func getNodesDefaults() *NodesConfig {
 	return &NodesConfig{
-		CallbackToken: callbackToken,
-		Protocol:      NodesProtocolArc,
+		Protocol: NodesProtocolArc,
 		Apis: []*MinerAPI{
 			{
 				ArcURL: "https://arc.gorillapool.io",

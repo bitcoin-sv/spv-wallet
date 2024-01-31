@@ -83,6 +83,23 @@ info:
   title: 'BUX: Server'
   version: v0.12.0
 paths:
+  /transaction/broadcast/callback:
+    post:
+      parameters:
+      - description: transaction
+        in: body
+        name: transaction
+        required: true
+        schema:
+          $ref: '#/definitions/broadcast.SubmittedTx'
+      responses:
+        "200":
+          description: OK
+      security:
+      - callback-auth: []
+      summary: Broadcast Callback
+      tags:
+      - Transactions
   /v1/access-key:
     delete:
       description: Revoke access key
@@ -994,23 +1011,6 @@ paths:
       security:
       - bux-auth-xpub: []
       summary: New transaction
-      tags:
-      - Transactions
-  /v1/transaction/callback:
-    post:
-      parameters:
-      - description: transaction
-        in: body
-        name: transaction
-        required: true
-        schema:
-          $ref: '#/definitions/broadcast.SubmittedTx'
-      responses:
-        "200":
-          description: OK
-      security:
-      - callback-auth: []
-      summary: Broadcast Callback
       tags:
       - Transactions
   /v1/transaction/count:

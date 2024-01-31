@@ -20,12 +20,15 @@ const (
 	ConfigFilePathKey       = "config_file"
 	DefaultConfigFilePath   = "config.yaml"
 	ConfigEnvPrefix         = "BUX_"
+	BroadcastCallbackRoute  = "/transaction/broadcast/callback"
 )
 
 // AppConfig is the configuration values and associated env vars
 type AppConfig struct {
 	// Authentication is the configuration for keys authentication in bux.
 	Authentication *AuthenticationConfig `json:"auth" mapstructure:"auth"`
+	// Callback is the configuration for callbacks.
+	Callback *CallbackConfig `json:"callback" mapstructure:"callback"`
 	// Cache is the configuration for cache, memory or redis, and cluster cache settings.
 	Cache *CacheConfig `json:"cache" mapstructure:"cache"`
 	// Db is the configuration for database related settings.
@@ -76,6 +79,14 @@ type CacheConfig struct {
 	Cluster *ClusterConfig `json:"cluster" mapstructure:"cluster"`
 	// Redis is a general config for redis if the engine is set to it.
 	Redis *RedisConfig `json:"redis" mapstructure:"redis"`
+}
+
+// CallbackConfig is the configuration for callbacks
+type CallbackConfig struct {
+	// CallbackHost is the URL for broadcast callback registration.
+	CallbackHost string `json:"callback_host" mapstructure:"callback_url"`
+	// CallbackToken is the token for broadcast callback registration.
+	CallbackToken string `json:"callback_token" mapstructure:"callback_token"`
 }
 
 // ClusterConfig is a configuration for the Bux cluster

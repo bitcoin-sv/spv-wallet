@@ -82,8 +82,10 @@ new_relic:
   enabled: false
   license_key: BOGUS-LICENSE-KEY-1234567890987654321234
 nodes:
-  # token to authenticate callback calls - default callback token will be generated from the Admin Key
-  callback_token: xyz
+  callback:
+    callback_host: https://xyz.com
+    # token to authenticate callback calls - default callback token will be generated from the Admin Key
+    _callback_token: 44a82509
   # protocol - arc/mapi (arc is default)
   protocol: arc
   # list of apis used for getting and broadcasting transactions
