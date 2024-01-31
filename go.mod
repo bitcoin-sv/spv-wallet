@@ -25,7 +25,7 @@ require (
 )
 
 require (
-	github.com/99designs/gqlgen v0.17.42 // indirect
+	github.com/99designs/gqlgen v0.17.43 // indirect
 	github.com/KyleBanks/depth v1.2.1 // indirect
 	github.com/asaskevich/govalidator v0.0.0-20230301143203-a9d515a09cc2 // indirect
 	github.com/bitcoin-sv/go-paymail v0.12.1 // indirect
@@ -112,7 +112,7 @@ require (
 	github.com/tylertreat/BoomFilters v0.0.0-20210315201527-1a82519a3e43 // indirect
 	github.com/ugorji/go/codec v1.2.12 // indirect
 	github.com/valyala/bytebufferpool v1.0.0 // indirect
-	github.com/vektah/gqlparser/v2 v2.5.10 // indirect
+	github.com/vektah/gqlparser/v2 v2.5.11 // indirect
 	github.com/vmihailenco/msgpack/v5 v5.4.1 // indirect
 	github.com/vmihailenco/tagparser/v2 v2.0.0 // indirect
 	github.com/vmihailenco/taskq/v3 v3.2.9 // indirect
