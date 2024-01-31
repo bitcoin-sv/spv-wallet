@@ -12,7 +12,7 @@ require (
 	github.com/julienschmidt/httprouter v1.3.0
 	github.com/mrz1836/go-api-router v0.7.1
 	github.com/mrz1836/go-cachestore v0.3.4
-	github.com/mrz1836/go-datastore v0.5.9
+	github.com/mrz1836/go-datastore v0.5.12
 	github.com/mrz1836/go-parameters v0.4.1
 	github.com/mrz1836/go-sanitize v1.3.1
 	github.com/mrz1836/go-validate v0.2.0
@@ -25,7 +25,7 @@ require (
 )
 
 require (
-	github.com/99designs/gqlgen v0.17.42 // indirect
+	github.com/99designs/gqlgen v0.17.43 // indirect
 	github.com/KyleBanks/depth v1.2.1 // indirect
 	github.com/asaskevich/govalidator v0.0.0-20230301143203-a9d515a09cc2 // indirect
 	github.com/bitcoin-sv/go-paymail v0.12.1 // indirect
@@ -57,7 +57,7 @@ require (
 	github.com/golang/protobuf v1.5.3 // indirect
 	github.com/golang/snappy v0.0.4 // indirect
 	github.com/gomodule/redigo v2.0.0+incompatible // indirect
-	github.com/google/uuid v1.5.0 // indirect
+	github.com/google/uuid v1.6.0 // indirect
 	github.com/gorilla/mux v1.8.1 // indirect
 	github.com/gorilla/websocket v1.5.1 // indirect
 	github.com/hashicorp/golang-lru v1.0.2 // indirect
@@ -65,13 +65,13 @@ require (
 	github.com/iancoleman/strcase v0.3.0 // indirect
 	github.com/jackc/pgpassfile v1.0.0 // indirect
 	github.com/jackc/pgservicefile v0.0.0-20231201235250-de7065d80cb9 // indirect
-	github.com/jackc/pgx/v5 v5.5.1 // indirect
+	github.com/jackc/pgx/v5 v5.5.2 // indirect
 	github.com/jackc/puddle/v2 v2.2.1 // indirect
 	github.com/jinzhu/inflection v1.0.0 // indirect
 	github.com/jinzhu/now v1.1.5 // indirect
 	github.com/josharian/intern v1.0.0 // indirect
 	github.com/jpillora/backoff v1.0.0 // indirect
-	github.com/klauspost/compress v1.17.4 // indirect
+	github.com/klauspost/compress v1.17.5 // indirect
 	github.com/korovkin/limiter v0.0.0-20230307205149-3d4b2b34c99d // indirect
 	github.com/libsv/go-bc v0.1.26 // indirect
 	github.com/libsv/go-bk v0.1.6 // indirect
@@ -83,13 +83,13 @@ require (
 	github.com/matryer/respond v1.0.1 // indirect
 	github.com/mattn/go-colorable v0.1.13 // indirect
 	github.com/mattn/go-isatty v0.0.20 // indirect
-	github.com/mattn/go-sqlite3 v1.14.19 // indirect
+	github.com/mattn/go-sqlite3 v1.14.20 // indirect
 	github.com/miekg/dns v1.1.57 // indirect
 	github.com/mitchellh/mapstructure v1.5.0
 	github.com/montanaflynn/stats v0.7.1 // indirect
 	github.com/mrz1836/go-cache v0.9.3 // indirect
 	github.com/mrz1836/go-logger v0.3.2 // indirect
-	github.com/newrelic/go-agent/v3/integrations/nrmongo v1.1.2 // indirect
+	github.com/newrelic/go-agent/v3/integrations/nrmongo v1.1.3 // indirect
 	github.com/pelletier/go-toml/v2 v2.1.1 // indirect
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/pmezard/go-difflib v1.0.1-0.20181226105442-5d4384ee4fb2 // indirect
@@ -112,7 +112,7 @@ require (
 	github.com/tylertreat/BoomFilters v0.0.0-20210315201527-1a82519a3e43 // indirect
 	github.com/ugorji/go/codec v1.2.12 // indirect
 	github.com/valyala/bytebufferpool v1.0.0 // indirect
-	github.com/vektah/gqlparser/v2 v2.5.10 // indirect
+	github.com/vektah/gqlparser/v2 v2.5.11 // indirect
 	github.com/vmihailenco/msgpack/v5 v5.4.1 // indirect
 	github.com/vmihailenco/tagparser/v2 v2.0.0 // indirect
 	github.com/vmihailenco/taskq/v3 v3.2.9 // indirect
@@ -127,7 +127,7 @@ require (
 	golang.org/x/exp v0.0.0-20231226003508-02704c960a9b // indirect
 	golang.org/x/mod v0.14.0 // indirect
 	golang.org/x/net v0.20.0 // indirect
-	golang.org/x/sync v0.5.0 // indirect
+	golang.org/x/sync v0.6.0 // indirect
 	golang.org/x/sys v0.16.0 // indirect
 	golang.org/x/text v0.14.0 // indirect
 	golang.org/x/tools v0.16.1 // indirect
@@ -139,7 +139,7 @@ require (
 	gorm.io/driver/mysql v1.5.2 // indirect
 	gorm.io/driver/postgres v1.5.4 // indirect
 	gorm.io/driver/sqlite v1.5.4 // indirect
-	gorm.io/gorm v1.25.5 // indirect
+	gorm.io/gorm v1.25.6 // indirect
 	gorm.io/plugin/dbresolver v1.5.0 // indirect
 )
 
