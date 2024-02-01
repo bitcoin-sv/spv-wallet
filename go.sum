@@ -1,7 +1,7 @@
 github.com/99designs/gqlgen v0.17.43 h1:I4SYg6ahjowErAQcHFVKy5EcWuwJ3+Xw9z2fLpuFCPo=
 github.com/99designs/gqlgen v0.17.43/go.mod h1:lO0Zjy8MkZgBdv4T1U91x09r0e0WFOdhVUutlQs1Rsc=
-github.com/BuxOrg/bux v0.14.1 h1:J83uOlqe6ZowjSCnCa1sKig4YtN5JGcoJd54h6A2Kf8=
-github.com/BuxOrg/bux v0.14.1/go.mod h1:Bdf2Nld2yrtvj9OTPr+bdhyv+lXEmTxldH03IPRGZIo=
+github.com/BuxOrg/bux v0.14.2 h1:Ct4UKIGuAwdpdgRWfONpkSgA2Ik08imPTwM/9gSfLoQ=
+github.com/BuxOrg/bux v0.14.2/go.mod h1:4Ku9S/zi4J9Gz1FNy7qJD6zNYcEmbbrx4MgrjSWlvAY=
 github.com/BuxOrg/bux-models v0.3.0 h1:+pvpDdYaiIgeOhAO847RK07Vzc+vuUvy2ok/xJevQyg=
 github.com/BuxOrg/bux-models v0.3.0/go.mod h1:JCpoXxVnKZmCy3rg6nOtLQL5AXh6iEo2tBvcD/qAxEY=
 github.com/DATA-DOG/go-sqlmock v1.5.2 h1:OcvFkGmslmlZibjAjaHm3L//6LiuBgolP7OputlJIzU=
