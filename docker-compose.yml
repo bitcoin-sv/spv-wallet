@@ -1,23 +1,66 @@
-# !NOTE: This file should be used only by start-bux-server.sh
-version: "3.9"
-
+##########################################################
+### !NOTE: This file is meant to be used by start.sh! ###
+########################################################
 services:
+  bux-wallet-frontend:
+    image: bsvb/bux-wallet-frontend:latest
+    pull_policy: always
+    ports:
+      - "3002:80"
+    configs:
+      - source: frontend-env-config
+        target: /usr/share/nginx/html/env-config.json
+
+  bux-wallet-backend:
+    image: bsvb/bux-wallet-backend:latest
+    pull_policy: always
+    environment:
+      BUX_PAYMAIL_DOMAIN: '${RUN_PAYMAIL_DOMAIN}'
+      HTTP_SERVER_CORS_ALLOWEDDOMAINS: 'http://localhost:3002'
+    env_file:
+      - .env.config
+    ports:
+      - "8081:8080"
+    links:
+      - bux-postgresql
+    depends_on:
+      bux-postgresql:
+        condition: service_healthy
+
+  pulse:
+    image: bsvb/pulse:latest
+    pull_policy: always
+    command:
+      - "--preloaded"
+    ports:
+      - "8080:8080"
+    volumes:
+      - pulse-data:/app/data
+
+  bux-server:
+    build: .
+    environment:
+      BUX_PAYMAIL_DOMAINS: '${RUN_PAYMAIL_DOMAIN}'
+    env_file:
+      - .env.config
+    ports:
+      - "3003:3003"
+    restart: unless-stopped
+
   bux-redis:
     image: redis
-    container_name: bux-redis
     hostname: redis
     ports:
       - "6379:6379"
     volumes:
-      - redis-data:/data
+      - bux-redis-data:/data
     healthcheck:
       test: ["CMD", "redis-cli", "ping"]
 
   bux-postgresql:
     image: postgres
-    container_name: bux-postgresql
     volumes:
-      - db-data:/var/lib/postgresql/data:Z
+      - bux-postgresql-data:/var/lib/postgresql/data
     environment:
       - POSTGRES_NAME=postgres
       - POSTGRES_USER=postgres
@@ -31,7 +74,6 @@ services:
 
   bux-mongodb:
     image: mongo
-    container_name: bux-mongodb
     environment:
       MONGO_INITDB_ROOT_USERNAME: mongo
       MONGO_INITDB_ROOT_PASSWORD: mongo
@@ -39,7 +81,7 @@ services:
     ports:
       - '27017:27017'
     volumes:
-      - db-data:/data/db
+      - bux-mongodb-data:/data/db
     healthcheck:
       test: echo 'db.runCommand("ping").ok' | mongosh mongodb:27017/test --quiet
       interval: 10s
@@ -47,20 +89,20 @@ services:
       retries: 5
       start_period: 40s
 
-  bux-server:
-    build: .
-    container_name: bux-server
-    env_file:
-      - .env.config
-    ports:
-      - "3003:3003"
-    volumes:
-      - ./config:/config:Z
-
 volumes:
-  app-data:
+  bux-postgresql-data:
     driver: local
-  db-data:
+  bux-redis-data:
     driver: local
-  redis-data:
+  bux-mongodb-data:
     driver: local
+  pulse-data:
+    driver: local
+
+configs:
+  frontend-env-config:
+    content: |
+      {
+          "paymailDomain": "${RUN_PAYMAIL_DOMAIN}",
+          "apiUrl": "http://localhost:8081"
+      }
