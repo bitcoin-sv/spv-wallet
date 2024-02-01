@@ -175,15 +175,15 @@ func (s *AppServices) loadBux(ctx context.Context, appConfig *AppConfig, testMod
 		options = loadBroadcastClientArc(appConfig, options, logger)
 	}
 
-	if appConfig.Callback.CallbackToken == "" {
+	if appConfig.Nodes.Callback.CallbackToken == "" {
 		callbackToken, err := utils.HashAdler32(DefaultAdminXpub)
 		if err != nil {
 			logger.Err(err).Msg("unable to compute default callback token")
 		}
-		appConfig.Callback.CallbackToken = callbackToken
+		appConfig.Nodes.Callback.CallbackToken = callbackToken
 	}
 
-	options = append(options, bux.WithCallback(appConfig.Callback.CallbackHost+BroadcastCallbackRoute, appConfig.Callback.CallbackToken))
+	options = append(options, bux.WithCallback(appConfig.Nodes.Callback.CallbackHost+BroadcastCallbackRoute, appConfig.Nodes.Callback.CallbackToken))
 
 	options = append(options, bux.WithFeeQuotes(appConfig.Nodes.UseFeeQuotes))
 

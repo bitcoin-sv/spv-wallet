@@ -27,8 +27,6 @@ const (
 type AppConfig struct {
 	// Authentication is the configuration for keys authentication in bux.
 	Authentication *AuthenticationConfig `json:"auth" mapstructure:"auth"`
-	// Callback is the configuration for callbacks.
-	Callback *CallbackConfig `json:"callback" mapstructure:"callback"`
 	// Cache is the configuration for cache, memory or redis, and cluster cache settings.
 	Cache *CacheConfig `json:"cache" mapstructure:"cache"`
 	// Db is the configuration for database related settings.
@@ -84,7 +82,7 @@ type CacheConfig struct {
 // CallbackConfig is the configuration for callbacks
 type CallbackConfig struct {
 	// CallbackHost is the URL for broadcast callback registration.
-	CallbackHost string `json:"callback_host" mapstructure:"callback_url"`
+	CallbackHost string `json:"callback_host" mapstructure:"callback_host"`
 	// CallbackToken is the token for broadcast callback registration.
 	CallbackToken string `json:"callback_token" mapstructure:"callback_token"`
 }
@@ -151,11 +149,11 @@ type NewRelicConfig struct {
 
 // NodesConfig consists of blockchain nodes (such as Minercraft and Arc) configuration
 type NodesConfig struct {
-	CallbackToken string         `json:"callback_token" mapstructure:"callback_token"`
-	Protocol      NodesProtocol  `json:"protocol" mapstructure:"protocol"`
-	Apis          []*MinerAPI    `json:"apis" mapstructure:"apis"`
-	UseFeeQuotes  bool           `json:"use_fee_quotes" mapstructure:"use_fee_quotes"`
-	FeeUnit       *FeeUnitConfig `json:"fee_unit" mapstructure:"fee_unit"`
+	Callback     *CallbackConfig `json:"callback" mapstructure:"callback"`
+	Protocol     NodesProtocol   `json:"protocol" mapstructure:"protocol"`
+	Apis         []*MinerAPI     `json:"apis" mapstructure:"apis"`
+	UseFeeQuotes bool            `json:"use_fee_quotes" mapstructure:"use_fee_quotes"`
+	FeeUnit      *FeeUnitConfig  `json:"fee_unit" mapstructure:"fee_unit"`
 }
 
 // FeeUnitConfig reflects the utils.FeeUnit struct with proper annotations for json and mapstructure

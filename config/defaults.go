@@ -12,7 +12,6 @@ func getDefaultAppConfig() *AppConfig {
 	return &AppConfig{
 		Authentication:     getAuthConfigDefaults(),
 		Cache:              getCacheDefaults(),
-		Callback:           getCallbackDefaults(),
 		Db:                 getDbDefaults(),
 		Debug:              true,
 		DebugProfiling:     true,
@@ -119,6 +118,7 @@ func getNewRelicDefaults() *NewRelicConfig {
 
 func getNodesDefaults() *NodesConfig {
 	return &NodesConfig{
+		Callback: getCallbackDefaults(),
 		Protocol: NodesProtocolArc,
 		Apis: []*MinerAPI{
 			{

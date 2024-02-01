@@ -126,7 +126,7 @@ func VerifyCallbackToken(appConfig *config.AppConfig, req *http.Request) (*http.
 	}
 
 	providedToken := authHeader[len(BEARER_SCHEMA):]
-	if providedToken != appConfig.Nodes.CallbackToken {
+	if providedToken != appConfig.Nodes.Callback.CallbackToken {
 		return req, dictionary.GetError(dictionary.ErrorAuthenticationCallback, "invalid authorization token")
 	}
 
