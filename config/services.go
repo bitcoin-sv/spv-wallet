@@ -332,6 +332,7 @@ func loadDatastore(options []bux.ClientOps, appConfig *AppConfig, testMode bool)
 			TimeZone:  appConfig.Db.SQL.TimeZone,
 			TxTimeout: appConfig.Db.SQL.TxTimeout,
 			User:      appConfig.Db.SQL.User,
+			SslMode:   appConfig.Db.SQL.SslMode,
 		}))
 
 	} else if appConfig.Db.Datastore.Engine == datastore.MongoDB {
