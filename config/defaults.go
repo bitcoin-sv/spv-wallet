@@ -80,6 +80,7 @@ func getDbDefaults() *DbConfig {
 			TimeZone:                  "UTC",
 			TxTimeout:                 10 * time.Second,
 			User:                      "postgres",
+			SslMode:                   "disable",
 		},
 		SQLite: &datastore.SQLiteConfig{
 			DatabasePath:       "./bux.db",
