@@ -6,6 +6,7 @@ import (
 	"github.com/mrz1836/go-datastore"
 )
 
+// DefaultAdminXpub is the default admin xpub used for authenticate requests.
 const DefaultAdminXpub = "xpub661MyMwAqRbcFgfmdkPgE2m5UjHXu9dj124DbaGLSjaqVESTWfCD4VuNmEbVPkbYLCkykwVZvmA8Pbf8884TQr1FgdG2nPoHR8aB36YdDQh"
 
 func getDefaultAppConfig() *AppConfig {

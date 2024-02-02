@@ -72,6 +72,7 @@ func (a *Action) RequireAdminAuthentication(fn httprouter.Handle) httprouter.Han
 	}
 }
 
+// RequireCallbackAuthentication checks and requires callback Authorize Bearer token for the related method
 func (a *Action) RequireCallbackAuthentication(fn httprouter.Handle) httprouter.Handle {
 	return func(w http.ResponseWriter, req *http.Request, p httprouter.Params) {
 		var knownErr dictionary.ErrorMessage
@@ -114,18 +115,19 @@ func CheckAuthentication(appConfig *config.AppConfig, bux bux.ClientInterface, r
 	return req, dictionary.ErrorMessage{}
 }
 
+// VerifyCallbackToken verifies the callback token - if it's valid and matches the Bearer scheme.
 func VerifyCallbackToken(appConfig *config.AppConfig, req *http.Request) (*http.Request, dictionary.ErrorMessage) {
-	const BEARER_SCHEMA = "Bearer "
+	const BearerSchema = "Bearer "
 	authHeader := req.Header.Get("Authorization")
 	if authHeader == "" {
 		return req, dictionary.GetError(dictionary.ErrorAuthenticationCallback, "missing auth header")
 	}
 
-	if !strings.HasPrefix(authHeader, BEARER_SCHEMA) || len(authHeader) <= len(BEARER_SCHEMA) {
+	if !strings.HasPrefix(authHeader, BearerSchema) || len(authHeader) <= len(BearerSchema) {
 		return req, dictionary.GetError(dictionary.ErrorAuthenticationCallback, "invalid or missing bearer token")
 	}
 
-	providedToken := authHeader[len(BEARER_SCHEMA):]
+	providedToken := authHeader[len(BearerSchema):]
 	if providedToken != appConfig.Nodes.Callback.CallbackToken {
 		return req, dictionary.GetError(dictionary.ErrorAuthenticationCallback, "invalid authorization token")
 	}

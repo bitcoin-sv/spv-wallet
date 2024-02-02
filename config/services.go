@@ -176,7 +176,8 @@ func (s *AppServices) loadBux(ctx context.Context, appConfig *AppConfig, testMod
 	}
 
 	if appConfig.Nodes.Callback.CallbackToken == "" {
-		callbackToken, err := utils.HashAdler32(DefaultAdminXpub)
+		var callbackToken string
+		callbackToken, err = utils.HashAdler32(DefaultAdminXpub)
 		if err != nil {
 			logger.Err(err).Msg("unable to compute default callback token")
 		}

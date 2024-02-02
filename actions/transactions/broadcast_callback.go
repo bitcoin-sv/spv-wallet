@@ -26,7 +26,11 @@ func (a *Action) broadcastCallback(w http.ResponseWriter, req *http.Request, _ h
 		return
 	}
 
-	defer req.Body.Close()
+	defer func() {
+		if err = req.Body.Close(); err != nil {
+			a.Services.Logger.Err(err).Msg("failed to close request body")
+		}
+	}()
 
 	err = a.Services.Bux.UpdateTransaction(req.Context(), resp)
 	if err != nil {
