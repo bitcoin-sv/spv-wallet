@@ -1,6 +1,7 @@
 package config
 
 import (
+	"math/rand"
 	"time"
 
 	"github.com/mrz1836/go-datastore"
@@ -109,7 +110,8 @@ func getNewRelicDefaults() *NewRelicConfig {
 
 func getNodesDefaults() *NodesConfig {
 	return &NodesConfig{
-		Protocol: NodesProtocolArc,
+		DeploymentID: "bux-" + generateRandomDeploymentIDSufix(),
+		Protocol:     NodesProtocolArc,
 		Apis: []*MinerAPI{
 			{
 				ArcURL: "https://arc.gorillapool.io",
@@ -157,4 +159,15 @@ func getServerDefaults() *ServerConfig {
 		WriteTimeout: 15 * time.Second,
 		Port:         3003,
 	}
+}
+
+func generateRandomDeploymentIDSufix() string {
+	rune := "abcdefghijklmnopqrstuvwxyz0123456789"
+	b := make([]byte, 10)
+	for i := range b {
+		// #nosec G404 (rand is used for random string generation)
+		b[i] = rune[rand.Intn(len(rune))]
+	}
+
+	return string(b)
 }
