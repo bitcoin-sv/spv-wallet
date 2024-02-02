@@ -28,7 +28,7 @@ func getDefaultAppConfig() *AppConfig {
 
 func getAuthConfigDefaults() *AuthenticationConfig {
 	return &AuthenticationConfig{
-		AdminKey:        "xpub661MyMwAqRbcEp7YgDpGXquSF2NW3GBAU3SXTikFT1nkxHGbxjG9RgGxr9X3D4AYsJ6ZqYjMGcdUsPDQZoeibKECs5d56f1w9rfF3QrAAu9",
+		AdminKey:        "xpub661MyMwAqRbcFgfmdkPgE2m5UjHXu9dj124DbaGLSjaqVESTWfCD4VuNmEbVPkbYLCkykwVZvmA8Pbf8884TQr1FgdG2nPoHR8aB36YdDQh",
 		RequireSigning:  false,
 		Scheme:          "xpub",
 		SigningDisabled: true,
@@ -112,7 +112,7 @@ func getNodesDefaults() *NodesConfig {
 		Protocol: NodesProtocolArc,
 		Apis: []*MinerAPI{
 			{
-				ArcURL:  "https://tapi.taal.com/arc/v1",
+				ArcURL:  "https://api.taal.com/arc/v1",
 				Token:   "mainnet_06770f425eb00298839a24a49cbdc02c",
 				MinerID: "03ad780153c47df915b3d2e23af727c68facaca4facd5f155bf5018b979b9aeb83",
 			},
