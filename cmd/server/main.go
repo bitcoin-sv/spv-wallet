@@ -22,6 +22,10 @@ import (
 // @securityDefinitions.apikey bux-auth-xpub
 // @in header
 // @name bux-auth-xpub
+
+// @securityDefinitions.apikey callback-auth
+// @in header
+// @name authorization
 func main() {
 	defaultLogger := logging.GetDefaultLogger()
 

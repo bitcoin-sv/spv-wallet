@@ -20,6 +20,7 @@ const (
 	ConfigFilePathKey       = "config_file"
 	DefaultConfigFilePath   = "config.yaml"
 	ConfigEnvPrefix         = "BUX_"
+	BroadcastCallbackRoute  = "/transaction/broadcast/callback"
 )
 
 // AppConfig is the configuration values and associated env vars
@@ -76,6 +77,14 @@ type CacheConfig struct {
 	Cluster *ClusterConfig `json:"cluster" mapstructure:"cluster"`
 	// Redis is a general config for redis if the engine is set to it.
 	Redis *RedisConfig `json:"redis" mapstructure:"redis"`
+}
+
+// CallbackConfig is the configuration for callbacks
+type CallbackConfig struct {
+	// CallbackHost is the URL for broadcast callback registration.
+	CallbackHost string `json:"callback_host" mapstructure:"callback_host"`
+	// CallbackToken is the token for broadcast callback registration.
+	CallbackToken string `json:"callback_token" mapstructure:"callback_token"`
 }
 
 // ClusterConfig is a configuration for the Bux cluster
@@ -140,10 +149,11 @@ type NewRelicConfig struct {
 
 // NodesConfig consists of blockchain nodes (such as Minercraft and Arc) configuration
 type NodesConfig struct {
-	Protocol     NodesProtocol  `json:"protocol" mapstructure:"protocol"`
-	Apis         []*MinerAPI    `json:"apis" mapstructure:"apis"`
-	UseFeeQuotes bool           `json:"use_fee_quotes" mapstructure:"use_fee_quotes"`
-	FeeUnit      *FeeUnitConfig `json:"fee_unit" mapstructure:"fee_unit"`
+	Callback     *CallbackConfig `json:"callback" mapstructure:"callback"`
+	Protocol     NodesProtocol   `json:"protocol" mapstructure:"protocol"`
+	Apis         []*MinerAPI     `json:"apis" mapstructure:"apis"`
+	UseFeeQuotes bool            `json:"use_fee_quotes" mapstructure:"use_fee_quotes"`
+	FeeUnit      *FeeUnitConfig  `json:"fee_unit" mapstructure:"fee_unit"`
 }
 
 // FeeUnitConfig reflects the utils.FeeUnit struct with proper annotations for json and mapstructure
