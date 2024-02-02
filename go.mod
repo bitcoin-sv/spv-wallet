@@ -3,7 +3,7 @@ module github.com/BuxOrg/bux-server
 go 1.21.5
 
 require (
-	github.com/BuxOrg/bux v0.14.2
+	github.com/BuxOrg/bux v0.14.3-0.20240201141930-5ac2858facdc
 	github.com/BuxOrg/bux-models v0.3.0
 	github.com/bitcoin-sv/go-broadcast-client v0.16.1
 	github.com/go-ozzo/ozzo-validation v3.6.0+incompatible
@@ -72,7 +72,6 @@ require (
 	github.com/josharian/intern v1.0.0 // indirect
 	github.com/jpillora/backoff v1.0.0 // indirect
 	github.com/klauspost/compress v1.17.5 // indirect
-	github.com/korovkin/limiter v0.0.0-20230307205149-3d4b2b34c99d // indirect
 	github.com/libsv/go-bc v0.1.26 // indirect
 	github.com/libsv/go-bk v0.1.6 // indirect
 	github.com/libsv/go-bt v1.0.8 // indirect
@@ -83,7 +82,7 @@ require (
 	github.com/matryer/respond v1.0.1 // indirect
 	github.com/mattn/go-colorable v0.1.13 // indirect
 	github.com/mattn/go-isatty v0.0.20 // indirect
-	github.com/mattn/go-sqlite3 v1.14.20 // indirect
+	github.com/mattn/go-sqlite3 v1.14.21 // indirect
 	github.com/miekg/dns v1.1.58 // indirect
 	github.com/mitchellh/mapstructure v1.5.0
 	github.com/montanaflynn/stats v0.7.1 // indirect
