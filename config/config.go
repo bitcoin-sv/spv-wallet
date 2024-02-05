@@ -140,6 +140,7 @@ type NewRelicConfig struct {
 
 // NodesConfig consists of blockchain nodes (such as Minercraft and Arc) configuration
 type NodesConfig struct {
+	DeploymentID string         `json:"deployment_id" mapstructure:"deployment_id"`
 	Protocol     NodesProtocol  `json:"protocol" mapstructure:"protocol"`
 	Apis         []*MinerAPI    `json:"apis" mapstructure:"apis"`
 	UseFeeQuotes bool           `json:"use_fee_quotes" mapstructure:"use_fee_quotes"`

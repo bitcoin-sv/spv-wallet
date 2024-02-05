@@ -82,6 +82,8 @@ new_relic:
   enabled: false
   license_key: BOGUS-LICENSE-KEY-1234567890987654321234
 nodes:
+  # deployment id used annotating api calls in XDeployment-ID header - this value will be randomly generated if not set
+  _deployment_id: bux-deployment-id
   # protocol - arc/mapi (arc is default)
   protocol: arc
   # list of apis used for getting and broadcasting transactions

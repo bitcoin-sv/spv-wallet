@@ -3,6 +3,7 @@ package config
 import (
 	"time"
 
+	"github.com/google/uuid"
 	"github.com/mrz1836/go-datastore"
 )
 
@@ -108,8 +109,10 @@ func getNewRelicDefaults() *NewRelicConfig {
 }
 
 func getNodesDefaults() *NodesConfig {
+	depIDSufix, _ := uuid.NewUUID()
 	return &NodesConfig{
-		Protocol: NodesProtocolArc,
+		DeploymentID: "bux-" + depIDSufix.String(),
+		Protocol:     NodesProtocolArc,
 		Apis: []*MinerAPI{
 			{
 				ArcURL:  "https://api.taal.com/arc",
