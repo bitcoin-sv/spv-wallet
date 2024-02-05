@@ -244,6 +244,23 @@ To override admin_key in auth config, use the path with "_" as a path delimiter 
 ```bash
 BUX_AUTH_ADMIN_KEY="admin_key"
 ```
+
+To be able to use TAAL API Key is needed. 
+
+To get and API Key:
+
+
+1. Enter the URL https://platform.taal.com/ in your browser.
+2. Register or login on to TAAL PLATFORM.
+3. Your mainnet and testnet API keys will be displayed on dashboard tab.
+
+https://docs.taal.com/introduction/get-an-api-key
+
+To use your API key put key in ``token`` field in ```config.example.yaml```
+
+``nodes`` -> ``apis`` -> ``token``
+
+
 <br/>
 
 ### Examples & Tests
