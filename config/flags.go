@@ -30,7 +30,7 @@ func loadFlags() error {
 		os.Exit(1)
 	}
 
-	err = viper.BindPFlags(buxFlags)
+	err = viper.BindPFlag(ConfigFilePathKey, buxFlags.Lookup(ConfigFilePathKey))
 	if err != nil {
 		return err
 	}
