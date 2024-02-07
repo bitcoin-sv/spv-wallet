@@ -52,3 +52,6 @@
 - color: c2e0c6
   description: "Old, unused, stale"
   name: "stale"
+- color: 50e061
+  description: "PR was tested by a team member"
+  name: "tested"
