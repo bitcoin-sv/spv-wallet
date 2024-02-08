@@ -57,9 +57,11 @@ func (nodes *NodesConfig) toBroadcastClientArc() []*broadcastclient.ArcClientCon
 			if cfg.ArcURL == "" {
 				continue
 			}
+
 			minerApis = append(minerApis, &broadcastclient.ArcClientConfig{
-				Token:  cfg.Token,
-				APIUrl: cfg.ArcURL,
+				Token:        cfg.Token,
+				APIUrl:       cfg.ArcURL,
+				DeploymentID: nodes.DeploymentID,
 			})
 		}
 	}

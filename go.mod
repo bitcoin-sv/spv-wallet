@@ -5,7 +5,7 @@ go 1.21.5
 require (
 	github.com/BuxOrg/bux v0.14.3-0.20240201141930-5ac2858facdc
 	github.com/BuxOrg/bux-models v0.3.0
-	github.com/bitcoin-sv/go-broadcast-client v0.16.1
+	github.com/bitcoin-sv/go-broadcast-client v0.17.1
 	github.com/go-ozzo/ozzo-validation v3.6.0+incompatible
 	github.com/go-redis/redis/v8 v8.11.5
 	github.com/gofrs/uuid v4.4.0+incompatible
@@ -57,7 +57,7 @@ require (
 	github.com/golang/protobuf v1.5.3 // indirect
 	github.com/golang/snappy v0.0.4 // indirect
 	github.com/gomodule/redigo v2.0.0+incompatible // indirect
-	github.com/google/uuid v1.6.0 // indirect
+	github.com/google/uuid v1.6.0
 	github.com/gorilla/mux v1.8.1 // indirect
 	github.com/gorilla/websocket v1.5.1 // indirect
 	github.com/hashicorp/golang-lru v1.0.2 // indirect
