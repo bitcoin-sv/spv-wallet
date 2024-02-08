@@ -1,0 +1,15 @@
+name: "On pull request"
+
+on:
+  pull_request_target:
+    types:
+      - labeled
+      - unlabeled
+      - opened
+
+permissions:
+  pull-requests: write
+
+jobs:
+  on-pr:
+    uses: bactions/workflows/.github/workflows/on-pull-request.yml@main
