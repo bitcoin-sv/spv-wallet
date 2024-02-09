@@ -39,13 +39,11 @@ func CreateLogger(instanceName, format, level string, logOrigin bool) (*zerolog.
 		logger = ecszerolog.New(writer, logLevel, origin).
 			With().
 			Str("application", instanceName).
-			Str("service", "bux-server").
 			Logger()
 	} else {
 		logger = ecszerolog.New(writer, logLevel).
 			With().
 			Str("application", instanceName).
-			Str("service", "bux-server").
 			Logger()
 	}
 
