@@ -27,6 +27,7 @@ func getDefaultAppConfig() *AppConfig {
 		RequestLogging:     true,
 		Server:             getServerDefaults(),
 		TaskManager:        getTaskManagerDefault(),
+		Metrics:            getMetricsDefaults(),
 	}
 }
 
@@ -168,5 +169,11 @@ func getServerDefaults() *ServerConfig {
 		ReadTimeout:  15 * time.Second,
 		WriteTimeout: 15 * time.Second,
 		Port:         3003,
+	}
+}
+
+func getMetricsDefaults() *MetricsConfig {
+	return &MetricsConfig{
+		Enabled: false,
 	}
 }

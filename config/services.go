@@ -10,6 +10,7 @@ import (
 
 	"github.com/BuxOrg/bux"
 	"github.com/BuxOrg/bux-server/logging"
+	"github.com/BuxOrg/bux-server/metrics"
 	"github.com/BuxOrg/bux/cluster"
 	"github.com/BuxOrg/bux/taskmanager"
 	"github.com/BuxOrg/bux/utils"
@@ -137,6 +138,11 @@ func (s *AppServices) loadBux(ctx context.Context, appConfig *AppConfig, testMod
 
 	if appConfig.NewRelic.Enabled {
 		options = append(options, bux.WithNewRelic(s.NewRelic))
+	}
+
+	if appConfig.Metrics.Enabled {
+		collector := metrics.EnableMetrics()
+		options = append(options, bux.WithMetrics(collector))
 	}
 
 	options = append(options, bux.WithUserAgent(appConfig.GetUserAgent()))

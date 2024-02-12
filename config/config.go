@@ -55,6 +55,8 @@ type AppConfig struct {
 	Server *ServerConfig `json:"server_config" mapstructure:"server_config"`
 	// TaskManager is a configuration for Task Manager in bux.
 	TaskManager *TaskManagerConfig `json:"task_manager" mapstructure:"task_manager"`
+	// Metrics is a configuration for metrics in bux.
+	Metrics *MetricsConfig `json:"metrics" mapstructure:"metrics"`
 }
 
 // AuthenticationConfig is the configuration for Authentication
@@ -237,6 +239,12 @@ type ServerConfig struct {
 	WriteTimeout time.Duration `json:"write_timeout" mapstructure:"write_timeout"`
 	// Port is the port that the server should use.
 	Port int `json:"port" mapstructure:"port"`
+}
+
+// MetricsConfig represents a metrics config.
+type MetricsConfig struct {
+	// Enabled is a flag for enabling metrics.
+	Enabled bool `json:"enabled" mapstructure:"enabled"`
 }
 
 // GetUserAgent will return the outgoing user agent
