@@ -3,7 +3,7 @@ module github.com/BuxOrg/bux-server
 go 1.21.5
 
 require (
-	github.com/BuxOrg/bux v0.14.3
+	github.com/BuxOrg/bux v0.14.4
 	github.com/BuxOrg/bux-models v0.3.0
 	github.com/bitcoin-sv/go-broadcast-client v0.17.2
 	github.com/go-ozzo/ozzo-validation v3.6.0+incompatible
@@ -18,10 +18,19 @@ require (
 	github.com/mrz1836/go-validate v0.2.1
 	github.com/newrelic/go-agent/v3 v3.29.1
 	github.com/newrelic/go-agent/v3/integrations/nrhttprouter v1.0.2
+	github.com/prometheus/client_golang v1.18.0
 	github.com/rs/zerolog v1.32.0
 	github.com/spf13/viper v1.18.2
 	github.com/stretchr/testify v1.8.4
 	github.com/swaggo/swag v1.16.3
+)
+
+require (
+	github.com/beorn7/perks v1.0.1 // indirect
+	github.com/matttproud/golang_protobuf_extensions/v2 v2.0.0 // indirect
+	github.com/prometheus/client_model v0.5.0 // indirect
+	github.com/prometheus/common v0.45.0 // indirect
+	github.com/prometheus/procfs v0.12.0 // indirect
 )
 
 require (
@@ -72,7 +81,6 @@ require (
 	github.com/josharian/intern v1.0.0 // indirect
 	github.com/jpillora/backoff v1.0.0 // indirect
 	github.com/klauspost/compress v1.17.6 // indirect
-	github.com/korovkin/limiter v0.0.0-20230307205149-3d4b2b34c99d // indirect
 	github.com/libsv/go-bc v0.1.26 // indirect
 	github.com/libsv/go-bk v0.1.6 // indirect
 	github.com/libsv/go-bt v1.0.8 // indirect
