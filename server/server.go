@@ -91,7 +91,7 @@ func (s *Server) Handlers() *nrhttprouter.Router {
 	s.Router.HTTPRouter.Handler(http.MethodGet, "/swagger", http.RedirectHandler("/swagger/index.html", http.StatusMovedPermanently))
 	s.Router.HTTPRouter.Handler(http.MethodGet, "/swagger/*any", httpSwagger.WrapHandler)
 	if metrics, enabled := metrics.Get(); enabled {
-		s.Router.HTTPRouter.Handler(http.MethodGet, "/metrics", metrics.HttpHandler())
+		s.Router.HTTPRouter.Handler(http.MethodGet, "/metrics", metrics.HTTPHandler())
 	}
 	segment.End()
 
