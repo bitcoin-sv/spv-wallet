@@ -13,7 +13,7 @@ type Metrics struct {
 	registerer prometheus.Registerer
 }
 
-// newMetrics will create a new Metrics object; this is private to ensure only one, global instance is created
+// newMetrics is private to ensure that only one global-instance is created
 func newMetrics() *Metrics {
 	registry := prometheus.NewRegistry()
 	constLabels := prometheus.Labels{"app": appName}
