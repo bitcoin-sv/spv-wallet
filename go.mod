@@ -15,7 +15,7 @@ require (
 	github.com/mrz1836/go-datastore v0.5.13
 	github.com/mrz1836/go-parameters v0.4.1
 	github.com/mrz1836/go-sanitize v1.3.1
-	github.com/mrz1836/go-validate v0.2.0
+	github.com/mrz1836/go-validate v0.2.1
 	github.com/newrelic/go-agent/v3 v3.29.1
 	github.com/newrelic/go-agent/v3/integrations/nrhttprouter v1.0.2
 	github.com/rs/zerolog v1.31.0
