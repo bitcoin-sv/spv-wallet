@@ -3,7 +3,7 @@ module github.com/BuxOrg/bux-server
 go 1.21.5
 
 require (
-	github.com/BuxOrg/bux v0.14.3-0.20240201141930-5ac2858facdc
+	github.com/BuxOrg/bux v0.14.4-0.20240212060332-36a09b80059f
 	github.com/BuxOrg/bux-models v0.3.0
 	github.com/bitcoin-sv/go-broadcast-client v0.17.1
 	github.com/go-ozzo/ozzo-validation v3.6.0+incompatible
