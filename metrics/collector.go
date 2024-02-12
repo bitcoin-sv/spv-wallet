@@ -16,7 +16,7 @@ func NewPrometheusCollector(reg prometheus.Registerer) buxmetrics.Collector {
 }
 
 // RegisterGauge creates a new Gauge and registers it with the collector.
-func (c *PrometheusCollector) RegisterGauge(name string) buxmetrics.GaugeInterface {
+func (c *PrometheusCollector) RegisterGauge(name string) prometheus.Gauge {
 	g := prometheus.NewGauge(
 		prometheus.GaugeOpts{
 			Name: name,
@@ -28,7 +28,7 @@ func (c *PrometheusCollector) RegisterGauge(name string) buxmetrics.GaugeInterfa
 }
 
 // RegisterGaugeVec creates a new GaugeVec and registers it with the collector.
-func (c *PrometheusCollector) RegisterGaugeVec(name string, labels ...string) buxmetrics.GaugeVecInterface {
+func (c *PrometheusCollector) RegisterGaugeVec(name string, labels ...string) *prometheus.GaugeVec {
 	g := prometheus.NewGaugeVec(
 		prometheus.GaugeOpts{
 			Name: name,
@@ -37,11 +37,11 @@ func (c *PrometheusCollector) RegisterGaugeVec(name string, labels ...string) bu
 		labels,
 	)
 	c.reg.MustRegister(g)
-	return &GaugeVecWrapper{g}
+	return g
 }
 
 // RegisterHistogramVec creates a new HistogramVec and registers it with the collector.
-func (c *PrometheusCollector) RegisterHistogramVec(name string, labels ...string) buxmetrics.HistogramVecInterface {
+func (c *PrometheusCollector) RegisterHistogramVec(name string, labels ...string) *prometheus.HistogramVec {
 	h := prometheus.NewHistogramVec(
 		prometheus.HistogramOpts{
 			Name: name,
@@ -50,25 +50,5 @@ func (c *PrometheusCollector) RegisterHistogramVec(name string, labels ...string
 		labels,
 	)
 	c.reg.MustRegister(h)
-	return &HistogramVecWrapper{h}
-}
-
-// GaugeVecWrapper is a wrapper for prometheus.GaugeVec
-type GaugeVecWrapper struct {
-	*prometheus.GaugeVec
-}
-
-// WithLabelValues returns a Gauge with the given label values
-func (g *GaugeVecWrapper) WithLabelValues(lvs ...string) buxmetrics.GaugeInterface {
-	return g.GaugeVec.WithLabelValues(lvs...)
-}
-
-// HistogramVecWrapper is a wrapper for prometheus.HistogramVec
-type HistogramVecWrapper struct {
-	*prometheus.HistogramVec
-}
-
-// WithLabelValues returns a Histogram with the given label values
-func (h *HistogramVecWrapper) WithLabelValues(lvs ...string) buxmetrics.HistogramInterface {
-	return h.HistogramVec.WithLabelValues(lvs...)
+	return h
 }

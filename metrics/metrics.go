@@ -1,7 +1,10 @@
 package metrics
 
 import (
+	"net/http"
+
 	"github.com/prometheus/client_golang/prometheus"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 )
 
 type Metrics struct {
@@ -20,4 +23,8 @@ func newMetrics() *Metrics {
 	}
 
 	return m
+}
+
+func (m *Metrics) HttpHandler() http.Handler {
+	return promhttp.HandlerFor(metrics.gatherer, promhttp.HandlerOpts{Registry: metrics.registerer})
 }

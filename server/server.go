@@ -16,6 +16,7 @@ import (
 	"github.com/BuxOrg/bux-server/actions/utxos"
 	"github.com/BuxOrg/bux-server/actions/xpubs"
 	"github.com/BuxOrg/bux-server/config"
+	"github.com/BuxOrg/bux-server/metrics"
 	apirouter "github.com/mrz1836/go-api-router"
 	"github.com/newrelic/go-agent/v3/integrations/nrhttprouter"
 	httpSwagger "github.com/swaggo/http-swagger"
@@ -89,6 +90,9 @@ func (s *Server) Handlers() *nrhttprouter.Router {
 	s.Router = apirouter.NewWithNewRelic(s.Services.NewRelic)
 	s.Router.HTTPRouter.Handler(http.MethodGet, "/swagger", http.RedirectHandler("/swagger/index.html", http.StatusMovedPermanently))
 	s.Router.HTTPRouter.Handler(http.MethodGet, "/swagger/*any", httpSwagger.WrapHandler)
+	if metrics, enabled := metrics.Get(); enabled {
+		s.Router.HTTPRouter.Handler(http.MethodGet, "/metrics", metrics.HttpHandler())
+	}
 	segment.End()
 
 	// Turned on all CORs - should be able to access in a browser
