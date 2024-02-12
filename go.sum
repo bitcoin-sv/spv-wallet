@@ -250,8 +250,8 @@ github.com/mrz1836/go-parameters v0.4.1 h1:8ElvGs8hzk0/hz2t5an2FmS9SPfWozGn2nXUv
 github.com/mrz1836/go-parameters v0.4.1/go.mod h1:r9EPPPb1XfSNtTbIvkbc77jvji8vjVNLZCj5ewrjTZs=
 github.com/mrz1836/go-sanitize v1.3.1 h1:bTxpzDXzGh9cp3XLTeVKgL2iLqEwCaLqqe+3BmpnCbo=
 github.com/mrz1836/go-sanitize v1.3.1/go.mod h1:Js6Gq1uiarNReoOeOKxPXxNpKy1FRlbgDDZnJG4THdM=
-github.com/mrz1836/go-validate v0.2.0 h1:F8AcgJRW0B/hUNFAXijrN/EGqYlAIkIIpMDkIMMRUho=
-github.com/mrz1836/go-validate v0.2.0/go.mod h1:IoGAb4rTAL6KgAxOiWL4ICwLqxGbKCKT1GyaSuE/4bk=
+github.com/mrz1836/go-validate v0.2.1 h1:LvhFvnZgemmJnZ/Ch9vEgY9YzKy+1Ka1Hx7yzpJEB00=
+github.com/mrz1836/go-validate v0.2.1/go.mod h1:IoGAb4rTAL6KgAxOiWL4ICwLqxGbKCKT1GyaSuE/4bk=
 github.com/newrelic/go-agent/v3 v3.29.1 h1:OINNRev5ImiyRq0IUYwhfTmtqQgQFYyDNQEtbRFAi+k=
 github.com/newrelic/go-agent/v3 v3.29.1/go.mod h1:9utrgxlSryNqRrTvII2XBL+0lpofXbqXApvVWPpbzUg=
 github.com/newrelic/go-agent/v3/integrations/nrhttprouter v1.0.2 h1:Y+bKuryqCg+TAvBkBaEKwak+Boy5OdosQNdDGFwyDLo=
