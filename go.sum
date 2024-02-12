@@ -236,8 +236,8 @@ github.com/mitchellh/mapstructure v1.5.0/go.mod h1:bFUtVrKA4DC2yAKiSyO/QUcy7e+RR
 github.com/montanaflynn/stats v0.0.0-20171201202039-1bf9dbcd8cbe/go.mod h1:wL8QJuTMNUDYhXwkmfOly8iTdp5TEcJFWZD2D7SIkUc=
 github.com/montanaflynn/stats v0.7.1 h1:etflOAAHORrCC44V+aR6Ftzort912ZU+YLiSTuV8eaE=
 github.com/montanaflynn/stats v0.7.1/go.mod h1:etXPPgVO6n31NxCd9KQUMvCM+ve0ruNzt6R8Bnaayow=
-github.com/mrz1836/go-api-router v0.7.1 h1:CD5eRWtpI6uAFTTS6ilostM9GlI0YXg7YJdJQiY8wpo=
-github.com/mrz1836/go-api-router v0.7.1/go.mod h1:x9W150CQr7BmHZmDUls1GaNVcarec29HlhQ3dbSmKO4=
+github.com/mrz1836/go-api-router v0.7.2 h1:/BXAAzbhYsjsMACITfR58RH1agK+JraDsT9VWjaKVqo=
+github.com/mrz1836/go-api-router v0.7.2/go.mod h1:Q1uiOk+f76Yw19mI10VfaedqnyHrl05x7/Nwz+QOs5Q=
 github.com/mrz1836/go-cache v0.9.4 h1:xK4Q7XqfOrID3BhvZsxma8QTyIGYG6wuHy3N6pi3lik=
 github.com/mrz1836/go-cache v0.9.4/go.mod h1:M+l5VNmL6juG4vYJtHv7OzM0ZtO2zTaN4APaU7aHn78=
 github.com/mrz1836/go-cachestore v0.3.6 h1:/llHdNN6nXvFaRaN6T2icGQ/FHNZwWkTvDwNuIsZbY4=
