@@ -4,8 +4,8 @@ import (
 	"net/http"
 
 	"github.com/BuxOrg/bux"
-	"github.com/BuxOrg/bux-server/actions"
-	"github.com/BuxOrg/bux-server/mappings"
+	"github.com/BuxOrg/spv-wallet/actions"
+	"github.com/BuxOrg/spv-wallet/mappings"
 	"github.com/julienschmidt/httprouter"
 	apirouter "github.com/mrz1836/go-api-router"
 )
@@ -19,7 +19,7 @@ import (
 // @Param		metadata query string false "metadata"
 // @Success		200
 // @Router		/v1/xpub [patch]
-// @Security	bux-auth-xpub
+// @Security	spv-wallet-auth-xpub
 func (a *Action) update(w http.ResponseWriter, req *http.Request, _ httprouter.Params) {
 	reqXPub, _ := bux.GetXpubFromRequest(req)
 	reqXPubID, _ := bux.GetXpubIDFromRequest(req)
@@ -31,7 +31,7 @@ func (a *Action) update(w http.ResponseWriter, req *http.Request, _ httprouter.P
 	// Get an xPub
 	var xPub *bux.Xpub
 	var err error
-	xPub, err = a.Services.Bux.UpdateXpubMetadata(
+	xPub, err = a.Services.SPV.UpdateXpubMetadata(
 		req.Context(), reqXPubID, metadata,
 	)
 	if err != nil {

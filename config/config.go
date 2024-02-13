@@ -10,28 +10,28 @@ import (
 	"github.com/mrz1836/go-datastore"
 )
 
-// Config constants used for bux-server
+// Config constants used for spv-wallet
 const (
-	ApplicationName         = "BuxServer"
+	ApplicationName         = "SPVWallet"
 	APIVersion              = "v1"
 	DefaultNewRelicShutdown = 10 * time.Second
 	HealthRequestPath       = "health"
 	Version                 = "v0.12.0"
 	ConfigFilePathKey       = "config_file"
 	DefaultConfigFilePath   = "config.yaml"
-	ConfigEnvPrefix         = "BUX_"
+	ConfigEnvPrefix         = "SPV_"
 	BroadcastCallbackRoute  = "/transaction/broadcast/callback"
 )
 
 // AppConfig is the configuration values and associated env vars
 type AppConfig struct {
-	// Authentication is the configuration for keys authentication in bux.
+	// Authentication is the configuration for keys authentication in spv.
 	Authentication *AuthenticationConfig `json:"auth" mapstructure:"auth"`
 	// Cache is the configuration for cache, memory or redis, and cluster cache settings.
 	Cache *CacheConfig `json:"cache" mapstructure:"cache"`
 	// Db is the configuration for database related settings.
 	Db *DbConfig `json:"db" mapstructure:"db"`
-	// Debug is a flag for enabling additional information from bux.
+	// Debug is a flag for enabling additional information from spv.
 	Debug bool `json:"debug" mapstructure:"debug"`
 	// DebugProfiling is a flag for enabling additinal debug profiling.
 	DebugProfiling bool `json:"debug_profiling" mapstructure:"debug_profiling"`
@@ -39,7 +39,7 @@ type AppConfig struct {
 	DisableITC bool `json:"disable_itc" mapstructure:"disable_itc"`
 	// ImportBlockHeaders is a URL from where the headers can be downloaded.
 	ImportBlockHeaders string `json:"import_block_headers" mapstructure:"import_block_headers"`
-	// Logging is the configuration for zerolog used in bux.
+	// Logging is the configuration for zerolog used in spv.
 	Logging *LoggingConfig `json:"logging" mapstructure:"logging"`
 	// NewRelic is New Relic related settings.
 	NewRelic *NewRelicConfig `json:"new_relic" mapstructure:"new_relic"`
@@ -51,11 +51,11 @@ type AppConfig struct {
 	Paymail *PaymailConfig `json:"paymail" mapstructure:"paymail"`
 	// RequestLogging is flag for enabling logging in go-api-router.
 	RequestLogging bool `json:"request_logging" mapstructure:"request_logging"`
-	// Server is a general configuration for bux-server.
+	// Server is a general configuration for spv-wallet.
 	Server *ServerConfig `json:"server_config" mapstructure:"server_config"`
-	// TaskManager is a configuration for Task Manager in bux.
+	// TaskManager is a configuration for Task Manager in spv.
 	TaskManager *TaskManagerConfig `json:"task_manager" mapstructure:"task_manager"`
-	// Metrics is a configuration for metrics in bux.
+	// Metrics is a configuration for metrics in spv.
 	Metrics *MetricsConfig `json:"metrics" mapstructure:"metrics"`
 }
 
@@ -75,7 +75,7 @@ type AuthenticationConfig struct {
 type CacheConfig struct {
 	// Engine is the cache engine to use (redis, freecache).
 	Engine cachestore.Engine `json:"engine" mapstructure:"engine"`
-	// Cluster is the cluster-specific configuration for bux.
+	// Cluster is the cluster-specific configuration for spv.
 	Cluster *ClusterConfig `json:"cluster" mapstructure:"cluster"`
 	// Redis is a general config for redis if the engine is set to it.
 	Redis *RedisConfig `json:"redis" mapstructure:"redis"`
@@ -89,7 +89,7 @@ type CallbackConfig struct {
 	CallbackToken string `json:"callback_token" mapstructure:"callback_token"`
 }
 
-// ClusterConfig is a configuration for the Bux cluster
+// ClusterConfig is a configuration for the SPV cluster
 type ClusterConfig struct {
 	// Coordinator is a cluster coordinator (redis or memory).
 	Coordinator cluster.Coordinator `json:"coordinator" mapstructure:"coordinator"`
@@ -249,5 +249,5 @@ type MetricsConfig struct {
 
 // GetUserAgent will return the outgoing user agent
 func (a *AppConfig) GetUserAgent() string {
-	return "BUX-Server " + Version
+	return "SPV-Wallet " + Version
 }

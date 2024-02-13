@@ -2,16 +2,16 @@ package mappings
 
 import (
 	"github.com/BuxOrg/bux"
-	buxmodels "github.com/BuxOrg/bux-models"
+	spvwalletmodels "github.com/BuxOrg/bux-models"
 )
 
-// MapToSyncConfigContract will map the sync-config model from bux to the bux-models contract
-func MapToSyncConfigContract(sc *bux.SyncConfig) *buxmodels.SyncConfig {
+// MapToSyncConfigContract will map the sync-config model from spv-wallet to the spv-wallet-models contract
+func MapToSyncConfigContract(sc *bux.SyncConfig) *spvwalletmodels.SyncConfig {
 	if sc == nil {
 		return nil
 	}
 
-	return &buxmodels.SyncConfig{
+	return &spvwalletmodels.SyncConfig{
 		Broadcast:        sc.Broadcast,
 		BroadcastInstant: sc.BroadcastInstant,
 		PaymailP2P:       sc.PaymailP2P,
@@ -19,8 +19,8 @@ func MapToSyncConfigContract(sc *bux.SyncConfig) *buxmodels.SyncConfig {
 	}
 }
 
-// MapToSyncConfigBux will map the sync-config model from bux-models to the bux contract
-func MapToSyncConfigBux(sc *buxmodels.SyncConfig) *bux.SyncConfig {
+// MapToSyncConfigSPV will map the sync-config model from spv-wallet-models to the spv-wallet contract
+func MapToSyncConfigSPV(sc *spvwalletmodels.SyncConfig) *bux.SyncConfig {
 	if sc == nil {
 		return nil
 	}

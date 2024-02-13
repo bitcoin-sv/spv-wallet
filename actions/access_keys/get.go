@@ -4,7 +4,7 @@ import (
 	"net/http"
 
 	"github.com/BuxOrg/bux"
-	"github.com/BuxOrg/bux-server/mappings"
+	"github.com/BuxOrg/spv-wallet/mappings"
 	"github.com/julienschmidt/httprouter"
 	apirouter "github.com/mrz1836/go-api-router"
 )
@@ -18,7 +18,7 @@ import (
 // @Param		id query string true "id"
 // @Success		200
 // @Router		/v1/access-key [get]
-// @Security	bux-auth-xpub
+// @Security	spv-wallet-auth-xpub
 func (a *Action) get(w http.ResponseWriter, req *http.Request, _ httprouter.Params) {
 	reqXPubID, _ := bux.GetXpubIDFromRequest(req)
 
@@ -32,7 +32,7 @@ func (a *Action) get(w http.ResponseWriter, req *http.Request, _ httprouter.Para
 	}
 
 	// Get access key
-	accessKey, err := a.Services.Bux.GetAccessKey(
+	accessKey, err := a.Services.SPV.GetAccessKey(
 		req.Context(), reqXPubID, id,
 	)
 	if err != nil {

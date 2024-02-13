@@ -4,8 +4,8 @@ import (
 	"net/http"
 
 	"github.com/BuxOrg/bux"
-	"github.com/BuxOrg/bux-server/actions"
-	"github.com/BuxOrg/bux-server/mappings"
+	"github.com/BuxOrg/spv-wallet/actions"
+	"github.com/BuxOrg/spv-wallet/mappings"
 	"github.com/julienschmidt/httprouter"
 	apirouter "github.com/mrz1836/go-api-router"
 )
@@ -24,19 +24,19 @@ import (
 // @Param		conditions query string false "Conditions filter"
 // @Success		200
 // @Router		/v1/admin/utxos/search [post]
-// @Security	bux-auth-xpub
+// @Security	spv-wallet-auth-xpub
 func (a *Action) utxosSearch(w http.ResponseWriter, req *http.Request, _ httprouter.Params) {
 	// Parse the params
 	params := apirouter.GetParams(req)
 	queryParams, metadataModel, conditions, err := actions.GetQueryParameters(params)
-	metadata := mappings.MapToBuxMetadata(metadataModel)
+	metadata := mappings.MapToSPVMetadata(metadataModel)
 	if err != nil {
 		apirouter.ReturnResponse(w, req, http.StatusExpectationFailed, err.Error())
 		return
 	}
 
 	var utxos []*bux.Utxo
-	if utxos, err = a.Services.Bux.GetUtxos(
+	if utxos, err = a.Services.SPV.GetUtxos(
 		req.Context(),
 		metadata,
 		conditions,
@@ -60,19 +60,19 @@ func (a *Action) utxosSearch(w http.ResponseWriter, req *http.Request, _ httprou
 // @Param		conditions query string false "Conditions filter"
 // @Success		200
 // @Router		/v1/admin/utxos/count [post]
-// @Security	bux-auth-xpub
+// @Security	spv-wallet-auth-xpub
 func (a *Action) utxosCount(w http.ResponseWriter, req *http.Request, _ httprouter.Params) {
 	// Parse the params
 	params := apirouter.GetParams(req)
 	_, metadataModel, conditions, err := actions.GetQueryParameters(params)
-	metadata := mappings.MapToBuxMetadata(metadataModel)
+	metadata := mappings.MapToSPVMetadata(metadataModel)
 	if err != nil {
 		apirouter.ReturnResponse(w, req, http.StatusExpectationFailed, err.Error())
 		return
 	}
 
 	var count int64
-	if count, err = a.Services.Bux.GetUtxosCount(
+	if count, err = a.Services.SPV.GetUtxosCount(
 		req.Context(),
 		metadata,
 		conditions,

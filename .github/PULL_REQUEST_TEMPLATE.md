@@ -5,8 +5,8 @@
 
 # Pull Request Checklist
 
-- [ ] 📖 I created my PR using provided  : [CODE_STANDARDS](https://github.com/BuxOrg/bux-server/blob/main/.github/CODE_STANDARDS.md)
-- [ ] 📖 I have read the short Code of Conduct: [CODE_OF_CONDUCT](https://github.com/BuxOrg/bux-server/blob/main/.github/CODE_OF_CONDUCT.md)
+- [ ] 📖 I created my PR using provided  : [CODE_STANDARDS](https://github.com/BuxOrg/spv-wallet/blob/main/.github/CODE_STANDARDS.md)
+- [ ] 📖 I have read the short Code of Conduct: [CODE_OF_CONDUCT](https://github.com/BuxOrg/spv-wallet/blob/main/.github/CODE_OF_CONDUCT.md)
 - [ ] 🏠 I tested my changes locally.
 - [ ] ✅ I have provided tests for my changes.
 - [ ] 📝 I have used conventional commits.

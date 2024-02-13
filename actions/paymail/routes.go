@@ -1,8 +1,8 @@
 package pmail
 
 import (
-	"github.com/BuxOrg/bux-server/actions"
-	"github.com/BuxOrg/bux-server/config"
+	"github.com/BuxOrg/spv-wallet/actions"
+	"github.com/BuxOrg/spv-wallet/config"
 	apirouter "github.com/mrz1836/go-api-router"
 )
 
@@ -18,7 +18,7 @@ func RegisterRoutes(router *apirouter.Router, appConfig *config.AppConfig, servi
 	requireAdmin.Use(a.RequireAdminAuthentication)
 
 	// Register the custom Paymail routes
-	services.Bux.GetPaymailConfig().RegisterRoutes(router.HTTPRouter)
+	services.SPV.GetPaymailConfig().RegisterRoutes(router.HTTPRouter)
 
 	// Create the action
 	action := &Action{actions.Action{AppConfig: a.AppConfig, Services: a.Services}}

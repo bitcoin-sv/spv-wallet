@@ -1,8 +1,8 @@
 package accesskeys
 
 import (
-	"github.com/BuxOrg/bux-server/actions"
-	"github.com/BuxOrg/bux-server/config"
+	"github.com/BuxOrg/spv-wallet/actions"
+	"github.com/BuxOrg/spv-wallet/config"
 	apirouter "github.com/mrz1836/go-api-router"
 )
 

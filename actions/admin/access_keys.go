@@ -4,9 +4,9 @@ import (
 	"net/http"
 
 	"github.com/BuxOrg/bux"
-	buxmodels "github.com/BuxOrg/bux-models"
-	"github.com/BuxOrg/bux-server/actions"
-	"github.com/BuxOrg/bux-server/mappings"
+	spvwalletmodels "github.com/BuxOrg/bux-models"
+	"github.com/BuxOrg/spv-wallet/actions"
+	"github.com/BuxOrg/spv-wallet/mappings"
 	"github.com/julienschmidt/httprouter"
 	apirouter "github.com/mrz1836/go-api-router"
 )
@@ -25,19 +25,19 @@ import (
 // @Param		conditions query string false "Conditions filter"
 // @Success		200
 // @Router		/v1/admin/access-keys/search [post]
-// @Security	bux-auth-xpub
+// @Security	spv-wallet-auth-xpub
 func (a *Action) accessKeysSearch(w http.ResponseWriter, req *http.Request, _ httprouter.Params) {
 	// Parse the params
 	params := apirouter.GetParams(req)
 	queryParams, metadataModel, conditions, err := actions.GetQueryParameters(params)
-	metadata := mappings.MapToBuxMetadata(metadataModel)
+	metadata := mappings.MapToSPVMetadata(metadataModel)
 	if err != nil {
 		apirouter.ReturnResponse(w, req, http.StatusExpectationFailed, err.Error())
 		return
 	}
 
 	var accessKeys []*bux.AccessKey
-	if accessKeys, err = a.Services.Bux.GetAccessKeys(
+	if accessKeys, err = a.Services.SPV.GetAccessKeys(
 		req.Context(),
 		metadata,
 		conditions,
@@ -47,7 +47,7 @@ func (a *Action) accessKeysSearch(w http.ResponseWriter, req *http.Request, _ ht
 		return
 	}
 
-	accessKeyContracts := make([]*buxmodels.AccessKey, 0)
+	accessKeyContracts := make([]*spvwalletmodels.AccessKey, 0)
 	for _, accessKey := range accessKeys {
 		accessKeyContracts = append(accessKeyContracts, mappings.MapToAccessKeyContract(accessKey))
 	}
@@ -66,19 +66,19 @@ func (a *Action) accessKeysSearch(w http.ResponseWriter, req *http.Request, _ ht
 // @Param		conditions query string false "Conditions filter"
 // @Success		200
 // @Router		/v1/admin/access-keys/count [post]
-// @Security	bux-auth-xpub
+// @Security	spv-wallet-auth-xpub
 func (a *Action) accessKeysCount(w http.ResponseWriter, req *http.Request, _ httprouter.Params) {
 	// Parse the params
 	params := apirouter.GetParams(req)
 	_, metadataModel, conditions, err := actions.GetQueryParameters(params)
-	metadata := mappings.MapToBuxMetadata(metadataModel)
+	metadata := mappings.MapToSPVMetadata(metadataModel)
 	if err != nil {
 		apirouter.ReturnResponse(w, req, http.StatusExpectationFailed, err.Error())
 		return
 	}
 
 	var count int64
-	if count, err = a.Services.Bux.GetAccessKeysCount(
+	if count, err = a.Services.SPV.GetAccessKeysCount(
 		req.Context(),
 		metadata,
 		conditions,

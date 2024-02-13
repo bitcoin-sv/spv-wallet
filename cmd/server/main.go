@@ -1,5 +1,5 @@
 /*
-Package main is the core service layer for the BUX Server
+Package main is the core service layer for the SPV Wallet
 */
 package main
 
@@ -9,19 +9,19 @@ import (
 	"os/signal"
 	"time"
 
-	"github.com/BuxOrg/bux-server/config"
-	"github.com/BuxOrg/bux-server/dictionary"
-	_ "github.com/BuxOrg/bux-server/docs"
-	"github.com/BuxOrg/bux-server/logging"
-	"github.com/BuxOrg/bux-server/server"
+	"github.com/BuxOrg/spv-wallet/config"
+	"github.com/BuxOrg/spv-wallet/dictionary"
+	_ "github.com/BuxOrg/spv-wallet/docs"
+	"github.com/BuxOrg/spv-wallet/logging"
+	"github.com/BuxOrg/spv-wallet/server"
 )
 
-// main method starts everything for the BUX Server
-// @title           BUX: Server
+// main method starts everything for the SPV Wallet
+// @title           SPV: Wallet
 // @version         v0.12.0
-// @securityDefinitions.apikey bux-auth-xpub
+// @securityDefinitions.apikey spv-wallet-auth-xpub
 // @in header
-// @name bux-auth-xpub
+// @name spv-wallet-auth-xpub
 
 // @securityDefinitions.apikey callback-auth
 // @in header
@@ -49,7 +49,7 @@ func main() {
 		return
 	}
 
-	// Try to ping the pulse service if enabled
+	// Try to ping the block header service if enabled
 	appConfig.CheckPulse(context.Background(), services.Logger)
 
 	// @mrz New Relic is ready at this point

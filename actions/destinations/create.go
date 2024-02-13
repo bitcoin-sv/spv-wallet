@@ -4,9 +4,9 @@ import (
 	"net/http"
 
 	"github.com/BuxOrg/bux"
-	"github.com/BuxOrg/bux-server/actions"
-	"github.com/BuxOrg/bux-server/mappings"
 	"github.com/BuxOrg/bux/utils"
+	"github.com/BuxOrg/spv-wallet/actions"
+	"github.com/BuxOrg/spv-wallet/mappings"
 	"github.com/julienschmidt/httprouter"
 	apirouter "github.com/mrz1836/go-api-router"
 )
@@ -22,14 +22,14 @@ import (
 // @Param		metadata query string false "metadata"
 // @Success		201
 // @Router		/v1/destination [post]
-// @Security	bux-auth-xpub
+// @Security	spv-wallet-auth-xpub
 func (a *Action) create(w http.ResponseWriter, req *http.Request, _ httprouter.Params) {
 	// Parse the params
 	params := apirouter.GetParams(req)
 
 	// Get the xPub from the request (via authentication)
 	reqXPub, _ := bux.GetXpubFromRequest(req)
-	xPub, err := a.Services.Bux.GetXpub(req.Context(), reqXPub)
+	xPub, err := a.Services.SPV.GetXpub(req.Context(), reqXPub)
 	if err != nil {
 		apirouter.ReturnResponse(w, req, http.StatusUnprocessableEntity, err.Error())
 		return
@@ -53,7 +53,7 @@ func (a *Action) create(w http.ResponseWriter, req *http.Request, _ httprouter.P
 		metadata[bux.ReferenceIDField] = referenceID
 	}
 
-	opts := a.Services.Bux.DefaultModelOptions()
+	opts := a.Services.SPV.DefaultModelOptions()
 
 	if metadata != nil {
 		opts = append(opts, bux.WithMetadatas(metadata))
@@ -61,7 +61,7 @@ func (a *Action) create(w http.ResponseWriter, req *http.Request, _ httprouter.P
 
 	// Get a new destination
 	var destination *bux.Destination
-	if destination, err = a.Services.Bux.NewDestination(
+	if destination, err = a.Services.SPV.NewDestination(
 		req.Context(),
 		xPub.RawXpub(),
 		uint32(0), // todo: use a constant? protect this?

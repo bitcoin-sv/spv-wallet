@@ -4,7 +4,7 @@ import (
 	"net/http"
 
 	"github.com/BuxOrg/bux"
-	"github.com/BuxOrg/bux-server/mappings"
+	"github.com/BuxOrg/spv-wallet/mappings"
 	"github.com/julienschmidt/httprouter"
 	apirouter "github.com/mrz1836/go-api-router"
 )
@@ -18,7 +18,7 @@ import (
 // @Param		id query string true "id"
 // @Success		200
 // @Router		/v1/transaction [get]
-// @Security	bux-auth-xpub
+// @Security	spv-wallet-auth-xpub
 func (a *Action) get(w http.ResponseWriter, req *http.Request, _ httprouter.Params) {
 	// Parse the params
 	params := apirouter.GetParams(req)
@@ -27,7 +27,7 @@ func (a *Action) get(w http.ResponseWriter, req *http.Request, _ httprouter.Para
 	reqXPubID, _ := bux.GetXpubIDFromRequest(req)
 
 	// Get a transaction by ID
-	transaction, err := a.Services.Bux.GetTransaction(
+	transaction, err := a.Services.SPV.GetTransaction(
 		req.Context(),
 		reqXPubID,
 		params.GetString("id"),

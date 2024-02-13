@@ -4,8 +4,8 @@ import (
 	"net/http"
 
 	"github.com/BuxOrg/bux"
-	"github.com/BuxOrg/bux-server/actions"
-	"github.com/BuxOrg/bux-server/mappings"
+	"github.com/BuxOrg/spv-wallet/actions"
+	"github.com/BuxOrg/spv-wallet/mappings"
 	"github.com/julienschmidt/httprouter"
 	apirouter "github.com/mrz1836/go-api-router"
 )
@@ -22,7 +22,7 @@ import (
 // @Param		metadata body string true "Destination Metadata"
 // @Success		200
 // @Router		/v1/destination [patch]
-// @Security	bux-auth-xpub
+// @Security	spv-wallet-auth-xpub
 func (a *Action) update(w http.ResponseWriter, req *http.Request, _ httprouter.Params) {
 	reqXPubID, _ := bux.GetXpubIDFromRequest(req)
 
@@ -41,15 +41,15 @@ func (a *Action) update(w http.ResponseWriter, req *http.Request, _ httprouter.P
 	var destination *bux.Destination
 	var err error
 	if id != "" {
-		destination, err = a.Services.Bux.UpdateDestinationMetadataByID(
+		destination, err = a.Services.SPV.UpdateDestinationMetadataByID(
 			req.Context(), reqXPubID, id, metadata,
 		)
 	} else if address != "" {
-		destination, err = a.Services.Bux.UpdateDestinationMetadataByAddress(
+		destination, err = a.Services.SPV.UpdateDestinationMetadataByAddress(
 			req.Context(), reqXPubID, address, metadata,
 		)
 	} else {
-		destination, err = a.Services.Bux.UpdateDestinationMetadataByLockingScript(
+		destination, err = a.Services.SPV.UpdateDestinationMetadataByLockingScript(
 			req.Context(), reqXPubID, lockingScript, metadata,
 		)
 	}

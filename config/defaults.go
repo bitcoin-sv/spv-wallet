@@ -45,7 +45,7 @@ func getCacheDefaults() *CacheConfig {
 		Engine: "freecache",
 		Cluster: &ClusterConfig{
 			Coordinator: "memory",
-			Prefix:      "bux_cluster_",
+			Prefix:      "spv_cluster_",
 			Redis:       nil,
 		},
 		Redis: &RedisConfig{
@@ -95,7 +95,7 @@ func getDbDefaults() *DbConfig {
 			SslMode:                   "disable",
 		},
 		SQLite: &datastore.SQLiteConfig{
-			DatabasePath:       "./bux.db",
+			DatabasePath:       "./spv.db",
 			ExistingConnection: nil,
 			Shared:             true,
 		},
@@ -106,7 +106,7 @@ func getLoggingDefaults() *LoggingConfig {
 	return &LoggingConfig{
 		Level:        "info",
 		Format:       "console",
-		InstanceName: "bux-server",
+		InstanceName: "spv-wallet",
 		LogOrigin:    false,
 	}
 }
@@ -122,7 +122,7 @@ func getNewRelicDefaults() *NewRelicConfig {
 func getNodesDefaults() *NodesConfig {
 	depIDSufix, _ := uuid.NewUUID()
 	return &NodesConfig{
-		DeploymentID: "bux-" + depIDSufix.String(),
+		DeploymentID: "spv-" + depIDSufix.String(),
 		Protocol:     NodesProtocolArc,
 		Callback:     getCallbackDefaults(),
 		Apis: []*MinerAPI{

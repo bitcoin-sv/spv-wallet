@@ -4,7 +4,7 @@ package actions
 import (
 	"net/http"
 
-	"github.com/BuxOrg/bux-server/dictionary"
+	"github.com/BuxOrg/spv-wallet/dictionary"
 	apirouter "github.com/mrz1836/go-api-router"
 )
 
