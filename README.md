@@ -1,23 +1,21 @@
 <div align="center">
 
-# BUX: Server
+# SPV Wallet
 
 
-[![Release](https://img.shields.io/github/release-pre/BuxOrg/bux-server.svg?logo=github&style=flat&v=3)](https://github.com/BuxOrg/bux-server/releases)
-[![Build Status](https://img.shields.io/github/actions/workflow/status/BuxOrg/bux-server/run-tests.yml?branch=master&v=3)](https://github.com/BuxOrg/bux-server/actions)
-[![Report](https://goreportcard.com/badge/github.com/BuxOrg/bux-server?style=flat&v=3)](https://goreportcard.com/report/github.com/BuxOrg/bux-server)
-[![codecov](https://codecov.io/gh/BuxOrg/bux-server/branch/master/graph/badge.svg?v=3)](https://codecov.io/gh/BuxOrg/bux-server)
-[![Mergify Status](https://img.shields.io/endpoint.svg?url=https://api.mergify.com/v1/badges/BuxOrg/bux-server&style=flat&v=3)](https://mergify.io)
+[![Release](https://img.shields.io/github/release-pre/BuxOrg/spv-wallet.svg?logo=github&style=flat&v=3)](https://github.com/BuxOrg/spv-wallet/releases)
+[![Build Status](https://img.shields.io/github/actions/workflow/status/BuxOrg/spv-wallet/run-tests.yml?branch=master&v=3)](https://github.com/BuxOrg/spv-wallet/actions)
+[![Report](https://goreportcard.com/badge/github.com/BuxOrg/spv-wallet?style=flat&v=3)](https://goreportcard.com/report/github.com/BuxOrg/spv-wallet)
+[![codecov](https://codecov.io/gh/BuxOrg/spv-wallet/branch/master/graph/badge.svg?v=3)](https://codecov.io/gh/BuxOrg/spv-wallet)
+[![Mergify Status](https://img.shields.io/endpoint.svg?url=https://api.mergify.com/v1/badges/BuxOrg/spv-wallet&style=flat&v=3)](https://mergify.io)
 <br>
 
-[![Go](https://img.shields.io/github/go-mod/go-version/BuxOrg/bux-server?v=3)](https://golang.org/)
-[![Gitpod Ready-to-Code](https://img.shields.io/badge/Gitpod-ready--to--code-blue?logo=gitpod&v=3)](https://gitpod.io/#https://github.com/BuxOrg/bux-server)
+[![Go](https://img.shields.io/github/go-mod/go-version/BuxOrg/spv-wallet?v=3)](https://golang.org/)
+[![Gitpod Ready-to-Code](https://img.shields.io/badge/Gitpod-ready--to--code-blue?logo=gitpod&v=3)](https://gitpod.io/#https://github.com/BuxOrg/spv-wallet)
 [![standard-readme compliant](https://img.shields.io/badge/readme%20style-standard-brightgreen.svg?style=flat&v=3)](https://github.com/RichardLitt/standard-readme)
 [![Makefile Included](https://img.shields.io/badge/Makefile-Supported%20-brightgreen?=flat&logo=probot&v=3)](Makefile)
 <br/>
 </div>
-
-> Get started using [BUX](https://getbux.io) in five minutes
 
 ## Table of Contents
 
@@ -36,36 +34,36 @@
 
 ## About
 
-[Read more about BUX](https://getbux.io)
+Complete stand-alone server using the SPV Wallet engine (UTXOs, xPubs, Paymail & More!)
 
 <br/>
 
 ## Installation
 
-**bux-server** requires a [supported release of Go](https://golang.org/doc/devel/release.html#policy).
+**spv-wallet** requires a [supported release of Go](https://golang.org/doc/devel/release.html#policy).
 
 ```shell script
-go get -u github.com/BuxOrg/bux-server
+go get -u github.com/BuxOrg/spv-wallet
 ```
 
 #### build
 
 ```shell script
-go build -o bux-server cmd/server/*
+go build -o spv-wallet cmd/server/*
 ```
 
 #### run
 
 ```shell script
-./bux-server
+./spv-wallet
 ```
 <br/>
 
 ## Documentation
 
-View the generated [documentation](https://pkg.go.dev/github.com/BuxOrg/bux-server)
+View the generated [documentation](https://pkg.go.dev/github.com/BuxOrg/spv-wallet)
 
-[![GoDoc](https://godoc.org/github.com/BuxOrg/bux-server?status.svg&style=flat&v=3)](https://pkg.go.dev/github.com/BuxOrg/bux-server)
+[![GoDoc](https://godoc.org/github.com/BuxOrg/spv-wallet?status.svg&style=flat&v=3)](https://pkg.go.dev/github.com/BuxOrg/spv-wallet)
 
 <br/>
 
@@ -195,7 +193,7 @@ vet                           Run the Go vet application
 
 ### Defaults
 
-If you run Bux-Server without editing anything, it will use the default configuration from file [defaults.go](/config/defaults.go). It is set up to use _freecache_, _sqlite_ with enabled _paymail_ with _signing disabled_ and with _beef_.
+If you run spv-wallet without editing anything, it will use the default configuration from file [defaults.go](/config/defaults.go). It is set up to use _freecache_, _sqlite_ with enabled _paymail_ with _signing disabled_ and with _beef_.
 
 
 ### Config Variables
@@ -228,7 +226,7 @@ go run ./cmd/server/main.go -C /my/config.json
 
 #### Environment variables
 
-To override any config variable with ENV, use the "BUX\_" prefix with mapstructure annotation path with "_" as a delimiter in all uppercase. Example:
+To override any config variable with ENV, use the "SPV\_" prefix with mapstructure annotation path with "_" as a delimiter in all uppercase. Example:
 
 Let's take this fragment of AppConfig from `config.example.yaml`:
 
@@ -240,9 +238,9 @@ auth:
     signing_disabled: true
 ```
 
-To override admin_key in auth config, use the path with "_" as a path delimiter and BUX\_ as prefix. So:
+To override admin_key in auth config, use the path with "_" as a path delimiter and SPV\_ as prefix. So:
 ```bash
-BUX_AUTH_ADMIN_KEY="admin_key"
+SPV_AUTH_ADMIN_KEY="admin_key"
 ```
 
 To be able to use TAAL API Key is needed. 
@@ -265,7 +263,7 @@ To use your API key put key in ``token`` field in ```config.example.yaml```
 
 ### Examples & Tests
 
-All unit tests run via [GitHub Actions](https://github.com/BuxOrg/bux-server/actions) and
+All unit tests run via [GitHub Actions](https://github.com/BuxOrg/spv-wallet/actions) and
 uses [Go version 1.19.x](https://golang.org/doc/go1.19). View the [configuration file](.github/workflows/run-tests.yml).
 
 <br/>
@@ -297,8 +295,8 @@ make bench
 
 ### Docker Compose Quickstart
 
-To get started with development, `bux-server` provides a `start.sh` script
-which is using `docker-compose.yml` file to starts up Bux Server with selected database
+To get started with development, `spv-wallet` provides a `start.sh` script
+which is using `docker-compose.yml` file to starts up SPV Wallet serer with selected database
 and cache storage. To start, we need to fill the config json which we want to use,
 for example: `config/envs/development.json`.
 
@@ -306,7 +304,7 @@ Main configuration is done when running the script.
 
 There are two way of running this script:
 1. with manual configuration - Every option is displayed in terminal and user can choose
-   which database/cache storage use and configure how to run bux-server.
+   which database/cache storage use and configure how to run spv-wallet.
   ```bash
   ./start.sh
   ```
@@ -316,7 +314,7 @@ There are two way of running this script:
   ./start.sh -db postgresql -c redis -bs true -env development -b false 
   ```
 
-`-l/--load` option add possibility to use previously created `.env.config` file and run bux-server with simple command:
+`-l/--load` option add possibility to use previously created `.env.config` file and run spv-wallet with simple command:
   ```bash
   ./start.sh -l
   ```
@@ -338,4 +336,4 @@ View the [contributing guidelines](.github/CODE_STANDARDS.md#3-contributing) and
 
 ## License
 
-[![License](https://img.shields.io/github/license/BuxOrg/bux-server.svg?style=flat&v=3)](LICENSE)
+[![License](https://img.shields.io/github/license/BuxOrg/spv-wallet.svg?style=flat&v=3)](LICENSE)
