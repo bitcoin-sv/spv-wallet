@@ -7,7 +7,7 @@ import (
 	"strings"
 	"sync"
 
-	"github.com/BuxOrg/bux-server/dictionary"
+	"github.com/BuxOrg/spv-wallet/dictionary"
 	"github.com/mitchellh/mapstructure"
 	"github.com/rs/zerolog"
 	"github.com/spf13/viper"
@@ -68,7 +68,7 @@ func setDefaults() error {
 }
 
 func envConfig() {
-	viper.SetEnvPrefix("BUX")
+	viper.SetEnvPrefix("SPV")
 	viper.SetEnvKeyReplacer(strings.NewReplacer(".", "_"))
 	viper.AutomaticEnv()
 }

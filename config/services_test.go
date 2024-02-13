@@ -34,7 +34,7 @@ func TestAppServices_CloseAll(t *testing.T) {
 		require.NotNil(t, s)
 		s.CloseAll(context.Background())
 
-		assert.Nil(t, s.Bux)
+		assert.Nil(t, s.SPV)
 		assert.Nil(t, s.NewRelic)
 	})
 }
@@ -47,6 +47,6 @@ func TestAppConfig_GetUserAgent(t *testing.T) {
 		ac := newTestConfig(t)
 		require.NotNil(t, ac)
 		agent := ac.GetUserAgent()
-		assert.Equal(t, "BUX-Server "+Version, agent)
+		assert.Equal(t, "SPV-Wallet "+Version, agent)
 	})
 }

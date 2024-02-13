@@ -1,13 +1,13 @@
 package metrics
 
 import (
-	buxmetrics "github.com/BuxOrg/bux/metrics"
+	spvmetrics "github.com/BuxOrg/bux/metrics"
 )
 
 var metrics *Metrics
 
 // EnableMetrics will enable the metrics for the application
-func EnableMetrics() buxmetrics.Collector {
+func EnableMetrics() spvmetrics.Collector {
 	metrics = newMetrics()
 	return NewPrometheusCollector(metrics.registerer)
 }

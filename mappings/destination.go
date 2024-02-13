@@ -2,17 +2,17 @@ package mappings
 
 import (
 	"github.com/BuxOrg/bux"
-	buxmodels "github.com/BuxOrg/bux-models"
-	"github.com/BuxOrg/bux-server/mappings/common"
+	spvwalletmodels "github.com/BuxOrg/bux-models"
+	"github.com/BuxOrg/spv-wallet/mappings/common"
 )
 
-// MapToDestinationContract will map the bux destination model to the bux-models contract
-func MapToDestinationContract(d *bux.Destination) *buxmodels.Destination {
+// MapToDestinationContract will map the spv-wallet destination model to the spv-wallet-models contract
+func MapToDestinationContract(d *bux.Destination) *spvwalletmodels.Destination {
 	if d == nil {
 		return nil
 	}
 
-	return &buxmodels.Destination{
+	return &spvwalletmodels.Destination{
 		Model:         *common.MapToContract(&d.Model),
 		ID:            d.ID,
 		XpubID:        d.XpubID,
@@ -25,8 +25,8 @@ func MapToDestinationContract(d *bux.Destination) *buxmodels.Destination {
 	}
 }
 
-// MapToDestinationBux will map the bux-models destination contract to the bux destination model
-func MapToDestinationBux(d *buxmodels.Destination) *bux.Destination {
+// MapToDestinationSPV will map the spv-wallet-models destination contract to the spv-wallet destination model
+func MapToDestinationSPV(d *spvwalletmodels.Destination) *bux.Destination {
 	if d == nil {
 		return nil
 	}

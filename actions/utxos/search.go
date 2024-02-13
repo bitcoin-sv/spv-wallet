@@ -4,9 +4,9 @@ import (
 	"net/http"
 
 	"github.com/BuxOrg/bux"
-	buxmodels "github.com/BuxOrg/bux-models"
-	"github.com/BuxOrg/bux-server/actions"
-	"github.com/BuxOrg/bux-server/mappings"
+	spvwalletmodels "github.com/BuxOrg/bux-models"
+	"github.com/BuxOrg/spv-wallet/actions"
+	"github.com/BuxOrg/spv-wallet/mappings"
 	"github.com/julienschmidt/httprouter"
 	apirouter "github.com/mrz1836/go-api-router"
 )
@@ -25,14 +25,14 @@ import (
 // @Param		conditions query string false "conditions"
 // @Success		200
 // @Router		/v1/utxo/search [post]
-// @Security	bux-auth-xpub
+// @Security	spv-wallet-auth-xpub
 func (a *Action) search(w http.ResponseWriter, req *http.Request, _ httprouter.Params) {
 	reqXPubID, _ := bux.GetXpubIDFromRequest(req)
 
 	// Parse the params
 	params := apirouter.GetParams(req)
 	queryParams, modelMetadata, conditions, err := actions.GetQueryParameters(params)
-	metadata := mappings.MapToBuxMetadata(modelMetadata)
+	metadata := mappings.MapToSPVMetadata(modelMetadata)
 	if err != nil {
 		apirouter.ReturnResponse(w, req, http.StatusExpectationFailed, err.Error())
 		return
@@ -40,7 +40,7 @@ func (a *Action) search(w http.ResponseWriter, req *http.Request, _ httprouter.P
 
 	// Record a new transaction (get the hex from parameters)a
 	var utxos []*bux.Utxo
-	if utxos, err = a.Services.Bux.GetUtxosByXpubID(
+	if utxos, err = a.Services.SPV.GetUtxosByXpubID(
 		req.Context(),
 		reqXPubID,
 		metadata,
@@ -51,7 +51,7 @@ func (a *Action) search(w http.ResponseWriter, req *http.Request, _ httprouter.P
 		return
 	}
 
-	contracts := make([]*buxmodels.Utxo, 0)
+	contracts := make([]*spvwalletmodels.Utxo, 0)
 	for _, utxo := range utxos {
 		contracts = append(contracts, mappings.MapToUtxoContract(utxo))
 	}

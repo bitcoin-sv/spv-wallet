@@ -4,7 +4,7 @@ import (
 	"net/http"
 
 	"github.com/BuxOrg/bux"
-	"github.com/BuxOrg/bux-server/mappings"
+	"github.com/BuxOrg/spv-wallet/mappings"
 	"github.com/julienschmidt/httprouter"
 	apirouter "github.com/mrz1836/go-api-router"
 )
@@ -18,7 +18,7 @@ import (
 // @Param		metadata query string false "metadata"
 // @Success		201
 // @Router		/v1/access-key [post]
-// @Security	bux-auth-xpub
+// @Security	spv-wallet-auth-xpub
 func (a *Action) create(w http.ResponseWriter, req *http.Request, _ httprouter.Params) {
 	reqXPub, _ := bux.GetXpubFromRequest(req)
 
@@ -29,7 +29,7 @@ func (a *Action) create(w http.ResponseWriter, req *http.Request, _ httprouter.P
 	metadata := params.GetJSON("metadata")
 
 	// Create a new accessKey
-	accessKey, err := a.Services.Bux.NewAccessKey(
+	accessKey, err := a.Services.SPV.NewAccessKey(
 		req.Context(),
 		reqXPub,
 		bux.WithMetadatas(metadata),

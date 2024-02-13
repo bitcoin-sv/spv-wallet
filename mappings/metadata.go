@@ -2,11 +2,11 @@ package mappings
 
 import (
 	"github.com/BuxOrg/bux"
-	buxmodels "github.com/BuxOrg/bux-models"
+	spvwalletmodels "github.com/BuxOrg/bux-models"
 )
 
-// MapToBuxMetadata will map the *buxmodels.Metadata to *bux.Metadata
-func MapToBuxMetadata(metadata *buxmodels.Metadata) *bux.Metadata {
+// MapToSPVMetadata will map the *spvwalletmodels.Metadata to *spv.Metadata
+func MapToSPVMetadata(metadata *spvwalletmodels.Metadata) *bux.Metadata {
 	if metadata == nil {
 		return nil
 	}

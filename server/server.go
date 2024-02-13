@@ -1,4 +1,4 @@
-// Package server is for all the BUX server settings and HTTP server
+// Package server is for all the SPV wallet settings and HTTP server
 package server
 
 import (
@@ -7,16 +7,16 @@ import (
 	"net/http"
 	"strconv"
 
-	accessKeys "github.com/BuxOrg/bux-server/actions/access_keys"
-	"github.com/BuxOrg/bux-server/actions/admin"
-	"github.com/BuxOrg/bux-server/actions/base"
-	"github.com/BuxOrg/bux-server/actions/destinations"
-	pmail "github.com/BuxOrg/bux-server/actions/paymail"
-	"github.com/BuxOrg/bux-server/actions/transactions"
-	"github.com/BuxOrg/bux-server/actions/utxos"
-	"github.com/BuxOrg/bux-server/actions/xpubs"
-	"github.com/BuxOrg/bux-server/config"
-	"github.com/BuxOrg/bux-server/metrics"
+	accessKeys "github.com/BuxOrg/spv-wallet/actions/access_keys"
+	"github.com/BuxOrg/spv-wallet/actions/admin"
+	"github.com/BuxOrg/spv-wallet/actions/base"
+	"github.com/BuxOrg/spv-wallet/actions/destinations"
+	pmail "github.com/BuxOrg/spv-wallet/actions/paymail"
+	"github.com/BuxOrg/spv-wallet/actions/transactions"
+	"github.com/BuxOrg/spv-wallet/actions/utxos"
+	"github.com/BuxOrg/spv-wallet/actions/xpubs"
+	"github.com/BuxOrg/spv-wallet/config"
+	"github.com/BuxOrg/spv-wallet/metrics"
 	apirouter "github.com/mrz1836/go-api-router"
 	"github.com/newrelic/go-agent/v3/integrations/nrhttprouter"
 	httpSwagger "github.com/swaggo/http-swagger"

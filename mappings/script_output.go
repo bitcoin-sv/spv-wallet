@@ -2,16 +2,16 @@ package mappings
 
 import (
 	"github.com/BuxOrg/bux"
-	buxmodels "github.com/BuxOrg/bux-models"
+	spvwalletmodels "github.com/BuxOrg/bux-models"
 )
 
-// MapToScriptOutputContract will map the script-output model from bux to the bux-models contract
-func MapToScriptOutputContract(so *bux.ScriptOutput) (sc *buxmodels.ScriptOutput) {
+// MapToScriptOutputContract will map the script-output model from spv-wallet to the spv-wallet-models contract
+func MapToScriptOutputContract(so *bux.ScriptOutput) (sc *spvwalletmodels.ScriptOutput) {
 	if so == nil {
 		return nil
 	}
 
-	return &buxmodels.ScriptOutput{
+	return &spvwalletmodels.ScriptOutput{
 		Address:    so.Address,
 		Satoshis:   so.Satoshis,
 		Script:     so.Script,
@@ -19,8 +19,8 @@ func MapToScriptOutputContract(so *bux.ScriptOutput) (sc *buxmodels.ScriptOutput
 	}
 }
 
-// MapToScriptOutputBux will map the script-output model from bux-models to the bux contract
-func MapToScriptOutputBux(so *buxmodels.ScriptOutput) (sc *bux.ScriptOutput) {
+// MapToScriptOutputSPV will map the script-output model from spv-wallet-models to the spv-wallet contract
+func MapToScriptOutputSPV(so *spvwalletmodels.ScriptOutput) (sc *bux.ScriptOutput) {
 	if so == nil {
 		return nil
 	}

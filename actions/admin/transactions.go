@@ -4,9 +4,9 @@ import (
 	"net/http"
 
 	"github.com/BuxOrg/bux"
-	buxmodels "github.com/BuxOrg/bux-models"
-	"github.com/BuxOrg/bux-server/actions"
-	"github.com/BuxOrg/bux-server/mappings"
+	spvwalletmodels "github.com/BuxOrg/bux-models"
+	"github.com/BuxOrg/spv-wallet/actions"
+	"github.com/BuxOrg/spv-wallet/mappings"
 	"github.com/julienschmidt/httprouter"
 	apirouter "github.com/mrz1836/go-api-router"
 )
@@ -25,19 +25,19 @@ import (
 // @Param		conditions query string false "Conditions filter"
 // @Success		200
 // @Router		/v1/admin/transactions/search [post]
-// @Security	bux-auth-xpub
+// @Security	spv-wallet-auth-xpub
 func (a *Action) transactionsSearch(w http.ResponseWriter, req *http.Request, _ httprouter.Params) {
 	// Parse the params
 	params := apirouter.GetParams(req)
 	queryParams, metadataModel, conditions, err := actions.GetQueryParameters(params)
-	metadata := mappings.MapToBuxMetadata(metadataModel)
+	metadata := mappings.MapToSPVMetadata(metadataModel)
 	if err != nil {
 		apirouter.ReturnResponse(w, req, http.StatusExpectationFailed, err.Error())
 		return
 	}
 
 	var transactions []*bux.Transaction
-	if transactions, err = a.Services.Bux.GetTransactions(
+	if transactions, err = a.Services.SPV.GetTransactions(
 		req.Context(),
 		metadata,
 		conditions,
@@ -47,7 +47,7 @@ func (a *Action) transactionsSearch(w http.ResponseWriter, req *http.Request, _ 
 		return
 	}
 
-	contracts := make([]*buxmodels.Transaction, 0)
+	contracts := make([]*spvwalletmodels.Transaction, 0)
 	for _, transaction := range transactions {
 		contracts = append(contracts, mappings.MapToTransactionContractForAdmin(transaction))
 	}
@@ -66,19 +66,19 @@ func (a *Action) transactionsSearch(w http.ResponseWriter, req *http.Request, _ 
 // @Param		conditions query string false "Conditions filter"
 // @Success		200
 // @Router		/v1/admin/transactions/count [post]
-// @Security	bux-auth-xpub
+// @Security	spv-wallet-auth-xpub
 func (a *Action) transactionsCount(w http.ResponseWriter, req *http.Request, _ httprouter.Params) {
 	// Parse the params
 	params := apirouter.GetParams(req)
 	_, metadataModel, conditions, err := actions.GetQueryParameters(params)
-	metadata := mappings.MapToBuxMetadata(metadataModel)
+	metadata := mappings.MapToSPVMetadata(metadataModel)
 	if err != nil {
 		apirouter.ReturnResponse(w, req, http.StatusExpectationFailed, err.Error())
 		return
 	}
 
 	var count int64
-	if count, err = a.Services.Bux.GetTransactionsCount(
+	if count, err = a.Services.SPV.GetTransactionsCount(
 		req.Context(),
 		metadata,
 		conditions,

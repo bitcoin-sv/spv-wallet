@@ -12,7 +12,7 @@ cache:
     # cluster coordinator - redis/memory
     coordinator: memory
     # prefix for channel names
-    prefix: bux_cluster_
+    prefix: spv_cluster_
     redis: null
   # cache engine - freecache/redis
   engine: freecache
@@ -60,7 +60,7 @@ db:
     tx_timeout: 10s
     user: postgres
   sqlite:
-    database_path: ./bux.db
+    database_path: ./spv.db
     debug: false
     max_connection_idle_time: 0s
     max_connection_time: 0s
@@ -83,7 +83,7 @@ new_relic:
   license_key: BOGUS-LICENSE-KEY-1234567890987654321234
 nodes:
   # deployment id used annotating api calls in XDeployment-ID header - this value will be randomly generated if not set
-  _deployment_id: bux-deployment-id
+  _deployment_id: spv-deployment-id
   callback:
     callback_host: https://xyz.com
     # token to authenticate callback calls - default callback token will be generated from the Admin Key
@@ -109,14 +109,14 @@ notifications:
   webhook_endpoint: ""
 paymail:
   beef:
-    pulse_auth_token: mQZQ6WmxURxWz5ch
-    # url to pulse, used for merkle root verification
-    pulse_url: http://localhost:8080/api/v1/chain/merkleroot/verify
+    bhs_auth_token: mQZQ6WmxURxWz5ch
+    # url to block header service, used for merkle root verification
+    bhs_url: http://localhost:8080/api/v1/chain/merkleroot/verify
     use_beef: false
   # set is as a default sender paymail if account does not have one
   default_from_paymail: from@domain.com
   # default note added into transactions - Deprecated
-  default_note: bux Address Resolution
+  default_note: spv Address Resolution
   # enable paymail domain validation, paymail domain must be in domains list to be valid and that the transaction can be processed
   domain_validation_enabled: false
   # list of domains used for paymail domain validation

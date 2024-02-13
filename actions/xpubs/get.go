@@ -4,7 +4,7 @@ import (
 	"net/http"
 
 	"github.com/BuxOrg/bux"
-	"github.com/BuxOrg/bux-server/mappings"
+	"github.com/BuxOrg/spv-wallet/mappings"
 	"github.com/julienschmidt/httprouter"
 	apirouter "github.com/mrz1836/go-api-router"
 )
@@ -18,7 +18,7 @@ import (
 // @Param		key query string false "key"
 // @Success		200
 // @Router		/v1/xpub [get]
-// @Security	bux-auth-xpub
+// @Security	spv-wallet-auth-xpub
 func (a *Action) get(w http.ResponseWriter, req *http.Request, _ httprouter.Params) {
 	reqXPub, _ := bux.GetXpubFromRequest(req)
 	reqXPubID, _ := bux.GetXpubIDFromRequest(req)
@@ -39,11 +39,11 @@ func (a *Action) get(w http.ResponseWriter, req *http.Request, _ httprouter.Para
 	var xPub *bux.Xpub
 	var err error
 	if key != "" {
-		xPub, err = a.Services.Bux.GetXpub(
+		xPub, err = a.Services.SPV.GetXpub(
 			req.Context(), key,
 		)
 	} else {
-		xPub, err = a.Services.Bux.GetXpubByID(
+		xPub, err = a.Services.SPV.GetXpubByID(
 			req.Context(), reqXPubID,
 		)
 	}

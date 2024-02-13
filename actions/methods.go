@@ -4,8 +4,8 @@ import (
 	"encoding/json"
 	"net/http"
 
-	buxmodels "github.com/BuxOrg/bux-models"
-	"github.com/BuxOrg/bux-server/dictionary"
+	spvwalletmodels "github.com/BuxOrg/bux-models"
+	"github.com/BuxOrg/spv-wallet/dictionary"
 	"github.com/julienschmidt/httprouter"
 	"github.com/mrz1836/go-datastore"
 	"github.com/mrz1836/go-parameters"
@@ -51,7 +51,7 @@ func MethodNotAllowed(w http.ResponseWriter, req *http.Request) {
 }
 
 // GetQueryParameters get all filtering parameters related to the db query
-func GetQueryParameters(params *parameters.Params) (*datastore.QueryParams, *buxmodels.Metadata, *map[string]interface{}, error) {
+func GetQueryParameters(params *parameters.Params) (*datastore.QueryParams, *spvwalletmodels.Metadata, *map[string]interface{}, error) {
 	var queryParams *datastore.QueryParams
 	jsonQueryParams, ok := params.GetJSONOk("params")
 	if ok {
@@ -73,7 +73,7 @@ func GetQueryParameters(params *parameters.Params) (*datastore.QueryParams, *bux
 	}
 
 	metadataReq := params.GetJSON(MetadataField)
-	var metadata *buxmodels.Metadata
+	var metadata *spvwalletmodels.Metadata
 	if len(metadataReq) > 0 {
 		// marshal the metadata into the Metadata model
 		metaJSON, _ := json.Marshal(metadataReq) //nolint:errchkjson // ignore for now

@@ -4,7 +4,7 @@ import (
 	"os"
 	"testing"
 
-	"github.com/BuxOrg/bux-server/logging"
+	"github.com/BuxOrg/spv-wallet/logging"
 	"github.com/spf13/viper"
 	"github.com/stretchr/testify/assert"
 )
@@ -30,9 +30,9 @@ func TestLoadConfig(t *testing.T) {
 
 		// when
 		// IMPORTANT! If you need to change the name of this variable, it means you're
-		// making backwards incompatible changes. Please inform all Bux adoptors and
+		// making backwards incompatible changes. Please inform all SPV adoptors and
 		// update your configs on all servers and scripts.
-		os.Setenv("BUX_CONFIG_FILE", anotherPath)
+		os.Setenv("SPV_CONFIG_FILE", anotherPath)
 		_, err := Load(defaultLogger)
 
 		// then
@@ -40,6 +40,6 @@ func TestLoadConfig(t *testing.T) {
 		assert.Error(t, err)
 
 		// cleanup
-		os.Unsetenv("BUX_CONFIG_FILE")
+		os.Unsetenv("SPV_CONFIG_FILE")
 	})
 }

@@ -9,11 +9,11 @@ import (
 	"time"
 
 	"github.com/BuxOrg/bux"
-	"github.com/BuxOrg/bux-server/logging"
-	"github.com/BuxOrg/bux-server/metrics"
 	"github.com/BuxOrg/bux/cluster"
 	"github.com/BuxOrg/bux/taskmanager"
 	"github.com/BuxOrg/bux/utils"
+	"github.com/BuxOrg/spv-wallet/logging"
+	"github.com/BuxOrg/spv-wallet/metrics"
 	broadcastclient "github.com/bitcoin-sv/go-broadcast-client/broadcast/broadcast-client"
 	"github.com/go-redis/redis/v8"
 	"github.com/mrz1836/go-cachestore"
@@ -25,7 +25,7 @@ import (
 // AppServices is the loaded services via config
 type (
 	AppServices struct {
-		Bux      bux.ClientInterface
+		SPV      bux.ClientInterface
 		NewRelic *newrelic.Application
 		Logger   *zerolog.Logger
 	}
@@ -54,8 +54,8 @@ func (a *AppConfig) LoadServices(ctx context.Context) (*AppServices, error) {
 
 	_services.Logger = logger
 
-	// Load BUX
-	if err = _services.loadBux(ctx, a, false, logger); err != nil {
+	// Load SPV Wallet
+	if err = _services.loadSPV(ctx, a, false, logger); err != nil {
 		return nil, err
 	}
 
@@ -78,8 +78,8 @@ func (a *AppConfig) LoadTestServices(ctx context.Context) (*AppServices, error) 
 	txn := _services.NewRelic.StartTransaction("services_load_test")
 	defer txn.End()
 
-	// Load bux for testing
-	if err = _services.loadBux(ctx, a, true, _services.Logger); err != nil {
+	// Load spv for testing
+	if err = _services.loadSPV(ctx, a, true, _services.Logger); err != nil {
 		return nil, err
 	}
 
@@ -114,10 +114,10 @@ func (a *AppConfig) loadNewRelic(services *AppServices) (err error) {
 
 // CloseAll will close all connections to all services
 func (s *AppServices) CloseAll(ctx context.Context) {
-	// Close Bux
-	if s.Bux != nil {
-		_ = s.Bux.Close(ctx)
-		s.Bux = nil
+	// Close SPV
+	if s.SPV != nil {
+		_ = s.SPV.Close(ctx)
+		s.SPV = nil
 	}
 
 	// Close new relic
@@ -132,8 +132,8 @@ func (s *AppServices) CloseAll(ctx context.Context) {
 	}
 }
 
-// loadBux will load the bux client (including CacheStore and DataStore)
-func (s *AppServices) loadBux(ctx context.Context, appConfig *AppConfig, testMode bool, logger *zerolog.Logger) (err error) {
+// loadSPV will load the spv client (including CacheStore and DataStore)
+func (s *AppServices) loadSPV(ctx context.Context, appConfig *AppConfig, testMode bool, logger *zerolog.Logger) (err error) {
 	var options []bux.ClientOps
 
 	if appConfig.NewRelic.Enabled {
@@ -148,8 +148,8 @@ func (s *AppServices) loadBux(ctx context.Context, appConfig *AppConfig, testMod
 	options = append(options, bux.WithUserAgent(appConfig.GetUserAgent()))
 
 	if logger != nil {
-		buxLogger := logger.With().Str("service", "bux").Logger()
-		options = append(options, bux.WithLogger(&buxLogger))
+		spvLogger := logger.With().Str("service", "spv").Logger()
+		options = append(options, bux.WithLogger(&spvLogger))
 	}
 
 	if appConfig.Debug {
@@ -202,7 +202,7 @@ func (s *AppServices) loadBux(ctx context.Context, appConfig *AppConfig, testMod
 	}
 
 	// Create the new client
-	s.Bux, err = bux.NewClient(ctx, options...)
+	s.SPV, err = bux.NewClient(ctx, options...)
 
 	return
 }

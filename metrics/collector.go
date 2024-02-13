@@ -1,17 +1,17 @@
 package metrics
 
 import (
-	buxmetrics "github.com/BuxOrg/bux/metrics"
+	spvwalletmodels "github.com/BuxOrg/bux/metrics"
 	"github.com/prometheus/client_golang/prometheus"
 )
 
-// PrometheusCollector is a collector for Prometheus metrics. It should implement buxmetrics.Collector.
+// PrometheusCollector is a collector for Prometheus metrics. It should implement spvwalletmodels.Collector.
 type PrometheusCollector struct {
 	reg prometheus.Registerer
 }
 
 // NewPrometheusCollector creates a new PrometheusCollector.
-func NewPrometheusCollector(reg prometheus.Registerer) buxmetrics.Collector {
+func NewPrometheusCollector(reg prometheus.Registerer) spvwalletmodels.Collector {
 	return &PrometheusCollector{reg: reg}
 }
 

@@ -3,7 +3,7 @@ package admin
 import (
 	"net/http"
 
-	"github.com/BuxOrg/bux-server/mappings"
+	"github.com/BuxOrg/spv-wallet/mappings"
 	"github.com/julienschmidt/httprouter"
 	apirouter "github.com/mrz1836/go-api-router"
 )
@@ -16,9 +16,9 @@ import (
 // @Produce		json
 // @Success		200
 // @Router		/v1/admin/stats [get]
-// @Security	bux-auth-xpub
+// @Security	spv-wallet-auth-xpub
 func (a *Action) stats(w http.ResponseWriter, req *http.Request, _ httprouter.Params) {
-	stats, err := a.Services.Bux.GetStats(req.Context())
+	stats, err := a.Services.SPV.GetStats(req.Context())
 	if err != nil {
 		apirouter.ReturnResponse(w, req, http.StatusExpectationFailed, err.Error())
 		return

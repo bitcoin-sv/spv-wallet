@@ -4,8 +4,8 @@ import (
 	"net/http"
 
 	"github.com/BuxOrg/bux"
-	"github.com/BuxOrg/bux-server/actions"
-	"github.com/BuxOrg/bux-server/mappings"
+	"github.com/BuxOrg/spv-wallet/actions"
+	"github.com/BuxOrg/spv-wallet/mappings"
 	"github.com/julienschmidt/httprouter"
 	apirouter "github.com/mrz1836/go-api-router"
 )
@@ -21,14 +21,14 @@ import (
 // @Param		metadata query string false "metadata"
 // @Success		200
 // @Router		/v1/transaction/record [post]
-// @Security	bux-auth-xpub
+// @Security	spv-wallet-auth-xpub
 func (a *Action) record(w http.ResponseWriter, req *http.Request, _ httprouter.Params) {
 	// Parse the params
 	params := apirouter.GetParams(req)
 
 	// Get the xPub from the request (via authentication)
 	reqXPub, _ := bux.GetXpubFromRequest(req)
-	xPub, err := a.Services.Bux.GetXpub(req.Context(), reqXPub)
+	xPub, err := a.Services.SPV.GetXpub(req.Context(), reqXPub)
 	if err != nil {
 		apirouter.ReturnResponse(w, req, http.StatusUnprocessableEntity, err.Error())
 		return
@@ -46,7 +46,7 @@ func (a *Action) record(w http.ResponseWriter, req *http.Request, _ httprouter.P
 
 	// Record a new transaction (get the hex from parameters)
 	var transaction *bux.Transaction
-	if transaction, err = a.Services.Bux.RecordTransaction(
+	if transaction, err = a.Services.SPV.RecordTransaction(
 		req.Context(),
 		reqXPub,
 		params.GetString("hex"),

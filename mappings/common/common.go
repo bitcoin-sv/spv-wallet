@@ -6,7 +6,7 @@ import (
 	"github.com/BuxOrg/bux-models/common"
 )
 
-// MapToContract will map the common model to the bux-models contract
+// MapToContract will map the common model to the spv-wallet-models contract
 func MapToContract(m *bux.Model) *common.Model {
 	if m == nil {
 		return nil
@@ -20,7 +20,7 @@ func MapToContract(m *bux.Model) *common.Model {
 	}
 }
 
-// MapToModel will map the bux-models contract to the common bux model
+// MapToModel will map the spv-wallet-models contract to the common spv model
 func MapToModel(m *common.Model) *bux.Model {
 	if m == nil {
 		return nil

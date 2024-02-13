@@ -16,7 +16,7 @@ import (
 // @Produce		json
 // @Success		200
 // @Router		/v1/paymail [delete]
-// @Security	bux-auth-xpub
+// @Security	spv-wallet-auth-xpub
 func (a *Action) delete(w http.ResponseWriter, req *http.Request, _ httprouter.Params) {
 	// Parse the params
 	params := apirouter.GetParams(req)
@@ -24,10 +24,10 @@ func (a *Action) delete(w http.ResponseWriter, req *http.Request, _ httprouter.P
 	// params
 	address := params.GetString("address") // the full paymail address
 
-	opts := a.Services.Bux.DefaultModelOptions()
+	opts := a.Services.SPV.DefaultModelOptions()
 
 	// Delete a new paymail address
-	err := a.Services.Bux.DeletePaymailAddress(
+	err := a.Services.SPV.DeletePaymailAddress(
 		req.Context(), address, opts...,
 	)
 	if err != nil {

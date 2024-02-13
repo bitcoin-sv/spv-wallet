@@ -1,4 +1,4 @@
-module github.com/BuxOrg/bux-server
+module github.com/BuxOrg/spv-wallet
 
 go 1.21.5
 

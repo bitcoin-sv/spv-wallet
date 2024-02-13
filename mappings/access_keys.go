@@ -5,12 +5,12 @@ import (
 	"time"
 
 	"github.com/BuxOrg/bux"
-	buxmodels "github.com/BuxOrg/bux-models"
-	"github.com/BuxOrg/bux-server/mappings/common"
+	spvwalletmodels "github.com/BuxOrg/bux-models"
+	"github.com/BuxOrg/spv-wallet/mappings/common"
 )
 
-// MapToAccessKeyContract will map the access key to the bux-models contract
-func MapToAccessKeyContract(ac *bux.AccessKey) *buxmodels.AccessKey {
+// MapToAccessKeyContract will map the access key to the spv-wallet-models contract
+func MapToAccessKeyContract(ac *bux.AccessKey) *spvwalletmodels.AccessKey {
 	if ac == nil {
 		return nil
 	}
@@ -20,7 +20,7 @@ func MapToAccessKeyContract(ac *bux.AccessKey) *buxmodels.AccessKey {
 		revokedAt = &ac.RevokedAt.Time
 	}
 
-	return &buxmodels.AccessKey{
+	return &spvwalletmodels.AccessKey{
 		Model:     *common.MapToContract(&ac.Model),
 		ID:        ac.ID,
 		XpubID:    ac.XpubID,

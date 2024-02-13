@@ -16,12 +16,12 @@ import (
 // @Param		reference_id query string false "draft tx id"
 // @Success		201
 // @Router		/v1/utxo/unreserve [patch]
-// @Security	bux-auth-xpub
+// @Security	spv-wallet-auth-xpub
 func (a *Action) unreserve(w http.ResponseWriter, req *http.Request, _ httprouter.Params) {
 	reqXPubID, _ := bux.GetXpubIDFromRequest(req)
 	params := apirouter.GetParams(req)
 
-	err := a.Services.Bux.UnReserveUtxos(
+	err := a.Services.SPV.UnReserveUtxos(
 		req.Context(),
 		reqXPubID,
 		params.GetString(bux.ReferenceIDField),
