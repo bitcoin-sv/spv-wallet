@@ -2,6 +2,7 @@ package actions
 
 import (
 	"net/http"
+	"strings"
 	"time"
 
 	"github.com/BuxOrg/bux"
@@ -21,14 +22,14 @@ type Action struct {
 
 // NewStack is used for registering routes
 func NewStack(appConfig *config.AppConfig,
-	services *config.AppServices) (Action, *apirouter.InternalStack) {
+	services *config.AppServices,
+) (Action, *apirouter.InternalStack) {
 	return Action{AppConfig: appConfig, Services: services}, apirouter.NewStack()
 }
 
 // RequireAuthentication checks and requires authentication for the related method
 func (a *Action) RequireAuthentication(fn httprouter.Handle) httprouter.Handle {
 	return func(w http.ResponseWriter, req *http.Request, p httprouter.Params) {
-
 		// Check the authentication
 		var knownErr dictionary.ErrorMessage
 		if req, knownErr = CheckAuthentication(a.AppConfig, a.Services.Bux, req, false, true); knownErr.Code > 0 {
@@ -44,7 +45,6 @@ func (a *Action) RequireAuthentication(fn httprouter.Handle) httprouter.Handle {
 // RequireBasicAuthentication checks and requires authentication for the related method, but does not require signing
 func (a *Action) RequireBasicAuthentication(fn httprouter.Handle) httprouter.Handle {
 	return func(w http.ResponseWriter, req *http.Request, p httprouter.Params) {
-
 		// Check the authentication
 		var knownErr dictionary.ErrorMessage
 		if req, knownErr = CheckAuthentication(a.AppConfig, a.Services.Bux, req, false, false); knownErr.Code > 0 {
@@ -60,10 +60,23 @@ func (a *Action) RequireBasicAuthentication(fn httprouter.Handle) httprouter.Han
 // RequireAdminAuthentication checks and requires ADMIN authentication for the related method
 func (a *Action) RequireAdminAuthentication(fn httprouter.Handle) httprouter.Handle {
 	return func(w http.ResponseWriter, req *http.Request, p httprouter.Params) {
-
 		// Check the authentication
 		var knownErr dictionary.ErrorMessage
 		if req, knownErr = CheckAuthentication(a.AppConfig, a.Services.Bux, req, true, true); knownErr.Code > 0 {
+			ReturnErrorResponse(w, req, knownErr, "")
+			return
+		}
+
+		// Continue to next method
+		fn(w, req, p)
+	}
+}
+
+// RequireCallbackAuthentication checks and requires callback Authorize Bearer token for the related method
+func (a *Action) RequireCallbackAuthentication(fn httprouter.Handle) httprouter.Handle {
+	return func(w http.ResponseWriter, req *http.Request, p httprouter.Params) {
+		var knownErr dictionary.ErrorMessage
+		if req, knownErr = VerifyCallbackToken(a.AppConfig, req); knownErr.Code > 0 {
 			ReturnErrorResponse(w, req, knownErr, "")
 			return
 		}
@@ -80,8 +93,8 @@ func (a *Action) Request(_ *apirouter.Router, h httprouter.Handle) httprouter.Ha
 
 // CheckAuthentication will check the authentication
 func CheckAuthentication(appConfig *config.AppConfig, bux bux.ClientInterface, req *http.Request,
-	adminRequired bool, requireSigning bool) (*http.Request, dictionary.ErrorMessage) {
-
+	adminRequired bool, requireSigning bool,
+) (*http.Request, dictionary.ErrorMessage) {
 	// Bad/Unknown scheme
 	if appConfig.Authentication.Scheme != config.AuthenticationSchemeXpub {
 		return req, dictionary.GetError(dictionary.ErrorAuthenticationScheme, appConfig.Authentication.Scheme)
@@ -99,6 +112,26 @@ func CheckAuthentication(appConfig *config.AppConfig, bux bux.ClientInterface, r
 	}
 
 	// Return an empty error message
+	return req, dictionary.ErrorMessage{}
+}
+
+// VerifyCallbackToken verifies the callback token - if it's valid and matches the Bearer scheme.
+func VerifyCallbackToken(appConfig *config.AppConfig, req *http.Request) (*http.Request, dictionary.ErrorMessage) {
+	const BearerSchema = "Bearer "
+	authHeader := req.Header.Get("Authorization")
+	if authHeader == "" {
+		return req, dictionary.GetError(dictionary.ErrorAuthenticationCallback, "missing auth header")
+	}
+
+	if !strings.HasPrefix(authHeader, BearerSchema) || len(authHeader) <= len(BearerSchema) {
+		return req, dictionary.GetError(dictionary.ErrorAuthenticationCallback, "invalid or missing bearer token")
+	}
+
+	providedToken := authHeader[len(BearerSchema):]
+	if providedToken != appConfig.Nodes.Callback.CallbackToken {
+		return req, dictionary.GetError(dictionary.ErrorAuthenticationCallback, "invalid authorization token")
+	}
+
 	return req, dictionary.ErrorMessage{}
 }
 
