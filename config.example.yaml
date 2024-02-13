@@ -84,13 +84,17 @@ new_relic:
 nodes:
   # deployment id used annotating api calls in XDeployment-ID header - this value will be randomly generated if not set
   _deployment_id: bux-deployment-id
+  callback:
+    callback_host: https://xyz.com
+    # token to authenticate callback calls - default callback token will be generated from the Admin Key
+    _callback_token: 44a82509
   # protocol - arc/mapi (arc is default)
   protocol: arc
   # list of apis used for getting and broadcasting transactions
   apis:
     # gorillapool can be used as well
-#    - arc_url: https://arc.gorillapool.io
-#    - token: ""
+    #    - arc_url: https://arc.gorillapool.io
+    #    - token: ""
     - arc_url: https://api.taal.com/arc/v1
       token: mainnet_06770f425eb00298839a24a49cbdc02c
   # use fee quotes for transaction fee calculation
@@ -135,3 +139,6 @@ server_config:
 task_manager:
   # task manager factory - memory, redis
   factory: memory
+# Prometheus metrics configuration
+metrics:
+  enabled: false
