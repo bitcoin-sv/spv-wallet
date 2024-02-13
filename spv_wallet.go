@@ -1,4 +1,4 @@
-// Package spv-wallet is a complete stand-alone server using the SPV Wallet Engine
+// Package spvwallet is a complete stand-alone server using the SPV Wallet Engine
 //
 // Run: go run cmd/server/main.go
 //
