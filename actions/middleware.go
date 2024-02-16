@@ -5,9 +5,9 @@ import (
 	"strings"
 	"time"
 
-	"github.com/BuxOrg/bux"
-	"github.com/BuxOrg/spv-wallet/config"
-	"github.com/BuxOrg/spv-wallet/dictionary"
+	"github.com/bitcoin-sv/bux"
+	"github.com/bitcoin-sv/spv-wallet/config"
+	"github.com/bitcoin-sv/spv-wallet/dictionary"
 	"github.com/gofrs/uuid"
 	"github.com/julienschmidt/httprouter"
 	apirouter "github.com/mrz1836/go-api-router"

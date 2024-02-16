@@ -2,8 +2,8 @@
 package common
 
 import (
-	"github.com/BuxOrg/bux"
-	"github.com/BuxOrg/bux-models/common"
+	"github.com/bitcoin-sv/bux"
+	"github.com/bitcoin-sv/bux-models/common"
 )
 
 // MapToContract will map the common model to the spv-wallet-models contract

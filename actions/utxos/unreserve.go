@@ -3,7 +3,7 @@ package utxos
 import (
 	"net/http"
 
-	"github.com/BuxOrg/bux"
+	"github.com/bitcoin-sv/bux"
 	"github.com/julienschmidt/httprouter"
 	apirouter "github.com/mrz1836/go-api-router"
 )

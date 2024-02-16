@@ -3,9 +3,9 @@ package destinations
 import (
 	"net/http"
 
-	"github.com/BuxOrg/bux"
-	"github.com/BuxOrg/spv-wallet/actions"
-	"github.com/BuxOrg/spv-wallet/mappings"
+	"github.com/bitcoin-sv/bux"
+	"github.com/bitcoin-sv/spv-wallet/actions"
+	"github.com/bitcoin-sv/spv-wallet/mappings"
 	"github.com/julienschmidt/httprouter"
 	apirouter "github.com/mrz1836/go-api-router"
 )

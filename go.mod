@@ -1,10 +1,10 @@
-module github.com/BuxOrg/spv-wallet
+module github.com/bitcoin-sv/spv-wallet
 
 go 1.21.5
 
 require (
-	github.com/BuxOrg/bux v0.14.5
-	github.com/BuxOrg/bux-models v0.3.0
+	github.com/bitcoin-sv/bux v0.14.5
+	github.com/bitcoin-sv/bux-models v0.3.0
 	github.com/bitcoin-sv/go-broadcast-client v0.17.2
 	github.com/go-ozzo/ozzo-validation v3.6.0+incompatible
 	github.com/go-redis/redis/v8 v8.11.5

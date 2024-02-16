@@ -1,8 +1,8 @@
 package mappings
 
 import (
-	"github.com/BuxOrg/bux"
-	spvwalletmodels "github.com/BuxOrg/bux-models"
+	"github.com/bitcoin-sv/bux"
+	spvwalletmodels "github.com/bitcoin-sv/bux-models"
 )
 
 // MapToSPVMetadata will map the *spvwalletmodels.Metadata to *spv.Metadata

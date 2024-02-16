@@ -1,9 +1,9 @@
 package mappings
 
 import (
-	"github.com/BuxOrg/bux"
-	spvwalletmodels "github.com/BuxOrg/bux-models"
-	"github.com/BuxOrg/spv-wallet/mappings/common"
+	"github.com/bitcoin-sv/bux"
+	spvwalletmodels "github.com/bitcoin-sv/bux-models"
+	"github.com/bitcoin-sv/spv-wallet/mappings/common"
 	customtypes "github.com/mrz1836/go-datastore/custom_types"
 )
 

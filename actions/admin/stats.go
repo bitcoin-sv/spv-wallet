@@ -3,7 +3,7 @@ package admin
 import (
 	"net/http"
 
-	"github.com/BuxOrg/spv-wallet/mappings"
+	"github.com/bitcoin-sv/spv-wallet/mappings"
 	"github.com/julienschmidt/httprouter"
 	apirouter "github.com/mrz1836/go-api-router"
 )

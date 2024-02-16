@@ -9,11 +9,11 @@ import (
 	"os/signal"
 	"time"
 
-	"github.com/BuxOrg/spv-wallet/config"
-	"github.com/BuxOrg/spv-wallet/dictionary"
-	_ "github.com/BuxOrg/spv-wallet/docs"
-	"github.com/BuxOrg/spv-wallet/logging"
-	"github.com/BuxOrg/spv-wallet/server"
+	"github.com/bitcoin-sv/spv-wallet/config"
+	"github.com/bitcoin-sv/spv-wallet/dictionary"
+	_ "github.com/bitcoin-sv/spv-wallet/docs"
+	"github.com/bitcoin-sv/spv-wallet/logging"
+	"github.com/bitcoin-sv/spv-wallet/server"
 )
 
 // main method starts everything for the SPV Wallet

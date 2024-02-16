@@ -1,8 +1,8 @@
 package mappings
 
 import (
-	"github.com/BuxOrg/bux"
-	spvwalletmodels "github.com/BuxOrg/bux-models"
+	"github.com/bitcoin-sv/bux"
+	spvwalletmodels "github.com/bitcoin-sv/bux-models"
 )
 
 // MapToSyncConfigContract will map the sync-config model from spv-wallet to the spv-wallet-models contract

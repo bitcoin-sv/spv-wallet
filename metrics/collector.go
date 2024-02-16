@@ -1,7 +1,7 @@
 package metrics
 
 import (
-	spvwalletmodels "github.com/BuxOrg/bux/metrics"
+	spvwalletmodels "github.com/bitcoin-sv/bux/metrics"
 	"github.com/prometheus/client_golang/prometheus"
 )
 

@@ -4,8 +4,8 @@ import (
 	"errors"
 	"net/http"
 
-	"github.com/BuxOrg/bux"
-	"github.com/BuxOrg/spv-wallet/mappings"
+	"github.com/bitcoin-sv/bux"
+	"github.com/bitcoin-sv/spv-wallet/mappings"
 	"github.com/julienschmidt/httprouter"
 	apirouter "github.com/mrz1836/go-api-router"
 	"github.com/mrz1836/go-datastore"

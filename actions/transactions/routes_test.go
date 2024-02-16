@@ -4,7 +4,7 @@ import (
 	"net/http"
 	"testing"
 
-	"github.com/BuxOrg/spv-wallet/config"
+	"github.com/bitcoin-sv/spv-wallet/config"
 	"github.com/stretchr/testify/assert"
 )
 

@@ -4,7 +4,7 @@ import (
 	"os"
 	"testing"
 
-	"github.com/BuxOrg/spv-wallet/logging"
+	"github.com/bitcoin-sv/spv-wallet/logging"
 	"github.com/spf13/viper"
 	"github.com/stretchr/testify/assert"
 )

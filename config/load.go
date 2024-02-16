@@ -7,7 +7,7 @@ import (
 	"strings"
 	"sync"
 
-	"github.com/BuxOrg/spv-wallet/dictionary"
+	"github.com/bitcoin-sv/spv-wallet/dictionary"
 	"github.com/mitchellh/mapstructure"
 	"github.com/rs/zerolog"
 	"github.com/spf13/viper"

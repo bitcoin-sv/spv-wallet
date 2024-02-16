@@ -1,8 +1,8 @@
 package transactions
 
 import (
-	"github.com/BuxOrg/spv-wallet/actions"
-	"github.com/BuxOrg/spv-wallet/config"
+	"github.com/bitcoin-sv/spv-wallet/actions"
+	"github.com/bitcoin-sv/spv-wallet/config"
 	apirouter "github.com/mrz1836/go-api-router"
 )
 

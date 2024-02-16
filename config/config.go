@@ -4,8 +4,8 @@ package config
 import (
 	"time"
 
-	"github.com/BuxOrg/bux/cluster"
-	"github.com/BuxOrg/bux/taskmanager"
+	"github.com/bitcoin-sv/bux/cluster"
+	"github.com/bitcoin-sv/bux/taskmanager"
 	"github.com/mrz1836/go-cachestore"
 	"github.com/mrz1836/go-datastore"
 )
