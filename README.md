@@ -103,7 +103,7 @@ This repository was created using [MrZ's `go-template`](https://github.com/mrz18
 <br/>
 
 -   [BitcoinSchema/go-bitcoin](https://github.com/BitcoinSchema/go-bitcoin)
--   [bitcoin-sv/bux](https://github.com/bitcoin-sv/bux)
+-   [bitcoin-sv/spv-wallet](https://github.com/bitcoin-sv/spv-wallet)
 -   [mrz1836/go-api-router](https://github.com/mrz1836/go-api-router)
 -   [mrz1836/go-sanitize](https://github.com/mrz1836/go-sanitize)
 -   [stretchr/testify](https://github.com/stretchr/testify)

@@ -7,7 +7,6 @@ replace github.com/bitcoin-sv/spv-wallet/models => ./models
 replace github.com/bitcoin-sv/spv-wallet/engine => ./engine
 
 require (
-	github.com/BuxOrg/bux v0.14.5
 	github.com/bitcoin-sv/go-broadcast-client v0.17.2
 	github.com/bitcoin-sv/spv-wallet/engine v0.0.0-00010101000000-000000000000
 	github.com/bitcoin-sv/spv-wallet/models v0.3.0
