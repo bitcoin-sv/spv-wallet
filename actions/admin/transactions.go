@@ -1,14 +1,13 @@
 package admin
 
 import (
+	"github.com/gin-gonic/gin"
 	"net/http"
 
 	"github.com/bitcoin-sv/spv-wallet/actions"
 	"github.com/bitcoin-sv/spv-wallet/engine"
 	"github.com/bitcoin-sv/spv-wallet/mappings"
 	"github.com/bitcoin-sv/spv-wallet/models"
-	"github.com/julienschmidt/httprouter"
-	apirouter "github.com/mrz1836/go-api-router"
 )
 
 // transactionsSearch will fetch a list of transactions filtered by metadata
@@ -26,24 +25,21 @@ import (
 // @Success		200
 // @Router		/v1/admin/transactions/search [post]
 // @Security	x-auth-xpub
-func (a *Action) transactionsSearch(w http.ResponseWriter, req *http.Request, _ httprouter.Params) {
-	// Parse the params
-	params := apirouter.GetParams(req)
-	queryParams, metadataModel, conditions, err := actions.GetQueryParameters(params)
-	metadata := mappings.MapToSpvWalletMetadata(metadataModel)
+func (a *Action) transactionsSearch(c *gin.Context) {
+	queryParams, metadata, conditions, err := actions.GetQueryParameters(c)
 	if err != nil {
-		apirouter.ReturnResponse(w, req, http.StatusExpectationFailed, err.Error())
+		c.JSON(http.StatusExpectationFailed, err.Error())
 		return
 	}
 
 	var transactions []*engine.Transaction
 	if transactions, err = a.Services.SpvWalletEngine.GetTransactions(
-		req.Context(),
+		c.Request.Context(),
 		metadata,
 		conditions,
 		queryParams,
 	); err != nil {
-		apirouter.ReturnResponse(w, req, http.StatusExpectationFailed, err.Error())
+		c.JSON(http.StatusExpectationFailed, err.Error())
 		return
 	}
 
@@ -52,8 +48,7 @@ func (a *Action) transactionsSearch(w http.ResponseWriter, req *http.Request, _ 
 		contracts = append(contracts, mappings.MapToTransactionContractForAdmin(transaction))
 	}
 
-	// Return response
-	apirouter.ReturnResponse(w, req, http.StatusOK, contracts)
+	c.JSON(http.StatusOK, contracts)
 }
 
 // transactionsCount will count all transactions filtered by metadata
@@ -67,26 +62,22 @@ func (a *Action) transactionsSearch(w http.ResponseWriter, req *http.Request, _ 
 // @Success		200
 // @Router		/v1/admin/transactions/count [post]
 // @Security	x-auth-xpub
-func (a *Action) transactionsCount(w http.ResponseWriter, req *http.Request, _ httprouter.Params) {
-	// Parse the params
-	params := apirouter.GetParams(req)
-	_, metadataModel, conditions, err := actions.GetQueryParameters(params)
-	metadata := mappings.MapToSpvWalletMetadata(metadataModel)
+func (a *Action) transactionsCount(c *gin.Context) {
+	_, metadata, conditions, err := actions.GetQueryParameters(c)
 	if err != nil {
-		apirouter.ReturnResponse(w, req, http.StatusExpectationFailed, err.Error())
+		c.JSON(http.StatusExpectationFailed, err.Error())
 		return
 	}
 
 	var count int64
 	if count, err = a.Services.SpvWalletEngine.GetTransactionsCount(
-		req.Context(),
+		c.Request.Context(),
 		metadata,
 		conditions,
 	); err != nil {
-		apirouter.ReturnResponse(w, req, http.StatusExpectationFailed, err.Error())
+		c.JSON(http.StatusExpectationFailed, err.Error())
 		return
 	}
 
-	// Return response
-	apirouter.ReturnResponse(w, req, http.StatusOK, count)
+	c.JSON(http.StatusOK, count)
 }

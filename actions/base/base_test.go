@@ -1,10 +1,10 @@
 package base
 
 import (
+	"github.com/gin-gonic/gin"
 	"testing"
 
 	"github.com/bitcoin-sv/spv-wallet/tests"
-	apirouter "github.com/mrz1836/go-api-router"
 	"github.com/stretchr/testify/require"
 	"github.com/stretchr/testify/suite"
 )
@@ -29,9 +29,10 @@ func (ts *TestSuite) SetupTest() {
 	ts.BaseSetupTest()
 
 	// Load the router & register routes
-	ts.Router = apirouter.New()
+	ts.Router = gin.Default()
 	require.NotNil(ts.T(), ts.Router)
-	RegisterRoutes(ts.Router, ts.AppConfig, ts.Services)
+	routes := NewHandler(ts.AppConfig, ts.Router)
+	routes.RegisterBaseEndpoints(ts.Router.Group(""))
 }
 
 // TearDownTest runs after each test

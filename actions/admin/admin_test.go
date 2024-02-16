@@ -1,4 +1,4 @@
-package accesskeys
+package admin
 
 import (
 	"github.com/bitcoin-sv/spv-wallet/config"
@@ -32,8 +32,8 @@ func (ts *TestSuite) SetupTest() {
 	// Load the router & register routes
 	ts.Router = gin.Default()
 	require.NotNil(ts.T(), ts.Router)
-	routes := NewHandler(ts.AppConfig, ts.Services)
-	routes.RegisterApiEndpoints(ts.Router.Group("/" + config.APIVersion))
+	adminRoutes := NewHandler(ts.AppConfig, ts.Services)
+	adminRoutes.RegisterAdminEndpoints(ts.Router.Group("/" + config.APIVersion))
 }
 
 // TearDownTest runs after each test

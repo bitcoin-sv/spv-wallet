@@ -1,7 +1,6 @@
 package xpubs
 
 import (
-	"net/http"
 	"testing"
 
 	"github.com/bitcoin-sv/spv-wallet/config"
@@ -12,13 +11,26 @@ import (
 func (ts *TestSuite) TestXPubRegisterRoutes() {
 	ts.T().Run("test routes", func(t *testing.T) {
 
-		handle, _, _ := ts.Router.HTTPRouter.Lookup(http.MethodPost, "/"+config.APIVersion+"/xpub")
-		assert.NotNil(t, handle)
+		testCases := []struct {
+			method string
+			url    string
+		}{
+			{"GET", "/" + config.APIVersion + "/xpub"},
+			{"PATCH", "/" + config.APIVersion + "/xpub"},
+		}
 
-		handle, _, _ = ts.Router.HTTPRouter.Lookup(http.MethodGet, "/"+config.APIVersion+"/xpub")
-		assert.NotNil(t, handle)
+		ts.Router.Routes()
 
-		handle, _, _ = ts.Router.HTTPRouter.Lookup(http.MethodPatch, "/"+config.APIVersion+"/xpub")
-		assert.NotNil(t, handle)
+		for _, testCase := range testCases {
+			found := false
+			for _, routeInfo := range ts.Router.Routes() {
+				if testCase.url == routeInfo.Path && testCase.method == routeInfo.Method {
+					assert.NotNil(t, routeInfo.HandlerFunc)
+					found = true
+					break
+				}
+			}
+			assert.True(t, found)
+		}
 	})
 }

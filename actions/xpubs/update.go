@@ -1,13 +1,12 @@
 package xpubs
 
 import (
+	"github.com/gin-gonic/gin"
 	"net/http"
 
-	"github.com/bitcoin-sv/spv-wallet/actions"
 	"github.com/bitcoin-sv/spv-wallet/engine"
 	"github.com/bitcoin-sv/spv-wallet/mappings"
-	"github.com/julienschmidt/httprouter"
-	apirouter "github.com/mrz1836/go-api-router"
+	"github.com/bitcoin-sv/spv-wallet/server/auth"
 )
 
 // update will update an existing model
@@ -20,32 +19,32 @@ import (
 // @Success		200
 // @Router		/v1/xpub [patch]
 // @Security	x-auth-xpub
-func (a *Action) update(w http.ResponseWriter, req *http.Request, _ httprouter.Params) {
-	reqXPub, _ := engine.GetXpubFromRequest(req)
-	reqXPubID, _ := engine.GetXpubIDFromRequest(req)
+// @Security	bux-auth-xpub
+func (a *Action) update(c *gin.Context) {
+	reqXPub := c.GetString(auth.ParamXPubKey)
+	reqXPubID := c.GetString(auth.ParamXPubHashKey)
 
-	// Parse the params
-	params := apirouter.GetParams(req)
-	metadata := params.GetJSON(actions.MetadataField)
+	var requestBody engine.Metadata
+	if err := c.Bind(&requestBody); err != nil {
+		c.JSON(http.StatusBadRequest, err.Error())
+		return
+	}
 
 	// Get an xPub
 	var xPub *engine.Xpub
 	var err error
 	xPub, err = a.Services.SpvWalletEngine.UpdateXpubMetadata(
-		req.Context(), reqXPubID, metadata,
+		c.Request.Context(), reqXPubID, requestBody,
 	)
 	if err != nil {
-		apirouter.ReturnResponse(w, req, http.StatusExpectationFailed, err.Error())
-		return
+		c.JSON(http.StatusExpectationFailed, err.Error())
 	}
 
-	signed := req.Context().Value("auth_signed")
-	if signed == nil || !signed.(bool) || reqXPub == "" {
+	signed := c.GetBool("auth_signed")
+	if signed == false || reqXPub == "" {
 		xPub.RemovePrivateData()
 	}
 
 	contract := mappings.MapToXpubContract(xPub)
-
-	// Return response
-	apirouter.ReturnResponse(w, req, http.StatusOK, contract)
+	c.JSON(http.StatusOK, contract)
 }

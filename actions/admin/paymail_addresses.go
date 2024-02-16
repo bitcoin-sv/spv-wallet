@@ -1,13 +1,11 @@
 package admin
 
 import (
+	"github.com/gin-gonic/gin"
 	"net/http"
 
 	"github.com/bitcoin-sv/spv-wallet/actions"
 	"github.com/bitcoin-sv/spv-wallet/engine"
-	"github.com/bitcoin-sv/spv-wallet/mappings"
-	"github.com/julienschmidt/httprouter"
-	apirouter "github.com/mrz1836/go-api-router"
 )
 
 // paymailGetAddress will return a paymail address
@@ -20,24 +18,28 @@ import (
 // @Success		200
 // @Router		/v1/admin/paymail/get [get]
 // @Security	x-auth-xpub
-func (a *Action) paymailGetAddress(w http.ResponseWriter, req *http.Request, _ httprouter.Params) {
-	params := apirouter.GetParams(req)
-	address := params.GetString("address")
+func (a *Action) paymailGetAddress(c *gin.Context) {
+	var requestBody AdminPaymailAddress
 
-	if address == "" {
-		apirouter.ReturnResponse(w, req, http.StatusExpectationFailed, "address is required")
+	if err := c.ShouldBindJSON(&requestBody); err != nil {
+		c.JSON(http.StatusBadRequest, err.Error())
+		return
+	}
+
+	if requestBody.Address == "" {
+		c.JSON(http.StatusExpectationFailed, "address is required")
 		return
 	}
 
 	opts := a.Services.SpvWalletEngine.DefaultModelOptions()
 
-	paymailAddress, err := a.Services.SpvWalletEngine.GetPaymailAddress(req.Context(), address, opts...)
+	paymailAddress, err := a.Services.SpvWalletEngine.GetPaymailAddress(c.Request.Context(), requestBody.Address, opts...)
 	if err != nil {
-		apirouter.ReturnResponse(w, req, http.StatusExpectationFailed, err.Error())
+		c.JSON(http.StatusExpectationFailed, err.Error())
 		return
 	}
 
-	apirouter.ReturnResponse(w, req, http.StatusOK, paymailAddress)
+	c.JSON(http.StatusOK, paymailAddress)
 }
 
 // paymailAddressesSearch will fetch a list of paymail addresses filtered by metadata
@@ -55,29 +57,25 @@ func (a *Action) paymailGetAddress(w http.ResponseWriter, req *http.Request, _ h
 // @Success		200
 // @Router		/v1/admin/paymails/search [post]
 // @Security	x-auth-xpub
-func (a *Action) paymailAddressesSearch(w http.ResponseWriter, req *http.Request, _ httprouter.Params) {
-	// Parse the params
-	params := apirouter.GetParams(req)
-	queryParams, metadataModel, conditions, err := actions.GetQueryParameters(params)
-	metadata := mappings.MapToSpvWalletMetadata(metadataModel)
+func (a *Action) paymailAddressesSearch(c *gin.Context) {
+	queryParams, metadata, conditions, err := actions.GetQueryParameters(c)
 	if err != nil {
-		apirouter.ReturnResponse(w, req, http.StatusExpectationFailed, err.Error())
+		c.JSON(http.StatusExpectationFailed, err.Error())
 		return
 	}
 
 	var paymailAddresses []*engine.PaymailAddress
 	if paymailAddresses, err = a.Services.SpvWalletEngine.GetPaymailAddresses(
-		req.Context(),
+		c.Request.Context(),
 		metadata,
 		conditions,
 		queryParams,
 	); err != nil {
-		apirouter.ReturnResponse(w, req, http.StatusExpectationFailed, err.Error())
+		c.JSON(http.StatusExpectationFailed, err.Error())
 		return
 	}
 
-	// Return response
-	apirouter.ReturnResponse(w, req, http.StatusOK, paymailAddresses)
+	c.JSON(http.StatusOK, paymailAddresses)
 }
 
 // paymailAddressesCount will count all paymail addresses filtered by metadata
@@ -91,28 +89,24 @@ func (a *Action) paymailAddressesSearch(w http.ResponseWriter, req *http.Request
 // @Success		200
 // @Router		/v1/admin/paymails/count [post]
 // @Security	x-auth-xpub
-func (a *Action) paymailAddressesCount(w http.ResponseWriter, req *http.Request, _ httprouter.Params) {
-	// Parse the params
-	params := apirouter.GetParams(req)
-	_, metadataModel, conditions, err := actions.GetQueryParameters(params)
-	metadata := mappings.MapToSpvWalletMetadata(metadataModel)
+func (a *Action) paymailAddressesCount(c *gin.Context) {
+	_, metadata, conditions, err := actions.GetQueryParameters(c)
 	if err != nil {
-		apirouter.ReturnResponse(w, req, http.StatusExpectationFailed, err.Error())
+		c.JSON(http.StatusExpectationFailed, err.Error())
 		return
 	}
 
 	var count int64
 	if count, err = a.Services.SpvWalletEngine.GetPaymailAddressesCount(
-		req.Context(),
+		c.Request.Context(),
 		metadata,
 		conditions,
 	); err != nil {
-		apirouter.ReturnResponse(w, req, http.StatusExpectationFailed, err.Error())
+		c.JSON(http.StatusExpectationFailed, err.Error())
 		return
 	}
 
-	// Return response
-	apirouter.ReturnResponse(w, req, http.StatusOK, count)
+	c.JSON(http.StatusOK, count)
 }
 
 // paymailCreateAddress will create a new paymail address
@@ -129,45 +123,39 @@ func (a *Action) paymailAddressesCount(w http.ResponseWriter, req *http.Request,
 // @Success		201
 // @Router		/v1/admin/paymail/create [post]
 // @Security	x-auth-xpub
-func (a *Action) paymailCreateAddress(w http.ResponseWriter, req *http.Request, _ httprouter.Params) {
-	// Parse the params
-	params := apirouter.GetParams(req)
-
-	xpub := params.GetString("xpub")
-	address := params.GetString("address")
-	publicName := params.GetString("public_name")
-	avatar := params.GetString("avatar")
-
-	if xpub == "" {
-		apirouter.ReturnResponse(w, req, http.StatusExpectationFailed, "xpub is required")
-		return
-	}
-	if address == "" {
-		apirouter.ReturnResponse(w, req, http.StatusExpectationFailed, "address is required")
+func (a *Action) paymailCreateAddress(c *gin.Context) {
+	var requestBody AdminCreatePaymail
+	if err := c.ShouldBindJSON(&requestBody); err != nil {
+		c.JSON(http.StatusBadRequest, err.Error())
 		return
 	}
 
-	_, metadata, _, err := actions.GetQueryParameters(params)
-	if err != nil {
-		apirouter.ReturnResponse(w, req, http.StatusExpectationFailed, err.Error())
+	if requestBody.XpubID == "" {
+		c.JSON(http.StatusExpectationFailed, "xpub is required")
+		return
+	}
+	if requestBody.Address == "" {
+		c.JSON(http.StatusExpectationFailed, "address is required")
 		return
 	}
 
 	opts := a.Services.SpvWalletEngine.DefaultModelOptions()
 
-	if metadata != nil {
-		opts = append(opts, engine.WithMetadatas(*metadata))
+	if requestBody.Metadata != nil {
+		opts = append(opts, engine.WithMetadatas(requestBody.Metadata))
 	}
 
 	var paymailAddress *engine.PaymailAddress
-	paymailAddress, err = a.Services.SpvWalletEngine.NewPaymailAddress(req.Context(), xpub, address, publicName, avatar, opts...)
+	paymailAddress, err := a.Services.SpvWalletEngine.NewPaymailAddress(
+		c.Request.Context(), requestBody.XpubID, requestBody.Address, requestBody.PublicName, requestBody.Avatar, opts...)
 	if err != nil {
-		apirouter.ReturnResponse(w, req, http.StatusExpectationFailed, err.Error())
+		c.JSON(http.StatusExpectationFailed, err.Error())
 		return
 	}
 
 	// Return response
-	apirouter.ReturnResponse(w, req, http.StatusCreated, paymailAddress)
+	//apirouter.ReturnResponse(w, req, http.StatusCreated, paymailAddress)
+	c.JSON(http.StatusCreated, paymailAddress)
 }
 
 // paymailDeleteAddress will delete a paymail address
@@ -180,25 +168,26 @@ func (a *Action) paymailCreateAddress(w http.ResponseWriter, req *http.Request, 
 // @Success		200
 // @Router		/v1/admin/paymail/delete [delete]
 // @Security	x-auth-xpub
-func (a *Action) paymailDeleteAddress(w http.ResponseWriter, req *http.Request, _ httprouter.Params) {
-	// Parse the params
-	params := apirouter.GetParams(req)
-	address := params.GetString("address")
+func (a *Action) paymailDeleteAddress(c *gin.Context) {
+	var requestBody AdminPaymailAddress
+	if err := c.ShouldBindJSON(&requestBody); err != nil {
+		c.JSON(http.StatusBadRequest, err.Error())
+		return
+	}
 
-	if address == "" {
-		apirouter.ReturnResponse(w, req, http.StatusExpectationFailed, "address is required")
+	if requestBody.Address == "" {
+		c.JSON(http.StatusExpectationFailed, "address is required")
 		return
 	}
 
 	opts := a.Services.SpvWalletEngine.DefaultModelOptions()
 
 	// Delete a new paymail address
-	err := a.Services.SpvWalletEngine.DeletePaymailAddress(req.Context(), address, opts...)
+	err := a.Services.SpvWalletEngine.DeletePaymailAddress(c.Request.Context(), requestBody.Address, opts...)
 	if err != nil {
-		apirouter.ReturnResponse(w, req, http.StatusExpectationFailed, err.Error())
+		c.JSON(http.StatusExpectationFailed, err.Error())
 		return
 	}
 
-	// Return response
-	apirouter.ReturnResponse(w, req, http.StatusOK, true)
+	c.Status(http.StatusOK)
 }

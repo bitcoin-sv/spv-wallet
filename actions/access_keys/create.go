@@ -1,12 +1,12 @@
 package accesskeys
 
 import (
+	"github.com/bitcoin-sv/spv-wallet/server/auth"
+	"github.com/gin-gonic/gin"
 	"net/http"
 
 	"github.com/bitcoin-sv/spv-wallet/engine"
 	"github.com/bitcoin-sv/spv-wallet/mappings"
-	"github.com/julienschmidt/httprouter"
-	apirouter "github.com/mrz1836/go-api-router"
 )
 
 // create will make a new model using the services defined in the action object
@@ -19,28 +19,26 @@ import (
 // @Success		201
 // @Router		/v1/access-key [post]
 // @Security	x-auth-xpub
-func (a *Action) create(w http.ResponseWriter, req *http.Request, _ httprouter.Params) {
-	reqXPub, _ := engine.GetXpubFromRequest(req)
+func (a *Action) create(c *gin.Context) {
+	reqXPub := c.GetString(auth.ParamXPubKey)
 
-	// Parse the params
-	params := apirouter.GetParams(req)
-
-	// params
-	metadata := params.GetJSON("metadata")
+	var requestBody CreateAccessKey
+	if err := c.Bind(&requestBody); err != nil {
+		c.JSON(http.StatusBadRequest, err.Error())
+		return
+	}
 
 	// Create a new accessKey
 	accessKey, err := a.Services.SpvWalletEngine.NewAccessKey(
-		req.Context(),
+		c.Request.Context(),
 		reqXPub,
-		engine.WithMetadatas(metadata),
+		engine.WithMetadatas(requestBody.Metadata),
 	)
 	if err != nil {
-		apirouter.ReturnResponse(w, req, http.StatusUnprocessableEntity, err.Error())
+		c.JSON(http.StatusUnprocessableEntity, err.Error())
 		return
 	}
 
 	contract := mappings.MapToAccessKeyContract(accessKey)
-
-	// Return response
-	apirouter.ReturnResponse(w, req, http.StatusCreated, contract)
+	c.JSON(http.StatusCreated, contract)
 }

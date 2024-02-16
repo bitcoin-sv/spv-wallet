@@ -2,12 +2,11 @@ package admin
 
 import (
 	"errors"
+	"github.com/gin-gonic/gin"
 	"net/http"
 
 	"github.com/bitcoin-sv/spv-wallet/engine"
 	"github.com/bitcoin-sv/spv-wallet/mappings"
-	"github.com/julienschmidt/httprouter"
-	apirouter "github.com/mrz1836/go-api-router"
 	"github.com/mrz1836/go-datastore"
 )
 
@@ -21,36 +20,36 @@ import (
 // @Success		201
 // @Router		/v1/admin/transactions/record [post]
 // @Security	x-auth-xpub
-func (a *Action) transactionRecord(w http.ResponseWriter, req *http.Request, _ httprouter.Params) {
-	// Parse the params
-	params := apirouter.GetParams(req)
-
-	hex := params.GetString("hex")
+func (a *Action) transactionRecord(c *gin.Context) {
+	var requestBody AdminRecordTransaction
+	if err := c.ShouldBindJSON(&requestBody); err != nil {
+		c.JSON(http.StatusBadRequest, err.Error())
+		return
+	}
 
 	// Set the metadata
 	opts := make([]engine.ModelOps, 0)
 
 	// Record a new transaction (get the hex from parameters)
 	transaction, err := a.Services.SpvWalletEngine.RecordRawTransaction(
-		req.Context(),
-		hex,
+		c.Request.Context(),
+		requestBody.Hex,
 		opts...,
 	)
 	if err != nil {
 		if errors.Is(err, datastore.ErrDuplicateKey) {
 			// already registered, just return the registered transaction
-			if transaction, err = a.Services.SpvWalletEngine.GetTransactionByHex(req.Context(), hex); err != nil {
-				apirouter.ReturnResponse(w, req, http.StatusUnprocessableEntity, err.Error())
+			if transaction, err = a.Services.SpvWalletEngine.GetTransactionByHex(c.Request.Context(), requestBody.Hex); err != nil {
+				c.JSON(http.StatusUnprocessableEntity, err.Error())
 				return
 			}
 		} else {
-			apirouter.ReturnResponse(w, req, http.StatusUnprocessableEntity, err.Error())
+			c.JSON(http.StatusUnprocessableEntity, err.Error())
 			return
 		}
 	}
 
 	contract := mappings.MapToTransactionContract(transaction)
 
-	// Return response
-	apirouter.ReturnResponse(w, req, http.StatusCreated, contract)
+	c.JSON(http.StatusCreated, contract)
 }

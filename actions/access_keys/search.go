@@ -1,14 +1,15 @@
 package accesskeys
 
 import (
+	"fmt"
+	"github.com/bitcoin-sv/spv-wallet/server/auth"
+	"github.com/gin-gonic/gin"
 	"net/http"
 
 	"github.com/bitcoin-sv/spv-wallet/actions"
 	"github.com/bitcoin-sv/spv-wallet/engine"
 	"github.com/bitcoin-sv/spv-wallet/mappings"
 	"github.com/bitcoin-sv/spv-wallet/models"
-	"github.com/julienschmidt/httprouter"
-	apirouter "github.com/mrz1836/go-api-router"
 )
 
 // search will fetch a list of access keys filtered by metadata
@@ -26,28 +27,31 @@ import (
 // @Success		200
 // @Router		/v1/access-key/search [post]
 // @Security	x-auth-xpub
-func (a *Action) search(w http.ResponseWriter, req *http.Request, _ httprouter.Params) {
-	reqXPubID, _ := engine.GetXpubIDFromRequest(req)
+func (a *Action) search(c *gin.Context) {
+	reqXPubID := c.GetString(auth.ParamXPubHashKey)
 
-	// Parse the params
-	params := apirouter.GetParams(req)
-	queryParams, metadataModel, conditions, err := actions.GetQueryParameters(params)
-	metadata := mappings.MapToSpvWalletMetadata(metadataModel)
+	queryParams, metadata, conditions, err := actions.GetQueryParameters(c)
 	if err != nil {
-		apirouter.ReturnResponse(w, req, http.StatusExpectationFailed, err.Error())
+		c.JSON(http.StatusExpectationFailed, err.Error())
 		return
 	}
 
-	// Record a new transaction (get the hex from parameters)a
+	dbConditions := make(map[string]interface{})
+	if conditions != nil {
+		dbConditions = *conditions
+	}
+	dbConditions["xpub_id"] = reqXPubID
+
 	var accessKeys []*engine.AccessKey
 	if accessKeys, err = a.Services.SpvWalletEngine.GetAccessKeysByXPubID(
-		req.Context(),
+		c.Request.Context(),
 		reqXPubID,
 		metadata,
-		conditions,
+		&dbConditions,
 		queryParams,
 	); err != nil {
-		apirouter.ReturnResponse(w, req, http.StatusExpectationFailed, err.Error())
+		fmt.Println("Error getting access keys by xpub id")
+		c.JSON(http.StatusExpectationFailed, err.Error())
 		return
 	}
 
@@ -56,6 +60,5 @@ func (a *Action) search(w http.ResponseWriter, req *http.Request, _ httprouter.P
 		accessKeyContracts = append(accessKeyContracts, mappings.MapToAccessKeyContract(accessKey))
 	}
 
-	// Return response
-	apirouter.ReturnResponse(w, req, http.StatusOK, accessKeyContracts)
+	c.JSON(http.StatusOK, accessKeyContracts)
 }
