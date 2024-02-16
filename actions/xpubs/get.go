@@ -3,7 +3,7 @@ package xpubs
 import (
 	"net/http"
 
-	"github.com/bitcoin-sv/bux"
+	"github.com/bitcoin-sv/spv-wallet/engine"
 	"github.com/bitcoin-sv/spv-wallet/mappings"
 	"github.com/julienschmidt/httprouter"
 	apirouter "github.com/mrz1836/go-api-router"
@@ -18,17 +18,17 @@ import (
 // @Param		key query string false "key"
 // @Success		200
 // @Router		/v1/xpub [get]
-// @Security	spv-wallet-auth-xpub
+// @Security	x-auth-xpub
 func (a *Action) get(w http.ResponseWriter, req *http.Request, _ httprouter.Params) {
-	reqXPub, _ := bux.GetXpubFromRequest(req)
-	reqXPubID, _ := bux.GetXpubIDFromRequest(req)
+	reqXPub, _ := engine.GetXpubFromRequest(req)
+	reqXPubID, _ := engine.GetXpubIDFromRequest(req)
 
 	// Parse the params
 	params := apirouter.GetParams(req)
 	key := params.GetString("key")
 	if key != "" {
-		if isAdmin, ok := bux.IsAdminRequest(req); !isAdmin || !ok {
-			apirouter.ReturnResponse(w, req, http.StatusExpectationFailed, bux.ErrNotAdminKey)
+		if isAdmin, ok := engine.IsAdminRequest(req); !isAdmin || !ok {
+			apirouter.ReturnResponse(w, req, http.StatusExpectationFailed, engine.ErrNotAdminKey)
 			return
 		}
 	} else {
@@ -36,7 +36,7 @@ func (a *Action) get(w http.ResponseWriter, req *http.Request, _ httprouter.Para
 	}
 
 	// Get an xPub
-	var xPub *bux.Xpub
+	var xPub *engine.Xpub
 	var err error
 	if key != "" {
 		xPub, err = a.Services.SPV.GetXpub(

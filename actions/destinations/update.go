@@ -3,8 +3,8 @@ package destinations
 import (
 	"net/http"
 
-	"github.com/bitcoin-sv/bux"
 	"github.com/bitcoin-sv/spv-wallet/actions"
+	"github.com/bitcoin-sv/spv-wallet/engine"
 	"github.com/bitcoin-sv/spv-wallet/mappings"
 	"github.com/julienschmidt/httprouter"
 	apirouter "github.com/mrz1836/go-api-router"
@@ -22,9 +22,9 @@ import (
 // @Param		metadata body string true "Destination Metadata"
 // @Success		200
 // @Router		/v1/destination [patch]
-// @Security	spv-wallet-auth-xpub
+// @Security	x-auth-xpub
 func (a *Action) update(w http.ResponseWriter, req *http.Request, _ httprouter.Params) {
-	reqXPubID, _ := bux.GetXpubIDFromRequest(req)
+	reqXPubID, _ := engine.GetXpubIDFromRequest(req)
 
 	// Parse the params
 	params := apirouter.GetParams(req)
@@ -38,7 +38,7 @@ func (a *Action) update(w http.ResponseWriter, req *http.Request, _ httprouter.P
 	metadata := params.GetJSON(actions.MetadataField)
 
 	// Get the destination
-	var destination *bux.Destination
+	var destination *engine.Destination
 	var err error
 	if id != "" {
 		destination, err = a.Services.SPV.UpdateDestinationMetadataByID(

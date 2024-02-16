@@ -1,14 +1,14 @@
 package mappings
 
 import (
-	"github.com/bitcoin-sv/bux"
-	spvwalletmodels "github.com/bitcoin-sv/bux-models"
+	"github.com/bitcoin-sv/spv-wallet/engine"
 	"github.com/bitcoin-sv/spv-wallet/mappings/common"
+	spvwalletmodels "github.com/bitcoin-sv/spv-wallet/models"
 	customtypes "github.com/mrz1836/go-datastore/custom_types"
 )
 
 // MapToUtxoPointer will map the utxo-pointer model from spv-wallet to the spv-wallet-models contract
-func MapToUtxoPointer(u *bux.UtxoPointer) *spvwalletmodels.UtxoPointer {
+func MapToUtxoPointer(u *engine.UtxoPointer) *spvwalletmodels.UtxoPointer {
 	if u == nil {
 		return nil
 	}
@@ -20,19 +20,19 @@ func MapToUtxoPointer(u *bux.UtxoPointer) *spvwalletmodels.UtxoPointer {
 }
 
 // MapToUtxoPointerSPV will map the utxo-pointer model from spv-wallet-models to the spv-wallet contract
-func MapToUtxoPointerSPV(u *spvwalletmodels.UtxoPointer) *bux.UtxoPointer {
+func MapToUtxoPointerSPV(u *spvwalletmodels.UtxoPointer) *engine.UtxoPointer {
 	if u == nil {
 		return nil
 	}
 
-	return &bux.UtxoPointer{
+	return &engine.UtxoPointer{
 		TransactionID: u.TransactionID,
 		OutputIndex:   u.OutputIndex,
 	}
 }
 
 // MapToUtxoContract will map the utxo model from spv-wallet to the spv-wallet-models contract
-func MapToUtxoContract(u *bux.Utxo) *spvwalletmodels.Utxo {
+func MapToUtxoContract(u *engine.Utxo) *spvwalletmodels.Utxo {
 	if u == nil {
 		return nil
 	}
@@ -52,7 +52,7 @@ func MapToUtxoContract(u *bux.Utxo) *spvwalletmodels.Utxo {
 }
 
 // MapToUtxoSPV will map the utxo model from spv-wallet-models to the spv-wallet contract
-func MapToUtxoSPV(u *spvwalletmodels.Utxo) *bux.Utxo {
+func MapToUtxoSPV(u *spvwalletmodels.Utxo) *engine.Utxo {
 	if u == nil {
 		return nil
 	}
@@ -63,7 +63,7 @@ func MapToUtxoSPV(u *spvwalletmodels.Utxo) *bux.Utxo {
 	var spendingTxID customtypes.NullString
 	spendingTxID.String = u.SpendingTxID
 
-	return &bux.Utxo{
+	return &engine.Utxo{
 		Model:        *common.MapToModel(&u.Model),
 		UtxoPointer:  *MapToUtxoPointerSPV(&u.UtxoPointer),
 		ID:           u.ID,

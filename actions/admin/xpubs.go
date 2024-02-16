@@ -3,8 +3,8 @@ package admin
 import (
 	"net/http"
 
-	"github.com/bitcoin-sv/bux"
 	"github.com/bitcoin-sv/spv-wallet/actions"
+	"github.com/bitcoin-sv/spv-wallet/engine"
 	"github.com/bitcoin-sv/spv-wallet/mappings"
 	"github.com/julienschmidt/httprouter"
 	apirouter "github.com/mrz1836/go-api-router"
@@ -24,7 +24,7 @@ import (
 // @Param		conditions query string false "Conditions filter"
 // @Success		200
 // @Router		/v1/admin/xpubs/search [post]
-// @Security	spv-wallet-auth-xpub
+// @Security	x-auth-xpub
 func (a *Action) xpubsSearch(w http.ResponseWriter, req *http.Request, _ httprouter.Params) {
 	// Parse the params
 	params := apirouter.GetParams(req)
@@ -36,7 +36,7 @@ func (a *Action) xpubsSearch(w http.ResponseWriter, req *http.Request, _ httprou
 		return
 	}
 
-	var xpubs []*bux.Xpub
+	var xpubs []*engine.Xpub
 	if xpubs, err = a.Services.SPV.GetXPubs(
 		req.Context(),
 		metadata,
@@ -61,7 +61,7 @@ func (a *Action) xpubsSearch(w http.ResponseWriter, req *http.Request, _ httprou
 // @Param		conditions query string false "Conditions filter"
 // @Success		200
 // @Router		/v1/admin/xpubs/count [post]
-// @Security	spv-wallet-auth-xpub
+// @Security	x-auth-xpub
 func (a *Action) xpubsCount(w http.ResponseWriter, req *http.Request, _ httprouter.Params) {
 	// Parse the params
 	params := apirouter.GetParams(req)

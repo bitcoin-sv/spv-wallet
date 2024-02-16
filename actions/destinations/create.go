@@ -3,9 +3,9 @@ package destinations
 import (
 	"net/http"
 
-	"github.com/bitcoin-sv/bux"
-	"github.com/bitcoin-sv/bux/utils"
 	"github.com/bitcoin-sv/spv-wallet/actions"
+	"github.com/bitcoin-sv/spv-wallet/engine"
+	"github.com/bitcoin-sv/spv-wallet/engine/utils"
 	"github.com/bitcoin-sv/spv-wallet/mappings"
 	"github.com/julienschmidt/httprouter"
 	apirouter "github.com/mrz1836/go-api-router"
@@ -22,13 +22,13 @@ import (
 // @Param		metadata query string false "metadata"
 // @Success		201
 // @Router		/v1/destination [post]
-// @Security	spv-wallet-auth-xpub
+// @Security	x-auth-xpub
 func (a *Action) create(w http.ResponseWriter, req *http.Request, _ httprouter.Params) {
 	// Parse the params
 	params := apirouter.GetParams(req)
 
 	// Get the xPub from the request (via authentication)
-	reqXPub, _ := bux.GetXpubFromRequest(req)
+	reqXPub, _ := engine.GetXpubFromRequest(req)
 	xPub, err := a.Services.SPV.GetXpub(req.Context(), reqXPub)
 	if err != nil {
 		apirouter.ReturnResponse(w, req, http.StatusUnprocessableEntity, err.Error())
@@ -39,7 +39,7 @@ func (a *Action) create(w http.ResponseWriter, req *http.Request, _ httprouter.P
 	}
 
 	// Get metadata (if any)
-	metadata := params.GetJSON(bux.ModelMetadata.String())
+	metadata := params.GetJSON(engine.ModelMetadata.String())
 
 	// Get the type
 	scriptType := params.GetString("type")
@@ -48,19 +48,19 @@ func (a *Action) create(w http.ResponseWriter, req *http.Request, _ httprouter.P
 	}
 
 	// Set the reference ID
-	referenceID := params.GetString(bux.ReferenceIDField)
+	referenceID := params.GetString(engine.ReferenceIDField)
 	if len(referenceID) > 0 {
-		metadata[bux.ReferenceIDField] = referenceID
+		metadata[engine.ReferenceIDField] = referenceID
 	}
 
 	opts := a.Services.SPV.DefaultModelOptions()
 
 	if metadata != nil {
-		opts = append(opts, bux.WithMetadatas(metadata))
+		opts = append(opts, engine.WithMetadatas(metadata))
 	}
 
 	// Get a new destination
-	var destination *bux.Destination
+	var destination *engine.Destination
 	if destination, err = a.Services.SPV.NewDestination(
 		req.Context(),
 		xPub.RawXpub(),

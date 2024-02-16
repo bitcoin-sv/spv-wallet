@@ -1,12 +1,12 @@
 package mappings
 
 import (
-	"github.com/bitcoin-sv/bux"
-	spvwalletmodels "github.com/bitcoin-sv/bux-models"
+	"github.com/bitcoin-sv/spv-wallet/engine"
+	spvwalletmodels "github.com/bitcoin-sv/spv-wallet/models"
 )
 
 // MapToAdminStatsContract will map the model from spv-wallet to the spv-wallet-models contract
-func MapToAdminStatsContract(s *bux.AdminStats) *spvwalletmodels.AdminStats {
+func MapToAdminStatsContract(s *engine.AdminStats) *spvwalletmodels.AdminStats {
 	if s == nil {
 		return nil
 	}

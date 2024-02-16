@@ -2,12 +2,12 @@
 package common
 
 import (
-	"github.com/bitcoin-sv/bux"
-	"github.com/bitcoin-sv/bux-models/common"
+	"github.com/bitcoin-sv/spv-wallet/engine"
+	"github.com/bitcoin-sv/spv-wallet/models/common"
 )
 
 // MapToContract will map the common model to the spv-wallet-models contract
-func MapToContract(m *bux.Model) *common.Model {
+func MapToContract(m *engine.Model) *common.Model {
 	if m == nil {
 		return nil
 	}
@@ -21,12 +21,12 @@ func MapToContract(m *bux.Model) *common.Model {
 }
 
 // MapToModel will map the spv-wallet-models contract to the common spv model
-func MapToModel(m *common.Model) *bux.Model {
+func MapToModel(m *common.Model) *engine.Model {
 	if m == nil {
 		return nil
 	}
 
-	return &bux.Model{
+	return &engine.Model{
 		CreatedAt: m.CreatedAt,
 		UpdatedAt: m.UpdatedAt,
 		Metadata:  m.Metadata,

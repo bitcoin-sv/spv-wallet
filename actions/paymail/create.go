@@ -3,7 +3,7 @@ package pmail
 import (
 	"net/http"
 
-	"github.com/bitcoin-sv/bux"
+	"github.com/bitcoin-sv/spv-wallet/engine"
 	"github.com/bitcoin-sv/spv-wallet/mappings"
 	"github.com/julienschmidt/httprouter"
 	apirouter "github.com/mrz1836/go-api-router"
@@ -22,7 +22,7 @@ import (
 // @Produce		json
 // @Success		201
 // @Router		/v1/paymail [post]
-// @Security	spv-wallet-auth-xpub
+// @Security	x-auth-xpub
 func (a *Action) create(w http.ResponseWriter, req *http.Request, _ httprouter.Params) {
 	// Parse the params
 	params := apirouter.GetParams(req)
@@ -37,7 +37,7 @@ func (a *Action) create(w http.ResponseWriter, req *http.Request, _ httprouter.P
 	opts := a.Services.SPV.DefaultModelOptions()
 
 	if metadata != nil {
-		opts = append(opts, bux.WithMetadatas(metadata))
+		opts = append(opts, engine.WithMetadatas(metadata))
 	}
 
 	paymailAddress, err := a.Services.SPV.NewPaymailAddress(req.Context(), key, address, publicName, avatar, opts...)

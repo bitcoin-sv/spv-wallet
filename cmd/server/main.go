@@ -19,9 +19,9 @@ import (
 // main method starts everything for the SPV Wallet
 // @title           SPV: Wallet
 // @version         v0.12.0
-// @securityDefinitions.apikey spv-wallet-auth-xpub
+// @securityDefinitions.apikey x-auth-xpub
 // @in header
-// @name spv-wallet-auth-xpub
+// @name x-auth-xpub
 
 // @securityDefinitions.apikey callback-auth
 // @in header

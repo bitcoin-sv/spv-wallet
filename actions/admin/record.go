@@ -4,7 +4,7 @@ import (
 	"errors"
 	"net/http"
 
-	"github.com/bitcoin-sv/bux"
+	"github.com/bitcoin-sv/spv-wallet/engine"
 	"github.com/bitcoin-sv/spv-wallet/mappings"
 	"github.com/julienschmidt/httprouter"
 	apirouter "github.com/mrz1836/go-api-router"
@@ -20,7 +20,7 @@ import (
 // @Param		hex query string true "Transaction hex"
 // @Success		201
 // @Router		/v1/admin/transactions/record [post]
-// @Security	spv-wallet-auth-xpub
+// @Security	x-auth-xpub
 func (a *Action) transactionRecord(w http.ResponseWriter, req *http.Request, _ httprouter.Params) {
 	// Parse the params
 	params := apirouter.GetParams(req)
@@ -28,7 +28,7 @@ func (a *Action) transactionRecord(w http.ResponseWriter, req *http.Request, _ h
 	hex := params.GetString("hex")
 
 	// Set the metadata
-	opts := make([]bux.ModelOps, 0)
+	opts := make([]engine.ModelOps, 0)
 
 	// Record a new transaction (get the hex from parameters)
 	transaction, err := a.Services.SPV.RecordRawTransaction(

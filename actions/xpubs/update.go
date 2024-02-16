@@ -3,8 +3,8 @@ package xpubs
 import (
 	"net/http"
 
-	"github.com/bitcoin-sv/bux"
 	"github.com/bitcoin-sv/spv-wallet/actions"
+	"github.com/bitcoin-sv/spv-wallet/engine"
 	"github.com/bitcoin-sv/spv-wallet/mappings"
 	"github.com/julienschmidt/httprouter"
 	apirouter "github.com/mrz1836/go-api-router"
@@ -19,17 +19,17 @@ import (
 // @Param		metadata query string false "metadata"
 // @Success		200
 // @Router		/v1/xpub [patch]
-// @Security	spv-wallet-auth-xpub
+// @Security	x-auth-xpub
 func (a *Action) update(w http.ResponseWriter, req *http.Request, _ httprouter.Params) {
-	reqXPub, _ := bux.GetXpubFromRequest(req)
-	reqXPubID, _ := bux.GetXpubIDFromRequest(req)
+	reqXPub, _ := engine.GetXpubFromRequest(req)
+	reqXPubID, _ := engine.GetXpubIDFromRequest(req)
 
 	// Parse the params
 	params := apirouter.GetParams(req)
 	metadata := params.GetJSON(actions.MetadataField)
 
 	// Get an xPub
-	var xPub *bux.Xpub
+	var xPub *engine.Xpub
 	var err error
 	xPub, err = a.Services.SPV.UpdateXpubMetadata(
 		req.Context(), reqXPubID, metadata,

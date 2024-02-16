@@ -1,8 +1,8 @@
 package mappings
 
 import (
-	spvwalletmodels "github.com/bitcoin-sv/bux-models"
-	"github.com/bitcoin-sv/bux/utils"
+	"github.com/bitcoin-sv/spv-wallet/engine/utils"
+	spvwalletmodels "github.com/bitcoin-sv/spv-wallet/models"
 )
 
 // MapToFeeUnitContract will map the fee-unit model from spv-wallet to the spv-wallet-models contract

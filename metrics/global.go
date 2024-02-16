@@ -1,7 +1,7 @@
 package metrics
 
 import (
-	spvmetrics "github.com/bitcoin-sv/bux/metrics"
+	spvmetrics "github.com/bitcoin-sv/spv-wallet/engine/metrics"
 )
 
 var metrics *Metrics

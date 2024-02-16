@@ -1,13 +1,13 @@
 package mappings
 
 import (
-	"github.com/bitcoin-sv/bux"
-	spvwalletmodels "github.com/bitcoin-sv/bux-models"
+	"github.com/bitcoin-sv/spv-wallet/engine"
 	"github.com/bitcoin-sv/spv-wallet/mappings/common"
+	spvwalletmodels "github.com/bitcoin-sv/spv-wallet/models"
 )
 
 // MapToXpubContract will map the xpub model from spv-wallet to the spv-wallet-models contract
-func MapToXpubContract(xpub *bux.Xpub) *spvwalletmodels.Xpub {
+func MapToXpubContract(xpub *engine.Xpub) *spvwalletmodels.Xpub {
 	if xpub == nil {
 		return nil
 	}

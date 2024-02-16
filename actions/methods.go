@@ -4,8 +4,8 @@ import (
 	"encoding/json"
 	"net/http"
 
-	spvwalletmodels "github.com/bitcoin-sv/bux-models"
 	"github.com/bitcoin-sv/spv-wallet/dictionary"
+	spvwalletmodels "github.com/bitcoin-sv/spv-wallet/models"
 	"github.com/julienschmidt/httprouter"
 	"github.com/mrz1836/go-datastore"
 	"github.com/mrz1836/go-parameters"

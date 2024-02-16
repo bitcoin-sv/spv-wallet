@@ -15,7 +15,7 @@ import (
 // @Produce		json
 // @Success		200
 // @Router		/v1/admin/status [get]
-// @Security	spv-wallet-auth-xpub
+// @Security	x-auth-xpub
 func (a *Action) status(w http.ResponseWriter, req *http.Request, _ httprouter.Params) {
 	// Return response
 	apirouter.ReturnResponse(w, req, http.StatusOK, true)

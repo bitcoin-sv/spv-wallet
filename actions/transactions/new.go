@@ -4,10 +4,10 @@ import (
 	"encoding/json"
 	"net/http"
 
-	"github.com/bitcoin-sv/bux"
-	spvwalletmodels "github.com/bitcoin-sv/bux-models"
 	"github.com/bitcoin-sv/spv-wallet/actions"
+	"github.com/bitcoin-sv/spv-wallet/engine"
 	"github.com/bitcoin-sv/spv-wallet/mappings"
+	spvwalletmodels "github.com/bitcoin-sv/spv-wallet/models"
 	"github.com/julienschmidt/httprouter"
 	apirouter "github.com/mrz1836/go-api-router"
 )
@@ -22,13 +22,13 @@ import (
 // @Param		metadata query string false "metadata"
 // @Success		201
 // @Router		/v1/transaction [post]
-// @Security	spv-wallet-auth-xpub
+// @Security	x-auth-xpub
 func (a *Action) newTransaction(w http.ResponseWriter, req *http.Request, _ httprouter.Params) {
 	// Parse the params
 	params := apirouter.GetParams(req)
 
 	// Get the xPub from the request (via authentication)
-	reqXPub, _ := bux.GetXpubFromRequest(req)
+	reqXPub, _ := engine.GetXpubFromRequest(req)
 	xPub, err := a.Services.SPV.GetXpub(req.Context(), reqXPub)
 	if err != nil {
 		apirouter.ReturnResponse(w, req, http.StatusUnprocessableEntity, err.Error())
@@ -58,16 +58,16 @@ func (a *Action) newTransaction(w http.ResponseWriter, req *http.Request, _ http
 		return
 	}
 
-	metadata := params.GetJSON(bux.ModelMetadata.String())
+	metadata := params.GetJSON(engine.ModelMetadata.String())
 	opts := a.Services.SPV.DefaultModelOptions()
 	if metadata != nil {
-		opts = append(opts, bux.WithMetadatas(metadata))
+		opts = append(opts, engine.WithMetadatas(metadata))
 	}
 
 	txConfig := mappings.MapToTransactionConfigSPV(&txContract)
 
 	// Record a new transaction (get the hex from parameters)
-	var transaction *bux.DraftTransaction
+	var transaction *engine.DraftTransaction
 	if transaction, err = a.Services.SPV.NewTransaction(
 		req.Context(),
 		xPub.RawXpub(),

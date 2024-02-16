@@ -3,8 +3,8 @@ package admin
 import (
 	"net/http"
 
-	"github.com/bitcoin-sv/bux"
 	"github.com/bitcoin-sv/spv-wallet/actions"
+	"github.com/bitcoin-sv/spv-wallet/engine"
 	"github.com/bitcoin-sv/spv-wallet/mappings"
 	"github.com/julienschmidt/httprouter"
 	apirouter "github.com/mrz1836/go-api-router"
@@ -24,7 +24,7 @@ import (
 // @Param		conditions query string false "Conditions filter"
 // @Success		200
 // @Router		/v1/admin/utxos/search [post]
-// @Security	spv-wallet-auth-xpub
+// @Security	x-auth-xpub
 func (a *Action) utxosSearch(w http.ResponseWriter, req *http.Request, _ httprouter.Params) {
 	// Parse the params
 	params := apirouter.GetParams(req)
@@ -35,7 +35,7 @@ func (a *Action) utxosSearch(w http.ResponseWriter, req *http.Request, _ httprou
 		return
 	}
 
-	var utxos []*bux.Utxo
+	var utxos []*engine.Utxo
 	if utxos, err = a.Services.SPV.GetUtxos(
 		req.Context(),
 		metadata,
@@ -60,7 +60,7 @@ func (a *Action) utxosSearch(w http.ResponseWriter, req *http.Request, _ httprou
 // @Param		conditions query string false "Conditions filter"
 // @Success		200
 // @Router		/v1/admin/utxos/count [post]
-// @Security	spv-wallet-auth-xpub
+// @Security	x-auth-xpub
 func (a *Action) utxosCount(w http.ResponseWriter, req *http.Request, _ httprouter.Params) {
 	// Parse the params
 	params := apirouter.GetParams(req)

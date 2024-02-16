@@ -4,13 +4,13 @@ package mappings
 import (
 	"time"
 
-	"github.com/bitcoin-sv/bux"
-	spvwalletmodels "github.com/bitcoin-sv/bux-models"
+	"github.com/bitcoin-sv/spv-wallet/engine"
 	"github.com/bitcoin-sv/spv-wallet/mappings/common"
+	spvwalletmodels "github.com/bitcoin-sv/spv-wallet/models"
 )
 
 // MapToAccessKeyContract will map the access key to the spv-wallet-models contract
-func MapToAccessKeyContract(ac *bux.AccessKey) *spvwalletmodels.AccessKey {
+func MapToAccessKeyContract(ac *engine.AccessKey) *spvwalletmodels.AccessKey {
 	if ac == nil {
 		return nil
 	}

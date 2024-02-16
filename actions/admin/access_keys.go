@@ -3,10 +3,10 @@ package admin
 import (
 	"net/http"
 
-	"github.com/bitcoin-sv/bux"
-	spvwalletmodels "github.com/bitcoin-sv/bux-models"
 	"github.com/bitcoin-sv/spv-wallet/actions"
+	"github.com/bitcoin-sv/spv-wallet/engine"
 	"github.com/bitcoin-sv/spv-wallet/mappings"
+	spvwalletmodels "github.com/bitcoin-sv/spv-wallet/models"
 	"github.com/julienschmidt/httprouter"
 	apirouter "github.com/mrz1836/go-api-router"
 )
@@ -25,7 +25,7 @@ import (
 // @Param		conditions query string false "Conditions filter"
 // @Success		200
 // @Router		/v1/admin/access-keys/search [post]
-// @Security	spv-wallet-auth-xpub
+// @Security	x-auth-xpub
 func (a *Action) accessKeysSearch(w http.ResponseWriter, req *http.Request, _ httprouter.Params) {
 	// Parse the params
 	params := apirouter.GetParams(req)
@@ -36,7 +36,7 @@ func (a *Action) accessKeysSearch(w http.ResponseWriter, req *http.Request, _ ht
 		return
 	}
 
-	var accessKeys []*bux.AccessKey
+	var accessKeys []*engine.AccessKey
 	if accessKeys, err = a.Services.SPV.GetAccessKeys(
 		req.Context(),
 		metadata,
@@ -66,7 +66,7 @@ func (a *Action) accessKeysSearch(w http.ResponseWriter, req *http.Request, _ ht
 // @Param		conditions query string false "Conditions filter"
 // @Success		200
 // @Router		/v1/admin/access-keys/count [post]
-// @Security	spv-wallet-auth-xpub
+// @Security	x-auth-xpub
 func (a *Action) accessKeysCount(w http.ResponseWriter, req *http.Request, _ httprouter.Params) {
 	// Parse the params
 	params := apirouter.GetParams(req)

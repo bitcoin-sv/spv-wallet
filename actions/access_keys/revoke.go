@@ -3,7 +3,7 @@ package accesskeys
 import (
 	"net/http"
 
-	"github.com/bitcoin-sv/bux"
+	"github.com/bitcoin-sv/spv-wallet/engine"
 	"github.com/bitcoin-sv/spv-wallet/mappings"
 	"github.com/julienschmidt/httprouter"
 	apirouter "github.com/mrz1836/go-api-router"
@@ -18,16 +18,16 @@ import (
 // @Param		id query string true "id"
 // @Success		201
 // @Router		/v1/access-key [delete]
-// @Security	spv-wallet-auth-xpub
+// @Security	x-auth-xpub
 func (a *Action) revoke(w http.ResponseWriter, req *http.Request, _ httprouter.Params) {
-	reqXPub, _ := bux.GetXpubFromRequest(req)
+	reqXPub, _ := engine.GetXpubFromRequest(req)
 
 	// Parse the params
 	params := apirouter.GetParams(req)
 	id := params.GetString("id")
 
 	if id == "" {
-		apirouter.ReturnResponse(w, req, http.StatusExpectationFailed, bux.ErrMissingFieldID)
+		apirouter.ReturnResponse(w, req, http.StatusExpectationFailed, engine.ErrMissingFieldID)
 		return
 	}
 

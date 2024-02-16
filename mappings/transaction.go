@@ -1,13 +1,13 @@
 package mappings
 
 import (
-	"github.com/bitcoin-sv/bux"
-	spvwalletmodels "github.com/bitcoin-sv/bux-models"
+	"github.com/bitcoin-sv/spv-wallet/engine"
 	"github.com/bitcoin-sv/spv-wallet/mappings/common"
+	spvwalletmodels "github.com/bitcoin-sv/spv-wallet/models"
 )
 
 // MapToTransactionContract will map the model from spv-wallet to the spv-wallet-models contract
-func MapToTransactionContract(t *bux.Transaction) *spvwalletmodels.Transaction {
+func MapToTransactionContract(t *engine.Transaction) *spvwalletmodels.Transaction {
 	if t == nil {
 		return nil
 	}
@@ -36,7 +36,7 @@ func MapToTransactionContract(t *bux.Transaction) *spvwalletmodels.Transaction {
 }
 
 // MapToTransactionContractForAdmin will map the model from spv-wallet to the spv-wallet-models contract for admin
-func MapToTransactionContractForAdmin(t *bux.Transaction) *spvwalletmodels.Transaction {
+func MapToTransactionContractForAdmin(t *engine.Transaction) *spvwalletmodels.Transaction {
 	if t == nil {
 		return nil
 	}
@@ -63,7 +63,7 @@ func MapToTransactionContractForAdmin(t *bux.Transaction) *spvwalletmodels.Trans
 	return &model
 }
 
-func processMetadata(t *bux.Transaction, xpubID string, model *spvwalletmodels.Transaction) {
+func processMetadata(t *engine.Transaction, xpubID string, model *spvwalletmodels.Transaction) {
 	if len(t.XpubMetadata) > 0 && len(t.XpubMetadata[xpubID]) > 0 {
 		if t.Model.Metadata == nil {
 			model.Model.Metadata = make(spvwalletmodels.Metadata)
@@ -74,7 +74,7 @@ func processMetadata(t *bux.Transaction, xpubID string, model *spvwalletmodels.T
 	}
 }
 
-func processOutputValue(t *bux.Transaction, xpubID string, model *spvwalletmodels.Transaction) {
+func processOutputValue(t *engine.Transaction, xpubID string, model *spvwalletmodels.Transaction) {
 	model.OutputValue = int64(0)
 	if len(t.XpubOutputValue) > 0 && t.XpubOutputValue[xpubID] != 0 {
 		model.OutputValue = t.XpubOutputValue[xpubID]
@@ -88,14 +88,14 @@ func processOutputValue(t *bux.Transaction, xpubID string, model *spvwalletmodel
 }
 
 // MapToTransactionSPV will map the model from spv-wallet-models to the spv-wallet contract
-func MapToTransactionSPV(t *spvwalletmodels.Transaction) *bux.Transaction {
+func MapToTransactionSPV(t *spvwalletmodels.Transaction) *engine.Transaction {
 	if t == nil {
 		return nil
 	}
 
-	return &bux.Transaction{
+	return &engine.Transaction{
 		Model:           *common.MapToModel(&t.Model),
-		TransactionBase: bux.TransactionBase{ID: t.ID, Hex: t.Hex},
+		TransactionBase: engine.TransactionBase{ID: t.ID, Hex: t.Hex},
 		XpubInIDs:       t.XpubInIDs,
 		XpubOutIDs:      t.XpubOutIDs,
 		BlockHash:       t.BlockHash,
@@ -106,20 +106,20 @@ func MapToTransactionSPV(t *spvwalletmodels.Transaction) *bux.Transaction {
 		DraftID:         t.DraftID,
 		TotalValue:      t.TotalValue,
 		OutputValue:     t.OutputValue,
-		Status:          bux.SyncStatus(t.Status),
-		Direction:       bux.TransactionDirection(t.TransactionDirection),
+		Status:          engine.SyncStatus(t.Status),
+		Direction:       engine.TransactionDirection(t.TransactionDirection),
 	}
 }
 
 // MapToTransactionConfigSPV will map the transaction-config model from spv-wallet to the spv-wallet-models contract
-func MapToTransactionConfigSPV(tx *spvwalletmodels.TransactionConfig) *bux.TransactionConfig {
+func MapToTransactionConfigSPV(tx *spvwalletmodels.TransactionConfig) *engine.TransactionConfig {
 	if tx == nil {
 		return nil
 	}
 
-	return &bux.TransactionConfig{
+	return &engine.TransactionConfig{
 		ChangeDestinations:         mapToSPVDestinations(tx),
-		ChangeDestinationsStrategy: bux.ChangeStrategy(tx.ChangeStrategy),
+		ChangeDestinationsStrategy: engine.ChangeStrategy(tx.ChangeStrategy),
 		ChangeMinimumSatoshis:      tx.ChangeMinimumSatoshis,
 		ChangeNumberOfDestinations: tx.ChangeNumberOfDestinations,
 		ChangeSatoshis:             tx.ChangeSatoshis,
@@ -135,60 +135,60 @@ func MapToTransactionConfigSPV(tx *spvwalletmodels.TransactionConfig) *bux.Trans
 	}
 }
 
-func mapToSPVOutputs(tx *spvwalletmodels.TransactionConfig) []*bux.TransactionOutput {
+func mapToSPVOutputs(tx *spvwalletmodels.TransactionConfig) []*engine.TransactionOutput {
 	if tx.Outputs == nil {
 		return nil
 	}
 
-	outputs := make([]*bux.TransactionOutput, 0)
+	outputs := make([]*engine.TransactionOutput, 0)
 	for _, output := range tx.Outputs {
 		outputs = append(outputs, MapToTransactionOutputSPV(output))
 	}
 	return outputs
 }
 
-func mapToSPVInputs(tx *spvwalletmodels.TransactionConfig) []*bux.TransactionInput {
+func mapToSPVInputs(tx *spvwalletmodels.TransactionConfig) []*engine.TransactionInput {
 	if tx.Inputs == nil {
 		return nil
 	}
 
-	inputs := make([]*bux.TransactionInput, 0)
+	inputs := make([]*engine.TransactionInput, 0)
 	for _, input := range tx.Inputs {
 		inputs = append(inputs, MapToTransactionInputSPV(input))
 	}
 	return inputs
 }
 
-func mapToSPVIncludeUtxos(tx *spvwalletmodels.TransactionConfig) []*bux.UtxoPointer {
+func mapToSPVIncludeUtxos(tx *spvwalletmodels.TransactionConfig) []*engine.UtxoPointer {
 	if tx.IncludeUtxos == nil {
 		return nil
 	}
 
-	includeUtxos := make([]*bux.UtxoPointer, 0)
+	includeUtxos := make([]*engine.UtxoPointer, 0)
 	for _, utxo := range tx.IncludeUtxos {
 		includeUtxos = append(includeUtxos, MapToUtxoPointerSPV(utxo))
 	}
 	return includeUtxos
 }
 
-func mapToSPVFromUtxos(tx *spvwalletmodels.TransactionConfig) []*bux.UtxoPointer {
+func mapToSPVFromUtxos(tx *spvwalletmodels.TransactionConfig) []*engine.UtxoPointer {
 	if tx.FromUtxos == nil {
 		return nil
 	}
 
-	fromUtxos := make([]*bux.UtxoPointer, 0)
+	fromUtxos := make([]*engine.UtxoPointer, 0)
 	for _, utxo := range tx.FromUtxos {
 		fromUtxos = append(fromUtxos, MapToUtxoPointerSPV(utxo))
 	}
 	return fromUtxos
 }
 
-func mapToSPVDestinations(tx *spvwalletmodels.TransactionConfig) []*bux.Destination {
+func mapToSPVDestinations(tx *spvwalletmodels.TransactionConfig) []*engine.Destination {
 	if tx.ChangeDestinations == nil {
 		return nil
 	}
 
-	destinations := make([]*bux.Destination, 0)
+	destinations := make([]*engine.Destination, 0)
 	for _, destination := range tx.ChangeDestinations {
 		destinations = append(destinations, MapToDestinationSPV(destination))
 	}
@@ -196,7 +196,7 @@ func mapToSPVDestinations(tx *spvwalletmodels.TransactionConfig) []*bux.Destinat
 }
 
 // MapToTransactionConfigContract will map the transaction-config model from spv-wallet-models to the spv-wallet contract
-func MapToTransactionConfigContract(tx *bux.TransactionConfig) *spvwalletmodels.TransactionConfig {
+func MapToTransactionConfigContract(tx *engine.TransactionConfig) *spvwalletmodels.TransactionConfig {
 	if tx == nil {
 		return nil
 	}
@@ -218,7 +218,7 @@ func MapToTransactionConfigContract(tx *bux.TransactionConfig) *spvwalletmodels.
 	}
 }
 
-func mapToContractOutputs(tx *bux.TransactionConfig) []*spvwalletmodels.TransactionOutput {
+func mapToContractOutputs(tx *engine.TransactionConfig) []*spvwalletmodels.TransactionOutput {
 	if tx.Outputs == nil {
 		return nil
 	}
@@ -230,7 +230,7 @@ func mapToContractOutputs(tx *bux.TransactionConfig) []*spvwalletmodels.Transact
 	return outputs
 }
 
-func mapToContractInputs(tx *bux.TransactionConfig) []*spvwalletmodels.TransactionInput {
+func mapToContractInputs(tx *engine.TransactionConfig) []*spvwalletmodels.TransactionInput {
 	if tx.Inputs == nil {
 		return nil
 	}
@@ -242,7 +242,7 @@ func mapToContractInputs(tx *bux.TransactionConfig) []*spvwalletmodels.Transacti
 	return inputs
 }
 
-func mapToContractIncludeUtxos(tx *bux.TransactionConfig) []*spvwalletmodels.UtxoPointer {
+func mapToContractIncludeUtxos(tx *engine.TransactionConfig) []*spvwalletmodels.UtxoPointer {
 	if tx.IncludeUtxos == nil {
 		return nil
 	}
@@ -254,7 +254,7 @@ func mapToContractIncludeUtxos(tx *bux.TransactionConfig) []*spvwalletmodels.Utx
 	return includeUtxos
 }
 
-func mapToContractFromUtxos(tx *bux.TransactionConfig) []*spvwalletmodels.UtxoPointer {
+func mapToContractFromUtxos(tx *engine.TransactionConfig) []*spvwalletmodels.UtxoPointer {
 	if tx.FromUtxos == nil {
 		return nil
 	}
@@ -266,7 +266,7 @@ func mapToContractFromUtxos(tx *bux.TransactionConfig) []*spvwalletmodels.UtxoPo
 	return fromUtxos
 }
 
-func mapToContractDestinations(tx *bux.TransactionConfig) []*spvwalletmodels.Destination {
+func mapToContractDestinations(tx *engine.TransactionConfig) []*spvwalletmodels.Destination {
 	if tx.ChangeDestinations == nil {
 		return nil
 	}
@@ -279,7 +279,7 @@ func mapToContractDestinations(tx *bux.TransactionConfig) []*spvwalletmodels.Des
 }
 
 // MapToDraftTransactionContract will map the transaction-output model from spv-wallet to the spv-wallet-models contract
-func MapToDraftTransactionContract(tx *bux.DraftTransaction) *spvwalletmodels.DraftTransaction {
+func MapToDraftTransactionContract(tx *engine.DraftTransaction) *spvwalletmodels.DraftTransaction {
 	if tx == nil {
 		return nil
 	}
@@ -295,7 +295,7 @@ func MapToDraftTransactionContract(tx *bux.DraftTransaction) *spvwalletmodels.Dr
 }
 
 // MapToTransactionInputContract will map the transaction-output model from spv-wallet-models to the spv-wallet contract
-func MapToTransactionInputContract(inp *bux.TransactionInput) *spvwalletmodels.TransactionInput {
+func MapToTransactionInputContract(inp *engine.TransactionInput) *spvwalletmodels.TransactionInput {
 	if inp == nil {
 		return nil
 	}
@@ -307,19 +307,19 @@ func MapToTransactionInputContract(inp *bux.TransactionInput) *spvwalletmodels.T
 }
 
 // MapToTransactionInputSPV will map the transaction-output model from spv-wallet to the spv-wallet-models contract
-func MapToTransactionInputSPV(inp *spvwalletmodels.TransactionInput) *bux.TransactionInput {
+func MapToTransactionInputSPV(inp *spvwalletmodels.TransactionInput) *engine.TransactionInput {
 	if inp == nil {
 		return nil
 	}
 
-	return &bux.TransactionInput{
+	return &engine.TransactionInput{
 		Utxo:        *MapToUtxoSPV(&inp.Utxo),
 		Destination: *MapToDestinationSPV(&inp.Destination),
 	}
 }
 
 // MapToTransactionOutputContract will map the transaction-output model from spv-wallet to the spv-wallet-models contract
-func MapToTransactionOutputContract(out *bux.TransactionOutput) *spvwalletmodels.TransactionOutput {
+func MapToTransactionOutputContract(out *engine.TransactionOutput) *spvwalletmodels.TransactionOutput {
 	if out == nil {
 		return nil
 	}
@@ -341,17 +341,17 @@ func MapToTransactionOutputContract(out *bux.TransactionOutput) *spvwalletmodels
 }
 
 // MapToTransactionOutputSPV will map the transaction-output model from spv-wallet-models to the spv-wallet contract
-func MapToTransactionOutputSPV(out *spvwalletmodels.TransactionOutput) *bux.TransactionOutput {
+func MapToTransactionOutputSPV(out *spvwalletmodels.TransactionOutput) *engine.TransactionOutput {
 	if out == nil {
 		return nil
 	}
 
-	scriptOutputs := make([]*bux.ScriptOutput, 0)
+	scriptOutputs := make([]*engine.ScriptOutput, 0)
 	for _, scriptOutput := range out.Scripts {
 		scriptOutputs = append(scriptOutputs, MapToScriptOutputSPV(scriptOutput))
 	}
 
-	return &bux.TransactionOutput{
+	return &engine.TransactionOutput{
 		OpReturn:     MapToOpReturnSPV(out.OpReturn),
 		PaymailP4:    MapToPaymailP4SPV(out.PaymailP4),
 		Satoshis:     out.Satoshis,
@@ -363,7 +363,7 @@ func MapToTransactionOutputSPV(out *spvwalletmodels.TransactionOutput) *bux.Tran
 }
 
 // MapToMapProtocolContract will map the transaction-output model from spv-wallet to the spv-wallet-models contract
-func MapToMapProtocolContract(mp *bux.MapProtocol) *spvwalletmodels.MapProtocol {
+func MapToMapProtocolContract(mp *engine.MapProtocol) *spvwalletmodels.MapProtocol {
 	if mp == nil {
 		return nil
 	}
@@ -376,12 +376,12 @@ func MapToMapProtocolContract(mp *bux.MapProtocol) *spvwalletmodels.MapProtocol 
 }
 
 // MapToMapProtocolSPV will map the transaction-output model from spv-wallet-models to the spv-wallet contract
-func MapToMapProtocolSPV(mp *spvwalletmodels.MapProtocol) *bux.MapProtocol {
+func MapToMapProtocolSPV(mp *spvwalletmodels.MapProtocol) *engine.MapProtocol {
 	if mp == nil {
 		return nil
 	}
 
-	return &bux.MapProtocol{
+	return &engine.MapProtocol{
 		App:  mp.App,
 		Keys: mp.Keys,
 		Type: mp.Type,
@@ -389,7 +389,7 @@ func MapToMapProtocolSPV(mp *spvwalletmodels.MapProtocol) *bux.MapProtocol {
 }
 
 // MapToOpReturnContract will map the transaction-output model from spv-wallet to the spv-wallet-models contract
-func MapToOpReturnContract(op *bux.OpReturn) *spvwalletmodels.OpReturn {
+func MapToOpReturnContract(op *engine.OpReturn) *spvwalletmodels.OpReturn {
 	if op == nil {
 		return nil
 	}
@@ -403,12 +403,12 @@ func MapToOpReturnContract(op *bux.OpReturn) *spvwalletmodels.OpReturn {
 }
 
 // MapToOpReturnSPV will map the op-return model from spv-wallet-models to the spv-wallet contract
-func MapToOpReturnSPV(op *spvwalletmodels.OpReturn) *bux.OpReturn {
+func MapToOpReturnSPV(op *spvwalletmodels.OpReturn) *engine.OpReturn {
 	if op == nil {
 		return nil
 	}
 
-	return &bux.OpReturn{
+	return &engine.OpReturn{
 		Hex:         op.Hex,
 		HexParts:    op.HexParts,
 		Map:         MapToMapProtocolSPV(op.Map),

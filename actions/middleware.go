@@ -5,9 +5,9 @@ import (
 	"strings"
 	"time"
 
-	"github.com/bitcoin-sv/bux"
 	"github.com/bitcoin-sv/spv-wallet/config"
 	"github.com/bitcoin-sv/spv-wallet/dictionary"
+	"github.com/bitcoin-sv/spv-wallet/engine"
 	"github.com/gofrs/uuid"
 	"github.com/julienschmidt/httprouter"
 	apirouter "github.com/mrz1836/go-api-router"
@@ -92,7 +92,7 @@ func (a *Action) Request(_ *apirouter.Router, h httprouter.Handle) httprouter.Ha
 }
 
 // CheckAuthentication will check the authentication
-func CheckAuthentication(appConfig *config.AppConfig, spv bux.ClientInterface, req *http.Request,
+func CheckAuthentication(appConfig *config.AppConfig, spv engine.ClientInterface, req *http.Request,
 	adminRequired bool, requireSigning bool,
 ) (*http.Request, dictionary.ErrorMessage) {
 	// Bad/Unknown scheme

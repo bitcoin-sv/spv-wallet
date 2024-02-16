@@ -3,10 +3,10 @@ package transactions
 import (
 	"net/http"
 
-	"github.com/bitcoin-sv/bux"
-	spvwalletmodels "github.com/bitcoin-sv/bux-models"
 	"github.com/bitcoin-sv/spv-wallet/actions"
+	"github.com/bitcoin-sv/spv-wallet/engine"
 	"github.com/bitcoin-sv/spv-wallet/mappings"
+	spvwalletmodels "github.com/bitcoin-sv/spv-wallet/models"
 	"github.com/julienschmidt/httprouter"
 	apirouter "github.com/mrz1836/go-api-router"
 )
@@ -25,9 +25,9 @@ import (
 // @Param		conditions query string false "conditions"
 // @Success		200
 // @Router		/v1/transaction/search [post]
-// @Security	spv-wallet-auth-xpub
+// @Security	x-auth-xpub
 func (a *Action) search(w http.ResponseWriter, req *http.Request, _ httprouter.Params) {
-	reqXPubID, _ := bux.GetXpubIDFromRequest(req)
+	reqXPubID, _ := engine.GetXpubIDFromRequest(req)
 
 	// Parse the params
 	params := apirouter.GetParams(req)
@@ -39,7 +39,7 @@ func (a *Action) search(w http.ResponseWriter, req *http.Request, _ httprouter.P
 	}
 
 	// Record a new transaction (get the hex from parameters)a
-	var transactions []*bux.Transaction
+	var transactions []*engine.Transaction
 	if transactions, err = a.Services.SPV.GetTransactionsByXpubID(
 		req.Context(),
 		reqXPubID,

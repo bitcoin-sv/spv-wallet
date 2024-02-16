@@ -7,7 +7,7 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/bitcoin-sv/bux/chainstate"
+	"github.com/bitcoin-sv/spv-wallet/engine/chainstate"
 	"github.com/rs/zerolog"
 )
 
