@@ -146,9 +146,9 @@ func getNotificationDefaults() *NotificationsConfig {
 func getPaymailDefaults() *PaymailConfig {
 	return &PaymailConfig{
 		Beef: &BeefConfig{
-			UseBeef:                  true,
-			PulseHeaderValidationURL: "http://localhost:8080/api/v1/chain/merkleroot/verify",
-			PulseAuthToken:           "mQZQ6WmxURxWz5ch", // #nosec G101
+			UseBeef:                               true,
+			BlockHeaderServiceHeaderValidationURL: "http://localhost:8080/api/v1/chain/merkleroot/verify",
+			BlockHeaderServiceAuthToken:           "mQZQ6WmxURxWz5ch", // #nosec G101
 		},
 		DefaultFromPaymail:      "from@domain.com",
 		Domains:                 []string{"localhost"},

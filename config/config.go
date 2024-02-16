@@ -209,14 +209,14 @@ type PaymailConfig struct {
 	SenderValidationEnabled bool `json:"sender_validation_enabled" mapstructure:"sender_validation_enabled"`
 }
 
-// BeefConfig consists of components required to use beef, e.g. Pulse for merkle roots validation
+// BeefConfig consists of components required to use beef, e.g. Block Header Service for merkle roots validation
 type BeefConfig struct {
 	// UseBeef is a flag for enabling BEEF transactions format.
 	UseBeef bool `json:"use_beef" mapstructure:"use_beef"`
-	// PulseHeaderValidationURL is the URL for headers validation in Pulse.
-	PulseHeaderValidationURL string `json:"pulse_url" mapstructure:"pulse_url"`
-	// PulseAuthToken is the authentication token for validating headers in Pulse.
-	PulseAuthToken string `json:"pulse_auth_token" mapstructure:"pulse_auth_token"`
+	// BlockHeaderServiceHeaderValidationURL is the URL for headers validation in Block Header Service.
+	BlockHeaderServiceHeaderValidationURL string `json:"block_header_service_url" mapstructure:"block_header_service_url"`
+	// BlockHeaderServiceAuthToken is the authentication token for validating headers in Block Header Service.
+	BlockHeaderServiceAuthToken string `json:"block_header_service_auth_token" mapstructure:"block_header_service_auth_token"`
 }
 
 func (b *BeefConfig) enabled() bool {

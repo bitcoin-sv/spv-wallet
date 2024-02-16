@@ -279,7 +279,7 @@ func loadPaymail(appConfig *AppConfig, options []engine.ClientOps) []engine.Clie
 		pm.SenderValidationEnabled,
 	))
 	if pm.Beef.enabled() {
-		options = append(options, engine.WithPaymailBeefSupport(pm.Beef.PulseHeaderValidationURL, pm.Beef.PulseAuthToken))
+		options = append(options, engine.WithPaymailBeefSupport(pm.Beef.BlockHeaderServiceHeaderValidationURL, pm.Beef.BlockHeaderServiceAuthToken))
 	}
 	return options
 }

@@ -19,36 +19,36 @@ const pastMerkleRootsJSON = `[
 ]`
 
 const (
-	pleaseCheck            = "Please check Pulse configuration and service status."
-	appWillContinue        = "Application will continue to operate but cannot receive transactions until Pulse is online."
-	pulseIsOfflineWarning  = "Unable to connect to Pulse service at startup. " + appWillContinue + " " + pleaseCheck
-	unexpectedResponse     = "Unexpected response from Pulse service. " + pleaseCheck
-	pulseIsNotReadyWarning = "Pulse is responding but is not ready to verify transactions. " + appWillContinue
+	pleaseCheck            = "Please check Block Header Service configuration and service status."
+	appWillContinue        = "Application will continue to operate but cannot receive transactions until Block Header Service is online."
+	blockHeaderServiceIsOfflineWarning  = "Unable to connect to Block Header Service service at startup. " + appWillContinue + " " + pleaseCheck
+	unexpectedResponse     = "Unexpected response from Block Header Service service. " + pleaseCheck
+	blockHeaderServiceIsNotReadyWarning = "Block Header Service is responding but is not ready to verify transactions. " + appWillContinue
 )
 
-// CheckPulse tries to make a request to the Pulse service to check if it is online and ready to verify transactions.
+// CheckBlockHeaderService tries to make a request to the Block Header Service to check if it is online and ready to verify transactions.
 // AppConfig should be validated before calling this method.
-// This method returns nothing, instead it logs either an error or a warning based on the state of the Pulse service.
-func (config *AppConfig) CheckPulse(ctx context.Context, logger *zerolog.Logger) {
-	if !config.PulseEnabled() {
-		// this method works only with Beef/Pulse enabled
+// This method returns nothing, instead it logs either an error or a warning based on the state of the Block Header Service.
+func (config *AppConfig) CheckBlockHeaderService(ctx context.Context, logger *zerolog.Logger) {
+	if !config.BlockHeaderServiceEnabled() {
+		// this method works only with Beef/Block Header Service enabled
 		return
 	}
 	b := config.Paymail.Beef
 
-	logger.Info().Msg("checking Pulse")
+	logger.Info().Msg("checking Block Header Service")
 
 	timedCtx, cancel := context.WithTimeout(ctx, 5*time.Second)
 	defer cancel()
 
-	req, err := http.NewRequestWithContext(timedCtx, "POST", b.PulseHeaderValidationURL, bytes.NewBufferString(pastMerkleRootsJSON))
+	req, err := http.NewRequestWithContext(timedCtx, "POST", b.BlockHeaderServiceHeaderValidationURL, bytes.NewBufferString(pastMerkleRootsJSON))
 	if err != nil {
-		logger.Error().Err(err).Msg("error checking Pulse - failed to create request")
+		logger.Error().Err(err).Msg("error checking Block Header Service - failed to create request")
 		return
 	}
 
-	if b.PulseAuthToken != "" {
-		req.Header.Set("Authorization", "Bearer "+b.PulseAuthToken)
+	if b.BlockHeaderServiceAuthToken != "" {
+		req.Header.Set("Authorization", "Bearer "+b.BlockHeaderServiceAuthToken)
 	}
 	client := &http.Client{}
 	res, err := client.Do(req)
@@ -59,11 +59,11 @@ func (config *AppConfig) CheckPulse(ctx context.Context, logger *zerolog.Logger)
 	}
 
 	if err != nil {
-		logger.Error().Err(err).Msg(pulseIsOfflineWarning)
+		logger.Error().Err(err).Msg(blockHeaderServiceIsOfflineWarning)
 		return
 	}
 	if res.StatusCode != http.StatusOK {
-		logger.Error().Msgf("%s Response statusCode: %d", pulseIsOfflineWarning, res.StatusCode)
+		logger.Error().Msgf("%s Response statusCode: %d", blockHeaderServiceIsOfflineWarning, res.StatusCode)
 		return
 	}
 
@@ -75,14 +75,14 @@ func (config *AppConfig) CheckPulse(ctx context.Context, logger *zerolog.Logger)
 	}
 
 	if responseModel.ConfirmationState != chainstate.Confirmed {
-		logger.Error().Msg(pulseIsNotReadyWarning)
+		logger.Error().Msg(blockHeaderServiceIsNotReadyWarning)
 		return
 	}
 
-	logger.Info().Msg("Pulse is ready to verify transactions.")
+	logger.Info().Msg("Block Header Service is ready to verify transactions.")
 }
 
-// PulseEnabled returns true if the Pulse service is enabled in the AppConfig
-func (config *AppConfig) PulseEnabled() bool {
+// BlockHeaderServiceEnabled returns true if the Block Header Service is enabled in the AppConfig
+func (config *AppConfig) BlockHeaderServiceEnabled() bool {
 	return config.Paymail != nil && config.Paymail.Beef.enabled()
 }
