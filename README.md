@@ -10,15 +10,6 @@
 [![Mergify Status](https://img.shields.io/endpoint.svg?url=https://api.mergify.com/v1/badges/bitcoin-sv/spv-wallet&style=flat&v=3)](https://mergify.io)
 <br>
 
-[![Go](https://img.shields.io/github/go-mod/go-version/bitcoin-sv/spv-wallet?v=3)](https://golang.org/)
-[![Gitpod Ready-to-Code](https://img.shields.io/badge/Gitpod-ready--to--code-blue?logo=gitpod&v=3)](https://gitpod.io/#https://github.com/bitcoin-sv/spv-wallet)
-[![Release](https://img.shields.io/github/release-pre/BuxOrg/spv-wallet.svg?logo=github&style=flat&v=3)](https://github.com/BuxOrg/spv-wallet/releases)
-[![Build Status](https://img.shields.io/github/actions/workflow/status/BuxOrg/spv-wallet/run-tests.yml?branch=master&v=3)](https://github.com/BuxOrg/spv-wallet/actions)
-[![Report](https://goreportcard.com/badge/github.com/BuxOrg/spv-wallet?style=flat&v=3)](https://goreportcard.com/report/github.com/BuxOrg/spv-wallet)
-[![codecov](https://codecov.io/gh/BuxOrg/spv-wallet/branch/master/graph/badge.svg?v=3)](https://codecov.io/gh/BuxOrg/spv-wallet)
-[![Mergify Status](https://img.shields.io/endpoint.svg?url=https://api.mergify.com/v1/badges/BuxOrg/spv-wallet&style=flat&v=3)](https://mergify.io)
-<br>
-
 [![Go](https://img.shields.io/github/go-mod/go-version/BuxOrg/spv-wallet?v=3)](https://golang.org/)
 [![Gitpod Ready-to-Code](https://img.shields.io/badge/Gitpod-ready--to--code-blue?logo=gitpod&v=3)](https://gitpod.io/#https://github.com/BuxOrg/spv-wallet)
 [![standard-readme compliant](https://img.shields.io/badge/readme%20style-standard-brightgreen.svg?style=flat&v=3)](https://github.com/RichardLitt/standard-readme)
@@ -53,7 +44,6 @@ Complete stand-alone server using the SPV Wallet engine (UTXOs, xPubs, Paymail &
 
 ```shell script
 go get -u github.com/bitcoin-sv/spv-wallet
-go get -u github.com/BuxOrg/spv-wallet
 ```
 
 #### build
@@ -351,4 +341,3 @@ View the [contributing guidelines](.github/CODE_STANDARDS.md#3-contributing) and
 ## License
 
 [![License](https://img.shields.io/github/license/bitcoin-sv/spv-wallet.svg?style=flat&v=3)](LICENSE)
-[![License](https://img.shields.io/github/license/BuxOrg/spv-wallet.svg?style=flat&v=3)](LICENSE)
