@@ -9,7 +9,7 @@ include .make/go.mk
 
 ## Not defined? Use default repo name which is the application
 ifeq ($(REPO_NAME),)
-	REPO_NAME="bux"
+	REPO_NAME="spv-wallet"
 endif
 
 ## Not defined? Use default repo owner

@@ -10,8 +10,8 @@
 [![Mergify Status](https://img.shields.io/endpoint.svg?url=https://api.mergify.com/v1/badges/bitcoin-sv/spv-wallet&style=flat&v=3)](https://mergify.io)
 <br>
 
-[![Go](https://img.shields.io/github/go-mod/go-version/BuxOrg/spv-wallet?v=3)](https://golang.org/)
-[![Gitpod Ready-to-Code](https://img.shields.io/badge/Gitpod-ready--to--code-blue?logo=gitpod&v=3)](https://gitpod.io/#https://github.com/BuxOrg/spv-wallet)
+[![Go](https://img.shields.io/github/go-mod/go-version/bitcoin-sv/spv-wallet?v=3)](https://golang.org/)
+[![Gitpod Ready-to-Code](https://img.shields.io/badge/Gitpod-ready--to--code-blue?logo=gitpod&v=3)](https://gitpod.io/#https://github.com/bitcoin-sv/spv-wallet)
 [![standard-readme compliant](https://img.shields.io/badge/readme%20style-standard-brightgreen.svg?style=flat&v=3)](https://github.com/RichardLitt/standard-readme)
 [![Makefile Included](https://img.shields.io/badge/Makefile-Supported%20-brightgreen?=flat&logo=probot&v=3)](Makefile)
 <br/>
@@ -64,9 +64,9 @@ go build -o spv-wallet cmd/server/*
 View the generated [documentation](https://pkg.go.dev/github.com/bitcoin-sv/spv-wallet)
 
 [![GoDoc](https://godoc.org/github.com/bitcoin-sv/spv-wallet?status.svg&style=flat&v=3)](https://pkg.go.dev/github.com/bitcoin-sv/spv-wallet)
-View the generated [documentation](https://pkg.go.dev/github.com/BuxOrg/spv-wallet)
+View the generated [documentation](https://pkg.go.dev/github.com/bitcoin-sv/spv-wallet)
 
-[![GoDoc](https://godoc.org/github.com/BuxOrg/spv-wallet?status.svg&style=flat&v=3)](https://pkg.go.dev/github.com/BuxOrg/spv-wallet)
+[![GoDoc](https://godoc.org/github.com/bitcoin-sv/spv-wallet?status.svg&style=flat&v=3)](https://pkg.go.dev/github.com/bitcoin-sv/spv-wallet)
 
 <br/>
 
@@ -267,7 +267,7 @@ To use your API key put key in ``token`` field in ```config.example.yaml```
 ### Examples & Tests
 
 All unit tests run via [GitHub Actions](https://github.com/bitcoin-sv/spv-wallet/actions) and
-All unit tests run via [GitHub Actions](https://github.com/BuxOrg/spv-wallet/actions) and
+All unit tests run via [GitHub Actions](https://github.com/bitcoin-sv/spv-wallet/actions) and
 uses [Go version 1.19.x](https://golang.org/doc/go1.19). View the [configuration file](.github/workflows/run-tests.yml).
 
 <br/>
