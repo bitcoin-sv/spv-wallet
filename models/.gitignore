@@ -1,0 +1,34 @@
+# Binaries for programs and plugins
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+
+# Test binary, build with `go test -c`
+*.test
+
+# Go List
+go.list
+
+# Output of the go coverage tool, specifically when used with LiteIDE
+*.out
+
+# OS files
+*.db
+*.DS_Store
+
+# Jetbrains
+.idea/
+
+# Eclipse
+.project
+
+# Notes
+todo.md
+
+# Distribution
+dist
+
+# Code coverage
+coverage.txt
