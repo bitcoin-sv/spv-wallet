@@ -1,0 +1,7 @@
+# CODEOWNERS file for bitcoin-sv
+
+# This file is used to designate code owners for files and directories in this repository.
+# The code owner will automatically be requested for review on pull requests that modify the corresponding files.
+
+* @bitcoin-sv/sr-engineers
+* @bitcoin-sv/developers

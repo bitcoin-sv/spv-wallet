@@ -152,3 +152,5 @@ replace github.com/gomodule/redigo => github.com/gomodule/redigo v1.8.9
 replace go.mongodb.org/mongo-driver => go.mongodb.org/mongo-driver v1.11.7
 
 replace github.com/bitcoin-sv/spv-wallet/models => ./models
+
+replace github.com/bitcoin-sv/spv-wallet/engine => ./engine
