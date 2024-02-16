@@ -12,6 +12,15 @@
 
 [![Go](https://img.shields.io/github/go-mod/go-version/bitcoin-sv/spv-wallet?v=3)](https://golang.org/)
 [![Gitpod Ready-to-Code](https://img.shields.io/badge/Gitpod-ready--to--code-blue?logo=gitpod&v=3)](https://gitpod.io/#https://github.com/bitcoin-sv/spv-wallet)
+[![Release](https://img.shields.io/github/release-pre/BuxOrg/spv-wallet.svg?logo=github&style=flat&v=3)](https://github.com/BuxOrg/spv-wallet/releases)
+[![Build Status](https://img.shields.io/github/actions/workflow/status/BuxOrg/spv-wallet/run-tests.yml?branch=master&v=3)](https://github.com/BuxOrg/spv-wallet/actions)
+[![Report](https://goreportcard.com/badge/github.com/BuxOrg/spv-wallet?style=flat&v=3)](https://goreportcard.com/report/github.com/BuxOrg/spv-wallet)
+[![codecov](https://codecov.io/gh/BuxOrg/spv-wallet/branch/master/graph/badge.svg?v=3)](https://codecov.io/gh/BuxOrg/spv-wallet)
+[![Mergify Status](https://img.shields.io/endpoint.svg?url=https://api.mergify.com/v1/badges/BuxOrg/spv-wallet&style=flat&v=3)](https://mergify.io)
+<br>
+
+[![Go](https://img.shields.io/github/go-mod/go-version/BuxOrg/spv-wallet?v=3)](https://golang.org/)
+[![Gitpod Ready-to-Code](https://img.shields.io/badge/Gitpod-ready--to--code-blue?logo=gitpod&v=3)](https://gitpod.io/#https://github.com/BuxOrg/spv-wallet)
 [![standard-readme compliant](https://img.shields.io/badge/readme%20style-standard-brightgreen.svg?style=flat&v=3)](https://github.com/RichardLitt/standard-readme)
 [![Makefile Included](https://img.shields.io/badge/Makefile-Supported%20-brightgreen?=flat&logo=probot&v=3)](Makefile)
 <br/>
@@ -44,6 +53,7 @@ Complete stand-alone server using the SPV Wallet engine (UTXOs, xPubs, Paymail &
 
 ```shell script
 go get -u github.com/bitcoin-sv/spv-wallet
+go get -u github.com/BuxOrg/spv-wallet
 ```
 
 #### build
@@ -64,6 +74,9 @@ go build -o spv-wallet cmd/server/*
 View the generated [documentation](https://pkg.go.dev/github.com/bitcoin-sv/spv-wallet)
 
 [![GoDoc](https://godoc.org/github.com/bitcoin-sv/spv-wallet?status.svg&style=flat&v=3)](https://pkg.go.dev/github.com/bitcoin-sv/spv-wallet)
+View the generated [documentation](https://pkg.go.dev/github.com/BuxOrg/spv-wallet)
+
+[![GoDoc](https://godoc.org/github.com/BuxOrg/spv-wallet?status.svg&style=flat&v=3)](https://pkg.go.dev/github.com/BuxOrg/spv-wallet)
 
 <br/>
 
@@ -264,6 +277,7 @@ To use your API key put key in ``token`` field in ```config.example.yaml```
 ### Examples & Tests
 
 All unit tests run via [GitHub Actions](https://github.com/bitcoin-sv/spv-wallet/actions) and
+All unit tests run via [GitHub Actions](https://github.com/BuxOrg/spv-wallet/actions) and
 uses [Go version 1.19.x](https://golang.org/doc/go1.19). View the [configuration file](.github/workflows/run-tests.yml).
 
 <br/>
@@ -337,3 +351,4 @@ View the [contributing guidelines](.github/CODE_STANDARDS.md#3-contributing) and
 ## License
 
 [![License](https://img.shields.io/github/license/bitcoin-sv/spv-wallet.svg?style=flat&v=3)](LICENSE)
+[![License](https://img.shields.io/github/license/BuxOrg/spv-wallet.svg?style=flat&v=3)](LICENSE)
