@@ -3,7 +3,7 @@ module github.com/BuxOrg/bux-server
 go 1.21.5
 
 require (
-	github.com/BuxOrg/bux v0.14.5
+	github.com/BuxOrg/bux v0.14.5-0.20240215141332-981aaae1d70a
 	github.com/BuxOrg/bux-models v0.3.0
 	github.com/bitcoin-sv/go-broadcast-client v0.17.2
 	github.com/go-ozzo/ozzo-validation v3.6.0+incompatible
@@ -27,9 +27,17 @@ require (
 
 require (
 	github.com/beorn7/perks v1.0.1 // indirect
+	github.com/centrifugal/centrifuge-go v0.10.2 // indirect
+	github.com/centrifugal/protocol v0.11.0 // indirect
+	github.com/gorilla/websocket v1.5.1 // indirect
+	github.com/jpillora/backoff v1.0.0 // indirect
 	github.com/prometheus/client_model v0.5.0 // indirect
 	github.com/prometheus/common v0.46.0 // indirect
 	github.com/prometheus/procfs v0.12.0 // indirect
+	github.com/segmentio/asm v1.2.0 // indirect
+	github.com/segmentio/encoding v0.4.0 // indirect
+	github.com/tylertreat/BoomFilters v0.0.0-20210315201527-1a82519a3e43 // indirect
+	github.com/valyala/bytebufferpool v1.0.0 // indirect
 )
 
 require (
