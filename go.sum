@@ -4,6 +4,8 @@ github.com/BuxOrg/bux v0.14.5-0.20240215141332-981aaae1d70a h1:eDvsbhrpzAMxdijad
 github.com/BuxOrg/bux v0.14.5-0.20240215141332-981aaae1d70a/go.mod h1:sDeOTJshHA0rduuag5NGnMUEe0oC/gVKKPuHlPIMpYI=
 github.com/BuxOrg/bux v0.14.5 h1:fSgxhesAOBliCv0MwTMssupdmRZ+lfHQElyRE0YpcZk=
 github.com/BuxOrg/bux v0.14.5/go.mod h1:je8b1btINOvd4iiVhU5HnbE8MEY8EmINs4vuiWpuVGM=
+github.com/BuxOrg/bux v0.14.6-0.20240217183815-7b28325fec9e h1:iknvG9qlUGiz4w/zx22wqJEtbWljPc3tTmemsodIZkg=
+github.com/BuxOrg/bux v0.14.6-0.20240217183815-7b28325fec9e/go.mod h1:je8b1btINOvd4iiVhU5HnbE8MEY8EmINs4vuiWpuVGM=
 github.com/BuxOrg/bux-models v0.3.0 h1:+pvpDdYaiIgeOhAO847RK07Vzc+vuUvy2ok/xJevQyg=
 github.com/BuxOrg/bux-models v0.3.0/go.mod h1:JCpoXxVnKZmCy3rg6nOtLQL5AXh6iEo2tBvcD/qAxEY=
 github.com/DATA-DOG/go-sqlmock v1.5.2 h1:OcvFkGmslmlZibjAjaHm3L//6LiuBgolP7OputlJIzU=
