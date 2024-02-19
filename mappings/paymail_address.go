@@ -3,16 +3,16 @@ package mappings
 import (
 	"github.com/bitcoin-sv/spv-wallet/engine"
 	"github.com/bitcoin-sv/spv-wallet/mappings/common"
-	spvwalletmodels "github.com/bitcoin-sv/spv-wallet/models"
+	"github.com/bitcoin-sv/spv-wallet/models"
 )
 
 // MapToPaymailContract will map the spv-wallet paymail-address model to the spv-wallet-models contract
-func MapToPaymailContract(pa *engine.PaymailAddress) *spvwalletmodels.PaymailAddress {
+func MapToPaymailContract(pa *engine.PaymailAddress) *models.PaymailAddress {
 	if pa == nil {
 		return nil
 	}
 
-	return &spvwalletmodels.PaymailAddress{
+	return &models.PaymailAddress{
 		Model:           *common.MapToContract(&pa.Model),
 		ID:              pa.ID,
 		XpubID:          pa.XpubID,
@@ -25,12 +25,12 @@ func MapToPaymailContract(pa *engine.PaymailAddress) *spvwalletmodels.PaymailAdd
 }
 
 // MapToPaymailP4Contract will map the spv-wallet-models paymail-address contract to the spv-wallet paymail-address model
-func MapToPaymailP4Contract(p *engine.PaymailP4) *spvwalletmodels.PaymailP4 {
+func MapToPaymailP4Contract(p *engine.PaymailP4) *models.PaymailP4 {
 	if p == nil {
 		return nil
 	}
 
-	return &spvwalletmodels.PaymailP4{
+	return &models.PaymailP4{
 		Alias:           p.Alias,
 		Domain:          p.Domain,
 		FromPaymail:     p.FromPaymail,
@@ -43,7 +43,7 @@ func MapToPaymailP4Contract(p *engine.PaymailP4) *spvwalletmodels.PaymailP4 {
 }
 
 // MapToPaymailP4SPV will map the spv-wallet-models paymail-address contract to the spv-wallet paymail-address model
-func MapToPaymailP4SPV(p *spvwalletmodels.PaymailP4) *engine.PaymailP4 {
+func MapToPaymailP4SPV(p *models.PaymailP4) *engine.PaymailP4 {
 	if p == nil {
 		return nil
 	}

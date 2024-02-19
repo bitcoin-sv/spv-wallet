@@ -32,7 +32,7 @@ func (a *Action) RequireAuthentication(fn httprouter.Handle) httprouter.Handle {
 	return func(w http.ResponseWriter, req *http.Request, p httprouter.Params) {
 		// Check the authentication
 		var knownErr dictionary.ErrorMessage
-		if req, knownErr = CheckAuthentication(a.AppConfig, a.Services.SPV, req, false, true); knownErr.Code > 0 {
+		if req, knownErr = CheckAuthentication(a.AppConfig, a.Services.SpvWalletEngine, req, false, true); knownErr.Code > 0 {
 			ReturnErrorResponse(w, req, knownErr, "")
 			return
 		}
@@ -47,7 +47,7 @@ func (a *Action) RequireBasicAuthentication(fn httprouter.Handle) httprouter.Han
 	return func(w http.ResponseWriter, req *http.Request, p httprouter.Params) {
 		// Check the authentication
 		var knownErr dictionary.ErrorMessage
-		if req, knownErr = CheckAuthentication(a.AppConfig, a.Services.SPV, req, false, false); knownErr.Code > 0 {
+		if req, knownErr = CheckAuthentication(a.AppConfig, a.Services.SpvWalletEngine, req, false, false); knownErr.Code > 0 {
 			ReturnErrorResponse(w, req, knownErr, "")
 			return
 		}
@@ -62,7 +62,7 @@ func (a *Action) RequireAdminAuthentication(fn httprouter.Handle) httprouter.Han
 	return func(w http.ResponseWriter, req *http.Request, p httprouter.Params) {
 		// Check the authentication
 		var knownErr dictionary.ErrorMessage
-		if req, knownErr = CheckAuthentication(a.AppConfig, a.Services.SPV, req, true, true); knownErr.Code > 0 {
+		if req, knownErr = CheckAuthentication(a.AppConfig, a.Services.SpvWalletEngine, req, true, true); knownErr.Code > 0 {
 			ReturnErrorResponse(w, req, knownErr, "")
 			return
 		}

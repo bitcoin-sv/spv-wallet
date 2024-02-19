@@ -6,7 +6,7 @@ import (
 	"github.com/bitcoin-sv/spv-wallet/actions"
 	"github.com/bitcoin-sv/spv-wallet/engine"
 	"github.com/bitcoin-sv/spv-wallet/mappings"
-	spvwalletmodels "github.com/bitcoin-sv/spv-wallet/models"
+	"github.com/bitcoin-sv/spv-wallet/models"
 	"github.com/julienschmidt/httprouter"
 	apirouter "github.com/mrz1836/go-api-router"
 )
@@ -40,7 +40,7 @@ func (a *Action) search(w http.ResponseWriter, req *http.Request, _ httprouter.P
 
 	// Record a new transaction (get the hex from parameters)a
 	var utxos []*engine.Utxo
-	if utxos, err = a.Services.SPV.GetUtxosByXpubID(
+	if utxos, err = a.Services.SpvWalletEngine.GetUtxosByXpubID(
 		req.Context(),
 		reqXPubID,
 		metadata,
@@ -51,7 +51,7 @@ func (a *Action) search(w http.ResponseWriter, req *http.Request, _ httprouter.P
 		return
 	}
 
-	contracts := make([]*spvwalletmodels.Utxo, 0)
+	contracts := make([]*models.Utxo, 0)
 	for _, utxo := range utxos {
 		contracts = append(contracts, mappings.MapToUtxoContract(utxo))
 	}

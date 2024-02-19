@@ -30,7 +30,7 @@ func (a *Action) update(w http.ResponseWriter, req *http.Request, _ httprouter.P
 	metadata := params.GetJSON(actions.MetadataField)
 
 	// Get a transaction by ID
-	transaction, err := a.Services.SPV.UpdateTransactionMetadata(
+	transaction, err := a.Services.SpvWalletEngine.UpdateTransactionMetadata(
 		req.Context(),
 		reqXPubID,
 		params.GetString("id"),

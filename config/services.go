@@ -25,9 +25,9 @@ import (
 // AppServices is the loaded services via config
 type (
 	AppServices struct {
-		SPV      engine.ClientInterface
-		NewRelic *newrelic.Application
-		Logger   *zerolog.Logger
+		SpvWalletEngine engine.ClientInterface
+		NewRelic        *newrelic.Application
+		Logger          *zerolog.Logger
 	}
 )
 
@@ -115,9 +115,9 @@ func (a *AppConfig) loadNewRelic(services *AppServices) (err error) {
 // CloseAll will close all connections to all services
 func (s *AppServices) CloseAll(ctx context.Context) {
 	// Close SPV
-	if s.SPV != nil {
-		_ = s.SPV.Close(ctx)
-		s.SPV = nil
+	if s.SpvWalletEngine != nil {
+		_ = s.SpvWalletEngine.Close(ctx)
+		s.SpvWalletEngine = nil
 	}
 
 	// Close new relic
@@ -202,7 +202,7 @@ func (s *AppServices) loadSPV(ctx context.Context, appConfig *AppConfig, testMod
 	}
 
 	// Create the new client
-	s.SPV, err = engine.NewClient(ctx, options...)
+	s.SpvWalletEngine, err = engine.NewClient(ctx, options...)
 
 	return
 }

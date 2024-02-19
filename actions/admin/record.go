@@ -31,7 +31,7 @@ func (a *Action) transactionRecord(w http.ResponseWriter, req *http.Request, _ h
 	opts := make([]engine.ModelOps, 0)
 
 	// Record a new transaction (get the hex from parameters)
-	transaction, err := a.Services.SPV.RecordRawTransaction(
+	transaction, err := a.Services.SpvWalletEngine.RecordRawTransaction(
 		req.Context(),
 		hex,
 		opts...,
@@ -39,7 +39,7 @@ func (a *Action) transactionRecord(w http.ResponseWriter, req *http.Request, _ h
 	if err != nil {
 		if errors.Is(err, datastore.ErrDuplicateKey) {
 			// already registered, just return the registered transaction
-			if transaction, err = a.Services.SPV.GetTransactionByHex(req.Context(), hex); err != nil {
+			if transaction, err = a.Services.SpvWalletEngine.GetTransactionByHex(req.Context(), hex); err != nil {
 				apirouter.ReturnResponse(w, req, http.StatusUnprocessableEntity, err.Error())
 				return
 			}

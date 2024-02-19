@@ -36,7 +36,7 @@ func (a *Action) utxosSearch(w http.ResponseWriter, req *http.Request, _ httprou
 	}
 
 	var utxos []*engine.Utxo
-	if utxos, err = a.Services.SPV.GetUtxos(
+	if utxos, err = a.Services.SpvWalletEngine.GetUtxos(
 		req.Context(),
 		metadata,
 		conditions,
@@ -72,7 +72,7 @@ func (a *Action) utxosCount(w http.ResponseWriter, req *http.Request, _ httprout
 	}
 
 	var count int64
-	if count, err = a.Services.SPV.GetUtxosCount(
+	if count, err = a.Services.SpvWalletEngine.GetUtxosCount(
 		req.Context(),
 		metadata,
 		conditions,

@@ -6,7 +6,7 @@ import (
 	"github.com/bitcoin-sv/spv-wallet/actions"
 	"github.com/bitcoin-sv/spv-wallet/engine"
 	"github.com/bitcoin-sv/spv-wallet/mappings"
-	spvwalletmodels "github.com/bitcoin-sv/spv-wallet/models"
+	"github.com/bitcoin-sv/spv-wallet/models"
 	"github.com/julienschmidt/httprouter"
 	apirouter "github.com/mrz1836/go-api-router"
 )
@@ -37,7 +37,7 @@ func (a *Action) transactionsSearch(w http.ResponseWriter, req *http.Request, _ 
 	}
 
 	var transactions []*engine.Transaction
-	if transactions, err = a.Services.SPV.GetTransactions(
+	if transactions, err = a.Services.SpvWalletEngine.GetTransactions(
 		req.Context(),
 		metadata,
 		conditions,
@@ -47,7 +47,7 @@ func (a *Action) transactionsSearch(w http.ResponseWriter, req *http.Request, _ 
 		return
 	}
 
-	contracts := make([]*spvwalletmodels.Transaction, 0)
+	contracts := make([]*models.Transaction, 0)
 	for _, transaction := range transactions {
 		contracts = append(contracts, mappings.MapToTransactionContractForAdmin(transaction))
 	}
@@ -78,7 +78,7 @@ func (a *Action) transactionsCount(w http.ResponseWriter, req *http.Request, _ h
 	}
 
 	var count int64
-	if count, err = a.Services.SPV.GetTransactionsCount(
+	if count, err = a.Services.SpvWalletEngine.GetTransactionsCount(
 		req.Context(),
 		metadata,
 		conditions,

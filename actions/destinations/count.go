@@ -35,7 +35,7 @@ func (a *Action) count(w http.ResponseWriter, req *http.Request, _ httprouter.Pa
 
 	// Record a new transaction (get the hex from parameters)
 	var count int64
-	if count, err = a.Services.SPV.GetDestinationsByXpubIDCount(
+	if count, err = a.Services.SpvWalletEngine.GetDestinationsByXpubIDCount(
 		req.Context(),
 		reqXPubID,
 		metadata,

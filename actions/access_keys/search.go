@@ -6,7 +6,7 @@ import (
 	"github.com/bitcoin-sv/spv-wallet/actions"
 	"github.com/bitcoin-sv/spv-wallet/engine"
 	"github.com/bitcoin-sv/spv-wallet/mappings"
-	spvwalletmodels "github.com/bitcoin-sv/spv-wallet/models"
+	"github.com/bitcoin-sv/spv-wallet/models"
 	"github.com/julienschmidt/httprouter"
 	apirouter "github.com/mrz1836/go-api-router"
 )
@@ -40,7 +40,7 @@ func (a *Action) search(w http.ResponseWriter, req *http.Request, _ httprouter.P
 
 	// Record a new transaction (get the hex from parameters)a
 	var accessKeys []*engine.AccessKey
-	if accessKeys, err = a.Services.SPV.GetAccessKeysByXPubID(
+	if accessKeys, err = a.Services.SpvWalletEngine.GetAccessKeysByXPubID(
 		req.Context(),
 		reqXPubID,
 		metadata,
@@ -51,7 +51,7 @@ func (a *Action) search(w http.ResponseWriter, req *http.Request, _ httprouter.P
 		return
 	}
 
-	accessKeyContracts := make([]*spvwalletmodels.AccessKey, 0)
+	accessKeyContracts := make([]*models.AccessKey, 0)
 	for _, accessKey := range accessKeys {
 		accessKeyContracts = append(accessKeyContracts, mappings.MapToAccessKeyContract(accessKey))
 	}

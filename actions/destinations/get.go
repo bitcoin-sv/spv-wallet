@@ -38,15 +38,15 @@ func (a *Action) get(w http.ResponseWriter, req *http.Request, _ httprouter.Para
 	var destination *engine.Destination
 	var err error
 	if id != "" {
-		destination, err = a.Services.SPV.GetDestinationByID(
+		destination, err = a.Services.SpvWalletEngine.GetDestinationByID(
 			req.Context(), reqXPubID, id,
 		)
 	} else if address != "" {
-		destination, err = a.Services.SPV.GetDestinationByAddress(
+		destination, err = a.Services.SpvWalletEngine.GetDestinationByAddress(
 			req.Context(), reqXPubID, address,
 		)
 	} else {
-		destination, err = a.Services.SPV.GetDestinationByLockingScript(
+		destination, err = a.Services.SpvWalletEngine.GetDestinationByLockingScript(
 			req.Context(), reqXPubID, lockingScript,
 		)
 	}

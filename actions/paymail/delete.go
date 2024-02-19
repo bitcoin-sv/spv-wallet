@@ -24,10 +24,10 @@ func (a *Action) delete(w http.ResponseWriter, req *http.Request, _ httprouter.P
 	// params
 	address := params.GetString("address") // the full paymail address
 
-	opts := a.Services.SPV.DefaultModelOptions()
+	opts := a.Services.SpvWalletEngine.DefaultModelOptions()
 
 	// Delete a new paymail address
-	err := a.Services.SPV.DeletePaymailAddress(
+	err := a.Services.SpvWalletEngine.DeletePaymailAddress(
 		req.Context(), address, opts...,
 	)
 	if err != nil {

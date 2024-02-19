@@ -37,7 +37,7 @@ func (a *Action) xpubsSearch(w http.ResponseWriter, req *http.Request, _ httprou
 	}
 
 	var xpubs []*engine.Xpub
-	if xpubs, err = a.Services.SPV.GetXPubs(
+	if xpubs, err = a.Services.SpvWalletEngine.GetXPubs(
 		req.Context(),
 		metadata,
 		conditions,
@@ -73,7 +73,7 @@ func (a *Action) xpubsCount(w http.ResponseWriter, req *http.Request, _ httprout
 	}
 
 	var count int64
-	if count, err = a.Services.SPV.GetXPubsCount(
+	if count, err = a.Services.SpvWalletEngine.GetXPubsCount(
 		req.Context(),
 		metadata,
 		conditions,

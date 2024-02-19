@@ -27,7 +27,7 @@ func (a *Action) get(w http.ResponseWriter, req *http.Request, _ httprouter.Para
 	reqXPubID, _ := engine.GetXpubIDFromRequest(req)
 
 	// Get a transaction by ID
-	transaction, err := a.Services.SPV.GetTransaction(
+	transaction, err := a.Services.SpvWalletEngine.GetTransaction(
 		req.Context(),
 		reqXPubID,
 		params.GetString("id"),

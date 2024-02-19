@@ -18,7 +18,7 @@ import (
 // @Router		/v1/admin/stats [get]
 // @Security	x-auth-xpub
 func (a *Action) stats(w http.ResponseWriter, req *http.Request, _ httprouter.Params) {
-	stats, err := a.Services.SPV.GetStats(req.Context())
+	stats, err := a.Services.SpvWalletEngine.GetStats(req.Context())
 	if err != nil {
 		apirouter.ReturnResponse(w, req, http.StatusExpectationFailed, err.Error())
 		return

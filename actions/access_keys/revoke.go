@@ -32,7 +32,7 @@ func (a *Action) revoke(w http.ResponseWriter, req *http.Request, _ httprouter.P
 	}
 
 	// Create a new accessKey
-	accessKey, err := a.Services.SPV.RevokeAccessKey(
+	accessKey, err := a.Services.SpvWalletEngine.RevokeAccessKey(
 		req.Context(),
 		reqXPub,
 		id,

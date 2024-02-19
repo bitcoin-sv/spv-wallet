@@ -49,7 +49,6 @@ func newTestPaymailConfig(t *testing.T, domain string) *server.Configuration {
 // mockValidResponse is used for mocking the response
 func mockValidResponse(statusCode int, p2p bool, domain string) {
 	httpmock.Reset()
-
 	serverURL := "https://" + domain + "/api/v1/" + paymail.DefaultServiceName
 
 	// Basic address resolution vs P2P

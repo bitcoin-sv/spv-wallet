@@ -18,7 +18,7 @@ func RegisterRoutes(router *apirouter.Router, appConfig *config.AppConfig, servi
 	requireAdmin.Use(a.RequireAdminAuthentication)
 
 	// Register the custom Paymail routes
-	services.SPV.GetPaymailConfig().RegisterRoutes(router.HTTPRouter)
+	services.SpvWalletEngine.GetPaymailConfig().RegisterRoutes(router.HTTPRouter)
 
 	// Create the action
 	action := &Action{actions.Action{AppConfig: a.AppConfig, Services: a.Services}}

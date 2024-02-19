@@ -29,7 +29,7 @@ func (a *Action) get(w http.ResponseWriter, req *http.Request, _ httprouter.Para
 	outputIndex := uint32(params.GetUint64("output_index"))
 
 	// Get a utxo using a xPub
-	utxo, err := a.Services.SPV.GetUtxo(
+	utxo, err := a.Services.SpvWalletEngine.GetUtxo(
 		req.Context(),
 		reqXPubID,
 		txID,

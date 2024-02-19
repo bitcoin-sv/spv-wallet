@@ -17,7 +17,7 @@ import (
 )
 
 // main method starts everything for the SPV Wallet
-// @title           SPV: Wallet
+// @title           SPV Wallet
 // @version         v0.12.0
 // @securityDefinitions.apikey x-auth-xpub
 // @in header

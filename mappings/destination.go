@@ -3,16 +3,16 @@ package mappings
 import (
 	"github.com/bitcoin-sv/spv-wallet/engine"
 	"github.com/bitcoin-sv/spv-wallet/mappings/common"
-	spvwalletmodels "github.com/bitcoin-sv/spv-wallet/models"
+	"github.com/bitcoin-sv/spv-wallet/models"
 )
 
 // MapToDestinationContract will map the spv-wallet destination model to the spv-wallet-models contract
-func MapToDestinationContract(d *engine.Destination) *spvwalletmodels.Destination {
+func MapToDestinationContract(d *engine.Destination) *models.Destination {
 	if d == nil {
 		return nil
 	}
 
-	return &spvwalletmodels.Destination{
+	return &models.Destination{
 		Model:         *common.MapToContract(&d.Model),
 		ID:            d.ID,
 		XpubID:        d.XpubID,
@@ -26,7 +26,7 @@ func MapToDestinationContract(d *engine.Destination) *spvwalletmodels.Destinatio
 }
 
 // MapToDestinationSPV will map the spv-wallet-models destination contract to the spv-wallet destination model
-func MapToDestinationSPV(d *spvwalletmodels.Destination) *engine.Destination {
+func MapToDestinationSPV(d *models.Destination) *engine.Destination {
 	if d == nil {
 		return nil
 	}

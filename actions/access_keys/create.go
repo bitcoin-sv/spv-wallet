@@ -29,7 +29,7 @@ func (a *Action) create(w http.ResponseWriter, req *http.Request, _ httprouter.P
 	metadata := params.GetJSON("metadata")
 
 	// Create a new accessKey
-	accessKey, err := a.Services.SPV.NewAccessKey(
+	accessKey, err := a.Services.SpvWalletEngine.NewAccessKey(
 		req.Context(),
 		reqXPub,
 		engine.WithMetadatas(metadata),

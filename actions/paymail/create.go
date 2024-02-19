@@ -34,13 +34,13 @@ func (a *Action) create(w http.ResponseWriter, req *http.Request, _ httprouter.P
 	avatar := params.GetString("avatar")          // the avatar
 	metadata := params.GetJSON("metadata")        // optional metadata
 
-	opts := a.Services.SPV.DefaultModelOptions()
+	opts := a.Services.SpvWalletEngine.DefaultModelOptions()
 
 	if metadata != nil {
 		opts = append(opts, engine.WithMetadatas(metadata))
 	}
 
-	paymailAddress, err := a.Services.SPV.NewPaymailAddress(req.Context(), key, address, publicName, avatar, opts...)
+	paymailAddress, err := a.Services.SpvWalletEngine.NewPaymailAddress(req.Context(), key, address, publicName, avatar, opts...)
 	if err != nil {
 		apirouter.ReturnResponse(w, req, http.StatusUnprocessableEntity, err.Error())
 		return

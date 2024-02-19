@@ -36,7 +36,7 @@ func (a *Action) destinationsSearch(w http.ResponseWriter, req *http.Request, _ 
 	}
 
 	var destinations []*engine.Destination
-	if destinations, err = a.Services.SPV.GetDestinations(
+	if destinations, err = a.Services.SpvWalletEngine.GetDestinations(
 		req.Context(),
 		metadata,
 		conditions,
@@ -72,7 +72,7 @@ func (a *Action) destinationsCount(w http.ResponseWriter, req *http.Request, _ h
 	}
 
 	var count int64
-	if count, err = a.Services.SPV.GetDestinationsCount(
+	if count, err = a.Services.SpvWalletEngine.GetDestinationsCount(
 		req.Context(),
 		metadata,
 		conditions,

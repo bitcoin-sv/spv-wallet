@@ -31,7 +31,7 @@ func (a *Action) update(w http.ResponseWriter, req *http.Request, _ httprouter.P
 	// Get an xPub
 	var xPub *engine.Xpub
 	var err error
-	xPub, err = a.Services.SPV.UpdateXpubMetadata(
+	xPub, err = a.Services.SpvWalletEngine.UpdateXpubMetadata(
 		req.Context(), reqXPubID, metadata,
 	)
 	if err != nil {

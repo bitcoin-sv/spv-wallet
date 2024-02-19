@@ -42,7 +42,7 @@ func (a *Action) count(w http.ResponseWriter, req *http.Request, _ httprouter.Pa
 
 	// Get a utxo using a xPub
 	var count int64
-	if count, err = a.Services.SPV.GetUtxosCount(
+	if count, err = a.Services.SpvWalletEngine.GetUtxosCount(
 		req.Context(),
 		metadata,
 		&dbConditions,

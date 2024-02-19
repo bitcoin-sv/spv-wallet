@@ -32,7 +32,7 @@ func (a *Action) get(w http.ResponseWriter, req *http.Request, _ httprouter.Para
 	}
 
 	// Get access key
-	accessKey, err := a.Services.SPV.GetAccessKey(
+	accessKey, err := a.Services.SpvWalletEngine.GetAccessKey(
 		req.Context(), reqXPubID, id,
 	)
 	if err != nil {

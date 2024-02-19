@@ -3,24 +3,24 @@ package mappings
 import (
 	"github.com/bitcoin-sv/spv-wallet/engine"
 	"github.com/bitcoin-sv/spv-wallet/mappings/common"
-	spvwalletmodels "github.com/bitcoin-sv/spv-wallet/models"
+	"github.com/bitcoin-sv/spv-wallet/models"
 	customtypes "github.com/mrz1836/go-datastore/custom_types"
 )
 
 // MapToUtxoPointer will map the utxo-pointer model from spv-wallet to the spv-wallet-models contract
-func MapToUtxoPointer(u *engine.UtxoPointer) *spvwalletmodels.UtxoPointer {
+func MapToUtxoPointer(u *engine.UtxoPointer) *models.UtxoPointer {
 	if u == nil {
 		return nil
 	}
 
-	return &spvwalletmodels.UtxoPointer{
+	return &models.UtxoPointer{
 		TransactionID: u.TransactionID,
 		OutputIndex:   u.OutputIndex,
 	}
 }
 
 // MapToUtxoPointerSPV will map the utxo-pointer model from spv-wallet-models to the spv-wallet contract
-func MapToUtxoPointerSPV(u *spvwalletmodels.UtxoPointer) *engine.UtxoPointer {
+func MapToUtxoPointerSPV(u *models.UtxoPointer) *engine.UtxoPointer {
 	if u == nil {
 		return nil
 	}
@@ -32,12 +32,12 @@ func MapToUtxoPointerSPV(u *spvwalletmodels.UtxoPointer) *engine.UtxoPointer {
 }
 
 // MapToUtxoContract will map the utxo model from spv-wallet to the spv-wallet-models contract
-func MapToUtxoContract(u *engine.Utxo) *spvwalletmodels.Utxo {
+func MapToUtxoContract(u *engine.Utxo) *models.Utxo {
 	if u == nil {
 		return nil
 	}
 
-	return &spvwalletmodels.Utxo{
+	return &models.Utxo{
 		Model:        *common.MapToContract(&u.Model),
 		UtxoPointer:  *MapToUtxoPointer(&u.UtxoPointer),
 		ID:           u.ID,
@@ -52,7 +52,7 @@ func MapToUtxoContract(u *engine.Utxo) *spvwalletmodels.Utxo {
 }
 
 // MapToUtxoSPV will map the utxo model from spv-wallet-models to the spv-wallet contract
-func MapToUtxoSPV(u *spvwalletmodels.Utxo) *engine.Utxo {
+func MapToUtxoSPV(u *models.Utxo) *engine.Utxo {
 	if u == nil {
 		return nil
 	}

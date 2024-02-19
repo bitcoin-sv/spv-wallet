@@ -30,7 +30,7 @@ func (a *Action) create(w http.ResponseWriter, req *http.Request, _ httprouter.P
 	metadata := params.GetJSON(actions.MetadataField)
 
 	// Create a new xPub
-	xPub, err := a.Services.SPV.NewXpub(
+	xPub, err := a.Services.SpvWalletEngine.NewXpub(
 		req.Context(), key,
 		engine.WithMetadatas(metadata),
 	)

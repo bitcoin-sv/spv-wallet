@@ -22,7 +22,7 @@ func (a *Action) unreserve(w http.ResponseWriter, req *http.Request, _ httproute
 	reqXPubID, _ := engine.GetXpubIDFromRequest(req)
 	params := apirouter.GetParams(req)
 
-	err := a.Services.SPV.UnReserveUtxos(
+	err := a.Services.SpvWalletEngine.UnReserveUtxos(
 		req.Context(),
 		reqXPubID,
 		params.GetString(engine.ReferenceIDField),

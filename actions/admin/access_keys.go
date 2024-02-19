@@ -6,7 +6,7 @@ import (
 	"github.com/bitcoin-sv/spv-wallet/actions"
 	"github.com/bitcoin-sv/spv-wallet/engine"
 	"github.com/bitcoin-sv/spv-wallet/mappings"
-	spvwalletmodels "github.com/bitcoin-sv/spv-wallet/models"
+	"github.com/bitcoin-sv/spv-wallet/models"
 	"github.com/julienschmidt/httprouter"
 	apirouter "github.com/mrz1836/go-api-router"
 )
@@ -37,7 +37,7 @@ func (a *Action) accessKeysSearch(w http.ResponseWriter, req *http.Request, _ ht
 	}
 
 	var accessKeys []*engine.AccessKey
-	if accessKeys, err = a.Services.SPV.GetAccessKeys(
+	if accessKeys, err = a.Services.SpvWalletEngine.GetAccessKeys(
 		req.Context(),
 		metadata,
 		conditions,
@@ -47,7 +47,7 @@ func (a *Action) accessKeysSearch(w http.ResponseWriter, req *http.Request, _ ht
 		return
 	}
 
-	accessKeyContracts := make([]*spvwalletmodels.AccessKey, 0)
+	accessKeyContracts := make([]*models.AccessKey, 0)
 	for _, accessKey := range accessKeys {
 		accessKeyContracts = append(accessKeyContracts, mappings.MapToAccessKeyContract(accessKey))
 	}
@@ -78,7 +78,7 @@ func (a *Action) accessKeysCount(w http.ResponseWriter, req *http.Request, _ htt
 	}
 
 	var count int64
-	if count, err = a.Services.SPV.GetAccessKeysCount(
+	if count, err = a.Services.SpvWalletEngine.GetAccessKeysCount(
 		req.Context(),
 		metadata,
 		conditions,

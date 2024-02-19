@@ -34,7 +34,7 @@ func TestAppServices_CloseAll(t *testing.T) {
 		require.NotNil(t, s)
 		s.CloseAll(context.Background())
 
-		assert.Nil(t, s.SPV)
+		assert.Nil(t, s.SpvWalletEngine)
 		assert.Nil(t, s.NewRelic)
 	})
 }

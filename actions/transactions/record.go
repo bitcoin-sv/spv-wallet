@@ -3,7 +3,6 @@ package transactions
 import (
 	"net/http"
 
-
 	"github.com/bitcoin-sv/spv-wallet/actions"
 	"github.com/bitcoin-sv/spv-wallet/engine"
 	"github.com/bitcoin-sv/spv-wallet/mappings"
@@ -29,7 +28,7 @@ func (a *Action) record(w http.ResponseWriter, req *http.Request, _ httprouter.P
 
 	// Get the xPub from the request (via authentication)
 	reqXPub, _ := engine.GetXpubFromRequest(req)
-	xPub, err := a.Services.SPV.GetXpub(req.Context(), reqXPub)
+	xPub, err := a.Services.SpvWalletEngine.GetXpub(req.Context(), reqXPub)
 	if err != nil {
 		apirouter.ReturnResponse(w, req, http.StatusUnprocessableEntity, err.Error())
 		return
@@ -47,7 +46,7 @@ func (a *Action) record(w http.ResponseWriter, req *http.Request, _ httprouter.P
 
 	// Record a new transaction (get the hex from parameters)
 	var transaction *engine.Transaction
-	if transaction, err = a.Services.SPV.RecordTransaction(
+	if transaction, err = a.Services.SpvWalletEngine.RecordTransaction(
 		req.Context(),
 		reqXPub,
 		params.GetString("hex"),

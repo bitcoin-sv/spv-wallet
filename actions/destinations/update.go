@@ -41,15 +41,15 @@ func (a *Action) update(w http.ResponseWriter, req *http.Request, _ httprouter.P
 	var destination *engine.Destination
 	var err error
 	if id != "" {
-		destination, err = a.Services.SPV.UpdateDestinationMetadataByID(
+		destination, err = a.Services.SpvWalletEngine.UpdateDestinationMetadataByID(
 			req.Context(), reqXPubID, id, metadata,
 		)
 	} else if address != "" {
-		destination, err = a.Services.SPV.UpdateDestinationMetadataByAddress(
+		destination, err = a.Services.SpvWalletEngine.UpdateDestinationMetadataByAddress(
 			req.Context(), reqXPubID, address, metadata,
 		)
 	} else {
-		destination, err = a.Services.SPV.UpdateDestinationMetadataByLockingScript(
+		destination, err = a.Services.SpvWalletEngine.UpdateDestinationMetadataByLockingScript(
 			req.Context(), reqXPubID, lockingScript, metadata,
 		)
 	}

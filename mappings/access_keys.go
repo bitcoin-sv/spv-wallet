@@ -6,11 +6,11 @@ import (
 
 	"github.com/bitcoin-sv/spv-wallet/engine"
 	"github.com/bitcoin-sv/spv-wallet/mappings/common"
-	spvwalletmodels "github.com/bitcoin-sv/spv-wallet/models"
+	"github.com/bitcoin-sv/spv-wallet/models"
 )
 
 // MapToAccessKeyContract will map the access key to the spv-wallet-models contract
-func MapToAccessKeyContract(ac *engine.AccessKey) *spvwalletmodels.AccessKey {
+func MapToAccessKeyContract(ac *engine.AccessKey) *models.AccessKey {
 	if ac == nil {
 		return nil
 	}
@@ -20,7 +20,7 @@ func MapToAccessKeyContract(ac *engine.AccessKey) *spvwalletmodels.AccessKey {
 		revokedAt = &ac.RevokedAt.Time
 	}
 
-	return &spvwalletmodels.AccessKey{
+	return &models.AccessKey{
 		Model:     *common.MapToContract(&ac.Model),
 		ID:        ac.ID,
 		XpubID:    ac.XpubID,

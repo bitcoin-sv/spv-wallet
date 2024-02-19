@@ -39,11 +39,11 @@ func (a *Action) get(w http.ResponseWriter, req *http.Request, _ httprouter.Para
 	var xPub *engine.Xpub
 	var err error
 	if key != "" {
-		xPub, err = a.Services.SPV.GetXpub(
+		xPub, err = a.Services.SpvWalletEngine.GetXpub(
 			req.Context(), key,
 		)
 	} else {
-		xPub, err = a.Services.SPV.GetXpubByID(
+		xPub, err = a.Services.SpvWalletEngine.GetXpubByID(
 			req.Context(), reqXPubID,
 		)
 	}

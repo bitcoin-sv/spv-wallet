@@ -29,7 +29,7 @@ func (a *Action) create(w http.ResponseWriter, req *http.Request, _ httprouter.P
 
 	// Get the xPub from the request (via authentication)
 	reqXPub, _ := engine.GetXpubFromRequest(req)
-	xPub, err := a.Services.SPV.GetXpub(req.Context(), reqXPub)
+	xPub, err := a.Services.SpvWalletEngine.GetXpub(req.Context(), reqXPub)
 	if err != nil {
 		apirouter.ReturnResponse(w, req, http.StatusUnprocessableEntity, err.Error())
 		return
@@ -53,7 +53,7 @@ func (a *Action) create(w http.ResponseWriter, req *http.Request, _ httprouter.P
 		metadata[engine.ReferenceIDField] = referenceID
 	}
 
-	opts := a.Services.SPV.DefaultModelOptions()
+	opts := a.Services.SpvWalletEngine.DefaultModelOptions()
 
 	if metadata != nil {
 		opts = append(opts, engine.WithMetadatas(metadata))
@@ -61,7 +61,7 @@ func (a *Action) create(w http.ResponseWriter, req *http.Request, _ httprouter.P
 
 	// Get a new destination
 	var destination *engine.Destination
-	if destination, err = a.Services.SPV.NewDestination(
+	if destination, err = a.Services.SpvWalletEngine.NewDestination(
 		req.Context(),
 		xPub.RawXpub(),
 		uint32(0), // todo: use a constant? protect this?

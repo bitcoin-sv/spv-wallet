@@ -29,9 +29,9 @@ func (a *Action) paymailGetAddress(w http.ResponseWriter, req *http.Request, _ h
 		return
 	}
 
-	opts := a.Services.SPV.DefaultModelOptions()
+	opts := a.Services.SpvWalletEngine.DefaultModelOptions()
 
-	paymailAddress, err := a.Services.SPV.GetPaymailAddress(req.Context(), address, opts...)
+	paymailAddress, err := a.Services.SpvWalletEngine.GetPaymailAddress(req.Context(), address, opts...)
 	if err != nil {
 		apirouter.ReturnResponse(w, req, http.StatusExpectationFailed, err.Error())
 		return
@@ -66,7 +66,7 @@ func (a *Action) paymailAddressesSearch(w http.ResponseWriter, req *http.Request
 	}
 
 	var paymailAddresses []*engine.PaymailAddress
-	if paymailAddresses, err = a.Services.SPV.GetPaymailAddresses(
+	if paymailAddresses, err = a.Services.SpvWalletEngine.GetPaymailAddresses(
 		req.Context(),
 		metadata,
 		conditions,
@@ -102,7 +102,7 @@ func (a *Action) paymailAddressesCount(w http.ResponseWriter, req *http.Request,
 	}
 
 	var count int64
-	if count, err = a.Services.SPV.GetPaymailAddressesCount(
+	if count, err = a.Services.SpvWalletEngine.GetPaymailAddressesCount(
 		req.Context(),
 		metadata,
 		conditions,
@@ -153,14 +153,14 @@ func (a *Action) paymailCreateAddress(w http.ResponseWriter, req *http.Request, 
 		return
 	}
 
-	opts := a.Services.SPV.DefaultModelOptions()
+	opts := a.Services.SpvWalletEngine.DefaultModelOptions()
 
 	if metadata != nil {
 		opts = append(opts, engine.WithMetadatas(*metadata))
 	}
 
 	var paymailAddress *engine.PaymailAddress
-	paymailAddress, err = a.Services.SPV.NewPaymailAddress(req.Context(), xpub, address, publicName, avatar, opts...)
+	paymailAddress, err = a.Services.SpvWalletEngine.NewPaymailAddress(req.Context(), xpub, address, publicName, avatar, opts...)
 	if err != nil {
 		apirouter.ReturnResponse(w, req, http.StatusExpectationFailed, err.Error())
 		return
@@ -190,10 +190,10 @@ func (a *Action) paymailDeleteAddress(w http.ResponseWriter, req *http.Request, 
 		return
 	}
 
-	opts := a.Services.SPV.DefaultModelOptions()
+	opts := a.Services.SpvWalletEngine.DefaultModelOptions()
 
 	// Delete a new paymail address
-	err := a.Services.SPV.DeletePaymailAddress(req.Context(), address, opts...)
+	err := a.Services.SpvWalletEngine.DeletePaymailAddress(req.Context(), address, opts...)
 	if err != nil {
 		apirouter.ReturnResponse(w, req, http.StatusExpectationFailed, err.Error())
 		return
