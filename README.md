@@ -49,7 +49,7 @@ go get -u github.com/bitcoin-sv/spv-wallet
 #### build
 
 ```shell script
-go build -o spv-wallet cmd/server/*
+go build -o spv-wallet cmd/*
 ```
 
 #### run
@@ -219,12 +219,12 @@ Available flags:
 
 To generate config file with defaults, use the --dump flag, or:
 ```bash
-go run ./cmd/server/main.go -d
+go run ./cmd/main.go -d
 ```
 
 The default config file path is **project root**, and the default file name is **config.yaml**. This can be overridden by -C flag.
 ```bash
-go run ./cmd/server/main.go -C /my/config.json
+go run ./cmd/main.go -C /my/config.json
 ```
 
 #### Environment variables
