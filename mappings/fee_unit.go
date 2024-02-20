@@ -17,8 +17,8 @@ func MapToFeeUnitContract(fu *utils.FeeUnit) (fc *models.FeeUnit) {
 	}
 }
 
-// MapToFeeUnitSPV will map the fee-unit model from spv-wallet-models to the spv-wallet contract
-func MapToFeeUnitSPV(fu *models.FeeUnit) (fc *utils.FeeUnit) {
+// MapFeeUnitModelToEngine will map the fee-unit model from spv-wallet-models to the spv-wallet contract
+func MapFeeUnitModelToEngine(fu *models.FeeUnit) (fc *utils.FeeUnit) {
 	if fu == nil {
 		return nil
 	}

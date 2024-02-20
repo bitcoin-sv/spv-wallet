@@ -30,7 +30,7 @@ func (a *Action) accessKeysSearch(w http.ResponseWriter, req *http.Request, _ ht
 	// Parse the params
 	params := apirouter.GetParams(req)
 	queryParams, metadataModel, conditions, err := actions.GetQueryParameters(params)
-	metadata := mappings.MapToSPVMetadata(metadataModel)
+	metadata := mappings.MapToSpvWalletMetadata(metadataModel)
 	if err != nil {
 		apirouter.ReturnResponse(w, req, http.StatusExpectationFailed, err.Error())
 		return
@@ -71,7 +71,7 @@ func (a *Action) accessKeysCount(w http.ResponseWriter, req *http.Request, _ htt
 	// Parse the params
 	params := apirouter.GetParams(req)
 	_, metadataModel, conditions, err := actions.GetQueryParameters(params)
-	metadata := mappings.MapToSPVMetadata(metadataModel)
+	metadata := mappings.MapToSpvWalletMetadata(metadataModel)
 	if err != nil {
 		apirouter.ReturnResponse(w, req, http.StatusExpectationFailed, err.Error())
 		return

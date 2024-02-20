@@ -25,8 +25,8 @@ func MapToDestinationContract(d *engine.Destination) *models.Destination {
 	}
 }
 
-// MapToDestinationSPV will map the spv-wallet-models destination contract to the spv-wallet destination model
-func MapToDestinationSPV(d *models.Destination) *engine.Destination {
+// MapDestinationModelToEngine will map the spv-wallet-models destination contract to the spv-wallet destination model
+func MapDestinationModelToEngine(d *models.Destination) *engine.Destination {
 	if d == nil {
 		return nil
 	}

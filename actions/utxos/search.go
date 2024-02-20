@@ -32,7 +32,7 @@ func (a *Action) search(w http.ResponseWriter, req *http.Request, _ httprouter.P
 	// Parse the params
 	params := apirouter.GetParams(req)
 	queryParams, modelMetadata, conditions, err := actions.GetQueryParameters(params)
-	metadata := mappings.MapToSPVMetadata(modelMetadata)
+	metadata := mappings.MapToSpvWalletMetadata(modelMetadata)
 	if err != nil {
 		apirouter.ReturnResponse(w, req, http.StatusExpectationFailed, err.Error())
 		return

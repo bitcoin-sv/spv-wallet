@@ -19,8 +19,8 @@ func MapToUtxoPointer(u *engine.UtxoPointer) *models.UtxoPointer {
 	}
 }
 
-// MapToUtxoPointerSPV will map the utxo-pointer model from spv-wallet-models to the spv-wallet contract
-func MapToUtxoPointerSPV(u *models.UtxoPointer) *engine.UtxoPointer {
+// MapUtxoPointerModelToEngine will map the utxo-pointer model from spv-wallet-models to the spv-wallet contract
+func MapUtxoPointerModelToEngine(u *models.UtxoPointer) *engine.UtxoPointer {
 	if u == nil {
 		return nil
 	}
@@ -51,8 +51,8 @@ func MapToUtxoContract(u *engine.Utxo) *models.Utxo {
 	}
 }
 
-// MapToUtxoSPV will map the utxo model from spv-wallet-models to the spv-wallet contract
-func MapToUtxoSPV(u *models.Utxo) *engine.Utxo {
+// MapUtxoModelToEngine will map the utxo model from spv-wallet-models to the spv-wallet contract
+func MapUtxoModelToEngine(u *models.Utxo) *engine.Utxo {
 	if u == nil {
 		return nil
 	}
@@ -65,7 +65,7 @@ func MapToUtxoSPV(u *models.Utxo) *engine.Utxo {
 
 	return &engine.Utxo{
 		Model:        *common.MapToModel(&u.Model),
-		UtxoPointer:  *MapToUtxoPointerSPV(&u.UtxoPointer),
+		UtxoPointer:  *MapUtxoPointerModelToEngine(&u.UtxoPointer),
 		ID:           u.ID,
 		XpubID:       u.XpubID,
 		Satoshis:     u.Satoshis,
@@ -73,6 +73,6 @@ func MapToUtxoSPV(u *models.Utxo) *engine.Utxo {
 		Type:         u.Type,
 		DraftID:      draftID,
 		SpendingTxID: spendingTxID,
-		Transaction:  MapToTransactionSPV(u.Transaction),
+		Transaction:  MapTransactionModelToEngine(u.Transaction),
 	}
 }

@@ -27,7 +27,7 @@ func (a *Action) count(w http.ResponseWriter, req *http.Request, _ httprouter.Pa
 	// Parse the params
 	params := apirouter.GetParams(req)
 	_, metadataModels, conditions, err := actions.GetQueryParameters(params)
-	metadata := mappings.MapToSPVMetadata(metadataModels)
+	metadata := mappings.MapToSpvWalletMetadata(metadataModels)
 	if err != nil {
 		apirouter.ReturnResponse(w, req, http.StatusExpectationFailed, err.Error())
 		return

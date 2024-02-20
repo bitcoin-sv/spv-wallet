@@ -55,7 +55,7 @@ func (a *AppConfig) LoadServices(ctx context.Context) (*AppServices, error) {
 	_services.Logger = logger
 
 	// Load SPV Wallet
-	if err = _services.loadSPV(ctx, a, false, logger); err != nil {
+	if err = _services.loadSPVWallet(ctx, a, false, logger); err != nil {
 		return nil, err
 	}
 
@@ -79,7 +79,7 @@ func (a *AppConfig) LoadTestServices(ctx context.Context) (*AppServices, error) 
 	defer txn.End()
 
 	// Load spv for testing
-	if err = _services.loadSPV(ctx, a, true, _services.Logger); err != nil {
+	if err = _services.loadSPVWallet(ctx, a, true, _services.Logger); err != nil {
 		return nil, err
 	}
 
@@ -114,7 +114,7 @@ func (a *AppConfig) loadNewRelic(services *AppServices) (err error) {
 
 // CloseAll will close all connections to all services
 func (s *AppServices) CloseAll(ctx context.Context) {
-	// Close SPV
+	// Close SPV Wallet Engine
 	if s.SpvWalletEngine != nil {
 		_ = s.SpvWalletEngine.Close(ctx)
 		s.SpvWalletEngine = nil
@@ -132,8 +132,8 @@ func (s *AppServices) CloseAll(ctx context.Context) {
 	}
 }
 
-// loadSPV will load the spv client (including CacheStore and DataStore)
-func (s *AppServices) loadSPV(ctx context.Context, appConfig *AppConfig, testMode bool, logger *zerolog.Logger) (err error) {
+// loadSPVWallet will load the spv client (including CacheStore and DataStore)
+func (s *AppServices) loadSPVWallet(ctx context.Context, appConfig *AppConfig, testMode bool, logger *zerolog.Logger) (err error) {
 	var options []engine.ClientOps
 
 	if appConfig.NewRelic.Enabled {

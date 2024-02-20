@@ -29,7 +29,7 @@ func (a *Action) xpubsSearch(w http.ResponseWriter, req *http.Request, _ httprou
 	// Parse the params
 	params := apirouter.GetParams(req)
 	queryParams, metadataModel, conditions, err := actions.GetQueryParameters(params)
-	metadata := mappings.MapToSPVMetadata(metadataModel)
+	metadata := mappings.MapToSpvWalletMetadata(metadataModel)
 
 	if err != nil {
 		apirouter.ReturnResponse(w, req, http.StatusExpectationFailed, err.Error())
@@ -66,7 +66,7 @@ func (a *Action) xpubsCount(w http.ResponseWriter, req *http.Request, _ httprout
 	// Parse the params
 	params := apirouter.GetParams(req)
 	_, metadataModel, conditions, err := actions.GetQueryParameters(params)
-	metadata := mappings.MapToSPVMetadata(metadataModel)
+	metadata := mappings.MapToSpvWalletMetadata(metadataModel)
 	if err != nil {
 		apirouter.ReturnResponse(w, req, http.StatusExpectationFailed, err.Error())
 		return

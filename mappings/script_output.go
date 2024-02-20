@@ -19,8 +19,8 @@ func MapToScriptOutputContract(so *engine.ScriptOutput) (sc *models.ScriptOutput
 	}
 }
 
-// MapToScriptOutputSPV will map the script-output model from spv-wallet-models to the spv-wallet contract
-func MapToScriptOutputSPV(so *models.ScriptOutput) (sc *engine.ScriptOutput) {
+// MapScriptOutputModelToEngine will map the script-output model from spv-wallet-models to the spv-wallet contract
+func MapScriptOutputModelToEngine(so *models.ScriptOutput) (sc *engine.ScriptOutput) {
 	if so == nil {
 		return nil
 	}

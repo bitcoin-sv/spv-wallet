@@ -42,8 +42,8 @@ func MapToPaymailP4Contract(p *engine.PaymailP4) *models.PaymailP4 {
 	}
 }
 
-// MapToPaymailP4SPV will map the spv-wallet-models paymail-address contract to the spv-wallet paymail-address model
-func MapToPaymailP4SPV(p *models.PaymailP4) *engine.PaymailP4 {
+// MapPaymailP4ModelToEngine will map the spv-wallet-models paymail-address contract to the spv-wallet paymail-address model
+func MapPaymailP4ModelToEngine(p *models.PaymailP4) *engine.PaymailP4 {
 	if p == nil {
 		return nil
 	}

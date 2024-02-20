@@ -64,7 +64,7 @@ func (a *Action) newTransaction(w http.ResponseWriter, req *http.Request, _ http
 		opts = append(opts, engine.WithMetadatas(metadata))
 	}
 
-	txConfig := mappings.MapToTransactionConfigSPV(&txContract)
+	txConfig := mappings.MapTransactionConfigEngineToModel(&txContract)
 
 	// Record a new transaction (get the hex from parameters)
 	var transaction *engine.DraftTransaction

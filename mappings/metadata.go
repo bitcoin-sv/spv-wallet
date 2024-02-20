@@ -5,8 +5,8 @@ import (
 	"github.com/bitcoin-sv/spv-wallet/models"
 )
 
-// MapToSPVMetadata will map the *spvwalletmodels.Metadata to *spv.Metadata
-func MapToSPVMetadata(metadata *models.Metadata) *engine.Metadata {
+// MapToSpvWalletMetadata will map the *spvwalletmodels.Metadata to *spv.Metadata
+func MapToSpvWalletMetadata(metadata *models.Metadata) *engine.Metadata {
 	if metadata == nil {
 		return nil
 	}

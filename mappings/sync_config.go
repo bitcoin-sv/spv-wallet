@@ -19,8 +19,8 @@ func MapToSyncConfigContract(sc *engine.SyncConfig) *models.SyncConfig {
 	}
 }
 
-// MapToSyncConfigSPV will map the sync-config model from spv-wallet-models to the spv-wallet contract
-func MapToSyncConfigSPV(sc *models.SyncConfig) *engine.SyncConfig {
+// MapSyncConfigModelToEngine will map the sync-config model from spv-wallet-models to the spv-wallet contract
+func MapSyncConfigModelToEngine(sc *models.SyncConfig) *engine.SyncConfig {
 	if sc == nil {
 		return nil
 	}
