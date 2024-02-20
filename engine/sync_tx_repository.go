@@ -164,7 +164,7 @@ func _areParentsBroadcasted(ctx context.Context, tx *Transaction, opts ...ModelO
 		return false, err
 	}
 
-	// check that all inputs we handled have been broadcast, or are not handled by spv wallet engine
+	// check that all inputs we handled have been broadcast, or are not handled by SPV Wallet Engine
 	parentsBroadcasted := true
 	for _, input := range btTx.Inputs {
 		var parentTx *SyncTransaction

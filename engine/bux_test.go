@@ -25,7 +25,7 @@ import (
 
 // TestingClient is for testing the entire package using real/mocked services
 type TestingClient struct {
-	client      ClientInterface  // Local spv wallet engine client for testing
+	client      ClientInterface  // Local SPV Wallet Engine client for testing
 	ctx         context.Context  // Current CTX
 	database    datastore.Engine // Current database
 	mocking     bool             // If mocking is enabled

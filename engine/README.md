@@ -54,10 +54,10 @@
 - Future plugins using [BRFC standards](http://bsvalias.org/01-brfc-specifications.html)
 
 #### **Project Assumptions: MVP**
-- _No private keys are used_, only the xPub (or access key) is given to spv wallet engine
+- _No private keys are used_, only the xPub (or access key) is given to SPV Wallet Engine
 - (BYOX) `Bring your own xPub`
 - Signing a transaction is outside this application (IE: [spv-wallet](https://github.com/bitcoin-sv/spv-wallet) or [spv-wallet-client](https://github.com/bitcoin-sv/spv-wallet-go-client))
-- All transactions need to be submitted to the spv wallet service to effectively track utxo states
+- All transactions need to be submitted to the SPV Wallet service to effectively track utxo states
 - Database can be backed up, but not regenerated from chain
   - Certain data is not on chain, plus re-scanning an xPub is expensive and not easily possible with 3rd party limitations
 

@@ -95,7 +95,7 @@ func waitForRecordTxWriteLock(ctx context.Context, c ClientInterface, key string
 	)
 	// Create the lock and set the release for after the function completes
 	// Waits for the moment when the transaction is unlocked and creates a new lock
-	// Relevant for spv wallet to spv wallet transactions, as we have 1 tx but need to record 2 txs - outgoing and incoming
+	// Relevant for SPV Wallet to SPV Wallet transactions, as we have 1 tx but need to record 2 txs - outgoing and incoming
 
 	lockKey := fmt.Sprintf(lockKeyRecordTx, key)
 

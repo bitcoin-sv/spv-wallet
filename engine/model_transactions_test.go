@@ -871,7 +871,7 @@ func TestEndToEndTransaction(t *testing.T) {
 		// Create the fake funding transaction using the given destinations
 		tx := CreateFakeFundingTransaction(t, masterKey, destinations, 10000)
 
-		// Register funding transaction in spv wallet engine
+		// Register funding transaction in SPV Wallet Engine
 		var transaction *Transaction
 		transaction, err = client.RecordTransaction(ctx, rawXPub, tx,
 			"",

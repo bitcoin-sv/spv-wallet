@@ -20,7 +20,7 @@ import (
 
 type (
 
-	// Client is the spv wallet engine client & options
+	// Client is the SPV Wallet Engine client & options
 	Client struct {
 		options *clientOptions
 	}
@@ -61,7 +61,7 @@ type (
 		options                    []cachestore.ClientOps // List of options
 	}
 
-	// clusterOptions holds the cluster configuration for spv wallet engine clusters
+	// clusterOptions holds the cluster configuration for SPV Wallet Engine clusters
 	// at the moment we only support redis as the cluster coordinator
 	clusterOptions struct {
 		cluster.ClientInterface
@@ -117,7 +117,7 @@ type (
 	}
 )
 
-// NewClient creates a new client for all spv wallet engine functionality
+// NewClient creates a new client for all SPV Wallet Engine functionality
 //
 // If no options are given, it will use the defaultClientOptions()
 // ctx may contain a NewRelic txn (or one will be created)

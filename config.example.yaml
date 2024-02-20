@@ -116,7 +116,7 @@ paymail:
   # set is as a default sender paymail if account does not have one
   default_from_paymail: from@domain.com
   # default note added into transactions - Deprecated
-  default_note: spv Address Resolution
+  default_note: SPV Wallet Address Resolution
   # enable paymail domain validation, paymail domain must be in domains list to be valid and that the transaction can be processed
   domain_validation_enabled: false
   # list of domains used for paymail domain validation

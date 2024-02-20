@@ -20,7 +20,7 @@ const (
 	dustLimit                  = uint64(1)                // Dust limit
 	mongoTestVersion           = "6.0.4"                  // Mongo Testing Version
 	sqliteTestVersion          = "3.37.0"                 // SQLite Testing Version (dummy version for now)
-	version                    = "v0.14.2"                // spv wallet engine version
+	version                    = "v0.14.2"                // SPV Wallet Engine version
 )
 
 // All the base models

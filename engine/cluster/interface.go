@@ -9,7 +9,7 @@ var (
 	// CoordinatorRedis definition
 	CoordinatorRedis Coordinator = "redis"
 
-	// CoordinatorMemory definition - use only in single server setups of spv wallet engine!
+	// CoordinatorMemory definition - use only in single server setups of SPV Wallet Engine!
 	CoordinatorMemory Coordinator = "memory"
 )
 

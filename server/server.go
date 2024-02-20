@@ -1,4 +1,4 @@
-// Package server is for all the SPV wallet settings and HTTP server
+// Package server is for all the SPV Wallet settings and HTTP server
 package server
 
 import (

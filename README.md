@@ -34,7 +34,7 @@
 
 ## About
 
-Complete stand-alone server using the SPV Wallet engine (UTXOs, xPubs, Paymail & More!)
+Complete stand-alone server using the SPV Wallet Engine (UTXOs, xPubs, Paymail & More!)
 
 <br/>
 

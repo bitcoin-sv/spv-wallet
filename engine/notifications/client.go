@@ -5,7 +5,7 @@ import (
 	"github.com/rs/zerolog"
 )
 
-// EventType event types thrown in spv wallet engine
+// EventType event types thrown in SPV Wallet Engine
 type EventType string
 
 const (

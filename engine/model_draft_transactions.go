@@ -689,7 +689,7 @@ func (m *DraftTransaction) setChangeDestinations(ctx context.Context, numberOfDe
 	return nil
 }
 
-// getInputsFromUtxos this function transforms spv wallet utxos to bt.UTXOs
+// getInputsFromUtxos this function transforms SPV Wallet utxos to bt.UTXOs
 func (m *DraftTransaction) getInputsFromUtxos(reservedUtxos []*Utxo) (*[]*bt.UTXO, uint64, error) {
 	// transform to bt.utxo and check if we have enough
 	inputUtxos := new([]*bt.UTXO)

@@ -27,7 +27,7 @@ type Model struct {
 	DeletedAt customTypes.NullTime `json:"deleted_at" toml:"deleted_at" yaml:"deleted_at" gorm:"index;comment:The time the record was marked as deleted" bson:"deleted_at,omitempty"`
 
 	// Private fields
-	client        ClientInterface // Interface of the parent Client that loaded this spv wallet engine model
+	client        ClientInterface // Interface of the parent Client that loaded this SPV Wallet Engine model
 	encryptionKey string          // Use for sensitive values that required encryption (IE: paymail public xpub)
 	name          ModelName       // Name of model (table name)
 	newRecord     bool            // Determine if the record is new (create vs update)

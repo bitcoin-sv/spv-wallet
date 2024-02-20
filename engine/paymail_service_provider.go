@@ -20,7 +20,7 @@ import (
 //
 // This is an example and the default functionality for all the basic Paymail actions
 type PaymailDefaultServiceProvider struct {
-	client ClientInterface // (pointer) to the Client for accessing spv wallet model methods & etc
+	client ClientInterface // (pointer) to the Client for accessing SPV Wallet Model methods & etc
 }
 
 // createMetadata will create a new metadata seeded from the server information

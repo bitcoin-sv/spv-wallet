@@ -10,7 +10,7 @@ import (
 
 // Example is an example model
 type Example struct {
-	engine.Model    `bson:",inline"` // Base spv wallet engine model
+	engine.Model    `bson:",inline"` // Base SPV Wallet Engine model
 	ID           string           `json:"id" toml:"id" yaml:"id" gorm:"<-:create;type:char(64);primaryKey;comment:This is the unique record id" bson:"_id"`                                       // Unique identifier
 	ExampleField string           `json:"example_field" toml:"example_field" yaml:"example_field" gorm:"<-:create;type:varchar(64);comment:This is an example string field" bson:"example_field"` // Example string field
 }

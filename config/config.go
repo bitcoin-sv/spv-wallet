@@ -25,13 +25,13 @@ const (
 
 // AppConfig is the configuration values and associated env vars
 type AppConfig struct {
-	// Authentication is the configuration for keys authentication in spv.
+	// Authentication is the configuration for keys authentication in SPV Wallet.
 	Authentication *AuthenticationConfig `json:"auth" mapstructure:"auth"`
 	// Cache is the configuration for cache, memory or redis, and cluster cache settings.
 	Cache *CacheConfig `json:"cache" mapstructure:"cache"`
 	// Db is the configuration for database related settings.
 	Db *DbConfig `json:"db" mapstructure:"db"`
-	// Debug is a flag for enabling additional information from spv.
+	// Debug is a flag for enabling additional information from SPV Wallet.
 	Debug bool `json:"debug" mapstructure:"debug"`
 	// DebugProfiling is a flag for enabling additinal debug profiling.
 	DebugProfiling bool `json:"debug_profiling" mapstructure:"debug_profiling"`
@@ -39,7 +39,7 @@ type AppConfig struct {
 	DisableITC bool `json:"disable_itc" mapstructure:"disable_itc"`
 	// ImportBlockHeaders is a URL from where the headers can be downloaded.
 	ImportBlockHeaders string `json:"import_block_headers" mapstructure:"import_block_headers"`
-	// Logging is the configuration for zerolog used in spv.
+	// Logging is the configuration for zerolog used in SPV Wallet.
 	Logging *LoggingConfig `json:"logging" mapstructure:"logging"`
 	// NewRelic is New Relic related settings.
 	NewRelic *NewRelicConfig `json:"new_relic" mapstructure:"new_relic"`
@@ -53,9 +53,9 @@ type AppConfig struct {
 	RequestLogging bool `json:"request_logging" mapstructure:"request_logging"`
 	// Server is a general configuration for spv-wallet.
 	Server *ServerConfig `json:"server_config" mapstructure:"server_config"`
-	// TaskManager is a configuration for Task Manager in spv.
+	// TaskManager is a configuration for Task Manager in SPV Wallet.
 	TaskManager *TaskManagerConfig `json:"task_manager" mapstructure:"task_manager"`
-	// Metrics is a configuration for metrics in spv.
+	// Metrics is a configuration for metrics in SPV Wallet.
 	Metrics *MetricsConfig `json:"metrics" mapstructure:"metrics"`
 }
 
@@ -75,7 +75,7 @@ type AuthenticationConfig struct {
 type CacheConfig struct {
 	// Engine is the cache engine to use (redis, freecache).
 	Engine cachestore.Engine `json:"engine" mapstructure:"engine"`
-	// Cluster is the cluster-specific configuration for spv.
+	// Cluster is the cluster-specific configuration for SPV Wallet.
 	Cluster *ClusterConfig `json:"cluster" mapstructure:"cluster"`
 	// Redis is a general config for redis if the engine is set to it.
 	Redis *RedisConfig `json:"redis" mapstructure:"redis"`
@@ -213,9 +213,9 @@ type PaymailConfig struct {
 type BeefConfig struct {
 	// UseBeef is a flag for enabling BEEF transactions format.
 	UseBeef bool `json:"use_beef" mapstructure:"use_beef"`
-	// BlockHeaderServiceHeaderValidationURL is the URL for headers validation in Block Header Service.
+	// BlockHeaderServiceHeaderValidationURL is the URL for merkle roots validation in Block Header Service.
 	BlockHeaderServiceHeaderValidationURL string `json:"block_header_service_url" mapstructure:"block_header_service_url"`
-	// BlockHeaderServiceAuthToken is the authentication token for validating headers in Block Header Service.
+	// BlockHeaderServiceAuthToken is the authentication token for validating merkle roots in Block Header Service.
 	BlockHeaderServiceAuthToken string `json:"block_header_service_auth_token" mapstructure:"block_header_service_auth_token"`
 }
 

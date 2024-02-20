@@ -1051,7 +1051,7 @@ func TestDraftTransaction_setChangeDestination(t *testing.T) {
 	})
 }
 
-// TestDraftTransaction_getInputsFromUtxos getting bt.UTXOs from spv wallet engine Utxos
+// TestDraftTransaction_getInputsFromUtxos getting bt.UTXOs from SPV Wallet Engine Utxos
 func TestDraftTransaction_getInputsFromUtxos(t *testing.T) {
 	t.Run("invalid lockingScript", func(t *testing.T) {
 		draftTransaction := &DraftTransaction{}

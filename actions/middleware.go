@@ -92,7 +92,7 @@ func (a *Action) Request(_ *apirouter.Router, h httprouter.Handle) httprouter.Ha
 }
 
 // CheckAuthentication will check the authentication
-func CheckAuthentication(appConfig *config.AppConfig, spv engine.ClientInterface, req *http.Request,
+func CheckAuthentication(appConfig *config.AppConfig, spvWalletEngine engine.ClientInterface, req *http.Request,
 	adminRequired bool, requireSigning bool,
 ) (*http.Request, dictionary.ErrorMessage) {
 	// Bad/Unknown scheme
@@ -102,7 +102,7 @@ func CheckAuthentication(appConfig *config.AppConfig, spv engine.ClientInterface
 
 	// AuthenticateFromRequest using the xPub scheme
 	var err error
-	if req, err = spv.AuthenticateRequest(
+	if req, err = spvWalletEngine.AuthenticateRequest(
 		req.Context(),
 		req, []string{appConfig.Authentication.AdminKey}, adminRequired,
 		requireSigning && appConfig.Authentication.RequireSigning,

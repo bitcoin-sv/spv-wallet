@@ -31,7 +31,7 @@ type AccessKeyService interface {
 	RevokeAccessKey(ctx context.Context, rawXpubKey, id string, opts ...ModelOps) (*AccessKey, error)
 }
 
-// AdminService is the spv wallet engine admin service interface comprised of all services available for admins
+// AdminService is the SPV Wallet Engine admin service interface comprised of all services available for admins
 type AdminService interface {
 	GetStats(ctx context.Context, opts ...ModelOps) (*AdminStats, error)
 	GetPaymailAddresses(ctx context.Context, metadataConditions *Metadata, conditions *map[string]interface{},

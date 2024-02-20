@@ -259,7 +259,7 @@ func WithLogger(customLogger *zerolog.Logger) ClientOps {
 		if customLogger != nil {
 			c.logger = customLogger
 
-			// Enable the logger on all spv wallet engine services
+			// Enable the logger on all SPV Wallet Engine services
 			chainstateLogger := customLogger.With().Str("subservice", "chainstate").Logger()
 			taskManagerLogger := customLogger.With().Str("subservice", "taskManager").Logger()
 			notificationsLogger := customLogger.With().Str("subservice", "notifications").Logger()
@@ -489,7 +489,7 @@ func WithPaymailSupport(domains []string, defaultFromPaymail string, domainValid
 			c.paymail.serverConfig.DefaultFromPaymail = defaultFromPaymail
 		}
 
-		// Add the paymail_address model in spv wallet engine
+		// Add the paymail_address model in SPV Wallet Engine
 		c.addModels(migrateList, newPaymail(""))
 	}
 }
@@ -518,7 +518,7 @@ func WithPaymailServerConfig(config *server.Configuration, defaultFromPaymail st
 			c.paymail.serverConfig.DefaultFromPaymail = defaultFromPaymail
 		}
 
-		// Add the paymail_address model in spv wallet engine
+		// Add the paymail_address model in SPV Wallet Engine
 		c.addModels(migrateList, newPaymail(""))
 	}
 }

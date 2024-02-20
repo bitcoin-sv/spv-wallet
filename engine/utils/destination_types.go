@@ -214,7 +214,7 @@ func GetAddressFromScript(lockingScript string) (address string) {
 		// } else if scriptType == ScriptTypeTokenSensible {
 		// sensible tokens do not have the receiving address in the token output, but in another output
 		// sensible does not seem to be a utxo protocol, but an output protocol (all outputs of the tx matter)
-		// TODO saving the utxo for the token in spv wallet engine
+		// TODO saving the utxo for the token in SPV Wallet Engine
 	}
 	return address
 }

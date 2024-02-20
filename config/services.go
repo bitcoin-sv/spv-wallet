@@ -78,7 +78,7 @@ func (a *AppConfig) LoadTestServices(ctx context.Context) (*AppServices, error) 
 	txn := _services.NewRelic.StartTransaction("services_load_test")
 	defer txn.End()
 
-	// Load spv for testing
+	// Load SPV Wallet for testing
 	if err = _services.loadSPVWallet(ctx, a, true, _services.Logger); err != nil {
 		return nil, err
 	}
@@ -132,7 +132,7 @@ func (s *AppServices) CloseAll(ctx context.Context) {
 	}
 }
 
-// loadSPVWallet will load the spv client (including CacheStore and DataStore)
+// loadSPVWallet will load the SPV Wallet client (including CacheStore and DataStore)
 func (s *AppServices) loadSPVWallet(ctx context.Context, appConfig *AppConfig, testMode bool, logger *zerolog.Logger) (err error) {
 	var options []engine.ClientOps
 

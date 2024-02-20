@@ -12,7 +12,7 @@ func main() {
 		context.Background(), // Set context
 		engine.WithDebugging(),
 		engine.WithAutoMigrate(engine.BaseModels...),
-		engine.WithModels(NewExample("example-field")), // Add additional custom models to spv wallet engine
+		engine.WithModels(NewExample("example-field")), // Add additional custom models to SPV Wallet Engine
 	)
 	if err != nil {
 		log.Fatalln("error: " + err.Error())

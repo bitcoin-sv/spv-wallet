@@ -37,7 +37,7 @@ func (c *Client) RecordTransaction(ctx context.Context, xPubKey, txHex, draftID 
 	return recordTransaction(ctx, c, rts, opts...)
 }
 
-// RecordRawTransaction will parse the transaction and save it into the Datastore directly, without any checks or broadcast but spv wallet engine will ask network for information if transaction was mined
+// RecordRawTransaction will parse the transaction and save it into the Datastore directly, without any checks or broadcast but SPV Wallet Engine will ask network for information if transaction was mined
 // The transaction is treat as external incoming transaction - transaction without a draft
 // Only use this function when you know what you are doing!
 //
@@ -247,7 +247,7 @@ func (c *Client) UpdateTransactionMetadata(ctx context.Context, xPubID, id strin
 	return transaction, nil
 }
 
-// RevertTransaction will revert a transaction created in the spv wallet engine database, but only if it has not
+// RevertTransaction will revert a transaction created in the SPV Wallet Engine database, but only if it has not
 // yet been synced on-chain and the utxos have not been spent.
 // All utxos that are reverted will be marked as deleted (and spent)
 func (c *Client) RevertTransaction(ctx context.Context, id string) error {
@@ -260,7 +260,7 @@ func (c *Client) RevertTransaction(ctx context.Context, id string) error {
 		return err
 	}
 
-	// make sure the transaction is coming from spv wallet engine
+	// make sure the transaction is coming from SPV Wallet Engine
 	if transaction.DraftID == "" {
 		return errors.New("not a spv wallet engine originating transaction, cannot revert")
 	}
@@ -303,7 +303,7 @@ func (c *Client) RevertTransaction(ctx context.Context, id string) error {
 	// Revert transaction and all related elements
 	//
 
-	// mark output utxos as deleted (no way to delete from spv wallet engine yet)
+	// mark output utxos as deleted (no way to delete from SPV Wallet Engine yet)
 	for _, utxo := range utxos {
 		utxo.enrich(ModelUtxo, c.DefaultModelOptions()...)
 		utxo.SpendingTxID.Valid = true
