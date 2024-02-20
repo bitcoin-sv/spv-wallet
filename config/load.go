@@ -13,6 +13,11 @@ import (
 	"github.com/spf13/viper"
 )
 
+const (
+	// EnvPrefix is the prefix for environment variables
+	EnvPrefix = "SPV"
+)
+
 // Added a mutex lock for a race-condition
 var viperLock sync.Mutex
 
@@ -68,7 +73,7 @@ func setDefaults() error {
 }
 
 func envConfig() {
-	viper.SetEnvPrefix("SPV")
+	viper.SetEnvPrefix(EnvPrefix)
 	viper.SetEnvKeyReplacer(strings.NewReplacer(".", "_"))
 	viper.AutomaticEnv()
 }
