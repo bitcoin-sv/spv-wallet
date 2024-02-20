@@ -1,7 +1,7 @@
 package metrics
 
 import (
-	spvwalletmetrics "github.com/bitcoin-sv/spv-wallet/engine/metrics"
+	enginemetrics "github.com/bitcoin-sv/spv-wallet/engine/metrics"
 	"github.com/prometheus/client_golang/prometheus"
 )
 
@@ -11,7 +11,7 @@ type PrometheusCollector struct {
 }
 
 // NewPrometheusCollector creates a new PrometheusCollector.
-func NewPrometheusCollector(reg prometheus.Registerer) spvwalletmetrics.Collector {
+func NewPrometheusCollector(reg prometheus.Registerer) enginemetrics.Collector {
 	return &PrometheusCollector{reg: reg}
 }
 
