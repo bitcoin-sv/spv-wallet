@@ -1,5 +1,5 @@
-// Package spvwalleterrors contains errors that can be returned by spv-wallet api
-package spvwalleterrors
+// Package apierrors contains errors that can be returned by spv-wallet api
+package apierrors
 
 import "errors"
 
