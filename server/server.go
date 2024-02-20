@@ -7,7 +7,7 @@ import (
 	"net/http"
 	"strconv"
 
-	accessKeys "github.com/bitcoin-sv/spv-wallet/actions/access_keys"
+	accesskeys "github.com/bitcoin-sv/spv-wallet/actions/access_keys"
 	"github.com/bitcoin-sv/spv-wallet/actions/admin"
 	"github.com/bitcoin-sv/spv-wallet/actions/base"
 	"github.com/bitcoin-sv/spv-wallet/actions/destinations"
@@ -108,7 +108,7 @@ func (s *Server) Handlers() *nrhttprouter.Router {
 	// Register all handlers (actions / routes)
 	base.RegisterRoutes(s.Router, s.AppConfig, s.Services)
 	admin.RegisterRoutes(s.Router, s.AppConfig, s.Services)
-	accessKeys.RegisterRoutes(s.Router, s.AppConfig, s.Services)
+	accesskeys.RegisterRoutes(s.Router, s.AppConfig, s.Services)
 	destinations.RegisterRoutes(s.Router, s.AppConfig, s.Services)
 	transactions.RegisterRoutes(s.Router, s.AppConfig, s.Services)
 	utxos.RegisterRoutes(s.Router, s.AppConfig, s.Services)
