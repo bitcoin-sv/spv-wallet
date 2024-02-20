@@ -34,7 +34,7 @@
 
 ## About
 
-Complete stand-alone server using the SPV Wallet Engine (UTXOs, xPubs, Paymail & More!)
+A comprehensive non-custodial wallet for BSV digital currency.
 
 <br/>
 
