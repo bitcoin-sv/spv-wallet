@@ -19,15 +19,22 @@
 > Bitcoin UTXO & xPub Management Engine
 
 ## Table of Contents
-- [About](#about)
-- [Installation](#installation)
-- [Documentation](#documentation)
-- [Usage](#usage)
-  - [Examples & Tests](#examples--tests)
-  - [Benchmarks](#benchmarks)
-- [Code Standards](#code-standards)
-- [Contributing](#contributing)
-- [License](#license)
+- [SPV Wallet Engine](#spv-wallet-engine)
+  - [Table of Contents](#table-of-contents)
+  - [About](#about)
+      - [DISCLAIMER](#disclaimer)
+      - [SPV Wallet Engine: Out-of-the-box Features:](#spv-wallet-engine-out-of-the-box-features)
+      - [**Project Assumptions: MVP**](#project-assumptions-mvp)
+  - [Installation](#installation)
+  - [Documentation](#documentation)
+      - [Built-in Features](#built-in-features)
+  - [Usage](#usage)
+    - [Examples \& Tests](#examples--tests)
+    - [Benchmarks](#benchmarks)
+  - [Code Standards](#code-standards)
+  - [Usage](#usage-1)
+  - [Contributing](#contributing)
+  - [License](#license)
 
 <br/>
 
@@ -132,86 +139,6 @@ This repository was created using [MrZ's `go-template`](https://github.com/mrz18
 - [vmihailenco/taskq](https://github.com/vmihailenco/taskq)
 </details>
 
-<details>
-<summary><strong><code>Library Deployment</code></strong></summary>
-<br/>
-
-Releases are automatically created when you create a new [git tag](https://git-scm.com/book/en/v2/Git-Basics-Tagging)!
-
-If you want to manually make releases, please install GoReleaser:
-
-[goreleaser](https://github.com/goreleaser/goreleaser) for easy binary or library deployment to GitHub and can be installed:
-- **using make:** `make install-releaser`
-- **using brew:** `brew install goreleaser`
-
-The [.goreleaser.yml](.goreleaser.yml) file is used to configure [goreleaser](https://github.com/goreleaser/goreleaser).
-
-<br/>
-
-### Automatic Releases on Tag Creation (recommended)
-Automatic releases via [GitHub Actions](.github/workflows/release.yml) from creating a new tag:
-```shell
-make tag version=1.2.3
-```
-
-<br/>
-
-### Manual Releases (optional)
-Use `make release-snap` to create a snapshot version of the release, and finally `make release` to ship to production (manually).
-
-<br/>
-
-</details>
-
-<details>
-<summary><strong><code>Makefile Commands</code></strong></summary>
-<br/>
-
-View all `makefile` commands
-```shell script
-make help
-```
-
-List of all current commands:
-```text
-all                           Runs multiple commands
-clean                         Remove previous builds and any cached data
-clean-mods                    Remove all the Go mod cache
-coverage                      Shows the test coverage
-diff                          Show the git diff
-generate                      Runs the go generate command in the base of the repo
-godocs                        Sync the latest tag with GoDocs
-help                          Show this help message
-install                       Install the application
-install-all-contributors      Installs all contributors locally
-install-go                    Install the application (Using Native Go)
-install-releaser              Install the GoReleaser application
-lint                          Run the golangci-lint application (install if not found)
-release                       Full production release (creates release in GitHub)
-release                       Runs common.release then runs godocs
-release-snap                  Test the full release (build binaries)
-release-test                  Full production test release (everything except deploy)
-replace-version               Replaces the version in HTML/JS (pre-deploy)
-tag                           Generate a new tag and push (tag version=0.0.0)
-tag-remove                    Remove a tag if found (tag-remove version=0.0.0)
-tag-update                    Update an existing tag to current commit (tag-update version=0.0.0)
-test                          Runs lint and ALL tests
-test-all-db                   Runs all tests including embedded database tests
-test-all-db-ci                Runs all tests including embedded database tests (CI)
-test-ci                       Runs all tests via CI (exports coverage)
-test-ci-no-race               Runs all tests via CI (no race) (exports coverage)
-test-ci-short                 Runs unit tests via CI (exports coverage)
-test-no-lint                  Runs just tests
-test-short                    Runs vet, lint and tests (excludes integration tests)
-test-unit                     Runs tests and outputs coverage
-uninstall                     Uninstall the application (and remove files)
-update-contributors           Regenerates the contributors html/list
-update-linter                 Update the golangci-lint package (macOS only)
-vet                           Run the Go vet application
-```
-</details>
-
-<br/>
 
 ## Usage
 

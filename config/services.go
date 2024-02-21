@@ -148,8 +148,8 @@ func (s *AppServices) loadSPVWallet(ctx context.Context, appConfig *AppConfig, t
 	options = append(options, engine.WithUserAgent(appConfig.GetUserAgent()))
 
 	if logger != nil {
-		spvLogger := logger.With().Str("service", "spv").Logger()
-		options = append(options, engine.WithLogger(&spvLogger))
+		serviceLogger := logger.With().Str("service", "spv-wallet").Logger()
+		options = append(options, engine.WithLogger(&serviceLogger))
 	}
 
 	if appConfig.Debug {

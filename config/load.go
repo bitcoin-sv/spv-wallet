@@ -13,11 +13,6 @@ import (
 	"github.com/spf13/viper"
 )
 
-const (
-	// EnvPrefix is the prefix for environment variables
-	EnvPrefix = "SPV"
-)
-
 // Added a mutex lock for a race-condition
 var viperLock sync.Mutex
 

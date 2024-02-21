@@ -19,7 +19,7 @@ const (
 	Version                 = "v0.12.0"
 	ConfigFilePathKey       = "config_file"
 	DefaultConfigFilePath   = "config.yaml"
-	ConfigEnvPrefix         = "SPV_"
+	EnvPrefix               = "SPVWALLET_"
 	BroadcastCallbackRoute  = "/transaction/broadcast/callback"
 )
 
@@ -89,7 +89,7 @@ type CallbackConfig struct {
 	CallbackToken string `json:"callback_token" mapstructure:"callback_token"`
 }
 
-// ClusterConfig is a configuration for the SPV cluster
+// ClusterConfig is a configuration for the SPV Wallet cluster
 type ClusterConfig struct {
 	// Coordinator is a cluster coordinator (redis or memory).
 	Coordinator cluster.Coordinator `json:"coordinator" mapstructure:"coordinator"`
@@ -249,5 +249,5 @@ type MetricsConfig struct {
 
 // GetUserAgent will return the outgoing user agent
 func (a *AppConfig) GetUserAgent() string {
-	return "SPV-Wallet " + Version
+	return "SPV Wallet " + Version
 }
