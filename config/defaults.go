@@ -45,7 +45,7 @@ func getCacheDefaults() *CacheConfig {
 		Engine: "freecache",
 		Cluster: &ClusterConfig{
 			Coordinator: "memory",
-			Prefix:      "spv_cluster_",
+			Prefix:      "spv_wallet_cluster_",
 			Redis:       nil,
 		},
 		Redis: &RedisConfig{
@@ -95,7 +95,7 @@ func getDbDefaults() *DbConfig {
 			SslMode:                   "disable",
 		},
 		SQLite: &datastore.SQLiteConfig{
-			DatabasePath:       "./spv.db",
+			DatabasePath:       "./spv-wallet.db",
 			ExistingConnection: nil,
 			Shared:             true,
 		},
@@ -122,7 +122,7 @@ func getNewRelicDefaults() *NewRelicConfig {
 func getNodesDefaults() *NodesConfig {
 	depIDSufix, _ := uuid.NewUUID()
 	return &NodesConfig{
-		DeploymentID: "spv-" + depIDSufix.String(),
+		DeploymentID: "spv-wallet-" + depIDSufix.String(),
 		Protocol:     NodesProtocolArc,
 		Callback:     getCallbackDefaults(),
 		Apis: []*MinerAPI{

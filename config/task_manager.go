@@ -2,5 +2,5 @@ package config
 
 // TaskManager defaults
 const (
-	TaskManagerQueueName = "spv_queue"
+	TaskManagerQueueName = "spv_wallet_queue"
 )

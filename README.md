@@ -19,16 +19,27 @@
 
 ## Table of Contents
 
-- [About](#about)
-- [Installation](#installation)
-- [Documentation](#documentation)
-- [Usage](#usage)
-  - [Config Variables](#config-variables)
-  - [Examples & Tests](#examples--tests)
-  - [Benchmarks](#benchmarks)
-- [Code Standards](#code-standards)
-- [Contributing](#contributing)
-- [License](#license)
+- [SPV Wallet](#spv-wallet)
+  - [Table of Contents](#table-of-contents)
+  - [About](#about)
+  - [Installation](#installation)
+      - [build](#build)
+      - [run](#run)
+  - [Documentation](#documentation)
+      - [Built-in Features](#built-in-features)
+    - [Automatic Releases on Tag Creation (recommended)](#automatic-releases-on-tag-creation-recommended)
+    - [Manual Releases (optional)](#manual-releases-optional)
+  - [Usage](#usage)
+    - [Defaults](#defaults)
+    - [Config Variables](#config-variables)
+      - [Flags](#flags)
+      - [Environment variables](#environment-variables)
+    - [Examples \& Tests](#examples--tests)
+    - [Benchmarks](#benchmarks)
+    - [Docker Compose Quickstart](#docker-compose-quickstart)
+  - [Code Standards](#code-standards)
+  - [Contributing](#contributing)
+  - [License](#license)
 
 <br/>
 
@@ -241,9 +252,9 @@ auth:
     signing_disabled: true
 ```
 
-To override admin_key in auth config, use the path with "_" as a path delimiter and SPV\_ as prefix. So:
+To override admin_key in auth config, use the path with "_" as a path delimiter and SPVWALLET\_ as prefix. So:
 ```bash
-SPV_AUTH_ADMIN_KEY="admin_key"
+SPVWALLET_AUTH_ADMIN_KEY="admin_key"
 ```
 
 To be able to use TAAL API Key is needed. 
@@ -300,7 +311,7 @@ make bench
 ### Docker Compose Quickstart
 
 To get started with development, `spv-wallet` provides a `start.sh` script
-which is using `docker-compose.yml` file to starts up SPV Wallet serer with selected database
+which is using `docker-compose.yml` file to starts up SPV Wallet server with selected database
 and cache storage. To start, we need to fill the config json which we want to use,
 for example: `config/envs/development.json`.
 

@@ -32,7 +32,7 @@ func TestLoadConfig(t *testing.T) {
 		// IMPORTANT! If you need to change the name of this variable, it means you're
 		// making backwards incompatible changes. Please inform all SPV adoptors and
 		// update your configs on all servers and scripts.
-		os.Setenv("SPV_CONFIG_FILE", anotherPath)
+		os.Setenv(EnvPrefix+"_CONFIG_FILE", anotherPath)
 		_, err := Load(defaultLogger)
 
 		// then
@@ -40,6 +40,6 @@ func TestLoadConfig(t *testing.T) {
 		assert.Error(t, err)
 
 		// cleanup
-		os.Unsetenv("SPV_CONFIG_FILE")
+		os.Unsetenv(EnvPrefix + "_CONFIG_FILE")
 	})
 }
