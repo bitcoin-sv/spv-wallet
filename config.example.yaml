@@ -12,7 +12,7 @@ cache:
     # cluster coordinator - redis/memory
     coordinator: memory
     # prefix for channel names
-    prefix: spv_cluster_
+    prefix: spv_wallet_cluster_
     redis: null
   # cache engine - freecache/redis
   engine: freecache
