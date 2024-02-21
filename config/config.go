@@ -19,7 +19,7 @@ const (
 	Version                 = "v0.12.0"
 	ConfigFilePathKey       = "config_file"
 	DefaultConfigFilePath   = "config.yaml"
-	EnvPrefix               = "SPVWALLET_"
+	EnvPrefix               = "SPVWALLET"
 	BroadcastCallbackRoute  = "/transaction/broadcast/callback"
 )
 

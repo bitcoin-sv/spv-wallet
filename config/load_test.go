@@ -30,9 +30,9 @@ func TestLoadConfig(t *testing.T) {
 
 		// when
 		// IMPORTANT! If you need to change the name of this variable, it means you're
-		// making backwards incompatible changes. Please inform all SPV Wallet adoptors and
+		// making backwards incompatible changes. Please inform all SPV Wallet adopters and
 		// update your configs on all servers and scripts.
-		os.Setenv(EnvPrefix+"CONFIG_FILE", anotherPath)
+		os.Setenv("SPVWALLET_CONFIG_FILE", anotherPath)
 		_, err := Load(defaultLogger)
 
 		// then
@@ -40,6 +40,6 @@ func TestLoadConfig(t *testing.T) {
 		assert.Error(t, err)
 
 		// cleanup
-		os.Unsetenv(EnvPrefix + "CONFIG_FILE")
+		os.Unsetenv("SPVWALLET_CONFIG_FILE")
 	})
 }
