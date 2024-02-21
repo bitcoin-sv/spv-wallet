@@ -39,8 +39,14 @@ release:: ## Runs common.release then runs godocs
 test-all-db: ## Runs all tests including embedded database tests
 	@echo "running all tests including embedded database tests..."
 	@go test ./... -v -tags="$(GO_BUILD_TAGS) database_tests"
+	cd engine/ && go test ./... -v -tags="$(GO_BUILD_TAGS) database_tests"
+	cd models/ && go test ./... -v -tags="$(GO_BUILD_TAGS) database_tests"
 
 .PHONY: test-all-db-ci
 test-all-db-ci: ## Runs all tests including embedded database tests (CI)
 	@echo "running all tests including embedded database tests..."
 	@go test ./... -coverprofile=coverage.txt -covermode=atomic -tags="$(GO_BUILD_TAGS) database_tests"
+	cd engine/ && go test ./... -coverprofile=coverage.txt -covermode=atomic -tags="$(GO_BUILD_TAGS) database_tests"
+	cd models/ && go test ./... -coverprofile=coverage.txt -covermode=atomic -tags="$(GO_BUILD_TAGS) database_tests"
+	tail -n +2 models/coverage.txt >> coverage.txt
+	tail -n +2 engine/coverage.txt >> coverage.txt
