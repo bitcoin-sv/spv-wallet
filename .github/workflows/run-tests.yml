@@ -70,8 +70,11 @@ jobs:
             ${{ runner.os }}-go-
       - name: Run linter
         run: make lint
+      # Install gotestfmt on the VM running the action.
+      - name: Set up gotestfmt
+        uses: GoTestTools/gotestfmt-action@v2
       - name: Run tests
-        run: make test-all-db-ci
+        run: make test-all-db-ci 2>&1 | tee gotest.log | gotestfmt
       - name: Update code coverage
         uses: codecov/codecov-action@v4.0.1
         with:
