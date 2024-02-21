@@ -45,7 +45,7 @@ func TestVerifyMerkleRoots(t *testing.T) {
 
 		assert.Error(t, err)
 		assert.Equal(t, 1, httpmock.GetTotalCallCount())
-		assert.True(t, bLogger.contains("block headers service client returned status code 500"))
+		assert.True(t, bLogger.contains("Block Headers Service client returned status code 500"))
 	})
 
 	t.Run("block headers service wrong auth", func(t *testing.T) {
