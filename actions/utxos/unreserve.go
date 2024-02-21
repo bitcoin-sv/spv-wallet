@@ -4,7 +4,6 @@ import (
 	"net/http"
 
 	"github.com/bitcoin-sv/spv-wallet/engine"
-
 	"github.com/julienschmidt/httprouter"
 	apirouter "github.com/mrz1836/go-api-router"
 )
