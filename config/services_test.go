@@ -22,7 +22,7 @@ func newTestServices(ctx context.Context, t *testing.T,
 func TestAppServices_CloseAll(t *testing.T) {
 	t.Parallel()
 
-	t.Run("no services", func(t *testing.T) {
+	t.Run("no services", func(_ *testing.T) {
 		s := new(AppServices)
 		s.CloseAll(context.Background())
 	})

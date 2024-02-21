@@ -19,10 +19,10 @@ const pastMerkleRootsJSON = `[
 ]`
 
 const (
-	pleaseCheck            = "Please check Block Headers Service configuration and service status."
-	appWillContinue        = "Application will continue to operate but cannot receive transactions until Block Headers Service is online."
+	pleaseCheck                         = "Please check Block Headers Service configuration and service status."
+	appWillContinue                     = "Application will continue to operate but cannot receive transactions until Block Headers Service is online."
 	blockHeaderServiceIsOfflineWarning  = "Unable to connect to Block Headers Service service at startup. " + appWillContinue + " " + pleaseCheck
-	unexpectedResponse     = "Unexpected response from Block Headers Service service. " + pleaseCheck
+	unexpectedResponse                  = "Unexpected response from Block Headers Service service. " + pleaseCheck
 	blockHeaderServiceIsNotReadyWarning = "Block Headers Service is responding but is not ready to verify transactions. " + appWillContinue
 )
 
