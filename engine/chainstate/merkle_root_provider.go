@@ -81,18 +81,18 @@ func (p *blockHeadersServiceClientProvider) verifyMerkleRoots(
 		}()
 	}
 	if err != nil {
-		return nil, _fmtAndLogError(err, logger, "Error occurred while sending request to the Block Headers Service service.")
+		return nil, _fmtAndLogError(err, logger, "Error occurred while sending request to the Block Headers Service.")
 	}
 
 	if res.StatusCode != 200 {
-		return nil, _fmtAndLogError(_statusError(res.StatusCode), logger, "Received unexpected status code from Block Headers Service service.")
+		return nil, _fmtAndLogError(_statusError(res.StatusCode), logger, "Received unexpected status code from Block Headers Service.")
 	}
 
 	// Parse response body.
 	var merkleRootsRes MerkleRootsConfirmationsResponse
 	err = json.NewDecoder(res.Body).Decode(&merkleRootsRes)
 	if err != nil {
-		return nil, _fmtAndLogError(err, logger, "Error occurred while parsing response from the Block Headers Service service.")
+		return nil, _fmtAndLogError(err, logger, "Error occurred while parsing response from the Block Headers Service.")
 	}
 
 	return &merkleRootsRes, nil
@@ -105,5 +105,5 @@ func _fmtAndLogError(err error, logger *zerolog.Logger, message string) error {
 }
 
 func _statusError(statusCode int) error {
-	return fmt.Errorf("block headers service client returned status code %d - check Block Headers Service configuration and service status", statusCode)
+	return fmt.Errorf("Block Headers Service client returned status code %d - check Block Headers Service configuration and status", statusCode)
 }

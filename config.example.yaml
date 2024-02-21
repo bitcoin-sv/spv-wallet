@@ -110,7 +110,7 @@ notifications:
 paymail:
   beef:
     block_headers_service_auth_token: mQZQ6WmxURxWz5ch
-    # url to block header service, used for merkle root verification
+    # url to Block Headers Service, used for merkle root verification
     block_headers_service_url: http://localhost:8080/api/v1/chain/merkleroot/verify
     use_beef: false
   # set is as a default sender paymail if account does not have one

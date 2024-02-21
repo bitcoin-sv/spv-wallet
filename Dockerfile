@@ -7,7 +7,7 @@ WORKDIR /go/src/github.com/bitcoin-sv/spv-wallet
 COPY . ./
 
 # Build binary
-RUN GOOS=linux go build -o spvwallet cmd/server/main.go
+RUN GOOS=linux go build -o spvwallet cmd/main.go
 
 # Get runtime image
 FROM registry.access.redhat.com/ubi9-minimal

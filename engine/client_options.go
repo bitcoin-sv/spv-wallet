@@ -495,13 +495,13 @@ func WithPaymailSupport(domains []string, defaultFromPaymail string, domainValid
 }
 
 // WithPaymailBeefSupport will enable Paymail BEEF format support (as a server) and create a Block Headers Service client for Merkle Roots verification.
-func WithPaymailBeefSupport(bhsURL, bhsAuthToken string) ClientOps {
+func WithPaymailBeefSupport(blockHeadersServiceURL, blockHeadersServiceAuthToken string) ClientOps {
 	return func(c *clientOptions) {
-		_, err := url.ParseRequestURI(bhsURL)
+		_, err := url.ParseRequestURI(blockHeadersServiceURL)
 		if err != nil {
 			panic(err)
 		}
-		c.chainstate.options = append(c.chainstate.options, chainstate.WithConnectionToBlockHeaderService(bhsURL, bhsAuthToken))
+		c.chainstate.options = append(c.chainstate.options, chainstate.WithConnectionToBlockHeaderService(blockHeadersServiceURL, blockHeadersServiceAuthToken))
 		c.paymail.serverConfig.options = append(c.paymail.serverConfig.options, server.WithBeefCapabilities())
 	}
 }

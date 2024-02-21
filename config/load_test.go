@@ -30,7 +30,7 @@ func TestLoadConfig(t *testing.T) {
 
 		// when
 		// IMPORTANT! If you need to change the name of this variable, it means you're
-		// making backwards incompatible changes. Please inform all SPV adoptors and
+		// making backwards incompatible changes. Please inform all SPV Wallet adoptors and
 		// update your configs on all servers and scripts.
 		os.Setenv(EnvPrefix+"_CONFIG_FILE", anotherPath)
 		_, err := Load(defaultLogger)

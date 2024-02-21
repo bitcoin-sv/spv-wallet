@@ -240,7 +240,7 @@ go run ./cmd/main.go -C /my/config.json
 
 #### Environment variables
 
-To override any config variable with ENV, use the "SPV\_" prefix with mapstructure annotation path with "_" as a delimiter in all uppercase. Example:
+To override any config variable with ENV, use the "SPVWALLET\_" prefix with mapstructure annotation path with "_" as a delimiter in all uppercase. Example:
 
 Let's take this fragment of AppConfig from `config.example.yaml`:
 

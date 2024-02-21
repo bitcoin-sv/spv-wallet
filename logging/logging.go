@@ -59,7 +59,7 @@ func GetDefaultLogger() *zerolog.Logger {
 	logger := ecszerolog.New(os.Stdout, ecszerolog.Level(zerolog.DebugLevel)).
 		With().
 		Caller().
-		Str("application", "spv-default").
+		Str("application", "spv-wallet-default").
 		Logger()
 
 	return &logger

@@ -49,7 +49,7 @@ func main() {
 		return
 	}
 
-	// Try to ping the block header service if enabled
+	// Try to ping the Block Headers Service if enabled
 	appConfig.CheckBlockHeaderService(context.Background(), services.Logger)
 
 	// @mrz New Relic is ready at this point

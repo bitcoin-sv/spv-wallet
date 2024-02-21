@@ -6,11 +6,11 @@ import (
 )
 
 // VerifyMerkleRoots will try to verify merkle roots with all available providers
-// When no error is returned, it means that the block headers service client responded with state: Confirmed or UnableToVerify
+// When no error is returned, it means that the Block Headers Service client responded with state: Confirmed or UnableToVerify
 func (c *Client) VerifyMerkleRoots(ctx context.Context, merkleRoots []MerkleRootConfirmationRequestItem) error {
 	pc := c.options.config.blockHedersServiceClient
 	if pc == nil {
-		c.options.logger.Warn().Msg("VerifyMerkleRoots is called even though no block headers service client is configured; this likely indicates that the paymail capabilities have been cached.")
+		c.options.logger.Warn().Msg("VerifyMerkleRoots is called even though no Block Headers Service client is configured; this likely indicates that the paymail capabilities have been cached.")
 		return errors.New("no block headers service client found")
 	}
 	merkleRootsRes, err := pc.verifyMerkleRoots(ctx, c.options.logger, merkleRoots)

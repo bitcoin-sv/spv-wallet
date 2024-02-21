@@ -209,13 +209,13 @@ type PaymailConfig struct {
 	SenderValidationEnabled bool `json:"sender_validation_enabled" mapstructure:"sender_validation_enabled"`
 }
 
-// BeefConfig consists of components required to use beef, e.g. Block Header Service for merkle roots validation
+// BeefConfig consists of components required to use beef, e.g. Block Headers Service for merkle roots validation
 type BeefConfig struct {
 	// UseBeef is a flag for enabling BEEF transactions format.
 	UseBeef bool `json:"use_beef" mapstructure:"use_beef"`
-	// BlockHeaderServiceHeaderValidationURL is the URL for merkle roots validation in Block Header Service.
+	// BlockHeaderServiceHeaderValidationURL is the URL for merkle roots validation in Block Headers Service.
 	BlockHeaderServiceHeaderValidationURL string `json:"block_header_service_url" mapstructure:"block_header_service_url"`
-	// BlockHeaderServiceAuthToken is the authentication token for validating merkle roots in Block Header Service.
+	// BlockHeaderServiceAuthToken is the authentication token for validating merkle roots in Block Headers Service.
 	BlockHeaderServiceAuthToken string `json:"block_header_service_auth_token" mapstructure:"block_header_service_auth_token"`
 }
 
