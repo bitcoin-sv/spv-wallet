@@ -20,7 +20,7 @@ func MapToContract(m *engine.Model) *common.Model {
 	}
 }
 
-// MapToModel will map the spv-wallet-models contract to the common SPV Model
+// MapToModel will map the spv-wallet-models contract to the common SPV Wallet Model
 func MapToModel(m *common.Model) *engine.Model {
 	if m == nil {
 		return nil
