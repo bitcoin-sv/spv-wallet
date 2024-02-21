@@ -10,6 +10,7 @@ import (
 	accessKeys "github.com/BuxOrg/bux-server/actions/access_keys"
 	"github.com/BuxOrg/bux-server/actions/admin"
 	"github.com/BuxOrg/bux-server/actions/base"
+	"github.com/BuxOrg/bux-server/actions/contacts"
 	"github.com/BuxOrg/bux-server/actions/destinations"
 	pmail "github.com/BuxOrg/bux-server/actions/paymail"
 	"github.com/BuxOrg/bux-server/actions/transactions"
@@ -109,6 +110,7 @@ func (s *Server) Handlers() *nrhttprouter.Router {
 	transactions.RegisterRoutes(s.Router, s.AppConfig, s.Services)
 	utxos.RegisterRoutes(s.Router, s.AppConfig, s.Services)
 	xpubs.RegisterRoutes(s.Router, s.AppConfig, s.Services)
+	contacts.RegisterRoutes(s.Router, s.AppConfig, s.Services)
 
 	// Load Paymail
 	pmail.RegisterRoutes(s.Router, s.AppConfig, s.Services)
