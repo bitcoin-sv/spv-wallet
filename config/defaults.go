@@ -7,6 +7,9 @@ import (
 	"github.com/mrz1836/go-datastore"
 )
 
+// DefaultAdminXpub is the default admin xpub used for authenticate requests.
+const DefaultAdminXpub = "xpub661MyMwAqRbcFgfmdkPgE2m5UjHXu9dj124DbaGLSjaqVESTWfCD4VuNmEbVPkbYLCkykwVZvmA8Pbf8884TQr1FgdG2nPoHR8aB36YdDQh"
+
 func getDefaultAppConfig() *AppConfig {
 	return &AppConfig{
 		Authentication:     getAuthConfigDefaults(),
@@ -24,12 +27,13 @@ func getDefaultAppConfig() *AppConfig {
 		RequestLogging:     true,
 		Server:             getServerDefaults(),
 		TaskManager:        getTaskManagerDefault(),
+		Metrics:            getMetricsDefaults(),
 	}
 }
 
 func getAuthConfigDefaults() *AuthenticationConfig {
 	return &AuthenticationConfig{
-		AdminKey:        "xpub661MyMwAqRbcFgfmdkPgE2m5UjHXu9dj124DbaGLSjaqVESTWfCD4VuNmEbVPkbYLCkykwVZvmA8Pbf8884TQr1FgdG2nPoHR8aB36YdDQh",
+		AdminKey:        DefaultAdminXpub,
 		RequireSigning:  false,
 		Scheme:          "xpub",
 		SigningDisabled: true,
@@ -53,6 +57,13 @@ func getCacheDefaults() *CacheConfig {
 			URL:                   "redis://localhost:6379",
 			UseTLS:                false,
 		},
+	}
+}
+
+func getCallbackDefaults() *CallbackConfig {
+	return &CallbackConfig{
+		CallbackHost:  "http://localhost:3003",
+		CallbackToken: "",
 	}
 }
 
@@ -113,6 +124,7 @@ func getNodesDefaults() *NodesConfig {
 	return &NodesConfig{
 		DeploymentID: "bux-" + depIDSufix.String(),
 		Protocol:     NodesProtocolArc,
+		Callback:     getCallbackDefaults(),
 		Apis: []*MinerAPI{
 			{
 				ArcURL:  "https://api.taal.com/arc",
@@ -139,7 +151,6 @@ func getPaymailDefaults() *PaymailConfig {
 			PulseAuthToken:           "mQZQ6WmxURxWz5ch", // #nosec G101
 		},
 		DefaultFromPaymail:      "from@domain.com",
-		DefaultNote:             "bux Address Resolution",
 		Domains:                 []string{"localhost"},
 		DomainValidationEnabled: true,
 		SenderValidationEnabled: false,
@@ -158,5 +169,11 @@ func getServerDefaults() *ServerConfig {
 		ReadTimeout:  15 * time.Second,
 		WriteTimeout: 15 * time.Second,
 		Port:         3003,
+	}
+}
+
+func getMetricsDefaults() *MetricsConfig {
+	return &MetricsConfig{
+		Enabled: false,
 	}
 }

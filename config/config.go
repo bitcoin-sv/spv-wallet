@@ -20,6 +20,7 @@ const (
 	ConfigFilePathKey       = "config_file"
 	DefaultConfigFilePath   = "config.yaml"
 	ConfigEnvPrefix         = "BUX_"
+	BroadcastCallbackRoute  = "/transaction/broadcast/callback"
 )
 
 // AppConfig is the configuration values and associated env vars
@@ -54,6 +55,8 @@ type AppConfig struct {
 	Server *ServerConfig `json:"server_config" mapstructure:"server_config"`
 	// TaskManager is a configuration for Task Manager in bux.
 	TaskManager *TaskManagerConfig `json:"task_manager" mapstructure:"task_manager"`
+	// Metrics is a configuration for metrics in bux.
+	Metrics *MetricsConfig `json:"metrics" mapstructure:"metrics"`
 }
 
 // AuthenticationConfig is the configuration for Authentication
@@ -76,6 +79,14 @@ type CacheConfig struct {
 	Cluster *ClusterConfig `json:"cluster" mapstructure:"cluster"`
 	// Redis is a general config for redis if the engine is set to it.
 	Redis *RedisConfig `json:"redis" mapstructure:"redis"`
+}
+
+// CallbackConfig is the configuration for callbacks
+type CallbackConfig struct {
+	// CallbackHost is the URL for broadcast callback registration.
+	CallbackHost string `json:"callback_host" mapstructure:"callback_host"`
+	// CallbackToken is the token for broadcast callback registration.
+	CallbackToken string `json:"callback_token" mapstructure:"callback_token"`
 }
 
 // ClusterConfig is a configuration for the Bux cluster
@@ -140,11 +151,12 @@ type NewRelicConfig struct {
 
 // NodesConfig consists of blockchain nodes (such as Minercraft and Arc) configuration
 type NodesConfig struct {
-	DeploymentID string         `json:"deployment_id" mapstructure:"deployment_id"`
-	Protocol     NodesProtocol  `json:"protocol" mapstructure:"protocol"`
-	Apis         []*MinerAPI    `json:"apis" mapstructure:"apis"`
-	UseFeeQuotes bool           `json:"use_fee_quotes" mapstructure:"use_fee_quotes"`
-	FeeUnit      *FeeUnitConfig `json:"fee_unit" mapstructure:"fee_unit"`
+	DeploymentID string          `json:"deployment_id" mapstructure:"deployment_id"`
+	Callback     *CallbackConfig `json:"callback" mapstructure:"callback"`
+	Protocol     NodesProtocol   `json:"protocol" mapstructure:"protocol"`
+	Apis         []*MinerAPI     `json:"apis" mapstructure:"apis"`
+	UseFeeQuotes bool            `json:"use_fee_quotes" mapstructure:"use_fee_quotes"`
+	FeeUnit      *FeeUnitConfig  `json:"fee_unit" mapstructure:"fee_unit"`
 }
 
 // FeeUnitConfig reflects the utils.FeeUnit struct with proper annotations for json and mapstructure
@@ -189,8 +201,6 @@ type PaymailConfig struct {
 	Beef *BeefConfig `json:"beef" mapstructure:"beef"`
 	// DefaultFromPaymail IE: from@domain.com.
 	DefaultFromPaymail string `json:"default_from_paymail" mapstructure:"default_from_paymail"`
-	// DefaultNote IE: message needed for address resolution.
-	DefaultNote string `json:"default_note" mapstructure:"default_note"`
 	// Domains is a list of allowed domains.
 	Domains []string `json:"domains" mapstructure:"domains"`
 	// DomainValidationEnabled should be turned off if hosted domain is not paymail related.
@@ -229,6 +239,12 @@ type ServerConfig struct {
 	WriteTimeout time.Duration `json:"write_timeout" mapstructure:"write_timeout"`
 	// Port is the port that the server should use.
 	Port int `json:"port" mapstructure:"port"`
+}
+
+// MetricsConfig represents a metrics config.
+type MetricsConfig struct {
+	// Enabled is a flag for enabling metrics.
+	Enabled bool `json:"enabled" mapstructure:"enabled"`
 }
 
 // GetUserAgent will return the outgoing user agent

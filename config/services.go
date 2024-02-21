@@ -10,6 +10,7 @@ import (
 
 	"github.com/BuxOrg/bux"
 	"github.com/BuxOrg/bux-server/logging"
+	"github.com/BuxOrg/bux-server/metrics"
 	"github.com/BuxOrg/bux/cluster"
 	"github.com/BuxOrg/bux/taskmanager"
 	"github.com/BuxOrg/bux/utils"
@@ -139,15 +140,12 @@ func (s *AppServices) loadBux(ctx context.Context, appConfig *AppConfig, testMod
 		options = append(options, bux.WithNewRelic(s.NewRelic))
 	}
 
+	if appConfig.Metrics.Enabled {
+		collector := metrics.EnableMetrics()
+		options = append(options, bux.WithMetrics(collector))
+	}
+
 	options = append(options, bux.WithUserAgent(appConfig.GetUserAgent()))
-
-	if appConfig.DisableITC {
-		options = append(options, bux.WithITCDisabled())
-	}
-
-	if appConfig.ImportBlockHeaders != "" {
-		options = append(options, bux.WithImportBlockHeaders(appConfig.ImportBlockHeaders))
-	}
 
 	if logger != nil {
 		buxLogger := logger.With().Str("service", "bux").Logger()
@@ -182,6 +180,17 @@ func (s *AppServices) loadBux(ctx context.Context, appConfig *AppConfig, testMod
 	} else if appConfig.Nodes.Protocol == NodesProtocolArc {
 		options = loadBroadcastClientArc(appConfig, options, logger)
 	}
+
+	if appConfig.Nodes.Callback.CallbackToken == "" {
+		var callbackToken string
+		callbackToken, err = utils.HashAdler32(DefaultAdminXpub)
+		if err != nil {
+			logger.Err(err).Msg("unable to compute default callback token")
+		}
+		appConfig.Nodes.Callback.CallbackToken = callbackToken
+	}
+
+	options = append(options, bux.WithCallback(appConfig.Nodes.Callback.CallbackHost+BroadcastCallbackRoute, appConfig.Nodes.Callback.CallbackToken))
 
 	options = append(options, bux.WithFeeQuotes(appConfig.Nodes.UseFeeQuotes))
 
@@ -266,7 +275,6 @@ func loadPaymail(appConfig *AppConfig, options []bux.ClientOps) []bux.ClientOps 
 	options = append(options, bux.WithPaymailSupport(
 		pm.Domains,
 		pm.DefaultFromPaymail,
-		pm.DefaultNote,
 		pm.DomainValidationEnabled,
 		pm.SenderValidationEnabled,
 	))
