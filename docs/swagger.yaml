@@ -80,7 +80,7 @@ definitions:
     - Rejected
 info:
   contact: {}
-  title: 'BUX: Server'
+  title: SPV Wallet
   version: v0.12.0
 paths:
   /transaction/broadcast/callback:
@@ -115,7 +115,7 @@ paths:
         "201":
           description: Created
       security:
-      - bux-auth-xpub: []
+      - x-auth-xpub: []
       summary: Revoke access key
       tags:
       - Access-key
@@ -133,7 +133,7 @@ paths:
         "200":
           description: OK
       security:
-      - bux-auth-xpub: []
+      - x-auth-xpub: []
       summary: Get access key
       tags:
       - Access-key
@@ -150,7 +150,7 @@ paths:
         "201":
           description: Created
       security:
-      - bux-auth-xpub: []
+      - x-auth-xpub: []
       summary: Create access key
       tags:
       - Access-key
@@ -172,7 +172,7 @@ paths:
         "200":
           description: OK
       security:
-      - bux-auth-xpub: []
+      - x-auth-xpub: []
       summary: Count of access keys
       tags:
       - Access-key
@@ -210,7 +210,7 @@ paths:
         "200":
           description: OK
       security:
-      - bux-auth-xpub: []
+      - x-auth-xpub: []
       summary: Search access key
       tags:
       - Access-key
@@ -232,7 +232,7 @@ paths:
         "200":
           description: OK
       security:
-      - bux-auth-xpub: []
+      - x-auth-xpub: []
       summary: Access Keys Count
       tags:
       - Admin
@@ -270,68 +270,8 @@ paths:
         "200":
           description: OK
       security:
-      - bux-auth-xpub: []
+      - x-auth-xpub: []
       summary: Access Keys Search
-      tags:
-      - Admin
-  /v1/admin/block-headers/count:
-    post:
-      description: Get block headers count
-      parameters:
-      - description: Metadata filter
-        in: query
-        name: metadata
-        type: string
-      - description: Conditions filter
-        in: query
-        name: conditions
-        type: string
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-      security:
-      - bux-auth-xpub: []
-      summary: Get block headers count
-      tags:
-      - Admin
-  /v1/admin/block-headers/search:
-    post:
-      description: Search for block headers
-      parameters:
-      - description: page
-        in: query
-        name: page
-        type: integer
-      - description: page_size
-        in: query
-        name: page_size
-        type: integer
-      - description: order_by_field
-        in: query
-        name: order_by_field
-        type: string
-      - description: sort_direction
-        in: query
-        name: sort_direction
-        type: string
-      - description: Metadata filter
-        in: query
-        name: metadata
-        type: string
-      - description: Conditions filter
-        in: query
-        name: conditions
-        type: string
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-      security:
-      - bux-auth-xpub: []
-      summary: Search for block headers
       tags:
       - Admin
   /v1/admin/destinations/count:
@@ -352,7 +292,7 @@ paths:
         "200":
           description: OK
       security:
-      - bux-auth-xpub: []
+      - x-auth-xpub: []
       summary: Count destinations
       tags:
       - Admin
@@ -390,7 +330,7 @@ paths:
         "200":
           description: OK
       security:
-      - bux-auth-xpub: []
+      - x-auth-xpub: []
       summary: Search for destinations
       tags:
       - Admin
@@ -426,7 +366,7 @@ paths:
         "201":
           description: Created
       security:
-      - bux-auth-xpub: []
+      - x-auth-xpub: []
       summary: Create paymail
       tags:
       - Admin
@@ -445,7 +385,7 @@ paths:
         "200":
           description: OK
       security:
-      - bux-auth-xpub: []
+      - x-auth-xpub: []
       summary: Delete paymail
       tags:
       - Admin
@@ -464,7 +404,7 @@ paths:
         "200":
           description: OK
       security:
-      - bux-auth-xpub: []
+      - x-auth-xpub: []
       summary: Get paymail
       tags:
       - Admin
@@ -486,7 +426,7 @@ paths:
         "200":
           description: OK
       security:
-      - bux-auth-xpub: []
+      - x-auth-xpub: []
       summary: Paymail addresses count
       tags:
       - Admin
@@ -524,7 +464,7 @@ paths:
         "200":
           description: OK
       security:
-      - bux-auth-xpub: []
+      - x-auth-xpub: []
       summary: Paymail addresses search
       tags:
       - Admin
@@ -537,7 +477,7 @@ paths:
         "200":
           description: OK
       security:
-      - bux-auth-xpub: []
+      - x-auth-xpub: []
       summary: Get stats
       tags:
       - Admin
@@ -550,7 +490,7 @@ paths:
         "200":
           description: OK
       security:
-      - bux-auth-xpub: []
+      - x-auth-xpub: []
       summary: Get status
       tags:
       - Admin
@@ -572,7 +512,7 @@ paths:
         "200":
           description: OK
       security:
-      - bux-auth-xpub: []
+      - x-auth-xpub: []
       summary: Count transactions
       tags:
       - Admin
@@ -591,7 +531,7 @@ paths:
         "201":
           description: Created
       security:
-      - bux-auth-xpub: []
+      - x-auth-xpub: []
       summary: Record transactions
       tags:
       - Admin
@@ -629,7 +569,7 @@ paths:
         "200":
           description: OK
       security:
-      - bux-auth-xpub: []
+      - x-auth-xpub: []
       summary: Search for transactions
       tags:
       - Admin
@@ -651,7 +591,7 @@ paths:
         "200":
           description: OK
       security:
-      - bux-auth-xpub: []
+      - x-auth-xpub: []
       summary: Count utxos
       tags:
       - Admin
@@ -689,7 +629,7 @@ paths:
         "200":
           description: OK
       security:
-      - bux-auth-xpub: []
+      - x-auth-xpub: []
       summary: Search for utxos
       tags:
       - Admin
@@ -711,7 +651,7 @@ paths:
         "200":
           description: OK
       security:
-      - bux-auth-xpub: []
+      - x-auth-xpub: []
       summary: Count xpubs
       tags:
       - Admin
@@ -749,7 +689,7 @@ paths:
         "200":
           description: OK
       security:
-      - bux-auth-xpub: []
+      - x-auth-xpub: []
       summary: Search for xpubs
       tags:
       - Admin
@@ -775,7 +715,7 @@ paths:
         "200":
           description: OK
       security:
-      - bux-auth-xpub: []
+      - x-auth-xpub: []
       summary: Get a destination
       tags:
       - Destinations
@@ -806,7 +746,7 @@ paths:
         "200":
           description: OK
       security:
-      - bux-auth-xpub: []
+      - x-auth-xpub: []
       summary: Update destination
       tags:
       - Destinations
@@ -831,7 +771,7 @@ paths:
         "201":
           description: Created
       security:
-      - bux-auth-xpub: []
+      - x-auth-xpub: []
       summary: Create a new destination
       tags:
       - Destinations
@@ -853,7 +793,7 @@ paths:
         "200":
           description: OK
       security:
-      - bux-auth-xpub: []
+      - x-auth-xpub: []
       summary: Count Destinations
       tags:
       - Destinations
@@ -891,7 +831,7 @@ paths:
         "200":
           description: OK
       security:
-      - bux-auth-xpub: []
+      - x-auth-xpub: []
       summary: Search for a destination
       tags:
       - Destinations
@@ -910,7 +850,7 @@ paths:
         "200":
           description: OK
       security:
-      - bux-auth-xpub: []
+      - x-auth-xpub: []
       summary: Delete paymail
       tags:
       - Paymails
@@ -945,7 +885,7 @@ paths:
         "201":
           description: Created
       security:
-      - bux-auth-xpub: []
+      - x-auth-xpub: []
       summary: Create paymail
       tags:
       - Paymails
@@ -964,7 +904,7 @@ paths:
         "200":
           description: OK
       security:
-      - bux-auth-xpub: []
+      - x-auth-xpub: []
       summary: Get transaction by id
       tags:
       - Transactions
@@ -987,7 +927,7 @@ paths:
         "200":
           description: OK
       security:
-      - bux-auth-xpub: []
+      - x-auth-xpub: []
       summary: Update transaction
       tags:
       - Transactions
@@ -1009,7 +949,7 @@ paths:
         "201":
           description: Created
       security:
-      - bux-auth-xpub: []
+      - x-auth-xpub: []
       summary: New transaction
       tags:
       - Transactions
@@ -1031,7 +971,7 @@ paths:
         "200":
           description: OK
       security:
-      - bux-auth-xpub: []
+      - x-auth-xpub: []
       summary: Count of transactions
       tags:
       - Transactions
@@ -1059,7 +999,7 @@ paths:
         "200":
           description: OK
       security:
-      - bux-auth-xpub: []
+      - x-auth-xpub: []
       summary: Record transaction
       tags:
       - Transactions
@@ -1097,7 +1037,7 @@ paths:
         "200":
           description: OK
       security:
-      - bux-auth-xpub: []
+      - x-auth-xpub: []
       summary: Search transaction
       tags:
       - Transactions
@@ -1121,7 +1061,7 @@ paths:
         "200":
           description: OK
       security:
-      - bux-auth-xpub: []
+      - x-auth-xpub: []
       summary: Get UTXO
       tags:
       - UTXO
@@ -1143,7 +1083,7 @@ paths:
         "200":
           description: OK
       security:
-      - bux-auth-xpub: []
+      - x-auth-xpub: []
       summary: Count of UTXOs
       tags:
       - UTXO
@@ -1181,7 +1121,7 @@ paths:
         "200":
           description: OK
       security:
-      - bux-auth-xpub: []
+      - x-auth-xpub: []
       summary: Search UTXO
       tags:
       - UTXO
@@ -1197,7 +1137,7 @@ paths:
         "201":
           description: Created
       security:
-      - bux-auth-xpub: []
+      - x-auth-xpub: []
       summary: Unreserve UTXOs
       tags:
       - UTXO
@@ -1215,7 +1155,7 @@ paths:
         "200":
           description: OK
       security:
-      - bux-auth-xpub: []
+      - x-auth-xpub: []
       summary: Get xPub
       tags:
       - xPub
@@ -1232,7 +1172,7 @@ paths:
         "200":
           description: OK
       security:
-      - bux-auth-xpub: []
+      - x-auth-xpub: []
       summary: Update xPub
       tags:
       - xPub
@@ -1254,17 +1194,17 @@ paths:
         "201":
           description: Created
       security:
-      - bux-auth-xpub: []
+      - x-auth-xpub: []
       summary: Create xPub
       tags:
       - xPub
 securityDefinitions:
-  bux-auth-xpub:
-    in: header
-    name: bux-auth-xpub
-    type: apiKey
   callback-auth:
     in: header
     name: authorization
+    type: apiKey
+  x-auth-xpub:
+    in: header
+    name: x-auth-xpub
     type: apiKey
 swagger: "2.0"
