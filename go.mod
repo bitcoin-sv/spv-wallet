@@ -8,6 +8,7 @@ go 1.21.5
 // Removing these replaces could disrupt the interdependency between modules and hinder our ability to build cohesive features
 // that often require modifications across multiple packages. Please refrain from removing these directives.
 replace github.com/bitcoin-sv/spv-wallet/models => ./models
+
 replace github.com/bitcoin-sv/spv-wallet/engine => ./engine
 
 require (
