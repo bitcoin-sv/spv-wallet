@@ -1,7 +1,7 @@
 {
     "swagger": "2.0",
     "info": {
-        "title": "BUX: Server",
+        "title": "SPV Wallet",
         "contact": {},
         "version": "v0.12.0"
     },
@@ -39,7 +39,7 @@
             "get": {
                 "security": [
                     {
-                        "bux-auth-xpub": []
+                        "x-auth-xpub": []
                     }
                 ],
                 "description": "Get access key",
@@ -68,7 +68,7 @@
             "post": {
                 "security": [
                     {
-                        "bux-auth-xpub": []
+                        "x-auth-xpub": []
                     }
                 ],
                 "description": "Create access key",
@@ -96,7 +96,7 @@
             "delete": {
                 "security": [
                     {
-                        "bux-auth-xpub": []
+                        "x-auth-xpub": []
                     }
                 ],
                 "description": "Revoke access key",
@@ -127,7 +127,7 @@
             "post": {
                 "security": [
                     {
-                        "bux-auth-xpub": []
+                        "x-auth-xpub": []
                     }
                 ],
                 "description": "Count of access keys",
@@ -163,7 +163,7 @@
             "post": {
                 "security": [
                     {
-                        "bux-auth-xpub": []
+                        "x-auth-xpub": []
                     }
                 ],
                 "description": "Search access key",
@@ -223,7 +223,7 @@
             "post": {
                 "security": [
                     {
-                        "bux-auth-xpub": []
+                        "x-auth-xpub": []
                     }
                 ],
                 "description": "Access Keys Count",
@@ -259,7 +259,7 @@
             "post": {
                 "security": [
                     {
-                        "bux-auth-xpub": []
+                        "x-auth-xpub": []
                     }
                 ],
                 "description": "Access Keys Search",
@@ -315,107 +315,11 @@
                 }
             }
         },
-        "/v1/admin/block-headers/count": {
-            "post": {
-                "security": [
-                    {
-                        "bux-auth-xpub": []
-                    }
-                ],
-                "description": "Get block headers count",
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Admin"
-                ],
-                "summary": "Get block headers count",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Metadata filter",
-                        "name": "metadata",
-                        "in": "query"
-                    },
-                    {
-                        "type": "string",
-                        "description": "Conditions filter",
-                        "name": "conditions",
-                        "in": "query"
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK"
-                    }
-                }
-            }
-        },
-        "/v1/admin/block-headers/search": {
-            "post": {
-                "security": [
-                    {
-                        "bux-auth-xpub": []
-                    }
-                ],
-                "description": "Search for block headers",
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Admin"
-                ],
-                "summary": "Search for block headers",
-                "parameters": [
-                    {
-                        "type": "integer",
-                        "description": "page",
-                        "name": "page",
-                        "in": "query"
-                    },
-                    {
-                        "type": "integer",
-                        "description": "page_size",
-                        "name": "page_size",
-                        "in": "query"
-                    },
-                    {
-                        "type": "string",
-                        "description": "order_by_field",
-                        "name": "order_by_field",
-                        "in": "query"
-                    },
-                    {
-                        "type": "string",
-                        "description": "sort_direction",
-                        "name": "sort_direction",
-                        "in": "query"
-                    },
-                    {
-                        "type": "string",
-                        "description": "Metadata filter",
-                        "name": "metadata",
-                        "in": "query"
-                    },
-                    {
-                        "type": "string",
-                        "description": "Conditions filter",
-                        "name": "conditions",
-                        "in": "query"
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK"
-                    }
-                }
-            }
-        },
         "/v1/admin/destinations/count": {
             "post": {
                 "security": [
                     {
-                        "bux-auth-xpub": []
+                        "x-auth-xpub": []
                     }
                 ],
                 "description": "Count destinations",
@@ -451,7 +355,7 @@
             "post": {
                 "security": [
                     {
-                        "bux-auth-xpub": []
+                        "x-auth-xpub": []
                     }
                 ],
                 "description": "Search for destinations",
@@ -511,7 +415,7 @@
             "post": {
                 "security": [
                     {
-                        "bux-auth-xpub": []
+                        "x-auth-xpub": []
                     }
                 ],
                 "description": "Create paymail",
@@ -567,7 +471,7 @@
             "delete": {
                 "security": [
                     {
-                        "bux-auth-xpub": []
+                        "x-auth-xpub": []
                     }
                 ],
                 "description": "Delete paymail",
@@ -598,7 +502,7 @@
             "get": {
                 "security": [
                     {
-                        "bux-auth-xpub": []
+                        "x-auth-xpub": []
                     }
                 ],
                 "description": "Get paymail",
@@ -629,7 +533,7 @@
             "post": {
                 "security": [
                     {
-                        "bux-auth-xpub": []
+                        "x-auth-xpub": []
                     }
                 ],
                 "description": "Paymail addresses count",
@@ -665,7 +569,7 @@
             "post": {
                 "security": [
                     {
-                        "bux-auth-xpub": []
+                        "x-auth-xpub": []
                     }
                 ],
                 "description": "Paymail addresses search",
@@ -725,7 +629,7 @@
             "get": {
                 "security": [
                     {
-                        "bux-auth-xpub": []
+                        "x-auth-xpub": []
                     }
                 ],
                 "description": "Get stats",
@@ -747,7 +651,7 @@
             "get": {
                 "security": [
                     {
-                        "bux-auth-xpub": []
+                        "x-auth-xpub": []
                     }
                 ],
                 "description": "Get status",
@@ -769,7 +673,7 @@
             "post": {
                 "security": [
                     {
-                        "bux-auth-xpub": []
+                        "x-auth-xpub": []
                     }
                 ],
                 "description": "Count transactions",
@@ -805,7 +709,7 @@
             "post": {
                 "security": [
                     {
-                        "bux-auth-xpub": []
+                        "x-auth-xpub": []
                     }
                 ],
                 "description": "Record transactions",
@@ -836,7 +740,7 @@
             "post": {
                 "security": [
                     {
-                        "bux-auth-xpub": []
+                        "x-auth-xpub": []
                     }
                 ],
                 "description": "Search for transactions",
@@ -896,7 +800,7 @@
             "post": {
                 "security": [
                     {
-                        "bux-auth-xpub": []
+                        "x-auth-xpub": []
                     }
                 ],
                 "description": "Count utxos",
@@ -932,7 +836,7 @@
             "post": {
                 "security": [
                     {
-                        "bux-auth-xpub": []
+                        "x-auth-xpub": []
                     }
                 ],
                 "description": "Search for utxos",
@@ -992,7 +896,7 @@
             "post": {
                 "security": [
                     {
-                        "bux-auth-xpub": []
+                        "x-auth-xpub": []
                     }
                 ],
                 "description": "Count xpubs",
@@ -1028,7 +932,7 @@
             "post": {
                 "security": [
                     {
-                        "bux-auth-xpub": []
+                        "x-auth-xpub": []
                     }
                 ],
                 "description": "Search for xpubs",
@@ -1088,7 +992,7 @@
             "get": {
                 "security": [
                     {
-                        "bux-auth-xpub": []
+                        "x-auth-xpub": []
                     }
                 ],
                 "description": "Get a destination",
@@ -1128,7 +1032,7 @@
             "post": {
                 "security": [
                     {
-                        "bux-auth-xpub": []
+                        "x-auth-xpub": []
                     }
                 ],
                 "description": "Create a new destination",
@@ -1168,7 +1072,7 @@
             "patch": {
                 "security": [
                     {
-                        "bux-auth-xpub": []
+                        "x-auth-xpub": []
                     }
                 ],
                 "description": "Update destination",
@@ -1219,7 +1123,7 @@
             "post": {
                 "security": [
                     {
-                        "bux-auth-xpub": []
+                        "x-auth-xpub": []
                     }
                 ],
                 "description": "Count Destinations",
@@ -1255,7 +1159,7 @@
             "get": {
                 "security": [
                     {
-                        "bux-auth-xpub": []
+                        "x-auth-xpub": []
                     }
                 ],
                 "description": "Search for a destination",
@@ -1315,7 +1219,7 @@
             "post": {
                 "security": [
                     {
-                        "bux-auth-xpub": []
+                        "x-auth-xpub": []
                     }
                 ],
                 "description": "Create paymail",
@@ -1369,7 +1273,7 @@
             "delete": {
                 "security": [
                     {
-                        "bux-auth-xpub": []
+                        "x-auth-xpub": []
                     }
                 ],
                 "description": "Delete paymail",
@@ -1400,7 +1304,7 @@
             "get": {
                 "security": [
                     {
-                        "bux-auth-xpub": []
+                        "x-auth-xpub": []
                     }
                 ],
                 "description": "Get transaction by id",
@@ -1429,7 +1333,7 @@
             "post": {
                 "security": [
                     {
-                        "bux-auth-xpub": []
+                        "x-auth-xpub": []
                     }
                 ],
                 "description": "New transaction",
@@ -1464,7 +1368,7 @@
             "patch": {
                 "security": [
                     {
-                        "bux-auth-xpub": []
+                        "x-auth-xpub": []
                     }
                 ],
                 "description": "Update transaction",
@@ -1502,7 +1406,7 @@
             "post": {
                 "security": [
                     {
-                        "bux-auth-xpub": []
+                        "x-auth-xpub": []
                     }
                 ],
                 "description": "Count of transactions",
@@ -1538,7 +1442,7 @@
             "post": {
                 "security": [
                     {
-                        "bux-auth-xpub": []
+                        "x-auth-xpub": []
                     }
                 ],
                 "description": "Record transaction",
@@ -1582,7 +1486,7 @@
             "post": {
                 "security": [
                     {
-                        "bux-auth-xpub": []
+                        "x-auth-xpub": []
                     }
                 ],
                 "description": "Search transaction",
@@ -1642,7 +1546,7 @@
             "get": {
                 "security": [
                     {
-                        "bux-auth-xpub": []
+                        "x-auth-xpub": []
                     }
                 ],
                 "description": "Get UTXO",
@@ -1680,7 +1584,7 @@
             "post": {
                 "security": [
                     {
-                        "bux-auth-xpub": []
+                        "x-auth-xpub": []
                     }
                 ],
                 "description": "Count of UTXOs",
@@ -1716,7 +1620,7 @@
             "post": {
                 "security": [
                     {
-                        "bux-auth-xpub": []
+                        "x-auth-xpub": []
                     }
                 ],
                 "description": "Search UTXO",
@@ -1776,7 +1680,7 @@
             "patch": {
                 "security": [
                     {
-                        "bux-auth-xpub": []
+                        "x-auth-xpub": []
                     }
                 ],
                 "description": "Unreserve UTXOs",
@@ -1803,7 +1707,7 @@
             "get": {
                 "security": [
                     {
-                        "bux-auth-xpub": []
+                        "x-auth-xpub": []
                     }
                 ],
                 "description": "Get xPub",
@@ -1831,7 +1735,7 @@
             "post": {
                 "security": [
                     {
-                        "bux-auth-xpub": []
+                        "x-auth-xpub": []
                     }
                 ],
                 "description": "Create xPub",
@@ -1866,7 +1770,7 @@
             "patch": {
                 "security": [
                     {
-                        "bux-auth-xpub": []
+                        "x-auth-xpub": []
                     }
                 ],
                 "description": "Update xPub",
@@ -1989,14 +1893,14 @@
         }
     },
     "securityDefinitions": {
-        "bux-auth-xpub": {
-            "type": "apiKey",
-            "name": "bux-auth-xpub",
-            "in": "header"
-        },
         "callback-auth": {
             "type": "apiKey",
             "name": "authorization",
+            "in": "header"
+        },
+        "x-auth-xpub": {
+            "type": "apiKey",
+            "name": "x-auth-xpub",
             "in": "header"
         }
     }

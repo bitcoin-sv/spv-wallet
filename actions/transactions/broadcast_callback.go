@@ -32,7 +32,7 @@ func (a *Action) broadcastCallback(w http.ResponseWriter, req *http.Request, _ h
 		}
 	}()
 
-	err = a.Services.Bux.UpdateTransaction(req.Context(), resp)
+	err = a.Services.SpvWalletEngine.UpdateTransaction(req.Context(), resp)
 	if err != nil {
 		a.Services.Logger.Err(err).Msgf("failed to update transaction - tx: %v", resp)
 		apirouter.ReturnResponse(w, req, http.StatusInternalServerError, "")

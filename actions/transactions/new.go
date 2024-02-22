@@ -4,10 +4,10 @@ import (
 	"encoding/json"
 	"net/http"
 
-	"github.com/BuxOrg/bux"
-	buxmodels "github.com/BuxOrg/bux-models"
-	"github.com/BuxOrg/bux-server/actions"
-	"github.com/BuxOrg/bux-server/mappings"
+	"github.com/bitcoin-sv/spv-wallet/actions"
+	"github.com/bitcoin-sv/spv-wallet/engine"
+	"github.com/bitcoin-sv/spv-wallet/mappings"
+	"github.com/bitcoin-sv/spv-wallet/models"
 	"github.com/julienschmidt/httprouter"
 	apirouter "github.com/mrz1836/go-api-router"
 )
@@ -22,14 +22,14 @@ import (
 // @Param		metadata query string false "metadata"
 // @Success		201
 // @Router		/v1/transaction [post]
-// @Security	bux-auth-xpub
+// @Security	x-auth-xpub
 func (a *Action) newTransaction(w http.ResponseWriter, req *http.Request, _ httprouter.Params) {
 	// Parse the params
 	params := apirouter.GetParams(req)
 
 	// Get the xPub from the request (via authentication)
-	reqXPub, _ := bux.GetXpubFromRequest(req)
-	xPub, err := a.Services.Bux.GetXpub(req.Context(), reqXPub)
+	reqXPub, _ := engine.GetXpubFromRequest(req)
+	xPub, err := a.Services.SpvWalletEngine.GetXpub(req.Context(), reqXPub)
 	if err != nil {
 		apirouter.ReturnResponse(w, req, http.StatusUnprocessableEntity, err.Error())
 		return
@@ -39,8 +39,7 @@ func (a *Action) newTransaction(w http.ResponseWriter, req *http.Request, _ http
 	}
 
 	// Read transaction config from request body
-	// TODO: Austin's params package probably has a better way to do this than
-	// marshal/unmarshal... couldn't figure it out
+	// TODO: consider using go params package functions instead of marshal/unmarshal
 	configMap, ok := params.GetJSONOk("config")
 	if !ok {
 		apirouter.ReturnResponse(w, req, http.StatusBadRequest, actions.ErrTxConfigNotFound.Error())
@@ -53,23 +52,23 @@ func (a *Action) newTransaction(w http.ResponseWriter, req *http.Request, _ http
 		return
 	}
 
-	txContract := buxmodels.TransactionConfig{}
+	txContract := models.TransactionConfig{}
 	if err = json.Unmarshal(configBytes, &txContract); err != nil {
 		apirouter.ReturnResponse(w, req, http.StatusBadRequest, actions.ErrBadTxConfig.Error())
 		return
 	}
 
-	metadata := params.GetJSON(bux.ModelMetadata.String())
-	opts := a.Services.Bux.DefaultModelOptions()
+	metadata := params.GetJSON(engine.ModelMetadata.String())
+	opts := a.Services.SpvWalletEngine.DefaultModelOptions()
 	if metadata != nil {
-		opts = append(opts, bux.WithMetadatas(metadata))
+		opts = append(opts, engine.WithMetadatas(metadata))
 	}
 
-	txConfig := mappings.MapToTransactionConfigBux(&txContract)
+	txConfig := mappings.MapTransactionConfigEngineToModel(&txContract)
 
 	// Record a new transaction (get the hex from parameters)
-	var transaction *bux.DraftTransaction
-	if transaction, err = a.Services.Bux.NewTransaction(
+	var transaction *engine.DraftTransaction
+	if transaction, err = a.Services.SpvWalletEngine.NewTransaction(
 		req.Context(),
 		xPub.RawXpub(),
 		txConfig,

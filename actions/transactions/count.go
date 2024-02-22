@@ -3,9 +3,9 @@ package transactions
 import (
 	"net/http"
 
-	"github.com/BuxOrg/bux"
-	"github.com/BuxOrg/bux-server/actions"
-	"github.com/BuxOrg/bux-server/mappings"
+	"github.com/bitcoin-sv/spv-wallet/actions"
+	"github.com/bitcoin-sv/spv-wallet/engine"
+	"github.com/bitcoin-sv/spv-wallet/mappings"
 	"github.com/julienschmidt/httprouter"
 	apirouter "github.com/mrz1836/go-api-router"
 )
@@ -20,14 +20,14 @@ import (
 // @Param		conditions query string false "conditions"
 // @Success		200
 // @Router		/v1/transaction/count [post]
-// @Security	bux-auth-xpub
+// @Security	x-auth-xpub
 func (a *Action) count(w http.ResponseWriter, req *http.Request, _ httprouter.Params) {
-	reqXPubID, _ := bux.GetXpubIDFromRequest(req)
+	reqXPubID, _ := engine.GetXpubIDFromRequest(req)
 
 	// Parse the params
 	params := apirouter.GetParams(req)
 	_, metadataModel, conditions, err := actions.GetQueryParameters(params)
-	metadata := mappings.MapToBuxMetadata(metadataModel)
+	metadata := mappings.MapToSpvWalletMetadata(metadataModel)
 	if err != nil {
 		apirouter.ReturnResponse(w, req, http.StatusExpectationFailed, err.Error())
 		return
@@ -35,7 +35,7 @@ func (a *Action) count(w http.ResponseWriter, req *http.Request, _ httprouter.Pa
 
 	// Record a new transaction (get the hex from parameters)a
 	var count int64
-	if count, err = a.Services.Bux.GetTransactionsByXpubIDCount(
+	if count, err = a.Services.SpvWalletEngine.GetTransactionsByXpubIDCount(
 		req.Context(),
 		reqXPubID,
 		metadata,

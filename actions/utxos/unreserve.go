@@ -3,7 +3,7 @@ package utxos
 import (
 	"net/http"
 
-	"github.com/BuxOrg/bux"
+	"github.com/bitcoin-sv/spv-wallet/engine"
 	"github.com/julienschmidt/httprouter"
 	apirouter "github.com/mrz1836/go-api-router"
 )
@@ -16,15 +16,15 @@ import (
 // @Param		reference_id query string false "draft tx id"
 // @Success		201
 // @Router		/v1/utxo/unreserve [patch]
-// @Security	bux-auth-xpub
+// @Security	x-auth-xpub
 func (a *Action) unreserve(w http.ResponseWriter, req *http.Request, _ httprouter.Params) {
-	reqXPubID, _ := bux.GetXpubIDFromRequest(req)
+	reqXPubID, _ := engine.GetXpubIDFromRequest(req)
 	params := apirouter.GetParams(req)
 
-	err := a.Services.Bux.UnReserveUtxos(
+	err := a.Services.SpvWalletEngine.UnReserveUtxos(
 		req.Context(),
 		reqXPubID,
-		params.GetString(bux.ReferenceIDField),
+		params.GetString(engine.ReferenceIDField),
 	)
 	if err != nil {
 		apirouter.ReturnResponse(w, req, http.StatusUnprocessableEntity, err.Error())

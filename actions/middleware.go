@@ -5,9 +5,9 @@ import (
 	"strings"
 	"time"
 
-	"github.com/BuxOrg/bux"
-	"github.com/BuxOrg/bux-server/config"
-	"github.com/BuxOrg/bux-server/dictionary"
+	"github.com/bitcoin-sv/spv-wallet/config"
+	"github.com/bitcoin-sv/spv-wallet/dictionary"
+	"github.com/bitcoin-sv/spv-wallet/engine"
 	"github.com/gofrs/uuid"
 	"github.com/julienschmidt/httprouter"
 	apirouter "github.com/mrz1836/go-api-router"
@@ -32,7 +32,7 @@ func (a *Action) RequireAuthentication(fn httprouter.Handle) httprouter.Handle {
 	return func(w http.ResponseWriter, req *http.Request, p httprouter.Params) {
 		// Check the authentication
 		var knownErr dictionary.ErrorMessage
-		if req, knownErr = CheckAuthentication(a.AppConfig, a.Services.Bux, req, false, true); knownErr.Code > 0 {
+		if req, knownErr = CheckAuthentication(a.AppConfig, a.Services.SpvWalletEngine, req, false, true); knownErr.Code > 0 {
 			ReturnErrorResponse(w, req, knownErr, "")
 			return
 		}
@@ -47,7 +47,7 @@ func (a *Action) RequireBasicAuthentication(fn httprouter.Handle) httprouter.Han
 	return func(w http.ResponseWriter, req *http.Request, p httprouter.Params) {
 		// Check the authentication
 		var knownErr dictionary.ErrorMessage
-		if req, knownErr = CheckAuthentication(a.AppConfig, a.Services.Bux, req, false, false); knownErr.Code > 0 {
+		if req, knownErr = CheckAuthentication(a.AppConfig, a.Services.SpvWalletEngine, req, false, false); knownErr.Code > 0 {
 			ReturnErrorResponse(w, req, knownErr, "")
 			return
 		}
@@ -62,7 +62,7 @@ func (a *Action) RequireAdminAuthentication(fn httprouter.Handle) httprouter.Han
 	return func(w http.ResponseWriter, req *http.Request, p httprouter.Params) {
 		// Check the authentication
 		var knownErr dictionary.ErrorMessage
-		if req, knownErr = CheckAuthentication(a.AppConfig, a.Services.Bux, req, true, true); knownErr.Code > 0 {
+		if req, knownErr = CheckAuthentication(a.AppConfig, a.Services.SpvWalletEngine, req, true, true); knownErr.Code > 0 {
 			ReturnErrorResponse(w, req, knownErr, "")
 			return
 		}
@@ -92,7 +92,7 @@ func (a *Action) Request(_ *apirouter.Router, h httprouter.Handle) httprouter.Ha
 }
 
 // CheckAuthentication will check the authentication
-func CheckAuthentication(appConfig *config.AppConfig, bux bux.ClientInterface, req *http.Request,
+func CheckAuthentication(appConfig *config.AppConfig, spvWalletEngine engine.ClientInterface, req *http.Request,
 	adminRequired bool, requireSigning bool,
 ) (*http.Request, dictionary.ErrorMessage) {
 	// Bad/Unknown scheme
@@ -102,7 +102,7 @@ func CheckAuthentication(appConfig *config.AppConfig, bux bux.ClientInterface, r
 
 	// AuthenticateFromRequest using the xPub scheme
 	var err error
-	if req, err = bux.AuthenticateRequest(
+	if req, err = spvWalletEngine.AuthenticateRequest(
 		req.Context(),
 		req, []string{appConfig.Authentication.AdminKey}, adminRequired,
 		requireSigning && appConfig.Authentication.RequireSigning,

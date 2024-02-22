@@ -2,8 +2,8 @@
 ### !NOTE: This file is meant to be used by start.sh! ###
 ########################################################
 services:
-  bux-wallet-frontend:
-    image: bsvb/bux-wallet-frontend:latest
+  spv-wallet-web-frontend:
+    image: bitcoin-sv/spv-wallet-web-frontend:latest
     pull_policy: always
     ports:
       - "3002:80"
@@ -11,56 +11,56 @@ services:
       - source: frontend-env-config
         target: /usr/share/nginx/html/env-config.json
 
-  bux-wallet-backend:
-    image: bsvb/bux-wallet-backend:latest
+  spv-wallet-web-backend:
+    image: bitcoin-sv/spv-wallet-web-backend:latest
     pull_policy: always
     environment:
-      BUX_PAYMAIL_DOMAIN: '${RUN_PAYMAIL_DOMAIN}'
+      SPVWALLET_PAYMAIL_DOMAIN: '${RUN_PAYMAIL_DOMAIN}'
       HTTP_SERVER_CORS_ALLOWEDDOMAINS: 'http://localhost:3002'
     env_file:
       - .env.config
     ports:
       - "8081:8080"
     links:
-      - bux-postgresql
+      - spv-wallet-postgresql
     depends_on:
-      bux-postgresql:
+      spv-wallet-postgresql:
         condition: service_healthy
 
-  pulse:
-    image: bsvb/pulse:latest
+  block-headers-service:
+    image: bitcoin-sv/block-headers-service:latest
     pull_policy: always
     command:
       - "--preloaded"
     ports:
       - "8080:8080"
     volumes:
-      - pulse-data:/app/data
+      - block-headers-service-data:/app/data
 
-  bux-server:
+  spv-wallet-engine:
     build: .
     environment:
-      BUX_PAYMAIL_DOMAINS: '${RUN_PAYMAIL_DOMAIN}'
+      SPVWALLET_PAYMAIL_DOMAINS: '${RUN_PAYMAIL_DOMAIN}'
     env_file:
       - .env.config
     ports:
       - "3003:3003"
     restart: unless-stopped
 
-  bux-redis:
+  spv-wallet-redis:
     image: redis
     hostname: redis
     ports:
       - "6379:6379"
     volumes:
-      - bux-redis-data:/data
+      - spv-wallet-redis-data:/data
     healthcheck:
       test: ["CMD", "redis-cli", "ping"]
 
-  bux-postgresql:
+  spv-wallet-postgresql:
     image: postgres
     volumes:
-      - bux-postgresql-data:/var/lib/postgresql/data
+      - spv-wallet-postgresql-data:/var/lib/postgresql/data
     environment:
       - POSTGRES_NAME=postgres
       - POSTGRES_USER=postgres
@@ -72,7 +72,7 @@ services:
       timeout: 5s
       retries: 3
 
-  bux-mongodb:
+  spv-wallet-mongodb:
     image: mongo
     environment:
       MONGO_INITDB_ROOT_USERNAME: mongo
@@ -81,7 +81,7 @@ services:
     ports:
       - '27017:27017'
     volumes:
-      - bux-mongodb-data:/data/db
+      - spv-wallet-mongodb-data:/data/db
     healthcheck:
       test: echo 'db.runCommand("ping").ok' | mongosh mongodb:27017/test --quiet
       interval: 10s
@@ -90,11 +90,11 @@ services:
       start_period: 40s
 
 volumes:
-  bux-postgresql-data:
+  spv-wallet-postgresql-data:
     driver: local
-  bux-redis-data:
+  spv-wallet-redis-data:
     driver: local
-  bux-mongodb-data:
+  spv-wallet-mongodb-data:
     driver: local
   pulse-data:
     driver: local

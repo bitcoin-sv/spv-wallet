@@ -22,7 +22,7 @@ func newTestServices(ctx context.Context, t *testing.T,
 func TestAppServices_CloseAll(t *testing.T) {
 	t.Parallel()
 
-	t.Run("no services", func(t *testing.T) {
+	t.Run("no services", func(_ *testing.T) {
 		s := new(AppServices)
 		s.CloseAll(context.Background())
 	})
@@ -34,7 +34,7 @@ func TestAppServices_CloseAll(t *testing.T) {
 		require.NotNil(t, s)
 		s.CloseAll(context.Background())
 
-		assert.Nil(t, s.Bux)
+		assert.Nil(t, s.SpvWalletEngine)
 		assert.Nil(t, s.NewRelic)
 	})
 }
@@ -47,6 +47,6 @@ func TestAppConfig_GetUserAgent(t *testing.T) {
 		ac := newTestConfig(t)
 		require.NotNil(t, ac)
 		agent := ac.GetUserAgent()
-		assert.Equal(t, "BUX-Server "+Version, agent)
+		assert.Equal(t, "SPV Wallet "+Version, agent)
 	})
 }
