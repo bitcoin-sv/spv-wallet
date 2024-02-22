@@ -10,9 +10,10 @@ import (
 )
 
 type outgoingTx struct {
-	Hex            string
+	BtTx           *bt.Tx
 	RelatedDraftID string
 	XPubKey        string
+	txID           string
 }
 
 func (strategy *outgoingTx) Name() string {
@@ -23,7 +24,7 @@ func (strategy *outgoingTx) Execute(ctx context.Context, c ClientInterface, opts
 	logger := c.Logger()
 	logger.Info().
 		Str("txID", strategy.TxID()).
-		Msg("start recording transaction")
+		Msg("start recording outgoing transaction")
 
 	// create
 	transaction, err := _createOutgoingTxToRecord(ctx, strategy, c, opts)
@@ -60,22 +61,19 @@ func (strategy *outgoingTx) Execute(ctx context.Context, c ClientInterface, opts
 	}
 
 	if syncTx.BroadcastStatus == SyncStatusReady {
+		transaction.syncTransaction = syncTx
 		_outgoingBroadcast(ctx, logger, transaction) // ignore error
 	}
 
 	logger.Info().
 		Str("txID", transaction.ID).
-		Msgf("complete, TxID: %s", transaction.ID)
+		Msgf("complete recording outgoing transaction")
 	return transaction, nil
 }
 
 func (strategy *outgoingTx) Validate() error {
-	if strategy.Hex == "" {
+	if strategy.BtTx == nil {
 		return ErrMissingFieldHex
-	}
-
-	if _, err := bt.NewTxFromString(strategy.Hex); err != nil {
-		return fmt.Errorf("invalid hex: %w", err)
 	}
 
 	if strategy.RelatedDraftID == "" {
@@ -90,8 +88,10 @@ func (strategy *outgoingTx) Validate() error {
 }
 
 func (strategy *outgoingTx) TxID() string {
-	btTx, _ := bt.NewTxFromString(strategy.Hex)
-	return btTx.TxID()
+	if strategy.txID == "" {
+		strategy.txID = strategy.BtTx.TxID()
+	}
+	return strategy.txID
 }
 
 func (strategy *outgoingTx) LockKey() string {
@@ -101,15 +101,11 @@ func (strategy *outgoingTx) LockKey() string {
 func _createOutgoingTxToRecord(ctx context.Context, oTx *outgoingTx, c ClientInterface, opts []ModelOps) (*Transaction, error) {
 	// Create NEW transaction model
 	newOpts := c.DefaultModelOptions(append(opts, WithXPub(oTx.XPubKey), New())...)
-	tx, err := newTransactionWithDraftID(
-		oTx.Hex, oTx.RelatedDraftID, newOpts...,
-	)
-	if err != nil {
-		return nil, err
-	}
+	tx := txFromBtTx(oTx.BtTx, newOpts...)
+	tx.DraftID = oTx.RelatedDraftID
 
 	// hydrate
-	if err = _hydrateOutgoingWithDraft(ctx, tx); err != nil {
+	if err := _hydrateOutgoingWithDraft(ctx, tx); err != nil {
 		return nil, err
 	}
 

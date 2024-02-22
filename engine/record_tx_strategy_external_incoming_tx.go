@@ -9,9 +9,10 @@ import (
 )
 
 type externalIncomingTx struct {
-	Hex                  string
+	BtTx                 *bt.Tx
 	broadcastNow         bool // e.g. BEEF must be broadcasted now
 	allowBroadcastErrors bool // only BEEF cannot allow for broadcast errors
+	txID                 string
 }
 
 func (strategy *externalIncomingTx) Name() string {
@@ -53,20 +54,18 @@ func (strategy *externalIncomingTx) Execute(ctx context.Context, c ClientInterfa
 }
 
 func (strategy *externalIncomingTx) Validate() error {
-	if strategy.Hex == "" {
+	if strategy.BtTx == nil {
 		return ErrMissingFieldHex
-	}
-
-	if _, err := bt.NewTxFromString(strategy.Hex); err != nil {
-		return fmt.Errorf("invalid hex: %w", err)
 	}
 
 	return nil // is valid
 }
 
 func (strategy *externalIncomingTx) TxID() string {
-	btTx, _ := bt.NewTxFromString(strategy.Hex)
-	return btTx.TxID()
+	if strategy.txID == "" {
+		strategy.txID = strategy.BtTx.TxID()
+	}
+	return strategy.txID
 }
 
 func (strategy *externalIncomingTx) LockKey() string {
@@ -83,18 +82,14 @@ func (strategy *externalIncomingTx) FailOnBroadcastError(forceFail bool) {
 
 func _createExternalTxToRecord(ctx context.Context, eTx *externalIncomingTx, c ClientInterface, opts []ModelOps) (*Transaction, error) {
 	// Create NEW tx model
-	tx, err := txFromHex(eTx.Hex, c.DefaultModelOptions(append(opts, New())...)...)
-	if err != nil {
-		return nil, err
-	}
-
+	tx := txFromBtTx(eTx.BtTx, c.DefaultModelOptions(append(opts, New())...)...)
 	_hydrateExternalWithSync(tx)
 
 	if !tx.TransactionBase.hasOneKnownDestination(ctx, c) {
 		return nil, ErrNoMatchingOutputs
 	}
 
-	if err = tx.processUtxos(ctx); err != nil {
+	if err := tx.processUtxos(ctx); err != nil {
 		return nil, err
 	}
 

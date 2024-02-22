@@ -4,6 +4,8 @@ import (
 	"context"
 	"fmt"
 	"time"
+
+	"github.com/libsv/go-bt/v2"
 )
 
 type recordTxStrategy interface {
@@ -36,18 +38,11 @@ func recordTransaction(ctx context.Context, c ClientInterface, strategy recordTx
 	return
 }
 
-func getRecordTxStrategy(ctx context.Context, c ClientInterface, xPubKey, txHex, draftID string) (recordTxStrategy, error) {
-	var rts recordTxStrategy
-
-	if draftID != "" {
-		rts = getOutgoingTxRecordStrategy(xPubKey, txHex, draftID)
-	} else {
-		var err error
-		rts, err = getIncomingTxRecordStrategy(ctx, c, txHex)
-
-		if err != nil {
-			return nil, err
-		}
+func getOutgoingTxRecordStrategy(xPubKey string, btTx *bt.Tx, draftID string) (recordTxStrategy, error) {
+	rts := &outgoingTx{
+		BtTx:           btTx,
+		RelatedDraftID: draftID,
+		XPubKey:        xPubKey,
 	}
 
 	if err := rts.Validate(); err != nil {
@@ -57,16 +52,8 @@ func getRecordTxStrategy(ctx context.Context, c ClientInterface, xPubKey, txHex,
 	return rts, nil
 }
 
-func getOutgoingTxRecordStrategy(xPubKey, txHex, draftID string) recordTxStrategy {
-	return &outgoingTx{
-		Hex:            txHex,
-		RelatedDraftID: draftID,
-		XPubKey:        xPubKey,
-	}
-}
-
-func getIncomingTxRecordStrategy(ctx context.Context, c ClientInterface, txHex string) (recordIncomingTxStrategy, error) {
-	tx, err := getTransactionByHex(ctx, txHex, c.DefaultModelOptions()...)
+func getIncomingTxRecordStrategy(ctx context.Context, c ClientInterface, btTx *bt.Tx) (recordIncomingTxStrategy, error) {
+	tx, err := getTransactionByHex(ctx, btTx.String(), c.DefaultModelOptions()...)
 	if err != nil {
 		return nil, err
 	}
@@ -74,15 +61,20 @@ func getIncomingTxRecordStrategy(ctx context.Context, c ClientInterface, txHex s
 	var rts recordIncomingTxStrategy
 
 	if tx != nil {
+		tx.parsedTx = btTx
 		rts = &internalIncomingTx{
 			Tx:           tx,
 			broadcastNow: false,
 		}
 	} else {
 		rts = &externalIncomingTx{
-			Hex:          txHex,
+			BtTx:         btTx,
 			broadcastNow: false,
 		}
+	}
+
+	if err := rts.Validate(); err != nil {
+		return nil, err
 	}
 
 	return rts, nil
@@ -95,7 +87,7 @@ func waitForRecordTxWriteLock(ctx context.Context, c ClientInterface, key string
 	)
 	// Create the lock and set the release for after the function completes
 	// Waits for the moment when the transaction is unlocked and creates a new lock
-	// Relevant for SPV Wallet to SPV Wallet transactions, as we have 1 tx but need to record 2 txs - outgoing and incoming
+	// Relevant for bux to bux transactions, as we have 1 tx but need to record 2 txs - outgoing and incoming
 
 	lockKey := fmt.Sprintf(lockKeyRecordTx, key)
 
