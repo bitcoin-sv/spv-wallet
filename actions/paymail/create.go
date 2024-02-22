@@ -3,8 +3,8 @@ package pmail
 import (
 	"net/http"
 
-	"github.com/BuxOrg/bux"
-	"github.com/BuxOrg/bux-server/mappings"
+	"github.com/bitcoin-sv/spv-wallet/engine"
+	"github.com/bitcoin-sv/spv-wallet/mappings"
 	"github.com/julienschmidt/httprouter"
 	apirouter "github.com/mrz1836/go-api-router"
 )
@@ -22,7 +22,7 @@ import (
 // @Produce		json
 // @Success		201
 // @Router		/v1/paymail [post]
-// @Security	bux-auth-xpub
+// @Security	x-auth-xpub
 func (a *Action) create(w http.ResponseWriter, req *http.Request, _ httprouter.Params) {
 	// Parse the params
 	params := apirouter.GetParams(req)
@@ -34,13 +34,13 @@ func (a *Action) create(w http.ResponseWriter, req *http.Request, _ httprouter.P
 	avatar := params.GetString("avatar")          // the avatar
 	metadata := params.GetJSON("metadata")        // optional metadata
 
-	opts := a.Services.Bux.DefaultModelOptions()
+	opts := a.Services.SpvWalletEngine.DefaultModelOptions()
 
 	if metadata != nil {
-		opts = append(opts, bux.WithMetadatas(metadata))
+		opts = append(opts, engine.WithMetadatas(metadata))
 	}
 
-	paymailAddress, err := a.Services.Bux.NewPaymailAddress(req.Context(), key, address, publicName, avatar, opts...)
+	paymailAddress, err := a.Services.SpvWalletEngine.NewPaymailAddress(req.Context(), key, address, publicName, avatar, opts...)
 	if err != nil {
 		apirouter.ReturnResponse(w, req, http.StatusUnprocessableEntity, err.Error())
 		return

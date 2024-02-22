@@ -3,7 +3,7 @@ package server
 import (
 	"testing"
 
-	"github.com/BuxOrg/bux-server/config"
+	"github.com/bitcoin-sv/spv-wallet/config"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )

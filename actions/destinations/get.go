@@ -3,8 +3,8 @@ package destinations
 import (
 	"net/http"
 
-	"github.com/BuxOrg/bux"
-	"github.com/BuxOrg/bux-server/mappings"
+	"github.com/bitcoin-sv/spv-wallet/engine"
+	"github.com/bitcoin-sv/spv-wallet/mappings"
 	"github.com/julienschmidt/httprouter"
 	apirouter "github.com/mrz1836/go-api-router"
 )
@@ -20,9 +20,9 @@ import (
 // @Param		locking_script query string false "Destination locking script"
 // @Success		200
 // @Router		/v1/destination [get]
-// @Security	bux-auth-xpub
+// @Security	x-auth-xpub
 func (a *Action) get(w http.ResponseWriter, req *http.Request, _ httprouter.Params) {
-	reqXPubID, _ := bux.GetXpubIDFromRequest(req)
+	reqXPubID, _ := engine.GetXpubIDFromRequest(req)
 
 	// Parse the params
 	params := apirouter.GetParams(req)
@@ -30,23 +30,23 @@ func (a *Action) get(w http.ResponseWriter, req *http.Request, _ httprouter.Para
 	address := params.GetString("address")
 	lockingScript := params.GetString("locking_script")
 	if id == "" && address == "" && lockingScript == "" {
-		apirouter.ReturnResponse(w, req, http.StatusExpectationFailed, bux.ErrMissingFieldID)
+		apirouter.ReturnResponse(w, req, http.StatusExpectationFailed, engine.ErrMissingFieldID)
 		return
 	}
 
 	// Get the destination
-	var destination *bux.Destination
+	var destination *engine.Destination
 	var err error
 	if id != "" {
-		destination, err = a.Services.Bux.GetDestinationByID(
+		destination, err = a.Services.SpvWalletEngine.GetDestinationByID(
 			req.Context(), reqXPubID, id,
 		)
 	} else if address != "" {
-		destination, err = a.Services.Bux.GetDestinationByAddress(
+		destination, err = a.Services.SpvWalletEngine.GetDestinationByAddress(
 			req.Context(), reqXPubID, address,
 		)
 	} else {
-		destination, err = a.Services.Bux.GetDestinationByLockingScript(
+		destination, err = a.Services.SpvWalletEngine.GetDestinationByLockingScript(
 			req.Context(), reqXPubID, lockingScript,
 		)
 	}

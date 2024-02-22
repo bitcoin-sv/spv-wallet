@@ -1,18 +1,18 @@
 package mappings
 
 import (
-	"github.com/BuxOrg/bux"
-	buxmodels "github.com/BuxOrg/bux-models"
-	"github.com/BuxOrg/bux-server/mappings/common"
+	"github.com/bitcoin-sv/spv-wallet/engine"
+	"github.com/bitcoin-sv/spv-wallet/mappings/common"
+	"github.com/bitcoin-sv/spv-wallet/models"
 )
 
-// MapToPaymailContract will map the bux paymail-address model to the bux-models contract
-func MapToPaymailContract(pa *bux.PaymailAddress) *buxmodels.PaymailAddress {
+// MapToPaymailContract will map the spv-wallet paymail-address model to the spv-wallet-models contract
+func MapToPaymailContract(pa *engine.PaymailAddress) *models.PaymailAddress {
 	if pa == nil {
 		return nil
 	}
 
-	return &buxmodels.PaymailAddress{
+	return &models.PaymailAddress{
 		Model:           *common.MapToContract(&pa.Model),
 		ID:              pa.ID,
 		XpubID:          pa.XpubID,
@@ -24,13 +24,13 @@ func MapToPaymailContract(pa *bux.PaymailAddress) *buxmodels.PaymailAddress {
 	}
 }
 
-// MapToPaymailP4Contract will map the bux-models paymail-address contract to the bux paymail-address model
-func MapToPaymailP4Contract(p *bux.PaymailP4) *buxmodels.PaymailP4 {
+// MapToPaymailP4Contract will map the spv-wallet-models paymail-address contract to the spv-wallet paymail-address model
+func MapToPaymailP4Contract(p *engine.PaymailP4) *models.PaymailP4 {
 	if p == nil {
 		return nil
 	}
 
-	return &buxmodels.PaymailP4{
+	return &models.PaymailP4{
 		Alias:           p.Alias,
 		Domain:          p.Domain,
 		FromPaymail:     p.FromPaymail,
@@ -42,13 +42,13 @@ func MapToPaymailP4Contract(p *bux.PaymailP4) *buxmodels.PaymailP4 {
 	}
 }
 
-// MapToPaymailP4Bux will map the bux-models paymail-address contract to the bux paymail-address model
-func MapToPaymailP4Bux(p *buxmodels.PaymailP4) *bux.PaymailP4 {
+// MapPaymailP4ModelToEngine will map the spv-wallet-models paymail-address contract to the spv-wallet paymail-address model
+func MapPaymailP4ModelToEngine(p *models.PaymailP4) *engine.PaymailP4 {
 	if p == nil {
 		return nil
 	}
 
-	return &bux.PaymailP4{
+	return &engine.PaymailP4{
 		Alias:           p.Alias,
 		Domain:          p.Domain,
 		FromPaymail:     p.FromPaymail,

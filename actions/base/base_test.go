@@ -3,7 +3,7 @@ package base
 import (
 	"testing"
 
-	"github.com/BuxOrg/bux-server/tests"
+	"github.com/bitcoin-sv/spv-wallet/tests"
 	apirouter "github.com/mrz1836/go-api-router"
 	"github.com/stretchr/testify/require"
 	"github.com/stretchr/testify/suite"

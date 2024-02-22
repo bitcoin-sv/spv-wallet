@@ -12,6 +12,6 @@ func index(w http.ResponseWriter, req *http.Request, _ httprouter.Params) {
 	apirouter.ReturnResponse(
 		w, req,
 		http.StatusOK,
-		map[string]interface{}{"message": "Welcome to the Bux Server ✌(◕‿-)✌"},
+		map[string]interface{}{"message": "Welcome to the SPV Wallet ✌(◕‿-)✌"},
 	)
 }

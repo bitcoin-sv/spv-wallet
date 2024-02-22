@@ -3,10 +3,10 @@ package destinations
 import (
 	"net/http"
 
-	"github.com/BuxOrg/bux"
-	"github.com/BuxOrg/bux-server/actions"
-	"github.com/BuxOrg/bux-server/mappings"
-	"github.com/BuxOrg/bux/utils"
+	"github.com/bitcoin-sv/spv-wallet/actions"
+	"github.com/bitcoin-sv/spv-wallet/engine"
+	"github.com/bitcoin-sv/spv-wallet/engine/utils"
+	"github.com/bitcoin-sv/spv-wallet/mappings"
 	"github.com/julienschmidt/httprouter"
 	apirouter "github.com/mrz1836/go-api-router"
 )
@@ -22,14 +22,14 @@ import (
 // @Param		metadata query string false "metadata"
 // @Success		201
 // @Router		/v1/destination [post]
-// @Security	bux-auth-xpub
+// @Security	x-auth-xpub
 func (a *Action) create(w http.ResponseWriter, req *http.Request, _ httprouter.Params) {
 	// Parse the params
 	params := apirouter.GetParams(req)
 
 	// Get the xPub from the request (via authentication)
-	reqXPub, _ := bux.GetXpubFromRequest(req)
-	xPub, err := a.Services.Bux.GetXpub(req.Context(), reqXPub)
+	reqXPub, _ := engine.GetXpubFromRequest(req)
+	xPub, err := a.Services.SpvWalletEngine.GetXpub(req.Context(), reqXPub)
 	if err != nil {
 		apirouter.ReturnResponse(w, req, http.StatusUnprocessableEntity, err.Error())
 		return
@@ -39,7 +39,7 @@ func (a *Action) create(w http.ResponseWriter, req *http.Request, _ httprouter.P
 	}
 
 	// Get metadata (if any)
-	metadata := params.GetJSON(bux.ModelMetadata.String())
+	metadata := params.GetJSON(engine.ModelMetadata.String())
 
 	// Get the type
 	scriptType := params.GetString("type")
@@ -48,20 +48,20 @@ func (a *Action) create(w http.ResponseWriter, req *http.Request, _ httprouter.P
 	}
 
 	// Set the reference ID
-	referenceID := params.GetString(bux.ReferenceIDField)
+	referenceID := params.GetString(engine.ReferenceIDField)
 	if len(referenceID) > 0 {
-		metadata[bux.ReferenceIDField] = referenceID
+		metadata[engine.ReferenceIDField] = referenceID
 	}
 
-	opts := a.Services.Bux.DefaultModelOptions()
+	opts := a.Services.SpvWalletEngine.DefaultModelOptions()
 
 	if metadata != nil {
-		opts = append(opts, bux.WithMetadatas(metadata))
+		opts = append(opts, engine.WithMetadatas(metadata))
 	}
 
 	// Get a new destination
-	var destination *bux.Destination
-	if destination, err = a.Services.Bux.NewDestination(
+	var destination *engine.Destination
+	if destination, err = a.Services.SpvWalletEngine.NewDestination(
 		req.Context(),
 		xPub.RawXpub(),
 		uint32(0), // todo: use a constant? protect this?

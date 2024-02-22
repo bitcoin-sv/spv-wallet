@@ -3,10 +3,10 @@ package destinations
 import (
 	"net/http"
 
-	"github.com/BuxOrg/bux"
-	buxmodels "github.com/BuxOrg/bux-models"
-	"github.com/BuxOrg/bux-server/actions"
-	"github.com/BuxOrg/bux-server/mappings"
+	"github.com/bitcoin-sv/spv-wallet/actions"
+	"github.com/bitcoin-sv/spv-wallet/engine"
+	"github.com/bitcoin-sv/spv-wallet/mappings"
+	"github.com/bitcoin-sv/spv-wallet/models"
 	"github.com/julienschmidt/httprouter"
 	apirouter "github.com/mrz1836/go-api-router"
 )
@@ -25,22 +25,22 @@ import (
 // @Param		condition query string false "condition"
 // @Success		200
 // @Router		/v1/destination/search [get]
-// @Security	bux-auth-xpub
+// @Security	x-auth-xpub
 func (a *Action) search(w http.ResponseWriter, req *http.Request, _ httprouter.Params) {
-	reqXPubID, _ := bux.GetXpubIDFromRequest(req)
+	reqXPubID, _ := engine.GetXpubIDFromRequest(req)
 
 	// Parse the params
 	params := apirouter.GetParams(req)
 	queryParams, metadataModel, conditions, err := actions.GetQueryParameters(params)
-	metadata := mappings.MapToBuxMetadata(metadataModel)
+	metadata := mappings.MapToSpvWalletMetadata(metadataModel)
 	if err != nil {
 		apirouter.ReturnResponse(w, req, http.StatusExpectationFailed, err.Error())
 		return
 	}
 
 	// Record a new transaction (get the hex from parameters)a
-	var destinations []*bux.Destination
-	if destinations, err = a.Services.Bux.GetDestinationsByXpubID(
+	var destinations []*engine.Destination
+	if destinations, err = a.Services.SpvWalletEngine.GetDestinationsByXpubID(
 		req.Context(),
 		reqXPubID,
 		metadata,
@@ -51,7 +51,7 @@ func (a *Action) search(w http.ResponseWriter, req *http.Request, _ httprouter.P
 		return
 	}
 
-	contracts := make([]*buxmodels.Destination, 0)
+	contracts := make([]*models.Destination, 0)
 	for _, destination := range destinations {
 		contracts = append(contracts, mappings.MapToDestinationContract(destination))
 	}

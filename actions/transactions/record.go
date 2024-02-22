@@ -3,9 +3,9 @@ package transactions
 import (
 	"net/http"
 
-	"github.com/BuxOrg/bux"
-	"github.com/BuxOrg/bux-server/actions"
-	"github.com/BuxOrg/bux-server/mappings"
+	"github.com/bitcoin-sv/spv-wallet/actions"
+	"github.com/bitcoin-sv/spv-wallet/engine"
+	"github.com/bitcoin-sv/spv-wallet/mappings"
 	"github.com/julienschmidt/httprouter"
 	apirouter "github.com/mrz1836/go-api-router"
 )
@@ -21,14 +21,14 @@ import (
 // @Param		metadata query string false "metadata"
 // @Success		200
 // @Router		/v1/transaction/record [post]
-// @Security	bux-auth-xpub
+// @Security	x-auth-xpub
 func (a *Action) record(w http.ResponseWriter, req *http.Request, _ httprouter.Params) {
 	// Parse the params
 	params := apirouter.GetParams(req)
 
 	// Get the xPub from the request (via authentication)
-	reqXPub, _ := bux.GetXpubFromRequest(req)
-	xPub, err := a.Services.Bux.GetXpub(req.Context(), reqXPub)
+	reqXPub, _ := engine.GetXpubFromRequest(req)
+	xPub, err := a.Services.SpvWalletEngine.GetXpub(req.Context(), reqXPub)
 	if err != nil {
 		apirouter.ReturnResponse(w, req, http.StatusUnprocessableEntity, err.Error())
 		return
@@ -38,19 +38,19 @@ func (a *Action) record(w http.ResponseWriter, req *http.Request, _ httprouter.P
 	}
 
 	// Set the metadata
-	metadata, ok := params.GetJSONOk(bux.ModelMetadata.String())
-	opts := make([]bux.ModelOps, 0)
+	metadata, ok := params.GetJSONOk(engine.ModelMetadata.String())
+	opts := make([]engine.ModelOps, 0)
 	if ok {
-		opts = append(opts, bux.WithMetadatas(metadata))
+		opts = append(opts, engine.WithMetadatas(metadata))
 	}
 
 	// Record a new transaction (get the hex from parameters)
-	var transaction *bux.Transaction
-	if transaction, err = a.Services.Bux.RecordTransaction(
+	var transaction *engine.Transaction
+	if transaction, err = a.Services.SpvWalletEngine.RecordTransaction(
 		req.Context(),
 		reqXPub,
 		params.GetString("hex"),
-		params.GetString(bux.ReferenceIDField),
+		params.GetString(engine.ReferenceIDField),
 		opts...,
 	); err != nil {
 		apirouter.ReturnResponse(w, req, http.StatusUnprocessableEntity, err.Error())

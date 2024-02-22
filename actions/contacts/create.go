@@ -42,6 +42,7 @@ func (c *Action) create(w http.ResponseWriter, req *http.Request, _ httprouter.P
 	}
 
 	contract := mappings.MapToContactContract(contact)
+	mappings
 
 	apirouter.ReturnResponse(w, req, http.StatusCreated, contract)
 }

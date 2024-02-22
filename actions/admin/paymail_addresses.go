@@ -3,9 +3,9 @@ package admin
 import (
 	"net/http"
 
-	"github.com/BuxOrg/bux"
-	"github.com/BuxOrg/bux-server/actions"
-	"github.com/BuxOrg/bux-server/mappings"
+	"github.com/bitcoin-sv/spv-wallet/actions"
+	"github.com/bitcoin-sv/spv-wallet/engine"
+	"github.com/bitcoin-sv/spv-wallet/mappings"
 	"github.com/julienschmidt/httprouter"
 	apirouter "github.com/mrz1836/go-api-router"
 )
@@ -19,7 +19,7 @@ import (
 // @Produce		json
 // @Success		200
 // @Router		/v1/admin/paymail/get [get]
-// @Security	bux-auth-xpub
+// @Security	x-auth-xpub
 func (a *Action) paymailGetAddress(w http.ResponseWriter, req *http.Request, _ httprouter.Params) {
 	params := apirouter.GetParams(req)
 	address := params.GetString("address")
@@ -29,9 +29,9 @@ func (a *Action) paymailGetAddress(w http.ResponseWriter, req *http.Request, _ h
 		return
 	}
 
-	opts := a.Services.Bux.DefaultModelOptions()
+	opts := a.Services.SpvWalletEngine.DefaultModelOptions()
 
-	paymailAddress, err := a.Services.Bux.GetPaymailAddress(req.Context(), address, opts...)
+	paymailAddress, err := a.Services.SpvWalletEngine.GetPaymailAddress(req.Context(), address, opts...)
 	if err != nil {
 		apirouter.ReturnResponse(w, req, http.StatusExpectationFailed, err.Error())
 		return
@@ -54,19 +54,19 @@ func (a *Action) paymailGetAddress(w http.ResponseWriter, req *http.Request, _ h
 // @Param		conditions query string false "Conditions filter"
 // @Success		200
 // @Router		/v1/admin/paymails/search [post]
-// @Security	bux-auth-xpub
+// @Security	x-auth-xpub
 func (a *Action) paymailAddressesSearch(w http.ResponseWriter, req *http.Request, _ httprouter.Params) {
 	// Parse the params
 	params := apirouter.GetParams(req)
 	queryParams, metadataModel, conditions, err := actions.GetQueryParameters(params)
-	metadata := mappings.MapToBuxMetadata(metadataModel)
+	metadata := mappings.MapToSpvWalletMetadata(metadataModel)
 	if err != nil {
 		apirouter.ReturnResponse(w, req, http.StatusExpectationFailed, err.Error())
 		return
 	}
 
-	var paymailAddresses []*bux.PaymailAddress
-	if paymailAddresses, err = a.Services.Bux.GetPaymailAddresses(
+	var paymailAddresses []*engine.PaymailAddress
+	if paymailAddresses, err = a.Services.SpvWalletEngine.GetPaymailAddresses(
 		req.Context(),
 		metadata,
 		conditions,
@@ -90,19 +90,19 @@ func (a *Action) paymailAddressesSearch(w http.ResponseWriter, req *http.Request
 // @Param		conditions query string false "Conditions filter"
 // @Success		200
 // @Router		/v1/admin/paymails/count [post]
-// @Security	bux-auth-xpub
+// @Security	x-auth-xpub
 func (a *Action) paymailAddressesCount(w http.ResponseWriter, req *http.Request, _ httprouter.Params) {
 	// Parse the params
 	params := apirouter.GetParams(req)
 	_, metadataModel, conditions, err := actions.GetQueryParameters(params)
-	metadata := mappings.MapToBuxMetadata(metadataModel)
+	metadata := mappings.MapToSpvWalletMetadata(metadataModel)
 	if err != nil {
 		apirouter.ReturnResponse(w, req, http.StatusExpectationFailed, err.Error())
 		return
 	}
 
 	var count int64
-	if count, err = a.Services.Bux.GetPaymailAddressesCount(
+	if count, err = a.Services.SpvWalletEngine.GetPaymailAddressesCount(
 		req.Context(),
 		metadata,
 		conditions,
@@ -128,7 +128,7 @@ func (a *Action) paymailAddressesCount(w http.ResponseWriter, req *http.Request,
 // @Produce		json
 // @Success		201
 // @Router		/v1/admin/paymail/create [post]
-// @Security	bux-auth-xpub
+// @Security	x-auth-xpub
 func (a *Action) paymailCreateAddress(w http.ResponseWriter, req *http.Request, _ httprouter.Params) {
 	// Parse the params
 	params := apirouter.GetParams(req)
@@ -153,14 +153,14 @@ func (a *Action) paymailCreateAddress(w http.ResponseWriter, req *http.Request, 
 		return
 	}
 
-	opts := a.Services.Bux.DefaultModelOptions()
+	opts := a.Services.SpvWalletEngine.DefaultModelOptions()
 
 	if metadata != nil {
-		opts = append(opts, bux.WithMetadatas(*metadata))
+		opts = append(opts, engine.WithMetadatas(*metadata))
 	}
 
-	var paymailAddress *bux.PaymailAddress
-	paymailAddress, err = a.Services.Bux.NewPaymailAddress(req.Context(), xpub, address, publicName, avatar, opts...)
+	var paymailAddress *engine.PaymailAddress
+	paymailAddress, err = a.Services.SpvWalletEngine.NewPaymailAddress(req.Context(), xpub, address, publicName, avatar, opts...)
 	if err != nil {
 		apirouter.ReturnResponse(w, req, http.StatusExpectationFailed, err.Error())
 		return
@@ -179,7 +179,7 @@ func (a *Action) paymailCreateAddress(w http.ResponseWriter, req *http.Request, 
 // @Produce		json
 // @Success		200
 // @Router		/v1/admin/paymail/delete [delete]
-// @Security	bux-auth-xpub
+// @Security	x-auth-xpub
 func (a *Action) paymailDeleteAddress(w http.ResponseWriter, req *http.Request, _ httprouter.Params) {
 	// Parse the params
 	params := apirouter.GetParams(req)
@@ -190,10 +190,10 @@ func (a *Action) paymailDeleteAddress(w http.ResponseWriter, req *http.Request, 
 		return
 	}
 
-	opts := a.Services.Bux.DefaultModelOptions()
+	opts := a.Services.SpvWalletEngine.DefaultModelOptions()
 
 	// Delete a new paymail address
-	err := a.Services.Bux.DeletePaymailAddress(req.Context(), address, opts...)
+	err := a.Services.SpvWalletEngine.DeletePaymailAddress(req.Context(), address, opts...)
 	if err != nil {
 		apirouter.ReturnResponse(w, req, http.StatusExpectationFailed, err.Error())
 		return

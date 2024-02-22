@@ -4,7 +4,7 @@ import (
 	"context"
 	"testing"
 
-	"github.com/BuxOrg/bux-server/logging"
+	"github.com/bitcoin-sv/spv-wallet/logging"
 	"github.com/mrz1836/go-cachestore"
 	"github.com/mrz1836/go-datastore"
 	"github.com/stretchr/testify/assert"

@@ -17,7 +17,6 @@ jobs:
     with:
       version: ${{ github.ref_name }}
       os: linux
-      go_main_file: cmd/server/main.go
       cgo_enabled: true
       release_binaries: false
     secrets:

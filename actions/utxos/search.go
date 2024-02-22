@@ -3,10 +3,10 @@ package utxos
 import (
 	"net/http"
 
-	"github.com/BuxOrg/bux"
-	buxmodels "github.com/BuxOrg/bux-models"
-	"github.com/BuxOrg/bux-server/actions"
-	"github.com/BuxOrg/bux-server/mappings"
+	"github.com/bitcoin-sv/spv-wallet/actions"
+	"github.com/bitcoin-sv/spv-wallet/engine"
+	"github.com/bitcoin-sv/spv-wallet/mappings"
+	"github.com/bitcoin-sv/spv-wallet/models"
 	"github.com/julienschmidt/httprouter"
 	apirouter "github.com/mrz1836/go-api-router"
 )
@@ -25,22 +25,22 @@ import (
 // @Param		conditions query string false "conditions"
 // @Success		200
 // @Router		/v1/utxo/search [post]
-// @Security	bux-auth-xpub
+// @Security	x-auth-xpub
 func (a *Action) search(w http.ResponseWriter, req *http.Request, _ httprouter.Params) {
-	reqXPubID, _ := bux.GetXpubIDFromRequest(req)
+	reqXPubID, _ := engine.GetXpubIDFromRequest(req)
 
 	// Parse the params
 	params := apirouter.GetParams(req)
 	queryParams, modelMetadata, conditions, err := actions.GetQueryParameters(params)
-	metadata := mappings.MapToBuxMetadata(modelMetadata)
+	metadata := mappings.MapToSpvWalletMetadata(modelMetadata)
 	if err != nil {
 		apirouter.ReturnResponse(w, req, http.StatusExpectationFailed, err.Error())
 		return
 	}
 
 	// Record a new transaction (get the hex from parameters)a
-	var utxos []*bux.Utxo
-	if utxos, err = a.Services.Bux.GetUtxosByXpubID(
+	var utxos []*engine.Utxo
+	if utxos, err = a.Services.SpvWalletEngine.GetUtxosByXpubID(
 		req.Context(),
 		reqXPubID,
 		metadata,
@@ -51,7 +51,7 @@ func (a *Action) search(w http.ResponseWriter, req *http.Request, _ httprouter.P
 		return
 	}
 
-	contracts := make([]*buxmodels.Utxo, 0)
+	contracts := make([]*models.Utxo, 0)
 	for _, utxo := range utxos {
 		contracts = append(contracts, mappings.MapToUtxoContract(utxo))
 	}

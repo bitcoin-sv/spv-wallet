@@ -4,8 +4,8 @@ import (
 	"errors"
 	"net/http"
 
-	"github.com/BuxOrg/bux"
-	"github.com/BuxOrg/bux-server/mappings"
+	"github.com/bitcoin-sv/spv-wallet/engine"
+	"github.com/bitcoin-sv/spv-wallet/mappings"
 	"github.com/julienschmidt/httprouter"
 	apirouter "github.com/mrz1836/go-api-router"
 	"github.com/mrz1836/go-datastore"
@@ -20,7 +20,7 @@ import (
 // @Param		hex query string true "Transaction hex"
 // @Success		201
 // @Router		/v1/admin/transactions/record [post]
-// @Security	bux-auth-xpub
+// @Security	x-auth-xpub
 func (a *Action) transactionRecord(w http.ResponseWriter, req *http.Request, _ httprouter.Params) {
 	// Parse the params
 	params := apirouter.GetParams(req)
@@ -28,10 +28,10 @@ func (a *Action) transactionRecord(w http.ResponseWriter, req *http.Request, _ h
 	hex := params.GetString("hex")
 
 	// Set the metadata
-	opts := make([]bux.ModelOps, 0)
+	opts := make([]engine.ModelOps, 0)
 
 	// Record a new transaction (get the hex from parameters)
-	transaction, err := a.Services.Bux.RecordRawTransaction(
+	transaction, err := a.Services.SpvWalletEngine.RecordRawTransaction(
 		req.Context(),
 		hex,
 		opts...,
@@ -39,7 +39,7 @@ func (a *Action) transactionRecord(w http.ResponseWriter, req *http.Request, _ h
 	if err != nil {
 		if errors.Is(err, datastore.ErrDuplicateKey) {
 			// already registered, just return the registered transaction
-			if transaction, err = a.Services.Bux.GetTransactionByHex(req.Context(), hex); err != nil {
+			if transaction, err = a.Services.SpvWalletEngine.GetTransactionByHex(req.Context(), hex); err != nil {
 				apirouter.ReturnResponse(w, req, http.StatusUnprocessableEntity, err.Error())
 				return
 			}

@@ -45,7 +45,7 @@ func getCacheDefaults() *CacheConfig {
 		Engine: "freecache",
 		Cluster: &ClusterConfig{
 			Coordinator: "memory",
-			Prefix:      "bux_cluster_",
+			Prefix:      "spv_wallet_cluster_",
 			Redis:       nil,
 		},
 		Redis: &RedisConfig{
@@ -95,7 +95,7 @@ func getDbDefaults() *DbConfig {
 			SslMode:                   "disable",
 		},
 		SQLite: &datastore.SQLiteConfig{
-			DatabasePath:       "./bux.db",
+			DatabasePath:       "./spv-wallet.db",
 			ExistingConnection: nil,
 			Shared:             true,
 		},
@@ -106,7 +106,7 @@ func getLoggingDefaults() *LoggingConfig {
 	return &LoggingConfig{
 		Level:        "info",
 		Format:       "console",
-		InstanceName: "bux-server",
+		InstanceName: "spv-wallet",
 		LogOrigin:    false,
 	}
 }
@@ -122,7 +122,7 @@ func getNewRelicDefaults() *NewRelicConfig {
 func getNodesDefaults() *NodesConfig {
 	depIDSufix, _ := uuid.NewUUID()
 	return &NodesConfig{
-		DeploymentID: "bux-" + depIDSufix.String(),
+		DeploymentID: "spv-wallet-" + depIDSufix.String(),
 		Protocol:     NodesProtocolArc,
 		Callback:     getCallbackDefaults(),
 		Apis: []*MinerAPI{
@@ -146,9 +146,9 @@ func getNotificationDefaults() *NotificationsConfig {
 func getPaymailDefaults() *PaymailConfig {
 	return &PaymailConfig{
 		Beef: &BeefConfig{
-			UseBeef:                  true,
-			PulseHeaderValidationURL: "http://localhost:8080/api/v1/chain/merkleroot/verify",
-			PulseAuthToken:           "mQZQ6WmxURxWz5ch", // #nosec G101
+			UseBeef:                               true,
+			BlockHeaderServiceHeaderValidationURL: "http://localhost:8080/api/v1/chain/merkleroot/verify",
+			BlockHeaderServiceAuthToken:           "mQZQ6WmxURxWz5ch", // #nosec G101
 		},
 		DefaultFromPaymail:      "from@domain.com",
 		Domains:                 []string{"localhost"},

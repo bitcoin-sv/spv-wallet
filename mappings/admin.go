@@ -1,17 +1,17 @@
 package mappings
 
 import (
-	"github.com/BuxOrg/bux"
-	buxmodels "github.com/BuxOrg/bux-models"
+	"github.com/bitcoin-sv/spv-wallet/engine"
+	"github.com/bitcoin-sv/spv-wallet/models"
 )
 
-// MapToAdminStatsContract will map the model from bux to the bux-models contract
-func MapToAdminStatsContract(s *bux.AdminStats) *buxmodels.AdminStats {
+// MapToAdminStatsContract will map the model from spv-wallet to the spv-wallet-models contract
+func MapToAdminStatsContract(s *engine.AdminStats) *models.AdminStats {
 	if s == nil {
 		return nil
 	}
 
-	return &buxmodels.AdminStats{
+	return &models.AdminStats{
 		Balance:            s.Balance,
 		Destinations:       s.Destinations,
 		PaymailAddresses:   s.PaymailAddresses,

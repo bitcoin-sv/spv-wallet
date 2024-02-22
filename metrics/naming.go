@@ -1,3 +1,3 @@
 package metrics
 
-const appName = "bux-server"
+const appName = "spv-wallet"

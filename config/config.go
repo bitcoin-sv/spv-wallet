@@ -4,34 +4,34 @@ package config
 import (
 	"time"
 
-	"github.com/BuxOrg/bux/cluster"
-	"github.com/BuxOrg/bux/taskmanager"
+	"github.com/bitcoin-sv/spv-wallet/engine/cluster"
+	"github.com/bitcoin-sv/spv-wallet/engine/taskmanager"
 	"github.com/mrz1836/go-cachestore"
 	"github.com/mrz1836/go-datastore"
 )
 
-// Config constants used for bux-server
+// Config constants used for spv-wallet
 const (
-	ApplicationName         = "BuxServer"
+	ApplicationName         = "SPVWallet"
 	APIVersion              = "v1"
 	DefaultNewRelicShutdown = 10 * time.Second
 	HealthRequestPath       = "health"
 	Version                 = "v0.12.0"
 	ConfigFilePathKey       = "config_file"
 	DefaultConfigFilePath   = "config.yaml"
-	ConfigEnvPrefix         = "BUX_"
+	EnvPrefix               = "SPVWALLET"
 	BroadcastCallbackRoute  = "/transaction/broadcast/callback"
 )
 
 // AppConfig is the configuration values and associated env vars
 type AppConfig struct {
-	// Authentication is the configuration for keys authentication in bux.
+	// Authentication is the configuration for keys authentication in SPV Wallet.
 	Authentication *AuthenticationConfig `json:"auth" mapstructure:"auth"`
 	// Cache is the configuration for cache, memory or redis, and cluster cache settings.
 	Cache *CacheConfig `json:"cache" mapstructure:"cache"`
 	// Db is the configuration for database related settings.
 	Db *DbConfig `json:"db" mapstructure:"db"`
-	// Debug is a flag for enabling additional information from bux.
+	// Debug is a flag for enabling additional information from SPV Wallet.
 	Debug bool `json:"debug" mapstructure:"debug"`
 	// DebugProfiling is a flag for enabling additinal debug profiling.
 	DebugProfiling bool `json:"debug_profiling" mapstructure:"debug_profiling"`
@@ -39,7 +39,7 @@ type AppConfig struct {
 	DisableITC bool `json:"disable_itc" mapstructure:"disable_itc"`
 	// ImportBlockHeaders is a URL from where the headers can be downloaded.
 	ImportBlockHeaders string `json:"import_block_headers" mapstructure:"import_block_headers"`
-	// Logging is the configuration for zerolog used in bux.
+	// Logging is the configuration for zerolog used in SPV Wallet.
 	Logging *LoggingConfig `json:"logging" mapstructure:"logging"`
 	// NewRelic is New Relic related settings.
 	NewRelic *NewRelicConfig `json:"new_relic" mapstructure:"new_relic"`
@@ -51,11 +51,11 @@ type AppConfig struct {
 	Paymail *PaymailConfig `json:"paymail" mapstructure:"paymail"`
 	// RequestLogging is flag for enabling logging in go-api-router.
 	RequestLogging bool `json:"request_logging" mapstructure:"request_logging"`
-	// Server is a general configuration for bux-server.
+	// Server is a general configuration for spv-wallet.
 	Server *ServerConfig `json:"server_config" mapstructure:"server_config"`
-	// TaskManager is a configuration for Task Manager in bux.
+	// TaskManager is a configuration for Task Manager in SPV Wallet.
 	TaskManager *TaskManagerConfig `json:"task_manager" mapstructure:"task_manager"`
-	// Metrics is a configuration for metrics in bux.
+	// Metrics is a configuration for metrics in SPV Wallet.
 	Metrics *MetricsConfig `json:"metrics" mapstructure:"metrics"`
 }
 
@@ -75,7 +75,7 @@ type AuthenticationConfig struct {
 type CacheConfig struct {
 	// Engine is the cache engine to use (redis, freecache).
 	Engine cachestore.Engine `json:"engine" mapstructure:"engine"`
-	// Cluster is the cluster-specific configuration for bux.
+	// Cluster is the cluster-specific configuration for SPV Wallet.
 	Cluster *ClusterConfig `json:"cluster" mapstructure:"cluster"`
 	// Redis is a general config for redis if the engine is set to it.
 	Redis *RedisConfig `json:"redis" mapstructure:"redis"`
@@ -89,7 +89,7 @@ type CallbackConfig struct {
 	CallbackToken string `json:"callback_token" mapstructure:"callback_token"`
 }
 
-// ClusterConfig is a configuration for the Bux cluster
+// ClusterConfig is a configuration for the SPV Wallet cluster
 type ClusterConfig struct {
 	// Coordinator is a cluster coordinator (redis or memory).
 	Coordinator cluster.Coordinator `json:"coordinator" mapstructure:"coordinator"`
@@ -209,14 +209,14 @@ type PaymailConfig struct {
 	SenderValidationEnabled bool `json:"sender_validation_enabled" mapstructure:"sender_validation_enabled"`
 }
 
-// BeefConfig consists of components required to use beef, e.g. Pulse for merkle roots validation
+// BeefConfig consists of components required to use beef, e.g. Block Headers Service for merkle roots validation
 type BeefConfig struct {
 	// UseBeef is a flag for enabling BEEF transactions format.
 	UseBeef bool `json:"use_beef" mapstructure:"use_beef"`
-	// PulseHeaderValidationURL is the URL for headers validation in Pulse.
-	PulseHeaderValidationURL string `json:"pulse_url" mapstructure:"pulse_url"`
-	// PulseAuthToken is the authentication token for validating headers in Pulse.
-	PulseAuthToken string `json:"pulse_auth_token" mapstructure:"pulse_auth_token"`
+	// BlockHeaderServiceHeaderValidationURL is the URL for merkle roots validation in Block Headers Service.
+	BlockHeaderServiceHeaderValidationURL string `json:"block_header_service_url" mapstructure:"block_header_service_url"`
+	// BlockHeaderServiceAuthToken is the authentication token for validating merkle roots in Block Headers Service.
+	BlockHeaderServiceAuthToken string `json:"block_header_service_auth_token" mapstructure:"block_header_service_auth_token"`
 }
 
 func (b *BeefConfig) enabled() bool {
@@ -249,5 +249,5 @@ type MetricsConfig struct {
 
 // GetUserAgent will return the outgoing user agent
 func (a *AppConfig) GetUserAgent() string {
-	return "BUX-Server " + Version
+	return "SPV Wallet " + Version
 }

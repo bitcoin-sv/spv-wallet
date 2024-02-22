@@ -3,8 +3,8 @@ package utxos
 import (
 	"net/http"
 
-	"github.com/BuxOrg/bux"
-	"github.com/BuxOrg/bux-server/mappings"
+	"github.com/bitcoin-sv/spv-wallet/engine"
+	"github.com/bitcoin-sv/spv-wallet/mappings"
 	"github.com/julienschmidt/httprouter"
 	apirouter "github.com/mrz1836/go-api-router"
 )
@@ -19,9 +19,9 @@ import (
 // @Param		output_index query int true "output_index"
 // @Success		200
 // @Router		/v1/utxo [get]
-// @Security	bux-auth-xpub
+// @Security	x-auth-xpub
 func (a *Action) get(w http.ResponseWriter, req *http.Request, _ httprouter.Params) {
-	reqXPubID, _ := bux.GetXpubIDFromRequest(req)
+	reqXPubID, _ := engine.GetXpubIDFromRequest(req)
 
 	// Parse the params
 	params := apirouter.GetParams(req)
@@ -29,7 +29,7 @@ func (a *Action) get(w http.ResponseWriter, req *http.Request, _ httprouter.Para
 	outputIndex := uint32(params.GetUint64("output_index"))
 
 	// Get a utxo using a xPub
-	utxo, err := a.Services.Bux.GetUtxo(
+	utxo, err := a.Services.SpvWalletEngine.GetUtxo(
 		req.Context(),
 		reqXPubID,
 		txID,

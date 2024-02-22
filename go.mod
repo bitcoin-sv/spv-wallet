@@ -1,11 +1,20 @@
-module github.com/BuxOrg/bux-server
+module github.com/bitcoin-sv/spv-wallet
 
 go 1.21.5
 
+// NOTE: The following replace directives are essential for maintaining the cohesion and functionality of this project.
+// We are using the packages github.com/bitcoin-sv/spv-wallet/models and github.com/bitcoin-sv/spv-wallet/engine directly
+// to facilitate the seamless integration of features across various components of our application.
+// Removing these replaces could disrupt the interdependency between modules and hinder our ability to build cohesive features
+// that often require modifications across multiple packages. Please refrain from removing these directives.
+replace github.com/bitcoin-sv/spv-wallet/models => ./models
+
+replace github.com/bitcoin-sv/spv-wallet/engine => ./engine
+
 require (
-	github.com/BuxOrg/bux v0.14.5
-	github.com/BuxOrg/bux-models v0.3.0
 	github.com/bitcoin-sv/go-broadcast-client v0.17.2
+	github.com/bitcoin-sv/spv-wallet/engine v0.0.0-00010101000000-000000000000
+	github.com/bitcoin-sv/spv-wallet/models v0.3.0
 	github.com/go-ozzo/ozzo-validation v3.6.0+incompatible
 	github.com/go-redis/redis/v8 v8.11.5
 	github.com/gofrs/uuid v4.4.0+incompatible

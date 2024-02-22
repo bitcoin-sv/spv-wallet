@@ -5,8 +5,8 @@ import (
 	"context"
 	"os"
 
-	"github.com/BuxOrg/bux-server/config"
-	"github.com/BuxOrg/bux-server/logging"
+	"github.com/bitcoin-sv/spv-wallet/config"
+	"github.com/bitcoin-sv/spv-wallet/logging"
 	apirouter "github.com/mrz1836/go-api-router"
 	"github.com/stretchr/testify/require"
 	"github.com/stretchr/testify/suite"

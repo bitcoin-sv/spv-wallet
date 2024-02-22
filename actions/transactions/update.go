@@ -3,9 +3,9 @@ package transactions
 import (
 	"net/http"
 
-	"github.com/BuxOrg/bux"
-	"github.com/BuxOrg/bux-server/actions"
-	"github.com/BuxOrg/bux-server/mappings"
+	"github.com/bitcoin-sv/spv-wallet/actions"
+	"github.com/bitcoin-sv/spv-wallet/engine"
+	"github.com/bitcoin-sv/spv-wallet/mappings"
 	"github.com/julienschmidt/httprouter"
 	apirouter "github.com/mrz1836/go-api-router"
 )
@@ -20,17 +20,17 @@ import (
 // @Param		metadata query string true "metadata"
 // @Success		200
 // @Router		/v1/transaction [patch]
-// @Security	bux-auth-xpub
+// @Security	x-auth-xpub
 func (a *Action) update(w http.ResponseWriter, req *http.Request, _ httprouter.Params) {
 	// Get the xPub from the request (via authentication)
-	reqXPubID, _ := bux.GetXpubIDFromRequest(req)
+	reqXPubID, _ := engine.GetXpubIDFromRequest(req)
 
 	// Parse the params
 	params := apirouter.GetParams(req)
 	metadata := params.GetJSON(actions.MetadataField)
 
 	// Get a transaction by ID
-	transaction, err := a.Services.Bux.UpdateTransactionMetadata(
+	transaction, err := a.Services.SpvWalletEngine.UpdateTransactionMetadata(
 		req.Context(),
 		reqXPubID,
 		params.GetString("id"),

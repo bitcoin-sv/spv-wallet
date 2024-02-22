@@ -20,22 +20,22 @@ func loadFlags() error {
 	}
 
 	cli := &cliFlags{}
-	buxFlags := pflag.NewFlagSet("buxFlags", pflag.ContinueOnError)
+	appFlags := pflag.NewFlagSet("appFlags", pflag.ContinueOnError)
 
-	initFlags(buxFlags, cli)
+	initFlags(appFlags, cli)
 
-	err := buxFlags.Parse(os.Args[1:])
+	err := appFlags.Parse(os.Args[1:])
 	if err != nil {
 		fmt.Printf("Flags can't be parsed: %v\n", err)
 		os.Exit(1)
 	}
 
-	err = viper.BindPFlag(ConfigFilePathKey, buxFlags.Lookup(ConfigFilePathKey))
+	err = viper.BindPFlag(ConfigFilePathKey, appFlags.Lookup(ConfigFilePathKey))
 	if err != nil {
 		return err
 	}
 
-	parseCliFlags(buxFlags, cli)
+	parseCliFlags(appFlags, cli)
 
 	return nil
 }
@@ -59,7 +59,7 @@ func parseCliFlags(fs *pflag.FlagSet, cli *cliFlags) {
 	}
 
 	if cli.showVersion {
-		fmt.Println("bux-sever", "version", Version)
+		fmt.Println("spv-wallet", "version", Version)
 		os.Exit(0)
 	}
 

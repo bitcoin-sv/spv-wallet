@@ -1,4 +1,4 @@
-// Package server is for all the BUX server settings and HTTP server
+// Package server is for all the SPV Wallet settings and HTTP server
 package server
 
 import (
@@ -7,17 +7,16 @@ import (
 	"net/http"
 	"strconv"
 
-	accessKeys "github.com/BuxOrg/bux-server/actions/access_keys"
-	"github.com/BuxOrg/bux-server/actions/admin"
-	"github.com/BuxOrg/bux-server/actions/base"
-	"github.com/BuxOrg/bux-server/actions/contacts"
-	"github.com/BuxOrg/bux-server/actions/destinations"
-	pmail "github.com/BuxOrg/bux-server/actions/paymail"
-	"github.com/BuxOrg/bux-server/actions/transactions"
-	"github.com/BuxOrg/bux-server/actions/utxos"
-	"github.com/BuxOrg/bux-server/actions/xpubs"
-	"github.com/BuxOrg/bux-server/config"
-	"github.com/BuxOrg/bux-server/metrics"
+	accesskeys "github.com/bitcoin-sv/spv-wallet/actions/access_keys"
+	"github.com/bitcoin-sv/spv-wallet/actions/admin"
+	"github.com/bitcoin-sv/spv-wallet/actions/base"
+	"github.com/bitcoin-sv/spv-wallet/actions/destinations"
+	pmail "github.com/bitcoin-sv/spv-wallet/actions/paymail"
+	"github.com/bitcoin-sv/spv-wallet/actions/transactions"
+	"github.com/bitcoin-sv/spv-wallet/actions/utxos"
+	"github.com/bitcoin-sv/spv-wallet/actions/xpubs"
+	"github.com/bitcoin-sv/spv-wallet/config"
+	"github.com/bitcoin-sv/spv-wallet/metrics"
 	apirouter "github.com/mrz1836/go-api-router"
 	"github.com/newrelic/go-agent/v3/integrations/nrhttprouter"
 	httpSwagger "github.com/swaggo/http-swagger"
@@ -109,7 +108,7 @@ func (s *Server) Handlers() *nrhttprouter.Router {
 	// Register all handlers (actions / routes)
 	base.RegisterRoutes(s.Router, s.AppConfig, s.Services)
 	admin.RegisterRoutes(s.Router, s.AppConfig, s.Services)
-	accessKeys.RegisterRoutes(s.Router, s.AppConfig, s.Services)
+	accesskeys.RegisterRoutes(s.Router, s.AppConfig, s.Services)
 	destinations.RegisterRoutes(s.Router, s.AppConfig, s.Services)
 	transactions.RegisterRoutes(s.Router, s.AppConfig, s.Services)
 	utxos.RegisterRoutes(s.Router, s.AppConfig, s.Services)
