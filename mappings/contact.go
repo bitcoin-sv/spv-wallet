@@ -6,6 +6,7 @@ import (
 	"github.com/bitcoin-sv/spv-wallet/models"
 )
 
+// MapToContactContract will map the contact to the spv-wallet-models contract
 func MapToContactContract(c *engine.Contact) *models.Contact {
 	if c == nil {
 		return nil

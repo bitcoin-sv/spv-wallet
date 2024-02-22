@@ -6,10 +6,12 @@ import (
 	apirouter "github.com/mrz1836/go-api-router"
 )
 
+// Action is an extension of actions.Action for this package
 type Action struct {
 	actions.Action
 }
 
+// RegisterRoutes register all the package specific routes
 func RegisterRoutes(router *apirouter.Router, appConfig *config.AppConfig, services *config.AppServices) {
 	a, require := actions.NewStack(appConfig, services)
 	require.Use(a.RequireAuthentication)
