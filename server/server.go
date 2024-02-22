@@ -4,13 +4,13 @@ package server
 import (
 	"context"
 	"crypto/tls"
-	"github.com/bitcoin-sv/spv-wallet/actions/contacts"
 	"net/http"
 	"strconv"
 
 	accesskeys "github.com/bitcoin-sv/spv-wallet/actions/access_keys"
 	"github.com/bitcoin-sv/spv-wallet/actions/admin"
 	"github.com/bitcoin-sv/spv-wallet/actions/base"
+	"github.com/bitcoin-sv/spv-wallet/actions/contacts"
 	"github.com/bitcoin-sv/spv-wallet/actions/destinations"
 	pmail "github.com/bitcoin-sv/spv-wallet/actions/paymail"
 	"github.com/bitcoin-sv/spv-wallet/actions/transactions"
