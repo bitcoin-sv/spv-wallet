@@ -6,8 +6,10 @@ import (
 	"crypto/tls"
 	"github.com/bitcoin-sv/spv-wallet/actions"
 	"github.com/bitcoin-sv/spv-wallet/actions/base"
+	"github.com/bitcoin-sv/spv-wallet/logging"
 	"github.com/bitcoin-sv/spv-wallet/metrics"
 	"github.com/gin-gonic/gin"
+	"github.com/rs/zerolog"
 	"net/http"
 	"strconv"
 
@@ -93,6 +95,13 @@ func (s *Server) Handlers() *gin.Engine {
 	engine := gin.New()
 	engine.Use(gin.LoggerWithWriter(debugWriter(&httpLogger)), gin.Recovery())
 	engine.Use(auth.CorsMiddleware())
+
+	if httpLogger.GetLevel() > zerolog.DebugLevel {
+		gin.SetMode(gin.ReleaseMode)
+	}
+	logging.SetGinWriters(&httpLogger)
+	engine.Use(logging.GinMiddleware(&httpLogger), gin.Recovery())
+
 	s.Router = engine
 
 	segment.End()
@@ -136,7 +145,7 @@ func SetupServerRoutes(appConfig *config.AppConfig, services *config.AppServices
 
 	prefix := "/" + config.APIVersion
 	baseRouter := engine.Group("")
-	authRouter := engine.Group("", auth.AuthMiddleware(services.Bux, appConfig))
+	authRouter := engine.Group("", auth.AuthMiddleware(services.SpvWalletEngine, appConfig))
 	basicAuthRouter := authRouter.Group(prefix, auth.SignatureMiddleware(appConfig, false, false))
 	apiAuthRouter := authRouter.Group(prefix, auth.SignatureMiddleware(appConfig, true, false))
 	adminAuthRouter := authRouter.Group(prefix, auth.SignatureMiddleware(appConfig, true, true), auth.AdminMiddleware())
