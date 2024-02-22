@@ -6,6 +6,10 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+const (
+	testEncryption = "35dbe09a941a90a5f59e57020face68860d7b284b7b2973a58de8b4242ec5a925a40ac2933b7e45e78a0b3a13123520e46f9566815589ba2d345577dadee0d5e"
+)
+
 // TestNew will test the method New()
 func TestNew(t *testing.T) {
 	t.Parallel()

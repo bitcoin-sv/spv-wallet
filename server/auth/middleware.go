@@ -5,9 +5,9 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"github.com/BuxOrg/bux"
-	"github.com/BuxOrg/bux-server/config"
-	"github.com/BuxOrg/bux/utils"
+	"github.com/bitcoin-sv/spv-wallet/config"
+	"github.com/bitcoin-sv/spv-wallet/engine"
+	"github.com/bitcoin-sv/spv-wallet/engine/utils"
 	"github.com/bitcoinschema/go-bitcoin/v2"
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
@@ -91,7 +91,7 @@ func CorsMiddleware() gin.HandlerFunc {
 }
 
 // AuthMiddleware will check the request for the xPub or AccessKey header
-func AuthMiddleware(bux bux.ClientInterface, appConfig *config.AppConfig) gin.HandlerFunc {
+func AuthMiddleware(engine engine.ClientInterface, appConfig *config.AppConfig) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		xPub := strings.TrimSpace(c.GetHeader(AuthHeader))
 		authAccessKey := strings.TrimSpace(c.GetHeader(AuthAccessKey))
@@ -121,7 +121,7 @@ func AuthMiddleware(bux bux.ClientInterface, appConfig *config.AppConfig) gin.Ha
 
 		} else if authAccessKey != "" {
 			xPubOrAccessKey = authAccessKey
-			accessKey, err := bux.AuthenticateAccessKey(context.Background(), utils.Hash(authAccessKey))
+			accessKey, err := engine.AuthenticateAccessKey(context.Background(), utils.Hash(authAccessKey))
 			if err != nil || accessKey == nil {
 				fmt.Println("Error: ", err)
 				c.AbortWithStatusJSON(http.StatusUnauthorized, err.Error())
