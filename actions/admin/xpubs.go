@@ -19,7 +19,7 @@ import (
 // @Param		metadata query string false "metadata"
 // @Success		201
 // @Router		/v1/admin/xpub [post]
-// @Security	bux-auth-xpub
+// @Security	x-auth-xpub
 func (a *Action) xpubsCreate(c *gin.Context) {
 	var requestBody AdminCreateXpub
 	if err := c.Bind(&requestBody); err != nil {
@@ -87,7 +87,6 @@ func (a *Action) xpubsSearch(c *gin.Context) {
 // @Success		200
 // @Router		/v1/admin/xpubs/count [post]
 // @Security	x-auth-xpub
-// @Security	bux-auth-xpub
 func (a *Action) xpubsCount(c *gin.Context) {
 	_, metadata, conditions, err := actions.GetQueryParameters(c)
 	if err != nil {

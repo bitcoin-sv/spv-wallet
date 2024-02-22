@@ -15,7 +15,6 @@ require (
 	github.com/bitcoin-sv/go-broadcast-client v0.17.2
 	github.com/bitcoin-sv/spv-wallet/engine v0.0.0-00010101000000-000000000000
 	github.com/bitcoin-sv/spv-wallet/models v0.3.0
-	github.com/gin-contrib/cors v1.5.0
 	github.com/gin-contrib/pprof v1.4.0
 	github.com/gin-gonic/gin v1.9.1
 	github.com/go-ozzo/ozzo-validation v3.6.0+incompatible

@@ -1,8 +1,10 @@
 package utxos
 
-import "github.com/BuxOrg/bux"
+import (
+	"github.com/bitcoin-sv/spv-wallet/engine"
+)
 
 type CountUtxo struct {
 	Conditions map[string]interface{} `json:"conditions"`
-	Metadata   bux.Metadata           `json:"metadata"`
+	Metadata   engine.Metadata        `json:"metadata"`
 }

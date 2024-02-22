@@ -8,8 +8,8 @@ import (
 	"github.com/bitcoin-sv/spv-wallet/config"
 	"github.com/bitcoin-sv/spv-wallet/engine"
 	"github.com/bitcoin-sv/spv-wallet/engine/utils"
+	"github.com/bitcoin-sv/spv-wallet/models"
 	"github.com/bitcoinschema/go-bitcoin/v2"
-	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"github.com/libsv/go-bt/v2/bscript"
 	"io"
@@ -17,29 +17,6 @@ import (
 	"strconv"
 	"strings"
 	"time"
-)
-
-const (
-	// AuthHeader is the header to use for authentication (raw xPub)
-	AuthHeader = "bux-auth-xpub"
-
-	// AuthAccessKey is the header to use for access key authentication (access public key)
-	AuthAccessKey = "bux-auth-key"
-
-	// AuthSignature is the given signature (body + timestamp)
-	AuthSignature = "bux-auth-signature"
-
-	// AuthHeaderHash hash of the body coming from the request
-	AuthHeaderHash = "bux-auth-hash"
-
-	// AuthHeaderNonce random nonce for the request
-	AuthHeaderNonce = "bux-auth-nonce"
-
-	// AuthHeaderTime the time of the request, only valid for 30 seconds
-	AuthHeaderTime = "bux-auth-time"
-
-	// AuthSignatureTTL is the max TTL for a signature to be valid
-	AuthSignatureTTL = 20 * time.Second
 )
 
 const (
@@ -70,15 +47,6 @@ type AuthPayload struct {
 	accessKey    string
 }
 
-func DefaultCorsMiddleware() gin.HandlerFunc {
-	return cors.New(cors.Config{
-		AllowOrigins:     []string{"*"},
-		AllowMethods:     []string{"GET, POST, PUT, DELETE, OPTIONS"},
-		AllowHeaders:     []string{"*"},
-		AllowCredentials: true,
-	})
-}
-
 // CorsMiddleware is a middleware that handles CORS.
 func CorsMiddleware() gin.HandlerFunc {
 	return func(c *gin.Context) {
@@ -93,8 +61,8 @@ func CorsMiddleware() gin.HandlerFunc {
 // AuthMiddleware will check the request for the xPub or AccessKey header
 func AuthMiddleware(engine engine.ClientInterface, appConfig *config.AppConfig) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		xPub := strings.TrimSpace(c.GetHeader(AuthHeader))
-		authAccessKey := strings.TrimSpace(c.GetHeader(AuthAccessKey))
+		xPub := strings.TrimSpace(c.GetHeader(models.AuthHeader))
+		authAccessKey := strings.TrimSpace(c.GetHeader(models.AuthAccessKey))
 		if len(xPub) == 0 && len(authAccessKey) == 0 {
 			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "missing authentication header"})
 			return
@@ -164,13 +132,13 @@ func SignatureMiddleware(appConfig *config.AppConfig, requireSigning, adminRequi
 
 		c.Request.Body = io.NopCloser(bytes.NewReader(b))
 
-		authTime, _ := strconv.Atoi(c.GetHeader(AuthHeaderTime))
+		authTime, _ := strconv.Atoi(c.GetHeader(models.AuthHeaderTime))
 		authData := &AuthPayload{
-			AuthHash:     c.GetHeader(AuthHeaderHash),
-			AuthNonce:    c.GetHeader(AuthHeaderNonce),
+			AuthHash:     c.GetHeader(models.AuthHeaderHash),
+			AuthNonce:    c.GetHeader(models.AuthHeaderNonce),
 			AuthTime:     int64(authTime),
 			BodyContents: string(b),
-			Signature:    c.GetHeader(AuthSignature),
+			Signature:    c.GetHeader(models.AuthSignature),
 			xPub:         c.GetString(ParamXPubKey),
 			accessKey:    c.GetString(ParamAccessKey),
 		}
@@ -218,7 +186,7 @@ func checkSignatureRequirements(auth *AuthPayload) error {
 		return errors.New("auth hash and body hash do not match")
 	}
 
-	if time.Now().UTC().After(time.UnixMilli(auth.AuthTime).Add(AuthSignatureTTL)) {
+	if time.Now().UTC().After(time.UnixMilli(auth.AuthTime).Add(models.AuthSignatureTTL)) {
 		return errors.New("signature has expired")
 	}
 	return nil
