@@ -92,15 +92,13 @@ func (s *Server) Handlers() *gin.Engine {
 	segment := txn.StartSegment("create_router")
 
 	httpLogger := s.Services.Logger.With().Str("service", "http-server").Logger()
-	engine := gin.New()
-	engine.Use(gin.LoggerWithWriter(debugWriter(&httpLogger)), gin.Recovery())
-	engine.Use(auth.CorsMiddleware())
-
 	if httpLogger.GetLevel() > zerolog.DebugLevel {
 		gin.SetMode(gin.ReleaseMode)
 	}
 	logging.SetGinWriters(&httpLogger)
+	engine := gin.New()
 	engine.Use(logging.GinMiddleware(&httpLogger), gin.Recovery())
+	engine.Use(auth.CorsMiddleware())
 
 	s.Router = engine
 
