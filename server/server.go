@@ -4,6 +4,7 @@ package server
 import (
 	"context"
 	"crypto/tls"
+	"github.com/bitcoin-sv/spv-wallet/actions/contacts"
 	"net/http"
 	"strconv"
 

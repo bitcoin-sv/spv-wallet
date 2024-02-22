@@ -1,8 +1,8 @@
 package contacts
 
 import (
-	"github.com/BuxOrg/bux"
-	"github.com/BuxOrg/bux-server/mappings"
+	"github.com/bitcoin-sv/spv-wallet/engine"
+	"github.com/bitcoin-sv/spv-wallet/mappings"
 	"net/http"
 
 	"github.com/julienschmidt/httprouter"
@@ -30,19 +30,18 @@ func (c *Action) create(w http.ResponseWriter, req *http.Request, _ httprouter.P
 	pubKey := params.GetString("pubKey")
 	metadata := params.GetJSON("metadata")
 
-	opts := c.Services.Bux.DefaultModelOptions()
+	opts := c.Services.SpvWalletEngine.DefaultModelOptions()
 	if metadata != nil {
-		opts = append(opts, bux.WithMetadatas(metadata))
+		opts = append(opts, engine.WithMetadatas(metadata))
 	}
 
-	contact, err := c.Services.Bux.NewContact(req.Context(), fullName, paymail, pubKey, opts...)
+	contact, err := c.Services.SpvWalletEngine.NewContact(req.Context(), fullName, paymail, pubKey, opts...)
 	if err != nil {
 		apirouter.ReturnResponse(w, req, http.StatusUnprocessableEntity, err.Error())
 		return
 	}
 
 	contract := mappings.MapToContactContract(contact)
-	mappings
 
 	apirouter.ReturnResponse(w, req, http.StatusCreated, contract)
 }

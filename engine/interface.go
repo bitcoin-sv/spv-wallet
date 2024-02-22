@@ -57,6 +57,10 @@ type ClientService interface {
 	Taskmanager() taskmanager.TaskEngine
 }
 
+type ContactService interface {
+	NewContact(ctx context.Context, fullName, paymail, pubKey string, opts ...ModelOps) (*Contact, error)
+}
+
 // DestinationService is the destination actions
 type DestinationService interface {
 	GetDestinationByID(ctx context.Context, xPubID, id string) (*Destination, error)
@@ -172,6 +176,7 @@ type ClientInterface interface {
 	TransactionService
 	UTXOService
 	XPubService
+	ContactService
 	AuthenticateRequest(ctx context.Context, req *http.Request, adminXPubs []string,
 		adminRequired, requireSigning, signingDisabled bool) (*http.Request, error)
 	Close(ctx context.Context) error
