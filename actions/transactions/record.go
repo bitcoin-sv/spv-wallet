@@ -51,7 +51,7 @@ func (a *Action) record(c *gin.Context) {
 		c.Request.Context(),
 		reqXPub,
 		requestBody.Hex,
-		requestBody.ReferenceId,
+		requestBody.ReferenceID,
 		opts...,
 	); err != nil {
 		c.JSON(http.StatusUnprocessableEntity, err.Error())

@@ -25,6 +25,10 @@ func (a *Action) get(c *gin.Context) {
 	txID := c.Query("tx_id")
 	outputIndex := c.Query("output_index")
 	outputIndex64, err := strconv.ParseUint(outputIndex, 10, 32)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, err.Error())
+		return
+	}
 
 	utxo, err := a.Services.SpvWalletEngine.GetUtxo(
 		c.Request.Context(),

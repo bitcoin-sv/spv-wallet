@@ -68,15 +68,11 @@ func AuthMiddleware(engine engine.ClientInterface, appConfig *config.AppConfig) 
 			return
 		}
 
-		fmt.Println("xPub: ", xPub)
-		fmt.Println("authAccessKey: ", authAccessKey)
-
 		xPubID := utils.Hash(xPub)
-		xPubOrAccessKey := xPub
 
 		if xPub != "" {
 			// Validate that the xPub is an HD key (length, validation)
-			if _, err := utils.ValidateXPub(xPubOrAccessKey); err != nil {
+			if _, err := utils.ValidateXPub(xPub); err != nil {
 				c.AbortWithStatusJSON(http.StatusUnauthorized, err.Error())
 				return
 			}
@@ -88,10 +84,8 @@ func AuthMiddleware(engine engine.ClientInterface, appConfig *config.AppConfig) 
 			c.Set(ParamXPubKey, xPub)
 
 		} else if authAccessKey != "" {
-			xPubOrAccessKey = authAccessKey
 			accessKey, err := engine.AuthenticateAccessKey(context.Background(), utils.Hash(authAccessKey))
 			if err != nil || accessKey == nil {
-				fmt.Println("Error: ", err)
 				c.AbortWithStatusJSON(http.StatusUnauthorized, err.Error())
 				return
 			}
@@ -110,7 +104,6 @@ func AdminMiddleware() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		if c.GetBool(ParamAdminRequest) {
 			c.Next()
-			return
 		} else {
 			c.AbortWithStatusJSON(http.StatusUnauthorized, "xpub provided is not an admin key")
 		}

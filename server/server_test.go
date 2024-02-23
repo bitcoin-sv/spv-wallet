@@ -2,13 +2,13 @@ package server
 
 import (
 	"github.com/bitcoin-sv/spv-wallet/engine/utils"
+	"github.com/bitcoin-sv/spv-wallet/models"
 	"github.com/bitcoin-sv/spv-wallet/tests"
 	"testing"
 
 	"bytes"
 	"context"
 	"github.com/bitcoin-sv/spv-wallet/config"
-	"github.com/bitcoin-sv/spv-wallet/server/auth"
 	"github.com/gin-gonic/gin"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -77,7 +77,7 @@ func (ts *TestSuite) TestAdminAuthentication() {
 		require.NoError(t, err)
 		require.NotNil(t, req)
 
-		req.Header.Set(auth.AuthHeader, testXpubAuth)
+		req.Header.Set(models.AuthHeader, testXpubAuth)
 
 		ts.Router.ServeHTTP(w, req)
 
@@ -91,7 +91,7 @@ func (ts *TestSuite) TestAdminAuthentication() {
 		require.NoError(t, err)
 		require.NotNil(t, req)
 
-		req.Header.Set(auth.AuthHeader, ts.AppConfig.Authentication.AdminKey)
+		req.Header.Set(models.AuthHeader, ts.AppConfig.Authentication.AdminKey)
 
 		ts.Router.ServeHTTP(w, req)
 
@@ -120,7 +120,7 @@ func (ts *TestSuite) TestApiAuthentication() {
 		require.NoError(t, err)
 		require.NotNil(t, req)
 
-		req.Header.Set(auth.AuthHeader, testXpubAuth)
+		req.Header.Set(models.AuthHeader, testXpubAuth)
 
 		ts.Router.ServeHTTP(w, req)
 
@@ -138,7 +138,7 @@ func (ts *TestSuite) TestApiAuthentication() {
 		require.NoError(t, err)
 		require.NotNil(t, req)
 
-		req.Header.Set(auth.AuthHeader, xpub.RawXpub())
+		req.Header.Set(models.AuthHeader, xpub.RawXpub())
 
 		ts.Router.ServeHTTP(w, req)
 
@@ -167,7 +167,7 @@ func (ts *TestSuite) TestBasicAuthentication() {
 		require.NoError(t, err)
 		require.NotNil(t, req)
 
-		req.Header.Set(auth.AuthHeader, testXpubAuth)
+		req.Header.Set(models.AuthHeader, testXpubAuth)
 
 		ts.Router.ServeHTTP(w, req)
 
@@ -189,7 +189,7 @@ func (ts *TestSuite) TestBasicAuthentication() {
 		require.NoError(t, err)
 		require.NotNil(t, req)
 
-		req.Header.Set(auth.AuthHeader, xpub.RawXpub())
+		req.Header.Set(models.AuthHeader, xpub.RawXpub())
 
 		ts.Router.ServeHTTP(w, req)
 

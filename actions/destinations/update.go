@@ -30,7 +30,7 @@ func (a *Action) update(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, err.Error())
 		return
 	}
-	if requestBody.Id == "" && requestBody.Address == "" && requestBody.LockingScript == "" {
+	if requestBody.ID == "" && requestBody.Address == "" && requestBody.LockingScript == "" {
 		c.JSON(http.StatusBadRequest, "One of the fields is required: id, address or lockingScript")
 		return
 	}
@@ -38,9 +38,9 @@ func (a *Action) update(c *gin.Context) {
 	// Get the destination
 	var destination *engine.Destination
 	var err error
-	if requestBody.Id != "" {
+	if requestBody.ID != "" {
 		destination, err = a.Services.SpvWalletEngine.UpdateDestinationMetadataByID(
-			c.Request.Context(), reqXPubID, requestBody.Id, requestBody.Metadata,
+			c.Request.Context(), reqXPubID, requestBody.ID, requestBody.Metadata,
 		)
 	} else if requestBody.Address != "" {
 		destination, err = a.Services.SpvWalletEngine.UpdateDestinationMetadataByAddress(

@@ -33,7 +33,7 @@ func (a *Action) update(c *gin.Context) {
 	transaction, err := a.Services.SpvWalletEngine.UpdateTransactionMetadata(
 		c.Request.Context(),
 		reqXPubID,
-		requestBody.Id,
+		requestBody.ID,
 		requestBody.Metadata,
 	)
 	if err != nil {

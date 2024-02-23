@@ -40,7 +40,7 @@ func (a *Action) get(c *gin.Context) {
 	}
 
 	signed := c.GetBool("auth_signed")
-	if signed == false || reqXPub == "" {
+	if !signed || reqXPub == "" {
 		xPub.RemovePrivateData()
 	}
 
