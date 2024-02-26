@@ -117,8 +117,8 @@ func SetupServerRoutes(appConfig *config.AppConfig, services *config.AppServices
 	baseRoutes := base.NewHandler(appConfig, engine)
 
 	accessKeyAPIRoutes := accesskeys.NewHandler(appConfig, services)
-	destinationBasicRoutes, destinationApiRoutes := destinations.NewHandler(appConfig, services)
-	transactionBasicRoutes, transactionApiRoutes, transactionCallbackRoutes := transactions.NewHandler(appConfig, services)
+	destinationBasicRoutes, destinationAPIRoutes := destinations.NewHandler(appConfig, services)
+	transactionBasicRoutes, transactionAPIRoutes, transactionCallbackRoutes := transactions.NewHandler(appConfig, services)
 	utxoAPIRoutes := utxos.NewHandler(appConfig, services)
 	xPubAPIRoutes := xpubs.NewHandler(appConfig, services)
 
@@ -131,10 +131,10 @@ func SetupServerRoutes(appConfig *config.AppConfig, services *config.AppServices
 		accessKeyAPIRoutes,
 		// Destination routes
 		destinationBasicRoutes,
-		destinationApiRoutes,
+		destinationAPIRoutes,
 		// Transaction routes
 		transactionBasicRoutes,
-		transactionApiRoutes,
+		transactionAPIRoutes,
 		transactionCallbackRoutes,
 		// Utxo routes
 		utxoAPIRoutes,
