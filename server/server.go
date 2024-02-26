@@ -111,15 +111,16 @@ func (s *Server) Handlers() *gin.Engine {
 	return s.Router
 }
 
+// SetupServerRoutes will register endpoints for all models
 func SetupServerRoutes(appConfig *config.AppConfig, services *config.AppServices, engine *gin.Engine) {
 	adminRoutes := admin.NewHandler(appConfig, services)
 	baseRoutes := base.NewHandler(appConfig, engine)
 
-	accessKeyApiRoutes := accesskeys.NewHandler(appConfig, services)
+	accessKeyAPIRoutes := accesskeys.NewHandler(appConfig, services)
 	destinationBasicRoutes, destinationApiRoutes := destinations.NewHandler(appConfig, services)
 	transactionBasicRoutes, transactionApiRoutes, transactionCallbackRoutes := transactions.NewHandler(appConfig, services)
-	utxoApiRoutes := utxos.NewHandler(appConfig, services)
-	xPubApiRoutes := xpubs.NewHandler(appConfig, services)
+	utxoAPIRoutes := utxos.NewHandler(appConfig, services)
+	xPubAPIRoutes := xpubs.NewHandler(appConfig, services)
 
 	routes := []interface{}{
 		// Admin routes
@@ -127,7 +128,7 @@ func SetupServerRoutes(appConfig *config.AppConfig, services *config.AppServices
 		// Base routes
 		baseRoutes,
 		// Access key routes
-		accessKeyApiRoutes,
+		accessKeyAPIRoutes,
 		// Destination routes
 		destinationBasicRoutes,
 		destinationApiRoutes,
@@ -136,9 +137,9 @@ func SetupServerRoutes(appConfig *config.AppConfig, services *config.AppServices
 		transactionApiRoutes,
 		transactionCallbackRoutes,
 		// Utxo routes
-		utxoApiRoutes,
+		utxoAPIRoutes,
 		// xPub routes
-		xPubApiRoutes,
+		xPubAPIRoutes,
 	}
 
 	prefix := "/" + config.APIVersion
