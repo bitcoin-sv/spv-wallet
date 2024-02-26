@@ -11,17 +11,11 @@ import (
 	"github.com/bitcoin-sv/spv-wallet/engine/chainstate"
 	"github.com/bitcoin-sv/spv-wallet/engine/utils"
 	"github.com/libsv/go-bc"
-	"github.com/libsv/go-bt"
+	"github.com/libsv/go-bt/v2"
 	"github.com/mrz1836/go-datastore"
 )
 
-// RecordTransaction will parse the transaction and save it into the Datastore
-//
-// Internal (known) transactions: there is a corresponding `draft_transaction` via `draft_id`
-// External (known) transactions: there are output(s) related to the destination `reference_id`, tx is valid (mempool/on-chain)
-// External (unknown) transactions: no reference id but some output(s) match known outputs, tx is valid (mempool/on-chain)
-// Unknown transactions: no matching outputs, tx will be disregarded
-//
+// RecordTransaction will parse the outgoing transaction and save it into the Datastore
 // xPubKey is the raw public xPub
 // txHex is the raw transaction hex
 // draftID is the unique draft id from a previously started New() transaction (draft_transaction.ID)
@@ -29,7 +23,12 @@ import (
 func (c *Client) RecordTransaction(ctx context.Context, xPubKey, txHex, draftID string, opts ...ModelOps) (*Transaction, error) {
 	ctx = c.GetOrStartTxn(ctx, "record_transaction")
 
-	rts, err := getRecordTxStrategy(ctx, c, xPubKey, txHex, draftID)
+	tx, err := bt.NewTxFromString(txHex)
+	if err != nil {
+		return nil, fmt.Errorf("invalid hex: %w", err)
+	}
+
+	rts, err := getOutgoingTxRecordStrategy(xPubKey, tx, draftID)
 	if err != nil {
 		return nil, err
 	}
@@ -135,7 +134,7 @@ func (c *Client) GetTransactionByHex(ctx context.Context, hex string) (*Transact
 		return nil, err
 	}
 
-	return c.GetTransaction(ctx, "", tx.GetTxID())
+	return c.GetTransaction(ctx, "", tx.TxID())
 }
 
 // GetTransactions will get all the transactions from the Datastore

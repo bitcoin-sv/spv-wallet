@@ -45,7 +45,7 @@ var (
 //
 // NOTE: if successful (in-mempool), no error will be returned
 // NOTE: function register the fastest successful broadcast into 'completeChannel' so client doesn't need to wait for other providers
-func (c *Client) broadcast(ctx context.Context, id, hex string, timeout time.Duration, completeChannel, errorChannel chan string) {
+func (c *Client) broadcast(ctx context.Context, id, hex string, format HexFormatFlag, timeout time.Duration, completeChannel, errorChannel chan string) {
 	// Create a context (to cancel or timeout)
 	ctxWithCancel, cancel := context.WithTimeout(ctx, timeout)
 	defer cancel()
@@ -55,7 +55,7 @@ func (c *Client) broadcast(ctx context.Context, id, hex string, timeout time.Dur
 	resultsChannel := make(chan broadcastResult)
 	status := newBroadcastStatus(completeChannel)
 
-	for _, broadcastProvider := range createActiveProviders(c, id, hex) {
+	for _, broadcastProvider := range createActiveProviders(c, id, hex, format) {
 		wg.Add(1)
 		go func(provider txBroadcastProvider) {
 			defer wg.Done()
@@ -85,11 +85,15 @@ func (c *Client) broadcast(ctx context.Context, id, hex string, timeout time.Dur
 	}
 }
 
-func createActiveProviders(c *Client, txID, txHex string) []txBroadcastProvider {
-	providers := make([]txBroadcastProvider, 0, 10)
+func createActiveProviders(c *Client, txID, txHex string, format HexFormatFlag) []txBroadcastProvider {
+	providers := make([]txBroadcastProvider, 0, 1)
 
 	switch c.ActiveProvider() {
 	case ProviderMinercraft:
+		if format != RawTx {
+			panic("MAPI doesn't support other broadcast format than RawTx")
+		}
+
 		for _, miner := range c.options.config.minercraftConfig.broadcastMiners {
 			if miner == nil {
 				continue
@@ -99,7 +103,7 @@ func createActiveProviders(c *Client, txID, txHex string) []txBroadcastProvider 
 			providers = append(providers, &pvdr)
 		}
 	case ProviderBroadcastClient:
-		pvdr := broadcastClientProvider{txID: txID, txHex: txHex}
+		pvdr := broadcastClientProvider{txID: txID, txHex: txHex, format: format}
 		providers = append(providers, &pvdr)
 	default:
 		c.options.logger.Warn().Msg("no active provider for broadcast")

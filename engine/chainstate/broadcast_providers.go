@@ -22,17 +22,20 @@ type mapiBroadcastProvider struct {
 	txID, txHex string
 }
 
-func (provider mapiBroadcastProvider) getName() string {
+func (provider *mapiBroadcastProvider) getName() string {
 	return provider.miner.Name
 }
 
-func (provider mapiBroadcastProvider) broadcast(ctx context.Context, c *Client) error {
+func (provider *mapiBroadcastProvider) broadcast(ctx context.Context, c *Client) error {
 	return broadcastMAPI(ctx, c, provider.miner, provider.txID, provider.txHex)
 }
 
 // broadcastMAPI will broadcast a transaction to a miner using mAPI
-func broadcastMAPI(ctx context.Context, client ClientInterface, miner *minercraft.Miner, id, hex string) error {
-	debugLog(client, id, "executing broadcast request in mapi using miner: "+miner.Name)
+func broadcastMAPI(ctx context.Context, client *Client, miner *minercraft.Miner, id, hex string) error {
+	logger := client.options.logger
+	logger.Debug().
+		Str("txID", id).
+		Msgf("executing broadcast request in mapi using miner: %s", miner.Name)
 
 	resp, err := client.Minercraft().SubmitTransaction(ctx, miner, &minercraft.Transaction{
 		CallBackEncryption: "", // todo: allow customizing the payload
@@ -44,7 +47,9 @@ func broadcastMAPI(ctx context.Context, client ClientInterface, miner *minercraf
 		RawTx:              hex,
 	})
 	if err != nil {
-		debugLog(client, id, "error executing request in mapi using miner: "+miner.Name+" failed: "+err.Error())
+		logger.Debug().
+			Str("txID", id).
+			Msgf("error executing request in mapi using miner: %s failed: %s", miner.Name, err.Error())
 		return err
 	}
 
@@ -83,36 +88,55 @@ func emptyBroadcastResponseErr(txID string) error {
 // BroadcastClient provider
 type broadcastClientProvider struct {
 	txID, txHex string
+	format      HexFormatFlag
 }
 
-func (provider broadcastClientProvider) getName() string {
+func (provider *broadcastClientProvider) getName() string {
 	return ProviderBroadcastClient
 }
 
-// Broadcast using BroadcastClient
-func (provider broadcastClientProvider) broadcast(ctx context.Context, c *Client) error {
-	return broadcastWithBroadcastClient(ctx, c, provider.txID, provider.txHex)
-}
+func (provider *broadcastClientProvider) broadcast(ctx context.Context, c *Client) error {
+	logger := c.options.logger
 
-func broadcastWithBroadcastClient(ctx context.Context, client *Client, txID, hex string) error {
-	debugLog(client, txID, "executing broadcast request for "+ProviderBroadcastClient)
+	logger.Debug().
+		Str("txID", provider.txID).
+		Msgf("executing broadcast request for %s", provider.getName())
 
 	tx := broadcast.Transaction{
-		Hex: hex,
+		Hex: provider.txHex,
 	}
 
-	result, err := client.BroadcastClient().SubmitTransaction(
+	formatOpt := broadcast.WithRawFormat()
+	if provider.format.Contains(Ef) {
+		formatOpt = broadcast.WithEfFormat()
+
+		logger.Debug().
+			Str("txID", provider.txID).
+			Msgf("broadcast with broadcast-client in Extended Format")
+	} else {
+		logger.Debug().
+			Str("txID", provider.txID).
+			Msgf("broadcast with broadcast-client in RawTx format")
+	}
+
+	result, err := c.BroadcastClient().SubmitTransaction(
 		ctx,
 		&tx,
-		broadcast.WithRawFormat(),
-		broadcast.WithCallback(client.options.config.callbackURL, client.options.config.callbackToken),
+		formatOpt,
+		broadcast.WithCallback(c.options.config.callbackURL, c.options.config.callbackToken),
 	)
+
 	if err != nil {
-		debugLog(client, txID, "error broadcast request for "+ProviderBroadcastClient+" failed: "+err.Error())
+		logger.Debug().
+			Str("txID", provider.txID).
+			Msgf("error broadcast request for %s failed: %s", provider.getName(), err.Error())
+
 		return err
 	}
 
-	debugLog(client, txID, "result broadcast request for "+ProviderBroadcastClient+" blockhash: "+result.BlockHash+" status: "+result.TxStatus.String())
+	logger.Debug().
+		Str("txID", provider.txID).
+		Msgf("result broadcast request for %s blockhash: %s status: %s", provider.getName(), result.BlockHash, result.TxStatus.String())
 
 	return nil
 }
