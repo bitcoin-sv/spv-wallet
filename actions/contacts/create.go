@@ -1,12 +1,11 @@
 package contacts
 
 import (
+	"github.com/gin-gonic/gin"
 	"net/http"
 
 	"github.com/bitcoin-sv/spv-wallet/engine"
 	"github.com/bitcoin-sv/spv-wallet/mappings"
-	"github.com/julienschmidt/httprouter"
-	apirouter "github.com/mrz1836/go-api-router"
 )
 
 // create will make a new model using the services defined in the action object
@@ -22,26 +21,26 @@ import (
 // @Success		201
 // @Router		/v1/contact [post]
 // @Security	bux-auth-xpub
-func (c *Action) create(w http.ResponseWriter, req *http.Request, _ httprouter.Params) {
-	params := apirouter.GetParams(req)
+func (a *Action) create(c *gin.Context) {
 
-	fullName := params.GetString("full_name")
-	paymail := params.GetString("paymail")
-	pubKey := params.GetString("pubKey")
-	metadata := params.GetJSON("metadata")
+	fullName := c.GetString("full_name")
+	paymail := c.GetString("paymail")
+	pubKey := c.GetString("pubKey")
 
-	opts := c.Services.SpvWalletEngine.DefaultModelOptions()
-	if metadata != nil {
-		opts = append(opts, engine.WithMetadatas(metadata))
+	var requestBody CreateContact
+
+	opts := a.Services.SpvWalletEngine.DefaultModelOptions()
+	if requestBody.Metadata != nil {
+		opts = append(opts, engine.WithMetadatas(requestBody.Metadata))
 	}
 
-	contact, err := c.Services.SpvWalletEngine.NewContact(req.Context(), fullName, paymail, pubKey, opts...)
+	contact, err := a.Services.SpvWalletEngine.NewContact(c.Request.Context(), fullName, paymail, pubKey, opts...)
 	if err != nil {
-		apirouter.ReturnResponse(w, req, http.StatusUnprocessableEntity, err.Error())
+		c.JSON(http.StatusUnprocessableEntity, err.Error())
 		return
 	}
 
 	contract := mappings.MapToContactContract(contact)
 
-	apirouter.ReturnResponse(w, req, http.StatusCreated, contract)
+	c.JSON(http.StatusCreated, contract)
 }
