@@ -128,6 +128,15 @@ func newTransactionWithDraftID(txHex, draftID string, opts ...ModelOps) (*Transa
 	return tx, nil
 }
 
+func txFromBtTx(btTx *bt.Tx, opts ...ModelOps) *Transaction {
+	tx := emptyTx(opts...)
+	tx.ID = btTx.TxID()
+	tx.Hex = btTx.String()
+	tx.parsedTx = btTx
+
+	return tx
+}
+
 // setXPubID will set the xPub ID on the model
 func (m *Transaction) setXPubID() {
 	if len(m.rawXpubKey) > 0 && len(m.XPubID) == 0 {

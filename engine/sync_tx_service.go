@@ -110,42 +110,33 @@ func broadcastSyncTransaction(ctx context.Context, syncTx *SyncTransaction) erro
 		return err
 	}
 
+	client := syncTx.Client()
+	chainstateSrv := client.Chainstate()
+
 	// Get the transaction HEX
-	var txHex string
-	if syncTx.transaction != nil && syncTx.transaction.Hex != "" {
-		// the transaction has already been retrieved and added to the syncTx object, just use that
-		txHex = syncTx.transaction.Hex
-	} else {
-		// else get hex from DB
-		transaction, err := getTransactionByID(
-			ctx, "", syncTx.ID, syncTx.GetOptions(false)...,
-		)
-		if err != nil {
-			return err
+	tx := syncTx.transaction
+	if tx == nil || tx.Hex == "" {
+		if tx, err = _getTransaction(ctx, syncTx.ID, syncTx.GetOptions(false)); err != nil {
+			return nil
 		}
-
-		if transaction == nil {
-			return errors.New("transaction was expected but not found, using ID: " + syncTx.ID)
-		}
-
-		txHex = transaction.Hex
 	}
+
+	txHex, hexFormat := _getTxHexInFormat(ctx, tx, chainstateSrv.SupportedBroadcastFormats(), client)
 
 	// Broadcast
 	var provider string
-	if provider, err = syncTx.Client().Chainstate().Broadcast(
-		ctx, syncTx.ID, txHex, defaultBroadcastTimeout,
+	if provider, err = chainstateSrv.Broadcast(
+		ctx, syncTx.ID, txHex, hexFormat, defaultBroadcastTimeout,
 	); err != nil {
 		_bailAndSaveSyncTransaction(ctx, syncTx, SyncStatusReady, syncActionBroadcast, provider, err.Error())
 		return err
 	}
 
-	// Create status message
-	message := "broadcast success"
-
 	// Update the sync information
+	statusMsg := "broadcast success"
+
 	syncTx.BroadcastStatus = SyncStatusComplete
-	syncTx.Results.LastMessage = message
+	syncTx.Results.LastMessage = statusMsg
 	syncTx.LastAttempt = customTypes.NullTime{
 		NullTime: sql.NullTime{
 			Time:  time.Now().UTC(),
@@ -157,7 +148,7 @@ func broadcastSyncTransaction(ctx context.Context, syncTx *SyncTransaction) erro
 		Action:        syncActionBroadcast,
 		ExecutedAt:    time.Now().UTC(),
 		Provider:      provider,
-		StatusMessage: message,
+		StatusMessage: statusMsg,
 	})
 
 	// Update sync status to be ready now
@@ -181,6 +172,25 @@ func broadcastSyncTransaction(ctx context.Context, syncTx *SyncTransaction) erro
 
 /////////////////
 
+func _getTxHexInFormat(ctx context.Context, tx *Transaction, prefferedFormat chainstate.HexFormatFlag, store TransactionGetter) (txHex string, actualFormat chainstate.HexFormatFlag) {
+
+	if prefferedFormat.Contains(chainstate.Ef) {
+		efHex, ok := ToEfHex(ctx, tx, store)
+
+		if ok {
+			txHex = efHex
+			actualFormat = chainstate.Ef
+			return
+		}
+	}
+
+	// return rawtx hex
+	txHex = tx.Hex
+	actualFormat = chainstate.RawTx
+
+	return
+}
+
 // _syncTxDataFromChain will process the sync transaction record, or save the failure
 func _syncTxDataFromChain(ctx context.Context, syncTx *SyncTransaction, transaction *Transaction) error {
 	// Successfully capture any panics, convert to readable string and log the error
@@ -188,17 +198,10 @@ func _syncTxDataFromChain(ctx context.Context, syncTx *SyncTransaction, transact
 
 	var err error
 
-	// Get the transaction
 	if transaction == nil {
-		if transaction, err = getTransactionByID(
-			ctx, "", syncTx.ID, syncTx.GetOptions(false)...,
-		); err != nil {
-			return err
+		if transaction, err = _getTransaction(ctx, syncTx.ID, syncTx.GetOptions(false)); err != nil {
+			return ErrMissingTransaction
 		}
-	}
-
-	if transaction == nil {
-		return ErrMissingTransaction
 	}
 
 	// Find on-chain
@@ -220,6 +223,19 @@ func _syncTxDataFromChain(ctx context.Context, syncTx *SyncTransaction, transact
 		return err
 	}
 	return processSyncTxSave(ctx, txInfo, syncTx, transaction)
+}
+
+func _getTransaction(ctx context.Context, id string, opts []ModelOps) (*Transaction, error) {
+	transaction, err := getTransactionByID(ctx, "", id, opts...)
+	if err != nil {
+		return nil, err
+	}
+
+	if transaction == nil {
+		return nil, ErrMissingTransaction
+	}
+
+	return transaction, nil
 }
 
 func processSyncTxSave(ctx context.Context, txInfo *chainstate.TransactionInfo, syncTx *SyncTransaction, transaction *Transaction) error {

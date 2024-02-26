@@ -3,8 +3,9 @@ package transactions
 import (
 	"testing"
 
+	"github.com/bitcoin-sv/spv-wallet/config"
 	"github.com/bitcoin-sv/spv-wallet/tests"
-	apirouter "github.com/mrz1836/go-api-router"
+	"github.com/gin-gonic/gin"
 	"github.com/stretchr/testify/require"
 	"github.com/stretchr/testify/suite"
 )
@@ -29,9 +30,12 @@ func (ts *TestSuite) SetupTest() {
 	ts.BaseSetupTest()
 
 	// Load the router & register routes
-	ts.Router = apirouter.New()
+	ts.Router = gin.Default()
 	require.NotNil(ts.T(), ts.Router)
-	RegisterRoutes(ts.Router, ts.AppConfig, ts.Services)
+	basicRoutes, apiRoutes, callbackRoutes := NewHandler(ts.AppConfig, ts.Services)
+	basicRoutes.RegisterBasicEndpoints(ts.Router.Group("/" + config.APIVersion))
+	apiRoutes.RegisterAPIEndpoints(ts.Router.Group("/" + config.APIVersion))
+	callbackRoutes.RegisterCallbackEndpoints(ts.Router.Group(""))
 }
 
 // TearDownTest runs after each test

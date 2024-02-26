@@ -1,7 +1,6 @@
 package utxos
 
 import (
-	"net/http"
 	"testing"
 
 	"github.com/bitcoin-sv/spv-wallet/config"
@@ -11,20 +10,27 @@ import (
 // TestUtxoRegisterRoutes will test routes
 func (ts *TestSuite) TestUtxoRegisterRoutes() {
 	ts.T().Run("test routes", func(t *testing.T) {
-		// get utxo
-		handle, _, _ := ts.Router.HTTPRouter.Lookup(http.MethodGet, "/"+config.APIVersion+"/utxo")
-		assert.NotNil(t, handle)
+		testCases := []struct {
+			method string
+			url    string
+		}{
+			{"GET", "/" + config.APIVersion + "/utxo"},
+			{"POST", "/" + config.APIVersion + "/utxo/count"},
+			{"POST", "/" + config.APIVersion + "/utxo/search"},
+		}
 
-		// count utxo
-		handle, _, _ = ts.Router.HTTPRouter.Lookup(http.MethodPost, "/"+config.APIVersion+"/utxo/count")
-		assert.NotNil(t, handle)
+		ts.Router.Routes()
 
-		// search utxo
-		handle, _, _ = ts.Router.HTTPRouter.Lookup(http.MethodPost, "/"+config.APIVersion+"/utxo/search")
-		assert.NotNil(t, handle)
-
-		// unreserve utxo
-		handle, _, _ = ts.Router.HTTPRouter.Lookup(http.MethodPatch, "/"+config.APIVersion+"/utxo/unreserve")
-		assert.NotNil(t, handle)
+		for _, testCase := range testCases {
+			found := false
+			for _, routeInfo := range ts.Router.Routes() {
+				if testCase.url == routeInfo.Path && testCase.method == routeInfo.Method {
+					assert.NotNil(t, routeInfo.HandlerFunc)
+					found = true
+					break
+				}
+			}
+			assert.True(t, found)
+		}
 	})
 }

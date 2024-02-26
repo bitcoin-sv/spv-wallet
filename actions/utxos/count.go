@@ -4,10 +4,8 @@ import (
 	"net/http"
 
 	"github.com/bitcoin-sv/spv-wallet/actions"
-	"github.com/bitcoin-sv/spv-wallet/engine"
-	"github.com/bitcoin-sv/spv-wallet/mappings"
-	"github.com/julienschmidt/httprouter"
-	apirouter "github.com/mrz1836/go-api-router"
+	"github.com/bitcoin-sv/spv-wallet/server/auth"
+	"github.com/gin-gonic/gin"
 )
 
 // count will count all the utxos fulfilling the given conditions
@@ -21,15 +19,12 @@ import (
 // @Success		200
 // @Router		/v1/utxo/count [post]
 // @Security	x-auth-xpub
-func (a *Action) count(w http.ResponseWriter, req *http.Request, _ httprouter.Params) {
-	reqXPubID, _ := engine.GetXpubIDFromRequest(req)
+func (a *Action) count(c *gin.Context) {
+	reqXPubID := c.GetString(auth.ParamXPubHashKey)
 
-	// Parse the params
-	params := apirouter.GetParams(req)
-	_, metadataModel, conditions, err := actions.GetQueryParameters(params)
-	metadata := mappings.MapToSpvWalletMetadata(metadataModel)
+	_, metadata, conditions, err := actions.GetQueryParameters(c)
 	if err != nil {
-		apirouter.ReturnResponse(w, req, http.StatusExpectationFailed, err.Error())
+		c.JSON(http.StatusExpectationFailed, err.Error())
 		return
 	}
 
@@ -37,20 +32,18 @@ func (a *Action) count(w http.ResponseWriter, req *http.Request, _ httprouter.Pa
 	if conditions != nil {
 		dbConditions = *conditions
 	}
-	// force the xpub_id of the current user on query
+
 	dbConditions["xpub_id"] = reqXPubID
 
-	// Get a utxo using a xPub
 	var count int64
 	if count, err = a.Services.SpvWalletEngine.GetUtxosCount(
-		req.Context(),
+		c.Request.Context(),
 		metadata,
 		&dbConditions,
 	); err != nil {
-		apirouter.ReturnResponse(w, req, http.StatusExpectationFailed, err.Error())
+		c.JSON(http.StatusExpectationFailed, err.Error())
 		return
 	}
 
-	// Return response
-	apirouter.ReturnResponse(w, req, http.StatusOK, count)
+	c.JSON(http.StatusOK, count)
 }

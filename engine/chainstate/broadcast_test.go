@@ -39,7 +39,7 @@ func TestClient_Broadcast(t *testing.T) {
 
 		// when
 		provider, err := c.Broadcast(
-			context.Background(), "", onChainExample1TxHex, defaultBroadcastTimeOut,
+			context.Background(), "", onChainExample1TxHex, RawTx, defaultBroadcastTimeOut,
 		)
 
 		// then
@@ -55,7 +55,7 @@ func TestClient_Broadcast(t *testing.T) {
 
 		// when
 		provider, err := c.Broadcast(
-			context.Background(), onChainExample1TxID, "", defaultBroadcastTimeOut,
+			context.Background(), onChainExample1TxID, "", RawTx, defaultBroadcastTimeOut,
 		)
 
 		// then
@@ -78,7 +78,7 @@ func TestClient_Broadcast_MAPI(t *testing.T) {
 
 		// when
 		providers, err := c.Broadcast(
-			context.Background(), broadcastExample1TxID, broadcastExample1TxHex, defaultBroadcastTimeOut,
+			context.Background(), broadcastExample1TxID, broadcastExample1TxHex, RawTx, defaultBroadcastTimeOut,
 		)
 
 		// then
@@ -112,7 +112,7 @@ func TestClient_Broadcast_BroadcastClient(t *testing.T) {
 
 		// when
 		providers, err := c.Broadcast(
-			context.Background(), broadcastExample1TxID, broadcastExample1TxHex, defaultBroadcastTimeOut,
+			context.Background(), broadcastExample1TxID, broadcastExample1TxHex, RawTx, defaultBroadcastTimeOut,
 		)
 
 		// then

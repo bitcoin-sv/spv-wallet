@@ -14,7 +14,7 @@ import (
 // chainStateBase is the base interface / methods
 type chainStateBase struct{}
 
-func (c *chainStateBase) Broadcast(context.Context, string, string, time.Duration) (string, error) {
+func (c *chainStateBase) Broadcast(context.Context, string, string, chainstate.HexFormatFlag, time.Duration) (string, error) {
 	return "", nil
 }
 
@@ -100,6 +100,10 @@ func (c *chainStateEverythingInMempool) QueryTransactionFastest(_ context.Contex
 
 type chainStateEverythingOnChain struct {
 	chainStateEverythingInMempool
+}
+
+func (c *chainStateEverythingOnChain) SupportedBroadcastFormats() chainstate.HexFormatFlag {
+	return chainstate.RawTx
 }
 
 func (c *chainStateEverythingOnChain) BroadcastClient() broadcast.Client {

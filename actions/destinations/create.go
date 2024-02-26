@@ -7,8 +7,8 @@ import (
 	"github.com/bitcoin-sv/spv-wallet/engine"
 	"github.com/bitcoin-sv/spv-wallet/engine/utils"
 	"github.com/bitcoin-sv/spv-wallet/mappings"
-	"github.com/julienschmidt/httprouter"
-	apirouter "github.com/mrz1836/go-api-router"
+	"github.com/bitcoin-sv/spv-wallet/server/auth"
+	"github.com/gin-gonic/gin"
 )
 
 // create will make a new destination
@@ -23,57 +23,41 @@ import (
 // @Success		201
 // @Router		/v1/destination [post]
 // @Security	x-auth-xpub
-func (a *Action) create(w http.ResponseWriter, req *http.Request, _ httprouter.Params) {
-	// Parse the params
-	params := apirouter.GetParams(req)
-
-	// Get the xPub from the request (via authentication)
-	reqXPub, _ := engine.GetXpubFromRequest(req)
-	xPub, err := a.Services.SpvWalletEngine.GetXpub(req.Context(), reqXPub)
+func (a *Action) create(c *gin.Context) {
+	reqXPub := c.GetString(auth.ParamXPubKey)
+	xPub, err := a.Services.SpvWalletEngine.GetXpub(c.Request.Context(), reqXPub)
 	if err != nil {
-		apirouter.ReturnResponse(w, req, http.StatusUnprocessableEntity, err.Error())
+		c.JSON(http.StatusUnprocessableEntity, err.Error())
 		return
 	} else if xPub == nil {
-		apirouter.ReturnResponse(w, req, http.StatusForbidden, actions.ErrXpubNotFound)
+		c.JSON(http.StatusForbidden, actions.ErrXpubNotFound)
 		return
 	}
 
-	// Get metadata (if any)
-	metadata := params.GetJSON(engine.ModelMetadata.String())
-
-	// Get the type
-	scriptType := params.GetString("type")
-	if scriptType == "" {
-		scriptType = utils.ScriptTypePubKeyHash
-	}
-
-	// Set the reference ID
-	referenceID := params.GetString(engine.ReferenceIDField)
-	if len(referenceID) > 0 {
-		metadata[engine.ReferenceIDField] = referenceID
+	var requestBody CreateDestination
+	if err = c.Bind(&requestBody); err != nil {
+		c.JSON(http.StatusBadRequest, err.Error())
+		return
 	}
 
 	opts := a.Services.SpvWalletEngine.DefaultModelOptions()
 
-	if metadata != nil {
-		opts = append(opts, engine.WithMetadatas(metadata))
+	if requestBody.Metadata != nil {
+		opts = append(opts, engine.WithMetadatas(requestBody.Metadata))
 	}
 
-	// Get a new destination
 	var destination *engine.Destination
 	if destination, err = a.Services.SpvWalletEngine.NewDestination(
-		req.Context(),
+		c.Request.Context(),
 		xPub.RawXpub(),
 		uint32(0), // todo: use a constant? protect this?
-		scriptType,
+		utils.ScriptTypePubKeyHash,
 		opts...,
 	); err != nil {
-		apirouter.ReturnResponse(w, req, http.StatusUnprocessableEntity, err.Error())
+		c.JSON(http.StatusUnprocessableEntity, err.Error())
 		return
 	}
 
 	contract := mappings.MapToDestinationContract(destination)
-
-	// Return response
-	apirouter.ReturnResponse(w, req, http.StatusCreated, contract)
+	c.JSON(http.StatusCreated, contract)
 }

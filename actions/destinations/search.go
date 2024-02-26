@@ -7,8 +7,8 @@ import (
 	"github.com/bitcoin-sv/spv-wallet/engine"
 	"github.com/bitcoin-sv/spv-wallet/mappings"
 	"github.com/bitcoin-sv/spv-wallet/models"
-	"github.com/julienschmidt/httprouter"
-	apirouter "github.com/mrz1836/go-api-router"
+	"github.com/bitcoin-sv/spv-wallet/server/auth"
+	"github.com/gin-gonic/gin"
 )
 
 // search will fetch a list of destinations filtered by metadata
@@ -26,28 +26,24 @@ import (
 // @Success		200
 // @Router		/v1/destination/search [get]
 // @Security	x-auth-xpub
-func (a *Action) search(w http.ResponseWriter, req *http.Request, _ httprouter.Params) {
-	reqXPubID, _ := engine.GetXpubIDFromRequest(req)
+func (a *Action) search(c *gin.Context) {
+	reqXPubID := c.GetString(auth.ParamXPubHashKey)
 
-	// Parse the params
-	params := apirouter.GetParams(req)
-	queryParams, metadataModel, conditions, err := actions.GetQueryParameters(params)
-	metadata := mappings.MapToSpvWalletMetadata(metadataModel)
+	queryParams, metadata, conditions, err := actions.GetQueryParameters(c)
 	if err != nil {
-		apirouter.ReturnResponse(w, req, http.StatusExpectationFailed, err.Error())
+		c.JSON(http.StatusBadRequest, err.Error())
 		return
 	}
 
-	// Record a new transaction (get the hex from parameters)a
 	var destinations []*engine.Destination
 	if destinations, err = a.Services.SpvWalletEngine.GetDestinationsByXpubID(
-		req.Context(),
+		c.Request.Context(),
 		reqXPubID,
 		metadata,
 		conditions,
 		queryParams,
 	); err != nil {
-		apirouter.ReturnResponse(w, req, http.StatusExpectationFailed, err.Error())
+		c.JSON(http.StatusExpectationFailed, err.Error())
 		return
 	}
 
@@ -55,7 +51,5 @@ func (a *Action) search(w http.ResponseWriter, req *http.Request, _ httprouter.P
 	for _, destination := range destinations {
 		contracts = append(contracts, mappings.MapToDestinationContract(destination))
 	}
-
-	// Return response
-	apirouter.ReturnResponse(w, req, http.StatusOK, contracts)
+	c.JSON(http.StatusOK, contracts)
 }

@@ -5,9 +5,7 @@ import (
 
 	"github.com/bitcoin-sv/spv-wallet/actions"
 	"github.com/bitcoin-sv/spv-wallet/engine"
-	"github.com/bitcoin-sv/spv-wallet/mappings"
-	"github.com/julienschmidt/httprouter"
-	apirouter "github.com/mrz1836/go-api-router"
+	"github.com/gin-gonic/gin"
 )
 
 // destinationsSearch will fetch a list of destinations filtered by metadata
@@ -25,29 +23,25 @@ import (
 // @Success		200
 // @Router		/v1/admin/destinations/search [post]
 // @Security	x-auth-xpub
-func (a *Action) destinationsSearch(w http.ResponseWriter, req *http.Request, _ httprouter.Params) {
-	// Parse the params
-	params := apirouter.GetParams(req)
-	queryParams, metadataModel, conditions, err := actions.GetQueryParameters(params)
-	metadata := mappings.MapToSpvWalletMetadata(metadataModel)
+func (a *Action) destinationsSearch(c *gin.Context) {
+	queryParams, metadata, conditions, err := actions.GetQueryParameters(c)
 	if err != nil {
-		apirouter.ReturnResponse(w, req, http.StatusExpectationFailed, err.Error())
+		c.JSON(http.StatusExpectationFailed, err.Error())
 		return
 	}
 
 	var destinations []*engine.Destination
 	if destinations, err = a.Services.SpvWalletEngine.GetDestinations(
-		req.Context(),
+		c.Request.Context(),
 		metadata,
 		conditions,
 		queryParams,
 	); err != nil {
-		apirouter.ReturnResponse(w, req, http.StatusExpectationFailed, err.Error())
+		c.JSON(http.StatusExpectationFailed, err.Error())
 		return
 	}
 
-	// Return response
-	apirouter.ReturnResponse(w, req, http.StatusOK, destinations)
+	c.JSON(http.StatusOK, destinations)
 }
 
 // destinationsCount will count all destinations filtered by metadata
@@ -61,26 +55,22 @@ func (a *Action) destinationsSearch(w http.ResponseWriter, req *http.Request, _ 
 // @Success		200
 // @Router		/v1/admin/destinations/count [post]
 // @Security	x-auth-xpub
-func (a *Action) destinationsCount(w http.ResponseWriter, req *http.Request, _ httprouter.Params) {
-	// Parse the params
-	params := apirouter.GetParams(req)
-	_, metadataModel, conditions, err := actions.GetQueryParameters(params)
-	metadata := mappings.MapToSpvWalletMetadata(metadataModel)
+func (a *Action) destinationsCount(c *gin.Context) {
+	_, metadata, conditions, err := actions.GetQueryParameters(c)
 	if err != nil {
-		apirouter.ReturnResponse(w, req, http.StatusExpectationFailed, err.Error())
+		c.JSON(http.StatusExpectationFailed, err.Error())
 		return
 	}
 
 	var count int64
 	if count, err = a.Services.SpvWalletEngine.GetDestinationsCount(
-		req.Context(),
+		c.Request.Context(),
 		metadata,
 		conditions,
 	); err != nil {
-		apirouter.ReturnResponse(w, req, http.StatusExpectationFailed, err.Error())
+		c.JSON(http.StatusExpectationFailed, err.Error())
 		return
 	}
 
-	// Return response
-	apirouter.ReturnResponse(w, req, http.StatusOK, count)
+	c.JSON(http.StatusOK, count)
 }
