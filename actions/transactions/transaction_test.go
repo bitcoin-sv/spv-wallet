@@ -32,9 +32,10 @@ func (ts *TestSuite) SetupTest() {
 	// Load the router & register routes
 	ts.Router = gin.Default()
 	require.NotNil(ts.T(), ts.Router)
-	basicRoutes, apiRoutes := NewHandler(ts.AppConfig, ts.Services)
+	basicRoutes, apiRoutes, callbackRoutes := NewHandler(ts.AppConfig, ts.Services)
 	basicRoutes.RegisterBasicEndpoints(ts.Router.Group("/" + config.APIVersion))
 	apiRoutes.RegisterAPIEndpoints(ts.Router.Group("/" + config.APIVersion))
+	callbackRoutes.RegisterCallbackEndpoints(ts.Router.Group(""))
 }
 
 // TearDownTest runs after each test
