@@ -6,6 +6,7 @@ import (
 	"errors"
 	"fmt"
 	"github.com/bitcoin-sv/spv-wallet/config"
+	"github.com/bitcoin-sv/spv-wallet/dictionary"
 	"github.com/bitcoin-sv/spv-wallet/engine"
 	"github.com/bitcoin-sv/spv-wallet/engine/utils"
 	"github.com/bitcoin-sv/spv-wallet/models"
@@ -154,6 +155,31 @@ func SignatureMiddleware(appConfig *config.AppConfig, requireSigning, adminRequi
 				c.AbortWithStatusJSON(http.StatusUnauthorized, err.Error())
 			}
 		}
+		c.Next()
+	}
+}
+
+// CallbackTokenMiddleware verifies the callback token - if it's valid and matches the Bearer scheme.
+func CallbackTokenMiddleware(appConfig *config.AppConfig) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		const BearerSchema = "Bearer "
+		authHeader := c.GetHeader("Authorization")
+		if authHeader == "" {
+			err := dictionary.GetError(dictionary.ErrorAuthenticationCallback, "missing auth header")
+			c.AbortWithStatusJSON(err.StatusCode, err)
+		}
+
+		if !strings.HasPrefix(authHeader, BearerSchema) || len(authHeader) <= len(BearerSchema) {
+			err := dictionary.GetError(dictionary.ErrorAuthenticationCallback, "invalid or missing bearer token")
+			c.AbortWithStatusJSON(err.StatusCode, err)
+		}
+
+		providedToken := authHeader[len(BearerSchema):]
+		if providedToken != appConfig.Nodes.Callback.CallbackToken {
+			err := dictionary.GetError(dictionary.ErrorAuthenticationCallback, "invalid authorization token")
+			c.AbortWithStatusJSON(err.StatusCode, err)
+		}
+
 		c.Next()
 	}
 }

@@ -13,7 +13,7 @@ type Action struct {
 }
 
 // NewHandler creates the specific package routes
-func NewHandler(appConfig *config.AppConfig, services *config.AppServices) (routes.BasicEndpointsFunc, routes.APIEndpointsFunc) {
+func NewHandler(appConfig *config.AppConfig, services *config.AppServices) (routes.BasicEndpointsFunc, routes.APIEndpointsFunc, routes.CallbackEndpointsFunc) {
 	action := &Action{actions.Action{AppConfig: appConfig, Services: services}}
 
 	basicEndpoints := routes.BasicEndpointsFunc(func(router *gin.RouterGroup) {
@@ -31,5 +31,10 @@ func NewHandler(appConfig *config.AppConfig, services *config.AppServices) (rout
 		apiTransactionGroup.POST("/record", action.record)
 	})
 
-	return basicEndpoints, apiEndpoints
+	callbackEndpoints := routes.CallbackEndpointsFunc(func(router *gin.RouterGroup) {
+		callbackTransactionGroup := router.Group("/transaction")
+		callbackTransactionGroup.POST("/callback", action.broadcastCallback)
+	})
+
+	return basicEndpoints, apiEndpoints, callbackEndpoints
 }

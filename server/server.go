@@ -118,7 +118,7 @@ func SetupServerRoutes(appConfig *config.AppConfig, services *config.AppServices
 
 	accessKeyApiRoutes := accesskeys.NewHandler(appConfig, services)
 	destinationBasicRoutes, destinationApiRoutes := destinations.NewHandler(appConfig, services)
-	transactionBasicRoutes, transactionApiRoutes := transactions.NewHandler(appConfig, services)
+	transactionBasicRoutes, transactionApiRoutes, transactionCallbackRoutes := transactions.NewHandler(appConfig, services)
 	utxoApiRoutes := utxos.NewHandler(appConfig, services)
 	xPubApiRoutes := xpubs.NewHandler(appConfig, services)
 
@@ -135,6 +135,7 @@ func SetupServerRoutes(appConfig *config.AppConfig, services *config.AppServices
 		// Transaction routes
 		transactionBasicRoutes,
 		transactionApiRoutes,
+		transactionCallbackRoutes,
 		// Utxo routes
 		utxoApiRoutes,
 		// xPub routes
@@ -147,6 +148,7 @@ func SetupServerRoutes(appConfig *config.AppConfig, services *config.AppServices
 	basicAuthRouter := authRouter.Group(prefix, auth.SignatureMiddleware(appConfig, false, false))
 	apiAuthRouter := authRouter.Group(prefix, auth.SignatureMiddleware(appConfig, true, false))
 	adminAuthRouter := authRouter.Group(prefix, auth.SignatureMiddleware(appConfig, true, true), auth.AdminMiddleware())
+	callbackAuthRouter := baseRouter.Group("", auth.CallbackTokenMiddleware(appConfig))
 
 	for _, r := range routes {
 		switch r := r.(type) {
@@ -158,6 +160,8 @@ func SetupServerRoutes(appConfig *config.AppConfig, services *config.AppServices
 			r.RegisterBasicEndpoints(basicAuthRouter)
 		case router.BaseEndpoints:
 			r.RegisterBaseEndpoints(baseRouter)
+		case router.CallbackEndpoints:
+			r.RegisterCallbackEndpoints(callbackAuthRouter)
 		default:
 			fmt.Println(r)
 			panic(errors.New("unexpected router endpoints registrar"))

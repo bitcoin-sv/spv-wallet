@@ -40,6 +40,15 @@ type BaseEndpoints interface {
 	RegisterBaseEndpoints(router *gin.RouterGroup)
 }
 
+// CallbackEndpointsFunc wrapping type for function to mark it as implementation of BaseEndpoints.
+type CallbackEndpointsFunc func(router *gin.RouterGroup)
+
+// CallbackEndpoints registrar which will register routes in CALLBACK routes group.
+type CallbackEndpoints interface {
+	// RegisterCallbackEndpoints register CALLBACK endpoints.
+	RegisterCallbackEndpoints(router *gin.RouterGroup)
+}
+
 // RegisterAdminEndpoints register root endpoints by registrar AdminEndpointsFunc.
 func (f AdminEndpointsFunc) RegisterAdminEndpoints(router *gin.RouterGroup) {
 	f(router)
@@ -50,26 +59,17 @@ func (f APIEndpointsFunc) RegisterAPIEndpoints(router *gin.RouterGroup) {
 	f(router)
 }
 
-// RegisterBasicEndpoints register API endpoints by registrar BasicEndpointsFunc.
+// RegisterBasicEndpoints register Basic endpoints by registrar BasicEndpointsFunc.
 func (f BasicEndpointsFunc) RegisterBasicEndpoints(router *gin.RouterGroup) {
 	f(router)
 }
 
-// RegisterBaseEndpoints register API endpoints by registrar BaseEndpointsFunc.
+// RegisterBaseEndpoints register Base endpoints by registrar BaseEndpointsFunc.
 func (f BaseEndpointsFunc) RegisterBaseEndpoints(router *gin.RouterGroup) {
 	f(router)
 }
 
-// APIMiddleware middleware that should handle API requests.
-type APIMiddleware interface {
-	//ApplyToAPI handle API request by middleware.
-	ApplyToAPI(c *gin.Context)
-}
-
-// APIMiddlewareFunc wrapping type for function to mark it as implementation of ApiMiddleware.
-type APIMiddlewareFunc func(c *gin.Context)
-
-// ApplyToAPI handle API request by middleware function.
-func (f APIMiddlewareFunc) ApplyToAPI(c *gin.Context) {
-	f(c)
+// RegisterCallbackEndpoints register Callback endpoints by registrar CallbackEndpointsFunc.
+func (f CallbackEndpointsFunc) RegisterCallbackEndpoints(router *gin.RouterGroup) {
+	f(router)
 }
