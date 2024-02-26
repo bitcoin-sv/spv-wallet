@@ -66,10 +66,10 @@ type APIMiddleware interface {
 	ApplyToAPI(c *gin.Context)
 }
 
-// ApiMiddlewareFunc wrapping type for function to mark it as implementation of ApiMiddleware.
+// APIMiddlewareFunc wrapping type for function to mark it as implementation of ApiMiddleware.
 type APIMiddlewareFunc func(c *gin.Context)
 
-// ApplyToApi handle API request by middleware function.
-func (f APIMiddlewareFunc) ApplyToApi(c *gin.Context) {
+// ApplyToAPI handle API request by middleware function.
+func (f APIMiddlewareFunc) ApplyToAPI(c *gin.Context) {
 	f(c)
 }
