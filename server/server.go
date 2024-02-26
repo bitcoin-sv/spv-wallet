@@ -14,7 +14,6 @@ import (
 	"strconv"
 
 	"errors"
-	"fmt"
 	accesskeys "github.com/bitcoin-sv/spv-wallet/actions/access_keys"
 	"github.com/bitcoin-sv/spv-wallet/actions/admin"
 	"github.com/bitcoin-sv/spv-wallet/actions/destinations"
@@ -163,7 +162,6 @@ func SetupServerRoutes(appConfig *config.AppConfig, services *config.AppServices
 		case router.CallbackEndpoints:
 			r.RegisterCallbackEndpoints(callbackAuthRouter)
 		default:
-			fmt.Println(r)
 			panic(errors.New("unexpected router endpoints registrar"))
 		}
 	}

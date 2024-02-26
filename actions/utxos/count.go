@@ -1,7 +1,6 @@
 package utxos
 
 import (
-	"fmt"
 	"github.com/gin-gonic/gin"
 	"net/http"
 
@@ -35,8 +34,6 @@ func (a *Action) count(c *gin.Context) {
 	}
 
 	dbConditions["xpub_id"] = reqXPubID
-
-	fmt.Println("dbConditions", dbConditions)
 
 	var count int64
 	if count, err = a.Services.SpvWalletEngine.GetUtxosCount(

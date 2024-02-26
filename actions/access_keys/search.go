@@ -1,7 +1,6 @@
 package accesskeys
 
 import (
-	"fmt"
 	"github.com/bitcoin-sv/spv-wallet/server/auth"
 	"github.com/gin-gonic/gin"
 	"net/http"
@@ -50,7 +49,6 @@ func (a *Action) search(c *gin.Context) {
 		&dbConditions,
 		queryParams,
 	); err != nil {
-		fmt.Println("Error getting access keys by xpub id")
 		c.JSON(http.StatusExpectationFailed, err.Error())
 		return
 	}
