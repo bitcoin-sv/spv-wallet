@@ -1,11 +1,11 @@
 package transactions
 
 import (
-	"github.com/gin-gonic/gin"
 	"net/http"
 
 	"github.com/bitcoin-sv/spv-wallet/mappings"
 	"github.com/bitcoin-sv/spv-wallet/server/auth"
+	"github.com/gin-gonic/gin"
 	apirouter "github.com/mrz1836/go-api-router"
 )
 

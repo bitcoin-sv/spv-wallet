@@ -1,11 +1,11 @@
 package destinations
 
 import (
-	"github.com/bitcoin-sv/spv-wallet/server/auth"
-	"github.com/gin-gonic/gin"
 	"net/http"
 
 	"github.com/bitcoin-sv/spv-wallet/actions"
+	"github.com/bitcoin-sv/spv-wallet/server/auth"
+	"github.com/gin-gonic/gin"
 )
 
 // count will fetch a count of destinations filtered by metadata

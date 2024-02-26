@@ -5,6 +5,12 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"io"
+	"net/http"
+	"strconv"
+	"strings"
+	"time"
+
 	"github.com/bitcoin-sv/spv-wallet/config"
 	"github.com/bitcoin-sv/spv-wallet/dictionary"
 	"github.com/bitcoin-sv/spv-wallet/engine"
@@ -13,11 +19,6 @@ import (
 	"github.com/bitcoinschema/go-bitcoin/v2"
 	"github.com/gin-gonic/gin"
 	"github.com/libsv/go-bt/v2/bscript"
-	"io"
-	"net/http"
-	"strconv"
-	"strings"
-	"time"
 )
 
 const (

@@ -1,11 +1,11 @@
 package admin
 
 import (
-	"github.com/gin-gonic/gin"
 	"net/http"
 
 	"github.com/bitcoin-sv/spv-wallet/actions"
 	"github.com/bitcoin-sv/spv-wallet/engine"
+	"github.com/gin-gonic/gin"
 )
 
 // utxosSearch will fetch a list of utxos filtered by metadata

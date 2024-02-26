@@ -1,10 +1,10 @@
 package config
 
 import (
-	"github.com/mrz1836/go-datastore"
 	"time"
 
 	"github.com/google/uuid"
+	"github.com/mrz1836/go-datastore"
 )
 
 // DefaultAdminXpub is the default admin xpub used for authenticate requests.

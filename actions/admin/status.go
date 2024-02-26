@@ -1,8 +1,9 @@
 package admin
 
 import (
-	"github.com/gin-gonic/gin"
 	"net/http"
+
+	"github.com/gin-gonic/gin"
 )
 
 // status will return the status of the admin login

@@ -1,9 +1,9 @@
 package admin
 
 import (
-	"github.com/bitcoin-sv/spv-wallet/config"
 	"testing"
 
+	"github.com/bitcoin-sv/spv-wallet/config"
 	"github.com/stretchr/testify/assert"
 )
 

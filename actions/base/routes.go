@@ -1,12 +1,11 @@
 package base
 
 import (
+	"github.com/bitcoin-sv/spv-wallet/actions"
+	"github.com/bitcoin-sv/spv-wallet/config"
 	"github.com/bitcoin-sv/spv-wallet/server/routes"
 	"github.com/gin-contrib/pprof"
 	"github.com/gin-gonic/gin"
-
-	"github.com/bitcoin-sv/spv-wallet/actions"
-	"github.com/bitcoin-sv/spv-wallet/config"
 )
 
 // Action is an extension of actions.Action for this package

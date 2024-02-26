@@ -4,25 +4,25 @@ package server
 import (
 	"context"
 	"crypto/tls"
-	"github.com/bitcoin-sv/spv-wallet/actions"
-	"github.com/bitcoin-sv/spv-wallet/actions/base"
-	"github.com/bitcoin-sv/spv-wallet/logging"
-	"github.com/bitcoin-sv/spv-wallet/metrics"
-	"github.com/gin-gonic/gin"
-	"github.com/rs/zerolog"
+	"errors"
 	"net/http"
 	"strconv"
 
-	"errors"
+	"github.com/bitcoin-sv/spv-wallet/actions"
 	accesskeys "github.com/bitcoin-sv/spv-wallet/actions/access_keys"
 	"github.com/bitcoin-sv/spv-wallet/actions/admin"
+	"github.com/bitcoin-sv/spv-wallet/actions/base"
 	"github.com/bitcoin-sv/spv-wallet/actions/destinations"
 	"github.com/bitcoin-sv/spv-wallet/actions/transactions"
 	"github.com/bitcoin-sv/spv-wallet/actions/utxos"
 	"github.com/bitcoin-sv/spv-wallet/actions/xpubs"
 	"github.com/bitcoin-sv/spv-wallet/config"
+	"github.com/bitcoin-sv/spv-wallet/logging"
+	"github.com/bitcoin-sv/spv-wallet/metrics"
 	"github.com/bitcoin-sv/spv-wallet/server/auth"
 	router "github.com/bitcoin-sv/spv-wallet/server/routes"
+	"github.com/gin-gonic/gin"
+	"github.com/rs/zerolog"
 )
 
 // Server is the configuration, services, and actual web server

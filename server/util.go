@@ -1,10 +1,11 @@
 package server
 
 import (
+	"net/http"
+
 	"github.com/gin-gonic/gin"
 	swaggerfiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
-	"net/http"
 )
 
 // WriterFunc wrapper type for function that is implementing io.Writer interface.

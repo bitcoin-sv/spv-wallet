@@ -1,12 +1,12 @@
 package utxos
 
 import (
-	"github.com/gin-gonic/gin"
 	"net/http"
 	"strconv"
 
 	"github.com/bitcoin-sv/spv-wallet/mappings"
 	"github.com/bitcoin-sv/spv-wallet/server/auth"
+	"github.com/gin-gonic/gin"
 )
 
 // get will fetch a given utxo according to conditions

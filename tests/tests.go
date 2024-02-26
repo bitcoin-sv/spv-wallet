@@ -3,11 +3,11 @@ package tests
 
 import (
 	"context"
-	"github.com/gin-gonic/gin"
 	"os"
 
 	"github.com/bitcoin-sv/spv-wallet/config"
 	"github.com/bitcoin-sv/spv-wallet/logging"
+	"github.com/gin-gonic/gin"
 	"github.com/stretchr/testify/require"
 	"github.com/stretchr/testify/suite"
 )

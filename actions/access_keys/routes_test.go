@@ -1,10 +1,10 @@
 package accesskeys
 
 import (
-	"github.com/stretchr/testify/assert"
 	"testing"
 
 	"github.com/bitcoin-sv/spv-wallet/config"
+	"github.com/stretchr/testify/assert"
 )
 
 // TestBaseRegisterRoutes will test routes

@@ -1,10 +1,10 @@
 package transactions
 
 import (
-	"github.com/gin-gonic/gin"
 	"net/http"
 
 	"github.com/bitcoin-sv/go-broadcast-client/broadcast"
+	"github.com/gin-gonic/gin"
 )
 
 // broadcastCallback will handle a broadcastCallback call from the broadcast api
