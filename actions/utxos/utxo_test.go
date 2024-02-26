@@ -33,7 +33,7 @@ func (ts *TestSuite) SetupTest() {
 	ts.Router = gin.Default()
 	require.NotNil(ts.T(), ts.Router)
 	apiRoutes := NewHandler(ts.AppConfig, ts.Services)
-	apiRoutes.RegisterApiEndpoints(ts.Router.Group("/" + config.APIVersion))
+	apiRoutes.RegisterAPIEndpoints(ts.Router.Group("/" + config.APIVersion))
 }
 
 // TearDownTest runs after each test

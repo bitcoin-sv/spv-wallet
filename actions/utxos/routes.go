@@ -13,10 +13,10 @@ type Action struct {
 }
 
 // NewHandler creates the specific package routes
-func NewHandler(appConfig *config.AppConfig, services *config.AppServices) routes.ApiEndpointsFunc {
+func NewHandler(appConfig *config.AppConfig, services *config.AppServices) routes.APIEndpointsFunc {
 	action := &Action{actions.Action{AppConfig: appConfig, Services: services}}
 
-	apiEndpoints := routes.ApiEndpointsFunc(func(router *gin.RouterGroup) {
+	apiEndpoints := routes.APIEndpointsFunc(func(router *gin.RouterGroup) {
 		utxoGroup := router.Group("/utxo")
 		utxoGroup.GET("", action.get)
 		utxoGroup.POST("/count", action.count)
