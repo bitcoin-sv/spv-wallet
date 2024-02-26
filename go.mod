@@ -37,7 +37,7 @@ require (
 	github.com/KyleBanks/depth v1.2.1 // indirect
 	github.com/asaskevich/govalidator v0.0.0-20230301143203-a9d515a09cc2 // indirect
 	github.com/beorn7/perks v1.0.1 // indirect
-	github.com/bitcoin-sv/go-paymail v0.12.1 // indirect
+	github.com/bitcoin-sv/go-paymail v0.13.0 // indirect
 	github.com/bitcoinschema/go-bitcoin/v2 v2.0.5
 	github.com/bitcoinschema/go-bpu v0.1.3 // indirect
 	github.com/bitcoinschema/go-map v0.1.0 // indirect
@@ -87,7 +87,7 @@ require (
 	github.com/jinzhu/now v1.1.5 // indirect
 	github.com/josharian/intern v1.0.0 // indirect
 	github.com/json-iterator/go v1.1.12 // indirect
-	github.com/julienschmidt/httprouter v1.3.0
+	github.com/julienschmidt/httprouter v1.3.0 // indirect
 	github.com/klauspost/compress v1.17.6 // indirect
 	github.com/klauspost/cpuid/v2 v2.2.6 // indirect
 	github.com/leodido/go-urn v1.4.0 // indirect
