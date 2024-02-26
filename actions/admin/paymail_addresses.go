@@ -19,7 +19,7 @@ import (
 // @Router		/v1/admin/paymail/get [get]
 // @Security	x-auth-xpub
 func (a *Action) paymailGetAddress(c *gin.Context) {
-	var requestBody AdminPaymailAddress
+	var requestBody PaymailAddress
 
 	if err := c.ShouldBindJSON(&requestBody); err != nil {
 		c.JSON(http.StatusBadRequest, err.Error())
@@ -124,7 +124,7 @@ func (a *Action) paymailAddressesCount(c *gin.Context) {
 // @Router		/v1/admin/paymail/create [post]
 // @Security	x-auth-xpub
 func (a *Action) paymailCreateAddress(c *gin.Context) {
-	var requestBody AdminCreatePaymail
+	var requestBody CreatePaymail
 	if err := c.ShouldBindJSON(&requestBody); err != nil {
 		c.JSON(http.StatusBadRequest, err.Error())
 		return
@@ -169,7 +169,7 @@ func (a *Action) paymailCreateAddress(c *gin.Context) {
 // @Router		/v1/admin/paymail/delete [delete]
 // @Security	x-auth-xpub
 func (a *Action) paymailDeleteAddress(c *gin.Context) {
-	var requestBody AdminPaymailAddress
+	var requestBody PaymailAddress
 	if err := c.ShouldBindJSON(&requestBody); err != nil {
 		c.JSON(http.StatusBadRequest, err.Error())
 		return

@@ -34,7 +34,7 @@ func (a *Action) newTransaction(c *gin.Context) {
 	}
 
 	var requestBody NewTransaction
-	if err := c.Bind(&requestBody); err != nil {
+	if err = c.Bind(&requestBody); err != nil {
 		c.JSON(http.StatusBadRequest, err.Error())
 		return
 	}

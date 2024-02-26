@@ -9,6 +9,7 @@ import (
 	"github.com/mrz1836/go-datastore"
 )
 
+// RequestParameters is a struct for handling basic request parameters
 type RequestParameters struct {
 	Conditions  map[string]interface{} `json:"conditions"`
 	Metadata    engine.Metadata        `json:"metadata"`

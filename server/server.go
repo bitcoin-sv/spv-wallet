@@ -143,7 +143,7 @@ func SetupServerRoutes(appConfig *config.AppConfig, services *config.AppServices
 
 	prefix := "/" + config.APIVersion
 	baseRouter := engine.Group("")
-	authRouter := engine.Group("", auth.AuthMiddleware(services.SpvWalletEngine, appConfig))
+	authRouter := engine.Group("", auth.BasicMiddleware(services.SpvWalletEngine, appConfig))
 	basicAuthRouter := authRouter.Group(prefix, auth.SignatureMiddleware(appConfig, false, false))
 	apiAuthRouter := authRouter.Group(prefix, auth.SignatureMiddleware(appConfig, true, false))
 	adminAuthRouter := authRouter.Group(prefix, auth.SignatureMiddleware(appConfig, true, true), auth.AdminMiddleware())
@@ -152,8 +152,8 @@ func SetupServerRoutes(appConfig *config.AppConfig, services *config.AppServices
 		switch r := r.(type) {
 		case router.AdminEndpoints:
 			r.RegisterAdminEndpoints(adminAuthRouter)
-		case router.ApiEndpoints:
-			r.RegisterApiEndpoints(apiAuthRouter)
+		case router.APIEndpoints:
+			r.RegisterAPIEndpoints(apiAuthRouter)
 		case router.BasicEndpoints:
 			r.RegisterBasicEndpoints(basicAuthRouter)
 		case router.BaseEndpoints:

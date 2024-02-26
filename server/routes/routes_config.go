@@ -13,13 +13,13 @@ type AdminEndpoints interface {
 	RegisterAdminEndpoints(router *gin.RouterGroup)
 }
 
-// ApiEndpointsFunc wrapping type for function to mark it as implementation of ApiEndpoints.
-type ApiEndpointsFunc func(router *gin.RouterGroup)
+// APIEndpointsFunc wrapping type for function to mark it as implementation of ApiEndpoints.
+type APIEndpointsFunc func(router *gin.RouterGroup)
 
-// ApiEndpoints registrar which will register routes in ADMIN routes group.
-type ApiEndpoints interface {
-	// RegisterApiEndpoints register ADMIN endpoints.
-	RegisterApiEndpoints(router *gin.RouterGroup)
+// APIEndpoints registrar which will register routes in ADMIN routes group.
+type APIEndpoints interface {
+	// RegisterAPIEndpoints register ADMIN endpoints.
+	RegisterAPIEndpoints(router *gin.RouterGroup)
 }
 
 // BasicEndpointsFunc wrapping type for function to mark it as implementation of BasicEndpoints.
@@ -45,8 +45,8 @@ func (f AdminEndpointsFunc) RegisterAdminEndpoints(router *gin.RouterGroup) {
 	f(router)
 }
 
-// RegisterApiEndpoints register API endpoints by registrar ApiEndpointsFunc.
-func (f ApiEndpointsFunc) RegisterApiEndpoints(router *gin.RouterGroup) {
+// RegisterAPIEndpoints register API endpoints by registrar ApiEndpointsFunc.
+func (f APIEndpointsFunc) RegisterAPIEndpoints(router *gin.RouterGroup) {
 	f(router)
 }
 
@@ -60,16 +60,16 @@ func (f BaseEndpointsFunc) RegisterBaseEndpoints(router *gin.RouterGroup) {
 	f(router)
 }
 
-// ApiMiddleware middleware that should handle API requests.
-type ApiMiddleware interface {
-	//ApplyToApi handle API request by middleware.
-	ApplyToApi(c *gin.Context)
+// APIMiddleware middleware that should handle API requests.
+type APIMiddleware interface {
+	//ApplyToAPI handle API request by middleware.
+	ApplyToAPI(c *gin.Context)
 }
 
 // ApiMiddlewareFunc wrapping type for function to mark it as implementation of ApiMiddleware.
-type ApiMiddlewareFunc func(c *gin.Context)
+type APIMiddlewareFunc func(c *gin.Context)
 
 // ApplyToApi handle API request by middleware function.
-func (f ApiMiddlewareFunc) ApplyToApi(c *gin.Context) {
+func (f APIMiddlewareFunc) ApplyToApi(c *gin.Context) {
 	f(c)
 }

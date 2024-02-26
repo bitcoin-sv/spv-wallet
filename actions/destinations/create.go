@@ -35,7 +35,7 @@ func (a *Action) create(c *gin.Context) {
 	}
 
 	var requestBody CreateDestination
-	if err := c.Bind(&requestBody); err != nil {
+	if err = c.Bind(&requestBody); err != nil {
 		c.JSON(http.StatusBadRequest, err.Error())
 		return
 	}

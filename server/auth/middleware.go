@@ -36,8 +36,8 @@ const (
 	ParamAuthSigned = "auth_signed"
 )
 
-// AuthPayload is the authentication payload for checking or creating a signature
-type AuthPayload struct {
+// Payload is the authentication payload for checking or creating a signature
+type Payload struct {
 	AuthHash     string `json:"auth_hash"`
 	AuthNonce    string `json:"auth_nonce"`
 	AuthTime     int64  `json:"auth_time"`
@@ -58,8 +58,8 @@ func CorsMiddleware() gin.HandlerFunc {
 	}
 }
 
-// AuthMiddleware will check the request for the xPub or AccessKey header
-func AuthMiddleware(engine engine.ClientInterface, appConfig *config.AppConfig) gin.HandlerFunc {
+// BasicMiddleware will check the request for the xPub or AccessKey header
+func BasicMiddleware(engine engine.ClientInterface, appConfig *config.AppConfig) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		xPub := strings.TrimSpace(c.GetHeader(models.AuthHeader))
 		authAccessKey := strings.TrimSpace(c.GetHeader(models.AuthAccessKey))
@@ -100,6 +100,7 @@ func AuthMiddleware(engine engine.ClientInterface, appConfig *config.AppConfig) 
 	}
 }
 
+// AdminMiddleware will check if the request is authorized with admin xpub
 func AdminMiddleware() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		if c.GetBool(ParamAdminRequest) {
@@ -110,6 +111,7 @@ func AdminMiddleware() gin.HandlerFunc {
 	}
 }
 
+// SignatureMiddleware will check the request for a signature
 func SignatureMiddleware(appConfig *config.AppConfig, requireSigning, adminRequired bool) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		if c.Request.Body == nil {
@@ -126,7 +128,7 @@ func SignatureMiddleware(appConfig *config.AppConfig, requireSigning, adminRequi
 		c.Request.Body = io.NopCloser(bytes.NewReader(b))
 
 		authTime, _ := strconv.Atoi(c.GetHeader(models.AuthHeaderTime))
-		authData := &AuthPayload{
+		authData := &Payload{
 			AuthHash:     c.GetHeader(models.AuthHeaderHash),
 			AuthNonce:    c.GetHeader(models.AuthHeaderNonce),
 			AuthTime:     int64(authTime),
@@ -157,7 +159,7 @@ func SignatureMiddleware(appConfig *config.AppConfig, requireSigning, adminRequi
 }
 
 // checkSignature check the signature for the provided auth payload
-func checkSignature(auth *AuthPayload) error {
+func checkSignature(auth *Payload) error {
 	if err := checkSignatureRequirements(auth); err != nil {
 		return err
 	}
@@ -169,7 +171,7 @@ func checkSignature(auth *AuthPayload) error {
 }
 
 // checkSignatureRequirements will check the payload for basic signature requirements
-func checkSignatureRequirements(auth *AuthPayload) error {
+func checkSignatureRequirements(auth *Payload) error {
 	if auth == nil || auth.Signature == "" {
 		return errors.New("missing signature")
 	}
@@ -191,7 +193,7 @@ func createBodyHash(bodyContents string) string {
 }
 
 // verifyKeyXPub will verify the xPub key and the signature payload
-func verifyKeyXPub(xPub string, auth *AuthPayload) error {
+func verifyKeyXPub(xPub string, auth *Payload) error {
 	if _, err := utils.ValidateXPub(xPub); err != nil {
 		return err
 	}
@@ -226,7 +228,7 @@ func verifyKeyXPub(xPub string, auth *AuthPayload) error {
 }
 
 // verifyMessageAndSignature will verify the access key and the signature payload
-func verifyMessageAndSignature(key string, auth *AuthPayload) error {
+func verifyMessageAndSignature(key string, auth *Payload) error {
 	address, err := bitcoin.GetAddressFromPubKeyString(
 		key, true,
 	)
@@ -245,6 +247,6 @@ func verifyMessageAndSignature(key string, auth *AuthPayload) error {
 }
 
 // getSigningMessage will build the signing message string
-func getSigningMessage(xPub string, auth *AuthPayload) string {
+func getSigningMessage(xPub string, auth *Payload) string {
 	return fmt.Sprintf("%s%s%s%d", xPub, auth.AuthHash, auth.AuthNonce, auth.AuthTime)
 }

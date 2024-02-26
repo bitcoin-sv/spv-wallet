@@ -4,8 +4,8 @@ import (
 	"github.com/bitcoin-sv/spv-wallet/engine"
 )
 
-// AdminCreatePaymail is the model for creating a paymail
-type AdminCreatePaymail struct {
+// CreatePaymail is the model for creating a paymail
+type CreatePaymail struct {
 	XpubID     string          `json:"xpub_id"`
 	Address    string          `json:"address"`
 	PublicName string          `json:"public_name"`
@@ -13,18 +13,18 @@ type AdminCreatePaymail struct {
 	Metadata   engine.Metadata `json:"metadata"`
 }
 
-// AdminPaymailAddress is the model containing only paymail address used for getting and deleting paymail address
-type AdminPaymailAddress struct {
+// PaymailAddress is the model containing only paymail address used for getting and deleting paymail address
+type PaymailAddress struct {
 	Address string `json:"address"`
 }
 
-// AdminRecordTransaction is the model for recording a transaction
-type AdminRecordTransaction struct {
+// RecordTransaction is the model for recording a transaction
+type RecordTransaction struct {
 	Hex string `json:"hex"`
 }
 
-// AdminCreateXpub is the model for creating an xpub
-type AdminCreateXpub struct {
+// CreateXpub is the model for creating an xpub
+type CreateXpub struct {
 	Key      string          `json:"key"`
 	Metadata engine.Metadata `json:"metadata"`
 }

@@ -21,7 +21,7 @@ import (
 // @Router		/v1/admin/transactions/record [post]
 // @Security	x-auth-xpub
 func (a *Action) transactionRecord(c *gin.Context) {
-	var requestBody AdminRecordTransaction
+	var requestBody RecordTransaction
 	if err := c.ShouldBindJSON(&requestBody); err != nil {
 		c.JSON(http.StatusBadRequest, err.Error())
 		return

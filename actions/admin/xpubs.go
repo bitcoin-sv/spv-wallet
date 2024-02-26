@@ -21,7 +21,7 @@ import (
 // @Router		/v1/admin/xpub [post]
 // @Security	x-auth-xpub
 func (a *Action) xpubsCreate(c *gin.Context) {
-	var requestBody AdminCreateXpub
+	var requestBody CreateXpub
 	if err := c.Bind(&requestBody); err != nil {
 		c.JSON(http.StatusBadRequest, err.Error())
 		return
