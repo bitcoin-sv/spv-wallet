@@ -52,7 +52,7 @@ func CorsMiddleware() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		c.Writer.Header().Set("Access-Control-Allow-Origin", "*")
 		c.Writer.Header().Set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS")
-		c.Writer.Header().Set("Access-Control-Allow-Headers", "Content-Type, Authorization, Cache-Control")
+		c.Writer.Header().Set("Access-Control-Allow-Headers", "Content-Type, Cache-Control"+", "+models.AuthHeader+", "+models.AuthAccessKey+", "+models.AuthSignature+", "+models.AuthHeaderHash+", "+models.AuthHeaderNonce+", "+models.AuthHeaderTime)
 		c.Writer.Header().Set("Access-Control-Allow-Credentials", "true")
 		c.Next()
 	}
