@@ -1,7 +1,6 @@
 package destinations
 
 import (
-	"net/http"
 	"testing"
 
 	"github.com/bitcoin-sv/spv-wallet/config"
@@ -11,25 +10,29 @@ import (
 // TestDestinationRegisterRoutes will test routes
 func (ts *TestSuite) TestDestinationRegisterRoutes() {
 	ts.T().Run("test routes", func(t *testing.T) {
+		testCases := []struct {
+			method string
+			url    string
+		}{
+			{"GET", "/" + config.APIVersion + "/destination"},
+			{"POST", "/" + config.APIVersion + "/destination"},
+			{"PATCH", "/" + config.APIVersion + "/destination"},
+			{"GET", "/" + config.APIVersion + "/destination/search"},
+			{"POST", "/" + config.APIVersion + "/destination/search"},
+		}
 
-		// get destination
-		handle, _, _ := ts.Router.HTTPRouter.Lookup(http.MethodGet, "/"+config.APIVersion+"/destination")
-		assert.NotNil(t, handle)
+		ts.Router.Routes()
 
-		// new destination
-		handle, _, _ = ts.Router.HTTPRouter.Lookup(http.MethodPost, "/"+config.APIVersion+"/destination")
-		assert.NotNil(t, handle)
-
-		// search destination
-		handle, _, _ = ts.Router.HTTPRouter.Lookup(http.MethodGet, "/"+config.APIVersion+"/destination/search")
-		assert.NotNil(t, handle)
-
-		// search destination
-		handle, _, _ = ts.Router.HTTPRouter.Lookup(http.MethodPost, "/"+config.APIVersion+"/destination/search")
-		assert.NotNil(t, handle)
-
-		// update destination
-		handle, _, _ = ts.Router.HTTPRouter.Lookup(http.MethodPatch, "/"+config.APIVersion+"/destination")
-		assert.NotNil(t, handle)
+		for _, testCase := range testCases {
+			found := false
+			for _, routeInfo := range ts.Router.Routes() {
+				if testCase.url == routeInfo.Path && testCase.method == routeInfo.Method {
+					assert.NotNil(t, routeInfo.HandlerFunc)
+					found = true
+					break
+				}
+			}
+			assert.True(t, found)
+		}
 	})
 }

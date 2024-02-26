@@ -1,7 +1,6 @@
 package accesskeys
 
 import (
-	"net/http"
 	"testing"
 
 	"github.com/bitcoin-sv/spv-wallet/config"
@@ -11,25 +10,29 @@ import (
 // TestBaseRegisterRoutes will test routes
 func (ts *TestSuite) TestRegisterRoutes() {
 	ts.T().Run("test routes", func(t *testing.T) {
+		testCases := []struct {
+			method string
+			url    string
+		}{
+			{"GET", "/" + config.APIVersion + "/access-key"},
+			{"POST", "/" + config.APIVersion + "/access-key"},
+			{"DELETE", "/" + config.APIVersion + "/access-key"},
+			{"POST", "/" + config.APIVersion + "/access-key/search"},
+			{"GET", "/" + config.APIVersion + "/access-key/search"},
+		}
 
-		// gey key
-		handle, _, _ := ts.Router.HTTPRouter.Lookup(http.MethodGet, "/"+config.APIVersion+"/access-key")
-		assert.NotNil(t, handle)
+		ts.Router.Routes()
 
-		// search key
-		handle, _, _ = ts.Router.HTTPRouter.Lookup(http.MethodGet, "/"+config.APIVersion+"/access-key/search")
-		assert.NotNil(t, handle)
-
-		// search key
-		handle, _, _ = ts.Router.HTTPRouter.Lookup(http.MethodPost, "/"+config.APIVersion+"/access-key/search")
-		assert.NotNil(t, handle)
-
-		// create key
-		handle, _, _ = ts.Router.HTTPRouter.Lookup(http.MethodPost, "/"+config.APIVersion+"/access-key")
-		assert.NotNil(t, handle)
-
-		// delete key
-		handle, _, _ = ts.Router.HTTPRouter.Lookup(http.MethodDelete, "/"+config.APIVersion+"/access-key")
-		assert.NotNil(t, handle)
+		for _, testCase := range testCases {
+			found := false
+			for _, routeInfo := range ts.Router.Routes() {
+				if testCase.url == routeInfo.Path && testCase.method == routeInfo.Method {
+					assert.NotNil(t, routeInfo.HandlerFunc)
+					found = true
+					break
+				}
+			}
+			assert.True(t, found)
+		}
 	})
 }

@@ -2,11 +2,11 @@ package utxos
 
 import (
 	"net/http"
+	"strconv"
 
-	"github.com/bitcoin-sv/spv-wallet/engine"
 	"github.com/bitcoin-sv/spv-wallet/mappings"
-	"github.com/julienschmidt/httprouter"
-	apirouter "github.com/mrz1836/go-api-router"
+	"github.com/bitcoin-sv/spv-wallet/server/auth"
+	"github.com/gin-gonic/gin"
 )
 
 // get will fetch a given utxo according to conditions
@@ -20,28 +20,27 @@ import (
 // @Success		200
 // @Router		/v1/utxo [get]
 // @Security	x-auth-xpub
-func (a *Action) get(w http.ResponseWriter, req *http.Request, _ httprouter.Params) {
-	reqXPubID, _ := engine.GetXpubIDFromRequest(req)
+func (a *Action) get(c *gin.Context) {
+	reqXPubID := c.GetString(auth.ParamXPubHashKey)
+	txID := c.Query("tx_id")
+	outputIndex := c.Query("output_index")
+	outputIndex64, err := strconv.ParseUint(outputIndex, 10, 32)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, err.Error())
+		return
+	}
 
-	// Parse the params
-	params := apirouter.GetParams(req)
-	txID := params.GetString("tx_id")
-	outputIndex := uint32(params.GetUint64("output_index"))
-
-	// Get a utxo using a xPub
 	utxo, err := a.Services.SpvWalletEngine.GetUtxo(
-		req.Context(),
+		c.Request.Context(),
 		reqXPubID,
 		txID,
-		outputIndex,
+		uint32(outputIndex64),
 	)
 	if err != nil {
-		apirouter.ReturnResponse(w, req, http.StatusExpectationFailed, err.Error())
+		c.JSON(http.StatusExpectationFailed, err.Error())
 		return
 	}
 
 	contract := mappings.MapToUtxoContract(utxo)
-
-	// Return response
-	apirouter.ReturnResponse(w, req, http.StatusOK, contract)
+	c.JSON(http.StatusOK, contract)
 }
