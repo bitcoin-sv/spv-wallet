@@ -3,10 +3,8 @@ package engine
 import (
 	"context"
 	"errors"
-	"fmt"
 	"github.com/bitcoin-sv/go-paymail"
 	"github.com/bitcoin-sv/spv-wallet/engine/utils"
-	"github.com/mrz1836/go-cachestore"
 	"github.com/mrz1836/go-datastore"
 )
 
@@ -55,12 +53,9 @@ func getContact(ctx context.Context, fullName, paymailAddress, senderPubKey stri
 	}
 
 	contact.enrich(ModelContact, opts...)
-	//if err != nil {
-	//	return nil, err
-	//}
-	//contact.ID = ""
+
 	conditions := map[string]interface{}{
-		senderXPubField: fullName,
+		senderXPubField: senderPubKey,
 		paymailField:    paymailAddress,
 	}
 
@@ -72,39 +67,6 @@ func getContact(ctx context.Context, fullName, paymailAddress, senderPubKey stri
 	}
 
 	return contact, nil
-}
-
-func (c *Contact) getContactPaymailCapability(ctx context.Context) (*paymail.CapabilitiesPayload, error) {
-	address := newPaymail(c.Paymail)
-
-	cs := c.Client().Cachestore()
-	pc := c.Client().PaymailClient()
-
-	capabilities, err := getCapabilities(ctx, cs, pc, address.Domain)
-
-	if err != nil {
-		if errors.Is(err, cachestore.ErrKeyNotFound) {
-			return nil, nil
-		}
-		return nil, err
-	}
-
-	return capabilities, nil
-}
-
-func (c *Contact) getPubKeyFromPki(pkiUrl string) (string, error) {
-	if pkiUrl == "" {
-		return "", errors.New("pkiUrl should not be empty")
-	}
-	alias, domain, _ := paymail.SanitizePaymail(c.Paymail)
-	pc := c.Client().PaymailClient()
-
-	pkiResponse, err := pc.GetPKI(pkiUrl, alias, domain)
-
-	if err != nil {
-		return "", fmt.Errorf("error getting public key from PKI: %w", err)
-	}
-	return pkiResponse.PubKey, nil
 }
 
 func (c *Contact) GetModelName() string {
@@ -140,7 +102,7 @@ func (c *Contact) BeforeCreating(_ context.Context) (err error) {
 		return ErrMissingContactFullName
 	}
 
-	if len(c.Paymail) == 0 {
+	if c.Paymail == "" {
 		return ErrMissingContactPaymail
 	}
 

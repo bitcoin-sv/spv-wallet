@@ -29,11 +29,6 @@ func (a *Action) create(c *gin.Context) {
 
 	var requestBody CreateContact
 
-	//opts := a.Services.SpvWalletEngine.DefaultModelOptions()
-	//if requestBody.Metadata != nil {
-	//	opts = append(opts, engine.WithMetadatas(requestBody.Metadata))
-	//}
-
 	contact, err := a.Services.SpvWalletEngine.NewContact(c.Request.Context(), fullName, paymail, pubKey, engine.WithMetadatas(requestBody.Metadata))
 	if err != nil {
 		c.JSON(http.StatusUnprocessableEntity, err.Error())
