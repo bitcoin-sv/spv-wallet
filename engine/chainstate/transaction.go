@@ -78,14 +78,14 @@ func (c *Client) fastestQuery(ctx context.Context, id string, requiredIn Require
 		}
 	case ProviderBroadcastClient:
 		wg.Add(1)
-		go func(ctx context.Context, client *Client, id string, requiredIn RequiredIn) {
+		go func(ctx context.Context, client *Client, wg *sync.WaitGroup, id string, requiredIn RequiredIn) {
 			defer wg.Done()
 			if resp, err := queryBroadcastClient(
 				ctx, client, id,
 			); err == nil && checkRequirementArc(requiredIn, id, resp) {
 				resultsChannel <- resp
 			}
-		}(ctxWithCancel, c, id, requiredIn)
+		}(ctxWithCancel, c, &wg, id, requiredIn)
 	default:
 		c.options.logger.Warn().Msg("no active provider for fastestQuery")
 	}

@@ -3,11 +3,10 @@ package destinations
 import (
 	"net/http"
 
-	"github.com/bitcoin-sv/spv-wallet/actions"
 	"github.com/bitcoin-sv/spv-wallet/engine"
 	"github.com/bitcoin-sv/spv-wallet/mappings"
-	"github.com/julienschmidt/httprouter"
-	apirouter "github.com/mrz1836/go-api-router"
+	"github.com/bitcoin-sv/spv-wallet/server/auth"
+	"github.com/gin-gonic/gin"
 )
 
 // update will update an existing model
@@ -23,43 +22,40 @@ import (
 // @Success		200
 // @Router		/v1/destination [patch]
 // @Security	x-auth-xpub
-func (a *Action) update(w http.ResponseWriter, req *http.Request, _ httprouter.Params) {
-	reqXPubID, _ := engine.GetXpubIDFromRequest(req)
+func (a *Action) update(c *gin.Context) {
+	reqXPubID := c.GetString(auth.ParamXPubHashKey)
 
-	// Parse the params
-	params := apirouter.GetParams(req)
-	id := params.GetString("id")
-	address := params.GetString("address")
-	lockingScript := params.GetString("locking_script")
-	if id == "" && address == "" && lockingScript == "" {
-		apirouter.ReturnResponse(w, req, http.StatusExpectationFailed, "One of the fields is required: id, address or lockingScript")
+	var requestBody UpdateDestination
+	if err := c.Bind(&requestBody); err != nil {
+		c.JSON(http.StatusBadRequest, err.Error())
 		return
 	}
-	metadata := params.GetJSON(actions.MetadataField)
+	if requestBody.ID == "" && requestBody.Address == "" && requestBody.LockingScript == "" {
+		c.JSON(http.StatusBadRequest, "One of the fields is required: id, address or lockingScript")
+		return
+	}
 
 	// Get the destination
 	var destination *engine.Destination
 	var err error
-	if id != "" {
+	if requestBody.ID != "" {
 		destination, err = a.Services.SpvWalletEngine.UpdateDestinationMetadataByID(
-			req.Context(), reqXPubID, id, metadata,
+			c.Request.Context(), reqXPubID, requestBody.ID, requestBody.Metadata,
 		)
-	} else if address != "" {
+	} else if requestBody.Address != "" {
 		destination, err = a.Services.SpvWalletEngine.UpdateDestinationMetadataByAddress(
-			req.Context(), reqXPubID, address, metadata,
+			c.Request.Context(), reqXPubID, requestBody.Address, requestBody.Metadata,
 		)
 	} else {
 		destination, err = a.Services.SpvWalletEngine.UpdateDestinationMetadataByLockingScript(
-			req.Context(), reqXPubID, lockingScript, metadata,
+			c.Request.Context(), reqXPubID, requestBody.LockingScript, requestBody.Metadata,
 		)
 	}
 	if err != nil {
-		apirouter.ReturnResponse(w, req, http.StatusExpectationFailed, err.Error())
+		c.JSON(http.StatusExpectationFailed, err.Error())
 		return
 	}
 
 	contract := mappings.MapToDestinationContract(destination)
-
-	// Return response
-	apirouter.ReturnResponse(w, req, http.StatusOK, contract)
+	c.JSON(http.StatusOK, contract)
 }

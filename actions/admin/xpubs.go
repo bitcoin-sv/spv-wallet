@@ -6,9 +6,39 @@ import (
 	"github.com/bitcoin-sv/spv-wallet/actions"
 	"github.com/bitcoin-sv/spv-wallet/engine"
 	"github.com/bitcoin-sv/spv-wallet/mappings"
-	"github.com/julienschmidt/httprouter"
-	apirouter "github.com/mrz1836/go-api-router"
+	"github.com/gin-gonic/gin"
 )
+
+// create will make a new model using the services defined in the action object
+// Create xPub godoc
+// @Summary		Create xPub
+// @Description	Create xPub
+// @Tags		xPub
+// @Produce		json
+// @Param		key query string true "key"
+// @Param		metadata query string false "metadata"
+// @Success		201
+// @Router		/v1/admin/xpub [post]
+// @Security	x-auth-xpub
+func (a *Action) xpubsCreate(c *gin.Context) {
+	var requestBody CreateXpub
+	if err := c.Bind(&requestBody); err != nil {
+		c.JSON(http.StatusBadRequest, err.Error())
+		return
+	}
+
+	xPub, err := a.Services.SpvWalletEngine.NewXpub(
+		c.Request.Context(), requestBody.Key,
+		engine.WithMetadatas(requestBody.Metadata),
+	)
+	if err != nil {
+		c.JSON(http.StatusUnprocessableEntity, err.Error())
+		return
+	}
+
+	contract := mappings.MapToXpubContract(xPub)
+	c.JSON(http.StatusCreated, contract)
+}
 
 // xpubsSearch will fetch a list of xpubs filtered by metadata
 // Search for xpubs filtering by metadata godoc
@@ -25,30 +55,25 @@ import (
 // @Success		200
 // @Router		/v1/admin/xpubs/search [post]
 // @Security	x-auth-xpub
-func (a *Action) xpubsSearch(w http.ResponseWriter, req *http.Request, _ httprouter.Params) {
-	// Parse the params
-	params := apirouter.GetParams(req)
-	queryParams, metadataModel, conditions, err := actions.GetQueryParameters(params)
-	metadata := mappings.MapToSpvWalletMetadata(metadataModel)
-
+func (a *Action) xpubsSearch(c *gin.Context) {
+	queryParams, metadata, conditions, err := actions.GetQueryParameters(c)
 	if err != nil {
-		apirouter.ReturnResponse(w, req, http.StatusExpectationFailed, err.Error())
+		c.JSON(http.StatusExpectationFailed, err.Error())
 		return
 	}
 
 	var xpubs []*engine.Xpub
 	if xpubs, err = a.Services.SpvWalletEngine.GetXPubs(
-		req.Context(),
+		c.Request.Context(),
 		metadata,
 		conditions,
 		queryParams,
 	); err != nil {
-		apirouter.ReturnResponse(w, req, http.StatusExpectationFailed, err.Error())
+		c.JSON(http.StatusExpectationFailed, err.Error())
 		return
 	}
 
-	// Return response
-	apirouter.ReturnResponse(w, req, http.StatusOK, xpubs)
+	c.JSON(http.StatusOK, xpubs)
 }
 
 // xpubsCount will count all xpubs filtered by metadata
@@ -62,26 +87,22 @@ func (a *Action) xpubsSearch(w http.ResponseWriter, req *http.Request, _ httprou
 // @Success		200
 // @Router		/v1/admin/xpubs/count [post]
 // @Security	x-auth-xpub
-func (a *Action) xpubsCount(w http.ResponseWriter, req *http.Request, _ httprouter.Params) {
-	// Parse the params
-	params := apirouter.GetParams(req)
-	_, metadataModel, conditions, err := actions.GetQueryParameters(params)
-	metadata := mappings.MapToSpvWalletMetadata(metadataModel)
+func (a *Action) xpubsCount(c *gin.Context) {
+	_, metadata, conditions, err := actions.GetQueryParameters(c)
 	if err != nil {
-		apirouter.ReturnResponse(w, req, http.StatusExpectationFailed, err.Error())
+		c.JSON(http.StatusExpectationFailed, err.Error())
 		return
 	}
 
 	var count int64
 	if count, err = a.Services.SpvWalletEngine.GetXPubsCount(
-		req.Context(),
+		c.Request.Context(),
 		metadata,
 		conditions,
 	); err != nil {
-		apirouter.ReturnResponse(w, req, http.StatusExpectationFailed, err.Error())
+		c.JSON(http.StatusExpectationFailed, err.Error())
 		return
 	}
 
-	// Return response
-	apirouter.ReturnResponse(w, req, http.StatusOK, count)
+	c.JSON(http.StatusOK, count)
 }

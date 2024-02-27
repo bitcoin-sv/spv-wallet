@@ -3,10 +3,9 @@ package transactions
 import (
 	"net/http"
 
-	"github.com/bitcoin-sv/spv-wallet/actions"
-	"github.com/bitcoin-sv/spv-wallet/engine"
 	"github.com/bitcoin-sv/spv-wallet/mappings"
-	"github.com/julienschmidt/httprouter"
+	"github.com/bitcoin-sv/spv-wallet/server/auth"
+	"github.com/gin-gonic/gin"
 	apirouter "github.com/mrz1836/go-api-router"
 )
 
@@ -21,33 +20,32 @@ import (
 // @Success		200
 // @Router		/v1/transaction [patch]
 // @Security	x-auth-xpub
-func (a *Action) update(w http.ResponseWriter, req *http.Request, _ httprouter.Params) {
-	// Get the xPub from the request (via authentication)
-	reqXPubID, _ := engine.GetXpubIDFromRequest(req)
+func (a *Action) update(c *gin.Context) {
+	reqXPubID := c.GetString(auth.ParamXPubHashKey)
 
-	// Parse the params
-	params := apirouter.GetParams(req)
-	metadata := params.GetJSON(actions.MetadataField)
+	var requestBody UpdateTransaction
+	if err := c.ShouldBindJSON(&requestBody); err != nil {
+		apirouter.ReturnResponse(c.Writer, c.Request, http.StatusExpectationFailed, err.Error())
+		return
+	}
 
 	// Get a transaction by ID
 	transaction, err := a.Services.SpvWalletEngine.UpdateTransactionMetadata(
-		req.Context(),
+		c.Request.Context(),
 		reqXPubID,
-		params.GetString("id"),
-		metadata,
+		requestBody.ID,
+		requestBody.Metadata,
 	)
 	if err != nil {
-		apirouter.ReturnResponse(w, req, http.StatusExpectationFailed, err.Error())
+		c.JSON(http.StatusExpectationFailed, err.Error())
 		return
 	} else if transaction == nil {
-		apirouter.ReturnResponse(w, req, http.StatusNotFound, "")
+		c.JSON(http.StatusNotFound, "not found")
 	} else if !transaction.IsXpubIDAssociated(reqXPubID) {
-		apirouter.ReturnResponse(w, req, http.StatusForbidden, "unauthorized")
+		c.JSON(http.StatusForbidden, "unauthorized")
 		return
 	}
 
 	contract := mappings.MapToTransactionContract(transaction)
-
-	// Return response
-	apirouter.ReturnResponse(w, req, http.StatusOK, contract)
+	c.JSON(http.StatusOK, contract)
 }

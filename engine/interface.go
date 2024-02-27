@@ -172,8 +172,7 @@ type ClientInterface interface {
 	TransactionService
 	UTXOService
 	XPubService
-	AuthenticateRequest(ctx context.Context, req *http.Request, adminXPubs []string,
-		adminRequired, requireSigning, signingDisabled bool) (*http.Request, error)
+	AuthenticateAccessKey(ctx context.Context, pubAccessKey string) (*AccessKey, error)
 	Close(ctx context.Context) error
 	Debug(on bool)
 	DefaultSyncConfig() *SyncConfig

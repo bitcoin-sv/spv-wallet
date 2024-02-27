@@ -5,8 +5,8 @@ import (
 
 	"github.com/bitcoin-sv/spv-wallet/engine"
 	"github.com/bitcoin-sv/spv-wallet/mappings"
-	"github.com/julienschmidt/httprouter"
-	apirouter "github.com/mrz1836/go-api-router"
+	"github.com/bitcoin-sv/spv-wallet/server/auth"
+	"github.com/gin-gonic/gin"
 )
 
 // revoke will revoke the intended model by id
@@ -19,31 +19,25 @@ import (
 // @Success		201
 // @Router		/v1/access-key [delete]
 // @Security	x-auth-xpub
-func (a *Action) revoke(w http.ResponseWriter, req *http.Request, _ httprouter.Params) {
-	reqXPub, _ := engine.GetXpubFromRequest(req)
+func (a *Action) revoke(c *gin.Context) {
+	reqXPub := c.GetString(auth.ParamXPubKey)
 
-	// Parse the params
-	params := apirouter.GetParams(req)
-	id := params.GetString("id")
-
+	id := c.Query("id")
 	if id == "" {
-		apirouter.ReturnResponse(w, req, http.StatusExpectationFailed, engine.ErrMissingFieldID)
+		c.JSON(http.StatusBadRequest, engine.ErrMissingFieldID)
 		return
 	}
 
-	// Create a new accessKey
 	accessKey, err := a.Services.SpvWalletEngine.RevokeAccessKey(
-		req.Context(),
+		c.Request.Context(),
 		reqXPub,
 		id,
 	)
 	if err != nil {
-		apirouter.ReturnResponse(w, req, http.StatusUnprocessableEntity, err.Error())
+		c.JSON(http.StatusUnprocessableEntity, err.Error())
 		return
 	}
 
 	contract := mappings.MapToAccessKeyContract(accessKey)
-
-	// Return response
-	apirouter.ReturnResponse(w, req, http.StatusCreated, contract)
+	c.JSON(http.StatusCreated, contract)
 }

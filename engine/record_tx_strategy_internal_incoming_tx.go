@@ -23,7 +23,7 @@ func (strategy *internalIncomingTx) Execute(ctx context.Context, c ClientInterfa
 	logger := c.Logger()
 	logger.Info().
 		Str("txID", strategy.Tx.ID).
-		Msg("start recording transaction")
+		Msg("start recording internal incoming transaction")
 
 	// process
 	transaction := strategy.Tx
@@ -48,7 +48,7 @@ func (strategy *internalIncomingTx) Execute(ctx context.Context, c ClientInterfa
 
 	logger.Info().
 		Str("txID", transaction.ID).
-		Msg("complete")
+		Msg("complete recording internal incoming transaction")
 	return transaction, nil
 }
 

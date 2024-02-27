@@ -3,7 +3,8 @@ package admin
 import (
 	"github.com/bitcoin-sv/spv-wallet/actions"
 	"github.com/bitcoin-sv/spv-wallet/config"
-	apirouter "github.com/mrz1836/go-api-router"
+	"github.com/bitcoin-sv/spv-wallet/server/routes"
+	"github.com/gin-gonic/gin"
 )
 
 // Action is an extension of actions.Action for this package
@@ -11,32 +12,32 @@ type Action struct {
 	actions.Action
 }
 
-// RegisterRoutes register all the package specific routes
-func RegisterRoutes(router *apirouter.Router, appConfig *config.AppConfig, services *config.AppServices) {
-	// Use the authentication middleware wrapper - this will only check for a valid admin
-	a, require := actions.NewStack(appConfig, services)
-	require.Use(a.RequireAdminAuthentication)
+// NewHandler creates the specific package routes
+func NewHandler(appConfig *config.AppConfig, services *config.AppServices) routes.AdminEndpointsFunc {
+	action := &Action{actions.Action{AppConfig: appConfig, Services: services}}
 
-	// Load the actions and set the services
-	action := &Action{actions.Action{AppConfig: a.AppConfig, Services: a.Services}}
+	adminEndpoints := routes.AdminEndpointsFunc(func(router *gin.RouterGroup) {
+		adminGroup := router.Group("/admin")
+		adminGroup.GET("/stats", action.stats)
+		adminGroup.GET("/status", action.status)
+		adminGroup.POST("/access-keys/search", action.accessKeysSearch)
+		adminGroup.POST("/access-keys/count", action.accessKeysCount)
+		adminGroup.POST("/destinations/search", action.destinationsSearch)
+		adminGroup.POST("/destinations/count", action.destinationsCount)
+		adminGroup.POST("/paymail/get", action.paymailGetAddress)
+		adminGroup.POST("/paymails/search", action.paymailAddressesSearch)
+		adminGroup.POST("/paymails/count", action.paymailAddressesCount)
+		adminGroup.POST("/paymail/create", action.paymailCreateAddress)
+		adminGroup.DELETE("/paymail/delete", action.paymailDeleteAddress)
+		adminGroup.POST("/transactions/search", action.transactionsSearch)
+		adminGroup.POST("/transactions/count", action.transactionsCount)
+		adminGroup.POST("/transactions/record", action.transactionRecord)
+		adminGroup.POST("/utxos/search", action.utxosSearch)
+		adminGroup.POST("/utxos/count", action.utxosCount)
+		adminGroup.POST("/xpub", action.xpubsCreate)
+		adminGroup.POST("/xpubs/search", action.xpubsSearch)
+		adminGroup.POST("/xpubs/count", action.xpubsCount)
+	})
 
-	// V1 Requests
-	router.HTTPRouter.GET("/"+config.APIVersion+"/admin/stats", action.Request(router, require.Wrap(action.stats)))
-	router.HTTPRouter.GET("/"+config.APIVersion+"/admin/status", action.Request(router, require.Wrap(action.status)))
-	router.HTTPRouter.POST("/"+config.APIVersion+"/admin/access-keys/search", action.Request(router, require.Wrap(action.accessKeysSearch)))
-	router.HTTPRouter.POST("/"+config.APIVersion+"/admin/access-keys/count", action.Request(router, require.Wrap(action.accessKeysCount)))
-	router.HTTPRouter.POST("/"+config.APIVersion+"/admin/destinations/search", action.Request(router, require.Wrap(action.destinationsSearch)))
-	router.HTTPRouter.POST("/"+config.APIVersion+"/admin/destinations/count", action.Request(router, require.Wrap(action.destinationsCount)))
-	router.HTTPRouter.POST("/"+config.APIVersion+"/admin/paymail/get", action.Request(router, require.Wrap(action.paymailGetAddress)))
-	router.HTTPRouter.POST("/"+config.APIVersion+"/admin/paymails/search", action.Request(router, require.Wrap(action.paymailAddressesSearch)))
-	router.HTTPRouter.POST("/"+config.APIVersion+"/admin/paymails/count", action.Request(router, require.Wrap(action.paymailAddressesCount)))
-	router.HTTPRouter.POST("/"+config.APIVersion+"/admin/paymail/create", action.Request(router, require.Wrap(action.paymailCreateAddress)))
-	router.HTTPRouter.DELETE("/"+config.APIVersion+"/admin/paymail/delete", action.Request(router, require.Wrap(action.paymailDeleteAddress)))
-	router.HTTPRouter.POST("/"+config.APIVersion+"/admin/transactions/search", action.Request(router, require.Wrap(action.transactionsSearch)))
-	router.HTTPRouter.POST("/"+config.APIVersion+"/admin/transactions/count", action.Request(router, require.Wrap(action.transactionsCount)))
-	router.HTTPRouter.POST("/"+config.APIVersion+"/admin/transactions/record", action.Request(router, require.Wrap(action.transactionRecord)))
-	router.HTTPRouter.POST("/"+config.APIVersion+"/admin/utxos/search", action.Request(router, require.Wrap(action.utxosSearch)))
-	router.HTTPRouter.POST("/"+config.APIVersion+"/admin/utxos/count", action.Request(router, require.Wrap(action.utxosCount)))
-	router.HTTPRouter.POST("/"+config.APIVersion+"/admin/xpubs/search", action.Request(router, require.Wrap(action.xpubsSearch)))
-	router.HTTPRouter.POST("/"+config.APIVersion+"/admin/xpubs/count", action.Request(router, require.Wrap(action.xpubsCount)))
+	return adminEndpoints
 }

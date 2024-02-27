@@ -5,8 +5,8 @@ import (
 
 	"github.com/bitcoin-sv/spv-wallet/engine"
 	"github.com/bitcoin-sv/spv-wallet/mappings"
-	"github.com/julienschmidt/httprouter"
-	apirouter "github.com/mrz1836/go-api-router"
+	"github.com/bitcoin-sv/spv-wallet/server/auth"
+	"github.com/gin-gonic/gin"
 )
 
 // get will get an existing model
@@ -19,34 +19,29 @@ import (
 // @Success		200
 // @Router		/v1/access-key [get]
 // @Security	x-auth-xpub
-func (a *Action) get(w http.ResponseWriter, req *http.Request, _ httprouter.Params) {
-	reqXPubID, _ := engine.GetXpubIDFromRequest(req)
+func (a *Action) get(c *gin.Context) {
+	reqXPubID := c.GetString(auth.ParamXPubHashKey)
 
-	// Parse the params
-	params := apirouter.GetParams(req)
-	id := params.GetString("id")
-
+	id := c.Query("id")
 	if id == "" {
-		apirouter.ReturnResponse(w, req, http.StatusExpectationFailed, engine.ErrMissingFieldID)
+		c.JSON(http.StatusBadRequest, engine.ErrMissingFieldID)
 		return
 	}
 
 	// Get access key
 	accessKey, err := a.Services.SpvWalletEngine.GetAccessKey(
-		req.Context(), reqXPubID, id,
+		c.Request.Context(), reqXPubID, id,
 	)
 	if err != nil {
-		apirouter.ReturnResponse(w, req, http.StatusExpectationFailed, err.Error())
+		c.JSON(http.StatusUnprocessableEntity, err.Error())
 		return
 	}
 
 	if accessKey.XpubID != reqXPubID {
-		apirouter.ReturnResponse(w, req, http.StatusForbidden, "unauthorized")
+		c.JSON(http.StatusForbidden, "unauthorized")
 		return
 	}
 
 	contract := mappings.MapToAccessKeyContract(accessKey)
-
-	// Return response
-	apirouter.ReturnResponse(w, req, http.StatusOK, contract)
+	c.JSON(http.StatusOK, contract)
 }
