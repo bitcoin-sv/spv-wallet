@@ -94,6 +94,7 @@ const (
 	bumpField            = "bump"
 	fullNameField        = "full_name"
 	paymailField         = "paymail"
+	senderXPubField      = "pub_key"
 
 	// Universal statuses
 	statusCanceled   = "canceled"
@@ -107,7 +108,7 @@ const (
 	statusSkipped    = "skipped"
 
 	// Contact statuses
-	notAuthenticated   = "not authenticated"
+	notConfirmed       = "not confirmed"
 	awaitingAcceptance = "awaiting acceptance"
 	confirmed          = "confirmed"
 

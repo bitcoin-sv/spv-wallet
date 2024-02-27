@@ -8,7 +8,7 @@ import (
 type ContactStatus string
 
 const (
-	ContactStatusNotAuth     = notAuthenticated
+	ContactStatusNotConf     = notConfirmed
 	ContactStatusAwaitAccept = awaitingAcceptance
 	ContactStatusConfirmed   = confirmed
 )
@@ -21,8 +21,8 @@ func (t *ContactStatus) Scan(value interface{}) error {
 	}
 
 	switch stringValue {
-	case notAuthenticated:
-		*t = ContactStatusNotAuth
+	case notConfirmed:
+		*t = ContactStatusNotConf
 	case awaitingAcceptance:
 		*t = ContactStatusAwaitAccept
 	case confirmed:

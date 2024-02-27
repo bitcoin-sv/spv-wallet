@@ -1,11 +1,11 @@
 package contacts
 
 import (
-	"github.com/gin-gonic/gin"
 	"net/http"
 
 	"github.com/bitcoin-sv/spv-wallet/engine"
 	"github.com/bitcoin-sv/spv-wallet/mappings"
+	"github.com/gin-gonic/gin"
 )
 
 // create will make a new model using the services defined in the action object
@@ -29,12 +29,12 @@ func (a *Action) create(c *gin.Context) {
 
 	var requestBody CreateContact
 
-	opts := a.Services.SpvWalletEngine.DefaultModelOptions()
-	if requestBody.Metadata != nil {
-		opts = append(opts, engine.WithMetadatas(requestBody.Metadata))
-	}
+	//opts := a.Services.SpvWalletEngine.DefaultModelOptions()
+	//if requestBody.Metadata != nil {
+	//	opts = append(opts, engine.WithMetadatas(requestBody.Metadata))
+	//}
 
-	contact, err := a.Services.SpvWalletEngine.NewContact(c.Request.Context(), fullName, paymail, pubKey, opts...)
+	contact, err := a.Services.SpvWalletEngine.NewContact(c.Request.Context(), fullName, paymail, pubKey, engine.WithMetadatas(requestBody.Metadata))
 	if err != nil {
 		c.JSON(http.StatusUnprocessableEntity, err.Error())
 		return

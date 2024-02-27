@@ -20,7 +20,7 @@ type Contact struct {
 	FullName string        `json:"full_name" toml:"full_name" yaml:"full_name" gorm:"<-create;comment:This is the contact's full name" bson:"full_name"`
 	Paymail  string        `json:"paymail" toml:"paymail" yaml:"paymail" gorm:"<-create;comment:This is the paymail address alias@domain.com" bson:"paymail"`
 	PubKey   string        `json:"pub_key" toml:"pub_key" yaml:"pub_key" gorm:"<-:create;index;comment:This is the related public key" bson:"pub_key"`
-	Status   ContactStatus `json:"status" toml:"status" yaml:"status" gorm:"<-create;type:varchar(20);default:not authenticated;comment:This is the contact status" bson:"status"`
+	Status   ContactStatus `json:"status" toml:"status" yaml:"status" gorm:"<-create;type:varchar(20);default:not confirmed;comment:This is the contact status" bson:"status"`
 }
 
 func newContact(fullName, paymailAddress, senderPubKey string, opts ...ModelOps) (*Contact, error) {
@@ -48,14 +48,20 @@ func newContact(fullName, paymailAddress, senderPubKey string, opts ...ModelOps)
 }
 
 func getContact(ctx context.Context, fullName, paymailAddress, senderPubKey string, opts ...ModelOps) (*Contact, error) {
-	contact, err := newContact(fullName, paymailAddress, senderPubKey, opts...)
-	if err != nil {
-		return nil, err
+
+	contact := &Contact{
+		FullName: fullName,
+		Paymail:  paymailAddress,
 	}
-	contact.ID = ""
+
+	contact.enrich(ModelContact, opts...)
+	//if err != nil {
+	//	return nil, err
+	//}
+	//contact.ID = ""
 	conditions := map[string]interface{}{
-		fullNameField: fullName,
-		paymailField:  paymailAddress,
+		senderXPubField: fullName,
+		paymailField:    paymailAddress,
 	}
 
 	if err := Get(ctx, contact, conditions, false, defaultDatabaseReadTimeout, false); err != nil {
@@ -130,7 +136,7 @@ func (c *Contact) BeforeCreating(_ context.Context) (err error) {
 		return ErrMissingContactID
 	}
 
-	if len(c.FullName) == 0 {
+	if c.FullName == "" {
 		return ErrMissingContactFullName
 	}
 
@@ -150,10 +156,6 @@ func (c *Contact) BeforeCreating(_ context.Context) (err error) {
 
 // AfterCreated will fire after the model is created in the Datastore
 func (c *Contact) AfterCreated(_ context.Context) error {
-	c.Client().Logger().Debug().
-		Str("contactID", c.ID).
-		Msgf("end: %s AfterCreated hook", c.Name())
-
 	c.Client().Logger().Debug().
 		Str("contactID", c.ID).
 		Msgf("end: %s AfterCreated hook", c.Name())
@@ -195,7 +197,7 @@ func (c *Contact) migrateMySQL(client datastore.ClientInterface, tableName strin
 		return err
 	}
 	if !idxExists {
-		tx := client.Execute("CREATE UNIQUE INDEX " + idxName + " ON `" + tableName + "` (full_name, paymail)")
+		tx := client.Execute("CREATE INDEX " + idxName + " ON `" + tableName + "` (full_name, paymail)")
 		if tx.Error != nil {
 			c.Client().Logger().Error().Msgf("failed creating json index on mysql: %s", tx.Error.Error())
 			return nil //nolint:nolintlint,nilerr // error is not needed

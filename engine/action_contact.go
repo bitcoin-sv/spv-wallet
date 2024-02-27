@@ -44,7 +44,7 @@ func (c *Client) NewContact(ctx context.Context, fullName, paymail, senderPubKey
 
 	contact.PubKey = receiverPubKey
 
-	contact.Status = notAuthenticated
+	contact.Status = notConfirmed
 
 	if err = contact.Save(ctx); err != nil {
 		return nil, err
