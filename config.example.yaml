@@ -93,9 +93,9 @@ nodes:
   # list of apis used for getting and broadcasting transactions
   apis:
     # gorillapool can be used as well
-    #    - arc_url: https://arc.gorillapool.io
-    #    - token: ""
-    - arc_url: https://api.taal.com/arc/v1
+    # - arc_url: https://arc.gorillapool.io
+    # - token: ""
+    - arc_url: https://api.taal.com/arc
       token: mainnet_06770f425eb00298839a24a49cbdc02c
   # use fee quotes for transaction fee calculation
   use_fee_quotes: true
