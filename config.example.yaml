@@ -28,11 +28,10 @@ db:
   datastore:
     # enable datastore debug mode
     debug: false
-    # datastore engine - sqlite/postgresql/mysql/mongodb
-    engine: postgres
+    # datastore engine - sqlite/postgresql/mysql/mongodb (experimental)
+    engine: postgresql
     # prefix for all tables
     table_prefix: xapi
-  # experimental engine
   mongodb:
     database_name: xapi
     debug: false
