@@ -3,7 +3,6 @@ package engine
 import (
 	"context"
 	"fmt"
-	"sync"
 	"testing"
 	"time"
 
@@ -16,6 +15,7 @@ import (
 	"github.com/dolthub/go-mysql-server/server"
 	embeddedPostgres "github.com/fergusstrange/embedded-postgres"
 	"github.com/mrz1836/go-datastore"
+	"github.com/rs/zerolog/log"
 	"github.com/stretchr/testify/require"
 	"github.com/stretchr/testify/suite"
 	"github.com/tryvium-travels/memongo"
@@ -61,28 +61,15 @@ type EmbeddedDBTestSuite struct {
 	MongoServer      *memongo.Server                    // In-memory  Mongo server
 	MySQLServer      *server.Server                     // In-memory MySQL server
 	PostgresqlServer *embeddedPostgres.EmbeddedPostgres // In-memory Postgresql server
-	quit             chan interface{}                   // Channel for exiting
-	wg               sync.WaitGroup                     // Workgroup for managing goroutines
 }
 
 // serveMySQL will serve the MySQL server and exit if quit
 func (ts *EmbeddedDBTestSuite) serveMySQL() {
-	defer ts.wg.Done()
-
-	logger := zerolog.Nop()
-
-	for {
-		err := ts.MySQLServer.Start()
-		if err != nil {
-			select {
-			case <-ts.quit:
-				logger.Debug().Msg("MySQL channel has closed")
-				return
-			default:
-				logger.Error().Msgf("mysql server error: %s", err.Error())
-			}
-		}
+	err := ts.MySQLServer.Start()
+	if err != nil {
+		log.Error().Msgf("mysql server error: %s", err.Error())
 	}
+
 }
 
 // SetupSuite runs at the start of the suite
@@ -97,8 +84,6 @@ func (ts *EmbeddedDBTestSuite) SetupSuite() {
 	}
 
 	// Don't block, serve the MySQL instance
-	ts.quit = make(chan interface{})
-	ts.wg.Add(1)
 	go ts.serveMySQL()
 
 	// Create the Mongo server
@@ -301,6 +286,9 @@ func (ts *EmbeddedDBTestSuite) createTestClient(ctx context.Context, database da
 	opts = append(opts, WithMinercraft(&chainstate.MinerCraftBase{}))
 
 	// Create the client
+	testLogger := zerolog.Nop()
+	opts = append(opts, WithLogger(&testLogger))
+
 	if tc.client, err = NewClient(ctx, opts...); err != nil {
 		return nil, err
 	}
