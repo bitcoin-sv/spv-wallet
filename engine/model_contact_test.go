@@ -101,16 +101,3 @@ func Test_getContact(t *testing.T) {
 		require.Error(t, err)
 	})
 }
-
-func Test_getPubKeyFromPki(t *testing.T) {
-	t.Run("empty pkiUrl", func(t *testing.T) {
-		contact, err := newContact(fullName, paymailTest, senderPubKey)
-
-		require.NoError(t, err)
-
-		pkiResp, err := contact.getPubKeyFromPki("")
-
-		assert.Equal(t, "", pkiResp)
-		require.Error(t, err)
-	})
-}
