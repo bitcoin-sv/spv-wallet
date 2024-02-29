@@ -30,6 +30,7 @@ func TestModelName_String(t *testing.T) {
 		assert.Equal(t, "utxo", ModelUtxo.String())
 		assert.Equal(t, "xpub", ModelXPub.String())
 		assert.Equal(t, "contact", ModelContact.String())
+
 		assert.Len(t, AllModelNames, 10)
 	})
 }
