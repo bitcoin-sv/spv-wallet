@@ -18,6 +18,7 @@ func Test_newContact(t *testing.T) {
 		contact, err := newContact(fullName, paymailTest, senderPubKey)
 		require.NoError(t, err)
 		require.NotNil(t, contact)
+
 		assert.Equal(t, fullName, contact.FullName)
 		assert.Equal(t, paymailTest, contact.Paymail)
 		assert.Equal(t, utils.Hash(senderPubKey), contact.XpubID)
