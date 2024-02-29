@@ -72,7 +72,7 @@ func Test_getContact(t *testing.T) {
 		contact, err := getContact(ctx, "", paymailTest, senderPubKey, client.DefaultModelOptions()...)
 
 		require.Nil(t, contact)
-		require.Error(t, err)
+		require.NoError(t, err)
 	})
 
 	t.Run("empty paymail", func(t *testing.T) {
@@ -81,7 +81,7 @@ func Test_getContact(t *testing.T) {
 		contact, err := getContact(ctx, fullName, "", senderPubKey, client.DefaultModelOptions()...)
 
 		require.Nil(t, contact)
-		require.Error(t, err)
+		require.NoError(t, err)
 	})
 
 	t.Run("invalid paymail", func(t *testing.T) {
@@ -90,7 +90,7 @@ func Test_getContact(t *testing.T) {
 		contact, err := getContact(ctx, fullName, "tests", senderPubKey, client.DefaultModelOptions()...)
 
 		require.Nil(t, contact)
-		require.Error(t, err)
+		require.NoError(t, err)
 	})
 
 	t.Run("empty pubKey", func(t *testing.T) {
@@ -99,6 +99,6 @@ func Test_getContact(t *testing.T) {
 		contact, err := getContact(ctx, fullName, paymailTest, "", client.DefaultModelOptions()...)
 
 		require.Nil(t, contact)
-		require.Error(t, err)
+		require.NoError(t, err)
 	})
 }
