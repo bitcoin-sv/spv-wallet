@@ -326,7 +326,7 @@ There are two way of running this script:
 2. with flags which define how to set up docker services. Ever option is displayed when
    you ran the script with flag `-h` or `--help`. Possible options:
   ```bash
-  ./start.sh -db postgresql -c redis -bs true -env development -b false 
+  ./start.sh -db postgresql -c redis -sw true -b false 
   ```
 
 `-l/--load` option add possibility to use previously created `.env.config` file and run spv-wallet with simple command:

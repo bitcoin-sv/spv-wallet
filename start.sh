@@ -114,15 +114,14 @@ function print_state() {
     print_debug "State:"
     print_debug "  database=${database}"
     print_debug "  cache=${cache}"
-    print_debug "  bux_server=${bux_server}"
-    print_debug "  bux_wallet_frontend=${bux_wallet_frontend}"
-    print_debug "  bux_wallet_backend=${bux_wallet_backend}"
+    print_debug "  spv_wallet=${spv_wallet}"
+    print_debug "  wallet_frontend=${wallet_frontend}"
+    print_debug "  wallet_backend=${wallet_backend}"
     print_debug "  background=${background}"
     print_debug "  default_xpub: $default_xpub"
     print_debug "  admin_xpub=${admin_xpub}"
     print_debug "  admin_xpriv=${admin_xpriv}"
     print_debug "  load_config=${load_config}"
-    print_debug "  no_rebuild=${no_rebuild}"
     print_debug "  debug=${debug}"
     print_debug ""
 }
@@ -215,20 +214,20 @@ while [[ $# -gt 0 ]]; do
         cache="$2"
         shift
         ;;
-        -bs|--bux-server)
-        bux_server="$2"
+        -sw|--spv-wallet)
+        spv_wallet="$2"
         shift
         ;;
-        -pl|--pulse)
-        pulse="$2"
+        -bhs|--blockchain-headers-service)
+        block_headers_service="$2"
         shift
         ;;
-        -bwf|--bux-wallet-frontend)
-        bux_wallet_frontend="$2"
+        -wf|--wallet-frontend)
+        wallet_frontend="$2"
         shift
         ;;
-        -bwb|--bux-wallet-backend)
-        bux_wallet_backend="$2"
+        -wb|--wallet-backend)
+        wallet_backend="$2"
         shift
         ;;
         --xpub)
@@ -247,10 +246,6 @@ while [[ $# -gt 0 ]]; do
         load_config="true"
         # no additional arguments so now `shift` command
         ;;
-        -nrb|--no-rebuild)
-        no_rebuild="true"
-        # no additional arguments so now `shift` command
-        ;;
         -b|--background)
         background="true"
         # no additional arguments so now `shift` command
@@ -267,20 +262,22 @@ while [[ $# -gt 0 ]]; do
         echo -e "Options:"
         echo -e "  -pm,  --paymail\t\t PayMail domain for which to run all applications"
         echo -e "  -l,   --load\t\t\t Load previously stored config from .env.config file"
-        echo -e "  -nrb, --no-rebuild\t\t Prevent rebuild of docker images before running"
         echo -e "  -b,   --background\t\t Whether the applications should be run in background"
         echo -e "  -d,   --debug\t\t\t Run in debug mode"
         echo -e "  -h,   --help\t\t\t Show this message"
         echo -e ""
-        echo -e "<----------   BUX SERVER SECTION"
-        echo -e "  -bs,  --bux-server\t\t Whether the bux-server should be run - true/false"
+        echo -e "<----------   SPV WALLET SECTION"
+        echo -e "  -sw,  --spv-wallet\t\t Whether the spv-wallet should be run - true/false"
         echo -e "  -db,  --database\t\t Define database - postgresql, mongodb, sqlite"
         echo -e "  -c,   --cache\t\t\t Define cache storage - freecache(in-memory), redis"
         echo -e "  --xpub\t\t\t Define admin xPub"
         echo ""
-        echo -e "<----------   BUX WALLET SECTION"
-        echo -e "  -bwf,  --bux-wallet-frontend\t Whether the bux-wallet-frontend should be run - true/false"
-        echo -e "  -bwb,  --bux-wallet-backend\t Whether the bux-wallet-backend should be run - true/false"
+        echo -e "<----------   BLOCK HEADERS SERVICE SECTION"
+        echo -e "  -bhs,  --blockchain-headers-service\t Whether the block-headers-service should be run - true/false"
+        echo ""
+        echo -e "<----------   SPV WALLET COMPONENT SECTION"
+        echo -e "  -wf,  --wallet-frontend\t Whether the wallet-frontend should be run - true/false"
+        echo -e "  -wb,  --wallet-backend\t Whether the wallet-backend should be run - true/false"
         echo -e "  --xprv\t\t\t Define admin xPriv"
         exit 1;
         shift
@@ -305,18 +302,17 @@ if [ "$load_config" == "true" ]; then
 
         while IFS= read -r line; do
             print_debug "Checking line '$line'"
-            load_from 'BUX_DB_DATASTORE_ENGINE' database
-            load_from 'BUX_CACHE_ENGINE' cache
-            load_from 'RUN_BUX_SERVER' bux_server
-            load_from 'RUN_PULSE' pulse
-            load_from 'RUN_BUX_WALLET_FRONTEND' bux_wallet_frontend
-            load_from 'RUN_BUX_WALLET_BACKEND' bux_wallet_backend
+            load_from 'SPVWALLET_DB_DATASTORE_ENGINE' database
+            load_from 'SPVWALLET_CACHE_ENGINE' cache
+            load_from 'RUN_SPVWALLET' spv_wallet
+            load_from 'RUN_BLOCK_HEADERS_SERVICE' block_headers_service
+            load_from 'RUN_SPVWALLET_FRONTEND' wallet_frontend
+            load_from 'RUN_SPVWALLET_BACKEND' wallet_backend
             load_from 'RUN_PAYMAIL_DOMAIN' paymail_domain
             load_from 'RUN_IN_BACKGROUND' background
             load_from 'RUN_WITH_DEFAULT_XPUB' default_xpub
-            load_from 'BUX_AUTH_ADMIN_KEY' admin_xpub
-            load_from 'BUX_ADMIN_XPRIV' admin_xpriv
-            load_from 'RUN_WITHOUT_REBUILD' no_rebuild
+            load_from 'SPVWALLET_AUTH_ADMIN_KEY' admin_xpub
+            load_from 'SPVWALLET_ADMIN_XPRIV' admin_xpriv
         done < ".env.config"
         print_success "Config loaded from .env.config file"
         print_debug "Config after loading .env.config:"
@@ -328,7 +324,7 @@ fi
 
 # === COLLECT CONFIG FROM USER IF NEEDED ===
 
-# <----------   BUX SERVER SECTION
+# <----------   SPV WALLET SECTION
 if [ "$database" == "" ]; then
     database_options=("postgresql" "mongodb" "sqlite")
     ask_for_choice "Select your database:" "${database_options[@]}"
@@ -352,31 +348,33 @@ if [ "$cache" == "" ]; then
     print_debug "cache: $cache"
 fi
 
-if [ "$bux_server" == "" ]; then
-    ask_for_yes_or_no "Do you want to run Bux-server?"
-    bux_server="$choice"
-    print_debug "bux_server: $bux_server"
+if [ "$spv_wallet" == "" ]; then
+    ask_for_yes_or_no "Do you want to run spv-wallet?"
+    spv_wallet="$choice"
+    print_debug "spv_wallet: $spv_wallet"
 fi
 
-if [ "$pulse" == "" ]; then
-    ask_for_yes_or_no "Do you want to run Pulse?"
-    pulse="$choice"
-    print_debug "pulse: $pulse"
+# <----------   BLOCK HEADERS SERVICE SECTION
+if [ "$block_headers_service" == "" ]; then
+    ask_for_yes_or_no "Do you want to run block-headers-service?"
+    block_headers_service="$choice"
+    print_debug "block_headers_service: $block_headers_service"
 fi
 
-if [ "$bux_wallet_frontend" == "" ]; then
-    ask_for_yes_or_no "Do you want to run bux-wallet-frontend?"
-    bux_wallet_frontend="$choice"
-    print_debug "bux_wallet_frontend: $bux_wallet_frontend"
+# <----------   SPV WALLET COMPONENT SECTION
+if [ "$wallet_frontend" == "" ]; then
+    ask_for_yes_or_no "Do you want to run spv-wallet-web-frontend?"
+    wallet_frontend="$choice"
+    print_debug "wallet_frontend: $wallet_frontend"
 fi
 
-if [ "$bux_wallet_backend" == "" ]; then
-    ask_for_yes_or_no "Do you want to run bux-wallet-backend?"
-    bux_wallet_backend="$choice"
-    print_debug "bux_wallet_backend: $bux_wallet_backend"
+if [ "$wallet_backend" == "" ]; then
+    ask_for_yes_or_no "Do you want to run spv-wallet-web-backend?"
+    wallet_backend="$choice"
+    print_debug "wallet_backend: $wallet_backend"
 fi
 
-if [ "$bux_server" == "true" ] && [ "$admin_xpub" == "" ] && [ "$default_xpub" != "true" ]; then
+if [ "$spv_wallet" == "true" ] && [ "$admin_xpub" == "" ] && [ "$default_xpub" != "true" ]; then
     ask_for_value "Define admin xPub (Leave empty to use the default one)" 'xpub'
 
     if [[ -n "$choice" ]]; then
@@ -388,13 +386,13 @@ if [ "$bux_server" == "true" ] && [ "$admin_xpub" == "" ] && [ "$default_xpub" !
     print_debug "default_xpub: $default_xpub"
 fi
 
-if [ "$bux_wallet_backend" == "true" ] && [ "$admin_xpriv" == "" ] && [ "$default_xpub" != "true" ]; then
+if [ "$wallet_backend" == "true" ] && [ "$admin_xpriv" == "" ] && [ "$default_xpub" != "true" ]; then
   ask_for_value "Define admin xPriv (Leave empty to use the default one)" 'xprv'
   admin_xpriv=$choice
   print_debug "admin_xpriv: $admin_xpriv"
 fi
 
-if [ "$paymail_domain" == "" ] && { [ "$bux_wallet_backend" == "true" ] || [ "$bux_wallet_frontend" == "true" ] || [ "$bux_server" == "true" ]; }; then
+if [ "$paymail_domain" == "" ] && { [ "$wallet_backend" == "true" ] || [ "$wallet_frontend" == "true" ] || [ "$spv_wallet" == "true" ]; }; then
     ask_for_value "What PayMail domain should be configured in applications?"
     paymail_domain=$choice
     print_debug "paymail_domain: $paymail_domain"
@@ -413,47 +411,46 @@ print_state
 # Create the .env.config file
 print_debug "Creating/Cleaning .env.config file."
 echo "# Used by start.sh. All unknown variables will be removed after running the script" > ".env.config"
-save_to 'BUX_DB_DATASTORE_ENGINE' database
-save_to 'BUX_CACHE_ENGINE' cache
-save_to 'RUN_BUX_SERVER' bux_server
-save_to 'RUN_PULSE' pulse
+save_to 'SPVWALLET_DB_DATASTORE_ENGINE' database
+save_to 'SPVWALLET_CACHE_ENGINE' cache
+save_to 'RUN_SPVWALLET' spv_wallet
+save_to 'RUN_BLOCK_HEADERS_SERVICE' block_headers_service
 save_to 'RUN_PAYMAIL_DOMAIN' paymail_domain
-save_to 'RUN_BUX_WALLET_FRONTEND' bux_wallet_frontend
-save_to 'RUN_BUX_WALLET_BACKEND' bux_wallet_backend
+save_to 'RUN_SPVWALLET_FRONTEND' wallet_frontend
+save_to 'RUN_SPVWALLET_BACKEND' wallet_backend
 save_to 'RUN_IN_BACKGROUND' background
 save_to 'RUN_WITH_DEFAULT_XPUB' default_xpub
-save_to 'BUX_AUTH_ADMIN_KEY' admin_xpub
-save_to 'BUX_ADMIN_XPRIV' admin_xpriv
-save_to 'RUN_WITHOUT_REBUILD' no_rebuild
+save_to 'SPVWALLET_AUTH_ADMIN_KEY' admin_xpub
+save_to 'SPVWALLET_ADMIN_XPRIV' admin_xpriv
 case $database in
   postgresql)
-    save_value 'BUX_DB_SQL_HOST' "bux-postgresql"
-    save_value 'BUX_DB_SQL_NAME' "postgres"
-    save_value 'BUX_DB_SQL_USER' "postgres"
-    save_value 'BUX_DB_SQL_PASSWORD' "postgres"
+    save_value 'SPVWALLET_DB_SQL_HOST' "wallet-postgresql"
+    save_value 'SPVWALLET_DB_SQL_NAME' "postgres"
+    save_value 'SPVWALLET_DB_SQL_USER' "postgres"
+    save_value 'SPVWALLET_DB_SQL_PASSWORD' "postgres"
   ;;
   mongodb)
-    save_value 'BUX_DB_MONGODB_URI' "mongodb://mongo:mongo@bux-mongodb:27017/"
+    save_value 'SPVWALLET_DB_MONGODB_URI' "mongodb://mongo:mongo@wallet-mongodb:27017/"
   ;;
 esac
 
 if [ "$cache" == "redis" ]; then
-  save_value 'BUX_CACHE_REDIS_URL' "redis://redis:6379"
+  save_value 'SPVWALLET_CACHE_REDIS_URL' "redis://redis:6379"
 fi
 
-if [ "$bux_server" == "true" ]; then
-  save_value 'BUX_SERVER_URL' "http://bux-server:3003/v1"
+if [ "$spv_wallet" == "true" ]; then
+  save_value 'SPVWALLET_SERVER_URL' "http://spv-wallet:3003/v1"
 else
-  save_value 'BUX_SERVER_URL' "http://host.docker.internal:3003/v1"
+  save_value 'SPVWALLET_SERVER_URL' "http://host.docker.internal:3003/v1"
 fi
-if [ "$bux_wallet_backend" == "true" ]; then
-  save_value 'DB_HOST' "bux-postgresql"
+if [ "$wallet_backend" == "true" ]; then
+  save_value 'DB_HOST' "wallet-postgresql"
 fi
 
-if [ "$pulse" == "true" ]; then
-  save_value 'BUX_PAYMAIL_BEEF_PULSE_URL' "http://pulse:8080/api/v1/chain/merkleroot/verify"
+if [ "$block_headers_service" == "true" ]; then
+  save_value 'SPVWALLET_PAYMAIL_BEEF_BLOCK_HEADER_SERVICE_URL' "http://block-headers-service:8080/api/v1/chain/merkleroot/verify"
 else
-  save_value 'BUX_PAYMAIL_BEEF_PULSE_URL' "http://host.docker.internal:8080/api/v1/chain/merkleroot/verify"
+  save_value 'SPVWALLET_PAYMAIL_BEEF_BLOCK_HEADER_SERVICE_URL' "http://host.docker.internal:8080/api/v1/chain/merkleroot/verify"
 fi
 print_debug "Exporting RUN_PAYMAIL_DOMAIN environment variable"
 export RUN_PAYMAIL_DOMAIN="$paymail_domain"
@@ -468,41 +465,37 @@ additionalFlags=()
 
 case $database in
   postgresql)
-    servicesToRun+=("bux-postgresql")
-    servicesToHideLogs+=("bux-postgresql")
+    servicesToRun+=("wallet-postgresql")
+    servicesToHideLogs+=("wallet-postgresql")
   ;;
   mongodb)
-    servicesToRun+=("bux-mongodb")
-    servicesToHideLogs+=("bux-mongodb")
+    servicesToRun+=("wallet-mongodb")
+    servicesToHideLogs+=("wallet-mongodb")
   ;;
 esac
 
 if [ "$cache" == "redis" ]; then
-  servicesToRun+=("bux-redis")
-  servicesToHideLogs+=("bux-redis")
+  servicesToRun+=("wallet-redis")
+  servicesToHideLogs+=("wallet-redis")
 fi
 
-if [ "$bux_server" == "true" ]; then
-  servicesToRun+=("bux-server")
+if [ "$spv_wallet" == "true" ]; then
+  servicesToRun+=("spv-wallet")
 fi
 
-if [ "$pulse" == "true" ]; then
-  servicesToRun+=("pulse")
+if [ "$block_headers_service" == "true" ]; then
+  servicesToRun+=("block-headers-service")
 fi
 
-if [ "$bux_wallet_backend" == "true" ]; then
-  servicesToRun+=("bux-wallet-backend")
-  servicesToRun+=("bux-postgresql")
-  servicesToHideLogs+=("bux-postgresql")
+if [ "$wallet_backend" == "true" ]; then
+  servicesToRun+=("wallet-backend")
+  servicesToRun+=("wallet-postgresql")
+  servicesToHideLogs+=("wallet-postgresql")
 fi
 
-if [ "$bux_wallet_frontend" == "true" ]; then
-  servicesToRun+=("bux-wallet-frontend")
-  servicesToHideLogs+=("bux-wallet-frontend")
-fi
-
-if [ "$no_rebuild" != "true" ]; then
-  additionalFlags+=("--build")
+if [ "$wallet_frontend" == "true" ]; then
+  servicesToRun+=("wallet-frontend")
+  servicesToHideLogs+=("wallet-frontend")
 fi
 
 if [ "$background" == "true" ]; then
