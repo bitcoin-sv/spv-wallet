@@ -310,10 +310,8 @@ make bench
 
 ### Docker Compose Quickstart
 
-To get started with development, `spv-wallet` provides a `start.sh` script
-which is using `docker-compose.yml` file to starts up SPV Wallet server with selected database
-and cache storage. To start, we need to fill the config json which we want to use,
-for example: `config/envs/development.json`.
+`spv-wallet` provides a `start.sh` script
+which is using `docker-compose.yml` file to starts up `SPV Wallet` with web-frontend, web-backend and selected database and cache storage.
 
 Main configuration is done when running the script.
 
@@ -326,7 +324,7 @@ There are two way of running this script:
 2. with flags which define how to set up docker services. Ever option is displayed when
    you ran the script with flag `-h` or `--help`. Possible options:
   ```bash
-  ./start.sh -db postgresql -c redis -bs true -env development -b false 
+  ./start.sh -db postgresql -c redis -sw true -b false 
   ```
 
 `-l/--load` option add possibility to use previously created `.env.config` file and run spv-wallet with simple command:
