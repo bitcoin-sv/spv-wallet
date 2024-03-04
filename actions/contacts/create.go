@@ -22,20 +22,25 @@ import (
 // @Router		/v1/contact [post]
 // @Security	bux-auth-xpub
 func (a *Action) create(c *gin.Context) {
+	requesterPubKey := c.GetString("pubKey")
 
-	fullName := c.GetString("full_name")
-	paymail := c.GetString("paymail")
-	pubKey := c.GetString("pubKey")
+	var req CreateContact
+	if err := c.Bind(&req); err != nil {
+		c.JSON(http.StatusBadRequest, err.Error())
+		return
+	}
 
-	var requestBody CreateContact
+	contact, err := a.Services.SpvWalletEngine.AddContact(
+		c.Request.Context(),
+		req.FullName, req.Paymail,
+		requesterPubKey, req.RequesterFullName, req.RequesterPaymail,
+		engine.WithMetadatas(req.Metadata))
 
-	contact, err := a.Services.SpvWalletEngine.NewContact(c.Request.Context(), fullName, paymail, pubKey, engine.WithMetadatas(requestBody.Metadata))
 	if err != nil {
 		c.JSON(http.StatusUnprocessableEntity, err.Error())
 		return
 	}
 
 	contract := mappings.MapToContactContract(contact)
-
 	c.JSON(http.StatusCreated, contract)
 }

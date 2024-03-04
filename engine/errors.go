@@ -202,8 +202,8 @@ var ErrMissingContactPaymail = errors.New("missing paymail in contact")
 // ErrMissingContactXPubKey missing XPubKey in contact
 var ErrMissingContactXPubKey = errors.New("missing pubKey in contact")
 
-// ErrEmptyContactFullName when full_name is empty
-var ErrEmptyContactFullName = errors.New("full_name is empty")
+// ErrMissingContactStatus missing status in contact
+var ErrMissingContactStatus = errors.New("status is required")
 
-// ErrEmptyContactPubKey when pubKey is empty
-var ErrEmptyContactPubKey = errors.New("pubKey is empty")
+// ErrMissingContactStatus missing status in contact
+var ErrMissingContactOwnerXPubId = errors.New("contact must have owner")

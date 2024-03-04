@@ -58,7 +58,8 @@ type ClientService interface {
 }
 
 type ContactService interface {
-	NewContact(ctx context.Context, fullName, paymail, pubKey string, opts ...ModelOps) (*Contact, error)
+	AddContact(ctx context.Context, fullName, paymailAdress, requesterPubKey, requesterFullName, requesterPaymail string, opts ...ModelOps) (*Contact, error)
+	AddContactRequest(ctx context.Context, fullName, paymailAdress, requesterXPubID string, opts ...ModelOps) (*Contact, error)
 }
 
 // DestinationService is the destination actions

@@ -18,7 +18,7 @@ func MapToContactContract(c *engine.Contact) *models.Contact {
 		FullName: c.FullName,
 		Paymail:  c.Paymail,
 		PubKey:   c.PubKey,
-		XpubID:   c.XpubID,
+		XpubID:   c.OwnerXpubID,
 		Status:   models.ContactStatus(c.Status),
 	}
 }

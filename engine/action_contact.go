@@ -3,50 +3,110 @@ package engine
 import (
 	"context"
 	"errors"
-	"fmt"
+
 	"github.com/bitcoin-sv/go-paymail"
-	"github.com/mrz1836/go-cachestore"
+	"github.com/bitcoin-sv/spv-wallet/engine/utils"
 )
 
-func (c *Client) NewContact(ctx context.Context, fullName, paymail, senderPubKey string, opts ...ModelOps) (*Contact, error) {
-	// Check for existing NewRelic transaction
-	ctx = c.GetOrStartTxn(ctx, "new_contact")
+var ErrInvalidRequesterPaymail = errors.New("invalid requester paymail address")
 
-	contact, err := getContact(ctx, fullName, paymail, senderPubKey, opts...)
+func (c *Client) AddContact(ctx context.Context, ctcFName, ctcPaymail, requesterPKey, requesterFName, requesterPaymail string, opts ...ModelOps) (*Contact, error) {
+	requesterXPubId := utils.Hash(requesterPKey)
 
+	reqPaymail, err := getPaymailAddress(ctx, requesterPaymail)
+	if err != nil {
+		return nil, err
+	}
+	if reqPaymail == nil || reqPaymail.XpubID != requesterXPubId {
+		return nil, ErrInvalidRequesterPaymail
+	}
+
+	pmSrvnt := &PaymailServant{
+		cs: c.Cachestore(),
+		pc: c.PaymailClient(),
+	}
+
+	contactPaymail := pmSrvnt.GetSanitizedPaymail(ctcPaymail)
+	contactPki, err := pmSrvnt.GetPkiForPaymail(ctx, contactPaymail)
+	if err != nil {
+		return nil, err
+	}
+
+	data := newContactData{
+		fullName: ctcFName,
+		paymail:  contactPaymail,
+		pubKey:   contactPki.PubKey,
+		status:   ContactStatusNotConf,
+		opts:     opts,
+	}
+
+	contact, err := c.addContact(ctx, &data, requesterXPubId)
+	if err != nil {
+		return nil, err
+	}
+
+	// request new contact
+	requesterContactRequest := paymail.PikeContactRequestPayload{
+		FullName:      requesterFName,
+		PaymailAdress: requesterPaymail,
+	}
+	if _, err = pmSrvnt.AddContactRequest(ctx, contactPaymail, &requesterContactRequest); err != nil {
+		c.Logger().Warn().
+			Str("requesterPaymil", requesterPaymail).
+			Str("requestedContact", ctcPaymail).
+			Msgf("adding contact request failed: %s", err.Error())
+	}
+
+	return contact, nil
+}
+
+func (c *Client) AddContactRequest(ctx context.Context, fullName, paymailAdress, requesterXPubID string, opts ...ModelOps) (*Contact, error) {
+	pmSrvnt := &PaymailServant{
+		cs: c.Cachestore(),
+		pc: c.PaymailClient(),
+	}
+
+	contactPaymail := pmSrvnt.GetSanitizedPaymail(paymailAdress)
+	contactPki, err := pmSrvnt.GetPkiForPaymail(ctx, contactPaymail)
+	if err != nil {
+		return nil, err
+	}
+
+	// add contact request
+	data := newContactData{
+		fullName: fullName,
+		paymail:  contactPaymail,
+		pubKey:   contactPki.PubKey,
+		status:   ContactStatusAwaitAccept,
+		opts:     opts,
+	}
+
+	contactRequest, err := c.addContact(ctx, &data, requesterXPubID)
+	if err != nil {
+		return nil, err
+	}
+
+	return contactRequest, nil
+}
+
+func (c *Client) addContact(ctx context.Context, data *newContactData, requesterXPubId string) (*Contact, error) {
+	// check if exists already
+	contact, err := getContact(ctx, data.paymail.adress, requesterXPubId)
+	if err != nil {
+		return nil, err
+	}
 	if contact != nil {
-		return nil, errors.New("contact already exists")
-	}
-	if err != nil {
-		return nil, err
+		return contact, nil
 	}
 
-	contact, err = newContact(
-		fullName,
-		paymail,
-		senderPubKey,
-		append(opts, c.DefaultModelOptions(
-			New(),
-		)...)...,
+	contact = newContact(
+		data.fullName,
+		data.paymail.adress,
+		data.pubKey,
+		requesterXPubId,
+		data.status,
+		c.DefaultModelOptions(append(data.opts, New())...)...,
 	)
-
-	if err != nil {
-		return nil, err
-	}
-
-	capabilities, err := c.GetPaymailCapability(ctx, contact.Paymail)
-
-	if err != nil {
-		return nil, fmt.Errorf("failed to get contact paymail capability: %w", err)
-	}
-
-	pkiURL := capabilities.GetString("pki", "")
-
-	receiverPubKey, err := c.GetPubKeyFromPki(pkiURL, contact.Paymail)
-
-	contact.PubKey = receiverPubKey
-
-	contact.Status = notConfirmed
 
 	if err = contact.Save(ctx); err != nil {
 		return nil, err
@@ -54,35 +114,10 @@ func (c *Client) NewContact(ctx context.Context, fullName, paymail, senderPubKey
 	return contact, nil
 }
 
-func (c *Client) GetPubKeyFromPki(pkiUrl, paymailAddress string) (string, error) {
-	if pkiUrl == "" {
-		return "", errors.New("pkiUrl should not be empty")
-	}
-	alias, domain, _ := paymail.SanitizePaymail(paymailAddress)
-	pc := c.PaymailClient()
-
-	pkiResponse, err := pc.GetPKI(pkiUrl, alias, domain)
-
-	if err != nil {
-		return "", fmt.Errorf("error getting public key from PKI: %w", err)
-	}
-	return pkiResponse.PubKey, nil
-}
-
-func (c *Client) GetPaymailCapability(ctx context.Context, paymailAddress string) (*paymail.CapabilitiesPayload, error) {
-	address := newPaymail(paymailAddress)
-
-	cs := c.Cachestore()
-	pc := c.PaymailClient()
-
-	capabilities, err := getCapabilities(ctx, cs, pc, address.Domain)
-
-	if err != nil {
-		if errors.Is(err, cachestore.ErrKeyNotFound) {
-			return nil, nil
-		}
-		return nil, err
-	}
-
-	return capabilities, nil
+type newContactData struct {
+	fullName string
+	paymail  *SanitizedPaymail
+	pubKey   string
+	status   ContactStatus
+	opts     []ModelOps
 }

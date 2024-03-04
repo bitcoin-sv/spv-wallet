@@ -2,15 +2,16 @@ package engine
 
 import (
 	"database/sql/driver"
+
 	"github.com/bitcoin-sv/spv-wallet/engine/utils"
 )
 
 type ContactStatus string
 
 const (
-	ContactStatusNotConf     = notConfirmed
-	ContactStatusAwaitAccept = awaitingAcceptance
-	ContactStatusConfirmed   = confirmed
+	ContactStatusNotConf     ContactStatus = notConfirmed
+	ContactStatusAwaitAccept ContactStatus = awaitingAcceptance
+	ContactStatusConfirmed   ContactStatus = confirmed
 )
 
 // Scan will scan the value into Struct, implements sql.Scanner interface

@@ -10,6 +10,7 @@ import (
 	"github.com/bitcoin-sv/go-paymail/beef"
 	"github.com/bitcoin-sv/go-paymail/server"
 	"github.com/bitcoin-sv/go-paymail/spv"
+
 	"github.com/bitcoin-sv/spv-wallet/engine/chainstate"
 	"github.com/bitcoin-sv/spv-wallet/engine/utils"
 	"github.com/bitcoinschema/go-bitcoin/v2"
@@ -229,6 +230,32 @@ func buildBtTx(p2pTx *paymail.P2PTransaction) *bt.Tx {
 
 	res, _ := bt.NewTxFromString(p2pTx.Hex)
 	return res
+}
+
+func (p *PaymailDefaultServiceProvider) AddContact(
+	ctx context.Context,
+	requesterPaymailAddress string,
+	contact *paymail.PikeContactRequestPayload,
+) (err error) {
+	if metrics, enabled := p.client.Metrics(); enabled {
+		end := metrics.TrackAddContact()
+		defer func() {
+			success := err == nil
+			end(success)
+		}()
+	}
+
+	reqPaymail, err := getPaymailAddress(ctx, requesterPaymailAddress)
+	if err != nil {
+		return
+	}
+	if reqPaymail == nil {
+		err = ErrInvalidRequesterPaymail
+		return
+	}
+
+	_, err = p.client.AddContactRequest(ctx, contact.FullName, contact.PaymailAdress, reqPaymail.XpubID)
+	return
 }
 
 func (p *PaymailDefaultServiceProvider) createPaymailInformation(ctx context.Context, alias, domain string, opts ...ModelOps) (paymailAddress *PaymailAddress, pubKey *derivedPubKey, err error) {

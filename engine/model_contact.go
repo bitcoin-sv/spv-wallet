@@ -3,6 +3,7 @@ package engine
 import (
 	"context"
 	"errors"
+
 	"github.com/bitcoin-sv/go-paymail"
 	"github.com/bitcoin-sv/spv-wallet/engine/utils"
 	"github.com/mrz1836/go-datastore"
@@ -13,51 +14,38 @@ type Contact struct {
 	Model `bson:",inline"`
 
 	// Model specific fields
-	ID       string        `json:"id" toml:"id" yaml:"id" gorm:"<-:create;type:char(64);primaryKey;comment:This is the unique contact id" bson:"_id"`
-	XpubID   string        `json:"xpub_id" toml:"xpub_id" yaml:"xpub_id" gorm:"<-:create;type:char(64);foreignKey:XpubID;reference:ID;index;comment:This is the related xPub" bson:"xpub_id"`
-	FullName string        `json:"full_name" toml:"full_name" yaml:"full_name" gorm:"<-create;comment:This is the contact's full name" bson:"full_name"`
-	Paymail  string        `json:"paymail" toml:"paymail" yaml:"paymail" gorm:"<-create;comment:This is the paymail address alias@domain.com" bson:"paymail"`
-	PubKey   string        `json:"pub_key" toml:"pub_key" yaml:"pub_key" gorm:"<-:create;index;comment:This is the related public key" bson:"pub_key"`
-	Status   ContactStatus `json:"status" toml:"status" yaml:"status" gorm:"<-create;type:varchar(20);default:not confirmed;comment:This is the contact status" bson:"status"`
+	ID          string        `json:"id" toml:"id" yaml:"id" gorm:"<-:create;type:char(64);primaryKey;comment:This is the unique contact id" bson:"_id"`
+	OwnerXpubID string        `json:"xpub_id" toml:"xpub_id" yaml:"xpub_id" gorm:"column:xpub_id;<-:create;type:char(64);foreignKey:XpubID;reference:ID;index;comment:This is the related xPub" bson:"xpub_id"`
+	FullName    string        `json:"full_name" toml:"full_name" yaml:"full_name" gorm:"<-create;comment:This is the contact's full name" bson:"full_name"`
+	Paymail     string        `json:"paymail" toml:"paymail" yaml:"paymail" gorm:"<-create;comment:This is the paymail address alias@domain.com" bson:"paymail"`
+	PubKey      string        `json:"pub_key" toml:"pub_key" yaml:"pub_key" gorm:"<-:create;index;comment:This is the related public key" bson:"pub_key"`
+	Status      ContactStatus `json:"status" toml:"status" yaml:"status" gorm:"<-create;type:varchar(20);default:not confirmed;comment:This is the contact status" bson:"status"`
 }
 
-func newContact(fullName, paymailAddress, senderPubKey string, opts ...ModelOps) (*Contact, error) {
-	if fullName == "" {
-		return nil, ErrEmptyContactFullName
-	}
+func newContact(fullName, paymailAddress, pubKey, ownerXpubID string, status ContactStatus, opts ...ModelOps) *Contact {
+	contact := Contact{
+		Model: *NewBaseModel(ModelContact, opts...),
 
-	err := paymail.ValidatePaymail(paymailAddress)
+		ID:          utils.Hash(ownerXpubID + paymailAddress),
+		OwnerXpubID: ownerXpubID,
 
-	if err != nil {
-		return nil, err
-	}
-
-	if senderPubKey == "" {
-		return nil, ErrEmptyContactPubKey
-	}
-
-	xPubId := utils.Hash(senderPubKey)
-
-	id := utils.Hash(xPubId + paymailAddress)
-
-	contact := &Contact{ID: id, XpubID: xPubId, Model: *NewBaseModel(ModelContact, opts...), FullName: fullName, Paymail: paymailAddress}
-
-	return contact, nil
-}
-
-func getContact(ctx context.Context, fullName, paymailAddress, senderPubKey string, opts ...ModelOps) (*Contact, error) {
-
-	contact := &Contact{
 		FullName: fullName,
 		Paymail:  paymailAddress,
+		PubKey:   pubKey,
+		Status:   status,
 	}
 
-	contact.enrich(ModelContact, opts...)
+	return &contact
+}
 
+func getContact(ctx context.Context, paymail, ownerXpubID string, opts ...ModelOps) (*Contact, error) {
 	conditions := map[string]interface{}{
-		senderXPubField: senderPubKey,
-		paymailField:    paymailAddress,
+		xPubIDField:  ownerXpubID,
+		paymailField: paymail,
 	}
+
+	contact := &Contact{}
+	contact.enrich(ModelContact, opts...)
 
 	if err := Get(ctx, contact, conditions, false, defaultDatabaseReadTimeout, false); err != nil {
 		if errors.Is(err, datastore.ErrNoResults) {
@@ -67,6 +55,34 @@ func getContact(ctx context.Context, fullName, paymailAddress, senderPubKey stri
 	}
 
 	return contact, nil
+}
+
+func (c *Contact) validate() error {
+	if c.ID == "" {
+		return ErrMissingContactID
+	}
+
+	if c.FullName == "" {
+		return ErrMissingContactFullName
+	}
+
+	if err := paymail.ValidatePaymail(c.Paymail); err != nil {
+		return err
+	}
+
+	if c.PubKey == "" {
+		return ErrMissingContactXPubKey
+	}
+
+	if c.Status == "" {
+		return ErrMissingContactStatus
+	}
+
+	if c.OwnerXpubID == "" {
+		return ErrMissingContactOwnerXPubId
+	}
+
+	return nil
 }
 
 func (c *Contact) GetModelName() string {
@@ -94,34 +110,14 @@ func (c *Contact) BeforeCreating(_ context.Context) (err error) {
 		Str("contactID", c.ID).
 		Msgf("starting: %s BeforeCreate hook...", c.Name())
 
-	if c.ID == "" {
-		return ErrMissingContactID
-	}
-
-	if c.FullName == "" {
-		return ErrMissingContactFullName
-	}
-
-	if c.Paymail == "" {
-		return ErrMissingContactPaymail
-	}
-
-	if len(c.PubKey) == 0 {
-		return ErrMissingContactXPubKey
+	if err = c.validate(); err != nil {
+		return
 	}
 
 	c.Client().Logger().Debug().
 		Str("contactID", c.ID).
 		Msgf("end: %s BeforeCreate hook", c.Name())
 	return
-}
-
-// AfterCreated will fire after the model is created in the Datastore
-func (c *Contact) AfterCreated(_ context.Context) error {
-	c.Client().Logger().Debug().
-		Str("contactID", c.ID).
-		Msgf("end: %s AfterCreated hook", c.Name())
-	return nil
 }
 
 // Migrate model specific migration on startup
