@@ -585,7 +585,7 @@ func TestWithModels(t *testing.T) {
 			ModelXPub.String(), ModelAccessKey.String(),
 			ModelDraftTransaction.String(), ModelTransaction.String(),
 			ModelSyncTransaction.String(), ModelDestination.String(),
-			ModelUtxo.String(),
+			ModelUtxo.String(), ModelContact.String(),
 		}, tc.GetModelNames())
 	})
 
@@ -603,7 +603,7 @@ func TestWithModels(t *testing.T) {
 			ModelXPub.String(), ModelAccessKey.String(),
 			ModelDraftTransaction.String(), ModelTransaction.String(),
 			ModelSyncTransaction.String(), ModelDestination.String(),
-			ModelUtxo.String(), ModelPaymailAddress.String(),
+			ModelUtxo.String(), ModelContact.String(), ModelPaymailAddress.String(),
 		}, tc.GetModelNames())
 	})
 }
@@ -797,6 +797,7 @@ func TestWithAutoMigrate(t *testing.T) {
 			ModelSyncTransaction.String(),
 			ModelDestination.String(),
 			ModelUtxo.String(),
+			ModelContact.String(),
 		}, tc.GetModelNames())
 	})
 
@@ -818,6 +819,7 @@ func TestWithAutoMigrate(t *testing.T) {
 			ModelSyncTransaction.String(),
 			ModelDestination.String(),
 			ModelUtxo.String(),
+			ModelContact.String(),
 			ModelPaymailAddress.String(),
 		}, tc.GetModelNames())
 	})

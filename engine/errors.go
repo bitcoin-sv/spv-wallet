@@ -189,3 +189,21 @@ var ErrMissingPaymailXPubID = errors.New("missing xpub_id in paymail")
 
 // ErrMissingClient missing client from model
 var ErrMissingClient = errors.New("client is missing from model, cannot save")
+
+// ErrMissingContactID missing id in contact
+var ErrMissingContactID = errors.New("missing id in contact")
+
+// ErrMissingContactFullName missing full name in contact
+var ErrMissingContactFullName = errors.New("missing full_name in contact")
+
+// ErrMissingContactPaymail missing paymail in contact
+var ErrMissingContactPaymail = errors.New("missing paymail in contact")
+
+// ErrMissingContactXPubKey missing XPubKey in contact
+var ErrMissingContactXPubKey = errors.New("missing pubKey in contact")
+
+// ErrEmptyContactFullName when full_name is empty
+var ErrEmptyContactFullName = errors.New("full_name is empty")
+
+// ErrEmptyContactPubKey when pubKey is empty
+var ErrEmptyContactPubKey = errors.New("pubKey is empty")

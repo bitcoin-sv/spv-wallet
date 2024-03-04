@@ -12,22 +12,23 @@ const DefaultAdminXpub = "xpub661MyMwAqRbcFgfmdkPgE2m5UjHXu9dj124DbaGLSjaqVESTWf
 
 func getDefaultAppConfig() *AppConfig {
 	return &AppConfig{
-		Authentication:     getAuthConfigDefaults(),
-		Cache:              getCacheDefaults(),
-		Db:                 getDbDefaults(),
-		Debug:              true,
-		DebugProfiling:     true,
-		DisableITC:         true,
-		ImportBlockHeaders: "",
-		Logging:            getLoggingDefaults(),
-		NewRelic:           getNewRelicDefaults(),
-		Nodes:              getNodesDefaults(),
-		Notifications:      getNotificationDefaults(),
-		Paymail:            getPaymailDefaults(),
-		RequestLogging:     true,
-		Server:             getServerDefaults(),
-		TaskManager:        getTaskManagerDefault(),
-		Metrics:            getMetricsDefaults(),
+		Authentication:       getAuthConfigDefaults(),
+		Cache:                getCacheDefaults(),
+		Db:                   getDbDefaults(),
+		Debug:                true,
+		DebugProfiling:       true,
+		DisableITC:           true,
+		ImportBlockHeaders:   "",
+		Logging:              getLoggingDefaults(),
+		NewRelic:             getNewRelicDefaults(),
+		Nodes:                getNodesDefaults(),
+		Notifications:        getNotificationDefaults(),
+		Paymail:              getPaymailDefaults(),
+		RequestLogging:       true,
+		Server:               getServerDefaults(),
+		TaskManager:          getTaskManagerDefault(),
+		Metrics:              getMetricsDefaults(),
+		ExperimentalFeatures: getExperimentalFeaturesConfig(),
 	}
 }
 
@@ -175,5 +176,11 @@ func getServerDefaults() *ServerConfig {
 func getMetricsDefaults() *MetricsConfig {
 	return &MetricsConfig{
 		Enabled: false,
+	}
+}
+
+func getExperimentalFeaturesConfig() *ExperimentalConfig {
+	return &ExperimentalConfig{
+		PikeEnabled: false,
 	}
 }

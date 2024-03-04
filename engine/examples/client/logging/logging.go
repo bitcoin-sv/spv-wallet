@@ -10,7 +10,7 @@ import (
 
 func main() {
 	client, err := engine.NewClient(
-		context.Background(),                       // Set context
+		context.Background(),                          // Set context
 		engine.WithLogger(logging.GetDefaultLogger()), // Example of using a custom logger
 	)
 	if err != nil {

@@ -12,6 +12,7 @@ import (
 	accesskeys "github.com/bitcoin-sv/spv-wallet/actions/access_keys"
 	"github.com/bitcoin-sv/spv-wallet/actions/admin"
 	"github.com/bitcoin-sv/spv-wallet/actions/base"
+	"github.com/bitcoin-sv/spv-wallet/actions/contacts"
 	"github.com/bitcoin-sv/spv-wallet/actions/destinations"
 	"github.com/bitcoin-sv/spv-wallet/actions/transactions"
 	"github.com/bitcoin-sv/spv-wallet/actions/utxos"
@@ -140,6 +141,10 @@ func SetupServerRoutes(appConfig *config.AppConfig, services *config.AppServices
 		utxoAPIRoutes,
 		// xPub routes
 		xPubAPIRoutes,
+	}
+
+	if appConfig.ExperimentalFeatures.PikeEnabled {
+		routes = append(routes, contacts.NewHandler(appConfig, services))
 	}
 
 	prefix := "/" + config.APIVersion
