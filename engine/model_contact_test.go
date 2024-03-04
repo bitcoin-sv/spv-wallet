@@ -2,6 +2,7 @@ package engine
 
 import (
 	"github.com/bitcoin-sv/spv-wallet/engine/utils"
+	"github.com/mrz1836/go-datastore"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"testing"
@@ -11,6 +12,7 @@ const (
 	fullName     = "John Doe"
 	paymailTest  = "test@paymail.com"
 	senderPubKey = "senderPubKey"
+	xPubID       = "62910a1ecbc7728afad563ab3f8aa70568ed934d1e0383cb1bbbfb1bc8f2afe5"
 )
 
 func Test_newContact(t *testing.T) {
@@ -102,15 +104,61 @@ func Test_getContact(t *testing.T) {
 	})
 }
 
-func Test_getPubKeyFromPki(t *testing.T) {
-	t.Run("empty pkiUrl", func(t *testing.T) {
-		contact, err := newContact(fullName, paymailTest, senderPubKey)
+func Test_getContacts(t *testing.T) {
+	t.Run("status 'not confirmed'", func(t *testing.T) {
+		ctx, client, deferMe := CreateTestSQLiteClient(t, false, false, withTaskManagerMockup())
+		defer deferMe()
+
+		var metadata *Metadata
+
+		dbConditions := make(map[string]interface{})
+
+		var queryParams *datastore.QueryParams
+
+		(dbConditions)[xPubIDField] = xPubID
+		(dbConditions)[contactStatus] = notConfirmed
+
+		contacts, err := getContacts(ctx, metadata, &dbConditions, queryParams, client.DefaultModelOptions()...)
 
 		require.NoError(t, err)
+		assert.NotNil(t, contacts)
+	})
 
-		pkiResp, err := contact.getPubKeyFromPki("")
+	t.Run("status 'confirmed'", func(t *testing.T) {
+		ctx, client, deferMe := CreateTestSQLiteClient(t, false, false, withTaskManagerMockup())
+		defer deferMe()
 
-		assert.Equal(t, "", pkiResp)
-		require.Error(t, err)
+		var metadata *Metadata
+
+		dbConditions := make(map[string]interface{})
+
+		var queryParams *datastore.QueryParams
+
+		(dbConditions)[xPubIDField] = xPubID
+		(dbConditions)[contactStatus] = confirmed
+
+		contacts, err := getContacts(ctx, metadata, &dbConditions, queryParams, client.DefaultModelOptions()...)
+
+		require.NoError(t, err)
+		assert.Equal(t, 0, len(contacts))
+	})
+
+	t.Run("status 'awaiting acceptance'", func(t *testing.T) {
+		ctx, client, deferMe := CreateTestSQLiteClient(t, false, false, withTaskManagerMockup())
+		defer deferMe()
+
+		var metadata *Metadata
+
+		dbConditions := make(map[string]interface{})
+
+		var queryParams *datastore.QueryParams
+
+		(dbConditions)[xPubIDField] = xPubID
+		(dbConditions)[contactStatus] = awaitingAcceptance
+
+		contacts, err := getContacts(ctx, metadata, &dbConditions, queryParams, client.DefaultModelOptions()...)
+
+		require.NoError(t, err)
+		assert.Equal(t, 0, len(contacts))
 	})
 }

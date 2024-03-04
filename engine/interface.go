@@ -59,6 +59,7 @@ type ClientService interface {
 
 type ContactService interface {
 	NewContact(ctx context.Context, fullName, paymail, pubKey string, opts ...ModelOps) (*Contact, error)
+	GetContacts(ctx context.Context, metadata *Metadata, conditions *map[string]interface{}, queryParams *datastore.QueryParams, opts ...ModelOps) ([]*Contact, error)
 }
 
 // DestinationService is the destination actions

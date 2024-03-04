@@ -7,14 +7,15 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-// TestBaseRegisterRoutes will test routes
-func (ts *TestSuite) TestRegisterRoutes() {
+// TestContactsRegisterRoutes will test routes
+func (ts *TestSuite) TestContactsRegisterRoutes() {
 	ts.T().Run("test routes", func(t *testing.T) {
 		testCases := []struct {
 			method string
 			url    string
 		}{
 			{"POST", "/" + config.APIVersion + "/contact"},
+			{"GET", "/" + config.APIVersion + "/contacts"},
 		}
 
 		ts.Router.Routes()

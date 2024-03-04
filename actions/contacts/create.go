@@ -1,10 +1,12 @@
 package contacts
 
 import (
+	"fmt"
 	"net/http"
 
 	"github.com/bitcoin-sv/spv-wallet/engine"
 	"github.com/bitcoin-sv/spv-wallet/mappings"
+	"github.com/bitcoin-sv/spv-wallet/server/auth"
 	"github.com/gin-gonic/gin"
 )
 
@@ -23,13 +25,19 @@ import (
 // @Security	bux-auth-xpub
 func (a *Action) create(c *gin.Context) {
 
-	fullName := c.GetString("full_name")
-	paymail := c.GetString("paymail")
-	pubKey := c.GetString("pubKey")
+	var contactStruct engine.Contact
+
+	err := c.ShouldBindJSON(&contactStruct)
+
+	if err != nil {
+		fmt.Println("err", err)
+	}
+
+	pubKey := c.GetString(auth.ParamXPubKey)
 
 	var requestBody CreateContact
 
-	contact, err := a.Services.SpvWalletEngine.NewContact(c.Request.Context(), fullName, paymail, pubKey, engine.WithMetadatas(requestBody.Metadata))
+	contact, err := a.Services.SpvWalletEngine.NewContact(c.Request.Context(), contactStruct.FullName, contactStruct.Paymail, pubKey, engine.WithMetadatas(requestBody.Metadata))
 	if err != nil {
 		c.JSON(http.StatusUnprocessableEntity, err.Error())
 		return
