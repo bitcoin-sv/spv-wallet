@@ -13,7 +13,7 @@ import (
 type RequestParameters struct {
 	Conditions  map[string]interface{} `json:"conditions"`
 	Metadata    engine.Metadata        `json:"metadata"`
-	QueryParams datastore.QueryParams  `json:"query_params"`
+	QueryParams datastore.QueryParams  `json:"params"`
 }
 
 // StatusOK is a basic response which sets the status to 200
