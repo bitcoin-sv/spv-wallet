@@ -249,6 +249,7 @@ type MetricsConfig struct {
 	Enabled bool `json:"enabled" mapstructure:"enabled"`
 }
 
+// ExperimentalConfig represents a feature flag config.
 type ExperimentalConfig struct {
 	PikeEnabled bool `json:"pike_enabled" mapstructure:"pike_enabled"`
 }
