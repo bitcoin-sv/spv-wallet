@@ -310,10 +310,8 @@ make bench
 
 ### Docker Compose Quickstart
 
-To get started with development, `spv-wallet` provides a `start.sh` script
-which is using `docker-compose.yml` file to starts up SPV Wallet server with selected database
-and cache storage. To start, we need to fill the config json which we want to use,
-for example: `config/envs/development.json`.
+`spv-wallet` provides a `start.sh` script
+which is using `docker-compose.yml` file to starts up `SPV Wallet` with web-frontend, web-backend and selected database and cache storage.
 
 Main configuration is done when running the script.
 
