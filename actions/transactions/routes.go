@@ -32,8 +32,7 @@ func NewHandler(appConfig *config.AppConfig, services *config.AppServices) (rout
 	})
 
 	callbackEndpoints := routes.CallbackEndpointsFunc(func(router *gin.RouterGroup) {
-		callbackTransactionGroup := router.Group("/transaction")
-		callbackTransactionGroup.POST("/callback", action.broadcastCallback)
+		router.POST(config.BroadcastCallbackRoute, action.broadcastCallback)
 	})
 
 	return basicEndpoints, apiEndpoints, callbackEndpoints
