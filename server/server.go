@@ -122,7 +122,6 @@ func SetupServerRoutes(appConfig *config.AppConfig, services *config.AppServices
 	transactionBasicRoutes, transactionAPIRoutes, transactionCallbackRoutes := transactions.NewHandler(appConfig, services)
 	utxoAPIRoutes := utxos.NewHandler(appConfig, services)
 	xPubAPIRoutes := xpubs.NewHandler(appConfig, services)
-	contactAPIRoutes := contacts.NewHandler(appConfig, services)
 
 	routes := []interface{}{
 		// Admin routes
@@ -142,8 +141,10 @@ func SetupServerRoutes(appConfig *config.AppConfig, services *config.AppServices
 		utxoAPIRoutes,
 		// xPub routes
 		xPubAPIRoutes,
-		// Contact routes
-		contactAPIRoutes,
+	}
+
+	if appConfig.ExperimentalFeatures.PikeEnabled {
+		routes = append(routes, contacts.NewHandler(appConfig, services))
 	}
 
 	prefix := "/" + config.APIVersion
