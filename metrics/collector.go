@@ -10,8 +10,8 @@ type PrometheusCollector struct {
 	reg prometheus.Registerer
 }
 
-// NewPrometheusCollector creates a new PrometheusCollector.
-func NewPrometheusCollector(reg prometheus.Registerer) enginemetrics.Collector {
+// newPrometheusCollector creates a new PrometheusCollector.
+func newPrometheusCollector(reg prometheus.Registerer) enginemetrics.Collector {
 	return &PrometheusCollector{reg: reg}
 }
 
@@ -51,4 +51,17 @@ func (c *PrometheusCollector) RegisterHistogramVec(name string, labels ...string
 	)
 	c.reg.MustRegister(h)
 	return h
+}
+
+// RegisterCounterVec creates a new CounterVec and registers it with the collector.
+func (c *PrometheusCollector) RegisterCounterVec(name string, labels ...string) *prometheus.CounterVec {
+	counter := prometheus.NewCounterVec(
+		prometheus.CounterOpts{
+			Name: name,
+			Help: "CounterVec of " + name,
+		},
+		labels,
+	)
+	c.reg.MustRegister(counter)
+	return counter
 }
