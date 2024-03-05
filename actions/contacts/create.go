@@ -1,7 +1,6 @@
 package contacts
 
 import (
-	"fmt"
 	"net/http"
 
 	"github.com/bitcoin-sv/spv-wallet/engine"
@@ -30,20 +29,21 @@ func (a *Action) create(c *gin.Context) {
 	err := c.ShouldBindJSON(&contactStruct)
 
 	if err != nil {
-		fmt.Println("err", err)
+		c.JSON(http.StatusUnprocessableEntity, err.Error())
+		return
 	}
 
 	pubKey := c.GetString(auth.ParamXPubKey)
 
 	var requestBody CreateContact
 
-	contact, err := a.Services.SpvWalletEngine.NewContact(c.Request.Context(), contactStruct.FullName, contactStruct.Paymail, pubKey, engine.WithMetadatas(requestBody.Metadata))
+	newContact, err := a.Services.SpvWalletEngine.NewContact(c.Request.Context(), contactStruct.FullName, contactStruct.Paymail, pubKey, engine.WithMetadatas(requestBody.Metadata))
 	if err != nil {
 		c.JSON(http.StatusUnprocessableEntity, err.Error())
 		return
 	}
 
-	contract := mappings.MapToContactContract(contact)
+	contract := mappings.MapToContactContract(newContact)
 
 	c.JSON(http.StatusCreated, contract)
 }
