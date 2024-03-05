@@ -20,7 +20,7 @@ func Get() (m *Metrics, enabled bool) {
 }
 
 // SetupGin will register the metrics with the gin engine
-// NOTE: Additional ginEngine.NoRoute(metrics.NoRoute, ...anotherMiddlewares) should be added when registering the server
+// NOTE: Remember to add the metrics.NoRoute function to ginEngine.NoRoute
 func SetupGin(ginEngine *gin.Engine) {
 	if metrics != nil {
 		ginEngine.Use(requestMetricsMiddleware())

@@ -10,7 +10,6 @@ type PrometheusCollector struct {
 	reg prometheus.Registerer
 }
 
-// newPrometheusCollector creates a new PrometheusCollector.
 func newPrometheusCollector(reg prometheus.Registerer) enginemetrics.Collector {
 	return &PrometheusCollector{reg: reg}
 }
