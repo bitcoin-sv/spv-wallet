@@ -5,6 +5,7 @@ import (
 
 	"github.com/bitcoin-sv/spv-wallet/engine"
 	"github.com/bitcoin-sv/spv-wallet/mappings"
+	"github.com/bitcoin-sv/spv-wallet/server/auth"
 	"github.com/gin-gonic/gin"
 )
 
@@ -14,18 +15,19 @@ import (
 // @Description	Create contact
 // @Tags		Contact
 // @Produce		json
-// @Param		fullName query string false "fullName"
-// @Param		paymail query string false "paymail"
-// @Param		pubKey query string false "pubKey"
-// @Param		metadata query string false "metadata"
 // @Success		201
 // @Router		/v1/contact [post]
-// @Security	bux-auth-xpub
+// @Security	x-auth-xpub
 func (a *Action) create(c *gin.Context) {
-	requesterPubKey := c.GetString("pubKey")
+	requesterPubKey := c.GetString(auth.ParamXPubKey)
 
 	var req CreateContact
 	if err := c.Bind(&req); err != nil {
+		c.JSON(http.StatusBadRequest, err.Error())
+		return
+	}
+
+	if err := req.validate(); err != nil {
 		c.JSON(http.StatusBadRequest, err.Error())
 		return
 	}

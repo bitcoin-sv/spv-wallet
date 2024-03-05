@@ -33,7 +33,7 @@ func (s *PaymailServant) GetSanitizedPaymail(paymailAdress string) *SanitizedPay
 func (s *PaymailServant) GetPkiForPaymail(ctx context.Context, sPaymail *SanitizedPaymail) (*paymail.PKIResponse, error) {
 	capabilities, err := getCapabilities(ctx, s.cs, s.pc, sPaymail.domain)
 	if err != nil {
-		return nil, fmt.Errorf("failed to get contact paymail capability: %w", err)
+		return nil, fmt.Errorf("failed to get paymail capability: %w", err)
 	}
 
 	if !capabilities.Has(paymail.BRFCPki, paymail.BRFCPkiAlternate) {
@@ -52,7 +52,7 @@ func (s *PaymailServant) GetPkiForPaymail(ctx context.Context, sPaymail *Sanitiz
 func (s *PaymailServant) AddContactRequest(ctx context.Context, receiverPaymail *SanitizedPaymail, contactData *paymail.PikeContactRequestPayload) (*paymail.PikeContactRequestResponse, error) {
 	capabilities, err := getCapabilities(ctx, s.cs, s.pc, receiverPaymail.domain)
 	if err != nil {
-		return nil, fmt.Errorf("failed to get contact paymail capability: %w", err)
+		return nil, fmt.Errorf("failed to get paymail capability: %w", err)
 	}
 
 	if !capabilities.Has(paymail.BRFCPike, "") {

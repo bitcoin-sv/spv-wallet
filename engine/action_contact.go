@@ -3,6 +3,7 @@ package engine
 import (
 	"context"
 	"errors"
+	"fmt"
 
 	"github.com/bitcoin-sv/go-paymail"
 	"github.com/bitcoin-sv/spv-wallet/engine/utils"
@@ -13,7 +14,7 @@ var ErrInvalidRequesterPaymail = errors.New("invalid requester paymail address")
 func (c *Client) AddContact(ctx context.Context, ctcFName, ctcPaymail, requesterPKey, requesterFName, requesterPaymail string, opts ...ModelOps) (*Contact, error) {
 	requesterXPubId := utils.Hash(requesterPKey)
 
-	reqPaymail, err := getPaymailAddress(ctx, requesterPaymail)
+	reqPaymail, err := getPaymailAddress(ctx, requesterPaymail, c.DefaultModelOptions()...)
 	if err != nil {
 		return nil, err
 	}
@@ -29,7 +30,7 @@ func (c *Client) AddContact(ctx context.Context, ctcFName, ctcPaymail, requester
 	contactPaymail := pmSrvnt.GetSanitizedPaymail(ctcPaymail)
 	contactPki, err := pmSrvnt.GetPkiForPaymail(ctx, contactPaymail)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("geting PKI for %s failed. Reason: %w", ctcPaymail, err)
 	}
 
 	data := newContactData{
@@ -42,7 +43,7 @@ func (c *Client) AddContact(ctx context.Context, ctcFName, ctcPaymail, requester
 
 	contact, err := c.addContact(ctx, &data, requesterXPubId)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("adding %s contact failed. Reason: %w", ctcPaymail, err)
 	}
 
 	// request new contact
@@ -69,7 +70,7 @@ func (c *Client) AddContactRequest(ctx context.Context, fullName, paymailAdress,
 	contactPaymail := pmSrvnt.GetSanitizedPaymail(paymailAdress)
 	contactPki, err := pmSrvnt.GetPkiForPaymail(ctx, contactPaymail)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("geting PKI for %s failed. Reason: %w", paymailAdress, err)
 	}
 
 	// add contact request
@@ -83,7 +84,7 @@ func (c *Client) AddContactRequest(ctx context.Context, fullName, paymailAdress,
 
 	contactRequest, err := c.addContact(ctx, &data, requesterXPubID)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("adding %s contact failed. Reason: %w", paymailAdress, err)
 	}
 
 	return contactRequest, nil
@@ -91,7 +92,7 @@ func (c *Client) AddContactRequest(ctx context.Context, fullName, paymailAdress,
 
 func (c *Client) addContact(ctx context.Context, data *newContactData, requesterXPubId string) (*Contact, error) {
 	// check if exists already
-	contact, err := getContact(ctx, data.paymail.adress, requesterXPubId)
+	contact, err := getContact(ctx, data.paymail.adress, requesterXPubId, c.DefaultModelOptions()...)
 	if err != nil {
 		return nil, err
 	}
