@@ -24,9 +24,9 @@ import (
 // @Security	bux-auth-xpub
 func (a *Action) create(c *gin.Context) {
 
-	var contactStruct engine.Contact
+	var contact engine.Contact
 
-	err := c.ShouldBindJSON(&contactStruct)
+	err := c.ShouldBindJSON(&contact)
 
 	if err != nil {
 		c.JSON(http.StatusUnprocessableEntity, err.Error())
@@ -37,7 +37,7 @@ func (a *Action) create(c *gin.Context) {
 
 	var requestBody CreateContact
 
-	newContact, err := a.Services.SpvWalletEngine.NewContact(c.Request.Context(), contactStruct.FullName, contactStruct.Paymail, pubKey, engine.WithMetadatas(requestBody.Metadata))
+	newContact, err := a.Services.SpvWalletEngine.NewContact(c.Request.Context(), contact.FullName, contact.Paymail, pubKey, engine.WithMetadatas(requestBody.Metadata))
 	if err != nil {
 		c.JSON(http.StatusUnprocessableEntity, err.Error())
 		return
