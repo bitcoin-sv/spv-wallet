@@ -29,6 +29,10 @@ func newContact(fullName, paymailAddress, senderPubKey string, opts ...ModelOps)
 		return nil, ErrEmptyContactPubKey
 	}
 
+	if paymailAddress == "" {
+		return nil, ErrEmptyContactPaymail
+	}
+
 	xPubId := utils.Hash(senderPubKey)
 
 	id := utils.Hash(senderPubKey + paymailAddress)

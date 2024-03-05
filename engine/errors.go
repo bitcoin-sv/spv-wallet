@@ -207,3 +207,6 @@ var ErrEmptyContactFullName = errors.New("full_name is empty")
 
 // ErrEmptyContactPubKey when pubKey is empty
 var ErrEmptyContactPubKey = errors.New("pubKey is empty")
+
+// ErrEmptyContactPaymail when paymail is empty
+var ErrEmptyContactPaymail = errors.New("paymail is empty")
