@@ -245,7 +245,7 @@ func (p *PaymailDefaultServiceProvider) AddContact(
 		}()
 	}
 
-	reqPaymail, err := getPaymailAddress(ctx, requesterPaymailAddress)
+	reqPaymail, err := getPaymailAddress(ctx, requesterPaymailAddress, p.client.DefaultModelOptions()...)
 	if err != nil {
 		return
 	}
@@ -254,7 +254,7 @@ func (p *PaymailDefaultServiceProvider) AddContact(
 		return
 	}
 
-	_, err = p.client.AddContactRequest(ctx, contact.FullName, contact.PaymailAdress, reqPaymail.XpubID)
+	_, err = p.client.AddContactRequest(ctx, contact.FullName, contact.Paymail, reqPaymail.XpubID)
 	return
 }
 

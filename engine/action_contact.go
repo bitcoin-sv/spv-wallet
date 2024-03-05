@@ -48,8 +48,8 @@ func (c *Client) AddContact(ctx context.Context, ctcFName, ctcPaymail, requester
 
 	// request new contact
 	requesterContactRequest := paymail.PikeContactRequestPayload{
-		FullName:      requesterFName,
-		PaymailAdress: requesterPaymail,
+		FullName: requesterFName,
+		Paymail:  requesterPaymail,
 	}
 	if _, err = pmSrvnt.AddContactRequest(ctx, contactPaymail, &requesterContactRequest); err != nil {
 		c.Logger().Warn().
