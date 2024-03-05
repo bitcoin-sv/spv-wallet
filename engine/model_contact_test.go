@@ -104,12 +104,12 @@ func Test_getContacts(t *testing.T) {
 
 		var metadata *Metadata
 
-		dbConditions := make(map[string]interface{})
+		dbConditions := map[string]interface{}{
+			xPubIDField:   xPubID,
+			contactStatus: notConfirmed,
+		}
 
 		var queryParams *datastore.QueryParams
-
-		(dbConditions)[xPubIDField] = xPubID
-		(dbConditions)[contactStatus] = notConfirmed
 
 		contacts, err := getContacts(ctx, metadata, &dbConditions, queryParams, client.DefaultModelOptions()...)
 
