@@ -3,6 +3,7 @@ package engine
 import (
 	"context"
 	"errors"
+	"github.com/bitcoin-sv/go-paymail"
 	"github.com/bitcoin-sv/spv-wallet/engine/utils"
 	"github.com/mrz1836/go-datastore"
 )
@@ -33,11 +34,17 @@ func newContact(fullName, paymailAddress, senderPubKey string, opts ...ModelOps)
 		return nil, ErrEmptyContactPaymail
 	}
 
+	sanitizedPaymail, err := paymail.ValidateAndSanitisePaymail(paymailAddress, false)
+
+	if err != nil {
+		return nil, err
+	}
+
 	xPubId := utils.Hash(senderPubKey)
 
-	id := utils.Hash(senderPubKey + paymailAddress)
+	id := utils.Hash(senderPubKey + sanitizedPaymail.Address)
 
-	contact := &Contact{ID: id, XpubID: xPubId, Model: *NewBaseModel(ModelContact, opts...), FullName: fullName, Paymail: paymailAddress}
+	contact := &Contact{ID: id, XpubID: xPubId, Model: *NewBaseModel(ModelContact, opts...), FullName: fullName, Paymail: sanitizedPaymail.Address}
 
 	return contact, nil
 }
@@ -51,9 +58,11 @@ func getContact(ctx context.Context, fullName, paymailAddress, senderPubKey stri
 
 	contact.enrich(ModelContact, opts...)
 
+	_, _, sanitizedAddress := paymail.SanitizePaymail(paymailAddress)
+
 	conditions := map[string]interface{}{
 		senderXPubField: senderPubKey,
-		paymailField:    paymailAddress,
+		paymailField:    sanitizedAddress,
 	}
 
 	if err := Get(ctx, contact, conditions, false, defaultDatabaseReadTimeout, false); err != nil {
