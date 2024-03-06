@@ -538,7 +538,7 @@ if [ "$expose" == "true" ]; then
     export RUN_SECURED_PROTOCOL_SUFFIX="s"
 else
     export RUN_API_DOMAIN="localhost:8180"
-    export RUN_SECURED_PROTOCOL_SUFFIX="s"
+    export RUN_SECURED_PROTOCOL_SUFFIX=""
 fi
 
 if [ "$background" == "true" ]; then
