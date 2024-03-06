@@ -15,10 +15,7 @@ import (
 // @Description	Update destination
 // @Tags		Destinations
 // @Produce		json
-// @Param		id path string false "Destination ID"
-// @Param		address path string false "Destination Address"
-// @Param		locking_script path string false "Destination Locking Script"
-// @Param		metadata body string true "Destination Metadata"
+// @Param		UpdateDestination body UpdateDestination false "UpdateDestination model containing ids, address, locking_script and metadata"
 // @Success		200
 // @Router		/v1/destination [patch]
 // @Security	x-auth-xpub

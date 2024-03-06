@@ -1,4 +1,57 @@
 definitions:
+  accesskeys.CreateAccessKey:
+    properties:
+      metadata:
+        $ref: '#/definitions/engine.Metadata'
+    type: object
+  actions.CountRequestParameters:
+    properties:
+      conditions:
+        additionalProperties: true
+        type: object
+      metadata:
+        $ref: '#/definitions/engine.Metadata'
+    type: object
+  actions.SearchRequestParameters:
+    properties:
+      conditions:
+        additionalProperties: true
+        type: object
+      metadata:
+        $ref: '#/definitions/engine.Metadata'
+      params:
+        $ref: '#/definitions/datastore.QueryParams'
+    type: object
+  admin.CreatePaymail:
+    properties:
+      address:
+        type: string
+      avatar:
+        type: string
+      metadata:
+        $ref: '#/definitions/engine.Metadata'
+      public_name:
+        type: string
+      xpub_id:
+        type: string
+    type: object
+  admin.CreateXpub:
+    properties:
+      key:
+        type: string
+      metadata:
+        $ref: '#/definitions/engine.Metadata'
+    type: object
+  admin.PaymailAddress:
+    properties:
+      address:
+        type: string
+    type: object
+  admin.RecordTransaction:
+    properties:
+      hex:
+        type: string
+    type: object
   broadcast.SubmittedTx:
     properties:
       blockHash:
@@ -78,6 +131,88 @@ definitions:
     - SeenInOrphanMempool
     - Confirmed
     - Rejected
+  datastore.QueryParams:
+    properties:
+      order_by_field:
+        type: string
+      page:
+        type: integer
+      page_size:
+        type: integer
+      sort_direction:
+        type: string
+    type: object
+  destinations.CreateDestination:
+    properties:
+      metadata:
+        $ref: '#/definitions/engine.Metadata'
+    type: object
+  destinations.UpdateDestination:
+    properties:
+      address:
+        type: string
+      id:
+        type: string
+      locking_script:
+        type: string
+      metadata:
+        $ref: '#/definitions/engine.Metadata'
+    type: object
+  engine.Metadata:
+    additionalProperties: true
+    type: object
+  models.Destination:
+    properties:
+      address:
+        description: Address is a destination's address.
+        type: string
+      chain:
+        description: Chain is a destination's chain representation.
+        type: integer
+      created_at:
+        description: CreatedAt is a time when outer model was created.
+        type: string
+      deleted_at:
+        description: DeletedAt is a time when outer model was deleted.
+        type: string
+      draft_id:
+        description: DraftID is a destination's draft id.
+        type: string
+      id:
+        description: ID is a destination id.
+        type: string
+      locking_script:
+        description: LockingScript is a destination's locking script.
+        type: string
+      metadata:
+        additionalProperties: true
+        description: Metadata is a metadata map of outer model.
+        type: object
+      monitor:
+        description: Monitor is a time when destination was monitored.
+        type: string
+      num:
+        description: Num is a destination's num representation.
+        type: integer
+      type:
+        description: Type is a destination's type.
+        type: string
+      updated_at:
+        description: UpdatedAt is a time when outer model was updated.
+        type: string
+      xpub_id:
+        description: XpubID is a destination's xpub related id used to register destination.
+        type: string
+    type: object
+  transactions.NewTransaction:
+    type: object
+  transactions.UpdateTransaction:
+    properties:
+      id:
+        type: string
+      metadata:
+        $ref: '#/definitions/engine.Metadata'
+    type: object
 info:
   contact: {}
   title: SPV Wallet
@@ -86,7 +221,7 @@ paths:
   /transaction/broadcast/callback:
     post:
       parameters:
-      - description: transaction
+      - description: Transaction
         in: body
         name: transaction
         required: true
@@ -140,10 +275,12 @@ paths:
     post:
       description: Create access key
       parameters:
-      - description: metadata
-        in: query
-        name: metadata
-        type: string
+      - description: CreateAccessKey model containing metadata
+        in: body
+        name: CreateAccessKey
+        required: true
+        schema:
+          $ref: '#/definitions/accesskeys.CreateAccessKey'
       produces:
       - application/json
       responses:
@@ -158,14 +295,11 @@ paths:
     post:
       description: Count of access keys
       parameters:
-      - description: metadata
-        in: query
-        name: metadata
-        type: string
-      - description: conditions
-        in: query
-        name: conditions
-        type: string
+      - description: CountRequestParameters model containing metadata and conditions
+        in: body
+        name: CountRequestParameters
+        schema:
+          $ref: '#/definitions/actions.CountRequestParameters'
       produces:
       - application/json
       responses:
@@ -180,30 +314,12 @@ paths:
     post:
       description: Search access key
       parameters:
-      - description: page
-        in: query
-        name: page
-        type: integer
-      - description: page_size
-        in: query
-        name: page_size
-        type: integer
-      - description: order_by_field
-        in: query
-        name: order_by_field
-        type: string
-      - description: sort_direction
-        in: query
-        name: sort_direction
-        type: string
-      - description: metadata
-        in: query
-        name: metadata
-        type: string
-      - description: conditions
-        in: query
-        name: conditions
-        type: string
+      - description: SearchRequestParameters model containing metadata, conditions
+          and query params
+        in: body
+        name: SearchRequestParameters
+        schema:
+          $ref: '#/definitions/actions.SearchRequestParameters'
       produces:
       - application/json
       responses:
@@ -218,14 +334,11 @@ paths:
     post:
       description: Access Keys Count
       parameters:
-      - description: Metadata filter
-        in: query
-        name: metadata
-        type: string
-      - description: Conditions filter
-        in: query
-        name: conditions
-        type: string
+      - description: CountRequestParameters model containing metadata and conditions
+        in: body
+        name: CountRequestParameters
+        schema:
+          $ref: '#/definitions/actions.CountRequestParameters'
       produces:
       - application/json
       responses:
@@ -240,30 +353,12 @@ paths:
     post:
       description: Access Keys Search
       parameters:
-      - description: page
-        in: query
-        name: page
-        type: integer
-      - description: page_size
-        in: query
-        name: page_size
-        type: integer
-      - description: order_by_field
-        in: query
-        name: order_by_field
-        type: string
-      - description: sort_direction
-        in: query
-        name: sort_direction
-        type: string
-      - description: Metadata filter
-        in: query
-        name: metadata
-        type: string
-      - description: Conditions filter
-        in: query
-        name: conditions
-        type: string
+      - description: SearchRequestParameters model containing metadata, conditions
+          and query params
+        in: body
+        name: SearchRequestParameters
+        schema:
+          $ref: '#/definitions/actions.SearchRequestParameters'
       produces:
       - application/json
       responses:
@@ -278,14 +373,11 @@ paths:
     post:
       description: Count destinations
       parameters:
-      - description: Metadata filter
-        in: query
-        name: metadata
-        type: string
-      - description: Conditions filter
-        in: query
-        name: conditions
-        type: string
+      - description: CountRequestParameters model containing metadata and conditions
+        in: body
+        name: CountRequestParameters
+        schema:
+          $ref: '#/definitions/actions.CountRequestParameters'
       produces:
       - application/json
       responses:
@@ -300,30 +392,12 @@ paths:
     post:
       description: Search for destinations
       parameters:
-      - description: page
-        in: query
-        name: page
-        type: integer
-      - description: page_size
-        in: query
-        name: page_size
-        type: integer
-      - description: order_by_field
-        in: query
-        name: order_by_field
-        type: string
-      - description: sort_direction
-        in: query
-        name: sort_direction
-        type: string
-      - description: Metadata filter
-        in: query
-        name: metadata
-        type: string
-      - description: Conditions filter
-        in: query
-        name: conditions
-        type: string
+      - description: SearchRequestParameters model containing metadata, conditions
+          and query params
+        in: body
+        name: SearchRequestParameters
+        schema:
+          $ref: '#/definitions/actions.SearchRequestParameters'
       produces:
       - application/json
       responses:
@@ -338,28 +412,12 @@ paths:
     post:
       description: Create paymail
       parameters:
-      - description: xpub
-        in: query
-        name: xpub
+      - description: CreatePaymail model containing paymail information
+        in: body
+        name: CreatePaymail
         required: true
-        type: string
-      - description: address
-        in: query
-        name: address
-        required: true
-        type: string
-      - description: public_name
-        in: query
-        name: public_name
-        type: string
-      - description: avatar
-        in: query
-        name: avatar
-        type: string
-      - description: metadata
-        in: query
-        name: metadata
-        type: string
+        schema:
+          $ref: '#/definitions/admin.CreatePaymail'
       produces:
       - application/json
       responses:
@@ -374,11 +432,12 @@ paths:
     delete:
       description: Delete paymail
       parameters:
-      - description: address
-        in: query
-        name: address
+      - description: PaymailAddress model containing paymail address to delete
+        in: body
+        name: PaymailAddress
         required: true
-        type: string
+        schema:
+          type: string
       produces:
       - application/json
       responses:
@@ -390,14 +449,15 @@ paths:
       tags:
       - Admin
   /v1/admin/paymail/get:
-    get:
+    post:
       description: Get paymail
       parameters:
-      - description: address
-        in: query
-        name: address
+      - description: CreateAccessKey model containing paymail address
+        in: body
+        name: PaymailAddress
         required: true
-        type: string
+        schema:
+          $ref: '#/definitions/admin.PaymailAddress'
       produces:
       - application/json
       responses:
@@ -412,14 +472,11 @@ paths:
     post:
       description: Paymail addresses count
       parameters:
-      - description: Metadata filter
-        in: query
-        name: metadata
-        type: string
-      - description: Conditions filter
-        in: query
-        name: conditions
-        type: string
+      - description: CountRequestParameters model containing metadata and conditions
+        in: body
+        name: CountRequestParameters
+        schema:
+          $ref: '#/definitions/actions.CountRequestParameters'
       produces:
       - application/json
       responses:
@@ -434,30 +491,12 @@ paths:
     post:
       description: Paymail addresses search
       parameters:
-      - description: page
-        in: query
-        name: page
-        type: integer
-      - description: page_size
-        in: query
-        name: page_size
-        type: integer
-      - description: order_by_field
-        in: query
-        name: order_by_field
-        type: string
-      - description: sort_direction
-        in: query
-        name: sort_direction
-        type: string
-      - description: Metadata filter
-        in: query
-        name: metadata
-        type: string
-      - description: Conditions filter
-        in: query
-        name: conditions
-        type: string
+      - description: SearchRequestParameters model containing metadata, conditions
+          and query params
+        in: body
+        name: SearchRequestParameters
+        schema:
+          $ref: '#/definitions/actions.SearchRequestParameters'
       produces:
       - application/json
       responses:
@@ -498,14 +537,11 @@ paths:
     post:
       description: Count transactions
       parameters:
-      - description: Metadata filter
-        in: query
-        name: metadata
-        type: string
-      - description: Conditions filter
-        in: query
-        name: conditions
-        type: string
+      - description: CountRequestParameters model containing metadata and conditions
+        in: body
+        name: CountRequestParameters
+        schema:
+          $ref: '#/definitions/actions.CountRequestParameters'
       produces:
       - application/json
       responses:
@@ -520,11 +556,13 @@ paths:
     post:
       description: Record transactions
       parameters:
-      - description: Transaction hex
-        in: query
-        name: hex
+      - description: RecordTransaction model containing hex of the transaction to
+          record
+        in: body
+        name: RecordTransaction
         required: true
-        type: string
+        schema:
+          $ref: '#/definitions/admin.RecordTransaction'
       produces:
       - application/json
       responses:
@@ -539,30 +577,12 @@ paths:
     post:
       description: Search for transactions
       parameters:
-      - description: page
-        in: query
-        name: page
-        type: integer
-      - description: page_size
-        in: query
-        name: page_size
-        type: integer
-      - description: order_by_field
-        in: query
-        name: order_by_field
-        type: string
-      - description: sort_direction
-        in: query
-        name: sort_direction
-        type: string
-      - description: Metadata filter
-        in: query
-        name: metadata
-        type: string
-      - description: Conditions filter
-        in: query
-        name: conditions
-        type: string
+      - description: SearchRequestParameters model containing metadata, conditions
+          and query params
+        in: body
+        name: SearchRequestParameters
+        schema:
+          $ref: '#/definitions/actions.SearchRequestParameters'
       produces:
       - application/json
       responses:
@@ -577,14 +597,11 @@ paths:
     post:
       description: Count utxos
       parameters:
-      - description: Metadata filter
-        in: query
-        name: metadata
-        type: string
-      - description: Conditions filter
-        in: query
-        name: conditions
-        type: string
+      - description: CountRequestParameters model containing metadata and conditions
+        in: body
+        name: CountRequestParameters
+        schema:
+          $ref: '#/definitions/actions.CountRequestParameters'
       produces:
       - application/json
       responses:
@@ -599,30 +616,12 @@ paths:
     post:
       description: Search for utxos
       parameters:
-      - description: page
-        in: query
-        name: page
-        type: integer
-      - description: page_size
-        in: query
-        name: page_size
-        type: integer
-      - description: order_by_field
-        in: query
-        name: order_by_field
-        type: string
-      - description: sort_direction
-        in: query
-        name: sort_direction
-        type: string
-      - description: Metadata filter
-        in: query
-        name: metadata
-        type: string
-      - description: Conditions filter
-        in: query
-        name: conditions
-        type: string
+      - description: SearchRequestParameters model containing metadata, conditions
+          and query params
+        in: body
+        name: SearchRequestParameters
+        schema:
+          $ref: '#/definitions/actions.SearchRequestParameters'
       produces:
       - application/json
       responses:
@@ -633,18 +632,35 @@ paths:
       summary: Search for utxos
       tags:
       - Admin
+  /v1/admin/xpub:
+    post:
+      description: Create xPub
+      parameters:
+      - description: CreateXpub model containing key and metadata
+        in: body
+        name: CreateXpub
+        required: true
+        schema:
+          $ref: '#/definitions/admin.CreateXpub'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+      security:
+      - x-auth-xpub: []
+      summary: Create xPub
+      tags:
+      - Admin
   /v1/admin/xpubs/count:
     post:
       description: Count xpubs
       parameters:
-      - description: Metadata filter
-        in: query
-        name: metadata
-        type: string
-      - description: Conditions filter
-        in: query
-        name: conditions
-        type: string
+      - description: CountRequestParameters model containing metadata and conditions
+        in: body
+        name: CountRequestParameters
+        schema:
+          $ref: '#/definitions/actions.CountRequestParameters'
       produces:
       - application/json
       responses:
@@ -659,30 +675,12 @@ paths:
     post:
       description: Search for xpubs
       parameters:
-      - description: page
-        in: query
-        name: page
-        type: integer
-      - description: page_size
-        in: query
-        name: page_size
-        type: integer
-      - description: order_by_field
-        in: query
-        name: order_by_field
-        type: string
-      - description: sort_direction
-        in: query
-        name: sort_direction
-        type: string
-      - description: Metadata filter
-        in: query
-        name: metadata
-        type: string
-      - description: Conditions filter
-        in: query
-        name: conditions
-        type: string
+      - description: SearchRequestParameters model containing metadata, conditions
+          and query params
+        in: body
+        name: SearchRequestParameters
+        schema:
+          $ref: '#/definitions/actions.SearchRequestParameters'
       produces:
       - application/json
       responses:
@@ -722,24 +720,12 @@ paths:
     patch:
       description: Update destination
       parameters:
-      - description: Destination ID
-        in: path
-        name: id
-        type: string
-      - description: Destination Address
-        in: path
-        name: address
-        type: string
-      - description: Destination Locking Script
-        in: path
-        name: locking_script
-        type: string
-      - description: Destination Metadata
+      - description: UpdateDestination model containing ids, address, locking_script
+          and metadata
         in: body
-        name: metadata
-        required: true
+        name: UpdateDestination
         schema:
-          type: string
+          $ref: '#/definitions/destinations.UpdateDestination'
       produces:
       - application/json
       responses:
@@ -753,18 +739,11 @@ paths:
     post:
       description: Create a new destination
       parameters:
-      - description: type
-        in: query
-        name: type
-        type: string
-      - description: reference_id
-        in: query
-        name: reference_id
-        type: string
-      - description: metadata
-        in: query
-        name: metadata
-        type: string
+      - description: CreateDestination model containing metadata
+        in: body
+        name: CreateDestination
+        schema:
+          $ref: '#/definitions/destinations.CreateDestination'
       produces:
       - application/json
       responses:
@@ -779,14 +758,11 @@ paths:
     post:
       description: Count Destinations
       parameters:
-      - description: metadata
-        in: query
-        name: metadata
-        type: string
-      - description: condition
-        in: query
-        name: condition
-        type: string
+      - description: CountRequestParameters model containing metadata and conditions
+        in: body
+        name: CountRequestParameters
+        schema:
+          $ref: '#/definitions/actions.CountRequestParameters'
       produces:
       - application/json
       responses:
@@ -798,33 +774,15 @@ paths:
       tags:
       - Destinations
   /v1/destination/search:
-    get:
+    post:
       description: Search for a destination
       parameters:
-      - description: page
-        in: query
-        name: page
-        type: integer
-      - description: page_size
-        in: query
-        name: page_size
-        type: integer
-      - description: order_by_field
-        in: query
-        name: order_by_field
-        type: string
-      - description: sort_direction
-        in: query
-        name: sort_direction
-        type: string
-      - description: metadata
-        in: query
-        name: metadata
-        type: string
-      - description: condition
-        in: query
-        name: condition
-        type: string
+      - description: SearchRequestParameters model containing metadata, conditions
+          and query params
+        in: body
+        name: SearchRequestParameters
+        schema:
+          $ref: '#/definitions/actions.SearchRequestParameters'
       produces:
       - application/json
       responses:
@@ -835,60 +793,6 @@ paths:
       summary: Search for a destination
       tags:
       - Destinations
-  /v1/paymail:
-    delete:
-      description: Delete paymail
-      parameters:
-      - description: address
-        in: query
-        name: address
-        required: true
-        type: string
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-      security:
-      - x-auth-xpub: []
-      summary: Delete paymail
-      tags:
-      - Paymails
-    post:
-      description: Create paymail
-      parameters:
-      - description: key
-        in: query
-        name: key
-        required: true
-        type: string
-      - description: address
-        in: query
-        name: address
-        required: true
-        type: string
-      - description: public_name
-        in: query
-        name: public_name
-        type: string
-      - description: avatar
-        in: query
-        name: avatar
-        type: string
-      - description: metadata
-        in: query
-        name: metadata
-        type: string
-      produces:
-      - application/json
-      responses:
-        "201":
-          description: Created
-      security:
-      - x-auth-xpub: []
-      summary: Create paymail
-      tags:
-      - Paymails
   /v1/transaction:
     get:
       description: Get transaction by id
@@ -911,16 +815,12 @@ paths:
     patch:
       description: Update transaction
       parameters:
-      - description: id
-        in: query
-        name: id
+      - description: UpdateTransaction model containing the transaction id and metadata
+        in: body
+        name: UpdateTransaction
         required: true
-        type: string
-      - description: metadata
-        in: query
-        name: metadata
-        required: true
-        type: string
+        schema:
+          $ref: '#/definitions/transactions.UpdateTransaction'
       produces:
       - application/json
       responses:
@@ -934,15 +834,12 @@ paths:
     post:
       description: New transaction
       parameters:
-      - description: transaction config
-        in: query
-        name: config
+      - description: NewTransaction model containing the transaction config and metadata
+        in: body
+        name: NewTransaction
         required: true
-        type: string
-      - description: metadata
-        in: query
-        name: metadata
-        type: string
+        schema:
+          $ref: '#/definitions/transactions.NewTransaction'
       produces:
       - application/json
       responses:
@@ -957,14 +854,11 @@ paths:
     post:
       description: Count of transactions
       parameters:
-      - description: metadata
-        in: query
-        name: metadata
-        type: string
-      - description: conditions
-        in: query
-        name: conditions
-        type: string
+      - description: CountRequestParameters model containing metadata and conditions
+        in: body
+        name: CountRequestParameters
+        schema:
+          $ref: '#/definitions/actions.CountRequestParameters'
       produces:
       - application/json
       responses:
@@ -978,21 +872,6 @@ paths:
   /v1/transaction/record:
     post:
       description: Record transaction
-      parameters:
-      - description: hex
-        in: query
-        name: hex
-        required: true
-        type: string
-      - description: reference_id
-        in: query
-        name: reference_id
-        required: true
-        type: string
-      - description: metadata
-        in: query
-        name: metadata
-        type: string
       produces:
       - application/json
       responses:
@@ -1007,30 +886,12 @@ paths:
     post:
       description: Search transaction
       parameters:
-      - description: page
-        in: query
-        name: page
-        type: integer
-      - description: page_size
-        in: query
-        name: page_size
-        type: integer
-      - description: order_by_field
-        in: query
-        name: order_by_field
-        type: string
-      - description: sort_direction
-        in: query
-        name: sort_direction
-        type: string
-      - description: metadata
-        in: query
-        name: metadata
-        type: string
-      - description: conditions
-        in: query
-        name: conditions
-        type: string
+      - description: SearchRequestParameters model containing metadata, conditions
+          and query params
+        in: body
+        name: SearchRequestParameters
+        schema:
+          $ref: '#/definitions/actions.SearchRequestParameters'
       produces:
       - application/json
       responses:
@@ -1069,14 +930,11 @@ paths:
     post:
       description: Count of UTXOs
       parameters:
-      - description: metadata
-        in: query
-        name: metadata
-        type: string
-      - description: conditions
-        in: query
-        name: conditions
-        type: string
+      - description: CountRequestParameters model containing metadata and conditions
+        in: body
+        name: CountRequestParameters
+        schema:
+          $ref: '#/definitions/actions.CountRequestParameters'
       produces:
       - application/json
       responses:
@@ -1091,30 +949,12 @@ paths:
     post:
       description: Search UTXO
       parameters:
-      - description: page
-        in: query
-        name: page
-        type: integer
-      - description: page_size
-        in: query
-        name: page_size
-        type: integer
-      - description: order_by_field
-        in: query
-        name: order_by_field
-        type: string
-      - description: sort_direction
-        in: query
-        name: sort_direction
-        type: string
-      - description: metadata
-        in: query
-        name: metadata
-        type: string
-      - description: conditions
-        in: query
-        name: conditions
-        type: string
+      - description: SearchRequestParameters model containing metadata, conditions
+          and query params
+        in: body
+        name: SearchRequestParameters
+        schema:
+          $ref: '#/definitions/actions.SearchRequestParameters'
       produces:
       - application/json
       responses:
@@ -1125,30 +965,9 @@ paths:
       summary: Search UTXO
       tags:
       - UTXO
-  /v1/utxo/unreserve:
-    patch:
-      description: Unreserve UTXOs
-      parameters:
-      - description: draft tx id
-        in: query
-        name: reference_id
-        type: string
-      responses:
-        "201":
-          description: Created
-      security:
-      - x-auth-xpub: []
-      summary: Unreserve UTXOs
-      tags:
-      - UTXO
   /v1/xpub:
     get:
       description: Get xPub
-      parameters:
-      - description: key
-        in: query
-        name: key
-        type: string
       produces:
       - application/json
       responses:
@@ -1162,10 +981,11 @@ paths:
     patch:
       description: Update xPub
       parameters:
-      - description: metadata
-        in: query
-        name: metadata
-        type: string
+      - description: Metadata which should replace the already existing one
+        in: body
+        name: Metadata
+        schema:
+          $ref: '#/definitions/engine.Metadata'
       produces:
       - application/json
       responses:
@@ -1173,29 +993,8 @@ paths:
           description: OK
       security:
       - x-auth-xpub: []
+      - bux-auth-xpub: []
       summary: Update xPub
-      tags:
-      - xPub
-    post:
-      description: Create xPub
-      parameters:
-      - description: key
-        in: query
-        name: key
-        required: true
-        type: string
-      - description: metadata
-        in: query
-        name: metadata
-        type: string
-      produces:
-      - application/json
-      responses:
-        "201":
-          description: Created
-      security:
-      - x-auth-xpub: []
-      summary: Create xPub
       tags:
       - xPub
 securityDefinitions:

@@ -16,9 +16,6 @@ import (
 // @Description	Record transaction
 // @Tags		Transactions
 // @Produce		json
-// @Param		hex query string true "hex"
-// @Param		reference_id query string true "reference_id"
-// @Param		metadata query string false "metadata"
 // @Success		200
 // @Router		/v1/transaction/record [post]
 // @Security	x-auth-xpub

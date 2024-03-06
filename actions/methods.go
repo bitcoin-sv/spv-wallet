@@ -9,11 +9,17 @@ import (
 	"github.com/mrz1836/go-datastore"
 )
 
-// RequestParameters is a struct for handling basic request parameters
-type RequestParameters struct {
+// SearchRequestParameters is a struct for handling request parameters for search requests
+type SearchRequestParameters struct {
 	Conditions  map[string]interface{} `json:"conditions"`
 	Metadata    engine.Metadata        `json:"metadata"`
 	QueryParams datastore.QueryParams  `json:"params"`
+}
+
+// CountRequestParameters is a struct for handling request parameters for count requests
+type CountRequestParameters struct {
+	Metadata   engine.Metadata        `json:"metadata"`
+	Conditions map[string]interface{} `json:"conditions"`
 }
 
 // StatusOK is a basic response which sets the status to 200
@@ -31,9 +37,9 @@ func MethodNotAllowed(c *gin.Context) {
 	c.JSON(http.StatusMethodNotAllowed, dictionary.GetError(dictionary.ErrorMethodNotAllowed, c.Request.Method, c.Request.RequestURI))
 }
 
-// GetQueryParameters get all filtering parameters related to the db query
-func GetQueryParameters(c *gin.Context) (*datastore.QueryParams, *engine.Metadata, *map[string]interface{}, error) {
-	var requestParameters RequestParameters
+// GetSearchQueryParameters get all filtering parameters related to the db query
+func GetSearchQueryParameters(c *gin.Context) (*datastore.QueryParams, *engine.Metadata, *map[string]interface{}, error) {
+	var requestParameters SearchRequestParameters
 	if err := c.Bind(&requestParameters); err != nil {
 		return nil, nil, nil, err
 	}
@@ -43,4 +49,18 @@ func GetQueryParameters(c *gin.Context) (*datastore.QueryParams, *engine.Metadat
 	}
 
 	return &requestParameters.QueryParams, &requestParameters.Metadata, &requestParameters.Conditions, nil
+}
+
+// GetCountQueryParameters get all filtering parameters related to the db query
+func GetCountQueryParameters(c *gin.Context) (*engine.Metadata, *map[string]interface{}, error) {
+	var requestParameters CountRequestParameters
+	if err := c.Bind(&requestParameters); err != nil {
+		return nil, nil, err
+	}
+
+	if requestParameters.Conditions == nil {
+		requestParameters.Conditions = make(map[string]interface{})
+	}
+
+	return &requestParameters.Metadata, &requestParameters.Conditions, nil
 }

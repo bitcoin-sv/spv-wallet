@@ -15,8 +15,7 @@ import (
 // @Description	Update transaction
 // @Tags		Transactions
 // @Produce		json
-// @Param		id query string true "id"
-// @Param		metadata query string true "metadata"
+// @Param		UpdateTransaction body UpdateTransaction true "UpdateTransaction model containing the transaction id and metadata"
 // @Success		200
 // @Router		/v1/transaction [patch]
 // @Security	x-auth-xpub

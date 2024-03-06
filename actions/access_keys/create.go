@@ -15,7 +15,7 @@ import (
 // @Description	Create access key
 // @Tags		Access-key
 // @Produce		json
-// @Param		metadata query string false "metadata"
+// @Param		CreateAccessKey body CreateAccessKey true "CreateAccessKey model containing metadata"
 // @Success		201
 // @Router		/v1/access-key [post]
 // @Security	x-auth-xpub

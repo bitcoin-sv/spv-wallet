@@ -16,8 +16,7 @@ import (
 // @Description	New transaction
 // @Tags		Transactions
 // @Produce		json
-// @Param		config query string true "transaction config"
-// @Param		metadata query string false "metadata"
+// @Param		NewTransaction body NewTransaction true "NewTransaction model containing the transaction config and metadata"
 // @Success		201
 // @Router		/v1/transaction [post]
 // @Security	x-auth-xpub

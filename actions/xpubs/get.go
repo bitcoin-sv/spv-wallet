@@ -15,7 +15,6 @@ import (
 // @Description	Get xPub
 // @Tags		xPub
 // @Produce		json
-// @Param		key query string false "key"
 // @Success		200
 // @Router		/v1/xpub [get]
 // @Security	x-auth-xpub

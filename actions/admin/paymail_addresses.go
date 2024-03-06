@@ -13,10 +13,10 @@ import (
 // @Summary		Get paymail
 // @Description	Get paymail
 // @Tags		Admin
-// @Param		address query string true "address"
+// @Param		PaymailAddress body PaymailAddress true "CreateAccessKey model containing paymail address"
 // @Produce		json
 // @Success		200
-// @Router		/v1/admin/paymail/get [get]
+// @Router		/v1/admin/paymail/get [post]
 // @Security	x-auth-xpub
 func (a *Action) paymailGetAddress(c *gin.Context) {
 	var requestBody PaymailAddress
@@ -48,17 +48,12 @@ func (a *Action) paymailGetAddress(c *gin.Context) {
 // @Description	Paymail addresses search
 // @Tags		Admin
 // @Produce		json
-// @Param		page query int false "page"
-// @Param		page_size query int false "page_size"
-// @Param		order_by_field query string false "order_by_field"
-// @Param		sort_direction query string false "sort_direction"
-// @Param		metadata query string false "Metadata filter"
-// @Param		conditions query string false "Conditions filter"
+// @Param		SearchRequestParameters body actions.SearchRequestParameters false "SearchRequestParameters model containing metadata, conditions and query params"
 // @Success		200
 // @Router		/v1/admin/paymails/search [post]
 // @Security	x-auth-xpub
 func (a *Action) paymailAddressesSearch(c *gin.Context) {
-	queryParams, metadata, conditions, err := actions.GetQueryParameters(c)
+	queryParams, metadata, conditions, err := actions.GetSearchQueryParameters(c)
 	if err != nil {
 		c.JSON(http.StatusExpectationFailed, err.Error())
 		return
@@ -84,13 +79,12 @@ func (a *Action) paymailAddressesSearch(c *gin.Context) {
 // @Description	Paymail addresses count
 // @Tags		Admin
 // @Produce		json
-// @Param		metadata query string false "Metadata filter"
-// @Param		conditions query string false "Conditions filter"
+// @Param		CountRequestParameters body actions.CountRequestParameters false "CountRequestParameters model containing metadata and conditions"
 // @Success		200
 // @Router		/v1/admin/paymails/count [post]
 // @Security	x-auth-xpub
 func (a *Action) paymailAddressesCount(c *gin.Context) {
-	_, metadata, conditions, err := actions.GetQueryParameters(c)
+	metadata, conditions, err := actions.GetCountQueryParameters(c)
 	if err != nil {
 		c.JSON(http.StatusExpectationFailed, err.Error())
 		return
@@ -114,11 +108,7 @@ func (a *Action) paymailAddressesCount(c *gin.Context) {
 // @Summary		Create paymail
 // @Description	Create paymail
 // @Tags		Admin
-// @Param		xpub query string true "xpub"
-// @Param		address query string true "address"
-// @Param		public_name query string false "public_name"
-// @Param		avatar query string false "avatar"
-// @Param		metadata query string false "metadata"
+// @Param		CreatePaymail body CreatePaymail true "CreatePaymail model containing paymail information"
 // @Produce		json
 // @Success		201
 // @Router		/v1/admin/paymail/create [post]
@@ -153,8 +143,6 @@ func (a *Action) paymailCreateAddress(c *gin.Context) {
 		return
 	}
 
-	// Return response
-	//apirouter.ReturnResponse(w, req, http.StatusCreated, paymailAddress)
 	c.JSON(http.StatusCreated, paymailAddress)
 }
 
@@ -163,7 +151,7 @@ func (a *Action) paymailCreateAddress(c *gin.Context) {
 // @Summary		Delete paymail
 // @Description	Delete paymail
 // @Tags		Admin
-// @Param		address query string true "address"
+// @Param		PaymailAddress body string true "PaymailAddress model containing paymail address to delete"
 // @Produce		json
 // @Success		200
 // @Router		/v1/admin/paymail/delete [delete]

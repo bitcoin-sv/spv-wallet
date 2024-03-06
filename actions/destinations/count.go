@@ -13,8 +13,7 @@ import (
 // @Summary		Count Destinations
 // @Description	Count Destinations
 // @Tags		Destinations
-// @Param		metadata query string false "metadata"
-// @Param		condition query string false "condition"
+// @Param		CountRequestParameters body actions.CountRequestParameters false "CountRequestParameters model containing metadata and conditions"
 // @Produce		json
 // @Success		200
 // @Router		/v1/destination/count [post]
@@ -22,7 +21,7 @@ import (
 func (a *Action) count(c *gin.Context) {
 	reqXPubID := c.GetString(auth.ParamXPubHashKey)
 
-	_, metadata, conditions, err := actions.GetQueryParameters(c)
+	metadata, conditions, err := actions.GetCountQueryParameters(c)
 	if err != nil {
 		c.JSON(http.StatusExpectationFailed, err.Error())
 		return

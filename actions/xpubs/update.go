@@ -15,7 +15,7 @@ import (
 // @Description	Update xPub
 // @Tags		xPub
 // @Produce		json
-// @Param		metadata query string false "metadata"
+// @Param		Metadata body engine.Metadata false "Metadata which should replace the already existing one"
 // @Success		200
 // @Router		/v1/xpub [patch]
 // @Security	x-auth-xpub

@@ -11,8 +11,8 @@ import (
 // Broadcast Callback godoc
 // @Summary		Broadcast Callback
 // @Tags		Transactions
-// @Param 		transaction body broadcast.SubmittedTx true "transaction"
 // @Success		200
+// @Param 		transaction body broadcast.SubmittedTx true "Transaction"
 // @Router		/transaction/broadcast/callback [post]
 // @Security	callback-auth
 func (a *Action) broadcastCallback(c *gin.Context) {

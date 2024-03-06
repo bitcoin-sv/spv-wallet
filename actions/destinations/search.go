@@ -17,19 +17,14 @@ import (
 // @Description	Search for a destination
 // @Tags		Destinations
 // @Produce		json
-// @Param		page query int false "page"
-// @Param		page_size query int false "page_size"
-// @Param		order_by_field query string false "order_by_field"
-// @Param		sort_direction query string false "sort_direction"
-// @Param		metadata query string false "metadata"
-// @Param		condition query string false "condition"
+// @Param		SearchRequestParameters body actions.SearchRequestParameters false "SearchRequestParameters model containing metadata, conditions and query params"
 // @Success		200
-// @Router		/v1/destination/search [get]
+// @Router		/v1/destination/search [post]
 // @Security	x-auth-xpub
 func (a *Action) search(c *gin.Context) {
 	reqXPubID := c.GetString(auth.ParamXPubHashKey)
 
-	queryParams, metadata, conditions, err := actions.GetQueryParameters(c)
+	queryParams, metadata, conditions, err := actions.GetSearchQueryParameters(c)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, err.Error())
 		return

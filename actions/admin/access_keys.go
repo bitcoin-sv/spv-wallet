@@ -16,17 +16,12 @@ import (
 // @Description	Access Keys Search
 // @Tags		Admin
 // @Produce		json
-// @Param		page query int false "page"
-// @Param		page_size query int false "page_size"
-// @Param		order_by_field query string false "order_by_field"
-// @Param		sort_direction query string false "sort_direction"
-// @Param		metadata query string false "Metadata filter"
-// @Param		conditions query string false "Conditions filter"
+// @Param		SearchRequestParameters body actions.SearchRequestParameters false "SearchRequestParameters model containing metadata, conditions and query params"
 // @Success		200
 // @Router		/v1/admin/access-keys/search [post]
 // @Security	x-auth-xpub
 func (a *Action) accessKeysSearch(c *gin.Context) {
-	queryParams, metadata, conditions, err := actions.GetQueryParameters(c)
+	queryParams, metadata, conditions, err := actions.GetSearchQueryParameters(c)
 	if err != nil {
 		c.JSON(http.StatusExpectationFailed, err.Error())
 		return
@@ -57,13 +52,12 @@ func (a *Action) accessKeysSearch(c *gin.Context) {
 // @Description	Access Keys Count
 // @Tags		Admin
 // @Produce		json
-// @Param		metadata query string false "Metadata filter"
-// @Param		conditions query string false "Conditions filter"
+// @Param		CountRequestParameters body actions.CountRequestParameters false "CountRequestParameters model containing metadata and conditions"
 // @Success		200
 // @Router		/v1/admin/access-keys/count [post]
 // @Security	x-auth-xpub
 func (a *Action) accessKeysCount(c *gin.Context) {
-	_, metadata, conditions, err := actions.GetQueryParameters(c)
+	metadata, conditions, err := actions.GetCountQueryParameters(c)
 	if err != nil {
 		c.JSON(http.StatusExpectationFailed, err.Error())
 		return

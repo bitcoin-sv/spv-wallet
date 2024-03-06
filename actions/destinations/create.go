@@ -17,9 +17,7 @@ import (
 // @Description	Create a new destination
 // @Tags		Destinations
 // @Produce		json
-// @Param		type query string false "type"
-// @Param		reference_id query string false "reference_id"
-// @Param		metadata query string false "metadata"
+// @Param		CreateDestination body CreateDestination false "CreateDestination model containing metadata"
 // @Success		201
 // @Router		/v1/destination [post]
 // @Security	x-auth-xpub

@@ -19,7 +19,7 @@
                 "summary": "Broadcast Callback",
                 "parameters": [
                     {
-                        "description": "transaction",
+                        "description": "Transaction",
                         "name": "transaction",
                         "in": "body",
                         "required": true,
@@ -81,10 +81,13 @@
                 "summary": "Create access key",
                 "parameters": [
                     {
-                        "type": "string",
-                        "description": "metadata",
-                        "name": "metadata",
-                        "in": "query"
+                        "description": "CreateAccessKey model containing metadata",
+                        "name": "CreateAccessKey",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/accesskeys.CreateAccessKey"
+                        }
                     }
                 ],
                 "responses": {
@@ -140,16 +143,12 @@
                 "summary": "Count of access keys",
                 "parameters": [
                     {
-                        "type": "string",
-                        "description": "metadata",
-                        "name": "metadata",
-                        "in": "query"
-                    },
-                    {
-                        "type": "string",
-                        "description": "conditions",
-                        "name": "conditions",
-                        "in": "query"
+                        "description": "CountRequestParameters model containing metadata and conditions",
+                        "name": "CountRequestParameters",
+                        "in": "body",
+                        "schema": {
+                            "$ref": "#/definitions/actions.CountRequestParameters"
+                        }
                     }
                 ],
                 "responses": {
@@ -176,40 +175,12 @@
                 "summary": "Search access key",
                 "parameters": [
                     {
-                        "type": "integer",
-                        "description": "page",
-                        "name": "page",
-                        "in": "query"
-                    },
-                    {
-                        "type": "integer",
-                        "description": "page_size",
-                        "name": "page_size",
-                        "in": "query"
-                    },
-                    {
-                        "type": "string",
-                        "description": "order_by_field",
-                        "name": "order_by_field",
-                        "in": "query"
-                    },
-                    {
-                        "type": "string",
-                        "description": "sort_direction",
-                        "name": "sort_direction",
-                        "in": "query"
-                    },
-                    {
-                        "type": "string",
-                        "description": "metadata",
-                        "name": "metadata",
-                        "in": "query"
-                    },
-                    {
-                        "type": "string",
-                        "description": "conditions",
-                        "name": "conditions",
-                        "in": "query"
+                        "description": "SearchRequestParameters model containing metadata, conditions and query params",
+                        "name": "SearchRequestParameters",
+                        "in": "body",
+                        "schema": {
+                            "$ref": "#/definitions/actions.SearchRequestParameters"
+                        }
                     }
                 ],
                 "responses": {
@@ -236,16 +207,12 @@
                 "summary": "Access Keys Count",
                 "parameters": [
                     {
-                        "type": "string",
-                        "description": "Metadata filter",
-                        "name": "metadata",
-                        "in": "query"
-                    },
-                    {
-                        "type": "string",
-                        "description": "Conditions filter",
-                        "name": "conditions",
-                        "in": "query"
+                        "description": "CountRequestParameters model containing metadata and conditions",
+                        "name": "CountRequestParameters",
+                        "in": "body",
+                        "schema": {
+                            "$ref": "#/definitions/actions.CountRequestParameters"
+                        }
                     }
                 ],
                 "responses": {
@@ -272,40 +239,12 @@
                 "summary": "Access Keys Search",
                 "parameters": [
                     {
-                        "type": "integer",
-                        "description": "page",
-                        "name": "page",
-                        "in": "query"
-                    },
-                    {
-                        "type": "integer",
-                        "description": "page_size",
-                        "name": "page_size",
-                        "in": "query"
-                    },
-                    {
-                        "type": "string",
-                        "description": "order_by_field",
-                        "name": "order_by_field",
-                        "in": "query"
-                    },
-                    {
-                        "type": "string",
-                        "description": "sort_direction",
-                        "name": "sort_direction",
-                        "in": "query"
-                    },
-                    {
-                        "type": "string",
-                        "description": "Metadata filter",
-                        "name": "metadata",
-                        "in": "query"
-                    },
-                    {
-                        "type": "string",
-                        "description": "Conditions filter",
-                        "name": "conditions",
-                        "in": "query"
+                        "description": "SearchRequestParameters model containing metadata, conditions and query params",
+                        "name": "SearchRequestParameters",
+                        "in": "body",
+                        "schema": {
+                            "$ref": "#/definitions/actions.SearchRequestParameters"
+                        }
                     }
                 ],
                 "responses": {
@@ -332,16 +271,12 @@
                 "summary": "Count destinations",
                 "parameters": [
                     {
-                        "type": "string",
-                        "description": "Metadata filter",
-                        "name": "metadata",
-                        "in": "query"
-                    },
-                    {
-                        "type": "string",
-                        "description": "Conditions filter",
-                        "name": "conditions",
-                        "in": "query"
+                        "description": "CountRequestParameters model containing metadata and conditions",
+                        "name": "CountRequestParameters",
+                        "in": "body",
+                        "schema": {
+                            "$ref": "#/definitions/actions.CountRequestParameters"
+                        }
                     }
                 ],
                 "responses": {
@@ -368,40 +303,12 @@
                 "summary": "Search for destinations",
                 "parameters": [
                     {
-                        "type": "integer",
-                        "description": "page",
-                        "name": "page",
-                        "in": "query"
-                    },
-                    {
-                        "type": "integer",
-                        "description": "page_size",
-                        "name": "page_size",
-                        "in": "query"
-                    },
-                    {
-                        "type": "string",
-                        "description": "order_by_field",
-                        "name": "order_by_field",
-                        "in": "query"
-                    },
-                    {
-                        "type": "string",
-                        "description": "sort_direction",
-                        "name": "sort_direction",
-                        "in": "query"
-                    },
-                    {
-                        "type": "string",
-                        "description": "Metadata filter",
-                        "name": "metadata",
-                        "in": "query"
-                    },
-                    {
-                        "type": "string",
-                        "description": "Conditions filter",
-                        "name": "conditions",
-                        "in": "query"
+                        "description": "SearchRequestParameters model containing metadata, conditions and query params",
+                        "name": "SearchRequestParameters",
+                        "in": "body",
+                        "schema": {
+                            "$ref": "#/definitions/actions.SearchRequestParameters"
+                        }
                     }
                 ],
                 "responses": {
@@ -428,36 +335,13 @@
                 "summary": "Create paymail",
                 "parameters": [
                     {
-                        "type": "string",
-                        "description": "xpub",
-                        "name": "xpub",
-                        "in": "query",
-                        "required": true
-                    },
-                    {
-                        "type": "string",
-                        "description": "address",
-                        "name": "address",
-                        "in": "query",
-                        "required": true
-                    },
-                    {
-                        "type": "string",
-                        "description": "public_name",
-                        "name": "public_name",
-                        "in": "query"
-                    },
-                    {
-                        "type": "string",
-                        "description": "avatar",
-                        "name": "avatar",
-                        "in": "query"
-                    },
-                    {
-                        "type": "string",
-                        "description": "metadata",
-                        "name": "metadata",
-                        "in": "query"
+                        "description": "CreatePaymail model containing paymail information",
+                        "name": "CreatePaymail",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/admin.CreatePaymail"
+                        }
                     }
                 ],
                 "responses": {
@@ -484,11 +368,13 @@
                 "summary": "Delete paymail",
                 "parameters": [
                     {
-                        "type": "string",
-                        "description": "address",
-                        "name": "address",
-                        "in": "query",
-                        "required": true
+                        "description": "PaymailAddress model containing paymail address to delete",
+                        "name": "PaymailAddress",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
                     }
                 ],
                 "responses": {
@@ -499,7 +385,7 @@
             }
         },
         "/v1/admin/paymail/get": {
-            "get": {
+            "post": {
                 "security": [
                     {
                         "x-auth-xpub": []
@@ -515,11 +401,13 @@
                 "summary": "Get paymail",
                 "parameters": [
                     {
-                        "type": "string",
-                        "description": "address",
-                        "name": "address",
-                        "in": "query",
-                        "required": true
+                        "description": "CreateAccessKey model containing paymail address",
+                        "name": "PaymailAddress",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/admin.PaymailAddress"
+                        }
                     }
                 ],
                 "responses": {
@@ -546,16 +434,12 @@
                 "summary": "Paymail addresses count",
                 "parameters": [
                     {
-                        "type": "string",
-                        "description": "Metadata filter",
-                        "name": "metadata",
-                        "in": "query"
-                    },
-                    {
-                        "type": "string",
-                        "description": "Conditions filter",
-                        "name": "conditions",
-                        "in": "query"
+                        "description": "CountRequestParameters model containing metadata and conditions",
+                        "name": "CountRequestParameters",
+                        "in": "body",
+                        "schema": {
+                            "$ref": "#/definitions/actions.CountRequestParameters"
+                        }
                     }
                 ],
                 "responses": {
@@ -582,40 +466,12 @@
                 "summary": "Paymail addresses search",
                 "parameters": [
                     {
-                        "type": "integer",
-                        "description": "page",
-                        "name": "page",
-                        "in": "query"
-                    },
-                    {
-                        "type": "integer",
-                        "description": "page_size",
-                        "name": "page_size",
-                        "in": "query"
-                    },
-                    {
-                        "type": "string",
-                        "description": "order_by_field",
-                        "name": "order_by_field",
-                        "in": "query"
-                    },
-                    {
-                        "type": "string",
-                        "description": "sort_direction",
-                        "name": "sort_direction",
-                        "in": "query"
-                    },
-                    {
-                        "type": "string",
-                        "description": "Metadata filter",
-                        "name": "metadata",
-                        "in": "query"
-                    },
-                    {
-                        "type": "string",
-                        "description": "Conditions filter",
-                        "name": "conditions",
-                        "in": "query"
+                        "description": "SearchRequestParameters model containing metadata, conditions and query params",
+                        "name": "SearchRequestParameters",
+                        "in": "body",
+                        "schema": {
+                            "$ref": "#/definitions/actions.SearchRequestParameters"
+                        }
                     }
                 ],
                 "responses": {
@@ -686,16 +542,12 @@
                 "summary": "Count transactions",
                 "parameters": [
                     {
-                        "type": "string",
-                        "description": "Metadata filter",
-                        "name": "metadata",
-                        "in": "query"
-                    },
-                    {
-                        "type": "string",
-                        "description": "Conditions filter",
-                        "name": "conditions",
-                        "in": "query"
+                        "description": "CountRequestParameters model containing metadata and conditions",
+                        "name": "CountRequestParameters",
+                        "in": "body",
+                        "schema": {
+                            "$ref": "#/definitions/actions.CountRequestParameters"
+                        }
                     }
                 ],
                 "responses": {
@@ -722,11 +574,13 @@
                 "summary": "Record transactions",
                 "parameters": [
                     {
-                        "type": "string",
-                        "description": "Transaction hex",
-                        "name": "hex",
-                        "in": "query",
-                        "required": true
+                        "description": "RecordTransaction model containing hex of the transaction to record",
+                        "name": "RecordTransaction",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/admin.RecordTransaction"
+                        }
                     }
                 ],
                 "responses": {
@@ -753,40 +607,12 @@
                 "summary": "Search for transactions",
                 "parameters": [
                     {
-                        "type": "integer",
-                        "description": "page",
-                        "name": "page",
-                        "in": "query"
-                    },
-                    {
-                        "type": "integer",
-                        "description": "page_size",
-                        "name": "page_size",
-                        "in": "query"
-                    },
-                    {
-                        "type": "string",
-                        "description": "order_by_field",
-                        "name": "order_by_field",
-                        "in": "query"
-                    },
-                    {
-                        "type": "string",
-                        "description": "sort_direction",
-                        "name": "sort_direction",
-                        "in": "query"
-                    },
-                    {
-                        "type": "string",
-                        "description": "Metadata filter",
-                        "name": "metadata",
-                        "in": "query"
-                    },
-                    {
-                        "type": "string",
-                        "description": "Conditions filter",
-                        "name": "conditions",
-                        "in": "query"
+                        "description": "SearchRequestParameters model containing metadata, conditions and query params",
+                        "name": "SearchRequestParameters",
+                        "in": "body",
+                        "schema": {
+                            "$ref": "#/definitions/actions.SearchRequestParameters"
+                        }
                     }
                 ],
                 "responses": {
@@ -813,16 +639,12 @@
                 "summary": "Count utxos",
                 "parameters": [
                     {
-                        "type": "string",
-                        "description": "Metadata filter",
-                        "name": "metadata",
-                        "in": "query"
-                    },
-                    {
-                        "type": "string",
-                        "description": "Conditions filter",
-                        "name": "conditions",
-                        "in": "query"
+                        "description": "CountRequestParameters model containing metadata and conditions",
+                        "name": "CountRequestParameters",
+                        "in": "body",
+                        "schema": {
+                            "$ref": "#/definitions/actions.CountRequestParameters"
+                        }
                     }
                 ],
                 "responses": {
@@ -849,45 +671,50 @@
                 "summary": "Search for utxos",
                 "parameters": [
                     {
-                        "type": "integer",
-                        "description": "page",
-                        "name": "page",
-                        "in": "query"
-                    },
-                    {
-                        "type": "integer",
-                        "description": "page_size",
-                        "name": "page_size",
-                        "in": "query"
-                    },
-                    {
-                        "type": "string",
-                        "description": "order_by_field",
-                        "name": "order_by_field",
-                        "in": "query"
-                    },
-                    {
-                        "type": "string",
-                        "description": "sort_direction",
-                        "name": "sort_direction",
-                        "in": "query"
-                    },
-                    {
-                        "type": "string",
-                        "description": "Metadata filter",
-                        "name": "metadata",
-                        "in": "query"
-                    },
-                    {
-                        "type": "string",
-                        "description": "Conditions filter",
-                        "name": "conditions",
-                        "in": "query"
+                        "description": "SearchRequestParameters model containing metadata, conditions and query params",
+                        "name": "SearchRequestParameters",
+                        "in": "body",
+                        "schema": {
+                            "$ref": "#/definitions/actions.SearchRequestParameters"
+                        }
                     }
                 ],
                 "responses": {
                     "200": {
                         "description": "OK"
+                    }
+                }
+            }
+        },
+        "/v1/admin/xpub": {
+            "post": {
+                "security": [
+                    {
+                        "x-auth-xpub": []
+                    }
+                ],
+                "description": "Create xPub",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Admin"
+                ],
+                "summary": "Create xPub",
+                "parameters": [
+                    {
+                        "description": "CreateXpub model containing key and metadata",
+                        "name": "CreateXpub",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/admin.CreateXpub"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created"
                     }
                 }
             }
@@ -909,16 +736,12 @@
                 "summary": "Count xpubs",
                 "parameters": [
                     {
-                        "type": "string",
-                        "description": "Metadata filter",
-                        "name": "metadata",
-                        "in": "query"
-                    },
-                    {
-                        "type": "string",
-                        "description": "Conditions filter",
-                        "name": "conditions",
-                        "in": "query"
+                        "description": "CountRequestParameters model containing metadata and conditions",
+                        "name": "CountRequestParameters",
+                        "in": "body",
+                        "schema": {
+                            "$ref": "#/definitions/actions.CountRequestParameters"
+                        }
                     }
                 ],
                 "responses": {
@@ -945,40 +768,12 @@
                 "summary": "Search for xpubs",
                 "parameters": [
                     {
-                        "type": "integer",
-                        "description": "page",
-                        "name": "page",
-                        "in": "query"
-                    },
-                    {
-                        "type": "integer",
-                        "description": "page_size",
-                        "name": "page_size",
-                        "in": "query"
-                    },
-                    {
-                        "type": "string",
-                        "description": "order_by_field",
-                        "name": "order_by_field",
-                        "in": "query"
-                    },
-                    {
-                        "type": "string",
-                        "description": "sort_direction",
-                        "name": "sort_direction",
-                        "in": "query"
-                    },
-                    {
-                        "type": "string",
-                        "description": "Metadata filter",
-                        "name": "metadata",
-                        "in": "query"
-                    },
-                    {
-                        "type": "string",
-                        "description": "Conditions filter",
-                        "name": "conditions",
-                        "in": "query"
+                        "description": "SearchRequestParameters model containing metadata, conditions and query params",
+                        "name": "SearchRequestParameters",
+                        "in": "body",
+                        "schema": {
+                            "$ref": "#/definitions/actions.SearchRequestParameters"
+                        }
                     }
                 ],
                 "responses": {
@@ -1045,22 +840,12 @@
                 "summary": "Create a new destination",
                 "parameters": [
                     {
-                        "type": "string",
-                        "description": "type",
-                        "name": "type",
-                        "in": "query"
-                    },
-                    {
-                        "type": "string",
-                        "description": "reference_id",
-                        "name": "reference_id",
-                        "in": "query"
-                    },
-                    {
-                        "type": "string",
-                        "description": "metadata",
-                        "name": "metadata",
-                        "in": "query"
+                        "description": "CreateDestination model containing metadata",
+                        "name": "CreateDestination",
+                        "in": "body",
+                        "schema": {
+                            "$ref": "#/definitions/destinations.CreateDestination"
+                        }
                     }
                 ],
                 "responses": {
@@ -1085,30 +870,11 @@
                 "summary": "Update destination",
                 "parameters": [
                     {
-                        "type": "string",
-                        "description": "Destination ID",
-                        "name": "id",
-                        "in": "path"
-                    },
-                    {
-                        "type": "string",
-                        "description": "Destination Address",
-                        "name": "address",
-                        "in": "path"
-                    },
-                    {
-                        "type": "string",
-                        "description": "Destination Locking Script",
-                        "name": "locking_script",
-                        "in": "path"
-                    },
-                    {
-                        "description": "Destination Metadata",
-                        "name": "metadata",
+                        "description": "UpdateDestination model containing ids, address, locking_script and metadata",
+                        "name": "UpdateDestination",
                         "in": "body",
-                        "required": true,
                         "schema": {
-                            "type": "string"
+                            "$ref": "#/definitions/destinations.UpdateDestination"
                         }
                     }
                 ],
@@ -1136,16 +902,12 @@
                 "summary": "Count Destinations",
                 "parameters": [
                     {
-                        "type": "string",
-                        "description": "metadata",
-                        "name": "metadata",
-                        "in": "query"
-                    },
-                    {
-                        "type": "string",
-                        "description": "condition",
-                        "name": "condition",
-                        "in": "query"
+                        "description": "CountRequestParameters model containing metadata and conditions",
+                        "name": "CountRequestParameters",
+                        "in": "body",
+                        "schema": {
+                            "$ref": "#/definitions/actions.CountRequestParameters"
+                        }
                     }
                 ],
                 "responses": {
@@ -1156,7 +918,7 @@
             }
         },
         "/v1/destination/search": {
-            "get": {
+            "post": {
                 "security": [
                     {
                         "x-auth-xpub": []
@@ -1172,125 +934,12 @@
                 "summary": "Search for a destination",
                 "parameters": [
                     {
-                        "type": "integer",
-                        "description": "page",
-                        "name": "page",
-                        "in": "query"
-                    },
-                    {
-                        "type": "integer",
-                        "description": "page_size",
-                        "name": "page_size",
-                        "in": "query"
-                    },
-                    {
-                        "type": "string",
-                        "description": "order_by_field",
-                        "name": "order_by_field",
-                        "in": "query"
-                    },
-                    {
-                        "type": "string",
-                        "description": "sort_direction",
-                        "name": "sort_direction",
-                        "in": "query"
-                    },
-                    {
-                        "type": "string",
-                        "description": "metadata",
-                        "name": "metadata",
-                        "in": "query"
-                    },
-                    {
-                        "type": "string",
-                        "description": "condition",
-                        "name": "condition",
-                        "in": "query"
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK"
-                    }
-                }
-            }
-        },
-        "/v1/paymail": {
-            "post": {
-                "security": [
-                    {
-                        "x-auth-xpub": []
-                    }
-                ],
-                "description": "Create paymail",
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Paymails"
-                ],
-                "summary": "Create paymail",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "key",
-                        "name": "key",
-                        "in": "query",
-                        "required": true
-                    },
-                    {
-                        "type": "string",
-                        "description": "address",
-                        "name": "address",
-                        "in": "query",
-                        "required": true
-                    },
-                    {
-                        "type": "string",
-                        "description": "public_name",
-                        "name": "public_name",
-                        "in": "query"
-                    },
-                    {
-                        "type": "string",
-                        "description": "avatar",
-                        "name": "avatar",
-                        "in": "query"
-                    },
-                    {
-                        "type": "string",
-                        "description": "metadata",
-                        "name": "metadata",
-                        "in": "query"
-                    }
-                ],
-                "responses": {
-                    "201": {
-                        "description": "Created"
-                    }
-                }
-            },
-            "delete": {
-                "security": [
-                    {
-                        "x-auth-xpub": []
-                    }
-                ],
-                "description": "Delete paymail",
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Paymails"
-                ],
-                "summary": "Delete paymail",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "address",
-                        "name": "address",
-                        "in": "query",
-                        "required": true
+                        "description": "SearchRequestParameters model containing metadata, conditions and query params",
+                        "name": "SearchRequestParameters",
+                        "in": "body",
+                        "schema": {
+                            "$ref": "#/definitions/actions.SearchRequestParameters"
+                        }
                     }
                 ],
                 "responses": {
@@ -1346,17 +995,13 @@
                 "summary": "New transaction",
                 "parameters": [
                     {
-                        "type": "string",
-                        "description": "transaction config",
-                        "name": "config",
-                        "in": "query",
-                        "required": true
-                    },
-                    {
-                        "type": "string",
-                        "description": "metadata",
-                        "name": "metadata",
-                        "in": "query"
+                        "description": "NewTransaction model containing the transaction config and metadata",
+                        "name": "NewTransaction",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/transactions.NewTransaction"
+                        }
                     }
                 ],
                 "responses": {
@@ -1381,18 +1026,13 @@
                 "summary": "Update transaction",
                 "parameters": [
                     {
-                        "type": "string",
-                        "description": "id",
-                        "name": "id",
-                        "in": "query",
-                        "required": true
-                    },
-                    {
-                        "type": "string",
-                        "description": "metadata",
-                        "name": "metadata",
-                        "in": "query",
-                        "required": true
+                        "description": "UpdateTransaction model containing the transaction id and metadata",
+                        "name": "UpdateTransaction",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/transactions.UpdateTransaction"
+                        }
                     }
                 ],
                 "responses": {
@@ -1419,16 +1059,12 @@
                 "summary": "Count of transactions",
                 "parameters": [
                     {
-                        "type": "string",
-                        "description": "metadata",
-                        "name": "metadata",
-                        "in": "query"
-                    },
-                    {
-                        "type": "string",
-                        "description": "conditions",
-                        "name": "conditions",
-                        "in": "query"
+                        "description": "CountRequestParameters model containing metadata and conditions",
+                        "name": "CountRequestParameters",
+                        "in": "body",
+                        "schema": {
+                            "$ref": "#/definitions/actions.CountRequestParameters"
+                        }
                     }
                 ],
                 "responses": {
@@ -1453,28 +1089,6 @@
                     "Transactions"
                 ],
                 "summary": "Record transaction",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "hex",
-                        "name": "hex",
-                        "in": "query",
-                        "required": true
-                    },
-                    {
-                        "type": "string",
-                        "description": "reference_id",
-                        "name": "reference_id",
-                        "in": "query",
-                        "required": true
-                    },
-                    {
-                        "type": "string",
-                        "description": "metadata",
-                        "name": "metadata",
-                        "in": "query"
-                    }
-                ],
                 "responses": {
                     "200": {
                         "description": "OK"
@@ -1499,40 +1113,12 @@
                 "summary": "Search transaction",
                 "parameters": [
                     {
-                        "type": "integer",
-                        "description": "page",
-                        "name": "page",
-                        "in": "query"
-                    },
-                    {
-                        "type": "integer",
-                        "description": "page_size",
-                        "name": "page_size",
-                        "in": "query"
-                    },
-                    {
-                        "type": "string",
-                        "description": "order_by_field",
-                        "name": "order_by_field",
-                        "in": "query"
-                    },
-                    {
-                        "type": "string",
-                        "description": "sort_direction",
-                        "name": "sort_direction",
-                        "in": "query"
-                    },
-                    {
-                        "type": "string",
-                        "description": "metadata",
-                        "name": "metadata",
-                        "in": "query"
-                    },
-                    {
-                        "type": "string",
-                        "description": "conditions",
-                        "name": "conditions",
-                        "in": "query"
+                        "description": "SearchRequestParameters model containing metadata, conditions and query params",
+                        "name": "SearchRequestParameters",
+                        "in": "body",
+                        "schema": {
+                            "$ref": "#/definitions/actions.SearchRequestParameters"
+                        }
                     }
                 ],
                 "responses": {
@@ -1597,16 +1183,12 @@
                 "summary": "Count of UTXOs",
                 "parameters": [
                     {
-                        "type": "string",
-                        "description": "metadata",
-                        "name": "metadata",
-                        "in": "query"
-                    },
-                    {
-                        "type": "string",
-                        "description": "conditions",
-                        "name": "conditions",
-                        "in": "query"
+                        "description": "CountRequestParameters model containing metadata and conditions",
+                        "name": "CountRequestParameters",
+                        "in": "body",
+                        "schema": {
+                            "$ref": "#/definitions/actions.CountRequestParameters"
+                        }
                     }
                 ],
                 "responses": {
@@ -1633,72 +1215,17 @@
                 "summary": "Search UTXO",
                 "parameters": [
                     {
-                        "type": "integer",
-                        "description": "page",
-                        "name": "page",
-                        "in": "query"
-                    },
-                    {
-                        "type": "integer",
-                        "description": "page_size",
-                        "name": "page_size",
-                        "in": "query"
-                    },
-                    {
-                        "type": "string",
-                        "description": "order_by_field",
-                        "name": "order_by_field",
-                        "in": "query"
-                    },
-                    {
-                        "type": "string",
-                        "description": "sort_direction",
-                        "name": "sort_direction",
-                        "in": "query"
-                    },
-                    {
-                        "type": "string",
-                        "description": "metadata",
-                        "name": "metadata",
-                        "in": "query"
-                    },
-                    {
-                        "type": "string",
-                        "description": "conditions",
-                        "name": "conditions",
-                        "in": "query"
+                        "description": "SearchRequestParameters model containing metadata, conditions and query params",
+                        "name": "SearchRequestParameters",
+                        "in": "body",
+                        "schema": {
+                            "$ref": "#/definitions/actions.SearchRequestParameters"
+                        }
                     }
                 ],
                 "responses": {
                     "200": {
                         "description": "OK"
-                    }
-                }
-            }
-        },
-        "/v1/utxo/unreserve": {
-            "patch": {
-                "security": [
-                    {
-                        "x-auth-xpub": []
-                    }
-                ],
-                "description": "Unreserve UTXOs",
-                "tags": [
-                    "UTXO"
-                ],
-                "summary": "Unreserve UTXOs",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "draft tx id",
-                        "name": "reference_id",
-                        "in": "query"
-                    }
-                ],
-                "responses": {
-                    "201": {
-                        "description": "Created"
                     }
                 }
             }
@@ -1718,52 +1245,9 @@
                     "xPub"
                 ],
                 "summary": "Get xPub",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "key",
-                        "name": "key",
-                        "in": "query"
-                    }
-                ],
                 "responses": {
                     "200": {
                         "description": "OK"
-                    }
-                }
-            },
-            "post": {
-                "security": [
-                    {
-                        "x-auth-xpub": []
-                    }
-                ],
-                "description": "Create xPub",
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "xPub"
-                ],
-                "summary": "Create xPub",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "key",
-                        "name": "key",
-                        "in": "query",
-                        "required": true
-                    },
-                    {
-                        "type": "string",
-                        "description": "metadata",
-                        "name": "metadata",
-                        "in": "query"
-                    }
-                ],
-                "responses": {
-                    "201": {
-                        "description": "Created"
                     }
                 }
             },
@@ -1771,6 +1255,9 @@
                 "security": [
                     {
                         "x-auth-xpub": []
+                    },
+                    {
+                        "bux-auth-xpub": []
                     }
                 ],
                 "description": "Update xPub",
@@ -1783,10 +1270,12 @@
                 "summary": "Update xPub",
                 "parameters": [
                     {
-                        "type": "string",
-                        "description": "metadata",
-                        "name": "metadata",
-                        "in": "query"
+                        "description": "Metadata which should replace the already existing one",
+                        "name": "Metadata",
+                        "in": "body",
+                        "schema": {
+                            "$ref": "#/definitions/engine.Metadata"
+                        }
                     }
                 ],
                 "responses": {
@@ -1798,6 +1287,88 @@
         }
     },
     "definitions": {
+        "accesskeys.CreateAccessKey": {
+            "type": "object",
+            "properties": {
+                "metadata": {
+                    "$ref": "#/definitions/engine.Metadata"
+                }
+            }
+        },
+        "actions.CountRequestParameters": {
+            "type": "object",
+            "properties": {
+                "conditions": {
+                    "type": "object",
+                    "additionalProperties": true
+                },
+                "metadata": {
+                    "$ref": "#/definitions/engine.Metadata"
+                }
+            }
+        },
+        "actions.SearchRequestParameters": {
+            "type": "object",
+            "properties": {
+                "conditions": {
+                    "type": "object",
+                    "additionalProperties": true
+                },
+                "metadata": {
+                    "$ref": "#/definitions/engine.Metadata"
+                },
+                "params": {
+                    "$ref": "#/definitions/datastore.QueryParams"
+                }
+            }
+        },
+        "admin.CreatePaymail": {
+            "type": "object",
+            "properties": {
+                "address": {
+                    "type": "string"
+                },
+                "avatar": {
+                    "type": "string"
+                },
+                "metadata": {
+                    "$ref": "#/definitions/engine.Metadata"
+                },
+                "public_name": {
+                    "type": "string"
+                },
+                "xpub_id": {
+                    "type": "string"
+                }
+            }
+        },
+        "admin.CreateXpub": {
+            "type": "object",
+            "properties": {
+                "key": {
+                    "type": "string"
+                },
+                "metadata": {
+                    "$ref": "#/definitions/engine.Metadata"
+                }
+            }
+        },
+        "admin.PaymailAddress": {
+            "type": "object",
+            "properties": {
+                "address": {
+                    "type": "string"
+                }
+            }
+        },
+        "admin.RecordTransaction": {
+            "type": "object",
+            "properties": {
+                "hex": {
+                    "type": "string"
+                }
+            }
+        },
         "broadcast.SubmittedTx": {
             "type": "object",
             "properties": {
@@ -1890,6 +1461,124 @@
                 "Confirmed",
                 "Rejected"
             ]
+        },
+        "datastore.QueryParams": {
+            "type": "object",
+            "properties": {
+                "order_by_field": {
+                    "type": "string"
+                },
+                "page": {
+                    "type": "integer"
+                },
+                "page_size": {
+                    "type": "integer"
+                },
+                "sort_direction": {
+                    "type": "string"
+                }
+            }
+        },
+        "destinations.CreateDestination": {
+            "type": "object",
+            "properties": {
+                "metadata": {
+                    "$ref": "#/definitions/engine.Metadata"
+                }
+            }
+        },
+        "destinations.UpdateDestination": {
+            "type": "object",
+            "properties": {
+                "address": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "locking_script": {
+                    "type": "string"
+                },
+                "metadata": {
+                    "$ref": "#/definitions/engine.Metadata"
+                }
+            }
+        },
+        "engine.Metadata": {
+            "type": "object",
+            "additionalProperties": true
+        },
+        "models.Destination": {
+            "type": "object",
+            "properties": {
+                "address": {
+                    "description": "Address is a destination's address.",
+                    "type": "string"
+                },
+                "chain": {
+                    "description": "Chain is a destination's chain representation.",
+                    "type": "integer"
+                },
+                "created_at": {
+                    "description": "CreatedAt is a time when outer model was created.",
+                    "type": "string"
+                },
+                "deleted_at": {
+                    "description": "DeletedAt is a time when outer model was deleted.",
+                    "type": "string"
+                },
+                "draft_id": {
+                    "description": "DraftID is a destination's draft id.",
+                    "type": "string"
+                },
+                "id": {
+                    "description": "ID is a destination id.",
+                    "type": "string"
+                },
+                "locking_script": {
+                    "description": "LockingScript is a destination's locking script.",
+                    "type": "string"
+                },
+                "metadata": {
+                    "description": "Metadata is a metadata map of outer model.",
+                    "type": "object",
+                    "additionalProperties": true
+                },
+                "monitor": {
+                    "description": "Monitor is a time when destination was monitored.",
+                    "type": "string"
+                },
+                "num": {
+                    "description": "Num is a destination's num representation.",
+                    "type": "integer"
+                },
+                "type": {
+                    "description": "Type is a destination's type.",
+                    "type": "string"
+                },
+                "updated_at": {
+                    "description": "UpdatedAt is a time when outer model was updated.",
+                    "type": "string"
+                },
+                "xpub_id": {
+                    "description": "XpubID is a destination's xpub related id used to register destination.",
+                    "type": "string"
+                }
+            }
+        },
+        "transactions.NewTransaction": {
+            "type": "object"
+        },
+        "transactions.UpdateTransaction": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "string"
+                },
+                "metadata": {
+                    "$ref": "#/definitions/engine.Metadata"
+                }
+            }
         }
     },
     "securityDefinitions": {

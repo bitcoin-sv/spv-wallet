@@ -16,7 +16,7 @@ import (
 // @Description	Record transactions
 // @Tags		Admin
 // @Produce		json
-// @Param		hex query string true "Transaction hex"
+// @Param		RecordTransaction body RecordTransaction true "RecordTransaction model containing hex of the transaction to record"
 // @Success		201
 // @Router		/v1/admin/transactions/record [post]
 // @Security	x-auth-xpub
