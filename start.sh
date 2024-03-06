@@ -246,6 +246,10 @@ while [[ $# -gt 0 ]]; do
         paymail_domain="$2"
         shift
         ;;
+        -a|--admin-panel)
+        admin_panel="$2"
+        shift
+        ;;
         -e|--expose)
         expose="$2"
         shift
@@ -288,6 +292,9 @@ while [[ $# -gt 0 ]]; do
         echo -e "  -wf,  --wallet-frontend\t Whether the wallet-frontend should be run - true/false"
         echo -e "  -wb,  --wallet-backend\t Whether the wallet-backend should be run - true/false"
         echo -e "  --xprv\t\t\t Define admin xPriv"
+        echo ""
+        echo -e "<----------   SPV WALLET ADMIN SECTION"
+        echo -e "  -a,  --admin-panel\t Whether the spv-wallet-admin should be run - true/false"
         exit 1;
         shift
         ;;
@@ -323,6 +330,7 @@ if [ "$load_config" == "true" ]; then
             load_from 'RUN_WITH_DEFAULT_XPUB' default_xpub
             load_from 'SPVWALLET_AUTH_ADMIN_KEY' admin_xpub
             load_from 'SPVWALLET_ADMIN_XPRIV' admin_xpriv
+            load_from 'RUN_SPVWALLET_ADMIN' admin_panel
         done < ".env.config"
         print_success "Config loaded from .env.config file"
         print_debug "Config after loading .env.config:"
@@ -362,6 +370,13 @@ if [ "$spv_wallet" == "" ]; then
     ask_for_yes_or_no "Do you want to run spv-wallet?"
     spv_wallet="$choice"
     print_debug "spv_wallet: $spv_wallet"
+fi
+
+# <----------   SPV WALLET ADMIN SECTION
+if [ "$admin_panel" == "" ]; then
+    ask_for_yes_or_no "Do you want to run spv-wallet-admin?"
+    admin_panel="$choice"
+    print_debug "admin_panel: $admin_panel"
 fi
 
 # <----------   BLOCK HEADERS SERVICE SECTION
@@ -446,6 +461,7 @@ save_to 'RUN_IN_BACKGROUND' background
 save_to 'RUN_WITH_DEFAULT_XPUB' default_xpub
 save_to 'SPVWALLET_AUTH_ADMIN_KEY' admin_xpub
 save_to 'SPVWALLET_ADMIN_XPRIV' admin_xpriv
+save_to 'RUN_SPVWALLET_ADMIN' admin_panel
 case $database in
   postgresql)
     save_value 'SPVWALLET_DB_SQL_HOST' "wallet-postgresql"
@@ -543,6 +559,11 @@ fi
 
 if [ "$background" == "true" ]; then
   additionalFlags+=("-d")
+fi
+
+if [ "$admin_panel" == "true" ]; then
+  servicesToRun+=("spv-wallet-admin")
+  servicesToHideLogs+=("spv-wallet-admin")
 fi
 
 docker_compose_up  "${servicesToRun[*]} ${additionalFlags[*]} $(prefix_each '--no-attach ' ${servicesToHideLogs[*]})"

@@ -117,6 +117,14 @@ services:
       retries: 5
       start_period: 40s
 
+  spv-wallet-admin:
+    image: bsvb/spv-wallet-admin:latest
+    pull_policy: always
+    env_file:
+      - .env.config
+    ports:
+      - "3000:3000"
+
   wallet-gateway:
     image: traefik:v2.11
     container_name: traefik
