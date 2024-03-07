@@ -18,12 +18,12 @@ import (
 // @Router		/v1/admin/shared-config [get]
 // @Security	x-auth-xpub
 func (a *Action) sharedConfig(c *gin.Context) {
-	sharedConfig := sync.OnceValue(func() models.SharedConfig {
+	makeConfig := sync.OnceValue(func() models.SharedConfig {
 		return models.SharedConfig{
 			PaymilDomains:        a.AppConfig.Paymail.Domains,
 			ExperimentalFeatures: *a.AppConfig.ExperimentalFeatures,
 		}
 	})
 
-	c.JSON(http.StatusOK, sharedConfig)
+	c.JSON(http.StatusOK, makeConfig())
 }
