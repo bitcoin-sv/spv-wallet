@@ -116,7 +116,7 @@ func (s *Server) Handlers() *gin.Engine {
 // SetupServerRoutes will register endpoints for all models
 func SetupServerRoutes(appConfig *config.AppConfig, services *config.AppServices, engine *gin.Engine) {
 	adminRoutes := admin.NewHandler(appConfig, services)
-	baseRoutes := base.NewHandler(services)
+	baseRoutes := base.NewHandler()
 
 	accessKeyAPIRoutes := accesskeys.NewHandler(appConfig, services)
 	destinationBasicRoutes, destinationAPIRoutes := destinations.NewHandler(appConfig, services)
