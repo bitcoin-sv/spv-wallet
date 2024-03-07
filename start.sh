@@ -11,6 +11,9 @@ color_user="\033[0;35m"  # purple
 color_reset="\033[0m"
 choice=''
 
+# Constants
+default_xpriv_value="xprv9s21ZrQH143K3CbJXirfrtpLvhT3Vgusdo8coBritQ3rcS7Jy7sxWhatuxG5h2y1Cqj8FKmPp69536gmjYRpfga2MJdsGyBsnB12E19CESK"
+
 function print_debug() {
   if [ "$debug" == "true" ]; then
       echo -e "${color_debug}$1${color_reset}"
@@ -246,6 +249,10 @@ while [[ $# -gt 0 ]]; do
         paymail_domain="$2"
         shift
         ;;
+        -a|--admin-panel)
+        admin_panel="$2"
+        shift
+        ;;
         -e|--expose)
         expose="$2"
         shift
@@ -288,6 +295,9 @@ while [[ $# -gt 0 ]]; do
         echo -e "  -wf,  --wallet-frontend\t Whether the wallet-frontend should be run - true/false"
         echo -e "  -wb,  --wallet-backend\t Whether the wallet-backend should be run - true/false"
         echo -e "  --xprv\t\t\t Define admin xPriv"
+        echo ""
+        echo -e "<----------   SPV WALLET ADMIN SECTION"
+        echo -e "  -a,  --admin-panel\t Whether the spv-wallet-admin should be run - true/false"
         exit 1;
         shift
         ;;
@@ -323,6 +333,7 @@ if [ "$load_config" == "true" ]; then
             load_from 'RUN_WITH_DEFAULT_XPUB' default_xpub
             load_from 'SPVWALLET_AUTH_ADMIN_KEY' admin_xpub
             load_from 'SPVWALLET_ADMIN_XPRIV' admin_xpriv
+            load_from 'RUN_ADMIN_PANEL' admin_panel
         done < ".env.config"
         print_success "Config loaded from .env.config file"
         print_debug "Config after loading .env.config:"
@@ -364,6 +375,13 @@ if [ "$spv_wallet" == "" ]; then
     print_debug "spv_wallet: $spv_wallet"
 fi
 
+# <----------   SPV WALLET ADMIN SECTION
+if [ "$admin_panel" == "" ]; then
+    ask_for_yes_or_no "Do you want to run spv-wallet-admin?"
+    admin_panel="$choice"
+    print_debug "admin_panel: $admin_panel"
+fi
+
 # <----------   BLOCK HEADERS SERVICE SECTION
 if [ "$block_headers_service" == "" ]; then
     ask_for_yes_or_no "Do you want to run block-headers-service?"
@@ -389,6 +407,7 @@ if [ "$spv_wallet" == "true" ] && [ "$admin_xpub" == "" ] && [ "$default_xpub" !
 
     if [[ -n "$choice" ]]; then
         admin_xpub=$choice
+        default_xpub="false"
     else
         default_xpub="true"
     fi
@@ -396,10 +415,37 @@ if [ "$spv_wallet" == "true" ] && [ "$admin_xpub" == "" ] && [ "$default_xpub" !
     print_debug "default_xpub: $default_xpub"
 fi
 
+if [ "$spv_wallet" != "true" ] && [ "$wallet_backend" == "true" ] && [ "$admin_xpriv" == "" ]; then
+  ask_for_value "Define admin xPriv (Leave empty to use the default one)" 'xprv'
+
+  if [[ -n "$choice" ]]; then
+      admin_xpriv=$choice
+      default_xpub="false"
+  else
+      default_xpub="true"
+  fi
+  print_debug "default_xpub: $default_xpub"
+  print_debug "admin_xpriv: $admin_xpriv"
+fi
+
 if [ "$wallet_backend" == "true" ] && [ "$admin_xpriv" == "" ] && [ "$default_xpub" != "true" ]; then
   ask_for_value "Define admin xPriv (Leave empty to use the default one)" 'xprv'
   admin_xpriv=$choice
   print_debug "admin_xpriv: $admin_xpriv"
+fi
+
+if [ "$admin_panel" == "true" ] && [ "$default_xpub" == "true" ]; then
+    print_warning "To login to the admin panel, you will need to provide the admin xPriv."
+    print_warning "You choose to use default admin xPub, so you can use the following xPriv:"
+    print_warning "$default_xpriv_value"
+elif [ "$spv_wallet" == "true" ] && [ "$admin_panel" == "true" ] && [ "$default_xpub" != "true" ]; then
+    print_warning "To login to the admin panel, you will need to provide the admin xPriv."
+    print_warning "You choose to use custom admin xPub, therefore ensure you have xPriv for it to use in admin panel"
+elif [ "$spv_wallet" != "true" ] && [ "$admin_panel" == "true" ] && [ "$default_xpub" != "true" ]; then
+    print_warning "To login to the admin panel, you will need to provide the admin xPriv."
+    print_warning "You choose to not start spv-wallet, therefore ensure you have xPriv for it to use in admin panel"
+    print_warning "By default it should be:"
+    print_warning "$default_xpriv_value"
 fi
 
 if [ "$paymail_domain" == "" ] && { [ "$wallet_backend" == "true" ] || [ "$wallet_frontend" == "true" ] || [ "$spv_wallet" == "true" ]; }; then
@@ -412,13 +458,15 @@ if [ "$expose" == "" ]; then
     ask_for_yes_or_no "Do you want to expose the services on $paymail_domain and its subdomains?" "false"
     expose="$choice"
     print_debug "expose: $expose"
-    if [ "$expose" == "true" ]; then
-        print_warning "Following domains/subdomains should be registered"
-        print_warning "$paymail_domain => where the spv-wallet will be running"
-        print_warning "wallet.$paymail_domain => where the web frontend will be running"
-        print_warning "api.$paymail_domain => where the web backend will be running"
-        print_warning "headers.$paymail_domain => where the block-headers-service will be running"
-    fi
+fi
+
+if [ "$expose" == "true" ]; then
+    print_warning "Following domains/subdomains should be registered"
+    print_warning "$paymail_domain => where the spv-wallet will be running"
+    print_warning "wallet.$paymail_domain => where the web frontend will be running"
+    print_warning "api.$paymail_domain => where the web backend will be running"
+    print_warning "headers.$paymail_domain => where the block-headers-service will be running"
+    print_warning "admin.$paymail_domain => where the admin panel will be running"
 fi
 
 if [ "$background" == "" ]; then
@@ -446,6 +494,20 @@ save_to 'RUN_IN_BACKGROUND' background
 save_to 'RUN_WITH_DEFAULT_XPUB' default_xpub
 save_to 'SPVWALLET_AUTH_ADMIN_KEY' admin_xpub
 save_to 'SPVWALLET_ADMIN_XPRIV' admin_xpriv
+if [ "$admin_panel" == "true" ] && [ "$default_xpub" == "true" ]; then
+    {
+        echo "# Use the following xPriv to login to the admin panel:" >> ".env.config"
+        echo "# $default_xpriv_value"
+    } >> ".env.config"
+elif [ "$spv_wallet" != "true" ] && [ "$admin_panel" == "true" ] && [ "$default_xpub" != "true" ]; then
+    {
+        echo "# You choose to not start spv-wallet, to log in to admin you need admin xPriv"
+        echo "# By default it is:"
+        echo "# $default_xpriv_value"
+    } >> ".env.config"
+fi
+
+save_to 'RUN_ADMIN_PANEL' admin_panel
 case $database in
   postgresql)
     save_value 'SPVWALLET_DB_SQL_HOST' "wallet-postgresql"
@@ -535,10 +597,21 @@ if [ "$expose" == "true" ]; then
         servicesToHideLogs+=("wallet-gateway")
     fi
     export RUN_API_DOMAIN="api.$paymail_domain"
+    export RUN_SPVWALLET_DOMAIN="$paymail_domain"
     export RUN_SECURED_PROTOCOL_SUFFIX="s"
 else
     export RUN_API_DOMAIN="localhost:8180"
+    export RUN_SPVWALLET_DOMAIN="localhost:3003"
     export RUN_SECURED_PROTOCOL_SUFFIX=""
+fi
+print_debug "Exporting following variables:"
+print_debug "  RUN_API_DOMAIN=$RUN_API_DOMAIN"
+print_debug "  RUN_SPVWALLET_DOMAIN=$RUN_SPVWALLET_DOMAIN"
+print_debug "  RUN_SECURED_PROTOCOL_SUFFIX=$RUN_SECURED_PROTOCOL_SUFFIX"
+
+if [ "$admin_panel" == "true" ]; then
+  servicesToRun+=("spv-wallet-admin")
+  servicesToHideLogs+=("spv-wallet-admin")
 fi
 
 if [ "$background" == "true" ]; then

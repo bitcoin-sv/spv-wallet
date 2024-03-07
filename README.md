@@ -331,6 +331,20 @@ There are two way of running this script:
   ```bash
   ./start.sh -l
   ```
+
+
+Ports which are used:
+
+- 3002 - SPV Wallet web-frontend
+- 8180 - SPV Wallet web-backend
+- 3003 - SPV Wallet (core service)
+- 3000 - SPV Wallet admin
+- 5432 - PostgreSQL DB
+- 6379 - Redis
+- 8080 - Block Headers Service
+- 27017 - MongoDB
+- 80 - in case of exposing on the paymail domain and its subdomains
+- 443 - in case of exposing on the paymail domain and its subdomains
 <br/>
 
 ## Code Standards

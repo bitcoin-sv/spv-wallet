@@ -57,6 +57,24 @@ services:
     volumes:
       - block-headers-service-data:/app/data
 
+  spv-wallet-admin:
+    image: bsvb/spv-wallet-admin:latest
+    pull_policy: always
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.admin.rule=Host(`admin.${RUN_PAYMAIL_DOMAIN}`)"
+      - "traefik.http.routers.admin.entrypoints=websecure"
+      - "traefik.http.routers.admin.tls=true"
+      - "traefik.http.routers.admin.tls.certresolver=httpsresolver"
+      - "traefik.http.services.admin.loadbalancer.server.port=3000"
+    env_file:
+      - .env.config
+    ports:
+      - "3000:3000"
+    configs:
+      - source: admin-env-config
+        target: /usr/share/nginx/html/env-config.json
+
   spv-wallet:
     image: bsvb/spv-wallet:latest
     pull_policy: always
@@ -135,7 +153,6 @@ services:
     ports:
       - "80:80"
       - "443:443"
-      - "8980:8080"
     volumes:
       - "/var/run/docker.sock:/var/run/docker.sock:ro"
       - "wallet-gateway-data:/gateway"
@@ -162,4 +179,10 @@ configs:
           "paymailDomain": "${RUN_PAYMAIL_DOMAIN}",
           "apiUrl": "http${RUN_SECURED_PROTOCOL_SUFFIX}://${RUN_API_DOMAIN}",
           "wsUrl": "ws${RUN_SECURED_PROTOCOL_SUFFIX}://${RUN_API_DOMAIN}/api/websocket"
+      }
+  admin-env-config:
+    content: |
+      {
+        "serverUrl": "http${RUN_SECURED_PROTOCOL_SUFFIX}://${RUN_SPVWALLET_DOMAIN}/v1",
+        "hideServerUrl": false
       }
