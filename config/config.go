@@ -6,6 +6,7 @@ import (
 
 	"github.com/bitcoin-sv/spv-wallet/engine/cluster"
 	"github.com/bitcoin-sv/spv-wallet/engine/taskmanager"
+	"github.com/bitcoin-sv/spv-wallet/models"
 	"github.com/mrz1836/go-cachestore"
 	"github.com/mrz1836/go-datastore"
 )
@@ -58,7 +59,7 @@ type AppConfig struct {
 	// Metrics is a configuration for metrics in SPV Wallet.
 	Metrics *MetricsConfig `json:"metrics" mapstructure:"metrics"`
 	// ExperimentalFeatures is a configuration that allows to enable features that are considered experimental/non-production.
-	ExperimentalFeatures *ExperimentalConfig `json:"experimental_features" mapstructure:"experimental_features"`
+	ExperimentalFeatures *models.ExperimentalConfig `json:"experimental_features" mapstructure:"experimental_features"`
 }
 
 // AuthenticationConfig is the configuration for Authentication
@@ -247,11 +248,6 @@ type ServerConfig struct {
 type MetricsConfig struct {
 	// Enabled is a flag for enabling metrics.
 	Enabled bool `json:"enabled" mapstructure:"enabled"`
-}
-
-// ExperimentalConfig represents a feature flag config.
-type ExperimentalConfig struct {
-	PikeEnabled bool `json:"pike_enabled" mapstructure:"pike_enabled"`
 }
 
 // GetUserAgent will return the outgoing user agent
