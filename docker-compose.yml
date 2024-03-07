@@ -118,29 +118,29 @@ services:
       start_period: 40s
 
   wallet-gateway:
-      image: traefik:v2.11
-      container_name: traefik
-      command:
-        - "--log.level=DEBUG"
-        - "--api.insecure=true"
-        - "--providers.docker=true"
-        - "--providers.docker.exposedbydefault=false"
-        - "--entrypoints.web.address=:80"
-        - "--entrypoints.websecure.address=:443"
-        - "--entrypoints.web.http.redirections.entrypoint.to=websecure"
-        - "--entrypoints.web.http.redirections.entrypoint.scheme=https"
-        - "--entrypoints.web.http.redirections.entrypoint.permanent=true"
-        - "--certificatesresolvers.httpsresolver.acme.storage=/gateway/acme.json"
-        - "--certificatesresolvers.httpsresolver.acme.tlschallenge=true"
-      ports:
-        - "80:80"
-        - "443:443"
-        - "8980:8080"
-      volumes:
-        - "/var/run/docker.sock:/var/run/docker.sock:ro"
-        - "wallet-gateway-data:/gateway"
-      labels:
-        - "traefik.enable=true"
+    image: traefik:v2.11
+    container_name: traefik
+    command:
+      - "--log.level=DEBUG"
+      - "--api.insecure=true"
+      - "--providers.docker=true"
+      - "--providers.docker.exposedbydefault=false"
+      - "--entrypoints.web.address=:80"
+      - "--entrypoints.websecure.address=:443"
+      - "--entrypoints.web.http.redirections.entrypoint.to=websecure"
+      - "--entrypoints.web.http.redirections.entrypoint.scheme=https"
+      - "--entrypoints.web.http.redirections.entrypoint.permanent=true"
+      - "--certificatesresolvers.httpsresolver.acme.storage=/gateway/acme.json"
+      - "--certificatesresolvers.httpsresolver.acme.tlschallenge=true"
+    ports:
+      - "80:80"
+      - "443:443"
+      - "8980:8080"
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock:ro"
+      - "wallet-gateway-data:/gateway"
+    labels:
+      - "traefik.enable=true"
 
 
 volumes:
