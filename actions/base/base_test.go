@@ -31,7 +31,7 @@ func (ts *TestSuite) SetupTest() {
 	// Load the router & register routes
 	ts.Router = gin.Default()
 	require.NotNil(ts.T(), ts.Router)
-	routes := NewHandler(ts.AppConfig, ts.Services)
+	routes := NewHandler(ts.Services)
 	routes.RegisterBaseEndpoints(ts.Router.Group(""))
 }
 

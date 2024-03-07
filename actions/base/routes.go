@@ -8,7 +8,7 @@ import (
 )
 
 // NewHandler creates the specific package routes
-func NewHandler(appConfig *config.AppConfig, services *config.AppServices) routes.BaseEndpointsFunc {
+func NewHandler(services *config.AppServices) routes.BaseEndpointsFunc {
 	basicEndpoints := routes.BaseEndpointsFunc(func(router *gin.RouterGroup) {
 		router.GET("/", index)
 		router.OPTIONS("/", actions.StatusOK)
