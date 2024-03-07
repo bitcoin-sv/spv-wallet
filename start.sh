@@ -17,6 +17,10 @@ function print_debug() {
   fi
 }
 
+function print_info() {
+  echo -e "$1"
+}
+
 function print_success() {
   echo -e "${color_success}$1${color_reset}"
 }
@@ -242,17 +246,21 @@ while [[ $# -gt 0 ]]; do
         paymail_domain="$2"
         shift
         ;;
-        -l|--load)
-        load_config="true"
-        # no additional arguments so now `shift` command
+        -e|--expose)
+        expose="$2"
+        shift
         ;;
         -b|--background)
-        background="true"
-        # no additional arguments so now `shift` command
+        background="$2"
+        shift
+        ;;
+        -l|--load)
+        load_config="true"
+        # no additional arguments so no `shift` command
         ;;
         -d|--debug)
         debug="true"
-        # no additional arguments so now `shift` command
+        # no additional arguments so no `shift` command
         ;;
         -h|--help)
         echo -e "Usage: ./start.sh [OPTIONS]"
@@ -261,8 +269,9 @@ while [[ $# -gt 0 ]]; do
         echo ""
         echo -e "Options:"
         echo -e "  -pm,  --paymail\t\t PayMail domain for which to run all applications"
+        echo -e "  -e,   --expose\t\t Whether to expose the services PayMail domain and its subdomains - true/false"
         echo -e "  -l,   --load\t\t\t Load previously stored config from .env.config file"
-        echo -e "  -b,   --background\t\t Whether the applications should be run in background"
+        echo -e "  -b,   --background\t\t Whether the applications should be run in background - true/false"
         echo -e "  -d,   --debug\t\t\t Run in debug mode"
         echo -e "  -h,   --help\t\t\t Show this message"
         echo -e ""
@@ -309,6 +318,7 @@ if [ "$load_config" == "true" ]; then
             load_from 'RUN_SPVWALLET_FRONTEND' wallet_frontend
             load_from 'RUN_SPVWALLET_BACKEND' wallet_backend
             load_from 'RUN_PAYMAIL_DOMAIN' paymail_domain
+            load_from 'RUN_EXPOSED' expose
             load_from 'RUN_IN_BACKGROUND' background
             load_from 'RUN_WITH_DEFAULT_XPUB' default_xpub
             load_from 'SPVWALLET_AUTH_ADMIN_KEY' admin_xpub
@@ -398,6 +408,19 @@ if [ "$paymail_domain" == "" ] && { [ "$wallet_backend" == "true" ] || [ "$walle
     print_debug "paymail_domain: $paymail_domain"
 fi
 
+if [ "$expose" == "" ]; then
+    ask_for_yes_or_no "Do you want to expose the services on $paymail_domain and its subdomains?" "false"
+    expose="$choice"
+    print_debug "expose: $expose"
+    if [ "$expose" == "true" ]; then
+        print_warning "Following domains/subdomains should be registered"
+        print_warning "$paymail_domain => where the spv-wallet will be running"
+        print_warning "wallet.$paymail_domain => where the web frontend will be running"
+        print_warning "api.$paymail_domain => where the web backend will be running"
+        print_warning "headers.$paymail_domain => where the block-headers-service will be running"
+    fi
+fi
+
 if [ "$background" == "" ]; then
     ask_for_yes_or_no "Do you want to run everything in the background?" "false"
     background="$choice"
@@ -418,6 +441,7 @@ save_to 'RUN_BLOCK_HEADERS_SERVICE' block_headers_service
 save_to 'RUN_PAYMAIL_DOMAIN' paymail_domain
 save_to 'RUN_SPVWALLET_FRONTEND' wallet_frontend
 save_to 'RUN_SPVWALLET_BACKEND' wallet_backend
+save_to 'RUN_EXPOSED' expose
 save_to 'RUN_IN_BACKGROUND' background
 save_to 'RUN_WITH_DEFAULT_XPUB' default_xpub
 save_to 'SPVWALLET_AUTH_ADMIN_KEY' admin_xpub
@@ -452,6 +476,13 @@ if [ "$block_headers_service" == "true" ]; then
 else
   save_value 'SPVWALLET_PAYMAIL_BEEF_BLOCK_HEADER_SERVICE_URL' "http://host.docker.internal:8080/api/v1/chain/merkleroot/verify"
 fi
+
+if [ "$expose" == "true" ]; then
+  save_value 'HTTP_SERVER_CORS_ALLOWEDDOMAINS' "https://wallet.$paymail_domain"
+else
+  save_value 'HTTP_SERVER_CORS_ALLOWEDDOMAINS' "http://localhost:3002"
+fi
+
 print_debug "Exporting RUN_PAYMAIL_DOMAIN environment variable"
 export RUN_PAYMAIL_DOMAIN="$paymail_domain"
 
@@ -496,6 +527,18 @@ fi
 if [ "$wallet_frontend" == "true" ]; then
   servicesToRun+=("wallet-frontend")
   servicesToHideLogs+=("wallet-frontend")
+fi
+
+if [ "$expose" == "true" ]; then
+    servicesToRun+=("wallet-gateway")
+    if [ "$debug" != "true" ]; then
+        servicesToHideLogs+=("wallet-gateway")
+    fi
+    export RUN_API_DOMAIN="api.$paymail_domain"
+    export RUN_SECURED_PROTOCOL_SUFFIX="s"
+else
+    export RUN_API_DOMAIN="localhost:8180"
+    export RUN_SECURED_PROTOCOL_SUFFIX=""
 fi
 
 if [ "$background" == "true" ]; then
