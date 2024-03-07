@@ -247,20 +247,20 @@ while [[ $# -gt 0 ]]; do
         shift
         ;;
         -e|--expose)
-        expose="true"
-        # no additional arguments so now `shift` command
+        expose="$2"
+        shift
+        ;;
+        -b|--background)
+        background="$2"
+        shift
         ;;
         -l|--load)
         load_config="true"
-        # no additional arguments so now `shift` command
-        ;;
-        -b|--background)
-        background="true"
-        # no additional arguments so now `shift` command
+        # no additional arguments so no `shift` command
         ;;
         -d|--debug)
         debug="true"
-        # no additional arguments so now `shift` command
+        # no additional arguments so no `shift` command
         ;;
         -h|--help)
         echo -e "Usage: ./start.sh [OPTIONS]"
@@ -269,9 +269,9 @@ while [[ $# -gt 0 ]]; do
         echo ""
         echo -e "Options:"
         echo -e "  -pm,  --paymail\t\t PayMail domain for which to run all applications"
-        echo -e "  -e,   --expose\t\t Expose the services PayMail domain and its subdomains"
+        echo -e "  -e,   --expose\t\t Whether to expose the services PayMail domain and its subdomains - true/false"
         echo -e "  -l,   --load\t\t\t Load previously stored config from .env.config file"
-        echo -e "  -b,   --background\t\t Whether the applications should be run in background"
+        echo -e "  -b,   --background\t\t Whether the applications should be run in background - true/false"
         echo -e "  -d,   --debug\t\t\t Run in debug mode"
         echo -e "  -h,   --help\t\t\t Show this message"
         echo -e ""
