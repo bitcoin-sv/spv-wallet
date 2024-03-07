@@ -401,7 +401,7 @@
                 "summary": "Get paymail",
                 "parameters": [
                     {
-                        "description": "CreateAccessKey model containing paymail address",
+                        "description": "PaymailAddress model containing paymail address",
                         "name": "PaymailAddress",
                         "in": "body",
                         "required": true,
@@ -783,6 +783,54 @@
                 }
             }
         },
+        "/v1/contact": {
+            "post": {
+                "security": [
+                    {
+                        "bux-auth-xpub": []
+                    }
+                ],
+                "description": "Create contact",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Contact"
+                ],
+                "summary": "Create contact",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "fullName",
+                        "name": "fullName",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "paymail",
+                        "name": "paymail",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "pubKey",
+                        "name": "pubKey",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "metadata",
+                        "name": "metadata",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created"
+                    }
+                }
+            }
+        },
         "/v1/destination": {
             "get": {
                 "security": [
@@ -870,7 +918,7 @@
                 "summary": "Update destination",
                 "parameters": [
                     {
-                        "description": "UpdateDestination model containing ids, address, locking_script and metadata",
+                        "description": "UpdateDestination model containing an id, address, locking_script and metadata",
                         "name": "UpdateDestination",
                         "in": "body",
                         "schema": {
@@ -1566,8 +1614,530 @@
                 }
             }
         },
+        "models.FeeUnit": {
+            "type": "object",
+            "properties": {
+                "bytes": {
+                    "description": "Bytes is a fee unit bytes representation.",
+                    "type": "integer"
+                },
+                "satoshis": {
+                    "description": "Satoshis is a fee unit satoshis amount.",
+                    "type": "integer"
+                }
+            }
+        },
+        "models.MapProtocol": {
+            "type": "object",
+            "properties": {
+                "app": {
+                    "description": "App is a map protocol app.",
+                    "type": "string"
+                },
+                "keys": {
+                    "description": "Keys is a map protocol keys.",
+                    "type": "object",
+                    "additionalProperties": true
+                },
+                "type": {
+                    "description": "Type is a map protocol type.",
+                    "type": "string"
+                }
+            }
+        },
+        "models.OpReturn": {
+            "type": "object",
+            "properties": {
+                "hex": {
+                    "description": "Hex is a full hex of op return.",
+                    "type": "string"
+                },
+                "hex_parts": {
+                    "description": "HexParts is a slice of splitted hex parts.",
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "map": {
+                    "description": "Map is a pointer to a map protocol object.",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/models.MapProtocol"
+                        }
+                    ]
+                },
+                "string_parts": {
+                    "description": "StringParts is a slice of string parts.",
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                }
+            }
+        },
+        "models.PaymailP4": {
+            "type": "object",
+            "properties": {
+                "alias": {
+                    "description": "Alias is a paymail p4 alias.",
+                    "type": "string"
+                },
+                "domain": {
+                    "description": "Domain is a paymail p4 domain.",
+                    "type": "string"
+                },
+                "from_paymail": {
+                    "description": "FromPaymail is a paymail p4 from paymail.",
+                    "type": "string"
+                },
+                "note": {
+                    "description": "Note is a paymail p4 note.",
+                    "type": "string"
+                },
+                "pub_key": {
+                    "description": "PubKey is a paymail p4 pub key.",
+                    "type": "string"
+                },
+                "receive_endpoint": {
+                    "description": "ReceiveEndpoint is a paymail p4 receive endpoint.",
+                    "type": "string"
+                },
+                "reference_id": {
+                    "description": "ReferenceID is a paymail p4 reference id.",
+                    "type": "string"
+                },
+                "resolution_type": {
+                    "description": "ResolutionType is a paymail p4 resolution type.",
+                    "type": "string"
+                }
+            }
+        },
+        "models.ScriptOutput": {
+            "type": "object",
+            "properties": {
+                "address": {
+                    "description": "Address is a script output address.",
+                    "type": "string"
+                },
+                "satoshis": {
+                    "description": "Satoshis is a script output satoshis.",
+                    "type": "integer"
+                },
+                "script": {
+                    "description": "Script is a script output script.",
+                    "type": "string"
+                },
+                "script_type": {
+                    "description": "ScriptType is a script output script type.",
+                    "type": "string"
+                }
+            }
+        },
+        "models.SyncConfig": {
+            "type": "object",
+            "properties": {
+                "broadcast": {
+                    "description": "Broadcast is a flag that indicates whether to broadcast transaction or not.",
+                    "type": "boolean"
+                },
+                "broadcast_instant": {
+                    "description": "BroadcastInstant is a flag that indicates whether to broadcast transaction instantly or not.",
+                    "type": "boolean"
+                },
+                "paymail_p2p": {
+                    "description": "PaymailP2P is a flag that indicates whether to use paymail p2p or not.",
+                    "type": "boolean"
+                },
+                "sync_on_chain": {
+                    "description": "SyncOnChain is a flag that indicates whether to sync transaction on chain or not.",
+                    "type": "boolean"
+                }
+            }
+        },
+        "models.Transaction": {
+            "type": "object",
+            "properties": {
+                "block_hash": {
+                    "description": "BlockHash is a block hash that transaction is in.",
+                    "type": "string"
+                },
+                "block_height": {
+                    "description": "BlockHeight is a block height that transaction is in.",
+                    "type": "integer"
+                },
+                "created_at": {
+                    "description": "CreatedAt is a time when outer model was created.",
+                    "type": "string"
+                },
+                "deleted_at": {
+                    "description": "DeletedAt is a time when outer model was deleted.",
+                    "type": "string"
+                },
+                "direction": {
+                    "description": "TransactionDirection is a transaction direction (inbound/outbound).",
+                    "type": "string"
+                },
+                "draft_id": {
+                    "description": "DraftID is a transaction related draft id.",
+                    "type": "string"
+                },
+                "fee": {
+                    "description": "Fee is a transaction fee.",
+                    "type": "integer"
+                },
+                "hex": {
+                    "description": "Hex is a transaction hex.",
+                    "type": "string"
+                },
+                "id": {
+                    "description": "ID is a transaction id.",
+                    "type": "string"
+                },
+                "metadata": {
+                    "description": "Metadata is a metadata map of outer model.",
+                    "type": "object",
+                    "additionalProperties": true
+                },
+                "number_of_inputs": {
+                    "description": "NumberOfInputs is a number of transaction inputs.",
+                    "type": "integer"
+                },
+                "number_of_outputs": {
+                    "description": "NumberOfOutputs is a number of transaction outputs.",
+                    "type": "integer"
+                },
+                "output_value": {
+                    "description": "OutputValue is a total output value.",
+                    "type": "integer"
+                },
+                "outputs": {
+                    "description": "Outputs represents all spv-wallet-transaction outputs. Will be shown only for admin.",
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "integer"
+                    }
+                },
+                "status": {
+                    "description": "Status is a transaction status.",
+                    "type": "string"
+                },
+                "total_value": {
+                    "description": "TotalValue is a total input value.",
+                    "type": "integer"
+                },
+                "updated_at": {
+                    "description": "UpdatedAt is a time when outer model was updated.",
+                    "type": "string"
+                },
+                "xpub_in_ids": {
+                    "description": "XpubInIDs is a slice of xpub input ids.",
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "xpub_out_ids": {
+                    "description": "XpubOutIDs is a slice of xpub output ids.",
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                }
+            }
+        },
+        "models.TransactionConfig": {
+            "type": "object",
+            "properties": {
+                "change_destinations": {
+                    "description": "ChangeDestinations is a slice of change destinations.",
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/models.Destination"
+                    }
+                },
+                "change_destinations_strategy": {
+                    "description": "ChangeStrategy is a change strategy.",
+                    "type": "string"
+                },
+                "change_minimum_satoshis": {
+                    "description": "ChangeMinimumSatoshis is a minimum satoshis for change.",
+                    "type": "integer"
+                },
+                "change_number_of_destinations": {
+                    "description": "ChangeNumberOfDestinations is a number of change destinations.",
+                    "type": "integer"
+                },
+                "change_satoshis": {
+                    "description": "ChangeSatoshis is a change satoshis.",
+                    "type": "integer"
+                },
+                "expires_in": {
+                    "description": "ExpiresAt is a time when transaction expires.",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/time.Duration"
+                        }
+                    ]
+                },
+                "fee": {
+                    "description": "Fee is a fee amount.",
+                    "type": "integer"
+                },
+                "fee_unit": {
+                    "description": "FeeUnit is a pointer to a fee unit object.",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/models.FeeUnit"
+                        }
+                    ]
+                },
+                "from_utxos": {
+                    "description": "FromUtxos is a slice of from utxos used to build transaction.",
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/models.UtxoPointer"
+                    }
+                },
+                "include_utxos": {
+                    "description": "IncludeUtxos is a slice of utxos to include in transaction.",
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/models.UtxoPointer"
+                    }
+                },
+                "inputs": {
+                    "description": "Inputs is a slice of transaction inputs.",
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/models.TransactionInput"
+                    }
+                },
+                "outputs": {
+                    "description": "Outputs is a slice of transaction outputs.",
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/models.TransactionOutput"
+                    }
+                },
+                "send_all_to": {
+                    "description": "SendAllTo is a pointer to a transaction output object.",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/models.TransactionOutput"
+                        }
+                    ]
+                },
+                "sync": {
+                    "description": "Sync contains sync configuration.",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/models.SyncConfig"
+                        }
+                    ]
+                }
+            }
+        },
+        "models.TransactionInput": {
+            "type": "object",
+            "properties": {
+                "created_at": {
+                    "description": "CreatedAt is a time when outer model was created.",
+                    "type": "string"
+                },
+                "deleted_at": {
+                    "description": "DeletedAt is a time when outer model was deleted.",
+                    "type": "string"
+                },
+                "destination": {
+                    "description": "Destination is a pointer to a destination object.",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/models.Destination"
+                        }
+                    ]
+                },
+                "draft_id": {
+                    "description": "DraftID is a utxo transaction related draft id.",
+                    "type": "string"
+                },
+                "id": {
+                    "description": "ID is a utxo id.",
+                    "type": "string"
+                },
+                "metadata": {
+                    "description": "Metadata is a metadata map of outer model.",
+                    "type": "object",
+                    "additionalProperties": true
+                },
+                "output_index": {
+                    "description": "OutputIndex is a output index that utxo points to.",
+                    "type": "integer"
+                },
+                "reserved_at": {
+                    "description": "ReservedAt is a time utxo was reserved at.",
+                    "type": "string"
+                },
+                "satoshis": {
+                    "description": "Satoshis is a utxo satoshis amount.",
+                    "type": "integer"
+                },
+                "script_pub_key": {
+                    "description": "ScriptPubKey is a utxo script pub key.",
+                    "type": "string"
+                },
+                "spending_tx_id": {
+                    "description": "SpendingTxID is a spending transaction id - null if not spent yet.",
+                    "type": "string"
+                },
+                "transaction": {
+                    "description": "Transaction is a transaction pointer that utxo points to.",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/models.Transaction"
+                        }
+                    ]
+                },
+                "transaction_id": {
+                    "description": "TransactionID is a transaction id that utxo points to.",
+                    "type": "string"
+                },
+                "type": {
+                    "description": "Type is a utxo type.",
+                    "type": "string"
+                },
+                "updated_at": {
+                    "description": "UpdatedAt is a time when outer model was updated.",
+                    "type": "string"
+                },
+                "xpub_id": {
+                    "description": "XpubID is a utxo related xpub id.",
+                    "type": "string"
+                }
+            }
+        },
+        "models.TransactionOutput": {
+            "type": "object",
+            "properties": {
+                "op_return": {
+                    "description": "OpReturn is a pointer to a op return object.",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/models.OpReturn"
+                        }
+                    ]
+                },
+                "paymail_p4": {
+                    "description": "PaymailP4 is a pointer to a paymail p4 object.",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/models.PaymailP4"
+                        }
+                    ]
+                },
+                "satoshis": {
+                    "description": "Satoshis is a satoshis amount.",
+                    "type": "integer"
+                },
+                "script": {
+                    "description": "Script is a transaction output string representation of script.",
+                    "type": "string"
+                },
+                "scripts": {
+                    "description": "ScriptType is a transaction output script type.",
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/models.ScriptOutput"
+                    }
+                },
+                "to": {
+                    "description": "To is a transaction output destination address.",
+                    "type": "string"
+                },
+                "use_for_change": {
+                    "description": "UseForChange is a flag that indicates if this output should be used for change.",
+                    "type": "boolean"
+                }
+            }
+        },
+        "models.UtxoPointer": {
+            "type": "object",
+            "properties": {
+                "output_index": {
+                    "description": "OutputIndex is a output index that utxo points to.",
+                    "type": "integer"
+                },
+                "transaction_id": {
+                    "description": "TransactionID is a transaction id that utxo points to.",
+                    "type": "string"
+                }
+            }
+        },
+        "time.Duration": {
+            "type": "integer",
+            "enum": [
+                -9223372036854775808,
+                9223372036854775807,
+                1,
+                1000,
+                1000000,
+                1000000000,
+                60000000000,
+                3600000000000,
+                -9223372036854775808,
+                9223372036854775807,
+                1,
+                1000,
+                1000000,
+                1000000000,
+                60000000000,
+                3600000000000,
+                -9223372036854775808,
+                9223372036854775807,
+                1,
+                1000,
+                1000000,
+                1000000000,
+                60000000000,
+                3600000000000
+            ],
+            "x-enum-varnames": [
+                "minDuration",
+                "maxDuration",
+                "Nanosecond",
+                "Microsecond",
+                "Millisecond",
+                "Second",
+                "Minute",
+                "Hour",
+                "minDuration",
+                "maxDuration",
+                "Nanosecond",
+                "Microsecond",
+                "Millisecond",
+                "Second",
+                "Minute",
+                "Hour",
+                "minDuration",
+                "maxDuration",
+                "Nanosecond",
+                "Microsecond",
+                "Millisecond",
+                "Second",
+                "Minute",
+                "Hour"
+            ]
+        },
         "transactions.NewTransaction": {
-            "type": "object"
+            "type": "object",
+            "properties": {
+                "config": {
+                    "$ref": "#/definitions/models.TransactionConfig"
+                },
+                "metadata": {
+                    "$ref": "#/definitions/engine.Metadata"
+                }
+            }
         },
         "transactions.UpdateTransaction": {
             "type": "object",

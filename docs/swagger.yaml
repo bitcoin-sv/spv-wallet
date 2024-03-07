@@ -204,7 +204,387 @@ definitions:
         description: XpubID is a destination's xpub related id used to register destination.
         type: string
     type: object
+  models.FeeUnit:
+    properties:
+      bytes:
+        description: Bytes is a fee unit bytes representation.
+        type: integer
+      satoshis:
+        description: Satoshis is a fee unit satoshis amount.
+        type: integer
+    type: object
+  models.MapProtocol:
+    properties:
+      app:
+        description: App is a map protocol app.
+        type: string
+      keys:
+        additionalProperties: true
+        description: Keys is a map protocol keys.
+        type: object
+      type:
+        description: Type is a map protocol type.
+        type: string
+    type: object
+  models.OpReturn:
+    properties:
+      hex:
+        description: Hex is a full hex of op return.
+        type: string
+      hex_parts:
+        description: HexParts is a slice of splitted hex parts.
+        items:
+          type: string
+        type: array
+      map:
+        allOf:
+        - $ref: '#/definitions/models.MapProtocol'
+        description: Map is a pointer to a map protocol object.
+      string_parts:
+        description: StringParts is a slice of string parts.
+        items:
+          type: string
+        type: array
+    type: object
+  models.PaymailP4:
+    properties:
+      alias:
+        description: Alias is a paymail p4 alias.
+        type: string
+      domain:
+        description: Domain is a paymail p4 domain.
+        type: string
+      from_paymail:
+        description: FromPaymail is a paymail p4 from paymail.
+        type: string
+      note:
+        description: Note is a paymail p4 note.
+        type: string
+      pub_key:
+        description: PubKey is a paymail p4 pub key.
+        type: string
+      receive_endpoint:
+        description: ReceiveEndpoint is a paymail p4 receive endpoint.
+        type: string
+      reference_id:
+        description: ReferenceID is a paymail p4 reference id.
+        type: string
+      resolution_type:
+        description: ResolutionType is a paymail p4 resolution type.
+        type: string
+    type: object
+  models.ScriptOutput:
+    properties:
+      address:
+        description: Address is a script output address.
+        type: string
+      satoshis:
+        description: Satoshis is a script output satoshis.
+        type: integer
+      script:
+        description: Script is a script output script.
+        type: string
+      script_type:
+        description: ScriptType is a script output script type.
+        type: string
+    type: object
+  models.SyncConfig:
+    properties:
+      broadcast:
+        description: Broadcast is a flag that indicates whether to broadcast transaction
+          or not.
+        type: boolean
+      broadcast_instant:
+        description: BroadcastInstant is a flag that indicates whether to broadcast
+          transaction instantly or not.
+        type: boolean
+      paymail_p2p:
+        description: PaymailP2P is a flag that indicates whether to use paymail p2p
+          or not.
+        type: boolean
+      sync_on_chain:
+        description: SyncOnChain is a flag that indicates whether to sync transaction
+          on chain or not.
+        type: boolean
+    type: object
+  models.Transaction:
+    properties:
+      block_hash:
+        description: BlockHash is a block hash that transaction is in.
+        type: string
+      block_height:
+        description: BlockHeight is a block height that transaction is in.
+        type: integer
+      created_at:
+        description: CreatedAt is a time when outer model was created.
+        type: string
+      deleted_at:
+        description: DeletedAt is a time when outer model was deleted.
+        type: string
+      direction:
+        description: TransactionDirection is a transaction direction (inbound/outbound).
+        type: string
+      draft_id:
+        description: DraftID is a transaction related draft id.
+        type: string
+      fee:
+        description: Fee is a transaction fee.
+        type: integer
+      hex:
+        description: Hex is a transaction hex.
+        type: string
+      id:
+        description: ID is a transaction id.
+        type: string
+      metadata:
+        additionalProperties: true
+        description: Metadata is a metadata map of outer model.
+        type: object
+      number_of_inputs:
+        description: NumberOfInputs is a number of transaction inputs.
+        type: integer
+      number_of_outputs:
+        description: NumberOfOutputs is a number of transaction outputs.
+        type: integer
+      output_value:
+        description: OutputValue is a total output value.
+        type: integer
+      outputs:
+        additionalProperties:
+          type: integer
+        description: Outputs represents all spv-wallet-transaction outputs. Will be
+          shown only for admin.
+        type: object
+      status:
+        description: Status is a transaction status.
+        type: string
+      total_value:
+        description: TotalValue is a total input value.
+        type: integer
+      updated_at:
+        description: UpdatedAt is a time when outer model was updated.
+        type: string
+      xpub_in_ids:
+        description: XpubInIDs is a slice of xpub input ids.
+        items:
+          type: string
+        type: array
+      xpub_out_ids:
+        description: XpubOutIDs is a slice of xpub output ids.
+        items:
+          type: string
+        type: array
+    type: object
+  models.TransactionConfig:
+    properties:
+      change_destinations:
+        description: ChangeDestinations is a slice of change destinations.
+        items:
+          $ref: '#/definitions/models.Destination'
+        type: array
+      change_destinations_strategy:
+        description: ChangeStrategy is a change strategy.
+        type: string
+      change_minimum_satoshis:
+        description: ChangeMinimumSatoshis is a minimum satoshis for change.
+        type: integer
+      change_number_of_destinations:
+        description: ChangeNumberOfDestinations is a number of change destinations.
+        type: integer
+      change_satoshis:
+        description: ChangeSatoshis is a change satoshis.
+        type: integer
+      expires_in:
+        allOf:
+        - $ref: '#/definitions/time.Duration'
+        description: ExpiresAt is a time when transaction expires.
+      fee:
+        description: Fee is a fee amount.
+        type: integer
+      fee_unit:
+        allOf:
+        - $ref: '#/definitions/models.FeeUnit'
+        description: FeeUnit is a pointer to a fee unit object.
+      from_utxos:
+        description: FromUtxos is a slice of from utxos used to build transaction.
+        items:
+          $ref: '#/definitions/models.UtxoPointer'
+        type: array
+      include_utxos:
+        description: IncludeUtxos is a slice of utxos to include in transaction.
+        items:
+          $ref: '#/definitions/models.UtxoPointer'
+        type: array
+      inputs:
+        description: Inputs is a slice of transaction inputs.
+        items:
+          $ref: '#/definitions/models.TransactionInput'
+        type: array
+      outputs:
+        description: Outputs is a slice of transaction outputs.
+        items:
+          $ref: '#/definitions/models.TransactionOutput'
+        type: array
+      send_all_to:
+        allOf:
+        - $ref: '#/definitions/models.TransactionOutput'
+        description: SendAllTo is a pointer to a transaction output object.
+      sync:
+        allOf:
+        - $ref: '#/definitions/models.SyncConfig'
+        description: Sync contains sync configuration.
+    type: object
+  models.TransactionInput:
+    properties:
+      created_at:
+        description: CreatedAt is a time when outer model was created.
+        type: string
+      deleted_at:
+        description: DeletedAt is a time when outer model was deleted.
+        type: string
+      destination:
+        allOf:
+        - $ref: '#/definitions/models.Destination'
+        description: Destination is a pointer to a destination object.
+      draft_id:
+        description: DraftID is a utxo transaction related draft id.
+        type: string
+      id:
+        description: ID is a utxo id.
+        type: string
+      metadata:
+        additionalProperties: true
+        description: Metadata is a metadata map of outer model.
+        type: object
+      output_index:
+        description: OutputIndex is a output index that utxo points to.
+        type: integer
+      reserved_at:
+        description: ReservedAt is a time utxo was reserved at.
+        type: string
+      satoshis:
+        description: Satoshis is a utxo satoshis amount.
+        type: integer
+      script_pub_key:
+        description: ScriptPubKey is a utxo script pub key.
+        type: string
+      spending_tx_id:
+        description: SpendingTxID is a spending transaction id - null if not spent
+          yet.
+        type: string
+      transaction:
+        allOf:
+        - $ref: '#/definitions/models.Transaction'
+        description: Transaction is a transaction pointer that utxo points to.
+      transaction_id:
+        description: TransactionID is a transaction id that utxo points to.
+        type: string
+      type:
+        description: Type is a utxo type.
+        type: string
+      updated_at:
+        description: UpdatedAt is a time when outer model was updated.
+        type: string
+      xpub_id:
+        description: XpubID is a utxo related xpub id.
+        type: string
+    type: object
+  models.TransactionOutput:
+    properties:
+      op_return:
+        allOf:
+        - $ref: '#/definitions/models.OpReturn'
+        description: OpReturn is a pointer to a op return object.
+      paymail_p4:
+        allOf:
+        - $ref: '#/definitions/models.PaymailP4'
+        description: PaymailP4 is a pointer to a paymail p4 object.
+      satoshis:
+        description: Satoshis is a satoshis amount.
+        type: integer
+      script:
+        description: Script is a transaction output string representation of script.
+        type: string
+      scripts:
+        description: ScriptType is a transaction output script type.
+        items:
+          $ref: '#/definitions/models.ScriptOutput'
+        type: array
+      to:
+        description: To is a transaction output destination address.
+        type: string
+      use_for_change:
+        description: UseForChange is a flag that indicates if this output should be
+          used for change.
+        type: boolean
+    type: object
+  models.UtxoPointer:
+    properties:
+      output_index:
+        description: OutputIndex is a output index that utxo points to.
+        type: integer
+      transaction_id:
+        description: TransactionID is a transaction id that utxo points to.
+        type: string
+    type: object
+  time.Duration:
+    enum:
+    - -9223372036854775808
+    - 9223372036854775807
+    - 1
+    - 1000
+    - 1000000
+    - 1000000000
+    - 60000000000
+    - 3600000000000
+    - -9223372036854775808
+    - 9223372036854775807
+    - 1
+    - 1000
+    - 1000000
+    - 1000000000
+    - 60000000000
+    - 3600000000000
+    - -9223372036854775808
+    - 9223372036854775807
+    - 1
+    - 1000
+    - 1000000
+    - 1000000000
+    - 60000000000
+    - 3600000000000
+    type: integer
+    x-enum-varnames:
+    - minDuration
+    - maxDuration
+    - Nanosecond
+    - Microsecond
+    - Millisecond
+    - Second
+    - Minute
+    - Hour
+    - minDuration
+    - maxDuration
+    - Nanosecond
+    - Microsecond
+    - Millisecond
+    - Second
+    - Minute
+    - Hour
+    - minDuration
+    - maxDuration
+    - Nanosecond
+    - Microsecond
+    - Millisecond
+    - Second
+    - Minute
+    - Hour
   transactions.NewTransaction:
+    properties:
+      config:
+        $ref: '#/definitions/models.TransactionConfig'
+      metadata:
+        $ref: '#/definitions/engine.Metadata'
     type: object
   transactions.UpdateTransaction:
     properties:
@@ -452,7 +832,7 @@ paths:
     post:
       description: Get paymail
       parameters:
-      - description: CreateAccessKey model containing paymail address
+      - description: PaymailAddress model containing paymail address
         in: body
         name: PaymailAddress
         required: true
@@ -691,6 +1071,36 @@ paths:
       summary: Search for xpubs
       tags:
       - Admin
+  /v1/contact:
+    post:
+      description: Create contact
+      parameters:
+      - description: fullName
+        in: query
+        name: fullName
+        type: string
+      - description: paymail
+        in: query
+        name: paymail
+        type: string
+      - description: pubKey
+        in: query
+        name: pubKey
+        type: string
+      - description: metadata
+        in: query
+        name: metadata
+        type: string
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+      security:
+      - bux-auth-xpub: []
+      summary: Create contact
+      tags:
+      - Contact
   /v1/destination:
     get:
       description: Get a destination
@@ -720,7 +1130,7 @@ paths:
     patch:
       description: Update destination
       parameters:
-      - description: UpdateDestination model containing ids, address, locking_script
+      - description: UpdateDestination model containing an id, address, locking_script
           and metadata
         in: body
         name: UpdateDestination

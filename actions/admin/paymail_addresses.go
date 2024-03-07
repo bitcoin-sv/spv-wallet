@@ -13,7 +13,7 @@ import (
 // @Summary		Get paymail
 // @Description	Get paymail
 // @Tags		Admin
-// @Param		PaymailAddress body PaymailAddress true "CreateAccessKey model containing paymail address"
+// @Param		PaymailAddress body PaymailAddress true "PaymailAddress model containing paymail address"
 // @Produce		json
 // @Success		200
 // @Router		/v1/admin/paymail/get [post]
