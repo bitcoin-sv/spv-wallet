@@ -2,7 +2,10 @@ package models
 
 import "github.com/bitcoin-sv/spv-wallet/models/common"
 
-type ContactStatus string
+type CreateContactResponse struct {
+	Contact        *Contact          `json:"contact"`
+	AdditionalInfo map[string]string `json:"additionalInfo"`
+}
 
 type Contact struct {
 	common.Model
@@ -17,5 +20,5 @@ type Contact struct {
 
 	PubKey string `json:"pubKey"`
 
-	Status ContactStatus `json:"status"`
+	Status string `json:"status"`
 }

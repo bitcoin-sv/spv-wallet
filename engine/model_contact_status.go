@@ -9,9 +9,13 @@ import (
 type ContactStatus string
 
 const (
-	ContactStatusNotConf     ContactStatus = notConfirmed
-	ContactStatusAwaitAccept ContactStatus = awaitingAcceptance
-	ContactStatusConfirmed   ContactStatus = confirmed
+	strContactStatusNotConfirmed = "unconfirmed"
+	strContactStatusAwaiting     = "awaiting"
+	strContactStatusConfirmed    = "confirmed"
+
+	ContactNotConfirmed ContactStatus = strContactStatusNotConfirmed
+	ContactAwaitAccept  ContactStatus = strContactStatusAwaiting
+	ContactConfirmed    ContactStatus = strContactStatusConfirmed
 )
 
 // Scan will scan the value into Struct, implements sql.Scanner interface
@@ -22,12 +26,12 @@ func (t *ContactStatus) Scan(value interface{}) error {
 	}
 
 	switch stringValue {
-	case notConfirmed:
-		*t = ContactStatusNotConf
-	case awaitingAcceptance:
-		*t = ContactStatusAwaitAccept
-	case confirmed:
-		*t = ContactStatusConfirmed
+	case strContactStatusNotConfirmed:
+		*t = ContactNotConfirmed
+	case strContactStatusAwaiting:
+		*t = ContactAwaitAccept
+	case strContactStatusConfirmed:
+		*t = ContactConfirmed
 	}
 
 	return nil

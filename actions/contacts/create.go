@@ -1,10 +1,12 @@
 package contacts
 
 import (
+	"errors"
 	"net/http"
 
 	"github.com/bitcoin-sv/spv-wallet/engine"
 	"github.com/bitcoin-sv/spv-wallet/mappings"
+	"github.com/bitcoin-sv/spv-wallet/models"
 	"github.com/bitcoin-sv/spv-wallet/server/auth"
 	"github.com/gin-gonic/gin"
 )
@@ -38,11 +40,21 @@ func (a *Action) create(c *gin.Context) {
 		requesterPubKey, req.RequesterFullName, req.RequesterPaymail,
 		engine.WithMetadatas(req.Metadata))
 
-	if err != nil {
+	if err != nil && !errors.Is(err, engine.ErrAddingContactRequest) {
 		c.JSON(http.StatusUnprocessableEntity, err.Error())
 		return
 	}
 
-	contract := mappings.MapToContactContract(contact)
+	contract := &models.CreateContactResponse{
+		Contact: mappings.MapToContactContract(contact),
+	}
+
+	if err != nil {
+		ai := make(map[string]string)
+		ai["warning"] = err.Error()
+
+		contract.AdditionalInfo = ai
+	}
+
 	c.JSON(http.StatusCreated, contract)
 }

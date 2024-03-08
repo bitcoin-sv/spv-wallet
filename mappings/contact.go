@@ -19,6 +19,19 @@ func MapToContactContract(c *engine.Contact) *models.Contact {
 		Paymail:  c.Paymail,
 		PubKey:   c.PubKey,
 		XpubID:   c.OwnerXpubID,
-		Status:   models.ContactStatus(c.Status),
+		Status:   mapContactStatus(c.Status),
+	}
+}
+
+func mapContactStatus(s engine.ContactStatus) string {
+	switch s {
+	case engine.ContactNotConfirmed:
+		return "uncofirmed"
+	case engine.ContactAwaitAccept:
+		return "awaiting"
+	case engine.ContactConfirmed:
+		return "confirmed"
+	default:
+		return "unknown"
 	}
 }

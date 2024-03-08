@@ -9,7 +9,10 @@ import (
 	"github.com/bitcoin-sv/spv-wallet/engine/utils"
 )
 
-var ErrInvalidRequesterPaymail = errors.New("invalid requester paymail address")
+var (
+	ErrInvalidRequesterPaymail = errors.New("invalid requester paymail address")
+	ErrAddingContactRequest    = errors.New("adding contact request failed")
+)
 
 func (c *Client) AddContact(ctx context.Context, ctcFName, ctcPaymail, requesterPKey, requesterFName, requesterPaymail string, opts ...ModelOps) (*Contact, error) {
 	requesterXPubId := utils.Hash(requesterPKey)
@@ -37,7 +40,7 @@ func (c *Client) AddContact(ctx context.Context, ctcFName, ctcPaymail, requester
 		fullName: ctcFName,
 		paymail:  contactPaymail,
 		pubKey:   contactPki.PubKey,
-		status:   ContactStatusNotConf,
+		status:   ContactNotConfirmed,
 		opts:     opts,
 	}
 
@@ -56,6 +59,8 @@ func (c *Client) AddContact(ctx context.Context, ctcFName, ctcPaymail, requester
 			Str("requesterPaymil", requesterPaymail).
 			Str("requestedContact", ctcPaymail).
 			Msgf("adding contact request failed: %s", err.Error())
+
+		return contact, ErrAddingContactRequest
 	}
 
 	return contact, nil
@@ -78,7 +83,7 @@ func (c *Client) AddContactRequest(ctx context.Context, fullName, paymailAdress,
 		fullName: fullName,
 		paymail:  contactPaymail,
 		pubKey:   contactPki.PubKey,
-		status:   ContactStatusAwaitAccept,
+		status:   ContactAwaitAccept,
 		opts:     opts,
 	}
 

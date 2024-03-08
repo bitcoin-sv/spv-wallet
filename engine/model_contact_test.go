@@ -12,7 +12,7 @@ func Test_contact_validate_success(t *testing.T) {
 	t.Run("valid contact", func(t *testing.T) {
 		// given
 		contact := newContact("Homer Simpson", "homer@springfield.7g", "xpubblablahomer",
-			"fafagasfaufrusfrusfrbsur", ContactStatusNotConf)
+			"fafagasfaufrusfrusfrbsur", ContactNotConfirmed)
 
 		// when
 		err := contact.validate()
@@ -31,27 +31,27 @@ func Test_contact_validate_returns_error(t *testing.T) {
 	}{
 		{
 			name:         "empty full name",
-			contact:      newContact("", "donot@know.who", "xpubblablablabla", "ownerspbubid", ContactStatusNotConf),
+			contact:      newContact("", "donot@know.who", "xpubblablablabla", "ownerspbubid", ContactNotConfirmed),
 			expetedError: ErrMissingContactFullName,
 		},
 		{
 			name:         "empty paymail",
-			contact:      newContact("Homer Simpson", "", "xpubblablahomer", "ownerspbubid", ContactStatusNotConf),
+			contact:      newContact("Homer Simpson", "", "xpubblablahomer", "ownerspbubid", ContactNotConfirmed),
 			expetedError: errors.New("paymail address failed format validation: "),
 		},
 		{
 			name:         "invalid paymail",
-			contact:      newContact("Marge Simpson", "definitely not paymail", "xpubblablamarge", "ownerspbubid", ContactStatusNotConf),
+			contact:      newContact("Marge Simpson", "definitely not paymail", "xpubblablamarge", "ownerspbubid", ContactNotConfirmed),
 			expetedError: fmt.Errorf("paymail address failed format validation: definitely not paymail"),
 		},
 		{
 			name:         "empty pubKey",
-			contact:      newContact("Bart Simpson", "bart@springfield.com", "", "ownerspbubid", ContactStatusNotConf),
+			contact:      newContact("Bart Simpson", "bart@springfield.com", "", "ownerspbubid", ContactNotConfirmed),
 			expetedError: ErrMissingContactXPubKey,
 		},
 		{
 			name:         "no owner id",
-			contact:      newContact("Lisa Simpson", "lisa@springfield.com", "xpubblablalisa", "", ContactStatusNotConf),
+			contact:      newContact("Lisa Simpson", "lisa@springfield.com", "xpubblablalisa", "", ContactNotConfirmed),
 			expetedError: ErrMissingContactOwnerXPubId,
 		},
 		{
@@ -82,7 +82,7 @@ func Test_getContact(t *testing.T) {
 		defer deferMe()
 
 		contact := newContact("Homer Simpson", "homer@springfield.7g", "xpubblablahomer",
-			"fafagasfaufrusfrusfrbsur", ContactStatusNotConf, WithClient(client))
+			"fafagasfaufrusfrusfrbsur", ContactNotConfirmed, WithClient(client))
 
 		err := contact.Save(ctx)
 		require.NoError(t, err)
@@ -107,7 +107,7 @@ func Test_getContact(t *testing.T) {
 		defer deferMe()
 
 		contact := newContact("Marge Simpson", "Marge@springfield.7g", "xpubblablamarge",
-			"fafagasfaufrusfrusfrbsur", ContactStatusNotConf, WithClient(client))
+			"fafagasfaufrusfrusfrbsur", ContactNotConfirmed, WithClient(client))
 
 		err := contact.Save(ctx)
 		require.NoError(t, err)

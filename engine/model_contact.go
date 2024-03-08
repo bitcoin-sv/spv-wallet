@@ -5,7 +5,7 @@ import (
 	"errors"
 
 	"github.com/bitcoin-sv/go-paymail"
-	"github.com/bitcoin-sv/spv-wallet/engine/utils"
+	"github.com/google/uuid"
 	"github.com/mrz1836/go-datastore"
 )
 
@@ -14,7 +14,7 @@ type Contact struct {
 	Model `bson:",inline"`
 
 	// Model specific fields
-	ID          string        `json:"id" toml:"id" yaml:"id" gorm:"<-:create;type:char(64);primaryKey;comment:This is the unique contact id" bson:"_id"`
+	ID          string        `json:"id" toml:"id" yaml:"id" gorm:"<-:create;type:char(36);primaryKey;comment:This is the unique contact id" bson:"_id"`
 	OwnerXpubID string        `json:"xpub_id" toml:"xpub_id" yaml:"xpub_id" gorm:"column:xpub_id;<-:create;type:char(64);foreignKey:XpubID;reference:ID;index;comment:This is the related xPub" bson:"xpub_id"`
 	FullName    string        `json:"full_name" toml:"full_name" yaml:"full_name" gorm:"<-create;comment:This is the contact's full name" bson:"full_name"`
 	Paymail     string        `json:"paymail" toml:"paymail" yaml:"paymail" gorm:"<-create;comment:This is the paymail address alias@domain.com" bson:"paymail"`
@@ -26,11 +26,11 @@ func newContact(fullName, paymailAddress, pubKey, ownerXpubID string, status Con
 	contact := Contact{
 		Model: *NewBaseModel(ModelContact, opts...),
 
-		ID:          utils.Hash(ownerXpubID + paymailAddress),
+		ID:          uuid.NewString(),
 		OwnerXpubID: ownerXpubID,
 
 		FullName: fullName,
-		Paymail:  paymailAddress,
+		Paymail:  paymail.SanitizeEmail(paymailAddress),
 		PubKey:   pubKey,
 		Status:   status,
 	}
