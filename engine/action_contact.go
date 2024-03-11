@@ -54,6 +54,40 @@ func (c *Client) NewContact(ctx context.Context, fullName, paymail, senderPubKey
 	return contact, nil
 }
 
+func (c *Client) UpdateContact(ctx context.Context, fullName, pubKey, xPubID, paymailAddr string, status ContactStatus, opts ...ModelOps) (*Contact, error) {
+	contact, err := getContactByXPubIdAndRequesterPubKey(ctx, xPubID, paymailAddr, opts...)
+
+	if err != nil {
+		return nil, fmt.Errorf("failed to get contact: %w", err)
+	}
+
+	if contact == nil {
+		return nil, fmt.Errorf("contact not found")
+	}
+
+	if fullName != "" {
+		contact.FullName = fullName
+	}
+
+	if pubKey != "" {
+		contact.PubKey = pubKey
+	}
+
+	if status != "" {
+		contact.Status = status
+	}
+
+	if paymailAddr != "" {
+		contact.Paymail = paymailAddr
+	}
+
+	if err = contact.Save(ctx); err != nil {
+		return nil, err
+	}
+
+	return contact, nil
+}
+
 func (c *Client) GetPubKeyFromPki(pkiUrl, paymailAddress string) (string, error) {
 	if pkiUrl == "" {
 		return "", errors.New("pkiUrl should not be empty")

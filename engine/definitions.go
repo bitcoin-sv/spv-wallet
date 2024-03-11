@@ -94,7 +94,7 @@ const (
 	bumpField            = "bump"
 	fullNameField        = "full_name"
 	paymailField         = "paymail"
-	senderXPubField      = "pub_key"
+	xPubKeyField         = "pub_key"
 
 	// Universal statuses
 	statusCanceled   = "canceled"

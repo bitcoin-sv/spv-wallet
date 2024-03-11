@@ -11,6 +11,9 @@ const (
 	fullName     = "John Doe"
 	paymailTest  = "test@paymail.com"
 	senderPubKey = "senderPubKey"
+	xpubKey      = "xpub661MyMwAqRbcEp7YgDpGXquSF2NW3GBAU3SXTikFT1nkxHGbxjG9RgGxr9X3D4AYsJ6ZqYjMGcdUsPDQZoeibKECs5d56f1w9rfF3QrAAu9"
+	xPubId       = "62910a1ecbc7728afad563ab3f8aa70568ed934d1e0383cb1bbbfb1bc8f2afe5"
+	paymailAddr  = "test.test@mail.test"
 )
 
 func Test_newContact(t *testing.T) {
@@ -100,5 +103,72 @@ func Test_getContact(t *testing.T) {
 
 		require.Nil(t, contact)
 		require.NoError(t, err)
+	})
+}
+
+func Test_getContactByXPubIdAndPubKey(t *testing.T) {
+	t.Run("valid xPubId and paymailAddr", func(t *testing.T) {
+		ctx, client, deferMe := CreateTestSQLiteClient(t, false, false, withTaskManagerMockup())
+		defer deferMe()
+		var opts []ModelOps
+		createdContact, err := newContact(
+			fullName,
+			paymailAddr,
+			xpubKey,
+			append(opts, client.DefaultModelOptions(
+				New(),
+			)...)...,
+		)
+		createdContact.PubKey = "testPubKey"
+		err = createdContact.Save(ctx)
+
+		contact, err := getContactByXPubIdAndRequesterPubKey(ctx, createdContact.XpubID, createdContact.Paymail, client.DefaultModelOptions()...)
+
+		require.NotNil(t, contact)
+		require.NoError(t, err)
+	})
+
+	t.Run("empty xPubId", func(t *testing.T) {
+		ctx, client, deferMe := CreateTestSQLiteClient(t, false, false, withTaskManagerMockup())
+		defer deferMe()
+
+		var opts []ModelOps
+		createdContact, err := newContact(
+			fullName,
+			paymailAddr,
+			xpubKey,
+			append(opts, client.DefaultModelOptions(
+				New(),
+			)...)...,
+		)
+		createdContact.PubKey = "testPubKey"
+		err = createdContact.Save(ctx)
+
+		contact, err := getContactByXPubIdAndRequesterPubKey(ctx, "", createdContact.Paymail, client.DefaultModelOptions()...)
+
+		require.Nil(t, contact)
+		require.Error(t, err)
+	})
+
+	t.Run("empty paymailAddr", func(t *testing.T) {
+		ctx, client, deferMe := CreateTestSQLiteClient(t, false, false, withTaskManagerMockup())
+		defer deferMe()
+
+		var opts []ModelOps
+		createdContact, err := newContact(
+			fullName,
+			paymailAddr,
+			xpubKey,
+			append(opts, client.DefaultModelOptions(
+				New(),
+			)...)...,
+		)
+		createdContact.PubKey = "testPubKey"
+		err = createdContact.Save(ctx)
+
+		contact, err := getContactByXPubIdAndRequesterPubKey(ctx, createdContact.XpubID, "", client.DefaultModelOptions()...)
+
+		require.Nil(t, contact)
+		require.Error(t, err)
 	})
 }

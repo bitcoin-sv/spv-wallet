@@ -3,6 +3,7 @@ package engine
 import (
 	"context"
 	"errors"
+	"fmt"
 	"github.com/bitcoin-sv/go-paymail"
 	"github.com/bitcoin-sv/spv-wallet/engine/utils"
 	"github.com/mrz1836/go-datastore"
@@ -55,8 +56,8 @@ func getContact(ctx context.Context, fullName, paymailAddress, senderPubKey stri
 	contact.enrich(ModelContact, opts...)
 
 	conditions := map[string]interface{}{
-		senderXPubField: senderPubKey,
-		paymailField:    paymailAddress,
+		xPubKeyField: senderPubKey,
+		paymailField: paymailAddress,
 	}
 
 	if err := Get(ctx, contact, conditions, false, defaultDatabaseReadTimeout, false); err != nil {
@@ -67,6 +68,38 @@ func getContact(ctx context.Context, fullName, paymailAddress, senderPubKey stri
 	}
 
 	return contact, nil
+}
+
+func getContactByXPubIdAndRequesterPubKey(ctx context.Context, xPubId, paymailAddr string, opts ...ModelOps) (*Contact, error) {
+
+	if xPubId == "" {
+		return nil, fmt.Errorf("xpub_id is empty")
+	}
+
+	if paymailAddr == "" {
+		return nil, fmt.Errorf("paymail address is empty")
+	}
+	contact := &Contact{
+		XpubID:  xPubId,
+		Paymail: paymailAddr,
+	}
+
+	contact.enrich(ModelContact, opts...)
+
+	conditions := map[string]interface{}{
+		xPubIDField:  xPubId,
+		paymailField: paymailAddr,
+	}
+
+	if err := Get(ctx, contact, conditions, false, defaultDatabaseReadTimeout, false); err != nil {
+		if errors.Is(err, datastore.ErrNoResults) {
+			return nil, nil
+		}
+		return nil, err
+	}
+
+	return contact, nil
+
 }
 
 func (c *Contact) GetModelName() string {
