@@ -54,7 +54,7 @@ func (a *Action) transactionsSearch(c *gin.Context) {
 // @Description	Count transactions
 // @Tags		Admin
 // @Produce		json
-// @Param		CountRequestParameters body actions.CountRequestParameters false "Supports targeted resource asset counting with filters for metadata and custom conditions"
+// @Param		CountRequestParameters body actions.CountRequestParameters false "Enables precise filtering of resource counts using custom conditions or metadata, catering to specific business or analysis needs"
 // @Success		200	{number} int64 "Count of transactions"
 // @Failure		400	"Bad request - Error while parsing CountRequestParameters from request body"
 // @Failure 	500	"Internal Server Error - Error while fetching count of transactions"
