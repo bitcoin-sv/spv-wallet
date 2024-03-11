@@ -20,8 +20,10 @@ import (
 func (a *Action) sharedConfig(c *gin.Context) {
 	makeConfig := sync.OnceValue(func() models.SharedConfig {
 		return models.SharedConfig{
-			PaymilDomains:        a.AppConfig.Paymail.Domains,
-			ExperimentalFeatures: *a.AppConfig.ExperimentalFeatures,
+			PaymilDomains: a.AppConfig.Paymail.Domains,
+			ExperimentalFeatures: map[string]bool{
+				"pike_enabled": a.AppConfig.ExperimentalFeatures.PikeEnabled,
+			},
 		}
 	})
 

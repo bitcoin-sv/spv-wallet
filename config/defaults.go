@@ -3,7 +3,6 @@ package config
 import (
 	"time"
 
-	"github.com/bitcoin-sv/spv-wallet/models"
 	"github.com/google/uuid"
 	"github.com/mrz1836/go-datastore"
 )
@@ -180,8 +179,8 @@ func getMetricsDefaults() *MetricsConfig {
 	}
 }
 
-func getExperimentalFeaturesConfig() *models.ExperimentalConfig {
-	return &models.ExperimentalConfig{
+func getExperimentalFeaturesConfig() *ExperimentalConfig {
+	return &ExperimentalConfig{
 		PikeEnabled: false,
 	}
 }
