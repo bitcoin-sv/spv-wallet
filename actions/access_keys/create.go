@@ -15,7 +15,7 @@ import (
 // @Description	Create access key
 // @Tags		Access-key
 // @Produce		json
-// @Param		CreateAccessKey body CreateAccessKey true "CreateAccessKey model containing metadata"
+// @Param		CreateAccessKey body CreateAccessKey true ""
 // @Success		201	{object} models.AccessKey "Created AccessKey"
 // @Failure		400	"Bad request - Error while parsing CreateAccessKey from request body"
 // @Failure 	500	"Internal server error - Error while creating new access key"

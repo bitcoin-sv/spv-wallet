@@ -15,7 +15,7 @@ import (
 // @Description	Create xPub
 // @Tags		Admin
 // @Produce		json
-// @Param		CreateXpub body CreateXpub true "CreateXpub model containing key and metadata"
+// @Param		CreateXpub body CreateXpub true ""
 // @Success		201 {object} models.Xpub "Created Xpub"
 // @Failure		400	"Bad request - Error while parsing CreateXpub from request body"
 // @Failure 	500	"Internal server error - Error while creating xpub"
