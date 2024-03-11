@@ -15,7 +15,7 @@ import (
 // @Description	Update destination
 // @Tags		Destinations
 // @Produce		json
-// @Param		UpdateDestination body UpdateDestination false "UpdateDestination model containing an id, address, locking_script and metadata"
+// @Param		UpdateDestination body UpdateDestination false ""
 // @Success		200 {object} models.Destination "Updated Destination"
 // @Failure		400	"Bad request - Error while parsing UpdateDestination from request body"
 // @Failure 	500	"Internal Server Error - Error while updating destination"

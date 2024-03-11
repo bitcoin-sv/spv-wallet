@@ -15,7 +15,7 @@ import (
 // @Description	Update xPub
 // @Tags		xPub
 // @Produce		json
-// @Param		Metadata body engine.Metadata false "Metadata which should replace the already existing one"
+// @Param		Metadata body engine.Metadata false ""
 // @Success		200 {object} models.Xpub "Updated xPub"
 // @Failure		400	"Bad request - Error while parsing Metadata from request body"
 // @Failure 	500	"Internal Server Error - Error while updating xPub"

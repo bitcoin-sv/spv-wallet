@@ -14,7 +14,7 @@ import (
 // @Description	Update transaction
 // @Tags		Transactions
 // @Produce		json
-// @Param		UpdateTransaction body UpdateTransaction true "UpdateTransaction model containing the information about tx to update"
+// @Param		UpdateTransaction body UpdateTransaction true ""
 // @Success		200 {object} models.Transaction "Updated transaction"
 // @Failure		400	"Bad request - Error while parsing UpdateTransaction from request body, tx not found or tx is not associated with the xpub"
 // @Failure 	500	"Internal Server Error - Error while updating transaction"
