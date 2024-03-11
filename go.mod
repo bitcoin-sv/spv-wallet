@@ -174,5 +174,3 @@ replace github.com/gomodule/redigo => github.com/gomodule/redigo v1.8.9
 
 // Issue: go.mongodb.org/mongo-driver/x/bsonx: cannot find module providing package go.mongodb.org/mongo-driver/x/bsonx
 replace go.mongodb.org/mongo-driver => go.mongodb.org/mongo-driver v1.11.7
-
-replace github.com/bitcoin-sv/go-paymail => ../go-paymail
