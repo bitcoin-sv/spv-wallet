@@ -8,7 +8,7 @@ import (
 // CreateContact is the model for creating a contact
 type CreateContact struct {
 	// Accepts a JSON object for embedding custom metadata, enabling arbitrary additional information to be associated with the resource
-	Metadata engine.Metadata `json:"metadata"`
+	Metadata engine.Metadata `json:"metadata" swaggertype:"object,string" example:"key:value,key2:value2"`
 }
 
 // UpdateContact is the model for updating a contact

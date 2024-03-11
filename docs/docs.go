@@ -108,7 +108,7 @@ const docTemplate = `{
                 "summary": "Create access key",
                 "parameters": [
                     {
-                        "description": "CreateAccessKey model containing metadata",
+                        "description": " ",
                         "name": "CreateAccessKey",
                         "in": "body",
                         "required": true,
@@ -188,7 +188,7 @@ const docTemplate = `{
                 "summary": "Count of access keys",
                 "parameters": [
                     {
-                        "description": "Supports targeted resource asset counting with filters for metadata and custom conditions",
+                        "description": "Enables precise filtering of resource counts using custom conditions or metadata, catering to specific business or analysis needs",
                         "name": "CountRequestParameters",
                         "in": "body",
                         "schema": {
@@ -276,7 +276,7 @@ const docTemplate = `{
                 "summary": "Access Keys Count",
                 "parameters": [
                     {
-                        "description": "Supports targeted resource asset counting with filters for metadata and custom conditions",
+                        "description": "Enables precise filtering of resource counts using custom conditions or metadata, catering to specific business or analysis needs",
                         "name": "CountRequestParameters",
                         "in": "body",
                         "schema": {
@@ -411,7 +411,7 @@ const docTemplate = `{
                 "summary": "Create paymail",
                 "parameters": [
                     {
-                        "description": "CreatePaymail model containing all information to create a new paymail address",
+                        "description": " ",
                         "name": "CreatePaymail",
                         "in": "body",
                         "schema": {
@@ -531,7 +531,7 @@ const docTemplate = `{
                 "summary": "Paymail addresses count",
                 "parameters": [
                     {
-                        "description": "Supports targeted resource asset counting with filters for metadata and custom conditions",
+                        "description": "Enables precise filtering of resource counts using custom conditions or metadata, catering to specific business or analysis needs",
                         "name": "CountRequestParameters",
                         "in": "body",
                         "schema": {
@@ -672,7 +672,7 @@ const docTemplate = `{
                 "summary": "Count transactions",
                 "parameters": [
                     {
-                        "description": "Supports targeted resource asset counting with filters for metadata and custom conditions",
+                        "description": "Enables precise filtering of resource counts using custom conditions or metadata, catering to specific business or analysis needs",
                         "name": "CountRequestParameters",
                         "in": "body",
                         "schema": {
@@ -802,7 +802,7 @@ const docTemplate = `{
                 "summary": "Count utxos",
                 "parameters": [
                     {
-                        "description": "Supports targeted resource asset counting with filters for metadata and custom conditions",
+                        "description": "Enables precise filtering of resource counts using custom conditions or metadata, catering to specific business or analysis needs",
                         "name": "CountRequestParameters",
                         "in": "body",
                         "schema": {
@@ -890,7 +890,7 @@ const docTemplate = `{
                 "summary": "Create xPub",
                 "parameters": [
                     {
-                        "description": "CreateXpub model containing key and metadata",
+                        "description": " ",
                         "name": "CreateXpub",
                         "in": "body",
                         "required": true,
@@ -932,7 +932,7 @@ const docTemplate = `{
                 "summary": "Count xpubs",
                 "parameters": [
                     {
-                        "description": "Supports targeted resource asset counting with filters for metadata and custom conditions",
+                        "description": "Enables precise filtering of resource counts using custom conditions or metadata, catering to specific business or analysis needs",
                         "name": "CountRequestParameters",
                         "in": "body",
                         "schema": {
@@ -1123,7 +1123,7 @@ const docTemplate = `{
                 "summary": "Create a new destination",
                 "parameters": [
                     {
-                        "description": "CreateDestination model containing metadata",
+                        "description": " ",
                         "name": "CreateDestination",
                         "in": "body",
                         "schema": {
@@ -1162,7 +1162,7 @@ const docTemplate = `{
                 "summary": "Update destination",
                 "parameters": [
                     {
-                        "description": "UpdateDestination model containing an id, address, locking_script and metadata",
+                        "description": " ",
                         "name": "UpdateDestination",
                         "in": "body",
                         "schema": {
@@ -1203,7 +1203,7 @@ const docTemplate = `{
                 "summary": "Count Destinations",
                 "parameters": [
                     {
-                        "description": "Supports targeted resource asset counting with filters for metadata and custom conditions",
+                        "description": "Enables precise filtering of resource counts using custom conditions or metadata, catering to specific business or analysis needs",
                         "name": "CountRequestParameters",
                         "in": "body",
                         "schema": {
@@ -1369,7 +1369,7 @@ const docTemplate = `{
                 "summary": "Update transaction",
                 "parameters": [
                     {
-                        "description": "UpdateTransaction model containing the information about tx to update",
+                        "description": " ",
                         "name": "UpdateTransaction",
                         "in": "body",
                         "required": true,
@@ -1411,7 +1411,7 @@ const docTemplate = `{
                 "summary": "Count of transactions",
                 "parameters": [
                     {
-                        "description": "Supports targeted resource asset counting with filters for metadata and custom conditions",
+                        "description": "Enables precise filtering of resource counts using custom conditions or metadata, catering to specific business or analysis needs",
                         "name": "CountRequestParameters",
                         "in": "body",
                         "schema": {
@@ -1588,7 +1588,7 @@ const docTemplate = `{
                 "summary": "Count of UTXOs",
                 "parameters": [
                     {
-                        "description": "Supports targeted resource asset counting with filters for metadata and custom conditions",
+                        "description": "Enables precise filtering of resource counts using custom conditions or metadata, catering to specific business or analysis needs",
                         "name": "CountRequestParameters",
                         "in": "body",
                         "schema": {
@@ -1705,7 +1705,7 @@ const docTemplate = `{
                 "summary": "Update xPub",
                 "parameters": [
                     {
-                        "description": "Metadata which should replace the already existing one",
+                        "description": " ",
                         "name": "Metadata",
                         "in": "body",
                         "schema": {
@@ -1753,15 +1753,23 @@ const docTemplate = `{
                 "conditions": {
                     "description": "Custom conditions used for filtering the search results",
                     "type": "object",
-                    "additionalProperties": true
+                    "additionalProperties": {
+                        "type": "string"
+                    },
+                    "example": {
+                        "testColumn": "testValue"
+                    }
                 },
                 "metadata": {
                     "description": "Accepts a JSON object for embedding custom metadata, enabling arbitrary additional information to be associated with the resource",
-                    "allOf": [
-                        {
-                            "$ref": "#/definitions/engine.Metadata"
-                        }
-                    ]
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "string"
+                    },
+                    "example": {
+                        "key": "value",
+                        "key2": "value2"
+                    }
                 }
             }
         },
@@ -1771,23 +1779,36 @@ const docTemplate = `{
                 "conditions": {
                     "description": "Custom conditions used for filtering the search results",
                     "type": "object",
-                    "additionalProperties": true
+                    "additionalProperties": {
+                        "type": "string"
+                    },
+                    "example": {
+                        "testColumn": "testValue"
+                    }
                 },
                 "metadata": {
                     "description": "Accepts a JSON object for embedding custom metadata, enabling arbitrary additional information to be associated with the resource",
-                    "allOf": [
-                        {
-                            "$ref": "#/definitions/engine.Metadata"
-                        }
-                    ]
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "string"
+                    },
+                    "example": {
+                        "key": "value",
+                        "key2": "value2"
+                    }
                 },
                 "params": {
                     "description": "Pagination and sorting options to streamline data exploration and analysis",
-                    "allOf": [
-                        {
-                            "$ref": "#/definitions/datastore.QueryParams"
-                        }
-                    ]
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "string"
+                    },
+                    "example": {
+                        "order_by_direction": "desc",
+                        "order_by_field": "created_at",
+                        "page": "1",
+                        "page_size": "10"
+                    }
                 }
             }
         },
@@ -1795,28 +1816,35 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "address": {
-                    "description": "The paymail address, example: example@spv-wallet.com",
-                    "type": "string"
+                    "description": "The paymail address",
+                    "type": "string",
+                    "example": "test@spv-wallet.com"
                 },
                 "avatar": {
                     "description": "The avatar of the paymail (url address)",
-                    "type": "string"
+                    "type": "string",
+                    "example": "https://example.com/avatar.png"
                 },
                 "metadata": {
                     "description": "Accepts a JSON object for embedding custom metadata, enabling arbitrary additional information to be associated with the resource",
-                    "allOf": [
-                        {
-                            "$ref": "#/definitions/engine.Metadata"
-                        }
-                    ]
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "string"
+                    },
+                    "example": {
+                        "key": "value",
+                        "key2": "value2"
+                    }
                 },
                 "public_name": {
                     "description": "The public name of the paymail",
-                    "type": "string"
+                    "type": "string",
+                    "example": "Test"
                 },
                 "xpub_id": {
                     "description": "The xpub with which the paymail is associated",
-                    "type": "string"
+                    "type": "string",
+                    "example": "xpub661MyMwAqRbcGpZVrSHU..."
                 }
             }
         },
@@ -1825,15 +1853,19 @@ const docTemplate = `{
             "properties": {
                 "key": {
                     "description": "The xpub key",
-                    "type": "string"
+                    "type": "string",
+                    "example": "xpub661MyMwAqRbcGpZVrSHU..."
                 },
                 "metadata": {
                     "description": "Accepts a JSON object for embedding custom metadata, enabling arbitrary additional information to be associated with the resource",
-                    "allOf": [
-                        {
-                            "$ref": "#/definitions/engine.Metadata"
-                        }
-                    ]
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "string"
+                    },
+                    "example": {
+                        "key": "value",
+                        "key2": "value2"
+                    }
                 }
             }
         },
@@ -1841,8 +1873,9 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "address": {
-                    "description": "The paymail address example: example@spv-wallet.com",
-                    "type": "string"
+                    "description": "The paymail address",
+                    "type": "string",
+                    "example": "test@spv-wallet.com"
                 }
             }
         },
@@ -1851,7 +1884,8 @@ const docTemplate = `{
             "properties": {
                 "hex": {
                     "description": "The transaction hex",
-                    "type": "string"
+                    "type": "string",
+                    "example": "0100000002..."
                 }
             }
         },
@@ -1972,33 +2006,19 @@ const docTemplate = `{
                 }
             }
         },
-        "datastore.QueryParams": {
-            "type": "object",
-            "properties": {
-                "order_by_field": {
-                    "type": "string"
-                },
-                "page": {
-                    "type": "integer"
-                },
-                "page_size": {
-                    "type": "integer"
-                },
-                "sort_direction": {
-                    "type": "string"
-                }
-            }
-        },
         "destinations.CreateDestination": {
             "type": "object",
             "properties": {
                 "metadata": {
                     "description": "Accepts a JSON object for embedding custom metadata, enabling arbitrary additional information to be associated with the resource",
-                    "allOf": [
-                        {
-                            "$ref": "#/definitions/engine.Metadata"
-                        }
-                    ]
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "string"
+                    },
+                    "example": {
+                        "key": "value",
+                        "key2": "value2"
+                    }
                 }
             }
         },
@@ -2007,23 +2027,29 @@ const docTemplate = `{
             "properties": {
                 "address": {
                     "description": "Address of the destination",
-                    "type": "string"
+                    "type": "string",
+                    "example": "1CDUf7CKu8ocTTkhcYUbq75t14Ft168K65"
                 },
                 "id": {
                     "description": "ID of the destination which is the hash of the LockingScript",
-                    "type": "string"
+                    "type": "string",
+                    "example": "82a5d848f997819a478b05fb713208d7f3aa66da5ba00953b9845fb1701f9b98"
                 },
                 "locking_script": {
                     "description": "LockingScript of the destination",
-                    "type": "string"
+                    "type": "string",
+                    "example": "76a9147b05764a97f3b4b981471492aa703b188e45979b88ac"
                 },
                 "metadata": {
                     "description": "Accepts a JSON object for embedding custom metadata, enabling arbitrary additional information to be associated with the resource",
-                    "allOf": [
-                        {
-                            "$ref": "#/definitions/engine.Metadata"
-                        }
-                    ]
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "string"
+                    },
+                    "example": {
+                        "key": "value",
+                        "key2": "value2"
+                    }
                 }
             }
         },
@@ -3143,9 +3169,41 @@ const docTemplate = `{
                 1000000,
                 1000000000,
                 60000000000,
+                3600000000000,
+                -9223372036854775808,
+                9223372036854775807,
+                1,
+                1000,
+                1000000,
+                1000000000,
+                60000000000,
+                3600000000000,
+                -9223372036854775808,
+                9223372036854775807,
+                1,
+                1000,
+                1000000,
+                1000000000,
+                60000000000,
                 3600000000000
             ],
             "x-enum-varnames": [
+                "minDuration",
+                "maxDuration",
+                "Nanosecond",
+                "Microsecond",
+                "Millisecond",
+                "Second",
+                "Minute",
+                "Hour",
+                "minDuration",
+                "maxDuration",
+                "Nanosecond",
+                "Microsecond",
+                "Millisecond",
+                "Second",
+                "Minute",
+                "Hour",
                 "minDuration",
                 "maxDuration",
                 "Nanosecond",
@@ -3177,11 +3235,14 @@ const docTemplate = `{
                 },
                 "metadata": {
                     "description": "Accepts a JSON object for embedding custom metadata, enabling arbitrary additional information to be associated with the resource",
-                    "allOf": [
-                        {
-                            "$ref": "#/definitions/engine.Metadata"
-                        }
-                    ]
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "string"
+                    },
+                    "example": {
+                        "key": "value",
+                        "key2": "value2"
+                    }
                 }
             }
         },
@@ -3190,19 +3251,24 @@ const docTemplate = `{
             "properties": {
                 "hex": {
                     "description": "Hex of the transaction",
-                    "type": "string"
+                    "type": "string",
+                    "example": "0100000002..."
                 },
                 "metadata": {
                     "description": "Accepts a JSON object for embedding custom metadata, enabling arbitrary additional information to be associated with the resource",
-                    "allOf": [
-                        {
-                            "$ref": "#/definitions/engine.Metadata"
-                        }
-                    ]
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "string"
+                    },
+                    "example": {
+                        "key": "value",
+                        "key2": "value2"
+                    }
                 },
                 "reference_id": {
                     "description": "ReferenceID which is a ID of the draft transaction",
-                    "type": "string"
+                    "type": "string",
+                    "example": "b356f7fa00cd3f20cce6c21d704cd13e871d28d714a5ebd0532f5a0e0cde63f7"
                 }
             }
         },
@@ -3211,15 +3277,19 @@ const docTemplate = `{
             "properties": {
                 "id": {
                     "description": "Id of the transaction which is a hash of the transaction",
-                    "type": "string"
+                    "type": "string",
+                    "example": "01d0d0067652f684c6acb3683763f353fce55f6496521c7d99e71e1d27e53f5c"
                 },
                 "metadata": {
                     "description": "Accepts a JSON object for embedding custom metadata, enabling arbitrary additional information to be associated with the resource",
-                    "allOf": [
-                        {
-                            "$ref": "#/definitions/engine.Metadata"
-                        }
-                    ]
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "string"
+                    },
+                    "example": {
+                        "key": "value",
+                        "key2": "value2"
+                    }
                 }
             }
         }

@@ -17,7 +17,7 @@ import (
 // @Description	Create a new destination
 // @Tags		Destinations
 // @Produce		json
-// @Param		CreateDestination body CreateDestination false ""
+// @Param		CreateDestination body CreateDestination false " "
 // @Success		201 {object} models.Destination "Created Destination"
 // @Failure		400	"Bad request - Error while parsing CreateDestination from request body"
 // @Failure 	500	"Internal Server Error - Error while creating destination"

@@ -115,7 +115,7 @@ func (a *Action) paymailAddressesCount(c *gin.Context) {
 // @Description	Create paymail
 // @Tags		Admin
 // @Produce		json
-// @Param		CreatePaymail body CreatePaymail false ""
+// @Param		CreatePaymail body CreatePaymail false " "
 // @Success		201	{object} engine.PaymailAddress "Created PaymailAddress"
 // @Failure		400	"Bad request - Error while parsing CreatePaymail from request body or if xpub or address are missing"
 // @Failure 	500	"Internal Server Error - Error while creating new paymail address"
