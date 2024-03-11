@@ -16,7 +16,9 @@ import (
 // @Tags		Access-key
 // @Produce		json
 // @Param		CreateAccessKey body CreateAccessKey true "CreateAccessKey model containing metadata"
-// @Success		201
+// @Success		201	{object} models.AccessKey "Created AccessKey"
+// @Failure		400	"Bad request - Error while parsing CreateAccessKey from request body"
+// @Failure 	500	"Internal server error - Error while creating new access key"
 // @Router		/v1/access-key [post]
 // @Security	x-auth-xpub
 func (a *Action) create(c *gin.Context) {
@@ -35,7 +37,7 @@ func (a *Action) create(c *gin.Context) {
 		engine.WithMetadatas(requestBody.Metadata),
 	)
 	if err != nil {
-		c.JSON(http.StatusUnprocessableEntity, err.Error())
+		c.JSON(http.StatusInternalServerError, err.Error())
 		return
 	}
 

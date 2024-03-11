@@ -14,8 +14,10 @@ import (
 // @Description	Count of transactions
 // @Tags		Transactions
 // @Produce		json
-// @Param		CountRequestParameters body actions.CountRequestParameters false "CountRequestParameters model containing metadata and conditions"
-// @Success		200
+// @Param		CountRequestParameters body actions.CountRequestParameters false "Supports targeted resource asset counting with filters for metadata and custom conditions"
+// @Success		200	{number} int64 "Count of access keys"
+// @Failure		400	"Bad request - Error while parsing CountRequestParameters from request body"
+// @Failure 	500	"Internal Server Error - Error while fetching count of transactions"
 // @Router		/v1/transaction/count [post]
 // @Security	x-auth-xpub
 func (a *Action) count(c *gin.Context) {
@@ -23,7 +25,7 @@ func (a *Action) count(c *gin.Context) {
 
 	metadata, conditions, err := actions.GetCountQueryParameters(c)
 	if err != nil {
-		c.JSON(http.StatusExpectationFailed, err.Error())
+		c.JSON(http.StatusBadRequest, err.Error())
 		return
 	}
 
@@ -34,7 +36,7 @@ func (a *Action) count(c *gin.Context) {
 		metadata,
 		conditions,
 	); err != nil {
-		c.JSON(http.StatusExpectationFailed, err.Error())
+		c.JSON(http.StatusInternalServerError, err.Error())
 		return
 	}
 

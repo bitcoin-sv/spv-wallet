@@ -7,19 +7,26 @@ import (
 
 // UpdateTransaction is the model for updating a transaction
 type UpdateTransaction struct {
-	ID       string          `json:"id"`
+	// Id of the transaction which is a hash of the transaction
+	ID string `json:"id"`
+	// Accepts a JSON object for embedding custom metadata, enabling arbitrary additional information to be associated with the resource
 	Metadata engine.Metadata `json:"metadata"`
 }
 
 // RecordTransaction is the model for recording a transaction
 type RecordTransaction struct {
-	Hex         string          `json:"hex"`
-	ReferenceID string          `json:"reference_id"`
-	Metadata    engine.Metadata `json:"metadata"`
+	// Hex of the transaction
+	Hex string `json:"hex"`
+	// ReferenceID which is a ID of the draft transaction
+	ReferenceID string `json:"reference_id"`
+	// Accepts a JSON object for embedding custom metadata, enabling arbitrary additional information to be associated with the resource
+	Metadata engine.Metadata `json:"metadata"`
 }
 
 // NewTransaction is the model for creating a new transaction
 type NewTransaction struct {
-	Config   models.TransactionConfig `json:"config"`
-	Metadata engine.Metadata          `json:"metadata"`
+	// Configuration of the transaction
+	Config models.TransactionConfig `json:"config"`
+	// Accepts a JSON object for embedding custom metadata, enabling arbitrary additional information to be associated with the resource
+	Metadata engine.Metadata `json:"metadata"`
 }

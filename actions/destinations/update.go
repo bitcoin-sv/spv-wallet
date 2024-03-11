@@ -16,7 +16,9 @@ import (
 // @Tags		Destinations
 // @Produce		json
 // @Param		UpdateDestination body UpdateDestination false "UpdateDestination model containing an id, address, locking_script and metadata"
-// @Success		200
+// @Success		200 {object} models.Destination "Updated Destination"
+// @Failure		400	"Bad request - Error while parsing UpdateDestination from request body"
+// @Failure 	500	"Internal Server Error - Error while updating destination"
 // @Router		/v1/destination [patch]
 // @Security	x-auth-xpub
 func (a *Action) update(c *gin.Context) {
@@ -49,7 +51,7 @@ func (a *Action) update(c *gin.Context) {
 		)
 	}
 	if err != nil {
-		c.JSON(http.StatusExpectationFailed, err.Error())
+		c.JSON(http.StatusInternalServerError, err.Error())
 		return
 	}
 

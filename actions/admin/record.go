@@ -17,7 +17,9 @@ import (
 // @Tags		Admin
 // @Produce		json
 // @Param		RecordTransaction body RecordTransaction true "RecordTransaction model containing hex of the transaction to record"
-// @Success		201
+// @Success		201	{object} models.Transaction "Recorded transaction"
+// @Failure		400	"Bad request - Error while parsing RecordTransaction from request body"
+// @Failure 	500	"Internal Server Error - Error while fetching count of access keys"
 // @Router		/v1/admin/transactions/record [post]
 // @Security	x-auth-xpub
 func (a *Action) transactionRecord(c *gin.Context) {
@@ -40,11 +42,11 @@ func (a *Action) transactionRecord(c *gin.Context) {
 		if errors.Is(err, datastore.ErrDuplicateKey) {
 			// already registered, just return the registered transaction
 			if transaction, err = a.Services.SpvWalletEngine.GetTransactionByHex(c.Request.Context(), requestBody.Hex); err != nil {
-				c.JSON(http.StatusUnprocessableEntity, err.Error())
+				c.JSON(http.StatusInternalServerError, err.Error())
 				return
 			}
 		} else {
-			c.JSON(http.StatusUnprocessableEntity, err.Error())
+			c.JSON(http.StatusInternalServerError, err.Error())
 			return
 		}
 	}

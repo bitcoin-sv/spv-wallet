@@ -19,7 +19,8 @@ import (
 // @Param		paymail query string false "paymail"
 // @Param		pubKey query string false "pubKey"
 // @Param		metadata query string false "metadata"
-// @Success		201
+// @Success		201 {object} models.Contact "Contact created"
+// @Failure 	500	"Internal server error - Error while creating contact"
 // @Router		/v1/contact [post]
 // @Security	bux-auth-xpub
 func (a *Action) create(c *gin.Context) {
@@ -29,7 +30,7 @@ func (a *Action) create(c *gin.Context) {
 	err := c.ShouldBindJSON(&contact)
 
 	if err != nil {
-		c.JSON(http.StatusUnprocessableEntity, err.Error())
+		c.JSON(http.StatusInternalServerError, err.Error())
 		return
 	}
 

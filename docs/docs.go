@@ -40,6 +40,12 @@ const docTemplate = `{
                 "responses": {
                     "200": {
                         "description": "OK"
+                    },
+                    "400": {
+                        "description": "Bad request - Error while parsing transaction from request body"
+                    },
+                    "500": {
+                        "description": "Internal Server Error - Error while updating transaction"
                     }
                 }
             }
@@ -62,7 +68,7 @@ const docTemplate = `{
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "id",
+                        "description": "id of the access key",
                         "name": "id",
                         "in": "query",
                         "required": true
@@ -70,7 +76,19 @@ const docTemplate = `{
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK"
+                        "description": "AccessKey with given id",
+                        "schema": {
+                            "$ref": "#/definitions/models.AccessKey"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request - Missing required field: id"
+                    },
+                    "403": {
+                        "description": "Forbidden - Access key is not owned by the user"
+                    },
+                    "500": {
+                        "description": "Internal server error - Error while getting access key"
                     }
                 }
             },
@@ -101,7 +119,16 @@ const docTemplate = `{
                 ],
                 "responses": {
                     "201": {
-                        "description": "Created"
+                        "description": "Created AccessKey",
+                        "schema": {
+                            "$ref": "#/definitions/models.AccessKey"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request - Error while parsing CreateAccessKey from request body"
+                    },
+                    "500": {
+                        "description": "Internal server error - Error while creating new access key"
                     }
                 }
             },
@@ -122,15 +149,24 @@ const docTemplate = `{
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "id",
+                        "description": "id of the access key",
                         "name": "id",
                         "in": "query",
                         "required": true
                     }
                 ],
                 "responses": {
-                    "201": {
-                        "description": "Created"
+                    "200": {
+                        "description": "Created AccessKey",
+                        "schema": {
+                            "$ref": "#/definitions/models.AccessKey"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request - Missing required field: id"
+                    },
+                    "500": {
+                        "description": "Internal server error - Error while revoking access key"
                     }
                 }
             }
@@ -152,7 +188,7 @@ const docTemplate = `{
                 "summary": "Count of access keys",
                 "parameters": [
                     {
-                        "description": "CountRequestParameters model containing metadata and conditions",
+                        "description": "Supports targeted resource asset counting with filters for metadata and custom conditions",
                         "name": "CountRequestParameters",
                         "in": "body",
                         "schema": {
@@ -162,7 +198,16 @@ const docTemplate = `{
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK"
+                        "description": "Count of access keys",
+                        "schema": {
+                            "type": "number"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request - Error while parsing CountRequestParameters from request body"
+                    },
+                    "500": {
+                        "description": "Internal Server Error - Error while fetching count of access keys"
                     }
                 }
             }
@@ -184,7 +229,7 @@ const docTemplate = `{
                 "summary": "Search access key",
                 "parameters": [
                     {
-                        "description": "SearchRequestParameters model containing metadata, conditions and query params",
+                        "description": "Supports targeted resource searches with filters for metadata and custom conditions, plus options for pagination and sorting to streamline data exploration and analysis",
                         "name": "SearchRequestParameters",
                         "in": "body",
                         "schema": {
@@ -194,7 +239,22 @@ const docTemplate = `{
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK"
+                        "description": "List of access keys",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "type": "array",
+                                "items": {
+                                    "$ref": "#/definitions/models.AccessKey"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request - Error while parsing SearchRequestParameters from request body"
+                    },
+                    "500": {
+                        "description": "Internal server error - Error while searching for access keys"
                     }
                 }
             }
@@ -216,7 +276,7 @@ const docTemplate = `{
                 "summary": "Access Keys Count",
                 "parameters": [
                     {
-                        "description": "CountRequestParameters model containing metadata and conditions",
+                        "description": "Supports targeted resource asset counting with filters for metadata and custom conditions",
                         "name": "CountRequestParameters",
                         "in": "body",
                         "schema": {
@@ -226,7 +286,16 @@ const docTemplate = `{
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK"
+                        "description": "Count of access keys",
+                        "schema": {
+                            "type": "number"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request - Error while parsing CountRequestParameters from request body"
+                    },
+                    "500": {
+                        "description": "Internal Server Error - Error while fetching count of access keys"
                     }
                 }
             }
@@ -248,7 +317,7 @@ const docTemplate = `{
                 "summary": "Access Keys Search",
                 "parameters": [
                     {
-                        "description": "SearchRequestParameters model containing metadata, conditions and query params",
+                        "description": "Supports targeted resource searches with filters for metadata and custom conditions, plus options for pagination and sorting to streamline data exploration and analysis",
                         "name": "SearchRequestParameters",
                         "in": "body",
                         "schema": {
@@ -258,39 +327,22 @@ const docTemplate = `{
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK"
-                    }
-                }
-            }
-        },
-        "/v1/admin/destinations/count": {
-            "post": {
-                "security": [
-                    {
-                        "x-auth-xpub": []
-                    }
-                ],
-                "description": "Count destinations",
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Admin"
-                ],
-                "summary": "Count destinations",
-                "parameters": [
-                    {
-                        "description": "CountRequestParameters model containing metadata and conditions",
-                        "name": "CountRequestParameters",
-                        "in": "body",
+                        "description": "List of access keys",
                         "schema": {
-                            "$ref": "#/definitions/actions.CountRequestParameters"
+                            "type": "array",
+                            "items": {
+                                "type": "array",
+                                "items": {
+                                    "$ref": "#/definitions/models.AccessKey"
+                                }
+                            }
                         }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK"
+                    },
+                    "400": {
+                        "description": "Bad request - Error while parsing SearchRequestParameters from request body"
+                    },
+                    "500": {
+                        "description": "Internal server error - Error while searching for access keys"
                     }
                 }
             }
@@ -312,7 +364,7 @@ const docTemplate = `{
                 "summary": "Search for destinations",
                 "parameters": [
                     {
-                        "description": "SearchRequestParameters model containing metadata, conditions and query params",
+                        "description": "Supports targeted resource searches with filters for metadata and custom conditions, plus options for pagination and sorting to streamline data exploration and analysis",
                         "name": "SearchRequestParameters",
                         "in": "body",
                         "schema": {
@@ -322,7 +374,22 @@ const docTemplate = `{
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK"
+                        "description": "List of destinations",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "type": "array",
+                                "items": {
+                                    "$ref": "#/definitions/models.Destination"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request - Error while parsing SearchRequestParameters from request body"
+                    },
+                    "500": {
+                        "description": "Internal server error - Error while searching for destinations"
                     }
                 }
             }
@@ -344,10 +411,9 @@ const docTemplate = `{
                 "summary": "Create paymail",
                 "parameters": [
                     {
-                        "description": "CreatePaymail model containing paymail information",
+                        "description": "CreatePaymail model containing all information to create a new paymail address",
                         "name": "CreatePaymail",
                         "in": "body",
-                        "required": true,
                         "schema": {
                             "$ref": "#/definitions/admin.CreatePaymail"
                         }
@@ -355,7 +421,16 @@ const docTemplate = `{
                 ],
                 "responses": {
                     "201": {
-                        "description": "Created"
+                        "description": "Created PaymailAddress",
+                        "schema": {
+                            "$ref": "#/definitions/engine.PaymailAddress"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request - Error while parsing CreatePaymail from request body or if xpub or address are missing"
+                    },
+                    "500": {
+                        "description": "Internal Server Error - Error while creating new paymail address"
                     }
                 }
             }
@@ -380,15 +455,20 @@ const docTemplate = `{
                         "description": "PaymailAddress model containing paymail address to delete",
                         "name": "PaymailAddress",
                         "in": "body",
-                        "required": true,
                         "schema": {
-                            "type": "string"
+                            "$ref": "#/definitions/admin.PaymailAddress"
                         }
                     }
                 ],
                 "responses": {
                     "200": {
                         "description": "OK"
+                    },
+                    "400": {
+                        "description": "Bad request - Error while parsing PaymailAddress from request body or if address is missing"
+                    },
+                    "500": {
+                        "description": "Internal Server Error - Error while deleting paymail address"
                     }
                 }
             }
@@ -410,10 +490,9 @@ const docTemplate = `{
                 "summary": "Get paymail",
                 "parameters": [
                     {
-                        "description": "PaymailAddress model containing paymail address",
+                        "description": "PaymailAddress model containing paymail address to get",
                         "name": "PaymailAddress",
                         "in": "body",
-                        "required": true,
                         "schema": {
                             "$ref": "#/definitions/admin.PaymailAddress"
                         }
@@ -421,7 +500,16 @@ const docTemplate = `{
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK"
+                        "description": "PaymailAddress with given address",
+                        "schema": {
+                            "$ref": "#/definitions/engine.PaymailAddress"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request - Error while parsing PaymailAddress from request body"
+                    },
+                    "500": {
+                        "description": "Internal Server Error - Error while getting paymail address"
                     }
                 }
             }
@@ -443,7 +531,7 @@ const docTemplate = `{
                 "summary": "Paymail addresses count",
                 "parameters": [
                     {
-                        "description": "CountRequestParameters model containing metadata and conditions",
+                        "description": "Supports targeted resource asset counting with filters for metadata and custom conditions",
                         "name": "CountRequestParameters",
                         "in": "body",
                         "schema": {
@@ -453,7 +541,16 @@ const docTemplate = `{
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK"
+                        "description": "Count of paymail addresses",
+                        "schema": {
+                            "type": "number"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request - Error while parsing CountRequestParameters from request body"
+                    },
+                    "500": {
+                        "description": "Internal Server Error - Error while fetching count of paymail addresses"
                     }
                 }
             }
@@ -475,7 +572,7 @@ const docTemplate = `{
                 "summary": "Paymail addresses search",
                 "parameters": [
                     {
-                        "description": "SearchRequestParameters model containing metadata, conditions and query params",
+                        "description": "Supports targeted resource searches with filters for metadata and custom conditions, plus options for pagination and sorting to streamline data exploration and analysis",
                         "name": "SearchRequestParameters",
                         "in": "body",
                         "schema": {
@@ -485,7 +582,22 @@ const docTemplate = `{
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK"
+                        "description": "List of paymail addresses",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "type": "array",
+                                "items": {
+                                    "$ref": "#/definitions/engine.PaymailAddress"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request - Error while parsing SearchRequestParameters from request body"
+                    },
+                    "500": {
+                        "description": "Internal server error - Error while searching for paymail addresses"
                     }
                 }
             }
@@ -507,7 +619,13 @@ const docTemplate = `{
                 "summary": "Get stats",
                 "responses": {
                     "200": {
-                        "description": "OK"
+                        "description": "Stats for the admin",
+                        "schema": {
+                            "$ref": "#/definitions/models.AdminStats"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error - Error while fetching admin stats"
                     }
                 }
             }
@@ -529,7 +647,10 @@ const docTemplate = `{
                 "summary": "Get status",
                 "responses": {
                     "200": {
-                        "description": "OK"
+                        "description": "Status response",
+                        "schema": {
+                            "type": "boolean"
+                        }
                     }
                 }
             }
@@ -551,7 +672,7 @@ const docTemplate = `{
                 "summary": "Count transactions",
                 "parameters": [
                     {
-                        "description": "CountRequestParameters model containing metadata and conditions",
+                        "description": "Supports targeted resource asset counting with filters for metadata and custom conditions",
                         "name": "CountRequestParameters",
                         "in": "body",
                         "schema": {
@@ -561,7 +682,16 @@ const docTemplate = `{
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK"
+                        "description": "Count of transactions",
+                        "schema": {
+                            "type": "number"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request - Error while parsing CountRequestParameters from request body"
+                    },
+                    "500": {
+                        "description": "Internal Server Error - Error while fetching count of transactions"
                     }
                 }
             }
@@ -594,7 +724,16 @@ const docTemplate = `{
                 ],
                 "responses": {
                     "201": {
-                        "description": "Created"
+                        "description": "Recorded transaction",
+                        "schema": {
+                            "$ref": "#/definitions/models.Transaction"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request - Error while parsing RecordTransaction from request body"
+                    },
+                    "500": {
+                        "description": "Internal Server Error - Error while fetching count of access keys"
                     }
                 }
             }
@@ -616,7 +755,7 @@ const docTemplate = `{
                 "summary": "Search for transactions",
                 "parameters": [
                     {
-                        "description": "SearchRequestParameters model containing metadata, conditions and query params",
+                        "description": "Supports targeted resource searches with filters for metadata and custom conditions, plus options for pagination and sorting to streamline data exploration and analysis",
                         "name": "SearchRequestParameters",
                         "in": "body",
                         "schema": {
@@ -626,7 +765,22 @@ const docTemplate = `{
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK"
+                        "description": "List of transactions",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "type": "array",
+                                "items": {
+                                    "$ref": "#/definitions/models.Transaction"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request - Error while parsing SearchRequestParameters from request body"
+                    },
+                    "500": {
+                        "description": "Internal server error - Error while searching for transactions"
                     }
                 }
             }
@@ -648,7 +802,7 @@ const docTemplate = `{
                 "summary": "Count utxos",
                 "parameters": [
                     {
-                        "description": "CountRequestParameters model containing metadata and conditions",
+                        "description": "Supports targeted resource asset counting with filters for metadata and custom conditions",
                         "name": "CountRequestParameters",
                         "in": "body",
                         "schema": {
@@ -658,7 +812,16 @@ const docTemplate = `{
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK"
+                        "description": "Count of utxos",
+                        "schema": {
+                            "type": "number"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request - Error while parsing CountRequestParameters from request body"
+                    },
+                    "500": {
+                        "description": "Internal Server Error - Error while fetching count of utxos"
                     }
                 }
             }
@@ -680,7 +843,7 @@ const docTemplate = `{
                 "summary": "Search for utxos",
                 "parameters": [
                     {
-                        "description": "SearchRequestParameters model containing metadata, conditions and query params",
+                        "description": "Supports targeted resource searches with filters for metadata and custom conditions, plus options for pagination and sorting to streamline data exploration and analysis",
                         "name": "SearchRequestParameters",
                         "in": "body",
                         "schema": {
@@ -690,7 +853,22 @@ const docTemplate = `{
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK"
+                        "description": "List of utxos",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "type": "array",
+                                "items": {
+                                    "$ref": "#/definitions/engine.Utxo"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request - Error while parsing SearchRequestParameters from request body"
+                    },
+                    "500": {
+                        "description": "Internal server error - Error while searching for utxos"
                     }
                 }
             }
@@ -723,7 +901,16 @@ const docTemplate = `{
                 ],
                 "responses": {
                     "201": {
-                        "description": "Created"
+                        "description": "Created Xpub",
+                        "schema": {
+                            "$ref": "#/definitions/models.Xpub"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request - Error while parsing CreateXpub from request body"
+                    },
+                    "500": {
+                        "description": "Internal server error - Error while creating xpub"
                     }
                 }
             }
@@ -745,7 +932,7 @@ const docTemplate = `{
                 "summary": "Count xpubs",
                 "parameters": [
                     {
-                        "description": "CountRequestParameters model containing metadata and conditions",
+                        "description": "Supports targeted resource asset counting with filters for metadata and custom conditions",
                         "name": "CountRequestParameters",
                         "in": "body",
                         "schema": {
@@ -755,7 +942,16 @@ const docTemplate = `{
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK"
+                        "description": "Count of access keys",
+                        "schema": {
+                            "type": "number"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request - Error while parsing CountRequestParameters from request body"
+                    },
+                    "500": {
+                        "description": "Internal Server Error - Error while fetching count of xpubs"
                     }
                 }
             }
@@ -777,7 +973,7 @@ const docTemplate = `{
                 "summary": "Search for xpubs",
                 "parameters": [
                     {
-                        "description": "SearchRequestParameters model containing metadata, conditions and query params",
+                        "description": "Supports targeted resource searches with filters for metadata and custom conditions, plus options for pagination and sorting to streamline data exploration and analysis",
                         "name": "SearchRequestParameters",
                         "in": "body",
                         "schema": {
@@ -787,7 +983,22 @@ const docTemplate = `{
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK"
+                        "description": "List of xpubs",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "type": "array",
+                                "items": {
+                                    "$ref": "#/definitions/engine.Xpub"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request - Error while parsing SearchRequestParameters from request body"
+                    },
+                    "500": {
+                        "description": "Internal server error - Error while searching for xpubs"
                     }
                 }
             }
@@ -835,7 +1046,13 @@ const docTemplate = `{
                 ],
                 "responses": {
                     "201": {
-                        "description": "Created"
+                        "description": "Contact created",
+                        "schema": {
+                            "$ref": "#/definitions/models.Contact"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error - Error while creating contact"
                     }
                 }
             }
@@ -877,7 +1094,16 @@ const docTemplate = `{
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK"
+                        "description": "Destination with given id",
+                        "schema": {
+                            "$ref": "#/definitions/models.Destination"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request - All parameters are missing (id, address, locking_script)"
+                    },
+                    "500": {
+                        "description": "Internal server error - Error while getting destination"
                     }
                 }
             },
@@ -907,7 +1133,16 @@ const docTemplate = `{
                 ],
                 "responses": {
                     "201": {
-                        "description": "Created"
+                        "description": "Created Destination",
+                        "schema": {
+                            "$ref": "#/definitions/models.Destination"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request - Error while parsing CreateDestination from request body"
+                    },
+                    "500": {
+                        "description": "Internal Server Error - Error while creating destination"
                     }
                 }
             },
@@ -937,7 +1172,16 @@ const docTemplate = `{
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK"
+                        "description": "Updated Destination",
+                        "schema": {
+                            "$ref": "#/definitions/models.Destination"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request - Error while parsing UpdateDestination from request body"
+                    },
+                    "500": {
+                        "description": "Internal Server Error - Error while updating destination"
                     }
                 }
             }
@@ -959,7 +1203,7 @@ const docTemplate = `{
                 "summary": "Count Destinations",
                 "parameters": [
                     {
-                        "description": "CountRequestParameters model containing metadata and conditions",
+                        "description": "Supports targeted resource asset counting with filters for metadata and custom conditions",
                         "name": "CountRequestParameters",
                         "in": "body",
                         "schema": {
@@ -969,7 +1213,16 @@ const docTemplate = `{
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK"
+                        "description": "Count of destinations",
+                        "schema": {
+                            "type": "number"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request - Error while parsing CountRequestParameters from request body"
+                    },
+                    "500": {
+                        "description": "Internal Server Error - Error while fetching count of destinations"
                     }
                 }
             }
@@ -991,7 +1244,7 @@ const docTemplate = `{
                 "summary": "Search for a destination",
                 "parameters": [
                     {
-                        "description": "SearchRequestParameters model containing metadata, conditions and query params",
+                        "description": "Supports targeted resource searches with filters for metadata and custom conditions, plus options for pagination and sorting to streamline data exploration and analysis",
                         "name": "SearchRequestParameters",
                         "in": "body",
                         "schema": {
@@ -1001,7 +1254,22 @@ const docTemplate = `{
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK"
+                        "description": "List of destinations",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "type": "array",
+                                "items": {
+                                    "$ref": "#/definitions/models.Destination"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request - Error while parsing SearchRequestParameters from request body"
+                    },
+                    "500": {
+                        "description": "Internal server error - Error while searching for destinations"
                     }
                 }
             }
@@ -1032,7 +1300,16 @@ const docTemplate = `{
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK"
+                        "description": "Transaction",
+                        "schema": {
+                            "$ref": "#/definitions/models.Transaction"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request - Transaction not found or associated with another xpub"
+                    },
+                    "500": {
+                        "description": "Internal Server Error - Error while fetching transaction"
                     }
                 }
             },
@@ -1063,7 +1340,16 @@ const docTemplate = `{
                 ],
                 "responses": {
                     "201": {
-                        "description": "Created"
+                        "description": "Created transaction",
+                        "schema": {
+                            "$ref": "#/definitions/models.DraftTransaction"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request - Error while parsing NewTransaction from request body or xpub not found"
+                    },
+                    "500": {
+                        "description": "Internal Server Error - Error while creating transaction"
                     }
                 }
             },
@@ -1083,7 +1369,7 @@ const docTemplate = `{
                 "summary": "Update transaction",
                 "parameters": [
                     {
-                        "description": "UpdateTransaction model containing the transaction id and metadata",
+                        "description": "UpdateTransaction model containing the information about tx to update",
                         "name": "UpdateTransaction",
                         "in": "body",
                         "required": true,
@@ -1094,7 +1380,16 @@ const docTemplate = `{
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK"
+                        "description": "Updated transaction",
+                        "schema": {
+                            "$ref": "#/definitions/models.Transaction"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request - Error while parsing UpdateTransaction from request body, tx not found or tx is not associated with the xpub"
+                    },
+                    "500": {
+                        "description": "Internal Server Error - Error while updating transaction"
                     }
                 }
             }
@@ -1116,7 +1411,7 @@ const docTemplate = `{
                 "summary": "Count of transactions",
                 "parameters": [
                     {
-                        "description": "CountRequestParameters model containing metadata and conditions",
+                        "description": "Supports targeted resource asset counting with filters for metadata and custom conditions",
                         "name": "CountRequestParameters",
                         "in": "body",
                         "schema": {
@@ -1126,7 +1421,16 @@ const docTemplate = `{
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK"
+                        "description": "Count of access keys",
+                        "schema": {
+                            "type": "number"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request - Error while parsing CountRequestParameters from request body"
+                    },
+                    "500": {
+                        "description": "Internal Server Error - Error while fetching count of transactions"
                     }
                 }
             }
@@ -1146,9 +1450,29 @@ const docTemplate = `{
                     "Transactions"
                 ],
                 "summary": "Record transaction",
+                "parameters": [
+                    {
+                        "description": "Transaction to be recorded",
+                        "name": "RecordTransaction",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/transactions.RecordTransaction"
+                        }
+                    }
+                ],
                 "responses": {
-                    "200": {
-                        "description": "OK"
+                    "201": {
+                        "description": "Created transaction",
+                        "schema": {
+                            "$ref": "#/definitions/models.Transaction"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request - Error while parsing RecordTransaction from request body or xpub not found"
+                    },
+                    "500": {
+                        "description": "Internal Server Error - Error while recording transaction"
                     }
                 }
             }
@@ -1170,7 +1494,7 @@ const docTemplate = `{
                 "summary": "Search transaction",
                 "parameters": [
                     {
-                        "description": "SearchRequestParameters model containing metadata, conditions and query params",
+                        "description": "Supports targeted resource searches with filters for metadata and custom conditions, plus options for pagination and sorting to streamline data exploration and analysis",
                         "name": "SearchRequestParameters",
                         "in": "body",
                         "schema": {
@@ -1180,7 +1504,22 @@ const docTemplate = `{
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK"
+                        "description": "List of transactions",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "type": "array",
+                                "items": {
+                                    "$ref": "#/definitions/models.Transaction"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request - Error while parsing SearchRequestParameters from request body"
+                    },
+                    "500": {
+                        "description": "Internal server error - Error while searching for transactions"
                     }
                 }
             }
@@ -1203,14 +1542,14 @@ const docTemplate = `{
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "tx_id",
+                        "description": "Id of the transaction",
                         "name": "tx_id",
                         "in": "query",
                         "required": true
                     },
                     {
                         "type": "integer",
-                        "description": "output_index",
+                        "description": "Output index",
                         "name": "output_index",
                         "in": "query",
                         "required": true
@@ -1218,7 +1557,16 @@ const docTemplate = `{
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK"
+                        "description": "UTXO with given Id and output index",
+                        "schema": {
+                            "$ref": "#/definitions/models.Utxo"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request - Error while parsing output_index"
+                    },
+                    "500": {
+                        "description": "Internal Server Error - Error while fetching utxo"
                     }
                 }
             }
@@ -1240,7 +1588,7 @@ const docTemplate = `{
                 "summary": "Count of UTXOs",
                 "parameters": [
                     {
-                        "description": "CountRequestParameters model containing metadata and conditions",
+                        "description": "Supports targeted resource asset counting with filters for metadata and custom conditions",
                         "name": "CountRequestParameters",
                         "in": "body",
                         "schema": {
@@ -1250,7 +1598,16 @@ const docTemplate = `{
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK"
+                        "description": "Count of utxos",
+                        "schema": {
+                            "type": "number"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request - Error while parsing CountRequestParameters from request body"
+                    },
+                    "500": {
+                        "description": "Internal Server Error - Error while fetching count of utxos"
                     }
                 }
             }
@@ -1272,7 +1629,7 @@ const docTemplate = `{
                 "summary": "Search UTXO",
                 "parameters": [
                     {
-                        "description": "SearchRequestParameters model containing metadata, conditions and query params",
+                        "description": "Supports targeted resource searches with filters for metadata and custom conditions, plus options for pagination and sorting to streamline data exploration and analysis",
                         "name": "SearchRequestParameters",
                         "in": "body",
                         "schema": {
@@ -1282,7 +1639,22 @@ const docTemplate = `{
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK"
+                        "description": "List of utxos",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "type": "array",
+                                "items": {
+                                    "$ref": "#/definitions/models.Utxo"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request - Error while parsing SearchRequestParameters from request body"
+                    },
+                    "500": {
+                        "description": "Internal server error - Error while searching for utxos"
                     }
                 }
             }
@@ -1304,7 +1676,13 @@ const docTemplate = `{
                 "summary": "Get xPub",
                 "responses": {
                     "200": {
-                        "description": "OK"
+                        "description": "xPub associated with the given xPub from auth header",
+                        "schema": {
+                            "$ref": "#/definitions/models.Xpub"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error - Error while fetching xPub"
                     }
                 }
             },
@@ -1337,7 +1715,16 @@ const docTemplate = `{
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK"
+                        "description": "Updated xPub",
+                        "schema": {
+                            "$ref": "#/definitions/models.Xpub"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request - Error while parsing Metadata from request body"
+                    },
+                    "500": {
+                        "description": "Internal Server Error - Error while updating xPub"
                     }
                 }
             }
@@ -1348,7 +1735,15 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "metadata": {
-                    "$ref": "#/definitions/engine.Metadata"
+                    "description": "Accepts a JSON object for embedding custom metadata, enabling arbitrary additional information to be associated with the resource",
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "string"
+                    },
+                    "example": {
+                        "key": "value",
+                        "key2": "value2"
+                    }
                 }
             }
         },
@@ -1356,11 +1751,17 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "conditions": {
+                    "description": "Custom conditions used for filtering the search results",
                     "type": "object",
                     "additionalProperties": true
                 },
                 "metadata": {
-                    "$ref": "#/definitions/engine.Metadata"
+                    "description": "Accepts a JSON object for embedding custom metadata, enabling arbitrary additional information to be associated with the resource",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/engine.Metadata"
+                        }
+                    ]
                 }
             }
         },
@@ -1368,14 +1769,25 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "conditions": {
+                    "description": "Custom conditions used for filtering the search results",
                     "type": "object",
                     "additionalProperties": true
                 },
                 "metadata": {
-                    "$ref": "#/definitions/engine.Metadata"
+                    "description": "Accepts a JSON object for embedding custom metadata, enabling arbitrary additional information to be associated with the resource",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/engine.Metadata"
+                        }
+                    ]
                 },
                 "params": {
-                    "$ref": "#/definitions/datastore.QueryParams"
+                    "description": "Pagination and sorting options to streamline data exploration and analysis",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/datastore.QueryParams"
+                        }
+                    ]
                 }
             }
         },
@@ -1383,18 +1795,27 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "address": {
+                    "description": "The paymail address, example: example@spv-wallet.com",
                     "type": "string"
                 },
                 "avatar": {
+                    "description": "The avatar of the paymail (url address)",
                     "type": "string"
                 },
                 "metadata": {
-                    "$ref": "#/definitions/engine.Metadata"
+                    "description": "Accepts a JSON object for embedding custom metadata, enabling arbitrary additional information to be associated with the resource",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/engine.Metadata"
+                        }
+                    ]
                 },
                 "public_name": {
+                    "description": "The public name of the paymail",
                     "type": "string"
                 },
                 "xpub_id": {
+                    "description": "The xpub with which the paymail is associated",
                     "type": "string"
                 }
             }
@@ -1403,10 +1824,16 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "key": {
+                    "description": "The xpub key",
                     "type": "string"
                 },
                 "metadata": {
-                    "$ref": "#/definitions/engine.Metadata"
+                    "description": "Accepts a JSON object for embedding custom metadata, enabling arbitrary additional information to be associated with the resource",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/engine.Metadata"
+                        }
+                    ]
                 }
             }
         },
@@ -1414,6 +1841,7 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "address": {
+                    "description": "The paymail address example: example@spv-wallet.com",
                     "type": "string"
                 }
             }
@@ -1422,6 +1850,7 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "hex": {
+                    "description": "The transaction hex",
                     "type": "string"
                 }
             }
@@ -1519,6 +1948,30 @@ const docTemplate = `{
                 "Rejected"
             ]
         },
+        "customtypes.NullString": {
+            "type": "object",
+            "properties": {
+                "string": {
+                    "type": "string"
+                },
+                "valid": {
+                    "description": "Valid is true if String is not NULL",
+                    "type": "boolean"
+                }
+            }
+        },
+        "customtypes.NullTime": {
+            "type": "object",
+            "properties": {
+                "time": {
+                    "type": "string"
+                },
+                "valid": {
+                    "description": "Valid is true if Time is not NULL",
+                    "type": "boolean"
+                }
+            }
+        },
         "datastore.QueryParams": {
             "type": "object",
             "properties": {
@@ -1540,7 +1993,12 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "metadata": {
-                    "$ref": "#/definitions/engine.Metadata"
+                    "description": "Accepts a JSON object for embedding custom metadata, enabling arbitrary additional information to be associated with the resource",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/engine.Metadata"
+                        }
+                    ]
                 }
             }
         },
@@ -1548,22 +2006,445 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "address": {
+                    "description": "Address of the destination",
                     "type": "string"
                 },
                 "id": {
+                    "description": "ID of the destination which is the hash of the LockingScript",
                     "type": "string"
                 },
                 "locking_script": {
+                    "description": "LockingScript of the destination",
                     "type": "string"
                 },
                 "metadata": {
-                    "$ref": "#/definitions/engine.Metadata"
+                    "description": "Accepts a JSON object for embedding custom metadata, enabling arbitrary additional information to be associated with the resource",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/engine.Metadata"
+                        }
+                    ]
+                }
+            }
+        },
+        "engine.BUMP": {
+            "type": "object",
+            "properties": {
+                "blockHeight": {
+                    "type": "string",
+                    "example": "0"
+                },
+                "path": {
+                    "type": "array",
+                    "items": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/definitions/engine.BUMPLeaf"
+                        }
+                    }
+                }
+            }
+        },
+        "engine.BUMPLeaf": {
+            "type": "object",
+            "properties": {
+                "duplicate": {
+                    "type": "boolean"
+                },
+                "hash": {
+                    "type": "string"
+                },
+                "offset": {
+                    "type": "string",
+                    "example": "0"
+                },
+                "txid": {
+                    "type": "boolean"
                 }
             }
         },
         "engine.Metadata": {
             "type": "object",
             "additionalProperties": true
+        },
+        "engine.PaymailAddress": {
+            "type": "object",
+            "properties": {
+                "alias": {
+                    "description": "Alias part of the paymail",
+                    "type": "string"
+                },
+                "avatar": {
+                    "description": "This is the url of the user (public profile)",
+                    "type": "string"
+                },
+                "created_at": {
+                    "type": "string"
+                },
+                "deleted_at": {
+                    "description": "https://gorm.io/docs/indexes.html\nDeletedAt gorm.DeletedAt ` + "`" + `json:\"deleted_at\" toml:\"deleted_at\" yaml:\"deleted_at\" (@mrz: this was the original type)",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/customtypes.NullTime"
+                        }
+                    ]
+                },
+                "domain": {
+                    "description": "Domain of the paymail",
+                    "type": "string"
+                },
+                "external_xpub_key": {
+                    "description": "PublicKey hex encoded",
+                    "type": "string"
+                },
+                "id": {
+                    "description": "Model specific fields",
+                    "type": "string"
+                },
+                "metadata": {
+                    "$ref": "#/definitions/engine.Metadata"
+                },
+                "public_name": {
+                    "description": "Full username",
+                    "type": "string"
+                },
+                "updated_at": {
+                    "type": "string"
+                },
+                "xpub_id": {
+                    "description": "Related xPub ID",
+                    "type": "string"
+                }
+            }
+        },
+        "engine.SyncStatus": {
+            "type": "string",
+            "enum": [
+                "pending",
+                "ready",
+                "processing",
+                "canceled",
+                "skipped",
+                "error",
+                "complete"
+            ],
+            "x-enum-varnames": [
+                "SyncStatusPending",
+                "SyncStatusReady",
+                "SyncStatusProcessing",
+                "SyncStatusCanceled",
+                "SyncStatusSkipped",
+                "SyncStatusError",
+                "SyncStatusComplete"
+            ]
+        },
+        "engine.Transaction": {
+            "type": "object",
+            "properties": {
+                "block_hash": {
+                    "type": "string"
+                },
+                "block_height": {
+                    "type": "integer"
+                },
+                "bump": {
+                    "$ref": "#/definitions/engine.BUMP"
+                },
+                "created_at": {
+                    "type": "string"
+                },
+                "deleted_at": {
+                    "description": "https://gorm.io/docs/indexes.html\nDeletedAt gorm.DeletedAt ` + "`" + `json:\"deleted_at\" toml:\"deleted_at\" yaml:\"deleted_at\" (@mrz: this was the original type)",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/customtypes.NullTime"
+                        }
+                    ]
+                },
+                "direction": {
+                    "$ref": "#/definitions/engine.TransactionDirection"
+                },
+                "draft_id": {
+                    "type": "string"
+                },
+                "fee": {
+                    "type": "integer"
+                },
+                "hex": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "metadata": {
+                    "$ref": "#/definitions/engine.Metadata"
+                },
+                "number_of_inputs": {
+                    "type": "integer"
+                },
+                "number_of_outputs": {
+                    "type": "integer"
+                },
+                "output_value": {
+                    "description": "Virtual Fields",
+                    "type": "integer"
+                },
+                "status": {
+                    "$ref": "#/definitions/engine.SyncStatus"
+                },
+                "total_value": {
+                    "type": "integer"
+                },
+                "txStatus": {
+                    "type": "string"
+                },
+                "updated_at": {
+                    "type": "string"
+                },
+                "xpubID": {
+                    "description": "XPub of the user registering this transaction",
+                    "type": "string"
+                },
+                "xpub_in_ids": {
+                    "description": "Model specific fields",
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "xpub_out_ids": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                }
+            }
+        },
+        "engine.TransactionDirection": {
+            "type": "string",
+            "enum": [
+                "incoming",
+                "outgoing",
+                "reconcile"
+            ],
+            "x-enum-varnames": [
+                "TransactionDirectionIn",
+                "TransactionDirectionOut",
+                "TransactionDirectionReconcile"
+            ]
+        },
+        "engine.Utxo": {
+            "type": "object",
+            "properties": {
+                "created_at": {
+                    "type": "string"
+                },
+                "deleted_at": {
+                    "description": "https://gorm.io/docs/indexes.html\nDeletedAt gorm.DeletedAt ` + "`" + `json:\"deleted_at\" toml:\"deleted_at\" yaml:\"deleted_at\" (@mrz: this was the original type)",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/customtypes.NullTime"
+                        }
+                    ]
+                },
+                "draft_id": {
+                    "$ref": "#/definitions/customtypes.NullString"
+                },
+                "id": {
+                    "description": "Model specific fields",
+                    "type": "string"
+                },
+                "metadata": {
+                    "$ref": "#/definitions/engine.Metadata"
+                },
+                "output_index": {
+                    "type": "integer"
+                },
+                "reserved_at": {
+                    "$ref": "#/definitions/customtypes.NullTime"
+                },
+                "satoshis": {
+                    "type": "integer"
+                },
+                "script_pub_key": {
+                    "type": "string"
+                },
+                "spending_tx_id": {
+                    "$ref": "#/definitions/customtypes.NullString"
+                },
+                "transaction": {
+                    "description": "Virtual field holding the original transaction the utxo originated from\nThis is needed when signing a new transaction that spends the utxo",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/engine.Transaction"
+                        }
+                    ]
+                },
+                "transaction_id": {
+                    "type": "string"
+                },
+                "type": {
+                    "type": "string"
+                },
+                "updated_at": {
+                    "type": "string"
+                },
+                "xpub_id": {
+                    "type": "string"
+                }
+            }
+        },
+        "engine.Xpub": {
+            "type": "object",
+            "properties": {
+                "created_at": {
+                    "type": "string"
+                },
+                "current_balance": {
+                    "type": "integer"
+                },
+                "deleted_at": {
+                    "description": "https://gorm.io/docs/indexes.html\nDeletedAt gorm.DeletedAt ` + "`" + `json:\"deleted_at\" toml:\"deleted_at\" yaml:\"deleted_at\" (@mrz: this was the original type)",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/customtypes.NullTime"
+                        }
+                    ]
+                },
+                "id": {
+                    "description": "Model specific fields",
+                    "type": "string"
+                },
+                "metadata": {
+                    "$ref": "#/definitions/engine.Metadata"
+                },
+                "next_external_num": {
+                    "type": "integer"
+                },
+                "next_internal_num": {
+                    "type": "integer"
+                },
+                "updated_at": {
+                    "type": "string"
+                }
+            }
+        },
+        "models.AccessKey": {
+            "type": "object",
+            "properties": {
+                "created_at": {
+                    "description": "CreatedAt is a time when outer model was created.",
+                    "type": "string"
+                },
+                "deleted_at": {
+                    "description": "DeletedAt is a time when outer model was deleted.",
+                    "type": "string"
+                },
+                "id": {
+                    "description": "ID is an access key id.",
+                    "type": "string"
+                },
+                "key": {
+                    "description": "Key is a string representation of an access key.",
+                    "type": "string"
+                },
+                "metadata": {
+                    "description": "Metadata is a metadata map of outer model.",
+                    "type": "object",
+                    "additionalProperties": true
+                },
+                "revoked_at": {
+                    "description": "RevokedAt is a time when access key was revoked.",
+                    "type": "string"
+                },
+                "updated_at": {
+                    "description": "UpdatedAt is a time when outer model was updated.",
+                    "type": "string"
+                },
+                "xpub_id": {
+                    "description": "XpubID is an access key's xpub related id.",
+                    "type": "string"
+                }
+            }
+        },
+        "models.AdminStats": {
+            "type": "object",
+            "properties": {
+                "balance": {
+                    "description": "Balance is a total balance of all xpubs.",
+                    "type": "integer"
+                },
+                "destinations": {
+                    "description": "Destinations is a total number of destinations.",
+                    "type": "integer"
+                },
+                "paymail_addresses": {
+                    "description": "PaymailAddresses is a total number of paymail addresses.",
+                    "type": "integer"
+                },
+                "transactions": {
+                    "description": "Transactions is a total number of committed transactions.",
+                    "type": "integer"
+                },
+                "transactions_per_day": {
+                    "description": "TransactionsPerDay is a total number of committed transactions per day.",
+                    "type": "object",
+                    "additionalProperties": true
+                },
+                "utxos": {
+                    "description": "Utxos is a total number of utxos.",
+                    "type": "integer"
+                },
+                "utxos_per_type": {
+                    "description": "UtxosPerType are utxos grouped by type.",
+                    "type": "object",
+                    "additionalProperties": true
+                },
+                "xpubs": {
+                    "description": "Xpubs is a total number of xpubs.",
+                    "type": "integer"
+                }
+            }
+        },
+        "models.Contact": {
+            "type": "object",
+            "properties": {
+                "created_at": {
+                    "description": "CreatedAt is a time when outer model was created.",
+                    "type": "string"
+                },
+                "deleted_at": {
+                    "description": "DeletedAt is a time when outer model was deleted.",
+                    "type": "string"
+                },
+                "fullName": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "metadata": {
+                    "description": "Metadata is a metadata map of outer model.",
+                    "type": "object",
+                    "additionalProperties": true
+                },
+                "paymail": {
+                    "type": "string"
+                },
+                "pubKey": {
+                    "type": "string"
+                },
+                "status": {
+                    "type": "string"
+                },
+                "updated_at": {
+                    "description": "UpdatedAt is a time when outer model was updated.",
+                    "type": "string"
+                },
+                "xpubID": {
+                    "type": "string"
+                }
+            }
         },
         "models.Destination": {
             "type": "object",
@@ -1619,6 +2500,60 @@ const docTemplate = `{
                 },
                 "xpub_id": {
                     "description": "XpubID is a destination's xpub related id used to register destination.",
+                    "type": "string"
+                }
+            }
+        },
+        "models.DraftTransaction": {
+            "type": "object",
+            "properties": {
+                "configuration": {
+                    "description": "Configuration contains draft transaction configuration.",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/models.TransactionConfig"
+                        }
+                    ]
+                },
+                "created_at": {
+                    "description": "CreatedAt is a time when outer model was created.",
+                    "type": "string"
+                },
+                "deleted_at": {
+                    "description": "DeletedAt is a time when outer model was deleted.",
+                    "type": "string"
+                },
+                "expires_at": {
+                    "description": "ExpiresAt is a time when draft transaction expired.",
+                    "type": "string"
+                },
+                "final_tx_id": {
+                    "description": "FinalTxID is a final transaction id.",
+                    "type": "string"
+                },
+                "hex": {
+                    "description": "Hex is a draft transaction hex.",
+                    "type": "string"
+                },
+                "id": {
+                    "description": "ID is a draft transaction id.",
+                    "type": "string"
+                },
+                "metadata": {
+                    "description": "Metadata is a metadata map of outer model.",
+                    "type": "object",
+                    "additionalProperties": true
+                },
+                "status": {
+                    "description": "Status is a draft transaction lastly monitored status.",
+                    "type": "string"
+                },
+                "updated_at": {
+                    "description": "UpdatedAt is a time when outer model was updated.",
+                    "type": "string"
+                },
+                "xpub_id": {
+                    "description": "XpubID is a draft transaction's xpub used to sign transaction.",
                     "type": "string"
                 }
             }
@@ -2069,6 +3004,76 @@ const docTemplate = `{
                 }
             }
         },
+        "models.Utxo": {
+            "type": "object",
+            "properties": {
+                "created_at": {
+                    "description": "CreatedAt is a time when outer model was created.",
+                    "type": "string"
+                },
+                "deleted_at": {
+                    "description": "DeletedAt is a time when outer model was deleted.",
+                    "type": "string"
+                },
+                "draft_id": {
+                    "description": "DraftID is a utxo transaction related draft id.",
+                    "type": "string"
+                },
+                "id": {
+                    "description": "ID is a utxo id.",
+                    "type": "string"
+                },
+                "metadata": {
+                    "description": "Metadata is a metadata map of outer model.",
+                    "type": "object",
+                    "additionalProperties": true
+                },
+                "output_index": {
+                    "description": "OutputIndex is a output index that utxo points to.",
+                    "type": "integer"
+                },
+                "reserved_at": {
+                    "description": "ReservedAt is a time utxo was reserved at.",
+                    "type": "string"
+                },
+                "satoshis": {
+                    "description": "Satoshis is a utxo satoshis amount.",
+                    "type": "integer"
+                },
+                "script_pub_key": {
+                    "description": "ScriptPubKey is a utxo script pub key.",
+                    "type": "string"
+                },
+                "spending_tx_id": {
+                    "description": "SpendingTxID is a spending transaction id - null if not spent yet.",
+                    "type": "string"
+                },
+                "transaction": {
+                    "description": "Transaction is a transaction pointer that utxo points to.",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/models.Transaction"
+                        }
+                    ]
+                },
+                "transaction_id": {
+                    "description": "TransactionID is a transaction id that utxo points to.",
+                    "type": "string"
+                },
+                "type": {
+                    "description": "Type is a utxo type.",
+                    "type": "string"
+                },
+                "updated_at": {
+                    "description": "UpdatedAt is a time when outer model was updated.",
+                    "type": "string"
+                },
+                "xpub_id": {
+                    "description": "XpubID is a utxo related xpub id.",
+                    "type": "string"
+                }
+            }
+        },
         "models.UtxoPointer": {
             "type": "object",
             "properties": {
@@ -2082,17 +3087,47 @@ const docTemplate = `{
                 }
             }
         },
+        "models.Xpub": {
+            "type": "object",
+            "properties": {
+                "created_at": {
+                    "description": "CreatedAt is a time when outer model was created.",
+                    "type": "string"
+                },
+                "current_balance": {
+                    "description": "CurrentBalance is a xpub's current balance.",
+                    "type": "integer"
+                },
+                "deleted_at": {
+                    "description": "DeletedAt is a time when outer model was deleted.",
+                    "type": "string"
+                },
+                "id": {
+                    "description": "ID is a xpub id.",
+                    "type": "string"
+                },
+                "metadata": {
+                    "description": "Metadata is a metadata map of outer model.",
+                    "type": "object",
+                    "additionalProperties": true
+                },
+                "next_external_num": {
+                    "description": "NextExternalNum is a next external num.",
+                    "type": "integer"
+                },
+                "next_internal_num": {
+                    "description": "NextInternalNum is a next internal num.",
+                    "type": "integer"
+                },
+                "updated_at": {
+                    "description": "UpdatedAt is a time when outer model was updated.",
+                    "type": "string"
+                }
+            }
+        },
         "time.Duration": {
             "type": "integer",
             "enum": [
-                -9223372036854775808,
-                9223372036854775807,
-                1,
-                1000,
-                1000000,
-                1000000000,
-                60000000000,
-                3600000000000,
                 -9223372036854775808,
                 9223372036854775807,
                 1,
@@ -2126,14 +3161,6 @@ const docTemplate = `{
                 "Millisecond",
                 "Second",
                 "Minute",
-                "Hour",
-                "minDuration",
-                "maxDuration",
-                "Nanosecond",
-                "Microsecond",
-                "Millisecond",
-                "Second",
-                "Minute",
                 "Hour"
             ]
         },
@@ -2141,10 +3168,41 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "config": {
-                    "$ref": "#/definitions/models.TransactionConfig"
+                    "description": "Configuration of the transaction",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/models.TransactionConfig"
+                        }
+                    ]
                 },
                 "metadata": {
-                    "$ref": "#/definitions/engine.Metadata"
+                    "description": "Accepts a JSON object for embedding custom metadata, enabling arbitrary additional information to be associated with the resource",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/engine.Metadata"
+                        }
+                    ]
+                }
+            }
+        },
+        "transactions.RecordTransaction": {
+            "type": "object",
+            "properties": {
+                "hex": {
+                    "description": "Hex of the transaction",
+                    "type": "string"
+                },
+                "metadata": {
+                    "description": "Accepts a JSON object for embedding custom metadata, enabling arbitrary additional information to be associated with the resource",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/engine.Metadata"
+                        }
+                    ]
+                },
+                "reference_id": {
+                    "description": "ReferenceID which is a ID of the draft transaction",
+                    "type": "string"
                 }
             }
         },
@@ -2152,10 +3210,16 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "id": {
+                    "description": "Id of the transaction which is a hash of the transaction",
                     "type": "string"
                 },
                 "metadata": {
-                    "$ref": "#/definitions/engine.Metadata"
+                    "description": "Accepts a JSON object for embedding custom metadata, enabling arbitrary additional information to be associated with the resource",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/engine.Metadata"
+                        }
+                    ]
                 }
             }
         }

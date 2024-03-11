@@ -6,6 +6,8 @@ import (
 
 // CountUtxo is the model containing filters for counting utxos
 type CountUtxo struct {
+	// Custom conditions used for filtering the search results
 	Conditions map[string]interface{} `json:"conditions"`
-	Metadata   engine.Metadata        `json:"metadata"`
+	// Accepts a JSON object for embedding custom metadata, enabling arbitrary additional information to be associated with the resource
+	Metadata engine.Metadata `json:"metadata"`
 }

@@ -16,14 +16,16 @@ import (
 // @Description	Search for transactions
 // @Tags		Admin
 // @Produce		json
-// @Param		SearchRequestParameters body actions.SearchRequestParameters false "SearchRequestParameters model containing metadata, conditions and query params"
-// @Success		200
+// @Param		SearchRequestParameters body actions.SearchRequestParameters false "Supports targeted resource searches with filters for metadata and custom conditions, plus options for pagination and sorting to streamline data exploration and analysis"
+// @Success		200 {array} []models.Transaction "List of transactions"
+// @Failure		400	"Bad request - Error while parsing SearchRequestParameters from request body"
+// @Failure 	500	"Internal server error - Error while searching for transactions"
 // @Router		/v1/admin/transactions/search [post]
 // @Security	x-auth-xpub
 func (a *Action) transactionsSearch(c *gin.Context) {
 	queryParams, metadata, conditions, err := actions.GetSearchQueryParameters(c)
 	if err != nil {
-		c.JSON(http.StatusExpectationFailed, err.Error())
+		c.JSON(http.StatusBadRequest, err.Error())
 		return
 	}
 
@@ -34,7 +36,7 @@ func (a *Action) transactionsSearch(c *gin.Context) {
 		conditions,
 		queryParams,
 	); err != nil {
-		c.JSON(http.StatusExpectationFailed, err.Error())
+		c.JSON(http.StatusInternalServerError, err.Error())
 		return
 	}
 
@@ -52,14 +54,16 @@ func (a *Action) transactionsSearch(c *gin.Context) {
 // @Description	Count transactions
 // @Tags		Admin
 // @Produce		json
-// @Param		CountRequestParameters body actions.CountRequestParameters false "CountRequestParameters model containing metadata and conditions"
-// @Success		200
+// @Param		CountRequestParameters body actions.CountRequestParameters false "Supports targeted resource asset counting with filters for metadata and custom conditions"
+// @Success		200	{number} int64 "Count of transactions"
+// @Failure		400	"Bad request - Error while parsing CountRequestParameters from request body"
+// @Failure 	500	"Internal Server Error - Error while fetching count of transactions"
 // @Router		/v1/admin/transactions/count [post]
 // @Security	x-auth-xpub
 func (a *Action) transactionsCount(c *gin.Context) {
 	metadata, conditions, err := actions.GetCountQueryParameters(c)
 	if err != nil {
-		c.JSON(http.StatusExpectationFailed, err.Error())
+		c.JSON(http.StatusBadRequest, err.Error())
 		return
 	}
 
@@ -69,7 +73,7 @@ func (a *Action) transactionsCount(c *gin.Context) {
 		metadata,
 		conditions,
 	); err != nil {
-		c.JSON(http.StatusExpectationFailed, err.Error())
+		c.JSON(http.StatusInternalServerError, err.Error())
 		return
 	}
 

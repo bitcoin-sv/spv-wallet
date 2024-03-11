@@ -6,7 +6,6 @@ import (
 	"github.com/bitcoin-sv/spv-wallet/mappings"
 	"github.com/bitcoin-sv/spv-wallet/server/auth"
 	"github.com/gin-gonic/gin"
-	apirouter "github.com/mrz1836/go-api-router"
 )
 
 // update will update a transaction
@@ -15,16 +14,18 @@ import (
 // @Description	Update transaction
 // @Tags		Transactions
 // @Produce		json
-// @Param		UpdateTransaction body UpdateTransaction true "UpdateTransaction model containing the transaction id and metadata"
-// @Success		200
+// @Param		UpdateTransaction body UpdateTransaction true "UpdateTransaction model containing the information about tx to update"
+// @Success		200 {object} models.Transaction "Updated transaction"
+// @Failure		400	"Bad request - Error while parsing UpdateTransaction from request body, tx not found or tx is not associated with the xpub"
+// @Failure 	500	"Internal Server Error - Error while updating transaction"
 // @Router		/v1/transaction [patch]
 // @Security	x-auth-xpub
 func (a *Action) update(c *gin.Context) {
 	reqXPubID := c.GetString(auth.ParamXPubHashKey)
 
 	var requestBody UpdateTransaction
-	if err := c.ShouldBindJSON(&requestBody); err != nil {
-		apirouter.ReturnResponse(c.Writer, c.Request, http.StatusExpectationFailed, err.Error())
+	if err := c.Bind(&requestBody); err != nil {
+		c.JSON(http.StatusBadRequest, err.Error())
 		return
 	}
 
@@ -36,12 +37,12 @@ func (a *Action) update(c *gin.Context) {
 		requestBody.Metadata,
 	)
 	if err != nil {
-		c.JSON(http.StatusExpectationFailed, err.Error())
+		c.JSON(http.StatusInternalServerError, err.Error())
 		return
 	} else if transaction == nil {
-		c.JSON(http.StatusNotFound, "not found")
+		c.JSON(http.StatusBadRequest, "not found")
 	} else if !transaction.IsXpubIDAssociated(reqXPubID) {
-		c.JSON(http.StatusForbidden, "unauthorized")
+		c.JSON(http.StatusBadRequest, "unauthorized")
 		return
 	}
 

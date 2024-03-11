@@ -18,17 +18,19 @@ import (
 // @Tags		Destinations
 // @Produce		json
 // @Param		CreateDestination body CreateDestination false "CreateDestination model containing metadata"
-// @Success		201
+// @Success		201 {object} models.Destination "Created Destination"
+// @Failure		400	"Bad request - Error while parsing CreateDestination from request body"
+// @Failure 	500	"Internal Server Error - Error while creating destination"
 // @Router		/v1/destination [post]
 // @Security	x-auth-xpub
 func (a *Action) create(c *gin.Context) {
 	reqXPub := c.GetString(auth.ParamXPubKey)
 	xPub, err := a.Services.SpvWalletEngine.GetXpub(c.Request.Context(), reqXPub)
 	if err != nil {
-		c.JSON(http.StatusUnprocessableEntity, err.Error())
+		c.JSON(http.StatusBadRequest, err.Error())
 		return
 	} else if xPub == nil {
-		c.JSON(http.StatusForbidden, actions.ErrXpubNotFound)
+		c.JSON(http.StatusBadRequest, actions.ErrXpubNotFound)
 		return
 	}
 
@@ -52,7 +54,7 @@ func (a *Action) create(c *gin.Context) {
 		utils.ScriptTypePubKeyHash,
 		opts...,
 	); err != nil {
-		c.JSON(http.StatusUnprocessableEntity, err.Error())
+		c.JSON(http.StatusInternalServerError, err.Error())
 		return
 	}
 

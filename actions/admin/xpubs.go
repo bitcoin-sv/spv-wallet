@@ -16,7 +16,9 @@ import (
 // @Tags		Admin
 // @Produce		json
 // @Param		CreateXpub body CreateXpub true "CreateXpub model containing key and metadata"
-// @Success		201
+// @Success		201 {object} models.Xpub "Created Xpub"
+// @Failure		400	"Bad request - Error while parsing CreateXpub from request body"
+// @Failure 	500	"Internal server error - Error while creating xpub"
 // @Router		/v1/admin/xpub [post]
 // @Security	x-auth-xpub
 func (a *Action) xpubsCreate(c *gin.Context) {
@@ -31,7 +33,7 @@ func (a *Action) xpubsCreate(c *gin.Context) {
 		engine.WithMetadatas(requestBody.Metadata),
 	)
 	if err != nil {
-		c.JSON(http.StatusUnprocessableEntity, err.Error())
+		c.JSON(http.StatusInternalServerError, err.Error())
 		return
 	}
 
@@ -45,8 +47,10 @@ func (a *Action) xpubsCreate(c *gin.Context) {
 // @Description	Search for xpubs
 // @Tags		Admin
 // @Produce		json
-// @Param		SearchRequestParameters body actions.SearchRequestParameters false "SearchRequestParameters model containing metadata, conditions and query params"
-// @Success		200
+// @Param		SearchRequestParameters body actions.SearchRequestParameters false "Supports targeted resource searches with filters for metadata and custom conditions, plus options for pagination and sorting to streamline data exploration and analysis"
+// @Success		200 {array} []engine.Xpub "List of xpubs"
+// @Failure		400	"Bad request - Error while parsing SearchRequestParameters from request body"
+// @Failure 	500	"Internal server error - Error while searching for xpubs"
 // @Router		/v1/admin/xpubs/search [post]
 // @Security	x-auth-xpub
 func (a *Action) xpubsSearch(c *gin.Context) {
@@ -76,8 +80,10 @@ func (a *Action) xpubsSearch(c *gin.Context) {
 // @Description	Count xpubs
 // @Tags		Admin
 // @Produce		json
-// @Param		CountRequestParameters body actions.CountRequestParameters false "CountRequestParameters model containing metadata and conditions"
-// @Success		200
+// @Param		CountRequestParameters body actions.CountRequestParameters false "Supports targeted resource asset counting with filters for metadata and custom conditions"
+// @Success		200	{number} int64 "Count of access keys"
+// @Failure		400	"Bad request - Error while parsing CountRequestParameters from request body"
+// @Failure 	500	"Internal Server Error - Error while fetching count of xpubs"
 // @Router		/v1/admin/xpubs/count [post]
 // @Security	x-auth-xpub
 func (a *Action) xpubsCount(c *gin.Context) {
