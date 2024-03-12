@@ -76,114 +76,39 @@ output:
   # add a prefix to the output file references; default is no prefix
   path-prefix: ""
 
-
-# all available settings of specific linters
-linters-settings:
-  dupl:
-    # tokens count to trigger issue, 150 by default
-    threshold: 200
-  errcheck:
-    # report about not checking of errors in type assertions: `a := b.(MyStruct)`;
-    # default is false: such cases aren't reported by default.
-    check-type-assertions: false
-
-    # report about assignment of errors to blank identifier: `num, _ := strconv.Atoi(numStr)`;
-    # default is false: such cases aren't reported by default.
-    check-blank: false
-
-    # [deprecated] comma-separated list of pairs of the form pkg:regex
-    # the regex is used to ignore names within pkg. (default "fmt:.*").
-    # see https://github.com/kisielk/errcheck#the-deprecated-method for details
-    ignore: fmt:.*,io/ioutil:^Read.*
-
-    # path to a file containing a list of functions to exclude from checking
-    # see https://github.com/kisielk/errcheck#excluding-functions for details
-    #exclude: /path/to/file.txt
-  exhaustive:
-    # indicates that switch statements are to be considered exhaustive if a
-    # 'default' case is present, even if all enum members aren't listed in the
-    # switch
-    default-signifies-exhaustive: false
-  gci:
-    # put imports beginning with prefix after 3rd-party packages;
-    # only support one prefix
-    # if not set, use goimports.local-prefixes
-    local-prefixes: github.com/org/project
-  gocyclo:
-    # minimal code complexity to report, 30 by default (but we recommend 10-20)
-    min-complexity: 10
-  govet:
-    # report about shadowed variables
-    check-shadowing: true
-
-    # settings per analyzer
-    settings:
-      printf: # analyzer name, run `go tool vet help` to see all analyzers
-        funcs: # run `go tool vet help printf` to see available settings for `printf` analyzer
-          - (github.com/golangci/golangci-lint/pkg/logutils.Log).Infof
-          - (github.com/golangci/golangci-lint/pkg/logutils.Log).Warnf
-          - (github.com/golangci/golangci-lint/pkg/logutils.Log).Errorf
-          - (github.com/golangci/golangci-lint/pkg/logutils.Log).Fatalf
-
-    # enable or disable analyzers by name
-    enable:
-      - atomicalign
-    enable-all: false
-    disable-all: false
-  maligned:
-    # print struct with more effective memory layout or not, false by default
-    suggest-new: true
-  misspell:
-    # Correct spellings using locale preferences for US or UK.
-    # Default is to use a neutral variety of English.
-    # Setting locale to US will correct the British spelling of 'colour' to 'color'.
-    locale: US
-    ignore-words:
-      - bsv
-      - bitcoin
-  nolintlint:
-    # Exclude following linters from requiring an explanation.  Default is [].
-    allow-no-explanation: []
-    # Enable to require an explanation of nonzero length after each nolint directive. Default is false.
-    require-explanation: true
-    # Enable to require nolint directives to mention the specific linter being suppressed. Default is false.
-    require-specific: true
-
 linters:
+  # Disable all linters.
+  # Default: false
+  disable-all: true
+  # Enable specific linter
+  # https://golangci-lint.run/usage/linters/#enabled-by-default
   enable:
-    - megacheck
-    - govet
-    - gosec
     - bodyclose
+    - errorlint
+    - exhaustive
+    - goconst
+    - unparam
+    - wastedassign
+    - wrapcheck
+    - exhaustruct
+    - gocognit
+    - gocyclo
+    - gofumpt
+    - gosec
+    - maligned
+    - prealloc
+    - testifylint
+    - govet
     - revive
     - unconvert
-    - misspell
     - ineffassign
     - dogsled
-    - prealloc
     - exportloopref
-    - exhaustive
     - sqlclosecheck
     - nolintlint
-    - gci
-  disable:
-    - gocritic # use this for very opinionated linting
-    - gochecknoglobals
-    - whitespace
-    - wsl
-    - goerr113
-    - godot
-    - testpackage
-    - nestif
-    - nlreturn
-    - testifylint
-    - goconst
-  disable-all: false
   presets:
     - bugs
     - unused
-  fast: false
-
 
 issues:
   # List of regexps of issue texts to exclude, empty list by default.

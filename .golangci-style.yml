@@ -76,63 +76,27 @@ output:
   # add a prefix to the output file references; default is no prefix
   path-prefix: ""
 
+linters:
+  # Disable all linters.
+  # Default: false
+  disable-all: true
+  # Enable specific linter
+  # https://golangci-lint.run/usage/linters/#enabled-by-default
+  enable:
+    - gci
+    - misspell
+    - tagalign
+    - tagliatelle
+  presets:
+    - bugs
+    - unused
 
-# all available settings of specific linters
 linters-settings:
-  dupl:
-    # tokens count to trigger issue, 150 by default
-    threshold: 200
-  errcheck:
-    # report about not checking of errors in type assertions: `a := b.(MyStruct)`;
-    # default is false: such cases aren't reported by default.
-    check-type-assertions: false
-
-    # report about assignment of errors to blank identifier: `num, _ := strconv.Atoi(numStr)`;
-    # default is false: such cases aren't reported by default.
-    check-blank: false
-
-    # [deprecated] comma-separated list of pairs of the form pkg:regex
-    # the regex is used to ignore names within pkg. (default "fmt:.*").
-    # see https://github.com/kisielk/errcheck#the-deprecated-method for details
-    ignore: fmt:.*,io/ioutil:^Read.*
-
-    # path to a file containing a list of functions to exclude from checking
-    # see https://github.com/kisielk/errcheck#excluding-functions for details
-    #exclude: /path/to/file.txt
-  exhaustive:
-    # indicates that switch statements are to be considered exhaustive if a
-    # 'default' case is present, even if all enum members aren't listed in the
-    # switch
-    default-signifies-exhaustive: false
   gci:
     # put imports beginning with prefix after 3rd-party packages;
     # only support one prefix
     # if not set, use goimports.local-prefixes
     local-prefixes: github.com/org/project
-  gocyclo:
-    # minimal code complexity to report, 30 by default (but we recommend 10-20)
-    min-complexity: 10
-  govet:
-    # report about shadowed variables
-    check-shadowing: true
-
-    # settings per analyzer
-    settings:
-      printf: # analyzer name, run `go tool vet help` to see all analyzers
-        funcs: # run `go tool vet help printf` to see available settings for `printf` analyzer
-          - (github.com/golangci/golangci-lint/pkg/logutils.Log).Infof
-          - (github.com/golangci/golangci-lint/pkg/logutils.Log).Warnf
-          - (github.com/golangci/golangci-lint/pkg/logutils.Log).Errorf
-          - (github.com/golangci/golangci-lint/pkg/logutils.Log).Fatalf
-
-    # enable or disable analyzers by name
-    enable:
-      - atomicalign
-    enable-all: false
-    disable-all: false
-  maligned:
-    # print struct with more effective memory layout or not, false by default
-    suggest-new: true
   misspell:
     # Correct spellings using locale preferences for US or UK.
     # Default is to use a neutral variety of English.
@@ -141,98 +105,17 @@ linters-settings:
     ignore-words:
       - bsv
       - bitcoin
-  nolintlint:
-    # Exclude following linters from requiring an explanation.  Default is [].
-    allow-no-explanation: []
-    # Enable to require an explanation of nonzero length after each nolint directive. Default is false.
-    require-explanation: true
-    # Enable to require nolint directives to mention the specific linter being suppressed. Default is false.
-    require-specific: true
-
-linters:
-  enable:
-    - megacheck
-    - govet
-    - gosec
-    - bodyclose
-    - revive
-    - unconvert
-    - misspell
-    - ineffassign
-    - dogsled
-    - prealloc
-    - exportloopref
-    - exhaustive
-    - sqlclosecheck
-    - nolintlint
-    - gci
-  disable:
-    - gocritic # use this for very opinionated linting
-    - gochecknoglobals
-    - whitespace
-    - wsl
-    - goerr113
-    - godot
-    - testpackage
-    - nestif
-    - nlreturn
-    - testifylint
-    - goconst
-  disable-all: false
-  presets:
-    - bugs
-    - unused
-  fast: false
-
 
 issues:
-  # List of regexps of issue texts to exclude, empty list by default.
-  # But independently of this option we use default exclude patterns,
-  # it can be disabled by `exclude-use-default: false`. To list all
-  # excluded by default patterns execute `golangci-lint run --help`
-  exclude:
-    - Using the variable on range scope .* in function literal
-    - should have a package comment
-
-  # Excluding configuration per-path, per-linter, per-text and per-source
-  exclude-rules:
-    # Exclude some linters from running on tests files.
-    - path: _test\.go
-      linters:
-        - gocyclo
-        - errcheck
-        - dupl
-        - gosec
-
-    # Exclude known linters from partially "hard-vendored" code,
-    # which is impossible to exclude via "nolint" comments.
-    - path: internal/hmac/
-      text: "weak cryptographic primitive"
-      linters:
-        - gosec
-
-    # Exclude some "staticcheck" messages
-    - linters:
-        - staticcheck
-      text: "SA1019:"
-
-    # Exclude lll issues for long lines with go:generate
-    - linters:
-        - lll
-      source: "^//go:generate "
-
   # Independently of option `exclude` we use default exclude patterns,
-  # it can be disabled by this option. To list all
-  # excluded by default patterns execute `golangci-lint run --help`.
-  # Default value for this option is true.
+  # it can be disabled by this option.
+  # To list all excluded by default patterns execute `golangci-lint run --help`.
+  # Default: true
   exclude-use-default: false
-
   # Maximum issues count per one linter. Set to 0 to disable. Default is 50.
   max-issues-per-linter: 0
-
   # Maximum count of issues with the same text. Set to 0 to disable. Default is 3.
   max-same-issues: 0
-
   # Show only new issues created after git revision `REV`
   new-from-rev: ""
 
