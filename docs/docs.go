@@ -602,6 +602,31 @@ const docTemplate = `{
                 }
             }
         },
+        "/v1/admin/shared-config": {
+            "get": {
+                "security": [
+                    {
+                        "x-auth-xpub": []
+                    }
+                ],
+                "description": "Get shared config",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Admin"
+                ],
+                "summary": "Get shared config",
+                "responses": {
+                    "200": {
+                        "description": "Shared configuration",
+                        "schema": {
+                            "$ref": "#/definitions/models.SharedConfig"
+                        }
+                    }
+                }
+            }
+        },
         "/v1/admin/stats": {
             "get": {
                 "security": [
@@ -2559,6 +2584,31 @@ const docTemplate = `{
                 }
             }
         },
+        "models.SharedConfig": {
+            "type": "object",
+            "properties": {
+                "experimental_features": {
+                    "description": "ExperimentalFeatures is a map of experimental features handled by spv-wallet.",
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "boolean"
+                    },
+                    "example": {
+                        "pike_enabled": true
+                    }
+                },
+                "paymail_domains": {
+                    "description": "PaymailDomains is a list of paymail domains handled by spv-wallet.",
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    },
+                    "example": [
+                        "spv-wallet.com"
+                    ]
+                }
+            }
+        },
         "models.SyncConfig": {
             "type": "object",
             "properties": {
@@ -3118,11 +3168,28 @@ const docTemplate = `{
                 1000000000,
                 60000000000,
                 3600000000000,
+                -9223372036854775808,
+                9223372036854775807,
                 1,
                 1000,
                 1000000,
                 1000000000,
-                60000000000
+                60000000000,
+                3600000000000,
+                -9223372036854775808,
+                9223372036854775807,
+                1,
+                1000,
+                1000000,
+                1000000000,
+                60000000000,
+                3600000000000,
+                1,
+                1000,
+                1000000,
+                1000000000,
+                60000000000,
+                3600000000000
             ],
             "x-enum-varnames": [
                 "minDuration",
@@ -3141,11 +3208,28 @@ const docTemplate = `{
                 "Second",
                 "Minute",
                 "Hour",
+                "minDuration",
+                "maxDuration",
                 "Nanosecond",
                 "Microsecond",
                 "Millisecond",
                 "Second",
-                "Minute"
+                "Minute",
+                "Hour",
+                "minDuration",
+                "maxDuration",
+                "Nanosecond",
+                "Microsecond",
+                "Millisecond",
+                "Second",
+                "Minute",
+                "Hour",
+                "Nanosecond",
+                "Microsecond",
+                "Millisecond",
+                "Second",
+                "Minute",
+                "Hour"
             ]
         },
         "transactions.NewTransaction": {

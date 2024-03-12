@@ -629,6 +629,24 @@ definitions:
         description: ScriptType is a script output script type.
         type: string
     type: object
+  models.SharedConfig:
+    properties:
+      experimental_features:
+        additionalProperties:
+          type: boolean
+        description: ExperimentalFeatures is a map of experimental features handled
+          by spv-wallet.
+        example:
+          pike_enabled: true
+        type: object
+      paymail_domains:
+        description: PaymailDomains is a list of paymail domains handled by spv-wallet.
+        example:
+        - spv-wallet.com
+        items:
+          type: string
+        type: array
+    type: object
   models.SyncConfig:
     properties:
       broadcast:
@@ -1049,11 +1067,28 @@ definitions:
     - 1000000000
     - 60000000000
     - 3600000000000
+    - -9223372036854775808
+    - 9223372036854775807
     - 1
     - 1000
     - 1000000
     - 1000000000
     - 60000000000
+    - 3600000000000
+    - -9223372036854775808
+    - 9223372036854775807
+    - 1
+    - 1000
+    - 1000000
+    - 1000000000
+    - 60000000000
+    - 3600000000000
+    - 1
+    - 1000
+    - 1000000
+    - 1000000000
+    - 60000000000
+    - 3600000000000
     type: integer
     x-enum-varnames:
     - minDuration
@@ -1072,11 +1107,28 @@ definitions:
     - Second
     - Minute
     - Hour
+    - minDuration
+    - maxDuration
     - Nanosecond
     - Microsecond
     - Millisecond
     - Second
     - Minute
+    - Hour
+    - minDuration
+    - maxDuration
+    - Nanosecond
+    - Microsecond
+    - Millisecond
+    - Second
+    - Minute
+    - Hour
+    - Nanosecond
+    - Microsecond
+    - Millisecond
+    - Second
+    - Minute
+    - Hour
   transactions.NewTransaction:
     properties:
       config:
@@ -1519,6 +1571,21 @@ paths:
       security:
       - x-auth-xpub: []
       summary: Paymail addresses search
+      tags:
+      - Admin
+  /v1/admin/shared-config:
+    get:
+      description: Get shared config
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Shared configuration
+          schema:
+            $ref: '#/definitions/models.SharedConfig'
+      security:
+      - x-auth-xpub: []
+      summary: Get shared config
       tags:
       - Admin
   /v1/admin/stats:
