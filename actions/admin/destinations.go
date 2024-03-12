@@ -1,6 +1,8 @@
 package admin
 
 import (
+	"github.com/bitcoin-sv/spv-wallet/mappings"
+	"github.com/bitcoin-sv/spv-wallet/models"
 	"net/http"
 
 	"github.com/bitcoin-sv/spv-wallet/actions"
@@ -38,7 +40,12 @@ func (a *Action) destinationsSearch(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, destinations)
+	destinationContracts := make([]*models.Destination, 0)
+	for _, destination := range destinations {
+		destinationContracts = append(destinationContracts, mappings.MapToDestinationContract(destination))
+	}
+
+	c.JSON(http.StatusOK, destinationContracts)
 }
 
 // destinationsCount will count all destinations filtered by metadata

@@ -197,14 +197,6 @@ definitions:
     - SeenInOrphanMempool
     - Confirmed
     - Rejected
-  customtypes.NullString:
-    properties:
-      string:
-        type: string
-      valid:
-        description: Valid is true if String is not NULL
-        type: boolean
-    type: object
   customtypes.NullTime:
     properties:
       time:
@@ -249,194 +241,8 @@ definitions:
           key2: value2
         type: object
     type: object
-  engine.BUMP:
-    properties:
-      blockHeight:
-        example: "0"
-        type: string
-      path:
-        items:
-          items:
-            $ref: '#/definitions/engine.BUMPLeaf'
-          type: array
-        type: array
-    type: object
-  engine.BUMPLeaf:
-    properties:
-      duplicate:
-        type: boolean
-      hash:
-        type: string
-      offset:
-        example: "0"
-        type: string
-      txid:
-        type: boolean
-    type: object
   engine.Metadata:
     additionalProperties: true
-    type: object
-  engine.PaymailAddress:
-    properties:
-      alias:
-        description: Alias part of the paymail
-        type: string
-      avatar:
-        description: This is the url of the user (public profile)
-        type: string
-      created_at:
-        type: string
-      deleted_at:
-        allOf:
-        - $ref: '#/definitions/customtypes.NullTime'
-        description: |-
-          https://gorm.io/docs/indexes.html
-          DeletedAt gorm.DeletedAt `json:"deleted_at" toml:"deleted_at" yaml:"deleted_at" (@mrz: this was the original type)
-      domain:
-        description: Domain of the paymail
-        type: string
-      external_xpub_key:
-        description: PublicKey hex encoded
-        type: string
-      id:
-        description: Model specific fields
-        type: string
-      metadata:
-        $ref: '#/definitions/engine.Metadata'
-      public_name:
-        description: Full username
-        type: string
-      updated_at:
-        type: string
-      xpub_id:
-        description: Related xPub ID
-        type: string
-    type: object
-  engine.SyncStatus:
-    enum:
-    - pending
-    - ready
-    - processing
-    - canceled
-    - skipped
-    - error
-    - complete
-    type: string
-    x-enum-varnames:
-    - SyncStatusPending
-    - SyncStatusReady
-    - SyncStatusProcessing
-    - SyncStatusCanceled
-    - SyncStatusSkipped
-    - SyncStatusError
-    - SyncStatusComplete
-  engine.Transaction:
-    properties:
-      block_hash:
-        type: string
-      block_height:
-        type: integer
-      bump:
-        $ref: '#/definitions/engine.BUMP'
-      created_at:
-        type: string
-      deleted_at:
-        allOf:
-        - $ref: '#/definitions/customtypes.NullTime'
-        description: |-
-          https://gorm.io/docs/indexes.html
-          DeletedAt gorm.DeletedAt `json:"deleted_at" toml:"deleted_at" yaml:"deleted_at" (@mrz: this was the original type)
-      direction:
-        $ref: '#/definitions/engine.TransactionDirection'
-      draft_id:
-        type: string
-      fee:
-        type: integer
-      hex:
-        type: string
-      id:
-        type: string
-      metadata:
-        $ref: '#/definitions/engine.Metadata'
-      number_of_inputs:
-        type: integer
-      number_of_outputs:
-        type: integer
-      output_value:
-        description: Virtual Fields
-        type: integer
-      status:
-        $ref: '#/definitions/engine.SyncStatus'
-      total_value:
-        type: integer
-      txStatus:
-        type: string
-      updated_at:
-        type: string
-      xpub_in_ids:
-        description: Model specific fields
-        items:
-          type: string
-        type: array
-      xpub_out_ids:
-        items:
-          type: string
-        type: array
-      xpubID:
-        description: XPub of the user registering this transaction
-        type: string
-    type: object
-  engine.TransactionDirection:
-    enum:
-    - incoming
-    - outgoing
-    - reconcile
-    type: string
-    x-enum-varnames:
-    - TransactionDirectionIn
-    - TransactionDirectionOut
-    - TransactionDirectionReconcile
-  engine.Utxo:
-    properties:
-      created_at:
-        type: string
-      deleted_at:
-        allOf:
-        - $ref: '#/definitions/customtypes.NullTime'
-        description: |-
-          https://gorm.io/docs/indexes.html
-          DeletedAt gorm.DeletedAt `json:"deleted_at" toml:"deleted_at" yaml:"deleted_at" (@mrz: this was the original type)
-      draft_id:
-        $ref: '#/definitions/customtypes.NullString'
-      id:
-        description: Model specific fields
-        type: string
-      metadata:
-        $ref: '#/definitions/engine.Metadata'
-      output_index:
-        type: integer
-      reserved_at:
-        $ref: '#/definitions/customtypes.NullTime'
-      satoshis:
-        type: integer
-      script_pub_key:
-        type: string
-      spending_tx_id:
-        $ref: '#/definitions/customtypes.NullString'
-      transaction:
-        allOf:
-        - $ref: '#/definitions/engine.Transaction'
-        description: |-
-          Virtual field holding the original transaction the utxo originated from
-          This is needed when signing a new transaction that spends the utxo
-      transaction_id:
-        type: string
-      type:
-        type: string
-      updated_at:
-        type: string
-      xpub_id:
-        type: string
     type: object
   engine.Xpub:
     properties:
@@ -466,28 +272,39 @@ definitions:
     properties:
       created_at:
         description: CreatedAt is a time when outer model was created.
+        example: "2024-02-26T11:00:28.069911Z"
         type: string
       deleted_at:
         description: DeletedAt is a time when outer model was deleted.
+        example: "2024-02-26T11:02:28.069911Z"
         type: string
       id:
-        description: ID is an access key id.
+        description: ID is an hash of the compressed public key.
+        example: 874b86d6fd1d6c85a857e73180164203d8d23211bfd9d04d210f9f7fde5b82d8
         type: string
       key:
         description: Key is a string representation of an access key.
+        example: 3fd870d6bf1725f04084cf31209c04be5bd9bed001a390ad3bc632a55a3ee078
         type: string
       metadata:
-        additionalProperties: true
+        additionalProperties:
+          type: string
         description: Metadata is a metadata map of outer model.
+        example:
+          key: value
+          key2: value2
         type: object
       revoked_at:
         description: RevokedAt is a time when access key was revoked.
+        example: "2024-02-26T11:02:28.069911Z"
         type: string
       updated_at:
         description: UpdatedAt is a time when outer model was updated.
+        example: "2024-02-26T11:01:28.069911Z"
         type: string
       xpub_id:
         description: XpubID is an access key's xpub related id.
+        example: bb8593f85ef8056a77026ad415f02128f3768906de53e9e8bf8749fe2d66cf50
         type: string
     type: object
   models.AdminStats:
@@ -524,71 +341,103 @@ definitions:
     properties:
       created_at:
         description: CreatedAt is a time when outer model was created.
+        example: "2024-02-26T11:00:28.069911Z"
         type: string
       deleted_at:
         description: DeletedAt is a time when outer model was deleted.
+        example: "2024-02-26T11:02:28.069911Z"
         type: string
       fullName:
+        description: FullName is name which could be shown instead of whole paymail
+          address.
+        example: Test User
         type: string
       id:
+        description: ID is the hash of the xpub and paymail
+        example: 68af358bde7d8641621c7dd3de1a276c9a62cfa9e2d0740494519f1ba61e2f4a
         type: string
       metadata:
-        additionalProperties: true
+        additionalProperties:
+          type: string
         description: Metadata is a metadata map of outer model.
+        example:
+          key: value
+          key2: value2
         type: object
       paymail:
+        description: Paymail is a paymail address related to contact.
+        example: test@spv-wallet.com
         type: string
       pubKey:
+        description: PubKey is a public key related to contact (receiver).
+        example: xpub661MyMwAqRbcGpZVrSHU...
         type: string
       status:
+        description: Status is a contact's current status.
+        example: confirmed
         type: string
       updated_at:
         description: UpdatedAt is a time when outer model was updated.
+        example: "2024-02-26T11:01:28.069911Z"
         type: string
       xpubID:
+        description: XpubID is the contact's xpub related id used to register contact.
+        example: bb8593f85ef8056a77026ad415f02128f3768906de53e9e8bf8749fe2d66cf50
         type: string
     type: object
   models.Destination:
     properties:
       address:
         description: Address is a destination's address.
+        example: 1CDUf7CKu8ocTTkhcYUbq75t14Ft168K65
         type: string
       chain:
         description: Chain is a destination's chain representation.
+        example: 0
         type: integer
       created_at:
         description: CreatedAt is a time when outer model was created.
+        example: "2024-02-26T11:00:28.069911Z"
         type: string
       deleted_at:
         description: DeletedAt is a time when outer model was deleted.
+        example: "2024-02-26T11:02:28.069911Z"
         type: string
       draft_id:
         description: DraftID is a destination's draft id.
+        example: b356f7fa00cd3f20cce6c21d704cd13e871d28d714a5ebd0532f5a0e0cde63f7
         type: string
       id:
-        description: ID is a destination id.
+        description: ID is a destination id which is the hash of the LockingScript.
+        example: 82a5d848f997819a478b05fb713208d7f3aa66da5ba00953b9845fb1701f9b98
         type: string
       locking_script:
         description: LockingScript is a destination's locking script.
+        example: 76a9147b05764a97f3b4b981471492aa703b188e45979b88ac
         type: string
       metadata:
-        additionalProperties: true
+        additionalProperties:
+          type: string
         description: Metadata is a metadata map of outer model.
+        example:
+          key: value
+          key2: value2
         type: object
-      monitor:
-        description: Monitor is a time when destination was monitored.
-        type: string
       num:
         description: Num is a destination's num representation.
+        example: 0
         type: integer
       type:
         description: Type is a destination's type.
+        example: pubkeyhash
         type: string
       updated_at:
         description: UpdatedAt is a time when outer model was updated.
+        example: "2024-02-26T11:01:28.069911Z"
         type: string
       xpub_id:
         description: XpubID is a destination's xpub related id used to register destination.
+        example: bb8593f85ef8056a77026ad415f02128f3768906de53e9e8bf8749fe2d66cf50
         type: string
     type: object
   models.DraftTransaction:
@@ -599,43 +448,58 @@ definitions:
         description: Configuration contains draft transaction configuration.
       created_at:
         description: CreatedAt is a time when outer model was created.
+        example: "2024-02-26T11:00:28.069911Z"
         type: string
       deleted_at:
         description: DeletedAt is a time when outer model was deleted.
+        example: "2024-02-26T11:02:28.069911Z"
         type: string
       expires_at:
         description: ExpiresAt is a time when draft transaction expired.
+        example: "2024-02-26T11:00:28.069911Z"
         type: string
       final_tx_id:
         description: FinalTxID is a final transaction id.
+        example: cfe30797f0b5fc098b32194e857569a7a1edd829fddf3df4567796b738de386d
         type: string
       hex:
         description: Hex is a draft transaction hex.
+        example: 0100000002...
         type: string
       id:
         description: ID is a draft transaction id.
+        example: b356f7fa00cd3f20cce6c21d704cd13e871d28d714a5ebd0532f5a0e0cde63f7
         type: string
       metadata:
-        additionalProperties: true
+        additionalProperties:
+          type: string
         description: Metadata is a metadata map of outer model.
+        example:
+          key: value
+          key2: value2
         type: object
       status:
         description: Status is a draft transaction lastly monitored status.
+        example: complete
         type: string
       updated_at:
         description: UpdatedAt is a time when outer model was updated.
+        example: "2024-02-26T11:01:28.069911Z"
         type: string
       xpub_id:
         description: XpubID is a draft transaction's xpub used to sign transaction.
+        example: bb8593f85ef8056a77026ad415f02128f3768906de53e9e8bf8749fe2d66cf50
         type: string
     type: object
   models.FeeUnit:
     properties:
       bytes:
         description: Bytes is a fee unit bytes representation.
+        example: 1000
         type: integer
       satoshis:
         description: Satoshis is a fee unit satoshis amount.
+        example: 1
         type: integer
     type: object
   models.MapProtocol:
@@ -670,6 +534,58 @@ definitions:
         items:
           type: string
         type: array
+    type: object
+  models.PaymailAddress:
+    properties:
+      alias:
+        description: Alias is a paymail address's alias (first part of paymail).
+        example: test
+        type: string
+      avatar:
+        description: Avatar is a paymail address's avatar.
+        example: https://spvwallet.com/avatar.png
+        type: string
+      created_at:
+        description: CreatedAt is a time when outer model was created.
+        example: "2024-02-26T11:00:28.069911Z"
+        type: string
+      deleted_at:
+        description: DeletedAt is a time when outer model was deleted.
+        example: "2024-02-26T11:02:28.069911Z"
+        type: string
+      domain:
+        description: Domain is a paymail address's domain (second part of paymail).
+        example: spvwallet.com
+        type: string
+      external_xpub_key:
+        description: ExternalXpubKey is a paymail address's external xpub key.
+        example: xpub661MyMwAqRbcGpZVrSHU...
+        type: string
+      id:
+        description: ID is a paymail address id.
+        example: c0ba4a52c89279268476a141be7569200cff2ca4892512b07ca75c25a95c16cd
+        type: string
+      metadata:
+        additionalProperties:
+          type: string
+        description: Metadata is a metadata map of outer model.
+        example:
+          key: value
+          key2: value2
+        type: object
+      public_name:
+        description: PublicName is a paymail address's public name.
+        example: Test User
+        type: string
+      updated_at:
+        description: UpdatedAt is a time when outer model was updated.
+        example: "2024-02-26T11:01:28.069911Z"
+        type: string
+      xpub_id:
+        description: XpubID is a paymail address's xpub related id used to register
+          paymail address.
+        example: bb8593f85ef8056a77026ad415f02128f3768906de53e9e8bf8749fe2d66cf50
+        type: string
     type: object
   models.PaymailP4:
     properties:
@@ -736,66 +652,92 @@ definitions:
     properties:
       block_hash:
         description: BlockHash is a block hash that transaction is in.
+        example: 0000000000000000046e81025ca6cfbd2f45c7331f650c77edc99a14d5a1f0d0
         type: string
       block_height:
         description: BlockHeight is a block height that transaction is in.
+        example: 833505
         type: integer
       created_at:
         description: CreatedAt is a time when outer model was created.
+        example: "2024-02-26T11:00:28.069911Z"
         type: string
       deleted_at:
         description: DeletedAt is a time when outer model was deleted.
+        example: "2024-02-26T11:02:28.069911Z"
         type: string
       direction:
-        description: TransactionDirection is a transaction direction (inbound/outbound).
+        description: TransactionDirection is a transaction direction (incoming/outgoing).
+        example: outgoing
         type: string
       draft_id:
         description: DraftID is a transaction related draft id.
+        example: b356f7fa00cd3f20cce6c21d704cd13e871d28d714a5ebd0532f5a0e0cde63f7
         type: string
       fee:
         description: Fee is a transaction fee.
+        example: 1
         type: integer
       hex:
         description: Hex is a transaction hex.
+        example: 0100000002...
         type: string
       id:
         description: ID is a transaction id.
+        example: 01d0d0067652f684c6acb3683763f353fce55f6496521c7d99e71e1d27e53f5c
         type: string
       metadata:
-        additionalProperties: true
+        additionalProperties:
+          type: string
         description: Metadata is a metadata map of outer model.
+        example:
+          key: value
+          key2: value2
         type: object
       number_of_inputs:
         description: NumberOfInputs is a number of transaction inputs.
+        example: 3
         type: integer
       number_of_outputs:
         description: NumberOfOutputs is a number of transaction outputs.
+        example: 2
         type: integer
       output_value:
         description: OutputValue is a total output value.
+        example: 50
         type: integer
       outputs:
         additionalProperties:
           type: integer
         description: Outputs represents all spv-wallet-transaction outputs. Will be
           shown only for admin.
+        example:
+          92640954841510a9d95f7737a43075f22ebf7255976549de4c52e8f3faf57470: -51
+          9d07977d2fc14402426288a6010b4cdf7d91b61461acfb75af050b209d2d07ba: 50
         type: object
       status:
         description: Status is a transaction status.
+        example: MINED
         type: string
       total_value:
         description: TotalValue is a total input value.
+        example: 51
         type: integer
       updated_at:
         description: UpdatedAt is a time when outer model was updated.
+        example: "2024-02-26T11:01:28.069911Z"
         type: string
       xpub_in_ids:
         description: XpubInIDs is a slice of xpub input ids.
+        example:
+        - bb8593f85ef8056a77026ad415f02128f3768906de53e9e8bf8749fe2d66cf50
         items:
           type: string
         type: array
       xpub_out_ids:
         description: XpubOutIDs is a slice of xpub output ids.
+        example:
+        - 2075eca10bf2688b38cd7fdad6c24562463a9a26ae505d66c480fd53165dbaa2
         items:
           type: string
         type: array
@@ -812,19 +754,24 @@ definitions:
         type: string
       change_minimum_satoshis:
         description: ChangeMinimumSatoshis is a minimum satoshis for change.
+        example: 0
         type: integer
       change_number_of_destinations:
         description: ChangeNumberOfDestinations is a number of change destinations.
+        example: 1
         type: integer
       change_satoshis:
         description: ChangeSatoshis is a change satoshis.
+        example: 49
         type: integer
       expires_in:
         allOf:
         - $ref: '#/definitions/time.Duration'
         description: ExpiresAt is a time when transaction expires.
+        example: 1000
       fee:
         description: Fee is a fee amount.
+        example: 1
         type: integer
       fee_unit:
         allOf:
@@ -863,9 +810,11 @@ definitions:
     properties:
       created_at:
         description: CreatedAt is a time when outer model was created.
+        example: "2024-02-26T11:00:28.069911Z"
         type: string
       deleted_at:
         description: DeletedAt is a time when outer model was deleted.
+        example: "2024-02-26T11:02:28.069911Z"
         type: string
       destination:
         allOf:
@@ -873,29 +822,41 @@ definitions:
         description: Destination is a pointer to a destination object.
       draft_id:
         description: DraftID is a utxo transaction related draft id.
+        example: b356f7fa00cd3f20cce6c21d704cd13e871d28d714a5ebd0532f5a0e0cde63f7
         type: string
       id:
-        description: ID is a utxo id.
+        description: ID is a utxo id which is a hash from transaction id and output
+          index.
+        example: c706a448748d398d542cf4dfad797c9a4b123ebb72dbfb8b27f3d0f1dda99b58
         type: string
       metadata:
-        additionalProperties: true
+        additionalProperties:
+          type: string
         description: Metadata is a metadata map of outer model.
+        example:
+          key: value
+          key2: value2
         type: object
       output_index:
         description: OutputIndex is a output index that utxo points to.
+        example: 0
         type: integer
       reserved_at:
         description: ReservedAt is a time utxo was reserved at.
+        example: "2024-02-26T11:00:28.069911Z"
         type: string
       satoshis:
         description: Satoshis is a utxo satoshis amount.
+        example: 100
         type: integer
       script_pub_key:
         description: ScriptPubKey is a utxo script pub key.
+        example: 76a91433ba3607a902bc022164bcb6e993f27bd040241c88ac
         type: string
       spending_tx_id:
         description: SpendingTxID is a spending transaction id - null if not spent
           yet.
+        example: 01d0d0067652f684c6acb3683763f353fce55f6496521c7d99e71e1d27e53f5c
         type: string
       transaction:
         allOf:
@@ -903,15 +864,19 @@ definitions:
         description: Transaction is a transaction pointer that utxo points to.
       transaction_id:
         description: TransactionID is a transaction id that utxo points to.
+        example: 01d0d0067652f684c6acb3683763f353fce55f6496521c7d99e71e1d27e53f5c
         type: string
       type:
         description: Type is a utxo type.
+        example: pubkeyhash
         type: string
       updated_at:
         description: UpdatedAt is a time when outer model was updated.
+        example: "2024-02-26T11:01:28.069911Z"
         type: string
       xpub_id:
         description: XpubID is a utxo related xpub id.
+        example: bb8593f85ef8056a77026ad415f02128f3768906de53e9e8bf8749fe2d66cf50
         type: string
     type: object
   models.TransactionOutput:
@@ -926,9 +891,11 @@ definitions:
         description: PaymailP4 is a pointer to a paymail p4 object.
       satoshis:
         description: Satoshis is a satoshis amount.
+        example: 50
         type: integer
       script:
         description: Script is a transaction output string representation of script.
+        example: 76a91433ba3607a902bc022164bcb6e993f27bd040241c88ac
         type: string
       scripts:
         description: ScriptType is a transaction output script type.
@@ -937,45 +904,61 @@ definitions:
         type: array
       to:
         description: To is a transaction output destination address.
+        example: 1MB8MfCyA5mGt3UBhxYr1exBfsFWgL1gCm
         type: string
       use_for_change:
         description: UseForChange is a flag that indicates if this output should be
           used for change.
+        example: false
         type: boolean
     type: object
   models.Utxo:
     properties:
       created_at:
         description: CreatedAt is a time when outer model was created.
+        example: "2024-02-26T11:00:28.069911Z"
         type: string
       deleted_at:
         description: DeletedAt is a time when outer model was deleted.
+        example: "2024-02-26T11:02:28.069911Z"
         type: string
       draft_id:
         description: DraftID is a utxo transaction related draft id.
+        example: b356f7fa00cd3f20cce6c21d704cd13e871d28d714a5ebd0532f5a0e0cde63f7
         type: string
       id:
-        description: ID is a utxo id.
+        description: ID is a utxo id which is a hash from transaction id and output
+          index.
+        example: c706a448748d398d542cf4dfad797c9a4b123ebb72dbfb8b27f3d0f1dda99b58
         type: string
       metadata:
-        additionalProperties: true
+        additionalProperties:
+          type: string
         description: Metadata is a metadata map of outer model.
+        example:
+          key: value
+          key2: value2
         type: object
       output_index:
         description: OutputIndex is a output index that utxo points to.
+        example: 0
         type: integer
       reserved_at:
         description: ReservedAt is a time utxo was reserved at.
+        example: "2024-02-26T11:00:28.069911Z"
         type: string
       satoshis:
         description: Satoshis is a utxo satoshis amount.
+        example: 100
         type: integer
       script_pub_key:
         description: ScriptPubKey is a utxo script pub key.
+        example: 76a91433ba3607a902bc022164bcb6e993f27bd040241c88ac
         type: string
       spending_tx_id:
         description: SpendingTxID is a spending transaction id - null if not spent
           yet.
+        example: 01d0d0067652f684c6acb3683763f353fce55f6496521c7d99e71e1d27e53f5c
         type: string
       transaction:
         allOf:
@@ -983,52 +966,69 @@ definitions:
         description: Transaction is a transaction pointer that utxo points to.
       transaction_id:
         description: TransactionID is a transaction id that utxo points to.
+        example: 01d0d0067652f684c6acb3683763f353fce55f6496521c7d99e71e1d27e53f5c
         type: string
       type:
         description: Type is a utxo type.
+        example: pubkeyhash
         type: string
       updated_at:
         description: UpdatedAt is a time when outer model was updated.
+        example: "2024-02-26T11:01:28.069911Z"
         type: string
       xpub_id:
         description: XpubID is a utxo related xpub id.
+        example: bb8593f85ef8056a77026ad415f02128f3768906de53e9e8bf8749fe2d66cf50
         type: string
     type: object
   models.UtxoPointer:
     properties:
       output_index:
         description: OutputIndex is a output index that utxo points to.
+        example: 0
         type: integer
       transaction_id:
         description: TransactionID is a transaction id that utxo points to.
+        example: 01d0d0067652f684c6acb3683763f353fce55f6496521c7d99e71e1d27e53f5c
         type: string
     type: object
   models.Xpub:
     properties:
       created_at:
         description: CreatedAt is a time when outer model was created.
+        example: "2024-02-26T11:00:28.069911Z"
         type: string
       current_balance:
         description: CurrentBalance is a xpub's current balance.
+        example: 1234
         type: integer
       deleted_at:
         description: DeletedAt is a time when outer model was deleted.
+        example: "2024-02-26T11:02:28.069911Z"
         type: string
       id:
-        description: ID is a xpub id.
+        description: ID is a hash of the xpub.
+        example: bb8593f85ef8056a77026ad415f02128f3768906de53e9e8bf8749fe2d66cf50
         type: string
       metadata:
-        additionalProperties: true
+        additionalProperties:
+          type: string
         description: Metadata is a metadata map of outer model.
+        example:
+          key: value
+          key2: value2
         type: object
       next_external_num:
         description: NextExternalNum is a next external num.
+        example: 0
         type: integer
       next_internal_num:
         description: NextInternalNum is a next internal num.
+        example: 0
         type: integer
       updated_at:
         description: UpdatedAt is a time when outer model was updated.
+        example: "2024-02-26T11:01:28.069911Z"
         type: string
     type: object
   time.Duration:
@@ -1049,22 +1049,11 @@ definitions:
     - 1000000000
     - 60000000000
     - 3600000000000
-    - -9223372036854775808
-    - 9223372036854775807
     - 1
     - 1000
     - 1000000
     - 1000000000
     - 60000000000
-    - 3600000000000
-    - -9223372036854775808
-    - 9223372036854775807
-    - 1
-    - 1000
-    - 1000000
-    - 1000000000
-    - 60000000000
-    - 3600000000000
     type: integer
     x-enum-varnames:
     - minDuration
@@ -1083,22 +1072,11 @@ definitions:
     - Second
     - Minute
     - Hour
-    - minDuration
-    - maxDuration
     - Nanosecond
     - Microsecond
     - Millisecond
     - Second
     - Minute
-    - Hour
-    - minDuration
-    - maxDuration
-    - Nanosecond
-    - Microsecond
-    - Millisecond
-    - Second
-    - Minute
-    - Hour
   transactions.NewTransaction:
     properties:
       config:
@@ -1422,7 +1400,7 @@ paths:
         "201":
           description: Created PaymailAddress
           schema:
-            $ref: '#/definitions/engine.PaymailAddress'
+            $ref: '#/definitions/models.PaymailAddress'
         "400":
           description: Bad request - Error while parsing CreatePaymail from request
             body or if xpub or address are missing
@@ -1472,7 +1450,7 @@ paths:
         "200":
           description: PaymailAddress with given address
           schema:
-            $ref: '#/definitions/engine.PaymailAddress'
+            $ref: '#/definitions/models.PaymailAddress'
         "400":
           description: Bad request - Error while parsing PaymailAddress from request
             body
@@ -1530,7 +1508,7 @@ paths:
           schema:
             items:
               items:
-                $ref: '#/definitions/engine.PaymailAddress'
+                $ref: '#/definitions/models.PaymailAddress'
               type: array
             type: array
         "400":
@@ -1709,7 +1687,7 @@ paths:
           schema:
             items:
               items:
-                $ref: '#/definitions/engine.Utxo'
+                $ref: '#/definitions/models.Utxo'
               type: array
             type: array
         "400":

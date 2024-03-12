@@ -1,6 +1,8 @@
 package admin
 
 import (
+	"github.com/bitcoin-sv/spv-wallet/mappings"
+	"github.com/bitcoin-sv/spv-wallet/models"
 	"net/http"
 
 	"github.com/bitcoin-sv/spv-wallet/actions"
@@ -15,7 +17,7 @@ import (
 // @Tags		Admin
 // @Produce		json
 // @Param		PaymailAddress body PaymailAddress false "PaymailAddress model containing paymail address to get"
-// @Success		200	{object} engine.PaymailAddress "PaymailAddress with given address"
+// @Success		200	{object} models.PaymailAddress "PaymailAddress with given address"
 // @Failure		400	"Bad request - Error while parsing PaymailAddress from request body"
 // @Failure 	500	"Internal Server Error - Error while getting paymail address"
 // @Router		/v1/admin/paymail/get [post]
@@ -41,7 +43,9 @@ func (a *Action) paymailGetAddress(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, paymailAddress)
+	paymailAddressContract := mappings.MapToPaymailContract(paymailAddress)
+
+	c.JSON(http.StatusOK, paymailAddressContract)
 }
 
 // paymailAddressesSearch will fetch a list of paymail addresses filtered by metadata
@@ -51,7 +55,7 @@ func (a *Action) paymailGetAddress(c *gin.Context) {
 // @Tags		Admin
 // @Produce		json
 // @Param		SearchRequestParameters body actions.SearchRequestParameters false "Supports targeted resource searches with filters for metadata and custom conditions, plus options for pagination and sorting to streamline data exploration and analysis"
-// @Success		200 {array} []engine.PaymailAddress "List of paymail addresses
+// @Success		200 {array} []models.PaymailAddress "List of paymail addresses
 // @Failure		400	"Bad request - Error while parsing SearchRequestParameters from request body"
 // @Failure 	500	"Internal server error - Error while searching for paymail addresses"
 // @Router		/v1/admin/paymails/search [post]
@@ -74,7 +78,12 @@ func (a *Action) paymailAddressesSearch(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, paymailAddresses)
+	var paymailAddressContracts []*models.PaymailAddress
+	for _, paymailAddress := range paymailAddresses {
+		paymailAddressContracts = append(paymailAddressContracts, mappings.MapToPaymailContract(paymailAddress))
+	}
+
+	c.JSON(http.StatusOK, paymailAddressContracts)
 }
 
 // paymailAddressesCount will count all paymail addresses filtered by metadata
@@ -116,7 +125,7 @@ func (a *Action) paymailAddressesCount(c *gin.Context) {
 // @Tags		Admin
 // @Produce		json
 // @Param		CreatePaymail body CreatePaymail false " "
-// @Success		201	{object} engine.PaymailAddress "Created PaymailAddress"
+// @Success		201	{object} models.PaymailAddress "Created PaymailAddress"
 // @Failure		400	"Bad request - Error while parsing CreatePaymail from request body or if xpub or address are missing"
 // @Failure 	500	"Internal Server Error - Error while creating new paymail address"
 // @Router		/v1/admin/paymail/create [post]
@@ -151,7 +160,9 @@ func (a *Action) paymailCreateAddress(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusCreated, paymailAddress)
+	paymailAddressContract := mappings.MapToPaymailContract(paymailAddress)
+
+	c.JSON(http.StatusCreated, paymailAddressContract)
 }
 
 // paymailDeleteAddress will delete a paymail address
