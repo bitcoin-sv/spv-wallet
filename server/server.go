@@ -22,6 +22,7 @@ import (
 	"github.com/bitcoin-sv/spv-wallet/metrics"
 	"github.com/bitcoin-sv/spv-wallet/server/auth"
 	router "github.com/bitcoin-sv/spv-wallet/server/routes"
+	"github.com/gin-contrib/pprof"
 	"github.com/gin-gonic/gin"
 	"github.com/rs/zerolog"
 )
@@ -115,7 +116,7 @@ func (s *Server) Handlers() *gin.Engine {
 // SetupServerRoutes will register endpoints for all models
 func SetupServerRoutes(appConfig *config.AppConfig, services *config.AppServices, engine *gin.Engine) {
 	adminRoutes := admin.NewHandler(appConfig, services)
-	baseRoutes := base.NewHandler(appConfig, engine)
+	baseRoutes := base.NewHandler()
 
 	accessKeyAPIRoutes := accesskeys.NewHandler(appConfig, services)
 	destinationBasicRoutes, destinationAPIRoutes := destinations.NewHandler(appConfig, services)
@@ -185,5 +186,9 @@ func SetupServerRoutes(appConfig *config.AppConfig, services *config.AppServices
 
 	if metrics, enabled := metrics.Get(); enabled {
 		engine.GET("/metrics", gin.WrapH(metrics.HTTPHandler()))
+	}
+
+	if appConfig.DebugProfiling {
+		pprof.Register(engine, "debug/pprof")
 	}
 }
