@@ -10,10 +10,6 @@ type CreateContactResponse struct {
 type Contact struct {
 	common.Model
 
-	ID string `json:"id"`
-
-	XpubID string `json:"xpubID"`
-
 	FullName string `json:"fullName"`
 
 	Paymail string `json:"paymail"`

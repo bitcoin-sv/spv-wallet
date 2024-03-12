@@ -10,53 +10,55 @@ import (
 )
 
 var (
-	ErrInvalidRequesterPaymail = errors.New("invalid requester paymail address")
-	ErrAddingContactRequest    = errors.New("adding contact request failed")
+	ErrInvalidRequesterXpub = errors.New("invalid requester xpub")
+	ErrAddingContactRequest = errors.New("adding contact request failed")
 )
 
-func (c *Client) AddContact(ctx context.Context, ctcFName, ctcPaymail, requesterPKey, requesterFName, requesterPaymail string, opts ...ModelOps) (*Contact, error) {
-	requesterXPubId := utils.Hash(requesterPKey)
+func (c *Client) UpsertContact(ctx context.Context, ctcFName, ctcPaymail, requesterXpub string, opts ...ModelOps) (*Contact, error) {
+	reqXPubID := utils.Hash(requesterXpub)
 
-	reqPaymail, err := getPaymailAddress(ctx, requesterPaymail, c.DefaultModelOptions()...)
+	reqPms, err := c.GetPaymailAddressesByXPubID(ctx, reqXPubID, nil, nil, nil)
 	if err != nil {
 		return nil, err
 	}
-	if reqPaymail == nil || reqPaymail.XpubID != requesterXPubId {
-		return nil, ErrInvalidRequesterPaymail
+	if len(reqPms) == 0 {
+		return nil, ErrInvalidRequesterXpub
 	}
+
+	reqPm := reqPms[0]
 
 	pmSrvnt := &PaymailServant{
 		cs: c.Cachestore(),
 		pc: c.PaymailClient(),
 	}
 
-	contactPaymail := pmSrvnt.GetSanitizedPaymail(ctcPaymail)
-	contactPki, err := pmSrvnt.GetPkiForPaymail(ctx, contactPaymail)
+	contactPm := pmSrvnt.GetSanitizedPaymail(ctcPaymail)
+	contactPki, err := pmSrvnt.GetPkiForPaymail(ctx, contactPm)
 	if err != nil {
 		return nil, fmt.Errorf("geting PKI for %s failed. Reason: %w", ctcPaymail, err)
 	}
 
 	data := newContactData{
 		fullName: ctcFName,
-		paymail:  contactPaymail,
+		paymail:  contactPm,
 		pubKey:   contactPki.PubKey,
 		status:   ContactNotConfirmed,
 		opts:     opts,
 	}
 
-	contact, err := c.addContact(ctx, &data, requesterXPubId)
+	contact, err := c.addContact(ctx, &data, reqXPubID)
 	if err != nil {
 		return nil, fmt.Errorf("adding %s contact failed. Reason: %w", ctcPaymail, err)
 	}
 
 	// request new contact
 	requesterContactRequest := paymail.PikeContactRequestPayload{
-		FullName: requesterFName,
-		Paymail:  requesterPaymail,
+		FullName: reqPm.PublicName,
+		Paymail:  reqPm.String(),
 	}
-	if _, err = pmSrvnt.AddContactRequest(ctx, contactPaymail, &requesterContactRequest); err != nil {
+	if _, err = pmSrvnt.AddContactRequest(ctx, contactPm, &requesterContactRequest); err != nil {
 		c.Logger().Warn().
-			Str("requesterPaymil", requesterPaymail).
+			Str("requesterPaymail", reqPm.String()).
 			Str("requestedContact", ctcPaymail).
 			Msgf("adding contact request failed: %s", err.Error())
 
@@ -72,8 +74,8 @@ func (c *Client) AddContactRequest(ctx context.Context, fullName, paymailAdress,
 		pc: c.PaymailClient(),
 	}
 
-	contactPaymail := pmSrvnt.GetSanitizedPaymail(paymailAdress)
-	contactPki, err := pmSrvnt.GetPkiForPaymail(ctx, contactPaymail)
+	contactPm := pmSrvnt.GetSanitizedPaymail(paymailAdress)
+	contactPki, err := pmSrvnt.GetPkiForPaymail(ctx, contactPm)
 	if err != nil {
 		return nil, fmt.Errorf("geting PKI for %s failed. Reason: %w", paymailAdress, err)
 	}
@@ -81,7 +83,7 @@ func (c *Client) AddContactRequest(ctx context.Context, fullName, paymailAdress,
 	// add contact request
 	data := newContactData{
 		fullName: fullName,
-		paymail:  contactPaymail,
+		paymail:  contactPm,
 		pubKey:   contactPki.PubKey,
 		status:   ContactAwaitAccept,
 		opts:     opts,

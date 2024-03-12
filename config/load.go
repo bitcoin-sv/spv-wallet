@@ -35,7 +35,7 @@ func Load(logger *zerolog.Logger) (appConfig *AppConfig, err error) {
 		return nil, err
 	}
 
-	appConfig = &AppConfig{}
+	appConfig = getDefaultAppConfig()
 	if err = unmarshallToAppConfig(appConfig); err != nil {
 		return nil, err
 	}

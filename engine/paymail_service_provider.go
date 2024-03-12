@@ -250,7 +250,7 @@ func (p *PaymailDefaultServiceProvider) AddContact(
 		return
 	}
 	if reqPaymail == nil {
-		err = ErrInvalidRequesterPaymail
+		err = ErrInvalidRequesterXpub
 		return
 	}
 

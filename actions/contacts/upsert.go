@@ -1,6 +1,7 @@
 package contacts
 
 import (
+	"encoding/json"
 	"errors"
 	"net/http"
 
@@ -11,20 +12,22 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-// create will make a new model using the services defined in the action object
-// Create contact godoc
-// @Summary		Create contact
-// @Description	Create contact
+// upsert will add new or modified existing contact
+// Upsert contact godoc
+// @Summary		Upsert contact
+// @Description	Add or update contact. For new contact send request to add current user as contact
 // @Tags		Contact
 // @Produce		json
+// @Param		UpsertContact body contacts.UpsertContact true "Full name and metadata needed to add/modify contact"
 // @Success		201
-// @Router		/v1/contact [post]
+// @Router		/v1/contact/{paymail} [PUT]
 // @Security	x-auth-xpub
-func (a *Action) create(c *gin.Context) {
+func (a *Action) upsert(c *gin.Context) {
 	requesterPubKey := c.GetString(auth.ParamXPubKey)
+	cPaymail := c.GetString("paymail")
 
-	var req CreateContact
-	if err := c.Bind(&req); err != nil {
+	var req UpsertContact
+	if err := json.NewDecoder(c.Request.Body).Decode(&req); err != nil {
 		c.JSON(http.StatusBadRequest, err.Error())
 		return
 	}
@@ -34,10 +37,10 @@ func (a *Action) create(c *gin.Context) {
 		return
 	}
 
-	contact, err := a.Services.SpvWalletEngine.AddContact(
+	contact, err := a.Services.SpvWalletEngine.UpsertContact(
 		c.Request.Context(),
-		req.FullName, req.Paymail,
-		requesterPubKey, req.RequesterFullName, req.RequesterPaymail,
+		req.FullName, cPaymail,
+		requesterPubKey,
 		engine.WithMetadatas(req.Metadata))
 
 	if err != nil && !errors.Is(err, engine.ErrAddingContactRequest) {

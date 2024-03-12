@@ -14,11 +14,9 @@ func MapToContactContract(c *engine.Contact) *models.Contact {
 
 	return &models.Contact{
 		Model:    *common.MapToContract(&c.Model),
-		ID:       c.ID,
 		FullName: c.FullName,
 		Paymail:  c.Paymail,
 		PubKey:   c.PubKey,
-		XpubID:   c.OwnerXpubID,
 		Status:   mapContactStatus(c.Status),
 	}
 }
