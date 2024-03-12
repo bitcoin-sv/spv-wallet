@@ -19,8 +19,6 @@ func (c *Client) NewXpub(ctx context.Context, xPubKey string, opts ...ModelOps) 
 		xPubKey, c.DefaultModelOptions(append(opts, New())...)...,
 	)
 
-	xPub.NextExternalNum = 1 // 0 is reserved for paymail adress external Xpub
-
 	// Save the model
 	if err := xPub.Save(ctx); err != nil {
 		return nil, err

@@ -490,7 +490,7 @@ func WithPaymailSupport(domains []string, defaultFromPaymail string, domainValid
 		}
 
 		// Add the paymail_address model in SPV Wallet Engine
-		c.addModels(migrateList, newPaymail(""))
+		c.addModels(migrateList, newPaymail("", 0))
 	}
 }
 
@@ -519,7 +519,7 @@ func WithPaymailServerConfig(config *server.Configuration, defaultFromPaymail st
 		}
 
 		// Add the paymail_address model in SPV Wallet Engine
-		c.addModels(migrateList, newPaymail(""))
+		c.addModels(migrateList, newPaymail("", 0))
 	}
 }
 
