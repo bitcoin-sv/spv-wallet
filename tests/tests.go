@@ -6,7 +6,6 @@ import (
 	"os"
 
 	"github.com/bitcoin-sv/spv-wallet/config"
-	"github.com/bitcoin-sv/spv-wallet/logging"
 	"github.com/gin-gonic/gin"
 	"github.com/stretchr/testify/require"
 	"github.com/stretchr/testify/suite"
@@ -22,11 +21,11 @@ type TestSuite struct {
 
 // BaseSetupSuite runs at the start of the suite
 func (ts *TestSuite) BaseSetupSuite() {
-	// Load the configuration
-	defaultLogger := logging.GetDefaultLogger()
-	var err error
-	ts.AppConfig, err = config.Load(defaultLogger)
-	require.NoError(ts.T(), err)
+	ts.AppConfig = config.LoadForTest()
+
+	gin.SetMode(gin.ReleaseMode)
+	ts.Router = gin.New()
+	require.NotNil(ts.T(), ts.Router)
 }
 
 // BaseTearDownSuite runs after the suite finishes
