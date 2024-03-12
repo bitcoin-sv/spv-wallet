@@ -468,6 +468,19 @@ paths:
       summary: Paymail addresses search
       tags:
       - Admin
+  /v1/admin/shared-config:
+    get:
+      description: Get shared config
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+      security:
+      - x-auth-xpub: []
+      summary: Get shared config
+      tags:
+      - Admin
   /v1/admin/stats:
     get:
       description: Get stats
@@ -633,6 +646,29 @@ paths:
       summary: Search for utxos
       tags:
       - Admin
+  /v1/admin/xpub:
+    post:
+      description: Create xPub
+      parameters:
+      - description: key
+        in: query
+        name: key
+        required: true
+        type: string
+      - description: metadata
+        in: query
+        name: metadata
+        type: string
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+      security:
+      - x-auth-xpub: []
+      summary: Create xPub
+      tags:
+      - xPub
   /v1/admin/xpubs/count:
     post:
       description: Count xpubs
@@ -693,6 +729,36 @@ paths:
       summary: Search for xpubs
       tags:
       - Admin
+  /v1/contact:
+    post:
+      description: Create contact
+      parameters:
+      - description: fullName
+        in: query
+        name: fullName
+        type: string
+      - description: paymail
+        in: query
+        name: paymail
+        type: string
+      - description: pubKey
+        in: query
+        name: pubKey
+        type: string
+      - description: metadata
+        in: query
+        name: metadata
+        type: string
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+      security:
+      - bux-auth-xpub: []
+      summary: Create contact
+      tags:
+      - Contact
   /v1/destination:
     get:
       description: Get a destination
@@ -835,60 +901,6 @@ paths:
       summary: Search for a destination
       tags:
       - Destinations
-  /v1/paymail:
-    delete:
-      description: Delete paymail
-      parameters:
-      - description: address
-        in: query
-        name: address
-        required: true
-        type: string
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-      security:
-      - x-auth-xpub: []
-      summary: Delete paymail
-      tags:
-      - Paymails
-    post:
-      description: Create paymail
-      parameters:
-      - description: key
-        in: query
-        name: key
-        required: true
-        type: string
-      - description: address
-        in: query
-        name: address
-        required: true
-        type: string
-      - description: public_name
-        in: query
-        name: public_name
-        type: string
-      - description: avatar
-        in: query
-        name: avatar
-        type: string
-      - description: metadata
-        in: query
-        name: metadata
-        type: string
-      produces:
-      - application/json
-      responses:
-        "201":
-          description: Created
-      security:
-      - x-auth-xpub: []
-      summary: Create paymail
-      tags:
-      - Paymails
   /v1/transaction:
     get:
       description: Get transaction by id
@@ -1125,22 +1137,6 @@ paths:
       summary: Search UTXO
       tags:
       - UTXO
-  /v1/utxo/unreserve:
-    patch:
-      description: Unreserve UTXOs
-      parameters:
-      - description: draft tx id
-        in: query
-        name: reference_id
-        type: string
-      responses:
-        "201":
-          description: Created
-      security:
-      - x-auth-xpub: []
-      summary: Unreserve UTXOs
-      tags:
-      - UTXO
   /v1/xpub:
     get:
       description: Get xPub
@@ -1173,29 +1169,8 @@ paths:
           description: OK
       security:
       - x-auth-xpub: []
+      - bux-auth-xpub: []
       summary: Update xPub
-      tags:
-      - xPub
-    post:
-      description: Create xPub
-      parameters:
-      - description: key
-        in: query
-        name: key
-        required: true
-        type: string
-      - description: metadata
-        in: query
-        name: metadata
-        type: string
-      produces:
-      - application/json
-      responses:
-        "201":
-          description: Created
-      security:
-      - x-auth-xpub: []
-      summary: Create xPub
       tags:
       - xPub
 securityDefinitions:

@@ -625,6 +625,28 @@
                 }
             }
         },
+        "/v1/admin/shared-config": {
+            "get": {
+                "security": [
+                    {
+                        "x-auth-xpub": []
+                    }
+                ],
+                "description": "Get shared config",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Admin"
+                ],
+                "summary": "Get shared config",
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                }
+            }
+        },
         "/v1/admin/stats": {
             "get": {
                 "security": [
@@ -892,6 +914,43 @@
                 }
             }
         },
+        "/v1/admin/xpub": {
+            "post": {
+                "security": [
+                    {
+                        "x-auth-xpub": []
+                    }
+                ],
+                "description": "Create xPub",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "xPub"
+                ],
+                "summary": "Create xPub",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "key",
+                        "name": "key",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "metadata",
+                        "name": "metadata",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created"
+                    }
+                }
+            }
+        },
         "/v1/admin/xpubs/count": {
             "post": {
                 "security": [
@@ -984,6 +1043,54 @@
                 "responses": {
                     "200": {
                         "description": "OK"
+                    }
+                }
+            }
+        },
+        "/v1/contact": {
+            "post": {
+                "security": [
+                    {
+                        "bux-auth-xpub": []
+                    }
+                ],
+                "description": "Create contact",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Contact"
+                ],
+                "summary": "Create contact",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "fullName",
+                        "name": "fullName",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "paymail",
+                        "name": "paymail",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "pubKey",
+                        "name": "pubKey",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "metadata",
+                        "name": "metadata",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created"
                     }
                 }
             }
@@ -1206,91 +1313,6 @@
                         "description": "condition",
                         "name": "condition",
                         "in": "query"
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK"
-                    }
-                }
-            }
-        },
-        "/v1/paymail": {
-            "post": {
-                "security": [
-                    {
-                        "x-auth-xpub": []
-                    }
-                ],
-                "description": "Create paymail",
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Paymails"
-                ],
-                "summary": "Create paymail",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "key",
-                        "name": "key",
-                        "in": "query",
-                        "required": true
-                    },
-                    {
-                        "type": "string",
-                        "description": "address",
-                        "name": "address",
-                        "in": "query",
-                        "required": true
-                    },
-                    {
-                        "type": "string",
-                        "description": "public_name",
-                        "name": "public_name",
-                        "in": "query"
-                    },
-                    {
-                        "type": "string",
-                        "description": "avatar",
-                        "name": "avatar",
-                        "in": "query"
-                    },
-                    {
-                        "type": "string",
-                        "description": "metadata",
-                        "name": "metadata",
-                        "in": "query"
-                    }
-                ],
-                "responses": {
-                    "201": {
-                        "description": "Created"
-                    }
-                }
-            },
-            "delete": {
-                "security": [
-                    {
-                        "x-auth-xpub": []
-                    }
-                ],
-                "description": "Delete paymail",
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Paymails"
-                ],
-                "summary": "Delete paymail",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "address",
-                        "name": "address",
-                        "in": "query",
-                        "required": true
                     }
                 ],
                 "responses": {
@@ -1676,33 +1698,6 @@
                 }
             }
         },
-        "/v1/utxo/unreserve": {
-            "patch": {
-                "security": [
-                    {
-                        "x-auth-xpub": []
-                    }
-                ],
-                "description": "Unreserve UTXOs",
-                "tags": [
-                    "UTXO"
-                ],
-                "summary": "Unreserve UTXOs",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "draft tx id",
-                        "name": "reference_id",
-                        "in": "query"
-                    }
-                ],
-                "responses": {
-                    "201": {
-                        "description": "Created"
-                    }
-                }
-            }
-        },
         "/v1/xpub": {
             "get": {
                 "security": [
@@ -1732,45 +1727,13 @@
                     }
                 }
             },
-            "post": {
-                "security": [
-                    {
-                        "x-auth-xpub": []
-                    }
-                ],
-                "description": "Create xPub",
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "xPub"
-                ],
-                "summary": "Create xPub",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "key",
-                        "name": "key",
-                        "in": "query",
-                        "required": true
-                    },
-                    {
-                        "type": "string",
-                        "description": "metadata",
-                        "name": "metadata",
-                        "in": "query"
-                    }
-                ],
-                "responses": {
-                    "201": {
-                        "description": "Created"
-                    }
-                }
-            },
             "patch": {
                 "security": [
                     {
                         "x-auth-xpub": []
+                    },
+                    {
+                        "bux-auth-xpub": []
                     }
                 ],
                 "description": "Update xPub",
