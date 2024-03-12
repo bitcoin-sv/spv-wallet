@@ -36,7 +36,7 @@ jobs:
           #
           # Note: By default, the `.golangci.yml` file should be at the root of the repository.
           # The location of the configuration file can be changed by using `--config=`
-          args: --config=../../.golangci-style.yml
+          args: --config=/.golangci-style.yml
 
           # Optional: show only new issues if it's a pull request. The default value is `false`.
           # only-new-issues: true
