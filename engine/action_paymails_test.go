@@ -8,7 +8,7 @@ import (
 )
 
 var (
-	externalXPubID = "xpub69PUyEkuD8cqyA9ekUkp3FwaeW1uyLxbwybEy3bmyD7mM6zShsJqfRCv12B43h6KiEiZgF3BFSMnYLsVZr526n37qsqVXkPKYWQ8En2xbi1"
+	externalXPubID = "xpub6BYQwVS6nGYGVp7BpvaKKLuurtSJGrNxMmVFxdpLTZUG4vApg9RDo6BVx8EDST4wKb7cNnkVygnrwkqJWg2KSKpi33h2k51QunNvPxEtq1t"
 	testAvatar     = "https://i.imgur.com/MYSVX44.png"
 	testAvatar2    = "https://i.imgur.com/cBJKPDh.png"
 	testPaymail    = "paymail@tester.com"
