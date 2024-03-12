@@ -78,7 +78,7 @@ func (a *Action) paymailAddressesSearch(c *gin.Context) {
 		return
 	}
 
-	var paymailAddressContracts []*models.PaymailAddress
+	paymailAddressContracts := make([]*models.PaymailAddress, 0)
 	for _, paymailAddress := range paymailAddresses {
 		paymailAddressContracts = append(paymailAddressContracts, mappings.MapToPaymailContract(paymailAddress))
 	}
