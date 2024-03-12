@@ -227,43 +227,44 @@ func (p *PaymailDefaultServiceProvider) getDestinationForPaymail(ctx context.Con
 		return nil, ErrPaymailNotFound
 	}
 
-	destination, err := createDestination(
+	dst, err := createDestination(
 		ctx, pm, append(p.client.DefaultModelOptions(), WithMetadatas(metadata))...,
 	)
 	if err != nil {
 		return nil, err
 	}
 
-	return destination, nil
+	return dst, nil
 }
 
-func createDestination(ctx context.Context, paymailAddress *PaymailAddress, opts ...ModelOps) (*Destination, error) {
-	externalHdXpub, err := paymailAddress.GetNextXpub(ctx)
+func createDestination(ctx context.Context, pm *PaymailAddress, opts ...ModelOps) (*Destination, error) {
+	hdXpub, err := pm.GetNextXpub(ctx)
 	if err != nil {
 		return nil, err
 	}
 
-	externalPk, err := externalHdXpub.ECPubKey()
+	pubKey, err := hdXpub.ECPubKey()
 	if err != nil {
 		return nil, err
 	}
 
-	lockingScript, err := createLockingScript(externalPk)
+	lockingScript, err := createLockingScript(pubKey)
 	if err != nil {
 		return nil, err
 	}
 
-	// create a new destination, based on the External xPub child
+	// create a new dst, based on the External xPub child
 	// this is not yet possible using the xpub struct. That needs the full xPub, which we don't have.
-	destination := newDestination(paymailAddress.XpubID, lockingScript, append(opts, New())...)
-	destination.Chain = utils.ChainExternal
-	destination.Num = paymailAddress.ExternalXpubKeyNum
+	dst := newDestination(pm.XpubID, lockingScript, append(opts, New())...)
+	dst.Chain = utils.ChainExternal
+	dst.Num = pm.ExternalXpubKeyNum
+	dst.PaymailExternalDerivationNum = pm.XpubDerivationSeq
 
-	if err = destination.Save(ctx); err != nil {
+	if err = dst.Save(ctx); err != nil {
 		return nil, err
 	}
 
-	return destination, nil
+	return dst, nil
 }
 
 func createLockingScript(ecPubKey *bec.PublicKey) (lockingScript string, err error) {

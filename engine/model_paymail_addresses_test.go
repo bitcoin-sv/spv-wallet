@@ -133,7 +133,7 @@ func TestNewPaymail(t *testing.T) {
 	})
 
 	t.Run("GetNextXpub() test", func(t *testing.T) {
-		ctx, c, deferMe := CreateTestSQLiteClient(t, true, false, WithAutoMigrate(&PaymailAddress{}), WithFreeCache())
+		ctx, c, deferMe := CreateTestSQLiteClient(t, false, false, WithAutoMigrate(&PaymailAddress{}), WithFreeCache())
 		defer deferMe()
 
 		// given
@@ -171,7 +171,7 @@ func TestNewPaymail(t *testing.T) {
 	})
 
 	t.Run("GetPubKey() test", func(t *testing.T) {
-		ctx, c, deferMe := CreateTestSQLiteClient(t, true, false, WithAutoMigrate(&PaymailAddress{}), WithFreeCache())
+		ctx, c, deferMe := CreateTestSQLiteClient(t, false, false, WithAutoMigrate(&PaymailAddress{}), WithFreeCache())
 		defer deferMe()
 
 		// given
@@ -210,7 +210,7 @@ func TestNewPaymail(t *testing.T) {
 	})
 
 	t.Run("RotatePubKey() test", func(t *testing.T) {
-		ctx, c, deferMe := CreateTestSQLiteClient(t, true, false, WithAutoMigrate(&PaymailAddress{}), WithFreeCache())
+		ctx, c, deferMe := CreateTestSQLiteClient(t, false, false, WithAutoMigrate(&PaymailAddress{}), WithFreeCache())
 		defer deferMe()
 
 		// given
@@ -251,7 +251,7 @@ func TestNewPaymail(t *testing.T) {
 	})
 
 	t.Run("ExternalXPub and PubKey rotation test", func(t *testing.T) {
-		ctx, c, deferMe := CreateTestSQLiteClient(t, true, false, WithAutoMigrate(&PaymailAddress{}), WithFreeCache())
+		ctx, c, deferMe := CreateTestSQLiteClient(t, false, false, WithAutoMigrate(&PaymailAddress{}), WithFreeCache())
 		defer deferMe()
 
 		// given
