@@ -2,6 +2,7 @@ package engine
 
 import (
 	"github.com/bitcoin-sv/spv-wallet/engine/utils"
+	"github.com/mrz1836/go-datastore"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"testing"
@@ -11,6 +12,7 @@ const (
 	fullName     = "John Doe"
 	paymailTest  = "test@paymail.com"
 	senderPubKey = "senderPubKey"
+	xPubID       = "62910a1ecbc7728afad563ab3f8aa70568ed934d1e0383cb1bbbfb1bc8f2afe5"
 )
 
 func Test_newContact(t *testing.T) {
@@ -18,11 +20,10 @@ func Test_newContact(t *testing.T) {
 		contact, err := newContact(fullName, paymailTest, senderPubKey)
 		require.NoError(t, err)
 		require.NotNil(t, contact)
-
 		assert.Equal(t, fullName, contact.FullName)
 		assert.Equal(t, paymailTest, contact.Paymail)
 		assert.Equal(t, utils.Hash(senderPubKey), contact.XpubID)
-		assert.Equal(t, utils.Hash(contact.XpubID+paymailTest), contact.ID)
+		assert.Equal(t, utils.Hash(senderPubKey+paymailTest), contact.ID)
 	})
 
 	t.Run("empty full_name", func(t *testing.T) {
@@ -37,14 +38,7 @@ func Test_newContact(t *testing.T) {
 		contact, err := newContact(fullName, "", senderPubKey)
 
 		require.Nil(t, contact)
-		require.ErrorContains(t, err, "paymail address failed format validation")
-	})
-
-	t.Run("invalid paymail", func(t *testing.T) {
-		contact, err := newContact(fullName, "testata", senderPubKey)
-
-		require.Nil(t, contact)
-		require.ErrorContains(t, err, "paymail address failed format validation")
+		require.EqualError(t, err, ErrEmptyContactPaymail.Error())
 	})
 
 	t.Run("empty pubKey", func(t *testing.T) {
@@ -100,5 +94,64 @@ func Test_getContact(t *testing.T) {
 
 		require.Nil(t, contact)
 		require.NoError(t, err)
+	})
+}
+
+func Test_getContacts(t *testing.T) {
+	t.Run("status 'not confirmed'", func(t *testing.T) {
+		ctx, client, deferMe := CreateTestSQLiteClient(t, false, false, withTaskManagerMockup())
+		defer deferMe()
+
+		var metadata *Metadata
+
+		dbConditions := map[string]interface{}{
+			xPubIDField:   xPubID,
+			contactStatus: notConfirmed,
+		}
+
+		var queryParams *datastore.QueryParams
+
+		contacts, err := getContacts(ctx, metadata, &dbConditions, queryParams, client.DefaultModelOptions()...)
+
+		require.NoError(t, err)
+		assert.NotNil(t, contacts)
+	})
+
+	t.Run("status 'confirmed'", func(t *testing.T) {
+		ctx, client, deferMe := CreateTestSQLiteClient(t, false, false, withTaskManagerMockup())
+		defer deferMe()
+
+		var metadata *Metadata
+
+		dbConditions := make(map[string]interface{})
+
+		var queryParams *datastore.QueryParams
+
+		(dbConditions)[xPubIDField] = xPubID
+		(dbConditions)[contactStatus] = confirmed
+
+		contacts, err := getContacts(ctx, metadata, &dbConditions, queryParams, client.DefaultModelOptions()...)
+
+		require.NoError(t, err)
+		assert.Equal(t, 0, len(contacts))
+	})
+
+	t.Run("status 'awaiting acceptance'", func(t *testing.T) {
+		ctx, client, deferMe := CreateTestSQLiteClient(t, false, false, withTaskManagerMockup())
+		defer deferMe()
+
+		var metadata *Metadata
+
+		dbConditions := make(map[string]interface{})
+
+		var queryParams *datastore.QueryParams
+
+		(dbConditions)[xPubIDField] = xPubID
+		(dbConditions)[contactStatus] = awaitingAcceptance
+
+		contacts, err := getContacts(ctx, metadata, &dbConditions, queryParams, client.DefaultModelOptions()...)
+
+		require.NoError(t, err)
+		assert.Equal(t, 0, len(contacts))
 	})
 }

@@ -95,6 +95,7 @@ const (
 	fullNameField        = "full_name"
 	paymailField         = "paymail"
 	senderXPubField      = "pub_key"
+	contactStatus        = "status"
 
 	// Universal statuses
 	statusCanceled   = "canceled"

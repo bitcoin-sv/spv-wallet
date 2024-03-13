@@ -5,6 +5,7 @@ import (
 
 	"github.com/bitcoin-sv/spv-wallet/engine"
 	"github.com/bitcoin-sv/spv-wallet/mappings"
+	"github.com/bitcoin-sv/spv-wallet/server/auth"
 	"github.com/gin-gonic/gin"
 )
 
@@ -23,19 +24,26 @@ import (
 // @Security	bux-auth-xpub
 func (a *Action) create(c *gin.Context) {
 
-	fullName := c.GetString("full_name")
-	paymail := c.GetString("paymail")
-	pubKey := c.GetString("pubKey")
+	var contact engine.Contact
 
-	var requestBody CreateContact
+	err := c.ShouldBindJSON(&contact)
 
-	contact, err := a.Services.SpvWalletEngine.NewContact(c.Request.Context(), fullName, paymail, pubKey, engine.WithMetadatas(requestBody.Metadata))
 	if err != nil {
 		c.JSON(http.StatusUnprocessableEntity, err.Error())
 		return
 	}
 
-	contract := mappings.MapToContactContract(contact)
+	pubKey := c.GetString(auth.ParamXPubKey)
+
+	var requestBody CreateContact
+
+	newContact, err := a.Services.SpvWalletEngine.NewContact(c.Request.Context(), contact.FullName, contact.Paymail, pubKey, engine.WithMetadatas(requestBody.Metadata))
+	if err != nil {
+		c.JSON(http.StatusUnprocessableEntity, err.Error())
+		return
+	}
+
+	contract := mappings.MapToContactContract(newContact)
 
 	c.JSON(http.StatusCreated, contract)
 }
