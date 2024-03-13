@@ -45,11 +45,23 @@ func Load(logger *zerolog.Logger) (appConfig *AppConfig, err error) {
 		if err != nil {
 			logger.Error().Msg("Unable to decode App Config to json")
 		} else {
-			fmt.Printf("loaded config: %s", cfg)
+			logger.Debug().Msgf("loaded config: %s", cfg)
 		}
 	}
 
 	return appConfig, nil
+}
+
+// LoadForTest returns test AppConfig
+func LoadForTest() (appConfig *AppConfig) {
+
+	appConfig = getDefaultAppConfig()
+	appConfig.Debug = false
+	appConfig.DebugProfiling = false
+	appConfig.Logging.Level = zerolog.LevelErrorValue
+	appConfig.Logging.Format = "console"
+
+	return appConfig
 }
 
 func setDefaults() error {
