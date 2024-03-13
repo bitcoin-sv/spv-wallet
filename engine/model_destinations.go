@@ -26,7 +26,7 @@ type Destination struct {
 	Type                         string `json:"type" toml:"type" yaml:"type" gorm:"<-:create;type:text;comment:Type of output" bson:"type"`
 	Chain                        uint32 `json:"chain" toml:"chain" yaml:"chain" gorm:"<-:create;type:int;comment:This is the (chain)/num location of the address related to the xPub" bson:"chain"`
 	Num                          uint32 `json:"num" toml:"num" yaml:"num" gorm:"<-:create;type:int;comment:This is the chain/(num) location of the address related to the xPub" bson:"num"`
-	PaymailExternalDerivationNum uint32 `json:"paymail_ext_derivation_num" toml:"paymail_ext_derivation_num" yaml:"paymail_ext_derivation_num" gorm:"<-:create;type:int not null;comment:This is the chain/(num)/(ext_derivation_num) location of the address related to the xPub" bson:"paymail_ext_derivation_num"`
+	PaymailExternalDerivationNum uint32 `json:"paymail_ext_derivation_num" toml:"paymail_ext_derivation_num" yaml:"paymail_ext_derivation_num" gorm:"<-:create;type:int not null;comment:This is the chain/(num)/(ext_derivation_num) location of the address related to the xPub:paymail_ext_derivation_num" bson:"paymail_ext_derivation_num"`
 	Address                      string `json:"address" toml:"address" yaml:"address" gorm:"<-:create;type:varchar(35);index;comment:This is the BitCoin address" bson:"address"`
 	DraftID                      string `json:"draft_id" toml:"draft_id" yaml:"draft_id" gorm:"<-:create;type:varchar(64);index;comment:This is the related draft id (if internal tx)" bson:"draft_id,omitempty"`
 }
