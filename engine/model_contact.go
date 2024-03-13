@@ -38,6 +38,12 @@ func newContact(fullName, paymailAddress, pubKey, ownerXpubID string, status Con
 	return &contact
 }
 
+func emptyContact(opts ...ModelOps) *Contact {
+	return &Contact{
+		Model: *NewBaseModel(ModelContact, opts...),
+	}
+}
+
 func getContact(ctx context.Context, paymail, ownerXpubID string, opts ...ModelOps) (*Contact, error) {
 	conditions := map[string]interface{}{
 		xPubIDField:  ownerXpubID,
@@ -54,6 +60,20 @@ func getContact(ctx context.Context, paymail, ownerXpubID string, opts ...ModelO
 		return nil, err
 	}
 
+	return contact, nil
+}
+
+// GetContactByPaymailAndXPub returns the contact with given paymail and xpub
+func getContactByPaymailAndXPubID(ctx context.Context, paymailAddress, xpubID string, opts ...ModelOps) (*Contact, error) {
+	contact := emptyContact(opts...)
+	contact.Paymail = paymailAddress
+	contact.OwnerXpubID = xpubID
+	if err := Get(ctx, contact, nil, false, defaultDatabaseReadTimeout, false); err != nil {
+		if errors.Is(err, datastore.ErrNoResults) {
+			return nil, nil
+		}
+		return nil, err
+	}
 	return contact, nil
 }
 

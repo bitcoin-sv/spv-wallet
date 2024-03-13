@@ -213,3 +213,23 @@ func (c *Client) GetContacts(ctx context.Context, metadata *Metadata, conditions
 
 	return contacts, nil
 }
+
+func (c *Client) AcceptContact(ctx context.Context, xPubID, paymail string) error {
+
+	contact, err := getContactByPaymailAndXPubID(ctx, paymail, xPubID, c.DefaultModelOptions()...)
+	if err != nil {
+		return err
+	}
+	if contact == nil {
+		return errors.New("contact not found")
+	}
+	if contact.Status != ContactAwaitAccept {
+		return errors.New("contact does not have status awaiting")
+	}
+	contact.Status = ContactNotConfirmed
+	if err = contact.Save(ctx); err != nil {
+		return err
+	}
+
+	return nil
+}
