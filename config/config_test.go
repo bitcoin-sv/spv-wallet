@@ -4,17 +4,18 @@ import (
 	"context"
 	"testing"
 
-	"github.com/bitcoin-sv/spv-wallet/logging"
 	"github.com/mrz1836/go-cachestore"
 	"github.com/mrz1836/go-datastore"
+	"github.com/rs/zerolog"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
 
 // newTestConfig will make a new test config
 func newTestConfig(t *testing.T) (ac *AppConfig) {
-	defaultLogger := logging.GetDefaultLogger()
-	ac, err := Load(defaultLogger)
+	nop := zerolog.Nop()
+	ac, err := Load(&nop)
+
 	require.NoError(t, err)
 	require.NotNil(t, ac)
 	return
