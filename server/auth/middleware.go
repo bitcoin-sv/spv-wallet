@@ -135,6 +135,7 @@ func SignatureMiddleware(appConfig *config.AppConfig, requireSigning, adminRequi
 	return func(c *gin.Context) {
 		if c.Request.Body == nil {
 			c.AbortWithStatusJSON(http.StatusUnauthorized, "missing body")
+			return
 		}
 		defer func() {
 			_ = c.Request.Body.Close()
