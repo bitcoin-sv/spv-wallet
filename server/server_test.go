@@ -39,8 +39,6 @@ func (ts *TestSuite) TearDownSuite() {
 func (ts *TestSuite) SetupTest() {
 	ts.BaseSetupTest()
 
-	// Load the router & register routes
-	require.NotNil(ts.T(), ts.Router)
 	SetupServerRoutes(ts.AppConfig, ts.Services, ts.Router)
 }
 

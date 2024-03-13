@@ -52,6 +52,7 @@ func Load(logger *zerolog.Logger) (appConfig *AppConfig, err error) {
 	return appConfig, nil
 }
 
+// LoadForTest returns test AppConfig
 func LoadForTest() (appConfig *AppConfig) {
 
 	appConfig = getDefaultAppConfig()
