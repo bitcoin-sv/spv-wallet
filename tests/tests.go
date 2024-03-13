@@ -7,7 +7,9 @@ import (
 
 	"github.com/bitcoin-sv/spv-wallet/config"
 	"github.com/bitcoin-sv/spv-wallet/logging"
+	"github.com/bitcoin-sv/spv-wallet/server/auth"
 	"github.com/gin-gonic/gin"
+	"github.com/rs/zerolog"
 	"github.com/stretchr/testify/require"
 	"github.com/stretchr/testify/suite"
 )
@@ -22,11 +24,7 @@ type TestSuite struct {
 
 // BaseSetupSuite runs at the start of the suite
 func (ts *TestSuite) BaseSetupSuite() {
-	// Load the configuration
-	defaultLogger := logging.GetDefaultLogger()
-	var err error
-	ts.AppConfig, err = config.Load(defaultLogger)
-	require.NoError(ts.T(), err)
+	ts.AppConfig = config.LoadForTest()
 }
 
 // BaseTearDownSuite runs after the suite finishes
@@ -46,6 +44,16 @@ func (ts *TestSuite) BaseTearDownSuite() {
 func (ts *TestSuite) BaseSetupTest() {
 	// Load the services
 	var err error
+	nop := zerolog.Nop()
+
+	gin.SetMode(gin.ReleaseMode)
+	engine := gin.New()
+	engine.Use(logging.GinMiddleware(&nop), gin.Recovery())
+	engine.Use(auth.CorsMiddleware())
+
+	ts.Router = engine
+	require.NotNil(ts.T(), ts.Router)
+
 	ts.Services, err = ts.AppConfig.LoadTestServices(context.Background())
 	require.NoError(ts.T(), err)
 }
