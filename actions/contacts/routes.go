@@ -19,9 +19,11 @@ func NewHandler(appConfig *config.AppConfig, services *config.AppServices) route
 	apiEndpoints := routes.APIEndpointsFunc(func(router *gin.RouterGroup) {
 		contactGroup := router.Group("/contact")
 		contactGroup.POST("", action.create)
+		contactGroup.PATCH("", action.update)
 
 		contactsGroup := router.Group("/contacts")
 		contactsGroup.GET("", action.search)
+
 	})
 
 	return apiEndpoints
