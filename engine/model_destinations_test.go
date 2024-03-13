@@ -410,7 +410,7 @@ func (ts *EmbeddedDBTestSuite) TestDestination_Save() {
 		// Create model
 		tc.MockSQLDB.ExpectExec("INSERT INTO `"+tc.tablePrefix+"_destinations` ("+
 			"`created_at`,`updated_at`,`metadata`,`deleted_at`,`id`,`xpub_id`,`locking_script`,"+
-			"`type`,`chain`,`num`,`paymail_ext_derivation_num`,`address`,`draft_id`) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)").WithArgs(
+			"`type`,`chain`,`num`,`paymail_external_derivation_num`,`address`,`draft_id`) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)").WithArgs(
 			tester.AnyTime{},    // created_at
 			tester.AnyTime{},    // updated_at
 			nil,                 // metadata
@@ -457,7 +457,7 @@ func (ts *EmbeddedDBTestSuite) TestDestination_Save() {
 		// Create model
 		tc.MockSQLDB.ExpectExec("INSERT INTO `"+tc.tablePrefix+"_destinations` ("+
 			"`created_at`,`updated_at`,`metadata`,`deleted_at`,`id`,`xpub_id`,`locking_script`,"+
-			"`type`,`chain`,`num`,`paymail_ext_derivation_num`,`address`,`draft_id`) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)").WithArgs(
+			"`type`,`chain`,`num`,`paymail_external_derivation_num`,`address`,`draft_id`) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)").WithArgs(
 			tester.AnyTime{},    // created_at
 			tester.AnyTime{},    // updated_at
 			nil,                 // metadata
@@ -502,7 +502,7 @@ func (ts *EmbeddedDBTestSuite) TestDestination_Save() {
 
 		// Create model
 		tc.MockSQLDB.ExpectExec(`INSERT INTO "`+tc.tablePrefix+`_destinations" `+
-			`("created_at","updated_at","metadata","deleted_at","id","xpub_id","locking_script","type","chain","num","paymail_ext_derivation_num","address","draft_id")`+
+			`("created_at","updated_at","metadata","deleted_at","id","xpub_id","locking_script","type","chain","num","paymail_external_derivation_num","address","draft_id")`+
 			`VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13)`).WithArgs(
 			tester.AnyTime{},    // created_at
 			tester.AnyTime{},    // updated_at
