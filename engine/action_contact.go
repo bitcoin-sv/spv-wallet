@@ -38,7 +38,7 @@ func (c *Client) UpsertContact(ctx context.Context, ctcFName, ctcPaymail, reques
 		return nil, fmt.Errorf("geting PKI for %s failed. Reason: %w", ctcPaymail, err)
 	}
 
-	data := newContactData{
+	data := contactData{
 		fullName: ctcFName,
 		paymail:  contactPm,
 		pubKey:   contactPki.PubKey,
@@ -46,7 +46,7 @@ func (c *Client) UpsertContact(ctx context.Context, ctcFName, ctcPaymail, reques
 		opts:     opts,
 	}
 
-	contact, err := c.addContact(ctx, &data, reqXPubID)
+	contact, err := c.saveContact(ctx, &data, reqXPubID)
 	if err != nil {
 		return nil, fmt.Errorf("adding %s contact failed. Reason: %w", ctcPaymail, err)
 	}
@@ -81,7 +81,7 @@ func (c *Client) AddContactRequest(ctx context.Context, fullName, paymailAdress,
 	}
 
 	// add contact request
-	data := newContactData{
+	data := contactData{
 		fullName: fullName,
 		paymail:  contactPm,
 		pubKey:   contactPki.PubKey,
@@ -89,7 +89,7 @@ func (c *Client) AddContactRequest(ctx context.Context, fullName, paymailAdress,
 		opts:     opts,
 	}
 
-	contactRequest, err := c.addContact(ctx, &data, requesterXPubID)
+	contactRequest, err := c.saveContact(ctx, &data, requesterXPubID)
 	if err != nil {
 		return nil, fmt.Errorf("adding %s contact failed. Reason: %w", paymailAdress, err)
 	}
@@ -97,24 +97,27 @@ func (c *Client) AddContactRequest(ctx context.Context, fullName, paymailAdress,
 	return contactRequest, nil
 }
 
-func (c *Client) addContact(ctx context.Context, data *newContactData, requesterXPubId string) (*Contact, error) {
+func (c *Client) saveContact(ctx context.Context, data *contactData, requesterXPubId string) (*Contact, error) {
 	// check if exists already
 	contact, err := getContact(ctx, data.paymail.adress, requesterXPubId, c.DefaultModelOptions()...)
 	if err != nil {
 		return nil, err
 	}
-	if contact != nil {
-		return contact, nil
-	}
 
-	contact = newContact(
-		data.fullName,
-		data.paymail.adress,
-		data.pubKey,
-		requesterXPubId,
-		data.status,
-		c.DefaultModelOptions(append(data.opts, New())...)...,
-	)
+	if contact == nil { // insert
+		contact = newContact(
+			data.fullName,
+			data.paymail.adress,
+			data.pubKey,
+			requesterXPubId,
+			data.status,
+			c.DefaultModelOptions(append(data.opts, New())...)...,
+		)
+
+	} else { // update
+		contact.FullName = data.fullName
+		contact.SetOptions(data.opts...) // add metada if exists
+	}
 
 	if err = contact.Save(ctx); err != nil {
 		return nil, err
@@ -122,7 +125,7 @@ func (c *Client) addContact(ctx context.Context, data *newContactData, requester
 	return contact, nil
 }
 
-type newContactData struct {
+type contactData struct {
 	fullName string
 	paymail  *SanitizedPaymail
 	pubKey   string

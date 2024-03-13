@@ -120,6 +120,22 @@ func (c *Contact) BeforeCreating(_ context.Context) (err error) {
 	return
 }
 
+func (c *Contact) BeforeUpdating(_ context.Context) (err error)  {
+	c.Client().Logger().Debug().
+		Str("contactID", c.ID).
+		Msgf("starting: %s BeforeUpdate hook...", c.Name())
+
+	if err = c.validate(); err != nil {
+		return
+	}
+
+	c.Client().Logger().Debug().
+		Str("contactID", c.ID).
+		Msgf("end: %s BeforeUpdate hook", c.Name())
+	return	
+}
+
+
 // Migrate model specific migration on startup
 func (c *Contact) Migrate(client datastore.ClientInterface) error {
 
