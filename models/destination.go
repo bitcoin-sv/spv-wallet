@@ -19,10 +19,14 @@ type Destination struct {
 	LockingScript string `json:"locking_script"`
 	// Type is a destination's type.
 	Type string `json:"type"`
-	// Chain is a destination's chain representation.
+
+	// Chain is the (chain)/num/ext_derivation_num location of the address related to the xPub.
 	Chain uint32 `json:"chain"`
-	// Num is a destination's num representation.
+	// Num is the chain/(num)/ext_derivation_num location of the address related to the xPub.
 	Num uint32 `json:"num"`
+	//PaymailExternalDerivationNum is the chain/num/(ext_derivation_num) location of the address related to the xPub.
+	PaymailExternalDerivationNum uint32 `json:"paymail_external_derivation_num"`
+
 	// Address is a destination's address.
 	Address string `json:"address"`
 	// DraftID is a destination's draft id.
