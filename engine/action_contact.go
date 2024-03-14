@@ -6,13 +6,14 @@ import (
 	"fmt"
 	"github.com/bitcoin-sv/go-paymail"
 	"github.com/mrz1836/go-cachestore"
+	"github.com/mrz1836/go-datastore"
 )
 
 func (c *Client) NewContact(ctx context.Context, fullName, paymail, senderPubKey string, opts ...ModelOps) (*Contact, error) {
 	// Check for existing NewRelic transaction
 	ctx = c.GetOrStartTxn(ctx, "new_contact")
 
-	contact, err := getContact(ctx, fullName, paymail, senderPubKey, opts...)
+	contact, err := getContact(ctx, fullName, paymail, senderPubKey, c.DefaultModelOptions()...)
 
 	if contact != nil {
 		return nil, errors.New("contact already exists")
@@ -27,6 +28,7 @@ func (c *Client) NewContact(ctx context.Context, fullName, paymail, senderPubKey
 		senderPubKey,
 		append(opts, c.DefaultModelOptions(
 			New(),
+			WithXPub(senderPubKey),
 		)...)...,
 	)
 
@@ -51,6 +53,40 @@ func (c *Client) NewContact(ctx context.Context, fullName, paymail, senderPubKey
 	if err = contact.Save(ctx); err != nil {
 		return nil, err
 	}
+	return contact, nil
+}
+
+func (c *Client) UpdateContact(ctx context.Context, fullName, pubKey, xPubID, paymailAddr string, status ContactStatus, opts ...ModelOps) (*Contact, error) {
+	contact, err := getContactByXPubIdAndRequesterPubKey(ctx, xPubID, paymailAddr, opts...)
+
+	if err != nil {
+		return nil, fmt.Errorf("failed to get contact: %w", err)
+	}
+
+	if contact == nil {
+		return nil, fmt.Errorf("contact not found")
+	}
+
+	if fullName != "" {
+		contact.FullName = fullName
+	}
+
+	if pubKey != "" {
+		contact.PubKey = pubKey
+	}
+
+	if status != "" {
+		contact.Status = status
+	}
+
+	if paymailAddr != "" {
+		contact.Paymail = paymailAddr
+	}
+
+	if err = contact.Save(ctx); err != nil {
+		return nil, err
+	}
+
 	return contact, nil
 }
 
@@ -85,4 +121,17 @@ func (c *Client) GetPaymailCapability(ctx context.Context, paymailAddress string
 	}
 
 	return capabilities, nil
+}
+
+func (c *Client) GetContacts(ctx context.Context, metadata *Metadata, conditions *map[string]interface{}, queryParams *datastore.QueryParams, opts ...ModelOps) ([]*Contact, error) {
+
+	ctx = c.GetOrStartTxn(ctx, "get_contacts")
+
+	contacts, err := getContacts(ctx, metadata, conditions, queryParams, c.DefaultModelOptions(opts...)...)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return contacts, nil
 }
