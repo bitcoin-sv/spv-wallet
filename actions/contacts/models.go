@@ -19,3 +19,13 @@ func (p *UpsertContact) validate() error {
 
 	return nil
 }
+
+// UpdateContact is the model for updating a contact
+type UpdateContact struct {
+	XPubID   string          `json:"xpub_id"`
+	FullName string          `json:"full_name"`
+	Paymail  string          `json:"paymail"`
+	PubKey   string          `json:"pubKey"`
+	Status   string          `json:"status"`
+	Metadata engine.Metadata `json:"metadata"`
+}

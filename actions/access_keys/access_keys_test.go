@@ -5,8 +5,6 @@ import (
 
 	"github.com/bitcoin-sv/spv-wallet/config"
 	"github.com/bitcoin-sv/spv-wallet/tests"
-	"github.com/gin-gonic/gin"
-	"github.com/stretchr/testify/require"
 	"github.com/stretchr/testify/suite"
 )
 
@@ -29,9 +27,6 @@ func (ts *TestSuite) TearDownSuite() {
 func (ts *TestSuite) SetupTest() {
 	ts.BaseSetupTest()
 
-	// Load the router & register routes
-	ts.Router = gin.Default()
-	require.NotNil(ts.T(), ts.Router)
 	routes := NewHandler(ts.AppConfig, ts.Services)
 	routes.RegisterAPIEndpoints(ts.Router.Group("/" + config.APIVersion))
 }

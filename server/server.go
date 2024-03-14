@@ -101,6 +101,8 @@ func (s *Server) Handlers() *gin.Engine {
 	engine.Use(logging.GinMiddleware(&httpLogger), gin.Recovery())
 	engine.Use(auth.CorsMiddleware())
 
+	metrics.SetupGin(engine)
+
 	s.Router = engine
 
 	segment.End()
@@ -177,16 +179,12 @@ func SetupServerRoutes(appConfig *config.AppConfig, services *config.AppServices
 	services.SpvWalletEngine.GetPaymailConfig().RegisterRoutes(engine)
 
 	// Set the 404 handler (any request not detected)
-	engine.NoRoute(actions.NotFound)
+	engine.NoRoute(metrics.NoRoute, actions.NotFound)
 
 	// Set the method not allowed
 	engine.NoMethod(actions.MethodNotAllowed)
 
 	registerSwaggerEndpoints(engine)
-
-	if metrics, enabled := metrics.Get(); enabled {
-		engine.GET("/metrics", gin.WrapH(metrics.HTTPHandler()))
-	}
 
 	if appConfig.DebugProfiling {
 		pprof.Register(engine, "debug/pprof")

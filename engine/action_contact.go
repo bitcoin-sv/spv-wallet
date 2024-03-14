@@ -7,6 +7,7 @@ import (
 
 	"github.com/bitcoin-sv/go-paymail"
 	"github.com/bitcoin-sv/spv-wallet/engine/utils"
+	"github.com/mrz1836/go-datastore"
 )
 
 var (
@@ -131,4 +132,51 @@ type contactData struct {
 	pubKey   string
 	status   ContactStatus
 	opts     []ModelOps
+}
+
+func (c *Client) UpdateContact(ctx context.Context, fullName, pubKey, xPubID, paymailAddr string, status ContactStatus, opts ...ModelOps) (*Contact, error) {
+	contact, err := getContact(ctx, paymailAddr, xPubID, opts...)
+
+	if err != nil {
+		return nil, fmt.Errorf("failed to get contact: %w", err)
+	}
+
+	if contact == nil {
+		return nil, fmt.Errorf("contact not found")
+	}
+
+	if fullName != "" {
+		contact.FullName = fullName
+	}
+
+	if pubKey != "" {
+		contact.PubKey = pubKey
+	}
+
+	if status != "" {
+		contact.Status = status
+	}
+
+	if paymailAddr != "" {
+		contact.Paymail = paymailAddr
+	}
+
+	if err = contact.Save(ctx); err != nil {
+		return nil, err
+	}
+
+	return contact, nil
+}
+
+func (c *Client) GetContacts(ctx context.Context, metadata *Metadata, conditions *map[string]interface{}, queryParams *datastore.QueryParams, opts ...ModelOps) ([]*Contact, error) {
+
+	ctx = c.GetOrStartTxn(ctx, "get_contacts")
+
+	contacts, err := getContacts(ctx, metadata, conditions, queryParams, c.DefaultModelOptions(opts...)...)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return contacts, nil
 }

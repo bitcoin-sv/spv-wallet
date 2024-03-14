@@ -5,13 +5,17 @@ import (
 	"fmt"
 	"testing"
 
+	"github.com/mrz1836/go-datastore"
+	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
+
+const xPubID = "62910a1ecbc7728afad563ab3f8aa70568ed934d1e0383cb1bbbfb1bc8f2afe5"
 
 func Test_contact_validate_success(t *testing.T) {
 	t.Run("valid contact", func(t *testing.T) {
 		// given
-		contact := newContact("Homer Simpson", "homer@springfield.7g", "xpubblablahomer",
+		contact := newContact("Homer Simpson", "homer@springfield.gg", "xpubblablahomer",
 			"fafagasfaufrusfrusfrbsur", ContactNotConfirmed)
 
 		// when
@@ -42,7 +46,7 @@ func Test_contact_validate_returns_error(t *testing.T) {
 		{
 			name:         "invalid paymail",
 			contact:      newContact("Marge Simpson", "definitely not paymail", "xpubblablamarge", "ownerspbubid", ContactNotConfirmed),
-			expetedError: fmt.Errorf("paymail address failed format validation: definitely not paymail"),
+			expetedError: fmt.Errorf("paymail address failed format validation: definitelynotpaymail"),
 		},
 		{
 			name:         "empty pubKey",
@@ -73,7 +77,6 @@ func Test_contact_validate_returns_error(t *testing.T) {
 			require.EqualError(t, err, tc.expetedError.Error())
 		})
 	}
-
 }
 
 func Test_getContact(t *testing.T) {
@@ -81,7 +84,7 @@ func Test_getContact(t *testing.T) {
 		ctx, client, deferMe := CreateTestSQLiteClient(t, false, false, withTaskManagerMockup())
 		defer deferMe()
 
-		contact := newContact("Homer Simpson", "homer@springfield.7g", "xpubblablahomer",
+		contact := newContact("Homer Simpson", "homer@springfield.com", "xpubblablahomer",
 			"fafagasfaufrusfrusfrbsur", ContactNotConfirmed, WithClient(client))
 
 		err := contact.Save(ctx)
@@ -106,7 +109,7 @@ func Test_getContact(t *testing.T) {
 		ctx, client, deferMe := CreateTestSQLiteClient(t, false, false, withTaskManagerMockup())
 		defer deferMe()
 
-		contact := newContact("Marge Simpson", "Marge@springfield.7g", "xpubblablamarge",
+		contact := newContact("Marge Simpson", "Marge@springfield.com", "xpubblablamarge",
 			"fafagasfaufrusfrusfrbsur", ContactNotConfirmed, WithClient(client))
 
 		err := contact.Save(ctx)
@@ -118,5 +121,65 @@ func Test_getContact(t *testing.T) {
 		// then
 		require.NoError(t, err)
 		require.Nil(t, result)
+	})
+}
+
+func Test_getContacts(t *testing.T) {
+	t.Run("status 'not confirmed'", func(t *testing.T) {
+		ctx, client, deferMe := CreateTestSQLiteClient(t, false, false, withTaskManagerMockup())
+		defer deferMe()
+
+		var metadata *Metadata
+
+		dbConditions := map[string]interface{}{
+			xPubIDField:   xPubID,
+			contactStatus: ContactNotConfirmed,
+		}
+
+		var queryParams *datastore.QueryParams
+
+		contacts, err := getContacts(ctx, metadata, &dbConditions, queryParams, client.DefaultModelOptions()...)
+
+		require.NoError(t, err)
+		assert.NotNil(t, contacts)
+	})
+
+	t.Run("status 'confirmed'", func(t *testing.T) {
+		ctx, client, deferMe := CreateTestSQLiteClient(t, false, false, withTaskManagerMockup())
+		defer deferMe()
+
+		var metadata *Metadata
+
+		dbConditions := make(map[string]interface{})
+
+		var queryParams *datastore.QueryParams
+
+		(dbConditions)[xPubIDField] = xPubID
+		(dbConditions)[contactStatus] = ContactConfirmed
+
+		contacts, err := getContacts(ctx, metadata, &dbConditions, queryParams, client.DefaultModelOptions()...)
+
+		require.NoError(t, err)
+		assert.Equal(t, 0, len(contacts))
+	})
+
+	t.Run("status 'awaiting acceptance'", func(t *testing.T) {
+		ctx, client, deferMe := CreateTestSQLiteClient(t, false, false, withTaskManagerMockup())
+		defer deferMe()
+
+		var metadata *Metadata
+
+		dbConditions := make(map[string]interface{})
+
+		var queryParams *datastore.QueryParams
+
+		(dbConditions)[xPubIDField] = xPubID
+		(dbConditions)[contactStatus] = ContactAwaitAccept
+
+		contacts, err := getContacts(ctx, metadata, &dbConditions, queryParams, client.DefaultModelOptions()...)
+
+		require.NoError(t, err)
+		assert.Equal(t, 0, len(contacts))
+
 	})
 }

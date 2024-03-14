@@ -176,7 +176,6 @@ configs:
   frontend-env-config:
     content: |
       {
-          "paymailDomain": "${RUN_PAYMAIL_DOMAIN}",
           "apiUrl": "http${RUN_SECURED_PROTOCOL_SUFFIX}://${RUN_API_DOMAIN}",
           "wsUrl": "ws${RUN_SECURED_PROTOCOL_SUFFIX}://${RUN_API_DOMAIN}/api/websocket"
       }

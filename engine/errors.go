@@ -207,3 +207,9 @@ var ErrMissingContactStatus = errors.New("status is required")
 
 // ErrMissingContactStatus missing status in contact
 var ErrMissingContactOwnerXPubId = errors.New("contact must have owner")
+
+// ErrEmptyContactPubKey when pubKey is empty
+var ErrEmptyContactPubKey = errors.New("pubKey is empty")
+
+// ErrEmptyContactPaymail when paymail is empty
+var ErrEmptyContactPaymail = errors.New("paymail is empty")

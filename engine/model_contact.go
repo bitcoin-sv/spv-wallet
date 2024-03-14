@@ -85,6 +85,16 @@ func (c *Contact) validate() error {
 	return nil
 }
 
+func getContacts(ctx context.Context, metadata *Metadata, conditions *map[string]interface{}, queryParams *datastore.QueryParams, opts ...ModelOps) ([]*Contact, error) {
+	contacts := make([]*Contact, 0)
+
+	if err := getModelsByConditions(ctx, ModelContact, &contacts, metadata, conditions, queryParams, opts...); err != nil {
+		return nil, err
+	}
+
+	return contacts, nil
+}
+
 func (c *Contact) GetModelName() string {
 	return ModelContact.String()
 }
@@ -120,7 +130,7 @@ func (c *Contact) BeforeCreating(_ context.Context) (err error) {
 	return
 }
 
-func (c *Contact) BeforeUpdating(_ context.Context) (err error)  {
+func (c *Contact) BeforeUpdating(_ context.Context) (err error) {
 	c.Client().Logger().Debug().
 		Str("contactID", c.ID).
 		Msgf("starting: %s BeforeUpdate hook...", c.Name())
@@ -132,9 +142,8 @@ func (c *Contact) BeforeUpdating(_ context.Context) (err error)  {
 	c.Client().Logger().Debug().
 		Str("contactID", c.ID).
 		Msgf("end: %s BeforeUpdate hook", c.Name())
-	return	
+	return
 }
-
 
 // Migrate model specific migration on startup
 func (c *Contact) Migrate(client datastore.ClientInterface) error {
