@@ -7,4 +7,5 @@ type Collector interface {
 	RegisterGauge(name string) prometheus.Gauge
 	RegisterGaugeVec(name string, labels ...string) *prometheus.GaugeVec
 	RegisterHistogramVec(name string, labels ...string) *prometheus.HistogramVec
+	RegisterCounterVec(name string, labels ...string) *prometheus.CounterVec
 }
