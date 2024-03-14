@@ -19,6 +19,4 @@ type PaymailAddress struct {
 	PublicName string `json:"public_name"`
 	// Avatar is a paymail address's avatar.
 	Avatar string `json:"avatar"`
-	// ExternalXpubKey is a paymail address's external xpub key.
-	ExternalXpubKey string `json:"external_xpub_key"`
 }

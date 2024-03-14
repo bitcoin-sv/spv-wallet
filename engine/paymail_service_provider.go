@@ -258,7 +258,7 @@ func createDestination(ctx context.Context, pm *PaymailAddress, opts ...ModelOps
 	dst := newDestination(pm.XpubID, lockingScript, append(opts, New())...)
 	dst.Chain = utils.ChainExternal
 	dst.Num = pm.ExternalXpubKeyNum
-	dst.PaymailExternalDerivationNum = pm.XpubDerivationSeq
+	dst.PaymailExternalDerivationNum = &pm.XpubDerivationSeq
 
 	if err = dst.Save(ctx); err != nil {
 		return nil, err

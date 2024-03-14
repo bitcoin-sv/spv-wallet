@@ -25,7 +25,7 @@ type Destination struct {
 	// Num is the chain/(num)/ext_derivation_num location of the address related to the xPub.
 	Num uint32 `json:"num"`
 	//PaymailExternalDerivationNum is the chain/num/(ext_derivation_num) location of the address related to the xPub.
-	PaymailExternalDerivationNum uint32 `json:"paymail_external_derivation_num"`
+	PaymailExternalDerivationNum *uint32 `json:"paymail_external_derivation_num"`
 
 	// Address is a destination's address.
 	Address string `json:"address"`
