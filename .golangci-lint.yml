@@ -93,7 +93,6 @@ linters:
     - exhaustruct
     - gocognit
     - gocyclo
-    - gofumpt
     - gosec
     - maligned
     - prealloc
@@ -109,6 +108,11 @@ linters:
   presets:
     - bugs
     - unused
+
+linters-settings:
+  govet:
+    enable:
+      - fieldalignment
 
 issues:
   # List of regexps of issue texts to exclude, empty list by default.
