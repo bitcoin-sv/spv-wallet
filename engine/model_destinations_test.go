@@ -421,7 +421,7 @@ func (ts *EmbeddedDBTestSuite) TestDestination_Save() {
 			destination.Type,    // type
 			0,                   // chain
 			0,                   // num
-			0,                   // paymail_ext_derivation_num
+			nil,                 // paymail_ext_derivation_num
 			destination.Address, // address
 			testDraftID,         // draft_id
 		).WillReturnResult(sqlmock.NewResult(1, 1))
@@ -468,7 +468,7 @@ func (ts *EmbeddedDBTestSuite) TestDestination_Save() {
 			destination.Type,    // type
 			0,                   // chain
 			0,                   // num
-			0,                   // paymail_external_derivation_num
+			nil,                 // paymail_external_derivation_num
 			destination.Address, // address
 			testDraftID,         // draft_id
 		).WillReturnResult(sqlmock.NewResult(1, 1))
@@ -515,7 +515,7 @@ func (ts *EmbeddedDBTestSuite) TestDestination_Save() {
 			destination.Type,    // type
 			0,                   // chain
 			0,                   // num
-			0,                   // paymail_ext_derivation_num
+			nil,                 // paymail_ext_derivation_num
 			destination.Address, // address
 			testDraftID,         // draft_id
 		).WillReturnResult(sqlmock.NewResult(1, 1))
