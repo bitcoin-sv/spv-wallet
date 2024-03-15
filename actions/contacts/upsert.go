@@ -12,7 +12,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-// upsert will add new or modified existing contact
+// upsert will add a new contact or modify an existing one.
 // Upsert contact godoc
 // @Summary		Upsert contact
 // @Description	Add or update contact. For new contact send request to add current user as contact
