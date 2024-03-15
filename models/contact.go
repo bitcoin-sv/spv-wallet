@@ -18,3 +18,11 @@ type Contact struct {
 
 	Status string `json:"status"`
 }
+
+func (m *CreateContactResponse) AddAdditionalInfo(k, v string) {
+	if m.AdditionalInfo == nil {
+		m.AdditionalInfo = make(map[string]string)
+	}
+
+	m.AdditionalInfo[k] = v
+}

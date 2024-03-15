@@ -48,16 +48,13 @@ func (a *Action) upsert(c *gin.Context) {
 		return
 	}
 
-	contract := &models.CreateContactResponse{
+	response := &models.CreateContactResponse{
 		Contact: mappings.MapToContactContract(contact),
 	}
 
 	if err != nil {
-		ai := make(map[string]string)
-		ai["warning"] = err.Error()
-
-		contract.AdditionalInfo = ai
+		response.AddAdditionalInfo("warning", err.Error())
 	}
 
-	c.JSON(http.StatusCreated, contract)
+	c.JSON(http.StatusCreated, response)
 }

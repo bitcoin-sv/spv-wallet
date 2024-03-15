@@ -2,21 +2,39 @@ package engine
 
 import (
 	"database/sql/driver"
+	"fmt"
 
 	"github.com/bitcoin-sv/spv-wallet/engine/utils"
 )
 
+type EnumStringMapper[T fmt.Stringer] struct {
+	elements map[string]T
+}
+
+func NewEnumStringMapper[T fmt.Stringer](elements ...T) EnumStringMapper[T] {
+	m := make(map[string]T)
+	for _, element := range elements {
+		m[element.String()] = element
+	}
+	return EnumStringMapper[T]{
+		elements: m,
+	}
+}
+
+func (m *EnumStringMapper[T]) Get(key string) (T, bool) {
+	value, ok := m.elements[key]
+	return value, ok
+}
+
 type ContactStatus string
 
 const (
-	strContactStatusNotConfirmed = "unconfirmed"
-	strContactStatusAwaiting     = "awaiting"
-	strContactStatusConfirmed    = "confirmed"
-
-	ContactNotConfirmed ContactStatus = strContactStatusNotConfirmed
-	ContactAwaitAccept  ContactStatus = strContactStatusAwaiting
-	ContactConfirmed    ContactStatus = strContactStatusConfirmed
+	ContactNotConfirmed ContactStatus = "unconfirmed"
+	ContactAwaitAccept  ContactStatus = "awaiting"
+	ContactConfirmed    ContactStatus = "confirmed"
 )
+
+var contactStatusMapper = NewEnumStringMapper(ContactNotConfirmed, ContactAwaitAccept, ContactConfirmed)
 
 // Scan will scan the value into Struct, implements sql.Scanner interface
 func (t *ContactStatus) Scan(value interface{}) error {
@@ -25,14 +43,11 @@ func (t *ContactStatus) Scan(value interface{}) error {
 		return nil
 	}
 
-	switch stringValue {
-	case strContactStatusNotConfirmed:
-		*t = ContactNotConfirmed
-	case strContactStatusAwaiting:
-		*t = ContactAwaitAccept
-	case strContactStatusConfirmed:
-		*t = ContactConfirmed
+	status, ok := contactStatusMapper.Get(stringValue)
+	if !ok {
+		return fmt.Errorf("invalid contact status: %s", stringValue)
 	}
+	*t = status
 
 	return nil
 }

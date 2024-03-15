@@ -81,7 +81,6 @@ func (c *Client) AddContactRequest(ctx context.Context, fullName, paymailAdress,
 		return nil, fmt.Errorf("geting PKI for %s failed. Reason: %w", paymailAdress, err)
 	}
 
-	// add contact request
 	data := contactData{
 		fullName: fullName,
 		paymail:  contactPm,
