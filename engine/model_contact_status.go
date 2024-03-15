@@ -7,25 +7,6 @@ import (
 	"github.com/bitcoin-sv/spv-wallet/engine/utils"
 )
 
-type EnumStringMapper[T fmt.Stringer] struct {
-	elements map[string]T
-}
-
-func NewEnumStringMapper[T fmt.Stringer](elements ...T) EnumStringMapper[T] {
-	m := make(map[string]T)
-	for _, element := range elements {
-		m[element.String()] = element
-	}
-	return EnumStringMapper[T]{
-		elements: m,
-	}
-}
-
-func (m *EnumStringMapper[T]) Get(key string) (T, bool) {
-	value, ok := m.elements[key]
-	return value, ok
-}
-
 type ContactStatus string
 
 const (
