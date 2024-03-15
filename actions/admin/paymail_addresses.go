@@ -137,8 +137,8 @@ func (a *Action) paymailCreateAddress(c *gin.Context) {
 		return
 	}
 
-	if requestBody.XpubID == "" {
-		c.JSON(http.StatusBadRequest, "xpub is required")
+	if requestBody.Key == "" {
+		c.JSON(http.StatusExpectationFailed, "xpub is required")
 		return
 	}
 	if requestBody.Address == "" {
@@ -154,7 +154,7 @@ func (a *Action) paymailCreateAddress(c *gin.Context) {
 
 	var paymailAddress *engine.PaymailAddress
 	paymailAddress, err := a.Services.SpvWalletEngine.NewPaymailAddress(
-		c.Request.Context(), requestBody.XpubID, requestBody.Address, requestBody.PublicName, requestBody.Avatar, opts...)
+		c.Request.Context(), requestBody.Key, requestBody.Address, requestBody.PublicName, requestBody.Avatar, opts...)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, err.Error())
 		return
