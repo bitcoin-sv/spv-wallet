@@ -30,7 +30,7 @@ func (a *Action) search(c *gin.Context) {
 
 	params := c.Request.URL.Query()
 
-	queryParams, metadata, _, err := actions.GetQueryParameters(c)
+	queryParams, metadata, _, err := actions.GetSearchQueryParameters(c)
 	if err != nil {
 		c.JSON(http.StatusExpectationFailed, err.Error())
 		return
