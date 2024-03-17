@@ -1,6 +1,7 @@
 package admin
 
 import (
+	"github.com/bitcoin-sv/spv-wallet/models"
 	"net/http"
 
 	"github.com/bitcoin-sv/spv-wallet/actions"
@@ -48,7 +49,7 @@ func (a *Action) xpubsCreate(c *gin.Context) {
 // @Tags		Admin
 // @Produce		json
 // @Param		SearchRequestParameters body actions.SearchRequestParameters false "Supports targeted resource searches with filters for metadata and custom conditions, plus options for pagination and sorting to streamline data exploration and analysis"
-// @Success		200 {array} []engine.Xpub "List of xpubs"
+// @Success		200 {object} []models.Xpub "List of xpubs"
 // @Failure		400	"Bad request - Error while parsing SearchRequestParameters from request body"
 // @Failure 	500	"Internal server error - Error while searching for xpubs"
 // @Router		/v1/admin/xpubs/search [post]
@@ -71,7 +72,12 @@ func (a *Action) xpubsSearch(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, xpubs)
+	xpubContracts := make([]*models.Xpub, 0)
+	for _, xpub := range xpubs {
+		xpubContracts = append(xpubContracts, mappings.MapToXpubContract(xpub))
+	}
+
+	c.JSON(http.StatusOK, xpubContracts)
 }
 
 // xpubsCount will count all xpubs filtered by metadata

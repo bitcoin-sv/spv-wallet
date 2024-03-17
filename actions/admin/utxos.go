@@ -15,7 +15,7 @@ import (
 // @Tags		Admin
 // @Produce		json
 // @Param		SearchRequestParameters body actions.SearchRequestParameters false "Supports targeted resource searches with filters for metadata and custom conditions, plus options for pagination and sorting to streamline data exploration and analysis"
-// @Success		200 {array} []models.Utxo "List of utxos"
+// @Success		200 {object} []models.Utxo "List of utxos"
 // @Failure		400	"Bad request - Error while parsing SearchRequestParameters from request body"
 // @Failure 	500	"Internal server error - Error while searching for utxos"
 // @Router		/v1/admin/utxos/search [post]

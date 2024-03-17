@@ -197,14 +197,6 @@ definitions:
     - SeenInOrphanMempool
     - Confirmed
     - Rejected
-  customtypes.NullTime:
-    properties:
-      time:
-        type: string
-      valid:
-        description: Valid is true if Time is not NULL
-        type: boolean
-    type: object
   destinations.CreateDestination:
     properties:
       metadata:
@@ -243,30 +235,6 @@ definitions:
     type: object
   engine.Metadata:
     additionalProperties: true
-    type: object
-  engine.Xpub:
-    properties:
-      created_at:
-        type: string
-      current_balance:
-        type: integer
-      deleted_at:
-        allOf:
-        - $ref: '#/definitions/customtypes.NullTime'
-        description: |-
-          https://gorm.io/docs/indexes.html
-          DeletedAt gorm.DeletedAt `json:"deleted_at" toml:"deleted_at" yaml:"deleted_at" (@mrz: this was the original type)
-      id:
-        description: Model specific fields
-        type: string
-      metadata:
-        $ref: '#/definitions/engine.Metadata'
-      next_external_num:
-        type: integer
-      next_internal_num:
-        type: integer
-      updated_at:
-        type: string
     type: object
   models.AccessKey:
     properties:
@@ -374,7 +342,7 @@ definitions:
         type: string
       status:
         description: Status is a contact's current status.
-        example: confirmed
+        example: not confirmed
         type: string
       updated_at:
         description: UpdatedAt is a time when outer model was updated.
@@ -1067,28 +1035,6 @@ definitions:
     - 1000000000
     - 60000000000
     - 3600000000000
-    - -9223372036854775808
-    - 9223372036854775807
-    - 1
-    - 1000
-    - 1000000
-    - 1000000000
-    - 60000000000
-    - 3600000000000
-    - -9223372036854775808
-    - 9223372036854775807
-    - 1
-    - 1000
-    - 1000000
-    - 1000000000
-    - 60000000000
-    - 3600000000000
-    - 1
-    - 1000
-    - 1000000
-    - 1000000000
-    - 60000000000
-    - 3600000000000
     type: integer
     x-enum-varnames:
     - minDuration
@@ -1101,28 +1047,6 @@ definitions:
     - Hour
     - minDuration
     - maxDuration
-    - Nanosecond
-    - Microsecond
-    - Millisecond
-    - Second
-    - Minute
-    - Hour
-    - minDuration
-    - maxDuration
-    - Nanosecond
-    - Microsecond
-    - Millisecond
-    - Second
-    - Minute
-    - Hour
-    - minDuration
-    - maxDuration
-    - Nanosecond
-    - Microsecond
-    - Millisecond
-    - Second
-    - Minute
-    - Hour
     - Nanosecond
     - Microsecond
     - Millisecond
@@ -1205,7 +1129,8 @@ paths:
           description: Internal Server Error - Error while updating transaction
       security:
       - callback-auth: []
-      summary: Broadcast Callback
+      summary: Endpoint designed for receiving callbacks from Arc (service responsible
+        for submitting transactions to the BSV network)
       tags:
       - Transactions
   /v1/access-key:
@@ -1221,7 +1146,7 @@ paths:
       - application/json
       responses:
         "200":
-          description: Created AccessKey
+          description: Revoked AccessKey
           schema:
             $ref: '#/definitions/models.AccessKey'
         "400":
@@ -1331,9 +1256,7 @@ paths:
           description: List of access keys
           schema:
             items:
-              items:
-                $ref: '#/definitions/models.AccessKey'
-              type: array
+              $ref: '#/definitions/models.AccessKey'
             type: array
         "400":
           description: Bad request - Error while parsing SearchRequestParameters from
@@ -1391,9 +1314,7 @@ paths:
           description: List of access keys
           schema:
             items:
-              items:
-                $ref: '#/definitions/models.AccessKey'
-              type: array
+              $ref: '#/definitions/models.AccessKey'
             type: array
         "400":
           description: Bad request - Error while parsing SearchRequestParameters from
@@ -1423,9 +1344,7 @@ paths:
           description: List of destinations
           schema:
             items:
-              items:
-                $ref: '#/definitions/models.Destination'
-              type: array
+              $ref: '#/definitions/models.Destination'
             type: array
         "400":
           description: Bad request - Error while parsing SearchRequestParameters from
@@ -1559,9 +1478,7 @@ paths:
           description: List of paymail addresses
           schema:
             items:
-              items:
-                $ref: '#/definitions/models.PaymailAddress'
-              type: array
+              $ref: '#/definitions/models.PaymailAddress'
             type: array
         "400":
           description: Bad request - Error while parsing SearchRequestParameters from
@@ -1694,9 +1611,7 @@ paths:
           description: List of transactions
           schema:
             items:
-              items:
-                $ref: '#/definitions/models.Transaction'
-              type: array
+              $ref: '#/definitions/models.Transaction'
             type: array
         "400":
           description: Bad request - Error while parsing SearchRequestParameters from
@@ -1753,9 +1668,7 @@ paths:
           description: List of utxos
           schema:
             items:
-              items:
-                $ref: '#/definitions/models.Utxo'
-              type: array
+              $ref: '#/definitions/models.Utxo'
             type: array
         "400":
           description: Bad request - Error while parsing SearchRequestParameters from
@@ -1838,9 +1751,7 @@ paths:
           description: List of xpubs
           schema:
             items:
-              items:
-                $ref: '#/definitions/engine.Xpub'
-              type: array
+              $ref: '#/definitions/models.Xpub'
             type: array
         "400":
           description: Bad request - Error while parsing SearchRequestParameters from
@@ -1853,6 +1764,32 @@ paths:
       tags:
       - Admin
   /v1/contact:
+    patch:
+      description: Update contact
+      parameters:
+      - description: Contacts Metadata
+        in: body
+        name: metadata
+        required: true
+        schema:
+          type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Updated contact
+          schema:
+            $ref: '#/definitions/models.Contact'
+        "400":
+          description: Bad request - Error while parsing UpdateContact from request
+            body
+        "500":
+          description: Internal server error - Error while updating contact
+      security:
+      - x-auth-xpub: []
+      summary: Update contact
+      tags:
+      - Contacts
     post:
       description: Create contact
       parameters:
@@ -1884,6 +1821,49 @@ paths:
       security:
       - bux-auth-xpub: []
       summary: Create contact
+      tags:
+      - Contact
+  /v1/contacts:
+    get:
+      description: Search contacts
+      parameters:
+      - description: page
+        in: query
+        name: page
+        type: integer
+      - description: page_size
+        in: query
+        name: page_size
+        type: integer
+      - description: order_by_field
+        in: query
+        name: order_by_field
+        type: string
+      - description: sort_direction
+        in: query
+        name: sort_direction
+        type: string
+      - description: conditions
+        in: query
+        name: conditions
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: List of contacts
+          schema:
+            items:
+              $ref: '#/definitions/models.Contact'
+            type: array
+        "400":
+          description: Bad request - Error while parsing SearchRequestParameters from
+            request body
+        "500":
+          description: Internal server error - Error while searching for contacts
+      security:
+      - x-auth-xpub: []
+      summary: Search contacts
       tags:
       - Contact
   /v1/destination:
@@ -2013,9 +1993,7 @@ paths:
           description: List of destinations
           schema:
             items:
-              items:
-                $ref: '#/definitions/models.Destination'
-              type: array
+              $ref: '#/definitions/models.Destination'
             type: array
         "400":
           description: Bad request - Error while parsing SearchRequestParameters from
@@ -2177,9 +2155,7 @@ paths:
           description: List of transactions
           schema:
             items:
-              items:
-                $ref: '#/definitions/models.Transaction'
-              type: array
+              $ref: '#/definitions/models.Transaction'
             type: array
         "400":
           description: Bad request - Error while parsing SearchRequestParameters from
@@ -2266,9 +2242,7 @@ paths:
           description: List of utxos
           schema:
             items:
-              items:
-                $ref: '#/definitions/models.Utxo'
-              type: array
+              $ref: '#/definitions/models.Utxo'
             type: array
         "400":
           description: Bad request - Error while parsing SearchRequestParameters from

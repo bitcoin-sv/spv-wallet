@@ -16,7 +16,7 @@ import (
 // @Tags		Access-key
 // @Produce		json
 // @Param		id query string true "id of the access key"
-// @Success		200	{object} models.AccessKey "Created AccessKey"
+// @Success		200	{object} models.AccessKey "Revoked AccessKey"
 // @Failure		400	"Bad request - Missing required field: id"
 // @Failure 	500	"Internal server error - Error while revoking access key"
 // @Router		/v1/access-key [delete]

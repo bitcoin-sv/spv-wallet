@@ -18,5 +18,5 @@ type Contact struct {
 	// PubKey is a public key related to contact (receiver).
 	PubKey string `json:"pubKey" example:"xpub661MyMwAqRbcGpZVrSHU..."`
 	// Status is a contact's current status.
-	Status ContactStatus `json:"status" example:"confirmed"`
+	Status ContactStatus `json:"status" example:"not confirmed"`
 }

@@ -25,7 +25,7 @@ const docTemplate = `{
                 "tags": [
                     "Transactions"
                 ],
-                "summary": "Broadcast Callback",
+                "summary": "Endpoint designed for receiving callbacks from Arc (service responsible for submitting transactions to the BSV network)",
                 "parameters": [
                     {
                         "description": "Transaction",
@@ -157,7 +157,7 @@ const docTemplate = `{
                 ],
                 "responses": {
                     "200": {
-                        "description": "Created AccessKey",
+                        "description": "Revoked AccessKey",
                         "schema": {
                             "$ref": "#/definitions/models.AccessKey"
                         }
@@ -243,10 +243,7 @@ const docTemplate = `{
                         "schema": {
                             "type": "array",
                             "items": {
-                                "type": "array",
-                                "items": {
-                                    "$ref": "#/definitions/models.AccessKey"
-                                }
+                                "$ref": "#/definitions/models.AccessKey"
                             }
                         }
                     },
@@ -331,10 +328,7 @@ const docTemplate = `{
                         "schema": {
                             "type": "array",
                             "items": {
-                                "type": "array",
-                                "items": {
-                                    "$ref": "#/definitions/models.AccessKey"
-                                }
+                                "$ref": "#/definitions/models.AccessKey"
                             }
                         }
                     },
@@ -378,10 +372,7 @@ const docTemplate = `{
                         "schema": {
                             "type": "array",
                             "items": {
-                                "type": "array",
-                                "items": {
-                                    "$ref": "#/definitions/models.Destination"
-                                }
+                                "$ref": "#/definitions/models.Destination"
                             }
                         }
                     },
@@ -586,10 +577,7 @@ const docTemplate = `{
                         "schema": {
                             "type": "array",
                             "items": {
-                                "type": "array",
-                                "items": {
-                                    "$ref": "#/definitions/models.PaymailAddress"
-                                }
+                                "$ref": "#/definitions/models.PaymailAddress"
                             }
                         }
                     },
@@ -794,10 +782,7 @@ const docTemplate = `{
                         "schema": {
                             "type": "array",
                             "items": {
-                                "type": "array",
-                                "items": {
-                                    "$ref": "#/definitions/models.Transaction"
-                                }
+                                "$ref": "#/definitions/models.Transaction"
                             }
                         }
                     },
@@ -882,10 +867,7 @@ const docTemplate = `{
                         "schema": {
                             "type": "array",
                             "items": {
-                                "type": "array",
-                                "items": {
-                                    "$ref": "#/definitions/models.Utxo"
-                                }
+                                "$ref": "#/definitions/models.Utxo"
                             }
                         }
                     },
@@ -1012,10 +994,7 @@ const docTemplate = `{
                         "schema": {
                             "type": "array",
                             "items": {
-                                "type": "array",
-                                "items": {
-                                    "$ref": "#/definitions/engine.Xpub"
-                                }
+                                "$ref": "#/definitions/models.Xpub"
                             }
                         }
                     },
@@ -1078,6 +1057,112 @@ const docTemplate = `{
                     },
                     "500": {
                         "description": "Internal server error - Error while creating contact"
+                    }
+                }
+            },
+            "patch": {
+                "security": [
+                    {
+                        "x-auth-xpub": []
+                    }
+                ],
+                "description": "Update contact",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Contacts"
+                ],
+                "summary": "Update contact",
+                "parameters": [
+                    {
+                        "description": "Contacts Metadata",
+                        "name": "metadata",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Updated contact",
+                        "schema": {
+                            "$ref": "#/definitions/models.Contact"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request - Error while parsing UpdateContact from request body"
+                    },
+                    "500": {
+                        "description": "Internal server error - Error while updating contact"
+                    }
+                }
+            }
+        },
+        "/v1/contacts": {
+            "get": {
+                "security": [
+                    {
+                        "x-auth-xpub": []
+                    }
+                ],
+                "description": "Search contacts",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Contact"
+                ],
+                "summary": "Search contacts",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "page",
+                        "name": "page",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "page_size",
+                        "name": "page_size",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "order_by_field",
+                        "name": "order_by_field",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "sort_direction",
+                        "name": "sort_direction",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "conditions",
+                        "name": "conditions",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "List of contacts",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/models.Contact"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request - Error while parsing SearchRequestParameters from request body"
+                    },
+                    "500": {
+                        "description": "Internal server error - Error while searching for contacts"
                     }
                 }
             }
@@ -1283,10 +1368,7 @@ const docTemplate = `{
                         "schema": {
                             "type": "array",
                             "items": {
-                                "type": "array",
-                                "items": {
-                                    "$ref": "#/definitions/models.Destination"
-                                }
+                                "$ref": "#/definitions/models.Destination"
                             }
                         }
                     },
@@ -1533,10 +1615,7 @@ const docTemplate = `{
                         "schema": {
                             "type": "array",
                             "items": {
-                                "type": "array",
-                                "items": {
-                                    "$ref": "#/definitions/models.Transaction"
-                                }
+                                "$ref": "#/definitions/models.Transaction"
                             }
                         }
                     },
@@ -1668,10 +1747,7 @@ const docTemplate = `{
                         "schema": {
                             "type": "array",
                             "items": {
-                                "type": "array",
-                                "items": {
-                                    "$ref": "#/definitions/models.Utxo"
-                                }
+                                "$ref": "#/definitions/models.Utxo"
                             }
                         }
                     },
@@ -2007,18 +2083,6 @@ const docTemplate = `{
                 "Rejected"
             ]
         },
-        "customtypes.NullTime": {
-            "type": "object",
-            "properties": {
-                "time": {
-                    "type": "string"
-                },
-                "valid": {
-                    "description": "Valid is true if Time is not NULL",
-                    "type": "boolean"
-                }
-            }
-        },
         "destinations.CreateDestination": {
             "type": "object",
             "properties": {
@@ -2069,41 +2133,6 @@ const docTemplate = `{
         "engine.Metadata": {
             "type": "object",
             "additionalProperties": true
-        },
-        "engine.Xpub": {
-            "type": "object",
-            "properties": {
-                "created_at": {
-                    "type": "string"
-                },
-                "current_balance": {
-                    "type": "integer"
-                },
-                "deleted_at": {
-                    "description": "https://gorm.io/docs/indexes.html\nDeletedAt gorm.DeletedAt ` + "`" + `json:\"deleted_at\" toml:\"deleted_at\" yaml:\"deleted_at\" (@mrz: this was the original type)",
-                    "allOf": [
-                        {
-                            "$ref": "#/definitions/customtypes.NullTime"
-                        }
-                    ]
-                },
-                "id": {
-                    "description": "Model specific fields",
-                    "type": "string"
-                },
-                "metadata": {
-                    "$ref": "#/definitions/engine.Metadata"
-                },
-                "next_external_num": {
-                    "type": "integer"
-                },
-                "next_internal_num": {
-                    "type": "integer"
-                },
-                "updated_at": {
-                    "type": "string"
-                }
-            }
         },
         "models.AccessKey": {
             "type": "object",
@@ -2242,7 +2271,7 @@ const docTemplate = `{
                 "status": {
                     "description": "Status is a contact's current status.",
                     "type": "string",
-                    "example": "confirmed"
+                    "example": "not confirmed"
                 },
                 "updated_at": {
                     "description": "UpdatedAt is a time when outer model was updated.",
@@ -3167,28 +3196,6 @@ const docTemplate = `{
                 1000000,
                 1000000000,
                 60000000000,
-                3600000000000,
-                -9223372036854775808,
-                9223372036854775807,
-                1,
-                1000,
-                1000000,
-                1000000000,
-                60000000000,
-                3600000000000,
-                -9223372036854775808,
-                9223372036854775807,
-                1,
-                1000,
-                1000000,
-                1000000000,
-                60000000000,
-                3600000000000,
-                1,
-                1000,
-                1000000,
-                1000000000,
-                60000000000,
                 3600000000000
             ],
             "x-enum-varnames": [
@@ -3202,28 +3209,6 @@ const docTemplate = `{
                 "Hour",
                 "minDuration",
                 "maxDuration",
-                "Nanosecond",
-                "Microsecond",
-                "Millisecond",
-                "Second",
-                "Minute",
-                "Hour",
-                "minDuration",
-                "maxDuration",
-                "Nanosecond",
-                "Microsecond",
-                "Millisecond",
-                "Second",
-                "Minute",
-                "Hour",
-                "minDuration",
-                "maxDuration",
-                "Nanosecond",
-                "Microsecond",
-                "Millisecond",
-                "Second",
-                "Minute",
-                "Hour",
                 "Nanosecond",
                 "Microsecond",
                 "Millisecond",

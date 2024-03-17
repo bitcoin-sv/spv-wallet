@@ -9,7 +9,7 @@ import (
 
 // broadcastCallback will handle a broadcastCallback call from the broadcast api
 // Broadcast Callback godoc
-// @Summary		Broadcast Callback
+// @Summary		Endpoint designed for receiving callbacks from Arc (service responsible for submitting transactions to the BSV network)
 // @Tags		Transactions
 // @Param 		transaction body broadcast.SubmittedTx true "Transaction"
 // @Success		200
