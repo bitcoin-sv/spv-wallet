@@ -16,7 +16,9 @@ import (
 // @Tags		Contacts
 // @Produce		json
 // @Param		metadata body string true "Contacts Metadata"
-// @Success		200
+// @Success		200 {object} models.Contact "Updated contact"
+// @Failure		400	"Bad request - Error while parsing UpdateContact from request body"
+// @Failure 	500	"Internal server error - Error while updating contact"
 // @Router		/v1/contact [patch]
 // @Security	x-auth-xpub
 func (a *Action) update(c *gin.Context) {

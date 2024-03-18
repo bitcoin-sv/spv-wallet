@@ -15,8 +15,8 @@ import (
 // @Description	Get xPub
 // @Tags		xPub
 // @Produce		json
-// @Param		key query string false "key"
-// @Success		200
+// @Success		200 {object} models.Xpub "xPub associated with the given xPub from auth header"
+// @Failure		500	"Internal Server Error - Error while fetching xPub"
 // @Router		/v1/xpub [get]
 // @Security	x-auth-xpub
 func (a *Action) get(c *gin.Context) {
@@ -35,7 +35,7 @@ func (a *Action) get(c *gin.Context) {
 		)
 	}
 	if err != nil {
-		c.JSON(http.StatusExpectationFailed, err.Error())
+		c.JSON(http.StatusInternalServerError, err.Error())
 		return
 	}
 

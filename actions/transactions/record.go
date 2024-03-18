@@ -16,10 +16,10 @@ import (
 // @Description	Record transaction
 // @Tags		Transactions
 // @Produce		json
-// @Param		hex query string true "hex"
-// @Param		reference_id query string true "reference_id"
-// @Param		metadata query string false "metadata"
-// @Success		200
+// @Param		RecordTransaction body RecordTransaction true "Transaction to be recorded"
+// @Success		201 {object} models.Transaction "Created transaction"
+// @Failure		400	"Bad request - Error while parsing RecordTransaction from request body or xpub not found"
+// @Failure 	500	"Internal Server Error - Error while recording transaction"
 // @Router		/v1/transaction/record [post]
 // @Security	x-auth-xpub
 func (a *Action) record(c *gin.Context) {
@@ -33,10 +33,10 @@ func (a *Action) record(c *gin.Context) {
 
 	xPub, err := a.Services.SpvWalletEngine.GetXpub(c.Request.Context(), reqXPub)
 	if err != nil {
-		c.JSON(http.StatusUnprocessableEntity, err.Error())
+		c.JSON(http.StatusInternalServerError, err.Error())
 		return
 	} else if xPub == nil {
-		c.JSON(http.StatusForbidden, actions.ErrXpubNotFound.Error())
+		c.JSON(http.StatusBadRequest, actions.ErrXpubNotFound.Error())
 		return
 	}
 
@@ -54,7 +54,7 @@ func (a *Action) record(c *gin.Context) {
 		requestBody.ReferenceID,
 		opts...,
 	); err != nil {
-		c.JSON(http.StatusUnprocessableEntity, err.Error())
+		c.JSON(http.StatusInternalServerError, err.Error())
 		return
 	}
 
