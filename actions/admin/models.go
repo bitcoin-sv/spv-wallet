@@ -7,7 +7,7 @@ import (
 // CreatePaymail is the model for creating a paymail
 type CreatePaymail struct {
 	// The xpub with which the paymail is associated
-	XpubID string `json:"xpub_id" example:"xpub661MyMwAqRbcGpZVrSHU..."`
+	Key string `json:"key" example:"xpub661MyMwAqRbcGpZVrSHU..."`
 	// The paymail address
 	Address string `json:"address" example:"test@spv-wallet.com"`
 	// The public name of the paymail
