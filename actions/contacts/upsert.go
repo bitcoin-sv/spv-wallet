@@ -20,6 +20,7 @@ import (
 // @Produce		json
 // @Param		paymail path string true "Paymail address of the contact the user wants to add/modify"
 // @Param		UpsertContact body contacts.UpsertContact true "Full name and metadata needed to add/modify contact"
+// @Param		paymail path string true "paymail"
 // @Success		201
 // @Router		/v1/contact/{paymail} [PUT]
 // @Security	x-auth-xpub
