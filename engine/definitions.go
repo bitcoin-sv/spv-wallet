@@ -73,6 +73,7 @@ const (
 	aliasField           = "alias"
 	broadcastStatusField = "broadcast_status"
 	createdAtField       = "created_at"
+	deletedAtField       = "deleted_at"
 	currentBalanceField  = "current_balance"
 	domainField          = "domain"
 	draftIDField         = "draft_id"
