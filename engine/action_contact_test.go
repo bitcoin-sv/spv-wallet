@@ -83,7 +83,7 @@ func TestAcceptContactErrorPath(t *testing.T) {
 			data: testCaseData{
 				xPub:          xPubForNotFoundContact,
 				paymail:       paymailGeneric,
-				contactStatus: strContactStatusAwaiting,
+				contactStatus: ContactAwaitAccept.String(),
 			},
 			expectedErrorMessage: errorContactNotFound,
 		},
@@ -93,7 +93,7 @@ func TestAcceptContactErrorPath(t *testing.T) {
 			data: testCaseData{
 				xPub:          xPubGeneric,
 				paymail:       paymailGeneric,
-				contactStatus: strContactStatusConfirmed,
+				contactStatus: ContactAwaitAccept.String(),
 			},
 			expectedErrorMessage: errorContactDoesNotHaveStatusAwaiting,
 		},
@@ -103,7 +103,7 @@ func TestAcceptContactErrorPath(t *testing.T) {
 			data: testCaseData{
 				xPub:          xPubGeneric,
 				paymail:       paymailGeneric,
-				contactStatus: strContactStatusNotConfirmed,
+				contactStatus: ContactNotConfirmed.String(),
 			},
 			expectedErrorMessage: errorContactDoesNotHaveStatusAwaiting,
 		},
@@ -113,7 +113,7 @@ func TestAcceptContactErrorPath(t *testing.T) {
 			data: testCaseData{
 				xPub:          xPubGeneric,
 				paymail:       paymailGeneric,
-				contactStatus: strContactStatusRejected,
+				contactStatus: ContactRejected.String(),
 			},
 			expectedErrorMessage: errorContactDoesNotHaveStatusAwaiting,
 		},
@@ -123,7 +123,7 @@ func TestAcceptContactErrorPath(t *testing.T) {
 			data: testCaseData{
 				xPub:          xPubGeneric,
 				paymail:       paymailGeneric,
-				contactStatus: strContactStatusRejected,
+				contactStatus: ContactRejected.String(),
 				deleted:       true,
 			},
 			expectedErrorMessage: errorContactNotFound,
@@ -199,7 +199,7 @@ func TestRejectContactErrorPath(t *testing.T) {
 			data: testCaseData{
 				xPub:          xPubForNotFoundContact,
 				paymail:       paymailGeneric,
-				contactStatus: strContactStatusAwaiting,
+				contactStatus: ContactAwaitAccept.String(),
 			},
 			expectedErrorMessage: errorContactNotFound,
 		},
@@ -209,7 +209,7 @@ func TestRejectContactErrorPath(t *testing.T) {
 			data: testCaseData{
 				xPub:          xPubGeneric,
 				paymail:       paymailGeneric,
-				contactStatus: strContactStatusConfirmed,
+				contactStatus: ContactConfirmed.String(),
 			},
 			expectedErrorMessage: errorContactDoesNotHaveStatusAwaiting,
 		},
@@ -219,7 +219,7 @@ func TestRejectContactErrorPath(t *testing.T) {
 			data: testCaseData{
 				xPub:          xPubGeneric,
 				paymail:       paymailGeneric,
-				contactStatus: strContactStatusNotConfirmed,
+				contactStatus: ContactNotConfirmed.String(),
 			},
 			expectedErrorMessage: errorContactDoesNotHaveStatusAwaiting,
 		},
@@ -229,7 +229,7 @@ func TestRejectContactErrorPath(t *testing.T) {
 			data: testCaseData{
 				xPub:          xPubGeneric,
 				paymail:       paymailGeneric,
-				contactStatus: strContactStatusRejected,
+				contactStatus: ContactRejected.String(),
 			},
 			expectedErrorMessage: errorContactDoesNotHaveStatusAwaiting,
 		},
@@ -239,7 +239,7 @@ func TestRejectContactErrorPath(t *testing.T) {
 			data: testCaseData{
 				xPub:          xPubGeneric,
 				paymail:       paymailGeneric,
-				contactStatus: strContactStatusRejected,
+				contactStatus: ContactRejected.String(),
 				deleted:       true,
 			},
 			expectedErrorMessage: errorContactNotFound,
