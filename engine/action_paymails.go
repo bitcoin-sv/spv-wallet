@@ -71,7 +71,8 @@ func (c *Client) GetPaymailAddressesByXPubID(ctx context.Context, xPubID string,
 	ctx = c.GetOrStartTxn(ctx, "get_paymail_by_xpub")
 
 	if conditions == nil {
-		*conditions = make(map[string]interface{})
+		x := make(map[string]interface{})
+		conditions = &x
 	}
 	// add the xpub_id to the conditions
 	(*conditions)["xpub_id"] = xPubID
