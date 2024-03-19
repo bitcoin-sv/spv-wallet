@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"time"
 
 	"github.com/bitcoin-sv/go-paymail"
 	"github.com/bitcoin-sv/spv-wallet/engine/datastore"
@@ -216,7 +217,7 @@ func (c *Client) GetContacts(ctx context.Context, metadata *Metadata, conditions
 
 func (c *Client) AcceptContact(ctx context.Context, xPubID, paymail string) error {
 
-	contact, err := getContactByPaymailAndXPubID(ctx, paymail, xPubID, c.DefaultModelOptions()...)
+	contact, err := getContact(ctx, paymail, xPubID, c.DefaultModelOptions()...)
 	if err != nil {
 		return err
 	}
@@ -227,6 +228,30 @@ func (c *Client) AcceptContact(ctx context.Context, xPubID, paymail string) erro
 		return errors.New("contact does not have status awaiting")
 	}
 	contact.Status = ContactNotConfirmed
+	if err = contact.Save(ctx); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (c *Client) RejectContact(ctx context.Context, xPubID, paymail string) error {
+
+	contact, err := getContact(ctx, paymail, xPubID, c.DefaultModelOptions()...)
+	if err != nil {
+		return err
+	}
+	if contact == nil {
+		return errors.New("contact not found")
+	}
+	if contact.Status != ContactAwaitAccept {
+		return errors.New("contact does not have status awaiting")
+	}
+
+	contact.DeletedAt.Valid = true
+	contact.DeletedAt.Time = time.Now()
+	contact.Status = ContactRejected
+
 	if err = contact.Save(ctx); err != nil {
 		return err
 	}
