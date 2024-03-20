@@ -15,8 +15,10 @@ import (
 // @Description	Revoke access key
 // @Tags		Access-key
 // @Produce		json
-// @Param		id query string true "id"
-// @Success		201
+// @Param		id query string true "id of the access key"
+// @Success		200	{object} models.AccessKey "Revoked AccessKey"
+// @Failure		400	"Bad request - Missing required field: id"
+// @Failure 	500	"Internal server error - Error while revoking access key"
 // @Router		/v1/access-key [delete]
 // @Security	x-auth-xpub
 func (a *Action) revoke(c *gin.Context) {
@@ -34,7 +36,7 @@ func (a *Action) revoke(c *gin.Context) {
 		id,
 	)
 	if err != nil {
-		c.JSON(http.StatusUnprocessableEntity, err.Error())
+		c.JSON(http.StatusInternalServerError, err.Error())
 		return
 	}
 

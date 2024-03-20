@@ -310,10 +310,8 @@ make bench
 
 ### Docker Compose Quickstart
 
-To get started with development, `spv-wallet` provides a `start.sh` script
-which is using `docker-compose.yml` file to starts up SPV Wallet server with selected database
-and cache storage. To start, we need to fill the config json which we want to use,
-for example: `config/envs/development.json`.
+`spv-wallet` provides a `start.sh` script
+which is using `docker-compose.yml` file to starts up `SPV Wallet` with web-frontend, web-backend and selected database and cache storage.
 
 Main configuration is done when running the script.
 
@@ -326,13 +324,27 @@ There are two way of running this script:
 2. with flags which define how to set up docker services. Ever option is displayed when
    you ran the script with flag `-h` or `--help`. Possible options:
   ```bash
-  ./start.sh -db postgresql -c redis -bs true -env development -b false 
+  ./start.sh -db postgresql -c redis -sw true -b false 
   ```
 
 `-l/--load` option add possibility to use previously created `.env.config` file and run spv-wallet with simple command:
   ```bash
   ./start.sh -l
   ```
+
+
+Ports which are used:
+
+- 3002 - SPV Wallet web-frontend
+- 8180 - SPV Wallet web-backend
+- 3003 - SPV Wallet (core service)
+- 3000 - SPV Wallet admin
+- 5432 - PostgreSQL DB
+- 6379 - Redis
+- 8080 - Block Headers Service
+- 27017 - MongoDB
+- 80 - in case of exposing on the paymail domain and its subdomains
+- 443 - in case of exposing on the paymail domain and its subdomains
 <br/>
 
 ## Code Standards

@@ -17,25 +17,21 @@ import (
 // @Description	Search UTXO
 // @Tags		UTXO
 // @Produce		json
-// @Param		page query int false "page"
-// @Param		page_size query int false "page_size"
-// @Param		order_by_field query string false "order_by_field"
-// @Param		sort_direction query string false "sort_direction"
-// @Param		metadata query string false "metadata"
-// @Param		conditions query string false "conditions"
-// @Success		200
+// @Param		SearchRequestParameters body actions.SearchRequestParameters false "Supports targeted resource searches with filters for metadata and custom conditions, plus options for pagination and sorting to streamline data exploration and analysis"
+// @Success		200 {object} []models.Utxo "List of utxos"
+// @Failure		400	"Bad request - Error while parsing SearchRequestParameters from request body"
+// @Failure 	500	"Internal server error - Error while searching for utxos"
 // @Router		/v1/utxo/search [post]
 // @Security	x-auth-xpub
 func (a *Action) search(c *gin.Context) {
 	reqXPubID := c.GetString(auth.ParamXPubHashKey)
 
-	queryParams, metadata, conditions, err := actions.GetQueryParameters(c)
+	queryParams, metadata, conditions, err := actions.GetSearchQueryParameters(c)
 	if err != nil {
-		c.JSON(http.StatusExpectationFailed, err.Error())
+		c.JSON(http.StatusBadRequest, err.Error())
 		return
 	}
 
-	// Record a new transaction (get the hex from parameters)a
 	var utxos []*engine.Utxo
 	if utxos, err = a.Services.SpvWalletEngine.GetUtxosByXpubID(
 		c.Request.Context(),
@@ -44,7 +40,7 @@ func (a *Action) search(c *gin.Context) {
 		conditions,
 		queryParams,
 	); err != nil {
-		c.JSON(http.StatusExpectationFailed, err.Error())
+		c.JSON(http.StatusInternalServerError, err.Error())
 		return
 	}
 

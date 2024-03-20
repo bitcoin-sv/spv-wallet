@@ -9,8 +9,8 @@ import (
 
 func main() {
 	client, err := engine.NewClient(
-		context.Background(), // Set context
-		engine.WithDebugging(),  // Enable debugging (verbose logs)
+		context.Background(),                                 // Set context
+		engine.WithDebugging(),                               // Enable debugging (verbose logs)
 		engine.WithChainstateOptions(true, true, true, true), // Broadcasting enabled by default
 	)
 	if err != nil {

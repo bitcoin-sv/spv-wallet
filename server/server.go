@@ -12,6 +12,7 @@ import (
 	accesskeys "github.com/bitcoin-sv/spv-wallet/actions/access_keys"
 	"github.com/bitcoin-sv/spv-wallet/actions/admin"
 	"github.com/bitcoin-sv/spv-wallet/actions/base"
+	"github.com/bitcoin-sv/spv-wallet/actions/contacts"
 	"github.com/bitcoin-sv/spv-wallet/actions/destinations"
 	"github.com/bitcoin-sv/spv-wallet/actions/transactions"
 	"github.com/bitcoin-sv/spv-wallet/actions/utxos"
@@ -21,6 +22,7 @@ import (
 	"github.com/bitcoin-sv/spv-wallet/metrics"
 	"github.com/bitcoin-sv/spv-wallet/server/auth"
 	router "github.com/bitcoin-sv/spv-wallet/server/routes"
+	"github.com/gin-contrib/pprof"
 	"github.com/gin-gonic/gin"
 	"github.com/rs/zerolog"
 )
@@ -99,6 +101,8 @@ func (s *Server) Handlers() *gin.Engine {
 	engine.Use(logging.GinMiddleware(&httpLogger), gin.Recovery())
 	engine.Use(auth.CorsMiddleware())
 
+	metrics.SetupGin(engine)
+
 	s.Router = engine
 
 	segment.End()
@@ -114,9 +118,10 @@ func (s *Server) Handlers() *gin.Engine {
 // SetupServerRoutes will register endpoints for all models
 func SetupServerRoutes(appConfig *config.AppConfig, services *config.AppServices, engine *gin.Engine) {
 	adminRoutes := admin.NewHandler(appConfig, services)
-	baseRoutes := base.NewHandler(appConfig, engine)
+	baseRoutes := base.NewHandler()
 
 	accessKeyAPIRoutes := accesskeys.NewHandler(appConfig, services)
+	contactAPIRoutes := contacts.NewHandler(appConfig, services)
 	destinationBasicRoutes, destinationAPIRoutes := destinations.NewHandler(appConfig, services)
 	transactionBasicRoutes, transactionAPIRoutes, transactionCallbackRoutes := transactions.NewHandler(appConfig, services)
 	utxoAPIRoutes := utxos.NewHandler(appConfig, services)
@@ -129,6 +134,8 @@ func SetupServerRoutes(appConfig *config.AppConfig, services *config.AppServices
 		baseRoutes,
 		// Access key routes
 		accessKeyAPIRoutes,
+		// Contact routes
+		contactAPIRoutes,
 		// Destination routes
 		destinationBasicRoutes,
 		destinationAPIRoutes,
@@ -140,6 +147,10 @@ func SetupServerRoutes(appConfig *config.AppConfig, services *config.AppServices
 		utxoAPIRoutes,
 		// xPub routes
 		xPubAPIRoutes,
+	}
+
+	if appConfig.ExperimentalFeatures.PikeEnabled {
+		routes = append(routes, contacts.NewHandler(appConfig, services))
 	}
 
 	prefix := "/" + config.APIVersion
@@ -171,14 +182,14 @@ func SetupServerRoutes(appConfig *config.AppConfig, services *config.AppServices
 	services.SpvWalletEngine.GetPaymailConfig().RegisterRoutes(engine)
 
 	// Set the 404 handler (any request not detected)
-	engine.NoRoute(actions.NotFound)
+	engine.NoRoute(metrics.NoRoute, actions.NotFound)
 
 	// Set the method not allowed
 	engine.NoMethod(actions.MethodNotAllowed)
 
 	registerSwaggerEndpoints(engine)
 
-	if metrics, enabled := metrics.Get(); enabled {
-		engine.GET("/metrics", gin.WrapH(metrics.HTTPHandler()))
+	if appConfig.DebugProfiling {
+		pprof.Register(engine, "debug/pprof")
 	}
 }

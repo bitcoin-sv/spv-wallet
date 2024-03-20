@@ -9,7 +9,7 @@ import (
 
 func main() {
 	client, err := engine.NewClient(
-		context.Background(),                      // Set context
+		context.Background(),                         // Set context
 		engine.WithUserAgent("my-custom-user-agent"), // Custom user agent
 	)
 	if err != nil {
