@@ -37,6 +37,7 @@ func NewHandler(appConfig *config.AppConfig, services *config.AppServices) route
 		adminGroup.POST("/xpub", action.xpubsCreate)
 		adminGroup.POST("/xpubs/search", action.xpubsSearch)
 		adminGroup.POST("/xpubs/count", action.xpubsCount)
+		adminGroup.GET("/shared-config", action.sharedConfig)
 	})
 
 	return adminEndpoints

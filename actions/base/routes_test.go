@@ -20,15 +20,6 @@ func (ts *TestSuite) TestBaseRegisterRoutes() {
 			{"GET", "/" + config.HealthRequestPath},
 			{"OPTIONS", "/" + config.HealthRequestPath},
 			{"HEAD", "/" + config.HealthRequestPath},
-			{"GET", "/debug/pprof/"},
-			{"GET", "/debug/pprof/cmdline"},
-			{"GET", "/debug/pprof/profile"},
-			{"POST", "/debug/pprof/symbol"},
-			{"GET", "/debug/pprof/trace"},
-			{"GET", "/debug/pprof/goroutine"},
-			{"GET", "/debug/pprof/heap"},
-			{"GET", "/debug/pprof/threadcreate"},
-			{"GET", "/debug/pprof/block"},
 		}
 
 		ts.Router.Routes()

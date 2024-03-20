@@ -15,8 +15,10 @@ import (
 // @Description	Update xPub
 // @Tags		xPub
 // @Produce		json
-// @Param		metadata query string false "metadata"
-// @Success		200
+// @Param		Metadata body engine.Metadata false " "
+// @Success		200 {object} models.Xpub "Updated xPub"
+// @Failure		400	"Bad request - Error while parsing Metadata from request body"
+// @Failure 	500	"Internal Server Error - Error while updating xPub"
 // @Router		/v1/xpub [patch]
 // @Security	x-auth-xpub
 // @Security	bux-auth-xpub
@@ -37,7 +39,7 @@ func (a *Action) update(c *gin.Context) {
 		c.Request.Context(), reqXPubID, requestBody,
 	)
 	if err != nil {
-		c.JSON(http.StatusExpectationFailed, err.Error())
+		c.JSON(http.StatusInternalServerError, err.Error())
 	}
 
 	signed := c.GetBool("auth_signed")

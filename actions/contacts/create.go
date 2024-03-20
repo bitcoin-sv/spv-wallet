@@ -5,6 +5,7 @@ import (
 
 	"github.com/bitcoin-sv/spv-wallet/engine"
 	"github.com/bitcoin-sv/spv-wallet/mappings"
+	"github.com/bitcoin-sv/spv-wallet/server/auth"
 	"github.com/gin-gonic/gin"
 )
 
@@ -18,24 +19,32 @@ import (
 // @Param		paymail query string false "paymail"
 // @Param		pubKey query string false "pubKey"
 // @Param		metadata query string false "metadata"
-// @Success		201
+// @Success		201 {object} models.Contact "Contact created"
+// @Failure 	500	"Internal server error - Error while creating contact"
 // @Router		/v1/contact [post]
 // @Security	bux-auth-xpub
 func (a *Action) create(c *gin.Context) {
 
-	fullName := c.GetString("full_name")
-	paymail := c.GetString("paymail")
-	pubKey := c.GetString("pubKey")
+	var contact engine.Contact
+
+	err := c.ShouldBindJSON(&contact)
+
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	pubKey := c.GetString(auth.ParamXPubKey)
 
 	var requestBody CreateContact
 
-	contact, err := a.Services.SpvWalletEngine.NewContact(c.Request.Context(), fullName, paymail, pubKey, engine.WithMetadatas(requestBody.Metadata))
+	newContact, err := a.Services.SpvWalletEngine.NewContact(c.Request.Context(), contact.FullName, contact.Paymail, pubKey, engine.WithMetadatas(requestBody.Metadata))
 	if err != nil {
 		c.JSON(http.StatusUnprocessableEntity, err.Error())
 		return
 	}
 
-	contract := mappings.MapToContactContract(contact)
+	contract := mappings.MapToContactContract(newContact)
 
 	c.JSON(http.StatusCreated, contract)
 }

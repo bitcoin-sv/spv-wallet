@@ -3,6 +3,8 @@ package engine
 import (
 	"context"
 	"errors"
+	"fmt"
+
 	"github.com/bitcoin-sv/go-paymail"
 	"github.com/bitcoin-sv/spv-wallet/engine/utils"
 	"github.com/mrz1836/go-datastore"
@@ -17,7 +19,7 @@ type Contact struct {
 	XpubID   string        `json:"xpub_id" toml:"xpub_id" yaml:"xpub_id" gorm:"<-:create;type:char(64);foreignKey:XpubID;reference:ID;index;comment:This is the related xPub" bson:"xpub_id"`
 	FullName string        `json:"full_name" toml:"full_name" yaml:"full_name" gorm:"<-create;comment:This is the contact's full name" bson:"full_name"`
 	Paymail  string        `json:"paymail" toml:"paymail" yaml:"paymail" gorm:"<-create;comment:This is the paymail address alias@domain.com" bson:"paymail"`
-	PubKey   string        `json:"pub_key" toml:"pub_key" yaml:"pub_key" gorm:"<-:create;index;comment:This is the related public key" bson:"pub_key"`
+	PubKey   string        `json:"pub_key" toml:"pub_key" yaml:"pub_key" gorm:"<-:create;index;comment:This is the related to receiver public key" bson:"pub_key"`
 	Status   ContactStatus `json:"status" toml:"status" yaml:"status" gorm:"<-create;type:varchar(20);default:not confirmed;comment:This is the contact status" bson:"status"`
 }
 
@@ -26,21 +28,25 @@ func newContact(fullName, paymailAddress, senderPubKey string, opts ...ModelOps)
 		return nil, ErrEmptyContactFullName
 	}
 
-	err := paymail.ValidatePaymail(paymailAddress)
+	if senderPubKey == "" {
+		return nil, ErrEmptyContactPubKey
+	}
+
+	if paymailAddress == "" {
+		return nil, ErrEmptyContactPaymail
+	}
+
+	sanitizedPaymail, err := paymail.ValidateAndSanitisePaymail(paymailAddress, false)
 
 	if err != nil {
 		return nil, err
 	}
 
-	if senderPubKey == "" {
-		return nil, ErrEmptyContactPubKey
-	}
-
 	xPubId := utils.Hash(senderPubKey)
 
-	id := utils.Hash(xPubId + paymailAddress)
+	id := utils.Hash(senderPubKey + sanitizedPaymail.Address)
 
-	contact := &Contact{ID: id, XpubID: xPubId, Model: *NewBaseModel(ModelContact, opts...), FullName: fullName, Paymail: paymailAddress}
+	contact := &Contact{ID: id, XpubID: xPubId, Model: *NewBaseModel(ModelContact, opts...), FullName: fullName, Paymail: sanitizedPaymail.Address}
 
 	return contact, nil
 }
@@ -54,9 +60,11 @@ func getContact(ctx context.Context, fullName, paymailAddress, senderPubKey stri
 
 	contact.enrich(ModelContact, opts...)
 
+	_, _, sanitizedAddress := paymail.SanitizePaymail(paymailAddress)
+
 	conditions := map[string]interface{}{
 		senderXPubField: senderPubKey,
-		paymailField:    paymailAddress,
+		paymailField:    sanitizedAddress,
 	}
 
 	if err := Get(ctx, contact, conditions, false, defaultDatabaseReadTimeout, false); err != nil {
@@ -67,6 +75,48 @@ func getContact(ctx context.Context, fullName, paymailAddress, senderPubKey stri
 	}
 
 	return contact, nil
+}
+
+func getContactByXPubIdAndRequesterPubKey(ctx context.Context, xPubId, paymailAddr string, opts ...ModelOps) (*Contact, error) {
+
+	if xPubId == "" {
+		return nil, fmt.Errorf("xpub_id is empty")
+	}
+
+	if paymailAddr == "" {
+		return nil, fmt.Errorf("paymail address is empty")
+	}
+	contact := &Contact{
+		XpubID:  xPubId,
+		Paymail: paymailAddr,
+	}
+
+	contact.enrich(ModelContact, opts...)
+
+	conditions := map[string]interface{}{
+		xPubIDField:  xPubId,
+		paymailField: paymailAddr,
+	}
+
+	if err := Get(ctx, contact, conditions, false, defaultDatabaseReadTimeout, false); err != nil {
+		if errors.Is(err, datastore.ErrNoResults) {
+			return nil, nil
+		}
+		return nil, err
+	}
+
+	return contact, nil
+}
+
+func getContacts(ctx context.Context, metadata *Metadata, conditions *map[string]interface{}, queryParams *datastore.QueryParams, opts ...ModelOps) ([]*Contact, error) {
+	contacts := make([]*Contact, 0)
+
+	if err := getModelsByConditions(ctx, ModelContact, &contacts, metadata, conditions, queryParams, opts...); err != nil {
+		return nil, err
+	}
+
+	return contacts, nil
+
 }
 
 func (c *Contact) GetModelName() string {

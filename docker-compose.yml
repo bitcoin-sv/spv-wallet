@@ -5,6 +5,13 @@ services:
   wallet-frontend:
     image: bsvb/spv-wallet-web-frontend:latest
     pull_policy: always
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.walletfrontend.rule=Host(`wallet.${RUN_PAYMAIL_DOMAIN}`)"
+      - "traefik.http.routers.walletfrontend.entrypoints=websecure"
+      - "traefik.http.routers.walletfrontend.tls=true"
+      - "traefik.http.routers.walletfrontend.tls.certresolver=httpsresolver"
+      - "traefik.http.services.walletfrontend.loadbalancer.server.port=80"
     ports:
       - "3002:80"
     configs:
@@ -14,9 +21,15 @@ services:
   wallet-backend:
     image: bsvb/spv-wallet-web-backend:latest
     pull_policy: always
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.walletbackend.rule=Host(`${RUN_API_DOMAIN}`)"
+      - "traefik.http.routers.walletbackend.entrypoints=websecure"
+      - "traefik.http.routers.walletbackend.tls=true"
+      - "traefik.http.routers.walletbackend.tls.certresolver=httpsresolver"
+      - "traefik.http.services.walletbackend.loadbalancer.server.port=8180"
     environment:
       SPVWALLET_PAYMAIL_DOMAIN: '${RUN_PAYMAIL_DOMAIN}'
-      HTTP_SERVER_CORS_ALLOWEDDOMAINS: 'http://localhost:3002'
     env_file:
       - .env.config
     ports:
@@ -30,6 +43,13 @@ services:
   block-headers-service:
     image: bsvb/block-headers-service:latest
     pull_policy: always
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.headers.rule=Host(`headers.${RUN_PAYMAIL_DOMAIN}`)"
+      - "traefik.http.routers.headers.entrypoints=websecure"
+      - "traefik.http.routers.headers.tls=true"
+      - "traefik.http.routers.headers.tls.certresolver=httpsresolver"
+      - "traefik.http.services.headers.loadbalancer.server.port=8080"
     command:
       - "--preloaded"
     ports:
@@ -37,9 +57,34 @@ services:
     volumes:
       - block-headers-service-data:/app/data
 
+  spv-wallet-admin:
+    image: bsvb/spv-wallet-admin:latest
+    pull_policy: always
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.admin.rule=Host(`admin.${RUN_PAYMAIL_DOMAIN}`)"
+      - "traefik.http.routers.admin.entrypoints=websecure"
+      - "traefik.http.routers.admin.tls=true"
+      - "traefik.http.routers.admin.tls.certresolver=httpsresolver"
+      - "traefik.http.services.admin.loadbalancer.server.port=3000"
+    env_file:
+      - .env.config
+    ports:
+      - "3000:3000"
+    configs:
+      - source: admin-env-config
+        target: /usr/share/nginx/html/env-config.json
+
   spv-wallet:
     image: bsvb/spv-wallet:latest
     pull_policy: always
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.wallet.rule=Host(`${RUN_PAYMAIL_DOMAIN}`)"
+      - "traefik.http.routers.wallet.entrypoints=websecure"
+      - "traefik.http.routers.wallet.tls=true"
+      - "traefik.http.routers.wallet.tls.certresolver=httpsresolver"
+      - "traefik.http.services.wallet.loadbalancer.server.port=3003"
     environment:
       SPVWALLET_PAYMAIL_DOMAINS: '${RUN_PAYMAIL_DOMAIN}'
     env_file:
@@ -90,6 +135,31 @@ services:
       retries: 5
       start_period: 40s
 
+  wallet-gateway:
+    image: traefik:v2.11
+    container_name: traefik
+    command:
+      - "--log.level=DEBUG"
+      - "--api.insecure=true"
+      - "--providers.docker=true"
+      - "--providers.docker.exposedbydefault=false"
+      - "--entrypoints.web.address=:80"
+      - "--entrypoints.websecure.address=:443"
+      - "--entrypoints.web.http.redirections.entrypoint.to=websecure"
+      - "--entrypoints.web.http.redirections.entrypoint.scheme=https"
+      - "--entrypoints.web.http.redirections.entrypoint.permanent=true"
+      - "--certificatesresolvers.httpsresolver.acme.storage=/gateway/acme.json"
+      - "--certificatesresolvers.httpsresolver.acme.tlschallenge=true"
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock:ro"
+      - "wallet-gateway-data:/gateway"
+    labels:
+      - "traefik.enable=true"
+
+
 volumes:
   wallet-postgresql-data:
     driver: local
@@ -99,12 +169,19 @@ volumes:
     driver: local
   block-headers-service-data:
     driver: local
+  wallet-gateway-data:
+    driver: local
 
 configs:
   frontend-env-config:
     content: |
       {
-          "paymailDomain": "${RUN_PAYMAIL_DOMAIN}",
-          "apiUrl": "http://localhost:8180",
-          "wsUrl": "ws://localhost:8180/api/websocket"
+          "apiUrl": "http${RUN_SECURED_PROTOCOL_SUFFIX}://${RUN_API_DOMAIN}",
+          "wsUrl": "ws${RUN_SECURED_PROTOCOL_SUFFIX}://${RUN_API_DOMAIN}/api/websocket"
+      }
+  admin-env-config:
+    content: |
+      {
+        "serverUrl": "http${RUN_SECURED_PROTOCOL_SUFFIX}://${RUN_SPVWALLET_DOMAIN}/v1",
+        "hideServerUrl": false
       }
