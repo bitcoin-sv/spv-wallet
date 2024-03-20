@@ -133,7 +133,6 @@ func SetupServerRoutes(appConfig *config.AppConfig, services *config.AppServices
 		baseRoutes,
 		// Access key routes
 		accessKeyAPIRoutes,
-		// Contact routes
 		// Destination routes
 		destinationBasicRoutes,
 		destinationAPIRoutes,
