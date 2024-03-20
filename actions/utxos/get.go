@@ -15,9 +15,11 @@ import (
 // @Description	Get UTXO
 // @Tags		UTXO
 // @Produce		json
-// @Param		tx_id query string true "tx_id"
-// @Param		output_index query int true "output_index"
-// @Success		200
+// @Param		tx_id query string true "Id of the transaction"
+// @Param		output_index query int true "Output index"
+// @Success		200 {object} models.Utxo "UTXO with given Id and output index"
+// @Failure		400	"Bad request - Error while parsing output_index"
+// @Failure 	500	"Internal Server Error - Error while fetching utxo"
 // @Router		/v1/utxo [get]
 // @Security	x-auth-xpub
 func (a *Action) get(c *gin.Context) {
@@ -37,7 +39,7 @@ func (a *Action) get(c *gin.Context) {
 		uint32(outputIndex64),
 	)
 	if err != nil {
-		c.JSON(http.StatusExpectationFailed, err.Error())
+		c.JSON(http.StatusInternalServerError, err.Error())
 		return
 	}
 

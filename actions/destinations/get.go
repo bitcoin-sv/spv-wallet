@@ -18,7 +18,9 @@ import (
 // @Param		id query string false "Destination ID"
 // @Param		address query string false "Destination address"
 // @Param		locking_script query string false "Destination locking script"
-// @Success		200
+// @Success		200 {object} models.Destination "Destination with given id"
+// @Failure		400	"Bad request - All parameters are missing (id, address, locking_script)"
+// @Failure 	500	"Internal server error - Error while getting destination"
 // @Router		/v1/destination [get]
 // @Security	x-auth-xpub
 func (a *Action) get(c *gin.Context) {
@@ -28,7 +30,7 @@ func (a *Action) get(c *gin.Context) {
 	address := c.Query("address")
 	lockingScript := c.Query("locking_script")
 	if id == "" && address == "" && lockingScript == "" {
-		c.JSON(http.StatusExpectationFailed, engine.ErrMissingFieldID)
+		c.JSON(http.StatusBadRequest, engine.ErrMissingFieldID)
 		return
 	}
 
@@ -48,7 +50,7 @@ func (a *Action) get(c *gin.Context) {
 		)
 	}
 	if err != nil {
-		c.JSON(http.StatusExpectationFailed, err.Error())
+		c.JSON(http.StatusInternalServerError, err.Error())
 		return
 	}
 
