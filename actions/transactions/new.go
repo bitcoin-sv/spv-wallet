@@ -16,9 +16,10 @@ import (
 // @Description	New transaction
 // @Tags		Transactions
 // @Produce		json
-// @Param		config query string true "transaction config"
-// @Param		metadata query string false "metadata"
-// @Success		201
+// @Param		NewTransaction body NewTransaction true "NewTransaction model containing the transaction config and metadata"
+// @Success		201 {object} models.DraftTransaction "Created transaction"
+// @Failure		400	"Bad request - Error while parsing NewTransaction from request body or xpub not found"
+// @Failure 	500	"Internal Server Error - Error while creating transaction"
 // @Router		/v1/transaction [post]
 // @Security	x-auth-xpub
 func (a *Action) newTransaction(c *gin.Context) {
@@ -26,10 +27,10 @@ func (a *Action) newTransaction(c *gin.Context) {
 
 	xPub, err := a.Services.SpvWalletEngine.GetXpub(c.Request.Context(), reqXPub)
 	if err != nil {
-		c.JSON(http.StatusUnprocessableEntity, err.Error())
+		c.JSON(http.StatusBadRequest, err.Error())
 		return
 	} else if xPub == nil {
-		c.JSON(http.StatusForbidden, actions.ErrXpubNotFound.Error())
+		c.JSON(http.StatusBadRequest, actions.ErrXpubNotFound.Error())
 		return
 	}
 
@@ -53,7 +54,7 @@ func (a *Action) newTransaction(c *gin.Context) {
 		txConfig,
 		opts...,
 	); err != nil {
-		c.JSON(http.StatusUnprocessableEntity, err.Error())
+		c.JSON(http.StatusInternalServerError, err.Error())
 		return
 	}
 

@@ -9,15 +9,15 @@ type TransactionConfig struct {
 	// ChangeStrategy is a change strategy.
 	ChangeStrategy string `json:"change_destinations_strategy"`
 	// ChangeMinimumSatoshis is a minimum satoshis for change.
-	ChangeMinimumSatoshis uint64 `json:"change_minimum_satoshis"`
+	ChangeMinimumSatoshis uint64 `json:"change_minimum_satoshis" example:"0"`
 	// ChangeNumberOfDestinations is a number of change destinations.
-	ChangeNumberOfDestinations int `json:"change_number_of_destinations"`
+	ChangeNumberOfDestinations int `json:"change_number_of_destinations" example:"1"`
 	// ChangeSatoshis is a change satoshis.
-	ChangeSatoshis uint64 `json:"change_satoshis"`
+	ChangeSatoshis uint64 `json:"change_satoshis" example:"49"`
 	// ExpiresAt is a time when transaction expires.
-	ExpiresIn time.Duration `json:"expires_in"`
+	ExpiresIn time.Duration `json:"expires_in" example:"1000"`
 	// Fee is a fee amount.
-	Fee uint64 `json:"fee"`
+	Fee uint64 `json:"fee" example:"1"`
 	// FeeUnit is a pointer to a fee unit object.
 	FeeUnit *FeeUnit `json:"fee_unit"`
 	// FromUtxos is a slice of from utxos used to build transaction.
@@ -49,15 +49,15 @@ type TransactionOutput struct {
 	// PaymailP4 is a pointer to a paymail p4 object.
 	PaymailP4 *PaymailP4 `json:"paymail_p4,omitempty"`
 	// Satoshis is a satoshis amount.
-	Satoshis uint64 `json:"satoshis"`
+	Satoshis uint64 `json:"satoshis" example:"50"`
 	// Script is a transaction output string representation of script.
-	Script string `json:"script"`
+	Script string `json:"script" example:"76a91433ba3607a902bc022164bcb6e993f27bd040241c88ac"`
 	// ScriptType is a transaction output script type.
 	Scripts []*ScriptOutput `json:"scripts,omitempty"`
 	// To is a transaction output destination address.
-	To string `json:"to"`
+	To string `json:"to" example:"1MB8MfCyA5mGt3UBhxYr1exBfsFWgL1gCm"`
 	// UseForChange is a flag that indicates if this output should be used for change.
-	UseForChange bool `json:"use_for_change"`
+	UseForChange bool `json:"use_for_change" example:"false"`
 }
 
 // MapProtocol is a model that represents a map protocol.

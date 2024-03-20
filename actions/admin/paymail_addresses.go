@@ -5,6 +5,8 @@ import (
 
 	"github.com/bitcoin-sv/spv-wallet/actions"
 	"github.com/bitcoin-sv/spv-wallet/engine"
+	"github.com/bitcoin-sv/spv-wallet/mappings"
+	"github.com/bitcoin-sv/spv-wallet/models"
 	"github.com/gin-gonic/gin"
 )
 
@@ -13,10 +15,12 @@ import (
 // @Summary		Get paymail
 // @Description	Get paymail
 // @Tags		Admin
-// @Param		address query string true "address"
 // @Produce		json
-// @Success		200
-// @Router		/v1/admin/paymail/get [get]
+// @Param		PaymailAddress body PaymailAddress false "PaymailAddress model containing paymail address to get"
+// @Success		200	{object} models.PaymailAddress "PaymailAddress with given address"
+// @Failure		400	"Bad request - Error while parsing PaymailAddress from request body"
+// @Failure 	500	"Internal Server Error - Error while getting paymail address"
+// @Router		/v1/admin/paymail/get [post]
 // @Security	x-auth-xpub
 func (a *Action) paymailGetAddress(c *gin.Context) {
 	var requestBody PaymailAddress
@@ -27,7 +31,7 @@ func (a *Action) paymailGetAddress(c *gin.Context) {
 	}
 
 	if requestBody.Address == "" {
-		c.JSON(http.StatusExpectationFailed, "address is required")
+		c.JSON(http.StatusBadRequest, "address is required")
 		return
 	}
 
@@ -35,11 +39,13 @@ func (a *Action) paymailGetAddress(c *gin.Context) {
 
 	paymailAddress, err := a.Services.SpvWalletEngine.GetPaymailAddress(c.Request.Context(), requestBody.Address, opts...)
 	if err != nil {
-		c.JSON(http.StatusExpectationFailed, err.Error())
+		c.JSON(http.StatusInternalServerError, err.Error())
 		return
 	}
 
-	c.JSON(http.StatusOK, paymailAddress)
+	paymailAddressContract := mappings.MapToPaymailContract(paymailAddress)
+
+	c.JSON(http.StatusOK, paymailAddressContract)
 }
 
 // paymailAddressesSearch will fetch a list of paymail addresses filtered by metadata
@@ -48,19 +54,16 @@ func (a *Action) paymailGetAddress(c *gin.Context) {
 // @Description	Paymail addresses search
 // @Tags		Admin
 // @Produce		json
-// @Param		page query int false "page"
-// @Param		page_size query int false "page_size"
-// @Param		order_by_field query string false "order_by_field"
-// @Param		sort_direction query string false "sort_direction"
-// @Param		metadata query string false "Metadata filter"
-// @Param		conditions query string false "Conditions filter"
-// @Success		200
+// @Param		SearchRequestParameters body actions.SearchRequestParameters false "Supports targeted resource searches with filters for metadata and custom conditions, plus options for pagination and sorting to streamline data exploration and analysis"
+// @Success		200 {object} []models.PaymailAddress "List of paymail addresses
+// @Failure		400	"Bad request - Error while parsing SearchRequestParameters from request body"
+// @Failure 	500	"Internal server error - Error while searching for paymail addresses"
 // @Router		/v1/admin/paymails/search [post]
 // @Security	x-auth-xpub
 func (a *Action) paymailAddressesSearch(c *gin.Context) {
-	queryParams, metadata, conditions, err := actions.GetQueryParameters(c)
+	queryParams, metadata, conditions, err := actions.GetSearchQueryParameters(c)
 	if err != nil {
-		c.JSON(http.StatusExpectationFailed, err.Error())
+		c.JSON(http.StatusBadRequest, err.Error())
 		return
 	}
 
@@ -71,11 +74,16 @@ func (a *Action) paymailAddressesSearch(c *gin.Context) {
 		conditions,
 		queryParams,
 	); err != nil {
-		c.JSON(http.StatusExpectationFailed, err.Error())
+		c.JSON(http.StatusInternalServerError, err.Error())
 		return
 	}
 
-	c.JSON(http.StatusOK, paymailAddresses)
+	paymailAddressContracts := make([]*models.PaymailAddress, 0)
+	for _, paymailAddress := range paymailAddresses {
+		paymailAddressContracts = append(paymailAddressContracts, mappings.MapToPaymailContract(paymailAddress))
+	}
+
+	c.JSON(http.StatusOK, paymailAddressContracts)
 }
 
 // paymailAddressesCount will count all paymail addresses filtered by metadata
@@ -84,15 +92,16 @@ func (a *Action) paymailAddressesSearch(c *gin.Context) {
 // @Description	Paymail addresses count
 // @Tags		Admin
 // @Produce		json
-// @Param		metadata query string false "Metadata filter"
-// @Param		conditions query string false "Conditions filter"
-// @Success		200
+// @Param		CountRequestParameters body actions.CountRequestParameters false "Enables precise filtering of resource counts using custom conditions or metadata, catering to specific business or analysis needs"
+// @Success		200	{number} int64 "Count of paymail addresses"
+// @Failure		400	"Bad request - Error while parsing CountRequestParameters from request body"
+// @Failure 	500	"Internal Server Error - Error while fetching count of paymail addresses"
 // @Router		/v1/admin/paymails/count [post]
 // @Security	x-auth-xpub
 func (a *Action) paymailAddressesCount(c *gin.Context) {
-	_, metadata, conditions, err := actions.GetQueryParameters(c)
+	metadata, conditions, err := actions.GetCountQueryParameters(c)
 	if err != nil {
-		c.JSON(http.StatusExpectationFailed, err.Error())
+		c.JSON(http.StatusBadRequest, err.Error())
 		return
 	}
 
@@ -102,7 +111,7 @@ func (a *Action) paymailAddressesCount(c *gin.Context) {
 		metadata,
 		conditions,
 	); err != nil {
-		c.JSON(http.StatusExpectationFailed, err.Error())
+		c.JSON(http.StatusInternalServerError, err.Error())
 		return
 	}
 
@@ -114,13 +123,11 @@ func (a *Action) paymailAddressesCount(c *gin.Context) {
 // @Summary		Create paymail
 // @Description	Create paymail
 // @Tags		Admin
-// @Param		xpub query string true "xpub"
-// @Param		address query string true "address"
-// @Param		public_name query string false "public_name"
-// @Param		avatar query string false "avatar"
-// @Param		metadata query string false "metadata"
 // @Produce		json
-// @Success		201
+// @Param		CreatePaymail body CreatePaymail false " "
+// @Success		201	{object} models.PaymailAddress "Created PaymailAddress"
+// @Failure		400	"Bad request - Error while parsing CreatePaymail from request body or if xpub or address are missing"
+// @Failure 	500	"Internal Server Error - Error while creating new paymail address"
 // @Router		/v1/admin/paymail/create [post]
 // @Security	x-auth-xpub
 func (a *Action) paymailCreateAddress(c *gin.Context) {
@@ -130,12 +137,12 @@ func (a *Action) paymailCreateAddress(c *gin.Context) {
 		return
 	}
 
-	if requestBody.XpubID == "" {
+	if requestBody.Key == "" {
 		c.JSON(http.StatusExpectationFailed, "xpub is required")
 		return
 	}
 	if requestBody.Address == "" {
-		c.JSON(http.StatusExpectationFailed, "address is required")
+		c.JSON(http.StatusBadRequest, "address is required")
 		return
 	}
 
@@ -147,15 +154,15 @@ func (a *Action) paymailCreateAddress(c *gin.Context) {
 
 	var paymailAddress *engine.PaymailAddress
 	paymailAddress, err := a.Services.SpvWalletEngine.NewPaymailAddress(
-		c.Request.Context(), requestBody.XpubID, requestBody.Address, requestBody.PublicName, requestBody.Avatar, opts...)
+		c.Request.Context(), requestBody.Key, requestBody.Address, requestBody.PublicName, requestBody.Avatar, opts...)
 	if err != nil {
-		c.JSON(http.StatusExpectationFailed, err.Error())
+		c.JSON(http.StatusInternalServerError, err.Error())
 		return
 	}
 
-	// Return response
-	//apirouter.ReturnResponse(w, req, http.StatusCreated, paymailAddress)
-	c.JSON(http.StatusCreated, paymailAddress)
+	paymailAddressContract := mappings.MapToPaymailContract(paymailAddress)
+
+	c.JSON(http.StatusCreated, paymailAddressContract)
 }
 
 // paymailDeleteAddress will delete a paymail address
@@ -163,9 +170,11 @@ func (a *Action) paymailCreateAddress(c *gin.Context) {
 // @Summary		Delete paymail
 // @Description	Delete paymail
 // @Tags		Admin
-// @Param		address query string true "address"
 // @Produce		json
+// @Param		PaymailAddress body PaymailAddress false "PaymailAddress model containing paymail address to delete"
 // @Success		200
+// @Failure		400	"Bad request - Error while parsing PaymailAddress from request body or if address is missing"
+// @Failure 	500	"Internal Server Error - Error while deleting paymail address"
 // @Router		/v1/admin/paymail/delete [delete]
 // @Security	x-auth-xpub
 func (a *Action) paymailDeleteAddress(c *gin.Context) {
@@ -176,7 +185,7 @@ func (a *Action) paymailDeleteAddress(c *gin.Context) {
 	}
 
 	if requestBody.Address == "" {
-		c.JSON(http.StatusExpectationFailed, "address is required")
+		c.JSON(http.StatusBadRequest, "address is required")
 		return
 	}
 
@@ -185,7 +194,7 @@ func (a *Action) paymailDeleteAddress(c *gin.Context) {
 	// Delete a new paymail address
 	err := a.Services.SpvWalletEngine.DeletePaymailAddress(c.Request.Context(), requestBody.Address, opts...)
 	if err != nil {
-		c.JSON(http.StatusExpectationFailed, err.Error())
+		c.JSON(http.StatusInternalServerError, err.Error())
 		return
 	}
 

@@ -9,7 +9,7 @@ import (
 // UpsertContact is the model for creating a contact
 type UpsertContact struct {
 	FullName string          `json:"fullName"`
-	Metadata engine.Metadata `json:"metadata"`
+	Metadata engine.Metadata `json:"metadata" swaggertype:"object,string" example:"key:value,key2:value2"`
 }
 
 func (p *UpsertContact) validate() error {

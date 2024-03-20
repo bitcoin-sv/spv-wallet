@@ -15,7 +15,9 @@ import (
 // @Tags		Transactions
 // @Produce		json
 // @Param		id query string true "id"
-// @Success		200
+// @Success		200 {object} models.Transaction "Transaction"
+// @Failure		400	"Bad request - Transaction not found or associated with another xpub"
+// @Failure 	500	"Internal Server Error - Error while fetching transaction"
 // @Router		/v1/transaction [get]
 // @Security	x-auth-xpub
 func (a *Action) get(c *gin.Context) {
@@ -28,13 +30,13 @@ func (a *Action) get(c *gin.Context) {
 		id,
 	)
 	if err != nil {
-		c.JSON(http.StatusExpectationFailed, err.Error())
+		c.JSON(http.StatusInternalServerError, err.Error())
 		return
 	} else if transaction == nil {
-		c.JSON(http.StatusNotFound, "not found")
+		c.JSON(http.StatusBadRequest, "not found")
 		return
 	} else if !transaction.IsXpubIDAssociated(reqXPubID) {
-		c.JSON(http.StatusForbidden, "unauthorized")
+		c.JSON(http.StatusBadRequest, "unauthorized")
 		return
 	}
 

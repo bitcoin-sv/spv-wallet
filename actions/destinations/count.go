@@ -13,18 +13,19 @@ import (
 // @Summary		Count Destinations
 // @Description	Count Destinations
 // @Tags		Destinations
-// @Param		metadata query string false "metadata"
-// @Param		condition query string false "condition"
 // @Produce		json
-// @Success		200
+// @Param		CountRequestParameters body actions.CountRequestParameters false "Enables precise filtering of resource counts using custom conditions or metadata, catering to specific business or analysis needs"
+// @Success		200	{number} int64 "Count of destinations"
+// @Failure		400	"Bad request - Error while parsing CountRequestParameters from request body"
+// @Failure 	500	"Internal Server Error - Error while fetching count of destinations"
 // @Router		/v1/destination/count [post]
 // @Security	x-auth-xpub
 func (a *Action) count(c *gin.Context) {
 	reqXPubID := c.GetString(auth.ParamXPubHashKey)
 
-	_, metadata, conditions, err := actions.GetQueryParameters(c)
+	metadata, conditions, err := actions.GetCountQueryParameters(c)
 	if err != nil {
-		c.JSON(http.StatusExpectationFailed, err.Error())
+		c.JSON(http.StatusBadRequest, err.Error())
 		return
 	}
 
@@ -36,7 +37,7 @@ func (a *Action) count(c *gin.Context) {
 		metadata,
 		conditions,
 	); err != nil {
-		c.JSON(http.StatusExpectationFailed, err.Error())
+		c.JSON(http.StatusInternalServerError, err.Error())
 		return
 	}
 
