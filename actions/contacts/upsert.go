@@ -44,7 +44,7 @@ func (a *Action) upsert(c *gin.Context) {
 		engine.WithMetadatas(req.Metadata))
 
 	if err != nil && !errors.Is(err, engine.ErrAddingContactRequest) {
-		c.JSON(http.StatusUnprocessableEntity, err.Error())
+		c.JSON(http.StatusInternalServerError, err.Error())
 		return
 	}
 
@@ -56,5 +56,5 @@ func (a *Action) upsert(c *gin.Context) {
 		response.AddAdditionalInfo("warning", err.Error())
 	}
 
-	c.JSON(http.StatusCreated, response)
+	c.JSON(http.StatusOK, response)
 }
