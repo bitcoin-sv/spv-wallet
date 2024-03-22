@@ -7,7 +7,7 @@ import (
 	"time"
 
 	"github.com/bitcoin-sv/spv-wallet/engine"
-	"github.com/mrz1836/go-datastore"
+	"github.com/bitcoin-sv/spv-wallet/engine/datastore"
 )
 
 func main() {

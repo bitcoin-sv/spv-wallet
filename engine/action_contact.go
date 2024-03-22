@@ -4,9 +4,10 @@ import (
 	"context"
 	"errors"
 	"fmt"
+
 	"github.com/bitcoin-sv/go-paymail"
+	"github.com/bitcoin-sv/spv-wallet/engine/datastore"
 	"github.com/mrz1836/go-cachestore"
-	"github.com/mrz1836/go-datastore"
 )
 
 func (c *Client) NewContact(ctx context.Context, fullName, paymail, senderPubKey string, opts ...ModelOps) (*Contact, error) {
@@ -31,13 +32,11 @@ func (c *Client) NewContact(ctx context.Context, fullName, paymail, senderPubKey
 			WithXPub(senderPubKey),
 		)...)...,
 	)
-
 	if err != nil {
 		return nil, err
 	}
 
 	capabilities, err := c.GetPaymailCapability(ctx, contact.Paymail)
-
 	if err != nil {
 		return nil, fmt.Errorf("failed to get contact paymail capability: %w", err)
 	}
@@ -58,7 +57,6 @@ func (c *Client) NewContact(ctx context.Context, fullName, paymail, senderPubKey
 
 func (c *Client) UpdateContact(ctx context.Context, fullName, pubKey, xPubID, paymailAddr string, status ContactStatus, opts ...ModelOps) (*Contact, error) {
 	contact, err := getContactByXPubIdAndRequesterPubKey(ctx, xPubID, paymailAddr, opts...)
-
 	if err != nil {
 		return nil, fmt.Errorf("failed to get contact: %w", err)
 	}
@@ -98,7 +96,6 @@ func (c *Client) GetPubKeyFromPki(pkiUrl, paymailAddress string) (string, error)
 	pc := c.PaymailClient()
 
 	pkiResponse, err := pc.GetPKI(pkiUrl, alias, domain)
-
 	if err != nil {
 		return "", fmt.Errorf("error getting public key from PKI: %w", err)
 	}
@@ -112,7 +109,6 @@ func (c *Client) GetPaymailCapability(ctx context.Context, paymailAddress string
 	pc := c.PaymailClient()
 
 	capabilities, err := getCapabilities(ctx, cs, pc, address.Domain)
-
 	if err != nil {
 		if errors.Is(err, cachestore.ErrKeyNotFound) {
 			return nil, nil
@@ -124,11 +120,9 @@ func (c *Client) GetPaymailCapability(ctx context.Context, paymailAddress string
 }
 
 func (c *Client) GetContacts(ctx context.Context, metadata *Metadata, conditions *map[string]interface{}, queryParams *datastore.QueryParams, opts ...ModelOps) ([]*Contact, error) {
-
 	ctx = c.GetOrStartTxn(ctx, "get_contacts")
 
 	contacts, err := getContacts(ctx, metadata, conditions, queryParams, c.DefaultModelOptions(opts...)...)
-
 	if err != nil {
 		return nil, err
 	}

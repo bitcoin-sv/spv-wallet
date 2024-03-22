@@ -5,8 +5,8 @@ import (
 	"database/sql/driver"
 	"encoding/json"
 
+	"github.com/bitcoin-sv/spv-wallet/engine/datastore"
 	"github.com/bitcoin-sv/spv-wallet/engine/utils"
-	"github.com/mrz1836/go-datastore"
 	"gorm.io/gorm"
 	"gorm.io/gorm/schema"
 )

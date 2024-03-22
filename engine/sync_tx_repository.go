@@ -5,8 +5,8 @@ import (
 	"encoding/hex"
 	"errors"
 
+	"github.com/bitcoin-sv/spv-wallet/engine/datastore"
 	"github.com/libsv/go-bt/v2"
-	"github.com/mrz1836/go-datastore"
 )
 
 /*** exported funcs ***/

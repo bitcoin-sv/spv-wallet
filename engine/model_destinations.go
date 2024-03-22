@@ -6,10 +6,10 @@ import (
 	"fmt"
 
 	"github.com/bitcoin-sv/spv-wallet/engine/cluster"
+	"github.com/bitcoin-sv/spv-wallet/engine/datastore"
 	"github.com/bitcoin-sv/spv-wallet/engine/notifications"
 	"github.com/bitcoin-sv/spv-wallet/engine/utils"
 	"github.com/bitcoinschema/go-bitcoin/v2"
-	"github.com/mrz1836/go-datastore"
 )
 
 // Destination is an object representing a BitCoin destination (address, script, etc)

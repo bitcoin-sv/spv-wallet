@@ -3,8 +3,8 @@ package engine
 import (
 	"context"
 
+	"github.com/bitcoin-sv/spv-wallet/engine/datastore"
 	"github.com/bitcoin-sv/spv-wallet/engine/utils"
-	"github.com/mrz1836/go-datastore"
 )
 
 // GetUtxos will get all the utxos from the Datastore

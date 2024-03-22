@@ -3,7 +3,7 @@ package config
 import (
 	"errors"
 
-	"github.com/mrz1836/go-datastore"
+	"github.com/bitcoin-sv/spv-wallet/engine/datastore"
 )
 
 // Validate checks the configuration for specific rules
