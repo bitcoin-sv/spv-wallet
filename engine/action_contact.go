@@ -16,9 +16,9 @@ var (
 	ErrMoreThanOnePaymailRegistered = errors.New("there are more than one paymail assigned to the xpub")
 )
 
-func (c *Client) UpsertContact(ctx context.Context, ctcFName, ctcPaymail, requesterXpub string, opts ...ModelOps) (*Contact, error) {
+func (c *Client) UpsertContact(ctx context.Context, ctcFName, ctcPaymail, requesterXpub, requesterPaymail string, opts ...ModelOps) (*Contact, error) {
 	reqXPubID := utils.Hash(requesterXpub)
-	reqPm, err := c.getPaymail(ctx, reqXPubID)
+	reqPm, err := c.getPaymail(ctx, reqXPubID, requesterPaymail)
 	if err != nil {
 		return nil, err
 	}
@@ -100,7 +100,20 @@ func (c *Client) AddContactRequest(ctx context.Context, fullName, paymailAdress,
 	return contact, nil
 }
 
-func (c *Client) getPaymail(ctx context.Context, xpubID string) (*PaymailAddress, error) {
+func (c *Client) getPaymail(ctx context.Context, xpubID, paymailAddr string) (*PaymailAddress, error) {
+	if paymailAddr != "" {
+		res, err := c.GetPaymailAddress(ctx, paymailAddr, c.DefaultModelOptions()...)
+		if err != nil {
+			return nil, err
+		}
+
+		if res == nil || res.XpubID != xpubID {
+			return nil, ErrInvalidRequesterXpub
+		}
+
+		return res, nil
+	}
+
 	emptyConditions := make(map[string]interface{})
 
 	paymails, err := c.GetPaymailAddressesByXPubID(ctx, xpubID, nil, &emptyConditions, nil)

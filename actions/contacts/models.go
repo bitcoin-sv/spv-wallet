@@ -10,6 +10,9 @@ import (
 type UpsertContact struct {
 	FullName string          `json:"fullName"`
 	Metadata engine.Metadata `json:"metadata" swaggertype:"object,string" example:"key:value,key2:value2"`
+
+	// optional
+	RequesterPaymail string `json:"requesterPaymail"`
 }
 
 func (p *UpsertContact) validate() error {

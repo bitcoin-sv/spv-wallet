@@ -70,6 +70,10 @@ definitions:
         description: The avatar of the paymail (url address)
         example: https://example.com/avatar.png
         type: string
+      key:
+        description: The xpub with which the paymail is associated
+        example: xpub661MyMwAqRbcGpZVrSHU...
+        type: string
       metadata:
         additionalProperties:
           type: string
@@ -82,10 +86,6 @@ definitions:
       public_name:
         description: The public name of the paymail
         example: Test
-        type: string
-      xpub_id:
-        description: The xpub with which the paymail is associated
-        example: xpub661MyMwAqRbcGpZVrSHU...
         type: string
     type: object
   admin.CreateXpub:
@@ -197,6 +197,21 @@ definitions:
     - SeenInOrphanMempool
     - Confirmed
     - Rejected
+  contacts.UpsertContact:
+    properties:
+      fullName:
+        type: string
+      metadata:
+        additionalProperties:
+          type: string
+        example:
+          key: value
+          key2: value2
+        type: object
+      requesterPaymail:
+        description: optional
+        type: string
+    type: object
   destinations.CreateDestination:
     properties:
       metadata:
@@ -321,7 +336,6 @@ definitions:
         example: Test User
         type: string
       id:
-        description: ID is the hash of the xpub and paymail
         example: 68af358bde7d8641621c7dd3de1a276c9a62cfa9e2d0740494519f1ba61e2f4a
         type: string
       metadata:
@@ -342,7 +356,7 @@ definitions:
         type: string
       status:
         description: Status is a contact's current status.
-        example: not confirmed
+        example: unconfirmed
         type: string
       updated_at:
         description: UpdatedAt is a time when outer model was updated.
@@ -1790,37 +1804,25 @@ paths:
       summary: Update contact
       tags:
       - Contacts
-    post:
-      description: Create contact
+  /v1/contact/{paymail}:
+    put:
+      description: Add or update contact. For new contact send request to add current
+        user as contact
       parameters:
-      - description: fullName
-        in: query
-        name: fullName
-        type: string
-      - description: paymail
-        in: query
-        name: paymail
-        type: string
-      - description: pubKey
-        in: query
-        name: pubKey
-        type: string
-      - description: metadata
-        in: query
-        name: metadata
-        type: string
+      - description: Full name and metadata needed to add/modify contact
+        in: body
+        name: UpsertContact
+        required: true
+        schema:
+          $ref: '#/definitions/contacts.UpsertContact'
       produces:
       - application/json
       responses:
         "201":
-          description: Contact created
-          schema:
-            $ref: '#/definitions/models.Contact'
-        "500":
-          description: Internal server error - Error while creating contact
+          description: Created
       security:
-      - bux-auth-xpub: []
-      summary: Create contact
+      - x-auth-xpub: []
+      summary: Upsert contact
       tags:
       - Contact
   /v1/contacts:

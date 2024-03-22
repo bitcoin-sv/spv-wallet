@@ -40,7 +40,7 @@ func (a *Action) upsert(c *gin.Context) {
 	contact, err := a.Services.SpvWalletEngine.UpsertContact(
 		c.Request.Context(),
 		req.FullName, cPaymail,
-		requesterPubKey,
+		requesterPubKey, req.RequesterPaymail,
 		engine.WithMetadatas(req.Metadata))
 
 	if err != nil && !errors.Is(err, engine.ErrAddingContactRequest) {

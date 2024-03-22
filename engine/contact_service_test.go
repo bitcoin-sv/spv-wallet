@@ -35,7 +35,7 @@ func Test_ClientService_UpsertContact(t *testing.T) {
 		require.NoError(t, err)
 
 		// when
-		res, err := client.UpsertContact(ctx, "Bran Stark", paymailAddr, cs_xpub, client.DefaultModelOptions()...)
+		res, err := client.UpsertContact(ctx, "Bran Stark", paymailAddr, cs_xpub, "", client.DefaultModelOptions()...)
 
 		// then
 		require.NoError(t, err)
@@ -50,7 +50,7 @@ func Test_ClientService_UpsertContact(t *testing.T) {
 		defer cleanup()
 
 		// when
-		res, err := client.UpsertContact(ctx, "Bran Stark", "bran_the_broken@winterfell.com", cs_xpub, client.DefaultModelOptions()...)
+		res, err := client.UpsertContact(ctx, "Bran Stark", "bran_the_broken@winterfell.com", cs_xpub, "", client.DefaultModelOptions()...)
 
 		// then
 		require.ErrorIs(t, err, ErrInvalidRequesterXpub)
@@ -78,7 +78,7 @@ func Test_ClientService_UpsertContact(t *testing.T) {
 		require.NoError(t, err)
 
 		// when
-		res, err := client.UpsertContact(ctx, "Bran Stark", paymailAddr, cs_xpub, client.DefaultModelOptions()...)
+		res, err := client.UpsertContact(ctx, "Bran Stark", paymailAddr, cs_xpub, "lady_stoneheart@winterfell.com", client.DefaultModelOptions()...)
 
 		// then
 		require.ErrorIs(t, err, ErrAddingContactRequest)
@@ -107,7 +107,7 @@ func Test_ClientService_UpsertContact(t *testing.T) {
 		_, err = client.NewPaymailAddress(ctx, cs_xpub, "lady_stoneheart@winterfell.com", "Catelyn Stark", "", client.DefaultModelOptions()...)
 		require.NoError(t, err)
 
-		contact, err := client.UpsertContact(ctx, "Bran Stark", paymailAddr, cs_xpub, client.DefaultModelOptions()...)
+		contact, err := client.UpsertContact(ctx, "Bran Stark", paymailAddr, cs_xpub, "", client.DefaultModelOptions()...)
 		require.NoError(t, err)
 		require.NotNil(t, contact)
 
@@ -117,7 +117,7 @@ func Test_ClientService_UpsertContact(t *testing.T) {
 		require.NoError(t, err)
 
 		// when
-		updatedContact, err := client.UpsertContact(ctx, updatedFullname, paymailAddr, cs_xpub, client.DefaultModelOptions()...)
+		updatedContact, err := client.UpsertContact(ctx, updatedFullname, paymailAddr, cs_xpub, "", client.DefaultModelOptions()...)
 
 		// then
 		require.NoError(t, err)
@@ -153,7 +153,7 @@ func Test_ClientService_UpsertContact(t *testing.T) {
 		_, err = client.NewPaymailAddress(ctx, cs_xpub, "lady_stoneheart@winterfell.com", "Catelyn Stark", "", client.DefaultModelOptions()...)
 		require.NoError(t, err)
 
-		contact, err := client.UpsertContact(ctx, "Bran Stark", paymailAddr, cs_xpub, client.DefaultModelOptions()...)
+		contact, err := client.UpsertContact(ctx, "Bran Stark", paymailAddr, cs_xpub, "", client.DefaultModelOptions()...)
 		require.NoError(t, err)
 		require.NotNil(t, contact)
 
@@ -166,7 +166,7 @@ func Test_ClientService_UpsertContact(t *testing.T) {
 		// change PKI
 		pt.mockPki(paymailAddr, updatedPki)
 
-		updatedContact, err := client.UpsertContact(ctx, updatedFullname, paymailAddr, cs_xpub, client.DefaultModelOptions()...)
+		updatedContact, err := client.UpsertContact(ctx, updatedFullname, paymailAddr, cs_xpub, "lady_stoneheart@winterfell.com", client.DefaultModelOptions()...)
 
 		// then
 		require.NoError(t, err)

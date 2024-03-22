@@ -999,58 +999,6 @@
             }
         },
         "/v1/contact": {
-            "post": {
-                "security": [
-                    {
-                        "bux-auth-xpub": []
-                    }
-                ],
-                "description": "Create contact",
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Contact"
-                ],
-                "summary": "Create contact",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "fullName",
-                        "name": "fullName",
-                        "in": "query"
-                    },
-                    {
-                        "type": "string",
-                        "description": "paymail",
-                        "name": "paymail",
-                        "in": "query"
-                    },
-                    {
-                        "type": "string",
-                        "description": "pubKey",
-                        "name": "pubKey",
-                        "in": "query"
-                    },
-                    {
-                        "type": "string",
-                        "description": "metadata",
-                        "name": "metadata",
-                        "in": "query"
-                    }
-                ],
-                "responses": {
-                    "201": {
-                        "description": "Contact created",
-                        "schema": {
-                            "$ref": "#/definitions/models.Contact"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal server error - Error while creating contact"
-                    }
-                }
-            },
             "patch": {
                 "security": [
                     {
@@ -1088,6 +1036,39 @@
                     },
                     "500": {
                         "description": "Internal server error - Error while updating contact"
+                    }
+                }
+            }
+        },
+        "/v1/contact/{paymail}": {
+            "put": {
+                "security": [
+                    {
+                        "x-auth-xpub": []
+                    }
+                ],
+                "description": "Add or update contact. For new contact send request to add current user as contact",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Contact"
+                ],
+                "summary": "Upsert contact",
+                "parameters": [
+                    {
+                        "description": "Full name and metadata needed to add/modify contact",
+                        "name": "UpsertContact",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/contacts.UpsertContact"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created"
                     }
                 }
             }
@@ -1917,6 +1898,11 @@
                     "type": "string",
                     "example": "https://example.com/avatar.png"
                 },
+                "key": {
+                    "description": "The xpub with which the paymail is associated",
+                    "type": "string",
+                    "example": "xpub661MyMwAqRbcGpZVrSHU..."
+                },
                 "metadata": {
                     "description": "Accepts a JSON object for embedding custom metadata, enabling arbitrary additional information to be associated with the resource",
                     "type": "object",
@@ -1932,11 +1918,6 @@
                     "description": "The public name of the paymail",
                     "type": "string",
                     "example": "Test"
-                },
-                "xpub_id": {
-                    "description": "The xpub with which the paymail is associated",
-                    "type": "string",
-                    "example": "xpub661MyMwAqRbcGpZVrSHU..."
                 }
             }
         },
@@ -2073,6 +2054,28 @@
                 "Confirmed",
                 "Rejected"
             ]
+        },
+        "contacts.UpsertContact": {
+            "type": "object",
+            "properties": {
+                "fullName": {
+                    "type": "string"
+                },
+                "metadata": {
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "string"
+                    },
+                    "example": {
+                        "key": "value",
+                        "key2": "value2"
+                    }
+                },
+                "requesterPaymail": {
+                    "description": "optional",
+                    "type": "string"
+                }
+            }
         },
         "destinations.CreateDestination": {
             "type": "object",
@@ -2234,7 +2237,6 @@
                     "example": "Test User"
                 },
                 "id": {
-                    "description": "ID is the hash of the xpub and paymail",
                     "type": "string",
                     "example": "68af358bde7d8641621c7dd3de1a276c9a62cfa9e2d0740494519f1ba61e2f4a"
                 },
@@ -2262,7 +2264,7 @@
                 "status": {
                     "description": "Status is a contact's current status.",
                     "type": "string",
-                    "example": "not confirmed"
+                    "example": "unconfirmed"
                 },
                 "updated_at": {
                     "description": "UpdatedAt is a time when outer model was updated.",
