@@ -88,7 +88,7 @@ func CreateTestSQLiteClient(t *testing.T, debug, shared bool, clientOpts ...Clie
 
 	// Set the default options, add migrate models
 	opts := DefaultClientOpts(debug, shared)
-	opts = append(opts, WithAutoMigrate(append(BaseModels, newPaymail(""))...))
+	opts = append(opts, WithAutoMigrate(append(BaseModels, newPaymail("", 0))...))
 	opts = append(opts, WithLogger(&logger))
 	opts = append(opts, clientOpts...)
 
