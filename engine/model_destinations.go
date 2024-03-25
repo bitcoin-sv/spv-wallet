@@ -163,11 +163,38 @@ func getDestinationsByXpubID(ctx context.Context, xPubID string, usingMetadata *
 	// Construct an empty model
 	var models []Destination
 
-	dbConditions := map[string]interface{}{}
+	var dest Destination
+
+	dbConditions, err := utils.StructToMap(dest)
+
+	if err != nil {
+		return nil, fmt.Errorf("cannot convert struct to map: %w", err)
+	}
+
+	//dbConditions := map[string]interface{}{
+	//	idField:          "",
+	//	xPubIDField:      "",
+	//	"locking_script": "",
+	//	"type":           "",
+	//	"chain":          "",
+	//	"num":            "",
+	//	"address":        "",
+	//	"draft_id":       "",
+	//}
+	fmt.Printf("%+v", dbConditions)
 	if conditions != nil {
-		dbConditions = *conditions
+		for key, value := range *conditions {
+			// Sanitize user input
+			sanitizedValue := utils.SanitizeInput(value.(string))
+			if _, ok := dbConditions[key]; ok {
+				dbConditions[key] = sanitizedValue
+			}
+
+			return nil, fmt.Errorf("column does not exist: %s", key)
+		}
 	}
 	dbConditions[xPubIDField] = xPubID
+	//result[xPubIDField] = xPubID
 
 	if usingMetadata != nil {
 		dbConditions[metadataField] = usingMetadata
