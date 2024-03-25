@@ -409,6 +409,11 @@ definitions:
         description: Num is a destination's num representation.
         example: 0
         type: integer
+      paymail_external_derivation_num:
+        description: PaymailExternalDerivationNum is the chain/num/(ext_derivation_num)
+          location of the address related to the xPub.
+        example: 0
+        type: integer
       type:
         description: Type is a destination's type.
         example: pubkeyhash
@@ -538,10 +543,6 @@ definitions:
       domain:
         description: Domain is a paymail address's domain (second part of paymail).
         example: spvwallet.com
-        type: string
-      external_xpub_key:
-        description: ExternalXpubKey is a paymail address's external xpub key.
-        example: xpub661MyMwAqRbcGpZVrSHU...
         type: string
       id:
         description: ID is a paymail address id.
@@ -1019,11 +1020,13 @@ definitions:
           key2: value2
         type: object
       next_external_num:
-        description: NextExternalNum is a next external num.
+        description: NextExternalNum is the index derivation number use to generate
+          NEXT external xPub (external xPub are used for address destinations).
         example: 0
         type: integer
       next_internal_num:
-        description: NextInternalNum is a next internal num.
+        description: NextInternalNum is the index derivation number use to generate
+          NEXT internal xPub (internal xPub are used for change destinations).
         example: 0
         type: integer
       updated_at:
@@ -1041,24 +1044,8 @@ definitions:
     - 1000000000
     - 60000000000
     - 3600000000000
-    - -9223372036854775808
-    - 9223372036854775807
-    - 1
-    - 1000
-    - 1000000
-    - 1000000000
-    - 60000000000
-    - 3600000000000
     type: integer
     x-enum-varnames:
-    - minDuration
-    - maxDuration
-    - Nanosecond
-    - Microsecond
-    - Millisecond
-    - Second
-    - Minute
-    - Hour
     - minDuration
     - maxDuration
     - Nanosecond

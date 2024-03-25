@@ -64,8 +64,8 @@ func (c *Client) NewTransaction(ctx context.Context, rawXpubKey string, config *
 	ctx = c.GetOrStartTxn(ctx, "new_transaction")
 
 	// Create the lock and set the release for after the function completes
-	unlock, err := newWaitWriteLock(
-		ctx, fmt.Sprintf(lockKeyProcessXpub, utils.Hash(rawXpubKey)), c.Cachestore(),
+	unlock, err := getWaitWriteLockForXpub(
+		ctx, c.Cachestore(), utils.Hash(rawXpubKey),
 	)
 	defer unlock()
 	if err != nil {
