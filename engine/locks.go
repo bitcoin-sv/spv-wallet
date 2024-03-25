@@ -2,6 +2,7 @@ package engine
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/mrz1836/go-cachestore"
 )
@@ -10,7 +11,6 @@ const (
 	lockKeyProcessBroadcastTx = "process-broadcast-transaction-%s" // + Tx ID
 	lockKeyProcessP2PTx       = "process-p2p-transaction-%s"       // + Tx ID
 	lockKeyProcessSyncTx      = "process-sync-transaction-task"
-	lockKeyProcessXpub        = "action-xpub-id-%s"            // + Xpub ID
 	lockKeyRecordTx           = "action-record-transaction-%s" // + Tx ID
 	lockKeyReserveUtxo        = "utxo-reserve-xpub-id-%s"      // + Xpub ID
 )
@@ -31,4 +31,16 @@ func newWaitWriteLock(ctx context.Context, lockKey string, cacheStore cachestore
 		// context is not set, since the req could be canceled, but unlocking should never be stopped
 		_, _ = cacheStore.ReleaseLock(context.Background(), lockKey, secret)
 	}, err
+}
+
+func getWaitWriteLockForPaymail(ctx context.Context, cs cachestore.LockService, id string) (unlock func(), err error) {
+	lockKey := fmt.Sprintf("process-paymail-%s", id)
+	unlock, err = newWaitWriteLock(ctx, lockKey, cs)
+	return
+}
+
+func getWaitWriteLockForXpub(ctx context.Context, cs cachestore.LockService, id string) (unlock func(), err error) {
+	lockKey := fmt.Sprintf("action-xpub-id-%s", id)
+	unlock, err = newWaitWriteLock(ctx, lockKey, cs)
+	return
 }

@@ -13,15 +13,16 @@ func MapToDestinationContract(d *engine.Destination) *models.Destination {
 	}
 
 	return &models.Destination{
-		Model:         *common.MapToContract(&d.Model),
-		ID:            d.ID,
-		XpubID:        d.XpubID,
-		LockingScript: d.LockingScript,
-		Type:          d.Type,
-		Chain:         d.Chain,
-		Num:           d.Num,
-		Address:       d.Address,
-		DraftID:       d.DraftID,
+		Model:                        *common.MapToContract(&d.Model),
+		ID:                           d.ID,
+		XpubID:                       d.XpubID,
+		LockingScript:                d.LockingScript,
+		Type:                         d.Type,
+		Chain:                        d.Chain,
+		Num:                          d.Num,
+		PaymailExternalDerivationNum: d.PaymailExternalDerivationNum,
+		Address:                      d.Address,
+		DraftID:                      d.DraftID,
 	}
 }
 
@@ -32,14 +33,15 @@ func MapDestinationModelToEngine(d *models.Destination) *engine.Destination {
 	}
 
 	return &engine.Destination{
-		Model:         *common.MapToModel(&d.Model),
-		ID:            d.ID,
-		XpubID:        d.XpubID,
-		LockingScript: d.LockingScript,
-		Type:          d.Type,
-		Chain:         d.Chain,
-		Num:           d.Num,
-		Address:       d.Address,
-		DraftID:       d.DraftID,
+		Model:                        *common.MapToModel(&d.Model),
+		ID:                           d.ID,
+		XpubID:                       d.XpubID,
+		LockingScript:                d.LockingScript,
+		Type:                         d.Type,
+		Chain:                        d.Chain,
+		Num:                          d.Num,
+		PaymailExternalDerivationNum: d.PaymailExternalDerivationNum,
+		Address:                      d.Address,
+		DraftID:                      d.DraftID,
 	}
 }

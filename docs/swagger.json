@@ -1917,6 +1917,11 @@
                     "type": "string",
                     "example": "https://example.com/avatar.png"
                 },
+                "key": {
+                    "description": "The xpub with which the paymail is associated",
+                    "type": "string",
+                    "example": "xpub661MyMwAqRbcGpZVrSHU..."
+                },
                 "metadata": {
                     "description": "Accepts a JSON object for embedding custom metadata, enabling arbitrary additional information to be associated with the resource",
                     "type": "object",
@@ -1932,11 +1937,6 @@
                     "description": "The public name of the paymail",
                     "type": "string",
                     "example": "Test"
-                },
-                "xpub_id": {
-                    "description": "The xpub with which the paymail is associated",
-                    "type": "string",
-                    "example": "xpub661MyMwAqRbcGpZVrSHU..."
                 }
             }
         },
@@ -2330,6 +2330,11 @@
                     "type": "integer",
                     "example": 0
                 },
+                "paymail_external_derivation_num": {
+                    "description": "PaymailExternalDerivationNum is the chain/num/(ext_derivation_num) location of the address related to the xPub.",
+                    "type": "integer",
+                    "example": 0
+                },
                 "type": {
                     "description": "Type is a destination's type.",
                     "type": "string",
@@ -2507,11 +2512,6 @@
                     "description": "Domain is a paymail address's domain (second part of paymail).",
                     "type": "string",
                     "example": "spvwallet.com"
-                },
-                "external_xpub_key": {
-                    "description": "ExternalXpubKey is a paymail address's external xpub key.",
-                    "type": "string",
-                    "example": "xpub661MyMwAqRbcGpZVrSHU..."
                 },
                 "id": {
                     "description": "ID is a paymail address id.",
@@ -3153,12 +3153,12 @@
                     }
                 },
                 "next_external_num": {
-                    "description": "NextExternalNum is a next external num.",
+                    "description": "NextExternalNum is the index derivation number use to generate NEXT external xPub (external xPub are used for address destinations).",
                     "type": "integer",
                     "example": 0
                 },
                 "next_internal_num": {
-                    "description": "NextInternalNum is a next internal num.",
+                    "description": "NextInternalNum is the index derivation number use to generate NEXT internal xPub (internal xPub are used for change destinations).",
                     "type": "integer",
                     "example": 0
                 },
@@ -3179,25 +3179,9 @@
                 1000000,
                 1000000000,
                 60000000000,
-                3600000000000,
-                -9223372036854775808,
-                9223372036854775807,
-                1,
-                1000,
-                1000000,
-                1000000000,
-                60000000000,
                 3600000000000
             ],
             "x-enum-varnames": [
-                "minDuration",
-                "maxDuration",
-                "Nanosecond",
-                "Microsecond",
-                "Millisecond",
-                "Second",
-                "Minute",
-                "Hour",
                 "minDuration",
                 "maxDuration",
                 "Nanosecond",

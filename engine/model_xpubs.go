@@ -19,8 +19,8 @@ type Xpub struct {
 	// Model specific fields
 	ID              string `json:"id" toml:"id" yaml:"id" gorm:"<-:create;type:char(64);primaryKey;comment:This is the sha256(xpub) hash" bson:"_id"`
 	CurrentBalance  uint64 `json:"current_balance" toml:"current_balance" yaml:"current_balance" gorm:"<-;comment:The current balance of unspent satoshis" bson:"current_balance"`
-	NextInternalNum uint32 `json:"next_internal_num" toml:"next_internal_num" yaml:"next_internal_num" gorm:"<-;type:int;comment:The next index number for the internal xPub derivation" bson:"next_internal_num"`
-	NextExternalNum uint32 `json:"next_external_num" toml:"next_external_num" yaml:"next_external_num" gorm:"<-;type:int;comment:The next index number for the external xPub derivation" bson:"next_external_num"`
+	NextInternalNum uint32 `json:"next_internal_num" toml:"next_internal_num" yaml:"next_internal_num" gorm:"<-;type:int not null;default:0;comment:The index derivation number use to generate NEXT internal xPub (internal xPub are used for change destinations)" bson:"next_internal_num"`
+	NextExternalNum uint32 `json:"next_external_num" toml:"next_external_num" yaml:"next_external_num" gorm:"<-;type:int not null;default:0;comment:The index derivation number use to generate NEXT external xPub (external xPub are used for address destinations)" bson:"next_external_num"`
 
 	destinations []Destination `gorm:"-" bson:"-"` // json:"destinations,omitempty"
 }
@@ -174,7 +174,7 @@ func (m *Xpub) getNewDestination(ctx context.Context, chain uint32, destinationT
 	}
 
 	// Increment the next num
-	num, err := m.incrementNextNum(ctx, chain)
+	num, err := m.getNextDerivationNum(ctx, chain)
 	if err != nil {
 		return nil, err
 	}
@@ -206,6 +206,30 @@ func (m *Xpub) incrementBalance(ctx context.Context, balanceIncrement int64) err
 	// Fire the after update
 	err = m.AfterUpdated(ctx)
 	return err
+}
+
+func (m *Xpub) GetNextInternalDerivationNum(ctx context.Context) (uint32, error) {
+	return m.getNextDerivationNum(ctx, utils.ChainInternal)
+}
+
+func (m *Xpub) GetNextExternalDerivationNum(ctx context.Context) (uint32, error) {
+	return m.getNextDerivationNum(ctx, utils.ChainExternal)
+}
+
+func (m *Xpub) getNextDerivationNum(ctx context.Context, chain uint32) (uint32, error) {
+	unlock, err := getWaitWriteLockForXpub(ctx, m.client.Cachestore(), m.ID)
+	defer unlock()
+
+	if err != nil {
+		return 0, err
+	}
+
+	derivation, err := m.incrementNextNum(ctx, chain)
+	if err != nil {
+		return 0, err
+	}
+
+	return derivation, nil
 }
 
 // incrementNextNum will atomically update the num of the given chain of the xPub and return it
