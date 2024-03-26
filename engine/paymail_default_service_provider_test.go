@@ -18,7 +18,7 @@ func Test_PaymailDefaultServiceProvider(t *testing.T) {
 
 func test_GetPaymailByAlias(t *testing.T) {
 	// given
-	ctx, c, deferMe := CreateTestSQLiteClient(t, false, false, WithAutoMigrate(&PaymailAddress{}), WithFreeCache())
+	ctx, c, deferMe := CreateTestSQLiteClient(t, false, false, WithFreeCache())
 	defer deferMe()
 
 	pm := newPaymail("paymail@domain.sc", 0, WithClient(c), WithXPub(testXPub))
@@ -47,7 +47,7 @@ func test_GetPaymailByAlias(t *testing.T) {
 
 func test_GetPaymailByAlias_MultipleRequest_ShouldReturnStablePubKey(t *testing.T) {
 	// given
-	ctx, c, deferMe := CreateTestSQLiteClient(t, false, false, WithAutoMigrate(&PaymailAddress{}), WithFreeCache())
+	ctx, c, deferMe := CreateTestSQLiteClient(t, false, false, WithFreeCache())
 	defer deferMe()
 
 	pm := newPaymail("paymail@domain.sc", 0, WithClient(c), WithXPub(testXPub))
@@ -72,7 +72,7 @@ func test_GetPaymailByAlias_MultipleRequest_ShouldReturnStablePubKey(t *testing.
 
 func test_CreateAddressResolutionResponse_ShouldReturnDifferentResponses(t *testing.T) {
 	// given
-	ctx, c, deferMe := CreateTestSQLiteClient(t, false, false, WithAutoMigrate(&PaymailAddress{}), WithFreeCache())
+	ctx, c, deferMe := CreateTestSQLiteClient(t, false, false, WithFreeCache())
 	defer deferMe()
 
 	pm := newPaymail("paymail@domain.sc", 0, WithClient(c), WithXPub(testXPub))
@@ -106,7 +106,7 @@ func test_CreateAddressResolutionResponse_ShouldReturnDifferentResponses(t *test
 
 func test_CreateP2PDestinationResponse_ShouldReturnDifferentResponses(t *testing.T) {
 	// given
-	ctx, c, deferMe := CreateTestSQLiteClient(t, false, false, WithAutoMigrate(&PaymailAddress{}), WithFreeCache())
+	ctx, c, deferMe := CreateTestSQLiteClient(t, false, false, WithFreeCache())
 	defer deferMe()
 
 	pm := newPaymail("paymail@domain.sc", 0, WithClient(c), WithXPub(testXPub))
