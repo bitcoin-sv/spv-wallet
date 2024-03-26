@@ -24,7 +24,7 @@ func MapToContactContract(c *engine.Contact) *models.Contact {
 func mapContactStatus(s engine.ContactStatus) string {
 	switch s {
 	case engine.ContactNotConfirmed:
-		return "uncofirmed"
+		return "unconfirmed"
 	case engine.ContactAwaitAccept:
 		return "awaiting"
 	case engine.ContactConfirmed:
