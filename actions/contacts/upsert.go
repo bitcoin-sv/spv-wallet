@@ -18,13 +18,14 @@ import (
 // @Description	Add or update contact. For new contact send request to add current user as contact
 // @Tags		Contact
 // @Produce		json
+// @Param		paymail path string true "Paymail address of the contact the user wants to add/modify"
 // @Param		UpsertContact body contacts.UpsertContact true "Full name and metadata needed to add/modify contact"
 // @Success		201
 // @Router		/v1/contact/{paymail} [PUT]
 // @Security	x-auth-xpub
 func (a *Action) upsert(c *gin.Context) {
 	requesterPubKey := c.GetString(auth.ParamXPubKey)
-	cPaymail := c.GetString("paymail")
+	cPaymail := c.Param("paymail")
 
 	var req UpsertContact
 	if err := json.NewDecoder(c.Request.Body).Decode(&req); err != nil {

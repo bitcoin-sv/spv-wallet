@@ -18,7 +18,7 @@ func NewHandler(appConfig *config.AppConfig, services *config.AppServices) route
 
 	apiEndpoints := routes.APIEndpointsFunc(func(router *gin.RouterGroup) {
 		contactGroup := router.Group("/contact")
-		contactGroup.PUT("/{paymail}", action.upsert)
+		contactGroup.PUT("/:paymail", action.upsert)
 
 		contactGroup.PATCH("", action.update)
 		contactsGroup := router.Group("/contacts")
