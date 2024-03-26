@@ -4,12 +4,13 @@ import (
 	"context"
 	"errors"
 	"fmt"
-
 	"github.com/bitcoin-sv/spv-wallet/engine/cluster"
 	"github.com/bitcoin-sv/spv-wallet/engine/notifications"
 	"github.com/bitcoin-sv/spv-wallet/engine/utils"
 	"github.com/bitcoinschema/go-bitcoin/v2"
 	"github.com/mrz1836/go-datastore"
+	"gorm.io/gorm/schema"
+	"sync"
 )
 
 // Destination is an object representing a BitCoin destination (address, script, etc)
@@ -165,32 +166,23 @@ func getDestinationsByXpubID(ctx context.Context, xPubID string, usingMetadata *
 
 	var dest Destination
 
-	dbConditions, err := utils.StructToMap(dest)
-
+	// Convert destination struct to map using GORM schema parsing
+	sch, err := schema.Parse(dest, &sync.Map{}, schema.NamingStrategy{})
 	if err != nil {
-		return nil, fmt.Errorf("cannot convert struct to map: %w", err)
+		return nil, fmt.Errorf("cannot parse schema: %w", err)
 	}
 
-	//dbConditions := map[string]interface{}{
-	//	idField:          "",
-	//	xPubIDField:      "",
-	//	"locking_script": "",
-	//	"type":           "",
-	//	"chain":          "",
-	//	"num":            "",
-	//	"address":        "",
-	//	"draft_id":       "",
-	//}
-	fmt.Printf("%+v", dbConditions)
+	dbConditions := make(map[string]interface{})
+
 	if conditions != nil {
 		for key, value := range *conditions {
 			// Sanitize user input
-			sanitizedValue := utils.SanitizeInput(value.(string))
-			if _, ok := dbConditions[key]; ok {
+			sanitizedValue := utils.SanitizeInput(fmt.Sprintf("%v", value))
+			if _, ok := sch.FieldsByName[key]; ok {
 				dbConditions[key] = sanitizedValue
+			} else {
+				return nil, fmt.Errorf("column does not exist: %s", key)
 			}
-
-			return nil, fmt.Errorf("column does not exist: %s", key)
 		}
 	}
 	dbConditions[xPubIDField] = xPubID
@@ -199,6 +191,9 @@ func getDestinationsByXpubID(ctx context.Context, xPubID string, usingMetadata *
 	if usingMetadata != nil {
 		dbConditions[metadataField] = usingMetadata
 	}
+
+	fmt.Printf("dbConditions %+v\n", dbConditions)
+	fmt.Printf("queryParams %+v\n", queryParams)
 
 	// Get the records
 	if err := getModels(
