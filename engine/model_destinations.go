@@ -4,12 +4,13 @@ import (
 	"context"
 	"errors"
 	"fmt"
-
 	"github.com/bitcoin-sv/spv-wallet/engine/cluster"
 	"github.com/bitcoin-sv/spv-wallet/engine/notifications"
 	"github.com/bitcoin-sv/spv-wallet/engine/utils"
 	"github.com/bitcoinschema/go-bitcoin/v2"
 	"github.com/mrz1836/go-datastore"
+	"gorm.io/gorm/schema"
+	"sync"
 )
 
 // Destination is an object representing a BitCoin destination (address, script, etc)
@@ -164,15 +165,36 @@ func getDestinationsByXpubID(ctx context.Context, xPubID string, usingMetadata *
 	// Construct an empty model
 	var models []Destination
 
-	dbConditions := map[string]interface{}{}
+	var dest Destination
+
+	// Convert destination struct to map using GORM schema parsing
+	sch, err := schema.Parse(dest, &sync.Map{}, schema.NamingStrategy{})
+	if err != nil {
+		return nil, fmt.Errorf("cannot parse schema: %w", err)
+	}
+
+	dbConditions := make(map[string]interface{})
+
 	if conditions != nil {
-		dbConditions = *conditions
+		for key, value := range *conditions {
+			// Sanitize user input
+			sanitizedValue := utils.SanitizeInput(fmt.Sprintf("%v", value))
+			if _, ok := sch.FieldsByName[key]; ok {
+				dbConditions[key] = sanitizedValue
+			} else {
+				return nil, fmt.Errorf("column does not exist: %s", key)
+			}
+		}
 	}
 	dbConditions[xPubIDField] = xPubID
+	//result[xPubIDField] = xPubID
 
 	if usingMetadata != nil {
 		dbConditions[metadataField] = usingMetadata
 	}
+
+	fmt.Printf("dbConditions %+v\n", dbConditions)
+	fmt.Printf("queryParams %+v\n", queryParams)
 
 	// Get the records
 	if err := getModels(
