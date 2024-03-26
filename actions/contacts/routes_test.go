@@ -14,7 +14,7 @@ func (ts *TestSuite) TestContactsRegisterRoutes() {
 			method string
 			url    string
 		}{
-			{"PUT", "/" + config.APIVersion + "/contact/{paymail}"},
+			{"PUT", "/" + config.APIVersion + "/contact/:paymail"},
 			{"GET", "/" + config.APIVersion + "/contacts"},
 		}
 
