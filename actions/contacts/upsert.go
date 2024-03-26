@@ -21,7 +21,7 @@ import (
 // @Param		paymail path string true "Paymail address of the contact the user wants to add/modify"
 // @Param		UpsertContact body contacts.UpsertContact true "Full name and metadata needed to add/modify contact"
 // @Success		201
-// @Router		/v1/contact/{paymail} [PUT]
+// @Router		/v1/contact/:paymail [PUT]
 // @Security	x-auth-xpub
 func (a *Action) upsert(c *gin.Context) {
 	requesterPubKey := c.GetString(auth.ParamXPubKey)
