@@ -30,9 +30,9 @@ type PaymailAddress struct {
 	Avatar     string `json:"avatar" toml:"avatar" yaml:"avatar" gorm:"<-;type:text;comment:This is avatar url" bson:"avatar"`                                                           // This is the url of the user (public profile)
 
 	ExternalXpubKey    string `json:"external_xpub_key" toml:"external_xpub_key" yaml:"external_xpub_key" gorm:"<-:create;type:varchar(512);index;comment:This is full xPub for external use, encryption optional" bson:"external_xpub_key"` // PublicKey hex encoded
-	ExternalXpubKeyNum uint32 `json:"external_xpub_num" toml:"external_xpub_num" yaml:"external_xpub_num" gorm:"<-;type:int not null;default:0;comment:Derivation number used to generate ExternalXpubKey:external_xpub_num"`
-	PubKeyNum          uint32 `json:"pubkey_num" toml:"pubkey_num" yaml:"pubkey_num" gorm:"<-;type:int not null;default:0;comment:Derivation number use to create PKI public key:pubkey_num"`
-	XpubDerivationSeq  uint32 `json:"xpub_derivation_seq" toml:"xpub_derivation_seq" yaml:"xpub_derivation_seq" gorm:"<-;type:int not null;default:0;comment:The index derivation number use to generate new external xpub child keys and rotate PubKey:xpub_derivation_seq"`
+	ExternalXpubKeyNum uint32 `json:"external_xpub_num" toml:"external_xpub_num" yaml:"external_xpub_num" gorm:"<-;type:int;default:0;comment:Derivation number used to generate ExternalXpubKey:external_xpub_num"`
+	PubKeyNum          uint32 `json:"pubkey_num" toml:"pubkey_num" yaml:"pubkey_num" gorm:"<-;type:int;default:0;comment:Derivation number use to create PKI public key:pubkey_num"`
+	XpubDerivationSeq  uint32 `json:"xpub_derivation_seq" toml:"xpub_derivation_seq" yaml:"xpub_derivation_seq" gorm:"<-;type:int;default:0;comment:The index derivation number use to generate new external xpub child keys and rotate PubKey:xpub_derivation_seq"`
 
 	// Private fields
 	externalXpubKeyDecrypted string
