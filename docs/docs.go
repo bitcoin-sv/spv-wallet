@@ -1057,7 +1057,7 @@ const docTemplate = `{
                         "x-auth-xpub": []
                     }
                 ],
-                "description": "Add or update contact. For new contact send request to add current user as contact",
+                "description": "Add or update contact. When adding a new contact, the system utilizes Paymail's PIKE capability to dispatch an invitation request, asking the counterparty to include the current user in their contacts.",
                 "produces": [
                     "application/json"
                 ],
@@ -2076,9 +2076,11 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "fullName": {
+                    "description": "The complete name of the contact, including first name, middle name (if applicable), and last name.",
                     "type": "string"
                 },
                 "metadata": {
+                    "description": "Accepts a JSON object for embedding custom metadata, enabling arbitrary additional information to be associated with the resource",
                     "type": "object",
                     "additionalProperties": {
                         "type": "string"
@@ -2089,7 +2091,7 @@ const docTemplate = `{
                     }
                 },
                 "requesterPaymail": {
-                    "description": "optional",
+                    "description": "Optional paymail address owned by the user to bind the contact to. It is required in case if user has multiple paymail addresses",
                     "type": "string"
                 }
             }
@@ -3198,41 +3200,9 @@ const docTemplate = `{
                 1000000,
                 1000000000,
                 60000000000,
-                3600000000000,
-                -9223372036854775808,
-                9223372036854775807,
-                1,
-                1000,
-                1000000,
-                1000000000,
-                60000000000,
-                3600000000000,
-                -9223372036854775808,
-                9223372036854775807,
-                1,
-                1000,
-                1000000,
-                1000000000,
-                60000000000,
                 3600000000000
             ],
             "x-enum-varnames": [
-                "minDuration",
-                "maxDuration",
-                "Nanosecond",
-                "Microsecond",
-                "Millisecond",
-                "Second",
-                "Minute",
-                "Hour",
-                "minDuration",
-                "maxDuration",
-                "Nanosecond",
-                "Microsecond",
-                "Millisecond",
-                "Second",
-                "Minute",
-                "Hour",
                 "minDuration",
                 "maxDuration",
                 "Nanosecond",

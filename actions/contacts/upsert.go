@@ -15,7 +15,7 @@ import (
 // upsert will add a new contact or modify an existing one.
 // Upsert contact godoc
 // @Summary		Upsert contact
-// @Description	Add or update contact. For new contact send request to add current user as contact
+// @Description	Add or update contact. When adding a new contact, the system utilizes Paymail's PIKE capability to dispatch an invitation request, asking the counterparty to include the current user in their contacts.
 // @Tags		Contact
 // @Produce		json
 // @Param		paymail path string true "Paymail address of the contact the user wants to add/modify"
