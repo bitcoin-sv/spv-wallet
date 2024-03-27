@@ -51,7 +51,7 @@ func mockClient(engine Engine) (*Client, *gorm.DB) {
 func makeWhereBuilder(client *Client, gdb *gorm.DB, model interface{}) *whereBuilder {
 	return &whereBuilder{
 		client: client,
-		gdb:    gdb.Model(model),
+		tx:     gdb.Model(model),
 		varNum: 0,
 	}
 }
@@ -118,8 +118,7 @@ func Test_processConditions(t *testing.T) {
 		client, gdb := mockClient(MySQL)
 
 		raw := gdb.ToSQL(func(tx *gorm.DB) *gorm.DB {
-			tx = tx.Model(mockObject{})
-			err := ApplyCustomWhere(client, tx, conditions)
+			tx, err := ApplyCustomWhere(client, tx, conditions, mockObject{})
 			assert.NoError(t, err)
 			return tx.First(&mockObject{})
 		})
@@ -133,8 +132,7 @@ func Test_processConditions(t *testing.T) {
 		client, gdb := mockClient(PostgreSQL)
 
 		raw := gdb.ToSQL(func(tx *gorm.DB) *gorm.DB {
-			tx = tx.Model(mockObject{})
-			err := ApplyCustomWhere(client, tx, conditions)
+			tx, err := ApplyCustomWhere(client, tx, conditions, mockObject{})
 			assert.NoError(t, err)
 			return tx.First(&mockObject{})
 		})
@@ -148,8 +146,7 @@ func Test_processConditions(t *testing.T) {
 		client, gdb := mockClient(SQLite)
 
 		raw := gdb.ToSQL(func(tx *gorm.DB) *gorm.DB {
-			tx = tx.Model(mockObject{})
-			err := ApplyCustomWhere(client, tx, conditions)
+			tx, err := ApplyCustomWhere(client, tx, conditions, mockObject{})
 			assert.NoError(t, err)
 			return tx.First(&mockObject{})
 		})
@@ -318,8 +315,7 @@ func TestCustomWhere(t *testing.T) {
 		conditions := map[string]interface{}{}
 
 		raw := gdb.ToSQL(func(tx *gorm.DB) *gorm.DB {
-			tx = tx.Model(mockObject{})
-			err := ApplyCustomWhere(client, tx, conditions)
+			tx, err := ApplyCustomWhere(client, tx, conditions, mockObject{})
 			assert.NoError(t, err)
 			return tx.First(&mockObject{})
 		})
@@ -336,8 +332,7 @@ func TestCustomWhere(t *testing.T) {
 		}
 
 		raw := gdb.ToSQL(func(tx *gorm.DB) *gorm.DB {
-			tx = tx.Model(mockObject{})
-			err := ApplyCustomWhere(client, tx, conditions)
+			tx, err := ApplyCustomWhere(client, tx, conditions, mockObject{})
 			assert.NoError(t, err)
 			return tx.First(&mockObject{})
 		})
@@ -361,8 +356,7 @@ func TestCustomWhere(t *testing.T) {
 		}
 
 		raw := gdb.ToSQL(func(tx *gorm.DB) *gorm.DB {
-			tx = tx.Model(mockObject{})
-			err := ApplyCustomWhere(client, tx, conditions)
+			tx, err := ApplyCustomWhere(client, tx, conditions, mockObject{})
 			assert.NoError(t, err)
 			return tx.First(&mockObject{})
 		})
@@ -388,8 +382,7 @@ func TestCustomWhere(t *testing.T) {
 		}
 
 		raw := gdb.ToSQL(func(tx *gorm.DB) *gorm.DB {
-			tx = tx.Model(mockObject{})
-			err := ApplyCustomWhere(client, tx, conditions)
+			tx, err := ApplyCustomWhere(client, tx, conditions, mockObject{})
 			assert.NoError(t, err)
 			return tx.First(&mockObject{})
 		})
@@ -408,8 +401,7 @@ func TestCustomWhere(t *testing.T) {
 		}
 
 		raw := gdb.ToSQL(func(tx *gorm.DB) *gorm.DB {
-			tx = tx.Model(mockObject{})
-			err := ApplyCustomWhere(client, tx, conditions)
+			tx, err := ApplyCustomWhere(client, tx, conditions, mockObject{})
 			assert.NoError(t, err)
 			return tx.First(&mockObject{})
 		})
@@ -426,8 +418,7 @@ func TestCustomWhere(t *testing.T) {
 		}
 
 		raw := gdb.ToSQL(func(tx *gorm.DB) *gorm.DB {
-			tx = tx.Model(mockObject{})
-			err := ApplyCustomWhere(client, tx, conditions)
+			tx, err := ApplyCustomWhere(client, tx, conditions, mockObject{})
 			assert.NoError(t, err)
 			return tx.First(&mockObject{})
 		})
@@ -444,8 +435,7 @@ func TestCustomWhere(t *testing.T) {
 		}
 
 		raw := gdb.ToSQL(func(tx *gorm.DB) *gorm.DB {
-			tx = tx.Model(mockObject{})
-			err := ApplyCustomWhere(client, tx, conditions)
+			tx, err := ApplyCustomWhere(client, tx, conditions, mockObject{})
 			assert.NoError(t, err)
 			return tx.First(&mockObject{})
 		})
@@ -475,8 +465,7 @@ func TestCustomWhere(t *testing.T) {
 		}
 
 		raw := gdb.ToSQL(func(tx *gorm.DB) *gorm.DB {
-			tx = tx.Model(mockObject{})
-			err := ApplyCustomWhere(client, tx, conditions)
+			tx, err := ApplyCustomWhere(client, tx, conditions, mockObject{})
 			assert.NoError(t, err)
 			return tx.First(&mockObject{})
 		})
@@ -508,8 +497,7 @@ func TestCustomWhere(t *testing.T) {
 		}
 
 		raw := gdb.ToSQL(func(tx *gorm.DB) *gorm.DB {
-			tx = tx.Model(mockObject{})
-			err := ApplyCustomWhere(client, tx, conditions)
+			tx, err := ApplyCustomWhere(client, tx, conditions, mockObject{})
 			assert.NoError(t, err)
 			return tx.First(&mockObject{})
 		})
@@ -541,8 +529,7 @@ func TestCustomWhere(t *testing.T) {
 		}
 
 		raw := gdb.ToSQL(func(tx *gorm.DB) *gorm.DB {
-			tx = tx.Model(mockObject{})
-			err := ApplyCustomWhere(client, tx, conditions)
+			tx, err := ApplyCustomWhere(client, tx, conditions, mockObject{})
 			assert.NoError(t, err)
 			return tx.First(&mockObject{})
 		})
@@ -562,8 +549,7 @@ func TestCustomWhere(t *testing.T) {
 		}
 
 		raw := gdb.ToSQL(func(tx *gorm.DB) *gorm.DB {
-			tx = tx.Model(mockObject{})
-			err := ApplyCustomWhere(client, tx, conditions)
+			tx, err := ApplyCustomWhere(client, tx, conditions, mockObject{})
 			assert.NoError(t, err)
 			return tx.First(&mockObject{})
 		})
@@ -587,8 +573,7 @@ func TestCustomWhere(t *testing.T) {
 		}
 
 		raw := gdb.ToSQL(func(tx *gorm.DB) *gorm.DB {
-			tx = tx.Model(mockObject{})
-			err := ApplyCustomWhere(client, tx, conditions)
+			tx, err := ApplyCustomWhere(client, tx, conditions, mockObject{})
 			assert.NoError(t, err)
 			return tx.First(&mockObject{})
 		})
@@ -616,8 +601,7 @@ func TestCustomWhere(t *testing.T) {
 		}
 
 		raw := gdb.ToSQL(func(tx *gorm.DB) *gorm.DB {
-			tx = tx.Model(mockObject{})
-			err := ApplyCustomWhere(client, tx, conditions)
+			tx, err := ApplyCustomWhere(client, tx, conditions, mockObject{})
 			assert.NoError(t, err)
 			return tx.First(&mockObject{})
 		})
@@ -663,8 +647,7 @@ func TestCustomWhere(t *testing.T) {
 		}
 
 		raw := gdb.ToSQL(func(tx *gorm.DB) *gorm.DB {
-			tx = tx.Model(mockObject{})
-			err := ApplyCustomWhere(client, tx, conditions)
+			tx, err := ApplyCustomWhere(client, tx, conditions, mockObject{})
 			assert.NoError(t, err)
 			return tx.First(&mockObject{})
 		})

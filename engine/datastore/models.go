@@ -143,20 +143,6 @@ func convertToInt64(i interface{}) int64 {
 	return i.(int64)
 }
 
-type gormWhere struct {
-	tx *gorm.DB
-}
-
-// Where will help fire the tx.Where method
-func (g *gormWhere) Where(query interface{}, args ...interface{}) {
-	g.tx.Where(query, args...)
-}
-
-// getGormTx returns the GORM db tx
-func (g *gormWhere) getGormTx() *gorm.DB {
-	return g.tx
-}
-
 // GetModel will get a model from the datastore
 func (c *Client) GetModel(
 	ctx context.Context,
@@ -176,21 +162,17 @@ func (c *Client) GetModel(
 	ctxDB, cancel := createCtx(ctx, c.options.db, timeout, c.IsDebug(), c.options.loggerDB)
 	defer cancel()
 
-	// Get the model data using a select
-	// todo: optimize by specific fields
-	var tx *gorm.DB
-	if forceWriteDB { // Use the "write" database for this query (Only MySQL and Postgres)
-		if c.Engine() == MySQL || c.Engine() == PostgreSQL {
-			tx = ctxDB.Clauses(dbresolver.Write).Select("*")
-		} else {
-			tx = ctxDB.Select("*")
-		}
-	} else { // Use a replica if found
-		tx = ctxDB.Select("*")
+	tx := ctxDB.Model(model)
+
+	if forceWriteDB && (c.Engine() == MySQL || c.Engine() == PostgreSQL) {
+		tx = ctxDB.Clauses(dbresolver.Write)
 	}
 
+	tx = tx.Select("*") // todo: optimize by specific fields
+
 	if len(conditions) > 0 {
-		if err := ApplyCustomWhere(c, tx, conditions); err != nil {
+		var err error
+		if tx, err = ApplyCustomWhere(c, tx, conditions, model); err != nil {
 			return err
 		}
 	}
@@ -293,7 +275,8 @@ func (c *Client) find(ctx context.Context, result interface{}, conditions map[st
 	}
 
 	if len(conditions) > 0 {
-		if err := ApplyCustomWhere(c, tx, conditions); err != nil {
+		var err error
+		if tx, err = ApplyCustomWhere(c, tx, conditions, result); err != nil {
 			return err
 		}
 	}
@@ -317,7 +300,8 @@ func (c *Client) count(ctx context.Context, model interface{}, conditions map[st
 
 	// Check for errors or no records found
 	if len(conditions) > 0 {
-		if err := ApplyCustomWhere(c, tx, conditions); err != nil {
+		var err error
+		if tx, err = ApplyCustomWhere(c, tx, conditions, model); err != nil {
 			return 0, err
 		}
 	}
@@ -346,10 +330,11 @@ func (c *Client) aggregate(ctx context.Context, model interface{}, conditions ma
 	// Check for errors or no records found
 	var aggregate []map[string]interface{}
 	if len(conditions) > 0 {
-		if err := ApplyCustomWhere(c, tx, conditions); err != nil {
+		var err error
+		if tx, err = ApplyCustomWhere(c, tx, conditions, model); err != nil {
 			return nil, err
 		}
-		err := checkResult(tx.Group(aggregateColumn).Scan(&aggregate))
+		err = checkResult(tx.Group(aggregateColumn).Scan(&aggregate))
 		if err != nil {
 			return nil, err
 		}

@@ -40,26 +40,29 @@ func (tx *txAccumulator) Where(query interface{}, args ...interface{}) *gorm.DB 
 // whereBuilder holds a state during custom where preparation
 type whereBuilder struct {
 	client ClientInterface
-	gdb    *gorm.DB
+	tx     *gorm.DB
 	varNum int
 }
 
-// ApplyCustomWhere adds conditions (in-place) to the gorm db instance
-func ApplyCustomWhere(client ClientInterface, gdb *gorm.DB, conditions map[string]interface{}) (err error) {
+// ApplyCustomWhere adds conditions to the gorm db instance
+// it returns a tx of type *gorm.DB with a model and conditions applied
+func ApplyCustomWhere(client ClientInterface, gdb *gorm.DB, conditions map[string]interface{}, model interface{}) (tx *gorm.DB, err error) {
 	defer func() {
 		if r := recover(); r != nil {
 			err = fmt.Errorf("error processing conditions: %v", r)
 		}
 	}()
 
+	tx = gdb.Model(model)
+
 	builder := &whereBuilder{
 		client: client,
-		gdb:    gdb,
+		tx:     tx,
 		varNum: 0,
 	}
 
-	builder.processConditions(gdb, conditions, nil)
-	return nil
+	builder.processConditions(tx, conditions, nil)
+	return
 }
 
 func (builder *whereBuilder) nextVarName() string {
@@ -68,17 +71,17 @@ func (builder *whereBuilder) nextVarName() string {
 	return varName
 }
 
-func (builder *whereBuilder) getColumnNameOrPanic(columnName string, model interface{}) string {
-	columnName, ok := GetColumnName(columnName, model, builder.gdb)
+func (builder *whereBuilder) getColumnNameOrPanic(key string) string {
+	columnName, ok := GetColumnName(key, builder.tx.Statement.Model, builder.tx)
 	if !ok {
-		panic(fmt.Errorf("column %s does not exist in the model", columnName))
+		panic(fmt.Errorf("column %s does not exist in the model", key))
 	}
 
 	return columnName
 }
 
 func (builder *whereBuilder) applyCondition(tx customWhereInterface, key string, operator string, condition interface{}) {
-	columnName := builder.getColumnNameOrPanic(key, builder.gdb.Statement.Model)
+	columnName := builder.getColumnNameOrPanic(key)
 
 	varName := builder.nextVarName()
 	query := fmt.Sprintf("%s %s @%s", columnName, operator, varName)
@@ -86,7 +89,7 @@ func (builder *whereBuilder) applyCondition(tx customWhereInterface, key string,
 }
 
 func (builder *whereBuilder) applyExistsCondition(tx customWhereInterface, key string, condition bool) {
-	columnName := builder.getColumnNameOrPanic(key, builder.gdb.Statement.Model)
+	columnName := builder.getColumnNameOrPanic(key)
 
 	operator := "IS NULL"
 	if condition {
@@ -169,7 +172,12 @@ func (builder *whereBuilder) processWhereAnd(tx customWhereInterface, condition 
 		builder.processConditions(accumulator, c, nil)
 	}
 
-	tx.Where(" ( "+strings.Join(accumulator.WhereClauses, " AND ")+" ) ", accumulator.Vars)
+	query := " ( " + strings.Join(accumulator.WhereClauses, " AND ") + " ) "
+	if len(accumulator.Vars) > 0 {
+		tx.Where(query, accumulator.Vars)
+	} else {
+		tx.Where(query)
+	}
 }
 
 // processWhereOr will process the OR statements
@@ -190,7 +198,12 @@ func (builder *whereBuilder) processWhereOr(tx customWhereInterface, condition i
 		or = append(or, strings.Join(statement[:], " AND "))
 	}
 
-	tx.Where(" ( ("+strings.Join(or, ") OR (")+") ) ", orVars)
+	query := " ( (" + strings.Join(or, ") OR (") + ") ) "
+	if len(orVars) > 0 {
+		tx.Where(query, orVars)
+	} else {
+		tx.Where(query)
+	}
 }
 
 // escapeDBString will escape the database string
