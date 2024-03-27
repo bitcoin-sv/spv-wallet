@@ -30,8 +30,6 @@ require (
 	github.com/swaggo/swag v1.16.3
 )
 
-require github.com/DATA-DOG/go-sqlmock v1.5.2 // indirect
-
 require (
 	github.com/99designs/gqlgen v0.17.43 // indirect
 	github.com/KyleBanks/depth v1.2.1 // indirect
