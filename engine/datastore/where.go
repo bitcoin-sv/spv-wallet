@@ -6,24 +6,23 @@ import (
 	"reflect"
 	"strconv"
 	"strings"
-	"sync"
 
 	customtypes "github.com/bitcoin-sv/spv-wallet/engine/datastore/customtypes"
 	"gorm.io/gorm"
-	"gorm.io/gorm/schema"
 )
 
-type CustomWhereInterface interface {
+// customWhereInterface with single method Where which aligns with gorm.DB.Where
+type customWhereInterface interface {
 	Where(query interface{}, args ...interface{}) *gorm.DB
 }
 
+// txAccumulator holds the state of the nested conditions for recursive processing
 type txAccumulator struct {
-	CustomWhereInterface
 	WhereClauses []string
 	Vars         map[string]interface{}
 }
 
-// Where is our custom where method
+// Where makes txAccumulator implement customWhereInterface which will overload gorm.DB.Where behavior
 func (tx *txAccumulator) Where(query interface{}, args ...interface{}) *gorm.DB {
 	tx.WhereClauses = append(tx.WhereClauses, query.(string))
 
@@ -38,14 +37,14 @@ func (tx *txAccumulator) Where(query interface{}, args ...interface{}) *gorm.DB 
 	return nil
 }
 
-// WhereBuilder holds a state during custom where preparation
-type WhereBuilder struct {
+// whereBuilder holds a state during custom where preparation
+type whereBuilder struct {
 	client ClientInterface
 	gdb    *gorm.DB
 	varNum int
 }
 
-// ApplyCustomWhere adds conditions to the gorm db instance
+// ApplyCustomWhere adds conditions (in-place) to the gorm db instance
 func ApplyCustomWhere(client ClientInterface, gdb *gorm.DB, conditions map[string]interface{}) (err error) {
 	defer func() {
 		if r := recover(); r != nil {
@@ -53,7 +52,7 @@ func ApplyCustomWhere(client ClientInterface, gdb *gorm.DB, conditions map[strin
 		}
 	}()
 
-	builder := &WhereBuilder{
+	builder := &whereBuilder{
 		client: client,
 		gdb:    gdb,
 		varNum: 0,
@@ -63,38 +62,31 @@ func ApplyCustomWhere(client ClientInterface, gdb *gorm.DB, conditions map[strin
 	return nil
 }
 
-func (builder *WhereBuilder) nextVarName() string {
+func (builder *whereBuilder) nextVarName() string {
 	varName := "var" + strconv.Itoa(builder.varNum)
 	builder.varNum++
 	return varName
 }
 
-func getColumnName(columnName string, model interface{}) string {
-	sch, err := schema.Parse(model, &sync.Map{}, schema.NamingStrategy{})
-	if err != nil {
-		panic(fmt.Errorf("cannot parse a model %v", model))
-	}
-	if field, ok := sch.FieldsByDBName[columnName]; ok {
-		return field.DBName
+func (builder *whereBuilder) getColumnNameOrPanic(columnName string, model interface{}) string {
+	columnName, ok := GetColumnName(columnName, model, builder.gdb)
+	if !ok {
+		panic(fmt.Errorf("column %s does not exist in the model", columnName))
 	}
 
-	if field, ok := sch.FieldsByName[columnName]; ok {
-		return field.DBName
-	}
-
-	panic(fmt.Errorf("column %s does not exist in the model", columnName))
+	return columnName
 }
 
-func (builder *WhereBuilder) applyCondition(tx CustomWhereInterface, key string, operator string, condition interface{}) {
-	columnName := getColumnName(key, builder.gdb.Statement.Model)
+func (builder *whereBuilder) applyCondition(tx customWhereInterface, key string, operator string, condition interface{}) {
+	columnName := builder.getColumnNameOrPanic(key, builder.gdb.Statement.Model)
 
 	varName := builder.nextVarName()
 	query := fmt.Sprintf("%s %s @%s", columnName, operator, varName)
 	tx.Where(query, map[string]interface{}{varName: builder.formatCondition(condition)})
 }
 
-func (builder *WhereBuilder) applyExistsCondition(tx CustomWhereInterface, key string, condition bool) {
-	columnName := getColumnName(key, builder.gdb.Statement.Model)
+func (builder *whereBuilder) applyExistsCondition(tx customWhereInterface, key string, condition bool) {
+	columnName := builder.getColumnNameOrPanic(key, builder.gdb.Statement.Model)
 
 	operator := "IS NULL"
 	if condition {
@@ -104,8 +96,7 @@ func (builder *WhereBuilder) applyExistsCondition(tx CustomWhereInterface, key s
 }
 
 // processConditions will process all conditions
-func (builder *WhereBuilder) processConditions(tx CustomWhereInterface, conditions map[string]interface{}, parentKey *string,
-) {
+func (builder *whereBuilder) processConditions(tx customWhereInterface, conditions map[string]interface{}, parentKey *string) {
 	for key, condition := range conditions {
 		if key == conditionAnd {
 			builder.processWhereAnd(tx, condition)
@@ -149,7 +140,7 @@ func (builder *WhereBuilder) processConditions(tx CustomWhereInterface, conditio
 }
 
 // formatCondition will format the conditions
-func (builder *WhereBuilder) formatCondition(condition interface{}) interface{} {
+func (builder *whereBuilder) formatCondition(condition interface{}) interface{} {
 	switch v := condition.(type) {
 	case customtypes.NullTime:
 		if v.Valid {
@@ -169,7 +160,7 @@ func (builder *WhereBuilder) formatCondition(condition interface{}) interface{} 
 }
 
 // processWhereAnd will process the AND statements
-func (builder *WhereBuilder) processWhereAnd(tx CustomWhereInterface, condition interface{}) {
+func (builder *whereBuilder) processWhereAnd(tx customWhereInterface, condition interface{}) {
 	accumulator := &txAccumulator{
 		WhereClauses: make([]string, 0),
 		Vars:         make(map[string]interface{}),
@@ -182,7 +173,7 @@ func (builder *WhereBuilder) processWhereAnd(tx CustomWhereInterface, condition 
 }
 
 // processWhereOr will process the OR statements
-func (builder *WhereBuilder) processWhereOr(tx CustomWhereInterface, condition interface{}) {
+func (builder *whereBuilder) processWhereOr(tx customWhereInterface, condition interface{}) {
 	or := make([]string, 0)
 	orVars := make(map[string]interface{})
 	for _, cond := range condition.([]map[string]interface{}) {
@@ -209,7 +200,7 @@ func escapeDBString(s string) string {
 }
 
 // whereObject generates the where object
-func (builder *WhereBuilder) whereObject(k string, v interface{}) string {
+func (builder *whereBuilder) whereObject(k string, v interface{}) string {
 	queryParts := make([]string, 0)
 
 	// we don't know the type, we handle the rangeValue as a map[string]interface{}
@@ -262,7 +253,7 @@ func (builder *WhereBuilder) whereObject(k string, v interface{}) string {
 }
 
 // whereSlice generates the where slice
-func (builder *WhereBuilder) whereSlice(k string, v interface{}) string {
+func (builder *whereBuilder) whereSlice(k string, v interface{}) string {
 	engine := builder.client.Engine()
 	if engine == MySQL {
 		return "JSON_CONTAINS(" + k + ", CAST('[\"" + v.(string) + "\"]' AS JSON))"

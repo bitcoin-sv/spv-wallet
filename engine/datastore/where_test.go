@@ -48,8 +48,8 @@ func mockClient(engine Engine) (*Client, *gorm.DB) {
 	return client, gdb
 }
 
-func makeWhereBuilder(client *Client, gdb *gorm.DB, model interface{}) *WhereBuilder {
-	return &WhereBuilder{
+func makeWhereBuilder(client *Client, gdb *gorm.DB, model interface{}) *whereBuilder {
+	return &whereBuilder{
 		client: client,
 		gdb:    gdb.Model(model),
 		varNum: 0,
