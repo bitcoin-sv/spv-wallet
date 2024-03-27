@@ -3,8 +3,8 @@ package engine
 import (
 	"context"
 
+	"github.com/bitcoin-sv/spv-wallet/engine/datastore"
 	"github.com/bitcoin-sv/spv-wallet/engine/notifications"
-	"github.com/mrz1836/go-datastore"
 )
 
 // GetModelTableName will get the db table name of the current model

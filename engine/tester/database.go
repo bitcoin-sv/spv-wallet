@@ -6,13 +6,13 @@ import (
 	"os"
 	"time"
 
+	"github.com/bitcoin-sv/spv-wallet/engine/datastore"
 	sqle "github.com/dolthub/go-mysql-server"
 	"github.com/dolthub/go-mysql-server/memory"
 	"github.com/dolthub/go-mysql-server/server"
 	"github.com/dolthub/go-mysql-server/sql"
 	"github.com/dolthub/go-mysql-server/sql/information_schema"
 	embeddedPostgres "github.com/fergusstrange/embedded-postgres"
-	"github.com/mrz1836/go-datastore"
 	"github.com/tryvium-travels/memongo"
 )
 
@@ -36,7 +36,6 @@ func (a AnyGUID) Match(v driver.Value) bool {
 
 // CreatePostgresServer will create a new Postgresql server
 func CreatePostgresServer(port uint32) (*embeddedPostgres.EmbeddedPostgres, error) {
-
 	// Create the new database
 	postgres := embeddedPostgres.NewDatabase(embeddedPostgres.DefaultConfig().Port(port))
 	if postgres == nil {
