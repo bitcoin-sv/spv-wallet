@@ -189,10 +189,10 @@ func (c *Client) GetModel(
 		tx = ctxDB.Select("*")
 	}
 
-	// Add conditions
 	if len(conditions) > 0 {
-		gtx := gormWhere{tx: tx}
-		return checkResult(c.CustomWhere(&gtx, conditions, c.Engine()).(*gorm.DB).Find(model))
+		if err := ApplyCustomWhere(c, tx, conditions); err != nil {
+			return err
+		}
 	}
 
 	return checkResult(tx.Find(model))
@@ -292,13 +292,10 @@ func (c *Client) find(ctx context.Context, result interface{}, conditions map[st
 		})
 	}
 
-	// Check for errors or no records found
 	if len(conditions) > 0 {
-		gtx := gormWhere{tx: tx}
-		if fieldResults != nil {
-			return checkResult(c.CustomWhere(&gtx, conditions, c.Engine()).(*gorm.DB).Find(fieldResults))
+		if err := ApplyCustomWhere(c, tx, conditions); err != nil {
+			return err
 		}
-		return checkResult(c.CustomWhere(&gtx, conditions, c.Engine()).(*gorm.DB).Find(result))
 	}
 
 	// Skip the conditions
@@ -320,10 +317,9 @@ func (c *Client) count(ctx context.Context, model interface{}, conditions map[st
 
 	// Check for errors or no records found
 	if len(conditions) > 0 {
-		gtx := gormWhere{tx: tx}
-		var count int64
-		err := checkResult(c.CustomWhere(&gtx, conditions, c.Engine()).(*gorm.DB).Model(model).Count(&count))
-		return count, err
+		if err := ApplyCustomWhere(c, tx, conditions); err != nil {
+			return 0, err
+		}
 	}
 	var count int64
 	err := checkResult(tx.Count(&count))
@@ -350,8 +346,10 @@ func (c *Client) aggregate(ctx context.Context, model interface{}, conditions ma
 	// Check for errors or no records found
 	var aggregate []map[string]interface{}
 	if len(conditions) > 0 {
-		gtx := gormWhere{tx: tx}
-		err := checkResult(c.CustomWhere(&gtx, conditions, c.Engine()).(*gorm.DB).Model(model).Group(aggregateColumn).Scan(&aggregate))
+		if err := ApplyCustomWhere(c, tx, conditions); err != nil {
+			return nil, err
+		}
+		err := checkResult(tx.Group(aggregateColumn).Scan(&aggregate))
 		if err != nil {
 			return nil, err
 		}
