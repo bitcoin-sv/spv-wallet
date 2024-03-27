@@ -13,6 +13,7 @@ func MapToContactContract(c *engine.Contact) *models.Contact {
 	}
 
 	return &models.Contact{
+		ID:       c.ID,
 		Model:    *common.MapToContract(&c.Model),
 		FullName: c.FullName,
 		Paymail:  c.Paymail,
