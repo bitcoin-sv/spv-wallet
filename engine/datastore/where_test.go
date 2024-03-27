@@ -97,8 +97,6 @@ func Test_whereSlice(t *testing.T) {
 func Test_processConditions(t *testing.T) {
 	t.Parallel()
 
-	dateField := dateCreatedAt
-	uniqueField := "unique_field_name"
 	theTime := time.Date(2022, 4, 4, 15, 12, 37, 651387237, time.UTC)
 	nullTime := sql.NullTime{
 		Valid: true,
@@ -106,10 +104,10 @@ func Test_processConditions(t *testing.T) {
 	}
 
 	conditions := map[string]interface{}{
-		dateField: map[string]interface{}{
+		"created_at": map[string]interface{}{
 			conditionGreaterThan: customtypes.NullTime{NullTime: nullTime},
 		},
-		uniqueField: map[string]interface{}{
+		"unique_field_name": map[string]interface{}{
 			conditionExists: true,
 		},
 	}
@@ -658,6 +656,57 @@ func TestCustomWhere(t *testing.T) {
 		assert.Regexp(t, "number(.*)\\>\\=(.*)3203", raw)
 		assert.Regexp(t, "number(.*)\\<\\=(.*)4203", raw)
 		assert.Regexp(t, "AND(.+)OR(.+)AND", raw)
+	})
+}
+
+func Test_sqlInjectionSafety(t *testing.T) {
+	t.Parallel()
+
+	t.Run("injection as simple key", func(t *testing.T) {
+		client, gdb := mockClient(PostgreSQL)
+
+		conditions := map[string]interface{}{
+			"1=1 --": 12,
+		}
+
+		gdb.ToSQL(func(tx *gorm.DB) *gorm.DB {
+			tx, err := ApplyCustomWhere(client, tx, conditions, mockObject{})
+			assert.Error(t, err)
+			return tx.First(&mockObject{})
+		})
+	})
+
+	t.Run("injection in key as conditionExists", func(t *testing.T) {
+		client, gdb := mockClient(PostgreSQL)
+
+		conditions := map[string]interface{}{
+			"1=1 OR unique_field_name": map[string]interface{}{
+				conditionExists: true,
+			},
+		}
+
+		gdb.ToSQL(func(tx *gorm.DB) *gorm.DB {
+			tx, err := ApplyCustomWhere(client, tx, conditions, mockObject{})
+			assert.Error(t, err)
+			return tx.First(&mockObject{})
+		})
+	})
+
+	t.Run("injection in metadata", func(t *testing.T) {
+		client, gdb := mockClient(PostgreSQL)
+		conditions := map[string]interface{}{
+			metadataField: map[string]interface{}{
+				"1=1; DELETE FROM users": "field_value",
+			},
+		}
+
+		raw := gdb.ToSQL(func(tx *gorm.DB) *gorm.DB {
+			tx, err := ApplyCustomWhere(client, tx, conditions, mockObject{})
+			assert.NoError(t, err)
+			return tx.First(&mockObject{})
+		})
+
+		assert.Contains(t, raw, `'{"1=1; DELETE FROM users":"field_value"}'`)
 	})
 }
 
