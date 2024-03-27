@@ -591,7 +591,7 @@ func TestWithModels(t *testing.T) {
 
 	t.Run("add custom models", func(t *testing.T) {
 		opts := DefaultClientOpts(false, true)
-		opts = append(opts, WithModels(newPaymail(testPaymail)))
+		opts = append(opts, WithModels(newPaymail(testPaymail, 0)))
 		opts = append(opts, WithLogger(&testLogger))
 
 		tc, err := NewClient(tester.GetNewRelicCtx(t, defaultNewRelicApp, defaultNewRelicTx), opts...)
@@ -803,7 +803,7 @@ func TestWithAutoMigrate(t *testing.T) {
 
 	t.Run("one additional model", func(t *testing.T) {
 		opts := DefaultClientOpts(false, true)
-		opts = append(opts, WithAutoMigrate(newPaymail(testPaymail)))
+		opts = append(opts, WithAutoMigrate(newPaymail(testPaymail, 0)))
 		opts = append(opts, WithLogger(&testLogger))
 
 		tc, err := NewClient(tester.GetNewRelicCtx(t, defaultNewRelicApp, defaultNewRelicTx), opts...)

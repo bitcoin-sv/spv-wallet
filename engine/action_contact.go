@@ -103,12 +103,13 @@ func (c *Client) GetPubKeyFromPki(pkiUrl, paymailAddress string) (string, error)
 }
 
 func (c *Client) GetPaymailCapability(ctx context.Context, paymailAddress string) (*paymail.CapabilitiesPayload, error) {
-	address := newPaymail(paymailAddress)
+	_, domain, _ := paymail.SanitizePaymail(paymailAddress)
 
 	cs := c.Cachestore()
 	pc := c.PaymailClient()
-
-	capabilities, err := getCapabilities(ctx, cs, pc, address.Domain)
+  
+	capabilities, err := getCapabilities(ctx, cs, pc, domain)
+  
 	if err != nil {
 		if errors.Is(err, cachestore.ErrKeyNotFound) {
 			return nil, nil
