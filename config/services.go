@@ -281,6 +281,10 @@ func loadPaymail(appConfig *AppConfig, options []engine.ClientOps) []engine.Clie
 	if pm.Beef.enabled() {
 		options = append(options, engine.WithPaymailBeefSupport(pm.Beef.BlockHeaderServiceHeaderValidationURL, pm.Beef.BlockHeaderServiceAuthToken))
 	}
+	if appConfig.ExperimentalFeatures.PikeEnabled {
+		options = append(options, engine.WithPaymailPikeSupport())
+	}
+
 	return options
 }
 

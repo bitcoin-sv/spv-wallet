@@ -523,6 +523,12 @@ func WithPaymailServerConfig(config *server.Configuration, defaultFromPaymail st
 	}
 }
 
+func WithPaymailPikeSupport() ClientOps {
+	return func(c *clientOptions) {
+		c.paymail.serverConfig.options = append(c.paymail.serverConfig.options, server.WithPikeCapabilities())
+	}
+}
+
 // -----------------------------------------------------------------
 // TASK MANAGER
 // -----------------------------------------------------------------

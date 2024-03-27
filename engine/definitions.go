@@ -111,11 +111,6 @@ const (
 	statusReady      = "ready"
 	statusSkipped    = "skipped"
 
-	// Contact statuses
-	notConfirmed       = "not confirmed"
-	awaitingAcceptance = "awaiting acceptance"
-	confirmed          = "confirmed"
-
 	// Paymail / Handles
 	cacheKeyAddressResolution = "paymail-address-resolution-"
 	cacheKeyCapabilities      = "paymail-capabilities-"

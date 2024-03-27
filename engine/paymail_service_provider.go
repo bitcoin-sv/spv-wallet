@@ -9,6 +9,7 @@ import (
 	"github.com/bitcoin-sv/go-paymail/beef"
 	"github.com/bitcoin-sv/go-paymail/server"
 	"github.com/bitcoin-sv/go-paymail/spv"
+
 	"github.com/bitcoin-sv/spv-wallet/engine/chainstate"
 	"github.com/bitcoin-sv/spv-wallet/engine/utils"
 	"github.com/bitcoinschema/go-bitcoin/v2"
@@ -200,22 +201,30 @@ func (p *PaymailDefaultServiceProvider) VerifyMerkleRoots(
 	return
 }
 
-func buildBtTx(p2pTx *paymail.P2PTransaction) *bt.Tx {
-	if p2pTx.DecodedBeef != nil {
-		res := p2pTx.DecodedBeef.GetLatestTx()
-		for _, input := range res.Inputs {
-			prevTxDt := find(p2pTx.DecodedBeef.Transactions, func(tx *beef.TxData) bool { return tx.Transaction.TxID() == input.PreviousTxIDStr() })
-
-			o := (*prevTxDt).Transaction.Outputs[input.PreviousTxOutIndex]
-			input.PreviousTxSatoshis = o.Satoshis
-			input.PreviousTxScript = o.LockingScript
-		}
-
-		return res
+func (p *PaymailDefaultServiceProvider) AddContact(
+	ctx context.Context,
+	requesterPaymailAddress string,
+	contact *paymail.PikeContactRequestPayload,
+) (err error) {
+	if metrics, enabled := p.client.Metrics(); enabled {
+		end := metrics.TrackAddContact()
+		defer func() {
+			success := err == nil
+			end(success)
+		}()
 	}
 
-	res, _ := bt.NewTxFromString(p2pTx.Hex)
-	return res
+	reqPaymail, err := getPaymailAddress(ctx, requesterPaymailAddress, p.client.DefaultModelOptions()...)
+	if err != nil {
+		return
+	}
+	if reqPaymail == nil {
+		err = ErrInvalidRequesterXpub
+		return
+	}
+
+	_, err = p.client.AddContactRequest(ctx, contact.FullName, contact.Paymail, reqPaymail.XpubID)
+	return
 }
 
 func (p *PaymailDefaultServiceProvider) getDestinationForPaymail(ctx context.Context, alias, domain string, metadata Metadata) (*Destination, error) {
@@ -276,6 +285,24 @@ func createLockingScript(ecPubKey *bec.PublicKey) (lockingScript string, err err
 
 	lockingScript, err = bitcoin.ScriptFromAddress(address)
 	return
+}
+
+func buildBtTx(p2pTx *paymail.P2PTransaction) *bt.Tx {
+	if p2pTx.DecodedBeef != nil {
+		res := p2pTx.DecodedBeef.GetLatestTx()
+		for _, input := range res.Inputs {
+			prevTxDt := find(p2pTx.DecodedBeef.Transactions, func(tx *beef.TxData) bool { return tx.Transaction.TxID() == input.PreviousTxIDStr() })
+
+			o := (*prevTxDt).Transaction.Outputs[input.PreviousTxOutIndex]
+			input.PreviousTxSatoshis = o.Satoshis
+			input.PreviousTxScript = o.LockingScript
+		}
+
+		return res
+	}
+
+	res, _ := bt.NewTxFromString(p2pTx.Hex)
+	return res
 }
 
 func saveBEEFTxInputs(ctx context.Context, c ClientInterface, dBeef *beef.DecodedBEEF) {
