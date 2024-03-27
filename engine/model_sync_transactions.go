@@ -3,8 +3,8 @@ package engine
 import (
 	"context"
 
-	"github.com/mrz1836/go-datastore"
-	customTypes "github.com/mrz1836/go-datastore/custom_types"
+	"github.com/bitcoin-sv/spv-wallet/engine/datastore"
+	customTypes "github.com/bitcoin-sv/spv-wallet/engine/datastore/customtypes"
 )
 
 // SyncTransaction is an object representing the chain-state sync configuration and results for a given transaction

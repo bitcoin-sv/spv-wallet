@@ -6,8 +6,8 @@ import (
 	"fmt"
 
 	"github.com/bitcoin-sv/go-paymail"
+	"github.com/bitcoin-sv/spv-wallet/engine/datastore"
 	"github.com/bitcoin-sv/spv-wallet/engine/utils"
-	"github.com/mrz1836/go-datastore"
 )
 
 type Contact struct {
@@ -37,7 +37,6 @@ func newContact(fullName, paymailAddress, senderPubKey string, opts ...ModelOps)
 	}
 
 	sanitizedPaymail, err := paymail.ValidateAndSanitisePaymail(paymailAddress, false)
-
 	if err != nil {
 		return nil, err
 	}
@@ -52,7 +51,6 @@ func newContact(fullName, paymailAddress, senderPubKey string, opts ...ModelOps)
 }
 
 func getContact(ctx context.Context, fullName, paymailAddress, senderPubKey string, opts ...ModelOps) (*Contact, error) {
-
 	contact := &Contact{
 		FullName: fullName,
 		Paymail:  paymailAddress,
@@ -78,7 +76,6 @@ func getContact(ctx context.Context, fullName, paymailAddress, senderPubKey stri
 }
 
 func getContactByXPubIdAndRequesterPubKey(ctx context.Context, xPubId, paymailAddr string, opts ...ModelOps) (*Contact, error) {
-
 	if xPubId == "" {
 		return nil, fmt.Errorf("xpub_id is empty")
 	}
@@ -116,7 +113,6 @@ func getContacts(ctx context.Context, metadata *Metadata, conditions *map[string
 	}
 
 	return contacts, nil
-
 }
 
 func (c *Contact) GetModelName() string {
@@ -176,7 +172,6 @@ func (c *Contact) AfterCreated(_ context.Context) error {
 
 // Migrate model specific migration on startup
 func (c *Contact) Migrate(client datastore.ClientInterface) error {
-
 	tableName := client.GetTableName(tableContacts)
 	if client.Engine() == datastore.MySQL {
 		if err := c.migrateMySQL(client, tableName); err != nil {

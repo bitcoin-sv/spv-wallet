@@ -4,7 +4,7 @@ import (
 	"context"
 	"time"
 
-	"github.com/mrz1836/go-datastore"
+	"github.com/bitcoin-sv/spv-wallet/engine/datastore"
 	"github.com/pkg/errors"
 )
 

@@ -10,11 +10,11 @@ import (
 
 	"github.com/DATA-DOG/go-sqlmock"
 	"github.com/bitcoin-sv/spv-wallet/engine/chainstate"
+	"github.com/bitcoin-sv/spv-wallet/engine/datastore"
 	"github.com/bitcoin-sv/spv-wallet/engine/taskmanager"
 	"github.com/bitcoin-sv/spv-wallet/engine/tester"
 	"github.com/dolthub/go-mysql-server/server"
 	embeddedPostgres "github.com/fergusstrange/embedded-postgres"
-	"github.com/mrz1836/go-datastore"
 	"github.com/rs/zerolog/log"
 	"github.com/stretchr/testify/require"
 	"github.com/stretchr/testify/suite"
@@ -69,7 +69,6 @@ func (ts *EmbeddedDBTestSuite) serveMySQL() {
 	if err != nil {
 		log.Error().Msgf("mysql server error: %s", err.Error())
 	}
-
 }
 
 // SetupSuite runs at the start of the suite

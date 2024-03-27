@@ -3,8 +3,8 @@ package engine
 import (
 	"testing"
 
+	"github.com/bitcoin-sv/spv-wallet/engine/datastore"
 	"github.com/bitcoin-sv/spv-wallet/engine/utils"
-	"github.com/mrz1836/go-datastore"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -48,7 +48,6 @@ func Test_newContact(t *testing.T) {
 	})
 
 	t.Run("empty pubKey", func(t *testing.T) {
-
 		contact, err := newContact(fullName, paymailTest, "")
 
 		require.Nil(t, contact)
@@ -169,6 +168,7 @@ func Test_getContactByXPubIdAndPubKey(t *testing.T) {
 		require.Error(t, err)
 	})
 }
+
 func Test_getContacts(t *testing.T) {
 	t.Run("status 'not confirmed'", func(t *testing.T) {
 		ctx, client, deferMe := CreateTestSQLiteClient(t, false, false, withTaskManagerMockup())
@@ -225,6 +225,5 @@ func Test_getContacts(t *testing.T) {
 
 		require.NoError(t, err)
 		assert.Equal(t, 0, len(contacts))
-
 	})
 }

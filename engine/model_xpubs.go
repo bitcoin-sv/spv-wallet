@@ -5,8 +5,8 @@ import (
 	"errors"
 	"fmt"
 
+	"github.com/bitcoin-sv/spv-wallet/engine/datastore"
 	"github.com/bitcoin-sv/spv-wallet/engine/utils"
-	"github.com/mrz1836/go-datastore"
 )
 
 // Xpub is an object representing an HD-Key or extended public key (xPub for short)

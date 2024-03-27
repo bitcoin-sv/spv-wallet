@@ -4,8 +4,8 @@ import (
 	"context"
 	"time"
 
+	"github.com/bitcoin-sv/spv-wallet/engine/datastore"
 	"github.com/bitcoin-sv/spv-wallet/engine/utils"
-	"github.com/mrz1836/go-datastore"
 )
 
 // NewAccessKey will create a new access key for the given xpub
