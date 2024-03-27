@@ -9,7 +9,7 @@ import (
 
 var modelsCache = sync.Map{}
 
-// GetColumnName checks if the the model has provided columnName as DBName or (struct field)Name
+// GetColumnName checks if the model has provided columnName as DBName or (struct field)Name
 // Returns (DBName, true) if the column exists otherwise (_, false)
 // Uses global cache store (thread safe)
 // Checking is case-sensitive
