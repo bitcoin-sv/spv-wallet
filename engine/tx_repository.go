@@ -4,8 +4,8 @@ import (
 	"context"
 	"errors"
 
+	"github.com/bitcoin-sv/spv-wallet/engine/datastore"
 	"github.com/libsv/go-bt"
-	"github.com/mrz1836/go-datastore"
 )
 
 // getTransactionByID will get the model from a given transaction ID

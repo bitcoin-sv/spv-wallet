@@ -7,10 +7,10 @@ import (
 	"fmt"
 
 	"github.com/bitcoin-sv/go-paymail"
+	"github.com/bitcoin-sv/spv-wallet/engine/datastore"
 	"github.com/bitcoin-sv/spv-wallet/engine/utils"
 	"github.com/bitcoinschema/go-bitcoin/v2"
 	"github.com/libsv/go-bk/bip32"
-	"github.com/mrz1836/go-datastore"
 )
 
 // PaymailAddress is an "external model example" - this model is not part of the standard models loaded and runtime

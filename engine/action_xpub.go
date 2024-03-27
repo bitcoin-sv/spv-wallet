@@ -3,7 +3,7 @@ package engine
 import (
 	"context"
 
-	"github.com/mrz1836/go-datastore"
+	"github.com/bitcoin-sv/spv-wallet/engine/datastore"
 )
 
 // NewXpub will parse the xPub and save it into the Datastore

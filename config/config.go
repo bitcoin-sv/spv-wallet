@@ -5,9 +5,9 @@ import (
 	"time"
 
 	"github.com/bitcoin-sv/spv-wallet/engine/cluster"
+	"github.com/bitcoin-sv/spv-wallet/engine/datastore"
 	"github.com/bitcoin-sv/spv-wallet/engine/taskmanager"
 	"github.com/mrz1836/go-cachestore"
-	"github.com/mrz1836/go-datastore"
 )
 
 // Config constants used for spv-wallet
@@ -121,7 +121,7 @@ type RedisConfig struct {
 
 // DbConfig consists of datastore config and specific dbs configs
 type DbConfig struct {
-	// Datastore is a general go-datastore config.
+	// Datastore general config.
 	Datastore *DatastoreConfig `json:"datastore" mapstructure:"datastore"`
 	// Mongo is a config for MongoDb. Works only if datastore engine is set to mongodb.
 	Mongo *datastore.MongoDBConfig `json:"mongodb" mapstructure:"mongodb"`

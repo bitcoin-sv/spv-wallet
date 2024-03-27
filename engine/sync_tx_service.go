@@ -12,9 +12,9 @@ import (
 
 	"github.com/bitcoin-sv/go-paymail"
 	"github.com/bitcoin-sv/spv-wallet/engine/chainstate"
+	"github.com/bitcoin-sv/spv-wallet/engine/datastore"
+	customTypes "github.com/bitcoin-sv/spv-wallet/engine/datastore/customtypes"
 	"github.com/bitcoin-sv/spv-wallet/engine/notifications"
-	"github.com/mrz1836/go-datastore"
-	customTypes "github.com/mrz1836/go-datastore/custom_types"
 )
 
 // processSyncTransactions will process sync transaction records
@@ -173,7 +173,6 @@ func broadcastSyncTransaction(ctx context.Context, syncTx *SyncTransaction) erro
 /////////////////
 
 func _getTxHexInFormat(ctx context.Context, tx *Transaction, prefferedFormat chainstate.HexFormatFlag, store TransactionGetter) (txHex string, actualFormat chainstate.HexFormatFlag) {
-
 	if prefferedFormat.Contains(chainstate.Ef) {
 		efHex, ok := ToEfHex(ctx, tx, store)
 

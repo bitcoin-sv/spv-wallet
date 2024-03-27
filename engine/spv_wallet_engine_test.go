@@ -7,6 +7,7 @@ import (
 
 	"github.com/DATA-DOG/go-sqlmock"
 	"github.com/bitcoin-sv/spv-wallet/engine/chainstate"
+	"github.com/bitcoin-sv/spv-wallet/engine/datastore"
 	"github.com/bitcoin-sv/spv-wallet/engine/taskmanager"
 	"github.com/bitcoin-sv/spv-wallet/engine/tester"
 	"github.com/bitcoinschema/go-bitcoin/v2"
@@ -17,7 +18,6 @@ import (
 	"github.com/libsv/go-bt/v2/sighash"
 	"github.com/libsv/go-bt/v2/unlocker"
 	"github.com/mrz1836/go-cache"
-	"github.com/mrz1836/go-datastore"
 	"github.com/rafaeljusto/redigomock"
 	"github.com/rs/zerolog"
 	"github.com/stretchr/testify/require"

@@ -5,8 +5,8 @@ import (
 	"log"
 
 	"github.com/bitcoin-sv/spv-wallet/engine"
+	"github.com/bitcoin-sv/spv-wallet/engine/datastore"
 	"github.com/bitcoin-sv/spv-wallet/engine/utils"
-	"github.com/mrz1836/go-datastore"
 )
 
 func main() {

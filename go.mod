@@ -20,7 +20,6 @@ require (
 	github.com/go-ozzo/ozzo-validation v3.6.0+incompatible
 	github.com/go-redis/redis/v8 v8.11.5
 	github.com/mrz1836/go-cachestore v0.3.6
-	github.com/mrz1836/go-datastore v0.5.14
 	github.com/mrz1836/go-sanitize v1.3.1
 	github.com/mrz1836/go-validate v0.2.1
 	github.com/newrelic/go-agent/v3 v3.29.1

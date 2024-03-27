@@ -6,7 +6,7 @@ import (
 
 	"github.com/bitcoin-sv/go-paymail"
 	"github.com/google/uuid"
-	"github.com/mrz1836/go-datastore"
+	"github.com/bitcoin-sv/spv-wallet/engine/datastore"
 )
 
 type Contact struct {
@@ -147,7 +147,6 @@ func (c *Contact) BeforeUpdating(_ context.Context) (err error) {
 
 // Migrate model specific migration on startup
 func (c *Contact) Migrate(client datastore.ClientInterface) error {
-
 	tableName := client.GetTableName(tableContacts)
 	if client.Engine() == datastore.MySQL {
 		if err := c.migrateMySQL(client, tableName); err != nil {

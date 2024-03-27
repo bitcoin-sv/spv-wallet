@@ -5,7 +5,8 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/mrz1836/go-datastore"
+	"github.com/bitcoin-sv/spv-wallet/engine/datastore"
+
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -180,6 +181,5 @@ func Test_getContacts(t *testing.T) {
 
 		require.NoError(t, err)
 		assert.Equal(t, 0, len(contacts))
-
 	})
 }

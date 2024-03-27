@@ -5,11 +5,11 @@ import (
 	"database/sql"
 	"testing"
 
+	"github.com/bitcoin-sv/spv-wallet/engine/datastore"
+	customTypes "github.com/bitcoin-sv/spv-wallet/engine/datastore/customtypes"
 	"github.com/bitcoin-sv/spv-wallet/engine/utils"
 	"github.com/libsv/go-bt/v2"
 	"github.com/libsv/go-bt/v2/bscript"
-	"github.com/mrz1836/go-datastore"
-	customTypes "github.com/mrz1836/go-datastore/custom_types"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
