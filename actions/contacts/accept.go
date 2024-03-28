@@ -28,5 +28,5 @@ func (a *Action) accept(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, "contact accepted")
+	c.Status(http.StatusOK)
 }

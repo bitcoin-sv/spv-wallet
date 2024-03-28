@@ -48,6 +48,7 @@ func TestAcceptContactHappyPath(t *testing.T) {
 	defer deferMe()
 
 	t.Run("accept contact, should return nil", func(t *testing.T) {
+		// given
 		contact := newContact(
 			fullName,
 			paymailGeneric,
@@ -56,20 +57,17 @@ func TestAcceptContactHappyPath(t *testing.T) {
 			ContactAwaitAccept,
 		)
 		contact.enrich(ModelContact, append(client.DefaultModelOptions(), New())...)
-		if err := contact.Save(ctx); err != nil {
-			t.Fatal(err)
-		}
+		err := contact.Save(ctx)
+		require.NoError(t, err)
 
 		// when
-		err := client.AcceptContact(ctx, xPubGeneric, paymailGeneric)
+		err = client.AcceptContact(ctx, xPubGeneric, paymailGeneric)
 
 		// then
 		require.NoError(t, err)
 
 		contact1, err := getContact(ctx, paymailGeneric, xPubGeneric, client.DefaultModelOptions()...)
-		if err != nil {
-			t.Fatal(err)
-		}
+		require.NoError(t, err)
 		require.Equal(t, ContactNotConfirmed, contact1.Status)
 	})
 }
@@ -134,6 +132,7 @@ func TestAcceptContactErrorPath(t *testing.T) {
 		ctx, client, deferMe := initContactTestCase(t)
 		defer deferMe()
 		t.Run(tc.name, func(t *testing.T) {
+			// given
 			contact := newContact(
 				fullName,
 				paymailGeneric,
@@ -146,12 +145,13 @@ func TestAcceptContactErrorPath(t *testing.T) {
 				contact.DeletedAt.Valid = true
 				contact.DeletedAt.Time = time.Now()
 			}
-			if err := contact.Save(ctx); err != nil {
-				t.Fatal(err)
-			}
+			err := contact.Save(ctx)
+			require.NoError(t, err)
 
-			err := client.AcceptContact(ctx, tc.data.xPub, tc.data.paymail)
+			// when
+			err = client.AcceptContact(ctx, tc.data.xPub, tc.data.paymail)
 
+			// then
 			require.Error(t, err)
 			require.EqualError(t, err, tc.expectedErrorMessage)
 		})
@@ -172,20 +172,17 @@ func TestRejectContactHappyPath(t *testing.T) {
 			ContactAwaitAccept,
 		)
 		contact.enrich(ModelContact, append(client.DefaultModelOptions(), New())...)
-		if err := contact.Save(ctx); err != nil {
-			t.Fatal(err)
-		}
+		err := contact.Save(ctx)
+		require.NoError(t, err)
 
 		// when
-		err := client.RejectContact(ctx, contact.OwnerXpubID, contact.Paymail)
+		err = client.RejectContact(ctx, contact.OwnerXpubID, contact.Paymail)
 
 		// then
 		require.NoError(t, err)
 
 		contact1, err := getContact(ctx, contact.Paymail, contact.OwnerXpubID, client.DefaultModelOptions()...)
-		if err != nil {
-			t.Fatal(err)
-		}
+		require.NoError(t, err)
 		require.Empty(t, contact1)
 	})
 }
@@ -249,6 +246,7 @@ func TestRejectContactErrorPath(t *testing.T) {
 		ctx, client, deferMe := initContactTestCase(t)
 		defer deferMe()
 		t.Run(tc.name, func(t *testing.T) {
+			// given
 			contact := newContact(
 				fullName,
 				paymailGeneric,
@@ -261,10 +259,13 @@ func TestRejectContactErrorPath(t *testing.T) {
 				contact.DeletedAt.Valid = true
 				contact.DeletedAt.Time = time.Now()
 			}
-			if err := contact.Save(ctx); err != nil {
-				t.Fatal(err)
-			}
-			err := client.RejectContact(ctx, tc.data.xPub, tc.data.paymail)
+			err := contact.Save(ctx)
+			require.NoError(t, err)
+
+			// when
+			err = client.RejectContact(ctx, tc.data.xPub, tc.data.paymail)
+
+			// then
 			require.Error(t, err)
 			require.EqualError(t, err, tc.expectedErrorMessage)
 		})
