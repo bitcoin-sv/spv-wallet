@@ -5,8 +5,8 @@ import (
 	"errors"
 
 	"github.com/bitcoin-sv/go-paymail"
-	"github.com/google/uuid"
 	"github.com/bitcoin-sv/spv-wallet/engine/datastore"
+	"github.com/google/uuid"
 )
 
 type Contact struct {

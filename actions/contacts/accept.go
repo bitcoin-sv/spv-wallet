@@ -1,8 +1,10 @@
 package contacts
 
 import (
+	"errors"
 	"net/http"
 
+	"github.com/bitcoin-sv/spv-wallet/engine"
 	"github.com/bitcoin-sv/spv-wallet/server/auth"
 	"github.com/gin-gonic/gin"
 )
@@ -13,9 +15,9 @@ import (
 // @Description	Accept contact. For contact with status "awaiting" change status to "unconfirmed"
 // @Tags		Contact
 // @Produce		json
-// @Param		paymail query string true "paymail"
+// @Param		paymail path string true "Paymail address of the contact the user wants to accept"
 // @Success		200
-// @Router		/v1/contact/accept [PATCH]
+// @Router		/v1/contact/accepted [PATCH]
 // @Security	x-auth-xpub
 func (a *Action) accept(c *gin.Context) {
 	reqXPubID := c.GetString(auth.ParamXPubHashKey)
@@ -24,7 +26,14 @@ func (a *Action) accept(c *gin.Context) {
 	err := a.Services.SpvWalletEngine.AcceptContact(c, reqXPubID, paymail)
 
 	if err != nil {
-		c.JSON(http.StatusExpectationFailed, err.Error())
+		switch {
+		case errors.Is(err, engine.ErrContactNotFound):
+			c.JSON(http.StatusNotFound, err.Error())
+		case errors.Is(err, engine.ErrContactStatusNotAwaiting):
+			c.JSON(http.StatusUnprocessableEntity, err.Error())
+		default:
+			c.JSON(http.StatusInternalServerError, err.Error())
+		}
 		return
 	}
 

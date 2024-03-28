@@ -1,8 +1,10 @@
 package contacts
 
 import (
+	"errors"
 	"net/http"
 
+	"github.com/bitcoin-sv/spv-wallet/engine"
 	"github.com/bitcoin-sv/spv-wallet/server/auth"
 	"github.com/gin-gonic/gin"
 )
@@ -13,9 +15,9 @@ import (
 // @Description	Reject contact. For contact with status "awaiting" delete contact
 // @Tags		Contact
 // @Produce		json
-// @Param		paymail query string true "paymail"
+// @Param		paymail path string true "Paymail address of the contact the user wants to reject"
 // @Success		200
-// @Router		/v1/contact/reject [PATCH]
+// @Router		/v1/contact/rejected [PATCH]
 // @Security	x-auth-xpub
 func (a *Action) reject(c *gin.Context) {
 	reqXPubID := c.GetString(auth.ParamXPubHashKey)
@@ -24,9 +26,15 @@ func (a *Action) reject(c *gin.Context) {
 	err := a.Services.SpvWalletEngine.RejectContact(c, reqXPubID, paymail)
 
 	if err != nil {
-		c.JSON(http.StatusExpectationFailed, err.Error())
+		switch {
+		case errors.Is(err, engine.ErrContactNotFound):
+			c.JSON(http.StatusNotFound, err.Error())
+		case errors.Is(err, engine.ErrContactStatusNotAwaiting):
+			c.JSON(http.StatusUnprocessableEntity, err.Error())
+		default:
+			c.JSON(http.StatusInternalServerError, err.Error())
+		}
 		return
 	}
-
 	c.Status(http.StatusOK)
 }

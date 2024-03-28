@@ -14,16 +14,13 @@ const (
 	paymailGeneric         = "test@test.test"
 	fullName               = "John Doe"
 	pubKey                 = "pubKey"
-
-	errorContactNotFound                  = "contact not found"
-	errorContactDoesNotHaveStatusAwaiting = "contact does not have status awaiting"
 )
 
 type testCase struct {
 	testID               int
 	name                 string
 	data                 testCaseData
-	expectedErrorMessage string
+	expectedErrorMessage error
 }
 
 type testCaseData struct {
@@ -83,7 +80,7 @@ func TestAcceptContactErrorPath(t *testing.T) {
 				paymail:       paymailGeneric,
 				contactStatus: ContactAwaitAccept.String(),
 			},
-			expectedErrorMessage: errorContactNotFound,
+			expectedErrorMessage: ErrContactNotFound,
 		},
 		{
 			testID: 2,
@@ -93,7 +90,7 @@ func TestAcceptContactErrorPath(t *testing.T) {
 				paymail:       paymailGeneric,
 				contactStatus: ContactAwaitAccept.String(),
 			},
-			expectedErrorMessage: errorContactDoesNotHaveStatusAwaiting,
+			expectedErrorMessage: ErrContactStatusNotAwaiting,
 		},
 		{
 			testID: 3,
@@ -103,7 +100,7 @@ func TestAcceptContactErrorPath(t *testing.T) {
 				paymail:       paymailGeneric,
 				contactStatus: ContactNotConfirmed.String(),
 			},
-			expectedErrorMessage: errorContactDoesNotHaveStatusAwaiting,
+			expectedErrorMessage: ErrContactStatusNotAwaiting,
 		},
 		{
 			testID: 4,
@@ -113,7 +110,7 @@ func TestAcceptContactErrorPath(t *testing.T) {
 				paymail:       paymailGeneric,
 				contactStatus: ContactRejected.String(),
 			},
-			expectedErrorMessage: errorContactDoesNotHaveStatusAwaiting,
+			expectedErrorMessage: ErrContactStatusNotAwaiting,
 		},
 		{
 			testID: 5,
@@ -124,7 +121,7 @@ func TestAcceptContactErrorPath(t *testing.T) {
 				contactStatus: ContactRejected.String(),
 				deleted:       true,
 			},
-			expectedErrorMessage: errorContactNotFound,
+			expectedErrorMessage: ErrContactNotFound,
 		},
 	}
 
@@ -153,7 +150,7 @@ func TestAcceptContactErrorPath(t *testing.T) {
 
 			// then
 			require.Error(t, err)
-			require.EqualError(t, err, tc.expectedErrorMessage)
+			require.EqualError(t, err, tc.expectedErrorMessage.Error())
 		})
 	}
 }
@@ -198,7 +195,7 @@ func TestRejectContactErrorPath(t *testing.T) {
 				paymail:       paymailGeneric,
 				contactStatus: ContactAwaitAccept.String(),
 			},
-			expectedErrorMessage: errorContactNotFound,
+			expectedErrorMessage: ErrContactNotFound,
 		},
 		{
 			testID: 2,
@@ -208,7 +205,7 @@ func TestRejectContactErrorPath(t *testing.T) {
 				paymail:       paymailGeneric,
 				contactStatus: ContactConfirmed.String(),
 			},
-			expectedErrorMessage: errorContactDoesNotHaveStatusAwaiting,
+			expectedErrorMessage: ErrContactStatusNotAwaiting,
 		},
 		{
 			testID: 3,
@@ -218,7 +215,7 @@ func TestRejectContactErrorPath(t *testing.T) {
 				paymail:       paymailGeneric,
 				contactStatus: ContactNotConfirmed.String(),
 			},
-			expectedErrorMessage: errorContactDoesNotHaveStatusAwaiting,
+			expectedErrorMessage: ErrContactStatusNotAwaiting,
 		},
 		{
 			testID: 4,
@@ -228,7 +225,7 @@ func TestRejectContactErrorPath(t *testing.T) {
 				paymail:       paymailGeneric,
 				contactStatus: ContactRejected.String(),
 			},
-			expectedErrorMessage: errorContactDoesNotHaveStatusAwaiting,
+			expectedErrorMessage: ErrContactStatusNotAwaiting,
 		},
 		{
 			testID: 5,
@@ -239,7 +236,7 @@ func TestRejectContactErrorPath(t *testing.T) {
 				contactStatus: ContactRejected.String(),
 				deleted:       true,
 			},
-			expectedErrorMessage: errorContactNotFound,
+			expectedErrorMessage: ErrContactNotFound,
 		}}
 
 	for _, tc := range testCases {
@@ -267,7 +264,7 @@ func TestRejectContactErrorPath(t *testing.T) {
 
 			// then
 			require.Error(t, err)
-			require.EqualError(t, err, tc.expectedErrorMessage)
+			require.EqualError(t, err, tc.expectedErrorMessage.Error())
 		})
 	}
 }

@@ -15,6 +15,8 @@ var (
 	ErrInvalidRequesterXpub         = errors.New("invalid requester xpub")
 	ErrAddingContactRequest         = errors.New("adding contact request failed")
 	ErrMoreThanOnePaymailRegistered = errors.New("there are more than one paymail assigned to the xpub")
+	ErrContactNotFound              = errors.New("contact not found")
+	ErrContactStatusNotAwaiting     = errors.New("contact status is not awaiting")
 )
 
 func (c *Client) UpsertContact(ctx context.Context, ctcFName, ctcPaymail, requesterXpub, requesterPaymail string, opts ...ModelOps) (*Contact, error) {
@@ -219,13 +221,17 @@ func (c *Client) AcceptContact(ctx context.Context, xPubID, paymail string) erro
 
 	contact, err := getContact(ctx, paymail, xPubID, c.DefaultModelOptions()...)
 	if err != nil {
+		c.Logger().Err(err).Msgf("unexpected error while geting contact for paymail %s and xPubID %s", paymail, xPubID)
 		return err
 	}
 	if contact == nil {
-		return errors.New("contact not found")
+		c.Logger().Err(ErrContactNotFound).Msgf("contact not found for paymail %s and xPubID %s", paymail, xPubID)
+		return ErrContactNotFound
 	}
 	if contact.Status != ContactAwaitAccept {
-		return errors.New("contact does not have status awaiting")
+		err = ErrContactStatusNotAwaiting
+		c.Logger().Err(err).Msgf("contact status is %s, expected %s", contact.Status, ContactAwaitAccept)
+		return err
 	}
 	contact.Status = ContactNotConfirmed
 	if err = contact.Save(ctx); err != nil {
@@ -239,13 +245,17 @@ func (c *Client) RejectContact(ctx context.Context, xPubID, paymail string) erro
 
 	contact, err := getContact(ctx, paymail, xPubID, c.DefaultModelOptions()...)
 	if err != nil {
+		c.Logger().Err(err).Msgf("unexpected error while geting contact for paymail %s and xPubID %s", paymail, xPubID)
 		return err
 	}
 	if contact == nil {
-		return errors.New("contact not found")
+		c.Logger().Err(ErrContactNotFound).Msgf("contact not found for paymail %s and xPubID %s", paymail, xPubID)
+		return ErrContactNotFound
 	}
 	if contact.Status != ContactAwaitAccept {
-		return errors.New("contact does not have status awaiting")
+		err = ErrContactStatusNotAwaiting
+		c.Logger().Err(err).Msgf("contact status is %s, expected %s", contact.Status, ContactAwaitAccept)
+		return err
 	}
 
 	contact.DeletedAt.Valid = true
