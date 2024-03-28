@@ -101,6 +101,7 @@ func (builder *whereBuilder) applyJSONArrayContains(tx customWhereInterface, key
 	}
 }
 
+// applyJSONCondition will apply condition on JSON Object field - client.GetObjectFields()
 func (builder *whereBuilder) applyJSONCondition(tx customWhereInterface, key string, condition interface{}) {
 	columnName := builder.getColumnNameOrPanic(key)
 	engine := builder.client.Engine()
