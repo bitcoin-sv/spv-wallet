@@ -221,16 +221,21 @@ func (c *Client) AcceptContact(ctx context.Context, xPubID, paymail string) erro
 
 	contact, err := getContact(ctx, paymail, xPubID, c.DefaultModelOptions()...)
 	if err != nil {
-		c.Logger().Err(err).Msgf("unexpected error while geting contact for paymail %s and xPubID %s", paymail, xPubID)
+		c.Logger().Err(err).
+			Str("xPubID", xPubID).
+			Str("paymail", paymail).
+			Msgf("unexpected error while geting contact: %s", err.Error())
 		return err
 	}
 	if contact == nil {
-		c.Logger().Err(ErrContactNotFound).Msgf("contact not found for paymail %s and xPubID %s", paymail, xPubID)
 		return ErrContactNotFound
 	}
 	if contact.Status != ContactAwaitAccept {
 		err = ErrContactStatusNotAwaiting
-		c.Logger().Err(err).Msgf("contact status is %s, expected %s", contact.Status, ContactAwaitAccept)
+		c.Logger().Warn().
+			Str("xPubID", xPubID).
+			Str("paymail", paymail).
+			Msgf("contact status is: %s, expected: %s, error: s", contact.Status, ContactAwaitAccept, err.Error())
 		return err
 	}
 	contact.Status = ContactNotConfirmed
@@ -245,16 +250,21 @@ func (c *Client) RejectContact(ctx context.Context, xPubID, paymail string) erro
 
 	contact, err := getContact(ctx, paymail, xPubID, c.DefaultModelOptions()...)
 	if err != nil {
-		c.Logger().Err(err).Msgf("unexpected error while geting contact for paymail %s and xPubID %s", paymail, xPubID)
+		c.Logger().Warn().
+			Str("xPubID", xPubID).
+			Str("paymail", paymail).
+			Msgf("unexpected error while geting contact: %s", err.Error())
 		return err
 	}
 	if contact == nil {
-		c.Logger().Err(ErrContactNotFound).Msgf("contact not found for paymail %s and xPubID %s", paymail, xPubID)
 		return ErrContactNotFound
 	}
 	if contact.Status != ContactAwaitAccept {
 		err = ErrContactStatusNotAwaiting
-		c.Logger().Err(err).Msgf("contact status is %s, expected %s", contact.Status, ContactAwaitAccept)
+		c.Logger().Warn().
+			Str("xPubID", xPubID).
+			Str("paymail", paymail).
+			Msgf("contact status is: %s, expected: %s, error: %s", contact.Status, ContactAwaitAccept, err.Error())
 		return err
 	}
 
