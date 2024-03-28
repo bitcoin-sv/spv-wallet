@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/hex"
 	"errors"
+	"fmt"
 
 	"github.com/bitcoin-sv/go-paymail"
 	"github.com/bitcoin-sv/spv-wallet/engine/datastore"
@@ -372,4 +373,8 @@ func (m *PaymailAddress) migrateMySQL(client datastore.ClientInterface, tableNam
 		}
 	}
 	return nil
+}
+
+func (m *PaymailAddress) String() string {
+	return fmt.Sprintf("%s@%s", m.Alias, m.Domain)
 }
