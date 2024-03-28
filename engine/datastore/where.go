@@ -7,7 +7,7 @@ import (
 	"strconv"
 	"strings"
 
-	customtypes "github.com/bitcoin-sv/spv-wallet/engine/datastore/customtypes"
+	"github.com/bitcoin-sv/spv-wallet/engine/datastore/customtypes"
 	"gorm.io/gorm"
 )
 
@@ -83,8 +83,27 @@ func (builder *whereBuilder) getColumnNameOrPanic(key string) string {
 func (builder *whereBuilder) applyCondition(tx customWhereInterface, key string, operator string, condition interface{}) {
 	columnName := builder.getColumnNameOrPanic(key)
 
+	if condition == nil {
+		tx.Where(columnName + " " + operator)
+		return
+	}
 	varName := builder.nextVarName()
 	query := fmt.Sprintf("%s %s @%s", columnName, operator, varName)
+	tx.Where(query, map[string]interface{}{varName: builder.formatCondition(condition)})
+}
+
+func (builder *whereBuilder) applyJson(tx customWhereInterface, key string, condition interface{}) {
+	columnName := builder.getColumnNameOrPanic(key)
+
+	varName := builder.nextVarName()
+	engine := builder.client.Engine()
+
+	if engine != PostgreSQL {
+		//todo handle other databases then postgres
+		panic("eoeoeoeoeoeoeoeoeoeoeo not implemented yet")
+	}
+
+	query := fmt.Sprintf("%s::jsonb @> @%s", columnName, varName)
 	tx.Where(query, map[string]interface{}{varName: builder.formatCondition(condition)})
 }
 
@@ -116,12 +135,12 @@ func (builder *whereBuilder) processConditions(tx customWhereInterface, conditio
 		} else if key == conditionExists {
 			builder.applyExistsCondition(tx, *parentKey, condition.(bool))
 		} else if StringInSlice(key, builder.client.GetArrayFields()) {
-			tx.Where(builder.whereSlice(key, builder.formatCondition(condition)))
+			builder.applyArray(tx, key, condition)
 		} else if StringInSlice(key, builder.client.GetObjectFields()) {
-			tx.Where(builder.whereObject(key, builder.formatCondition(condition)))
+			builder.applyJson(tx, key, condition)
 		} else {
 			if condition == nil {
-				tx.Where(key + " IS NULL")
+				builder.applyCondition(tx, key, "IS NULL", nil)
 			} else {
 				v := reflect.ValueOf(condition)
 				switch v.Kind() { //nolint:exhaustive // not all cases are needed
@@ -274,4 +293,20 @@ func (builder *whereBuilder) whereSlice(k string, v interface{}) string {
 		return k + "::jsonb @> '[\"" + v.(string) + "\"]'"
 	}
 	return "EXISTS (SELECT 1 FROM json_each(" + k + ") WHERE value = \"" + v.(string) + "\")"
+}
+
+func (builder *whereBuilder) applyArray(tx customWhereInterface, key string, condition interface{}) {
+	columnName := builder.getColumnNameOrPanic(key)
+
+	varName := builder.nextVarName()
+	engine := builder.client.Engine()
+
+	if engine != PostgreSQL {
+		//todo handle other databases then postgres
+		panic("eoeoeoeoeoeoeoeoeoeoeo not implemented yet")
+	}
+
+	query := fmt.Sprintf("%s::jsonb @> @%s", columnName, varName)
+	c := condition.(string)
+	tx.Where(query, map[string]interface{}{varName: builder.formatCondition("[\"" + c + "\"]")})
 }
