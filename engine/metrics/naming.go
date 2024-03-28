@@ -6,6 +6,7 @@ const (
 	verifyMerkleRootsHistogramName = domainPrefix + "verify_merkle_roots_histogram"
 	recordTransactionHistogramName = domainPrefix + "record_transaction_histogram"
 	queryTransactionHistogramName  = domainPrefix + "query_transaction_histogram"
+	addContactHistogramName        = domainPrefix + "add_contact_histogram"
 )
 
 const (
