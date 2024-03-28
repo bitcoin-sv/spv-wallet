@@ -1,18 +1,25 @@
 package datastore
 
 import (
+	"bytes"
 	"context"
 	"database/sql"
+	"database/sql/driver"
+	"encoding/json"
 	"testing"
 	"time"
 
 	"github.com/DATA-DOG/go-sqlmock"
 	customtypes "github.com/bitcoin-sv/spv-wallet/engine/datastore/customtypes"
+	"github.com/bitcoin-sv/spv-wallet/engine/utils"
 	"github.com/stretchr/testify/assert"
+	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson/bsontype"
 	"gorm.io/driver/mysql"
 	"gorm.io/driver/postgres"
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
+	"gorm.io/gorm/schema"
 )
 
 func mockDialector(engine Engine) gorm.Dialector {
@@ -56,40 +63,144 @@ func makeWhereBuilder(client *Client, gdb *gorm.DB, model interface{}) *whereBui
 	}
 }
 
+const (
+	// MetadataField is the field name used for metadata (params)
+	MetadataField = "metadata"
+)
+
+type Metadata map[string]interface{}
+
+func (m Metadata) GormDataType() string {
+	return "text"
+}
+
+func (m *Metadata) Scan(value interface{}) error {
+	if value == nil {
+		return nil
+	}
+
+	byteValue, err := utils.ToByteArray(value)
+	if err != nil || bytes.Equal(byteValue, []byte("")) || bytes.Equal(byteValue, []byte("\"\"")) {
+		return nil
+	}
+
+	return json.Unmarshal(byteValue, &m)
+}
+
+func (m Metadata) Value() (driver.Value, error) {
+	if m == nil {
+		return nil, nil
+	}
+	marshal, err := json.Marshal(m)
+	if err != nil {
+		return nil, err
+	}
+
+	return string(marshal), nil
+}
+
+func (Metadata) GormDBDataType(db *gorm.DB, _ *schema.Field) string {
+	if db.Dialector.Name() == Postgres {
+		return JSONB
+	}
+	return JSON
+}
+
+func (m *Metadata) MarshalBSONValue() (bsontype.Type, []byte, error) {
+	if m == nil || len(*m) == 0 {
+		return bson.TypeNull, nil, nil
+	}
+
+	metadata := make([]map[string]interface{}, 0)
+	for key, value := range *m {
+		metadata = append(metadata, map[string]interface{}{
+			"k": key,
+			"v": value,
+		})
+	}
+
+	return bson.MarshalValue(metadata)
+}
+
+func (m *Metadata) UnmarshalBSONValue(t bsontype.Type, data []byte) error {
+	raw := bson.RawValue{Type: t, Value: data}
+
+	if raw.Value == nil {
+		return nil
+	}
+
+	var uMap []map[string]interface{}
+	if err := raw.Unmarshal(&uMap); err != nil {
+		return err
+	}
+
+	*m = make(Metadata)
+	for _, meta := range uMap {
+		key := meta["k"].(string)
+		(*m)[key] = meta["v"]
+	}
+
+	return nil
+}
+
 type mockObject struct {
 	ID              string
 	CreatedAt       time.Time
 	UniqueFieldName string
 	Number          int
 	ReferenceID     string
+	Metadata        Metadata
 }
 
 // Test_whereObject test the SQL where selector
 func Test_whereSlice(t *testing.T) {
 	t.Parallel()
 
-	t.Run("MySQL", func(t *testing.T) {
-		client, gdb := mockClient(MySQL)
-		builder := makeWhereBuilder(client, gdb, mockObject{})
-		query := builder.whereSlice(fieldInIDs, "id_1")
-		expected := `JSON_CONTAINS(` + fieldInIDs + `, CAST('["id_1"]' AS JSON))`
-		assert.Equal(t, expected, query)
-	})
+	conditions := map[string]interface{}{
+		"metadata": Metadata{
+			"domain": "test-domain",
+		},
+	}
 
 	t.Run("Postgres", func(t *testing.T) {
 		client, gdb := mockClient(PostgreSQL)
-		builder := makeWhereBuilder(client, gdb, mockObject{})
-		query := builder.whereSlice(fieldInIDs, "id_1")
-		expected := fieldInIDs + `::jsonb @> '["id_1"]'`
-		assert.Equal(t, expected, query)
+
+		raw := gdb.ToSQL(func(tx *gorm.DB) *gorm.DB {
+			tx, err := ApplyCustomWhere(client, tx, conditions, mockObject{})
+			assert.NoError(t, err)
+			return tx.First(&mockObject{})
+		})
+
+		assert.Contains(t, raw, "metadata::jsonb @>")
+		assert.Contains(t, raw, `'{"domain":"test-domain"}'`)
 	})
 
 	t.Run("SQLite", func(t *testing.T) {
 		client, gdb := mockClient(SQLite)
-		builder := makeWhereBuilder(client, gdb, mockObject{})
-		query := builder.whereSlice(fieldInIDs, "id_1")
-		expected := `EXISTS (SELECT 1 FROM json_each(` + fieldInIDs + `) WHERE value = "id_1")`
-		assert.Equal(t, expected, query)
+
+		raw := gdb.ToSQL(func(tx *gorm.DB) *gorm.DB {
+			tx, err := ApplyCustomWhere(client, tx, conditions, mockObject{})
+			assert.NoError(t, err)
+			return tx.First(&mockObject{})
+		})
+
+		assert.Contains(t, raw, "JSON_EXTRACT(metadata")
+		assert.Contains(t, raw, `"$.domain"`)
+		assert.Contains(t, raw, `"test-domain"`)
+	})
+
+	t.Run("MySQL", func(t *testing.T) {
+		client, gdb := mockClient(MySQL)
+
+		raw := gdb.ToSQL(func(tx *gorm.DB) *gorm.DB {
+			tx, err := ApplyCustomWhere(client, tx, conditions, mockObject{})
+			assert.NoError(t, err)
+			return tx.First(&mockObject{})
+		})
+
+		assert.Contains(t, raw, "JSON_EXTRACT(metadata")
+		assert.Contains(t, raw, "'$.domain'")
+		assert.Contains(t, raw, "'test-domain'")
 	})
 }
 

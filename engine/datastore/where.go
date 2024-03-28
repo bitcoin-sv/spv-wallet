@@ -92,21 +92,6 @@ func (builder *whereBuilder) applyCondition(tx customWhereInterface, key string,
 	tx.Where(query, map[string]interface{}{varName: builder.formatCondition(condition)})
 }
 
-func (builder *whereBuilder) applyJson(tx customWhereInterface, key string, condition interface{}) {
-	columnName := builder.getColumnNameOrPanic(key)
-
-	varName := builder.nextVarName()
-	engine := builder.client.Engine()
-
-	if engine != PostgreSQL {
-		//todo handle other databases then postgres
-		panic("eoeoeoeoeoeoeoeoeoeoeo not implemented yet")
-	}
-
-	query := fmt.Sprintf("%s::jsonb @> @%s", columnName, varName)
-	tx.Where(query, map[string]interface{}{varName: builder.formatCondition(condition)})
-}
-
 func (builder *whereBuilder) applyExistsCondition(tx customWhereInterface, key string, condition bool) {
 	columnName := builder.getColumnNameOrPanic(key)
 
@@ -135,9 +120,9 @@ func (builder *whereBuilder) processConditions(tx customWhereInterface, conditio
 		} else if key == conditionExists {
 			builder.applyExistsCondition(tx, *parentKey, condition.(bool))
 		} else if StringInSlice(key, builder.client.GetArrayFields()) {
-			builder.applyArray(tx, key, condition)
+			builder.applyArray(tx, key, condition.(string))
 		} else if StringInSlice(key, builder.client.GetObjectFields()) {
-			builder.applyJson(tx, key, condition)
+			builder.applyJSONCondition(tx, key, condition)
 		} else {
 			if condition == nil {
 				builder.applyCondition(tx, key, "IS NULL", nil)
@@ -285,28 +270,78 @@ func (builder *whereBuilder) whereObject(k string, v interface{}) string {
 }
 
 // whereSlice generates the where slice
-func (builder *whereBuilder) whereSlice(k string, v interface{}) string {
-	engine := builder.client.Engine()
-	if engine == MySQL {
-		return "JSON_CONTAINS(" + k + ", CAST('[\"" + v.(string) + "\"]' AS JSON))"
-	} else if engine == PostgreSQL {
-		return k + "::jsonb @> '[\"" + v.(string) + "\"]'"
-	}
-	return "EXISTS (SELECT 1 FROM json_each(" + k + ") WHERE value = \"" + v.(string) + "\")"
-}
+// func (builder *whereBuilder) whereSlice(k string, v interface{}) string {
+// 	engine := builder.client.Engine()
+// 	if engine == MySQL {
+// 		return "JSON_CONTAINS(" + k + ", CAST('[\"" + v.(string) + "\"]' AS JSON))"
+// 	} else if engine == PostgreSQL {
+// 		return k + "::jsonb @> '[\"" + v.(string) + "\"]'"
+// 	}
+// 	return "EXISTS (SELECT 1 FROM json_each(" + k + ") WHERE value = \"" + v.(string) + "\")"
+// }
 
-func (builder *whereBuilder) applyArray(tx customWhereInterface, key string, condition interface{}) {
+func (builder *whereBuilder) applyArray(tx customWhereInterface, key string, condition string) {
 	columnName := builder.getColumnNameOrPanic(key)
 
 	varName := builder.nextVarName()
 	engine := builder.client.Engine()
 
-	if engine != PostgreSQL {
-		//todo handle other databases then postgres
-		panic("eoeoeoeoeoeoeoeoeoeoeo not implemented yet")
+	query := ""
+	arg := ""
+
+	switch engine {
+	case PostgreSQL:
+		query = fmt.Sprintf("%s::jsonb @> @%s", columnName, varName)
+		arg = fmt.Sprintf(`["%s"]`, condition)
+	case MySQL:
+		query = fmt.Sprintf("JSON_CONTAINS(%s, CAST(@%s AS JSON))", columnName, varName)
+		arg = fmt.Sprintf(`["%s"]`, condition)
+	case SQLite:
+		query = fmt.Sprintf("EXISTS (SELECT 1 FROM json_each(%s) WHERE value = @%s)", columnName, varName)
+		arg = condition
+	default:
+		panic("Database engine not supported")
 	}
 
+	tx.Where(query, map[string]interface{}{varName: arg})
+}
+
+func (builder *whereBuilder) applyJSONCondition(tx customWhereInterface, key string, condition interface{}) {
+	columnName := builder.getColumnNameOrPanic(key)
+	engine := builder.client.Engine()
+
+	if engine == PostgreSQL {
+		builder.applyJSONBCondition(tx, columnName, condition)
+	} else if engine == MySQL || engine == SQLite {
+		builder.applyJSONExtractCondition(tx, columnName, condition)
+	} else {
+		panic("Database engine not supported")
+	}
+}
+
+func (builder *whereBuilder) applyJSONBCondition(tx customWhereInterface, columnName string, condition interface{}) {
+	varName := builder.nextVarName()
 	query := fmt.Sprintf("%s::jsonb @> @%s", columnName, varName)
-	c := condition.(string)
-	tx.Where(query, map[string]interface{}{varName: builder.formatCondition("[\"" + c + "\"]")})
+	tx.Where(query, map[string]interface{}{varName: condition})
+}
+
+func (builder *whereBuilder) applyJSONExtractCondition(tx customWhereInterface, columnName string, condition interface{}) {
+	dict := convertTo[map[string]interface{}](condition)
+	for key, value := range dict {
+		keyVarName := builder.nextVarName()
+		valueVarName := builder.nextVarName()
+		query := fmt.Sprintf("JSON_EXTRACT(%s, @%s) = @%s", columnName, keyVarName, valueVarName)
+		tx.Where(query, map[string]interface{}{
+			keyVarName:   fmt.Sprintf("$.%s", key),
+			valueVarName: value,
+		})
+	}
+}
+
+func convertTo[T any](object interface{}) T {
+	vJSON, _ := json.Marshal(object)
+
+	var converted T
+	_ = json.Unmarshal(vJSON, &converted)
+	return converted
 }
