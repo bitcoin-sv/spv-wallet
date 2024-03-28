@@ -30,6 +30,8 @@ func mapContactStatus(s engine.ContactStatus) string {
 		return "awaiting"
 	case engine.ContactConfirmed:
 		return "confirmed"
+	case engine.ContactRejected:
+		return "rejected"
 	default:
 		return "unknown"
 	}

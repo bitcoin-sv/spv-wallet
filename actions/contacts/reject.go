@@ -19,7 +19,6 @@ import (
 // @Security	x-auth-xpub
 func (a *Action) reject(c *gin.Context) {
 	reqXPubID := c.GetString(auth.ParamXPubHashKey)
-	// paymail := c.Query("paymail")
 	paymail := c.Param("paymail")
 
 	err := a.Services.SpvWalletEngine.RejectContact(c, reqXPubID, paymail)
@@ -29,5 +28,5 @@ func (a *Action) reject(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, "contact rejected")
+	c.Status(http.StatusOK)
 }
