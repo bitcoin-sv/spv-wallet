@@ -341,6 +341,7 @@ definitions:
         example: Test User
         type: string
       id:
+        description: ID is a unique identifier of contact.
         example: 68af358bde7d8641621c7dd3de1a276c9a62cfa9e2d0740494519f1ba61e2f4a
         type: string
       metadata:
@@ -366,10 +367,6 @@ definitions:
       updated_at:
         description: UpdatedAt is a time when outer model was updated.
         example: "2024-02-26T11:01:28.069911Z"
-        type: string
-      xpubID:
-        description: XpubID is the contact's xpub related id used to register contact.
-        example: bb8593f85ef8056a77026ad415f02128f3768906de53e9e8bf8749fe2d66cf50
         type: string
     type: object
   models.Destination:
@@ -1049,8 +1046,40 @@ definitions:
     - 1000000000
     - 60000000000
     - 3600000000000
+    - -9223372036854775808
+    - 9223372036854775807
+    - 1
+    - 1000
+    - 1000000
+    - 1000000000
+    - 60000000000
+    - 3600000000000
+    - -9223372036854775808
+    - 9223372036854775807
+    - 1
+    - 1000
+    - 1000000
+    - 1000000000
+    - 60000000000
+    - 3600000000000
     type: integer
     x-enum-varnames:
+    - minDuration
+    - maxDuration
+    - Nanosecond
+    - Microsecond
+    - Millisecond
+    - Second
+    - Minute
+    - Hour
+    - minDuration
+    - maxDuration
+    - Nanosecond
+    - Microsecond
+    - Millisecond
+    - Second
+    - Minute
+    - Hour
     - minDuration
     - maxDuration
     - Nanosecond
@@ -1821,6 +1850,57 @@ paths:
       security:
       - x-auth-xpub: []
       summary: Upsert contact
+      tags:
+      - Contact
+  /v1/contact/accepted:
+    patch:
+      description: Accept contact. For contact with status "awaiting" change status
+        to "unconfirmed"
+      parameters:
+      - description: Paymail address of the contact the user wants to accept
+        in: path
+        name: paymail
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+        "404":
+          description: Contact not found
+        "422":
+          description: Contact status not awaiting
+        "500":
+          description: Internal server error
+      security:
+      - x-auth-xpub: []
+      summary: Accept contact
+      tags:
+      - Contact
+  /v1/contact/rejected:
+    patch:
+      description: Reject contact. For contact with status "awaiting" delete contact
+      parameters:
+      - description: Paymail address of the contact the user wants to reject
+        in: path
+        name: paymail
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+        "404":
+          description: Contact not found
+        "422":
+          description: Contact status not awaiting
+        "500":
+          description: Internal server error
+      security:
+      - x-auth-xpub: []
+      summary: Reject contact
       tags:
       - Contact
   /v1/contacts:

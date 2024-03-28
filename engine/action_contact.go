@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"time"
 
 	"github.com/bitcoin-sv/go-paymail"
 	"github.com/bitcoin-sv/spv-wallet/engine/datastore"
@@ -14,6 +15,8 @@ var (
 	ErrInvalidRequesterXpub         = errors.New("invalid requester xpub")
 	ErrAddingContactRequest         = errors.New("adding contact request failed")
 	ErrMoreThanOnePaymailRegistered = errors.New("there are more than one paymail assigned to the xpub")
+	ErrContactNotFound              = errors.New("contact not found")
+	ErrContactStatusNotAwaiting     = errors.New("contact status is not awaiting")
 )
 
 func (c *Client) UpsertContact(ctx context.Context, ctcFName, ctcPaymail, requesterXpub, requesterPaymail string, opts ...ModelOps) (*Contact, error) {
@@ -212,4 +215,66 @@ func (c *Client) GetContacts(ctx context.Context, metadata *Metadata, conditions
 	}
 
 	return contacts, nil
+}
+
+func (c *Client) AcceptContact(ctx context.Context, xPubID, paymail string) error {
+
+	contact, err := getContact(ctx, paymail, xPubID, c.DefaultModelOptions()...)
+	if err != nil {
+		c.Logger().Err(err).
+			Str("xPubID", xPubID).
+			Str("paymail", paymail).
+			Msgf("unexpected error while geting contact: %s", err.Error())
+		return err
+	}
+	if contact == nil {
+		return ErrContactNotFound
+	}
+	if contact.Status != ContactAwaitAccept {
+		err = ErrContactStatusNotAwaiting
+		c.Logger().Warn().
+			Str("xPubID", xPubID).
+			Str("paymail", paymail).
+			Msgf("contact status is: %s, expected: %s, error: %s", contact.Status, ContactAwaitAccept, err.Error())
+		return err
+	}
+	contact.Status = ContactNotConfirmed
+	if err = contact.Save(ctx); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (c *Client) RejectContact(ctx context.Context, xPubID, paymail string) error {
+
+	contact, err := getContact(ctx, paymail, xPubID, c.DefaultModelOptions()...)
+	if err != nil {
+		c.Logger().Warn().
+			Str("xPubID", xPubID).
+			Str("paymail", paymail).
+			Msgf("unexpected error while geting contact: %s", err.Error())
+		return err
+	}
+	if contact == nil {
+		return ErrContactNotFound
+	}
+	if contact.Status != ContactAwaitAccept {
+		err = ErrContactStatusNotAwaiting
+		c.Logger().Warn().
+			Str("xPubID", xPubID).
+			Str("paymail", paymail).
+			Msgf("contact status is: %s, expected: %s, error: %s", contact.Status, ContactAwaitAccept, err.Error())
+		return err
+	}
+
+	contact.DeletedAt.Valid = true
+	contact.DeletedAt.Time = time.Now()
+	contact.Status = ContactRejected
+
+	if err = contact.Save(ctx); err != nil {
+		return err
+	}
+
+	return nil
 }
