@@ -15,6 +15,8 @@
 [![standard-readme compliant](https://img.shields.io/badge/readme%20style-standard-brightgreen.svg?style=flat&v=3)](https://github.com/RichardLitt/standard-readme)
 [![Makefile Included](https://img.shields.io/badge/Makefile-Supported%20-brightgreen?=flat&logo=probot&v=3)](Makefile)
 <br/>
+
+[SPV Wallet GitBook](https://bsvblockchain.gitbook.io/docs)
 </div>
 
 ## Table of Contents
