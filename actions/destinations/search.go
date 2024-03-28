@@ -5,6 +5,7 @@ import (
 
 	"github.com/bitcoin-sv/spv-wallet/actions"
 	"github.com/bitcoin-sv/spv-wallet/engine"
+	"github.com/bitcoin-sv/spv-wallet/engine/utils"
 	"github.com/bitcoin-sv/spv-wallet/mappings"
 	"github.com/bitcoin-sv/spv-wallet/models"
 	"github.com/bitcoin-sv/spv-wallet/server/auth"
@@ -32,12 +33,21 @@ func (a *Action) search(c *gin.Context) {
 		return
 	}
 
+	var destFilters models.DestinationFilters
+
+	destConditions, err := utils.FilterMapByStructFields(*conditions, &destFilters)
+
+	if err != nil {
+		c.JSON(http.StatusBadRequest, err.Error())
+		return
+	}
+
 	var destinations []*engine.Destination
 	if destinations, err = a.Services.SpvWalletEngine.GetDestinationsByXpubID(
 		c.Request.Context(),
 		reqXPubID,
 		metadata,
-		conditions,
+		&destConditions,
 		queryParams,
 	); err != nil {
 		c.JSON(http.StatusInternalServerError, err.Error())

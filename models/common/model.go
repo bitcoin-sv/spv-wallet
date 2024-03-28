@@ -14,3 +14,10 @@ type Model struct {
 	// Metadata is a metadata map of outer model.
 	Metadata map[string]interface{} `json:"metadata" swaggertype:"object,string" example:"key:value,key2:value2"`
 }
+
+type TimeRange struct {
+	// From represents the start time of the time range.
+	From time.Time `json:"from" example:"2024-02-26T11:00:28.069911Z"`
+	// To represents the end time of the time range.
+	To time.Time `json:"to" example:"2024-02-26T11:00:28.069911Z"`
+}
