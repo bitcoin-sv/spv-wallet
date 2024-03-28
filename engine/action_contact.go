@@ -235,7 +235,7 @@ func (c *Client) AcceptContact(ctx context.Context, xPubID, paymail string) erro
 		c.Logger().Warn().
 			Str("xPubID", xPubID).
 			Str("paymail", paymail).
-			Msgf("contact status is: %s, expected: %s, error: s", contact.Status, ContactAwaitAccept, err.Error())
+			Msgf("contact status is: %s, expected: %s, error: %s", contact.Status, ContactAwaitAccept, err.Error())
 		return err
 	}
 	contact.Status = ContactNotConfirmed
