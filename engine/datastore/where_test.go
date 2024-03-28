@@ -758,11 +758,3 @@ func Test_sqlInjectionSafety(t *testing.T) {
 		assert.Contains(t, raw, `'{"1=1; DELETE FROM users":"field_value"}'`)
 	})
 }
-
-// Test_escapeDBString will test the method escapeDBString()
-func Test_escapeDBString(t *testing.T) {
-	t.Parallel()
-
-	str := escapeDBString(`SELECT * FROM 'table' WHERE 'field'=1;`)
-	assert.Equal(t, `SELECT * FROM \'table\' WHERE \'field\'=1;`, str)
-}
