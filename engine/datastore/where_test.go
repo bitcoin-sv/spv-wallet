@@ -143,6 +143,48 @@ func (m *Metadata) UnmarshalBSONValue(t bsontype.Type, data []byte) error {
 	return nil
 }
 
+type IDs []string
+
+// GormDataType type in gorm
+func (i IDs) GormDataType() string {
+	return "text"
+}
+
+// Scan scan value into JSON, implements sql.Scanner interface
+func (i *IDs) Scan(value interface{}) error {
+	if value == nil {
+		return nil
+	}
+
+	byteValue, err := utils.ToByteArray(value)
+	if err != nil {
+		return nil
+	}
+
+	return json.Unmarshal(byteValue, &i)
+}
+
+// Value return json value, implement driver.Valuer interface
+func (i IDs) Value() (driver.Value, error) {
+	if i == nil {
+		return nil, nil
+	}
+	marshal, err := json.Marshal(i)
+	if err != nil {
+		return nil, err
+	}
+
+	return string(marshal), nil
+}
+
+// GormDBDataType the gorm data type for metadata
+func (IDs) GormDBDataType(db *gorm.DB, _ *schema.Field) string {
+	if db.Dialector.Name() == Postgres {
+		return JSONB
+	}
+	return JSON
+}
+
 type mockObject struct {
 	ID              string
 	CreatedAt       time.Time
@@ -150,10 +192,12 @@ type mockObject struct {
 	Number          int
 	ReferenceID     string
 	Metadata        Metadata
+	FieldInIDs      IDs
+	FieldOutIDs     IDs
 }
 
 // Test_whereObject test the SQL where selector
-func Test_whereSlice(t *testing.T) {
+func Test_whereObject(t *testing.T) {
 	t.Parallel()
 
 	conditions := map[string]interface{}{
@@ -201,6 +245,63 @@ func Test_whereSlice(t *testing.T) {
 		assert.Contains(t, raw, "JSON_EXTRACT(metadata")
 		assert.Contains(t, raw, "'$.domain'")
 		assert.Contains(t, raw, "'test-domain'")
+	})
+}
+
+// Test_whereObject test the SQL where selector
+func Test_whereSlice(t *testing.T) {
+	t.Parallel()
+
+	conditions := map[string]interface{}{
+		"field_in_ids": "test",
+	}
+
+	t.Run("Postgres", func(t *testing.T) {
+		client, gdb := mockClient(PostgreSQL)
+		WithCustomFields([]string{"field_in_ids"}, nil)(client.options)
+
+		raw := gdb.ToSQL(func(tx *gorm.DB) *gorm.DB {
+			tx, err := ApplyCustomWhere(client, tx, conditions, mockObject{})
+			assert.NoError(t, err)
+			return tx.First(&mockObject{})
+		})
+		// produced SQL:
+		// SELECT * FROM "mock_objects" WHERE field_in_ids::jsonb @> '["test"]' ORDER BY "mock_objects"."id" LIMIT 1
+
+		assert.Contains(t, raw, "field_in_ids::jsonb @>")
+		assert.Contains(t, raw, `'["test"]'`)
+	})
+
+	t.Run("MySQL", func(t *testing.T) {
+		client, gdb := mockClient(MySQL)
+		WithCustomFields([]string{"field_in_ids"}, nil)(client.options)
+
+		raw := gdb.ToSQL(func(tx *gorm.DB) *gorm.DB {
+			tx, err := ApplyCustomWhere(client, tx, conditions, mockObject{})
+			assert.NoError(t, err)
+			return tx.First(&mockObject{})
+		})
+		// produced SQL:
+		// SELECT * FROM `mock_objects` WHERE JSON_CONTAINS(field_in_ids, CAST('["test"]' AS JSON)) ORDER BY `mock_objects`.`id` LIMIT 1
+
+		assert.Contains(t, raw, "JSON_CONTAINS(field_in_ids")
+		assert.Contains(t, raw, `'["test"]'`)
+	})
+
+	t.Run("SQLite", func(t *testing.T) {
+		client, gdb := mockClient(SQLite)
+		WithCustomFields([]string{"field_in_ids"}, nil)(client.options)
+
+		raw := gdb.ToSQL(func(tx *gorm.DB) *gorm.DB {
+			tx, err := ApplyCustomWhere(client, tx, conditions, mockObject{})
+			assert.NoError(t, err)
+			return tx.First(&mockObject{})
+		})
+		// produced SQL:
+		// SELECT * FROM `mock_objects` WHERE EXISTS (SELECT 1 FROM json_each(field_in_ids) WHERE value = "test") ORDER BY `mock_objects`.`id` LIMIT 1
+
+		assert.Contains(t, raw, "json_each(field_in_ids)")
+		assert.Contains(t, raw, `"test"`)
 	})
 }
 
@@ -266,154 +367,6 @@ func Test_processConditions(t *testing.T) {
 	})
 }
 
-// Test_whereObject test the SQL where selector
-func Test_whereObject(t *testing.T) {
-	t.Parallel()
-
-	t.Run("MySQL", func(t *testing.T) {
-		client, gdb := mockClient(MySQL)
-		builder := makeWhereBuilder(client, gdb, mockObject{})
-
-		metadata := map[string]interface{}{
-			"test_key": "test-value",
-		}
-		query := builder.whereObject(metadataField, metadata)
-		expected := "JSON_EXTRACT(" + metadataField + ", '$.test_key') = \"test-value\""
-		assert.Equal(t, expected, query)
-
-		metadata = map[string]interface{}{
-			"test_key": "test-'value'",
-		}
-		query = builder.whereObject(metadataField, metadata)
-		expected = "JSON_EXTRACT(" + metadataField + ", '$.test_key') = \"test-\\'value\\'\""
-		assert.Equal(t, expected, query)
-
-		metadata = map[string]interface{}{
-			"test_key1": "test-value",
-			"test_key2": "test-value2",
-		}
-		query = builder.whereObject(metadataField, metadata)
-
-		assert.Contains(t, []string{
-			"(JSON_EXTRACT(" + metadataField + ", '$.test_key1') = \"test-value\" AND JSON_EXTRACT(" + metadataField + ", '$.test_key2') = \"test-value2\")",
-			"(JSON_EXTRACT(" + metadataField + ", '$.test_key2') = \"test-value2\" AND JSON_EXTRACT(" + metadataField + ", '$.test_key1') = \"test-value\")",
-		}, query)
-
-		// NOTE: the order of the items can change, hence the query order can change
-		// assert.Equal(t, expected, query)
-
-		objectMetadata := map[string]interface{}{
-			"testId": map[string]interface{}{
-				"test_key1": "test-value",
-				"test_key2": "test-value2",
-			},
-		}
-		query = builder.whereObject("object_metadata", objectMetadata)
-
-		assert.Contains(t, []string{
-			"(JSON_EXTRACT(object_metadata, '$.testId.test_key1') = \"test-value\" AND JSON_EXTRACT(object_metadata, '$.testId.test_key2') = \"test-value2\")",
-			"(JSON_EXTRACT(object_metadata, '$.testId.test_key2') = \"test-value2\" AND JSON_EXTRACT(object_metadata, '$.testId.test_key1') = \"test-value\")",
-		}, query)
-
-		// NOTE: the order of the items can change, hence the query order can change
-		// assert.Equal(t, expected, query)
-	})
-
-	t.Run("Postgres", func(t *testing.T) {
-		client, gdb := mockClient(PostgreSQL)
-		builder := makeWhereBuilder(client, gdb, mockObject{})
-
-		metadata := map[string]interface{}{
-			"test_key": "test-value",
-		}
-		query := builder.whereObject(metadataField, metadata)
-		expected := metadataField + "::jsonb @> '{\"test_key\":\"test-value\"}'::jsonb"
-		assert.Equal(t, expected, query)
-
-		metadata = map[string]interface{}{
-			"test_key": "test-'value'",
-		}
-		query = builder.whereObject(metadataField, metadata)
-		expected = metadataField + "::jsonb @> '{\"test_key\":\"test-\\'value\\'\"}'::jsonb"
-		assert.Equal(t, expected, query)
-
-		metadata = map[string]interface{}{
-			"test_key1": "test-value",
-			"test_key2": "test-value2",
-		}
-		query = builder.whereObject(metadataField, metadata)
-
-		assert.Contains(t, []string{
-			"(" + metadataField + "::jsonb @> '{\"test_key1\":\"test-value\"}'::jsonb AND " + metadataField + "::jsonb @> '{\"test_key2\":\"test-value2\"}'::jsonb)",
-			"(" + metadataField + "::jsonb @> '{\"test_key2\":\"test-value2\"}'::jsonb AND " + metadataField + "::jsonb @> '{\"test_key1\":\"test-value\"}'::jsonb)",
-		}, query)
-
-		// NOTE: the order of the items can change, hence the query order can change
-		// assert.Equal(t, expected, query)
-
-		objectMetadata := map[string]interface{}{
-			"testId": map[string]interface{}{
-				"test_key1": "test-value",
-				"test_key2": "test-value2",
-			},
-		}
-		query = builder.whereObject("object_metadata", objectMetadata)
-		assert.Contains(t, []string{
-			"object_metadata::jsonb @> '{\"testId\":{\"test_key1\":\"test-value\",\"test_key2\":\"test-value2\"}}'::jsonb",
-			"object_metadata::jsonb @> '{\"testId\":{\"test_key2\":\"test-value2\",\"test_key1\":\"test-value\"}}'::jsonb",
-		}, query)
-
-		// NOTE: the order of the items can change, hence the query order can change
-		// assert.Equal(t, expected, query)
-	})
-
-	t.Run("SQLite", func(t *testing.T) {
-		client, gdb := mockClient(SQLite)
-		builder := makeWhereBuilder(client, gdb, mockObject{})
-
-		metadata := map[string]interface{}{
-			"test_key": "test-value",
-		}
-		query := builder.whereObject(metadataField, metadata)
-		expected := "JSON_EXTRACT(" + metadataField + ", '$.test_key') = \"test-value\""
-		assert.Equal(t, expected, query)
-
-		metadata = map[string]interface{}{
-			"test_key": "test-'value'",
-		}
-		query = builder.whereObject(metadataField, metadata)
-		expected = "JSON_EXTRACT(" + metadataField + ", '$.test_key') = \"test-\\'value\\'\""
-		assert.Equal(t, expected, query)
-
-		metadata = map[string]interface{}{
-			"test_key1": "test-value",
-			"test_key2": "test-value2",
-		}
-		query = builder.whereObject(metadataField, metadata)
-		assert.Contains(t, []string{
-			"(JSON_EXTRACT(" + metadataField + ", '$.test_key1') = \"test-value\" AND JSON_EXTRACT(" + metadataField + ", '$.test_key2') = \"test-value2\")",
-			"(JSON_EXTRACT(" + metadataField + ", '$.test_key2') = \"test-value2\" AND JSON_EXTRACT(" + metadataField + ", '$.test_key1') = \"test-value\")",
-		}, query)
-
-		// NOTE: the order of the items can change, hence the query order can change
-		// assert.Equal(t, expected, query)
-
-		objectMetadata := map[string]interface{}{
-			"testId": map[string]interface{}{
-				"test_key1": "test-value",
-				"test_key2": "test-value2",
-			},
-		}
-		query = builder.whereObject("object_metadata", objectMetadata)
-		assert.Contains(t, []string{
-			"(JSON_EXTRACT(object_metadata, '$.testId.test_key1') = \"test-value\" AND JSON_EXTRACT(object_metadata, '$.testId.test_key2') = \"test-value2\")",
-			"(JSON_EXTRACT(object_metadata, '$.testId.test_key2') = \"test-value2\" AND JSON_EXTRACT(object_metadata, '$.testId.test_key1') = \"test-value\")",
-		}, query)
-		// NOTE: the order of the items can change, hence the query order can change
-		// assert.Equal(t, expected, query)
-	})
-}
-
 // TestCustomWhere will test the method CustomWhere()
 func TestCustomWhere(t *testing.T) {
 	t.Parallel()
@@ -450,17 +403,14 @@ func TestCustomWhere(t *testing.T) {
 	})
 
 	t.Run("SQLite $or in json", func(t *testing.T) {
-		arrayField1 := fieldInIDs
-		arrayField2 := fieldOutIDs
-
 		client, gdb := mockClient(SQLite)
-		WithCustomFields([]string{arrayField1, arrayField2}, nil)(client.options)
+		WithCustomFields([]string{"field_in_ids", "field_out_ids"}, nil)(client.options)
 
 		conditions := map[string]interface{}{
 			conditionOr: []map[string]interface{}{{
-				arrayField1: "value_id",
+				"field_in_ids": "value_id",
 			}, {
-				arrayField2: "value_id",
+				"field_out_ids": "value_id",
 			}},
 		}
 
@@ -476,17 +426,14 @@ func TestCustomWhere(t *testing.T) {
 	})
 
 	t.Run("PostgreSQL $or in json", func(t *testing.T) {
-		arrayField1 := fieldInIDs
-		arrayField2 := fieldOutIDs
-
 		client, gdb := mockClient(PostgreSQL)
-		WithCustomFields([]string{arrayField1, arrayField2}, nil)(client.options)
+		WithCustomFields([]string{"field_in_ids", "field_out_ids"}, nil)(client.options)
 
 		conditions := map[string]interface{}{
 			conditionOr: []map[string]interface{}{{
-				arrayField1: "value_id",
+				"field_in_ids": "value_id",
 			}, {
-				arrayField2: "value_id",
+				"field_out_ids": "value_id",
 			}},
 		}
 
@@ -515,7 +462,7 @@ func TestCustomWhere(t *testing.T) {
 			return tx.First(&mockObject{})
 		})
 
-		assert.Contains(t, raw, "JSON_EXTRACT(metadata, '$.field_name') = \"field_value\"")
+		assert.Contains(t, raw, `JSON_EXTRACT(metadata, "$.field_name") = "field_value"`)
 	})
 
 	t.Run("MySQL metadata", func(t *testing.T) {
@@ -532,13 +479,13 @@ func TestCustomWhere(t *testing.T) {
 			return tx.First(&mockObject{})
 		})
 
-		assert.Contains(t, raw, "JSON_EXTRACT(metadata, '$.field_name') = \"field_value\"")
+		assert.Contains(t, raw, "JSON_EXTRACT(metadata, '$.field_name') = 'field_value'")
 	})
 
 	t.Run("PostgreSQL metadata", func(t *testing.T) {
 		client, gdb := mockClient(PostgreSQL)
 		conditions := map[string]interface{}{
-			metadataField: map[string]interface{}{
+			metadataField: Metadata{
 				"field_name": "field_value",
 			},
 		}
@@ -549,15 +496,12 @@ func TestCustomWhere(t *testing.T) {
 			return tx.First(&mockObject{})
 		})
 
-		assert.Contains(t, raw, "metadata::jsonb @> '{\"field_name\":\"field_value\"}'::jsonb")
+		assert.Contains(t, raw, `metadata::jsonb @> '{"field_name":"field_value"}'`)
 	})
 
 	t.Run("SQLite $and", func(t *testing.T) {
-		arrayField1 := fieldInIDs
-		arrayField2 := fieldOutIDs
-
 		client, gdb := mockClient(SQLite)
-		WithCustomFields([]string{arrayField1, arrayField2}, nil)(client.options)
+		WithCustomFields([]string{"field_in_ids", "field_out_ids"}, nil)(client.options)
 
 		conditions := map[string]interface{}{
 			conditionAnd: []map[string]interface{}{{
@@ -566,9 +510,9 @@ func TestCustomWhere(t *testing.T) {
 				"number": 12,
 			}, {
 				conditionOr: []map[string]interface{}{{
-					arrayField1: "value_id",
+					"field_in_ids": "value_id",
 				}, {
-					arrayField2: "value_id",
+					"field_out_ids": "value_id",
 				}},
 			}},
 		}
@@ -585,11 +529,8 @@ func TestCustomWhere(t *testing.T) {
 	})
 
 	t.Run("MySQL $and", func(t *testing.T) {
-		arrayField1 := fieldInIDs
-		arrayField2 := fieldOutIDs
-
 		client, gdb := mockClient(MySQL)
-		WithCustomFields([]string{arrayField1, arrayField2}, nil)(client.options)
+		WithCustomFields([]string{"field_in_ids", "field_out_ids"}, nil)(client.options)
 
 		conditions := map[string]interface{}{
 			conditionAnd: []map[string]interface{}{{
@@ -598,9 +539,9 @@ func TestCustomWhere(t *testing.T) {
 				"number": 12,
 			}, {
 				conditionOr: []map[string]interface{}{{
-					arrayField1: "value_id",
+					"field_in_ids": "value_id",
 				}, {
-					arrayField2: "value_id",
+					"field_out_ids": "value_id",
 				}},
 			}},
 		}
@@ -617,11 +558,8 @@ func TestCustomWhere(t *testing.T) {
 	})
 
 	t.Run("PostgreSQL $and", func(t *testing.T) {
-		arrayField1 := fieldInIDs
-		arrayField2 := fieldOutIDs
-
 		client, gdb := mockClient(PostgreSQL)
-		WithCustomFields([]string{arrayField1, arrayField2}, nil)(client.options)
+		WithCustomFields([]string{"field_in_ids", "field_out_ids"}, nil)(client.options)
 
 		conditions := map[string]interface{}{
 			conditionAnd: []map[string]interface{}{{
@@ -630,9 +568,9 @@ func TestCustomWhere(t *testing.T) {
 				"number": 12,
 			}, {
 				conditionOr: []map[string]interface{}{{
-					arrayField1: "value_id",
+					"field_in_ids": "value_id",
 				}, {
-					arrayField2: "value_id",
+					"field_out_ids": "value_id",
 				}},
 			}},
 		}
@@ -806,7 +744,7 @@ func Test_sqlInjectionSafety(t *testing.T) {
 	t.Run("injection in metadata", func(t *testing.T) {
 		client, gdb := mockClient(PostgreSQL)
 		conditions := map[string]interface{}{
-			metadataField: map[string]interface{}{
+			metadataField: Metadata{
 				"1=1; DELETE FROM users": "field_value",
 			},
 		}

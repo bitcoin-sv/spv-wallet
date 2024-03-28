@@ -283,25 +283,31 @@ func (builder *whereBuilder) whereObject(k string, v interface{}) string {
 func (builder *whereBuilder) applyArray(tx customWhereInterface, key string, condition string) {
 	columnName := builder.getColumnNameOrPanic(key)
 
-	varName := builder.nextVarName()
 	engine := builder.client.Engine()
-
-	query := ""
-	arg := ""
 
 	switch engine {
 	case PostgreSQL:
-		query = fmt.Sprintf("%s::jsonb @> @%s", columnName, varName)
-		arg = fmt.Sprintf(`["%s"]`, condition)
+		builder.applyJSONBCondition(tx, columnName, fmt.Sprintf(`["%s"]`, condition))
 	case MySQL:
-		query = fmt.Sprintf("JSON_CONTAINS(%s, CAST(@%s AS JSON))", columnName, varName)
-		arg = fmt.Sprintf(`["%s"]`, condition)
+		builder.applyJSONContainsCondition(tx, columnName, condition)
 	case SQLite:
-		query = fmt.Sprintf("EXISTS (SELECT 1 FROM json_each(%s) WHERE value = @%s)", columnName, varName)
-		arg = condition
+		builder.applyJSONExistsCondition(tx, columnName, condition)
 	default:
 		panic("Database engine not supported")
 	}
+}
+
+func (builder *whereBuilder) applyJSONExistsCondition(tx customWhereInterface, columnName string, condition string) {
+	varName := builder.nextVarName()
+	query := fmt.Sprintf("EXISTS (SELECT 1 FROM json_each(%s) WHERE value = @%s)", columnName, varName)
+
+	tx.Where(query, map[string]interface{}{varName: condition})
+}
+
+func (builder *whereBuilder) applyJSONContainsCondition(tx customWhereInterface, columnName string, condition string) {
+	varName := builder.nextVarName()
+	query := fmt.Sprintf("JSON_CONTAINS(%s, CAST(@%s AS JSON))", columnName, varName)
+	arg := fmt.Sprintf(`["%s"]`, condition)
 
 	tx.Where(query, map[string]interface{}{varName: arg})
 }
