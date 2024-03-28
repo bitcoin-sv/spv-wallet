@@ -175,8 +175,13 @@ func (c *Client) loadDefaultPaymailConfig() (err error) {
 	c.options.paymail.serverConfig.options = append(c.options.paymail.serverConfig.options, server.WithLogger(&paymailLogger))
 
 	// Create the paymail configuration using the client and default service provider
+	paymailLocator := &server.PaymailServiceLocator{}
+	paymailService := &PaymailDefaultServiceProvider{client: c}
+	paymailLocator.RegisterPaymailService(paymailService)
+	paymailLocator.RegisterPikeService(paymailService)
+
 	c.options.paymail.serverConfig.Configuration, err = server.NewConfig(
-		&PaymailDefaultServiceProvider{client: c},
+		paymailLocator,
 		c.options.paymail.serverConfig.options...,
 	)
 	return

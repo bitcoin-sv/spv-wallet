@@ -21,7 +21,7 @@ func getCapabilities(ctx context.Context, cs cachestore.ClientInterface, client 
 		ctx, cacheKeyCapabilities+domain, capabilities,
 	); err != nil && !errors.Is(err, cachestore.ErrKeyNotFound) {
 		return nil, err
-	} else if capabilities != nil && len(capabilities.Capabilities) > 0 {
+	} else if len(capabilities.Capabilities) > 0 {
 		return capabilities, nil
 	}
 

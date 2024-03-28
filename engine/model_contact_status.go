@@ -2,16 +2,20 @@ package engine
 
 import (
 	"database/sql/driver"
+	"fmt"
+
 	"github.com/bitcoin-sv/spv-wallet/engine/utils"
 )
 
 type ContactStatus string
 
 const (
-	ContactStatusNotConf     = notConfirmed
-	ContactStatusAwaitAccept = awaitingAcceptance
-	ContactStatusConfirmed   = confirmed
+	ContactNotConfirmed ContactStatus = "unconfirmed"
+	ContactAwaitAccept  ContactStatus = "awaiting"
+	ContactConfirmed    ContactStatus = "confirmed"
 )
+
+var contactStatusMapper = NewEnumStringMapper(ContactNotConfirmed, ContactAwaitAccept, ContactConfirmed)
 
 // Scan will scan the value into Struct, implements sql.Scanner interface
 func (t *ContactStatus) Scan(value interface{}) error {
@@ -20,14 +24,11 @@ func (t *ContactStatus) Scan(value interface{}) error {
 		return nil
 	}
 
-	switch stringValue {
-	case notConfirmed:
-		*t = ContactStatusNotConf
-	case awaitingAcceptance:
-		*t = ContactStatusAwaitAccept
-	case confirmed:
-		*t = ContactStatusConfirmed
+	status, ok := contactStatusMapper.Get(stringValue)
+	if !ok {
+		return fmt.Errorf("invalid contact status: %s", stringValue)
 	}
+	*t = status
 
 	return nil
 }

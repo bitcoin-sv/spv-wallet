@@ -1009,58 +1009,6 @@ const docTemplate = `{
             }
         },
         "/v1/contact": {
-            "post": {
-                "security": [
-                    {
-                        "bux-auth-xpub": []
-                    }
-                ],
-                "description": "Create contact",
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Contact"
-                ],
-                "summary": "Create contact",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "fullName",
-                        "name": "fullName",
-                        "in": "query"
-                    },
-                    {
-                        "type": "string",
-                        "description": "paymail",
-                        "name": "paymail",
-                        "in": "query"
-                    },
-                    {
-                        "type": "string",
-                        "description": "pubKey",
-                        "name": "pubKey",
-                        "in": "query"
-                    },
-                    {
-                        "type": "string",
-                        "description": "metadata",
-                        "name": "metadata",
-                        "in": "query"
-                    }
-                ],
-                "responses": {
-                    "201": {
-                        "description": "Contact created",
-                        "schema": {
-                            "$ref": "#/definitions/models.Contact"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal server error - Error while creating contact"
-                    }
-                }
-            },
             "patch": {
                 "security": [
                     {
@@ -1098,6 +1046,46 @@ const docTemplate = `{
                     },
                     "500": {
                         "description": "Internal server error - Error while updating contact"
+                    }
+                }
+            }
+        },
+        "/v1/contact/{paymail}": {
+            "put": {
+                "security": [
+                    {
+                        "x-auth-xpub": []
+                    }
+                ],
+                "description": "Add or update contact. When adding a new contact, the system utilizes Paymail's PIKE capability to dispatch an invitation request, asking the counterparty to include the current user in their contacts.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Contact"
+                ],
+                "summary": "Upsert contact",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Paymail address of the contact the user wants to add/modify",
+                        "name": "paymail",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Full name and metadata needed to add/modify contact",
+                        "name": "UpsertContact",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/contacts.UpsertContact"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created"
                     }
                 }
             }
@@ -2084,6 +2072,30 @@ const docTemplate = `{
                 "Rejected"
             ]
         },
+        "contacts.UpsertContact": {
+            "type": "object",
+            "properties": {
+                "fullName": {
+                    "description": "The complete name of the contact, including first name, middle name (if applicable), and last name.",
+                    "type": "string"
+                },
+                "metadata": {
+                    "description": "Accepts a JSON object for embedding custom metadata, enabling arbitrary additional information to be associated with the resource",
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "string"
+                    },
+                    "example": {
+                        "key": "value",
+                        "key2": "value2"
+                    }
+                },
+                "requesterPaymail": {
+                    "description": "Optional paymail address owned by the user to bind the contact to. It is required in case if user has multiple paymail addresses",
+                    "type": "string"
+                }
+            }
+        },
         "destinations.CreateDestination": {
             "type": "object",
             "properties": {
@@ -2244,7 +2256,6 @@ const docTemplate = `{
                     "example": "Test User"
                 },
                 "id": {
-                    "description": "ID is the hash of the xpub and paymail",
                     "type": "string",
                     "example": "68af358bde7d8641621c7dd3de1a276c9a62cfa9e2d0740494519f1ba61e2f4a"
                 },
@@ -2272,7 +2283,7 @@ const docTemplate = `{
                 "status": {
                     "description": "Status is a contact's current status.",
                     "type": "string",
-                    "example": "not confirmed"
+                    "example": "unconfirmed"
                 },
                 "updated_at": {
                     "description": "UpdatedAt is a time when outer model was updated.",
