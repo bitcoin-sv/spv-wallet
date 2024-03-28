@@ -17,6 +17,9 @@ import (
 // @Produce		json
 // @Param		paymail path string true "Paymail address of the contact the user wants to accept"
 // @Success		200
+// @Failure		404	"Contact not found"
+// @Failure		422	"Contact status not awaiting"
+// @Failure		500	"Internal server error"
 // @Router		/v1/contact/accepted [PATCH]
 // @Security	x-auth-xpub
 func (a *Action) accept(c *gin.Context) {
