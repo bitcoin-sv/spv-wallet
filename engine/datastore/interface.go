@@ -12,7 +12,6 @@ import (
 type StorageService interface {
 	AutoMigrateDatabase(ctx context.Context, models ...interface{}) error
 	CreateInBatches(ctx context.Context, models interface{}, batchSize int) error
-	CustomWhere(tx CustomWhereInterface, conditions map[string]interface{}, engine Engine) interface{}
 	Execute(query string) *gorm.DB
 	GetModel(ctx context.Context, model interface{}, conditions map[string]interface{},
 		timeout time.Duration, forceWriteDB bool) error
