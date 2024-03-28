@@ -58,10 +58,10 @@ type ClientService interface {
 }
 
 type ContactService interface {
-	NewContact(ctx context.Context, fullName, paymail, pubKey string, opts ...ModelOps) (*Contact, error)
+	UpsertContact(ctx context.Context, fullName, paymailAdress, requesterPubKey, requesterPaymail string, opts ...ModelOps) (*Contact, error)
+	AddContactRequest(ctx context.Context, fullName, paymailAdress, requesterXPubID string, opts ...ModelOps) (*Contact, error)
 
 	UpdateContact(ctx context.Context, fullName, pubKey, xPubID, paymail string, status ContactStatus, opts ...ModelOps) (*Contact, error)
-
 	GetContacts(ctx context.Context, metadata *Metadata, conditions *map[string]interface{}, queryParams *datastore.QueryParams, opts ...ModelOps) ([]*Contact, error)
 }
 

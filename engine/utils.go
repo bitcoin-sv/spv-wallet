@@ -1,6 +1,7 @@
 package engine
 
 import (
+	"fmt"
 	"runtime/debug"
 	"strings"
 
@@ -28,4 +29,23 @@ func find[E any](collection []E, predicate func(E) bool) *E {
 
 func contains[E any](collection []E, predicate func(E) bool) bool {
 	return find(collection, predicate) != nil
+}
+
+type EnumStringMapper[T fmt.Stringer] struct {
+	elements map[string]T
+}
+
+func NewEnumStringMapper[T fmt.Stringer](elements ...T) EnumStringMapper[T] {
+	m := make(map[string]T)
+	for _, element := range elements {
+		m[element.String()] = element
+	}
+	return EnumStringMapper[T]{
+		elements: m,
+	}
+}
+
+func (m *EnumStringMapper[T]) Get(key string) (T, bool) {
+	value, ok := m.elements[key]
+	return value, ok
 }
