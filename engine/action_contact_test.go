@@ -276,14 +276,14 @@ func TestConfirmContactErrorPath(t *testing.T) {
 		getContact    func() (contact *Contact, paymail string, onwerXpubId string)
 	}{
 		{
-			name:          "contact doesn't exist - return not found",
+			name:          "contact doesn't exist - return not found error",
 			expectedError: ErrContactNotFound,
 			getContact: func() (*Contact, string, string) {
 				return nil, "idontexist", "xpubID"
 			},
 		},
 		{
-			name:          "already confirmed contact - return incorrect status",
+			name:          "already confirmed contact - return incorrect status error",
 			expectedError: ErrContactIncorrectStatus,
 			getContact: func() (*Contact, string, string) {
 				cc := newContact("Paul Altreides", "paul@altreides.diune", "pki", "xpub", ContactNotConfirmed)
@@ -293,7 +293,7 @@ func TestConfirmContactErrorPath(t *testing.T) {
 			},
 		},
 		{
-			name:          "awaiting contact - return incorrect status",
+			name:          "awaiting contact - return incorrect status error",
 			expectedError: ErrContactIncorrectStatus,
 			getContact: func() (*Contact, string, string) {
 				cc := newContact("Alia Altreides", "alia@altreides.diune", "pki", "xpub", ContactAwaitAccept)
@@ -302,7 +302,7 @@ func TestConfirmContactErrorPath(t *testing.T) {
 			},
 		},
 		{
-			name:          "rejected contact - return not found",
+			name:          "rejected contact - return not found error",
 			expectedError: ErrContactNotFound,
 			getContact: func() (*Contact, string, string) {
 				cc := newContact("Alia Altreides", "alia@altreides.diune", "pki", "xpub", ContactAwaitAccept)
