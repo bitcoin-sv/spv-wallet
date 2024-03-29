@@ -9,24 +9,24 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-// reject will reject contact request
-// Reject contact godoc
-// @Summary		Reject contact
-// @Description	Reject contact. For contact with status "awaiting" delete contact
+// confirm will confirm contact request
+// Confirm contact godoc
+// @Summary		Confirm contact
+// @Description	Confirm contact. For contact with status "unconfirmed" change status to "confirmed"
 // @Tags		Contact
 // @Produce		json
-// @Param		paymail path string true "Paymail address of the contact the user wants to reject"
+// @Param		paymail path string true "Paymail address of the contact the user wants to confirm"
 // @Success		200
 // @Failure		404	"Contact not found"
-// @Failure		422	"Contact status not awaiting"
+// @Failure		422	"Contact status not unconfirmed"
 // @Failure		500	"Internal server error"
-// @Router		/v1/contact/rejected/{paymail} [PATCH]
+// @Router		/v1/contact/confirmed/{paymail} [PATCH]
 // @Security	x-auth-xpub
-func (a *Action) reject(c *gin.Context) {
+func (a *Action) confirm(c *gin.Context) {
 	reqXPubID := c.GetString(auth.ParamXPubHashKey)
 	paymail := c.Param("paymail")
 
-	err := a.Services.SpvWalletEngine.RejectContact(c, reqXPubID, paymail)
+	err := a.Services.SpvWalletEngine.ConfirmContact(c, reqXPubID, paymail)
 
 	if err != nil {
 		switch {

@@ -16,7 +16,7 @@ var (
 	ErrAddingContactRequest         = errors.New("adding contact request failed")
 	ErrMoreThanOnePaymailRegistered = errors.New("there are more than one paymail assigned to the xpub")
 	ErrContactNotFound              = errors.New("contact not found")
-	ErrContactStatusNotAwaiting     = errors.New("contact status is not awaiting")
+	ErrContactIncorrectStatus       = errors.New("contact is in incorrect status to proceed")
 )
 
 func (c *Client) UpsertContact(ctx context.Context, ctcFName, ctcPaymail, requesterXpub, requesterPaymail string, opts ...ModelOps) (*Contact, error) {
@@ -172,40 +172,6 @@ func (c *Client) upsertContact(ctx context.Context, pmSrvnt *PaymailServant, req
 	return contact, nil
 }
 
-func (c *Client) UpdateContact(ctx context.Context, fullName, pubKey, xPubID, paymailAddr string, status ContactStatus, opts ...ModelOps) (*Contact, error) {
-	contact, err := getContact(ctx, paymailAddr, xPubID, opts...)
-
-	if err != nil {
-		return nil, fmt.Errorf("failed to get contact: %w", err)
-	}
-
-	if contact == nil {
-		return nil, fmt.Errorf("contact not found")
-	}
-
-	if fullName != "" {
-		contact.FullName = fullName
-	}
-
-	if pubKey != "" {
-		contact.PubKey = pubKey
-	}
-
-	if status != "" {
-		contact.Status = status
-	}
-
-	if paymailAddr != "" {
-		contact.Paymail = paymailAddr
-	}
-
-	if err = contact.Save(ctx); err != nil {
-		return nil, err
-	}
-
-	return contact, nil
-}
-
 func (c *Client) GetContacts(ctx context.Context, metadata *Metadata, conditions *map[string]interface{}, queryParams *datastore.QueryParams, opts ...ModelOps) ([]*Contact, error) {
 	ctx = c.GetOrStartTxn(ctx, "get_contacts")
 
@@ -221,25 +187,20 @@ func (c *Client) AcceptContact(ctx context.Context, xPubID, paymail string) erro
 
 	contact, err := getContact(ctx, paymail, xPubID, c.DefaultModelOptions()...)
 	if err != nil {
-		c.Logger().Err(err).
-			Str("xPubID", xPubID).
-			Str("paymail", paymail).
-			Msgf("unexpected error while geting contact: %s", err.Error())
+		c.logContactError(xPubID, paymail, fmt.Sprintf("unexpected error while geting contact: %s", err.Error()))
 		return err
 	}
 	if contact == nil {
 		return ErrContactNotFound
 	}
 	if contact.Status != ContactAwaitAccept {
-		err = ErrContactStatusNotAwaiting
-		c.Logger().Warn().
-			Str("xPubID", xPubID).
-			Str("paymail", paymail).
-			Msgf("contact status is: %s, expected: %s, error: %s", contact.Status, ContactAwaitAccept, err.Error())
-		return err
+		c.logContactWarining(xPubID, paymail,
+			fmt.Sprintf("cannot accept contact. Reason: status: %s, expected: %s", contact.Status, ContactAwaitAccept))
+		return ErrContactIncorrectStatus
 	}
 	contact.Status = ContactNotConfirmed
 	if err = contact.Save(ctx); err != nil {
+		c.logContactError(xPubID, paymail, fmt.Sprintf("unexpected error while saving contact: %s", err.Error()))
 		return err
 	}
 
@@ -247,25 +208,18 @@ func (c *Client) AcceptContact(ctx context.Context, xPubID, paymail string) erro
 }
 
 func (c *Client) RejectContact(ctx context.Context, xPubID, paymail string) error {
-
 	contact, err := getContact(ctx, paymail, xPubID, c.DefaultModelOptions()...)
 	if err != nil {
-		c.Logger().Warn().
-			Str("xPubID", xPubID).
-			Str("paymail", paymail).
-			Msgf("unexpected error while geting contact: %s", err.Error())
+		c.logContactError(xPubID, paymail, fmt.Sprintf("unexpected error while geting contact: %s", err.Error()))
 		return err
 	}
 	if contact == nil {
 		return ErrContactNotFound
 	}
 	if contact.Status != ContactAwaitAccept {
-		err = ErrContactStatusNotAwaiting
-		c.Logger().Warn().
-			Str("xPubID", xPubID).
-			Str("paymail", paymail).
-			Msgf("contact status is: %s, expected: %s, error: %s", contact.Status, ContactAwaitAccept, err.Error())
-		return err
+		c.logContactWarining(xPubID, paymail,
+			fmt.Sprintf("cannot reject contact. Reason: status: %s, expected: %s", contact.Status, ContactAwaitAccept))
+		return ErrContactIncorrectStatus
 	}
 
 	contact.DeletedAt.Valid = true
@@ -273,8 +227,47 @@ func (c *Client) RejectContact(ctx context.Context, xPubID, paymail string) erro
 	contact.Status = ContactRejected
 
 	if err = contact.Save(ctx); err != nil {
+		c.logContactError(xPubID, paymail, fmt.Sprintf("unexpected error while saving contact: %s", err.Error()))
 		return err
 	}
 
 	return nil
+}
+
+func (c *Client) ConfirmContact(ctx context.Context, xPubID, paymail string) error {
+	contact, err := getContact(ctx, paymail, xPubID, c.DefaultModelOptions()...)
+	if err != nil {
+		c.logContactError(xPubID, paymail, fmt.Sprintf("unexpected error while geting contact: %s", err.Error()))
+		return err
+	}
+	if contact == nil {
+		return ErrContactNotFound
+	}
+	if contact.Status != ContactNotConfirmed {
+		c.logContactWarining(xPubID, paymail,
+			fmt.Sprintf("cannot confirm contact. Reason: status: %s, expected: %s", contact.Status, ContactNotConfirmed))
+		return ErrContactIncorrectStatus
+	}
+
+	contact.Status = ContactConfirmed
+	if err = contact.Save(ctx); err != nil {
+		c.logContactError(xPubID, paymail, fmt.Sprintf("unexpected error while saving contact: %s", err.Error()))
+		return err
+	}
+
+	return nil
+}
+
+func (c *Client) logContactWarining(xPubID, cPaymail, warning string) {
+	c.Logger().Warn().
+		Str("xPubID", xPubID).
+		Str("contact", cPaymail).
+		Msg(warning)
+}
+
+func (c *Client) logContactError(xPubID, cPaymail, errorMsg string) {
+	c.Logger().Error().
+		Str("xPubID", xPubID).
+		Str("contact", cPaymail).
+		Msg(errorMsg)
 }

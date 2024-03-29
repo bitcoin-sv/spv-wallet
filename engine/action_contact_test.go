@@ -90,7 +90,7 @@ func TestAcceptContactErrorPath(t *testing.T) {
 				paymail:       paymailGeneric,
 				contactStatus: ContactAwaitAccept.String(),
 			},
-			expectedErrorMessage: ErrContactStatusNotAwaiting,
+			expectedErrorMessage: ErrContactIncorrectStatus,
 		},
 		{
 			testID: 3,
@@ -100,7 +100,7 @@ func TestAcceptContactErrorPath(t *testing.T) {
 				paymail:       paymailGeneric,
 				contactStatus: ContactNotConfirmed.String(),
 			},
-			expectedErrorMessage: ErrContactStatusNotAwaiting,
+			expectedErrorMessage: ErrContactIncorrectStatus,
 		},
 		{
 			testID: 4,
@@ -110,7 +110,7 @@ func TestAcceptContactErrorPath(t *testing.T) {
 				paymail:       paymailGeneric,
 				contactStatus: ContactRejected.String(),
 			},
-			expectedErrorMessage: ErrContactStatusNotAwaiting,
+			expectedErrorMessage: ErrContactIncorrectStatus,
 		},
 		{
 			testID: 5,
@@ -205,7 +205,7 @@ func TestRejectContactErrorPath(t *testing.T) {
 				paymail:       paymailGeneric,
 				contactStatus: ContactConfirmed.String(),
 			},
-			expectedErrorMessage: ErrContactStatusNotAwaiting,
+			expectedErrorMessage: ErrContactIncorrectStatus,
 		},
 		{
 			testID: 3,
@@ -215,7 +215,7 @@ func TestRejectContactErrorPath(t *testing.T) {
 				paymail:       paymailGeneric,
 				contactStatus: ContactNotConfirmed.String(),
 			},
-			expectedErrorMessage: ErrContactStatusNotAwaiting,
+			expectedErrorMessage: ErrContactIncorrectStatus,
 		},
 		{
 			testID: 4,
@@ -225,7 +225,7 @@ func TestRejectContactErrorPath(t *testing.T) {
 				paymail:       paymailGeneric,
 				contactStatus: ContactRejected.String(),
 			},
-			expectedErrorMessage: ErrContactStatusNotAwaiting,
+			expectedErrorMessage: ErrContactIncorrectStatus,
 		},
 		{
 			testID: 5,
