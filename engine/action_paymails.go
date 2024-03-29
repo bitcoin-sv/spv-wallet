@@ -5,8 +5,8 @@ import (
 	"errors"
 	"time"
 
+	"github.com/bitcoin-sv/spv-wallet/engine/datastore"
 	"github.com/bitcoin-sv/spv-wallet/engine/utils"
-	"github.com/mrz1836/go-datastore"
 )
 
 // GetPaymailAddress will get a paymail address model
@@ -96,7 +96,7 @@ func (c *Client) NewPaymailAddress(ctx context.Context, xPubKey, address, public
 	ctx = c.GetOrStartTxn(ctx, "new_paymail_address")
 
 	// Get the xPub (make sure it exists)
-	_, err := getXpubWithCache(ctx, c, xPubKey, "", c.DefaultModelOptions()...)
+	xPub, err := getXpubWithCache(ctx, c, xPubKey, "", c.DefaultModelOptions()...)
 	if err != nil {
 		return nil, err
 	}
@@ -110,9 +110,15 @@ func (c *Client) NewPaymailAddress(ctx context.Context, xPubKey, address, public
 		return nil, err
 	}
 
+	externalXpubDerivation, err := xPub.GetNextExternalDerivationNum(ctx)
+	if err != nil {
+		return nil, err
+	}
+
 	// Start the new paymail address model
 	paymailAddress := newPaymail(
 		address,
+		externalXpubDerivation,
 		append(opts, c.DefaultModelOptions(
 			New(),
 			WithXPub(xPubKey),

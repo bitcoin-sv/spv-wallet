@@ -14,13 +14,13 @@ import (
 // @Description	Get shared config
 // @Tags		Admin
 // @Produce		json
-// @Success		200
+// @Success		200 {object} models.SharedConfig "Shared configuration"
 // @Router		/v1/admin/shared-config [get]
 // @Security	x-auth-xpub
 func (a *Action) sharedConfig(c *gin.Context) {
 	makeConfig := sync.OnceValue(func() models.SharedConfig {
 		return models.SharedConfig{
-			PaymilDomains: a.AppConfig.Paymail.Domains,
+			PaymailDomains: a.AppConfig.Paymail.Domains,
 			ExperimentalFeatures: map[string]bool{
 				"pike_enabled": a.AppConfig.ExperimentalFeatures.PikeEnabled,
 			},

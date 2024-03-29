@@ -7,6 +7,7 @@ import (
 
 	"github.com/DATA-DOG/go-sqlmock"
 	"github.com/bitcoin-sv/spv-wallet/engine/chainstate"
+	"github.com/bitcoin-sv/spv-wallet/engine/datastore"
 	"github.com/bitcoin-sv/spv-wallet/engine/taskmanager"
 	"github.com/bitcoin-sv/spv-wallet/engine/tester"
 	"github.com/bitcoinschema/go-bitcoin/v2"
@@ -17,7 +18,6 @@ import (
 	"github.com/libsv/go-bt/v2/sighash"
 	"github.com/libsv/go-bt/v2/unlocker"
 	"github.com/mrz1836/go-cache"
-	"github.com/mrz1836/go-datastore"
 	"github.com/rafaeljusto/redigomock"
 	"github.com/rs/zerolog"
 	"github.com/stretchr/testify/require"
@@ -88,7 +88,7 @@ func CreateTestSQLiteClient(t *testing.T, debug, shared bool, clientOpts ...Clie
 
 	// Set the default options, add migrate models
 	opts := DefaultClientOpts(debug, shared)
-	opts = append(opts, WithAutoMigrate(BaseModels...))
+	opts = append(opts, WithAutoMigrate(append(BaseModels, newPaymail("", 0))...))
 	opts = append(opts, WithLogger(&logger))
 	opts = append(opts, clientOpts...)
 

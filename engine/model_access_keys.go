@@ -6,10 +6,10 @@ import (
 	"encoding/hex"
 	"errors"
 
+	"github.com/bitcoin-sv/spv-wallet/engine/datastore"
+	customTypes "github.com/bitcoin-sv/spv-wallet/engine/datastore/customtypes"
 	"github.com/bitcoin-sv/spv-wallet/engine/utils"
 	"github.com/bitcoinschema/go-bitcoin/v2"
-	"github.com/mrz1836/go-datastore"
-	customTypes "github.com/mrz1836/go-datastore/custom_types"
 )
 
 // AccessKey is an object representing an access key model

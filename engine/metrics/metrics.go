@@ -21,6 +21,7 @@ type Metrics struct {
 	verifyMerkleRoots *prometheus.HistogramVec
 	recordTransaction *prometheus.HistogramVec
 	queryTransaction  *prometheus.HistogramVec
+	addContact        *prometheus.HistogramVec
 
 	// each cronJob is observed by the duration it takes to execute and the last time it was executed
 	cronHistogram     *prometheus.HistogramVec
@@ -35,6 +36,7 @@ func NewMetrics(collector Collector) *Metrics {
 		verifyMerkleRoots: collector.RegisterHistogramVec(verifyMerkleRootsHistogramName, "classification"),
 		recordTransaction: collector.RegisterHistogramVec(recordTransactionHistogramName, "classification", "strategy"),
 		queryTransaction:  collector.RegisterHistogramVec(queryTransactionHistogramName, "classification"),
+		addContact:        collector.RegisterHistogramVec(addContactHistogramName, "classification", "pike"),
 		cronHistogram:     collector.RegisterHistogramVec(cronHistogramName, "name"),
 		cronLastExecution: collector.RegisterGaugeVec(cronLastExecutionGaugeName, "name"),
 	}
@@ -73,6 +75,14 @@ func (m *Metrics) TrackCron(name string) EndWithClassification {
 	m.cronLastExecution.WithLabelValues(name).Set(float64(start.Unix()))
 	return func(success bool) {
 		m.cronHistogram.WithLabelValues(name).Observe(time.Since(start).Seconds())
+	}
+}
+
+// TrackAddContact is used to track the time it takes to add PIKE contact
+func (m *Metrics) TrackAddContact() EndWithClassification {
+	start := time.Now()
+	return func(success bool) {
+		m.addContact.WithLabelValues(classify(success)).Observe(time.Since(start).Seconds())
 	}
 }
 

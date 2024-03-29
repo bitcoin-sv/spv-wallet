@@ -3,7 +3,7 @@ package engine
 import (
 	"context"
 
-	"github.com/mrz1836/go-datastore"
+	"github.com/bitcoin-sv/spv-wallet/engine/datastore"
 )
 
 // NewDestination will get a new destination for an existing xPub

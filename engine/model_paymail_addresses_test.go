@@ -1,6 +1,9 @@
 package engine
 
 import (
+	"encoding/hex"
+	"fmt"
+	"math/rand"
 	"testing"
 
 	"github.com/bitcoin-sv/spv-wallet/engine/utils"
@@ -17,10 +20,11 @@ const (
 // TestNewPaymail will test the method newPaymail()
 func TestNewPaymail(t *testing.T) {
 	t.Run("paymail basic test", func(t *testing.T) {
-		ctx, client, deferMe := CreateTestSQLiteClient(t, true, false, WithAutoMigrate(&PaymailAddress{}))
+		ctx, client, deferMe := CreateTestSQLiteClient(t, true, false)
 		defer deferMe()
 
 		paymail := "paymail@tester.com"
+		externalDerivationNum := randDerivationNum()
 
 		xPub, err := bitcoin.GetHDKeyFromExtendedPublicKey(testXpubAuth)
 		require.NoError(t, err)
@@ -28,8 +32,8 @@ func TestNewPaymail(t *testing.T) {
 
 		// Get the external public key
 		var paymailExternalKey *bip32.ExtendedKey
-		paymailExternalKey, err = bitcoin.GetHDKeyChild(
-			xPub, utils.ChainExternal,
+		paymailExternalKey, err = bitcoin.GetHDKeyByPath(
+			xPub, utils.ChainExternal, externalDerivationNum,
 		)
 		require.NoError(t, err)
 		require.NotNil(t, paymailExternalKey)
@@ -44,6 +48,7 @@ func TestNewPaymail(t *testing.T) {
 
 		p := newPaymail(
 			paymail,
+			externalDerivationNum,
 			WithClient(client),
 			WithXPub(testXpubAuth),
 			WithEncryptionKey(testEncryption),
@@ -55,6 +60,7 @@ func TestNewPaymail(t *testing.T) {
 
 		p2 := newPaymail(
 			paymail,
+			externalDerivationNum,
 			WithClient(client),
 			WithEncryptionKey(testEncryption),
 		)
@@ -112,4 +118,192 @@ func TestNewPaymail(t *testing.T) {
 		address1, _ := bitcoin.GetAddressFromPubKey(key1, true)
 		assert.Equal(t, addressInternal, address1.AddressString)
 	})
+
+	t.Run("ctor test", func(t *testing.T) {
+		// given
+		derivationNumber := randDerivationNum()
+
+		// when
+		pm := newPaymail("paymail@domain.sc", derivationNumber, WithXPub(testXPub))
+
+		// then
+		require.Equal(t, uint32(0), pm.PubKeyNum, "PubKeyNum for new paymail MUST equal 0")
+		require.Equal(t, uint32(0), pm.XpubDerivationSeq, "XpubDerivationSeq for new paymail MUST equal 0")
+		require.Equal(t, derivationNumber, pm.ExternalXpubKeyNum)
+	})
+
+	t.Run("GetNextXpub() test", func(t *testing.T) {
+		ctx, c, deferMe := CreateTestSQLiteClient(t, false, false, WithFreeCache())
+		defer deferMe()
+
+		// given
+		derivationNumber := randDerivationNum()
+
+		pm := newPaymail("paymail@domain.sc", derivationNumber, WithClient(c), WithXPub(testXPub))
+		err := pm.Save(ctx)
+		require.NoError(t, err)
+
+		// when
+		firstExternalXpub, err := pm.GetNextXpub(ctx)
+		require.NoError(t, err)
+		derivationForFirstXpub := pm.XpubDerivationSeq
+
+		secondExternalXpub, err := pm.GetNextXpub(ctx)
+		require.NoError(t, err)
+		derivationForSecondXpub := pm.XpubDerivationSeq
+
+		// then
+		require.Equal(t, derivationNumber, pm.ExternalXpubKeyNum, "ExternalXpubKeyNum MUST NOT be changed durring any key rotation")
+
+		require.Equal(t, uint32(1), derivationForFirstXpub, "XpubDerivationSeq after first rotation MUST equal 1")
+		require.Equal(t, uint32(2), derivationForSecondXpub, "XpubDerivationSeq after second rotation MUST equal 2")
+
+		require.NotEqual(t, firstExternalXpub, secondExternalXpub, "External Xpubs cannot be equal")
+
+		// verify the correctness of the derivation path
+		expectedXpubDerivationPath := fmt.Sprintf("%d/%d/%d", utils.ChainExternal, derivationNumber, pm.XpubDerivationSeq)
+		masterXPub, _ := bitcoin.GetHDKeyFromExtendedPublicKey(testXPub)
+
+		expectedExternalXpub, err := masterXPub.DeriveChildFromPath(expectedXpubDerivationPath)
+		require.NoError(t, err)
+
+		require.Equal(t, expectedExternalXpub, secondExternalXpub)
+	})
+
+	t.Run("GetPubKey() test", func(t *testing.T) {
+		ctx, c, deferMe := CreateTestSQLiteClient(t, false, false, WithFreeCache())
+		defer deferMe()
+
+		// given
+		derivationNumber := randDerivationNum()
+
+		pm := newPaymail("paymail@domain.sc", derivationNumber, WithClient(c), WithXPub(testXPub))
+		err := pm.Save(ctx)
+		require.NoError(t, err)
+
+		initialDerivationSeq := pm.XpubDerivationSeq
+
+		// when
+		firstPubKey, err := pm.GetPubKey()
+		require.NoError(t, err)
+
+		secondPubKey, err := pm.GetPubKey()
+		require.NoError(t, err)
+
+		// then
+		require.Equal(t, initialDerivationSeq, pm.XpubDerivationSeq, "XpubDerivationSeq cannot be changed")
+		require.Equal(t, derivationNumber, pm.ExternalXpubKeyNum, "ExternalXpubKeyNum MUST NOT be changed durring any key rotation")
+
+		require.Equal(t, firstPubKey, secondPubKey, "PubKeys must be equal")
+
+		// verify the correctness of the derivation path
+		expectedXpubDerivationPath := fmt.Sprintf("%d/%d/%d", utils.ChainExternal, derivationNumber, initialDerivationSeq)
+		masterXPub, _ := bitcoin.GetHDKeyFromExtendedPublicKey(testXPub)
+
+		expectedHdPubKey, err := masterXPub.DeriveChildFromPath(expectedXpubDerivationPath)
+		require.NoError(t, err)
+
+		expectedPubKey, err := expectedHdPubKey.ECPubKey()
+		require.NoError(t, err)
+
+		require.Equal(t, hex.EncodeToString(expectedPubKey.SerialiseCompressed()), firstPubKey)
+	})
+
+	t.Run("RotatePubKey() test", func(t *testing.T) {
+		ctx, c, deferMe := CreateTestSQLiteClient(t, false, false, WithFreeCache())
+		defer deferMe()
+
+		// given
+		derivationNumber := randDerivationNum()
+
+		pm := newPaymail("paymail@domain.sc", derivationNumber, WithClient(c), WithXPub(testXPub))
+		err := pm.Save(ctx)
+		require.NoError(t, err)
+
+		initialDerivationSeq := pm.XpubDerivationSeq
+
+		// when
+		firstPubKey, err := pm.GetPubKey()
+		require.NoError(t, err)
+
+		err = pm.RotatePubKey(ctx)
+		require.NoError(t, err)
+
+		secondPubKey, err := pm.GetPubKey()
+		require.NoError(t, err)
+
+		// then
+		require.Greater(t, pm.XpubDerivationSeq, initialDerivationSeq, "XpubDerivationSeq must be incremented after rotation")
+		require.Equal(t, derivationNumber, pm.ExternalXpubKeyNum, "ExternalXpubKeyNum MUST NOT be changed durring any key rotation")
+
+		require.NotEqual(t, firstPubKey, secondPubKey)
+
+		externalXPubDerivationPath := fmt.Sprintf("%d/%d/%d", utils.ChainExternal, derivationNumber, pm.XpubDerivationSeq)
+		masterXPub, _ := bitcoin.GetHDKeyFromExtendedPublicKey(testXPub)
+
+		expectedExternalXpub, err := masterXPub.DeriveChildFromPath(externalXPubDerivationPath)
+		require.NoError(t, err)
+
+		expectedPubKey, err := expectedExternalXpub.ECPubKey()
+		require.NoError(t, err)
+
+		require.Equal(t, hex.EncodeToString(expectedPubKey.SerialiseCompressed()), secondPubKey)
+	})
+
+	t.Run("ExternalXPub and PubKey rotation test", func(t *testing.T) {
+		ctx, c, deferMe := CreateTestSQLiteClient(t, false, false, WithFreeCache())
+		defer deferMe()
+
+		// given
+		derivationNumber := randDerivationNum()
+
+		pm := newPaymail("paymail@domain.sc", derivationNumber, WithClient(c), WithXPub(testXPub))
+		err := pm.Save(ctx)
+		require.NoError(t, err)
+
+		initialDerivationSeq := pm.XpubDerivationSeq
+
+		// when
+
+		// get pub key	- XpubDerivationSeq - should not be changed
+		// PubKeyNum shoud be equal to XpubDerivationSeq
+		firstPubKey, err := pm.GetPubKey()
+		require.NoError(t, err)
+
+		require.Equal(t, initialDerivationSeq, pm.XpubDerivationSeq)
+		require.Equal(t, pm.PubKeyNum, pm.XpubDerivationSeq)
+
+		// get external xpub - XpubDerivationSeq should be incremented
+		firstExternalXpub, err := pm.GetNextXpub(ctx)
+		require.NoError(t, err)
+
+		require.Greater(t, pm.XpubDerivationSeq, initialDerivationSeq)
+
+		// get pub key again - should be the same as previous one
+		secondPubKey, err := pm.GetPubKey()
+		require.NoError(t, err)
+
+		require.Equal(t, firstPubKey, secondPubKey)
+
+		// rotate pub key - XpubDerivationSeq should be incremented
+		err = pm.RotatePubKey(ctx)
+		require.NoError(t, err)
+
+		// get external xpub - XpubDerivationSeq should be incremented
+		secondExternalXpub, err := pm.GetNextXpub(ctx)
+		require.NoError(t, err)
+
+		numberOfRotation := 3
+		require.Equal(t, initialDerivationSeq+uint32(numberOfRotation), pm.XpubDerivationSeq)
+		require.NotEqual(t, firstExternalXpub, secondExternalXpub)
+	})
+}
+
+func randDerivationNum() uint32 {
+	rnd := rand.Int63n(int64(bip32.HardenedKeyStart))
+	if rnd < 0 {
+		rnd = rnd * -1
+	}
+
+	return uint32(rnd)
 }

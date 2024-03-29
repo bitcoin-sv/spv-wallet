@@ -11,13 +11,13 @@ import (
 	broadcastclient "github.com/bitcoin-sv/go-broadcast-client/broadcast/broadcast-client"
 	"github.com/bitcoin-sv/spv-wallet/engine"
 	"github.com/bitcoin-sv/spv-wallet/engine/cluster"
+	"github.com/bitcoin-sv/spv-wallet/engine/datastore"
 	"github.com/bitcoin-sv/spv-wallet/engine/taskmanager"
 	"github.com/bitcoin-sv/spv-wallet/engine/utils"
 	"github.com/bitcoin-sv/spv-wallet/logging"
 	"github.com/bitcoin-sv/spv-wallet/metrics"
 	"github.com/go-redis/redis/v8"
 	"github.com/mrz1836/go-cachestore"
-	"github.com/mrz1836/go-datastore"
 	"github.com/newrelic/go-agent/v3/newrelic"
 	"github.com/rs/zerolog"
 )
@@ -281,6 +281,10 @@ func loadPaymail(appConfig *AppConfig, options []engine.ClientOps) []engine.Clie
 	if pm.Beef.enabled() {
 		options = append(options, engine.WithPaymailBeefSupport(pm.Beef.BlockHeaderServiceHeaderValidationURL, pm.Beef.BlockHeaderServiceAuthToken))
 	}
+	if appConfig.ExperimentalFeatures.PikeEnabled {
+		options = append(options, engine.WithPaymailPikeSupport())
+	}
+
 	return options
 }
 

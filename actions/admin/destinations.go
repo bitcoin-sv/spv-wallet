@@ -5,6 +5,8 @@ import (
 
 	"github.com/bitcoin-sv/spv-wallet/actions"
 	"github.com/bitcoin-sv/spv-wallet/engine"
+	"github.com/bitcoin-sv/spv-wallet/mappings"
+	"github.com/bitcoin-sv/spv-wallet/models"
 	"github.com/gin-gonic/gin"
 )
 
@@ -14,19 +16,16 @@ import (
 // @Description	Search for destinations
 // @Tags		Admin
 // @Produce		json
-// @Param		page query int false "page"
-// @Param		page_size query int false "page_size"
-// @Param		order_by_field query string false "order_by_field"
-// @Param		sort_direction query string false "sort_direction"
-// @Param		metadata query string false "Metadata filter"
-// @Param		conditions query string false "Conditions filter"
-// @Success		200
+// @Param		SearchRequestParameters body actions.SearchRequestParameters false "Supports targeted resource searches with filters for metadata and custom conditions, plus options for pagination and sorting to streamline data exploration and analysis"
+// @Success		200 {object} []models.Destination "List of destinations"
+// @Failure		400	"Bad request - Error while parsing SearchRequestParameters from request body"
+// @Failure 	500	"Internal server error - Error while searching for destinations"
 // @Router		/v1/admin/destinations/search [post]
 // @Security	x-auth-xpub
 func (a *Action) destinationsSearch(c *gin.Context) {
-	queryParams, metadata, conditions, err := actions.GetQueryParameters(c)
+	queryParams, metadata, conditions, err := actions.GetSearchQueryParameters(c)
 	if err != nil {
-		c.JSON(http.StatusExpectationFailed, err.Error())
+		c.JSON(http.StatusBadRequest, err.Error())
 		return
 	}
 
@@ -37,11 +36,16 @@ func (a *Action) destinationsSearch(c *gin.Context) {
 		conditions,
 		queryParams,
 	); err != nil {
-		c.JSON(http.StatusExpectationFailed, err.Error())
+		c.JSON(http.StatusInternalServerError, err.Error())
 		return
 	}
 
-	c.JSON(http.StatusOK, destinations)
+	destinationContracts := make([]*models.Destination, 0)
+	for _, destination := range destinations {
+		destinationContracts = append(destinationContracts, mappings.MapToDestinationContract(destination))
+	}
+
+	c.JSON(http.StatusOK, destinationContracts)
 }
 
 // destinationsCount will count all destinations filtered by metadata
@@ -50,15 +54,15 @@ func (a *Action) destinationsSearch(c *gin.Context) {
 // @Description	Count destinations
 // @Tags		Admin
 // @Produce		json
-// @Param		metadata query string false "Metadata filter"
-// @Param		conditions query string false "Conditions filter"
-// @Success		200
-// @Router		/v1/admin/destinations/count [post]
+// @Param		CountRequestParameters body actions.CountRequestParameters false "Enables precise filtering of resource counts using custom conditions or metadata, catering to specific business or analysis needs"
+// @Success		200	{number} int64 "Count of destinations"
+// @Failure		400	"Bad request - Error while parsing CountRequestParameters from request body"
+// @Failure 	500	"Internal Server Error - Error while fetching count of destinations"
 // @Security	x-auth-xpub
 func (a *Action) destinationsCount(c *gin.Context) {
-	_, metadata, conditions, err := actions.GetQueryParameters(c)
+	metadata, conditions, err := actions.GetCountQueryParameters(c)
 	if err != nil {
-		c.JSON(http.StatusExpectationFailed, err.Error())
+		c.JSON(http.StatusBadRequest, err.Error())
 		return
 	}
 
@@ -68,7 +72,7 @@ func (a *Action) destinationsCount(c *gin.Context) {
 		metadata,
 		conditions,
 	); err != nil {
-		c.JSON(http.StatusExpectationFailed, err.Error())
+		c.JSON(http.StatusInternalServerError, err.Error())
 		return
 	}
 

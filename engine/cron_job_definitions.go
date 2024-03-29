@@ -5,7 +5,7 @@ import (
 	"errors"
 	"time"
 
-	"github.com/mrz1836/go-datastore"
+	"github.com/bitcoin-sv/spv-wallet/engine/datastore"
 )
 
 // taskCleanupDraftTransactions will clean up all old expired draft transactions

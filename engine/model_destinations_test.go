@@ -4,11 +4,11 @@ import (
 	"testing"
 
 	"github.com/DATA-DOG/go-sqlmock"
+	"github.com/bitcoin-sv/spv-wallet/engine/datastore"
 	"github.com/bitcoin-sv/spv-wallet/engine/tester"
 	"github.com/bitcoin-sv/spv-wallet/engine/utils"
 	bscript2 "github.com/libsv/go-bt/v2/bscript"
 	"github.com/mrz1836/go-cache"
-	"github.com/mrz1836/go-datastore"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -410,7 +410,7 @@ func (ts *EmbeddedDBTestSuite) TestDestination_Save() {
 		// Create model
 		tc.MockSQLDB.ExpectExec("INSERT INTO `"+tc.tablePrefix+"_destinations` ("+
 			"`created_at`,`updated_at`,`metadata`,`deleted_at`,`id`,`xpub_id`,`locking_script`,"+
-			"`type`,`chain`,`num`,`address`,`draft_id`) VALUES (?,?,?,?,?,?,?,?,?,?,?,?)").WithArgs(
+			"`type`,`chain`,`num`,`paymail_external_derivation_num`,`address`,`draft_id`) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)").WithArgs(
 			tester.AnyTime{},    // created_at
 			tester.AnyTime{},    // updated_at
 			nil,                 // metadata
@@ -421,6 +421,7 @@ func (ts *EmbeddedDBTestSuite) TestDestination_Save() {
 			destination.Type,    // type
 			0,                   // chain
 			0,                   // num
+			nil,                 // paymail_ext_derivation_num
 			destination.Address, // address
 			testDraftID,         // draft_id
 		).WillReturnResult(sqlmock.NewResult(1, 1))
@@ -456,7 +457,7 @@ func (ts *EmbeddedDBTestSuite) TestDestination_Save() {
 		// Create model
 		tc.MockSQLDB.ExpectExec("INSERT INTO `"+tc.tablePrefix+"_destinations` ("+
 			"`created_at`,`updated_at`,`metadata`,`deleted_at`,`id`,`xpub_id`,`locking_script`,"+
-			"`type`,`chain`,`num`,`address`,`draft_id`) VALUES (?,?,?,?,?,?,?,?,?,?,?,?)").WithArgs(
+			"`type`,`chain`,`num`,`paymail_external_derivation_num`,`address`,`draft_id`) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)").WithArgs(
 			tester.AnyTime{},    // created_at
 			tester.AnyTime{},    // updated_at
 			nil,                 // metadata
@@ -467,6 +468,7 @@ func (ts *EmbeddedDBTestSuite) TestDestination_Save() {
 			destination.Type,    // type
 			0,                   // chain
 			0,                   // num
+			nil,                 // paymail_external_derivation_num
 			destination.Address, // address
 			testDraftID,         // draft_id
 		).WillReturnResult(sqlmock.NewResult(1, 1))
@@ -500,7 +502,9 @@ func (ts *EmbeddedDBTestSuite) TestDestination_Save() {
 		tc.MockSQLDB.ExpectBegin()
 
 		// Create model
-		tc.MockSQLDB.ExpectExec(`INSERT INTO "`+tc.tablePrefix+`_destinations" ("created_at","updated_at","metadata","deleted_at","id","xpub_id","locking_script","type","chain","num","address","draft_id") VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12)`).WithArgs(
+		tc.MockSQLDB.ExpectExec(`INSERT INTO "`+tc.tablePrefix+`_destinations" `+
+			`("created_at","updated_at","metadata","deleted_at","id","xpub_id","locking_script","type","chain","num","paymail_external_derivation_num","address","draft_id") `+
+			`VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13)`).WithArgs(
 			tester.AnyTime{},    // created_at
 			tester.AnyTime{},    // updated_at
 			nil,                 // metadata
@@ -511,6 +515,7 @@ func (ts *EmbeddedDBTestSuite) TestDestination_Save() {
 			destination.Type,    // type
 			0,                   // chain
 			0,                   // num
+			nil,                 // paymail_ext_derivation_num
 			destination.Address, // address
 			testDraftID,         // draft_id
 		).WillReturnResult(sqlmock.NewResult(1, 1))
@@ -527,9 +532,5 @@ func (ts *EmbeddedDBTestSuite) TestDestination_Save() {
 		err = tc.MockSQLDB.ExpectationsWereMet()
 		require.NoError(t, err)
 		assert.Equal(t, true, setCmd.Called)
-	})
-
-	ts.T().Run("[mongo] [redis] [mocking] - create destination", func(t *testing.T) {
-		// todo: mocking for MongoDB
 	})
 }

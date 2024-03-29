@@ -13,14 +13,13 @@ func MapToPaymailContract(pa *engine.PaymailAddress) *models.PaymailAddress {
 	}
 
 	return &models.PaymailAddress{
-		Model:           *common.MapToContract(&pa.Model),
-		ID:              pa.ID,
-		XpubID:          pa.XpubID,
-		Alias:           pa.Alias,
-		Domain:          pa.Domain,
-		PublicName:      pa.PublicName,
-		Avatar:          pa.Avatar,
-		ExternalXpubKey: pa.ExternalXpubKey,
+		Model:      *common.MapToContract(&pa.Model),
+		ID:         pa.ID,
+		XpubID:     pa.XpubID,
+		Alias:      pa.Alias,
+		Domain:     pa.Domain,
+		PublicName: pa.PublicName,
+		Avatar:     pa.Avatar,
 	}
 }
 

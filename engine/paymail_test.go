@@ -9,11 +9,11 @@ import (
 	"github.com/bitcoin-sv/go-paymail"
 	"github.com/bitcoin-sv/go-paymail/server"
 	"github.com/bitcoin-sv/spv-wallet/engine/chainstate"
+	"github.com/bitcoin-sv/spv-wallet/engine/datastore"
 	"github.com/bitcoin-sv/spv-wallet/engine/taskmanager"
 	xtester "github.com/bitcoin-sv/spv-wallet/engine/tester"
 	"github.com/jarcoal/httpmock"
 	"github.com/mrz1836/go-cache"
-	"github.com/mrz1836/go-datastore"
 	"github.com/rs/zerolog"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -36,8 +36,11 @@ func newTestPaymailClient(t *testing.T, domains []string) paymail.ClientInterfac
 
 // newTestPaymailConfig loads a basic test configuration
 func newTestPaymailConfig(t *testing.T, domain string) *server.Configuration {
+	pl := &server.PaymailServiceLocator{}
+	pl.RegisterPaymailService(new(mockServiceProvider))
+
 	c, err := server.NewConfig(
-		new(mockServiceProvider),
+		pl,
 		server.WithDomain(domain),
 		server.WithP2PCapabilities(),
 	)
@@ -114,7 +117,11 @@ func mockCapabilities(t *testing.T, p2pEnabled, beefEnabled bool) *paymail.Capab
 	if beefEnabled {
 		options = append(options, server.WithBeefCapabilities())
 	}
-	config, err := server.NewConfig(new(mockServiceProvider), options...)
+
+	pl := &server.PaymailServiceLocator{}
+	pl.RegisterPaymailService(new(mockServiceProvider))
+
+	config, err := server.NewConfig(pl, options...)
 	assert.NoError(t, err)
 	capPayload, err := config.EnrichCapabilities("test.com")
 	if err != nil {

@@ -7,10 +7,10 @@ import (
 	"github.com/bitcoin-sv/go-paymail/server"
 	"github.com/bitcoin-sv/spv-wallet/engine/chainstate"
 	"github.com/bitcoin-sv/spv-wallet/engine/cluster"
+	"github.com/bitcoin-sv/spv-wallet/engine/datastore"
 	"github.com/bitcoin-sv/spv-wallet/engine/notifications"
 	"github.com/bitcoin-sv/spv-wallet/engine/taskmanager"
 	"github.com/mrz1836/go-cachestore"
-	"github.com/mrz1836/go-datastore"
 )
 
 // loadCache will load caching configuration and start the Cachestore client
@@ -175,8 +175,13 @@ func (c *Client) loadDefaultPaymailConfig() (err error) {
 	c.options.paymail.serverConfig.options = append(c.options.paymail.serverConfig.options, server.WithLogger(&paymailLogger))
 
 	// Create the paymail configuration using the client and default service provider
+	paymailLocator := &server.PaymailServiceLocator{}
+	paymailService := &PaymailDefaultServiceProvider{client: c}
+	paymailLocator.RegisterPaymailService(paymailService)
+	paymailLocator.RegisterPikeService(paymailService)
+
 	c.options.paymail.serverConfig.Configuration, err = server.NewConfig(
-		&PaymailDefaultServiceProvider{client: c},
+		paymailLocator,
 		c.options.paymail.serverConfig.options...,
 	)
 	return

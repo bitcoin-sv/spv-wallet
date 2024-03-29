@@ -1,174 +1,130 @@
 package engine
 
 import (
+	"errors"
+	"fmt"
 	"testing"
 
-	"github.com/bitcoin-sv/spv-wallet/engine/utils"
-	"github.com/mrz1836/go-datastore"
+	"github.com/bitcoin-sv/spv-wallet/engine/datastore"
+
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
 
-const (
-	fullName     = "John Doe"
-	paymailTest  = "test@paymail.com"
-	senderPubKey = "senderPubKey"
+const xPubID = "62910a1ecbc7728afad563ab3f8aa70568ed934d1e0383cb1bbbfb1bc8f2afe5"
 
-	xpubKey     = "xpub661MyMwAqRbcEp7YgDpGXquSF2NW3GBAU3SXTikFT1nkxHGbxjG9RgGxr9X3D4AYsJ6ZqYjMGcdUsPDQZoeibKECs5d56f1w9rfF3QrAAu9"
-	xPubId      = "62910a1ecbc7728afad563ab3f8aa70568ed934d1e0383cb1bbbfb1bc8f2afe5"
-	paymailAddr = "test.test@mail.test"
+func Test_contact_validate_success(t *testing.T) {
+	t.Run("valid contact", func(t *testing.T) {
+		// given
+		contact := newContact("Homer Simpson", "homer@springfield.gg", "xpubblablahomer",
+			"fafagasfaufrusfrusfrbsur", ContactNotConfirmed)
 
-	xPubID = "62910a1ecbc7728afad563ab3f8aa70568ed934d1e0383cb1bbbfb1bc8f2afe5"
-)
+		// when
+		err := contact.validate()
 
-func Test_newContact(t *testing.T) {
-	t.Run("valid full_name and paymail, pubKey is not empty", func(t *testing.T) {
-		contact, err := newContact(fullName, paymailTest, senderPubKey)
+		// then
 		require.NoError(t, err)
 		require.NotNil(t, contact)
-		assert.Equal(t, fullName, contact.FullName)
-		assert.Equal(t, paymailTest, contact.Paymail)
-		assert.Equal(t, utils.Hash(senderPubKey), contact.XpubID)
-		assert.Equal(t, utils.Hash(senderPubKey+paymailTest), contact.ID)
 	})
+}
 
-	t.Run("empty full_name", func(t *testing.T) {
-		contact, err := newContact("", paymailTest, senderPubKey)
-		require.Errorf(t, err, ErrEmptyContactFullName.Error())
-		require.EqualError(t, err, ErrEmptyContactFullName.Error())
+func Test_contact_validate_returns_error(t *testing.T) {
+	tcs := []struct {
+		name         string
+		contact      *Contact
+		expetedError error
+	}{
+		{
+			name:         "empty full name",
+			contact:      newContact("", "donot@know.who", "xpubblablablabla", "ownerspbubid", ContactNotConfirmed),
+			expetedError: ErrMissingContactFullName,
+		},
+		{
+			name:         "empty paymail",
+			contact:      newContact("Homer Simpson", "", "xpubblablahomer", "ownerspbubid", ContactNotConfirmed),
+			expetedError: errors.New("paymail address failed format validation: "),
+		},
+		{
+			name:         "invalid paymail",
+			contact:      newContact("Marge Simpson", "definitely not paymail", "xpubblablamarge", "ownerspbubid", ContactNotConfirmed),
+			expetedError: fmt.Errorf("paymail address failed format validation: definitelynotpaymail"),
+		},
+		{
+			name:         "empty pubKey",
+			contact:      newContact("Bart Simpson", "bart@springfield.com", "", "ownerspbubid", ContactNotConfirmed),
+			expetedError: ErrMissingContactXPubKey,
+		},
+		{
+			name:         "no owner id",
+			contact:      newContact("Lisa Simpson", "lisa@springfield.com", "xpubblablalisa", "", ContactNotConfirmed),
+			expetedError: ErrMissingContactOwnerXPubId,
+		},
+		{
+			name:         "no status",
+			contact:      newContact("Margaret Simpson", "maggie@springfield.com", "xpubblablamaggie", "ownerspbubid", ""),
+			expetedError: ErrMissingContactStatus,
+		},
+	}
 
-		require.Nil(t, contact)
-	})
+	for _, tc := range tcs {
+		t.Run(tc.name, func(t *testing.T) {
+			// given
+			contact := tc.contact
 
-	t.Run("empty paymail", func(t *testing.T) {
-		contact, err := newContact(fullName, "", senderPubKey)
+			// when
+			err := contact.validate()
 
-		require.Nil(t, contact)
-		require.EqualError(t, err, ErrEmptyContactPaymail.Error())
-	})
-
-	t.Run("empty pubKey", func(t *testing.T) {
-
-		contact, err := newContact(fullName, paymailTest, "")
-
-		require.Nil(t, contact)
-		require.ErrorContains(t, err, ErrEmptyContactPubKey.Error())
-	})
+			// then
+			require.EqualError(t, err, tc.expetedError.Error())
+		})
+	}
 }
 
 func Test_getContact(t *testing.T) {
-	t.Run("fullName, paymail and pubKey are valid", func(t *testing.T) {
+	t.Run("get by paymail for owner xpubid", func(t *testing.T) {
 		ctx, client, deferMe := CreateTestSQLiteClient(t, false, false, withTaskManagerMockup())
 		defer deferMe()
-		contact, err := getContact(ctx, fullName, paymailTest, senderPubKey, client.DefaultModelOptions()...)
 
-		require.Nil(t, contact)
+		contact := newContact("Homer Simpson", "homer@springfield.com", "xpubblablahomer",
+			"fafagasfaufrusfrusfrbsur", ContactNotConfirmed, WithClient(client))
+
+		err := contact.Save(ctx)
 		require.NoError(t, err)
+
+		// when
+		result, err := getContact(ctx, contact.Paymail, contact.OwnerXpubID, WithClient(client))
+
+		// then
+		require.NoError(t, err)
+		require.NotNil(t, result)
+
+		require.Equal(t, contact.ID, result.ID)
+		require.Equal(t, contact.OwnerXpubID, result.OwnerXpubID)
+		require.Equal(t, contact.FullName, result.FullName)
+		require.Equal(t, contact.Paymail, result.Paymail)
+		require.Equal(t, contact.PubKey, result.PubKey)
+		require.Equal(t, contact.Status, result.Status)
 	})
 
-	t.Run("empty full_name", func(t *testing.T) {
+	t.Run("get by paymail for not matching owner xpubid - returns nil", func(t *testing.T) {
 		ctx, client, deferMe := CreateTestSQLiteClient(t, false, false, withTaskManagerMockup())
 		defer deferMe()
-		contact, err := getContact(ctx, "", paymailTest, senderPubKey, client.DefaultModelOptions()...)
 
-		require.Nil(t, contact)
+		contact := newContact("Marge Simpson", "Marge@springfield.com", "xpubblablamarge",
+			"fafagasfaufrusfrusfrbsur", ContactNotConfirmed, WithClient(client))
+
+		err := contact.Save(ctx)
 		require.NoError(t, err)
-	})
 
-	t.Run("empty paymail", func(t *testing.T) {
-		ctx, client, deferMe := CreateTestSQLiteClient(t, false, false, withTaskManagerMockup())
-		defer deferMe()
-		contact, err := getContact(ctx, fullName, "", senderPubKey, client.DefaultModelOptions()...)
+		// when
+		result, err := getContact(ctx, contact.Paymail, "not owner xpubid", WithClient(client))
 
-		require.Nil(t, contact)
+		// then
 		require.NoError(t, err)
-	})
-
-	t.Run("invalid paymail", func(t *testing.T) {
-		ctx, client, deferMe := CreateTestSQLiteClient(t, false, false, withTaskManagerMockup())
-		defer deferMe()
-		contact, err := getContact(ctx, fullName, "tests", senderPubKey, client.DefaultModelOptions()...)
-
-		require.Nil(t, contact)
-		require.NoError(t, err)
-	})
-
-	t.Run("empty pubKey", func(t *testing.T) {
-		ctx, client, deferMe := CreateTestSQLiteClient(t, false, false, withTaskManagerMockup())
-		defer deferMe()
-		contact, err := getContact(ctx, fullName, paymailTest, "", client.DefaultModelOptions()...)
-
-		require.Nil(t, contact)
-		require.NoError(t, err)
+		require.Nil(t, result)
 	})
 }
 
-func Test_getContactByXPubIdAndPubKey(t *testing.T) {
-	t.Run("valid xPubId and paymailAddr", func(t *testing.T) {
-		ctx, client, deferMe := CreateTestSQLiteClient(t, false, false, withTaskManagerMockup())
-		defer deferMe()
-		var opts []ModelOps
-		createdContact, err := newContact(
-			fullName,
-			paymailAddr,
-			xpubKey,
-			append(opts, client.DefaultModelOptions(
-				New(),
-			)...)...,
-		)
-		createdContact.PubKey = "testPubKey"
-		err = createdContact.Save(ctx)
-
-		contact, err := getContactByXPubIdAndRequesterPubKey(ctx, createdContact.XpubID, createdContact.Paymail, client.DefaultModelOptions()...)
-
-		require.NotNil(t, contact)
-		require.NoError(t, err)
-	})
-
-	t.Run("empty xPubId", func(t *testing.T) {
-		ctx, client, deferMe := CreateTestSQLiteClient(t, false, false, withTaskManagerMockup())
-		defer deferMe()
-
-		var opts []ModelOps
-		createdContact, err := newContact(
-			fullName,
-			paymailAddr,
-			xpubKey,
-			append(opts, client.DefaultModelOptions(
-				New(),
-			)...)...,
-		)
-		createdContact.PubKey = "testPubKey"
-		err = createdContact.Save(ctx)
-
-		contact, err := getContactByXPubIdAndRequesterPubKey(ctx, "", createdContact.Paymail, client.DefaultModelOptions()...)
-
-		require.Nil(t, contact)
-		require.Error(t, err)
-	})
-
-	t.Run("empty paymailAddr", func(t *testing.T) {
-		ctx, client, deferMe := CreateTestSQLiteClient(t, false, false, withTaskManagerMockup())
-		defer deferMe()
-
-		var opts []ModelOps
-		createdContact, err := newContact(
-			fullName,
-			paymailAddr,
-			xpubKey,
-			append(opts, client.DefaultModelOptions(
-				New(),
-			)...)...,
-		)
-		createdContact.PubKey = "testPubKey"
-		err = createdContact.Save(ctx)
-
-		contact, err := getContactByXPubIdAndRequesterPubKey(ctx, createdContact.XpubID, "", client.DefaultModelOptions()...)
-
-		require.Nil(t, contact)
-		require.Error(t, err)
-	})
-}
 func Test_getContacts(t *testing.T) {
 	t.Run("status 'not confirmed'", func(t *testing.T) {
 		ctx, client, deferMe := CreateTestSQLiteClient(t, false, false, withTaskManagerMockup())
@@ -178,7 +134,7 @@ func Test_getContacts(t *testing.T) {
 
 		dbConditions := map[string]interface{}{
 			xPubIDField:   xPubID,
-			contactStatus: notConfirmed,
+			contactStatus: ContactNotConfirmed,
 		}
 
 		var queryParams *datastore.QueryParams
@@ -200,7 +156,7 @@ func Test_getContacts(t *testing.T) {
 		var queryParams *datastore.QueryParams
 
 		(dbConditions)[xPubIDField] = xPubID
-		(dbConditions)[contactStatus] = confirmed
+		(dbConditions)[contactStatus] = ContactConfirmed
 
 		contacts, err := getContacts(ctx, metadata, &dbConditions, queryParams, client.DefaultModelOptions()...)
 
@@ -219,12 +175,11 @@ func Test_getContacts(t *testing.T) {
 		var queryParams *datastore.QueryParams
 
 		(dbConditions)[xPubIDField] = xPubID
-		(dbConditions)[contactStatus] = awaitingAcceptance
+		(dbConditions)[contactStatus] = ContactAwaitAccept
 
 		contacts, err := getContacts(ctx, metadata, &dbConditions, queryParams, client.DefaultModelOptions()...)
 
 		require.NoError(t, err)
 		assert.Equal(t, 0, len(contacts))
-
 	})
 }

@@ -12,7 +12,7 @@ import (
 // @Description	Get status
 // @Tags		Admin
 // @Produce		json
-// @Success		200
+// @Success		200 {boolean} bool "Status response"
 // @Router		/v1/admin/status [get]
 // @Security	x-auth-xpub
 func (a *Action) status(c *gin.Context) {

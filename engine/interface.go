@@ -8,11 +8,11 @@ import (
 	"github.com/bitcoin-sv/go-paymail"
 	"github.com/bitcoin-sv/spv-wallet/engine/chainstate"
 	"github.com/bitcoin-sv/spv-wallet/engine/cluster"
+	"github.com/bitcoin-sv/spv-wallet/engine/datastore"
 	"github.com/bitcoin-sv/spv-wallet/engine/metrics"
 	"github.com/bitcoin-sv/spv-wallet/engine/notifications"
 	"github.com/bitcoin-sv/spv-wallet/engine/taskmanager"
 	"github.com/mrz1836/go-cachestore"
-	"github.com/mrz1836/go-datastore"
 	"github.com/rs/zerolog"
 )
 
@@ -58,10 +58,10 @@ type ClientService interface {
 }
 
 type ContactService interface {
-	NewContact(ctx context.Context, fullName, paymail, pubKey string, opts ...ModelOps) (*Contact, error)
+	UpsertContact(ctx context.Context, fullName, paymailAdress, requesterPubKey, requesterPaymail string, opts ...ModelOps) (*Contact, error)
+	AddContactRequest(ctx context.Context, fullName, paymailAdress, requesterXPubID string, opts ...ModelOps) (*Contact, error)
 
 	UpdateContact(ctx context.Context, fullName, pubKey, xPubID, paymail string, status ContactStatus, opts ...ModelOps) (*Contact, error)
-
 	GetContacts(ctx context.Context, metadata *Metadata, conditions *map[string]interface{}, queryParams *datastore.QueryParams, opts ...ModelOps) ([]*Contact, error)
 }
 
