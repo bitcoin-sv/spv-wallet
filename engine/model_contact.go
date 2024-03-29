@@ -3,6 +3,8 @@ package engine
 import (
 	"context"
 	"errors"
+	"fmt"
+	"time"
 
 	"github.com/bitcoin-sv/go-paymail"
 	"github.com/bitcoin-sv/spv-wallet/engine/datastore"
@@ -36,12 +38,6 @@ func newContact(fullName, paymailAddress, pubKey, ownerXpubID string, status Con
 	}
 
 	return &contact
-}
-
-func emptyContact(opts ...ModelOps) *Contact {
-	return &Contact{
-		Model: *NewBaseModel(ModelContact, opts...),
-	}
 }
 
 func getContact(ctx context.Context, paymail, ownerXpubID string, opts ...ModelOps) (*Contact, error) {
@@ -100,6 +96,48 @@ func getContacts(ctx context.Context, metadata *Metadata, conditions *map[string
 	}
 
 	return contacts, nil
+}
+
+func (c *Contact) Accept() error {
+	if c.Status != ContactAwaitAccept {
+		return fmt.Errorf("cannot accept contact. Reason: status: %s, expected: %s", c.Status, ContactAwaitAccept)
+	}
+
+	c.Status = ContactNotConfirmed
+	return nil
+}
+
+func (c *Contact) Reject() error {
+	if c.Status != ContactAwaitAccept {
+		return fmt.Errorf("cannot reject contact. Reason: status: %s, expected: %s", c.Status, ContactAwaitAccept)
+	}
+
+	c.DeletedAt.Valid = true
+	c.DeletedAt.Time = time.Now()
+	c.Status = ContactRejected
+	return nil
+}
+
+func (c *Contact) Confirm() error {
+	if c.Status != ContactNotConfirmed {
+		return fmt.Errorf("cannot confirm contact. Reason: status: %s, expected: %s", c.Status, ContactNotConfirmed)
+	}
+
+	c.Status = ContactConfirmed
+	return nil
+}
+
+func (c *Contact) UpdatePubKey(pk string) (updated bool) {
+	if c.PubKey != pk {
+		// update and back to awaiting if pub key has changed
+		c.Status = ContactAwaitAccept
+		c.PubKey = pk
+
+		updated = true
+	}
+
+	updated = false
+	return
 }
 
 func (c *Contact) GetModelName() string {

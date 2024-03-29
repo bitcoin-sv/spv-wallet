@@ -4,7 +4,6 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"time"
 
 	"github.com/bitcoin-sv/go-paymail"
 	"github.com/bitcoin-sv/spv-wallet/engine/datastore"
@@ -74,13 +73,7 @@ func (c *Client) AddContactRequest(ctx context.Context, fullName, paymailAdress,
 
 	save := false
 	if contact != nil {
-		// update and back to awaiting if PKI changed
-		if contact.PubKey != contactPki.PubKey {
-			contact.Status = ContactAwaitAccept // ? Or error
-			contact.PubKey = contactPki.PubKey
-
-			save = true
-		}
+		save = contact.UpdatePubKey(contactPki.PubKey)
 	} else {
 		contact = newContact(
 			fullName,
@@ -158,11 +151,7 @@ func (c *Client) upsertContact(ctx context.Context, pmSrvnt *PaymailServant, req
 		contact.FullName = ctcFName
 		contact.SetOptions(opts...)
 
-		// go back to unconfirmed status
-		if contact.PubKey != contactPki.PubKey {
-			contact.Status = ContactNotConfirmed
-			contact.PubKey = contactPki.PubKey
-		}
+		contact.UpdatePubKey(contactPki.PubKey)
 	}
 
 	if err = contact.Save(ctx); err != nil {
@@ -193,12 +182,12 @@ func (c *Client) AcceptContact(ctx context.Context, xPubID, paymail string) erro
 	if contact == nil {
 		return ErrContactNotFound
 	}
-	if contact.Status != ContactAwaitAccept {
-		c.logContactWarining(xPubID, paymail,
-			fmt.Sprintf("cannot accept contact. Reason: status: %s, expected: %s", contact.Status, ContactAwaitAccept))
+
+	if err = contact.Accept(); err != nil {
+		c.logContactWarining(xPubID, paymail, err.Error())
 		return ErrContactIncorrectStatus
 	}
-	contact.Status = ContactNotConfirmed
+
 	if err = contact.Save(ctx); err != nil {
 		c.logContactError(xPubID, paymail, fmt.Sprintf("unexpected error while saving contact: %s", err.Error()))
 		return err
@@ -216,15 +205,11 @@ func (c *Client) RejectContact(ctx context.Context, xPubID, paymail string) erro
 	if contact == nil {
 		return ErrContactNotFound
 	}
-	if contact.Status != ContactAwaitAccept {
-		c.logContactWarining(xPubID, paymail,
-			fmt.Sprintf("cannot reject contact. Reason: status: %s, expected: %s", contact.Status, ContactAwaitAccept))
+
+	if err = contact.Reject(); err != nil {
+		c.logContactWarining(xPubID, paymail, err.Error())
 		return ErrContactIncorrectStatus
 	}
-
-	contact.DeletedAt.Valid = true
-	contact.DeletedAt.Time = time.Now()
-	contact.Status = ContactRejected
 
 	if err = contact.Save(ctx); err != nil {
 		c.logContactError(xPubID, paymail, fmt.Sprintf("unexpected error while saving contact: %s", err.Error()))
@@ -243,13 +228,12 @@ func (c *Client) ConfirmContact(ctx context.Context, xPubID, paymail string) err
 	if contact == nil {
 		return ErrContactNotFound
 	}
-	if contact.Status != ContactNotConfirmed {
-		c.logContactWarining(xPubID, paymail,
-			fmt.Sprintf("cannot confirm contact. Reason: status: %s, expected: %s", contact.Status, ContactNotConfirmed))
+
+	if err = contact.Confirm(); err != nil {
+		c.logContactWarining(xPubID, paymail, err.Error())
 		return ErrContactIncorrectStatus
 	}
 
-	contact.Status = ContactConfirmed
 	if err = contact.Save(ctx); err != nil {
 		c.logContactError(xPubID, paymail, fmt.Sprintf("unexpected error while saving contact: %s", err.Error()))
 		return err

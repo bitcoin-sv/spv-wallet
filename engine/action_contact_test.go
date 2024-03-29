@@ -268,3 +268,69 @@ func TestRejectContactErrorPath(t *testing.T) {
 		})
 	}
 }
+
+func TestConfirmContactErrorPath(t *testing.T) {
+	tcs := []struct {
+		name          string
+		expectedError error
+		getContact    func() (contact *Contact, paymail string, onwerXpubId string)
+	}{
+		{
+			name:          "contact doesn't exist - return not found",
+			expectedError: ErrContactNotFound,
+			getContact: func() (*Contact, string, string) {
+				return nil, "idontexist", "xpubID"
+			},
+		},
+		{
+			name:          "already confirmed contact - return incorrect status",
+			expectedError: ErrContactIncorrectStatus,
+			getContact: func() (*Contact, string, string) {
+				cc := newContact("Paul Altreides", "paul@altreides.diune", "pki", "xpub", ContactNotConfirmed)
+				cc.Confirm()
+
+				return cc, cc.Paymail, cc.OwnerXpubID
+			},
+		},
+		{
+			name:          "awaiting contact - return incorrect status",
+			expectedError: ErrContactIncorrectStatus,
+			getContact: func() (*Contact, string, string) {
+				cc := newContact("Alia Altreides", "alia@altreides.diune", "pki", "xpub", ContactAwaitAccept)
+
+				return cc, cc.Paymail, cc.OwnerXpubID
+			},
+		},
+		{
+			name:          "rejected contact - return not found",
+			expectedError: ErrContactNotFound,
+			getContact: func() (*Contact, string, string) {
+				cc := newContact("Alia Altreides", "alia@altreides.diune", "pki", "xpub", ContactAwaitAccept)
+				cc.Reject()
+
+				return cc, cc.Paymail, cc.OwnerXpubID
+			},
+		},
+	}
+
+	for _, tc := range tcs {
+		t.Run(tc.name, func(t *testing.T) {
+			// given
+			ctx, client, cleanup := CreateTestSQLiteClient(t, false, true, withTaskManagerMockup())
+			defer cleanup()
+
+			contact, paymail, ownerXpubID := tc.getContact()
+			if contact != nil {
+				contact.enrich(ModelContact, client.DefaultModelOptions()...)
+				err := contact.Save(ctx)
+				require.NoError(t, err)
+			}
+
+			// when
+			err := client.ConfirmContact(ctx, ownerXpubID, paymail)
+
+			// then
+			require.ErrorIs(t, err, tc.expectedError)
+		})
+	}
+}

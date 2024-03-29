@@ -80,6 +80,89 @@ func Test_contact_validate_returns_error(t *testing.T) {
 	}
 }
 
+func Test_Accept(t *testing.T) {
+	t.Run("accept awaiting contact - status changed to <<unconfirmed>>", func(t *testing.T) {
+		// given
+		sut := newContact("Leto Atreides", "leto@atreides.diune", "pubkey", "xpubid", ContactAwaitAccept)
+
+		// when
+		err := sut.Accept()
+
+		// then
+		require.NoError(t, err)
+		require.Equal(t, ContactNotConfirmed, sut.Status)
+	})
+
+	t.Run("accept non-awaiting contact - return error, status has not been changed", func(t *testing.T) {
+		// given
+		const notAwaitingStatus = ContactNotConfirmed
+		sut := newContact("Jessica Atreides", "jess@atreides.diune", "pubkey", "xpubid", notAwaitingStatus)
+
+		// when
+		err := sut.Accept()
+
+		// then
+		require.Error(t, err)
+		require.Equal(t, notAwaitingStatus, sut.Status)
+	})
+}
+
+func Test_Reject(t *testing.T) {
+	t.Run("reject awaiting contact - status changed to <<rejected>>, contact has been marked as deleted", func(t *testing.T) {
+		// given
+		sut := newContact("Vladimir Harkonnen", "vlad@harkonnen.diune", "pubkey", "xpubid", ContactAwaitAccept)
+
+		// when
+		err := sut.Reject()
+
+		// then
+		require.NoError(t, err)
+		require.Equal(t, ContactRejected, sut.Status)
+		require.True(t, sut.DeletedAt.Valid)
+	})
+
+	t.Run("reject non-awaiting contact - return error, status has not been changed", func(t *testing.T) {
+		// given
+		const notAwaitingStatus = ContactNotConfirmed
+		sut := newContact("Feyd-Rautha Harkonnen", "frautha@harkonnen.diune", "pubkey", "xpubid", notAwaitingStatus)
+
+		// when
+		err := sut.Reject()
+
+		// then
+		require.Error(t, err)
+		require.Equal(t, notAwaitingStatus, sut.Status)
+		require.False(t, sut.DeletedAt.Valid)
+	})
+}
+
+func Test_Confirm(t *testing.T) {
+	t.Run("confirm unconfirmed contact - status changed to <<confirmed>>", func(t *testing.T) {
+		// given
+		sut := newContact("Thufir Hawat", "hawat@atreides.diune", "pubkey", "xpubid", ContactNotConfirmed)
+
+		// when
+		err := sut.Confirm()
+
+		// then
+		require.NoError(t, err)
+		require.Equal(t, ContactNotConfirmed, sut.Status)
+	})
+
+	t.Run("confirm non-unconfirmed contact - return error, status has not been changed", func(t *testing.T) {
+		// given
+		const notUncormirmedStatus = ContactAwaitAccept
+		sut := newContact("Gurney Halleck", "halleck@atreides.diune", "pubkey", "xpubid", notUncormirmedStatus)
+
+		// when
+		err := sut.Confirm()
+
+		// then
+		require.Error(t, err)
+		require.Equal(t, notUncormirmedStatus, sut.Status)
+	})
+}
+
 func Test_getContact(t *testing.T) {
 	t.Run("get by paymail for owner xpubid", func(t *testing.T) {
 		ctx, client, deferMe := CreateTestSQLiteClient(t, false, false, withTaskManagerMockup())
