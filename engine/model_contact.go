@@ -129,9 +129,11 @@ func (c *Contact) Confirm() error {
 
 func (c *Contact) UpdatePubKey(pk string) (updated bool) {
 	if c.PubKey != pk {
-		// update and back to awaiting if pub key has changed
-		c.Status = ContactAwaitAccept
 		c.PubKey = pk
+
+		if c.Status == ContactConfirmed {
+			c.Status = ContactNotConfirmed
+		}
 
 		updated = true
 	}
