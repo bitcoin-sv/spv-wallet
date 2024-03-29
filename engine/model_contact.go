@@ -88,10 +88,15 @@ func (c *Contact) validate() error {
 	return nil
 }
 
-func getContacts(ctx context.Context, metadata *Metadata, conditions *map[string]interface{}, queryParams *datastore.QueryParams, opts ...ModelOps) ([]*Contact, error) {
-	contacts := make([]*Contact, 0)
+func getContacts(ctx context.Context, xPubID string, metadata *Metadata, conditions map[string]interface{}, queryParams *datastore.QueryParams, opts ...ModelOps) ([]*Contact, error) {
+	if conditions == nil {
+		conditions = make(map[string]interface{})
+	}
+	conditions[xPubIDField] = xPubID
+	conditions[deletedAtField] = nil
 
-	if err := getModelsByConditions(ctx, ModelContact, &contacts, metadata, conditions, queryParams, opts...); err != nil {
+	contacts := make([]*Contact, 0)
+	if err := getModelsByConditions(ctx, ModelContact, &contacts, metadata, &conditions, queryParams, opts...); err != nil {
 		return nil, err
 	}
 

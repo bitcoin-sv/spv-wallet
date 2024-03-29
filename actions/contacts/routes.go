@@ -24,8 +24,7 @@ func NewHandler(appConfig *config.AppConfig, services *config.AppServices) route
 		group.PATCH("/rejected/:paymail", action.reject)
 		group.PATCH("/confirmed/:paymail", action.confirm)
 
-		contactsGroup := router.Group("/contacts")
-		contactsGroup.GET("", action.search)
+		group.POST("search", action.search)
 	})
 
 	return apiEndpoints

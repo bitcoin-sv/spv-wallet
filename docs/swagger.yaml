@@ -1870,8 +1870,8 @@ paths:
       summary: Reject contact
       tags:
       - Contact
-  /v1/contacts:
-    get:
+  /v1/contact/search:
+    post:
       description: Search contacts
       parameters:
       - description: page

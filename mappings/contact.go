@@ -7,19 +7,29 @@ import (
 )
 
 // MapToContactContract will map the contact to the spv-wallet-models contract
-func MapToContactContract(c *engine.Contact) *models.Contact {
-	if c == nil {
+func MapToContactContract(src *engine.Contact) *models.Contact {
+	if src == nil {
 		return nil
 	}
 
 	return &models.Contact{
-		ID:       c.ID,
-		Model:    *common.MapToContract(&c.Model),
-		FullName: c.FullName,
-		Paymail:  c.Paymail,
-		PubKey:   c.PubKey,
-		Status:   mapContactStatus(c.Status),
+		ID:       src.ID,
+		Model:    *common.MapToContract(&src.Model),
+		FullName: src.FullName,
+		Paymail:  src.Paymail,
+		PubKey:   src.PubKey,
+		Status:   mapContactStatus(src.Status),
 	}
+}
+
+func MapToContactContracts(src []*engine.Contact) []*models.Contact {
+	res := make([]*models.Contact, len(src))
+
+	for _, c := range src {
+		res = append(res, MapToContactContract(c))
+	}
+
+	return res
 }
 
 func mapContactStatus(s engine.ContactStatus) string {

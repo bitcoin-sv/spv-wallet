@@ -1128,48 +1128,8 @@ const docTemplate = `{
                 }
             }
         },
-        "/v1/contact/{paymail}": {
-            "put": {
-                "security": [
-                    {
-                        "x-auth-xpub": []
-                    }
-                ],
-                "description": "Add or update contact. When adding a new contact, the system utilizes Paymail's PIKE capability to dispatch an invitation request, asking the counterparty to include the current user in their contacts.",
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Contact"
-                ],
-                "summary": "Upsert contact",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Paymail address of the contact the user wants to add/modify",
-                        "name": "paymail",
-                        "in": "path",
-                        "required": true
-                    },
-                    {
-                        "description": "Full name and metadata needed to add/modify contact",
-                        "name": "UpsertContact",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/contacts.UpsertContact"
-                        }
-                    }
-                ],
-                "responses": {
-                    "201": {
-                        "description": "Created"
-                    }
-                }
-            }
-        },
-        "/v1/contacts": {
-            "get": {
+        "/v1/contact/search": {
+            "post": {
                 "security": [
                     {
                         "x-auth-xpub": []
@@ -1230,6 +1190,46 @@ const docTemplate = `{
                     },
                     "500": {
                         "description": "Internal server error - Error while searching for contacts"
+                    }
+                }
+            }
+        },
+        "/v1/contact/{paymail}": {
+            "put": {
+                "security": [
+                    {
+                        "x-auth-xpub": []
+                    }
+                ],
+                "description": "Add or update contact. When adding a new contact, the system utilizes Paymail's PIKE capability to dispatch an invitation request, asking the counterparty to include the current user in their contacts.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Contact"
+                ],
+                "summary": "Upsert contact",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Paymail address of the contact the user wants to add/modify",
+                        "name": "paymail",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Full name and metadata needed to add/modify contact",
+                        "name": "UpsertContact",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/contacts.UpsertContact"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created"
                     }
                 }
             }
@@ -3274,7 +3274,7 @@ const docTemplate = `{
                 1000000,
                 1000000000,
                 60000000000,
-                3600000000000               
+                3600000000000
             ],
             "x-enum-varnames": [
                 "minDuration",

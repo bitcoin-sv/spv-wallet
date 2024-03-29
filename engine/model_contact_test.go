@@ -1,13 +1,12 @@
 package engine
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"testing"
+	"time"
 
-	"github.com/bitcoin-sv/spv-wallet/engine/datastore"
-
-	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
 
@@ -206,63 +205,143 @@ func Test_getContact(t *testing.T) {
 		require.NoError(t, err)
 		require.Nil(t, result)
 	})
+
+	t.Run("get deleted contact - returns nil", func(t *testing.T) {
+		ctx, client, deferMe := CreateTestSQLiteClient(t, false, false, withTaskManagerMockup())
+		defer deferMe()
+
+		contact := newContact("Marge Simpson", "Marge@springfield.com", "xpubblablamarge",
+			"fafagasfaufrusfrusfrbsur", ContactNotConfirmed, WithClient(client))
+
+		err := contact.Save(ctx)
+		require.NoError(t, err)
+
+		// delete
+		contact.DeletedAt.Valid = true
+		contact.DeletedAt.Time = time.Now()
+		err = contact.Save(ctx)
+		require.NoError(t, err)
+
+		// when
+		result, err := getContact(ctx, contact.Paymail, contact.OwnerXpubID, WithClient(client))
+
+		// then
+		require.NoError(t, err)
+		require.Nil(t, result)
+	})
 }
 
 func Test_getContacts(t *testing.T) {
-	t.Run("status 'not confirmed'", func(t *testing.T) {
-		ctx, client, deferMe := CreateTestSQLiteClient(t, false, false, withTaskManagerMockup())
-		defer deferMe()
 
-		var metadata *Metadata
+	t.Run("get by status 'not confirmed'", func(t *testing.T) {
+		// given
+		ctx, client, cleanup := CreateTestSQLiteClient(t, false, false, withTaskManagerMockup())
+		defer cleanup()
 
-		dbConditions := map[string]interface{}{
-			xPubIDField:   xPubID,
-			contactStatus: ContactNotConfirmed,
+		xpubID := "xpubid"
+
+		// fullfill db
+		saveContactsN(xpubID, ContactAwaitAccept, 10, client)
+		saveContactsN(xpubID, ContactNotConfirmed, 13, client)
+
+		conditions := map[string]interface{}{
+			contactStatusField: ContactNotConfirmed,
 		}
 
-		var queryParams *datastore.QueryParams
+		// when
+		contacts, err := getContacts(ctx, xpubID, nil, conditions, nil, client.DefaultModelOptions()...)
 
-		contacts, err := getContacts(ctx, metadata, &dbConditions, queryParams, client.DefaultModelOptions()...)
-
+		// then
 		require.NoError(t, err)
-		assert.NotNil(t, contacts)
+		require.NotNil(t, contacts)
+		require.Equal(t, 13, len(contacts))
+
+		for _, c := range contacts {
+			require.Equal(t, ContactNotConfirmed, c.Status)
+		}
+
 	})
 
-	t.Run("status 'confirmed'", func(t *testing.T) {
-		ctx, client, deferMe := CreateTestSQLiteClient(t, false, false, withTaskManagerMockup())
-		defer deferMe()
+	t.Run("get without conditions - return all", func(t *testing.T) {
+		// given
+		ctx, client, cleanup := CreateTestSQLiteClient(t, false, false, withTaskManagerMockup())
+		defer cleanup()
 
-		var metadata *Metadata
+		xpubID := "xpubid"
 
-		dbConditions := make(map[string]interface{})
+		// fullfill db
+		saveContactsN(xpubID, ContactAwaitAccept, 10, client)
+		saveContactsN(xpubID, ContactNotConfirmed, 13, client)
 
-		var queryParams *datastore.QueryParams
+		// when
+		contacts, err := getContacts(ctx, xpubID, nil, nil, nil, client.DefaultModelOptions()...)
 
-		(dbConditions)[xPubIDField] = xPubID
-		(dbConditions)[contactStatus] = ContactConfirmed
-
-		contacts, err := getContacts(ctx, metadata, &dbConditions, queryParams, client.DefaultModelOptions()...)
-
+		// then
 		require.NoError(t, err)
-		assert.Equal(t, 0, len(contacts))
+		require.NotNil(t, contacts)
+		require.Equal(t, 23, len(contacts))
+
 	})
 
-	t.Run("status 'awaiting acceptance'", func(t *testing.T) {
-		ctx, client, deferMe := CreateTestSQLiteClient(t, false, false, withTaskManagerMockup())
-		defer deferMe()
+	t.Run("get without conditions - ensure returned only with correct xpubid", func(t *testing.T) {
+		// given
+		ctx, client, cleanup := CreateTestSQLiteClient(t, false, false, withTaskManagerMockup())
+		defer cleanup()
 
-		var metadata *Metadata
+		xpubID := "xpubid"
 
-		dbConditions := make(map[string]interface{})
+		// fullfill db
+		saveContactsN(xpubID, ContactAwaitAccept, 10, client)
+		saveContactsN("other-xpub", ContactNotConfirmed, 13, client)
 
-		var queryParams *datastore.QueryParams
+		// when
+		contacts, err := getContacts(ctx, xpubID, nil, nil, nil, client.DefaultModelOptions()...)
 
-		(dbConditions)[xPubIDField] = xPubID
-		(dbConditions)[contactStatus] = ContactAwaitAccept
-
-		contacts, err := getContacts(ctx, metadata, &dbConditions, queryParams, client.DefaultModelOptions()...)
-
+		// then
 		require.NoError(t, err)
-		assert.Equal(t, 0, len(contacts))
+		require.NotNil(t, contacts)
+		require.Equal(t, 10, len(contacts))
+
 	})
+
+	t.Run("get without conditions - ensure returned without deleted", func(t *testing.T) {
+		// given
+		ctx, client, cleanup := CreateTestSQLiteClient(t, false, false, withTaskManagerMockup())
+		defer cleanup()
+
+		xpubID := "xpubid"
+
+		// fullfill db
+		saveContactsN(xpubID, ContactAwaitAccept, 10, client)
+		saveContactsDeletedN(xpubID, ContactNotConfirmed, 13, client)
+
+		// when
+		contacts, err := getContacts(ctx, xpubID, nil, nil, nil, client.DefaultModelOptions()...)
+
+		// then
+		require.NoError(t, err)
+		require.NotNil(t, contacts)
+		require.Equal(t, 10, len(contacts))
+
+	})
+}
+
+func saveContactsN(xpubID string, status ContactStatus, n int, c ClientInterface) {
+	for i := 0; i < n; i++ {
+		e := newContact(fmt.Sprintf("%s%d", status, i), fmt.Sprintf("%s%d@t.com", status, i), "pubkey", xpubID, status, c.DefaultModelOptions()...)
+		if err := e.Save(context.Background()); err != nil {
+			panic(err)
+		}
+	}
+}
+
+func saveContactsDeletedN(xpubID string, status ContactStatus, n int, c ClientInterface) {
+	for i := 0; i < n; i++ {
+		e := newContact(fmt.Sprintf("%s%d", status, i), fmt.Sprintf("%s%d@t.com", status, i), "pubkey", xpubID, status, c.DefaultModelOptions()...)
+		e.DeletedAt.Valid = true
+		e.DeletedAt.Time = time.Now()
+		if err := e.Save(context.Background()); err != nil {
+			panic(err)
+		}
+	}
 }
