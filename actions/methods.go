@@ -42,7 +42,7 @@ func MethodNotAllowed(c *gin.Context) {
 	c.JSON(http.StatusMethodNotAllowed, dictionary.GetError(dictionary.ErrorMethodNotAllowed, c.Request.Method, c.Request.RequestURI))
 }
 
-// GetSearchQueryParameters get all filtering parameters related to the db
+// GetSearchQueryParameters get all filtering parameters related to the db query
 func GetSearchQueryParameters(c *gin.Context) (*datastore.QueryParams, *engine.Metadata, *map[string]interface{}, error) {
 	var requestParameters SearchRequestParameters
 	if err := c.Bind(&requestParameters); err != nil {
