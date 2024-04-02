@@ -5,8 +5,8 @@ import (
 	"errors"
 
 	"github.com/bitcoin-sv/go-paymail"
-	"github.com/google/uuid"
 	"github.com/bitcoin-sv/spv-wallet/engine/datastore"
+	"github.com/google/uuid"
 )
 
 type Contact struct {
@@ -38,10 +38,17 @@ func newContact(fullName, paymailAddress, pubKey, ownerXpubID string, status Con
 	return &contact
 }
 
+func emptyContact(opts ...ModelOps) *Contact {
+	return &Contact{
+		Model: *NewBaseModel(ModelContact, opts...),
+	}
+}
+
 func getContact(ctx context.Context, paymail, ownerXpubID string, opts ...ModelOps) (*Contact, error) {
 	conditions := map[string]interface{}{
-		xPubIDField:  ownerXpubID,
-		paymailField: paymail,
+		xPubIDField:    ownerXpubID,
+		paymailField:   paymail,
+		deletedAtField: nil,
 	}
 
 	contact := &Contact{}

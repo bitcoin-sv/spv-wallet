@@ -63,6 +63,8 @@ type ContactService interface {
 
 	UpdateContact(ctx context.Context, fullName, pubKey, xPubID, paymail string, status ContactStatus, opts ...ModelOps) (*Contact, error)
 	GetContacts(ctx context.Context, metadata *Metadata, conditions *map[string]interface{}, queryParams *datastore.QueryParams, opts ...ModelOps) ([]*Contact, error)
+	AcceptContact(ctx context.Context, xPubID, paymail string) error
+	RejectContact(ctx context.Context, xPubID, paymail string) error
 }
 
 // DestinationService is the destination actions
