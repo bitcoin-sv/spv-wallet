@@ -22,8 +22,9 @@ func MapToContactContract(src *engine.Contact) *models.Contact {
 	}
 }
 
+// MapToContactContracts will map the contacts collection to the spv-wallet-models contracts collection
 func MapToContactContracts(src []*engine.Contact) []*models.Contact {
-	res := make([]*models.Contact, len(src))
+	res := make([]*models.Contact, 0, len(src))
 
 	for _, c := range src {
 		res = append(res, MapToContactContract(c))
