@@ -145,7 +145,7 @@ func Test_Confirm(t *testing.T) {
 
 		// then
 		require.NoError(t, err)
-		require.Equal(t, ContactNotConfirmed, sut.Status)
+		require.Equal(t, ContactConfirmed, sut.Status)
 	})
 
 	t.Run("confirm non-unconfirmed contact - return error, status has not been changed", func(t *testing.T) {
