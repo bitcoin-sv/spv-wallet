@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"strings"
 	"time"
 
 	"github.com/bitcoin-sv/go-paymail"
@@ -41,6 +42,7 @@ func newContact(fullName, paymailAddress, pubKey, ownerXpubID string, status Con
 }
 
 func getContact(ctx context.Context, paymail, ownerXpubID string, opts ...ModelOps) (*Contact, error) {
+	paymail = strings.ToLower(paymail)
 	conditions := map[string]interface{}{
 		xPubIDField:    ownerXpubID,
 		paymailField:   paymail,

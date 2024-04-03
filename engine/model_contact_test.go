@@ -4,13 +4,12 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"strings"
 	"testing"
 	"time"
 
 	"github.com/stretchr/testify/require"
 )
-
-const xPubID = "62910a1ecbc7728afad563ab3f8aa70568ed934d1e0383cb1bbbfb1bc8f2afe5"
 
 func Test_contact_validate_success(t *testing.T) {
 	t.Run("valid contact", func(t *testing.T) {
@@ -175,6 +174,33 @@ func Test_getContact(t *testing.T) {
 
 		// when
 		result, err := getContact(ctx, contact.Paymail, contact.OwnerXpubID, WithClient(client))
+
+		// then
+		require.NoError(t, err)
+		require.NotNil(t, result)
+
+		require.Equal(t, contact.ID, result.ID)
+		require.Equal(t, contact.OwnerXpubID, result.OwnerXpubID)
+		require.Equal(t, contact.FullName, result.FullName)
+		require.Equal(t, contact.Paymail, result.Paymail)
+		require.Equal(t, contact.PubKey, result.PubKey)
+		require.Equal(t, contact.Status, result.Status)
+	})
+
+	t.Run("get by paymail for owner xpubid - case insensitive", func(t *testing.T) {
+		ctx, client, deferMe := CreateTestSQLiteClient(t, false, false, withTaskManagerMockup())
+		defer deferMe()
+
+		contact := newContact("Homer Simpson", "hOmEr@springfield.com", "xpubblablahomer",
+			"fafagasfaufrusfrusfrbsur", ContactNotConfirmed, WithClient(client))
+
+		uppercaseContactPaymail := strings.ToUpper(contact.Paymail)
+
+		err := contact.Save(ctx)
+		require.NoError(t, err)
+
+		// when
+		result, err := getContact(ctx, uppercaseContactPaymail, contact.OwnerXpubID, WithClient(client))
 
 		// then
 		require.NoError(t, err)

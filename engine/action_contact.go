@@ -29,7 +29,10 @@ func (c *Client) UpsertContact(ctx context.Context, ctcFName, ctcPaymail, reques
 		cs: c.Cachestore(),
 		pc: c.PaymailClient(),
 	}
-	contactPm := pmSrvnt.GetSanitizedPaymail(ctcPaymail)
+	contactPm, err := pmSrvnt.GetSanitizedPaymail(ctcPaymail)
+	if err != nil {
+		return nil, fmt.Errorf("requested contact paymail is invalid. Reason: %w", err)
+	}
 
 	contact, err := c.upsertContact(ctx, pmSrvnt, reqXPubID, ctcFName, contactPm, opts...)
 	if err != nil {
@@ -59,14 +62,18 @@ func (c *Client) AddContactRequest(ctx context.Context, fullName, paymailAdress,
 		pc: c.PaymailClient(),
 	}
 
-	contactPm := pmSrvnt.GetSanitizedPaymail(paymailAdress)
+	contactPm, err := pmSrvnt.GetSanitizedPaymail(paymailAdress)
+	if err != nil {
+		return nil, fmt.Errorf("requested contact paymail is invalid. Reason: %w", err)
+	}
+
 	contactPki, err := pmSrvnt.GetPkiForPaymail(ctx, contactPm)
 	if err != nil {
 		return nil, fmt.Errorf("geting PKI for %s failed. Reason: %w", paymailAdress, err)
 	}
 
 	// check if exists already
-	contact, err := getContact(ctx, contactPm.adress, requesterXPubID, c.DefaultModelOptions()...)
+	contact, err := getContact(ctx, contactPm.Address, requesterXPubID, c.DefaultModelOptions()...)
 	if err != nil {
 		return nil, err
 	}
@@ -77,7 +84,7 @@ func (c *Client) AddContactRequest(ctx context.Context, fullName, paymailAdress,
 	} else {
 		contact = newContact(
 			fullName,
-			contactPm.adress,
+			contactPm.Address,
 			contactPki.PubKey,
 			requesterXPubID,
 			ContactAwaitAccept,
@@ -204,15 +211,15 @@ func (c *Client) getPaymail(ctx context.Context, xpubID, paymailAddr string) (*P
 	return paymails[0], nil
 }
 
-func (c *Client) upsertContact(ctx context.Context, pmSrvnt *PaymailServant, reqXPubID, ctcFName string, ctcPaymail *SanitizedPaymail, opts ...ModelOps) (*Contact, error) {
+func (c *Client) upsertContact(ctx context.Context, pmSrvnt *PaymailServant, reqXPubID, ctcFName string, ctcPaymail *paymail.SanitisedPaymail, opts ...ModelOps) (*Contact, error) {
 
 	contactPki, err := pmSrvnt.GetPkiForPaymail(ctx, ctcPaymail)
 	if err != nil {
-		return nil, fmt.Errorf("geting PKI for %s failed. Reason: %w", ctcPaymail.adress, err)
+		return nil, fmt.Errorf("geting PKI for %s failed. Reason: %w", ctcPaymail.Address, err)
 	}
 
 	// check if exists already
-	contact, err := getContact(ctx, ctcPaymail.adress, reqXPubID, c.DefaultModelOptions()...)
+	contact, err := getContact(ctx, ctcPaymail.Address, reqXPubID, c.DefaultModelOptions()...)
 	if err != nil {
 		return nil, err
 	}
@@ -220,7 +227,7 @@ func (c *Client) upsertContact(ctx context.Context, pmSrvnt *PaymailServant, req
 	if contact == nil { // insert
 		contact = newContact(
 			ctcFName,
-			ctcPaymail.adress,
+			ctcPaymail.Address,
 			contactPki.PubKey,
 			reqXPubID,
 			ContactNotConfirmed,

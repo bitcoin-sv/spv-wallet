@@ -33,16 +33,16 @@ func MapToContactContracts(src []*engine.Contact) []*models.Contact {
 	return res
 }
 
-func mapContactStatus(s engine.ContactStatus) string {
+func mapContactStatus(s engine.ContactStatus) models.ContactStatus {
 	switch s {
 	case engine.ContactNotConfirmed:
-		return "unconfirmed"
+		return models.ContactNotConfirmed
 	case engine.ContactAwaitAccept:
-		return "awaiting"
+		return models.ContactAwaitAccept
 	case engine.ContactConfirmed:
-		return "confirmed"
+		return models.ContactConfirmed
 	case engine.ContactRejected:
-		return "rejected"
+		return models.ContactRejected
 	default:
 		return "unknown"
 	}
