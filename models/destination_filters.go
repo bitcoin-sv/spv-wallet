@@ -16,7 +16,63 @@ type DestinationFilters struct {
 	// Metadata is a metadata map of outer model.
 	Metadata *map[string]interface{} `json:"metadata,omitempty" swaggertype:"object,string" example:"key:value,key2:value2"`
 	// CreatedRange is a filter for destinations created within a specific time range.
-	CreatedRange *common.TimeRange `json:"created_range,omitempty" example:"from:2024-02-26T11:01:28.069911,to:2025-02-26T11:01:28.069911"`
+	CreatedRange *common.TimeRange `json:"created_range,omitempty" swaggertype:"object,string" example:"from:2024-02-26T11:01:28.069911,to:2025-02-26T11:01:28.069911"`
 	// UpdatedRange is a filter for destinations updated within a specific time range.
-	UpdatedRange *common.TimeRange `json:"updated_range,omitempty" example:"from:2024-02-26T11:01:28.069911,to:2025-02-26T11:01:28.069911"`
+	UpdatedRange *common.TimeRange `json:"updated_range,omitempty" swaggertype:"object,string" example:"from:2024-02-26T11:01:28.069911,to:2025-02-26T11:01:28.069911"`
+}
+
+// NewDestinationFilters Constructor function to create a new instance of DestinationFilters with default values
+func NewDestinationFilters() *DestinationFilters {
+	includeDeleted := false
+	return &DestinationFilters{
+		IncludeDeleted: &includeDeleted,
+	}
+}
+
+func (d *DestinationFilters) ToConditions() map[string]interface{} {
+	conditions := map[string]interface{}{}
+
+	if d.LockingScript != nil {
+		addToConditions(conditions, "locking_script", d.LockingScript)
+	}
+
+	if d.Address != nil {
+		addToConditions(conditions, "address", d.Address)
+	}
+
+	if d.DraftID != nil {
+		addToConditions(conditions, "draft_id", d.DraftID)
+	}
+
+	if d.Metadata != nil {
+		addToConditions(conditions, "metadata", d.Metadata)
+	}
+
+	if d.CreatedRange != nil {
+		addToConditions(conditions, "created_at", map[string]interface{}{
+			"$gte": d.CreatedRange.From,
+			"$lte": d.CreatedRange.To,
+		})
+	}
+
+	if d.UpdatedRange != nil {
+		addToConditions(conditions, "updated_at", map[string]interface{}{
+			"$gte": d.UpdatedRange.From,
+			"$lte": d.UpdatedRange.To,
+		})
+	}
+
+	if d.IncludeDeleted != nil {
+		addToConditions(conditions, "deleted_at", map[string]interface{}{
+			"$exists": !*d.IncludeDeleted,
+		})
+	}
+	return conditions
+
+}
+
+func addToConditions(conditions map[string]interface{}, key string, value interface{}) {
+	if value != nil {
+		conditions[key] = value
+	}
 }

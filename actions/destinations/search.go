@@ -3,9 +3,7 @@ package destinations
 import (
 	"net/http"
 
-	"github.com/bitcoin-sv/spv-wallet/actions"
 	"github.com/bitcoin-sv/spv-wallet/engine"
-	"github.com/bitcoin-sv/spv-wallet/engine/utils"
 	"github.com/bitcoin-sv/spv-wallet/mappings"
 	"github.com/bitcoin-sv/spv-wallet/models"
 	"github.com/bitcoin-sv/spv-wallet/server/auth"
@@ -18,24 +16,20 @@ import (
 // @Description	Search for a destination
 // @Tags		Destinations
 // @Produce		json
-// @Param		SearchRequestParameters body actions.SearchRequestParameters false "Supports targeted resource searches with filters for metadata and custom conditions, plus options for pagination and sorting to streamline data exploration and analysis"
+// @Param		SearchRequestDestinationParameters body SearchRequestDestinationParameters false "Supports targeted resource searches with filters for metadata and custom conditions, plus options for pagination and sorting to streamline data exploration and analysis"
 // @Success		200 {object} []models.Destination "List of destinations
-// @Failure		400	"Bad request - Error while parsing SearchRequestParameters from request body"
+// @Failure		400	"Bad request - Error while parsing SearchRequestDestinationParameters from request body"
 // @Failure 	500	"Internal server error - Error while searching for destinations"
 // @Router		/v1/destination/search [post]
 // @Security	x-auth-xpub
 func (a *Action) search(c *gin.Context) {
 	reqXPubID := c.GetString(auth.ParamXPubHashKey)
 
-	queryParams, metadata, conditions, err := actions.GetSearchQueryParameters(c)
+	queryParams, metadata, conditions, err := GetSearchDestinationQueryParameters(c)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, err.Error())
 		return
 	}
-
-	var destFilters models.DestinationFilters
-
-	destConditions, err := utils.FilterMapByStructFields(*conditions, &destFilters)
 
 	if err != nil {
 		c.JSON(http.StatusBadRequest, err.Error())
@@ -47,7 +41,7 @@ func (a *Action) search(c *gin.Context) {
 		c.Request.Context(),
 		reqXPubID,
 		metadata,
-		&destConditions,
+		conditions,
 		queryParams,
 	); err != nil {
 		c.JSON(http.StatusInternalServerError, err.Error())

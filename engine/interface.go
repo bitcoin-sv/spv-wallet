@@ -2,6 +2,7 @@ package engine
 
 import (
 	"context"
+	"github.com/bitcoin-sv/spv-wallet/models"
 	"net/http"
 
 	"github.com/bitcoin-sv/go-broadcast-client/broadcast"
@@ -74,7 +75,7 @@ type DestinationService interface {
 		queryParams *datastore.QueryParams, opts ...ModelOps) ([]*Destination, error)
 	GetDestinationsCount(ctx context.Context, metadata *Metadata,
 		conditions *map[string]interface{}, opts ...ModelOps) (int64, error)
-	GetDestinationsByXpubID(ctx context.Context, xPubID string, usingMetadata *Metadata, conditions *map[string]interface{},
+	GetDestinationsByXpubID(ctx context.Context, xPubID string, usingMetadata *Metadata, conditions *models.DestinationFilters,
 		queryParams *datastore.QueryParams) ([]*Destination, error)
 	GetDestinationsByXpubIDCount(ctx context.Context, xPubID string, usingMetadata *Metadata,
 		conditions *map[string]interface{}) (int64, error)
