@@ -49,7 +49,11 @@ func (d *DestinationFilters) ToConditions() map[string]interface{} {
 	}
 
 	if d.CreatedRange != nil {
-		addToConditions(conditions, "created_at", map[string]interface{}{
+		//addToConditions(conditions, "created_at", map[string]interface{}{
+		//	"$gte": d.CreatedRange.From,
+		//	"$lte": d.CreatedRange.To,
+		//})
+		addToConditions(conditions, "createdAt", map[string]interface{}{
 			"$gte": d.CreatedRange.From,
 			"$lte": d.CreatedRange.To,
 		})
@@ -62,10 +66,22 @@ func (d *DestinationFilters) ToConditions() map[string]interface{} {
 		})
 	}
 
+	//if d.IncludeDeleted != nil {
+	//	addToConditions(conditions, "deleted_at", map[string]interface{}{
+	//		"$exists": !*d.IncludeDeleted,
+	//	})
+	//}
+
+	//if d.IncludeDeleted != nil {
+	//	addToConditions(conditions, "deleted_at.Valid", map[string]interface{}{
+	//		"$gt": "0001-01-01T00:00:00.069911Z",
+	//	})
+	//}
+
 	if d.IncludeDeleted != nil {
-		addToConditions(conditions, "deleted_at", map[string]interface{}{
-			"$exists": !*d.IncludeDeleted,
-		})
+		// TODO: need to check this
+		addToConditions(conditions, "deleted_at", nil)
+
 	}
 	return conditions
 

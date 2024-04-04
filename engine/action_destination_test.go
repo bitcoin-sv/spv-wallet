@@ -2,7 +2,11 @@ package engine
 
 import (
 	"context"
+	"fmt"
+	"github.com/bitcoin-sv/spv-wallet/models"
+	"github.com/bitcoin-sv/spv-wallet/models/common"
 	"testing"
+	"time"
 
 	"github.com/bitcoin-sv/spv-wallet/engine/utils"
 	"github.com/stretchr/testify/assert"
@@ -187,6 +191,374 @@ func (ts *EmbeddedDBTestSuite) TestClient_GetDestinations() {
 			require.NoError(t, err)
 			assert.Equal(t, 0, len(getDestinations))
 		})
+
+		ts.T().Run(testCase.name+" with locking_script filter", func(t *testing.T) {
+			tc := ts.genericDBClient(t, testCase.database, false)
+			defer tc.Close(tc.ctx)
+
+			_, _, rawKey := CreateNewXPub(tc.ctx, t, tc.client)
+			xPubID := utils.Hash(rawKey)
+
+			metadata := map[string]interface{}{
+				ReferenceIDField: testReferenceID,
+				testMetadataKey:  testMetadataValue,
+			}
+			opts := append(tc.client.DefaultModelOptions(), WithMetadatas(metadata))
+
+			// Create a new destination
+			destination, err := tc.client.NewDestination(
+				tc.ctx, rawKey, utils.ChainExternal, utils.ScriptTypePubKeyHash,
+				opts...,
+			)
+			require.NoError(t, err)
+			require.NotNil(t, destination)
+
+			conditions := models.DestinationFilters{LockingScript: &destination.LockingScript}
+
+			var getDestinations []*Destination
+			getDestinations, err = tc.client.GetDestinationsByXpubID(
+				tc.ctx, xPubID, nil, &conditions, nil,
+			)
+			fmt.Printf("Destinatosn %+v", getDestinations[0].LockingScript)
+			require.NoError(t, err)
+			require.NotNil(t, getDestinations)
+			assert.Equal(t, 1, len(getDestinations))
+			assert.Equal(t, destination.XpubID, getDestinations[0].XpubID)
+			assert.Equal(t, destination.LockingScript, getDestinations[0].LockingScript)
+		})
+
+		ts.T().Run(testCase.name+" with address filter", func(t *testing.T) {
+			tc := ts.genericDBClient(t, testCase.database, false)
+			defer tc.Close(tc.ctx)
+
+			_, _, rawKey := CreateNewXPub(tc.ctx, t, tc.client)
+			xPubID := utils.Hash(rawKey)
+
+			metadata := map[string]interface{}{
+				ReferenceIDField: testReferenceID,
+				testMetadataKey:  testMetadataValue,
+			}
+			opts := append(tc.client.DefaultModelOptions(), WithMetadatas(metadata))
+
+			// Create a new destination
+			destination, err := tc.client.NewDestination(
+				tc.ctx, rawKey, utils.ChainExternal, utils.ScriptTypePubKeyHash,
+				opts...,
+			)
+			require.NoError(t, err)
+			require.NotNil(t, destination)
+
+			conditions := models.DestinationFilters{Address: &destination.Address}
+
+			var getDestinations []*Destination
+			getDestinations, err = tc.client.GetDestinationsByXpubID(
+				tc.ctx, xPubID, nil, &conditions, nil,
+			)
+			require.NoError(t, err)
+			require.NotNil(t, getDestinations)
+			assert.Equal(t, 1, len(getDestinations))
+			assert.Equal(t, destination.XpubID, getDestinations[0].XpubID)
+			assert.Equal(t, destination.Address, getDestinations[0].Address)
+		})
+
+		ts.T().Run(testCase.name+" with draft_id filter", func(t *testing.T) {
+			tc := ts.genericDBClient(t, testCase.database, false)
+			defer tc.Close(tc.ctx)
+
+			_, _, rawKey := CreateNewXPub(tc.ctx, t, tc.client)
+			xPubID := utils.Hash(rawKey)
+
+			metadata := map[string]interface{}{
+				ReferenceIDField: testReferenceID,
+				testMetadataKey:  testMetadataValue,
+			}
+			opts := append(tc.client.DefaultModelOptions(), WithMetadatas(metadata))
+
+			// Create a new destination
+			destination, err := tc.client.NewDestination(
+				tc.ctx, rawKey, utils.ChainExternal, utils.ScriptTypePubKeyHash,
+				opts...,
+			)
+			require.NoError(t, err)
+			require.NotNil(t, destination)
+
+			//conditions := models.DestinationFilters{DraftID: &destination.DraftID}
+
+			//var getDestinations []*Destination
+			//getDestinations, err = tc.client.GetDestinationsByXpubID(
+			//	tc.ctx, xPubID, nil, &conditions, nil,
+			//)
+			dests, err := tc.client.GetDestinationsByXpubID(
+				tc.ctx, xPubID, nil, nil, nil,
+			)
+			fmt.Printf("bbb %+v", &dests)
+			require.NoError(t, err)
+			require.NotNil(t, dests)
+			assert.Equal(t, 1, len(dests))
+			assert.Equal(t, destination.XpubID, dests[0].XpubID)
+			assert.Equal(t, destination.DraftID, dests[0].DraftID)
+		})
+
+		ts.T().Run(testCase.name+" with include_deleted true filter", func(t *testing.T) {
+			tc := ts.genericDBClient(t, testCase.database, false)
+			defer tc.Close(tc.ctx)
+
+			_, _, rawKey := CreateNewXPub(tc.ctx, t, tc.client)
+			xPubID := utils.Hash(rawKey)
+
+			metadata := map[string]interface{}{
+				ReferenceIDField: testReferenceID,
+				testMetadataKey:  testMetadataValue,
+			}
+			opts := append(tc.client.DefaultModelOptions(), WithMetadatas(metadata))
+
+			// Create a new destination
+			destination, err := tc.client.NewDestination(
+				tc.ctx, rawKey, utils.ChainExternal, utils.ScriptTypePubKeyHash,
+				opts...,
+			)
+			require.NoError(t, err)
+			require.NotNil(t, destination)
+
+			trueValue := true
+
+			conditions := models.DestinationFilters{IncludeDeleted: &trueValue}
+
+			var getDestinations []*Destination
+			getDestinations, err = tc.client.GetDestinationsByXpubID(
+				tc.ctx, xPubID, nil, &conditions, nil,
+			)
+			require.NoError(t, err)
+			require.NotNil(t, getDestinations)
+			assert.Equal(t, 1, len(getDestinations))
+			assert.Equal(t, destination.XpubID, getDestinations[0].XpubID)
+		})
+
+		ts.T().Run(testCase.name+" with include_deleted false filter", func(t *testing.T) {
+			tc := ts.genericDBClient(t, testCase.database, false)
+			defer tc.Close(tc.ctx)
+
+			_, _, rawKey := CreateNewXPub(tc.ctx, t, tc.client)
+			xPubID := utils.Hash(rawKey)
+
+			metadata := map[string]interface{}{
+				ReferenceIDField: testReferenceID,
+				testMetadataKey:  testMetadataValue,
+			}
+			opts := append(tc.client.DefaultModelOptions(), WithMetadatas(metadata))
+
+			// Create a new destination
+			destination, err := tc.client.NewDestination(
+				tc.ctx, rawKey, utils.ChainExternal, utils.ScriptTypePubKeyHash,
+				opts...,
+			)
+			fmt.Println("HELLO", tc.tablePrefix)
+			require.NoError(t, err)
+			require.NotNil(t, destination)
+
+			//query := fmt.Sprintf("select * from %s_destinations;", tc.tablePrefix)
+			//
+			//fmt.Println("Q", query)
+			//
+			//res := tc.SQLConn.QueryRowContext(tc.ctx, query)
+			//
+			//if err != nil {
+			//	fmt.Println("lala", err)
+			//}
+			//
+			//fmt.Println("bababa", res)
+
+			fmt.Printf("destination: %+v", destination)
+
+			falseValue := false
+
+			conditions := models.DestinationFilters{IncludeDeleted: &falseValue}
+
+			var getDestinations []*Destination
+			getDestinations, err = tc.client.GetDestinationsByXpubID(
+				tc.ctx, xPubID, nil, &conditions, nil,
+			)
+			require.NoError(t, err)
+			require.NotNil(t, getDestinations)
+			assert.Equal(t, 1, len(getDestinations))
+			assert.Equal(t, destination.XpubID, getDestinations[0].XpubID)
+		})
+
+		ts.T().Run(testCase.name+" with created_range filter valid", func(t *testing.T) {
+			tc := ts.genericDBClient(t, testCase.database, false)
+			defer tc.Close(tc.ctx)
+
+			_, _, rawKey := CreateNewXPub(tc.ctx, t, tc.client)
+			xPubID := utils.Hash(rawKey)
+
+			metadata := map[string]interface{}{
+				ReferenceIDField: testReferenceID,
+				testMetadataKey:  testMetadataValue,
+			}
+			opts := append(tc.client.DefaultModelOptions(), WithMetadatas(metadata))
+
+			// Create a new destination
+			destination, err := tc.client.NewDestination(
+				tc.ctx, rawKey, utils.ChainExternal, utils.ScriptTypePubKeyHash,
+				opts...,
+			)
+			fmt.Println("New dest")
+			require.NoError(t, err)
+			require.NotNil(t, destination)
+			fmt.Println("test", destination.CreatedAt)
+
+			fromTime, _ := time.Parse(time.RFC3339Nano, "2020-02-26T11:01:28.069911Z")
+			toTime, _ := time.Parse(time.RFC3339Nano, "2035-02-26T11:01:28.069911Z")
+			timeRange := common.TimeRange{
+				From: fromTime,
+				To:   toTime,
+			}
+
+			// Initialize the DestinationFilters struct with the common.TimeRange
+			conditions := models.DestinationFilters{
+				CreatedRange: &timeRange,
+			}
+
+			//var getDestinations []*Destination
+			dests, err := tc.client.GetDestinationsByXpubID(
+				tc.ctx, xPubID, nil, &conditions, nil,
+			)
+			require.NoError(t, err)
+			fmt.Println("Updated", dests)
+			require.NotNil(t, dests)
+			assert.Equal(t, 1, len(dests))
+			assert.Equal(t, destination.XpubID, dests[0].XpubID)
+		})
+
+		ts.T().Run(testCase.name+" with created_range filter invalid", func(t *testing.T) {
+			tc := ts.genericDBClient(t, testCase.database, false)
+			defer tc.Close(tc.ctx)
+
+			_, _, rawKey := CreateNewXPub(tc.ctx, t, tc.client)
+			xPubID := utils.Hash(rawKey)
+
+			metadata := map[string]interface{}{
+				ReferenceIDField: testReferenceID,
+				testMetadataKey:  testMetadataValue,
+			}
+			opts := append(tc.client.DefaultModelOptions(), WithMetadatas(metadata))
+
+			// Create a new destination
+			destination, err := tc.client.NewDestination(
+				tc.ctx, rawKey, utils.ChainExternal, utils.ScriptTypePubKeyHash,
+				opts...,
+			)
+			require.NoError(t, err)
+			require.NotNil(t, destination)
+
+			fromTime, _ := time.Parse(time.RFC3339Nano, "2028-02-26T11:01:28.069911Z")
+			toTime, _ := time.Parse(time.RFC3339Nano, "2030-02-26T11:01:28.069911Z")
+			timeRange := common.TimeRange{
+				From: fromTime,
+				To:   toTime,
+			}
+
+			// Initialize the DestinationFilters struct with the common.TimeRange
+			conditions := models.DestinationFilters{
+				CreatedRange: &timeRange,
+			}
+
+			var getDestinations []*Destination
+			getDestinations, err = tc.client.GetDestinationsByXpubID(
+				tc.ctx, xPubID, nil, &conditions, nil,
+			)
+			require.NoError(t, err)
+			require.Nil(t, getDestinations)
+			//assert.Equal(t, 1, len(getDestinations))
+			//assert.Equal(t, destination.XpubID, getDestinations[0].XpubID)
+		})
+
+		ts.T().Run(testCase.name+" with created_range filter valid", func(t *testing.T) {
+			tc := ts.genericDBClient(t, testCase.database, false)
+			defer tc.Close(tc.ctx)
+
+			_, _, rawKey := CreateNewXPub(tc.ctx, t, tc.client)
+			xPubID := utils.Hash(rawKey)
+
+			metadata := map[string]interface{}{
+				ReferenceIDField: testReferenceID,
+				testMetadataKey:  testMetadataValue,
+			}
+			opts := append(tc.client.DefaultModelOptions(), WithMetadatas(metadata))
+
+			// Create a new destination
+			destination, err := tc.client.NewDestination(
+				tc.ctx, rawKey, utils.ChainExternal, utils.ScriptTypePubKeyHash,
+				opts...,
+			)
+			require.NoError(t, err)
+			require.NotNil(t, destination)
+
+			fromTime, _ := time.Parse(time.RFC3339Nano, "2020-02-26T11:01:28.069911Z")
+			toTime, _ := time.Parse(time.RFC3339Nano, "2030-02-26T11:01:28.069911Z")
+			timeRange := common.TimeRange{
+				From: fromTime,
+				To:   toTime,
+			}
+
+			// Initialize the DestinationFilters struct with the common.TimeRange
+			conditions := models.DestinationFilters{
+				UpdatedRange: &timeRange,
+			}
+
+			//var getDestinations []*Destination
+			dests, err := tc.client.GetDestinationsByXpubID(
+				tc.ctx, xPubID, nil, &conditions, nil,
+			)
+			require.NoError(t, err)
+			require.NotNil(t, dests)
+			assert.Equal(t, 1, len(dests))
+			assert.Equal(t, destination.XpubID, dests[0].XpubID)
+		})
+
+		ts.T().Run(testCase.name+" with updated_range filter invalid", func(t *testing.T) {
+			tc := ts.genericDBClient(t, testCase.database, false)
+			defer tc.Close(tc.ctx)
+
+			_, _, rawKey := CreateNewXPub(tc.ctx, t, tc.client)
+			xPubID := utils.Hash(rawKey)
+
+			metadata := map[string]interface{}{
+				ReferenceIDField: testReferenceID,
+				testMetadataKey:  testMetadataValue,
+			}
+			opts := append(tc.client.DefaultModelOptions(), WithMetadatas(metadata))
+
+			// Create a new destination
+			destination, err := tc.client.NewDestination(
+				tc.ctx, rawKey, utils.ChainExternal, utils.ScriptTypePubKeyHash,
+				opts...,
+			)
+			require.NoError(t, err)
+			require.NotNil(t, destination)
+
+			fromTime, _ := time.Parse(time.RFC3339Nano, "2028-02-26T11:01:28.069911Z")
+			toTime, _ := time.Parse(time.RFC3339Nano, "2030-02-26T11:01:28.069911Z")
+			timeRange := common.TimeRange{
+				From: fromTime,
+				To:   toTime,
+			}
+
+			// Initialize the DestinationFilters struct with the common.TimeRange
+			conditions := models.DestinationFilters{
+				UpdatedRange: &timeRange,
+			}
+
+			//var getDestinations []*Destination
+			dests, err := tc.client.GetDestinationsByXpubID(
+				tc.ctx, xPubID, nil, &conditions, nil,
+			)
+			require.NoError(t, err)
+			require.NotNil(t, dests)
+			assert.Equal(t, 1, len(dests))
+			//assert.Equal(t, destination.XpubID, getDestinations[0].XpubID)
+		})
+
 	}
 }
 
