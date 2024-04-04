@@ -85,9 +85,7 @@ linters:
   enable:
     - gci
     - misspell
-  presets:
-    - bugs
-    - unused
+
 
 linters-settings:
   gci:

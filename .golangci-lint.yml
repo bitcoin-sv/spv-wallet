@@ -99,9 +99,6 @@ linters:
     - gosimple
     - staticcheck
     - unused
-#  presets:
-#    - bugs
-#    - unused
 
 linters-settings:
   govet:
