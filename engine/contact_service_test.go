@@ -276,8 +276,8 @@ func TestClientService_AddContactRequest(t *testing.T) {
 		require.NoError(t, err)
 		require.NotNil(t, contact)
 
-		// mark request as accepted
-		contact.Status = ContactNotConfirmed
+		// mark request as confirmed
+		contact.Status = ContactConfirmed
 		err = contact.Save(ctx)
 		require.NoError(t, err)
 
@@ -295,7 +295,7 @@ func TestClientService_AddContactRequest(t *testing.T) {
 		require.Equal(t, updatedPki, updatedContact.PubKey)
 
 		// status should back to awaiting
-		require.Equal(t, ContactAwaitAccept, updatedContact.Status)
+		require.Equal(t, ContactNotConfirmed, updatedContact.Status)
 	})
 }
 

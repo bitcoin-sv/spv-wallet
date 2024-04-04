@@ -14,6 +14,8 @@ var (
 	ErrInvalidRequesterXpub         = errors.New("invalid requester xpub")
 	ErrAddingContactRequest         = errors.New("adding contact request failed")
 	ErrMoreThanOnePaymailRegistered = errors.New("there are more than one paymail assigned to the xpub")
+	ErrContactNotFound              = errors.New("contact not found")
+	ErrContactIncorrectStatus       = errors.New("contact is in incorrect status to proceed")
 )
 
 func (c *Client) UpsertContact(ctx context.Context, ctcFName, ctcPaymail, requesterXpub, requesterPaymail string, opts ...ModelOps) (*Contact, error) {
@@ -27,7 +29,10 @@ func (c *Client) UpsertContact(ctx context.Context, ctcFName, ctcPaymail, reques
 		cs: c.Cachestore(),
 		pc: c.PaymailClient(),
 	}
-	contactPm := pmSrvnt.GetSanitizedPaymail(ctcPaymail)
+	contactPm, err := pmSrvnt.GetSanitizedPaymail(ctcPaymail)
+	if err != nil {
+		return nil, fmt.Errorf("requested contact paymail is invalid. Reason: %w", err)
+	}
 
 	contact, err := c.upsertContact(ctx, pmSrvnt, reqXPubID, ctcFName, contactPm, opts...)
 	if err != nil {
@@ -57,31 +62,29 @@ func (c *Client) AddContactRequest(ctx context.Context, fullName, paymailAdress,
 		pc: c.PaymailClient(),
 	}
 
-	contactPm := pmSrvnt.GetSanitizedPaymail(paymailAdress)
+	contactPm, err := pmSrvnt.GetSanitizedPaymail(paymailAdress)
+	if err != nil {
+		return nil, fmt.Errorf("requested contact paymail is invalid. Reason: %w", err)
+	}
+
 	contactPki, err := pmSrvnt.GetPkiForPaymail(ctx, contactPm)
 	if err != nil {
 		return nil, fmt.Errorf("geting PKI for %s failed. Reason: %w", paymailAdress, err)
 	}
 
 	// check if exists already
-	contact, err := getContact(ctx, contactPm.adress, requesterXPubID, c.DefaultModelOptions()...)
+	contact, err := getContact(ctx, contactPm.Address, requesterXPubID, c.DefaultModelOptions()...)
 	if err != nil {
 		return nil, err
 	}
 
 	save := false
 	if contact != nil {
-		// update and back to awaiting if PKI changed
-		if contact.PubKey != contactPki.PubKey {
-			contact.Status = ContactAwaitAccept // ? Or error
-			contact.PubKey = contactPki.PubKey
-
-			save = true
-		}
+		save = contact.UpdatePubKey(contactPki.PubKey)
 	} else {
 		contact = newContact(
 			fullName,
-			contactPm.adress,
+			contactPm.Address,
 			contactPki.PubKey,
 			requesterXPubID,
 			ContactAwaitAccept,
@@ -98,6 +101,85 @@ func (c *Client) AddContactRequest(ctx context.Context, fullName, paymailAdress,
 	}
 
 	return contact, nil
+}
+
+func (c *Client) GetContacts(ctx context.Context, xPubID string, metadata *Metadata, conditions map[string]interface{}, queryParams *datastore.QueryParams) ([]*Contact, error) {
+	contacts, err := getContacts(ctx, xPubID, metadata, conditions, queryParams, c.DefaultModelOptions()...)
+	if err != nil {
+		return nil, err
+	}
+
+	return contacts, nil
+}
+
+func (c *Client) AcceptContact(ctx context.Context, xPubID, paymail string) error {
+
+	contact, err := getContact(ctx, paymail, xPubID, c.DefaultModelOptions()...)
+	if err != nil {
+		c.logContactError(xPubID, paymail, fmt.Sprintf("unexpected error while geting contact: %s", err.Error()))
+		return err
+	}
+	if contact == nil {
+		return ErrContactNotFound
+	}
+
+	if err = contact.Accept(); err != nil {
+		c.logContactWarining(xPubID, paymail, err.Error())
+		return ErrContactIncorrectStatus
+	}
+
+	if err = contact.Save(ctx); err != nil {
+		c.logContactError(xPubID, paymail, fmt.Sprintf("unexpected error while saving contact: %s", err.Error()))
+		return err
+	}
+
+	return nil
+}
+
+func (c *Client) RejectContact(ctx context.Context, xPubID, paymail string) error {
+	contact, err := getContact(ctx, paymail, xPubID, c.DefaultModelOptions()...)
+	if err != nil {
+		c.logContactError(xPubID, paymail, fmt.Sprintf("unexpected error while geting contact: %s", err.Error()))
+		return err
+	}
+	if contact == nil {
+		return ErrContactNotFound
+	}
+
+	if err = contact.Reject(); err != nil {
+		c.logContactWarining(xPubID, paymail, err.Error())
+		return ErrContactIncorrectStatus
+	}
+
+	if err = contact.Save(ctx); err != nil {
+		c.logContactError(xPubID, paymail, fmt.Sprintf("unexpected error while saving contact: %s", err.Error()))
+		return err
+	}
+
+	return nil
+}
+
+func (c *Client) ConfirmContact(ctx context.Context, xPubID, paymail string) error {
+	contact, err := getContact(ctx, paymail, xPubID, c.DefaultModelOptions()...)
+	if err != nil {
+		c.logContactError(xPubID, paymail, fmt.Sprintf("unexpected error while geting contact: %s", err.Error()))
+		return err
+	}
+	if contact == nil {
+		return ErrContactNotFound
+	}
+
+	if err = contact.Confirm(); err != nil {
+		c.logContactWarining(xPubID, paymail, err.Error())
+		return ErrContactIncorrectStatus
+	}
+
+	if err = contact.Save(ctx); err != nil {
+		c.logContactError(xPubID, paymail, fmt.Sprintf("unexpected error while saving contact: %s", err.Error()))
+		return err
+	}
+
+	return nil
 }
 
 func (c *Client) getPaymail(ctx context.Context, xpubID, paymailAddr string) (*PaymailAddress, error) {
@@ -129,15 +211,15 @@ func (c *Client) getPaymail(ctx context.Context, xpubID, paymailAddr string) (*P
 	return paymails[0], nil
 }
 
-func (c *Client) upsertContact(ctx context.Context, pmSrvnt *PaymailServant, reqXPubID, ctcFName string, ctcPaymail *SanitizedPaymail, opts ...ModelOps) (*Contact, error) {
+func (c *Client) upsertContact(ctx context.Context, pmSrvnt *PaymailServant, reqXPubID, ctcFName string, ctcPaymail *paymail.SanitisedPaymail, opts ...ModelOps) (*Contact, error) {
 
 	contactPki, err := pmSrvnt.GetPkiForPaymail(ctx, ctcPaymail)
 	if err != nil {
-		return nil, fmt.Errorf("geting PKI for %s failed. Reason: %w", ctcPaymail.adress, err)
+		return nil, fmt.Errorf("geting PKI for %s failed. Reason: %w", ctcPaymail.Address, err)
 	}
 
 	// check if exists already
-	contact, err := getContact(ctx, ctcPaymail.adress, reqXPubID, c.DefaultModelOptions()...)
+	contact, err := getContact(ctx, ctcPaymail.Address, reqXPubID, c.DefaultModelOptions()...)
 	if err != nil {
 		return nil, err
 	}
@@ -145,7 +227,7 @@ func (c *Client) upsertContact(ctx context.Context, pmSrvnt *PaymailServant, req
 	if contact == nil { // insert
 		contact = newContact(
 			ctcFName,
-			ctcPaymail.adress,
+			ctcPaymail.Address,
 			contactPki.PubKey,
 			reqXPubID,
 			ContactNotConfirmed,
@@ -155,11 +237,7 @@ func (c *Client) upsertContact(ctx context.Context, pmSrvnt *PaymailServant, req
 		contact.FullName = ctcFName
 		contact.SetOptions(opts...)
 
-		// go back to unconfirmed status
-		if contact.PubKey != contactPki.PubKey {
-			contact.Status = ContactNotConfirmed
-			contact.PubKey = contactPki.PubKey
-		}
+		contact.UpdatePubKey(contactPki.PubKey)
 	}
 
 	if err = contact.Save(ctx); err != nil {
@@ -169,47 +247,16 @@ func (c *Client) upsertContact(ctx context.Context, pmSrvnt *PaymailServant, req
 	return contact, nil
 }
 
-func (c *Client) UpdateContact(ctx context.Context, fullName, pubKey, xPubID, paymailAddr string, status ContactStatus, opts ...ModelOps) (*Contact, error) {
-	contact, err := getContact(ctx, paymailAddr, xPubID, opts...)
-
-	if err != nil {
-		return nil, fmt.Errorf("failed to get contact: %w", err)
-	}
-
-	if contact == nil {
-		return nil, fmt.Errorf("contact not found")
-	}
-
-	if fullName != "" {
-		contact.FullName = fullName
-	}
-
-	if pubKey != "" {
-		contact.PubKey = pubKey
-	}
-
-	if status != "" {
-		contact.Status = status
-	}
-
-	if paymailAddr != "" {
-		contact.Paymail = paymailAddr
-	}
-
-	if err = contact.Save(ctx); err != nil {
-		return nil, err
-	}
-
-	return contact, nil
+func (c *Client) logContactWarining(xPubID, cPaymail, warning string) {
+	c.Logger().Warn().
+		Str("xPubID", xPubID).
+		Str("contact", cPaymail).
+		Msg(warning)
 }
 
-func (c *Client) GetContacts(ctx context.Context, metadata *Metadata, conditions *map[string]interface{}, queryParams *datastore.QueryParams, opts ...ModelOps) ([]*Contact, error) {
-	ctx = c.GetOrStartTxn(ctx, "get_contacts")
-
-	contacts, err := getContacts(ctx, metadata, conditions, queryParams, c.DefaultModelOptions(opts...)...)
-	if err != nil {
-		return nil, err
-	}
-
-	return contacts, nil
+func (c *Client) logContactError(xPubID, cPaymail, errorMsg string) {
+	c.Logger().Error().
+		Str("xPubID", xPubID).
+		Str("contact", cPaymail).
+		Msg(errorMsg)
 }
