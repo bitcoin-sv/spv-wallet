@@ -4,7 +4,6 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"github.com/bitcoin-sv/spv-wallet/models"
 
 	"github.com/bitcoin-sv/spv-wallet/engine/cluster"
 	"github.com/bitcoin-sv/spv-wallet/engine/datastore"
@@ -159,7 +158,7 @@ func getDestinationsCount(ctx context.Context, metadata *Metadata, conditions *m
 }
 
 // getDestinationsByXpubID will get the destination(s) by the given xPubID
-func getDestinationsByXpubID(ctx context.Context, xPubID string, usingMetadata *Metadata, conditions *models.DestinationFilters,
+func getDestinationsByXpubID(ctx context.Context, xPubID string, usingMetadata *Metadata, conditions map[string]interface{},
 	queryParams *datastore.QueryParams, opts ...ModelOps,
 ) ([]*Destination, error) {
 	// Construct an empty model
@@ -167,7 +166,7 @@ func getDestinationsByXpubID(ctx context.Context, xPubID string, usingMetadata *
 
 	dbConditions := map[string]interface{}{}
 	if conditions != nil {
-		dbConditions = conditions.ToConditions()
+		dbConditions = conditions
 	}
 	dbConditions[xPubIDField] = xPubID
 

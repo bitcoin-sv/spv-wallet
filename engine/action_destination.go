@@ -2,7 +2,6 @@ package engine
 
 import (
 	"context"
-	"github.com/bitcoin-sv/spv-wallet/models"
 
 	"github.com/bitcoin-sv/spv-wallet/engine/datastore"
 )
@@ -119,7 +118,7 @@ func (c *Client) GetDestinationsCount(ctx context.Context, metadataConditions *M
 //
 // metadataConditions are the search criteria used to find destinations
 func (c *Client) GetDestinationsByXpubID(ctx context.Context, xPubID string, metadataConditions *Metadata,
-	conditions *models.DestinationFilters, queryParams *datastore.QueryParams,
+	conditions map[string]interface{}, queryParams *datastore.QueryParams,
 ) ([]*Destination, error) {
 	// Check for existing NewRelic transaction
 	ctx = c.GetOrStartTxn(ctx, "get_destinations")

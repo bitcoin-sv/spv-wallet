@@ -25,25 +25,21 @@ import (
 func (a *Action) search(c *gin.Context) {
 	reqXPubID := c.GetString(auth.ParamXPubHashKey)
 
-	queryParams, metadata, conditions, err := GetSearchDestinationQueryParameters(c)
-	if err != nil {
-		c.JSON(http.StatusBadRequest, err.Error())
-		return
-	}
-
-	if err != nil {
+	var reqParams SearchRequestDestinationParameters
+	if err := c.Bind(&reqParams); err != nil {
 		c.JSON(http.StatusBadRequest, err.Error())
 		return
 	}
 
 	var destinations []*engine.Destination
-	if destinations, err = a.Services.SpvWalletEngine.GetDestinationsByXpubID(
+	destinations, err := a.Services.SpvWalletEngine.GetDestinationsByXpubID(
 		c.Request.Context(),
 		reqXPubID,
-		metadata,
-		conditions,
-		queryParams,
-	); err != nil {
+		reqParams.Metadata,
+		reqParams.Conditions.ToDbConditions(),
+		reqParams.QueryParams,
+	)
+	if err != nil {
 		c.JSON(http.StatusInternalServerError, err.Error())
 		return
 	}

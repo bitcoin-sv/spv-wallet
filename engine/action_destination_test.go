@@ -3,8 +3,6 @@ package engine
 import (
 	"context"
 	"fmt"
-	"github.com/bitcoin-sv/spv-wallet/models"
-	"github.com/bitcoin-sv/spv-wallet/models/common"
 	"testing"
 	"time"
 
@@ -213,11 +211,13 @@ func (ts *EmbeddedDBTestSuite) TestClient_GetDestinations() {
 			require.NoError(t, err)
 			require.NotNil(t, destination)
 
-			conditions := models.DestinationFilters{LockingScript: &destination.LockingScript}
+			conditions := map[string]interface{}{
+				"locking_script": destination.LockingScript,
+			}
 
 			var getDestinations []*Destination
 			getDestinations, err = tc.client.GetDestinationsByXpubID(
-				tc.ctx, xPubID, nil, &conditions, nil,
+				tc.ctx, xPubID, nil, conditions, nil,
 			)
 			fmt.Printf("Destinatosn %+v", getDestinations[0].LockingScript)
 			require.NoError(t, err)
@@ -248,11 +248,13 @@ func (ts *EmbeddedDBTestSuite) TestClient_GetDestinations() {
 			require.NoError(t, err)
 			require.NotNil(t, destination)
 
-			conditions := models.DestinationFilters{Address: &destination.Address}
+			conditions := map[string]interface{}{
+				"address": destination.Address,
+			}
 
 			var getDestinations []*Destination
 			getDestinations, err = tc.client.GetDestinationsByXpubID(
-				tc.ctx, xPubID, nil, &conditions, nil,
+				tc.ctx, xPubID, nil, conditions, nil,
 			)
 			require.NoError(t, err)
 			require.NotNil(t, getDestinations)
@@ -282,7 +284,7 @@ func (ts *EmbeddedDBTestSuite) TestClient_GetDestinations() {
 			require.NoError(t, err)
 			require.NotNil(t, destination)
 
-			//conditions := models.DestinationFilters{DraftID: &destination.DraftID}
+			// conditions := models.DestinationFilters{DraftID: &destination.DraftID}
 
 			//var getDestinations []*Destination
 			//getDestinations, err = tc.client.GetDestinationsByXpubID(
@@ -320,13 +322,12 @@ func (ts *EmbeddedDBTestSuite) TestClient_GetDestinations() {
 			require.NoError(t, err)
 			require.NotNil(t, destination)
 
-			trueValue := true
-
-			conditions := models.DestinationFilters{IncludeDeleted: &trueValue}
+			// deleted items should be present by default (empty conditions)
+			conditions := make(map[string]interface{})
 
 			var getDestinations []*Destination
 			getDestinations, err = tc.client.GetDestinationsByXpubID(
-				tc.ctx, xPubID, nil, &conditions, nil,
+				tc.ctx, xPubID, nil, conditions, nil,
 			)
 			require.NoError(t, err)
 			require.NotNil(t, getDestinations)
@@ -352,31 +353,17 @@ func (ts *EmbeddedDBTestSuite) TestClient_GetDestinations() {
 				tc.ctx, rawKey, utils.ChainExternal, utils.ScriptTypePubKeyHash,
 				opts...,
 			)
-			fmt.Println("HELLO", tc.tablePrefix)
 			require.NoError(t, err)
 			require.NotNil(t, destination)
 
-			//query := fmt.Sprintf("select * from %s_destinations;", tc.tablePrefix)
-			//
-			//fmt.Println("Q", query)
-			//
-			//res := tc.SQLConn.QueryRowContext(tc.ctx, query)
-			//
-			//if err != nil {
-			//	fmt.Println("lala", err)
-			//}
-			//
-			//fmt.Println("bababa", res)
-
-			fmt.Printf("destination: %+v", destination)
-
-			falseValue := false
-
-			conditions := models.DestinationFilters{IncludeDeleted: &falseValue}
+			// when deleted_at is NULL id db - we treat it as not deleted
+			conditions := map[string]interface{}{
+				"deleted_at": nil,
+			}
 
 			var getDestinations []*Destination
 			getDestinations, err = tc.client.GetDestinationsByXpubID(
-				tc.ctx, xPubID, nil, &conditions, nil,
+				tc.ctx, xPubID, nil, conditions, nil,
 			)
 			require.NoError(t, err)
 			require.NotNil(t, getDestinations)
@@ -409,19 +396,16 @@ func (ts *EmbeddedDBTestSuite) TestClient_GetDestinations() {
 
 			fromTime, _ := time.Parse(time.RFC3339Nano, "2020-02-26T11:01:28.069911Z")
 			toTime, _ := time.Parse(time.RFC3339Nano, "2035-02-26T11:01:28.069911Z")
-			timeRange := common.TimeRange{
-				From: fromTime,
-				To:   toTime,
+
+			conditions := map[string]interface{}{
+				"created_at": map[string]interface{}{
+					"$gte": fromTime,
+					"$lte": toTime,
+				},
 			}
 
-			// Initialize the DestinationFilters struct with the common.TimeRange
-			conditions := models.DestinationFilters{
-				CreatedRange: &timeRange,
-			}
-
-			//var getDestinations []*Destination
 			dests, err := tc.client.GetDestinationsByXpubID(
-				tc.ctx, xPubID, nil, &conditions, nil,
+				tc.ctx, xPubID, nil, conditions, nil,
 			)
 			require.NoError(t, err)
 			fmt.Println("Updated", dests)
@@ -451,26 +435,16 @@ func (ts *EmbeddedDBTestSuite) TestClient_GetDestinations() {
 			require.NoError(t, err)
 			require.NotNil(t, destination)
 
-			fromTime, _ := time.Parse(time.RFC3339Nano, "2028-02-26T11:01:28.069911Z")
-			toTime, _ := time.Parse(time.RFC3339Nano, "2030-02-26T11:01:28.069911Z")
-			timeRange := common.TimeRange{
-				From: fromTime,
-				To:   toTime,
-			}
-
-			// Initialize the DestinationFilters struct with the common.TimeRange
-			conditions := models.DestinationFilters{
-				CreatedRange: &timeRange,
+			conditions := map[string]interface{}{
+				"created_at": 123,
 			}
 
 			var getDestinations []*Destination
 			getDestinations, err = tc.client.GetDestinationsByXpubID(
-				tc.ctx, xPubID, nil, &conditions, nil,
+				tc.ctx, xPubID, nil, conditions, nil,
 			)
 			require.NoError(t, err)
 			require.Nil(t, getDestinations)
-			//assert.Equal(t, 1, len(getDestinations))
-			//assert.Equal(t, destination.XpubID, getDestinations[0].XpubID)
 		})
 
 		ts.T().Run(testCase.name+" with created_range filter valid", func(t *testing.T) {
@@ -496,19 +470,16 @@ func (ts *EmbeddedDBTestSuite) TestClient_GetDestinations() {
 
 			fromTime, _ := time.Parse(time.RFC3339Nano, "2020-02-26T11:01:28.069911Z")
 			toTime, _ := time.Parse(time.RFC3339Nano, "2030-02-26T11:01:28.069911Z")
-			timeRange := common.TimeRange{
-				From: fromTime,
-				To:   toTime,
+
+			conditions := map[string]interface{}{
+				"updated_at": map[string]interface{}{
+					"$gte": fromTime,
+					"$lte": toTime,
+				},
 			}
 
-			// Initialize the DestinationFilters struct with the common.TimeRange
-			conditions := models.DestinationFilters{
-				UpdatedRange: &timeRange,
-			}
-
-			//var getDestinations []*Destination
 			dests, err := tc.client.GetDestinationsByXpubID(
-				tc.ctx, xPubID, nil, &conditions, nil,
+				tc.ctx, xPubID, nil, conditions, nil,
 			)
 			require.NoError(t, err)
 			require.NotNil(t, dests)
@@ -537,26 +508,18 @@ func (ts *EmbeddedDBTestSuite) TestClient_GetDestinations() {
 			require.NoError(t, err)
 			require.NotNil(t, destination)
 
-			fromTime, _ := time.Parse(time.RFC3339Nano, "2028-02-26T11:01:28.069911Z")
-			toTime, _ := time.Parse(time.RFC3339Nano, "2030-02-26T11:01:28.069911Z")
-			timeRange := common.TimeRange{
-				From: fromTime,
-				To:   toTime,
+			conditions := map[string]interface{}{
+				"updated_at": 123,
 			}
 
-			// Initialize the DestinationFilters struct with the common.TimeRange
-			conditions := models.DestinationFilters{
-				UpdatedRange: &timeRange,
-			}
-
-			//var getDestinations []*Destination
+			// var getDestinations []*Destination
 			dests, err := tc.client.GetDestinationsByXpubID(
-				tc.ctx, xPubID, nil, &conditions, nil,
+				tc.ctx, xPubID, nil, conditions, nil,
 			)
 			require.NoError(t, err)
 			require.NotNil(t, dests)
 			assert.Equal(t, 1, len(dests))
-			//assert.Equal(t, destination.XpubID, getDestinations[0].XpubID)
+			// assert.Equal(t, destination.XpubID, getDestinations[0].XpubID)
 		})
 
 	}
