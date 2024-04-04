@@ -12,59 +12,59 @@ func TestErrorCode_IsValid(t *testing.T) {
 	t.Parallel()
 
 	var tests = []struct {
-		testCase    string
-		code        ErrorCode
 		expectValid bool
+		code        ErrorCode
+		testCase    string
 	}{
 		{
-			"ErrorBadErrorCode",
+			true,
 			ErrorBadErrorCode,
-			true,
+			"ErrorBadErrorCode",
 		},
 		{
-			"ErrorMissingEnv",
+			true,
 			ErrorMissingEnv,
-			true,
+			"ErrorMissingEnv",
 		},
 		{
-			"ErrorInvalidEnv",
+			true,
 			ErrorInvalidEnv,
-			true,
+			"ErrorInvalidEnv",
 		},
 		{
-			"ErrorReadingConfig",
+			true,
 			ErrorReadingConfig,
-			true,
+			"ErrorReadingConfig",
 		},
 		{
-			"ErrorViper",
+			true,
 			ErrorViper,
-			true,
+			"ErrorViper",
 		},
 		{
-			"ErrorConfigValidation",
+			true,
 			ErrorConfigValidation,
-			true,
+			"ErrorConfigValidation",
 		},
 		{
-			"ErrorDecryptEnv",
+			true,
 			ErrorDecryptEnv,
-			true,
+			"ErrorDecryptEnv",
 		},
 		{
-			"ErrorLoadingConfig",
+			true,
 			ErrorLoadingConfig,
-			true,
+			"ErrorLoadingConfig",
 		},
 		{
-			"ErrorLoadingCache",
+			true,
 			ErrorLoadingCache,
-			true,
+			"ErrorLoadingCache",
 		},
 		{
-			"unknown code",
-			9999,
 			false,
+			9999,
+			"unknown code",
 		},
 	}
 
