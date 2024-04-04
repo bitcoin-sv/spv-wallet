@@ -128,7 +128,7 @@ func getNodesDefaults() *NodesConfig {
 		Callback:     getCallbackDefaults(),
 		Apis: []*MinerAPI{
 			{
-				ArcURL:  "https://api.taal.com/arc",
+				ArcURL:  "https://arc.taal.com",
 				Token:   "mainnet_06770f425eb00298839a24a49cbdc02c",
 				MinerID: "03ad780153c47df915b3d2e23af727c68facaca4facd5f155bf5018b979b9aeb83",
 			},
