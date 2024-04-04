@@ -84,19 +84,9 @@ linters:
   # https://golangci-lint.run/usage/linters/#enabled-by-default
   enable:
     - bodyclose
-    - errorlint
     - exhaustive
-    - goconst
-    - unparam
-    - wastedassign
-    - wrapcheck
-    - exhaustruct
-    - gocognit
-    - gocyclo
     - gosec
-    - maligned
     - prealloc
-    - testifylint
     - govet
     - revive
     - unconvert
@@ -105,6 +95,10 @@ linters:
     - exportloopref
     - sqlclosecheck
     - nolintlint
+    - errcheck
+    - gosimple
+    - staticcheck
+    - unused
   presets:
     - bugs
     - unused
@@ -130,7 +124,6 @@ issues:
       linters:
         - gocyclo
         - errcheck
-        - dupl
         - gosec
 
     # Exclude known linters from partially "hard-vendored" code,
