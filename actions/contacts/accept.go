@@ -20,7 +20,7 @@ import (
 // @Failure		404	"Contact not found"
 // @Failure		422	"Contact status not awaiting"
 // @Failure		500	"Internal server error"
-// @Router		/v1/contact/accepted [PATCH]
+// @Router		/v1/contact/accepted/{paymail} [PATCH]
 // @Security	x-auth-xpub
 func (a *Action) accept(c *gin.Context) {
 	reqXPubID := c.GetString(auth.ParamXPubHashKey)
@@ -32,7 +32,7 @@ func (a *Action) accept(c *gin.Context) {
 		switch {
 		case errors.Is(err, engine.ErrContactNotFound):
 			c.JSON(http.StatusNotFound, err.Error())
-		case errors.Is(err, engine.ErrContactStatusNotAwaiting):
+		case errors.Is(err, engine.ErrContactIncorrectStatus):
 			c.JSON(http.StatusUnprocessableEntity, err.Error())
 		default:
 			c.JSON(http.StatusInternalServerError, err.Error())

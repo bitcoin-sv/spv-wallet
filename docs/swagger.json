@@ -998,49 +998,7 @@
                 }
             }
         },
-        "/v1/contact": {
-            "patch": {
-                "security": [
-                    {
-                        "x-auth-xpub": []
-                    }
-                ],
-                "description": "Update contact",
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Contacts"
-                ],
-                "summary": "Update contact",
-                "parameters": [
-                    {
-                        "description": "Contacts Metadata",
-                        "name": "metadata",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "type": "string"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "Updated contact",
-                        "schema": {
-                            "$ref": "#/definitions/models.Contact"
-                        }
-                    },
-                    "400": {
-                        "description": "Bad request - Error while parsing UpdateContact from request body"
-                    },
-                    "500": {
-                        "description": "Internal server error - Error while updating contact"
-                    }
-                }
-            }
-        },
-        "/v1/contact/accepted": {
+        "/v1/contact/accepted/{paymail}": {
             "patch": {
                 "security": [
                     {
@@ -1080,7 +1038,47 @@
                 }
             }
         },
-        "/v1/contact/rejected": {
+        "/v1/contact/confirmed/{paymail}": {
+            "patch": {
+                "security": [
+                    {
+                        "x-auth-xpub": []
+                    }
+                ],
+                "description": "Confirm contact. For contact with status \"unconfirmed\" change status to \"confirmed\"",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Contact"
+                ],
+                "summary": "Confirm contact",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Paymail address of the contact the user wants to confirm",
+                        "name": "paymail",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "404": {
+                        "description": "Contact not found"
+                    },
+                    "422": {
+                        "description": "Contact status not unconfirmed"
+                    },
+                    "500": {
+                        "description": "Internal server error"
+                    }
+                }
+            }
+        },
+        "/v1/contact/rejected/{paymail}": {
             "patch": {
                 "security": [
                     {
@@ -1120,48 +1118,8 @@
                 }
             }
         },
-        "/v1/contact/{paymail}": {
-            "put": {
-                "security": [
-                    {
-                        "x-auth-xpub": []
-                    }
-                ],
-                "description": "Add or update contact. When adding a new contact, the system utilizes Paymail's PIKE capability to dispatch an invitation request, asking the counterparty to include the current user in their contacts.",
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Contact"
-                ],
-                "summary": "Upsert contact",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Paymail address of the contact the user wants to add/modify",
-                        "name": "paymail",
-                        "in": "path",
-                        "required": true
-                    },
-                    {
-                        "description": "Full name and metadata needed to add/modify contact",
-                        "name": "UpsertContact",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/contacts.UpsertContact"
-                        }
-                    }
-                ],
-                "responses": {
-                    "201": {
-                        "description": "Created"
-                    }
-                }
-            }
-        },
-        "/v1/contacts": {
-            "get": {
+        "/v1/contact/search": {
+            "post": {
                 "security": [
                     {
                         "x-auth-xpub": []
@@ -1222,6 +1180,46 @@
                     },
                     "500": {
                         "description": "Internal server error - Error while searching for contacts"
+                    }
+                }
+            }
+        },
+        "/v1/contact/{paymail}": {
+            "put": {
+                "security": [
+                    {
+                        "x-auth-xpub": []
+                    }
+                ],
+                "description": "Add or update contact. When adding a new contact, the system utilizes Paymail's PIKE capability to dispatch an invitation request, asking the counterparty to include the current user in their contacts.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Contact"
+                ],
+                "summary": "Upsert contact",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Paymail address of the contact the user wants to add/modify",
+                        "name": "paymail",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Full name and metadata needed to add/modify contact",
+                        "name": "UpsertContact",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/contacts.UpsertContact"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created"
                     }
                 }
             }
@@ -3266,41 +3264,9 @@
                 1000000,
                 1000000000,
                 60000000000,
-                3600000000000,
-                -9223372036854775808,
-                9223372036854775807,
-                1,
-                1000,
-                1000000,
-                1000000000,
-                60000000000,
-                3600000000000,
-                -9223372036854775808,
-                9223372036854775807,
-                1,
-                1000,
-                1000000,
-                1000000000,
-                60000000000,
                 3600000000000
             ],
             "x-enum-varnames": [
-                "minDuration",
-                "maxDuration",
-                "Nanosecond",
-                "Microsecond",
-                "Millisecond",
-                "Second",
-                "Minute",
-                "Hour",
-                "minDuration",
-                "maxDuration",
-                "Nanosecond",
-                "Microsecond",
-                "Millisecond",
-                "Second",
-                "Minute",
-                "Hour",
                 "minDuration",
                 "maxDuration",
                 "Nanosecond",

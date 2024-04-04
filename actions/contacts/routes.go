@@ -17,13 +17,14 @@ func NewHandler(appConfig *config.AppConfig, services *config.AppServices) route
 	action := &Action{actions.Action{AppConfig: appConfig, Services: services}}
 
 	apiEndpoints := routes.APIEndpointsFunc(func(router *gin.RouterGroup) {
-		contactGroup := router.Group("/contact")
-		contactGroup.PUT("/:paymail", action.upsert)
-		contactGroup.PATCH("", action.update)
-		contactGroup.PATCH("/accepted/:paymail", action.accept)
-		contactGroup.PATCH("/rejected/:paymail", action.reject)
-		contactsGroup := router.Group("/contacts")
-		contactsGroup.GET("", action.search)
+		group := router.Group("/contact")
+		group.PUT("/:paymail", action.upsert)
+
+		group.PATCH("/accepted/:paymail", action.accept)
+		group.PATCH("/rejected/:paymail", action.reject)
+		group.PATCH("/confirmed/:paymail", action.confirm)
+
+		group.POST("search", action.search)
 	})
 
 	return apiEndpoints

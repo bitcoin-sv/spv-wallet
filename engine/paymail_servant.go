@@ -19,19 +19,19 @@ type PaymailServant struct {
 	pc paymail.ClientInterface
 }
 
-type SanitizedPaymail struct {
-	alias, domain, adress string
+func (s *PaymailServant) GetSanitizedPaymail(addr string) (*paymail.SanitisedPaymail, error) {
+	if err := paymail.ValidatePaymail(addr); err != nil {
+		return nil, err
+	}
+
+	sanitised := &paymail.SanitisedPaymail{}
+	sanitised.Alias, sanitised.Domain, sanitised.Address = paymail.SanitizePaymail(addr)
+
+	return sanitised, nil
 }
 
-func (s *PaymailServant) GetSanitizedPaymail(paymailAdress string) *SanitizedPaymail {
-	sanitized := &SanitizedPaymail{}
-	sanitized.alias, sanitized.domain, sanitized.adress = paymail.SanitizePaymail(paymailAdress)
-
-	return sanitized
-}
-
-func (s *PaymailServant) GetPkiForPaymail(ctx context.Context, sPaymail *SanitizedPaymail) (*paymail.PKIResponse, error) {
-	capabilities, err := getCapabilities(ctx, s.cs, s.pc, sPaymail.domain)
+func (s *PaymailServant) GetPkiForPaymail(ctx context.Context, sPaymail *paymail.SanitisedPaymail) (*paymail.PKIResponse, error) {
+	capabilities, err := getCapabilities(ctx, s.cs, s.pc, sPaymail.Domain)
 	if err != nil {
 		return nil, fmt.Errorf("failed to get paymail capability: %w", err)
 	}
@@ -41,7 +41,7 @@ func (s *PaymailServant) GetPkiForPaymail(ctx context.Context, sPaymail *Sanitiz
 	}
 
 	url := capabilities.GetString(paymail.BRFCPki, paymail.BRFCPkiAlternate)
-	pki, err := s.pc.GetPKI(url, sPaymail.alias, sPaymail.domain)
+	pki, err := s.pc.GetPKI(url, sPaymail.Alias, sPaymail.Domain)
 	if err != nil {
 		return nil, fmt.Errorf("error getting PKI: %w", err)
 	}
@@ -49,8 +49,8 @@ func (s *PaymailServant) GetPkiForPaymail(ctx context.Context, sPaymail *Sanitiz
 	return pki, nil
 }
 
-func (s *PaymailServant) AddContactRequest(ctx context.Context, receiverPaymail *SanitizedPaymail, contactData *paymail.PikeContactRequestPayload) (*paymail.PikeContactRequestResponse, error) {
-	capabilities, err := getCapabilities(ctx, s.cs, s.pc, receiverPaymail.domain)
+func (s *PaymailServant) AddContactRequest(ctx context.Context, receiverPaymail *paymail.SanitisedPaymail, contactData *paymail.PikeContactRequestPayload) (*paymail.PikeContactRequestResponse, error) {
+	capabilities, err := getCapabilities(ctx, s.cs, s.pc, receiverPaymail.Domain)
 	if err != nil {
 		return nil, fmt.Errorf("failed to get paymail capability: %w", err)
 	}
@@ -60,7 +60,7 @@ func (s *PaymailServant) AddContactRequest(ctx context.Context, receiverPaymail 
 	}
 
 	url := capabilities.GetString(paymail.BRFCPike, "")
-	response, err := s.pc.AddContactRequest(url, receiverPaymail.alias, receiverPaymail.domain, contactData)
+	response, err := s.pc.AddContactRequest(url, receiverPaymail.Alias, receiverPaymail.Domain, contactData)
 	if err != nil {
 		return nil, fmt.Errorf("error during requesting new contact: %w", err)
 	}
