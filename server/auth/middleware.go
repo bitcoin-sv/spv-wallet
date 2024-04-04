@@ -40,9 +40,9 @@ const (
 
 // Payload is the authentication payload for checking or creating a signature
 type Payload struct {
+	AuthTime     int64  `json:"auth_time"`
 	AuthHash     string `json:"auth_hash"`
 	AuthNonce    string `json:"auth_nonce"`
-	AuthTime     int64  `json:"auth_time"`
 	BodyContents string `json:"body_contents"`
 	Signature    string `json:"signature"`
 	xPub         string
