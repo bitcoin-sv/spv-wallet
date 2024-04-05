@@ -1118,40 +1118,8 @@ definitions:
     - 1000000000
     - 60000000000
     - 3600000000000
-    - -9223372036854775808
-    - 9223372036854775807
-    - 1
-    - 1000
-    - 1000000
-    - 1000000000
-    - 60000000000
-    - 3600000000000
-    - -9223372036854775808
-    - 9223372036854775807
-    - 1
-    - 1000
-    - 1000000
-    - 1000000000
-    - 60000000000
-    - 3600000000000
     type: integer
     x-enum-varnames:
-    - minDuration
-    - maxDuration
-    - Nanosecond
-    - Microsecond
-    - Millisecond
-    - Second
-    - Minute
-    - Hour
-    - minDuration
-    - maxDuration
-    - Nanosecond
-    - Microsecond
-    - Millisecond
-    - Second
-    - Minute
-    - Hour
     - minDuration
     - maxDuration
     - Nanosecond
@@ -1870,33 +1838,6 @@ paths:
       summary: Search for xpubs
       tags:
       - Admin
-  /v1/contact:
-    patch:
-      description: Update contact
-      parameters:
-      - description: Contacts Metadata
-        in: body
-        name: metadata
-        required: true
-        schema:
-          type: string
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: Updated contact
-          schema:
-            $ref: '#/definitions/models.Contact'
-        "400":
-          description: Bad request - Error while parsing UpdateContact from request
-            body
-        "500":
-          description: Internal server error - Error while updating contact
-      security:
-      - x-auth-xpub: []
-      summary: Update contact
-      tags:
-      - Contacts
   /v1/contact/{paymail}:
     put:
       description: Add or update contact. When adding a new contact, the system utilizes
@@ -1924,7 +1865,7 @@ paths:
       summary: Upsert contact
       tags:
       - Contact
-  /v1/contact/accepted:
+  /v1/contact/accepted/{paymail}:
     patch:
       description: Accept contact. For contact with status "awaiting" change status
         to "unconfirmed"
@@ -1950,7 +1891,33 @@ paths:
       summary: Accept contact
       tags:
       - Contact
-  /v1/contact/rejected:
+  /v1/contact/confirmed/{paymail}:
+    patch:
+      description: Confirm contact. For contact with status "unconfirmed" change status
+        to "confirmed"
+      parameters:
+      - description: Paymail address of the contact the user wants to confirm
+        in: path
+        name: paymail
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+        "404":
+          description: Contact not found
+        "422":
+          description: Contact status not unconfirmed
+        "500":
+          description: Internal server error
+      security:
+      - x-auth-xpub: []
+      summary: Confirm contact
+      tags:
+      - Contact
+  /v1/contact/rejected/{paymail}:
     patch:
       description: Reject contact. For contact with status "awaiting" delete contact
       parameters:
@@ -1975,8 +1942,8 @@ paths:
       summary: Reject contact
       tags:
       - Contact
-  /v1/contacts:
-    get:
+  /v1/contact/search:
+    post:
       description: Search contacts
       parameters:
       - description: page

@@ -36,7 +36,7 @@ func NewMetrics(collector Collector) *Metrics {
 		verifyMerkleRoots: collector.RegisterHistogramVec(verifyMerkleRootsHistogramName, "classification"),
 		recordTransaction: collector.RegisterHistogramVec(recordTransactionHistogramName, "classification", "strategy"),
 		queryTransaction:  collector.RegisterHistogramVec(queryTransactionHistogramName, "classification"),
-		addContact:        collector.RegisterHistogramVec(addContactHistogramName, "classification", "pike"),
+		addContact:        collector.RegisterHistogramVec(addContactHistogramName, "classification"),
 		cronHistogram:     collector.RegisterHistogramVec(cronHistogramName, "name"),
 		cronLastExecution: collector.RegisterGaugeVec(cronLastExecutionGaugeName, "name"),
 	}

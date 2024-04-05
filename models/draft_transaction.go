@@ -30,7 +30,7 @@ type DraftTransaction struct {
 	// Hex is a draft transaction hex.
 	Hex string `json:"hex" example:"0100000002..."`
 	// XpubID is a draft transaction's xpub used to sign transaction.
-	XpubID string `json:"xpub_id" example:"bb8593f85ef8056a77026ad415f02128f3768906de53e9e8bf8749fe2d66cf50""`
+	XpubID string `json:"xpub_id" example:"bb8593f85ef8056a77026ad415f02128f3768906de53e9e8bf8749fe2d66cf50"`
 	// ExpiresAt is a time when draft transaction expired.
 	ExpiresAt time.Time `json:"expires_at" example:"2024-02-26T11:00:28.069911Z"`
 	// Configuration contains draft transaction configuration.
