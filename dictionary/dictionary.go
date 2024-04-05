@@ -8,10 +8,10 @@ import (
 
 // ErrorMessage is used for standardizing the messages/codes for errors
 type ErrorMessage struct {
-	Code            ErrorCode `json:"code"`
-	StatusCode      int       `json:"status_code"`
 	InternalMessage string    `json:"internal_message"`
 	PublicMessage   string    `json:"public_message"`
+	StatusCode      int       `json:"status_code"`
+	Code            ErrorCode `json:"code"`
 }
 
 // errorMessages is the public

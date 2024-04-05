@@ -12,59 +12,59 @@ func TestErrorCode_IsValid(t *testing.T) {
 	t.Parallel()
 
 	var tests = []struct {
-		expectValid bool
-		code        ErrorCode
 		testCase    string
+		code        ErrorCode
+		expectValid bool
 	}{
 		{
-			true,
-			ErrorBadErrorCode,
 			"ErrorBadErrorCode",
+			ErrorBadErrorCode,
+			true,
 		},
 		{
-			true,
-			ErrorMissingEnv,
 			"ErrorMissingEnv",
+			ErrorMissingEnv,
+			true,
 		},
 		{
-			true,
-			ErrorInvalidEnv,
 			"ErrorInvalidEnv",
+			ErrorInvalidEnv,
+			true,
 		},
 		{
-			true,
-			ErrorReadingConfig,
 			"ErrorReadingConfig",
+			ErrorReadingConfig,
+			true,
 		},
 		{
-			true,
-			ErrorViper,
 			"ErrorViper",
+			ErrorViper,
+			true,
 		},
 		{
-			true,
-			ErrorConfigValidation,
 			"ErrorConfigValidation",
+			ErrorConfigValidation,
+			true,
 		},
 		{
-			true,
-			ErrorDecryptEnv,
 			"ErrorDecryptEnv",
+			ErrorDecryptEnv,
+			true,
 		},
 		{
-			true,
-			ErrorLoadingConfig,
 			"ErrorLoadingConfig",
-		},
-		{
+			ErrorLoadingConfig,
 			true,
-			ErrorLoadingCache,
-			"ErrorLoadingCache",
 		},
 		{
-			false,
-			9999,
+			"ErrorLoadingCache",
+			ErrorLoadingCache,
+			true,
+		},
+		{
 			"unknown code",
+			9999,
+			false,
 		},
 	}
 
@@ -82,58 +82,58 @@ func TestGetInternalMessage(t *testing.T) {
 
 	var tests = []struct {
 		testCase        string
-		code            ErrorCode
 		expectedMessage string
+		code            ErrorCode
 	}{
 		{
 			"ErrorBadErrorCode",
-			ErrorBadErrorCode,
 			"failed to find internal error message from error code",
+			ErrorBadErrorCode,
 		},
 		{
 			"ErrorMissingEnv",
-			ErrorMissingEnv,
 			"missing required environment variable: %s",
+			ErrorMissingEnv,
 		},
 		{
 			"ErrorInvalidEnv",
-			ErrorInvalidEnv,
 			"invalid environment variable value: %s",
+			ErrorInvalidEnv,
 		},
 		{
 			"ErrorReadingConfig",
-			ErrorReadingConfig,
 			"error reading environment configuration: %s",
+			ErrorReadingConfig,
 		},
 		{
 			"ErrorViper",
-			ErrorViper,
 			"error in viper unmarshal into config.Values: %s",
+			ErrorViper,
 		},
 		{
 			"ErrorConfigValidation",
-			ErrorConfigValidation,
 			"error in environment configuration validation: %s",
+			ErrorConfigValidation,
 		},
 		{
 			"ErrorDecryptEnv",
-			ErrorDecryptEnv,
 			"error in decrypting %s: %s",
+			ErrorDecryptEnv,
 		},
 		{
 			"ErrorLoadingConfig",
-			ErrorLoadingConfig,
 			"fatal error loading configuration: %s",
+			ErrorLoadingConfig,
 		},
 		{
 			"ErrorLoadingCache",
-			ErrorLoadingCache,
 			"failed to enable cache: %s - cache is disabled",
+			ErrorLoadingCache,
 		},
 		{
 			"unknown code",
-			9999,
 			"failed to find internal error message from error code",
+			9999,
 		},
 	}
 
@@ -151,58 +151,58 @@ func TestGetPublicMessage(t *testing.T) {
 
 	var tests = []struct {
 		testCase        string
-		code            ErrorCode
 		expectedMessage string
+		code            ErrorCode
 	}{
 		{
 			"ErrorBadErrorCode",
-			ErrorBadErrorCode,
 			"error not found",
+			ErrorBadErrorCode,
 		},
 		{
 			"ErrorMissingEnv",
-			ErrorMissingEnv,
 			"missing required environment variable",
+			ErrorMissingEnv,
 		},
 		{
 			"ErrorInvalidEnv",
-			ErrorInvalidEnv,
 			"invalid environment variable value",
+			ErrorInvalidEnv,
 		},
 		{
 			"ErrorReadingConfig",
-			ErrorReadingConfig,
 			"error reading environment configuration",
+			ErrorReadingConfig,
 		},
 		{
 			"ErrorViper",
-			ErrorViper,
 			"error in loading configuration",
+			ErrorViper,
 		},
 		{
 			"ErrorConfigValidation",
-			ErrorConfigValidation,
 			"error in environment configuration validation",
+			ErrorConfigValidation,
 		},
 		{
 			"ErrorDecryptEnv",
-			ErrorDecryptEnv,
 			"error decrypting an encrypted environment variable",
+			ErrorDecryptEnv,
 		},
 		{
 			"ErrorLoadingConfig",
-			ErrorLoadingConfig,
 			"error loading configuration",
+			ErrorLoadingConfig,
 		},
 		{
 			"ErrorLoadingCache",
-			ErrorLoadingCache,
 			"failed to enable cache",
+			ErrorLoadingCache,
 		},
 		{
 			"unknown error",
-			9999,
 			"error not found",
+			9999,
 		},
 	}
 

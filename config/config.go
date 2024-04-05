@@ -25,30 +25,32 @@ const (
 
 // AppConfig is the configuration values and associated env vars
 type AppConfig struct {
-	// Authentication is the configuration for keys authentication in SPV Wallet.
-	Authentication *AuthenticationConfig `json:"auth" mapstructure:"auth"`
-	// Cache is the configuration for cache, memory or redis, and cluster cache settings.
-	Cache *CacheConfig `json:"cache" mapstructure:"cache"`
-	// Db is the configuration for database related settings.
-	Db *DbConfig `json:"db" mapstructure:"db"`
-	// Server is a general configuration for spv-wallet.
-	Server *ServerConfig `json:"server_config" mapstructure:"server_config"`
+	// NewRelic is New Relic related settings.
+	NewRelic *NewRelicConfig `json:"new_relic" mapstructure:"new_relic"`
 	// TaskManager is a configuration for Task Manager in SPV Wallet.
 	TaskManager *TaskManagerConfig `json:"task_manager" mapstructure:"task_manager"`
+	// Authentication is the configuration for keys authentication in SPV Wallet.
+	Authentication *AuthenticationConfig `json:"auth" mapstructure:"auth"`
+	// Server is a general configuration for spv-wallet.
+	Server *ServerConfig `json:"server_config" mapstructure:"server_config"`
+	// Nodes is a config for BSV nodes, mAPI and Arc.
+	Nodes *NodesConfig `json:"nodes" mapstructure:"nodes"`
 	// Metrics is a configuration for metrics in SPV Wallet.
 	Metrics *MetricsConfig `json:"metrics" mapstructure:"metrics"`
 	// ExperimentalFeatures is a configuration that allows to enable features that are considered experimental/non-production.
 	ExperimentalFeatures *ExperimentalConfig `json:"experimental_features" mapstructure:"experimental_features"`
-	// Logging is the configuration for zerolog used in SPV Wallet.
-	Logging *LoggingConfig `json:"logging" mapstructure:"logging"`
-	// NewRelic is New Relic related settings.
-	NewRelic *NewRelicConfig `json:"new_relic" mapstructure:"new_relic"`
-	// Nodes is a config for BSV nodes, mAPI and Arc.
-	Nodes *NodesConfig `json:"nodes" mapstructure:"nodes"`
 	// Notifications is a config for Notification service.
 	Notifications *NotificationsConfig `json:"notifications" mapstructure:"notifications"`
+	// Db is the configuration for database related settings.
+	Db *DbConfig `json:"db" mapstructure:"db"`
+	// Cache is the configuration for cache, memory or redis, and cluster cache settings.
+	Cache *CacheConfig `json:"cache" mapstructure:"cache"`
+	// Logging is the configuration for zerolog used in SPV Wallet.
+	Logging *LoggingConfig `json:"logging" mapstructure:"logging"`
 	// Paymail is a config for Paymail and BEEF.
 	Paymail *PaymailConfig `json:"paymail" mapstructure:"paymail"`
+	// ImportBlockHeaders is a URL from where the headers can be downloaded.
+	ImportBlockHeaders string `json:"import_block_headers" mapstructure:"import_block_headers"`
 	// Debug is a flag for enabling additional information from SPV Wallet.
 	Debug bool `json:"debug" mapstructure:"debug"`
 	// DebugProfiling is a flag for enabling additinal debug profiling.
@@ -57,20 +59,18 @@ type AppConfig struct {
 	DisableITC bool `json:"disable_itc" mapstructure:"disable_itc"`
 	// RequestLogging is flag for enabling logging in go-api-router.
 	RequestLogging bool `json:"request_logging" mapstructure:"request_logging"`
-	// ImportBlockHeaders is a URL from where the headers can be downloaded.
-	ImportBlockHeaders string `json:"import_block_headers" mapstructure:"import_block_headers"`
 }
 
 // AuthenticationConfig is the configuration for Authentication
 type AuthenticationConfig struct {
-	// RequireSigning is the flag that decides if the signing is required
-	RequireSigning bool `json:"require_signing" mapstructure:"require_signing"`
-	// SigningDisabled turns off signing. NOTE: Only for development
-	SigningDisabled bool `json:"signing_disabled" mapstructure:"signing_disabled"`
 	// AdminKey is used for administrative requests
 	AdminKey string `json:"admin_key" mapstructure:"admin_key"`
 	// Scheme it the authentication scheme to use (default is: xpub)
 	Scheme string `json:"scheme" mapstructure:"scheme"`
+	// RequireSigning is the flag that decides if the signing is required
+	RequireSigning bool `json:"require_signing" mapstructure:"require_signing"`
+	// SigningDisabled turns off signing. NOTE: Only for development
+	SigningDisabled bool `json:"signing_disabled" mapstructure:"signing_disabled"`
 }
 
 // CacheConfig is a configuration for cachestore
@@ -103,10 +103,8 @@ type ClusterConfig struct {
 
 // RedisConfig is a configuration for Redis cachestore or taskmanager
 type RedisConfig struct {
-	// DependencyMode works only in Redis with script enabled.
-	DependencyMode bool `json:"dependency_mode" mapstructure:"dependency_mode"`
-	// UseTLS is a flag which decides whether to use TLS
-	UseTLS bool `json:"use_tls" mapstructure:"use_tls"`
+	// URL is Redis url connection string.
+	URL string `json:"url" mapstructure:"url"`
 	// MaxActiveConnections is maximum number of active redis connections.
 	MaxActiveConnections int `json:"max_active_connections" mapstructure:"max_active_connections"`
 	// MaxIdleConnections is the maximum number of idle connections.
@@ -115,8 +113,10 @@ type RedisConfig struct {
 	MaxConnectionLifetime time.Duration `json:"max_connection_lifetime" mapstructure:"max_connection_lifetime"`
 	// MaxIdleTimeout is the maximum duration of idle redis connection before timeout.
 	MaxIdleTimeout time.Duration `json:"max_idle_timeout" mapstructure:"max_idle_timeout"`
-	// URL is Redis url connection string.
-	URL string `json:"url" mapstructure:"url"`
+	// DependencyMode works only in Redis with script enabled.
+	DependencyMode bool `json:"dependency_mode" mapstructure:"dependency_mode"`
+	// UseTLS is a flag which decides whether to use TLS
+	UseTLS bool `json:"use_tls" mapstructure:"use_tls"`
 }
 
 // DbConfig consists of datastore config and specific dbs configs
@@ -133,32 +133,32 @@ type DbConfig struct {
 
 // DatastoreConfig is a configuration for the datastore
 type DatastoreConfig struct {
-	// Debug is a flag that decides whether additional output (such as sql statements) should be produced from datastore.
-	Debug bool `json:"debug" mapstructure:"debug"`
 	// TablePrefix is the prefix for all table names in the database.
 	TablePrefix string `json:"table_prefix" mapstructure:"table_prefix"`
 	// Engine is the database to be used, mysql, sqlite, postgresql.
 	Engine datastore.Engine `json:"engine" mapstructure:"engine"`
+	// Debug is a flag that decides whether additional output (such as sql statements) should be produced from datastore.
+	Debug bool `json:"debug" mapstructure:"debug"`
 }
 
 // NewRelicConfig is the configuration for New Relic
 type NewRelicConfig struct {
-	// Enabled is the flag that enables New Relic service.
-	Enabled bool `json:"enabled" mapstructure:"enabled"`
 	// DomainName is used for hostname display.
 	DomainName string `json:"domain_name" mapstructure:"domain_name"`
 	// LicenseKey is the New Relic license key.
 	LicenseKey string `json:"license_key" mapstructure:"license_key"`
+	// Enabled is the flag that enables New Relic service.
+	Enabled bool `json:"enabled" mapstructure:"enabled"`
 }
 
 // NodesConfig consists of blockchain nodes (such as Minercraft and Arc) configuration
 type NodesConfig struct {
 	Callback     *CallbackConfig `json:"callback" mapstructure:"callback"`
-	Apis         []*MinerAPI     `json:"apis" mapstructure:"apis"`
 	FeeUnit      *FeeUnitConfig  `json:"fee_unit" mapstructure:"fee_unit"`
-	UseFeeQuotes bool            `json:"use_fee_quotes" mapstructure:"use_fee_quotes"`
 	DeploymentID string          `json:"deployment_id" mapstructure:"deployment_id"`
 	Protocol     NodesProtocol   `json:"protocol" mapstructure:"protocol"`
+	Apis         []*MinerAPI     `json:"apis" mapstructure:"apis"`
+	UseFeeQuotes bool            `json:"use_fee_quotes" mapstructure:"use_fee_quotes"`
 }
 
 // FeeUnitConfig reflects the utils.FeeUnit struct with proper annotations for json and mapstructure
