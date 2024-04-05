@@ -9,7 +9,7 @@ import (
 // SearchRequestDestinationParameters is a struct for handling request parameters for search requests
 type SearchRequestDestinationParameters struct {
 	// Custom conditions used for filtering the search results
-	Conditions *filter.DestinationFilters `json:"conditions,omitempty"`
+	Conditions *filter.DestinationFilter `json:"conditions,omitempty"`
 	// Accepts a JSON object for embedding custom metadata, enabling arbitrary additional information to be associated with the resource
 	Metadata *engine.Metadata `json:"metadata,omitempty" swaggertype:"object,string" example:"key:value,key2:value2"`
 	// Pagination and sorting options to streamline data exploration and analysis

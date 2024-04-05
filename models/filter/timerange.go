@@ -5,15 +5,15 @@ import "time"
 // TimeRange defines a range between two points in time.
 type TimeRange struct {
 	// From specifies the start time of the range. It's optional and can be nil.
-	From *time.Time `json:"from,omitempty" example:"2024-02-26T11:00:28.069911Z"`
+	From *time.Time `json:"from,omitempty" example:"2024-02-26T11:01:28Z"`
 	// To specifies the end time of the range. It's optional and can be nil.
-	To *time.Time `json:"to,omitempty" example:"2024-02-26T11:00:28.069911Z"`
+	To *time.Time `json:"to,omitempty" example:"2024-02-26T11:01:28Z"`
 }
 
 // ToDbConditions converts the TimeRange to a set of database query conditions.
 // Returns nil if both From and To are nil or zero, indicating no conditions.
 func (tr *TimeRange) ToDbConditions() map[string]interface{} {
-	if tr.isEmpty() {
+	if tr == nil || tr.isEmpty() {
 		return nil
 	}
 

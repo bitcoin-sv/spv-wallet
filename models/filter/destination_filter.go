@@ -1,7 +1,7 @@
 package filter
 
-// DestinationFilters is a struct for handling request parameters for destination search requests
-type DestinationFilters struct {
+// DestinationFilter is a struct for handling request parameters for destination search requests
+type DestinationFilter struct {
 	ModelFilter   `json:",inline"`
 	LockingScript *string `json:"locking_script,omitempty" example:"76a9147b05764a97f3b4b981471492aa703b188e45979b88ac"`
 	Address       *string `json:"address,omitempty" example:"1CDUf7CKu8ocTTkhcYUbq75t14Ft168K65"`
@@ -9,7 +9,7 @@ type DestinationFilters struct {
 }
 
 // ToDbConditions converts filter fields to the datastore conditions using gorm naming strategy
-func (d *DestinationFilters) ToDbConditions() map[string]interface{} {
+func (d *DestinationFilter) ToDbConditions() map[string]interface{} {
 	conditions := d.ModelFilter.ToDbConditions()
 
 	applyIfNotNil(conditions, "locking_script", d.LockingScript)
