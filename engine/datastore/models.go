@@ -345,7 +345,7 @@ func (c *Client) aggregate(ctx context.Context, model interface{}, conditions ma
 		if StringInSlice(aggregateCol, DateFields) {
 			if c.Engine() == MySQL {
 				aggregateCol = "DATE_FORMAT(" + aggregateCol + ", '%Y%m%d')"
-			} else if c.Engine() == Postgres {
+			} else if c.Engine() == PostgreSQL {
 				aggregateCol = "to_char(" + aggregateCol + ", 'YYYYMMDD')"
 			} else {
 				aggregateCol = "strftime('%Y%m%d', " + aggregateCol + ")"
