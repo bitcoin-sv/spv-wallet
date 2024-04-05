@@ -2,7 +2,6 @@ package engine
 
 import (
 	"context"
-	"fmt"
 	"testing"
 	"time"
 
@@ -219,7 +218,6 @@ func (ts *EmbeddedDBTestSuite) TestClient_GetDestinations() {
 			getDestinations, err = tc.client.GetDestinationsByXpubID(
 				tc.ctx, xPubID, nil, conditions, nil,
 			)
-			fmt.Printf("Destinatosn %+v", getDestinations[0].LockingScript)
 			require.NoError(t, err)
 			require.NotNil(t, getDestinations)
 			assert.Equal(t, 1, len(getDestinations))
@@ -284,16 +282,9 @@ func (ts *EmbeddedDBTestSuite) TestClient_GetDestinations() {
 			require.NoError(t, err)
 			require.NotNil(t, destination)
 
-			// conditions := models.DestinationFilters{DraftID: &destination.DraftID}
-
-			//var getDestinations []*Destination
-			//getDestinations, err = tc.client.GetDestinationsByXpubID(
-			//	tc.ctx, xPubID, nil, &conditions, nil,
-			//)
 			dests, err := tc.client.GetDestinationsByXpubID(
 				tc.ctx, xPubID, nil, nil, nil,
 			)
-			fmt.Printf("bbb %+v", &dests)
 			require.NoError(t, err)
 			require.NotNil(t, dests)
 			assert.Equal(t, 1, len(dests))
@@ -389,13 +380,11 @@ func (ts *EmbeddedDBTestSuite) TestClient_GetDestinations() {
 				tc.ctx, rawKey, utils.ChainExternal, utils.ScriptTypePubKeyHash,
 				opts...,
 			)
-			fmt.Println("New dest")
 			require.NoError(t, err)
 			require.NotNil(t, destination)
-			fmt.Println("test", destination.CreatedAt)
 
-			fromTime, _ := time.Parse(time.RFC3339Nano, "2020-02-26T11:01:28.069911Z")
-			toTime, _ := time.Parse(time.RFC3339Nano, "2035-02-26T11:01:28.069911Z")
+			fromTime, _ := time.Parse(time.DateOnly, "2020-02-03")
+			toTime, _ := time.Parse(time.DateOnly, "2035-02-04")
 
 			conditions := map[string]interface{}{
 				"created_at": map[string]interface{}{
@@ -408,7 +397,6 @@ func (ts *EmbeddedDBTestSuite) TestClient_GetDestinations() {
 				tc.ctx, xPubID, nil, conditions, nil,
 			)
 			require.NoError(t, err)
-			fmt.Println("Updated", dests)
 			require.NotNil(t, dests)
 			assert.Equal(t, 1, len(dests))
 			assert.Equal(t, destination.XpubID, dests[0].XpubID)
@@ -435,16 +423,21 @@ func (ts *EmbeddedDBTestSuite) TestClient_GetDestinations() {
 			require.NoError(t, err)
 			require.NotNil(t, destination)
 
+			fromTime, _ := time.Parse(time.DateOnly, "2030-02-03")
+			toTime, _ := time.Parse(time.DateOnly, "2035-02-04")
+
 			conditions := map[string]interface{}{
-				"created_at": 123,
+				"created_at": map[string]interface{}{
+					"$gte": fromTime,
+					"$lte": toTime,
+				},
 			}
 
-			var getDestinations []*Destination
-			getDestinations, err = tc.client.GetDestinationsByXpubID(
+			dests, err := tc.client.GetDestinationsByXpubID(
 				tc.ctx, xPubID, nil, conditions, nil,
 			)
 			require.NoError(t, err)
-			require.Nil(t, getDestinations)
+			assert.Equal(t, 0, len(dests))
 		})
 
 		ts.T().Run(testCase.name+" with created_range filter valid", func(t *testing.T) {
@@ -468,11 +461,11 @@ func (ts *EmbeddedDBTestSuite) TestClient_GetDestinations() {
 			require.NoError(t, err)
 			require.NotNil(t, destination)
 
-			fromTime, _ := time.Parse(time.RFC3339Nano, "2020-02-26T11:01:28.069911Z")
-			toTime, _ := time.Parse(time.RFC3339Nano, "2030-02-26T11:01:28.069911Z")
+			fromTime, _ := time.Parse(time.DateOnly, "2020-02-03")
+			toTime, _ := time.Parse(time.DateOnly, "2030-02-04")
 
 			conditions := map[string]interface{}{
-				"updated_at": map[string]interface{}{
+				"created_at": map[string]interface{}{
 					"$gte": fromTime,
 					"$lte": toTime,
 				},
@@ -508,8 +501,12 @@ func (ts *EmbeddedDBTestSuite) TestClient_GetDestinations() {
 			require.NoError(t, err)
 			require.NotNil(t, destination)
 
+			fromTime, _ := time.Parse(time.DateOnly, "2027-02-03")
+
 			conditions := map[string]interface{}{
-				"updated_at": 123,
+				"updated_at": map[string]interface{}{
+					"$gte": fromTime,
+				},
 			}
 
 			// var getDestinations []*Destination
@@ -517,9 +514,7 @@ func (ts *EmbeddedDBTestSuite) TestClient_GetDestinations() {
 				tc.ctx, xPubID, nil, conditions, nil,
 			)
 			require.NoError(t, err)
-			require.NotNil(t, dests)
-			assert.Equal(t, 1, len(dests))
-			// assert.Equal(t, destination.XpubID, getDestinations[0].XpubID)
+			assert.Equal(t, 0, len(dests))
 		})
 
 	}
