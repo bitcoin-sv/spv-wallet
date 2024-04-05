@@ -6,15 +6,30 @@ updates:
     target-branch: "master"
     directory: "/"
     schedule:
-      interval: "daily"
-      time: "10:00"
-      timezone: "UTC"
-    reviewers:
-      - "mrz1836"
-    assignees:
-      - "mrz1836"
+      interval: "weekly"
+      day: "monday"
     labels:
-      - "chore"
+      - "dependencies"
+    open-pull-requests-limit: 10
+
+  - package-ecosystem: "gomod"
+    target-branch: "master"
+    directory: "/engine"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+    labels:
+      - "dependencies"
+    open-pull-requests-limit: 10
+
+  - package-ecosystem: "gomod"
+    target-branch: "master"
+    directory: "/models"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+    labels:
+      - "dependencies"
     open-pull-requests-limit: 10
 
   # Maintain dependencies for GitHub Actions
@@ -24,12 +39,8 @@ updates:
     schedule:
       interval: "weekly"
       day: "monday"
-    reviewers:
-      - "mrz1836"
-    assignees:
-      - "mrz1836"
     labels:
-      - "chore"
+      - "dependencies"
     open-pull-requests-limit: 10
 
   # Maintain dependencies for Docker
@@ -39,10 +50,17 @@ updates:
     schedule:
       interval: "weekly"
       day: "monday"
-    reviewers:
-      - "mrz1836"
-    assignees:
-      - "mrz1836"
     labels:
-      - "chore"
+      - "dependencies"
+    open-pull-requests-limit: 10
+
+  # Maintain dependencies for Docker
+  - package-ecosystem: "docker"
+    target-branch: "master"
+    directory: "/release"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+    labels:
+      - "dependencies"
     open-pull-requests-limit: 10
