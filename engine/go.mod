@@ -6,7 +6,6 @@ require (
 	github.com/DATA-DOG/go-sqlmock v1.5.2
 	github.com/bitcoin-sv/go-broadcast-client v0.17.2
 	github.com/bitcoin-sv/go-paymail v0.14.0
-	github.com/bitcoin-sv/spv-wallet/models v0.25.0
 	github.com/bitcoinschema/go-bitcoin/v2 v2.0.5
 	github.com/bitcoinschema/go-map v0.1.0
 	github.com/coocood/freecache v1.2.4
@@ -161,5 +160,3 @@ replace github.com/gomodule/redigo => github.com/gomodule/redigo v1.8.9
 // Issue: go.mongodb.org/mongo-driver/x/bsonx: cannot find module providing package go.mongodb.org/mongo-driver/x/bsonx
 // Need to convert bsonx to bsoncore
 replace go.mongodb.org/mongo-driver => go.mongodb.org/mongo-driver v1.11.7
-
-replace github.com/bitcoin-sv/spv-wallet/models => ../models
