@@ -7,10 +7,10 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestTimerange(t *testing.T) {
+func TestTimeRange(t *testing.T) {
 	t.Parallel()
 
-	t.Run("empty timerange", func(t *testing.T) {
+	t.Run("empty time range", func(t *testing.T) {
 		filter := TimeRange{}
 		dbConditions := filter.ToDbConditions()
 
@@ -19,24 +19,24 @@ func TestTimerange(t *testing.T) {
 	})
 
 	t.Run("only _from_ field", func(t *testing.T) {
-		time := time.Now()
+		timeNow := time.Now()
 		filter := TimeRange{
-			From: ptr(time),
+			From: ptr(timeNow),
 		}
 		dbConditions := filter.ToDbConditions()
 
 		assert.Equal(t, 1, len(dbConditions))
-		assert.Equal(t, time, dbConditions["$gte"])
+		assert.Equal(t, timeNow, dbConditions["$gte"])
 	})
 
 	t.Run("only _to_ field", func(t *testing.T) {
-		time := time.Now()
+		timeNow := time.Now()
 		filter := TimeRange{
-			To: ptr(time),
+			To: ptr(timeNow),
 		}
 		dbConditions := filter.ToDbConditions()
 
 		assert.Equal(t, 1, len(dbConditions))
-		assert.Equal(t, time, dbConditions["$lte"])
+		assert.Equal(t, timeNow, dbConditions["$lte"])
 	})
 }
