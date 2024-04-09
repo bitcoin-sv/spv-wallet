@@ -16,6 +16,10 @@
 [![Makefile Included](https://img.shields.io/badge/Makefile-Supported%20-brightgreen?=flat&logo=probot&v=3)](Makefile)
 <br/>
 
+## Documentation
+
+For in-depth information and guidance, please refer to the [SPV Wallet Documentation]([link here](https://bsvblockchain.gitbook.io/docs)).
+
 </div>
 
 ## Table of Contents
