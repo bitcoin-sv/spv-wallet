@@ -572,3 +572,64 @@ func Test_sqlInjectionSafety(t *testing.T) {
 		assert.Contains(t, raw, `'{"1=1; DELETE FROM users":"field_value"}'`)
 	})
 }
+
+func Test_isEmptyCondition(t *testing.T) {
+	t.Parallel()
+
+	t.Run("nil ptr to map", func(t *testing.T) {
+		var condition *map[string]interface{}
+		assert.True(t, isEmptyCondition(condition))
+	})
+
+	t.Run("not-nil ptr to nil-map", func(t *testing.T) {
+		var theMap map[string]interface{}
+		condition := &theMap
+		assert.True(t, isEmptyCondition(condition))
+	})
+
+	t.Run("not-nil ptr to empty map", func(t *testing.T) {
+		theMap := map[string]interface{}{}
+		condition := &theMap
+		assert.True(t, isEmptyCondition(condition))
+	})
+
+	t.Run("not-nil ptr to not-empty map", func(t *testing.T) {
+		theMap := map[string]interface{}{
+			"key": 123,
+		}
+		condition := &theMap
+		assert.False(t, isEmptyCondition(condition))
+	})
+
+	t.Run("nil ptr to int", func(t *testing.T) {
+		var condition *int
+		assert.True(t, isEmptyCondition(condition))
+	})
+
+	t.Run("not nil ptr to int", func(t *testing.T) {
+		theInt := 123
+		condition := &theInt
+		assert.False(t, isEmptyCondition(condition))
+	})
+
+	t.Run("just int", func(t *testing.T) {
+		assert.False(t, isEmptyCondition(123))
+	})
+
+	t.Run("nil ptr to slice", func(t *testing.T) {
+		var condition *[]interface{} = nil
+		assert.True(t, isEmptyCondition(condition))
+	})
+
+	t.Run("not-nil ptr to nil-slice", func(t *testing.T) {
+		var theSlice []interface{} = nil
+		var condition *[]interface{} = &theSlice
+		assert.True(t, isEmptyCondition(condition))
+	})
+
+	t.Run("not-nil ptr to empty slice", func(t *testing.T) {
+		theSlice := []interface{}{}
+		condition := &theSlice
+		assert.True(t, isEmptyCondition(condition))
+	})
+}
