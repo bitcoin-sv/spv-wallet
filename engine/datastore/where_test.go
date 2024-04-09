@@ -1,7 +1,6 @@
 package datastore
 
 import (
-	"context"
 	"database/sql"
 	"testing"
 	"time"
@@ -12,25 +11,111 @@ import (
 )
 
 // Test_whereObject test the SQL where selector
-func Test_whereSlice(t *testing.T) {
+func Test_whereObject(t *testing.T) {
 	t.Parallel()
 
-	t.Run("MySQL", func(t *testing.T) {
-		query := whereSlice(MySQL, fieldInIDs, "id_1")
-		expected := `JSON_CONTAINS(` + fieldInIDs + `, CAST('["id_1"]' AS JSON))`
-		assert.Equal(t, expected, query)
-	})
+	conditions := map[string]interface{}{
+		"metadata": Metadata{
+			"domain": "test-domain",
+		},
+	}
 
 	t.Run("Postgres", func(t *testing.T) {
-		query := whereSlice(PostgreSQL, fieldInIDs, "id_1")
-		expected := fieldInIDs + `::jsonb @> '["id_1"]'`
-		assert.Equal(t, expected, query)
+		client, gdb := mockClient(PostgreSQL)
+
+		raw := gdb.ToSQL(func(tx *gorm.DB) *gorm.DB {
+			tx, err := ApplyCustomWhere(client, tx, conditions, mockObject{})
+			assert.NoError(t, err)
+			return tx.First(&mockObject{})
+		})
+
+		assert.Contains(t, raw, "metadata::jsonb @>")
+		assert.Contains(t, raw, `'{"domain":"test-domain"}'`)
 	})
 
 	t.Run("SQLite", func(t *testing.T) {
-		query := whereSlice(SQLite, fieldInIDs, "id_1")
-		expected := `EXISTS (SELECT 1 FROM json_each(` + fieldInIDs + `) WHERE value = "id_1")`
-		assert.Equal(t, expected, query)
+		client, gdb := mockClient(SQLite)
+
+		raw := gdb.ToSQL(func(tx *gorm.DB) *gorm.DB {
+			tx, err := ApplyCustomWhere(client, tx, conditions, mockObject{})
+			assert.NoError(t, err)
+			return tx.First(&mockObject{})
+		})
+
+		assert.Contains(t, raw, "JSON_EXTRACT(metadata")
+		assert.Contains(t, raw, `"$.domain"`)
+		assert.Contains(t, raw, `"test-domain"`)
+	})
+
+	t.Run("MySQL", func(t *testing.T) {
+		client, gdb := mockClient(MySQL)
+
+		raw := gdb.ToSQL(func(tx *gorm.DB) *gorm.DB {
+			tx, err := ApplyCustomWhere(client, tx, conditions, mockObject{})
+			assert.NoError(t, err)
+			return tx.First(&mockObject{})
+		})
+
+		assert.Contains(t, raw, "JSON_EXTRACT(metadata")
+		assert.Contains(t, raw, "'$.domain'")
+		assert.Contains(t, raw, "'test-domain'")
+	})
+}
+
+// Test_whereObject test the SQL where selector
+func Test_whereSlice(t *testing.T) {
+	t.Parallel()
+
+	conditions := map[string]interface{}{
+		"field_in_ids": "test",
+	}
+
+	t.Run("Postgres", func(t *testing.T) {
+		client, gdb := mockClient(PostgreSQL)
+		WithCustomFields([]string{"field_in_ids"}, nil)(client.options)
+
+		raw := gdb.ToSQL(func(tx *gorm.DB) *gorm.DB {
+			tx, err := ApplyCustomWhere(client, tx, conditions, mockObject{})
+			assert.NoError(t, err)
+			return tx.First(&mockObject{})
+		})
+		// produced SQL:
+		// SELECT * FROM "mock_objects" WHERE field_in_ids::jsonb @> '["test"]' ORDER BY "mock_objects"."id" LIMIT 1
+
+		assert.Contains(t, raw, "field_in_ids::jsonb @>")
+		assert.Contains(t, raw, `'["test"]'`)
+	})
+
+	t.Run("MySQL", func(t *testing.T) {
+		client, gdb := mockClient(MySQL)
+		WithCustomFields([]string{"field_in_ids"}, nil)(client.options)
+
+		raw := gdb.ToSQL(func(tx *gorm.DB) *gorm.DB {
+			tx, err := ApplyCustomWhere(client, tx, conditions, mockObject{})
+			assert.NoError(t, err)
+			return tx.First(&mockObject{})
+		})
+		// produced SQL:
+		// SELECT * FROM `mock_objects` WHERE JSON_CONTAINS(field_in_ids, CAST('["test"]' AS JSON)) ORDER BY `mock_objects`.`id` LIMIT 1
+
+		assert.Contains(t, raw, "JSON_CONTAINS(field_in_ids")
+		assert.Contains(t, raw, `'["test"]'`)
+	})
+
+	t.Run("SQLite", func(t *testing.T) {
+		client, gdb := mockClient(SQLite)
+		WithCustomFields([]string{"field_in_ids"}, nil)(client.options)
+
+		raw := gdb.ToSQL(func(tx *gorm.DB) *gorm.DB {
+			tx, err := ApplyCustomWhere(client, tx, conditions, mockObject{})
+			assert.NoError(t, err)
+			return tx.First(&mockObject{})
+		})
+		// produced SQL:
+		// SELECT * FROM `mock_objects` WHERE EXISTS (SELECT 1 FROM json_each(field_in_ids) WHERE value = "test") ORDER BY `mock_objects`.`id` LIMIT 1
+
+		assert.Contains(t, raw, "json_each(field_in_ids)")
+		assert.Contains(t, raw, `"test"`)
 	})
 }
 
@@ -38,228 +123,62 @@ func Test_whereSlice(t *testing.T) {
 func Test_processConditions(t *testing.T) {
 	t.Parallel()
 
-	dateField := dateCreatedAt
-	uniqueField := "unique_field_name"
+	theTime := time.Date(2022, 4, 4, 15, 12, 37, 651387237, time.UTC)
+	nullTime := sql.NullTime{
+		Valid: true,
+		Time:  theTime,
+	}
 
 	conditions := map[string]interface{}{
-		dateField: map[string]interface{}{
-			conditionGreaterThan: customtypes.NullTime{NullTime: sql.NullTime{
-				Valid: true,
-				Time:  time.Date(2022, 4, 4, 15, 12, 37, 651387237, time.UTC),
-			}},
+		"created_at": map[string]interface{}{
+			conditionGreaterThan: customtypes.NullTime{NullTime: nullTime},
 		},
-		uniqueField: map[string]interface{}{
+		"unique_field_name": map[string]interface{}{
 			conditionExists: true,
 		},
 	}
 
 	t.Run("MySQL", func(t *testing.T) {
-		client, deferFunc := testClient(context.Background(), t)
-		defer deferFunc()
-		tx := &mockSQLCtx{
-			WhereClauses: make([]interface{}, 0),
-			Vars:         make(map[string]interface{}),
-		}
-		varNum := 0
-		_ = processConditions(client, tx, conditions, MySQL, &varNum, nil)
-		// assert.Equal(t, "created_at > @var0", tx.WhereClauses[0])
-		assert.Contains(t, tx.WhereClauses, dateField+" > @var0")
-		// assert.Equal(t, "unique_field_name IS NOT NULL", tx.WhereClauses[1])
-		assert.Contains(t, tx.WhereClauses, uniqueField+" IS NOT NULL")
-		assert.Equal(t, "2022-04-04 15:12:37", tx.Vars["var0"])
+		client, gdb := mockClient(MySQL)
+
+		raw := gdb.ToSQL(func(tx *gorm.DB) *gorm.DB {
+			tx, err := ApplyCustomWhere(client, tx, conditions, mockObject{})
+			assert.NoError(t, err)
+			return tx.First(&mockObject{})
+		})
+
+		assert.Contains(t, raw, "2022-04-04 15:12:37")
+		assert.Contains(t, raw, "AND")
+		assert.Regexp(t, "(.+)unique_field_name(.+)IS NOT NULL", raw)
 	})
 
 	t.Run("Postgres", func(t *testing.T) {
-		client, deferFunc := testClient(context.Background(), t)
-		defer deferFunc()
-		tx := &mockSQLCtx{
-			WhereClauses: make([]interface{}, 0),
-			Vars:         make(map[string]interface{}),
-		}
-		varNum := 0
-		_ = processConditions(client, tx, conditions, PostgreSQL, &varNum, nil)
-		// assert.Equal(t, "created_at > @var0", tx.WhereClauses[0])
-		assert.Contains(t, tx.WhereClauses, dateField+" > @var0")
-		// assert.Equal(t, "unique_field_name IS NOT NULL", tx.WhereClauses[1])
-		assert.Contains(t, tx.WhereClauses, uniqueField+" IS NOT NULL")
-		assert.Equal(t, "2022-04-04T15:12:37Z", tx.Vars["var0"])
+		client, gdb := mockClient(PostgreSQL)
+
+		raw := gdb.ToSQL(func(tx *gorm.DB) *gorm.DB {
+			tx, err := ApplyCustomWhere(client, tx, conditions, mockObject{})
+			assert.NoError(t, err)
+			return tx.First(&mockObject{})
+		})
+
+		assert.Contains(t, raw, "2022-04-04T15:12:37Z")
+		assert.Contains(t, raw, "AND")
+		assert.Regexp(t, "(.+)unique_field_name(.+)IS NOT NULL", raw)
 	})
 
 	t.Run("SQLite", func(t *testing.T) {
-		client, deferFunc := testClient(context.Background(), t)
-		defer deferFunc()
-		tx := &mockSQLCtx{
-			WhereClauses: make([]interface{}, 0),
-			Vars:         make(map[string]interface{}),
-		}
-		varNum := 0
-		_ = processConditions(client, tx, conditions, SQLite, &varNum, nil)
-		// assert.Equal(t, "created_at > @var0", tx.WhereClauses[0])
-		assert.Contains(t, tx.WhereClauses, dateField+" > @var0")
-		// assert.Equal(t, "unique_field_name IS NOT NULL", tx.WhereClauses[1])
-		assert.Contains(t, tx.WhereClauses, uniqueField+" IS NOT NULL")
-		assert.Equal(t, "2022-04-04T15:12:37.651Z", tx.Vars["var0"])
+		client, gdb := mockClient(SQLite)
+
+		raw := gdb.ToSQL(func(tx *gorm.DB) *gorm.DB {
+			tx, err := ApplyCustomWhere(client, tx, conditions, mockObject{})
+			assert.NoError(t, err)
+			return tx.First(&mockObject{})
+		})
+
+		assert.Contains(t, raw, "2022-04-04T15:12:37.651Z")
+		assert.Contains(t, raw, "AND")
+		assert.Regexp(t, "(.+)unique_field_name(.+)IS NOT NULL", raw)
 	})
-}
-
-// Test_whereObject test the SQL where selector
-func Test_whereObject(t *testing.T) {
-	t.Parallel()
-
-	t.Run("MySQL", func(t *testing.T) {
-		metadata := map[string]interface{}{
-			"test_key": "test-value",
-		}
-		query := whereObject(MySQL, metadataField, metadata)
-		expected := "JSON_EXTRACT(" + metadataField + ", '$.test_key') = \"test-value\""
-		assert.Equal(t, expected, query)
-
-		metadata = map[string]interface{}{
-			"test_key": "test-'value'",
-		}
-		query = whereObject(MySQL, metadataField, metadata)
-		expected = "JSON_EXTRACT(" + metadataField + ", '$.test_key') = \"test-\\'value\\'\""
-		assert.Equal(t, expected, query)
-
-		metadata = map[string]interface{}{
-			"test_key1": "test-value",
-			"test_key2": "test-value2",
-		}
-		query = whereObject(MySQL, metadataField, metadata)
-
-		assert.Contains(t, []string{
-			"(JSON_EXTRACT(" + metadataField + ", '$.test_key1') = \"test-value\" AND JSON_EXTRACT(" + metadataField + ", '$.test_key2') = \"test-value2\")",
-			"(JSON_EXTRACT(" + metadataField + ", '$.test_key2') = \"test-value2\" AND JSON_EXTRACT(" + metadataField + ", '$.test_key1') = \"test-value\")",
-		}, query)
-
-		// NOTE: the order of the items can change, hence the query order can change
-		// assert.Equal(t, expected, query)
-
-		objectMetadata := map[string]interface{}{
-			"testId": map[string]interface{}{
-				"test_key1": "test-value",
-				"test_key2": "test-value2",
-			},
-		}
-		query = whereObject(MySQL, "object_metadata", objectMetadata)
-
-		assert.Contains(t, []string{
-			"(JSON_EXTRACT(object_metadata, '$.testId.test_key1') = \"test-value\" AND JSON_EXTRACT(object_metadata, '$.testId.test_key2') = \"test-value2\")",
-			"(JSON_EXTRACT(object_metadata, '$.testId.test_key2') = \"test-value2\" AND JSON_EXTRACT(object_metadata, '$.testId.test_key1') = \"test-value\")",
-		}, query)
-
-		// NOTE: the order of the items can change, hence the query order can change
-		// assert.Equal(t, expected, query)
-	})
-
-	t.Run("Postgres", func(t *testing.T) {
-		metadata := map[string]interface{}{
-			"test_key": "test-value",
-		}
-		query := whereObject(PostgreSQL, metadataField, metadata)
-		expected := metadataField + "::jsonb @> '{\"test_key\":\"test-value\"}'::jsonb"
-		assert.Equal(t, expected, query)
-
-		metadata = map[string]interface{}{
-			"test_key": "test-'value'",
-		}
-		query = whereObject(PostgreSQL, metadataField, metadata)
-		expected = metadataField + "::jsonb @> '{\"test_key\":\"test-\\'value\\'\"}'::jsonb"
-		assert.Equal(t, expected, query)
-
-		metadata = map[string]interface{}{
-			"test_key1": "test-value",
-			"test_key2": "test-value2",
-		}
-		query = whereObject(PostgreSQL, metadataField, metadata)
-
-		assert.Contains(t, []string{
-			"(" + metadataField + "::jsonb @> '{\"test_key1\":\"test-value\"}'::jsonb AND " + metadataField + "::jsonb @> '{\"test_key2\":\"test-value2\"}'::jsonb)",
-			"(" + metadataField + "::jsonb @> '{\"test_key2\":\"test-value2\"}'::jsonb AND " + metadataField + "::jsonb @> '{\"test_key1\":\"test-value\"}'::jsonb)",
-		}, query)
-
-		// NOTE: the order of the items can change, hence the query order can change
-		// assert.Equal(t, expected, query)
-
-		objectMetadata := map[string]interface{}{
-			"testId": map[string]interface{}{
-				"test_key1": "test-value",
-				"test_key2": "test-value2",
-			},
-		}
-		query = whereObject(PostgreSQL, "object_metadata", objectMetadata)
-		assert.Contains(t, []string{
-			"object_metadata::jsonb @> '{\"testId\":{\"test_key1\":\"test-value\",\"test_key2\":\"test-value2\"}}'::jsonb",
-			"object_metadata::jsonb @> '{\"testId\":{\"test_key2\":\"test-value2\",\"test_key1\":\"test-value\"}}'::jsonb",
-		}, query)
-
-		// NOTE: the order of the items can change, hence the query order can change
-		// assert.Equal(t, expected, query)
-	})
-
-	t.Run("SQLite", func(t *testing.T) {
-		metadata := map[string]interface{}{
-			"test_key": "test-value",
-		}
-		query := whereObject(SQLite, metadataField, metadata)
-		expected := "JSON_EXTRACT(" + metadataField + ", '$.test_key') = \"test-value\""
-		assert.Equal(t, expected, query)
-
-		metadata = map[string]interface{}{
-			"test_key": "test-'value'",
-		}
-		query = whereObject(SQLite, metadataField, metadata)
-		expected = "JSON_EXTRACT(" + metadataField + ", '$.test_key') = \"test-\\'value\\'\""
-		assert.Equal(t, expected, query)
-
-		metadata = map[string]interface{}{
-			"test_key1": "test-value",
-			"test_key2": "test-value2",
-		}
-		query = whereObject(SQLite, metadataField, metadata)
-		assert.Contains(t, []string{
-			"(JSON_EXTRACT(" + metadataField + ", '$.test_key1') = \"test-value\" AND JSON_EXTRACT(" + metadataField + ", '$.test_key2') = \"test-value2\")",
-			"(JSON_EXTRACT(" + metadataField + ", '$.test_key2') = \"test-value2\" AND JSON_EXTRACT(" + metadataField + ", '$.test_key1') = \"test-value\")",
-		}, query)
-
-		// NOTE: the order of the items can change, hence the query order can change
-		// assert.Equal(t, expected, query)
-
-		objectMetadata := map[string]interface{}{
-			"testId": map[string]interface{}{
-				"test_key1": "test-value",
-				"test_key2": "test-value2",
-			},
-		}
-		query = whereObject(SQLite, "object_metadata", objectMetadata)
-		assert.Contains(t, []string{
-			"(JSON_EXTRACT(object_metadata, '$.testId.test_key1') = \"test-value\" AND JSON_EXTRACT(object_metadata, '$.testId.test_key2') = \"test-value2\")",
-			"(JSON_EXTRACT(object_metadata, '$.testId.test_key2') = \"test-value2\" AND JSON_EXTRACT(object_metadata, '$.testId.test_key1') = \"test-value\")",
-		}, query)
-		// NOTE: the order of the items can change, hence the query order can change
-		// assert.Equal(t, expected, query)
-	})
-}
-
-// mockSQLCtx is used to mock the SQL
-type mockSQLCtx struct {
-	WhereClauses []interface{}
-	Vars         map[string]interface{}
-}
-
-func (f *mockSQLCtx) Where(query interface{}, args ...interface{}) {
-	f.WhereClauses = append(f.WhereClauses, query)
-	if len(args) > 0 {
-		for _, variables := range args {
-			for key, value := range variables.(map[string]interface{}) {
-				f.Vars[key] = value
-			}
-		}
-	}
-}
-
-func (f *mockSQLCtx) getGormTx() *gorm.DB {
-	return nil
 }
 
 // TestCustomWhere will test the method CustomWhere()
@@ -267,160 +186,137 @@ func TestCustomWhere(t *testing.T) {
 	t.Parallel()
 
 	t.Run("SQLite empty select", func(t *testing.T) {
-		client, deferFunc := testClient(context.Background(), t)
-		defer deferFunc()
-		tx := mockSQLCtx{
-			WhereClauses: make([]interface{}, 0),
-			Vars:         make(map[string]interface{}),
-		}
+		client, gdb := mockClient(SQLite)
+
 		conditions := map[string]interface{}{}
-		_ = client.CustomWhere(&tx, conditions, SQLite)
-		assert.Equal(t, []interface{}{}, tx.WhereClauses)
+
+		raw := gdb.ToSQL(func(tx *gorm.DB) *gorm.DB {
+			tx, err := ApplyCustomWhere(client, tx, conditions, mockObject{})
+			assert.NoError(t, err)
+			return tx.First(&mockObject{})
+		})
+
+		assert.Regexp(t, "SELECT(.+)FROM(.+)ORDER BY(.+)LIMIT 1", raw)
+		assert.NotContains(t, raw, "WHERE")
 	})
 
 	t.Run("SQLite simple select", func(t *testing.T) {
-		client, deferFunc := testClient(context.Background(), t)
-		defer deferFunc()
-		tx := mockSQLCtx{
-			WhereClauses: make([]interface{}, 0),
-			Vars:         make(map[string]interface{}),
-		}
+		client, gdb := mockClient(SQLite)
+
 		conditions := map[string]interface{}{
 			sqlIDFieldProper: "testID",
 		}
-		_ = client.CustomWhere(&tx, conditions, SQLite)
-		assert.Len(t, tx.WhereClauses, 1)
-		assert.Equal(t, sqlIDFieldProper+" = @var0", tx.WhereClauses[0])
-		assert.Equal(t, "testID", tx.Vars["var0"])
+
+		raw := gdb.ToSQL(func(tx *gorm.DB) *gorm.DB {
+			tx, err := ApplyCustomWhere(client, tx, conditions, mockObject{})
+			assert.NoError(t, err)
+			return tx.First(&mockObject{})
+		})
+
+		assert.Regexp(t, "SELECT(.+)FROM(.+)WHERE(.+)id(.*)\\=(.*)testID(.+)ORDER BY(.+)LIMIT 1", raw)
 	})
 
-	t.Run("SQLite "+conditionOr, func(t *testing.T) {
-		arrayField1 := fieldInIDs
-		arrayField2 := fieldOutIDs
+	t.Run("SQLite $or in json", func(t *testing.T) {
+		client, gdb := mockClient(SQLite)
+		WithCustomFields([]string{"field_in_ids", "field_out_ids"}, nil)(client.options)
 
-		client, deferFunc := testClient(context.Background(), t, WithCustomFields([]string{arrayField1, arrayField2}, nil))
-		defer deferFunc()
-		tx := mockSQLCtx{
-			WhereClauses: make([]interface{}, 0),
-			Vars:         make(map[string]interface{}),
-		}
 		conditions := map[string]interface{}{
 			conditionOr: []map[string]interface{}{{
-				arrayField1: "value_id",
+				"field_in_ids": "value_id",
 			}, {
-				arrayField2: "value_id",
+				"field_out_ids": "value_id",
 			}},
 		}
-		_ = client.CustomWhere(&tx, conditions, SQLite)
-		assert.Len(t, tx.WhereClauses, 1)
-		assert.Equal(t, " ( (EXISTS (SELECT 1 FROM json_each("+arrayField1+") WHERE value = \"value_id\")) OR (EXISTS (SELECT 1 FROM json_each("+arrayField2+") WHERE value = \"value_id\")) ) ", tx.WhereClauses[0])
+
+		raw := gdb.ToSQL(func(tx *gorm.DB) *gorm.DB {
+			tx, err := ApplyCustomWhere(client, tx, conditions, mockObject{})
+			assert.NoError(t, err)
+			return tx.First(&mockObject{})
+		})
+
+		assert.Contains(t, raw, "json_each(field_in_ids) WHERE value = \"value_id\"")
+		assert.Contains(t, raw, "json_each(field_out_ids) WHERE value = \"value_id\"")
+		assert.Regexp(t, "SELECT(.+)FROM(.+)WHERE(.+)EXISTS(.+)SELECT 1(.+)FROM(.+)json_each(.+)WHERE(.+)OR(.+)EXISTS(.+)SELECT 1(.+)FROM(.+)json_each(.+)WHERE(.+)ORDER BY(.+)LIMIT 1", raw)
 	})
 
-	t.Run("MySQL "+conditionOr, func(t *testing.T) {
-		arrayField1 := fieldInIDs
-		arrayField2 := fieldOutIDs
+	t.Run("PostgreSQL $or in json", func(t *testing.T) {
+		client, gdb := mockClient(PostgreSQL)
+		WithCustomFields([]string{"field_in_ids", "field_out_ids"}, nil)(client.options)
 
-		client, deferFunc := testClient(context.Background(), t, WithCustomFields([]string{arrayField1, arrayField2}, nil))
-		defer deferFunc()
-		tx := mockSQLCtx{
-			WhereClauses: make([]interface{}, 0),
-			Vars:         make(map[string]interface{}),
-		}
 		conditions := map[string]interface{}{
 			conditionOr: []map[string]interface{}{{
-				arrayField1: "value_id",
+				"field_in_ids": "value_id",
 			}, {
-				arrayField2: "value_id",
+				"field_out_ids": "value_id",
 			}},
 		}
-		_ = client.CustomWhere(&tx, conditions, MySQL)
-		assert.Len(t, tx.WhereClauses, 1)
-		assert.Equal(t, " ( (JSON_CONTAINS("+arrayField1+", CAST('[\"value_id\"]' AS JSON))) OR (JSON_CONTAINS("+arrayField2+", CAST('[\"value_id\"]' AS JSON))) ) ", tx.WhereClauses[0])
+
+		raw := gdb.ToSQL(func(tx *gorm.DB) *gorm.DB {
+			tx, err := ApplyCustomWhere(client, tx, conditions, mockObject{})
+			assert.NoError(t, err)
+			return tx.First(&mockObject{})
+		})
+
+		assert.Contains(t, raw, "field_in_ids::jsonb @> '[\"value_id\"]'")
+		assert.Contains(t, raw, "field_out_ids::jsonb @> '[\"value_id\"]")
+		assert.Regexp(t, "SELECT(.+)FROM(.+)WHERE(.+)field_(in|out)_ids(.+)OR(.+)field_(in|out)_ids(.+)ORDER BY(.+)LIMIT 1", raw)
 	})
 
-	t.Run("PostgreSQL "+conditionOr, func(t *testing.T) {
-		arrayField1 := fieldInIDs
-		arrayField2 := fieldOutIDs
-
-		client, deferFunc := testClient(context.Background(), t, WithCustomFields([]string{arrayField1, arrayField2}, nil))
-		defer deferFunc()
-		tx := mockSQLCtx{
-			WhereClauses: make([]interface{}, 0),
-			Vars:         make(map[string]interface{}),
-		}
-		conditions := map[string]interface{}{
-			conditionOr: []map[string]interface{}{{
-				arrayField1: "value_id",
-			}, {
-				arrayField2: "value_id",
-			}},
-		}
-		_ = client.CustomWhere(&tx, conditions, PostgreSQL)
-		assert.Len(t, tx.WhereClauses, 1)
-		assert.Equal(t, " ( ("+arrayField1+"::jsonb @> '[\"value_id\"]') OR ("+arrayField2+"::jsonb @> '[\"value_id\"]') ) ", tx.WhereClauses[0])
-	})
-
-	t.Run("SQLite "+metadataField, func(t *testing.T) {
-		client, deferFunc := testClient(context.Background(), t)
-		defer deferFunc()
-		tx := mockSQLCtx{
-			WhereClauses: make([]interface{}, 0),
-			Vars:         make(map[string]interface{}),
-		}
+	t.Run("SQLite metadata", func(t *testing.T) {
+		client, gdb := mockClient(SQLite)
 		conditions := map[string]interface{}{
 			metadataField: map[string]interface{}{
 				"field_name": "field_value",
 			},
 		}
-		_ = client.CustomWhere(&tx, conditions, SQLite)
-		assert.Len(t, tx.WhereClauses, 1)
-		assert.Equal(t, "JSON_EXTRACT("+metadataField+", '$.field_name') = \"field_value\"", tx.WhereClauses[0])
+
+		raw := gdb.ToSQL(func(tx *gorm.DB) *gorm.DB {
+			tx, err := ApplyCustomWhere(client, tx, conditions, mockObject{})
+			assert.NoError(t, err)
+			return tx.First(&mockObject{})
+		})
+
+		assert.Contains(t, raw, `JSON_EXTRACT(metadata, "$.field_name") = "field_value"`)
 	})
 
-	t.Run("MySQL "+metadataField, func(t *testing.T) {
-		client, deferFunc := testClient(context.Background(), t)
-		defer deferFunc()
-		tx := mockSQLCtx{
-			WhereClauses: make([]interface{}, 0),
-			Vars:         make(map[string]interface{}),
-		}
+	t.Run("MySQL metadata", func(t *testing.T) {
+		client, gdb := mockClient(MySQL)
 		conditions := map[string]interface{}{
 			metadataField: map[string]interface{}{
 				"field_name": "field_value",
 			},
 		}
-		_ = client.CustomWhere(&tx, conditions, MySQL)
-		assert.Len(t, tx.WhereClauses, 1)
-		assert.Equal(t, "JSON_EXTRACT("+metadataField+", '$.field_name') = \"field_value\"", tx.WhereClauses[0])
+
+		raw := gdb.ToSQL(func(tx *gorm.DB) *gorm.DB {
+			tx, err := ApplyCustomWhere(client, tx, conditions, mockObject{})
+			assert.NoError(t, err)
+			return tx.First(&mockObject{})
+		})
+
+		assert.Contains(t, raw, "JSON_EXTRACT(metadata, '$.field_name') = 'field_value'")
 	})
 
-	t.Run("PostgreSQL "+metadataField, func(t *testing.T) {
-		client, deferFunc := testClient(context.Background(), t)
-		defer deferFunc()
-		tx := mockSQLCtx{
-			WhereClauses: make([]interface{}, 0),
-			Vars:         make(map[string]interface{}),
-		}
+	t.Run("PostgreSQL metadata", func(t *testing.T) {
+		client, gdb := mockClient(PostgreSQL)
 		conditions := map[string]interface{}{
-			metadataField: map[string]interface{}{
+			metadataField: Metadata{
 				"field_name": "field_value",
 			},
 		}
-		_ = client.CustomWhere(&tx, conditions, PostgreSQL)
-		assert.Len(t, tx.WhereClauses, 1)
-		assert.Equal(t, metadataField+"::jsonb @> '{\"field_name\":\"field_value\"}'::jsonb", tx.WhereClauses[0])
+
+		raw := gdb.ToSQL(func(tx *gorm.DB) *gorm.DB {
+			tx, err := ApplyCustomWhere(client, tx, conditions, mockObject{})
+			assert.NoError(t, err)
+			return tx.First(&mockObject{})
+		})
+
+		assert.Contains(t, raw, `metadata::jsonb @> '{"field_name":"field_value"}'`)
 	})
 
-	t.Run("SQLite "+conditionAnd, func(t *testing.T) {
-		arrayField1 := fieldInIDs
-		arrayField2 := fieldOutIDs
+	t.Run("SQLite $and", func(t *testing.T) {
+		client, gdb := mockClient(SQLite)
+		WithCustomFields([]string{"field_in_ids", "field_out_ids"}, nil)(client.options)
 
-		client, deferFunc := testClient(context.Background(), t, WithCustomFields([]string{arrayField1, arrayField2}, nil))
-		defer deferFunc()
-		tx := mockSQLCtx{
-			WhereClauses: make([]interface{}, 0),
-			Vars:         make(map[string]interface{}),
-		}
 		conditions := map[string]interface{}{
 			conditionAnd: []map[string]interface{}{{
 				"reference_id": "reference",
@@ -428,29 +324,28 @@ func TestCustomWhere(t *testing.T) {
 				"number": 12,
 			}, {
 				conditionOr: []map[string]interface{}{{
-					arrayField1: "value_id",
+					"field_in_ids": "value_id",
 				}, {
-					arrayField2: "value_id",
+					"field_out_ids": "value_id",
 				}},
 			}},
 		}
-		_ = client.CustomWhere(&tx, conditions, SQLite)
-		assert.Len(t, tx.WhereClauses, 1)
-		assert.Equal(t, " ( reference_id = @var0 AND number = @var1 AND  ( (EXISTS (SELECT 1 FROM json_each("+arrayField1+") WHERE value = \"value_id\")) OR (EXISTS (SELECT 1 FROM json_each("+arrayField2+") WHERE value = \"value_id\")) )  ) ", tx.WhereClauses[0])
-		assert.Equal(t, "reference", tx.Vars["var0"])
-		assert.Equal(t, 12, tx.Vars["var1"])
+
+		raw := gdb.ToSQL(func(tx *gorm.DB) *gorm.DB {
+			tx, err := ApplyCustomWhere(client, tx, conditions, mockObject{})
+			assert.NoError(t, err)
+			return tx.First(&mockObject{})
+		})
+
+		assert.Regexp(t, "reference_id(.*)\\=(.*)reference", raw)
+		assert.Regexp(t, "number(.*)\\=(.*)12", raw)
+		assert.Regexp(t, "AND(.*)AND", raw)
 	})
 
-	t.Run("MySQL "+conditionAnd, func(t *testing.T) {
-		arrayField1 := fieldInIDs
-		arrayField2 := fieldOutIDs
+	t.Run("MySQL $and", func(t *testing.T) {
+		client, gdb := mockClient(MySQL)
+		WithCustomFields([]string{"field_in_ids", "field_out_ids"}, nil)(client.options)
 
-		client, deferFunc := testClient(context.Background(), t, WithCustomFields([]string{arrayField1, arrayField2}, nil))
-		defer deferFunc()
-		tx := mockSQLCtx{
-			WhereClauses: make([]interface{}, 0),
-			Vars:         make(map[string]interface{}),
-		}
 		conditions := map[string]interface{}{
 			conditionAnd: []map[string]interface{}{{
 				"reference_id": "reference",
@@ -458,29 +353,28 @@ func TestCustomWhere(t *testing.T) {
 				"number": 12,
 			}, {
 				conditionOr: []map[string]interface{}{{
-					arrayField1: "value_id",
+					"field_in_ids": "value_id",
 				}, {
-					arrayField2: "value_id",
+					"field_out_ids": "value_id",
 				}},
 			}},
 		}
-		_ = client.CustomWhere(&tx, conditions, MySQL)
-		assert.Len(t, tx.WhereClauses, 1)
-		assert.Equal(t, " ( reference_id = @var0 AND number = @var1 AND  ( (JSON_CONTAINS("+arrayField1+", CAST('[\"value_id\"]' AS JSON))) OR (JSON_CONTAINS("+arrayField2+", CAST('[\"value_id\"]' AS JSON))) )  ) ", tx.WhereClauses[0])
-		assert.Equal(t, "reference", tx.Vars["var0"])
-		assert.Equal(t, 12, tx.Vars["var1"])
+
+		raw := gdb.ToSQL(func(tx *gorm.DB) *gorm.DB {
+			tx, err := ApplyCustomWhere(client, tx, conditions, mockObject{})
+			assert.NoError(t, err)
+			return tx.First(&mockObject{})
+		})
+
+		assert.Regexp(t, "reference_id(.*)\\=(.*)reference", raw)
+		assert.Regexp(t, "number(.*)\\=(.*)12", raw)
+		assert.Regexp(t, "AND(.*)AND", raw)
 	})
 
-	t.Run("PostgreSQL "+conditionAnd, func(t *testing.T) {
-		arrayField1 := fieldInIDs
-		arrayField2 := fieldOutIDs
+	t.Run("PostgreSQL $and", func(t *testing.T) {
+		client, gdb := mockClient(PostgreSQL)
+		WithCustomFields([]string{"field_in_ids", "field_out_ids"}, nil)(client.options)
 
-		client, deferFunc := testClient(context.Background(), t, WithCustomFields([]string{arrayField1, arrayField2}, nil))
-		defer deferFunc()
-		tx := mockSQLCtx{
-			WhereClauses: make([]interface{}, 0),
-			Vars:         make(map[string]interface{}),
-		}
 		conditions := map[string]interface{}{
 			conditionAnd: []map[string]interface{}{{
 				"reference_id": "reference",
@@ -488,194 +382,193 @@ func TestCustomWhere(t *testing.T) {
 				"number": 12,
 			}, {
 				conditionOr: []map[string]interface{}{{
-					arrayField1: "value_id",
+					"field_in_ids": "value_id",
 				}, {
-					arrayField2: "value_id",
+					"field_out_ids": "value_id",
 				}},
 			}},
 		}
-		_ = client.CustomWhere(&tx, conditions, PostgreSQL)
-		assert.Len(t, tx.WhereClauses, 1)
-		assert.Equal(t, " ( reference_id = @var0 AND number = @var1 AND  ( ("+arrayField1+"::jsonb @> '[\"value_id\"]') OR ("+arrayField2+"::jsonb @> '[\"value_id\"]') )  ) ", tx.WhereClauses[0])
-		assert.Equal(t, "reference", tx.Vars["var0"])
-		assert.Equal(t, 12, tx.Vars["var1"])
+
+		raw := gdb.ToSQL(func(tx *gorm.DB) *gorm.DB {
+			tx, err := ApplyCustomWhere(client, tx, conditions, mockObject{})
+			assert.NoError(t, err)
+			return tx.First(&mockObject{})
+		})
+
+		assert.Regexp(t, "reference_id(.*)\\=(.*)reference", raw)
+		assert.Regexp(t, "number(.*)\\=(.*)12", raw)
+		assert.Regexp(t, "AND(.*)AND", raw)
 	})
 
-	t.Run("Where "+conditionGreaterThan, func(t *testing.T) {
-		client, deferFunc := testClient(context.Background(), t)
-		defer deferFunc()
-		tx := mockSQLCtx{
-			WhereClauses: make([]interface{}, 0),
-			Vars:         make(map[string]interface{}),
-		}
+	t.Run("Where $gt", func(t *testing.T) {
+		client, gdb := mockClient(PostgreSQL)
+
 		conditions := map[string]interface{}{
-			"amount": map[string]interface{}{
+			"number": map[string]interface{}{
 				conditionGreaterThan: 502,
 			},
 		}
-		_ = client.CustomWhere(&tx, conditions, PostgreSQL) // all the same
-		assert.Len(t, tx.WhereClauses, 1)
-		assert.Equal(t, "amount > @var0", tx.WhereClauses[0])
-		assert.Equal(t, 502, tx.Vars["var0"])
+
+		raw := gdb.ToSQL(func(tx *gorm.DB) *gorm.DB {
+			tx, err := ApplyCustomWhere(client, tx, conditions, mockObject{})
+			assert.NoError(t, err)
+			return tx.First(&mockObject{})
+		})
+
+		assert.Regexp(t, "number(.*)\\>(.*)502", raw)
 	})
 
-	t.Run("Where "+conditionGreaterThan+" "+conditionLessThan, func(t *testing.T) {
-		client, deferFunc := testClient(context.Background(), t)
-		defer deferFunc()
-		tx := mockSQLCtx{
-			WhereClauses: make([]interface{}, 0),
-			Vars:         make(map[string]interface{}),
-		}
+	t.Run("Where $and $gt $lt", func(t *testing.T) {
+		client, gdb := mockClient(PostgreSQL)
+
 		conditions := map[string]interface{}{
 			conditionAnd: []map[string]interface{}{{
-				"amount": map[string]interface{}{
+				"number": map[string]interface{}{
 					conditionLessThan: 503,
 				},
 			}, {
-				"amount": map[string]interface{}{
+				"number": map[string]interface{}{
 					conditionGreaterThan: 203,
 				},
 			}},
 		}
-		_ = client.CustomWhere(&tx, conditions, PostgreSQL) // all the same
-		assert.Len(t, tx.WhereClauses, 1)
-		assert.Equal(t, " ( amount < @var0 AND amount > @var1 ) ", tx.WhereClauses[0])
-		assert.Equal(t, 503, tx.Vars["var0"])
-		assert.Equal(t, 203, tx.Vars["var1"])
+
+		raw := gdb.ToSQL(func(tx *gorm.DB) *gorm.DB {
+			tx, err := ApplyCustomWhere(client, tx, conditions, mockObject{})
+			assert.NoError(t, err)
+			return tx.First(&mockObject{})
+		})
+
+		// the order may vary
+		assert.Regexp(t, "number(.*)\\>(.*)203", raw)
+		assert.Regexp(t, "number(.*)\\<(.*)503", raw)
+
+		assert.Regexp(t, "number(.*)[\\d](.*)AND(.*)number(.*)[\\d]", raw)
 	})
 
-	t.Run("Where "+conditionGreaterThanOrEqual+" "+conditionLessThanOrEqual, func(t *testing.T) {
-		client, deferFunc := testClient(context.Background(), t)
-		defer deferFunc()
-		tx := mockSQLCtx{
-			WhereClauses: make([]interface{}, 0),
-			Vars:         make(map[string]interface{}),
-		}
+	t.Run("Where $or $gte $lte", func(t *testing.T) {
+		client, gdb := mockClient(PostgreSQL)
+
 		conditions := map[string]interface{}{
 			conditionOr: []map[string]interface{}{{
-				"amount": map[string]interface{}{
-					conditionLessThanOrEqual: 203,
+				"number": map[string]interface{}{
+					conditionLessThanOrEqual: 503,
 				},
 			}, {
-				"amount": map[string]interface{}{
-					conditionGreaterThanOrEqual: 1203,
+				"number": map[string]interface{}{
+					conditionGreaterThanOrEqual: 203,
 				},
 			}},
 		}
-		_ = client.CustomWhere(&tx, conditions, PostgreSQL) // all the same
-		assert.Len(t, tx.WhereClauses, 1)
-		assert.Equal(t, " ( (amount <= @var0) OR (amount >= @var1) ) ", tx.WhereClauses[0])
-		assert.Equal(t, 203, tx.Vars["var0"])
-		assert.Equal(t, 1203, tx.Vars["var1"])
+
+		raw := gdb.ToSQL(func(tx *gorm.DB) *gorm.DB {
+			tx, err := ApplyCustomWhere(client, tx, conditions, mockObject{})
+			assert.NoError(t, err)
+			return tx.First(&mockObject{})
+		})
+
+		// the order may vary
+		assert.Regexp(t, "number(.*)\\>\\=(.*)203", raw)
+		assert.Regexp(t, "number(.*)\\<\\=(.*)503", raw)
+
+		assert.Regexp(t, "number(.*)[\\d](.*)OR(.*)number(.*)[\\d]", raw)
 	})
 
-	t.Run("Where "+conditionOr+" "+conditionAnd+" "+conditionOr+" "+conditionGreaterThanOrEqual+" "+conditionLessThanOrEqual, func(t *testing.T) {
-		client, deferFunc := testClient(context.Background(), t)
-		defer deferFunc()
-		tx := mockSQLCtx{
-			WhereClauses: make([]interface{}, 0),
-			Vars:         make(map[string]interface{}),
-		}
+	t.Run("Where $or $and $or $gte $lte", func(t *testing.T) {
+		client, gdb := mockClient(PostgreSQL)
+
 		conditions := map[string]interface{}{
 			conditionOr: []map[string]interface{}{{
 				conditionAnd: []map[string]interface{}{{
-					"amount": map[string]interface{}{
+					"number": map[string]interface{}{
 						conditionLessThanOrEqual: 203,
 					},
 				}, {
 					conditionOr: []map[string]interface{}{{
-						"amount": map[string]interface{}{
+						"number": map[string]interface{}{
 							conditionGreaterThanOrEqual: 1203,
 						},
 					}, {
-						"value": map[string]interface{}{
+						"number": map[string]interface{}{
 							conditionGreaterThanOrEqual: 2203,
 						},
 					}},
 				}},
 			}, {
 				conditionAnd: []map[string]interface{}{{
-					"amount": map[string]interface{}{
+					"number": map[string]interface{}{
 						conditionGreaterThanOrEqual: 3203,
 					},
 				}, {
-					"value": map[string]interface{}{
+					"number": map[string]interface{}{
 						conditionGreaterThanOrEqual: 4203,
 					},
 				}},
 			}},
 		}
-		_ = client.CustomWhere(&tx, conditions, PostgreSQL) // all the same
-		assert.Len(t, tx.WhereClauses, 1)
-		assert.Equal(t, " ( ( ( amount <= @var0 AND  ( (amount >= @var1) OR (value >= @var2) )  ) ) OR ( ( amount >= @var3 AND value >= @var4 ) ) ) ", tx.WhereClauses[0])
-		assert.Equal(t, 203, tx.Vars["var0"])
-		assert.Equal(t, 1203, tx.Vars["var1"])
-		assert.Equal(t, 2203, tx.Vars["var2"])
-		assert.Equal(t, 3203, tx.Vars["var3"])
-		assert.Equal(t, 4203, tx.Vars["var4"])
-	})
 
-	t.Run("Where "+conditionAnd+" "+conditionOr+" "+conditionOr+" "+conditionGreaterThanOrEqual+" "+conditionLessThanOrEqual, func(t *testing.T) {
-		client, deferFunc := testClient(context.Background(), t)
-		defer deferFunc()
-		tx := mockSQLCtx{
-			WhereClauses: make([]interface{}, 0),
-			Vars:         make(map[string]interface{}),
-		}
-		conditions := map[string]interface{}{
-			conditionAnd: []map[string]interface{}{{
-				conditionAnd: []map[string]interface{}{{
-					"amount": map[string]interface{}{
-						conditionLessThanOrEqual:    203,
-						conditionGreaterThanOrEqual: 103,
-					},
-				}, {
-					conditionOr: []map[string]interface{}{{
-						"amount": map[string]interface{}{
-							conditionGreaterThanOrEqual: 1203,
-						},
-					}, {
-						"value": map[string]interface{}{
-							conditionGreaterThanOrEqual: 2203,
-						},
-					}},
-				}},
-			}, {
-				conditionOr: []map[string]interface{}{{
-					"amount": map[string]interface{}{
-						conditionGreaterThanOrEqual: 3203,
-					},
-				}, {
-					"value": map[string]interface{}{
-						conditionGreaterThanOrEqual: 4203,
-					},
-				}},
-			}},
-		}
-		_ = client.CustomWhere(&tx, conditions, PostgreSQL) // all the same
-		assert.Len(t, tx.WhereClauses, 1)
-		assert.Contains(t, []string{
-			" (  ( amount <= @var0 AND amount >= @var1 AND  ( (amount >= @var2) OR (value >= @var3) )  )  AND  ( (amount >= @var4) OR (value >= @var5) )  ) ",
-			" (  ( amount >= @var0 AND amount <= @var1 AND  ( (amount >= @var2) OR (value >= @var3) )  )  AND  ( (amount >= @var4) OR (value >= @var5) )  ) ",
-		}, tx.WhereClauses[0])
+		raw := gdb.ToSQL(func(tx *gorm.DB) *gorm.DB {
+			tx, err := ApplyCustomWhere(client, tx, conditions, mockObject{})
+			assert.NoError(t, err)
+			return tx.First(&mockObject{})
+		})
 
-		// assert.Equal(t, " (  ( amount <= @var0 AND amount >= @var1 AND  ( (amount >= @var2) OR (value >= @var3) )  )  AND  ( (amount >= @var4) OR (value >= @var5) )  ) ", tx.WhereClauses[0])
-
-		assert.Contains(t, []int{203, 103}, tx.Vars["var0"])
-		assert.Contains(t, []int{203, 103}, tx.Vars["var1"])
-		// assert.Equal(t, 203, tx.Vars["var0"])
-		// assert.Equal(t, 103, tx.Vars["var1"])
-		assert.Equal(t, 1203, tx.Vars["var2"])
-		assert.Equal(t, 2203, tx.Vars["var3"])
-		assert.Equal(t, 3203, tx.Vars["var4"])
-		assert.Equal(t, 4203, tx.Vars["var5"])
+		assert.Regexp(t, "number(.*)\\>\\=(.*)203", raw)
+		assert.Regexp(t, "number(.*)\\>\\=(.*)1203", raw)
+		assert.Regexp(t, "number(.*)\\<\\=(.*)2203", raw)
+		assert.Regexp(t, "number(.*)\\>\\=(.*)3203", raw)
+		assert.Regexp(t, "number(.*)\\<\\=(.*)4203", raw)
+		assert.Regexp(t, "AND(.+)OR(.+)AND", raw)
 	})
 }
 
-// Test_escapeDBString will test the method escapeDBString()
-func Test_escapeDBString(t *testing.T) {
+func Test_sqlInjectionSafety(t *testing.T) {
 	t.Parallel()
 
-	str := escapeDBString(`SELECT * FROM 'table' WHERE 'field'=1;`)
-	assert.Equal(t, `SELECT * FROM \'table\' WHERE \'field\'=1;`, str)
+	t.Run("injection as simple key", func(t *testing.T) {
+		client, gdb := mockClient(PostgreSQL)
+
+		conditions := map[string]interface{}{
+			"1=1 --": 12,
+		}
+
+		gdb.ToSQL(func(tx *gorm.DB) *gorm.DB {
+			tx, err := ApplyCustomWhere(client, tx, conditions, mockObject{})
+			assert.Error(t, err)
+			return tx.First(&mockObject{})
+		})
+	})
+
+	t.Run("injection in key as conditionExists", func(t *testing.T) {
+		client, gdb := mockClient(PostgreSQL)
+
+		conditions := map[string]interface{}{
+			"1=1 OR unique_field_name": map[string]interface{}{
+				conditionExists: true,
+			},
+		}
+
+		gdb.ToSQL(func(tx *gorm.DB) *gorm.DB {
+			tx, err := ApplyCustomWhere(client, tx, conditions, mockObject{})
+			assert.Error(t, err)
+			return tx.First(&mockObject{})
+		})
+	})
+
+	t.Run("injection in metadata", func(t *testing.T) {
+		client, gdb := mockClient(PostgreSQL)
+		conditions := map[string]interface{}{
+			metadataField: Metadata{
+				"1=1; DELETE FROM users": "field_value",
+			},
+		}
+
+		raw := gdb.ToSQL(func(tx *gorm.DB) *gorm.DB {
+			tx, err := ApplyCustomWhere(client, tx, conditions, mockObject{})
+			assert.NoError(t, err)
+			return tx.First(&mockObject{})
+		})
+
+		assert.Contains(t, raw, `'{"1=1; DELETE FROM users":"field_value"}'`)
+	})
 }

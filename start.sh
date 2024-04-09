@@ -415,7 +415,7 @@ if [ "$spv_wallet" == "true" ] && [ "$admin_xpub" == "" ] && [ "$default_xpub" !
     print_debug "default_xpub: $default_xpub"
 fi
 
-if [ "$spv_wallet" != "true" ] && [ "$wallet_backend" == "true" ] && [ "$admin_xpriv" == "" ]; then
+if [ "$spv_wallet" != "true" ] && [ "$wallet_backend" == "true" ] && [ "$admin_xpriv" == "" ] && [ "$default_xpub" != "true" ]; then
   ask_for_value "Define admin xPriv (Leave empty to use the default one)" 'xprv'
 
   if [[ -n "$choice" ]]; then
