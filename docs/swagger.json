@@ -1412,10 +1412,10 @@
                 "parameters": [
                     {
                         "description": "Supports targeted resource searches with filters for metadata and custom conditions, plus options for pagination and sorting to streamline data exploration and analysis",
-                        "name": "SearchRequestParameters",
+                        "name": "SearchRequestDestinationParameters",
                         "in": "body",
                         "schema": {
-                            "$ref": "#/definitions/actions.SearchRequestParameters"
+                            "$ref": "#/definitions/destinations.SearchRequestDestinationParameters"
                         }
                     }
                 ],
@@ -1430,7 +1430,7 @@
                         }
                     },
                     "400": {
-                        "description": "Bad request - Error while parsing SearchRequestParameters from request body"
+                        "description": "Bad request - Error while parsing SearchRequestDestinationParameters from request body"
                     },
                     "500": {
                         "description": "Internal server error - Error while searching for destinations"
@@ -2180,6 +2180,43 @@
                 }
             }
         },
+        "destinations.SearchRequestDestinationParameters": {
+            "type": "object",
+            "properties": {
+                "conditions": {
+                    "description": "Custom conditions used for filtering the search results",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/models.DestinationFilters"
+                        }
+                    ]
+                },
+                "metadata": {
+                    "description": "Accepts a JSON object for embedding custom metadata, enabling arbitrary additional information to be associated with the resource",
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "string"
+                    },
+                    "example": {
+                        "key": "value",
+                        "key2": "value2"
+                    }
+                },
+                "params": {
+                    "description": "Pagination and sorting options to streamline data exploration and analysis",
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "string"
+                    },
+                    "example": {
+                        "order_by_direction": "desc",
+                        "order_by_field": "created_at",
+                        "page": "1",
+                        "page_size": "10"
+                    }
+                }
+            }
+        },
         "destinations.UpdateDestination": {
             "type": "object",
             "properties": {
@@ -2434,6 +2471,64 @@
                     "description": "XpubID is a destination's xpub related id used to register destination.",
                     "type": "string",
                     "example": "bb8593f85ef8056a77026ad415f02128f3768906de53e9e8bf8749fe2d66cf50"
+                }
+            }
+        },
+        "models.DestinationFilters": {
+            "type": "object",
+            "properties": {
+                "address": {
+                    "description": "Address is a destination's address.",
+                    "type": "string",
+                    "example": "1CDUf7CKu8ocTTkhcYUbq75t14Ft168K65"
+                },
+                "created_range": {
+                    "description": "CreatedRange is a filter for destinations created within a specific time range.",
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "string"
+                    },
+                    "example": {
+                        "from": "2024-02-26T11:01:28.069911",
+                        "to": "2025-02-26T11:01:28.069911"
+                    }
+                },
+                "draft_id": {
+                    "description": "DraftID is a destination's draft id.",
+                    "type": "string",
+                    "example": "b356f7fa00cd3f20cce6c21d704cd13e871d28d714a5ebd0532f5a0e0cde63f7"
+                },
+                "include_deleted": {
+                    "description": "IncludeDeleted is a flag which includes deleted destinations.",
+                    "type": "boolean",
+                    "example": true
+                },
+                "locking_script": {
+                    "description": "LockingScript is a destination's locking script.",
+                    "type": "string",
+                    "example": "76a9147b05764a97f3b4b981471492aa703b188e45979b88ac"
+                },
+                "metadata": {
+                    "description": "Metadata is a metadata map of outer model.",
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "string"
+                    },
+                    "example": {
+                        "key": "value",
+                        "key2": "value2"
+                    }
+                },
+                "updated_range": {
+                    "description": "UpdatedRange is a filter for destinations updated within a specific time range.",
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "string"
+                    },
+                    "example": {
+                        "from": "2024-02-26T11:01:28.069911",
+                        "to": "2025-02-26T11:01:28.069911"
+                    }
                 }
             }
         },
