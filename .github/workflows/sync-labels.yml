@@ -1,7 +1,8 @@
+---
 # Workflow: https://github.com/micnncim/action-label-syncer
 # Export your labels: https://github.com/micnncim/label-exporter
 name: sync-labels
-on:
+on:  # yamllint disable-line rule:truthy
   push:
     branches:
       - master

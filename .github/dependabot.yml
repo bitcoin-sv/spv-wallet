@@ -1,3 +1,4 @@
+---
 # Basic dependabot.yml to update gomod, Github Actions and Docker
 version: 2
 updates:

@@ -1,3 +1,4 @@
+---
 # This file contains all available configuration options
 # with their default values.
 
@@ -31,7 +32,7 @@ run:
   # If invoked with -mod=vendor, the go command assumes that the vendor
   # directory holds the correct copies of dependencies and ignores
   # the dependency descriptions in go.mod.
-  #modules-download-mode: readonly|release|vendor
+  # modules-download-mode: readonly|release|vendor
 
   # Allow multiple parallel golangci-lint instances running.
   # If false (default) - golangci-lint acquires file lock on start.
@@ -69,9 +70,9 @@ linters:
 linters-settings:
   gci:
     sections:
-      - standard # Standard section: captures all standard packages.
-      - default # Default section: contains all imports that could not be matched to another section type.
-      - prefix(bitcoin-sv/spv-wallet) # Custom section: groups all imports with the specified Prefix.
+      - standard  # Standard section: captures all standard packages.
+      - default  # Default section: contains all imports that could not be matched to another section type.
+      - prefix(bitcoin-sv/spv-wallet)  # Custom section: groups all imports with the specified Prefix.
   misspell:
     # Correct spellings using locale preferences for US or UK.
     # Default is to use a neutral variety of English.

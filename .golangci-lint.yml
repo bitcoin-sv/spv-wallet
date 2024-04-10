@@ -1,3 +1,4 @@
+---
 # This file contains all available configuration options
 # with their default values.
 
@@ -20,11 +21,9 @@ run:
     - mytag
 
 
-
   # default is true. Enables skipping of directories:
   #   vendor$, third_party$, testdata$, examples$, Godeps$, builtin$
   skip-dirs-use-default: true
-
 
 
   # by default isn't set. If set we pass it to "go list -mod={option}". From "go help modules":
@@ -35,7 +34,7 @@ run:
   # If invoked with -mod=vendor, the go command assumes that the vendor
   # directory holds the correct copies of dependencies and ignores
   # the dependency descriptions in go.mod.
-  #modules-download-mode: readonly|release|vendor
+  # modules-download-mode: readonly|release|vendor
 
   # Allow multiple parallel golangci-lint instances running.
   # If false (default) - golangci-lint acquires file lock on start.

@@ -1,18 +1,17 @@
+---
 # See more at: https://docs.github.com/en/actions/learn-github-actions/workflow-syntax-for-github-actions
 name: run-go-tests
 
 env:
-  GO111MODULE: on
+  GO111MODULE: "on"
 
-on:
+"on":
   pull_request:
     branches:
       - "*"
   push:
     branches:
       - "*"
-  # schedule:
-  #  - cron: '1 4 * * *'
 
 jobs:
   yamllint:
@@ -105,5 +104,5 @@ jobs:
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           flags: unittests
-          fail_ci_if_error: false # optional (default = false)
-          verbose: true # optional (default = false)
+          fail_ci_if_error: false  # optional (default = false)
+          verbose: true  # optional (default = false)

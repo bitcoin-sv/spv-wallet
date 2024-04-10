@@ -1,3 +1,4 @@
+---
 pull_request_rules:
 
   # ===============================================================================
@@ -95,55 +96,55 @@ pull_request_rules:
 
   - name: Work in Progress
     conditions:
-      - "head~=(?i)^wip" # if the PR branch starts with wip/
+      - "head~=(?i)^wip"  # if the PR branch starts with wip/
     actions:
       label:
         add: ["work-in-progress"]
   - name: Hotfix label
     conditions:
-      - "head~=(?i)^hotfix" # if the PR branch starts with hotfix/
+      - "head~=(?i)^hotfix"  # if the PR branch starts with hotfix/
     actions:
       label:
         add: ["hot-fix"]
   - name: Bug / Fix label
     conditions:
-      - "head~=(?i)^(bug)?fix" # if the PR branch starts with (bug)?fix/
+      - "head~=(?i)^(bug)?fix"  # if the PR branch starts with (bug)?fix/
     actions:
       label:
         add: ["bug-P3"]
   - name: Documentation label
     conditions:
-      - "head~=(?i)^docs" # if the PR branch starts with docs/
+      - "head~=(?i)^docs"  # if the PR branch starts with docs/
     actions:
       label:
         add: ["documentation"]
   - name: Feature label
     conditions:
-      - "head~=(?i)^feat(ure)?" # if the PR branch starts with feat(ure)?/
+      - "head~=(?i)^feat(ure)?"  # if the PR branch starts with feat(ure)?/
     actions:
       label:
         add: ["feature"]
   - name: Chore label
     conditions:
-      - "head~=(?i)^chore" # if the PR branch starts with chore/
+      - "head~=(?i)^chore"  # if the PR branch starts with chore/
     actions:
       label:
         add: ["update"]
   - name: Question label
     conditions:
-      - "head~=(?i)^question" # if the PR branch starts with question/
+      - "head~=(?i)^question"  # if the PR branch starts with question/
     actions:
       label:
         add: ["question"]
   - name: Test label
     conditions:
-      - "head~=(?i)^test" # if the PR branch starts with test/
+      - "head~=(?i)^test"  # if the PR branch starts with test/
     actions:
       label:
         add: ["test"]
   - name: Idea label
     conditions:
-      - "head~=(?i)^idea" # if the PR branch starts with idea/
+      - "head~=(?i)^idea"  # if the PR branch starts with idea/
     actions:
       label:
         add: ["idea"]
@@ -195,25 +196,3 @@ pull_request_rules:
       - merged
     actions:
       delete_head_branch:
-
-  # ===============================================================================
-  # CONVENTION
-  # ===============================================================================
-  # https://www.conventionalcommits.org/en/v1.0.0/
-  # Premium feature only
-
-  #- name: Conventional Commit
-  #  conditions:
-  #    - "title~=^(fix|feat|docs|style|refactor|perf|test|build|ci|chore|revert)(?:\\(.+\\))?:"
-  #  actions:
-  #    post_check:
-  #      title: |
-  #        {% if check_succeed %}
-  #        Title follows Conventional Commit
-  #        {% else %}
-  #        Title does not follow Conventional Commit
-  #        {% endif %}
-  #      summary: |
-  #        {% if not check_succeed %}
-  #        Your pull request title must follow [Conventional Commit](https://www.conventionalcommits.org/en/v1.0.0/).
-  #        {% endif %}

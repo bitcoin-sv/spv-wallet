@@ -1,6 +1,7 @@
+---
 name: "On pull request"
 
-on:
+on:  # yamllint disable-line rule:truthy
   pull_request_target:
     types:
       - labeled
