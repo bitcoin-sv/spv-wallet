@@ -125,7 +125,7 @@ func processDBConditions(xPubID string, conditions map[string]interface{},
 						key: value,
 					},
 				}, {
-					xPubMetadataField: map[string]interface{}{
+					xPubMetadataField: XpubMetadata{
 						xPubID: Metadata{
 							key: value,
 						},
@@ -137,7 +137,7 @@ func processDBConditions(xPubID string, conditions map[string]interface{},
 		dbConditions["$and"] = and
 	}
 
-	if conditions != nil && len(conditions) > 0 {
+	if len(conditions) > 0 {
 		and := make([]map[string]interface{}, 0)
 		if _, ok := dbConditions["$and"]; ok {
 			and = dbConditions["$and"].([]map[string]interface{})
