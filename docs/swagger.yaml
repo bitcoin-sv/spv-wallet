@@ -217,6 +217,22 @@ definitions:
           to. It is required in case if user has multiple paymail addresses
         type: string
     type: object
+  destinations.CountDestinations:
+    properties:
+      conditions:
+        allOf:
+        - $ref: '#/definitions/filter.DestinationFilter'
+        description: Custom conditions used for filtering the search results
+      metadata:
+        additionalProperties:
+          type: string
+        description: Accepts a JSON object for embedding custom metadata, enabling
+          arbitrary additional information to be associated with the resource
+        example:
+          key: value
+          key2: value2
+        type: object
+    type: object
   destinations.CreateDestination:
     properties:
       metadata:
@@ -229,11 +245,11 @@ definitions:
           key2: value2
         type: object
     type: object
-  destinations.SearchRequestDestinationParameters:
+  destinations.SearchDestinations:
     properties:
       conditions:
         allOf:
-        - $ref: '#/definitions/models.DestinationFilters'
+        - $ref: '#/definitions/filter.DestinationFilter'
         description: Custom conditions used for filtering the search results
       metadata:
         additionalProperties:
@@ -282,6 +298,74 @@ definitions:
     type: object
   engine.Metadata:
     additionalProperties: true
+    type: object
+  filter.DestinationFilter:
+    properties:
+      address:
+        example: 1CDUf7CKu8ocTTkhcYUbq75t14Ft168K65
+        type: string
+      created_range:
+        additionalProperties:
+          type: string
+        type: object
+      draft_id:
+        example: b356f7fa00cd3f20cce6c21d704cd13e871d28d714a5ebd0532f5a0e0cde63f7
+        type: string
+      include_deleted:
+        example: true
+        type: boolean
+      locking_script:
+        example: 76a9147b05764a97f3b4b981471492aa703b188e45979b88ac
+        type: string
+      updated_range:
+        additionalProperties:
+          type: string
+        type: object
+    type: object
+  filter.TransactionFilter:
+    properties:
+      block_hash:
+        type: string
+      block_height:
+        type: integer
+      created_range:
+        additionalProperties:
+          type: string
+        type: object
+      direction:
+        example: incoming|outgoing
+        type: string
+      draft_id:
+        type: string
+      fee:
+        type: integer
+      hex:
+        type: string
+      include_deleted:
+        example: true
+        type: boolean
+      number_of_inputs:
+        type: integer
+      number_of_outputs:
+        type: integer
+      output_value:
+        type: integer
+      status:
+        type: string
+      total_value:
+        type: integer
+      updated_range:
+        additionalProperties:
+          type: string
+        type: object
+      xpub_in_ids:
+        items:
+          type: string
+        type: array
+      xpub_out_ids:
+        items:
+          type: string
+        type: array
     type: object
   models.AccessKey:
     properties:
@@ -388,14 +472,27 @@ definitions:
         example: xpub661MyMwAqRbcGpZVrSHU...
         type: string
       status:
+        allOf:
+        - $ref: '#/definitions/models.ContactStatus'
         description: Status is a contact's current status.
         example: unconfirmed
-        type: string
       updated_at:
         description: UpdatedAt is a time when outer model was updated.
         example: "2024-02-26T11:01:28.069911Z"
         type: string
     type: object
+  models.ContactStatus:
+    enum:
+    - unconfirmed
+    - awaiting
+    - confirmed
+    - rejected
+    type: string
+    x-enum-varnames:
+    - ContactNotConfirmed
+    - ContactAwaitAccept
+    - ContactConfirmed
+    - ContactRejected
   models.Destination:
     properties:
       address:
@@ -455,51 +552,6 @@ definitions:
         description: XpubID is a destination's xpub related id used to register destination.
         example: bb8593f85ef8056a77026ad415f02128f3768906de53e9e8bf8749fe2d66cf50
         type: string
-    type: object
-  models.DestinationFilters:
-    properties:
-      address:
-        description: Address is a destination's address.
-        example: 1CDUf7CKu8ocTTkhcYUbq75t14Ft168K65
-        type: string
-      created_range:
-        additionalProperties:
-          type: string
-        description: CreatedRange is a filter for destinations created within a specific
-          time range.
-        example:
-          from: 2024-02-26T11:01:28.069911
-          to: 2025-02-26T11:01:28.069911
-        type: object
-      draft_id:
-        description: DraftID is a destination's draft id.
-        example: b356f7fa00cd3f20cce6c21d704cd13e871d28d714a5ebd0532f5a0e0cde63f7
-        type: string
-      include_deleted:
-        description: IncludeDeleted is a flag which includes deleted destinations.
-        example: true
-        type: boolean
-      locking_script:
-        description: LockingScript is a destination's locking script.
-        example: 76a9147b05764a97f3b4b981471492aa703b188e45979b88ac
-        type: string
-      metadata:
-        additionalProperties:
-          type: string
-        description: Metadata is a metadata map of outer model.
-        example:
-          key: value
-          key2: value2
-        type: object
-      updated_range:
-        additionalProperties:
-          type: string
-        description: UpdatedRange is a filter for destinations updated within a specific
-          time range.
-        example:
-          from: 2024-02-26T11:01:28.069911
-          to: 2025-02-26T11:01:28.069911
-        type: object
     type: object
   models.DraftTransaction:
     properties:
@@ -1118,6 +1170,28 @@ definitions:
     - 1000000000
     - 60000000000
     - 3600000000000
+    - -9223372036854775808
+    - 9223372036854775807
+    - 1
+    - 1000
+    - 1000000
+    - 1000000000
+    - 60000000000
+    - 3600000000000
+    - -9223372036854775808
+    - 9223372036854775807
+    - 1
+    - 1000
+    - 1000000
+    - 1000000000
+    - 60000000000
+    - 3600000000000
+    - 1
+    - 1000
+    - 1000000
+    - 1000000000
+    - 60000000000
+    - 3600000000000
     type: integer
     x-enum-varnames:
     - minDuration
@@ -1128,6 +1202,44 @@ definitions:
     - Second
     - Minute
     - Hour
+    - minDuration
+    - maxDuration
+    - Nanosecond
+    - Microsecond
+    - Millisecond
+    - Second
+    - Minute
+    - Hour
+    - minDuration
+    - maxDuration
+    - Nanosecond
+    - Microsecond
+    - Millisecond
+    - Second
+    - Minute
+    - Hour
+    - Nanosecond
+    - Microsecond
+    - Millisecond
+    - Second
+    - Minute
+    - Hour
+  transactions.CountTransactions:
+    properties:
+      conditions:
+        allOf:
+        - $ref: '#/definitions/filter.TransactionFilter'
+        description: Custom conditions used for filtering the search results
+      metadata:
+        additionalProperties:
+          type: string
+        description: Accepts a JSON object for embedding custom metadata, enabling
+          arbitrary additional information to be associated with the resource
+        example:
+          key: value
+          key2: value2
+        type: object
+    type: object
   transactions.NewTransaction:
     properties:
       config:
@@ -1163,6 +1275,33 @@ definitions:
         description: ReferenceID which is a ID of the draft transaction
         example: b356f7fa00cd3f20cce6c21d704cd13e871d28d714a5ebd0532f5a0e0cde63f7
         type: string
+    type: object
+  transactions.SearchTransactions:
+    properties:
+      conditions:
+        allOf:
+        - $ref: '#/definitions/filter.TransactionFilter'
+        description: Custom conditions used for filtering the search results
+      metadata:
+        additionalProperties:
+          type: string
+        description: Accepts a JSON object for embedding custom metadata, enabling
+          arbitrary additional information to be associated with the resource
+        example:
+          key: value
+          key2: value2
+        type: object
+      params:
+        additionalProperties:
+          type: string
+        description: Pagination and sorting options to streamline data exploration
+          and analysis
+        example:
+          order_by_direction: desc
+          order_by_field: created_at
+          page: "1"
+          page_size: "10"
+        type: object
     type: object
   transactions.UpdateTransaction:
     properties:
@@ -2074,9 +2213,9 @@ paths:
       - description: Enables precise filtering of resource counts using custom conditions
           or metadata, catering to specific business or analysis needs
         in: body
-        name: CountRequestParameters
+        name: CountDestinations
         schema:
-          $ref: '#/definitions/actions.CountRequestParameters'
+          $ref: '#/definitions/destinations.CountDestinations'
       produces:
       - application/json
       responses:
@@ -2085,8 +2224,8 @@ paths:
           schema:
             type: number
         "400":
-          description: Bad request - Error while parsing CountRequestParameters from
-            request body
+          description: Bad request - Error while parsing CountDestinations from request
+            body
         "500":
           description: Internal Server Error - Error while fetching count of destinations
       security:
@@ -2102,9 +2241,9 @@ paths:
           and custom conditions, plus options for pagination and sorting to streamline
           data exploration and analysis
         in: body
-        name: SearchRequestDestinationParameters
+        name: SearchDestinations
         schema:
-          $ref: '#/definitions/destinations.SearchRequestDestinationParameters'
+          $ref: '#/definitions/destinations.SearchDestinations'
       produces:
       - application/json
       responses:
@@ -2115,8 +2254,8 @@ paths:
               $ref: '#/definitions/models.Destination'
             type: array
         "400":
-          description: Bad request - Error while parsing SearchRequestDestinationParameters
-            from request body
+          description: Bad request - Error while parsing SearchDestinations from request
+            body
         "500":
           description: Internal server error - Error while searching for destinations
       security:
@@ -2209,9 +2348,9 @@ paths:
       - description: Enables precise filtering of resource counts using custom conditions
           or metadata, catering to specific business or analysis needs
         in: body
-        name: CountRequestParameters
+        name: CountTransactions
         schema:
-          $ref: '#/definitions/actions.CountRequestParameters'
+          $ref: '#/definitions/transactions.CountTransactions'
       produces:
       - application/json
       responses:
@@ -2220,8 +2359,8 @@ paths:
           schema:
             type: number
         "400":
-          description: Bad request - Error while parsing CountRequestParameters from
-            request body
+          description: Bad request - Error while parsing CountTransactions from request
+            body
         "500":
           description: Internal Server Error - Error while fetching count of transactions
       security:
@@ -2264,9 +2403,9 @@ paths:
           and custom conditions, plus options for pagination and sorting to streamline
           data exploration and analysis
         in: body
-        name: SearchRequestParameters
+        name: SearchTransactions
         schema:
-          $ref: '#/definitions/actions.SearchRequestParameters'
+          $ref: '#/definitions/transactions.SearchTransactions'
       produces:
       - application/json
       responses:
@@ -2277,8 +2416,8 @@ paths:
               $ref: '#/definitions/models.Transaction'
             type: array
         "400":
-          description: Bad request - Error while parsing SearchRequestParameters from
-            request body
+          description: Bad request - Error while parsing SearchTransactions from request
+            body
         "500":
           description: Internal server error - Error while searching for transactions
       security:

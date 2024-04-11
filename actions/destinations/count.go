@@ -13,7 +13,7 @@ import (
 // @Description	Count Destinations
 // @Tags		Destinations
 // @Produce		json
-// @Param		CountDestinations body actions.CountDestinations false "Enables precise filtering of resource counts using custom conditions or metadata, catering to specific business or analysis needs"
+// @Param		CountDestinations body CountDestinations false "Enables precise filtering of resource counts using custom conditions or metadata, catering to specific business or analysis needs"
 // @Success		200	{number} int64 "Count of destinations"
 // @Failure		400	"Bad request - Error while parsing CountDestinations from request body"
 // @Failure 	500	"Internal Server Error - Error while fetching count of destinations"
