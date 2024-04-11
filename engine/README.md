@@ -3,9 +3,9 @@
 # SPV Wallet Engine
 
 [![Release](https://img.shields.io/github/release-pre/bitcoin-sv/spv-wallet/engine.svg?logo=github&style=flat&v=2)](https://github.com/bitcoin-sv/spv-wallet/engine/releases)
-[![Build Status](https://img.shields.io/github/actions/workflow/status/bitcoin-sv/spv-wallet/engine/run-tests.yml?branch=master&v=2)](https://github.com/bitcoin-sv/spv-wallet/engine/actions)
+[![Build Status](https://img.shields.io/github/actions/workflow/status/bitcoin-sv/spv-wallet/engine/run-tests.yml?branch=main&v=2)](https://github.com/bitcoin-sv/spv-wallet/engine/actions)
 [![Report](https://goreportcard.com/badge/github.com/bitcoin-sv/spv-wallet/engine?style=flat&v=2)](https://goreportcard.com/report/github.com/bitcoin-sv/spv-wallet/engine)
-[![codecov](https://codecov.io/gh/bitcoin-sv/spv-wallet/engine/branch/master/graph/badge.svg?v=2)](https://codecov.io/gh/bitcoin-sv/spv-wallet/engine)
+[![codecov](https://codecov.io/gh/bitcoin-sv/spv-wallet/engine/branch/main/graph/badge.svg?v=2)](https://codecov.io/gh/bitcoin-sv/spv-wallet/engine)
 [![Mergify Status](https://img.shields.io/endpoint.svg?url=https://api.mergify.com/v1/badges/bitcoin-sv/spv-wallet/engine&style=flat&v=2)](https://mergify.com)
 <br>
 

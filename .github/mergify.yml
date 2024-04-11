@@ -176,7 +176,7 @@ pull_request_rules:
 
   - name: Close stale pull request
     conditions:
-      - base=master
+      - base=main
       - -closed
       - updated-at<21 days ago
     actions:
