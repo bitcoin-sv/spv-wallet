@@ -1,7 +1,9 @@
 package destinations
 
 import (
+	"github.com/bitcoin-sv/spv-wallet/actions/common"
 	"github.com/bitcoin-sv/spv-wallet/engine"
+	"github.com/bitcoin-sv/spv-wallet/models/filter"
 )
 
 // CreateDestination is the model for creating a destination
@@ -21,3 +23,9 @@ type UpdateDestination struct {
 	// Accepts a JSON object for embedding custom metadata, enabling arbitrary additional information to be associated with the resource
 	Metadata engine.Metadata `json:"metadata" swaggertype:"object,string" example:"key:value,key2:value2"`
 }
+
+// SearchDestinations is a model for handling searching with filters and metadata
+type SearchDestinations = common.SearchModel[filter.DestinationFilter]
+
+// CountDestinations is a model for handling counting filtered destinations
+type CountDestinations = common.ConditionsModel[filter.DestinationFilter]

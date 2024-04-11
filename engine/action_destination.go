@@ -135,7 +135,7 @@ func (c *Client) GetDestinationsByXpubID(ctx context.Context, xPubID string, met
 
 // GetDestinationsByXpubIDCount will get a count of all destinations based on an xPub
 func (c *Client) GetDestinationsByXpubIDCount(ctx context.Context, xPubID string, metadataConditions *Metadata,
-	conditions *map[string]interface{},
+	conditions map[string]interface{},
 ) (int64, error) {
 	// Check for existing NewRelic transaction
 	ctx = c.GetOrStartTxn(ctx, "get_destinations")
