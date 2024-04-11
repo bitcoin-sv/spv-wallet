@@ -4,7 +4,7 @@ version: 2
 updates:
   # Maintain dependencies for the core library
   - package-ecosystem: "gomod"
-    target-branch: "master"
+    target-branch: "main"
     directory: "/"
     schedule:
       interval: "weekly"
@@ -14,7 +14,7 @@ updates:
     open-pull-requests-limit: 10
 
   - package-ecosystem: "gomod"
-    target-branch: "master"
+    target-branch: "main"
     directory: "/engine"
     schedule:
       interval: "weekly"
@@ -24,7 +24,7 @@ updates:
     open-pull-requests-limit: 10
 
   - package-ecosystem: "gomod"
-    target-branch: "master"
+    target-branch: "main"
     directory: "/models"
     schedule:
       interval: "weekly"
@@ -35,7 +35,7 @@ updates:
 
   # Maintain dependencies for GitHub Actions
   - package-ecosystem: "github-actions"
-    target-branch: "master"
+    target-branch: "main"
     directory: "/"
     schedule:
       interval: "weekly"
@@ -46,7 +46,7 @@ updates:
 
   # Maintain dependencies for Docker
   - package-ecosystem: "docker"
-    target-branch: "master"
+    target-branch: "main"
     directory: "/"
     schedule:
       interval: "weekly"
@@ -57,7 +57,7 @@ updates:
 
   # Maintain dependencies for Docker
   - package-ecosystem: "docker"
-    target-branch: "master"
+    target-branch: "main"
     directory: "/release"
     schedule:
       interval: "weekly"
