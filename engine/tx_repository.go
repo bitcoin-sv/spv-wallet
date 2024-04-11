@@ -91,7 +91,7 @@ func processDBConditions(xPubID string, conditions map[string]interface{},
 	}
 
 	// check for direction query
-	if conditions != nil && conditions["direction"] != nil {
+	if len(conditions) > 0 && conditions["direction"] != nil {
 		direction := conditions["direction"].(string)
 		if direction == string(TransactionDirectionIn) {
 			dbConditions["xpub_output_value"] = map[string]interface{}{

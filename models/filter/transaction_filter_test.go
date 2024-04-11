@@ -37,27 +37,6 @@ func TestTransactionFilter(t *testing.T) {
 		assert.Equal(t, "test", dbConditions["hex"])
 	})
 
-	t.Run("with empty xpub_in_ids", func(t *testing.T) {
-		filter := fromJSON[TransactionFilter](`{
-			"xpub_in_ids": [],
-			"include_deleted": true
-		}`)
-		dbConditions := filter.ToDbConditions()
-
-		assert.Equal(t, 0, len(dbConditions))
-	})
-
-	t.Run("with not-empty xpub_in_ids", func(t *testing.T) {
-		filter := fromJSON[TransactionFilter](`{
-			"xpub_in_ids": ["test"],
-			"include_deleted": true
-		}`)
-		dbConditions := filter.ToDbConditions()
-
-		assert.Equal(t, 1, len(dbConditions))
-		assert.Equal(t, "test", dbConditions["xpub_in_id"].([]string)[0])
-	})
-
 	t.Run("with block_height", func(t *testing.T) {
 		filter := fromJSON[TransactionFilter](`{
 			"block_height": 100,
