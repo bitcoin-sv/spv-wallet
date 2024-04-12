@@ -35,10 +35,10 @@ func (m *RequestMetrics) Track(method, path string) *RequestTracker {
 
 // RequestTracker is used to track the duration and status of a request
 type RequestTracker struct {
+	metrics   *RequestMetrics
+	startTime time.Time
 	method    string
 	path      string
-	startTime time.Time
-	metrics   *RequestMetrics
 }
 
 // Start will start the tracking of the request

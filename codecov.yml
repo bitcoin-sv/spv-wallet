@@ -27,10 +27,10 @@ ignore:
 parsers:
   gcov:
     branch_detection:
-      conditional: yes
-      loop: yes
-      method: no
-      macro: no
+      conditional: yes  # yamllint disable-line rule:truthy
+      loop: yes  # yamllint disable-line rule:truthy
+      method: no  # yamllint disable-line rule:truthy
+      macro: no  # yamllint disable-line rule:truthy
 
 # Pull request comments:
 # ----------------------
