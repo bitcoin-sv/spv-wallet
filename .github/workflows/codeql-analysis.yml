@@ -15,8 +15,6 @@ on:
     branches:
       - master
       - main
-  # schedule:
-  #  - cron: '0 23 * * 0'
 
 jobs:
   analyze:
