@@ -15,6 +15,7 @@
 [![standard-readme compliant](https://img.shields.io/badge/readme%20style-standard-brightgreen.svg?style=flat&v=3)](https://github.com/RichardLitt/standard-readme)
 [![Makefile Included](https://img.shields.io/badge/Makefile-Supported%20-brightgreen?=flat&logo=probot&v=3)](Makefile)
 <br/>
+
 </div>
 
 ## Table of Contents
@@ -46,6 +47,8 @@
 ## About
 
 A comprehensive non-custodial wallet for BSV digital currency.
+
+More in-depth information and guidance about SPV Wallet Toolbox you can find [here](https://bsvblockchain.gitbook.io/docs).
 
 <br/>
 
