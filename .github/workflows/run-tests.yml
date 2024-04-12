@@ -1,11 +1,10 @@
----
 # See more at: https://docs.github.com/en/actions/learn-github-actions/workflow-syntax-for-github-actions
 name: run-go-tests
 
 env:
-  GO111MODULE: "on"
+  GO111MODULE: on
 
-on:  # yamllint disable-line rule:truthy
+on:
   pull_request:
     branches:
       - "*"

@@ -1,13 +1,12 @@
----
 name: Release
 permissions:
   contents: write
   packages: write
 
 env:
-  GO111MODULE: on  # yamllint disable-line rule:truthy
+  GO111MODULE: on
 
-on:  # yamllint disable-line rule:truthy
+on:
   push:
     tags:
       - 'v*'
