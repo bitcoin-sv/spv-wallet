@@ -2333,10 +2333,6 @@ const docTemplate = `{
                         "type": "string"
                     }
                 },
-                "direction": {
-                    "type": "string",
-                    "example": "incoming|outgoing"
-                },
                 "draft_id": {
                     "type": "string"
                 },
@@ -2356,11 +2352,23 @@ const docTemplate = `{
                 "number_of_outputs": {
                     "type": "integer"
                 },
-                "output_value": {
-                    "type": "integer"
-                },
                 "status": {
-                    "type": "string"
+                    "type": "string",
+                    "enum": [
+                        "UNKNOWN",
+                        "QUEUED",
+                        "RECEIVED",
+                        "STORED",
+                        "ANNOUNCED_TO_NETWORK",
+                        "REQUESTED_BY_NETWORK",
+                        "SENT_TO_NETWORK",
+                        "ACCEPTED_BY_NETWORK",
+                        "SEEN_ON_NETWORK",
+                        "MINED",
+                        "SEEN_IN_ORPHAN_MEMPOOL",
+                        "CONFIRMED",
+                        "REJECTED"
+                    ]
                 },
                 "total_value": {
                     "type": "integer"
@@ -2368,18 +2376,6 @@ const docTemplate = `{
                 "updated_range": {
                     "type": "object",
                     "additionalProperties": {
-                        "type": "string"
-                    }
-                },
-                "xpub_in_ids": {
-                    "type": "array",
-                    "items": {
-                        "type": "string"
-                    }
-                },
-                "xpub_out_ids": {
-                    "type": "array",
-                    "items": {
                         "type": "string"
                     }
                 }
@@ -3462,14 +3458,6 @@ const docTemplate = `{
                 1000000000,
                 60000000000,
                 3600000000000,
-                -9223372036854775808,
-                9223372036854775807,
-                1,
-                1000,
-                1000000,
-                1000000000,
-                60000000000,
-                3600000000000,
                 1,
                 1000,
                 1000000,
@@ -3478,14 +3466,6 @@ const docTemplate = `{
                 3600000000000
             ],
             "x-enum-varnames": [
-                "minDuration",
-                "maxDuration",
-                "Nanosecond",
-                "Microsecond",
-                "Millisecond",
-                "Second",
-                "Minute",
-                "Hour",
                 "minDuration",
                 "maxDuration",
                 "Nanosecond",
@@ -3625,7 +3605,7 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "id": {
-                    "description": "Id of the transaction which is a hash of the transaction",
+                    "description": "ID of the transaction which is a hash of the transaction",
                     "type": "string",
                     "example": "01d0d0067652f684c6acb3683763f353fce55f6496521c7d99e71e1d27e53f5c"
                 },
