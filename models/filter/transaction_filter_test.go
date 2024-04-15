@@ -11,7 +11,7 @@ func TestTransactionFilter(t *testing.T) {
 
 	t.Run("default filter", func(t *testing.T) {
 		filter := TransactionFilter{}
-		dbConditions, _ := filter.ToDbConditions()
+		dbConditions := filter.ToDbConditions()
 
 		assert.Equal(t, 1, len(dbConditions))
 		assert.Nil(t, dbConditions["deleted_at"])
@@ -21,7 +21,7 @@ func TestTransactionFilter(t *testing.T) {
 		filter := fromJSON[TransactionFilter](`{
 			"include_deleted": true
 		}`)
-		dbConditions, _ := filter.ToDbConditions()
+		dbConditions := filter.ToDbConditions()
 
 		assert.Equal(t, 0, len(dbConditions))
 	})
@@ -31,7 +31,7 @@ func TestTransactionFilter(t *testing.T) {
 			"hex": "test",
 			"include_deleted": true
 		}`)
-		dbConditions, _ := filter.ToDbConditions()
+		dbConditions := filter.ToDbConditions()
 
 		assert.Equal(t, 1, len(dbConditions))
 		assert.Equal(t, "test", dbConditions["hex"])
@@ -42,30 +42,9 @@ func TestTransactionFilter(t *testing.T) {
 			"block_height": 100,
 			"include_deleted": true
 		}`)
-		dbConditions, _ := filter.ToDbConditions()
+		dbConditions := filter.ToDbConditions()
 
 		assert.Equal(t, 1, len(dbConditions))
 		assert.Equal(t, uint64(100), dbConditions["block_height"])
-	})
-
-	t.Run("with correct direction", func(t *testing.T) {
-		filter := fromJSON[TransactionFilter](`{
-			"direction": "incoming",
-			"include_deleted": true
-		}`)
-		dbConditions, _ := filter.ToDbConditions()
-
-		assert.Equal(t, 1, len(dbConditions))
-		assert.Equal(t, "incoming", dbConditions["direction"])
-	})
-
-	t.Run("with wrong direction", func(t *testing.T) {
-		filter := fromJSON[TransactionFilter](`{
-			"direction": "wrong_direction",
-			"include_deleted": true
-		}`)
-		_, err := filter.ToDbConditions()
-
-		assert.Error(t, err)
 	})
 }

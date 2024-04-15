@@ -90,29 +90,6 @@ func processDBConditions(xPubID string, conditions map[string]interface{},
 		}},
 	}
 
-	// check for direction query
-	if len(conditions) > 0 && conditions["direction"] != nil {
-		direction := conditions["direction"].(string)
-		if direction == string(TransactionDirectionIn) {
-			dbConditions["xpub_output_value"] = map[string]interface{}{
-				xPubID: map[string]interface{}{
-					"$gt": 0,
-				},
-			}
-		} else if direction == string(TransactionDirectionOut) {
-			dbConditions["xpub_output_value"] = map[string]interface{}{
-				xPubID: map[string]interface{}{
-					"$lt": 0,
-				},
-			}
-		} else if direction == string(TransactionDirectionReconcile) {
-			dbConditions["xpub_output_value"] = map[string]interface{}{
-				xPubID: 0,
-			}
-		}
-		delete(conditions, "direction")
-	}
-
 	if metadata != nil && len(*metadata) > 0 {
 		and := make([]map[string]interface{}, 0)
 		if _, ok := dbConditions["$and"]; ok {
