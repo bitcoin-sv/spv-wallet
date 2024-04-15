@@ -11,12 +11,12 @@ type TransactionFilter struct {
 	NumberOfOutputs      *uint32 `json:"number_of_outputs,omitempty"`
 	DraftID              *string `json:"draft_id,omitempty"`
 	TotalValue           *uint64 `json:"total_value,omitempty"`
-	Status               *string `json:"status,omitempty"`
-	TransactionDirection *string `json:"direction,omitempty" example:"incoming|outgoing"`
+	Status               *string `json:"status,omitempty" enums:"UNKNOWN,QUEUED,RECEIVED,STORED,ANNOUNCED_TO_NETWORK,REQUESTED_BY_NETWORK,SENT_TO_NETWORK,ACCEPTED_BY_NETWORK,SEEN_ON_NETWORK,MINED,SEEN_IN_ORPHAN_MEMPOOL,CONFIRMED,REJECTED"`
+	TransactionDirection *string `json:"direction,omitempty" enums:"incoming,outgoing,reconcile"`
 }
 
 // ToDbConditions converts filter fields to the datastore conditions using gorm naming strategy
-func (d *TransactionFilter) ToDbConditions() map[string]interface{} {
+func (d *TransactionFilter) ToDbConditions() (map[string]interface{}, error) {
 	conditions := d.ModelFilter.ToDbConditions()
 
 	// Column names come from the database model, see: /engine/model_transactions.go
@@ -28,15 +28,15 @@ func (d *TransactionFilter) ToDbConditions() map[string]interface{} {
 	applyIfNotNil(conditions, "number_of_outputs", d.NumberOfOutputs)
 	applyIfNotNil(conditions, "draft_id", d.DraftID)
 	applyIfNotNil(conditions, "total_value", d.TotalValue)
-
-	// TODO: Should we check if the status string is valid?
-	// TODO: where is the list of valid status strings?
-	// TODO: for now, it works only for uppercase status strings
-	applyIfNotNil(conditions, "tx_status", d.Status) // be aware that the name of db the dbcolumn is tx_status not status
+	applyIfNotNil(conditions, "tx_status", d.Status) // be aware that the name of db the dbcolumn is "tx_status" not "status"
 
 	// NOTE that the "direction" is not a column in the database
 	// this field is transformed into final form in the processDBConditions function /engine/tx_repository.go
-	applyIfNotNil(conditions, "direction", d.TransactionDirection)
+	direction, err := strOption(d.TransactionDirection, "incoming", "outgoing", "reconcile")
+	if err != nil {
+		return nil, err
+	}
+	applyIfNotNil(conditions, "direction", direction)
 
-	return conditions
+	return conditions, nil
 }

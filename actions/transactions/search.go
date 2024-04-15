@@ -30,12 +30,18 @@ func (a *Action) search(c *gin.Context) {
 		return
 	}
 
+	dbConditions, err := reqParams.Conditions.ToDbConditions()
+	if err != nil {
+		c.JSON(http.StatusBadRequest, err.Error())
+		return
+	}
+
 	// Record a new transaction (get the hex from parameters)a
 	transactions, err := a.Services.SpvWalletEngine.GetTransactionsByXpubID(
 		c.Request.Context(),
 		reqXPubID,
 		reqParams.Metadata,
-		reqParams.Conditions.ToDbConditions(),
+		dbConditions,
 		reqParams.QueryParams,
 	)
 	if err != nil {
