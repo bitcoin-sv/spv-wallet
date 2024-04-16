@@ -1,7 +1,6 @@
 package filter
 
 import (
-	"encoding/json"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -19,7 +18,7 @@ func TestDestinationFilter(t *testing.T) {
 	})
 
 	t.Run("empty filter with include deleted", func(t *testing.T) {
-		filter := fromJSON(`{
+		filter := fromJSON[DestinationFilter](`{
 			"include_deleted": true
 		}`)
 		dbConditions := filter.ToDbConditions()
@@ -28,7 +27,7 @@ func TestDestinationFilter(t *testing.T) {
 	})
 
 	t.Run("with full CreatedRange", func(t *testing.T) {
-		filter := fromJSON(`{
+		filter := fromJSON[DestinationFilter](`{
 			"created_range": {
 				"from": "2024-02-26T11:01:28Z",
 				"to": "2024-02-25T11:01:28Z"
@@ -43,7 +42,7 @@ func TestDestinationFilter(t *testing.T) {
 	})
 
 	t.Run("with empty CreatedRange", func(t *testing.T) {
-		filter := fromJSON(`{
+		filter := fromJSON[DestinationFilter](`{
 			"locking_script": "test",
 			"address": "test",
 			"draft_id": "test",
@@ -56,10 +55,4 @@ func TestDestinationFilter(t *testing.T) {
 		assert.NotNil(t, dbConditions["address"])
 		assert.NotNil(t, dbConditions["draft_id"])
 	})
-}
-
-func fromJSON(raw string) DestinationFilter {
-	var filter DestinationFilter
-	json.Unmarshal([]byte(raw), &filter)
-	return filter
 }

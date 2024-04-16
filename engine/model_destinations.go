@@ -197,11 +197,11 @@ func getDestinationsByXpubID(ctx context.Context, xPubID string, usingMetadata *
 
 // getDestinationsCountByXPubID will get a count of the destination(s) by the given xPubID
 func getDestinationsCountByXPubID(ctx context.Context, xPubID string, usingMetadata *Metadata,
-	conditions *map[string]interface{}, opts ...ModelOps,
+	conditions map[string]interface{}, opts ...ModelOps,
 ) (int64, error) {
 	dbConditions := map[string]interface{}{}
 	if conditions != nil {
-		dbConditions = *conditions
+		dbConditions = conditions
 	}
 	dbConditions[xPubIDField] = xPubID
 
