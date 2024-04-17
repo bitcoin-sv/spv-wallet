@@ -91,7 +91,17 @@ linters-settings:
       - fieldalignment
   tagalign:
     align: false
-    sort: false
+    sort: true
+    order:
+      - json
+      - yaml
+      - yml
+      - toml
+      - mapstructure
+      - binding
+      - validate
+      - swaggertype
+      - example
 
 issues:
   # List of regexps of issue texts to exclude, empty list by default.
