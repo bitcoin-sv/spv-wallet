@@ -182,7 +182,7 @@ func (c *Client) GetTransactionsCount(ctx context.Context, metadataConditions *M
 // metadataConditions is added to the request for searching
 // conditions is added the request for searching
 func (c *Client) GetTransactionsByXpubID(ctx context.Context, xPubID string, metadataConditions *Metadata,
-	conditions *map[string]interface{}, queryParams *datastore.QueryParams,
+	conditions map[string]interface{}, queryParams *datastore.QueryParams,
 ) ([]*Transaction, error) {
 	// Check for existing NewRelic transaction
 	ctx = c.GetOrStartTxn(ctx, "get_transaction")
@@ -202,7 +202,7 @@ func (c *Client) GetTransactionsByXpubID(ctx context.Context, xPubID string, met
 
 // GetTransactionsByXpubIDCount will get the count of all transactions matching the search criteria
 func (c *Client) GetTransactionsByXpubIDCount(ctx context.Context, xPubID string, metadataConditions *Metadata,
-	conditions *map[string]interface{},
+	conditions map[string]interface{},
 ) (int64, error) {
 	// Check for existing NewRelic transaction
 	ctx = c.GetOrStartTxn(ctx, "count_transactions")
