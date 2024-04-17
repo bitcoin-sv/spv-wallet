@@ -2,6 +2,7 @@ package config
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"os"
 	"strings"
@@ -69,6 +70,7 @@ func setDefaults() error {
 
 	defaultsMap := make(map[string]interface{})
 	if err := mapstructure.Decode(getDefaultAppConfig(), &defaultsMap); err != nil {
+		err = errors.New("error occurred while setting defaults: " + err.Error())
 		return err
 	}
 

@@ -1,6 +1,7 @@
 package logging
 
 import (
+	"errors"
 	"io"
 	"os"
 	"time"
@@ -28,6 +29,7 @@ func CreateLogger(instanceName, format, level string, logOrigin bool) (*zerolog.
 
 	parsedLevel, err := zerolog.ParseLevel(level)
 	if err != nil {
+		err = errors.New("failed to parse log level: " + err.Error())
 		return nil, err
 	}
 

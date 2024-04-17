@@ -81,6 +81,7 @@ linters:
     - staticcheck
     - unused
     - tagalign
+    - wrapcheck
     - errorlint
     - wastedassign
 

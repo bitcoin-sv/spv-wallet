@@ -1,6 +1,7 @@
 package config
 
 import (
+	"errors"
 	"fmt"
 	"os"
 
@@ -32,6 +33,7 @@ func loadFlags() error {
 
 	err = viper.BindPFlag(ConfigFilePathKey, appFlags.Lookup(ConfigFilePathKey))
 	if err != nil {
+		err = errors.New("error while binding flags to viper" + err.Error())
 		return err
 	}
 
