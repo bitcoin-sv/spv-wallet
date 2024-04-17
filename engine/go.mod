@@ -27,7 +27,7 @@ require (
 	github.com/rafaeljusto/redigomock v2.4.0+incompatible
 	github.com/robfig/cron/v3 v3.0.1
 	github.com/rs/zerolog v1.32.0
-	github.com/stretchr/testify v1.8.4
+	github.com/stretchr/testify v1.9.0
 	github.com/tonicpow/go-minercraft/v2 v2.0.8
 	github.com/tryvium-travels/memongo v0.11.0
 	github.com/vmihailenco/taskq/v3 v3.2.9
@@ -117,7 +117,7 @@ require (
 	github.com/sosodev/duration v1.2.0 // indirect
 	github.com/spaolacci/murmur3 v1.1.0 // indirect
 	github.com/spf13/afero v1.11.0 // indirect
-	github.com/stretchr/objx v0.5.1 // indirect
+	github.com/stretchr/objx v0.5.2 // indirect
 	github.com/tetratelabs/wazero v1.5.0 // indirect
 	github.com/tidwall/gjson v1.17.0 // indirect
 	github.com/tidwall/match v1.1.1 // indirect
