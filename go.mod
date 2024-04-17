@@ -85,7 +85,7 @@ require (
 	github.com/klauspost/compress v1.17.6 // indirect
 	github.com/klauspost/cpuid/v2 v2.2.6 // indirect
 	github.com/leodido/go-urn v1.4.0 // indirect
-	github.com/libsv/go-bc v0.1.26 // indirect
+	github.com/libsv/go-bc v0.1.28 // indirect
 	github.com/libsv/go-bk v0.1.6 // indirect
 	github.com/libsv/go-bt v1.0.8 // indirect
 	github.com/libsv/go-bt/v2 v2.2.5
