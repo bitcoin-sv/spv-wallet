@@ -153,7 +153,7 @@ require (
 	gorm.io/driver/mysql v1.5.4 // indirect
 	gorm.io/driver/postgres v1.5.6 // indirect
 	gorm.io/driver/sqlite v1.5.5 // indirect
-	gorm.io/gorm v1.25.7 // indirect
+	gorm.io/gorm v1.25.9 // indirect
 	gorm.io/plugin/dbresolver v1.5.0 // indirect
 )
 
