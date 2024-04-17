@@ -3,10 +3,10 @@ package accesskeys
 import (
 	"net/http"
 
-	"github.com/BuxOrg/bux"
-	"github.com/BuxOrg/bux-server/mappings"
-	"github.com/julienschmidt/httprouter"
-	apirouter "github.com/mrz1836/go-api-router"
+	"github.com/bitcoin-sv/spv-wallet/engine"
+	"github.com/bitcoin-sv/spv-wallet/mappings"
+	"github.com/bitcoin-sv/spv-wallet/server/auth"
+	"github.com/gin-gonic/gin"
 )
 
 // revoke will revoke the intended model by id
@@ -15,35 +15,31 @@ import (
 // @Description	Revoke access key
 // @Tags		Access-key
 // @Produce		json
-// @Param		id query string true "id"
-// @Success		201
+// @Param		id query string true "id of the access key"
+// @Success		200	{object} models.AccessKey "Revoked AccessKey"
+// @Failure		400	"Bad request - Missing required field: id"
+// @Failure 	500	"Internal server error - Error while revoking access key"
 // @Router		/v1/access-key [delete]
-// @Security	bux-auth-xpub
-func (a *Action) revoke(w http.ResponseWriter, req *http.Request, _ httprouter.Params) {
-	reqXPub, _ := bux.GetXpubFromRequest(req)
+// @Security	x-auth-xpub
+func (a *Action) revoke(c *gin.Context) {
+	reqXPub := c.GetString(auth.ParamXPubKey)
 
-	// Parse the params
-	params := apirouter.GetParams(req)
-	id := params.GetString("id")
-
+	id := c.Query("id")
 	if id == "" {
-		apirouter.ReturnResponse(w, req, http.StatusExpectationFailed, bux.ErrMissingFieldID)
+		c.JSON(http.StatusBadRequest, engine.ErrMissingFieldID)
 		return
 	}
 
-	// Create a new accessKey
-	accessKey, err := a.Services.Bux.RevokeAccessKey(
-		req.Context(),
+	accessKey, err := a.Services.SpvWalletEngine.RevokeAccessKey(
+		c.Request.Context(),
 		reqXPub,
 		id,
 	)
 	if err != nil {
-		apirouter.ReturnResponse(w, req, http.StatusUnprocessableEntity, err.Error())
+		c.JSON(http.StatusInternalServerError, err.Error())
 		return
 	}
 
 	contract := mappings.MapToAccessKeyContract(accessKey)
-
-	// Return response
-	apirouter.ReturnResponse(w, req, http.StatusCreated, contract)
+	c.JSON(http.StatusCreated, contract)
 }

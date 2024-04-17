@@ -3,11 +3,10 @@ package xpubs
 import (
 	"net/http"
 
-	"github.com/BuxOrg/bux"
-	"github.com/BuxOrg/bux-server/actions"
-	"github.com/BuxOrg/bux-server/mappings"
-	"github.com/julienschmidt/httprouter"
-	apirouter "github.com/mrz1836/go-api-router"
+	"github.com/bitcoin-sv/spv-wallet/engine"
+	"github.com/bitcoin-sv/spv-wallet/mappings"
+	"github.com/bitcoin-sv/spv-wallet/server/auth"
+	"github.com/gin-gonic/gin"
 )
 
 // update will update an existing model
@@ -16,36 +15,38 @@ import (
 // @Description	Update xPub
 // @Tags		xPub
 // @Produce		json
-// @Param		metadata query string false "metadata"
-// @Success		200
+// @Param		Metadata body engine.Metadata false " "
+// @Success		200 {object} models.Xpub "Updated xPub"
+// @Failure		400	"Bad request - Error while parsing Metadata from request body"
+// @Failure 	500	"Internal Server Error - Error while updating xPub"
 // @Router		/v1/xpub [patch]
+// @Security	x-auth-xpub
 // @Security	bux-auth-xpub
-func (a *Action) update(w http.ResponseWriter, req *http.Request, _ httprouter.Params) {
-	reqXPub, _ := bux.GetXpubFromRequest(req)
-	reqXPubID, _ := bux.GetXpubIDFromRequest(req)
+func (a *Action) update(c *gin.Context) {
+	reqXPub := c.GetString(auth.ParamXPubKey)
+	reqXPubID := c.GetString(auth.ParamXPubHashKey)
 
-	// Parse the params
-	params := apirouter.GetParams(req)
-	metadata := params.GetJSON(actions.MetadataField)
-
-	// Get an xPub
-	var xPub *bux.Xpub
-	var err error
-	xPub, err = a.Services.Bux.UpdateXpubMetadata(
-		req.Context(), reqXPubID, metadata,
-	)
-	if err != nil {
-		apirouter.ReturnResponse(w, req, http.StatusExpectationFailed, err.Error())
+	var requestBody engine.Metadata
+	if err := c.Bind(&requestBody); err != nil {
+		c.JSON(http.StatusBadRequest, err.Error())
 		return
 	}
 
-	signed := req.Context().Value("auth_signed")
-	if signed == nil || !signed.(bool) || reqXPub == "" {
+	// Get an xPub
+	var xPub *engine.Xpub
+	var err error
+	xPub, err = a.Services.SpvWalletEngine.UpdateXpubMetadata(
+		c.Request.Context(), reqXPubID, requestBody,
+	)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, err.Error())
+	}
+
+	signed := c.GetBool("auth_signed")
+	if !signed || reqXPub == "" {
 		xPub.RemovePrivateData()
 	}
 
 	contract := mappings.MapToXpubContract(xPub)
-
-	// Return response
-	apirouter.ReturnResponse(w, req, http.StatusOK, contract)
+	c.JSON(http.StatusOK, contract)
 }

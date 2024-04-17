@@ -1,31 +1,36 @@
-// Package server is for all the BUX server settings and HTTP server
+// Package server is for all the SPV Wallet settings and HTTP server
 package server
 
 import (
 	"context"
 	"crypto/tls"
+	"errors"
 	"net/http"
 	"strconv"
 
-	accessKeys "github.com/BuxOrg/bux-server/actions/access_keys"
-	"github.com/BuxOrg/bux-server/actions/admin"
-	"github.com/BuxOrg/bux-server/actions/base"
-	"github.com/BuxOrg/bux-server/actions/destinations"
-	pmail "github.com/BuxOrg/bux-server/actions/paymail"
-	"github.com/BuxOrg/bux-server/actions/transactions"
-	"github.com/BuxOrg/bux-server/actions/utxos"
-	"github.com/BuxOrg/bux-server/actions/xpubs"
-	"github.com/BuxOrg/bux-server/config"
-	"github.com/BuxOrg/bux-server/metrics"
-	apirouter "github.com/mrz1836/go-api-router"
-	"github.com/newrelic/go-agent/v3/integrations/nrhttprouter"
-	httpSwagger "github.com/swaggo/http-swagger"
+	"github.com/bitcoin-sv/spv-wallet/actions"
+	accesskeys "github.com/bitcoin-sv/spv-wallet/actions/access_keys"
+	"github.com/bitcoin-sv/spv-wallet/actions/admin"
+	"github.com/bitcoin-sv/spv-wallet/actions/base"
+	"github.com/bitcoin-sv/spv-wallet/actions/contacts"
+	"github.com/bitcoin-sv/spv-wallet/actions/destinations"
+	"github.com/bitcoin-sv/spv-wallet/actions/transactions"
+	"github.com/bitcoin-sv/spv-wallet/actions/utxos"
+	"github.com/bitcoin-sv/spv-wallet/actions/xpubs"
+	"github.com/bitcoin-sv/spv-wallet/config"
+	"github.com/bitcoin-sv/spv-wallet/logging"
+	"github.com/bitcoin-sv/spv-wallet/metrics"
+	"github.com/bitcoin-sv/spv-wallet/server/auth"
+	router "github.com/bitcoin-sv/spv-wallet/server/routes"
+	"github.com/gin-contrib/pprof"
+	"github.com/gin-gonic/gin"
+	"github.com/rs/zerolog"
 )
 
 // Server is the configuration, services, and actual web server
 type Server struct {
 	AppConfig *config.AppConfig
-	Router    *apirouter.Router
+	Router    *gin.Engine
 	Services  *config.AppServices
 	WebServer *http.Server
 }
@@ -80,43 +85,108 @@ func (s *Server) Shutdown(ctx context.Context) error {
 }
 
 // Handlers will return handlers
-func (s *Server) Handlers() *nrhttprouter.Router {
+func (s *Server) Handlers() *gin.Engine {
 	// Start a transaction for loading handlers
 	txn := s.Services.NewRelic.StartTransaction("load_handlers")
 	defer txn.End()
 
-	// Create a new router
 	segment := txn.StartSegment("create_router")
-	s.Router = apirouter.NewWithNewRelic(s.Services.NewRelic)
-	s.Router.HTTPRouter.Handler(http.MethodGet, "/swagger", http.RedirectHandler("/swagger/index.html", http.StatusMovedPermanently))
-	s.Router.HTTPRouter.Handler(http.MethodGet, "/swagger/*any", httpSwagger.WrapHandler)
-	if metrics, enabled := metrics.Get(); enabled {
-		s.Router.HTTPRouter.Handler(http.MethodGet, "/metrics", metrics.HTTPHandler())
-	}
-	segment.End()
 
-	// Turned on all CORs - should be able to access in a browser
-	s.Router.CrossOriginEnabled = true
-	s.Router.CrossOriginAllowCredentials = true
-	s.Router.CrossOriginAllowOrigin = "*"
-	s.Router.CrossOriginAllowMethods = "POST,GET,OPTIONS,DELETE"
-	s.Router.CrossOriginAllowHeaders = "*"
+	httpLogger := s.Services.Logger.With().Str("service", "http-server").Logger()
+	if httpLogger.GetLevel() > zerolog.DebugLevel {
+		gin.SetMode(gin.ReleaseMode)
+	}
+	logging.SetGinWriters(&httpLogger)
+	engine := gin.New()
+	engine.Use(logging.GinMiddleware(&httpLogger), gin.Recovery())
+	engine.Use(auth.CorsMiddleware())
+
+	metrics.SetupGin(engine)
+
+	s.Router = engine
+
+	segment.End()
 
 	// Start the segment
 	defer txn.StartSegment("register_handlers").End()
 
-	// Register all handlers (actions / routes)
-	base.RegisterRoutes(s.Router, s.AppConfig, s.Services)
-	admin.RegisterRoutes(s.Router, s.AppConfig, s.Services)
-	accessKeys.RegisterRoutes(s.Router, s.AppConfig, s.Services)
-	destinations.RegisterRoutes(s.Router, s.AppConfig, s.Services)
-	transactions.RegisterRoutes(s.Router, s.AppConfig, s.Services)
-	utxos.RegisterRoutes(s.Router, s.AppConfig, s.Services)
-	xpubs.RegisterRoutes(s.Router, s.AppConfig, s.Services)
+	SetupServerRoutes(s.AppConfig, s.Services, s.Router)
 
-	// Load Paymail
-	pmail.RegisterRoutes(s.Router, s.AppConfig, s.Services)
+	return s.Router
+}
 
-	// Return the router
-	return s.Router.HTTPRouter
+// SetupServerRoutes will register endpoints for all models
+func SetupServerRoutes(appConfig *config.AppConfig, services *config.AppServices, engine *gin.Engine) {
+	adminRoutes := admin.NewHandler(appConfig, services)
+	baseRoutes := base.NewHandler()
+
+	accessKeyAPIRoutes := accesskeys.NewHandler(appConfig, services)
+	destinationBasicRoutes, destinationAPIRoutes := destinations.NewHandler(appConfig, services)
+	transactionBasicRoutes, transactionAPIRoutes, transactionCallbackRoutes := transactions.NewHandler(appConfig, services)
+	utxoAPIRoutes := utxos.NewHandler(appConfig, services)
+	xPubAPIRoutes := xpubs.NewHandler(appConfig, services)
+
+	routes := []interface{}{
+		// Admin routes
+		adminRoutes,
+		// Base routes
+		baseRoutes,
+		// Access key routes
+		accessKeyAPIRoutes,
+		// Destination routes
+		destinationBasicRoutes,
+		destinationAPIRoutes,
+		// Transaction routes
+		transactionBasicRoutes,
+		transactionAPIRoutes,
+		transactionCallbackRoutes,
+		// Utxo routes
+		utxoAPIRoutes,
+		// xPub routes
+		xPubAPIRoutes,
+	}
+
+	if appConfig.ExperimentalFeatures.PikeEnabled {
+		routes = append(routes, contacts.NewHandler(appConfig, services))
+	}
+
+	prefix := "/" + config.APIVersion
+	baseRouter := engine.Group("")
+	authRouter := engine.Group("", auth.BasicMiddleware(services.SpvWalletEngine, appConfig))
+	basicAuthRouter := authRouter.Group(prefix, auth.SignatureMiddleware(appConfig, false, false))
+	apiAuthRouter := authRouter.Group(prefix, auth.SignatureMiddleware(appConfig, true, false))
+	adminAuthRouter := authRouter.Group(prefix, auth.SignatureMiddleware(appConfig, true, true), auth.AdminMiddleware())
+	callbackAuthRouter := baseRouter.Group("", auth.CallbackTokenMiddleware(appConfig))
+
+	for _, r := range routes {
+		switch r := r.(type) {
+		case router.AdminEndpoints:
+			r.RegisterAdminEndpoints(adminAuthRouter)
+		case router.APIEndpoints:
+			r.RegisterAPIEndpoints(apiAuthRouter)
+		case router.BasicEndpoints:
+			r.RegisterBasicEndpoints(basicAuthRouter)
+		case router.BaseEndpoints:
+			r.RegisterBaseEndpoints(baseRouter)
+		case router.CallbackEndpoints:
+			r.RegisterCallbackEndpoints(callbackAuthRouter)
+		default:
+			panic(errors.New("unexpected router endpoints registrar"))
+		}
+	}
+
+	// Register paymail routes
+	services.SpvWalletEngine.GetPaymailConfig().RegisterRoutes(engine)
+
+	// Set the 404 handler (any request not detected)
+	engine.NoRoute(metrics.NoRoute, actions.NotFound)
+
+	// Set the method not allowed
+	engine.NoMethod(actions.MethodNotAllowed)
+
+	registerSwaggerEndpoints(engine)
+
+	if appConfig.DebugProfiling {
+		pprof.Register(engine, "debug/pprof")
+	}
 }

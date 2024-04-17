@@ -17,10 +17,36 @@ jobs:
     with:
       version: ${{ github.ref_name }}
       os: linux
-      go_main_file: cmd/server/main.go
       cgo_enabled: true
       release_binaries: false
     secrets:
       SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
       DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
       DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
+
+  release_libs:
+    runs-on: ubuntu-latest
+    needs: [release_default]
+    strategy:
+      matrix:
+        lib:
+          - models
+          - engine
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: 'Configure Git'
+        run: |
+          git config user.name "$GITHUB_ACTOR"
+          git config user.email "$GITHUB_ACTOR@users.noreply.github.com"
+
+      - name: Tag ${{ matrix.lib }}
+        run: |
+          git tag ${{ matrix.lib }}/${{ github.ref_name }} -am "${{ matrix.lib }}/${{ github.ref_name }}"
+          git push origin ${{ matrix.lib }}/${{ github.ref_name }}
+
+      - name: Syndicate to GoDocs
+        run: |
+          echo "syndicating to GoDocs..."
+          curl "https://proxy.golang.org/github.com/${{ github.repository }}/${{ matrix.lib }}/@v/${{ github.ref_name }}.info"

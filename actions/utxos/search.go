@@ -3,12 +3,12 @@ package utxos
 import (
 	"net/http"
 
-	"github.com/BuxOrg/bux"
-	buxmodels "github.com/BuxOrg/bux-models"
-	"github.com/BuxOrg/bux-server/actions"
-	"github.com/BuxOrg/bux-server/mappings"
-	"github.com/julienschmidt/httprouter"
-	apirouter "github.com/mrz1836/go-api-router"
+	"github.com/bitcoin-sv/spv-wallet/actions"
+	"github.com/bitcoin-sv/spv-wallet/engine"
+	"github.com/bitcoin-sv/spv-wallet/mappings"
+	"github.com/bitcoin-sv/spv-wallet/models"
+	"github.com/bitcoin-sv/spv-wallet/server/auth"
+	"github.com/gin-gonic/gin"
 )
 
 // search will fetch a list of utxos filtered on conditions and metadata
@@ -17,45 +17,37 @@ import (
 // @Description	Search UTXO
 // @Tags		UTXO
 // @Produce		json
-// @Param		page query int false "page"
-// @Param		page_size query int false "page_size"
-// @Param		order_by_field query string false "order_by_field"
-// @Param		sort_direction query string false "sort_direction"
-// @Param		metadata query string false "metadata"
-// @Param		conditions query string false "conditions"
-// @Success		200
+// @Param		SearchRequestParameters body actions.SearchRequestParameters false "Supports targeted resource searches with filters for metadata and custom conditions, plus options for pagination and sorting to streamline data exploration and analysis"
+// @Success		200 {object} []models.Utxo "List of utxos"
+// @Failure		400	"Bad request - Error while parsing SearchRequestParameters from request body"
+// @Failure 	500	"Internal server error - Error while searching for utxos"
 // @Router		/v1/utxo/search [post]
-// @Security	bux-auth-xpub
-func (a *Action) search(w http.ResponseWriter, req *http.Request, _ httprouter.Params) {
-	reqXPubID, _ := bux.GetXpubIDFromRequest(req)
+// @Security	x-auth-xpub
+func (a *Action) search(c *gin.Context) {
+	reqXPubID := c.GetString(auth.ParamXPubHashKey)
 
-	// Parse the params
-	params := apirouter.GetParams(req)
-	queryParams, modelMetadata, conditions, err := actions.GetQueryParameters(params)
-	metadata := mappings.MapToBuxMetadata(modelMetadata)
+	queryParams, metadata, conditions, err := actions.GetSearchQueryParameters(c)
 	if err != nil {
-		apirouter.ReturnResponse(w, req, http.StatusExpectationFailed, err.Error())
+		c.JSON(http.StatusBadRequest, err.Error())
 		return
 	}
 
-	// Record a new transaction (get the hex from parameters)a
-	var utxos []*bux.Utxo
-	if utxos, err = a.Services.Bux.GetUtxosByXpubID(
-		req.Context(),
+	var utxos []*engine.Utxo
+	if utxos, err = a.Services.SpvWalletEngine.GetUtxosByXpubID(
+		c.Request.Context(),
 		reqXPubID,
 		metadata,
 		conditions,
 		queryParams,
 	); err != nil {
-		apirouter.ReturnResponse(w, req, http.StatusExpectationFailed, err.Error())
+		c.JSON(http.StatusInternalServerError, err.Error())
 		return
 	}
 
-	contracts := make([]*buxmodels.Utxo, 0)
+	contracts := make([]*models.Utxo, 0)
 	for _, utxo := range utxos {
 		contracts = append(contracts, mappings.MapToUtxoContract(utxo))
 	}
 
-	// Return response
-	apirouter.ReturnResponse(w, req, http.StatusOK, contracts)
+	c.JSON(http.StatusOK, contracts)
 }

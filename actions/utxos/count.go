@@ -3,11 +3,9 @@ package utxos
 import (
 	"net/http"
 
-	"github.com/BuxOrg/bux"
-	"github.com/BuxOrg/bux-server/actions"
-	"github.com/BuxOrg/bux-server/mappings"
-	"github.com/julienschmidt/httprouter"
-	apirouter "github.com/mrz1836/go-api-router"
+	"github.com/bitcoin-sv/spv-wallet/actions"
+	"github.com/bitcoin-sv/spv-wallet/server/auth"
+	"github.com/gin-gonic/gin"
 )
 
 // count will count all the utxos fulfilling the given conditions
@@ -16,20 +14,18 @@ import (
 // @Description	Count of UTXOs
 // @Tags		UTXO
 // @Produce		json
-// @Param		metadata query string false "metadata"
-// @Param		conditions query string false "conditions"
-// @Success		200
+// @Param		CountRequestParameters body actions.CountRequestParameters false "Enables precise filtering of resource counts using custom conditions or metadata, catering to specific business or analysis needs"
+// @Success		200	{number} int64 "Count of utxos"
+// @Failure		400	"Bad request - Error while parsing CountRequestParameters from request body"
+// @Failure 	500	"Internal Server Error - Error while fetching count of utxos"
 // @Router		/v1/utxo/count [post]
-// @Security	bux-auth-xpub
-func (a *Action) count(w http.ResponseWriter, req *http.Request, _ httprouter.Params) {
-	reqXPubID, _ := bux.GetXpubIDFromRequest(req)
+// @Security	x-auth-xpub
+func (a *Action) count(c *gin.Context) {
+	reqXPubID := c.GetString(auth.ParamXPubHashKey)
 
-	// Parse the params
-	params := apirouter.GetParams(req)
-	_, metadataModel, conditions, err := actions.GetQueryParameters(params)
-	metadata := mappings.MapToBuxMetadata(metadataModel)
+	metadata, conditions, err := actions.GetCountQueryParameters(c)
 	if err != nil {
-		apirouter.ReturnResponse(w, req, http.StatusExpectationFailed, err.Error())
+		c.JSON(http.StatusBadRequest, err.Error())
 		return
 	}
 
@@ -37,20 +33,18 @@ func (a *Action) count(w http.ResponseWriter, req *http.Request, _ httprouter.Pa
 	if conditions != nil {
 		dbConditions = *conditions
 	}
-	// force the xpub_id of the current user on query
+
 	dbConditions["xpub_id"] = reqXPubID
 
-	// Get a utxo using a xPub
 	var count int64
-	if count, err = a.Services.Bux.GetUtxosCount(
-		req.Context(),
+	if count, err = a.Services.SpvWalletEngine.GetUtxosCount(
+		c.Request.Context(),
 		metadata,
 		&dbConditions,
 	); err != nil {
-		apirouter.ReturnResponse(w, req, http.StatusExpectationFailed, err.Error())
+		c.JSON(http.StatusInternalServerError, err.Error())
 		return
 	}
 
-	// Return response
-	apirouter.ReturnResponse(w, req, http.StatusOK, count)
+	c.JSON(http.StatusOK, count)
 }

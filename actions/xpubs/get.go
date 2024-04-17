@@ -3,10 +3,10 @@ package xpubs
 import (
 	"net/http"
 
-	"github.com/BuxOrg/bux"
-	"github.com/BuxOrg/bux-server/mappings"
-	"github.com/julienschmidt/httprouter"
-	apirouter "github.com/mrz1836/go-api-router"
+	"github.com/bitcoin-sv/spv-wallet/engine"
+	"github.com/bitcoin-sv/spv-wallet/mappings"
+	"github.com/bitcoin-sv/spv-wallet/server/auth"
+	"github.com/gin-gonic/gin"
 )
 
 // get will get an existing model
@@ -15,50 +15,35 @@ import (
 // @Description	Get xPub
 // @Tags		xPub
 // @Produce		json
-// @Param		key query string false "key"
-// @Success		200
+// @Success		200 {object} models.Xpub "xPub associated with the given xPub from auth header"
+// @Failure		500	"Internal Server Error - Error while fetching xPub"
 // @Router		/v1/xpub [get]
-// @Security	bux-auth-xpub
-func (a *Action) get(w http.ResponseWriter, req *http.Request, _ httprouter.Params) {
-	reqXPub, _ := bux.GetXpubFromRequest(req)
-	reqXPubID, _ := bux.GetXpubIDFromRequest(req)
+// @Security	x-auth-xpub
+func (a *Action) get(c *gin.Context) {
+	reqXPub := c.GetString(auth.ParamXPubKey)
+	reqXPubID := c.GetString(auth.ParamXPubHashKey)
 
-	// Parse the params
-	params := apirouter.GetParams(req)
-	key := params.GetString("key")
-	if key != "" {
-		if isAdmin, ok := bux.IsAdminRequest(req); !isAdmin || !ok {
-			apirouter.ReturnResponse(w, req, http.StatusExpectationFailed, bux.ErrNotAdminKey)
-			return
-		}
-	} else {
-		key = reqXPub
-	}
-
-	// Get an xPub
-	var xPub *bux.Xpub
+	var xPub *engine.Xpub
 	var err error
-	if key != "" {
-		xPub, err = a.Services.Bux.GetXpub(
-			req.Context(), key,
+	if reqXPub != "" {
+		xPub, err = a.Services.SpvWalletEngine.GetXpub(
+			c.Request.Context(), reqXPub,
 		)
 	} else {
-		xPub, err = a.Services.Bux.GetXpubByID(
-			req.Context(), reqXPubID,
+		xPub, err = a.Services.SpvWalletEngine.GetXpubByID(
+			c.Request.Context(), reqXPubID,
 		)
 	}
 	if err != nil {
-		apirouter.ReturnResponse(w, req, http.StatusExpectationFailed, err.Error())
+		c.JSON(http.StatusInternalServerError, err.Error())
 		return
 	}
 
-	signed := req.Context().Value("auth_signed")
-	if signed == nil || !signed.(bool) || reqXPub == "" {
+	signed := c.GetBool("auth_signed")
+	if !signed || reqXPub == "" {
 		xPub.RemovePrivateData()
 	}
 
 	contract := mappings.MapToXpubContract(xPub)
-
-	// Return response
-	apirouter.ReturnResponse(w, req, http.StatusOK, contract)
+	c.JSON(http.StatusOK, contract)
 }

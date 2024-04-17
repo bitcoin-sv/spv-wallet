@@ -2,24 +2,24 @@
 FROM golang:1.22.0 as builder
 
 # Set the working directory
-WORKDIR /go/src/github.com/BuxOrg/bux-server
+WORKDIR /go/src/github.com/bitcoin-sv/spv-wallet
 
 COPY . ./
 
 # Build binary
-RUN GOOS=linux go build -o bux cmd/server/main.go
+RUN GOOS=linux go build -o spvwallet cmd/main.go
 
 # Get runtime image
 FROM registry.access.redhat.com/ubi9-minimal
 
 # Version
-LABEL version="1.0" name="Bux"
+LABEL version="1.0" name="SPVWallet"
 
 # Set working directory
 WORKDIR /
 
 # Copy binary to runner
-COPY --from=builder /go/src/github.com/BuxOrg/bux-server/bux .
+COPY --from=builder /go/src/github.com/bitcoin-sv/spv-wallet/engine .
 
 # Set entrypoint
-ENTRYPOINT ["/bux"]
+ENTRYPOINT ["/spvwallet"]

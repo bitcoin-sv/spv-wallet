@@ -1,43 +1,43 @@
 package mappings
 
 import (
-	"github.com/BuxOrg/bux"
-	buxmodels "github.com/BuxOrg/bux-models"
-	"github.com/BuxOrg/bux-server/mappings/common"
-	customtypes "github.com/mrz1836/go-datastore/custom_types"
+	"github.com/bitcoin-sv/spv-wallet/engine"
+	customtypes "github.com/bitcoin-sv/spv-wallet/engine/datastore/customtypes"
+	"github.com/bitcoin-sv/spv-wallet/mappings/common"
+	"github.com/bitcoin-sv/spv-wallet/models"
 )
 
-// MapToUtxoPointer will map the utxo-pointer model from bux to the bux-models contract
-func MapToUtxoPointer(u *bux.UtxoPointer) *buxmodels.UtxoPointer {
+// MapToUtxoPointer will map the utxo-pointer model from spv-wallet to the spv-wallet-models contract
+func MapToUtxoPointer(u *engine.UtxoPointer) *models.UtxoPointer {
 	if u == nil {
 		return nil
 	}
 
-	return &buxmodels.UtxoPointer{
+	return &models.UtxoPointer{
 		TransactionID: u.TransactionID,
 		OutputIndex:   u.OutputIndex,
 	}
 }
 
-// MapToUtxoPointerBux will map the utxo-pointer model from bux-models to the bux contract
-func MapToUtxoPointerBux(u *buxmodels.UtxoPointer) *bux.UtxoPointer {
+// MapUtxoPointerModelToEngine will map the utxo-pointer model from spv-wallet-models to the spv-wallet contract
+func MapUtxoPointerModelToEngine(u *models.UtxoPointer) *engine.UtxoPointer {
 	if u == nil {
 		return nil
 	}
 
-	return &bux.UtxoPointer{
+	return &engine.UtxoPointer{
 		TransactionID: u.TransactionID,
 		OutputIndex:   u.OutputIndex,
 	}
 }
 
-// MapToUtxoContract will map the utxo model from bux to the bux-models contract
-func MapToUtxoContract(u *bux.Utxo) *buxmodels.Utxo {
+// MapToUtxoContract will map the utxo model from spv-wallet to the spv-wallet-models contract
+func MapToUtxoContract(u *engine.Utxo) *models.Utxo {
 	if u == nil {
 		return nil
 	}
 
-	return &buxmodels.Utxo{
+	return &models.Utxo{
 		Model:        *common.MapToContract(&u.Model),
 		UtxoPointer:  *MapToUtxoPointer(&u.UtxoPointer),
 		ID:           u.ID,
@@ -51,8 +51,8 @@ func MapToUtxoContract(u *bux.Utxo) *buxmodels.Utxo {
 	}
 }
 
-// MapToUtxoBux will map the utxo model from bux-models to the bux contract
-func MapToUtxoBux(u *buxmodels.Utxo) *bux.Utxo {
+// MapUtxoModelToEngine will map the utxo model from spv-wallet-models to the spv-wallet contract
+func MapUtxoModelToEngine(u *models.Utxo) *engine.Utxo {
 	if u == nil {
 		return nil
 	}
@@ -63,9 +63,9 @@ func MapToUtxoBux(u *buxmodels.Utxo) *bux.Utxo {
 	var spendingTxID customtypes.NullString
 	spendingTxID.String = u.SpendingTxID
 
-	return &bux.Utxo{
+	return &engine.Utxo{
 		Model:        *common.MapToModel(&u.Model),
-		UtxoPointer:  *MapToUtxoPointerBux(&u.UtxoPointer),
+		UtxoPointer:  *MapUtxoPointerModelToEngine(&u.UtxoPointer),
 		ID:           u.ID,
 		XpubID:       u.XpubID,
 		Satoshis:     u.Satoshis,
@@ -73,6 +73,6 @@ func MapToUtxoBux(u *buxmodels.Utxo) *bux.Utxo {
 		Type:         u.Type,
 		DraftID:      draftID,
 		SpendingTxID: spendingTxID,
-		Transaction:  MapToTransactionBux(u.Transaction),
+		Transaction:  MapTransactionModelToEngine(u.Transaction),
 	}
 }

@@ -4,11 +4,10 @@ import (
 	"errors"
 	"net/http"
 
-	"github.com/BuxOrg/bux"
-	"github.com/BuxOrg/bux-server/mappings"
-	"github.com/julienschmidt/httprouter"
-	apirouter "github.com/mrz1836/go-api-router"
-	"github.com/mrz1836/go-datastore"
+	"github.com/bitcoin-sv/spv-wallet/engine"
+	"github.com/bitcoin-sv/spv-wallet/engine/datastore"
+	"github.com/bitcoin-sv/spv-wallet/mappings"
+	"github.com/gin-gonic/gin"
 )
 
 // transactionRecord will save and complete a transaction directly, without any checks
@@ -17,40 +16,42 @@ import (
 // @Description	Record transactions
 // @Tags		Admin
 // @Produce		json
-// @Param		hex query string true "Transaction hex"
-// @Success		201
+// @Param		RecordTransaction body RecordTransaction true "RecordTransaction model containing hex of the transaction to record"
+// @Success		201	{object} models.Transaction "Recorded transaction"
+// @Failure		400	"Bad request - Error while parsing RecordTransaction from request body"
+// @Failure 	500	"Internal Server Error - Error while fetching count of access keys"
 // @Router		/v1/admin/transactions/record [post]
-// @Security	bux-auth-xpub
-func (a *Action) transactionRecord(w http.ResponseWriter, req *http.Request, _ httprouter.Params) {
-	// Parse the params
-	params := apirouter.GetParams(req)
-
-	hex := params.GetString("hex")
+// @Security	x-auth-xpub
+func (a *Action) transactionRecord(c *gin.Context) {
+	var requestBody RecordTransaction
+	if err := c.ShouldBindJSON(&requestBody); err != nil {
+		c.JSON(http.StatusBadRequest, err.Error())
+		return
+	}
 
 	// Set the metadata
-	opts := make([]bux.ModelOps, 0)
+	opts := make([]engine.ModelOps, 0)
 
 	// Record a new transaction (get the hex from parameters)
-	transaction, err := a.Services.Bux.RecordRawTransaction(
-		req.Context(),
-		hex,
+	transaction, err := a.Services.SpvWalletEngine.RecordRawTransaction(
+		c.Request.Context(),
+		requestBody.Hex,
 		opts...,
 	)
 	if err != nil {
 		if errors.Is(err, datastore.ErrDuplicateKey) {
 			// already registered, just return the registered transaction
-			if transaction, err = a.Services.Bux.GetTransactionByHex(req.Context(), hex); err != nil {
-				apirouter.ReturnResponse(w, req, http.StatusUnprocessableEntity, err.Error())
+			if transaction, err = a.Services.SpvWalletEngine.GetTransactionByHex(c.Request.Context(), requestBody.Hex); err != nil {
+				c.JSON(http.StatusInternalServerError, err.Error())
 				return
 			}
 		} else {
-			apirouter.ReturnResponse(w, req, http.StatusUnprocessableEntity, err.Error())
+			c.JSON(http.StatusInternalServerError, err.Error())
 			return
 		}
 	}
 
 	contract := mappings.MapToTransactionContract(transaction)
 
-	// Return response
-	apirouter.ReturnResponse(w, req, http.StatusCreated, contract)
+	c.JSON(http.StatusCreated, contract)
 }

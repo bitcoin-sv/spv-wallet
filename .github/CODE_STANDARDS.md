@@ -245,13 +245,13 @@ Additional information and guidelines on Conventional Commits can be found [here
 
 Good example:
 
-```bash
-feat: add possibility to create a new user by admin (#BUX-123)
+```
+feat(#123): add possibility to create a new user by admin
 ```
 
 Bad example:
 
-```bash
+```
 debugo feature - checkpoint full work
 ```
 

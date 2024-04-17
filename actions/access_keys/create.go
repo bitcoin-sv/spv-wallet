@@ -3,10 +3,10 @@ package accesskeys
 import (
 	"net/http"
 
-	"github.com/BuxOrg/bux"
-	"github.com/BuxOrg/bux-server/mappings"
-	"github.com/julienschmidt/httprouter"
-	apirouter "github.com/mrz1836/go-api-router"
+	"github.com/bitcoin-sv/spv-wallet/engine"
+	"github.com/bitcoin-sv/spv-wallet/mappings"
+	"github.com/bitcoin-sv/spv-wallet/server/auth"
+	"github.com/gin-gonic/gin"
 )
 
 // create will make a new model using the services defined in the action object
@@ -15,32 +15,32 @@ import (
 // @Description	Create access key
 // @Tags		Access-key
 // @Produce		json
-// @Param		metadata query string false "metadata"
-// @Success		201
+// @Param		CreateAccessKey body CreateAccessKey true " "
+// @Success		201	{object} models.AccessKey "Created AccessKey"
+// @Failure		400	"Bad request - Error while parsing CreateAccessKey from request body"
+// @Failure 	500	"Internal server error - Error while creating new access key"
 // @Router		/v1/access-key [post]
-// @Security	bux-auth-xpub
-func (a *Action) create(w http.ResponseWriter, req *http.Request, _ httprouter.Params) {
-	reqXPub, _ := bux.GetXpubFromRequest(req)
+// @Security	x-auth-xpub
+func (a *Action) create(c *gin.Context) {
+	reqXPub := c.GetString(auth.ParamXPubKey)
 
-	// Parse the params
-	params := apirouter.GetParams(req)
-
-	// params
-	metadata := params.GetJSON("metadata")
+	var requestBody CreateAccessKey
+	if err := c.Bind(&requestBody); err != nil {
+		c.JSON(http.StatusBadRequest, err.Error())
+		return
+	}
 
 	// Create a new accessKey
-	accessKey, err := a.Services.Bux.NewAccessKey(
-		req.Context(),
+	accessKey, err := a.Services.SpvWalletEngine.NewAccessKey(
+		c.Request.Context(),
 		reqXPub,
-		bux.WithMetadatas(metadata),
+		engine.WithMetadatas(requestBody.Metadata),
 	)
 	if err != nil {
-		apirouter.ReturnResponse(w, req, http.StatusUnprocessableEntity, err.Error())
+		c.JSON(http.StatusInternalServerError, err.Error())
 		return
 	}
 
 	contract := mappings.MapToAccessKeyContract(accessKey)
-
-	// Return response
-	apirouter.ReturnResponse(w, req, http.StatusCreated, contract)
+	c.JSON(http.StatusCreated, contract)
 }

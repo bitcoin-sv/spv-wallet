@@ -3,12 +3,10 @@ package destinations
 import (
 	"net/http"
 
-	"github.com/BuxOrg/bux"
-	buxmodels "github.com/BuxOrg/bux-models"
-	"github.com/BuxOrg/bux-server/actions"
-	"github.com/BuxOrg/bux-server/mappings"
-	"github.com/julienschmidt/httprouter"
-	apirouter "github.com/mrz1836/go-api-router"
+	"github.com/bitcoin-sv/spv-wallet/mappings"
+	"github.com/bitcoin-sv/spv-wallet/models"
+	"github.com/bitcoin-sv/spv-wallet/server/auth"
+	"github.com/gin-gonic/gin"
 )
 
 // search will fetch a list of destinations filtered by metadata
@@ -17,45 +15,36 @@ import (
 // @Description	Search for a destination
 // @Tags		Destinations
 // @Produce		json
-// @Param		page query int false "page"
-// @Param		page_size query int false "page_size"
-// @Param		order_by_field query string false "order_by_field"
-// @Param		sort_direction query string false "sort_direction"
-// @Param		metadata query string false "metadata"
-// @Param		condition query string false "condition"
-// @Success		200
-// @Router		/v1/destination/search [get]
-// @Security	bux-auth-xpub
-func (a *Action) search(w http.ResponseWriter, req *http.Request, _ httprouter.Params) {
-	reqXPubID, _ := bux.GetXpubIDFromRequest(req)
+// @Param		SearchDestinations body SearchDestinations false "Supports targeted resource searches with filters for metadata and custom conditions, plus options for pagination and sorting to streamline data exploration and analysis"
+// @Success		200 {object} []models.Destination "List of destinations
+// @Failure		400	"Bad request - Error while parsing SearchDestinations from request body"
+// @Failure 	500	"Internal server error - Error while searching for destinations"
+// @Router		/v1/destination/search [post]
+// @Security	x-auth-xpub
+func (a *Action) search(c *gin.Context) {
+	reqXPubID := c.GetString(auth.ParamXPubHashKey)
 
-	// Parse the params
-	params := apirouter.GetParams(req)
-	queryParams, metadataModel, conditions, err := actions.GetQueryParameters(params)
-	metadata := mappings.MapToBuxMetadata(metadataModel)
-	if err != nil {
-		apirouter.ReturnResponse(w, req, http.StatusExpectationFailed, err.Error())
+	var reqParams SearchDestinations
+	if err := c.Bind(&reqParams); err != nil {
+		c.JSON(http.StatusBadRequest, err.Error())
 		return
 	}
 
-	// Record a new transaction (get the hex from parameters)a
-	var destinations []*bux.Destination
-	if destinations, err = a.Services.Bux.GetDestinationsByXpubID(
-		req.Context(),
+	destinations, err := a.Services.SpvWalletEngine.GetDestinationsByXpubID(
+		c.Request.Context(),
 		reqXPubID,
-		metadata,
-		conditions,
-		queryParams,
-	); err != nil {
-		apirouter.ReturnResponse(w, req, http.StatusExpectationFailed, err.Error())
+		reqParams.Metadata,
+		reqParams.Conditions.ToDbConditions(),
+		reqParams.QueryParams,
+	)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, err.Error())
 		return
 	}
 
-	contracts := make([]*buxmodels.Destination, 0)
+	contracts := make([]*models.Destination, 0)
 	for _, destination := range destinations {
 		contracts = append(contracts, mappings.MapToDestinationContract(destination))
 	}
-
-	// Return response
-	apirouter.ReturnResponse(w, req, http.StatusOK, contracts)
+	c.JSON(http.StatusOK, contracts)
 }

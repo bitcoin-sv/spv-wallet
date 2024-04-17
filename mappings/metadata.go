@@ -1,16 +1,16 @@
 package mappings
 
 import (
-	"github.com/BuxOrg/bux"
-	buxmodels "github.com/BuxOrg/bux-models"
+	"github.com/bitcoin-sv/spv-wallet/engine"
+	"github.com/bitcoin-sv/spv-wallet/models"
 )
 
-// MapToBuxMetadata will map the *buxmodels.Metadata to *bux.Metadata
-func MapToBuxMetadata(metadata *buxmodels.Metadata) *bux.Metadata {
+// MapToSpvWalletMetadata will map the *spvwalletmodels.Metadata to *spv.Metadata
+func MapToSpvWalletMetadata(metadata *models.Metadata) *engine.Metadata {
 	if metadata == nil {
 		return nil
 	}
 
-	output := bux.Metadata(*metadata)
+	output := engine.Metadata(*metadata)
 	return &output
 }

@@ -1,9 +1,10 @@
 package xpubs
 
 import (
-	"github.com/BuxOrg/bux-server/actions"
-	"github.com/BuxOrg/bux-server/config"
-	apirouter "github.com/mrz1836/go-api-router"
+	"github.com/bitcoin-sv/spv-wallet/actions"
+	"github.com/bitcoin-sv/spv-wallet/config"
+	"github.com/bitcoin-sv/spv-wallet/server/routes"
+	"github.com/gin-gonic/gin"
 )
 
 // Action is an extension of actions.Action for this package
@@ -11,22 +12,15 @@ type Action struct {
 	actions.Action
 }
 
-// RegisterRoutes register all the package specific routes
-func RegisterRoutes(router *apirouter.Router, appConfig *config.AppConfig, services *config.AppServices) {
+// NewHandler creates the specific package routes
+func NewHandler(appConfig *config.AppConfig, services *config.AppServices) routes.APIEndpointsFunc {
+	action := &Action{actions.Action{AppConfig: appConfig, Services: services}}
 
-	// Use the authentication middleware wrapper
-	a, requireAdmin := actions.NewStack(appConfig, services)
-	requireAdmin.Use(a.RequireAdminAuthentication)
+	apiEndpoints := routes.APIEndpointsFunc(func(router *gin.RouterGroup) {
+		xpubGroup := router.Group("/xpub")
+		xpubGroup.GET("", action.get)
+		xpubGroup.PATCH("", action.update)
+	})
 
-	// Use the authentication middleware wrapper - this will only check for a valid xPub
-	aBasic, requireBasic := actions.NewStack(appConfig, services)
-	requireBasic.Use(aBasic.RequireBasicAuthentication)
-
-	// Load the actions and set the services
-	action := &Action{actions.Action{AppConfig: a.AppConfig, Services: a.Services}}
-
-	// V1 Requests
-	router.HTTPRouter.GET("/"+config.APIVersion+"/xpub", action.Request(router, requireBasic.Wrap(action.get)))
-	router.HTTPRouter.POST("/"+config.APIVersion+"/xpub", action.Request(router, requireAdmin.Wrap(action.create)))
-	router.HTTPRouter.PATCH("/"+config.APIVersion+"/xpub", action.Request(router, requireAdmin.Wrap(action.update)))
+	return apiEndpoints
 }

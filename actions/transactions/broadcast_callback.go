@@ -1,44 +1,38 @@
 package transactions
 
 import (
-	"encoding/json"
 	"net/http"
 
 	"github.com/bitcoin-sv/go-broadcast-client/broadcast"
-	"github.com/julienschmidt/httprouter"
-	apirouter "github.com/mrz1836/go-api-router"
+	"github.com/gin-gonic/gin"
 )
 
 // broadcastCallback will handle a broadcastCallback call from the broadcast api
 // Broadcast Callback godoc
-// @Summary		Broadcast Callback
+// @Summary		Endpoint designed for receiving callbacks from Arc (service responsible for submitting transactions to the BSV network)
 // @Tags		Transactions
-// @Param 		transaction body broadcast.SubmittedTx true "transaction"
+// @Param 		transaction body broadcast.SubmittedTx true "Transaction"
 // @Success		200
+// @Failure		400	"Bad request - Error while parsing transaction from request body"
+// @Failure 	500	"Internal Server Error - Error while updating transaction"
 // @Router		/transaction/broadcast/callback [post]
 // @Security	callback-auth
-func (a *Action) broadcastCallback(w http.ResponseWriter, req *http.Request, _ httprouter.Params) {
+func (a *Action) broadcastCallback(c *gin.Context) {
 	var resp *broadcast.SubmittedTx
 
-	err := json.NewDecoder(req.Body).Decode(&resp)
+	err := c.Bind(&resp)
 	if err != nil {
-		apirouter.ReturnResponse(w, req, http.StatusExpectationFailed, err.Error())
+		c.JSON(http.StatusBadRequest, err.Error())
 		return
 	}
 
-	defer func() {
-		if err = req.Body.Close(); err != nil {
-			a.Services.Logger.Err(err).Msg("failed to close request body")
-		}
-	}()
-
-	err = a.Services.Bux.UpdateTransaction(req.Context(), resp)
+	err = a.Services.SpvWalletEngine.UpdateTransaction(c.Request.Context(), resp)
 	if err != nil {
 		a.Services.Logger.Err(err).Msgf("failed to update transaction - tx: %v", resp)
-		apirouter.ReturnResponse(w, req, http.StatusInternalServerError, "")
+		c.Status(http.StatusInternalServerError)
 		return
 	}
 
 	// Return response
-	apirouter.ReturnResponse(w, req, http.StatusOK, "")
+	c.Status(http.StatusOK)
 }

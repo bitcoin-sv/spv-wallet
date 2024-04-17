@@ -3,10 +3,10 @@ package destinations
 import (
 	"net/http"
 
-	"github.com/BuxOrg/bux"
-	"github.com/BuxOrg/bux-server/mappings"
-	"github.com/julienschmidt/httprouter"
-	apirouter "github.com/mrz1836/go-api-router"
+	"github.com/bitcoin-sv/spv-wallet/engine"
+	"github.com/bitcoin-sv/spv-wallet/mappings"
+	"github.com/bitcoin-sv/spv-wallet/server/auth"
+	"github.com/gin-gonic/gin"
 )
 
 // get will get an existing model
@@ -18,45 +18,42 @@ import (
 // @Param		id query string false "Destination ID"
 // @Param		address query string false "Destination address"
 // @Param		locking_script query string false "Destination locking script"
-// @Success		200
+// @Success		200 {object} models.Destination "Destination with given id"
+// @Failure		400	"Bad request - All parameters are missing (id, address, locking_script)"
+// @Failure 	500	"Internal server error - Error while getting destination"
 // @Router		/v1/destination [get]
-// @Security	bux-auth-xpub
-func (a *Action) get(w http.ResponseWriter, req *http.Request, _ httprouter.Params) {
-	reqXPubID, _ := bux.GetXpubIDFromRequest(req)
+// @Security	x-auth-xpub
+func (a *Action) get(c *gin.Context) {
+	reqXPubID := c.GetString(auth.ParamXPubHashKey)
 
-	// Parse the params
-	params := apirouter.GetParams(req)
-	id := params.GetString("id")
-	address := params.GetString("address")
-	lockingScript := params.GetString("locking_script")
+	id := c.Query("id")
+	address := c.Query("address")
+	lockingScript := c.Query("locking_script")
 	if id == "" && address == "" && lockingScript == "" {
-		apirouter.ReturnResponse(w, req, http.StatusExpectationFailed, bux.ErrMissingFieldID)
+		c.JSON(http.StatusBadRequest, engine.ErrMissingFieldID)
 		return
 	}
 
-	// Get the destination
-	var destination *bux.Destination
+	var destination *engine.Destination
 	var err error
 	if id != "" {
-		destination, err = a.Services.Bux.GetDestinationByID(
-			req.Context(), reqXPubID, id,
+		destination, err = a.Services.SpvWalletEngine.GetDestinationByID(
+			c.Request.Context(), reqXPubID, id,
 		)
 	} else if address != "" {
-		destination, err = a.Services.Bux.GetDestinationByAddress(
-			req.Context(), reqXPubID, address,
+		destination, err = a.Services.SpvWalletEngine.GetDestinationByAddress(
+			c.Request.Context(), reqXPubID, address,
 		)
 	} else {
-		destination, err = a.Services.Bux.GetDestinationByLockingScript(
-			req.Context(), reqXPubID, lockingScript,
+		destination, err = a.Services.SpvWalletEngine.GetDestinationByLockingScript(
+			c.Request.Context(), reqXPubID, lockingScript,
 		)
 	}
 	if err != nil {
-		apirouter.ReturnResponse(w, req, http.StatusExpectationFailed, err.Error())
+		c.JSON(http.StatusInternalServerError, err.Error())
 		return
 	}
 
 	contract := mappings.MapToDestinationContract(destination)
-
-	// Return response
-	apirouter.ReturnResponse(w, req, http.StatusOK, contract)
+	c.JSON(http.StatusOK, contract)
 }

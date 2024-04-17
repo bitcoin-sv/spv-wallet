@@ -3,12 +3,12 @@ package accesskeys
 import (
 	"net/http"
 
-	"github.com/BuxOrg/bux"
-	buxmodels "github.com/BuxOrg/bux-models"
-	"github.com/BuxOrg/bux-server/actions"
-	"github.com/BuxOrg/bux-server/mappings"
-	"github.com/julienschmidt/httprouter"
-	apirouter "github.com/mrz1836/go-api-router"
+	"github.com/bitcoin-sv/spv-wallet/actions"
+	"github.com/bitcoin-sv/spv-wallet/engine"
+	"github.com/bitcoin-sv/spv-wallet/mappings"
+	"github.com/bitcoin-sv/spv-wallet/models"
+	"github.com/bitcoin-sv/spv-wallet/server/auth"
+	"github.com/gin-gonic/gin"
 )
 
 // search will fetch a list of access keys filtered by metadata
@@ -17,45 +17,43 @@ import (
 // @Description	Search access key
 // @Tags		Access-key
 // @Produce		json
-// @Param		page query int false "page"
-// @Param		page_size query int false "page_size"
-// @Param		order_by_field query string false "order_by_field"
-// @Param		sort_direction query string false "sort_direction"
-// @Param		metadata query string false "metadata"
-// @Param		conditions query string false "conditions"
-// @Success		200
+// @Param		SearchRequestParameters body actions.SearchRequestParameters false "Supports targeted resource searches with filters for metadata and custom conditions, plus options for pagination and sorting to streamline data exploration and analysis"
+// @Success		200 {object} []models.AccessKey "List of access keys"
+// @Failure		400	"Bad request - Error while parsing SearchRequestParameters from request body"
+// @Failure 	500	"Internal server error - Error while searching for access keys"
 // @Router		/v1/access-key/search [post]
-// @Security	bux-auth-xpub
-func (a *Action) search(w http.ResponseWriter, req *http.Request, _ httprouter.Params) {
-	reqXPubID, _ := bux.GetXpubIDFromRequest(req)
+// @Security	x-auth-xpub
+func (a *Action) search(c *gin.Context) {
+	reqXPubID := c.GetString(auth.ParamXPubHashKey)
 
-	// Parse the params
-	params := apirouter.GetParams(req)
-	queryParams, metadataModel, conditions, err := actions.GetQueryParameters(params)
-	metadata := mappings.MapToBuxMetadata(metadataModel)
+	queryParams, metadata, conditions, err := actions.GetSearchQueryParameters(c)
 	if err != nil {
-		apirouter.ReturnResponse(w, req, http.StatusExpectationFailed, err.Error())
+		c.JSON(http.StatusBadRequest, err.Error())
 		return
 	}
 
-	// Record a new transaction (get the hex from parameters)a
-	var accessKeys []*bux.AccessKey
-	if accessKeys, err = a.Services.Bux.GetAccessKeysByXPubID(
-		req.Context(),
+	dbConditions := make(map[string]interface{})
+	if conditions != nil {
+		dbConditions = *conditions
+	}
+	dbConditions["xpub_id"] = reqXPubID
+
+	var accessKeys []*engine.AccessKey
+	if accessKeys, err = a.Services.SpvWalletEngine.GetAccessKeysByXPubID(
+		c.Request.Context(),
 		reqXPubID,
 		metadata,
-		conditions,
+		&dbConditions,
 		queryParams,
 	); err != nil {
-		apirouter.ReturnResponse(w, req, http.StatusExpectationFailed, err.Error())
+		c.JSON(http.StatusInternalServerError, err.Error())
 		return
 	}
 
-	accessKeyContracts := make([]*buxmodels.AccessKey, 0)
+	accessKeyContracts := make([]*models.AccessKey, 0)
 	for _, accessKey := range accessKeys {
 		accessKeyContracts = append(accessKeyContracts, mappings.MapToAccessKeyContract(accessKey))
 	}
 
-	// Return response
-	apirouter.ReturnResponse(w, req, http.StatusOK, accessKeyContracts)
+	c.JSON(http.StatusOK, accessKeyContracts)
 }

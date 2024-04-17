@@ -3,8 +3,8 @@ package config
 import (
 	"time"
 
+	"github.com/bitcoin-sv/spv-wallet/engine/datastore"
 	"github.com/google/uuid"
-	"github.com/mrz1836/go-datastore"
 )
 
 // DefaultAdminXpub is the default admin xpub used for authenticate requests.
@@ -12,22 +12,23 @@ const DefaultAdminXpub = "xpub661MyMwAqRbcFgfmdkPgE2m5UjHXu9dj124DbaGLSjaqVESTWf
 
 func getDefaultAppConfig() *AppConfig {
 	return &AppConfig{
-		Authentication:     getAuthConfigDefaults(),
-		Cache:              getCacheDefaults(),
-		Db:                 getDbDefaults(),
-		Debug:              true,
-		DebugProfiling:     true,
-		DisableITC:         true,
-		ImportBlockHeaders: "",
-		Logging:            getLoggingDefaults(),
-		NewRelic:           getNewRelicDefaults(),
-		Nodes:              getNodesDefaults(),
-		Notifications:      getNotificationDefaults(),
-		Paymail:            getPaymailDefaults(),
-		RequestLogging:     true,
-		Server:             getServerDefaults(),
-		TaskManager:        getTaskManagerDefault(),
-		Metrics:            getMetricsDefaults(),
+		Authentication:       getAuthConfigDefaults(),
+		Cache:                getCacheDefaults(),
+		Db:                   getDbDefaults(),
+		Debug:                true,
+		DebugProfiling:       true,
+		DisableITC:           true,
+		ImportBlockHeaders:   "",
+		Logging:              getLoggingDefaults(),
+		NewRelic:             getNewRelicDefaults(),
+		Nodes:                getNodesDefaults(),
+		Notifications:        getNotificationDefaults(),
+		Paymail:              getPaymailDefaults(),
+		RequestLogging:       true,
+		Server:               getServerDefaults(),
+		TaskManager:          getTaskManagerDefault(),
+		Metrics:              getMetricsDefaults(),
+		ExperimentalFeatures: getExperimentalFeaturesConfig(),
 	}
 }
 
@@ -45,7 +46,7 @@ func getCacheDefaults() *CacheConfig {
 		Engine: "freecache",
 		Cluster: &ClusterConfig{
 			Coordinator: "memory",
-			Prefix:      "bux_cluster_",
+			Prefix:      "spv_wallet_cluster_",
 			Redis:       nil,
 		},
 		Redis: &RedisConfig{
@@ -95,7 +96,7 @@ func getDbDefaults() *DbConfig {
 			SslMode:                   "disable",
 		},
 		SQLite: &datastore.SQLiteConfig{
-			DatabasePath:       "./bux.db",
+			DatabasePath:       "./spv-wallet.db",
 			ExistingConnection: nil,
 			Shared:             true,
 		},
@@ -106,7 +107,7 @@ func getLoggingDefaults() *LoggingConfig {
 	return &LoggingConfig{
 		Level:        "info",
 		Format:       "console",
-		InstanceName: "bux-server",
+		InstanceName: "spv-wallet",
 		LogOrigin:    false,
 	}
 }
@@ -122,12 +123,12 @@ func getNewRelicDefaults() *NewRelicConfig {
 func getNodesDefaults() *NodesConfig {
 	depIDSufix, _ := uuid.NewUUID()
 	return &NodesConfig{
-		DeploymentID: "bux-" + depIDSufix.String(),
+		DeploymentID: "spv-wallet-" + depIDSufix.String(),
 		Protocol:     NodesProtocolArc,
 		Callback:     getCallbackDefaults(),
 		Apis: []*MinerAPI{
 			{
-				ArcURL:  "https://api.taal.com/arc",
+				ArcURL:  "https://arc.taal.com",
 				Token:   "mainnet_06770f425eb00298839a24a49cbdc02c",
 				MinerID: "03ad780153c47df915b3d2e23af727c68facaca4facd5f155bf5018b979b9aeb83",
 			},
@@ -146,9 +147,9 @@ func getNotificationDefaults() *NotificationsConfig {
 func getPaymailDefaults() *PaymailConfig {
 	return &PaymailConfig{
 		Beef: &BeefConfig{
-			UseBeef:                  true,
-			PulseHeaderValidationURL: "http://localhost:8080/api/v1/chain/merkleroot/verify",
-			PulseAuthToken:           "mQZQ6WmxURxWz5ch", // #nosec G101
+			UseBeef:                               true,
+			BlockHeaderServiceHeaderValidationURL: "http://localhost:8080/api/v1/chain/merkleroot/verify",
+			BlockHeaderServiceAuthToken:           "mQZQ6WmxURxWz5ch", // #nosec G101
 		},
 		DefaultFromPaymail:      "from@domain.com",
 		Domains:                 []string{"localhost"},
@@ -175,5 +176,11 @@ func getServerDefaults() *ServerConfig {
 func getMetricsDefaults() *MetricsConfig {
 	return &MetricsConfig{
 		Enabled: false,
+	}
+}
+
+func getExperimentalFeaturesConfig() *ExperimentalConfig {
+	return &ExperimentalConfig{
+		PikeEnabled: false,
 	}
 }

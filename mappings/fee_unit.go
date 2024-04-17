@@ -1,24 +1,24 @@
 package mappings
 
 import (
-	buxmodels "github.com/BuxOrg/bux-models"
-	"github.com/BuxOrg/bux/utils"
+	"github.com/bitcoin-sv/spv-wallet/engine/utils"
+	"github.com/bitcoin-sv/spv-wallet/models"
 )
 
-// MapToFeeUnitContract will map the fee-unit model from bux to the bux-models contract
-func MapToFeeUnitContract(fu *utils.FeeUnit) (fc *buxmodels.FeeUnit) {
+// MapToFeeUnitContract will map the fee-unit model from spv-wallet to the spv-wallet-models contract
+func MapToFeeUnitContract(fu *utils.FeeUnit) (fc *models.FeeUnit) {
 	if fu == nil {
 		return nil
 	}
 
-	return &buxmodels.FeeUnit{
+	return &models.FeeUnit{
 		Satoshis: fu.Satoshis,
 		Bytes:    fu.Bytes,
 	}
 }
 
-// MapToFeeUnitBux will map the fee-unit model from bux-models to the bux contract
-func MapToFeeUnitBux(fu *buxmodels.FeeUnit) (fc *utils.FeeUnit) {
+// MapFeeUnitModelToEngine will map the fee-unit model from spv-wallet-models to the spv-wallet contract
+func MapFeeUnitModelToEngine(fu *models.FeeUnit) (fc *utils.FeeUnit) {
 	if fu == nil {
 		return nil
 	}

@@ -76,8 +76,11 @@ lint: ## Run the golangci-lint application (install if not found)
 	@if [ "$(shell command -v golangci-lint)" = "" ] && [ "$(shell command -v brew)" != "" ]; then brew install golangci-lint; fi;
 	@#MacOS Vanilla
 	@if [ "$(shell command -v golangci-lint)" = "" ] && [ "$(shell command -v brew)" != "" ]; then curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- v1.55.2; fi;
-	@echo "running golangci-lint..."
-	@golangci-lint run --verbose
+	@echo "running golangci-lint-error..."
+	@golangci-lint run --config=./.golangci-lint.yml --verbose --fix
+	@#golangci-lint run --verbose
+	@echo "running golangci-lint-style..."
+	@golangci-lint run --config=./.golangci-style.yml --verbose --fix
 
 .PHONY: test
 test: ## Runs lint and ALL tests

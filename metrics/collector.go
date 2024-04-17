@@ -1,17 +1,16 @@
 package metrics
 
 import (
-	buxmetrics "github.com/BuxOrg/bux/metrics"
+	enginemetrics "github.com/bitcoin-sv/spv-wallet/engine/metrics"
 	"github.com/prometheus/client_golang/prometheus"
 )
 
-// PrometheusCollector is a collector for Prometheus metrics. It should implement buxmetrics.Collector.
+// PrometheusCollector is a collector for Prometheus metrics. It should implement spvwalletmodels.Collector.
 type PrometheusCollector struct {
 	reg prometheus.Registerer
 }
 
-// NewPrometheusCollector creates a new PrometheusCollector.
-func NewPrometheusCollector(reg prometheus.Registerer) buxmetrics.Collector {
+func newPrometheusCollector(reg prometheus.Registerer) enginemetrics.Collector {
 	return &PrometheusCollector{reg: reg}
 }
 
@@ -51,4 +50,17 @@ func (c *PrometheusCollector) RegisterHistogramVec(name string, labels ...string
 	)
 	c.reg.MustRegister(h)
 	return h
+}
+
+// RegisterCounterVec creates a new CounterVec and registers it with the collector.
+func (c *PrometheusCollector) RegisterCounterVec(name string, labels ...string) *prometheus.CounterVec {
+	counter := prometheus.NewCounterVec(
+		prometheus.CounterOpts{
+			Name: name,
+			Help: "CounterVec of " + name,
+		},
+		labels,
+	)
+	c.reg.MustRegister(counter)
+	return counter
 }

@@ -3,9 +3,7 @@ package base
 import (
 	"testing"
 
-	"github.com/BuxOrg/bux-server/tests"
-	apirouter "github.com/mrz1836/go-api-router"
-	"github.com/stretchr/testify/require"
+	"github.com/bitcoin-sv/spv-wallet/tests"
 	"github.com/stretchr/testify/suite"
 )
 
@@ -29,9 +27,8 @@ func (ts *TestSuite) SetupTest() {
 	ts.BaseSetupTest()
 
 	// Load the router & register routes
-	ts.Router = apirouter.New()
-	require.NotNil(ts.T(), ts.Router)
-	RegisterRoutes(ts.Router, ts.AppConfig, ts.Services)
+	routes := NewHandler()
+	routes.RegisterBaseEndpoints(ts.Router.Group(""))
 }
 
 // TearDownTest runs after each test

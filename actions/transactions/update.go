@@ -3,11 +3,9 @@ package transactions
 import (
 	"net/http"
 
-	"github.com/BuxOrg/bux"
-	"github.com/BuxOrg/bux-server/actions"
-	"github.com/BuxOrg/bux-server/mappings"
-	"github.com/julienschmidt/httprouter"
-	apirouter "github.com/mrz1836/go-api-router"
+	"github.com/bitcoin-sv/spv-wallet/mappings"
+	"github.com/bitcoin-sv/spv-wallet/server/auth"
+	"github.com/gin-gonic/gin"
 )
 
 // update will update a transaction
@@ -16,38 +14,38 @@ import (
 // @Description	Update transaction
 // @Tags		Transactions
 // @Produce		json
-// @Param		id query string true "id"
-// @Param		metadata query string true "metadata"
-// @Success		200
+// @Param		UpdateTransaction body UpdateTransaction true " "
+// @Success		200 {object} models.Transaction "Updated transaction"
+// @Failure		400	"Bad request - Error while parsing UpdateTransaction from request body, tx not found or tx is not associated with the xpub"
+// @Failure 	500	"Internal Server Error - Error while updating transaction"
 // @Router		/v1/transaction [patch]
-// @Security	bux-auth-xpub
-func (a *Action) update(w http.ResponseWriter, req *http.Request, _ httprouter.Params) {
-	// Get the xPub from the request (via authentication)
-	reqXPubID, _ := bux.GetXpubIDFromRequest(req)
+// @Security	x-auth-xpub
+func (a *Action) update(c *gin.Context) {
+	reqXPubID := c.GetString(auth.ParamXPubHashKey)
 
-	// Parse the params
-	params := apirouter.GetParams(req)
-	metadata := params.GetJSON(actions.MetadataField)
+	var requestBody UpdateTransaction
+	if err := c.Bind(&requestBody); err != nil {
+		c.JSON(http.StatusBadRequest, err.Error())
+		return
+	}
 
 	// Get a transaction by ID
-	transaction, err := a.Services.Bux.UpdateTransactionMetadata(
-		req.Context(),
+	transaction, err := a.Services.SpvWalletEngine.UpdateTransactionMetadata(
+		c.Request.Context(),
 		reqXPubID,
-		params.GetString("id"),
-		metadata,
+		requestBody.ID,
+		requestBody.Metadata,
 	)
 	if err != nil {
-		apirouter.ReturnResponse(w, req, http.StatusExpectationFailed, err.Error())
+		c.JSON(http.StatusInternalServerError, err.Error())
 		return
 	} else if transaction == nil {
-		apirouter.ReturnResponse(w, req, http.StatusNotFound, "")
+		c.JSON(http.StatusBadRequest, "not found")
 	} else if !transaction.IsXpubIDAssociated(reqXPubID) {
-		apirouter.ReturnResponse(w, req, http.StatusForbidden, "unauthorized")
+		c.JSON(http.StatusBadRequest, "unauthorized")
 		return
 	}
 
 	contract := mappings.MapToTransactionContract(transaction)
-
-	// Return response
-	apirouter.ReturnResponse(w, req, http.StatusOK, contract)
+	c.JSON(http.StatusOK, contract)
 }

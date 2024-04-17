@@ -1,71 +1,86 @@
 <div align="center">
 
-# BUX: Server
+# SPV Wallet
 
 
-[![Release](https://img.shields.io/github/release-pre/BuxOrg/bux-server.svg?logo=github&style=flat&v=3)](https://github.com/BuxOrg/bux-server/releases)
-[![Build Status](https://img.shields.io/github/actions/workflow/status/BuxOrg/bux-server/run-tests.yml?branch=master&v=3)](https://github.com/BuxOrg/bux-server/actions)
-[![Report](https://goreportcard.com/badge/github.com/BuxOrg/bux-server?style=flat&v=3)](https://goreportcard.com/report/github.com/BuxOrg/bux-server)
-[![codecov](https://codecov.io/gh/BuxOrg/bux-server/branch/master/graph/badge.svg?v=3)](https://codecov.io/gh/BuxOrg/bux-server)
-[![Mergify Status](https://img.shields.io/endpoint.svg?url=https://api.mergify.com/v1/badges/BuxOrg/bux-server&style=flat&v=3)](https://mergify.io)
+[![Release](https://img.shields.io/github/release-pre/bitcoin-sv/spv-wallet.svg?logo=github&style=flat&v=3)](https://github.com/bitcoin-sv/spv-wallet/releases)
+[![Build Status](https://img.shields.io/github/actions/workflow/status/bitcoin-sv/spv-wallet/run-tests.yml?branch=main&v=3)](https://github.com/bitcoin-sv/spv-wallet/actions)
+[![Report](https://goreportcard.com/badge/github.com/bitcoin-sv/spv-wallet?style=flat&v=3)](https://goreportcard.com/report/github.com/bitcoin-sv/spv-wallet)
+[![codecov](https://codecov.io/gh/bitcoin-sv/spv-wallet/branch/main/graph/badge.svg?v=3)](https://codecov.io/gh/bitcoin-sv/spv-wallet)
+[![Mergify Status](https://img.shields.io/endpoint.svg?url=https://api.mergify.com/v1/badges/bitcoin-sv/spv-wallet&style=flat&v=3)](https://mergify.io)
 <br>
 
-[![Go](https://img.shields.io/github/go-mod/go-version/BuxOrg/bux-server?v=3)](https://golang.org/)
-[![Gitpod Ready-to-Code](https://img.shields.io/badge/Gitpod-ready--to--code-blue?logo=gitpod&v=3)](https://gitpod.io/#https://github.com/BuxOrg/bux-server)
+[![Go](https://img.shields.io/github/go-mod/go-version/bitcoin-sv/spv-wallet?v=3)](https://golang.org/)
+[![Gitpod Ready-to-Code](https://img.shields.io/badge/Gitpod-ready--to--code-blue?logo=gitpod&v=3)](https://gitpod.io/#https://github.com/bitcoin-sv/spv-wallet)
 [![standard-readme compliant](https://img.shields.io/badge/readme%20style-standard-brightgreen.svg?style=flat&v=3)](https://github.com/RichardLitt/standard-readme)
 [![Makefile Included](https://img.shields.io/badge/Makefile-Supported%20-brightgreen?=flat&logo=probot&v=3)](Makefile)
 <br/>
-</div>
 
-> Get started using [BUX](https://getbux.io) in five minutes
+</div>
 
 ## Table of Contents
 
-- [About](#about)
-- [Installation](#installation)
-- [Documentation](#documentation)
-- [Usage](#usage)
-  - [Config Variables](#config-variables)
-  - [Examples & Tests](#examples--tests)
-  - [Benchmarks](#benchmarks)
-- [Code Standards](#code-standards)
-- [Contributing](#contributing)
-- [License](#license)
+- [SPV Wallet](#spv-wallet)
+  - [Table of Contents](#table-of-contents)
+  - [About](#about)
+  - [Installation](#installation)
+      - [build](#build)
+      - [run](#run)
+  - [Documentation](#documentation)
+      - [Built-in Features](#built-in-features)
+    - [Automatic Releases on Tag Creation (recommended)](#automatic-releases-on-tag-creation-recommended)
+    - [Manual Releases (optional)](#manual-releases-optional)
+  - [Usage](#usage)
+    - [Defaults](#defaults)
+    - [Config Variables](#config-variables)
+      - [Flags](#flags)
+      - [Environment variables](#environment-variables)
+    - [Examples \& Tests](#examples--tests)
+    - [Benchmarks](#benchmarks)
+    - [Docker Compose Quickstart](#docker-compose-quickstart)
+  - [Code Standards](#code-standards)
+  - [Contributing](#contributing)
+  - [License](#license)
 
 <br/>
 
 ## About
 
-[Read more about BUX](https://getbux.io)
+A comprehensive non-custodial wallet for BSV digital currency.
+
+More in-depth information and guidance about SPV Wallet Toolbox you can find [here](https://bsvblockchain.gitbook.io/docs).
 
 <br/>
 
 ## Installation
 
-**bux-server** requires a [supported release of Go](https://golang.org/doc/devel/release.html#policy).
+**spv-wallet** requires a [supported release of Go](https://golang.org/doc/devel/release.html#policy).
 
 ```shell script
-go get -u github.com/BuxOrg/bux-server
+go get -u github.com/bitcoin-sv/spv-wallet
 ```
 
 #### build
 
 ```shell script
-go build -o bux-server cmd/server/*
+go build -o spv-wallet cmd/*
 ```
 
 #### run
 
 ```shell script
-./bux-server
+./spv-wallet
 ```
 <br/>
 
 ## Documentation
 
-View the generated [documentation](https://pkg.go.dev/github.com/BuxOrg/bux-server)
+View the generated [documentation](https://pkg.go.dev/github.com/bitcoin-sv/spv-wallet)
 
-[![GoDoc](https://godoc.org/github.com/BuxOrg/bux-server?status.svg&style=flat&v=3)](https://pkg.go.dev/github.com/BuxOrg/bux-server)
+[![GoDoc](https://godoc.org/github.com/bitcoin-sv/spv-wallet?status.svg&style=flat&v=3)](https://pkg.go.dev/github.com/bitcoin-sv/spv-wallet)
+View the generated [documentation](https://pkg.go.dev/github.com/bitcoin-sv/spv-wallet)
+
+[![GoDoc](https://godoc.org/github.com/bitcoin-sv/spv-wallet?status.svg&style=flat&v=3)](https://pkg.go.dev/github.com/bitcoin-sv/spv-wallet)
 
 <br/>
 
@@ -105,7 +120,7 @@ This repository was created using [MrZ's `go-template`](https://github.com/mrz18
 <br/>
 
 -   [BitcoinSchema/go-bitcoin](https://github.com/BitcoinSchema/go-bitcoin)
--   [BuxOrg/bux](https://github.com/BuxOrg/bux)
+-   [bitcoin-sv/spv-wallet](https://github.com/bitcoin-sv/spv-wallet)
 -   [mrz1836/go-api-router](https://github.com/mrz1836/go-api-router)
 -   [mrz1836/go-sanitize](https://github.com/mrz1836/go-sanitize)
 -   [stretchr/testify](https://github.com/stretchr/testify)
@@ -195,7 +210,7 @@ vet                           Run the Go vet application
 
 ### Defaults
 
-If you run Bux-Server without editing anything, it will use the default configuration from file [defaults.go](/config/defaults.go). It is set up to use _freecache_, _sqlite_ with enabled _paymail_ with _signing disabled_ and with _beef_.
+If you run spv-wallet without editing anything, it will use the default configuration from file [defaults.go](/config/defaults.go). It is set up to use _freecache_, _sqlite_ with enabled _paymail_ with _signing disabled_ and with _beef_.
 
 
 ### Config Variables
@@ -218,17 +233,17 @@ Available flags:
 
 To generate config file with defaults, use the --dump flag, or:
 ```bash
-go run ./cmd/server/main.go -d
+go run ./cmd/main.go -d
 ```
 
 The default config file path is **project root**, and the default file name is **config.yaml**. This can be overridden by -C flag.
 ```bash
-go run ./cmd/server/main.go -C /my/config.json
+go run ./cmd/main.go -C /my/config.json
 ```
 
 #### Environment variables
 
-To override any config variable with ENV, use the "BUX\_" prefix with mapstructure annotation path with "_" as a delimiter in all uppercase. Example:
+To override any config variable with ENV, use the "SPVWALLET\_" prefix with mapstructure annotation path with "_" as a delimiter in all uppercase. Example:
 
 Let's take this fragment of AppConfig from `config.example.yaml`:
 
@@ -240,9 +255,9 @@ auth:
     signing_disabled: true
 ```
 
-To override admin_key in auth config, use the path with "_" as a path delimiter and BUX\_ as prefix. So:
+To override admin_key in auth config, use the path with "_" as a path delimiter and SPVWALLET\_ as prefix. So:
 ```bash
-BUX_AUTH_ADMIN_KEY="admin_key"
+SPVWALLET_AUTH_ADMIN_KEY="admin_key"
 ```
 
 To be able to use TAAL API Key is needed. 
@@ -265,7 +280,8 @@ To use your API key put key in ``token`` field in ```config.example.yaml```
 
 ### Examples & Tests
 
-All unit tests run via [GitHub Actions](https://github.com/BuxOrg/bux-server/actions) and
+All unit tests run via [GitHub Actions](https://github.com/bitcoin-sv/spv-wallet/actions) and
+All unit tests run via [GitHub Actions](https://github.com/bitcoin-sv/spv-wallet/actions) and
 uses [Go version 1.19.x](https://golang.org/doc/go1.19). View the [configuration file](.github/workflows/run-tests.yml).
 
 <br/>
@@ -297,29 +313,41 @@ make bench
 
 ### Docker Compose Quickstart
 
-To get started with development, `bux-server` provides a `start.sh` script
-which is using `docker-compose.yml` file to starts up Bux Server with selected database
-and cache storage. To start, we need to fill the config json which we want to use,
-for example: `config/envs/development.json`.
+`spv-wallet` provides a `start.sh` script
+which is using `docker-compose.yml` file to starts up `SPV Wallet` with web-frontend, web-backend and selected database and cache storage.
 
 Main configuration is done when running the script.
 
 There are two way of running this script:
 1. with manual configuration - Every option is displayed in terminal and user can choose
-   which database/cache storage use and configure how to run bux-server.
+   which database/cache storage use and configure how to run spv-wallet.
   ```bash
   ./start.sh
   ```
 2. with flags which define how to set up docker services. Ever option is displayed when
    you ran the script with flag `-h` or `--help`. Possible options:
   ```bash
-  ./start.sh -db postgresql -c redis -bs true -env development -b false 
+  ./start.sh -db postgresql -c redis -sw true -b false 
   ```
 
-`-l/--load` option add possibility to use previously created `.env.config` file and run bux-server with simple command:
+`-l/--load` option add possibility to use previously created `.env.config` file and run spv-wallet with simple command:
   ```bash
   ./start.sh -l
   ```
+
+
+Ports which are used:
+
+- 3002 - SPV Wallet web-frontend
+- 8180 - SPV Wallet web-backend
+- 3003 - SPV Wallet (core service)
+- 3000 - SPV Wallet admin
+- 5432 - PostgreSQL DB
+- 6379 - Redis
+- 8080 - Block Headers Service
+- 27017 - MongoDB
+- 80 - in case of exposing on the paymail domain and its subdomains
+- 443 - in case of exposing on the paymail domain and its subdomains
 <br/>
 
 ## Code Standards
@@ -338,4 +366,4 @@ View the [contributing guidelines](.github/CODE_STANDARDS.md#3-contributing) and
 
 ## License
 
-[![License](https://img.shields.io/github/license/BuxOrg/bux-server.svg?style=flat&v=3)](LICENSE)
+[![License](https://img.shields.io/github/license/bitcoin-sv/spv-wallet.svg?style=flat&v=3)](LICENSE)

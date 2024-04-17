@@ -8,16 +8,16 @@ import (
 	"net/url"
 	"time"
 
-	"github.com/BuxOrg/bux"
-	"github.com/BuxOrg/bux-server/logging"
-	"github.com/BuxOrg/bux-server/metrics"
-	"github.com/BuxOrg/bux/cluster"
-	"github.com/BuxOrg/bux/taskmanager"
-	"github.com/BuxOrg/bux/utils"
 	broadcastclient "github.com/bitcoin-sv/go-broadcast-client/broadcast/broadcast-client"
+	"github.com/bitcoin-sv/spv-wallet/engine"
+	"github.com/bitcoin-sv/spv-wallet/engine/cluster"
+	"github.com/bitcoin-sv/spv-wallet/engine/datastore"
+	"github.com/bitcoin-sv/spv-wallet/engine/taskmanager"
+	"github.com/bitcoin-sv/spv-wallet/engine/utils"
+	"github.com/bitcoin-sv/spv-wallet/logging"
+	"github.com/bitcoin-sv/spv-wallet/metrics"
 	"github.com/go-redis/redis/v8"
 	"github.com/mrz1836/go-cachestore"
-	"github.com/mrz1836/go-datastore"
 	"github.com/newrelic/go-agent/v3/newrelic"
 	"github.com/rs/zerolog"
 )
@@ -25,9 +25,9 @@ import (
 // AppServices is the loaded services via config
 type (
 	AppServices struct {
-		Bux      bux.ClientInterface
-		NewRelic *newrelic.Application
-		Logger   *zerolog.Logger
+		SpvWalletEngine engine.ClientInterface
+		NewRelic        *newrelic.Application
+		Logger          *zerolog.Logger
 	}
 )
 
@@ -54,8 +54,8 @@ func (a *AppConfig) LoadServices(ctx context.Context) (*AppServices, error) {
 
 	_services.Logger = logger
 
-	// Load BUX
-	if err = _services.loadBux(ctx, a, false, logger); err != nil {
+	// Load SPV Wallet
+	if err = _services.loadSPVWallet(ctx, a, false, logger); err != nil {
 		return nil, err
 	}
 
@@ -78,8 +78,8 @@ func (a *AppConfig) LoadTestServices(ctx context.Context) (*AppServices, error) 
 	txn := _services.NewRelic.StartTransaction("services_load_test")
 	defer txn.End()
 
-	// Load bux for testing
-	if err = _services.loadBux(ctx, a, true, _services.Logger); err != nil {
+	// Load SPV Wallet for testing
+	if err = _services.loadSPVWallet(ctx, a, true, _services.Logger); err != nil {
 		return nil, err
 	}
 
@@ -114,10 +114,10 @@ func (a *AppConfig) loadNewRelic(services *AppServices) (err error) {
 
 // CloseAll will close all connections to all services
 func (s *AppServices) CloseAll(ctx context.Context) {
-	// Close Bux
-	if s.Bux != nil {
-		_ = s.Bux.Close(ctx)
-		s.Bux = nil
+	// Close SPV Wallet Engine
+	if s.SpvWalletEngine != nil {
+		_ = s.SpvWalletEngine.Close(ctx)
+		s.SpvWalletEngine = nil
 	}
 
 	// Close new relic
@@ -132,28 +132,28 @@ func (s *AppServices) CloseAll(ctx context.Context) {
 	}
 }
 
-// loadBux will load the bux client (including CacheStore and DataStore)
-func (s *AppServices) loadBux(ctx context.Context, appConfig *AppConfig, testMode bool, logger *zerolog.Logger) (err error) {
-	var options []bux.ClientOps
+// loadSPVWallet will load the SPV Wallet client (including CacheStore and DataStore)
+func (s *AppServices) loadSPVWallet(ctx context.Context, appConfig *AppConfig, testMode bool, logger *zerolog.Logger) (err error) {
+	var options []engine.ClientOps
 
 	if appConfig.NewRelic.Enabled {
-		options = append(options, bux.WithNewRelic(s.NewRelic))
+		options = append(options, engine.WithNewRelic(s.NewRelic))
 	}
 
 	if appConfig.Metrics.Enabled {
 		collector := metrics.EnableMetrics()
-		options = append(options, bux.WithMetrics(collector))
+		options = append(options, engine.WithMetrics(collector))
 	}
 
-	options = append(options, bux.WithUserAgent(appConfig.GetUserAgent()))
+	options = append(options, engine.WithUserAgent(appConfig.GetUserAgent()))
 
 	if logger != nil {
-		buxLogger := logger.With().Str("service", "bux").Logger()
-		options = append(options, bux.WithLogger(&buxLogger))
+		serviceLogger := logger.With().Str("service", "spv-wallet").Logger()
+		options = append(options, engine.WithLogger(&serviceLogger))
 	}
 
 	if appConfig.Debug {
-		options = append(options, bux.WithDebugging())
+		options = append(options, engine.WithDebugging())
 	}
 
 	options = loadCachestore(appConfig, options)
@@ -172,7 +172,7 @@ func (s *AppServices) loadBux(ctx context.Context, appConfig *AppConfig, testMod
 	options = loadTaskManager(appConfig, options)
 
 	if appConfig.Notifications != nil && appConfig.Notifications.Enabled {
-		options = append(options, bux.WithNotifications(appConfig.Notifications.WebhookEndpoint))
+		options = append(options, engine.WithNotifications(appConfig.Notifications.WebhookEndpoint))
 	}
 
 	if appConfig.Nodes.Protocol == NodesProtocolMapi {
@@ -190,26 +190,26 @@ func (s *AppServices) loadBux(ctx context.Context, appConfig *AppConfig, testMod
 		appConfig.Nodes.Callback.CallbackToken = callbackToken
 	}
 
-	options = append(options, bux.WithCallback(appConfig.Nodes.Callback.CallbackHost+BroadcastCallbackRoute, appConfig.Nodes.Callback.CallbackToken))
+	options = append(options, engine.WithCallback(appConfig.Nodes.Callback.CallbackHost+BroadcastCallbackRoute, appConfig.Nodes.Callback.CallbackToken))
 
-	options = append(options, bux.WithFeeQuotes(appConfig.Nodes.UseFeeQuotes))
+	options = append(options, engine.WithFeeQuotes(appConfig.Nodes.UseFeeQuotes))
 
 	if appConfig.Nodes.FeeUnit != nil {
-		options = append(options, bux.WithFeeUnit(&utils.FeeUnit{
+		options = append(options, engine.WithFeeUnit(&utils.FeeUnit{
 			Satoshis: appConfig.Nodes.FeeUnit.Satoshis,
 			Bytes:    appConfig.Nodes.FeeUnit.Bytes,
 		}))
 	}
 
 	// Create the new client
-	s.Bux, err = bux.NewClient(ctx, options...)
+	s.SpvWalletEngine, err = engine.NewClient(ctx, options...)
 
 	return
 }
 
-func loadCachestore(appConfig *AppConfig, options []bux.ClientOps) []bux.ClientOps {
+func loadCachestore(appConfig *AppConfig, options []engine.ClientOps) []engine.ClientOps {
 	if appConfig.Cache.Engine == cachestore.Redis {
-		options = append(options, bux.WithRedis(&cachestore.RedisConfig{
+		options = append(options, engine.WithRedis(&cachestore.RedisConfig{
 			DependencyMode:        appConfig.Cache.Redis.DependencyMode,
 			MaxActiveConnections:  appConfig.Cache.Redis.MaxActiveConnections,
 			MaxConnectionLifetime: appConfig.Cache.Redis.MaxConnectionLifetime,
@@ -219,13 +219,13 @@ func loadCachestore(appConfig *AppConfig, options []bux.ClientOps) []bux.ClientO
 			UseTLS:                appConfig.Cache.Redis.UseTLS,
 		}))
 	} else if appConfig.Cache.Engine == cachestore.FreeCache {
-		options = append(options, bux.WithFreeCache())
+		options = append(options, engine.WithFreeCache())
 	}
 
 	return options
 }
 
-func loadCluster(appConfig *AppConfig, options []bux.ClientOps) ([]bux.ClientOps, error) {
+func loadCluster(appConfig *AppConfig, options []engine.ClientOps) ([]engine.ClientOps, error) {
 	if appConfig.Cache.Cluster != nil {
 		if appConfig.Cache.Cluster.Coordinator == cluster.CoordinatorRedis {
 			var redisOptions *redis.Options
@@ -260,32 +260,36 @@ func loadCluster(appConfig *AppConfig, options []bux.ClientOps) ([]bux.ClientOps
 			} else {
 				return options, errors.New("could not load redis cluster coordinator")
 			}
-			options = append(options, bux.WithClusterRedis(redisOptions))
+			options = append(options, engine.WithClusterRedis(redisOptions))
 		}
 		if appConfig.Cache.Cluster.Prefix != "" {
-			options = append(options, bux.WithClusterKeyPrefix(appConfig.Cache.Cluster.Prefix))
+			options = append(options, engine.WithClusterKeyPrefix(appConfig.Cache.Cluster.Prefix))
 		}
 	}
 
 	return options, nil
 }
 
-func loadPaymail(appConfig *AppConfig, options []bux.ClientOps) []bux.ClientOps {
+func loadPaymail(appConfig *AppConfig, options []engine.ClientOps) []engine.ClientOps {
 	pm := appConfig.Paymail
-	options = append(options, bux.WithPaymailSupport(
+	options = append(options, engine.WithPaymailSupport(
 		pm.Domains,
 		pm.DefaultFromPaymail,
 		pm.DomainValidationEnabled,
 		pm.SenderValidationEnabled,
 	))
 	if pm.Beef.enabled() {
-		options = append(options, bux.WithPaymailBeefSupport(pm.Beef.PulseHeaderValidationURL, pm.Beef.PulseAuthToken))
+		options = append(options, engine.WithPaymailBeefSupport(pm.Beef.BlockHeaderServiceHeaderValidationURL, pm.Beef.BlockHeaderServiceAuthToken))
 	}
+	if appConfig.ExperimentalFeatures.PikeEnabled {
+		options = append(options, engine.WithPaymailPikeSupport())
+	}
+
 	return options
 }
 
 // loadDatastore will load the correct datastore based on the engine
-func loadDatastore(options []bux.ClientOps, appConfig *AppConfig, testMode bool) ([]bux.ClientOps, error) {
+func loadDatastore(options []engine.ClientOps, appConfig *AppConfig, testMode bool) ([]engine.ClientOps, error) {
 	// Set the datastore options
 	if testMode {
 		var err error
@@ -305,7 +309,7 @@ func loadDatastore(options []bux.ClientOps, appConfig *AppConfig, testMode bool)
 		if len(appConfig.Db.SQLite.TablePrefix) > 0 {
 			tablePrefix = appConfig.Db.SQLite.TablePrefix
 		}
-		options = append(options, bux.WithSQLite(&datastore.SQLiteConfig{
+		options = append(options, engine.WithSQLite(&datastore.SQLiteConfig{
 			CommonConfig: datastore.CommonConfig{
 				Debug:                 appConfig.Db.Datastore.Debug,
 				MaxConnectionIdleTime: appConfig.Db.SQLite.MaxConnectionIdleTime,
@@ -323,7 +327,7 @@ func loadDatastore(options []bux.ClientOps, appConfig *AppConfig, testMode bool)
 			tablePrefix = appConfig.Db.SQL.TablePrefix
 		}
 
-		options = append(options, bux.WithSQL(appConfig.Db.Datastore.Engine, &datastore.SQLConfig{
+		options = append(options, engine.WithSQL(appConfig.Db.Datastore.Engine, &datastore.SQLConfig{
 			CommonConfig: datastore.CommonConfig{
 				Debug:                 appConfig.Db.Datastore.Debug,
 				MaxConnectionIdleTime: appConfig.Db.SQL.MaxConnectionIdleTime,
@@ -352,28 +356,28 @@ func loadDatastore(options []bux.ClientOps, appConfig *AppConfig, testMode bool)
 		}
 		appConfig.Db.Mongo.Debug = debug
 		appConfig.Db.Mongo.TablePrefix = tablePrefix
-		options = append(options, bux.WithMongoDB(appConfig.Db.Mongo))
+		options = append(options, engine.WithMongoDB(appConfig.Db.Mongo))
 	} else {
 		return nil, errors.New("unsupported datastore engine: " + appConfig.Db.Datastore.Engine.String())
 	}
 
-	options = append(options, bux.WithAutoMigrate(bux.BaseModels...))
+	options = append(options, engine.WithAutoMigrate(engine.BaseModels...))
 
 	return options, nil
 }
 
-func loadTaskManager(appConfig *AppConfig, options []bux.ClientOps) []bux.ClientOps {
+func loadTaskManager(appConfig *AppConfig, options []engine.ClientOps) []engine.ClientOps {
 	ops := []taskmanager.TasqOps{}
 	if appConfig.TaskManager.Factory == taskmanager.FactoryRedis {
 		ops = append(ops, taskmanager.WithRedis(appConfig.Cache.Redis.URL))
 	}
-	options = append(options, bux.WithTaskqConfig(
+	options = append(options, engine.WithTaskqConfig(
 		taskmanager.DefaultTaskQConfig(TaskManagerQueueName, ops...),
 	))
 	return options
 }
 
-func loadBroadcastClientArc(appConfig *AppConfig, options []bux.ClientOps, logger *zerolog.Logger) []bux.ClientOps {
+func loadBroadcastClientArc(appConfig *AppConfig, options []engine.ClientOps, logger *zerolog.Logger) []engine.ClientOps {
 	builder := broadcastclient.Builder()
 	var bcLogger zerolog.Logger
 	if logger == nil {
@@ -387,16 +391,16 @@ func loadBroadcastClientArc(appConfig *AppConfig, options []bux.ClientOps, logge
 	broadcastClient := builder.Build()
 	options = append(
 		options,
-		bux.WithBroadcastClient(broadcastClient),
+		engine.WithBroadcastClient(broadcastClient),
 	)
 	return options
 }
 
-func loadMinercraftMapi(appConfig *AppConfig, options []bux.ClientOps) []bux.ClientOps {
+func loadMinercraftMapi(appConfig *AppConfig, options []engine.ClientOps) []engine.ClientOps {
 	options = append(
 		options,
-		bux.WithMAPI(),
-		bux.WithMinercraftAPIs(appConfig.Nodes.toMinercraftMapi()),
+		engine.WithMAPI(),
+		engine.WithMinercraftAPIs(appConfig.Nodes.toMinercraftMapi()),
 	)
 	return options
 }

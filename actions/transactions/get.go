@@ -3,10 +3,9 @@ package transactions
 import (
 	"net/http"
 
-	"github.com/BuxOrg/bux"
-	"github.com/BuxOrg/bux-server/mappings"
-	"github.com/julienschmidt/httprouter"
-	apirouter "github.com/mrz1836/go-api-router"
+	"github.com/bitcoin-sv/spv-wallet/mappings"
+	"github.com/bitcoin-sv/spv-wallet/server/auth"
+	"github.com/gin-gonic/gin"
 )
 
 // get will fetch a transaction
@@ -16,34 +15,31 @@ import (
 // @Tags		Transactions
 // @Produce		json
 // @Param		id query string true "id"
-// @Success		200
+// @Success		200 {object} models.Transaction "Transaction"
+// @Failure		400	"Bad request - Transaction not found or associated with another xpub"
+// @Failure 	500	"Internal Server Error - Error while fetching transaction"
 // @Router		/v1/transaction [get]
-// @Security	bux-auth-xpub
-func (a *Action) get(w http.ResponseWriter, req *http.Request, _ httprouter.Params) {
-	// Parse the params
-	params := apirouter.GetParams(req)
+// @Security	x-auth-xpub
+func (a *Action) get(c *gin.Context) {
+	reqXPubID := c.GetString(auth.ParamXPubHashKey)
+	id := c.Query("id")
 
-	// Get the xPub from the request (via authentication)
-	reqXPubID, _ := bux.GetXpubIDFromRequest(req)
-
-	// Get a transaction by ID
-	transaction, err := a.Services.Bux.GetTransaction(
-		req.Context(),
+	transaction, err := a.Services.SpvWalletEngine.GetTransaction(
+		c.Request.Context(),
 		reqXPubID,
-		params.GetString("id"),
+		id,
 	)
 	if err != nil {
-		apirouter.ReturnResponse(w, req, http.StatusExpectationFailed, err.Error())
+		c.JSON(http.StatusInternalServerError, err.Error())
 		return
 	} else if transaction == nil {
-		apirouter.ReturnResponse(w, req, http.StatusNotFound, "")
+		c.JSON(http.StatusBadRequest, "not found")
+		return
 	} else if !transaction.IsXpubIDAssociated(reqXPubID) {
-		apirouter.ReturnResponse(w, req, http.StatusForbidden, "unauthorized")
+		c.JSON(http.StatusBadRequest, "unauthorized")
 		return
 	}
 
 	contract := mappings.MapToTransactionContract(transaction)
-
-	// Return response
-	apirouter.ReturnResponse(w, req, http.StatusOK, contract)
+	c.JSON(http.StatusOK, contract)
 }

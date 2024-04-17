@@ -1,15 +1,13 @@
 package transactions
 
 import (
-	"encoding/json"
 	"net/http"
 
-	"github.com/BuxOrg/bux"
-	buxmodels "github.com/BuxOrg/bux-models"
-	"github.com/BuxOrg/bux-server/actions"
-	"github.com/BuxOrg/bux-server/mappings"
-	"github.com/julienschmidt/httprouter"
-	apirouter "github.com/mrz1836/go-api-router"
+	"github.com/bitcoin-sv/spv-wallet/actions"
+	"github.com/bitcoin-sv/spv-wallet/engine"
+	"github.com/bitcoin-sv/spv-wallet/mappings"
+	"github.com/bitcoin-sv/spv-wallet/server/auth"
+	"github.com/gin-gonic/gin"
 )
 
 // newTransaction will create a new transaction
@@ -18,69 +16,48 @@ import (
 // @Description	New transaction
 // @Tags		Transactions
 // @Produce		json
-// @Param		config query string true "transaction config"
-// @Param		metadata query string false "metadata"
-// @Success		201
+// @Param		NewTransaction body NewTransaction true "NewTransaction model containing the transaction config and metadata"
+// @Success		201 {object} models.DraftTransaction "Created transaction"
+// @Failure		400	"Bad request - Error while parsing NewTransaction from request body or xpub not found"
+// @Failure 	500	"Internal Server Error - Error while creating transaction"
 // @Router		/v1/transaction [post]
-// @Security	bux-auth-xpub
-func (a *Action) newTransaction(w http.ResponseWriter, req *http.Request, _ httprouter.Params) {
-	// Parse the params
-	params := apirouter.GetParams(req)
+// @Security	x-auth-xpub
+func (a *Action) newTransaction(c *gin.Context) {
+	reqXPub := c.GetString(auth.ParamXPubKey)
 
-	// Get the xPub from the request (via authentication)
-	reqXPub, _ := bux.GetXpubFromRequest(req)
-	xPub, err := a.Services.Bux.GetXpub(req.Context(), reqXPub)
+	xPub, err := a.Services.SpvWalletEngine.GetXpub(c.Request.Context(), reqXPub)
 	if err != nil {
-		apirouter.ReturnResponse(w, req, http.StatusUnprocessableEntity, err.Error())
+		c.JSON(http.StatusBadRequest, err.Error())
 		return
 	} else if xPub == nil {
-		apirouter.ReturnResponse(w, req, http.StatusForbidden, actions.ErrXpubNotFound.Error())
+		c.JSON(http.StatusBadRequest, actions.ErrXpubNotFound.Error())
 		return
 	}
 
-	// Read transaction config from request body
-	// TODO: Austin's params package probably has a better way to do this than
-	// marshal/unmarshal... couldn't figure it out
-	configMap, ok := params.GetJSONOk("config")
-	if !ok {
-		apirouter.ReturnResponse(w, req, http.StatusBadRequest, actions.ErrTxConfigNotFound.Error())
+	var requestBody NewTransaction
+	if err = c.Bind(&requestBody); err != nil {
+		c.JSON(http.StatusBadRequest, err.Error())
 		return
 	}
 
-	var configBytes []byte
-	if configBytes, err = json.Marshal(configMap); err != nil {
-		apirouter.ReturnResponse(w, req, http.StatusBadRequest, actions.ErrBadTxConfig.Error())
-		return
+	opts := a.Services.SpvWalletEngine.DefaultModelOptions()
+	if requestBody.Metadata != nil {
+		opts = append(opts, engine.WithMetadatas(requestBody.Metadata))
 	}
 
-	txContract := buxmodels.TransactionConfig{}
-	if err = json.Unmarshal(configBytes, &txContract); err != nil {
-		apirouter.ReturnResponse(w, req, http.StatusBadRequest, actions.ErrBadTxConfig.Error())
-		return
-	}
+	txConfig := mappings.MapTransactionConfigEngineToModel(&requestBody.Config)
 
-	metadata := params.GetJSON(bux.ModelMetadata.String())
-	opts := a.Services.Bux.DefaultModelOptions()
-	if metadata != nil {
-		opts = append(opts, bux.WithMetadatas(metadata))
-	}
-
-	txConfig := mappings.MapToTransactionConfigBux(&txContract)
-
-	// Record a new transaction (get the hex from parameters)
-	var transaction *bux.DraftTransaction
-	if transaction, err = a.Services.Bux.NewTransaction(
-		req.Context(),
+	var transaction *engine.DraftTransaction
+	if transaction, err = a.Services.SpvWalletEngine.NewTransaction(
+		c.Request.Context(),
 		xPub.RawXpub(),
 		txConfig,
 		opts...,
 	); err != nil {
-		apirouter.ReturnResponse(w, req, http.StatusUnprocessableEntity, err.Error())
+		c.JSON(http.StatusInternalServerError, err.Error())
 		return
 	}
 
 	contract := mappings.MapToDraftTransactionContract(transaction)
-
-	// Return response
-	apirouter.ReturnResponse(w, req, http.StatusCreated, contract)
+	c.JSON(http.StatusCreated, contract)
 }

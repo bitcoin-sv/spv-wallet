@@ -3,11 +3,8 @@ package destinations
 import (
 	"net/http"
 
-	"github.com/BuxOrg/bux"
-	"github.com/BuxOrg/bux-server/actions"
-	"github.com/BuxOrg/bux-server/mappings"
-	"github.com/julienschmidt/httprouter"
-	apirouter "github.com/mrz1836/go-api-router"
+	"github.com/bitcoin-sv/spv-wallet/server/auth"
+	"github.com/gin-gonic/gin"
 )
 
 // count will fetch a count of destinations filtered by metadata
@@ -15,36 +12,32 @@ import (
 // @Summary		Count Destinations
 // @Description	Count Destinations
 // @Tags		Destinations
-// @Param		metadata query string false "metadata"
-// @Param		condition query string false "condition"
 // @Produce		json
-// @Success		200
+// @Param		CountDestinations body CountDestinations false "Enables precise filtering of resource counts using custom conditions or metadata, catering to specific business or analysis needs"
+// @Success		200	{number} int64 "Count of destinations"
+// @Failure		400	"Bad request - Error while parsing CountDestinations from request body"
+// @Failure 	500	"Internal Server Error - Error while fetching count of destinations"
 // @Router		/v1/destination/count [post]
-// @Security	bux-auth-xpub
-func (a *Action) count(w http.ResponseWriter, req *http.Request, _ httprouter.Params) {
-	reqXPubID, _ := bux.GetXpubIDFromRequest(req)
+// @Security	x-auth-xpub
+func (a *Action) count(c *gin.Context) {
+	reqXPubID := c.GetString(auth.ParamXPubHashKey)
 
-	// Parse the params
-	params := apirouter.GetParams(req)
-	_, metadataModels, conditions, err := actions.GetQueryParameters(params)
-	metadata := mappings.MapToBuxMetadata(metadataModels)
-	if err != nil {
-		apirouter.ReturnResponse(w, req, http.StatusExpectationFailed, err.Error())
+	var reqParams CountDestinations
+	if err := c.Bind(&reqParams); err != nil {
+		c.JSON(http.StatusBadRequest, err.Error())
 		return
 	}
 
-	// Record a new transaction (get the hex from parameters)
-	var count int64
-	if count, err = a.Services.Bux.GetDestinationsByXpubIDCount(
-		req.Context(),
+	count, err := a.Services.SpvWalletEngine.GetDestinationsByXpubIDCount(
+		c.Request.Context(),
 		reqXPubID,
-		metadata,
-		conditions,
-	); err != nil {
-		apirouter.ReturnResponse(w, req, http.StatusExpectationFailed, err.Error())
+		reqParams.Metadata,
+		reqParams.Conditions.ToDbConditions(),
+	)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, err.Error())
 		return
 	}
 
-	// Return response
-	apirouter.ReturnResponse(w, req, http.StatusOK, count)
+	c.JSON(http.StatusOK, count)
 }

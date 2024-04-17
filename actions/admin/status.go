@@ -3,8 +3,7 @@ package admin
 import (
 	"net/http"
 
-	"github.com/julienschmidt/httprouter"
-	apirouter "github.com/mrz1836/go-api-router"
+	"github.com/gin-gonic/gin"
 )
 
 // status will return the status of the admin login
@@ -13,10 +12,9 @@ import (
 // @Description	Get status
 // @Tags		Admin
 // @Produce		json
-// @Success		200
+// @Success		200 {boolean} bool "Status response"
 // @Router		/v1/admin/status [get]
-// @Security	bux-auth-xpub
-func (a *Action) status(w http.ResponseWriter, req *http.Request, _ httprouter.Params) {
-	// Return response
-	apirouter.ReturnResponse(w, req, http.StatusOK, true)
+// @Security	x-auth-xpub
+func (a *Action) status(c *gin.Context) {
+	c.JSON(http.StatusOK, true)
 }

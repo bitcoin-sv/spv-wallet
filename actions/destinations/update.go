@@ -3,11 +3,10 @@ package destinations
 import (
 	"net/http"
 
-	"github.com/BuxOrg/bux"
-	"github.com/BuxOrg/bux-server/actions"
-	"github.com/BuxOrg/bux-server/mappings"
-	"github.com/julienschmidt/httprouter"
-	apirouter "github.com/mrz1836/go-api-router"
+	"github.com/bitcoin-sv/spv-wallet/engine"
+	"github.com/bitcoin-sv/spv-wallet/mappings"
+	"github.com/bitcoin-sv/spv-wallet/server/auth"
+	"github.com/gin-gonic/gin"
 )
 
 // update will update an existing model
@@ -16,50 +15,46 @@ import (
 // @Description	Update destination
 // @Tags		Destinations
 // @Produce		json
-// @Param		id path string false "Destination ID"
-// @Param		address path string false "Destination Address"
-// @Param		locking_script path string false "Destination Locking Script"
-// @Param		metadata body string true "Destination Metadata"
-// @Success		200
+// @Param		UpdateDestination body UpdateDestination false " "
+// @Success		200 {object} models.Destination "Updated Destination"
+// @Failure		400	"Bad request - Error while parsing UpdateDestination from request body"
+// @Failure 	500	"Internal Server Error - Error while updating destination"
 // @Router		/v1/destination [patch]
-// @Security	bux-auth-xpub
-func (a *Action) update(w http.ResponseWriter, req *http.Request, _ httprouter.Params) {
-	reqXPubID, _ := bux.GetXpubIDFromRequest(req)
+// @Security	x-auth-xpub
+func (a *Action) update(c *gin.Context) {
+	reqXPubID := c.GetString(auth.ParamXPubHashKey)
 
-	// Parse the params
-	params := apirouter.GetParams(req)
-	id := params.GetString("id")
-	address := params.GetString("address")
-	lockingScript := params.GetString("locking_script")
-	if id == "" && address == "" && lockingScript == "" {
-		apirouter.ReturnResponse(w, req, http.StatusExpectationFailed, "One of the fields is required: id, address or lockingScript")
+	var requestBody UpdateDestination
+	if err := c.Bind(&requestBody); err != nil {
+		c.JSON(http.StatusBadRequest, err.Error())
 		return
 	}
-	metadata := params.GetJSON(actions.MetadataField)
+	if requestBody.ID == "" && requestBody.Address == "" && requestBody.LockingScript == "" {
+		c.JSON(http.StatusBadRequest, "One of the fields is required: id, address or lockingScript")
+		return
+	}
 
 	// Get the destination
-	var destination *bux.Destination
+	var destination *engine.Destination
 	var err error
-	if id != "" {
-		destination, err = a.Services.Bux.UpdateDestinationMetadataByID(
-			req.Context(), reqXPubID, id, metadata,
+	if requestBody.ID != "" {
+		destination, err = a.Services.SpvWalletEngine.UpdateDestinationMetadataByID(
+			c.Request.Context(), reqXPubID, requestBody.ID, requestBody.Metadata,
 		)
-	} else if address != "" {
-		destination, err = a.Services.Bux.UpdateDestinationMetadataByAddress(
-			req.Context(), reqXPubID, address, metadata,
+	} else if requestBody.Address != "" {
+		destination, err = a.Services.SpvWalletEngine.UpdateDestinationMetadataByAddress(
+			c.Request.Context(), reqXPubID, requestBody.Address, requestBody.Metadata,
 		)
 	} else {
-		destination, err = a.Services.Bux.UpdateDestinationMetadataByLockingScript(
-			req.Context(), reqXPubID, lockingScript, metadata,
+		destination, err = a.Services.SpvWalletEngine.UpdateDestinationMetadataByLockingScript(
+			c.Request.Context(), reqXPubID, requestBody.LockingScript, requestBody.Metadata,
 		)
 	}
 	if err != nil {
-		apirouter.ReturnResponse(w, req, http.StatusExpectationFailed, err.Error())
+		c.JSON(http.StatusInternalServerError, err.Error())
 		return
 	}
 
 	contract := mappings.MapToDestinationContract(destination)
-
-	// Return response
-	apirouter.ReturnResponse(w, req, http.StatusOK, contract)
+	c.JSON(http.StatusOK, contract)
 }

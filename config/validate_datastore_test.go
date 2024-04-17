@@ -3,7 +3,7 @@ package config
 import (
 	"testing"
 
-	"github.com/mrz1836/go-datastore"
+	"github.com/bitcoin-sv/spv-wallet/engine/datastore"
 	"github.com/stretchr/testify/require"
 )
 
