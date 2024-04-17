@@ -1371,10 +1371,10 @@
                 "parameters": [
                     {
                         "description": "Enables precise filtering of resource counts using custom conditions or metadata, catering to specific business or analysis needs",
-                        "name": "CountRequestParameters",
+                        "name": "CountDestinations",
                         "in": "body",
                         "schema": {
-                            "$ref": "#/definitions/actions.CountRequestParameters"
+                            "$ref": "#/definitions/destinations.CountDestinations"
                         }
                     }
                 ],
@@ -1386,7 +1386,7 @@
                         }
                     },
                     "400": {
-                        "description": "Bad request - Error while parsing CountRequestParameters from request body"
+                        "description": "Bad request - Error while parsing CountDestinations from request body"
                     },
                     "500": {
                         "description": "Internal Server Error - Error while fetching count of destinations"
@@ -1412,10 +1412,10 @@
                 "parameters": [
                     {
                         "description": "Supports targeted resource searches with filters for metadata and custom conditions, plus options for pagination and sorting to streamline data exploration and analysis",
-                        "name": "SearchRequestParameters",
+                        "name": "SearchDestinations",
                         "in": "body",
                         "schema": {
-                            "$ref": "#/definitions/actions.SearchRequestParameters"
+                            "$ref": "#/definitions/destinations.SearchDestinations"
                         }
                     }
                 ],
@@ -1430,7 +1430,7 @@
                         }
                     },
                     "400": {
-                        "description": "Bad request - Error while parsing SearchRequestParameters from request body"
+                        "description": "Bad request - Error while parsing SearchDestinations from request body"
                     },
                     "500": {
                         "description": "Internal server error - Error while searching for destinations"
@@ -1576,10 +1576,10 @@
                 "parameters": [
                     {
                         "description": "Enables precise filtering of resource counts using custom conditions or metadata, catering to specific business or analysis needs",
-                        "name": "CountRequestParameters",
+                        "name": "CountTransactions",
                         "in": "body",
                         "schema": {
-                            "$ref": "#/definitions/actions.CountRequestParameters"
+                            "$ref": "#/definitions/transactions.CountTransactions"
                         }
                     }
                 ],
@@ -1591,7 +1591,7 @@
                         }
                     },
                     "400": {
-                        "description": "Bad request - Error while parsing CountRequestParameters from request body"
+                        "description": "Bad request - Error while parsing CountTransactions from request body"
                     },
                     "500": {
                         "description": "Internal Server Error - Error while fetching count of transactions"
@@ -1659,10 +1659,10 @@
                 "parameters": [
                     {
                         "description": "Supports targeted resource searches with filters for metadata and custom conditions, plus options for pagination and sorting to streamline data exploration and analysis",
-                        "name": "SearchRequestParameters",
+                        "name": "SearchTransactions",
                         "in": "body",
                         "schema": {
-                            "$ref": "#/definitions/actions.SearchRequestParameters"
+                            "$ref": "#/definitions/transactions.SearchTransactions"
                         }
                     }
                 ],
@@ -1677,7 +1677,7 @@
                         }
                     },
                     "400": {
-                        "description": "Bad request - Error while parsing SearchRequestParameters from request body"
+                        "description": "Bad request - Error while parsing SearchTransactions from request body"
                     },
                     "500": {
                         "description": "Internal server error - Error while searching for transactions"
@@ -2164,6 +2164,30 @@
                 }
             }
         },
+        "destinations.CountDestinations": {
+            "type": "object",
+            "properties": {
+                "conditions": {
+                    "description": "Custom conditions used for filtering the search results",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/filter.DestinationFilter"
+                        }
+                    ]
+                },
+                "metadata": {
+                    "description": "Accepts a JSON object for embedding custom metadata, enabling arbitrary additional information to be associated with the resource",
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "string"
+                    },
+                    "example": {
+                        "key": "value",
+                        "key2": "value2"
+                    }
+                }
+            }
+        },
         "destinations.CreateDestination": {
             "type": "object",
             "properties": {
@@ -2176,6 +2200,43 @@
                     "example": {
                         "key": "value",
                         "key2": "value2"
+                    }
+                }
+            }
+        },
+        "destinations.SearchDestinations": {
+            "type": "object",
+            "properties": {
+                "conditions": {
+                    "description": "Custom conditions used for filtering the search results",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/filter.DestinationFilter"
+                        }
+                    ]
+                },
+                "metadata": {
+                    "description": "Accepts a JSON object for embedding custom metadata, enabling arbitrary additional information to be associated with the resource",
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "string"
+                    },
+                    "example": {
+                        "key": "value",
+                        "key2": "value2"
+                    }
+                },
+                "params": {
+                    "description": "Pagination and sorting options to streamline data exploration and analysis",
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "string"
+                    },
+                    "example": {
+                        "order_by_direction": "desc",
+                        "order_by_field": "created_at",
+                        "page": "1",
+                        "page_size": "10"
                     }
                 }
             }
@@ -2214,6 +2275,102 @@
         "engine.Metadata": {
             "type": "object",
             "additionalProperties": true
+        },
+        "filter.DestinationFilter": {
+            "type": "object",
+            "properties": {
+                "address": {
+                    "type": "string",
+                    "example": "1CDUf7CKu8ocTTkhcYUbq75t14Ft168K65"
+                },
+                "created_range": {
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "string"
+                    }
+                },
+                "draft_id": {
+                    "type": "string",
+                    "example": "b356f7fa00cd3f20cce6c21d704cd13e871d28d714a5ebd0532f5a0e0cde63f7"
+                },
+                "include_deleted": {
+                    "type": "boolean",
+                    "example": true
+                },
+                "locking_script": {
+                    "type": "string",
+                    "example": "76a9147b05764a97f3b4b981471492aa703b188e45979b88ac"
+                },
+                "updated_range": {
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "string"
+                    }
+                }
+            }
+        },
+        "filter.TransactionFilter": {
+            "type": "object",
+            "properties": {
+                "block_hash": {
+                    "type": "string"
+                },
+                "block_height": {
+                    "type": "integer"
+                },
+                "created_range": {
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "string"
+                    }
+                },
+                "draft_id": {
+                    "type": "string"
+                },
+                "fee": {
+                    "type": "integer"
+                },
+                "hex": {
+                    "type": "string"
+                },
+                "include_deleted": {
+                    "type": "boolean",
+                    "example": true
+                },
+                "number_of_inputs": {
+                    "type": "integer"
+                },
+                "number_of_outputs": {
+                    "type": "integer"
+                },
+                "status": {
+                    "type": "string",
+                    "enum": [
+                        "UNKNOWN",
+                        "QUEUED",
+                        "RECEIVED",
+                        "STORED",
+                        "ANNOUNCED_TO_NETWORK",
+                        "REQUESTED_BY_NETWORK",
+                        "SENT_TO_NETWORK",
+                        "ACCEPTED_BY_NETWORK",
+                        "SEEN_ON_NETWORK",
+                        "MINED",
+                        "SEEN_IN_ORPHAN_MEMPOOL",
+                        "CONFIRMED",
+                        "REJECTED"
+                    ]
+                },
+                "total_value": {
+                    "type": "integer"
+                },
+                "updated_range": {
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "string"
+                    }
+                }
+            }
         },
         "models.AccessKey": {
             "type": "object",
@@ -2351,7 +2508,11 @@
                 },
                 "status": {
                     "description": "Status is a contact's current status.",
-                    "type": "string",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/models.ContactStatus"
+                        }
+                    ],
                     "example": "unconfirmed"
                 },
                 "updated_at": {
@@ -2360,6 +2521,21 @@
                     "example": "2024-02-26T11:01:28.069911Z"
                 }
             }
+        },
+        "models.ContactStatus": {
+            "type": "string",
+            "enum": [
+                "unconfirmed",
+                "awaiting",
+                "confirmed",
+                "rejected"
+            ],
+            "x-enum-varnames": [
+                "ContactNotConfirmed",
+                "ContactAwaitAccept",
+                "ContactConfirmed",
+                "ContactRejected"
+            ]
         },
         "models.Destination": {
             "type": "object",
@@ -3264,6 +3440,20 @@
                 1000000,
                 1000000000,
                 60000000000,
+                3600000000000,
+                -9223372036854775808,
+                9223372036854775807,
+                1,
+                1000,
+                1000000,
+                1000000000,
+                60000000000,
+                3600000000000,
+                1,
+                1000,
+                1000000,
+                1000000000,
+                60000000000,
                 3600000000000
             ],
             "x-enum-varnames": [
@@ -3274,8 +3464,46 @@
                 "Millisecond",
                 "Second",
                 "Minute",
+                "Hour",
+                "minDuration",
+                "maxDuration",
+                "Nanosecond",
+                "Microsecond",
+                "Millisecond",
+                "Second",
+                "Minute",
+                "Hour",
+                "Nanosecond",
+                "Microsecond",
+                "Millisecond",
+                "Second",
+                "Minute",
                 "Hour"
             ]
+        },
+        "transactions.CountTransactions": {
+            "type": "object",
+            "properties": {
+                "conditions": {
+                    "description": "Custom conditions used for filtering the search results",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/filter.TransactionFilter"
+                        }
+                    ]
+                },
+                "metadata": {
+                    "description": "Accepts a JSON object for embedding custom metadata, enabling arbitrary additional information to be associated with the resource",
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "string"
+                    },
+                    "example": {
+                        "key": "value",
+                        "key2": "value2"
+                    }
+                }
+            }
         },
         "transactions.NewTransaction": {
             "type": "object",
@@ -3327,11 +3555,48 @@
                 }
             }
         },
+        "transactions.SearchTransactions": {
+            "type": "object",
+            "properties": {
+                "conditions": {
+                    "description": "Custom conditions used for filtering the search results",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/filter.TransactionFilter"
+                        }
+                    ]
+                },
+                "metadata": {
+                    "description": "Accepts a JSON object for embedding custom metadata, enabling arbitrary additional information to be associated with the resource",
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "string"
+                    },
+                    "example": {
+                        "key": "value",
+                        "key2": "value2"
+                    }
+                },
+                "params": {
+                    "description": "Pagination and sorting options to streamline data exploration and analysis",
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "string"
+                    },
+                    "example": {
+                        "order_by_direction": "desc",
+                        "order_by_field": "created_at",
+                        "page": "1",
+                        "page_size": "10"
+                    }
+                }
+            }
+        },
         "transactions.UpdateTransaction": {
             "type": "object",
             "properties": {
                 "id": {
-                    "description": "Id of the transaction which is a hash of the transaction",
+                    "description": "ID of the transaction which is a hash of the transaction",
                     "type": "string",
                     "example": "01d0d0067652f684c6acb3683763f353fce55f6496521c7d99e71e1d27e53f5c"
                 },

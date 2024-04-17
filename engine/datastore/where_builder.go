@@ -103,7 +103,7 @@ func (builder *whereBuilder) applyJSONArrayContains(tx customWhereInterface, key
 
 // applyJSONCondition will apply condition on JSON Object field - client.GetObjectFields()
 func (builder *whereBuilder) applyJSONCondition(tx customWhereInterface, key string, condition interface{}) {
-	if isNilCondition(condition) {
+	if isEmptyCondition(condition) {
 		return
 	}
 
@@ -228,14 +228,17 @@ func convertToDict(object interface{}) map[string]interface{} {
 	return converted
 }
 
-func isNilCondition(condition interface{}) bool {
+func isEmptyCondition(condition interface{}) bool {
 	val := reflect.ValueOf(condition)
-	if val.IsNil() {
-		return true
+	for ; val.Kind() == reflect.Ptr; val = val.Elem() {
+		if val.IsNil() {
+			return true
+		}
 	}
-	if val.Kind() == reflect.Ptr {
-		val = val.Elem()
-		return val.IsNil()
+	kind := val.Kind()
+	if kind == reflect.Map || kind == reflect.Slice {
+		return val.Len() == 0
 	}
+
 	return false
 }

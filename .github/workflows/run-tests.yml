@@ -11,8 +11,6 @@ on:
   push:
     branches:
       - "*"
-  # schedule:
-  #  - cron: '1 4 * * *'
 
 jobs:
   yamllint:
@@ -40,6 +38,34 @@ jobs:
       - name: Ask Nancy
         uses: sonatype-nexus-community/nancy-github-action@v1.0.3
         continue-on-error: true
+  error-lint:
+    name: error-lint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version: '1.21'
+          cache: false
+      - name: golangci-lint
+        uses: golangci/golangci-lint-action@v4
+        with:
+          version: latest
+          args: --config=./.golangci-lint.yml
+  style-lint:
+    name: style-lint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version: '1.21'
+          cache: false
+      - name: golangci-style-lint
+        uses: golangci/golangci-lint-action@v4
+        with:
+          version: latest
+          args: --config=./.golangci-style.yml
   test:
     needs: [yamllint, asknancy]
     strategy:
@@ -68,17 +94,14 @@ jobs:
           key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
           restore-keys: |
             ${{ runner.os }}-go-
-      - name: Run linter
-        run: make lint
-      # Install gotestfmt on the VM running the action.
       - name: Set up gotestfmt
         uses: GoTestTools/gotestfmt-action@v2
       - name: Run tests
         run: make test-all-db-ci
       - name: Update code coverage
-        uses: codecov/codecov-action@v4.1.0
+        uses: codecov/codecov-action@v4.3.0
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           flags: unittests
-          fail_ci_if_error: false # optional (default = false)
-          verbose: true # optional (default = false)
+          fail_ci_if_error: false  # optional (default = false)
+          verbose: true  # optional (default = false)
