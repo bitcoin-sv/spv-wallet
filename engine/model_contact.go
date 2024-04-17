@@ -3,10 +3,13 @@ package engine
 import (
 	"context"
 	"errors"
+	"fmt"
+	"strings"
+	"time"
 
 	"github.com/bitcoin-sv/go-paymail"
-	"github.com/google/uuid"
 	"github.com/bitcoin-sv/spv-wallet/engine/datastore"
+	"github.com/google/uuid"
 )
 
 type Contact struct {
@@ -39,9 +42,11 @@ func newContact(fullName, paymailAddress, pubKey, ownerXpubID string, status Con
 }
 
 func getContact(ctx context.Context, paymail, ownerXpubID string, opts ...ModelOps) (*Contact, error) {
+	paymail = strings.ToLower(paymail)
 	conditions := map[string]interface{}{
-		xPubIDField:  ownerXpubID,
-		paymailField: paymail,
+		xPubIDField:    ownerXpubID,
+		paymailField:   paymail,
+		deletedAtField: nil,
 	}
 
 	contact := &Contact{}
@@ -85,14 +90,63 @@ func (c *Contact) validate() error {
 	return nil
 }
 
-func getContacts(ctx context.Context, metadata *Metadata, conditions *map[string]interface{}, queryParams *datastore.QueryParams, opts ...ModelOps) ([]*Contact, error) {
-	contacts := make([]*Contact, 0)
+func getContacts(ctx context.Context, xPubID string, metadata *Metadata, conditions map[string]interface{}, queryParams *datastore.QueryParams, opts ...ModelOps) ([]*Contact, error) {
+	if conditions == nil {
+		conditions = make(map[string]interface{})
+	}
+	conditions[xPubIDField] = xPubID
+	conditions[deletedAtField] = nil
 
-	if err := getModelsByConditions(ctx, ModelContact, &contacts, metadata, conditions, queryParams, opts...); err != nil {
+	contacts := make([]*Contact, 0)
+	if err := getModelsByConditions(ctx, ModelContact, &contacts, metadata, &conditions, queryParams, opts...); err != nil {
 		return nil, err
 	}
 
 	return contacts, nil
+}
+
+func (c *Contact) Accept() error {
+	if c.Status != ContactAwaitAccept {
+		return fmt.Errorf("cannot accept contact. Reason: status: %s, expected: %s", c.Status, ContactAwaitAccept)
+	}
+
+	c.Status = ContactNotConfirmed
+	return nil
+}
+
+func (c *Contact) Reject() error {
+	if c.Status != ContactAwaitAccept {
+		return fmt.Errorf("cannot reject contact. Reason: status: %s, expected: %s", c.Status, ContactAwaitAccept)
+	}
+
+	c.DeletedAt.Valid = true
+	c.DeletedAt.Time = time.Now()
+	c.Status = ContactRejected
+	return nil
+}
+
+func (c *Contact) Confirm() error {
+	if c.Status != ContactNotConfirmed {
+		return fmt.Errorf("cannot confirm contact. Reason: status: %s, expected: %s", c.Status, ContactNotConfirmed)
+	}
+
+	c.Status = ContactConfirmed
+	return nil
+}
+
+func (c *Contact) UpdatePubKey(pk string) (updated bool) {
+	if c.PubKey != pk {
+		c.PubKey = pk
+
+		if c.Status == ContactConfirmed {
+			c.Status = ContactNotConfirmed
+		}
+
+		updated = true
+	}
+
+	updated = false
+	return
 }
 
 func (c *Contact) GetModelName() string {

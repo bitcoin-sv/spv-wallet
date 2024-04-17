@@ -998,90 +998,128 @@
                 }
             }
         },
-        "/v1/contact": {
+        "/v1/contact/accepted/{paymail}": {
             "patch": {
                 "security": [
                     {
                         "x-auth-xpub": []
                     }
                 ],
-                "description": "Update contact",
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Contacts"
-                ],
-                "summary": "Update contact",
-                "parameters": [
-                    {
-                        "description": "Contacts Metadata",
-                        "name": "metadata",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "type": "string"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "Updated contact",
-                        "schema": {
-                            "$ref": "#/definitions/models.Contact"
-                        }
-                    },
-                    "400": {
-                        "description": "Bad request - Error while parsing UpdateContact from request body"
-                    },
-                    "500": {
-                        "description": "Internal server error - Error while updating contact"
-                    }
-                }
-            }
-        },
-        "/v1/contact/{paymail}": {
-            "put": {
-                "security": [
-                    {
-                        "x-auth-xpub": []
-                    }
-                ],
-                "description": "Add or update contact. When adding a new contact, the system utilizes Paymail's PIKE capability to dispatch an invitation request, asking the counterparty to include the current user in their contacts.",
+                "description": "Accept contact. For contact with status \"awaiting\" change status to \"unconfirmed\"",
                 "produces": [
                     "application/json"
                 ],
                 "tags": [
                     "Contact"
                 ],
-                "summary": "Upsert contact",
+                "summary": "Accept contact",
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "Paymail address of the contact the user wants to add/modify",
+                        "description": "Paymail address of the contact the user wants to accept",
                         "name": "paymail",
                         "in": "path",
                         "required": true
-                    },
-                    {
-                        "description": "Full name and metadata needed to add/modify contact",
-                        "name": "UpsertContact",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/contacts.UpsertContact"
-                        }
                     }
                 ],
                 "responses": {
-                    "201": {
-                        "description": "Created"
+                    "200": {
+                        "description": "OK"
+                    },
+                    "404": {
+                        "description": "Contact not found"
+                    },
+                    "422": {
+                        "description": "Contact status not awaiting"
+                    },
+                    "500": {
+                        "description": "Internal server error"
                     }
                 }
             }
         },
-        "/v1/contacts": {
-            "get": {
+        "/v1/contact/confirmed/{paymail}": {
+            "patch": {
+                "security": [
+                    {
+                        "x-auth-xpub": []
+                    }
+                ],
+                "description": "Confirm contact. For contact with status \"unconfirmed\" change status to \"confirmed\"",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Contact"
+                ],
+                "summary": "Confirm contact",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Paymail address of the contact the user wants to confirm",
+                        "name": "paymail",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "404": {
+                        "description": "Contact not found"
+                    },
+                    "422": {
+                        "description": "Contact status not unconfirmed"
+                    },
+                    "500": {
+                        "description": "Internal server error"
+                    }
+                }
+            }
+        },
+        "/v1/contact/rejected/{paymail}": {
+            "patch": {
+                "security": [
+                    {
+                        "x-auth-xpub": []
+                    }
+                ],
+                "description": "Reject contact. For contact with status \"awaiting\" delete contact",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Contact"
+                ],
+                "summary": "Reject contact",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Paymail address of the contact the user wants to reject",
+                        "name": "paymail",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "404": {
+                        "description": "Contact not found"
+                    },
+                    "422": {
+                        "description": "Contact status not awaiting"
+                    },
+                    "500": {
+                        "description": "Internal server error"
+                    }
+                }
+            }
+        },
+        "/v1/contact/search": {
+            "post": {
                 "security": [
                     {
                         "x-auth-xpub": []
@@ -1142,6 +1180,46 @@
                     },
                     "500": {
                         "description": "Internal server error - Error while searching for contacts"
+                    }
+                }
+            }
+        },
+        "/v1/contact/{paymail}": {
+            "put": {
+                "security": [
+                    {
+                        "x-auth-xpub": []
+                    }
+                ],
+                "description": "Add or update contact. When adding a new contact, the system utilizes Paymail's PIKE capability to dispatch an invitation request, asking the counterparty to include the current user in their contacts.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Contact"
+                ],
+                "summary": "Upsert contact",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Paymail address of the contact the user wants to add/modify",
+                        "name": "paymail",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Full name and metadata needed to add/modify contact",
+                        "name": "UpsertContact",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/contacts.UpsertContact"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created"
                     }
                 }
             }
@@ -1293,10 +1371,10 @@
                 "parameters": [
                     {
                         "description": "Enables precise filtering of resource counts using custom conditions or metadata, catering to specific business or analysis needs",
-                        "name": "CountRequestParameters",
+                        "name": "CountDestinations",
                         "in": "body",
                         "schema": {
-                            "$ref": "#/definitions/actions.CountRequestParameters"
+                            "$ref": "#/definitions/destinations.CountDestinations"
                         }
                     }
                 ],
@@ -1308,7 +1386,7 @@
                         }
                     },
                     "400": {
-                        "description": "Bad request - Error while parsing CountRequestParameters from request body"
+                        "description": "Bad request - Error while parsing CountDestinations from request body"
                     },
                     "500": {
                         "description": "Internal Server Error - Error while fetching count of destinations"
@@ -1334,10 +1412,10 @@
                 "parameters": [
                     {
                         "description": "Supports targeted resource searches with filters for metadata and custom conditions, plus options for pagination and sorting to streamline data exploration and analysis",
-                        "name": "SearchRequestParameters",
+                        "name": "SearchDestinations",
                         "in": "body",
                         "schema": {
-                            "$ref": "#/definitions/actions.SearchRequestParameters"
+                            "$ref": "#/definitions/destinations.SearchDestinations"
                         }
                     }
                 ],
@@ -1352,7 +1430,7 @@
                         }
                     },
                     "400": {
-                        "description": "Bad request - Error while parsing SearchRequestParameters from request body"
+                        "description": "Bad request - Error while parsing SearchDestinations from request body"
                     },
                     "500": {
                         "description": "Internal server error - Error while searching for destinations"
@@ -1498,10 +1576,10 @@
                 "parameters": [
                     {
                         "description": "Enables precise filtering of resource counts using custom conditions or metadata, catering to specific business or analysis needs",
-                        "name": "CountRequestParameters",
+                        "name": "CountTransactions",
                         "in": "body",
                         "schema": {
-                            "$ref": "#/definitions/actions.CountRequestParameters"
+                            "$ref": "#/definitions/transactions.CountTransactions"
                         }
                     }
                 ],
@@ -1513,7 +1591,7 @@
                         }
                     },
                     "400": {
-                        "description": "Bad request - Error while parsing CountRequestParameters from request body"
+                        "description": "Bad request - Error while parsing CountTransactions from request body"
                     },
                     "500": {
                         "description": "Internal Server Error - Error while fetching count of transactions"
@@ -1581,10 +1659,10 @@
                 "parameters": [
                     {
                         "description": "Supports targeted resource searches with filters for metadata and custom conditions, plus options for pagination and sorting to streamline data exploration and analysis",
-                        "name": "SearchRequestParameters",
+                        "name": "SearchTransactions",
                         "in": "body",
                         "schema": {
-                            "$ref": "#/definitions/actions.SearchRequestParameters"
+                            "$ref": "#/definitions/transactions.SearchTransactions"
                         }
                     }
                 ],
@@ -1599,7 +1677,7 @@
                         }
                     },
                     "400": {
-                        "description": "Bad request - Error while parsing SearchRequestParameters from request body"
+                        "description": "Bad request - Error while parsing SearchTransactions from request body"
                     },
                     "500": {
                         "description": "Internal server error - Error while searching for transactions"
@@ -2086,6 +2164,30 @@
                 }
             }
         },
+        "destinations.CountDestinations": {
+            "type": "object",
+            "properties": {
+                "conditions": {
+                    "description": "Custom conditions used for filtering the search results",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/filter.DestinationFilter"
+                        }
+                    ]
+                },
+                "metadata": {
+                    "description": "Accepts a JSON object for embedding custom metadata, enabling arbitrary additional information to be associated with the resource",
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "string"
+                    },
+                    "example": {
+                        "key": "value",
+                        "key2": "value2"
+                    }
+                }
+            }
+        },
         "destinations.CreateDestination": {
             "type": "object",
             "properties": {
@@ -2098,6 +2200,43 @@
                     "example": {
                         "key": "value",
                         "key2": "value2"
+                    }
+                }
+            }
+        },
+        "destinations.SearchDestinations": {
+            "type": "object",
+            "properties": {
+                "conditions": {
+                    "description": "Custom conditions used for filtering the search results",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/filter.DestinationFilter"
+                        }
+                    ]
+                },
+                "metadata": {
+                    "description": "Accepts a JSON object for embedding custom metadata, enabling arbitrary additional information to be associated with the resource",
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "string"
+                    },
+                    "example": {
+                        "key": "value",
+                        "key2": "value2"
+                    }
+                },
+                "params": {
+                    "description": "Pagination and sorting options to streamline data exploration and analysis",
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "string"
+                    },
+                    "example": {
+                        "order_by_direction": "desc",
+                        "order_by_field": "created_at",
+                        "page": "1",
+                        "page_size": "10"
                     }
                 }
             }
@@ -2136,6 +2275,102 @@
         "engine.Metadata": {
             "type": "object",
             "additionalProperties": true
+        },
+        "filter.DestinationFilter": {
+            "type": "object",
+            "properties": {
+                "address": {
+                    "type": "string",
+                    "example": "1CDUf7CKu8ocTTkhcYUbq75t14Ft168K65"
+                },
+                "created_range": {
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "string"
+                    }
+                },
+                "draft_id": {
+                    "type": "string",
+                    "example": "b356f7fa00cd3f20cce6c21d704cd13e871d28d714a5ebd0532f5a0e0cde63f7"
+                },
+                "include_deleted": {
+                    "type": "boolean",
+                    "example": true
+                },
+                "locking_script": {
+                    "type": "string",
+                    "example": "76a9147b05764a97f3b4b981471492aa703b188e45979b88ac"
+                },
+                "updated_range": {
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "string"
+                    }
+                }
+            }
+        },
+        "filter.TransactionFilter": {
+            "type": "object",
+            "properties": {
+                "block_hash": {
+                    "type": "string"
+                },
+                "block_height": {
+                    "type": "integer"
+                },
+                "created_range": {
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "string"
+                    }
+                },
+                "draft_id": {
+                    "type": "string"
+                },
+                "fee": {
+                    "type": "integer"
+                },
+                "hex": {
+                    "type": "string"
+                },
+                "include_deleted": {
+                    "type": "boolean",
+                    "example": true
+                },
+                "number_of_inputs": {
+                    "type": "integer"
+                },
+                "number_of_outputs": {
+                    "type": "integer"
+                },
+                "status": {
+                    "type": "string",
+                    "enum": [
+                        "UNKNOWN",
+                        "QUEUED",
+                        "RECEIVED",
+                        "STORED",
+                        "ANNOUNCED_TO_NETWORK",
+                        "REQUESTED_BY_NETWORK",
+                        "SENT_TO_NETWORK",
+                        "ACCEPTED_BY_NETWORK",
+                        "SEEN_ON_NETWORK",
+                        "MINED",
+                        "SEEN_IN_ORPHAN_MEMPOOL",
+                        "CONFIRMED",
+                        "REJECTED"
+                    ]
+                },
+                "total_value": {
+                    "type": "integer"
+                },
+                "updated_range": {
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "string"
+                    }
+                }
+            }
         },
         "models.AccessKey": {
             "type": "object",
@@ -2246,6 +2481,7 @@
                     "example": "Test User"
                 },
                 "id": {
+                    "description": "ID is a unique identifier of contact.",
                     "type": "string",
                     "example": "68af358bde7d8641621c7dd3de1a276c9a62cfa9e2d0740494519f1ba61e2f4a"
                 },
@@ -2272,20 +2508,34 @@
                 },
                 "status": {
                     "description": "Status is a contact's current status.",
-                    "type": "string",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/models.ContactStatus"
+                        }
+                    ],
                     "example": "unconfirmed"
                 },
                 "updated_at": {
                     "description": "UpdatedAt is a time when outer model was updated.",
                     "type": "string",
                     "example": "2024-02-26T11:01:28.069911Z"
-                },
-                "xpubID": {
-                    "description": "XpubID is the contact's xpub related id used to register contact.",
-                    "type": "string",
-                    "example": "bb8593f85ef8056a77026ad415f02128f3768906de53e9e8bf8749fe2d66cf50"
                 }
             }
+        },
+        "models.ContactStatus": {
+            "type": "string",
+            "enum": [
+                "unconfirmed",
+                "awaiting",
+                "confirmed",
+                "rejected"
+            ],
+            "x-enum-varnames": [
+                "ContactNotConfirmed",
+                "ContactAwaitAccept",
+                "ContactConfirmed",
+                "ContactRejected"
+            ]
         },
         "models.Destination": {
             "type": "object",
@@ -3190,6 +3440,20 @@
                 1000000,
                 1000000000,
                 60000000000,
+                3600000000000,
+                -9223372036854775808,
+                9223372036854775807,
+                1,
+                1000,
+                1000000,
+                1000000000,
+                60000000000,
+                3600000000000,
+                1,
+                1000,
+                1000000,
+                1000000000,
+                60000000000,
                 3600000000000
             ],
             "x-enum-varnames": [
@@ -3200,8 +3464,46 @@
                 "Millisecond",
                 "Second",
                 "Minute",
+                "Hour",
+                "minDuration",
+                "maxDuration",
+                "Nanosecond",
+                "Microsecond",
+                "Millisecond",
+                "Second",
+                "Minute",
+                "Hour",
+                "Nanosecond",
+                "Microsecond",
+                "Millisecond",
+                "Second",
+                "Minute",
                 "Hour"
             ]
+        },
+        "transactions.CountTransactions": {
+            "type": "object",
+            "properties": {
+                "conditions": {
+                    "description": "Custom conditions used for filtering the search results",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/filter.TransactionFilter"
+                        }
+                    ]
+                },
+                "metadata": {
+                    "description": "Accepts a JSON object for embedding custom metadata, enabling arbitrary additional information to be associated with the resource",
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "string"
+                    },
+                    "example": {
+                        "key": "value",
+                        "key2": "value2"
+                    }
+                }
+            }
         },
         "transactions.NewTransaction": {
             "type": "object",
@@ -3253,11 +3555,48 @@
                 }
             }
         },
+        "transactions.SearchTransactions": {
+            "type": "object",
+            "properties": {
+                "conditions": {
+                    "description": "Custom conditions used for filtering the search results",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/filter.TransactionFilter"
+                        }
+                    ]
+                },
+                "metadata": {
+                    "description": "Accepts a JSON object for embedding custom metadata, enabling arbitrary additional information to be associated with the resource",
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "string"
+                    },
+                    "example": {
+                        "key": "value",
+                        "key2": "value2"
+                    }
+                },
+                "params": {
+                    "description": "Pagination and sorting options to streamline data exploration and analysis",
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "string"
+                    },
+                    "example": {
+                        "order_by_direction": "desc",
+                        "order_by_field": "created_at",
+                        "page": "1",
+                        "page_size": "10"
+                    }
+                }
+            }
+        },
         "transactions.UpdateTransaction": {
             "type": "object",
             "properties": {
                 "id": {
-                    "description": "Id of the transaction which is a hash of the transaction",
+                    "description": "ID of the transaction which is a hash of the transaction",
                     "type": "string",
                     "example": "01d0d0067652f684c6acb3683763f353fce55f6496521c7d99e71e1d27e53f5c"
                 },

@@ -62,7 +62,7 @@ func getTransactionsCount(ctx context.Context, metadata *Metadata, conditions *m
 
 // getTransactionsCountByXpubID will get the count of all the models for a given xpub ID
 func getTransactionsCountByXpubID(ctx context.Context, xPubID string, metadata *Metadata,
-	conditions *map[string]interface{}, opts ...ModelOps,
+	conditions map[string]interface{}, opts ...ModelOps,
 ) (int64, error) {
 	dbConditions := processDBConditions(xPubID, conditions, metadata)
 
@@ -71,7 +71,7 @@ func getTransactionsCountByXpubID(ctx context.Context, xPubID string, metadata *
 
 // getTransactionsByXpubID will get all the models for a given xpub ID
 func getTransactionsByXpubID(ctx context.Context, xPubID string,
-	metadata *Metadata, conditions *map[string]interface{},
+	metadata *Metadata, conditions map[string]interface{},
 	queryParams *datastore.QueryParams, opts ...ModelOps,
 ) ([]*Transaction, error) {
 	dbConditions := processDBConditions(xPubID, conditions, metadata)
@@ -79,7 +79,7 @@ func getTransactionsByXpubID(ctx context.Context, xPubID string,
 	return getTransactionsInternal(ctx, dbConditions, xPubID, queryParams, opts...)
 }
 
-func processDBConditions(xPubID string, conditions *map[string]interface{},
+func processDBConditions(xPubID string, conditions map[string]interface{},
 	metadata *Metadata,
 ) map[string]interface{} {
 	dbConditions := map[string]interface{}{
@@ -88,29 +88,6 @@ func processDBConditions(xPubID string, conditions *map[string]interface{},
 		}, {
 			"xpub_out_ids": xPubID,
 		}},
-	}
-
-	// check for direction query
-	if conditions != nil && (*conditions)["direction"] != nil {
-		direction := (*conditions)["direction"].(string)
-		if direction == string(TransactionDirectionIn) {
-			dbConditions["xpub_output_value"] = map[string]interface{}{
-				xPubID: map[string]interface{}{
-					"$gt": 0,
-				},
-			}
-		} else if direction == string(TransactionDirectionOut) {
-			dbConditions["xpub_output_value"] = map[string]interface{}{
-				xPubID: map[string]interface{}{
-					"$lt": 0,
-				},
-			}
-		} else if direction == string(TransactionDirectionReconcile) {
-			dbConditions["xpub_output_value"] = map[string]interface{}{
-				xPubID: 0,
-			}
-		}
-		delete(*conditions, "direction")
 	}
 
 	if metadata != nil && len(*metadata) > 0 {
@@ -125,7 +102,7 @@ func processDBConditions(xPubID string, conditions *map[string]interface{},
 						key: value,
 					},
 				}, {
-					xPubMetadataField: map[string]interface{}{
+					xPubMetadataField: XpubMetadata{
 						xPubID: Metadata{
 							key: value,
 						},
@@ -137,12 +114,12 @@ func processDBConditions(xPubID string, conditions *map[string]interface{},
 		dbConditions["$and"] = and
 	}
 
-	if conditions != nil && len(*conditions) > 0 {
+	if len(conditions) > 0 {
 		and := make([]map[string]interface{}, 0)
 		if _, ok := dbConditions["$and"]; ok {
 			and = dbConditions["$and"].([]map[string]interface{})
 		}
-		and = append(and, *conditions)
+		and = append(and, conditions)
 		dbConditions["$and"] = and
 	}
 

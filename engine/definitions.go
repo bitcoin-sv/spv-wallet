@@ -73,6 +73,7 @@ const (
 	aliasField           = "alias"
 	broadcastStatusField = "broadcast_status"
 	createdAtField       = "created_at"
+	deletedAtField       = "deleted_at"
 	currentBalanceField  = "current_balance"
 	domainField          = "domain"
 	draftIDField         = "draft_id"
@@ -94,11 +95,7 @@ const (
 	bumpField            = "bump"
 	fullNameField        = "full_name"
 	paymailField         = "paymail"
-
-	// TODO: check
-	xPubKeyField    = "pub_key"
-	senderXPubField = "pub_key"
-	contactStatus   = "status"
+	contactStatusField   = "status"
 
 	// Universal statuses
 	statusCanceled   = "canceled"
