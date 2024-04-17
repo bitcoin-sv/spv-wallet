@@ -207,8 +207,8 @@ github.com/lestrrat-go/strftime v1.0.6/go.mod h1:f7jQKgV5nnJpYgdEasS+/y7EsTb8ykN
 github.com/lib/pq v1.2.0/go.mod h1:5WUZQaWbwv1U+lTReE5YruASi9Al49XbQIvNi/34Woo=
 github.com/lib/pq v1.10.9 h1:YXG7RB+JIjhP29X+OtkiDnYaXQwpS4JEWq7dtCCRUEw=
 github.com/lib/pq v1.10.9/go.mod h1:AlVN5x4E4T544tWzH6hKfbfQvm3HdbOxrmggDNAPY9o=
-github.com/libsv/go-bc v0.1.26 h1:/eZEHVrmCK76rrcHueMzRUwheF2Eqjds9212UL9qzFY=
-github.com/libsv/go-bc v0.1.26/go.mod h1:l6epTfcakN8YKId/hrpUzlu1QeT3ODF1MI3DeYhG1O8=
+github.com/libsv/go-bc v0.1.28 h1:LubB5VmRGF3EfkOVbb8Gmoq9Ku7XvtkwIkSW55sfnlo=
+github.com/libsv/go-bc v0.1.28/go.mod h1:l6epTfcakN8YKId/hrpUzlu1QeT3ODF1MI3DeYhG1O8=
 github.com/libsv/go-bk v0.1.6 h1:c9CiT5+64HRDbzxPl1v/oiFmbvWZTuUYqywCf+MBs/c=
 github.com/libsv/go-bk v0.1.6/go.mod h1:khJboDoH18FPUaZlzRFKzlVN84d4YfdmlDtdX4LAjQA=
 github.com/libsv/go-bt v1.0.8 h1:nWLLcnUm0dxNO3exqrL5jvAcTGkl0dsnBuQqB6+M6vQ=
