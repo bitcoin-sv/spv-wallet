@@ -13,6 +13,7 @@ const (
 	ContactNotConfirmed ContactStatus = "unconfirmed"
 	ContactAwaitAccept  ContactStatus = "awaiting"
 	ContactConfirmed    ContactStatus = "confirmed"
+	ContactRejected     ContactStatus = "rejected"
 )
 
 var contactStatusMapper = NewEnumStringMapper(ContactNotConfirmed, ContactAwaitAccept, ContactConfirmed)

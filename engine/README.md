@@ -3,16 +3,16 @@
 # SPV Wallet Engine
 
 [![Release](https://img.shields.io/github/release-pre/bitcoin-sv/spv-wallet/engine.svg?logo=github&style=flat&v=2)](https://github.com/bitcoin-sv/spv-wallet/engine/releases)
-[![Build Status](https://img.shields.io/github/actions/workflow/status/bitcoin-sv/spv-wallet/engine/run-tests.yml?branch=master&v=2)](https://github.com/bitcoin-sv/spv-wallet/engine/actions)
+[![Build Status](https://img.shields.io/github/actions/workflow/status/bitcoin-sv/spv-wallet/engine/run-tests.yml?branch=main&v=2)](https://github.com/bitcoin-sv/spv-wallet/engine/actions)
 [![Report](https://goreportcard.com/badge/github.com/bitcoin-sv/spv-wallet/engine?style=flat&v=2)](https://goreportcard.com/report/github.com/bitcoin-sv/spv-wallet/engine)
-[![codecov](https://codecov.io/gh/bitcoin-sv/spv-wallet/engine/branch/master/graph/badge.svg?v=2)](https://codecov.io/gh/bitcoin-sv/spv-wallet/engine)
+[![codecov](https://codecov.io/gh/bitcoin-sv/spv-wallet/engine/branch/main/graph/badge.svg?v=2)](https://codecov.io/gh/bitcoin-sv/spv-wallet/engine)
 [![Mergify Status](https://img.shields.io/endpoint.svg?url=https://api.mergify.com/v1/badges/bitcoin-sv/spv-wallet/engine&style=flat&v=2)](https://mergify.com)
 <br>
 
 [![Go](https://img.shields.io/github/go-mod/go-version/bitcoin-sv/spv-wallet/engine?v=2)](https://golang.org/)
 [![Gitpod Ready-to-Code](https://img.shields.io/badge/Gitpod-ready--to--code-blue?logo=gitpod&v=2)](https://gitpod.io/#https://github.com/bitcoin-sv/spv-wallet/engine)
 [![standard-readme compliant](https://img.shields.io/badge/readme%20style-standard-brightgreen.svg?style=flat&v=2)](https://github.com/RichardLitt/standard-readme)
-[![Makefile Included](https://img.shields.io/badge/Makefile-Supported%20-brightgreen?=flat&logo=probot&v=2)](Makefile)
+[![Makefile Included](https://img.shields.io/badge/Makefile-Supported%20-brightgreen?=flat&logo=probot&v=2)](../Makefile)
 <br/>
 
 </div>
@@ -115,11 +115,11 @@ This repository was created using [MrZ's `go-template`](https://github.com/mrz18
 -   Automatic syndication to [pkg.go.dev](https://pkg.go.dev/) on every release
 -   Generic templates for [Issues and Pull Requests](https://docs.github.com/en/communities/using-templates-to-encourage-useful-issues-and-pull-requests/configuring-issue-templates-for-your-repository) in GitHub
 -   All standard GitHub files such as `LICENSE`, `CONTRIBUTING.md`, `CODE_OF_CONDUCT.md`, and `SECURITY.md`
--   Code [ownership configuration](.github/CODEOWNERS) for GitHub
--   All your ignore files for [vs-code](.editorconfig), [docker](.dockerignore) and [git](.gitignore)
--   Automatic sync for [labels](.github/labels.yml) into GitHub using a pre-defined [configuration](.github/labels.yml)
+-   Code [ownership configuration](../.github/CODEOWNERS) for GitHub
+-   All your ignore files for [vs-code](../.editorconfig), [docker](../.dockerignore) and [git](../.gitignore)
+-   Automatic sync for [labels](../.github/labels.yml) into GitHub using a pre-defined [configuration](../.github/labels.yml)
 -   Built-in powerful merging rules using [Mergify](https://mergify.io/)
--   Welcome [new contributors](.github/mergify.yml) on their first Pull-Request
+-   Welcome [new contributors](../.github/mergify.yml) on their first Pull-Request
 -   Follows the [standard-readme](https://github.com/RichardLitt/standard-readme/blob/master/spec.md) specification
 -   [Visual Studio Code](https://code.visualstudio.com) configuration with [Go](https://code.visualstudio.com/docs/languages/go)
 -   (Optional) [Slack](https://slack.com), [Discord](https://discord.com) or [Twitter](https://twitter.com) announcements on new GitHub Releases
@@ -155,7 +155,7 @@ This repository was created using [MrZ's `go-template`](https://github.com/mrz18
 Checkout all the [examples](examples)!
 
 All unit tests and [examples](examples) run via [GitHub Actions](https://github.com/bitcoin-sv/spv-wallet/engine/actions) and
-uses [Go version 1.19.x](https://golang.org/doc/go1.19). View the [configuration file](.github/workflows/run-tests.yml).
+uses [Go version 1.19.x](https://golang.org/doc/go1.19). View the [configuration file](../.github/workflows/run-tests.yml).
 
 <br/>
 
@@ -195,7 +195,7 @@ make bench
 
 ## Code Standards
 
-Read more about this Go project's [code standards](.github/CODE_STANDARDS.md).
+Read more about this Go project's [code standards](../.github/CODE_STANDARDS.md).
 
 <br/>
 
@@ -226,9 +226,9 @@ Checkout all the [examples](examples)!
 
 All kinds of contributions are welcome!
 <br/>
-To get started, take a look at [code standards](.github/CODE_STANDARDS.md).
+To get started, take a look at [code standards](../.github/CODE_STANDARDS.md).
 <br/>
-View the [contributing guidelines](.github/CODE_STANDARDS.md#3-contributing) and follow the [code of conduct](.github/CODE_OF_CONDUCT.md).
+View the [contributing guidelines](../.github/CODE_STANDARDS.md#3-contributing) and follow the [code of conduct](../.github/CODE_OF_CONDUCT.md).
 
 <br/>
 

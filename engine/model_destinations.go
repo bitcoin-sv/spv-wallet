@@ -158,15 +158,15 @@ func getDestinationsCount(ctx context.Context, metadata *Metadata, conditions *m
 }
 
 // getDestinationsByXpubID will get the destination(s) by the given xPubID
-func getDestinationsByXpubID(ctx context.Context, xPubID string, usingMetadata *Metadata, conditions *map[string]interface{},
+func getDestinationsByXpubID(ctx context.Context, xPubID string, usingMetadata *Metadata, conditions map[string]interface{},
 	queryParams *datastore.QueryParams, opts ...ModelOps,
 ) ([]*Destination, error) {
 	// Construct an empty model
-	var models []Destination
+	var destModels []Destination
 
 	dbConditions := map[string]interface{}{}
 	if conditions != nil {
-		dbConditions = *conditions
+		dbConditions = conditions
 	}
 	dbConditions[xPubIDField] = xPubID
 
@@ -177,7 +177,7 @@ func getDestinationsByXpubID(ctx context.Context, xPubID string, usingMetadata *
 	// Get the records
 	if err := getModels(
 		ctx, NewBaseModel(ModelNameEmpty, opts...).Client().Datastore(),
-		&models, dbConditions, queryParams, defaultDatabaseReadTimeout,
+		&destModels, dbConditions, queryParams, defaultDatabaseReadTimeout,
 	); err != nil {
 		if errors.Is(err, datastore.ErrNoResults) {
 			return nil, nil
@@ -187,9 +187,9 @@ func getDestinationsByXpubID(ctx context.Context, xPubID string, usingMetadata *
 
 	// Loop and enrich
 	destinations := make([]*Destination, 0)
-	for index := range models {
-		models[index].enrich(ModelDestination, opts...)
-		destinations = append(destinations, &models[index])
+	for index := range destModels {
+		destModels[index].enrich(ModelDestination, opts...)
+		destinations = append(destinations, &destModels[index])
 	}
 
 	return destinations, nil
@@ -197,11 +197,11 @@ func getDestinationsByXpubID(ctx context.Context, xPubID string, usingMetadata *
 
 // getDestinationsCountByXPubID will get a count of the destination(s) by the given xPubID
 func getDestinationsCountByXPubID(ctx context.Context, xPubID string, usingMetadata *Metadata,
-	conditions *map[string]interface{}, opts ...ModelOps,
+	conditions map[string]interface{}, opts ...ModelOps,
 ) (int64, error) {
 	dbConditions := map[string]interface{}{}
 	if conditions != nil {
-		dbConditions = *conditions
+		dbConditions = conditions
 	}
 	dbConditions[xPubIDField] = xPubID
 

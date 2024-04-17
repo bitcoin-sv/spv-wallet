@@ -61,8 +61,11 @@ type ContactService interface {
 	UpsertContact(ctx context.Context, fullName, paymailAdress, requesterPubKey, requesterPaymail string, opts ...ModelOps) (*Contact, error)
 	AddContactRequest(ctx context.Context, fullName, paymailAdress, requesterXPubID string, opts ...ModelOps) (*Contact, error)
 
-	UpdateContact(ctx context.Context, fullName, pubKey, xPubID, paymail string, status ContactStatus, opts ...ModelOps) (*Contact, error)
-	GetContacts(ctx context.Context, metadata *Metadata, conditions *map[string]interface{}, queryParams *datastore.QueryParams, opts ...ModelOps) ([]*Contact, error)
+	AcceptContact(ctx context.Context, xPubID, paymail string) error
+	RejectContact(ctx context.Context, xPubID, paymail string) error
+	ConfirmContact(ctx context.Context, xPubID, paymail string) error
+
+	GetContacts(ctx context.Context, xPubID string, metadata *Metadata, conditions map[string]interface{}, queryParams *datastore.QueryParams) ([]*Contact, error)
 }
 
 // DestinationService is the destination actions
@@ -74,10 +77,10 @@ type DestinationService interface {
 		queryParams *datastore.QueryParams, opts ...ModelOps) ([]*Destination, error)
 	GetDestinationsCount(ctx context.Context, metadata *Metadata,
 		conditions *map[string]interface{}, opts ...ModelOps) (int64, error)
-	GetDestinationsByXpubID(ctx context.Context, xPubID string, usingMetadata *Metadata, conditions *map[string]interface{},
+	GetDestinationsByXpubID(ctx context.Context, xPubID string, usingMetadata *Metadata, conditions map[string]interface{},
 		queryParams *datastore.QueryParams) ([]*Destination, error)
 	GetDestinationsByXpubIDCount(ctx context.Context, xPubID string, usingMetadata *Metadata,
-		conditions *map[string]interface{}) (int64, error)
+		conditions map[string]interface{}) (int64, error)
 	NewDestination(ctx context.Context, xPubKey string, chain uint32, destinationType string,
 		opts ...ModelOps) (*Destination, error)
 	NewDestinationForLockingScript(ctx context.Context, xPubID, lockingScript string,
@@ -133,10 +136,10 @@ type TransactionService interface {
 		queryParams *datastore.QueryParams, opts ...ModelOps) ([]*Transaction, error)
 	GetTransactionsCount(ctx context.Context, metadata *Metadata,
 		conditions *map[string]interface{}, opts ...ModelOps) (int64, error)
-	GetTransactionsByXpubID(ctx context.Context, xPubID string, metadata *Metadata, conditions *map[string]interface{},
+	GetTransactionsByXpubID(ctx context.Context, xPubID string, metadata *Metadata, conditions map[string]interface{},
 		queryParams *datastore.QueryParams) ([]*Transaction, error)
 	GetTransactionsByXpubIDCount(ctx context.Context, xPubID string, metadata *Metadata,
-		conditions *map[string]interface{}) (int64, error)
+		conditions map[string]interface{}) (int64, error)
 	NewTransaction(ctx context.Context, rawXpubKey string, config *TransactionConfig,
 		opts ...ModelOps) (*DraftTransaction, error)
 	RecordTransaction(ctx context.Context, xPubKey, txHex, draftID string,

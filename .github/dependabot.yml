@@ -3,46 +3,64 @@ version: 2
 updates:
   # Maintain dependencies for the core library
   - package-ecosystem: "gomod"
-    target-branch: "master"
+    target-branch: "main"
     directory: "/"
     schedule:
-      interval: "daily"
-      time: "10:00"
-      timezone: "UTC"
-    reviewers:
-      - "mrz1836"
-    assignees:
-      - "mrz1836"
+      interval: "weekly"
+      day: "monday"
     labels:
-      - "chore"
+      - "dependencies"
+    open-pull-requests-limit: 10
+
+  - package-ecosystem: "gomod"
+    target-branch: "main"
+    directory: "/engine"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+    labels:
+      - "dependencies"
+    open-pull-requests-limit: 10
+
+  - package-ecosystem: "gomod"
+    target-branch: "main"
+    directory: "/models"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+    labels:
+      - "dependencies"
     open-pull-requests-limit: 10
 
   # Maintain dependencies for GitHub Actions
   - package-ecosystem: "github-actions"
-    target-branch: "master"
+    target-branch: "main"
     directory: "/"
     schedule:
       interval: "weekly"
       day: "monday"
-    reviewers:
-      - "mrz1836"
-    assignees:
-      - "mrz1836"
     labels:
-      - "chore"
+      - "dependencies"
     open-pull-requests-limit: 10
 
   # Maintain dependencies for Docker
   - package-ecosystem: "docker"
-    target-branch: "master"
+    target-branch: "main"
     directory: "/"
     schedule:
       interval: "weekly"
       day: "monday"
-    reviewers:
-      - "mrz1836"
-    assignees:
-      - "mrz1836"
     labels:
-      - "chore"
+      - "dependencies"
+    open-pull-requests-limit: 10
+
+  # Maintain dependencies for Docker
+  - package-ecosystem: "docker"
+    target-branch: "main"
+    directory: "/release"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+    labels:
+      - "dependencies"
     open-pull-requests-limit: 10
