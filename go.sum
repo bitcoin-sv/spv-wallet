@@ -275,8 +275,8 @@ github.com/mrz1836/go-sanitize v1.3.1 h1:bTxpzDXzGh9cp3XLTeVKgL2iLqEwCaLqqe+3Bmp
 github.com/mrz1836/go-sanitize v1.3.1/go.mod h1:Js6Gq1uiarNReoOeOKxPXxNpKy1FRlbgDDZnJG4THdM=
 github.com/mrz1836/go-validate v0.2.1 h1:LvhFvnZgemmJnZ/Ch9vEgY9YzKy+1Ka1Hx7yzpJEB00=
 github.com/mrz1836/go-validate v0.2.1/go.mod h1:IoGAb4rTAL6KgAxOiWL4ICwLqxGbKCKT1GyaSuE/4bk=
-github.com/newrelic/go-agent/v3 v3.31.0 h1:MVZA93FO6IEybg5EZUcOHUoDg5oBFuy8nrUIa2hfd8M=
-github.com/newrelic/go-agent/v3 v3.31.0/go.mod h1:MnbPbcIAmtKH80ZRXovE9kQLDs0Nc32IQa7bWydDKsk=
+github.com/newrelic/go-agent/v3 v3.32.0 h1:99Et9lXXzeQV1CfYldfeTXv+d9W9KatpMbb50kIscWo=
+github.com/newrelic/go-agent/v3 v3.32.0/go.mod h1:SMdqPzE/ghkWdY0rYGSD7Clw2daK/XH6pUnVd4albg4=
 github.com/newrelic/go-agent/v3/integrations/nrmongo v1.1.3 h1:Z85RJZKk+hghOQYJzsKUo3s4vP9W7/HUlB+CuLelqnc=
 github.com/newrelic/go-agent/v3/integrations/nrmongo v1.1.3/go.mod h1:BzSK3ljUwW9PaTPdKstpKwQszKPnrU3xUaqidleearI=
 github.com/nxadm/tail v1.4.4/go.mod h1:kenIhsEOeOJmVchQTgglprH7qJGnHDVpk1VPCcaMI8A=

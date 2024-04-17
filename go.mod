@@ -22,7 +22,7 @@ require (
 	github.com/mrz1836/go-cachestore v0.3.9
 	github.com/mrz1836/go-sanitize v1.3.1
 	github.com/mrz1836/go-validate v0.2.1
-	github.com/newrelic/go-agent/v3 v3.31.0
+	github.com/newrelic/go-agent/v3 v3.32.0
 	github.com/prometheus/client_golang v1.18.0
 	github.com/rs/zerolog v1.32.0
 	github.com/spf13/viper v1.18.2
