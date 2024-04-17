@@ -61,7 +61,8 @@ bin
 tmp
 .all-contributorsrc
 .gitpod.yml
-.golangci.yml
+.golangci-lint.yml
+.golangci-style.yml
 .goreleaser.yml
 .yamllint.yml
 .editorconfig

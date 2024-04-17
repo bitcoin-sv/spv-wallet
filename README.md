@@ -4,9 +4,9 @@
 
 
 [![Release](https://img.shields.io/github/release-pre/bitcoin-sv/spv-wallet.svg?logo=github&style=flat&v=3)](https://github.com/bitcoin-sv/spv-wallet/releases)
-[![Build Status](https://img.shields.io/github/actions/workflow/status/bitcoin-sv/spv-wallet/run-tests.yml?branch=master&v=3)](https://github.com/bitcoin-sv/spv-wallet/actions)
+[![Build Status](https://img.shields.io/github/actions/workflow/status/bitcoin-sv/spv-wallet/run-tests.yml?branch=main&v=3)](https://github.com/bitcoin-sv/spv-wallet/actions)
 [![Report](https://goreportcard.com/badge/github.com/bitcoin-sv/spv-wallet?style=flat&v=3)](https://goreportcard.com/report/github.com/bitcoin-sv/spv-wallet)
-[![codecov](https://codecov.io/gh/bitcoin-sv/spv-wallet/branch/master/graph/badge.svg?v=3)](https://codecov.io/gh/bitcoin-sv/spv-wallet)
+[![codecov](https://codecov.io/gh/bitcoin-sv/spv-wallet/branch/main/graph/badge.svg?v=3)](https://codecov.io/gh/bitcoin-sv/spv-wallet)
 [![Mergify Status](https://img.shields.io/endpoint.svg?url=https://api.mergify.com/v1/badges/bitcoin-sv/spv-wallet&style=flat&v=3)](https://mergify.io)
 <br>
 
@@ -15,6 +15,7 @@
 [![standard-readme compliant](https://img.shields.io/badge/readme%20style-standard-brightgreen.svg?style=flat&v=3)](https://github.com/RichardLitt/standard-readme)
 [![Makefile Included](https://img.shields.io/badge/Makefile-Supported%20-brightgreen?=flat&logo=probot&v=3)](Makefile)
 <br/>
+
 </div>
 
 ## Table of Contents
@@ -46,6 +47,8 @@
 ## About
 
 A comprehensive non-custodial wallet for BSV digital currency.
+
+More in-depth information and guidance about SPV Wallet Toolbox you can find [here](https://bsvblockchain.gitbook.io/docs).
 
 <br/>
 

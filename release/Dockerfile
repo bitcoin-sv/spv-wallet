@@ -8,7 +8,7 @@ ARG version
 ARG tag
 ENV APP_BINARY=${project_name}
 ENV VERSION=${version:-develop}
-ENV TAG=${tag:-master}
+ENV TAG=${tag:-main}
 COPY ./release/entrypoint.sh .
 RUN chmod +x entrypoint.sh
 

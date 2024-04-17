@@ -42,11 +42,11 @@ const (
 type Payload struct {
 	AuthHash     string `json:"auth_hash"`
 	AuthNonce    string `json:"auth_nonce"`
-	AuthTime     int64  `json:"auth_time"`
 	BodyContents string `json:"body_contents"`
 	Signature    string `json:"signature"`
 	xPub         string
 	accessKey    string
+	AuthTime     int64 `json:"auth_time"`
 }
 
 // CorsMiddleware is a middleware that handles CORS.
