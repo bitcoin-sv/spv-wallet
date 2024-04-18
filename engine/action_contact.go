@@ -263,6 +263,29 @@ func (c *Client) ConfirmContact(ctx context.Context, xPubID, paymail string) err
 	return nil
 }
 
+func (c *Client) UnconfirmContact(ctx context.Context, xPubID, paymail string) error {
+	contact, err := getContact(ctx, paymail, xPubID, c.DefaultModelOptions()...)
+	if err != nil {
+		c.logContactError(xPubID, paymail, fmt.Sprintf("unexpected error while geting contact: %s", err.Error()))
+		return err
+	}
+	if contact == nil {
+		return ErrContactNotFound
+	}
+
+	if err = contact.Unconfirm(); err != nil {
+		c.logContactWarining(xPubID, paymail, err.Error())
+		return ErrContactIncorrectStatus
+	}
+
+	if err = contact.Save(ctx); err != nil {
+		c.logContactError(xPubID, paymail, fmt.Sprintf("unexpected error while saving contact: %s", err.Error()))
+		return err
+	}
+
+	return nil
+}
+
 func (c *Client) getPaymail(ctx context.Context, xpubID, paymailAddr string) (*PaymailAddress, error) {
 	if paymailAddr != "" {
 		res, err := c.GetPaymailAddress(ctx, paymailAddr, c.DefaultModelOptions()...)
