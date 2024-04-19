@@ -23,15 +23,10 @@ func (s *ServerConfig) Validate() error {
 		return errors.New("Server port outside of bounds")
 	}
 
-	err := validation.ValidateStruct(s,
+	return validation.ValidateStruct(s,
 		validation.Field(&s.IdleTimeout, validation.Required),
 		validation.Field(&s.ReadTimeout, validation.Required),
 		validation.Field(&s.WriteTimeout, validation.Required),
 		validation.Field(&s.Port, validation.Required),
 	)
-	if err != nil {
-		err = errors.New("error while validating server config: " + err.Error())
-		return err
-	}
-	return nil
 }
