@@ -74,7 +74,7 @@ func broadcastMAPI(ctx context.Context, client *Client, miner *minercraft.Miner,
 	}
 
 	// Check error message (for success error message)
-	if doesErrorContain(resp.Results.ResultDescription, broadcastSuccessErrors) {
+	if containsAny(resp.Results.ResultDescription, broadcastSuccessErrors) {
 		return nil
 	}
 

@@ -95,7 +95,7 @@ func broadcastToProvider(ctx, fallbackCtx context.Context, provider txBroadcastP
 	failure := provider.broadcast(ctx, c)
 
 	if failure != nil {
-		checkMempool := doesErrorContain(failure.Error.Error(), broadcastQuestionableErrors)
+		checkMempool := containsAny(failure.Error.Error(), broadcastQuestionableErrors)
 
 		if !checkMempool { // return original failure
 			return &BroadcastResult{

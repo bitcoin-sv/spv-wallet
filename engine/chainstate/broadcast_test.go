@@ -14,17 +14,17 @@ import (
 
 func Test_doesErrorContain(t *testing.T) {
 	t.Run("valid contains", func(t *testing.T) {
-		success := doesErrorContain("this is the test message", []string{"another", "test message"})
+		success := containsAny("this is the test message", []string{"another", "test message"})
 		assert.Equal(t, true, success)
 	})
 
 	t.Run("valid contains - equal case", func(t *testing.T) {
-		success := doesErrorContain("this is the TEST message", []string{"another", "test message"})
+		success := containsAny("this is the TEST message", []string{"another", "test message"})
 		assert.Equal(t, true, success)
 	})
 
 	t.Run("does not contain", func(t *testing.T) {
-		success := doesErrorContain("this is the test message", []string{"another", "nope"})
+		success := containsAny("this is the test message", []string{"another", "nope"})
 		assert.Equal(t, false, success)
 	})
 }

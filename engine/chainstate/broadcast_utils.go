@@ -5,10 +5,10 @@ import (
 	"strings"
 )
 
-// doesErrorContain will look at a string for a list of strings
-func doesErrorContain(err string, messages []string) bool {
-	lower := strings.ToLower(err)
-	for _, str := range messages {
+// containsAny checks if the given string contains any of the provided substrings
+func containsAny(s string, substr []string) bool {
+	lower := strings.ToLower(s)
+	for _, str := range substr {
 		if strings.Contains(lower, str) {
 			return true
 		}
@@ -31,7 +31,6 @@ func groupBroadcastResults(results []*BroadcastResult) *BroadcastResult {
 }
 
 func groupBroadcastFailures(results []*BroadcastResult) *BroadcastFailure {
-	// group  failures
 	invalidTx := false
 	var err error
 
