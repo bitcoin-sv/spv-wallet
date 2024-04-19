@@ -475,6 +475,45 @@ const docTemplate = `{
                 }
             }
         },
+        "/v1/admin/contact/unconfirmed/{id}": {
+            "patch": {
+                "security": [
+                    {
+                        "x-auth-xpub": []
+                    }
+                ],
+                "description": "Change contact status to unconfirmed",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Admin"
+                ],
+                "summary": "Change contact status to unconfirmed",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Contact id",
+                        "name": "id",
+                        "in": "path"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Changed contact",
+                        "schema": {
+                            "$ref": "#/definitions/models.Contact"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request - Error while getting id from path"
+                    },
+                    "500": {
+                        "description": "Internal server error - Error while changing contact status"
+                    }
+                }
+            }
+        },
         "/v1/admin/contact/{id}": {
             "delete": {
                 "security": [
@@ -4550,8 +4589,11 @@ const docTemplate = `{
                 1000000000,
                 60000000000,
                 3600000000000,
-                -9223372036854775808,
-                9223372036854775807,
+                1,
+                1000,
+                1000000,
+                1000000000,
+                60000000000,
                 1,
                 1000,
                 1000000,
@@ -4562,8 +4604,7 @@ const docTemplate = `{
                 1000,
                 1000000,
                 1000000000,
-                60000000000,
-                3600000000000
+                60000000000
             ],
             "x-enum-varnames": [
                 "minDuration",
@@ -4574,8 +4615,11 @@ const docTemplate = `{
                 "Second",
                 "Minute",
                 "Hour",
-                "minDuration",
-                "maxDuration",
+                "Nanosecond",
+                "Microsecond",
+                "Millisecond",
+                "Second",
+                "Minute",
                 "Nanosecond",
                 "Microsecond",
                 "Millisecond",
@@ -4586,8 +4630,7 @@ const docTemplate = `{
                 "Microsecond",
                 "Millisecond",
                 "Second",
-                "Minute",
-                "Hour"
+                "Minute"
             ]
         },
         "transactions.CountTransactions": {

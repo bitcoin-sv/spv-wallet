@@ -187,6 +187,40 @@ func (a *Action) contactsAccept(c *gin.Context) {
 	c.JSON(http.StatusOK, contract)
 }
 
+// contactsUnconfirm will change contact status to unconfirmed
+// Change contact status to unconfirmed godoc
+// @Summary		Change contact status to unconfirmed
+// @Description	Change contact status to unconfirmed
+// @Tags		Admin
+// @Produce		json
+// @Param		id path string false "Contact id"
+// @Success		200 {object} models.Contact "Changed contact"
+// @Failure		400	"Bad request - Error while getting id from path"
+// @Failure 	500	"Internal server error - Error while changing contact status"
+// @Router		/v1/admin/contact/unconfirmed/{id} [patch]
+// @Security	x-auth-xpub
+func (a *Action) contactsUnconfirm(c *gin.Context) {
+	id := c.Param("id")
+	if id == "" {
+		c.JSON(http.StatusBadRequest, "id is required")
+		return
+	}
+
+	contact, err := a.Services.SpvWalletEngine.AdminChangeContactStatus(
+		c.Request.Context(),
+		id,
+		engine.ContactNotConfirmed,
+	)
+	if err != nil {
+		handleErrors(err, c)
+		return
+	}
+
+	contract := mappings.MapToContactContract(contact)
+
+	c.JSON(http.StatusOK, contract)
+}
+
 func handleErrors(err error, c *gin.Context) {
 	switch {
 	case errors.Is(err, engine.ErrContactNotFound):

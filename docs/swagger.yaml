@@ -1782,8 +1782,11 @@ definitions:
     - 1000000000
     - 60000000000
     - 3600000000000
-    - -9223372036854775808
-    - 9223372036854775807
+    - 1
+    - 1000
+    - 1000000
+    - 1000000000
+    - 60000000000
     - 1
     - 1000
     - 1000000
@@ -1795,7 +1798,6 @@ definitions:
     - 1000000
     - 1000000000
     - 60000000000
-    - 3600000000000
     type: integer
     x-enum-varnames:
     - minDuration
@@ -1806,8 +1808,11 @@ definitions:
     - Second
     - Minute
     - Hour
-    - minDuration
-    - maxDuration
+    - Nanosecond
+    - Microsecond
+    - Millisecond
+    - Second
+    - Minute
     - Nanosecond
     - Microsecond
     - Millisecond
@@ -1819,7 +1824,6 @@ definitions:
     - Millisecond
     - Second
     - Minute
-    - Hour
   transactions.CountTransactions:
     properties:
       conditions:
@@ -2324,6 +2328,30 @@ paths:
       security:
       - x-auth-xpub: []
       summary: Search for contacts
+      tags:
+      - Admin
+  /v1/admin/contact/unconfirmed/{id}:
+    patch:
+      description: Change contact status to unconfirmed
+      parameters:
+      - description: Contact id
+        in: path
+        name: id
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Changed contact
+          schema:
+            $ref: '#/definitions/models.Contact'
+        "400":
+          description: Bad request - Error while getting id from path
+        "500":
+          description: Internal server error - Error while changing contact status
+      security:
+      - x-auth-xpub: []
+      summary: Change contact status to unconfirmed
       tags:
       - Admin
   /v1/admin/destinations/search:
