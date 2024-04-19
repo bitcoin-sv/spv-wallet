@@ -58,7 +58,7 @@ func (c *Client) Broadcast(ctx context.Context, id, txHex string, format HexForm
 		if r.Failure != nil {
 			failures = append(failures, r)
 		} else {
-			return r // wait for first success
+			return r // one successful result is sufficient, and we consider the entire broadcast process complete. We disregard failures from other providers
 		}
 	}
 
