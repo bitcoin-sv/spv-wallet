@@ -1,7 +1,7 @@
 package actions
 
 import (
-	"errors"
+	"fmt"
 	"net/http"
 
 	"github.com/bitcoin-sv/spv-wallet/dictionary"
@@ -47,7 +47,7 @@ func MethodNotAllowed(c *gin.Context) {
 func GetSearchQueryParameters(c *gin.Context) (*datastore.QueryParams, *engine.Metadata, *map[string]interface{}, error) {
 	var requestParameters SearchRequestParameters
 	if err := c.Bind(&requestParameters); err != nil {
-		err = errors.New("error occurred while binding request parameters" + err.Error())
+		err = fmt.Errorf("error occurred while binding request parameters: %w", err)
 		return nil, nil, nil, err
 	}
 
@@ -62,7 +62,7 @@ func GetSearchQueryParameters(c *gin.Context) (*datastore.QueryParams, *engine.M
 func GetCountQueryParameters(c *gin.Context) (*engine.Metadata, *map[string]interface{}, error) {
 	var requestParameters CountRequestParameters
 	if err := c.Bind(&requestParameters); err != nil {
-		err = errors.New("error occurred while binding request parameters" + err.Error())
+		err = fmt.Errorf("error occurred while binding request parameters: %w", err)
 		return nil, nil, err
 	}
 
