@@ -58,7 +58,7 @@ type ClientService interface {
 }
 
 type ContactService interface {
-	UpsertContact(ctx context.Context, fullName, paymailAdress, requesterPubKey, requesterPaymail string, opts ...ModelOps) (*Contact, error)
+	UpsertContact(ctx context.Context, fullName, paymailAdress, requesterXPubID, requesterPaymail string, opts ...ModelOps) (*Contact, error)
 	AddContactRequest(ctx context.Context, fullName, paymailAdress, requesterXPubID string, opts ...ModelOps) (*Contact, error)
 
 	AcceptContact(ctx context.Context, xPubID, paymail string) error
