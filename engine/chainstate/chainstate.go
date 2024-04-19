@@ -35,10 +35,13 @@ func (c *Client) SupportedBroadcastFormats() HexFormatFlag {
 	}
 }
 
+// BroadcastResult contains data about broadcasting to provider
 type BroadcastResult struct {
 	Provider string
 	Failure  *BroadcastFailure
 }
+
+// BroadcastFailure contains data about broadcast failure
 type BroadcastFailure struct {
 	InvalidTx bool
 	Error     error

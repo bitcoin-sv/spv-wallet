@@ -247,14 +247,12 @@ func processSyncTxSave(ctx context.Context, txInfo *chainstate.TransactionInfo, 
 		return err
 	}
 
-	message := "transaction was found on-chain by " + chainstate.ProviderBroadcastClient
-
 	syncTx.SyncStatus = SyncStatusComplete
 	syncTx.Results.Results = append(syncTx.Results.Results, &SyncResult{
 		Action:        syncActionSync,
 		ExecutedAt:    time.Now().UTC(),
 		Provider:      chainstate.ProviderBroadcastClient,
-		StatusMessage: message,
+		StatusMessage: "transaction was found on-chain by " + chainstate.ProviderBroadcastClient,
 	})
 
 	if err := syncTx.Save(ctx); err != nil {

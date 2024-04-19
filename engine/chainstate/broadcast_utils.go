@@ -17,18 +17,17 @@ func doesErrorContain(err string, messages []string) bool {
 }
 
 func groupBroadcastResults(results []*BroadcastResult) *BroadcastResult {
-	var grouped *BroadcastResult
-
-	if len(results) == 1 {
-		grouped = results[0]
-	} else {
-		grouped = &BroadcastResult{
+	switch len(results) {
+	case 0:
+		return nil
+	case 1:
+		return results[0]
+	default:
+		return &BroadcastResult{
 			Provider: ProviderAll,
 			Failure:  groupBroadcastFailures(results),
 		}
 	}
-
-	return grouped
 }
 
 func groupBroadcastFailures(results []*BroadcastResult) *BroadcastFailure {
