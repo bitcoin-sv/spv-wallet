@@ -42,10 +42,10 @@ type CreateXpub struct {
 
 // UpdateContact is the model for updating a contact
 type UpdateContact struct {
-	// New name for the contact
-	FullName string `json:"fullName" example:"John Doe"`
 	// Accepts a JSON object for embedding custom metadata, enabling arbitrary additional information to be associated with the resource
 	Metadata engine.Metadata `json:"metadata" swaggertype:"object,string" example:"key:value,key2:value2"`
+	// New name for the contact
+	FullName string `json:"fullName" example:"John Doe"`
 }
 
 // SearchTransactions is a model for handling searching with filters and metadata

@@ -1,11 +1,12 @@
 package admin
 
 import (
+	"net/http"
+
 	"github.com/bitcoin-sv/spv-wallet/engine"
 	"github.com/bitcoin-sv/spv-wallet/mappings"
 	"github.com/bitcoin-sv/spv-wallet/models"
 	"github.com/gin-gonic/gin"
-	"net/http"
 )
 
 // contactsSearch will fetch a list of contacts filtered by Metadata and ContactFilters
