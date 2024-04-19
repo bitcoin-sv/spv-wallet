@@ -34,7 +34,7 @@ func (a *Action) search(c *gin.Context) {
 		return
 	}
 
-	contacts, err := a.Services.SpvWalletEngine.GetContacts(
+	contacts, err := a.Services.SpvWalletEngine.GetContactsByXpubID(
 		c.Request.Context(),
 		reqXPubID,
 		metadata,

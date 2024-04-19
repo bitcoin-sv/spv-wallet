@@ -332,6 +332,175 @@
                 }
             }
         },
+        "/v1/admin/contact/rejected/{id}": {
+            "patch": {
+                "security": [
+                    {
+                        "x-auth-xpub": []
+                    }
+                ],
+                "description": "Reject contact",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Admin"
+                ],
+                "summary": "Reject contact",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Contact id",
+                        "name": "id",
+                        "in": "path"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Rejected contact",
+                        "schema": {
+                            "$ref": "#/definitions/models.Contact"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request - Error while getting id from path"
+                    },
+                    "500": {
+                        "description": "Internal server error - Error while changing contact status"
+                    }
+                }
+            }
+        },
+        "/v1/admin/contact/search": {
+            "post": {
+                "security": [
+                    {
+                        "x-auth-xpub": []
+                    }
+                ],
+                "description": "Search for contacts",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Admin"
+                ],
+                "summary": "Search for contacts",
+                "parameters": [
+                    {
+                        "description": "Supports targeted resource searches with filters for metadata and custom conditions, plus options for pagination and sorting to streamline data exploration and analysis",
+                        "name": "SearchRequestParameters",
+                        "in": "body",
+                        "schema": {
+                            "$ref": "#/definitions/actions.SearchRequestParameters"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "List of contacts",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/models.Contact"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request - Error while parsing SearchRequestParameters from request body"
+                    },
+                    "500": {
+                        "description": "Internal server error - Error while searching for contacts"
+                    }
+                }
+            }
+        },
+        "/v1/admin/contact/unconfirmed/{id}": {
+            "patch": {
+                "security": [
+                    {
+                        "x-auth-xpub": []
+                    }
+                ],
+                "description": "Change contact status to unconfirmed",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Admin"
+                ],
+                "summary": "Change contact status to unconfirmed",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Contact id",
+                        "name": "id",
+                        "in": "path"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Changed contact",
+                        "schema": {
+                            "$ref": "#/definitions/models.Contact"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request - Error while getting id from path"
+                    },
+                    "500": {
+                        "description": "Internal server error - Error while changing contact status"
+                    }
+                }
+            }
+        },
+        "/v1/admin/contact/{id}": {
+            "patch": {
+                "security": [
+                    {
+                        "x-auth-xpub": []
+                    }
+                ],
+                "description": "Update contact FullName or Metadata",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Admin"
+                ],
+                "summary": "Update contact FullName or Metadata",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Contact id",
+                        "name": "id",
+                        "in": "path"
+                    },
+                    {
+                        "description": "FullName and metadata to update",
+                        "name": "UpdateContact",
+                        "in": "body",
+                        "schema": {
+                            "$ref": "#/definitions/admin.UpdateContact"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Updated contact",
+                        "schema": {
+                            "$ref": "#/definitions/models.Contact"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request - Error while parsing UpdateContact from request body or getting id from path"
+                    },
+                    "500": {
+                        "description": "Internal server error - Error while updating contact"
+                    }
+                }
+            }
+        },
         "/v1/admin/destinations/search": {
             "post": {
                 "security": [
@@ -2047,6 +2216,27 @@
                 }
             }
         },
+        "admin.UpdateContact": {
+            "type": "object",
+            "properties": {
+                "fullName": {
+                    "description": "New name for the contact",
+                    "type": "string",
+                    "example": "John Doe"
+                },
+                "metadata": {
+                    "description": "Accepts a JSON object for embedding custom metadata, enabling arbitrary additional information to be associated with the resource",
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "string"
+                    },
+                    "example": {
+                        "key": "value",
+                        "key2": "value2"
+                    }
+                }
+            }
+        },
         "broadcast.SubmittedTx": {
             "type": "object",
             "properties": {
@@ -3441,14 +3631,6 @@
                 1000000000,
                 60000000000,
                 3600000000000,
-                -9223372036854775808,
-                9223372036854775807,
-                1,
-                1000,
-                1000000,
-                1000000000,
-                60000000000,
-                3600000000000,
                 1,
                 1000,
                 1000000,
@@ -3457,14 +3639,6 @@
                 3600000000000
             ],
             "x-enum-varnames": [
-                "minDuration",
-                "maxDuration",
-                "Nanosecond",
-                "Microsecond",
-                "Millisecond",
-                "Second",
-                "Minute",
-                "Hour",
                 "minDuration",
                 "maxDuration",
                 "Nanosecond",

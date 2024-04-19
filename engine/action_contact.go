@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"time"
 
 	"github.com/bitcoin-sv/go-paymail"
 	"github.com/bitcoin-sv/spv-wallet/engine/datastore"
@@ -101,13 +102,63 @@ func (c *Client) AddContactRequest(ctx context.Context, fullName, paymailAdress,
 	return contact, nil
 }
 
-func (c *Client) GetContacts(ctx context.Context, xPubID string, metadata *Metadata, conditions map[string]interface{}, queryParams *datastore.QueryParams) ([]*Contact, error) {
-	contacts, err := getContacts(ctx, xPubID, metadata, conditions, queryParams, c.DefaultModelOptions()...)
+func (c *Client) GetContacts(ctx context.Context, metadata *Metadata, conditions map[string]interface{}, queryParams *datastore.QueryParams) ([]*Contact, error) {
+	contacts, err := getContacts(ctx, metadata, conditions, queryParams, c.DefaultModelOptions()...)
 	if err != nil {
 		return nil, err
 	}
 
 	return contacts, nil
+}
+
+func (c *Client) GetContactsByXpubID(ctx context.Context, xPubID string, metadata *Metadata, conditions map[string]interface{}, queryParams *datastore.QueryParams) ([]*Contact, error) {
+	contacts, err := getContactsByXpubID(ctx, xPubID, metadata, conditions, queryParams, c.DefaultModelOptions()...)
+	if err != nil {
+		return nil, err
+	}
+
+	return contacts, nil
+}
+
+func (c *Client) UpdateContact(ctx context.Context, id, fullName string, metadata *Metadata) (*Contact, error) {
+	contact, err := getContactByID(ctx, id, c.DefaultModelOptions()...)
+	if err != nil {
+		return nil, err
+	}
+
+	contact.FullName = fullName
+	contact.UpdateMetadata(*metadata)
+
+	if err = contact.Save(ctx); err != nil {
+		return nil, fmt.Errorf("updating %s contact failed. Reason: %w", id, err)
+	}
+
+	return contact, nil
+}
+
+func (c *Client) AdminChangeContactStatus(ctx context.Context, id string, status ContactStatus) (*Contact, error) {
+	contact, err := getContactByID(ctx, id, c.DefaultModelOptions()...)
+	if err != nil {
+		return nil, err
+	}
+
+	switch status {
+	case ContactNotConfirmed:
+		if contact.Status == ContactConfirmed {
+			contact.Status = ContactNotConfirmed
+		} else {
+			return nil, ErrContactIncorrectStatus
+		}
+	case ContactRejected:
+		contact.DeletedAt.Valid = true
+		contact.DeletedAt.Time = time.Now()
+		contact.Status = ContactRejected
+	}
+
+	if err = contact.Save(ctx); err != nil {
+		return nil, fmt.Errorf("updating %s contact failed. Reason: %w", id, err)
+	}
+	return contact, nil
 }
 
 func (c *Client) AcceptContact(ctx context.Context, xPubID, paymail string) error {
