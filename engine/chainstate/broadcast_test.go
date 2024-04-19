@@ -4,6 +4,7 @@ import (
 	"context"
 	"strings"
 	"testing"
+	"time"
 
 	broadcast_client_mock "github.com/bitcoin-sv/go-broadcast-client/broadcast/broadcast-client-mock"
 	"github.com/stretchr/testify/assert"
@@ -28,43 +29,6 @@ func Test_doesErrorContain(t *testing.T) {
 	})
 }
 
-// TestClient_Broadcast will test the method Broadcast()
-func TestClient_Broadcast(t *testing.T) {
-	t.Parallel()
-
-	t.Run("error - missing tx id", func(t *testing.T) {
-		// given
-		c := NewTestClient(context.Background(), t,
-			WithMinercraft(&MinerCraftBase{}))
-
-		// when
-		provider, err := c.Broadcast(
-			context.Background(), "", onChainExample1TxHex, RawTx, defaultBroadcastTimeOut,
-		)
-
-		// then
-		require.Error(t, err)
-		assert.ErrorIs(t, err, ErrInvalidTransactionID)
-		assert.Empty(t, provider)
-	})
-
-	t.Run("error - missing tx hex", func(t *testing.T) {
-		// given
-		c := NewTestClient(context.Background(), t,
-			WithMinercraft(&MinerCraftBase{}))
-
-		// when
-		provider, err := c.Broadcast(
-			context.Background(), onChainExample1TxID, "", RawTx, defaultBroadcastTimeOut,
-		)
-
-		// then
-		require.Error(t, err)
-		assert.ErrorIs(t, err, ErrInvalidTransactionHex)
-		assert.Empty(t, provider)
-	})
-}
-
 // TestClient_Broadcast_MAPI will test the method Broadcast() with MAPI
 func TestClient_Broadcast_MAPI(t *testing.T) {
 	t.Parallel()
@@ -77,13 +41,15 @@ func TestClient_Broadcast_MAPI(t *testing.T) {
 		)
 
 		// when
-		providers, err := c.Broadcast(
+		res := c.Broadcast(
 			context.Background(), broadcastExample1TxID, broadcastExample1TxHex, RawTx, defaultBroadcastTimeOut,
 		)
 
 		// then
-		require.NoError(t, err)
-		miners := strings.Split(providers, ",")
+		require.NotNil(t, res)
+		require.Nil(t, res.Failure)
+
+		miners := strings.Split(res.Provider, ",")
 		assert.GreaterOrEqual(t, len(miners), 1)
 		assert.True(t, containsAtLeastOneElement(
 			miners,
@@ -106,23 +72,44 @@ func TestClient_Broadcast_BroadcastClient(t *testing.T) {
 			Build()
 		c := NewTestClient(
 			context.Background(), t,
-			WithMinercraft(&MinerCraftBase{}),
 			WithBroadcastClient(bc),
 		)
 
 		// when
-		providers, err := c.Broadcast(
+		res := c.Broadcast(
 			context.Background(), broadcastExample1TxID, broadcastExample1TxHex, RawTx, defaultBroadcastTimeOut,
 		)
 
 		// then
-		require.NoError(t, err)
-		miners := strings.Split(providers, ",")
-		assert.GreaterOrEqual(t, len(miners), 1)
-		assert.True(t, containsAtLeastOneElement(
-			miners,
-			ProviderBroadcastClient,
-		))
+		require.NotNil(t, res)
+		require.Nil(t, res.Failure)
+
+		assert.Equal(t, ProviderBroadcastClient, res.Provider)
+	})
+
+	t.Run("broadcast - success (multiple broadcast-client)", func(t *testing.T) {
+		// given
+		bc := broadcast_client_mock.Builder().
+			WithMockArc(broadcast_client_mock.MockFailure).
+			WithMockArc(broadcast_client_mock.MockFailure).
+			WithMockArc(broadcast_client_mock.MockSuccess).
+			WithMockArc(broadcast_client_mock.MockFailure).
+			Build()
+		c := NewTestClient(
+			context.Background(), t,
+			WithBroadcastClient(bc),
+		)
+
+		// when
+		res := c.Broadcast(
+			context.Background(), broadcastExample1TxID, broadcastExample1TxHex, RawTx, 1*time.Second,
+		)
+
+		// then
+		require.NotNil(t, res)
+		require.Nil(t, res.Failure)
+
+		assert.Equal(t, ProviderBroadcastClient, res.Provider)
 	})
 }
 

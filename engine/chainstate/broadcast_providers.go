@@ -13,7 +13,7 @@ import (
 // generic broadcast provider
 type txBroadcastProvider interface {
 	getName() string
-	broadcast(ctx context.Context, c *Client) error
+	broadcast(ctx context.Context, c *Client) *BroadcastFailure
 }
 
 // mAPI provider
@@ -26,8 +26,15 @@ func (provider *mapiBroadcastProvider) getName() string {
 	return provider.miner.Name
 }
 
-func (provider *mapiBroadcastProvider) broadcast(ctx context.Context, c *Client) error {
-	return broadcastMAPI(ctx, c, provider.miner, provider.txID, provider.txHex)
+func (provider *mapiBroadcastProvider) broadcast(ctx context.Context, c *Client) *BroadcastFailure {
+	if err := broadcastMAPI(ctx, c, provider.miner, provider.txID, provider.txHex); err != nil {
+		return &BroadcastFailure{
+			InvalidTx: false, // for simplify we treet all mAPI errors as client/network issue that can be retried
+			Error:     err,
+		}
+	}
+
+	return nil
 }
 
 // broadcastMAPI will broadcast a transaction to a miner using mAPI
@@ -95,7 +102,7 @@ func (provider *broadcastClientProvider) getName() string {
 	return ProviderBroadcastClient
 }
 
-func (provider *broadcastClientProvider) broadcast(ctx context.Context, c *Client) error {
+func (provider *broadcastClientProvider) broadcast(ctx context.Context, c *Client) *BroadcastFailure {
 	logger := c.options.logger
 
 	logger.Debug().
@@ -119,19 +126,22 @@ func (provider *broadcastClientProvider) broadcast(ctx context.Context, c *Clien
 			Msgf("broadcast with broadcast-client in RawTx format")
 	}
 
-	result, err := c.BroadcastClient().SubmitTransaction(
+	result, failure := c.BroadcastClient().SubmitTransaction(
 		ctx,
 		&tx,
 		formatOpt,
 		broadcast.WithCallback(c.options.config.callbackURL, c.options.config.callbackToken),
 	)
 
-	if err != nil {
+	if failure != nil {
 		logger.Debug().
 			Str("txID", provider.txID).
-			Msgf("error broadcast request for %s failed: %s", provider.getName(), err.Error())
+			Msgf("error broadcast request for %s failed: %s", provider.getName(), failure.Error())
 
-		return err
+		return &BroadcastFailure{
+			InvalidTx: failure.ArcErrorResponse != nil, // failure was caused be invalid request not client/network issue
+			Error:     failure,
+		}
 	}
 
 	logger.Debug().

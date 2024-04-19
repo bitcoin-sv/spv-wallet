@@ -5,7 +5,6 @@ package chainstate
 
 import (
 	"context"
-	"fmt"
 	"time"
 )
 
@@ -36,34 +35,31 @@ func (c *Client) SupportedBroadcastFormats() HexFormatFlag {
 	}
 }
 
+type BroadcastResult struct {
+	Provider string
+	Failure  *BroadcastFailure
+}
+type BroadcastFailure struct {
+	InvalidTx bool
+	Error     error
+}
+
 // Broadcast will attempt to broadcast a transaction using the given providers
-func (c *Client) Broadcast(ctx context.Context, id, txHex string, format HexFormatFlag, timeout time.Duration) (string, error) {
-	// Basic validation
-	if len(id) < 50 {
-		return "", ErrInvalidTransactionID
-	} else if len(txHex) <= 0 { // todo: validate the tx hex
-		return "", ErrInvalidTransactionHex
+func (c *Client) Broadcast(ctx context.Context, id, txHex string, format HexFormatFlag, timeout time.Duration) *BroadcastResult {
+	results := make(chan *BroadcastResult)
+	go c.broadcast(ctx, id, txHex, format, timeout, results)
+
+	failures := make([]*BroadcastResult, 0)
+
+	for r := range results {
+		if r.Failure != nil {
+			failures = append(failures, r)
+		} else {
+			return r // wait for first success
+		}
 	}
 
-	// Debug the id and hex
-	c.DebugLog("tx_id: " + id)
-	c.DebugLog("tx_hex: " + txHex)
-
-	// Broadcast or die
-	successCompleteCh := make(chan string)
-	errorCh := make(chan string)
-
-	go c.broadcast(ctx, id, txHex, format, timeout, successCompleteCh, errorCh)
-
-	// wait for first success
-	success := <-successCompleteCh
-	if success != "" {
-		return success, nil
-	}
-
-	// successCompleteCh closed without any values
-	errorMessage := <-errorCh
-	return ProviderAll, fmt.Errorf("broadcast failed, errors: %s", errorMessage)
+	return groupBroadcastResults(failures)
 }
 
 // QueryTransaction will get the transaction info from all providers returning the "first" valid result
