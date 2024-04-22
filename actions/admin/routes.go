@@ -27,7 +27,6 @@ func NewHandler(appConfig *config.AppConfig, services *config.AppServices) route
 		adminGroup.DELETE("/contact/:id", action.contactsDelete)
 		adminGroup.PATCH("/contact/accepted/:id", action.contactsAccept)
 		adminGroup.PATCH("/contact/rejected/:id", action.contactsReject)
-		adminGroup.PATCH("/contact/unconfirmed/:id", action.contactsUnconfirm)
 		adminGroup.POST("/destinations/search", action.destinationsSearch)
 		adminGroup.POST("/destinations/count", action.destinationsCount)
 		adminGroup.POST("/paymail/get", action.paymailGetAddress)
