@@ -12,8 +12,8 @@ github.com/acobaugh/osrelease v0.1.0/go.mod h1:4bFEs0MtgHNHBrmHCt67gNisnabCRAlzd
 github.com/afex/hystrix-go v0.0.0-20180209013831-27fae8d30f1a/go.mod h1:SkGFH1ia65gfNATL8TAiHDNxPzPdmEL5uirI2Uyuz6c=
 github.com/alicebob/gopher-json v0.0.0-20230218143504-906a9b012302 h1:uvdUDbHQHO85qeSydJtItA4T55Pw6BtAejd0APRJOCE=
 github.com/alicebob/gopher-json v0.0.0-20230218143504-906a9b012302/go.mod h1:SGnFV6hVsYE877CKEZ6tDNTjaSXYUk6QqoIK6PrAtcc=
-github.com/alicebob/miniredis/v2 v2.31.1 h1:7XAt0uUg3DtwEKW5ZAGa+K7FZV2DdKQo5K/6TTnfX8Y=
-github.com/alicebob/miniredis/v2 v2.31.1/go.mod h1:UB/T2Uztp7MlFSDakaX1sTXUv5CASoprx0wulRT6HBg=
+github.com/alicebob/miniredis/v2 v2.32.1 h1:Bz7CciDnYSaa0mX5xODh6GUITRSx+cVhjNoOR4JssBo=
+github.com/alicebob/miniredis/v2 v2.32.1/go.mod h1:AqkLNAfUm0K07J28hnAyyQKf/x0YkCY/g5DCtuL01Mw=
 github.com/andreyvit/diff v0.0.0-20170406064948-c7f18ee00883 h1:bvNMNQO63//z+xNgfBlViaCIJKLlCJ6/fmUseuG0wVQ=
 github.com/andreyvit/diff v0.0.0-20170406064948-c7f18ee00883/go.mod h1:rCTlJbsFo29Kk6CurOXKm700vrz8f0KW0JNfpkRJY/8=
 github.com/aws/aws-sdk-go v1.43.45 h1:2708Bj4uV+ym62MOtBnErm/CDX61C4mFe9V2gXy1caE=
@@ -245,8 +245,8 @@ github.com/montanaflynn/stats v0.7.1 h1:etflOAAHORrCC44V+aR6Ftzort912ZU+YLiSTuV8
 github.com/montanaflynn/stats v0.7.1/go.mod h1:etXPPgVO6n31NxCd9KQUMvCM+ve0ruNzt6R8Bnaayow=
 github.com/mrz1836/go-cache v0.9.7 h1:v9QhZqwkDCkKxbA4HuuKoP6cvf9PFTE2Q7dOpxxuDcE=
 github.com/mrz1836/go-cache v0.9.7/go.mod h1:j3Jm/6bUEb9ilzYmKXu6nGy6D488e0vP7//dnqyQUpc=
-github.com/mrz1836/go-cachestore v0.3.6 h1:/llHdNN6nXvFaRaN6T2icGQ/FHNZwWkTvDwNuIsZbY4=
-github.com/mrz1836/go-cachestore v0.3.6/go.mod h1:IR9VXbyE+FN/1VguWRlXK4sAbu375FS1XUAb8IXOzvs=
+github.com/mrz1836/go-cachestore v0.3.9 h1:SBdj+rVaK2vhqAiVLpTm9EH4uEpda2GZK6l8/dF+A/Y=
+github.com/mrz1836/go-cachestore v0.3.9/go.mod h1:nKqw7vOaWmqdy/AThhRYZC+TRXqncoEeiaKocZxmH7A=
 github.com/mrz1836/go-logger v0.3.3 h1:L/u+So5yrsYi7KhkFWlZ8v28cmoHt6aB7X8uVEIEHu8=
 github.com/mrz1836/go-logger v0.3.3/go.mod h1:hlP6K2fnTcisDbcYw9u3eV+1TW5jCsYUfoujA4+38NY=
 github.com/newrelic/go-agent/v3 v3.31.0 h1:MVZA93FO6IEybg5EZUcOHUoDg5oBFuy8nrUIa2hfd8M=
