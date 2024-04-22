@@ -90,7 +90,7 @@ linters-settings:
       - fieldalignment
   wrapcheck:
     ignorePackageGlobs:
-     - "github.com/go-ozzo/ozzo-validation"
+      - "github.com/go-ozzo/ozzo-validation"
 
 issues:
   # List of regexps of issue texts to exclude, empty list by default.
