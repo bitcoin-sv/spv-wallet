@@ -13,7 +13,8 @@ func TestAccessKey(t *testing.T) {
 	ac := new(AccessKey)
 	ac.Model.UpdatedAt = time.Now().UTC()
 	ac.Model.CreatedAt = time.Now().UTC()
-	ac.Model.DeletedAt = time.Now().UTC()
+	deletedAt := time.Now().UTC()
+	ac.Model.DeletedAt = &deletedAt
 	ac.XpubID = "123"
 	ac.ID = "123"
 
@@ -25,7 +26,8 @@ func ExampleAccessKey() {
 	ac := new(AccessKey)
 	ac.Model.UpdatedAt = time.Now().UTC()
 	ac.Model.CreatedAt = time.Now().UTC()
-	ac.Model.DeletedAt = time.Now().UTC()
+	deletedAt := time.Now().UTC()
+	ac.Model.DeletedAt = &deletedAt
 	ac.XpubID = "123"
 	ac.ID = "123"
 	fmt.Printf("%s", ac.ID)
