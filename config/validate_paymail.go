@@ -2,6 +2,7 @@ package config
 
 import (
 	"errors"
+	"fmt"
 
 	"github.com/mrz1836/go-sanitize"
 	"github.com/mrz1836/go-validate"
@@ -23,7 +24,7 @@ func (p *PaymailConfig) Validate() error {
 	for _, domain := range p.Domains {
 		domain, err = sanitize.Domain(domain, false, true)
 		if err != nil {
-			err = errors.New("error sanitizing domain [" + domain + "]: " + err.Error())
+			err = fmt.Errorf("error sanitizing domain [%s]: %w", domain, err)
 			return err
 		}
 		if !validate.IsValidHost(domain) {
