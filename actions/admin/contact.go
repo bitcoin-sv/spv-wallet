@@ -1,11 +1,11 @@
 package admin
 
 import (
+	"errors"
 	"net/http"
 
 	"github.com/bitcoin-sv/spv-wallet/engine"
 	"github.com/bitcoin-sv/spv-wallet/mappings"
-	"github.com/bitcoin-sv/spv-wallet/models"
 	"github.com/gin-gonic/gin"
 )
 
@@ -40,10 +40,7 @@ func (a *Action) contactsSearch(c *gin.Context) {
 		return
 	}
 
-	contracts := make([]*models.Contact, 0)
-	for _, contact := range contacts {
-		contracts = append(contracts, mappings.MapToContactContract(contact))
-	}
+	contracts := mappings.MapToContactContracts(contacts)
 
 	c.JSON(http.StatusOK, contracts)
 }
@@ -58,6 +55,8 @@ func (a *Action) contactsSearch(c *gin.Context) {
 // @Param		UpdateContact body UpdateContact false "FullName and metadata to update"
 // @Success		200 {object} models.Contact "Updated contact"
 // @Failure		400	"Bad request - Error while parsing UpdateContact from request body or getting id from path"
+// @Failure		404	"Not found - Error while getting contact by id"
+// @Failure		422	"Unprocessable entity - Incorrect status of contact"
 // @Failure 	500	"Internal server error - Error while updating contact"
 // @Router		/v1/admin/contact/{id} [patch]
 // @Security	x-auth-xpub
@@ -69,10 +68,6 @@ func (a *Action) contactsUpdate(c *gin.Context) {
 	}
 
 	id := c.Param("id")
-	if id == "" {
-		c.JSON(http.StatusBadRequest, "id is required")
-		return
-	}
 
 	contact, err := a.Services.SpvWalletEngine.UpdateContact(
 		c.Request.Context(),
@@ -80,14 +75,45 @@ func (a *Action) contactsUpdate(c *gin.Context) {
 		reqParams.FullName,
 		&reqParams.Metadata,
 	)
+
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, err.Error())
+		handleErrors(err, c)
 		return
 	}
 
 	contract := mappings.MapToContactContract(contact)
 
 	c.JSON(http.StatusOK, contract)
+}
+
+// contactsDelete will delete contact with the given id
+// Delete contact godoc
+// @Summary		Delete contact
+// @Description	Delete contact
+// @Tags		Admin
+// @Produce		json
+// @Param		id path string false "Contact id"
+// @Success		200
+// @Failure		400	"Bad request - Error while parsing UpdateContact from request body or getting id from path"
+// @Failure		404	"Not found - Error while getting contact by id"
+// @Failure		422	"Unprocessable entity - Incorrect status of contact"
+// @Failure 	500	"Internal server error - Error while updating contact"
+// @Failure 	500	"Internal server error - Error while updating contact"
+// @Router		/v1/admin/contact/{id} [delete]
+// @Security	x-auth-xpub
+func (a *Action) contactsDelete(c *gin.Context) {
+	id := c.Param("id")
+
+	err := a.Services.SpvWalletEngine.DeleteContact(
+		c.Request.Context(),
+		id,
+	)
+	if err != nil {
+		handleErrors(err, c)
+		return
+	}
+
+	c.Status(http.StatusOK)
 }
 
 // contactsReject will reject contact with the given id
@@ -99,15 +125,14 @@ func (a *Action) contactsUpdate(c *gin.Context) {
 // @Param		id path string false "Contact id"
 // @Success		200 {object} models.Contact "Rejected contact"
 // @Failure		400	"Bad request - Error while getting id from path"
+// @Failure		404	"Not found - Error while getting contact by id"
+// @Failure		422	"Unprocessable entity - Incorrect status of contact"
+// @Failure 	500	"Internal server error - Error while updating contact"
 // @Failure 	500	"Internal server error - Error while changing contact status"
 // @Router		/v1/admin/contact/rejected/{id} [patch]
 // @Security	x-auth-xpub
 func (a *Action) contactsReject(c *gin.Context) {
 	id := c.Param("id")
-	if id == "" {
-		c.JSON(http.StatusBadRequest, "id is required")
-		return
-	}
 
 	contact, err := a.Services.SpvWalletEngine.AdminChangeContactStatus(
 		c.Request.Context(),
@@ -115,7 +140,7 @@ func (a *Action) contactsReject(c *gin.Context) {
 		engine.ContactRejected,
 	)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, err.Error())
+		handleErrors(err, c)
 		return
 	}
 
@@ -124,24 +149,23 @@ func (a *Action) contactsReject(c *gin.Context) {
 	c.JSON(http.StatusOK, contract)
 }
 
-// contactsReject will change contact status to unconfirmed
-// Change contact status to unconfirmed godoc
-// @Summary		Change contact status to unconfirmed
-// @Description	Change contact status to unconfirmed
+// contactsAccept will perform Accept action on contact with the given id
+// Perform accept action on contact godoc
+// @Summary		Accept contact
+// @Description Accept contact
 // @Tags		Admin
 // @Produce		json
 // @Param		id path string false "Contact id"
 // @Success		200 {object} models.Contact "Changed contact"
 // @Failure		400	"Bad request - Error while getting id from path"
+// @Failure		404	"Not found - Error while getting contact by id"
+// @Failure		422	"Unprocessable entity - Incorrect status of contact"
+// @Failure 	500	"Internal server error - Error while updating contact"
 // @Failure 	500	"Internal server error - Error while changing contact status"
 // @Router		/v1/admin/contact/unconfirmed/{id} [patch]
 // @Security	x-auth-xpub
-func (a *Action) contactsUnconfirm(c *gin.Context) {
+func (a *Action) contactsAccept(c *gin.Context) {
 	id := c.Param("id")
-	if id == "" {
-		c.JSON(http.StatusBadRequest, "id is required")
-		return
-	}
 
 	contact, err := a.Services.SpvWalletEngine.AdminChangeContactStatus(
 		c.Request.Context(),
@@ -149,11 +173,22 @@ func (a *Action) contactsUnconfirm(c *gin.Context) {
 		engine.ContactNotConfirmed,
 	)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, err.Error())
+		handleErrors(err, c)
 		return
 	}
 
 	contract := mappings.MapToContactContract(contact)
 
 	c.JSON(http.StatusOK, contract)
+}
+
+func handleErrors(err error, c *gin.Context) {
+	switch {
+	case errors.Is(err, engine.ErrContactNotFound):
+		c.JSON(http.StatusNotFound, err.Error())
+	case errors.Is(err, engine.ErrContactIncorrectStatus):
+		c.JSON(http.StatusUnprocessableEntity, err.Error())
+	default:
+		c.JSON(http.StatusInternalServerError, err.Error())
+	}
 }

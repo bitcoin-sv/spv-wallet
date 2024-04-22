@@ -166,6 +166,11 @@ func (c *Contact) Confirm() error {
 	return nil
 }
 
+func (c *Contact) Delete() {
+	c.DeletedAt.Valid = true
+	c.DeletedAt.Time = time.Now()
+}
+
 func (c *Contact) UpdatePubKey(pk string) (updated bool) {
 	if c.PubKey != pk {
 		c.PubKey = pk

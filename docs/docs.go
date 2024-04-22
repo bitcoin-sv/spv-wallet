@@ -374,6 +374,12 @@ const docTemplate = `{
                     "400": {
                         "description": "Bad request - Error while getting id from path"
                     },
+                    "404": {
+                        "description": "Not found - Error while getting contact by id"
+                    },
+                    "422": {
+                        "description": "Unprocessable entity - Incorrect status of contact"
+                    },
                     "500": {
                         "description": "Internal server error - Error while changing contact status"
                     }
@@ -431,14 +437,14 @@ const docTemplate = `{
                         "x-auth-xpub": []
                     }
                 ],
-                "description": "Change contact status to unconfirmed",
+                "description": "Accept contact",
                 "produces": [
                     "application/json"
                 ],
                 "tags": [
                     "Admin"
                 ],
-                "summary": "Change contact status to unconfirmed",
+                "summary": "Accept contact",
                 "parameters": [
                     {
                         "type": "string",
@@ -457,6 +463,12 @@ const docTemplate = `{
                     "400": {
                         "description": "Bad request - Error while getting id from path"
                     },
+                    "404": {
+                        "description": "Not found - Error while getting contact by id"
+                    },
+                    "422": {
+                        "description": "Unprocessable entity - Incorrect status of contact"
+                    },
                     "500": {
                         "description": "Internal server error - Error while changing contact status"
                     }
@@ -464,6 +476,46 @@ const docTemplate = `{
             }
         },
         "/v1/admin/contact/{id}": {
+            "delete": {
+                "security": [
+                    {
+                        "x-auth-xpub": []
+                    }
+                ],
+                "description": "Delete contact",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Admin"
+                ],
+                "summary": "Delete contact",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Contact id",
+                        "name": "id",
+                        "in": "path"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "400": {
+                        "description": "Bad request - Error while parsing UpdateContact from request body or getting id from path"
+                    },
+                    "404": {
+                        "description": "Not found - Error while getting contact by id"
+                    },
+                    "422": {
+                        "description": "Unprocessable entity - Incorrect status of contact"
+                    },
+                    "500": {
+                        "description": "Internal server error - Error while updating contact"
+                    }
+                }
+            },
             "patch": {
                 "security": [
                     {
@@ -503,6 +555,12 @@ const docTemplate = `{
                     },
                     "400": {
                         "description": "Bad request - Error while parsing UpdateContact from request body or getting id from path"
+                    },
+                    "404": {
+                        "description": "Not found - Error while getting contact by id"
+                    },
+                    "422": {
+                        "description": "Unprocessable entity - Incorrect status of contact"
                     },
                     "500": {
                         "description": "Internal server error - Error while updating contact"
@@ -3640,6 +3698,24 @@ const docTemplate = `{
                 1000000000,
                 60000000000,
                 3600000000000,
+                -9223372036854775808,
+                9223372036854775807,
+                1,
+                1000,
+                1000000,
+                1000000000,
+                60000000000,
+                3600000000000,
+                -9223372036854775808,
+                9223372036854775807,
+                1,
+                1000,
+                1000000,
+                1000000000,
+                60000000000,
+                3600000000000,
+                -9223372036854775808,
+                9223372036854775807,
                 1,
                 1000,
                 1000000,
@@ -3656,6 +3732,24 @@ const docTemplate = `{
                 "Second",
                 "Minute",
                 "Hour",
+                "minDuration",
+                "maxDuration",
+                "Nanosecond",
+                "Microsecond",
+                "Millisecond",
+                "Second",
+                "Minute",
+                "Hour",
+                "minDuration",
+                "maxDuration",
+                "Nanosecond",
+                "Microsecond",
+                "Millisecond",
+                "Second",
+                "Minute",
+                "Hour",
+                "minDuration",
+                "maxDuration",
                 "Nanosecond",
                 "Microsecond",
                 "Millisecond",
