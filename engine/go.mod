@@ -10,7 +10,7 @@ require (
 	github.com/bitcoinschema/go-map v0.1.0
 	github.com/coocood/freecache v1.2.4
 	github.com/dolthub/go-mysql-server v0.17.0
-	github.com/fergusstrange/embedded-postgres v1.25.0
+	github.com/fergusstrange/embedded-postgres v1.26.0
 	github.com/go-redis/redis/v8 v8.11.5
 	github.com/go-redis/redis_rate/v9 v9.1.2
 	github.com/gomodule/redigo v2.0.0+incompatible
