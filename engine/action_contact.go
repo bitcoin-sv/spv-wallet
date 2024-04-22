@@ -7,7 +7,6 @@ import (
 
 	"github.com/bitcoin-sv/go-paymail"
 	"github.com/bitcoin-sv/spv-wallet/engine/datastore"
-	"github.com/bitcoin-sv/spv-wallet/engine/utils"
 )
 
 var (
@@ -18,9 +17,8 @@ var (
 	ErrContactIncorrectStatus       = errors.New("contact is in incorrect status to proceed")
 )
 
-func (c *Client) UpsertContact(ctx context.Context, ctcFName, ctcPaymail, requesterXpub, requesterPaymail string, opts ...ModelOps) (*Contact, error) {
-	reqXPubID := utils.Hash(requesterXpub)
-	reqPm, err := c.getPaymail(ctx, reqXPubID, requesterPaymail)
+func (c *Client) UpsertContact(ctx context.Context, ctcFName, ctcPaymail, requesterXPubID, requesterPaymail string, opts ...ModelOps) (*Contact, error) {
+	reqPm, err := c.getPaymail(ctx, requesterXPubID, requesterPaymail)
 	if err != nil {
 		return nil, err
 	}
@@ -34,7 +32,7 @@ func (c *Client) UpsertContact(ctx context.Context, ctcFName, ctcPaymail, reques
 		return nil, fmt.Errorf("requested contact paymail is invalid. Reason: %w", err)
 	}
 
-	contact, err := c.upsertContact(ctx, pmSrvnt, reqXPubID, ctcFName, contactPm, opts...)
+	contact, err := c.upsertContact(ctx, pmSrvnt, requesterXPubID, ctcFName, contactPm, opts...)
 	if err != nil {
 		return nil, err
 	}
