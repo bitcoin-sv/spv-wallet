@@ -2,12 +2,12 @@ package common
 
 import (
 	"database/sql"
-	"fmt"
+	"testing"
+	"time"
+
 	"github.com/bitcoin-sv/spv-wallet/engine"
 	"github.com/bitcoin-sv/spv-wallet/engine/datastore/customtypes"
 	"github.com/stretchr/testify/assert"
-	"testing"
-	"time"
 )
 
 func TestMapToContract_NewlyCreatedRecord(t *testing.T) {
@@ -18,7 +18,6 @@ func TestMapToContract_NewlyCreatedRecord(t *testing.T) {
 	}
 
 	commonModel := MapToContract(&engineModel)
-	fmt.Printf("Struct: %+v", commonModel)
 	assert.Equal(t, engineModel.CreatedAt, commonModel.CreatedAt)
 	assert.Equal(t, engineModel.UpdatedAt, commonModel.UpdatedAt)
 	assert.Nil(t, commonModel.DeletedAt)
@@ -39,7 +38,6 @@ func TestMapToContract_DeletedAtFieldSet(t *testing.T) {
 	}
 
 	commonModel := MapToContract(&engineModel)
-	fmt.Printf("Struct: %+v", commonModel)
 	assert.Equal(t, engineModel.CreatedAt, commonModel.CreatedAt)
 	assert.Equal(t, engineModel.UpdatedAt, commonModel.UpdatedAt)
 	assert.Equal(t, engineModel.DeletedAt.Time, *commonModel.DeletedAt)
