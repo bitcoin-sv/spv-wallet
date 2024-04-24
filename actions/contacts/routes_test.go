@@ -19,6 +19,7 @@ func (ts *TestSuite) TestContactsRegisterRoutes() {
 			{"PATCH", "/" + config.APIVersion + "/contact/rejected/:paymail"},
 			{"PATCH", "/" + config.APIVersion + "/contact/confirmed/:paymail"},
 			{"POST", "/" + config.APIVersion + "/contact/search"},
+			{"DELETE", "/" + config.APIVersion + "/contact/:contactId"},
 		}
 
 		ts.Router.Routes()

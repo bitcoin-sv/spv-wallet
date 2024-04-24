@@ -10,6 +10,8 @@ import (
 // DefaultAdminXpub is the default admin xpub used for authenticate requests.
 const DefaultAdminXpub = "xpub661MyMwAqRbcFgfmdkPgE2m5UjHXu9dj124DbaGLSjaqVESTWfCD4VuNmEbVPkbYLCkykwVZvmA8Pbf8884TQr1FgdG2nPoHR8aB36YdDQh"
 
+//const DefaultAdminXpub = "xpub661MyMwAqRbcEp7YgDpGXquSF2NW3GBAU3SXTikFT1nkxHGbxjG9RgGxr9X3D4AYsJ6ZqYjMGcdUsPDQZoeibKECs5d56f1w9rfF3QrAAu9"
+
 func getDefaultAppConfig() *AppConfig {
 	return &AppConfig{
 		Authentication:       getAuthConfigDefaults(),
@@ -72,7 +74,7 @@ func getDbDefaults() *DbConfig {
 	return &DbConfig{
 		Datastore: &DatastoreConfig{
 			Debug:       false,
-			Engine:      "sqlite",
+			Engine:      "postgresql",
 			TablePrefix: "xapi",
 		},
 		Mongo: &datastore.MongoDBConfig{
@@ -181,6 +183,6 @@ func getMetricsDefaults() *MetricsConfig {
 
 func getExperimentalFeaturesConfig() *ExperimentalConfig {
 	return &ExperimentalConfig{
-		PikeEnabled: false,
+		PikeEnabled: true,
 	}
 }

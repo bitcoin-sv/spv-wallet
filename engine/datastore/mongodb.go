@@ -581,3 +581,32 @@ func openMongoDatabase(ctx context.Context, config *MongoDBConfig) (*mongo.Datab
 		config.DatabaseName,
 	), nil
 }
+
+// deleteWithMongo will find and delete records in MongoDB
+func (c *Client) deleteWithMongo(
+	ctx context.Context,
+	model interface{},
+	conditions map[string]interface{},
+) error {
+	collectionName := GetModelTableName(model)
+
+	if collectionName == nil {
+		return ErrUnknownCollection
+	}
+	collection := c.GetMongoCollection(*collectionName)
+
+	if collection == nil {
+		return ErrUnknownCollection
+	}
+	result, err := collection.DeleteOne(ctx, conditions)
+
+	if err != nil {
+		return err
+	}
+
+	if result.DeletedCount == 0 {
+		return mongo.ErrNoDocuments
+	}
+
+	return nil
+}

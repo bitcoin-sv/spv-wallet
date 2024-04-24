@@ -334,3 +334,43 @@ func TestConfirmContactErrorPath(t *testing.T) {
 		})
 	}
 }
+
+func TestDeleteContactHappyPath(t *testing.T) {
+	ctx, client, deferMe := initContactTestCase(t)
+	defer deferMe()
+
+	t.Run("delete contact with valid contactId", func(t *testing.T) {
+		// Create a mock contact
+		contact := newContact(
+			fullName,
+			paymailGeneric,
+			pubKey,
+			xPubGeneric,
+			ContactAwaitAccept,
+		)
+		contact.enrich(ModelContact, append(client.DefaultModelOptions(), New())...)
+		err := contact.Save(ctx)
+		require.NoError(t, err)
+
+		// Delete the contact
+		err = client.DeleteContact(ctx, contact.ID)
+		require.NoError(t, err)
+
+		// Check if the contact is deleted
+		contact1, err := getContact(ctx, contact.Paymail, contact.OwnerXpubID, client.DefaultModelOptions()...)
+		require.NoError(t, err)
+		require.Empty(t, contact1)
+	})
+}
+
+func TestDeleteContactErrorPath(t *testing.T) {
+	ctx, client, deferMe := initContactTestCase(t)
+	defer deferMe()
+
+	t.Run("delete contact with invalid contactId", func(t *testing.T) {
+		// Delete a non-existent contact
+		err := client.DeleteContact(ctx, "invalidContactId")
+		require.Error(t, err)
+		require.EqualError(t, err, ErrContactNotFound.Error())
+	})
+}

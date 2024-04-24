@@ -16,6 +16,7 @@ var (
 	ErrMoreThanOnePaymailRegistered = errors.New("there are more than one paymail assigned to the xpub")
 	ErrContactNotFound              = errors.New("contact not found")
 	ErrContactIncorrectStatus       = errors.New("contact is in incorrect status to proceed")
+	ErrInvalidContactId             = errors.New("invalid contact id")
 )
 
 func (c *Client) UpsertContact(ctx context.Context, ctcFName, ctcPaymail, requesterXpub, requesterPaymail string, opts ...ModelOps) (*Contact, error) {
@@ -179,6 +180,33 @@ func (c *Client) ConfirmContact(ctx context.Context, xPubID, paymail string) err
 		return err
 	}
 
+	return nil
+}
+
+func (c *Client) DeleteContact(ctx context.Context, contactId string) error {
+	if contactId == "" {
+		return ErrInvalidContactId
+	}
+
+	return c.deleteContact(ctx, contactId)
+}
+
+func (c *Client) deleteContact(ctx context.Context, contactId string) error {
+
+	contact, err := getContactById(ctx, contactId, c.DefaultModelOptions()...)
+
+	if err != nil {
+		return err
+	}
+	if contact == nil {
+		return ErrContactNotFound
+	}
+
+	err = contact.DeleteContact(ctx, contactId)
+
+	if err != nil {
+		return err
+	}
 	return nil
 }
 

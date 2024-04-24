@@ -22,7 +22,7 @@ type Contact struct {
 	FullName    string        `json:"full_name" toml:"full_name" yaml:"full_name" gorm:"<-create;comment:This is the contact's full name" bson:"full_name"`
 	Paymail     string        `json:"paymail" toml:"paymail" yaml:"paymail" gorm:"<-create;comment:This is the paymail address alias@domain.com" bson:"paymail"`
 	PubKey      string        `json:"pub_key" toml:"pub_key" yaml:"pub_key" gorm:"<-:create;index;comment:This is the related public key" bson:"pub_key"`
-	Status      ContactStatus `json:"status" toml:"status" yaml:"status" gorm:"<-create;type:varchar(20);default:not confirmed;comment:This is the contact status" bson:"status"`
+	Status      ContactStatus `json:"status" toml:"status" yaml:"status" gorm:"<-create;type:varchar(20);default:unconfirmed;comment:This is the contact status" bson:"status"`
 }
 
 func newContact(fullName, paymailAddress, pubKey, ownerXpubID string, status ContactStatus, opts ...ModelOps) *Contact {
@@ -59,6 +59,23 @@ func getContact(ctx context.Context, paymail, ownerXpubID string, opts ...ModelO
 		return nil, err
 	}
 
+	return contact, nil
+}
+
+// getContactById will get the contact by id
+func getContactById(ctx context.Context, id string, opts ...ModelOps) (*Contact, error) {
+	conditions := map[string]interface{}{
+		idField:        id,
+		deletedAtField: nil,
+	}
+	contact := &Contact{}
+	contact.enrich(ModelContact, opts...)
+	if err := Get(ctx, contact, conditions, false, defaultDatabaseReadTimeout, false); err != nil {
+		if errors.Is(err, datastore.ErrNoResults) {
+			return nil, nil
+		}
+		return nil, err
+	}
 	return contact, nil
 }
 
@@ -166,6 +183,24 @@ func (c *Contact) Save(ctx context.Context) (err error) {
 // GetID will get the ID
 func (c *Contact) GetID() string {
 	return c.ID
+}
+
+// DeleteContact will delete the contact
+func (c *Contact) DeleteContact(ctx context.Context, contactId string) error {
+	return Delete(ctx, c, map[string]interface{}{idField: contactId})
+
+}
+
+// AfterCreated will fire after the model is created in the Datastore
+func (c *Contact) AfterCreated(_ context.Context) error {
+	c.Client().Logger().Debug().
+		Str("contactId", c.ID).
+		Msgf("end: %s AfterCreated hook", c.Name())
+
+	c.Client().Logger().Debug().
+		Str("contactId", c.ID).
+		Msgf("end: %s AfterCreated hook", c.Name())
+	return nil
 }
 
 // BeforeCreating is called before the model is saved to the DB

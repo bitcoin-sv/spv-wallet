@@ -409,3 +409,19 @@ func createCtx(ctx context.Context, db *gorm.DB, timeout time.Duration, debug bo
 	ctx, cancel = context.WithTimeout(ctx, timeout)
 	return db.Session(getGormSessionConfig(db.PrepareStmt, debug, optionalLogger)).WithContext(ctx), cancel
 }
+
+// DeleteModel will delete the given model
+func (c *Client) DeleteModel(
+	ctx context.Context,
+	model interface{},
+	conditions map[string]interface{},
+) error {
+	engine := c.Engine()
+	if engine == MongoDB {
+		return c.deleteWithMongo(ctx, model, conditions)
+	} else if !IsSQLEngine(engine) {
+		return ErrUnsupportedEngine
+	}
+	tx := c.options.db.Delete(model, conditions)
+	return tx.Error
+}

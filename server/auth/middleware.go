@@ -36,6 +36,9 @@ const (
 
 	// ParamAuthSigned the request parameter that says whether the request was signed
 	ParamAuthSigned = "auth_signed"
+
+	// ContactID the request parameter for the contact ID
+	ContactID = "contactId"
 )
 
 // Payload is the authentication payload for checking or creating a signature
