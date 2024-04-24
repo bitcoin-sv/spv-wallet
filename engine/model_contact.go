@@ -62,6 +62,24 @@ func getContact(ctx context.Context, paymail, ownerXpubID string, opts ...ModelO
 	return contact, nil
 }
 
+func getContactByID(ctx context.Context, id string, opts ...ModelOps) (*Contact, error) {
+	conditions := map[string]interface{}{
+		idField: id,
+	}
+
+	contact := &Contact{}
+	contact.enrich(ModelContact, opts...)
+
+	if err := Get(ctx, contact, conditions, false, defaultDatabaseReadTimeout, false); err != nil {
+		if errors.Is(err, datastore.ErrNoResults) {
+			return nil, nil
+		}
+		return nil, err
+	}
+
+	return contact, nil
+}
+
 func (c *Contact) validate() error {
 	if c.ID == "" {
 		return ErrMissingContactID
@@ -90,7 +108,21 @@ func (c *Contact) validate() error {
 	return nil
 }
 
-func getContacts(ctx context.Context, xPubID string, metadata *Metadata, conditions map[string]interface{}, queryParams *datastore.QueryParams, opts ...ModelOps) ([]*Contact, error) {
+func getContacts(ctx context.Context, metadata *Metadata, conditions map[string]interface{}, queryParams *datastore.QueryParams, opts ...ModelOps) ([]*Contact, error) {
+	if conditions == nil {
+		conditions = make(map[string]interface{})
+	}
+	conditions[deletedAtField] = nil
+
+	contacts := make([]*Contact, 0)
+	if err := getModelsByConditions(ctx, ModelContact, &contacts, metadata, &conditions, queryParams, opts...); err != nil {
+		return nil, err
+	}
+
+	return contacts, nil
+}
+
+func getContactsByXpubID(ctx context.Context, xPubID string, metadata *Metadata, conditions map[string]interface{}, queryParams *datastore.QueryParams, opts ...ModelOps) ([]*Contact, error) {
 	if conditions == nil {
 		conditions = make(map[string]interface{})
 	}
@@ -132,6 +164,11 @@ func (c *Contact) Confirm() error {
 
 	c.Status = ContactConfirmed
 	return nil
+}
+
+func (c *Contact) Delete() {
+	c.DeletedAt.Valid = true
+	c.DeletedAt.Time = time.Now()
 }
 
 func (c *Contact) UpdatePubKey(pk string) (updated bool) {

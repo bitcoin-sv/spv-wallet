@@ -118,6 +118,22 @@ definitions:
         example: 0100000002...
         type: string
     type: object
+  admin.UpdateContact:
+    properties:
+      fullName:
+        description: New name for the contact
+        example: John Doe
+        type: string
+      metadata:
+        additionalProperties:
+          type: string
+        description: Accepts a JSON object for embedding custom metadata, enabling
+          arbitrary additional information to be associated with the resource
+        example:
+          key: value
+          key2: value2
+        type: object
+    type: object
   broadcast.SubmittedTx:
     properties:
       blockHash:
@@ -1179,6 +1195,8 @@ definitions:
     - 1000000000
     - 60000000000
     - 3600000000000
+    - -9223372036854775808
+    - 9223372036854775807
     - 1
     - 1000
     - 1000000
@@ -1203,6 +1221,8 @@ definitions:
     - Second
     - Minute
     - Hour
+    - minDuration
+    - maxDuration
     - Nanosecond
     - Microsecond
     - Millisecond
@@ -1523,6 +1543,152 @@ paths:
       security:
       - x-auth-xpub: []
       summary: Access Keys Search
+      tags:
+      - Admin
+  /v1/admin/contact/{id}:
+    delete:
+      description: Delete contact
+      parameters:
+      - description: Contact id
+        in: path
+        name: id
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad request - Error while parsing UpdateContact from request
+            body or getting id from path
+        "404":
+          description: Not found - Error while getting contact by id
+        "422":
+          description: Unprocessable entity - Incorrect status of contact
+        "500":
+          description: Internal server error - Error while updating contact
+      security:
+      - x-auth-xpub: []
+      summary: Delete contact
+      tags:
+      - Admin
+    patch:
+      description: Update contact FullName or Metadata
+      parameters:
+      - description: Contact id
+        in: path
+        name: id
+        type: string
+      - description: FullName and metadata to update
+        in: body
+        name: UpdateContact
+        schema:
+          $ref: '#/definitions/admin.UpdateContact'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Updated contact
+          schema:
+            $ref: '#/definitions/models.Contact'
+        "400":
+          description: Bad request - Error while parsing UpdateContact from request
+            body or getting id from path
+        "404":
+          description: Not found - Error while getting contact by id
+        "422":
+          description: Unprocessable entity - Incorrect status of contact
+        "500":
+          description: Internal server error - Error while updating contact
+      security:
+      - x-auth-xpub: []
+      summary: Update contact FullName or Metadata
+      tags:
+      - Admin
+  /v1/admin/contact/accepted/{id}:
+    patch:
+      description: Accept contact
+      parameters:
+      - description: Contact id
+        in: path
+        name: id
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Changed contact
+          schema:
+            $ref: '#/definitions/models.Contact'
+        "400":
+          description: Bad request - Error while getting id from path
+        "404":
+          description: Not found - Error while getting contact by id
+        "422":
+          description: Unprocessable entity - Incorrect status of contact
+        "500":
+          description: Internal server error - Error while changing contact status
+      security:
+      - x-auth-xpub: []
+      summary: Accept contact
+      tags:
+      - Admin
+  /v1/admin/contact/rejected/{id}:
+    patch:
+      description: Reject contact
+      parameters:
+      - description: Contact id
+        in: path
+        name: id
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Rejected contact
+          schema:
+            $ref: '#/definitions/models.Contact'
+        "400":
+          description: Bad request - Error while getting id from path
+        "404":
+          description: Not found - Error while getting contact by id
+        "422":
+          description: Unprocessable entity - Incorrect status of contact
+        "500":
+          description: Internal server error - Error while changing contact status
+      security:
+      - x-auth-xpub: []
+      summary: Reject contact
+      tags:
+      - Admin
+  /v1/admin/contact/search:
+    post:
+      description: Search for contacts
+      parameters:
+      - description: Supports targeted resource searches with filters for metadata
+          and custom conditions, plus options for pagination and sorting to streamline
+          data exploration and analysis
+        in: body
+        name: SearchRequestParameters
+        schema:
+          $ref: '#/definitions/actions.SearchRequestParameters'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: List of contacts
+          schema:
+            items:
+              $ref: '#/definitions/models.Contact'
+            type: array
+        "400":
+          description: Bad request - Error while parsing SearchRequestParameters from
+            request body
+        "500":
+          description: Internal server error - Error while searching for contacts
+      security:
+      - x-auth-xpub: []
+      summary: Search for contacts
       tags:
       - Admin
   /v1/admin/destinations/search:

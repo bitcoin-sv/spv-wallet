@@ -275,7 +275,7 @@ func Test_getContacts(t *testing.T) {
 		}
 
 		// when
-		contacts, err := getContacts(ctx, xpubID, nil, conditions, nil, client.DefaultModelOptions()...)
+		contacts, err := getContactsByXpubID(ctx, xpubID, nil, conditions, nil, client.DefaultModelOptions()...)
 
 		// then
 		require.NoError(t, err)
@@ -300,7 +300,7 @@ func Test_getContacts(t *testing.T) {
 		saveContactsN(xpubID, ContactNotConfirmed, 13, client)
 
 		// when
-		contacts, err := getContacts(ctx, xpubID, nil, nil, nil, client.DefaultModelOptions()...)
+		contacts, err := getContactsByXpubID(ctx, xpubID, nil, nil, nil, client.DefaultModelOptions()...)
 
 		// then
 		require.NoError(t, err)
@@ -321,7 +321,7 @@ func Test_getContacts(t *testing.T) {
 		saveContactsN("other-xpub", ContactNotConfirmed, 13, client)
 
 		// when
-		contacts, err := getContacts(ctx, xpubID, nil, nil, nil, client.DefaultModelOptions()...)
+		contacts, err := getContactsByXpubID(ctx, xpubID, nil, nil, nil, client.DefaultModelOptions()...)
 
 		// then
 		require.NoError(t, err)
@@ -342,7 +342,7 @@ func Test_getContacts(t *testing.T) {
 		saveContactsDeletedN(xpubID, ContactNotConfirmed, 13, client)
 
 		// when
-		contacts, err := getContacts(ctx, xpubID, nil, nil, nil, client.DefaultModelOptions()...)
+		contacts, err := getContactsByXpubID(ctx, xpubID, nil, nil, nil, client.DefaultModelOptions()...)
 
 		// then
 		require.NoError(t, err)
