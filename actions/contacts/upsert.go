@@ -24,7 +24,7 @@ import (
 // @Router		/v1/contact/{paymail} [PUT]
 // @Security	x-auth-xpub
 func (a *Action) upsert(c *gin.Context) {
-	requesterPubKey := c.GetString(auth.ParamXPubKey)
+	reqXPubID := c.GetString(auth.ParamXPubHashKey)
 	cPaymail := c.Param("paymail")
 
 	var req UpsertContact
@@ -41,7 +41,7 @@ func (a *Action) upsert(c *gin.Context) {
 	contact, err := a.Services.SpvWalletEngine.UpsertContact(
 		c.Request.Context(),
 		req.FullName, cPaymail,
-		requesterPubKey, req.RequesterPaymail,
+		reqXPubID, req.RequesterPaymail,
 		engine.WithMetadatas(req.Metadata))
 
 	if err != nil && !errors.Is(err, engine.ErrAddingContactRequest) {

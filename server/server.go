@@ -5,6 +5,7 @@ import (
 	"context"
 	"crypto/tls"
 	"errors"
+	"fmt"
 	"net/http"
 	"strconv"
 
@@ -81,7 +82,12 @@ func (s *Server) Serve() {
 // Shutdown will stop the web server
 func (s *Server) Shutdown(ctx context.Context) error {
 	s.Services.CloseAll(ctx) // Should have been executed in main.go, but might panic and not run?
-	return s.WebServer.Shutdown(ctx)
+	err := s.WebServer.Shutdown(ctx)
+	if err != nil {
+		err = fmt.Errorf("error shutting down server: %w", err)
+		return err
+	}
+	return nil
 }
 
 // Handlers will return handlers

@@ -69,6 +69,7 @@ func setDefaults() error {
 
 	defaultsMap := make(map[string]interface{})
 	if err := mapstructure.Decode(getDefaultAppConfig(), &defaultsMap); err != nil {
+		err = fmt.Errorf("error occurred while setting defaults: %w", err)
 		return err
 	}
 

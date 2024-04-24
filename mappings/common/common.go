@@ -12,12 +12,16 @@ func MapToContract(m *engine.Model) *common.Model {
 		return nil
 	}
 
-	return &common.Model{
+	result := common.Model{
 		CreatedAt: m.CreatedAt,
 		UpdatedAt: m.UpdatedAt,
-		DeletedAt: m.DeletedAt.Time,
 		Metadata:  m.Metadata,
 	}
+	if m.DeletedAt.Valid {
+		result.DeletedAt = &m.DeletedAt.Time
+	}
+
+	return &result
 }
 
 // MapToModel will map the spv-wallet-models contract to the common SPV Wallet Model

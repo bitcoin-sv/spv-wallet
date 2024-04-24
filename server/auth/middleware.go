@@ -243,6 +243,7 @@ func createBodyHash(bodyContents string) string {
 // verifyKeyXPub will verify the xPub key and the signature payload
 func verifyKeyXPub(xPub string, auth *Payload) error {
 	if _, err := utils.ValidateXPub(xPub); err != nil {
+		err := fmt.Errorf("error occurred while validating xPub key: %w", err)
 		return err
 	}
 
@@ -252,15 +253,18 @@ func verifyKeyXPub(xPub string, auth *Payload) error {
 
 	key, err := bitcoin.GetHDKeyFromExtendedPublicKey(xPub)
 	if err != nil {
+		err = fmt.Errorf("error occurred while getting HD key from xPub: %w", err)
 		return err
 	}
 
 	if key, err = utils.DeriveChildKeyFromHex(key, auth.AuthNonce); err != nil {
+		err = fmt.Errorf("error occurred while deriving child key: %w", err)
 		return err
 	}
 
 	var address *bscript.Address
 	if address, err = bitcoin.GetAddressFromHDKey(key); err != nil {
+		err = fmt.Errorf("error occurred while getting address from HD key: %w", err)
 		return err // Should never error
 	}
 
@@ -281,6 +285,7 @@ func verifyMessageAndSignature(key string, auth *Payload) error {
 		key, true,
 	)
 	if err != nil {
+		err = fmt.Errorf("error occurred while getting address from public key: %w", err)
 		return err
 	}
 

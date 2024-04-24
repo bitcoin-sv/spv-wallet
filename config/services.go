@@ -49,6 +49,7 @@ func (a *AppConfig) LoadServices(ctx context.Context) (*AppServices, error) {
 
 	logger, err := logging.CreateLogger(a.Logging.InstanceName, a.Logging.Format, a.Logging.Level, a.Logging.LogOrigin)
 	if err != nil {
+		err = fmt.Errorf("error creating logger: %w", err)
 		return nil, err
 	}
 
@@ -295,6 +296,7 @@ func loadDatastore(options []engine.ClientOps, appConfig *AppConfig, testMode bo
 		var err error
 		// Set the unique table prefix
 		if appConfig.Db.SQLite.TablePrefix, err = utils.RandomHex(8); err != nil {
+			err = fmt.Errorf("error generating random hex: %w", err)
 			return options, err
 		}
 

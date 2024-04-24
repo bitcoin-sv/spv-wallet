@@ -341,6 +341,233 @@ const docTemplate = `{
                 }
             }
         },
+        "/v1/admin/contact/accepted/{id}": {
+            "patch": {
+                "security": [
+                    {
+                        "x-auth-xpub": []
+                    }
+                ],
+                "description": "Accept contact",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Admin"
+                ],
+                "summary": "Accept contact",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Contact id",
+                        "name": "id",
+                        "in": "path"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Changed contact",
+                        "schema": {
+                            "$ref": "#/definitions/models.Contact"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request - Error while getting id from path"
+                    },
+                    "404": {
+                        "description": "Not found - Error while getting contact by id"
+                    },
+                    "422": {
+                        "description": "Unprocessable entity - Incorrect status of contact"
+                    },
+                    "500": {
+                        "description": "Internal server error - Error while changing contact status"
+                    }
+                }
+            }
+        },
+        "/v1/admin/contact/rejected/{id}": {
+            "patch": {
+                "security": [
+                    {
+                        "x-auth-xpub": []
+                    }
+                ],
+                "description": "Reject contact",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Admin"
+                ],
+                "summary": "Reject contact",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Contact id",
+                        "name": "id",
+                        "in": "path"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Rejected contact",
+                        "schema": {
+                            "$ref": "#/definitions/models.Contact"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request - Error while getting id from path"
+                    },
+                    "404": {
+                        "description": "Not found - Error while getting contact by id"
+                    },
+                    "422": {
+                        "description": "Unprocessable entity - Incorrect status of contact"
+                    },
+                    "500": {
+                        "description": "Internal server error - Error while changing contact status"
+                    }
+                }
+            }
+        },
+        "/v1/admin/contact/search": {
+            "post": {
+                "security": [
+                    {
+                        "x-auth-xpub": []
+                    }
+                ],
+                "description": "Search for contacts",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Admin"
+                ],
+                "summary": "Search for contacts",
+                "parameters": [
+                    {
+                        "description": "Supports targeted resource searches with filters for metadata and custom conditions, plus options for pagination and sorting to streamline data exploration and analysis",
+                        "name": "SearchRequestParameters",
+                        "in": "body",
+                        "schema": {
+                            "$ref": "#/definitions/actions.SearchRequestParameters"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "List of contacts",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/models.Contact"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request - Error while parsing SearchRequestParameters from request body"
+                    },
+                    "500": {
+                        "description": "Internal server error - Error while searching for contacts"
+                    }
+                }
+            }
+        },
+        "/v1/admin/contact/{id}": {
+            "delete": {
+                "security": [
+                    {
+                        "x-auth-xpub": []
+                    }
+                ],
+                "description": "Delete contact",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Admin"
+                ],
+                "summary": "Delete contact",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Contact id",
+                        "name": "id",
+                        "in": "path"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "400": {
+                        "description": "Bad request - Error while parsing UpdateContact from request body or getting id from path"
+                    },
+                    "404": {
+                        "description": "Not found - Error while getting contact by id"
+                    },
+                    "422": {
+                        "description": "Unprocessable entity - Incorrect status of contact"
+                    },
+                    "500": {
+                        "description": "Internal server error - Error while updating contact"
+                    }
+                }
+            },
+            "patch": {
+                "security": [
+                    {
+                        "x-auth-xpub": []
+                    }
+                ],
+                "description": "Update contact FullName or Metadata",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Admin"
+                ],
+                "summary": "Update contact FullName or Metadata",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Contact id",
+                        "name": "id",
+                        "in": "path"
+                    },
+                    {
+                        "description": "FullName and metadata to update",
+                        "name": "UpdateContact",
+                        "in": "body",
+                        "schema": {
+                            "$ref": "#/definitions/admin.UpdateContact"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Updated contact",
+                        "schema": {
+                            "$ref": "#/definitions/models.Contact"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request - Error while parsing UpdateContact from request body or getting id from path"
+                    },
+                    "404": {
+                        "description": "Not found - Error while getting contact by id"
+                    },
+                    "422": {
+                        "description": "Unprocessable entity - Incorrect status of contact"
+                    },
+                    "500": {
+                        "description": "Internal server error - Error while updating contact"
+                    }
+                }
+            }
+        },
         "/v1/admin/destinations/search": {
             "post": {
                 "security": [
@@ -2093,6 +2320,27 @@ const docTemplate = `{
                 }
             }
         },
+        "admin.UpdateContact": {
+            "type": "object",
+            "properties": {
+                "fullName": {
+                    "description": "New name for the contact",
+                    "type": "string",
+                    "example": "John Doe"
+                },
+                "metadata": {
+                    "description": "Accepts a JSON object for embedding custom metadata, enabling arbitrary additional information to be associated with the resource",
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "string"
+                    },
+                    "example": {
+                        "key": "value",
+                        "key2": "value2"
+                    }
+                }
+            }
+        },
         "broadcast.SubmittedTx": {
             "type": "object",
             "properties": {
@@ -2728,6 +2976,70 @@ const docTemplate = `{
                 }
             }
         },
+        "models.FeeUnit": {
+            "type": "object",
+            "properties": {
+                "bytes": {
+                    "description": "Bytes is a fee unit bytes representation.",
+                    "type": "integer",
+                    "example": 1000
+                },
+                "satoshis": {
+                    "description": "Satoshis is a fee unit satoshis amount.",
+                    "type": "integer",
+                    "example": 1
+                }
+            }
+        },
+        "models.MapProtocol": {
+            "type": "object",
+            "properties": {
+                "app": {
+                    "description": "App is a map protocol app.",
+                    "type": "string"
+                },
+                "keys": {
+                    "description": "Keys is a map protocol keys.",
+                    "type": "object",
+                    "additionalProperties": true
+                },
+                "type": {
+                    "description": "Type is a map protocol type.",
+                    "type": "string"
+                }
+            }
+        },
+        "models.OpReturn": {
+            "type": "object",
+            "properties": {
+                "hex": {
+                    "description": "Hex is a full hex of op return.",
+                    "type": "string"
+                },
+                "hex_parts": {
+                    "description": "HexParts is a slice of splitted hex parts.",
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "map": {
+                    "description": "Map is a pointer to a map protocol object.",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/models.MapProtocol"
+                        }
+                    ]
+                },
+                "string_parts": {
+                    "description": "StringParts is a slice of string parts.",
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                }
+            }
+        },
         "models.PaymailAddress": {
             "type": "object",
             "properties": {
@@ -2789,6 +3101,64 @@ const docTemplate = `{
                 }
             }
         },
+        "models.PaymailP4": {
+            "type": "object",
+            "properties": {
+                "alias": {
+                    "description": "Alias is a paymail p4 alias.",
+                    "type": "string"
+                },
+                "domain": {
+                    "description": "Domain is a paymail p4 domain.",
+                    "type": "string"
+                },
+                "from_paymail": {
+                    "description": "FromPaymail is a paymail p4 from paymail.",
+                    "type": "string"
+                },
+                "note": {
+                    "description": "Note is a paymail p4 note.",
+                    "type": "string"
+                },
+                "pub_key": {
+                    "description": "PubKey is a paymail p4 pub key.",
+                    "type": "string"
+                },
+                "receive_endpoint": {
+                    "description": "ReceiveEndpoint is a paymail p4 receive endpoint.",
+                    "type": "string"
+                },
+                "reference_id": {
+                    "description": "ReferenceID is a paymail p4 reference id.",
+                    "type": "string"
+                },
+                "resolution_type": {
+                    "description": "ResolutionType is a paymail p4 resolution type.",
+                    "type": "string"
+                }
+            }
+        },
+        "models.ScriptOutput": {
+            "type": "object",
+            "properties": {
+                "address": {
+                    "description": "Address is a script output address.",
+                    "type": "string"
+                },
+                "satoshis": {
+                    "description": "Satoshis is a script output satoshis.",
+                    "type": "integer"
+                },
+                "script": {
+                    "description": "Script is a script output script.",
+                    "type": "string"
+                },
+                "script_type": {
+                    "description": "ScriptType is a script output script type.",
+                    "type": "string"
+                }
+            }
+        },
         "models.SharedConfig": {
             "type": "object",
             "properties": {
@@ -2811,6 +3181,27 @@ const docTemplate = `{
                     "example": [
                         "spv-wallet.com"
                     ]
+                }
+            }
+        },
+        "models.SyncConfig": {
+            "type": "object",
+            "properties": {
+                "broadcast": {
+                    "description": "Broadcast is a flag that indicates whether to broadcast transaction or not.",
+                    "type": "boolean"
+                },
+                "broadcast_instant": {
+                    "description": "BroadcastInstant is a flag that indicates whether to broadcast transaction instantly or not.",
+                    "type": "boolean"
+                },
+                "paymail_p2p": {
+                    "description": "PaymailP2P is a flag that indicates whether to use paymail p2p or not.",
+                    "type": "boolean"
+                },
+                "sync_on_chain": {
+                    "description": "SyncOnChain is a flag that indicates whether to sync transaction on chain or not.",
+                    "type": "boolean"
                 }
             }
         },
@@ -3028,6 +3419,21 @@ const docTemplate = `{
                 }
             }
         },
+        "models.UtxoPointer": {
+            "type": "object",
+            "properties": {
+                "output_index": {
+                    "description": "OutputIndex is a output index that utxo points to.",
+                    "type": "integer",
+                    "example": 0
+                },
+                "transaction_id": {
+                    "description": "TransactionID is a transaction id that utxo points to.",
+                    "type": "string",
+                    "example": "01d0d0067652f684c6acb3683763f353fce55f6496521c7d99e71e1d27e53f5c"
+                }
+            }
+        },
         "models.Xpub": {
             "type": "object",
             "properties": {
@@ -3078,6 +3484,61 @@ const docTemplate = `{
                     "example": "2024-02-26T11:01:28.069911Z"
                 }
             }
+        },
+        "time.Duration": {
+            "type": "integer",
+            "enum": [
+                -9223372036854775808,
+                9223372036854775807,
+                1,
+                1000,
+                1000000,
+                1000000000,
+                60000000000,
+                3600000000000,
+                -9223372036854775808,
+                9223372036854775807,
+                1,
+                1000,
+                1000000,
+                1000000000,
+                60000000000,
+                3600000000000,
+                -9223372036854775808,
+                9223372036854775807,
+                1,
+                1000,
+                1000000,
+                1000000000,
+                60000000000,
+                3600000000000
+            ],
+            "x-enum-varnames": [
+                "minDuration",
+                "maxDuration",
+                "Nanosecond",
+                "Microsecond",
+                "Millisecond",
+                "Second",
+                "Minute",
+                "Hour",
+                "minDuration",
+                "maxDuration",
+                "Nanosecond",
+                "Microsecond",
+                "Millisecond",
+                "Second",
+                "Minute",
+                "Hour",
+                "minDuration",
+                "maxDuration",
+                "Nanosecond",
+                "Microsecond",
+                "Millisecond",
+                "Second",
+                "Minute",
+                "Hour"
+            ]
         },
         "transactions.CountTransactions": {
             "type": "object",

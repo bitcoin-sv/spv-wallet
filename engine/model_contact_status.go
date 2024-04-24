@@ -16,7 +16,7 @@ const (
 	ContactRejected     ContactStatus = "rejected"
 )
 
-var contactStatusMapper = NewEnumStringMapper(ContactNotConfirmed, ContactAwaitAccept, ContactConfirmed)
+var contactStatusMapper = NewEnumStringMapper(ContactNotConfirmed, ContactAwaitAccept, ContactConfirmed, ContactRejected)
 
 // Scan will scan the value into Struct, implements sql.Scanner interface
 func (t *ContactStatus) Scan(value interface{}) error {
