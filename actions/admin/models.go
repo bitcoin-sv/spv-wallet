@@ -48,11 +48,23 @@ type UpdateContact struct {
 	FullName string `json:"fullName" example:"John Doe"`
 }
 
-// SearchTransactions is a model for handling searching with filters and metadata
-type SearchTransactions = common.SearchModel[filter.ContactFilter]
+// SearchContacts is a model for handling searching with filters and metadata
+type SearchContacts = common.SearchModel[filter.ContactFilter]
 
 // SearchAccessKeys is a model for handling searching with filters and metadata
 type SearchAccessKeys = common.SearchModel[filter.AccessKeyFilter]
 
 // CountAccessKeys is a model for handling counting filtered transactions
 type CountAccessKeys = common.ConditionsModel[filter.AccessKeyFilter]
+
+// SearchDestinations is a model for handling searching with filters and metadata
+type SearchDestinations = common.SearchModel[filter.DestinationFilter]
+
+// CountDestinations is a model for handling counting filtered destinations
+type CountDestinations = common.ConditionsModel[filter.DestinationFilter]
+
+// SearchTransactions is a model for handling searching with filters and metadata
+type SearchTransactions = common.SearchModel[filter.TransactionFilter]
+
+// CountTransactions is a model for handling counting filtered transactions
+type CountTransactions = common.ConditionsModel[filter.TransactionFilter]

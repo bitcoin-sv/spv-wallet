@@ -3,8 +3,6 @@ package admin
 import (
 	"net/http"
 
-	"github.com/bitcoin-sv/spv-wallet/actions"
-	"github.com/bitcoin-sv/spv-wallet/engine"
 	"github.com/bitcoin-sv/spv-wallet/mappings"
 	"github.com/bitcoin-sv/spv-wallet/models"
 	"github.com/gin-gonic/gin"
@@ -23,19 +21,19 @@ import (
 // @Router		/v1/admin/destinations/search [post]
 // @Security	x-auth-xpub
 func (a *Action) destinationsSearch(c *gin.Context) {
-	queryParams, metadata, conditions, err := actions.GetSearchQueryParameters(c)
-	if err != nil {
+	var reqParams SearchDestinations
+	if err := c.Bind(&reqParams); err != nil {
 		c.JSON(http.StatusBadRequest, err.Error())
 		return
 	}
 
-	var destinations []*engine.Destination
-	if destinations, err = a.Services.SpvWalletEngine.GetDestinations(
+	destinations, err := a.Services.SpvWalletEngine.GetDestinations(
 		c.Request.Context(),
-		metadata,
-		conditions,
-		queryParams,
-	); err != nil {
+		reqParams.Metadata,
+		reqParams.Conditions.ToDbConditions(),
+		reqParams.QueryParams,
+	)
+	if err != nil {
 		c.JSON(http.StatusInternalServerError, err.Error())
 		return
 	}
@@ -60,18 +58,18 @@ func (a *Action) destinationsSearch(c *gin.Context) {
 // @Failure 	500	"Internal Server Error - Error while fetching count of destinations"
 // @Security	x-auth-xpub
 func (a *Action) destinationsCount(c *gin.Context) {
-	metadata, conditions, err := actions.GetCountQueryParameters(c)
-	if err != nil {
+	var reqParams CountDestinations
+	if err := c.Bind(&reqParams); err != nil {
 		c.JSON(http.StatusBadRequest, err.Error())
 		return
 	}
 
-	var count int64
-	if count, err = a.Services.SpvWalletEngine.GetDestinationsCount(
+	count, err := a.Services.SpvWalletEngine.GetDestinationsCount(
 		c.Request.Context(),
-		metadata,
-		conditions,
-	); err != nil {
+		reqParams.Metadata,
+		reqParams.Conditions.ToDbConditions(),
+	)
+	if err != nil {
 		c.JSON(http.StatusInternalServerError, err.Error())
 		return
 	}
