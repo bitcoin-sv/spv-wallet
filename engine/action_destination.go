@@ -78,7 +78,7 @@ func (c *Client) NewDestinationForLockingScript(ctx context.Context, xPubID, loc
 
 // GetDestinations will get all the destinations from the Datastore
 func (c *Client) GetDestinations(ctx context.Context, metadataConditions *Metadata,
-	conditions *map[string]interface{}, queryParams *datastore.QueryParams, opts ...ModelOps,
+	conditions map[string]interface{}, queryParams *datastore.QueryParams, opts ...ModelOps,
 ) ([]*Destination, error) {
 	// Check for existing NewRelic transaction
 	ctx = c.GetOrStartTxn(ctx, "get_destinations")
@@ -97,7 +97,7 @@ func (c *Client) GetDestinations(ctx context.Context, metadataConditions *Metada
 
 // GetDestinationsCount will get a count of all the destinations from the Datastore
 func (c *Client) GetDestinationsCount(ctx context.Context, metadataConditions *Metadata,
-	conditions *map[string]interface{}, opts ...ModelOps,
+	conditions map[string]interface{}, opts ...ModelOps,
 ) (int64, error) {
 	// Check for existing NewRelic transaction
 	ctx = c.GetOrStartTxn(ctx, "get_destinations_count")

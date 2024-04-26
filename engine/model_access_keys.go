@@ -69,7 +69,7 @@ func getAccessKey(ctx context.Context, id string, opts ...ModelOps) (*AccessKey,
 }
 
 // getAccessKeys will get all the access keys with the given conditions
-func getAccessKeys(ctx context.Context, metadata *Metadata, conditions *map[string]interface{},
+func getAccessKeys(ctx context.Context, metadata *Metadata, conditions map[string]interface{},
 	queryParams *datastore.QueryParams, opts ...ModelOps,
 ) ([]*AccessKey, error) {
 	modelItems := make([]*AccessKey, 0)
@@ -81,7 +81,7 @@ func getAccessKeys(ctx context.Context, metadata *Metadata, conditions *map[stri
 }
 
 // getAccessKeysCount will get a count of all the access keys with the given conditions
-func getAccessKeysCount(ctx context.Context, metadata *Metadata, conditions *map[string]interface{},
+func getAccessKeysCount(ctx context.Context, metadata *Metadata, conditions map[string]interface{},
 	opts ...ModelOps,
 ) (int64, error) {
 	return getModelCountByConditions(ctx, ModelAccessKey, AccessKey{}, metadata, conditions, opts...)

@@ -83,7 +83,7 @@ func getPaymailAddress(ctx context.Context, address string, opts ...ModelOps) (*
 }
 
 // getPaymailAddresses will get all the paymail addresses with the given conditions
-func getPaymailAddresses(ctx context.Context, metadata *Metadata, conditions *map[string]interface{},
+func getPaymailAddresses(ctx context.Context, metadata *Metadata, conditions map[string]interface{},
 	queryParams *datastore.QueryParams, opts ...ModelOps,
 ) ([]*PaymailAddress, error) {
 	modelItems := make([]*PaymailAddress, 0)
@@ -95,7 +95,7 @@ func getPaymailAddresses(ctx context.Context, metadata *Metadata, conditions *ma
 }
 
 // getPaymailAddressesCount will get all the paymail addresses with the given conditions
-func getPaymailAddressesCount(ctx context.Context, metadata *Metadata, conditions *map[string]interface{},
+func getPaymailAddressesCount(ctx context.Context, metadata *Metadata, conditions map[string]interface{},
 	opts ...ModelOps,
 ) (int64, error) {
 	return getModelCountByConditions(ctx, ModelPaymailAddress, PaymailAddress{}, metadata, conditions, opts...)

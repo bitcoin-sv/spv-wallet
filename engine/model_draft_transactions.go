@@ -95,7 +95,7 @@ func getDraftTransactionID(ctx context.Context, xPubID, id string,
 }
 
 // getDraftTransactions will get all the draft transactions with the given conditions
-func getDraftTransactions(ctx context.Context, metadata *Metadata, conditions *map[string]interface{},
+func getDraftTransactions(ctx context.Context, metadata *Metadata, conditions map[string]interface{},
 	queryParams *datastore.QueryParams, opts ...ModelOps,
 ) ([]*DraftTransaction, error) {
 	modelItems := make([]*DraftTransaction, 0)
@@ -107,7 +107,7 @@ func getDraftTransactions(ctx context.Context, metadata *Metadata, conditions *m
 }
 
 // getDraftTransactionsCount will get a count of all the access keys with the given conditions
-func getDraftTransactionsCount(ctx context.Context, metadata *Metadata, conditions *map[string]interface{},
+func getDraftTransactionsCount(ctx context.Context, metadata *Metadata, conditions map[string]interface{},
 	opts ...ModelOps,
 ) (int64, error) {
 	return getModelCountByConditions(ctx, ModelDraftTransaction, DraftTransaction{}, metadata, conditions, opts...)
@@ -157,7 +157,7 @@ func (m *DraftTransaction) processConfigOutputs(ctx context.Context) error {
 	conditions := map[string]interface{}{
 		xPubIDField: m.XpubID,
 	}
-	paymails, err := c.GetPaymailAddressesByXPubID(ctx, m.XpubID, nil, &conditions, nil)
+	paymails, err := c.GetPaymailAddressesByXPubID(ctx, m.XpubID, nil, conditions, nil)
 	if err == nil && len(paymails) != 0 {
 		paymailFrom = fmt.Sprintf("%s@%s", paymails[0].Alias, paymails[0].Domain)
 	}

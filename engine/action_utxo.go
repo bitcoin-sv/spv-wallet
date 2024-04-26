@@ -9,7 +9,7 @@ import (
 
 // GetUtxos will get all the utxos from the Datastore
 func (c *Client) GetUtxos(ctx context.Context, metadataConditions *Metadata,
-	conditions *map[string]interface{}, queryParams *datastore.QueryParams, opts ...ModelOps,
+	conditions map[string]interface{}, queryParams *datastore.QueryParams, opts ...ModelOps,
 ) ([]*Utxo, error) {
 	// Check for existing NewRelic transaction
 	ctx = c.GetOrStartTxn(ctx, "get_utxos")
@@ -31,7 +31,7 @@ func (c *Client) GetUtxos(ctx context.Context, metadataConditions *Metadata,
 
 // GetUtxosCount will get a count of all the utxos from the Datastore
 func (c *Client) GetUtxosCount(ctx context.Context, metadataConditions *Metadata,
-	conditions *map[string]interface{}, opts ...ModelOps,
+	conditions map[string]interface{}, opts ...ModelOps,
 ) (int64, error) {
 	// Check for existing NewRelic transaction
 	ctx = c.GetOrStartTxn(ctx, "get_utxos_count")
@@ -49,7 +49,7 @@ func (c *Client) GetUtxosCount(ctx context.Context, metadataConditions *Metadata
 }
 
 // GetUtxosByXpubID will get utxos based on an xPub
-func (c *Client) GetUtxosByXpubID(ctx context.Context, xPubID string, metadata *Metadata, conditions *map[string]interface{},
+func (c *Client) GetUtxosByXpubID(ctx context.Context, xPubID string, metadata *Metadata, conditions map[string]interface{},
 	queryParams *datastore.QueryParams,
 ) ([]*Utxo, error) {
 	// Check for existing NewRelic transaction

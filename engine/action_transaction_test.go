@@ -48,7 +48,7 @@ func Test_RevertTransaction(t *testing.T) {
 
 		// check utxos where reverted
 		var utxos []*Utxo
-		conditions := &map[string]interface{}{
+		conditions := map[string]interface{}{
 			xPubIDField: transaction.XPubID,
 		}
 		utxos, err = client.GetUtxos(ctx, nil, conditions, nil, client.DefaultModelOptions()...)
@@ -300,7 +300,7 @@ func initRevertTransactionData(t *testing.T) (context.Context, ClientInterface, 
 	assert.Equal(t, SyncStatusReady, syncTx.BroadcastStatus)
 
 	var utxos []*Utxo
-	conditions := &map[string]interface{}{
+	conditions := map[string]interface{}{
 		xPubIDField: transaction.XPubID,
 	}
 	utxos, err = client.GetUtxos(ctx, nil, conditions, nil, client.DefaultModelOptions()...)

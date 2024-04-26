@@ -124,7 +124,7 @@ func getXpubWithCache(ctx context.Context, client ClientInterface,
 }
 
 // getXPubs will get all the xpubs matching the conditions
-func getXPubs(ctx context.Context, usingMetadata *Metadata, conditions *map[string]interface{},
+func getXPubs(ctx context.Context, usingMetadata *Metadata, conditions map[string]interface{},
 	queryParams *datastore.QueryParams, opts ...ModelOps,
 ) ([]*Xpub, error) {
 	modelItems := make([]*Xpub, 0)
@@ -138,7 +138,7 @@ func getXPubs(ctx context.Context, usingMetadata *Metadata, conditions *map[stri
 
 // getXPubsCount will get a count of the xpubs matching the conditions
 func getXPubsCount(ctx context.Context, usingMetadata *Metadata,
-	conditions *map[string]interface{}, opts ...ModelOps,
+	conditions map[string]interface{}, opts ...ModelOps,
 ) (int64, error) {
 	return getModelCountByConditions(ctx, ModelXPub, Xpub{}, usingMetadata, conditions, opts...)
 }

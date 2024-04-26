@@ -257,7 +257,7 @@ func newUtxoFromTxID(txID string, index uint32, opts ...ModelOps) *Utxo {
 }
 
 // getUtxos will get all the utxos with the given conditions
-func getUtxos(ctx context.Context, metadata *Metadata, conditions *map[string]interface{},
+func getUtxos(ctx context.Context, metadata *Metadata, conditions map[string]interface{},
 	queryParams *datastore.QueryParams, opts ...ModelOps,
 ) ([]*Utxo, error) {
 	modelItems := make([]*Utxo, 0)
@@ -269,14 +269,14 @@ func getUtxos(ctx context.Context, metadata *Metadata, conditions *map[string]in
 }
 
 // getAccessKeysCount will get a count of all the utxos with the given conditions
-func getUtxosCount(ctx context.Context, metadata *Metadata, conditions *map[string]interface{},
+func getUtxosCount(ctx context.Context, metadata *Metadata, conditions map[string]interface{},
 	opts ...ModelOps,
 ) (int64, error) {
 	return getModelCountByConditions(ctx, ModelUtxo, Utxo{}, metadata, conditions, opts...)
 }
 
 // getTransactionsAggregate will get a count of all transactions per aggregate column with the given conditions
-func getUtxosAggregate(ctx context.Context, metadata *Metadata, conditions *map[string]interface{},
+func getUtxosAggregate(ctx context.Context, metadata *Metadata, conditions map[string]interface{},
 	aggregateColumn string, opts ...ModelOps,
 ) (map[string]interface{}, error) {
 	modelItems := make([]*Utxo, 0)
@@ -291,12 +291,12 @@ func getUtxosAggregate(ctx context.Context, metadata *Metadata, conditions *map[
 }
 
 // getUtxosByXpubID will return utxos by a given xPub ID
-func getUtxosByXpubID(ctx context.Context, xPubID string, metadata *Metadata, conditions *map[string]interface{},
+func getUtxosByXpubID(ctx context.Context, xPubID string, metadata *Metadata, conditions map[string]interface{},
 	queryParams *datastore.QueryParams, opts ...ModelOps,
 ) ([]*Utxo, error) {
 	dbConditions := map[string]interface{}{}
 	if conditions != nil {
-		dbConditions = *conditions
+		dbConditions = conditions
 	}
 	dbConditions[xPubIDField] = xPubID
 

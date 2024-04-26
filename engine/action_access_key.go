@@ -73,7 +73,7 @@ func (c *Client) GetAccessKey(ctx context.Context, xPubID, id string) (*AccessKe
 
 // GetAccessKeys will get all the access keys from the Datastore
 func (c *Client) GetAccessKeys(ctx context.Context, metadataConditions *Metadata,
-	conditions *map[string]interface{}, queryParams *datastore.QueryParams, opts ...ModelOps,
+	conditions map[string]interface{}, queryParams *datastore.QueryParams, opts ...ModelOps,
 ) ([]*AccessKey, error) {
 	// Check for existing NewRelic transaction
 	ctx = c.GetOrStartTxn(ctx, "get_access_keys")
@@ -92,7 +92,7 @@ func (c *Client) GetAccessKeys(ctx context.Context, metadataConditions *Metadata
 
 // GetAccessKeysCount will get a count of all the access keys from the Datastore
 func (c *Client) GetAccessKeysCount(ctx context.Context, metadataConditions *Metadata,
-	conditions *map[string]interface{}, opts ...ModelOps,
+	conditions map[string]interface{}, opts ...ModelOps,
 ) (int64, error) {
 	// Check for existing NewRelic transaction
 	ctx = c.GetOrStartTxn(ctx, "get_access_keys_count")

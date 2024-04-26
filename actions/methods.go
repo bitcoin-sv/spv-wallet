@@ -44,7 +44,7 @@ func MethodNotAllowed(c *gin.Context) {
 }
 
 // GetSearchQueryParameters get all filtering parameters related to the db query
-func GetSearchQueryParameters(c *gin.Context) (*datastore.QueryParams, *engine.Metadata, *map[string]interface{}, error) {
+func GetSearchQueryParameters(c *gin.Context) (*datastore.QueryParams, *engine.Metadata, map[string]interface{}, error) {
 	var requestParameters SearchRequestParameters
 	if err := c.Bind(&requestParameters); err != nil {
 		err = fmt.Errorf("error occurred while binding request parameters: %w", err)
@@ -55,11 +55,11 @@ func GetSearchQueryParameters(c *gin.Context) (*datastore.QueryParams, *engine.M
 		requestParameters.Conditions = make(map[string]interface{})
 	}
 
-	return &requestParameters.QueryParams, &requestParameters.Metadata, &requestParameters.Conditions, nil
+	return &requestParameters.QueryParams, &requestParameters.Metadata, requestParameters.Conditions, nil
 }
 
 // GetCountQueryParameters get all filtering parameters related to the db query
-func GetCountQueryParameters(c *gin.Context) (*engine.Metadata, *map[string]interface{}, error) {
+func GetCountQueryParameters(c *gin.Context) (*engine.Metadata, map[string]interface{}, error) {
 	var requestParameters CountRequestParameters
 	if err := c.Bind(&requestParameters); err != nil {
 		err = fmt.Errorf("error occurred while binding request parameters: %w", err)
@@ -70,5 +70,5 @@ func GetCountQueryParameters(c *gin.Context) (*engine.Metadata, *map[string]inte
 		requestParameters.Conditions = make(map[string]interface{})
 	}
 
-	return &requestParameters.Metadata, &requestParameters.Conditions, nil
+	return &requestParameters.Metadata, requestParameters.Conditions, nil
 }

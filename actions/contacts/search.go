@@ -38,10 +38,9 @@ func (a *Action) search(c *gin.Context) {
 		c.Request.Context(),
 		reqXPubID,
 		metadata,
-		*conditions,
+		conditions,
 		queryParams,
 	)
-
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, err.Error())
 		return

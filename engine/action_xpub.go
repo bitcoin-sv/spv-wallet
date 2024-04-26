@@ -89,7 +89,7 @@ func (c *Client) UpdateXpubMetadata(ctx context.Context, xPubID string, metadata
 
 // GetXPubs gets all xpubs matching the conditions
 func (c *Client) GetXPubs(ctx context.Context, metadataConditions *Metadata,
-	conditions *map[string]interface{}, queryParams *datastore.QueryParams, opts ...ModelOps,
+	conditions map[string]interface{}, queryParams *datastore.QueryParams, opts ...ModelOps,
 ) ([]*Xpub, error) {
 	// Check for existing NewRelic transaction
 	ctx = c.GetOrStartTxn(ctx, "get_destinations")
@@ -107,7 +107,7 @@ func (c *Client) GetXPubs(ctx context.Context, metadataConditions *Metadata,
 
 // GetXPubsCount gets a count of all xpubs matching the conditions
 func (c *Client) GetXPubsCount(ctx context.Context, metadataConditions *Metadata,
-	conditions *map[string]interface{}, opts ...ModelOps,
+	conditions map[string]interface{}, opts ...ModelOps,
 ) (int64, error) {
 	// Check for existing NewRelic transaction
 	ctx = c.GetOrStartTxn(ctx, "get_destinations")

@@ -115,7 +115,7 @@ func getContacts(ctx context.Context, metadata *Metadata, conditions map[string]
 	conditions[deletedAtField] = nil
 
 	contacts := make([]*Contact, 0)
-	if err := getModelsByConditions(ctx, ModelContact, &contacts, metadata, &conditions, queryParams, opts...); err != nil {
+	if err := getModelsByConditions(ctx, ModelContact, &contacts, metadata, conditions, queryParams, opts...); err != nil {
 		return nil, err
 	}
 
@@ -130,7 +130,7 @@ func getContactsByXpubID(ctx context.Context, xPubID string, metadata *Metadata,
 	conditions[deletedAtField] = nil
 
 	contacts := make([]*Contact, 0)
-	if err := getModelsByConditions(ctx, ModelContact, &contacts, metadata, &conditions, queryParams, opts...); err != nil {
+	if err := getModelsByConditions(ctx, ModelContact, &contacts, metadata, conditions, queryParams, opts...); err != nil {
 		return nil, err
 	}
 

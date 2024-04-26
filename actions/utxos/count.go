@@ -31,7 +31,7 @@ func (a *Action) count(c *gin.Context) {
 
 	dbConditions := map[string]interface{}{}
 	if conditions != nil {
-		dbConditions = *conditions
+		dbConditions = conditions
 	}
 
 	dbConditions["xpub_id"] = reqXPubID
@@ -40,7 +40,7 @@ func (a *Action) count(c *gin.Context) {
 	if count, err = a.Services.SpvWalletEngine.GetUtxosCount(
 		c.Request.Context(),
 		metadata,
-		&dbConditions,
+		dbConditions,
 	); err != nil {
 		c.JSON(http.StatusInternalServerError, err.Error())
 		return

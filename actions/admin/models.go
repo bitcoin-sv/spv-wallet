@@ -50,3 +50,9 @@ type UpdateContact struct {
 
 // SearchTransactions is a model for handling searching with filters and metadata
 type SearchTransactions = common.SearchModel[filter.ContactFilter]
+
+// SearchAccessKeys is a model for handling searching with filters and metadata
+type SearchAccessKeys = common.SearchModel[filter.AccessKeyFilter]
+
+// CountAccessKeys is a model for handling counting filtered transactions
+type CountAccessKeys = common.ConditionsModel[filter.AccessKeyFilter]

@@ -139,7 +139,7 @@ func (c *Client) GetTransactionByHex(ctx context.Context, hex string) (*Transact
 
 // GetTransactions will get all the transactions from the Datastore
 func (c *Client) GetTransactions(ctx context.Context, metadataConditions *Metadata,
-	conditions *map[string]interface{}, queryParams *datastore.QueryParams, opts ...ModelOps,
+	conditions map[string]interface{}, queryParams *datastore.QueryParams, opts ...ModelOps,
 ) ([]*Transaction, error) {
 	// Check for existing NewRelic transaction
 	ctx = c.GetOrStartTxn(ctx, "get_transactions")
@@ -158,7 +158,7 @@ func (c *Client) GetTransactions(ctx context.Context, metadataConditions *Metada
 
 // GetTransactionsCount will get a count of all the transactions from the Datastore
 func (c *Client) GetTransactionsCount(ctx context.Context, metadataConditions *Metadata,
-	conditions *map[string]interface{}, opts ...ModelOps,
+	conditions map[string]interface{}, opts ...ModelOps,
 ) (int64, error) {
 	// Check for existing NewRelic transaction
 	ctx = c.GetOrStartTxn(ctx, "get_transactions_count")
@@ -285,7 +285,7 @@ func (c *Client) RevertTransaction(ctx context.Context, id string) error {
 
 	// check that the utxos of this transaction have not been spent
 	// this transaction needs to be the tip of the chain
-	conditions := &map[string]interface{}{
+	conditions := map[string]interface{}{
 		"transaction_id": transaction.ID,
 	}
 	var utxos []*Utxo
@@ -415,16 +415,14 @@ func (c *Client) UpdateTransaction(ctx context.Context, callbackResp *broadcast.
 	return processSyncTxSave(ctx, txInfo, syncTx, tx)
 }
 
-func generateTxIDFilterConditions(txIDs []string) *map[string]interface{} {
+func generateTxIDFilterConditions(txIDs []string) map[string]interface{} {
 	orConditions := make([]map[string]interface{}, len(txIDs))
 
 	for i, txID := range txIDs {
 		orConditions[i] = map[string]interface{}{"id": txID}
 	}
 
-	conditions := &map[string]interface{}{
+	return map[string]interface{}{
 		"$or": orConditions,
 	}
-
-	return conditions
 }

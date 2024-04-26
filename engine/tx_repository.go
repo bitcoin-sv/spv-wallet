@@ -27,7 +27,7 @@ func getTransactionByID(ctx context.Context, xPubID, txID string, opts ...ModelO
 }
 
 // getTransactions will get all the transactions with the given conditions
-func getTransactions(ctx context.Context, metadata *Metadata, conditions *map[string]interface{},
+func getTransactions(ctx context.Context, metadata *Metadata, conditions map[string]interface{},
 	queryParams *datastore.QueryParams, opts ...ModelOps,
 ) ([]*Transaction, error) {
 	modelItems := make([]*Transaction, 0)
@@ -39,7 +39,7 @@ func getTransactions(ctx context.Context, metadata *Metadata, conditions *map[st
 }
 
 // getTransactionsAggregate will get a count of all transactions per aggregate column with the given conditions
-func getTransactionsAggregate(ctx context.Context, metadata *Metadata, conditions *map[string]interface{},
+func getTransactionsAggregate(ctx context.Context, metadata *Metadata, conditions map[string]interface{},
 	aggregateColumn string, opts ...ModelOps,
 ) (map[string]interface{}, error) {
 	modelItems := make([]*Transaction, 0)
@@ -54,7 +54,7 @@ func getTransactionsAggregate(ctx context.Context, metadata *Metadata, condition
 }
 
 // getTransactionsCount will get a count of all the transactions with the given conditions
-func getTransactionsCount(ctx context.Context, metadata *Metadata, conditions *map[string]interface{},
+func getTransactionsCount(ctx context.Context, metadata *Metadata, conditions map[string]interface{},
 	opts ...ModelOps,
 ) (int64, error) {
 	return getModelCountByConditions(ctx, ModelTransaction, Transaction{}, metadata, conditions, opts...)
