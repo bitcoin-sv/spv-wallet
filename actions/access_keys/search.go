@@ -3,8 +3,6 @@ package accesskeys
 import (
 	"net/http"
 
-	"github.com/bitcoin-sv/spv-wallet/actions"
-	"github.com/bitcoin-sv/spv-wallet/engine"
 	"github.com/bitcoin-sv/spv-wallet/mappings"
 	"github.com/bitcoin-sv/spv-wallet/models"
 	"github.com/bitcoin-sv/spv-wallet/server/auth"
@@ -26,26 +24,20 @@ import (
 func (a *Action) search(c *gin.Context) {
 	reqXPubID := c.GetString(auth.ParamXPubHashKey)
 
-	queryParams, metadata, conditions, err := actions.GetSearchQueryParameters(c)
-	if err != nil {
+	var reqParams SearchAccessKeys
+	if err := c.Bind(&reqParams); err != nil {
 		c.JSON(http.StatusBadRequest, err.Error())
 		return
 	}
 
-	dbConditions := make(map[string]interface{})
-	if conditions != nil {
-		dbConditions = *conditions
-	}
-	dbConditions["xpub_id"] = reqXPubID
-
-	var accessKeys []*engine.AccessKey
-	if accessKeys, err = a.Services.SpvWalletEngine.GetAccessKeysByXPubID(
+	accessKeys, err := a.Services.SpvWalletEngine.GetAccessKeysByXPubID(
 		c.Request.Context(),
 		reqXPubID,
-		metadata,
-		&dbConditions,
-		queryParams,
-	); err != nil {
+		reqParams.Metadata,
+		reqParams.Conditions.ToDbConditions(),
+		reqParams.QueryParams,
+	); 
+	if err != nil {
 		c.JSON(http.StatusInternalServerError, err.Error())
 		return
 	}

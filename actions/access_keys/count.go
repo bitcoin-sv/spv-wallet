@@ -3,7 +3,6 @@ package accesskeys
 import (
 	"net/http"
 
-	"github.com/bitcoin-sv/spv-wallet/actions"
 	"github.com/bitcoin-sv/spv-wallet/server/auth"
 	"github.com/gin-gonic/gin"
 )
@@ -23,19 +22,19 @@ import (
 func (a *Action) count(c *gin.Context) {
 	reqXPubID := c.GetString(auth.ParamXPubHashKey)
 
-	metadata, conditions, err := actions.GetCountQueryParameters(c)
-	if err != nil {
+	var reqParams CountAccessKeys
+	if err := c.Bind(&reqParams); err != nil {
 		c.JSON(http.StatusBadRequest, err.Error())
 		return
 	}
 
-	var count int64
-	if count, err = a.Services.SpvWalletEngine.GetAccessKeysByXPubIDCount(
+	count, err := a.Services.SpvWalletEngine.GetAccessKeysByXPubIDCount(
 		c.Request.Context(),
 		reqXPubID,
-		metadata,
-		conditions,
-	); err != nil {
+		reqParams.Metadata,
+		reqParams.Conditions.ToDbConditions(),
+	)
+	if err != nil {
 		c.JSON(http.StatusInternalServerError, err.Error())
 		return
 	}

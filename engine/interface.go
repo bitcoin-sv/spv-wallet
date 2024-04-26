@@ -23,10 +23,10 @@ type AccessKeyService interface {
 		queryParams *datastore.QueryParams, opts ...ModelOps) ([]*AccessKey, error)
 	GetAccessKeysCount(ctx context.Context, metadata *Metadata,
 		conditions *map[string]interface{}, opts ...ModelOps) (int64, error)
-	GetAccessKeysByXPubID(ctx context.Context, xPubID string, metadata *Metadata, conditions *map[string]interface{},
+	GetAccessKeysByXPubID(ctx context.Context, xPubID string, metadata *Metadata, conditions map[string]interface{},
 		queryParams *datastore.QueryParams, opts ...ModelOps) ([]*AccessKey, error)
 	GetAccessKeysByXPubIDCount(ctx context.Context, xPubID string, metadata *Metadata,
-		conditions *map[string]interface{}, opts ...ModelOps) (int64, error)
+		conditions map[string]interface{}, opts ...ModelOps) (int64, error)
 	NewAccessKey(ctx context.Context, rawXpubKey string, opts ...ModelOps) (*AccessKey, error)
 	RevokeAccessKey(ctx context.Context, rawXpubKey, id string, opts ...ModelOps) (*AccessKey, error)
 }

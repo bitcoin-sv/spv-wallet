@@ -88,7 +88,7 @@ func getAccessKeysCount(ctx context.Context, metadata *Metadata, conditions *map
 }
 
 // getAccessKeysByXPubID will get all the access keys that match the metadata search
-func getAccessKeysByXPubID(ctx context.Context, xPubID string, metadata *Metadata, conditions *map[string]interface{},
+func getAccessKeysByXPubID(ctx context.Context, xPubID string, metadata *Metadata, conditions map[string]interface{},
 	queryParams *datastore.QueryParams, opts ...ModelOps,
 ) ([]*AccessKey, error) {
 	// Construct an empty model
@@ -96,7 +96,7 @@ func getAccessKeysByXPubID(ctx context.Context, xPubID string, metadata *Metadat
 
 	dbConditions := map[string]interface{}{}
 	if conditions != nil {
-		dbConditions = *conditions
+		dbConditions = conditions
 	}
 	dbConditions[xPubIDField] = xPubID
 
@@ -127,11 +127,11 @@ func getAccessKeysByXPubID(ctx context.Context, xPubID string, metadata *Metadat
 
 // getAccessKeysByXPubIDCount will get a count of all the access keys that match the metadata search
 func getAccessKeysByXPubIDCount(ctx context.Context, xPubID string, metadata *Metadata,
-	conditions *map[string]interface{}, opts ...ModelOps,
+	conditions map[string]interface{}, opts ...ModelOps,
 ) (int64, error) {
 	dbConditions := map[string]interface{}{}
 	if conditions != nil {
-		dbConditions = *conditions
+		dbConditions = conditions
 	}
 	dbConditions[xPubIDField] = xPubID
 
