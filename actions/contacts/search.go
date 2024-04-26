@@ -3,7 +3,6 @@ package contacts
 import (
 	"net/http"
 
-	"github.com/bitcoin-sv/spv-wallet/actions"
 	"github.com/bitcoin-sv/spv-wallet/mappings"
 	"github.com/bitcoin-sv/spv-wallet/server/auth"
 	"github.com/gin-gonic/gin"
@@ -28,18 +27,18 @@ import (
 func (a *Action) search(c *gin.Context) {
 	reqXPubID := c.GetString(auth.ParamXPubHashKey)
 
-	queryParams, metadata, conditions, err := actions.GetSearchQueryParameters(c)
-	if err != nil {
-		c.JSON(http.StatusExpectationFailed, err.Error())
+	var reqParams SearchContacts
+	if err := c.Bind(&reqParams); err != nil {
+		c.JSON(http.StatusBadRequest, err.Error())
 		return
 	}
 
 	contacts, err := a.Services.SpvWalletEngine.GetContactsByXpubID(
 		c.Request.Context(),
 		reqXPubID,
-		metadata,
-		conditions,
-		queryParams,
+		reqParams.Metadata,
+		reqParams.Conditions.ToDbConditions(),
+		reqParams.QueryParams,
 	)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, err.Error())

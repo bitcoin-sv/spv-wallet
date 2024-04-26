@@ -1,6 +1,6 @@
 package filter
 
-// TransactionFilter is a struct for handling request parameters for destination search requests
+// TransactionFilter is a struct for handling request parameters for transactions search requests
 type TransactionFilter struct {
 	ModelFilter     `json:",inline"`
 	Hex             *string `json:"hex,omitempty"`

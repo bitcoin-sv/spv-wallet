@@ -3,7 +3,6 @@ package utxos
 import (
 	"net/http"
 
-	"github.com/bitcoin-sv/spv-wallet/actions"
 	"github.com/bitcoin-sv/spv-wallet/engine"
 	"github.com/bitcoin-sv/spv-wallet/mappings"
 	"github.com/bitcoin-sv/spv-wallet/models"
@@ -26,7 +25,13 @@ import (
 func (a *Action) search(c *gin.Context) {
 	reqXPubID := c.GetString(auth.ParamXPubHashKey)
 
-	queryParams, metadata, conditions, err := actions.GetSearchQueryParameters(c)
+	var reqParams SearchUtxos
+	if err := c.Bind(&reqParams); err != nil {
+		c.JSON(http.StatusBadRequest, err.Error())
+		return
+	}
+
+	conditions, err := reqParams.Conditions.ToDbConditions()
 	if err != nil {
 		c.JSON(http.StatusBadRequest, err.Error())
 		return
@@ -36,9 +41,9 @@ func (a *Action) search(c *gin.Context) {
 	if utxos, err = a.Services.SpvWalletEngine.GetUtxosByXpubID(
 		c.Request.Context(),
 		reqXPubID,
-		metadata,
+		reqParams.Metadata,
 		conditions,
-		queryParams,
+		reqParams.QueryParams,
 	); err != nil {
 		c.JSON(http.StatusInternalServerError, err.Error())
 		return

@@ -3,8 +3,6 @@ package admin
 import (
 	"net/http"
 
-	"github.com/bitcoin-sv/spv-wallet/actions"
-	"github.com/bitcoin-sv/spv-wallet/engine"
 	"github.com/gin-gonic/gin"
 )
 
@@ -21,19 +19,25 @@ import (
 // @Router		/v1/admin/utxos/search [post]
 // @Security	x-auth-xpub
 func (a *Action) utxosSearch(c *gin.Context) {
-	queryParams, metadata, conditions, err := actions.GetSearchQueryParameters(c)
+	var reqParams SearchUtxos
+	if err := c.Bind(&reqParams); err != nil {
+		c.JSON(http.StatusBadRequest, err.Error())
+		return
+	}
+
+	conditions, err := reqParams.Conditions.ToDbConditions()
 	if err != nil {
 		c.JSON(http.StatusBadRequest, err.Error())
 		return
 	}
 
-	var utxos []*engine.Utxo
-	if utxos, err = a.Services.SpvWalletEngine.GetUtxos(
+	utxos, err := a.Services.SpvWalletEngine.GetUtxos(
 		c.Request.Context(),
-		metadata,
+		reqParams.Metadata,
 		conditions,
-		queryParams,
-	); err != nil {
+		reqParams.QueryParams,
+	)
+	if err != nil {
 		c.JSON(http.StatusInternalServerError, err.Error())
 		return
 	}
@@ -54,18 +58,24 @@ func (a *Action) utxosSearch(c *gin.Context) {
 // @Router		/v1/admin/utxos/count [post]
 // @Security	x-auth-xpub
 func (a *Action) utxosCount(c *gin.Context) {
-	metadata, conditions, err := actions.GetCountQueryParameters(c)
+	var reqParams CountUtxos
+	if err := c.Bind(&reqParams); err != nil {
+		c.JSON(http.StatusBadRequest, err.Error())
+		return
+	}
+
+	conditions, err := reqParams.Conditions.ToDbConditions()
 	if err != nil {
 		c.JSON(http.StatusBadRequest, err.Error())
 		return
 	}
 
-	var count int64
-	if count, err = a.Services.SpvWalletEngine.GetUtxosCount(
+	count, err := a.Services.SpvWalletEngine.GetUtxosCount(
 		c.Request.Context(),
-		metadata,
+		reqParams.Metadata,
 		conditions,
-	); err != nil {
+	)
+	if err != nil {
 		c.JSON(http.StatusInternalServerError, err.Error())
 		return
 	}

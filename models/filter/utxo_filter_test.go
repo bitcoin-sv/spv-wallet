@@ -1,0 +1,53 @@
+package filter
+
+import (
+	"testing"
+
+	"github.com/stretchr/testify/assert"
+)
+
+func TestUtxoFilter(t *testing.T) {
+	t.Parallel()
+
+	t.Run("default filter", func(t *testing.T) {
+		filter := UtxoFilter{}
+		dbConditions, err := filter.ToDbConditions()
+
+		assert.NoError(t, err)
+		assert.Equal(t, 1, len(dbConditions))
+		assert.Nil(t, dbConditions["deleted_at"])
+	})
+
+	t.Run("empty filter with include deleted", func(t *testing.T) {
+		filter := fromJSON[UtxoFilter](`{
+			"include_deleted": true
+		}`)
+		dbConditions, err := filter.ToDbConditions()
+
+		assert.NoError(t, err)
+		assert.Equal(t, 0, len(dbConditions))
+	})
+
+	t.Run("with type", func(t *testing.T) {
+		filter := fromJSON[UtxoFilter](`{
+			"type": "pubkey",
+			"include_deleted": true
+		}`)
+		dbConditions, err := filter.ToDbConditions()
+
+		assert.NoError(t, err)
+		assert.Equal(t, 1, len(dbConditions))
+		assert.Equal(t, "pubkey", dbConditions["type"])
+	})
+
+	t.Run("with wrong type", func(t *testing.T) {
+		filter := fromJSON[UtxoFilter](`{
+			"type": "wrong_type",
+			"include_deleted": true
+		}`)
+		dbConditions, err := filter.ToDbConditions()
+
+		assert.Error(t, err)
+		assert.Nil(t, dbConditions)
+	})
+}

@@ -1,13 +1,12 @@
 package utxos
 
 import (
-	"github.com/bitcoin-sv/spv-wallet/engine"
+	"github.com/bitcoin-sv/spv-wallet/actions/common"
+	"github.com/bitcoin-sv/spv-wallet/models/filter"
 )
 
-// CountUtxo is the model containing filters for counting utxos
-type CountUtxo struct {
-	// Custom conditions used for filtering the search results
-	Conditions map[string]interface{} `json:"conditions"`
-	// Accepts a JSON object for embedding custom metadata, enabling arbitrary additional information to be associated with the resource
-	Metadata engine.Metadata `json:"metadata"`
-}
+// SearchUtxos is a model for handling searching with filters and metadata
+type SearchUtxos = common.SearchModel[filter.UtxoFilter]
+
+// CountUtxos is a model for handling counting filtered UTXOs
+type CountUtxos = common.ConditionsModel[filter.UtxoFilter]

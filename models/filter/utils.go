@@ -2,6 +2,7 @@ package filter
 
 import (
 	"errors"
+	"reflect"
 	"strings"
 )
 
@@ -18,15 +19,41 @@ func applyConditionsIfNotNil(conditions map[string]interface{}, columnName strin
 }
 
 // strOption checks (case-insensitive) if value is in options, if it is, it returns a pointer to the value, otherwise it returns an error
-func strOption(value *string, options ...string) (*string, error) {
-	if value == nil {
-		return nil, nil
-	}
+func checkStrOption(value string, options ...string) (string, error) {
 	for _, opt := range options {
-		if strings.EqualFold(*value, opt) {
-			s := string(opt)
-			return &s, nil
+		if strings.EqualFold(value, opt) {
+			return opt, nil
 		}
 	}
-	return nil, errors.New("Invalid option: " + *value)
+	return "", errors.New("Invalid option: " + value)
+}
+
+func checkAndApplyStrOption(conditions map[string]interface{}, columnName string, value *string, options ...string) error {
+	if value == nil {
+		return nil
+	}
+	opt, err := checkStrOption(*value, options...)
+	if err != nil {
+		return err
+	}
+	conditions[columnName] = opt
+	return nil
+}
+
+// getEnumValues gets the tag "enums" of a field by fieldName of a provided struct
+func getEnumValues[T any](fieldName string) []string {
+	t := reflect.TypeOf(*new(T))
+	field, found := t.FieldByName(fieldName)
+	if !found {
+		return nil
+	}
+	enums := field.Tag.Get("enums")
+	if enums == "" {
+		return nil
+	}
+	options := strings.Split(enums, ",")
+	for i := 0; i < len(options); i++ {
+		options[i] = strings.TrimSpace(options[i])
+	}
+	return options
 }

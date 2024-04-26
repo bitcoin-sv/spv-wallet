@@ -68,3 +68,9 @@ type SearchTransactions = common.SearchModel[filter.TransactionFilter]
 
 // CountTransactions is a model for handling counting filtered transactions
 type CountTransactions = common.ConditionsModel[filter.TransactionFilter]
+
+// SearchUtxos is a model for handling searching with filters and metadata
+type SearchUtxos = common.SearchModel[filter.UtxoFilter]
+
+// CountUtxos is a model for handling counting filtered UTXOs
+type CountUtxos = common.ConditionsModel[filter.UtxoFilter]

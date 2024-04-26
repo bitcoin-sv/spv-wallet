@@ -3,7 +3,6 @@ package utxos
 import (
 	"net/http"
 
-	"github.com/bitcoin-sv/spv-wallet/actions"
 	"github.com/bitcoin-sv/spv-wallet/server/auth"
 	"github.com/gin-gonic/gin"
 )
@@ -23,7 +22,13 @@ import (
 func (a *Action) count(c *gin.Context) {
 	reqXPubID := c.GetString(auth.ParamXPubHashKey)
 
-	metadata, conditions, err := actions.GetCountQueryParameters(c)
+	var reqParams CountUtxos
+	if err := c.Bind(&reqParams); err != nil {
+		c.JSON(http.StatusBadRequest, err.Error())
+		return
+	}
+
+	conditions, err := reqParams.Conditions.ToDbConditions()
 	if err != nil {
 		c.JSON(http.StatusBadRequest, err.Error())
 		return
@@ -39,7 +44,7 @@ func (a *Action) count(c *gin.Context) {
 	var count int64
 	if count, err = a.Services.SpvWalletEngine.GetUtxosCount(
 		c.Request.Context(),
-		metadata,
+		reqParams.Metadata,
 		dbConditions,
 	); err != nil {
 		c.JSON(http.StatusInternalServerError, err.Error())
