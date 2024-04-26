@@ -3,7 +3,6 @@ package admin
 import (
 	"net/http"
 
-	"github.com/bitcoin-sv/spv-wallet/actions"
 	"github.com/bitcoin-sv/spv-wallet/engine"
 	"github.com/bitcoin-sv/spv-wallet/mappings"
 	"github.com/bitcoin-sv/spv-wallet/models"
@@ -61,19 +60,19 @@ func (a *Action) paymailGetAddress(c *gin.Context) {
 // @Router		/v1/admin/paymails/search [post]
 // @Security	x-auth-xpub
 func (a *Action) paymailAddressesSearch(c *gin.Context) {
-	queryParams, metadata, conditions, err := actions.GetSearchQueryParameters(c)
-	if err != nil {
+	var reqParams SearchPaymails
+	if err := c.Bind(&reqParams); err != nil {
 		c.JSON(http.StatusBadRequest, err.Error())
 		return
 	}
 
-	var paymailAddresses []*engine.PaymailAddress
-	if paymailAddresses, err = a.Services.SpvWalletEngine.GetPaymailAddresses(
+	paymailAddresses, err := a.Services.SpvWalletEngine.GetPaymailAddresses(
 		c.Request.Context(),
-		metadata,
-		conditions,
-		queryParams,
-	); err != nil {
+		reqParams.Metadata,
+		reqParams.Conditions.ToDbConditions(),
+		reqParams.QueryParams,
+	)
+	if err != nil {
 		c.JSON(http.StatusInternalServerError, err.Error())
 		return
 	}
@@ -99,18 +98,18 @@ func (a *Action) paymailAddressesSearch(c *gin.Context) {
 // @Router		/v1/admin/paymails/count [post]
 // @Security	x-auth-xpub
 func (a *Action) paymailAddressesCount(c *gin.Context) {
-	metadata, conditions, err := actions.GetCountQueryParameters(c)
-	if err != nil {
+	var reqParams CountPaymails
+	if err := c.Bind(&reqParams); err != nil {
 		c.JSON(http.StatusBadRequest, err.Error())
 		return
 	}
 
-	var count int64
-	if count, err = a.Services.SpvWalletEngine.GetPaymailAddressesCount(
+	count, err := a.Services.SpvWalletEngine.GetPaymailAddressesCount(
 		c.Request.Context(),
-		metadata,
-		conditions,
-	); err != nil {
+		reqParams.Metadata,
+		reqParams.Conditions.ToDbConditions(),
+	)
+	if err != nil {
 		c.JSON(http.StatusInternalServerError, err.Error())
 		return
 	}
