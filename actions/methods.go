@@ -1,7 +1,6 @@
 package actions
 
 import (
-	"fmt"
 	"net/http"
 
 	"github.com/bitcoin-sv/spv-wallet/dictionary"
@@ -41,34 +40,4 @@ func NotFound(c *gin.Context) {
 // MethodNotAllowed handles all 405 requests
 func MethodNotAllowed(c *gin.Context) {
 	c.JSON(http.StatusMethodNotAllowed, dictionary.GetError(dictionary.ErrorMethodNotAllowed, c.Request.Method, c.Request.RequestURI))
-}
-
-// GetSearchQueryParameters get all filtering parameters related to the db query
-func GetSearchQueryParameters(c *gin.Context) (*datastore.QueryParams, *engine.Metadata, map[string]interface{}, error) {
-	var requestParameters SearchRequestParameters
-	if err := c.Bind(&requestParameters); err != nil {
-		err = fmt.Errorf("error occurred while binding request parameters: %w", err)
-		return nil, nil, nil, err
-	}
-
-	if requestParameters.Conditions == nil {
-		requestParameters.Conditions = make(map[string]interface{})
-	}
-
-	return &requestParameters.QueryParams, &requestParameters.Metadata, requestParameters.Conditions, nil
-}
-
-// GetCountQueryParameters get all filtering parameters related to the db query
-func GetCountQueryParameters(c *gin.Context) (*engine.Metadata, map[string]interface{}, error) {
-	var requestParameters CountRequestParameters
-	if err := c.Bind(&requestParameters); err != nil {
-		err = fmt.Errorf("error occurred while binding request parameters: %w", err)
-		return nil, nil, err
-	}
-
-	if requestParameters.Conditions == nil {
-		requestParameters.Conditions = make(map[string]interface{})
-	}
-
-	return &requestParameters.Metadata, requestParameters.Conditions, nil
 }

@@ -3,7 +3,6 @@ package admin
 import (
 	"net/http"
 
-	"github.com/bitcoin-sv/spv-wallet/actions"
 	"github.com/bitcoin-sv/spv-wallet/engine"
 	"github.com/bitcoin-sv/spv-wallet/mappings"
 	"github.com/bitcoin-sv/spv-wallet/models"
@@ -55,19 +54,19 @@ func (a *Action) xpubsCreate(c *gin.Context) {
 // @Router		/v1/admin/xpubs/search [post]
 // @Security	x-auth-xpub
 func (a *Action) xpubsSearch(c *gin.Context) {
-	queryParams, metadata, conditions, err := actions.GetSearchQueryParameters(c)
-	if err != nil {
-		c.JSON(http.StatusExpectationFailed, err.Error())
+	var reqParams SearchXpubs
+	if err := c.Bind(&reqParams); err != nil {
+		c.JSON(http.StatusBadRequest, err.Error())
 		return
 	}
 
-	var xpubs []*engine.Xpub
-	if xpubs, err = a.Services.SpvWalletEngine.GetXPubs(
+	xpubs, err := a.Services.SpvWalletEngine.GetXPubs(
 		c.Request.Context(),
-		metadata,
-		conditions,
-		queryParams,
-	); err != nil {
+		reqParams.Metadata,
+		reqParams.Conditions.ToDbConditions(),
+		reqParams.QueryParams,
+	)
+	if err != nil {
 		c.JSON(http.StatusExpectationFailed, err.Error())
 		return
 	}
@@ -93,18 +92,18 @@ func (a *Action) xpubsSearch(c *gin.Context) {
 // @Router		/v1/admin/xpubs/count [post]
 // @Security	x-auth-xpub
 func (a *Action) xpubsCount(c *gin.Context) {
-	metadata, conditions, err := actions.GetCountQueryParameters(c)
-	if err != nil {
-		c.JSON(http.StatusExpectationFailed, err.Error())
+	var reqParams CountXpubs
+	if err := c.Bind(&reqParams); err != nil {
+		c.JSON(http.StatusBadRequest, err.Error())
 		return
 	}
 
-	var count int64
-	if count, err = a.Services.SpvWalletEngine.GetXPubsCount(
+	count, err := a.Services.SpvWalletEngine.GetXPubsCount(
 		c.Request.Context(),
-		metadata,
-		conditions,
-	); err != nil {
+		reqParams.Metadata,
+		reqParams.Conditions.ToDbConditions(),
+	)
+	if err != nil {
 		c.JSON(http.StatusExpectationFailed, err.Error())
 		return
 	}

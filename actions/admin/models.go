@@ -80,3 +80,9 @@ type SearchPaymails = common.SearchModel[filter.PaymailFilter]
 
 // CountPaymails is a model for handling counting filtered paymails
 type CountPaymails = common.ConditionsModel[filter.PaymailFilter]
+
+// SearchXpubs is a model for handling searching with filters and metadata
+type SearchXpubs = common.SearchModel[filter.XpubFilter]
+
+// CountXpubs is a model for handling counting filtered xPubs
+type CountXpubs = common.ConditionsModel[filter.XpubFilter]
