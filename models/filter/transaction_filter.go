@@ -4,13 +4,13 @@ package filter
 type TransactionFilter struct {
 	ModelFilter     `json:",inline"`
 	Hex             *string `json:"hex,omitempty"`
-	BlockHash       *string `json:"block_hash,omitempty"`
-	BlockHeight     *uint64 `json:"block_height,omitempty"`
+	BlockHash       *string `json:"blockHash,omitempty"`
+	BlockHeight     *uint64 `json:"blockHeight,omitempty"`
 	Fee             *uint64 `json:"fee,omitempty"`
-	NumberOfInputs  *uint32 `json:"number_of_inputs,omitempty"`
-	NumberOfOutputs *uint32 `json:"number_of_outputs,omitempty"`
-	DraftID         *string `json:"draft_id,omitempty"`
-	TotalValue      *uint64 `json:"total_value,omitempty"`
+	NumberOfInputs  *uint32 `json:"numberOfInputs,omitempty"`
+	NumberOfOutputs *uint32 `json:"numberOfOutputs,omitempty"`
+	DraftID         *string `json:"draftId,omitempty"`
+	TotalValue      *uint64 `json:"totalValue,omitempty"`
 	Status          *string `json:"status,omitempty" enums:"UNKNOWN,QUEUED,RECEIVED,STORED,ANNOUNCED_TO_NETWORK,REQUESTED_BY_NETWORK,SENT_TO_NETWORK,ACCEPTED_BY_NETWORK,SEEN_ON_NETWORK,MINED,SEEN_IN_ORPHAN_MEMPOOL,CONFIRMED,REJECTED"`
 }
 

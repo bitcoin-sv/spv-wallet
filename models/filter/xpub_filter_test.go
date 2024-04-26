@@ -19,7 +19,7 @@ func TestXpubFilter(t *testing.T) {
 
 	t.Run("empty filter with include deleted", func(t *testing.T) {
 		filter := fromJSON[XpubFilter](`{
-			"include_deleted": true
+			"includeDeleted": true
 		}`)
 		dbConditions := filter.ToDbConditions()
 
@@ -29,7 +29,7 @@ func TestXpubFilter(t *testing.T) {
 	t.Run("with id", func(t *testing.T) {
 		filter := fromJSON[XpubFilter](`{
 			"id": "test",
-			"include_deleted": true
+			"includeDeleted": true
 		}`)
 		dbConditions := filter.ToDbConditions()
 
@@ -40,7 +40,7 @@ func TestXpubFilter(t *testing.T) {
 	t.Run("with nextInternalNum", func(t *testing.T) {
 		filter := fromJSON[XpubFilter](`{
 			"nextInternalNum": 100,
-			"include_deleted": true
+			"includeDeleted": true
 		}`)
 		dbConditions := filter.ToDbConditions()
 

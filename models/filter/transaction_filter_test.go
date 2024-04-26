@@ -19,7 +19,7 @@ func TestTransactionFilter(t *testing.T) {
 
 	t.Run("empty filter with include deleted", func(t *testing.T) {
 		filter := fromJSON[TransactionFilter](`{
-			"include_deleted": true
+			"includeDeleted": true
 		}`)
 		dbConditions := filter.ToDbConditions()
 
@@ -29,7 +29,7 @@ func TestTransactionFilter(t *testing.T) {
 	t.Run("with hex", func(t *testing.T) {
 		filter := fromJSON[TransactionFilter](`{
 			"hex": "test",
-			"include_deleted": true
+			"includeDeleted": true
 		}`)
 		dbConditions := filter.ToDbConditions()
 
@@ -39,8 +39,8 @@ func TestTransactionFilter(t *testing.T) {
 
 	t.Run("with block_height", func(t *testing.T) {
 		filter := fromJSON[TransactionFilter](`{
-			"block_height": 100,
-			"include_deleted": true
+			"blockHeight": 100,
+			"includeDeleted": true
 		}`)
 		dbConditions := filter.ToDbConditions()
 

@@ -20,7 +20,7 @@ func TestUtxoFilter(t *testing.T) {
 
 	t.Run("empty filter with include deleted", func(t *testing.T) {
 		filter := fromJSON[UtxoFilter](`{
-			"include_deleted": true
+			"includeDeleted": true
 		}`)
 		dbConditions, err := filter.ToDbConditions()
 
@@ -31,7 +31,7 @@ func TestUtxoFilter(t *testing.T) {
 	t.Run("with type", func(t *testing.T) {
 		filter := fromJSON[UtxoFilter](`{
 			"type": "pubkey",
-			"include_deleted": true
+			"includeDeleted": true
 		}`)
 		dbConditions, err := filter.ToDbConditions()
 
@@ -43,7 +43,7 @@ func TestUtxoFilter(t *testing.T) {
 	t.Run("with wrong type", func(t *testing.T) {
 		filter := fromJSON[UtxoFilter](`{
 			"type": "wrong_type",
-			"include_deleted": true
+			"includeDeleted": true
 		}`)
 		dbConditions, err := filter.ToDbConditions()
 

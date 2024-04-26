@@ -19,7 +19,7 @@ func TestDestinationFilter(t *testing.T) {
 
 	t.Run("empty filter with include deleted", func(t *testing.T) {
 		filter := fromJSON[DestinationFilter](`{
-			"include_deleted": true
+			"includeDeleted": true
 		}`)
 		dbConditions := filter.ToDbConditions()
 
@@ -28,11 +28,11 @@ func TestDestinationFilter(t *testing.T) {
 
 	t.Run("with full CreatedRange", func(t *testing.T) {
 		filter := fromJSON[DestinationFilter](`{
-			"created_range": {
+			"createdRange": {
 				"from": "2024-02-26T11:01:28Z",
 				"to": "2024-02-25T11:01:28Z"
 			},
-			"include_deleted": true
+			"includeDeleted": true
 		}`)
 
 		dbConditions := filter.ToDbConditions()
@@ -43,10 +43,10 @@ func TestDestinationFilter(t *testing.T) {
 
 	t.Run("with empty CreatedRange", func(t *testing.T) {
 		filter := fromJSON[DestinationFilter](`{
-			"locking_script": "test",
+			"lockingScript": "test",
 			"address": "test",
-			"draft_id": "test",
-			"include_deleted": true
+			"draftId": "test",
+			"includeDeleted": true
 		}`)
 		dbConditions := filter.ToDbConditions()
 

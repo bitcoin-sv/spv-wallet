@@ -19,7 +19,7 @@ func TestPaymailFilter(t *testing.T) {
 
 	t.Run("empty filter with include deleted", func(t *testing.T) {
 		filter := fromJSON[PaymailFilter](`{
-			"include_deleted": true
+			"includeDeleted": true
 		}`)
 		dbConditions := filter.ToDbConditions()
 
@@ -29,7 +29,7 @@ func TestPaymailFilter(t *testing.T) {
 	t.Run("with alias", func(t *testing.T) {
 		filter := fromJSON[PaymailFilter](`{
 			"alias": "example",
-			"include_deleted": true
+			"includeDeleted": true
 		}`)
 		dbConditions := filter.ToDbConditions()
 
@@ -40,7 +40,7 @@ func TestPaymailFilter(t *testing.T) {
 	t.Run("with publicName", func(t *testing.T) {
 		filter := fromJSON[PaymailFilter](`{
 			"publicName": "pubName",
-			"include_deleted": true
+			"includeDeleted": true
 		}`)
 		dbConditions := filter.ToDbConditions()
 

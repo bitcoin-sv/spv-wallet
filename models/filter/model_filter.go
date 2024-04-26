@@ -2,9 +2,9 @@ package filter
 
 // ModelFilter is a common model filter that contains common fields for all model filters.
 type ModelFilter struct {
-	IncludeDeleted *bool      `json:"include_deleted,omitempty" example:"true"`
-	CreatedRange   *TimeRange `json:"created_range,omitempty" swaggertype:"object,string"`
-	UpdatedRange   *TimeRange `json:"updated_range,omitempty" swaggertype:"object,string"`
+	IncludeDeleted *bool      `json:"includeDeleted,omitempty" example:"true"`
+	CreatedRange   *TimeRange `json:"createdRange,omitempty" swaggertype:"object,string"`
+	UpdatedRange   *TimeRange `json:"updatedRange,omitempty" swaggertype:"object,string"`
 }
 
 // ToDbConditions converts filter fields to the datastore conditions using gorm naming strategy
