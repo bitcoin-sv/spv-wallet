@@ -36,7 +36,7 @@ func (a *Action) search(c *gin.Context) {
 		reqParams.Metadata,
 		reqParams.Conditions.ToDbConditions(),
 		reqParams.QueryParams,
-	); 
+	)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, err.Error())
 		return
