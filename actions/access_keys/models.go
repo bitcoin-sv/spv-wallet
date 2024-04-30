@@ -15,5 +15,5 @@ type CreateAccessKey struct {
 // SearchAccessKeys is a model for handling searching with filters and metadata
 type SearchAccessKeys = common.SearchModel[filter.AccessKeyFilter]
 
-// CountAccessKeys is a model for handling counting filtered transactions
+// CountAccessKeys is a model for handling counting filtered access keys
 type CountAccessKeys = common.ConditionsModel[filter.AccessKeyFilter]
