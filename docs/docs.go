@@ -2540,25 +2540,24 @@ const docTemplate = `{
                     "type": "string",
                     "example": "1CDUf7CKu8ocTTkhcYUbq75t14Ft168K65"
                 },
-                "created_range": {
+                "createdRange": {
                     "type": "object",
                     "additionalProperties": {
                         "type": "string"
                     }
                 },
-                "draft_id": {
+                "draftId": {
                     "type": "string",
                     "example": "b356f7fa00cd3f20cce6c21d704cd13e871d28d714a5ebd0532f5a0e0cde63f7"
                 },
-                "include_deleted": {
-                    "type": "boolean",
-                    "example": true
+                "includeDeleted": {
+                    "type": "boolean"
                 },
-                "locking_script": {
+                "lockingScript": {
                     "type": "string",
                     "example": "76a9147b05764a97f3b4b981471492aa703b188e45979b88ac"
                 },
-                "updated_range": {
+                "updatedRange": {
                     "type": "object",
                     "additionalProperties": {
                         "type": "string"
@@ -2569,36 +2568,41 @@ const docTemplate = `{
         "filter.TransactionFilter": {
             "type": "object",
             "properties": {
-                "block_hash": {
-                    "type": "string"
+                "blockHash": {
+                    "type": "string",
+                    "example": "0000000000000000031928c28075a82d7a00c2c90b489d1d66dc0afa3f8d26f8"
                 },
-                "block_height": {
-                    "type": "integer"
+                "blockHeight": {
+                    "type": "integer",
+                    "example": 839376
                 },
-                "created_range": {
+                "createdRange": {
                     "type": "object",
                     "additionalProperties": {
                         "type": "string"
                     }
                 },
-                "draft_id": {
-                    "type": "string"
+                "draftId": {
+                    "type": "string",
+                    "example": "d425432e0d10a46af1ec6d00f380e9581ebf7907f3486572b3cd561a4c326e14"
                 },
                 "fee": {
-                    "type": "integer"
+                    "type": "integer",
+                    "example": 1
                 },
                 "hex": {
                     "type": "string"
                 },
-                "include_deleted": {
-                    "type": "boolean",
-                    "example": true
+                "includeDeleted": {
+                    "type": "boolean"
                 },
-                "number_of_inputs": {
-                    "type": "integer"
+                "numberOfInputs": {
+                    "type": "integer",
+                    "example": 1
                 },
-                "number_of_outputs": {
-                    "type": "integer"
+                "numberOfOutputs": {
+                    "type": "integer",
+                    "example": 2
                 },
                 "status": {
                     "type": "string",
@@ -2618,10 +2622,11 @@ const docTemplate = `{
                         "REJECTED"
                     ]
                 },
-                "total_value": {
-                    "type": "integer"
+                "totalValue": {
+                    "type": "integer",
+                    "example": 100000000
                 },
-                "updated_range": {
+                "updatedRange": {
                     "type": "object",
                     "additionalProperties": {
                         "type": "string"
@@ -3698,16 +3703,6 @@ const docTemplate = `{
                 1000000000,
                 60000000000,
                 3600000000000,
-                -9223372036854775808,
-                9223372036854775807,
-                1,
-                1000,
-                1000000,
-                1000000000,
-                60000000000,
-                3600000000000,
-                -9223372036854775808,
-                9223372036854775807,
                 1,
                 1000,
                 1000000,
@@ -3724,16 +3719,6 @@ const docTemplate = `{
                 "Second",
                 "Minute",
                 "Hour",
-                "minDuration",
-                "maxDuration",
-                "Nanosecond",
-                "Microsecond",
-                "Millisecond",
-                "Second",
-                "Minute",
-                "Hour",
-                "minDuration",
-                "maxDuration",
                 "Nanosecond",
                 "Microsecond",
                 "Millisecond",
