@@ -33,11 +33,17 @@ func (a *Action) search(c *gin.Context) {
 		return
 	}
 
+	conditions, err := reqParams.Conditions.ToDbConditions()
+	if err != nil {
+		c.JSON(http.StatusBadRequest, err.Error())
+		return
+	}
+
 	contacts, err := a.Services.SpvWalletEngine.GetContactsByXpubID(
 		c.Request.Context(),
 		reqXPubID,
 		reqParams.Metadata,
-		reqParams.Conditions.ToDbConditions(),
+		conditions,
 		reqParams.QueryParams,
 	)
 	if err != nil {

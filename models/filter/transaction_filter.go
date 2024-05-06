@@ -4,13 +4,13 @@ package filter
 type TransactionFilter struct {
 	ModelFilter     `json:",inline"`
 	Hex             *string `json:"hex,omitempty"`
-	BlockHash       *string `json:"blockHash,omitempty"`
-	BlockHeight     *uint64 `json:"blockHeight,omitempty"`
-	Fee             *uint64 `json:"fee,omitempty"`
-	NumberOfInputs  *uint32 `json:"numberOfInputs,omitempty"`
-	NumberOfOutputs *uint32 `json:"numberOfOutputs,omitempty"`
-	DraftID         *string `json:"draftId,omitempty"`
-	TotalValue      *uint64 `json:"totalValue,omitempty"`
+	BlockHash       *string `json:"blockHash,omitempty" example:"0000000000000000031928c28075a82d7a00c2c90b489d1d66dc0afa3f8d26f8"`
+	BlockHeight     *uint64 `json:"blockHeight,omitempty" example:"839376"`
+	Fee             *uint64 `json:"fee,omitempty" example:"1"`
+	NumberOfInputs  *uint32 `json:"numberOfInputs,omitempty" example:"1"`
+	NumberOfOutputs *uint32 `json:"numberOfOutputs,omitempty" example:"2"`
+	DraftID         *string `json:"draftId,omitempty" example:"d425432e0d10a46af1ec6d00f380e9581ebf7907f3486572b3cd561a4c326e14"`
+	TotalValue      *uint64 `json:"totalValue,omitempty" example:"100000000"`
 	Status          *string `json:"status,omitempty" enums:"UNKNOWN,QUEUED,RECEIVED,STORED,ANNOUNCED_TO_NETWORK,REQUESTED_BY_NETWORK,SENT_TO_NETWORK,ACCEPTED_BY_NETWORK,SEEN_ON_NETWORK,MINED,SEEN_IN_ORPHAN_MEMPOOL,CONFIRMED,REJECTED"`
 }
 

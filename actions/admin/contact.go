@@ -28,11 +28,17 @@ func (a *Action) contactsSearch(c *gin.Context) {
 		return
 	}
 
+	conditions, err := reqParams.Conditions.ToDbConditions()
+	if err != nil {
+		c.JSON(http.StatusBadRequest, err.Error())
+		return
+	}
+
 	// Record a new transaction (get the hex from parameters)a
 	contacts, err := a.Services.SpvWalletEngine.GetContacts(
 		c.Request.Context(),
 		reqParams.Metadata,
-		reqParams.Conditions.ToDbConditions(),
+		conditions,
 		reqParams.QueryParams,
 	)
 	if err != nil {

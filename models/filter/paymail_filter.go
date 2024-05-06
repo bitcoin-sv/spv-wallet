@@ -4,11 +4,11 @@ package filter
 type AdminPaymailFilter struct {
 	ModelFilter `json:",inline"`
 
-	ID         *string `json:"id,omitempty"`
-	XpubID     *string `json:"xpubId,omitempty"`
-	Alias      *string `json:"alias,omitempty"`
-	Domain     *string `json:"domain,omitempty"`
-	PublicName *string `json:"publicName,omitempty"`
+	ID         *string `json:"id,omitempty" example:"ffb86c103d17d87c15aaf080aab6be5415c9fa885309a79b04c9910e39f2b542"`
+	XpubID     *string `json:"xpubId,omitempty" example:"79f90a6bab0a44402fc64828af820e9465645658aea2d138c5205b88e6dabd00"`
+	Alias      *string `json:"alias,omitempty" example:"alice"`
+	Domain     *string `json:"domain,omitempty" example:"example.com"`
+	PublicName *string `json:"publicName,omitempty" example:"Alice"`
 }
 
 // ToDbConditions converts filter fields to the datastore conditions using gorm naming strategy

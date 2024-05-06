@@ -2,7 +2,7 @@ package filter
 
 // ModelFilter is a common model filter that contains common fields for all model filters.
 type ModelFilter struct {
-	IncludeDeleted *bool      `json:"includeDeleted,omitempty" example:"true"`
+	IncludeDeleted *bool      `json:"includeDeleted,omitempty" swaggertype:"boolean"`
 	CreatedRange   *TimeRange `json:"createdRange,omitempty" swaggertype:"object,string"`
 	UpdatedRange   *TimeRange `json:"updatedRange,omitempty" swaggertype:"object,string"`
 }

@@ -4,8 +4,8 @@ package filter
 type XpubFilter struct {
 	ModelFilter `json:",inline"`
 
-	ID             *string `json:"id,omitempty"`
-	CurrentBalance *uint64 `json:"currentBalance,omitempty"`
+	ID             *string `json:"id,omitempty" example:"00b953624f78004a4c727cd28557475d5233c15f17aef545106639f4d71b712d"`
+	CurrentBalance *uint64 `json:"currentBalance,omitempty" example:"1000"`
 }
 
 // ToDbConditions converts filter fields to the datastore conditions using gorm naming strategy
