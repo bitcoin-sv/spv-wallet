@@ -39,23 +39,25 @@ func TestPaymailFilter(t *testing.T) {
 
 	t.Run("with publicName", func(t *testing.T) {
 		filter := fromJSON[AdminPaymailFilter](`{
-			"publicName": "pubName",
+			"publicName": "thepubname",
 			"includeDeleted": true
 		}`)
 		dbConditions := filter.ToDbConditions()
 
 		assert.Equal(t, 1, len(dbConditions))
-		assert.Equal(t, "pubName", dbConditions["public_name"])
+		assert.Equal(t, "thepubname", dbConditions["public_name"])
 	})
 
 	t.Run("with publicName", func(t *testing.T) {
 		filter := fromJSON[AdminPaymailFilter](`{
-			"publicName": "pubName",
-			"xpubId": thexpubid,
+			"publicName": "thepubname",
+			"xpubId": "thexpubid",
+			"includeDeleted": true
 		}`)
 		dbConditions := filter.ToDbConditions()
 
-		assert.Equal(t, 1, len(dbConditions))
+		assert.Equal(t, 2, len(dbConditions))
 		assert.Equal(t, "thexpubid", dbConditions["xpub_id"])
+		assert.Equal(t, "thepubname", dbConditions["public_name"])
 	})
 }
