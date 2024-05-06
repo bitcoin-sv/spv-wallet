@@ -4,10 +4,8 @@ package filter
 type XpubFilter struct {
 	ModelFilter `json:",inline"`
 
-	ID              *string `json:"id,omitempty"`
-	CurrentBalance  *uint64 `json:"currentBalance,omitempty"`
-	NextInternalNum *uint32 `json:"nextInternalNum,omitempty"`
-	NextExternalNum *uint32 `json:"nextExternalNum,omitempty"`
+	ID             *string `json:"id,omitempty"`
+	CurrentBalance *uint64 `json:"currentBalance,omitempty"`
 }
 
 // ToDbConditions converts filter fields to the datastore conditions using gorm naming strategy
@@ -17,8 +15,6 @@ func (d *XpubFilter) ToDbConditions() map[string]interface{} {
 	// Column names come from the database model, see: /engine/model_xpubs.go
 	applyIfNotNil(conditions, "id", d.ID)
 	applyIfNotNil(conditions, "current_balance", d.CurrentBalance)
-	applyIfNotNil(conditions, "next_internal_num", d.NextInternalNum)
-	applyIfNotNil(conditions, "next_external_num", d.NextExternalNum)
 
 	return conditions
 }

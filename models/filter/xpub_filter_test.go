@@ -37,14 +37,14 @@ func TestXpubFilter(t *testing.T) {
 		assert.Equal(t, "test", dbConditions["id"])
 	})
 
-	t.Run("with nextInternalNum", func(t *testing.T) {
+	t.Run("with currentBalance", func(t *testing.T) {
 		filter := fromJSON[XpubFilter](`{
-			"nextInternalNum": 100,
+			"currentBalance": 100,
 			"includeDeleted": true
 		}`)
 		dbConditions := filter.ToDbConditions()
 
 		assert.Equal(t, 1, len(dbConditions))
-		assert.Equal(t, uint32(100), dbConditions["next_internal_num"])
+		assert.Equal(t, uint64(100), dbConditions["current_balance"])
 	})
 }

@@ -8,7 +8,6 @@ type UtxoFilter struct {
 	OutputIndex   *uint32 `json:"outputIndex,omitempty"`
 
 	ID            *string    `json:"id,omitempty"`
-	XpubID        *string    `json:"xpubId,omitempty"`
 	Satoshis      *uint64    `json:"satoshis,omitempty"`
 	ScriptPubKey  *string    `json:"scriptPubKey,omitempty"`
 	Type          *string    `json:"type,omitempty" enums:"pubkey,pubkeyhash,nulldata,multisig,nonstandard,scripthash,metanet,token_stas,token_sensible"`
@@ -27,7 +26,6 @@ func (d *UtxoFilter) ToDbConditions() (map[string]interface{}, error) {
 	applyIfNotNil(conditions, "transaction_id", d.TransactionID)
 	applyIfNotNil(conditions, "output_index", d.OutputIndex)
 	applyIfNotNil(conditions, "id", d.ID)
-	applyIfNotNil(conditions, "xpub_id", d.XpubID)
 	applyIfNotNil(conditions, "satoshis", d.Satoshis)
 	applyIfNotNil(conditions, "script_pub_key", d.ScriptPubKey)
 	if err := checkAndApplyStrOption(conditions, "type", d.Type, validTypes...); err != nil {
@@ -36,6 +34,25 @@ func (d *UtxoFilter) ToDbConditions() (map[string]interface{}, error) {
 	applyIfNotNil(conditions, "spending_tx_id", d.SpendingTxID)
 
 	applyConditionsIfNotNil(conditions, "reserved_at", d.ReservedRange.ToDbConditions())
+
+	return conditions, nil
+}
+
+// AdminUtxoFilter wraps the UtxoFilter providing additional fields for admin utxo search requests
+type AdminUtxoFilter struct {
+	UtxoFilter `json:",inline"`
+
+	XpubID *string `json:"xpubId,omitempty"`
+}
+
+// ToDbConditions converts filter fields to the datastore conditions using gorm naming strategy
+func (d *AdminUtxoFilter) ToDbConditions() (map[string]interface{}, error) {
+	conditions, err := d.UtxoFilter.ToDbConditions()
+	if err != nil {
+		return nil, err
+	}
+
+	applyIfNotNil(conditions, "xpub_id", d.XpubID)
 
 	return conditions, nil
 }

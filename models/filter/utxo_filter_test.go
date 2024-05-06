@@ -50,4 +50,16 @@ func TestUtxoFilter(t *testing.T) {
 		assert.Error(t, err)
 		assert.Nil(t, dbConditions)
 	})
+
+	t.Run("admin filter with xpubid", func(t *testing.T) {
+		filter := fromJSON[AdminUtxoFilter](`{
+			"includeDeleted": true,
+			"id": "theid",
+			"xpubId": "thexpubid"
+		}`)
+		dbConditions, _ := filter.ToDbConditions()
+
+		assert.Equal(t, "thexpubid", dbConditions["xpub_id"])
+		assert.Equal(t, "theid", dbConditions["id"])
+	})
 }

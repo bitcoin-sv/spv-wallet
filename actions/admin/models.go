@@ -52,10 +52,10 @@ type UpdateContact struct {
 type SearchContacts = common.SearchModel[filter.ContactFilter]
 
 // SearchAccessKeys is a model for handling searching with filters and metadata
-type SearchAccessKeys = common.SearchModel[filter.AccessKeyFilter]
+type SearchAccessKeys = common.SearchModel[filter.AdminAccessKeyFilter]
 
 // CountAccessKeys is a model for handling counting filtered transactions
-type CountAccessKeys = common.ConditionsModel[filter.AccessKeyFilter]
+type CountAccessKeys = common.ConditionsModel[filter.AdminAccessKeyFilter]
 
 // SearchDestinations is a model for handling searching with filters and metadata
 type SearchDestinations = common.SearchModel[filter.DestinationFilter]
@@ -70,16 +70,16 @@ type SearchTransactions = common.SearchModel[filter.TransactionFilter]
 type CountTransactions = common.ConditionsModel[filter.TransactionFilter]
 
 // SearchUtxos is a model for handling searching with filters and metadata
-type SearchUtxos = common.SearchModel[filter.UtxoFilter]
+type SearchUtxos = common.SearchModel[filter.AdminUtxoFilter]
 
 // CountUtxos is a model for handling counting filtered UTXOs
-type CountUtxos = common.ConditionsModel[filter.UtxoFilter]
+type CountUtxos = common.ConditionsModel[filter.AdminUtxoFilter]
 
 // SearchPaymails is a model for handling searching with filters and metadata
-type SearchPaymails = common.SearchModel[filter.PaymailFilter]
+type SearchPaymails = common.SearchModel[filter.AdminPaymailFilter]
 
 // CountPaymails is a model for handling counting filtered paymails
-type CountPaymails = common.ConditionsModel[filter.PaymailFilter]
+type CountPaymails = common.ConditionsModel[filter.AdminPaymailFilter]
 
 // SearchXpubs is a model for handling searching with filters and metadata
 type SearchXpubs = common.SearchModel[filter.XpubFilter]
