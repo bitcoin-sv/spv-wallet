@@ -68,6 +68,7 @@ type ContactService interface {
 	AcceptContact(ctx context.Context, xPubID, paymail string) error
 	RejectContact(ctx context.Context, xPubID, paymail string) error
 	ConfirmContact(ctx context.Context, xPubID, paymail string) error
+	UnconfirmContact(ctx context.Context, xPubID, paymail string) error
 
 	GetContacts(ctx context.Context, metadata *Metadata, conditions map[string]interface{}, queryParams *datastore.QueryParams) ([]*Contact, error)
 	GetContactsByXpubID(ctx context.Context, xPubID string, metadata *Metadata, conditions map[string]interface{}, queryParams *datastore.QueryParams) ([]*Contact, error)

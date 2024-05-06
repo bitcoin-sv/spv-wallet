@@ -269,6 +269,35 @@ func TestRejectContactErrorPath(t *testing.T) {
 	}
 }
 
+func TestConfirmContactHappyPath(t *testing.T) {
+	ctx, client, deferMe := initContactTestCase(t)
+	defer deferMe()
+
+	t.Run("confirm contact", func(t *testing.T) {
+		// given
+		contact := newContact(
+			fullName,
+			paymailGeneric,
+			pubKey,
+			xPubGeneric,
+			ContactNotConfirmed,
+		)
+		contact.enrich(ModelContact, append(client.DefaultModelOptions(), New())...)
+		err := contact.Save(ctx)
+		require.NoError(t, err)
+
+		// when
+		err = client.ConfirmContact(ctx, contact.OwnerXpubID, contact.Paymail)
+
+		// then
+		require.NoError(t, err)
+
+		contact1, err := getContact(ctx, contact.Paymail, contact.OwnerXpubID, client.DefaultModelOptions()...)
+		require.NoError(t, err)
+		require.Equal(t, ContactConfirmed, contact1.Status)
+	})
+}
+
 func TestConfirmContactErrorPath(t *testing.T) {
 	tcs := []struct {
 		name          string
@@ -328,6 +357,100 @@ func TestConfirmContactErrorPath(t *testing.T) {
 
 			// when
 			err := client.ConfirmContact(ctx, ownerXpubID, paymail)
+
+			// then
+			require.ErrorIs(t, err, tc.expectedError)
+		})
+	}
+}
+
+func TestUnconfirmContactHappyPath(t *testing.T) {
+	ctx, client, deferMe := initContactTestCase(t)
+	defer deferMe()
+
+	t.Run("unconfirm contact", func(t *testing.T) {
+		// given
+		contact := newContact(
+			fullName,
+			paymailGeneric,
+			pubKey,
+			xPubGeneric,
+			ContactConfirmed,
+		)
+		contact.enrich(ModelContact, append(client.DefaultModelOptions(), New())...)
+		err := contact.Save(ctx)
+		require.NoError(t, err)
+
+		// when
+		err = client.UnconfirmContact(ctx, contact.OwnerXpubID, contact.Paymail)
+
+		// then
+		require.NoError(t, err)
+
+		contact1, err := getContact(ctx, contact.Paymail, contact.OwnerXpubID, client.DefaultModelOptions()...)
+		require.NoError(t, err)
+		require.Equal(t, ContactNotConfirmed, contact1.Status)
+	})
+}
+
+func TestUnconfirmContactErrorPath(t *testing.T) {
+	tcs := []struct {
+		name          string
+		expectedError error
+		getContact    func() (contact *Contact, paymail string, onwerXpubId string)
+	}{
+		{
+			name:          "contact doesn't exist - return not found error",
+			expectedError: ErrContactNotFound,
+			getContact: func() (*Contact, string, string) {
+				return nil, "idontexist", "xpubID"
+			},
+		},
+		{
+			name:          "already unconfirmed contact - return incorrect status error",
+			expectedError: ErrContactIncorrectStatus,
+			getContact: func() (*Contact, string, string) {
+				cc := newContact("Paul Altreides", "paul@altreides.diune", "pki", "xpub", ContactNotConfirmed)
+
+				return cc, cc.Paymail, cc.OwnerXpubID
+			},
+		},
+		{
+			name:          "awaiting contact - return incorrect status error",
+			expectedError: ErrContactIncorrectStatus,
+			getContact: func() (*Contact, string, string) {
+				cc := newContact("Alia Altreides", "alia@altreides.diune", "pki", "xpub", ContactAwaitAccept)
+
+				return cc, cc.Paymail, cc.OwnerXpubID
+			},
+		},
+		{
+			name:          "rejected contact - return not found error",
+			expectedError: ErrContactNotFound,
+			getContact: func() (*Contact, string, string) {
+				cc := newContact("Alia Altreides", "alia@altreides.diune", "pki", "xpub", ContactAwaitAccept)
+				cc.Reject()
+
+				return cc, cc.Paymail, cc.OwnerXpubID
+			},
+		},
+	}
+
+	for _, tc := range tcs {
+		t.Run(tc.name, func(t *testing.T) {
+			// given
+			ctx, client, cleanup := CreateTestSQLiteClient(t, false, true, withTaskManagerMockup())
+			defer cleanup()
+
+			contact, paymail, ownerXpubID := tc.getContact()
+			if contact != nil {
+				contact.enrich(ModelContact, client.DefaultModelOptions()...)
+				err := contact.Save(ctx)
+				require.NoError(t, err)
+			}
+
+			// when
+			err := client.UnconfirmContact(ctx, ownerXpubID, paymail)
 
 			// then
 			require.ErrorIs(t, err, tc.expectedError)
