@@ -1389,6 +1389,46 @@
                 }
             }
         },
+        "/v1/contact/unconfirmed/{paymail}": {
+            "patch": {
+                "security": [
+                    {
+                        "x-auth-xpub": []
+                    }
+                ],
+                "description": "Unconfirm contact. For contact with status \"confirmed\" change status to \"unconfirmed\"",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Contact"
+                ],
+                "summary": "Unconfirm contact",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Paymail address of the contact the user wants to unconfirm",
+                        "name": "paymail",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "404": {
+                        "description": "Contact not found"
+                    },
+                    "422": {
+                        "description": "Contact status not confirmed"
+                    },
+                    "500": {
+                        "description": "Internal server error"
+                    }
+                }
+            }
+        },
         "/v1/contact/{paymail}": {
             "put": {
                 "security": [
@@ -4509,16 +4549,6 @@
                 1000000000,
                 60000000000,
                 3600000000000,
-                -9223372036854775808,
-                9223372036854775807,
-                1,
-                1000,
-                1000000,
-                1000000000,
-                60000000000,
-                3600000000000,
-                -9223372036854775808,
-                9223372036854775807,
                 1,
                 1000,
                 1000000,
@@ -4543,16 +4573,6 @@
                 "Second",
                 "Minute",
                 "Hour",
-                "minDuration",
-                "maxDuration",
-                "Nanosecond",
-                "Microsecond",
-                "Millisecond",
-                "Second",
-                "Minute",
-                "Hour",
-                "minDuration",
-                "maxDuration",
                 "Nanosecond",
                 "Microsecond",
                 "Millisecond",

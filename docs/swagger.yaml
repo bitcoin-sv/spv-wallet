@@ -1790,16 +1790,6 @@ definitions:
     - 1000000000
     - 60000000000
     - 3600000000000
-    - -9223372036854775808
-    - 9223372036854775807
-    - 1
-    - 1000
-    - 1000000
-    - 1000000000
-    - 60000000000
-    - 3600000000000
-    - -9223372036854775808
-    - 9223372036854775807
     - 1
     - 1000
     - 1000000
@@ -1824,16 +1814,6 @@ definitions:
     - Second
     - Minute
     - Hour
-    - minDuration
-    - maxDuration
-    - Nanosecond
-    - Microsecond
-    - Millisecond
-    - Second
-    - Minute
-    - Hour
-    - minDuration
-    - maxDuration
     - Nanosecond
     - Microsecond
     - Millisecond
@@ -2909,6 +2889,32 @@ paths:
       security:
       - x-auth-xpub: []
       summary: Search contacts
+      tags:
+      - Contact
+  /v1/contact/unconfirmed/{paymail}:
+    patch:
+      description: Unconfirm contact. For contact with status "confirmed" change status
+        to "unconfirmed"
+      parameters:
+      - description: Paymail address of the contact the user wants to unconfirm
+        in: path
+        name: paymail
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+        "404":
+          description: Contact not found
+        "422":
+          description: Contact status not confirmed
+        "500":
+          description: Internal server error
+      security:
+      - x-auth-xpub: []
+      summary: Unconfirm contact
       tags:
       - Contact
   /v1/destination:
