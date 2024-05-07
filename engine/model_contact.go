@@ -166,6 +166,15 @@ func (c *Contact) Confirm() error {
 	return nil
 }
 
+func (c *Contact) Unconfirm() error {
+	if c.Status != ContactConfirmed {
+		return fmt.Errorf("cannot unconfirm contact. Reason: status: %s, expected: %s", c.Status, ContactNotConfirmed)
+	}
+
+	c.Status = ContactNotConfirmed
+	return nil
+}
+
 func (c *Contact) Delete() {
 	c.DeletedAt.Valid = true
 	c.DeletedAt.Time = time.Now()

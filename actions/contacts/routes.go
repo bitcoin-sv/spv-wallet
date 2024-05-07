@@ -23,6 +23,7 @@ func NewHandler(appConfig *config.AppConfig, services *config.AppServices) route
 		group.PATCH("/accepted/:paymail", action.accept)
 		group.PATCH("/rejected/:paymail", action.reject)
 		group.PATCH("/confirmed/:paymail", action.confirm)
+		group.PATCH("/unconfirmed/:paymail", action.unconfirm)
 
 		group.POST("search", action.search)
 	})
