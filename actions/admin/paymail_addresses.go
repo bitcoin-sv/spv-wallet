@@ -53,9 +53,9 @@ func (a *Action) paymailGetAddress(c *gin.Context) {
 // @Description	Paymail addresses search
 // @Tags		Admin
 // @Produce		json
-// @Param		SearchRequestParameters body actions.SearchRequestParameters false "Supports targeted resource searches with filters for metadata and custom conditions, plus options for pagination and sorting to streamline data exploration and analysis"
+// @Param		SearchPaymails body SearchPaymails false "Supports targeted resource searches with filters and metadata, plus options for pagination and sorting to streamline data exploration and analysis"
 // @Success		200 {object} []models.PaymailAddress "List of paymail addresses
-// @Failure		400	"Bad request - Error while parsing SearchRequestParameters from request body"
+// @Failure		400	"Bad request - Error while parsing SearchPaymails from request body"
 // @Failure 	500	"Internal server error - Error while searching for paymail addresses"
 // @Router		/v1/admin/paymails/search [post]
 // @Security	x-auth-xpub
@@ -91,9 +91,9 @@ func (a *Action) paymailAddressesSearch(c *gin.Context) {
 // @Description	Paymail addresses count
 // @Tags		Admin
 // @Produce		json
-// @Param		CountRequestParameters body actions.CountRequestParameters false "Enables precise filtering of resource counts using custom conditions or metadata, catering to specific business or analysis needs"
+// @Param		CountPaymails body CountPaymails false "Enables filtering of elements to be counted"
 // @Success		200	{number} int64 "Count of paymail addresses"
-// @Failure		400	"Bad request - Error while parsing CountRequestParameters from request body"
+// @Failure		400	"Bad request - Error while parsing CountPaymails from request body"
 // @Failure 	500	"Internal Server Error - Error while fetching count of paymail addresses"
 // @Router		/v1/admin/paymails/count [post]
 // @Security	x-auth-xpub

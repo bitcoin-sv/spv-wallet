@@ -14,9 +14,9 @@ import (
 // @Description	Search for transactions
 // @Tags		Admin
 // @Produce		json
-// @Param		SearchRequestParameters body actions.SearchRequestParameters false "Supports targeted resource searches with filters for metadata and custom conditions, plus options for pagination and sorting to streamline data exploration and analysis"
+// @Param		SearchTransactions body SearchTransactions false "Supports targeted resource searches with filters and metadata, plus options for pagination and sorting to streamline data exploration and analysis"
 // @Success		200 {object} []models.Transaction "List of transactions"
-// @Failure		400	"Bad request - Error while parsing SearchRequestParameters from request body"
+// @Failure		400	"Bad request - Error while parsing SearchTransactions from request body"
 // @Failure 	500	"Internal server error - Error while searching for transactions"
 // @Router		/v1/admin/transactions/search [post]
 // @Security	x-auth-xpub
@@ -52,9 +52,9 @@ func (a *Action) transactionsSearch(c *gin.Context) {
 // @Description	Count transactions
 // @Tags		Admin
 // @Produce		json
-// @Param		CountRequestParameters body actions.CountRequestParameters false "Enables precise filtering of resource counts using custom conditions or metadata, catering to specific business or analysis needs"
+// @Param		CountTransactions body CountTransactions false "Enables filtering of elements to be counted"
 // @Success		200	{number} int64 "Count of transactions"
-// @Failure		400	"Bad request - Error while parsing CountRequestParameters from request body"
+// @Failure		400	"Bad request - Error while parsing CountTransactions from request body"
 // @Failure 	500	"Internal Server Error - Error while fetching count of transactions"
 // @Router		/v1/admin/transactions/count [post]
 // @Security	x-auth-xpub

@@ -12,7 +12,7 @@ type UtxoFilter struct {
 	ScriptPubKey  *string    `json:"scriptPubKey,omitempty" example:"76a914a5f271385e75f57bcd9092592dede812f8c466d088ac"`
 	Type          *string    `json:"type,omitempty" enums:"pubkey,pubkeyhash,nulldata,multisig,nonstandard,scripthash,metanet,token_stas,token_sensible"`
 	DraftID       *string    `json:"draftId,omitempty" example:"89419d4c7c50810bfe5ff9df9ad5074b749959423782dc91a30f1058b9ad7ef7"`
-	ReservedRange *TimeRange `json:"reservedRange,omitempty" swaggertype:"object,string"`
+	ReservedRange *TimeRange `json:"reservedRange,omitempty"` // ReservedRange specifies the time range when a UTXO was reserved.
 	SpendingTxID  *string    `json:"spendingTxId,omitempty" example:"11a7746489a70e9c0170601c2be65558455317a984194eb2791b637f59f8cd6e"`
 }
 

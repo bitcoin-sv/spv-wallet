@@ -13,9 +13,9 @@ import (
 // @Description	Count of access keys
 // @Tags		Access-key
 // @Produce		json
-// @Param		CountRequestParameters body actions.CountRequestParameters false "Enables precise filtering of resource counts using custom conditions or metadata, catering to specific business or analysis needs"
+// @Param		CountAccessKeys body CountAccessKeys false "Enables filtering of elements to be counted"
 // @Success		200	{number} int64 "Count of access keys"
-// @Failure		400	"Bad request - Error while parsing CountRequestParameters from request body"
+// @Failure		400	"Bad request - Error while parsing CountAccessKeys from request body"
 // @Failure 	500	"Internal Server Error - Error while fetching count of access keys"
 // @Router		/v1/access-key/count [post]
 // @Security	x-auth-xpub

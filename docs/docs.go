@@ -188,11 +188,11 @@ const docTemplate = `{
                 "summary": "Count of access keys",
                 "parameters": [
                     {
-                        "description": "Enables precise filtering of resource counts using custom conditions or metadata, catering to specific business or analysis needs",
-                        "name": "CountRequestParameters",
+                        "description": "Enables filtering of elements to be counted",
+                        "name": "CountAccessKeys",
                         "in": "body",
                         "schema": {
-                            "$ref": "#/definitions/actions.CountRequestParameters"
+                            "$ref": "#/definitions/accesskeys.CountAccessKeys"
                         }
                     }
                 ],
@@ -204,7 +204,7 @@ const docTemplate = `{
                         }
                     },
                     "400": {
-                        "description": "Bad request - Error while parsing CountRequestParameters from request body"
+                        "description": "Bad request - Error while parsing CountAccessKeys from request body"
                     },
                     "500": {
                         "description": "Internal Server Error - Error while fetching count of access keys"
@@ -229,11 +229,11 @@ const docTemplate = `{
                 "summary": "Search access key",
                 "parameters": [
                     {
-                        "description": "Supports targeted resource searches with filters for metadata and custom conditions, plus options for pagination and sorting to streamline data exploration and analysis",
-                        "name": "SearchRequestParameters",
+                        "description": "Supports targeted resource searches with filters and metadata, plus options for pagination and sorting to streamline data exploration and analysis",
+                        "name": "SearchAccessKeys",
                         "in": "body",
                         "schema": {
-                            "$ref": "#/definitions/actions.SearchRequestParameters"
+                            "$ref": "#/definitions/accesskeys.SearchAccessKeys"
                         }
                     }
                 ],
@@ -248,7 +248,7 @@ const docTemplate = `{
                         }
                     },
                     "400": {
-                        "description": "Bad request - Error while parsing SearchRequestParameters from request body"
+                        "description": "Bad request - Error while SearchAccessKeys from request body"
                     },
                     "500": {
                         "description": "Internal server error - Error while searching for access keys"
@@ -273,11 +273,11 @@ const docTemplate = `{
                 "summary": "Access Keys Count",
                 "parameters": [
                     {
-                        "description": "Enables precise filtering of resource counts using custom conditions or metadata, catering to specific business or analysis needs",
-                        "name": "CountRequestParameters",
+                        "description": "Enables filtering of elements to be counted",
+                        "name": "CountAccessKeys",
                         "in": "body",
                         "schema": {
-                            "$ref": "#/definitions/actions.CountRequestParameters"
+                            "$ref": "#/definitions/admin.CountAccessKeys"
                         }
                     }
                 ],
@@ -289,7 +289,7 @@ const docTemplate = `{
                         }
                     },
                     "400": {
-                        "description": "Bad request - Error while parsing CountRequestParameters from request body"
+                        "description": "Bad request - Error while parsing CountAccessKeys from request body"
                     },
                     "500": {
                         "description": "Internal Server Error - Error while fetching count of access keys"
@@ -314,11 +314,11 @@ const docTemplate = `{
                 "summary": "Access Keys Search",
                 "parameters": [
                     {
-                        "description": "Supports targeted resource searches with filters for metadata and custom conditions, plus options for pagination and sorting to streamline data exploration and analysis",
-                        "name": "SearchRequestParameters",
+                        "description": "Supports targeted resource searches with filters and metadata, plus options for pagination and sorting to streamline data exploration and analysis",
+                        "name": "SearchAccessKeys",
                         "in": "body",
                         "schema": {
-                            "$ref": "#/definitions/actions.SearchRequestParameters"
+                            "$ref": "#/definitions/admin.SearchAccessKeys"
                         }
                     }
                 ],
@@ -333,7 +333,7 @@ const docTemplate = `{
                         }
                     },
                     "400": {
-                        "description": "Bad request - Error while parsing SearchRequestParameters from request body"
+                        "description": "Bad request - Error while parsing SearchAccessKeys from request body"
                     },
                     "500": {
                         "description": "Internal server error - Error while searching for access keys"
@@ -448,11 +448,11 @@ const docTemplate = `{
                 "summary": "Search for contacts",
                 "parameters": [
                     {
-                        "description": "Supports targeted resource searches with filters for metadata and custom conditions, plus options for pagination and sorting to streamline data exploration and analysis",
-                        "name": "SearchRequestParameters",
+                        "description": "Supports targeted resource searches with filters and metadata, plus options for pagination and sorting to streamline data exploration and analysis",
+                        "name": "SearchContacts",
                         "in": "body",
                         "schema": {
-                            "$ref": "#/definitions/actions.SearchRequestParameters"
+                            "$ref": "#/definitions/admin.SearchContacts"
                         }
                     }
                 ],
@@ -467,7 +467,7 @@ const docTemplate = `{
                         }
                     },
                     "400": {
-                        "description": "Bad request - Error while parsing SearchRequestParameters from request body"
+                        "description": "Bad request - Error while parsing SearchContacts from request body"
                     },
                     "500": {
                         "description": "Internal server error - Error while searching for contacts"
@@ -585,11 +585,11 @@ const docTemplate = `{
                 "summary": "Search for destinations",
                 "parameters": [
                     {
-                        "description": "Supports targeted resource searches with filters for metadata and custom conditions, plus options for pagination and sorting to streamline data exploration and analysis",
-                        "name": "SearchRequestParameters",
+                        "description": "Supports targeted resource searches with filters and metadata, plus options for pagination and sorting to streamline data exploration and analysis",
+                        "name": "SearchDestinations",
                         "in": "body",
                         "schema": {
-                            "$ref": "#/definitions/actions.SearchRequestParameters"
+                            "$ref": "#/definitions/admin.SearchDestinations"
                         }
                     }
                 ],
@@ -604,7 +604,7 @@ const docTemplate = `{
                         }
                     },
                     "400": {
-                        "description": "Bad request - Error while parsing SearchRequestParameters from request body"
+                        "description": "Bad request - Error while parsing SearchDestinations from request body"
                     },
                     "500": {
                         "description": "Internal server error - Error while searching for destinations"
@@ -749,11 +749,11 @@ const docTemplate = `{
                 "summary": "Paymail addresses count",
                 "parameters": [
                     {
-                        "description": "Enables precise filtering of resource counts using custom conditions or metadata, catering to specific business or analysis needs",
-                        "name": "CountRequestParameters",
+                        "description": "Enables filtering of elements to be counted",
+                        "name": "CountPaymails",
                         "in": "body",
                         "schema": {
-                            "$ref": "#/definitions/actions.CountRequestParameters"
+                            "$ref": "#/definitions/admin.CountPaymails"
                         }
                     }
                 ],
@@ -765,7 +765,7 @@ const docTemplate = `{
                         }
                     },
                     "400": {
-                        "description": "Bad request - Error while parsing CountRequestParameters from request body"
+                        "description": "Bad request - Error while parsing CountPaymails from request body"
                     },
                     "500": {
                         "description": "Internal Server Error - Error while fetching count of paymail addresses"
@@ -790,11 +790,11 @@ const docTemplate = `{
                 "summary": "Paymail addresses search",
                 "parameters": [
                     {
-                        "description": "Supports targeted resource searches with filters for metadata and custom conditions, plus options for pagination and sorting to streamline data exploration and analysis",
-                        "name": "SearchRequestParameters",
+                        "description": "Supports targeted resource searches with filters and metadata, plus options for pagination and sorting to streamline data exploration and analysis",
+                        "name": "SearchPaymails",
                         "in": "body",
                         "schema": {
-                            "$ref": "#/definitions/actions.SearchRequestParameters"
+                            "$ref": "#/definitions/admin.SearchPaymails"
                         }
                     }
                 ],
@@ -809,7 +809,7 @@ const docTemplate = `{
                         }
                     },
                     "400": {
-                        "description": "Bad request - Error while parsing SearchRequestParameters from request body"
+                        "description": "Bad request - Error while parsing SearchPaymails from request body"
                     },
                     "500": {
                         "description": "Internal server error - Error while searching for paymail addresses"
@@ -912,11 +912,11 @@ const docTemplate = `{
                 "summary": "Count transactions",
                 "parameters": [
                     {
-                        "description": "Enables precise filtering of resource counts using custom conditions or metadata, catering to specific business or analysis needs",
-                        "name": "CountRequestParameters",
+                        "description": "Enables filtering of elements to be counted",
+                        "name": "CountTransactions",
                         "in": "body",
                         "schema": {
-                            "$ref": "#/definitions/actions.CountRequestParameters"
+                            "$ref": "#/definitions/admin.CountTransactions"
                         }
                     }
                 ],
@@ -928,7 +928,7 @@ const docTemplate = `{
                         }
                     },
                     "400": {
-                        "description": "Bad request - Error while parsing CountRequestParameters from request body"
+                        "description": "Bad request - Error while parsing CountTransactions from request body"
                     },
                     "500": {
                         "description": "Internal Server Error - Error while fetching count of transactions"
@@ -995,11 +995,11 @@ const docTemplate = `{
                 "summary": "Search for transactions",
                 "parameters": [
                     {
-                        "description": "Supports targeted resource searches with filters for metadata and custom conditions, plus options for pagination and sorting to streamline data exploration and analysis",
-                        "name": "SearchRequestParameters",
+                        "description": "Supports targeted resource searches with filters and metadata, plus options for pagination and sorting to streamline data exploration and analysis",
+                        "name": "SearchTransactions",
                         "in": "body",
                         "schema": {
-                            "$ref": "#/definitions/actions.SearchRequestParameters"
+                            "$ref": "#/definitions/admin.SearchTransactions"
                         }
                     }
                 ],
@@ -1014,7 +1014,7 @@ const docTemplate = `{
                         }
                     },
                     "400": {
-                        "description": "Bad request - Error while parsing SearchRequestParameters from request body"
+                        "description": "Bad request - Error while parsing SearchTransactions from request body"
                     },
                     "500": {
                         "description": "Internal server error - Error while searching for transactions"
@@ -1039,11 +1039,11 @@ const docTemplate = `{
                 "summary": "Count utxos",
                 "parameters": [
                     {
-                        "description": "Enables precise filtering of resource counts using custom conditions or metadata, catering to specific business or analysis needs",
-                        "name": "CountRequestParameters",
+                        "description": "Enables filtering of elements to be counted",
+                        "name": "CountUtxos",
                         "in": "body",
                         "schema": {
-                            "$ref": "#/definitions/actions.CountRequestParameters"
+                            "$ref": "#/definitions/admin.CountUtxos"
                         }
                     }
                 ],
@@ -1055,7 +1055,7 @@ const docTemplate = `{
                         }
                     },
                     "400": {
-                        "description": "Bad request - Error while parsing CountRequestParameters from request body"
+                        "description": "Bad request - Error while parsing CountUtxos from request body"
                     },
                     "500": {
                         "description": "Internal Server Error - Error while fetching count of utxos"
@@ -1080,11 +1080,11 @@ const docTemplate = `{
                 "summary": "Search for utxos",
                 "parameters": [
                     {
-                        "description": "Supports targeted resource searches with filters for metadata and custom conditions, plus options for pagination and sorting to streamline data exploration and analysis",
-                        "name": "SearchRequestParameters",
+                        "description": "Supports targeted resource searches with filters and metadata, plus options for pagination and sorting to streamline data exploration and analysis",
+                        "name": "SearchUtxos",
                         "in": "body",
                         "schema": {
-                            "$ref": "#/definitions/actions.SearchRequestParameters"
+                            "$ref": "#/definitions/admin.SearchUtxos"
                         }
                     }
                 ],
@@ -1099,7 +1099,7 @@ const docTemplate = `{
                         }
                     },
                     "400": {
-                        "description": "Bad request - Error while parsing SearchRequestParameters from request body"
+                        "description": "Bad request - Error while parsing SearchUtxos from request body"
                     },
                     "500": {
                         "description": "Internal server error - Error while searching for utxos"
@@ -1166,11 +1166,11 @@ const docTemplate = `{
                 "summary": "Count xpubs",
                 "parameters": [
                     {
-                        "description": "Enables precise filtering of resource counts using custom conditions or metadata, catering to specific business or analysis needs",
-                        "name": "CountRequestParameters",
+                        "description": "Enables filtering of elements to be counted",
+                        "name": "CountXpubs",
                         "in": "body",
                         "schema": {
-                            "$ref": "#/definitions/actions.CountRequestParameters"
+                            "$ref": "#/definitions/admin.CountXpubs"
                         }
                     }
                 ],
@@ -1182,7 +1182,7 @@ const docTemplate = `{
                         }
                     },
                     "400": {
-                        "description": "Bad request - Error while parsing CountRequestParameters from request body"
+                        "description": "Bad request - Error while parsing CountXpubs from request body"
                     },
                     "500": {
                         "description": "Internal Server Error - Error while fetching count of xpubs"
@@ -1207,11 +1207,11 @@ const docTemplate = `{
                 "summary": "Search for xpubs",
                 "parameters": [
                     {
-                        "description": "Supports targeted resource searches with filters for metadata and custom conditions, plus options for pagination and sorting to streamline data exploration and analysis",
-                        "name": "SearchRequestParameters",
+                        "description": "Supports targeted resource searches with filters and metadata, plus options for pagination and sorting to streamline data exploration and analysis",
+                        "name": "SearchXpubs",
                         "in": "body",
                         "schema": {
-                            "$ref": "#/definitions/actions.SearchRequestParameters"
+                            "$ref": "#/definitions/admin.SearchXpubs"
                         }
                     }
                 ],
@@ -1226,7 +1226,7 @@ const docTemplate = `{
                         }
                     },
                     "400": {
-                        "description": "Bad request - Error while parsing SearchRequestParameters from request body"
+                        "description": "Bad request - Error while parsing SearchXpubs from request body"
                     },
                     "500": {
                         "description": "Internal server error - Error while searching for xpubs"
@@ -1371,34 +1371,12 @@ const docTemplate = `{
                 "summary": "Search contacts",
                 "parameters": [
                     {
-                        "type": "integer",
-                        "description": "page",
-                        "name": "page",
-                        "in": "query"
-                    },
-                    {
-                        "type": "integer",
-                        "description": "page_size",
-                        "name": "page_size",
-                        "in": "query"
-                    },
-                    {
-                        "type": "string",
-                        "description": "order_by_field",
-                        "name": "order_by_field",
-                        "in": "query"
-                    },
-                    {
-                        "type": "string",
-                        "description": "sort_direction",
-                        "name": "sort_direction",
-                        "in": "query"
-                    },
-                    {
-                        "type": "string",
-                        "description": "conditions",
-                        "name": "conditions",
-                        "in": "query"
+                        "description": "Supports targeted resource searches with filters and metadata, plus options for pagination and sorting to streamline data exploration and analysis",
+                        "name": "SearchContacts",
+                        "in": "body",
+                        "schema": {
+                            "$ref": "#/definitions/contacts.SearchContacts"
+                        }
                     }
                 ],
                 "responses": {
@@ -1412,7 +1390,7 @@ const docTemplate = `{
                         }
                     },
                     "400": {
-                        "description": "Bad request - Error while parsing SearchRequestParameters from request body"
+                        "description": "Bad request - Error while parsing SearchContacts from request body"
                     },
                     "500": {
                         "description": "Internal server error - Error while searching for contacts"
@@ -1606,7 +1584,7 @@ const docTemplate = `{
                 "summary": "Count Destinations",
                 "parameters": [
                     {
-                        "description": "Enables precise filtering of resource counts using custom conditions or metadata, catering to specific business or analysis needs",
+                        "description": "Enables filtering of elements to be counted",
                         "name": "CountDestinations",
                         "in": "body",
                         "schema": {
@@ -1647,7 +1625,7 @@ const docTemplate = `{
                 "summary": "Search for a destination",
                 "parameters": [
                     {
-                        "description": "Supports targeted resource searches with filters for metadata and custom conditions, plus options for pagination and sorting to streamline data exploration and analysis",
+                        "description": "Supports targeted resource searches with filters and metadata, plus options for pagination and sorting to streamline data exploration and analysis",
                         "name": "SearchDestinations",
                         "in": "body",
                         "schema": {
@@ -1811,7 +1789,7 @@ const docTemplate = `{
                 "summary": "Count of transactions",
                 "parameters": [
                     {
-                        "description": "Enables precise filtering of resource counts using custom conditions or metadata, catering to specific business or analysis needs",
+                        "description": "Enables filtering of elements to be counted",
                         "name": "CountTransactions",
                         "in": "body",
                         "schema": {
@@ -1894,7 +1872,7 @@ const docTemplate = `{
                 "summary": "Search transaction",
                 "parameters": [
                     {
-                        "description": "Supports targeted resource searches with filters for metadata and custom conditions, plus options for pagination and sorting to streamline data exploration and analysis",
+                        "description": "Supports targeted resource searches with filters and metadata, plus options for pagination and sorting to streamline data exploration and analysis",
                         "name": "SearchTransactions",
                         "in": "body",
                         "schema": {
@@ -1985,11 +1963,11 @@ const docTemplate = `{
                 "summary": "Count of UTXOs",
                 "parameters": [
                     {
-                        "description": "Enables precise filtering of resource counts using custom conditions or metadata, catering to specific business or analysis needs",
-                        "name": "CountRequestParameters",
+                        "description": "Enables filtering of elements to be counted",
+                        "name": "CountUtxos",
                         "in": "body",
                         "schema": {
-                            "$ref": "#/definitions/actions.CountRequestParameters"
+                            "$ref": "#/definitions/utxos.CountUtxos"
                         }
                     }
                 ],
@@ -2001,7 +1979,7 @@ const docTemplate = `{
                         }
                     },
                     "400": {
-                        "description": "Bad request - Error while parsing CountRequestParameters from request body"
+                        "description": "Bad request - Error while parsing CountUtxos from request body"
                     },
                     "500": {
                         "description": "Internal Server Error - Error while fetching count of utxos"
@@ -2026,11 +2004,11 @@ const docTemplate = `{
                 "summary": "Search UTXO",
                 "parameters": [
                     {
-                        "description": "Supports targeted resource searches with filters for metadata and custom conditions, plus options for pagination and sorting to streamline data exploration and analysis",
-                        "name": "SearchRequestParameters",
+                        "description": "Supports targeted resource searches with filters and metadata, plus options for pagination and sorting to streamline data exploration and analysis",
+                        "name": "SearchUtxos",
                         "in": "body",
                         "schema": {
-                            "$ref": "#/definitions/actions.SearchRequestParameters"
+                            "$ref": "#/definitions/utxos.SearchUtxos"
                         }
                     }
                 ],
@@ -2045,7 +2023,7 @@ const docTemplate = `{
                         }
                     },
                     "400": {
-                        "description": "Bad request - Error while parsing SearchRequestParameters from request body"
+                        "description": "Bad request - Error while parsing SearchUtxos from request body"
                     },
                     "500": {
                         "description": "Internal server error - Error while searching for utxos"
@@ -2125,6 +2103,30 @@ const docTemplate = `{
         }
     },
     "definitions": {
+        "accesskeys.CountAccessKeys": {
+            "type": "object",
+            "properties": {
+                "conditions": {
+                    "description": "Custom conditions used for filtering the search results. Every field within the object is optional.",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/filter.AccessKeyFilter"
+                        }
+                    ]
+                },
+                "metadata": {
+                    "description": "Accepts a JSON object for embedding custom metadata, enabling arbitrary additional information to be associated with the resource",
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "string"
+                    },
+                    "example": {
+                        "key": "value",
+                        "key2": "value2"
+                    }
+                }
+            }
+        },
         "accesskeys.CreateAccessKey": {
             "type": "object",
             "properties": {
@@ -2141,44 +2143,16 @@ const docTemplate = `{
                 }
             }
         },
-        "actions.CountRequestParameters": {
+        "accesskeys.SearchAccessKeys": {
             "type": "object",
             "properties": {
                 "conditions": {
-                    "description": "Custom conditions used for filtering the search results",
-                    "type": "object",
-                    "additionalProperties": {
-                        "type": "string"
-                    },
-                    "example": {
-                        "testColumn": "testValue"
-                    }
-                },
-                "metadata": {
-                    "description": "Accepts a JSON object for embedding custom metadata, enabling arbitrary additional information to be associated with the resource",
-                    "type": "object",
-                    "additionalProperties": {
-                        "type": "string"
-                    },
-                    "example": {
-                        "key": "value",
-                        "key2": "value2"
-                    }
-                }
-            }
-        },
-        "actions.SearchRequestParameters": {
-            "type": "object",
-            "properties": {
-                "conditions": {
-                    "description": "Custom conditions used for filtering the search results",
-                    "type": "object",
-                    "additionalProperties": {
-                        "type": "string"
-                    },
-                    "example": {
-                        "testColumn": "testValue"
-                    }
+                    "description": "Custom conditions used for filtering the search results. Every field within the object is optional.",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/filter.AccessKeyFilter"
+                        }
+                    ]
                 },
                 "metadata": {
                     "description": "Accepts a JSON object for embedding custom metadata, enabling arbitrary additional information to be associated with the resource",
@@ -2202,6 +2176,150 @@ const docTemplate = `{
                         "order_by_field": "created_at",
                         "page": "1",
                         "page_size": "10"
+                    }
+                }
+            }
+        },
+        "admin.CountAccessKeys": {
+            "type": "object",
+            "properties": {
+                "conditions": {
+                    "description": "Custom conditions used for filtering the search results. Every field within the object is optional.",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/filter.AdminAccessKeyFilter"
+                        }
+                    ]
+                },
+                "metadata": {
+                    "description": "Accepts a JSON object for embedding custom metadata, enabling arbitrary additional information to be associated with the resource",
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "string"
+                    },
+                    "example": {
+                        "key": "value",
+                        "key2": "value2"
+                    }
+                }
+            }
+        },
+        "admin.CountDestinations": {
+            "type": "object",
+            "properties": {
+                "conditions": {
+                    "description": "Custom conditions used for filtering the search results. Every field within the object is optional.",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/filter.DestinationFilter"
+                        }
+                    ]
+                },
+                "metadata": {
+                    "description": "Accepts a JSON object for embedding custom metadata, enabling arbitrary additional information to be associated with the resource",
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "string"
+                    },
+                    "example": {
+                        "key": "value",
+                        "key2": "value2"
+                    }
+                }
+            }
+        },
+        "admin.CountPaymails": {
+            "type": "object",
+            "properties": {
+                "conditions": {
+                    "description": "Custom conditions used for filtering the search results. Every field within the object is optional.",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/filter.AdminPaymailFilter"
+                        }
+                    ]
+                },
+                "metadata": {
+                    "description": "Accepts a JSON object for embedding custom metadata, enabling arbitrary additional information to be associated with the resource",
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "string"
+                    },
+                    "example": {
+                        "key": "value",
+                        "key2": "value2"
+                    }
+                }
+            }
+        },
+        "admin.CountTransactions": {
+            "type": "object",
+            "properties": {
+                "conditions": {
+                    "description": "Custom conditions used for filtering the search results. Every field within the object is optional.",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/filter.TransactionFilter"
+                        }
+                    ]
+                },
+                "metadata": {
+                    "description": "Accepts a JSON object for embedding custom metadata, enabling arbitrary additional information to be associated with the resource",
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "string"
+                    },
+                    "example": {
+                        "key": "value",
+                        "key2": "value2"
+                    }
+                }
+            }
+        },
+        "admin.CountUtxos": {
+            "type": "object",
+            "properties": {
+                "conditions": {
+                    "description": "Custom conditions used for filtering the search results. Every field within the object is optional.",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/filter.AdminUtxoFilter"
+                        }
+                    ]
+                },
+                "metadata": {
+                    "description": "Accepts a JSON object for embedding custom metadata, enabling arbitrary additional information to be associated with the resource",
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "string"
+                    },
+                    "example": {
+                        "key": "value",
+                        "key2": "value2"
+                    }
+                }
+            }
+        },
+        "admin.CountXpubs": {
+            "type": "object",
+            "properties": {
+                "conditions": {
+                    "description": "Custom conditions used for filtering the search results. Every field within the object is optional.",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/filter.XpubFilter"
+                        }
+                    ]
+                },
+                "metadata": {
+                    "description": "Accepts a JSON object for embedding custom metadata, enabling arbitrary additional information to be associated with the resource",
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "string"
+                    },
+                    "example": {
+                        "key": "value",
+                        "key2": "value2"
                     }
                 }
             }
@@ -2280,6 +2398,265 @@ const docTemplate = `{
                     "description": "The transaction hex",
                     "type": "string",
                     "example": "0100000002..."
+                }
+            }
+        },
+        "admin.SearchAccessKeys": {
+            "type": "object",
+            "properties": {
+                "conditions": {
+                    "description": "Custom conditions used for filtering the search results. Every field within the object is optional.",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/filter.AdminAccessKeyFilter"
+                        }
+                    ]
+                },
+                "metadata": {
+                    "description": "Accepts a JSON object for embedding custom metadata, enabling arbitrary additional information to be associated with the resource",
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "string"
+                    },
+                    "example": {
+                        "key": "value",
+                        "key2": "value2"
+                    }
+                },
+                "params": {
+                    "description": "Pagination and sorting options to streamline data exploration and analysis",
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "string"
+                    },
+                    "example": {
+                        "order_by_direction": "desc",
+                        "order_by_field": "created_at",
+                        "page": "1",
+                        "page_size": "10"
+                    }
+                }
+            }
+        },
+        "admin.SearchContacts": {
+            "type": "object",
+            "properties": {
+                "conditions": {
+                    "description": "Custom conditions used for filtering the search results. Every field within the object is optional.",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/filter.ContactFilter"
+                        }
+                    ]
+                },
+                "metadata": {
+                    "description": "Accepts a JSON object for embedding custom metadata, enabling arbitrary additional information to be associated with the resource",
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "string"
+                    },
+                    "example": {
+                        "key": "value",
+                        "key2": "value2"
+                    }
+                },
+                "params": {
+                    "description": "Pagination and sorting options to streamline data exploration and analysis",
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "string"
+                    },
+                    "example": {
+                        "order_by_direction": "desc",
+                        "order_by_field": "created_at",
+                        "page": "1",
+                        "page_size": "10"
+                    }
+                }
+            }
+        },
+        "admin.SearchDestinations": {
+            "type": "object",
+            "properties": {
+                "conditions": {
+                    "description": "Custom conditions used for filtering the search results. Every field within the object is optional.",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/filter.DestinationFilter"
+                        }
+                    ]
+                },
+                "metadata": {
+                    "description": "Accepts a JSON object for embedding custom metadata, enabling arbitrary additional information to be associated with the resource",
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "string"
+                    },
+                    "example": {
+                        "key": "value",
+                        "key2": "value2"
+                    }
+                },
+                "params": {
+                    "description": "Pagination and sorting options to streamline data exploration and analysis",
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "string"
+                    },
+                    "example": {
+                        "order_by_direction": "desc",
+                        "order_by_field": "created_at",
+                        "page": "1",
+                        "page_size": "10"
+                    }
+                }
+            }
+        },
+        "admin.SearchPaymails": {
+            "type": "object",
+            "properties": {
+                "conditions": {
+                    "description": "Custom conditions used for filtering the search results. Every field within the object is optional.",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/filter.AdminPaymailFilter"
+                        }
+                    ]
+                },
+                "metadata": {
+                    "description": "Accepts a JSON object for embedding custom metadata, enabling arbitrary additional information to be associated with the resource",
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "string"
+                    },
+                    "example": {
+                        "key": "value",
+                        "key2": "value2"
+                    }
+                },
+                "params": {
+                    "description": "Pagination and sorting options to streamline data exploration and analysis",
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "string"
+                    },
+                    "example": {
+                        "order_by_direction": "desc",
+                        "order_by_field": "created_at",
+                        "page": "1",
+                        "page_size": "10"
+                    }
+                }
+            }
+        },
+        "admin.SearchTransactions": {
+            "type": "object",
+            "properties": {
+                "conditions": {
+                    "description": "Custom conditions used for filtering the search results. Every field within the object is optional.",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/filter.TransactionFilter"
+                        }
+                    ]
+                },
+                "metadata": {
+                    "description": "Accepts a JSON object for embedding custom metadata, enabling arbitrary additional information to be associated with the resource",
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "string"
+                    },
+                    "example": {
+                        "key": "value",
+                        "key2": "value2"
+                    }
+                },
+                "params": {
+                    "description": "Pagination and sorting options to streamline data exploration and analysis",
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "string"
+                    },
+                    "example": {
+                        "order_by_direction": "desc",
+                        "order_by_field": "created_at",
+                        "page": "1",
+                        "page_size": "10"
+                    }
+                }
+            }
+        },
+        "admin.SearchUtxos": {
+            "type": "object",
+            "properties": {
+                "conditions": {
+                    "description": "Custom conditions used for filtering the search results. Every field within the object is optional.",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/filter.AdminUtxoFilter"
+                        }
+                    ]
+                },
+                "metadata": {
+                    "description": "Accepts a JSON object for embedding custom metadata, enabling arbitrary additional information to be associated with the resource",
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "string"
+                    },
+                    "example": {
+                        "key": "value",
+                        "key2": "value2"
+                    }
+                },
+                "params": {
+                    "description": "Pagination and sorting options to streamline data exploration and analysis",
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "string"
+                    },
+                    "example": {
+                        "order_by_direction": "desc",
+                        "order_by_field": "created_at",
+                        "page": "1",
+                        "page_size": "10"
+                    }
+                }
+            }
+        },
+        "admin.SearchXpubs": {
+            "type": "object",
+            "properties": {
+                "conditions": {
+                    "description": "Custom conditions used for filtering the search results. Every field within the object is optional.",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/filter.XpubFilter"
+                        }
+                    ]
+                },
+                "metadata": {
+                    "description": "Accepts a JSON object for embedding custom metadata, enabling arbitrary additional information to be associated with the resource",
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "string"
+                    },
+                    "example": {
+                        "key": "value",
+                        "key2": "value2"
+                    }
+                },
+                "params": {
+                    "description": "Pagination and sorting options to streamline data exploration and analysis",
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "string"
+                    },
+                    "example": {
+                        "order_by_direction": "desc",
+                        "order_by_field": "created_at",
+                        "page": "1",
+                        "page_size": "10"
+                    }
                 }
             }
         },
@@ -2397,6 +2774,43 @@ const docTemplate = `{
                 "Rejected"
             ]
         },
+        "contacts.SearchContacts": {
+            "type": "object",
+            "properties": {
+                "conditions": {
+                    "description": "Custom conditions used for filtering the search results. Every field within the object is optional.",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/filter.ContactFilter"
+                        }
+                    ]
+                },
+                "metadata": {
+                    "description": "Accepts a JSON object for embedding custom metadata, enabling arbitrary additional information to be associated with the resource",
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "string"
+                    },
+                    "example": {
+                        "key": "value",
+                        "key2": "value2"
+                    }
+                },
+                "params": {
+                    "description": "Pagination and sorting options to streamline data exploration and analysis",
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "string"
+                    },
+                    "example": {
+                        "order_by_direction": "desc",
+                        "order_by_field": "created_at",
+                        "page": "1",
+                        "page_size": "10"
+                    }
+                }
+            }
+        },
         "contacts.UpsertContact": {
             "type": "object",
             "properties": {
@@ -2425,7 +2839,7 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "conditions": {
-                    "description": "Custom conditions used for filtering the search results",
+                    "description": "Custom conditions used for filtering the search results. Every field within the object is optional.",
                     "allOf": [
                         {
                             "$ref": "#/definitions/filter.DestinationFilter"
@@ -2465,7 +2879,7 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "conditions": {
-                    "description": "Custom conditions used for filtering the search results",
+                    "description": "Custom conditions used for filtering the search results. Every field within the object is optional.",
                     "allOf": [
                         {
                             "$ref": "#/definitions/filter.DestinationFilter"
@@ -2533,6 +2947,258 @@ const docTemplate = `{
             "type": "object",
             "additionalProperties": true
         },
+        "filter.AccessKeyFilter": {
+            "type": "object",
+            "properties": {
+                "createdRange": {
+                    "description": "CreatedRange specifies the time range when a record was created.",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/filter.TimeRange"
+                        }
+                    ]
+                },
+                "includeDeleted": {
+                    "description": "IncludeDeleted is a flag whether or not to include deleted items in the search results",
+                    "type": "boolean",
+                    "default": false,
+                    "example": true
+                },
+                "revokedRange": {
+                    "description": "RevokedRange specifies the time range when a record was revoked.",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/filter.TimeRange"
+                        }
+                    ]
+                },
+                "updatedRange": {
+                    "description": "UpdatedRange specifies the time range when a record was updated.",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/filter.TimeRange"
+                        }
+                    ]
+                }
+            }
+        },
+        "filter.AdminAccessKeyFilter": {
+            "type": "object",
+            "properties": {
+                "createdRange": {
+                    "description": "CreatedRange specifies the time range when a record was created.",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/filter.TimeRange"
+                        }
+                    ]
+                },
+                "includeDeleted": {
+                    "description": "IncludeDeleted is a flag whether or not to include deleted items in the search results",
+                    "type": "boolean",
+                    "default": false,
+                    "example": true
+                },
+                "revokedRange": {
+                    "description": "RevokedRange specifies the time range when a record was revoked.",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/filter.TimeRange"
+                        }
+                    ]
+                },
+                "updatedRange": {
+                    "description": "UpdatedRange specifies the time range when a record was updated.",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/filter.TimeRange"
+                        }
+                    ]
+                },
+                "xpubId": {
+                    "type": "string"
+                }
+            }
+        },
+        "filter.AdminPaymailFilter": {
+            "type": "object",
+            "properties": {
+                "alias": {
+                    "type": "string",
+                    "example": "alice"
+                },
+                "createdRange": {
+                    "description": "CreatedRange specifies the time range when a record was created.",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/filter.TimeRange"
+                        }
+                    ]
+                },
+                "domain": {
+                    "type": "string",
+                    "example": "example.com"
+                },
+                "id": {
+                    "type": "string",
+                    "example": "ffb86c103d17d87c15aaf080aab6be5415c9fa885309a79b04c9910e39f2b542"
+                },
+                "includeDeleted": {
+                    "description": "IncludeDeleted is a flag whether or not to include deleted items in the search results",
+                    "type": "boolean",
+                    "default": false,
+                    "example": true
+                },
+                "publicName": {
+                    "type": "string",
+                    "example": "Alice"
+                },
+                "updatedRange": {
+                    "description": "UpdatedRange specifies the time range when a record was updated.",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/filter.TimeRange"
+                        }
+                    ]
+                },
+                "xpubId": {
+                    "type": "string",
+                    "example": "79f90a6bab0a44402fc64828af820e9465645658aea2d138c5205b88e6dabd00"
+                }
+            }
+        },
+        "filter.AdminUtxoFilter": {
+            "type": "object",
+            "properties": {
+                "createdRange": {
+                    "description": "CreatedRange specifies the time range when a record was created.",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/filter.TimeRange"
+                        }
+                    ]
+                },
+                "draftId": {
+                    "type": "string",
+                    "example": "89419d4c7c50810bfe5ff9df9ad5074b749959423782dc91a30f1058b9ad7ef7"
+                },
+                "id": {
+                    "type": "string",
+                    "example": "fe4cbfee0258aa589cbc79963f7c204061fd67d987e32ee5049aa90ce14658ee"
+                },
+                "includeDeleted": {
+                    "description": "IncludeDeleted is a flag whether or not to include deleted items in the search results",
+                    "type": "boolean",
+                    "default": false,
+                    "example": true
+                },
+                "outputIndex": {
+                    "type": "integer",
+                    "example": 0
+                },
+                "reservedRange": {
+                    "description": "ReservedRange specifies the time range when a UTXO was reserved.",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/filter.TimeRange"
+                        }
+                    ]
+                },
+                "satoshis": {
+                    "type": "integer",
+                    "example": 1
+                },
+                "scriptPubKey": {
+                    "type": "string",
+                    "example": "76a914a5f271385e75f57bcd9092592dede812f8c466d088ac"
+                },
+                "spendingTxId": {
+                    "type": "string",
+                    "example": "11a7746489a70e9c0170601c2be65558455317a984194eb2791b637f59f8cd6e"
+                },
+                "transactionId": {
+                    "type": "string",
+                    "example": "5e17858ea0ca4155827754ba82bdcfcce108d5bb5b47fbb3aa54bd14540683c6"
+                },
+                "type": {
+                    "type": "string",
+                    "enum": [
+                        "pubkey",
+                        "pubkeyhash",
+                        "nulldata",
+                        "multisig",
+                        "nonstandard",
+                        "scripthash",
+                        "metanet",
+                        "token_stas",
+                        "token_sensible"
+                    ]
+                },
+                "updatedRange": {
+                    "description": "UpdatedRange specifies the time range when a record was updated.",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/filter.TimeRange"
+                        }
+                    ]
+                },
+                "xpubId": {
+                    "type": "string"
+                }
+            }
+        },
+        "filter.ContactFilter": {
+            "type": "object",
+            "properties": {
+                "createdRange": {
+                    "description": "CreatedRange specifies the time range when a record was created.",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/filter.TimeRange"
+                        }
+                    ]
+                },
+                "fullName": {
+                    "type": "string",
+                    "example": "Alice"
+                },
+                "id": {
+                    "type": "string",
+                    "example": "ffdbe74e-0700-4710-aac5-611a1f877c7f"
+                },
+                "includeDeleted": {
+                    "description": "IncludeDeleted is a flag whether or not to include deleted items in the search results",
+                    "type": "boolean",
+                    "default": false,
+                    "example": true
+                },
+                "paymail": {
+                    "type": "string",
+                    "example": "alice@example.com"
+                },
+                "pubKey": {
+                    "type": "string",
+                    "example": "0334f01ecb971e93db179e6fb320cd1466beb0c1ec6c1c6a37aa6cb02e53d5dd1a"
+                },
+                "status": {
+                    "type": "string",
+                    "enum": [
+                        "unconfirmed",
+                        "awaiting",
+                        "confirmed",
+                        "rejected"
+                    ]
+                },
+                "updatedRange": {
+                    "description": "UpdatedRange specifies the time range when a record was updated.",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/filter.TimeRange"
+                        }
+                    ]
+                }
+            }
+        },
         "filter.DestinationFilter": {
             "type": "object",
             "properties": {
@@ -2541,27 +3207,49 @@ const docTemplate = `{
                     "example": "1CDUf7CKu8ocTTkhcYUbq75t14Ft168K65"
                 },
                 "createdRange": {
-                    "type": "object",
-                    "additionalProperties": {
-                        "type": "string"
-                    }
+                    "description": "CreatedRange specifies the time range when a record was created.",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/filter.TimeRange"
+                        }
+                    ]
                 },
                 "draftId": {
                     "type": "string",
                     "example": "b356f7fa00cd3f20cce6c21d704cd13e871d28d714a5ebd0532f5a0e0cde63f7"
                 },
                 "includeDeleted": {
-                    "type": "boolean"
+                    "description": "IncludeDeleted is a flag whether or not to include deleted items in the search results",
+                    "type": "boolean",
+                    "default": false,
+                    "example": true
                 },
                 "lockingScript": {
                     "type": "string",
                     "example": "76a9147b05764a97f3b4b981471492aa703b188e45979b88ac"
                 },
                 "updatedRange": {
-                    "type": "object",
-                    "additionalProperties": {
-                        "type": "string"
-                    }
+                    "description": "UpdatedRange specifies the time range when a record was updated.",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/filter.TimeRange"
+                        }
+                    ]
+                }
+            }
+        },
+        "filter.TimeRange": {
+            "type": "object",
+            "properties": {
+                "from": {
+                    "description": "From specifies the start time of the range. It's optional and can be nil.",
+                    "type": "string",
+                    "example": "2024-02-26T11:01:28Z"
+                },
+                "to": {
+                    "description": "To specifies the end time of the range. It's optional and can be nil.",
+                    "type": "string",
+                    "example": "2024-02-26T11:01:28Z"
                 }
             }
         },
@@ -2577,10 +3265,12 @@ const docTemplate = `{
                     "example": 839376
                 },
                 "createdRange": {
-                    "type": "object",
-                    "additionalProperties": {
-                        "type": "string"
-                    }
+                    "description": "CreatedRange specifies the time range when a record was created.",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/filter.TimeRange"
+                        }
+                    ]
                 },
                 "draftId": {
                     "type": "string",
@@ -2594,7 +3284,10 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "includeDeleted": {
-                    "type": "boolean"
+                    "description": "IncludeDeleted is a flag whether or not to include deleted items in the search results",
+                    "type": "boolean",
+                    "default": false,
+                    "example": true
                 },
                 "numberOfInputs": {
                     "type": "integer",
@@ -2627,10 +3320,124 @@ const docTemplate = `{
                     "example": 100000000
                 },
                 "updatedRange": {
-                    "type": "object",
-                    "additionalProperties": {
-                        "type": "string"
-                    }
+                    "description": "UpdatedRange specifies the time range when a record was updated.",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/filter.TimeRange"
+                        }
+                    ]
+                }
+            }
+        },
+        "filter.UtxoFilter": {
+            "type": "object",
+            "properties": {
+                "createdRange": {
+                    "description": "CreatedRange specifies the time range when a record was created.",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/filter.TimeRange"
+                        }
+                    ]
+                },
+                "draftId": {
+                    "type": "string",
+                    "example": "89419d4c7c50810bfe5ff9df9ad5074b749959423782dc91a30f1058b9ad7ef7"
+                },
+                "id": {
+                    "type": "string",
+                    "example": "fe4cbfee0258aa589cbc79963f7c204061fd67d987e32ee5049aa90ce14658ee"
+                },
+                "includeDeleted": {
+                    "description": "IncludeDeleted is a flag whether or not to include deleted items in the search results",
+                    "type": "boolean",
+                    "default": false,
+                    "example": true
+                },
+                "outputIndex": {
+                    "type": "integer",
+                    "example": 0
+                },
+                "reservedRange": {
+                    "description": "ReservedRange specifies the time range when a UTXO was reserved.",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/filter.TimeRange"
+                        }
+                    ]
+                },
+                "satoshis": {
+                    "type": "integer",
+                    "example": 1
+                },
+                "scriptPubKey": {
+                    "type": "string",
+                    "example": "76a914a5f271385e75f57bcd9092592dede812f8c466d088ac"
+                },
+                "spendingTxId": {
+                    "type": "string",
+                    "example": "11a7746489a70e9c0170601c2be65558455317a984194eb2791b637f59f8cd6e"
+                },
+                "transactionId": {
+                    "type": "string",
+                    "example": "5e17858ea0ca4155827754ba82bdcfcce108d5bb5b47fbb3aa54bd14540683c6"
+                },
+                "type": {
+                    "type": "string",
+                    "enum": [
+                        "pubkey",
+                        "pubkeyhash",
+                        "nulldata",
+                        "multisig",
+                        "nonstandard",
+                        "scripthash",
+                        "metanet",
+                        "token_stas",
+                        "token_sensible"
+                    ]
+                },
+                "updatedRange": {
+                    "description": "UpdatedRange specifies the time range when a record was updated.",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/filter.TimeRange"
+                        }
+                    ]
+                }
+            }
+        },
+        "filter.XpubFilter": {
+            "type": "object",
+            "properties": {
+                "createdRange": {
+                    "description": "CreatedRange specifies the time range when a record was created.",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/filter.TimeRange"
+                        }
+                    ]
+                },
+                "currentBalance": {
+                    "type": "integer",
+                    "example": 1000
+                },
+                "id": {
+                    "type": "string",
+                    "example": "00b953624f78004a4c727cd28557475d5233c15f17aef545106639f4d71b712d"
+                },
+                "includeDeleted": {
+                    "description": "IncludeDeleted is a flag whether or not to include deleted items in the search results",
+                    "type": "boolean",
+                    "default": false,
+                    "example": true
+                },
+                "updatedRange": {
+                    "description": "UpdatedRange specifies the time range when a record was updated.",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/filter.TimeRange"
+                        }
+                    ]
                 }
             }
         },
@@ -3703,6 +4510,24 @@ const docTemplate = `{
                 1000000000,
                 60000000000,
                 3600000000000,
+                -9223372036854775808,
+                9223372036854775807,
+                1,
+                1000,
+                1000000,
+                1000000000,
+                60000000000,
+                3600000000000,
+                -9223372036854775808,
+                9223372036854775807,
+                1,
+                1000,
+                1000000,
+                1000000000,
+                60000000000,
+                3600000000000,
+                -9223372036854775808,
+                9223372036854775807,
                 1,
                 1000,
                 1000000,
@@ -3719,6 +4544,24 @@ const docTemplate = `{
                 "Second",
                 "Minute",
                 "Hour",
+                "minDuration",
+                "maxDuration",
+                "Nanosecond",
+                "Microsecond",
+                "Millisecond",
+                "Second",
+                "Minute",
+                "Hour",
+                "minDuration",
+                "maxDuration",
+                "Nanosecond",
+                "Microsecond",
+                "Millisecond",
+                "Second",
+                "Minute",
+                "Hour",
+                "minDuration",
+                "maxDuration",
                 "Nanosecond",
                 "Microsecond",
                 "Millisecond",
@@ -3731,7 +4574,7 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "conditions": {
-                    "description": "Custom conditions used for filtering the search results",
+                    "description": "Custom conditions used for filtering the search results. Every field within the object is optional.",
                     "allOf": [
                         {
                             "$ref": "#/definitions/filter.TransactionFilter"
@@ -3805,7 +4648,7 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "conditions": {
-                    "description": "Custom conditions used for filtering the search results",
+                    "description": "Custom conditions used for filtering the search results. Every field within the object is optional.",
                     "allOf": [
                         {
                             "$ref": "#/definitions/filter.TransactionFilter"
@@ -3855,6 +4698,67 @@ const docTemplate = `{
                     "example": {
                         "key": "value",
                         "key2": "value2"
+                    }
+                }
+            }
+        },
+        "utxos.CountUtxos": {
+            "type": "object",
+            "properties": {
+                "conditions": {
+                    "description": "Custom conditions used for filtering the search results. Every field within the object is optional.",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/filter.UtxoFilter"
+                        }
+                    ]
+                },
+                "metadata": {
+                    "description": "Accepts a JSON object for embedding custom metadata, enabling arbitrary additional information to be associated with the resource",
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "string"
+                    },
+                    "example": {
+                        "key": "value",
+                        "key2": "value2"
+                    }
+                }
+            }
+        },
+        "utxos.SearchUtxos": {
+            "type": "object",
+            "properties": {
+                "conditions": {
+                    "description": "Custom conditions used for filtering the search results. Every field within the object is optional.",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/filter.UtxoFilter"
+                        }
+                    ]
+                },
+                "metadata": {
+                    "description": "Accepts a JSON object for embedding custom metadata, enabling arbitrary additional information to be associated with the resource",
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "string"
+                    },
+                    "example": {
+                        "key": "value",
+                        "key2": "value2"
+                    }
+                },
+                "params": {
+                    "description": "Pagination and sorting options to streamline data exploration and analysis",
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "string"
+                    },
+                    "example": {
+                        "order_by_direction": "desc",
+                        "order_by_field": "created_at",
+                        "page": "1",
+                        "page_size": "10"
                     }
                 }
             }
