@@ -51,6 +51,38 @@ func (a *Action) contactsSearch(c *gin.Context) {
 	c.JSON(http.StatusOK, contracts)
 }
 
+// count will fetch a count of contacts filtered on conditions and metadata
+// Count of contacts godoc
+// @Summary		Count of contacts
+// @Description	Count of contacts
+// @Tags		Admin
+// @Produce		json
+// @Param		CountContacts body CountContacts false "Enables precise filtering of resource counts using custom conditions or metadata, catering to specific business or analysis needs"
+// @Success		200	{number} int64 "Count of contacts"
+// @Failure		400	"Bad request - Error while parsing CountContacts from request body"
+// @Failure 	500	"Internal Server Error - Error while fetching count of contacts"
+// @Router		/v1/contact/count [post]
+// @Security	x-auth-xpub
+func (a *Action) contactsCount(c *gin.Context) {
+	var reqParams CountContacts
+	if err := c.Bind(&reqParams); err != nil {
+		c.JSON(http.StatusBadRequest, err.Error())
+		return
+	}
+
+	count, err := a.Services.SpvWalletEngine.GetContactsCount(
+		c.Request.Context(),
+		reqParams.Metadata,
+		reqParams.Conditions.ToDbConditions(),
+	)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	c.JSON(http.StatusOK, count)
+}
+
 // contactsUpdate will update contact with the given id
 // Update contact FullName or Metadata godoc
 // @Summary		Update contact FullName or Metadata
@@ -176,6 +208,39 @@ func (a *Action) contactsAccept(c *gin.Context) {
 		c.Request.Context(),
 		id,
 		engine.ContactNotConfirmed,
+	)
+	if err != nil {
+		handleErrors(err, c)
+		return
+	}
+
+	contract := mappings.MapToContactContract(contact)
+
+	c.JSON(http.StatusOK, contract)
+}
+
+// contactsConfirm will perform Confirm action on contact with the given id
+// Perform confirm action on contact godoc
+// @Summary		Confirm contact
+// @Description Confirm contact
+// @Tags		Admin
+// @Produce		json
+// @Param		id path string false "Contact id"
+// @Success		200 {object} models.Contact "Changed contact"
+// @Failure		400	"Bad request - Error while getting id from path"
+// @Failure		404	"Not found - Error while getting contact by id"
+// @Failure		422	"Unprocessable entity - Incorrect status of contact"
+// @Failure 	500	"Internal server error - Error while updating contact"
+// @Failure 	500	"Internal server error - Error while changing contact status"
+// @Router		/v1/admin/contact/accepted/{id} [patch]
+// @Security	x-auth-xpub
+func (a *Action) contactsConfirm(c *gin.Context) {
+	id := c.Param("id")
+
+	contact, err := a.Services.SpvWalletEngine.AdminChangeContactStatus(
+		c.Request.Context(),
+		id,
+		engine.ContactConfirmed,
 	)
 	if err != nil {
 		handleErrors(err, c)
