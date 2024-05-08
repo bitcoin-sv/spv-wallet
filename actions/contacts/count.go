@@ -1,9 +1,10 @@
 package contacts
 
 import (
+	"net/http"
+
 	"github.com/bitcoin-sv/spv-wallet/server/auth"
 	"github.com/gin-gonic/gin"
-	"net/http"
 )
 
 // count will fetch a count of contacts filtered on conditions and metadata
