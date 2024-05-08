@@ -82,11 +82,11 @@ func getContactByID(ctx context.Context, id string, opts ...ModelOps) (*Contact,
 
 // getContactsByXPubIDCount will get a count of all the contacts
 func getContactsByXPubIDCount(ctx context.Context, xPubID string, metadata *Metadata,
-	conditions *map[string]interface{}, opts ...ModelOps,
+	conditions map[string]interface{}, opts ...ModelOps,
 ) (int64, error) {
 	dbConditions := map[string]interface{}{}
 	if conditions != nil {
-		dbConditions = *conditions
+		dbConditions = conditions
 	}
 	dbConditions[xPubIDField] = xPubID
 

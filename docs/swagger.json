@@ -339,14 +339,14 @@
                         "x-auth-xpub": []
                     }
                 ],
-                "description": "Accept contact",
+                "description": "Confirm contact",
                 "produces": [
                     "application/json"
                 ],
                 "tags": [
                     "Admin"
                 ],
-                "summary": "Accept contact",
+                "summary": "Confirm contact",
                 "parameters": [
                     {
                         "type": "string",
@@ -462,45 +462,6 @@
                     },
                     "500": {
                         "description": "Internal server error - Error while searching for contacts"
-                    }
-                }
-            }
-        },
-        "/v1/admin/contact/unconfirmed/{id}": {
-            "patch": {
-                "security": [
-                    {
-                        "x-auth-xpub": []
-                    }
-                ],
-                "description": "Change contact status to unconfirmed",
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Admin"
-                ],
-                "summary": "Change contact status to unconfirmed",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Contact id",
-                        "name": "id",
-                        "in": "path"
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "Changed contact",
-                        "schema": {
-                            "$ref": "#/definitions/models.Contact"
-                        }
-                    },
-                    "400": {
-                        "description": "Bad request - Error while getting id from path"
-                    },
-                    "500": {
-                        "description": "Internal server error - Error while changing contact status"
                     }
                 }
             }
@@ -1340,6 +1301,47 @@
                     },
                     "500": {
                         "description": "Internal server error"
+                    }
+                }
+            }
+        },
+        "/v1/contact/count": {
+            "post": {
+                "security": [
+                    {
+                        "x-auth-xpub": []
+                    }
+                ],
+                "description": "Count of contacts",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Contacts"
+                ],
+                "summary": "Count of contacts",
+                "parameters": [
+                    {
+                        "description": "Enables filtering of elements to be counted",
+                        "name": "CountContacts",
+                        "in": "body",
+                        "schema": {
+                            "$ref": "#/definitions/contacts.CountContacts"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Count of contacts",
+                        "schema": {
+                            "type": "number"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request - Error while parsing CountRequestParameters from request body"
+                    },
+                    "500": {
+                        "description": "Internal Server Error - Error while fetching count of contacts"
                     }
                 }
             }
@@ -2274,6 +2276,30 @@
                 }
             }
         },
+        "admin.CountContacts": {
+            "type": "object",
+            "properties": {
+                "conditions": {
+                    "description": "Custom conditions used for filtering the search results. Every field within the object is optional.",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/filter.ContactFilter"
+                        }
+                    ]
+                },
+                "metadata": {
+                    "description": "Accepts a JSON object for embedding custom metadata, enabling arbitrary additional information to be associated with the resource",
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "string"
+                    },
+                    "example": {
+                        "key": "value",
+                        "key2": "value2"
+                    }
+                }
+            }
+        },
         "admin.CountDestinations": {
             "type": "object",
             "properties": {
@@ -2843,6 +2869,30 @@
                 "Confirmed",
                 "Rejected"
             ]
+        },
+        "contacts.CountContacts": {
+            "type": "object",
+            "properties": {
+                "conditions": {
+                    "description": "Custom conditions used for filtering the search results. Every field within the object is optional.",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/filter.ContactFilter"
+                        }
+                    ]
+                },
+                "metadata": {
+                    "description": "Accepts a JSON object for embedding custom metadata, enabling arbitrary additional information to be associated with the resource",
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "string"
+                    },
+                    "example": {
+                        "key": "value",
+                        "key2": "value2"
+                    }
+                }
+            }
         },
         "contacts.SearchContacts": {
             "type": "object",
@@ -4580,22 +4630,14 @@
                 1000000000,
                 60000000000,
                 3600000000000,
+                -9223372036854775808,
+                9223372036854775807,
                 1,
                 1000,
                 1000000,
                 1000000000,
                 60000000000,
-                1,
-                1000,
-                1000000,
-                1000000000,
-                60000000000,
-                3600000000000,
-                1,
-                1000,
-                1000000,
-                1000000000,
-                60000000000
+                3600000000000
             ],
             "x-enum-varnames": [
                 "minDuration",
@@ -4606,22 +4648,14 @@
                 "Second",
                 "Minute",
                 "Hour",
+                "minDuration",
+                "maxDuration",
                 "Nanosecond",
                 "Microsecond",
                 "Millisecond",
                 "Second",
                 "Minute",
-                "Nanosecond",
-                "Microsecond",
-                "Millisecond",
-                "Second",
-                "Minute",
-                "Hour",
-                "Nanosecond",
-                "Microsecond",
-                "Millisecond",
-                "Second",
-                "Minute"
+                "Hour"
             ]
         },
         "transactions.CountTransactions": {

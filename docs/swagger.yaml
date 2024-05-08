@@ -73,6 +73,23 @@ definitions:
           key2: value2
         type: object
     type: object
+  admin.CountContacts:
+    properties:
+      conditions:
+        allOf:
+        - $ref: '#/definitions/filter.ContactFilter'
+        description: Custom conditions used for filtering the search results. Every
+          field within the object is optional.
+      metadata:
+        additionalProperties:
+          type: string
+        description: Accepts a JSON object for embedding custom metadata, enabling
+          arbitrary additional information to be associated with the resource
+        example:
+          key: value
+          key2: value2
+        type: object
+    type: object
   admin.CountDestinations:
     properties:
       conditions:
@@ -507,6 +524,23 @@ definitions:
     - SeenInOrphanMempool
     - Confirmed
     - Rejected
+  contacts.CountContacts:
+    properties:
+      conditions:
+        allOf:
+        - $ref: '#/definitions/filter.ContactFilter'
+        description: Custom conditions used for filtering the search results. Every
+          field within the object is optional.
+      metadata:
+        additionalProperties:
+          type: string
+        description: Accepts a JSON object for embedding custom metadata, enabling
+          arbitrary additional information to be associated with the resource
+        example:
+          key: value
+          key2: value2
+        type: object
+    type: object
   contacts.SearchContacts:
     properties:
       conditions:
@@ -1782,22 +1816,14 @@ definitions:
     - 1000000000
     - 60000000000
     - 3600000000000
-    - 1
-    - 1000
-    - 1000000
-    - 1000000000
-    - 60000000000
+    - -9223372036854775808
+    - 9223372036854775807
     - 1
     - 1000
     - 1000000
     - 1000000000
     - 60000000000
     - 3600000000000
-    - 1
-    - 1000
-    - 1000000
-    - 1000000000
-    - 60000000000
     type: integer
     x-enum-varnames:
     - minDuration
@@ -1808,22 +1834,14 @@ definitions:
     - Second
     - Minute
     - Hour
-    - Nanosecond
-    - Microsecond
-    - Millisecond
-    - Second
-    - Minute
+    - minDuration
+    - maxDuration
     - Nanosecond
     - Microsecond
     - Millisecond
     - Second
     - Minute
     - Hour
-    - Nanosecond
-    - Microsecond
-    - Millisecond
-    - Second
-    - Minute
   transactions.CountTransactions:
     properties:
       conditions:
@@ -2246,7 +2264,7 @@ paths:
       - Admin
   /v1/admin/contact/accepted/{id}:
     patch:
-      description: Accept contact
+      description: Confirm contact
       parameters:
       - description: Contact id
         in: path
@@ -2269,7 +2287,7 @@ paths:
           description: Internal server error - Error while changing contact status
       security:
       - x-auth-xpub: []
-      summary: Accept contact
+      summary: Confirm contact
       tags:
       - Admin
   /v1/admin/contact/rejected/{id}:
@@ -2328,30 +2346,6 @@ paths:
       security:
       - x-auth-xpub: []
       summary: Search for contacts
-      tags:
-      - Admin
-  /v1/admin/contact/unconfirmed/{id}:
-    patch:
-      description: Change contact status to unconfirmed
-      parameters:
-      - description: Contact id
-        in: path
-        name: id
-        type: string
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: Changed contact
-          schema:
-            $ref: '#/definitions/models.Contact'
-        "400":
-          description: Bad request - Error while getting id from path
-        "500":
-          description: Internal server error - Error while changing contact status
-      security:
-      - x-auth-xpub: []
-      summary: Change contact status to unconfirmed
       tags:
       - Admin
   /v1/admin/destinations/search:
@@ -2864,6 +2858,32 @@ paths:
       summary: Confirm contact
       tags:
       - Contact
+  /v1/contact/count:
+    post:
+      description: Count of contacts
+      parameters:
+      - description: Enables filtering of elements to be counted
+        in: body
+        name: CountContacts
+        schema:
+          $ref: '#/definitions/contacts.CountContacts'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Count of contacts
+          schema:
+            type: number
+        "400":
+          description: Bad request - Error while parsing CountRequestParameters from
+            request body
+        "500":
+          description: Internal Server Error - Error while fetching count of contacts
+      security:
+      - x-auth-xpub: []
+      summary: Count of contacts
+      tags:
+      - Contacts
   /v1/contact/rejected/{paymail}:
     patch:
       description: Reject contact. For contact with status "awaiting" delete contact
