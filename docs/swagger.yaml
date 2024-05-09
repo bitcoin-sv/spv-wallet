@@ -1816,14 +1816,15 @@ definitions:
     - 1000000000
     - 60000000000
     - 3600000000000
-    - -9223372036854775808
-    - 9223372036854775807
+    - 1
+    - 1000
+    - 1000000
+    - 1000000000
     - 1
     - 1000
     - 1000000
     - 1000000000
     - 60000000000
-    - 3600000000000
     type: integer
     x-enum-varnames:
     - minDuration
@@ -1834,14 +1835,15 @@ definitions:
     - Second
     - Minute
     - Hour
-    - minDuration
-    - maxDuration
+    - Nanosecond
+    - Microsecond
+    - Millisecond
+    - Second
     - Nanosecond
     - Microsecond
     - Millisecond
     - Second
     - Minute
-    - Hour
   transactions.CountTransactions:
     properties:
       conditions:
@@ -2263,6 +2265,34 @@ paths:
       tags:
       - Admin
   /v1/admin/contact/accepted/{id}:
+    patch:
+      description: Accept contact
+      parameters:
+      - description: Contact id
+        in: path
+        name: id
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Changed contact
+          schema:
+            $ref: '#/definitions/models.Contact'
+        "400":
+          description: Bad request - Error while getting id from path
+        "404":
+          description: Not found - Error while getting contact by id
+        "422":
+          description: Unprocessable entity - Incorrect status of contact
+        "500":
+          description: Internal server error - Error while changing contact status
+      security:
+      - x-auth-xpub: []
+      summary: Accept contact
+      tags:
+      - Admin
+  /v1/admin/contact/confirmed/{id}:
     patch:
       description: Confirm contact
       parameters:

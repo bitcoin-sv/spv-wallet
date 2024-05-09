@@ -232,7 +232,7 @@ func (a *Action) contactsAccept(c *gin.Context) {
 // @Failure		422	"Unprocessable entity - Incorrect status of contact"
 // @Failure 	500	"Internal server error - Error while updating contact"
 // @Failure 	500	"Internal server error - Error while changing contact status"
-// @Router		/v1/admin/contact/accepted/{id} [patch]
+// @Router		/v1/admin/contact/confirmed/{id} [patch]
 // @Security	x-auth-xpub
 func (a *Action) contactsConfirm(c *gin.Context) {
 	id := c.Param("id")
