@@ -3,7 +3,6 @@ package utxos
 import (
 	"net/http"
 
-	"github.com/bitcoin-sv/spv-wallet/actions"
 	"github.com/bitcoin-sv/spv-wallet/server/auth"
 	"github.com/gin-gonic/gin"
 )
@@ -14,16 +13,22 @@ import (
 // @Description	Count of UTXOs
 // @Tags		UTXO
 // @Produce		json
-// @Param		CountRequestParameters body actions.CountRequestParameters false "Enables precise filtering of resource counts using custom conditions or metadata, catering to specific business or analysis needs"
+// @Param		CountUtxos body CountUtxos false "Enables filtering of elements to be counted"
 // @Success		200	{number} int64 "Count of utxos"
-// @Failure		400	"Bad request - Error while parsing CountRequestParameters from request body"
+// @Failure		400	"Bad request - Error while parsing CountUtxos from request body"
 // @Failure 	500	"Internal Server Error - Error while fetching count of utxos"
 // @Router		/v1/utxo/count [post]
 // @Security	x-auth-xpub
 func (a *Action) count(c *gin.Context) {
 	reqXPubID := c.GetString(auth.ParamXPubHashKey)
 
-	metadata, conditions, err := actions.GetCountQueryParameters(c)
+	var reqParams CountUtxos
+	if err := c.Bind(&reqParams); err != nil {
+		c.JSON(http.StatusBadRequest, err.Error())
+		return
+	}
+
+	conditions, err := reqParams.Conditions.ToDbConditions()
 	if err != nil {
 		c.JSON(http.StatusBadRequest, err.Error())
 		return
@@ -31,7 +36,7 @@ func (a *Action) count(c *gin.Context) {
 
 	dbConditions := map[string]interface{}{}
 	if conditions != nil {
-		dbConditions = *conditions
+		dbConditions = conditions
 	}
 
 	dbConditions["xpub_id"] = reqXPubID
@@ -39,8 +44,8 @@ func (a *Action) count(c *gin.Context) {
 	var count int64
 	if count, err = a.Services.SpvWalletEngine.GetUtxosCount(
 		c.Request.Context(),
-		metadata,
-		&dbConditions,
+		reqParams.Metadata,
+		dbConditions,
 	); err != nil {
 		c.JSON(http.StatusInternalServerError, err.Error())
 		return

@@ -19,14 +19,14 @@ import (
 // AccessKeyService is the access key actions
 type AccessKeyService interface {
 	GetAccessKey(ctx context.Context, xPubID, pubAccessKey string) (*AccessKey, error)
-	GetAccessKeys(ctx context.Context, metadata *Metadata, conditions *map[string]interface{},
+	GetAccessKeys(ctx context.Context, metadata *Metadata, conditions map[string]interface{},
 		queryParams *datastore.QueryParams, opts ...ModelOps) ([]*AccessKey, error)
 	GetAccessKeysCount(ctx context.Context, metadata *Metadata,
-		conditions *map[string]interface{}, opts ...ModelOps) (int64, error)
-	GetAccessKeysByXPubID(ctx context.Context, xPubID string, metadata *Metadata, conditions *map[string]interface{},
+		conditions map[string]interface{}, opts ...ModelOps) (int64, error)
+	GetAccessKeysByXPubID(ctx context.Context, xPubID string, metadata *Metadata, conditions map[string]interface{},
 		queryParams *datastore.QueryParams, opts ...ModelOps) ([]*AccessKey, error)
 	GetAccessKeysByXPubIDCount(ctx context.Context, xPubID string, metadata *Metadata,
-		conditions *map[string]interface{}, opts ...ModelOps) (int64, error)
+		conditions map[string]interface{}, opts ...ModelOps) (int64, error)
 	NewAccessKey(ctx context.Context, rawXpubKey string, opts ...ModelOps) (*AccessKey, error)
 	RevokeAccessKey(ctx context.Context, rawXpubKey, id string, opts ...ModelOps) (*AccessKey, error)
 }
@@ -34,14 +34,14 @@ type AccessKeyService interface {
 // AdminService is the SPV Wallet Engine admin service interface comprised of all services available for admins
 type AdminService interface {
 	GetStats(ctx context.Context, opts ...ModelOps) (*AdminStats, error)
-	GetPaymailAddresses(ctx context.Context, metadataConditions *Metadata, conditions *map[string]interface{},
+	GetPaymailAddresses(ctx context.Context, metadataConditions *Metadata, conditions map[string]interface{},
 		queryParams *datastore.QueryParams, opts ...ModelOps) ([]*PaymailAddress, error)
 	GetPaymailAddressesCount(ctx context.Context, metadataConditions *Metadata,
-		conditions *map[string]interface{}, opts ...ModelOps) (int64, error)
+		conditions map[string]interface{}, opts ...ModelOps) (int64, error)
 	GetXPubs(ctx context.Context, metadataConditions *Metadata,
-		conditions *map[string]interface{}, queryParams *datastore.QueryParams, opts ...ModelOps) ([]*Xpub, error)
+		conditions map[string]interface{}, queryParams *datastore.QueryParams, opts ...ModelOps) ([]*Xpub, error)
 	GetXPubsCount(ctx context.Context, metadataConditions *Metadata,
-		conditions *map[string]interface{}, opts ...ModelOps) (int64, error)
+		conditions map[string]interface{}, opts ...ModelOps) (int64, error)
 }
 
 // ClientService is the client related services
@@ -79,10 +79,10 @@ type DestinationService interface {
 	GetDestinationByID(ctx context.Context, xPubID, id string) (*Destination, error)
 	GetDestinationByAddress(ctx context.Context, xPubID, address string) (*Destination, error)
 	GetDestinationByLockingScript(ctx context.Context, xPubID, lockingScript string) (*Destination, error)
-	GetDestinations(ctx context.Context, metadata *Metadata, conditions *map[string]interface{},
+	GetDestinations(ctx context.Context, metadata *Metadata, conditions map[string]interface{},
 		queryParams *datastore.QueryParams, opts ...ModelOps) ([]*Destination, error)
 	GetDestinationsCount(ctx context.Context, metadata *Metadata,
-		conditions *map[string]interface{}, opts ...ModelOps) (int64, error)
+		conditions map[string]interface{}, opts ...ModelOps) (int64, error)
 	GetDestinationsByXpubID(ctx context.Context, xPubID string, usingMetadata *Metadata, conditions map[string]interface{},
 		queryParams *datastore.QueryParams) ([]*Destination, error)
 	GetDestinationsByXpubIDCount(ctx context.Context, xPubID string, usingMetadata *Metadata,
@@ -100,10 +100,10 @@ type DestinationService interface {
 
 // DraftTransactionService is the draft transactions actions
 type DraftTransactionService interface {
-	GetDraftTransactions(ctx context.Context, metadata *Metadata, conditions *map[string]interface{},
+	GetDraftTransactions(ctx context.Context, metadata *Metadata, conditions map[string]interface{},
 		queryParams *datastore.QueryParams, opts ...ModelOps) ([]*DraftTransaction, error)
 	GetDraftTransactionsCount(ctx context.Context, metadata *Metadata,
-		conditions *map[string]interface{}, opts ...ModelOps) (int64, error)
+		conditions map[string]interface{}, opts ...ModelOps) (int64, error)
 }
 
 // HTTPInterface is the HTTP client interface
@@ -124,7 +124,7 @@ type PaymailService interface {
 	GetPaymailConfig() *PaymailServerOptions
 	GetPaymailAddress(ctx context.Context, address string, opts ...ModelOps) (*PaymailAddress, error)
 	GetPaymailAddressesByXPubID(ctx context.Context, xPubID string, metadataConditions *Metadata,
-		conditions *map[string]interface{}, queryParams *datastore.QueryParams) ([]*PaymailAddress, error)
+		conditions map[string]interface{}, queryParams *datastore.QueryParams) ([]*PaymailAddress, error)
 	NewPaymailAddress(ctx context.Context, key, address, publicName,
 		avatar string, opts ...ModelOps) (*PaymailAddress, error)
 	UpdatePaymailAddress(ctx context.Context, address, publicName,
@@ -138,10 +138,10 @@ type TransactionService interface {
 	GetTransaction(ctx context.Context, xPubID, txID string) (*Transaction, error)
 	GetTransactionsByIDs(ctx context.Context, txIDs []string) ([]*Transaction, error)
 	GetTransactionByHex(ctx context.Context, hex string) (*Transaction, error)
-	GetTransactions(ctx context.Context, metadata *Metadata, conditions *map[string]interface{},
+	GetTransactions(ctx context.Context, metadata *Metadata, conditions map[string]interface{},
 		queryParams *datastore.QueryParams, opts ...ModelOps) ([]*Transaction, error)
 	GetTransactionsCount(ctx context.Context, metadata *Metadata,
-		conditions *map[string]interface{}, opts ...ModelOps) (int64, error)
+		conditions map[string]interface{}, opts ...ModelOps) (int64, error)
 	GetTransactionsByXpubID(ctx context.Context, xPubID string, metadata *Metadata, conditions map[string]interface{},
 		queryParams *datastore.QueryParams) ([]*Transaction, error)
 	GetTransactionsByXpubIDCount(ctx context.Context, xPubID string, metadata *Metadata,
@@ -160,11 +160,11 @@ type TransactionService interface {
 type UTXOService interface {
 	GetUtxo(ctx context.Context, xPubKey, txID string, outputIndex uint32) (*Utxo, error)
 	GetUtxoByTransactionID(ctx context.Context, txID string, outputIndex uint32) (*Utxo, error)
-	GetUtxos(ctx context.Context, metadata *Metadata, conditions *map[string]interface{},
+	GetUtxos(ctx context.Context, metadata *Metadata, conditions map[string]interface{},
 		queryParams *datastore.QueryParams, opts ...ModelOps) ([]*Utxo, error)
 	GetUtxosCount(ctx context.Context, metadata *Metadata,
-		conditions *map[string]interface{}, opts ...ModelOps) (int64, error)
-	GetUtxosByXpubID(ctx context.Context, xPubID string, metadata *Metadata, conditions *map[string]interface{},
+		conditions map[string]interface{}, opts ...ModelOps) (int64, error)
+	GetUtxosByXpubID(ctx context.Context, xPubID string, metadata *Metadata, conditions map[string]interface{},
 		queryParams *datastore.QueryParams) ([]*Utxo, error)
 	UnReserveUtxos(ctx context.Context, xPubID, draftID string) error
 }

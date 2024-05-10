@@ -6,11 +6,11 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestTransactionFilter(t *testing.T) {
+func TestXpubFilter(t *testing.T) {
 	t.Parallel()
 
 	t.Run("default filter", func(t *testing.T) {
-		filter := TransactionFilter{}
+		filter := XpubFilter{}
 		dbConditions := filter.ToDbConditions()
 
 		assert.Equal(t, 1, len(dbConditions))
@@ -18,7 +18,7 @@ func TestTransactionFilter(t *testing.T) {
 	})
 
 	t.Run("empty filter with include deleted", func(t *testing.T) {
-		filter := fromJSON[TransactionFilter](`{
+		filter := fromJSON[XpubFilter](`{
 			"includeDeleted": true
 		}`)
 		dbConditions := filter.ToDbConditions()
@@ -26,25 +26,25 @@ func TestTransactionFilter(t *testing.T) {
 		assert.Equal(t, 0, len(dbConditions))
 	})
 
-	t.Run("with hex", func(t *testing.T) {
-		filter := fromJSON[TransactionFilter](`{
-			"hex": "test",
+	t.Run("with id", func(t *testing.T) {
+		filter := fromJSON[XpubFilter](`{
+			"id": "test",
 			"includeDeleted": true
 		}`)
 		dbConditions := filter.ToDbConditions()
 
 		assert.Equal(t, 1, len(dbConditions))
-		assert.Equal(t, "test", dbConditions["hex"])
+		assert.Equal(t, "test", dbConditions["id"])
 	})
 
-	t.Run("with block_height", func(t *testing.T) {
-		filter := fromJSON[TransactionFilter](`{
-			"blockHeight": 100,
+	t.Run("with currentBalance", func(t *testing.T) {
+		filter := fromJSON[XpubFilter](`{
+			"currentBalance": 100,
 			"includeDeleted": true
 		}`)
 		dbConditions := filter.ToDbConditions()
 
 		assert.Equal(t, 1, len(dbConditions))
-		assert.Equal(t, uint64(100), dbConditions["block_height"])
+		assert.Equal(t, uint64(100), dbConditions["current_balance"])
 	})
 }

@@ -139,7 +139,7 @@ func getDestinationByLockingScript(ctx context.Context, lockingScript string, op
 }
 
 // getDestinations will get all the destinations with the given conditions
-func getDestinations(ctx context.Context, metadata *Metadata, conditions *map[string]interface{},
+func getDestinations(ctx context.Context, metadata *Metadata, conditions map[string]interface{},
 	queryParams *datastore.QueryParams, opts ...ModelOps,
 ) ([]*Destination, error) {
 	modelItems := make([]*Destination, 0)
@@ -151,7 +151,7 @@ func getDestinations(ctx context.Context, metadata *Metadata, conditions *map[st
 }
 
 // getDestinationsCount will get a count of all the destinations with the given conditions
-func getDestinationsCount(ctx context.Context, metadata *Metadata, conditions *map[string]interface{},
+func getDestinationsCount(ctx context.Context, metadata *Metadata, conditions map[string]interface{},
 	opts ...ModelOps,
 ) (int64, error) {
 	return getModelCountByConditions(ctx, ModelDestination, Destination{}, metadata, conditions, opts...)

@@ -3,8 +3,6 @@ package admin
 import (
 	"net/http"
 
-	"github.com/bitcoin-sv/spv-wallet/actions"
-	"github.com/bitcoin-sv/spv-wallet/engine"
 	"github.com/bitcoin-sv/spv-wallet/mappings"
 	"github.com/bitcoin-sv/spv-wallet/models"
 	"github.com/gin-gonic/gin"
@@ -16,26 +14,26 @@ import (
 // @Description	Search for transactions
 // @Tags		Admin
 // @Produce		json
-// @Param		SearchRequestParameters body actions.SearchRequestParameters false "Supports targeted resource searches with filters for metadata and custom conditions, plus options for pagination and sorting to streamline data exploration and analysis"
+// @Param		SearchTransactions body SearchTransactions false "Supports targeted resource searches with filters and metadata, plus options for pagination and sorting to streamline data exploration and analysis"
 // @Success		200 {object} []models.Transaction "List of transactions"
-// @Failure		400	"Bad request - Error while parsing SearchRequestParameters from request body"
+// @Failure		400	"Bad request - Error while parsing SearchTransactions from request body"
 // @Failure 	500	"Internal server error - Error while searching for transactions"
 // @Router		/v1/admin/transactions/search [post]
 // @Security	x-auth-xpub
 func (a *Action) transactionsSearch(c *gin.Context) {
-	queryParams, metadata, conditions, err := actions.GetSearchQueryParameters(c)
-	if err != nil {
+	var reqParams SearchTransactions
+	if err := c.Bind(&reqParams); err != nil {
 		c.JSON(http.StatusBadRequest, err.Error())
 		return
 	}
 
-	var transactions []*engine.Transaction
-	if transactions, err = a.Services.SpvWalletEngine.GetTransactions(
+	transactions, err := a.Services.SpvWalletEngine.GetTransactions(
 		c.Request.Context(),
-		metadata,
-		conditions,
-		queryParams,
-	); err != nil {
+		reqParams.Metadata,
+		reqParams.Conditions.ToDbConditions(),
+		reqParams.QueryParams,
+	)
+	if err != nil {
 		c.JSON(http.StatusInternalServerError, err.Error())
 		return
 	}
@@ -54,25 +52,25 @@ func (a *Action) transactionsSearch(c *gin.Context) {
 // @Description	Count transactions
 // @Tags		Admin
 // @Produce		json
-// @Param		CountRequestParameters body actions.CountRequestParameters false "Enables precise filtering of resource counts using custom conditions or metadata, catering to specific business or analysis needs"
+// @Param		CountTransactions body CountTransactions false "Enables filtering of elements to be counted"
 // @Success		200	{number} int64 "Count of transactions"
-// @Failure		400	"Bad request - Error while parsing CountRequestParameters from request body"
+// @Failure		400	"Bad request - Error while parsing CountTransactions from request body"
 // @Failure 	500	"Internal Server Error - Error while fetching count of transactions"
 // @Router		/v1/admin/transactions/count [post]
 // @Security	x-auth-xpub
 func (a *Action) transactionsCount(c *gin.Context) {
-	metadata, conditions, err := actions.GetCountQueryParameters(c)
-	if err != nil {
+	var reqParams CountTransactions
+	if err := c.Bind(&reqParams); err != nil {
 		c.JSON(http.StatusBadRequest, err.Error())
 		return
 	}
 
-	var count int64
-	if count, err = a.Services.SpvWalletEngine.GetTransactionsCount(
+	count, err := a.Services.SpvWalletEngine.GetTransactionsCount(
 		c.Request.Context(),
-		metadata,
-		conditions,
-	); err != nil {
+		reqParams.Metadata,
+		reqParams.Conditions.ToDbConditions(),
+	)
+	if err != nil {
 		c.JSON(http.StatusInternalServerError, err.Error())
 		return
 	}

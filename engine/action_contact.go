@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+
 	"github.com/bitcoin-sv/go-paymail"
 	"github.com/bitcoin-sv/spv-wallet/engine/datastore"
 )
@@ -194,7 +195,6 @@ func (c *Client) DeleteContact(ctx context.Context, id string) error {
 }
 
 func (c *Client) AcceptContact(ctx context.Context, xPubID, paymail string) error {
-
 	contact, err := getContact(ctx, paymail, xPubID, c.DefaultModelOptions()...)
 	if err != nil {
 		c.logContactError(xPubID, paymail, fmt.Sprintf("unexpected error while geting contact: %s", err.Error()))
@@ -302,7 +302,7 @@ func (c *Client) getPaymail(ctx context.Context, xpubID, paymailAddr string) (*P
 
 	emptyConditions := make(map[string]interface{})
 
-	paymails, err := c.GetPaymailAddressesByXPubID(ctx, xpubID, nil, &emptyConditions, nil)
+	paymails, err := c.GetPaymailAddressesByXPubID(ctx, xpubID, nil, emptyConditions, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -316,7 +316,6 @@ func (c *Client) getPaymail(ctx context.Context, xpubID, paymailAddr string) (*P
 }
 
 func (c *Client) upsertContact(ctx context.Context, pmSrvnt *PaymailServant, reqXPubID, ctcFName string, ctcPaymail *paymail.SanitisedPaymail, opts ...ModelOps) (*Contact, error) {
-
 	contactPki, err := pmSrvnt.GetPkiForPaymail(ctx, ctcPaymail)
 	if err != nil {
 		return nil, fmt.Errorf("geting PKI for %s failed. Reason: %w", ctcPaymail.Address, err)

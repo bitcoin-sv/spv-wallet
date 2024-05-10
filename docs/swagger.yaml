@@ -1,4 +1,21 @@
 definitions:
+  accesskeys.CountAccessKeys:
+    properties:
+      conditions:
+        allOf:
+        - $ref: '#/definitions/filter.AccessKeyFilter'
+        description: Custom conditions used for filtering the search results. Every
+          field within the object is optional.
+      metadata:
+        additionalProperties:
+          type: string
+        description: Accepts a JSON object for embedding custom metadata, enabling
+          arbitrary additional information to be associated with the resource
+        example:
+          key: value
+          key2: value2
+        type: object
+    type: object
   accesskeys.CreateAccessKey:
     properties:
       metadata:
@@ -11,34 +28,13 @@ definitions:
           key2: value2
         type: object
     type: object
-  actions.CountRequestParameters:
+  accesskeys.SearchAccessKeys:
     properties:
       conditions:
-        additionalProperties:
-          type: string
-        description: Custom conditions used for filtering the search results
-        example:
-          testColumn: testValue
-        type: object
-      metadata:
-        additionalProperties:
-          type: string
-        description: Accepts a JSON object for embedding custom metadata, enabling
-          arbitrary additional information to be associated with the resource
-        example:
-          key: value
-          key2: value2
-        type: object
-    type: object
-  actions.SearchRequestParameters:
-    properties:
-      conditions:
-        additionalProperties:
-          type: string
-        description: Custom conditions used for filtering the search results
-        example:
-          testColumn: testValue
-        type: object
+        allOf:
+        - $ref: '#/definitions/filter.AccessKeyFilter'
+        description: Custom conditions used for filtering the search results. Every
+          field within the object is optional.
       metadata:
         additionalProperties:
           type: string
@@ -58,6 +54,108 @@ definitions:
           order_by_field: created_at
           page: "1"
           page_size: "10"
+        type: object
+    type: object
+  admin.CountAccessKeys:
+    properties:
+      conditions:
+        allOf:
+        - $ref: '#/definitions/filter.AdminAccessKeyFilter'
+        description: Custom conditions used for filtering the search results. Every
+          field within the object is optional.
+      metadata:
+        additionalProperties:
+          type: string
+        description: Accepts a JSON object for embedding custom metadata, enabling
+          arbitrary additional information to be associated with the resource
+        example:
+          key: value
+          key2: value2
+        type: object
+    type: object
+  admin.CountDestinations:
+    properties:
+      conditions:
+        allOf:
+        - $ref: '#/definitions/filter.DestinationFilter'
+        description: Custom conditions used for filtering the search results. Every
+          field within the object is optional.
+      metadata:
+        additionalProperties:
+          type: string
+        description: Accepts a JSON object for embedding custom metadata, enabling
+          arbitrary additional information to be associated with the resource
+        example:
+          key: value
+          key2: value2
+        type: object
+    type: object
+  admin.CountPaymails:
+    properties:
+      conditions:
+        allOf:
+        - $ref: '#/definitions/filter.AdminPaymailFilter'
+        description: Custom conditions used for filtering the search results. Every
+          field within the object is optional.
+      metadata:
+        additionalProperties:
+          type: string
+        description: Accepts a JSON object for embedding custom metadata, enabling
+          arbitrary additional information to be associated with the resource
+        example:
+          key: value
+          key2: value2
+        type: object
+    type: object
+  admin.CountTransactions:
+    properties:
+      conditions:
+        allOf:
+        - $ref: '#/definitions/filter.TransactionFilter'
+        description: Custom conditions used for filtering the search results. Every
+          field within the object is optional.
+      metadata:
+        additionalProperties:
+          type: string
+        description: Accepts a JSON object for embedding custom metadata, enabling
+          arbitrary additional information to be associated with the resource
+        example:
+          key: value
+          key2: value2
+        type: object
+    type: object
+  admin.CountUtxos:
+    properties:
+      conditions:
+        allOf:
+        - $ref: '#/definitions/filter.AdminUtxoFilter'
+        description: Custom conditions used for filtering the search results. Every
+          field within the object is optional.
+      metadata:
+        additionalProperties:
+          type: string
+        description: Accepts a JSON object for embedding custom metadata, enabling
+          arbitrary additional information to be associated with the resource
+        example:
+          key: value
+          key2: value2
+        type: object
+    type: object
+  admin.CountXpubs:
+    properties:
+      conditions:
+        allOf:
+        - $ref: '#/definitions/filter.XpubFilter'
+        description: Custom conditions used for filtering the search results. Every
+          field within the object is optional.
+      metadata:
+        additionalProperties:
+          type: string
+        description: Accepts a JSON object for embedding custom metadata, enabling
+          arbitrary additional information to be associated with the resource
+        example:
+          key: value
+          key2: value2
         type: object
     type: object
   admin.CreatePaymail:
@@ -117,6 +215,202 @@ definitions:
         description: The transaction hex
         example: 0100000002...
         type: string
+    type: object
+  admin.SearchAccessKeys:
+    properties:
+      conditions:
+        allOf:
+        - $ref: '#/definitions/filter.AdminAccessKeyFilter'
+        description: Custom conditions used for filtering the search results. Every
+          field within the object is optional.
+      metadata:
+        additionalProperties:
+          type: string
+        description: Accepts a JSON object for embedding custom metadata, enabling
+          arbitrary additional information to be associated with the resource
+        example:
+          key: value
+          key2: value2
+        type: object
+      params:
+        additionalProperties:
+          type: string
+        description: Pagination and sorting options to streamline data exploration
+          and analysis
+        example:
+          order_by_direction: desc
+          order_by_field: created_at
+          page: "1"
+          page_size: "10"
+        type: object
+    type: object
+  admin.SearchContacts:
+    properties:
+      conditions:
+        allOf:
+        - $ref: '#/definitions/filter.ContactFilter'
+        description: Custom conditions used for filtering the search results. Every
+          field within the object is optional.
+      metadata:
+        additionalProperties:
+          type: string
+        description: Accepts a JSON object for embedding custom metadata, enabling
+          arbitrary additional information to be associated with the resource
+        example:
+          key: value
+          key2: value2
+        type: object
+      params:
+        additionalProperties:
+          type: string
+        description: Pagination and sorting options to streamline data exploration
+          and analysis
+        example:
+          order_by_direction: desc
+          order_by_field: created_at
+          page: "1"
+          page_size: "10"
+        type: object
+    type: object
+  admin.SearchDestinations:
+    properties:
+      conditions:
+        allOf:
+        - $ref: '#/definitions/filter.DestinationFilter'
+        description: Custom conditions used for filtering the search results. Every
+          field within the object is optional.
+      metadata:
+        additionalProperties:
+          type: string
+        description: Accepts a JSON object for embedding custom metadata, enabling
+          arbitrary additional information to be associated with the resource
+        example:
+          key: value
+          key2: value2
+        type: object
+      params:
+        additionalProperties:
+          type: string
+        description: Pagination and sorting options to streamline data exploration
+          and analysis
+        example:
+          order_by_direction: desc
+          order_by_field: created_at
+          page: "1"
+          page_size: "10"
+        type: object
+    type: object
+  admin.SearchPaymails:
+    properties:
+      conditions:
+        allOf:
+        - $ref: '#/definitions/filter.AdminPaymailFilter'
+        description: Custom conditions used for filtering the search results. Every
+          field within the object is optional.
+      metadata:
+        additionalProperties:
+          type: string
+        description: Accepts a JSON object for embedding custom metadata, enabling
+          arbitrary additional information to be associated with the resource
+        example:
+          key: value
+          key2: value2
+        type: object
+      params:
+        additionalProperties:
+          type: string
+        description: Pagination and sorting options to streamline data exploration
+          and analysis
+        example:
+          order_by_direction: desc
+          order_by_field: created_at
+          page: "1"
+          page_size: "10"
+        type: object
+    type: object
+  admin.SearchTransactions:
+    properties:
+      conditions:
+        allOf:
+        - $ref: '#/definitions/filter.TransactionFilter'
+        description: Custom conditions used for filtering the search results. Every
+          field within the object is optional.
+      metadata:
+        additionalProperties:
+          type: string
+        description: Accepts a JSON object for embedding custom metadata, enabling
+          arbitrary additional information to be associated with the resource
+        example:
+          key: value
+          key2: value2
+        type: object
+      params:
+        additionalProperties:
+          type: string
+        description: Pagination and sorting options to streamline data exploration
+          and analysis
+        example:
+          order_by_direction: desc
+          order_by_field: created_at
+          page: "1"
+          page_size: "10"
+        type: object
+    type: object
+  admin.SearchUtxos:
+    properties:
+      conditions:
+        allOf:
+        - $ref: '#/definitions/filter.AdminUtxoFilter'
+        description: Custom conditions used for filtering the search results. Every
+          field within the object is optional.
+      metadata:
+        additionalProperties:
+          type: string
+        description: Accepts a JSON object for embedding custom metadata, enabling
+          arbitrary additional information to be associated with the resource
+        example:
+          key: value
+          key2: value2
+        type: object
+      params:
+        additionalProperties:
+          type: string
+        description: Pagination and sorting options to streamline data exploration
+          and analysis
+        example:
+          order_by_direction: desc
+          order_by_field: created_at
+          page: "1"
+          page_size: "10"
+        type: object
+    type: object
+  admin.SearchXpubs:
+    properties:
+      conditions:
+        allOf:
+        - $ref: '#/definitions/filter.XpubFilter'
+        description: Custom conditions used for filtering the search results. Every
+          field within the object is optional.
+      metadata:
+        additionalProperties:
+          type: string
+        description: Accepts a JSON object for embedding custom metadata, enabling
+          arbitrary additional information to be associated with the resource
+        example:
+          key: value
+          key2: value2
+        type: object
+      params:
+        additionalProperties:
+          type: string
+        description: Pagination and sorting options to streamline data exploration
+          and analysis
+        example:
+          order_by_direction: desc
+          order_by_field: created_at
+          page: "1"
+          page_size: "10"
+        type: object
     type: object
   admin.UpdateContact:
     properties:
@@ -213,6 +507,34 @@ definitions:
     - SeenInOrphanMempool
     - Confirmed
     - Rejected
+  contacts.SearchContacts:
+    properties:
+      conditions:
+        allOf:
+        - $ref: '#/definitions/filter.ContactFilter'
+        description: Custom conditions used for filtering the search results. Every
+          field within the object is optional.
+      metadata:
+        additionalProperties:
+          type: string
+        description: Accepts a JSON object for embedding custom metadata, enabling
+          arbitrary additional information to be associated with the resource
+        example:
+          key: value
+          key2: value2
+        type: object
+      params:
+        additionalProperties:
+          type: string
+        description: Pagination and sorting options to streamline data exploration
+          and analysis
+        example:
+          order_by_direction: desc
+          order_by_field: created_at
+          page: "1"
+          page_size: "10"
+        type: object
+    type: object
   contacts.UpsertContact:
     properties:
       fullName:
@@ -238,7 +560,8 @@ definitions:
       conditions:
         allOf:
         - $ref: '#/definitions/filter.DestinationFilter'
-        description: Custom conditions used for filtering the search results
+        description: Custom conditions used for filtering the search results. Every
+          field within the object is optional.
       metadata:
         additionalProperties:
           type: string
@@ -266,7 +589,8 @@ definitions:
       conditions:
         allOf:
         - $ref: '#/definitions/filter.DestinationFilter'
-        description: Custom conditions used for filtering the search results
+        description: Custom conditions used for filtering the search results. Every
+          field within the object is optional.
       metadata:
         additionalProperties:
           type: string
@@ -315,51 +639,244 @@ definitions:
   engine.Metadata:
     additionalProperties: true
     type: object
+  filter.AccessKeyFilter:
+    properties:
+      createdRange:
+        allOf:
+        - $ref: '#/definitions/filter.TimeRange'
+        description: CreatedRange specifies the time range when a record was created.
+      includeDeleted:
+        default: false
+        description: IncludeDeleted is a flag whether or not to include deleted items
+          in the search results
+        example: true
+        type: boolean
+      revokedRange:
+        allOf:
+        - $ref: '#/definitions/filter.TimeRange'
+        description: RevokedRange specifies the time range when a record was revoked.
+      updatedRange:
+        allOf:
+        - $ref: '#/definitions/filter.TimeRange'
+        description: UpdatedRange specifies the time range when a record was updated.
+    type: object
+  filter.AdminAccessKeyFilter:
+    properties:
+      createdRange:
+        allOf:
+        - $ref: '#/definitions/filter.TimeRange'
+        description: CreatedRange specifies the time range when a record was created.
+      includeDeleted:
+        default: false
+        description: IncludeDeleted is a flag whether or not to include deleted items
+          in the search results
+        example: true
+        type: boolean
+      revokedRange:
+        allOf:
+        - $ref: '#/definitions/filter.TimeRange'
+        description: RevokedRange specifies the time range when a record was revoked.
+      updatedRange:
+        allOf:
+        - $ref: '#/definitions/filter.TimeRange'
+        description: UpdatedRange specifies the time range when a record was updated.
+      xpubId:
+        type: string
+    type: object
+  filter.AdminPaymailFilter:
+    properties:
+      alias:
+        example: alice
+        type: string
+      createdRange:
+        allOf:
+        - $ref: '#/definitions/filter.TimeRange'
+        description: CreatedRange specifies the time range when a record was created.
+      domain:
+        example: example.com
+        type: string
+      id:
+        example: ffb86c103d17d87c15aaf080aab6be5415c9fa885309a79b04c9910e39f2b542
+        type: string
+      includeDeleted:
+        default: false
+        description: IncludeDeleted is a flag whether or not to include deleted items
+          in the search results
+        example: true
+        type: boolean
+      publicName:
+        example: Alice
+        type: string
+      updatedRange:
+        allOf:
+        - $ref: '#/definitions/filter.TimeRange'
+        description: UpdatedRange specifies the time range when a record was updated.
+      xpubId:
+        example: 79f90a6bab0a44402fc64828af820e9465645658aea2d138c5205b88e6dabd00
+        type: string
+    type: object
+  filter.AdminUtxoFilter:
+    properties:
+      createdRange:
+        allOf:
+        - $ref: '#/definitions/filter.TimeRange'
+        description: CreatedRange specifies the time range when a record was created.
+      draftId:
+        example: 89419d4c7c50810bfe5ff9df9ad5074b749959423782dc91a30f1058b9ad7ef7
+        type: string
+      id:
+        example: fe4cbfee0258aa589cbc79963f7c204061fd67d987e32ee5049aa90ce14658ee
+        type: string
+      includeDeleted:
+        default: false
+        description: IncludeDeleted is a flag whether or not to include deleted items
+          in the search results
+        example: true
+        type: boolean
+      outputIndex:
+        example: 0
+        type: integer
+      reservedRange:
+        allOf:
+        - $ref: '#/definitions/filter.TimeRange'
+        description: ReservedRange specifies the time range when a UTXO was reserved.
+      satoshis:
+        example: 1
+        type: integer
+      scriptPubKey:
+        example: 76a914a5f271385e75f57bcd9092592dede812f8c466d088ac
+        type: string
+      spendingTxId:
+        example: 11a7746489a70e9c0170601c2be65558455317a984194eb2791b637f59f8cd6e
+        type: string
+      transactionId:
+        example: 5e17858ea0ca4155827754ba82bdcfcce108d5bb5b47fbb3aa54bd14540683c6
+        type: string
+      type:
+        enum:
+        - pubkey
+        - pubkeyhash
+        - nulldata
+        - multisig
+        - nonstandard
+        - scripthash
+        - metanet
+        - token_stas
+        - token_sensible
+        type: string
+      updatedRange:
+        allOf:
+        - $ref: '#/definitions/filter.TimeRange'
+        description: UpdatedRange specifies the time range when a record was updated.
+      xpubId:
+        type: string
+    type: object
+  filter.ContactFilter:
+    properties:
+      createdRange:
+        allOf:
+        - $ref: '#/definitions/filter.TimeRange'
+        description: CreatedRange specifies the time range when a record was created.
+      fullName:
+        example: Alice
+        type: string
+      id:
+        example: ffdbe74e-0700-4710-aac5-611a1f877c7f
+        type: string
+      includeDeleted:
+        default: false
+        description: IncludeDeleted is a flag whether or not to include deleted items
+          in the search results
+        example: true
+        type: boolean
+      paymail:
+        example: alice@example.com
+        type: string
+      pubKey:
+        example: 0334f01ecb971e93db179e6fb320cd1466beb0c1ec6c1c6a37aa6cb02e53d5dd1a
+        type: string
+      status:
+        enum:
+        - unconfirmed
+        - awaiting
+        - confirmed
+        - rejected
+        type: string
+      updatedRange:
+        allOf:
+        - $ref: '#/definitions/filter.TimeRange'
+        description: UpdatedRange specifies the time range when a record was updated.
+    type: object
   filter.DestinationFilter:
     properties:
       address:
         example: 1CDUf7CKu8ocTTkhcYUbq75t14Ft168K65
         type: string
-      created_range:
-        additionalProperties:
-          type: string
-        type: object
-      draft_id:
+      createdRange:
+        allOf:
+        - $ref: '#/definitions/filter.TimeRange'
+        description: CreatedRange specifies the time range when a record was created.
+      draftId:
         example: b356f7fa00cd3f20cce6c21d704cd13e871d28d714a5ebd0532f5a0e0cde63f7
         type: string
-      include_deleted:
+      includeDeleted:
+        default: false
+        description: IncludeDeleted is a flag whether or not to include deleted items
+          in the search results
         example: true
         type: boolean
-      locking_script:
+      lockingScript:
         example: 76a9147b05764a97f3b4b981471492aa703b188e45979b88ac
         type: string
-      updated_range:
-        additionalProperties:
-          type: string
-        type: object
+      updatedRange:
+        allOf:
+        - $ref: '#/definitions/filter.TimeRange'
+        description: UpdatedRange specifies the time range when a record was updated.
+    type: object
+  filter.TimeRange:
+    properties:
+      from:
+        description: From specifies the start time of the range. It's optional and
+          can be nil.
+        example: "2024-02-26T11:01:28Z"
+        type: string
+      to:
+        description: To specifies the end time of the range. It's optional and can
+          be nil.
+        example: "2024-02-26T11:01:28Z"
+        type: string
     type: object
   filter.TransactionFilter:
     properties:
-      block_hash:
+      blockHash:
+        example: 0000000000000000031928c28075a82d7a00c2c90b489d1d66dc0afa3f8d26f8
         type: string
-      block_height:
+      blockHeight:
+        example: 839376
         type: integer
-      created_range:
-        additionalProperties:
-          type: string
-        type: object
-      draft_id:
+      createdRange:
+        allOf:
+        - $ref: '#/definitions/filter.TimeRange'
+        description: CreatedRange specifies the time range when a record was created.
+      draftId:
+        example: d425432e0d10a46af1ec6d00f380e9581ebf7907f3486572b3cd561a4c326e14
         type: string
       fee:
+        example: 1
         type: integer
       hex:
         type: string
-      include_deleted:
+      includeDeleted:
+        default: false
+        description: IncludeDeleted is a flag whether or not to include deleted items
+          in the search results
         example: true
         type: boolean
-      number_of_inputs:
+      numberOfInputs:
+        example: 1
         type: integer
-      number_of_outputs:
+      numberOfOutputs:
+        example: 2
         type: integer
       status:
         enum:
@@ -377,12 +894,90 @@ definitions:
         - CONFIRMED
         - REJECTED
         type: string
-      total_value:
+      totalValue:
+        example: 100000000
         type: integer
-      updated_range:
-        additionalProperties:
-          type: string
-        type: object
+      updatedRange:
+        allOf:
+        - $ref: '#/definitions/filter.TimeRange'
+        description: UpdatedRange specifies the time range when a record was updated.
+    type: object
+  filter.UtxoFilter:
+    properties:
+      createdRange:
+        allOf:
+        - $ref: '#/definitions/filter.TimeRange'
+        description: CreatedRange specifies the time range when a record was created.
+      draftId:
+        example: 89419d4c7c50810bfe5ff9df9ad5074b749959423782dc91a30f1058b9ad7ef7
+        type: string
+      id:
+        example: fe4cbfee0258aa589cbc79963f7c204061fd67d987e32ee5049aa90ce14658ee
+        type: string
+      includeDeleted:
+        default: false
+        description: IncludeDeleted is a flag whether or not to include deleted items
+          in the search results
+        example: true
+        type: boolean
+      outputIndex:
+        example: 0
+        type: integer
+      reservedRange:
+        allOf:
+        - $ref: '#/definitions/filter.TimeRange'
+        description: ReservedRange specifies the time range when a UTXO was reserved.
+      satoshis:
+        example: 1
+        type: integer
+      scriptPubKey:
+        example: 76a914a5f271385e75f57bcd9092592dede812f8c466d088ac
+        type: string
+      spendingTxId:
+        example: 11a7746489a70e9c0170601c2be65558455317a984194eb2791b637f59f8cd6e
+        type: string
+      transactionId:
+        example: 5e17858ea0ca4155827754ba82bdcfcce108d5bb5b47fbb3aa54bd14540683c6
+        type: string
+      type:
+        enum:
+        - pubkey
+        - pubkeyhash
+        - nulldata
+        - multisig
+        - nonstandard
+        - scripthash
+        - metanet
+        - token_stas
+        - token_sensible
+        type: string
+      updatedRange:
+        allOf:
+        - $ref: '#/definitions/filter.TimeRange'
+        description: UpdatedRange specifies the time range when a record was updated.
+    type: object
+  filter.XpubFilter:
+    properties:
+      createdRange:
+        allOf:
+        - $ref: '#/definitions/filter.TimeRange'
+        description: CreatedRange specifies the time range when a record was created.
+      currentBalance:
+        example: 1000
+        type: integer
+      id:
+        example: 00b953624f78004a4c727cd28557475d5233c15f17aef545106639f4d71b712d
+        type: string
+      includeDeleted:
+        default: false
+        description: IncludeDeleted is a flag whether or not to include deleted items
+          in the search results
+        example: true
+        type: boolean
+      updatedRange:
+        allOf:
+        - $ref: '#/definitions/filter.TimeRange'
+        description: UpdatedRange specifies the time range when a record was updated.
     type: object
   models.AccessKey:
     properties:
@@ -1195,8 +1790,6 @@ definitions:
     - 1000000000
     - 60000000000
     - 3600000000000
-    - -9223372036854775808
-    - 9223372036854775807
     - 1
     - 1000
     - 1000000
@@ -1221,8 +1814,6 @@ definitions:
     - Second
     - Minute
     - Hour
-    - minDuration
-    - maxDuration
     - Nanosecond
     - Microsecond
     - Millisecond
@@ -1234,7 +1825,8 @@ definitions:
       conditions:
         allOf:
         - $ref: '#/definitions/filter.TransactionFilter'
-        description: Custom conditions used for filtering the search results
+        description: Custom conditions used for filtering the search results. Every
+          field within the object is optional.
       metadata:
         additionalProperties:
           type: string
@@ -1286,7 +1878,8 @@ definitions:
       conditions:
         allOf:
         - $ref: '#/definitions/filter.TransactionFilter'
-        description: Custom conditions used for filtering the search results
+        description: Custom conditions used for filtering the search results. Every
+          field within the object is optional.
       metadata:
         additionalProperties:
           type: string
@@ -1322,6 +1915,51 @@ definitions:
         example:
           key: value
           key2: value2
+        type: object
+    type: object
+  utxos.CountUtxos:
+    properties:
+      conditions:
+        allOf:
+        - $ref: '#/definitions/filter.UtxoFilter'
+        description: Custom conditions used for filtering the search results. Every
+          field within the object is optional.
+      metadata:
+        additionalProperties:
+          type: string
+        description: Accepts a JSON object for embedding custom metadata, enabling
+          arbitrary additional information to be associated with the resource
+        example:
+          key: value
+          key2: value2
+        type: object
+    type: object
+  utxos.SearchUtxos:
+    properties:
+      conditions:
+        allOf:
+        - $ref: '#/definitions/filter.UtxoFilter'
+        description: Custom conditions used for filtering the search results. Every
+          field within the object is optional.
+      metadata:
+        additionalProperties:
+          type: string
+        description: Accepts a JSON object for embedding custom metadata, enabling
+          arbitrary additional information to be associated with the resource
+        example:
+          key: value
+          key2: value2
+        type: object
+      params:
+        additionalProperties:
+          type: string
+        description: Pagination and sorting options to streamline data exploration
+          and analysis
+        example:
+          order_by_direction: desc
+          order_by_field: created_at
+          page: "1"
+          page_size: "10"
         type: object
     type: object
 info:
@@ -1433,12 +2071,11 @@ paths:
     post:
       description: Count of access keys
       parameters:
-      - description: Enables precise filtering of resource counts using custom conditions
-          or metadata, catering to specific business or analysis needs
+      - description: Enables filtering of elements to be counted
         in: body
-        name: CountRequestParameters
+        name: CountAccessKeys
         schema:
-          $ref: '#/definitions/actions.CountRequestParameters'
+          $ref: '#/definitions/accesskeys.CountAccessKeys'
       produces:
       - application/json
       responses:
@@ -1447,8 +2084,8 @@ paths:
           schema:
             type: number
         "400":
-          description: Bad request - Error while parsing CountRequestParameters from
-            request body
+          description: Bad request - Error while parsing CountAccessKeys from request
+            body
         "500":
           description: Internal Server Error - Error while fetching count of access
             keys
@@ -1461,13 +2098,13 @@ paths:
     post:
       description: Search access key
       parameters:
-      - description: Supports targeted resource searches with filters for metadata
-          and custom conditions, plus options for pagination and sorting to streamline
-          data exploration and analysis
+      - description: Supports targeted resource searches with filters and metadata,
+          plus options for pagination and sorting to streamline data exploration and
+          analysis
         in: body
-        name: SearchRequestParameters
+        name: SearchAccessKeys
         schema:
-          $ref: '#/definitions/actions.SearchRequestParameters'
+          $ref: '#/definitions/accesskeys.SearchAccessKeys'
       produces:
       - application/json
       responses:
@@ -1478,8 +2115,7 @@ paths:
               $ref: '#/definitions/models.AccessKey'
             type: array
         "400":
-          description: Bad request - Error while parsing SearchRequestParameters from
-            request body
+          description: Bad request - Error while SearchAccessKeys from request body
         "500":
           description: Internal server error - Error while searching for access keys
       security:
@@ -1491,12 +2127,11 @@ paths:
     post:
       description: Access Keys Count
       parameters:
-      - description: Enables precise filtering of resource counts using custom conditions
-          or metadata, catering to specific business or analysis needs
+      - description: Enables filtering of elements to be counted
         in: body
-        name: CountRequestParameters
+        name: CountAccessKeys
         schema:
-          $ref: '#/definitions/actions.CountRequestParameters'
+          $ref: '#/definitions/admin.CountAccessKeys'
       produces:
       - application/json
       responses:
@@ -1505,8 +2140,8 @@ paths:
           schema:
             type: number
         "400":
-          description: Bad request - Error while parsing CountRequestParameters from
-            request body
+          description: Bad request - Error while parsing CountAccessKeys from request
+            body
         "500":
           description: Internal Server Error - Error while fetching count of access
             keys
@@ -1519,13 +2154,13 @@ paths:
     post:
       description: Access Keys Search
       parameters:
-      - description: Supports targeted resource searches with filters for metadata
-          and custom conditions, plus options for pagination and sorting to streamline
-          data exploration and analysis
+      - description: Supports targeted resource searches with filters and metadata,
+          plus options for pagination and sorting to streamline data exploration and
+          analysis
         in: body
-        name: SearchRequestParameters
+        name: SearchAccessKeys
         schema:
-          $ref: '#/definitions/actions.SearchRequestParameters'
+          $ref: '#/definitions/admin.SearchAccessKeys'
       produces:
       - application/json
       responses:
@@ -1536,8 +2171,8 @@ paths:
               $ref: '#/definitions/models.AccessKey'
             type: array
         "400":
-          description: Bad request - Error while parsing SearchRequestParameters from
-            request body
+          description: Bad request - Error while parsing SearchAccessKeys from request
+            body
         "500":
           description: Internal server error - Error while searching for access keys
       security:
@@ -1665,13 +2300,13 @@ paths:
     post:
       description: Search for contacts
       parameters:
-      - description: Supports targeted resource searches with filters for metadata
-          and custom conditions, plus options for pagination and sorting to streamline
-          data exploration and analysis
+      - description: Supports targeted resource searches with filters and metadata,
+          plus options for pagination and sorting to streamline data exploration and
+          analysis
         in: body
-        name: SearchRequestParameters
+        name: SearchContacts
         schema:
-          $ref: '#/definitions/actions.SearchRequestParameters'
+          $ref: '#/definitions/admin.SearchContacts'
       produces:
       - application/json
       responses:
@@ -1682,8 +2317,8 @@ paths:
               $ref: '#/definitions/models.Contact'
             type: array
         "400":
-          description: Bad request - Error while parsing SearchRequestParameters from
-            request body
+          description: Bad request - Error while parsing SearchContacts from request
+            body
         "500":
           description: Internal server error - Error while searching for contacts
       security:
@@ -1695,13 +2330,13 @@ paths:
     post:
       description: Search for destinations
       parameters:
-      - description: Supports targeted resource searches with filters for metadata
-          and custom conditions, plus options for pagination and sorting to streamline
-          data exploration and analysis
+      - description: Supports targeted resource searches with filters and metadata,
+          plus options for pagination and sorting to streamline data exploration and
+          analysis
         in: body
-        name: SearchRequestParameters
+        name: SearchDestinations
         schema:
-          $ref: '#/definitions/actions.SearchRequestParameters'
+          $ref: '#/definitions/admin.SearchDestinations'
       produces:
       - application/json
       responses:
@@ -1712,8 +2347,8 @@ paths:
               $ref: '#/definitions/models.Destination'
             type: array
         "400":
-          description: Bad request - Error while parsing SearchRequestParameters from
-            request body
+          description: Bad request - Error while parsing SearchDestinations from request
+            body
         "500":
           description: Internal server error - Error while searching for destinations
       security:
@@ -1801,12 +2436,11 @@ paths:
     post:
       description: Paymail addresses count
       parameters:
-      - description: Enables precise filtering of resource counts using custom conditions
-          or metadata, catering to specific business or analysis needs
+      - description: Enables filtering of elements to be counted
         in: body
-        name: CountRequestParameters
+        name: CountPaymails
         schema:
-          $ref: '#/definitions/actions.CountRequestParameters'
+          $ref: '#/definitions/admin.CountPaymails'
       produces:
       - application/json
       responses:
@@ -1815,8 +2449,8 @@ paths:
           schema:
             type: number
         "400":
-          description: Bad request - Error while parsing CountRequestParameters from
-            request body
+          description: Bad request - Error while parsing CountPaymails from request
+            body
         "500":
           description: Internal Server Error - Error while fetching count of paymail
             addresses
@@ -1829,13 +2463,13 @@ paths:
     post:
       description: Paymail addresses search
       parameters:
-      - description: Supports targeted resource searches with filters for metadata
-          and custom conditions, plus options for pagination and sorting to streamline
-          data exploration and analysis
+      - description: Supports targeted resource searches with filters and metadata,
+          plus options for pagination and sorting to streamline data exploration and
+          analysis
         in: body
-        name: SearchRequestParameters
+        name: SearchPaymails
         schema:
-          $ref: '#/definitions/actions.SearchRequestParameters'
+          $ref: '#/definitions/admin.SearchPaymails'
       produces:
       - application/json
       responses:
@@ -1846,8 +2480,8 @@ paths:
               $ref: '#/definitions/models.PaymailAddress'
             type: array
         "400":
-          description: Bad request - Error while parsing SearchRequestParameters from
-            request body
+          description: Bad request - Error while parsing SearchPaymails from request
+            body
         "500":
           description: Internal server error - Error while searching for paymail addresses
       security:
@@ -1906,12 +2540,11 @@ paths:
     post:
       description: Count transactions
       parameters:
-      - description: Enables precise filtering of resource counts using custom conditions
-          or metadata, catering to specific business or analysis needs
+      - description: Enables filtering of elements to be counted
         in: body
-        name: CountRequestParameters
+        name: CountTransactions
         schema:
-          $ref: '#/definitions/actions.CountRequestParameters'
+          $ref: '#/definitions/admin.CountTransactions'
       produces:
       - application/json
       responses:
@@ -1920,8 +2553,8 @@ paths:
           schema:
             type: number
         "400":
-          description: Bad request - Error while parsing CountRequestParameters from
-            request body
+          description: Bad request - Error while parsing CountTransactions from request
+            body
         "500":
           description: Internal Server Error - Error while fetching count of transactions
       security:
@@ -1962,13 +2595,13 @@ paths:
     post:
       description: Search for transactions
       parameters:
-      - description: Supports targeted resource searches with filters for metadata
-          and custom conditions, plus options for pagination and sorting to streamline
-          data exploration and analysis
+      - description: Supports targeted resource searches with filters and metadata,
+          plus options for pagination and sorting to streamline data exploration and
+          analysis
         in: body
-        name: SearchRequestParameters
+        name: SearchTransactions
         schema:
-          $ref: '#/definitions/actions.SearchRequestParameters'
+          $ref: '#/definitions/admin.SearchTransactions'
       produces:
       - application/json
       responses:
@@ -1979,8 +2612,8 @@ paths:
               $ref: '#/definitions/models.Transaction'
             type: array
         "400":
-          description: Bad request - Error while parsing SearchRequestParameters from
-            request body
+          description: Bad request - Error while parsing SearchTransactions from request
+            body
         "500":
           description: Internal server error - Error while searching for transactions
       security:
@@ -1992,12 +2625,11 @@ paths:
     post:
       description: Count utxos
       parameters:
-      - description: Enables precise filtering of resource counts using custom conditions
-          or metadata, catering to specific business or analysis needs
+      - description: Enables filtering of elements to be counted
         in: body
-        name: CountRequestParameters
+        name: CountUtxos
         schema:
-          $ref: '#/definitions/actions.CountRequestParameters'
+          $ref: '#/definitions/admin.CountUtxos'
       produces:
       - application/json
       responses:
@@ -2006,8 +2638,7 @@ paths:
           schema:
             type: number
         "400":
-          description: Bad request - Error while parsing CountRequestParameters from
-            request body
+          description: Bad request - Error while parsing CountUtxos from request body
         "500":
           description: Internal Server Error - Error while fetching count of utxos
       security:
@@ -2019,13 +2650,13 @@ paths:
     post:
       description: Search for utxos
       parameters:
-      - description: Supports targeted resource searches with filters for metadata
-          and custom conditions, plus options for pagination and sorting to streamline
-          data exploration and analysis
+      - description: Supports targeted resource searches with filters and metadata,
+          plus options for pagination and sorting to streamline data exploration and
+          analysis
         in: body
-        name: SearchRequestParameters
+        name: SearchUtxos
         schema:
-          $ref: '#/definitions/actions.SearchRequestParameters'
+          $ref: '#/definitions/admin.SearchUtxos'
       produces:
       - application/json
       responses:
@@ -2036,8 +2667,8 @@ paths:
               $ref: '#/definitions/models.Utxo'
             type: array
         "400":
-          description: Bad request - Error while parsing SearchRequestParameters from
-            request body
+          description: Bad request - Error while parsing SearchUtxos from request
+            body
         "500":
           description: Internal server error - Error while searching for utxos
       security:
@@ -2075,12 +2706,11 @@ paths:
     post:
       description: Count xpubs
       parameters:
-      - description: Enables precise filtering of resource counts using custom conditions
-          or metadata, catering to specific business or analysis needs
+      - description: Enables filtering of elements to be counted
         in: body
-        name: CountRequestParameters
+        name: CountXpubs
         schema:
-          $ref: '#/definitions/actions.CountRequestParameters'
+          $ref: '#/definitions/admin.CountXpubs'
       produces:
       - application/json
       responses:
@@ -2089,8 +2719,7 @@ paths:
           schema:
             type: number
         "400":
-          description: Bad request - Error while parsing CountRequestParameters from
-            request body
+          description: Bad request - Error while parsing CountXpubs from request body
         "500":
           description: Internal Server Error - Error while fetching count of xpubs
       security:
@@ -2102,13 +2731,13 @@ paths:
     post:
       description: Search for xpubs
       parameters:
-      - description: Supports targeted resource searches with filters for metadata
-          and custom conditions, plus options for pagination and sorting to streamline
-          data exploration and analysis
+      - description: Supports targeted resource searches with filters and metadata,
+          plus options for pagination and sorting to streamline data exploration and
+          analysis
         in: body
-        name: SearchRequestParameters
+        name: SearchXpubs
         schema:
-          $ref: '#/definitions/actions.SearchRequestParameters'
+          $ref: '#/definitions/admin.SearchXpubs'
       produces:
       - application/json
       responses:
@@ -2119,8 +2748,8 @@ paths:
               $ref: '#/definitions/models.Xpub'
             type: array
         "400":
-          description: Bad request - Error while parsing SearchRequestParameters from
-            request body
+          description: Bad request - Error while parsing SearchXpubs from request
+            body
         "500":
           description: Internal server error - Error while searching for xpubs
       security:
@@ -2236,26 +2865,13 @@ paths:
     post:
       description: Search contacts
       parameters:
-      - description: page
-        in: query
-        name: page
-        type: integer
-      - description: page_size
-        in: query
-        name: page_size
-        type: integer
-      - description: order_by_field
-        in: query
-        name: order_by_field
-        type: string
-      - description: sort_direction
-        in: query
-        name: sort_direction
-        type: string
-      - description: conditions
-        in: query
-        name: conditions
-        type: string
+      - description: Supports targeted resource searches with filters and metadata,
+          plus options for pagination and sorting to streamline data exploration and
+          analysis
+        in: body
+        name: SearchContacts
+        schema:
+          $ref: '#/definitions/contacts.SearchContacts'
       produces:
       - application/json
       responses:
@@ -2266,13 +2882,39 @@ paths:
               $ref: '#/definitions/models.Contact'
             type: array
         "400":
-          description: Bad request - Error while parsing SearchRequestParameters from
-            request body
+          description: Bad request - Error while parsing SearchContacts from request
+            body
         "500":
           description: Internal server error - Error while searching for contacts
       security:
       - x-auth-xpub: []
       summary: Search contacts
+      tags:
+      - Contact
+  /v1/contact/unconfirmed/{paymail}:
+    patch:
+      description: Unconfirm contact. For contact with status "confirmed" change status
+        to "unconfirmed"
+      parameters:
+      - description: Paymail address of the contact the user wants to unconfirm
+        in: path
+        name: paymail
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+        "404":
+          description: Contact not found
+        "422":
+          description: Contact status not confirmed
+        "500":
+          description: Internal server error
+      security:
+      - x-auth-xpub: []
+      summary: Unconfirm contact
       tags:
       - Contact
   /v1/destination:
@@ -2361,8 +3003,7 @@ paths:
     post:
       description: Count Destinations
       parameters:
-      - description: Enables precise filtering of resource counts using custom conditions
-          or metadata, catering to specific business or analysis needs
+      - description: Enables filtering of elements to be counted
         in: body
         name: CountDestinations
         schema:
@@ -2388,9 +3029,9 @@ paths:
     post:
       description: Search for a destination
       parameters:
-      - description: Supports targeted resource searches with filters for metadata
-          and custom conditions, plus options for pagination and sorting to streamline
-          data exploration and analysis
+      - description: Supports targeted resource searches with filters and metadata,
+          plus options for pagination and sorting to streamline data exploration and
+          analysis
         in: body
         name: SearchDestinations
         schema:
@@ -2496,8 +3137,7 @@ paths:
     post:
       description: Count of transactions
       parameters:
-      - description: Enables precise filtering of resource counts using custom conditions
-          or metadata, catering to specific business or analysis needs
+      - description: Enables filtering of elements to be counted
         in: body
         name: CountTransactions
         schema:
@@ -2550,9 +3190,9 @@ paths:
     post:
       description: Search transaction
       parameters:
-      - description: Supports targeted resource searches with filters for metadata
-          and custom conditions, plus options for pagination and sorting to streamline
-          data exploration and analysis
+      - description: Supports targeted resource searches with filters and metadata,
+          plus options for pagination and sorting to streamline data exploration and
+          analysis
         in: body
         name: SearchTransactions
         schema:
@@ -2610,12 +3250,11 @@ paths:
     post:
       description: Count of UTXOs
       parameters:
-      - description: Enables precise filtering of resource counts using custom conditions
-          or metadata, catering to specific business or analysis needs
+      - description: Enables filtering of elements to be counted
         in: body
-        name: CountRequestParameters
+        name: CountUtxos
         schema:
-          $ref: '#/definitions/actions.CountRequestParameters'
+          $ref: '#/definitions/utxos.CountUtxos'
       produces:
       - application/json
       responses:
@@ -2624,8 +3263,7 @@ paths:
           schema:
             type: number
         "400":
-          description: Bad request - Error while parsing CountRequestParameters from
-            request body
+          description: Bad request - Error while parsing CountUtxos from request body
         "500":
           description: Internal Server Error - Error while fetching count of utxos
       security:
@@ -2637,13 +3275,13 @@ paths:
     post:
       description: Search UTXO
       parameters:
-      - description: Supports targeted resource searches with filters for metadata
-          and custom conditions, plus options for pagination and sorting to streamline
-          data exploration and analysis
+      - description: Supports targeted resource searches with filters and metadata,
+          plus options for pagination and sorting to streamline data exploration and
+          analysis
         in: body
-        name: SearchRequestParameters
+        name: SearchUtxos
         schema:
-          $ref: '#/definitions/actions.SearchRequestParameters'
+          $ref: '#/definitions/utxos.SearchUtxos'
       produces:
       - application/json
       responses:
@@ -2654,8 +3292,8 @@ paths:
               $ref: '#/definitions/models.Utxo'
             type: array
         "400":
-          description: Bad request - Error while parsing SearchRequestParameters from
-            request body
+          description: Bad request - Error while parsing SearchUtxos from request
+            body
         "500":
           description: Internal server error - Error while searching for utxos
       security:
