@@ -70,10 +70,16 @@ func (a *Action) contactsCount(c *gin.Context) {
 		return
 	}
 
+	conditions, err := reqParams.Conditions.ToDbConditions()
+	if err != nil {
+		c.JSON(http.StatusBadRequest, err.Error())
+		return
+	}
+
 	count, err := a.Services.SpvWalletEngine.GetContactsCount(
 		c.Request.Context(),
 		reqParams.Metadata,
-		reqParams.Conditions.ToDbConditions(),
+		conditions,
 	)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, err.Error())
@@ -208,39 +214,6 @@ func (a *Action) contactsAccept(c *gin.Context) {
 		c.Request.Context(),
 		id,
 		engine.ContactNotConfirmed,
-	)
-	if err != nil {
-		handleErrors(err, c)
-		return
-	}
-
-	contract := mappings.MapToContactContract(contact)
-
-	c.JSON(http.StatusOK, contract)
-}
-
-// contactsConfirm will perform Confirm action on contact with the given id
-// Perform confirm action on contact godoc
-// @Summary		Confirm contact
-// @Description Confirm contact
-// @Tags		Admin
-// @Produce		json
-// @Param		id path string false "Contact id"
-// @Success		200 {object} models.Contact "Changed contact"
-// @Failure		400	"Bad request - Error while getting id from path"
-// @Failure		404	"Not found - Error while getting contact by id"
-// @Failure		422	"Unprocessable entity - Incorrect status of contact"
-// @Failure 	500	"Internal server error - Error while updating contact"
-// @Failure 	500	"Internal server error - Error while changing contact status"
-// @Router		/v1/admin/contact/confirmed/{id} [patch]
-// @Security	x-auth-xpub
-func (a *Action) contactsConfirm(c *gin.Context) {
-	id := c.Param("id")
-
-	contact, err := a.Services.SpvWalletEngine.AdminChangeContactStatus(
-		c.Request.Context(),
-		id,
-		engine.ContactConfirmed,
 	)
 	if err != nil {
 		handleErrors(err, c)

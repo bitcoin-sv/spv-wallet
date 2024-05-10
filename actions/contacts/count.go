@@ -28,12 +28,18 @@ func (a *Action) count(c *gin.Context) {
 		return
 	}
 
+	conditions, err := reqParams.Conditions.ToDbConditions()
+	if err != nil {
+		c.JSON(http.StatusBadRequest, err.Error())
+		return
+	}
+
 	var count int64
-	count, err := a.Services.SpvWalletEngine.GetContactsByXPubIDCount(
+	count, err = a.Services.SpvWalletEngine.GetContactsByXPubIDCount(
 		c.Request.Context(),
 		reqXPubID,
 		reqParams.Metadata,
-		reqParams.Conditions.ToDbConditions(),
+		conditions,
 	)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, err.Error())
