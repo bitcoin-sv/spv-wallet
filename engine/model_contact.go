@@ -141,8 +141,6 @@ func getContacts(ctx context.Context, metadata *Metadata, conditions map[string]
 		conditions = make(map[string]interface{})
 	}
 
-	fmt.Println("conditions", conditions)
-
 	contacts := make([]*Contact, 0)
 	if err := getModelsByConditions(ctx, ModelContact, &contacts, metadata, conditions, queryParams, opts...); err != nil {
 		return nil, err
