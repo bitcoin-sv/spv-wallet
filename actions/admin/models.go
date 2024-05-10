@@ -48,5 +48,5 @@ type UpdateContact struct {
 	FullName string `json:"fullName" example:"John Doe"`
 }
 
-// SearchTransactions is a model for handling searching with filters and metadata
-type SearchTransactions = common.SearchModel[filter.ContactFilter]
+// SearchContacts is a model for handling searching with filters and metadata
+type SearchContacts = common.SearchModel[filter.ContactFilter]

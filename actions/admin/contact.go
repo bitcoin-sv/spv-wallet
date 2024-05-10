@@ -22,7 +22,7 @@ import (
 // @Router		/v1/admin/contact/search [post]
 // @Security	x-auth-xpub
 func (a *Action) contactsSearch(c *gin.Context) {
-	var reqParams SearchTransactions
+	var reqParams SearchContacts
 	if err := c.Bind(&reqParams); err != nil {
 		c.JSON(http.StatusBadRequest, err.Error())
 		return
