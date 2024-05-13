@@ -74,7 +74,7 @@ func getModelCount(
 
 // getModelsByConditions will get models by given conditions
 func getModelsByConditions(ctx context.Context, modelName ModelName, modelItems interface{},
-	metadata *Metadata, conditions *map[string]interface{}, queryParams *datastore.QueryParams,
+	metadata *Metadata, conditions map[string]interface{}, queryParams *datastore.QueryParams,
 	opts ...ModelOps,
 ) error {
 	dbConditions := map[string]interface{}{}
@@ -83,12 +83,12 @@ func getModelsByConditions(ctx context.Context, modelName ModelName, modelItems 
 		dbConditions[metadataField] = metadata
 	}
 
-	if conditions != nil && len(*conditions) > 0 {
+	if conditions != nil && len(conditions) > 0 {
 		and := make([]map[string]interface{}, 0)
 		if _, ok := dbConditions["$and"]; ok {
 			and = dbConditions["$and"].([]map[string]interface{})
 		}
-		and = append(and, *conditions)
+		and = append(and, conditions)
 		dbConditions["$and"] = and
 	}
 
@@ -108,7 +108,7 @@ func getModelsByConditions(ctx context.Context, modelName ModelName, modelItems 
 
 // getModelsAggregateByConditions will get aggregates of models by given conditions
 func getModelsAggregateByConditions(ctx context.Context, modelName ModelName, models interface{},
-	metadata *Metadata, conditions *map[string]interface{}, aggregateColumn string,
+	metadata *Metadata, conditions map[string]interface{}, aggregateColumn string,
 	opts ...ModelOps,
 ) (map[string]interface{}, error) {
 	dbConditions := map[string]interface{}{}
@@ -117,12 +117,12 @@ func getModelsAggregateByConditions(ctx context.Context, modelName ModelName, mo
 		dbConditions[metadataField] = metadata
 	}
 
-	if conditions != nil && len(*conditions) > 0 {
+	if conditions != nil && len(conditions) > 0 {
 		and := make([]map[string]interface{}, 0)
 		if _, ok := dbConditions["$and"]; ok {
 			and = dbConditions["$and"].([]map[string]interface{})
 		}
-		and = append(and, *conditions)
+		and = append(and, conditions)
 		dbConditions["$and"] = and
 	}
 
@@ -143,7 +143,7 @@ func getModelsAggregateByConditions(ctx context.Context, modelName ModelName, mo
 
 // getModelCountByConditions will get model counts (sums) from given conditions
 func getModelCountByConditions(ctx context.Context, modelName ModelName, model interface{},
-	metadata *Metadata, conditions *map[string]interface{}, opts ...ModelOps,
+	metadata *Metadata, conditions map[string]interface{}, opts ...ModelOps,
 ) (int64, error) {
 	dbConditions := map[string]interface{}{}
 
@@ -151,12 +151,12 @@ func getModelCountByConditions(ctx context.Context, modelName ModelName, model i
 		dbConditions[metadataField] = metadata
 	}
 
-	if conditions != nil && len(*conditions) > 0 {
+	if conditions != nil && len(conditions) > 0 {
 		and := make([]map[string]interface{}, 0)
 		if _, ok := dbConditions["$and"]; ok {
 			and = dbConditions["$and"].([]map[string]interface{})
 		}
-		and = append(and, *conditions)
+		and = append(and, conditions)
 		dbConditions["$and"] = and
 	}
 

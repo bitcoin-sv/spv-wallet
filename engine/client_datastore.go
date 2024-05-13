@@ -12,23 +12,23 @@ const (
 )
 
 // processCustomFields will process all custom fields
-func processCustomFields(conditions *map[string]interface{}) {
+func processCustomFields(conditions map[string]interface{}) {
 	// Process the xpub_output_value
-	_, ok := (*conditions)["xpub_output_value"]
+	_, ok := conditions["xpub_output_value"]
 	if ok {
 		processXpubOutputValueConditions(conditions)
 	}
 
 	// Process the xpub_output_value
-	_, ok = (*conditions)["xpub_metadata"]
+	_, ok = conditions["xpub_metadata"]
 	if ok {
 		processXpubMetadataConditions(conditions)
 	}
 }
 
 // processXpubOutputValueConditions will process xpub_output_value
-func processXpubOutputValueConditions(conditions *map[string]interface{}) {
-	m, _ := json.Marshal((*conditions)["xpub_output_value"]) //nolint:errchkjson // this check might break the current code
+func processXpubOutputValueConditions(conditions map[string]interface{}) {
+	m, _ := json.Marshal(conditions["xpub_output_value"]) //nolint:errchkjson // this check might break the current code
 	var r map[string]interface{}
 	_ = json.Unmarshal(m, &r)
 
@@ -40,23 +40,23 @@ func processXpubOutputValueConditions(conditions *map[string]interface{}) {
 		})
 	}
 	if len(xPubOutputValue) > 0 {
-		_, ok := (*conditions)[conditionAnd]
+		_, ok := conditions[conditionAnd]
 		if ok {
-			and := (*conditions)[conditionAnd].([]map[string]interface{})
+			and := conditions[conditionAnd].([]map[string]interface{})
 			and = append(and, xPubOutputValue...)
-			(*conditions)[conditionAnd] = and
+			conditions[conditionAnd] = and
 		} else {
-			(*conditions)[conditionAnd] = xPubOutputValue
+			conditions[conditionAnd] = xPubOutputValue
 		}
 	}
 
-	delete(*conditions, "xpub_output_value")
+	delete(conditions, "xpub_output_value")
 }
 
 // processXpubMetadataConditions will process xpub_metadata
-func processXpubMetadataConditions(conditions *map[string]interface{}) {
+func processXpubMetadataConditions(conditions map[string]interface{}) {
 	// marshal / unmarshal into standard map[string]interface{}
-	m, _ := json.Marshal((*conditions)["xpub_metadata"]) //nolint:errchkjson // this check might break the current code
+	m, _ := json.Marshal(conditions["xpub_metadata"]) //nolint:errchkjson // this check might break the current code
 	var r map[string]interface{}
 	_ = json.Unmarshal(m, &r)
 
@@ -70,17 +70,17 @@ func processXpubMetadataConditions(conditions *map[string]interface{}) {
 			})
 		}
 		if len(xPubMetadata) > 0 {
-			_, ok := (*conditions)[conditionAnd]
+			_, ok := conditions[conditionAnd]
 			if ok {
-				and := (*conditions)[conditionAnd].([]map[string]interface{})
+				and := conditions[conditionAnd].([]map[string]interface{})
 				and = append(and, xPubMetadata...)
-				(*conditions)[conditionAnd] = and
+				conditions[conditionAnd] = and
 			} else {
-				(*conditions)[conditionAnd] = xPubMetadata
+				conditions[conditionAnd] = xPubMetadata
 			}
 		}
 	}
-	delete(*conditions, "xpub_metadata")
+	delete(conditions, "xpub_metadata")
 }
 
 // getMongoIndexes will get indexes from mongo

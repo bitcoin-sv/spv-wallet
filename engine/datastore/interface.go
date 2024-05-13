@@ -38,7 +38,7 @@ type GetterInterface interface {
 	GetDatabaseName() string
 	GetMongoCollection(collectionName string) *mongo.Collection
 	GetMongoCollectionByTableName(tableName string) *mongo.Collection
-	GetMongoConditionProcessor() func(conditions *map[string]interface{})
+	GetMongoConditionProcessor() func(conditions map[string]interface{})
 	GetMongoIndexer() func() map[string][]mongo.IndexModel
 	GetObjectFields() []string
 	GetTableName(modelName string) string

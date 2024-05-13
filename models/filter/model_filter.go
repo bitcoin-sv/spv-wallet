@@ -2,9 +2,14 @@ package filter
 
 // ModelFilter is a common model filter that contains common fields for all model filters.
 type ModelFilter struct {
-	IncludeDeleted *bool      `json:"include_deleted,omitempty" example:"true"`
-	CreatedRange   *TimeRange `json:"created_range,omitempty" swaggertype:"object,string"`
-	UpdatedRange   *TimeRange `json:"updated_range,omitempty" swaggertype:"object,string"`
+	// IncludeDeleted is a flag whether or not to include deleted items in the search results
+	IncludeDeleted *bool `json:"includeDeleted,omitempty" swaggertype:"boolean" default:"false" example:"true"`
+
+	// CreatedRange specifies the time range when a record was created.
+	CreatedRange *TimeRange `json:"createdRange,omitempty"`
+
+	// UpdatedRange specifies the time range when a record was updated.
+	UpdatedRange *TimeRange `json:"updatedRange,omitempty"`
 }
 
 // ToDbConditions converts filter fields to the datastore conditions using gorm naming strategy

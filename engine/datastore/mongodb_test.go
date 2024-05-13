@@ -409,9 +409,9 @@ func TestClient_getMongoQueryConditions(t *testing.T) {
 
 // processObjectMetadataConditions is an example of processing custom object metadata
 // ObjectID -> Key/Value
-func processObjectMetadataConditions(conditions *map[string]interface{}) {
+func processObjectMetadataConditions(conditions map[string]interface{}) {
 	// marshal / unmarshal into standard map[string]interface{}
-	m, _ := json.Marshal((*conditions)[objectMetadataField]) //nolint:errchkjson // this check might break the current code
+	m, _ := json.Marshal(conditions[objectMetadataField]) //nolint:errchkjson // this check might break the current code
 	var r map[string]interface{}
 	_ = json.Unmarshal(m, &r)
 
@@ -425,25 +425,25 @@ func processObjectMetadataConditions(conditions *map[string]interface{}) {
 			})
 		}
 		if len(objectMetadata) > 0 {
-			_, ok := (*conditions)[conditionAnd]
+			_, ok := conditions[conditionAnd]
 			if ok {
-				and := (*conditions)[conditionAnd].([]map[string]interface{})
+				and := conditions[conditionAnd].([]map[string]interface{})
 				and = append(and, objectMetadata...)
-				(*conditions)[conditionAnd] = and
+				conditions[conditionAnd] = and
 			} else {
-				(*conditions)[conditionAnd] = objectMetadata
+				conditions[conditionAnd] = objectMetadata
 			}
 		}
 	}
-	delete(*conditions, objectMetadataField)
+	delete(conditions, objectMetadataField)
 }
 
 // processObjectOutputValueConditions is an example of processing custom object value
 // ObjectID -> Value
-func processObjectOutputValueConditions(conditions *map[string]interface{}) {
+func processObjectOutputValueConditions(conditions map[string]interface{}) {
 	fieldName := "object_output_value"
 
-	m, _ := json.Marshal((*conditions)[fieldName]) //nolint:errchkjson // this check might break the current code
+	m, _ := json.Marshal(conditions[fieldName]) //nolint:errchkjson // this check might break the current code
 	var r map[string]interface{}
 	_ = json.Unmarshal(m, &r)
 
@@ -455,15 +455,15 @@ func processObjectOutputValueConditions(conditions *map[string]interface{}) {
 		})
 	}
 	if len(objectOutputValue) > 0 {
-		_, ok := (*conditions)[conditionAnd]
+		_, ok := conditions[conditionAnd]
 		if ok {
-			and := (*conditions)[conditionAnd].([]map[string]interface{})
+			and := conditions[conditionAnd].([]map[string]interface{})
 			and = append(and, objectOutputValue...)
-			(*conditions)[conditionAnd] = and
+			conditions[conditionAnd] = and
 		} else {
-			(*conditions)[conditionAnd] = objectOutputValue
+			conditions[conditionAnd] = objectOutputValue
 		}
 	}
 
-	delete(*conditions, fieldName)
+	delete(conditions, fieldName)
 }

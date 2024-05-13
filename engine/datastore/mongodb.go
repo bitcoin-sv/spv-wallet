@@ -458,7 +458,7 @@ func setPrefix(prefix, collection string) string {
 func getMongoQueryConditions(
 	model interface{},
 	conditions map[string]interface{},
-	customProcessor func(conditions *map[string]interface{}),
+	customProcessor func(conditions map[string]interface{}),
 ) map[string]interface{} {
 	if conditions == nil {
 		conditions = map[string]interface{}{}
@@ -470,7 +470,7 @@ func getMongoQueryConditions(
 			delete(conditions, sqlIDField)
 		}
 
-		processMongoConditions(&conditions, customProcessor)
+		processMongoConditions(conditions, customProcessor)
 	}
 
 	// add model ID to the query conditions, if set on the model
@@ -483,18 +483,18 @@ func getMongoQueryConditions(
 }
 
 // processMongoConditions will process all conditions for Mongo, including custom processing
-func processMongoConditions(conditions *map[string]interface{},
-	customProcessor func(conditions *map[string]interface{}),
-) *map[string]interface{} {
+func processMongoConditions(conditions map[string]interface{},
+	customProcessor func(conditions map[string]interface{}),
+) map[string]interface{} {
 	// Transform the id field to mongo _id field
-	_, ok := (*conditions)[sqlIDField]
+	_, ok := conditions[sqlIDField]
 	if ok {
-		(*conditions)[mongoIDField] = (*conditions)[sqlIDField]
-		delete(*conditions, sqlIDField)
+		conditions[mongoIDField] = conditions[sqlIDField]
+		delete(conditions, sqlIDField)
 	}
 
 	// Transform the map of metadata to key / value query
-	_, ok = (*conditions)[metadataField]
+	_, ok = conditions[metadataField]
 	if ok {
 		processMetadataConditions(conditions)
 	}
@@ -505,16 +505,16 @@ func processMongoConditions(conditions *map[string]interface{},
 	}
 
 	// Handle all conditions post-processing
-	for key, condition := range *conditions {
+	for key, condition := range conditions {
 		if key == conditionAnd || key == conditionOr {
 			var slice []map[string]interface{}
 			a, _ := json.Marshal(condition) //nolint:errchkjson // this check might break the current code
 			_ = json.Unmarshal(a, &slice)
 			var newConditions []map[string]interface{}
 			for _, c := range slice {
-				newConditions = append(newConditions, *processMongoConditions(&c, customProcessor)) //nolint:scopelint,gosec // ignore for now
+				newConditions = append(newConditions, processMongoConditions(c, customProcessor)) //nolint:scopelint,gosec // ignore for now
 			}
-			(*conditions)[key] = newConditions
+			conditions[key] = newConditions
 		}
 	}
 
@@ -522,9 +522,9 @@ func processMongoConditions(conditions *map[string]interface{},
 }
 
 // processMetadataConditions will process metadata conditions
-func processMetadataConditions(conditions *map[string]interface{}) {
+func processMetadataConditions(conditions map[string]interface{}) {
 	// marshal / unmarshal into standard map[string]interface{}
-	m, _ := json.Marshal((*conditions)[metadataField]) //nolint:errchkjson // this check might break the current code
+	m, _ := json.Marshal(conditions[metadataField]) //nolint:errchkjson // this check might break the current code
 	var r map[string]interface{}
 	_ = json.Unmarshal(m, &r)
 
@@ -539,18 +539,18 @@ func processMetadataConditions(conditions *map[string]interface{}) {
 
 	// Found some metadata
 	if len(metadata) > 0 {
-		_, ok := (*conditions)[conditionAnd]
+		_, ok := conditions[conditionAnd]
 		if ok {
-			and := (*conditions)[conditionAnd].([]map[string]interface{})
+			and := conditions[conditionAnd].([]map[string]interface{})
 			and = append(and, metadata...)
-			(*conditions)[conditionAnd] = and
+			conditions[conditionAnd] = and
 		} else {
-			(*conditions)[conditionAnd] = metadata
+			conditions[conditionAnd] = metadata
 		}
 	}
 
 	// Remove the field from conditions
-	delete(*conditions, metadataField)
+	delete(conditions, metadataField)
 }
 
 // openMongoDatabase will open a new database or use an existing connection

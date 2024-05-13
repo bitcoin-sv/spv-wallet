@@ -15,15 +15,21 @@ import (
 // @Description	Search for contacts
 // @Tags		Admin
 // @Produce		json
-// @Param		SearchRequestParameters body actions.SearchRequestParameters false "Supports targeted resource searches with filters for metadata and custom conditions, plus options for pagination and sorting to streamline data exploration and analysis"
+// @Param		SearchContacts body SearchContacts false "Supports targeted resource searches with filters and metadata, plus options for pagination and sorting to streamline data exploration and analysis"
 // @Success		200 {object} []models.Contact "List of contacts"
-// @Failure		400	"Bad request - Error while parsing SearchRequestParameters from request body"
+// @Failure		400	"Bad request - Error while parsing SearchContacts from request body"
 // @Failure 	500	"Internal server error - Error while searching for contacts"
 // @Router		/v1/admin/contact/search [post]
 // @Security	x-auth-xpub
 func (a *Action) contactsSearch(c *gin.Context) {
-	var reqParams SearchTransactions
+	var reqParams SearchContacts
 	if err := c.Bind(&reqParams); err != nil {
+		c.JSON(http.StatusBadRequest, err.Error())
+		return
+	}
+
+	conditions, err := reqParams.Conditions.ToDbConditions()
+	if err != nil {
 		c.JSON(http.StatusBadRequest, err.Error())
 		return
 	}
@@ -32,7 +38,7 @@ func (a *Action) contactsSearch(c *gin.Context) {
 	contacts, err := a.Services.SpvWalletEngine.GetContacts(
 		c.Request.Context(),
 		reqParams.Metadata,
-		reqParams.Conditions.ToDbConditions(),
+		conditions,
 		reqParams.QueryParams,
 	)
 	if err != nil {
@@ -75,7 +81,6 @@ func (a *Action) contactsUpdate(c *gin.Context) {
 		reqParams.FullName,
 		&reqParams.Metadata,
 	)
-
 	if err != nil {
 		handleErrors(err, c)
 		return

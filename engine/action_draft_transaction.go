@@ -24,7 +24,7 @@ func (c *Client) GetDraftTransactionByID(ctx context.Context, id string, opts ..
 
 // GetDraftTransactions will get all the draft transactions from the Datastore
 func (c *Client) GetDraftTransactions(ctx context.Context, metadataConditions *Metadata,
-	conditions *map[string]interface{}, queryParams *datastore.QueryParams, opts ...ModelOps,
+	conditions map[string]interface{}, queryParams *datastore.QueryParams, opts ...ModelOps,
 ) ([]*DraftTransaction, error) {
 	// Check for existing NewRelic transaction
 	ctx = c.GetOrStartTxn(ctx, "get_draft_transactions")
@@ -43,7 +43,7 @@ func (c *Client) GetDraftTransactions(ctx context.Context, metadataConditions *M
 
 // GetDraftTransactionsCount will get a count of all the draft transactions from the Datastore
 func (c *Client) GetDraftTransactionsCount(ctx context.Context, metadataConditions *Metadata,
-	conditions *map[string]interface{}, opts ...ModelOps,
+	conditions map[string]interface{}, opts ...ModelOps,
 ) (int64, error) {
 	// Check for existing NewRelic transaction
 	ctx = c.GetOrStartTxn(ctx, "get_draft_transactions_count")

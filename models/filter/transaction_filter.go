@@ -1,16 +1,16 @@
 package filter
 
-// TransactionFilter is a struct for handling request parameters for destination search requests
+// TransactionFilter is a struct for handling request parameters for transactions search requests
 type TransactionFilter struct {
 	ModelFilter     `json:",inline"`
 	Hex             *string `json:"hex,omitempty"`
-	BlockHash       *string `json:"block_hash,omitempty"`
-	BlockHeight     *uint64 `json:"block_height,omitempty"`
-	Fee             *uint64 `json:"fee,omitempty"`
-	NumberOfInputs  *uint32 `json:"number_of_inputs,omitempty"`
-	NumberOfOutputs *uint32 `json:"number_of_outputs,omitempty"`
-	DraftID         *string `json:"draft_id,omitempty"`
-	TotalValue      *uint64 `json:"total_value,omitempty"`
+	BlockHash       *string `json:"blockHash,omitempty" example:"0000000000000000031928c28075a82d7a00c2c90b489d1d66dc0afa3f8d26f8"`
+	BlockHeight     *uint64 `json:"blockHeight,omitempty" example:"839376"`
+	Fee             *uint64 `json:"fee,omitempty" example:"1"`
+	NumberOfInputs  *uint32 `json:"numberOfInputs,omitempty" example:"1"`
+	NumberOfOutputs *uint32 `json:"numberOfOutputs,omitempty" example:"2"`
+	DraftID         *string `json:"draftId,omitempty" example:"d425432e0d10a46af1ec6d00f380e9581ebf7907f3486572b3cd561a4c326e14"`
+	TotalValue      *uint64 `json:"totalValue,omitempty" example:"100000000"`
 	Status          *string `json:"status,omitempty" enums:"UNKNOWN,QUEUED,RECEIVED,STORED,ANNOUNCED_TO_NETWORK,REQUESTED_BY_NETWORK,SENT_TO_NETWORK,ACCEPTED_BY_NETWORK,SEEN_ON_NETWORK,MINED,SEEN_IN_ORPHAN_MEMPOOL,CONFIRMED,REJECTED"`
 }
 

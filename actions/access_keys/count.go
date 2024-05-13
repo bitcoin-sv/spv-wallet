@@ -3,7 +3,6 @@ package accesskeys
 import (
 	"net/http"
 
-	"github.com/bitcoin-sv/spv-wallet/actions"
 	"github.com/bitcoin-sv/spv-wallet/server/auth"
 	"github.com/gin-gonic/gin"
 )
@@ -14,28 +13,28 @@ import (
 // @Description	Count of access keys
 // @Tags		Access-key
 // @Produce		json
-// @Param		CountRequestParameters body actions.CountRequestParameters false "Enables precise filtering of resource counts using custom conditions or metadata, catering to specific business or analysis needs"
+// @Param		CountAccessKeys body CountAccessKeys false "Enables filtering of elements to be counted"
 // @Success		200	{number} int64 "Count of access keys"
-// @Failure		400	"Bad request - Error while parsing CountRequestParameters from request body"
+// @Failure		400	"Bad request - Error while parsing CountAccessKeys from request body"
 // @Failure 	500	"Internal Server Error - Error while fetching count of access keys"
 // @Router		/v1/access-key/count [post]
 // @Security	x-auth-xpub
 func (a *Action) count(c *gin.Context) {
 	reqXPubID := c.GetString(auth.ParamXPubHashKey)
 
-	metadata, conditions, err := actions.GetCountQueryParameters(c)
-	if err != nil {
+	var reqParams CountAccessKeys
+	if err := c.Bind(&reqParams); err != nil {
 		c.JSON(http.StatusBadRequest, err.Error())
 		return
 	}
 
-	var count int64
-	if count, err = a.Services.SpvWalletEngine.GetAccessKeysByXPubIDCount(
+	count, err := a.Services.SpvWalletEngine.GetAccessKeysByXPubIDCount(
 		c.Request.Context(),
 		reqXPubID,
-		metadata,
-		conditions,
-	); err != nil {
+		reqParams.Metadata,
+		reqParams.Conditions.ToDbConditions(),
+	)
+	if err != nil {
 		c.JSON(http.StatusInternalServerError, err.Error())
 		return
 	}

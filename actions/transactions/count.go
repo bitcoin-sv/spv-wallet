@@ -13,7 +13,7 @@ import (
 // @Description	Count of transactions
 // @Tags		Transactions
 // @Produce		json
-// @Param		CountTransactions body CountTransactions false "Enables precise filtering of resource counts using custom conditions or metadata, catering to specific business or analysis needs"
+// @Param		CountTransactions body CountTransactions false "Enables filtering of elements to be counted"
 // @Success		200	{number} int64 "Count of access keys"
 // @Failure		400	"Bad request - Error while parsing CountTransactions from request body"
 // @Failure 	500	"Internal Server Error - Error while fetching count of transactions"

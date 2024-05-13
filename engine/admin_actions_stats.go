@@ -54,7 +54,7 @@ func (c *Client) GetStats(ctx context.Context, opts ...ModelOps) (*AdminStats, e
 		"deleted_at": nil,
 	}
 	if paymailAddressCount, err = getPaymailAddressesCount(
-		ctx, nil, &conditions, defaultOpts...,
+		ctx, nil, conditions, defaultOpts...,
 	); err != nil {
 		return nil, err
 	}

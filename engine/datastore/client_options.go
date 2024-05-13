@@ -227,7 +227,7 @@ func WithCustomFields(arrayFields []string, objectFields []string) ClientOps {
 }
 
 // WithCustomMongoConditionProcessor will add a custom mongo condition processor function
-func WithCustomMongoConditionProcessor(f func(conditions *map[string]interface{})) ClientOps {
+func WithCustomMongoConditionProcessor(f func(conditions map[string]interface{})) ClientOps {
 	return func(c *clientOptions) {
 		if f != nil {
 			c.fields.customMongoConditionProcessor = f

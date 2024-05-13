@@ -27,7 +27,7 @@ func (c *Client) GetPaymailAddress(ctx context.Context, address string, opts ...
 
 // GetPaymailAddresses will get all the paymail addresses from the Datastore
 func (c *Client) GetPaymailAddresses(ctx context.Context, metadataConditions *Metadata,
-	conditions *map[string]interface{}, queryParams *datastore.QueryParams, opts ...ModelOps,
+	conditions map[string]interface{}, queryParams *datastore.QueryParams, opts ...ModelOps,
 ) ([]*PaymailAddress, error) {
 	// Check for existing NewRelic transaction
 	ctx = c.GetOrStartTxn(ctx, "get_paymail_addresses")
@@ -46,7 +46,7 @@ func (c *Client) GetPaymailAddresses(ctx context.Context, metadataConditions *Me
 
 // GetPaymailAddressesCount will get a count of all the paymail addresses from the Datastore
 func (c *Client) GetPaymailAddressesCount(ctx context.Context, metadataConditions *Metadata,
-	conditions *map[string]interface{}, opts ...ModelOps,
+	conditions map[string]interface{}, opts ...ModelOps,
 ) (int64, error) {
 	// Check for existing NewRelic transaction
 	ctx = c.GetOrStartTxn(ctx, "get_paymail_addresses_count")
@@ -65,17 +65,17 @@ func (c *Client) GetPaymailAddressesCount(ctx context.Context, metadataCondition
 
 // GetPaymailAddressesByXPubID will get all the paymail addresses for an xPubID from the Datastore
 func (c *Client) GetPaymailAddressesByXPubID(ctx context.Context, xPubID string, metadataConditions *Metadata,
-	conditions *map[string]interface{}, queryParams *datastore.QueryParams,
+	conditions map[string]interface{}, queryParams *datastore.QueryParams,
 ) ([]*PaymailAddress, error) {
 	// Check for existing NewRelic transaction
 	ctx = c.GetOrStartTxn(ctx, "get_paymail_by_xpub")
 
 	if conditions == nil {
 		x := make(map[string]interface{})
-		conditions = &x
+		conditions = x
 	}
 	// add the xpub_id to the conditions
-	(*conditions)["xpub_id"] = xPubID
+	conditions["xpub_id"] = xPubID
 
 	// Get the paymail address
 	paymailAddresses, err := getPaymailAddresses(
