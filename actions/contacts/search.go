@@ -62,7 +62,7 @@ func (a *Action) search(c *gin.Context) {
 	contracts := mappings.MapToContactContracts(contacts)
 
 	if !addCount {
-		c.JSON(http.StatusOK, contracts)
+		c.JSON(http.StatusOK, common.WrapBasicSearchResponse(contracts, len(contracts)))
 		return
 	}
 
