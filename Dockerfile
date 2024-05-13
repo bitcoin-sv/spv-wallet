@@ -1,5 +1,5 @@
 # Get Golang for builder
-FROM golang:1.21.6 as builder
+FROM golang:1.22.3 as builder
 
 # Set the working directory
 WORKDIR /go/src/github.com/bitcoin-sv/spv-wallet
