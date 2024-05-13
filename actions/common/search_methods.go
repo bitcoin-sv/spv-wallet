@@ -1,8 +1,9 @@
 package common
 
 import (
-	"github.com/bitcoin-sv/spv-wallet/engine/datastore"
 	"math"
+
+	"github.com/bitcoin-sv/spv-wallet/engine/datastore"
 )
 
 // Count object to use when returning a count of database query results

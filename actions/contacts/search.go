@@ -1,12 +1,13 @@
 package contacts
 
 import (
+	"net/http"
+	"strconv"
+
 	"github.com/bitcoin-sv/spv-wallet/actions/common"
 	"github.com/bitcoin-sv/spv-wallet/mappings"
 	"github.com/bitcoin-sv/spv-wallet/server/auth"
 	"github.com/gin-gonic/gin"
-	"net/http"
-	"strconv"
 )
 
 // Search will fetch a list of contacts
