@@ -26,7 +26,6 @@ func NewHandler(appConfig *config.AppConfig, services *config.AppServices) route
 		group.PATCH("/unconfirmed/:paymail", action.unconfirm)
 
 		group.POST("search", action.search)
-		group.POST("count", action.count)
 	})
 
 	return apiEndpoints
