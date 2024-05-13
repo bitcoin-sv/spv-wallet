@@ -23,7 +23,6 @@ func NewHandler(appConfig *config.AppConfig, services *config.AppServices) route
 		adminGroup.POST("/access-keys/search", action.accessKeysSearch)
 		adminGroup.POST("/access-keys/count", action.accessKeysCount)
 		adminGroup.POST("/contact/search", action.contactsSearch)
-		adminGroup.POST("/contact/count", action.contactsCount)
 		adminGroup.PATCH("/contact/:id", action.contactsUpdate)
 		adminGroup.DELETE("/contact/:id", action.contactsDelete)
 		adminGroup.PATCH("/contact/accepted/:id", action.contactsAccept)

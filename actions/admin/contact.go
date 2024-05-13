@@ -2,7 +2,9 @@ package admin
 
 import (
 	"errors"
+	"github.com/bitcoin-sv/spv-wallet/actions/common"
 	"net/http"
+	"strconv"
 
 	"github.com/bitcoin-sv/spv-wallet/engine"
 	"github.com/bitcoin-sv/spv-wallet/mappings"
@@ -22,6 +24,12 @@ import (
 // @Router		/v1/admin/contact/search [post]
 // @Security	x-auth-xpub
 func (a *Action) contactsSearch(c *gin.Context) {
+	addCount, err := strconv.ParseBool(c.DefaultQuery("count", "true"))
+	if err != nil {
+		c.JSON(http.StatusBadRequest, err.Error())
+		return
+	}
+
 	var reqParams SearchContacts
 	if err := c.Bind(&reqParams); err != nil {
 		c.JSON(http.StatusBadRequest, err.Error())
@@ -34,7 +42,10 @@ func (a *Action) contactsSearch(c *gin.Context) {
 		return
 	}
 
-	// Record a new transaction (get the hex from parameters)a
+	if addCount && reqParams.QueryParams == nil {
+		reqParams.QueryParams = common.LoadDefaultQueryParams()
+	}
+
 	contacts, err := a.Services.SpvWalletEngine.GetContacts(
 		c.Request.Context(),
 		reqParams.Metadata,
@@ -48,31 +59,8 @@ func (a *Action) contactsSearch(c *gin.Context) {
 
 	contracts := mappings.MapToContactContracts(contacts)
 
-	c.JSON(http.StatusOK, contracts)
-}
-
-// count will fetch a count of contacts filtered on conditions and metadata
-// Count of contacts godoc
-// @Summary		Count of contacts
-// @Description	Count of contacts
-// @Tags		Admin
-// @Produce		json
-// @Param		CountContacts body CountContacts false "Enables precise filtering of resource counts using custom conditions or metadata, catering to specific business or analysis needs"
-// @Success		200	{number} int64 "Count of contacts"
-// @Failure		400	"Bad request - Error while parsing CountContacts from request body"
-// @Failure 	500	"Internal Server Error - Error while fetching count of contacts"
-// @Router		/v1/contact/count [post]
-// @Security	x-auth-xpub
-func (a *Action) contactsCount(c *gin.Context) {
-	var reqParams CountContacts
-	if err := c.Bind(&reqParams); err != nil {
-		c.JSON(http.StatusBadRequest, err.Error())
-		return
-	}
-
-	conditions, err := reqParams.Conditions.ToDbConditions()
-	if err != nil {
-		c.JSON(http.StatusBadRequest, err.Error())
+	if !addCount {
+		c.JSON(http.StatusOK, contracts)
 		return
 	}
 
@@ -85,8 +73,7 @@ func (a *Action) contactsCount(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, err.Error())
 		return
 	}
-
-	c.JSON(http.StatusOK, count)
+	c.JSON(http.StatusOK, common.WrapCountResponse(contracts, count, reqParams.QueryParams))
 }
 
 // contactsUpdate will update contact with the given id

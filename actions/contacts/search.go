@@ -1,11 +1,12 @@
 package contacts
 
 import (
-	"net/http"
-
+	"github.com/bitcoin-sv/spv-wallet/actions/common"
 	"github.com/bitcoin-sv/spv-wallet/mappings"
 	"github.com/bitcoin-sv/spv-wallet/server/auth"
 	"github.com/gin-gonic/gin"
+	"net/http"
+	"strconv"
 )
 
 // Search will fetch a list of contacts
@@ -23,6 +24,12 @@ import (
 func (a *Action) search(c *gin.Context) {
 	reqXPubID := c.GetString(auth.ParamXPubHashKey)
 
+	addCount, err := strconv.ParseBool(c.DefaultQuery("count", "true"))
+	if err != nil {
+		c.JSON(http.StatusBadRequest, err.Error())
+		return
+	}
+
 	var reqParams SearchContacts
 	if err := c.Bind(&reqParams); err != nil {
 		c.JSON(http.StatusBadRequest, err.Error())
@@ -33,6 +40,10 @@ func (a *Action) search(c *gin.Context) {
 	if err != nil {
 		c.JSON(http.StatusBadRequest, err.Error())
 		return
+	}
+
+	if addCount && reqParams.QueryParams == nil {
+		reqParams.QueryParams = common.LoadDefaultQueryParams()
 	}
 
 	contacts, err := a.Services.SpvWalletEngine.GetContactsByXpubID(
@@ -47,5 +58,22 @@ func (a *Action) search(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, mappings.MapToContactContracts(contacts))
+	contracts := mappings.MapToContactContracts(contacts)
+
+	if !addCount {
+		c.JSON(http.StatusOK, contracts)
+		return
+	}
+
+	count, err := a.Services.SpvWalletEngine.GetContactsByXPubIDCount(
+		c.Request.Context(),
+		reqXPubID,
+		reqParams.Metadata,
+		conditions,
+	)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, err.Error())
+		return
+	}
+	c.JSON(http.StatusOK, common.WrapCountResponse(contracts, count, reqParams.QueryParams))
 }
