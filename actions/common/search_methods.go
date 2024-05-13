@@ -14,10 +14,10 @@ type Count struct {
 
 // Page object to use when limiting and sorting database query results
 type Page struct {
-	Size          int    `json:"size"`
-	Number        int    `json:"number"`
 	TotalElements *int64 `json:"totalElements"`
 	TotalPages    *int   `json:"totalPages"`
+	Size          int    `json:"size"`
+	Number        int    `json:"number"`
 }
 
 // LoadDefaultQueryParams will load the default query parameters
