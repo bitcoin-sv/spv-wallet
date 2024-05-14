@@ -8,16 +8,18 @@ import (
 
 // Count object to use when returning a count of database query results
 type Count struct {
-	Content any  `json:"content,omitempty"`
-	Page    Page `json:"page,omitempty"`
+	Content any  `json:"content"`
+	Page    Page `json:"page"`
 }
 
 // Page object to use when limiting and sorting database query results
 type Page struct {
-	TotalElements *int64 `json:"totalElements"`
-	TotalPages    *int   `json:"totalPages"`
-	Size          int    `json:"size"`
-	Number        int    `json:"number"`
+	TotalElements *int64  `json:"totalElements"`
+	TotalPages    *int    `json:"totalPages"`
+	OrderByField  *string `json:"orderByField"`
+	SortDirection *string `json:"sortDirection"`
+	Size          int     `json:"size"`
+	Number        int     `json:"number"`
 }
 
 // LoadDefaultQueryParams will load the default query parameters
@@ -31,7 +33,8 @@ func LoadDefaultQueryParams() *datastore.QueryParams {
 // WrapCountResponse will wrap the content with the count and query parameters
 func WrapCountResponse(content any, count int64, queryParams *datastore.QueryParams) Count {
 	totalPages := int(math.Ceil(float64(count) / float64(queryParams.PageSize)))
-	return Count{
+
+	response := Count{
 		Content: content,
 		Page: Page{
 			Size:          queryParams.PageSize,
@@ -40,15 +43,12 @@ func WrapCountResponse(content any, count int64, queryParams *datastore.QueryPar
 			TotalPages:    &totalPages,
 		},
 	}
-}
 
-// WrapBasicSearchResponse will wrap the content without the count and query parameters
-func WrapBasicSearchResponse(content any, size int) Count {
-	return Count{
-		Content: content,
-		Page: Page{
-			Size:   size,
-			Number: 1,
-		},
+	if queryParams.OrderByField != "" {
+		response.Page.OrderByField = &queryParams.OrderByField
 	}
+	if queryParams.SortDirection != "" {
+		response.Page.SortDirection = &queryParams.SortDirection
+	}
+	return response
 }

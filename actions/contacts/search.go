@@ -2,7 +2,6 @@ package contacts
 
 import (
 	"net/http"
-	"strconv"
 
 	"github.com/bitcoin-sv/spv-wallet/actions/common"
 	"github.com/bitcoin-sv/spv-wallet/mappings"
@@ -25,12 +24,6 @@ import (
 func (a *Action) search(c *gin.Context) {
 	reqXPubID := c.GetString(auth.ParamXPubHashKey)
 
-	addCount, err := strconv.ParseBool(c.DefaultQuery("count", "true"))
-	if err != nil {
-		c.JSON(http.StatusBadRequest, err.Error())
-		return
-	}
-
 	var reqParams SearchContacts
 	if err := c.Bind(&reqParams); err != nil {
 		c.JSON(http.StatusBadRequest, err.Error())
@@ -43,7 +36,7 @@ func (a *Action) search(c *gin.Context) {
 		return
 	}
 
-	if addCount && reqParams.QueryParams == nil {
+	if reqParams.QueryParams == nil {
 		reqParams.QueryParams = common.LoadDefaultQueryParams()
 	}
 
@@ -60,11 +53,6 @@ func (a *Action) search(c *gin.Context) {
 	}
 
 	contracts := mappings.MapToContactContracts(contacts)
-
-	if !addCount {
-		c.JSON(http.StatusOK, common.WrapBasicSearchResponse(contracts, len(contracts)))
-		return
-	}
 
 	count, err := a.Services.SpvWalletEngine.GetContactsByXPubIDCount(
 		c.Request.Context(),
