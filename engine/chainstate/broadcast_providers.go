@@ -139,7 +139,7 @@ func (provider *broadcastClientProvider) broadcast(ctx context.Context, c *Clien
 			Msgf("error broadcast request for %s failed: %s", provider.getName(), failure.Error())
 
 		return &BroadcastFailure{
-			InvalidTx: failure.ArcErrorResponse != nil, // failure was caused be invalid request not client/network issue
+			InvalidTx: failure.Details() != nil, // failure was caused be invalid request not client/network issue
 			Error:     failure,
 		}
 	}

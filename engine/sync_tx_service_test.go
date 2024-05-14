@@ -119,7 +119,7 @@ func (mq *broadcastClientMq) setupResponse(method string, response broadcastClie
 	mq.responses[method] = response
 }
 
-func (mq *broadcastClientMq) GetFeeQuote(ctx context.Context) ([]*broadcast_client.FeeQuote, *broadcast_client.FailureResponse) {
+func (mq *broadcastClientMq) GetFeeQuote(ctx context.Context) ([]*broadcast_client.FeeQuote, broadcast_client.ArcFailure) {
 	if r, ok := mq.responses["GetFeeQuote"]; ok {
 		return r.r.([]*broadcast_client.FeeQuote), r.f
 	}
@@ -127,21 +127,21 @@ func (mq *broadcastClientMq) GetFeeQuote(ctx context.Context) ([]*broadcast_clie
 	return []*broadcast_client.FeeQuote{{MiningFee: broadcast_client.MiningFeeResponse{Bytes: 1, Satoshis: 1}}}, nil
 }
 
-func (*broadcastClientMq) GetPolicyQuote(ctx context.Context) ([]*broadcast_client.PolicyQuoteResponse, *broadcast_client.FailureResponse) {
+func (*broadcastClientMq) GetPolicyQuote(ctx context.Context) ([]*broadcast_client.PolicyQuoteResponse, broadcast_client.ArcFailure) {
 	return nil, nil
 }
 
-func (*broadcastClientMq) QueryTransaction(ctx context.Context, txID string) (*broadcast_client.QueryTxResponse, *broadcast_client.FailureResponse) {
+func (*broadcastClientMq) QueryTransaction(ctx context.Context, txID string) (*broadcast_client.QueryTxResponse, broadcast_client.ArcFailure) {
 	return nil, nil
 }
 
 func (*broadcastClientMq) SubmitBatchTransactions(ctx context.Context, tx []*broadcast_client.Transaction, opts ...broadcast_client.TransactionOptFunc,
-) (*broadcast_client.SubmitBatchTxResponse, *broadcast_client.FailureResponse) {
+) (*broadcast_client.SubmitBatchTxResponse, broadcast_client.ArcFailure) {
 	return nil, nil
 }
 
 func (mq *broadcastClientMq) SubmitTransaction(ctx context.Context, tx *broadcast_client.Transaction, opts ...broadcast_client.TransactionOptFunc,
-) (*broadcast_client.SubmitTxResponse, *broadcast_client.FailureResponse) {
+) (*broadcast_client.SubmitTxResponse, broadcast_client.ArcFailure) {
 	r := mq.responses["SubmitTransaction"]
 	return r.r.(*broadcast_client.SubmitTxResponse), r.f
 }
