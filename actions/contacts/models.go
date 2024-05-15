@@ -28,6 +28,3 @@ func (p *UpsertContact) validate() error {
 
 // SearchContacts is a model for handling searching with filters and metadata
 type SearchContacts = common.SearchModel[filter.ContactFilter]
-
-// CountContacts is a model for handling counting filtered contacts
-type CountContacts = common.ConditionsModel[filter.ContactFilter]

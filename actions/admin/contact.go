@@ -17,7 +17,7 @@ import (
 // @Tags		Admin
 // @Produce		json
 // @Param		SearchContacts body SearchContacts false "Supports targeted resource searches with filters and metadata, plus options for pagination and sorting to streamline data exploration and analysis"
-// @Success		200 {object} []models.Contact "List of contacts"
+// @Success		200 {object} common.SearchContactsResponse "List of contacts"
 // @Failure		400	"Bad request - Error while parsing SearchContacts from request body"
 // @Failure 	500	"Internal server error - Error while searching for contacts"
 // @Router		/v1/admin/contact/search [post]
@@ -61,7 +61,13 @@ func (a *Action) contactsSearch(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, err.Error())
 		return
 	}
-	c.JSON(http.StatusOK, common.WrapCountResponse(contracts, count, reqParams.QueryParams))
+
+	response := common.SearchContactsResponse{
+		Content: contracts,
+		Page:    common.GetPageFromQueryParams(reqParams.QueryParams, count),
+	}
+
+	c.JSON(http.StatusOK, response)
 }
 
 // contactsUpdate will update contact with the given id

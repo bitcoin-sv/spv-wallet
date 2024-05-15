@@ -386,51 +386,6 @@ const docTemplate = `{
                 }
             }
         },
-        "/v1/admin/contact/confirmed/{id}": {
-            "patch": {
-                "security": [
-                    {
-                        "x-auth-xpub": []
-                    }
-                ],
-                "description": "Confirm contact",
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Admin"
-                ],
-                "summary": "Confirm contact",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Contact id",
-                        "name": "id",
-                        "in": "path"
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "Changed contact",
-                        "schema": {
-                            "$ref": "#/definitions/models.Contact"
-                        }
-                    },
-                    "400": {
-                        "description": "Bad request - Error while getting id from path"
-                    },
-                    "404": {
-                        "description": "Not found - Error while getting contact by id"
-                    },
-                    "422": {
-                        "description": "Unprocessable entity - Incorrect status of contact"
-                    },
-                    "500": {
-                        "description": "Internal server error - Error while changing contact status"
-                    }
-                }
-            }
-        },
         "/v1/admin/contact/rejected/{id}": {
             "patch": {
                 "security": [
@@ -505,10 +460,7 @@ const docTemplate = `{
                     "200": {
                         "description": "List of contacts",
                         "schema": {
-                            "type": "array",
-                            "items": {
-                                "$ref": "#/definitions/models.Contact"
-                            }
+                            "$ref": "#/definitions/common.SearchContactsResponse"
                         }
                     },
                     "400": {
@@ -1359,47 +1311,6 @@ const docTemplate = `{
                 }
             }
         },
-        "/v1/contact/count": {
-            "post": {
-                "security": [
-                    {
-                        "x-auth-xpub": []
-                    }
-                ],
-                "description": "Count of contacts",
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Contacts"
-                ],
-                "summary": "Count of contacts",
-                "parameters": [
-                    {
-                        "description": "Enables filtering of elements to be counted",
-                        "name": "CountContacts",
-                        "in": "body",
-                        "schema": {
-                            "$ref": "#/definitions/contacts.CountContacts"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "Count of contacts",
-                        "schema": {
-                            "type": "number"
-                        }
-                    },
-                    "400": {
-                        "description": "Bad request - Error while parsing CountRequestParameters from request body"
-                    },
-                    "500": {
-                        "description": "Internal Server Error - Error while fetching count of contacts"
-                    }
-                }
-            }
-        },
         "/v1/contact/rejected/{paymail}": {
             "patch": {
                 "security": [
@@ -1469,10 +1380,7 @@ const docTemplate = `{
                     "200": {
                         "description": "List of contacts",
                         "schema": {
-                            "type": "array",
-                            "items": {
-                                "$ref": "#/definitions/models.Contact"
-                            }
+                            "$ref": "#/definitions/common.SearchContactsResponse"
                         }
                     },
                     "400": {
@@ -2330,30 +2238,6 @@ const docTemplate = `{
                 }
             }
         },
-        "admin.CountContacts": {
-            "type": "object",
-            "properties": {
-                "conditions": {
-                    "description": "Custom conditions used for filtering the search results. Every field within the object is optional.",
-                    "allOf": [
-                        {
-                            "$ref": "#/definitions/filter.ContactFilter"
-                        }
-                    ]
-                },
-                "metadata": {
-                    "description": "Accepts a JSON object for embedding custom metadata, enabling arbitrary additional information to be associated with the resource",
-                    "type": "object",
-                    "additionalProperties": {
-                        "type": "string"
-                    },
-                    "example": {
-                        "key": "value",
-                        "key2": "value2"
-                    }
-                }
-            }
-        },
         "admin.CountDestinations": {
             "type": "object",
             "properties": {
@@ -2924,27 +2808,52 @@ const docTemplate = `{
                 "Rejected"
             ]
         },
-        "contacts.CountContacts": {
+        "common.Page": {
             "type": "object",
             "properties": {
-                "conditions": {
-                    "description": "Custom conditions used for filtering the search results. Every field within the object is optional.",
+                "number": {
+                    "description": "Page number",
+                    "type": "integer"
+                },
+                "orderByField": {
+                    "description": "Field by which to order the results",
+                    "type": "string"
+                },
+                "size": {
+                    "description": "Size of the page",
+                    "type": "integer"
+                },
+                "sortDirection": {
+                    "description": "Direction in which to order the results ASC/DSC",
+                    "type": "string"
+                },
+                "totalElements": {
+                    "description": "Total count of elements",
+                    "type": "integer"
+                },
+                "totalPages": {
+                    "description": "Total number of possible pages",
+                    "type": "integer"
+                }
+            }
+        },
+        "common.SearchContactsResponse": {
+            "type": "object",
+            "properties": {
+                "content": {
+                    "description": "List of records for the response",
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/models.Contact"
+                    }
+                },
+                "page": {
+                    "description": "Pagination details",
                     "allOf": [
                         {
-                            "$ref": "#/definitions/filter.ContactFilter"
+                            "$ref": "#/definitions/common.Page"
                         }
                     ]
-                },
-                "metadata": {
-                    "description": "Accepts a JSON object for embedding custom metadata, enabling arbitrary additional information to be associated with the resource",
-                    "type": "object",
-                    "additionalProperties": {
-                        "type": "string"
-                    },
-                    "example": {
-                        "key": "value",
-                        "key2": "value2"
-                    }
                 }
             }
         },
@@ -4692,7 +4601,12 @@ const docTemplate = `{
                 1000,
                 1000000,
                 1000000000,
-                60000000000
+                60000000000,
+                3600000000000,
+                1,
+                1000,
+                1000000,
+                1000000000
             ],
             "x-enum-varnames": [
                 "minDuration",
@@ -4711,7 +4625,12 @@ const docTemplate = `{
                 "Microsecond",
                 "Millisecond",
                 "Second",
-                "Minute"
+                "Minute",
+                "Hour",
+                "Nanosecond",
+                "Microsecond",
+                "Millisecond",
+                "Second"
             ]
         },
         "transactions.CountTransactions": {

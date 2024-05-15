@@ -73,23 +73,6 @@ definitions:
           key2: value2
         type: object
     type: object
-  admin.CountContacts:
-    properties:
-      conditions:
-        allOf:
-        - $ref: '#/definitions/filter.ContactFilter'
-        description: Custom conditions used for filtering the search results. Every
-          field within the object is optional.
-      metadata:
-        additionalProperties:
-          type: string
-        description: Accepts a JSON object for embedding custom metadata, enabling
-          arbitrary additional information to be associated with the resource
-        example:
-          key: value
-          key2: value2
-        type: object
-    type: object
   admin.CountDestinations:
     properties:
       conditions:
@@ -524,22 +507,38 @@ definitions:
     - SeenInOrphanMempool
     - Confirmed
     - Rejected
-  contacts.CountContacts:
+  common.Page:
     properties:
-      conditions:
+      number:
+        description: Page number
+        type: integer
+      orderByField:
+        description: Field by which to order the results
+        type: string
+      size:
+        description: Size of the page
+        type: integer
+      sortDirection:
+        description: Direction in which to order the results ASC/DSC
+        type: string
+      totalElements:
+        description: Total count of elements
+        type: integer
+      totalPages:
+        description: Total number of possible pages
+        type: integer
+    type: object
+  common.SearchContactsResponse:
+    properties:
+      content:
+        description: List of records for the response
+        items:
+          $ref: '#/definitions/models.Contact'
+        type: array
+      page:
         allOf:
-        - $ref: '#/definitions/filter.ContactFilter'
-        description: Custom conditions used for filtering the search results. Every
-          field within the object is optional.
-      metadata:
-        additionalProperties:
-          type: string
-        description: Accepts a JSON object for embedding custom metadata, enabling
-          arbitrary additional information to be associated with the resource
-        example:
-          key: value
-          key2: value2
-        type: object
+        - $ref: '#/definitions/common.Page'
+        description: Pagination details
     type: object
   contacts.SearchContacts:
     properties:
@@ -1825,6 +1824,11 @@ definitions:
     - 1000000
     - 1000000000
     - 60000000000
+    - 3600000000000
+    - 1
+    - 1000
+    - 1000000
+    - 1000000000
     type: integer
     x-enum-varnames:
     - minDuration
@@ -1844,6 +1848,11 @@ definitions:
     - Millisecond
     - Second
     - Minute
+    - Hour
+    - Nanosecond
+    - Microsecond
+    - Millisecond
+    - Second
   transactions.CountTransactions:
     properties:
       conditions:
@@ -2292,34 +2301,6 @@ paths:
       summary: Accept contact
       tags:
       - Admin
-  /v1/admin/contact/confirmed/{id}:
-    patch:
-      description: Confirm contact
-      parameters:
-      - description: Contact id
-        in: path
-        name: id
-        type: string
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: Changed contact
-          schema:
-            $ref: '#/definitions/models.Contact'
-        "400":
-          description: Bad request - Error while getting id from path
-        "404":
-          description: Not found - Error while getting contact by id
-        "422":
-          description: Unprocessable entity - Incorrect status of contact
-        "500":
-          description: Internal server error - Error while changing contact status
-      security:
-      - x-auth-xpub: []
-      summary: Confirm contact
-      tags:
-      - Admin
   /v1/admin/contact/rejected/{id}:
     patch:
       description: Reject contact
@@ -2365,9 +2346,7 @@ paths:
         "200":
           description: List of contacts
           schema:
-            items:
-              $ref: '#/definitions/models.Contact'
-            type: array
+            $ref: '#/definitions/common.SearchContactsResponse'
         "400":
           description: Bad request - Error while parsing SearchContacts from request
             body
@@ -2888,32 +2867,6 @@ paths:
       summary: Confirm contact
       tags:
       - Contact
-  /v1/contact/count:
-    post:
-      description: Count of contacts
-      parameters:
-      - description: Enables filtering of elements to be counted
-        in: body
-        name: CountContacts
-        schema:
-          $ref: '#/definitions/contacts.CountContacts'
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: Count of contacts
-          schema:
-            type: number
-        "400":
-          description: Bad request - Error while parsing CountRequestParameters from
-            request body
-        "500":
-          description: Internal Server Error - Error while fetching count of contacts
-      security:
-      - x-auth-xpub: []
-      summary: Count of contacts
-      tags:
-      - Contacts
   /v1/contact/rejected/{paymail}:
     patch:
       description: Reject contact. For contact with status "awaiting" delete contact
@@ -2956,9 +2909,7 @@ paths:
         "200":
           description: List of contacts
           schema:
-            items:
-              $ref: '#/definitions/models.Contact'
-            type: array
+            $ref: '#/definitions/common.SearchContactsResponse'
         "400":
           description: Bad request - Error while parsing SearchContacts from request
             body
