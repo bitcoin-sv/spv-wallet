@@ -1,8 +1,9 @@
 package common
 
 import (
-	"github.com/bitcoin-sv/spv-wallet/engine/datastore"
 	"math"
+
+	"github.com/bitcoin-sv/spv-wallet/engine/datastore"
 )
 
 // LoadDefaultQueryParams will load the default query parameters

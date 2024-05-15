@@ -32,14 +32,14 @@ type PagedResponse[content any] struct {
 
 // Page object to use when limiting and sorting database query results
 type Page struct {
-	// Total count of elements
-	TotalElements int64 `json:"totalElements"`
-	// Total number of possible pages
-	TotalPages int `json:"totalPages"`
 	// Field by which to order the results
 	OrderByField *string `json:"orderByField"`
 	// Direction in which to order the results ASC/DSC
 	SortDirection *string `json:"sortDirection"`
+	// Total count of elements
+	TotalElements int64 `json:"totalElements"`
+	// Total number of possible pages
+	TotalPages int `json:"totalPages"`
 	// Size of the page
 	Size int `json:"size"`
 	// Page number
