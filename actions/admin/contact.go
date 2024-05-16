@@ -7,6 +7,7 @@ import (
 	"github.com/bitcoin-sv/spv-wallet/actions/common"
 	"github.com/bitcoin-sv/spv-wallet/engine"
 	"github.com/bitcoin-sv/spv-wallet/mappings"
+	"github.com/bitcoin-sv/spv-wallet/models"
 	"github.com/gin-gonic/gin"
 )
 
@@ -62,7 +63,7 @@ func (a *Action) contactsSearch(c *gin.Context) {
 		return
 	}
 
-	response := common.SearchContactsResponse{
+	response := models.SearchContactsResponse{
 		Content: contracts,
 		Page:    common.GetPageFromQueryParams(reqParams.QueryParams, count),
 	}
