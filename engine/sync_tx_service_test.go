@@ -13,13 +13,13 @@ import (
 
 func Test_processBroadcastTransactions(t *testing.T) {
 	// mocked broadcast client responses
-	// broadcastSuccess := broadcastClientMqResponse{
-	// 	r: &broadcast_client.SubmitTxResponse{
-	// 		SubmittedTx: &broadcast_client.SubmittedTx{
-	// 			BaseTxResponse: broadcast_client.BaseTxResponse{},
-	// 		},
-	// 	},
-	// }
+	broadcastSuccess := broadcastClientMqResponse{
+		r: &broadcast_client.SubmitTxResponse{
+			SubmittedTx: &broadcast_client.SubmittedTx{
+				BaseTxResponse: broadcast_client.BaseTxResponse{},
+			},
+		},
+	}
 
 	broadcastClientFailed := broadcastClientMqResponse{
 		r: new(broadcast_client.SubmitTxResponse),
@@ -36,11 +36,11 @@ func Test_processBroadcastTransactions(t *testing.T) {
 		expectedBroadcastStatus SyncStatus
 		broadcastResponse       broadcastClientMqResponse
 	}{
-		// {
-		// 	name:                    "broadcast success - status is complete",
-		// 	expectedBroadcastStatus: SyncStatusComplete,
-		// 	broadcastResponse:       broadcastSuccess,
-		// },
+		{
+			name:                    "broadcast success - status is complete",
+			expectedBroadcastStatus: SyncStatusComplete,
+			broadcastResponse:       broadcastSuccess,
+		},
 		{
 			name:                    "broadcast failed (client error) - status is ready",
 			expectedBroadcastStatus: SyncStatusReady,
