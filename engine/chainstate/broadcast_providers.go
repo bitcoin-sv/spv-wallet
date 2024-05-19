@@ -126,21 +126,29 @@ func (provider *broadcastClientProvider) broadcast(ctx context.Context, c *Clien
 			Msgf("broadcast with broadcast-client in RawTx format")
 	}
 
-	result, failure := c.BroadcastClient().SubmitTransaction(
+	result, err := c.BroadcastClient().SubmitTransaction(
 		ctx,
 		&tx,
 		formatOpt,
 		broadcast.WithCallback(c.options.config.callbackURL, c.options.config.callbackToken),
 	)
 
-	if failure != nil {
-		logger.Debug().
-			Str("txID", provider.txID).
-			Msgf("error broadcast request for %s failed: %s", provider.getName(), failure.Error())
+	if err != nil {
+		var arcErr *broadcast.ArcError
+		if errors.As(err, &arcErr) {
+			logger.Debug().
+				Str("txID", provider.txID).
+				Msgf("error broadcast request for %s failed: %s", provider.getName(), arcErr.Error())
+
+			return &BroadcastFailure{
+				InvalidTx: arcErr.IsRejectedTransaction(),
+				Error:     arcErr,
+			}
+		}
 
 		return &BroadcastFailure{
-			InvalidTx: failure.Details() != nil, // failure was caused be invalid request not client/network issue
-			Error:     failure,
+			InvalidTx: false,
+			Error:     err,
 		}
 	}
 
