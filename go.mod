@@ -12,7 +12,7 @@ replace github.com/bitcoin-sv/spv-wallet/models => ./models
 replace github.com/bitcoin-sv/spv-wallet/engine => ./engine
 
 require (
-	github.com/bitcoin-sv/go-broadcast-client v0.18.0
+	github.com/bitcoin-sv/go-broadcast-client v0.18.1-0.20240519195313-20246f7265ed
 	github.com/bitcoin-sv/spv-wallet/engine v0.0.0-00010101000000-000000000000
 	github.com/bitcoin-sv/spv-wallet/models v0.25.0
 	github.com/gin-contrib/pprof v1.4.0
@@ -165,3 +165,5 @@ replace github.com/gomodule/redigo => github.com/gomodule/redigo v1.8.9
 
 // Issue: go.mongodb.org/mongo-driver/x/bsonx: cannot find module providing package go.mongodb.org/mongo-driver/x/bsonx
 replace go.mongodb.org/mongo-driver => go.mongodb.org/mongo-driver v1.11.7
+
+replace github.com/bitcoin-sv/go-broadcast-client => ../go-broadcast-client
