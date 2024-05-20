@@ -134,8 +134,9 @@ func (provider *broadcastClientProvider) broadcast(ctx context.Context, c *Clien
 	)
 
 	if err != nil {
-		var arcErr *broadcast.ArcError
-		if errors.As(err, &arcErr) {
+		var failureResp *broadcast.FailureResponse
+		if errors.As(err, &failureResp) && failureResp.ArcErrorResponse != nil {
+			arcErr := failureResp.ArcErrorResponse
 			logger.Debug().
 				Str("txID", provider.txID).
 				Msgf("error broadcast request for %s failed: %s", provider.getName(), arcErr.Error())

@@ -28,7 +28,7 @@ func Test_processBroadcastTransactions(t *testing.T) {
 
 	broadcastTransactionDeclined := broadcastClientMqResponse{
 		r: new(broadcast_client.SubmitTxResponse),
-		f: broadcast_client.Failure("invalid tx", &broadcast_client.ArcError{}),
+		f: broadcast_client.Failure("invalid tx", &broadcast_client.ArcError{Status: 109}),
 	}
 
 	tcs := []struct {
@@ -108,7 +108,7 @@ type broadcastClientMq struct {
 
 type broadcastClientMqResponse struct {
 	r any
-	f *broadcast_client.FailureResponse
+	f error
 }
 
 func (mq *broadcastClientMq) setupResponse(method string, response broadcastClientMqResponse) {
