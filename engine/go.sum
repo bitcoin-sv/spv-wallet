@@ -20,7 +20,6 @@ github.com/aws/aws-sdk-go v1.43.45 h1:2708Bj4uV+ym62MOtBnErm/CDX61C4mFe9V2gXy1ca
 github.com/aws/aws-sdk-go v1.43.45/go.mod h1:y4AeaBuwd2Lk+GepC1E9v0qOiTws0MIWAX4oIKwKHZo=
 github.com/beorn7/perks v1.0.1 h1:VlbKKnNfV8bJzeqoa4cOKqO6bYr3WgKZxO8Z16+hsOM=
 github.com/beorn7/perks v1.0.1/go.mod h1:G2ZrVWU2WbWT9wwq4/hrbKbnv/1ERSJQ0ibhJ6rlkpw=
-github.com/bitcoin-sv/go-broadcast-client v0.18.0/go.mod h1:GRAliwumNBjEbLRIEkXqIKJpsgmMfjvlIDqgyw/NoJE=
 github.com/bitcoin-sv/go-broadcast-client v0.18.1-0.20240519195313-20246f7265ed h1:zjNzgRi01Uq3jqsoL8FJTA5v0vfAMkUGjPoJxEhgb7o=
 github.com/bitcoin-sv/go-broadcast-client v0.18.1-0.20240519195313-20246f7265ed/go.mod h1:GRAliwumNBjEbLRIEkXqIKJpsgmMfjvlIDqgyw/NoJE=
 github.com/bitcoin-sv/go-paymail v0.14.0 h1:xG/fql8BOUI2365oLFUVP2KJ6SpI57R5R5tIGnAbfo4=
