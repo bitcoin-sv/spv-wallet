@@ -22,7 +22,8 @@ func (a *Action) get(c *gin.Context) {
 		return models.SharedConfig{
 			PaymailDomains: a.AppConfig.Paymail.Domains,
 			ExperimentalFeatures: map[string]bool{
-				"pike_enabled": a.AppConfig.ExperimentalFeatures.PikeEnabled,
+				"pike_contacts_enabled": a.AppConfig.ExperimentalFeatures.PikeContactsEnabled,
+				"pike_payment_enabled":  a.AppConfig.ExperimentalFeatures.PikePaymentEnabled,
 			},
 		}
 	})

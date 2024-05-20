@@ -249,7 +249,8 @@ type MetricsConfig struct {
 
 // ExperimentalConfig represents a feature flag config.
 type ExperimentalConfig struct {
-	PikeEnabled bool `json:"pike_enabled" mapstructure:"pike_enabled"`
+	PikeContactsEnabled bool `json:"pike_contacts_enabled" mapstructure:"pike_contacts_enabled"`
+	PikePaymentEnabled  bool `json:"pike_payment_enabled" mapstructure:"pike_payment_enabled"`
 }
 
 // GetUserAgent will return the outgoing user agent

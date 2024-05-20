@@ -227,6 +227,23 @@ func (p *PaymailDefaultServiceProvider) AddContact(
 	return
 }
 
+func (p *PaymailDefaultServiceProvider) CreatePikeDestinationResponse(
+	ctx context.Context,
+	alias, domain string,
+	satoshis uint64,
+	requestMetadata *server.RequestMetadata,
+) (*paymail.PikePaymentDestinationsResponse, error) {
+	referenceID, err := utils.RandomHex(16)
+	if err != nil {
+		return nil, err
+	}
+
+	return &paymail.PikePaymentDestinationsResponse{
+		Outputs:   make([]paymail.PikePaymentDestination, 0),
+		Reference: referenceID,
+	}, nil
+}
+
 func (p *PaymailDefaultServiceProvider) getDestinationForPaymail(ctx context.Context, alias, domain string, metadata Metadata) (*Destination, error) {
 	pm, err := getPaymailAddress(ctx, alias+"@"+domain, p.client.DefaultModelOptions()...)
 	if err != nil {
