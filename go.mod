@@ -12,7 +12,7 @@ replace github.com/bitcoin-sv/spv-wallet/models => ./models
 replace github.com/bitcoin-sv/spv-wallet/engine => ./engine
 
 require (
-	github.com/bitcoin-sv/go-broadcast-client v0.18.1-0.20240519195313-20246f7265ed
+	github.com/bitcoin-sv/go-broadcast-client v0.18.1-0.20240521085852-0816fc1823bf
 	github.com/bitcoin-sv/spv-wallet/engine v0.0.0-00010101000000-000000000000
 	github.com/bitcoin-sv/spv-wallet/models v0.25.0
 	github.com/gin-contrib/pprof v1.4.0
