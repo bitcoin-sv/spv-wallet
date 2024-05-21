@@ -90,8 +90,6 @@ func emptyBroadcastResponseErr(txID string) error {
 	return fmt.Errorf("an empty response was returned after broadcasting of tx id [%s]", txID)
 }
 
-////
-
 // BroadcastClient provider
 type broadcastClientProvider struct {
 	txID, txHex string
@@ -134,16 +132,15 @@ func (provider *broadcastClientProvider) broadcast(ctx context.Context, c *Clien
 	)
 
 	if err != nil {
-		var failureResp *broadcast.FailureResponse
-		if errors.As(err, &failureResp) && failureResp.ArcErrorResponse != nil {
-			arcErr := failureResp.ArcErrorResponse
+		var arcError *broadcast.ArcError
+		if errors.As(err, &arcError) {
 			logger.Debug().
 				Str("txID", provider.txID).
-				Msgf("error broadcast request for %s failed: %s", provider.getName(), arcErr.Error())
+				Msgf("error broadcast request for %s failed: %s", provider.getName(), arcError.Error())
 
 			return &BroadcastFailure{
-				InvalidTx: arcErr.IsRejectedTransaction(),
-				Error:     arcErr,
+				InvalidTx: arcError.IsRejectedTransaction(),
+				Error:     arcError,
 			}
 		}
 
