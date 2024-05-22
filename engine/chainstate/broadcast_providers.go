@@ -13,7 +13,7 @@ import (
 // generic broadcast provider
 type txBroadcastProvider interface {
 	getName() string
-	broadcast(ctx context.Context, c *Client) error
+	broadcast(ctx context.Context, c *Client) *BroadcastFailure
 }
 
 // mAPI provider
@@ -26,8 +26,15 @@ func (provider *mapiBroadcastProvider) getName() string {
 	return provider.miner.Name
 }
 
-func (provider *mapiBroadcastProvider) broadcast(ctx context.Context, c *Client) error {
-	return broadcastMAPI(ctx, c, provider.miner, provider.txID, provider.txHex)
+func (provider *mapiBroadcastProvider) broadcast(ctx context.Context, c *Client) *BroadcastFailure {
+	if err := broadcastMAPI(ctx, c, provider.miner, provider.txID, provider.txHex); err != nil {
+		return &BroadcastFailure{
+			InvalidTx: false, // for simplify we treet all mAPI errors as client/network issue that can be retried
+			Error:     err,
+		}
+	}
+
+	return nil
 }
 
 // broadcastMAPI will broadcast a transaction to a miner using mAPI
@@ -67,7 +74,7 @@ func broadcastMAPI(ctx context.Context, client *Client, miner *minercraft.Miner,
 	}
 
 	// Check error message (for success error message)
-	if doesErrorContain(resp.Results.ResultDescription, broadcastSuccessErrors) {
+	if containsAny(resp.Results.ResultDescription, broadcastSuccessErrors) {
 		return nil
 	}
 
@@ -83,8 +90,6 @@ func emptyBroadcastResponseErr(txID string) error {
 	return fmt.Errorf("an empty response was returned after broadcasting of tx id [%s]", txID)
 }
 
-////
-
 // BroadcastClient provider
 type broadcastClientProvider struct {
 	txID, txHex string
@@ -95,7 +100,7 @@ func (provider *broadcastClientProvider) getName() string {
 	return ProviderBroadcastClient
 }
 
-func (provider *broadcastClientProvider) broadcast(ctx context.Context, c *Client) error {
+func (provider *broadcastClientProvider) broadcast(ctx context.Context, c *Client) *BroadcastFailure {
 	logger := c.options.logger
 
 	logger.Debug().
@@ -127,11 +132,22 @@ func (provider *broadcastClientProvider) broadcast(ctx context.Context, c *Clien
 	)
 
 	if err != nil {
-		logger.Debug().
-			Str("txID", provider.txID).
-			Msgf("error broadcast request for %s failed: %s", provider.getName(), err.Error())
+		var arcError *broadcast.ArcError
+		if errors.As(err, &arcError) {
+			logger.Debug().
+				Str("txID", provider.txID).
+				Msgf("error broadcast request for %s failed: %s", provider.getName(), arcError.Error())
 
-		return err
+			return &BroadcastFailure{
+				InvalidTx: arcError.IsRejectedTransaction(),
+				Error:     arcError,
+			}
+		}
+
+		return &BroadcastFailure{
+			InvalidTx: false,
+			Error:     err,
+		}
 	}
 
 	logger.Debug().

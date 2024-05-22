@@ -18,7 +18,7 @@ type HTTPInterface interface {
 // ChainService is the chain related methods
 type ChainService interface {
 	SupportedBroadcastFormats() HexFormatFlag
-	Broadcast(ctx context.Context, id, txHex string, format HexFormatFlag, timeout time.Duration) (string, error)
+	Broadcast(ctx context.Context, id, txHex string, format HexFormatFlag, timeout time.Duration) *BroadcastResult
 	QueryTransaction(
 		ctx context.Context, id string, requiredIn RequiredIn, timeout time.Duration,
 	) (*TransactionInfo, error)
