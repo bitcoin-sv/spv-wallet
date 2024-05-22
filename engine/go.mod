@@ -7,7 +7,7 @@ require (
 	github.com/bitcoin-sv/go-broadcast-client v0.18.1
 	github.com/bitcoin-sv/go-paymail v0.14.0
 	github.com/bitcoinschema/go-bitcoin/v2 v2.0.5
-	github.com/bitcoinschema/go-map v0.1.0
+	github.com/bitcoinschema/go-map v0.1.1
 	github.com/coocood/freecache v1.2.4
 	github.com/dolthub/go-mysql-server v0.17.0
 	github.com/fergusstrange/embedded-postgres v1.25.0

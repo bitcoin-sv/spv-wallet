@@ -26,12 +26,12 @@ github.com/bitcoin-sv/go-paymail v0.14.0 h1:xG/fql8BOUI2365oLFUVP2KJ6SpI57R5R5tI
 github.com/bitcoin-sv/go-paymail v0.14.0/go.mod h1:IuT/blY8OjhmMLQ2cgCmoL/2NfJL2gME46VHj5HAzxA=
 github.com/bitcoinschema/go-bitcoin/v2 v2.0.5 h1:Sgh5Eb746Zck/46rFDrZZEXZWyO53fMuWYhNoZa1tck=
 github.com/bitcoinschema/go-bitcoin/v2 v2.0.5/go.mod h1:JjO1ivfZv6vhK0uAXzyH08AAHlzNMAfnyK1Fiv9r4ZA=
-github.com/bitcoinschema/go-bob v0.4.0 h1:adsAEboLQCg0D6e9vwcJUJEJScszsouAYCYu35UAiGo=
-github.com/bitcoinschema/go-bob v0.4.0/go.mod h1:Qc8BG9MsYrumSVyihHVuvLhd22FHjHVVAAq4cdcOMaQ=
+github.com/bitcoinschema/go-bob v0.4.3 h1:0iboiIQ3PY2+rrqPr8Gsh5RX+9Ha6Uzyo0bw720Ljlc=
+github.com/bitcoinschema/go-bob v0.4.3/go.mod h1:XEHhQ/v+to/s8THRNKU099OpsDreRFYnU/822IihjR8=
 github.com/bitcoinschema/go-bpu v0.1.3 h1:O7SvuptH4Q7hemD6G9OotPLINZ61CAVOgWKJWKM+edY=
 github.com/bitcoinschema/go-bpu v0.1.3/go.mod h1:y4ZEDC0fSYRrA6N6bzKwHXdtMrRiQhpurpkTVobz07I=
-github.com/bitcoinschema/go-map v0.1.0 h1:dM8OJ/E5MnEm9m1xNI/B3msCgSI9s7Ps3Vk0BFP53eI=
-github.com/bitcoinschema/go-map v0.1.0/go.mod h1:36YXG/kob/Z+tCK3EpHMdN9+ADMSDMPYA7JFuPOBi3M=
+github.com/bitcoinschema/go-map v0.1.1 h1:r4YF3E0yOMFOJJkjQyKIw+mOwMx3CODRC2RJr7X8Pyw=
+github.com/bitcoinschema/go-map v0.1.1/go.mod h1:Q8em9GcLZQ7io9fg3v1Oq3J0u9uAwHTDfOocitxwP/4=
 github.com/bitcoinsv/bsvd v0.0.0-20190609155523-4c29707f7173 h1:2yTIV9u7H0BhRDGXH5xrAwAz7XibWJtX2dNezMeNsUo=
 github.com/bitcoinsv/bsvd v0.0.0-20190609155523-4c29707f7173/go.mod h1:BZ1UcC9+tmcDEcdVXgpt13hMczwJxWzpAn68wNs7zRA=
 github.com/bitcoinsv/bsvutil v0.0.0-20181216182056-1d77cf353ea9 h1:hFI8rT84FCA0FFy3cFrkW5Nz4FyNKlIdCvEvvTNySKg=
