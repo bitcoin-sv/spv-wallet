@@ -2,7 +2,6 @@ package datastore
 
 import (
 	"context"
-	"database/sql"
 	"os"
 	"testing"
 
@@ -10,7 +9,6 @@ import (
 	"github.com/newrelic/go-agent/v3/newrelic"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"go.mongodb.org/mongo-driver/mongo"
 )
 
 // TestDefaultClientOptions will test the method defaultClientOptions()
@@ -168,14 +166,6 @@ func TestWithSQL(t *testing.T) {
 		assert.Nil(t, options.sqlConfigs)
 	})
 
-	t.Run("test applying empty config", func(t *testing.T) {
-		options := &clientOptions{}
-		opt := WithSQL(MySQL, nil)
-		opt(options)
-		assert.Equal(t, Engine(""), options.engine)
-		assert.Nil(t, options.sqlConfigs)
-	})
-
 	t.Run("test applying option - postgresql", func(t *testing.T) {
 		options := &clientOptions{}
 		config := &SQLConfig{
@@ -212,81 +202,6 @@ func TestWithSQLConnection(t *testing.T) {
 		opt(options)
 		assert.Equal(t, Engine(""), options.engine)
 		assert.Nil(t, options.sqlConfigs)
-	})
-
-	t.Run("test applying empty connection", func(t *testing.T) {
-		options := &clientOptions{}
-		opt := WithSQLConnection(MySQL, nil, testTablePrefix)
-		opt(options)
-		assert.Equal(t, Engine(""), options.engine)
-		assert.Nil(t, options.sqlConfigs)
-	})
-
-	t.Run("test applying a connection", func(t *testing.T) {
-		options := &clientOptions{}
-		opt := WithSQLConnection(MySQL, &sql.DB{}, testTablePrefix)
-		opt(options)
-		assert.Equal(t, MySQL, options.engine)
-		assert.Len(t, options.sqlConfigs, 1)
-		assert.Equal(t, testTablePrefix, options.tablePrefix)
-	})
-}
-
-// TestWithMongo will test the method WithMongo()
-func TestWithMongo(t *testing.T) {
-	t.Run("check type", func(t *testing.T) {
-		opt := WithMongo(nil)
-		assert.IsType(t, *new(ClientOps), opt)
-	})
-
-	t.Run("test applying nil config", func(t *testing.T) {
-		options := &clientOptions{}
-		opt := WithMongo(nil)
-		opt(options)
-		assert.Equal(t, Engine(""), options.engine)
-		assert.Nil(t, options.mongoDB)
-	})
-
-	t.Run("test applying valid config", func(t *testing.T) {
-		options := &clientOptions{}
-		opt := WithMongo(&MongoDBConfig{
-			CommonConfig: CommonConfig{
-				Debug:       true,
-				TablePrefix: testTablePrefix,
-			},
-			DatabaseName: testDatabaseName,
-			URI:          testDatabaseURI,
-		})
-		opt(options)
-		assert.Equal(t, MongoDB, options.engine)
-		assert.NotNil(t, options.mongoDBConfig)
-		assert.Equal(t, testTablePrefix, options.tablePrefix)
-		assert.True(t, options.debug)
-	})
-}
-
-// TestWithMongoConnection will test the method WithMongoConnection()
-func TestWithMongoConnection(t *testing.T) {
-	t.Run("check type", func(t *testing.T) {
-		opt := WithMongoConnection(nil, testTablePrefix)
-		assert.IsType(t, *new(ClientOps), opt)
-	})
-
-	t.Run("test applying nil config", func(t *testing.T) {
-		options := &clientOptions{}
-		opt := WithMongoConnection(nil, testTablePrefix)
-		opt(options)
-		assert.Equal(t, Engine(""), options.engine)
-		assert.Nil(t, options.mongoDB)
-	})
-
-	t.Run("test applying valid config", func(t *testing.T) {
-		options := &clientOptions{}
-		opt := WithMongoConnection(&mongo.Database{}, testTablePrefix)
-		opt(options)
-		assert.Equal(t, MongoDB, options.engine)
-		assert.NotNil(t, options.mongoDBConfig)
-		assert.Equal(t, testTablePrefix, options.tablePrefix)
 	})
 }
 

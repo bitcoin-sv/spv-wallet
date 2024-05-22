@@ -16,7 +16,6 @@ import (
 	embeddedPostgres "github.com/fergusstrange/embedded-postgres"
 	"github.com/stretchr/testify/require"
 	"github.com/stretchr/testify/suite"
-	"github.com/tryvium-travels/memongo"
 )
 
 const (
@@ -42,8 +41,6 @@ type dbTestCase struct {
 
 // dbTestCases is the list of supported databases
 var dbTestCases = []dbTestCase{
-	{name: "[mongo] [in-memory]", database: datastore.MongoDB},
-	{name: "[mysql] [in-memory]", database: datastore.MySQL},
 	{name: "[postgresql] [in-memory]", database: datastore.PostgreSQL},
 	{name: "[sqlite] [in-memory]", database: datastore.SQLite},
 }
@@ -51,18 +48,12 @@ var dbTestCases = []dbTestCase{
 // EmbeddedDBTestSuite is for testing the entire package using real/mocked services
 type EmbeddedDBTestSuite struct {
 	suite.Suite
-	MongoServer      *memongo.Server                    // In-memory  Mongo server 	// In-memory MySQL server
 	PostgresqlServer *embeddedPostgres.EmbeddedPostgres // In-memory Postgresql server
 }
 
 // SetupSuite runs at the start of the suite
 func (ts *EmbeddedDBTestSuite) SetupSuite() {
 	var err error
-
-	// Create the Mongo server
-	// if ts.MongoServer, err = tester.CreateMongoServer(mongoTestVersion); err != nil {
-	// 	require.NoError(ts.T(), err)
-	// }
 
 	// Create the Postgresql server
 	if ts.PostgresqlServer, err = tester.CreatePostgresServer(postgresqlTestPort); err != nil {
@@ -78,10 +69,6 @@ func (ts *EmbeddedDBTestSuite) SetupSuite() {
 
 // TearDownSuite runs after the suite finishes
 func (ts *EmbeddedDBTestSuite) TearDownSuite() {
-	// Stop the Mongo server
-	if ts.MongoServer != nil {
-		ts.MongoServer.Stop()
-	}
 
 	// Stop the postgresql server
 	if ts.PostgresqlServer != nil {
@@ -137,12 +124,9 @@ func (ts *EmbeddedDBTestSuite) createTestClient(ctx context.Context, database da
 				},
 				ExistingConnection: tc.SQLConn,
 			}))
-		} else if database == datastore.MySQL {
-			opts = append(opts, WithSQLConnection(datastore.MySQL, tc.SQLConn, tablePrefix))
 		} else if database == datastore.PostgreSQL {
 			opts = append(opts, WithSQLConnection(datastore.PostgreSQL, tc.SQLConn, tablePrefix))
-		} else { // todo: finish more Datastore support (missing: Mongo)
-			// "https://medium.com/@victor.neuret/mocking-the-official-mongo-golang-driver-5aad5b226a78"
+		} else {
 			return nil, ErrDatastoreNotSupported
 		}
 
@@ -158,24 +142,6 @@ func (ts *EmbeddedDBTestSuite) createTestClient(ctx context.Context, database da
 				Shared: true, // mrz: TestTransaction_Save requires this to be true for some reason
 				// I get the error: no such table: _17a1f3e22f2eec56_utxos
 			}))
-		} else if database == datastore.MongoDB {
-
-			// Sanity check
-			if ts.MongoServer == nil {
-				return nil, ErrLoadServerFirst
-			}
-
-			// Add the new Mongo connection
-			opts = append(opts, WithMongoDB(&datastore.MongoDBConfig{
-				CommonConfig: datastore.CommonConfig{
-					MaxIdleConnections: 1,
-					MaxOpenConnections: 1,
-					TablePrefix:        tablePrefix,
-				},
-				URI:          ts.MongoServer.URIWithRandomDB(),
-				DatabaseName: memongo.RandomDatabase(),
-			}))
-
 		} else if database == datastore.PostgreSQL {
 
 			// Sanity check

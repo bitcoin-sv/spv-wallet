@@ -2,12 +2,10 @@ package tester
 
 import (
 	"database/sql/driver"
-	"os"
 	"time"
 
 	"github.com/bitcoin-sv/spv-wallet/engine/datastore"
 	embeddedPostgres "github.com/fergusstrange/embedded-postgres"
-	"github.com/tryvium-travels/memongo"
 )
 
 // AnyTime will fill the need for any timestamp field
@@ -43,22 +41,6 @@ func CreatePostgresServer(port uint32) (*embeddedPostgres.EmbeddedPostgres, erro
 
 	// Return the database
 	return postgres, nil
-}
-
-// CreateMongoServer will create a new mongo server
-func CreateMongoServer(version string) (*memongo.Server, error) {
-	mongoServer, err := memongo.StartWithOptions(
-		&memongo.Options{
-			MongoVersion:     version,
-			ShouldUseReplica: false,
-			DownloadURL:      os.Getenv("SPV_WALLET_MONGODB_DOWNLOAD_URL"),
-		},
-	)
-	if err != nil {
-		return nil, err
-	}
-
-	return mongoServer, nil
 }
 
 // SQLiteTestConfig will return a test-version of SQLite

@@ -125,7 +125,7 @@ type DbConfig struct {
 	Datastore *DatastoreConfig `json:"datastore" mapstructure:"datastore"`
 	// Mongo is a config for MongoDb. Works only if datastore engine is set to mongodb.
 	Mongo *datastore.MongoDBConfig `json:"mongodb" mapstructure:"mongodb"`
-	// SQL is a config for PostgreSQL or MySQL. Works only if datastore engine is set to postgresql or mysql.
+	// SQL is a config for PostgreSQL.. Works only if datastore engine is set to postgresql.
 	SQL *datastore.SQLConfig `json:"sql" mapstructure:"sql"`
 	// SQLite is a config for SQLite. Works only if datastore engine is set to sqlite.
 	SQLite *datastore.SQLiteConfig `json:"sqlite" mapstructure:"sqlite"`
@@ -135,7 +135,7 @@ type DbConfig struct {
 type DatastoreConfig struct {
 	// TablePrefix is the prefix for all table names in the database.
 	TablePrefix string `json:"table_prefix" mapstructure:"table_prefix"`
-	// Engine is the database to be used, mysql, sqlite, postgresql.
+	// Engine is the database to be used, sqlite, postgresql.
 	Engine datastore.Engine `json:"engine" mapstructure:"engine"`
 	// Debug is a flag that decides whether additional output (such as sql statements) should be produced from datastore.
 	Debug bool `json:"debug" mapstructure:"debug"`
