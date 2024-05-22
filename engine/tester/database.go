@@ -70,7 +70,7 @@ func CreateMongoServer(version string) (*memongo.Server, error) {
 // CreateMySQL will make a new MySQL server
 // NOTE: not using username, password anymore since the mysql package removed "auth"
 func CreateMySQL(host, databaseName, _, _ string, port uint32) (*server.Server, error) {
-	pro := createTestDatabase()
+	pro := createTestDatabaseProvider(databaseName)
 	engine := sqle.NewDefault(
 		sql.NewDatabaseProvider(
 			CreateMySQLTestDatabase(databaseName),
@@ -89,8 +89,8 @@ func CreateMySQL(host, databaseName, _, _ string, port uint32) (*server.Server, 
 	return s, nil
 }
 
-func createTestDatabase() *memory.DbProvider {
-	db := memory.NewDatabase("test")
+func createTestDatabaseProvider(dbName string) *memory.DbProvider {
+	db := memory.NewDatabase(dbName)
 	db.BaseDatabase.EnablePrimaryKeyIndexes()
 	return memory.NewDBProvider(db)
 }
