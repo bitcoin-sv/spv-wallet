@@ -13,22 +13,15 @@ import (
 	"github.com/bitcoin-sv/spv-wallet/engine/datastore"
 	"github.com/bitcoin-sv/spv-wallet/engine/taskmanager"
 	"github.com/bitcoin-sv/spv-wallet/engine/tester"
-	"github.com/dolthub/go-mysql-server/server"
 	embeddedPostgres "github.com/fergusstrange/embedded-postgres"
-	"github.com/rs/zerolog/log"
 	"github.com/stretchr/testify/require"
 	"github.com/stretchr/testify/suite"
 	"github.com/tryvium-travels/memongo"
 )
 
 const (
-	defaultDatabaseName      = "spv-wallet-test"
 	defaultNewRelicTx        = "testing-transaction"
 	defaultNewRelicApp       = "testing-app"
-	mySQLHost                = "localhost"
-	mySQLPassword            = ""
-	mySQLTestPort            = uint32(3307)
-	mySQLUsername            = "root"
 	postgresqlTestHost       = "localhost"
 	postgresqlTestName       = "postgres"
 	postgresqlTestPort       = uint32(61333)
@@ -58,37 +51,18 @@ var dbTestCases = []dbTestCase{
 // EmbeddedDBTestSuite is for testing the entire package using real/mocked services
 type EmbeddedDBTestSuite struct {
 	suite.Suite
-	MongoServer      *memongo.Server                    // In-memory  Mongo server
-	MySQLServer      *server.Server                     // In-memory MySQL server
+	MongoServer      *memongo.Server                    // In-memory  Mongo server 	// In-memory MySQL server
 	PostgresqlServer *embeddedPostgres.EmbeddedPostgres // In-memory Postgresql server
-}
-
-// serveMySQL will serve the MySQL server and exit if quit
-func (ts *EmbeddedDBTestSuite) serveMySQL() {
-	err := ts.MySQLServer.Start()
-	if err != nil {
-		log.Error().Msgf("mysql server error: %s", err.Error())
-	}
 }
 
 // SetupSuite runs at the start of the suite
 func (ts *EmbeddedDBTestSuite) SetupSuite() {
 	var err error
 
-	// Create the MySQL server
-	if ts.MySQLServer, err = tester.CreateMySQL(
-		mySQLHost, defaultDatabaseName, mySQLUsername, mySQLPassword, mySQLTestPort,
-	); err != nil {
-		require.NoError(ts.T(), err)
-	}
-
-	// Don't block, serve the MySQL instance
-	go ts.serveMySQL()
-
 	// Create the Mongo server
-	if ts.MongoServer, err = tester.CreateMongoServer(mongoTestVersion); err != nil {
-		require.NoError(ts.T(), err)
-	}
+	// if ts.MongoServer, err = tester.CreateMongoServer(mongoTestVersion); err != nil {
+	// 	require.NoError(ts.T(), err)
+	// }
 
 	// Create the Postgresql server
 	if ts.PostgresqlServer, err = tester.CreatePostgresServer(postgresqlTestPort); err != nil {
@@ -112,17 +86,6 @@ func (ts *EmbeddedDBTestSuite) TearDownSuite() {
 	// Stop the postgresql server
 	if ts.PostgresqlServer != nil {
 		_ = ts.PostgresqlServer.Stop()
-	}
-
-	// Stop the MySQL server
-	if ts.MySQLServer != nil {
-		/*
-			defer ts.wg.Done()
-			if ts.quit != nil {
-				close(ts.quit)
-			}
-		*/
-		_ = ts.MySQLServer.Close()
 	}
 }
 
@@ -232,28 +195,6 @@ func (ts *EmbeddedDBTestSuite) createTestClient(ctx context.Context, database da
 				User:                      postgresqlTestUser,
 				Password:                  postgresTestPassword,
 				Port:                      fmt.Sprintf("%d", postgresqlTestPort),
-				SkipInitializeWithVersion: true,
-			}))
-
-		} else if database == datastore.MySQL {
-
-			// Sanity check
-			if ts.MySQLServer == nil {
-				return nil, ErrLoadServerFirst
-			}
-
-			// Add the new Postgresql connection
-			opts = append(opts, WithSQL(datastore.MySQL, &datastore.SQLConfig{
-				CommonConfig: datastore.CommonConfig{
-					MaxIdleConnections: 1,
-					MaxOpenConnections: 1,
-					TablePrefix:        tablePrefix,
-				},
-				Host:                      mySQLHost,
-				Name:                      defaultDatabaseName,
-				User:                      mySQLUsername,
-				Password:                  mySQLPassword,
-				Port:                      fmt.Sprintf("%d", mySQLTestPort),
 				SkipInitializeWithVersion: true,
 			}))
 

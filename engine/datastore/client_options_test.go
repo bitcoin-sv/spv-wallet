@@ -176,28 +176,6 @@ func TestWithSQL(t *testing.T) {
 		assert.Nil(t, options.sqlConfigs)
 	})
 
-	t.Run("test applying option - mysql", func(t *testing.T) {
-		options := &clientOptions{}
-		config := &SQLConfig{
-			CommonConfig: CommonConfig{
-				Debug:       true,
-				TablePrefix: testTablePrefix,
-			},
-			Driver:   MySQL.String(),
-			Host:     testDatabaseHost,
-			Name:     testDatabaseName,
-			Password: testDatabasePassword,
-			Port:     testDatabasePortMySQL,
-			User:     testDatabaseUser,
-		}
-		opt := WithSQL(MySQL, []*SQLConfig{config})
-		opt(options)
-		assert.Len(t, options.sqlConfigs, 1)
-		assert.Equal(t, MySQL, options.engine)
-		assert.Equal(t, config.TablePrefix, options.tablePrefix)
-		assert.True(t, options.debug)
-	})
-
 	t.Run("test applying option - postgresql", func(t *testing.T) {
 		options := &clientOptions{}
 		config := &SQLConfig{
@@ -209,7 +187,7 @@ func TestWithSQL(t *testing.T) {
 			Host:     testDatabaseHost,
 			Name:     testDatabaseName,
 			Password: testDatabasePassword,
-			Port:     testDatabasePortMySQL,
+			Port:     defaultPostgreSQLPort,
 			User:     testDatabaseUser,
 		}
 		opt := WithSQL(PostgreSQL, []*SQLConfig{config})

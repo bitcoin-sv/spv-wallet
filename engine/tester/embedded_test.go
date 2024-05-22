@@ -6,7 +6,6 @@ package tester
 import (
 	"testing"
 
-	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
 
@@ -53,30 +52,3 @@ func TestCreatePostgresServer(t *testing.T) {
 	})
 }
 */
-
-// TestCreateMySQL will test the method CreateMySQL()
-func TestCreateMySQL(t *testing.T) {
-	t.Parallel()
-
-	t.Run("valid server", func(t *testing.T) {
-		server, err := CreateMySQL(
-			testDatabaseHost, testDatabaseName, testDatabaseUser,
-			testDatabasePassword, testDatabasePort2,
-		)
-		require.NoError(t, err)
-		require.NotNil(t, server)
-		err = server.Close()
-		require.NoError(t, err)
-	})
-}
-
-// TestCreateMySQLTestDatabase will test the method CreateMySQLTestDatabase()
-func TestCreateMySQLTestDatabase(t *testing.T) {
-	t.Parallel()
-
-	t.Run("valid db", func(t *testing.T) {
-		db := CreateMySQLTestDatabase(testDatabaseName)
-		require.NotNil(t, db)
-		assert.Equal(t, testDatabaseName, db.Name())
-	})
-}
