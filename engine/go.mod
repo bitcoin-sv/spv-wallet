@@ -29,7 +29,7 @@ require (
 	github.com/rs/zerolog v1.32.0
 	github.com/stretchr/testify v1.9.0
 	github.com/tonicpow/go-minercraft/v2 v2.0.8
-	github.com/tryvium-travels/memongo v0.11.0
+	github.com/tryvium-travels/memongo v0.12.0
 	github.com/vmihailenco/taskq/v3 v3.2.9
 	go.elastic.co/ecszerolog v0.2.0
 	go.mongodb.org/mongo-driver v1.13.1
