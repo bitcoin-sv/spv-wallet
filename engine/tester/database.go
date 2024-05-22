@@ -70,6 +70,7 @@ func CreateMongoServer(version string) (*memongo.Server, error) {
 // CreateMySQL will make a new MySQL server
 // NOTE: not using username, password anymore since the mysql package removed "auth"
 func CreateMySQL(host, databaseName, _, _ string, port uint32) (*server.Server, error) {
+	pro := createTestDatabase()
 	engine := sqle.NewDefault(
 		sql.NewDatabaseProvider(
 			CreateMySQLTestDatabase(databaseName),
@@ -81,11 +82,17 @@ func CreateMySQL(host, databaseName, _, _ string, port uint32) (*server.Server, 
 		// This package is no longer found in: github.com/dolthub/go-mysql-server v0.12.0
 		// Auth:     auth.NewNativeSingle(username, password, auth.AllPermissions),
 	}
-	s, err := server.NewDefaultServer(config, engine)
+	s, err := server.NewServer(config, engine, memory.NewSessionBuilder(pro), nil)
 	if err != nil {
 		return nil, err
 	}
 	return s, nil
+}
+
+func createTestDatabase() *memory.DbProvider {
+	db := memory.NewDatabase("test")
+	db.BaseDatabase.EnablePrimaryKeyIndexes()
+	return memory.NewDBProvider(db)
 }
 
 // CreateMySQLTestDatabase is a dummy database for MySQL
