@@ -26,7 +26,7 @@ require (
 	github.com/mrz1836/go-validate v0.2.1
 	github.com/newrelic/go-agent/v3 v3.33.0
 	github.com/prometheus/client_golang v1.19.1
-	github.com/rs/zerolog v1.32.0
+	github.com/rs/zerolog v1.33.0
 	github.com/spf13/viper v1.18.2
 	github.com/stretchr/testify v1.9.0
 	github.com/swaggo/swag v1.16.3
