@@ -6,7 +6,6 @@ import (
 
 	zLogger "github.com/mrz1836/go-logger"
 	"github.com/newrelic/go-agent/v3/newrelic"
-	"go.mongodb.org/mongo-driver/mongo"
 )
 
 // ClientOps allow functional options to be supplied
@@ -142,52 +141,16 @@ func WithSQLConnection(engine Engine, sqlDB *sql.DB, tablePrefix string) ClientO
 			return
 		}
 
-		skipInitializeWithVersion := false
-
 		c.sqlConfigs = []*SQLConfig{{
 			CommonConfig: CommonConfig{
 				Debug:       c.debug,
 				TablePrefix: tablePrefix,
 			},
-			Driver:                    engine.String(),
-			ExistingConnection:        sqlDB,
-			SkipInitializeWithVersion: skipInitializeWithVersion,
+			Driver:             engine.String(),
+			ExistingConnection: sqlDB,
 		}}
 		c.engine = engine
 		c.tablePrefix = tablePrefix
-	}
-}
-
-// WithMongo will set the datastore to use MongoDB
-func WithMongo(config *MongoDBConfig) ClientOps {
-	return func(c *clientOptions) {
-		if config == nil {
-			return
-		}
-		c.engine = MongoDB
-		c.tablePrefix = config.TablePrefix
-		c.mongoDBConfig = config
-		if config.Debug {
-			c.debug = true
-		}
-	}
-}
-
-// WithMongoConnection will set the datastore to use an existing Mongo database connection
-func WithMongoConnection(database *mongo.Database, tablePrefix string) ClientOps {
-	return func(c *clientOptions) {
-		if database == nil {
-			return
-		}
-		c.engine = MongoDB
-		c.tablePrefix = tablePrefix
-		c.mongoDBConfig = &MongoDBConfig{
-			CommonConfig: CommonConfig{
-				Debug:       c.debug,
-				TablePrefix: tablePrefix,
-			},
-			ExistingConnection: database,
-		}
 	}
 }
 
@@ -216,24 +179,6 @@ func WithCustomFields(arrayFields []string, objectFields []string) ClientOps {
 					c.fields.objectFields = append(c.fields.objectFields, field)
 				}
 			}
-		}
-	}
-}
-
-// WithCustomMongoConditionProcessor will add a custom mongo condition processor function
-func WithCustomMongoConditionProcessor(f func(conditions map[string]interface{})) ClientOps {
-	return func(c *clientOptions) {
-		if f != nil {
-			c.fields.customMongoConditionProcessor = f
-		}
-	}
-}
-
-// WithCustomMongoIndexer will add a custom mongo index function (returns custom mongo indexes)
-func WithCustomMongoIndexer(f func() map[string][]mongo.IndexModel) ClientOps {
-	return func(c *clientOptions) {
-		if f != nil {
-			c.fields.customMongoIndexer = f
 		}
 	}
 }

@@ -23,15 +23,7 @@ func (c *Client) SaveModel(
 	tx *Transaction,
 	newRecord, commitTx bool,
 ) error {
-	// MongoDB (does not support transactions at this time)
-	if c.Engine() == MongoDB {
-		sessionContext := ctx //nolint:contextcheck // we need to overwrite the ctx for transaction support
-		if tx.mongoTx != nil {
-			// set the context to the session context -> mongo transaction
-			sessionContext = *tx.mongoTx
-		}
-		return c.saveWithMongo(sessionContext, model, newRecord)
-	} else if !IsSQLEngine(c.Engine()) {
+	if !IsSQLEngine(c.Engine()) {
 		return ErrUnsupportedEngine
 	}
 
@@ -78,9 +70,7 @@ func (c *Client) IncrementModel(
 	fieldName string,
 	increment int64,
 ) (newValue int64, err error) {
-	if c.Engine() == MongoDB {
-		return c.incrementWithMongo(ctx, model, fieldName, increment)
-	} else if !IsSQLEngine(c.Engine()) {
+	if !IsSQLEngine(c.Engine()) {
 		return 0, ErrUnsupportedEngine
 	}
 
@@ -119,10 +109,6 @@ func (c *Client) CreateInBatches(
 	models interface{},
 	batchSize int,
 ) error {
-	if c.Engine() == MongoDB {
-		return c.CreateInBatchesMongo(ctx, models, batchSize)
-	}
-
 	tx := c.options.db.CreateInBatches(models, batchSize)
 	return tx.Error
 }
@@ -199,9 +185,7 @@ func (c *Client) GetModels(
 	queryParams.SortDirection = strings.ToLower(queryParams.SortDirection)
 
 	// Switch on the datastore engines
-	if c.Engine() == MongoDB { // Get using Mongo
-		return c.getWithMongo(ctx, models, conditions, fieldResults, queryParams)
-	} else if !IsSQLEngine(c.Engine()) {
+	if !IsSQLEngine(c.Engine()) {
 		return ErrUnsupportedEngine
 	}
 	return c.find(ctx, models, conditions, queryParams, fieldResults, timeout)
@@ -215,9 +199,7 @@ func (c *Client) GetModelCount(
 	timeout time.Duration,
 ) (int64, error) {
 	// Switch on the datastore engines
-	if c.Engine() == MongoDB {
-		return c.countWithMongo(ctx, model, conditions)
-	} else if !IsSQLEngine(c.Engine()) {
+	if !IsSQLEngine(c.Engine()) {
 		return 0, ErrUnsupportedEngine
 	}
 
@@ -229,9 +211,7 @@ func (c *Client) GetModelsAggregate(ctx context.Context, models interface{},
 	conditions map[string]interface{}, aggregateColumn string, timeout time.Duration,
 ) (map[string]interface{}, error) {
 	// Switch on the datastore engines
-	if c.Engine() == MongoDB {
-		return c.aggregateWithMongo(ctx, models, conditions, aggregateColumn, timeout)
-	} else if !IsSQLEngine(c.Engine()) {
+	if !IsSQLEngine(c.Engine()) {
 		return nil, ErrUnsupportedEngine
 	}
 

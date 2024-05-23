@@ -123,8 +123,6 @@ type RedisConfig struct {
 type DbConfig struct {
 	// Datastore general config.
 	Datastore *DatastoreConfig `json:"datastore" mapstructure:"datastore"`
-	// Mongo is a config for MongoDb. Works only if datastore engine is set to mongodb.
-	Mongo *datastore.MongoDBConfig `json:"mongodb" mapstructure:"mongodb"`
 	// SQL is a config for PostgreSQL. Works only if datastore engine is set to postgresql.
 	SQL *datastore.SQLConfig `json:"sql" mapstructure:"sql"`
 	// SQLite is a config for SQLite. Works only if datastore engine is set to sqlite.

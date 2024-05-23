@@ -87,16 +87,6 @@ func TestClient_Engine(t *testing.T) {
 		assert.Equal(t, SQLite, c.Engine())
 	})
 
-	t.Run("[mongo] - failed to load", func(t *testing.T) {
-		c, err := NewClient(context.Background(), WithMongo(&MongoDBConfig{
-			DatabaseName: "test",
-			Transactions: false,
-			URI:          "",
-		}))
-		assert.Nil(t, c)
-		require.Error(t, err)
-	})
-
 	// todo: Postgresql
 }
 

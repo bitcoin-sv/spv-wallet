@@ -26,14 +26,7 @@ func (d *DbConfig) Validate() error {
 		} else if len(d.SQL.Name) == 0 {
 			return errors.New("missing sql db name")
 		}
-	} else if d.Datastore.Engine == datastore.MongoDB {
-		if d.Mongo == nil {
-			return errors.New("missing mongo config")
-		} else if len(d.Mongo.URI) == 0 {
-			return errors.New("missing mongo uri")
-		} else if len(d.Mongo.DatabaseName) == 0 {
-			return errors.New("missing mongo database name")
-		}
 	}
+
 	return nil
 }

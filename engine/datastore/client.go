@@ -6,7 +6,6 @@ import (
 
 	zLogger "github.com/mrz1836/go-logger"
 	"github.com/newrelic/go-agent/v3/newrelic"
-	"go.mongodb.org/mongo-driver/mongo"
 	"gorm.io/gorm"
 	gLogger "gorm.io/gorm/logger"
 )
@@ -29,8 +28,6 @@ type (
 		loggerDB        gLogger.Interface           // Custom logger interface (for GORM)
 		migratedModels  []string                    // List of models (types) that have been migrated
 		migrateModels   []interface{}               // Models for migrations
-		mongoDB         *mongo.Database             // Database connection for a MongoDB datastore
-		mongoDBConfig   *MongoDBConfig              // Configuration for a MongoDB datastore
 		newRelicEnabled bool                        // If NewRelic is enabled (parent application)
 		sqlConfigs      []*SQLConfig                // Configuration for a PostgreSQL datastore
 		sqLite          *SQLiteConfig               // Configuration for a SQLite datastore
@@ -39,10 +36,8 @@ type (
 
 	// fieldConfig is the configuration for custom fields
 	fieldConfig struct {
-		arrayFields                   []string                                // Fields that are an array (string, string, string)
-		customMongoConditionProcessor func(conditions map[string]interface{}) // Function for processing custom conditions (arrays, objects)
-		customMongoIndexer            func() map[string][]mongo.IndexModel    // Function for returning custom mongo indexes
-		objectFields                  []string                                // Fields that are objects/JSON (metadata)
+		arrayFields  []string // Fields that are an array (string, string, string)
+		objectFields []string // Fields that are objects/JSON (metadata)
 	}
 )
 
@@ -102,12 +97,6 @@ func NewClient(ctx context.Context, opts ...ClientOps) (ClientInterface, error) 
 		); err != nil {
 			return nil, err
 		}
-	} else if client.Engine() == MongoDB {
-		if client.options.mongoDB, err = openMongoDatabase(
-			ctx, client.options.mongoDBConfig,
-		); err != nil {
-			return nil, err
-		}
 	} else { // SQLite
 		if client.options.db, err = openSQLiteDatabase(
 			client.options.loggerDB, client.options.sqLite,
@@ -133,18 +122,10 @@ func (c *Client) Close(ctx context.Context) error {
 		defer txn.StartSegment("close_datastore").End()
 	}
 
-	// Close Mongo
-	if c.Engine() == MongoDB {
-		if err := c.options.mongoDB.Client().Disconnect(ctx); err != nil {
-			return err
-		}
-		c.options.mongoDB = nil
-	} else { // All other SQL database(s)
-		if err := closeSQLDatabase(c.options.db); err != nil {
-			return err
-		}
-		c.options.db = nil
+	if err := closeSQLDatabase(c.options.db); err != nil {
+		return err
 	}
+	c.options.db = nil
 
 	c.options.engine = Empty
 	return nil
@@ -192,22 +173,6 @@ func (c *Client) GetArrayFields() []string {
 // GetObjectFields will return the object fields
 func (c *Client) GetObjectFields() []string {
 	return c.options.fields.objectFields
-}
-
-// GetMongoConditionProcessor will return a custom mongo condition processor if set
-func (c *Client) GetMongoConditionProcessor() func(conditions map[string]interface{}) {
-	if c.options.fields.customMongoConditionProcessor != nil {
-		return c.options.fields.customMongoConditionProcessor
-	}
-	return nil
-}
-
-// GetMongoIndexer will return a custom mongo condition indexer
-func (c *Client) GetMongoIndexer() func() map[string][]mongo.IndexModel {
-	if c.options.fields.customMongoIndexer != nil {
-		return c.options.fields.customMongoIndexer
-	}
-	return nil
 }
 
 // HasMigratedModel will return if the model type has been migrated

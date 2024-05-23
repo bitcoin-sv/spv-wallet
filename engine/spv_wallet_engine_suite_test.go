@@ -125,8 +125,7 @@ func (ts *EmbeddedDBTestSuite) createTestClient(ctx context.Context, database da
 			}))
 		} else if database == datastore.PostgreSQL {
 			opts = append(opts, WithSQLConnection(datastore.PostgreSQL, tc.SQLConn, tablePrefix))
-		} else { // todo: finish more Datastore support (missing: Mongo)
-			// "https://medium.com/@victor.neuret/mocking-the-official-mongo-golang-driver-5aad5b226a78"
+		} else {
 			return nil, ErrDatastoreNotSupported
 		}
 

@@ -349,16 +349,6 @@ func loadDatastore(options []engine.ClientOps, appConfig *AppConfig, testMode bo
 			SslMode:   appConfig.Db.SQL.SslMode,
 		}))
 
-	} else if appConfig.Db.Datastore.Engine == datastore.MongoDB {
-
-		debug := appConfig.Db.Datastore.Debug
-		tablePrefix := appConfig.Db.Datastore.TablePrefix
-		if len(appConfig.Db.Mongo.TablePrefix) > 0 {
-			tablePrefix = appConfig.Db.Mongo.TablePrefix
-		}
-		appConfig.Db.Mongo.Debug = debug
-		appConfig.Db.Mongo.TablePrefix = tablePrefix
-		options = append(options, engine.WithMongoDB(appConfig.Db.Mongo))
 	} else {
 		return nil, errors.New("unsupported datastore engine: " + appConfig.Db.Datastore.Engine.String())
 	}

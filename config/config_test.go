@@ -143,28 +143,4 @@ func TestAppConfig_Validate(t *testing.T) {
 		err := app.Validate()
 		assert.Error(t, err)
 	})
-
-	t.Run("datastore - invalid mongo config", func(t *testing.T) {
-		app, _ := baseTestConfig(t)
-		app.Db.Datastore.Engine = datastore.MongoDB
-		app.Db.Mongo = nil
-		err := app.Validate()
-		assert.Error(t, err)
-	})
-
-	t.Run("datastore - invalid mongo uri", func(t *testing.T) {
-		app, _ := baseTestConfig(t)
-		app.Db.Datastore.Engine = datastore.MongoDB
-		app.Db.Mongo.URI = ""
-		err := app.Validate()
-		assert.Error(t, err)
-	})
-
-	t.Run("datastore - invalid mongo database name", func(t *testing.T) {
-		app, _ := baseTestConfig(t)
-		app.Db.Datastore.Engine = datastore.MongoDB
-		app.Db.Mongo.DatabaseName = ""
-		err := app.Validate()
-		assert.Error(t, err)
-	})
 }
