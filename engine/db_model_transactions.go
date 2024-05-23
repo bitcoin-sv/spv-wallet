@@ -158,8 +158,10 @@ func (m *Transaction) ChildModels() (childModels []ModelInterface) {
 // Migrate model specific migration on startup
 func (m *Transaction) Migrate(client datastore.ClientInterface) error {
 	tableName := client.GetTableName(tableTransactions)
-	if err := m.migratePostgreSQL(client, tableName); err != nil {
-		return err
+	if client.Engine() == datastore.PostgreSQL {
+		if err := m.migratePostgreSQL(client, tableName); err != nil {
+			return err
+		}
 	}
 
 	return client.IndexMetadata(tableName, xPubMetadataField)
