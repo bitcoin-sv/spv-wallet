@@ -80,6 +80,34 @@ func getContactByID(ctx context.Context, id string, opts ...ModelOps) (*Contact,
 	return contact, nil
 }
 
+// getContactsByXPubIDCount will get a count of all the contacts
+func getContactsByXPubIDCount(ctx context.Context, xPubID string, metadata *Metadata,
+	conditions map[string]interface{}, opts ...ModelOps,
+) (int64, error) {
+	dbConditions := map[string]interface{}{}
+	if conditions != nil {
+		dbConditions = conditions
+	}
+	dbConditions[xPubIDField] = xPubID
+
+	if metadata != nil {
+		dbConditions[metadataField] = metadata
+	}
+
+	count, err := getModelCount(
+		ctx, NewBaseModel(ModelNameEmpty, opts...).Client().Datastore(),
+		Contact{}, dbConditions, defaultDatabaseReadTimeout,
+	)
+	if err != nil {
+		if errors.Is(err, datastore.ErrNoResults) {
+			return 0, nil
+		}
+		return 0, err
+	}
+
+	return count, nil
+}
+
 func (c *Contact) validate() error {
 	if c.ID == "" {
 		return ErrMissingContactID
@@ -112,7 +140,6 @@ func getContacts(ctx context.Context, metadata *Metadata, conditions map[string]
 	if conditions == nil {
 		conditions = make(map[string]interface{})
 	}
-	conditions[deletedAtField] = nil
 
 	contacts := make([]*Contact, 0)
 	if err := getModelsByConditions(ctx, ModelContact, &contacts, metadata, conditions, queryParams, opts...); err != nil {

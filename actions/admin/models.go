@@ -86,3 +86,6 @@ type SearchXpubs = common.SearchModel[filter.XpubFilter]
 
 // CountXpubs is a model for handling counting filtered xPubs
 type CountXpubs = common.ConditionsModel[filter.XpubFilter]
+
+// CountContacts is a model for handling counting filtered contacts
+type CountContacts = common.ConditionsModel[filter.ContactFilter]
