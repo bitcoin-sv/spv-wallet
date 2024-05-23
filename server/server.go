@@ -6,7 +6,6 @@ import (
 	"crypto/tls"
 	"errors"
 	"fmt"
-	"github.com/bitcoin-sv/spv-wallet/actions/sharedconfig"
 	"net/http"
 	"strconv"
 
@@ -16,6 +15,7 @@ import (
 	"github.com/bitcoin-sv/spv-wallet/actions/base"
 	"github.com/bitcoin-sv/spv-wallet/actions/contacts"
 	"github.com/bitcoin-sv/spv-wallet/actions/destinations"
+	"github.com/bitcoin-sv/spv-wallet/actions/sharedconfig"
 	"github.com/bitcoin-sv/spv-wallet/actions/transactions"
 	"github.com/bitcoin-sv/spv-wallet/actions/utxos"
 	"github.com/bitcoin-sv/spv-wallet/actions/xpubs"
