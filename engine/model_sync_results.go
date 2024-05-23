@@ -11,8 +11,7 @@ import (
 
 // SyncResults is the results from all sync attempts (broadcast or sync)
 type SyncResults struct {
-	LastMessage string        `json:"last_message"` // Last message (success or failure)
-	Results     []*SyncResult `json:"results"`      // Each result of a sync task
+	Results []*SyncResult `json:"results"` // Each result of a sync task
 }
 
 // Sync actions for syncing transactions

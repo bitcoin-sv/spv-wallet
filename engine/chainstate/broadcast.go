@@ -3,7 +3,6 @@ package chainstate
 import (
 	"context"
 	"fmt"
-	"strings"
 	"sync"
 	"time"
 )
@@ -44,45 +43,23 @@ var (
 // broadcast will broadcast using a standard strategy
 //
 // NOTE: if successful (in-mempool), no error will be returned
-// NOTE: function register the fastest successful broadcast into 'completeChannel' so client doesn't need to wait for other providers
-func (c *Client) broadcast(ctx context.Context, id, hex string, format HexFormatFlag, timeout time.Duration, completeChannel, errorChannel chan string) {
+func (c *Client) broadcast(ctx context.Context, id, hex string, format HexFormatFlag, timeout time.Duration, resultsChannel chan *BroadcastResult) {
 	// Create a context (to cancel or timeout)
 	ctxWithCancel, cancel := context.WithTimeout(ctx, timeout)
 	defer cancel()
 
 	var wg sync.WaitGroup
 
-	resultsChannel := make(chan broadcastResult)
-	status := newBroadcastStatus(completeChannel)
-
 	for _, broadcastProvider := range createActiveProviders(c, id, hex, format) {
 		wg.Add(1)
 		go func(provider txBroadcastProvider) {
 			defer wg.Done()
-			broadcastToProvider(ctxWithCancel, ctx, provider, id, c, timeout,
-				resultsChannel, status)
+			resultsChannel <- broadcastToProvider(ctxWithCancel, ctx, provider, id, c, timeout)
 		}(broadcastProvider)
 	}
 
-	go func() {
-		wg.Wait()
-		close(resultsChannel)
-		status.dispose()
-	}()
-
-	var errorMessages []string
-	for result := range resultsChannel {
-		if result.isError {
-			debugLog(c, id, fmt.Sprintf("broadcast error: %s from provider %s", result.err, result.provider))
-			errorMessages = append(errorMessages, result.provider+": "+result.err.Error())
-		} else {
-			debugLog(c, id, fmt.Sprintf("successful broadcast to %s", result.provider))
-		}
-	}
-
-	if !status.success && len(errorMessages) > 0 {
-		errorChannel <- strings.Join(errorMessages, ", ")
-	}
+	wg.Wait()
+	close(resultsChannel)
 }
 
 func createActiveProviders(c *Client, txID, txHex string, format HexFormatFlag) []txBroadcastProvider {
@@ -114,35 +91,31 @@ func createActiveProviders(c *Client, txID, txHex string, format HexFormatFlag) 
 
 func broadcastToProvider(ctx, fallbackCtx context.Context, provider txBroadcastProvider, txID string,
 	c *Client, fallbackTimeout time.Duration,
-	resultsChannel chan broadcastResult, status *broadcastStatus,
-) {
-	bErr := provider.broadcast(ctx, c)
+) *BroadcastResult {
+	failure := provider.broadcast(ctx, c)
 
-	if bErr != nil {
+	if failure != nil {
+		checkMempool := containsAny(failure.Error.Error(), broadcastQuestionableErrors)
+
+		if !checkMempool { // return original failure
+			return &BroadcastResult{
+				Provider: provider.getName(),
+				Failure:  failure,
+			}
+		}
+
 		// check in Mempool as fallback - if transaction is there -> GREAT SUCCESS
-		// Check error response for "questionable errors"/(TX FAILURE)
-		if doesErrorContain(bErr.Error(), broadcastQuestionableErrors) {
-			bErr = checkInMempool(fallbackCtx, c, txID, bErr.Error(), fallbackTimeout)
+		if _, err := c.QueryTransaction(fallbackCtx, txID, requiredInMempool, fallbackTimeout); err != nil {
+			return &BroadcastResult{
+				Provider: provider.getName(),
+				Failure: &BroadcastFailure{
+					InvalidTx: failure.InvalidTx,
+					Error:     fmt.Errorf("query tx failed: %w, initial error: %s", err, failure.Error.Error()),
+				},
+			}
 		}
-
-		if bErr != nil {
-			resultsChannel <- newErrorResult(bErr, provider.getName())
-		}
 	}
 
-	// successful broadcast or found in mempool
-	if bErr == nil {
-		status.tryCompleteWithSuccess(provider.getName())
-		resultsChannel <- newSuccessResult(provider.getName())
-	}
-}
-
-// checkInMempool is a quick check to see if the tx is in mempool (or on-chain)
-func checkInMempool(ctx context.Context, client ClientInterface, id, initErrMsg string, timeout time.Duration) error {
-	if _, err := client.QueryTransaction(
-		ctx, id, requiredInMempool, timeout,
-	); err != nil {
-		return fmt.Errorf("error query tx failed: %w, broadcast initial error: %s", err, initErrMsg)
-	}
-	return nil
+	// successful broadcasted or found in mempool
+	return &BroadcastResult{Provider: provider.getName()}
 }

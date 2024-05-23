@@ -1260,6 +1260,27 @@ definitions:
           type: string
         type: array
     type: object
+  models.Page:
+    properties:
+      number:
+        description: Page number
+        type: integer
+      orderByField:
+        description: Field by which to order the results
+        type: string
+      size:
+        description: Size of the page
+        type: integer
+      sortDirection:
+        description: Direction in which to order the results ASC/DSC
+        type: string
+      totalElements:
+        description: Total count of elements
+        type: integer
+      totalPages:
+        description: Total number of possible pages
+        type: integer
+    type: object
   models.PaymailAddress:
     properties:
       alias:
@@ -1349,6 +1370,18 @@ definitions:
       script_type:
         description: ScriptType is a script output script type.
         type: string
+    type: object
+  models.SearchContactsResponse:
+    properties:
+      content:
+        description: List of records for the response
+        items:
+          $ref: '#/definitions/models.Contact'
+        type: array
+      page:
+        allOf:
+        - $ref: '#/definitions/models.Page'
+        description: Pagination details
     type: object
   models.SharedConfig:
     properties:
@@ -1790,6 +1823,8 @@ definitions:
     - 1000000000
     - 60000000000
     - 3600000000000
+    - -9223372036854775808
+    - 9223372036854775807
     - 1
     - 1000
     - 1000000
@@ -1814,6 +1849,8 @@ definitions:
     - Second
     - Minute
     - Hour
+    - minDuration
+    - maxDuration
     - Nanosecond
     - Microsecond
     - Millisecond
@@ -2313,9 +2350,7 @@ paths:
         "200":
           description: List of contacts
           schema:
-            items:
-              $ref: '#/definitions/models.Contact'
-            type: array
+            $ref: '#/definitions/models.SearchContactsResponse'
         "400":
           description: Bad request - Error while parsing SearchContacts from request
             body
@@ -2878,9 +2913,7 @@ paths:
         "200":
           description: List of contacts
           schema:
-            items:
-              $ref: '#/definitions/models.Contact'
-            type: array
+            $ref: '#/definitions/models.SearchContactsResponse'
         "400":
           description: Bad request - Error while parsing SearchContacts from request
             body
