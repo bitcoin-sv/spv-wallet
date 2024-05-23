@@ -417,7 +417,7 @@ func WithSQLConfigs(engine datastore.Engine, configs []*datastore.SQLConfig) Cli
 	}
 }
 
-// WithSQLConnection will set the Datastore to an existing connection for MySQL or PostgreSQL
+// WithSQLConnection will set the Datastore to an existing connection for PostgreSQL
 func WithSQLConnection(engine datastore.Engine, sqlDB *sql.DB, tablePrefix string) ClientOps {
 	return func(c *clientOptions) {
 		if sqlDB != nil && !engine.IsEmpty() {

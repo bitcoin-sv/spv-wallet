@@ -97,7 +97,7 @@ func TestClient_Engine(t *testing.T) {
 		require.Error(t, err)
 	})
 
-	// todo: add MySQL, Postgresql and MongoDB
+	// todo: Postgresql
 }
 
 // TestClient_GetTableName will test the method GetTableName()

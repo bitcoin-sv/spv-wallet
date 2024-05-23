@@ -50,7 +50,7 @@ func (c *Client) SaveModel(
 	if newRecord {
 		if err := tx.sqlTx.Omit(clause.Associations).Create(model).Error; err != nil {
 			_ = tx.Rollback()
-			// todo add duplicate key check for MySQL, Postgres and SQLite
+			// todo add duplicate key check for Postgres and SQLite
 			return err
 		}
 	} else {
@@ -151,10 +151,7 @@ func (c *Client) GetModel(
 	timeout time.Duration,
 	forceWriteDB bool,
 ) error {
-	// Switch on the datastore engines
-	if c.Engine() == MongoDB { // Get using Mongo
-		return c.getWithMongo(ctx, model, conditions, nil, nil)
-	} else if !IsSQLEngine(c.Engine()) {
+	if !IsSQLEngine(c.Engine()) {
 		return ErrUnsupportedEngine
 	}
 
@@ -164,7 +161,7 @@ func (c *Client) GetModel(
 
 	tx := ctxDB.Model(model)
 
-	if forceWriteDB && (c.Engine() == MySQL || c.Engine() == PostgreSQL) {
+	if forceWriteDB && c.Engine() == PostgreSQL {
 		tx = ctxDB.Clauses(dbresolver.Write)
 	}
 
@@ -343,9 +340,7 @@ func (c *Client) aggregate(ctx context.Context, model interface{}, conditions ma
 
 		// Check for a known date field
 		if StringInSlice(aggregateCol, DateFields) {
-			if c.Engine() == MySQL {
-				aggregateCol = "DATE_FORMAT(" + aggregateCol + ", '%Y%m%d')"
-			} else if c.Engine() == PostgreSQL {
+			if c.Engine() == PostgreSQL {
 				aggregateCol = "to_char(" + aggregateCol + ", 'YYYYMMDD')"
 			} else {
 				aggregateCol = "strftime('%Y%m%d', " + aggregateCol + ")"

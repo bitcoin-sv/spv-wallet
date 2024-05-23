@@ -370,45 +370,6 @@ func (ts *EmbeddedDBTestSuite) TestXpub_Save() {
 		assert.Equal(t, true, setCmd.Called)
 	})
 
-	ts.T().Run("[mysql] [redis] [mocking] - create xpub", func(t *testing.T) {
-		tc := ts.genericMockedDBClient(t, datastore.MySQL)
-		defer tc.Close(tc.ctx)
-
-		xPub := newXpub(testXPub, append(tc.client.DefaultModelOptions(), New())...)
-		require.NotNil(t, xPub)
-
-		// Create the expectations
-		tc.MockSQLDB.ExpectBegin()
-
-		// Create model
-		tc.MockSQLDB.ExpectExec("INSERT INTO `"+tc.tablePrefix+"_"+tableXPubs+"` (`created_at`,`updated_at`,`metadata`,`deleted_at`,`id`,"+
-			"`current_balance`,`next_internal_num`,`next_external_num`"+
-			") VALUES (?,?,?,?,?,?,?,?)").WithArgs(
-			tester.AnyTime{}, // created_at
-			tester.AnyTime{}, // updated_at
-			nil,              // metadata
-			nil,              // deleted_at
-			xPub.GetID(),     // id
-			0,                // current_balance
-			0,                // next_internal_num
-			0,                // next_external_num
-		).WillReturnResult(sqlmock.NewResult(1, 1))
-
-		// Commit the TX
-		tc.MockSQLDB.ExpectCommit()
-
-		// @mrz: this is only testing a SET cmd is fired, not the data being set (that is tested elsewhere)
-		setCmd := tc.redisConn.GenericCommand(cache.SetCommand).Expect("ok")
-
-		err := xPub.Save(tc.ctx)
-		require.NoError(t, err)
-
-		err = tc.MockSQLDB.ExpectationsWereMet()
-		require.NoError(t, err)
-
-		assert.Equal(t, true, setCmd.Called)
-	})
-
 	ts.T().Run("[postgresql] [redis] [mocking] - create xpub", func(t *testing.T) {
 		tc := ts.genericMockedDBClient(t, datastore.PostgreSQL)
 		defer tc.Close(tc.ctx)

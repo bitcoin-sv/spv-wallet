@@ -13,22 +13,15 @@ import (
 	"github.com/bitcoin-sv/spv-wallet/engine/datastore"
 	"github.com/bitcoin-sv/spv-wallet/engine/taskmanager"
 	"github.com/bitcoin-sv/spv-wallet/engine/tester"
-	"github.com/dolthub/go-mysql-server/server"
 	embeddedPostgres "github.com/fergusstrange/embedded-postgres"
-	"github.com/rs/zerolog/log"
 	"github.com/stretchr/testify/require"
 	"github.com/stretchr/testify/suite"
-	"github.com/tryvium-travels/memongo"
 )
 
 const (
 	defaultDatabaseName      = "spv-wallet-test"
 	defaultNewRelicTx        = "testing-transaction"
 	defaultNewRelicApp       = "testing-app"
-	mySQLHost                = "localhost"
-	mySQLPassword            = ""
-	mySQLTestPort            = uint32(3307)
-	mySQLUsername            = "root"
 	postgresqlTestHost       = "localhost"
 	postgresqlTestName       = "postgres"
 	postgresqlTestPort       = uint32(61333)
@@ -49,8 +42,6 @@ type dbTestCase struct {
 
 // dbTestCases is the list of supported databases
 var dbTestCases = []dbTestCase{
-	{name: "[mongo] [in-memory]", database: datastore.MongoDB},
-	{name: "[mysql] [in-memory]", database: datastore.MySQL},
 	{name: "[postgresql] [in-memory]", database: datastore.PostgreSQL},
 	{name: "[sqlite] [in-memory]", database: datastore.SQLite},
 }
@@ -58,38 +49,12 @@ var dbTestCases = []dbTestCase{
 // EmbeddedDBTestSuite is for testing the entire package using real/mocked services
 type EmbeddedDBTestSuite struct {
 	suite.Suite
-	MongoServer      *memongo.Server                    // In-memory  Mongo server
-	MySQLServer      *server.Server                     // In-memory MySQL server
 	PostgresqlServer *embeddedPostgres.EmbeddedPostgres // In-memory Postgresql server
-}
-
-// serveMySQL will serve the MySQL server and exit if quit
-func (ts *EmbeddedDBTestSuite) serveMySQL() {
-	err := ts.MySQLServer.Start()
-	if err != nil {
-		log.Error().Msgf("mysql server error: %s", err.Error())
-	}
 }
 
 // SetupSuite runs at the start of the suite
 func (ts *EmbeddedDBTestSuite) SetupSuite() {
 	var err error
-
-	// Create the MySQL server
-	if ts.MySQLServer, err = tester.CreateMySQL(
-		mySQLHost, defaultDatabaseName, mySQLUsername, mySQLPassword, mySQLTestPort,
-	); err != nil {
-		require.NoError(ts.T(), err)
-	}
-
-	// Don't block, serve the MySQL instance
-	go ts.serveMySQL()
-
-	// Create the Mongo server
-	if ts.MongoServer, err = tester.CreateMongoServer(mongoTestVersion); err != nil {
-		require.NoError(ts.T(), err)
-	}
-
 	// Create the Postgresql server
 	if ts.PostgresqlServer, err = tester.CreatePostgresServer(postgresqlTestPort); err != nil {
 		require.NoError(ts.T(), err)
@@ -104,25 +69,9 @@ func (ts *EmbeddedDBTestSuite) SetupSuite() {
 
 // TearDownSuite runs after the suite finishes
 func (ts *EmbeddedDBTestSuite) TearDownSuite() {
-	// Stop the Mongo server
-	if ts.MongoServer != nil {
-		ts.MongoServer.Stop()
-	}
-
 	// Stop the postgresql server
 	if ts.PostgresqlServer != nil {
 		_ = ts.PostgresqlServer.Stop()
-	}
-
-	// Stop the MySQL server
-	if ts.MySQLServer != nil {
-		/*
-			defer ts.wg.Done()
-			if ts.quit != nil {
-				close(ts.quit)
-			}
-		*/
-		_ = ts.MySQLServer.Close()
 	}
 }
 
@@ -174,8 +123,6 @@ func (ts *EmbeddedDBTestSuite) createTestClient(ctx context.Context, database da
 				},
 				ExistingConnection: tc.SQLConn,
 			}))
-		} else if database == datastore.MySQL {
-			opts = append(opts, WithSQLConnection(datastore.MySQL, tc.SQLConn, tablePrefix))
 		} else if database == datastore.PostgreSQL {
 			opts = append(opts, WithSQLConnection(datastore.PostgreSQL, tc.SQLConn, tablePrefix))
 		} else { // todo: finish more Datastore support (missing: Mongo)
@@ -195,24 +142,6 @@ func (ts *EmbeddedDBTestSuite) createTestClient(ctx context.Context, database da
 				Shared: true, // mrz: TestTransaction_Save requires this to be true for some reason
 				// I get the error: no such table: _17a1f3e22f2eec56_utxos
 			}))
-		} else if database == datastore.MongoDB {
-
-			// Sanity check
-			if ts.MongoServer == nil {
-				return nil, ErrLoadServerFirst
-			}
-
-			// Add the new Mongo connection
-			opts = append(opts, WithMongoDB(&datastore.MongoDBConfig{
-				CommonConfig: datastore.CommonConfig{
-					MaxIdleConnections: 1,
-					MaxOpenConnections: 1,
-					TablePrefix:        tablePrefix,
-				},
-				URI:          ts.MongoServer.URIWithRandomDB(),
-				DatabaseName: memongo.RandomDatabase(),
-			}))
-
 		} else if database == datastore.PostgreSQL {
 
 			// Sanity check
@@ -232,28 +161,6 @@ func (ts *EmbeddedDBTestSuite) createTestClient(ctx context.Context, database da
 				User:                      postgresqlTestUser,
 				Password:                  postgresTestPassword,
 				Port:                      fmt.Sprintf("%d", postgresqlTestPort),
-				SkipInitializeWithVersion: true,
-			}))
-
-		} else if database == datastore.MySQL {
-
-			// Sanity check
-			if ts.MySQLServer == nil {
-				return nil, ErrLoadServerFirst
-			}
-
-			// Add the new Postgresql connection
-			opts = append(opts, WithSQL(datastore.MySQL, &datastore.SQLConfig{
-				CommonConfig: datastore.CommonConfig{
-					MaxIdleConnections: 1,
-					MaxOpenConnections: 1,
-					TablePrefix:        tablePrefix,
-				},
-				Host:                      mySQLHost,
-				Name:                      defaultDatabaseName,
-				User:                      mySQLUsername,
-				Password:                  mySQLPassword,
-				Port:                      fmt.Sprintf("%d", mySQLTestPort),
 				SkipInitializeWithVersion: true,
 			}))
 

@@ -21,10 +21,8 @@ func (c *Client) AutoMigrateDatabase(ctx context.Context, models ...interface{})
 	}
 
 	// Make sure we have a supported engine
-	if c.Engine() != MySQL &&
-		c.Engine() != PostgreSQL &&
-		c.Engine() != SQLite &&
-		c.Engine() != MongoDB {
+	if c.Engine() != PostgreSQL &&
+		c.Engine() != SQLite {
 		return ErrUnsupportedEngine
 	}
 
@@ -44,11 +42,6 @@ func (c *Client) AutoMigrateDatabase(ctx context.Context, models ...interface{})
 		len(models),
 		c.options.migratedModels,
 	))
-
-	// Migrate database for Mongo
-	if c.Engine() == MongoDB {
-		return autoMigrateMongoDatabase(ctx, c.Engine(), c.options, models...)
-	}
 
 	// Migrate database for SQL (using GORM)
 	return autoMigrateSQLDatabase(ctx, c.Engine(), c.options.db, c.IsDebug(), c.options.loggerDB, models...)
@@ -110,11 +103,6 @@ func autoMigrateSQLDatabase(ctx context.Context, engine Engine, sqlWriteDB *gorm
 
 	// Create a session with config settings
 	sessionDb := sqlWriteDB.Session(getGormSessionConfig(sqlWriteDB.PrepareStmt, debug, optionalLogger))
-
-	// Run the auto migrate method
-	if engine == MySQL {
-		return sessionDb.Set("gorm:table_options", "ENGINE=InnoDB").AutoMigrate(models...)
-	}
 
 	// PostgreSQL and SQLite
 	return sessionDb.AutoMigrate(models...)

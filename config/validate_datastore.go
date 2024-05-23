@@ -16,7 +16,7 @@ func (d *DbConfig) Validate() error {
 		if d.SQLite == nil {
 			return errors.New("missing sqlite config")
 		}
-	} else if d.Datastore.Engine == datastore.MySQL || d.Datastore.Engine == datastore.PostgreSQL {
+	} else if d.Datastore.Engine == datastore.PostgreSQL {
 		if d.SQL == nil {
 			return errors.New("missing sql config")
 		} else if len(d.SQL.Host) == 0 {

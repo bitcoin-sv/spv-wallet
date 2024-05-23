@@ -2,7 +2,6 @@ package datastore
 
 import (
 	"context"
-	"database/sql"
 	"os"
 	"testing"
 
@@ -167,58 +166,6 @@ func TestWithSQL(t *testing.T) {
 		assert.Equal(t, Engine(""), options.engine)
 		assert.Nil(t, options.sqlConfigs)
 	})
-
-	t.Run("test applying empty config", func(t *testing.T) {
-		options := &clientOptions{}
-		opt := WithSQL(MySQL, nil)
-		opt(options)
-		assert.Equal(t, Engine(""), options.engine)
-		assert.Nil(t, options.sqlConfigs)
-	})
-
-	t.Run("test applying option - mysql", func(t *testing.T) {
-		options := &clientOptions{}
-		config := &SQLConfig{
-			CommonConfig: CommonConfig{
-				Debug:       true,
-				TablePrefix: testTablePrefix,
-			},
-			Driver:   MySQL.String(),
-			Host:     testDatabaseHost,
-			Name:     testDatabaseName,
-			Password: testDatabasePassword,
-			Port:     testDatabasePortMySQL,
-			User:     testDatabaseUser,
-		}
-		opt := WithSQL(MySQL, []*SQLConfig{config})
-		opt(options)
-		assert.Len(t, options.sqlConfigs, 1)
-		assert.Equal(t, MySQL, options.engine)
-		assert.Equal(t, config.TablePrefix, options.tablePrefix)
-		assert.True(t, options.debug)
-	})
-
-	t.Run("test applying option - postgresql", func(t *testing.T) {
-		options := &clientOptions{}
-		config := &SQLConfig{
-			CommonConfig: CommonConfig{
-				Debug:       true,
-				TablePrefix: testTablePrefix,
-			},
-			Driver:   PostgreSQL.String(),
-			Host:     testDatabaseHost,
-			Name:     testDatabaseName,
-			Password: testDatabasePassword,
-			Port:     testDatabasePortMySQL,
-			User:     testDatabaseUser,
-		}
-		opt := WithSQL(PostgreSQL, []*SQLConfig{config})
-		opt(options)
-		assert.Len(t, options.sqlConfigs, 1)
-		assert.Equal(t, PostgreSQL, options.engine)
-		assert.Equal(t, config.TablePrefix, options.tablePrefix)
-		assert.True(t, options.debug)
-	})
 }
 
 // TestWithSQLConnection will test the method WithSQLConnection()
@@ -234,23 +181,6 @@ func TestWithSQLConnection(t *testing.T) {
 		opt(options)
 		assert.Equal(t, Engine(""), options.engine)
 		assert.Nil(t, options.sqlConfigs)
-	})
-
-	t.Run("test applying empty connection", func(t *testing.T) {
-		options := &clientOptions{}
-		opt := WithSQLConnection(MySQL, nil, testTablePrefix)
-		opt(options)
-		assert.Equal(t, Engine(""), options.engine)
-		assert.Nil(t, options.sqlConfigs)
-	})
-
-	t.Run("test applying a connection", func(t *testing.T) {
-		options := &clientOptions{}
-		opt := WithSQLConnection(MySQL, &sql.DB{}, testTablePrefix)
-		opt(options)
-		assert.Equal(t, MySQL, options.engine)
-		assert.Len(t, options.sqlConfigs, 1)
-		assert.Equal(t, testTablePrefix, options.tablePrefix)
 	})
 }
 

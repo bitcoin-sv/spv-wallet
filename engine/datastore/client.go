@@ -23,7 +23,7 @@ type (
 		autoMigrate     bool                        // Setting for Auto Migration of SQL tables
 		db              *gorm.DB                    // Database connection for Read-Only requests (can be same as Write)
 		debug           bool                        // Setting for global debugging
-		engine          Engine                      // Datastore engine (MySQL, PostgreSQL, SQLite)
+		engine          Engine                      // Datastore engine (PostgreSQL, SQLite)
 		fields          *fieldConfig                // Configuration for custom fields
 		logger          zLogger.GormLoggerInterface // Custom logger interface (standard interface)
 		loggerDB        gLogger.Interface           // Custom logger interface (for GORM)
@@ -32,7 +32,7 @@ type (
 		mongoDB         *mongo.Database             // Database connection for a MongoDB datastore
 		mongoDBConfig   *MongoDBConfig              // Configuration for a MongoDB datastore
 		newRelicEnabled bool                        // If NewRelic is enabled (parent application)
-		sqlConfigs      []*SQLConfig                // Configuration for a MySQL or PostgreSQL datastore
+		sqlConfigs      []*SQLConfig                // Configuration for a PostgreSQL datastore
 		sqLite          *SQLiteConfig               // Configuration for a SQLite datastore
 		tablePrefix     string                      // Model table prefix
 	}
@@ -96,7 +96,7 @@ func NewClient(ctx context.Context, opts ...ClientOps) (ClientInterface, error) 
 
 	// Use different datastore configurations
 	var err error
-	if client.Engine() == MySQL || client.Engine() == PostgreSQL {
+	if client.Engine() == PostgreSQL {
 		if client.options.db, err = openSQLDatabase(
 			client.options.loggerDB, client.options.sqlConfigs...,
 		); err != nil {
@@ -177,10 +177,8 @@ func (c *Client) GetTableName(modelName string) string {
 
 // GetDatabaseName will return the full database name for the given model name
 func (c *Client) GetDatabaseName() string {
-	if c.Engine() == MySQL || c.Engine() == PostgreSQL {
+	if c.Engine() == PostgreSQL {
 		return c.options.sqlConfigs[0].Name
-	} else if c.Engine() == MongoDB {
-		return c.options.mongoDBConfig.DatabaseName
 	}
 
 	return ""

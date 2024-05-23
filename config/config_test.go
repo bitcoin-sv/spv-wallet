@@ -144,38 +144,6 @@ func TestAppConfig_Validate(t *testing.T) {
 		assert.Error(t, err)
 	})
 
-	t.Run("datastore - invalid sql config", func(t *testing.T) {
-		app, _ := baseTestConfig(t)
-		app.Db.Datastore.Engine = datastore.MySQL
-		app.Db.SQL = nil
-		err := app.Validate()
-		assert.Error(t, err)
-	})
-
-	t.Run("datastore - invalid sql user", func(t *testing.T) {
-		app, _ := baseTestConfig(t)
-		app.Db.Datastore.Engine = datastore.MySQL
-		app.Db.SQL.User = ""
-		err := app.Validate()
-		assert.Error(t, err)
-	})
-
-	t.Run("datastore - invalid sql name", func(t *testing.T) {
-		app, _ := baseTestConfig(t)
-		app.Db.Datastore.Engine = datastore.MySQL
-		app.Db.SQL.Name = ""
-		err := app.Validate()
-		assert.Error(t, err)
-	})
-
-	t.Run("datastore - invalid sql host", func(t *testing.T) {
-		app, _ := baseTestConfig(t)
-		app.Db.Datastore.Engine = datastore.MySQL
-		app.Db.SQL.Host = ""
-		err := app.Validate()
-		assert.Error(t, err)
-	})
-
 	t.Run("datastore - invalid mongo config", func(t *testing.T) {
 		app, _ := baseTestConfig(t)
 		app.Db.Datastore.Engine = datastore.MongoDB

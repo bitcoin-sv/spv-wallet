@@ -97,7 +97,7 @@ func WithSQLite(config *SQLiteConfig) ClientOps {
 func WithSQL(engine Engine, configs []*SQLConfig) ClientOps {
 	return func(c *clientOptions) {
 		// Do not set if engine is wrong
-		if engine != MySQL && engine != PostgreSQL {
+		if engine != PostgreSQL {
 			return
 		}
 
@@ -129,11 +129,11 @@ func WithSQL(engine Engine, configs []*SQLConfig) ClientOps {
 	}
 }
 
-// WithSQLConnection will set the datastore to an existing connection for MySQL or PostgreSQL
+// WithSQLConnection will set the datastore to an existing connection for PostgreSQL
 func WithSQLConnection(engine Engine, sqlDB *sql.DB, tablePrefix string) ClientOps {
 	return func(c *clientOptions) {
 		// Do not set if engine is wrong
-		if engine != MySQL && engine != PostgreSQL {
+		if engine != PostgreSQL {
 			return
 		}
 
@@ -142,13 +142,7 @@ func WithSQLConnection(engine Engine, sqlDB *sql.DB, tablePrefix string) ClientO
 			return
 		}
 
-		// this was set for mock testing in MySQL
-		// failed to initialize database, got error all expectations were already fulfilled,
-		// call to Query 'SELECT VERSION()' with args [] was not expected
 		skipInitializeWithVersion := false
-		if engine == MySQL {
-			skipInitializeWithVersion = true
-		}
 
 		c.sqlConfigs = []*SQLConfig{{
 			CommonConfig: CommonConfig{

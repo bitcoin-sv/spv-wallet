@@ -444,41 +444,8 @@ func (m *Utxo) GenerateID() string {
 	return utils.Hash(fmt.Sprintf("%s|%d", m.TransactionID, m.OutputIndex))
 }
 
-// Migrate model specific migration on startup
-func (m *Utxo) Migrate(client datastore.ClientInterface) error {
-	tableName := client.GetTableName(tableUTXOs)
-	if client.Engine() == datastore.MySQL {
-		if err := m.migrateMySQL(client, tableName); err != nil {
-			return err
-		}
-	} else if client.Engine() == datastore.PostgreSQL {
-		if err := m.migratePostgreSQL(client, tableName); err != nil {
-			return err
-		}
-	}
-
-	return client.IndexMetadata(client.GetTableName(tableUTXOs), metadataField)
-}
-
 // migratePostgreSQL is specific migration SQL for Postgresql
 func (m *Utxo) migratePostgreSQL(client datastore.ClientInterface, tableName string) error {
 	tx := client.Execute(`CREATE INDEX IF NOT EXISTS "idx_utxo_reserved" ON "` + tableName + `" ("xpub_id","type","draft_id","spending_tx_id")`)
 	return tx.Error
-}
-
-// migrateMySQL is specific migration SQL for MySQL
-func (m *Utxo) migrateMySQL(client datastore.ClientInterface, tableName string) error {
-	idxName := "idx_" + tableName + "_reserved"
-	idxExists, err := client.IndexExists(tableName, idxName)
-	if err != nil {
-		return err
-	}
-	if !idxExists {
-		tx := client.Execute("CREATE INDEX `" + idxName + "` ON `" + tableName + "` (xpub_id,type,draft_id,spending_tx_id)")
-		if tx.Error != nil {
-			return tx.Error
-		}
-	}
-
-	return nil
 }

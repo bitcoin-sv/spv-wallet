@@ -323,7 +323,7 @@ func loadDatastore(options []engine.ClientOps, appConfig *AppConfig, testMode bo
 			DatabasePath: appConfig.Db.SQLite.DatabasePath, // "" for in memory
 			Shared:       appConfig.Db.SQLite.Shared,
 		}))
-	} else if appConfig.Db.Datastore.Engine == datastore.MySQL || appConfig.Db.Datastore.Engine == datastore.PostgreSQL {
+	} else if appConfig.Db.Datastore.Engine == datastore.PostgreSQL {
 		tablePrefix := appConfig.Db.Datastore.TablePrefix
 		if len(appConfig.Db.SQL.TablePrefix) > 0 {
 			tablePrefix = appConfig.Db.SQL.TablePrefix
