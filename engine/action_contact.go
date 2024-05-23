@@ -119,6 +119,30 @@ func (c *Client) GetContactsByXpubID(ctx context.Context, xPubID string, metadat
 	return contacts, nil
 }
 
+func (c *Client) GetContactsByXPubIDCount(ctx context.Context, xPubID string, metadata *Metadata, conditions map[string]interface{}, opts ...ModelOps) (int64, error) {
+	count, err := getContactsByXPubIDCount(
+		ctx,
+		xPubID,
+		metadata,
+		conditions,
+		c.DefaultModelOptions(opts...)...,
+	)
+	if err != nil {
+		return 0, err
+	}
+
+	return count, nil
+}
+
+func (c *Client) GetContactsCount(ctx context.Context, metadata *Metadata, conditions map[string]interface{}, opts ...ModelOps) (int64, error) {
+	count, err := getModelCountByConditions(ctx, ModelContact, Contact{}, metadata, conditions, c.DefaultModelOptions(opts...)...)
+	if err != nil {
+		return 0, err
+	}
+
+	return count, nil
+}
+
 func (c *Client) UpdateContact(ctx context.Context, id, fullName string, metadata *Metadata) (*Contact, error) {
 	contact, err := getContactByID(ctx, id, c.DefaultModelOptions()...)
 	if err != nil {

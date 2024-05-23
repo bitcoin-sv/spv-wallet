@@ -460,10 +460,7 @@ const docTemplate = `{
                     "200": {
                         "description": "List of contacts",
                         "schema": {
-                            "type": "array",
-                            "items": {
-                                "$ref": "#/definitions/models.Contact"
-                            }
+                            "$ref": "#/definitions/models.SearchContactsResponse"
                         }
                     },
                     "400": {
@@ -1383,10 +1380,7 @@ const docTemplate = `{
                     "200": {
                         "description": "List of contacts",
                         "schema": {
-                            "type": "array",
-                            "items": {
-                                "$ref": "#/definitions/models.Contact"
-                            }
+                            "$ref": "#/definitions/models.SearchContactsResponse"
                         }
                     },
                     "400": {
@@ -3855,6 +3849,35 @@ const docTemplate = `{
                 }
             }
         },
+        "models.Page": {
+            "type": "object",
+            "properties": {
+                "number": {
+                    "description": "Page number",
+                    "type": "integer"
+                },
+                "orderByField": {
+                    "description": "Field by which to order the results",
+                    "type": "string"
+                },
+                "size": {
+                    "description": "Size of the page",
+                    "type": "integer"
+                },
+                "sortDirection": {
+                    "description": "Direction in which to order the results ASC/DSC",
+                    "type": "string"
+                },
+                "totalElements": {
+                    "description": "Total count of elements",
+                    "type": "integer"
+                },
+                "totalPages": {
+                    "description": "Total number of possible pages",
+                    "type": "integer"
+                }
+            }
+        },
         "models.PaymailAddress": {
             "type": "object",
             "properties": {
@@ -3971,6 +3994,26 @@ const docTemplate = `{
                 "script_type": {
                     "description": "ScriptType is a script output script type.",
                     "type": "string"
+                }
+            }
+        },
+        "models.SearchContactsResponse": {
+            "type": "object",
+            "properties": {
+                "content": {
+                    "description": "List of records for the response",
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/models.Contact"
+                    }
+                },
+                "page": {
+                    "description": "Pagination details",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/models.Page"
+                        }
+                    ]
                 }
             }
         },
@@ -4558,6 +4601,8 @@ const docTemplate = `{
                 1000000000,
                 60000000000,
                 3600000000000,
+                -9223372036854775808,
+                9223372036854775807,
                 1,
                 1000,
                 1000000,
@@ -4582,6 +4627,8 @@ const docTemplate = `{
                 "Second",
                 "Minute",
                 "Hour",
+                "minDuration",
+                "maxDuration",
                 "Nanosecond",
                 "Microsecond",
                 "Millisecond",
