@@ -5,7 +5,7 @@ import (
 	"testing"
 
 	"github.com/libsv/go-bk/bec"
-	"github.com/stretchr/testify/assert"
+	assert "github.com/stretchr/testify/require"
 )
 
 func TestCreatePikeOutput(t *testing.T) {
