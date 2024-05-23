@@ -155,12 +155,11 @@ func (ts *EmbeddedDBTestSuite) createTestClient(ctx context.Context, database da
 					MaxOpenConnections: 1,
 					TablePrefix:        tablePrefix,
 				},
-				Host:                      postgresqlTestHost,
-				Name:                      postgresqlTestName,
-				User:                      postgresqlTestUser,
-				Password:                  postgresTestPassword,
-				Port:                      fmt.Sprintf("%d", postgresqlTestPort),
-				SkipInitializeWithVersion: true,
+				Host:     postgresqlTestHost,
+				Name:     postgresqlTestName,
+				User:     postgresqlTestUser,
+				Password: postgresTestPassword,
+				Port:     fmt.Sprintf("%d", postgresqlTestPort),
 			}))
 
 		} else {
