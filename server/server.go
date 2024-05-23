@@ -6,6 +6,7 @@ import (
 	"crypto/tls"
 	"errors"
 	"fmt"
+	"github.com/bitcoin-sv/spv-wallet/actions/sharedconfig"
 	"net/http"
 	"strconv"
 
@@ -131,6 +132,7 @@ func SetupServerRoutes(appConfig *config.AppConfig, services *config.AppServices
 	transactionBasicRoutes, transactionAPIRoutes, transactionCallbackRoutes := transactions.NewHandler(appConfig, services)
 	utxoAPIRoutes := utxos.NewHandler(appConfig, services)
 	xPubAPIRoutes := xpubs.NewHandler(appConfig, services)
+	sharedConfigRoutes := sharedconfig.NewHandler(appConfig, services)
 
 	routes := []interface{}{
 		// Admin routes
@@ -150,6 +152,8 @@ func SetupServerRoutes(appConfig *config.AppConfig, services *config.AppServices
 		utxoAPIRoutes,
 		// xPub routes
 		xPubAPIRoutes,
+		// Shared Config routes
+		sharedConfigRoutes,
 	}
 
 	if appConfig.ExperimentalFeatures.PikeEnabled {

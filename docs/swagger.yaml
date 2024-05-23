@@ -1216,50 +1216,6 @@ definitions:
         example: bb8593f85ef8056a77026ad415f02128f3768906de53e9e8bf8749fe2d66cf50
         type: string
     type: object
-  models.FeeUnit:
-    properties:
-      bytes:
-        description: Bytes is a fee unit bytes representation.
-        example: 1000
-        type: integer
-      satoshis:
-        description: Satoshis is a fee unit satoshis amount.
-        example: 1
-        type: integer
-    type: object
-  models.MapProtocol:
-    properties:
-      app:
-        description: App is a map protocol app.
-        type: string
-      keys:
-        additionalProperties: true
-        description: Keys is a map protocol keys.
-        type: object
-      type:
-        description: Type is a map protocol type.
-        type: string
-    type: object
-  models.OpReturn:
-    properties:
-      hex:
-        description: Hex is a full hex of op return.
-        type: string
-      hex_parts:
-        description: HexParts is a slice of splitted hex parts.
-        items:
-          type: string
-        type: array
-      map:
-        allOf:
-        - $ref: '#/definitions/models.MapProtocol'
-        description: Map is a pointer to a map protocol object.
-      string_parts:
-        description: StringParts is a slice of string parts.
-        items:
-          type: string
-        type: array
-    type: object
   models.Page:
     properties:
       number:
@@ -1329,48 +1285,6 @@ definitions:
         example: bb8593f85ef8056a77026ad415f02128f3768906de53e9e8bf8749fe2d66cf50
         type: string
     type: object
-  models.PaymailP4:
-    properties:
-      alias:
-        description: Alias is a paymail p4 alias.
-        type: string
-      domain:
-        description: Domain is a paymail p4 domain.
-        type: string
-      from_paymail:
-        description: FromPaymail is a paymail p4 from paymail.
-        type: string
-      note:
-        description: Note is a paymail p4 note.
-        type: string
-      pub_key:
-        description: PubKey is a paymail p4 pub key.
-        type: string
-      receive_endpoint:
-        description: ReceiveEndpoint is a paymail p4 receive endpoint.
-        type: string
-      reference_id:
-        description: ReferenceID is a paymail p4 reference id.
-        type: string
-      resolution_type:
-        description: ResolutionType is a paymail p4 resolution type.
-        type: string
-    type: object
-  models.ScriptOutput:
-    properties:
-      address:
-        description: Address is a script output address.
-        type: string
-      satoshis:
-        description: Satoshis is a script output satoshis.
-        type: integer
-      script:
-        description: Script is a script output script.
-        type: string
-      script_type:
-        description: ScriptType is a script output script type.
-        type: string
-    type: object
   models.SearchContactsResponse:
     properties:
       content:
@@ -1400,25 +1314,6 @@ definitions:
         items:
           type: string
         type: array
-    type: object
-  models.SyncConfig:
-    properties:
-      broadcast:
-        description: Broadcast is a flag that indicates whether to broadcast transaction
-          or not.
-        type: boolean
-      broadcast_instant:
-        description: BroadcastInstant is a flag that indicates whether to broadcast
-          transaction instantly or not.
-        type: boolean
-      paymail_p2p:
-        description: PaymailP2P is a flag that indicates whether to use paymail p2p
-          or not.
-        type: boolean
-      sync_on_chain:
-        description: SyncOnChain is a flag that indicates whether to sync transaction
-          on chain or not.
-        type: boolean
     type: object
   models.Transaction:
     properties:
@@ -1515,174 +1410,6 @@ definitions:
         type: array
     type: object
   models.TransactionConfig:
-    properties:
-      change_destinations:
-        description: ChangeDestinations is a slice of change destinations.
-        items:
-          $ref: '#/definitions/models.Destination'
-        type: array
-      change_destinations_strategy:
-        description: ChangeStrategy is a change strategy.
-        type: string
-      change_minimum_satoshis:
-        description: ChangeMinimumSatoshis is a minimum satoshis for change.
-        example: 0
-        type: integer
-      change_number_of_destinations:
-        description: ChangeNumberOfDestinations is a number of change destinations.
-        example: 1
-        type: integer
-      change_satoshis:
-        description: ChangeSatoshis is a change satoshis.
-        example: 49
-        type: integer
-      expires_in:
-        allOf:
-        - $ref: '#/definitions/time.Duration'
-        description: ExpiresAt is a time when transaction expires.
-        example: 1000
-      fee:
-        description: Fee is a fee amount.
-        example: 1
-        type: integer
-      fee_unit:
-        allOf:
-        - $ref: '#/definitions/models.FeeUnit'
-        description: FeeUnit is a pointer to a fee unit object.
-      from_utxos:
-        description: FromUtxos is a slice of from utxos used to build transaction.
-        items:
-          $ref: '#/definitions/models.UtxoPointer'
-        type: array
-      include_utxos:
-        description: IncludeUtxos is a slice of utxos to include in transaction.
-        items:
-          $ref: '#/definitions/models.UtxoPointer'
-        type: array
-      inputs:
-        description: Inputs is a slice of transaction inputs.
-        items:
-          $ref: '#/definitions/models.TransactionInput'
-        type: array
-      outputs:
-        description: Outputs is a slice of transaction outputs.
-        items:
-          $ref: '#/definitions/models.TransactionOutput'
-        type: array
-      send_all_to:
-        allOf:
-        - $ref: '#/definitions/models.TransactionOutput'
-        description: SendAllTo is a pointer to a transaction output object.
-      sync:
-        allOf:
-        - $ref: '#/definitions/models.SyncConfig'
-        description: Sync contains sync configuration.
-    type: object
-  models.TransactionInput:
-    properties:
-      created_at:
-        description: CreatedAt is a time when outer model was created.
-        example: "2024-02-26T11:00:28.069911Z"
-        type: string
-      deleted_at:
-        description: DeletedAt is a time when outer model was deleted.
-        example: "2024-02-26T11:02:28.069911Z"
-        type: string
-      destination:
-        allOf:
-        - $ref: '#/definitions/models.Destination'
-        description: Destination is a pointer to a destination object.
-      draft_id:
-        description: DraftID is a utxo transaction related draft id.
-        example: b356f7fa00cd3f20cce6c21d704cd13e871d28d714a5ebd0532f5a0e0cde63f7
-        type: string
-      id:
-        description: ID is a utxo id which is a hash from transaction id and output
-          index.
-        example: c706a448748d398d542cf4dfad797c9a4b123ebb72dbfb8b27f3d0f1dda99b58
-        type: string
-      metadata:
-        additionalProperties:
-          type: string
-        description: Metadata is a metadata map of outer model.
-        example:
-          key: value
-          key2: value2
-        type: object
-      output_index:
-        description: OutputIndex is a output index that utxo points to.
-        example: 0
-        type: integer
-      reserved_at:
-        description: ReservedAt is a time utxo was reserved at.
-        example: "2024-02-26T11:00:28.069911Z"
-        type: string
-      satoshis:
-        description: Satoshis is a utxo satoshis amount.
-        example: 100
-        type: integer
-      script_pub_key:
-        description: ScriptPubKey is a utxo script pub key.
-        example: 76a91433ba3607a902bc022164bcb6e993f27bd040241c88ac
-        type: string
-      spending_tx_id:
-        description: SpendingTxID is a spending transaction id - null if not spent
-          yet.
-        example: 01d0d0067652f684c6acb3683763f353fce55f6496521c7d99e71e1d27e53f5c
-        type: string
-      transaction:
-        allOf:
-        - $ref: '#/definitions/models.Transaction'
-        description: Transaction is a transaction pointer that utxo points to.
-      transaction_id:
-        description: TransactionID is a transaction id that utxo points to.
-        example: 01d0d0067652f684c6acb3683763f353fce55f6496521c7d99e71e1d27e53f5c
-        type: string
-      type:
-        description: Type is a utxo type.
-        example: pubkeyhash
-        type: string
-      updated_at:
-        description: UpdatedAt is a time when outer model was updated.
-        example: "2024-02-26T11:01:28.069911Z"
-        type: string
-      xpub_id:
-        description: XpubID is a utxo related xpub id.
-        example: bb8593f85ef8056a77026ad415f02128f3768906de53e9e8bf8749fe2d66cf50
-        type: string
-    type: object
-  models.TransactionOutput:
-    properties:
-      op_return:
-        allOf:
-        - $ref: '#/definitions/models.OpReturn'
-        description: OpReturn is a pointer to a op return object.
-      paymail_p4:
-        allOf:
-        - $ref: '#/definitions/models.PaymailP4'
-        description: PaymailP4 is a pointer to a paymail p4 object.
-      satoshis:
-        description: Satoshis is a satoshis amount.
-        example: 50
-        type: integer
-      script:
-        description: Script is a transaction output string representation of script.
-        example: 76a91433ba3607a902bc022164bcb6e993f27bd040241c88ac
-        type: string
-      scripts:
-        description: ScriptType is a transaction output script type.
-        items:
-          $ref: '#/definitions/models.ScriptOutput'
-        type: array
-      to:
-        description: To is a transaction output destination address.
-        example: 1MB8MfCyA5mGt3UBhxYr1exBfsFWgL1gCm
-        type: string
-      use_for_change:
-        description: UseForChange is a flag that indicates if this output should be
-          used for change.
-        example: false
-        type: boolean
     type: object
   models.Utxo:
     properties:
@@ -1753,17 +1480,6 @@ definitions:
         example: bb8593f85ef8056a77026ad415f02128f3768906de53e9e8bf8749fe2d66cf50
         type: string
     type: object
-  models.UtxoPointer:
-    properties:
-      output_index:
-        description: OutputIndex is a output index that utxo points to.
-        example: 0
-        type: integer
-      transaction_id:
-        description: TransactionID is a transaction id that utxo points to.
-        example: 01d0d0067652f684c6acb3683763f353fce55f6496521c7d99e71e1d27e53f5c
-        type: string
-    type: object
   models.Xpub:
     properties:
       created_at:
@@ -1805,58 +1521,6 @@ definitions:
         example: "2024-02-26T11:01:28.069911Z"
         type: string
     type: object
-  time.Duration:
-    enum:
-    - -9223372036854775808
-    - 9223372036854775807
-    - 1
-    - 1000
-    - 1000000
-    - 1000000000
-    - 60000000000
-    - 3600000000000
-    - -9223372036854775808
-    - 9223372036854775807
-    - 1
-    - 1000
-    - 1000000
-    - 1000000000
-    - 60000000000
-    - 3600000000000
-    - -9223372036854775808
-    - 9223372036854775807
-    - 1
-    - 1000
-    - 1000000
-    - 1000000000
-    - 60000000000
-    - 3600000000000
-    type: integer
-    x-enum-varnames:
-    - minDuration
-    - maxDuration
-    - Nanosecond
-    - Microsecond
-    - Millisecond
-    - Second
-    - Minute
-    - Hour
-    - minDuration
-    - maxDuration
-    - Nanosecond
-    - Microsecond
-    - Millisecond
-    - Second
-    - Minute
-    - Hour
-    - minDuration
-    - maxDuration
-    - Nanosecond
-    - Microsecond
-    - Millisecond
-    - Second
-    - Minute
-    - Hour
   transactions.CountTransactions:
     properties:
       conditions:
@@ -1875,20 +1539,6 @@ definitions:
         type: object
     type: object
   transactions.NewTransaction:
-    properties:
-      config:
-        allOf:
-        - $ref: '#/definitions/models.TransactionConfig'
-        description: Configuration of the transaction
-      metadata:
-        additionalProperties:
-          type: string
-        description: Accepts a JSON object for embedding custom metadata, enabling
-          arbitrary additional information to be associated with the resource
-        example:
-          key: value
-          key2: value2
-        type: object
     type: object
   transactions.RecordTransaction:
     properties:
@@ -2524,21 +2174,6 @@ paths:
       summary: Paymail addresses search
       tags:
       - Admin
-  /v1/admin/shared-config:
-    get:
-      description: Get shared config
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: Shared configuration
-          schema:
-            $ref: '#/definitions/models.SharedConfig'
-      security:
-      - x-auth-xpub: []
-      summary: Get shared config
-      tags:
-      - Admin
   /v1/admin/stats:
     get:
       description: Get stats
@@ -3088,6 +2723,21 @@ paths:
       summary: Search for a destination
       tags:
       - Destinations
+  /v1/shared-config:
+    get:
+      description: Get shared config
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Shared configuration
+          schema:
+            $ref: '#/definitions/models.SharedConfig'
+      security:
+      - x-auth-xpub: []
+      summary: Get shared config
+      tags:
+      - Shared-config
   /v1/transaction:
     get:
       description: Get transaction by id
