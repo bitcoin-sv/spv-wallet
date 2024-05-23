@@ -449,3 +449,15 @@ func (m *Utxo) migratePostgreSQL(client datastore.ClientInterface, tableName str
 	tx := client.Execute(`CREATE INDEX IF NOT EXISTS "idx_utxo_reserved" ON "` + tableName + `" ("xpub_id","type","draft_id","spending_tx_id")`)
 	return tx.Error
 }
+
+// Migrate model specific migration on startup
+func (m *Utxo) Migrate(client datastore.ClientInterface) error {
+	tableName := client.GetTableName(tableUTXOs)
+	if client.Engine() == datastore.PostgreSQL {
+		if err := m.migratePostgreSQL(client, tableName); err != nil {
+			return err
+		}
+	}
+
+	return client.IndexMetadata(client.GetTableName(tableUTXOs), metadataField)
+}
