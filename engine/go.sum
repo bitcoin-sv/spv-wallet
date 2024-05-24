@@ -211,8 +211,8 @@ github.com/mrz1836/go-cachestore v0.3.6 h1:/llHdNN6nXvFaRaN6T2icGQ/FHNZwWkTvDwNu
 github.com/mrz1836/go-cachestore v0.3.6/go.mod h1:IR9VXbyE+FN/1VguWRlXK4sAbu375FS1XUAb8IXOzvs=
 github.com/mrz1836/go-logger v0.3.3 h1:L/u+So5yrsYi7KhkFWlZ8v28cmoHt6aB7X8uVEIEHu8=
 github.com/mrz1836/go-logger v0.3.3/go.mod h1:hlP6K2fnTcisDbcYw9u3eV+1TW5jCsYUfoujA4+38NY=
-github.com/newrelic/go-agent/v3 v3.31.0 h1:MVZA93FO6IEybg5EZUcOHUoDg5oBFuy8nrUIa2hfd8M=
-github.com/newrelic/go-agent/v3 v3.31.0/go.mod h1:MnbPbcIAmtKH80ZRXovE9kQLDs0Nc32IQa7bWydDKsk=
+github.com/newrelic/go-agent/v3 v3.33.0 h1:0Phrvp6KWOcJPsIxskL9ZrVddhrZDl1xokNtTjN4GpQ=
+github.com/newrelic/go-agent/v3 v3.33.0/go.mod h1:SMdqPzE/ghkWdY0rYGSD7Clw2daK/XH6pUnVd4albg4=
 github.com/nxadm/tail v1.4.4/go.mod h1:kenIhsEOeOJmVchQTgglprH7qJGnHDVpk1VPCcaMI8A=
 github.com/nxadm/tail v1.4.8 h1:nPr65rt6Y5JFSKQO7qToXr7pePgD6Gwiw05lkbyAQTE=
 github.com/nxadm/tail v1.4.8/go.mod h1:+ncqLTQzXmGhMZNUePPaPqPvBxHAIsmXswZKocGu+AU=
