@@ -11,8 +11,6 @@ replace github.com/bitcoin-sv/spv-wallet/models => ./models
 
 replace github.com/bitcoin-sv/spv-wallet/engine => ./engine
 
-replace github.com/bitcoin-sv/spv-wallet/engine/types/type24 => ./engine/types/type24
-
 require (
 	github.com/bitcoin-sv/go-broadcast-client v0.18.1
 	github.com/bitcoin-sv/spv-wallet/engine v0.0.0-00010101000000-000000000000
