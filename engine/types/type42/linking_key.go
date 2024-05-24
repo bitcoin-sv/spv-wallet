@@ -71,8 +71,11 @@ func calculateDedicatedPublicKey(hmacResult []byte, receiverPubKey *bec.PublicKe
 // with use of invoiceNumber as reference of this derivation.
 func DeriveLinkedKey(source bec.PublicKey, linkPubKey bec.PublicKey, invoiceNumber string) (*bec.PublicKey, error) {
 	// Check for nil receiver public key
+	if source.X == nil || source.Y == nil {
+		return nil, errors.New("source public key is nil")
+	}
 	if linkPubKey.X == nil || linkPubKey.Y == nil {
-		return nil, fmt.Errorf("receiver public key is nil")
+		return nil, errors.New("receiver public key is nil")
 	}
 
 	// Compute the shared secret
