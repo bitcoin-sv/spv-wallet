@@ -135,8 +135,12 @@ uninstall: ## Uninstall the application (and remove files)
 
 .PHONY: update
 update:  ## Update all project dependencies
-	@echo "updating dependencies..."
+	@echo "updating dependencies in root..."
 	@go get -u ./... && go mod tidy
+	@echo "updating dependencies in engine..."
+	@(cd engine && go get -u ./... && go mod tidy)
+	@echo "updating dependencies in models..."
+	@(cd models && go get -u ./... && go mod tidy)
 
 .PHONY: update-linter
 update-linter: ## Update the golangci-lint package (macOS only)
