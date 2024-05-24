@@ -345,7 +345,6 @@ Ports which are used:
 - 5432 - PostgreSQL DB
 - 6379 - Redis
 - 8080 - Block Headers Service
-- 27017 - MongoDB
 - 80 - in case of exposing on the paymail domain and its subdomains
 - 443 - in case of exposing on the paymail domain and its subdomains
 <br/>

@@ -18,7 +18,6 @@ const (
 	defaultQueryTxTimeout      = 10 * time.Second         // Default timeout for syncing on-chain information
 	defaultUserAgent           = "spv-wallet: " + version // Default user agent
 	dustLimit                  = uint64(1)                // Dust limit
-	mongoTestVersion           = "6.0.4"                  // Mongo Testing Version
 	sqliteTestVersion          = "3.37.0"                 // SQLite Testing Version (dummy version for now)
 	version                    = "v0.14.2"                // SPV Wallet Engine version
 )

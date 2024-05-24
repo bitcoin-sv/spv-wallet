@@ -284,7 +284,7 @@ while [[ $# -gt 0 ]]; do
         echo -e ""
         echo -e "<----------   SPV WALLET SECTION"
         echo -e "  -sw,  --spv-wallet\t\t Whether the spv-wallet should be run - true/false"
-        echo -e "  -db,  --database\t\t Define database - postgresql, mongodb, sqlite"
+        echo -e "  -db,  --database\t\t Define database - postgresql, sqlite"
         echo -e "  -c,   --cache\t\t\t Define cache storage - freecache(in-memory), redis"
         echo -e "  --xpub\t\t\t Define admin xPub"
         echo ""
@@ -347,13 +347,12 @@ fi
 
 # <----------   SPV WALLET SECTION
 if [ "$database" == "" ]; then
-    database_options=("postgresql" "mongodb" "sqlite")
+    database_options=("postgresql" "sqlite")
     ask_for_choice "Select your database:" "${database_options[@]}"
 
     case $choice in
         1) database="postgresql";;
-        2) database="mongodb";;
-        3) database="sqlite";;
+        2) database="sqlite";;
     esac
     print_debug "database: $database"
 fi
@@ -515,9 +514,6 @@ case $database in
     save_value 'SPVWALLET_DB_SQL_USER' "postgres"
     save_value 'SPVWALLET_DB_SQL_PASSWORD' "postgres"
   ;;
-  mongodb)
-    save_value 'SPVWALLET_DB_MONGODB_URI' "mongodb://mongo:mongo@wallet-mongodb:27017/"
-  ;;
 esac
 
 if [ "$cache" == "redis" ]; then
@@ -560,10 +556,6 @@ case $database in
   postgresql)
     servicesToRun+=("wallet-postgresql")
     servicesToHideLogs+=("wallet-postgresql")
-  ;;
-  mongodb)
-    servicesToRun+=("wallet-mongodb")
-    servicesToHideLogs+=("wallet-mongodb")
   ;;
 esac
 

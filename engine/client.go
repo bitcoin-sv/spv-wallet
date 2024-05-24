@@ -30,7 +30,7 @@ type (
 		cacheStore    *cacheStoreOptions    // Configuration options for Cachestore (ristretto, redis, etc.)
 		cluster       *clusterOptions       // Configuration options for the cluster coordinator
 		chainstate    *chainstateOptions    // Configuration options for Chainstate (broadcast, sync, etc.)
-		dataStore     *dataStoreOptions     // Configuration options for the DataStore (MySQL, etc.)
+		dataStore     *dataStoreOptions     // Configuration options for the DataStore (PostgreSQL, etc.)
 		debug         bool                  // If the client is in debug mode
 		encryptionKey string                // Encryption key for encrypting sensitive information (IE: paymail xPub) (hex encoded key)
 		httpClient    HTTPInterface         // HTTP interface to use

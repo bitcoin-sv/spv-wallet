@@ -82,20 +82,12 @@ func (builder *whereBuilder) applyJSONArrayContains(tx customWhereInterface, key
 	switch engine {
 	case PostgreSQL:
 		builder.applyPostgresJSONB(tx, columnName, fmt.Sprintf(`["%s"]`, condition))
-	case MySQL:
-		varName := builder.nextVarName()
-		tx.Where(
-			fmt.Sprintf("JSON_CONTAINS(%s, CAST(@%s AS JSON))", columnName, varName),
-			map[string]interface{}{varName: fmt.Sprintf(`["%s"]`, condition)},
-		)
 	case SQLite:
 		varName := builder.nextVarName()
 		tx.Where(
 			fmt.Sprintf("EXISTS (SELECT 1 FROM json_each(%s) WHERE value = @%s)", columnName, varName),
 			map[string]interface{}{varName: condition},
 		)
-	case MongoDB, Empty:
-		panic("Database engine not supported")
 	default:
 		panic("Unknown database engine")
 	}
@@ -112,7 +104,7 @@ func (builder *whereBuilder) applyJSONCondition(tx customWhereInterface, key str
 
 	if engine == PostgreSQL {
 		builder.applyPostgresJSONB(tx, columnName, condition)
-	} else if engine == MySQL || engine == SQLite {
+	} else if engine == SQLite {
 		builder.applyJSONExtract(tx, columnName, condition)
 	} else {
 		panic("Database engine not supported")
@@ -208,9 +200,6 @@ func (builder *whereBuilder) formatNullTime(condition customtypes.NullTime) inte
 		return nil
 	}
 	engine := builder.client.Engine()
-	if engine == MySQL {
-		return condition.Time.Format("2006-01-02 15:04:05")
-	}
 	if engine == PostgreSQL {
 		return condition.Time.Format("2006-01-02T15:04:05Z07:00")
 	}
