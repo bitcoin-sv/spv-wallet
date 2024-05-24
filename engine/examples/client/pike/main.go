@@ -6,7 +6,8 @@ import (
 
 	"github.com/libsv/go-bk/bec"
 
-	"github.com/bitcoin-sv/spv-wallet/engine/pike2"
+	"github.com/bitcoin-sv/spv-wallet/engine/pike"
+	"github.com/bitcoin-sv/spv-wallet/engine/script/template"
 )
 
 func main() {
@@ -33,10 +34,10 @@ func main() {
 	}
 
 	// example of usage pike2
-	outputsTemplate, _ := pike2.CreatePikeOutputsTemplate(10000)
+	outputsTemplate, _ := template.P2PKH(10000)
 	fmt.Println(outputsTemplate)
 
-	lockingScripts, err := pike2.GenerateLockingScriptsFromTemplates(outputsTemplate, senderPubKey, receiverPubKey, "reference")
+	lockingScripts, err := pike.GenerateLockingScriptsFromTemplates(outputsTemplate, senderPubKey, receiverPubKey, "reference")
 	if err != nil {
 		fmt.Println("Error:", err)
 		return

@@ -1,4 +1,4 @@
-package pike2
+package pike
 
 import (
 	"crypto/hmac"
