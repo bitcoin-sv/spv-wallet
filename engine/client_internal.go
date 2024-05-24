@@ -2,7 +2,6 @@ package engine
 
 import (
 	"context"
-
 	"github.com/bitcoin-sv/go-paymail"
 	"github.com/bitcoin-sv/go-paymail/server"
 	"github.com/bitcoin-sv/spv-wallet/engine/chainstate"
@@ -166,14 +165,8 @@ func (c *Client) loadDefaultPaymailConfig() (err error) {
 	paymailLocator := &server.PaymailServiceLocator{}
 	paymailService := &PaymailDefaultServiceProvider{client: c}
 	paymailLocator.RegisterPaymailService(paymailService)
-
-	if c.options.paymail.serverConfig.PikeContactCapabilitiesEnabled {
-		paymailLocator.RegisterPikeContactService(&PikeContactServiceProvider{client: c})
-	}
-
-	if c.options.paymail.serverConfig.PikePaymentCapabilitiesEnabled {
-		paymailLocator.RegisterPikePaymentService(&PikePaymentServiceProvider{client: c})
-	}
+	paymailLocator.RegisterPikeContactService(&PikeContactServiceProvider{client: c})
+	paymailLocator.RegisterPikePaymentService(&PikePaymentServiceProvider{client: c})
 
 	c.options.paymail.serverConfig.Configuration, err = server.NewConfig(
 		paymailLocator,

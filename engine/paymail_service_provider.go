@@ -83,7 +83,7 @@ func (p *PaymailDefaultServiceProvider) CreateAddressResolutionResponse(
 	_ bool,
 	requestMetadata *server.RequestMetadata,
 ) (*paymail.ResolutionPayload, error) {
-	metadata := p.createMetadata(requestMetadata, "CreateAddressResolutionResponse")
+	metadata := createMetadata(requestMetadata, "CreateAddressResolutionResponse")
 
 	dst, err := p.getDestinationForPaymail(ctx, alias, domain, metadata)
 	if err != nil {
@@ -109,7 +109,7 @@ func (p *PaymailDefaultServiceProvider) CreateP2PDestinationResponse(
 		return nil, err
 	}
 
-	metadata := p.createMetadata(requestMetadata, "CreateP2PDestinationResponse")
+	metadata := createMetadata(requestMetadata, "CreateP2PDestinationResponse")
 	metadata[ReferenceIDField] = referenceID
 	metadata[satoshisField] = satoshis
 
@@ -139,7 +139,7 @@ func (p *PaymailDefaultServiceProvider) RecordTransaction(ctx context.Context,
 	p2pTx *paymail.P2PTransaction, requestMetadata *server.RequestMetadata,
 ) (*paymail.P2PTransactionPayload, error) {
 	// Create the metadata
-	metadata := p.createMetadata(requestMetadata, "HandleReceivedP2pTransaction")
+	metadata := createMetadata(requestMetadata, "HandleReceivedP2pTransaction")
 	metadata[p2pMetadataField] = p2pTx.MetaData
 	metadata[ReferenceIDField] = p2pTx.Reference
 
