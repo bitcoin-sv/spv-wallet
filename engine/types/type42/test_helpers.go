@@ -1,4 +1,4 @@
-package pike
+package type42
 
 import (
 	"crypto/hmac"

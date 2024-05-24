@@ -20,6 +20,10 @@ type P2PKHTemplate struct {
 // P2PKH creates a single output with the PIKE template
 func P2PKH(satoshis uint64) ([]P2PKHTemplate, error) {
 
+	if satoshis == ^uint64(0) {
+		return nil, errors.New("invalid satoshis")
+	}
+
 	opcodes := []byte{
 		bscript.OpDUP,
 		bscript.OpHASH160,
@@ -62,6 +66,13 @@ func Evaluate(script []byte, dPK *bec.PublicKey) []byte {
 	parsedScript, err := parser.Parse(&s)
 	if err != nil {
 		return nil
+	}
+
+	// Validate parsed opcodes
+	for _, op := range parsedScript {
+		if op.Value() == 0xFF {
+			return nil
+		}
 	}
 
 	// Serialize the public key to compressed format

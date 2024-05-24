@@ -3,6 +3,7 @@ package type42
 import (
 	"crypto/hmac"
 	"crypto/sha256"
+	"errors"
 	"fmt"
 	"math/big"
 
@@ -20,6 +21,9 @@ import (
 // Returns:
 // - A byte slice containing the HMAC result as a byte slice or an error if the HMAC calculation fails.
 func calculateHMAC(pubSharedSecret []byte, reference string) ([]byte, error) {
+	if reference == "" {
+		return nil, errors.New("invalid invoice number")
+	}
 	h := hmac.New(sha256.New, []byte(reference))
 	if _, err := h.Write(pubSharedSecret); err != nil {
 		return nil, fmt.Errorf("error writing HMAC message - %w", err)
@@ -66,6 +70,11 @@ func calculateDedicatedPublicKey(hmacResult []byte, receiverPubKey *bec.PublicKe
 // DeriveLinkedKey derives a child public key from the source public key and link it with public key
 // with use of invoiceNumber as reference of this derivation.
 func DeriveLinkedKey(source bec.PublicKey, linkPubKey bec.PublicKey, invoiceNumber string) (*bec.PublicKey, error) {
+	// Check for nil receiver public key
+	if linkPubKey.X == nil || linkPubKey.Y == nil {
+		return nil, fmt.Errorf("receiver public key is nil")
+	}
+
 	// Compute the shared secret
 	sharedSecret := source.SerialiseCompressed()
 
