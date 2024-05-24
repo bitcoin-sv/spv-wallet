@@ -248,8 +248,8 @@ github.com/mrz1836/go-cachestore v0.3.9 h1:SBdj+rVaK2vhqAiVLpTm9EH4uEpda2GZK6l8/
 github.com/mrz1836/go-cachestore v0.3.9/go.mod h1:nKqw7vOaWmqdy/AThhRYZC+TRXqncoEeiaKocZxmH7A=
 github.com/mrz1836/go-logger v0.3.3 h1:L/u+So5yrsYi7KhkFWlZ8v28cmoHt6aB7X8uVEIEHu8=
 github.com/mrz1836/go-logger v0.3.3/go.mod h1:hlP6K2fnTcisDbcYw9u3eV+1TW5jCsYUfoujA4+38NY=
-github.com/mrz1836/go-sanitize v1.3.1 h1:bTxpzDXzGh9cp3XLTeVKgL2iLqEwCaLqqe+3BmpnCbo=
-github.com/mrz1836/go-sanitize v1.3.1/go.mod h1:Js6Gq1uiarNReoOeOKxPXxNpKy1FRlbgDDZnJG4THdM=
+github.com/mrz1836/go-sanitize v1.3.2 h1:sGhusPxP4L+7NAUVAUl/WrrBazNSNECsvYh3yumuJXQ=
+github.com/mrz1836/go-sanitize v1.3.2/go.mod h1:wvRS2ALFDxOCK3ORQPwKUxl7HTIBUV8S3U34Hwn96r4=
 github.com/mrz1836/go-validate v0.2.1 h1:LvhFvnZgemmJnZ/Ch9vEgY9YzKy+1Ka1Hx7yzpJEB00=
 github.com/mrz1836/go-validate v0.2.1/go.mod h1:IoGAb4rTAL6KgAxOiWL4ICwLqxGbKCKT1GyaSuE/4bk=
 github.com/newrelic/go-agent/v3 v3.32.0 h1:99Et9lXXzeQV1CfYldfeTXv+d9W9KatpMbb50kIscWo=
