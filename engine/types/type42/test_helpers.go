@@ -22,7 +22,7 @@ func sha256Hash(data string) []byte {
 
 // Helper function to compute the expected HMAC
 func computeExpectedHMAC(pubSharedSecret []byte, reference string, idx int) []byte {
-	h := hmac.New(sha256.New, []byte(fmt.Sprintf("%s-%d", reference, idx)))
-	h.Write(pubSharedSecret)
+	h := hmac.New(sha256.New, pubSharedSecret)
+	h.Write([]byte(fmt.Sprintf("%s-%d", reference, idx)))
 	return h.Sum(nil)
 }

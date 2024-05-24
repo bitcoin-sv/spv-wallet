@@ -24,8 +24,8 @@ func calculateHMAC(pubSharedSecret []byte, reference string) ([]byte, error) {
 	if reference == "" {
 		return nil, errors.New("invalid invoice number")
 	}
-	h := hmac.New(sha256.New, []byte(reference))
-	if _, err := h.Write(pubSharedSecret); err != nil {
+	h := hmac.New(sha256.New, pubSharedSecret)
+	if _, err := h.Write([]byte(reference)); err != nil {
 		return nil, fmt.Errorf("error writing HMAC message - %w", err)
 	}
 	return h.Sum(nil), nil
