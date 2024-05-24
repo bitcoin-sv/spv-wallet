@@ -167,8 +167,13 @@ func (c *Client) loadDefaultPaymailConfig() (err error) {
 	paymailService := &PaymailDefaultServiceProvider{client: c}
 	paymailLocator.RegisterPaymailService(paymailService)
 
-	paymailLocator.RegisterPikeContactService(paymailService)
-	paymailLocator.RegisterPikePaymentService(paymailService)
+	if c.options.paymail.serverConfig.PikeContactCapabilitiesEnabled {
+		paymailLocator.RegisterPikeContactService(&PikeContactServiceProvider{client: c})
+	}
+
+	if c.options.paymail.serverConfig.PikePaymentCapabilitiesEnabled {
+		paymailLocator.RegisterPikePaymentService(&PikePaymentServiceProvider{client: c})
+	}
 
 	c.options.paymail.serverConfig.Configuration, err = server.NewConfig(
 		paymailLocator,

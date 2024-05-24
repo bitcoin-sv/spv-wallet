@@ -25,7 +25,7 @@ type PaymailDefaultServiceProvider struct {
 }
 
 // createMetadata will create a new metadata seeded from the server information
-func (p *PaymailDefaultServiceProvider) createMetadata(serverMetaData *server.RequestMetadata, request string) (metadata Metadata) {
+func createMetadata(serverMetaData *server.RequestMetadata, request string) (metadata Metadata) {
 	metadata = make(Metadata)
 	metadata["paymail_request"] = request
 
@@ -232,14 +232,14 @@ func (p *PaymailDefaultServiceProvider) CreatePikeDestinationResponse(
 	alias, domain string,
 	satoshis uint64,
 	requestMetadata *server.RequestMetadata,
-) (*paymail.PikePaymentDestinationsResponse, error) {
+) (*paymail.PikePaymentOutputsResponse, error) {
 	referenceID, err := utils.RandomHex(16)
 	if err != nil {
 		return nil, err
 	}
 
-	return &paymail.PikePaymentDestinationsResponse{
-		Outputs:   make([]paymail.PikePaymentDestination, 0),
+	return &paymail.PikePaymentOutputsResponse{
+		Outputs:   make([]paymail.PikePaymentOutput, 0),
 		Reference: referenceID,
 	}, nil
 }

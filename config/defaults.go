@@ -98,7 +98,7 @@ func getDbDefaults() *DbConfig {
 
 func getLoggingDefaults() *LoggingConfig {
 	return &LoggingConfig{
-		Level:        "info",
+		Level:        "debug",
 		Format:       "console",
 		InstanceName: "spv-wallet",
 		LogOrigin:    false,
@@ -145,7 +145,7 @@ func getPaymailDefaults() *PaymailConfig {
 			BlockHeaderServiceAuthToken:           "mQZQ6WmxURxWz5ch", // #nosec G101
 		},
 		DefaultFromPaymail:      "from@domain.com",
-		Domains:                 []string{"localhost"},
+		Domains:                 []string{"localhost", "pawel.4chain.space", "pawel.serveo.net"},
 		DomainValidationEnabled: true,
 		SenderValidationEnabled: false,
 	}
@@ -168,13 +168,13 @@ func getServerDefaults() *ServerConfig {
 
 func getMetricsDefaults() *MetricsConfig {
 	return &MetricsConfig{
-		Enabled: false,
+		Enabled: true,
 	}
 }
 
 func getExperimentalFeaturesConfig() *ExperimentalConfig {
 	return &ExperimentalConfig{
 		PikeContactsEnabled: false,
-		PikePaymentEnabled:  false,
+		PikePaymentEnabled:  true,
 	}
 }
