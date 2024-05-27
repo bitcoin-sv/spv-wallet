@@ -14,8 +14,6 @@ const (
 	defaultDatabaseMaxIdleTime        = 360 * time.Second // Default max idle open connection time
 	defaultDatabaseMaxTimeout         = 60 * time.Second  // Default max timeout on a query
 	defaultDatabaseTxTimeout          = 10 * time.Second  // Default transaction timeout
-	defaultMySQLHost                  = "localhost"       // Default host for MySQL
-	defaultMySQLPort                  = "3306"            // Default port for MySQL
 	defaultPageSize                   = 20                // The default amount of results to return
 	defaultPostgreSQLHost             = "localhost"       // Default host for PostgreSQL
 	defaultPostgreSQLPort             = "5432"            // Default port for PostgreSQL
@@ -78,21 +76,20 @@ type CommonConfig struct {
 	TablePrefix           string        `json:"table_prefix" mapstructure:"table_prefix"`                         // pre_users (pre)
 }
 
-// SQLConfig is the configuration for each SQL connection (mysql or postgresql)
+// SQLConfig is the configuration for each SQL connection (postgresql)
 type SQLConfig struct {
-	CommonConfig              `json:",inline" mapstructure:",squash"` // Common configuration
-	Driver                    string                                  `json:"driver" mapstructure:"driver"`                                             // mysql or postgresql
-	ExistingConnection        *sql.DB                                 `json:"-" mapstructure:"-"`                                                       // Used for existing database connection
-	Host                      string                                  `json:"host" mapstructure:"host"`                                                 // database host IE: localhost
-	Name                      string                                  `json:"name" mapstructure:"name"`                                                 // database-name
-	Password                  string                                  `json:"password" mapstructure:"password" encrypted:"true"`                        // user-password
-	Port                      string                                  `json:"port" mapstructure:"port"`                                                 // 3306
-	Replica                   bool                                    `json:"replica" mapstructure:"replica"`                                           // True if it's a replica (Read-Only)
-	SkipInitializeWithVersion bool                                    `json:"skip_initialize_with_version" mapstructure:"skip_initialize_with_version"` // Skip using MySQL in test mode
-	TimeZone                  string                                  `json:"time_zone" mapstructure:"time_zone"`                                       // timezone (IE: Asia/Shanghai)
-	TxTimeout                 time.Duration                           `json:"tx_timeout" mapstructure:"tx_timeout"`                                     // 5*time.Second
-	User                      string                                  `json:"user" mapstructure:"user"`                                                 // database username
-	SslMode                   string                                  `json:"ssl_mode" mapstructure:"ssl_mode"`                                         // ssl mode (for PostgreSQL) [disable|allow|prefer|require|verify-ca|verify-full]
+	CommonConfig       `json:",inline" mapstructure:",squash"` // Common configuration
+	Driver             string                                  `json:"driver" mapstructure:"driver"`                      // postgresql
+	ExistingConnection *sql.DB                                 `json:"-" mapstructure:"-"`                                // Used for existing database connection
+	Host               string                                  `json:"host" mapstructure:"host"`                          // database host IE: localhost
+	Name               string                                  `json:"name" mapstructure:"name"`                          // database-name
+	Password           string                                  `json:"password" mapstructure:"password" encrypted:"true"` // user-password
+	Port               string                                  `json:"port" mapstructure:"port"`                          // 3306
+	Replica            bool                                    `json:"replica" mapstructure:"replica"`                    // True if it's a replica (Read-Only)
+	TimeZone           string                                  `json:"time_zone" mapstructure:"time_zone"`                // timezone (IE: Asia/Shanghai)
+	TxTimeout          time.Duration                           `json:"tx_timeout" mapstructure:"tx_timeout"`              // 5*time.Second
+	User               string                                  `json:"user" mapstructure:"user"`                          // database username
+	SslMode            string                                  `json:"ssl_mode" mapstructure:"ssl_mode"`                  // ssl mode (for PostgreSQL) [disable|allow|prefer|require|verify-ca|verify-full]
 }
 
 // SQLiteConfig is the configuration for each SQLite connection

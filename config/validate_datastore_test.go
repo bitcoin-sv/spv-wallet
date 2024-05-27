@@ -14,7 +14,6 @@ func TestDatastoreConfig_Validate(t *testing.T) {
 	t.Run("valid datastore config", func(t *testing.T) {
 		d := DbConfig{
 			Datastore: &DatastoreConfig{Engine: datastore.SQLite},
-			Mongo:     &datastore.MongoDBConfig{},
 			SQL:       &datastore.SQLConfig{},
 			SQLite:    &datastore.SQLiteConfig{},
 		}
@@ -27,7 +26,6 @@ func TestDatastoreConfig_Validate(t *testing.T) {
 	t.Run("empty datastore", func(t *testing.T) {
 		d := DbConfig{
 			Datastore: &DatastoreConfig{Engine: datastore.Empty},
-			Mongo:     &datastore.MongoDBConfig{},
 			SQL:       &datastore.SQLConfig{},
 			SQLite:    &datastore.SQLiteConfig{},
 		}
@@ -40,7 +38,6 @@ func TestDatastoreConfig_Validate(t *testing.T) {
 	t.Run("invalid datastore engine", func(t *testing.T) {
 		d := DbConfig{
 			Datastore: &DatastoreConfig{Engine: ""},
-			Mongo:     &datastore.MongoDBConfig{},
 			SQL:       &datastore.SQLConfig{},
 			SQLite:    &datastore.SQLiteConfig{},
 		}

@@ -275,14 +275,8 @@ func (c *Contact) BeforeUpdating(_ context.Context) (err error) {
 // Migrate model specific migration on startup
 func (c *Contact) Migrate(client datastore.ClientInterface) error {
 	tableName := client.GetTableName(tableContacts)
-	if client.Engine() == datastore.MySQL {
-		if err := c.migrateMySQL(client, tableName); err != nil {
-			return err
-		}
-	} else if client.Engine() == datastore.PostgreSQL {
-		if err := c.migratePostgreSQL(client, tableName); err != nil {
-			return err
-		}
+	if err := c.migratePostgreSQL(client, tableName); err != nil {
+		return err
 	}
 
 	return client.IndexMetadata(client.GetTableName(tableContacts), MetadataField)
@@ -294,23 +288,6 @@ func (c *Contact) migratePostgreSQL(client datastore.ClientInterface, tableName 
 	tx := client.Execute(`CREATE INDEX IF NOT EXISTS "` + idxName + `" ON "` + tableName + `" ("full_name", "paymail")`)
 	if tx.Error != nil {
 		return tx.Error
-	}
-	return nil
-}
-
-// migrateMySQL is specific migration SQL for MySQL
-func (c *Contact) migrateMySQL(client datastore.ClientInterface, tableName string) error {
-	idxName := "idx_" + tableName + "_contacts"
-	idxExists, err := client.IndexExists(tableName, idxName)
-	if err != nil {
-		return err
-	}
-	if !idxExists {
-		tx := client.Execute("CREATE INDEX " + idxName + " ON `" + tableName + "` (full_name, paymail)")
-		if tx.Error != nil {
-			c.Client().Logger().Error().Msgf("failed creating json index on mysql: %s", tx.Error.Error())
-			return nil //nolint:nolintlint,nilerr // error is not needed
-		}
 	}
 	return nil
 }

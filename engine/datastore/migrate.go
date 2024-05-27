@@ -6,8 +6,6 @@ import (
 	"fmt"
 
 	"github.com/newrelic/go-agent/v3/newrelic"
-	"go.mongodb.org/mongo-driver/mongo"
-	mongoOptions "go.mongodb.org/mongo-driver/mongo/options"
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
 )
@@ -21,10 +19,8 @@ func (c *Client) AutoMigrateDatabase(ctx context.Context, models ...interface{})
 	}
 
 	// Make sure we have a supported engine
-	if c.Engine() != MySQL &&
-		c.Engine() != PostgreSQL &&
-		c.Engine() != SQLite &&
-		c.Engine() != MongoDB {
+	if c.Engine() != PostgreSQL &&
+		c.Engine() != SQLite {
 		return ErrUnsupportedEngine
 	}
 
@@ -45,11 +41,6 @@ func (c *Client) AutoMigrateDatabase(ctx context.Context, models ...interface{})
 		c.options.migratedModels,
 	))
 
-	// Migrate database for Mongo
-	if c.Engine() == MongoDB {
-		return autoMigrateMongoDatabase(ctx, c.Engine(), c.options, models...)
-	}
-
 	// Migrate database for SQL (using GORM)
 	return autoMigrateSQLDatabase(ctx, c.Engine(), c.options.db, c.IsDebug(), c.options.loggerDB, models...)
 }
@@ -57,43 +48,6 @@ func (c *Client) AutoMigrateDatabase(ctx context.Context, models ...interface{})
 // IsAutoMigrate returns whether auto migration is on
 func (c *Client) IsAutoMigrate() bool {
 	return c.options.autoMigrate
-}
-
-// autoMigrateMongoDatabase will start a new database for Mongo
-func autoMigrateMongoDatabase(ctx context.Context, _ Engine, options *clientOptions,
-	_ ...interface{},
-) error {
-	var err error
-
-	if options.fields.customMongoIndexer != nil {
-		for collectionName, idx := range options.fields.customMongoIndexer() {
-			for _, index := range idx {
-				if err = createMongoIndex(
-					ctx, options, collectionName, false, index,
-				); err != nil {
-					return err
-				}
-			}
-		}
-	}
-
-	return nil
-}
-
-// createMongoIndex will create a mongo index
-func createMongoIndex(ctx context.Context, options *clientOptions, modelName string, withPrefix bool,
-	index mongo.IndexModel,
-) error {
-	collectionName := modelName
-	if !withPrefix {
-		collectionName = setPrefix(options.mongoDBConfig.TablePrefix, collectionName)
-	}
-	collection := options.mongoDB.Collection(collectionName)
-	_, err := collection.Indexes().CreateOne(
-		ctx, index, mongoOptions.CreateIndexes().SetMaxTime(defaultDatabaseCreateIndexTimeout),
-	)
-
-	return err
 }
 
 // autoMigrateSQLDatabase will attempt to create or update table schema
@@ -110,11 +64,6 @@ func autoMigrateSQLDatabase(ctx context.Context, engine Engine, sqlWriteDB *gorm
 
 	// Create a session with config settings
 	sessionDb := sqlWriteDB.Session(getGormSessionConfig(sqlWriteDB.PrepareStmt, debug, optionalLogger))
-
-	// Run the auto migrate method
-	if engine == MySQL {
-		return sessionDb.Set("gorm:table_options", "ENGINE=InnoDB").AutoMigrate(models...)
-	}
 
 	// PostgreSQL and SQLite
 	return sessionDb.AutoMigrate(models...)

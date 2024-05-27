@@ -335,14 +335,8 @@ func (m *PaymailAddress) AfterCreated(_ context.Context) error {
 // Migrate model specific migration on startup
 func (m *PaymailAddress) Migrate(client datastore.ClientInterface) error {
 	tableName := client.GetTableName(tablePaymailAddresses)
-	if client.Engine() == datastore.MySQL {
-		if err := m.migrateMySQL(client, tableName); err != nil {
-			return err
-		}
-	} else if client.Engine() == datastore.PostgreSQL {
-		if err := m.migratePostgreSQL(client, tableName); err != nil {
-			return err
-		}
+	if err := m.migratePostgreSQL(client, tableName); err != nil {
+		return err
 	}
 
 	return client.IndexMetadata(client.GetTableName(tablePaymailAddresses), MetadataField)
@@ -354,23 +348,6 @@ func (m *PaymailAddress) migratePostgreSQL(client datastore.ClientInterface, tab
 	tx := client.Execute(`CREATE INDEX IF NOT EXISTS "` + idxName + `" ON "` + tableName + `" ("alias", "domain")`)
 	if tx.Error != nil {
 		return tx.Error
-	}
-	return nil
-}
-
-// migrateMySQL is specific migration SQL for MySQL
-func (m *PaymailAddress) migrateMySQL(client datastore.ClientInterface, tableName string) error {
-	idxName := "idx_" + tableName + "_paymail_address"
-	idxExists, err := client.IndexExists(tableName, idxName)
-	if err != nil {
-		return err
-	}
-	if !idxExists {
-		tx := client.Execute("CREATE UNIQUE INDEX " + idxName + " ON `" + tableName + "` (alias, domain)")
-		if tx.Error != nil {
-			m.Client().Logger().Error().Msgf("failed creating json index on mysql: %s", tx.Error.Error())
-			return nil //nolint:nolintlint,nilerr // error is not needed
-		}
 	}
 	return nil
 }
