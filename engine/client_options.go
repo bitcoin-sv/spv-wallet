@@ -26,7 +26,6 @@ import (
 	"github.com/rs/zerolog"
 	"github.com/tonicpow/go-minercraft/v2"
 	taskq "github.com/vmihailenco/taskq/v3"
-	"go.mongodb.org/mongo-driver/mongo"
 )
 
 // ClientOps allow functional options to be supplied that overwrite default client options.
@@ -417,34 +416,13 @@ func WithSQLConfigs(engine datastore.Engine, configs []*datastore.SQLConfig) Cli
 	}
 }
 
-// WithSQLConnection will set the Datastore to an existing connection for MySQL or PostgreSQL
+// WithSQLConnection will set the Datastore to an existing connection for PostgreSQL
 func WithSQLConnection(engine datastore.Engine, sqlDB *sql.DB, tablePrefix string) ClientOps {
 	return func(c *clientOptions) {
 		if sqlDB != nil && !engine.IsEmpty() {
 			c.dataStore.options = append(
 				c.dataStore.options,
 				datastore.WithSQLConnection(engine, sqlDB, tablePrefix),
-			)
-		}
-	}
-}
-
-// WithMongoDB will set the Datastore to use MongoDB
-func WithMongoDB(config *datastore.MongoDBConfig) ClientOps {
-	return func(c *clientOptions) {
-		if config != nil {
-			c.dataStore.options = append(c.dataStore.options, datastore.WithMongo(config))
-		}
-	}
-}
-
-// WithMongoConnection will set the Datastore to an existing connection for MongoDB
-func WithMongoConnection(database *mongo.Database, tablePrefix string) ClientOps {
-	return func(c *clientOptions) {
-		if database != nil {
-			c.dataStore.options = append(
-				c.dataStore.options,
-				datastore.WithMongoConnection(database, tablePrefix),
 			)
 		}
 	}

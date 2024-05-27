@@ -73,18 +73,6 @@ func (c *Client) loadDatastore(ctx context.Context) (err error) {
 				},
 			))
 
-		// Add custom mongo processor
-		c.options.dataStore.options = append(
-			c.options.dataStore.options,
-			datastore.WithCustomMongoConditionProcessor(processCustomFields),
-		)
-
-		// Add custom mongo indexes
-		c.options.dataStore.options = append(
-			c.options.dataStore.options,
-			datastore.WithCustomMongoIndexer(getMongoIndexes),
-		)
-
 		// Load the datastore client
 		c.options.dataStore.ClientInterface, err = datastore.NewClient(
 			ctx, c.options.dataStore.options...,
