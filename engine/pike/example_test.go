@@ -1,4 +1,4 @@
-package main
+package pike_test
 
 import (
 	"encoding/hex"
@@ -7,12 +7,10 @@ import (
 	"github.com/libsv/go-bk/bec"
 
 	"github.com/bitcoin-sv/spv-wallet/engine/pike"
-	"github.com/bitcoin-sv/spv-wallet/engine/script/template"
 )
 
-func main() {
+func Example_generateLockingScripts() {
 	// Example sender's public key (replace with actual sender's public key)
-	// generating keys
 	senderPublicKeyHex := "034252e5359a1de3b8ec08e6c29b80594e88fb47e6ae9ce65ee5a94f0d371d2cde"
 	senderPublicKeyBytes, err := hex.DecodeString(senderPublicKeyHex)
 	if err != nil {
@@ -33,27 +31,22 @@ func main() {
 		panic(err)
 	}
 
-	// example of usage pike2
-	outputsTemplate, _ := pike.GenerateOutputsTemplate(10000)
-	fmt.Println(formatOutputs(outputsTemplate))
+	// Example usage of GenerateOutputsTemplate
+	outputsTemplate, err := pike.GenerateOutputsTemplate(10000)
+	if err != nil {
+		panic(fmt.Errorf("Error generating outputs template - %w", err))
+	}
 
+	// Example usage of GenerateLockingScriptsFromTemplates
 	lockingScripts, err := pike.GenerateLockingScriptsFromTemplates(outputsTemplate, senderPubKey, receiverPubKey, "reference")
 	if err != nil {
-		fmt.Println("Error:", err)
-		return
+		panic(fmt.Errorf("Error generating locking scripts - %w", err))
 	}
 
 	for _, script := range lockingScripts {
 		fmt.Println("Locking Script:", script)
 	}
 
-}
-
-// Helper function to format the outputs into a string
-func formatOutputs(outputs []*template.OutputTemplate) string {
-	var result string
-	for i, output := range outputs {
-		result += fmt.Sprintf("Output %d: %v\n", i+1, output)
-	}
-	return result
+	// Output:
+	// Locking Script: 76a9147327490be831259f38b0f9ab019413e51d1b40c688ac
 }

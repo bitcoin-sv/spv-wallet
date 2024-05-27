@@ -20,21 +20,21 @@ import (
 //
 // Returns:
 // - A byte slice containing the HMAC result as a byte slice or an error if the HMAC calculation fails.
-func calculateHMAC(pubSharedSecret []byte, reference string) ([]byte, error) {
-	if reference == "" {
+func calculateHMAC(pubSharedSecret []byte, message string) ([]byte, error) {
+	if message == "" {
 		return nil, errors.New("invalid invoice number")
 	}
 	h := hmac.New(sha256.New, pubSharedSecret)
-	if _, err := h.Write([]byte(reference)); err != nil {
+	if _, err := h.Write([]byte(message)); err != nil {
 		return nil, fmt.Errorf("error writing HMAC message - %w", err)
 	}
 	return h.Sum(nil), nil
 }
 
-// calculateDedicatedPublicKey calculates the dedicated public key (dPK) using the HMAC result and the receiver's public key.
+// calculateLinkedPublicKey calculates the dedicated public key (dPK) using the HMAC result and the receiver's public key.
 // The HMAC result is used as a scalar to perform elliptic curve scalar multiplication and point addition.
 // Returns the resulting public key or an error if the calculation fails.
-func calculateDedicatedPublicKey(hmacResult []byte, receiverPubKey *bec.PublicKey) (*bec.PublicKey, error) {
+func calculateLinkedPublicKey(hmacResult []byte, receiverPubKey *bec.PublicKey) (*bec.PublicKey, error) {
 	if len(hmacResult) == 0 {
 		return nil, fmt.Errorf("HMAC result is empty")
 	}
@@ -69,7 +69,11 @@ func calculateDedicatedPublicKey(hmacResult []byte, receiverPubKey *bec.PublicKe
 
 // DeriveLinkedKey derives a child public key from the source public key and link it with public key
 // with use of invoiceNumber as reference of this derivation.
-func DeriveLinkedKey(source bec.PublicKey, linkPubKey bec.PublicKey, invoiceNumber string) (*bec.PublicKey, error) {
+func DeriveLinkedKey(source *bec.PublicKey, linkPubKey *bec.PublicKey, invoiceNumber string) (*bec.PublicKey, error) {
+	if source == nil || linkPubKey == nil {
+		return nil, errors.New("source or receiver public key is nil")
+	}
+
 	// Check for nil receiver public key
 	if source.X == nil || source.Y == nil {
 		return nil, errors.New("source public key is nil")
@@ -79,19 +83,19 @@ func DeriveLinkedKey(source bec.PublicKey, linkPubKey bec.PublicKey, invoiceNumb
 	}
 
 	// Compute the shared secret
-	sharedSecret := source.SerialiseCompressed()
+	publicKeyBytes := source.SerialiseCompressed()
 
 	// Compute the HMAC result
-	hmacResult, err := calculateHMAC(sharedSecret, invoiceNumber)
+	hmacResult, err := calculateHMAC(publicKeyBytes, invoiceNumber)
 	if err != nil {
 		return nil, err
 	}
 
 	// Calculate the dedicated public key
-	dPK, err := calculateDedicatedPublicKey(hmacResult, &linkPubKey)
+	linkedPK, err := calculateLinkedPublicKey(hmacResult, linkPubKey)
 	if err != nil {
 		return nil, err
 	}
 
-	return dPK, nil
+	return linkedPK, nil
 }

@@ -24,8 +24,17 @@ import (
 	"github.com/bitcoin-sv/spv-wallet/engine/types/type42"
 )
 
+// GenerateOutputsTemplate creates a Pike output template
+func GenerateOutputsTemplate(satoshis uint64) ([]*template.OutputTemplate, error) {
+	p2pkhTemplate, err := template.P2PKH(satoshis)
+	if err != nil {
+		return nil, err
+	}
+	return []*template.OutputTemplate{p2pkhTemplate}, nil
+}
+
 // GenerateLockingScriptsFromTemplates converts Pike outputs templates to scripts
-func GenerateLockingScriptsFromTemplates(outputsTemplate []template.P2PKHTemplate, senderPubKey, receiverPubKey *bec.PublicKey, reference string) ([]string, error) {
+func GenerateLockingScriptsFromTemplates(outputsTemplate []*template.OutputTemplate, senderPubKey, receiverPubKey *bec.PublicKey, reference string) ([]string, error) {
 	lockingScripts := make([]string, len(outputsTemplate))
 
 	for idx, output := range outputsTemplate {
@@ -34,12 +43,16 @@ func GenerateLockingScriptsFromTemplates(outputsTemplate []template.P2PKHTemplat
 			return nil, fmt.Errorf("error creating script from hex string - %w", err)
 		}
 
-		dPK, err := type42.DeriveLinkedKey(*senderPubKey, *receiverPubKey, fmt.Sprintf("%s-%d", reference, idx))
+		dPK, err := type42.DeriveLinkedKey(senderPubKey, receiverPubKey, fmt.Sprintf("%s-%d", reference, idx))
 		if err != nil {
 			return nil, err
 		}
 
-		scriptBytes := template.Evaluate(*templateScript, dPK)
+		scriptBytes, err := template.Evaluate(*templateScript, dPK)
+		if err != nil {
+			return nil, fmt.Errorf("error evaluating template script - %w", err)
+		}
+
 		finalScript := bscript.Script(scriptBytes)
 
 		lockingScripts[idx] = finalScript.String()

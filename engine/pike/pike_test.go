@@ -24,19 +24,21 @@ func TestGenerateLockingScriptsFromTemplates(t *testing.T) {
 	receiverPubKey, err := bec.ParsePubKey(receiverPubKeyBytes, bec.S256())
 	assert.NoError(t, err)
 
-	outputsTemplate := []template.P2PKHTemplate{
-		{Script: "76a914fd88ac"}, // Example P2PKH script in hex
-		{Script: "76a914fe88ad"}, // Another example P2PKH script in hex
+	outputsTemplate := []*template.OutputTemplate{
+		{Script: "76a914000000000000000000000000000000000000000088ac"},
+		{Script: "76a914111111111111111111111111111111111111111188ac"},
 	}
 
 	t.Run("Valid Case", func(t *testing.T) {
 		lockingScripts, err := GenerateLockingScriptsFromTemplates(outputsTemplate, senderPubKey, receiverPubKey, "test-reference")
 		assert.NoError(t, err)
 		assert.Len(t, lockingScripts, len(outputsTemplate))
+		assert.Equal(t, outputsTemplate[0].Script, lockingScripts[0])
+		assert.Equal(t, outputsTemplate[1].Script, lockingScripts[1])
 	})
 
 	t.Run("Invalid Template Script", func(t *testing.T) {
-		invalidTemplate := []template.P2PKHTemplate{
+		invalidTemplate := []*template.OutputTemplate{
 			{Script: "invalid-hex-string"}, // Invalid hex string
 		}
 		lockingScripts, err := GenerateLockingScriptsFromTemplates(invalidTemplate, senderPubKey, receiverPubKey, "test-reference")
