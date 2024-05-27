@@ -33,7 +33,7 @@ func main() {
 		panic(err)
 	}
 
-	// example of usage pike2
+	// example of usage pike.GenerateOutputsTemplate
 	outputsTemplate, _ := pike.GenerateOutputsTemplate(10000)
 	fmt.Println(formatOutputs(outputsTemplate))
 

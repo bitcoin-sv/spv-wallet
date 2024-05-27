@@ -4,9 +4,28 @@ package template
 import (
 	"encoding/hex"
 	"errors"
+	"sync"
 
 	"github.com/libsv/go-bt/v2/bscript"
 )
+
+var (
+	scriptHex string
+	once      sync.Once
+)
+
+func initScriptHex() {
+	opcodes := []byte{
+		bscript.OpDUP,
+		bscript.OpHASH160,
+		bscript.OpPUBKEYHASH,
+		bscript.OpEQUALVERIFY,
+		bscript.OpCHECKSIG,
+	}
+
+	// Convert opcodes to hexadecimal string
+	scriptHex = hex.EncodeToString(opcodes)
+}
 
 // OutputTemplate represents the script and satoshis for a Pike output
 type OutputTemplate struct {
@@ -24,21 +43,8 @@ func P2PKH(satoshis uint64) (*OutputTemplate, error) {
 		return nil, errors.New("invalid satoshis")
 	}
 
-	opcodes := []byte{
-		bscript.OpDUP,
-		bscript.OpHASH160,
-		bscript.OpPUBKEYHASH,
-		bscript.OpEQUALVERIFY,
-		bscript.OpCHECKSIG,
-	}
-
-	// Convert opcodes to hexadecimal string
-	scriptHex := hex.EncodeToString(opcodes)
-
-	// Check if the conversion was successful
-	if scriptHex == "" {
-		return nil, errors.New("failed to create script hex")
-	}
+	// Initialize the scriptHex once
+	once.Do(initScriptHex)
 
 	// Create and return the PikeOutputsTemplate
 	return &OutputTemplate{

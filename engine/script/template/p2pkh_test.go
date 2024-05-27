@@ -14,29 +14,36 @@ func TestP2PKH(t *testing.T) {
 	validTests := []struct {
 		name     string
 		satoshis uint64
-		expected []OutputTemplate
+		expected *OutputTemplate
 	}{
 		{
 			name:     "valid input",
 			satoshis: 1000,
-			expected: []OutputTemplate{
-				{
-					Script:   "76a9fd88ac",
-					Satoshis: 1000,
-				},
+			expected: &OutputTemplate{
+				Script:   "76a9fd88ac",
+				Satoshis: 1000,
 			},
 		},
 		{
 			name:     "zero satoshis",
 			satoshis: 1,
-			expected: []OutputTemplate{
-				{
-					Script:   "76a9fd88ac",
-					Satoshis: 0,
-				},
+			expected: &OutputTemplate{
+				Script:   "76a9fd88ac",
+				Satoshis: 1,
 			},
 		},
 	}
+
+	t.Run("Valid Cases", func(t *testing.T) {
+		for _, tt := range validTests {
+			tt := tt // capture range variable
+			t.Run(tt.name, func(t *testing.T) {
+				got, err := P2PKH(tt.satoshis)
+				assert.NoError(t, err)
+				assert.Equal(t, tt.expected, got)
+			})
+		}
+	})
 
 	t.Run("Valid Cases", func(t *testing.T) {
 		for _, tt := range validTests {
