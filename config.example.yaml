@@ -28,20 +28,10 @@ db:
   datastore:
     # enable datastore debug mode
     debug: false
-    # datastore engine - sqlite/postgresql/mysql/mongodb (experimental)
+    # datastore engine - sqlite/postgresql
     engine: sqlite
     # prefix for all tables
     table_prefix: xapi
-  mongodb:
-    database_name: xapi
-    debug: false
-    max_connection_idle_time: 0s
-    max_connection_time: 0s
-    max_idle_connections: 0
-    max_open_connections: 0
-    table_prefix: ""
-    transactions: false
-    uri: mongodb://localhost:27017/xapi
   sql:
     debug: false
     driver: postgresql

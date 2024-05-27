@@ -158,11 +158,7 @@ func (m *Transaction) ChildModels() (childModels []ModelInterface) {
 // Migrate model specific migration on startup
 func (m *Transaction) Migrate(client datastore.ClientInterface) error {
 	tableName := client.GetTableName(tableTransactions)
-	if client.Engine() == datastore.MySQL {
-		if err := m.migrateMySQL(client, tableName); err != nil {
-			return err
-		}
-	} else if client.Engine() == datastore.PostgreSQL {
+	if client.Engine() == datastore.PostgreSQL {
 		if err := m.migratePostgreSQL(client, tableName); err != nil {
 			return err
 		}
@@ -182,46 +178,6 @@ func (m *Transaction) migratePostgreSQL(client datastore.ClientInterface, tableN
 	if tx = client.Execute(`CREATE INDEX IF NOT EXISTS idx_` + tableName + `_xpub_out_ids ON ` +
 		tableName + ` USING gin (xpub_out_ids jsonb_ops)`); tx.Error != nil {
 		return tx.Error
-	}
-
-	return nil
-}
-
-// migrateMySQL is specific migration SQL for MySQL
-func (m *Transaction) migrateMySQL(client datastore.ClientInterface, tableName string) error {
-	idxName := "idx_" + tableName + "_xpub_in_ids"
-	idxExists, err := client.IndexExists(tableName, idxName)
-	if err != nil {
-		return err
-	}
-	if !idxExists {
-		tx := client.Execute("ALTER TABLE `" + tableName + "`" +
-			" ADD INDEX " + idxName + " ( (CAST(xpub_in_ids AS CHAR(64) ARRAY)) )")
-		if tx.Error != nil {
-			m.Client().Logger().Error().Msg("failed creating json index on mysql: " + tx.Error.Error())
-			return nil //nolint:nolintlint,nilerr // error is not needed
-		}
-	}
-
-	idxName = "idx_" + tableName + "_xpub_out_ids"
-	if idxExists, err = client.IndexExists(
-		tableName, idxName,
-	); err != nil {
-		return err
-	}
-	if !idxExists {
-		tx := client.Execute("ALTER TABLE `" + tableName + "`" +
-			" ADD INDEX " + idxName + " ( (CAST(xpub_out_ids AS CHAR(64) ARRAY)) )")
-		if tx.Error != nil {
-			m.Client().Logger().Error().Msg("failed creating json index on mysql: " + tx.Error.Error())
-			return nil //nolint:nolintlint,nilerr // error is not needed
-		}
-	}
-
-	tx := client.Execute("ALTER TABLE `" + tableName + "` MODIFY COLUMN hex longtext")
-	if tx.Error != nil {
-		m.Client().Logger().Error().Msg("failed changing hex type to longtext in MySQL: " + tx.Error.Error())
-		return nil //nolint:nolintlint,nilerr // error is not needed
 	}
 
 	return nil

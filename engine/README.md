@@ -21,22 +21,22 @@
 
 ## Table of Contents
 
--   [SPV Wallet Engine](#spv-wallet-engine)
-    -   [Table of Contents](#table-of-contents)
-    -   [About](#about)
-        -   [DISCLAIMER](#disclaimer)
-        -   [SPV Wallet Engine: Out-of-the-box Features:](#spv-wallet-engine-out-of-the-box-features)
-        -   [**Project Assumptions: MVP**](#project-assumptions-mvp)
-    -   [Installation](#installation)
-    -   [Documentation](#documentation)
-        -   [Built-in Features](#built-in-features)
-    -   [Usage](#usage)
-        -   [Examples \& Tests](#examples--tests)
-        -   [Benchmarks](#benchmarks)
-    -   [Code Standards](#code-standards)
-    -   [Usage](#usage-1)
-    -   [Contributing](#contributing)
-    -   [License](#license)
+- [SPV Wallet Engine](#spv-wallet-engine)
+  - [Table of Contents](#table-of-contents)
+  - [About](#about)
+      - [DISCLAIMER](#disclaimer)
+      - [SPV Wallet Engine: Out-of-the-box Features:](#spv-wallet-engine-out-of-the-box-features)
+      - [**Project Assumptions: MVP**](#project-assumptions-mvp)
+  - [Installation](#installation)
+  - [Documentation](#documentation)
+      - [Built-in Features](#built-in-features)
+  - [Usage](#usage)
+    - [Examples \& Tests](#examples--tests)
+    - [Benchmarks](#benchmarks)
+  - [Code Standards](#code-standards)
+  - [Usage](#usage-1)
+  - [Contributing](#contributing)
+  - [License](#license)
 
 <br/>
 
@@ -61,7 +61,7 @@
 #### SPV Wallet Engine: Out-of-the-box Features:
 
 -   xPub & UTXO State Management (state, balance, utxos, destinations)
--   Bring your own Database ([PostgreSQL](https://www.postgresql.org/), [SQLite](https://www.sqlite.org), [MySQL](https://www.mysql.com/), [Mongo](https://www.mongodb.com/) or [interface](./datastore/interface.go) your own)
+-   Bring your own Database ([PostgreSQL](https://www.postgresql.org/), [SQLite](https://www.sqlite.org), or [interface](./datastore/interface.go) your own)
 -   Caching ([FreeCache](https://github.com/github.com/coocood/freecache), [Redis](https://redis.io/) or [interface](https://github.com/mrz1836/go-cachestore/blob/master/interface.go) your own)
 -   Task Management ([TaskQ](https://github.com/vmihailenco/taskq) or [interface](taskmanager/interface.go) your own)
 -   Transaction Syncing (queue, broadcast, push to mempool or on-chain, or [interface](chainstate/interface.go) your own)
