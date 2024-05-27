@@ -6,7 +6,6 @@ import (
 
 	zLogger "github.com/mrz1836/go-logger"
 	"github.com/newrelic/go-agent/v3/newrelic"
-	"go.mongodb.org/mongo-driver/mongo"
 	"gorm.io/gorm"
 	gLogger "gorm.io/gorm/logger"
 )
@@ -23,26 +22,22 @@ type (
 		autoMigrate     bool                        // Setting for Auto Migration of SQL tables
 		db              *gorm.DB                    // Database connection for Read-Only requests (can be same as Write)
 		debug           bool                        // Setting for global debugging
-		engine          Engine                      // Datastore engine (MySQL, PostgreSQL, SQLite)
+		engine          Engine                      // Datastore engine (PostgreSQL, SQLite)
 		fields          *fieldConfig                // Configuration for custom fields
 		logger          zLogger.GormLoggerInterface // Custom logger interface (standard interface)
 		loggerDB        gLogger.Interface           // Custom logger interface (for GORM)
 		migratedModels  []string                    // List of models (types) that have been migrated
 		migrateModels   []interface{}               // Models for migrations
-		mongoDB         *mongo.Database             // Database connection for a MongoDB datastore
-		mongoDBConfig   *MongoDBConfig              // Configuration for a MongoDB datastore
 		newRelicEnabled bool                        // If NewRelic is enabled (parent application)
-		sqlConfigs      []*SQLConfig                // Configuration for a MySQL or PostgreSQL datastore
+		sqlConfigs      []*SQLConfig                // Configuration for a PostgreSQL datastore
 		sqLite          *SQLiteConfig               // Configuration for a SQLite datastore
 		tablePrefix     string                      // Model table prefix
 	}
 
 	// fieldConfig is the configuration for custom fields
 	fieldConfig struct {
-		arrayFields                   []string                                // Fields that are an array (string, string, string)
-		customMongoConditionProcessor func(conditions map[string]interface{}) // Function for processing custom conditions (arrays, objects)
-		customMongoIndexer            func() map[string][]mongo.IndexModel    // Function for returning custom mongo indexes
-		objectFields                  []string                                // Fields that are objects/JSON (metadata)
+		arrayFields  []string // Fields that are an array (string, string, string)
+		objectFields []string // Fields that are objects/JSON (metadata)
 	}
 )
 
@@ -96,15 +91,9 @@ func NewClient(ctx context.Context, opts ...ClientOps) (ClientInterface, error) 
 
 	// Use different datastore configurations
 	var err error
-	if client.Engine() == MySQL || client.Engine() == PostgreSQL {
+	if client.Engine() == PostgreSQL {
 		if client.options.db, err = openSQLDatabase(
 			client.options.loggerDB, client.options.sqlConfigs...,
-		); err != nil {
-			return nil, err
-		}
-	} else if client.Engine() == MongoDB {
-		if client.options.mongoDB, err = openMongoDatabase(
-			ctx, client.options.mongoDBConfig,
 		); err != nil {
 			return nil, err
 		}
@@ -133,18 +122,10 @@ func (c *Client) Close(ctx context.Context) error {
 		defer txn.StartSegment("close_datastore").End()
 	}
 
-	// Close Mongo
-	if c.Engine() == MongoDB {
-		if err := c.options.mongoDB.Client().Disconnect(ctx); err != nil {
-			return err
-		}
-		c.options.mongoDB = nil
-	} else { // All other SQL database(s)
-		if err := closeSQLDatabase(c.options.db); err != nil {
-			return err
-		}
-		c.options.db = nil
+	if err := closeSQLDatabase(c.options.db); err != nil {
+		return err
 	}
+	c.options.db = nil
 
 	c.options.engine = Empty
 	return nil
@@ -177,10 +158,8 @@ func (c *Client) GetTableName(modelName string) string {
 
 // GetDatabaseName will return the full database name for the given model name
 func (c *Client) GetDatabaseName() string {
-	if c.Engine() == MySQL || c.Engine() == PostgreSQL {
+	if c.Engine() == PostgreSQL {
 		return c.options.sqlConfigs[0].Name
-	} else if c.Engine() == MongoDB {
-		return c.options.mongoDBConfig.DatabaseName
 	}
 
 	return ""
@@ -194,22 +173,6 @@ func (c *Client) GetArrayFields() []string {
 // GetObjectFields will return the object fields
 func (c *Client) GetObjectFields() []string {
 	return c.options.fields.objectFields
-}
-
-// GetMongoConditionProcessor will return a custom mongo condition processor if set
-func (c *Client) GetMongoConditionProcessor() func(conditions map[string]interface{}) {
-	if c.options.fields.customMongoConditionProcessor != nil {
-		return c.options.fields.customMongoConditionProcessor
-	}
-	return nil
-}
-
-// GetMongoIndexer will return a custom mongo condition indexer
-func (c *Client) GetMongoIndexer() func() map[string][]mongo.IndexModel {
-	if c.options.fields.customMongoIndexer != nil {
-		return c.options.fields.customMongoIndexer
-	}
-	return nil
 }
 
 // HasMigratedModel will return if the model type has been migrated

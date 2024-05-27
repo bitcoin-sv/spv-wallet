@@ -11,7 +11,6 @@ import (
 	"github.com/bitcoin-sv/spv-wallet/engine/utils"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/bsontype"
-	"gorm.io/driver/mysql"
 	"gorm.io/driver/postgres"
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
@@ -32,12 +31,6 @@ type mockObject struct {
 func mockDialector(engine Engine) gorm.Dialector {
 	mockDb, _, _ := sqlmock.New()
 	switch engine {
-	case MySQL:
-		return mysql.New(mysql.Config{
-			Conn:                      mockDb,
-			SkipInitializeWithVersion: true,
-			DriverName:                "mysql",
-		})
 	case PostgreSQL:
 		return postgres.New(postgres.Config{
 			Conn:       mockDb,
@@ -45,9 +38,6 @@ func mockDialector(engine Engine) gorm.Dialector {
 		})
 	case SQLite:
 		return sqlite.Open("file::memory:?cache=shared")
-	case MongoDB, Empty:
-		// the where builder is not applicable for MongoDB
-		return nil
 	default:
 		return nil
 	}
