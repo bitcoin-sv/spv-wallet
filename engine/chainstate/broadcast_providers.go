@@ -7,7 +7,6 @@ import (
 	"strings"
 
 	"github.com/bitcoin-sv/go-broadcast-client/broadcast"
-	"github.com/tonicpow/go-minercraft/v2"
 )
 
 // generic broadcast provider

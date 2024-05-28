@@ -24,7 +24,7 @@ import (
 	"github.com/mrz1836/go-cachestore"
 	"github.com/newrelic/go-agent/v3/newrelic"
 	"github.com/rs/zerolog"
-	"github.com/tonicpow/go-minercraft/v2"
+	
 	taskq "github.com/vmihailenco/taskq/v3"
 )
 

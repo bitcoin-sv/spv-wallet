@@ -10,7 +10,6 @@ import (
 	"github.com/rs/zerolog"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"github.com/tonicpow/go-minercraft/v2"
 )
 
 // TestNewClient will test the method NewClient()

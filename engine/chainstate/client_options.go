@@ -9,7 +9,6 @@ import (
 	"github.com/bitcoin-sv/spv-wallet/engine/utils"
 	"github.com/newrelic/go-agent/v3/newrelic"
 	"github.com/rs/zerolog"
-	"github.com/tonicpow/go-minercraft/v2"
 )
 
 // ClientOps allow functional options to be supplied

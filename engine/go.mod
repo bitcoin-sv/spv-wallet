@@ -27,7 +27,6 @@ require (
 	github.com/robfig/cron/v3 v3.0.1
 	github.com/rs/zerolog v1.33.0
 	github.com/stretchr/testify v1.9.0
-	github.com/tonicpow/go-minercraft/v2 v2.1.0
 	github.com/vmihailenco/taskq/v3 v3.2.9
 	go.elastic.co/ecszerolog v0.2.0
 	go.mongodb.org/mongo-driver v1.15.0
@@ -71,8 +70,6 @@ require (
 	github.com/dgryski/go-rendezvous v0.0.0-20200823014737-9f7001d12a5f // indirect
 	github.com/go-resty/resty/v2 v2.13.1 // indirect
 	github.com/go-sql-driver/mysql v1.7.1 // indirect
-	github.com/gojektech/heimdall/v6 v6.1.0 // indirect
-	github.com/gojektech/valkyrie v0.0.0-20190210220504-8f62c1e7ba45 // indirect
 	github.com/golang/protobuf v1.5.4 // indirect
 	github.com/golang/snappy v0.0.4 // indirect
 	github.com/google/uuid v1.6.0

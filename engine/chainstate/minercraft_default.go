@@ -1,6 +1,5 @@
 package chainstate
 
-import "github.com/tonicpow/go-minercraft/v2"
 
 func defaultMinecraftConfig() *minercraftConfig {
 	miners, _ := minercraft.DefaultMiners()
