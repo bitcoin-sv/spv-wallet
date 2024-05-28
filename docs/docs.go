@@ -814,31 +814,6 @@ const docTemplate = `{
                 }
             }
         },
-        "/v1/admin/shared-config": {
-            "get": {
-                "security": [
-                    {
-                        "x-auth-xpub": []
-                    }
-                ],
-                "description": "Get shared config",
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Admin"
-                ],
-                "summary": "Get shared config",
-                "responses": {
-                    "200": {
-                        "description": "Shared configuration",
-                        "schema": {
-                            "$ref": "#/definitions/models.SharedConfig"
-                        }
-                    }
-                }
-            }
-        },
         "/v1/admin/stats": {
             "get": {
                 "security": [
@@ -1682,6 +1657,31 @@ const docTemplate = `{
                     },
                     "500": {
                         "description": "Internal server error - Error while searching for destinations"
+                    }
+                }
+            }
+        },
+        "/v1/shared-config": {
+            "get": {
+                "security": [
+                    {
+                        "x-auth-xpub": []
+                    }
+                ],
+                "description": "Get shared config",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Shared-config"
+                ],
+                "summary": "Get shared config",
+                "responses": {
+                    "200": {
+                        "description": "Shared configuration",
+                        "schema": {
+                            "$ref": "#/definitions/models.SharedConfig"
+                        }
                     }
                 }
             }
@@ -3785,7 +3785,7 @@ const docTemplate = `{
                 }
             }
         },
-        "models.FeeUnit": {
+		"models.FeeUnit": {
             "type": "object",
             "properties": {
                 "bytes": {
@@ -3939,7 +3939,7 @@ const docTemplate = `{
                 }
             }
         },
-        "models.PaymailP4": {
+		"models.PaymailP4": {
             "type": "object",
             "properties": {
                 "alias": {
@@ -4042,7 +4042,7 @@ const docTemplate = `{
                 }
             }
         },
-        "models.SyncConfig": {
+		"models.SyncConfig": {
             "type": "object",
             "properties": {
                 "broadcast": {
@@ -4516,7 +4516,7 @@ const docTemplate = `{
                 }
             }
         },
-        "models.UtxoPointer": {
+		"models.UtxoPointer": {
             "type": "object",
             "properties": {
                 "output_index": {
@@ -4582,7 +4582,7 @@ const docTemplate = `{
                 }
             }
         },
-        "time.Duration": {
+		"time.Duration": {
             "type": "integer",
             "enum": [
                 -9223372036854775808,

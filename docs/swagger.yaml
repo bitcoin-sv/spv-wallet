@@ -1252,7 +1252,7 @@ definitions:
         type: array
       map:
         allOf:
-        - $ref: '#/definitions/models.MapProtocol'
+          - $ref: '#/definitions/models.MapProtocol'
         description: Map is a pointer to a map protocol object.
       string_parts:
         description: StringParts is a slice of string parts.
@@ -1538,7 +1538,7 @@ definitions:
         type: integer
       expires_in:
         allOf:
-        - $ref: '#/definitions/time.Duration'
+          - $ref: '#/definitions/time.Duration'
         description: ExpiresAt is a time when transaction expires.
         example: 1000
       fee:
@@ -1547,7 +1547,7 @@ definitions:
         type: integer
       fee_unit:
         allOf:
-        - $ref: '#/definitions/models.FeeUnit'
+          - $ref: '#/definitions/models.FeeUnit'
         description: FeeUnit is a pointer to a fee unit object.
       from_utxos:
         description: FromUtxos is a slice of from utxos used to build transaction.
@@ -1571,11 +1571,11 @@ definitions:
         type: array
       send_all_to:
         allOf:
-        - $ref: '#/definitions/models.TransactionOutput'
+          - $ref: '#/definitions/models.TransactionOutput'
         description: SendAllTo is a pointer to a transaction output object.
       sync:
         allOf:
-        - $ref: '#/definitions/models.SyncConfig'
+          - $ref: '#/definitions/models.SyncConfig'
         description: Sync contains sync configuration.
     type: object
   models.TransactionInput:
@@ -1590,7 +1590,7 @@ definitions:
         type: string
       destination:
         allOf:
-        - $ref: '#/definitions/models.Destination'
+          - $ref: '#/definitions/models.Destination'
         description: Destination is a pointer to a destination object.
       draft_id:
         description: DraftID is a utxo transaction related draft id.
@@ -1632,7 +1632,7 @@ definitions:
         type: string
       transaction:
         allOf:
-        - $ref: '#/definitions/models.Transaction'
+          - $ref: '#/definitions/models.Transaction'
         description: Transaction is a transaction pointer that utxo points to.
       transaction_id:
         description: TransactionID is a transaction id that utxo points to.
@@ -1655,11 +1655,11 @@ definitions:
     properties:
       op_return:
         allOf:
-        - $ref: '#/definitions/models.OpReturn'
+          - $ref: '#/definitions/models.OpReturn'
         description: OpReturn is a pointer to a op return object.
       paymail_p4:
         allOf:
-        - $ref: '#/definitions/models.PaymailP4'
+          - $ref: '#/definitions/models.PaymailP4'
         description: PaymailP4 is a pointer to a paymail p4 object.
       satoshis:
         description: Satoshis is a satoshis amount.
@@ -1807,56 +1807,56 @@ definitions:
     type: object
   time.Duration:
     enum:
-    - -9223372036854775808
-    - 9223372036854775807
-    - 1
-    - 1000
-    - 1000000
-    - 1000000000
-    - 60000000000
-    - 3600000000000
-    - -9223372036854775808
-    - 9223372036854775807
-    - 1
-    - 1000
-    - 1000000
-    - 1000000000
-    - 60000000000
-    - 3600000000000
-    - -9223372036854775808
-    - 9223372036854775807
-    - 1
-    - 1000
-    - 1000000
-    - 1000000000
-    - 60000000000
-    - 3600000000000
+      - -9223372036854775808
+      - 9223372036854775807
+      - 1
+      - 1000
+      - 1000000
+      - 1000000000
+      - 60000000000
+      - 3600000000000
+      - -9223372036854775808
+      - 9223372036854775807
+      - 1
+      - 1000
+      - 1000000
+      - 1000000000
+      - 60000000000
+      - 3600000000000
+      - -9223372036854775808
+      - 9223372036854775807
+      - 1
+      - 1000
+      - 1000000
+      - 1000000000
+      - 60000000000
+      - 3600000000000
     type: integer
     x-enum-varnames:
-    - minDuration
-    - maxDuration
-    - Nanosecond
-    - Microsecond
-    - Millisecond
-    - Second
-    - Minute
-    - Hour
-    - minDuration
-    - maxDuration
-    - Nanosecond
-    - Microsecond
-    - Millisecond
-    - Second
-    - Minute
-    - Hour
-    - minDuration
-    - maxDuration
-    - Nanosecond
-    - Microsecond
-    - Millisecond
-    - Second
-    - Minute
-    - Hour
+      - minDuration
+      - maxDuration
+      - Nanosecond
+      - Microsecond
+      - Millisecond
+      - Second
+      - Minute
+      - Hour
+      - minDuration
+      - maxDuration
+      - Nanosecond
+      - Microsecond
+      - Millisecond
+      - Second
+      - Minute
+      - Hour
+      - minDuration
+      - maxDuration
+      - Nanosecond
+      - Microsecond
+      - Millisecond
+      - Second
+      - Minute
+      - Hour
   transactions.CountTransactions:
     properties:
       conditions:
@@ -1878,7 +1878,7 @@ definitions:
     properties:
       config:
         allOf:
-        - $ref: '#/definitions/models.TransactionConfig'
+          - $ref: '#/definitions/models.TransactionConfig'
         description: Configuration of the transaction
       metadata:
         additionalProperties:
@@ -2524,21 +2524,6 @@ paths:
       summary: Paymail addresses search
       tags:
       - Admin
-  /v1/admin/shared-config:
-    get:
-      description: Get shared config
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: Shared configuration
-          schema:
-            $ref: '#/definitions/models.SharedConfig'
-      security:
-      - x-auth-xpub: []
-      summary: Get shared config
-      tags:
-      - Admin
   /v1/admin/stats:
     get:
       description: Get stats
@@ -3088,6 +3073,21 @@ paths:
       summary: Search for a destination
       tags:
       - Destinations
+  /v1/shared-config:
+    get:
+      description: Get shared config
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Shared configuration
+          schema:
+            $ref: '#/definitions/models.SharedConfig'
+      security:
+      - x-auth-xpub: []
+      summary: Get shared config
+      tags:
+      - Shared-config
   /v1/transaction:
     get:
       description: Get transaction by id
