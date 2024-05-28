@@ -396,8 +396,6 @@ func (c *Client) UpdateTransaction(ctx context.Context, callbackResp *broadcast.
 		ID:          callbackResp.TxID,
 		TxStatus:    callbackResp.TxStatus,
 		BUMP:        bump,
-		// it's not possible to get confirmations from broadcast client; zero would be treated as "not confirmed" that's why -1
-		Confirmations: -1,
 	}
 
 	tx, err := c.GetTransaction(ctx, "", txInfo.ID)

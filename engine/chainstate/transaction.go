@@ -39,7 +39,6 @@ func (c *Client) fastestQuery(ctx context.Context, id string, requiredIn Require
 	// The channel for the internal results
 	resultsChannel := make(
 		chan *TransactionInfo,
-		// len(c.options.config.mAPI.queryMiners)+2,
 	) // All miners & WhatsOnChain
 
 	// Create a context (to cancel or timeout)
@@ -91,8 +90,6 @@ func queryBroadcastClient(ctx context.Context, client ClientInterface, id string
 			Provider:    resp.Miner,
 			TxStatus:    resp.TxStatus,
 			BUMP:        bump,
-			// it's not possible to get confirmations from broadcast client; zero would be treated as "not confirmed" that's why -1
-			Confirmations: -1,
 		}, nil
 	}
 	return nil, ErrTransactionIDMismatch
