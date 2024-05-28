@@ -42,7 +42,6 @@ const (
 // List of providers
 const (
 	ProviderAll             = "all"             // All providers (used for errors etc)
-	ProviderMinercraft      = "minercraft"      // Query & broadcast provider for mAPI (using given miners)
 	ProviderBroadcastClient = "broadcastclient" // Query & broadcast provider for configured miners
 	ProviderNone            = "none"            // No providers (used to indicate no providers)
 )

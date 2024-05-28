@@ -20,34 +20,6 @@ func (n *NodesConfig) Validate() error {
 		return errors.New("no miner apis configured")
 	}
 
-	if n.Protocol == NodesProtocolMapi {
-		// check if at least one mapi url is configured
-		anyMapiNode := slices.IndexFunc(n.Apis, func(el *MinerAPI) bool {
-			return isMapiNode(el)
-		})
-		if anyMapiNode == -1 {
-			return errors.New("no mapi urls configured")
-		}
-
-		wrongMapiNode := slices.IndexFunc(n.Apis, func(el *MinerAPI) bool {
-			return isMapiNode(el) && el.MinerID == ""
-		})
-		if wrongMapiNode != -1 {
-			return errors.New("mapi url configured without miner id")
-		}
-
-		// check if MinerIDs for mAPI nodes are unique
-		ids := make(map[string]bool)
-		for _, el := range n.Apis {
-			if isMapiNode(el) {
-				if _, ok := ids[el.MinerID]; ok {
-					return errors.New("miner ids are not unique")
-				}
-				ids[el.MinerID] = true
-			}
-		}
-	}
-
 	// check if at least one arc url is configured
 	if n.Protocol == NodesProtocolArc {
 		found := slices.IndexFunc(n.Apis, func(el *MinerAPI) bool {

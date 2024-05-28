@@ -182,9 +182,7 @@ func (s *AppServices) loadSPVWallet(ctx context.Context, appConfig *AppConfig, t
 		options = append(options, engine.WithNotifications(appConfig.Notifications.WebhookEndpoint))
 	}
 
-	if appConfig.Nodes.Protocol == NodesProtocolMapi {
-		options = loadMinercraftMapi(appConfig, options)
-	} else if appConfig.Nodes.Protocol == NodesProtocolArc {
+	if appConfig.Nodes.Protocol == NodesProtocolArc {
 		options = loadBroadcastClientArc(appConfig, options, logger)
 	}
 
@@ -387,15 +385,6 @@ func loadBroadcastClientArc(appConfig *AppConfig, options []engine.ClientOps, lo
 	options = append(
 		options,
 		engine.WithBroadcastClient(broadcastClient),
-	)
-	return options
-}
-
-func loadMinercraftMapi(appConfig *AppConfig, options []engine.ClientOps) []engine.ClientOps {
-	options = append(
-		options,
-		engine.WithMAPI(),
-		engine.WithMinercraftAPIs(appConfig.Nodes.toMinercraftMapi()),
 	)
 	return options
 }

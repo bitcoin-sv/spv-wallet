@@ -66,19 +66,6 @@ func createActiveProviders(c *Client, txID, txHex string, format HexFormatFlag) 
 	providers := make([]txBroadcastProvider, 0, 1)
 
 	switch c.ActiveProvider() {
-	case ProviderMinercraft:
-		if format != RawTx {
-			panic("MAPI doesn't support other broadcast format than RawTx")
-		}
-
-		for _, miner := range c.options.config.minercraftConfig.broadcastMiners {
-			if miner == nil {
-				continue
-			}
-
-			pvdr := mapiBroadcastProvider{miner: miner, txID: txID, txHex: txHex}
-			providers = append(providers, &pvdr)
-		}
 	case ProviderBroadcastClient:
 		pvdr := broadcastClientProvider{txID: txID, txHex: txHex, format: format}
 		providers = append(providers, &pvdr)

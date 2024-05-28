@@ -19,16 +19,6 @@ func (c *Client) query(ctx context.Context, id string, requiredIn RequiredIn,
 	defer cancel()
 
 	switch c.ActiveProvider() {
-	case ProviderMinercraft:
-		for index := range c.options.config.minercraftConfig.queryMiners {
-			if c.options.config.minercraftConfig.queryMiners[index] != nil {
-				if res, err := queryMinercraft(
-					ctxWithCancel, c, c.options.config.minercraftConfig.queryMiners[index], id,
-				); err == nil && checkRequirementMapi(requiredIn, id, res) {
-					return res
-				}
-			}
-		}
 	case ProviderBroadcastClient:
 		resp, err := queryBroadcastClient(
 			ctxWithCancel, c, id,
@@ -60,22 +50,6 @@ func (c *Client) fastestQuery(ctx context.Context, id string, requiredIn Require
 	var wg sync.WaitGroup
 
 	switch c.ActiveProvider() {
-	case ProviderMinercraft:
-		for index := range c.options.config.minercraftConfig.queryMiners {
-			wg.Add(1)
-			go func(
-				ctx context.Context, client *Client,
-				wg *sync.WaitGroup, miner *minercraft.Miner,
-				id string, requiredIn RequiredIn,
-			) {
-				defer wg.Done()
-				if res, err := queryMinercraft(
-					ctx, client, miner, id,
-				); err == nil && checkRequirementMapi(requiredIn, id, res) {
-					resultsChannel <- res
-				}
-			}(ctxWithCancel, c, &wg, c.options.config.minercraftConfig.queryMiners[index], id, requiredIn)
-		}
 	case ProviderBroadcastClient:
 		wg.Add(1)
 		go func(ctx context.Context, client *Client, wg *sync.WaitGroup, id string, requiredIn RequiredIn) {
@@ -97,26 +71,6 @@ func (c *Client) fastestQuery(ctx context.Context, id string, requiredIn Require
 	}()
 
 	return <-resultsChannel
-}
-
-// queryMinercraft will submit a query transaction request to a miner using Minercraft(mAPI or Arc)
-func queryMinercraft(ctx context.Context, client ClientInterface, miner *minercraft.Miner, id string) (*TransactionInfo, error) {
-	client.DebugLog("executing request in minercraft using miner: " + miner.Name)
-	if resp, err := client.Minercraft().QueryTransaction(ctx, miner, id, minercraft.WithQueryMerkleProof()); err != nil {
-		client.DebugLog("error executing request in minercraft using miner: " + miner.Name + " failed: " + err.Error())
-		return nil, err
-	} else if resp != nil && resp.Query.ReturnResult == mAPISuccess && strings.EqualFold(resp.Query.TxID, id) {
-		return &TransactionInfo{
-			BlockHash:     resp.Query.BlockHash,
-			BlockHeight:   resp.Query.BlockHeight,
-			Confirmations: resp.Query.Confirmations,
-			ID:            resp.Query.TxID,
-			MinerID:       resp.Query.MinerID,
-			Provider:      miner.Name,
-			MerkleProof:   resp.Query.MerkleProof,
-		}, nil
-	}
-	return nil, ErrTransactionIDMismatch
 }
 
 // queryBroadcastClient will submit a query transaction request to a go-broadcast-client

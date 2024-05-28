@@ -28,7 +28,6 @@ type ChainService interface {
 
 // ProviderServices is the chainstate providers interface
 type ProviderServices interface {
-	Minercraft() minercraft.ClientInterface
 	BroadcastClient() broadcast.Client
 }
 

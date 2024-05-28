@@ -24,9 +24,6 @@ func (flag HexFormatFlag) Contains(other HexFormatFlag) bool {
 // SupportedBroadcastFormats retuns supported formats based on active providers
 func (c *Client) SupportedBroadcastFormats() HexFormatFlag {
 	switch c.ActiveProvider() {
-	case ProviderMinercraft:
-		return RawTx
-
 	case ProviderBroadcastClient:
 		return RawTx | Ef
 

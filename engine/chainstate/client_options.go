@@ -22,14 +22,12 @@ func defaultClientOptions() *clientOptions {
 	// Set the default options
 	return &clientOptions{
 		config: &syncConfig{
-			httpClient:       nil,
-			minercraftConfig: defaultMinecraftConfig(),
-			minercraft:       nil,
-			network:          MainNet,
-			queryTimeout:     defaultQueryTimeOut,
-			broadcastClient:  nil,
-			feeQuotes:        true,
-			feeUnit:          nil, // fee has to be set explicitly or via fee quotes
+			httpClient:      nil,
+			network:         MainNet,
+			queryTimeout:    defaultQueryTimeOut,
+			broadcastClient: nil,
+			feeQuotes:       true,
+			feeUnit:         nil, // fee has to be set explicitly or via fee quotes
 		},
 		debug:           false,
 		newRelicEnabled: false,
@@ -68,22 +66,6 @@ func WithHTTPClient(client HTTPInterface) ClientOps {
 		if client != nil {
 			c.config.httpClient = client
 		}
-	}
-}
-
-// WithMinercraft will set a custom Minercraft client
-func WithMinercraft(client minercraft.ClientInterface) ClientOps {
-	return func(c *clientOptions) {
-		if client != nil {
-			c.config.minercraft = client
-		}
-	}
-}
-
-// WithMAPI will specify mAPI as an API for minercraft client
-func WithMAPI() ClientOps {
-	return func(c *clientOptions) {
-		c.config.minercraftConfig.apiType = minercraft.MAPI
 	}
 }
 
@@ -143,13 +125,6 @@ func WithFeeQuotes(enabled bool) ClientOps {
 func WithFeeUnit(feeUnit *utils.FeeUnit) ClientOps {
 	return func(c *clientOptions) {
 		c.config.feeUnit = feeUnit
-	}
-}
-
-// WithMinercraftAPIs will set miners APIs
-func WithMinercraftAPIs(apis []*minercraft.MinerAPIs) ClientOps {
-	return func(c *clientOptions) {
-		c.config.minercraftConfig.minerAPIs = apis
 	}
 }
 

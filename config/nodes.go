@@ -10,9 +10,6 @@ import (
 type NodesProtocol string
 
 const (
-	// NodesProtocolMapi represents the mapi protocol provided by minercraft
-	NodesProtocolMapi NodesProtocol = "mapi"
-
 	// NodesProtocolArc represents the arc protocol provided by go-broadcast-client
 	NodesProtocolArc NodesProtocol = "arc"
 )
@@ -20,33 +17,11 @@ const (
 // Validate whether the protocol is known
 func (n NodesProtocol) Validate() error {
 	switch n {
-	case NodesProtocolMapi, NodesProtocolArc:
+	case NodesProtocolArc:
 		return nil
 	default:
 		return errors.New("invalid nodes protocol")
 	}
-}
-
-func (nodes *NodesConfig) toMinercraftMapi() []*minercraft.MinerAPIs {
-	minerApis := []*minercraft.MinerAPIs{}
-	if nodes.Apis != nil {
-		for _, api := range nodes.Apis {
-			if api.MapiURL == "" {
-				continue
-			}
-			minerApis = append(minerApis, &minercraft.MinerAPIs{
-				MinerID: api.MinerID,
-				APIs: []minercraft.API{
-					{
-						Token: api.Token,
-						URL:   api.MapiURL,
-						Type:  minercraft.MAPI,
-					},
-				},
-			})
-		}
-	}
-	return minerApis
 }
 
 func (nodes *NodesConfig) toBroadcastClientArc() []*broadcastclient.ArcClientConfig {

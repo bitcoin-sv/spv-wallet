@@ -37,23 +37,12 @@ type (
 		callbackToken            string                             // Broadcast callback access token
 		excludedProviders        []string                           // List of provider names
 		httpClient               HTTPInterface                      // Custom HTTP client (Minercraft, WOC)
-		minercraftConfig         *minercraftConfig                  // minercraftConfig configuration
-		minercraft               minercraft.ClientInterface         // Minercraft client
 		network                  Network                            // Current network (mainnet, testnet, stn)
 		queryTimeout             time.Duration                      // Timeout for transaction query
 		broadcastClient          broadcast.Client                   // Broadcast client
 		blockHedersServiceClient *blockHeadersServiceClientProvider // Block Headers Service client
 		feeUnit                  *utils.FeeUnit                     // The lowest fees among all miners
 		feeQuotes                bool                               // If set, feeUnit will be updated with fee quotes from miner's
-	}
-
-	// minercraftConfig is specific for minercraft configuration
-	minercraftConfig struct {
-		broadcastMiners []*minercraft.Miner // List of loaded miners for broadcasting
-		queryMiners     []*minercraft.Miner // List of loaded miners for querying transactions
-
-		apiType   minercraft.APIType      // MinerCraft APIType(ARC/mAPI)
-		minerAPIs []*minercraft.MinerAPIs // List of miners APIs
 	}
 )
 
@@ -95,12 +84,6 @@ func (c *Client) Close(ctx context.Context) {
 	if txn := newrelic.FromContext(ctx); txn != nil {
 		defer txn.StartSegment("close_chainstate").End()
 	}
-	if c != nil && c.options.config != nil {
-		// Close minercraft
-		if c.options.config.minercraft != nil {
-			c.options.config.minercraft = nil
-		}
-	}
 }
 
 // Debug will set the debug flag
@@ -133,11 +116,6 @@ func (c *Client) Network() Network {
 	return c.options.config.network
 }
 
-// Minercraft will return the Minercraft client
-func (c *Client) Minercraft() minercraft.ClientInterface {
-	return c.options.config.minercraft
-}
-
 // BroadcastClient will return the BroadcastClient client
 func (c *Client) BroadcastClient() broadcast.Client {
 	return c.options.config.broadcastClient
@@ -159,9 +137,6 @@ func (c *Client) ActiveProvider() string {
 	if !utils.StringInSlice(ProviderBroadcastClient, excluded) && c.BroadcastClient() != nil {
 		return ProviderBroadcastClient
 	}
-	if !utils.StringInSlice(ProviderMinercraft, excluded) && (c.Network() == MainNet || c.Network() == TestNet) {
-		return ProviderMinercraft
-	}
 	return ProviderNone
 }
 
@@ -171,8 +146,6 @@ func (c *Client) isFeeQuotesEnabled() bool {
 
 func (c *Client) initActiveProvider(ctx context.Context) error {
 	switch c.ActiveProvider() {
-	case ProviderMinercraft:
-		return c.minercraftInit(ctx)
 	case ProviderBroadcastClient:
 		return c.broadcastClientInit(ctx)
 	default:
