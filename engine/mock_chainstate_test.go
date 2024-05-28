@@ -8,7 +8,6 @@ import (
 	"github.com/bitcoin-sv/spv-wallet/engine/chainstate"
 	"github.com/bitcoin-sv/spv-wallet/engine/utils"
 	"github.com/libsv/go-bc"
-	"github.com/tonicpow/go-minercraft/v2"
 )
 
 // chainStateBase is the base interface / methods

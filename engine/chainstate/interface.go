@@ -7,7 +7,6 @@ import (
 
 	"github.com/bitcoin-sv/go-broadcast-client/broadcast"
 	"github.com/bitcoin-sv/spv-wallet/engine/utils"
-	"github.com/tonicpow/go-minercraft/v2"
 )
 
 // HTTPInterface is the HTTP client interface

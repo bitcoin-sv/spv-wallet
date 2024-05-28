@@ -9,8 +9,6 @@ import (
 
 	"github.com/libsv/go-bk/envelope"
 	"github.com/libsv/go-bt/v2"
-	"github.com/tonicpow/go-minercraft/v2"
-	"github.com/tonicpow/go-minercraft/v2/apis/mapi"
 )
 
 var (

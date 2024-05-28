@@ -8,8 +8,6 @@ import (
 
 	"github.com/bitcoin-sv/spv-wallet/engine/utils"
 	"github.com/newrelic/go-agent/v3/newrelic"
-	"github.com/tonicpow/go-minercraft/v2"
-	"github.com/tonicpow/go-minercraft/v2/apis/mapi"
 )
 
 func (c *Client) minercraftInit(ctx context.Context) error {

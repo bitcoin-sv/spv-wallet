@@ -8,7 +8,6 @@ import (
 	"time"
 
 	"github.com/libsv/go-bc"
-	"github.com/tonicpow/go-minercraft/v2"
 )
 
 // query will try ALL providers in order and return the first "valid" response based on requirements

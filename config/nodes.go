@@ -4,7 +4,6 @@ import (
 	"errors"
 
 	broadcastclient "github.com/bitcoin-sv/go-broadcast-client/broadcast/broadcast-client"
-	"github.com/tonicpow/go-minercraft/v2"
 )
 
 // NodesProtocol is the protocol/api_type used to communicate with the miners
