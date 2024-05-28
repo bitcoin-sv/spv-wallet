@@ -24,7 +24,6 @@ import (
 	"github.com/mrz1836/go-cachestore"
 	"github.com/newrelic/go-agent/v3/newrelic"
 	"github.com/rs/zerolog"
-	
 	taskq "github.com/vmihailenco/taskq/v3"
 )
 
@@ -628,29 +627,6 @@ func WithFeeQuotes(enabled bool) ClientOps {
 func WithFeeUnit(feeUnit *utils.FeeUnit) ClientOps {
 	return func(c *clientOptions) {
 		c.chainstate.options = append(c.chainstate.options, chainstate.WithFeeUnit(feeUnit))
-	}
-}
-
-// WithMAPI will specify Arc as an API for minercraft client
-func WithMAPI() ClientOps {
-	return func(c *clientOptions) {
-		c.chainstate.options = append(c.chainstate.options, chainstate.WithMAPI())
-	}
-}
-
-// WithMinercraft will set custom minercraft client
-func WithMinercraft(minercraft minercraft.ClientInterface) ClientOps {
-	return func(c *clientOptions) {
-		if minercraft != nil {
-			c.chainstate.options = append(c.chainstate.options, chainstate.WithMinercraft(minercraft))
-		}
-	}
-}
-
-// WithMinercraftAPIs set custom MinerAPIs for minercraft
-func WithMinercraftAPIs(miners []*minercraft.MinerAPIs) ClientOps {
-	return func(c *clientOptions) {
-		c.chainstate.options = append(c.chainstate.options, chainstate.WithMinercraftAPIs(miners))
 	}
 }
 
