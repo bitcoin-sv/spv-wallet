@@ -227,23 +227,6 @@ func (p *PaymailDefaultServiceProvider) AddContact(
 	return
 }
 
-func (p *PaymailDefaultServiceProvider) CreatePikeDestinationResponse(
-	ctx context.Context,
-	alias, domain string,
-	satoshis uint64,
-	requestMetadata *server.RequestMetadata,
-) (*paymail.PikePaymentOutputsResponse, error) {
-	referenceID, err := utils.RandomHex(16)
-	if err != nil {
-		return nil, err
-	}
-
-	return &paymail.PikePaymentOutputsResponse{
-		Outputs:   make([]paymail.PikePaymentOutput, 0),
-		Reference: referenceID,
-	}, nil
-}
-
 func (p *PaymailDefaultServiceProvider) getDestinationForPaymail(ctx context.Context, alias, domain string, metadata Metadata) (*Destination, error) {
 	pm, err := getPaymailAddress(ctx, alias+"@"+domain, p.client.DefaultModelOptions()...)
 	if err != nil {
@@ -285,6 +268,7 @@ func createDestination(ctx context.Context, pm *PaymailAddress, opts ...ModelOps
 	dst.Chain = utils.ChainExternal
 	dst.Num = pm.ExternalXpubKeyNum
 	dst.PaymailExternalDerivationNum = &pm.XpubDerivationSeq
+	dst.DerivationMethod = BIP32DerivationMethod
 
 	if err = dst.Save(ctx); err != nil {
 		return nil, err

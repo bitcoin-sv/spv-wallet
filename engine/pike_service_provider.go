@@ -2,9 +2,13 @@ package engine
 
 import (
 	"context"
+	"encoding/hex"
 	"github.com/bitcoin-sv/go-paymail"
 	"github.com/bitcoin-sv/go-paymail/server"
+	"github.com/bitcoin-sv/spv-wallet/engine/pike"
+	"github.com/bitcoin-sv/spv-wallet/engine/script/template"
 	"github.com/bitcoin-sv/spv-wallet/engine/utils"
+	"github.com/libsv/go-bk/bec"
 )
 
 // PikeContactServiceProvider is an interface for handling the pike contact actions in go-paymail/server
@@ -47,9 +51,9 @@ func (p *PikeContactServiceProvider) AddContact(
 
 // PIKE PAYMENT SERVICE PROVIDER METHODS
 
-func (p *PikePaymentServiceProvider) CreatePikeDestinationResponse(
+func (p *PikePaymentServiceProvider) CreatePikeOutputResponse(
 	ctx context.Context,
-	alias, domain string,
+	alias, domain, senderPubKey string,
 	satoshis uint64,
 	requestMetadata *server.RequestMetadata,
 ) (*paymail.PikePaymentOutputsResponse, error) {
@@ -58,63 +62,97 @@ func (p *PikePaymentServiceProvider) CreatePikeDestinationResponse(
 		return nil, err
 	}
 
-	// Create outputs template
-	// outputs := CreatePikeOutputsTemplate(satoshis)
+	outputs, err := pike.GenerateOutputsTemplate(satoshis)
+	if err != nil {
+		return nil, err
+	}
 
 	metadata := createMetadata(requestMetadata, "CreatePikeDestinationResponse")
 	opts := WithMetadatas(metadata)
 
-	// Generate and save PIKE destinations
-	_, err = p.createPikeDestination(ctx, nil, alias, domain, referenceID, opts)
-	if err != nil {
+	if err = p.createPikeDestinations(ctx, outputs, alias, domain, senderPubKey, referenceID, opts); err != nil {
 		return nil, err
 	}
 
 	return &paymail.PikePaymentOutputsResponse{
-		Outputs:   make([]paymail.PikePaymentOutput, 0),
+		Outputs:   convertToPaymailOutputTemplates(outputs),
 		Reference: referenceID,
 	}, nil
 }
 
-func (p *PikePaymentServiceProvider) createPikeDestination(ctx context.Context, outputsTemplate []paymail.PikePaymentOutput, alias, domain, reference string, opts ...ModelOps) (*Destination, error) {
-	pm, err := getPaymailAddress(ctx, alias+"@"+domain, p.client.DefaultModelOptions()...)
+func (p *PikePaymentServiceProvider) createPikeDestinations(ctx context.Context, outputsTemplate []*template.OutputTemplate, alias, domain, senderPubKeyHex, reference string, opts ...ModelOps) error {
+	pAddress, err := getPaymailAddress(ctx, alias+"@"+domain, p.client.DefaultModelOptions()...)
+	if err != nil {
+		return err
+	}
+
+	receiverPublicKeyHex, err := pAddress.GetPubKey()
+	if err != nil {
+		return err
+	}
+
+	receiverPubKey, senderPubKey, err := getPublicKeys(receiverPublicKeyHex, senderPubKeyHex)
+	if err != nil {
+		return err
+	}
+
+	scripts, err := pike.GenerateLockingScriptsFromTemplates(outputsTemplate, senderPubKey, receiverPubKey, reference)
+	if err != nil {
+		return err
+	}
+
+	return p.saveDestinations(ctx, pAddress, scripts, senderPubKeyHex, opts...)
+}
+
+func (p *PikePaymentServiceProvider) saveDestinations(
+	ctx context.Context,
+	pAddress *PaymailAddress,
+	scripts []string,
+	senderPubKeyHex string,
+	opts ...ModelOps,
+) error {
+	for index, script := range scripts {
+		dst := newDestination(pAddress.XpubID, script, append(p.client.DefaultModelOptions(), opts...)...)
+		dst.DerivationMethod = PIKEDerivationMethod
+		dst.SenderXpub = senderPubKeyHex
+		dst.OutputIndex = uint32(index)
+
+		if err := dst.Save(ctx); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func getPublicKeys(receiverPubKeyHex, senderPubKeyHex string) (*bec.PublicKey, *bec.PublicKey, error) {
+	receiverPubKey, err := getPublicKey(receiverPubKeyHex)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	senderPubKey, err := getPublicKey(senderPubKeyHex)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	return receiverPubKey, senderPubKey, nil
+}
+
+func getPublicKey(pubKeyHex string) (*bec.PublicKey, error) {
+	pubKeyBytes, err := hex.DecodeString(pubKeyHex)
 	if err != nil {
 		return nil, err
 	}
-	if pm == nil {
-		return nil, ErrPaymailNotFound
+	return bec.ParsePubKey(pubKeyBytes, bec.S256())
+}
+
+func convertToPaymailOutputTemplates(outputTemplates []*template.OutputTemplate) []*paymail.OutputTemplate {
+	outputs := make([]*paymail.OutputTemplate, 0)
+	for _, output := range outputTemplates {
+		outputs = append(outputs, &paymail.OutputTemplate{
+			Script:   output.Script,
+			Satoshis: output.Satoshis,
+		})
 	}
-
-	hdXpub, err := pm.GetNextXpub(ctx)
-	if err != nil {
-		return nil, err
-	}
-
-	pubKey, err := hdXpub.ECPubKey()
-	if err != nil {
-		return nil, err
-	}
-
-	lockingScript, err := createLockingScript(pubKey)
-	if err != nil {
-		return nil, err
-	}
-
-	// scripts := GenerateLockingScriptsFromTemplates(outputsTemplate, senderPubKey, receiverPubKey, "reference")
-	// if len(scripts) == 0 {
-	// 	return nil, errors.New("no locking scripts generated")
-	// }
-	// lockingScript := scripts[0]
-
-	// create a new dst, based on the External xPub child
-	// this is not yet possible using the xpub struct. That needs the full xPub, which we don't have.
-	dst := newDestination(pm.XpubID, lockingScript, append(opts, New())...)
-	dst.Chain = utils.ChainExternal
-	dst.Num = pm.ExternalXpubKeyNum
-	dst.PaymailExternalDerivationNum = &pm.XpubDerivationSeq
-
-	if err = dst.Save(ctx); err != nil {
-		return nil, err
-	}
-	return dst, nil
+	return outputs
 }
