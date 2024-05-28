@@ -33,8 +33,6 @@ const (
 
 // Requirements and providers
 const (
-	mAPIFailure       = "failure"  // Minercraft result was a failure / error
-	mAPISuccess       = "success"  // Minercraft result was success (still could be an error)
 	requiredInMempool = "mempool"  // Requirement for tx query (has to be >= mempool)
 	requiredOnChain   = "on-chain" // Requirement for tx query (has to be == on-chain)
 )

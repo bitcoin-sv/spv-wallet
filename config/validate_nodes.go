@@ -37,10 +37,6 @@ func (n *NodesConfig) Validate() error {
 	return nil
 }
 
-func isMapiNode(node *MinerAPI) bool {
-	return node.MapiURL != ""
-}
-
 func isArcNode(node *MinerAPI) bool {
 	return node.ArcURL != ""
 }

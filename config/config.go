@@ -169,12 +169,8 @@ type FeeUnitConfig struct {
 
 // MinerAPI holds connection info for a single miner endpoint
 type MinerAPI struct {
-	Token   string `json:"token" mapstructure:"token"`
-	ArcURL  string `json:"arc_url" mapstructure:"arc_url"`
-	MapiURL string `json:"mapi_url" mapstructure:"mapi_url"`
-
-	// MinerID is not used with ARC potocol
-	MinerID string `json:"minerid" mapstructure:"minerid"`
+	Token  string `json:"token" mapstructure:"token"`
+	ArcURL string `json:"arc_url" mapstructure:"arc_url"`
 }
 
 // NotificationsConfig is the configuration for notifications

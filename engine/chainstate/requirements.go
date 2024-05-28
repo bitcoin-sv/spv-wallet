@@ -33,6 +33,6 @@ func checkRequirementArc(requirement RequiredIn, id string, txInfo *TransactionI
 }
 
 func checkRequirementMapi(requirement RequiredIn, id string, txInfo *TransactionInfo) bool {
-	isConfirmedOnChain := len(txInfo.BlockHash) > 0 && txInfo.Confirmations > 0
+	isConfirmedOnChain := len(txInfo.BlockHash) > 0
 	return checkRequirement(requirement, id, txInfo, isConfirmedOnChain)
 }
