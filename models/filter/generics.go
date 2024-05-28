@@ -1,0 +1,25 @@
+package filter
+
+// ConditionsModel is a generic model for handling conditions with metadata
+type ConditionsModel[TFilter any] struct {
+	// Custom conditions used for filtering the search results. Every field within the object is optional.
+	Conditions TFilter `json:"conditions"`
+	// Accepts a JSON object for embedding custom metadata, enabling arbitrary additional information to be associated with the resource
+	Metadata *map[string]interface{} `json:"metadata,omitempty" swaggertype:"object,string" example:"key:value,key2:value2"`
+}
+
+// QueryParams object to use when limiting and sorting database query results
+type QueryParams struct {
+	Page          int    `json:"page,omitempty"`
+	PageSize      int    `json:"page_size,omitempty"`
+	OrderByField  string `json:"order_by_field,omitempty"`
+	SortDirection string `json:"sort_direction,omitempty"`
+}
+
+// SearchModel is a generic model for handling searching with filters and metadata
+type SearchModel[TFilter any] struct {
+	ConditionsModel[TFilter]
+
+	// Pagination and sorting options to streamline data exploration and analysis
+	QueryParams *QueryParams `json:"params,omitempty" swaggertype:"object,string" example:"page:1,page_size:10,order_by_field:created_at,order_by_direction:desc"`
+}

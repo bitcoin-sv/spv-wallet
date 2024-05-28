@@ -1,9 +1,7 @@
 package destinations
 
 import (
-	"github.com/bitcoin-sv/spv-wallet/actions/common"
 	"github.com/bitcoin-sv/spv-wallet/engine"
-	"github.com/bitcoin-sv/spv-wallet/models/filter"
 )
 
 // CreateDestination is the model for creating a destination
@@ -23,9 +21,3 @@ type UpdateDestination struct {
 	// LockingScript of the destination
 	LockingScript string `json:"locking_script" example:"76a9147b05764a97f3b4b981471492aa703b188e45979b88ac"`
 }
-
-// SearchDestinations is a model for handling searching with filters and metadata
-type SearchDestinations = common.SearchModel[filter.DestinationFilter]
-
-// CountDestinations is a model for handling counting filtered destinations
-type CountDestinations = common.ConditionsModel[filter.DestinationFilter]
