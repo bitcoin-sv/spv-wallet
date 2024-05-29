@@ -156,7 +156,7 @@ func SetupServerRoutes(appConfig *config.AppConfig, services *config.AppServices
 		sharedConfigRoutes,
 	}
 
-	if appConfig.ExperimentalFeatures.PikeContactsEnabled || appConfig.ExperimentalFeatures.PikePaymentEnabled {
+	if appConfig.ExperimentalFeatures.PikeContactsEnabled {
 		routes = append(routes, contacts.NewHandler(appConfig, services))
 	}
 
