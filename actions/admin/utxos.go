@@ -14,7 +14,7 @@ import (
 // @Description	Search for utxos
 // @Tags		Admin
 // @Produce		json
-// @Param		SearchUtxos body SearchUtxos false "Supports targeted resource searches with filters and metadata, plus options for pagination and sorting to streamline data exploration and analysis"
+// @Param		SearchUtxos body filter.AdminSearchUtxos false "Supports targeted resource searches with filters and metadata, plus options for pagination and sorting to streamline data exploration and analysis"
 // @Success		200 {object} []models.Utxo "List of utxos"
 // @Failure		400	"Bad request - Error while parsing SearchUtxos from request body"
 // @Failure 	500	"Internal server error - Error while searching for utxos"
@@ -53,7 +53,7 @@ func (a *Action) utxosSearch(c *gin.Context) {
 // @Description	Count utxos
 // @Tags		Admin
 // @Produce		json
-// @Param		CountUtxos body CountUtxos false "Enables filtering of elements to be counted"
+// @Param		CountUtxos body filter.AdminCountUtxos false "Enables filtering of elements to be counted"
 // @Success		200	{number} int64 "Count of utxos"
 // @Failure		400	"Bad request - Error while parsing CountUtxos from request body"
 // @Failure 	500	"Internal Server Error - Error while fetching count of utxos"

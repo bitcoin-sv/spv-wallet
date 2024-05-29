@@ -15,7 +15,7 @@ import (
 // @Description	Search for transactions
 // @Tags		Admin
 // @Produce		json
-// @Param		SearchTransactions body SearchTransactions false "Supports targeted resource searches with filters and metadata, plus options for pagination and sorting to streamline data exploration and analysis"
+// @Param		SearchTransactions body filter.SearchTransactions false "Supports targeted resource searches with filters and metadata, plus options for pagination and sorting to streamline data exploration and analysis"
 // @Success		200 {object} []models.Transaction "List of transactions"
 // @Failure		400	"Bad request - Error while parsing SearchTransactions from request body"
 // @Failure 	500	"Internal server error - Error while searching for transactions"
@@ -53,7 +53,7 @@ func (a *Action) transactionsSearch(c *gin.Context) {
 // @Description	Count transactions
 // @Tags		Admin
 // @Produce		json
-// @Param		CountTransactions body CountTransactions false "Enables filtering of elements to be counted"
+// @Param		CountTransactions body filter.CountTransactions false "Enables filtering of elements to be counted"
 // @Success		200	{number} int64 "Count of transactions"
 // @Failure		400	"Bad request - Error while parsing CountTransactions from request body"
 // @Failure 	500	"Internal Server Error - Error while fetching count of transactions"

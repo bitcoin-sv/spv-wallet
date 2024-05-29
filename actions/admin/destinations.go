@@ -15,7 +15,7 @@ import (
 // @Description	Search for destinations
 // @Tags		Admin
 // @Produce		json
-// @Param		SearchDestinations body SearchDestinations false "Supports targeted resource searches with filters and metadata, plus options for pagination and sorting to streamline data exploration and analysis"
+// @Param		SearchDestinations body filter.SearchDestinations false "Supports targeted resource searches with filters and metadata, plus options for pagination and sorting to streamline data exploration and analysis"
 // @Success		200 {object} []models.Destination "List of destinations"
 // @Failure		400	"Bad request - Error while parsing SearchDestinations from request body"
 // @Failure 	500	"Internal server error - Error while searching for destinations"
@@ -53,7 +53,7 @@ func (a *Action) destinationsSearch(c *gin.Context) {
 // @Description	Count destinations
 // @Tags		Admin
 // @Produce		json
-// @Param		CountDestinations body CountDestinations false "Enables filtering of elements to be counted"
+// @Param		CountDestinations body filter.CountDestinations false "Enables filtering of elements to be counted"
 // @Success		200	{number} int64 "Count of destinations"
 // @Failure		400	"Bad request - Error while parsing CountDestinations from request body"
 // @Failure 	500	"Internal Server Error - Error while fetching count of destinations"

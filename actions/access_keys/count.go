@@ -15,7 +15,7 @@ import (
 // @Description	Count of access keys
 // @Tags		Access-key
 // @Produce		json
-// @Param		CountAccessKeys body CountAccessKeys false "Enables filtering of elements to be counted"
+// @Param		CountAccessKeys body filter.CountAccessKeys false "Enables filtering of elements to be counted"
 // @Success		200	{number} int64 "Count of access keys"
 // @Failure		400	"Bad request - Error while parsing CountAccessKeys from request body"
 // @Failure 	500	"Internal Server Error - Error while fetching count of access keys"

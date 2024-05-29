@@ -48,7 +48,7 @@ func (a *Action) xpubsCreate(c *gin.Context) {
 // @Description	Search for xpubs
 // @Tags		Admin
 // @Produce		json
-// @Param		SearchXpubs body SearchXpubs false "Supports targeted resource searches with filters and metadata, plus options for pagination and sorting to streamline data exploration and analysis"
+// @Param		SearchXpubs body filter.SearchXpubs false "Supports targeted resource searches with filters and metadata, plus options for pagination and sorting to streamline data exploration and analysis"
 // @Success		200 {object} []models.Xpub "List of xpubs"
 // @Failure		400	"Bad request - Error while parsing SearchXpubs from request body"
 // @Failure 	500	"Internal server error - Error while searching for xpubs"
@@ -86,7 +86,7 @@ func (a *Action) xpubsSearch(c *gin.Context) {
 // @Description	Count xpubs
 // @Tags		Admin
 // @Produce		json
-// @Param		CountXpubs body CountXpubs false "Enables filtering of elements to be counted"
+// @Param		CountXpubs body filter.CountXpubs false "Enables filtering of elements to be counted"
 // @Success		200	{number} int64 "Count of access keys"
 // @Failure		400	"Bad request - Error while parsing CountXpubs from request body"
 // @Failure 	500	"Internal Server Error - Error while fetching count of xpubs"

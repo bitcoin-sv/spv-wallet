@@ -15,7 +15,7 @@ import (
 // @Description	Access Keys Search
 // @Tags		Admin
 // @Produce		json
-// @Param		SearchAccessKeys body SearchAccessKeys false "Supports targeted resource searches with filters and metadata, plus options for pagination and sorting to streamline data exploration and analysis"
+// @Param		SearchAccessKeys body filter.SearchAccessKeys false "Supports targeted resource searches with filters and metadata, plus options for pagination and sorting to streamline data exploration and analysis"
 // @Success		200 {object} []models.AccessKey "List of access keys"
 // @Failure		400	"Bad request - Error while parsing SearchAccessKeys from request body"
 // @Failure 	500	"Internal server error - Error while searching for access keys"
@@ -53,7 +53,7 @@ func (a *Action) accessKeysSearch(c *gin.Context) {
 // @Description	Access Keys Count
 // @Tags		Admin
 // @Produce		json
-// @Param		CountAccessKeys body CountAccessKeys false "Enables filtering of elements to be counted"
+// @Param		CountAccessKeys body filter.CountAccessKeys false "Enables filtering of elements to be counted"
 // @Success		200 {number} int64 "Count of access keys"
 // @Failure		400	"Bad request - Error while parsing CountAccessKeys from request body"
 // @Failure 	500	"Internal Server Error - Error while fetching count of access keys"

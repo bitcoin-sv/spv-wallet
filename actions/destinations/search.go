@@ -16,7 +16,7 @@ import (
 // @Description	Search for a destination
 // @Tags		Destinations
 // @Produce		json
-// @Param		SearchDestinations body SearchDestinations false "Supports targeted resource searches with filters and metadata, plus options for pagination and sorting to streamline data exploration and analysis"
+// @Param		SearchDestinations body filter.SearchDestinations false "Supports targeted resource searches with filters and metadata, plus options for pagination and sorting to streamline data exploration and analysis"
 // @Success		200 {object} []models.Destination "List of destinations
 // @Failure		400	"Bad request - Error while parsing SearchDestinations from request body"
 // @Failure 	500	"Internal server error - Error while searching for destinations"

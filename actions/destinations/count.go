@@ -15,7 +15,7 @@ import (
 // @Description	Count Destinations
 // @Tags		Destinations
 // @Produce		json
-// @Param		CountDestinations body CountDestinations false "Enables filtering of elements to be counted"
+// @Param		CountDestinations body filter.CountDestinations false "Enables filtering of elements to be counted"
 // @Success		200	{number} int64 "Count of destinations"
 // @Failure		400	"Bad request - Error while parsing CountDestinations from request body"
 // @Failure 	500	"Internal Server Error - Error while fetching count of destinations"

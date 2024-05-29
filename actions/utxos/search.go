@@ -17,7 +17,7 @@ import (
 // @Description	Search UTXO
 // @Tags		UTXO
 // @Produce		json
-// @Param		SearchUtxos body SearchUtxos false "Supports targeted resource searches with filters and metadata, plus options for pagination and sorting to streamline data exploration and analysis"
+// @Param		SearchUtxos body filter.SearchUtxos false "Supports targeted resource searches with filters and metadata, plus options for pagination and sorting to streamline data exploration and analysis"
 // @Success		200 {object} []models.Utxo "List of utxos"
 // @Failure		400	"Bad request - Error while parsing SearchUtxos from request body"
 // @Failure 	500	"Internal server error - Error while searching for utxos"

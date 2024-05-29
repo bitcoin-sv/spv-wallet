@@ -16,7 +16,7 @@ import (
 // @Description	Search access key
 // @Tags		Access-key
 // @Produce		json
-// @Param		SearchAccessKeys body SearchAccessKeys false "Supports targeted resource searches with filters and metadata, plus options for pagination and sorting to streamline data exploration and analysis"
+// @Param		SearchAccessKeys body filter.SearchAccessKeys false "Supports targeted resource searches with filters and metadata, plus options for pagination and sorting to streamline data exploration and analysis"
 // @Success		200 {object} []models.AccessKey "List of access keys"
 // @Failure		400	"Bad request - Error while SearchAccessKeys from request body"
 // @Failure 	500	"Internal server error - Error while searching for access keys"

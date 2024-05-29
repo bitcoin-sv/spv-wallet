@@ -15,7 +15,7 @@ import (
 // @Description	Count of UTXOs
 // @Tags		UTXO
 // @Produce		json
-// @Param		CountUtxos body CountUtxos false "Enables filtering of elements to be counted"
+// @Param		CountUtxos body filter.CountUtxos false "Enables filtering of elements to be counted"
 // @Success		200	{number} int64 "Count of utxos"
 // @Failure		400	"Bad request - Error while parsing CountUtxos from request body"
 // @Failure 	500	"Internal Server Error - Error while fetching count of utxos"
