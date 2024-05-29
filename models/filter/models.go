@@ -14,3 +14,9 @@ type SearchPaymails = SearchModel[AdminPaymailFilter]
 
 // CountPaymails is a model for handling counting filtered paymails
 type CountPaymails = ConditionsModel[AdminPaymailFilter]
+
+// SearchTransactions is a model for handling searching with filters and metadata
+type SearchTransactions = SearchModel[TransactionFilter]
+
+// CountTransactions is a model for handling counting filtered transactions
+type CountTransactions = ConditionsModel[TransactionFilter]

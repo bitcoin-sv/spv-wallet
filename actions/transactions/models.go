@@ -1,10 +1,8 @@
 package transactions
 
 import (
-	"github.com/bitcoin-sv/spv-wallet/actions/common"
 	"github.com/bitcoin-sv/spv-wallet/engine"
 	"github.com/bitcoin-sv/spv-wallet/models"
-	"github.com/bitcoin-sv/spv-wallet/models/filter"
 )
 
 // UpdateTransaction is the model for updating a transaction
@@ -32,9 +30,3 @@ type NewTransaction struct {
 	// Accepts a JSON object for embedding custom metadata, enabling arbitrary additional information to be associated with the resource
 	Metadata engine.Metadata `json:"metadata" swaggertype:"object,string" example:"key:value,key2:value2"`
 }
-
-// SearchTransactions is a model for handling searching with filters and metadata
-type SearchTransactions = common.SearchModel[filter.TransactionFilter]
-
-// CountTransactions is a model for handling counting filtered transactions
-type CountTransactions = common.ConditionsModel[filter.TransactionFilter]
