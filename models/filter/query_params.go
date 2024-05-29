@@ -8,15 +8,6 @@ type QueryParams struct {
 	SortDirection string `json:"sort_direction,omitempty"`
 }
 
-func (qp *QueryParams) DefaultIfNil() {
-	if qp == nil {
-		qp = &QueryParams{
-			Page:     1,
-			PageSize: 10,
-		}
-	}
-}
-
 // DefaultQueryParams will return the default query parameters
 func DefaultQueryParams() *QueryParams {
 	return &QueryParams{
