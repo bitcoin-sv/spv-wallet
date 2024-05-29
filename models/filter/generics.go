@@ -3,7 +3,7 @@ package filter
 // ConditionsModel is a generic model for handling conditions with metadata
 type ConditionsModel[TFilter any] struct {
 	// Custom conditions used for filtering the search results. Every field within the object is optional.
-	Conditions TFilter `json:"conditions"`
+	Conditions *TFilter `json:"conditions"`
 	// Accepts a JSON object for embedding custom metadata, enabling arbitrary additional information to be associated with the resource
 	Metadata *map[string]interface{} `json:"metadata,omitempty" swaggertype:"object,string" example:"key:value,key2:value2"`
 }
