@@ -21,8 +21,12 @@ type PikePaymentServiceProvider struct {
 	client ClientInterface // (pointer) to the Client for accessing SPV Wallet Model methods & etc
 }
 
+// ReferenceIDLength determine the length of the reference ID
+const ReferenceIDLength = 16
+
 // PIKE CONTACT SERVICE PROVIDER METHODS
 
+// AddContact is a method to add a new contact to the pike contact list
 func (p *PikeContactServiceProvider) AddContact(
 	ctx context.Context,
 	requesterPaymailAddress string,
@@ -51,13 +55,14 @@ func (p *PikeContactServiceProvider) AddContact(
 
 // PIKE PAYMENT SERVICE PROVIDER METHODS
 
+// CreatePikeOutputResponse is a method to create new output templates, save destinations and return formatted response
 func (p *PikePaymentServiceProvider) CreatePikeOutputResponse(
 	ctx context.Context,
 	alias, domain, senderPubKey string,
 	satoshis uint64,
 	requestMetadata *server.RequestMetadata,
 ) (*paymail.PikePaymentOutputsResponse, error) {
-	referenceID, err := utils.RandomHex(16)
+	referenceID, err := generateReferenceID()
 	if err != nil {
 		return nil, err
 	}
@@ -122,6 +127,11 @@ func (p *PikePaymentServiceProvider) saveDestinations(
 		}
 	}
 	return nil
+}
+
+func generateReferenceID() (string, error) {
+	referenceID, err := utils.RandomHex(ReferenceIDLength)
+	return referenceID, err
 }
 
 func getPublicKeys(receiverPubKeyHex, senderPubKeyHex string) (*bec.PublicKey, *bec.PublicKey, error) {
