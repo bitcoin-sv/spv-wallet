@@ -10,6 +10,9 @@ type AccessKeyFilter struct {
 
 // ToDbConditions converts filter fields to the datastore conditions using gorm naming strategy
 func (d *AccessKeyFilter) ToDbConditions() map[string]interface{} {
+	if d == nil {
+		return nil
+	}
 	conditions := d.ModelFilter.ToDbConditions()
 
 	// Column names come from the database model, see: /engine/model_access_keys.go
@@ -27,6 +30,9 @@ type AdminAccessKeyFilter struct {
 
 // ToDbConditions converts filter fields to the datastore conditions using gorm naming strategy
 func (d *AdminAccessKeyFilter) ToDbConditions() map[string]interface{} {
+	if d == nil {
+		return nil
+	}
 	conditions := d.AccessKeyFilter.ToDbConditions()
 
 	// Column names come from the database model, see: /engine/model_access_keys.go

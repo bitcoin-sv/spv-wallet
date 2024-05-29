@@ -10,6 +10,9 @@ type DestinationFilter struct {
 
 // ToDbConditions converts filter fields to the datastore conditions using gorm naming strategy
 func (d *DestinationFilter) ToDbConditions() map[string]interface{} {
+	if d == nil {
+		return nil
+	}
 	conditions := d.ModelFilter.ToDbConditions()
 
 	applyIfNotNil(conditions, "locking_script", d.LockingScript)

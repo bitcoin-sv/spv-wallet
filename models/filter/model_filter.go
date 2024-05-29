@@ -14,6 +14,9 @@ type ModelFilter struct {
 
 // ToDbConditions converts filter fields to the datastore conditions using gorm naming strategy
 func (mf *ModelFilter) ToDbConditions() map[string]interface{} {
+	if mf == nil {
+		return nil
+	}
 	conditions := map[string]interface{}{}
 
 	applyConditionsIfNotNil(conditions, "created_at", mf.CreatedRange.ToDbConditions())
