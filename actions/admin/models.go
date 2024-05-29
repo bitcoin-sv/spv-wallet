@@ -57,12 +57,6 @@ type SearchAccessKeys = common.SearchModel[filter.AdminAccessKeyFilter]
 // CountAccessKeys is a model for handling counting filtered transactions
 type CountAccessKeys = common.ConditionsModel[filter.AdminAccessKeyFilter]
 
-// SearchDestinations is a model for handling searching with filters and metadata
-type SearchDestinations = common.SearchModel[filter.DestinationFilter]
-
-// CountDestinations is a model for handling counting filtered destinations
-type CountDestinations = common.ConditionsModel[filter.DestinationFilter]
-
 // SearchTransactions is a model for handling searching with filters and metadata
 type SearchTransactions = common.SearchModel[filter.TransactionFilter]
 
