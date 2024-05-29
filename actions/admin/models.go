@@ -48,9 +48,6 @@ type UpdateContact struct {
 	FullName string `json:"fullName" example:"John Doe"`
 }
 
-// SearchContacts is a model for handling searching with filters and metadata
-type SearchContacts = common.SearchModel[filter.ContactFilter]
-
 // SearchAccessKeys is a model for handling searching with filters and metadata
 type SearchAccessKeys = common.SearchModel[filter.AdminAccessKeyFilter]
 

@@ -5,3 +5,6 @@ type SearchDestinations = SearchModel[DestinationFilter]
 
 // CountDestinations is a model for handling counting filtered destinations
 type CountDestinations = ConditionsModel[DestinationFilter]
+
+// SearchContacts is a model for handling searching with filters and metadata
+type SearchContacts = SearchModel[ContactFilter]

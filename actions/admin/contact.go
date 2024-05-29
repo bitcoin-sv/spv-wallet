@@ -8,6 +8,7 @@ import (
 	"github.com/bitcoin-sv/spv-wallet/engine"
 	"github.com/bitcoin-sv/spv-wallet/mappings"
 	"github.com/bitcoin-sv/spv-wallet/models"
+	"github.com/bitcoin-sv/spv-wallet/models/filter"
 	"github.com/gin-gonic/gin"
 )
 
@@ -24,7 +25,7 @@ import (
 // @Router		/v1/admin/contact/search [post]
 // @Security	x-auth-xpub
 func (a *Action) contactsSearch(c *gin.Context) {
-	var reqParams SearchContacts
+	var reqParams filter.SearchContacts
 	if err := c.Bind(&reqParams); err != nil {
 		c.JSON(http.StatusBadRequest, err.Error())
 		return
@@ -36,15 +37,13 @@ func (a *Action) contactsSearch(c *gin.Context) {
 		return
 	}
 
-	if reqParams.QueryParams == nil {
-		reqParams.QueryParams = common.LoadDefaultQueryParams()
-	}
+	reqParams.DefaultsIfNil()
 
 	contacts, err := a.Services.SpvWalletEngine.GetContacts(
 		c.Request.Context(),
-		reqParams.Metadata,
+		mappings.MapToMetadata(reqParams.Metadata),
 		conditions,
-		reqParams.QueryParams,
+		mappings.MapToQueryParams(reqParams.QueryParams),
 	)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, err.Error())
@@ -55,7 +54,7 @@ func (a *Action) contactsSearch(c *gin.Context) {
 
 	count, err := a.Services.SpvWalletEngine.GetContactsCount(
 		c.Request.Context(),
-		reqParams.Metadata,
+		mappings.MapToMetadata(reqParams.Metadata),
 		conditions,
 	)
 	if err != nil {

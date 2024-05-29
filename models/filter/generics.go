@@ -8,18 +8,17 @@ type ConditionsModel[TFilter any] struct {
 	Metadata *map[string]interface{} `json:"metadata,omitempty" swaggertype:"object,string" example:"key:value,key2:value2"`
 }
 
-// QueryParams object to use when limiting and sorting database query results
-type QueryParams struct {
-	Page          int    `json:"page,omitempty"`
-	PageSize      int    `json:"page_size,omitempty"`
-	OrderByField  string `json:"order_by_field,omitempty"`
-	SortDirection string `json:"sort_direction,omitempty"`
-}
-
 // SearchModel is a generic model for handling searching with filters and metadata
 type SearchModel[TFilter any] struct {
 	ConditionsModel[TFilter]
 
 	// Pagination and sorting options to streamline data exploration and analysis
 	QueryParams *QueryParams `json:"params,omitempty" swaggertype:"object,string" example:"page:1,page_size:10,order_by_field:created_at,order_by_direction:desc"`
+}
+
+// DefaultsIfNil fills empty but neccessary fields with default values
+func (sm *SearchModel[TFilter]) DefaultsIfNil() {
+	if sm.QueryParams == nil {
+		sm.QueryParams = DefaultQueryParams()
+	}
 }
