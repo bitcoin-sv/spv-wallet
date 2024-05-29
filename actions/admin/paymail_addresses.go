@@ -6,6 +6,7 @@ import (
 	"github.com/bitcoin-sv/spv-wallet/engine"
 	"github.com/bitcoin-sv/spv-wallet/mappings"
 	"github.com/bitcoin-sv/spv-wallet/models"
+	"github.com/bitcoin-sv/spv-wallet/models/filter"
 	"github.com/gin-gonic/gin"
 )
 
@@ -60,7 +61,7 @@ func (a *Action) paymailGetAddress(c *gin.Context) {
 // @Router		/v1/admin/paymails/search [post]
 // @Security	x-auth-xpub
 func (a *Action) paymailAddressesSearch(c *gin.Context) {
-	var reqParams SearchPaymails
+	var reqParams filter.SearchPaymails
 	if err := c.Bind(&reqParams); err != nil {
 		c.JSON(http.StatusBadRequest, err.Error())
 		return
@@ -68,9 +69,9 @@ func (a *Action) paymailAddressesSearch(c *gin.Context) {
 
 	paymailAddresses, err := a.Services.SpvWalletEngine.GetPaymailAddresses(
 		c.Request.Context(),
-		reqParams.Metadata,
+		mappings.MapToMetadata(reqParams.Metadata),
 		reqParams.Conditions.ToDbConditions(),
-		reqParams.QueryParams,
+		mappings.MapToQueryParams(reqParams.QueryParams),
 	)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, err.Error())
@@ -98,7 +99,7 @@ func (a *Action) paymailAddressesSearch(c *gin.Context) {
 // @Router		/v1/admin/paymails/count [post]
 // @Security	x-auth-xpub
 func (a *Action) paymailAddressesCount(c *gin.Context) {
-	var reqParams CountPaymails
+	var reqParams filter.CountPaymails
 	if err := c.Bind(&reqParams); err != nil {
 		c.JSON(http.StatusBadRequest, err.Error())
 		return
@@ -106,7 +107,7 @@ func (a *Action) paymailAddressesCount(c *gin.Context) {
 
 	count, err := a.Services.SpvWalletEngine.GetPaymailAddressesCount(
 		c.Request.Context(),
-		reqParams.Metadata,
+		mappings.MapToMetadata(reqParams.Metadata),
 		reqParams.Conditions.ToDbConditions(),
 	)
 	if err != nil {

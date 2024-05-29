@@ -66,17 +66,8 @@ type SearchUtxos = common.SearchModel[filter.AdminUtxoFilter]
 // CountUtxos is a model for handling counting filtered UTXOs
 type CountUtxos = common.ConditionsModel[filter.AdminUtxoFilter]
 
-// SearchPaymails is a model for handling searching with filters and metadata
-type SearchPaymails = common.SearchModel[filter.AdminPaymailFilter]
-
-// CountPaymails is a model for handling counting filtered paymails
-type CountPaymails = common.ConditionsModel[filter.AdminPaymailFilter]
-
 // SearchXpubs is a model for handling searching with filters and metadata
 type SearchXpubs = common.SearchModel[filter.XpubFilter]
 
 // CountXpubs is a model for handling counting filtered xPubs
 type CountXpubs = common.ConditionsModel[filter.XpubFilter]
-
-// CountContacts is a model for handling counting filtered contacts
-type CountContacts = common.ConditionsModel[filter.ContactFilter]
