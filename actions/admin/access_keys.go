@@ -5,6 +5,7 @@ import (
 
 	"github.com/bitcoin-sv/spv-wallet/mappings"
 	"github.com/bitcoin-sv/spv-wallet/models"
+	"github.com/bitcoin-sv/spv-wallet/models/filter"
 	"github.com/gin-gonic/gin"
 )
 
@@ -21,7 +22,7 @@ import (
 // @Router		/v1/admin/access-keys/search [post]
 // @Security	x-auth-xpub
 func (a *Action) accessKeysSearch(c *gin.Context) {
-	var reqParams SearchAccessKeys
+	var reqParams filter.AdminSearchAccessKeys
 	if err := c.Bind(&reqParams); err != nil {
 		c.JSON(http.StatusBadRequest, err.Error())
 		return
@@ -29,9 +30,9 @@ func (a *Action) accessKeysSearch(c *gin.Context) {
 
 	accessKeys, err := a.Services.SpvWalletEngine.GetAccessKeys(
 		c.Request.Context(),
-		reqParams.Metadata,
+		mappings.MapToMetadata(reqParams.Metadata),
 		reqParams.Conditions.ToDbConditions(),
-		reqParams.QueryParams,
+		mappings.MapToQueryParams(reqParams.QueryParams),
 	)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, err.Error())
@@ -59,7 +60,7 @@ func (a *Action) accessKeysSearch(c *gin.Context) {
 // @Router		/v1/admin/access-keys/count [post]
 // @Security	x-auth-xpub
 func (a *Action) accessKeysCount(c *gin.Context) {
-	var reqParams CountAccessKeys
+	var reqParams filter.AdminCountAccessKeys
 	if err := c.Bind(&reqParams); err != nil {
 		c.JSON(http.StatusBadRequest, err.Error())
 		return
@@ -67,7 +68,7 @@ func (a *Action) accessKeysCount(c *gin.Context) {
 
 	count, err := a.Services.SpvWalletEngine.GetAccessKeysCount(
 		c.Request.Context(),
-		reqParams.Metadata,
+		mappings.MapToMetadata(reqParams.Metadata),
 		reqParams.Conditions.ToDbConditions(),
 	)
 	if err != nil {

@@ -61,7 +61,7 @@ func (a *Action) paymailGetAddress(c *gin.Context) {
 // @Router		/v1/admin/paymails/search [post]
 // @Security	x-auth-xpub
 func (a *Action) paymailAddressesSearch(c *gin.Context) {
-	var reqParams filter.SearchPaymails
+	var reqParams filter.AdminSearchPaymails
 	if err := c.Bind(&reqParams); err != nil {
 		c.JSON(http.StatusBadRequest, err.Error())
 		return
@@ -99,7 +99,7 @@ func (a *Action) paymailAddressesSearch(c *gin.Context) {
 // @Router		/v1/admin/paymails/count [post]
 // @Security	x-auth-xpub
 func (a *Action) paymailAddressesCount(c *gin.Context) {
-	var reqParams filter.CountPaymails
+	var reqParams filter.AdminCountPaymails
 	if err := c.Bind(&reqParams); err != nil {
 		c.JSON(http.StatusBadRequest, err.Error())
 		return

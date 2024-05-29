@@ -6,6 +6,7 @@ import (
 	"github.com/bitcoin-sv/spv-wallet/engine"
 	"github.com/bitcoin-sv/spv-wallet/mappings"
 	"github.com/bitcoin-sv/spv-wallet/models"
+	"github.com/bitcoin-sv/spv-wallet/models/filter"
 	"github.com/gin-gonic/gin"
 )
 
@@ -54,7 +55,7 @@ func (a *Action) xpubsCreate(c *gin.Context) {
 // @Router		/v1/admin/xpubs/search [post]
 // @Security	x-auth-xpub
 func (a *Action) xpubsSearch(c *gin.Context) {
-	var reqParams SearchXpubs
+	var reqParams filter.SearchXpubs
 	if err := c.Bind(&reqParams); err != nil {
 		c.JSON(http.StatusBadRequest, err.Error())
 		return
@@ -62,9 +63,9 @@ func (a *Action) xpubsSearch(c *gin.Context) {
 
 	xpubs, err := a.Services.SpvWalletEngine.GetXPubs(
 		c.Request.Context(),
-		reqParams.Metadata,
+		mappings.MapToMetadata(reqParams.Metadata),
 		reqParams.Conditions.ToDbConditions(),
-		reqParams.QueryParams,
+		mappings.MapToQueryParams(reqParams.QueryParams),
 	)
 	if err != nil {
 		c.JSON(http.StatusExpectationFailed, err.Error())
@@ -92,7 +93,7 @@ func (a *Action) xpubsSearch(c *gin.Context) {
 // @Router		/v1/admin/xpubs/count [post]
 // @Security	x-auth-xpub
 func (a *Action) xpubsCount(c *gin.Context) {
-	var reqParams CountXpubs
+	var reqParams filter.CountXpubs
 	if err := c.Bind(&reqParams); err != nil {
 		c.JSON(http.StatusBadRequest, err.Error())
 		return
@@ -100,7 +101,7 @@ func (a *Action) xpubsCount(c *gin.Context) {
 
 	count, err := a.Services.SpvWalletEngine.GetXPubsCount(
 		c.Request.Context(),
-		reqParams.Metadata,
+		mappings.MapToMetadata(reqParams.Metadata),
 		reqParams.Conditions.ToDbConditions(),
 	)
 	if err != nil {
