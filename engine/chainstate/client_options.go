@@ -22,12 +22,13 @@ func defaultClientOptions() *clientOptions {
 	// Set the default options
 	return &clientOptions{
 		config: &syncConfig{
-			httpClient:      nil,
-			network:         MainNet,
-			queryTimeout:    defaultQueryTimeOut,
-			broadcastClient: nil,
-			feeQuotes:       true,
-			feeUnit:         nil, // fee has to be set explicitly or via fee quotes
+			httpClient:            nil,
+			broadcastClientConfig: defaultArcConfig(),
+			network:               MainNet,
+			queryTimeout:          defaultQueryTimeOut,
+			broadcastClient:       nil,
+			feeQuotes:             true,
+			feeUnit:               nil, // fee has to be set explicitly or via fee quotes
 		},
 		debug:           false,
 		newRelicEnabled: false,
