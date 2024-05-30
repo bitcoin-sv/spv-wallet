@@ -13,10 +13,13 @@ import (
 // TestClient_Transaction will test the method QueryTransaction()
 func TestClient_Transaction(t *testing.T) {
 	t.Parallel()
+	bc := broadcast_client_mock.Builder().
+		WithMockArc(broadcast_client_mock.MockSuccess).
+		Build()
 
 	t.Run("error - missing id", func(t *testing.T) {
 		// given
-		c := NewTestClient(context.Background(), t)
+		c := NewTestClient(context.Background(), t, WithBroadcastClient(bc))
 
 		// when
 		info, err := c.QueryTransaction(
@@ -31,7 +34,7 @@ func TestClient_Transaction(t *testing.T) {
 
 	t.Run("error - missing requirements", func(t *testing.T) {
 		// given
-		c := NewTestClient(context.Background(), t)
+		c := NewTestClient(context.Background(), t, WithBroadcastClient(bc))
 
 		// when
 		info, err := c.QueryTransaction(

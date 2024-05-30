@@ -37,12 +37,18 @@ type (
 		callbackToken            string                             // Broadcast callback access token
 		excludedProviders        []string                           // List of provider names
 		httpClient               HTTPInterface                      // Custom HTTP client (Minercraft, WOC)
+		broadcastClientConfig    *broadcastConfig                   // Broadcast client configuration
 		network                  Network                            // Current network (mainnet, testnet, stn)
 		queryTimeout             time.Duration                      // Timeout for transaction query
 		broadcastClient          broadcast.Client                   // Broadcast client
 		blockHedersServiceClient *blockHeadersServiceClientProvider // Block Headers Service client
 		feeUnit                  *utils.FeeUnit                     // The lowest fees among all miners
 		feeQuotes                bool                               // If set, feeUnit will be updated with fee quotes from miner's
+	}
+
+	broadcastConfig struct {
+		protocol  string
+		minerAPIs []string
 	}
 )
 
