@@ -16,7 +16,7 @@ func TestClient_Transaction(t *testing.T) {
 
 	t.Run("error - missing id", func(t *testing.T) {
 		// given
-		c := NewTestClient(context.Background(), t, WithMinercraft(&minerCraftTxOnChain{}))
+		c := NewTestClient(context.Background(), t)
 
 		// when
 		info, err := c.QueryTransaction(
@@ -31,7 +31,7 @@ func TestClient_Transaction(t *testing.T) {
 
 	t.Run("error - missing requirements", func(t *testing.T) {
 		// given
-		c := NewTestClient(context.Background(), t, WithMinercraft(&minerCraftTxOnChain{}))
+		c := NewTestClient(context.Background(), t)
 
 		// when
 		info, err := c.QueryTransaction(
@@ -46,59 +46,6 @@ func TestClient_Transaction(t *testing.T) {
 	})
 }
 
-func TestClient_Transaction_MAPI(t *testing.T) {
-	t.Parallel()
-
-	t.Run("query transaction success - mAPI", func(t *testing.T) {
-		// given
-		c := NewTestClient(
-			context.Background(), t,
-			WithMinercraft(&minerCraftTxOnChain{}),
-		)
-
-		// when
-		info, err := c.QueryTransaction(
-			context.Background(), onChainExample1TxID,
-			RequiredOnChain, defaultQueryTimeOut,
-		)
-
-		// then
-		require.NoError(t, err)
-		require.NotNil(t, info)
-		assert.Equal(t, onChainExample1TxID, info.ID)
-		assert.Equal(t, onChainExample1BlockHash, info.BlockHash)
-		assert.Equal(t, onChainExample1BlockHeight, info.BlockHeight)
-		assert.Equal(t, onChainExample1Confirmations, info.Confirmations)
-		assert.Equal(t, minerTaal.Name, info.Provider)
-		assert.Equal(t, minerTaal.MinerID, info.MinerID)
-	})
-
-	t.Run("valid - test network - mAPI", func(t *testing.T) {
-		// given
-		c := NewTestClient(
-			context.Background(), t,
-			WithMinercraft(&minerCraftTxOnChain{}),
-			WithNetwork(TestNet),
-		)
-
-		// when
-		info, err := c.QueryTransaction(
-			context.Background(), onChainExample1TxID,
-			RequiredOnChain, defaultQueryTimeOut,
-		)
-
-		// then
-		require.NoError(t, err)
-		require.NotNil(t, info)
-		assert.Equal(t, onChainExample1TxID, info.ID)
-		assert.Equal(t, onChainExample1BlockHash, info.BlockHash)
-		assert.Equal(t, onChainExample1BlockHeight, info.BlockHeight)
-		assert.Equal(t, onChainExample1Confirmations, info.Confirmations)
-		assert.Equal(t, minerTaal.Name, info.Provider)
-		assert.Equal(t, minerTaal.MinerID, info.MinerID)
-	})
-}
-
 func TestClient_Transaction_BroadcastClient(t *testing.T) {
 	t.Parallel()
 
@@ -109,7 +56,6 @@ func TestClient_Transaction_BroadcastClient(t *testing.T) {
 			Build()
 		c := NewTestClient(
 			context.Background(), t,
-			WithMinercraft(&MinerCraftBase{}),
 			WithBroadcastClient(bc),
 		)
 
@@ -135,7 +81,6 @@ func TestClient_Transaction_BroadcastClient(t *testing.T) {
 			Build()
 		c := NewTestClient(
 			context.Background(), t,
-			WithMinercraft(&MinerCraftBase{}),
 			WithBroadcastClient(bc),
 			WithNetwork(StressTestNet),
 		)
@@ -162,7 +107,6 @@ func TestClient_Transaction_BroadcastClient(t *testing.T) {
 			Build()
 		c := NewTestClient(
 			context.Background(), t,
-			WithMinercraft(&MinerCraftBase{}),
 			WithBroadcastClient(bc),
 			WithNetwork(TestNet),
 		)
@@ -180,59 +124,6 @@ func TestClient_Transaction_BroadcastClient(t *testing.T) {
 		assert.Equal(t, broadcast_fixtures.TxBlockHash, info.BlockHash)
 		assert.Equal(t, broadcast_fixtures.TxBlockHeight, info.BlockHeight)
 		assert.Equal(t, broadcast_fixtures.ProviderMain, info.Provider)
-	})
-}
-
-func TestClient_Transaction_MAPI_Fastest(t *testing.T) {
-	t.Parallel()
-
-	t.Run("query transaction success - mAPI", func(t *testing.T) {
-		// given
-		c := NewTestClient(
-			context.Background(), t,
-			WithMinercraft(&minerCraftTxOnChain{}),
-		)
-
-		// when
-		info, err := c.QueryTransactionFastest(
-			context.Background(), onChainExample1TxID,
-			RequiredOnChain, defaultQueryTimeOut,
-		)
-
-		// then
-		require.NoError(t, err)
-		require.NotNil(t, info)
-		assert.Equal(t, onChainExample1TxID, info.ID)
-		assert.Equal(t, onChainExample1BlockHash, info.BlockHash)
-		assert.Equal(t, onChainExample1BlockHeight, info.BlockHeight)
-		assert.Equal(t, onChainExample1Confirmations, info.Confirmations)
-		assert.Equal(t, minerTaal.Name, info.Provider)
-		assert.Equal(t, minerTaal.MinerID, info.MinerID)
-	})
-
-	t.Run("valid - test network - mAPI", func(t *testing.T) {
-		// given
-		c := NewTestClient(
-			context.Background(), t,
-			WithMinercraft(&minerCraftTxOnChain{}),
-			WithNetwork(TestNet),
-		)
-
-		// when
-		info, err := c.QueryTransactionFastest(
-			context.Background(), onChainExample1TxID,
-			RequiredOnChain, defaultQueryTimeOut,
-		)
-
-		// then
-		require.NoError(t, err)
-		require.NotNil(t, info)
-		assert.Equal(t, onChainExample1TxID, info.ID)
-		assert.Equal(t, onChainExample1BlockHash, info.BlockHash)
-		assert.Equal(t, onChainExample1BlockHeight, info.BlockHeight)
-		assert.Equal(t, onChainExample1Confirmations, info.Confirmations)
-		assert.Equal(t, minerTaal.Name, info.Provider)
-		assert.Equal(t, minerTaal.MinerID, info.MinerID)
 	})
 }
 
@@ -246,7 +137,6 @@ func TestClient_Transaction_BroadcastClient_Fastest(t *testing.T) {
 			Build()
 		c := NewTestClient(
 			context.Background(), t,
-			WithMinercraft(&MinerCraftBase{}),
 			WithBroadcastClient(bc),
 		)
 
@@ -272,7 +162,6 @@ func TestClient_Transaction_BroadcastClient_Fastest(t *testing.T) {
 			Build()
 		c := NewTestClient(
 			context.Background(), t,
-			WithMinercraft(&MinerCraftBase{}),
 			WithBroadcastClient(bc),
 			WithNetwork(StressTestNet),
 		)
@@ -299,7 +188,6 @@ func TestClient_Transaction_BroadcastClient_Fastest(t *testing.T) {
 			Build()
 		c := NewTestClient(
 			context.Background(), t,
-			WithMinercraft(&MinerCraftBase{}),
 			WithBroadcastClient(bc),
 			WithNetwork(TestNet),
 		)

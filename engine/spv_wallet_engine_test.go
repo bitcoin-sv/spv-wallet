@@ -6,7 +6,7 @@ import (
 	"testing"
 
 	"github.com/DATA-DOG/go-sqlmock"
-	"github.com/bitcoin-sv/spv-wallet/engine/chainstate"
+	broadcast_client_mock "github.com/bitcoin-sv/go-broadcast-client/broadcast/broadcast-client-mock"
 	"github.com/bitcoin-sv/spv-wallet/engine/datastore"
 	"github.com/bitcoin-sv/spv-wallet/engine/taskmanager"
 	"github.com/bitcoin-sv/spv-wallet/engine/tester"
@@ -62,6 +62,9 @@ func DefaultClientOpts(debug, shared bool) []ClientOps {
 	tqc := taskmanager.DefaultTaskQConfig(tester.RandomTablePrefix())
 	tqc.MaxNumWorker = 2
 	tqc.MaxNumFetcher = 2
+	bc := broadcast_client_mock.Builder().
+		WithMockArc(broadcast_client_mock.MockSuccess).
+		Build()
 
 	opts := make([]ClientOps, 0)
 	opts = append(
@@ -69,7 +72,7 @@ func DefaultClientOpts(debug, shared bool) []ClientOps {
 		WithTaskqConfig(tqc),
 		WithSQLite(tester.SQLiteTestConfig(debug, shared)),
 		WithChainstateOptions(false, false, false, false),
-		WithMinercraft(&chainstate.MinerCraftBase{}),
+		WithBroadcastClient(bc),
 	)
 	if debug {
 		opts = append(opts, WithDebugging())
@@ -86,11 +89,12 @@ func CreateTestSQLiteClient(t *testing.T, debug, shared bool, clientOpts ...Clie
 
 	logger := zerolog.Nop()
 
+
 	// Set the default options, add migrate models
 	opts := DefaultClientOpts(debug, shared)
 	opts = append(opts, WithAutoMigrate(append(BaseModels, newPaymail("", 0))...))
 	opts = append(opts, WithLogger(&logger))
-	opts = append(opts, clientOpts...)
+	// opts = append(opts, clientOpts...)
 
 	// Create the client
 	client, err := NewClient(ctx, opts...)

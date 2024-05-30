@@ -9,7 +9,6 @@ import (
 	"github.com/rs/zerolog"
 
 	"github.com/DATA-DOG/go-sqlmock"
-	"github.com/bitcoin-sv/spv-wallet/engine/chainstate"
 	"github.com/bitcoin-sv/spv-wallet/engine/datastore"
 	"github.com/bitcoin-sv/spv-wallet/engine/taskmanager"
 	"github.com/bitcoin-sv/spv-wallet/engine/tester"
@@ -187,7 +186,6 @@ func (ts *EmbeddedDBTestSuite) createTestClient(ctx context.Context, database da
 
 	// Add a custom user agent (future: make this passed into the function via opts)
 	opts = append(opts, WithUserAgent("spv wallet engine test suite"))
-	opts = append(opts, WithMinercraft(&chainstate.MinerCraftBase{}))
 
 	// Create the client
 	testLogger := zerolog.Nop()

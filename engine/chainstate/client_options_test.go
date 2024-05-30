@@ -20,9 +20,12 @@ func TestWithNewRelic(t *testing.T) {
 	})
 
 	t.Run("apply opts", func(t *testing.T) {
+		bc := broadcast_client_mock.Builder().
+			WithMockArc(broadcast_client_mock.MockSuccess).
+			Build()
 		opts := []ClientOps{
 			WithNewRelic(),
-			WithMinercraft(&MinerCraftBase{}),
+			WithBroadcastClient(bc),
 		}
 		c, err := NewClient(context.Background(), opts...)
 		require.NotNil(t, c)
@@ -34,15 +37,20 @@ func TestWithNewRelic(t *testing.T) {
 
 // TestWithDebugging will test the method WithDebugging()
 func TestWithDebugging(t *testing.T) {
+
 	t.Run("get opts", func(t *testing.T) {
 		opt := WithDebugging()
 		assert.IsType(t, *new(ClientOps), opt)
 	})
 
 	t.Run("apply opts", func(t *testing.T) {
+		bc := broadcast_client_mock.Builder().
+			WithMockArc(broadcast_client_mock.MockSuccess).
+			Build()
+
 		opts := []ClientOps{
 			WithDebugging(),
-			WithMinercraft(&MinerCraftBase{}),
+			WithBroadcastClient(bc),
 		}
 		c, err := NewClient(context.Background(), opts...)
 		require.NotNil(t, c)
@@ -78,35 +86,6 @@ func TestWithHTTPClient(t *testing.T) {
 		opt := WithHTTPClient(customClient)
 		opt(options)
 		assert.Equal(t, customClient, options.config.httpClient)
-	})
-}
-
-// TestWithMinercraft will test the method WithMinercraft()
-func TestWithMinercraft(t *testing.T) {
-	t.Parallel()
-
-	t.Run("check type", func(t *testing.T) {
-		opt := WithMinercraft(nil)
-		assert.IsType(t, *new(ClientOps), opt)
-	})
-
-	t.Run("test applying nil", func(t *testing.T) {
-		options := &clientOptions{
-			config: &syncConfig{},
-		}
-		opt := WithMinercraft(nil)
-		opt(options)
-		assert.Nil(t, options.config.minercraft)
-	})
-
-	t.Run("test applying option", func(t *testing.T) {
-		options := &clientOptions{
-			config: &syncConfig{},
-		}
-		customClient := &minerCraftTxOnChain{}
-		opt := WithMinercraft(customClient)
-		opt(options)
-		assert.Equal(t, customClient, options.config.minercraft)
 	})
 }
 
