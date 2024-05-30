@@ -5,14 +5,18 @@ import (
 	"context"
 	"testing"
 
+	broadcast_client_mock "github.com/bitcoin-sv/go-broadcast-client/broadcast/broadcast-client-mock"
 	"github.com/jarcoal/httpmock"
 	"github.com/rs/zerolog"
 	"github.com/stretchr/testify/assert"
 )
 
 func initMockClient(ops ...ClientOps) (*Client, *buffLogger) {
+	bc := broadcast_client_mock.Builder().
+		WithMockArc(broadcast_client_mock.MockSuccess).
+		Build()
 	bLogger := newBuffLogger()
-	ops = append(ops, WithLogger(bLogger.logger))
+	ops = append(ops, WithLogger(bLogger.logger), WithBroadcastClient(bc))
 	c, _ := NewClient(
 		context.Background(),
 		ops...,

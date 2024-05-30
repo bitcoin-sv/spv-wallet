@@ -5,6 +5,7 @@ import (
 	"testing"
 	"time"
 
+	broadcast_client_mock "github.com/bitcoin-sv/go-broadcast-client/broadcast/broadcast-client-mock"
 	"github.com/rs/zerolog"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -23,9 +24,12 @@ func NewTestClient(ctx context.Context, t *testing.T, opts ...ClientOps) ClientI
 
 // TestQueryTransactionFastest tests the querying for a transaction and returns the fastest response
 func TestQueryTransactionFastest(t *testing.T) {
+	bc := broadcast_client_mock.Builder().
+		WithMockArc(broadcast_client_mock.MockSuccess).
+		Build()
 	t.Run("no tx ID", func(t *testing.T) {
 		ctx := context.Background()
-		c := NewTestClient(ctx, t, WithMinercraft(&minerCraftTxOnChain{}))
+		c := NewTestClient(ctx, t, WithBroadcastClient(bc))
 
 		_, err := c.QueryTransactionFastest(ctx, "", RequiredInMempool, 5*time.Second)
 		require.Error(t, err)
@@ -33,7 +37,7 @@ func TestQueryTransactionFastest(t *testing.T) {
 
 	t.Run("fastest query", func(t *testing.T) {
 		ctx := context.Background()
-		c := NewTestClient(ctx, t, WithMinercraft(&minerCraftTxOnChain{}))
+		c := NewTestClient(ctx, t, WithBroadcastClient(bc))
 
 		var txInfo *TransactionInfo
 		txInfo, err := c.QueryTransactionFastest(ctx, onChainExample1TxID, RequiredInMempool, 5*time.Second)

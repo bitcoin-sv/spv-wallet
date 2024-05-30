@@ -2,7 +2,6 @@ package chainstate
 
 import (
 	"context"
-	"strings"
 	"testing"
 	"time"
 
@@ -25,38 +24,6 @@ func Test_doesErrorContain(t *testing.T) {
 	t.Run("does not contain", func(t *testing.T) {
 		success := containsAny("this is the test message", []string{"another", "nope"})
 		assert.Equal(t, false, success)
-	})
-}
-
-// TestClient_Broadcast_MAPI will test the method Broadcast() with MAPI
-func TestClient_Broadcast_MAPI(t *testing.T) {
-	t.Parallel()
-
-	t.Run("broadcast - success (mAPI)", func(t *testing.T) {
-		// given
-		c := NewTestClient(
-			context.Background(), t,
-			WithMinercraft(&minerCraftBroadcastSuccess{}),
-		)
-
-		// when
-		res := c.Broadcast(
-			context.Background(), broadcastExample1TxID, broadcastExample1TxHex, RawTx, defaultBroadcastTimeOut,
-		)
-
-		// then
-		require.NotNil(t, res)
-		require.Nil(t, res.Failure)
-
-		miners := strings.Split(res.Provider, ",")
-		assert.GreaterOrEqual(t, len(miners), 1)
-		assert.True(t, containsAtLeastOneElement(
-			miners,
-			minercraft.MinerTaal,
-			minercraft.MinerMempool,
-			minercraft.MinerGorillaPool,
-			minercraft.MinerMatterpool,
-		))
 	})
 }
 

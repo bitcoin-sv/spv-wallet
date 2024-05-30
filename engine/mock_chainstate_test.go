@@ -47,10 +47,6 @@ func (c *chainStateBase) IsNewRelicEnabled() bool {
 	return true
 }
 
-func (c *chainStateBase) Minercraft() minercraft.ClientInterface {
-	return nil
-}
-
 func (c *chainStateBase) Network() chainstate.Network {
 	return chainstate.MainNet
 }
@@ -72,28 +68,22 @@ func (c *chainStateEverythingInMempool) Broadcast(context.Context, string, strin
 func (c *chainStateEverythingInMempool) QueryTransaction(_ context.Context, id string,
 	_ chainstate.RequiredIn, _ time.Duration,
 ) (*chainstate.TransactionInfo, error) {
-	minerID, _ := utils.RandomHex(32)
 	return &chainstate.TransactionInfo{
-		BlockHash:     "",
-		BlockHeight:   0,
-		Confirmations: 0,
-		ID:            id,
-		MinerID:       minerID,
-		Provider:      "some-miner-name",
+		BlockHash:   "",
+		BlockHeight: 0,
+		ID:          id,
+		Provider:    "some-miner-name",
 	}, nil
 }
 
 func (c *chainStateEverythingInMempool) QueryTransactionFastest(_ context.Context, id string, _ chainstate.RequiredIn,
 	_ time.Duration,
 ) (*chainstate.TransactionInfo, error) {
-	minerID, _ := utils.RandomHex(32)
 	return &chainstate.TransactionInfo{
-		BlockHash:     "",
-		BlockHeight:   0,
-		Confirmations: 0,
-		ID:            id,
-		MinerID:       minerID,
-		Provider:      "some-miner-name",
+		BlockHash:   "",
+		BlockHeight: 0,
+		ID:          id,
+		Provider:    "some-miner-name",
 	}, nil
 }
 
@@ -114,12 +104,10 @@ func (c *chainStateEverythingOnChain) QueryTransaction(_ context.Context, id str
 ) (*chainstate.TransactionInfo, error) {
 	hash, _ := utils.RandomHex(32)
 	return &chainstate.TransactionInfo{
-		BlockHash:     hash,
-		BlockHeight:   600000,
-		Confirmations: 10,
-		ID:            id,
-		MinerID:       "",
-		Provider:      "whatsonchain",
+		BlockHash:   hash,
+		BlockHeight: 600000,
+		ID:          id,
+		Provider:    "whatsonchain",
 		MerkleProof: &bc.MerkleProof{
 			Index:  37008,
 			TxOrID: id,
@@ -133,12 +121,10 @@ func (c *chainStateEverythingOnChain) QueryTransactionFastest(_ context.Context,
 ) (*chainstate.TransactionInfo, error) {
 	hash, _ := utils.RandomHex(32)
 	return &chainstate.TransactionInfo{
-		BlockHash:     hash,
-		BlockHeight:   600000,
-		Confirmations: 10,
-		ID:            id,
-		MinerID:       "",
-		Provider:      "whatsonchain",
+		BlockHash:   hash,
+		BlockHeight: 600000,
+		ID:          id,
+		Provider:    "whatsonchain",
 		MerkleProof: &bc.MerkleProof{
 			Index:  37008,
 			TxOrID: id,
