@@ -258,7 +258,6 @@ func Test_getContact(t *testing.T) {
 }
 
 func Test_getContacts(t *testing.T) {
-
 	t.Run("get by status 'not confirmed'", func(t *testing.T) {
 		// given
 		ctx, client, cleanup := CreateTestSQLiteClient(t, false, false, withTaskManagerMockup())
@@ -272,6 +271,7 @@ func Test_getContacts(t *testing.T) {
 
 		conditions := map[string]interface{}{
 			contactStatusField: ContactNotConfirmed,
+			deletedAtField:     nil,
 		}
 
 		// when
@@ -285,7 +285,6 @@ func Test_getContacts(t *testing.T) {
 		for _, c := range contacts {
 			require.Equal(t, ContactNotConfirmed, c.Status)
 		}
-
 	})
 
 	t.Run("get without conditions - return all", func(t *testing.T) {
@@ -306,7 +305,6 @@ func Test_getContacts(t *testing.T) {
 		require.NoError(t, err)
 		require.NotNil(t, contacts)
 		require.Equal(t, 23, len(contacts))
-
 	})
 
 	t.Run("get without conditions - ensure returned only with correct xpubid", func(t *testing.T) {
@@ -327,10 +325,9 @@ func Test_getContacts(t *testing.T) {
 		require.NoError(t, err)
 		require.NotNil(t, contacts)
 		require.Equal(t, 10, len(contacts))
-
 	})
 
-	t.Run("get without conditions - ensure returned without deleted", func(t *testing.T) {
+	t.Run("get without conditions - ensure returned with deleted", func(t *testing.T) {
 		// given
 		ctx, client, cleanup := CreateTestSQLiteClient(t, false, false, withTaskManagerMockup())
 		defer cleanup()
@@ -347,8 +344,7 @@ func Test_getContacts(t *testing.T) {
 		// then
 		require.NoError(t, err)
 		require.NotNil(t, contacts)
-		require.Equal(t, 10, len(contacts))
-
+		require.Equal(t, 23, len(contacts))
 	})
 }
 
