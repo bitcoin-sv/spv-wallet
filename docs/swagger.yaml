@@ -244,6 +244,46 @@ definitions:
         - $ref: '#/definitions/filter.TimeRange'
         description: UpdatedRange specifies the time range when a record was updated.
     type: object
+  filter.AdminAccessKeyFilter:
+    properties:
+      createdRange:
+        allOf:
+        - $ref: '#/definitions/filter.TimeRange'
+        description: CreatedRange specifies the time range when a record was created.
+      includeDeleted:
+        default: false
+        description: IncludeDeleted is a flag whether or not to include deleted items
+          in the search results
+        example: true
+        type: boolean
+      revokedRange:
+        allOf:
+        - $ref: '#/definitions/filter.TimeRange'
+        description: RevokedRange specifies the time range when a record was revoked.
+      updatedRange:
+        allOf:
+        - $ref: '#/definitions/filter.TimeRange'
+        description: UpdatedRange specifies the time range when a record was updated.
+      xpubId:
+        type: string
+    type: object
+  filter.AdminCountAccessKeys:
+    properties:
+      conditions:
+        allOf:
+        - $ref: '#/definitions/filter.AdminAccessKeyFilter'
+        description: Custom conditions used for filtering the search results. Every
+          field within the object is optional.
+      metadata:
+        additionalProperties:
+          type: string
+        description: Accepts a JSON object for embedding custom metadata, enabling
+          arbitrary additional information to be associated with the resource
+        example:
+          key: value
+          key2: value2
+        type: object
+    type: object
   filter.AdminCountPaymails:
     properties:
       conditions:
@@ -309,6 +349,34 @@ definitions:
       xpubId:
         example: 79f90a6bab0a44402fc64828af820e9465645658aea2d138c5205b88e6dabd00
         type: string
+    type: object
+  filter.AdminSearchAccessKeys:
+    properties:
+      conditions:
+        allOf:
+        - $ref: '#/definitions/filter.AdminAccessKeyFilter'
+        description: Custom conditions used for filtering the search results. Every
+          field within the object is optional.
+      metadata:
+        additionalProperties:
+          type: string
+        description: Accepts a JSON object for embedding custom metadata, enabling
+          arbitrary additional information to be associated with the resource
+        example:
+          key: value
+          key2: value2
+        type: object
+      params:
+        additionalProperties:
+          type: string
+        description: Pagination and sorting options to streamline data exploration
+          and analysis
+        example:
+          order_by_direction: desc
+          order_by_field: created_at
+          page: "1"
+          page_size: "10"
+        type: object
     type: object
   filter.AdminSearchPaymails:
     properties:
@@ -1719,6 +1787,8 @@ definitions:
     - 1000000000
     - 60000000000
     - 3600000000000
+    - -9223372036854775808
+    - 9223372036854775807
     - 1
     - 1000
     - 1000000
@@ -1735,6 +1805,8 @@ definitions:
     - Second
     - Minute
     - Hour
+    - minDuration
+    - maxDuration
     - Nanosecond
     - Microsecond
     - Millisecond
@@ -1962,7 +2034,7 @@ paths:
         in: body
         name: CountAccessKeys
         schema:
-          $ref: '#/definitions/filter.CountAccessKeys'
+          $ref: '#/definitions/filter.AdminCountAccessKeys'
       produces:
       - application/json
       responses:
@@ -1991,7 +2063,7 @@ paths:
         in: body
         name: SearchAccessKeys
         schema:
-          $ref: '#/definitions/filter.SearchAccessKeys'
+          $ref: '#/definitions/filter.AdminSearchAccessKeys'
       produces:
       - application/json
       responses:

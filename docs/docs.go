@@ -277,7 +277,7 @@ const docTemplate = `{
                         "name": "CountAccessKeys",
                         "in": "body",
                         "schema": {
-                            "$ref": "#/definitions/filter.CountAccessKeys"
+                            "$ref": "#/definitions/filter.AdminCountAccessKeys"
                         }
                     }
                 ],
@@ -318,7 +318,7 @@ const docTemplate = `{
                         "name": "SearchAccessKeys",
                         "in": "body",
                         "schema": {
-                            "$ref": "#/definitions/filter.SearchAccessKeys"
+                            "$ref": "#/definitions/filter.AdminSearchAccessKeys"
                         }
                     }
                 ],
@@ -2454,6 +2454,68 @@ const docTemplate = `{
                 }
             }
         },
+        "filter.AdminAccessKeyFilter": {
+            "type": "object",
+            "properties": {
+                "createdRange": {
+                    "description": "CreatedRange specifies the time range when a record was created.",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/filter.TimeRange"
+                        }
+                    ]
+                },
+                "includeDeleted": {
+                    "description": "IncludeDeleted is a flag whether or not to include deleted items in the search results",
+                    "type": "boolean",
+                    "default": false,
+                    "example": true
+                },
+                "revokedRange": {
+                    "description": "RevokedRange specifies the time range when a record was revoked.",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/filter.TimeRange"
+                        }
+                    ]
+                },
+                "updatedRange": {
+                    "description": "UpdatedRange specifies the time range when a record was updated.",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/filter.TimeRange"
+                        }
+                    ]
+                },
+                "xpubId": {
+                    "type": "string"
+                }
+            }
+        },
+        "filter.AdminCountAccessKeys": {
+            "type": "object",
+            "properties": {
+                "conditions": {
+                    "description": "Custom conditions used for filtering the search results. Every field within the object is optional.",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/filter.AdminAccessKeyFilter"
+                        }
+                    ]
+                },
+                "metadata": {
+                    "description": "Accepts a JSON object for embedding custom metadata, enabling arbitrary additional information to be associated with the resource",
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "string"
+                    },
+                    "example": {
+                        "key": "value",
+                        "key2": "value2"
+                    }
+                }
+            }
+        },
         "filter.AdminCountPaymails": {
             "type": "object",
             "properties": {
@@ -2546,6 +2608,43 @@ const docTemplate = `{
                 "xpubId": {
                     "type": "string",
                     "example": "79f90a6bab0a44402fc64828af820e9465645658aea2d138c5205b88e6dabd00"
+                }
+            }
+        },
+        "filter.AdminSearchAccessKeys": {
+            "type": "object",
+            "properties": {
+                "conditions": {
+                    "description": "Custom conditions used for filtering the search results. Every field within the object is optional.",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/filter.AdminAccessKeyFilter"
+                        }
+                    ]
+                },
+                "metadata": {
+                    "description": "Accepts a JSON object for embedding custom metadata, enabling arbitrary additional information to be associated with the resource",
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "string"
+                    },
+                    "example": {
+                        "key": "value",
+                        "key2": "value2"
+                    }
+                },
+                "params": {
+                    "description": "Pagination and sorting options to streamline data exploration and analysis",
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "string"
+                    },
+                    "example": {
+                        "order_by_direction": "desc",
+                        "order_by_field": "created_at",
+                        "page": "1",
+                        "page_size": "10"
+                    }
                 }
             }
         },
@@ -4457,6 +4556,8 @@ const docTemplate = `{
                 1000000000,
                 60000000000,
                 3600000000000,
+                -9223372036854775808,
+                9223372036854775807,
                 1,
                 1000,
                 1000000,
@@ -4473,6 +4574,8 @@ const docTemplate = `{
                 "Second",
                 "Minute",
                 "Hour",
+                "minDuration",
+                "maxDuration",
                 "Nanosecond",
                 "Microsecond",
                 "Millisecond",
