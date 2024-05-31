@@ -75,7 +75,7 @@ nodes:
   # deployment id used annotating api calls in XDeployment-ID header - this value will be randomly generated if not set
   _deployment_id: spv-wallet-deployment-id
   callback:
-    callback_host: https://xyz.com
+    callback_host: https://example.com
     # token to authenticate callback calls - default callback token will be generated from the Admin Key
     _callback_token: 44a82509
   # protocol - arc/mapi (arc is default)
