@@ -1,4 +1,4 @@
-package admin
+package sharedconfig
 
 import (
 	"net/http"
@@ -12,12 +12,12 @@ import (
 // Get shared config godoc
 // @Summary		Get shared config
 // @Description	Get shared config
-// @Tags		Admin
+// @Tags		Shared-config
 // @Produce		json
 // @Success		200 {object} models.SharedConfig "Shared configuration"
-// @Router		/v1/admin/shared-config [get]
+// @Router		/v1/shared-config [get]
 // @Security	x-auth-xpub
-func (a *Action) sharedConfig(c *gin.Context) {
+func (a *Action) get(c *gin.Context) {
 	makeConfig := sync.OnceValue(func() models.SharedConfig {
 		return models.SharedConfig{
 			PaymailDomains: a.AppConfig.Paymail.Domains,

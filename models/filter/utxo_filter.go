@@ -20,6 +20,9 @@ var validUtxoTypes = getEnumValues[UtxoFilter]("Type")
 
 // ToDbConditions converts filter fields to the datastore conditions using gorm naming strategy
 func (d *UtxoFilter) ToDbConditions() (map[string]interface{}, error) {
+	if d == nil {
+		return nil, nil
+	}
 	conditions := d.ModelFilter.ToDbConditions()
 
 	// Column names come from the database model, see: /engine/model_utxos.go
@@ -47,6 +50,9 @@ type AdminUtxoFilter struct {
 
 // ToDbConditions converts filter fields to the datastore conditions using gorm naming strategy
 func (d *AdminUtxoFilter) ToDbConditions() (map[string]interface{}, error) {
+	if d == nil {
+		return nil, nil
+	}
 	conditions, err := d.UtxoFilter.ToDbConditions()
 	if err != nil {
 		return nil, err

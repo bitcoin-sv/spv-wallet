@@ -13,6 +13,9 @@ type AdminPaymailFilter struct {
 
 // ToDbConditions converts filter fields to the datastore conditions using gorm naming strategy
 func (d *AdminPaymailFilter) ToDbConditions() map[string]interface{} {
+	if d == nil {
+		return nil
+	}
 	conditions := d.ModelFilter.ToDbConditions()
 
 	// Column names come from the database model, see: /engine/model_paymail_addresses.go

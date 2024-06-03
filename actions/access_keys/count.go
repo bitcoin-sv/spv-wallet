@@ -3,6 +3,8 @@ package accesskeys
 import (
 	"net/http"
 
+	"github.com/bitcoin-sv/spv-wallet/mappings"
+	"github.com/bitcoin-sv/spv-wallet/models/filter"
 	"github.com/bitcoin-sv/spv-wallet/server/auth"
 	"github.com/gin-gonic/gin"
 )
@@ -13,7 +15,7 @@ import (
 // @Description	Count of access keys
 // @Tags		Access-key
 // @Produce		json
-// @Param		CountAccessKeys body CountAccessKeys false "Enables filtering of elements to be counted"
+// @Param		CountAccessKeys body filter.CountAccessKeys false "Enables filtering of elements to be counted"
 // @Success		200	{number} int64 "Count of access keys"
 // @Failure		400	"Bad request - Error while parsing CountAccessKeys from request body"
 // @Failure 	500	"Internal Server Error - Error while fetching count of access keys"
@@ -22,7 +24,7 @@ import (
 func (a *Action) count(c *gin.Context) {
 	reqXPubID := c.GetString(auth.ParamXPubHashKey)
 
-	var reqParams CountAccessKeys
+	var reqParams filter.CountAccessKeys
 	if err := c.Bind(&reqParams); err != nil {
 		c.JSON(http.StatusBadRequest, err.Error())
 		return
@@ -31,7 +33,7 @@ func (a *Action) count(c *gin.Context) {
 	count, err := a.Services.SpvWalletEngine.GetAccessKeysByXPubIDCount(
 		c.Request.Context(),
 		reqXPubID,
-		reqParams.Metadata,
+		mappings.MapToMetadata(reqParams.Metadata),
 		reqParams.Conditions.ToDbConditions(),
 	)
 	if err != nil {

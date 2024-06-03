@@ -1,9 +1,7 @@
 package admin
 
 import (
-	"github.com/bitcoin-sv/spv-wallet/actions/common"
 	"github.com/bitcoin-sv/spv-wallet/engine"
-	"github.com/bitcoin-sv/spv-wallet/models/filter"
 )
 
 // CreatePaymail is the model for creating a paymail
@@ -48,44 +46,3 @@ type UpdateContact struct {
 	FullName string `json:"fullName" example:"John Doe"`
 }
 
-// SearchContacts is a model for handling searching with filters and metadata
-type SearchContacts = common.SearchModel[filter.ContactFilter]
-
-// SearchAccessKeys is a model for handling searching with filters and metadata
-type SearchAccessKeys = common.SearchModel[filter.AdminAccessKeyFilter]
-
-// CountAccessKeys is a model for handling counting filtered transactions
-type CountAccessKeys = common.ConditionsModel[filter.AdminAccessKeyFilter]
-
-// SearchDestinations is a model for handling searching with filters and metadata
-type SearchDestinations = common.SearchModel[filter.DestinationFilter]
-
-// CountDestinations is a model for handling counting filtered destinations
-type CountDestinations = common.ConditionsModel[filter.DestinationFilter]
-
-// SearchTransactions is a model for handling searching with filters and metadata
-type SearchTransactions = common.SearchModel[filter.TransactionFilter]
-
-// CountTransactions is a model for handling counting filtered transactions
-type CountTransactions = common.ConditionsModel[filter.TransactionFilter]
-
-// SearchUtxos is a model for handling searching with filters and metadata
-type SearchUtxos = common.SearchModel[filter.AdminUtxoFilter]
-
-// CountUtxos is a model for handling counting filtered UTXOs
-type CountUtxos = common.ConditionsModel[filter.AdminUtxoFilter]
-
-// SearchPaymails is a model for handling searching with filters and metadata
-type SearchPaymails = common.SearchModel[filter.AdminPaymailFilter]
-
-// CountPaymails is a model for handling counting filtered paymails
-type CountPaymails = common.ConditionsModel[filter.AdminPaymailFilter]
-
-// SearchXpubs is a model for handling searching with filters and metadata
-type SearchXpubs = common.SearchModel[filter.XpubFilter]
-
-// CountXpubs is a model for handling counting filtered xPubs
-type CountXpubs = common.ConditionsModel[filter.XpubFilter]
-
-// CountContacts is a model for handling counting filtered contacts
-type CountContacts = common.ConditionsModel[filter.ContactFilter]
