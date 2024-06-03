@@ -20,8 +20,8 @@ require (
 	github.com/libsv/go-bk v0.1.6
 	github.com/libsv/go-bt v1.0.8
 	github.com/libsv/go-bt/v2 v2.2.5
-	github.com/mrz1836/go-cache v0.9.7
-	github.com/mrz1836/go-cachestore v0.3.10
+	github.com/mrz1836/go-cache v0.10.0
+	github.com/mrz1836/go-cachestore v0.4.1
 	github.com/mrz1836/go-logger v0.3.3
 	github.com/newrelic/go-agent/v3 v3.33.0
 	github.com/pkg/errors v0.9.1
@@ -118,7 +118,7 @@ require (
 	golang.org/x/sys v0.20.0 // indirect
 	golang.org/x/text v0.15.0 // indirect
 	golang.org/x/tools v0.21.0 // indirect
-	google.golang.org/genproto/googleapis/rpc v0.0.0-20240521202816-d264139d666e // indirect
+	google.golang.org/genproto/googleapis/rpc v0.0.0-20240528184218-531527333157 // indirect
 	google.golang.org/grpc v1.64.0 // indirect
 	google.golang.org/protobuf v1.34.1 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
