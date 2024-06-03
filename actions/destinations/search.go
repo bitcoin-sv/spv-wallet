@@ -5,6 +5,7 @@ import (
 
 	"github.com/bitcoin-sv/spv-wallet/mappings"
 	"github.com/bitcoin-sv/spv-wallet/models"
+	"github.com/bitcoin-sv/spv-wallet/models/filter"
 	"github.com/bitcoin-sv/spv-wallet/server/auth"
 	"github.com/gin-gonic/gin"
 )
@@ -15,7 +16,7 @@ import (
 // @Description	Search for a destination
 // @Tags		Destinations
 // @Produce		json
-// @Param		SearchDestinations body SearchDestinations false "Supports targeted resource searches with filters and metadata, plus options for pagination and sorting to streamline data exploration and analysis"
+// @Param		SearchDestinations body filter.SearchDestinations false "Supports targeted resource searches with filters and metadata, plus options for pagination and sorting to streamline data exploration and analysis"
 // @Success		200 {object} []models.Destination "List of destinations
 // @Failure		400	"Bad request - Error while parsing SearchDestinations from request body"
 // @Failure 	500	"Internal server error - Error while searching for destinations"
@@ -24,7 +25,7 @@ import (
 func (a *Action) search(c *gin.Context) {
 	reqXPubID := c.GetString(auth.ParamXPubHashKey)
 
-	var reqParams SearchDestinations
+	var reqParams filter.SearchDestinations
 	if err := c.Bind(&reqParams); err != nil {
 		c.JSON(http.StatusBadRequest, err.Error())
 		return
@@ -33,9 +34,9 @@ func (a *Action) search(c *gin.Context) {
 	destinations, err := a.Services.SpvWalletEngine.GetDestinationsByXpubID(
 		c.Request.Context(),
 		reqXPubID,
-		reqParams.Metadata,
+		mappings.MapToMetadata(reqParams.Metadata),
 		reqParams.Conditions.ToDbConditions(),
-		reqParams.QueryParams,
+		mappings.MapToQueryParams(reqParams.QueryParams),
 	)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, err.Error())

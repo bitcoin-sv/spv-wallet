@@ -1,153 +1,6 @@
 definitions:
-  accesskeys.CountAccessKeys:
-    properties:
-      conditions:
-        allOf:
-        - $ref: '#/definitions/filter.AccessKeyFilter'
-        description: Custom conditions used for filtering the search results. Every
-          field within the object is optional.
-      metadata:
-        additionalProperties:
-          type: string
-        description: Accepts a JSON object for embedding custom metadata, enabling
-          arbitrary additional information to be associated with the resource
-        example:
-          key: value
-          key2: value2
-        type: object
-    type: object
   accesskeys.CreateAccessKey:
     properties:
-      metadata:
-        additionalProperties:
-          type: string
-        description: Accepts a JSON object for embedding custom metadata, enabling
-          arbitrary additional information to be associated with the resource
-        example:
-          key: value
-          key2: value2
-        type: object
-    type: object
-  accesskeys.SearchAccessKeys:
-    properties:
-      conditions:
-        allOf:
-        - $ref: '#/definitions/filter.AccessKeyFilter'
-        description: Custom conditions used for filtering the search results. Every
-          field within the object is optional.
-      metadata:
-        additionalProperties:
-          type: string
-        description: Accepts a JSON object for embedding custom metadata, enabling
-          arbitrary additional information to be associated with the resource
-        example:
-          key: value
-          key2: value2
-        type: object
-      params:
-        additionalProperties:
-          type: string
-        description: Pagination and sorting options to streamline data exploration
-          and analysis
-        example:
-          order_by_direction: desc
-          order_by_field: created_at
-          page: "1"
-          page_size: "10"
-        type: object
-    type: object
-  admin.CountAccessKeys:
-    properties:
-      conditions:
-        allOf:
-        - $ref: '#/definitions/filter.AdminAccessKeyFilter'
-        description: Custom conditions used for filtering the search results. Every
-          field within the object is optional.
-      metadata:
-        additionalProperties:
-          type: string
-        description: Accepts a JSON object for embedding custom metadata, enabling
-          arbitrary additional information to be associated with the resource
-        example:
-          key: value
-          key2: value2
-        type: object
-    type: object
-  admin.CountDestinations:
-    properties:
-      conditions:
-        allOf:
-        - $ref: '#/definitions/filter.DestinationFilter'
-        description: Custom conditions used for filtering the search results. Every
-          field within the object is optional.
-      metadata:
-        additionalProperties:
-          type: string
-        description: Accepts a JSON object for embedding custom metadata, enabling
-          arbitrary additional information to be associated with the resource
-        example:
-          key: value
-          key2: value2
-        type: object
-    type: object
-  admin.CountPaymails:
-    properties:
-      conditions:
-        allOf:
-        - $ref: '#/definitions/filter.AdminPaymailFilter'
-        description: Custom conditions used for filtering the search results. Every
-          field within the object is optional.
-      metadata:
-        additionalProperties:
-          type: string
-        description: Accepts a JSON object for embedding custom metadata, enabling
-          arbitrary additional information to be associated with the resource
-        example:
-          key: value
-          key2: value2
-        type: object
-    type: object
-  admin.CountTransactions:
-    properties:
-      conditions:
-        allOf:
-        - $ref: '#/definitions/filter.TransactionFilter'
-        description: Custom conditions used for filtering the search results. Every
-          field within the object is optional.
-      metadata:
-        additionalProperties:
-          type: string
-        description: Accepts a JSON object for embedding custom metadata, enabling
-          arbitrary additional information to be associated with the resource
-        example:
-          key: value
-          key2: value2
-        type: object
-    type: object
-  admin.CountUtxos:
-    properties:
-      conditions:
-        allOf:
-        - $ref: '#/definitions/filter.AdminUtxoFilter'
-        description: Custom conditions used for filtering the search results. Every
-          field within the object is optional.
-      metadata:
-        additionalProperties:
-          type: string
-        description: Accepts a JSON object for embedding custom metadata, enabling
-          arbitrary additional information to be associated with the resource
-        example:
-          key: value
-          key2: value2
-        type: object
-    type: object
-  admin.CountXpubs:
-    properties:
-      conditions:
-        allOf:
-        - $ref: '#/definitions/filter.XpubFilter'
-        description: Custom conditions used for filtering the search results. Every
-          field within the object is optional.
       metadata:
         additionalProperties:
           type: string
@@ -215,202 +68,6 @@ definitions:
         description: The transaction hex
         example: 0100000002...
         type: string
-    type: object
-  admin.SearchAccessKeys:
-    properties:
-      conditions:
-        allOf:
-        - $ref: '#/definitions/filter.AdminAccessKeyFilter'
-        description: Custom conditions used for filtering the search results. Every
-          field within the object is optional.
-      metadata:
-        additionalProperties:
-          type: string
-        description: Accepts a JSON object for embedding custom metadata, enabling
-          arbitrary additional information to be associated with the resource
-        example:
-          key: value
-          key2: value2
-        type: object
-      params:
-        additionalProperties:
-          type: string
-        description: Pagination and sorting options to streamline data exploration
-          and analysis
-        example:
-          order_by_direction: desc
-          order_by_field: created_at
-          page: "1"
-          page_size: "10"
-        type: object
-    type: object
-  admin.SearchContacts:
-    properties:
-      conditions:
-        allOf:
-        - $ref: '#/definitions/filter.ContactFilter'
-        description: Custom conditions used for filtering the search results. Every
-          field within the object is optional.
-      metadata:
-        additionalProperties:
-          type: string
-        description: Accepts a JSON object for embedding custom metadata, enabling
-          arbitrary additional information to be associated with the resource
-        example:
-          key: value
-          key2: value2
-        type: object
-      params:
-        additionalProperties:
-          type: string
-        description: Pagination and sorting options to streamline data exploration
-          and analysis
-        example:
-          order_by_direction: desc
-          order_by_field: created_at
-          page: "1"
-          page_size: "10"
-        type: object
-    type: object
-  admin.SearchDestinations:
-    properties:
-      conditions:
-        allOf:
-        - $ref: '#/definitions/filter.DestinationFilter'
-        description: Custom conditions used for filtering the search results. Every
-          field within the object is optional.
-      metadata:
-        additionalProperties:
-          type: string
-        description: Accepts a JSON object for embedding custom metadata, enabling
-          arbitrary additional information to be associated with the resource
-        example:
-          key: value
-          key2: value2
-        type: object
-      params:
-        additionalProperties:
-          type: string
-        description: Pagination and sorting options to streamline data exploration
-          and analysis
-        example:
-          order_by_direction: desc
-          order_by_field: created_at
-          page: "1"
-          page_size: "10"
-        type: object
-    type: object
-  admin.SearchPaymails:
-    properties:
-      conditions:
-        allOf:
-        - $ref: '#/definitions/filter.AdminPaymailFilter'
-        description: Custom conditions used for filtering the search results. Every
-          field within the object is optional.
-      metadata:
-        additionalProperties:
-          type: string
-        description: Accepts a JSON object for embedding custom metadata, enabling
-          arbitrary additional information to be associated with the resource
-        example:
-          key: value
-          key2: value2
-        type: object
-      params:
-        additionalProperties:
-          type: string
-        description: Pagination and sorting options to streamline data exploration
-          and analysis
-        example:
-          order_by_direction: desc
-          order_by_field: created_at
-          page: "1"
-          page_size: "10"
-        type: object
-    type: object
-  admin.SearchTransactions:
-    properties:
-      conditions:
-        allOf:
-        - $ref: '#/definitions/filter.TransactionFilter'
-        description: Custom conditions used for filtering the search results. Every
-          field within the object is optional.
-      metadata:
-        additionalProperties:
-          type: string
-        description: Accepts a JSON object for embedding custom metadata, enabling
-          arbitrary additional information to be associated with the resource
-        example:
-          key: value
-          key2: value2
-        type: object
-      params:
-        additionalProperties:
-          type: string
-        description: Pagination and sorting options to streamline data exploration
-          and analysis
-        example:
-          order_by_direction: desc
-          order_by_field: created_at
-          page: "1"
-          page_size: "10"
-        type: object
-    type: object
-  admin.SearchUtxos:
-    properties:
-      conditions:
-        allOf:
-        - $ref: '#/definitions/filter.AdminUtxoFilter'
-        description: Custom conditions used for filtering the search results. Every
-          field within the object is optional.
-      metadata:
-        additionalProperties:
-          type: string
-        description: Accepts a JSON object for embedding custom metadata, enabling
-          arbitrary additional information to be associated with the resource
-        example:
-          key: value
-          key2: value2
-        type: object
-      params:
-        additionalProperties:
-          type: string
-        description: Pagination and sorting options to streamline data exploration
-          and analysis
-        example:
-          order_by_direction: desc
-          order_by_field: created_at
-          page: "1"
-          page_size: "10"
-        type: object
-    type: object
-  admin.SearchXpubs:
-    properties:
-      conditions:
-        allOf:
-        - $ref: '#/definitions/filter.XpubFilter'
-        description: Custom conditions used for filtering the search results. Every
-          field within the object is optional.
-      metadata:
-        additionalProperties:
-          type: string
-        description: Accepts a JSON object for embedding custom metadata, enabling
-          arbitrary additional information to be associated with the resource
-        example:
-          key: value
-          key2: value2
-        type: object
-      params:
-        additionalProperties:
-          type: string
-        description: Pagination and sorting options to streamline data exploration
-          and analysis
-        example:
-          order_by_direction: desc
-          order_by_field: created_at
-          page: "1"
-          page_size: "10"
-        type: object
     type: object
   admin.UpdateContact:
     properties:
@@ -507,34 +164,6 @@ definitions:
     - SeenInOrphanMempool
     - Confirmed
     - Rejected
-  contacts.SearchContacts:
-    properties:
-      conditions:
-        allOf:
-        - $ref: '#/definitions/filter.ContactFilter'
-        description: Custom conditions used for filtering the search results. Every
-          field within the object is optional.
-      metadata:
-        additionalProperties:
-          type: string
-        description: Accepts a JSON object for embedding custom metadata, enabling
-          arbitrary additional information to be associated with the resource
-        example:
-          key: value
-          key2: value2
-        type: object
-      params:
-        additionalProperties:
-          type: string
-        description: Pagination and sorting options to streamline data exploration
-          and analysis
-        example:
-          order_by_direction: desc
-          order_by_field: created_at
-          page: "1"
-          page_size: "10"
-        type: object
-    type: object
   contacts.UpsertContact:
     properties:
       fullName:
@@ -555,23 +184,6 @@ definitions:
           to. It is required in case if user has multiple paymail addresses
         type: string
     type: object
-  destinations.CountDestinations:
-    properties:
-      conditions:
-        allOf:
-        - $ref: '#/definitions/filter.DestinationFilter'
-        description: Custom conditions used for filtering the search results. Every
-          field within the object is optional.
-      metadata:
-        additionalProperties:
-          type: string
-        description: Accepts a JSON object for embedding custom metadata, enabling
-          arbitrary additional information to be associated with the resource
-        example:
-          key: value
-          key2: value2
-        type: object
-    type: object
   destinations.CreateDestination:
     properties:
       metadata:
@@ -582,34 +194,6 @@ definitions:
         example:
           key: value
           key2: value2
-        type: object
-    type: object
-  destinations.SearchDestinations:
-    properties:
-      conditions:
-        allOf:
-        - $ref: '#/definitions/filter.DestinationFilter'
-        description: Custom conditions used for filtering the search results. Every
-          field within the object is optional.
-      metadata:
-        additionalProperties:
-          type: string
-        description: Accepts a JSON object for embedding custom metadata, enabling
-          arbitrary additional information to be associated with the resource
-        example:
-          key: value
-          key2: value2
-        type: object
-      params:
-        additionalProperties:
-          type: string
-        description: Pagination and sorting options to streamline data exploration
-          and analysis
-        example:
-          order_by_direction: desc
-          order_by_field: created_at
-          page: "1"
-          page_size: "10"
         type: object
     type: object
   destinations.UpdateDestination:
@@ -683,6 +267,57 @@ definitions:
       xpubId:
         type: string
     type: object
+  filter.AdminCountAccessKeys:
+    properties:
+      conditions:
+        allOf:
+        - $ref: '#/definitions/filter.AdminAccessKeyFilter'
+        description: Custom conditions used for filtering the search results. Every
+          field within the object is optional.
+      metadata:
+        additionalProperties:
+          type: string
+        description: Accepts a JSON object for embedding custom metadata, enabling
+          arbitrary additional information to be associated with the resource
+        example:
+          key: value
+          key2: value2
+        type: object
+    type: object
+  filter.AdminCountPaymails:
+    properties:
+      conditions:
+        allOf:
+        - $ref: '#/definitions/filter.AdminPaymailFilter'
+        description: Custom conditions used for filtering the search results. Every
+          field within the object is optional.
+      metadata:
+        additionalProperties:
+          type: string
+        description: Accepts a JSON object for embedding custom metadata, enabling
+          arbitrary additional information to be associated with the resource
+        example:
+          key: value
+          key2: value2
+        type: object
+    type: object
+  filter.AdminCountUtxos:
+    properties:
+      conditions:
+        allOf:
+        - $ref: '#/definitions/filter.AdminUtxoFilter'
+        description: Custom conditions used for filtering the search results. Every
+          field within the object is optional.
+      metadata:
+        additionalProperties:
+          type: string
+        description: Accepts a JSON object for embedding custom metadata, enabling
+          arbitrary additional information to be associated with the resource
+        example:
+          key: value
+          key2: value2
+        type: object
+    type: object
   filter.AdminPaymailFilter:
     properties:
       alias:
@@ -714,6 +349,90 @@ definitions:
       xpubId:
         example: 79f90a6bab0a44402fc64828af820e9465645658aea2d138c5205b88e6dabd00
         type: string
+    type: object
+  filter.AdminSearchAccessKeys:
+    properties:
+      conditions:
+        allOf:
+        - $ref: '#/definitions/filter.AdminAccessKeyFilter'
+        description: Custom conditions used for filtering the search results. Every
+          field within the object is optional.
+      metadata:
+        additionalProperties:
+          type: string
+        description: Accepts a JSON object for embedding custom metadata, enabling
+          arbitrary additional information to be associated with the resource
+        example:
+          key: value
+          key2: value2
+        type: object
+      params:
+        additionalProperties:
+          type: string
+        description: Pagination and sorting options to streamline data exploration
+          and analysis
+        example:
+          order_by_direction: desc
+          order_by_field: created_at
+          page: "1"
+          page_size: "10"
+        type: object
+    type: object
+  filter.AdminSearchPaymails:
+    properties:
+      conditions:
+        allOf:
+        - $ref: '#/definitions/filter.AdminPaymailFilter'
+        description: Custom conditions used for filtering the search results. Every
+          field within the object is optional.
+      metadata:
+        additionalProperties:
+          type: string
+        description: Accepts a JSON object for embedding custom metadata, enabling
+          arbitrary additional information to be associated with the resource
+        example:
+          key: value
+          key2: value2
+        type: object
+      params:
+        additionalProperties:
+          type: string
+        description: Pagination and sorting options to streamline data exploration
+          and analysis
+        example:
+          order_by_direction: desc
+          order_by_field: created_at
+          page: "1"
+          page_size: "10"
+        type: object
+    type: object
+  filter.AdminSearchUtxos:
+    properties:
+      conditions:
+        allOf:
+        - $ref: '#/definitions/filter.AdminUtxoFilter'
+        description: Custom conditions used for filtering the search results. Every
+          field within the object is optional.
+      metadata:
+        additionalProperties:
+          type: string
+        description: Accepts a JSON object for embedding custom metadata, enabling
+          arbitrary additional information to be associated with the resource
+        example:
+          key: value
+          key2: value2
+        type: object
+      params:
+        additionalProperties:
+          type: string
+        description: Pagination and sorting options to streamline data exploration
+          and analysis
+        example:
+          order_by_direction: desc
+          order_by_field: created_at
+          page: "1"
+          page_size: "10"
+        type: object
     type: object
   filter.AdminUtxoFilter:
     properties:
@@ -807,6 +526,91 @@ definitions:
         - $ref: '#/definitions/filter.TimeRange'
         description: UpdatedRange specifies the time range when a record was updated.
     type: object
+  filter.CountAccessKeys:
+    properties:
+      conditions:
+        allOf:
+        - $ref: '#/definitions/filter.AccessKeyFilter'
+        description: Custom conditions used for filtering the search results. Every
+          field within the object is optional.
+      metadata:
+        additionalProperties:
+          type: string
+        description: Accepts a JSON object for embedding custom metadata, enabling
+          arbitrary additional information to be associated with the resource
+        example:
+          key: value
+          key2: value2
+        type: object
+    type: object
+  filter.CountDestinations:
+    properties:
+      conditions:
+        allOf:
+        - $ref: '#/definitions/filter.DestinationFilter'
+        description: Custom conditions used for filtering the search results. Every
+          field within the object is optional.
+      metadata:
+        additionalProperties:
+          type: string
+        description: Accepts a JSON object for embedding custom metadata, enabling
+          arbitrary additional information to be associated with the resource
+        example:
+          key: value
+          key2: value2
+        type: object
+    type: object
+  filter.CountTransactions:
+    properties:
+      conditions:
+        allOf:
+        - $ref: '#/definitions/filter.TransactionFilter'
+        description: Custom conditions used for filtering the search results. Every
+          field within the object is optional.
+      metadata:
+        additionalProperties:
+          type: string
+        description: Accepts a JSON object for embedding custom metadata, enabling
+          arbitrary additional information to be associated with the resource
+        example:
+          key: value
+          key2: value2
+        type: object
+    type: object
+  filter.CountUtxos:
+    properties:
+      conditions:
+        allOf:
+        - $ref: '#/definitions/filter.UtxoFilter'
+        description: Custom conditions used for filtering the search results. Every
+          field within the object is optional.
+      metadata:
+        additionalProperties:
+          type: string
+        description: Accepts a JSON object for embedding custom metadata, enabling
+          arbitrary additional information to be associated with the resource
+        example:
+          key: value
+          key2: value2
+        type: object
+    type: object
+  filter.CountXpubs:
+    properties:
+      conditions:
+        allOf:
+        - $ref: '#/definitions/filter.XpubFilter'
+        description: Custom conditions used for filtering the search results. Every
+          field within the object is optional.
+      metadata:
+        additionalProperties:
+          type: string
+        description: Accepts a JSON object for embedding custom metadata, enabling
+          arbitrary additional information to be associated with the resource
+        example:
+          key: value
+          key2: value2
+        type: object
+    type: object
   filter.DestinationFilter:
     properties:
       address:
@@ -832,6 +636,174 @@ definitions:
         allOf:
         - $ref: '#/definitions/filter.TimeRange'
         description: UpdatedRange specifies the time range when a record was updated.
+    type: object
+  filter.SearchAccessKeys:
+    properties:
+      conditions:
+        allOf:
+        - $ref: '#/definitions/filter.AccessKeyFilter'
+        description: Custom conditions used for filtering the search results. Every
+          field within the object is optional.
+      metadata:
+        additionalProperties:
+          type: string
+        description: Accepts a JSON object for embedding custom metadata, enabling
+          arbitrary additional information to be associated with the resource
+        example:
+          key: value
+          key2: value2
+        type: object
+      params:
+        additionalProperties:
+          type: string
+        description: Pagination and sorting options to streamline data exploration
+          and analysis
+        example:
+          order_by_direction: desc
+          order_by_field: created_at
+          page: "1"
+          page_size: "10"
+        type: object
+    type: object
+  filter.SearchContacts:
+    properties:
+      conditions:
+        allOf:
+        - $ref: '#/definitions/filter.ContactFilter'
+        description: Custom conditions used for filtering the search results. Every
+          field within the object is optional.
+      metadata:
+        additionalProperties:
+          type: string
+        description: Accepts a JSON object for embedding custom metadata, enabling
+          arbitrary additional information to be associated with the resource
+        example:
+          key: value
+          key2: value2
+        type: object
+      params:
+        additionalProperties:
+          type: string
+        description: Pagination and sorting options to streamline data exploration
+          and analysis
+        example:
+          order_by_direction: desc
+          order_by_field: created_at
+          page: "1"
+          page_size: "10"
+        type: object
+    type: object
+  filter.SearchDestinations:
+    properties:
+      conditions:
+        allOf:
+        - $ref: '#/definitions/filter.DestinationFilter'
+        description: Custom conditions used for filtering the search results. Every
+          field within the object is optional.
+      metadata:
+        additionalProperties:
+          type: string
+        description: Accepts a JSON object for embedding custom metadata, enabling
+          arbitrary additional information to be associated with the resource
+        example:
+          key: value
+          key2: value2
+        type: object
+      params:
+        additionalProperties:
+          type: string
+        description: Pagination and sorting options to streamline data exploration
+          and analysis
+        example:
+          order_by_direction: desc
+          order_by_field: created_at
+          page: "1"
+          page_size: "10"
+        type: object
+    type: object
+  filter.SearchTransactions:
+    properties:
+      conditions:
+        allOf:
+        - $ref: '#/definitions/filter.TransactionFilter'
+        description: Custom conditions used for filtering the search results. Every
+          field within the object is optional.
+      metadata:
+        additionalProperties:
+          type: string
+        description: Accepts a JSON object for embedding custom metadata, enabling
+          arbitrary additional information to be associated with the resource
+        example:
+          key: value
+          key2: value2
+        type: object
+      params:
+        additionalProperties:
+          type: string
+        description: Pagination and sorting options to streamline data exploration
+          and analysis
+        example:
+          order_by_direction: desc
+          order_by_field: created_at
+          page: "1"
+          page_size: "10"
+        type: object
+    type: object
+  filter.SearchUtxos:
+    properties:
+      conditions:
+        allOf:
+        - $ref: '#/definitions/filter.UtxoFilter'
+        description: Custom conditions used for filtering the search results. Every
+          field within the object is optional.
+      metadata:
+        additionalProperties:
+          type: string
+        description: Accepts a JSON object for embedding custom metadata, enabling
+          arbitrary additional information to be associated with the resource
+        example:
+          key: value
+          key2: value2
+        type: object
+      params:
+        additionalProperties:
+          type: string
+        description: Pagination and sorting options to streamline data exploration
+          and analysis
+        example:
+          order_by_direction: desc
+          order_by_field: created_at
+          page: "1"
+          page_size: "10"
+        type: object
+    type: object
+  filter.SearchXpubs:
+    properties:
+      conditions:
+        allOf:
+        - $ref: '#/definitions/filter.XpubFilter'
+        description: Custom conditions used for filtering the search results. Every
+          field within the object is optional.
+      metadata:
+        additionalProperties:
+          type: string
+        description: Accepts a JSON object for embedding custom metadata, enabling
+          arbitrary additional information to be associated with the resource
+        example:
+          key: value
+          key2: value2
+        type: object
+      params:
+        additionalProperties:
+          type: string
+        description: Pagination and sorting options to streamline data exploration
+          and analysis
+        example:
+          order_by_direction: desc
+          order_by_field: created_at
+          page: "1"
+          page_size: "10"
+        type: object
     type: object
   filter.TimeRange:
     properties:
@@ -1252,7 +1224,7 @@ definitions:
         type: array
       map:
         allOf:
-          - $ref: '#/definitions/models.MapProtocol'
+        - $ref: '#/definitions/models.MapProtocol'
         description: Map is a pointer to a map protocol object.
       string_parts:
         description: StringParts is a slice of string parts.
@@ -1538,7 +1510,7 @@ definitions:
         type: integer
       expires_in:
         allOf:
-          - $ref: '#/definitions/time.Duration'
+        - $ref: '#/definitions/time.Duration'
         description: ExpiresAt is a time when transaction expires.
         example: 1000
       fee:
@@ -1547,7 +1519,7 @@ definitions:
         type: integer
       fee_unit:
         allOf:
-          - $ref: '#/definitions/models.FeeUnit'
+        - $ref: '#/definitions/models.FeeUnit'
         description: FeeUnit is a pointer to a fee unit object.
       from_utxos:
         description: FromUtxos is a slice of from utxos used to build transaction.
@@ -1571,11 +1543,11 @@ definitions:
         type: array
       send_all_to:
         allOf:
-          - $ref: '#/definitions/models.TransactionOutput'
+        - $ref: '#/definitions/models.TransactionOutput'
         description: SendAllTo is a pointer to a transaction output object.
       sync:
         allOf:
-          - $ref: '#/definitions/models.SyncConfig'
+        - $ref: '#/definitions/models.SyncConfig'
         description: Sync contains sync configuration.
     type: object
   models.TransactionInput:
@@ -1590,7 +1562,7 @@ definitions:
         type: string
       destination:
         allOf:
-          - $ref: '#/definitions/models.Destination'
+        - $ref: '#/definitions/models.Destination'
         description: Destination is a pointer to a destination object.
       draft_id:
         description: DraftID is a utxo transaction related draft id.
@@ -1632,7 +1604,7 @@ definitions:
         type: string
       transaction:
         allOf:
-          - $ref: '#/definitions/models.Transaction'
+        - $ref: '#/definitions/models.Transaction'
         description: Transaction is a transaction pointer that utxo points to.
       transaction_id:
         description: TransactionID is a transaction id that utxo points to.
@@ -1655,11 +1627,11 @@ definitions:
     properties:
       op_return:
         allOf:
-          - $ref: '#/definitions/models.OpReturn'
+        - $ref: '#/definitions/models.OpReturn'
         description: OpReturn is a pointer to a op return object.
       paymail_p4:
         allOf:
-          - $ref: '#/definitions/models.PaymailP4'
+        - $ref: '#/definitions/models.PaymailP4'
         description: PaymailP4 is a pointer to a paymail p4 object.
       satoshis:
         description: Satoshis is a satoshis amount.
@@ -1807,78 +1779,45 @@ definitions:
     type: object
   time.Duration:
     enum:
-      - -9223372036854775808
-      - 9223372036854775807
-      - 1
-      - 1000
-      - 1000000
-      - 1000000000
-      - 60000000000
-      - 3600000000000
-      - -9223372036854775808
-      - 9223372036854775807
-      - 1
-      - 1000
-      - 1000000
-      - 1000000000
-      - 60000000000
-      - 3600000000000
-      - -9223372036854775808
-      - 9223372036854775807
-      - 1
-      - 1000
-      - 1000000
-      - 1000000000
-      - 60000000000
-      - 3600000000000
+    - -9223372036854775808
+    - 9223372036854775807
+    - 1
+    - 1000
+    - 1000000
+    - 1000000000
+    - 60000000000
+    - 3600000000000
+    - -9223372036854775808
+    - 9223372036854775807
+    - 1
+    - 1000
+    - 1000000
+    - 1000000000
+    - 60000000000
+    - 3600000000000
     type: integer
     x-enum-varnames:
-      - minDuration
-      - maxDuration
-      - Nanosecond
-      - Microsecond
-      - Millisecond
-      - Second
-      - Minute
-      - Hour
-      - minDuration
-      - maxDuration
-      - Nanosecond
-      - Microsecond
-      - Millisecond
-      - Second
-      - Minute
-      - Hour
-      - minDuration
-      - maxDuration
-      - Nanosecond
-      - Microsecond
-      - Millisecond
-      - Second
-      - Minute
-      - Hour
-  transactions.CountTransactions:
-    properties:
-      conditions:
-        allOf:
-        - $ref: '#/definitions/filter.TransactionFilter'
-        description: Custom conditions used for filtering the search results. Every
-          field within the object is optional.
-      metadata:
-        additionalProperties:
-          type: string
-        description: Accepts a JSON object for embedding custom metadata, enabling
-          arbitrary additional information to be associated with the resource
-        example:
-          key: value
-          key2: value2
-        type: object
-    type: object
+    - minDuration
+    - maxDuration
+    - Nanosecond
+    - Microsecond
+    - Millisecond
+    - Second
+    - Minute
+    - Hour
+    - minDuration
+    - maxDuration
+    - Nanosecond
+    - Microsecond
+    - Millisecond
+    - Second
+    - Minute
+    - Hour
   transactions.NewTransaction:
     properties:
       config:
         allOf:
-          - $ref: '#/definitions/models.TransactionConfig'
+        - $ref: '#/definitions/models.TransactionConfig'
         description: Configuration of the transaction
       metadata:
         additionalProperties:
@@ -1910,34 +1849,6 @@ definitions:
         example: b356f7fa00cd3f20cce6c21d704cd13e871d28d714a5ebd0532f5a0e0cde63f7
         type: string
     type: object
-  transactions.SearchTransactions:
-    properties:
-      conditions:
-        allOf:
-        - $ref: '#/definitions/filter.TransactionFilter'
-        description: Custom conditions used for filtering the search results. Every
-          field within the object is optional.
-      metadata:
-        additionalProperties:
-          type: string
-        description: Accepts a JSON object for embedding custom metadata, enabling
-          arbitrary additional information to be associated with the resource
-        example:
-          key: value
-          key2: value2
-        type: object
-      params:
-        additionalProperties:
-          type: string
-        description: Pagination and sorting options to streamline data exploration
-          and analysis
-        example:
-          order_by_direction: desc
-          order_by_field: created_at
-          page: "1"
-          page_size: "10"
-        type: object
-    type: object
   transactions.UpdateTransaction:
     properties:
       id:
@@ -1952,51 +1863,6 @@ definitions:
         example:
           key: value
           key2: value2
-        type: object
-    type: object
-  utxos.CountUtxos:
-    properties:
-      conditions:
-        allOf:
-        - $ref: '#/definitions/filter.UtxoFilter'
-        description: Custom conditions used for filtering the search results. Every
-          field within the object is optional.
-      metadata:
-        additionalProperties:
-          type: string
-        description: Accepts a JSON object for embedding custom metadata, enabling
-          arbitrary additional information to be associated with the resource
-        example:
-          key: value
-          key2: value2
-        type: object
-    type: object
-  utxos.SearchUtxos:
-    properties:
-      conditions:
-        allOf:
-        - $ref: '#/definitions/filter.UtxoFilter'
-        description: Custom conditions used for filtering the search results. Every
-          field within the object is optional.
-      metadata:
-        additionalProperties:
-          type: string
-        description: Accepts a JSON object for embedding custom metadata, enabling
-          arbitrary additional information to be associated with the resource
-        example:
-          key: value
-          key2: value2
-        type: object
-      params:
-        additionalProperties:
-          type: string
-        description: Pagination and sorting options to streamline data exploration
-          and analysis
-        example:
-          order_by_direction: desc
-          order_by_field: created_at
-          page: "1"
-          page_size: "10"
         type: object
     type: object
 info:
@@ -2112,7 +1978,7 @@ paths:
         in: body
         name: CountAccessKeys
         schema:
-          $ref: '#/definitions/accesskeys.CountAccessKeys'
+          $ref: '#/definitions/filter.CountAccessKeys'
       produces:
       - application/json
       responses:
@@ -2141,7 +2007,7 @@ paths:
         in: body
         name: SearchAccessKeys
         schema:
-          $ref: '#/definitions/accesskeys.SearchAccessKeys'
+          $ref: '#/definitions/filter.SearchAccessKeys'
       produces:
       - application/json
       responses:
@@ -2168,7 +2034,7 @@ paths:
         in: body
         name: CountAccessKeys
         schema:
-          $ref: '#/definitions/admin.CountAccessKeys'
+          $ref: '#/definitions/filter.AdminCountAccessKeys'
       produces:
       - application/json
       responses:
@@ -2197,7 +2063,7 @@ paths:
         in: body
         name: SearchAccessKeys
         schema:
-          $ref: '#/definitions/admin.SearchAccessKeys'
+          $ref: '#/definitions/filter.AdminSearchAccessKeys'
       produces:
       - application/json
       responses:
@@ -2343,7 +2209,7 @@ paths:
         in: body
         name: SearchContacts
         schema:
-          $ref: '#/definitions/admin.SearchContacts'
+          $ref: '#/definitions/filter.SearchContacts'
       produces:
       - application/json
       responses:
@@ -2371,7 +2237,7 @@ paths:
         in: body
         name: SearchDestinations
         schema:
-          $ref: '#/definitions/admin.SearchDestinations'
+          $ref: '#/definitions/filter.SearchDestinations'
       produces:
       - application/json
       responses:
@@ -2475,7 +2341,7 @@ paths:
         in: body
         name: CountPaymails
         schema:
-          $ref: '#/definitions/admin.CountPaymails'
+          $ref: '#/definitions/filter.AdminCountPaymails'
       produces:
       - application/json
       responses:
@@ -2504,7 +2370,7 @@ paths:
         in: body
         name: SearchPaymails
         schema:
-          $ref: '#/definitions/admin.SearchPaymails'
+          $ref: '#/definitions/filter.AdminSearchPaymails'
       produces:
       - application/json
       responses:
@@ -2564,7 +2430,7 @@ paths:
         in: body
         name: CountTransactions
         schema:
-          $ref: '#/definitions/admin.CountTransactions'
+          $ref: '#/definitions/filter.CountTransactions'
       produces:
       - application/json
       responses:
@@ -2621,7 +2487,7 @@ paths:
         in: body
         name: SearchTransactions
         schema:
-          $ref: '#/definitions/admin.SearchTransactions'
+          $ref: '#/definitions/filter.SearchTransactions'
       produces:
       - application/json
       responses:
@@ -2649,7 +2515,7 @@ paths:
         in: body
         name: CountUtxos
         schema:
-          $ref: '#/definitions/admin.CountUtxos'
+          $ref: '#/definitions/filter.AdminCountUtxos'
       produces:
       - application/json
       responses:
@@ -2676,7 +2542,7 @@ paths:
         in: body
         name: SearchUtxos
         schema:
-          $ref: '#/definitions/admin.SearchUtxos'
+          $ref: '#/definitions/filter.AdminSearchUtxos'
       produces:
       - application/json
       responses:
@@ -2730,7 +2596,7 @@ paths:
         in: body
         name: CountXpubs
         schema:
-          $ref: '#/definitions/admin.CountXpubs'
+          $ref: '#/definitions/filter.CountXpubs'
       produces:
       - application/json
       responses:
@@ -2757,7 +2623,7 @@ paths:
         in: body
         name: SearchXpubs
         schema:
-          $ref: '#/definitions/admin.SearchXpubs'
+          $ref: '#/definitions/filter.SearchXpubs'
       produces:
       - application/json
       responses:
@@ -2891,7 +2757,7 @@ paths:
         in: body
         name: SearchContacts
         schema:
-          $ref: '#/definitions/contacts.SearchContacts'
+          $ref: '#/definitions/filter.SearchContacts'
       produces:
       - application/json
       responses:
@@ -3025,7 +2891,7 @@ paths:
         in: body
         name: CountDestinations
         schema:
-          $ref: '#/definitions/destinations.CountDestinations'
+          $ref: '#/definitions/filter.CountDestinations'
       produces:
       - application/json
       responses:
@@ -3053,7 +2919,7 @@ paths:
         in: body
         name: SearchDestinations
         schema:
-          $ref: '#/definitions/destinations.SearchDestinations'
+          $ref: '#/definitions/filter.SearchDestinations'
       produces:
       - application/json
       responses:
@@ -3174,7 +3040,7 @@ paths:
         in: body
         name: CountTransactions
         schema:
-          $ref: '#/definitions/transactions.CountTransactions'
+          $ref: '#/definitions/filter.CountTransactions'
       produces:
       - application/json
       responses:
@@ -3229,7 +3095,7 @@ paths:
         in: body
         name: SearchTransactions
         schema:
-          $ref: '#/definitions/transactions.SearchTransactions'
+          $ref: '#/definitions/filter.SearchTransactions'
       produces:
       - application/json
       responses:
@@ -3287,7 +3153,7 @@ paths:
         in: body
         name: CountUtxos
         schema:
-          $ref: '#/definitions/utxos.CountUtxos'
+          $ref: '#/definitions/filter.CountUtxos'
       produces:
       - application/json
       responses:
@@ -3314,7 +3180,7 @@ paths:
         in: body
         name: SearchUtxos
         schema:
-          $ref: '#/definitions/utxos.SearchUtxos'
+          $ref: '#/definitions/filter.SearchUtxos'
       produces:
       - application/json
       responses:

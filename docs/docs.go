@@ -192,7 +192,7 @@ const docTemplate = `{
                         "name": "CountAccessKeys",
                         "in": "body",
                         "schema": {
-                            "$ref": "#/definitions/accesskeys.CountAccessKeys"
+                            "$ref": "#/definitions/filter.CountAccessKeys"
                         }
                     }
                 ],
@@ -233,7 +233,7 @@ const docTemplate = `{
                         "name": "SearchAccessKeys",
                         "in": "body",
                         "schema": {
-                            "$ref": "#/definitions/accesskeys.SearchAccessKeys"
+                            "$ref": "#/definitions/filter.SearchAccessKeys"
                         }
                     }
                 ],
@@ -277,7 +277,7 @@ const docTemplate = `{
                         "name": "CountAccessKeys",
                         "in": "body",
                         "schema": {
-                            "$ref": "#/definitions/admin.CountAccessKeys"
+                            "$ref": "#/definitions/filter.AdminCountAccessKeys"
                         }
                     }
                 ],
@@ -318,7 +318,7 @@ const docTemplate = `{
                         "name": "SearchAccessKeys",
                         "in": "body",
                         "schema": {
-                            "$ref": "#/definitions/admin.SearchAccessKeys"
+                            "$ref": "#/definitions/filter.AdminSearchAccessKeys"
                         }
                     }
                 ],
@@ -452,7 +452,7 @@ const docTemplate = `{
                         "name": "SearchContacts",
                         "in": "body",
                         "schema": {
-                            "$ref": "#/definitions/admin.SearchContacts"
+                            "$ref": "#/definitions/filter.SearchContacts"
                         }
                     }
                 ],
@@ -586,7 +586,7 @@ const docTemplate = `{
                         "name": "SearchDestinations",
                         "in": "body",
                         "schema": {
-                            "$ref": "#/definitions/admin.SearchDestinations"
+                            "$ref": "#/definitions/filter.SearchDestinations"
                         }
                     }
                 ],
@@ -750,7 +750,7 @@ const docTemplate = `{
                         "name": "CountPaymails",
                         "in": "body",
                         "schema": {
-                            "$ref": "#/definitions/admin.CountPaymails"
+                            "$ref": "#/definitions/filter.AdminCountPaymails"
                         }
                     }
                 ],
@@ -791,7 +791,7 @@ const docTemplate = `{
                         "name": "SearchPaymails",
                         "in": "body",
                         "schema": {
-                            "$ref": "#/definitions/admin.SearchPaymails"
+                            "$ref": "#/definitions/filter.AdminSearchPaymails"
                         }
                     }
                 ],
@@ -888,7 +888,7 @@ const docTemplate = `{
                         "name": "CountTransactions",
                         "in": "body",
                         "schema": {
-                            "$ref": "#/definitions/admin.CountTransactions"
+                            "$ref": "#/definitions/filter.CountTransactions"
                         }
                     }
                 ],
@@ -971,7 +971,7 @@ const docTemplate = `{
                         "name": "SearchTransactions",
                         "in": "body",
                         "schema": {
-                            "$ref": "#/definitions/admin.SearchTransactions"
+                            "$ref": "#/definitions/filter.SearchTransactions"
                         }
                     }
                 ],
@@ -1015,7 +1015,7 @@ const docTemplate = `{
                         "name": "CountUtxos",
                         "in": "body",
                         "schema": {
-                            "$ref": "#/definitions/admin.CountUtxos"
+                            "$ref": "#/definitions/filter.AdminCountUtxos"
                         }
                     }
                 ],
@@ -1056,7 +1056,7 @@ const docTemplate = `{
                         "name": "SearchUtxos",
                         "in": "body",
                         "schema": {
-                            "$ref": "#/definitions/admin.SearchUtxos"
+                            "$ref": "#/definitions/filter.AdminSearchUtxos"
                         }
                     }
                 ],
@@ -1142,7 +1142,7 @@ const docTemplate = `{
                         "name": "CountXpubs",
                         "in": "body",
                         "schema": {
-                            "$ref": "#/definitions/admin.CountXpubs"
+                            "$ref": "#/definitions/filter.CountXpubs"
                         }
                     }
                 ],
@@ -1183,7 +1183,7 @@ const docTemplate = `{
                         "name": "SearchXpubs",
                         "in": "body",
                         "schema": {
-                            "$ref": "#/definitions/admin.SearchXpubs"
+                            "$ref": "#/definitions/filter.SearchXpubs"
                         }
                     }
                 ],
@@ -1347,7 +1347,7 @@ const docTemplate = `{
                         "name": "SearchContacts",
                         "in": "body",
                         "schema": {
-                            "$ref": "#/definitions/contacts.SearchContacts"
+                            "$ref": "#/definitions/filter.SearchContacts"
                         }
                     }
                 ],
@@ -1597,7 +1597,7 @@ const docTemplate = `{
                         "name": "CountDestinations",
                         "in": "body",
                         "schema": {
-                            "$ref": "#/definitions/destinations.CountDestinations"
+                            "$ref": "#/definitions/filter.CountDestinations"
                         }
                     }
                 ],
@@ -1638,7 +1638,7 @@ const docTemplate = `{
                         "name": "SearchDestinations",
                         "in": "body",
                         "schema": {
-                            "$ref": "#/definitions/destinations.SearchDestinations"
+                            "$ref": "#/definitions/filter.SearchDestinations"
                         }
                     }
                 ],
@@ -1827,7 +1827,7 @@ const docTemplate = `{
                         "name": "CountTransactions",
                         "in": "body",
                         "schema": {
-                            "$ref": "#/definitions/transactions.CountTransactions"
+                            "$ref": "#/definitions/filter.CountTransactions"
                         }
                     }
                 ],
@@ -1910,7 +1910,7 @@ const docTemplate = `{
                         "name": "SearchTransactions",
                         "in": "body",
                         "schema": {
-                            "$ref": "#/definitions/transactions.SearchTransactions"
+                            "$ref": "#/definitions/filter.SearchTransactions"
                         }
                     }
                 ],
@@ -2001,7 +2001,7 @@ const docTemplate = `{
                         "name": "CountUtxos",
                         "in": "body",
                         "schema": {
-                            "$ref": "#/definitions/utxos.CountUtxos"
+                            "$ref": "#/definitions/filter.CountUtxos"
                         }
                     }
                 ],
@@ -2042,7 +2042,7 @@ const docTemplate = `{
                         "name": "SearchUtxos",
                         "in": "body",
                         "schema": {
-                            "$ref": "#/definitions/utxos.SearchUtxos"
+                            "$ref": "#/definitions/filter.SearchUtxos"
                         }
                     }
                 ],
@@ -2137,214 +2137,9 @@ const docTemplate = `{
         }
     },
     "definitions": {
-        "accesskeys.CountAccessKeys": {
-            "type": "object",
-            "properties": {
-                "conditions": {
-                    "description": "Custom conditions used for filtering the search results. Every field within the object is optional.",
-                    "allOf": [
-                        {
-                            "$ref": "#/definitions/filter.AccessKeyFilter"
-                        }
-                    ]
-                },
-                "metadata": {
-                    "description": "Accepts a JSON object for embedding custom metadata, enabling arbitrary additional information to be associated with the resource",
-                    "type": "object",
-                    "additionalProperties": {
-                        "type": "string"
-                    },
-                    "example": {
-                        "key": "value",
-                        "key2": "value2"
-                    }
-                }
-            }
-        },
         "accesskeys.CreateAccessKey": {
             "type": "object",
             "properties": {
-                "metadata": {
-                    "description": "Accepts a JSON object for embedding custom metadata, enabling arbitrary additional information to be associated with the resource",
-                    "type": "object",
-                    "additionalProperties": {
-                        "type": "string"
-                    },
-                    "example": {
-                        "key": "value",
-                        "key2": "value2"
-                    }
-                }
-            }
-        },
-        "accesskeys.SearchAccessKeys": {
-            "type": "object",
-            "properties": {
-                "conditions": {
-                    "description": "Custom conditions used for filtering the search results. Every field within the object is optional.",
-                    "allOf": [
-                        {
-                            "$ref": "#/definitions/filter.AccessKeyFilter"
-                        }
-                    ]
-                },
-                "metadata": {
-                    "description": "Accepts a JSON object for embedding custom metadata, enabling arbitrary additional information to be associated with the resource",
-                    "type": "object",
-                    "additionalProperties": {
-                        "type": "string"
-                    },
-                    "example": {
-                        "key": "value",
-                        "key2": "value2"
-                    }
-                },
-                "params": {
-                    "description": "Pagination and sorting options to streamline data exploration and analysis",
-                    "type": "object",
-                    "additionalProperties": {
-                        "type": "string"
-                    },
-                    "example": {
-                        "order_by_direction": "desc",
-                        "order_by_field": "created_at",
-                        "page": "1",
-                        "page_size": "10"
-                    }
-                }
-            }
-        },
-        "admin.CountAccessKeys": {
-            "type": "object",
-            "properties": {
-                "conditions": {
-                    "description": "Custom conditions used for filtering the search results. Every field within the object is optional.",
-                    "allOf": [
-                        {
-                            "$ref": "#/definitions/filter.AdminAccessKeyFilter"
-                        }
-                    ]
-                },
-                "metadata": {
-                    "description": "Accepts a JSON object for embedding custom metadata, enabling arbitrary additional information to be associated with the resource",
-                    "type": "object",
-                    "additionalProperties": {
-                        "type": "string"
-                    },
-                    "example": {
-                        "key": "value",
-                        "key2": "value2"
-                    }
-                }
-            }
-        },
-        "admin.CountDestinations": {
-            "type": "object",
-            "properties": {
-                "conditions": {
-                    "description": "Custom conditions used for filtering the search results. Every field within the object is optional.",
-                    "allOf": [
-                        {
-                            "$ref": "#/definitions/filter.DestinationFilter"
-                        }
-                    ]
-                },
-                "metadata": {
-                    "description": "Accepts a JSON object for embedding custom metadata, enabling arbitrary additional information to be associated with the resource",
-                    "type": "object",
-                    "additionalProperties": {
-                        "type": "string"
-                    },
-                    "example": {
-                        "key": "value",
-                        "key2": "value2"
-                    }
-                }
-            }
-        },
-        "admin.CountPaymails": {
-            "type": "object",
-            "properties": {
-                "conditions": {
-                    "description": "Custom conditions used for filtering the search results. Every field within the object is optional.",
-                    "allOf": [
-                        {
-                            "$ref": "#/definitions/filter.AdminPaymailFilter"
-                        }
-                    ]
-                },
-                "metadata": {
-                    "description": "Accepts a JSON object for embedding custom metadata, enabling arbitrary additional information to be associated with the resource",
-                    "type": "object",
-                    "additionalProperties": {
-                        "type": "string"
-                    },
-                    "example": {
-                        "key": "value",
-                        "key2": "value2"
-                    }
-                }
-            }
-        },
-        "admin.CountTransactions": {
-            "type": "object",
-            "properties": {
-                "conditions": {
-                    "description": "Custom conditions used for filtering the search results. Every field within the object is optional.",
-                    "allOf": [
-                        {
-                            "$ref": "#/definitions/filter.TransactionFilter"
-                        }
-                    ]
-                },
-                "metadata": {
-                    "description": "Accepts a JSON object for embedding custom metadata, enabling arbitrary additional information to be associated with the resource",
-                    "type": "object",
-                    "additionalProperties": {
-                        "type": "string"
-                    },
-                    "example": {
-                        "key": "value",
-                        "key2": "value2"
-                    }
-                }
-            }
-        },
-        "admin.CountUtxos": {
-            "type": "object",
-            "properties": {
-                "conditions": {
-                    "description": "Custom conditions used for filtering the search results. Every field within the object is optional.",
-                    "allOf": [
-                        {
-                            "$ref": "#/definitions/filter.AdminUtxoFilter"
-                        }
-                    ]
-                },
-                "metadata": {
-                    "description": "Accepts a JSON object for embedding custom metadata, enabling arbitrary additional information to be associated with the resource",
-                    "type": "object",
-                    "additionalProperties": {
-                        "type": "string"
-                    },
-                    "example": {
-                        "key": "value",
-                        "key2": "value2"
-                    }
-                }
-            }
-        },
-        "admin.CountXpubs": {
-            "type": "object",
-            "properties": {
-                "conditions": {
-                    "description": "Custom conditions used for filtering the search results. Every field within the object is optional.",
-                    "allOf": [
-                        {
-                            "$ref": "#/definitions/filter.XpubFilter"
-                        }
-                    ]
-                },
                 "metadata": {
                     "description": "Accepts a JSON object for embedding custom metadata, enabling arbitrary additional information to be associated with the resource",
                     "type": "object",
@@ -2432,265 +2227,6 @@ const docTemplate = `{
                     "description": "The transaction hex",
                     "type": "string",
                     "example": "0100000002..."
-                }
-            }
-        },
-        "admin.SearchAccessKeys": {
-            "type": "object",
-            "properties": {
-                "conditions": {
-                    "description": "Custom conditions used for filtering the search results. Every field within the object is optional.",
-                    "allOf": [
-                        {
-                            "$ref": "#/definitions/filter.AdminAccessKeyFilter"
-                        }
-                    ]
-                },
-                "metadata": {
-                    "description": "Accepts a JSON object for embedding custom metadata, enabling arbitrary additional information to be associated with the resource",
-                    "type": "object",
-                    "additionalProperties": {
-                        "type": "string"
-                    },
-                    "example": {
-                        "key": "value",
-                        "key2": "value2"
-                    }
-                },
-                "params": {
-                    "description": "Pagination and sorting options to streamline data exploration and analysis",
-                    "type": "object",
-                    "additionalProperties": {
-                        "type": "string"
-                    },
-                    "example": {
-                        "order_by_direction": "desc",
-                        "order_by_field": "created_at",
-                        "page": "1",
-                        "page_size": "10"
-                    }
-                }
-            }
-        },
-        "admin.SearchContacts": {
-            "type": "object",
-            "properties": {
-                "conditions": {
-                    "description": "Custom conditions used for filtering the search results. Every field within the object is optional.",
-                    "allOf": [
-                        {
-                            "$ref": "#/definitions/filter.ContactFilter"
-                        }
-                    ]
-                },
-                "metadata": {
-                    "description": "Accepts a JSON object for embedding custom metadata, enabling arbitrary additional information to be associated with the resource",
-                    "type": "object",
-                    "additionalProperties": {
-                        "type": "string"
-                    },
-                    "example": {
-                        "key": "value",
-                        "key2": "value2"
-                    }
-                },
-                "params": {
-                    "description": "Pagination and sorting options to streamline data exploration and analysis",
-                    "type": "object",
-                    "additionalProperties": {
-                        "type": "string"
-                    },
-                    "example": {
-                        "order_by_direction": "desc",
-                        "order_by_field": "created_at",
-                        "page": "1",
-                        "page_size": "10"
-                    }
-                }
-            }
-        },
-        "admin.SearchDestinations": {
-            "type": "object",
-            "properties": {
-                "conditions": {
-                    "description": "Custom conditions used for filtering the search results. Every field within the object is optional.",
-                    "allOf": [
-                        {
-                            "$ref": "#/definitions/filter.DestinationFilter"
-                        }
-                    ]
-                },
-                "metadata": {
-                    "description": "Accepts a JSON object for embedding custom metadata, enabling arbitrary additional information to be associated with the resource",
-                    "type": "object",
-                    "additionalProperties": {
-                        "type": "string"
-                    },
-                    "example": {
-                        "key": "value",
-                        "key2": "value2"
-                    }
-                },
-                "params": {
-                    "description": "Pagination and sorting options to streamline data exploration and analysis",
-                    "type": "object",
-                    "additionalProperties": {
-                        "type": "string"
-                    },
-                    "example": {
-                        "order_by_direction": "desc",
-                        "order_by_field": "created_at",
-                        "page": "1",
-                        "page_size": "10"
-                    }
-                }
-            }
-        },
-        "admin.SearchPaymails": {
-            "type": "object",
-            "properties": {
-                "conditions": {
-                    "description": "Custom conditions used for filtering the search results. Every field within the object is optional.",
-                    "allOf": [
-                        {
-                            "$ref": "#/definitions/filter.AdminPaymailFilter"
-                        }
-                    ]
-                },
-                "metadata": {
-                    "description": "Accepts a JSON object for embedding custom metadata, enabling arbitrary additional information to be associated with the resource",
-                    "type": "object",
-                    "additionalProperties": {
-                        "type": "string"
-                    },
-                    "example": {
-                        "key": "value",
-                        "key2": "value2"
-                    }
-                },
-                "params": {
-                    "description": "Pagination and sorting options to streamline data exploration and analysis",
-                    "type": "object",
-                    "additionalProperties": {
-                        "type": "string"
-                    },
-                    "example": {
-                        "order_by_direction": "desc",
-                        "order_by_field": "created_at",
-                        "page": "1",
-                        "page_size": "10"
-                    }
-                }
-            }
-        },
-        "admin.SearchTransactions": {
-            "type": "object",
-            "properties": {
-                "conditions": {
-                    "description": "Custom conditions used for filtering the search results. Every field within the object is optional.",
-                    "allOf": [
-                        {
-                            "$ref": "#/definitions/filter.TransactionFilter"
-                        }
-                    ]
-                },
-                "metadata": {
-                    "description": "Accepts a JSON object for embedding custom metadata, enabling arbitrary additional information to be associated with the resource",
-                    "type": "object",
-                    "additionalProperties": {
-                        "type": "string"
-                    },
-                    "example": {
-                        "key": "value",
-                        "key2": "value2"
-                    }
-                },
-                "params": {
-                    "description": "Pagination and sorting options to streamline data exploration and analysis",
-                    "type": "object",
-                    "additionalProperties": {
-                        "type": "string"
-                    },
-                    "example": {
-                        "order_by_direction": "desc",
-                        "order_by_field": "created_at",
-                        "page": "1",
-                        "page_size": "10"
-                    }
-                }
-            }
-        },
-        "admin.SearchUtxos": {
-            "type": "object",
-            "properties": {
-                "conditions": {
-                    "description": "Custom conditions used for filtering the search results. Every field within the object is optional.",
-                    "allOf": [
-                        {
-                            "$ref": "#/definitions/filter.AdminUtxoFilter"
-                        }
-                    ]
-                },
-                "metadata": {
-                    "description": "Accepts a JSON object for embedding custom metadata, enabling arbitrary additional information to be associated with the resource",
-                    "type": "object",
-                    "additionalProperties": {
-                        "type": "string"
-                    },
-                    "example": {
-                        "key": "value",
-                        "key2": "value2"
-                    }
-                },
-                "params": {
-                    "description": "Pagination and sorting options to streamline data exploration and analysis",
-                    "type": "object",
-                    "additionalProperties": {
-                        "type": "string"
-                    },
-                    "example": {
-                        "order_by_direction": "desc",
-                        "order_by_field": "created_at",
-                        "page": "1",
-                        "page_size": "10"
-                    }
-                }
-            }
-        },
-        "admin.SearchXpubs": {
-            "type": "object",
-            "properties": {
-                "conditions": {
-                    "description": "Custom conditions used for filtering the search results. Every field within the object is optional.",
-                    "allOf": [
-                        {
-                            "$ref": "#/definitions/filter.XpubFilter"
-                        }
-                    ]
-                },
-                "metadata": {
-                    "description": "Accepts a JSON object for embedding custom metadata, enabling arbitrary additional information to be associated with the resource",
-                    "type": "object",
-                    "additionalProperties": {
-                        "type": "string"
-                    },
-                    "example": {
-                        "key": "value",
-                        "key2": "value2"
-                    }
-                },
-                "params": {
-                    "description": "Pagination and sorting options to streamline data exploration and analysis",
-                    "type": "object",
-                    "additionalProperties": {
-                        "type": "string"
-                    },
-                    "example": {
-                        "order_by_direction": "desc",
-                        "order_by_field": "created_at",
-                        "page": "1",
-                        "page_size": "10"
-                    }
                 }
             }
         },
@@ -2808,43 +2344,6 @@ const docTemplate = `{
                 "Rejected"
             ]
         },
-        "contacts.SearchContacts": {
-            "type": "object",
-            "properties": {
-                "conditions": {
-                    "description": "Custom conditions used for filtering the search results. Every field within the object is optional.",
-                    "allOf": [
-                        {
-                            "$ref": "#/definitions/filter.ContactFilter"
-                        }
-                    ]
-                },
-                "metadata": {
-                    "description": "Accepts a JSON object for embedding custom metadata, enabling arbitrary additional information to be associated with the resource",
-                    "type": "object",
-                    "additionalProperties": {
-                        "type": "string"
-                    },
-                    "example": {
-                        "key": "value",
-                        "key2": "value2"
-                    }
-                },
-                "params": {
-                    "description": "Pagination and sorting options to streamline data exploration and analysis",
-                    "type": "object",
-                    "additionalProperties": {
-                        "type": "string"
-                    },
-                    "example": {
-                        "order_by_direction": "desc",
-                        "order_by_field": "created_at",
-                        "page": "1",
-                        "page_size": "10"
-                    }
-                }
-            }
-        },
         "contacts.UpsertContact": {
             "type": "object",
             "properties": {
@@ -2869,30 +2368,6 @@ const docTemplate = `{
                 }
             }
         },
-        "destinations.CountDestinations": {
-            "type": "object",
-            "properties": {
-                "conditions": {
-                    "description": "Custom conditions used for filtering the search results. Every field within the object is optional.",
-                    "allOf": [
-                        {
-                            "$ref": "#/definitions/filter.DestinationFilter"
-                        }
-                    ]
-                },
-                "metadata": {
-                    "description": "Accepts a JSON object for embedding custom metadata, enabling arbitrary additional information to be associated with the resource",
-                    "type": "object",
-                    "additionalProperties": {
-                        "type": "string"
-                    },
-                    "example": {
-                        "key": "value",
-                        "key2": "value2"
-                    }
-                }
-            }
-        },
         "destinations.CreateDestination": {
             "type": "object",
             "properties": {
@@ -2905,43 +2380,6 @@ const docTemplate = `{
                     "example": {
                         "key": "value",
                         "key2": "value2"
-                    }
-                }
-            }
-        },
-        "destinations.SearchDestinations": {
-            "type": "object",
-            "properties": {
-                "conditions": {
-                    "description": "Custom conditions used for filtering the search results. Every field within the object is optional.",
-                    "allOf": [
-                        {
-                            "$ref": "#/definitions/filter.DestinationFilter"
-                        }
-                    ]
-                },
-                "metadata": {
-                    "description": "Accepts a JSON object for embedding custom metadata, enabling arbitrary additional information to be associated with the resource",
-                    "type": "object",
-                    "additionalProperties": {
-                        "type": "string"
-                    },
-                    "example": {
-                        "key": "value",
-                        "key2": "value2"
-                    }
-                },
-                "params": {
-                    "description": "Pagination and sorting options to streamline data exploration and analysis",
-                    "type": "object",
-                    "additionalProperties": {
-                        "type": "string"
-                    },
-                    "example": {
-                        "order_by_direction": "desc",
-                        "order_by_field": "created_at",
-                        "page": "1",
-                        "page_size": "10"
                     }
                 }
             }
@@ -3054,6 +2492,78 @@ const docTemplate = `{
                 }
             }
         },
+        "filter.AdminCountAccessKeys": {
+            "type": "object",
+            "properties": {
+                "conditions": {
+                    "description": "Custom conditions used for filtering the search results. Every field within the object is optional.",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/filter.AdminAccessKeyFilter"
+                        }
+                    ]
+                },
+                "metadata": {
+                    "description": "Accepts a JSON object for embedding custom metadata, enabling arbitrary additional information to be associated with the resource",
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "string"
+                    },
+                    "example": {
+                        "key": "value",
+                        "key2": "value2"
+                    }
+                }
+            }
+        },
+        "filter.AdminCountPaymails": {
+            "type": "object",
+            "properties": {
+                "conditions": {
+                    "description": "Custom conditions used for filtering the search results. Every field within the object is optional.",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/filter.AdminPaymailFilter"
+                        }
+                    ]
+                },
+                "metadata": {
+                    "description": "Accepts a JSON object for embedding custom metadata, enabling arbitrary additional information to be associated with the resource",
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "string"
+                    },
+                    "example": {
+                        "key": "value",
+                        "key2": "value2"
+                    }
+                }
+            }
+        },
+        "filter.AdminCountUtxos": {
+            "type": "object",
+            "properties": {
+                "conditions": {
+                    "description": "Custom conditions used for filtering the search results. Every field within the object is optional.",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/filter.AdminUtxoFilter"
+                        }
+                    ]
+                },
+                "metadata": {
+                    "description": "Accepts a JSON object for embedding custom metadata, enabling arbitrary additional information to be associated with the resource",
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "string"
+                    },
+                    "example": {
+                        "key": "value",
+                        "key2": "value2"
+                    }
+                }
+            }
+        },
         "filter.AdminPaymailFilter": {
             "type": "object",
             "properties": {
@@ -3098,6 +2608,117 @@ const docTemplate = `{
                 "xpubId": {
                     "type": "string",
                     "example": "79f90a6bab0a44402fc64828af820e9465645658aea2d138c5205b88e6dabd00"
+                }
+            }
+        },
+        "filter.AdminSearchAccessKeys": {
+            "type": "object",
+            "properties": {
+                "conditions": {
+                    "description": "Custom conditions used for filtering the search results. Every field within the object is optional.",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/filter.AdminAccessKeyFilter"
+                        }
+                    ]
+                },
+                "metadata": {
+                    "description": "Accepts a JSON object for embedding custom metadata, enabling arbitrary additional information to be associated with the resource",
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "string"
+                    },
+                    "example": {
+                        "key": "value",
+                        "key2": "value2"
+                    }
+                },
+                "params": {
+                    "description": "Pagination and sorting options to streamline data exploration and analysis",
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "string"
+                    },
+                    "example": {
+                        "order_by_direction": "desc",
+                        "order_by_field": "created_at",
+                        "page": "1",
+                        "page_size": "10"
+                    }
+                }
+            }
+        },
+        "filter.AdminSearchPaymails": {
+            "type": "object",
+            "properties": {
+                "conditions": {
+                    "description": "Custom conditions used for filtering the search results. Every field within the object is optional.",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/filter.AdminPaymailFilter"
+                        }
+                    ]
+                },
+                "metadata": {
+                    "description": "Accepts a JSON object for embedding custom metadata, enabling arbitrary additional information to be associated with the resource",
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "string"
+                    },
+                    "example": {
+                        "key": "value",
+                        "key2": "value2"
+                    }
+                },
+                "params": {
+                    "description": "Pagination and sorting options to streamline data exploration and analysis",
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "string"
+                    },
+                    "example": {
+                        "order_by_direction": "desc",
+                        "order_by_field": "created_at",
+                        "page": "1",
+                        "page_size": "10"
+                    }
+                }
+            }
+        },
+        "filter.AdminSearchUtxos": {
+            "type": "object",
+            "properties": {
+                "conditions": {
+                    "description": "Custom conditions used for filtering the search results. Every field within the object is optional.",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/filter.AdminUtxoFilter"
+                        }
+                    ]
+                },
+                "metadata": {
+                    "description": "Accepts a JSON object for embedding custom metadata, enabling arbitrary additional information to be associated with the resource",
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "string"
+                    },
+                    "example": {
+                        "key": "value",
+                        "key2": "value2"
+                    }
+                },
+                "params": {
+                    "description": "Pagination and sorting options to streamline data exploration and analysis",
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "string"
+                    },
+                    "example": {
+                        "order_by_direction": "desc",
+                        "order_by_field": "created_at",
+                        "page": "1",
+                        "page_size": "10"
+                    }
                 }
             }
         },
@@ -3233,6 +2854,126 @@ const docTemplate = `{
                 }
             }
         },
+        "filter.CountAccessKeys": {
+            "type": "object",
+            "properties": {
+                "conditions": {
+                    "description": "Custom conditions used for filtering the search results. Every field within the object is optional.",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/filter.AccessKeyFilter"
+                        }
+                    ]
+                },
+                "metadata": {
+                    "description": "Accepts a JSON object for embedding custom metadata, enabling arbitrary additional information to be associated with the resource",
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "string"
+                    },
+                    "example": {
+                        "key": "value",
+                        "key2": "value2"
+                    }
+                }
+            }
+        },
+        "filter.CountDestinations": {
+            "type": "object",
+            "properties": {
+                "conditions": {
+                    "description": "Custom conditions used for filtering the search results. Every field within the object is optional.",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/filter.DestinationFilter"
+                        }
+                    ]
+                },
+                "metadata": {
+                    "description": "Accepts a JSON object for embedding custom metadata, enabling arbitrary additional information to be associated with the resource",
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "string"
+                    },
+                    "example": {
+                        "key": "value",
+                        "key2": "value2"
+                    }
+                }
+            }
+        },
+        "filter.CountTransactions": {
+            "type": "object",
+            "properties": {
+                "conditions": {
+                    "description": "Custom conditions used for filtering the search results. Every field within the object is optional.",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/filter.TransactionFilter"
+                        }
+                    ]
+                },
+                "metadata": {
+                    "description": "Accepts a JSON object for embedding custom metadata, enabling arbitrary additional information to be associated with the resource",
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "string"
+                    },
+                    "example": {
+                        "key": "value",
+                        "key2": "value2"
+                    }
+                }
+            }
+        },
+        "filter.CountUtxos": {
+            "type": "object",
+            "properties": {
+                "conditions": {
+                    "description": "Custom conditions used for filtering the search results. Every field within the object is optional.",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/filter.UtxoFilter"
+                        }
+                    ]
+                },
+                "metadata": {
+                    "description": "Accepts a JSON object for embedding custom metadata, enabling arbitrary additional information to be associated with the resource",
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "string"
+                    },
+                    "example": {
+                        "key": "value",
+                        "key2": "value2"
+                    }
+                }
+            }
+        },
+        "filter.CountXpubs": {
+            "type": "object",
+            "properties": {
+                "conditions": {
+                    "description": "Custom conditions used for filtering the search results. Every field within the object is optional.",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/filter.XpubFilter"
+                        }
+                    ]
+                },
+                "metadata": {
+                    "description": "Accepts a JSON object for embedding custom metadata, enabling arbitrary additional information to be associated with the resource",
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "string"
+                    },
+                    "example": {
+                        "key": "value",
+                        "key2": "value2"
+                    }
+                }
+            }
+        },
         "filter.DestinationFilter": {
             "type": "object",
             "properties": {
@@ -3269,6 +3010,228 @@ const docTemplate = `{
                             "$ref": "#/definitions/filter.TimeRange"
                         }
                     ]
+                }
+            }
+        },
+        "filter.SearchAccessKeys": {
+            "type": "object",
+            "properties": {
+                "conditions": {
+                    "description": "Custom conditions used for filtering the search results. Every field within the object is optional.",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/filter.AccessKeyFilter"
+                        }
+                    ]
+                },
+                "metadata": {
+                    "description": "Accepts a JSON object for embedding custom metadata, enabling arbitrary additional information to be associated with the resource",
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "string"
+                    },
+                    "example": {
+                        "key": "value",
+                        "key2": "value2"
+                    }
+                },
+                "params": {
+                    "description": "Pagination and sorting options to streamline data exploration and analysis",
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "string"
+                    },
+                    "example": {
+                        "order_by_direction": "desc",
+                        "order_by_field": "created_at",
+                        "page": "1",
+                        "page_size": "10"
+                    }
+                }
+            }
+        },
+        "filter.SearchContacts": {
+            "type": "object",
+            "properties": {
+                "conditions": {
+                    "description": "Custom conditions used for filtering the search results. Every field within the object is optional.",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/filter.ContactFilter"
+                        }
+                    ]
+                },
+                "metadata": {
+                    "description": "Accepts a JSON object for embedding custom metadata, enabling arbitrary additional information to be associated with the resource",
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "string"
+                    },
+                    "example": {
+                        "key": "value",
+                        "key2": "value2"
+                    }
+                },
+                "params": {
+                    "description": "Pagination and sorting options to streamline data exploration and analysis",
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "string"
+                    },
+                    "example": {
+                        "order_by_direction": "desc",
+                        "order_by_field": "created_at",
+                        "page": "1",
+                        "page_size": "10"
+                    }
+                }
+            }
+        },
+        "filter.SearchDestinations": {
+            "type": "object",
+            "properties": {
+                "conditions": {
+                    "description": "Custom conditions used for filtering the search results. Every field within the object is optional.",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/filter.DestinationFilter"
+                        }
+                    ]
+                },
+                "metadata": {
+                    "description": "Accepts a JSON object for embedding custom metadata, enabling arbitrary additional information to be associated with the resource",
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "string"
+                    },
+                    "example": {
+                        "key": "value",
+                        "key2": "value2"
+                    }
+                },
+                "params": {
+                    "description": "Pagination and sorting options to streamline data exploration and analysis",
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "string"
+                    },
+                    "example": {
+                        "order_by_direction": "desc",
+                        "order_by_field": "created_at",
+                        "page": "1",
+                        "page_size": "10"
+                    }
+                }
+            }
+        },
+        "filter.SearchTransactions": {
+            "type": "object",
+            "properties": {
+                "conditions": {
+                    "description": "Custom conditions used for filtering the search results. Every field within the object is optional.",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/filter.TransactionFilter"
+                        }
+                    ]
+                },
+                "metadata": {
+                    "description": "Accepts a JSON object for embedding custom metadata, enabling arbitrary additional information to be associated with the resource",
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "string"
+                    },
+                    "example": {
+                        "key": "value",
+                        "key2": "value2"
+                    }
+                },
+                "params": {
+                    "description": "Pagination and sorting options to streamline data exploration and analysis",
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "string"
+                    },
+                    "example": {
+                        "order_by_direction": "desc",
+                        "order_by_field": "created_at",
+                        "page": "1",
+                        "page_size": "10"
+                    }
+                }
+            }
+        },
+        "filter.SearchUtxos": {
+            "type": "object",
+            "properties": {
+                "conditions": {
+                    "description": "Custom conditions used for filtering the search results. Every field within the object is optional.",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/filter.UtxoFilter"
+                        }
+                    ]
+                },
+                "metadata": {
+                    "description": "Accepts a JSON object for embedding custom metadata, enabling arbitrary additional information to be associated with the resource",
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "string"
+                    },
+                    "example": {
+                        "key": "value",
+                        "key2": "value2"
+                    }
+                },
+                "params": {
+                    "description": "Pagination and sorting options to streamline data exploration and analysis",
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "string"
+                    },
+                    "example": {
+                        "order_by_direction": "desc",
+                        "order_by_field": "created_at",
+                        "page": "1",
+                        "page_size": "10"
+                    }
+                }
+            }
+        },
+        "filter.SearchXpubs": {
+            "type": "object",
+            "properties": {
+                "conditions": {
+                    "description": "Custom conditions used for filtering the search results. Every field within the object is optional.",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/filter.XpubFilter"
+                        }
+                    ]
+                },
+                "metadata": {
+                    "description": "Accepts a JSON object for embedding custom metadata, enabling arbitrary additional information to be associated with the resource",
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "string"
+                    },
+                    "example": {
+                        "key": "value",
+                        "key2": "value2"
+                    }
+                },
+                "params": {
+                    "description": "Pagination and sorting options to streamline data exploration and analysis",
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "string"
+                    },
+                    "example": {
+                        "order_by_direction": "desc",
+                        "order_by_field": "created_at",
+                        "page": "1",
+                        "page_size": "10"
+                    }
                 }
             }
         },
@@ -3785,7 +3748,7 @@ const docTemplate = `{
                 }
             }
         },
-		"models.FeeUnit": {
+        "models.FeeUnit": {
             "type": "object",
             "properties": {
                 "bytes": {
@@ -3939,7 +3902,7 @@ const docTemplate = `{
                 }
             }
         },
-		"models.PaymailP4": {
+        "models.PaymailP4": {
             "type": "object",
             "properties": {
                 "alias": {
@@ -4042,7 +4005,7 @@ const docTemplate = `{
                 }
             }
         },
-		"models.SyncConfig": {
+        "models.SyncConfig": {
             "type": "object",
             "properties": {
                 "broadcast": {
@@ -4516,7 +4479,7 @@ const docTemplate = `{
                 }
             }
         },
-		"models.UtxoPointer": {
+        "models.UtxoPointer": {
             "type": "object",
             "properties": {
                 "output_index": {
@@ -4582,17 +4545,9 @@ const docTemplate = `{
                 }
             }
         },
-		"time.Duration": {
+        "time.Duration": {
             "type": "integer",
             "enum": [
-                -9223372036854775808,
-                9223372036854775807,
-                1,
-                1000,
-                1000000,
-                1000000000,
-                60000000000,
-                3600000000000,
                 -9223372036854775808,
                 9223372036854775807,
                 1,
@@ -4626,40 +4581,8 @@ const docTemplate = `{
                 "Millisecond",
                 "Second",
                 "Minute",
-                "Hour",
-                "minDuration",
-                "maxDuration",
-                "Nanosecond",
-                "Microsecond",
-                "Millisecond",
-                "Second",
-                "Minute",
                 "Hour"
             ]
-        },
-        "transactions.CountTransactions": {
-            "type": "object",
-            "properties": {
-                "conditions": {
-                    "description": "Custom conditions used for filtering the search results. Every field within the object is optional.",
-                    "allOf": [
-                        {
-                            "$ref": "#/definitions/filter.TransactionFilter"
-                        }
-                    ]
-                },
-                "metadata": {
-                    "description": "Accepts a JSON object for embedding custom metadata, enabling arbitrary additional information to be associated with the resource",
-                    "type": "object",
-                    "additionalProperties": {
-                        "type": "string"
-                    },
-                    "example": {
-                        "key": "value",
-                        "key2": "value2"
-                    }
-                }
-            }
         },
         "transactions.NewTransaction": {
             "type": "object",
@@ -4711,43 +4634,6 @@ const docTemplate = `{
                 }
             }
         },
-        "transactions.SearchTransactions": {
-            "type": "object",
-            "properties": {
-                "conditions": {
-                    "description": "Custom conditions used for filtering the search results. Every field within the object is optional.",
-                    "allOf": [
-                        {
-                            "$ref": "#/definitions/filter.TransactionFilter"
-                        }
-                    ]
-                },
-                "metadata": {
-                    "description": "Accepts a JSON object for embedding custom metadata, enabling arbitrary additional information to be associated with the resource",
-                    "type": "object",
-                    "additionalProperties": {
-                        "type": "string"
-                    },
-                    "example": {
-                        "key": "value",
-                        "key2": "value2"
-                    }
-                },
-                "params": {
-                    "description": "Pagination and sorting options to streamline data exploration and analysis",
-                    "type": "object",
-                    "additionalProperties": {
-                        "type": "string"
-                    },
-                    "example": {
-                        "order_by_direction": "desc",
-                        "order_by_field": "created_at",
-                        "page": "1",
-                        "page_size": "10"
-                    }
-                }
-            }
-        },
         "transactions.UpdateTransaction": {
             "type": "object",
             "properties": {
@@ -4765,67 +4651,6 @@ const docTemplate = `{
                     "example": {
                         "key": "value",
                         "key2": "value2"
-                    }
-                }
-            }
-        },
-        "utxos.CountUtxos": {
-            "type": "object",
-            "properties": {
-                "conditions": {
-                    "description": "Custom conditions used for filtering the search results. Every field within the object is optional.",
-                    "allOf": [
-                        {
-                            "$ref": "#/definitions/filter.UtxoFilter"
-                        }
-                    ]
-                },
-                "metadata": {
-                    "description": "Accepts a JSON object for embedding custom metadata, enabling arbitrary additional information to be associated with the resource",
-                    "type": "object",
-                    "additionalProperties": {
-                        "type": "string"
-                    },
-                    "example": {
-                        "key": "value",
-                        "key2": "value2"
-                    }
-                }
-            }
-        },
-        "utxos.SearchUtxos": {
-            "type": "object",
-            "properties": {
-                "conditions": {
-                    "description": "Custom conditions used for filtering the search results. Every field within the object is optional.",
-                    "allOf": [
-                        {
-                            "$ref": "#/definitions/filter.UtxoFilter"
-                        }
-                    ]
-                },
-                "metadata": {
-                    "description": "Accepts a JSON object for embedding custom metadata, enabling arbitrary additional information to be associated with the resource",
-                    "type": "object",
-                    "additionalProperties": {
-                        "type": "string"
-                    },
-                    "example": {
-                        "key": "value",
-                        "key2": "value2"
-                    }
-                },
-                "params": {
-                    "description": "Pagination and sorting options to streamline data exploration and analysis",
-                    "type": "object",
-                    "additionalProperties": {
-                        "type": "string"
-                    },
-                    "example": {
-                        "order_by_direction": "desc",
-                        "order_by_field": "created_at",
-                        "page": "1",
-                        "page_size": "10"
                     }
                 }
             }

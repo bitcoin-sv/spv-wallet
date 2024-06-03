@@ -154,7 +154,6 @@ func getContactsByXpubID(ctx context.Context, xPubID string, metadata *Metadata,
 		conditions = make(map[string]interface{})
 	}
 	conditions[xPubIDField] = xPubID
-	conditions[deletedAtField] = nil
 
 	contacts := make([]*Contact, 0)
 	if err := getModelsByConditions(ctx, ModelContact, &contacts, metadata, conditions, queryParams, opts...); err != nil {

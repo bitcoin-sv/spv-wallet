@@ -3,9 +3,7 @@ package contacts
 import (
 	"errors"
 
-	"github.com/bitcoin-sv/spv-wallet/actions/common"
 	"github.com/bitcoin-sv/spv-wallet/engine"
-	"github.com/bitcoin-sv/spv-wallet/models/filter"
 )
 
 // UpsertContact is the model for creating a contact
@@ -25,6 +23,3 @@ func (p *UpsertContact) validate() error {
 
 	return nil
 }
-
-// SearchContacts is a model for handling searching with filters and metadata
-type SearchContacts = common.SearchModel[filter.ContactFilter]

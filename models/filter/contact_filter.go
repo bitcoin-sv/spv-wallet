@@ -14,6 +14,9 @@ var validContactStatuses = getEnumValues[ContactFilter]("Status")
 
 // ToDbConditions converts filter fields to the datastore conditions using gorm naming strategy
 func (d *ContactFilter) ToDbConditions() (map[string]interface{}, error) {
+	if d == nil {
+		return nil, nil
+	}
 	conditions := d.ModelFilter.ToDbConditions()
 
 	// Column names come from the database model, see: /engine/model_contact.go
