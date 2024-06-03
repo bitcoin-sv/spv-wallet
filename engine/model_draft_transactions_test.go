@@ -35,20 +35,22 @@ func TestDraftTransaction_newDraftTransaction(t *testing.T) {
 
 	t.Run("nil config, panic", func(t *testing.T) {
 		assert.Panics(t, func() {
-			draftTx := newDraftTransaction(
+			draftTx, err := newDraftTransaction(
 				testXPub, nil, New(),
 			)
 			require.NotNil(t, draftTx)
+			require.NoError(t, err)
 		})
 	})
 
 	t.Run("valid config", func(t *testing.T) {
 		expires := time.Now().UTC().Add(defaultDraftTxExpiresIn)
-		draftTx := newDraftTransaction(
+		draftTx, err := newDraftTransaction(
 			testXPub, &TransactionConfig{
 				FeeUnit: chainstate.MockDefaultFee,
 			}, New(),
 		)
+		require.NoError(t, err)
 		require.NotNil(t, draftTx)
 		assert.NotEqual(t, "", draftTx.ID)
 		assert.Equal(t, 64, len(draftTx.ID))
@@ -64,9 +66,10 @@ func TestDraftTransaction_GetModelName(t *testing.T) {
 	t.Parallel()
 
 	t.Run("model name", func(t *testing.T) {
-		draftTx := newDraftTransaction(testXPub, &TransactionConfig{
+		draftTx, err := newDraftTransaction(testXPub, &TransactionConfig{
 			FeeUnit: chainstate.MockDefaultFee,
 		}, New())
+		require.NoError(t, err)
 		require.NotNil(t, draftTx)
 		assert.Equal(t, ModelDraftTransaction.String(), draftTx.GetModelName())
 	})
@@ -75,7 +78,7 @@ func TestDraftTransaction_GetModelName(t *testing.T) {
 // TestDraftTransaction_getOutputSatoshis tests getting the output satoshis for the destinations
 func TestDraftTransaction_getOutputSatoshis(t *testing.T) {
 	t.Run("1 change destination", func(t *testing.T) {
-		draftTx := newDraftTransaction(
+		draftTx, err := newDraftTransaction(
 			testXPub, &TransactionConfig{
 				ChangeDestinations: []*Destination{{
 					LockingScript: testLockingScript,
@@ -83,6 +86,7 @@ func TestDraftTransaction_getOutputSatoshis(t *testing.T) {
 				FeeUnit: chainstate.MockDefaultFee,
 			},
 		)
+		require.NoError(t, err)
 		changSatoshis, err := draftTx.getChangeSatoshis(1000000)
 		require.NoError(t, err)
 		assert.Len(t, changSatoshis, 1)
@@ -90,7 +94,7 @@ func TestDraftTransaction_getOutputSatoshis(t *testing.T) {
 	})
 
 	t.Run("1 change destination using default", func(t *testing.T) {
-		draftTx := newDraftTransaction(
+		draftTx, err := newDraftTransaction(
 			testXPub, &TransactionConfig{
 				ChangeDestinationsStrategy: ChangeStrategyDefault,
 				ChangeDestinations: []*Destination{{
@@ -99,6 +103,7 @@ func TestDraftTransaction_getOutputSatoshis(t *testing.T) {
 				FeeUnit: chainstate.MockDefaultFee,
 			},
 		)
+		require.NoError(t, err)
 		changSatoshis, err := draftTx.getChangeSatoshis(1000000)
 		require.NoError(t, err)
 		assert.Len(t, changSatoshis, 1)
@@ -106,7 +111,7 @@ func TestDraftTransaction_getOutputSatoshis(t *testing.T) {
 	})
 
 	t.Run("2 change destinations", func(t *testing.T) {
-		draftTx := newDraftTransaction(
+		draftTx, err := newDraftTransaction(
 			testXPub, &TransactionConfig{
 				ChangeDestinations: []*Destination{{
 					LockingScript: testLockingScript,
@@ -116,6 +121,7 @@ func TestDraftTransaction_getOutputSatoshis(t *testing.T) {
 				FeeUnit: chainstate.MockDefaultFee,
 			},
 		)
+		require.NoError(t, err)
 		changSatoshis, err := draftTx.getChangeSatoshis(1000001)
 		require.NoError(t, err)
 		assert.Len(t, changSatoshis, 2)
@@ -124,7 +130,7 @@ func TestDraftTransaction_getOutputSatoshis(t *testing.T) {
 	})
 
 	t.Run("3 change destinations - random", func(t *testing.T) {
-		draftTx := newDraftTransaction(
+		draftTx, err := newDraftTransaction(
 			testXPub, &TransactionConfig{
 				ChangeDestinationsStrategy: ChangeStrategyRandom,
 				ChangeDestinations: []*Destination{{
@@ -137,6 +143,7 @@ func TestDraftTransaction_getOutputSatoshis(t *testing.T) {
 				FeeUnit: chainstate.MockDefaultFee,
 			},
 		)
+		require.NoError(t, err)
 		satoshis := uint64(1000001)
 		changSatoshis, err := draftTx.getChangeSatoshis(satoshis)
 		require.NoError(t, err)
@@ -158,12 +165,13 @@ func TestDraftTransaction_setChangeDestinations(t *testing.T) {
 		err := xPub.Save(ctx)
 		require.NoError(t, err)
 
-		draftTx := newDraftTransaction(testXPub, &TransactionConfig{
+		draftTx, err := newDraftTransaction(testXPub, &TransactionConfig{
 			Outputs: []*TransactionOutput{{
 				To:       testExternalAddress,
 				Satoshis: 1000,
 			}},
 		}, append(client.DefaultModelOptions(), New())...)
+		require.NoError(t, err)
 
 		err = draftTx.setChangeDestinations(ctx, 1)
 		require.NoError(t, err)
@@ -177,12 +185,13 @@ func TestDraftTransaction_setChangeDestinations(t *testing.T) {
 		err := xPub.Save(ctx)
 		require.NoError(t, err)
 
-		draftTx := newDraftTransaction(testXPub, &TransactionConfig{
+		draftTx, err := newDraftTransaction(testXPub, &TransactionConfig{
 			Outputs: []*TransactionOutput{{
 				To:       testExternalAddress,
 				Satoshis: 1000,
 			}},
 		}, append(client.DefaultModelOptions(), New())...)
+		require.NoError(t, err)
 
 		err = draftTx.setChangeDestinations(ctx, 5)
 		require.NoError(t, err)
@@ -203,8 +212,9 @@ func TestDraftTransaction_getDraftTransactionID(t *testing.T) {
 	t.Run("found by draft id", func(t *testing.T) {
 		ctx, client, deferMe := CreateTestSQLiteClient(t, false, false, withTaskManagerMockup())
 		defer deferMe()
-		draftTransaction := newDraftTransaction(testXPub, &TransactionConfig{}, client.DefaultModelOptions()...)
-		err := draftTransaction.Save(ctx)
+		draftTransaction, err := newDraftTransaction(testXPub, &TransactionConfig{}, client.DefaultModelOptions()...)
+		require.NoError(t, err)
+		err = draftTransaction.Save(ctx)
 		require.NoError(t, err)
 
 		var draftTx *DraftTransaction
@@ -220,23 +230,25 @@ func TestDraftTransaction_createTransaction(t *testing.T) {
 	t.Run("empty transaction", func(t *testing.T) {
 		ctx, client, deferMe := CreateTestSQLiteClient(t, false, false, withTaskManagerMockup())
 		defer deferMe()
-		draftTransaction := newDraftTransaction(testXPub, &TransactionConfig{}, append(client.DefaultModelOptions(), New())...)
+		draftTransaction, err := newDraftTransaction(testXPub, &TransactionConfig{}, append(client.DefaultModelOptions(), New())...)
+		require.NoError(t, err)
 
-		err := draftTransaction.createTransactionHex(ctx)
+		err = draftTransaction.createTransactionHex(ctx)
 		require.ErrorIs(t, err, ErrMissingTransactionOutputs)
 	})
 
 	t.Run("transaction with no utxos", func(t *testing.T) {
 		ctx, client, deferMe := CreateTestSQLiteClient(t, false, false, withTaskManagerMockup())
 		defer deferMe()
-		draftTransaction := newDraftTransaction(testXPub, &TransactionConfig{
+		draftTransaction, err := newDraftTransaction(testXPub, &TransactionConfig{
 			Outputs: []*TransactionOutput{{
 				To:       testExternalAddress,
 				Satoshis: 1000,
 			}},
 		}, append(client.DefaultModelOptions(), New())...)
+		require.NoError(t, err)
 
-		err := draftTransaction.createTransactionHex(ctx)
+		err = draftTransaction.createTransactionHex(ctx)
 		require.ErrorIs(t, err, ErrNotEnoughUtxos)
 	})
 
@@ -263,12 +275,13 @@ func TestDraftTransaction_createTransaction(t *testing.T) {
 		err = transaction.Save(ctx)
 		require.NoError(t, err)
 
-		draftTransaction := newDraftTransaction(testXPub, &TransactionConfig{
+		draftTransaction, err := newDraftTransaction(testXPub, &TransactionConfig{
 			Outputs: []*TransactionOutput{{
 				To:       testExternalAddress,
 				Satoshis: 1000,
 			}},
 		}, append(client.DefaultModelOptions(), New())...)
+		require.NoError(t, err)
 
 		err = draftTransaction.createTransactionHex(ctx)
 		require.NoError(t, err)
@@ -337,9 +350,10 @@ func TestDraftTransaction_createTransaction(t *testing.T) {
 		err = transaction.Save(ctx)
 		require.NoError(t, err)
 
-		draftTransaction := newDraftTransaction(testXPub, &TransactionConfig{
+		draftTransaction, err := newDraftTransaction(testXPub, &TransactionConfig{
 			SendAllTo: &TransactionOutput{To: testExternalAddress},
 		}, append(client.DefaultModelOptions(), New())...)
+		require.NoError(t, err)
 
 		err = draftTransaction.createTransactionHex(ctx)
 		require.NoError(t, err)
@@ -379,7 +393,7 @@ func TestDraftTransaction_createTransaction(t *testing.T) {
 		err = transaction.Save(ctx)
 		require.NoError(t, err)
 
-		draftTransaction := newDraftTransaction(testXPub, &TransactionConfig{
+		draftTransaction, err := newDraftTransaction(testXPub, &TransactionConfig{
 			Outputs: []*TransactionOutput{{
 				To:       testExternalAddress,
 				Satoshis: 1000,
@@ -396,6 +410,7 @@ func TestDraftTransaction_createTransaction(t *testing.T) {
 				},
 			}},
 		}, append(client.DefaultModelOptions(), New())...)
+		require.NoError(t, err)
 
 		err = draftTransaction.createTransactionHex(ctx)
 		require.NoError(t, err)
@@ -440,7 +455,7 @@ func TestDraftTransaction_createTransaction(t *testing.T) {
 		err = transaction.Save(ctx)
 		require.NoError(t, err)
 
-		draftTransaction := newDraftTransaction(testXPub, &TransactionConfig{
+		draftTransaction, err := newDraftTransaction(testXPub, &TransactionConfig{
 			Outputs: []*TransactionOutput{{
 				To:       testExternalAddress,
 				Satoshis: 12166,
@@ -460,6 +475,7 @@ func TestDraftTransaction_createTransaction(t *testing.T) {
 				},
 			}},
 		}, append(client.DefaultModelOptions(), New())...)
+		require.NoError(t, err)
 
 		err = draftTransaction.createTransactionHex(ctx)
 		require.NoError(t, err)
@@ -499,7 +515,7 @@ func TestDraftTransaction_createTransaction(t *testing.T) {
 		err = transaction.Save(ctx)
 		require.NoError(t, err)
 
-		draftTransaction := newDraftTransaction(testXPub, &TransactionConfig{
+		draftTransaction, err := newDraftTransaction(testXPub, &TransactionConfig{
 			FeeUnit: &utils.FeeUnit{
 				Satoshis: 5,
 				Bytes:    100,
@@ -517,6 +533,7 @@ func TestDraftTransaction_createTransaction(t *testing.T) {
 				},
 			}},
 		}, append(client.DefaultModelOptions(), New())...)
+		require.NoError(t, err)
 
 		err = draftTransaction.createTransactionHex(ctx)
 		require.NoError(t, err)
@@ -564,9 +581,10 @@ func TestDraftTransaction_createTransaction(t *testing.T) {
 		err = transaction.Save(ctx)
 		require.NoError(t, err)
 
-		draftTransaction := newDraftTransaction(testXPub, &TransactionConfig{
+		draftTransaction, err := newDraftTransaction(testXPub, &TransactionConfig{
 			SendAllTo: &TransactionOutput{To: testExternalAddress},
 		}, append(client.DefaultModelOptions(), New())...)
+		require.NoError(t, err)
 
 		err = draftTransaction.createTransactionHex(ctx)
 		require.NoError(t, err)
@@ -614,7 +632,7 @@ func TestDraftTransaction_createTransaction(t *testing.T) {
 		err = transaction.Save(ctx)
 		require.NoError(t, err)
 
-		draftTransaction := newDraftTransaction(testXPub, &TransactionConfig{
+		draftTransaction, err := newDraftTransaction(testXPub, &TransactionConfig{
 			SendAllTo: &TransactionOutput{To: testExternalAddress},
 			FromUtxos: []*UtxoPointer{{
 				TransactionID: testTxID,
@@ -624,6 +642,7 @@ func TestDraftTransaction_createTransaction(t *testing.T) {
 				OutputIndex:   2,
 			}},
 		}, append(client.DefaultModelOptions(), New())...)
+		require.NoError(t, err)
 
 		err = draftTransaction.createTransactionHex(ctx)
 		require.NoError(t, err)
@@ -677,7 +696,7 @@ func TestDraftTransaction_createTransaction(t *testing.T) {
 		require.NoError(t, err)
 
 		// todo how to make sure we do not unwittingly destroy tokens ?
-		draftTransaction := newDraftTransaction(testXPub, &TransactionConfig{
+		draftTransaction, err := newDraftTransaction(testXPub, &TransactionConfig{
 			IncludeUtxos: []*UtxoPointer{{
 				TransactionID: testTxID,
 				OutputIndex:   2,
@@ -690,6 +709,7 @@ func TestDraftTransaction_createTransaction(t *testing.T) {
 				Satoshis: 564,
 			}},
 		}, append(client.DefaultModelOptions(), New())...)
+		require.NoError(t, err)
 
 		err = draftTransaction.createTransactionHex(ctx)
 		require.NoError(t, err)
@@ -723,7 +743,7 @@ func TestDraftTransaction_createTransaction(t *testing.T) {
 		ctx, client, deferMe := initSimpleTestCase(t)
 		defer deferMe()
 
-		draftTransaction := newDraftTransaction(testXPub, &TransactionConfig{
+		draftTransaction, err := newDraftTransaction(testXPub, &TransactionConfig{
 			FromUtxos: []*UtxoPointer{{
 				TransactionID: testTxID,
 				OutputIndex:   0,
@@ -732,8 +752,9 @@ func TestDraftTransaction_createTransaction(t *testing.T) {
 				To: testExternalAddress,
 			},
 		}, append(client.DefaultModelOptions(), New())...)
+		require.NoError(t, err)
 
-		err := draftTransaction.createTransactionHex(ctx)
+		err = draftTransaction.createTransactionHex(ctx)
 		require.NoError(t, err)
 		assert.Len(t, draftTransaction.Configuration.Outputs, 1)
 		assert.Equal(t, testExternalAddress, draftTransaction.Configuration.Outputs[0].To)
@@ -745,7 +766,7 @@ func TestDraftTransaction_createTransaction(t *testing.T) {
 		ctx, client, deferMe := initSimpleTestCase(t)
 		defer deferMe()
 
-		draftTransaction := newDraftTransaction(testXPub, &TransactionConfig{
+		draftTransaction, err := newDraftTransaction(testXPub, &TransactionConfig{
 			FromUtxos: []*UtxoPointer{{
 				TransactionID: testTxID,
 				OutputIndex:   0,
@@ -758,8 +779,9 @@ func TestDraftTransaction_createTransaction(t *testing.T) {
 				Satoshis: 1000,
 			}},
 		}, append(client.DefaultModelOptions(), New())...)
+		require.NoError(t, err)
 
-		err := draftTransaction.createTransactionHex(ctx)
+		err = draftTransaction.createTransactionHex(ctx)
 		require.NoError(t, err)
 		assert.Len(t, draftTransaction.Configuration.Outputs, 2)
 		assert.Equal(t, testExternalAddress, draftTransaction.Configuration.Outputs[0].To)
@@ -773,7 +795,7 @@ func TestDraftTransaction_createTransaction(t *testing.T) {
 		ctx, client, deferMe := initSimpleTestCase(t)
 		defer deferMe()
 
-		draftTransaction := newDraftTransaction(testXPub, &TransactionConfig{
+		draftTransaction, err := newDraftTransaction(testXPub, &TransactionConfig{
 			FromUtxos: []*UtxoPointer{{
 				TransactionID: testTxID,
 				OutputIndex:   0,
@@ -796,8 +818,9 @@ func TestDraftTransaction_createTransaction(t *testing.T) {
 				},
 			}},
 		}, append(client.DefaultModelOptions(), New())...)
+		require.NoError(t, err)
 
-		err := draftTransaction.createTransactionHex(ctx)
+		err = draftTransaction.createTransactionHex(ctx)
 		require.NoError(t, err)
 		assert.Len(t, draftTransaction.Configuration.Outputs, 3)
 		assert.Equal(t, testExternalAddress, draftTransaction.Configuration.Outputs[0].To)
@@ -851,7 +874,7 @@ func TestDraftTransaction_createTransaction(t *testing.T) {
 		err = transaction.Save(ctx)
 		require.NoError(t, err)
 
-		draftTransaction := newDraftTransaction(testXPub, &TransactionConfig{
+		draftTransaction, err := newDraftTransaction(testXPub, &TransactionConfig{
 			FromUtxos: []*UtxoPointer{{
 				TransactionID: testTxID,
 				OutputIndex:   1,
@@ -874,6 +897,7 @@ func TestDraftTransaction_createTransaction(t *testing.T) {
 				},
 			}},
 		}, append(client.DefaultModelOptions(), New())...)
+		require.NoError(t, err)
 
 		err = draftTransaction.createTransactionHex(ctx)
 		require.NoError(t, err)
@@ -897,7 +921,7 @@ func TestDraftTransaction_createTransaction(t *testing.T) {
 		err := utxo.Save(ctx)
 		require.NoError(t, err)
 
-		draftTransaction := newDraftTransaction(testXPub, &TransactionConfig{
+		draftTransaction, err := newDraftTransaction(testXPub, &TransactionConfig{
 			FromUtxos: []*UtxoPointer{{
 				TransactionID: utxo.TransactionID,
 				OutputIndex:   utxo.OutputIndex,
@@ -910,6 +934,7 @@ func TestDraftTransaction_createTransaction(t *testing.T) {
 				Satoshis: 1500,
 			}},
 		}, append(client.DefaultModelOptions(), New())...)
+		require.NoError(t, err)
 
 		err = draftTransaction.createTransactionHex(ctx)
 		require.ErrorIs(t, err, ErrDuplicateUTXOs)
@@ -1212,12 +1237,13 @@ func TestDraftTransaction_addIncludeUtxos(t *testing.T) {
 		err = utxo.Save(ctx)
 		require.NoError(t, err)
 
-		draft := newDraftTransaction("", &TransactionConfig{
+		draft, err := newDraftTransaction("", &TransactionConfig{
 			IncludeUtxos: []*UtxoPointer{{
 				testSTAStxID,
 				0,
 			}},
 		}, client.DefaultModelOptions(New())...)
+		require.NoError(t, err)
 
 		var includeUtxoSatoshis uint64
 		includeUtxoSatoshis, err = draft.addIncludeUtxos(ctx)
@@ -1380,7 +1406,12 @@ func createDraftTransactionFromHex(hex string, inInfo []interface{}, feeUnit *ut
 		Outputs:            outputs,
 	}
 
-	return newDraftTransaction(testXPub, draftConfig), tx, nil
+	draftTransaction, err := newDraftTransaction(testXPub, draftConfig)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	return draftTransaction, tx, nil
 }
 
 func TestDraftTransaction_estimateFees(t *testing.T) {
@@ -1505,7 +1536,8 @@ func TestDraftTransaction_SignInputs(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			m := newDraftTransaction(xPub.rawXpubKey, tt.config, client.DefaultModelOptions(New())...)
+			m, err := newDraftTransaction(xPub.rawXpubKey, tt.config, client.DefaultModelOptions(New())...)
+			require.NoError(t, err)
 			err = m.createTransactionHex(ctx)
 			require.NoError(t, err)
 

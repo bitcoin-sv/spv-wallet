@@ -70,7 +70,7 @@ func Test_RevertTransaction(t *testing.T) {
 		defer deferMe()
 
 		// we need a draft transaction, otherwise we cannot revert
-		draftTransaction := newDraftTransaction(
+		draftTransaction, err := newDraftTransaction(
 			testXPub, &TransactionConfig{
 				Outputs: []*TransactionOutput{{
 					To:       "1A1PjKqjWMNBzTVdcBru27EV1PHcXWc63W", // random address
@@ -86,8 +86,10 @@ func Test_RevertTransaction(t *testing.T) {
 			},
 			append(client.DefaultModelOptions(), New())...,
 		)
+		require.NoError(t, err)
+
 		// this gets inputs etc.
-		err := draftTransaction.Save(ctx)
+		err = draftTransaction.Save(ctx)
 		require.NoError(t, err)
 
 		var hex string
@@ -125,7 +127,7 @@ func Test_RevertTransaction(t *testing.T) {
 		require.NoError(t, err)
 
 		// we need a draft transaction, otherwise we cannot revert
-		draftTransaction := newDraftTransaction(
+		draftTransaction, err := newDraftTransaction(
 			testXPub, &TransactionConfig{
 				Outputs: []*TransactionOutput{{
 					To:       destination.Address,
@@ -141,6 +143,8 @@ func Test_RevertTransaction(t *testing.T) {
 			},
 			append(client.DefaultModelOptions(), New())...,
 		)
+		require.NoError(t, err)
+
 		// this gets inputs etc.
 		err = draftTransaction.Save(ctx)
 		require.NoError(t, err)
@@ -190,7 +194,7 @@ func Test_RevertTransaction(t *testing.T) {
 func Test_RecordTransaction(t *testing.T) {
 	ctx, client, _ := initSimpleTestCase(t)
 	// given
-	draftTransaction := newDraftTransaction(
+	draftTransaction, err := newDraftTransaction(
 		testXPub, &TransactionConfig{
 			Outputs: []*TransactionOutput{{
 				To:       "1A1PjKqjWMNBzTVdcBru27EV1PHcXWc63W",
@@ -206,6 +210,8 @@ func Test_RecordTransaction(t *testing.T) {
 		},
 		append(client.DefaultModelOptions(), New())...,
 	)
+	require.NoError(t, err)
+
 	draftTransactionID := draftTransaction.ID
 
 	t.Run("hex validation -> invalid hex", func(t *testing.T) {
@@ -241,7 +247,7 @@ func initRevertTransactionData(t *testing.T) (context.Context, ClientInterface, 
 	ctx, client, deferMe := initSimpleTestCase(t)
 
 	// we need a draft transaction, otherwise we cannot revert
-	draftTransaction := newDraftTransaction(
+	draftTransaction, err := newDraftTransaction(
 		testXPub, &TransactionConfig{
 			Outputs: []*TransactionOutput{{
 				To:       "1A1PjKqjWMNBzTVdcBru27EV1PHcXWc63W", // random address
@@ -257,8 +263,10 @@ func initRevertTransactionData(t *testing.T) (context.Context, ClientInterface, 
 		},
 		append(client.DefaultModelOptions(), New())...,
 	)
+	require.NoError(t, err)
+
 	// this gets inputs etc.
-	err := draftTransaction.Save(ctx)
+	err = draftTransaction.Save(ctx)
 	require.NoError(t, err)
 
 	var xPriv *bip32.ExtendedKey

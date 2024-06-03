@@ -787,9 +787,10 @@ func (ts *EmbeddedDBTestSuite) TestTransaction_Save() {
 				To:       testExternalAddress,
 			}},
 		}
-		draftTransaction := newDraftTransaction(
+		draftTransaction, err := newDraftTransaction(
 			xPub.rawXpubKey, draftConfig, append(tc.client.DefaultModelOptions(), New())...,
 		)
+		require.NoError(t, err)
 		err = draftTransaction.Save(tc.ctx)
 		require.NoError(t, err)
 

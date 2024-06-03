@@ -38,7 +38,7 @@ type DraftTransaction struct {
 }
 
 // newDraftTransaction will start a new draft tx
-func newDraftTransaction(rawXpubKey string, config *TransactionConfig, opts ...ModelOps) *DraftTransaction {
+func newDraftTransaction(rawXpubKey string, config *TransactionConfig, opts ...ModelOps) (*DraftTransaction, error) {
 	// Random GUID
 	id, _ := utils.RandomHex(32)
 
@@ -64,7 +64,12 @@ func newDraftTransaction(rawXpubKey string, config *TransactionConfig, opts ...M
 	if config.FeeUnit == nil {
 		draft.Configuration.FeeUnit = draft.Client().Chainstate().FeeUnit()
 	}
-	return draft
+
+	err := draft.createTransactionHex(context.Background())
+	if err != nil {
+		return nil, err
+	}
+	return draft, nil
 }
 
 // getDraftTransactionID will get the draft transaction with the given conditions
@@ -72,7 +77,6 @@ func getDraftTransactionID(ctx context.Context, xPubID, id string,
 	opts ...ModelOps,
 ) (*DraftTransaction, error) {
 	// Get the record
-	config := &TransactionConfig{}
 	conditions := map[string]interface{}{
 		xPubIDField: xPubID,
 		idField:     id,
@@ -82,8 +86,11 @@ func getDraftTransactionID(ctx context.Context, xPubID, id string,
 			idField: id,
 		}
 	}
-	draftTransaction := newDraftTransaction("", config, opts...)
-	draftTransaction.ID = "" // newDraftTransaction always sets an ID, need to remove for querying
+
+	draftTransaction := &DraftTransaction{Model: *NewBaseModel(
+		ModelDraftTransaction,
+		append(opts)...,
+	)}
 	if err := Get(ctx, draftTransaction, conditions, false, defaultDatabaseReadTimeout, true); err != nil {
 		if errors.Is(err, datastore.ErrNoResults) {
 			return nil, nil
@@ -234,89 +241,9 @@ func (m *DraftTransaction) createTransactionHex(ctx context.Context) (err error)
 		return
 	}
 
-	var inputUtxos *[]*bt.UTXO
-	var satoshisReserved uint64
-
-	if m.Configuration.SendAllTo != nil { // Send TO ALL
-
-		var spendableUtxos []*Utxo
-		// todo should all utxos be sent to the SendAllTo address, not only the p2pkhs?
-		if spendableUtxos, err = getSpendableUtxos(
-			ctx, m.XpubID, utils.ScriptTypePubKeyHash, nil, m.Configuration.FromUtxos, opts...,
-		); err != nil {
-			return err
-		}
-		for _, utxo := range spendableUtxos {
-			// Reserve the utxos
-			utxo.DraftID.Valid = true
-			utxo.DraftID.String = m.ID
-			utxo.ReservedAt.Valid = true
-			utxo.ReservedAt.Time = time.Now().UTC()
-
-			// Save the UTXO
-			if err = utxo.Save(ctx); err != nil {
-				return err
-			}
-
-			m.Configuration.Outputs[0].Satoshis += utxo.Satoshis
-		}
-
-		// Get the inputUtxos (in bt.UTXO format) and the total amount of satoshis from the utxos
-		if inputUtxos, satoshisReserved, err = m.getInputsFromUtxos(
-			spendableUtxos,
-		); err != nil {
-			return
-		}
-
-		if err = m.processUtxos(
-			ctx, spendableUtxos,
-		); err != nil {
-			return err
-		}
-	} else {
-
-		// we can only include separate utxos (like tokens) when not using SendAllTo
-		var includeUtxoSatoshis uint64
-		if m.Configuration.IncludeUtxos != nil {
-			includeUtxoSatoshis, err = m.addIncludeUtxos(ctx)
-			if err != nil {
-				return err
-			}
-		}
-
-		// Reserve and Get utxos for the transaction
-		var reservedUtxos []*Utxo
-		feePerByte := float64(m.Configuration.FeeUnit.Satoshis / m.Configuration.FeeUnit.Bytes)
-
-		reserveSatoshis := satoshisNeeded + m.estimateFee(m.Configuration.FeeUnit, 0)
-		if reserveSatoshis <= dustLimit && !m.containsOpReturn() {
-			m.client.Logger().Error().
-				Str("txID", m.GetID()).
-				Msg("amount of satoshis to send less than the dust limit")
-			return ErrOutputValueTooLow
-		}
-		if reservedUtxos, err = reserveUtxos(
-			ctx, m.XpubID, m.ID, reserveSatoshis, feePerByte, m.Configuration.FromUtxos, opts...,
-		); err != nil {
-			return
-		}
-
-		// Get the inputUtxos (in bt.UTXO format) and the total amount of satoshis from the utxos
-		if inputUtxos, satoshisReserved, err = m.getInputsFromUtxos(
-			reservedUtxos,
-		); err != nil {
-			return
-		}
-
-		// add the satoshis from the utxos we forcibly included to the total input sats
-		satoshisReserved += includeUtxoSatoshis
-
-		// Reserve the utxos
-		if err = m.processUtxos(
-			ctx, reservedUtxos,
-		); err != nil {
-			return err
-		}
+	inputUtxos, satoshisReserved, err := m.prepareUtxos(ctx, opts, satoshisNeeded)
+	if err != nil {
+		return
 	}
 
 	// Start a new transaction from the reservedUtxos
@@ -326,6 +253,27 @@ func (m *DraftTransaction) createTransactionHex(ctx context.Context) (err error)
 	}
 
 	// Estimate the fee for the transaction
+	err = m.calculateAndSetFee(ctx, satoshisReserved, satoshisNeeded)
+	if err != nil {
+		return
+	}
+
+	// Add the outputs to the bt transaction
+	if err = m.addOutputsToTx(tx); err != nil {
+		return
+	}
+
+	if err = validateOutputsInputs(m.Configuration.Inputs, m.Configuration.Outputs, m.Configuration.Fee); err != nil {
+		return
+	}
+
+	// Create the final hex (without signatures)
+	m.Hex = tx.String()
+
+	return
+}
+
+func (m *DraftTransaction) calculateAndSetFee(ctx context.Context, satoshisReserved uint64, satoshisNeeded uint64) error {
 	fee := m.estimateFee(m.Configuration.FeeUnit, 0)
 	if m.Configuration.SendAllTo != nil {
 		if m.Configuration.Outputs[0].Satoshis <= dustLimit {
@@ -343,39 +291,130 @@ func (m *DraftTransaction) createTransactionHex(ctx context.Context) (err error)
 		}
 
 		m.Configuration.Outputs[0].Scripts[0].Satoshis = m.Configuration.Outputs[0].Satoshis
-	} else {
-		if satoshisReserved < satoshisNeeded+fee {
-			return ErrNotEnoughUtxos
+	}
+
+	if satoshisReserved < satoshisNeeded+fee {
+		return ErrNotEnoughUtxos
+	}
+
+	// if we have a remainder, add that to an output to our own wallet address
+	satoshisChange := satoshisReserved - satoshisNeeded - fee
+	m.Configuration.Fee = fee
+	if satoshisChange > 0 {
+		var newFee uint64
+		newFee, err := m.setChangeDestination(
+			ctx, satoshisChange, fee,
+		)
+		if err != nil {
+			return err
+		}
+		m.Configuration.Fee = newFee
+	}
+
+	return nil
+}
+
+func (m *DraftTransaction) prepareUtxos(ctx context.Context, opts []ModelOps, satoshisNeeded uint64) (*[]*bt.UTXO, uint64, error) {
+	if m.Configuration.SendAllTo != nil { // Send TO ALL
+		inputUtxos, satoshisReserved, err := m.prepareSendAllToUtxos(ctx, opts)
+		if err != nil {
+			return nil, 0, err
+		}
+		return inputUtxos, satoshisReserved, nil
+	}
+
+	inputUtxos, satoshisReserved, err := m.prepareSeparateUtxos(ctx, opts, satoshisNeeded)
+	if err != nil {
+		return nil, 0, err
+	}
+	return inputUtxos, satoshisReserved, nil
+}
+
+func (m *DraftTransaction) prepareSeparateUtxos(ctx context.Context, opts []ModelOps, satoshisNeeded uint64) (*[]*bt.UTXO, uint64, error) {
+	// we can only include separate utxos (like tokens) when not using SendAllTo
+	var includeUtxoSatoshis uint64
+	var err error
+	if m.Configuration.IncludeUtxos != nil {
+		includeUtxoSatoshis, err = m.addIncludeUtxos(ctx)
+		if err != nil {
+			return nil, 0, err
+		}
+	}
+
+	// Reserve and Get utxos for the transaction
+	var reservedUtxos []*Utxo
+	feePerByte := float64(m.Configuration.FeeUnit.Satoshis / m.Configuration.FeeUnit.Bytes)
+
+	reserveSatoshis := satoshisNeeded + m.estimateFee(m.Configuration.FeeUnit, 0)
+	if reserveSatoshis <= dustLimit && !m.containsOpReturn() {
+		m.client.Logger().Error().
+			Str("txID", m.GetID()).
+			Msg("amount of satoshis to send less than the dust limit")
+		return nil, 0, err
+	}
+	if reservedUtxos, err = reserveUtxos(
+		ctx, m.XpubID, m.ID, reserveSatoshis, feePerByte, m.Configuration.FromUtxos, opts...,
+	); err != nil {
+		return nil, 0, err
+	}
+
+	// Get the inputUtxos (in bt.UTXO format) and the total amount of satoshis from the utxos
+	inputUtxos, satoshisReserved, err := m.getInputsFromUtxos(
+		reservedUtxos,
+	)
+	if err != nil {
+		return nil, 0, err
+	}
+
+	// add the satoshis from the utxos we forcibly included to the total input sats
+	satoshisReserved += includeUtxoSatoshis
+
+	// Reserve the utxos
+	if err = m.processUtxos(
+		ctx, reservedUtxos,
+	); err != nil {
+		return nil, 0, err
+	}
+	return inputUtxos, satoshisReserved, nil
+}
+
+func (m *DraftTransaction) prepareSendAllToUtxos(ctx context.Context, opts []ModelOps) (*[]*bt.UTXO, uint64, error) {
+	// todo should all utxos be sent to the SendAllTo address, not only the p2pkhs?
+	spendableUtxos, err := getSpendableUtxos(
+		ctx, m.XpubID, utils.ScriptTypePubKeyHash, nil, m.Configuration.FromUtxos, opts...,
+	)
+	if err != nil {
+		return nil, 0, err
+	}
+	for _, utxo := range spendableUtxos {
+		// Reserve the utxos
+		utxo.DraftID.Valid = true
+		utxo.DraftID.String = m.ID
+		utxo.ReservedAt.Valid = true
+		utxo.ReservedAt.Time = time.Now().UTC()
+
+		// Save the UTXO
+		if err = utxo.Save(ctx); err != nil {
+			return nil, 0, err
 		}
 
-		// if we have a remainder, add that to an output to our own wallet address
-		satoshisChange := satoshisReserved - satoshisNeeded - fee
-		m.Configuration.Fee = fee
-		if satoshisChange > 0 {
-			var newFee uint64
-			newFee, err = m.setChangeDestination(
-				ctx, satoshisChange, fee,
-			)
-			if err != nil {
-				return
-			}
-			m.Configuration.Fee = newFee
-		}
+		m.Configuration.Outputs[0].Satoshis += utxo.Satoshis
 	}
 
-	// Add the outputs to the bt transaction
-	if err = m.addOutputsToTx(tx); err != nil {
-		return
+	// Get the inputUtxos (in bt.UTXO format) and the total amount of satoshis from the utxos
+	inputUtxos, satoshisReserved, err := m.getInputsFromUtxos(
+		spendableUtxos,
+	)
+	if err != nil {
+		return nil, 0, err
 	}
 
-	if err = validateOutputsInputs(m.Configuration.Inputs, m.Configuration.Outputs, m.Configuration.Fee); err != nil {
-		return
+	if err = m.processUtxos(
+		ctx, spendableUtxos,
+	); err != nil {
+		return nil, 0, err
 	}
-
-	// Create the final hex (without signatures)
-	m.Hex = tx.String()
-
-	return
+	return inputUtxos, satoshisReserved, nil
 }
 
 func validateOutputsInputs(inputs []*TransactionInput, outputs []*TransactionOutput, fee uint64) error {
@@ -737,11 +776,6 @@ func (m *DraftTransaction) BeforeCreating(ctx context.Context) (err error) {
 	m.Client().Logger().Debug().
 		Str("draftTxID", m.GetID()).
 		Msgf("starting: %s BeforeCreating hook...", m.Name())
-
-	// Prepare the transaction
-	if err = m.createTransactionHex(ctx); err != nil {
-		return
-	}
 
 	m.Client().Logger().Debug().
 		Str("draftTxID", m.GetID()).

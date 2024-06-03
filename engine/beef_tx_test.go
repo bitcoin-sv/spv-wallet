@@ -283,7 +283,7 @@ func Test_ToBeef_ErrorPaths(t *testing.T) {
 }
 
 func createProcessedTx(ctx context.Context, t *testing.T, client ClientInterface, testCase *beefTestCase, ancestors []*Transaction) *Transaction {
-	draftTx := newDraftTransaction(
+	draftTx, err := newDraftTransaction(
 		testXPub, &TransactionConfig{
 			Inputs: createInputsUsingAncestors(ancestors, client),
 			Outputs: []*TransactionOutput{{
@@ -300,6 +300,7 @@ func createProcessedTx(ctx context.Context, t *testing.T, client ClientInterface
 		},
 		append(client.DefaultModelOptions(), New())...,
 	)
+	require.NoError(t, err)
 
 	transaction, err := txFromHex(testCase.hexForProcessedTx, append(client.DefaultModelOptions(), New())...)
 	require.NoError(t, err)
