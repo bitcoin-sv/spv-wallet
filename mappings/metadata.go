@@ -14,3 +14,12 @@ func MapToSpvWalletMetadata(metadata *models.Metadata) *engine.Metadata {
 	output := engine.Metadata(*metadata)
 	return &output
 }
+
+// MapToMetadata converts "raw" key-value map to aliased engine.Metadata
+func MapToMetadata(explicitMap map[string]interface{}) *engine.Metadata {
+	if explicitMap == nil {
+		return nil
+	}
+	m := engine.Metadata(explicitMap)
+	return &m
+}

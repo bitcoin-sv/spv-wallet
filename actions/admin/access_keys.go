@@ -5,6 +5,7 @@ import (
 
 	"github.com/bitcoin-sv/spv-wallet/mappings"
 	"github.com/bitcoin-sv/spv-wallet/models"
+	"github.com/bitcoin-sv/spv-wallet/models/filter"
 	"github.com/gin-gonic/gin"
 )
 
@@ -14,14 +15,14 @@ import (
 // @Description	Access Keys Search
 // @Tags		Admin
 // @Produce		json
-// @Param		SearchAccessKeys body SearchAccessKeys false "Supports targeted resource searches with filters and metadata, plus options for pagination and sorting to streamline data exploration and analysis"
+// @Param		SearchAccessKeys body filter.AdminSearchAccessKeys false "Supports targeted resource searches with filters and metadata, plus options for pagination and sorting to streamline data exploration and analysis"
 // @Success		200 {object} []models.AccessKey "List of access keys"
 // @Failure		400	"Bad request - Error while parsing SearchAccessKeys from request body"
 // @Failure 	500	"Internal server error - Error while searching for access keys"
 // @Router		/v1/admin/access-keys/search [post]
 // @Security	x-auth-xpub
 func (a *Action) accessKeysSearch(c *gin.Context) {
-	var reqParams SearchAccessKeys
+	var reqParams filter.AdminSearchAccessKeys
 	if err := c.Bind(&reqParams); err != nil {
 		c.JSON(http.StatusBadRequest, err.Error())
 		return
@@ -29,9 +30,9 @@ func (a *Action) accessKeysSearch(c *gin.Context) {
 
 	accessKeys, err := a.Services.SpvWalletEngine.GetAccessKeys(
 		c.Request.Context(),
-		reqParams.Metadata,
+		mappings.MapToMetadata(reqParams.Metadata),
 		reqParams.Conditions.ToDbConditions(),
-		reqParams.QueryParams,
+		mappings.MapToQueryParams(reqParams.QueryParams),
 	)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, err.Error())
@@ -52,14 +53,14 @@ func (a *Action) accessKeysSearch(c *gin.Context) {
 // @Description	Access Keys Count
 // @Tags		Admin
 // @Produce		json
-// @Param		CountAccessKeys body CountAccessKeys false "Enables filtering of elements to be counted"
+// @Param		CountAccessKeys body filter.AdminCountAccessKeys false "Enables filtering of elements to be counted"
 // @Success		200 {number} int64 "Count of access keys"
 // @Failure		400	"Bad request - Error while parsing CountAccessKeys from request body"
 // @Failure 	500	"Internal Server Error - Error while fetching count of access keys"
 // @Router		/v1/admin/access-keys/count [post]
 // @Security	x-auth-xpub
 func (a *Action) accessKeysCount(c *gin.Context) {
-	var reqParams CountAccessKeys
+	var reqParams filter.AdminCountAccessKeys
 	if err := c.Bind(&reqParams); err != nil {
 		c.JSON(http.StatusBadRequest, err.Error())
 		return
@@ -67,7 +68,7 @@ func (a *Action) accessKeysCount(c *gin.Context) {
 
 	count, err := a.Services.SpvWalletEngine.GetAccessKeysCount(
 		c.Request.Context(),
-		reqParams.Metadata,
+		mappings.MapToMetadata(reqParams.Metadata),
 		reqParams.Conditions.ToDbConditions(),
 	)
 	if err != nil {

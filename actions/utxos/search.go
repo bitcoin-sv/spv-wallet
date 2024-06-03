@@ -6,6 +6,7 @@ import (
 	"github.com/bitcoin-sv/spv-wallet/engine"
 	"github.com/bitcoin-sv/spv-wallet/mappings"
 	"github.com/bitcoin-sv/spv-wallet/models"
+	"github.com/bitcoin-sv/spv-wallet/models/filter"
 	"github.com/bitcoin-sv/spv-wallet/server/auth"
 	"github.com/gin-gonic/gin"
 )
@@ -16,7 +17,7 @@ import (
 // @Description	Search UTXO
 // @Tags		UTXO
 // @Produce		json
-// @Param		SearchUtxos body SearchUtxos false "Supports targeted resource searches with filters and metadata, plus options for pagination and sorting to streamline data exploration and analysis"
+// @Param		SearchUtxos body filter.SearchUtxos false "Supports targeted resource searches with filters and metadata, plus options for pagination and sorting to streamline data exploration and analysis"
 // @Success		200 {object} []models.Utxo "List of utxos"
 // @Failure		400	"Bad request - Error while parsing SearchUtxos from request body"
 // @Failure 	500	"Internal server error - Error while searching for utxos"
@@ -25,7 +26,7 @@ import (
 func (a *Action) search(c *gin.Context) {
 	reqXPubID := c.GetString(auth.ParamXPubHashKey)
 
-	var reqParams SearchUtxos
+	var reqParams filter.SearchUtxos
 	if err := c.Bind(&reqParams); err != nil {
 		c.JSON(http.StatusBadRequest, err.Error())
 		return
@@ -41,9 +42,9 @@ func (a *Action) search(c *gin.Context) {
 	if utxos, err = a.Services.SpvWalletEngine.GetUtxosByXpubID(
 		c.Request.Context(),
 		reqXPubID,
-		reqParams.Metadata,
+		mappings.MapToMetadata(reqParams.Metadata),
 		conditions,
-		reqParams.QueryParams,
+		mappings.MapToQueryParams(reqParams.QueryParams),
 	); err != nil {
 		c.JSON(http.StatusInternalServerError, err.Error())
 		return
