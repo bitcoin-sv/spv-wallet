@@ -335,6 +335,12 @@ if [ "$load_config" == "true" ]; then
             load_from 'SPVWALLET_ADMIN_XPRIV' admin_xpriv
             load_from 'RUN_ADMIN_PANEL' admin_panel
         done < ".env.config"
+
+        if [ -n "$paymail_domain" ]; then
+            SPVWALLET_NODES_CALLBACK_CALLBACK_HOST="https://$paymail_domain"
+            print_debug "SPVWALLET_NODES_CALLBACK_CALLBACK_HOST set to $SPVWALLET_NODES_CALLBACK_CALLBACK_HOST"
+        fi
+
         print_success "Config loaded from .env.config file"
         print_debug "Config after loading .env.config:"
         print_state
@@ -474,6 +480,12 @@ if [ "$background" == "" ]; then
     print_debug "background: $background"
 fi
 
+# Set SPVWALLET_NODES_CALLBACK_CALLBACK_HOST if paymail_domain is set
+if [ -n "$paymail_domain" ]; then
+    SPVWALLET_NODES_CALLBACK_CALLBACK_HOST="https://$paymail_domain"
+    print_debug "SPVWALLET_NODES_CALLBACK_CALLBACK_HOST set to $SPVWALLET_NODES_CALLBACK_CALLBACK_HOST"
+fi
+
 # === SAVE CONFIG ===
 print_debug "Config before storing:"
 print_state
@@ -493,6 +505,8 @@ save_to 'RUN_IN_BACKGROUND' background
 save_to 'RUN_WITH_DEFAULT_XPUB' default_xpub
 save_to 'SPVWALLET_AUTH_ADMIN_KEY' admin_xpub
 save_to 'SPVWALLET_ADMIN_XPRIV' admin_xpriv
+save_to 'SPVWALLET_NODES_CALLBACK_CALLBACK_HOST' SPVWALLET_NODES_CALLBACK_CALLBACK_HOST
+
 if [ "$admin_panel" == "true" ] && [ "$default_xpub" == "true" ]; then
     {
         echo "# Use the following xPriv to login to the admin panel:" >> ".env.config"

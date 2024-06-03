@@ -63,7 +63,7 @@ func getCacheDefaults() *CacheConfig {
 
 func getCallbackDefaults() *CallbackConfig {
 	return &CallbackConfig{
-		CallbackHost:  "http://localhost:3003",
+		CallbackHost:  "https://example.com",
 		CallbackToken: "",
 	}
 }
