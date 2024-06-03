@@ -2,9 +2,6 @@ package engine
 
 import (
 	"encoding/json"
-
-	"go.mongodb.org/mongo-driver/mongo"
-	"go.mongodb.org/mongo-driver/x/bsonx"
 )
 
 const (
@@ -81,81 +78,4 @@ func processXpubMetadataConditions(conditions map[string]interface{}) {
 		}
 	}
 	delete(conditions, "xpub_metadata")
-}
-
-// getMongoIndexes will get indexes from mongo
-func getMongoIndexes() map[string][]mongo.IndexModel {
-	return map[string][]mongo.IndexModel{
-		"block_headers": {
-			mongo.IndexModel{Keys: bsonx.Doc{{
-				Key:   "height",
-				Value: bsonx.Int32(1),
-			}}},
-			mongo.IndexModel{Keys: bsonx.Doc{{
-				Key:   "synced",
-				Value: bsonx.Int32(1),
-			}}},
-		},
-		"destinations": {
-			mongo.IndexModel{Keys: bsonx.Doc{{
-				Key:   "address",
-				Value: bsonx.Int32(1),
-			}}},
-		},
-		"draft_transactions": {
-			mongo.IndexModel{Keys: bsonx.Doc{{
-				Key:   "status",
-				Value: bsonx.Int32(1),
-			}}},
-			mongo.IndexModel{Keys: bsonx.Doc{{
-				Key:   "xpub_id",
-				Value: bsonx.Int32(1),
-			}, {
-				Key:   "status",
-				Value: bsonx.Int32(1),
-			}}},
-		},
-		"transactions": {
-			mongo.IndexModel{Keys: bsonx.Doc{{
-				Key:   "xpub_metadata.x",
-				Value: bsonx.Int32(1),
-			}, {
-				Key:   "xpub_metadata.k",
-				Value: bsonx.Int32(1),
-			}, {
-				Key:   "xpub_metadata.v",
-				Value: bsonx.Int32(1),
-			}}},
-			mongo.IndexModel{Keys: bsonx.Doc{{
-				Key:   "xpub_in_ids",
-				Value: bsonx.Int32(1),
-			}}},
-			mongo.IndexModel{Keys: bsonx.Doc{{
-				Key:   "xpub_out_ids",
-				Value: bsonx.Int32(1),
-			}}},
-		},
-		"utxos": {
-			mongo.IndexModel{Keys: bsonx.Doc{{
-				Key:   "transaction_id",
-				Value: bsonx.Int32(1),
-			}, {
-				Key:   "output_index",
-				Value: bsonx.Int32(1),
-			}}},
-			mongo.IndexModel{Keys: bsonx.Doc{{
-				Key:   "xpub_id",
-				Value: bsonx.Int32(1),
-			}, {
-				Key:   "type",
-				Value: bsonx.Int32(1),
-			}, {
-				Key:   "draft_id",
-				Value: bsonx.Int32(1),
-			}, {
-				Key:   "spending_tx_id",
-				Value: bsonx.Int32(1),
-			}}},
-		},
-	}
 }

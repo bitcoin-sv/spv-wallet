@@ -6,7 +6,6 @@ import (
 	"os"
 	"time"
 
-	"gorm.io/driver/mysql"
 	"gorm.io/driver/postgres"
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
@@ -17,7 +16,6 @@ import (
 
 /*
 // Load the NewRelic capable drivers
-// _ "github.com/newrelic/go-agent/v3/integrations/nrmysql"
 // _ "github.com/newrelic/go-agent/v3/integrations/nrpgx"
 // _ "github.com/newrelic/go-agent/v3/integrations/nrsqlite3"
 */
@@ -25,12 +23,9 @@ import (
 // SQL related default settings
 // todo: make this configurable for the end-user?
 const (
-	defaultDatetimePrecision            = true            // disable datetime precision, which not supported before MySQL 5.6
-	defaultDontSupportRenameColumn      = true            // `change` when rename column, rename column not supported before MySQL 8, MariaDB
-	defaultDontSupportRenameIndex       = true            // drop & create when rename index, rename index not supported before MySQL 5.7, MariaDB
-	defaultFieldStringSize         uint = 256             // default size for string fields
-	dsnDefault                          = "file::memory:" // DSN for connection (file or memory, default is memory)
-	defaultPreparedStatements           = false           // Flag for prepared statements for SQL
+	defaultFieldStringSize    uint = 256             // default size for string fields
+	dsnDefault                     = "file::memory:" // DSN for connection (file or memory, default is memory)
+	defaultPreparedStatements      = false           // Flag for prepared statements for SQL
 )
 
 // openSQLDatabase will open a new SQL database
@@ -42,7 +37,7 @@ func openSQLDatabase(optionalLogger glogger.Interface, configs ...*SQLConfig) (d
 	}
 
 	// Not a valid driver?
-	if sourceConfig.Driver != MySQL.String() && sourceConfig.Driver != PostgreSQL.String() {
+	if sourceConfig.Driver != PostgreSQL.String() {
 		return nil, ErrUnsupportedDriver
 	}
 
@@ -180,35 +175,7 @@ func getDNS(databasePath string, shared bool) (dsn string) {
 
 // getDialector will return a new gorm.Dialector based on driver
 func getDialector(config *SQLConfig) gorm.Dialector {
-	if config.Driver == MySQL.String() {
-		return mySQLDialector(config)
-	}
 	return postgreSQLDialector(config)
-}
-
-// mySQLDialector will return a gorm.Dialector
-func mySQLDialector(config *SQLConfig) gorm.Dialector {
-	// Create the default MySQL configuration
-	cfg := mysql.Config{
-		// DriverName: "nrmysql",
-		// todo: make all params customizable via config
-		DSN: config.User + ":" + config.Password +
-			"@tcp(" + config.Host + ":" + config.Port + ")/" +
-			config.Name + "?charset=utf8&parseTime=True&loc=Local", // data source name (connection string)
-		DefaultStringSize:         defaultFieldStringSize,           // default size for string fields
-		DisableDatetimePrecision:  defaultDatetimePrecision,         // disable datetime precision, which not supported before MySQL 5.6
-		DontSupportRenameIndex:    defaultDontSupportRenameIndex,    // drop & create when rename index, rename index not supported before MySQL 5.7, MariaDB
-		DontSupportRenameColumn:   defaultDontSupportRenameColumn,   // `change` when rename column, rename column not supported before MySQL 8, MariaDB
-		SkipInitializeWithVersion: config.SkipInitializeWithVersion, // autoconfigure based on currently MySQL version
-	}
-
-	// Do we have an existing connection
-	if config.ExistingConnection != nil {
-		cfg.DSN = ""
-		cfg.Conn = config.ExistingConnection
-	}
-
-	return mysql.New(cfg)
 }
 
 // postgreSQLDialector will return a gorm.Dialector
@@ -369,18 +336,10 @@ func (s *SQLConfig) sqlDefaults(engine Engine) *SQLConfig {
 		s.MaxConnectionIdleTime = defaultDatabaseMaxIdleTime
 	}
 	if len(s.Port) == 0 {
-		if engine == MySQL {
-			s.Port = defaultMySQLPort
-		} else {
-			s.Port = defaultPostgreSQLPort
-		}
+		s.Port = defaultPostgreSQLPort
 	}
 	if len(s.Host) == 0 {
-		if engine == MySQL {
-			s.Host = defaultMySQLHost
-		} else {
-			s.Host = defaultPostgreSQLHost
-		}
+		s.Host = defaultPostgreSQLHost
 	}
 	if len(s.TimeZone) == 0 {
 		s.TimeZone = defaultTimeZone

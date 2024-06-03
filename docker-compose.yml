@@ -118,23 +118,6 @@ services:
       timeout: 5s
       retries: 3
 
-  wallet-mongodb:
-    image: mongo
-    environment:
-      MONGO_INITDB_ROOT_USERNAME: mongo
-      MONGO_INITDB_ROOT_PASSWORD: mongo
-      MONGO_INITDB_DATABASE: xapi
-    ports:
-      - '27017:27017'
-    volumes:
-      - wallet-mongodb-data:/data/db
-    healthcheck:
-      test: echo 'db.runCommand("ping").ok' | mongosh mongodb:27017/test --quiet
-      interval: 10s
-      timeout: 10s
-      retries: 5
-      start_period: 40s
-
   wallet-gateway:
     image: traefik:v2.11
     container_name: traefik
@@ -164,8 +147,6 @@ volumes:
   wallet-postgresql-data:
     driver: local
   wallet-redis-data:
-    driver: local
-  wallet-mongodb-data:
     driver: local
   block-headers-service-data:
     driver: local

@@ -141,7 +141,7 @@ func (i *minercraftInitializer) getFeeQuote(ctx context.Context, miner *minercra
 
 	btFee := quote.Quote.GetFee(mapi.FeeTypeData)
 	if btFee == nil {
-		return nil, fmt.Errorf("Fee is missing in %s's FeeQuote response", miner.Name)
+		return nil, fmt.Errorf("fee is missing in %s's FeeQuote response", miner.Name)
 	}
 
 	feeUnit := &utils.FeeUnit{

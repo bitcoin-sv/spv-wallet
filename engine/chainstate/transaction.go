@@ -2,6 +2,7 @@ package chainstate
 
 import (
 	"context"
+	"errors"
 	"strings"
 	"sync"
 	"time"
@@ -122,9 +123,9 @@ func queryMinercraft(ctx context.Context, client ClientInterface, miner *minercr
 // queryBroadcastClient will submit a query transaction request to a go-broadcast-client
 func queryBroadcastClient(ctx context.Context, client ClientInterface, id string) (*TransactionInfo, error) {
 	client.DebugLog("executing request using " + ProviderBroadcastClient)
-	if resp, err := client.BroadcastClient().QueryTransaction(ctx, id); err != nil {
-		client.DebugLog("error executing request using " + ProviderBroadcastClient + " failed: " + err.Error())
-		return nil, err
+	if resp, failure := client.BroadcastClient().QueryTransaction(ctx, id); failure != nil {
+		client.DebugLog("error executing request using " + ProviderBroadcastClient + " failed: " + failure.Error())
+		return nil, errors.New(failure.Error())
 	} else if resp != nil && strings.EqualFold(resp.TxID, id) {
 		bump, err := bc.NewBUMPFromStr(resp.BaseTxResponse.MerklePath)
 		if err != nil {

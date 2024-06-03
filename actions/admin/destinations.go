@@ -5,6 +5,7 @@ import (
 
 	"github.com/bitcoin-sv/spv-wallet/mappings"
 	"github.com/bitcoin-sv/spv-wallet/models"
+	"github.com/bitcoin-sv/spv-wallet/models/filter"
 	"github.com/gin-gonic/gin"
 )
 
@@ -14,14 +15,14 @@ import (
 // @Description	Search for destinations
 // @Tags		Admin
 // @Produce		json
-// @Param		SearchDestinations body SearchDestinations false "Supports targeted resource searches with filters and metadata, plus options for pagination and sorting to streamline data exploration and analysis"
+// @Param		SearchDestinations body filter.SearchDestinations false "Supports targeted resource searches with filters and metadata, plus options for pagination and sorting to streamline data exploration and analysis"
 // @Success		200 {object} []models.Destination "List of destinations"
 // @Failure		400	"Bad request - Error while parsing SearchDestinations from request body"
 // @Failure 	500	"Internal server error - Error while searching for destinations"
 // @Router		/v1/admin/destinations/search [post]
 // @Security	x-auth-xpub
 func (a *Action) destinationsSearch(c *gin.Context) {
-	var reqParams SearchDestinations
+	var reqParams filter.SearchDestinations
 	if err := c.Bind(&reqParams); err != nil {
 		c.JSON(http.StatusBadRequest, err.Error())
 		return
@@ -29,9 +30,9 @@ func (a *Action) destinationsSearch(c *gin.Context) {
 
 	destinations, err := a.Services.SpvWalletEngine.GetDestinations(
 		c.Request.Context(),
-		reqParams.Metadata,
+		mappings.MapToMetadata(reqParams.Metadata),
 		reqParams.Conditions.ToDbConditions(),
-		reqParams.QueryParams,
+		mappings.MapToQueryParams(reqParams.QueryParams),
 	)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, err.Error())
@@ -52,13 +53,13 @@ func (a *Action) destinationsSearch(c *gin.Context) {
 // @Description	Count destinations
 // @Tags		Admin
 // @Produce		json
-// @Param		CountDestinations body CountDestinations false "Enables filtering of elements to be counted"
+// @Param		CountDestinations body filter.CountDestinations false "Enables filtering of elements to be counted"
 // @Success		200	{number} int64 "Count of destinations"
 // @Failure		400	"Bad request - Error while parsing CountDestinations from request body"
 // @Failure 	500	"Internal Server Error - Error while fetching count of destinations"
 // @Security	x-auth-xpub
 func (a *Action) destinationsCount(c *gin.Context) {
-	var reqParams CountDestinations
+	var reqParams filter.CountDestinations
 	if err := c.Bind(&reqParams); err != nil {
 		c.JSON(http.StatusBadRequest, err.Error())
 		return
@@ -66,7 +67,7 @@ func (a *Action) destinationsCount(c *gin.Context) {
 
 	count, err := a.Services.SpvWalletEngine.GetDestinationsCount(
 		c.Request.Context(),
-		reqParams.Metadata,
+		mappings.MapToMetadata(reqParams.Metadata),
 		reqParams.Conditions.ToDbConditions(),
 	)
 	if err != nil {

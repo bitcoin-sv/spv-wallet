@@ -6,8 +6,6 @@ type Engine string
 // Supported engines (databases)
 const (
 	Empty      Engine = "empty"
-	MongoDB    Engine = "mongodb"
-	MySQL      Engine = "mysql"
 	PostgreSQL Engine = "postgresql"
 	SQLite     Engine = "sqlite"
 )
@@ -21,7 +19,6 @@ const (
 
 // SQLDatabases is the list of supported SQL databases (via GORM)
 var SQLDatabases = []Engine{
-	MySQL,
 	PostgreSQL,
 	SQLite,
 }

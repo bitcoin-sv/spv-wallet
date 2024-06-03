@@ -2,7 +2,6 @@ package engine
 
 import (
 	"context"
-	"database/sql"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -13,7 +12,6 @@ import (
 	"github.com/bitcoin-sv/go-paymail"
 	"github.com/bitcoin-sv/spv-wallet/engine/chainstate"
 	"github.com/bitcoin-sv/spv-wallet/engine/datastore"
-	customTypes "github.com/bitcoin-sv/spv-wallet/engine/datastore/customtypes"
 	"github.com/bitcoin-sv/spv-wallet/engine/notifications"
 )
 
@@ -121,46 +119,38 @@ func broadcastSyncTransaction(ctx context.Context, syncTx *SyncTransaction) erro
 		}
 	}
 
-	txHex, hexFormat := _getTxHexInFormat(ctx, tx, chainstateSrv.SupportedBroadcastFormats(), client)
-
 	// Broadcast
-	var provider string
-	if provider, err = chainstateSrv.Broadcast(
-		ctx, syncTx.ID, txHex, hexFormat, defaultBroadcastTimeout,
-	); err != nil {
-		_bailAndSaveSyncTransaction(ctx, syncTx, SyncStatusReady, syncActionBroadcast, provider, err.Error())
-		return err
+	txHex, hexFormat := _getTxHexInFormat(ctx, tx, chainstateSrv.SupportedBroadcastFormats(), client)
+	br := chainstateSrv.Broadcast(ctx, syncTx.ID, txHex, hexFormat, defaultBroadcastTimeout)
+
+	if br.Failure != nil { // broadcast failed
+		if br.Failure.InvalidTx {
+			syncTx.BroadcastStatus = SyncStatusError // invalid transaction, won't be broadcasted anymore
+		} else {
+			syncTx.BroadcastStatus = SyncStatusReady // client error, try again later
+		}
+
+		_addSyncResult(ctx, syncTx, syncActionBroadcast, br.Provider, br.Failure.Error.Error())
+		return br.Failure.Error
 	}
 
 	// Update the sync information
-	statusMsg := "broadcast success"
-
 	syncTx.BroadcastStatus = SyncStatusComplete
-	syncTx.Results.LastMessage = statusMsg
-	syncTx.LastAttempt = customTypes.NullTime{
-		NullTime: sql.NullTime{
-			Time:  time.Now().UTC(),
-			Valid: true,
-		},
-	}
-
-	syncTx.Results.Results = append(syncTx.Results.Results, &SyncResult{
-		Action:        syncActionBroadcast,
-		ExecutedAt:    time.Now().UTC(),
-		Provider:      provider,
-		StatusMessage: statusMsg,
-	})
-
 	// Update sync status to be ready now
 	if syncTx.SyncStatus == SyncStatusPending {
 		syncTx.SyncStatus = SyncStatusReady
 	}
 
+	syncTx.Results.Results = append(syncTx.Results.Results, &SyncResult{
+		Action:        syncActionBroadcast,
+		ExecutedAt:    time.Now().UTC(),
+		Provider:      br.Provider,
+		StatusMessage: "broadcast success",
+	})
+
 	// Update the sync transaction record
 	if err = syncTx.Save(ctx); err != nil {
-		_bailAndSaveSyncTransaction(
-			ctx, syncTx, SyncStatusError, syncActionBroadcast, "internal", err.Error(),
-		)
+		_addSyncResult(ctx, syncTx, syncActionBroadcast, "internal", err.Error())
 		return err
 	}
 
@@ -214,9 +204,8 @@ func _syncTxDataFromChain(ctx context.Context, syncTx *SyncTransaction, transact
 				Str("txID", syncTx.ID).
 				Msgf("Transaction not found on-chain, will try again later")
 
-			_bailAndSaveSyncTransaction(
-				ctx, syncTx, SyncStatusReady, syncActionSync, "all", "transaction not found on-chain",
-			)
+			syncTx.SyncStatus = SyncStatusReady
+			_addSyncResult(ctx, syncTx, syncActionSync, "all", "transaction not found on-chain")
 			return nil
 		}
 		return err
@@ -253,27 +242,21 @@ func processSyncTxSave(ctx context.Context, txInfo *chainstate.TransactionInfo, 
 	}
 
 	transaction.setChainInfo(txInfo)
-
-	message := "transaction was found on-chain by " + chainstate.ProviderBroadcastClient
-
 	if err := transaction.Save(ctx); err != nil {
-		_bailAndSaveSyncTransaction(
-			ctx, syncTx, SyncStatusError, syncActionSync, "internal", err.Error(),
-		)
+		_addSyncResult(ctx, syncTx, syncActionSync, "internal", err.Error())
 		return err
 	}
 
 	syncTx.SyncStatus = SyncStatusComplete
-	syncTx.Results.LastMessage = message
 	syncTx.Results.Results = append(syncTx.Results.Results, &SyncResult{
 		Action:        syncActionSync,
 		ExecutedAt:    time.Now().UTC(),
 		Provider:      chainstate.ProviderBroadcastClient,
-		StatusMessage: message,
+		StatusMessage: "transaction was found on-chain by " + chainstate.ProviderBroadcastClient,
 	})
 
 	if err := syncTx.Save(ctx); err != nil {
-		_bailAndSaveSyncTransaction(ctx, syncTx, SyncStatusError, syncActionSync, "internal", err.Error())
+		_addSyncResult(ctx, syncTx, syncActionSync, "internal", err.Error())
 		return err
 	}
 
@@ -300,25 +283,23 @@ func processP2PTransaction(ctx context.Context, tx *Transaction) error {
 
 	// No draft?
 	if len(tx.DraftID) == 0 {
-		_bailAndSaveSyncTransaction(
-			ctx, syncTx, SyncStatusComplete, syncActionP2P, "all", "no draft found, cannot complete p2p",
-		)
+		syncTx.P2PStatus = SyncStatusError
+		_addSyncResult(ctx, syncTx, syncActionP2P, "all", "no draft found, cannot complete p2p")
+
 		return nil
 	}
 
 	// Notify any P2P paymail providers associated to the transaction
 	var results []*SyncResult
 	if results, err = _notifyPaymailProviders(ctx, tx); err != nil {
-		_bailAndSaveSyncTransaction(
-			ctx, syncTx, SyncStatusReady, syncActionP2P, "", err.Error(),
-		)
+		syncTx.P2PStatus = SyncStatusReady
+		_addSyncResult(ctx, syncTx, syncActionP2P, "", err.Error())
 		return err
 	}
 
 	// Update if we have some results
 	if len(results) > 0 {
 		syncTx.Results.Results = append(syncTx.Results.Results, results...)
-		syncTx.Results.LastMessage = fmt.Sprintf("notified %d paymail provider(s)", len(results))
 	}
 
 	// Save the record
@@ -330,9 +311,8 @@ func processP2PTransaction(ctx context.Context, tx *Transaction) error {
 	}
 
 	if err = syncTx.Save(ctx); err != nil {
-		_bailAndSaveSyncTransaction(
-			ctx, syncTx, SyncStatusError, syncActionP2P, "internal", err.Error(),
-		)
+		syncTx.P2PStatus = SyncStatusError
+		_addSyncResult(ctx, syncTx, syncActionP2P, "internal", err.Error())
 		return err
 	}
 
@@ -407,24 +387,10 @@ func _groupByXpub(scTxs []*SyncTransaction) map[string][]*SyncTransaction {
 	return txsByXpub
 }
 
-// _bailAndSaveSyncTransaction will save the error message for a sync tx
-func _bailAndSaveSyncTransaction(ctx context.Context, syncTx *SyncTransaction, status SyncStatus,
+// _addSyncResult will save the error message for a sync tx
+func _addSyncResult(ctx context.Context, syncTx *SyncTransaction,
 	action, provider, message string,
 ) {
-	if action == syncActionSync {
-		syncTx.SyncStatus = status
-	} else if action == syncActionP2P {
-		syncTx.P2PStatus = status
-	} else if action == syncActionBroadcast {
-		syncTx.BroadcastStatus = status
-	}
-	syncTx.LastAttempt = customTypes.NullTime{
-		NullTime: sql.NullTime{
-			Time:  time.Now().UTC(),
-			Valid: true,
-		},
-	}
-	syncTx.Results.LastMessage = message
 	syncTx.Results.Results = append(syncTx.Results.Results, &SyncResult{
 		Action:        action,
 		ExecutedAt:    time.Now().UTC(),

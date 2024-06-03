@@ -5,6 +5,7 @@ import (
 
 	"github.com/bitcoin-sv/spv-wallet/mappings"
 	"github.com/bitcoin-sv/spv-wallet/models"
+	"github.com/bitcoin-sv/spv-wallet/models/filter"
 	"github.com/bitcoin-sv/spv-wallet/server/auth"
 	"github.com/gin-gonic/gin"
 )
@@ -15,7 +16,7 @@ import (
 // @Description	Search access key
 // @Tags		Access-key
 // @Produce		json
-// @Param		SearchAccessKeys body SearchAccessKeys false "Supports targeted resource searches with filters and metadata, plus options for pagination and sorting to streamline data exploration and analysis"
+// @Param		SearchAccessKeys body filter.SearchAccessKeys false "Supports targeted resource searches with filters and metadata, plus options for pagination and sorting to streamline data exploration and analysis"
 // @Success		200 {object} []models.AccessKey "List of access keys"
 // @Failure		400	"Bad request - Error while SearchAccessKeys from request body"
 // @Failure 	500	"Internal server error - Error while searching for access keys"
@@ -24,7 +25,7 @@ import (
 func (a *Action) search(c *gin.Context) {
 	reqXPubID := c.GetString(auth.ParamXPubHashKey)
 
-	var reqParams SearchAccessKeys
+	var reqParams filter.SearchAccessKeys
 	if err := c.Bind(&reqParams); err != nil {
 		c.JSON(http.StatusBadRequest, err.Error())
 		return
@@ -33,9 +34,9 @@ func (a *Action) search(c *gin.Context) {
 	accessKeys, err := a.Services.SpvWalletEngine.GetAccessKeysByXPubID(
 		c.Request.Context(),
 		reqXPubID,
-		reqParams.Metadata,
+		mappings.MapToMetadata(reqParams.Metadata),
 		reqParams.Conditions.ToDbConditions(),
-		reqParams.QueryParams,
+		mappings.MapToQueryParams(reqParams.QueryParams),
 	)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, err.Error())

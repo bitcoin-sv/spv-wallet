@@ -80,6 +80,34 @@ func getContactByID(ctx context.Context, id string, opts ...ModelOps) (*Contact,
 	return contact, nil
 }
 
+// getContactsByXPubIDCount will get a count of all the contacts
+func getContactsByXPubIDCount(ctx context.Context, xPubID string, metadata *Metadata,
+	conditions map[string]interface{}, opts ...ModelOps,
+) (int64, error) {
+	dbConditions := map[string]interface{}{}
+	if conditions != nil {
+		dbConditions = conditions
+	}
+	dbConditions[xPubIDField] = xPubID
+
+	if metadata != nil {
+		dbConditions[metadataField] = metadata
+	}
+
+	count, err := getModelCount(
+		ctx, NewBaseModel(ModelNameEmpty, opts...).Client().Datastore(),
+		Contact{}, dbConditions, defaultDatabaseReadTimeout,
+	)
+	if err != nil {
+		if errors.Is(err, datastore.ErrNoResults) {
+			return 0, nil
+		}
+		return 0, err
+	}
+
+	return count, nil
+}
+
 func (c *Contact) validate() error {
 	if c.ID == "" {
 		return ErrMissingContactID
@@ -112,7 +140,6 @@ func getContacts(ctx context.Context, metadata *Metadata, conditions map[string]
 	if conditions == nil {
 		conditions = make(map[string]interface{})
 	}
-	conditions[deletedAtField] = nil
 
 	contacts := make([]*Contact, 0)
 	if err := getModelsByConditions(ctx, ModelContact, &contacts, metadata, conditions, queryParams, opts...); err != nil {
@@ -127,7 +154,6 @@ func getContactsByXpubID(ctx context.Context, xPubID string, metadata *Metadata,
 		conditions = make(map[string]interface{})
 	}
 	conditions[xPubIDField] = xPubID
-	conditions[deletedAtField] = nil
 
 	contacts := make([]*Contact, 0)
 	if err := getModelsByConditions(ctx, ModelContact, &contacts, metadata, conditions, queryParams, opts...); err != nil {
@@ -248,14 +274,8 @@ func (c *Contact) BeforeUpdating(_ context.Context) (err error) {
 // Migrate model specific migration on startup
 func (c *Contact) Migrate(client datastore.ClientInterface) error {
 	tableName := client.GetTableName(tableContacts)
-	if client.Engine() == datastore.MySQL {
-		if err := c.migrateMySQL(client, tableName); err != nil {
-			return err
-		}
-	} else if client.Engine() == datastore.PostgreSQL {
-		if err := c.migratePostgreSQL(client, tableName); err != nil {
-			return err
-		}
+	if err := c.migratePostgreSQL(client, tableName); err != nil {
+		return err
 	}
 
 	return client.IndexMetadata(client.GetTableName(tableContacts), MetadataField)
@@ -267,23 +287,6 @@ func (c *Contact) migratePostgreSQL(client datastore.ClientInterface, tableName 
 	tx := client.Execute(`CREATE INDEX IF NOT EXISTS "` + idxName + `" ON "` + tableName + `" ("full_name", "paymail")`)
 	if tx.Error != nil {
 		return tx.Error
-	}
-	return nil
-}
-
-// migrateMySQL is specific migration SQL for MySQL
-func (c *Contact) migrateMySQL(client datastore.ClientInterface, tableName string) error {
-	idxName := "idx_" + tableName + "_contacts"
-	idxExists, err := client.IndexExists(tableName, idxName)
-	if err != nil {
-		return err
-	}
-	if !idxExists {
-		tx := client.Execute("CREATE INDEX " + idxName + " ON `" + tableName + "` (full_name, paymail)")
-		if tx.Error != nil {
-			c.Client().Logger().Error().Msgf("failed creating json index on mysql: %s", tx.Error.Error())
-			return nil //nolint:nolintlint,nilerr // error is not needed
-		}
 	}
 	return nil
 }

@@ -2,18 +2,10 @@ package tester
 
 import (
 	"database/sql/driver"
-	"fmt"
-	"os"
 	"time"
 
 	"github.com/bitcoin-sv/spv-wallet/engine/datastore"
-	sqle "github.com/dolthub/go-mysql-server"
-	"github.com/dolthub/go-mysql-server/memory"
-	"github.com/dolthub/go-mysql-server/server"
-	"github.com/dolthub/go-mysql-server/sql"
-	"github.com/dolthub/go-mysql-server/sql/information_schema"
 	embeddedPostgres "github.com/fergusstrange/embedded-postgres"
-	"github.com/tryvium-travels/memongo"
 )
 
 // AnyTime will fill the need for any timestamp field
@@ -49,48 +41,6 @@ func CreatePostgresServer(port uint32) (*embeddedPostgres.EmbeddedPostgres, erro
 
 	// Return the database
 	return postgres, nil
-}
-
-// CreateMongoServer will create a new mongo server
-func CreateMongoServer(version string) (*memongo.Server, error) {
-	mongoServer, err := memongo.StartWithOptions(
-		&memongo.Options{
-			MongoVersion:     version,
-			ShouldUseReplica: false,
-			DownloadURL:      os.Getenv("SPV_WALLET_MONGODB_DOWNLOAD_URL"),
-		},
-	)
-	if err != nil {
-		return nil, err
-	}
-
-	return mongoServer, nil
-}
-
-// CreateMySQL will make a new MySQL server
-// NOTE: not using username, password anymore since the mysql package removed "auth"
-func CreateMySQL(host, databaseName, _, _ string, port uint32) (*server.Server, error) {
-	engine := sqle.NewDefault(
-		sql.NewDatabaseProvider(
-			CreateMySQLTestDatabase(databaseName),
-			information_schema.NewInformationSchemaDatabase(),
-		))
-	config := server.Config{
-		Protocol: "tcp",
-		Address:  fmt.Sprintf("%s:%d", host, port),
-		// This package is no longer found in: github.com/dolthub/go-mysql-server v0.12.0
-		// Auth:     auth.NewNativeSingle(username, password, auth.AllPermissions),
-	}
-	s, err := server.NewDefaultServer(config, engine)
-	if err != nil {
-		return nil, err
-	}
-	return s, nil
-}
-
-// CreateMySQLTestDatabase is a dummy database for MySQL
-func CreateMySQLTestDatabase(databaseName string) *memory.Database {
-	return memory.NewDatabase(databaseName)
 }
 
 // SQLiteTestConfig will return a test-version of SQLite

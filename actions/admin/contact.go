@@ -4,8 +4,11 @@ import (
 	"errors"
 	"net/http"
 
+	"github.com/bitcoin-sv/spv-wallet/actions/common"
 	"github.com/bitcoin-sv/spv-wallet/engine"
 	"github.com/bitcoin-sv/spv-wallet/mappings"
+	"github.com/bitcoin-sv/spv-wallet/models"
+	"github.com/bitcoin-sv/spv-wallet/models/filter"
 	"github.com/gin-gonic/gin"
 )
 
@@ -15,14 +18,14 @@ import (
 // @Description	Search for contacts
 // @Tags		Admin
 // @Produce		json
-// @Param		SearchContacts body SearchContacts false "Supports targeted resource searches with filters and metadata, plus options for pagination and sorting to streamline data exploration and analysis"
-// @Success		200 {object} []models.Contact "List of contacts"
+// @Param		SearchContacts body filter.SearchContacts false "Supports targeted resource searches with filters and metadata, plus options for pagination and sorting to streamline data exploration and analysis"
+// @Success		200 {object} models.SearchContactsResponse "List of contacts"
 // @Failure		400	"Bad request - Error while parsing SearchContacts from request body"
 // @Failure 	500	"Internal server error - Error while searching for contacts"
 // @Router		/v1/admin/contact/search [post]
 // @Security	x-auth-xpub
 func (a *Action) contactsSearch(c *gin.Context) {
-	var reqParams SearchContacts
+	var reqParams filter.SearchContacts
 	if err := c.Bind(&reqParams); err != nil {
 		c.JSON(http.StatusBadRequest, err.Error())
 		return
@@ -34,12 +37,13 @@ func (a *Action) contactsSearch(c *gin.Context) {
 		return
 	}
 
-	// Record a new transaction (get the hex from parameters)a
+	reqParams.DefaultsIfNil()
+
 	contacts, err := a.Services.SpvWalletEngine.GetContacts(
 		c.Request.Context(),
-		reqParams.Metadata,
+		mappings.MapToMetadata(reqParams.Metadata),
 		conditions,
-		reqParams.QueryParams,
+		mappings.MapToQueryParams(reqParams.QueryParams),
 	)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, err.Error())
@@ -48,7 +52,22 @@ func (a *Action) contactsSearch(c *gin.Context) {
 
 	contracts := mappings.MapToContactContracts(contacts)
 
-	c.JSON(http.StatusOK, contracts)
+	count, err := a.Services.SpvWalletEngine.GetContactsCount(
+		c.Request.Context(),
+		mappings.MapToMetadata(reqParams.Metadata),
+		conditions,
+	)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	response := models.SearchContactsResponse{
+		Content: contracts,
+		Page:    common.GetPageFromQueryParams(reqParams.QueryParams, count),
+	}
+
+	c.JSON(http.StatusOK, response)
 }
 
 // contactsUpdate will update contact with the given id
