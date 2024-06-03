@@ -57,12 +57,9 @@ func GetChildNumsFromHex(hexHash string) ([]uint32, error) {
 		if stop > strLen {
 			stop = strLen
 		}
-		num, err := strconv.ParseUint(hexHash[start:stop], 16, 64)
+		num, err := strconv.ParseUint(hexHash[start:stop], 16, 32)
 		if err != nil {
 			return nil, err
-		}
-		if num > math.MaxUint32 {
-			return nil, fmt.Errorf("num %d is out of range for uint32", num)
 		}
 		childNums = append(childNums, uint32(num)) // todo: re-work to remove casting (possible cutoff)
 	}
