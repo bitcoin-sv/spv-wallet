@@ -3,6 +3,7 @@ package engine
 import (
 	"context"
 	"encoding/json"
+	"strconv"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -345,8 +346,10 @@ func addAncestor(ctx context.Context, testCase *beefTestCaseAncestor, client Cli
 func createInputsUsingAncestors(ancestors []*Transaction, client ClientInterface) []*TransactionInput {
 	var inputs []*TransactionInput
 
-	for _, input := range ancestors {
-		inputs = append(inputs, &TransactionInput{Utxo: *newUtxoFromTxID(input.GetID(), 0, append(client.DefaultModelOptions(), New())...)})
+	for i, input := range ancestors {
+		utxo := *newUtxoFromTxID(input.GetID(), 0, append(client.DefaultModelOptions(), New())...)
+		utxo.ID = strconv.Itoa(i)
+		inputs = append(inputs, &TransactionInput{Utxo: utxo})
 	}
 
 	return inputs

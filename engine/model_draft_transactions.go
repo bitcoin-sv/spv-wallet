@@ -291,6 +291,7 @@ func (m *DraftTransaction) calculateAndSetFee(ctx context.Context, satoshisReser
 		}
 
 		m.Configuration.Outputs[0].Scripts[0].Satoshis = m.Configuration.Outputs[0].Satoshis
+		return nil
 	}
 
 	if satoshisReserved < satoshisNeeded+fee {
