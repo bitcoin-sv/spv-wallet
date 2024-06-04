@@ -130,6 +130,7 @@ function print_state() {
     print_debug "  admin_xpriv=${admin_xpriv}"
     print_debug "  load_config=${load_config}"
     print_debug "  debug=${debug}"
+    print_debug "  no_run=${no_run}"
     print_debug ""
 }
 
@@ -263,6 +264,10 @@ while [[ $# -gt 0 ]]; do
         ;;
         -l|--load)
         load_config="true"
+        # no additional arguments so no `shift` command
+        ;;
+        -n|--no-run)
+        no_run="true"
         # no additional arguments so no `shift` command
         ;;
         -d|--debug)
@@ -624,4 +629,6 @@ if [ "$background" == "true" ]; then
   additionalFlags+=("-d")
 fi
 
-docker_compose_up  "${servicesToRun[*]} ${additionalFlags[*]} $(prefix_each '--no-attach ' ${servicesToHideLogs[*]})"
+if [ "$no_run" != "true" ]; then
+  docker_compose_up  "${servicesToRun[*]} ${additionalFlags[*]} $(prefix_each '--no-attach ' ${servicesToHideLogs[*]})"
+fi
