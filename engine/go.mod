@@ -7,7 +7,7 @@ toolchain go1.22.3
 require (
 	github.com/DATA-DOG/go-sqlmock v1.5.2
 	github.com/bitcoin-sv/go-broadcast-client v0.18.1
-	github.com/bitcoin-sv/go-paymail v0.14.0
+	github.com/bitcoin-sv/go-paymail v0.16.0
 	github.com/bitcoinschema/go-bitcoin/v2 v2.0.5
 	github.com/bitcoinschema/go-map v0.1.1
 	github.com/coocood/freecache v1.2.4
@@ -16,7 +16,7 @@ require (
 	github.com/go-redis/redis_rate/v9 v9.1.2
 	github.com/gomodule/redigo v2.0.0+incompatible
 	github.com/jarcoal/httpmock v1.3.1
-	github.com/libsv/go-bc v0.1.28
+	github.com/libsv/go-bc v0.1.29
 	github.com/libsv/go-bk v0.1.6
 	github.com/libsv/go-bt v1.0.8
 	github.com/libsv/go-bt/v2 v2.2.5

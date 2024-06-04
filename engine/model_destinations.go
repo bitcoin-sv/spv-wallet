@@ -29,7 +29,17 @@ type Destination struct {
 	PaymailExternalDerivationNum *uint32 `json:"paymail_external_derivation_num" toml:"paymail_external_derivation_num" yaml:"paymail_external_derivation_num" gorm:"<-:create;type:int;comment:This is the chain/num/(ext_derivation_num) location of the address related to the xPub" bson:"paymail_external_derivation_num"`
 	Address                      string  `json:"address" toml:"address" yaml:"address" gorm:"<-:create;type:varchar(35);index;comment:This is the BitCoin address" bson:"address"`
 	DraftID                      string  `json:"draft_id" toml:"draft_id" yaml:"draft_id" gorm:"<-:create;type:varchar(64);index;comment:This is the related draft id (if internal tx)" bson:"draft_id,omitempty"`
+	DerivationMethod             string  `json:"derivation_method" toml:"derivation_method" yaml:"derivation_method" gorm:"<-:create;type:varchar(64);index;comment:This is the derivation method BIP32 or PIKE" bson:"derivation_method,omitempty"`
+	SenderXpub                   string  `json:"sender_xpub" toml:"sender_xpub" yaml:"sender_xpub" gorm:"<-:create;type:varchar(64);index;comment:This is the related sender xpub" bson:"sender_xpub,omitempty"`
+	OutputIndex                  uint32  `json:"output_index" toml:"output_index" yaml:"output_index" gorm:"<-:create;type:int;index;comment:This is the index of script from output templates" bson:"output_index,omitempty"`
 }
+
+const (
+	// BIP32DerivationMethod is the BIP32 derivation method
+	BIP32DerivationMethod = "BIP32"
+	// PIKEDerivationMethod is the PIKE derivation method
+	PIKEDerivationMethod = "PIKE"
+)
 
 // newDestination will start a new Destination model for a locking script
 func newDestination(xPubID, lockingScript string, opts ...ModelOps) *Destination {

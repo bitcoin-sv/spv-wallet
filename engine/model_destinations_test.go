@@ -403,6 +403,9 @@ func (ts *EmbeddedDBTestSuite) TestDestination_Save() {
 		destination := newDestination(xPub.ID, testLockingScript, append(tc.client.DefaultModelOptions(), New())...)
 		require.NotNil(t, destination)
 		destination.DraftID = testDraftID
+		destination.DerivationMethod = PIKEDerivationMethod
+		destination.SenderXpub = testXPubID
+		destination.OutputIndex = 0
 
 		// Create the expectations
 		tc.MockSQLDB.ExpectBegin()
@@ -410,20 +413,24 @@ func (ts *EmbeddedDBTestSuite) TestDestination_Save() {
 		// Create model
 		tc.MockSQLDB.ExpectExec("INSERT INTO `"+tc.tablePrefix+"_destinations` ("+
 			"`created_at`,`updated_at`,`metadata`,`deleted_at`,`id`,`xpub_id`,`locking_script`,"+
-			"`type`,`chain`,`num`,`paymail_external_derivation_num`,`address`,`draft_id`) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)").WithArgs(
-			tester.AnyTime{},    // created_at
-			tester.AnyTime{},    // updated_at
-			nil,                 // metadata
-			nil,                 // deleted_at
-			tester.AnyGUID{},    // id
-			xPub.GetID(),        // xpub_id
-			testLockingScript,   // locking_script
-			destination.Type,    // type
-			0,                   // chain
-			0,                   // num
-			nil,                 // paymail_ext_derivation_num
-			destination.Address, // address
-			testDraftID,         // draft_id
+			"`type`,`chain`,`num`,`paymail_external_derivation_num`,`address`,`draft_id`,"+
+			"`derivation_method`,`sender_xpub`,`output_index`) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)").WithArgs(
+			tester.AnyTime{},     // created_at
+			tester.AnyTime{},     // updated_at
+			nil,                  // metadata
+			nil,                  // deleted_at
+			tester.AnyGUID{},     // id
+			xPub.GetID(),         // xpub_id
+			testLockingScript,    // locking_script
+			destination.Type,     // type
+			0,                    // chain
+			0,                    // num
+			nil,                  // paymail_ext_derivation_num
+			destination.Address,  // address
+			testDraftID,          // draft_id
+			PIKEDerivationMethod, // derivation_method
+			testXPubID,           // sender_xpub
+			0,                    // output_index
 		).WillReturnResult(sqlmock.NewResult(1, 1))
 
 		// Commit the TX
@@ -450,27 +457,33 @@ func (ts *EmbeddedDBTestSuite) TestDestination_Save() {
 		destination := newDestination(xPub.ID, testLockingScript, append(tc.client.DefaultModelOptions(), New())...)
 		require.NotNil(t, destination)
 		destination.DraftID = testDraftID
+		destination.DerivationMethod = PIKEDerivationMethod
+		destination.SenderXpub = testXPubID
+		destination.OutputIndex = 0
 
 		// Create the expectations
 		tc.MockSQLDB.ExpectBegin()
 
 		// Create model
 		tc.MockSQLDB.ExpectExec(`INSERT INTO "`+tc.tablePrefix+`_destinations" `+
-			`("created_at","updated_at","metadata","deleted_at","id","xpub_id","locking_script","type","chain","num","paymail_external_derivation_num","address","draft_id") `+
-			`VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13)`).WithArgs(
-			tester.AnyTime{},    // created_at
-			tester.AnyTime{},    // updated_at
-			nil,                 // metadata
-			nil,                 // deleted_at
-			tester.AnyGUID{},    // id
-			xPub.GetID(),        // xpub_id
-			testLockingScript,   // locking_script
-			destination.Type,    // type
-			0,                   // chain
-			0,                   // num
-			nil,                 // paymail_ext_derivation_num
-			destination.Address, // address
-			testDraftID,         // draft_id
+			`("created_at","updated_at","metadata","deleted_at","id","xpub_id","locking_script","type","chain","num","paymail_external_derivation_num","address","draft_id","derivation_method","sender_xpub","output_index") `+
+			`VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16)`).WithArgs(
+			tester.AnyTime{},     // created_at
+			tester.AnyTime{},     // updated_at
+			nil,                  // metadata
+			nil,                  // deleted_at
+			tester.AnyGUID{},     // id
+			xPub.GetID(),         // xpub_id
+			testLockingScript,    // locking_script
+			destination.Type,     // type
+			0,                    // chain
+			0,                    // num
+			nil,                  // paymail_ext_derivation_num
+			destination.Address,  // address
+			testDraftID,          // draft_id
+			PIKEDerivationMethod, // derivation_method
+			testXPubID,           // sender_xpub
+			0,                    // output_index
 		).WillReturnResult(sqlmock.NewResult(1, 1))
 
 		// Commit the TX

@@ -501,9 +501,17 @@ func WithPaymailServerConfig(config *server.Configuration, defaultFromPaymail st
 	}
 }
 
-func WithPaymailPikeSupport() ClientOps {
+// WithPaymailPikeContactSupport will enable Paymail Pike Contact support
+func WithPaymailPikeContactSupport() ClientOps {
 	return func(c *clientOptions) {
-		c.paymail.serverConfig.options = append(c.paymail.serverConfig.options, server.WithPikeCapabilities())
+		c.paymail.serverConfig.options = append(c.paymail.serverConfig.options, server.WithPikeContactCapabilities())
+	}
+}
+
+// WithPaymailPikePaymentSupport will enable Paymail Pike Payment support
+func WithPaymailPikePaymentSupport() ClientOps {
+	return func(c *clientOptions) {
+		c.paymail.serverConfig.options = append(c.paymail.serverConfig.options, server.WithPikePaymentCapabilities())
 	}
 }
 
