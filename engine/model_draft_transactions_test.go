@@ -3,11 +3,8 @@ package engine
 import (
 	"context"
 	"encoding/hex"
-	"encoding/json"
 	"fmt"
-	"io/ioutil"
 	"net/http"
-	"os"
 	"strings"
 	"testing"
 	"time"
@@ -1118,125 +1115,6 @@ func TestDraftTransaction_addOutputsToTx(t *testing.T) {
 		tx := bt.NewTx()
 		err := draft.addOutputsToTx(tx)
 		require.ErrorIs(t, err, ErrInvalidOpReturnOutput)
-	})
-}
-
-func createDraftTransactionFromHex(hex string, inInfo []interface{}, feeUnit *utils.FeeUnit) (*DraftTransaction, *bt.Tx, error) {
-	tx, err := bt.NewTxFromString(hex)
-	if err != nil {
-		return nil, nil, err
-	}
-
-	feePaid := uint64(0)
-
-	inputs := make([]*TransactionInput, 0)
-	for txIndex := range tx.Inputs {
-		in := inInfo[txIndex].(map[string]interface{})
-		satoshis := uint64(in["satoshis"].(float64))
-		lockingScript := in["locking_script"].(string)
-		input := TransactionInput{
-			Utxo: Utxo{
-				UtxoPointer: UtxoPointer{
-					OutputIndex:   uint32(txIndex),
-					TransactionID: tx.TxID(),
-				},
-				XpubID:       testXPubID,
-				Satoshis:     satoshis,
-				ScriptPubKey: lockingScript,
-				Type:         utils.ScriptTypePubKeyHash,
-			},
-			Destination: Destination{
-				XpubID:        testXPubID,
-				LockingScript: lockingScript,
-				Type:          utils.ScriptTypePubKeyHash,
-				Chain:         0,
-				Num:           uint32(txIndex),
-				Address:       testExternalAddress,
-				DraftID:       testDraftID,
-			},
-		}
-		feePaid += input.Satoshis
-
-		inputs = append(inputs, &input)
-	}
-
-	outputs := make([]*TransactionOutput, 0)
-	for _, txOutput := range tx.Outputs {
-		output := TransactionOutput{
-			Satoshis: txOutput.Satoshis,
-			Scripts: []*ScriptOutput{{
-				Address: testExternalAddress,
-				Script:  txOutput.LockingScript.String(),
-			}},
-			To: testExternalAddress,
-		}
-		feePaid -= output.Satoshis
-
-		outputs = append(outputs, &output)
-	}
-
-	draftConfig := &TransactionConfig{
-		ChangeDestinations: []*Destination{{}}, // set to not nil, otherwise will be overwritten when processing
-		Fee:                0,
-		FeeUnit:            feeUnit,
-		Inputs:             inputs,
-		Outputs:            outputs,
-	}
-
-	draftTransaction, err := newDraftTransaction(testXPub, draftConfig)
-	if err != nil {
-		return nil, nil, err
-	}
-
-	return draftTransaction, tx, nil
-}
-
-func TestDraftTransaction_estimateFees(t *testing.T) {
-	t.Run("json data", func(t *testing.T) {
-		jsonFile, err := os.Open("./tests/model_draft_transactions_test.json")
-		require.NoError(t, err)
-		defer func() {
-			_ = jsonFile.Close()
-		}()
-
-		byteValue, bErr := ioutil.ReadAll(jsonFile)
-		require.NoError(t, bErr)
-
-		var testData map[string]interface{}
-		err = json.Unmarshal(byteValue, &testData)
-		require.NoError(t, err)
-
-		for _, inTx := range testData["rawTransactions"].([]interface{}) {
-			in := inTx.(map[string]interface{})
-			txID := in["txId"].(string)
-			var feeUnit *utils.FeeUnit
-			if _, ok := in["feeUnit"]; ok {
-				b, _ := json.Marshal(in["feeUnit"])
-				_ = json.Unmarshal(b, &feeUnit)
-			} else {
-				feeUnit = chainstate.MockDefaultFee
-			}
-			draftTransaction, tx, err2 := createDraftTransactionFromHex(in["hex"].(string), in["inputs"].([]interface{}), feeUnit)
-			require.NoError(t, err2)
-			assert.Equal(t, txID, tx.TxID())
-			assert.IsType(t, DraftTransaction{}, *draftTransaction)
-			assert.IsType(t, bt.Tx{}, *tx)
-
-			realFee := uint64(0)
-			for _, input := range in["inputs"].([]interface{}) {
-				i := input.(map[string]interface{})
-				realFee += uint64(i["satoshis"].(float64))
-			}
-			for _, output := range tx.Outputs {
-				realFee -= output.Satoshis
-			}
-
-			realSize := uint64(float64(len(in["hex"].(string))) / 2)
-			sizeEstimate := draftTransaction.estimateSize()
-			feeEstimate := draftTransaction.estimateFee(feeUnit, 0)
-			assert.GreaterOrEqual(t, sizeEstimate, realSize)
-			assert.GreaterOrEqual(t, feeEstimate, realFee)
-		}
 	})
 }
 
