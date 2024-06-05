@@ -14,6 +14,12 @@ choice=''
 # Constants
 default_xpriv_value="xprv9s21ZrQH143K3CbJXirfrtpLvhT3Vgusdo8coBritQ3rcS7Jy7sxWhatuxG5h2y1Cqj8FKmPp69536gmjYRpfga2MJdsGyBsnB12E19CESK"
 
+# Variables
+servicesToRun=()
+servicesToHideLogs=()
+additionalFlags=()
+composeFiles=("docker-compose.yml")
+
 function print_debug() {
   if [ "$debug" == "true" ]; then
       echo -e "${color_debug}$1${color_reset}"
@@ -191,9 +197,9 @@ function docker_compose_up() {
   fi
 
   if [ $compose_plugin == true ]; then
-    docker compose up $1
+    docker compose $1 up $2
   else
-    docker-compose up $1
+    docker-compose $1 up $2
   fi
 }
 
@@ -205,6 +211,28 @@ function prefix_each() {
        result+="$delimiter $element "
     done
     echo "$result"
+}
+
+function parse_compose_additional() {
+    local argument="$1"
+
+    # Check if argument value is provided
+    if [ -z "$argument" ]; then
+        echo "Error: Argument for --compose-additional is missing"
+        exit 1
+    fi
+
+    # Split the argument on ':' to separate file and services
+    IFS=':' read -r file services <<< "$argument"
+
+    # Append file to the list of compose files
+    composeFiles+=("$file")
+
+    # Split services by spaces and append to servicesToRun
+    IFS=' ' read -r -a serviceArray <<< "$services"
+    for service in "${serviceArray[@]}"; do
+        servicesToRun+=("$service")
+    done
 }
 
 # === LOAD FROM CLI ===
@@ -259,6 +287,10 @@ while [[ $# -gt 0 ]]; do
         ;;
         -b|--background)
         background="$2"
+        shift
+        ;;
+        -ca|--compose-additional)
+        parse_compose_additional "$2"
         shift
         ;;
         -l|--load)
@@ -562,9 +594,6 @@ print_success "File .env.config updated!"
 print_debug "$(cat .env.config)"
 
 # === RUN WHAT IS NEEDED ===
-servicesToRun=()
-servicesToHideLogs=()
-additionalFlags=()
 
 case $database in
   postgresql)
@@ -624,4 +653,10 @@ if [ "$background" == "true" ]; then
   additionalFlags+=("-d")
 fi
 
-docker_compose_up  "${servicesToRun[*]} ${additionalFlags[*]} $(prefix_each '--no-attach ' ${servicesToHideLogs[*]})"
+composeFilesArgs=""
+for file in "${composeFiles[@]}"; do
+    composeFilesArgs+=" -f $file"
+done
+
+docker_compose_up "$composeFilesArgs" "${servicesToRun[*]} ${additionalFlags[*]} $(prefix_each '--no-attach ' ${servicesToHideLogs[*]})"
+
