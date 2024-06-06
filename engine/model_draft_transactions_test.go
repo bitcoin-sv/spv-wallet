@@ -28,8 +28,6 @@ const (
 
 // TestDraftTransaction_newDraftTransaction will test the method newDraftTransaction()
 func TestDraftTransaction_newDraftTransaction(t *testing.T) {
-	t.Parallel()
-
 	t.Run("nil config, panic", func(t *testing.T) {
 		assert.Panics(t, func() {
 			draftTx, err := newDraftTransaction(
@@ -64,8 +62,6 @@ func TestDraftTransaction_newDraftTransaction(t *testing.T) {
 
 // TestDraftTransaction_GetModelName will test the method GetModelName()
 func TestDraftTransaction_GetModelName(t *testing.T) {
-	t.Parallel()
-
 	t.Run("model name", func(t *testing.T) {
 		ctx, client, deferMe := CreateTestSQLiteClient(t, false, true, withTaskManagerMockup())
 		defer deferMe()
