@@ -3,8 +3,9 @@ package config
 import (
 	"time"
 
-	"github.com/bitcoin-sv/spv-wallet/engine/datastore"
 	"github.com/google/uuid"
+
+	"github.com/bitcoin-sv/spv-wallet/engine/datastore"
 )
 
 // DefaultAdminXpub is the default admin xpub used for authenticate requests.
@@ -174,7 +175,7 @@ func getMetricsDefaults() *MetricsConfig {
 
 func getExperimentalFeaturesConfig() *ExperimentalConfig {
 	return &ExperimentalConfig{
-		PikeContactsEnabled: false,
-		PikePaymentEnabled:  false,
+		PikeContactsEnabled: true,
+		PikePaymentEnabled:  true,
 	}
 }

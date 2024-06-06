@@ -43,7 +43,7 @@ require (
 	github.com/KyleBanks/depth v1.2.1 // indirect
 	github.com/asaskevich/govalidator v0.0.0-20230301143203-a9d515a09cc2 // indirect
 	github.com/beorn7/perks v1.0.1 // indirect
-	github.com/bitcoin-sv/go-paymail v0.16.0 // indirect
+	github.com/bitcoin-sv/go-paymail v0.16.1-0.20240605052525-5d449cc8c786 // indirect
 	github.com/bitcoinschema/go-bitcoin/v2 v2.0.5
 	github.com/bitcoinschema/go-bpu v0.1.3 // indirect
 	github.com/bitcoinschema/go-map v0.1.1 // indirect
