@@ -248,7 +248,7 @@ func (m *DraftTransaction) createTransactionHex(ctx context.Context) (err error)
 
 	// Start a new transaction from the reservedUtxos
 	tx := bt.NewTx()
-	if err = tx.FromUTXOs(*inputUtxos...); err != nil {
+	if err = tx.FromUTXOs(inputUtxos...); err != nil {
 		return
 	}
 
@@ -315,8 +315,8 @@ func (m *DraftTransaction) calculateAndSetFee(ctx context.Context, satoshisReser
 	return nil
 }
 
-func (m *DraftTransaction) prepareUtxos(ctx context.Context, opts []ModelOps, satoshisNeeded uint64) (*[]*bt.UTXO, uint64, error) {
-	if m.Configuration.SendAllTo != nil { // Send TO ALL
+func (m *DraftTransaction) prepareUtxos(ctx context.Context, opts []ModelOps, satoshisNeeded uint64) ([]*bt.UTXO, uint64, error) {
+	if m.Configuration.SendAllTo != nil {
 		inputUtxos, satoshisReserved, err := m.prepareSendAllToUtxos(ctx, opts)
 		if err != nil {
 			return nil, 0, err
@@ -331,7 +331,8 @@ func (m *DraftTransaction) prepareUtxos(ctx context.Context, opts []ModelOps, sa
 	return inputUtxos, satoshisReserved, nil
 }
 
-func (m *DraftTransaction) prepareSeparateUtxos(ctx context.Context, opts []ModelOps, satoshisNeeded uint64) (*[]*bt.UTXO, uint64, error) {
+// prepareSeparateUtxos will get user's utxos which will have the required amount of satoshi and then reserve and process them.
+func (m *DraftTransaction) prepareSeparateUtxos(ctx context.Context, opts []ModelOps, satoshisNeeded uint64) ([]*bt.UTXO, uint64, error) {
 	// we can only include separate utxos (like tokens) when not using SendAllTo
 	var includeUtxoSatoshis uint64
 	var err error
@@ -360,9 +361,7 @@ func (m *DraftTransaction) prepareSeparateUtxos(ctx context.Context, opts []Mode
 	}
 
 	// Get the inputUtxos (in bt.UTXO format) and the total amount of satoshis from the utxos
-	inputUtxos, satoshisReserved, err := m.getInputsFromUtxos(
-		reservedUtxos,
-	)
+	inputUtxos, satoshisReserved, err := m.getInputsFromUtxos(reservedUtxos)
 	if err != nil {
 		return nil, 0, err
 	}
@@ -379,7 +378,8 @@ func (m *DraftTransaction) prepareSeparateUtxos(ctx context.Context, opts []Mode
 	return inputUtxos, satoshisReserved, nil
 }
 
-func (m *DraftTransaction) prepareSendAllToUtxos(ctx context.Context, opts []ModelOps) (*[]*bt.UTXO, uint64, error) {
+// prepareSendAllToUtxos will reserve and process all the user's utxos which will be sent to one address
+func (m *DraftTransaction) prepareSendAllToUtxos(ctx context.Context, opts []ModelOps) ([]*bt.UTXO, uint64, error) {
 	// todo should all utxos be sent to the SendAllTo address, not only the p2pkhs?
 	spendableUtxos, err := getSpendableUtxos(
 		ctx, m.XpubID, utils.ScriptTypePubKeyHash, nil, m.Configuration.FromUtxos, opts...,
@@ -730,9 +730,9 @@ func (m *DraftTransaction) setChangeDestinations(ctx context.Context, numberOfDe
 }
 
 // getInputsFromUtxos this function transforms SPV Wallet utxos to bt.UTXOs
-func (m *DraftTransaction) getInputsFromUtxos(reservedUtxos []*Utxo) (*[]*bt.UTXO, uint64, error) {
+func (m *DraftTransaction) getInputsFromUtxos(reservedUtxos []*Utxo) ([]*bt.UTXO, uint64, error) {
 	// transform to bt.utxo and check if we have enough
-	inputUtxos := new([]*bt.UTXO)
+	inputUtxos := make([]*bt.UTXO, 0)
 	satoshisReserved := uint64(0)
 	var lockingScript *bscript.Script
 	var err error
@@ -751,7 +751,7 @@ func (m *DraftTransaction) getInputsFromUtxos(reservedUtxos []*Utxo) (*[]*bt.UTX
 			return nil, 0, errors.Wrap(ErrInvalidTransactionID, err.Error())
 		}
 
-		*inputUtxos = append(*inputUtxos, &bt.UTXO{
+		inputUtxos = append(inputUtxos, &bt.UTXO{
 			TxID:           txIDBytes,
 			Vout:           utxo.OutputIndex,
 			Satoshis:       utxo.Satoshis,
