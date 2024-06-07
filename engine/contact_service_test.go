@@ -315,12 +315,15 @@ func (p *paymailTestMock) setup(t *testing.T, domain string, supportPike bool) {
 	}
 
 	if supportPike {
-		wellKnownBody.Capabilities[paymail.BRFCPike] = fmt.Sprintf("%s/pike/{alias}@{domain.tld}", serverURL)
+		wellKnownBody.Capabilities[paymail.BRFCPike] = map[string]string{
+			paymail.BRFCPikeInvite:  fmt.Sprintf("%s/contact/invite/{alias}@{domain.tld}", serverURL),
+			paymail.BRFCPikeOutputs: fmt.Sprintf("%s/pike/outputs/{alias}@{domain.tld}", serverURL),
+		}
 	}
 
-	wellKnownReponse, _ := json.Marshal(wellKnownBody)
-	wellKnonwResponder := httpmock.NewStringResponder(http.StatusOK, string(wellKnownReponse))
-	httpmock.RegisterResponder(http.MethodGet, wellKnownUrl, wellKnonwResponder)
+	wellKnownResponse, _ := json.Marshal(wellKnownBody)
+	wellKnownResponder := httpmock.NewStringResponder(http.StatusOK, string(wellKnownResponse))
+	httpmock.RegisterResponder(http.MethodGet, wellKnownUrl, wellKnownResponder)
 
 	p.serverUrl = serverURL
 	p.paymailClient = newTestPaymailClient(t, []string{domain})
@@ -341,7 +344,13 @@ func (p *paymailTestMock) mockPki(paymail, pubkey string) {
 }
 
 func (p *paymailTestMock) mockPike(paymail string) {
-	httpmock.RegisterResponder(http.MethodPost, fmt.Sprintf("%s/pike/%s", p.serverUrl, paymail),
+	httpmock.RegisterResponder(http.MethodPost, fmt.Sprintf("%s/contact/invite/%s", p.serverUrl, paymail),
+		httpmock.NewStringResponder(
+			200,
+			"{}",
+		),
+	)
+	httpmock.RegisterResponder(http.MethodPost, fmt.Sprintf("%s/pike/outputs%s", p.serverUrl, paymail),
 		httpmock.NewStringResponder(
 			200,
 			"{}",
