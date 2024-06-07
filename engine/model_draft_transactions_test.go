@@ -3,11 +3,8 @@ package engine
 import (
 	"context"
 	"encoding/hex"
-	"encoding/json"
 	"fmt"
-	"io/ioutil"
 	"net/http"
-	"os"
 	"strings"
 	"testing"
 	"time"
@@ -31,24 +28,28 @@ const (
 
 // TestDraftTransaction_newDraftTransaction will test the method newDraftTransaction()
 func TestDraftTransaction_newDraftTransaction(t *testing.T) {
-	t.Parallel()
-
 	t.Run("nil config, panic", func(t *testing.T) {
 		assert.Panics(t, func() {
-			draftTx := newDraftTransaction(
+			draftTx, err := newDraftTransaction(
 				testXPub, nil, New(),
 			)
 			require.NotNil(t, draftTx)
+			require.NoError(t, err)
 		})
 	})
 
 	t.Run("valid config", func(t *testing.T) {
+		ctx, client, deferMe := CreateTestSQLiteClient(t, false, true, withTaskManagerMockup())
+		defer deferMe()
+		prepareAdditionalModels(t, client, ctx, false)
 		expires := time.Now().UTC().Add(defaultDraftTxExpiresIn)
-		draftTx := newDraftTransaction(
+		draftTx, err := newDraftTransaction(
 			testXPub, &TransactionConfig{
-				FeeUnit: chainstate.MockDefaultFee,
-			}, New(),
+				FeeUnit:   chainstate.MockDefaultFee,
+				SendAllTo: &TransactionOutput{To: testExternalAddress},
+			}, append(client.DefaultModelOptions(), New())...,
 		)
+		require.NoError(t, err)
 		require.NotNil(t, draftTx)
 		assert.NotEqual(t, "", draftTx.ID)
 		assert.Equal(t, 64, len(draftTx.ID))
@@ -61,12 +62,15 @@ func TestDraftTransaction_newDraftTransaction(t *testing.T) {
 
 // TestDraftTransaction_GetModelName will test the method GetModelName()
 func TestDraftTransaction_GetModelName(t *testing.T) {
-	t.Parallel()
-
 	t.Run("model name", func(t *testing.T) {
-		draftTx := newDraftTransaction(testXPub, &TransactionConfig{
-			FeeUnit: chainstate.MockDefaultFee,
-		}, New())
+		ctx, client, deferMe := CreateTestSQLiteClient(t, false, true, withTaskManagerMockup())
+		defer deferMe()
+		prepareAdditionalModels(t, client, ctx, false)
+		draftTx, err := newDraftTransaction(testXPub, &TransactionConfig{
+			FeeUnit:   chainstate.MockDefaultFee,
+			SendAllTo: &TransactionOutput{To: testExternalAddress},
+		}, append(client.DefaultModelOptions(), New())...)
+		require.NoError(t, err)
 		require.NotNil(t, draftTx)
 		assert.Equal(t, ModelDraftTransaction.String(), draftTx.GetModelName())
 	})
@@ -75,14 +79,19 @@ func TestDraftTransaction_GetModelName(t *testing.T) {
 // TestDraftTransaction_getOutputSatoshis tests getting the output satoshis for the destinations
 func TestDraftTransaction_getOutputSatoshis(t *testing.T) {
 	t.Run("1 change destination", func(t *testing.T) {
-		draftTx := newDraftTransaction(
+		ctx, client, deferMe := CreateTestSQLiteClient(t, false, true, withTaskManagerMockup())
+		defer deferMe()
+		prepareAdditionalModels(t, client, ctx, false)
+		draftTx, err := newDraftTransaction(
 			testXPub, &TransactionConfig{
 				ChangeDestinations: []*Destination{{
 					LockingScript: testLockingScript,
 				}},
-				FeeUnit: chainstate.MockDefaultFee,
-			},
+				FeeUnit:   chainstate.MockDefaultFee,
+				SendAllTo: &TransactionOutput{To: testExternalAddress},
+			}, append(client.DefaultModelOptions(), New())...,
 		)
+		require.NoError(t, err)
 		changSatoshis, err := draftTx.getChangeSatoshis(1000000)
 		require.NoError(t, err)
 		assert.Len(t, changSatoshis, 1)
@@ -90,15 +99,20 @@ func TestDraftTransaction_getOutputSatoshis(t *testing.T) {
 	})
 
 	t.Run("1 change destination using default", func(t *testing.T) {
-		draftTx := newDraftTransaction(
+		ctx, client, deferMe := CreateTestSQLiteClient(t, false, true, withTaskManagerMockup())
+		defer deferMe()
+		prepareAdditionalModels(t, client, ctx, false)
+		draftTx, err := newDraftTransaction(
 			testXPub, &TransactionConfig{
 				ChangeDestinationsStrategy: ChangeStrategyDefault,
 				ChangeDestinations: []*Destination{{
 					LockingScript: testLockingScript,
 				}},
-				FeeUnit: chainstate.MockDefaultFee,
-			},
+				FeeUnit:   chainstate.MockDefaultFee,
+				SendAllTo: &TransactionOutput{To: testExternalAddress},
+			}, append(client.DefaultModelOptions(), New())...,
 		)
+		require.NoError(t, err)
 		changSatoshis, err := draftTx.getChangeSatoshis(1000000)
 		require.NoError(t, err)
 		assert.Len(t, changSatoshis, 1)
@@ -106,16 +120,21 @@ func TestDraftTransaction_getOutputSatoshis(t *testing.T) {
 	})
 
 	t.Run("2 change destinations", func(t *testing.T) {
-		draftTx := newDraftTransaction(
+		ctx, client, deferMe := CreateTestSQLiteClient(t, false, true, withTaskManagerMockup())
+		defer deferMe()
+		prepareAdditionalModels(t, client, ctx, false)
+		draftTx, err := newDraftTransaction(
 			testXPub, &TransactionConfig{
 				ChangeDestinations: []*Destination{{
 					LockingScript: testLockingScript,
 				}, {
 					LockingScript: testTxInScriptPubKey,
 				}},
-				FeeUnit: chainstate.MockDefaultFee,
-			},
+				FeeUnit:   chainstate.MockDefaultFee,
+				SendAllTo: &TransactionOutput{To: testExternalAddress},
+			}, append(client.DefaultModelOptions(), New())...,
 		)
+		require.NoError(t, err)
 		changSatoshis, err := draftTx.getChangeSatoshis(1000001)
 		require.NoError(t, err)
 		assert.Len(t, changSatoshis, 2)
@@ -124,7 +143,10 @@ func TestDraftTransaction_getOutputSatoshis(t *testing.T) {
 	})
 
 	t.Run("3 change destinations - random", func(t *testing.T) {
-		draftTx := newDraftTransaction(
+		ctx, client, deferMe := CreateTestSQLiteClient(t, false, true, withTaskManagerMockup())
+		defer deferMe()
+		prepareAdditionalModels(t, client, ctx, false)
+		draftTx, err := newDraftTransaction(
 			testXPub, &TransactionConfig{
 				ChangeDestinationsStrategy: ChangeStrategyRandom,
 				ChangeDestinations: []*Destination{{
@@ -134,9 +156,11 @@ func TestDraftTransaction_getOutputSatoshis(t *testing.T) {
 				}, {
 					LockingScript: testTxScriptPubKey1,
 				}},
-				FeeUnit: chainstate.MockDefaultFee,
-			},
+				FeeUnit:   chainstate.MockDefaultFee,
+				SendAllTo: &TransactionOutput{To: testExternalAddress},
+			}, append(client.DefaultModelOptions(), New())...,
 		)
+		require.NoError(t, err)
 		satoshis := uint64(1000001)
 		changSatoshis, err := draftTx.getChangeSatoshis(satoshis)
 		require.NoError(t, err)
@@ -152,18 +176,19 @@ func TestDraftTransaction_getOutputSatoshis(t *testing.T) {
 // TestDraftTransaction_setChangeDestinations sets the given of change destinations on the draft transaction
 func TestDraftTransaction_setChangeDestinations(t *testing.T) {
 	t.Run("1 change destination", func(t *testing.T) {
-		ctx, client, deferMe := CreateTestSQLiteClient(t, false, false, withTaskManagerMockup())
+		ctx, client, deferMe := CreateTestSQLiteClient(t, false, true, withTaskManagerMockup())
 		defer deferMe()
-		xPub := newXpub(testXPub, append(client.DefaultModelOptions(), New())...)
-		err := xPub.Save(ctx)
-		require.NoError(t, err)
+		prepareAdditionalModels(t, client, ctx, false)
 
-		draftTx := newDraftTransaction(testXPub, &TransactionConfig{
+		draftTx, err := newDraftTransaction(testXPub, &TransactionConfig{
 			Outputs: []*TransactionOutput{{
 				To:       testExternalAddress,
 				Satoshis: 1000,
 			}},
-		}, append(client.DefaultModelOptions(), New())...)
+			SendAllTo: &TransactionOutput{To: testExternalAddress},
+		}, append(client.DefaultModelOptions(), New())...,
+		)
+		require.NoError(t, err)
 
 		err = draftTx.setChangeDestinations(ctx, 1)
 		require.NoError(t, err)
@@ -171,18 +196,19 @@ func TestDraftTransaction_setChangeDestinations(t *testing.T) {
 	})
 
 	t.Run("5 change destinations", func(t *testing.T) {
-		ctx, client, deferMe := CreateTestSQLiteClient(t, false, false, withTaskManagerMockup())
+		ctx, client, deferMe := CreateTestSQLiteClient(t, false, true, withTaskManagerMockup())
 		defer deferMe()
-		xPub := newXpub(testXPub, append(client.DefaultModelOptions(), New())...)
-		err := xPub.Save(ctx)
-		require.NoError(t, err)
+		prepareAdditionalModels(t, client, ctx, false)
 
-		draftTx := newDraftTransaction(testXPub, &TransactionConfig{
+		draftTx, err := newDraftTransaction(testXPub, &TransactionConfig{
 			Outputs: []*TransactionOutput{{
 				To:       testExternalAddress,
 				Satoshis: 1000,
 			}},
-		}, append(client.DefaultModelOptions(), New())...)
+			SendAllTo: &TransactionOutput{To: testExternalAddress},
+		}, append(client.DefaultModelOptions(), New())...,
+		)
+		require.NoError(t, err)
 
 		err = draftTx.setChangeDestinations(ctx, 5)
 		require.NoError(t, err)
@@ -201,10 +227,14 @@ func TestDraftTransaction_getDraftTransactionID(t *testing.T) {
 	})
 
 	t.Run("found by draft id", func(t *testing.T) {
-		ctx, client, deferMe := CreateTestSQLiteClient(t, false, false, withTaskManagerMockup())
+		ctx, client, deferMe := CreateTestSQLiteClient(t, false, true, withTaskManagerMockup())
 		defer deferMe()
-		draftTransaction := newDraftTransaction(testXPub, &TransactionConfig{}, client.DefaultModelOptions()...)
-		err := draftTransaction.Save(ctx)
+		prepareAdditionalModels(t, client, ctx, false)
+		draftTransaction, err := newDraftTransaction(testXPub, &TransactionConfig{
+			SendAllTo: &TransactionOutput{To: testExternalAddress},
+		}, append(client.DefaultModelOptions(), New())...)
+		require.NoError(t, err)
+		err = draftTransaction.Save(ctx)
 		require.NoError(t, err)
 
 		var draftTx *DraftTransaction
@@ -218,60 +248,37 @@ func TestDraftTransaction_getDraftTransactionID(t *testing.T) {
 // TestDraftTransaction_createTransaction create a transaction hex
 func TestDraftTransaction_createTransaction(t *testing.T) {
 	t.Run("empty transaction", func(t *testing.T) {
-		ctx, client, deferMe := CreateTestSQLiteClient(t, false, false, withTaskManagerMockup())
+		_, client, deferMe := CreateTestSQLiteClient(t, false, false, withTaskManagerMockup())
 		defer deferMe()
-		draftTransaction := newDraftTransaction(testXPub, &TransactionConfig{}, append(client.DefaultModelOptions(), New())...)
-
-		err := draftTransaction.createTransactionHex(ctx)
+		_, err := newDraftTransaction(testXPub, &TransactionConfig{}, append(client.DefaultModelOptions(), New())...)
 		require.ErrorIs(t, err, ErrMissingTransactionOutputs)
 	})
 
 	t.Run("transaction with no utxos", func(t *testing.T) {
-		ctx, client, deferMe := CreateTestSQLiteClient(t, false, false, withTaskManagerMockup())
+		_, client, deferMe := CreateTestSQLiteClient(t, false, false, withTaskManagerMockup())
 		defer deferMe()
-		draftTransaction := newDraftTransaction(testXPub, &TransactionConfig{
+		_, err := newDraftTransaction(testXPub, &TransactionConfig{
 			Outputs: []*TransactionOutput{{
 				To:       testExternalAddress,
 				Satoshis: 1000,
 			}},
 		}, append(client.DefaultModelOptions(), New())...)
-
-		err := draftTransaction.createTransactionHex(ctx)
 		require.ErrorIs(t, err, ErrNotEnoughUtxos)
 	})
 
 	t.Run("transaction with utxos", func(t *testing.T) {
 		ctx, client, deferMe := CreateTestSQLiteClient(t, false, true, withTaskManagerMockup())
 		defer deferMe()
-		xPub := newXpub(testXPub, append(client.DefaultModelOptions(), New())...)
-		err := xPub.Save(ctx)
-		require.NoError(t, err)
+		prepareAdditionalModels(t, client, ctx, false)
 
-		destination := newDestination(testXPubID, testLockingScript,
-			append(client.DefaultModelOptions(), New())...)
-		err = destination.Save(ctx)
-		require.NoError(t, err)
-
-		utxo := newUtxo(testXPubID, testTxID, testLockingScript, 0, 100000,
-			append(client.DefaultModelOptions(), New())...)
-		err = utxo.Save(ctx)
-		require.NoError(t, err)
-
-		transaction, err := txFromHex(testTxHex, append(client.DefaultModelOptions(), New())...)
-		require.NoError(t, err)
-
-		err = transaction.Save(ctx)
-		require.NoError(t, err)
-
-		draftTransaction := newDraftTransaction(testXPub, &TransactionConfig{
+		draftTransaction, err := newDraftTransaction(testXPub, &TransactionConfig{
 			Outputs: []*TransactionOutput{{
 				To:       testExternalAddress,
 				Satoshis: 1000,
 			}},
 		}, append(client.DefaultModelOptions(), New())...)
-
-		err = draftTransaction.createTransactionHex(ctx)
 		require.NoError(t, err)
+
 		assert.Equal(t, testXPubID, draftTransaction.XpubID)
 		assert.Equal(t, DraftStatusDraft, draftTransaction.Status)
 
@@ -317,32 +324,13 @@ func TestDraftTransaction_createTransaction(t *testing.T) {
 	t.Run("send to all", func(t *testing.T) {
 		ctx, client, deferMe := CreateTestSQLiteClient(t, false, true, withTaskManagerMockup())
 		defer deferMe()
-		xPub := newXpub(testXPub, append(client.DefaultModelOptions(), New())...)
-		err := xPub.Save(ctx)
-		require.NoError(t, err)
+		prepareAdditionalModels(t, client, ctx, false)
 
-		destination := newDestination(testXPubID, testLockingScript,
-			append(client.DefaultModelOptions(), New())...)
-		err = destination.Save(ctx)
-		require.NoError(t, err)
-
-		utxo := newUtxo(testXPubID, testTxID, testLockingScript, 0, 100000,
-			append(client.DefaultModelOptions(), New())...)
-		err = utxo.Save(ctx)
-		require.NoError(t, err)
-
-		transaction, err := txFromHex(testTxHex, append(client.DefaultModelOptions(), New())...)
-		require.NoError(t, err)
-
-		err = transaction.Save(ctx)
-		require.NoError(t, err)
-
-		draftTransaction := newDraftTransaction(testXPub, &TransactionConfig{
+		draftTransaction, err := newDraftTransaction(testXPub, &TransactionConfig{
 			SendAllTo: &TransactionOutput{To: testExternalAddress},
 		}, append(client.DefaultModelOptions(), New())...)
-
-		err = draftTransaction.createTransactionHex(ctx)
 		require.NoError(t, err)
+
 		assert.Equal(t, testXPubID, draftTransaction.XpubID)
 		assert.Equal(t, DraftStatusDraft, draftTransaction.Status)
 		assert.Equal(t, testExternalAddress, draftTransaction.Configuration.SendAllTo.To)
@@ -359,27 +347,9 @@ func TestDraftTransaction_createTransaction(t *testing.T) {
 	t.Run("fee calculation - MAP", func(t *testing.T) {
 		ctx, client, deferMe := CreateTestSQLiteClient(t, false, true, withTaskManagerMockup())
 		defer deferMe()
-		xPub := newXpub(testXPub, append(client.DefaultModelOptions(), New())...)
-		err := xPub.Save(ctx)
-		require.NoError(t, err)
+		prepareAdditionalModels(t, client, ctx, false)
 
-		destination := newDestination(testXPubID, testLockingScript,
-			append(client.DefaultModelOptions(), New())...)
-		err = destination.Save(ctx)
-		require.NoError(t, err)
-
-		utxo := newUtxo(testXPubID, testTxID, testLockingScript, 0, 100000,
-			append(client.DefaultModelOptions(), New())...)
-		err = utxo.Save(ctx)
-		require.NoError(t, err)
-
-		transaction, err := txFromHex(testTxHex, append(client.DefaultModelOptions(), New())...)
-		require.NoError(t, err)
-
-		err = transaction.Save(ctx)
-		require.NoError(t, err)
-
-		draftTransaction := newDraftTransaction(testXPub, &TransactionConfig{
+		draftTransaction, err := newDraftTransaction(testXPub, &TransactionConfig{
 			Outputs: []*TransactionOutput{{
 				To:       testExternalAddress,
 				Satoshis: 1000,
@@ -396,9 +366,8 @@ func TestDraftTransaction_createTransaction(t *testing.T) {
 				},
 			}},
 		}, append(client.DefaultModelOptions(), New())...)
-
-		err = draftTransaction.createTransactionHex(ctx)
 		require.NoError(t, err)
+
 		fee := draftTransaction.Configuration.Fee
 		calculateFee := draftTransaction.estimateFee(draftTransaction.Configuration.FeeUnit, 0)
 		assert.Equal(t, fee, calculateFee)
@@ -415,32 +384,9 @@ func TestDraftTransaction_createTransaction(t *testing.T) {
 	t.Run("fee calculation - MAP 2", func(t *testing.T) {
 		ctx, client, deferMe := CreateTestSQLiteClient(t, false, true, withTaskManagerMockup())
 		defer deferMe()
-		xPub := newXpub(testXPub, append(client.DefaultModelOptions(), New())...)
-		err := xPub.Save(ctx)
-		require.NoError(t, err)
+		prepareAdditionalModels(t, client, ctx, false)
 
-		destination := newDestination(testXPubID, testLockingScript,
-			append(client.DefaultModelOptions(), New())...)
-		err = destination.Save(ctx)
-		require.NoError(t, err)
-
-		utxo := newUtxo(testXPubID, testTxID, testLockingScript, 0, 11239,
-			append(client.DefaultModelOptions(), New())...)
-		err = utxo.Save(ctx)
-		require.NoError(t, err)
-
-		utxo = newUtxo(testXPubID, testTxID, testLockingScript, 1, 251725,
-			append(client.DefaultModelOptions(), New())...)
-		err = utxo.Save(ctx)
-		require.NoError(t, err)
-
-		transaction, err := txFromHex(testTxHex, append(client.DefaultModelOptions(), New())...)
-		require.NoError(t, err)
-
-		err = transaction.Save(ctx)
-		require.NoError(t, err)
-
-		draftTransaction := newDraftTransaction(testXPub, &TransactionConfig{
+		draftTransaction, err := newDraftTransaction(testXPub, &TransactionConfig{
 			Outputs: []*TransactionOutput{{
 				To:       testExternalAddress,
 				Satoshis: 12166,
@@ -460,9 +406,8 @@ func TestDraftTransaction_createTransaction(t *testing.T) {
 				},
 			}},
 		}, append(client.DefaultModelOptions(), New())...)
-
-		err = draftTransaction.createTransactionHex(ctx)
 		require.NoError(t, err)
+
 		fee := draftTransaction.Configuration.Fee
 		calculateFee := draftTransaction.estimateFee(draftTransaction.Configuration.FeeUnit, 0)
 		assert.Equal(t, fee, calculateFee)
@@ -479,27 +424,9 @@ func TestDraftTransaction_createTransaction(t *testing.T) {
 	t.Run("fee calculation - tonicpow", func(t *testing.T) {
 		ctx, client, deferMe := CreateTestSQLiteClient(t, false, true, withTaskManagerMockup())
 		defer deferMe()
-		xPub := newXpub(testXPub, append(client.DefaultModelOptions(), New())...)
-		err := xPub.Save(ctx)
-		require.NoError(t, err)
+		prepareAdditionalModels(t, client, ctx, false)
 
-		destination := newDestination(testXPubID, testLockingScript,
-			append(client.DefaultModelOptions(), New())...)
-		err = destination.Save(ctx)
-		require.NoError(t, err)
-
-		utxo := newUtxo(testXPubID, testTxID, testLockingScript, 1, 114216,
-			append(client.DefaultModelOptions(), New())...)
-		err = utxo.Save(ctx)
-		require.NoError(t, err)
-
-		transaction, err := txFromHex(testTxHex, append(client.DefaultModelOptions(), New())...)
-		require.NoError(t, err)
-
-		err = transaction.Save(ctx)
-		require.NoError(t, err)
-
-		draftTransaction := newDraftTransaction(testXPub, &TransactionConfig{
+		draftTransaction, err := newDraftTransaction(testXPub, &TransactionConfig{
 			FeeUnit: &utils.FeeUnit{
 				Satoshis: 5,
 				Bytes:    100,
@@ -517,9 +444,8 @@ func TestDraftTransaction_createTransaction(t *testing.T) {
 				},
 			}},
 		}, append(client.DefaultModelOptions(), New())...)
-
-		err = draftTransaction.createTransactionHex(ctx)
 		require.NoError(t, err)
+
 		fee := draftTransaction.Configuration.Fee
 		calculateFee := draftTransaction.estimateFee(draftTransaction.Configuration.FeeUnit, 0)
 		assert.Equal(t, fee, calculateFee)
@@ -536,40 +462,13 @@ func TestDraftTransaction_createTransaction(t *testing.T) {
 	t.Run("send to all - multiple utxos", func(t *testing.T) {
 		ctx, client, deferMe := CreateTestSQLiteClient(t, false, true, withTaskManagerMockup())
 		defer deferMe()
-		xPub := newXpub(testXPub, append(client.DefaultModelOptions(), New())...)
-		err := xPub.Save(ctx)
-		require.NoError(t, err)
+		prepareAdditionalModels(t, client, ctx, true)
 
-		destination := newDestination(testXPubID, testLockingScript,
-			append(client.DefaultModelOptions(), New())...)
-		err = destination.Save(ctx)
-		require.NoError(t, err)
-
-		utxo := newUtxo(testXPubID, testTxID, testLockingScript, 0, 100000,
-			append(client.DefaultModelOptions(), New())...)
-		err = utxo.Save(ctx)
-		require.NoError(t, err)
-		utxo = newUtxo(testXPubID, testTxID, testLockingScript, 1, 110000,
-			append(client.DefaultModelOptions(), New())...)
-		err = utxo.Save(ctx)
-		require.NoError(t, err)
-		utxo = newUtxo(testXPubID, testTxID, testLockingScript, 2, 130000,
-			append(client.DefaultModelOptions(), New())...)
-		err = utxo.Save(ctx)
-		require.NoError(t, err)
-
-		transaction, err := txFromHex(testTxHex, append(client.DefaultModelOptions(), New())...)
-		require.NoError(t, err)
-
-		err = transaction.Save(ctx)
-		require.NoError(t, err)
-
-		draftTransaction := newDraftTransaction(testXPub, &TransactionConfig{
+		draftTransaction, err := newDraftTransaction(testXPub, &TransactionConfig{
 			SendAllTo: &TransactionOutput{To: testExternalAddress},
 		}, append(client.DefaultModelOptions(), New())...)
-
-		err = draftTransaction.createTransactionHex(ctx)
 		require.NoError(t, err)
+
 		assert.Equal(t, testXPubID, draftTransaction.XpubID)
 		assert.Equal(t, DraftStatusDraft, draftTransaction.Status)
 		assert.Equal(t, testExternalAddress, draftTransaction.Configuration.SendAllTo.To)
@@ -586,35 +485,9 @@ func TestDraftTransaction_createTransaction(t *testing.T) {
 	t.Run("send to all - selected utxos", func(t *testing.T) {
 		ctx, client, deferMe := CreateTestSQLiteClient(t, false, true, withTaskManagerMockup())
 		defer deferMe()
-		xPub := newXpub(testXPub, append(client.DefaultModelOptions(), New())...)
-		err := xPub.Save(ctx)
-		require.NoError(t, err)
+		prepareAdditionalModels(t, client, ctx, true)
 
-		destination := newDestination(testXPubID, testLockingScript,
-			append(client.DefaultModelOptions(), New())...)
-		err = destination.Save(ctx)
-		require.NoError(t, err)
-
-		utxo := newUtxo(testXPubID, testTxID, testLockingScript, 0, 100000,
-			append(client.DefaultModelOptions(), New())...)
-		err = utxo.Save(ctx)
-		require.NoError(t, err)
-		utxo = newUtxo(testXPubID, testTxID, testLockingScript, 1, 110000,
-			append(client.DefaultModelOptions(), New())...)
-		err = utxo.Save(ctx)
-		require.NoError(t, err)
-		utxo = newUtxo(testXPubID, testTxID, testLockingScript, 2, 130000,
-			append(client.DefaultModelOptions(), New())...)
-		err = utxo.Save(ctx)
-		require.NoError(t, err)
-
-		transaction, err := txFromHex(testTxHex, append(client.DefaultModelOptions(), New())...)
-		require.NoError(t, err)
-
-		err = transaction.Save(ctx)
-		require.NoError(t, err)
-
-		draftTransaction := newDraftTransaction(testXPub, &TransactionConfig{
+		draftTransaction, err := newDraftTransaction(testXPub, &TransactionConfig{
 			SendAllTo: &TransactionOutput{To: testExternalAddress},
 			FromUtxos: []*UtxoPointer{{
 				TransactionID: testTxID,
@@ -624,9 +497,8 @@ func TestDraftTransaction_createTransaction(t *testing.T) {
 				OutputIndex:   2,
 			}},
 		}, append(client.DefaultModelOptions(), New())...)
-
-		err = draftTransaction.createTransactionHex(ctx)
 		require.NoError(t, err)
+
 		assert.Equal(t, testXPubID, draftTransaction.XpubID)
 		assert.Equal(t, DraftStatusDraft, draftTransaction.Status)
 		assert.Equal(t, testExternalAddress, draftTransaction.Configuration.SendAllTo.To)
@@ -643,44 +515,23 @@ func TestDraftTransaction_createTransaction(t *testing.T) {
 	t.Run("include utxos - tokens", func(t *testing.T) {
 		ctx, client, deferMe := CreateTestSQLiteClient(t, false, true, withTaskManagerMockup())
 		defer deferMe()
-		xPub := newXpub(testXPub, append(client.DefaultModelOptions(), New())...)
-		err := xPub.Save(ctx)
-		require.NoError(t, err)
+		prepareAdditionalModels(t, client, ctx, true)
 
-		destination := newDestination(testXPubID, testLockingScript,
+		destination := newDestination(testXPubID, testSTASScriptPubKey,
 			append(client.DefaultModelOptions(), New())...)
-		err = destination.Save(ctx)
+		err := destination.Save(ctx)
 		require.NoError(t, err)
 
-		destination = newDestination(testXPubID, testSTASScriptPubKey,
-			append(client.DefaultModelOptions(), New())...)
-		err = destination.Save(ctx)
-		require.NoError(t, err)
-
-		utxo := newUtxo(testXPubID, testTxID, testLockingScript, 0, 100000,
+		utxo := newUtxo(testXPubID, testTxID, testSTASLockingScript, 3, 564,
 			append(client.DefaultModelOptions(), New())...)
 		err = utxo.Save(ctx)
-		require.NoError(t, err)
-		utxo = newUtxo(testXPubID, testTxID, testLockingScript, 1, 110000,
-			append(client.DefaultModelOptions(), New())...)
-		err = utxo.Save(ctx)
-		require.NoError(t, err)
-		utxo = newUtxo(testXPubID, testTxID, testSTASLockingScript, 2, 564,
-			append(client.DefaultModelOptions(), New())...)
-		err = utxo.Save(ctx)
-		require.NoError(t, err)
-
-		transaction, err := txFromHex(testTxHex, append(client.DefaultModelOptions(), New())...)
-		require.NoError(t, err)
-
-		err = transaction.Save(ctx)
 		require.NoError(t, err)
 
 		// todo how to make sure we do not unwittingly destroy tokens ?
-		draftTransaction := newDraftTransaction(testXPub, &TransactionConfig{
+		draftTransaction, err := newDraftTransaction(testXPub, &TransactionConfig{
 			IncludeUtxos: []*UtxoPointer{{
 				TransactionID: testTxID,
-				OutputIndex:   2,
+				OutputIndex:   3,
 			}},
 			Outputs: []*TransactionOutput{{
 				To:       testExternalAddress,
@@ -690,9 +541,8 @@ func TestDraftTransaction_createTransaction(t *testing.T) {
 				Satoshis: 564,
 			}},
 		}, append(client.DefaultModelOptions(), New())...)
-
-		err = draftTransaction.createTransactionHex(ctx)
 		require.NoError(t, err)
+
 		assert.Equal(t, testXPubID, draftTransaction.XpubID)
 		assert.Equal(t, DraftStatusDraft, draftTransaction.Status)
 		assert.Equal(t, uint64(120), draftTransaction.Configuration.Fee)
@@ -720,10 +570,11 @@ func TestDraftTransaction_createTransaction(t *testing.T) {
 	})
 
 	t.Run("SendAllTo", func(t *testing.T) {
-		ctx, client, deferMe := initSimpleTestCase(t)
+		ctx, client, deferMe := CreateTestSQLiteClient(t, false, true, withTaskManagerMockup())
 		defer deferMe()
+		prepareAdditionalModels(t, client, ctx, true)
 
-		draftTransaction := newDraftTransaction(testXPub, &TransactionConfig{
+		draftTransaction, err := newDraftTransaction(testXPub, &TransactionConfig{
 			FromUtxos: []*UtxoPointer{{
 				TransactionID: testTxID,
 				OutputIndex:   0,
@@ -732,9 +583,8 @@ func TestDraftTransaction_createTransaction(t *testing.T) {
 				To: testExternalAddress,
 			},
 		}, append(client.DefaultModelOptions(), New())...)
-
-		err := draftTransaction.createTransactionHex(ctx)
 		require.NoError(t, err)
+
 		assert.Len(t, draftTransaction.Configuration.Outputs, 1)
 		assert.Equal(t, testExternalAddress, draftTransaction.Configuration.Outputs[0].To)
 		assert.Equal(t, uint64(99990), draftTransaction.Configuration.Outputs[0].Satoshis)
@@ -742,10 +592,11 @@ func TestDraftTransaction_createTransaction(t *testing.T) {
 	})
 
 	t.Run("SendAllTo + output", func(t *testing.T) {
-		ctx, client, deferMe := initSimpleTestCase(t)
+		ctx, client, deferMe := CreateTestSQLiteClient(t, false, true, withTaskManagerMockup())
 		defer deferMe()
+		prepareAdditionalModels(t, client, ctx, true)
 
-		draftTransaction := newDraftTransaction(testXPub, &TransactionConfig{
+		draftTransaction, err := newDraftTransaction(testXPub, &TransactionConfig{
 			FromUtxos: []*UtxoPointer{{
 				TransactionID: testTxID,
 				OutputIndex:   0,
@@ -758,9 +609,8 @@ func TestDraftTransaction_createTransaction(t *testing.T) {
 				Satoshis: 1000,
 			}},
 		}, append(client.DefaultModelOptions(), New())...)
-
-		err := draftTransaction.createTransactionHex(ctx)
 		require.NoError(t, err)
+
 		assert.Len(t, draftTransaction.Configuration.Outputs, 2)
 		assert.Equal(t, testExternalAddress, draftTransaction.Configuration.Outputs[0].To)
 		assert.Equal(t, uint64(98988), draftTransaction.Configuration.Outputs[0].Satoshis)
@@ -770,10 +620,11 @@ func TestDraftTransaction_createTransaction(t *testing.T) {
 	})
 
 	t.Run("SendAllTo + output + op_return", func(t *testing.T) {
-		ctx, client, deferMe := initSimpleTestCase(t)
+		ctx, client, deferMe := CreateTestSQLiteClient(t, false, true, withTaskManagerMockup())
 		defer deferMe()
+		prepareAdditionalModels(t, client, ctx, true)
 
-		draftTransaction := newDraftTransaction(testXPub, &TransactionConfig{
+		draftTransaction, err := newDraftTransaction(testXPub, &TransactionConfig{
 			FromUtxos: []*UtxoPointer{{
 				TransactionID: testTxID,
 				OutputIndex:   0,
@@ -796,9 +647,8 @@ func TestDraftTransaction_createTransaction(t *testing.T) {
 				},
 			}},
 		}, append(client.DefaultModelOptions(), New())...)
-
-		err := draftTransaction.createTransactionHex(ctx)
 		require.NoError(t, err)
+
 		assert.Len(t, draftTransaction.Configuration.Outputs, 3)
 		assert.Equal(t, testExternalAddress, draftTransaction.Configuration.Outputs[0].To)
 		assert.Equal(t, uint64(98984), draftTransaction.Configuration.Outputs[0].Satoshis)
@@ -816,6 +666,7 @@ func TestDraftTransaction_createTransaction(t *testing.T) {
 			WithPaymailClient(p),
 		)
 		defer deferMe()
+		prepareAdditionalModels(t, client, ctx, true)
 
 		httpmock.Reset()
 		mockValidResponse(http.StatusOK, true, "handcash.io")
@@ -826,32 +677,7 @@ func TestDraftTransaction_createTransaction(t *testing.T) {
 			),
 		)
 
-		xPub := newXpub(testXPub, append(client.DefaultModelOptions(), New())...)
-		err := xPub.Save(ctx)
-		require.NoError(t, err)
-
-		destination := newDestination(testXPubID, testLockingScript,
-			append(client.DefaultModelOptions(), New())...)
-		err = destination.Save(ctx)
-		require.NoError(t, err)
-
-		utxo := newUtxo(testXPubID, testTxID, testLockingScript, 1, 13483,
-			append(client.DefaultModelOptions(), New())...)
-		err = utxo.Save(ctx)
-		require.NoError(t, err)
-
-		utxo = newUtxo(testXPubID, testTxID, testLockingScript, 0, 13483,
-			append(client.DefaultModelOptions(), New())...)
-		err = utxo.Save(ctx)
-		require.NoError(t, err)
-
-		transaction, err := txFromHex(testTxHex, append(client.DefaultModelOptions(), New())...)
-		require.NoError(t, err)
-
-		err = transaction.Save(ctx)
-		require.NoError(t, err)
-
-		draftTransaction := newDraftTransaction(testXPub, &TransactionConfig{
+		draftTransaction, err := newDraftTransaction(testXPub, &TransactionConfig{
 			FromUtxos: []*UtxoPointer{{
 				TransactionID: testTxID,
 				OutputIndex:   1,
@@ -874,30 +700,30 @@ func TestDraftTransaction_createTransaction(t *testing.T) {
 				},
 			}},
 		}, append(client.DefaultModelOptions(), New())...)
-
-		err = draftTransaction.createTransactionHex(ctx)
 		require.NoError(t, err)
+
 		assert.Len(t, draftTransaction.Configuration.Outputs, 2)
 		assert.Equal(t, "mrzz@handcash.io", draftTransaction.Configuration.Outputs[0].To)
-		assert.Equal(t, uint64(26944), draftTransaction.Configuration.Outputs[0].Satoshis)
+		assert.Equal(t, uint64(209978), draftTransaction.Configuration.Outputs[0].Satoshis)
 		assert.Equal(t, "16fkwYn8feXEbK7iCTg5KMx9Rx9GzZ9HuE", draftTransaction.Configuration.Outputs[0].Scripts[0].Address)
 		assert.Equal(t, "76a9143e2d1d795f8acaa7957045cc59376177eb04a3c588ac", draftTransaction.Configuration.Outputs[0].Scripts[0].Script)
-		assert.Equal(t, uint64(26944), draftTransaction.Configuration.Outputs[0].Scripts[0].Satoshis)
+		assert.Equal(t, uint64(209978), draftTransaction.Configuration.Outputs[0].Scripts[0].Satoshis)
 		assert.Equal(t, uint64(22), draftTransaction.Configuration.Fee)
 		assert.Equal(t, "", draftTransaction.Configuration.Outputs[1].To)
 		assert.Equal(t, uint64(0), draftTransaction.Configuration.Outputs[1].Satoshis)
 	})
 
 	t.Run("duplicate inputs", func(t *testing.T) {
-		ctx, client, deferMe := initSimpleTestCase(t)
+		ctx, client, deferMe := CreateTestSQLiteClient(t, false, true, withTaskManagerMockup())
 		defer deferMe()
+		prepareAdditionalModels(t, client, ctx, true)
 
 		opts := append(client.DefaultModelOptions(), New())
 		utxo := newUtxo(testXPubID, testTxID, testLockingScript, 12, 1225, opts...)
 		err := utxo.Save(ctx)
 		require.NoError(t, err)
 
-		draftTransaction := newDraftTransaction(testXPub, &TransactionConfig{
+		_, err = newDraftTransaction(testXPub, &TransactionConfig{
 			FromUtxos: []*UtxoPointer{{
 				TransactionID: utxo.TransactionID,
 				OutputIndex:   utxo.OutputIndex,
@@ -910,8 +736,6 @@ func TestDraftTransaction_createTransaction(t *testing.T) {
 				Satoshis: 1500,
 			}},
 		}, append(client.DefaultModelOptions(), New())...)
-
-		err = draftTransaction.createTransactionHex(ctx)
 		require.ErrorIs(t, err, ErrDuplicateUTXOs)
 	})
 }
@@ -1101,11 +925,11 @@ func TestDraftTransaction_getInputsFromUtxos(t *testing.T) {
 		inputUtxos, satoshisReserved, err := draftTransaction.getInputsFromUtxos(reservedUtxos)
 		require.NoError(t, err)
 		assert.Equal(t, uint64(124235), satoshisReserved)
-		assert.Equal(t, 1, len(*inputUtxos))
-		assert.Equal(t, testTxID, hex.EncodeToString((*inputUtxos)[0].TxID))
-		assert.Equal(t, uint32(123), (*inputUtxos)[0].Vout)
-		assert.Equal(t, testLockingScript, (*inputUtxos)[0].LockingScript.String())
-		assert.Equal(t, uint64(124235), (*inputUtxos)[0].Satoshis)
+		assert.Equal(t, 1, len(inputUtxos))
+		assert.Equal(t, testTxID, hex.EncodeToString((inputUtxos)[0].TxID))
+		assert.Equal(t, uint32(123), (inputUtxos)[0].Vout)
+		assert.Equal(t, testLockingScript, (inputUtxos)[0].LockingScript.String())
+		assert.Equal(t, uint64(124235), (inputUtxos)[0].Satoshis)
 	})
 
 	t.Run("get multi", func(t *testing.T) {
@@ -1129,17 +953,17 @@ func TestDraftTransaction_getInputsFromUtxos(t *testing.T) {
 		inputUtxos, satoshisReserved, err := draftTransaction.getInputsFromUtxos(reservedUtxos)
 		require.NoError(t, err)
 		assert.Equal(t, uint64(124235+52313), satoshisReserved)
-		assert.Equal(t, 2, len(*inputUtxos))
+		assert.Equal(t, 2, len(inputUtxos))
 
-		assert.Equal(t, testTxID, hex.EncodeToString((*inputUtxos)[0].TxID))
-		assert.Equal(t, uint32(124), (*inputUtxos)[0].Vout)
-		assert.Equal(t, testLockingScript, (*inputUtxos)[0].LockingScript.String())
-		assert.Equal(t, uint64(52313), (*inputUtxos)[0].Satoshis)
+		assert.Equal(t, testTxID, hex.EncodeToString((inputUtxos)[0].TxID))
+		assert.Equal(t, uint32(124), (inputUtxos)[0].Vout)
+		assert.Equal(t, testLockingScript, (inputUtxos)[0].LockingScript.String())
+		assert.Equal(t, uint64(52313), (inputUtxos)[0].Satoshis)
 
-		assert.Equal(t, testTxID, hex.EncodeToString((*inputUtxos)[1].TxID))
-		assert.Equal(t, uint32(123), (*inputUtxos)[1].Vout)
-		assert.Equal(t, testLockingScript, (*inputUtxos)[1].LockingScript.String())
-		assert.Equal(t, uint64(124235), (*inputUtxos)[1].Satoshis)
+		assert.Equal(t, testTxID, hex.EncodeToString((inputUtxos)[1].TxID))
+		assert.Equal(t, uint32(123), (inputUtxos)[1].Vout)
+		assert.Equal(t, testLockingScript, (inputUtxos)[1].LockingScript.String())
+		assert.Equal(t, uint64(124235), (inputUtxos)[1].Satoshis)
 	})
 }
 
@@ -1198,34 +1022,6 @@ func TestDraftTransaction_addIncludeUtxos(t *testing.T) {
 		require.NoError(t, err)
 		assert.Len(t, draft.Configuration.Inputs, 0)
 		assert.Equal(t, uint64(0), includeUtxoSatoshis)
-	})
-
-	t.Run("with includeUtxos", func(t *testing.T) {
-		ctx, client, deferMe := CreateTestSQLiteClient(t, false, false)
-		defer deferMe()
-
-		destination := newDestination(testXPubID, testSTASScriptPubKey, client.DefaultModelOptions(New())...)
-		err := destination.Save(ctx)
-		require.NoError(t, err)
-
-		utxo := newUtxo(testXPubID, testSTAStxID, testSTASLockingScript, 0, 550, client.DefaultModelOptions(New())...)
-		err = utxo.Save(ctx)
-		require.NoError(t, err)
-
-		draft := newDraftTransaction("", &TransactionConfig{
-			IncludeUtxos: []*UtxoPointer{{
-				testSTAStxID,
-				0,
-			}},
-		}, client.DefaultModelOptions(New())...)
-
-		var includeUtxoSatoshis uint64
-		includeUtxoSatoshis, err = draft.addIncludeUtxos(ctx)
-		require.NoError(t, err)
-		assert.Len(t, draft.Configuration.Inputs, 1)
-		assert.Equal(t, uint64(550), includeUtxoSatoshis)
-		assert.Equal(t, testSTASLockingScript, draft.Configuration.Inputs[0].ScriptPubKey)
-		assert.Equal(t, testSTASScriptPubKey, draft.Configuration.Inputs[0].Destination.LockingScript)
 	})
 }
 
@@ -1318,120 +1114,6 @@ func TestDraftTransaction_addOutputsToTx(t *testing.T) {
 	})
 }
 
-func createDraftTransactionFromHex(hex string, inInfo []interface{}, feeUnit *utils.FeeUnit) (*DraftTransaction, *bt.Tx, error) {
-	tx, err := bt.NewTxFromString(hex)
-	if err != nil {
-		return nil, nil, err
-	}
-
-	feePaid := uint64(0)
-
-	inputs := make([]*TransactionInput, 0)
-	for txIndex := range tx.Inputs {
-		in := inInfo[txIndex].(map[string]interface{})
-		satoshis := uint64(in["satoshis"].(float64))
-		lockingScript := in["locking_script"].(string)
-		input := TransactionInput{
-			Utxo: Utxo{
-				UtxoPointer: UtxoPointer{
-					OutputIndex:   uint32(txIndex),
-					TransactionID: tx.TxID(),
-				},
-				XpubID:       testXPubID,
-				Satoshis:     satoshis,
-				ScriptPubKey: lockingScript,
-				Type:         utils.ScriptTypePubKeyHash,
-			},
-			Destination: Destination{
-				XpubID:        testXPubID,
-				LockingScript: lockingScript,
-				Type:          utils.ScriptTypePubKeyHash,
-				Chain:         0,
-				Num:           uint32(txIndex),
-				Address:       testExternalAddress,
-				DraftID:       testDraftID,
-			},
-		}
-		feePaid += input.Satoshis
-
-		inputs = append(inputs, &input)
-	}
-
-	outputs := make([]*TransactionOutput, 0)
-	for _, txOutput := range tx.Outputs {
-		output := TransactionOutput{
-			Satoshis: txOutput.Satoshis,
-			Scripts: []*ScriptOutput{{
-				Address: testExternalAddress,
-				Script:  txOutput.LockingScript.String(),
-			}},
-			To: testExternalAddress,
-		}
-		feePaid -= output.Satoshis
-
-		outputs = append(outputs, &output)
-	}
-
-	draftConfig := &TransactionConfig{
-		ChangeDestinations: []*Destination{{}}, // set to not nil, otherwise will be overwritten when processing
-		Fee:                0,
-		FeeUnit:            feeUnit,
-		Inputs:             inputs,
-		Outputs:            outputs,
-	}
-
-	return newDraftTransaction(testXPub, draftConfig), tx, nil
-}
-
-func TestDraftTransaction_estimateFees(t *testing.T) {
-	t.Run("json data", func(t *testing.T) {
-		jsonFile, err := os.Open("./tests/model_draft_transactions_test.json")
-		require.NoError(t, err)
-		defer func() {
-			_ = jsonFile.Close()
-		}()
-
-		byteValue, bErr := ioutil.ReadAll(jsonFile)
-		require.NoError(t, bErr)
-
-		var testData map[string]interface{}
-		err = json.Unmarshal(byteValue, &testData)
-		require.NoError(t, err)
-
-		for _, inTx := range testData["rawTransactions"].([]interface{}) {
-			in := inTx.(map[string]interface{})
-			txID := in["txId"].(string)
-			var feeUnit *utils.FeeUnit
-			if _, ok := in["feeUnit"]; ok {
-				b, _ := json.Marshal(in["feeUnit"])
-				_ = json.Unmarshal(b, &feeUnit)
-			} else {
-				feeUnit = chainstate.MockDefaultFee
-			}
-			draftTransaction, tx, err2 := createDraftTransactionFromHex(in["hex"].(string), in["inputs"].([]interface{}), feeUnit)
-			require.NoError(t, err2)
-			assert.Equal(t, txID, tx.TxID())
-			assert.IsType(t, DraftTransaction{}, *draftTransaction)
-			assert.IsType(t, bt.Tx{}, *tx)
-
-			realFee := uint64(0)
-			for _, input := range in["inputs"].([]interface{}) {
-				i := input.(map[string]interface{})
-				realFee += uint64(i["satoshis"].(float64))
-			}
-			for _, output := range tx.Outputs {
-				realFee -= output.Satoshis
-			}
-
-			realSize := uint64(float64(len(in["hex"].(string))) / 2)
-			sizeEstimate := draftTransaction.estimateSize()
-			feeEstimate := draftTransaction.estimateFee(feeUnit, 0)
-			assert.GreaterOrEqual(t, sizeEstimate, realSize)
-			assert.GreaterOrEqual(t, feeEstimate, realFee)
-		}
-	})
-}
-
 func TestDraftTransaction_SignInputs(t *testing.T) {
 	ctx, client, deferMe := CreateTestSQLiteClient(t, true, true)
 	defer deferMe()
@@ -1505,8 +1187,7 @@ func TestDraftTransaction_SignInputs(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			m := newDraftTransaction(xPub.rawXpubKey, tt.config, client.DefaultModelOptions(New())...)
-			err = m.createTransactionHex(ctx)
+			m, err := newDraftTransaction(xPub.rawXpubKey, tt.config, client.DefaultModelOptions(New())...)
 			require.NoError(t, err)
 
 			var gotSignedHex string
@@ -1579,4 +1260,49 @@ func initSimpleTestCase(t *testing.T) (context.Context, ClientInterface, func())
 	require.NoError(t, err)
 
 	return ctx, client, deferMe
+}
+
+func prepareAdditionalModels(t *testing.T, client ClientInterface, ctx context.Context, multipleUtxos bool) {
+	xPub := newXpub(testXPub, append(client.DefaultModelOptions(), New())...)
+	err := xPub.Save(ctx)
+	require.NoError(t, err)
+
+	destination := newDestination(testXPubID, testLockingScript,
+		append(client.DefaultModelOptions(), New())...)
+	err = destination.Save(ctx)
+	require.NoError(t, err)
+
+	if multipleUtxos {
+		prepareMultipleUtxos(t, client, ctx)
+	} else {
+		prepareSingleUtxo(t, client, ctx)
+	}
+
+	transaction, err := txFromHex(testTxHex, append(client.DefaultModelOptions(), New())...)
+	require.NoError(t, err)
+
+	err = transaction.Save(ctx)
+	require.NoError(t, err)
+}
+
+func prepareSingleUtxo(t *testing.T, client ClientInterface, ctx context.Context) {
+	utxo := newUtxo(testXPubID, testTxID, testLockingScript, 0, 100000,
+		append(client.DefaultModelOptions(), New())...)
+	err := utxo.Save(ctx)
+	require.NoError(t, err)
+}
+
+func prepareMultipleUtxos(t *testing.T, client ClientInterface, ctx context.Context) {
+	utxo := newUtxo(testXPubID, testTxID, testLockingScript, 0, 100000,
+		append(client.DefaultModelOptions(), New())...)
+	err := utxo.Save(ctx)
+	require.NoError(t, err)
+	utxo = newUtxo(testXPubID, testTxID, testLockingScript, 1, 110000,
+		append(client.DefaultModelOptions(), New())...)
+	err = utxo.Save(ctx)
+	require.NoError(t, err)
+	utxo = newUtxo(testXPubID, testTxID, testLockingScript, 2, 130000,
+		append(client.DefaultModelOptions(), New())...)
+	err = utxo.Save(ctx)
+	require.NoError(t, err)
 }

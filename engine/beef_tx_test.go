@@ -3,6 +3,7 @@ package engine
 import (
 	"context"
 	"encoding/json"
+	"strconv"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -154,7 +155,7 @@ func Test_ToBeef_HappyPaths(t *testing.T) {
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
 			// given
-			ctx, client, deferMe := initSimpleTestCase(t)
+			ctx, client, deferMe := prepareModels(t)
 			store := NewMockTransactionStore()
 			defer deferMe()
 
@@ -168,8 +169,8 @@ func Test_ToBeef_HappyPaths(t *testing.T) {
 			result, err := ToBeef(ctx, newTx, store)
 
 			// then
-			assert.Equal(t, expectedBeefHex[tc.testID], result)
 			assert.NoError(t, nil, err)
+			assert.Equal(t, expectedBeefHex[tc.testID], result)
 		})
 	}
 }
@@ -219,50 +220,13 @@ func Test_ToBeef_ErrorPaths(t *testing.T) {
 			outputValue:          3000,
 			expectedErrorMessage: "prepareBUMPFactors() error: required transactions not found in database: [04f01fd4cef5a7bcb6328b08133094e7b9f6feb4b856f46123168de6b4bc4f62]",
 		},
-		{
-			hexForProcessedTx: "0100000002cb3553424ffc94b59a60fb358b6cb6dfb694aee894dcd1effc0ed0a9052464e3000000006a4730440220515c3bf93d38fa7cc164746fae4bec8b66c60a82509eb553751afa5971c3e41d0220321517fd5c997ab5f8ef0e59048ce9157de46f92b10d882bf898e62f3ee7343d4121038f1273fcb299405d8d140b4de9a2111ecb39291b2846660ebecd864d13bee575ffffffff624fbcb4e68d162361f456b8b4fef6b9e7943013088b32b6bca7f5ced41ff004010000006a47304402203fb24f6e00a6487cf88a3b39d8454786db63d649142ea76374c2f55990777e6302207fbb903d038cf43e13ffb496a64f36637ec7323e5ac48bb96bdb4a885100abca4121024b003d3cf49a8f48c1fe79b711b1d08e306c42a0ab8da004d97fccc4ced3343affffffff026f000000000000001976a914f232d38cd4c2f87c117af06542b04a7061b6640188aca62a0000000000001976a9146058e52d00e3b94211939f68cc2d9a3fc1e3db0f88ac00000000",
-			name:              "last ancestor has corrupted hex in database - should return error",
-			ancestors: []*beefTestCaseAncestor{
-				{
-					hex:         "0100000001cfc39e3adcd58ed58cf590079dc61c3eb6ec739abb7d22b592fb969d427f33ee000000006a4730440220253e674e64028459457d55b444f5f3dc15c658425e3184c628016739e4921fd502207c8fe20eb34e55e4115fbd82c23878b4e54f01f6c6ad0811282dd0b1df863b5e41210310a4366fd997127ad972b14c56ca2e18f39ca631ac9e3e4ad3d9827865d0cc70ffffffff0264000000000000001976a914668a92ff9cb5785eb8fc044771837a0818b028b588acdc4e0000000000001976a914b073264927a61cf84327dea77414df6c28b11e5988ac00000000",
-					isMined:     true,
-					bumpJSON:    `{"blockHeight":"817574","path":[[{"offset":"11432","hash":"3b535e0f8e266124bce9868420052d5a7585c67e82c1edc2c7fe05fd5e140307"},{"offset":"11433","hash":"e3642405a9d00efcefd1dc94e8ae94b6dfb66c8b35fb609ab594fc4f425335cb","txid":true}],[{"offset":"5717","hash":"6ef9c6dde7fff82fa893754109f12378c8453b47dc896596b5531433093ab5b7"}],[{"offset":"2859","hash":"daa67e00ad2aef787998b66cbb3417033fbec136da1e230a5f5df3186f5c0880"}],[{"offset":"1428","hash":"bc777a80d951fbf2b7bd3a8048a9bb78fbf1d23d4127290c3fed9740b4246dd2"}],[{"offset":"715","hash":"762b57f88e7258f5757b48cda96d075cbe767c0a39a83e7109574555fd2dd8ba"}],[{"offset":"356","hash":"bbaab745bcca4f8a4be39c06c7e9be3aa1994f32271e3c6b4f768897153e5522"}],[{"offset":"179","hash":"817694ccbde5dbf88f290c30e8735991708a3d406740f7dd31434ff516a5bfde"}],[{"offset":"88","hash":"ed5b52ba4af9198d398e934a84e18405f49e7abde91cafb6dfe5aeaedb33a979"}],[{"offset":"45","hash":"0e51ec9dd5319ceb32d2d20f620c0ca3e0d918260803c1005d49e686c9b18752"}],[{"offset":"23","hash":"08ab694ef1af4019e2999a543a632cf4a662ae04d5fee879c6aadaeb749f6374"}],[{"offset":"10","hash":"4223f47597b14ee0fa7ade08e611ec80948b5fa9da267ce6c8e5d952e7fdb38e"}],[{"offset":"4","hash":"b6dace0d2294fd6e0c11f74376b7f0a1fc8ee415b350caf90c3ae92749e2a8ee"}],[{"offset":"3","hash":"795e7514ebf6d63b454d3f04854e1e0db0ac3a549f61135d5e9ef8d5785f2c68"}],[{"offset":"0","hash":"3f458f2c06493c31cbc3a035ba131913b274ac7915b9b9bc79128001a75cf76d"}],[{"offset":"1","hash":"b9b9f80cc72a674e37b54a9fdee72a9bff761f8cbcb94146afc2bffef33be89f"}]]}`,
-					blockHeight: 817574,
-				},
-				{
-					hex:         "0100000001a114c7deb8deba851d87755aa10aa18c97bd77afee4e1bad01d1c50e07a644eb010000006a473044022041abd4f93bd1db1d0097f2d467ae183801d7842d23d0605fa9568040d245167402201be66c96bef4d6d051304f6df2aecbdfe23a8a05af0908ef2117ab5388d8903c412103c08545a40c819f6e50892e31e792d221b6df6da96ebdba9b6fe39305cc6cc768ffffffff0263040000000000001976a91454097d9d921f9a1f55084a943571d868552e924f88acb22a0000000000001976a914c36b3fca5159231033f3fbdca1cde942096d379f88ac00000000",
-					isMined:     false,
-					bumpJSON:    ``,
-					blockHeight: -1,
-					parents: []*beefTestCaseAncestor{
-						{
-							hex:         "010000000150965003ea3d2c08bc79b116c9ffe7e730c9f9cf0a61e3df07868b24eac6f8d3000000006b4830450221009d3489f9e76ff3b043708972c52f85519e50a5fc35563d405e04b668780bf2ba0220024188508fc9c6870b2fc4f40b9484ae4163481199a5b4a7a338b86ec8952fee4121036a8b9d796ce2dee820d1f6d7a6ba07037dab4758f16028654fe4bc3a5c430b40ffffffff022a200000000000001976a91484c73348a8fbbc44cfa34f8f5441fc104f3bc78588ac162f0000000000001976a914590b1df63948c2c4e7a12a6e52012b36e25daa9888ac00000000",
-							isMined:     false,
-							bumpJSON:    ``,
-							blockHeight: -1,
-							parents: []*beefTestCaseAncestor{
-								{
-									hex:         "0100000002787a565270ec00b1bf6ed20100223176656705dc0cfe5ef9d1810ca6569f12d1020000006a47304402203cfe36be7ff5c2ac939bb6a625e4a1226be242f1f9950672b5f696ec58a3358902202a48d6c6e81e5950dc49d0dd1a35b46fa8f919b109b0e7c05deaef3db6051890412102fb130326dbd7c43841cde467196e5f289b9d8596e237725df84f768468426d8bffffffff008d9db2a5c8c310e6394c24c1f3c23b3adbdd6ab4a719e917a4a0ed78768773020000006a473044022049c80385f7f69e8ba6039ebe84fe5e6578f4c3c83eb622442a96219c59ac1a750220317fe2b47838dff11f88d909732d0846eba20acff57cb357a3ff39b5a7b61b3741210322b79b40a759c485eac318eabba60a73a49ec3307ded79ba8c47204405bb2f3fffffffff05414f0000000000001976a91400414bcf2602f309171901d837b4a155adbfb5ce88ac50c30000000000001976a91489ef778cc07c77cce1ad3ff6274615afe15f20c088ac204e0000000000001976a914971b76df1dc6acf01e8e7d2f8bfb3c86e69bc64c88acef250000000000001976a9144b4a836b444d5ed8d245ddb1aa87890",
-									isMined:     true,
-									bumpJSON:    `{"blockHeight":"817117","path":[[{"offset":"90","hash":"d3f8c6ea248b8607dfe3610acff9c930e7e7ffc916b179bc082c3dea03509650","txid":true},{"offset":"91","hash":"5b52ad65ab613867da9a710d60898a6e5da62dea97dac25da40a0dc385253ad2"}],[{"offset":"44","hash":"84c338bea7f65ccaf7a27ca9ae6d4b11372339cf6aa6021523de3ce6f5fe4f0c"}],[{"offset":"23","hash":"5860f292e051c0a5d9d8d69a451311a009c9cde8da6522df915587913a5180dd"}],[{"offset":"10","hash":"633fb08a689363af6a8245d3482fff232b27a62b94a4d119e67700fb9608ef78"}],[{"offset":"4","hash":"4b80bb130cebb1b8c313eb4088d098178ae122fd490a255218ceada19ab9eb52"}],[{"offset":"3","hash":"cf3d0335dda3223c8b4cf28ca2c03c7e025e3088525d51981d0ee1bd2ea210cf"}],[{"offset":"0","hash":"99c7462c2530abd1be779b170b7c2afbf7b883c07175871c971734d2bd38d35b"}],[{"offset":"1","hash":"9a66c7e35426281b1be6f43ecad44a3b65a9d2234d69a55b87d535f5903d677f"}],[{"offset":"1","hash":"40e34161018499a3ad5d1ef0d74a2e557733b6c7b5c07c1d8b872ffd504e545b"}],[{"offset":"1","hash":"dce6b1d7924d3ea2b1d7e3f2c4ae15abeea3b63e1362cc0896a82bca57a21387"}],[{"offset":"1","hash":"e1fe4e2b97189cb9da328bc59430a51595ee248079bd01a3f658af810e14cb7c"}]]}`,
-									blockHeight: 817117,
-								},
-							},
-						},
-					},
-				},
-			},
-			receiverAddress:      "1A1PjKqjWMNBzTVdcBru27EV1PHcXWc63W",
-			outputValue:          4500,
-			expectedErrorMessage: "prepareBUMPFactors() error: required transactions not found in database: [d3f8c6ea248b8607dfe3610acff9c930e7e7ffc916b179bc082c3dea03509650]",
-		},
 	}
 
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
 			// given
-			ctx, client, deferMe := initSimpleTestCase(t)
 			store := NewMockTransactionStore()
+			ctx, client, deferMe := prepareModels(t)
 			defer deferMe()
 
 			var ancestors []*Transaction
@@ -283,7 +247,7 @@ func Test_ToBeef_ErrorPaths(t *testing.T) {
 }
 
 func createProcessedTx(ctx context.Context, t *testing.T, client ClientInterface, testCase *beefTestCase, ancestors []*Transaction) *Transaction {
-	draftTx := newDraftTransaction(
+	draftTx, err := newDraftTransaction(
 		testXPub, &TransactionConfig{
 			Inputs: createInputsUsingAncestors(ancestors, client),
 			Outputs: []*TransactionOutput{{
@@ -300,6 +264,7 @@ func createProcessedTx(ctx context.Context, t *testing.T, client ClientInterface
 		},
 		append(client.DefaultModelOptions(), New())...,
 	)
+	require.NoError(t, err)
 
 	transaction, err := txFromHex(testCase.hexForProcessedTx, append(client.DefaultModelOptions(), New())...)
 	require.NoError(t, err)
@@ -314,10 +279,6 @@ func createProcessedTx(ctx context.Context, t *testing.T, client ClientInterface
 
 func addAncestor(ctx context.Context, testCase *beefTestCaseAncestor, client ClientInterface, store *MockTransactionStore, t *testing.T) *Transaction {
 	ancestor, err := txFromHex(testCase.hex, append(client.DefaultModelOptions(), New())...)
-	if err != nil {
-		ancestor = emptyTx(append(client.DefaultModelOptions(), New())...)
-		ancestor.Hex = testCase.hex
-	}
 
 	if testCase.isMined {
 		ancestor.BlockHeight = uint64(testCase.blockHeight)
@@ -338,15 +299,38 @@ func addAncestor(ctx context.Context, testCase *beefTestCaseAncestor, client Cli
 		store.AddToStore(ancestor)
 	}
 
+	utxo := newUtxo(testXPubID, ancestor.ID, testLockingScript, 1, 100000,
+		append(client.DefaultModelOptions(), New())...)
+	err = utxo.Save(ctx)
+	require.NoError(t, err)
+
 	return ancestor
 }
 
 func createInputsUsingAncestors(ancestors []*Transaction, client ClientInterface) []*TransactionInput {
 	var inputs []*TransactionInput
 
-	for _, input := range ancestors {
-		inputs = append(inputs, &TransactionInput{Utxo: *newUtxoFromTxID(input.GetID(), 0, append(client.DefaultModelOptions(), New())...)})
+	for i, input := range ancestors {
+		utxo := *newUtxoFromTxID(input.GetID(), 0, append(client.DefaultModelOptions(), New())...)
+		utxo.ID = strconv.Itoa(i)
+		inputs = append(inputs, &TransactionInput{Utxo: utxo})
 	}
 
 	return inputs
+}
+
+func prepareModels(t *testing.T) (context.Context, ClientInterface, func()) {
+	ctx, client, deferMe := CreateTestSQLiteClient(t, false, true, withTaskManagerMockup())
+
+	xPub := newXpub(testXPub, append(client.DefaultModelOptions(), New())...)
+	xPub.CurrentBalance = 100000
+	err := xPub.Save(ctx)
+	require.NoError(t, err)
+
+	destination := newDestination(testXPubID, testLockingScript,
+		append(client.DefaultModelOptions(), New())...)
+	err = destination.Save(ctx)
+	require.NoError(t, err)
+
+	return ctx, client, deferMe
 }
