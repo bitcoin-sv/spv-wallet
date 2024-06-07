@@ -175,7 +175,7 @@ func getMetricsDefaults() *MetricsConfig {
 
 func getExperimentalFeaturesConfig() *ExperimentalConfig {
 	return &ExperimentalConfig{
-		PikeContactsEnabled: true,
-		PikePaymentEnabled:  true,
+		PikeContactsEnabled: false,
+		PikePaymentEnabled:  false,
 	}
 }
