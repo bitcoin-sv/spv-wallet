@@ -59,7 +59,7 @@ func (s *PaymailServant) AddContactRequest(ctx context.Context, receiverPaymail 
 		return nil, ErrCapabilitiesPikeUnsupported
 	}
 
-	url := capabilities.GetString(paymail.BRFCPike, "")
+	url := capabilities.ExtractPikeInviteURL()
 	response, err := s.pc.AddContactRequest(url, receiverPaymail.Alias, receiverPaymail.Domain, contactData)
 	if err != nil {
 		return nil, fmt.Errorf("error during requesting new contact: %w", err)
