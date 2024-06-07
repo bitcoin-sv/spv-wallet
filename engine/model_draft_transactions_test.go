@@ -925,11 +925,11 @@ func TestDraftTransaction_getInputsFromUtxos(t *testing.T) {
 		inputUtxos, satoshisReserved, err := draftTransaction.getInputsFromUtxos(reservedUtxos)
 		require.NoError(t, err)
 		assert.Equal(t, uint64(124235), satoshisReserved)
-		assert.Equal(t, 1, len(*inputUtxos))
-		assert.Equal(t, testTxID, hex.EncodeToString((*inputUtxos)[0].TxID))
-		assert.Equal(t, uint32(123), (*inputUtxos)[0].Vout)
-		assert.Equal(t, testLockingScript, (*inputUtxos)[0].LockingScript.String())
-		assert.Equal(t, uint64(124235), (*inputUtxos)[0].Satoshis)
+		assert.Equal(t, 1, len(inputUtxos))
+		assert.Equal(t, testTxID, hex.EncodeToString((inputUtxos)[0].TxID))
+		assert.Equal(t, uint32(123), (inputUtxos)[0].Vout)
+		assert.Equal(t, testLockingScript, (inputUtxos)[0].LockingScript.String())
+		assert.Equal(t, uint64(124235), (inputUtxos)[0].Satoshis)
 	})
 
 	t.Run("get multi", func(t *testing.T) {
@@ -953,17 +953,17 @@ func TestDraftTransaction_getInputsFromUtxos(t *testing.T) {
 		inputUtxos, satoshisReserved, err := draftTransaction.getInputsFromUtxos(reservedUtxos)
 		require.NoError(t, err)
 		assert.Equal(t, uint64(124235+52313), satoshisReserved)
-		assert.Equal(t, 2, len(*inputUtxos))
+		assert.Equal(t, 2, len(inputUtxos))
 
-		assert.Equal(t, testTxID, hex.EncodeToString((*inputUtxos)[0].TxID))
-		assert.Equal(t, uint32(124), (*inputUtxos)[0].Vout)
-		assert.Equal(t, testLockingScript, (*inputUtxos)[0].LockingScript.String())
-		assert.Equal(t, uint64(52313), (*inputUtxos)[0].Satoshis)
+		assert.Equal(t, testTxID, hex.EncodeToString((inputUtxos)[0].TxID))
+		assert.Equal(t, uint32(124), (inputUtxos)[0].Vout)
+		assert.Equal(t, testLockingScript, (inputUtxos)[0].LockingScript.String())
+		assert.Equal(t, uint64(52313), (inputUtxos)[0].Satoshis)
 
-		assert.Equal(t, testTxID, hex.EncodeToString((*inputUtxos)[1].TxID))
-		assert.Equal(t, uint32(123), (*inputUtxos)[1].Vout)
-		assert.Equal(t, testLockingScript, (*inputUtxos)[1].LockingScript.String())
-		assert.Equal(t, uint64(124235), (*inputUtxos)[1].Satoshis)
+		assert.Equal(t, testTxID, hex.EncodeToString((inputUtxos)[1].TxID))
+		assert.Equal(t, uint32(123), (inputUtxos)[1].Vout)
+		assert.Equal(t, testLockingScript, (inputUtxos)[1].LockingScript.String())
+		assert.Equal(t, uint64(124235), (inputUtxos)[1].Satoshis)
 	})
 }
 
