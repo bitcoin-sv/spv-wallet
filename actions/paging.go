@@ -9,6 +9,18 @@ import (
 )
 
 func Paging(c *gin.Context) {
+	pageable := extractPageableFromRequest(c)
+
+	fmt.Printf("Pageable from request: %+v\n", pageable)
+
+	// call service with pageable data
+
+	c.JSON(http.StatusOK, gin.H{
+		"pageable": "OK",
+	})
+}
+
+func extractPageableFromRequest(c *gin.Context) *models.Pageable {
 	pageFromQueryParam, _ := strconv.Atoi(c.Query("page"))
 	fmt.Println("Page from request", pageFromQueryParam)
 
@@ -17,18 +29,9 @@ func Paging(c *gin.Context) {
 
 	sort := c.QueryArray("sort")
 	fmt.Println("Sort from request", sort)
-
-	pageable := models.Pageable{
+	return &models.Pageable{
 		Page: pageFromQueryParam,
 		Size: sizeFromQueryParam,
 		Sort: models.Sort{},
 	}
-
-	fmt.Printf("%+v\n", pageable)
-
-	// call service with pageable data
-
-	c.JSON(http.StatusOK, gin.H{
-		"pageable": "OK",
-	})
 }
