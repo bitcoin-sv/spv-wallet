@@ -20,6 +20,9 @@ servicesToHideLogs=()
 additionalFlags=()
 composeFiles=("docker-compose.yml")
 
+# Setting it globally to solve problem with passing it docker_compose_up function
+name=""
+
 function print_debug() {
   if [ "$debug" == "true" ]; then
       echo -e "${color_debug}$1${color_reset}"
@@ -180,13 +183,17 @@ function docker_compose_up() {
   fi
 
   local run="true"
+  local additionalComposeFlags=($1)
+  if [ -n "$name" ]; then
+    additionalComposeFlags+=("--project-name $name")
+  fi
 
   if [ "$debug" == 'true' ]; then
     echo ""
     if [ $compose_plugin == true ]; then
-      print_debug "docker compose up $1"
+      print_debug "docker compose ${additionalComposeFlags[*]} up $2"
     else
-      print_debug "docker-compose up $1"
+      print_debug "docker-compose ${additionalComposeFlags[*]} up $2"
     fi
     echo ""
     ask_for_yes_or_no "You use debug mode. Do you want to run docker compose now?"
@@ -197,9 +204,9 @@ function docker_compose_up() {
   fi
 
   if [ $compose_plugin == true ]; then
-    docker compose $1 up $2
+    docker compose ${additionalComposeFlags[*]} up $2
   else
-    docker-compose $1 up $2
+    docker-compose ${additionalComposeFlags[*]} up $2
   fi
 }
 
@@ -297,6 +304,13 @@ while [[ $# -gt 0 ]]; do
         load_config="true"
         # no additional arguments so no `shift` command
         ;;
+        -n|--name)
+        name="$2"
+        if [ "$name" = "" ]; then
+            useDefaultName="true"
+        fi
+        shift
+        ;;
         -d|--debug)
         debug="true"
         # no additional arguments so no `shift` command
@@ -311,6 +325,7 @@ while [[ $# -gt 0 ]]; do
         echo -e "  -e,   --expose\t\t Whether to expose the services PayMail domain and its subdomains - true/false"
         echo -e "  -l,   --load\t\t\t Load previously stored config from .env.config file"
         echo -e "  -b,   --background\t\t Whether the applications should be run in background - true/false"
+        echo -e "  -n,   --name\t\t\t Define project name used by docker-compose - defaults to name from docker-compose.yaml"
         echo -e "  -d,   --debug\t\t\t Run in debug mode"
         echo -e "  -h,   --help\t\t\t Show this message"
         echo -e ""
@@ -362,6 +377,9 @@ if [ "$load_config" == "true" ]; then
             load_from 'RUN_PAYMAIL_DOMAIN' paymail_domain
             load_from 'RUN_EXPOSED' expose
             load_from 'RUN_IN_BACKGROUND' background
+            if [ "$useDefaultName" != "true" ]; then
+                load_from 'RUN_NAME' name
+            fi
             load_from 'RUN_WITH_DEFAULT_XPUB' default_xpub
             load_from 'SPVWALLET_AUTH_ADMIN_KEY' admin_xpub
             load_from 'SPVWALLET_ADMIN_XPRIV' admin_xpriv
@@ -534,6 +552,7 @@ save_to 'RUN_SPVWALLET_FRONTEND' wallet_frontend
 save_to 'RUN_SPVWALLET_BACKEND' wallet_backend
 save_to 'RUN_EXPOSED' expose
 save_to 'RUN_IN_BACKGROUND' background
+save_to 'RUN_NAME' name
 save_to 'RUN_WITH_DEFAULT_XPUB' default_xpub
 save_to 'SPVWALLET_AUTH_ADMIN_KEY' admin_xpub
 save_to 'SPVWALLET_ADMIN_XPRIV' admin_xpriv
@@ -653,10 +672,4 @@ if [ "$background" == "true" ]; then
   additionalFlags+=("-d")
 fi
 
-composeFilesArgs=""
-for file in "${composeFiles[@]}"; do
-    composeFilesArgs+=" -f $file"
-done
-
-docker_compose_up "$composeFilesArgs" "${servicesToRun[*]} ${additionalFlags[*]} $(prefix_each '--no-attach ' ${servicesToHideLogs[*]})"
-
+docker_compose_up "$(prefix_each '-f ' ${composeFiles[*]})" "${servicesToRun[*]} ${additionalFlags[*]} $(prefix_each '--no-attach ' ${servicesToHideLogs[*]})"

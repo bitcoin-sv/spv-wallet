@@ -1,6 +1,7 @@
 ##########################################################
 ### !NOTE: This file is meant to be used by start.sh! ###
 ########################################################
+name: "spv-wallet"
 services:
   wallet-frontend:
     image: bsvb/spv-wallet-web-frontend:latest
