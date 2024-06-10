@@ -23,7 +23,6 @@ func NewHandler(appConfig *config.AppConfig, services *config.AppServices) (rout
 		basicTransactionGroup.POST("/count", action.count)
 		basicTransactionGroup.GET("/search", action.search)
 		basicTransactionGroup.POST("/search", action.search)
-		basicTransactionGroup.GET("/hello", action.paging)
 	})
 
 	apiEndpoints := routes.APIEndpointsFunc(func(router *gin.RouterGroup) {
