@@ -73,10 +73,13 @@ func (c *Client) NewTransaction(ctx context.Context, rawXpubKey string, config *
 	}
 
 	// Create the draft tx model
-	draftTransaction := newDraftTransaction(
+	draftTransaction, err := newDraftTransaction(
 		rawXpubKey, config,
 		c.DefaultModelOptions(append(opts, New())...)...,
 	)
+	if err != nil {
+		return nil, err
+	}
 
 	// Save the model
 	if err = draftTransaction.Save(ctx); err != nil {
