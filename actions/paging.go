@@ -6,6 +6,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"net/http"
 	"strconv"
+	"strings"
 )
 
 func Paging(c *gin.Context) {
@@ -20,6 +21,8 @@ func Paging(c *gin.Context) {
 	})
 }
 
+// TODO: handle default parameters values
+// TODO: handle errors
 func extractPageableFromRequest(c *gin.Context) *models.Pageable {
 	pageFromQueryParam, _ := strconv.Atoi(c.Query("page"))
 	fmt.Println("Page from request", pageFromQueryParam)
@@ -32,6 +35,21 @@ func extractPageableFromRequest(c *gin.Context) *models.Pageable {
 	return &models.Pageable{
 		Page: pageFromQueryParam,
 		Size: sizeFromQueryParam,
-		Sort: models.Sort{},
+		Sort: *createSortFromQueryParam(sort),
 	}
+}
+
+func createSortFromQueryParam(sort []string) *models.Sort {
+	orders := make([]models.Order, 0)
+	const indexOfProperty = 0
+	const indexOfDirection = 1
+	for _, s := range sort {
+		tokens := strings.Split(s, ",")
+		orders = append(orders, models.Order{
+			Property:  tokens[indexOfProperty],
+			Direction: tokens[indexOfDirection],
+		})
+	}
+
+	return &models.Sort{Orders: orders}
 }
