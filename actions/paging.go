@@ -21,14 +21,19 @@ func Paging(c *gin.Context) {
 	})
 }
 
-// TODO: handle default parameters values
 // TODO: handle errors
 func extractPageableFromRequest(c *gin.Context) *models.Pageable {
-	pageFromQueryParam, _ := strconv.Atoi(c.Query("page"))
+	pageFromQueryParam, err := strconv.Atoi(c.Query("page"))
 	fmt.Println("Page from request", pageFromQueryParam)
+	if err != nil {
+		pageFromQueryParam = 0
+	}
 
-	sizeFromQueryParam, _ := strconv.Atoi(c.Query("size"))
+	sizeFromQueryParam, err := strconv.Atoi(c.Query("size"))
 	fmt.Println("Size from request", sizeFromQueryParam)
+	if err != nil {
+		sizeFromQueryParam = 100
+	}
 
 	sort := c.QueryArray("sort")
 	fmt.Println("Sort from request", sort)
