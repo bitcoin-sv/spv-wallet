@@ -79,8 +79,6 @@ nodes:
     host: https://example.com
     # token to authenticate callback calls - default callback token will be generated from the Admin Key
     _token: 44a82509
-  # protocol - arc/mapi (arc is default)
-  protocol: arc
   # list of apis used for getting and broadcasting transactions
   apis:
     # gorillapool can be used as well
