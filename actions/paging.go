@@ -44,16 +44,26 @@ func extractPageableFromRequest(c *gin.Context) *models.Pageable {
 	}
 }
 
+// TODO: handle default sort order
+// TODO: what to do if sort parameter is broken?
 func createSortFromQueryParam(sort []string) *models.Sort {
 	orders := make([]models.Order, 0)
 	const indexOfProperty = 0
 	const indexOfDirection = 1
+	const defaultSortOrder = "asc"
 	for _, s := range sort {
 		tokens := strings.Split(s, ",")
-		orders = append(orders, models.Order{
-			Property:  tokens[indexOfProperty],
-			Direction: tokens[indexOfDirection],
-		})
+		if len(tokens) == 2 {
+			orders = append(orders, models.Order{
+				Property:  tokens[indexOfProperty],
+				Direction: tokens[indexOfDirection],
+			})
+		} else if len(tokens) == 1 {
+			orders = append(orders, models.Order{
+				Property:  tokens[indexOfProperty],
+				Direction: defaultSortOrder,
+			})
+		}
 	}
 
 	return &models.Sort{Orders: orders}
