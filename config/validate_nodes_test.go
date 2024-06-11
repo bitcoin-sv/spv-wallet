@@ -15,12 +15,6 @@ func TestNodesConfig_Validate(t *testing.T) {
 		assert.NoError(t, n.Validate())
 	})
 
-	t.Run("wrong protocol", func(t *testing.T) {
-		n := getNodesDefaults()
-		n.Protocol = "wrong"
-		assert.Error(t, n.Validate())
-	})
-
 	t.Run("empty list of apis", func(t *testing.T) {
 		n := getNodesDefaults()
 
@@ -34,7 +28,6 @@ func TestNodesConfig_Validate(t *testing.T) {
 	t.Run("no arc url", func(t *testing.T) {
 		n := getNodesDefaults()
 
-		n.Protocol = NodesProtocolArc
 		n.Apis[0].ArcURL = ""
 		assert.Error(t, n.Validate())
 	})

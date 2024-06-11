@@ -117,7 +117,6 @@ func getNodesDefaults() *NodesConfig {
 	depIDSufix, _ := uuid.NewUUID()
 	return &NodesConfig{
 		DeploymentID: "spv-wallet-" + depIDSufix.String(),
-		Protocol:     NodesProtocolArc,
 		Callback:     getCallbackDefaults(),
 		Apis: []*MinerAPI{
 			{

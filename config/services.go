@@ -176,9 +176,7 @@ func (s *AppServices) loadSPVWallet(ctx context.Context, appConfig *AppConfig, t
 		options = append(options, engine.WithNotifications(appConfig.Notifications.WebhookEndpoint))
 	}
 
-	if appConfig.Nodes.Protocol == NodesProtocolArc {
-		options = loadBroadcastClientArc(appConfig, options, logger)
-	}
+	options = loadBroadcastClientArc(appConfig, options, logger)
 
 	if appConfig.Nodes.Callback.CallbackToken == "" {
 		var callbackToken string
