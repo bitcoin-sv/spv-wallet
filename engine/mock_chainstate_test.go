@@ -7,7 +7,6 @@ import (
 	"github.com/bitcoin-sv/go-broadcast-client/broadcast"
 	"github.com/bitcoin-sv/spv-wallet/engine/chainstate"
 	"github.com/bitcoin-sv/spv-wallet/engine/utils"
-	"github.com/libsv/go-bc"
 )
 
 // chainStateBase is the base interface / methods
@@ -108,11 +107,6 @@ func (c *chainStateEverythingOnChain) QueryTransaction(_ context.Context, id str
 		BlockHeight: 600000,
 		ID:          id,
 		Provider:    "whatsonchain",
-		MerkleProof: &bc.MerkleProof{
-			Index:  37008,
-			TxOrID: id,
-			Nodes:  []string{"3228f78cfd3c96262ec521225f1b9dd6326b4d3e245d1551bb06258f2101cb65", "05267706279d2e5ebcf89ed0645d4283108c7e850cdb84aeb0974738ae447a8d"},
-		},
 	}, nil
 }
 
@@ -125,11 +119,6 @@ func (c *chainStateEverythingOnChain) QueryTransactionFastest(_ context.Context,
 		BlockHeight: 600000,
 		ID:          id,
 		Provider:    "whatsonchain",
-		MerkleProof: &bc.MerkleProof{
-			Index:  37008,
-			TxOrID: id,
-			Nodes:  []string{"3228f78cfd3c96262ec521225f1b9dd6326b4d3e245d1551bb06258f2101cb65", "05267706279d2e5ebcf89ed0645d4283108c7e850cdb84aeb0974738ae447a8d"},
-		},
 	}, nil
 }
 

@@ -85,13 +85,4 @@ func TestNewClient(t *testing.T) {
 		require.NotNil(t, c)
 		assert.Equal(t, TestNet, c.Network())
 	})
-
-	t.Run("unreachable miners", func(t *testing.T) {
-		_, err := NewClient(
-			context.Background(),
-			WithBroadcastClient(bc),
-		)
-		require.Error(t, err)
-		assert.ErrorIs(t, err, ErrMissingBroadcastMiners)
-	})
 }

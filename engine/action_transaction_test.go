@@ -244,7 +244,7 @@ func initRevertTransactionData(t *testing.T) (context.Context, ClientInterface, 
 	draftTransaction := newDraftTransaction(
 		testXPub, &TransactionConfig{
 			Outputs: []*TransactionOutput{{
-				To:       "1A1PjKqjWMNBzTVdcBru27EV1PHcXWc63W", // random address
+				To:       "18VWHjMt4ixHddPPbs6righWTs3Sg2QNcn", // random address
 				Satoshis: 1000,
 			}},
 			ChangeNumberOfDestinations: 1,
