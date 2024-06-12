@@ -50,3 +50,32 @@ func TestAppConfig_GetUserAgent(t *testing.T) {
 		assert.Equal(t, "SPV Wallet "+Version, agent)
 	})
 }
+
+func TestCallback_HostPattern(t *testing.T) {
+	validURLs := []string{
+		"http://example.com",
+		"https://example.com",
+		"http://subdomain.example.com",
+		"https://subdomain.example.com",
+	}
+
+	invalidURLs := []string{
+		"example.com",
+		"ftp://example.com",
+		"localhost",
+		"http//example.com",
+		"https//example.com",
+	}
+
+	for _, url := range validURLs {
+		if !callbackURLPattern.MatchString(url) {
+			t.Errorf("expected %v to be valid, but it was not", url)
+		}
+	}
+
+	for _, url := range invalidURLs {
+		if callbackURLPattern.MatchString(url) {
+			t.Errorf("expected %v to be invalid, but it was not", url)
+		}
+	}
+}

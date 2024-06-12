@@ -24,7 +24,7 @@ import (
 )
 
 // callbackURLPattern is a regex pattern to check the callback URL (host)
-var callbackURLPattern = regexp.MustCompile(`^https?://(?!localhost)`)
+var callbackURLPattern = regexp.MustCompile(`^https?://`)
 
 // AppServices is the loaded services via config
 type (
