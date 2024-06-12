@@ -93,9 +93,9 @@ func TestCallback_ConfigureCallback(t *testing.T) {
 			appConfig: AppConfig{
 				Nodes: &NodesConfig{
 					Callback: &CallbackConfig{
-						Enabled: true,
 						Host:    "http://example.com",
 						Token:   "",
+						Enabled: true,
 					},
 				},
 			},
@@ -107,9 +107,9 @@ func TestCallback_ConfigureCallback(t *testing.T) {
 			appConfig: AppConfig{
 				Nodes: &NodesConfig{
 					Callback: &CallbackConfig{
-						Enabled: true,
 						Host:    "https://example.com",
 						Token:   "existingToken",
+						Enabled: true,
 					},
 				},
 			},
@@ -121,9 +121,9 @@ func TestCallback_ConfigureCallback(t *testing.T) {
 			appConfig: AppConfig{
 				Nodes: &NodesConfig{
 					Callback: &CallbackConfig{
-						Enabled: true,
 						Host:    "ftp://example.com",
 						Token:   "",
+						Enabled: true,
 					},
 				},
 			},
@@ -135,9 +135,9 @@ func TestCallback_ConfigureCallback(t *testing.T) {
 			appConfig: AppConfig{
 				Nodes: &NodesConfig{
 					Callback: &CallbackConfig{
-						Enabled: true,
 						Host:    "http://localhost:3003",
 						Token:   "",
+						Enabled: true,
 					},
 				},
 			},
@@ -149,9 +149,9 @@ func TestCallback_ConfigureCallback(t *testing.T) {
 			appConfig: AppConfig{
 				Nodes: &NodesConfig{
 					Callback: &CallbackConfig{
-						Enabled: false,
 						Host:    "http://example.com",
 						Token:   "",
+						Enabled: false,
 					},
 				},
 			},
