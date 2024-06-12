@@ -25,8 +25,8 @@ import (
 	"github.com/rs/zerolog"
 )
 
-// explicitHttpUrlRegex is a regex pattern to check the callback URL (host)
-var explicitHttpUrlRegex = regexp.MustCompile(`^https?://`)
+// explicitHTTPURLRegex is a regex pattern to check the callback URL (host)
+var explicitHTTPURLRegex = regexp.MustCompile(`^https?://`)
 
 // AppServices is the loaded services via config
 type (
@@ -439,7 +439,7 @@ func isLocal(hostname string) bool {
 }
 
 func isValidURL(rawURL string) bool {
-	if !explicitHttpUrlRegex.MatchString(rawURL) {
+	if !explicitHTTPURLRegex.MatchString(rawURL) {
 		return false
 	}
 	u, err := url.Parse(rawURL)
