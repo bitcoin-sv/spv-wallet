@@ -2,6 +2,7 @@ package config
 
 import (
 	"context"
+	"github.com/bitcoin-sv/spv-wallet/engine"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -77,5 +78,99 @@ func TestCallback_HostPattern(t *testing.T) {
 		if callbackURLPattern.MatchString(url) {
 			t.Errorf("expected %v to be invalid, but it was not", url)
 		}
+	}
+}
+
+func TestCallback_ConfigureCallback(t *testing.T) {
+	tests := []struct {
+		name         string
+		appConfig    AppConfig
+		expectedErr  string
+		expectedOpts int
+	}{
+		{
+			name: "Valid URL with empty token and http",
+			appConfig: AppConfig{
+				Nodes: &NodesConfig{
+					Callback: &CallbackConfig{
+						Enabled: true,
+						Host:    "http://example.com",
+						Token:   "",
+					},
+				},
+			},
+			expectedErr:  "",
+			expectedOpts: 1,
+		},
+		{
+			name: "Valid URL with existing token and https",
+			appConfig: AppConfig{
+				Nodes: &NodesConfig{
+					Callback: &CallbackConfig{
+						Enabled: true,
+						Host:    "https://example.com",
+						Token:   "existingToken",
+					},
+				},
+			},
+			expectedErr:  "",
+			expectedOpts: 1,
+		},
+		{
+			name: "Invalid URL without http/https",
+			appConfig: AppConfig{
+				Nodes: &NodesConfig{
+					Callback: &CallbackConfig{
+						Enabled: true,
+						Host:    "ftp://example.com",
+						Token:   "",
+					},
+				},
+			},
+			expectedErr:  "invalid callback host: ftp://example.com - must be a https:// or http:// valid external url",
+			expectedOpts: 0,
+		},
+		{
+			name: "Invalid URL with localhost",
+			appConfig: AppConfig{
+				Nodes: &NodesConfig{
+					Callback: &CallbackConfig{
+						Enabled: true,
+						Host:    "http://localhost:3003",
+						Token:   "",
+					},
+				},
+			},
+			expectedErr:  "invalid callback host: http://localhost:3003 - must be a valid external url - not a localhost",
+			expectedOpts: 0,
+		},
+		{
+			name: "Callback disabled",
+			appConfig: AppConfig{
+				Nodes: &NodesConfig{
+					Callback: &CallbackConfig{
+						Enabled: false,
+						Host:    "http://example.com",
+						Token:   "",
+					},
+				},
+			},
+			expectedErr:  "",
+			expectedOpts: 0,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			options := []engine.ClientOps{}
+			ops, err := configureCallback(options, &tt.appConfig)
+			if tt.expectedErr != "" {
+				assert.Error(t, err)
+				assert.Contains(t, err.Error(), tt.expectedErr)
+			} else {
+				assert.NoError(t, err)
+			}
+			assert.Equal(t, tt.expectedOpts, len(ops))
+		})
 	}
 }

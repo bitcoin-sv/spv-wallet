@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"net/url"
 	"regexp"
+	"strings"
 	"time"
 
 	broadcastclient "github.com/bitcoin-sv/go-broadcast-client/broadcast/broadcast-client"
@@ -402,6 +403,10 @@ func configureCallback(options []engine.ClientOps, appConfig *AppConfig) ([]engi
 	if appConfig.Nodes.Callback.Enabled {
 		if !callbackURLPattern.MatchString(appConfig.Nodes.Callback.Host) {
 			return nil, fmt.Errorf("invalid callback host: %s - must be a https:// or http:// valid external url", appConfig.Nodes.Callback.Host)
+		}
+
+		if strings.Contains(appConfig.Nodes.Callback.Host, "localhost") {
+			return nil, fmt.Errorf("invalid callback host: %s - must be a valid external url - not a localhost", appConfig.Nodes.Callback.Host)
 		}
 
 		if appConfig.Nodes.Callback.Token == "" {
