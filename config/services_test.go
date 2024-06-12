@@ -59,6 +59,7 @@ func TestCallback_HostPattern(t *testing.T) {
 		"https://example.com",
 		"http://subdomain.example.com",
 		"https://subdomain.example.com",
+		"https://subdomain.example.com:3003",
 	}
 
 	invalidURLs := []string{
@@ -67,16 +68,18 @@ func TestCallback_HostPattern(t *testing.T) {
 		"localhost",
 		"http//example.com",
 		"https//example.com",
+		"https://localhost",
+		"https://127.0.0.1",
 	}
 
 	for _, url := range validURLs {
-		if !callbackURLPattern.MatchString(url) {
+		if !isValidURL(url) {
 			t.Errorf("expected %v to be valid, but it was not", url)
 		}
 	}
 
 	for _, url := range invalidURLs {
-		if callbackURLPattern.MatchString(url) {
+		if isValidURL(url) {
 			t.Errorf("expected %v to be invalid, but it was not", url)
 		}
 	}
@@ -130,7 +133,7 @@ func TestCallback_ConfigureCallback(t *testing.T) {
 				},
 			},
 			name:         "Invalid URL without http/https",
-			expectedErr:  "invalid callback host: ftp://example.com - must be a https:// or http:// valid external url",
+			expectedErr:  "invalid callback host: ftp://example.com - must be a valid external url - not a localhost",
 			expectedOpts: 0,
 		},
 		{

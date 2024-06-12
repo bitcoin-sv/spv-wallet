@@ -5,6 +5,7 @@ import (
 	"crypto/tls"
 	"errors"
 	"fmt"
+	"net"
 	"net/url"
 	"regexp"
 	"strings"
@@ -24,8 +25,8 @@ import (
 	"github.com/rs/zerolog"
 )
 
-// callbackURLPattern is a regex pattern to check the callback URL (host)
-var callbackURLPattern = regexp.MustCompile(`^https?://`)
+// explicitHttpUrlRegex is a regex pattern to check the callback URL (host)
+var explicitHttpUrlRegex = regexp.MustCompile(`^https?://`)
 
 // AppServices is the loaded services via config
 type (
@@ -401,11 +402,7 @@ func loadMinercraftMapi(appConfig *AppConfig, options []engine.ClientOps) []engi
 
 func configureCallback(options []engine.ClientOps, appConfig *AppConfig) ([]engine.ClientOps, error) {
 	if appConfig.Nodes.Callback.Enabled {
-		if !callbackURLPattern.MatchString(appConfig.Nodes.Callback.Host) {
-			return nil, fmt.Errorf("invalid callback host: %s - must be a https:// or http:// valid external url", appConfig.Nodes.Callback.Host)
-		}
-
-		if strings.Contains(appConfig.Nodes.Callback.Host, "localhost") {
+		if !isValidURL(appConfig.Nodes.Callback.Host) {
 			return nil, fmt.Errorf("invalid callback host: %s - must be a valid external url - not a localhost", appConfig.Nodes.Callback.Host)
 		}
 
@@ -420,4 +417,37 @@ func configureCallback(options []engine.ClientOps, appConfig *AppConfig) ([]engi
 		options = append(options, engine.WithCallback(appConfig.Nodes.Callback.Host+BroadcastCallbackRoute, appConfig.Nodes.Callback.Token))
 	}
 	return options, nil
+}
+
+func isLocal(hostname string) bool {
+	if strings.Contains(hostname, "localhost") {
+		return true
+	}
+
+	ip := net.ParseIP(hostname)
+	if ip != nil {
+		_, private10, _ := net.ParseCIDR("10.0.0.0/8")
+		_, private172, _ := net.ParseCIDR("172.16.0.0/12")
+		_, private192, _ := net.ParseCIDR("192.168.0.0/16")
+		_, loopback, _ := net.ParseCIDR("127.0.0.0/8")
+		_, linkLocal, _ := net.ParseCIDR("169.254.0.0/16")
+
+		return private10.Contains(ip) || private172.Contains(ip) || private192.Contains(ip) || loopback.Contains(ip) || linkLocal.Contains(ip)
+	}
+
+	return false
+}
+
+func isValidURL(rawURL string) bool {
+	if !explicitHttpUrlRegex.MatchString(rawURL) {
+		return false
+	}
+	u, err := url.Parse(rawURL)
+	if err != nil {
+		return false
+	}
+
+	hostname := u.Hostname()
+
+	return !isLocal(hostname)
 }
