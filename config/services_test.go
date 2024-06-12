@@ -84,9 +84,9 @@ func TestCallback_HostPattern(t *testing.T) {
 func TestCallback_ConfigureCallback(t *testing.T) {
 	tests := []struct {
 		name         string
-		appConfig    AppConfig
 		expectedErr  string
 		expectedOpts int
+		appConfig    AppConfig
 	}{
 		{
 			name: "Valid URL with empty token and http",
@@ -162,7 +162,7 @@ func TestCallback_ConfigureCallback(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			options := []engine.ClientOps{}
+			var options []engine.ClientOps
 			ops, err := configureCallback(options, &tt.appConfig)
 			if tt.expectedErr != "" {
 				assert.Error(t, err)
