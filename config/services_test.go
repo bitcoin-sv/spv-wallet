@@ -2,9 +2,9 @@ package config
 
 import (
 	"context"
-	"github.com/bitcoin-sv/spv-wallet/engine"
 	"testing"
 
+	"github.com/bitcoin-sv/spv-wallet/engine"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -52,6 +52,7 @@ func TestAppConfig_GetUserAgent(t *testing.T) {
 	})
 }
 
+// TestCallback_HostPattern will test the callback host pattern defined by the regex
 func TestCallback_HostPattern(t *testing.T) {
 	validURLs := []string{
 		"http://example.com",
@@ -81,15 +82,16 @@ func TestCallback_HostPattern(t *testing.T) {
 	}
 }
 
+// TestCallback_ConfigureCallback will test the method configureCallback()
 func TestCallback_ConfigureCallback(t *testing.T) {
+	//nolint: govet
 	tests := []struct {
+		appConfig    AppConfig
 		name         string
 		expectedErr  string
 		expectedOpts int
-		appConfig    AppConfig
 	}{
 		{
-			name: "Valid URL with empty token and http",
 			appConfig: AppConfig{
 				Nodes: &NodesConfig{
 					Callback: &CallbackConfig{
@@ -99,11 +101,11 @@ func TestCallback_ConfigureCallback(t *testing.T) {
 					},
 				},
 			},
+			name:         "Valid URL with empty token and http",
 			expectedErr:  "",
 			expectedOpts: 1,
 		},
 		{
-			name: "Valid URL with existing token and https",
 			appConfig: AppConfig{
 				Nodes: &NodesConfig{
 					Callback: &CallbackConfig{
@@ -113,11 +115,11 @@ func TestCallback_ConfigureCallback(t *testing.T) {
 					},
 				},
 			},
+			name:         "Valid URL with existing token and https",
 			expectedErr:  "",
 			expectedOpts: 1,
 		},
 		{
-			name: "Invalid URL without http/https",
 			appConfig: AppConfig{
 				Nodes: &NodesConfig{
 					Callback: &CallbackConfig{
@@ -127,11 +129,11 @@ func TestCallback_ConfigureCallback(t *testing.T) {
 					},
 				},
 			},
+			name:         "Invalid URL without http/https",
 			expectedErr:  "invalid callback host: ftp://example.com - must be a https:// or http:// valid external url",
 			expectedOpts: 0,
 		},
 		{
-			name: "Invalid URL with localhost",
 			appConfig: AppConfig{
 				Nodes: &NodesConfig{
 					Callback: &CallbackConfig{
@@ -141,11 +143,11 @@ func TestCallback_ConfigureCallback(t *testing.T) {
 					},
 				},
 			},
+			name:         "Invalid URL with localhost",
 			expectedErr:  "invalid callback host: http://localhost:3003 - must be a valid external url - not a localhost",
 			expectedOpts: 0,
 		},
 		{
-			name: "Callback disabled",
 			appConfig: AppConfig{
 				Nodes: &NodesConfig{
 					Callback: &CallbackConfig{
@@ -155,6 +157,7 @@ func TestCallback_ConfigureCallback(t *testing.T) {
 					},
 				},
 			},
+			name:         "Callback disabled",
 			expectedErr:  "",
 			expectedOpts: 0,
 		},
