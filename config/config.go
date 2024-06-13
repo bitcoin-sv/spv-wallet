@@ -33,7 +33,7 @@ type AppConfig struct {
 	Authentication *AuthenticationConfig `json:"auth" mapstructure:"auth"`
 	// Server is a general configuration for spv-wallet.
 	Server *ServerConfig `json:"server_config" mapstructure:"server_config"`
-	// Nodes is a config for BSV nodes, mAPI and Arc.
+	// Nodes is a config for Arc.
 	Nodes *NodesConfig `json:"nodes" mapstructure:"nodes"`
 	// Metrics is a configuration for metrics in SPV Wallet.
 	Metrics *MetricsConfig `json:"metrics" mapstructure:"metrics"`
