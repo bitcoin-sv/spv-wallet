@@ -5,6 +5,7 @@ import (
 	"crypto/rand"
 	"encoding/hex"
 	"fmt"
+	"github.com/bitcoin-sv/go-paymail"
 	"math"
 	"math/big"
 	"time"
@@ -164,6 +165,16 @@ func (m *DraftTransaction) processConfigOutputs(ctx context.Context) error {
 	conditions := map[string]interface{}{
 		xPubIDField: m.XpubID,
 	}
+
+	// Get the sender's paymail from the metadata, this help when sender has multiple paymails
+	senderPaymail, ok := m.Metadata["sender"].(string)
+	if ok {
+		alias, _, address := paymail.SanitizePaymail(senderPaymail)
+		if address != "" {
+			conditions["alias"] = alias
+		}
+	}
+
 	paymails, err := c.GetPaymailAddressesByXPubID(ctx, m.XpubID, nil, conditions, nil)
 	if err == nil && len(paymails) != 0 {
 		paymailFrom = fmt.Sprintf("%s@%s", paymails[0].Alias, paymails[0].Domain)
