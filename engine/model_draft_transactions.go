@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"math"
 	"math/big"
+	"strings"
 	"time"
 
 	"github.com/bitcoin-sv/spv-wallet/engine/datastore"
@@ -163,6 +164,13 @@ func (m *DraftTransaction) processConfigOutputs(ctx context.Context) error {
 	paymailFrom := c.GetPaymailConfig().DefaultFromPaymail
 	conditions := map[string]interface{}{
 		xPubIDField: m.XpubID,
+	}
+	// Get the sender's paymail from the metadata, this help when sender has multiple paymails
+	if m.Metadata != nil && m.Metadata["sender"] != nil {
+		parts := strings.Split(m.Metadata["sender"].(string), "@")
+		if len(parts) > 1 {
+			conditions["alias"] = parts[0]
+		}
 	}
 	paymails, err := c.GetPaymailAddressesByXPubID(ctx, m.XpubID, nil, conditions, nil)
 	if err == nil && len(paymails) != 0 {
