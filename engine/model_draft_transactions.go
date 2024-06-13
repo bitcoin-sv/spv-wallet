@@ -169,8 +169,10 @@ func (m *DraftTransaction) processConfigOutputs(ctx context.Context) error {
 	// Get the sender's paymail from the metadata, this help when sender has multiple paymails
 	senderPaymail, ok := m.Metadata["sender"].(string)
 	if ok {
-		alias, _, _ := paymail.SanitizePaymail(senderPaymail)
-		conditions["alias"] = alias
+		alias, _, address := paymail.SanitizePaymail(senderPaymail)
+		if address != "" {
+			conditions["alias"] = alias
+		}
 	}
 
 	paymails, err := c.GetPaymailAddressesByXPubID(ctx, m.XpubID, nil, conditions, nil)
