@@ -85,10 +85,12 @@ type CacheConfig struct {
 
 // CallbackConfig is the configuration for callbacks
 type CallbackConfig struct {
-	// CallbackHost is the URL for broadcast callback registration.
-	CallbackHost string `json:"callback_host" mapstructure:"callback_host"`
-	// CallbackToken is the token for broadcast callback registration.
-	CallbackToken string `json:"callback_token" mapstructure:"callback_token"`
+	// Host is the URL for broadcast callback registration.
+	Host string `json:"host" mapstructure:"host"`
+	// Token is the token for broadcast callback registration.
+	Token string `json:"token" mapstructure:"token"`
+	// Enabled is the flag that enables callbacks.
+	Enabled bool `json:"enabled" mapstructure:"enabled"`
 }
 
 // ClusterConfig is a configuration for the SPV Wallet cluster

@@ -194,7 +194,7 @@ func CallbackTokenMiddleware(appConfig *config.AppConfig) gin.HandlerFunc {
 		}
 
 		providedToken := authHeader[len(BearerSchema):]
-		if providedToken != appConfig.Nodes.Callback.CallbackToken {
+		if providedToken != appConfig.Nodes.Callback.Token {
 			err := dictionary.GetError(dictionary.ErrorAuthenticationCallback, "invalid authorization token")
 			c.AbortWithStatusJSON(err.StatusCode, err)
 		}

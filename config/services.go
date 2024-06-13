@@ -5,7 +5,10 @@ import (
 	"crypto/tls"
 	"errors"
 	"fmt"
+	"net"
 	"net/url"
+	"regexp"
+	"strings"
 	"time"
 
 	broadcastclient "github.com/bitcoin-sv/go-broadcast-client/broadcast/broadcast-client"
@@ -21,6 +24,9 @@ import (
 	"github.com/newrelic/go-agent/v3/newrelic"
 	"github.com/rs/zerolog"
 )
+
+// explicitHTTPURLRegex is a regex pattern to check the callback URL (host)
+var explicitHTTPURLRegex = regexp.MustCompile(`^https?://`)
 
 // AppServices is the loaded services via config
 type (
@@ -182,16 +188,10 @@ func (s *AppServices) loadSPVWallet(ctx context.Context, appConfig *AppConfig, t
 		options = loadBroadcastClientArc(appConfig, options, logger)
 	}
 
-	if appConfig.Nodes.Callback.CallbackToken == "" {
-		var callbackToken string
-		callbackToken, err = utils.HashAdler32(DefaultAdminXpub)
-		if err != nil {
-			logger.Err(err).Msg("unable to compute default callback token")
-		}
-		appConfig.Nodes.Callback.CallbackToken = callbackToken
+	options, err = configureCallback(options, appConfig)
+	if err != nil {
+		logger.Err(err).Msg("error while configuring callback")
 	}
-
-	options = append(options, engine.WithCallback(appConfig.Nodes.Callback.CallbackHost+BroadcastCallbackRoute, appConfig.Nodes.Callback.CallbackToken))
 
 	options = append(options, engine.WithFeeQuotes(appConfig.Nodes.UseFeeQuotes))
 
@@ -398,4 +398,56 @@ func loadMinercraftMapi(appConfig *AppConfig, options []engine.ClientOps) []engi
 		engine.WithMinercraftAPIs(appConfig.Nodes.toMinercraftMapi()),
 	)
 	return options
+}
+
+func configureCallback(options []engine.ClientOps, appConfig *AppConfig) ([]engine.ClientOps, error) {
+	if appConfig.Nodes.Callback.Enabled {
+		if !isValidURL(appConfig.Nodes.Callback.Host) {
+			return nil, fmt.Errorf("invalid callback host: %s - must be a valid external url - not a localhost", appConfig.Nodes.Callback.Host)
+		}
+
+		if appConfig.Nodes.Callback.Token == "" {
+			callbackToken, err := utils.HashAdler32(DefaultAdminXpub)
+			if err != nil {
+				return nil, fmt.Errorf("error hashing callback token: %w", err)
+			}
+			appConfig.Nodes.Callback.Token = callbackToken
+		}
+
+		options = append(options, engine.WithCallback(appConfig.Nodes.Callback.Host+BroadcastCallbackRoute, appConfig.Nodes.Callback.Token))
+	}
+	return options, nil
+}
+
+func isLocal(hostname string) bool {
+	if strings.Contains(hostname, "localhost") {
+		return true
+	}
+
+	ip := net.ParseIP(hostname)
+	if ip != nil {
+		_, private10, _ := net.ParseCIDR("10.0.0.0/8")
+		_, private172, _ := net.ParseCIDR("172.16.0.0/12")
+		_, private192, _ := net.ParseCIDR("192.168.0.0/16")
+		_, loopback, _ := net.ParseCIDR("127.0.0.0/8")
+		_, linkLocal, _ := net.ParseCIDR("169.254.0.0/16")
+
+		return private10.Contains(ip) || private172.Contains(ip) || private192.Contains(ip) || loopback.Contains(ip) || linkLocal.Contains(ip)
+	}
+
+	return false
+}
+
+func isValidURL(rawURL string) bool {
+	if !explicitHTTPURLRegex.MatchString(rawURL) {
+		return false
+	}
+	u, err := url.Parse(rawURL)
+	if err != nil {
+		return false
+	}
+
+	hostname := u.Hostname()
+
+	return !isLocal(hostname)
 }
