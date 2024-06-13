@@ -1393,8 +1393,6 @@ func createDraftTransactionFromHex(hex string, inInfo []interface{}, feeUnit *ut
 }
 
 func TestDraftTransaction_estimateFees(t *testing.T) {
-
-	// TODO jk bt librarary transaction to hex
 	t.Run("json data", func(t *testing.T) {
 		jsonFile, err := os.Open("./tests/model_draft_transactions_test.json")
 		require.NoError(t, err)
@@ -1562,8 +1560,9 @@ func TestDraftTransaction_SignInputs(t *testing.T) {
 	}
 }
 
-func initSimpleTestCase(t *testing.T) (context.Context, ClientInterface, func()) {
-	ctx, client, deferMe := CreateTestSQLiteClient(t, false, true, withTaskManagerMockup())
+func initSimpleTestCase(t *testing.T, clientOpts ...ClientOps) (context.Context, ClientInterface, func()) {
+	clientOpts = append(clientOpts, withTaskManagerMockup())
+	ctx, client, deferMe := CreateTestSQLiteClient(t, false, true, clientOpts...)
 
 	xPub := newXpub(testXPub, append(client.DefaultModelOptions(), New())...)
 	xPub.CurrentBalance = 100000

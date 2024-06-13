@@ -23,13 +23,7 @@ func (flag HexFormatFlag) Contains(other HexFormatFlag) bool {
 
 // SupportedBroadcastFormats retuns supported formats based on active providers
 func (c *Client) SupportedBroadcastFormats() HexFormatFlag {
-	switch c.ActiveProvider() {
-	case ProviderBroadcastClient:
-		return RawTx | Ef
-
-	default:
-		return RawTx
-	}
+	return RawTx | Ef
 }
 
 // BroadcastResult contains data about broadcasting to provider

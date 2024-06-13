@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"testing"
 
+	broadcast_client_mock "github.com/bitcoin-sv/go-broadcast-client/broadcast/broadcast-client-mock"
 	"github.com/bitcoin-sv/spv-wallet/engine/utils"
 	"github.com/libsv/go-bk/bip32"
 	"github.com/stretchr/testify/assert"
@@ -12,8 +13,11 @@ import (
 )
 
 func Test_RevertTransaction(t *testing.T) {
+	bc := broadcast_client_mock.Builder().
+		WithMockArc(broadcast_client_mock.MockNillQueryTransactionResponse).
+		Build()
 	t.Run("revert transaction", func(t *testing.T) {
-		ctx, client, transaction, _, deferMe := initRevertTransactionData(t)
+		ctx, client, transaction, _, deferMe := initRevertTransactionData(t, WithBroadcastClient(bc))
 		defer deferMe()
 
 		//
@@ -236,9 +240,9 @@ func Test_RecordTransaction(t *testing.T) {
 	})
 }
 
-func initRevertTransactionData(t *testing.T) (context.Context, ClientInterface, *Transaction, *bip32.ExtendedKey, func()) {
+func initRevertTransactionData(t *testing.T, clientOpts ...ClientOps) (context.Context, ClientInterface, *Transaction, *bip32.ExtendedKey, func()) {
 	// this creates an xpub, destination and utxo
-	ctx, client, deferMe := initSimpleTestCase(t)
+	ctx, client, deferMe := initSimpleTestCase(t, clientOpts...)
 
 	// we need a draft transaction, otherwise we cannot revert
 	draftTransaction := newDraftTransaction(

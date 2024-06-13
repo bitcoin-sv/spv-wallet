@@ -65,13 +65,8 @@ func (c *Client) broadcast(ctx context.Context, id, hex string, format HexFormat
 func createActiveProviders(c *Client, txID, txHex string, format HexFormatFlag) []txBroadcastProvider {
 	providers := make([]txBroadcastProvider, 0, 1)
 
-	switch c.ActiveProvider() {
-	case ProviderBroadcastClient:
-		pvdr := broadcastClientProvider{txID: txID, txHex: txHex, format: format}
-		providers = append(providers, &pvdr)
-	default:
-		c.options.logger.Warn().Msg("no active provider for broadcast")
-	}
+	pvdr := broadcastClientProvider{txID: txID, txHex: txHex, format: format}
+	providers = append(providers, &pvdr)
 
 	return providers
 }

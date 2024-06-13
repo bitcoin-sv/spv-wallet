@@ -18,17 +18,13 @@ func (c *Client) query(ctx context.Context, id string, requiredIn RequiredIn,
 	ctxWithCancel, cancel := context.WithTimeout(ctx, timeout)
 	defer cancel()
 
-	switch c.ActiveProvider() {
-	case ProviderBroadcastClient:
-		resp, err := queryBroadcastClient(
-			ctxWithCancel, c, id,
-		)
-		if err == nil && checkRequirementArc(requiredIn, id, resp) {
-			return resp
-		}
-	default:
-		c.options.logger.Warn().Msg("no active provider for query")
+	resp, err := queryBroadcastClient(
+		ctxWithCancel, c, id,
+	)
+	if err == nil && checkRequirementArc(requiredIn, id, resp) {
+		return resp
 	}
+
 	return nil // No transaction information found
 }
 
@@ -48,20 +44,15 @@ func (c *Client) fastestQuery(ctx context.Context, id string, requiredIn Require
 	// Loop each miner (break into a Go routine for each query)
 	var wg sync.WaitGroup
 
-	switch c.ActiveProvider() {
-	case ProviderBroadcastClient:
-		wg.Add(1)
-		go func(ctx context.Context, client *Client, wg *sync.WaitGroup, id string, requiredIn RequiredIn) {
-			defer wg.Done()
-			if resp, err := queryBroadcastClient(
-				ctx, client, id,
-			); err == nil && checkRequirementArc(requiredIn, id, resp) {
-				resultsChannel <- resp
-			}
-		}(ctxWithCancel, c, &wg, id, requiredIn)
-	default:
-		c.options.logger.Warn().Msg("no active provider for fastestQuery")
-	}
+	wg.Add(1)
+	go func(ctx context.Context, client *Client, wg *sync.WaitGroup, id string, requiredIn RequiredIn) {
+		defer wg.Done()
+		if resp, err := queryBroadcastClient(
+			ctx, client, id,
+		); err == nil && checkRequirementArc(requiredIn, id, resp) {
+			resultsChannel <- resp
+		}
+	}(ctxWithCancel, c, &wg, id, requiredIn)
 
 	// Waiting for all requests to finish
 	go func() {

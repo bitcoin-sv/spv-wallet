@@ -137,26 +137,12 @@ func (c *Client) FeeUnit() *utils.FeeUnit {
 	return c.options.config.feeUnit
 }
 
-// ActiveProvider returns a name of a provider based on config.
-func (c *Client) ActiveProvider() string {
-	excluded := c.options.config.excludedProviders
-	if !utils.StringInSlice(ProviderBroadcastClient, excluded) && c.BroadcastClient() != nil {
-		return ProviderBroadcastClient
-	}
-	return ProviderNone
-}
-
 func (c *Client) isFeeQuotesEnabled() bool {
 	return c.options.config.feeQuotes
 }
 
 func (c *Client) initActiveProvider(ctx context.Context) error {
-	switch c.ActiveProvider() {
-	case ProviderBroadcastClient:
-		return c.broadcastClientInit(ctx)
-	default:
-		return errors.New("no active provider found")
-	}
+	return c.broadcastClientInit(ctx)
 }
 
 func (c *Client) checkFeeUnit() error {
