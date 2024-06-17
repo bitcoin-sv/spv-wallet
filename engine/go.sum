@@ -12,8 +12,8 @@ github.com/aws/aws-sdk-go v1.43.45 h1:2708Bj4uV+ym62MOtBnErm/CDX61C4mFe9V2gXy1ca
 github.com/aws/aws-sdk-go v1.43.45/go.mod h1:y4AeaBuwd2Lk+GepC1E9v0qOiTws0MIWAX4oIKwKHZo=
 github.com/beorn7/perks v1.0.1 h1:VlbKKnNfV8bJzeqoa4cOKqO6bYr3WgKZxO8Z16+hsOM=
 github.com/beorn7/perks v1.0.1/go.mod h1:G2ZrVWU2WbWT9wwq4/hrbKbnv/1ERSJQ0ibhJ6rlkpw=
-github.com/bitcoin-sv/go-broadcast-client v0.18.1 h1:9cnBvIxQeysM5YU02+N/Stmf1h4dnedO6cdhaFq0aCg=
-github.com/bitcoin-sv/go-broadcast-client v0.18.1/go.mod h1:GRAliwumNBjEbLRIEkXqIKJpsgmMfjvlIDqgyw/NoJE=
+github.com/bitcoin-sv/go-broadcast-client v0.18.2-0.20240613134708-564eb4a7ebfd h1:MzHaY/cAp+jxK52YMy5JHUeTGhOjrSu/EHg1R3iCNa8=
+github.com/bitcoin-sv/go-broadcast-client v0.18.2-0.20240613134708-564eb4a7ebfd/go.mod h1:GRAliwumNBjEbLRIEkXqIKJpsgmMfjvlIDqgyw/NoJE=
 github.com/bitcoin-sv/go-paymail v0.18.0 h1:J22q2LQDshqBTHUHRr/8i27OuSSN8dat357Dranx0Fo=
 github.com/bitcoin-sv/go-paymail v0.18.0/go.mod h1:WCyS7JsadXs4KIft0mI5U1S0YRUeZKBswJe9oEMlDD8=
 github.com/bitcoinschema/go-bitcoin/v2 v2.0.5 h1:Sgh5Eb746Zck/46rFDrZZEXZWyO53fMuWYhNoZa1tck=
@@ -304,9 +304,6 @@ golang.org/x/crypto v0.19.0/go.mod h1:Iy9bg/ha4yyC70EfRS8jz+B6ybOBKMaSxLj6P6oBDf
 golang.org/x/crypto v0.23.0/go.mod h1:CKFgDieR+mRhux2Lsu27y0fO304Db0wZe70UKqHu0v8=
 golang.org/x/crypto v0.24.0 h1:mnl8DM0o513X8fdIkmyFE/5hTYxbwYOjDS/+rK6qpRI=
 golang.org/x/crypto v0.24.0/go.mod h1:Z1PMYSOR5nyMcyAVAIQSKCDwalqy85Aqn1x3Ws4L5DM=
-golang.org/x/lint v0.0.0-20200302205851-738671d3881b/go.mod h1:3xt1FjdF8hUf6vQPIChWIBhFzV8gjjsPE/fR3IyQdNY=
-golang.org/x/mod v0.1.1-0.20191105210325-c90efee705ee/go.mod h1:QqPTAvyqsEbceGzBzNggFXnrqF1CaUcvgkdR5Ot7KZg=
-golang.org/x/mod v0.2.0/go.mod h1:s0Qsj1ACt9ePp/hMypM3fl4fZqREWJwdYDEqhRiZZUA=
 golang.org/x/mod v0.3.0/go.mod h1:s0Qsj1ACt9ePp/hMypM3fl4fZqREWJwdYDEqhRiZZUA=
 golang.org/x/mod v0.6.0-dev.0.20220419223038-86c51ed26bb4/go.mod h1:jJ57K6gSWd91VN4djpZkiMVwK6gcyfeH4XE8wZrZaV4=
 golang.org/x/mod v0.8.0/go.mod h1:iBbtSCu2XBx23ZKBPSOrRkjjQPZFPuis4dIYUhu/chs=
