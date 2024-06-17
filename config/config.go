@@ -151,7 +151,7 @@ type NewRelicConfig struct {
 	Enabled bool `json:"enabled" mapstructure:"enabled"`
 }
 
-// NodesConfig consists of blockchain nodes (such as Minercraft and Arc) configuration
+// NodesConfig consists of blockchain nodes (Arc) configuration
 type NodesConfig struct {
 	Callback     *CallbackConfig `json:"callback" mapstructure:"callback"`
 	FeeUnit      *FeeUnitConfig  `json:"fee_unit" mapstructure:"fee_unit"`

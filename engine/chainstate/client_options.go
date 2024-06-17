@@ -115,7 +115,7 @@ func WithExcludedProviders(providers []string) ClientOps {
 	}
 }
 
-// WithFeeQuotes will set minercraftFeeQuotes flag as true
+// WithFeeQuotes will set feeQuotes flag as true
 func WithFeeQuotes(enabled bool) ClientOps {
 	return func(c *clientOptions) {
 		c.config.feeQuotes = enabled

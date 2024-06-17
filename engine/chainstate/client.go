@@ -36,7 +36,7 @@ type (
 		callbackURL              string                             // Broadcast callback URL
 		callbackToken            string                             // Broadcast callback access token
 		excludedProviders        []string                           // List of provider names
-		httpClient               HTTPInterface                      // Custom HTTP client (Minercraft, WOC)
+		httpClient               HTTPInterface                      // Custom HTTP client (for example WOC)
 		broadcastClientConfig    *broadcastConfig                   // Broadcast client configuration
 		network                  Network                            // Current network (mainnet, testnet, stn)
 		queryTimeout             time.Duration                      // Timeout for transaction query
