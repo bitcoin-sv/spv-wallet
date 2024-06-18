@@ -47,8 +47,7 @@ type (
 	}
 
 	broadcastConfig struct {
-		protocol string
-		ArcAPIs  []string
+		ArcAPIs []string
 	}
 )
 

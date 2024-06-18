@@ -20,7 +20,7 @@ var (
 	// broadcastQuestionableErrors are a list of errors that are not good broadcast responses,
 	// but need to be checked differently
 	broadcastQuestionableErrors = []string{
-		"missing inputs", // Returned from mAPI for a valid tx that is on-chain
+		"missing inputs", // The transaction has been sent to at least 1 Bitcoin node but parent transaction was not found. This status means that inputs are currently missing, but the transaction is not yet rejected.
 	}
 
 	/*

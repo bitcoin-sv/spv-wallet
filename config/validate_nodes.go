@@ -17,7 +17,7 @@ func (n *NodesConfig) Validate() error {
 
 	// check if at least one arc url is configured
 	found := slices.IndexFunc(n.Apis, func(el *ArcAPI) bool {
-		return isArcNode(el)
+		return el.ArcURL != ""
 	})
 	if found == -1 {
 		return errors.New("no arc urls configured")
@@ -28,8 +28,4 @@ func (n *NodesConfig) Validate() error {
 	}
 
 	return nil
-}
-
-func isArcNode(node *ArcAPI) bool {
-	return node.ArcURL != ""
 }

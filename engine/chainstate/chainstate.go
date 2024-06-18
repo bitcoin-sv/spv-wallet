@@ -58,7 +58,7 @@ func (c *Client) Broadcast(ctx context.Context, id, txHex string, format HexForm
 
 // QueryTransaction will get the transaction info from all providers returning the "first" valid result
 //
-// Note: this is slow, but follows a specific order: mAPI -> WhatsOnChain
+// Note: this is slow, but follows a specific order: ARC -> WhatsOnChain
 func (c *Client) QueryTransaction(
 	ctx context.Context, id string, requiredIn RequiredIn, timeout time.Duration,
 ) (transaction *TransactionInfo, err error) {
