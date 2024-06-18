@@ -248,6 +248,9 @@ func (ts *EmbeddedDBTestSuite) genericDBClient(t *testing.T, database datastore.
 //
 // NOTE: you need to close the client: ts.Close()
 func (ts *EmbeddedDBTestSuite) genericMockedDBClient(t *testing.T, database datastore.Engine) *TestingClient {
+	bc := broadcast_client_mock.Builder().
+		WithMockArc(broadcast_client_mock.MockSuccess).
+		Build()
 	prefix := tester.RandomTablePrefix()
 	tc, err := ts.createTestClient(
 		tester.GetNewRelicCtx(
@@ -255,7 +258,7 @@ func (ts *EmbeddedDBTestSuite) genericMockedDBClient(t *testing.T, database data
 		),
 		database, prefix,
 		true, true, WithDebugging(),
-		withTaskManagerMockup(),
+		withTaskManagerMockup(), WithBroadcastClient(bc),
 	)
 	require.NoError(t, err)
 	require.NotNil(t, tc)
