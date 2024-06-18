@@ -17,7 +17,5 @@ type TransactionInfo struct {
 
 // Valid validates TransactionInfo by checking if it contains BlockHash and BUMP
 func (t *TransactionInfo) Valid() bool {
-	arcInvalid := t.BUMP == nil
-	invalid := t.BlockHash == "" || arcInvalid
-	return !invalid
+	return t.BlockHash != "" && t.BUMP != nil
 }

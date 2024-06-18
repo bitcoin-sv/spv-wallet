@@ -156,7 +156,7 @@ type NodesConfig struct {
 	Callback     *CallbackConfig `json:"callback" mapstructure:"callback"`
 	FeeUnit      *FeeUnitConfig  `json:"fee_unit" mapstructure:"fee_unit"`
 	DeploymentID string          `json:"deployment_id" mapstructure:"deployment_id"`
-	Apis         []*MinerAPI     `json:"apis" mapstructure:"apis"`
+	Apis         []*ArcAPI       `json:"apis" mapstructure:"apis"`
 	UseFeeQuotes bool            `json:"use_fee_quotes" mapstructure:"use_fee_quotes"`
 }
 
@@ -166,8 +166,8 @@ type FeeUnitConfig struct {
 	Bytes    int `json:"bytes" mapstructure:"bytes"`
 }
 
-// MinerAPI holds connection info for a single miner endpoint
-type MinerAPI struct {
+// ArcAPI holds connection info for a single miner endpoint
+type ArcAPI struct {
 	Token  string `json:"token" mapstructure:"token"`
 	ArcURL string `json:"arc_url" mapstructure:"arc_url"`
 }

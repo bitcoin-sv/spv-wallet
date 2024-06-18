@@ -47,8 +47,8 @@ type (
 	}
 
 	broadcastConfig struct {
-		protocol  string
-		minerAPIs []string
+		protocol string
+		ArcAPIs  []string
 	}
 )
 

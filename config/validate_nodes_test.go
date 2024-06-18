@@ -21,7 +21,7 @@ func TestNodesConfig_Validate(t *testing.T) {
 		n.Apis = nil
 		assert.Error(t, n.Validate())
 
-		n.Apis = []*MinerAPI{}
+		n.Apis = []*ArcAPI{}
 		assert.Error(t, n.Validate())
 	})
 

@@ -119,7 +119,7 @@ func getNodesDefaults() *NodesConfig {
 	return &NodesConfig{
 		DeploymentID: "spv-wallet-" + depIDSufix.String(),
 		Callback:     getCallbackDefaults(),
-		Apis: []*MinerAPI{
+		Apis: []*ArcAPI{
 			{
 				ArcURL: "https://arc.taal.com",
 				Token:  "mainnet_06770f425eb00298839a24a49cbdc02c",

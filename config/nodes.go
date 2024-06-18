@@ -5,19 +5,19 @@ import (
 )
 
 func (nodes *NodesConfig) toBroadcastClientArc() []*broadcastclient.ArcClientConfig {
-	minerApis := []*broadcastclient.ArcClientConfig{}
+	ArcAPIs := []*broadcastclient.ArcClientConfig{}
 	if nodes.Apis != nil {
 		for _, cfg := range nodes.Apis {
 			if cfg.ArcURL == "" {
 				continue
 			}
 
-			minerApis = append(minerApis, &broadcastclient.ArcClientConfig{
+			ArcAPIs = append(ArcAPIs, &broadcastclient.ArcClientConfig{
 				Token:        cfg.Token,
 				APIUrl:       cfg.ArcURL,
 				DeploymentID: nodes.DeploymentID,
 			})
 		}
 	}
-	return minerApis
+	return ArcAPIs
 }
