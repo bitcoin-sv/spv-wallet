@@ -14,7 +14,7 @@ import (
 
 func Test_RevertTransaction(t *testing.T) {
 	bc := broadcast_client_mock.Builder().
-		WithMockArc(broadcast_client_mock.MockNillQueryTransactionResponse).
+		WithMockArc(broadcast_client_mock.MockNilQueryTxResp).
 		Build()
 	t.Run("revert transaction", func(t *testing.T) {
 		ctx, client, transaction, _, deferMe := initRevertTransactionData(t, WithBroadcastClient(bc))

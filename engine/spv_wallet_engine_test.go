@@ -63,7 +63,7 @@ func DefaultClientOpts(debug, shared bool) []ClientOps {
 	tqc.MaxNumWorker = 2
 	tqc.MaxNumFetcher = 2
 	bc := broadcast_client_mock.Builder().
-		WithMockArc(broadcast_client_mock.MockNillQueryTransactionResponse).
+		WithMockArc(broadcast_client_mock.MockNilQueryTxResp).
 		Build()
 
 	opts := make([]ClientOps, 0)
