@@ -4,7 +4,7 @@ go 1.22.4
 
 require (
 	github.com/DATA-DOG/go-sqlmock v1.5.2
-	github.com/bitcoin-sv/go-broadcast-client v0.18.2-0.20240619070946-3ca77b404561
+	github.com/bitcoin-sv/go-broadcast-client v0.19.0
 	github.com/bitcoin-sv/go-paymail v0.18.0
 	github.com/bitcoinschema/go-bitcoin/v2 v2.0.5
 	github.com/bitcoinschema/go-map v0.1.1
