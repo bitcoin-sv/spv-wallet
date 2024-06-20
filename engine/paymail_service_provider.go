@@ -3,6 +3,7 @@ package engine
 import (
 	"context"
 	"fmt"
+	"github.com/bitcoin-sv/spv-wallet/spverrors"
 	"reflect"
 
 	"github.com/bitcoin-sv/go-paymail"
@@ -58,7 +59,7 @@ func (p *PaymailDefaultServiceProvider) GetPaymailByAlias(
 		return nil, err
 	}
 	if pm == nil {
-		return nil, ErrPaymailNotFound
+		return nil, spverrors.ErrCouldNotFindPaymail
 	}
 
 	pk, err := pm.GetPubKey()
@@ -219,7 +220,7 @@ func (p *PaymailDefaultServiceProvider) AddContact(
 		return
 	}
 	if reqPaymail == nil {
-		err = ErrInvalidRequesterXpub
+		err = spverrors.ErrInvalidRequesterXpub
 		return
 	}
 
@@ -233,7 +234,7 @@ func (p *PaymailDefaultServiceProvider) getDestinationForPaymail(ctx context.Con
 		return nil, err
 	}
 	if pm == nil {
-		return nil, ErrPaymailNotFound
+		return nil, spverrors.ErrCouldNotFindPaymail
 	}
 
 	dst, err := createDestination(

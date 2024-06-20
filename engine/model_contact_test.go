@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"github.com/bitcoin-sv/spv-wallet/spverrors"
 	"strings"
 	"testing"
 	"time"
@@ -35,7 +36,7 @@ func Test_contact_validate_returns_error(t *testing.T) {
 		{
 			name:         "empty full name",
 			contact:      newContact("", "donot@know.who", "xpubblablablabla", "ownerspbubid", ContactNotConfirmed),
-			expetedError: ErrMissingContactFullName,
+			expetedError: spverrors.ErrMissingContactFullName,
 		},
 		{
 			name:         "empty paymail",
@@ -50,17 +51,17 @@ func Test_contact_validate_returns_error(t *testing.T) {
 		{
 			name:         "empty pubKey",
 			contact:      newContact("Bart Simpson", "bart@springfield.com", "", "ownerspbubid", ContactNotConfirmed),
-			expetedError: ErrMissingContactXPubKey,
+			expetedError: spverrors.ErrMissingContactXPubKey,
 		},
 		{
 			name:         "no owner id",
 			contact:      newContact("Lisa Simpson", "lisa@springfield.com", "xpubblablalisa", "", ContactNotConfirmed),
-			expetedError: ErrMissingContactOwnerXPubId,
+			expetedError: spverrors.ErrMissingContactOwnerXPubId,
 		},
 		{
 			name:         "no status",
 			contact:      newContact("Margaret Simpson", "maggie@springfield.com", "xpubblablamaggie", "ownerspbubid", ""),
-			expetedError: ErrMissingContactStatus,
+			expetedError: spverrors.ErrMissingContactStatus,
 		},
 	}
 

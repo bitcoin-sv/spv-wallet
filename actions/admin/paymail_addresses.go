@@ -1,13 +1,13 @@
 package admin
 
 import (
-	"github.com/bitcoin-sv/spv-wallet/spverrors"
 	"net/http"
 
 	"github.com/bitcoin-sv/spv-wallet/engine"
 	"github.com/bitcoin-sv/spv-wallet/mappings"
 	"github.com/bitcoin-sv/spv-wallet/models"
 	"github.com/bitcoin-sv/spv-wallet/models/filter"
+	"github.com/bitcoin-sv/spv-wallet/spverrors"
 	"github.com/gin-gonic/gin"
 )
 
@@ -139,7 +139,7 @@ func (a *Action) paymailCreateAddress(c *gin.Context) {
 	}
 
 	if requestBody.Key == "" {
-		spverrors.ErrorResponse(c, spverrors.ErrMissingXpub, a.Services.Logger)
+		spverrors.ErrorResponse(c, spverrors.ErrMissingFieldXpub, a.Services.Logger)
 		return
 	}
 	if requestBody.Address == "" {

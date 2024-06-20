@@ -2,12 +2,12 @@ package admin
 
 import (
 	"errors"
-	"github.com/bitcoin-sv/spv-wallet/spverrors"
 	"net/http"
 
 	"github.com/bitcoin-sv/spv-wallet/engine"
 	"github.com/bitcoin-sv/spv-wallet/engine/datastore"
 	"github.com/bitcoin-sv/spv-wallet/mappings"
+	"github.com/bitcoin-sv/spv-wallet/spverrors"
 	"github.com/gin-gonic/gin"
 )
 

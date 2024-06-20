@@ -2,6 +2,7 @@ package engine
 
 import (
 	"context"
+	"github.com/bitcoin-sv/spv-wallet/spverrors"
 
 	"github.com/bitcoin-sv/spv-wallet/engine/datastore"
 	"github.com/bitcoin-sv/spv-wallet/engine/notifications"
@@ -88,7 +89,7 @@ func (m *Transaction) AfterCreated(ctx context.Context) error {
 		if err != nil {
 			return err
 		} else if xPub == nil {
-			return ErrMissingRequiredXpub
+			return spverrors.ErrMissingFieldXpub
 		}
 		if err = xPub.incrementBalance(ctx, balance); err != nil {
 			return err

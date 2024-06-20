@@ -2,6 +2,7 @@ package engine
 
 import (
 	"context"
+	"github.com/bitcoin-sv/spv-wallet/spverrors"
 	"testing"
 
 	"github.com/DATA-DOG/go-sqlmock"
@@ -90,7 +91,7 @@ func TestXpub_getNewDestination(t *testing.T) {
 			"test-key": "test-value",
 		}
 		_, err = xPub.getNewDestination(ctx, utils.ChainInternal, utils.ScriptTypePubKeyHash, append(client.DefaultModelOptions(), WithMetadatas(metaData))...)
-		assert.ErrorIs(t, utils.ErrXpubInvalidLength, err)
+		assert.ErrorIs(t, spverrors.ErrXpubInvalidLength, err)
 	})
 
 	t.Run("new internal destination", func(t *testing.T) {

@@ -2,6 +2,7 @@ package engine
 
 import (
 	"context"
+	"github.com/bitcoin-sv/spv-wallet/spverrors"
 	"time"
 
 	"github.com/bitcoin-sv/spv-wallet/engine/notifications"
@@ -143,7 +144,7 @@ func incrementField(ctx context.Context, model ModelInterface, fieldName string,
 	// Check for client
 	c := model.Client()
 	if c == nil {
-		return 0, ErrMissingClient
+		return 0, spverrors.ErrMissingClient
 	}
 
 	// Increment

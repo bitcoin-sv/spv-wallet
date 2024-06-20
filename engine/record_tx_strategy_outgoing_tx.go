@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"github.com/bitcoin-sv/spv-wallet/spverrors"
 
 	"github.com/libsv/go-bt/v2"
 	"github.com/rs/zerolog"
@@ -29,11 +30,17 @@ func (strategy *outgoingTx) Execute(ctx context.Context, c ClientInterface, opts
 	// create
 	transaction, err := _createOutgoingTxToRecord(ctx, strategy, c, opts)
 	if err != nil {
-		return nil, fmt.Errorf("creation of outgoing tx failed. Reason: %w", err)
+		logger.Error().
+			Str("txID", strategy.TxID()).
+			Msgf("creation of outgoing tx failed. Reason: %v", err)
+		return nil, spverrors.ErrCreateOutgoingTxFailed
 	}
 
 	if err = transaction.Save(ctx); err != nil {
-		return nil, fmt.Errorf("saving of Transaction failed. Reason: %w", err)
+		logger.Error().
+			Str("txID", strategy.TxID()).
+			Msgf("saving of Transaction failed. Reason: %v", err)
+		return nil, spverrors.ErrDuringSaveTx
 	}
 
 	// process
@@ -47,7 +54,7 @@ func (strategy *outgoingTx) Execute(ctx context.Context, c ClientInterface, opts
 			if revertErr := c.RevertTransaction(ctx, transaction.ID); revertErr != nil {
 				logger.Error().
 					Str("txID", transaction.ID).
-					Msgf("FATAL! Reverting transaction after failed P2P notification failed. Reason: %s", err)
+					Msgf("FATAL! Reverting transaction after failed P2P notification failed. Reason: %s", revertErr)
 			}
 
 			return nil, err
@@ -57,7 +64,10 @@ func (strategy *outgoingTx) Execute(ctx context.Context, c ClientInterface, opts
 	// get newest syncTx from DB - if it's an internal tx it could be broadcasted by us already
 	syncTx, err := GetSyncTransactionByID(ctx, transaction.ID, transaction.GetOptions(false)...)
 	if err != nil || syncTx == nil {
-		return nil, fmt.Errorf("getting syncTx failed. Reason: %w", err)
+		logger.Error().
+			Str("txID", transaction.ID).
+			Msgf("getting syncTx failed. Reason: %v", err)
+		return nil, spverrors.ErrCouldNotFindSyncTx
 	}
 
 	if syncTx.BroadcastStatus == SyncStatusReady {
@@ -125,11 +135,11 @@ func _hydrateOutgoingWithDraft(ctx context.Context, tx *Transaction) error {
 	}
 
 	if draft == nil {
-		return ErrDraftNotFound
+		return spverrors.ErrCouldNotFindDraftTx
 	}
 
 	if len(draft.Configuration.Outputs) == 0 {
-		return errors.New("corresponding draft transaction has no outputs")
+		return spverrors.ErrDraftTxHasNoOutputs
 	}
 
 	if draft.Configuration.Sync == nil {
@@ -199,7 +209,7 @@ func _outgoingNotifyP2p(ctx context.Context, logger *zerolog.Logger, tx *Transac
 			Str("txID", tx.ID).
 			Msgf("processP2PTransaction failed. Reason: %s", err)
 
-		return err
+		return spverrors.ErrProcessP2PTx
 	}
 
 	logger.Info().

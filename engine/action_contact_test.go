@@ -2,6 +2,7 @@ package engine
 
 import (
 	"context"
+	"github.com/bitcoin-sv/spv-wallet/spverrors"
 	"testing"
 	"time"
 
@@ -80,7 +81,7 @@ func TestAcceptContactErrorPath(t *testing.T) {
 				paymail:       paymailGeneric,
 				contactStatus: ContactAwaitAccept.String(),
 			},
-			expectedErrorMessage: ErrContactNotFound,
+			expectedErrorMessage: spverrors.ErrContactNotFound,
 		},
 		{
 			testID: 2,
@@ -90,7 +91,7 @@ func TestAcceptContactErrorPath(t *testing.T) {
 				paymail:       paymailGeneric,
 				contactStatus: ContactAwaitAccept.String(),
 			},
-			expectedErrorMessage: ErrContactIncorrectStatus,
+			expectedErrorMessage: spverrors.ErrContactIncorrectStatus,
 		},
 		{
 			testID: 3,
@@ -100,7 +101,7 @@ func TestAcceptContactErrorPath(t *testing.T) {
 				paymail:       paymailGeneric,
 				contactStatus: ContactNotConfirmed.String(),
 			},
-			expectedErrorMessage: ErrContactIncorrectStatus,
+			expectedErrorMessage: spverrors.ErrContactIncorrectStatus,
 		},
 		{
 			testID: 4,
@@ -110,7 +111,7 @@ func TestAcceptContactErrorPath(t *testing.T) {
 				paymail:       paymailGeneric,
 				contactStatus: ContactRejected.String(),
 			},
-			expectedErrorMessage: ErrContactIncorrectStatus,
+			expectedErrorMessage: spverrors.ErrContactIncorrectStatus,
 		},
 		{
 			testID: 5,
@@ -121,7 +122,7 @@ func TestAcceptContactErrorPath(t *testing.T) {
 				contactStatus: ContactRejected.String(),
 				deleted:       true,
 			},
-			expectedErrorMessage: ErrContactNotFound,
+			expectedErrorMessage: spverrors.ErrContactNotFound,
 		},
 	}
 
@@ -195,7 +196,7 @@ func TestRejectContactErrorPath(t *testing.T) {
 				paymail:       paymailGeneric,
 				contactStatus: ContactAwaitAccept.String(),
 			},
-			expectedErrorMessage: ErrContactNotFound,
+			expectedErrorMessage: spverrors.ErrContactNotFound,
 		},
 		{
 			testID: 2,
@@ -205,7 +206,7 @@ func TestRejectContactErrorPath(t *testing.T) {
 				paymail:       paymailGeneric,
 				contactStatus: ContactConfirmed.String(),
 			},
-			expectedErrorMessage: ErrContactIncorrectStatus,
+			expectedErrorMessage: spverrors.ErrContactIncorrectStatus,
 		},
 		{
 			testID: 3,
@@ -215,7 +216,7 @@ func TestRejectContactErrorPath(t *testing.T) {
 				paymail:       paymailGeneric,
 				contactStatus: ContactNotConfirmed.String(),
 			},
-			expectedErrorMessage: ErrContactIncorrectStatus,
+			expectedErrorMessage: spverrors.ErrContactIncorrectStatus,
 		},
 		{
 			testID: 4,
@@ -225,7 +226,7 @@ func TestRejectContactErrorPath(t *testing.T) {
 				paymail:       paymailGeneric,
 				contactStatus: ContactRejected.String(),
 			},
-			expectedErrorMessage: ErrContactIncorrectStatus,
+			expectedErrorMessage: spverrors.ErrContactIncorrectStatus,
 		},
 		{
 			testID: 5,
@@ -236,7 +237,7 @@ func TestRejectContactErrorPath(t *testing.T) {
 				contactStatus: ContactRejected.String(),
 				deleted:       true,
 			},
-			expectedErrorMessage: ErrContactNotFound,
+			expectedErrorMessage: spverrors.ErrContactNotFound,
 		}}
 
 	for _, tc := range testCases {
@@ -306,14 +307,14 @@ func TestConfirmContactErrorPath(t *testing.T) {
 	}{
 		{
 			name:          "contact doesn't exist - return not found error",
-			expectedError: ErrContactNotFound,
+			expectedError: spverrors.ErrContactNotFound,
 			getContact: func() (*Contact, string, string) {
 				return nil, "idontexist", "xpubID"
 			},
 		},
 		{
 			name:          "already confirmed contact - return incorrect status error",
-			expectedError: ErrContactIncorrectStatus,
+			expectedError: spverrors.ErrContactIncorrectStatus,
 			getContact: func() (*Contact, string, string) {
 				cc := newContact("Paul Altreides", "paul@altreides.diune", "pki", "xpub", ContactNotConfirmed)
 				cc.Confirm()
@@ -323,7 +324,7 @@ func TestConfirmContactErrorPath(t *testing.T) {
 		},
 		{
 			name:          "awaiting contact - return incorrect status error",
-			expectedError: ErrContactIncorrectStatus,
+			expectedError: spverrors.ErrContactIncorrectStatus,
 			getContact: func() (*Contact, string, string) {
 				cc := newContact("Alia Altreides", "alia@altreides.diune", "pki", "xpub", ContactAwaitAccept)
 
@@ -332,7 +333,7 @@ func TestConfirmContactErrorPath(t *testing.T) {
 		},
 		{
 			name:          "rejected contact - return not found error",
-			expectedError: ErrContactNotFound,
+			expectedError: spverrors.ErrContactNotFound,
 			getContact: func() (*Contact, string, string) {
 				cc := newContact("Alia Altreides", "alia@altreides.diune", "pki", "xpub", ContactAwaitAccept)
 				cc.Reject()
@@ -401,14 +402,14 @@ func TestUnconfirmContactErrorPath(t *testing.T) {
 	}{
 		{
 			name:          "contact doesn't exist - return not found error",
-			expectedError: ErrContactNotFound,
+			expectedError: spverrors.ErrContactNotFound,
 			getContact: func() (*Contact, string, string) {
 				return nil, "idontexist", "xpubID"
 			},
 		},
 		{
 			name:          "already unconfirmed contact - return incorrect status error",
-			expectedError: ErrContactIncorrectStatus,
+			expectedError: spverrors.ErrContactIncorrectStatus,
 			getContact: func() (*Contact, string, string) {
 				cc := newContact("Paul Altreides", "paul@altreides.diune", "pki", "xpub", ContactNotConfirmed)
 
@@ -417,7 +418,7 @@ func TestUnconfirmContactErrorPath(t *testing.T) {
 		},
 		{
 			name:          "awaiting contact - return incorrect status error",
-			expectedError: ErrContactIncorrectStatus,
+			expectedError: spverrors.ErrContactIncorrectStatus,
 			getContact: func() (*Contact, string, string) {
 				cc := newContact("Alia Altreides", "alia@altreides.diune", "pki", "xpub", ContactAwaitAccept)
 
@@ -426,7 +427,7 @@ func TestUnconfirmContactErrorPath(t *testing.T) {
 		},
 		{
 			name:          "rejected contact - return not found error",
-			expectedError: ErrContactNotFound,
+			expectedError: spverrors.ErrContactNotFound,
 			getContact: func() (*Contact, string, string) {
 				cc := newContact("Alia Altreides", "alia@altreides.diune", "pki", "xpub", ContactAwaitAccept)
 				cc.Reject()

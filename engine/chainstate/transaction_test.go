@@ -2,6 +2,7 @@ package chainstate
 
 import (
 	"context"
+	"github.com/bitcoin-sv/spv-wallet/spverrors"
 	"testing"
 
 	broadcast_client_mock "github.com/bitcoin-sv/go-broadcast-client/broadcast/broadcast-client-mock"
@@ -29,7 +30,7 @@ func TestClient_Transaction(t *testing.T) {
 		// then
 		require.Error(t, err)
 		require.Nil(t, info)
-		assert.ErrorIs(t, err, ErrInvalidTransactionID)
+		assert.ErrorIs(t, err, spverrors.ErrInvalidTransactionID)
 	})
 
 	t.Run("error - missing requirements", func(t *testing.T) {
@@ -45,7 +46,7 @@ func TestClient_Transaction(t *testing.T) {
 		// then
 		require.Error(t, err)
 		require.Nil(t, info)
-		assert.ErrorIs(t, err, ErrInvalidRequirements)
+		assert.ErrorIs(t, err, spverrors.ErrInvalidRequirements)
 	})
 }
 

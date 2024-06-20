@@ -1,13 +1,13 @@
 package destinations
 
 import (
-	"github.com/bitcoin-sv/spv-wallet/spverrors"
 	"net/http"
 
 	"github.com/bitcoin-sv/spv-wallet/engine"
 	"github.com/bitcoin-sv/spv-wallet/engine/utils"
 	"github.com/bitcoin-sv/spv-wallet/mappings"
 	"github.com/bitcoin-sv/spv-wallet/server/auth"
+	"github.com/bitcoin-sv/spv-wallet/spverrors"
 	"github.com/gin-gonic/gin"
 )
 

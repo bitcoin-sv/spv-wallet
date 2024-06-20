@@ -3,6 +3,7 @@ package engine
 import (
 	"context"
 	"database/sql"
+	"github.com/bitcoin-sv/spv-wallet/spverrors"
 	"testing"
 
 	"github.com/bitcoin-sv/spv-wallet/engine/datastore"
@@ -449,7 +450,7 @@ func TestTransaction_processInputs(t *testing.T) {
 
 		ctx := context.Background()
 		err = transaction._processInputs(ctx)
-		require.ErrorIs(t, err, ErrUtxoAlreadySpent)
+		require.ErrorIs(t, err, spverrors.ErrUtxoAlreadySpent)
 	})
 
 	t.Run("not reserved utxo", func(t *testing.T) {
@@ -477,7 +478,7 @@ func TestTransaction_processInputs(t *testing.T) {
 
 		ctx := context.Background()
 		err = transaction._processInputs(ctx)
-		require.ErrorIs(t, err, ErrUtxoNotReserved)
+		require.ErrorIs(t, err, spverrors.ErrUtxoNotReserved)
 	})
 
 	t.Run("incorrect reservation ID of utxo", func(t *testing.T) {
@@ -509,7 +510,7 @@ func TestTransaction_processInputs(t *testing.T) {
 
 		ctx := context.Background()
 		err = transaction._processInputs(ctx)
-		require.ErrorIs(t, err, ErrDraftIDMismatch)
+		require.ErrorIs(t, err, spverrors.ErrDraftIDMismatch)
 	})
 
 	t.Run("inputUtxoChecksOff", func(t *testing.T) {

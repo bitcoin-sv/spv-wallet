@@ -1,6 +1,7 @@
 package engine
 
 import (
+	"github.com/bitcoin-sv/spv-wallet/spverrors"
 	"testing"
 
 	"github.com/DATA-DOG/go-sqlmock"
@@ -335,7 +336,7 @@ func TestClient_NewDestination(t *testing.T) {
 		)
 		require.Error(t, err)
 		require.Nil(t, destination)
-		assert.ErrorIs(t, err, ErrMissingXpub)
+		assert.ErrorIs(t, err, spverrors.ErrCouldNotFindXpub)
 	})
 
 	t.Run("error - unsupported destination type", func(t *testing.T) {

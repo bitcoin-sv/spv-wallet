@@ -123,15 +123,15 @@ func (c *Contact) validate() error {
 	}
 
 	if c.PubKey == "" {
-		return ErrMissingContactXPubKey
+		return spverrors.ErrMissingContactXPubKey
 	}
 
 	if c.Status == "" {
-		return ErrMissingContactStatus
+		return spverrors.ErrMissingContactStatus
 	}
 
 	if c.OwnerXpubID == "" {
-		return ErrMissingContactOwnerXPubId
+		return spverrors.ErrMissingContactOwnerXPubId
 	}
 
 	return nil

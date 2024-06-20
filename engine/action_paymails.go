@@ -2,7 +2,6 @@ package engine
 
 import (
 	"context"
-	"errors"
 	"github.com/bitcoin-sv/spv-wallet/spverrors"
 	"time"
 
@@ -106,7 +105,7 @@ func (c *Client) NewPaymailAddress(ctx context.Context, xPubKey, address, public
 	// Check if the paymail address already exists
 	paymail, err := getPaymailAddress(ctx, address, opts...)
 	if paymail != nil {
-		return nil, errors.New("paymail address already exists")
+		return nil, spverrors.ErrPaymailAlreadyExists
 	}
 	if err != nil {
 		return nil, err

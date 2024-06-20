@@ -5,6 +5,7 @@ import (
 	"encoding/hex"
 	"errors"
 	"fmt"
+	"github.com/bitcoin-sv/spv-wallet/spverrors"
 
 	"github.com/bitcoin-sv/go-paymail"
 	"github.com/bitcoin-sv/spv-wallet/engine/datastore"
@@ -291,19 +292,19 @@ func (m *PaymailAddress) BeforeCreating(_ context.Context) (err error) {
 		Msgf("starting: %s BeforeCreate hook...", m.Name())
 
 	if m.ID == "" {
-		return ErrMissingPaymailID
+		return spverrors.ErrMissingFieldID
 	}
 
 	if len(m.Alias) == 0 {
-		return ErrMissingPaymailAddress
+		return spverrors.ErrMissingPaymailAddress
 	}
 
 	if len(m.Domain) == 0 {
-		return ErrMissingPaymailDomain
+		return spverrors.ErrMissingPaymailDomain
 	}
 
 	if len(m.ExternalXpubKey) == 0 {
-		return ErrMissingPaymailExternalXPub
+		return spverrors.ErrMissingPaymailExternalXPub
 	} else if len(m.externalXpubKeyDecrypted) > 0 {
 		if _, err = utils.ValidateXPub(m.externalXpubKeyDecrypted); err != nil {
 			return
@@ -311,7 +312,7 @@ func (m *PaymailAddress) BeforeCreating(_ context.Context) (err error) {
 	}
 
 	if len(m.XpubID) == 0 {
-		return ErrMissingPaymailXPubID
+		return spverrors.ErrMissingPaymailXPubID
 	}
 
 	m.Client().Logger().Debug().

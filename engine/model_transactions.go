@@ -2,6 +2,7 @@ package engine
 
 import (
 	"context"
+	"github.com/bitcoin-sv/spv-wallet/spverrors"
 
 	"github.com/bitcoin-sv/spv-wallet/engine/chainstate"
 	"github.com/bitcoin-sv/spv-wallet/engine/utils"
@@ -147,7 +148,7 @@ func (m *Transaction) setXPubID() {
 // UpdateTransactionMetadata will update the transaction metadata by xPubID
 func (m *Transaction) UpdateTransactionMetadata(xPubID string, metadata Metadata) error {
 	if xPubID == "" {
-		return ErrXpubIDMisMatch
+		return spverrors.ErrXpubIDMisMatch
 	}
 
 	// transaction metadata is saved per xPubID

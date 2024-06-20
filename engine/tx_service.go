@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/hex"
 	"fmt"
+	"github.com/bitcoin-sv/spv-wallet/spverrors"
 
 	"github.com/bitcoin-sv/spv-wallet/engine/utils"
 )
@@ -14,7 +15,7 @@ func saveRawTransaction(ctx context.Context, c ClientInterface, allowUnknown boo
 	newOpts := c.DefaultModelOptions(append(opts, New())...)
 	tx, err := txFromHex(txHex, newOpts...)
 	if err != nil {
-		return nil, ErrMissingTxHex
+		return nil, spverrors.ErrMissingTxHex
 	}
 
 	// Create the lock and set the release for after the function completes
@@ -27,7 +28,7 @@ func saveRawTransaction(ctx context.Context, c ClientInterface, allowUnknown boo
 	}
 
 	if !allowUnknown && !tx.hasOneKnownDestination(ctx, c) {
-		return nil, ErrNoMatchingOutputs
+		return nil, spverrors.ErrNoMatchingOutputs
 	}
 
 	if err = tx.processUtxos(ctx); err != nil {
@@ -95,7 +96,7 @@ func (m *Transaction) _processInputs(ctx context.Context) (err error) {
 
 			// Is Spent?
 			if len(utxo.SpendingTxID.String) > 0 {
-				return ErrUtxoAlreadySpent
+				return spverrors.ErrUtxoAlreadySpent
 			}
 
 			// Only if IUC is enabled (or client is nil which means its enabled by default)
@@ -107,10 +108,10 @@ func (m *Transaction) _processInputs(ctx context.Context) (err error) {
 
 				// Check whether the spending transaction was reserved by the draft transaction (in the utxo)
 				if !isReserved {
-					return ErrUtxoNotReserved
+					return spverrors.ErrUtxoNotReserved
 				}
 				if !matchesDraft {
-					return ErrDraftIDMismatch
+					return spverrors.ErrDraftIDMismatch
 				}
 			}
 

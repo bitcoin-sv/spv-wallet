@@ -2,6 +2,7 @@ package engine
 
 import (
 	"context"
+	"github.com/bitcoin-sv/spv-wallet/spverrors"
 )
 
 // AuthenticateAccessKey check if access key exists
@@ -10,9 +11,9 @@ func (c *Client) AuthenticateAccessKey(ctx context.Context, pubAccessKey string)
 	if err != nil {
 		return nil, err
 	} else if accessKey == nil {
-		return nil, ErrUnknownAccessKey
+		return nil, spverrors.ErrCouldNotFindAccessKey
 	} else if accessKey.RevokedAt.Valid {
-		return nil, ErrAccessKeyRevoked
+		return nil, spverrors.ErrAccessKeyRevoked
 	}
 	return accessKey, nil
 }

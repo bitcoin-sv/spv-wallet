@@ -8,6 +8,7 @@ import (
 	"github.com/bitcoin-sv/spv-wallet/engine/pike"
 	"github.com/bitcoin-sv/spv-wallet/engine/script/template"
 	"github.com/bitcoin-sv/spv-wallet/engine/utils"
+	"github.com/bitcoin-sv/spv-wallet/spverrors"
 	"github.com/libsv/go-bk/bec"
 )
 
@@ -45,7 +46,7 @@ func (p *PikeContactServiceProvider) AddContact(
 		return
 	}
 	if reqPaymail == nil {
-		err = ErrInvalidRequesterXpub
+		err = spverrors.ErrInvalidRequesterXpub
 		return
 	}
 

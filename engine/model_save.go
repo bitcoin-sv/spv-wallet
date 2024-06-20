@@ -2,6 +2,7 @@ package engine
 
 import (
 	"context"
+	"github.com/bitcoin-sv/spv-wallet/spverrors"
 	"time"
 
 	"github.com/bitcoin-sv/spv-wallet/engine/datastore"
@@ -13,13 +14,13 @@ func Save(ctx context.Context, model ModelInterface) (err error) {
 	// Check for a client
 	c := model.Client()
 	if c == nil {
-		return ErrMissingClient
+		return spverrors.ErrMissingClient
 	}
 
 	// Check for a datastore
 	ds := c.Datastore()
 	if ds == nil {
-		return ErrDatastoreRequired
+		return spverrors.ErrDatastoreRequired
 	}
 	// Create new Datastore transaction
 	// @siggi: we need this to be in a callback context for Mongo

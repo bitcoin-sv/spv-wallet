@@ -1,10 +1,10 @@
 package transactions
 
 import (
-	"github.com/bitcoin-sv/spv-wallet/spverrors"
 	"net/http"
 
 	"github.com/bitcoin-sv/go-broadcast-client/broadcast"
+	"github.com/bitcoin-sv/spv-wallet/spverrors"
 	"github.com/gin-gonic/gin"
 )
 

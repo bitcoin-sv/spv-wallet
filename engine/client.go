@@ -2,6 +2,7 @@ package engine
 
 import (
 	"context"
+	"github.com/bitcoin-sv/spv-wallet/spverrors"
 	"time"
 
 	"github.com/bitcoin-sv/go-paymail"
@@ -208,7 +209,7 @@ func (c *Client) AddModels(ctx context.Context, autoMigrate bool, models ...inte
 		// Ensure we have a datastore
 		d := c.Datastore()
 		if d == nil {
-			return ErrDatastoreRequired
+			return spverrors.ErrDatastoreRequired
 		}
 
 		// Apply the database migration with the new models

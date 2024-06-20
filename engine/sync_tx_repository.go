@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/hex"
 	"errors"
+	"github.com/bitcoin-sv/spv-wallet/spverrors"
 
 	"github.com/bitcoin-sv/spv-wallet/engine/datastore"
 	"github.com/libsv/go-bt/v2"
@@ -82,7 +83,7 @@ func getTransactionsToBroadcast(ctx context.Context, queryParams *datastore.Quer
 		if err != nil {
 			return nil, err
 		} else if sTx.transaction == nil {
-			return nil, ErrMissingTransaction
+			return nil, spverrors.ErrCouldNotFindTransaction
 		}
 
 		parentsBroadcast, err := _areParentsBroadcasted(ctx, sTx.transaction, opts...)

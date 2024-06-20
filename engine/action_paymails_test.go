@@ -1,6 +1,7 @@
 package engine
 
 import (
+	"github.com/bitcoin-sv/spv-wallet/spverrors"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -29,7 +30,7 @@ func (ts *EmbeddedDBTestSuite) TestClient_NewPaymailAddress() {
 
 			var paymailAddress *PaymailAddress
 			paymailAddress, err = tc.client.NewPaymailAddress(tc.ctx, testXPub, "", testPublicName, testAvatar, tc.client.DefaultModelOptions()...)
-			require.ErrorIs(t, err, ErrMissingPaymailAddress)
+			require.ErrorIs(t, err, spverrors.ErrMissingPaymailAddress)
 			require.Nil(t, paymailAddress)
 		})
 
@@ -81,7 +82,7 @@ func (ts *EmbeddedDBTestSuite) Test_DeletePaymailAddress() {
 
 			paymail := ""
 			err := tc.client.DeletePaymailAddress(tc.ctx, paymail, tc.client.DefaultModelOptions()...)
-			require.ErrorIs(t, err, ErrPaymailNotFound)
+			require.ErrorIs(t, err, spverrors.ErrCouldNotFindPaymail)
 		})
 
 		ts.T().Run(testCase.name+" - delete unknown paymail address", func(t *testing.T) {
@@ -89,7 +90,7 @@ func (ts *EmbeddedDBTestSuite) Test_DeletePaymailAddress() {
 			defer tc.Close(tc.ctx)
 
 			err := tc.client.DeletePaymailAddress(tc.ctx, testPaymail, tc.client.DefaultModelOptions()...)
-			require.ErrorIs(t, err, ErrPaymailNotFound)
+			require.ErrorIs(t, err, spverrors.ErrCouldNotFindPaymail)
 		})
 
 		ts.T().Run(testCase.name+" - delete paymail address", func(t *testing.T) {

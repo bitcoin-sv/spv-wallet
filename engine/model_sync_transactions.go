@@ -2,6 +2,7 @@ package engine
 
 import (
 	"context"
+	"github.com/bitcoin-sv/spv-wallet/spverrors"
 
 	"github.com/bitcoin-sv/spv-wallet/engine/datastore"
 )
@@ -88,7 +89,7 @@ func (m *SyncTransaction) BeforeCreating(_ context.Context) error {
 
 	// Make sure ID is valid
 	if len(m.ID) == 0 {
-		return ErrMissingFieldID
+		return spverrors.ErrMissingFieldID
 	}
 
 	m.Client().Logger().Debug().
