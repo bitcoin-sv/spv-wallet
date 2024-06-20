@@ -24,6 +24,36 @@ var SPVErrorResponses = map[error]SPVError{
 		Message:    ErrAuthorization.Error(),
 		StatusCode: 401,
 	},
+	ErrMissingAuthHeader: {
+		Code:       AuthorizationError,
+		Message:    ErrMissingAuthHeader.Error(),
+		StatusCode: 401,
+	},
+	ErrNotAnAdminKey: {
+		Code:       AuthorizationError,
+		Message:    ErrNotAnAdminKey.Error(),
+		StatusCode: 401,
+	},
+	ErrMissingBody: {
+		Code:       AuthorizationError,
+		Message:    ErrMissingBody.Error(),
+		StatusCode: 401,
+	},
+	ErrCheckSignature: {
+		Code:       AuthorizationError,
+		Message:    ErrCheckSignature.Error(),
+		StatusCode: 401,
+	},
+	ErrInvalidOrMissingToken: {
+		Code:       AuthorizationError,
+		Message:    ErrInvalidOrMissingToken.Error(),
+		StatusCode: 401,
+	},
+	ErrInvalidToken: {
+		Code:       AuthorizationError,
+		Message:    ErrInvalidToken.Error(),
+		StatusCode: 401,
+	},
 	ErrInvalidFilterOption: {
 		Code:       BindingError,
 		Message:    ErrInvalidFilterOption.Error(),

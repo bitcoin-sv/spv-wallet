@@ -10,12 +10,22 @@ type Response struct {
 	Message string `json:"Message"`
 }
 
+// ErrorResponse is searching for error and setting it up in gin context
 func ErrorResponse(c *gin.Context, err error, log *zerolog.Logger) {
 	response, statusCode, found := getError(err)
-	if found {
+	if !found && log != nil {
 		log.Warn().Str("module", "spv-errors").Msgf("Unable to get information about error, details:  %s", err.Error())
 	}
 	c.JSON(statusCode, response)
+}
+
+// AbortWithErrorResponse is searching for error and abort with error set
+func AbortWithErrorResponse(c *gin.Context, err error, log *zerolog.Logger) {
+	response, statusCode, found := getError(err)
+	if !found && log != nil {
+		log.Warn().Str("module", "spv-errors").Msgf("Unable to get information about error, details:  %s", err.Error())
+	}
+	c.AbortWithStatusJSON(statusCode, response)
 }
 
 func getError(err error) (Response, int, bool) {

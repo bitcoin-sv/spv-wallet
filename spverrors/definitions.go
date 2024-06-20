@@ -8,14 +8,36 @@ import (
 
 //////////////////////////////////// AUTHORIZATION ERRORS
 
+// ErrAuthorization is basic auth error
 var ErrAuthorization = errors.New("unauthorized")
+
+// ErrMissingAuthHeader is when request does not have auth header
+var ErrMissingAuthHeader = errors.New("missing auth header")
+
+// ErrNotAnAdminKey is when xpub from auth header is not an admin key
+var ErrNotAnAdminKey = errors.New("xpub provided is not an admin key")
+
+// ErrMissingBody is when request is missing body
+var ErrMissingBody = errors.New("missing body")
+
+// ErrCheckSignature is when error occurred during checking signature
+var ErrCheckSignature = errors.New("error occurred during checking signature")
+
+// ErrInvalidOrMissingToken is when callback token from headers is invalid or missing
+var ErrInvalidOrMissingToken = errors.New("invalid or missing bearer token")
+
+// ErrInvalidToken is when callback token from headers is invalid
+var ErrInvalidToken = errors.New("invalid authorization token")
 
 //////////////////////////////////// BINDING ERRORS
 
+// ErrCannotBindRequest is when request body cannot be bind into struct
 var ErrCannotBindRequest = errors.New("cannot bin request body")
 
+// ErrInvalidFilterOption is when filter has invalid option
 var ErrInvalidFilterOption = errors.New("invalid filter option")
 
+// ErrInvalidConditions is when request has invalid conditions
 var ErrInvalidConditions = errors.New("invalid conditions")
 
 //////////////////////////////////// ACCESS KEY ERRORS

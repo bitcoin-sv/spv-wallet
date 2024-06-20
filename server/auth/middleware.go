@@ -5,6 +5,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"github.com/bitcoin-sv/spv-wallet/spverrors"
 	"io"
 	"net/http"
 	"strconv"
@@ -12,7 +13,6 @@ import (
 	"time"
 
 	"github.com/bitcoin-sv/spv-wallet/config"
-	"github.com/bitcoin-sv/spv-wallet/dictionary"
 	"github.com/bitcoin-sv/spv-wallet/engine"
 	"github.com/bitcoin-sv/spv-wallet/engine/utils"
 	"github.com/bitcoin-sv/spv-wallet/models"
@@ -83,7 +83,7 @@ func BasicMiddleware(engine engine.ClientInterface, appConfig *config.AppConfig)
 		xPub := strings.TrimSpace(c.GetHeader(models.AuthHeader))
 		authAccessKey := strings.TrimSpace(c.GetHeader(models.AuthAccessKey))
 		if len(xPub) == 0 && len(authAccessKey) == 0 {
-			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "missing authentication header"})
+			spverrors.AbortWithErrorResponse(c, spverrors.ErrMissingAuthHeader, nil)
 			return
 		}
 
@@ -92,7 +92,7 @@ func BasicMiddleware(engine engine.ClientInterface, appConfig *config.AppConfig)
 		if xPub != "" {
 			// Validate that the xPub is an HD key (length, validation)
 			if _, err := utils.ValidateXPub(xPub); err != nil {
-				c.AbortWithStatusJSON(http.StatusUnauthorized, err.Error())
+				spverrors.AbortWithErrorResponse(c, spverrors.ErrAuthorization, nil)
 				return
 			}
 
@@ -105,7 +105,7 @@ func BasicMiddleware(engine engine.ClientInterface, appConfig *config.AppConfig)
 		} else if authAccessKey != "" {
 			accessKey, err := engine.AuthenticateAccessKey(context.Background(), utils.Hash(authAccessKey))
 			if err != nil || accessKey == nil {
-				c.AbortWithStatusJSON(http.StatusUnauthorized, err.Error())
+				spverrors.AbortWithErrorResponse(c, spverrors.ErrAuthorization, nil)
 				return
 			}
 
@@ -125,7 +125,7 @@ func AdminMiddleware() gin.HandlerFunc {
 		if c.GetBool(ParamAdminRequest) {
 			c.Next()
 		} else {
-			c.AbortWithStatusJSON(http.StatusUnauthorized, "xpub provided is not an admin key")
+			spverrors.AbortWithErrorResponse(c, spverrors.ErrNotAnAdminKey, nil)
 		}
 	}
 }
@@ -134,7 +134,7 @@ func AdminMiddleware() gin.HandlerFunc {
 func SignatureMiddleware(appConfig *config.AppConfig, requireSigning, adminRequired bool) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		if c.Request.Body == nil {
-			c.AbortWithStatusJSON(http.StatusUnauthorized, "missing body")
+			spverrors.AbortWithErrorResponse(c, spverrors.ErrMissingBody, nil)
 			return
 		}
 		defer func() {
@@ -142,7 +142,7 @@ func SignatureMiddleware(appConfig *config.AppConfig, requireSigning, adminRequi
 		}()
 		b, err := io.ReadAll(c.Request.Body)
 		if err != nil {
-			c.AbortWithStatusJSON(http.StatusUnauthorized, err.Error())
+			spverrors.AbortWithErrorResponse(c, spverrors.ErrAuthorization, nil)
 		}
 
 		c.Request.Body = io.NopCloser(bytes.NewReader(b))
@@ -161,7 +161,7 @@ func SignatureMiddleware(appConfig *config.AppConfig, requireSigning, adminRequi
 		// adminRequired will always force checking of a signature
 		if (requireSigning || adminRequired) && !appConfig.Authentication.SigningDisabled {
 			if err = checkSignature(authData); err != nil {
-				c.AbortWithStatusJSON(http.StatusUnauthorized, err.Error())
+				spverrors.AbortWithErrorResponse(c, spverrors.ErrCheckSignature, nil)
 			}
 			c.Set(ParamAuthSigned, true)
 		} else {
@@ -171,7 +171,7 @@ func SignatureMiddleware(appConfig *config.AppConfig, requireSigning, adminRequi
 
 			// NOTE: you can not use an access key if signing is invalid - ever
 			if authData.accessKey != "" && err != nil {
-				c.AbortWithStatusJSON(http.StatusUnauthorized, err.Error())
+				spverrors.AbortWithErrorResponse(c, spverrors.ErrCheckSignature, nil)
 			}
 		}
 		c.Next()
@@ -184,19 +184,16 @@ func CallbackTokenMiddleware(appConfig *config.AppConfig) gin.HandlerFunc {
 		const BearerSchema = "Bearer "
 		authHeader := c.GetHeader("Authorization")
 		if authHeader == "" {
-			err := dictionary.GetError(dictionary.ErrorAuthenticationCallback, "missing auth header")
-			c.AbortWithStatusJSON(err.StatusCode, err)
+			spverrors.AbortWithErrorResponse(c, spverrors.ErrMissingAuthHeader, nil)
 		}
 
 		if !strings.HasPrefix(authHeader, BearerSchema) || len(authHeader) <= len(BearerSchema) {
-			err := dictionary.GetError(dictionary.ErrorAuthenticationCallback, "invalid or missing bearer token")
-			c.AbortWithStatusJSON(err.StatusCode, err)
+			spverrors.AbortWithErrorResponse(c, spverrors.ErrInvalidOrMissingToken, nil)
 		}
 
 		providedToken := authHeader[len(BearerSchema):]
 		if providedToken != appConfig.Nodes.Callback.Token {
-			err := dictionary.GetError(dictionary.ErrorAuthenticationCallback, "invalid authorization token")
-			c.AbortWithStatusJSON(err.StatusCode, err)
+			spverrors.AbortWithErrorResponse(c, spverrors.ErrInvalidToken, nil)
 		}
 
 		c.Next()
