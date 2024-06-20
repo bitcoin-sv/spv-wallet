@@ -1,6 +1,7 @@
 package xpubs
 
 import (
+	"github.com/bitcoin-sv/spv-wallet/spverrors"
 	"net/http"
 
 	"github.com/bitcoin-sv/spv-wallet/engine"
@@ -35,7 +36,7 @@ func (a *Action) get(c *gin.Context) {
 		)
 	}
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, err.Error())
+		spverrors.ErrorResponse(c, spverrors.ErrCouldNotFindXpub, a.Services.Logger)
 		return
 	}
 

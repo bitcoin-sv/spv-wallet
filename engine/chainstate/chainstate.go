@@ -5,6 +5,7 @@ package chainstate
 
 import (
 	"context"
+	"github.com/bitcoin-sv/spv-wallet/spverrors"
 	"time"
 )
 
@@ -21,7 +22,7 @@ func (flag HexFormatFlag) Contains(other HexFormatFlag) bool {
 	return (flag & other) == other
 }
 
-// SupportedBroadcastFormats retuns supported formats based on active providers
+// SupportedBroadcastFormats returns supported formats based on active providers
 func (c *Client) SupportedBroadcastFormats() HexFormatFlag {
 	return RawTx | Ef
 }
@@ -72,15 +73,15 @@ func (c *Client) QueryTransaction(
 
 	// Basic validation
 	if len(id) < 50 {
-		return nil, ErrInvalidTransactionID
+		return nil, spverrors.ErrInvalidTransactionID
 	} else if !c.validRequirement(requiredIn) {
-		return nil, ErrInvalidRequirements
+		return nil, spverrors.ErrInvalidRequirements
 	}
 
 	// Try all providers and return the "first" valid response
 	info := c.query(ctx, id, requiredIn, timeout)
 	if info == nil {
-		return nil, ErrTransactionNotFound
+		return nil, spverrors.ErrCouldNotFindTransaction
 	}
 	return info, nil
 }
@@ -93,15 +94,15 @@ func (c *Client) QueryTransactionFastest(
 ) (*TransactionInfo, error) {
 	// Basic validation
 	if len(id) < 50 {
-		return nil, ErrInvalidTransactionID
+		return nil, spverrors.ErrInvalidTransactionID
 	} else if !c.validRequirement(requiredIn) {
-		return nil, ErrInvalidRequirements
+		return nil, spverrors.ErrInvalidRequirements
 	}
 
 	// Try all providers and return the "fastest" valid response
 	info := c.fastestQuery(ctx, id, requiredIn, timeout)
 	if info == nil {
-		return nil, ErrTransactionNotFound
+		return nil, spverrors.ErrCouldNotFindTransaction
 	}
 	return info, nil
 }

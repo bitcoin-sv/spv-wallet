@@ -1,6 +1,7 @@
 package utxos
 
 import (
+	"github.com/bitcoin-sv/spv-wallet/spverrors"
 	"net/http"
 
 	"github.com/bitcoin-sv/spv-wallet/mappings"
@@ -26,13 +27,13 @@ func (a *Action) count(c *gin.Context) {
 
 	var reqParams filter.CountUtxos
 	if err := c.Bind(&reqParams); err != nil {
-		c.JSON(http.StatusBadRequest, err.Error())
+		spverrors.ErrorResponse(c, spverrors.ErrCannotBindRequest, a.Services.Logger)
 		return
 	}
 
 	conditions, err := reqParams.Conditions.ToDbConditions()
 	if err != nil {
-		c.JSON(http.StatusBadRequest, err.Error())
+		spverrors.ErrorResponse(c, spverrors.ErrInvalidConditions, a.Services.Logger)
 		return
 	}
 
@@ -49,7 +50,7 @@ func (a *Action) count(c *gin.Context) {
 		mappings.MapToMetadata(reqParams.Metadata),
 		dbConditions,
 	); err != nil {
-		c.JSON(http.StatusInternalServerError, err.Error())
+		spverrors.ErrorResponse(c, err, a.Services.Logger)
 		return
 	}
 

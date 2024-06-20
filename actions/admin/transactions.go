@@ -1,6 +1,7 @@
 package admin
 
 import (
+	"github.com/bitcoin-sv/spv-wallet/spverrors"
 	"net/http"
 
 	"github.com/bitcoin-sv/spv-wallet/mappings"
@@ -24,7 +25,7 @@ import (
 func (a *Action) transactionsSearch(c *gin.Context) {
 	var reqParams filter.SearchTransactions
 	if err := c.Bind(&reqParams); err != nil {
-		c.JSON(http.StatusBadRequest, err.Error())
+		spverrors.ErrorResponse(c, spverrors.ErrCannotBindRequest, a.Services.Logger)
 		return
 	}
 
@@ -35,7 +36,7 @@ func (a *Action) transactionsSearch(c *gin.Context) {
 		mappings.MapToQueryParams(reqParams.QueryParams),
 	)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, err.Error())
+		spverrors.ErrorResponse(c, err, a.Services.Logger)
 		return
 	}
 
@@ -62,7 +63,7 @@ func (a *Action) transactionsSearch(c *gin.Context) {
 func (a *Action) transactionsCount(c *gin.Context) {
 	var reqParams filter.CountTransactions
 	if err := c.Bind(&reqParams); err != nil {
-		c.JSON(http.StatusBadRequest, err.Error())
+		spverrors.ErrorResponse(c, spverrors.ErrCannotBindRequest, a.Services.Logger)
 		return
 	}
 
@@ -72,7 +73,7 @@ func (a *Action) transactionsCount(c *gin.Context) {
 		reqParams.Conditions.ToDbConditions(),
 	)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, err.Error())
+		spverrors.ErrorResponse(c, err, a.Services.Logger)
 		return
 	}
 

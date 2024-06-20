@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"github.com/bitcoin-sv/spv-wallet/spverrors"
 	"math"
 	"time"
 
@@ -103,7 +104,7 @@ func (c *Client) GetTransaction(ctx context.Context, xPubID, txID string) (*Tran
 		return nil, err
 	}
 	if transaction == nil {
-		return nil, ErrMissingTransaction
+		return nil, spverrors.ErrCouldNotFindTransaction
 	}
 
 	return transaction, nil
@@ -278,7 +279,7 @@ func (c *Client) RevertTransaction(ctx context.Context, id string) error {
 	// check whether transaction is not already on chain
 	var info *chainstate.TransactionInfo
 	if info, err = c.Chainstate().QueryTransaction(ctx, transaction.ID, chainstate.RequiredInMempool, 30*time.Second); err != nil {
-		if !errors.Is(err, chainstate.ErrTransactionNotFound) {
+		if !errors.Is(err, spverrors.ErrCouldNotFindTransaction) {
 			return err
 		}
 	}

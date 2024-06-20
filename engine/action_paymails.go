@@ -3,6 +3,7 @@ package engine
 import (
 	"context"
 	"errors"
+	"github.com/bitcoin-sv/spv-wallet/spverrors"
 	"time"
 
 	"github.com/bitcoin-sv/spv-wallet/engine/datastore"
@@ -19,7 +20,7 @@ func (c *Client) GetPaymailAddress(ctx context.Context, address string, opts ...
 	if err != nil {
 		return nil, err
 	} else if paymailAddress == nil {
-		return nil, ErrPaymailNotFound
+		return nil, spverrors.ErrCouldNotFindPaymail
 	}
 
 	return paymailAddress, nil
@@ -147,7 +148,7 @@ func (c *Client) DeletePaymailAddress(ctx context.Context, address string, opts 
 	if err != nil {
 		return err
 	} else if paymailAddress == nil {
-		return ErrPaymailNotFound
+		return spverrors.ErrCouldNotFindPaymail
 	}
 
 	// todo: make a better approach for deleting paymail addresses?
@@ -179,7 +180,7 @@ func (c *Client) UpdatePaymailAddressMetadata(ctx context.Context, address strin
 	if err != nil {
 		return nil, err
 	} else if paymailAddress == nil {
-		return nil, ErrPaymailNotFound
+		return nil, spverrors.ErrCouldNotFindPaymail
 	}
 
 	// Update the metadata
@@ -205,7 +206,7 @@ func (c *Client) UpdatePaymailAddress(ctx context.Context, address, publicName, 
 	if err != nil {
 		return nil, err
 	} else if paymailAddress == nil {
-		return nil, ErrPaymailNotFound
+		return nil, spverrors.ErrCouldNotFindPaymail
 	}
 
 	// Update the public name

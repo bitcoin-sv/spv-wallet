@@ -3,11 +3,11 @@ package chainstate
 import (
 	"context"
 	"errors"
+	"github.com/bitcoin-sv/spv-wallet/spverrors"
+	"github.com/libsv/go-bc"
 	"strings"
 	"sync"
 	"time"
-
-	"github.com/libsv/go-bc"
 )
 
 // query will try ALL providers in order and return the first "valid" response based on requirements
@@ -83,5 +83,5 @@ func queryBroadcastClient(ctx context.Context, client ClientInterface, id string
 			BUMP:        bump,
 		}, nil
 	}
-	return nil, ErrTransactionIDMismatch
+	return nil, spverrors.ErrTransactionIDMismatch
 }

@@ -2,19 +2,11 @@ package engine
 
 import (
 	"context"
-	"errors"
 	"fmt"
+	"github.com/bitcoin-sv/spv-wallet/spverrors"
 
 	"github.com/bitcoin-sv/go-paymail"
 	"github.com/bitcoin-sv/spv-wallet/engine/datastore"
-)
-
-var (
-	ErrInvalidRequesterXpub         = errors.New("invalid requester xpub")
-	ErrAddingContactRequest         = errors.New("adding contact request failed")
-	ErrMoreThanOnePaymailRegistered = errors.New("there are more than one paymail assigned to the xpub")
-	ErrContactNotFound              = errors.New("contact not found")
-	ErrContactIncorrectStatus       = errors.New("contact is in incorrect status to proceed")
 )
 
 func (c *Client) UpsertContact(ctx context.Context, ctcFName, ctcPaymail, requesterXPubID, requesterPaymail string, opts ...ModelOps) (*Contact, error) {
@@ -48,7 +40,7 @@ func (c *Client) UpsertContact(ctx context.Context, ctcFName, ctcPaymail, reques
 			Str("requestedContact", ctcPaymail).
 			Msgf("adding contact request failed: %s", err.Error())
 
-		return contact, ErrAddingContactRequest
+		return contact, spverrors.ErrAddingContactRequest
 	}
 
 	return contact, nil
@@ -151,7 +143,7 @@ func (c *Client) UpdateContact(ctx context.Context, id, fullName string, metadat
 	}
 
 	if contact == nil {
-		return nil, ErrContactNotFound
+		return nil, spverrors.ErrContactNotFound
 	}
 
 	contact.FullName = fullName
@@ -173,7 +165,7 @@ func (c *Client) AdminChangeContactStatus(ctx context.Context, id string, status
 	}
 
 	if contact == nil {
-		return nil, ErrContactNotFound
+		return nil, spverrors.ErrContactNotFound
 	}
 
 	switch status {
@@ -205,7 +197,7 @@ func (c *Client) DeleteContact(ctx context.Context, id string) error {
 	}
 
 	if contact == nil {
-		return ErrContactNotFound
+		return spverrors.ErrContactNotFound
 	}
 
 	contact.Delete()
@@ -225,12 +217,12 @@ func (c *Client) AcceptContact(ctx context.Context, xPubID, paymail string) erro
 		return err
 	}
 	if contact == nil {
-		return ErrContactNotFound
+		return spverrors.ErrContactNotFound
 	}
 
 	if err = contact.Accept(); err != nil {
 		c.logContactWarining(xPubID, paymail, err.Error())
-		return ErrContactIncorrectStatus
+		return spverrors.ErrContactIncorrectStatus
 	}
 
 	if err = contact.Save(ctx); err != nil {
@@ -248,12 +240,12 @@ func (c *Client) RejectContact(ctx context.Context, xPubID, paymail string) erro
 		return err
 	}
 	if contact == nil {
-		return ErrContactNotFound
+		return spverrors.ErrContactNotFound
 	}
 
 	if err = contact.Reject(); err != nil {
 		c.logContactWarining(xPubID, paymail, err.Error())
-		return ErrContactIncorrectStatus
+		return spverrors.ErrContactIncorrectStatus
 	}
 
 	if err = contact.Save(ctx); err != nil {
@@ -271,12 +263,12 @@ func (c *Client) ConfirmContact(ctx context.Context, xPubID, paymail string) err
 		return err
 	}
 	if contact == nil {
-		return ErrContactNotFound
+		return spverrors.ErrContactNotFound
 	}
 
 	if err = contact.Confirm(); err != nil {
 		c.logContactWarining(xPubID, paymail, err.Error())
-		return ErrContactIncorrectStatus
+		return spverrors.ErrContactIncorrectStatus
 	}
 
 	if err = contact.Save(ctx); err != nil {
@@ -294,12 +286,12 @@ func (c *Client) UnconfirmContact(ctx context.Context, xPubID, paymail string) e
 		return err
 	}
 	if contact == nil {
-		return ErrContactNotFound
+		return spverrors.ErrContactNotFound
 	}
 
 	if err = contact.Unconfirm(); err != nil {
 		c.logContactWarining(xPubID, paymail, err.Error())
-		return ErrContactIncorrectStatus
+		return spverrors.ErrContactIncorrectStatus
 	}
 
 	if err = contact.Save(ctx); err != nil {
@@ -318,7 +310,7 @@ func (c *Client) getPaymail(ctx context.Context, xpubID, paymailAddr string) (*P
 		}
 
 		if res == nil || res.XpubID != xpubID {
-			return nil, ErrInvalidRequesterXpub
+			return nil, spverrors.ErrInvalidRequesterXpub
 		}
 
 		return res, nil
@@ -331,9 +323,9 @@ func (c *Client) getPaymail(ctx context.Context, xpubID, paymailAddr string) (*P
 		return nil, err
 	}
 	if len(paymails) == 0 {
-		return nil, ErrInvalidRequesterXpub
+		return nil, spverrors.ErrInvalidRequesterXpub
 	} else if len(paymails) > 1 {
-		return nil, ErrMoreThanOnePaymailRegistered
+		return nil, spverrors.ErrMoreThanOnePaymailRegistered
 	}
 
 	return paymails[0], nil

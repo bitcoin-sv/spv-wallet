@@ -1,6 +1,7 @@
 package destinations
 
 import (
+	"github.com/bitcoin-sv/spv-wallet/spverrors"
 	"net/http"
 
 	"github.com/bitcoin-sv/spv-wallet/engine"
@@ -30,7 +31,7 @@ func (a *Action) get(c *gin.Context) {
 	address := c.Query("address")
 	lockingScript := c.Query("locking_script")
 	if id == "" && address == "" && lockingScript == "" {
-		c.JSON(http.StatusBadRequest, engine.ErrMissingFieldID)
+		spverrors.ErrorResponse(c, spverrors.ErrOneOfTheFieldsIsRequired, a.Services.Logger)
 		return
 	}
 
@@ -50,7 +51,7 @@ func (a *Action) get(c *gin.Context) {
 		)
 	}
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, err.Error())
+		spverrors.ErrorResponse(c, err, a.Services.Logger)
 		return
 	}
 

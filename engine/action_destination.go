@@ -2,6 +2,7 @@ package engine
 
 import (
 	"context"
+	"github.com/bitcoin-sv/spv-wallet/spverrors"
 
 	"github.com/bitcoin-sv/spv-wallet/engine/datastore"
 )
@@ -24,7 +25,7 @@ func (c *Client) NewDestination(ctx context.Context, xPubKey string, chain uint3
 	); err != nil {
 		return nil, err
 	} else if xPub == nil {
-		return nil, ErrMissingXpub
+		return nil, spverrors.ErrCouldNotFindXpub
 	}
 
 	// Get/create a new destination
@@ -54,7 +55,7 @@ func (c *Client) NewDestinationForLockingScript(ctx context.Context, xPubID, loc
 
 	// Ensure locking script isn't empty
 	if len(lockingScript) == 0 {
-		return nil, ErrMissingLockingScript
+		return nil, spverrors.ErrMissingLockingScript
 	}
 
 	// Start the new destination - will detect type
@@ -64,7 +65,7 @@ func (c *Client) NewDestinationForLockingScript(ctx context.Context, xPubID, loc
 	)
 
 	if destination.Type == "" {
-		return nil, ErrUnknownLockingScript
+		return nil, spverrors.ErrUnknownLockingScript
 	}
 
 	// Save the destination
@@ -166,7 +167,7 @@ func (c *Client) GetDestinationByID(ctx context.Context, xPubID, id string) (*De
 
 	// Check that the id matches
 	if destination.XpubID != xPubID {
-		return nil, ErrXpubIDMisMatch
+		return nil, spverrors.ErrXpubIDMisMatch
 	}
 
 	return destination, nil
@@ -187,7 +188,7 @@ func (c *Client) GetDestinationByLockingScript(ctx context.Context, xPubID, lock
 
 	// Check that the id matches
 	if destination.XpubID != xPubID {
-		return nil, ErrXpubIDMisMatch
+		return nil, spverrors.ErrXpubIDMisMatch
 	}
 
 	return destination, nil
@@ -208,7 +209,7 @@ func (c *Client) GetDestinationByAddress(ctx context.Context, xPubID, address st
 
 	// Check that the id matches
 	if destination.XpubID != xPubID {
-		return nil, ErrXpubIDMisMatch
+		return nil, spverrors.ErrXpubIDMisMatch
 	}
 
 	return destination, nil

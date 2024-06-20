@@ -2,6 +2,7 @@ package engine
 
 import (
 	"context"
+	"github.com/bitcoin-sv/spv-wallet/spverrors"
 
 	"github.com/bitcoin-sv/spv-wallet/engine/datastore"
 	"github.com/bitcoin-sv/spv-wallet/engine/utils"
@@ -86,12 +87,12 @@ func (c *Client) GetUtxo(ctx context.Context, xPubKey, txID string, outputIndex 
 	if err != nil {
 		return nil, err
 	} else if utxo == nil {
-		return nil, ErrMissingUtxo
+		return nil, spverrors.ErrCouldNotFindUtxo
 	}
 
 	// Check that the id matches
 	if utxo.XpubID != utils.Hash(xPubKey) {
-		return nil, ErrXpubIDMisMatch
+		return nil, spverrors.ErrXpubIDMisMatch
 	}
 
 	var tx *Transaction
@@ -117,7 +118,7 @@ func (c *Client) GetUtxoByTransactionID(ctx context.Context, txID string, output
 	if err != nil {
 		return nil, err
 	} else if utxo == nil {
-		return nil, ErrMissingUtxo
+		return nil, spverrors.ErrCouldNotFindUtxo
 	}
 
 	var tx *Transaction
@@ -134,7 +135,7 @@ func (c *Client) GetUtxoByTransactionID(ctx context.Context, txID string, output
 // UnReserveUtxos remove the reservation on the utxos for the given draft ID
 func (c *Client) UnReserveUtxos(ctx context.Context, xPubID, draftID string) error {
 	// Check for existing NewRelic transaction
-	ctx = c.GetOrStartTxn(ctx, "unreserve_uxtos_by_draft_id")
+	ctx = c.GetOrStartTxn(ctx, "unreserve_utxos_by_draft_id")
 
 	return unReserveUtxos(ctx, xPubID, draftID, c.DefaultModelOptions()...)
 }

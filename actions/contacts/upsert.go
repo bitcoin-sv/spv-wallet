@@ -3,6 +3,7 @@ package contacts
 import (
 	"encoding/json"
 	"errors"
+	"github.com/bitcoin-sv/spv-wallet/spverrors"
 	"net/http"
 
 	"github.com/bitcoin-sv/spv-wallet/engine"
@@ -29,12 +30,12 @@ func (a *Action) upsert(c *gin.Context) {
 
 	var req UpsertContact
 	if err := json.NewDecoder(c.Request.Body).Decode(&req); err != nil {
-		c.JSON(http.StatusBadRequest, err.Error())
+		spverrors.ErrorResponse(c, spverrors.ErrCannotBindRequest, a.Services.Logger)
 		return
 	}
 
 	if err := req.validate(); err != nil {
-		c.JSON(http.StatusBadRequest, err.Error())
+		spverrors.ErrorResponse(c, err, a.Services.Logger)
 		return
 	}
 
@@ -44,8 +45,8 @@ func (a *Action) upsert(c *gin.Context) {
 		reqXPubID, req.RequesterPaymail,
 		engine.WithMetadatas(req.Metadata))
 
-	if err != nil && !errors.Is(err, engine.ErrAddingContactRequest) {
-		c.JSON(http.StatusInternalServerError, err.Error())
+	if err != nil && !errors.Is(err, spverrors.ErrAddingContactRequest) {
+		spverrors.ErrorResponse(c, err, a.Services.Logger)
 		return
 	}
 

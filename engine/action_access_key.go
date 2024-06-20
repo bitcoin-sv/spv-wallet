@@ -2,6 +2,7 @@ package engine
 
 import (
 	"context"
+	"github.com/bitcoin-sv/spv-wallet/spverrors"
 	"time"
 
 	"github.com/bitcoin-sv/spv-wallet/engine/datastore"
@@ -29,7 +30,7 @@ func (c *Client) NewAccessKey(ctx context.Context, rawXpubKey string, opts ...Mo
 	); err != nil {
 		return nil, err
 	} else if xPub == nil {
-		return nil, ErrMissingXpub
+		return nil, spverrors.ErrCouldNotFindXpub
 	}
 
 	// Create the model & set the default options (gives options from client->model)
@@ -59,12 +60,12 @@ func (c *Client) GetAccessKey(ctx context.Context, xPubID, id string) (*AccessKe
 	if err != nil {
 		return nil, err
 	} else if accessKey == nil {
-		return nil, ErrAccessKeyNotFound
+		return nil, spverrors.ErrAccessKeyNotFound
 	}
 
 	// make sure this is the correct accessKey
 	if accessKey.XpubID != xPubID {
-		return nil, utils.ErrXpubNoMatch
+		return nil, spverrors.ErrXpubNoMatch
 	}
 
 	// Return the model
@@ -181,7 +182,7 @@ func (c *Client) RevokeAccessKey(ctx context.Context, rawXpubKey, id string, opt
 	); err != nil {
 		return nil, err
 	} else if xPub == nil {
-		return nil, ErrMissingXpub
+		return nil, spverrors.ErrCouldNotFindXpub
 	}
 
 	var accessKey *AccessKey
@@ -191,13 +192,13 @@ func (c *Client) RevokeAccessKey(ctx context.Context, rawXpubKey, id string, opt
 		return nil, err
 	}
 	if accessKey == nil {
-		return nil, ErrMissingAccessKey
+		return nil, spverrors.ErrCouldNotFindAccessKey
 	}
 
 	// make sure this is the correct accessKey
 	xPubID := utils.Hash(rawXpubKey)
 	if accessKey.XpubID != xPubID {
-		return nil, utils.ErrXpubNoMatch
+		return nil, spverrors.ErrXpubNoMatch
 	}
 
 	accessKey.RevokedAt.Valid = true

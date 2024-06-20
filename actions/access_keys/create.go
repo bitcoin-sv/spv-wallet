@@ -1,6 +1,7 @@
 package accesskeys
 
 import (
+	"github.com/bitcoin-sv/spv-wallet/spverrors"
 	"net/http"
 
 	"github.com/bitcoin-sv/spv-wallet/engine"
@@ -26,7 +27,7 @@ func (a *Action) create(c *gin.Context) {
 
 	var requestBody CreateAccessKey
 	if err := c.Bind(&requestBody); err != nil {
-		c.JSON(http.StatusBadRequest, err.Error())
+		spverrors.ErrorResponse(c, spverrors.ErrCannotBindRequest, a.Services.Logger)
 		return
 	}
 
@@ -37,7 +38,7 @@ func (a *Action) create(c *gin.Context) {
 		engine.WithMetadatas(requestBody.Metadata),
 	)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, err.Error())
+		spverrors.ErrorResponse(c, err, a.Services.Logger)
 		return
 	}
 

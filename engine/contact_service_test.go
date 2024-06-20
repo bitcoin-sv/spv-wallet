@@ -3,6 +3,7 @@ package engine
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/bitcoin-sv/spv-wallet/spverrors"
 	"net/http"
 	"testing"
 
@@ -55,7 +56,7 @@ func Test_ClientService_UpsertContact(t *testing.T) {
 		res, err := client.UpsertContact(ctx, "Bran Stark", "bran_the_broken@winterfell.com", cs_xpubHash, "", client.DefaultModelOptions()...)
 
 		// then
-		require.ErrorIs(t, err, ErrInvalidRequesterXpub)
+		require.ErrorIs(t, err, spverrors.ErrInvalidRequesterXpub)
 		require.Nil(t, res)
 	})
 
@@ -82,7 +83,7 @@ func Test_ClientService_UpsertContact(t *testing.T) {
 		res, err := client.UpsertContact(ctx, "Bran Stark", paymailAddr, cs_xpubHash, "lady_stoneheart@winterfell.com", client.DefaultModelOptions()...)
 
 		// then
-		require.ErrorIs(t, err, ErrAddingContactRequest)
+		require.ErrorIs(t, err, spverrors.ErrAddingContactRequest)
 		require.NotNil(t, res)
 		require.Equal(t, ContactNotConfirmed, res.Status)
 	})

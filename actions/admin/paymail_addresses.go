@@ -1,6 +1,7 @@
 package admin
 
 import (
+	"github.com/bitcoin-sv/spv-wallet/spverrors"
 	"net/http"
 
 	"github.com/bitcoin-sv/spv-wallet/engine"
@@ -26,7 +27,7 @@ func (a *Action) paymailGetAddress(c *gin.Context) {
 	var requestBody PaymailAddress
 
 	if err := c.ShouldBindJSON(&requestBody); err != nil {
-		c.JSON(http.StatusBadRequest, err.Error())
+		spverrors.ErrorResponse(c, spverrors.ErrCannotBindRequest, a.Services.Logger)
 		return
 	}
 
@@ -39,7 +40,7 @@ func (a *Action) paymailGetAddress(c *gin.Context) {
 
 	paymailAddress, err := a.Services.SpvWalletEngine.GetPaymailAddress(c.Request.Context(), requestBody.Address, opts...)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, err.Error())
+		spverrors.ErrorResponse(c, err, a.Services.Logger)
 		return
 	}
 
@@ -63,7 +64,7 @@ func (a *Action) paymailGetAddress(c *gin.Context) {
 func (a *Action) paymailAddressesSearch(c *gin.Context) {
 	var reqParams filter.AdminSearchPaymails
 	if err := c.Bind(&reqParams); err != nil {
-		c.JSON(http.StatusBadRequest, err.Error())
+		spverrors.ErrorResponse(c, spverrors.ErrCannotBindRequest, a.Services.Logger)
 		return
 	}
 
@@ -74,7 +75,7 @@ func (a *Action) paymailAddressesSearch(c *gin.Context) {
 		mappings.MapToQueryParams(reqParams.QueryParams),
 	)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, err.Error())
+		spverrors.ErrorResponse(c, err, a.Services.Logger)
 		return
 	}
 
@@ -101,7 +102,7 @@ func (a *Action) paymailAddressesSearch(c *gin.Context) {
 func (a *Action) paymailAddressesCount(c *gin.Context) {
 	var reqParams filter.AdminCountPaymails
 	if err := c.Bind(&reqParams); err != nil {
-		c.JSON(http.StatusBadRequest, err.Error())
+		spverrors.ErrorResponse(c, spverrors.ErrCannotBindRequest, a.Services.Logger)
 		return
 	}
 
@@ -111,7 +112,7 @@ func (a *Action) paymailAddressesCount(c *gin.Context) {
 		reqParams.Conditions.ToDbConditions(),
 	)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, err.Error())
+		spverrors.ErrorResponse(c, err, a.Services.Logger)
 		return
 	}
 
@@ -133,16 +134,16 @@ func (a *Action) paymailAddressesCount(c *gin.Context) {
 func (a *Action) paymailCreateAddress(c *gin.Context) {
 	var requestBody CreatePaymail
 	if err := c.ShouldBindJSON(&requestBody); err != nil {
-		c.JSON(http.StatusBadRequest, err.Error())
+		spverrors.ErrorResponse(c, spverrors.ErrCannotBindRequest, a.Services.Logger)
 		return
 	}
 
 	if requestBody.Key == "" {
-		c.JSON(http.StatusExpectationFailed, "xpub is required")
+		spverrors.ErrorResponse(c, spverrors.ErrMissingXpub, a.Services.Logger)
 		return
 	}
 	if requestBody.Address == "" {
-		c.JSON(http.StatusBadRequest, "address is required")
+		spverrors.ErrorResponse(c, spverrors.ErrMissingAddress, a.Services.Logger)
 		return
 	}
 
@@ -180,12 +181,12 @@ func (a *Action) paymailCreateAddress(c *gin.Context) {
 func (a *Action) paymailDeleteAddress(c *gin.Context) {
 	var requestBody PaymailAddress
 	if err := c.ShouldBindJSON(&requestBody); err != nil {
-		c.JSON(http.StatusBadRequest, err.Error())
+		spverrors.ErrorResponse(c, spverrors.ErrCannotBindRequest, a.Services.Logger)
 		return
 	}
 
 	if requestBody.Address == "" {
-		c.JSON(http.StatusBadRequest, "address is required")
+		spverrors.ErrorResponse(c, spverrors.ErrMissingAddress, a.Services.Logger)
 		return
 	}
 
@@ -194,7 +195,7 @@ func (a *Action) paymailDeleteAddress(c *gin.Context) {
 	// Delete a new paymail address
 	err := a.Services.SpvWalletEngine.DeletePaymailAddress(c.Request.Context(), requestBody.Address, opts...)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, err.Error())
+		spverrors.ErrorResponse(c, err, a.Services.Logger)
 		return
 	}
 

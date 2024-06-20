@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"github.com/bitcoin-sv/spv-wallet/spverrors"
 	"strings"
 	"time"
 
@@ -110,11 +111,11 @@ func getContactsByXPubIDCount(ctx context.Context, xPubID string, metadata *Meta
 
 func (c *Contact) validate() error {
 	if c.ID == "" {
-		return ErrMissingContactID
+		return spverrors.ErrMissingContactID
 	}
 
 	if c.FullName == "" {
-		return ErrMissingContactFullName
+		return spverrors.ErrMissingContactFullName
 	}
 
 	if err := paymail.ValidatePaymail(c.Paymail); err != nil {
