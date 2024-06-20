@@ -9,7 +9,6 @@ import (
 	"github.com/bitcoin-sv/spv-wallet/engine/utils"
 	"github.com/newrelic/go-agent/v3/newrelic"
 	"github.com/rs/zerolog"
-	"github.com/tonicpow/go-minercraft/v2"
 )
 
 // ClientOps allow functional options to be supplied
@@ -23,14 +22,13 @@ func defaultClientOptions() *clientOptions {
 	// Set the default options
 	return &clientOptions{
 		config: &syncConfig{
-			httpClient:       nil,
-			minercraftConfig: defaultMinecraftConfig(),
-			minercraft:       nil,
-			network:          MainNet,
-			queryTimeout:     defaultQueryTimeOut,
-			broadcastClient:  nil,
-			feeQuotes:        true,
-			feeUnit:          nil, // fee has to be set explicitly or via fee quotes
+			httpClient:            nil,
+			broadcastClientConfig: defaultArcConfig(),
+			network:               MainNet,
+			queryTimeout:          defaultQueryTimeOut,
+			broadcastClient:       nil,
+			feeQuotes:             true,
+			feeUnit:               nil, // fee has to be set explicitly or via fee quotes
 		},
 		debug:           false,
 		newRelicEnabled: false,
@@ -69,22 +67,6 @@ func WithHTTPClient(client HTTPInterface) ClientOps {
 		if client != nil {
 			c.config.httpClient = client
 		}
-	}
-}
-
-// WithMinercraft will set a custom Minercraft client
-func WithMinercraft(client minercraft.ClientInterface) ClientOps {
-	return func(c *clientOptions) {
-		if client != nil {
-			c.config.minercraft = client
-		}
-	}
-}
-
-// WithMAPI will specify mAPI as an API for minercraft client
-func WithMAPI() ClientOps {
-	return func(c *clientOptions) {
-		c.config.minercraftConfig.apiType = minercraft.MAPI
 	}
 }
 
@@ -133,7 +115,7 @@ func WithExcludedProviders(providers []string) ClientOps {
 	}
 }
 
-// WithFeeQuotes will set minercraftFeeQuotes flag as true
+// WithFeeQuotes will set feeQuotes flag as true
 func WithFeeQuotes(enabled bool) ClientOps {
 	return func(c *clientOptions) {
 		c.config.feeQuotes = enabled
@@ -144,13 +126,6 @@ func WithFeeQuotes(enabled bool) ClientOps {
 func WithFeeUnit(feeUnit *utils.FeeUnit) ClientOps {
 	return func(c *clientOptions) {
 		c.config.feeUnit = feeUnit
-	}
-}
-
-// WithMinercraftAPIs will set miners APIs
-func WithMinercraftAPIs(apis []*minercraft.MinerAPIs) ClientOps {
-	return func(c *clientOptions) {
-		c.config.minercraftConfig.minerAPIs = apis
 	}
 }
 

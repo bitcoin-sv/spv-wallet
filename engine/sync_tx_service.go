@@ -195,7 +195,6 @@ func _syncTxDataFromChain(ctx context.Context, syncTx *SyncTransaction, transact
 
 	// Find on-chain
 	var txInfo *chainstate.TransactionInfo
-	// only mAPI currently provides merkle proof, so QueryTransaction should be used here
 	if txInfo, err = syncTx.Client().Chainstate().QueryTransaction(
 		ctx, syncTx.ID, chainstate.RequiredOnChain, defaultQueryTxTimeout,
 	); err != nil {

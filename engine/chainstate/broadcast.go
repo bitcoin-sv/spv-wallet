@@ -20,7 +20,7 @@ var (
 	// broadcastQuestionableErrors are a list of errors that are not good broadcast responses,
 	// but need to be checked differently
 	broadcastQuestionableErrors = []string{
-		"missing inputs", // Returned from mAPI for a valid tx that is on-chain
+		"missing inputs", // The transaction has been sent to at least 1 Bitcoin node but parent transaction was not found. This status means that inputs are currently missing, but the transaction is not yet rejected.
 	}
 
 	/*
@@ -65,26 +65,8 @@ func (c *Client) broadcast(ctx context.Context, id, hex string, format HexFormat
 func createActiveProviders(c *Client, txID, txHex string, format HexFormatFlag) []txBroadcastProvider {
 	providers := make([]txBroadcastProvider, 0, 1)
 
-	switch c.ActiveProvider() {
-	case ProviderMinercraft:
-		if format != RawTx {
-			panic("MAPI doesn't support other broadcast format than RawTx")
-		}
-
-		for _, miner := range c.options.config.minercraftConfig.broadcastMiners {
-			if miner == nil {
-				continue
-			}
-
-			pvdr := mapiBroadcastProvider{miner: miner, txID: txID, txHex: txHex}
-			providers = append(providers, &pvdr)
-		}
-	case ProviderBroadcastClient:
-		pvdr := broadcastClientProvider{txID: txID, txHex: txHex, format: format}
-		providers = append(providers, &pvdr)
-	default:
-		c.options.logger.Warn().Msg("no active provider for broadcast")
-	}
+	pvdr := broadcastClientProvider{txID: txID, txHex: txHex, format: format}
+	providers = append(providers, &pvdr)
 
 	return providers
 }

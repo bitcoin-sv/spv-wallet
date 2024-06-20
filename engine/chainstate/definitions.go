@@ -33,8 +33,6 @@ const (
 
 // Requirements and providers
 const (
-	mAPIFailure       = "failure"  // Minercraft result was a failure / error
-	mAPISuccess       = "success"  // Minercraft result was success (still could be an error)
 	requiredInMempool = "mempool"  // Requirement for tx query (has to be >= mempool)
 	requiredOnChain   = "on-chain" // Requirement for tx query (has to be == on-chain)
 )
@@ -42,7 +40,6 @@ const (
 // List of providers
 const (
 	ProviderAll             = "all"             // All providers (used for errors etc)
-	ProviderMinercraft      = "minercraft"      // Query & broadcast provider for mAPI (using given miners)
 	ProviderBroadcastClient = "broadcastclient" // Query & broadcast provider for configured miners
 	ProviderNone            = "none"            // No providers (used to indicate no providers)
 )

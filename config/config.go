@@ -33,7 +33,7 @@ type AppConfig struct {
 	Authentication *AuthenticationConfig `json:"auth" mapstructure:"auth"`
 	// Server is a general configuration for spv-wallet.
 	Server *ServerConfig `json:"server_config" mapstructure:"server_config"`
-	// Nodes is a config for BSV nodes, mAPI and Arc.
+	// Nodes is a config for Arc.
 	Nodes *NodesConfig `json:"nodes" mapstructure:"nodes"`
 	// Metrics is a configuration for metrics in SPV Wallet.
 	Metrics *MetricsConfig `json:"metrics" mapstructure:"metrics"`
@@ -151,13 +151,12 @@ type NewRelicConfig struct {
 	Enabled bool `json:"enabled" mapstructure:"enabled"`
 }
 
-// NodesConfig consists of blockchain nodes (such as Minercraft and Arc) configuration
+// NodesConfig consists of blockchain nodes (Arc) configuration
 type NodesConfig struct {
 	Callback     *CallbackConfig `json:"callback" mapstructure:"callback"`
 	FeeUnit      *FeeUnitConfig  `json:"fee_unit" mapstructure:"fee_unit"`
 	DeploymentID string          `json:"deployment_id" mapstructure:"deployment_id"`
-	Protocol     NodesProtocol   `json:"protocol" mapstructure:"protocol"`
-	Apis         []*MinerAPI     `json:"apis" mapstructure:"apis"`
+	Apis         []*ArcAPI       `json:"apis" mapstructure:"apis"`
 	UseFeeQuotes bool            `json:"use_fee_quotes" mapstructure:"use_fee_quotes"`
 }
 
@@ -167,14 +166,10 @@ type FeeUnitConfig struct {
 	Bytes    int `json:"bytes" mapstructure:"bytes"`
 }
 
-// MinerAPI holds connection info for a single miner endpoint
-type MinerAPI struct {
-	Token   string `json:"token" mapstructure:"token"`
-	ArcURL  string `json:"arc_url" mapstructure:"arc_url"`
-	MapiURL string `json:"mapi_url" mapstructure:"mapi_url"`
-
-	// MinerID is not used with ARC potocol
-	MinerID string `json:"minerid" mapstructure:"minerid"`
+// ArcAPI holds connection info for a single miner endpoint
+type ArcAPI struct {
+	Token  string `json:"token" mapstructure:"token"`
+	ArcURL string `json:"arc_url" mapstructure:"arc_url"`
 }
 
 // NotificationsConfig is the configuration for notifications

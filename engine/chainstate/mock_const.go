@@ -29,5 +29,5 @@ const (
 // MockDefaultFee is a mock default fee used for assertions
 var MockDefaultFee = &utils.FeeUnit{
 	Satoshis: 1,
-	Bytes:    20,
+	Bytes:    1000,
 }

@@ -23,16 +23,7 @@ func (flag HexFormatFlag) Contains(other HexFormatFlag) bool {
 
 // SupportedBroadcastFormats retuns supported formats based on active providers
 func (c *Client) SupportedBroadcastFormats() HexFormatFlag {
-	switch c.ActiveProvider() {
-	case ProviderMinercraft:
-		return RawTx
-
-	case ProviderBroadcastClient:
-		return RawTx | Ef
-
-	default:
-		return RawTx
-	}
+	return RawTx | Ef
 }
 
 // BroadcastResult contains data about broadcasting to provider
@@ -67,7 +58,7 @@ func (c *Client) Broadcast(ctx context.Context, id, txHex string, format HexForm
 
 // QueryTransaction will get the transaction info from all providers returning the "first" valid result
 //
-// Note: this is slow, but follows a specific order: mAPI -> WhatsOnChain
+// Note: this is slow, but follows a specific order: ARC -> WhatsOnChain
 func (c *Client) QueryTransaction(
 	ctx context.Context, id string, requiredIn RequiredIn, timeout time.Duration,
 ) (transaction *TransactionInfo, err error) {
