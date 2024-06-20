@@ -25,30 +25,29 @@ func (e SPVError) Error() string {
 
 // ErrorResponse is searching for error and setting it up in gin context
 func ErrorResponse(c *gin.Context, err error, log *zerolog.Logger) {
-	response, statusCode, found := getError(err)
-	logError(found, log, err)
+	response, statusCode := getError(err, log)
 	c.JSON(statusCode, response)
 }
 
 // AbortWithErrorResponse is searching for error and abort with error set
 func AbortWithErrorResponse(c *gin.Context, err error, log *zerolog.Logger) {
-	response, statusCode, found := getError(err)
-	logError(found, log, err)
+	response, statusCode := getError(err, log)
 	c.AbortWithStatusJSON(statusCode, response)
 }
 
-func getError(err error) (responseError, int, bool) {
+func getError(err error, log *zerolog.Logger) (responseError, int) {
 	var errDetails SPVError
 	ok := errors.As(err, &errDetails)
 	if !ok {
-		return responseError{Code: "error-unknown", Message: "Unable to get information about error"}, 500, false
+		logError(log, err)
+		return responseError{Code: "error-unknown", Message: "Unable to get information about error"}, 500
 	}
 
-	return responseError{Code: errDetails.Code, Message: errDetails.Message}, errDetails.StatusCode, true
+	return responseError{Code: errDetails.Code, Message: errDetails.Message}, errDetails.StatusCode
 }
 
-func logError(found bool, log *zerolog.Logger, err error) {
-	if !found && log != nil {
+func logError(log *zerolog.Logger, err error) {
+	if log != nil {
 		log.Warn().Str("module", "spv-errors").Msgf("Unable to get information about error, details:  %s", err.Error())
 	}
 }
