@@ -143,7 +143,6 @@ This repository was created using [MrZ's `go-template`](https://github.com/mrz18
 -   [newrelic/go-agent](https://github.com/newrelic/go-agent)
 -   [robfig/cron](https://github.com/robfig/cron)
 -   [stretchr/testify](https://github.com/stretchr/testify)
--   [tonicpow/go-minercraft](https://github.com/tonicpow/go-minercraft)
 -   [bitcoin-sv/go-paymail](https://github.com/bitcoin-sv/go-paymail)
 -   [vmihailenco/taskq](https://github.com/vmihailenco/taskq)
 </details>

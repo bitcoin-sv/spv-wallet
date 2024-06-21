@@ -6,9 +6,9 @@ import (
 	"testing"
 	"time"
 
+	broadcast_client_mock "github.com/bitcoin-sv/go-broadcast-client/broadcast/broadcast-client-mock"
 	"github.com/bitcoin-sv/go-paymail"
 	"github.com/bitcoin-sv/go-paymail/server"
-	"github.com/bitcoin-sv/spv-wallet/engine/chainstate"
 	"github.com/bitcoin-sv/spv-wallet/engine/datastore"
 	"github.com/bitcoin-sv/spv-wallet/engine/taskmanager"
 	xtester "github.com/bitcoin-sv/spv-wallet/engine/tester"
@@ -223,6 +223,9 @@ func Test_startP2PTransaction(t *testing.T) {
 // Test_getCapabilities will test the method getCapabilities()
 func Test_getCapabilities(t *testing.T) {
 	// t.Parallel() mocking does not allow parallel tests
+	bc := broadcast_client_mock.Builder().
+		WithMockArc(broadcast_client_mock.MockSuccess).
+		Build()
 
 	t.Run("[mocked] - valid response - no cache found", func(t *testing.T) {
 		client := newTestPaymailClient(t, []string{testDomain})
@@ -241,7 +244,7 @@ func Test_getCapabilities(t *testing.T) {
 			WithSQLite(&datastore.SQLiteConfig{Shared: true}),
 			WithChainstateOptions(false, false, false, false),
 			WithDebugging(),
-			WithMinercraft(&chainstate.MinerCraftBase{}),
+			WithBroadcastClient(bc),
 			WithLogger(&logger),
 		)
 		require.NoError(t, err)
@@ -283,7 +286,7 @@ func Test_getCapabilities(t *testing.T) {
 			WithSQLite(&datastore.SQLiteConfig{Shared: true}),
 			WithChainstateOptions(false, false, false, false),
 			WithDebugging(),
-			WithMinercraft(&chainstate.MinerCraftBase{}),
+			WithBroadcastClient(bc),
 			WithLogger(&logger),
 		)
 		require.NoError(t, err)

@@ -118,13 +118,11 @@ func getNodesDefaults() *NodesConfig {
 	depIDSufix, _ := uuid.NewUUID()
 	return &NodesConfig{
 		DeploymentID: "spv-wallet-" + depIDSufix.String(),
-		Protocol:     NodesProtocolArc,
 		Callback:     getCallbackDefaults(),
-		Apis: []*MinerAPI{
+		Apis: []*ArcAPI{
 			{
-				ArcURL:  "https://arc.taal.com",
-				Token:   "mainnet_06770f425eb00298839a24a49cbdc02c",
-				MinerID: "03ad780153c47df915b3d2e23af727c68facaca4facd5f155bf5018b979b9aeb83",
+				ArcURL: "https://arc.taal.com",
+				Token:  "mainnet_06770f425eb00298839a24a49cbdc02c",
 			},
 		},
 		UseFeeQuotes: true,

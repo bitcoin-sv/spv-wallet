@@ -7,7 +7,6 @@ import (
 
 	"github.com/bitcoin-sv/go-broadcast-client/broadcast"
 	"github.com/bitcoin-sv/spv-wallet/engine/utils"
-	"github.com/tonicpow/go-minercraft/v2"
 )
 
 // HTTPInterface is the HTTP client interface
@@ -29,7 +28,6 @@ type ChainService interface {
 
 // ProviderServices is the chainstate providers interface
 type ProviderServices interface {
-	Minercraft() minercraft.ClientInterface
 	BroadcastClient() broadcast.Client
 }
 

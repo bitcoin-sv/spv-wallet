@@ -7,8 +7,6 @@ import (
 	"github.com/bitcoin-sv/go-broadcast-client/broadcast"
 	"github.com/bitcoin-sv/spv-wallet/engine/chainstate"
 	"github.com/bitcoin-sv/spv-wallet/engine/utils"
-	"github.com/libsv/go-bc"
-	"github.com/tonicpow/go-minercraft/v2"
 )
 
 // chainStateBase is the base interface / methods
@@ -48,10 +46,6 @@ func (c *chainStateBase) IsNewRelicEnabled() bool {
 	return true
 }
 
-func (c *chainStateBase) Minercraft() minercraft.ClientInterface {
-	return nil
-}
-
 func (c *chainStateBase) Network() chainstate.Network {
 	return chainstate.MainNet
 }
@@ -73,28 +67,22 @@ func (c *chainStateEverythingInMempool) Broadcast(context.Context, string, strin
 func (c *chainStateEverythingInMempool) QueryTransaction(_ context.Context, id string,
 	_ chainstate.RequiredIn, _ time.Duration,
 ) (*chainstate.TransactionInfo, error) {
-	minerID, _ := utils.RandomHex(32)
 	return &chainstate.TransactionInfo{
-		BlockHash:     "",
-		BlockHeight:   0,
-		Confirmations: 0,
-		ID:            id,
-		MinerID:       minerID,
-		Provider:      "some-miner-name",
+		BlockHash:   "",
+		BlockHeight: 0,
+		ID:          id,
+		Provider:    "some-miner-name",
 	}, nil
 }
 
 func (c *chainStateEverythingInMempool) QueryTransactionFastest(_ context.Context, id string, _ chainstate.RequiredIn,
 	_ time.Duration,
 ) (*chainstate.TransactionInfo, error) {
-	minerID, _ := utils.RandomHex(32)
 	return &chainstate.TransactionInfo{
-		BlockHash:     "",
-		BlockHeight:   0,
-		Confirmations: 0,
-		ID:            id,
-		MinerID:       minerID,
-		Provider:      "some-miner-name",
+		BlockHash:   "",
+		BlockHeight: 0,
+		ID:          id,
+		Provider:    "some-miner-name",
 	}, nil
 }
 
@@ -115,17 +103,10 @@ func (c *chainStateEverythingOnChain) QueryTransaction(_ context.Context, id str
 ) (*chainstate.TransactionInfo, error) {
 	hash, _ := utils.RandomHex(32)
 	return &chainstate.TransactionInfo{
-		BlockHash:     hash,
-		BlockHeight:   600000,
-		Confirmations: 10,
-		ID:            id,
-		MinerID:       "",
-		Provider:      "whatsonchain",
-		MerkleProof: &bc.MerkleProof{
-			Index:  37008,
-			TxOrID: id,
-			Nodes:  []string{"3228f78cfd3c96262ec521225f1b9dd6326b4d3e245d1551bb06258f2101cb65", "05267706279d2e5ebcf89ed0645d4283108c7e850cdb84aeb0974738ae447a8d"},
-		},
+		BlockHash:   hash,
+		BlockHeight: 600000,
+		ID:          id,
+		Provider:    "whatsonchain",
 	}, nil
 }
 
@@ -134,17 +115,10 @@ func (c *chainStateEverythingOnChain) QueryTransactionFastest(_ context.Context,
 ) (*chainstate.TransactionInfo, error) {
 	hash, _ := utils.RandomHex(32)
 	return &chainstate.TransactionInfo{
-		BlockHash:     hash,
-		BlockHeight:   600000,
-		Confirmations: 10,
-		ID:            id,
-		MinerID:       "",
-		Provider:      "whatsonchain",
-		MerkleProof: &bc.MerkleProof{
-			Index:  37008,
-			TxOrID: id,
-			Nodes:  []string{"3228f78cfd3c96262ec521225f1b9dd6326b4d3e245d1551bb06258f2101cb65", "05267706279d2e5ebcf89ed0645d4283108c7e850cdb84aeb0974738ae447a8d"},
-		},
+		BlockHash:   hash,
+		BlockHeight: 600000,
+		ID:          id,
+		Provider:    "whatsonchain",
 	}, nil
 }
 
