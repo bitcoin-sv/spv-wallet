@@ -2,9 +2,9 @@ package engine
 
 import (
 	"context"
-	"github.com/bitcoin-sv/spv-wallet/spverrors"
 
 	"github.com/bitcoin-sv/spv-wallet/engine/datastore"
+	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 )
 
 // SyncTransaction is an object representing the chain-state sync configuration and results for a given transaction

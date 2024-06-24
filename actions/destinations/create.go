@@ -1,13 +1,13 @@
 package destinations
 
 import (
+	spverrors2 "github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"net/http"
 
 	"github.com/bitcoin-sv/spv-wallet/engine"
 	"github.com/bitcoin-sv/spv-wallet/engine/utils"
 	"github.com/bitcoin-sv/spv-wallet/mappings"
 	"github.com/bitcoin-sv/spv-wallet/server/auth"
-	"github.com/bitcoin-sv/spv-wallet/spverrors"
 	"github.com/gin-gonic/gin"
 )
 
@@ -27,16 +27,16 @@ func (a *Action) create(c *gin.Context) {
 	reqXPub := c.GetString(auth.ParamXPubKey)
 	xPub, err := a.Services.SpvWalletEngine.GetXpub(c.Request.Context(), reqXPub)
 	if err != nil {
-		spverrors.ErrorResponse(c, err, a.Services.Logger)
+		spverrors2.ErrorResponse(c, err, a.Services.Logger)
 		return
 	} else if xPub == nil {
-		spverrors.ErrorResponse(c, spverrors.ErrCouldNotFindXpub, a.Services.Logger)
+		spverrors2.ErrorResponse(c, spverrors2.ErrCouldNotFindXpub, a.Services.Logger)
 		return
 	}
 
 	var requestBody CreateDestination
 	if err = c.Bind(&requestBody); err != nil {
-		spverrors.ErrorResponse(c, spverrors.ErrCannotBindRequest, a.Services.Logger)
+		spverrors2.ErrorResponse(c, spverrors2.ErrCannotBindRequest, a.Services.Logger)
 		return
 	}
 
@@ -54,7 +54,7 @@ func (a *Action) create(c *gin.Context) {
 		utils.ScriptTypePubKeyHash,
 		opts...,
 	); err != nil {
-		spverrors.ErrorResponse(c, err, a.Services.Logger)
+		spverrors2.ErrorResponse(c, err, a.Services.Logger)
 		return
 	}
 

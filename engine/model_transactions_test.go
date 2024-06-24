@@ -3,11 +3,11 @@ package engine
 import (
 	"context"
 	"database/sql"
-	"github.com/bitcoin-sv/spv-wallet/spverrors"
 	"testing"
 
 	"github.com/bitcoin-sv/spv-wallet/engine/datastore"
 	customTypes "github.com/bitcoin-sv/spv-wallet/engine/datastore/customtypes"
+	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/bitcoin-sv/spv-wallet/engine/utils"
 	"github.com/libsv/go-bt/v2"
 	"github.com/libsv/go-bt/v2/bscript"

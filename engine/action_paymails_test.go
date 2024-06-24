@@ -1,9 +1,9 @@
 package engine
 
 import (
-	"github.com/bitcoin-sv/spv-wallet/spverrors"
 	"testing"
 
+	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )

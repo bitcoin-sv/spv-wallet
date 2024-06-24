@@ -3,10 +3,10 @@ package engine
 import (
 	"context"
 	"fmt"
-	"github.com/bitcoin-sv/spv-wallet/spverrors"
 
 	"github.com/bitcoin-sv/go-paymail"
 	"github.com/bitcoin-sv/spv-wallet/engine/datastore"
+	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 )
 
 func (c *Client) UpsertContact(ctx context.Context, ctcFName, ctcPaymail, requesterXPubID, requesterPaymail string, opts ...ModelOps) (*Contact, error) {
@@ -59,7 +59,7 @@ func (c *Client) AddContactRequest(ctx context.Context, fullName, paymailAdress,
 
 	contactPki, err := pmSrvnt.GetPkiForPaymail(ctx, contactPm)
 	if err != nil {
-		return nil, fmt.Errorf("geting PKI for %s failed. Reason: %w", paymailAdress, err)
+		return nil, fmt.Errorf("getting PKI for %s failed. Reason: %w", paymailAdress, err)
 	}
 
 	// check if exists already
@@ -138,7 +138,7 @@ func (c *Client) GetContactsCount(ctx context.Context, metadata *Metadata, condi
 func (c *Client) UpdateContact(ctx context.Context, id, fullName string, metadata *Metadata) (*Contact, error) {
 	contact, err := getContactByID(ctx, id, c.DefaultModelOptions()...)
 	if err != nil {
-		c.logContactError("", "", fmt.Sprintf("error while geting contact: %s", err.Error()))
+		c.logContactError("", "", fmt.Sprintf("error while getting contact: %s", err.Error()))
 		return nil, err
 	}
 
@@ -160,7 +160,7 @@ func (c *Client) UpdateContact(ctx context.Context, id, fullName string, metadat
 func (c *Client) AdminChangeContactStatus(ctx context.Context, id string, status ContactStatus) (*Contact, error) {
 	contact, err := getContactByID(ctx, id, c.DefaultModelOptions()...)
 	if err != nil {
-		c.logContactError("", "", fmt.Sprintf("error while geting contact: %s", err.Error()))
+		c.logContactError("", "", fmt.Sprintf("error while getting contact: %s", err.Error()))
 		return nil, err
 	}
 
@@ -192,7 +192,7 @@ func (c *Client) AdminChangeContactStatus(ctx context.Context, id string, status
 func (c *Client) DeleteContact(ctx context.Context, id string) error {
 	contact, err := getContactByID(ctx, id, c.DefaultModelOptions()...)
 	if err != nil {
-		c.logContactError("", "", fmt.Sprintf("error while geting contact: %s", err.Error()))
+		c.logContactError("", "", fmt.Sprintf("error while getting contact: %s", err.Error()))
 		return err
 	}
 
@@ -213,7 +213,7 @@ func (c *Client) DeleteContact(ctx context.Context, id string) error {
 func (c *Client) AcceptContact(ctx context.Context, xPubID, paymail string) error {
 	contact, err := getContact(ctx, paymail, xPubID, c.DefaultModelOptions()...)
 	if err != nil {
-		c.logContactError(xPubID, paymail, fmt.Sprintf("unexpected error while geting contact: %s", err.Error()))
+		c.logContactError(xPubID, paymail, fmt.Sprintf("unexpected error while getting contact: %s", err.Error()))
 		return err
 	}
 	if contact == nil {
@@ -236,7 +236,7 @@ func (c *Client) AcceptContact(ctx context.Context, xPubID, paymail string) erro
 func (c *Client) RejectContact(ctx context.Context, xPubID, paymail string) error {
 	contact, err := getContact(ctx, paymail, xPubID, c.DefaultModelOptions()...)
 	if err != nil {
-		c.logContactError(xPubID, paymail, fmt.Sprintf("unexpected error while geting contact: %s", err.Error()))
+		c.logContactError(xPubID, paymail, fmt.Sprintf("unexpected error while getting contact: %s", err.Error()))
 		return err
 	}
 	if contact == nil {
@@ -259,7 +259,7 @@ func (c *Client) RejectContact(ctx context.Context, xPubID, paymail string) erro
 func (c *Client) ConfirmContact(ctx context.Context, xPubID, paymail string) error {
 	contact, err := getContact(ctx, paymail, xPubID, c.DefaultModelOptions()...)
 	if err != nil {
-		c.logContactError(xPubID, paymail, fmt.Sprintf("unexpected error while geting contact: %s", err.Error()))
+		c.logContactError(xPubID, paymail, fmt.Sprintf("unexpected error while getting contact: %s", err.Error()))
 		return err
 	}
 	if contact == nil {
@@ -282,7 +282,7 @@ func (c *Client) ConfirmContact(ctx context.Context, xPubID, paymail string) err
 func (c *Client) UnconfirmContact(ctx context.Context, xPubID, paymail string) error {
 	contact, err := getContact(ctx, paymail, xPubID, c.DefaultModelOptions()...)
 	if err != nil {
-		c.logContactError(xPubID, paymail, fmt.Sprintf("unexpected error while geting contact: %s", err.Error()))
+		c.logContactError(xPubID, paymail, fmt.Sprintf("unexpected error while getting contact: %s", err.Error()))
 		return err
 	}
 	if contact == nil {
@@ -334,7 +334,7 @@ func (c *Client) getPaymail(ctx context.Context, xpubID, paymailAddr string) (*P
 func (c *Client) upsertContact(ctx context.Context, pmSrvnt *PaymailServant, reqXPubID, ctcFName string, ctcPaymail *paymail.SanitisedPaymail, opts ...ModelOps) (*Contact, error) {
 	contactPki, err := pmSrvnt.GetPkiForPaymail(ctx, ctcPaymail)
 	if err != nil {
-		return nil, fmt.Errorf("geting PKI for %s failed. Reason: %w", ctcPaymail.Address, err)
+		return nil, fmt.Errorf("getting PKI for %s failed. Reason: %w", ctcPaymail.Address, err)
 	}
 
 	// check if exists already

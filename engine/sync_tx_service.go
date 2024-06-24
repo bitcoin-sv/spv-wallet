@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"github.com/bitcoin-sv/spv-wallet/spverrors"
 	"runtime"
 	"sync"
 	"time"
@@ -14,6 +13,7 @@ import (
 	"github.com/bitcoin-sv/spv-wallet/engine/chainstate"
 	"github.com/bitcoin-sv/spv-wallet/engine/datastore"
 	"github.com/bitcoin-sv/spv-wallet/engine/notifications"
+	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 )
 
 // processSyncTransactions will process sync transaction records

@@ -2,10 +2,8 @@ module github.com/bitcoin-sv/spv-wallet/models
 
 go 1.22.4
 
-replace github.com/bitcoin-sv/spv-wallet/spverrors => ./../spverrors
 
 require (
-	github.com/bitcoin-sv/spv-wallet/spverrors v0.0.0-00010101000000-000000000000
 	github.com/stretchr/testify v1.9.0
 )
 

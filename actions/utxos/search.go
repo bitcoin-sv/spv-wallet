@@ -1,6 +1,7 @@
 package utxos
 
 import (
+	spverrors2 "github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"net/http"
 
 	"github.com/bitcoin-sv/spv-wallet/engine"
@@ -8,7 +9,6 @@ import (
 	"github.com/bitcoin-sv/spv-wallet/models"
 	"github.com/bitcoin-sv/spv-wallet/models/filter"
 	"github.com/bitcoin-sv/spv-wallet/server/auth"
-	"github.com/bitcoin-sv/spv-wallet/spverrors"
 	"github.com/gin-gonic/gin"
 )
 
@@ -29,7 +29,7 @@ func (a *Action) search(c *gin.Context) {
 
 	var reqParams filter.SearchUtxos
 	if err := c.Bind(&reqParams); err != nil {
-		spverrors.ErrorResponse(c, spverrors.ErrCannotBindRequest, a.Services.Logger)
+		spverrors2.ErrorResponse(c, spverrors2.ErrCannotBindRequest, a.Services.Logger)
 		return
 	}
 
@@ -47,7 +47,7 @@ func (a *Action) search(c *gin.Context) {
 		conditions,
 		mappings.MapToQueryParams(reqParams.QueryParams),
 	); err != nil {
-		spverrors.ErrorResponse(c, err, a.Services.Logger)
+		spverrors2.ErrorResponse(c, err, a.Services.Logger)
 		return
 	}
 

@@ -1,7 +1,7 @@
 package filter
 
 import (
-	"github.com/bitcoin-sv/spv-wallet/spverrors"
+	"errors"
 	"reflect"
 	"strings"
 )
@@ -25,7 +25,7 @@ func checkStrOption(value string, options ...string) (string, error) {
 			return opt, nil
 		}
 	}
-	return "", spverrors.ErrInvalidFilterOption
+	return "", errors.New("invalid filter option")
 }
 
 func checkAndApplyStrOption(conditions map[string]interface{}, columnName string, value *string, options ...string) error {

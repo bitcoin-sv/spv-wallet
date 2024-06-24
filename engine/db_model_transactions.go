@@ -2,10 +2,10 @@ package engine
 
 import (
 	"context"
-	"github.com/bitcoin-sv/spv-wallet/spverrors"
 
 	"github.com/bitcoin-sv/spv-wallet/engine/datastore"
 	"github.com/bitcoin-sv/spv-wallet/engine/notifications"
+	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 )
 
 // GetModelTableName will get the db table name of the current model

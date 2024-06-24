@@ -1,11 +1,11 @@
 package accesskeys
 
 import (
+	spverrors2 "github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"net/http"
 
 	"github.com/bitcoin-sv/spv-wallet/mappings"
 	"github.com/bitcoin-sv/spv-wallet/server/auth"
-	"github.com/bitcoin-sv/spv-wallet/spverrors"
 	"github.com/gin-gonic/gin"
 )
 
@@ -27,7 +27,7 @@ func (a *Action) get(c *gin.Context) {
 
 	id := c.Query("id")
 	if id == "" {
-		spverrors.ErrorResponse(c, spverrors.ErrMissingFieldID, a.Services.Logger)
+		spverrors2.ErrorResponse(c, spverrors2.ErrMissingFieldID, a.Services.Logger)
 		return
 	}
 
@@ -36,12 +36,12 @@ func (a *Action) get(c *gin.Context) {
 		c.Request.Context(), reqXPubID, id,
 	)
 	if err != nil {
-		spverrors.ErrorResponse(c, err, a.Services.Logger)
+		spverrors2.ErrorResponse(c, err, a.Services.Logger)
 		return
 	}
 
 	if accessKey.XpubID != reqXPubID {
-		spverrors.ErrorResponse(c, spverrors.ErrAuthorization, a.Services.Logger)
+		spverrors2.ErrorResponse(c, spverrors2.ErrAuthorization, a.Services.Logger)
 		return
 	}
 

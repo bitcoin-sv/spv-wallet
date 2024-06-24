@@ -3,11 +3,11 @@ package engine
 import (
 	"context"
 	"fmt"
-	"github.com/bitcoin-sv/spv-wallet/spverrors"
 	"net/http"
 	"testing"
 
 	"github.com/bitcoin-sv/spv-wallet/engine/chainstate"
+	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/bitcoin-sv/spv-wallet/engine/utils"
 	magic "github.com/bitcoinschema/go-map"
 	"github.com/rs/zerolog"

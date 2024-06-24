@@ -3,11 +3,12 @@ package chainstate
 import (
 	"context"
 	"errors"
-	"github.com/bitcoin-sv/spv-wallet/spverrors"
-	"github.com/libsv/go-bc"
 	"strings"
 	"sync"
 	"time"
+
+	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
+	"github.com/libsv/go-bc"
 )
 
 // query will try ALL providers in order and return the first "valid" response based on requirements

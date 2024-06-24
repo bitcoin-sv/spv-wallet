@@ -5,8 +5,9 @@ package chainstate
 
 import (
 	"context"
-	"github.com/bitcoin-sv/spv-wallet/spverrors"
 	"time"
+
+	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 )
 
 // HexFormatFlag transaction hex format

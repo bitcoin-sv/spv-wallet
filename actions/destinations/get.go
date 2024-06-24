@@ -1,12 +1,12 @@
 package destinations
 
 import (
+	spverrors2 "github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"net/http"
 
 	"github.com/bitcoin-sv/spv-wallet/engine"
 	"github.com/bitcoin-sv/spv-wallet/mappings"
 	"github.com/bitcoin-sv/spv-wallet/server/auth"
-	"github.com/bitcoin-sv/spv-wallet/spverrors"
 	"github.com/gin-gonic/gin"
 )
 
@@ -31,7 +31,7 @@ func (a *Action) get(c *gin.Context) {
 	address := c.Query("address")
 	lockingScript := c.Query("locking_script")
 	if id == "" && address == "" && lockingScript == "" {
-		spverrors.ErrorResponse(c, spverrors.ErrOneOfTheFieldsIsRequired, a.Services.Logger)
+		spverrors2.ErrorResponse(c, spverrors2.ErrOneOfTheFieldsIsRequired, a.Services.Logger)
 		return
 	}
 
@@ -51,7 +51,7 @@ func (a *Action) get(c *gin.Context) {
 		)
 	}
 	if err != nil {
-		spverrors.ErrorResponse(c, err, a.Services.Logger)
+		spverrors2.ErrorResponse(c, err, a.Services.Logger)
 		return
 	}
 

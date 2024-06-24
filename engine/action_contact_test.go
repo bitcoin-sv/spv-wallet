@@ -2,10 +2,10 @@ package engine
 
 import (
 	"context"
-	"github.com/bitcoin-sv/spv-wallet/spverrors"
 	"testing"
 	"time"
 
+	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/stretchr/testify/require"
 )
 
@@ -75,7 +75,7 @@ func TestAcceptContactErrorPath(t *testing.T) {
 	testCases := []testCase{
 		{
 			testID: 1,
-			name:   "non existance contact, should return \"contact not found\" error",
+			name:   "non existence contact, should return \"contact not found\" error",
 			data: testCaseData{
 				xPub:          xPubForNotFoundContact,
 				paymail:       paymailGeneric,
@@ -190,7 +190,7 @@ func TestRejectContactErrorPath(t *testing.T) {
 	testCases := []testCase{
 		{
 			testID: 1,
-			name:   "non existance contact, should return \"contact not found\" error",
+			name:   "non existence contact, should return \"contact not found\" error",
 			data: testCaseData{
 				xPub:          xPubForNotFoundContact,
 				paymail:       paymailGeneric,

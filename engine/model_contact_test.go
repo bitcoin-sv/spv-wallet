@@ -4,11 +4,11 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"github.com/bitcoin-sv/spv-wallet/spverrors"
 	"strings"
 	"testing"
 	"time"
 
+	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/stretchr/testify/require"
 )
 
@@ -266,7 +266,7 @@ func Test_getContacts(t *testing.T) {
 
 		xpubID := "xpubid"
 
-		// fullfill db
+		// fulfill db
 		saveContactsN(xpubID, ContactAwaitAccept, 10, client)
 		saveContactsN(xpubID, ContactNotConfirmed, 13, client)
 
@@ -295,7 +295,7 @@ func Test_getContacts(t *testing.T) {
 
 		xpubID := "xpubid"
 
-		// fullfill db
+		// fulfill db
 		saveContactsN(xpubID, ContactAwaitAccept, 10, client)
 		saveContactsN(xpubID, ContactNotConfirmed, 13, client)
 
@@ -315,7 +315,7 @@ func Test_getContacts(t *testing.T) {
 
 		xpubID := "xpubid"
 
-		// fullfill db
+		// fulfill db
 		saveContactsN(xpubID, ContactAwaitAccept, 10, client)
 		saveContactsN("other-xpub", ContactNotConfirmed, 13, client)
 
@@ -335,7 +335,7 @@ func Test_getContacts(t *testing.T) {
 
 		xpubID := "xpubid"
 
-		// fullfill db
+		// fulfill db
 		saveContactsN(xpubID, ContactAwaitAccept, 10, client)
 		saveContactsDeletedN(xpubID, ContactNotConfirmed, 13, client)
 

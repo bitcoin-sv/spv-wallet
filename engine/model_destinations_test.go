@@ -1,11 +1,11 @@
 package engine
 
 import (
-	"github.com/bitcoin-sv/spv-wallet/spverrors"
 	"testing"
 
 	"github.com/DATA-DOG/go-sqlmock"
 	"github.com/bitcoin-sv/spv-wallet/engine/datastore"
+	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/bitcoin-sv/spv-wallet/engine/tester"
 	"github.com/bitcoin-sv/spv-wallet/engine/utils"
 	bscript2 "github.com/libsv/go-bt/v2/bscript"

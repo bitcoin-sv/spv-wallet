@@ -2,9 +2,9 @@ package engine
 
 import (
 	"context"
-	"github.com/bitcoin-sv/spv-wallet/spverrors"
 
 	"github.com/bitcoin-sv/spv-wallet/engine/datastore"
+	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 )
 
 // NewDestination will get a new destination for an existing xPub

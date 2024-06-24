@@ -24,10 +24,10 @@ func (s *PaymailServant) GetSanitizedPaymail(addr string) (*paymail.SanitisedPay
 		return nil, err
 	}
 
-	sanitised := &paymail.SanitisedPaymail{}
+	sanitized := &paymail.SanitisedPaymail{}
 	sanitised.Alias, sanitised.Domain, sanitised.Address = paymail.SanitizePaymail(addr)
 
-	return sanitised, nil
+	return sanitized, nil
 }
 
 func (s *PaymailServant) GetPkiForPaymail(ctx context.Context, sPaymail *paymail.SanitisedPaymail) (*paymail.PKIResponse, error) {

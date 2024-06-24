@@ -5,6 +5,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	spverrors2 "github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"io"
 	"net/http"
 	"strconv"
@@ -15,7 +16,6 @@ import (
 	"github.com/bitcoin-sv/spv-wallet/engine"
 	"github.com/bitcoin-sv/spv-wallet/engine/utils"
 	"github.com/bitcoin-sv/spv-wallet/models"
-	"github.com/bitcoin-sv/spv-wallet/spverrors"
 	"github.com/bitcoinschema/go-bitcoin/v2"
 	"github.com/gin-gonic/gin"
 	"github.com/libsv/go-bt/v2/bscript"
@@ -83,7 +83,7 @@ func BasicMiddleware(engine engine.ClientInterface, appConfig *config.AppConfig)
 		xPub := strings.TrimSpace(c.GetHeader(models.AuthHeader))
 		authAccessKey := strings.TrimSpace(c.GetHeader(models.AuthAccessKey))
 		if len(xPub) == 0 && len(authAccessKey) == 0 {
-			spverrors.AbortWithErrorResponse(c, spverrors.ErrMissingAuthHeader, nil)
+			spverrors2.AbortWithErrorResponse(c, spverrors2.ErrMissingAuthHeader, nil)
 			return
 		}
 
@@ -92,7 +92,7 @@ func BasicMiddleware(engine engine.ClientInterface, appConfig *config.AppConfig)
 		if xPub != "" {
 			// Validate that the xPub is an HD key (length, validation)
 			if _, err := utils.ValidateXPub(xPub); err != nil {
-				spverrors.AbortWithErrorResponse(c, spverrors.ErrAuthorization, nil)
+				spverrors2.AbortWithErrorResponse(c, spverrors2.ErrAuthorization, nil)
 				return
 			}
 
@@ -105,7 +105,7 @@ func BasicMiddleware(engine engine.ClientInterface, appConfig *config.AppConfig)
 		} else if authAccessKey != "" {
 			accessKey, err := engine.AuthenticateAccessKey(context.Background(), utils.Hash(authAccessKey))
 			if err != nil || accessKey == nil {
-				spverrors.AbortWithErrorResponse(c, spverrors.ErrAuthorization, nil)
+				spverrors2.AbortWithErrorResponse(c, spverrors2.ErrAuthorization, nil)
 				return
 			}
 
@@ -125,7 +125,7 @@ func AdminMiddleware() gin.HandlerFunc {
 		if c.GetBool(ParamAdminRequest) {
 			c.Next()
 		} else {
-			spverrors.AbortWithErrorResponse(c, spverrors.ErrNotAnAdminKey, nil)
+			spverrors2.AbortWithErrorResponse(c, spverrors2.ErrNotAnAdminKey, nil)
 		}
 	}
 }
@@ -134,7 +134,7 @@ func AdminMiddleware() gin.HandlerFunc {
 func SignatureMiddleware(appConfig *config.AppConfig, requireSigning, adminRequired bool) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		if c.Request.Body == nil {
-			spverrors.AbortWithErrorResponse(c, spverrors.ErrMissingBody, nil)
+			spverrors2.AbortWithErrorResponse(c, spverrors2.ErrMissingBody, nil)
 			return
 		}
 		defer func() {
@@ -142,7 +142,7 @@ func SignatureMiddleware(appConfig *config.AppConfig, requireSigning, adminRequi
 		}()
 		b, err := io.ReadAll(c.Request.Body)
 		if err != nil {
-			spverrors.AbortWithErrorResponse(c, spverrors.ErrAuthorization, nil)
+			spverrors2.AbortWithErrorResponse(c, spverrors2.ErrAuthorization, nil)
 		}
 
 		c.Request.Body = io.NopCloser(bytes.NewReader(b))
@@ -161,7 +161,7 @@ func SignatureMiddleware(appConfig *config.AppConfig, requireSigning, adminRequi
 		// adminRequired will always force checking of a signature
 		if (requireSigning || adminRequired) && !appConfig.Authentication.SigningDisabled {
 			if err = checkSignature(authData); err != nil {
-				spverrors.AbortWithErrorResponse(c, spverrors.ErrCheckSignature, nil)
+				spverrors2.AbortWithErrorResponse(c, spverrors2.ErrCheckSignature, nil)
 			}
 			c.Set(ParamAuthSigned, true)
 		} else {
@@ -171,7 +171,7 @@ func SignatureMiddleware(appConfig *config.AppConfig, requireSigning, adminRequi
 
 			// NOTE: you can not use an access key if signing is invalid - ever
 			if authData.accessKey != "" && err != nil {
-				spverrors.AbortWithErrorResponse(c, spverrors.ErrCheckSignature, nil)
+				spverrors2.AbortWithErrorResponse(c, spverrors2.ErrCheckSignature, nil)
 			}
 		}
 		c.Next()
@@ -184,16 +184,16 @@ func CallbackTokenMiddleware(appConfig *config.AppConfig) gin.HandlerFunc {
 		const BearerSchema = "Bearer "
 		authHeader := c.GetHeader("Authorization")
 		if authHeader == "" {
-			spverrors.AbortWithErrorResponse(c, spverrors.ErrMissingAuthHeader, nil)
+			spverrors2.AbortWithErrorResponse(c, spverrors2.ErrMissingAuthHeader, nil)
 		}
 
 		if !strings.HasPrefix(authHeader, BearerSchema) || len(authHeader) <= len(BearerSchema) {
-			spverrors.AbortWithErrorResponse(c, spverrors.ErrInvalidOrMissingToken, nil)
+			spverrors2.AbortWithErrorResponse(c, spverrors2.ErrInvalidOrMissingToken, nil)
 		}
 
 		providedToken := authHeader[len(BearerSchema):]
 		if providedToken != appConfig.Nodes.Callback.Token {
-			spverrors.AbortWithErrorResponse(c, spverrors.ErrInvalidToken, nil)
+			spverrors2.AbortWithErrorResponse(c, spverrors2.ErrInvalidToken, nil)
 		}
 
 		c.Next()

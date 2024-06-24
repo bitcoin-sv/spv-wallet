@@ -2,7 +2,8 @@ package engine
 
 import (
 	"context"
-	"github.com/bitcoin-sv/spv-wallet/spverrors"
+
+	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 )
 
 // AuthenticateAccessKey check if access key exists

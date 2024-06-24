@@ -2,11 +2,11 @@ package chainstate
 
 import (
 	"context"
-	"github.com/bitcoin-sv/spv-wallet/spverrors"
 	"testing"
 
 	broadcast_client_mock "github.com/bitcoin-sv/go-broadcast-client/broadcast/broadcast-client-mock"
 	broadcast_fixtures "github.com/bitcoin-sv/go-broadcast-client/broadcast/broadcast-client-mock/fixtures"
+	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
