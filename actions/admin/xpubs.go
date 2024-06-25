@@ -1,10 +1,10 @@
 package admin
 
 import (
-	spverrors2 "github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"net/http"
 
 	"github.com/bitcoin-sv/spv-wallet/engine"
+	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/bitcoin-sv/spv-wallet/mappings"
 	"github.com/bitcoin-sv/spv-wallet/models"
 	"github.com/bitcoin-sv/spv-wallet/models/filter"
@@ -26,7 +26,7 @@ import (
 func (a *Action) xpubsCreate(c *gin.Context) {
 	var requestBody CreateXpub
 	if err := c.Bind(&requestBody); err != nil {
-		spverrors2.ErrorResponse(c, spverrors2.ErrCannotBindRequest, a.Services.Logger)
+		spverrors.ErrorResponse(c, spverrors.ErrCannotBindRequest, a.Services.Logger)
 		return
 	}
 
@@ -35,7 +35,7 @@ func (a *Action) xpubsCreate(c *gin.Context) {
 		engine.WithMetadatas(requestBody.Metadata),
 	)
 	if err != nil {
-		spverrors2.ErrorResponse(c, err, a.Services.Logger)
+		spverrors.ErrorResponse(c, err, a.Services.Logger)
 		return
 	}
 
@@ -58,7 +58,7 @@ func (a *Action) xpubsCreate(c *gin.Context) {
 func (a *Action) xpubsSearch(c *gin.Context) {
 	var reqParams filter.SearchXpubs
 	if err := c.Bind(&reqParams); err != nil {
-		spverrors2.ErrorResponse(c, spverrors2.ErrCannotBindRequest, a.Services.Logger)
+		spverrors.ErrorResponse(c, spverrors.ErrCannotBindRequest, a.Services.Logger)
 		return
 	}
 
@@ -69,7 +69,7 @@ func (a *Action) xpubsSearch(c *gin.Context) {
 		mappings.MapToQueryParams(reqParams.QueryParams),
 	)
 	if err != nil {
-		spverrors2.ErrorResponse(c, err, a.Services.Logger)
+		spverrors.ErrorResponse(c, err, a.Services.Logger)
 		return
 	}
 
@@ -96,7 +96,7 @@ func (a *Action) xpubsSearch(c *gin.Context) {
 func (a *Action) xpubsCount(c *gin.Context) {
 	var reqParams filter.CountXpubs
 	if err := c.Bind(&reqParams); err != nil {
-		spverrors2.ErrorResponse(c, spverrors2.ErrCannotBindRequest, a.Services.Logger)
+		spverrors.ErrorResponse(c, spverrors.ErrCannotBindRequest, a.Services.Logger)
 		return
 	}
 
@@ -106,7 +106,7 @@ func (a *Action) xpubsCount(c *gin.Context) {
 		reqParams.Conditions.ToDbConditions(),
 	)
 	if err != nil {
-		spverrors2.ErrorResponse(c, err, a.Services.Logger)
+		spverrors.ErrorResponse(c, err, a.Services.Logger)
 		return
 	}
 

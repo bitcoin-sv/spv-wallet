@@ -1,10 +1,10 @@
 package transactions
 
 import (
-	spverrors2 "github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"net/http"
 
 	"github.com/bitcoin-sv/spv-wallet/engine"
+	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/bitcoin-sv/spv-wallet/mappings"
 	"github.com/bitcoin-sv/spv-wallet/server/auth"
 	"github.com/gin-gonic/gin"
@@ -27,16 +27,16 @@ func (a *Action) newTransaction(c *gin.Context) {
 
 	xPub, err := a.Services.SpvWalletEngine.GetXpub(c.Request.Context(), reqXPub)
 	if err != nil {
-		spverrors2.ErrorResponse(c, err, a.Services.Logger)
+		spverrors.ErrorResponse(c, err, a.Services.Logger)
 		return
 	} else if xPub == nil {
-		spverrors2.ErrorResponse(c, spverrors2.ErrCouldNotFindXpub, a.Services.Logger)
+		spverrors.ErrorResponse(c, spverrors.ErrCouldNotFindXpub, a.Services.Logger)
 		return
 	}
 
 	var requestBody NewTransaction
 	if err = c.Bind(&requestBody); err != nil {
-		spverrors2.ErrorResponse(c, spverrors2.ErrCannotBindRequest, a.Services.Logger)
+		spverrors.ErrorResponse(c, spverrors.ErrCannotBindRequest, a.Services.Logger)
 		return
 	}
 
@@ -54,7 +54,7 @@ func (a *Action) newTransaction(c *gin.Context) {
 		txConfig,
 		opts...,
 	); err != nil {
-		spverrors2.ErrorResponse(c, err, a.Services.Logger)
+		spverrors.ErrorResponse(c, err, a.Services.Logger)
 		return
 	}
 

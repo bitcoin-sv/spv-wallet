@@ -1,10 +1,10 @@
 package destinations
 
 import (
-	spverrors2 "github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"net/http"
 
 	"github.com/bitcoin-sv/spv-wallet/engine"
+	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/bitcoin-sv/spv-wallet/mappings"
 	"github.com/bitcoin-sv/spv-wallet/server/auth"
 	"github.com/gin-gonic/gin"
@@ -27,11 +27,11 @@ func (a *Action) update(c *gin.Context) {
 
 	var requestBody UpdateDestination
 	if err := c.Bind(&requestBody); err != nil {
-		spverrors2.ErrorResponse(c, spverrors2.ErrCannotBindRequest, a.Services.Logger)
+		spverrors.ErrorResponse(c, spverrors.ErrCannotBindRequest, a.Services.Logger)
 		return
 	}
 	if requestBody.ID == "" && requestBody.Address == "" && requestBody.LockingScript == "" {
-		spverrors2.ErrorResponse(c, spverrors2.ErrOneOfTheFieldsIsRequired, a.Services.Logger)
+		spverrors.ErrorResponse(c, spverrors.ErrOneOfTheFieldsIsRequired, a.Services.Logger)
 		return
 	}
 
@@ -52,7 +52,7 @@ func (a *Action) update(c *gin.Context) {
 		)
 	}
 	if err != nil {
-		spverrors2.ErrorResponse(c, err, a.Services.Logger)
+		spverrors.ErrorResponse(c, err, a.Services.Logger)
 		return
 	}
 

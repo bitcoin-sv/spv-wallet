@@ -1,10 +1,10 @@
 package admin
 
 import (
-	spverrors2 "github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"net/http"
 
 	"github.com/bitcoin-sv/spv-wallet/engine"
+	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/bitcoin-sv/spv-wallet/mappings"
 	"github.com/bitcoin-sv/spv-wallet/models"
 	"github.com/bitcoin-sv/spv-wallet/models/filter"
@@ -27,7 +27,7 @@ func (a *Action) paymailGetAddress(c *gin.Context) {
 	var requestBody PaymailAddress
 
 	if err := c.ShouldBindJSON(&requestBody); err != nil {
-		spverrors2.ErrorResponse(c, spverrors2.ErrCannotBindRequest, a.Services.Logger)
+		spverrors.ErrorResponse(c, spverrors.ErrCannotBindRequest, a.Services.Logger)
 		return
 	}
 
@@ -40,7 +40,7 @@ func (a *Action) paymailGetAddress(c *gin.Context) {
 
 	paymailAddress, err := a.Services.SpvWalletEngine.GetPaymailAddress(c.Request.Context(), requestBody.Address, opts...)
 	if err != nil {
-		spverrors2.ErrorResponse(c, err, a.Services.Logger)
+		spverrors.ErrorResponse(c, err, a.Services.Logger)
 		return
 	}
 
@@ -64,7 +64,7 @@ func (a *Action) paymailGetAddress(c *gin.Context) {
 func (a *Action) paymailAddressesSearch(c *gin.Context) {
 	var reqParams filter.AdminSearchPaymails
 	if err := c.Bind(&reqParams); err != nil {
-		spverrors2.ErrorResponse(c, spverrors2.ErrCannotBindRequest, a.Services.Logger)
+		spverrors.ErrorResponse(c, spverrors.ErrCannotBindRequest, a.Services.Logger)
 		return
 	}
 
@@ -75,7 +75,7 @@ func (a *Action) paymailAddressesSearch(c *gin.Context) {
 		mappings.MapToQueryParams(reqParams.QueryParams),
 	)
 	if err != nil {
-		spverrors2.ErrorResponse(c, err, a.Services.Logger)
+		spverrors.ErrorResponse(c, err, a.Services.Logger)
 		return
 	}
 
@@ -102,7 +102,7 @@ func (a *Action) paymailAddressesSearch(c *gin.Context) {
 func (a *Action) paymailAddressesCount(c *gin.Context) {
 	var reqParams filter.AdminCountPaymails
 	if err := c.Bind(&reqParams); err != nil {
-		spverrors2.ErrorResponse(c, spverrors2.ErrCannotBindRequest, a.Services.Logger)
+		spverrors.ErrorResponse(c, spverrors.ErrCannotBindRequest, a.Services.Logger)
 		return
 	}
 
@@ -112,7 +112,7 @@ func (a *Action) paymailAddressesCount(c *gin.Context) {
 		reqParams.Conditions.ToDbConditions(),
 	)
 	if err != nil {
-		spverrors2.ErrorResponse(c, err, a.Services.Logger)
+		spverrors.ErrorResponse(c, err, a.Services.Logger)
 		return
 	}
 
@@ -134,16 +134,16 @@ func (a *Action) paymailAddressesCount(c *gin.Context) {
 func (a *Action) paymailCreateAddress(c *gin.Context) {
 	var requestBody CreatePaymail
 	if err := c.ShouldBindJSON(&requestBody); err != nil {
-		spverrors2.ErrorResponse(c, spverrors2.ErrCannotBindRequest, a.Services.Logger)
+		spverrors.ErrorResponse(c, spverrors.ErrCannotBindRequest, a.Services.Logger)
 		return
 	}
 
 	if requestBody.Key == "" {
-		spverrors2.ErrorResponse(c, spverrors2.ErrMissingFieldXpub, a.Services.Logger)
+		spverrors.ErrorResponse(c, spverrors.ErrMissingFieldXpub, a.Services.Logger)
 		return
 	}
 	if requestBody.Address == "" {
-		spverrors2.ErrorResponse(c, spverrors2.ErrMissingAddress, a.Services.Logger)
+		spverrors.ErrorResponse(c, spverrors.ErrMissingAddress, a.Services.Logger)
 		return
 	}
 
@@ -181,12 +181,12 @@ func (a *Action) paymailCreateAddress(c *gin.Context) {
 func (a *Action) paymailDeleteAddress(c *gin.Context) {
 	var requestBody PaymailAddress
 	if err := c.ShouldBindJSON(&requestBody); err != nil {
-		spverrors2.ErrorResponse(c, spverrors2.ErrCannotBindRequest, a.Services.Logger)
+		spverrors.ErrorResponse(c, spverrors.ErrCannotBindRequest, a.Services.Logger)
 		return
 	}
 
 	if requestBody.Address == "" {
-		spverrors2.ErrorResponse(c, spverrors2.ErrMissingAddress, a.Services.Logger)
+		spverrors.ErrorResponse(c, spverrors.ErrMissingAddress, a.Services.Logger)
 		return
 	}
 
@@ -195,7 +195,7 @@ func (a *Action) paymailDeleteAddress(c *gin.Context) {
 	// Delete a new paymail address
 	err := a.Services.SpvWalletEngine.DeletePaymailAddress(c.Request.Context(), requestBody.Address, opts...)
 	if err != nil {
-		spverrors2.ErrorResponse(c, err, a.Services.Logger)
+		spverrors.ErrorResponse(c, err, a.Services.Logger)
 		return
 	}
 

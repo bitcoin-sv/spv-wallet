@@ -25,7 +25,7 @@ func (s *PaymailServant) GetSanitizedPaymail(addr string) (*paymail.SanitisedPay
 	}
 
 	sanitized := &paymail.SanitisedPaymail{}
-	sanitised.Alias, sanitised.Domain, sanitised.Address = paymail.SanitizePaymail(addr)
+	sanitized.Alias, sanitized.Domain, sanitized.Address = paymail.SanitizePaymail(addr)
 
 	return sanitized, nil
 }

@@ -1,9 +1,9 @@
 package transactions
 
 import (
-	spverrors2 "github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"net/http"
 
+	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/bitcoin-sv/spv-wallet/mappings"
 	"github.com/bitcoin-sv/spv-wallet/models"
 	"github.com/bitcoin-sv/spv-wallet/models/filter"
@@ -28,7 +28,7 @@ func (a *Action) search(c *gin.Context) {
 
 	var reqParams filter.SearchTransactions
 	if err := c.Bind(&reqParams); err != nil {
-		spverrors2.ErrorResponse(c, spverrors2.ErrCouldNotFindXpub, a.Services.Logger)
+		spverrors.ErrorResponse(c, spverrors.ErrCouldNotFindXpub, a.Services.Logger)
 		return
 	}
 
@@ -41,7 +41,7 @@ func (a *Action) search(c *gin.Context) {
 		mappings.MapToQueryParams(reqParams.QueryParams),
 	)
 	if err != nil {
-		spverrors2.ErrorResponse(c, err, a.Services.Logger)
+		spverrors.ErrorResponse(c, err, a.Services.Logger)
 		return
 	}
 

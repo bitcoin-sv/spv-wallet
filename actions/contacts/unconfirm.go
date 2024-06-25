@@ -1,9 +1,9 @@
 package contacts
 
 import (
-	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"net/http"
 
+	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/bitcoin-sv/spv-wallet/server/auth"
 	"github.com/gin-gonic/gin"
 )

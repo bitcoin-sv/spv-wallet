@@ -2,11 +2,11 @@ package admin
 
 import (
 	"errors"
-	spverrors2 "github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"net/http"
 
 	"github.com/bitcoin-sv/spv-wallet/engine"
 	"github.com/bitcoin-sv/spv-wallet/engine/datastore"
+	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/bitcoin-sv/spv-wallet/mappings"
 	"github.com/gin-gonic/gin"
 )
@@ -26,7 +26,7 @@ import (
 func (a *Action) transactionRecord(c *gin.Context) {
 	var requestBody RecordTransaction
 	if err := c.ShouldBindJSON(&requestBody); err != nil {
-		spverrors2.ErrorResponse(c, spverrors2.ErrCannotBindRequest, a.Services.Logger)
+		spverrors.ErrorResponse(c, spverrors.ErrCannotBindRequest, a.Services.Logger)
 		return
 	}
 
@@ -43,11 +43,11 @@ func (a *Action) transactionRecord(c *gin.Context) {
 		if errors.Is(err, datastore.ErrDuplicateKey) {
 			// already registered, just return the registered transaction
 			if transaction, err = a.Services.SpvWalletEngine.GetTransactionByHex(c.Request.Context(), requestBody.Hex); err != nil {
-				spverrors2.ErrorResponse(c, err, a.Services.Logger)
+				spverrors.ErrorResponse(c, err, a.Services.Logger)
 				return
 			}
 		} else {
-			spverrors2.ErrorResponse(c, err, a.Services.Logger)
+			spverrors.ErrorResponse(c, err, a.Services.Logger)
 			return
 		}
 	}

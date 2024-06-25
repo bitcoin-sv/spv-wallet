@@ -3,10 +3,10 @@ package contacts
 import (
 	"encoding/json"
 	"errors"
-	spverrors2 "github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"net/http"
 
 	"github.com/bitcoin-sv/spv-wallet/engine"
+	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/bitcoin-sv/spv-wallet/mappings"
 	"github.com/bitcoin-sv/spv-wallet/models"
 	"github.com/bitcoin-sv/spv-wallet/server/auth"
@@ -30,12 +30,12 @@ func (a *Action) upsert(c *gin.Context) {
 
 	var req UpsertContact
 	if err := json.NewDecoder(c.Request.Body).Decode(&req); err != nil {
-		spverrors2.ErrorResponse(c, spverrors2.ErrCannotBindRequest, a.Services.Logger)
+		spverrors.ErrorResponse(c, spverrors.ErrCannotBindRequest, a.Services.Logger)
 		return
 	}
 
 	if err := req.validate(); err != nil {
-		spverrors2.ErrorResponse(c, err, a.Services.Logger)
+		spverrors.ErrorResponse(c, err, a.Services.Logger)
 		return
 	}
 
@@ -45,8 +45,8 @@ func (a *Action) upsert(c *gin.Context) {
 		reqXPubID, req.RequesterPaymail,
 		engine.WithMetadatas(req.Metadata))
 
-	if err != nil && !errors.Is(err, spverrors2.ErrAddingContactRequest) {
-		spverrors2.ErrorResponse(c, err, a.Services.Logger)
+	if err != nil && !errors.Is(err, spverrors.ErrAddingContactRequest) {
+		spverrors.ErrorResponse(c, err, a.Services.Logger)
 		return
 	}
 
