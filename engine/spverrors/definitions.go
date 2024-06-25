@@ -186,6 +186,15 @@ var ErrDraftTxHasNoOutputs = models.SPVError{Message: "corresponding draft trans
 // ErrProcessP2PTx is when error occurred during processing p2p tx
 var ErrProcessP2PTx = models.SPVError{Message: "error during processing p2p transaction", StatusCode: 500, Code: "error-transaction-process-p2p"}
 
+// ErrInvalidHex is when cannot create tx from hex
+var ErrInvalidHex = models.SPVError{Message: "invalid hex", StatusCode: 400, Code: "error-transaction-invalid-hex"}
+
+// ErrEmptyRelatedDraftId is when related draft id is empty
+var ErrEmptyRelatedDraftId = models.SPVError{Message: "empty RelatedDraftID", StatusCode: 400, Code: "error-transaction-empty-related-draft-id"}
+
+// ErrEmptyXpubKey is when xpub key is empty
+var ErrEmptyXpubKey = models.SPVError{Message: "empty xPubKey", StatusCode: 400, Code: "error-transaction-empty-xpub-key"}
+
 //////////////////////////////////// UTXO ERRORS
 
 // ErrCouldNotFindUtxo is an error when a given utxo could not be found

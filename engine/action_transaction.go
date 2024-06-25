@@ -3,7 +3,6 @@ package engine
 import (
 	"context"
 	"errors"
-	"fmt"
 	"math"
 	"time"
 
@@ -26,7 +25,7 @@ func (c *Client) RecordTransaction(ctx context.Context, xPubKey, txHex, draftID 
 
 	tx, err := bt.NewTxFromString(txHex)
 	if err != nil {
-		return nil, fmt.Errorf("invalid hex: %w", err)
+		return nil, spverrors.ErrInvalidHex
 	}
 
 	rts, err := getOutgoingTxRecordStrategy(xPubKey, tx, draftID)

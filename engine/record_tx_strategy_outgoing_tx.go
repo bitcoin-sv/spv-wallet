@@ -2,7 +2,6 @@ package engine
 
 import (
 	"context"
-	"errors"
 	"fmt"
 
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
@@ -87,11 +86,11 @@ func (strategy *outgoingTx) Validate() error {
 	}
 
 	if strategy.RelatedDraftID == "" {
-		return errors.New("empty RelatedDraftID")
+		return spverrors.ErrEmptyRelatedDraftId
 	}
 
 	if strategy.XPubKey == "" {
-		return errors.New("empty xPubKey")
+		return spverrors.ErrEmptyXpubKey
 	}
 
 	return nil // is valid

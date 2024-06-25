@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 
 	"github.com/libsv/go-bt/v2"
 	"github.com/rs/zerolog"
@@ -28,8 +29,10 @@ func (strategy *internalIncomingTx) Execute(ctx context.Context, c ClientInterfa
 	// process
 	transaction := strategy.Tx
 	syncTx, err := GetSyncTransactionByID(ctx, transaction.ID, transaction.GetOptions(false)...)
-	if err != nil || syncTx == nil {
-		return nil, fmt.Errorf("getting syncTx failed. Reason: %w", err)
+	if err != nil {
+		return nil, err
+	} else if syncTx == nil {
+		return nil, spverrors.ErrCouldNotFindSyncTx
 	}
 
 	if strategy.broadcastNow || syncTx.BroadcastStatus == SyncStatusReady {
@@ -42,7 +45,7 @@ func (strategy *internalIncomingTx) Execute(ctx context.Context, c ClientInterfa
 				Str("txID", transaction.ID).
 				Msgf("broadcasting failed, transaction rejected! Reason: %s", err)
 
-			return nil, fmt.Errorf("broadcasting failed, transaction rejected! Reason: %w", err)
+			return nil, err
 		}
 	}
 
