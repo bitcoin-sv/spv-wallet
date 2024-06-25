@@ -2,12 +2,14 @@ package engine
 
 import (
 	"context"
+
 	"github.com/bitcoin-sv/go-paymail"
 	"github.com/bitcoin-sv/go-paymail/server"
 	"github.com/bitcoin-sv/spv-wallet/engine/chainstate"
 	"github.com/bitcoin-sv/spv-wallet/engine/cluster"
 	"github.com/bitcoin-sv/spv-wallet/engine/datastore"
-	"github.com/bitcoin-sv/spv-wallet/engine/notifications"
+
+	// "github.com/bitcoin-sv/spv-wallet/engine/notifications"
 	"github.com/bitcoin-sv/spv-wallet/engine/taskmanager"
 	"github.com/mrz1836/go-cachestore"
 )
@@ -83,9 +85,9 @@ func (c *Client) loadDatastore(ctx context.Context) (err error) {
 // loadNotificationClient will load the notifications client
 func (c *Client) loadNotificationClient() (err error) {
 	// Load notification if a custom interface was NOT provided
-	if c.options.notifications.ClientInterface == nil {
-		c.options.notifications.ClientInterface, err = notifications.NewClient(c.options.notifications.options...)
-	}
+	// if c.options.notifications.ClientInterface == nil {
+	// 	c.options.notifications.ClientInterface, err = notifications.NewClient(c.options.notifications.options...)
+	// }
 	return
 }
 

@@ -12,7 +12,6 @@ import (
 	"github.com/bitcoin-sv/go-paymail"
 	"github.com/bitcoin-sv/spv-wallet/engine/chainstate"
 	"github.com/bitcoin-sv/spv-wallet/engine/datastore"
-	"github.com/bitcoin-sv/spv-wallet/engine/notifications"
 )
 
 // processSyncTransactions will process sync transaction records
@@ -155,7 +154,7 @@ func broadcastSyncTransaction(ctx context.Context, syncTx *SyncTransaction) erro
 	}
 
 	// Fire a notification
-	notify(notifications.EventTypeBroadcast, syncTx)
+	// notify(notifications.EventTypeBroadcast, syncTx)
 
 	return nil
 }

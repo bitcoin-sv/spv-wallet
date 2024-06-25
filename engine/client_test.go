@@ -35,7 +35,7 @@ func TestClient_Debug(t *testing.T) {
 		assert.Equal(t, true, tc.IsDebug())
 		assert.Equal(t, true, tc.Cachestore().IsDebug())
 		assert.Equal(t, true, tc.Datastore().IsDebug())
-		assert.Equal(t, true, tc.Notifications().IsDebug())
+		// assert.Equal(t, true, tc.Notifications().IsDebug())
 	})
 }
 

@@ -15,7 +15,8 @@ import (
 	"github.com/bitcoin-sv/spv-wallet/engine/datastore"
 	"github.com/bitcoin-sv/spv-wallet/engine/logging"
 	"github.com/bitcoin-sv/spv-wallet/engine/metrics"
-	"github.com/bitcoin-sv/spv-wallet/engine/notifications"
+
+	// "github.com/bitcoin-sv/spv-wallet/engine/notifications"
 	"github.com/bitcoin-sv/spv-wallet/engine/taskmanager"
 	"github.com/bitcoin-sv/spv-wallet/engine/utils"
 	"github.com/coocood/freecache"
@@ -86,10 +87,10 @@ func defaultClientOptions() *clientOptions {
 		newRelic: &newRelicOptions{},
 
 		// Blank notifications config
-		notifications: &notificationsOptions{
-			ClientInterface: nil,
-			webhookEndpoint: "",
-		},
+		// notifications: &notificationsOptions{
+		// 	ClientInterface: nil,
+		// 	webhookEndpoint: "",
+		// },
 
 		// Blank Paymail config
 		paymail: &paymailOptions{
@@ -211,7 +212,6 @@ func WithDebugging() ClientOps {
 		c.cacheStore.options = append(c.cacheStore.options, cachestore.WithDebugging())
 		c.chainstate.options = append(c.chainstate.options, chainstate.WithDebugging())
 		c.dataStore.options = append(c.dataStore.options, datastore.WithDebugging())
-		c.notifications.options = append(c.notifications.options, notifications.WithDebugging())
 	}
 }
 
@@ -260,10 +260,10 @@ func WithLogger(customLogger *zerolog.Logger) ClientOps {
 			// Enable the logger on all SPV Wallet Engine services
 			chainstateLogger := customLogger.With().Str("subservice", "chainstate").Logger()
 			taskManagerLogger := customLogger.With().Str("subservice", "taskManager").Logger()
-			notificationsLogger := customLogger.With().Str("subservice", "notifications").Logger()
+			// notificationsLogger := customLogger.With().Str("subservice", "notifications").Logger()
 			c.chainstate.options = append(c.chainstate.options, chainstate.WithLogger(&chainstateLogger))
 			c.taskManager.options = append(c.taskManager.options, taskmanager.WithLogger(&taskManagerLogger))
-			c.notifications.options = append(c.notifications.options, notifications.WithLogger(&notificationsLogger))
+			// c.notifications.options = append(c.notifications.options, notifications.WithLogger(&notificationsLogger))
 
 			// Enable the logger on all external services
 			var datastoreLogger *logging.GormLoggerAdapter
@@ -611,15 +611,6 @@ func WithNotifications(webhookEndpoint string) ClientOps {
 	return func(c *clientOptions) {
 		if len(webhookEndpoint) > 0 {
 			c.notifications.webhookEndpoint = webhookEndpoint
-		}
-	}
-}
-
-// WithCustomNotifications will set a custom notifications interface
-func WithCustomNotifications(customNotifications notifications.ClientInterface) ClientOps {
-	return func(c *clientOptions) {
-		if customNotifications != nil {
-			c.notifications.ClientInterface = customNotifications
 		}
 	}
 }

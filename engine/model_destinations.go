@@ -7,7 +7,6 @@ import (
 
 	"github.com/bitcoin-sv/spv-wallet/engine/cluster"
 	"github.com/bitcoin-sv/spv-wallet/engine/datastore"
-	"github.com/bitcoin-sv/spv-wallet/engine/notifications"
 	"github.com/bitcoin-sv/spv-wallet/engine/utils"
 	"github.com/bitcoinschema/go-bitcoin/v2"
 )
@@ -367,7 +366,7 @@ func (m *Destination) AfterCreated(ctx context.Context) error {
 		return err
 	}
 
-	notify(notifications.EventTypeCreate, m)
+	// notify(notifications.EventTypeCreate, m)
 
 	m.Client().Logger().Debug().
 		Str("destinationID", m.ID).
@@ -418,7 +417,7 @@ func (m *Destination) AfterUpdated(ctx context.Context) error {
 		return err
 	}
 
-	notify(notifications.EventTypeUpdate, m)
+	// notify(notifications.EventTypeUpdate, m)
 
 	m.Client().Logger().Debug().
 		Str("destinationID", m.ID).
@@ -449,7 +448,7 @@ func (m *Destination) AfterDeleted(ctx context.Context) error {
 		}
 	}
 
-	notify(notifications.EventTypeDelete, m)
+	// notify(notifications.EventTypeDelete, m)
 
 	m.Client().Logger().Debug().
 		Str("destinationID", m.ID).
