@@ -73,15 +73,15 @@ func getDbDefaults() *DbConfig {
 	return &DbConfig{
 		Datastore: &DatastoreConfig{
 			Debug:       false,
-			Engine:      "postgresql",
+			Engine:      "sqlite",
 			TablePrefix: "xapi",
 		},
 		SQL: &datastore.SQLConfig{
 			Driver:             "postgresql",
 			ExistingConnection: nil,
 			Host:               "localhost",
-			Name:               "postgres",
-			Password:           "postgres",
+			Name:               "xapi",
+			Password:           "",
 			Port:               "5432",
 			Replica:            false,
 			TimeZone:           "UTC",
@@ -99,7 +99,7 @@ func getDbDefaults() *DbConfig {
 
 func getLoggingDefaults() *LoggingConfig {
 	return &LoggingConfig{
-		Level:        "debug",
+		Level:        "info",
 		Format:       "console",
 		InstanceName: "spv-wallet",
 		LogOrigin:    false,
@@ -144,7 +144,7 @@ func getPaymailDefaults() *PaymailConfig {
 			BlockHeaderServiceAuthToken:           "mQZQ6WmxURxWz5ch", // #nosec G101
 		},
 		DefaultFromPaymail:      "from@domain.com",
-		Domains:                 []string{"localhost", "pawel.test.4chain.space"},
+		Domains:                 []string{"localhost"},
 		DomainValidationEnabled: true,
 		SenderValidationEnabled: false,
 	}
@@ -173,7 +173,7 @@ func getMetricsDefaults() *MetricsConfig {
 
 func getExperimentalFeaturesConfig() *ExperimentalConfig {
 	return &ExperimentalConfig{
-		PikeContactsEnabled: true,
-		PikePaymentEnabled:  true,
+		PikeContactsEnabled: false,
+		PikePaymentEnabled:  false,
 	}
 }
