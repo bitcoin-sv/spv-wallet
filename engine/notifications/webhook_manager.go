@@ -39,6 +39,7 @@ func NewWebhookManager(ctx context.Context, notifications *Notifications, reposi
 		webhookNotifiers: &sync.Map{},
 		ticker:           time.NewTicker(5 * time.Second),
 		notifications:    notifications,
+		updateMsg:        make(chan bool),
 	}
 
 	go manager.checkForUpdates()
@@ -52,7 +53,7 @@ func (w *WebhookManager) Stop() {
 
 func (w *WebhookManager) Subscribe(webhookModel *WebhookModel) error {
 	err := w.repository.CreateWebhook(webhookModel)
-	if err != nil {
+	if err == nil {
 		w.updateMsg <- true
 	}
 	return errors.Wrap(err, "failed to create webhook")
