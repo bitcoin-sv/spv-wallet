@@ -89,7 +89,6 @@ loop:
 func (w *WebhookNotifier) sendEventsToWebhook(events []Event) error {
 	data, err := json.Marshal(events)
 	if err != nil {
-		// Handle error, possibly log it
 		return errors.Wrap(err, "failed to marshal events")
 	}
 
