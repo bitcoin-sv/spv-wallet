@@ -108,7 +108,6 @@ func (w *WebhookManager) update() {
 	for _, model := range filteredWebhooks {
 		if _, ok := w.webhookNotifiers.Load(model.URL); !ok {
 			w.addNotifier(model)
-		} else {
 		}
 	}
 
@@ -120,6 +119,13 @@ func (w *WebhookManager) update() {
 		}
 		return true
 	})
+
+	// update definition of remained webhooks
+	for _, model := range filteredWebhooks {
+		if item, ok := w.webhookNotifiers.Load(model.URL); ok {
+			item.(*notifierWithCtx).notifier.Update(*model)
+		}
+	}
 }
 
 func (w *WebhookManager) addNotifier(model *WebhookModel) {

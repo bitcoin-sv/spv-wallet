@@ -43,6 +43,20 @@ func NewWebhookNotifier(ctx context.Context, model WebhookModel, banMsg chan str
 	return notifier
 }
 
+func (w *WebhookNotifier) Update(model WebhookModel) {
+	w.definitionMtx.Lock()
+	defer w.definitionMtx.Unlock()
+
+	w.definition = model
+}
+
+func (w *WebhookNotifier) currentDefinition() WebhookModel {
+	w.definitionMtx.Lock()
+	defer w.definitionMtx.Unlock()
+
+	return w.definition
+}
+
 // consumer - consumer for webhook notifier
 // It accumulates events (produced during http call) and sends them to webhook
 // If sending fails, it retries several times
@@ -65,7 +79,7 @@ func (w *WebhookNotifier) consumer(ctx context.Context) {
 			}
 
 			if err != nil {
-				w.banMsg <- w.definition.URL
+				w.banMsg <- w.currentDefinition().URL
 				return
 			}
 		case <-ctx.Done():
@@ -93,18 +107,19 @@ loop:
 }
 
 func (w *WebhookNotifier) sendEventsToWebhook(ctx context.Context, events []Event) error {
+	definition := w.currentDefinition()
 	data, err := json.Marshal(events)
 	if err != nil {
 		return errors.Wrap(err, "failed to marshal events")
 	}
 
-	req, err := http.NewRequestWithContext(ctx, "POST", w.definition.URL, bytes.NewBuffer(data))
+	req, err := http.NewRequestWithContext(ctx, "POST", definition.URL, bytes.NewBuffer(data))
 	if err != nil {
 		return errors.Wrap(err, "failed to create request")
 	}
 
 	req.Header.Set("Content-Type", "application/json")
-	tokenHeader, tokenValue := w.definition.TokenHeader, w.definition.TokenValue
+	tokenHeader, tokenValue := definition.TokenHeader, definition.TokenValue
 	if tokenHeader != "" {
 		req.Header.Set(tokenHeader, tokenValue)
 	}
