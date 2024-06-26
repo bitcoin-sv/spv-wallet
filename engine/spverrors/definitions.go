@@ -30,6 +30,30 @@ var ErrInvalidOrMissingToken = models.SPVError{Message: "invalid or missing bear
 // ErrInvalidToken is when callback token from headers is invalid
 var ErrInvalidToken = models.SPVError{Message: "invalid authorization token", StatusCode: 401, Code: "error-unauthorized-invalid-token"}
 
+// ErrInvalidSignature is when signature is invalid
+var ErrInvalidSignature = models.SPVError{Message: "invalid signature", StatusCode: 401, Code: "error-unauthorized-invalid-signature"}
+
+// ErrMissingSignature is when signature is missing in authorization process
+var ErrMissingSignature = models.SPVError{Message: "missing signature", StatusCode: 401, Code: "error-unauthorized-missing-signature"}
+
+// ErrHashesDoNotMatch is when two hashes do not match
+var ErrHashesDoNotMatch = models.SPVError{Message: "auth hash and body hash do not match", StatusCode: 401, Code: "error-unauthorized-hashes-do-not-match"}
+
+// ErrSignatureExpired is when given signature is expired
+var ErrSignatureExpired = models.SPVError{Message: "signature has expired", StatusCode: 401, Code: "error-unauthorized-signature-expired"}
+
+// ErrGettingHdKeyFromXpub is when error occurred during getting hd key from xpub
+var ErrGettingHdKeyFromXpub = models.SPVError{Message: "error getting hd key from xpub", StatusCode: 401, Code: "error-unauthorized-getting-hd-key-from-xpub"}
+
+// ErrDeriveChildKey is when error occurred during deriving child key
+var ErrDeriveChildKey = models.SPVError{Message: "error deriving child key", StatusCode: 401, Code: "error-unauthorized-derive-child-key"}
+
+// ErrGettingAddressFromHdKey is when error occurred during getting address from hd key
+var ErrGettingAddressFromHdKey = models.SPVError{Message: "error getting address from hd key", StatusCode: 401, Code: "error-unauthorized-getting-address-from-hd-key"}
+
+// ErrGettingAddressFromPublicKey is when error occurred during getting address from public key
+var ErrGettingAddressFromPublicKey = models.SPVError{Message: "error getting address from public key", StatusCode: 401, Code: "error-unauthorized-getting-address-from-public-key"}
+
 //////////////////////////////////// BINDING ERRORS
 
 // ErrCannotBindRequest is when request body cannot be bind into struct
@@ -121,6 +145,17 @@ var ErrMissingPaymailXPubID = models.SPVError{Message: "missing xpub_id in payma
 // ErrPaymailAlreadyExists is when paymail with given data already exists in db
 var ErrPaymailAlreadyExists = models.SPVError{Message: "paymail already exists", StatusCode: 409, Code: "error-paymail-already-exists"}
 
+//////////////////////////////////// CAPABILITIES ERRORS
+
+// ErrCapabilitiesPkiUnsupported is when PKI is not supported for given paymail domain
+var ErrCapabilitiesPkiUnsupported = models.SPVError{Message: "server doesn't support PKI", StatusCode: 400, Code: "error-capabilities-pki-unsupported"}
+
+// ErrCapabilitiesPikeUnsupported is when PIKE is not supported for given paymail domain
+var ErrCapabilitiesPikeUnsupported = models.SPVError{Message: "server doesn't support PIKE", StatusCode: 400, Code: "error-capabilities-pike-unsupported"}
+
+// ErrGetCapabilities is when getting capabilities failed
+var ErrGetCapabilities = models.SPVError{Message: "failed to get paymail capabilities", StatusCode: 400, Code: "error-capabilities-failed-to-get"}
+
 //////////////////////////////////// TRANSACTION ERRORS
 
 // ErrCouldNotFindTransaction is an error when a transaction could not be found
@@ -194,6 +229,21 @@ var ErrEmptyRelatedDraftId = models.SPVError{Message: "empty RelatedDraftID", St
 
 // ErrEmptyXpubKey is when xpub key is empty
 var ErrEmptyXpubKey = models.SPVError{Message: "empty xPubKey", StatusCode: 400, Code: "error-transaction-empty-xpub-key"}
+
+// ErrEmptyTx is when tx is empty
+var ErrEmptyTx = models.SPVError{Message: "empty tx", StatusCode: 400, Code: "error-transaction-empty-tx"}
+
+// ErrTxRevertEmptyDraftID is when draft id is empty this means that tx is not from spv-wallet
+var ErrTxRevertEmptyDraftID = models.SPVError{Message: "not a spv wallet engine originating transaction, cannot revert", StatusCode: 400, Code: "error-transaction-revert-empty-draft-id"}
+
+// ErrTxRevertCouldNotFindDraftTx is when draft tx could not be found
+var ErrTxRevertCouldNotFindDraftTx = models.SPVError{Message: "could not find the draft transaction for this transaction, cannot revert", StatusCode: 400, Code: "error-transaction-revert-draft-tx-not-found"}
+
+// ErrTxRevertNotFoundOnChain is when tx was not found on chain
+var ErrTxRevertNotFoundOnChain = models.SPVError{Message: "transaction was found on-chain, cannot revert", StatusCode: 400, Code: "error-transaction-revert-not-found-on-chain"}
+
+// ErrTxRevertUtxoAlreadySpent is when utxo from tx was already spent
+var ErrTxRevertUtxoAlreadySpent = models.SPVError{Message: "utxo of this transaction has been spent, cannot revert", StatusCode: 400, Code: "error-transaction-revert-utxo-already-spent"}
 
 //////////////////////////////////// UTXO ERRORS
 

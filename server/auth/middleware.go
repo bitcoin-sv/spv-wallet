@@ -3,7 +3,6 @@ package auth
 import (
 	"bytes"
 	"context"
-	"errors"
 	"fmt"
 	"io"
 	"net/http"
@@ -161,7 +160,7 @@ func SignatureMiddleware(appConfig *config.AppConfig, requireSigning, adminRequi
 		// adminRequired will always force checking of a signature
 		if (requireSigning || adminRequired) && !appConfig.Authentication.SigningDisabled {
 			if err = checkSignature(authData); err != nil {
-				spverrors.AbortWithErrorResponse(c, spverrors.ErrCheckSignature, nil)
+				spverrors.AbortWithErrorResponse(c, err, nil)
 			}
 			c.Set(ParamAuthSigned, true)
 		} else {
@@ -171,7 +170,7 @@ func SignatureMiddleware(appConfig *config.AppConfig, requireSigning, adminRequi
 
 			// NOTE: you can not use an access key if signing is invalid - ever
 			if authData.accessKey != "" && err != nil {
-				spverrors.AbortWithErrorResponse(c, spverrors.ErrCheckSignature, nil)
+				spverrors.AbortWithErrorResponse(c, err, nil)
 			}
 		}
 		c.Next()
@@ -215,16 +214,16 @@ func checkSignature(auth *Payload) error {
 // checkSignatureRequirements will check the payload for basic signature requirements
 func checkSignatureRequirements(auth *Payload) error {
 	if auth == nil || auth.Signature == "" {
-		return errors.New("missing signature")
+		return spverrors.ErrMissingSignature
 	}
 
 	bodyHash := createBodyHash(auth.BodyContents)
 	if auth.AuthHash != bodyHash {
-		return errors.New("auth hash and body hash do not match")
+		return spverrors.ErrHashesDoNotMatch
 	}
 
 	if time.Now().UTC().After(time.UnixMilli(auth.AuthTime).Add(models.AuthSignatureTTL)) {
-		return errors.New("signature has expired")
+		return spverrors.ErrSignatureExpired
 	}
 	return nil
 }
@@ -237,29 +236,25 @@ func createBodyHash(bodyContents string) string {
 // verifyKeyXPub will verify the xPub key and the signature payload
 func verifyKeyXPub(xPub string, auth *Payload) error {
 	if _, err := utils.ValidateXPub(xPub); err != nil {
-		err := fmt.Errorf("error occurred while validating xPub key: %w", err)
 		return err
 	}
 
 	if auth == nil {
-		return errors.New("missing signature")
+		return spverrors.ErrMissingSignature
 	}
 
 	key, err := bitcoin.GetHDKeyFromExtendedPublicKey(xPub)
 	if err != nil {
-		err = fmt.Errorf("error occurred while getting HD key from xPub: %w", err)
-		return err
+		return spverrors.ErrGettingHdKeyFromXpub
 	}
 
 	if key, err = utils.DeriveChildKeyFromHex(key, auth.AuthNonce); err != nil {
-		err = fmt.Errorf("error occurred while deriving child key: %w", err)
-		return err
+		return spverrors.ErrDeriveChildKey
 	}
 
 	var address *bscript.Address
 	if address, err = bitcoin.GetAddressFromHDKey(key); err != nil {
-		err = fmt.Errorf("error occurred while getting address from HD key: %w", err)
-		return err // Should never error
+		return spverrors.ErrGettingAddressFromHdKey
 	}
 
 	message := getSigningMessage(xPub, auth)
@@ -268,7 +263,7 @@ func verifyKeyXPub(xPub string, auth *Payload) error {
 		auth.Signature,
 		message,
 	); err != nil {
-		return errors.New("signature invalid")
+		return spverrors.ErrInvalidSignature
 	}
 	return nil
 }
@@ -279,8 +274,7 @@ func verifyMessageAndSignature(key string, auth *Payload) error {
 		key, true,
 	)
 	if err != nil {
-		err = fmt.Errorf("error occurred while getting address from public key: %w", err)
-		return err
+		return spverrors.ErrGettingAddressFromPublicKey
 	}
 
 	if err := bitcoin.VerifyMessage(
@@ -288,7 +282,7 @@ func verifyMessageAndSignature(key string, auth *Payload) error {
 		auth.Signature,
 		getSigningMessage(key, auth),
 	); err != nil {
-		return errors.New("signature invalid")
+		return spverrors.ErrInvalidSignature
 	}
 	return nil
 }

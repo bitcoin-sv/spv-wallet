@@ -2,7 +2,6 @@ package engine
 
 import (
 	"context"
-	"errors"
 	"fmt"
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 
@@ -57,11 +56,11 @@ func (strategy *internalIncomingTx) Execute(ctx context.Context, c ClientInterfa
 
 func (strategy *internalIncomingTx) Validate() error {
 	if strategy.Tx == nil {
-		return errors.New("tx cannot be nil")
+		return spverrors.ErrEmptyTx
 	}
 
 	if _, err := bt.NewTxFromString(strategy.Tx.Hex); err != nil {
-		return fmt.Errorf("invalid hex: %w", err)
+		return spverrors.ErrInvalidHex
 	}
 
 	return nil // is valid

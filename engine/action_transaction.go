@@ -264,7 +264,7 @@ func (c *Client) RevertTransaction(ctx context.Context, id string) error {
 
 	// make sure the transaction is coming from SPV Wallet Engine
 	if transaction.DraftID == "" {
-		return errors.New("not a spv wallet engine originating transaction, cannot revert")
+		return spverrors.ErrTxRevertEmptyDraftID
 	}
 
 	var draftTransaction *DraftTransaction
@@ -272,7 +272,7 @@ func (c *Client) RevertTransaction(ctx context.Context, id string) error {
 		return err
 	}
 	if draftTransaction == nil {
-		return errors.New("could not find the draft transaction for this transaction, cannot revert")
+		return spverrors.ErrTxRevertCouldNotFindDraftTx
 	}
 
 	// check whether transaction is not already on chain
@@ -283,7 +283,7 @@ func (c *Client) RevertTransaction(ctx context.Context, id string) error {
 		}
 	}
 	if info != nil {
-		return errors.New("transaction was found on-chain, cannot revert")
+		return spverrors.ErrTxRevertNotFoundOnChain
 	}
 
 	// check that the utxos of this transaction have not been spent
@@ -297,7 +297,7 @@ func (c *Client) RevertTransaction(ctx context.Context, id string) error {
 	}
 	for _, utxo := range utxos {
 		if utxo.SpendingTxID.Valid {
-			return errors.New("utxo of this transaction has been spent, cannot revert")
+			return spverrors.ErrTxRevertUtxoAlreadySpent
 		}
 	}
 
