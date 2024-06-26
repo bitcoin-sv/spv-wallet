@@ -9,12 +9,13 @@ type SPVError struct {
 
 // ResponseError is an error which will be returned in HTTP response
 type ResponseError struct {
-	Code    string `json:"Code"`
-	Message string `json:"Message"`
+	Code    string `json:"code"`
+	Message string `json:"message"`
 }
 
 const UnknownErrorCode = "error-unknown"
 
+// Error returns the error message string for SPVError, satisfying the error interface
 func (e SPVError) Error() string {
 	return e.Message
 }

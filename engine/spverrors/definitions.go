@@ -3,9 +3,10 @@ package spverrors
 import "github.com/bitcoin-sv/spv-wallet/models"
 
 // How the Codes are generated?
-// 1. The first part of the code is the error prefix, e.g. "error"
-// 2. The second part of the code is the model name, e.g. "transaction"
-// 2. The third part of the code is the reason of the error, e.g. "not-found"
+// 1. "error" - like mandatory prefix for all error codes
+// 2. (optional) {error group} - e.g. "unauthorized", "bind"
+// 3. (optional) {subject} - name of model (with or without specific field) or some noun e.g. "body", "auth-header", "transaction", "paymail-address"
+// 4. (optional) {reason} - what happened, e.g. "not-found", "missing", "invalid"
 
 //////////////////////////////////// AUTHORIZATION ERRORS
 
@@ -13,28 +14,25 @@ import "github.com/bitcoin-sv/spv-wallet/models"
 var ErrAuthorization = models.SPVError{Message: "unauthorized", StatusCode: 401, Code: "error-unauthorized"}
 
 // ErrMissingAuthHeader is when request does not have auth header
-var ErrMissingAuthHeader = models.SPVError{Message: "missing auth header", StatusCode: 401, Code: "error-unauthorized-missing-auth-header"}
+var ErrMissingAuthHeader = models.SPVError{Message: "missing auth header", StatusCode: 401, Code: "error-unauthorized-auth-header-missing"}
 
 // ErrNotAnAdminKey is when xpub from auth header is not an admin key
-var ErrNotAnAdminKey = models.SPVError{Message: "xpub provided is not an admin key", StatusCode: 401, Code: "error-unauthorized-not-an-admin-key"}
+var ErrNotAnAdminKey = models.SPVError{Message: "xpub provided is not an admin key", StatusCode: 401, Code: "error-unauthorized-xpub-not-an-admin-key"}
 
 // ErrMissingBody is when request is missing body
-var ErrMissingBody = models.SPVError{Message: "missing body", StatusCode: 401, Code: "error-unauthorized-missing-body"}
-
-// ErrCheckSignature is when error occurred during checking signature
-var ErrCheckSignature = models.SPVError{Message: "error occurred during checking signature", StatusCode: 401, Code: "error-unauthorized-check-signature"}
+var ErrMissingBody = models.SPVError{Message: "missing body", StatusCode: 401, Code: "error-unauthorized-body-missing"}
 
 // ErrInvalidOrMissingToken is when callback token from headers is invalid or missing
-var ErrInvalidOrMissingToken = models.SPVError{Message: "invalid or missing bearer token", StatusCode: 401, Code: "error-unauthorized-invalid-or-missing-token"}
+var ErrInvalidOrMissingToken = models.SPVError{Message: "invalid or missing bearer token", StatusCode: 401, Code: "error-unauthorized-token-invalid-or-missing"}
 
 // ErrInvalidToken is when callback token from headers is invalid
-var ErrInvalidToken = models.SPVError{Message: "invalid authorization token", StatusCode: 401, Code: "error-unauthorized-invalid-token"}
+var ErrInvalidToken = models.SPVError{Message: "invalid authorization token", StatusCode: 401, Code: "error-unauthorized-token-invalid"}
 
 // ErrInvalidSignature is when signature is invalid
-var ErrInvalidSignature = models.SPVError{Message: "invalid signature", StatusCode: 401, Code: "error-unauthorized-invalid-signature"}
+var ErrInvalidSignature = models.SPVError{Message: "invalid signature", StatusCode: 401, Code: "error-unauthorized-signature-invalid"}
 
 // ErrMissingSignature is when signature is missing in authorization process
-var ErrMissingSignature = models.SPVError{Message: "missing signature", StatusCode: 401, Code: "error-unauthorized-missing-signature"}
+var ErrMissingSignature = models.SPVError{Message: "missing signature", StatusCode: 401, Code: "error-unauthorized-signature-missing"}
 
 // ErrHashesDoNotMatch is when two hashes do not match
 var ErrHashesDoNotMatch = models.SPVError{Message: "auth hash and body hash do not match", StatusCode: 401, Code: "error-unauthorized-hashes-do-not-match"}
@@ -43,30 +41,27 @@ var ErrHashesDoNotMatch = models.SPVError{Message: "auth hash and body hash do n
 var ErrSignatureExpired = models.SPVError{Message: "signature has expired", StatusCode: 401, Code: "error-unauthorized-signature-expired"}
 
 // ErrGettingHdKeyFromXpub is when error occurred during getting hd key from xpub
-var ErrGettingHdKeyFromXpub = models.SPVError{Message: "error getting hd key from xpub", StatusCode: 401, Code: "error-unauthorized-getting-hd-key-from-xpub"}
+var ErrGettingHdKeyFromXpub = models.SPVError{Message: "error getting hd key from xpub", StatusCode: 401, Code: "error-unauthorized-xpub-failed-to-get-from-hd-key"}
 
 // ErrDeriveChildKey is when error occurred during deriving child key
 var ErrDeriveChildKey = models.SPVError{Message: "error deriving child key", StatusCode: 401, Code: "error-unauthorized-derive-child-key"}
 
 // ErrGettingAddressFromHdKey is when error occurred during getting address from hd key
-var ErrGettingAddressFromHdKey = models.SPVError{Message: "error getting address from hd key", StatusCode: 401, Code: "error-unauthorized-getting-address-from-hd-key"}
+var ErrGettingAddressFromHdKey = models.SPVError{Message: "error getting address from hd key", StatusCode: 401, Code: "error-unauthorized-address-failed-to-get-from-hd-key"}
 
 // ErrGettingAddressFromPublicKey is when error occurred during getting address from public key
-var ErrGettingAddressFromPublicKey = models.SPVError{Message: "error getting address from public key", StatusCode: 401, Code: "error-unauthorized-getting-address-from-public-key"}
+var ErrGettingAddressFromPublicKey = models.SPVError{Message: "error getting address from public key", StatusCode: 401, Code: "error-unauthorized-address-failed-to-get-from-public-key"}
 
 // ErrValidateXPub is when validation xpub
-var ErrValidateXPub = models.SPVError{Message: "error validation xpub", StatusCode: 401, Code: "error-unauthorized-xpub-validation-failed"}
+var ErrValidateXPub = models.SPVError{Message: "error validation xpub", StatusCode: 401, Code: "error-unauthorized-xpub-invalid"}
 
 //////////////////////////////////// BINDING ERRORS
 
 // ErrCannotBindRequest is when request body cannot be bind into struct
-var ErrCannotBindRequest = models.SPVError{Message: "cannot bind request body", StatusCode: 400, Code: "error-bind-request"}
-
-// ErrInvalidFilterOption is when filter has invalid option
-var ErrInvalidFilterOption = models.SPVError{Message: "invalid filter option", StatusCode: 400, Code: "error-bind-invalid-filter-option"}
+var ErrCannotBindRequest = models.SPVError{Message: "cannot bind request body", StatusCode: 400, Code: "error-bind-body-invalid"}
 
 // ErrInvalidConditions is when request has invalid conditions
-var ErrInvalidConditions = models.SPVError{Message: "invalid conditions", StatusCode: 400, Code: "error-bind-invalid-conditions"}
+var ErrInvalidConditions = models.SPVError{Message: "invalid conditions", StatusCode: 400, Code: "error-bind-conditions-invalid"}
 
 //////////////////////////////////// ACCESS KEY ERRORS
 
@@ -96,31 +91,31 @@ var ErrContactNotFound = models.SPVError{Message: "contact not found", StatusCod
 var ErrInvalidRequesterXpub = models.SPVError{Message: "invalid requester xpub", StatusCode: 400, Code: "error-contact-invalid-requester-xpub"}
 
 // ErrAddingContactRequest is when error occurred while adding contact
-var ErrAddingContactRequest = models.SPVError{Message: "adding contact request failed", StatusCode: 500, Code: "error-contact-adding-request"}
+var ErrAddingContactRequest = models.SPVError{Message: "adding contact request failed", StatusCode: 500, Code: "error-contact-request-failed"}
 
 // ErrMoreThanOnePaymailRegistered is when user who want to add contact has more than one paymail address
 var ErrMoreThanOnePaymailRegistered = models.SPVError{Message: "there are more than one paymail assigned to the xpub", StatusCode: 400, Code: "error-contact-more-than-one-paymail-registered"}
 
 // ErrContactIncorrectStatus is when contact is in incorrect status to make a change
-var ErrContactIncorrectStatus = models.SPVError{Message: "contact is in incorrect status to proceed", StatusCode: 400, Code: "error-contact-incorrect-status"}
+var ErrContactIncorrectStatus = models.SPVError{Message: "contact is in incorrect status to proceed", StatusCode: 400, Code: "error-contact-status-incorrect"}
 
 // ErrMissingContactID is when id is missing in contact
-var ErrMissingContactID = models.SPVError{Message: "missing id in contact", StatusCode: 400, Code: "error-contact-missing-id"}
+var ErrMissingContactID = models.SPVError{Message: "missing id in contact", StatusCode: 400, Code: "error-contact-id-missing"}
 
 // ErrMissingContactFullName is when full name is missing in contact
-var ErrMissingContactFullName = models.SPVError{Message: "missing full name in contact", StatusCode: 400, Code: "error-contact-missing-full-name"}
+var ErrMissingContactFullName = models.SPVError{Message: "missing full name in contact", StatusCode: 400, Code: "error-contact-full-name-missing"}
 
 // ErrMissingContactPaymail is when paymail is missing in contact
-var ErrMissingContactPaymail = models.SPVError{Message: "missing paymail in contact", StatusCode: 400, Code: "error-contact-missing-paymail"}
+var ErrMissingContactPaymail = models.SPVError{Message: "missing paymail in contact", StatusCode: 400, Code: "error-contact-paymail-missing"}
 
 // ErrMissingContactXPubKey is when XPubKey is missing in contact
-var ErrMissingContactXPubKey = models.SPVError{Message: "missing pubKey in contact", StatusCode: 400, Code: "error-contact-missing-xpub"}
+var ErrMissingContactXPubKey = models.SPVError{Message: "missing pubKey in contact", StatusCode: 400, Code: "error-contact-xpub-missing"}
 
 // ErrMissingContactStatus is when status is missing in contact
-var ErrMissingContactStatus = models.SPVError{Message: "status is required", StatusCode: 400, Code: "error-contact-missing-status"}
+var ErrMissingContactStatus = models.SPVError{Message: "status is required", StatusCode: 400, Code: "error-contact-status-missing"}
 
 // ErrMissingContactOwnerXPubId is when owner XPubId is missing in contact
-var ErrMissingContactOwnerXPubId = models.SPVError{Message: "contact must have owner", StatusCode: 400, Code: "error-contact-missing-owner-xpub-id"}
+var ErrMissingContactOwnerXPubId = models.SPVError{Message: "contact must have owner", StatusCode: 400, Code: "error-contact-owner-xpub-id-missing"}
 
 // ErrRequestedContactInvalid is when the requested contact is invalid
 var ErrRequestedContactInvalid = models.SPVError{Message: "requested contact paymail is invalid", StatusCode: 400, Code: "error-contact-requested-contact-invalid"}
@@ -140,19 +135,19 @@ var ErrCouldNotFindPaymail = models.SPVError{Message: "paymail not found", Statu
 var ErrPaymailAddressIsInvalid = models.SPVError{Message: "paymail address is invalid", StatusCode: 400, Code: "error-paymail-address-invalid"}
 
 // ErrMissingPaymailID is when id is missing in paymail
-var ErrMissingPaymailID = models.SPVError{Message: "missing id in paymail", StatusCode: 400, Code: "error-paymail-missing-id"}
+var ErrMissingPaymailID = models.SPVError{Message: "missing id in paymail", StatusCode: 400, Code: "error-paymail-id-missing"}
 
 // ErrMissingPaymailAddress is when alias is missing in paymail
-var ErrMissingPaymailAddress = models.SPVError{Message: "missing alias in paymail", StatusCode: 400, Code: "error-paymail-missing-address"}
+var ErrMissingPaymailAddress = models.SPVError{Message: "missing alias in paymail", StatusCode: 400, Code: "error-paymail-address-missing"}
 
 // ErrMissingPaymailDomain is when domain is missing in paymail
-var ErrMissingPaymailDomain = models.SPVError{Message: "missing domain in paymail", StatusCode: 400, Code: "error-paymail-missing-domain"}
+var ErrMissingPaymailDomain = models.SPVError{Message: "missing domain in paymail", StatusCode: 400, Code: "error-paymail-domain-missing"}
 
 // ErrMissingPaymailExternalXPub is when external xPub is missing in paymail
-var ErrMissingPaymailExternalXPub = models.SPVError{Message: "missing external xPub in paymail", StatusCode: 400, Code: "error-paymail-missing-external-xpub"}
+var ErrMissingPaymailExternalXPub = models.SPVError{Message: "missing external xPub in paymail", StatusCode: 400, Code: "error-paymail-external-xpub-missing"}
 
 // ErrMissingPaymailXPubID is when xpub_id is missing in paymail
-var ErrMissingPaymailXPubID = models.SPVError{Message: "missing xpub_id in paymail", StatusCode: 400, Code: "error-paymail-missing-xpub-id"}
+var ErrMissingPaymailXPubID = models.SPVError{Message: "missing xpub_id in paymail", StatusCode: 400, Code: "error-paymail-xpub-id-missing"}
 
 // ErrPaymailAlreadyExists is when paymail with given data already exists in db
 var ErrPaymailAlreadyExists = models.SPVError{Message: "paymail already exists", StatusCode: 409, Code: "error-paymail-already-exists"}
@@ -180,16 +175,16 @@ var ErrCouldNotFindSyncTx = models.SPVError{Message: "sync tx not found", Status
 var ErrCouldNotFindDraftTx = models.SPVError{Message: "draft tx not found", StatusCode: 404, Code: "error-transaction-draft-tx-not-found"}
 
 // ErrInvalidTransactionID is when a transaction id cannot be decoded
-var ErrInvalidTransactionID = models.SPVError{Message: "invalid transaction id", StatusCode: 400, Code: "error-transaction-invalid-id"}
+var ErrInvalidTransactionID = models.SPVError{Message: "invalid transaction id", StatusCode: 400, Code: "error-transaction-id-invalid"}
 
 // ErrInvalidRequirements is when an invalid requirement was given
-var ErrInvalidRequirements = models.SPVError{Message: "requirements are invalid or missing", StatusCode: 400, Code: "error-transaction-invalid-requirements"}
+var ErrInvalidRequirements = models.SPVError{Message: "requirements are invalid or missing", StatusCode: 400, Code: "error-transaction-requirements-invalid"}
 
 // ErrTransactionIDMismatch is when the returned tx does not match the expected given tx id
 var ErrTransactionIDMismatch = models.SPVError{Message: "result tx id did not match provided tx id", StatusCode: 400, Code: "error-transaction-id-mismatch"}
 
 // ErrMissingTransactionOutputs is when the draft transaction has no outputs
-var ErrMissingTransactionOutputs = models.SPVError{Message: "draft transaction configuration has no outputs", StatusCode: 400, Code: "error-transaction-missing-outputs"}
+var ErrMissingTransactionOutputs = models.SPVError{Message: "draft transaction configuration has no outputs", StatusCode: 400, Code: "error-transaction-outputs-missing"}
 
 // ErrOutputValueTooLow is when the satoshis output is too low on a transaction
 var ErrOutputValueTooLow = models.SPVError{Message: "output value is too low", StatusCode: 400, Code: "error-transaction-output-value-too-low"}
@@ -201,31 +196,31 @@ var ErrOutputValueTooHigh = models.SPVError{Message: "output value is too high",
 var ErrInvalidOpReturnOutput = models.SPVError{Message: "invalid op_return output", StatusCode: 400, Code: "error-transaction-invalid-op-return-output"}
 
 // ErrInvalidLockingScript is when a locking script cannot be decoded
-var ErrInvalidLockingScript = models.SPVError{Message: "invalid locking script", StatusCode: 400, Code: "error-transaction-invalid-locking-script"}
+var ErrInvalidLockingScript = models.SPVError{Message: "invalid locking script", StatusCode: 400, Code: "error-transaction-locking-script-invalid"}
 
 // ErrOutputValueNotRecognized is when there is an invalid output value given, or missing value
 var ErrOutputValueNotRecognized = models.SPVError{Message: "output value is unrecognized", StatusCode: 400, Code: "error-transaction-output-value-unrecognized"}
 
 // ErrInvalidScriptOutput is when a locking script is not a valid bitcoin script
-var ErrInvalidScriptOutput = models.SPVError{Message: "invalid script output", StatusCode: 400, Code: "error-transaction-invalid-script-output"}
+var ErrInvalidScriptOutput = models.SPVError{Message: "invalid script output", StatusCode: 400, Code: "error-transaction-script-output-invalid"}
 
 // ErrDraftIDMismatch is when the reference ID does not match the reservation id
 var ErrDraftIDMismatch = models.SPVError{Message: "transaction draft id does not match utxo draft reservation id", StatusCode: 400, Code: "error-transaction-draft-id-mismatch"}
 
 // ErrMissingTxHex is when the hex is missing or invalid and creates an empty id
-var ErrMissingTxHex = models.SPVError{Message: "transaction hex is empty or id is missing", StatusCode: 400, Code: "error-transaction-missing-hex"}
+var ErrMissingTxHex = models.SPVError{Message: "transaction hex is empty or id is missing", StatusCode: 400, Code: "error-transaction-hex-missing"}
 
 // ErrNoMatchingOutputs is when the transaction does not match any known destinations
-var ErrNoMatchingOutputs = models.SPVError{Message: "transaction outputs do not match any known destinations", StatusCode: 400, Code: "error-transaction-no-matching-outputs"}
+var ErrNoMatchingOutputs = models.SPVError{Message: "transaction outputs do not match any known destinations", StatusCode: 400, Code: "error-transaction-outputs-no-matching"}
 
 // ErrCreateOutgoingTxFailed is when error occurred during creation of outgoing tx
 var ErrCreateOutgoingTxFailed = models.SPVError{Message: "creation of outgoing tx failed", StatusCode: 500, Code: "error-transaction-create-outgoing-tx-failed"}
 
 // ErrDuringSaveTx is when error occurred during save tx
-var ErrDuringSaveTx = models.SPVError{Message: "error during saving tx", StatusCode: 500, Code: "error-transaction-during-save"}
+var ErrDuringSaveTx = models.SPVError{Message: "error during saving tx", StatusCode: 500, Code: "error-transaction-save-failed"}
 
 // ErrTransactionRejectedByP2PProvider is an error when a tx was rejected by P2P Provider
-var ErrTransactionRejectedByP2PProvider = models.SPVError{Message: "transaction rejected by P2P provider", StatusCode: 400, Code: "error-transaction-rejected-by-p2p-provider"}
+var ErrTransactionRejectedByP2PProvider = models.SPVError{Message: "transaction rejected by P2P provider", StatusCode: 400, Code: "error-transaction-rejected"}
 
 // ErrDraftTxHasNoOutputs is when draft transaction has no outputs
 var ErrDraftTxHasNoOutputs = models.SPVError{Message: "corresponding draft transaction has no outputs", StatusCode: 400, Code: "error-transaction-draft-has-no-outputs"}
@@ -234,19 +229,19 @@ var ErrDraftTxHasNoOutputs = models.SPVError{Message: "corresponding draft trans
 var ErrProcessP2PTx = models.SPVError{Message: "error during processing p2p transaction", StatusCode: 500, Code: "error-transaction-process-p2p"}
 
 // ErrInvalidHex is when cannot create tx from hex
-var ErrInvalidHex = models.SPVError{Message: "invalid hex", StatusCode: 400, Code: "error-transaction-invalid-hex"}
+var ErrInvalidHex = models.SPVError{Message: "invalid hex", StatusCode: 400, Code: "error-transaction-hex-invalid"}
 
 // ErrEmptyRelatedDraftId is when related draft id is empty
-var ErrEmptyRelatedDraftId = models.SPVError{Message: "empty RelatedDraftID", StatusCode: 400, Code: "error-transaction-empty-related-draft-id"}
+var ErrEmptyRelatedDraftId = models.SPVError{Message: "empty RelatedDraftID", StatusCode: 400, Code: "error-transaction-related-draft-id-empty"}
 
 // ErrEmptyXpubKey is when xpub key is empty
-var ErrEmptyXpubKey = models.SPVError{Message: "empty xPubKey", StatusCode: 400, Code: "error-transaction-empty-xpub-key"}
+var ErrEmptyXpubKey = models.SPVError{Message: "empty xPubKey", StatusCode: 400, Code: "error-transaction-xpub-key-empty"}
 
 // ErrEmptyTx is when tx is empty
-var ErrEmptyTx = models.SPVError{Message: "empty tx", StatusCode: 400, Code: "error-transaction-empty-tx"}
+var ErrEmptyTx = models.SPVError{Message: "empty tx", StatusCode: 400, Code: "error-transaction-empty"}
 
 // ErrTxRevertEmptyDraftID is when draft id is empty this means that tx is not from spv-wallet
-var ErrTxRevertEmptyDraftID = models.SPVError{Message: "not a spv wallet engine originating transaction, cannot revert", StatusCode: 400, Code: "error-transaction-revert-empty-draft-id"}
+var ErrTxRevertEmptyDraftID = models.SPVError{Message: "not a spv wallet engine originating transaction, cannot revert", StatusCode: 400, Code: "error-transaction-revert-draft-id-empty"}
 
 // ErrTxRevertCouldNotFindDraftTx is when draft tx could not be found
 var ErrTxRevertCouldNotFindDraftTx = models.SPVError{Message: "could not find the draft transaction for this transaction, cannot revert", StatusCode: 400, Code: "error-transaction-revert-draft-tx-not-found"}
@@ -266,7 +261,7 @@ var ErrCouldNotFindUtxo = models.SPVError{Message: "utxo could not be found", St
 var ErrUtxoAlreadySpent = models.SPVError{Message: "utxo has already been spent", StatusCode: 400, Code: "error-utxo-already-spent"}
 
 // ErrMissingUTXOsSpendable is when there are no utxos found from the "spendable utxos"
-var ErrMissingUTXOsSpendable = models.SPVError{Message: "no utxos found using spendable", StatusCode: 404, Code: "error-utxo-missing-spendable"}
+var ErrMissingUTXOsSpendable = models.SPVError{Message: "no utxos found using spendable", StatusCode: 404, Code: "error-utxo-spendable-missing"}
 
 // ErrNotEnoughUtxos is when a draft transaction cannot be created because of lack of utxos
 var ErrNotEnoughUtxos = models.SPVError{Message: "could not select enough outputs to satisfy transaction", StatusCode: 400, Code: "error-utxo-not-enough"}
@@ -289,7 +284,7 @@ var ErrUtxoNotReserved = models.SPVError{Message: "transaction utxo has not been
 var ErrCouldNotFindXpub = models.SPVError{Message: "xpub not found", StatusCode: 404, Code: "error-xpub-not-found"}
 
 // ErrXpubInvalidLength is when the length of the xpub does not match the desired length
-var ErrXpubInvalidLength = models.SPVError{Message: "xpub is an invalid length", StatusCode: 400, Code: "error-xpub-invalid-length"}
+var ErrXpubInvalidLength = models.SPVError{Message: "xpub is an invalid length", StatusCode: 400, Code: "error-xpub-length-invalid"}
 
 // ErrXpubNoMatch is when the derived xpub key does not match the key given
 var ErrXpubNoMatch = models.SPVError{Message: "xpub key does not match raw key", StatusCode: 400, Code: "error-xpub-key-no-match"}
@@ -332,7 +327,7 @@ var ErrMissingLockingScript = models.SPVError{Message: "missing required field: 
 //////////////////////////////////// SAVE ERROR
 
 // ErrMissingClient is when client is missing from model, cannot save
-var ErrMissingClient = models.SPVError{Message: "client is missing from model, cannot save", StatusCode: 400, Code: "error-missing-client"}
+var ErrMissingClient = models.SPVError{Message: "client is missing from model, cannot save", StatusCode: 400, Code: "error-client-missing"}
 
 // ErrDatastoreRequired is when a datastore function is called without a datastore present
 var ErrDatastoreRequired = models.SPVError{Message: "datastore is required", StatusCode: 500, Code: "error-datastore-required"}
