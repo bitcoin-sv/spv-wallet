@@ -119,6 +119,15 @@ var ErrMissingContactStatus = models.SPVError{Message: "status is required", Sta
 // ErrMissingContactOwnerXPubId is when owner XPubId is missing in contact
 var ErrMissingContactOwnerXPubId = models.SPVError{Message: "contact must have owner", StatusCode: 400, Code: "error-contact-missing-owner-xpub-id"}
 
+// ErrRequestedContactInvalid is when the requested contact is invalid
+var ErrRequestedContactInvalid = models.SPVError{Message: "requested contact paymail is invalid", StatusCode: 400, Code: "error-contact-requested-contact-invalid"}
+
+// ErrGettingPKIFailed is when getting PKI for contact paymail failed
+var ErrGettingPKIFailed = models.SPVError{Message: "getting PKI for contact failed", StatusCode: 400, Code: "error-contact-getting-pki-failed"}
+
+// ErrSaveContact is when saving new contact failed
+var ErrSaveContact = models.SPVError{Message: "adding contact failed", StatusCode: 400, Code: "error-contact-adding-contact-failed"}
+
 //////////////////////////////////// PAYMAIL ERRORS
 
 // ErrCouldNotFindPaymail is when paymail could not be found

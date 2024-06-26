@@ -54,12 +54,14 @@ func (c *Client) AddContactRequest(ctx context.Context, fullName, paymailAdress,
 
 	contactPm, err := pmSrvnt.GetSanitizedPaymail(paymailAdress)
 	if err != nil {
-		return nil, fmt.Errorf("requested contact paymail is invalid. Reason: %w", err)
+		c.Logger().Error().Msgf("requested contact paymail is invalid. Reason: %s", err.Error())
+		return nil, spverrors.ErrRequestedContactInvalid
 	}
 
 	contactPki, err := pmSrvnt.GetPkiForPaymail(ctx, contactPm)
 	if err != nil {
-		return nil, fmt.Errorf("getting PKI for %s failed. Reason: %w", paymailAdress, err)
+		c.Logger().Error().Msgf("getting PKI for %s failed. Reason: %v", paymailAdress, err)
+		return nil, spverrors.ErrGettingPKIFailed
 	}
 
 	// check if exists already
@@ -86,7 +88,8 @@ func (c *Client) AddContactRequest(ctx context.Context, fullName, paymailAdress,
 
 	if save {
 		if err = contact.Save(ctx); err != nil {
-			return nil, fmt.Errorf("adding %s contact failed. Reason: %w", paymailAdress, err)
+			c.Logger().Error().Msgf("adding %s contact failed. Reason: %v", paymailAdress, err)
+			return nil, spverrors.ErrSaveContact
 		}
 	}
 
@@ -151,7 +154,7 @@ func (c *Client) UpdateContact(ctx context.Context, id, fullName string, metadat
 
 	if err = contact.Save(ctx); err != nil {
 		c.logContactError(contact.OwnerXpubID, contact.Paymail, fmt.Sprintf("unexpected error while saving contact: %s", err.Error()))
-		return nil, err
+		return nil, spverrors.ErrSaveContact
 	}
 
 	return contact, nil
@@ -184,7 +187,7 @@ func (c *Client) AdminChangeContactStatus(ctx context.Context, id string, status
 
 	if err = contact.Save(ctx); err != nil {
 		c.logContactError(contact.OwnerXpubID, contact.Paymail, fmt.Sprintf("unexpected error while saving contact: %s", err.Error()))
-		return nil, err
+		return nil, spverrors.ErrSaveContact
 	}
 	return contact, nil
 }
@@ -204,7 +207,7 @@ func (c *Client) DeleteContact(ctx context.Context, id string) error {
 
 	if err = contact.Save(ctx); err != nil {
 		c.logContactError(contact.OwnerXpubID, contact.Paymail, fmt.Sprintf("unexpected error while saving contact: %s", err.Error()))
-		return err
+		return spverrors.ErrSaveContact
 	}
 
 	return nil
@@ -227,7 +230,7 @@ func (c *Client) AcceptContact(ctx context.Context, xPubID, paymail string) erro
 
 	if err = contact.Save(ctx); err != nil {
 		c.logContactError(xPubID, paymail, fmt.Sprintf("unexpected error while saving contact: %s", err.Error()))
-		return err
+		return spverrors.ErrSaveContact
 	}
 
 	return nil
@@ -250,7 +253,7 @@ func (c *Client) RejectContact(ctx context.Context, xPubID, paymail string) erro
 
 	if err = contact.Save(ctx); err != nil {
 		c.logContactError(xPubID, paymail, fmt.Sprintf("unexpected error while saving contact: %s", err.Error()))
-		return err
+		return spverrors.ErrSaveContact
 	}
 
 	return nil
@@ -273,7 +276,7 @@ func (c *Client) ConfirmContact(ctx context.Context, xPubID, paymail string) err
 
 	if err = contact.Save(ctx); err != nil {
 		c.logContactError(xPubID, paymail, fmt.Sprintf("unexpected error while saving contact: %s", err.Error()))
-		return err
+		return spverrors.ErrSaveContact
 	}
 
 	return nil
@@ -296,7 +299,7 @@ func (c *Client) UnconfirmContact(ctx context.Context, xPubID, paymail string) e
 
 	if err = contact.Save(ctx); err != nil {
 		c.logContactError(xPubID, paymail, fmt.Sprintf("unexpected error while saving contact: %s", err.Error()))
-		return err
+		return spverrors.ErrSaveContact
 	}
 
 	return nil
@@ -334,7 +337,7 @@ func (c *Client) getPaymail(ctx context.Context, xpubID, paymailAddr string) (*P
 func (c *Client) upsertContact(ctx context.Context, pmSrvnt *PaymailServant, reqXPubID, ctcFName string, ctcPaymail *paymail.SanitisedPaymail, opts ...ModelOps) (*Contact, error) {
 	contactPki, err := pmSrvnt.GetPkiForPaymail(ctx, ctcPaymail)
 	if err != nil {
-		return nil, fmt.Errorf("getting PKI for %s failed. Reason: %w", ctcPaymail.Address, err)
+		return nil, spverrors.ErrGettingPKIFailed
 	}
 
 	// check if exists already
@@ -360,7 +363,7 @@ func (c *Client) upsertContact(ctx context.Context, pmSrvnt *PaymailServant, req
 	}
 
 	if err = contact.Save(ctx); err != nil {
-		return nil, fmt.Errorf("adding %s contact failed. Reason: %w", ctcPaymail, err)
+		return nil, spverrors.ErrSaveContact
 	}
 
 	return contact, nil
