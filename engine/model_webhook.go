@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/bitcoin-sv/spv-wallet/engine/datastore"
+	customTypes "github.com/bitcoin-sv/spv-wallet/engine/datastore/customtypes"
 	"github.com/bitcoin-sv/spv-wallet/engine/notifications"
 )
 
@@ -14,9 +15,10 @@ type Webhook struct {
 	// Base model
 	Model `bson:",inline"`
 
-	URL         string `json:"url" toml:"url" yaml:"url" gorm:"<-create;primaryKey;comment:This is the url on which notifications will be sent" bson:"url"`
-	TokenHeader string `json:"token_header" toml:"token_header" yaml:"token_header" gorm:"<-create;comment:This is optioal token header to be sent" bson:"token_header"`
-	Token       string `json:"token" toml:"token" yaml:"token" gorm:"<-create;comment:This is optional token to be sent" bson:"token"`
+	URL         string               `json:"url" toml:"url" yaml:"url" gorm:"<-create;primaryKey;comment:This is the url on which notifications will be sent" bson:"url"`
+	TokenHeader string               `json:"token_header" toml:"token_header" yaml:"token_header" gorm:"<-create;comment:This is optioal token header to be sent" bson:"token_header"`
+	Token       string               `json:"token" toml:"token" yaml:"token" gorm:"<-create;comment:This is optional token to be sent" bson:"token"`
+	BannedTo    customTypes.NullTime `json:"banned_to" toml:"banned_to" yaml:"banned_to" gorm:"comment:The time until the webhook will be banned" bson:"banned_to"`
 }
 
 func newWebhook(url, tokenHeader, token string, opts ...ModelOps) *Webhook {
@@ -67,12 +69,29 @@ func (m *Webhook) Migrate(client datastore.ClientInterface) error {
 	return client.IndexMetadata(client.GetTableName(tableAccessKeys), metadataField)
 }
 
-func (m *Webhook) GetURL() string {
-	return m.URL
+func (m *Webhook) GetWebhookModel() *notifications.WebhookModel {
+	model := &notifications.WebhookModel{
+		URL:         m.URL,
+		TokenHeader: m.TokenHeader,
+		TokenValue:  m.Token,
+	}
+
+	if m.BannedTo.Valid {
+		model.BannedTo = &m.BannedTo.Time
+	}
+	return model
 }
 
 func (m *Webhook) GetToken() (string, string) {
 	return m.TokenHeader, m.Token
+}
+
+func (m *Webhook) GetIsBanned() bool {
+	if !m.BannedTo.Valid {
+		return false
+	}
+	ret := !time.Now().After(m.BannedTo.Time)
+	return ret
 }
 
 type WebhooksRepository struct {
@@ -80,6 +99,17 @@ type WebhooksRepository struct {
 }
 
 func (wr *WebhooksRepository) CreateWebhook(ctx context.Context, url, tokenHeader, tokenValue string) error {
+	existed, err := wr.getByURL(ctx, url)
+	if err != nil {
+		return err
+	}
+	if existed != nil {
+		existed.DeletedAt.Valid = false
+		existed.BannedTo.Valid = false
+		existed.TokenHeader = tokenHeader
+		existed.Token = tokenValue
+		return existed.Save(ctx)
+	}
 	opts := append(wr.client.DefaultModelOptions(), New())
 	model := newWebhook(url, tokenHeader, tokenValue, opts...)
 	return model.Save(ctx)
@@ -116,7 +146,19 @@ func (wr *WebhooksRepository) RemoveWebhook(ctx context.Context, url string) err
 	return Save(ctx, webhook)
 }
 
-func (wr *WebhooksRepository) GetWebhooks(ctx context.Context) ([]notifications.WebhookInterface, error) {
+func (wr *WebhooksRepository) BanWebhook(ctx context.Context, url string, bannedTo time.Time) error {
+	webhook, err := wr.getByURL(ctx, url)
+	if err != nil {
+		return err
+	}
+
+	webhook.BannedTo.Valid = true
+	webhook.BannedTo.Time = bannedTo
+
+	return Save(ctx, webhook)
+}
+
+func (wr *WebhooksRepository) GetWebhooks(ctx context.Context) ([]*notifications.WebhookModel, error) {
 	conditions := map[string]any{
 		deletedAtField: nil,
 	}
@@ -125,9 +167,9 @@ func (wr *WebhooksRepository) GetWebhooks(ctx context.Context) ([]notifications.
 		return nil, err
 	}
 	// map to slice of WebhookInterface
-	res := make([]notifications.WebhookInterface, len(list))
+	res := make([]*notifications.WebhookModel, len(list))
 	for i, elem := range list {
-		res[i] = elem
+		res[i] = elem.GetWebhookModel()
 	}
 	return res, nil
 }

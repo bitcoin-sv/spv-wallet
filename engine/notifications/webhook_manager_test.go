@@ -10,17 +10,18 @@ import (
 )
 
 type mockRepository struct {
-	webhooks []WebhookInterface
+	webhooks []*WebhookModel
 }
 
 func (r *mockRepository) CreateWebhook(_ context.Context, url, tokenHeader, tokenValue string) error {
-	r.webhooks = append(r.webhooks, newMockWebhookModel(url, tokenHeader, tokenValue))
+	model := newMockWebhookModel(url, tokenHeader, tokenValue)
+	r.webhooks = append(r.webhooks, model)
 	return nil
 }
 
 func (r *mockRepository) RemoveWebhook(_ context.Context, url string) error {
 	for i, w := range r.webhooks {
-		if w.GetURL() == url {
+		if w.URL == url {
 			r.webhooks = append(r.webhooks[:i], r.webhooks[i+1:]...)
 			return nil
 		}
@@ -28,8 +29,17 @@ func (r *mockRepository) RemoveWebhook(_ context.Context, url string) error {
 	return fmt.Errorf("webhook not found")
 }
 
-func (r *mockRepository) GetWebhooks(_ context.Context) ([]WebhookInterface, error) {
+func (r *mockRepository) GetWebhooks(_ context.Context) ([]*WebhookModel, error) {
 	return r.webhooks, nil
+}
+
+func (r *mockRepository) BanWebhook(_ context.Context, url string, banTime time.Time) error {
+	for _, item := range r.webhooks {
+		if item.URL == url {
+			item.BannedTo = &banTime
+		}
+	}
+	return nil
 }
 
 func TestWebhookManager(t *testing.T) {
@@ -43,7 +53,7 @@ func TestWebhookManager(t *testing.T) {
 		ctx, cancel := context.WithCancel(context.Background())
 
 		n := NewNotifications(ctx)
-		repo := &mockRepository{webhooks: []WebhookInterface{newMockWebhookModel(client.url, "", "")}}
+		repo := &mockRepository{webhooks: []*WebhookModel{newMockWebhookModel(client.url, "", "")}}
 
 		manager := NewWebhookManager(ctx, n, repo)
 		time.Sleep(100 * time.Millisecond) // wait for manager to update notifiers
@@ -72,7 +82,7 @@ func TestWebhookManager(t *testing.T) {
 		ctx, cancel := context.WithCancel(context.Background())
 
 		n := NewNotifications(ctx)
-		repo := &mockRepository{webhooks: []WebhookInterface{newMockWebhookModel(client.url, "", "")}}
+		repo := &mockRepository{webhooks: []*WebhookModel{newMockWebhookModel(client.url, "", "")}}
 
 		manager := NewWebhookManager(ctx, n, repo)
 		time.Sleep(100 * time.Millisecond)
