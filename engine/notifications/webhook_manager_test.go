@@ -10,11 +10,11 @@ import (
 )
 
 type mockRepository struct {
-	webhooks []WebhookModel
+	webhooks []*WebhookModel
 }
 
 func (r *mockRepository) CreateWebhook(webhook *WebhookModel) error {
-	r.webhooks = append(r.webhooks, *webhook)
+	r.webhooks = append(r.webhooks, webhook)
 	return nil
 }
 
@@ -28,7 +28,7 @@ func (r *mockRepository) RemoveWebhook(url string) error {
 	return fmt.Errorf("webhook not found")
 }
 
-func (r *mockRepository) GetWebhooks() ([]WebhookModel, error) {
+func (r *mockRepository) GetWebhooks() ([]*WebhookModel, error) {
 	return r.webhooks, nil
 }
 
@@ -43,7 +43,7 @@ func TestWebhookManager(t *testing.T) {
 		ctx, cancel := context.WithCancel(context.Background())
 
 		n := NewNotifications(ctx)
-		repo := &mockRepository{webhooks: []WebhookModel{{URL: client.url}}}
+		repo := &mockRepository{webhooks: []*WebhookModel{NewWebhookModel(client.url, "", "")}}
 
 		manager := NewWebhookManager(ctx, n, repo)
 		time.Sleep(100 * time.Millisecond) // wait for manager to update notifiers
@@ -72,7 +72,7 @@ func TestWebhookManager(t *testing.T) {
 		ctx, cancel := context.WithCancel(context.Background())
 
 		n := NewNotifications(ctx)
-		repo := &mockRepository{webhooks: []WebhookModel{}}
+		repo := &mockRepository{webhooks: []*WebhookModel{NewWebhookModel(client.url, "", "")}}
 
 		manager := NewWebhookManager(ctx, n, repo)
 		time.Sleep(100 * time.Millisecond)

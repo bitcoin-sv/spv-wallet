@@ -11,7 +11,7 @@ import (
 type WebhookRepository interface {
 	CreateWebhook(webhook *WebhookModel) error
 	RemoveWebhook(url string) error
-	GetWebhooks() ([]WebhookModel, error)
+	GetWebhooks() ([]*WebhookModel, error)
 }
 
 type notifierWithCtx struct {
@@ -92,7 +92,7 @@ func (w *WebhookManager) update() {
 	// add notifiers which are not in the map
 	for _, model := range dbWebhooks {
 		if _, ok := w.webhookNotifiers.Load(model.URL); !ok {
-			w.addNotifier(&model)
+			w.addNotifier(model)
 		}
 	}
 
@@ -122,7 +122,7 @@ func (w *WebhookManager) removeNotifier(url string) {
 	}
 }
 
-func containsWebhook(webhooks []WebhookModel, url string) bool {
+func containsWebhook(webhooks []*WebhookModel, url string) bool {
 	for _, webhook := range webhooks {
 		if webhook.URL == url {
 			return true
