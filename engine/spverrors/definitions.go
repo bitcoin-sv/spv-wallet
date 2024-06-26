@@ -54,6 +54,9 @@ var ErrGettingAddressFromHdKey = models.SPVError{Message: "error getting address
 // ErrGettingAddressFromPublicKey is when error occurred during getting address from public key
 var ErrGettingAddressFromPublicKey = models.SPVError{Message: "error getting address from public key", StatusCode: 401, Code: "error-unauthorized-getting-address-from-public-key"}
 
+// ErrValidateXPub is when validation xpub
+var ErrValidateXPub = models.SPVError{Message: "error validation xpub", StatusCode: 401, Code: "error-unauthorized-xpub-validation-failed"}
+
 //////////////////////////////////// BINDING ERRORS
 
 // ErrCannotBindRequest is when request body cannot be bind into struct

@@ -236,7 +236,7 @@ func createBodyHash(bodyContents string) string {
 // verifyKeyXPub will verify the xPub key and the signature payload
 func verifyKeyXPub(xPub string, auth *Payload) error {
 	if _, err := utils.ValidateXPub(xPub); err != nil {
-		return err
+		return spverrors.ErrValidateXPub
 	}
 
 	if auth == nil {
