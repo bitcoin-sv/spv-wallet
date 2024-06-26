@@ -8,12 +8,6 @@ import (
 	"github.com/pkg/errors"
 )
 
-type WebhookRepository interface {
-	CreateWebhook(webhook *WebhookModel) error
-	RemoveWebhook(url string) error
-	GetWebhooks() ([]*WebhookModel, error)
-}
-
 type notifierWithCtx struct {
 	notifier   *WebhookNotifier
 	ctx        context.Context
@@ -21,7 +15,7 @@ type notifierWithCtx struct {
 }
 
 type WebhookManager struct {
-	repository       WebhookRepository
+	repository       WebhooksRepository
 	rootContext      context.Context
 	cancelAllFunc    context.CancelFunc
 	webhookNotifiers *sync.Map // [string, *notifierWithCtx]
@@ -30,7 +24,7 @@ type WebhookManager struct {
 	notifications    *Notifications
 }
 
-func NewWebhookManager(ctx context.Context, notifications *Notifications, repository WebhookRepository) *WebhookManager {
+func NewWebhookManager(ctx context.Context, notifications *Notifications, repository WebhooksRepository) *WebhookManager {
 	rootContext, cancelAllFunc := context.WithCancel(ctx)
 	manager := WebhookManager{
 		repository:       repository,
@@ -51,16 +45,16 @@ func (w *WebhookManager) Stop() {
 	w.cancelAllFunc()
 }
 
-func (w *WebhookManager) Subscribe(webhookModel *WebhookModel) error {
-	err := w.repository.CreateWebhook(webhookModel)
+func (w *WebhookManager) Subscribe(ctx context.Context, url, tokenHeader, tokenValue string) error {
+	err := w.repository.CreateWebhook(ctx, url, tokenHeader, tokenValue)
 	if err == nil {
 		w.updateMsg <- true
 	}
 	return errors.Wrap(err, "failed to create webhook")
 }
 
-func (w *WebhookManager) Unsubscribe(url string) error {
-	err := w.repository.RemoveWebhook(url)
+func (w *WebhookManager) Unsubscribe(ctx context.Context, url string) error {
+	err := w.repository.RemoveWebhook(ctx, url)
 	if err != nil {
 		w.updateMsg <- true
 	}
@@ -83,7 +77,7 @@ func (w *WebhookManager) checkForUpdates() {
 }
 
 func (w *WebhookManager) update() {
-	dbWebhooks, err := w.repository.GetWebhooks()
+	dbWebhooks, err := w.repository.GetWebhooks(w.rootContext)
 	if err != nil {
 		// log error
 		return
@@ -91,7 +85,7 @@ func (w *WebhookManager) update() {
 
 	// add notifiers which are not in the map
 	for _, model := range dbWebhooks {
-		if _, ok := w.webhookNotifiers.Load(model.URL); !ok {
+		if _, ok := w.webhookNotifiers.Load(model.GetURL()); !ok {
 			w.addNotifier(model)
 		}
 	}
@@ -106,11 +100,11 @@ func (w *WebhookManager) update() {
 	})
 }
 
-func (w *WebhookManager) addNotifier(model *WebhookModel) {
+func (w *WebhookManager) addNotifier(model WebhookInterface) {
 	ctx, cancel := context.WithCancel(w.rootContext)
 	notifier := NewWebhookNotifier(ctx, model)
-	w.webhookNotifiers.Store(model.URL, &notifierWithCtx{notifier: notifier, ctx: ctx, cancelFunc: cancel})
-	w.notifications.AddNotifier(model.URL, notifier.Channel)
+	w.webhookNotifiers.Store(model.GetURL(), &notifierWithCtx{notifier: notifier, ctx: ctx, cancelFunc: cancel})
+	w.notifications.AddNotifier(model.GetURL(), notifier.Channel)
 }
 
 func (w *WebhookManager) removeNotifier(url string) {
@@ -122,9 +116,9 @@ func (w *WebhookManager) removeNotifier(url string) {
 	}
 }
 
-func containsWebhook(webhooks []*WebhookModel, url string) bool {
+func containsWebhook(webhooks []WebhookInterface, url string) bool {
 	for _, webhook := range webhooks {
-		if webhook.URL == url {
+		if webhook.GetURL() == url {
 			return true
 		}
 	}

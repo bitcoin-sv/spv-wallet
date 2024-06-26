@@ -10,17 +10,17 @@ import (
 )
 
 type mockRepository struct {
-	webhooks []*WebhookModel
+	webhooks []WebhookInterface
 }
 
-func (r *mockRepository) CreateWebhook(webhook *WebhookModel) error {
-	r.webhooks = append(r.webhooks, webhook)
+func (r *mockRepository) CreateWebhook(_ context.Context, url, tokenHeader, tokenValue string) error {
+	r.webhooks = append(r.webhooks, newMockWebhookModel(url, tokenHeader, tokenValue))
 	return nil
 }
 
-func (r *mockRepository) RemoveWebhook(url string) error {
+func (r *mockRepository) RemoveWebhook(_ context.Context, url string) error {
 	for i, w := range r.webhooks {
-		if w.URL == url {
+		if w.GetURL() == url {
 			r.webhooks = append(r.webhooks[:i], r.webhooks[i+1:]...)
 			return nil
 		}
@@ -28,7 +28,7 @@ func (r *mockRepository) RemoveWebhook(url string) error {
 	return fmt.Errorf("webhook not found")
 }
 
-func (r *mockRepository) GetWebhooks() ([]*WebhookModel, error) {
+func (r *mockRepository) GetWebhooks(_ context.Context) ([]WebhookInterface, error) {
 	return r.webhooks, nil
 }
 
@@ -43,7 +43,7 @@ func TestWebhookManager(t *testing.T) {
 		ctx, cancel := context.WithCancel(context.Background())
 
 		n := NewNotifications(ctx)
-		repo := &mockRepository{webhooks: []*WebhookModel{NewWebhookModel(client.url, "", "")}}
+		repo := &mockRepository{webhooks: []WebhookInterface{newMockWebhookModel(client.url, "", "")}}
 
 		manager := NewWebhookManager(ctx, n, repo)
 		time.Sleep(100 * time.Millisecond) // wait for manager to update notifiers
@@ -72,13 +72,13 @@ func TestWebhookManager(t *testing.T) {
 		ctx, cancel := context.WithCancel(context.Background())
 
 		n := NewNotifications(ctx)
-		repo := &mockRepository{webhooks: []*WebhookModel{NewWebhookModel(client.url, "", "")}}
+		repo := &mockRepository{webhooks: []WebhookInterface{newMockWebhookModel(client.url, "", "")}}
 
 		manager := NewWebhookManager(ctx, n, repo)
 		time.Sleep(100 * time.Millisecond)
 		defer manager.Stop()
 
-		manager.Subscribe(&WebhookModel{URL: client.url})
+		manager.Subscribe(ctx, client.url, "", "")
 		time.Sleep(100 * time.Millisecond) // wait for manager to update notifiers
 
 		expected := []Event{}

@@ -179,7 +179,7 @@ func (s *AppServices) loadSPVWallet(ctx context.Context, appConfig *AppConfig, t
 	options = loadTaskManager(appConfig, options)
 
 	if appConfig.Notifications != nil && appConfig.Notifications.Enabled {
-		options = append(options, engine.WithNotifications(appConfig.Notifications.WebhookEndpoint))
+		options = append(options, engine.WithNotifications())
 	}
 
 	options = loadBroadcastClientArc(appConfig, options, logger)

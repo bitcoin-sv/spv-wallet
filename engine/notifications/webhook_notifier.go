@@ -21,14 +21,14 @@ const (
 // WebhookNotifier - notifier for sending events to webhook
 type WebhookNotifier struct {
 	Channel    chan Event
-	definition *WebhookModel
+	definition WebhookInterface
 	banTime    *time.Time
 	banMsg     chan bool
 	httpClient *http.Client
 }
 
 // NewWebhookNotifier - creates a new instance of WebhookNotifier
-func NewWebhookNotifier(ctx context.Context, hook *WebhookModel) *WebhookNotifier {
+func NewWebhookNotifier(ctx context.Context, hook WebhookInterface) *WebhookNotifier {
 	notifier := &WebhookNotifier{
 		Channel:    make(chan Event, lengthOfWebhookChannel),
 		definition: hook,
@@ -114,14 +114,15 @@ func (w *WebhookNotifier) sendEventsToWebhook(ctx context.Context, events []Even
 		return errors.Wrap(err, "failed to marshal events")
 	}
 
-	req, err := http.NewRequestWithContext(ctx, "POST", w.definition.URL, bytes.NewBuffer(data))
+	req, err := http.NewRequestWithContext(ctx, "POST", w.definition.GetURL(), bytes.NewBuffer(data))
 	if err != nil {
 		return errors.Wrap(err, "failed to create request")
 	}
 
 	req.Header.Set("Content-Type", "application/json")
-	if w.definition.TokenHeader != "" {
-		req.Header.Set(w.definition.TokenHeader, w.definition.Token)
+	tokenHeader, tokenValue := w.definition.GetToken()
+	if tokenHeader != "" {
+		req.Header.Set(tokenHeader, tokenValue)
 	}
 
 	resp, err := w.httpClient.Do(req)

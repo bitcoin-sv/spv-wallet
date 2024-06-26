@@ -2,12 +2,14 @@ package engine
 
 import (
 	"context"
+	"time"
 
 	"github.com/bitcoin-sv/go-paymail"
 	"github.com/bitcoin-sv/go-paymail/server"
 	"github.com/bitcoin-sv/spv-wallet/engine/chainstate"
 	"github.com/bitcoin-sv/spv-wallet/engine/cluster"
 	"github.com/bitcoin-sv/spv-wallet/engine/datastore"
+	"github.com/bitcoin-sv/spv-wallet/engine/notifications"
 
 	// "github.com/bitcoin-sv/spv-wallet/engine/notifications"
 	"github.com/bitcoin-sv/spv-wallet/engine/taskmanager"
@@ -83,12 +85,37 @@ func (c *Client) loadDatastore(ctx context.Context) (err error) {
 }
 
 // loadNotificationClient will load the notifications client
-func (c *Client) loadNotificationClient() (err error) {
-	// Load notification if a custom interface was NOT provided
-	// if c.options.notifications.ClientInterface == nil {
-	// 	c.options.notifications.ClientInterface, err = notifications.NewClient(c.options.notifications.options...)
-	// }
+func (c *Client) loadNotificationClient(ctx context.Context) (err error) {
+	if c.options.notifications == nil || !c.options.notifications.enabled {
+		return
+	}
+	notificationService := notifications.NewNotifications(ctx)
+	c.options.notifications.client = notificationService
+	c.options.notifications.webhookManager = notifications.NewWebhookManager(ctx, notificationService, &WebhooksRepository{client: c})
+
+	// for development purposes only
+	i := 0
+	ticker := time.NewTicker(100 * time.Microsecond)
+	go func() {
+		for {
+			select {
+			case <-ctx.Done():
+				return
+			case <-ticker.C:
+				notificationService.Notify(i)
+				i++
+			}
+		}
+	}()
 	return
+}
+
+func (c *Client) SubscribeWebhook(ctx context.Context, url, tokenHeader, token string) error {
+	if c.options.notifications == nil || c.options.notifications.webhookManager == nil {
+		return nil
+	}
+
+	return c.options.notifications.webhookManager.Subscribe(ctx, url, tokenHeader, token)
 }
 
 // loadPaymailClient will load the Paymail client
