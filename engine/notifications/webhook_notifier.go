@@ -21,7 +21,7 @@ const (
 
 // WebhookNotifier - notifier for sending events to webhook
 type WebhookNotifier struct {
-	Channel chan Event
+	Channel chan *RawEvent
 
 	definition    WebhookModel
 	definitionMtx sync.Mutex
@@ -32,7 +32,7 @@ type WebhookNotifier struct {
 // NewWebhookNotifier - creates a new instance of WebhookNotifier
 func NewWebhookNotifier(ctx context.Context, model WebhookModel, banMsg chan string) *WebhookNotifier {
 	notifier := &WebhookNotifier{
-		Channel:    make(chan Event, lengthOfWebhookChannel),
+		Channel:    make(chan *RawEvent, lengthOfWebhookChannel),
 		definition: model,
 		banMsg:     banMsg,
 		httpClient: &http.Client{},
@@ -92,7 +92,7 @@ func (w *WebhookNotifier) consumer(ctx context.Context) {
 	}
 }
 
-func (w *WebhookNotifier) accumulateEvents(ctx context.Context, event Event) (events []Event, done bool) {
+func (w *WebhookNotifier) accumulateEvents(ctx context.Context, event *RawEvent) (events []*RawEvent, done bool) {
 	events = append(events, event)
 loop:
 	for i := 0; i < maxBatchSize; i++ {
@@ -108,7 +108,7 @@ loop:
 	return events, false
 }
 
-func (w *WebhookNotifier) sendEventsToWebhook(ctx context.Context, events []Event) error {
+func (w *WebhookNotifier) sendEventsToWebhook(ctx context.Context, events []*RawEvent) error {
 	definition := w.currentDefinition()
 	data, err := json.Marshal(events)
 	if err != nil {

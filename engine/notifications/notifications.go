@@ -5,19 +5,16 @@ import (
 	"sync"
 )
 
-// Event - event type
-type Event any
-
 const lengthOfInputChannel = 100
 
 // Notifications - service for sending events to multiple notifiers
 type Notifications struct {
-	inputChannel   chan Event
-	outputChannels *sync.Map //[string, chan Event]
+	inputChannel   chan *RawEvent
+	outputChannels *sync.Map //[string, chan *Event]
 }
 
 // AddNotifier - add notifier by key
-func (n *Notifications) AddNotifier(key string, ch chan Event) {
+func (n *Notifications) AddNotifier(key string, ch chan *RawEvent) {
 	n.outputChannels.Store(key, ch)
 }
 
@@ -27,7 +24,7 @@ func (n *Notifications) RemoveNotifier(key string) {
 }
 
 // Notify - send event to all notifiers
-func (n *Notifications) Notify(event Event) {
+func (n *Notifications) Notify(event *RawEvent) {
 	n.inputChannel <- event
 }
 
@@ -37,7 +34,7 @@ func (n *Notifications) exchange(ctx context.Context) {
 		select {
 		case event := <-n.inputChannel:
 			n.outputChannels.Range(func(_, value any) bool {
-				ch := value.(chan Event)
+				ch := value.(chan *RawEvent)
 				n.sendEventToChannel(ch, event)
 				return true
 			})
@@ -48,7 +45,7 @@ func (n *Notifications) exchange(ctx context.Context) {
 }
 
 // sendEventToChannel - non blocking send event to channel
-func (n *Notifications) sendEventToChannel(ch chan Event, event Event) {
+func (n *Notifications) sendEventToChannel(ch chan *RawEvent, event *RawEvent) {
 	select {
 	case ch <- event:
 		// Successfully sent event
@@ -60,7 +57,7 @@ func (n *Notifications) sendEventToChannel(ch chan Event, event Event) {
 // NewNotifications - creates a new instance of Notifications
 func NewNotifications(ctx context.Context) *Notifications {
 	n := &Notifications{
-		inputChannel:   make(chan Event, lengthOfInputChannel),
+		inputChannel:   make(chan *RawEvent, lengthOfInputChannel),
 		outputChannels: new(sync.Map),
 	}
 

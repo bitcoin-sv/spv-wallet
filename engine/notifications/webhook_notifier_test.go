@@ -16,12 +16,12 @@ import (
 type mockClient struct {
 	interceptor     func(req *http.Request) (*http.Response, error)
 	url             string
-	receivedBatches [][]Event
+	receivedBatches [][]*RawEvent
 }
 
 func newMockClient(url string) *mockClient {
 	mc := &mockClient{
-		receivedBatches: make([][]Event, 0),
+		receivedBatches: make([][]*RawEvent, 0),
 		url:             url,
 	}
 
@@ -39,7 +39,7 @@ func newMockClient(url string) *mockClient {
 			return httpmock.NewStringResponse(500, ""), err
 		}
 
-		var events []Event
+		var events []*RawEvent
 		err = json.Unmarshal(body, &events)
 		if err != nil {
 			return httpmock.NewStringResponse(500, ""), err
@@ -55,15 +55,17 @@ func newMockClient(url string) *mockClient {
 	return mc
 }
 
-func (mc *mockClient) assertEvents(t *testing.T, expected []Event) {
-	flatten := make([]Event, 0)
+func (mc *mockClient) assertEvents(t *testing.T, expected []int) {
+	flatten := make([]*RawEvent, 0)
 	for _, batch := range mc.receivedBatches {
 		flatten = append(flatten, batch...)
 	}
 	assert.Equal(t, len(expected), len(flatten))
 	if len(expected) == len(flatten) {
 		for i := 0; i < len(expected); i++ {
-			assert.EqualValues(t, expected[i], flatten[i])
+			actualEvent, err := GetEventContent[mockNotificationFrame](flatten[i])
+			assert.NoError(t, err)
+			assert.Equal(t, expected[i], actualEvent.Value)
 		}
 	}
 }
@@ -100,9 +102,9 @@ func TestWebhookNotifier(t *testing.T) {
 		notifier := NewWebhookNotifier(ctx, *newMockWebhookModel(client.url, "", ""), make(chan string))
 		n.AddNotifier(client.url, notifier.Channel)
 
-		expected := []Event{}
+		expected := []int{}
 		for i := 0; i < 10; i++ {
-			n.Notify(i)
+			n.Notify(newMockEvent(i))
 			expected = append(expected, i)
 		}
 
@@ -130,9 +132,9 @@ func TestWebhookNotifier(t *testing.T) {
 		notifier2 := NewWebhookNotifier(ctx, *newMockWebhookModel(client2.url, "", ""), make(chan string))
 		n.AddNotifier(client2.url, notifier2.Channel)
 
-		expected := []Event{}
+		expected := []int{}
 		for i := 0; i < 10; i++ {
-			n.Notify(i)
+			n.Notify(newMockEvent(i))
 			expected = append(expected, i)
 		}
 
@@ -158,35 +160,9 @@ func TestWebhookNotifier(t *testing.T) {
 		notifier := NewWebhookNotifier(ctx, *newMockWebhookModel(client.url, "", ""), make(chan string))
 		n.AddNotifier(client.url, notifier.Channel)
 
-		expected := []Event{}
+		expected := []int{}
 		for i := 0; i < 10; i++ {
-			n.Notify(i)
-			time.Sleep(100 * time.Microsecond)
-			expected = append(expected, i)
-		}
-
-		time.Sleep(100 * time.Millisecond)
-		cancel()
-
-		client.assertEvents(t, expected)
-		client.assertEventsWereSentInBatches(t, false)
-	})
-
-	t.Run("no batches when notifications are put slowly", func(t *testing.T) {
-		httpmock.Reset()
-		httpmock.Activate()
-		defer httpmock.Deactivate()
-
-		client := newMockClient("http://localhost:8080")
-
-		ctx, cancel := context.WithCancel(context.Background())
-		n := NewNotifications(ctx)
-		notifier := NewWebhookNotifier(ctx, *newMockWebhookModel(client.url, "", ""), make(chan string))
-		n.AddNotifier(client.url, notifier.Channel)
-
-		expected := []Event{}
-		for i := 0; i < 10; i++ {
-			n.Notify(i)
+			n.Notify(newMockEvent(i))
 			time.Sleep(100 * time.Microsecond)
 			expected = append(expected, i)
 		}
@@ -218,9 +194,9 @@ func TestWebhookNotifier(t *testing.T) {
 		notifier := NewWebhookNotifier(ctx, *newMockWebhookModel(client.url, "", ""), make(chan string))
 		n.AddNotifier(client.url, notifier.Channel)
 
-		expected := []Event{}
+		expected := []int{}
 		for i := 0; i < 10; i++ {
-			n.Notify(i)
+			n.Notify(newMockEvent(i))
 			expected = append(expected, i)
 		}
 
@@ -247,7 +223,7 @@ func TestWebhookNotifier(t *testing.T) {
 		n.AddNotifier(client.url, notifier.Channel)
 
 		for i := 0; i < 10; i++ {
-			n.Notify(i)
+			n.Notify(newMockEvent(i))
 		}
 
 		banHasBeenTriggered := false
@@ -294,7 +270,7 @@ func TestWebhookNotifier(t *testing.T) {
 		n.AddNotifier(client.url, notifier.Channel)
 
 		for i := 0; i < 10; i++ {
-			n.Notify(i)
+			n.Notify(newMockEvent(i))
 		}
 
 		<-waitForCall
