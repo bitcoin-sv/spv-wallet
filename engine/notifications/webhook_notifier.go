@@ -75,7 +75,11 @@ func (w *WebhookNotifier) consumer(ctx context.Context) {
 				if err == nil {
 					break
 				}
-				time.Sleep(retriesDelay)
+				select {
+				case <-ctx.Done():
+					return
+				case <-time.After(retriesDelay):
+				}
 			}
 
 			if err != nil {

@@ -117,8 +117,7 @@ func (wr *WebhooksRepository) CreateWebhook(ctx context.Context, url, tokenHeade
 
 func (wr *WebhooksRepository) getByURL(ctx context.Context, url string) (*Webhook, error) {
 	conditions := map[string]any{
-		"url":          url,
-		deletedAtField: nil,
+		"url": url,
 	}
 
 	webhook := &Webhook{}
