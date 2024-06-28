@@ -20,6 +20,10 @@ func NewHandler(appConfig *config.AppConfig, services *config.AppServices) route
 		xpubGroup := router.Group("/xpub")
 		xpubGroup.GET("", action.get)
 		xpubGroup.PATCH("", action.update)
+
+		xpubGroup2 := router.Group("/users/current")
+		xpubGroup2.GET("", action.get)
+		xpubGroup2.PATCH("", action.update)
 	})
 
 	return apiEndpoints
