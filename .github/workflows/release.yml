@@ -31,7 +31,6 @@ jobs:
       matrix:
         lib:
           - models
-          - engine
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
