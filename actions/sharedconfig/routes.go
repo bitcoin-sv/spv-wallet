@@ -19,6 +19,9 @@ func NewHandler(appConfig *config.AppConfig, services *config.AppServices) route
 	sharedConfigEndpoints := routes.OldAPIEndpointsFunc(func(router *gin.RouterGroup) {
 		group := router.Group("/shared-config")
 		group.GET("", action.get)
+
+		group2 := router.Group("/configs/shared")
+		group2.GET("", action.get)
 	})
 
 	return sharedConfigEndpoints
