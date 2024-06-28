@@ -96,15 +96,19 @@ func (c *Client) loadNotificationClient(ctx context.Context) (err error) {
 
 	// for development purposes only
 	i := 0
+	j := 0
 	ticker := time.NewTicker(100 * time.Microsecond)
+	ticker2 := time.NewTicker(1 * time.Second)
 	go func() {
 		for {
 			select {
 			case <-ctx.Done():
 				return
 			case <-ticker.C:
-				notificationService.Notify(notifications.NewRawEvent(notifications.GeneralPurposeEvent{Value: fmt.Sprintf("%d", i)}))
+				notificationService.Notify(notifications.NewRawEvent(&notifications.NumericEvent{Numeric: i}))
 				i++
+			case <-ticker2.C:
+				notificationService.Notify(notifications.NewRawEvent(&notifications.StringEvent{Value: fmt.Sprintf("Hello %d", j)}))
 			}
 		}
 	}()

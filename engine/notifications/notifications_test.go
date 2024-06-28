@@ -8,17 +8,9 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-type mockNotificationFrame struct {
-	Value int `json:"value"`
-}
-
-func (mockNotificationFrame) GetType() string {
-	return "mock-notification"
-}
-
 func newMockEvent(value int) *RawEvent {
-	return NewRawEvent(mockNotificationFrame{
-		Value: value,
+	return NewRawEvent(&NumericEvent{
+		Numeric: value,
 	})
 }
 
@@ -46,9 +38,9 @@ func (m *mockNotifier) assertOutput(t *testing.T, expected []int) {
 	assert.Equal(t, len(expected), len(m.output))
 	if len(expected) == len(m.output) {
 		for i := 0; i < len(expected); i++ {
-			actualEvent, err := GetEventContent[mockNotificationFrame](m.output[i])
+			actualEvent, err := GetEventContent[NumericEvent](m.output[i])
 			assert.NoError(t, err)
-			assert.Equal(t, expected[i], actualEvent.Value)
+			assert.Equal(t, expected[i], actualEvent.Numeric)
 		}
 	}
 }
