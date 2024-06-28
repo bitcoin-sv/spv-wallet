@@ -8,24 +8,6 @@ import (
 	"github.com/pkg/errors"
 )
 
-// RawEvent - event type
-type RawEvent struct {
-	Type    string          `json:"type"`
-	Content json.RawMessage `json:"content"`
-}
-
-type StringEvent struct {
-	Value string
-}
-
-type NumericEvent struct {
-	Numeric int
-}
-
-type Events interface {
-	StringEvent | NumericEvent
-}
-
 func InstantinateEvent[EventType Events]() *EventType {
 	base := *new(EventType)
 	return &base

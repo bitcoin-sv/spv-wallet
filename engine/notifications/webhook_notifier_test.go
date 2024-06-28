@@ -55,7 +55,7 @@ func newMockClient(url string) *mockClient {
 	return mc
 }
 
-func (mc *mockClient) assertEvents(t *testing.T, expected []int) {
+func (mc *mockClient) assertEvents(t *testing.T, expected []string) {
 	flatten := make([]*RawEvent, 0)
 	for _, batch := range mc.receivedBatches {
 		flatten = append(flatten, batch...)
@@ -63,9 +63,9 @@ func (mc *mockClient) assertEvents(t *testing.T, expected []int) {
 	assert.Equal(t, len(expected), len(flatten))
 	if len(expected) == len(flatten) {
 		for i := 0; i < len(expected); i++ {
-			actualEvent, err := GetEventContent[NumericEvent](flatten[i])
+			actualEvent, err := GetEventContent[StringEvent](flatten[i])
 			assert.NoError(t, err)
-			assert.Equal(t, expected[i], actualEvent.Numeric)
+			assert.Equal(t, expected[i], actualEvent.Value)
 		}
 	}
 }
@@ -102,10 +102,11 @@ func TestWebhookNotifier(t *testing.T) {
 		notifier := NewWebhookNotifier(ctx, *newMockWebhookModel(client.url, "", ""), make(chan string))
 		n.AddNotifier(client.url, notifier.Channel)
 
-		expected := []int{}
+		expected := []string{}
 		for i := 0; i < 10; i++ {
-			n.Notify(newMockEvent(i))
-			expected = append(expected, i)
+			msg := fmt.Sprintf("msg-%d", i)
+			n.Notify(newMockEvent(msg))
+			expected = append(expected, msg)
 		}
 
 		time.Sleep(100 * time.Millisecond)
@@ -132,10 +133,11 @@ func TestWebhookNotifier(t *testing.T) {
 		notifier2 := NewWebhookNotifier(ctx, *newMockWebhookModel(client2.url, "", ""), make(chan string))
 		n.AddNotifier(client2.url, notifier2.Channel)
 
-		expected := []int{}
+		expected := []string{}
 		for i := 0; i < 10; i++ {
-			n.Notify(newMockEvent(i))
-			expected = append(expected, i)
+			msg := fmt.Sprintf("msg-%d", i)
+			n.Notify(newMockEvent(msg))
+			expected = append(expected, msg)
 		}
 
 		time.Sleep(100 * time.Millisecond)
@@ -160,11 +162,12 @@ func TestWebhookNotifier(t *testing.T) {
 		notifier := NewWebhookNotifier(ctx, *newMockWebhookModel(client.url, "", ""), make(chan string))
 		n.AddNotifier(client.url, notifier.Channel)
 
-		expected := []int{}
+		expected := []string{}
 		for i := 0; i < 10; i++ {
-			n.Notify(newMockEvent(i))
+			msg := fmt.Sprintf("msg-%d", i)
+			n.Notify(newMockEvent(msg))
 			time.Sleep(100 * time.Microsecond)
-			expected = append(expected, i)
+			expected = append(expected, msg)
 		}
 
 		time.Sleep(100 * time.Millisecond)
@@ -194,10 +197,11 @@ func TestWebhookNotifier(t *testing.T) {
 		notifier := NewWebhookNotifier(ctx, *newMockWebhookModel(client.url, "", ""), make(chan string))
 		n.AddNotifier(client.url, notifier.Channel)
 
-		expected := []int{}
+		expected := []string{}
 		for i := 0; i < 10; i++ {
-			n.Notify(newMockEvent(i))
-			expected = append(expected, i)
+			msg := fmt.Sprintf("msg-%d", i)
+			n.Notify(newMockEvent(msg))
+			expected = append(expected, msg)
 		}
 
 		time.Sleep(1500 * time.Millisecond)
@@ -223,7 +227,8 @@ func TestWebhookNotifier(t *testing.T) {
 		n.AddNotifier(client.url, notifier.Channel)
 
 		for i := 0; i < 10; i++ {
-			n.Notify(newMockEvent(i))
+			msg := fmt.Sprintf("msg-%d", i)
+			n.Notify(newMockEvent(msg))
 		}
 
 		banHasBeenTriggered := false
@@ -270,7 +275,8 @@ func TestWebhookNotifier(t *testing.T) {
 		n.AddNotifier(client.url, notifier.Channel)
 
 		for i := 0; i < 10; i++ {
-			n.Notify(newMockEvent(i))
+			msg := fmt.Sprintf("msg-%d", i)
+			n.Notify(newMockEvent(msg))
 		}
 
 		<-waitForCall
