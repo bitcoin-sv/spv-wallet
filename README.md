@@ -48,7 +48,7 @@
 
 A comprehensive non-custodial wallet for BSV digital currency.
 
-More in-depth information and guidance about SPV Wallet Toolbox you can find [here](https://bsvblockchain.gitbook.io/docs).
+More in-depth information and guidance about SPV Wallet Toolbox you can find [here](https://docs.bsvblockchain.org/network-topology/applications/spv-wallet).
 
 <br/>
 

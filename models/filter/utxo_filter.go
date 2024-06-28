@@ -30,6 +30,7 @@ func (d *UtxoFilter) ToDbConditions() (map[string]interface{}, error) {
 	applyIfNotNil(conditions, "output_index", d.OutputIndex)
 	applyIfNotNil(conditions, "id", d.ID)
 	applyIfNotNil(conditions, "satoshis", d.Satoshis)
+	applyIfNotNil(conditions, "draft_id", d.DraftID)
 	applyIfNotNil(conditions, "script_pub_key", d.ScriptPubKey)
 	if err := checkAndApplyStrOption(conditions, "type", d.Type, validUtxoTypes...); err != nil {
 		return nil, err
