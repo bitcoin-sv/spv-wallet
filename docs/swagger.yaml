@@ -3168,6 +3168,48 @@ paths:
       summary: Search transaction
       tags:
       - Transactions
+  /v1/users/current:
+    get:
+      description: Get xPub
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: xPub associated with the given xPub from auth header
+          schema:
+            $ref: '#/definitions/models.Xpub'
+        "500":
+          description: Internal Server Error - Error while fetching xPub
+      security:
+      - x-auth-xpub: []
+      summary: Get xPub
+      tags:
+      - xPub
+    patch:
+      description: Update xPub
+      parameters:
+      - description: ' '
+        in: body
+        name: Metadata
+        schema:
+          $ref: '#/definitions/engine.Metadata'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Updated xPub
+          schema:
+            $ref: '#/definitions/models.Xpub'
+        "400":
+          description: Bad request - Error while parsing Metadata from request body
+        "500":
+          description: Internal Server Error - Error while updating xPub
+      security:
+      - x-auth-xpub: []
+      - bux-auth-xpub: []
+      summary: Update xPub
+      tags:
+      - xPub
   /v1/utxo:
     get:
       description: Get UTXO

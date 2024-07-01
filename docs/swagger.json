@@ -1998,6 +1998,76 @@
                 }
             }
         },
+        "/v1/users/current": {
+            "get": {
+                "security": [
+                    {
+                        "x-auth-xpub": []
+                    }
+                ],
+                "description": "Get xPub",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "xPub"
+                ],
+                "summary": "Get xPub",
+                "responses": {
+                    "200": {
+                        "description": "xPub associated with the given xPub from auth header",
+                        "schema": {
+                            "$ref": "#/definitions/models.Xpub"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error - Error while fetching xPub"
+                    }
+                }
+            },
+            "patch": {
+                "security": [
+                    {
+                        "x-auth-xpub": []
+                    },
+                    {
+                        "bux-auth-xpub": []
+                    }
+                ],
+                "description": "Update xPub",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "xPub"
+                ],
+                "summary": "Update xPub",
+                "parameters": [
+                    {
+                        "description": " ",
+                        "name": "Metadata",
+                        "in": "body",
+                        "schema": {
+                            "$ref": "#/definitions/engine.Metadata"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Updated xPub",
+                        "schema": {
+                            "$ref": "#/definitions/models.Xpub"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request - Error while parsing Metadata from request body"
+                    },
+                    "500": {
+                        "description": "Internal Server Error - Error while updating xPub"
+                    }
+                }
+            }
+        },
         "/v1/utxo": {
             "get": {
                 "security": [
