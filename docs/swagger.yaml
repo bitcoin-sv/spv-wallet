@@ -1787,8 +1787,6 @@ definitions:
     - 1000000000
     - 60000000000
     - 3600000000000
-    - -9223372036854775808
-    - 9223372036854775807
     - 1
     - 1000
     - 1000000
@@ -1805,8 +1803,6 @@ definitions:
     - Second
     - Minute
     - Hour
-    - minDuration
-    - maxDuration
     - Nanosecond
     - Microsecond
     - Millisecond
@@ -2643,6 +2639,21 @@ paths:
       summary: Search for xpubs
       tags:
       - Admin
+  /v1/configs/shared:
+    get:
+      description: Get shared config
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Shared configuration
+          schema:
+            $ref: '#/definitions/models.SharedConfig'
+      security:
+      - x-auth-xpub: []
+      summary: Get shared config
+      tags:
+      - Shared-config
   /v1/contact/{paymail}:
     put:
       description: Add or update contact. When adding a new contact, the system utilizes

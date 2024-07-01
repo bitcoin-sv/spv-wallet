@@ -21,7 +21,7 @@ func NewHandler(appConfig *config.AppConfig, services *config.AppServices) route
 		group.GET("", action.get)
 
 		group2 := router.Group("/configs/shared")
-		group2.GET("", action.get)
+		group2.GET("", action.get2)
 	})
 
 	return sharedConfigEndpoints
