@@ -15,41 +15,6 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
-        "/transaction/broadcast/callback": {
-            "post": {
-                "security": [
-                    {
-                        "callback-auth": []
-                    }
-                ],
-                "tags": [
-                    "Transactions"
-                ],
-                "summary": "Endpoint designed for receiving callbacks from Arc (service responsible for submitting transactions to the BSV network)",
-                "parameters": [
-                    {
-                        "description": "Transaction",
-                        "name": "transaction",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/broadcast.SubmittedTx"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK"
-                    },
-                    "400": {
-                        "description": "Bad request - Error while parsing transaction from request body"
-                    },
-                    "500": {
-                        "description": "Internal Server Error - Error while updating transaction"
-                    }
-                }
-            }
-        },
         "/v1/access-key": {
             "get": {
                 "security": [
@@ -1933,6 +1898,212 @@ const docTemplate = `{
                 }
             }
         },
+        "/v1/transactions": {
+            "get": {
+                "security": [
+                    {
+                        "x-auth-xpub": []
+                    }
+                ],
+                "description": "Get transactions",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "New Transactions"
+                ],
+                "summary": "Get transactions",
+                "parameters": [
+                    {
+                        "description": "Supports targeted resource searches with filters and metadata, plus options for pagination and sorting to streamline data exploration and analysis",
+                        "name": "SearchTransactions",
+                        "in": "body",
+                        "schema": {
+                            "$ref": "#/definitions/filter.SearchTransactions"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "List of transactions",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/models.Transaction"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request - Error while parsing SearchTransactions from request body"
+                    },
+                    "500": {
+                        "description": "Internal server error - Error while searching for transactions"
+                    }
+                }
+            },
+            "post": {
+                "security": [
+                    {
+                        "x-auth-xpub": []
+                    }
+                ],
+                "description": "Record transaction",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "New Transactions"
+                ],
+                "summary": "Record transaction",
+                "parameters": [
+                    {
+                        "description": "Transaction to be recorded",
+                        "name": "RecordTransaction",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/transactions.RecordTransaction"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created transaction",
+                        "schema": {
+                            "$ref": "#/definitions/models.Transaction"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request - Error while parsing RecordTransaction from request body or xpub not found"
+                    },
+                    "500": {
+                        "description": "Internal Server Error - Error while recording transaction"
+                    }
+                }
+            }
+        },
+        "/v1/transactions/drafts": {
+            "post": {
+                "security": [
+                    {
+                        "x-auth-xpub": []
+                    }
+                ],
+                "description": "New transaction draft",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "New Transactions"
+                ],
+                "summary": "New transaction draft",
+                "parameters": [
+                    {
+                        "description": "NewTransaction model containing the transaction config and metadata",
+                        "name": "NewTransaction",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/transactions.NewTransaction"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created transaction",
+                        "schema": {
+                            "$ref": "#/definitions/models.DraftTransaction"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request - Error while parsing NewTransaction from request body or xpub not found"
+                    },
+                    "500": {
+                        "description": "Internal Server Error - Error while creating transaction"
+                    }
+                }
+            }
+        },
+        "/v1/transactions/{id}": {
+            "get": {
+                "security": [
+                    {
+                        "x-auth-xpub": []
+                    }
+                ],
+                "description": "Get transaction by id",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "New Transactions"
+                ],
+                "summary": "Get transaction by id",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Transaction",
+                        "schema": {
+                            "$ref": "#/definitions/models.Transaction"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request - Transaction not found or associated with another xpub"
+                    },
+                    "500": {
+                        "description": "Internal Server Error - Error while fetching transaction"
+                    }
+                }
+            },
+            "patch": {
+                "security": [
+                    {
+                        "x-auth-xpub": []
+                    }
+                ],
+                "description": "Update transaction",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "New Transactions"
+                ],
+                "summary": "Update transaction",
+                "parameters": [
+                    {
+                        "description": " ",
+                        "name": "UpdateTransaction",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/transactions.UpdateTransaction"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Updated transaction",
+                        "schema": {
+                            "$ref": "#/definitions/models.Transaction"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request - Error while parsing UpdateTransaction from request body, tx not found or tx is not associated with the xpub"
+                    },
+                    "500": {
+                        "description": "Internal Server Error - Error while updating transaction"
+                    }
+                }
+            }
+        },
         "/v1/utxo": {
             "get": {
                 "security": [
@@ -2250,99 +2421,6 @@ const docTemplate = `{
                     }
                 }
             }
-        },
-        "broadcast.SubmittedTx": {
-            "type": "object",
-            "properties": {
-                "blockHash": {
-                    "description": "BlockHash is the hash of the block where the transaction was included.",
-                    "type": "string"
-                },
-                "blockHeight": {
-                    "description": "BlockHeight is the height of the block where the transaction was included.",
-                    "type": "integer"
-                },
-                "extraInfo": {
-                    "description": "ExtraInfo provides extra information for given transaction.",
-                    "type": "string"
-                },
-                "merklePath": {
-                    "description": "MerklePath is the Merkle path used to calculate Merkle root of the block in which the transaction was included.",
-                    "type": "string"
-                },
-                "status": {
-                    "description": "Status is the status of the response.",
-                    "type": "integer"
-                },
-                "timestamp": {
-                    "description": "Timestamp is the timestamp of the block where the transaction was included.",
-                    "type": "string"
-                },
-                "title": {
-                    "description": "Title is the title of the response.",
-                    "type": "string"
-                },
-                "txStatus": {
-                    "description": "TxStatus is the status of the transaction.",
-                    "allOf": [
-                        {
-                            "$ref": "#/definitions/broadcast.TxStatus"
-                        }
-                    ]
-                },
-                "txid": {
-                    "description": "TxID is the transaction id.",
-                    "type": "string"
-                }
-            }
-        },
-        "broadcast.TxStatus": {
-            "type": "string",
-            "enum": [
-                "UNKNOWN",
-                "QUEUED",
-                "RECEIVED",
-                "STORED",
-                "ANNOUNCED_TO_NETWORK",
-                "REQUESTED_BY_NETWORK",
-                "SENT_TO_NETWORK",
-                "ACCEPTED_BY_NETWORK",
-                "SEEN_ON_NETWORK",
-                "MINED",
-                "SEEN_IN_ORPHAN_MEMPOOL",
-                "CONFIRMED",
-                "REJECTED"
-            ],
-            "x-enum-comments": {
-                "AcceptedByNetwork": "7",
-                "AnnouncedToNetwork": "4",
-                "Confirmed": "108",
-                "Mined": "9",
-                "Queued": "1",
-                "Received": "2",
-                "Rejected": "109",
-                "RequestedByNetwork": "5",
-                "SeenInOrphanMempool": "10",
-                "SeenOnNetwork": "8",
-                "SentToNetwork": "6",
-                "Stored": "3",
-                "Unknown": "0"
-            },
-            "x-enum-varnames": [
-                "Unknown",
-                "Queued",
-                "Received",
-                "Stored",
-                "AnnouncedToNetwork",
-                "RequestedByNetwork",
-                "SentToNetwork",
-                "AcceptedByNetwork",
-                "SeenOnNetwork",
-                "Mined",
-                "SeenInOrphanMempool",
-                "Confirmed",
-                "Rejected"
-            ]
         },
         "contacts.UpsertContact": {
             "type": "object",

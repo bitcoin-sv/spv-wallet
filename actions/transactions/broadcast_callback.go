@@ -8,15 +8,14 @@ import (
 )
 
 // broadcastCallback will handle a broadcastCallback call from the broadcast api
-// Broadcast Callback godoc
-// @Summary		Endpoint designed for receiving callbacks from Arc (service responsible for submitting transactions to the BSV network)
-// @Tags		Transactions
-// @Param 		transaction body broadcast.SubmittedTx true "Transaction"
-// @Success		200
-// @Failure		400	"Bad request - Error while parsing transaction from request body"
-// @Failure 	500	"Internal Server Error - Error while updating transaction"
-// @Router		/transaction/broadcast/callback [post]
-// @Security	callback-auth
+// Summary		Endpoint designed for receiving callbacks from Arc (service responsible for submitting transactions to the BSV network)
+// Tags		Transactions
+// Param 		transaction body broadcast.SubmittedTx true "Transaction"
+// Success		200
+// Failure		400	"Bad request - Error while parsing transaction from request body"
+// Failure 	500	"Internal Server Error - Error while updating transaction"
+// Router		/transaction/broadcast/callback [post]
+// Security	callback-auth
 func (a *Action) broadcastCallback(c *gin.Context) {
 	var resp *broadcast.SubmittedTx
 

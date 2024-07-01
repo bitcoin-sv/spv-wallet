@@ -12,6 +12,32 @@ type Action struct {
 	actions.Action
 }
 
+// NewTransactionsHandler
+func NewTransactionsHandler(appConfig *config.AppConfig, services *config.AppServices) (routes.BasicEndpointsFunc, routes.APIEndpointsFunc, routes.CallbackEndpointsFunc) {
+	action := &Action{actions.Action{AppConfig: appConfig, Services: services}}
+
+	basicEndpoints := routes.BasicEndpointsFunc(func(router *gin.RouterGroup) {
+		basicTransactionGroup := router.Group("/transactions")
+		basicTransactionGroup.GET(":id", action.getById)
+		basicTransactionGroup.PATCH(":id", action.updateTransaction)
+		basicTransactionGroup.GET("", action.transactions)
+	})
+
+	apiEndpoints := routes.APIEndpointsFunc(func(router *gin.RouterGroup) {
+		apiTransactionGroup := router.Group("/transactions")
+		apiTransactionGroup.POST("/drafts", action.newTransactionDraft)
+		apiTransactionGroup.POST("", action.recordTransaction)
+
+	})
+
+	callbackEndpoints := routes.CallbackEndpointsFunc(func(router *gin.RouterGroup) {
+		router.POST(config.BroadcastCallbackRoute, action.broadcastCallback)
+	})
+
+	return basicEndpoints, apiEndpoints, callbackEndpoints
+
+}
+
 // NewHandler creates the specific package routes
 func NewHandler(appConfig *config.AppConfig, services *config.AppServices) (routes.BasicEndpointsFunc, routes.APIEndpointsFunc, routes.CallbackEndpointsFunc) {
 	action := &Action{actions.Action{AppConfig: appConfig, Services: services}}
