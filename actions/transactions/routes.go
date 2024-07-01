@@ -12,7 +12,7 @@ type Action struct {
 	actions.Action
 }
 
-// NewTransactionsHandler
+// NewTransactionsHandler creates the specific package routes in restfull style
 func NewTransactionsHandler(appConfig *config.AppConfig, services *config.AppServices) (routes.BasicEndpointsFunc, routes.APIEndpointsFunc, routes.CallbackEndpointsFunc) {
 	action := &Action{actions.Action{AppConfig: appConfig, Services: services}}
 

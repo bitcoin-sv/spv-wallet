@@ -29,10 +29,10 @@ func (a *Action) update(c *gin.Context) {
 	}
 	id := requestBody.ID
 
-	a.updateTransactionWithId(c, id, requestBody)
+	a.updateTransactionWithID(c, id, requestBody)
 }
 
-func (a *Action) updateTransactionWithId(c *gin.Context, id string, requestBody UpdateTransaction) {
+func (a *Action) updateTransactionWithID(c *gin.Context, id string, requestBody UpdateTransaction) {
 	reqXPubID := c.GetString(auth.ParamXPubHashKey)
 
 	// Get a transaction by ID
@@ -76,5 +76,5 @@ func (a *Action) updateTransaction(c *gin.Context) {
 	}
 	id := c.Param("id")
 
-	a.updateTransactionWithId(c, id, requestBody)
+	a.updateTransactionWithID(c, id, requestBody)
 }
