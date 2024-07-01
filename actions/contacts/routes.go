@@ -32,20 +32,25 @@ func NewHandler(appConfig *config.AppConfig, services *config.AppServices) route
 }
 
 // NewContactsHandler creates the specific package routes
-func NewContactsHandler(appConfig *config.AppConfig, services *config.AppServices) routes.APIEndpointsFunc {
+func NewContactsHandler(appConfig *config.AppConfig, services *config.AppServices) (routes.APIEndpointsFunc, routes.APIEndpointsFunc) {
 	action := &Action{actions.Action{AppConfig: appConfig, Services: services}}
 
-	apiEndpoints := routes.APIEndpointsFunc(func(router *gin.RouterGroup) {
+	contactsAPIEndpoints := routes.APIEndpointsFunc(func(router *gin.RouterGroup) {
 		group := router.Group("/contacts")
-		group.PUT("/:paymail", action.upsert)
+		group.PUT("/:paymail", action.upsertContact)
+		group.PATCH("/:paymail/confirmation", action.confirmContact)
+		group.PATCH("/:paymail/non-confirmation", action.unconfirmContact)
 
-		group.PATCH("/accepted/:paymail", action.accept)
-		group.PATCH("/rejected/:paymail", action.reject)
-		group.PATCH("/confirmed/:paymail", action.confirm)
-		group.PATCH("/unconfirmed/:paymail", action.unconfirm)
-
-		group.POST("search", action.search)
+		group.GET("", action.getContacts)
+		group.GET(":paymail", action.getContactsByID)
 	})
 
-	return apiEndpoints
+	invitationsAPIEndpoints := routes.APIEndpointsFunc(func(router *gin.RouterGroup) {
+		group := router.Group("/invitations")
+
+		group.POST("/:paymail", action.acceptInvitations)
+		group.DELETE("/:paymail", action.rejectInvitation)
+
+	})
+	return contactsAPIEndpoints, invitationsAPIEndpoints
 }
