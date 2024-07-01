@@ -8,6 +8,6 @@ type PageDescription struct {
 }
 
 type PageModel[T any] struct {
-	Content []T             `json:"content"`
+	Content []*T            `json:"content"`
 	Page    PageDescription `json:"page"`
 }

@@ -92,5 +92,14 @@ func (a *Action) transactions(c *gin.Context) {
 		contracts = append(contracts, mappings.MapToTransactionContract(transaction))
 	}
 
-	c.JSON(http.StatusOK, contracts)
+	response := models.PageModel[models.Transaction]{
+		Content: contracts,
+		Page: models.PageDescription{
+			Size:          len(contracts),
+			Number:        0,
+			TotalElements: len(contracts),
+			TotalPages:    1,
+		},
+	}
+	c.JSON(http.StatusOK, response)
 }
