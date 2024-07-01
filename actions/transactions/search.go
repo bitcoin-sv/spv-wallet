@@ -31,7 +31,7 @@ func (a *Action) search(c *gin.Context) {
 		return
 	}
 
-	// Record a new transaction (get the hex from parameters)a
+	// Record a new transaction (get the hex from parameters)
 	transactions, err := a.Services.SpvWalletEngine.GetTransactionsByXpubID(
 		c.Request.Context(),
 		reqXPubID,
@@ -74,7 +74,7 @@ func (a *Action) transactions(c *gin.Context) {
 		return
 	}
 
-	// Record a new transaction (get the hex from parameters)a
+	// Record a new transaction (get the hex from parameters)
 	transactions, err := a.Services.SpvWalletEngine.GetTransactionsByXpubID(
 		c.Request.Context(),
 		reqXPubID,
