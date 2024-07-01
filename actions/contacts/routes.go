@@ -30,3 +30,22 @@ func NewHandler(appConfig *config.AppConfig, services *config.AppServices) route
 
 	return apiEndpoints
 }
+
+// NewContactsHandler creates the specific package routes
+func NewContactsHandler(appConfig *config.AppConfig, services *config.AppServices) routes.APIEndpointsFunc {
+	action := &Action{actions.Action{AppConfig: appConfig, Services: services}}
+
+	apiEndpoints := routes.APIEndpointsFunc(func(router *gin.RouterGroup) {
+		group := router.Group("/contacts")
+		group.PUT("/:paymail", action.upsert)
+
+		group.PATCH("/accepted/:paymail", action.accept)
+		group.PATCH("/rejected/:paymail", action.reject)
+		group.PATCH("/confirmed/:paymail", action.confirm)
+		group.PATCH("/unconfirmed/:paymail", action.unconfirm)
+
+		group.POST("search", action.search)
+	})
+
+	return apiEndpoints
+}
