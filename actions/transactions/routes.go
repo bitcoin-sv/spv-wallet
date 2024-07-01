@@ -18,7 +18,7 @@ func NewTransactionsHandler(appConfig *config.AppConfig, services *config.AppSer
 
 	basicEndpoints := routes.BasicEndpointsFunc(func(router *gin.RouterGroup) {
 		basicTransactionGroup := router.Group("/transactions")
-		basicTransactionGroup.GET(":id", action.getById)
+		basicTransactionGroup.GET(":id", action.getByID)
 		basicTransactionGroup.PATCH(":id", action.updateTransaction)
 		basicTransactionGroup.GET("", action.transactions)
 	})
