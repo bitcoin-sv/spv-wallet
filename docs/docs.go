@@ -1206,6 +1206,31 @@ const docTemplate = `{
                 }
             }
         },
+        "/v1/configs/shared": {
+            "get": {
+                "security": [
+                    {
+                        "x-auth-xpub": []
+                    }
+                ],
+                "description": "Get shared config",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Shared-config"
+                ],
+                "summary": "Get shared config",
+                "responses": {
+                    "200": {
+                        "description": "Shared configuration",
+                        "schema": {
+                            "$ref": "#/definitions/models.SharedConfig"
+                        }
+                    }
+                }
+            }
+        },
         "/v1/contact/accepted/{paymail}": {
             "patch": {
                 "security": [
@@ -4556,8 +4581,6 @@ const docTemplate = `{
                 1000000000,
                 60000000000,
                 3600000000000,
-                -9223372036854775808,
-                9223372036854775807,
                 1,
                 1000,
                 1000000,
@@ -4574,8 +4597,6 @@ const docTemplate = `{
                 "Second",
                 "Minute",
                 "Hour",
-                "minDuration",
-                "maxDuration",
                 "Nanosecond",
                 "Microsecond",
                 "Millisecond",
