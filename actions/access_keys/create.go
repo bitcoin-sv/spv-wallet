@@ -45,3 +45,19 @@ func (a *Action) create(c *gin.Context) {
 	contract := mappings.MapToAccessKeyContract(accessKey)
 	c.JSON(http.StatusCreated, contract)
 }
+
+// create will make a new model using the services defined in the action object
+// Create access key godoc
+// @Summary		Create access key
+// @Description	Create access key
+// @Tags		Access-key
+// @Produce		json
+// @Param		CreateAccessKey body CreateAccessKey true " "
+// @Success		201	{object} models.AccessKey "Created AccessKey"
+// @Failure		400	"Bad request - Error while parsing CreateAccessKey from request body"
+// @Failure 	500	"Internal server error - Error while creating new access key"
+// @Router		/v1/users/current/keys [post]
+// @Security	x-auth-xpub
+func (a *Action) create2(c *gin.Context) {
+	a.create(c)
+}

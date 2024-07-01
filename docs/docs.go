@@ -2007,6 +2007,127 @@ const docTemplate = `{
                 }
             }
         },
+        "/v1/users/current/keys": {
+            "get": {
+                "security": [
+                    {
+                        "x-auth-xpub": []
+                    }
+                ],
+                "description": "Get access key",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Access-key"
+                ],
+                "summary": "Get access key",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "id of the access key",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "AccessKey with given id",
+                        "schema": {
+                            "$ref": "#/definitions/models.AccessKey"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request - Missing required field: id"
+                    },
+                    "403": {
+                        "description": "Forbidden - Access key is not owned by the user"
+                    },
+                    "500": {
+                        "description": "Internal server error - Error while getting access key"
+                    }
+                }
+            },
+            "post": {
+                "security": [
+                    {
+                        "x-auth-xpub": []
+                    }
+                ],
+                "description": "Create access key",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Access-key"
+                ],
+                "summary": "Create access key",
+                "parameters": [
+                    {
+                        "description": " ",
+                        "name": "CreateAccessKey",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/accesskeys.CreateAccessKey"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created AccessKey",
+                        "schema": {
+                            "$ref": "#/definitions/models.AccessKey"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request - Error while parsing CreateAccessKey from request body"
+                    },
+                    "500": {
+                        "description": "Internal server error - Error while creating new access key"
+                    }
+                }
+            },
+            "delete": {
+                "security": [
+                    {
+                        "x-auth-xpub": []
+                    }
+                ],
+                "description": "Revoke access key",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Access-key"
+                ],
+                "summary": "Revoke access key",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "id of the access key",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Revoked AccessKey",
+                        "schema": {
+                            "$ref": "#/definitions/models.AccessKey"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request - Missing required field: id"
+                    },
+                    "500": {
+                        "description": "Internal server error - Error while revoking access key"
+                    }
+                }
+            }
+        },
         "/v1/utxo": {
             "get": {
                 "security": [
@@ -4652,11 +4773,14 @@ const docTemplate = `{
                 1000000000,
                 60000000000,
                 3600000000000,
+                -9223372036854775808,
+                9223372036854775807,
                 1,
                 1000,
                 1000000,
                 1000000000,
-                60000000000
+                60000000000,
+                3600000000000
             ],
             "x-enum-varnames": [
                 "minDuration",
@@ -4667,11 +4791,14 @@ const docTemplate = `{
                 "Second",
                 "Minute",
                 "Hour",
+                "minDuration",
+                "maxDuration",
                 "Nanosecond",
                 "Microsecond",
                 "Millisecond",
                 "Second",
-                "Minute"
+                "Minute",
+                "Hour"
             ]
         },
         "transactions.NewTransaction": {
