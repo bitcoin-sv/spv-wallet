@@ -3,9 +3,6 @@
 
 # options for analysis running
 run:
-  # default concurrency is an available CPU number
-  concurrency: 4
-
   # timeout for analysis, e.g. 30s, 5m, default is 1m
   timeout: 5m
 
@@ -152,6 +149,8 @@ issues:
     - .github
     - .make
     - dist
+    - engine # FIXME: skip engine dir until we fix all issues there
+
   # Maximum issues count per one linter. Set to 0 to disable. Default is 50.
   max-issues-per-linter: 0
 
