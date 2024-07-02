@@ -24,6 +24,12 @@ func NewHandler(appConfig *config.AppConfig, services *config.AppServices) route
 		accessKeyGroup.POST("/count", action.count)
 		accessKeyGroup.GET("/search", action.search)
 		accessKeyGroup.POST("/search", action.search)
+
+		accessKeyGroup2 := router.Group("/users/current/keys")
+		accessKeyGroup2.GET("/:id", action.get2)
+		accessKeyGroup2.POST("", action.create2)
+		accessKeyGroup2.DELETE("/:id", action.revoke2)
+		// TODO: accessKeyGroup2.GET("", action.search)
 	})
 
 	return apiEndpoints
