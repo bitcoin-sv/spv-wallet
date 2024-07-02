@@ -86,12 +86,6 @@ func defaultClientOptions() *clientOptions {
 		// Blank NewRelic config
 		newRelic: &newRelicOptions{},
 
-		// Blank notifications config
-		// notifications: &notificationsOptions{
-		// 	ClientInterface: nil,
-		// 	webhookEndpoint: "",
-		// },
-
 		// Blank Paymail config
 		paymail: &paymailOptions{
 			client: nil,
@@ -260,10 +254,8 @@ func WithLogger(customLogger *zerolog.Logger) ClientOps {
 			// Enable the logger on all SPV Wallet Engine services
 			chainstateLogger := customLogger.With().Str("subservice", "chainstate").Logger()
 			taskManagerLogger := customLogger.With().Str("subservice", "taskManager").Logger()
-			// notificationsLogger := customLogger.With().Str("subservice", "notifications").Logger()
 			c.chainstate.options = append(c.chainstate.options, chainstate.WithLogger(&chainstateLogger))
 			c.taskManager.options = append(c.taskManager.options, taskmanager.WithLogger(&taskManagerLogger))
-			// c.notifications.options = append(c.notifications.options, notifications.WithLogger(&notificationsLogger))
 
 			// Enable the logger on all external services
 			var datastoreLogger *logging.GormLoggerAdapter

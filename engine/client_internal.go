@@ -11,8 +11,6 @@ import (
 	"github.com/bitcoin-sv/spv-wallet/engine/cluster"
 	"github.com/bitcoin-sv/spv-wallet/engine/datastore"
 	"github.com/bitcoin-sv/spv-wallet/engine/notifications"
-
-	// "github.com/bitcoin-sv/spv-wallet/engine/notifications"
 	"github.com/bitcoin-sv/spv-wallet/engine/taskmanager"
 	"github.com/mrz1836/go-cachestore"
 )
@@ -92,7 +90,8 @@ func (c *Client) loadNotificationClient(ctx context.Context) (err error) {
 	}
 	notificationService := notifications.NewNotifications(ctx)
 	c.options.notifications.client = notificationService
-	c.options.notifications.webhookManager = notifications.NewWebhookManager(ctx, notificationService, &WebhooksRepository{client: c})
+	logger := c.Logger().With().Str("subservice", "taskManager").Logger()
+	c.options.notifications.webhookManager = notifications.NewWebhookManager(ctx, &logger, notificationService, &WebhooksRepository{client: c})
 
 	// for development purposes only
 	notifications.StartSendingMockEvents(

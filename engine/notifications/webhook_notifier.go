@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/pkg/errors"
+	"github.com/rs/zerolog"
 )
 
 const (
@@ -26,15 +27,17 @@ type WebhookNotifier struct {
 	httpClient    *http.Client
 	definition    WebhookModel
 	definitionMtx sync.Mutex
+	logger        *zerolog.Logger
 }
 
 // NewWebhookNotifier - creates a new instance of WebhookNotifier
-func NewWebhookNotifier(ctx context.Context, model WebhookModel, banMsg chan string) *WebhookNotifier {
+func NewWebhookNotifier(ctx context.Context, logger *zerolog.Logger, model WebhookModel, banMsg chan string) *WebhookNotifier {
 	notifier := &WebhookNotifier{
 		Channel:    make(chan *RawEvent, lengthOfWebhookChannel),
 		definition: model,
 		banMsg:     banMsg,
 		httpClient: &http.Client{},
+		logger:     logger,
 	}
 
 	go notifier.consumer(ctx)
@@ -73,6 +76,7 @@ func (w *WebhookNotifier) consumer(ctx context.Context) {
 			for i := 0; i < mexRetries; i++ {
 				err = w.sendEventsToWebhook(ctx, events)
 				if err == nil {
+					w.logger.Warn().Msgf("Webhook call was failed: %v", err)
 					break
 				}
 				select {
@@ -108,7 +112,13 @@ loop:
 	return events, false
 }
 
-func (w *WebhookNotifier) sendEventsToWebhook(ctx context.Context, events []*RawEvent) error {
+func (w *WebhookNotifier) sendEventsToWebhook(ctx context.Context, events []*RawEvent) (resultError error) {
+	defer func() {
+		if r := recover(); r != nil {
+			w.logger.Warn().Msgf("Webhook call failed: %v", r)
+			resultError = errors.New("panic")
+		}
+	}()
 	definition := w.currentDefinition()
 	data, err := json.Marshal(events)
 	if err != nil {

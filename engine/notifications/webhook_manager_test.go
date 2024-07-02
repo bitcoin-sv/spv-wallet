@@ -55,7 +55,7 @@ func TestWebhookManager(t *testing.T) {
 		n := NewNotifications(ctx)
 		repo := &mockRepository{webhooks: []*WebhookModel{newMockWebhookModel(client.url, "", "")}}
 
-		manager := NewWebhookManager(ctx, n, repo)
+		manager := NewWebhookManager(ctx, &nopLogger, n, repo)
 		time.Sleep(100 * time.Millisecond) // wait for manager to update notifiers
 		defer manager.Stop()
 
@@ -85,7 +85,7 @@ func TestWebhookManager(t *testing.T) {
 		n := NewNotifications(ctx)
 		repo := &mockRepository{webhooks: []*WebhookModel{newMockWebhookModel(client.url, "", "")}}
 
-		manager := NewWebhookManager(ctx, n, repo)
+		manager := NewWebhookManager(ctx, &nopLogger, n, repo)
 		time.Sleep(100 * time.Millisecond)
 		defer manager.Stop()
 
