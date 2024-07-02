@@ -3,7 +3,7 @@ package accesskeys
 import (
 	"net/http"
 
-	"github.com/bitcoin-sv/spv-wallet/engine"
+	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/bitcoin-sv/spv-wallet/mappings"
 	"github.com/bitcoin-sv/spv-wallet/server/auth"
 	"github.com/gin-gonic/gin"
@@ -27,7 +27,7 @@ func (a *Action) get(c *gin.Context) {
 
 	id := c.Query("id")
 	if id == "" {
-		c.JSON(http.StatusBadRequest, engine.ErrMissingFieldID)
+		spverrors.ErrorResponse(c, spverrors.ErrMissingFieldID, a.Services.Logger)
 		return
 	}
 
@@ -36,12 +36,12 @@ func (a *Action) get(c *gin.Context) {
 		c.Request.Context(), reqXPubID, id,
 	)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, err.Error())
+		spverrors.ErrorResponse(c, err, a.Services.Logger)
 		return
 	}
 
 	if accessKey.XpubID != reqXPubID {
-		c.JSON(http.StatusForbidden, "unauthorized")
+		spverrors.ErrorResponse(c, spverrors.ErrAuthorization, a.Services.Logger)
 		return
 	}
 

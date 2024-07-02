@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/bitcoin-sv/spv-wallet/engine/notifications"
+	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 )
 
 // AfterDeleted will fire after a successful delete in the Datastore
@@ -143,7 +144,7 @@ func incrementField(ctx context.Context, model ModelInterface, fieldName string,
 	// Check for client
 	c := model.Client()
 	if c == nil {
-		return 0, ErrMissingClient
+		return 0, spverrors.ErrMissingClient
 	}
 
 	// Increment

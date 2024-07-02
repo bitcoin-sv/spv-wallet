@@ -6,6 +6,7 @@ import (
 
 	"github.com/bitcoin-sv/spv-wallet/engine"
 	"github.com/bitcoin-sv/spv-wallet/engine/datastore"
+	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/bitcoin-sv/spv-wallet/mappings"
 	"github.com/gin-gonic/gin"
 )
@@ -25,7 +26,7 @@ import (
 func (a *Action) transactionRecord(c *gin.Context) {
 	var requestBody RecordTransaction
 	if err := c.ShouldBindJSON(&requestBody); err != nil {
-		c.JSON(http.StatusBadRequest, err.Error())
+		spverrors.ErrorResponse(c, spverrors.ErrCannotBindRequest, a.Services.Logger)
 		return
 	}
 
@@ -42,11 +43,11 @@ func (a *Action) transactionRecord(c *gin.Context) {
 		if errors.Is(err, datastore.ErrDuplicateKey) {
 			// already registered, just return the registered transaction
 			if transaction, err = a.Services.SpvWalletEngine.GetTransactionByHex(c.Request.Context(), requestBody.Hex); err != nil {
-				c.JSON(http.StatusInternalServerError, err.Error())
+				spverrors.ErrorResponse(c, err, a.Services.Logger)
 				return
 			}
 		} else {
-			c.JSON(http.StatusInternalServerError, err.Error())
+			spverrors.ErrorResponse(c, err, a.Services.Logger)
 			return
 		}
 	}

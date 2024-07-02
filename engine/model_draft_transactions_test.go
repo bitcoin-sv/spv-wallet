@@ -10,6 +10,7 @@ import (
 	"time"
 
 	"github.com/bitcoin-sv/spv-wallet/engine/chainstate"
+	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/bitcoin-sv/spv-wallet/engine/utils"
 	"github.com/bitcoinschema/go-bitcoin/v2"
 	"github.com/jarcoal/httpmock"
@@ -259,7 +260,7 @@ func TestDraftTransaction_createTransaction(t *testing.T) {
 		_, client, deferMe := CreateTestSQLiteClient(t, false, false, withTaskManagerMockup())
 		defer deferMe()
 		_, err := newDraftTransaction(testXPub, &TransactionConfig{}, append(client.DefaultModelOptions(), New())...)
-		require.ErrorIs(t, err, ErrMissingTransactionOutputs)
+		require.ErrorIs(t, err, spverrors.ErrMissingTransactionOutputs)
 	})
 
 	t.Run("transaction with no utxos", func(t *testing.T) {
@@ -271,7 +272,7 @@ func TestDraftTransaction_createTransaction(t *testing.T) {
 				Satoshis: 1000,
 			}},
 		}, append(client.DefaultModelOptions(), New())...)
-		require.ErrorIs(t, err, ErrNotEnoughUtxos)
+		require.ErrorIs(t, err, spverrors.ErrNotEnoughUtxos)
 	})
 
 	t.Run("transaction with utxos", func(t *testing.T) {
@@ -745,7 +746,7 @@ func TestDraftTransaction_createTransaction(t *testing.T) {
 				Satoshis: 1500,
 			}},
 		}, append(client.DefaultModelOptions(), New())...)
-		require.ErrorIs(t, err, ErrDuplicateUTXOs)
+		require.ErrorIs(t, err, spverrors.ErrDuplicateUTXOs)
 	})
 }
 
@@ -769,7 +770,7 @@ func TestDraftTransaction_setChangeDestination(t *testing.T) {
 		}
 
 		_, err := draftTransaction.setChangeDestination(ctx, 100, 200)
-		require.ErrorIs(t, err, ErrMissingXpub)
+		require.ErrorIs(t, err, spverrors.ErrCouldNotFindXpub)
 	})
 
 	t.Run("set valid destination", func(t *testing.T) {
@@ -898,7 +899,7 @@ func TestDraftTransaction_getInputsFromUtxos(t *testing.T) {
 			ScriptPubKey: "testLockingScript",
 		}}
 		inputUtxos, satoshisReserved, err := draftTransaction.getInputsFromUtxos(reservedUtxos)
-		require.ErrorIs(t, err, ErrInvalidLockingScript)
+		require.ErrorIs(t, err, spverrors.ErrInvalidLockingScript)
 		assert.Nil(t, inputUtxos)
 		assert.Equal(t, uint64(0), satoshisReserved)
 	})
@@ -915,7 +916,7 @@ func TestDraftTransaction_getInputsFromUtxos(t *testing.T) {
 			ScriptPubKey: testLockingScript,
 		}}
 		inputUtxos, satoshisReserved, err := draftTransaction.getInputsFromUtxos(reservedUtxos)
-		require.ErrorIs(t, err, ErrInvalidTransactionID)
+		require.ErrorIs(t, err, spverrors.ErrInvalidTransactionID)
 		assert.Nil(t, inputUtxos)
 		assert.Equal(t, uint64(0), satoshisReserved)
 	})
@@ -1062,7 +1063,7 @@ func TestDraftTransaction_addOutputsToTx(t *testing.T) {
 		}
 		tx := bt.NewTx()
 		err := draft.addOutputsToTx(tx)
-		require.ErrorIs(t, err, ErrOutputValueTooLow)
+		require.ErrorIs(t, err, spverrors.ErrOutputValueTooLow)
 		assert.Len(t, tx.Outputs, 0)
 	})
 
@@ -1119,7 +1120,7 @@ func TestDraftTransaction_addOutputsToTx(t *testing.T) {
 		}
 		tx := bt.NewTx()
 		err := draft.addOutputsToTx(tx)
-		require.ErrorIs(t, err, ErrInvalidOpReturnOutput)
+		require.ErrorIs(t, err, spverrors.ErrInvalidOpReturnOutput)
 	})
 }
 

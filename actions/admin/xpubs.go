@@ -4,6 +4,7 @@ import (
 	"net/http"
 
 	"github.com/bitcoin-sv/spv-wallet/engine"
+	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/bitcoin-sv/spv-wallet/mappings"
 	"github.com/bitcoin-sv/spv-wallet/models"
 	"github.com/bitcoin-sv/spv-wallet/models/filter"
@@ -25,7 +26,7 @@ import (
 func (a *Action) xpubsCreate(c *gin.Context) {
 	var requestBody CreateXpub
 	if err := c.Bind(&requestBody); err != nil {
-		c.JSON(http.StatusBadRequest, err.Error())
+		spverrors.ErrorResponse(c, spverrors.ErrCannotBindRequest, a.Services.Logger)
 		return
 	}
 
@@ -34,7 +35,7 @@ func (a *Action) xpubsCreate(c *gin.Context) {
 		engine.WithMetadatas(requestBody.Metadata),
 	)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, err.Error())
+		spverrors.ErrorResponse(c, err, a.Services.Logger)
 		return
 	}
 
@@ -57,7 +58,7 @@ func (a *Action) xpubsCreate(c *gin.Context) {
 func (a *Action) xpubsSearch(c *gin.Context) {
 	var reqParams filter.SearchXpubs
 	if err := c.Bind(&reqParams); err != nil {
-		c.JSON(http.StatusBadRequest, err.Error())
+		spverrors.ErrorResponse(c, spverrors.ErrCannotBindRequest, a.Services.Logger)
 		return
 	}
 
@@ -68,7 +69,7 @@ func (a *Action) xpubsSearch(c *gin.Context) {
 		mappings.MapToQueryParams(reqParams.QueryParams),
 	)
 	if err != nil {
-		c.JSON(http.StatusExpectationFailed, err.Error())
+		spverrors.ErrorResponse(c, err, a.Services.Logger)
 		return
 	}
 
@@ -95,7 +96,7 @@ func (a *Action) xpubsSearch(c *gin.Context) {
 func (a *Action) xpubsCount(c *gin.Context) {
 	var reqParams filter.CountXpubs
 	if err := c.Bind(&reqParams); err != nil {
-		c.JSON(http.StatusBadRequest, err.Error())
+		spverrors.ErrorResponse(c, spverrors.ErrCannotBindRequest, a.Services.Logger)
 		return
 	}
 
@@ -105,7 +106,7 @@ func (a *Action) xpubsCount(c *gin.Context) {
 		reqParams.Conditions.ToDbConditions(),
 	)
 	if err != nil {
-		c.JSON(http.StatusExpectationFailed, err.Error())
+		spverrors.ErrorResponse(c, err, a.Services.Logger)
 		return
 	}
 

@@ -1,11 +1,11 @@
 package admin
 
 import (
-	"errors"
 	"net/http"
 
 	"github.com/bitcoin-sv/spv-wallet/actions/common"
 	"github.com/bitcoin-sv/spv-wallet/engine"
+	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/bitcoin-sv/spv-wallet/mappings"
 	"github.com/bitcoin-sv/spv-wallet/models"
 	"github.com/bitcoin-sv/spv-wallet/models/filter"
@@ -27,13 +27,13 @@ import (
 func (a *Action) contactsSearch(c *gin.Context) {
 	var reqParams filter.SearchContacts
 	if err := c.Bind(&reqParams); err != nil {
-		c.JSON(http.StatusBadRequest, err.Error())
+		spverrors.ErrorResponse(c, spverrors.ErrCannotBindRequest, a.Services.Logger)
 		return
 	}
 
 	conditions, err := reqParams.Conditions.ToDbConditions()
 	if err != nil {
-		c.JSON(http.StatusBadRequest, err.Error())
+		spverrors.ErrorResponse(c, spverrors.ErrCannotBindRequest, a.Services.Logger)
 		return
 	}
 
@@ -46,7 +46,7 @@ func (a *Action) contactsSearch(c *gin.Context) {
 		mappings.MapToQueryParams(reqParams.QueryParams),
 	)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, err.Error())
+		spverrors.ErrorResponse(c, err, a.Services.Logger)
 		return
 	}
 
@@ -58,7 +58,7 @@ func (a *Action) contactsSearch(c *gin.Context) {
 		conditions,
 	)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, err.Error())
+		spverrors.ErrorResponse(c, err, a.Services.Logger)
 		return
 	}
 
@@ -88,7 +88,7 @@ func (a *Action) contactsSearch(c *gin.Context) {
 func (a *Action) contactsUpdate(c *gin.Context) {
 	var reqParams UpdateContact
 	if err := c.Bind(&reqParams); err != nil {
-		c.JSON(http.StatusBadRequest, err.Error())
+		spverrors.ErrorResponse(c, spverrors.ErrCannotBindRequest, a.Services.Logger)
 		return
 	}
 
@@ -101,7 +101,7 @@ func (a *Action) contactsUpdate(c *gin.Context) {
 		&reqParams.Metadata,
 	)
 	if err != nil {
-		handleErrors(err, c)
+		spverrors.ErrorResponse(c, err, a.Services.Logger)
 		return
 	}
 
@@ -133,7 +133,7 @@ func (a *Action) contactsDelete(c *gin.Context) {
 		id,
 	)
 	if err != nil {
-		handleErrors(err, c)
+		spverrors.ErrorResponse(c, err, a.Services.Logger)
 		return
 	}
 
@@ -164,7 +164,7 @@ func (a *Action) contactsReject(c *gin.Context) {
 		engine.ContactRejected,
 	)
 	if err != nil {
-		handleErrors(err, c)
+		spverrors.ErrorResponse(c, err, a.Services.Logger)
 		return
 	}
 
@@ -197,22 +197,11 @@ func (a *Action) contactsAccept(c *gin.Context) {
 		engine.ContactNotConfirmed,
 	)
 	if err != nil {
-		handleErrors(err, c)
+		spverrors.ErrorResponse(c, err, a.Services.Logger)
 		return
 	}
 
 	contract := mappings.MapToContactContract(contact)
 
 	c.JSON(http.StatusOK, contract)
-}
-
-func handleErrors(err error, c *gin.Context) {
-	switch {
-	case errors.Is(err, engine.ErrContactNotFound):
-		c.JSON(http.StatusNotFound, err.Error())
-	case errors.Is(err, engine.ErrContactIncorrectStatus):
-		c.JSON(http.StatusUnprocessableEntity, err.Error())
-	default:
-		c.JSON(http.StatusInternalServerError, err.Error())
-	}
 }

@@ -16,11 +16,11 @@ package pike
 
 import (
 	"fmt"
-	"github.com/libsv/go-bk/bec"
-	"github.com/libsv/go-bt/v2/bscript"
 
 	"github.com/bitcoin-sv/spv-wallet/engine/script/template"
 	"github.com/bitcoin-sv/spv-wallet/engine/types/type42"
+	"github.com/libsv/go-bk/bec"
+	"github.com/libsv/go-bt/v2/bscript"
 )
 
 // GenerateOutputsTemplate creates a Pike output template

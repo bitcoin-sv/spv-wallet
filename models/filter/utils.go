@@ -25,7 +25,7 @@ func checkStrOption(value string, options ...string) (string, error) {
 			return opt, nil
 		}
 	}
-	return "", errors.New("Invalid option: " + value)
+	return "", errors.New("invalid filter option")
 }
 
 func checkAndApplyStrOption(conditions map[string]interface{}, columnName string, value *string, options ...string) error {

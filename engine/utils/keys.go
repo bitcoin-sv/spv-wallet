@@ -1,6 +1,7 @@
 package utils
 
 import (
+	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/bitcoinschema/go-bitcoin/v2"
 	"github.com/libsv/go-bk/bec"
 	"github.com/libsv/go-bk/bip32"
@@ -45,7 +46,7 @@ func ValidateXPub(rawKey string) (*bip32.ExtendedKey, error) {
 
 	// Validate the xpub (length)
 	if len(rawKey) != XpubKeyLength {
-		return nil, ErrXpubInvalidLength
+		return nil, spverrors.ErrXpubInvalidLength
 	}
 
 	// Parse the xPub into an HD key
@@ -53,7 +54,7 @@ func ValidateXPub(rawKey string) (*bip32.ExtendedKey, error) {
 	if err != nil {
 		return nil, err
 	} else if hdKey.String() != rawKey { // Sanity check (might not be needed)
-		return nil, ErrXpubNoMatch
+		return nil, spverrors.ErrXpubNoMatch
 	}
 	return hdKey, nil
 }

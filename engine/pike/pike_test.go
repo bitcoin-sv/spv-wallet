@@ -4,10 +4,9 @@ import (
 	"encoding/hex"
 	"testing"
 
+	"github.com/bitcoin-sv/spv-wallet/engine/script/template"
 	"github.com/libsv/go-bk/bec"
 	assert "github.com/stretchr/testify/require"
-
-	"github.com/bitcoin-sv/spv-wallet/engine/script/template"
 )
 
 func TestGenerateLockingScriptsFromTemplates(t *testing.T) {
