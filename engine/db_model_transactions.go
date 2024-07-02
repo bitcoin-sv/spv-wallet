@@ -5,6 +5,7 @@ import (
 
 	"github.com/bitcoin-sv/spv-wallet/engine/datastore"
 	"github.com/bitcoin-sv/spv-wallet/engine/notifications"
+	"github.com/bitcoin-sv/spv-wallet/models"
 )
 
 // GetModelTableName will get the db table name of the current model
@@ -105,8 +106,7 @@ func (m *Transaction) AfterCreated(ctx context.Context) error {
 		}
 	}
 
-	// Fire notifications (this is already in a go routine)
-	notify(notifications.EventTypeCreate, m)
+	m.notify()
 
 	m.Client().Logger().Debug().
 		Str("txID", m.ID).
@@ -120,8 +120,7 @@ func (m *Transaction) AfterUpdated(_ context.Context) error {
 		Str("txID", m.ID).
 		Msgf("starting: %s AfterUpdated hook...", m.Name())
 
-	// Fire notifications (this is already in a go routine)
-	notify(notifications.EventTypeUpdate, m)
+	m.notify()
 
 	m.Client().Logger().Debug().
 		Str("txID", m.ID).
@@ -132,9 +131,6 @@ func (m *Transaction) AfterUpdated(_ context.Context) error {
 // AfterDeleted will fire after the model is deleted in the Datastore
 func (m *Transaction) AfterDeleted(_ context.Context) error {
 	m.Client().Logger().Debug().Msgf("starting: %s AfterDeleted hook...", m.Name())
-
-	// Fire notifications (this is already in a go routine)
-	notify(notifications.EventTypeDelete, m)
 
 	m.Client().Logger().Debug().Msgf("end: %s AfterDeleted hook", m.Name())
 	return nil
@@ -181,4 +177,16 @@ func (m *Transaction) migratePostgreSQL(client datastore.ClientInterface, tableN
 	}
 
 	return nil
+}
+
+func (m *Transaction) notify() {
+	if n := m.Client().Notifications(); n != nil {
+		n.Notify(notifications.NewRawEvent(&models.TransactionEvent{
+			UserEvent: models.UserEvent{
+				XPubID: m.XPubID,
+			},
+			TransactionID: m.ID,
+			Status:        m.TxStatus,
+		}))
+	}
 }

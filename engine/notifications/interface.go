@@ -2,21 +2,13 @@ package notifications
 
 import (
 	"context"
-	"net/http"
-
-	"github.com/rs/zerolog"
+	"time"
 )
 
-// HTTPInterface is the HTTP client interface
-type HTTPInterface interface {
-	Do(req *http.Request) (*http.Response, error)
-}
-
-// ClientInterface is the notification client interface
-type ClientInterface interface {
-	Debug(on bool)
-	GetWebhookEndpoint() string
-	IsDebug() bool
-	Logger() *zerolog.Logger
-	Notify(ctx context.Context, modelType string, eventType EventType, model interface{}, id string) error
+// WebhooksRepository is an interface for managing webhooks.
+type WebhooksRepository interface {
+	CreateWebhook(ctx context.Context, url, tokenHeader, tokenValue string) error
+	RemoveWebhook(ctx context.Context, url string) error
+	BanWebhook(ctx context.Context, url string, bannedTo time.Time) error
+	GetWebhooks(ctx context.Context) ([]*WebhookModel, error)
 }
