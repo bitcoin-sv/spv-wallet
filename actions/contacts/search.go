@@ -75,7 +75,6 @@ func (a *Action) search(c *gin.Context) {
 
 // TODO: this method will be changed based on search poc
 // getContacts will fetch a list of contacts
-// Get contacts godoc
 // @Summary		Get contacts
 // @Description	Get contacts
 // @Tags		Contacts
@@ -141,18 +140,17 @@ func (a *Action) getContacts(c *gin.Context) {
 	c.JSON(http.StatusOK, response)
 }
 
-// getContactsByID will fetch a list of contacts
-// Get contacts godoc
-// @Summary		Get contacts by id
-// @Description	Get contacts by id
+// getContactByPaymail will fetch a list of contacts
+// @Summary		Get contact by paymail
+// @Description	Get contact by paymail
 // @Tags		Contacts
 // @Produce		json
 // @Success		200 {object} models.Contact "Contact"
 // @Failure		400	"Bad request - Error while parsing SearchContacts from request body"
 // @Failure 	500	"Internal server error - Error while searching for contacts"
-// @Router		/v1/contacts/{id} [GET]
+// @Router		/v1/contacts/{paymail} [GET]
 // @Security	x-auth-xpub
-func (a *Action) getContactsByID(c *gin.Context) {
+func (a *Action) getContactByPaymail(c *gin.Context) {
 	reqXPubID := c.GetString(auth.ParamXPubHashKey)
 	paymail := c.Param("paymail")
 	var reqParams filter.SearchContacts

@@ -1488,21 +1488,21 @@ const docTemplate = `{
                 }
             }
         },
-        "/v1/contacts/{id}": {
+        "/v1/contacts/{paymail}": {
             "get": {
                 "security": [
                     {
                         "x-auth-xpub": []
                     }
                 ],
-                "description": "Get contacts by id",
+                "description": "Get contact by paymail",
                 "produces": [
                     "application/json"
                 ],
                 "tags": [
                     "Contacts"
                 ],
-                "summary": "Get contacts by id",
+                "summary": "Get contact by paymail",
                 "responses": {
                     "200": {
                         "description": "Contact",
@@ -1517,9 +1517,7 @@ const docTemplate = `{
                         "description": "Internal server error - Error while searching for contacts"
                     }
                 }
-            }
-        },
-        "/v1/contacts/{paymail}": {
+            },
             "put": {
                 "security": [
                     {
@@ -4864,28 +4862,6 @@ const docTemplate = `{
                 1000000,
                 1000000000,
                 60000000000,
-                3600000000000,
-                -9223372036854775808,
-                9223372036854775807,
-                1,
-                1000,
-                1000000,
-                1000000000,
-                60000000000,
-                3600000000000,
-                -9223372036854775808,
-                9223372036854775807,
-                1,
-                1000,
-                1000000,
-                1000000000,
-                60000000000,
-                3600000000000,
-                1,
-                1000,
-                1000000,
-                1000000000,
-                60000000000,
                 3600000000000
             ],
             "x-enum-varnames": [
@@ -4899,28 +4875,6 @@ const docTemplate = `{
                 "Hour",
                 "minDuration",
                 "maxDuration",
-                "Nanosecond",
-                "Microsecond",
-                "Millisecond",
-                "Second",
-                "Minute",
-                "Hour",
-                "minDuration",
-                "maxDuration",
-                "Nanosecond",
-                "Microsecond",
-                "Millisecond",
-                "Second",
-                "Minute",
-                "Hour",
-                "minDuration",
-                "maxDuration",
-                "Nanosecond",
-                "Microsecond",
-                "Millisecond",
-                "Second",
-                "Minute",
-                "Hour",
                 "Nanosecond",
                 "Microsecond",
                 "Millisecond",

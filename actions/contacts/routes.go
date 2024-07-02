@@ -42,7 +42,7 @@ func NewContactsHandler(appConfig *config.AppConfig, services *config.AppService
 		group.PATCH("/:paymail/non-confirmation", action.unconfirmContact)
 
 		group.GET("", action.getContacts)
-		group.GET(":paymail", action.getContactsByID)
+		group.GET(":paymail", action.getContactByPaymail)
 	})
 
 	invitationsAPIEndpoints := routes.APIEndpointsFunc(func(router *gin.RouterGroup) {
