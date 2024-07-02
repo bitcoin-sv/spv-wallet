@@ -59,3 +59,18 @@ func (a *Action) upsert(c *gin.Context) {
 
 	c.JSON(http.StatusOK, response)
 }
+
+// upsertContact will add a new contact or modify an existing one.
+// upsertContact contact godoc
+// @Summary		Upsert contact
+// @Description	Add or update contact. When adding a new contact, the system utilizes Paymail's PIKE capability to dispatch an invitation request, asking the counterparty to include the current user in their contacts.
+// @Tags		Contacts
+// @Produce		json
+// @Param		paymail path string true "Paymail address of the contact the user wants to add/modify"
+// @Param		UpsertContact body contacts.UpsertContact true "Full name and metadata needed to add/modify contact"
+// @Success		201
+// @Router		/v1/contacts/{paymail} [PUT]
+// @Security	x-auth-xpub
+func (a *Action) upsertContact(c *gin.Context) {
+	a.upsert(c)
+}

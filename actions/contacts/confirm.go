@@ -41,3 +41,20 @@ func (a *Action) confirm(c *gin.Context) {
 	}
 	c.Status(http.StatusOK)
 }
+
+// confirmContact will confirm contact request
+// Confirm contact godoc
+// @Summary		Confirm contact
+// @Description	Confirm contact. For contact with status "unconfirmed" change status to "confirmed"
+// @Tags		Contacts
+// @Produce		json
+// @Param		paymail path string true "Paymail address of the contact the user wants to confirm"
+// @Success		200
+// @Failure		404	"Contact not found"
+// @Failure		422	"Contact status not unconfirmed"
+// @Failure		500	"Internal server error"
+// @Router		/v1/contacts/{paymail}/confirmation [PATCH]
+// @Security	x-auth-xpub
+func (a *Action) confirmContact(c *gin.Context) {
+	a.confirm(c)
+}
