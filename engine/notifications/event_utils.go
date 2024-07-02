@@ -5,28 +5,30 @@ import (
 	"fmt"
 	"reflect"
 
+	"github.com/bitcoin-sv/spv-wallet/models"
+
 	"github.com/pkg/errors"
 )
 
 // InstantinateEvent creates a new instance of the event type passed as a type parameter.
-func InstantinateEvent[EventType Events]() *EventType {
+func InstantinateEvent[EventType models.Events]() *EventType {
 	base := *new(EventType)
 	return &base
 }
 
 // GetEventNameByType returns the name of the event type passed as a type parameter.
-func GetEventNameByType[EventType Events]() string {
+func GetEventNameByType[EventType models.Events]() string {
 	content := InstantinateEvent[EventType]()
 	return reflect.TypeOf(content).Elem().Name()
 }
 
 // GetEventName returns the name of the event type passed as a parameter.
-func GetEventName[EventType Events](instance *EventType) string {
+func GetEventName[EventType models.Events](instance *EventType) string {
 	return reflect.TypeOf(instance).Elem().Name()
 }
 
 // GetEventContent returns the content of the raw event passed as a parameter.
-func GetEventContent[EventType Events](raw *RawEvent) (*EventType, error) {
+func GetEventContent[EventType models.Events](raw *models.RawEvent) (*EventType, error) {
 	model := InstantinateEvent[EventType]()
 	if raw.Type != GetEventName(model) {
 		return nil, fmt.Errorf("Wrong type")
@@ -39,9 +41,9 @@ func GetEventContent[EventType Events](raw *RawEvent) (*EventType, error) {
 }
 
 // NewRawEvent creates a new raw event from actual event object.
-func NewRawEvent[EventType Events](namedEvent *EventType) *RawEvent {
+func NewRawEvent[EventType models.Events](namedEvent *EventType) *models.RawEvent {
 	asJSON, _ := json.Marshal(namedEvent)
-	return &RawEvent{
+	return &models.RawEvent{
 		Type:    GetEventName(namedEvent),
 		Content: asJSON,
 	}

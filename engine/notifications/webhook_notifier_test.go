@@ -9,6 +9,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/bitcoin-sv/spv-wallet/models"
 	"github.com/jarcoal/httpmock"
 	"github.com/rs/zerolog"
 	"github.com/stretchr/testify/assert"
@@ -17,14 +18,14 @@ import (
 type mockClient struct {
 	interceptor     func(req *http.Request) (*http.Response, error)
 	url             string
-	receivedBatches [][]*RawEvent
+	receivedBatches [][]*models.RawEvent
 }
 
 var nopLogger = zerolog.Nop()
 
 func newMockClient(url string) *mockClient {
 	mc := &mockClient{
-		receivedBatches: make([][]*RawEvent, 0),
+		receivedBatches: make([][]*models.RawEvent, 0),
 		url:             url,
 	}
 
@@ -42,7 +43,7 @@ func newMockClient(url string) *mockClient {
 			return httpmock.NewStringResponse(500, ""), err
 		}
 
-		var events []*RawEvent
+		var events []*models.RawEvent
 		err = json.Unmarshal(body, &events)
 		if err != nil {
 			return httpmock.NewStringResponse(500, ""), err
@@ -59,14 +60,14 @@ func newMockClient(url string) *mockClient {
 }
 
 func (mc *mockClient) assertEvents(t *testing.T, expected []string) {
-	flatten := make([]*RawEvent, 0)
+	flatten := make([]*models.RawEvent, 0)
 	for _, batch := range mc.receivedBatches {
 		flatten = append(flatten, batch...)
 	}
 	assert.Equal(t, len(expected), len(flatten))
 	if len(expected) == len(flatten) {
 		for i := 0; i < len(expected); i++ {
-			actualEvent, err := GetEventContent[StringEvent](flatten[i])
+			actualEvent, err := GetEventContent[models.StringEvent](flatten[i])
 			assert.NoError(t, err)
 			assert.Equal(t, expected[i], actualEvent.Value)
 		}

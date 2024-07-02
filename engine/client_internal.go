@@ -12,6 +12,7 @@ import (
 	"github.com/bitcoin-sv/spv-wallet/engine/datastore"
 	"github.com/bitcoin-sv/spv-wallet/engine/notifications"
 	"github.com/bitcoin-sv/spv-wallet/engine/taskmanager"
+	"github.com/bitcoin-sv/spv-wallet/models"
 	"github.com/mrz1836/go-cachestore"
 )
 
@@ -98,8 +99,8 @@ func (c *Client) loadNotificationClient(ctx context.Context) (err error) {
 		ctx,
 		notificationService,
 		100*time.Millisecond,
-		func(i int) *notifications.StringEvent {
-			return &notifications.StringEvent{Value: fmt.Sprintf("msg-%d", i)}
+		func(i int) *models.StringEvent {
+			return &models.StringEvent{Value: fmt.Sprintf("msg-%d", i)}
 		},
 	)
 
