@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/bitcoin-sv/spv-wallet/engine/datastore"
+	"github.com/bitcoin-sv/spv-wallet/engine/notifications"
 )
 
 // GetModelTableName will get the db table name of the current model
@@ -119,8 +120,13 @@ func (m *Transaction) AfterUpdated(_ context.Context) error {
 		Str("txID", m.ID).
 		Msgf("starting: %s AfterUpdated hook...", m.Name())
 
-	// Fire notifications (this is already in a go routine)
-	// notify(notifications.EventTypeUpdate, m)
+	m.Client().Notifications().Notify(notifications.NewRawEvent(&notifications.TransactionEvent{
+		UserEvent: notifications.UserEvent{
+			XPubID: m.XPubID,
+		},
+		TransactionID: m.ID,
+		Status:        m.TxStatus,
+	}))
 
 	m.Client().Logger().Debug().
 		Str("txID", m.ID).
@@ -131,9 +137,6 @@ func (m *Transaction) AfterUpdated(_ context.Context) error {
 // AfterDeleted will fire after the model is deleted in the Datastore
 func (m *Transaction) AfterDeleted(_ context.Context) error {
 	m.Client().Logger().Debug().Msgf("starting: %s AfterDeleted hook...", m.Name())
-
-	// Fire notifications (this is already in a go routine)
-	// notify(notifications.EventTypeDelete, m)
 
 	m.Client().Logger().Debug().Msgf("end: %s AfterDeleted hook", m.Name())
 	return nil

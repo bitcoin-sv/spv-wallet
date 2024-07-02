@@ -366,8 +366,6 @@ func (m *Destination) AfterCreated(ctx context.Context) error {
 		return err
 	}
 
-	// notify(notifications.EventTypeCreate, m)
-
 	m.Client().Logger().Debug().
 		Str("destinationID", m.ID).
 		Msgf("end: %s AfterCreated hook", m.Name())
@@ -417,8 +415,6 @@ func (m *Destination) AfterUpdated(ctx context.Context) error {
 		return err
 	}
 
-	// notify(notifications.EventTypeUpdate, m)
-
 	m.Client().Logger().Debug().
 		Str("destinationID", m.ID).
 		Msgf("end: %s AfterUpdated hook", m.Name())
@@ -447,8 +443,6 @@ func (m *Destination) AfterDeleted(ctx context.Context) error {
 			}
 		}
 	}
-
-	// notify(notifications.EventTypeDelete, m)
 
 	m.Client().Logger().Debug().
 		Str("destinationID", m.ID).
