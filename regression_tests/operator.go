@@ -1,9 +1,12 @@
 package main
 
 import (
+	"context"
 	"flag"
 	"fmt"
+	"time"
 
+	walletclient "github.com/bitcoin-sv/spv-wallet-go-client"
 	"github.com/bitcoin-sv/spv-wallet-go-client/xpriv"
 )
 
@@ -12,6 +15,7 @@ const (
 	adminXPriv         = "xprv9s21ZrQH143K3CbJXirfrtpLvhT3Vgusdo8coBritQ3rcS7Jy7sxWhatuxG5h2y1Cqj8FKmPp69536gmjYRpfga2MJdsGyBsnB12E19CESK"
 	adminXPub          = "xpub661MyMwAqRbcFgfmdkPgE2m5UjHXu9dj124DbaGLSjaqVESTWfCD4VuNmEbVPkbYLCkykwVZvmA8Pbf8884TQr1FgdG2nPoHR8aB36YdDQh"
 	leaderPaymailAlias = "leader"
+	minimalBalance     = 100
 )
 
 func main() {
@@ -57,6 +61,11 @@ func main() {
 		return
 	}
 	UpdateConfigWithUserKeys(config, user)
+
+	if err := handleCoinsTransfer(user, config); err != nil {
+		fmt.Println("Error handling transactions:", err)
+		return
+	}
 
 }
 
@@ -115,4 +124,61 @@ func useExistingPaymail(paymailAlias string, config *Config) (*User, error) {
 		XPub:    keys.XPub().String(),
 		Paymail: PreparePaymail(paymailAlias, config.ClientOneURL),
 	}, nil
+}
+
+func handleCoinsTransfer(user *User, config *Config) error {
+	response := PromptUserAndCheck("Do you have xpriv and master instance URL? (y/yes or n/no): ")
+	if response == 0 {
+		fmt.Printf("Please send %d Sato for full regression tests:\n%s\n", minimalBalance, user.Paymail)
+		isSent := 0
+		for isSent < 1 {
+			isSent = PromptUserAndCheck("Did you make the transaction? (y/yes or n/no): ")
+		}
+	} else {
+		if err := takeMasterUrlAndXPriv(user); err != nil {
+			return fmt.Errorf("error sending coins: %v", err)
+		}
+	}
+
+	leaderBalance := 0
+	for leaderBalance == 0 {
+		fmt.Print("Waiting for coins")
+		for i := 0; i < 3; i++ {
+			fmt.Print(".")
+			time.Sleep(1 * time.Second)
+		}
+		leaderBalance = CheckBalance(config.ClientOneURL, config.ClientOneLeaderXPriv)
+		fmt.Println()
+	}
+	return nil
+}
+
+func takeMasterUrlAndXPriv(leaderPaymail *User) error {
+	url := GetValidURL()
+	xprivMaster := GetValidXPriv()
+
+	err := sendCoinsWithGoClient(url, xprivMaster, leaderPaymail.Paymail)
+	if err != nil {
+		fmt.Println("Error sending coins:", err)
+		return err
+	}
+	return nil
+}
+
+func sendCoinsWithGoClient(instanceUrl string, istanceXPriv string, receiverPaymail string) error {
+	client := walletclient.NewWithXPriv(AddPrefixIfNeeded(instanceUrl), istanceXPriv)
+	ctx := context.Background()
+
+	balance := CheckBalance(instanceUrl, istanceXPriv)
+	if balance < minimalBalance {
+		return fmt.Errorf("balance too low: %d", balance)
+	}
+	recipient := walletclient.Recipients{To: receiverPaymail, Satoshis: uint64(balance - 1)}
+	recipients := []*walletclient.Recipients{&recipient}
+
+	_, err := client.SendToRecipients(ctx, recipients, map[string]any{"message": "regression test funds"})
+	if err != nil {
+		return fmt.Errorf("error sending to recipients: %v", err)
+	}
+	return nil
 }

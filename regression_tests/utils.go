@@ -8,6 +8,7 @@ import (
 	"io"
 	"net/http"
 	"os"
+	"regexp"
 	"strings"
 
 	walletclient "github.com/bitcoin-sv/spv-wallet-go-client"
@@ -26,6 +27,8 @@ const (
 	ClientOneLeaderXPrivEnvVar = "CLIENT_ONE_LEADER_XPRIV"
 	ClientTwoLeaderXPrivEnvVar = "CLIENT_TWO_LEADER_XPRIV"
 )
+
+var explicitHTTPURLRegex = regexp.MustCompile(`^https?://`)
 
 type User struct {
 	XPriv   string `json:"xpriv"`
@@ -212,4 +215,30 @@ func PromptUser(question string) string {
 	fmt.Println(question)
 	response, _ := reader.ReadString('\n')
 	return strings.TrimSpace(response)
+}
+
+func GetValidURL() string {
+	for {
+		url := PromptUser("Enter master instance URL with prefix: ")
+		if IsValidURL(url) {
+			return url
+		}
+		fmt.Println("Invalid URL. Please enter a valid URL with http/https prefix")
+	}
+}
+
+func IsValidURL(rawURL string) bool {
+	return explicitHTTPURLRegex.MatchString(rawURL)
+}
+
+func CheckBalance(domain, xpriv string) int {
+	client := walletclient.NewWithXPriv(AddPrefixIfNeeded(domain), xpriv)
+	ctx := context.Background()
+
+	xpubInfo, err := client.GetXPub(ctx)
+	if err != nil {
+		fmt.Println("Error getting xpub info:", err)
+		os.Exit(1)
+	}
+	return int(xpubInfo.CurrentBalance)
 }
