@@ -2,7 +2,6 @@ package spverrors
 
 import (
 	"errors"
-
 	"github.com/bitcoin-sv/spv-wallet/models"
 	"github.com/gin-gonic/gin"
 	"github.com/rs/zerolog"
@@ -21,14 +20,19 @@ func AbortWithErrorResponse(c *gin.Context, err error, log *zerolog.Logger) {
 }
 
 func getError(err error, log *zerolog.Logger) (models.ResponseError, int) {
-	var errDetails models.SPVError
-	ok := errors.As(err, &errDetails)
-	if !ok {
-		logError(log, err)
-		return models.ResponseError{Code: models.UnknownErrorCode, Message: "Unable to get information about error"}, 500
+	var extendedErr models.ExtendedError
+	if errors.As(err, &extendedErr) {
+		return models.ResponseError{
+			Code:    extendedErr.GetCode(),
+			Message: extendedErr.GetMessage(),
+		}, extendedErr.GetStatusCode()
 	}
 
-	return models.ResponseError{Code: errDetails.Code, Message: errDetails.Message}, errDetails.StatusCode
+	logError(log, err)
+	return models.ResponseError{
+		Code:    models.UnknownErrorCode,
+		Message: "Unable to get information about error",
+	}, 500
 }
 
 func logError(log *zerolog.Logger, err error) {
