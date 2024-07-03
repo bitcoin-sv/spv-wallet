@@ -4,6 +4,13 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+// Handler is a type that represents a handler for various types of endpoints.
+type Handler struct {
+	BasicEndpointsFunc
+	APIEndpoints
+	CallbackEndpoints
+}
+
 // AdminEndpointsFunc wrapping type for function to mark it as implementation of AdminEndpoints.
 type AdminEndpointsFunc func(router *gin.RouterGroup)
 

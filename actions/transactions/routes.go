@@ -13,29 +13,26 @@ type Action struct {
 }
 
 // NewTransactionsHandler creates the specific package routes in restfull style
-func NewTransactionsHandler(appConfig *config.AppConfig, services *config.AppServices) (routes.BasicEndpointsFunc, routes.APIEndpointsFunc, routes.CallbackEndpointsFunc) {
+func NewTransactionsHandler(appConfig *config.AppConfig, services *config.AppServices) *routes.Handler {
 	action := &Action{actions.Action{AppConfig: appConfig, Services: services}}
 
-	basicEndpoints := routes.BasicEndpointsFunc(func(router *gin.RouterGroup) {
-		basicTransactionGroup := router.Group("/transactions")
-		basicTransactionGroup.GET(":id", action.getByID)
-		basicTransactionGroup.PATCH(":id", action.updateTransaction)
-		basicTransactionGroup.GET("", action.transactions)
-	})
-
-	apiEndpoints := routes.APIEndpointsFunc(func(router *gin.RouterGroup) {
-		apiTransactionGroup := router.Group("/transactions")
-		apiTransactionGroup.POST("/drafts", action.newTransactionDraft)
-		apiTransactionGroup.POST("", action.recordTransaction)
-
-	})
-
-	callbackEndpoints := routes.CallbackEndpointsFunc(func(router *gin.RouterGroup) {
-		router.POST(config.BroadcastCallbackRoute, action.broadcastCallback)
-	})
-
-	return basicEndpoints, apiEndpoints, callbackEndpoints
-
+	handler := routes.Handler{
+		BasicEndpointsFunc: routes.BasicEndpointsFunc(func(router *gin.RouterGroup) {
+			basicTransactionGroup := router.Group("/transactions")
+			basicTransactionGroup.GET(":id", action.getByID)
+			basicTransactionGroup.PATCH(":id", action.updateTransaction)
+			basicTransactionGroup.GET("", action.transactions)
+		}),
+		APIEndpoints: routes.APIEndpointsFunc(func(router *gin.RouterGroup) {
+			apiTransactionGroup := router.Group("/transactions")
+			apiTransactionGroup.POST("/drafts", action.newTransactionDraft)
+			apiTransactionGroup.POST("", action.recordTransaction)
+		}),
+		CallbackEndpoints: routes.CallbackEndpointsFunc(func(router *gin.RouterGroup) {
+			router.POST(config.BroadcastCallbackRoute, action.broadcastCallback)
+		}),
+	}
+	return &handler
 }
 
 // NewHandler creates the specific package routes
