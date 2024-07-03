@@ -3,10 +3,13 @@ package main
 import (
 	"flag"
 	"fmt"
+
+	"github.com/bitcoin-sv/spv-wallet-go-client/xpriv"
 )
 
 const (
 	domainLocalHost    = "localhost:3003"
+	adminXPriv         = "xprv9s21ZrQH143K3CbJXirfrtpLvhT3Vgusdo8coBritQ3rcS7Jy7sxWhatuxG5h2y1Cqj8FKmPp69536gmjYRpfga2MJdsGyBsnB12E19CESK"
 	adminXPub          = "xpub661MyMwAqRbcFgfmdkPgE2m5UjHXu9dj124DbaGLSjaqVESTWfCD4VuNmEbVPkbYLCkykwVZvmA8Pbf8884TQr1FgdG2nPoHR8aB36YdDQh"
 	leaderPaymailAlias = "leader"
 )
@@ -60,7 +63,7 @@ func main() {
 func handleUserCreation(paymailAlias string, config *Config) (*User, error) {
 	if config.ClientOneLeaderXPriv != "" {
 		if PromptUserAndCheck("Would you like to use user from env? (y/yes or n/no): ") == 1 {
-			return useUserFromEnv(config, paymailAlias)
+			return UseUserFromEnv(config, paymailAlias)
 		}
 	}
 
@@ -74,7 +77,42 @@ func handleUserCreation(paymailAlias string, config *Config) (*User, error) {
 
 func handleCreateUserError(err error, paymailAlias string, config *Config) (*User, error) {
 	if err.Error() == "paymail address already exists" {
-		return nil, nil //TODO: Add logic to handle existing user
+		return handleExistingPaymail(paymailAlias, config)
 	}
 	return nil, fmt.Errorf("error creating user: %v", err)
+}
+
+func handleExistingPaymail(paymailAlias string, config *Config) (*User, error) {
+	if PromptUserAndCheck("Paymail already exists. Would you like to use it (you need to have xpriv)? (y/yes or n/no): ") == 1 {
+		return useExistingPaymail(paymailAlias, config)
+	}
+	if PromptUserAndCheck("Would you like to delete and create new user? (y/yes or n/no):") == 1 {
+		return recreateUser(paymailAlias, config)
+	}
+	return nil, fmt.Errorf("your choices make it impossible to proceed, exiting")
+}
+
+func recreateUser(paymailAlias string, config *Config) (*User, error) {
+	err := DeleteUser(paymailAlias, config)
+	if err != nil {
+		return nil, fmt.Errorf("error deleting user: %v", err)
+	}
+	user, err := CreateUser(paymailAlias, config)
+	if err != nil {
+		return nil, fmt.Errorf("error creating user after deletion: %v", err)
+	}
+	return user, nil
+}
+
+func useExistingPaymail(paymailAlias string, config *Config) (*User, error) {
+	validatedXPriv := GetValidXPriv()
+	keys, err := xpriv.FromString(validatedXPriv)
+	if err != nil {
+		return nil, fmt.Errorf("error parsing xpriv: %v", err)
+	}
+	return &User{
+		XPriv:   keys.XPriv(),
+		XPub:    keys.XPub().String(),
+		Paymail: PreparePaymail(paymailAlias, config.ClientOneURL),
+	}, nil
 }

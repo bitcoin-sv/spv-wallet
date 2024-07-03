@@ -2,6 +2,7 @@ package main
 
 import (
 	"bufio"
+	"context"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -9,6 +10,7 @@ import (
 	"os"
 	"strings"
 
+	walletclient "github.com/bitcoin-sv/spv-wallet-go-client"
 	"github.com/bitcoin-sv/spv-wallet/models"
 	"github.com/joho/godotenv"
 )
@@ -180,6 +182,34 @@ func UpdateConfigWithUserKeys(config *Config, user *User) {
 	config.ClientTwoLeaderXPriv = user.XPriv
 }
 
-func useUserFromEnv(config *Config, paymailAlias string) (*User, error) {
+func UseUserFromEnv(config *Config, paymailAlias string) (*User, error) {
 	return nil, nil
+}
+
+func DeleteUser(paymail string, config *Config) error {
+	paymail = PreparePaymail(paymail, config.ClientOneURL)
+	adminClient := walletclient.NewWithAdminKey(AddPrefixIfNeeded(domainLocalHost), adminXPriv)
+	ctx := context.Background()
+	err := adminClient.AdminDeletePaymail(ctx, paymail)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func GetValidXPriv() string {
+	for {
+		xpriv := PromptUser("Enter xpriv: ")
+		if strings.HasPrefix(xpriv, "xprv") {
+			return xpriv
+		}
+		fmt.Println("Invalid xpriv. Please enter a valid xpriv")
+	}
+}
+
+func PromptUser(question string) string {
+	reader := bufio.NewReader(os.Stdin)
+	fmt.Println(question)
+	response, _ := reader.ReadString('\n')
+	return strings.TrimSpace(response)
 }
