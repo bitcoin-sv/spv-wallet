@@ -4,6 +4,10 @@ import (
 	"context"
 	"flag"
 	"fmt"
+	"os"
+	"os/exec"
+	"runtime"
+	"strings"
 	"time"
 
 	walletclient "github.com/bitcoin-sv/spv-wallet-go-client"
@@ -11,11 +15,13 @@ import (
 )
 
 const (
-	domainLocalHost    = "localhost:3003"
-	adminXPriv         = "xprv9s21ZrQH143K3CbJXirfrtpLvhT3Vgusdo8coBritQ3rcS7Jy7sxWhatuxG5h2y1Cqj8FKmPp69536gmjYRpfga2MJdsGyBsnB12E19CESK"
-	adminXPub          = "xpub661MyMwAqRbcFgfmdkPgE2m5UjHXu9dj124DbaGLSjaqVESTWfCD4VuNmEbVPkbYLCkykwVZvmA8Pbf8884TQr1FgdG2nPoHR8aB36YdDQh"
-	leaderPaymailAlias = "leader"
-	minimalBalance     = 100
+	domainLocalHost     = "localhost:3003"
+	adminXPriv          = "xprv9s21ZrQH143K3CbJXirfrtpLvhT3Vgusdo8coBritQ3rcS7Jy7sxWhatuxG5h2y1Cqj8FKmPp69536gmjYRpfga2MJdsGyBsnB12E19CESK"
+	adminXPub           = "xpub661MyMwAqRbcFgfmdkPgE2m5UjHXu9dj124DbaGLSjaqVESTWfCD4VuNmEbVPkbYLCkykwVZvmA8Pbf8884TQr1FgdG2nPoHR8aB36YdDQh"
+	leaderPaymailAlias  = "leader"
+	minimalBalance      = 100
+	defaultGoClientPath = "../../spv-wallet-go-client/regression_tests"
+	defaultJSClientPath = "../../spv-wallet-js-client/regression_tests"
 )
 
 func main() {
@@ -60,13 +66,36 @@ func main() {
 		fmt.Println("Error handling user creation:", err)
 		return
 	}
-	UpdateConfigWithUserKeys(config, user)
+
+	config.ClientOneLeaderXPriv = user.XPriv
+	config.ClientTwoLeaderXPriv = user.XPriv
 
 	if err := handleCoinsTransfer(user, config); err != nil {
 		fmt.Println("Error handling transactions:", err)
 		return
 	}
 
+	clientType := ""
+	for clientType != "go" && clientType != "js" {
+		clientType = PromptUser("Do you want to run tests from go-client or js-client? (enter 'go' or 'js'): ")
+		clientType = strings.ToLower(clientType)
+	}
+
+	var defaultPath string
+	if clientType == "go" {
+		defaultPath = defaultGoClientPath
+	} else {
+		defaultPath = defaultJSClientPath
+	}
+	err = SaveConfig(config)
+	if err != nil {
+		fmt.Println("Error saving config:", err)
+		return
+	}
+
+	if err := runTests(clientType, defaultPath); err != nil {
+		fmt.Println("Error running tests:", err)
+	}
 }
 
 func handleUserCreation(paymailAlias string, config *Config) (*User, error) {
@@ -180,5 +209,43 @@ func sendCoinsWithGoClient(instanceUrl string, istanceXPriv string, receiverPaym
 	if err != nil {
 		return fmt.Errorf("error sending to recipients: %v", err)
 	}
+	return nil
+}
+
+func runTests(clientType string, defaultPath string) error {
+	var command string
+	if clientType == "go" {
+		command = "go test ./..."
+	}
+	if clientType == "js" {
+		command = "yarn install && yarn test"
+	}
+	var path string
+	var cmd *exec.Cmd
+	for {
+		path = PromptUser(fmt.Sprintf("Enter relative path to the %s client (default: %s): ", clientType, defaultPath))
+		if path == "" {
+			path = defaultPath
+		}
+
+		if _, err := os.Stat(path); os.IsNotExist(err) {
+			fmt.Printf("Path %s does not exist. Please enter a valid path.\n", path)
+		} else {
+			break
+		}
+	}
+
+	if runtime.GOOS == "windows" {
+		cmd = exec.Command("cmd", "/c", fmt.Sprintf("cd %s && %s", path, command))
+	} else {
+		cmd = exec.Command("sh", "-c", fmt.Sprintf("cd %s && %s", path, command))
+	}
+
+	cmd.Stdout = os.Stdout
+	cmd.Stderr = os.Stderr
+	if err := cmd.Run(); err != nil {
+		return fmt.Errorf("error running tests: %v", err)
+	}
+
 	return nil
 }
