@@ -6,10 +6,8 @@ import (
 )
 
 const (
-	ClientOneURLEnvVar         = "CLIENT_ONE_URL"
-	ClientTwoURLEnvVar         = "CLIENT_TWO_URL"
-	ClientOneLeaderXPrivEnvVar = "CLIENT_ONE_LEADER_XPRIV"
-	ClientTwoLeaderXPrivEnvVar = "CLIENT_TWO_LEADER_XPRIV"
+
+	domainLocalHost = "localhost:3003"
 )
 
 func main() {
@@ -30,4 +28,10 @@ func main() {
 	} else {
 		config = &Config{}
 	}
+
+	if !IsSPVWalletRunning(domainLocalHost) {
+		fmt.Println("spv-wallet is not running. Run spv-wallet and try again")
+		return
+	}
+
 }

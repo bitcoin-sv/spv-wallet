@@ -1,10 +1,24 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
+	"io"
+	"net/http"
 	"os"
+	"strings"
 
 	"github.com/joho/godotenv"
+)
+
+const (
+	domainPrefix           = "http://"
+	spvWalletIndexResponse = "Welcome to the SPV Wallet ✌(◕‿-)✌"
+
+	ClientOneURLEnvVar         = "CLIENT_ONE_URL"
+	ClientTwoURLEnvVar         = "CLIENT_TWO_URL"
+	ClientOneLeaderXPrivEnvVar = "CLIENT_ONE_LEADER_XPRIV"
+	ClientTwoLeaderXPrivEnvVar = "CLIENT_TWO_LEADER_XPRIV"
 )
 
 type User struct {
@@ -18,6 +32,10 @@ type Config struct {
 	ClientTwoURL         string
 	ClientOneLeaderXPriv string
 	ClientTwoLeaderXPriv string
+}
+
+type WalletResponse struct {
+	Message string `json:"message"`
 }
 
 func SaveConfig(config *Config) error {
@@ -47,4 +65,34 @@ func LoadConfig() (*Config, error) {
 		ClientOneLeaderXPriv: os.Getenv(ClientOneLeaderXPrivEnvVar),
 		ClientTwoLeaderXPriv: os.Getenv(ClientTwoLeaderXPrivEnvVar),
 	}, nil
+}
+
+func IsSPVWalletRunning(url string) bool {
+	url = AddPrefixIfNeeded(url)
+	resp, err := http.Get(url)
+	if err != nil || resp.StatusCode != http.StatusOK {
+		return false
+	}
+	defer resp.Body.Close()
+
+	body, err := io.ReadAll(resp.Body)
+	if err != nil {
+		fmt.Println("Error reading response body:", err)
+		return false
+	}
+
+	var walletResp WalletResponse
+	if err := json.Unmarshal(body, &walletResp); err != nil {
+		fmt.Println("Error parsing response JSON:", err)
+		return false
+	}
+
+	return walletResp.Message == spvWalletIndexResponse
+}
+
+func AddPrefixIfNeeded(url string) string {
+	if !strings.HasPrefix(url, domainPrefix) {
+		return domainPrefix + url
+	}
+	return url
 }
