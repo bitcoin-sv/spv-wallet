@@ -12,6 +12,7 @@ import (
 	"strings"
 
 	walletclient "github.com/bitcoin-sv/spv-wallet-go-client"
+	"github.com/bitcoin-sv/spv-wallet-go-client/xpriv"
 	"github.com/bitcoin-sv/spv-wallet/models"
 	"github.com/joho/godotenv"
 )
@@ -177,16 +178,48 @@ func PreparePaymail(paymailAlias string, domain string) string {
 }
 
 func CreateUser(paymail string, config *Config) (*User, error) {
-	return nil, nil
-}
+	keys, err := xpriv.Generate()
+	if err != nil {
+		return nil, err
+	}
 
-func UpdateConfigWithUserKeys(config *Config, user *User) {
-	config.ClientOneLeaderXPriv = user.XPriv
-	config.ClientTwoLeaderXPriv = user.XPriv
+	user := &User{
+		XPriv:   keys.XPriv(),
+		XPub:    keys.XPub().String(),
+		Paymail: PreparePaymail(paymail, config.ClientOneURL),
+	}
+
+	adminClient := walletclient.NewWithAdminKey(AddPrefixIfNeeded(domainLocalHost), adminXPriv)
+	ctx := context.Background()
+
+	if err := adminClient.AdminNewXpub(ctx, user.XPub, map[string]any{"some_metadata": "remove"}); err != nil {
+		fmt.Println("AdminNewXpub failed with status code:", err)
+		return nil, err
+	}
+
+	createPaymailRes, err := adminClient.AdminCreatePaymail(ctx, user.XPub, user.Paymail, "Test test", "")
+	if err != nil {
+		if err.Error() == "paymail address already exists" {
+			return user, fmt.Errorf("paymail address already exists")
+		}
+		return nil, err
+	}
+
+	fmt.Println(keys.XPriv())
+	user.Paymail = PreparePaymail(createPaymailRes.Alias, createPaymailRes.Domain)
+	return user, nil
 }
 
 func UseUserFromEnv(config *Config, paymailAlias string) (*User, error) {
-	return nil, nil
+	keys, err := xpriv.FromString(config.ClientOneLeaderXPriv)
+	if err != nil {
+		return nil, fmt.Errorf("error parsing xpriv: %v", err)
+	}
+	return &User{
+		XPriv:   keys.XPriv(),
+		XPub:    keys.XPub().String(),
+		Paymail: PreparePaymail(paymailAlias, config.ClientOneURL),
+	}, nil
 }
 
 func DeleteUser(paymail string, config *Config) error {
