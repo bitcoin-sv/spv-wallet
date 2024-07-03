@@ -42,4 +42,9 @@ func main() {
 	config.ClientOneURL = sharedConfig.PaymailDomains[0]
 	config.ClientTwoURL = sharedConfig.PaymailDomains[0]
 
+	if !IsSPVWalletRunning(config.ClientOneURL) {
+		fmt.Println("can't connect to spv-wallet at", config.ClientOneURL, "\nEnable tunneling from localhost")
+		return
+	}
+
 }
