@@ -57,13 +57,13 @@ func (a *Action) search(c *gin.Context) {
 // Get transactions godoc
 // @Summary		Get transactions
 // @Description	Get transactions
-// @Tags		New Transactions
+// @Tags		Transactions
 // @Produce		json
 // @Param		SearchTransactions body filter.SearchTransactions false "Supports targeted resource searches with filters and metadata, plus options for pagination and sorting to streamline data exploration and analysis"
-// @Success		200 {object} []models.Transaction "List of transactions"
+// @Success		200 {object} models.PageModel[models.Transaction] "Page of transactions"
 // @Failure		400	"Bad request - Error while parsing SearchTransactions from request body"
 // @Failure 	500	"Internal server error - Error while searching for transactions"
-// @Router		/v1/transactions [get]
+// @Router		/api/v1/transactions [get]
 // @Security	x-auth-xpub
 func (a *Action) transactions(c *gin.Context) {
 	reqXPubID := c.GetString(auth.ParamXPubHashKey)

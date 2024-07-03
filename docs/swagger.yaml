@@ -1174,6 +1174,26 @@ definitions:
         description: Total number of possible pages
         type: integer
     type: object
+  models.PageDescription:
+    properties:
+      number:
+        type: integer
+      size:
+        type: integer
+      totalElements:
+        type: integer
+      totalPages:
+        type: integer
+    type: object
+  models.PageModel-models_Transaction:
+    properties:
+      content:
+        items:
+          $ref: '#/definitions/models.Transaction'
+        type: array
+      page:
+        $ref: '#/definitions/models.PageDescription'
+    type: object
   models.PaymailAddress:
     properties:
       alias:
@@ -1708,14 +1728,17 @@ definitions:
     - 1000000000
     - 60000000000
     - 3600000000000
-    - -9223372036854775808
-    - 9223372036854775807
     - 1
     - 1000
     - 1000000
     - 1000000000
     - 60000000000
     - 3600000000000
+    - 1
+    - 1000
+    - 1000000
+    - 1000000000
+    - 60000000000
     type: integer
     x-enum-varnames:
     - minDuration
@@ -1726,14 +1749,17 @@ definitions:
     - Second
     - Minute
     - Hour
-    - minDuration
-    - maxDuration
     - Nanosecond
     - Microsecond
     - Millisecond
     - Second
     - Minute
     - Hour
+    - Nanosecond
+    - Microsecond
+    - Millisecond
+    - Second
+    - Minute
   transactions.NewTransaction:
     properties:
       config:
@@ -1786,11 +1812,156 @@ definitions:
           key2: value2
         type: object
     type: object
+  transactions.UpdateTransactionRequest:
+    properties:
+      metadata:
+        additionalProperties:
+          type: string
+        description: Accepts a JSON object for embedding custom metadata, enabling
+          arbitrary additional information to be associated with the resource
+        example:
+          key: value
+          key2: value2
+        type: object
+    type: object
 info:
   contact: {}
   title: SPV Wallet
   version: v0.12.0
 paths:
+  /api/v1/transactions:
+    get:
+      description: Get transactions
+      parameters:
+      - description: Supports targeted resource searches with filters and metadata,
+          plus options for pagination and sorting to streamline data exploration and
+          analysis
+        in: body
+        name: SearchTransactions
+        schema:
+          $ref: '#/definitions/filter.SearchTransactions'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Page of transactions
+          schema:
+            $ref: '#/definitions/models.PageModel-models_Transaction'
+        "400":
+          description: Bad request - Error while parsing SearchTransactions from request
+            body
+        "500":
+          description: Internal server error - Error while searching for transactions
+      security:
+      - x-auth-xpub: []
+      summary: Get transactions
+      tags:
+      - Transactions
+    post:
+      description: Record transaction
+      parameters:
+      - description: Transaction to be recorded
+        in: body
+        name: RecordTransaction
+        required: true
+        schema:
+          $ref: '#/definitions/transactions.RecordTransaction'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created transaction
+          schema:
+            $ref: '#/definitions/models.Transaction'
+        "400":
+          description: Bad request - Error while parsing RecordTransaction from request
+            body or xpub not found
+        "500":
+          description: Internal Server Error - Error while recording transaction
+      security:
+      - x-auth-xpub: []
+      summary: Record transaction
+      tags:
+      - Transactions
+  /api/v1/transactions/{id}:
+    get:
+      description: Get transaction by id
+      parameters:
+      - description: id
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Transaction
+          schema:
+            $ref: '#/definitions/models.Transaction'
+        "400":
+          description: Bad request - Transaction not found or associated with another
+            xpub
+        "500":
+          description: Internal Server Error - Error while fetching transaction
+      security:
+      - x-auth-xpub: []
+      summary: Get transaction by id
+      tags:
+      - Transactions
+    patch:
+      description: Update transaction
+      parameters:
+      - description: ' '
+        in: body
+        name: UpdateTransactionRequest
+        required: true
+        schema:
+          $ref: '#/definitions/transactions.UpdateTransactionRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Updated transaction
+          schema:
+            $ref: '#/definitions/models.Transaction'
+        "400":
+          description: Bad request - Error while parsing UpdateTransaction from request
+            body, tx not found or tx is not associated with the xpub
+        "500":
+          description: Internal Server Error - Error while updating transaction
+      security:
+      - x-auth-xpub: []
+      summary: Update transaction
+      tags:
+      - Transactions
+  /api/v1/transactions/drafts:
+    post:
+      description: New transaction draft
+      parameters:
+      - description: NewTransaction model containing the transaction config and metadata
+        in: body
+        name: NewTransaction
+        required: true
+        schema:
+          $ref: '#/definitions/transactions.NewTransaction'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created transaction
+          schema:
+            $ref: '#/definitions/models.DraftTransaction'
+        "400":
+          description: Bad request - Error while parsing NewTransaction from request
+            body or xpub not found
+        "500":
+          description: Internal Server Error - Error while creating transaction
+      security:
+      - x-auth-xpub: []
+      summary: New transaction draft
+      tags:
+      - Transactions
   /v1/access-key:
     delete:
       description: Revoke access key
@@ -2854,7 +3025,9 @@ paths:
       - Shared-config
   /v1/transaction:
     get:
-      description: Get transaction by id
+      deprecated: true
+      description: This endpoint has been deprecated. Use (GET) /api/v1/transactions/{id}
+        instead.
       parameters:
       - description: id
         in: query
@@ -2879,7 +3052,9 @@ paths:
       tags:
       - Transactions
     patch:
-      description: Update transaction
+      deprecated: true
+      description: This endpoint has been deprecated. Use (PATCH) /api/v1/transactions/{id}
+        instead.
       parameters:
       - description: ' '
         in: body
@@ -2905,7 +3080,9 @@ paths:
       tags:
       - Transactions
     post:
-      description: New transaction
+      deprecated: true
+      description: This endpoint has been deprecated. Use (POST) /api/v1/transactions/drafts
+        instead.
       parameters:
       - description: NewTransaction model containing the transaction config and metadata
         in: body
@@ -2932,7 +3109,8 @@ paths:
       - Transactions
   /v1/transaction/count:
     post:
-      description: Count of transactions
+      description: The functionality of this method will be offered in the future
+        by /api/v1/transactions [get].
       parameters:
       - description: Enables filtering of elements to be counted
         in: body
@@ -2958,7 +3136,9 @@ paths:
       - Transactions
   /v1/transaction/record:
     post:
-      description: Record transaction
+      deprecated: true
+      description: This endpoint has been deprecated. Use (POST) /api/v1/transactions
+        instead.
       parameters:
       - description: Transaction to be recorded
         in: body
@@ -3013,141 +3193,6 @@ paths:
       summary: Search transaction
       tags:
       - Transactions
-  /v1/transactions:
-    get:
-      description: Get transactions
-      parameters:
-      - description: Supports targeted resource searches with filters and metadata,
-          plus options for pagination and sorting to streamline data exploration and
-          analysis
-        in: body
-        name: SearchTransactions
-        schema:
-          $ref: '#/definitions/filter.SearchTransactions'
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: List of transactions
-          schema:
-            items:
-              $ref: '#/definitions/models.Transaction'
-            type: array
-        "400":
-          description: Bad request - Error while parsing SearchTransactions from request
-            body
-        "500":
-          description: Internal server error - Error while searching for transactions
-      security:
-      - x-auth-xpub: []
-      summary: Get transactions
-      tags:
-      - New Transactions
-    post:
-      description: Record transaction
-      parameters:
-      - description: Transaction to be recorded
-        in: body
-        name: RecordTransaction
-        required: true
-        schema:
-          $ref: '#/definitions/transactions.RecordTransaction'
-      produces:
-      - application/json
-      responses:
-        "201":
-          description: Created transaction
-          schema:
-            $ref: '#/definitions/models.Transaction'
-        "400":
-          description: Bad request - Error while parsing RecordTransaction from request
-            body or xpub not found
-        "500":
-          description: Internal Server Error - Error while recording transaction
-      security:
-      - x-auth-xpub: []
-      summary: Record transaction
-      tags:
-      - New Transactions
-  /v1/transactions/{id}:
-    get:
-      description: Get transaction by id
-      parameters:
-      - description: id
-        in: path
-        name: id
-        required: true
-        type: string
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: Transaction
-          schema:
-            $ref: '#/definitions/models.Transaction'
-        "400":
-          description: Bad request - Transaction not found or associated with another
-            xpub
-        "500":
-          description: Internal Server Error - Error while fetching transaction
-      security:
-      - x-auth-xpub: []
-      summary: Get transaction by id
-      tags:
-      - New Transactions
-    patch:
-      description: Update transaction
-      parameters:
-      - description: ' '
-        in: body
-        name: UpdateTransaction
-        required: true
-        schema:
-          $ref: '#/definitions/transactions.UpdateTransaction'
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: Updated transaction
-          schema:
-            $ref: '#/definitions/models.Transaction'
-        "400":
-          description: Bad request - Error while parsing UpdateTransaction from request
-            body, tx not found or tx is not associated with the xpub
-        "500":
-          description: Internal Server Error - Error while updating transaction
-      security:
-      - x-auth-xpub: []
-      summary: Update transaction
-      tags:
-      - New Transactions
-  /v1/transactions/drafts:
-    post:
-      description: New transaction draft
-      parameters:
-      - description: NewTransaction model containing the transaction config and metadata
-        in: body
-        name: NewTransaction
-        required: true
-        schema:
-          $ref: '#/definitions/transactions.NewTransaction'
-      produces:
-      - application/json
-      responses:
-        "201":
-          description: Created transaction
-          schema:
-            $ref: '#/definitions/models.DraftTransaction'
-        "400":
-          description: Bad request - Error while parsing NewTransaction from request
-            body or xpub not found
-        "500":
-          description: Internal Server Error - Error while creating transaction
-      security:
-      - x-auth-xpub: []
-      summary: New transaction draft
-      tags:
-      - New Transactions
   /v1/utxo:
     get:
       description: Get UTXO

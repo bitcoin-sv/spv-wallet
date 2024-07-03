@@ -1,19 +1,18 @@
 package transactions
 
 import (
-	"net/http"
-
 	"github.com/bitcoin-sv/spv-wallet/actions"
 	"github.com/bitcoin-sv/spv-wallet/engine"
 	"github.com/bitcoin-sv/spv-wallet/mappings"
 	"github.com/bitcoin-sv/spv-wallet/server/auth"
 	"github.com/gin-gonic/gin"
+	"net/http"
 )
 
 // record will save and complete a transaction
-// Record transaction godoc
+// @Deprecated
 // @Summary		Record transaction
-// @Description	Record transaction
+// @Description	This endpoint has been deprecated. Use (POST) /api/v1/transactions instead.
 // @Tags		Transactions
 // @Produce		json
 // @Param		RecordTransaction body RecordTransaction true "Transaction to be recorded"
@@ -23,6 +22,21 @@ import (
 // @Router		/v1/transaction/record [post]
 // @Security	x-auth-xpub
 func (a *Action) record(c *gin.Context) {
+	a.recordTransaction(c)
+}
+
+// recordTransaction will save and complete a transaction
+// @Summary		Record transaction
+// @Description	Record transaction
+// @Tags		Transactions
+// @Produce		json
+// @Param		RecordTransaction body RecordTransaction true "Transaction to be recorded"
+// @Success		201 {object} models.Transaction "Created transaction"
+// @Failure		400	"Bad request - Error while parsing RecordTransaction from request body or xpub not found"
+// @Failure 	500	"Internal Server Error - Error while recording transaction"
+// @Router		/api/v1/transactions [post]
+// @Security	x-auth-xpub
+func (a *Action) recordTransaction(c *gin.Context) {
 	reqXPub := c.GetString(auth.ParamXPubKey)
 
 	var requestBody RecordTransaction
@@ -60,20 +74,4 @@ func (a *Action) record(c *gin.Context) {
 
 	contract := mappings.MapToTransactionContract(transaction)
 	c.JSON(http.StatusCreated, contract)
-}
-
-// recordTransaction will save and complete a transaction
-// Record transaction godoc
-// @Summary		Record transaction
-// @Description	Record transaction
-// @Tags		New Transactions
-// @Produce		json
-// @Param		RecordTransaction body RecordTransaction true "Transaction to be recorded"
-// @Success		201 {object} models.Transaction "Created transaction"
-// @Failure		400	"Bad request - Error while parsing RecordTransaction from request body or xpub not found"
-// @Failure 	500	"Internal Server Error - Error while recording transaction"
-// @Router		/v1/transactions [post]
-// @Security	x-auth-xpub
-func (a *Action) recordTransaction(c *gin.Context) {
-	a.record(c)
 }

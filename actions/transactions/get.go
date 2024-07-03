@@ -9,9 +9,8 @@ import (
 )
 
 // get will fetch a transaction
-// Get transaction by id godoc
 // @Summary		Get transaction by id
-// @Description	Get transaction by id
+// @Description	This endpoint has been deprecated. Use (GET) /api/v1/transactions/{id} instead.
 // @Tags		Transactions
 // @Produce		json
 // @Param		id query string true "id"
@@ -20,6 +19,7 @@ import (
 // @Failure 	500	"Internal Server Error - Error while fetching transaction"
 // @Router		/v1/transaction [get]
 // @Security	x-auth-xpub
+// @Deprecated
 func (a *Action) get(c *gin.Context) {
 	id := c.Query("id")
 	a.getTransactionByID(c, id)
@@ -52,13 +52,13 @@ func (a *Action) getTransactionByID(c *gin.Context, id string) {
 // Get transaction by id godoc
 // @Summary		Get transaction by id
 // @Description	Get transaction by id
-// @Tags		New Transactions
+// @Tags		Transactions
 // @Produce		json
 // @Param		id path string true "id"
 // @Success		200 {object} models.Transaction "Transaction"
 // @Failure		400	"Bad request - Transaction not found or associated with another xpub"
 // @Failure 	500	"Internal Server Error - Error while fetching transaction"
-// @Router		/v1/transactions/{id} [get]
+// @Router		/api/v1/transactions/{id} [get]
 // @Security	x-auth-xpub
 func (a *Action) getByID(c *gin.Context) {
 	id := c.Param("id")

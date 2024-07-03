@@ -1,6 +1,7 @@
 package transactions
 
 import (
+	"github.com/bitcoin-sv/spv-wallet/engine"
 	"net/http"
 
 	"github.com/bitcoin-sv/spv-wallet/mappings"
@@ -11,7 +12,7 @@ import (
 // update will update a transaction
 // Update transaction godoc
 // @Summary		Update transaction
-// @Description	Update transaction
+// @Description	This endpoint has been deprecated. Use (PATCH) /api/v1/transactions/{id} instead.
 // @Tags		Transactions
 // @Produce		json
 // @Param		UpdateTransaction body UpdateTransaction true " "
@@ -20,6 +21,7 @@ import (
 // @Failure 	500	"Internal Server Error - Error while updating transaction"
 // @Router		/v1/transaction [patch]
 // @Security	x-auth-xpub
+// @Deprecated
 func (a *Action) update(c *gin.Context) {
 
 	var requestBody UpdateTransaction
@@ -29,10 +31,10 @@ func (a *Action) update(c *gin.Context) {
 	}
 	id := requestBody.ID
 
-	a.updateTransactionWithID(c, id, requestBody)
+	a.updateTransactionWithID(c, id, requestBody.Metadata)
 }
 
-func (a *Action) updateTransactionWithID(c *gin.Context, id string, requestBody UpdateTransaction) {
+func (a *Action) updateTransactionWithID(c *gin.Context, id string, requestMetadata engine.Metadata) {
 	reqXPubID := c.GetString(auth.ParamXPubHashKey)
 
 	// Get a transaction by ID
@@ -40,7 +42,7 @@ func (a *Action) updateTransactionWithID(c *gin.Context, id string, requestBody 
 		c.Request.Context(),
 		reqXPubID,
 		id,
-		requestBody.Metadata,
+		requestMetadata,
 	)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, err.Error())
@@ -60,21 +62,21 @@ func (a *Action) updateTransactionWithID(c *gin.Context, id string, requestBody 
 // Update transaction godoc
 // @Summary		Update transaction
 // @Description	Update transaction
-// @Tags		New Transactions
+// @Tags		Transactions
 // @Produce		json
-// @Param		UpdateTransaction body UpdateTransaction true " "
+// @Param		UpdateTransactionRequest body UpdateTransactionRequest true " "
 // @Success		200 {object} models.Transaction "Updated transaction"
 // @Failure		400	"Bad request - Error while parsing UpdateTransaction from request body, tx not found or tx is not associated with the xpub"
 // @Failure 	500	"Internal Server Error - Error while updating transaction"
-// @Router		/v1/transactions/{id} [patch]
+// @Router		/api/v1/transactions/{id} [patch]
 // @Security	x-auth-xpub
 func (a *Action) updateTransaction(c *gin.Context) {
-	var requestBody UpdateTransaction
+	var requestBody UpdateTransactionRequest
 	if err := c.Bind(&requestBody); err != nil {
 		c.JSON(http.StatusBadRequest, err.Error())
 		return
 	}
 	id := c.Param("id")
 
-	a.updateTransactionWithID(c, id, requestBody)
+	a.updateTransactionWithID(c, id, requestBody.Metadata)
 }
