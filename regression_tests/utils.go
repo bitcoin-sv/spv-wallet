@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bufio"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -13,6 +14,7 @@ import (
 )
 
 const (
+	atSign                   = "@"
 	domainPrefix             = "http://"
 	domainSuffixSharedConfig = "/v1/shared-config"
 	spvWalletIndexResponse   = "Welcome to the SPV Wallet ✌(◕‿-)✌"
@@ -131,4 +133,53 @@ func GetSharedConfig(xpub string) (*models.SharedConfig, error) {
 		return nil, fmt.Errorf("expected 1 paymail domain, got %d", len(configResponse.PaymailDomains))
 	}
 	return &configResponse, nil
+}
+
+func PromptUserAndCheck(question string) int {
+	reader := bufio.NewReader(os.Stdin)
+	var response string
+	var checkResult int
+
+	for {
+		fmt.Println(question)
+		response, _ = reader.ReadString('\n')
+		response = strings.TrimSpace(response)
+
+		checkResult = CheckResponse(response)
+		if checkResult != -1 {
+			break
+		}
+		fmt.Println("Invalid response. Please answer y/yes or n/no.")
+	}
+
+	return checkResult
+}
+
+func CheckResponse(response string) int {
+	response = strings.ToLower(strings.TrimSpace(response))
+	switch response {
+	case "yes", "y":
+		return 1
+	case "no", "n":
+		return 0
+	default:
+		return -1
+	}
+}
+
+func PreparePaymail(paymailAlias string, domain string) string {
+	return paymailAlias + atSign + domain
+}
+
+func CreateUser(paymail string, config *Config) (*User, error) {
+	return nil, nil
+}
+
+func UpdateConfigWithUserKeys(config *Config, user *User) {
+	config.ClientOneLeaderXPriv = user.XPriv
+	config.ClientTwoLeaderXPriv = user.XPriv
+}
+
+func useUserFromEnv(config *Config, paymailAlias string) (*User, error) {
+	return nil, nil
 }
