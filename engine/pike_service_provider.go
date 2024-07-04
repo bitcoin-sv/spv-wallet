@@ -3,10 +3,12 @@ package engine
 import (
 	"context"
 	"encoding/hex"
+
 	"github.com/bitcoin-sv/go-paymail"
 	"github.com/bitcoin-sv/go-paymail/server"
 	"github.com/bitcoin-sv/spv-wallet/engine/pike"
 	"github.com/bitcoin-sv/spv-wallet/engine/script/template"
+	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/bitcoin-sv/spv-wallet/engine/utils"
 	"github.com/libsv/go-bk/bec"
 )
@@ -45,7 +47,7 @@ func (p *PikeContactServiceProvider) AddContact(
 		return
 	}
 	if reqPaymail == nil {
-		err = ErrInvalidRequesterXpub
+		err = spverrors.ErrInvalidRequesterXpub
 		return
 	}
 

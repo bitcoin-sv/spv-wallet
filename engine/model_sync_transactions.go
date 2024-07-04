@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/bitcoin-sv/spv-wallet/engine/datastore"
+	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 )
 
 // SyncTransaction is an object representing the chain-state sync configuration and results for a given transaction
@@ -88,7 +89,7 @@ func (m *SyncTransaction) BeforeCreating(_ context.Context) error {
 
 	// Make sure ID is valid
 	if len(m.ID) == 0 {
-		return ErrMissingFieldID
+		return spverrors.ErrMissingFieldID
 	}
 
 	m.Client().Logger().Debug().

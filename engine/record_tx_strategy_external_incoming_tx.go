@@ -23,7 +23,8 @@ func (strategy *externalIncomingTx) Execute(ctx context.Context, c ClientInterfa
 	logger := c.Logger()
 	transaction, err := _createExternalTxToRecord(ctx, strategy, c, opts)
 	if err != nil {
-		return nil, fmt.Errorf("creation of external incoming tx failed. Reason: %w", err)
+		logger.Error().Msgf("creation of external incoming tx failed. Reason: %v", err)
+		return nil, err
 	}
 
 	logger.Info().
@@ -38,13 +39,16 @@ func (strategy *externalIncomingTx) Execute(ctx context.Context, c ClientInterfa
 				Str("txID", transaction.ID).
 				Msgf("broadcasting failed, transaction rejected! Reason: %s", err)
 
-			return nil, fmt.Errorf("broadcasting failed, transaction rejected! Reason: %w", err)
+			return nil, err
 		}
 	}
 
 	// record
 	if err = transaction.Save(ctx); err != nil {
-		return nil, fmt.Errorf("saving of Transaction failed. Reason: %w", err)
+		logger.Error().
+			Str("txID", transaction.ID).
+			Msgf("saving of Transaction failed. Reason: %v", err)
+		return nil, err
 	}
 
 	logger.Info().

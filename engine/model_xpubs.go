@@ -6,6 +6,7 @@ import (
 	"fmt"
 
 	"github.com/bitcoin-sv/spv-wallet/engine/datastore"
+	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/bitcoin-sv/spv-wallet/engine/utils"
 )
 
@@ -84,7 +85,7 @@ func getXpubWithCache(ctx context.Context, client ClientInterface,
 		xPubID = utils.Hash(key)
 		opts = append(opts, WithXPub(key)) // Add the xPub option which will set it on the model
 	} else if len(xPubID) == 0 {
-		return nil, ErrMissingFieldXpubID
+		return nil, spverrors.ErrMissingFieldXpubID
 	}
 	cacheKey := fmt.Sprintf(cacheKeyXpubModel, xPubID)
 
@@ -108,7 +109,7 @@ func getXpubWithCache(ctx context.Context, client ClientInterface,
 	); err != nil {
 		return nil, err
 	} else if xPub == nil {
-		return nil, ErrMissingXpub
+		return nil, spverrors.ErrCouldNotFindXpub
 	}
 
 	// Save to cache
@@ -170,7 +171,7 @@ func (m *Xpub) getNewDestination(ctx context.Context, chain uint32, destinationT
 	// Check the type
 	// todo: support more types of destinations
 	if destinationType != utils.ScriptTypePubKeyHash {
-		return nil, ErrUnsupportedDestinationType
+		return nil, spverrors.ErrUnsupportedDestinationType
 	}
 
 	// Increment the next num
@@ -286,7 +287,7 @@ func (m *Xpub) BeforeCreating(_ context.Context) error {
 
 	// Make sure we have an ID
 	if len(m.ID) == 0 {
-		return ErrMissingFieldID
+		return spverrors.ErrMissingFieldID
 	}
 
 	m.Client().Logger().Debug().

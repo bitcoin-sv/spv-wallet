@@ -4,9 +4,8 @@ import (
 	"encoding/hex"
 	"fmt"
 
-	"github.com/libsv/go-bk/bec"
-
 	"github.com/bitcoin-sv/spv-wallet/engine/pike"
+	"github.com/libsv/go-bk/bec"
 )
 
 func Example_generateLockingScripts() {

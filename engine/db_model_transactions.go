@@ -5,6 +5,7 @@ import (
 
 	"github.com/bitcoin-sv/spv-wallet/engine/datastore"
 	"github.com/bitcoin-sv/spv-wallet/engine/notifications"
+	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 )
 
 // GetModelTableName will get the db table name of the current model
@@ -88,7 +89,7 @@ func (m *Transaction) AfterCreated(ctx context.Context) error {
 		if err != nil {
 			return err
 		} else if xPub == nil {
-			return ErrMissingRequiredXpub
+			return spverrors.ErrMissingFieldXpub
 		}
 		if err = xPub.incrementBalance(ctx, balance); err != nil {
 			return err
