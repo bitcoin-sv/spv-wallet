@@ -82,9 +82,6 @@ linters:
     - wastedassign
 
 linters-settings:
-  govet:
-    enable:
-      - fieldalignment
   wrapcheck:
     ignorePackageGlobs:
       - "github.com/go-ozzo/ozzo-validation"
@@ -149,7 +146,6 @@ issues:
     - .github
     - .make
     - dist
-    - engine # FIXME: skip engine dir until we fix all issues there
 
   # Maximum issues count per one linter. Set to 0 to disable. Default is 50.
   max-issues-per-linter: 0

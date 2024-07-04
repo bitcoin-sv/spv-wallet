@@ -91,7 +91,7 @@ func getDraftTransactionID(ctx context.Context, xPubID, id string,
 
 	draftTransaction := &DraftTransaction{Model: *NewBaseModel(
 		ModelDraftTransaction,
-		append(opts)...,
+		opts...,
 	)}
 	if err := Get(ctx, draftTransaction, conditions, false, defaultDatabaseReadTimeout, true); err != nil {
 		if errors.Is(err, datastore.ErrNoResults) {
@@ -785,7 +785,7 @@ func (m *DraftTransaction) getTotalSatoshis() (satoshis uint64) {
 }
 
 // BeforeCreating will fire before the model is being inserted into the Datastore
-func (m *DraftTransaction) BeforeCreating(ctx context.Context) (err error) {
+func (m *DraftTransaction) BeforeCreating(_ context.Context) (err error) {
 	m.Client().Logger().Debug().
 		Str("draftTxID", m.GetID()).
 		Msgf("starting: %s BeforeCreating hook...", m.Name())

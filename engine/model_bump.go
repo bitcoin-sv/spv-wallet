@@ -197,10 +197,6 @@ func getOffsetPair(offset uint64) uint64 {
 	return offset - 1
 }
 
-func getParentOffset(offset uint64) uint64 {
-	return getOffsetPair(offset / 2)
-}
-
 func prepareNodes(baseLeaf BUMPLeaf, offset uint64, leafInPair BUMPLeaf, newOffset uint64) (string, string) {
 	var baseLeafHash, pairLeafHash string
 
@@ -356,33 +352,4 @@ func bcBumpToBUMP(bcBump *bc.BUMP) BUMP {
 		BlockHeight: bcBump.BlockHeight,
 		Path:        path,
 	}
-}
-
-func sortAndAddToPath(txIDPath1 BUMPLeaf, offset uint64, txIDPath2 BUMPLeaf, pairOffset uint64) [][]BUMPLeaf {
-	path := make([][]BUMPLeaf, 0)
-	txIDPath := make([]BUMPLeaf, 2)
-
-	if offset < pairOffset {
-		txIDPath[0] = txIDPath1
-		txIDPath[1] = txIDPath2
-	} else {
-		txIDPath[0] = txIDPath2
-		txIDPath[1] = txIDPath1
-	}
-
-	path = append(path, txIDPath)
-	return path
-}
-
-func createLeaf(offset uint64, node string) BUMPLeaf {
-	leaf := BUMPLeaf{Offset: offset}
-
-	isDuplicate := node == "*"
-	if !isDuplicate {
-		leaf.Hash = node
-	} else {
-		leaf.Duplicate = true
-	}
-
-	return leaf
 }

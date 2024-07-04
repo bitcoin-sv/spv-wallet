@@ -13,6 +13,7 @@ import (
 	"github.com/google/uuid"
 )
 
+// Contact is a model that represents a known contacts of the user and invitations to contact.
 type Contact struct {
 	// Base model
 	Model `bson:",inline"`
@@ -164,6 +165,7 @@ func getContactsByXpubID(ctx context.Context, xPubID string, metadata *Metadata,
 	return contacts, nil
 }
 
+// Accept marks the contact invitation as accepted, what means that the contact invitation is treated as normal contact.
 func (c *Contact) Accept() error {
 	if c.Status != ContactAwaitAccept {
 		return fmt.Errorf("cannot accept contact. Reason: status: %s, expected: %s", c.Status, ContactAwaitAccept)
@@ -173,6 +175,7 @@ func (c *Contact) Accept() error {
 	return nil
 }
 
+// Reject marks the contact invitation as rejected
 func (c *Contact) Reject() error {
 	if c.Status != ContactAwaitAccept {
 		return fmt.Errorf("cannot reject contact. Reason: status: %s, expected: %s", c.Status, ContactAwaitAccept)
@@ -184,6 +187,7 @@ func (c *Contact) Reject() error {
 	return nil
 }
 
+// Confirm marks the contact as confirmed
 func (c *Contact) Confirm() error {
 	if c.Status != ContactNotConfirmed {
 		return fmt.Errorf("cannot confirm contact. Reason: status: %s, expected: %s", c.Status, ContactNotConfirmed)
@@ -193,6 +197,7 @@ func (c *Contact) Confirm() error {
 	return nil
 }
 
+// Unconfirm marks the contact as unconfirmed
 func (c *Contact) Unconfirm() error {
 	if c.Status != ContactConfirmed {
 		return fmt.Errorf("cannot unconfirm contact. Reason: status: %s, expected: %s", c.Status, ContactNotConfirmed)
@@ -202,11 +207,13 @@ func (c *Contact) Unconfirm() error {
 	return nil
 }
 
+// Delete marks the contact as deleted
 func (c *Contact) Delete() {
 	c.DeletedAt.Valid = true
 	c.DeletedAt.Time = time.Now()
 }
 
+// UpdatePubKey updates the contact's public key
 func (c *Contact) UpdatePubKey(pk string) (updated bool) {
 	if c.PubKey != pk {
 		c.PubKey = pk
@@ -216,12 +223,14 @@ func (c *Contact) UpdatePubKey(pk string) (updated bool) {
 		}
 
 		updated = true
+		return
 	}
 
 	updated = false
 	return
 }
 
+// GetModelName returns name of the model
 func (c *Contact) GetModelName() string {
 	return ModelContact.String()
 }
@@ -257,6 +266,7 @@ func (c *Contact) BeforeCreating(_ context.Context) (err error) {
 	return
 }
 
+// BeforeUpdating is called before the model is updated in the DB
 func (c *Contact) BeforeUpdating(_ context.Context) (err error) {
 	c.Client().Logger().Debug().
 		Str("contactID", c.ID).

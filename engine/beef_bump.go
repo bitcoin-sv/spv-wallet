@@ -129,14 +129,14 @@ func checkParentTransactions(ctx context.Context, store TransactionGetter, btTx 
 	return validBtTxs, validTxs, nil
 }
 
-func getRequiredTransactions(ctx context.Context, txIds []string, store TransactionGetter) ([]*Transaction, error) {
-	txs, err := store.GetTransactionsByIDs(ctx, txIds)
+func getRequiredTransactions(ctx context.Context, txIDs []string, store TransactionGetter) ([]*Transaction, error) {
+	txs, err := store.GetTransactionsByIDs(ctx, txIDs)
 	if err != nil {
 		return nil, fmt.Errorf("cannot get transactions from database: %w", err)
 	}
 
-	if len(txs) != len(txIds) {
-		missingTxIDs := getMissingTxs(txIds, txs)
+	if len(txs) != len(txIDs) {
+		missingTxIDs := getMissingTxs(txIDs, txs)
 		return nil, fmt.Errorf("required transactions not found in database: %v", missingTxIDs)
 	}
 

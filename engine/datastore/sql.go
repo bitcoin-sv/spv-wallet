@@ -324,7 +324,7 @@ func closeSQLDatabase(gormDB *gorm.DB) error {
 }
 
 // sqlDefaults will set the default values if missing
-func (s *SQLConfig) sqlDefaults(engine Engine) *SQLConfig {
+func (s *SQLConfig) sqlDefaults() *SQLConfig {
 	// Set the default(s)
 	if s.TxTimeout.String() == emptyTimeDuration {
 		s.TxTimeout = defaultDatabaseTxTimeout

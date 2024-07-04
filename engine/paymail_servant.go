@@ -13,6 +13,7 @@ type PaymailServant struct {
 	pc paymail.ClientInterface
 }
 
+// GetSanitizedPaymail validates and returns the sanitized version of paymail address (alias@domain.tld)
 func (s *PaymailServant) GetSanitizedPaymail(addr string) (*paymail.SanitisedPaymail, error) {
 	if err := paymail.ValidatePaymail(addr); err != nil {
 		return nil, err
@@ -24,6 +25,7 @@ func (s *PaymailServant) GetSanitizedPaymail(addr string) (*paymail.SanitisedPay
 	return sanitized, nil
 }
 
+// GetPkiForPaymail retrieves the PKI for a paymail address
 func (s *PaymailServant) GetPkiForPaymail(ctx context.Context, sPaymail *paymail.SanitisedPaymail) (*paymail.PKIResponse, error) {
 	capabilities, err := getCapabilities(ctx, s.cs, s.pc, sPaymail.Domain)
 	if err != nil {
@@ -43,6 +45,7 @@ func (s *PaymailServant) GetPkiForPaymail(ctx context.Context, sPaymail *paymail
 	return pki, nil
 }
 
+// AddContactRequest sends a contact invitation via PIKE capability
 func (s *PaymailServant) AddContactRequest(ctx context.Context, receiverPaymail *paymail.SanitisedPaymail, contactData *paymail.PikeContactRequestPayload) (*paymail.PikeContactRequestResponse, error) {
 	capabilities, err := getCapabilities(ctx, s.cs, s.pc, receiverPaymail.Domain)
 	if err != nil {

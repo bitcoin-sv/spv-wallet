@@ -87,7 +87,7 @@ func TestCallback_HostPattern(t *testing.T) {
 
 // TestCallback_ConfigureCallback will test the method configureCallback()
 func TestCallback_ConfigureCallback(t *testing.T) {
-	//nolint: govet
+
 	tests := []struct {
 		appConfig    AppConfig
 		name         string

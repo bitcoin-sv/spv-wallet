@@ -1,7 +1,7 @@
 package datastore
 
 // IndexExists check whether the given index exists in the datastore
-func (c *Client) IndexExists(tableName, indexName string) (bool, error) {
+func (c *Client) IndexExists(_, _ string) (bool, error) {
 	return false, ErrUnknownSQL
 }
 

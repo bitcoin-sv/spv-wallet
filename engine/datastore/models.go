@@ -18,7 +18,7 @@ import (
 //
 // value is a pointer to the model
 func (c *Client) SaveModel(
-	ctx context.Context,
+	_ context.Context,
 	model interface{},
 	tx *Transaction,
 	newRecord, commitTx bool,
@@ -65,7 +65,7 @@ func (c *Client) SaveModel(
 
 // IncrementModel will increment the given field atomically in the database and return the new value
 func (c *Client) IncrementModel(
-	ctx context.Context,
+	_ context.Context,
 	model interface{},
 	fieldName string,
 	increment int64,
@@ -105,7 +105,7 @@ func (c *Client) IncrementModel(
 
 // CreateInBatches create all the models given in batches
 func (c *Client) CreateInBatches(
-	ctx context.Context,
+	_ context.Context,
 	models interface{},
 	batchSize int,
 ) error {

@@ -209,10 +209,12 @@ func (m *Xpub) incrementBalance(ctx context.Context, balanceIncrement int64) err
 	return err
 }
 
+// GetNextInternalDerivationNum will return the next internal derivation number
 func (m *Xpub) GetNextInternalDerivationNum(ctx context.Context) (uint32, error) {
 	return m.getNextDerivationNum(ctx, utils.ChainInternal)
 }
 
+// GetNextExternalDerivationNum will return the next external derivation number
 func (m *Xpub) GetNextExternalDerivationNum(ctx context.Context) (uint32, error) {
 	return m.getNextDerivationNum(ctx, utils.ChainExternal)
 }

@@ -196,6 +196,7 @@ func (m *PaymailAddress) getExternalXpub() (*bip32.ExtendedKey, error) {
 	return m.externalHdXpub, nil
 }
 
+// GetPubKey will get the public key for the paymail address.
 func (m *PaymailAddress) GetPubKey() (string, error) {
 	xPub, err := m.getExternalXpub()
 	if err != nil {
@@ -215,6 +216,7 @@ func (m *PaymailAddress) GetPubKey() (string, error) {
 	return hex.EncodeToString(pubKey.SerialiseCompressed()), nil
 }
 
+// GetNextXpub will get the next child xPub for external operations.
 func (m *PaymailAddress) GetNextXpub(ctx context.Context) (*bip32.ExtendedKey, error) {
 	unlock, err := getWaitWriteLockForPaymail(ctx, m.client.Cachestore(), m.ID)
 	defer unlock()
@@ -234,6 +236,7 @@ func (m *PaymailAddress) GetNextXpub(ctx context.Context) (*bip32.ExtendedKey, e
 	return xPub.Child(m.XpubDerivationSeq)
 }
 
+// RotatePubKey will rotate the public key
 func (m *PaymailAddress) RotatePubKey(ctx context.Context) error {
 	unlock, err := getWaitWriteLockForPaymail(ctx, m.client.Cachestore(), m.ID)
 	defer unlock()

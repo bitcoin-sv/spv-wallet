@@ -88,6 +88,8 @@ func (builder *whereBuilder) applyJSONArrayContains(tx customWhereInterface, key
 			fmt.Sprintf("EXISTS (SELECT 1 FROM json_each(%s) WHERE value = @%s)", columnName, varName),
 			map[string]interface{}{varName: condition},
 		)
+	case Empty:
+		panic("Database engine not configured")
 	default:
 		panic("Unknown database engine")
 	}

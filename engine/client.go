@@ -112,9 +112,9 @@ type (
 
 	// taskManagerOptions holds the configuration for taskmanager
 	taskManagerOptions struct {
-		taskmanager.TaskEngine                                  // Client for TaskManager
-		options                []taskmanager.TaskManagerOptions // List of options
-		cronCustomPeriods      map[string]time.Duration         // will override the default period of cronJob
+		taskmanager.TaskEngine                          // Client for TaskManager
+		options                []taskmanager.Options    // List of options
+		cronCustomPeriods      map[string]time.Duration // will override the default period of cronJob
 	}
 )
 

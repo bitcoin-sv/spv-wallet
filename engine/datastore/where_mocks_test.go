@@ -38,6 +38,8 @@ func mockDialector(engine Engine) gorm.Dialector {
 		})
 	case SQLite:
 		return sqlite.Open("file::memory:?cache=shared")
+	case Empty:
+		fallthrough
 	default:
 		return nil
 	}

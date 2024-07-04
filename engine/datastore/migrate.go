@@ -42,7 +42,7 @@ func (c *Client) AutoMigrateDatabase(ctx context.Context, models ...interface{})
 	))
 
 	// Migrate database for SQL (using GORM)
-	return autoMigrateSQLDatabase(ctx, c.Engine(), c.options.db, c.IsDebug(), c.options.loggerDB, models...)
+	return autoMigrateSQLDatabase(ctx, c.options.db, c.IsDebug(), c.options.loggerDB, models...)
 }
 
 // IsAutoMigrate returns whether auto migration is on
@@ -53,9 +53,7 @@ func (c *Client) IsAutoMigrate() bool {
 // autoMigrateSQLDatabase will attempt to create or update table schema
 //
 // See: https://gorm.io/docs/migration.html
-func autoMigrateSQLDatabase(ctx context.Context, engine Engine, sqlWriteDB *gorm.DB,
-	debug bool, optionalLogger logger.Interface, models ...interface{},
-) error {
+func autoMigrateSQLDatabase(ctx context.Context, sqlWriteDB *gorm.DB, debug bool, optionalLogger logger.Interface, models ...interface{}) error {
 	// Create a segment
 	txn := newrelic.FromContext(ctx)
 	if txn != nil {

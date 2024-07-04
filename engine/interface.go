@@ -59,6 +59,7 @@ type ClientService interface {
 	Taskmanager() taskmanager.TaskEngine
 }
 
+// ContactService is the service for managing contacts
 type ContactService interface {
 	UpsertContact(ctx context.Context, fullName, paymailAdress, requesterXPubID, requesterPaymail string, opts ...ModelOps) (*Contact, error)
 	AddContactRequest(ctx context.Context, fullName, paymailAdress, requesterXPubID string, opts ...ModelOps) (*Contact, error)

@@ -246,7 +246,7 @@ func Test_ToBeef_ErrorPaths(t *testing.T) {
 	}
 }
 
-func createProcessedTx(ctx context.Context, t *testing.T, client ClientInterface, testCase *beefTestCase, ancestors []*Transaction) *Transaction {
+func createProcessedTx(_ context.Context, t *testing.T, client ClientInterface, testCase *beefTestCase, ancestors []*Transaction) *Transaction {
 	draftTx, err := newDraftTransaction(
 		testXPub, &TransactionConfig{
 			Inputs: createInputsUsingAncestors(ancestors, client),
@@ -279,6 +279,7 @@ func createProcessedTx(ctx context.Context, t *testing.T, client ClientInterface
 
 func addAncestor(ctx context.Context, testCase *beefTestCaseAncestor, client ClientInterface, store *MockTransactionStore, t *testing.T) *Transaction {
 	ancestor, err := txFromHex(testCase.hex, append(client.DefaultModelOptions(), New())...)
+	require.NoError(t, err)
 
 	if testCase.isMined {
 		ancestor.BlockHeight = uint64(testCase.blockHeight)
@@ -308,7 +309,7 @@ func addAncestor(ctx context.Context, testCase *beefTestCaseAncestor, client Cli
 }
 
 func createInputsUsingAncestors(ancestors []*Transaction, client ClientInterface) []*TransactionInput {
-	var inputs []*TransactionInput
+	inputs := make([]*TransactionInput, 0, len(ancestors))
 
 	for i, input := range ancestors {
 		utxo := *newUtxoFromTxID(input.GetID(), 0, append(client.DefaultModelOptions(), New())...)

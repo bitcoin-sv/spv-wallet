@@ -50,7 +50,7 @@ func createMetadata(serverMetaData *server.RequestMetadata, request string) (met
 func (p *PaymailDefaultServiceProvider) GetPaymailByAlias(
 	ctx context.Context,
 	alias, domain string,
-	requestMetadata *server.RequestMetadata,
+	_ *server.RequestMetadata,
 ) (*paymail.AddressInformation, error) {
 
 	pm, err := getPaymailAddress(ctx, alias+"@"+domain, p.client.DefaultModelOptions()...)
@@ -201,6 +201,7 @@ func (p *PaymailDefaultServiceProvider) VerifyMerkleRoots(
 	return
 }
 
+// AddContact will add a contact to the paymail address
 func (p *PaymailDefaultServiceProvider) AddContact(
 	ctx context.Context,
 	requesterPaymailAddress string,
