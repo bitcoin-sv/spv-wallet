@@ -1868,7 +1868,7 @@ const docTemplate = `{
                 "tags": [
                     "Transactions"
                 ],
-                "summary": "Get transaction by id",
+                "summary": "Get transaction by id - Use (GET) /api/v1/transactions/{id} instead.",
                 "deprecated": true,
                 "parameters": [
                     {
@@ -1907,7 +1907,7 @@ const docTemplate = `{
                 "tags": [
                     "Transactions"
                 ],
-                "summary": "New transaction",
+                "summary": "New transaction - Use (POST) /api/v1/transactions/drafts instead.",
                 "deprecated": true,
                 "parameters": [
                     {
@@ -1948,7 +1948,7 @@ const docTemplate = `{
                 "tags": [
                     "Transactions"
                 ],
-                "summary": "Update transaction",
+                "summary": "Update transaction - Use (PATCH) /api/v1/transactions/{id} instead.",
                 "deprecated": true,
                 "parameters": [
                     {
@@ -2032,7 +2032,7 @@ const docTemplate = `{
                 "tags": [
                     "Transactions"
                 ],
-                "summary": "Record transaction",
+                "summary": "Record transaction - Use (POST) /api/v1/transactions instead.",
                 "deprecated": true,
                 "parameters": [
                     {
@@ -4671,12 +4671,7 @@ const docTemplate = `{
                 1000000,
                 1000000000,
                 60000000000,
-                3600000000000,
-                1,
-                1000,
-                1000000,
-                1000000000,
-                60000000000
+                3600000000000
             ],
             "x-enum-varnames": [
                 "minDuration",
@@ -4692,12 +4687,7 @@ const docTemplate = `{
                 "Millisecond",
                 "Second",
                 "Minute",
-                "Hour",
-                "Nanosecond",
-                "Microsecond",
-                "Millisecond",
-                "Second",
-                "Minute"
+                "Hour"
             ]
         },
         "transactions.NewTransaction": {

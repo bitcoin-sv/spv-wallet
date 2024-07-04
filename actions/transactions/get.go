@@ -9,7 +9,7 @@ import (
 )
 
 // get will fetch a transaction
-// @Summary		Get transaction by id
+// @Summary		Get transaction by id - Use (GET) /api/v1/transactions/{id} instead.
 // @Description	This endpoint has been deprecated. Use (GET) /api/v1/transactions/{id} instead.
 // @Tags		Transactions
 // @Produce		json

@@ -12,7 +12,7 @@ import (
 
 // newTransaction will create a new transaction
 // New transaction godoc
-// @Summary		New transaction
+// @Summary		New transaction - Use (POST) /api/v1/transactions/drafts instead.
 // @Description	This endpoint has been deprecated. Use (POST) /api/v1/transactions/drafts instead.
 // @Tags		Transactions
 // @Produce		json

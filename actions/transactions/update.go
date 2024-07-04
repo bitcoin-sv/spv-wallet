@@ -11,7 +11,7 @@ import (
 
 // update will update a transaction
 // Update transaction godoc
-// @Summary		Update transaction
+// @Summary		Update transaction - Use (PATCH) /api/v1/transactions/{id} instead.
 // @Description	This endpoint has been deprecated. Use (PATCH) /api/v1/transactions/{id} instead.
 // @Tags		Transactions
 // @Produce		json

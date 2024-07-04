@@ -1734,11 +1734,6 @@ definitions:
     - 1000000000
     - 60000000000
     - 3600000000000
-    - 1
-    - 1000
-    - 1000000
-    - 1000000000
-    - 60000000000
     type: integer
     x-enum-varnames:
     - minDuration
@@ -1755,11 +1750,6 @@ definitions:
     - Second
     - Minute
     - Hour
-    - Nanosecond
-    - Microsecond
-    - Millisecond
-    - Second
-    - Minute
   transactions.NewTransaction:
     properties:
       config:
@@ -3048,7 +3038,7 @@ paths:
           description: Internal Server Error - Error while fetching transaction
       security:
       - x-auth-xpub: []
-      summary: Get transaction by id
+      summary: Get transaction by id - Use (GET) /api/v1/transactions/{id} instead.
       tags:
       - Transactions
     patch:
@@ -3076,7 +3066,7 @@ paths:
           description: Internal Server Error - Error while updating transaction
       security:
       - x-auth-xpub: []
-      summary: Update transaction
+      summary: Update transaction - Use (PATCH) /api/v1/transactions/{id} instead.
       tags:
       - Transactions
     post:
@@ -3104,7 +3094,7 @@ paths:
           description: Internal Server Error - Error while creating transaction
       security:
       - x-auth-xpub: []
-      summary: New transaction
+      summary: New transaction - Use (POST) /api/v1/transactions/drafts instead.
       tags:
       - Transactions
   /v1/transaction/count:
@@ -3160,7 +3150,7 @@ paths:
           description: Internal Server Error - Error while recording transaction
       security:
       - x-auth-xpub: []
-      summary: Record transaction
+      summary: Record transaction - Use (POST) /api/v1/transactions instead.
       tags:
       - Transactions
   /v1/transaction/search:

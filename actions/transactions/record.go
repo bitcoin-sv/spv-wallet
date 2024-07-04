@@ -12,7 +12,7 @@ import (
 
 // record will save and complete a transaction
 // @Deprecated
-// @Summary		Record transaction
+// @Summary		Record transaction - Use (POST) /api/v1/transactions instead.
 // @Description	This endpoint has been deprecated. Use (POST) /api/v1/transactions instead.
 // @Tags		Transactions
 // @Produce		json
