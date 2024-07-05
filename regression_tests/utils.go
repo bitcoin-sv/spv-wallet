@@ -48,7 +48,8 @@ type WalletResponse struct {
 	Message string `json:"message"`
 }
 
-func SaveConfig(config *Config) error {
+// saveConfig saves the configuration to a .env.config file.
+func saveConfig(config *Config) error {
 	envMap := map[string]string{
 		ClientOneURLEnvVar:         config.ClientOneURL,
 		ClientTwoURLEnvVar:         config.ClientTwoURL,
@@ -56,17 +57,18 @@ func SaveConfig(config *Config) error {
 		ClientTwoLeaderXPrivEnvVar: config.ClientTwoLeaderXPriv,
 	}
 
-	err := godotenv.Write(envMap, ".env")
+	err := godotenv.Write(envMap, ".env.config")
 	if err != nil {
-		return fmt.Errorf("error saving .env file: %w", err)
+		return fmt.Errorf("error saving .env.config file: %w", err)
 	}
 
 	return nil
 }
 
-func LoadConfig() (*Config, error) {
-	if err := godotenv.Load(".env"); err != nil {
-		return nil, fmt.Errorf("error loading .env file: %v", err)
+// loadConfig loads the configuration from a .env.config file.
+func loadConfig() (*Config, error) {
+	if err := godotenv.Load(".env.config"); err != nil {
+		return nil, fmt.Errorf("error loading .env.config file: %v", err)
 	}
 
 	return &Config{
@@ -77,8 +79,9 @@ func LoadConfig() (*Config, error) {
 	}, nil
 }
 
-func IsSPVWalletRunning(url string) bool {
-	url = AddPrefixIfNeeded(url)
+// isSPVWalletRunning checks if the SPV wallet is running at the specified URL.
+func isSPVWalletRunning(url string) bool {
+	url = addPrefixIfNeeded(url)
 	resp, err := http.Get(url)
 	if err != nil || resp.StatusCode != http.StatusOK {
 		return false
@@ -87,28 +90,30 @@ func IsSPVWalletRunning(url string) bool {
 
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {
-		fmt.Println("Error reading response body:", err)
+		fmt.Println("error reading response body:", err)
 		return false
 	}
 
 	var walletResp WalletResponse
 	if err := json.Unmarshal(body, &walletResp); err != nil {
-		fmt.Println("Error parsing response JSON:", err)
+		fmt.Println("error parsing response JSON:", err)
 		return false
 	}
 
 	return walletResp.Message == spvWalletIndexResponse
 }
 
-func AddPrefixIfNeeded(url string) string {
+// addPrefixIfNeeded adds the HTTP prefix to the URL if it is missing.
+func addPrefixIfNeeded(url string) string {
 	if !strings.HasPrefix(url, domainPrefix) {
 		return domainPrefix + url
 	}
 	return url
 }
 
-func GetSharedConfig(xpub string) (*models.SharedConfig, error) {
-	req, err := http.NewRequest(http.MethodGet, AddPrefixIfNeeded(domainLocalHost)+domainSuffixSharedConfig, nil)
+// getSharedConfig retrieves the shared configuration from the SPV Wallet.
+func getSharedConfig(xpub string) (*models.SharedConfig, error) {
+	req, err := http.NewRequest(http.MethodGet, addPrefixIfNeeded(domainLocalHost)+domainSuffixSharedConfig, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -141,7 +146,8 @@ func GetSharedConfig(xpub string) (*models.SharedConfig, error) {
 	return &configResponse, nil
 }
 
-func PromptUserAndCheck(question string) int {
+// promptUserAndCheck prompts the user with a question and validates the response.
+func promptUserAndCheck(question string) int {
 	reader := bufio.NewReader(os.Stdin)
 	var response string
 	var checkResult int
@@ -151,7 +157,7 @@ func PromptUserAndCheck(question string) int {
 		response, _ = reader.ReadString('\n')
 		response = strings.TrimSpace(response)
 
-		checkResult = CheckResponse(response)
+		checkResult = checkResponse(response)
 		if checkResult != -1 {
 			break
 		}
@@ -161,7 +167,8 @@ func PromptUserAndCheck(question string) int {
 	return checkResult
 }
 
-func CheckResponse(response string) int {
+// checkResponse checks the response and returns an integer indicating the result.
+func checkResponse(response string) int {
 	response = strings.ToLower(strings.TrimSpace(response))
 	switch response {
 	case "yes", "y":
@@ -173,11 +180,13 @@ func CheckResponse(response string) int {
 	}
 }
 
-func PreparePaymail(paymailAlias string, domain string) string {
+// preparePaymail constructs a paymail address from the alias and domain.
+func preparePaymail(paymailAlias string, domain string) string {
 	return paymailAlias + atSign + domain
 }
 
-func CreateUser(paymail string, config *Config) (*User, error) {
+// createUser creates a new user with the specified paymail.
+func createUser(paymail string, config *Config) (*User, error) {
 	keys, err := xpriv.Generate()
 	if err != nil {
 		return nil, err
@@ -186,14 +195,14 @@ func CreateUser(paymail string, config *Config) (*User, error) {
 	user := &User{
 		XPriv:   keys.XPriv(),
 		XPub:    keys.XPub().String(),
-		Paymail: PreparePaymail(paymail, config.ClientOneURL),
+		Paymail: preparePaymail(paymail, config.ClientOneURL),
 	}
 
-	adminClient := walletclient.NewWithAdminKey(AddPrefixIfNeeded(domainLocalHost), adminXPriv)
+	adminClient := walletclient.NewWithAdminKey(addPrefixIfNeeded(domainLocalHost), adminXPriv)
 	ctx := context.Background()
 
 	if err := adminClient.AdminNewXpub(ctx, user.XPub, map[string]any{"some_metadata": "remove"}); err != nil {
-		fmt.Println("AdminNewXpub failed with status code:", err)
+		fmt.Println("adminNewXpub failed with status code:", err)
 		return nil, err
 	}
 
@@ -206,11 +215,12 @@ func CreateUser(paymail string, config *Config) (*User, error) {
 	}
 
 	fmt.Println(keys.XPriv())
-	user.Paymail = PreparePaymail(createPaymailRes.Alias, createPaymailRes.Domain)
+	user.Paymail = preparePaymail(createPaymailRes.Alias, createPaymailRes.Domain)
 	return user, nil
 }
 
-func UseUserFromEnv(config *Config, paymailAlias string) (*User, error) {
+// useUserFromEnv uses the user from the environment variables.
+func useUserFromEnv(config *Config, paymailAlias string) (*User, error) {
 	keys, err := xpriv.FromString(config.ClientOneLeaderXPriv)
 	if err != nil {
 		return nil, fmt.Errorf("error parsing xpriv: %v", err)
@@ -218,13 +228,14 @@ func UseUserFromEnv(config *Config, paymailAlias string) (*User, error) {
 	return &User{
 		XPriv:   keys.XPriv(),
 		XPub:    keys.XPub().String(),
-		Paymail: PreparePaymail(paymailAlias, config.ClientOneURL),
+		Paymail: preparePaymail(paymailAlias, config.ClientOneURL),
 	}, nil
 }
 
-func DeleteUser(paymail string, config *Config) error {
-	paymail = PreparePaymail(paymail, config.ClientOneURL)
-	adminClient := walletclient.NewWithAdminKey(AddPrefixIfNeeded(domainLocalHost), adminXPriv)
+// deleteUser deletes the user with the specified paymail address from the SPV Wallet.
+func deleteUser(paymail string, config *Config) error {
+	paymail = preparePaymail(paymail, config.ClientOneURL)
+	adminClient := walletclient.NewWithAdminKey(addPrefixIfNeeded(domainLocalHost), adminXPriv)
 	ctx := context.Background()
 	err := adminClient.AdminDeletePaymail(ctx, paymail)
 	if err != nil {
@@ -233,9 +244,10 @@ func DeleteUser(paymail string, config *Config) error {
 	return nil
 }
 
-func GetValidXPriv() string {
+// getValidXPriv prompts the user for a valid xpriv and returns it.
+func getValidXPriv() string {
 	for {
-		xpriv := PromptUser("Enter xpriv: ")
+		xpriv := promptUser("Enter xpriv: ")
 		if strings.HasPrefix(xpriv, "xprv") {
 			return xpriv
 		}
@@ -243,35 +255,51 @@ func GetValidXPriv() string {
 	}
 }
 
-func PromptUser(question string) string {
+// promptUser prompts the user with a question and returns the response.
+func promptUser(question string) string {
 	reader := bufio.NewReader(os.Stdin)
 	fmt.Println(question)
 	response, _ := reader.ReadString('\n')
 	return strings.TrimSpace(response)
 }
 
-func GetValidURL() string {
+// getValidURL prompts the user for a valid URL and returns it.
+func getValidURL() string {
 	for {
-		url := PromptUser("Enter master instance URL with prefix: ")
-		if IsValidURL(url) {
+		url := promptUser("Enter master instance URL with prefix: ")
+		if isValidURL(url) {
 			return url
 		}
 		fmt.Println("Invalid URL. Please enter a valid URL with http/https prefix")
 	}
 }
 
-func IsValidURL(rawURL string) bool {
+// isValidURL validates the URL.
+func isValidURL(rawURL string) bool {
 	return explicitHTTPURLRegex.MatchString(rawURL)
 }
 
-func CheckBalance(domain, xpriv string) int {
-	client := walletclient.NewWithXPriv(AddPrefixIfNeeded(domain), xpriv)
+// checkBalance checks the balance of the specified xpriv at the given domain.
+func checkBalance(domain, xpriv string) int {
+	client := walletclient.NewWithXPriv(addPrefixIfNeeded(domain), xpriv)
 	ctx := context.Background()
 
 	xpubInfo, err := client.GetXPub(ctx)
 	if err != nil {
-		fmt.Println("Error getting xpub info:", err)
+		fmt.Println("error getting xpub info:", err)
 		os.Exit(1)
 	}
 	return int(xpubInfo.CurrentBalance)
+}
+
+// setConfigClientsUrls sets the environment domains variables in the config.
+func setConfigClientsUrls(config *Config, domain string) {
+	config.ClientOneURL = domain
+	config.ClientTwoURL = domain
+}
+
+// setConfigLeaderXPriv sets the environment xprivs variables in the config.
+func setConfigLeaderXPriv(config *Config, xPriv string) {
+	config.ClientOneLeaderXPriv = xPriv
+	config.ClientTwoLeaderXPriv = xPriv
 }

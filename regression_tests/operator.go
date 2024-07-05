@@ -33,9 +33,9 @@ func main() {
 	user := &User{}
 
 	if *loadConfigFlag {
-		config, err = LoadConfig()
+		config, err = loadConfig()
 		if err != nil {
-			fmt.Println("Error loading config:", err)
+			fmt.Println("error loading config:", err)
 			return
 		}
 		user.XPriv = config.ClientOneLeaderXPriv
@@ -43,41 +43,40 @@ func main() {
 		config = &Config{}
 	}
 
-	if !IsSPVWalletRunning(domainLocalHost) {
+	if !isSPVWalletRunning(domainLocalHost) {
 		fmt.Println("spv-wallet is not running. Run spv-wallet and try again")
 		return
 	}
 
-	sharedConfig, err := GetSharedConfig(adminXPub)
+	sharedConfig, err := getSharedConfig(adminXPub)
 	if err != nil {
-		fmt.Println("Error getting shared config:", err)
+		fmt.Println("error getting shared config:", err)
 		return
 	}
-	config.ClientOneURL = sharedConfig.PaymailDomains[0]
-	config.ClientTwoURL = sharedConfig.PaymailDomains[0]
 
-	if !IsSPVWalletRunning(config.ClientOneURL) {
+	setConfigClientsUrls(config, sharedConfig.PaymailDomains[0])
+
+	if !isSPVWalletRunning(config.ClientOneURL) {
 		fmt.Println("can't connect to spv-wallet at", config.ClientOneURL, "\nEnable tunneling from localhost")
 		return
 	}
 
 	user, err = handleUserCreation(leaderPaymailAlias, config)
 	if err != nil {
-		fmt.Println("Error handling user creation:", err)
+		fmt.Println("error handling user creation:", err)
 		return
 	}
 
-	config.ClientOneLeaderXPriv = user.XPriv
-	config.ClientTwoLeaderXPriv = user.XPriv
+	setConfigLeaderXPriv(config, user.XPriv)
 
 	if err := handleCoinsTransfer(user, config); err != nil {
-		fmt.Println("Error handling transactions:", err)
+		fmt.Println("error handling transactions:", err)
 		return
 	}
 
 	clientType := ""
 	for clientType != "go" && clientType != "js" {
-		clientType = PromptUser("Do you want to run tests from go-client or js-client? (enter 'go' or 'js'): ")
+		clientType = promptUser("Do you want to run tests from go-client or js-client? (enter 'go' or 'js'): ")
 		clientType = strings.ToLower(clientType)
 	}
 
@@ -87,25 +86,26 @@ func main() {
 	} else {
 		defaultPath = defaultJSClientPath
 	}
-	err = SaveConfig(config)
+	err = saveConfig(config)
 	if err != nil {
-		fmt.Println("Error saving config:", err)
+		fmt.Println("error saving config:", err)
 		return
 	}
 
 	if err := runTests(clientType, defaultPath); err != nil {
-		fmt.Println("Error running tests:", err)
+		fmt.Println("error running tests:", err)
 	}
 }
 
+// handleUserCreation handles the creation of a user.
 func handleUserCreation(paymailAlias string, config *Config) (*User, error) {
 	if config.ClientOneLeaderXPriv != "" {
-		if PromptUserAndCheck("Would you like to use user from env? (y/yes or n/no): ") == 1 {
-			return UseUserFromEnv(config, paymailAlias)
+		if promptUserAndCheck("Would you like to use user from env? (y/yes or n/no): ") == 1 {
+			return useUserFromEnv(config, paymailAlias)
 		}
 	}
 
-	user, err := CreateUser(paymailAlias, config)
+	user, err := createUser(paymailAlias, config)
 	if err != nil {
 		return handleCreateUserError(err, paymailAlias, config)
 	}
@@ -113,37 +113,42 @@ func handleUserCreation(paymailAlias string, config *Config) (*User, error) {
 	return user, nil
 }
 
+// handleCreateUserError handles the error when creating a user.
 func handleCreateUserError(err error, paymailAlias string, config *Config) (*User, error) {
-	if err.Error() == "paymail address already exists" {
+	if err.Error() == "paymail already exists" {
 		return handleExistingPaymail(paymailAlias, config)
+	} else {
+		return nil, fmt.Errorf("error creating user: %v", err)
 	}
-	return nil, fmt.Errorf("error creating user: %v", err)
 }
 
+// handleExistingPaymail handles the case when the paymail already exists.
 func handleExistingPaymail(paymailAlias string, config *Config) (*User, error) {
-	if PromptUserAndCheck("Paymail already exists. Would you like to use it (you need to have xpriv)? (y/yes or n/no): ") == 1 {
+	if promptUserAndCheck("Paymail already exists. Would you like to use it (you need to have xpriv)? (y/yes or n/no): ") == 1 {
 		return useExistingPaymail(paymailAlias, config)
 	}
-	if PromptUserAndCheck("Would you like to delete and create new user? (y/yes or n/no):") == 1 {
+	if promptUserAndCheck("Would you like to recreate user? (y/yes or n/no):") == 1 {
 		return recreateUser(paymailAlias, config)
 	}
-	return nil, fmt.Errorf("your choices make it impossible to proceed, exiting")
+	return nil, fmt.Errorf("can't work with user when xpriv is unknown")
 }
 
+// recreateUser deletes and recreates the user.
 func recreateUser(paymailAlias string, config *Config) (*User, error) {
-	err := DeleteUser(paymailAlias, config)
+	err := deleteUser(paymailAlias, config)
 	if err != nil {
 		return nil, fmt.Errorf("error deleting user: %v", err)
 	}
-	user, err := CreateUser(paymailAlias, config)
+	user, err := createUser(paymailAlias, config)
 	if err != nil {
 		return nil, fmt.Errorf("error creating user after deletion: %v", err)
 	}
 	return user, nil
 }
 
+// useExistingPaymail uses an existing paymail address.
 func useExistingPaymail(paymailAlias string, config *Config) (*User, error) {
-	validatedXPriv := GetValidXPriv()
+	validatedXPriv := getValidXPriv()
 	keys, err := xpriv.FromString(validatedXPriv)
 	if err != nil {
 		return nil, fmt.Errorf("error parsing xpriv: %v", err)
@@ -151,17 +156,18 @@ func useExistingPaymail(paymailAlias string, config *Config) (*User, error) {
 	return &User{
 		XPriv:   keys.XPriv(),
 		XPub:    keys.XPub().String(),
-		Paymail: PreparePaymail(paymailAlias, config.ClientOneURL),
+		Paymail: preparePaymail(paymailAlias, config.ClientOneURL),
 	}, nil
 }
 
+// handleCoinsTransfer handles the transfer of coins to a user.
 func handleCoinsTransfer(user *User, config *Config) error {
-	response := PromptUserAndCheck("Do you have xpriv and master instance URL? (y/yes or n/no): ")
+	response := promptUserAndCheck("Do you have xpriv and master instance URL? (y/yes or n/no): ")
 	if response == 0 {
 		fmt.Printf("Please send %d Sato for full regression tests:\n%s\n", minimalBalance, user.Paymail)
 		isSent := 0
 		for isSent < 1 {
-			isSent = PromptUserAndCheck("Did you make the transaction? (y/yes or n/no): ")
+			isSent = promptUserAndCheck("Did you make the transaction? (y/yes or n/no): ")
 		}
 	} else {
 		if err := takeMasterUrlAndXPriv(user); err != nil {
@@ -176,29 +182,31 @@ func handleCoinsTransfer(user *User, config *Config) error {
 			fmt.Print(".")
 			time.Sleep(1 * time.Second)
 		}
-		leaderBalance = CheckBalance(config.ClientOneURL, config.ClientOneLeaderXPriv)
+		leaderBalance = checkBalance(config.ClientOneURL, config.ClientOneLeaderXPriv)
 		fmt.Println()
 	}
 	return nil
 }
 
+// takeMasterUrlAndXPriv takes the master URL and xpriv for transferring coins.
 func takeMasterUrlAndXPriv(leaderPaymail *User) error {
-	url := GetValidURL()
-	xprivMaster := GetValidXPriv()
+	url := getValidURL()
+	xprivMaster := getValidXPriv()
 
 	err := sendCoinsWithGoClient(url, xprivMaster, leaderPaymail.Paymail)
 	if err != nil {
-		fmt.Println("Error sending coins:", err)
+		fmt.Println("error sending coins:", err)
 		return err
 	}
 	return nil
 }
 
+// sendCoinsWithGoClient sends coins using the Go client.
 func sendCoinsWithGoClient(instanceUrl string, istanceXPriv string, receiverPaymail string) error {
-	client := walletclient.NewWithXPriv(AddPrefixIfNeeded(instanceUrl), istanceXPriv)
+	client := walletclient.NewWithXPriv(addPrefixIfNeeded(instanceUrl), istanceXPriv)
 	ctx := context.Background()
 
-	balance := CheckBalance(instanceUrl, istanceXPriv)
+	balance := checkBalance(instanceUrl, istanceXPriv)
 	if balance < minimalBalance {
 		return fmt.Errorf("balance too low: %d", balance)
 	}
@@ -212,7 +220,9 @@ func sendCoinsWithGoClient(instanceUrl string, istanceXPriv string, receiverPaym
 	return nil
 }
 
+// runTests runs the regression tests, asks for type of client and path to it and executes command.
 func runTests(clientType string, defaultPath string) error {
+	// TODO: adjust command and path when regression tests are implemented
 	var command string
 	if clientType == "go" {
 		command = "go test ./..."
@@ -223,7 +233,7 @@ func runTests(clientType string, defaultPath string) error {
 	var path string
 	var cmd *exec.Cmd
 	for {
-		path = PromptUser(fmt.Sprintf("Enter relative path to the %s client (default: %s): ", clientType, defaultPath))
+		path = promptUser(fmt.Sprintf("Enter relative path to the %s client (default: %s): ", clientType, defaultPath))
 		if path == "" {
 			path = defaultPath
 		}
