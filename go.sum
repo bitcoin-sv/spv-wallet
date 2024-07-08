@@ -228,8 +228,8 @@ github.com/mrz1836/go-sanitize v1.3.2 h1:sGhusPxP4L+7NAUVAUl/WrrBazNSNECsvYh3yum
 github.com/mrz1836/go-sanitize v1.3.2/go.mod h1:wvRS2ALFDxOCK3ORQPwKUxl7HTIBUV8S3U34Hwn96r4=
 github.com/mrz1836/go-validate v0.2.1 h1:LvhFvnZgemmJnZ/Ch9vEgY9YzKy+1Ka1Hx7yzpJEB00=
 github.com/mrz1836/go-validate v0.2.1/go.mod h1:IoGAb4rTAL6KgAxOiWL4ICwLqxGbKCKT1GyaSuE/4bk=
-github.com/newrelic/go-agent/v3 v3.33.0 h1:0Phrvp6KWOcJPsIxskL9ZrVddhrZDl1xokNtTjN4GpQ=
-github.com/newrelic/go-agent/v3 v3.33.0/go.mod h1:SMdqPzE/ghkWdY0rYGSD7Clw2daK/XH6pUnVd4albg4=
+github.com/newrelic/go-agent/v3 v3.33.1 h1:eWOtty43cyxrMKws4VNPdebgEB6ujFTf0yxPsgB0M80=
+github.com/newrelic/go-agent/v3 v3.33.1/go.mod h1:SMdqPzE/ghkWdY0rYGSD7Clw2daK/XH6pUnVd4albg4=
 github.com/nxadm/tail v1.4.4/go.mod h1:kenIhsEOeOJmVchQTgglprH7qJGnHDVpk1VPCcaMI8A=
 github.com/nxadm/tail v1.4.8 h1:nPr65rt6Y5JFSKQO7qToXr7pePgD6Gwiw05lkbyAQTE=
 github.com/nxadm/tail v1.4.8/go.mod h1:+ncqLTQzXmGhMZNUePPaPqPvBxHAIsmXswZKocGu+AU=

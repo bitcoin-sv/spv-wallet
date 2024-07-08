@@ -37,7 +37,7 @@ require (
 	github.com/mrz1836/go-logger v0.3.3
 	github.com/mrz1836/go-sanitize v1.3.2
 	github.com/mrz1836/go-validate v0.2.1
-	github.com/newrelic/go-agent/v3 v3.33.0
+	github.com/newrelic/go-agent/v3 v3.33.1
 	github.com/pkg/errors v0.9.1
 	github.com/prometheus/client_golang v1.19.1
 	github.com/rafaeljusto/redigomock v2.4.0+incompatible
