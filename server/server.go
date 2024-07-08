@@ -132,7 +132,7 @@ func SetupServerRoutes(appConfig *config.AppConfig, services *config.AppServices
 	transactionBasicRoutes, transactionAPIRoutes, transactionCallbackRoutes := transactions.NewHandler(appConfig, services)
 	utxoAPIRoutes := utxos.NewHandler(appConfig, services)
 	xPubAPIRoutes := xpubs.NewHandler(appConfig, services)
-	sharedConfigRoutes := sharedconfig.NewHandler(appConfig, services)
+	oldSharedConfigRoutes, sharedConfigRoutes := sharedconfig.NewHandler(appConfig, services)
 
 	routes := []interface{}{
 		// Admin routes
@@ -153,6 +153,7 @@ func SetupServerRoutes(appConfig *config.AppConfig, services *config.AppServices
 		// xPub routes
 		xPubAPIRoutes,
 		// Shared Config routes
+		oldSharedConfigRoutes,
 		sharedConfigRoutes,
 	}
 

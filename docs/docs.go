@@ -15,6 +15,31 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
+        "/api/v1/configs/shared": {
+            "get": {
+                "security": [
+                    {
+                        "x-auth-xpub": []
+                    }
+                ],
+                "description": "Get shared config",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Configurations"
+                ],
+                "summary": "Get shared config",
+                "responses": {
+                    "200": {
+                        "description": "Shared configuration",
+                        "schema": {
+                            "$ref": "#/definitions/models.SharedConfig"
+                        }
+                    }
+                }
+            }
+        },
         "/transaction/broadcast/callback": {
             "post": {
                 "security": [
@@ -1206,31 +1231,6 @@ const docTemplate = `{
                 }
             }
         },
-        "/v1/configs/shared": {
-            "get": {
-                "security": [
-                    {
-                        "x-auth-xpub": []
-                    }
-                ],
-                "description": "Get shared config",
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Shared-config"
-                ],
-                "summary": "Get shared config",
-                "responses": {
-                    "200": {
-                        "description": "Shared configuration",
-                        "schema": {
-                            "$ref": "#/definitions/models.SharedConfig"
-                        }
-                    }
-                }
-            }
-        },
         "/v1/contact/accepted/{paymail}": {
             "patch": {
                 "security": [
@@ -1693,14 +1693,15 @@ const docTemplate = `{
                         "x-auth-xpub": []
                     }
                 ],
-                "description": "Get shared config",
+                "description": "This endpoint has been deprecated. Use (GET) /api/v1/configs/shared instead.",
                 "produces": [
                     "application/json"
                 ],
                 "tags": [
-                    "Shared-config"
+                    "Configurations"
                 ],
-                "summary": "Get shared config",
+                "summary": "Get shared config - Use (GET) /api/v1/configs/shared instead.",
+                "deprecated": true,
                 "responses": {
                     "200": {
                         "description": "Shared configuration",
@@ -4581,6 +4582,16 @@ const docTemplate = `{
                 1000000000,
                 60000000000,
                 3600000000000,
+                -9223372036854775808,
+                9223372036854775807,
+                1,
+                1000,
+                1000000,
+                1000000000,
+                60000000000,
+                3600000000000,
+                -9223372036854775808,
+                9223372036854775807,
                 1,
                 1000,
                 1000000,
@@ -4597,6 +4608,16 @@ const docTemplate = `{
                 "Second",
                 "Minute",
                 "Hour",
+                "minDuration",
+                "maxDuration",
+                "Nanosecond",
+                "Microsecond",
+                "Millisecond",
+                "Second",
+                "Minute",
+                "Hour",
+                "minDuration",
+                "maxDuration",
                 "Nanosecond",
                 "Microsecond",
                 "Millisecond",
