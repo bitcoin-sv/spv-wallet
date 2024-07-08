@@ -31,13 +31,13 @@ const (
 
 var explicitHTTPURLRegex = regexp.MustCompile(`^https?://`)
 
-type User struct {
+type regressionTestUser struct {
 	XPriv   string `json:"xpriv"`
 	XPub    string `json:"xpub"`
 	Paymail string `json:"paymail"`
 }
 
-type Config struct {
+type regressionTestConfig struct {
 	ClientOneURL         string
 	ClientTwoURL         string
 	ClientOneLeaderXPriv string
@@ -49,7 +49,7 @@ type WalletResponse struct {
 }
 
 // saveConfig saves the configuration to a .env.config file.
-func saveConfig(config *Config) error {
+func saveConfig(config *regressionTestConfig) error {
 	envMap := map[string]string{
 		ClientOneURLEnvVar:         config.ClientOneURL,
 		ClientTwoURLEnvVar:         config.ClientTwoURL,
@@ -66,12 +66,12 @@ func saveConfig(config *Config) error {
 }
 
 // loadConfig loads the configuration from a .env.config file.
-func loadConfig() (*Config, error) {
+func loadConfig() (*regressionTestConfig, error) {
 	if err := godotenv.Load(".env.config"); err != nil {
 		return nil, fmt.Errorf("error loading .env.config file: %v", err)
 	}
 
-	return &Config{
+	return &regressionTestConfig{
 		ClientOneURL:         os.Getenv(ClientOneURLEnvVar),
 		ClientTwoURL:         os.Getenv(ClientTwoURLEnvVar),
 		ClientOneLeaderXPriv: os.Getenv(ClientOneLeaderXPrivEnvVar),
@@ -186,13 +186,13 @@ func preparePaymail(paymailAlias string, domain string) string {
 }
 
 // createUser creates a new user with the specified paymail.
-func createUser(paymail string, config *Config) (*User, error) {
+func createUser(paymail string, config *regressionTestConfig) (*regressionTestUser, error) {
 	keys, err := xpriv.Generate()
 	if err != nil {
 		return nil, err
 	}
 
-	user := &User{
+	user := &regressionTestUser{
 		XPriv:   keys.XPriv(),
 		XPub:    keys.XPub().String(),
 		Paymail: preparePaymail(paymail, config.ClientOneURL),
@@ -220,12 +220,12 @@ func createUser(paymail string, config *Config) (*User, error) {
 }
 
 // useUserFromEnv uses the user from the environment variables.
-func useUserFromEnv(config *Config, paymailAlias string) (*User, error) {
+func useUserFromEnv(config *regressionTestConfig, paymailAlias string) (*regressionTestUser, error) {
 	keys, err := xpriv.FromString(config.ClientOneLeaderXPriv)
 	if err != nil {
 		return nil, fmt.Errorf("error parsing xpriv: %v", err)
 	}
-	return &User{
+	return &regressionTestUser{
 		XPriv:   keys.XPriv(),
 		XPub:    keys.XPub().String(),
 		Paymail: preparePaymail(paymailAlias, config.ClientOneURL),
@@ -233,7 +233,7 @@ func useUserFromEnv(config *Config, paymailAlias string) (*User, error) {
 }
 
 // deleteUser deletes the user with the specified paymail address from the SPV Wallet.
-func deleteUser(paymail string, config *Config) error {
+func deleteUser(paymail string, config *regressionTestConfig) error {
 	paymail = preparePaymail(paymail, config.ClientOneURL)
 	adminClient := walletclient.NewWithAdminKey(addPrefixIfNeeded(domainLocalHost), adminXPriv)
 	ctx := context.Background()
@@ -293,13 +293,13 @@ func checkBalance(domain, xpriv string) int {
 }
 
 // setConfigClientsUrls sets the environment domains variables in the config.
-func setConfigClientsUrls(config *Config, domain string) {
+func setConfigClientsUrls(config *regressionTestConfig, domain string) {
 	config.ClientOneURL = domain
 	config.ClientTwoURL = domain
 }
 
 // setConfigLeaderXPriv sets the environment xprivs variables in the config.
-func setConfigLeaderXPriv(config *Config, xPriv string) {
+func setConfigLeaderXPriv(config *regressionTestConfig, xPriv string) {
 	config.ClientOneLeaderXPriv = xPriv
 	config.ClientTwoLeaderXPriv = xPriv
 }

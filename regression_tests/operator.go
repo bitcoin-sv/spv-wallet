@@ -28,9 +28,9 @@ func main() {
 	loadConfigFlag := flag.Bool("l", false, "Load configuration from .env.config file")
 	flag.Parse()
 
-	var config *Config
+	var config *regressionTestConfig
 	var err error
-	user := &User{}
+	user := &regressionTestUser{}
 
 	if *loadConfigFlag {
 		config, err = loadConfig()
@@ -40,7 +40,7 @@ func main() {
 		}
 		user.XPriv = config.ClientOneLeaderXPriv
 	} else {
-		config = &Config{}
+		config = &regressionTestConfig{}
 	}
 
 	if !isSPVWalletRunning(domainLocalHost) {
@@ -98,7 +98,7 @@ func main() {
 }
 
 // handleUserCreation handles the creation of a user.
-func handleUserCreation(paymailAlias string, config *Config) (*User, error) {
+func handleUserCreation(paymailAlias string, config *regressionTestConfig) (*regressionTestUser, error) {
 	if config.ClientOneLeaderXPriv != "" {
 		if promptUserAndCheck("Would you like to use user from env? (y/yes or n/no): ") == 1 {
 			return useUserFromEnv(config, paymailAlias)
@@ -114,7 +114,7 @@ func handleUserCreation(paymailAlias string, config *Config) (*User, error) {
 }
 
 // handleCreateUserError handles the error when creating a user.
-func handleCreateUserError(err error, paymailAlias string, config *Config) (*User, error) {
+func handleCreateUserError(err error, paymailAlias string, config *regressionTestConfig) (*regressionTestUser, error) {
 	if err.Error() == "paymail already exists" {
 		return handleExistingPaymail(paymailAlias, config)
 	} else {
@@ -123,7 +123,7 @@ func handleCreateUserError(err error, paymailAlias string, config *Config) (*Use
 }
 
 // handleExistingPaymail handles the case when the paymail already exists.
-func handleExistingPaymail(paymailAlias string, config *Config) (*User, error) {
+func handleExistingPaymail(paymailAlias string, config *regressionTestConfig) (*regressionTestUser, error) {
 	if promptUserAndCheck("Paymail already exists. Would you like to use it (you need to have xpriv)? (y/yes or n/no): ") == 1 {
 		return useExistingPaymail(paymailAlias, config)
 	}
@@ -134,7 +134,7 @@ func handleExistingPaymail(paymailAlias string, config *Config) (*User, error) {
 }
 
 // recreateUser deletes and recreates the user.
-func recreateUser(paymailAlias string, config *Config) (*User, error) {
+func recreateUser(paymailAlias string, config *regressionTestConfig) (*regressionTestUser, error) {
 	err := deleteUser(paymailAlias, config)
 	if err != nil {
 		return nil, fmt.Errorf("error deleting user: %v", err)
@@ -147,13 +147,13 @@ func recreateUser(paymailAlias string, config *Config) (*User, error) {
 }
 
 // useExistingPaymail uses an existing paymail address.
-func useExistingPaymail(paymailAlias string, config *Config) (*User, error) {
+func useExistingPaymail(paymailAlias string, config *regressionTestConfig) (*regressionTestUser, error) {
 	validatedXPriv := getValidXPriv()
 	keys, err := xpriv.FromString(validatedXPriv)
 	if err != nil {
 		return nil, fmt.Errorf("error parsing xpriv: %v", err)
 	}
-	return &User{
+	return &regressionTestUser{
 		XPriv:   keys.XPriv(),
 		XPub:    keys.XPub().String(),
 		Paymail: preparePaymail(paymailAlias, config.ClientOneURL),
@@ -161,7 +161,7 @@ func useExistingPaymail(paymailAlias string, config *Config) (*User, error) {
 }
 
 // handleCoinsTransfer handles the transfer of coins to a user.
-func handleCoinsTransfer(user *User, config *Config) error {
+func handleCoinsTransfer(user *regressionTestUser, config *regressionTestConfig) error {
 	response := promptUserAndCheck("Do you have xpriv and master instance URL? (y/yes or n/no): ")
 	if response == 0 {
 		fmt.Printf("Please send %d Sato for full regression tests:\n%s\n", minimalBalance, user.Paymail)
@@ -189,7 +189,7 @@ func handleCoinsTransfer(user *User, config *Config) error {
 }
 
 // takeMasterUrlAndXPriv takes the master URL and xpriv for transferring coins.
-func takeMasterUrlAndXPriv(leaderPaymail *User) error {
+func takeMasterUrlAndXPriv(leaderPaymail *regressionTestUser) error {
 	url := getValidURL()
 	xprivMaster := getValidXPriv()
 
