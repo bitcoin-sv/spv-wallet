@@ -49,7 +49,7 @@ func (t *SyncResults) Scan(value interface{}) error {
 }
 
 // Value return json value, implement driver.Valuer interface
-func (t *SyncResults) Value() (driver.Value, error) {
+func (t SyncResults) Value() (driver.Value, error) {
 	marshal, err := json.Marshal(t)
 	if err != nil {
 		return nil, spverrors.Wrapf(err, "failed to convert SyncResults to JSON")

@@ -196,7 +196,7 @@ func Test_ToBeef_ErrorPaths(t *testing.T) {
 			},
 			receiverAddress:      "1A1PjKqjWMNBzTVdcBru27EV1PHcXWc63W",
 			outputValue:          3000,
-			expectedErrorMessage: "prepareBUMPFactors() error: required transactions not found in database: [ee337f429d96fb92b5227dbb9a73ecb63e1cc69d0790f58cd58ed5dc3a9ec3cf]",
+			expectedErrorMessage: "prepareBUMPFactors() error caused by: required transactions ([ee337f429d96fb92b5227dbb9a73ecb63e1cc69d0790f58cd58ed5dc3a9ec3cf]) not found in database",
 		},
 		{
 			hexForProcessedTx: "0100000002cb3553424ffc94b59a60fb358b6cb6dfb694aee894dcd1effc0ed0a9052464e3000000006a4730440220515c3bf93d38fa7cc164746fae4bec8b66c60a82509eb553751afa5971c3e41d0220321517fd5c997ab5f8ef0e59048ce9157de46f92b10d882bf898e62f3ee7343d4121038f1273fcb299405d8d140b4de9a2111ecb39291b2846660ebecd864d13bee575ffffffff624fbcb4e68d162361f456b8b4fef6b9e7943013088b32b6bca7f5ced41ff004010000006a47304402203fb24f6e00a6487cf88a3b39d8454786db63d649142ea76374c2f55990777e6302207fbb903d038cf43e13ffb496a64f36637ec7323e5ac48bb96bdb4a885100abca4121024b003d3cf49a8f48c1fe79b711b1d08e306c42a0ab8da004d97fccc4ced3343affffffff026f000000000000001976a914f232d38cd4c2f87c117af06542b04a7061b6640188aca62a0000000000001976a9146058e52d00e3b94211939f68cc2d9a3fc1e3db0f88ac00000000",
@@ -218,7 +218,7 @@ func Test_ToBeef_ErrorPaths(t *testing.T) {
 			},
 			receiverAddress:      "1A1PjKqjWMNBzTVdcBru27EV1PHcXWc63W",
 			outputValue:          3000,
-			expectedErrorMessage: "prepareBUMPFactors() error: required transactions not found in database: [04f01fd4cef5a7bcb6328b08133094e7b9f6feb4b856f46123168de6b4bc4f62]",
+			expectedErrorMessage: "prepareBUMPFactors() error caused by: required transactions ([04f01fd4cef5a7bcb6328b08133094e7b9f6feb4b856f46123168de6b4bc4f62]) not found in database",
 		},
 	}
 

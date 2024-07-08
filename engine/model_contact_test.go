@@ -40,12 +40,12 @@ func Test_contact_validate_returns_error(t *testing.T) {
 		{
 			name:         "empty paymail",
 			contact:      newContact("Homer Simpson", "", "xpubblablahomer", "ownerspbubid", ContactNotConfirmed),
-			expetedError: spverrors.Newf("paymail address failed format validation: "),
+			expetedError: spverrors.Newf("invalid paymail in contact"),
 		},
 		{
 			name:         "invalid paymail",
 			contact:      newContact("Marge Simpson", "definitely not paymail", "xpubblablamarge", "ownerspbubid", ContactNotConfirmed),
-			expetedError: spverrors.Newf("paymail address failed format validation: definitelynotpaymail"),
+			expetedError: spverrors.Newf("invalid paymail in contact"),
 		},
 		{
 			name:         "empty pubKey",
