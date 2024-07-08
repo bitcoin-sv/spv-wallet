@@ -13,7 +13,7 @@ type Action struct {
 }
 
 // NewHandler creates the specific package routes
-func NewHandler(appConfig *config.AppConfig, services *config.AppServices) (routes.BasicEndpointsFunc, routes.APIEndpointsFunc) {
+func NewHandler(appConfig *config.AppConfig, services *config.AppServices) (routes.BasicEndpointsFunc, routes.OldAPIEndpointsFunc) {
 	action := &Action{actions.Action{AppConfig: appConfig, Services: services}}
 
 	basicEndpoints := routes.BasicEndpointsFunc(func(router *gin.RouterGroup) {
@@ -24,7 +24,7 @@ func NewHandler(appConfig *config.AppConfig, services *config.AppServices) (rout
 		basicDestinationGroup.POST("/search", action.search)
 	})
 
-	apiEndpoints := routes.APIEndpointsFunc(func(router *gin.RouterGroup) {
+	apiEndpoints := routes.OldAPIEndpointsFunc(func(router *gin.RouterGroup) {
 		apiDestinationGroup := router.Group("/destination")
 		apiDestinationGroup.POST("", action.create)
 		apiDestinationGroup.PATCH("", action.update)
