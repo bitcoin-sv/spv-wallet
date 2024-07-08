@@ -6,6 +6,7 @@ import (
 
 	"github.com/bitcoin-sv/go-paymail"
 	"github.com/bitcoin-sv/go-paymail/tester"
+	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 )
 
 // PaymailMockClient will return a client for testing purposes
@@ -17,7 +18,7 @@ func PaymailMockClient(domainNames []string) (paymail.ClientInterface, error) {
 		paymail.WithDNSTimeout(15*time.Second),
 	)
 	if err != nil {
-		return nil, err
+		return nil, spverrors.Wrapf(err, "error creating paymail client")
 	}
 
 	// Set the HTTP mocking client

@@ -7,6 +7,7 @@ import (
 	"context"
 
 	"github.com/bitcoin-sv/spv-wallet/engine/logging"
+	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/newrelic/go-agent/v3/newrelic"
 	"github.com/robfig/cron/v3"
 	"github.com/rs/zerolog"
@@ -84,7 +85,7 @@ func (tm *TaskManager) Close(ctx context.Context) error {
 
 		// Close the taskq queue
 		if err := tm.options.taskq.queue.Close(); err != nil {
-			return err
+			return spverrors.Wrapf(err, "failed to close taskq queue")
 		}
 
 		// Empty all values and reset

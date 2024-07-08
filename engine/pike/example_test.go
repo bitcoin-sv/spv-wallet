@@ -5,6 +5,7 @@ import (
 	"fmt"
 
 	"github.com/bitcoin-sv/spv-wallet/engine/pike"
+	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/libsv/go-bk/bec"
 )
 
@@ -33,13 +34,13 @@ func Example_generateLockingScripts() {
 	// Example usage of GenerateOutputsTemplate
 	outputsTemplate, err := pike.GenerateOutputsTemplate(10000)
 	if err != nil {
-		panic(fmt.Errorf("Error generating outputs template - %w", err))
+		panic(spverrors.Wrapf(err, "Error generating outputs template"))
 	}
 
 	// Example usage of GenerateLockingScriptsFromTemplates
 	lockingScripts, err := pike.GenerateLockingScriptsFromTemplates(outputsTemplate, senderPubKey, receiverPubKey, "reference")
 	if err != nil {
-		panic(fmt.Errorf("Error generating locking scripts - %w", err))
+		panic(spverrors.Wrapf(err, "Error generating locking scripts"))
 	}
 
 	for _, script := range lockingScripts {

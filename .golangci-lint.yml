@@ -83,6 +83,8 @@ linters:
 
 linters-settings:
   wrapcheck:
+    ignoreSigRegexps:
+      - spverrors\.(Newf|Wrapf)
     ignorePackageGlobs:
       - "github.com/go-ozzo/ozzo-validation"
 
@@ -103,6 +105,7 @@ issues:
         - gocyclo
         - errcheck
         - gosec
+        - wrapcheck
 
     # Exclude known linters from partially "hard-vendored" code,
     # which is impossible to exclude via "nolint" comments.

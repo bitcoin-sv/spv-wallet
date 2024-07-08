@@ -2,10 +2,10 @@ package engine
 
 import (
 	"context"
-	"errors"
 	"testing"
 
 	broadcast_client "github.com/bitcoin-sv/go-broadcast-client/broadcast"
+	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/bitcoin-sv/spv-wallet/engine/tester"
 	"github.com/rs/zerolog"
 	"github.com/stretchr/testify/require"
@@ -23,7 +23,7 @@ func Test_processBroadcastTransactions(t *testing.T) {
 
 	broadcastClientFailed := broadcastClientMqResponse{
 		r: new(broadcast_client.SubmitTxResponse),
-		f: broadcast_client.Failure("error", errors.New("test client error")),
+		f: broadcast_client.Failure("error", spverrors.Newf("test client error")),
 	}
 
 	broadcastTransactionDeclined := broadcastClientMqResponse{

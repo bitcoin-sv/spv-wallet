@@ -6,7 +6,6 @@ import (
 
 	"github.com/bitcoin-sv/spv-wallet/engine/datastore"
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
-	"github.com/pkg/errors"
 )
 
 // Save will save the model(s) into the Datastore
@@ -25,6 +24,7 @@ func Save(ctx context.Context, model ModelInterface) (err error) {
 	// Create new Datastore transaction
 	// @siggi: we need this to be in a callback context for Mongo
 	// NOTE: a DB error is not being returned from here
+	//nolint:wrapcheck // this returns the error from the callback
 	return ds.NewTx(ctx, func(tx *datastore.Transaction) (err error) {
 		parentBeforeHook := _beforeHook(model)
 		if err = parentBeforeHook(ctx); err != nil {
@@ -89,7 +89,7 @@ func Save(ctx context.Context, model ModelInterface) (err error) {
 				if err == nil { // First error - set the error
 					err = afterErr
 				} else { // Got more than one error, wrap it!
-					err = errors.Wrap(err, afterErr.Error())
+					err = spverrors.Wrapf(err, afterErr.Error())
 				}
 			}
 		}
@@ -106,7 +106,7 @@ func saveToCache(ctx context.Context, keys []string, model ModelInterface, ttl t
 	if model.Client() != nil {
 		for _, key := range keys {
 			if err := model.Client().Cachestore().SetModel(ctx, key, model, ttl); err != nil {
-				return err
+				return spverrors.Wrapf(err, "failed to save model to cache")
 			}
 		}
 	} else {
@@ -124,18 +124,18 @@ func _closeTxWithError(tx *datastore.Transaction, baseError error) error {
 		if baseError != nil {
 			return baseError
 		}
-		return errors.New("transaction is nil during rollback")
+		return spverrors.Newf("transaction is nil during rollback")
 	}
 	if err := tx.Rollback(); err != nil {
 		if baseError != nil {
-			return errors.Wrap(baseError, err.Error())
+			return spverrors.Wrapf(baseError, err.Error())
 		}
-		return err
+		return spverrors.Wrapf(err, "failed to rollback transaction")
 	}
 	if baseError != nil {
 		return baseError
 	}
-	return errors.New("closing transaction with error")
+	return spverrors.Newf("closing transaction with error")
 }
 
 func _beforeHook(model ModelInterface) func(context.Context) error {

@@ -22,7 +22,7 @@ func (c *Client) UpsertContact(ctx context.Context, ctcFName, ctcPaymail, reques
 	}
 	contactPm, err := pmSrvnt.GetSanitizedPaymail(ctcPaymail)
 	if err != nil {
-		return nil, fmt.Errorf("requested contact paymail is invalid. Reason: %w", err)
+		return nil, spverrors.Wrapf(err, "requested contact paymail is invalid")
 	}
 
 	contact, err := c.upsertContact(ctx, pmSrvnt, requesterXPubID, ctcFName, contactPm, opts...)
@@ -186,6 +186,10 @@ func (c *Client) AdminChangeContactStatus(ctx context.Context, id string, status
 		err = contact.Reject()
 	case ContactConfirmed:
 		err = contact.Confirm()
+	case ContactAwaitAccept:
+		fallthrough
+	default:
+		return nil, spverrors.ErrContactIncorrectStatus
 	}
 
 	if err != nil {

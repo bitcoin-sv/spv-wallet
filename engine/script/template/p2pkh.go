@@ -3,9 +3,9 @@ package template
 
 import (
 	"encoding/hex"
-	"errors"
 	"sync"
 
+	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/libsv/go-bt/v2/bscript"
 )
 
@@ -37,10 +37,10 @@ type OutputTemplate struct {
 func P2PKH(satoshis uint64) (*OutputTemplate, error) {
 
 	if satoshis == 0 {
-		return nil, errors.New("satoshis cannot be zero")
+		return nil, spverrors.Newf("satoshis cannot be zero")
 	}
 	if satoshis == ^uint64(0) {
-		return nil, errors.New("invalid satoshis")
+		return nil, spverrors.Newf("invalid satoshis")
 	}
 
 	// Initialize the scriptHex once

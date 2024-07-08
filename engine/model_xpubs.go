@@ -284,7 +284,7 @@ func (m *Xpub) BeforeCreating(_ context.Context) error {
 
 	// Validate that the xPub key is correct
 	if _, err := utils.ValidateXPub(m.rawXpubKey); err != nil {
-		return err
+		return err //nolint:wrapcheck // it is our function returing spverrors
 	}
 
 	// Make sure we have an ID
@@ -340,7 +340,8 @@ func (m *Xpub) AfterUpdated(ctx context.Context) error {
 
 // Migrate model specific migration on startup
 func (m *Xpub) Migrate(client datastore.ClientInterface) error {
-	return client.IndexMetadata(client.GetTableName(tableXPubs), metadataField)
+	err := client.IndexMetadata(client.GetTableName(tableXPubs), metadataField)
+	return spverrors.Wrapf(err, "failed to index metadata column on model %s", m.GetModelName())
 }
 
 // RemovePrivateData unset all fields that are sensitive

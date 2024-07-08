@@ -2,8 +2,8 @@ package engine
 
 import (
 	"database/sql/driver"
-	"fmt"
 
+	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/bitcoin-sv/spv-wallet/engine/utils"
 )
 
@@ -32,7 +32,7 @@ func (t *ContactStatus) Scan(value interface{}) error {
 
 	status, ok := contactStatusMapper.Get(stringValue)
 	if !ok {
-		return fmt.Errorf("invalid contact status: %s", stringValue)
+		return spverrors.Newf("invalid contact status: %s", stringValue)
 	}
 	*t = status
 

@@ -5,6 +5,7 @@ import (
 	"database/sql/driver"
 	"encoding/json"
 
+	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/bitcoin-sv/spv-wallet/engine/utils"
 )
 
@@ -34,14 +35,18 @@ func (t *SyncConfig) Scan(value interface{}) error {
 		return nil
 	}
 
-	return json.Unmarshal(byteValue, &t)
+	err = json.Unmarshal(byteValue, &t)
+	if err != nil {
+		return spverrors.Wrapf(err, "failed to parse SyncConfig from JSON")
+	}
+	return nil
 }
 
 // Value return json value, implement driver.Valuer interface
-func (t SyncConfig) Value() (driver.Value, error) {
+func (t *SyncConfig) Value() (driver.Value, error) {
 	marshal, err := json.Marshal(t)
 	if err != nil {
-		return nil, err
+		return nil, spverrors.Wrapf(err, "failed to convert SyncConfig to JSON")
 	}
 
 	return string(marshal), nil

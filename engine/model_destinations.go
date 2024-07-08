@@ -81,7 +81,7 @@ func newAddress(rawXpubKey string, chain, num uint32, opts ...ModelOps) (*Destin
 	if destination.LockingScript, err = bitcoin.ScriptFromAddress(
 		destination.Address,
 	); err != nil {
-		return nil, err
+		return nil, spverrors.Wrapf(err, "failed to get locking script from address %s", destination.Address)
 	}
 
 	// Determine the type if the locking script is provided
@@ -353,7 +353,7 @@ func (m *Destination) AfterCreated(ctx context.Context) error {
 
 	err := m.client.Cluster().Publish(cluster.DestinationNew, m.LockingScript)
 	if err != nil {
-		return err
+		return spverrors.Wrapf(err, "failed to publish destination %s to cluster", m.ID)
 	}
 
 	// Store in the cache
@@ -378,7 +378,7 @@ func (m *Destination) setAddress(rawXpubKey string) error {
 	// Check the xPub
 	hdKey, err := utils.ValidateXPub(rawXpubKey)
 	if err != nil {
-		return err
+		return err //nolint:wrapcheck // Already wrapped in Validate
 	}
 
 	// Set the ID
@@ -388,7 +388,7 @@ func (m *Destination) setAddress(rawXpubKey string) error {
 	if m.Address, err = utils.DeriveAddress(
 		hdKey, m.Chain, m.Num,
 	); err != nil {
-		return err
+		return spverrors.Wrapf(err, "failed to derive address for chain %d and num %d", m.Chain, m.Num)
 	}
 
 	return nil
@@ -396,7 +396,8 @@ func (m *Destination) setAddress(rawXpubKey string) error {
 
 // Migrate model specific migration on startup
 func (m *Destination) Migrate(client datastore.ClientInterface) error {
-	return client.IndexMetadata(client.GetTableName(tableDestinations), metadataField)
+	err := client.IndexMetadata(client.GetTableName(tableDestinations), metadataField)
+	return spverrors.Wrapf(err, "failed to index metadata column on model %s", m.GetModelName())
 }
 
 // AfterUpdated will fire after the model is updated in the Datastore
@@ -440,7 +441,7 @@ func (m *Destination) AfterDeleted(ctx context.Context) error {
 			if err := m.Client().Cachestore().Delete(
 				ctx, fmt.Sprintf(key, val),
 			); err != nil {
-				return err
+				return spverrors.Wrapf(err, "failed to delete cache key %s", key)
 			}
 		}
 	}

@@ -149,14 +149,18 @@ func (t *TransactionConfig) Scan(value interface{}) error {
 		return nil
 	}
 
-	return json.Unmarshal(byteValue, &t)
+	err = json.Unmarshal(byteValue, &t)
+	if err != nil {
+		return spverrors.Wrapf(err, "failed to parse TransactionConfig from JSON")
+	}
+	return nil
 }
 
 // Value return json value, implement driver.Valuer interface
 func (t TransactionConfig) Value() (driver.Value, error) {
 	marshal, err := json.Marshal(t)
 	if err != nil {
-		return nil, err
+		return nil, spverrors.Wrapf(err, "failed to convert TransactionConfig to JSON")
 	}
 
 	return string(marshal), nil
@@ -237,7 +241,7 @@ func (t *TransactionOutput) processPaymailOutput(ctx context.Context, cacheStore
 		)
 	}
 
-	return fmt.Errorf("paymail provider does not support P2P")
+	return spverrors.Newf("paymail provider does not support P2P")
 }
 
 // processPaymailViaP2P will process the output for P2P Paymail resolution
@@ -260,7 +264,7 @@ func (t *TransactionOutput) processPaymailViaP2P(client paymail.ClientInterface,
 	// split the total output satoshis across all the paymail outputs given
 	outputValues, err := utils.SplitOutputValues(satoshis, len(destinationInfo.Outputs))
 	if err != nil {
-		return err
+		return spverrors.Wrapf(err, "failed to split satoshis between output values")
 	}
 
 	// Loop all received P2P outputs and build scripts

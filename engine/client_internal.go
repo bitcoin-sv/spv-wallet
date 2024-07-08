@@ -165,7 +165,8 @@ func (c *Client) registerCronJobs() error {
 		}
 	}
 
-	return c.Taskmanager().CronJobsInit(cronJobs)
+	err := c.Taskmanager().CronJobsInit(cronJobs)
+	return spverrors.Wrapf(err, "failed to init cron jobs")
 }
 
 // loadDefaultPaymailConfig will load the default paymail server configuration

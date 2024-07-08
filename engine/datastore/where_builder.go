@@ -7,6 +7,7 @@ import (
 	"strings"
 
 	"github.com/bitcoin-sv/spv-wallet/engine/datastore/customtypes"
+	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"gorm.io/gorm"
 )
 
@@ -183,7 +184,7 @@ func (builder *whereBuilder) nextVarName() string {
 func (builder *whereBuilder) getColumnNameOrPanic(key string) string {
 	columnName, ok := GetColumnName(key, builder.tx.Statement.Model, builder.tx)
 	if !ok {
-		panic(fmt.Errorf("column %s does not exist in the model", key))
+		panic(spverrors.Newf("column %s does not exist in the model", key))
 	}
 
 	return columnName

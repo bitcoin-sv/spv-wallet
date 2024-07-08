@@ -1,8 +1,7 @@
 package template
 
 import (
-	"errors"
-
+	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/libsv/go-bk/bec"
 	"github.com/libsv/go-bk/crypto"
 	"github.com/libsv/go-bt/v2/bscript"
@@ -25,13 +24,13 @@ func Evaluate(script []byte, pubKey *bec.PublicKey) ([]byte, error) {
 	parser := interpreter.DefaultOpcodeParser{}
 	parsedScript, err := parser.Parse(&s)
 	if err != nil {
-		return nil, err
+		return nil, spverrors.Wrapf(err, "failed to parse script template")
 	}
 
 	// Validate parsed opcodes
 	for _, op := range parsedScript {
 		if op.Value() == 0xFF {
-			return nil, errors.New("invalid opcode")
+			return nil, spverrors.Newf("invalid opcode")
 		}
 	}
 
@@ -43,14 +42,14 @@ func Evaluate(script []byte, pubKey *bec.PublicKey) ([]byte, error) {
 
 	// Create a new script with the public key hash
 	newScript := new(bscript.Script)
-	if err := newScript.AppendPushData(dPKHash); err != nil {
-		return nil, err
+	if err = newScript.AppendPushData(dPKHash); err != nil {
+		return nil, spverrors.Wrapf(err, "failed to convert pubkeyhash value into opcodes")
 	}
 
 	// Parse the public key hash script
 	pkhParsed, err := parser.Parse(newScript)
 	if err != nil {
-		return nil, err
+		return nil, spverrors.Wrapf(err, "failed to convert pubkeyhash value into opcodes")
 	}
 
 	// Replace OP_PUBKEYHASH with the actual public key hash
@@ -60,7 +59,7 @@ func Evaluate(script []byte, pubKey *bec.PublicKey) ([]byte, error) {
 		case bscript.OpPUBKEYHASH:
 			evaluated = append(evaluated, pkhParsed...)
 		case bscript.OpPUBKEY:
-			return nil, errors.New("OP_PUBKEY not supported yet")
+			return nil, spverrors.Newf("OP_PUBKEY not supported yet")
 		default:
 			evaluated = append(evaluated, op)
 		}
@@ -69,7 +68,7 @@ func Evaluate(script []byte, pubKey *bec.PublicKey) ([]byte, error) {
 	// Unparse the evaluated opcodes back into a script
 	finalScript, err := parser.Unparse(evaluated)
 	if err != nil {
-		return nil, err
+		return nil, spverrors.Wrapf(err, "failed to create script after evaluation of template")
 	}
 
 	// Cast *bscript.Script back to []byte

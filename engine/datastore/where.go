@@ -1,8 +1,7 @@
 package datastore
 
 import (
-	"fmt"
-
+	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"gorm.io/gorm"
 )
 
@@ -11,7 +10,7 @@ import (
 func ApplyCustomWhere(client ClientInterface, gdb *gorm.DB, conditions map[string]interface{}, model interface{}) (tx *gorm.DB, err error) {
 	defer func() {
 		if r := recover(); r != nil {
-			err = fmt.Errorf("error processing conditions: %v", r)
+			err = spverrors.Newf("error processing conditions, %v", r)
 		}
 	}()
 

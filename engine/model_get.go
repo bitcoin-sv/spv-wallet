@@ -1,3 +1,6 @@
+//revive:disable
+//nolint:wrapcheck // wrapping should be done at the higher level
+//revive:enable
 package engine
 
 import (

@@ -2,7 +2,6 @@ package engine
 
 import (
 	"context"
-	"errors"
 	"fmt"
 	"strings"
 	"testing"
@@ -41,12 +40,12 @@ func Test_contact_validate_returns_error(t *testing.T) {
 		{
 			name:         "empty paymail",
 			contact:      newContact("Homer Simpson", "", "xpubblablahomer", "ownerspbubid", ContactNotConfirmed),
-			expetedError: errors.New("paymail address failed format validation: "),
+			expetedError: spverrors.Newf("paymail address failed format validation: "),
 		},
 		{
 			name:         "invalid paymail",
 			contact:      newContact("Marge Simpson", "definitely not paymail", "xpubblablamarge", "ownerspbubid", ContactNotConfirmed),
-			expetedError: fmt.Errorf("paymail address failed format validation: definitelynotpaymail"),
+			expetedError: spverrors.Newf("paymail address failed format validation: definitelynotpaymail"),
 		},
 		{
 			name:         "empty pubKey",
@@ -56,7 +55,7 @@ func Test_contact_validate_returns_error(t *testing.T) {
 		{
 			name:         "no owner id",
 			contact:      newContact("Lisa Simpson", "lisa@springfield.com", "xpubblablalisa", "", ContactNotConfirmed),
-			expetedError: spverrors.ErrMissingContactOwnerXPubId,
+			expetedError: spverrors.ErrMissingContactOwnerXPubID,
 		},
 		{
 			name:         "no status",

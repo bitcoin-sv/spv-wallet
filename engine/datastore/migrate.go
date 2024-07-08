@@ -2,9 +2,9 @@ package datastore
 
 import (
 	"context"
-	"errors"
 	"fmt"
 
+	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/newrelic/go-agent/v3/newrelic"
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
@@ -28,7 +28,7 @@ func (c *Client) AutoMigrateDatabase(ctx context.Context, models ...interface{})
 	for _, modelInterface := range models {
 		modelType := fmt.Sprintf("%T", modelInterface)
 		if c.HasMigratedModel(modelType) {
-			return errors.New("model " + modelType + " was already migrated")
+			return spverrors.Newf("model %s was already migrated", modelType)
 		}
 		c.options.migratedModels = append(c.options.migratedModels, modelType)
 	}
@@ -64,5 +64,6 @@ func autoMigrateSQLDatabase(ctx context.Context, sqlWriteDB *gorm.DB, debug bool
 	sessionDb := sqlWriteDB.Session(getGormSessionConfig(sqlWriteDB.PrepareStmt, debug, optionalLogger))
 
 	// PostgreSQL and SQLite
-	return sessionDb.AutoMigrate(models...)
+	err := sessionDb.AutoMigrate(models...)
+	return spverrors.Wrapf(err, "failed during automigration")
 }

@@ -7,9 +7,10 @@ import (
 	"sync"
 	"time"
 
+	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/go-redis/redis/v8"
 	"github.com/go-redis/redis_rate/v9"
-	taskq "github.com/vmihailenco/taskq/v3"
+	"github.com/vmihailenco/taskq/v3"
 	"github.com/vmihailenco/taskq/v3/memqueue"
 	"github.com/vmihailenco/taskq/v3/redisq"
 )
@@ -73,7 +74,7 @@ func (c *TaskManager) loadTaskQ(ctx context.Context) error {
 	// Check for a valid config (set on client creation)
 	factoryType := c.Factory()
 	if factoryType == FactoryEmpty {
-		return fmt.Errorf("missing factory type to load taskq")
+		return spverrors.Newf("missing factory type to load taskq")
 	}
 
 	var factory taskq.Factory
@@ -88,7 +89,7 @@ func (c *TaskManager) loadTaskQ(ctx context.Context) error {
 	c.options.taskq.queue = q
 	if factoryType == FactoryRedis {
 		if err := q.Consumer().Start(ctx); err != nil {
-			return err
+			return spverrors.Wrapf(err, "failed to start consuming tasks from redis: %v")
 		}
 	}
 
@@ -134,17 +135,19 @@ func (c *TaskManager) RunTask(ctx context.Context, options *TaskRunOptions) erro
 	// Try to get the task
 	task, ok := c.options.taskq.tasks[options.TaskName]
 	if !ok {
-		return fmt.Errorf("task %s not registered", options.TaskName)
+		return spverrors.Newf("task %s not registered", options.TaskName)
 	}
 
 	// Task message will be used to add to the queue
 	taskMessage := task.WithArgs(ctx, options.Arguments...)
 
 	if options.runImmediately() {
-		return c.options.taskq.queue.Add(taskMessage)
+		err := c.options.taskq.queue.Add(taskMessage)
+		return spverrors.Wrapf(err, "failed to add task to queue")
 	}
 	// Note: The first scheduled run will be after the period has passed
-	return c.scheduleTaskWithCron(ctx, task, taskMessage, options.RunEveryPeriod)
+	err := c.scheduleTaskWithCron(ctx, task, taskMessage, options.RunEveryPeriod)
+	return spverrors.Wrapf(err, "failed to schedule task")
 }
 
 func (c *TaskManager) scheduleTaskWithCron(ctx context.Context, task *taskq.Task, taskMessage *taskq.Message, runEveryPeriod time.Duration) error {
@@ -156,7 +159,7 @@ func (c *TaskManager) scheduleTaskWithCron(ctx context.Context, task *taskq.Task
 
 		// The runEveryPeriod should be greater than 1 second
 		if runEveryPeriod < 1*time.Second {
-			return fmt.Errorf("runEveryPeriod should be greater than 1 second")
+			return spverrors.Newf("runEveryPeriod should be greater than 1 second")
 		}
 
 		// Lock time is the period minus 500ms to allow for some clock drift
@@ -179,5 +182,8 @@ func (c *TaskManager) scheduleTaskWithCron(ctx context.Context, task *taskq.Task
 		fmt.Sprintf("@every %ds", int(runEveryPeriod.Seconds())),
 		handler,
 	)
-	return err
+	if err == nil {
+		return nil
+	}
+	return spverrors.Wrapf(err, "failed to register cron job")
 }
