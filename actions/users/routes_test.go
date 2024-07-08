@@ -1,4 +1,4 @@
-package xpubs
+package users
 
 import (
 	"testing"
