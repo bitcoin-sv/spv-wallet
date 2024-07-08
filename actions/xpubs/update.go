@@ -10,19 +10,34 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-// update will update an existing model
-// Update xPub godoc
-// @Summary		Update xPub
-// @Description	Update xPub
-// @Tags		xPub
+// oldUpdate will update an existing model
+// Update current user information godoc
+// @Summary		Update current user information - Use (PATCH) /api/v1/users/current instead.
+// @Description	This endpoint has been deprecated. Use (PATCH) /api/v1/users/current instead.
+// @Tags		Users
 // @Produce		json
 // @Param		Metadata body engine.Metadata false " "
 // @Success		200 {object} models.Xpub "Updated xPub"
 // @Failure		400	"Bad request - Error while parsing Metadata from request body"
 // @Failure 	500	"Internal Server Error - Error while updating xPub"
-// @Router		/v1/xpub [patch]
+// @DeprecatedRouter  /v1/xpub [patch]
 // @Security	x-auth-xpub
-// @Security	bux-auth-xpub
+func (a *Action) oldUpdate(c *gin.Context) {
+	a.update(c)
+}
+
+// update will update an existing model
+// Update current user information godoc
+// @Summary		Update current user information
+// @Description	Update current user information
+// @Tags		Users
+// @Produce		json
+// @Param		Metadata body engine.Metadata false " "
+// @Success		200 {object} models.Xpub "Updated xPub"
+// @Failure		400	"Bad request - Error while parsing Metadata from request body"
+// @Failure 	500	"Internal Server Error - Error while updating xPub"
+// @Router		/api/v1/users/current [patch]
+// @Security	x-auth-xpub
 func (a *Action) update(c *gin.Context) {
 	reqXPub := c.GetString(auth.ParamXPubKey)
 	reqXPubID := c.GetString(auth.ParamXPubHashKey)
@@ -42,48 +57,6 @@ func (a *Action) update(c *gin.Context) {
 	if err != nil {
 		spverrors.ErrorResponse(c, err, a.Services.Logger)
 		return
-	}
-
-	signed := c.GetBool("auth_signed")
-	if !signed || reqXPub == "" {
-		xPub.RemovePrivateData()
-	}
-
-	contract := mappings.MapToXpubContract(xPub)
-	c.JSON(http.StatusOK, contract)
-}
-
-// update will update an existing model
-// Update xPub godoc
-// @Summary		Update xPub
-// @Description	Update xPub
-// @Tags		xPub
-// @Produce		json
-// @Param		Metadata body engine.Metadata false " "
-// @Success		200 {object} models.Xpub "Updated xPub"
-// @Failure		400	"Bad request - Error while parsing Metadata from request body"
-// @Failure 	500	"Internal Server Error - Error while updating xPub"
-// @Router		/v1/users/current [patch]
-// @Security	x-auth-xpub
-// @Security	bux-auth-xpub
-func (a *Action) update2(c *gin.Context) {
-	reqXPub := c.GetString(auth.ParamXPubKey)
-	reqXPubID := c.GetString(auth.ParamXPubHashKey)
-
-	var requestBody engine.Metadata
-	if err := c.Bind(&requestBody); err != nil {
-		c.JSON(http.StatusBadRequest, err.Error())
-		return
-	}
-
-	// Get an xPub
-	var xPub *engine.Xpub
-	var err error
-	xPub, err = a.Services.SpvWalletEngine.UpdateXpubMetadata(
-		c.Request.Context(), reqXPubID, requestBody,
-	)
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, err.Error())
 	}
 
 	signed := c.GetBool("auth_signed")

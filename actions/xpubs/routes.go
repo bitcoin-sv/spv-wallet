@@ -13,18 +13,20 @@ type Action struct {
 }
 
 // NewHandler creates the specific package routes
-func NewHandler(appConfig *config.AppConfig, services *config.AppServices) routes.OldAPIEndpointsFunc {
+func NewHandler(appConfig *config.AppConfig, services *config.AppServices) (routes.OldAPIEndpointsFunc, routes.APIEndpointsFunc) {
 	action := &Action{actions.Action{AppConfig: appConfig, Services: services}}
 
-	apiEndpoints := routes.OldAPIEndpointsFunc(func(router *gin.RouterGroup) {
+	oldApiEndpoints := routes.OldAPIEndpointsFunc(func(router *gin.RouterGroup) {
 		xpubGroup := router.Group("/xpub")
-		xpubGroup.GET("", action.get)
-		xpubGroup.PATCH("", action.update)
-
-		xpubGroup2 := router.Group("/users/current")
-		xpubGroup2.GET("", action.get2)
-		xpubGroup2.PATCH("", action.update2)
+		xpubGroup.GET("", action.oldGet)
+		xpubGroup.PATCH("", action.oldUpdate)
 	})
 
-	return apiEndpoints
+	apiEndpoints := routes.APIEndpointsFunc(func(router *gin.RouterGroup) {
+		xpubGroup := router.Group("/users/current")
+		xpubGroup.GET("", action.get)
+		xpubGroup.PATCH("", action.update)
+	})
+
+	return oldApiEndpoints, apiEndpoints
 }
