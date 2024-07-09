@@ -1079,7 +1079,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/v1/admin/webhooks/subscribe": {
+        "/v1/admin/webhooks/subscription": {
             "post": {
                 "security": [
                     {
@@ -1115,10 +1115,8 @@ const docTemplate = `{
                         "description": "Internal server error - Error while subscribing to the webhook"
                     }
                 }
-            }
-        },
-        "/v1/admin/webhooks/unsubscribe": {
-            "post": {
+            },
+            "delete": {
                 "security": [
                     {
                         "x-auth-xpub": []
@@ -4654,6 +4652,22 @@ const docTemplate = `{
                 1000000000,
                 60000000000,
                 3600000000000,
+                -9223372036854775808,
+                9223372036854775807,
+                1,
+                1000,
+                1000000,
+                1000000000,
+                60000000000,
+                3600000000000,
+                -9223372036854775808,
+                9223372036854775807,
+                1,
+                1000,
+                1000000,
+                1000000000,
+                60000000000,
+                3600000000000,
                 1,
                 1000,
                 1000000,
@@ -4662,6 +4676,22 @@ const docTemplate = `{
                 3600000000000
             ],
             "x-enum-varnames": [
+                "minDuration",
+                "maxDuration",
+                "Nanosecond",
+                "Microsecond",
+                "Millisecond",
+                "Second",
+                "Minute",
+                "Hour",
+                "minDuration",
+                "maxDuration",
+                "Nanosecond",
+                "Microsecond",
+                "Millisecond",
+                "Second",
+                "Minute",
+                "Hour",
                 "minDuration",
                 "maxDuration",
                 "Nanosecond",
