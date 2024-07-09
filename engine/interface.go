@@ -208,4 +208,5 @@ type ClientInterface interface {
 	Version() string
 	Metrics() (metrics *metrics.Metrics, enabled bool)
 	SubscribeWebhook(ctx context.Context, url, tokenHeader, token string) error
+	UnsubscribeWebhook(ctx context.Context, url string) error
 }

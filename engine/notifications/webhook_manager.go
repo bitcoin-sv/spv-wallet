@@ -58,7 +58,7 @@ func (w *WebhookManager) Subscribe(ctx context.Context, url, tokenHeader, tokenV
 
 func (w *WebhookManager) Unsubscribe(ctx context.Context, url string) error {
 	err := w.repository.RemoveWebhook(ctx, url)
-	if err != nil {
+	if err == nil {
 		w.updateMsg <- true
 	}
 	return errors.Wrap(err, "failed to remove webhook")

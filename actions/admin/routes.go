@@ -43,6 +43,7 @@ func NewHandler(appConfig *config.AppConfig, services *config.AppServices) route
 		adminGroup.POST("/xpubs/search", action.xpubsSearch)
 		adminGroup.POST("/xpubs/count", action.xpubsCount)
 		adminGroup.POST("/webhooks/subscribe", action.subscribeWebhook)
+		adminGroup.POST("/webhooks/unsubscribe", action.unsubscribeWebhook)
 	})
 
 	return adminEndpoints
