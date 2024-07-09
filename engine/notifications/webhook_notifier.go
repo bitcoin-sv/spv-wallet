@@ -5,6 +5,7 @@ import (
 	"context"
 	"encoding/json"
 	"net/http"
+	"sync"
 	"time"
 
 	"github.com/pkg/errors"
@@ -20,19 +21,20 @@ const (
 
 // WebhookNotifier - notifier for sending events to webhook
 type WebhookNotifier struct {
-	Channel    chan Event
-	definition WebhookInterface
-	banTime    *time.Time
-	banMsg     chan bool
-	httpClient *http.Client
+	Channel chan Event
+
+	definition    WebhookModel
+	definitionMtx sync.Mutex
+	banMsg        chan string
+	httpClient    *http.Client
 }
 
 // NewWebhookNotifier - creates a new instance of WebhookNotifier
-func NewWebhookNotifier(ctx context.Context, hook WebhookInterface) *WebhookNotifier {
+func NewWebhookNotifier(ctx context.Context, model WebhookModel, banMsg chan string) *WebhookNotifier {
 	notifier := &WebhookNotifier{
 		Channel:    make(chan Event, lengthOfWebhookChannel),
-		definition: hook,
-		banMsg:     make(chan bool),
+		definition: model,
+		banMsg:     banMsg,
 		httpClient: &http.Client{},
 	}
 
@@ -49,9 +51,6 @@ func (w *WebhookNotifier) consumer(ctx context.Context) {
 	for {
 		select {
 		case event := <-w.Channel:
-			if w.banned() {
-				continue // discard events
-			}
 			events, done := w.accumulateEvents(ctx, event)
 			if done {
 				return
@@ -66,30 +65,15 @@ func (w *WebhookNotifier) consumer(ctx context.Context) {
 			}
 
 			if err != nil {
-				w.ban()
+				w.banMsg <- w.definition.URL
+				return
 			}
-		case <-w.banMsg:
-			w.ban()
 		case <-ctx.Done():
 			return
+		default:
+			time.Sleep(100 * time.Millisecond)
 		}
 	}
-}
-
-// Ban - ban notifier for some time
-func (w *WebhookNotifier) Ban() {
-	w.banMsg <- true
-}
-
-// internal ban function; not thread safe
-func (w *WebhookNotifier) ban() {
-	now := time.Now()
-	w.banTime = &now
-}
-
-// banned - check if notifier is banned; this is not thread safe, for internal use only
-func (w *WebhookNotifier) banned() bool {
-	return w.banTime != nil && time.Now().Before(w.banTime.Add(banTime))
 }
 
 func (w *WebhookNotifier) accumulateEvents(ctx context.Context, event Event) (events []Event, done bool) {
@@ -114,13 +98,13 @@ func (w *WebhookNotifier) sendEventsToWebhook(ctx context.Context, events []Even
 		return errors.Wrap(err, "failed to marshal events")
 	}
 
-	req, err := http.NewRequestWithContext(ctx, "POST", w.definition.GetURL(), bytes.NewBuffer(data))
+	req, err := http.NewRequestWithContext(ctx, "POST", w.definition.URL, bytes.NewBuffer(data))
 	if err != nil {
 		return errors.Wrap(err, "failed to create request")
 	}
 
 	req.Header.Set("Content-Type", "application/json")
-	tokenHeader, tokenValue := w.definition.GetToken()
+	tokenHeader, tokenValue := w.definition.TokenHeader, w.definition.TokenValue
 	if tokenHeader != "" {
 		req.Header.Set(tokenHeader, tokenValue)
 	}

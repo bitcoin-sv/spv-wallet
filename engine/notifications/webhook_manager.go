@@ -2,6 +2,7 @@ package notifications
 
 import (
 	"context"
+	"fmt"
 	"sync"
 	"time"
 
@@ -21,6 +22,7 @@ type WebhookManager struct {
 	webhookNotifiers *sync.Map // [string, *notifierWithCtx]
 	ticker           *time.Ticker
 	updateMsg        chan bool
+	banMsg           chan string // url
 	notifications    *Notifications
 }
 
@@ -34,6 +36,7 @@ func NewWebhookManager(ctx context.Context, notifications *Notifications, reposi
 		ticker:           time.NewTicker(5 * time.Second),
 		notifications:    notifications,
 		updateMsg:        make(chan bool),
+		banMsg:           make(chan string),
 	}
 
 	go manager.checkForUpdates()
@@ -62,6 +65,13 @@ func (w *WebhookManager) Unsubscribe(ctx context.Context, url string) error {
 }
 
 func (w *WebhookManager) checkForUpdates() {
+	defer func() {
+		fmt.Printf("WebhookManager stopped\n")
+		if err := recover(); err != nil {
+			fmt.Printf("WebhookManager stopped with error: %v\n", err)
+		}
+	}()
+
 	w.update()
 
 	for {
@@ -70,6 +80,9 @@ func (w *WebhookManager) checkForUpdates() {
 			w.update()
 		case <-w.updateMsg:
 			w.update()
+		case url := <-w.banMsg:
+			w.repository.BanWebhook(w.rootContext, url, time.Now().Add(banTime)) // TODO log error from this method
+			w.removeNotifier(url)
 		case <-w.rootContext.Done():
 			return
 		}
@@ -83,28 +96,37 @@ func (w *WebhookManager) update() {
 		return
 	}
 
+	// filter out banned webhooks
+	var filteredWebhooks []*WebhookModel
+	for _, webhook := range dbWebhooks {
+		if !webhook.Banned() {
+			filteredWebhooks = append(filteredWebhooks, webhook)
+		}
+	}
+
 	// add notifiers which are not in the map
-	for _, model := range dbWebhooks {
-		if _, ok := w.webhookNotifiers.Load(model.GetURL()); !ok {
+	for _, model := range filteredWebhooks {
+		if _, ok := w.webhookNotifiers.Load(model.URL); !ok {
 			w.addNotifier(model)
+		} else {
 		}
 	}
 
 	// remove notifiers which are not in the database
 	w.webhookNotifiers.Range(func(key, _ any) bool {
 		url := key.(string)
-		if !containsWebhook(dbWebhooks, url) {
+		if !containsWebhook(filteredWebhooks, url) {
 			w.removeNotifier(url)
 		}
 		return true
 	})
 }
 
-func (w *WebhookManager) addNotifier(model WebhookInterface) {
+func (w *WebhookManager) addNotifier(model *WebhookModel) {
 	ctx, cancel := context.WithCancel(w.rootContext)
-	notifier := NewWebhookNotifier(ctx, model)
-	w.webhookNotifiers.Store(model.GetURL(), &notifierWithCtx{notifier: notifier, ctx: ctx, cancelFunc: cancel})
-	w.notifications.AddNotifier(model.GetURL(), notifier.Channel)
+	notifier := NewWebhookNotifier(ctx, *model, w.banMsg)
+	w.webhookNotifiers.Store(model.URL, &notifierWithCtx{notifier: notifier, ctx: ctx, cancelFunc: cancel})
+	w.notifications.AddNotifier(model.URL, notifier.Channel)
 }
 
 func (w *WebhookManager) removeNotifier(url string) {
@@ -116,9 +138,9 @@ func (w *WebhookManager) removeNotifier(url string) {
 	}
 }
 
-func containsWebhook(webhooks []WebhookInterface, url string) bool {
+func containsWebhook(webhooks []*WebhookModel, url string) bool {
 	for _, webhook := range webhooks {
-		if webhook.GetURL() == url {
+		if webhook.URL == url {
 			return true
 		}
 	}
