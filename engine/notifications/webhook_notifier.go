@@ -23,12 +23,22 @@ type WebhookNotifier struct {
 	Channel    chan Event
 	definition *WebhookModel
 	banTime    *time.Time
+	banMsg     chan bool
+	httpClient *http.Client
 }
 
-// Ban - ban notifier for some time
-func (w *WebhookNotifier) Ban() {
-	now := time.Now()
-	w.banTime = &now // TODO: it's not thread save - use channels or mutex
+// NewWebhookNotifier - creates a new instance of WebhookNotifier
+func NewWebhookNotifier(ctx context.Context, hook *WebhookModel) *WebhookNotifier {
+	notifier := &WebhookNotifier{
+		Channel:    make(chan Event, lengthOfWebhookChannel),
+		definition: hook,
+		banMsg:     make(chan bool),
+		httpClient: &http.Client{},
+	}
+
+	go notifier.consumer(ctx)
+
+	return notifier
 }
 
 // consumer - consumer for webhook notifier
@@ -48,7 +58,7 @@ func (w *WebhookNotifier) consumer(ctx context.Context) {
 			}
 			var err error
 			for i := 0; i < mexRetries; i++ {
-				err = w.sendEventsToWebhook(events)
+				err = w.sendEventsToWebhook(ctx, events)
 				if err == nil {
 					break
 				}
@@ -56,15 +66,28 @@ func (w *WebhookNotifier) consumer(ctx context.Context) {
 			}
 
 			if err != nil {
-				w.Ban()
+				w.ban()
 			}
+		case <-w.banMsg:
+			w.ban()
 		case <-ctx.Done():
 			return
 		}
 	}
 }
 
-// banned - check if notifier is banned
+// Ban - ban notifier for some time
+func (w *WebhookNotifier) Ban() {
+	w.banMsg <- true
+}
+
+// internal ban function; not thread safe
+func (w *WebhookNotifier) ban() {
+	now := time.Now()
+	w.banTime = &now
+}
+
+// banned - check if notifier is banned; this is not thread safe, for internal use only
 func (w *WebhookNotifier) banned() bool {
 	return w.banTime != nil && time.Now().Before(w.banTime.Add(banTime))
 }
@@ -85,21 +108,23 @@ loop:
 	return events, false
 }
 
-func (w *WebhookNotifier) sendEventsToWebhook(events []Event) error {
+func (w *WebhookNotifier) sendEventsToWebhook(ctx context.Context, events []Event) error {
 	data, err := json.Marshal(events)
 	if err != nil {
 		return errors.Wrap(err, "failed to marshal events")
 	}
 
-	req, err := http.NewRequest("POST", w.definition.URL, bytes.NewBuffer(data))
+	req, err := http.NewRequestWithContext(ctx, "POST", w.definition.URL, bytes.NewBuffer(data))
 	if err != nil {
 		return errors.Wrap(err, "failed to create request")
 	}
 
 	req.Header.Set("Content-Type", "application/json")
+	if w.definition.TokenHeader != "" {
+		req.Header.Set(w.definition.TokenHeader, w.definition.Token)
+	}
 
-	client := &http.Client{}
-	resp, err := client.Do(req)
+	resp, err := w.httpClient.Do(req)
 	if err != nil {
 		return errors.Wrap(err, "failed to send request")
 	}
@@ -111,16 +136,4 @@ func (w *WebhookNotifier) sendEventsToWebhook(events []Event) error {
 	// TODO: Handle response
 
 	return nil
-}
-
-// NewWebhookNotifier - creates a new instance of WebhookNotifier
-func NewWebhookNotifier(ctx context.Context, hook *WebhookModel) *WebhookNotifier {
-	notifier := &WebhookNotifier{
-		Channel:    make(chan Event, lengthOfWebhookChannel),
-		definition: hook,
-	}
-
-	go notifier.consumer(ctx)
-
-	return notifier
 }

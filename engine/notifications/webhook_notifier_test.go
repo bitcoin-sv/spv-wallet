@@ -14,7 +14,7 @@ import (
 )
 
 type mockClient struct {
-	interceptor     func() (*http.Response, error)
+	interceptor     func(req *http.Request) (*http.Response, error)
 	url             string
 	receivedBatches [][]Event
 }
@@ -27,7 +27,7 @@ func newMockClient(url string) *mockClient {
 
 	customResponder := func(req *http.Request) (*http.Response, error) {
 		if mc.interceptor != nil {
-			res, err := mc.interceptor()
+			res, err := mc.interceptor(req)
 			if res != nil {
 				return res, err
 			}
@@ -89,7 +89,7 @@ func TestWebhookNotifier(t *testing.T) {
 
 		ctx, cancel := context.WithCancel(context.Background())
 		n := NewNotifications(ctx)
-		notifier := NewWebhookNotifier(ctx, &WebhookModel{URL: client.url})
+		notifier := NewWebhookNotifier(ctx, NewWebhookModel(client.url, "", ""))
 		n.AddNotifier(client.url, notifier.Channel)
 
 		expected := []Event{}
@@ -116,10 +116,10 @@ func TestWebhookNotifier(t *testing.T) {
 		ctx, cancel := context.WithCancel(context.Background())
 		n := NewNotifications(ctx)
 
-		notifier1 := NewWebhookNotifier(ctx, &WebhookModel{URL: client1.url})
+		notifier1 := NewWebhookNotifier(ctx, NewWebhookModel(client1.url, "", ""))
 		n.AddNotifier(client1.url, notifier1.Channel)
 
-		notifier2 := NewWebhookNotifier(ctx, &WebhookModel{URL: client2.url})
+		notifier2 := NewWebhookNotifier(ctx, NewWebhookModel(client2.url, "", ""))
 		n.AddNotifier(client2.url, notifier2.Channel)
 
 		expected := []Event{}
@@ -147,7 +147,7 @@ func TestWebhookNotifier(t *testing.T) {
 
 		ctx, cancel := context.WithCancel(context.Background())
 		n := NewNotifications(ctx)
-		notifier := NewWebhookNotifier(ctx, &WebhookModel{URL: client.url})
+		notifier := NewWebhookNotifier(ctx, NewWebhookModel(client.url, "", ""))
 		n.AddNotifier(client.url, notifier.Channel)
 
 		expected := []Event{}
@@ -173,7 +173,7 @@ func TestWebhookNotifier(t *testing.T) {
 
 		ctx, cancel := context.WithCancel(context.Background())
 		n := NewNotifications(ctx)
-		notifier := NewWebhookNotifier(ctx, &WebhookModel{URL: client.url})
+		notifier := NewWebhookNotifier(ctx, NewWebhookModel(client.url, "", ""))
 		n.AddNotifier(client.url, notifier.Channel)
 
 		expected := []Event{}
@@ -197,7 +197,7 @@ func TestWebhookNotifier(t *testing.T) {
 
 		client := newMockClient("http://localhost:8080")
 		k := 0
-		client.interceptor = func() (*http.Response, error) {
+		client.interceptor = func(_ *http.Request) (*http.Response, error) {
 			if k < 1 {
 				k++
 				return httpmock.NewStringResponse(408, ""), fmt.Errorf("Timeout")
@@ -207,7 +207,7 @@ func TestWebhookNotifier(t *testing.T) {
 
 		ctx, cancel := context.WithCancel(context.Background())
 		n := NewNotifications(ctx)
-		notifier := NewWebhookNotifier(ctx, &WebhookModel{URL: client.url})
+		notifier := NewWebhookNotifier(ctx, NewWebhookModel(client.url, "", ""))
 		n.AddNotifier(client.url, notifier.Channel)
 
 		expected := []Event{}
@@ -228,13 +228,13 @@ func TestWebhookNotifier(t *testing.T) {
 		defer httpmock.Deactivate()
 
 		client := newMockClient("http://localhost:8080")
-		client.interceptor = func() (*http.Response, error) {
+		client.interceptor = func(_ *http.Request) (*http.Response, error) {
 			return httpmock.NewStringResponse(408, ""), fmt.Errorf("Timeout")
 		}
 
 		ctx, cancel := context.WithCancel(context.Background())
 		n := NewNotifications(ctx)
-		notifier := NewWebhookNotifier(ctx, &WebhookModel{URL: client.url})
+		notifier := NewWebhookNotifier(ctx, NewWebhookModel(client.url, "", ""))
 		n.AddNotifier(client.url, notifier.Channel)
 
 		for i := 0; i < 10; i++ {
@@ -245,5 +245,68 @@ func TestWebhookNotifier(t *testing.T) {
 		cancel()
 
 		assert.Equal(t, true, notifier.banned())
+	})
+
+	t.Run("ban webhook from outside", func(t *testing.T) {
+		httpmock.Reset()
+		httpmock.Activate()
+		defer httpmock.Deactivate()
+
+		client := newMockClient("http://localhost:8080")
+		ctx, cancel := context.WithCancel(context.Background())
+		n := NewNotifications(ctx)
+		notifier := NewWebhookNotifier(ctx, NewWebhookModel(client.url, "", ""))
+		n.AddNotifier(client.url, notifier.Channel)
+
+		notifier.Ban()
+
+		time.Sleep(100 * time.Millisecond)
+
+		assert.Equal(t, true, notifier.banned())
+
+		for i := 0; i < 10; i++ {
+			n.Notify(i)
+		}
+
+		time.Sleep(100 * time.Millisecond)
+		cancel()
+
+		client.assertEvents(t, []Event{})
+	})
+
+	t.Run("with token", func(t *testing.T) {
+		httpmock.Reset()
+		httpmock.Activate()
+		defer httpmock.Deactivate()
+
+		tokenHeader := "test"
+		tokenValue := "token"
+
+		waitForCall := make(chan bool)
+		client := newMockClient("http://localhost:8080")
+		allGood := false
+		client.interceptor = func(req *http.Request) (*http.Response, error) {
+			defer func() {
+				waitForCall <- true
+			}()
+			if tokenValue == req.Header.Get(tokenHeader) {
+				allGood = true
+			}
+			return nil, nil
+		}
+
+		ctx, cancel := context.WithCancel(context.Background())
+		n := NewNotifications(ctx)
+		notifier := NewWebhookNotifier(ctx, NewWebhookModel(client.url, tokenHeader, tokenValue))
+		n.AddNotifier(client.url, notifier.Channel)
+
+		for i := 0; i < 10; i++ {
+			n.Notify(i)
+		}
+
+		<-waitForCall
+		cancel()
+
+		assert.Equal(t, true, allGood)
 	})
 }
