@@ -3,6 +3,7 @@ package notifications
 import (
 	"encoding/json"
 	"fmt"
+	"reflect"
 
 	"github.com/pkg/errors"
 )
@@ -13,34 +14,48 @@ type RawEvent struct {
 	Content json.RawMessage `json:"content"`
 }
 
-type EventContent interface {
-	GetType() string
-}
-
-type GeneralPurposeEvent struct {
+type StringEvent struct {
 	Value string
 }
 
-func (GeneralPurposeEvent) GetType() string {
-	return "general-purpose-event"
+type NumericEvent struct {
+	Numeric int
 }
 
-func GetEventContent[modelType EventContent](raw *RawEvent) (*modelType, error) {
-	model := *new(modelType)
-	if raw.Type != model.GetType() {
+type Events interface {
+	StringEvent | NumericEvent
+}
+
+func InstantinateEvent[EventType Events]() *EventType {
+	base := *new(EventType)
+	return &base
+}
+
+func GetEventNameByType[EventType Events]() string {
+	content := InstantinateEvent[EventType]()
+	return reflect.TypeOf(content).Elem().Name()
+}
+
+func GetEventName[EventType Events](instance *EventType) string {
+	return reflect.TypeOf(instance).Elem().Name()
+}
+
+func GetEventContent[EventType Events](raw *RawEvent) (*EventType, error) {
+	model := InstantinateEvent[EventType]()
+	if raw.Type != GetEventName[EventType](model) {
 		return nil, fmt.Errorf("Wrong type")
 	}
 
 	if err := json.Unmarshal(raw.Content, &model); err != nil {
 		return nil, errors.Wrap(err, "Cannot unmarshall the content json")
 	}
-	return &model, nil
+	return model, nil
 }
 
-func NewRawEvent(namedEvent EventContent) *RawEvent {
+func NewRawEvent[EventType Events](namedEvent *EventType) *RawEvent {
 	asJson, _ := json.Marshal(namedEvent)
 	return &RawEvent{
-		Type:    namedEvent.GetType(),
+		Type:    GetEventName[EventType](namedEvent),
 		Content: asJson,
 	}
 }

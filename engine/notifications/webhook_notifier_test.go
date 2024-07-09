@@ -63,9 +63,9 @@ func (mc *mockClient) assertEvents(t *testing.T, expected []int) {
 	assert.Equal(t, len(expected), len(flatten))
 	if len(expected) == len(flatten) {
 		for i := 0; i < len(expected); i++ {
-			actualEvent, err := GetEventContent[mockNotificationFrame](flatten[i])
+			actualEvent, err := GetEventContent[NumericEvent](flatten[i])
 			assert.NoError(t, err)
-			assert.Equal(t, expected[i], actualEvent.Value)
+			assert.Equal(t, expected[i], actualEvent.Numeric)
 		}
 	}
 }

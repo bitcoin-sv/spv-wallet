@@ -7,18 +7,10 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-type MockEvent struct {
-	Value int `json:"value"`
-}
-
-func (me MockEvent) GetType() string {
-	return "mock-notification"
-}
-
 func TestEventParsing(t *testing.T) {
-	t.Run("one notifier", func(t *testing.T) {
-		source := NewRawEvent(&MockEvent{
-			Value: 1,
+	t.Run("parse the raw event to actual event type", func(t *testing.T) {
+		source := NewRawEvent(&NumericEvent{
+			Numeric: 1,
 		})
 		asJSON, _ := json.Marshal(source)
 
@@ -26,8 +18,14 @@ func TestEventParsing(t *testing.T) {
 		_ = json.Unmarshal(asJSON, &target)
 		assert.Equal(t, source.Type, target.Type)
 
-		actualEvent, err := GetEventContent[MockEvent](&target)
+		actualEvent, err := GetEventContent[NumericEvent](&target)
 		assert.NoError(t, err)
-		assert.Equal(t, 1, actualEvent.Value)
+		assert.Equal(t, 1, actualEvent.Numeric)
+	})
+
+	t.Run("event name", func(t *testing.T) {
+		assert.Equal(t, "NumericEvent", GetEventNameByType[NumericEvent]())
+		var numericEventInstance *NumericEvent
+		assert.Equal(t, "NumericEvent", GetEventName(numericEventInstance))
 	})
 }
