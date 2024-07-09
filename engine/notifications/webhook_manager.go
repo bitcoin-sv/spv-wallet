@@ -2,11 +2,11 @@ package notifications
 
 import (
 	"context"
-	"fmt"
 	"sync"
 	"time"
 
 	"github.com/pkg/errors"
+	"github.com/rs/zerolog"
 )
 
 type notifierWithCtx struct {
@@ -25,10 +25,11 @@ type WebhookManager struct {
 	updateMsg        chan bool
 	banMsg           chan string // url
 	notifications    *Notifications
+	logger           *zerolog.Logger
 }
 
 // NewWebhookManager creates a new WebhookManager. It starts a goroutine which checks for webhook updates.
-func NewWebhookManager(ctx context.Context, notifications *Notifications, repository WebhooksRepository) *WebhookManager {
+func NewWebhookManager(ctx context.Context, logger *zerolog.Logger, notifications *Notifications, repository WebhooksRepository) *WebhookManager {
 	rootContext, cancelAllFunc := context.WithCancel(ctx)
 	manager := WebhookManager{
 		repository:       repository,
@@ -39,6 +40,7 @@ func NewWebhookManager(ctx context.Context, notifications *Notifications, reposi
 		notifications:    notifications,
 		updateMsg:        make(chan bool),
 		banMsg:           make(chan string),
+		logger:           logger,
 	}
 
 	go manager.checkForUpdates()
@@ -71,12 +73,13 @@ func (w *WebhookManager) Unsubscribe(ctx context.Context, url string) error {
 
 func (w *WebhookManager) checkForUpdates() {
 	defer func() {
-		fmt.Printf("WebhookManager stopped\n")
+		w.logger.Info().Msg("WebhookManager stopped")
 		if err := recover(); err != nil {
-			fmt.Printf("WebhookManager stopped with error: %v\n", err)
+			w.logger.Warn().Msgf("WebhookManager failed: %v", err)
 		}
 	}()
 
+	w.logger.Info().Msg("WebhookManager started")
 	w.update()
 
 	for {
@@ -86,7 +89,10 @@ func (w *WebhookManager) checkForUpdates() {
 		case <-w.updateMsg:
 			w.update()
 		case url := <-w.banMsg:
-			_ = w.repository.BanWebhook(w.rootContext, url, time.Now().Add(banTime))
+			err := w.repository.BanWebhook(w.rootContext, url, time.Now().Add(banTime))
+			if err != nil {
+				w.logger.Warn().Msgf("failed to mark a webhook as banned: %v", err)
+			}
 			w.removeNotifier(url)
 		case <-w.rootContext.Done():
 			return
@@ -95,9 +101,14 @@ func (w *WebhookManager) checkForUpdates() {
 }
 
 func (w *WebhookManager) update() {
+	defer func() {
+		if err := recover(); err != nil {
+			w.logger.Warn().Msgf("WebhookManager update failed: %v", err)
+		}
+	}()
 	dbWebhooks, err := w.repository.GetWebhooks(w.rootContext)
 	if err != nil {
-		// log error
+		w.logger.Warn().Msgf("failed to get webhooks: %v", err)
 		return
 	}
 
@@ -134,14 +145,16 @@ func (w *WebhookManager) update() {
 }
 
 func (w *WebhookManager) addNotifier(model *WebhookModel) {
+	w.logger.Info().Msgf("Add a webhook notifier. URL: %s", model.URL)
 	ctx, cancel := context.WithCancel(w.rootContext)
-	notifier := NewWebhookNotifier(ctx, *model, w.banMsg)
+	notifier := NewWebhookNotifier(ctx, w.logger, *model, w.banMsg)
 	w.webhookNotifiers.Store(model.URL, &notifierWithCtx{notifier: notifier, ctx: ctx, cancelFunc: cancel})
 	w.notifications.AddNotifier(model.URL, notifier.Channel)
 }
 
 func (w *WebhookManager) removeNotifier(url string) {
 	if item, ok := w.webhookNotifiers.Load(url); ok {
+		w.logger.Info().Msgf("Remove a webhook notifier. URL: %s", url)
 		item := item.(*notifierWithCtx)
 		item.cancelFunc()
 		w.webhookNotifiers.Delete(url)

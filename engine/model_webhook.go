@@ -69,6 +69,7 @@ func (m *Webhook) Migrate(client datastore.ClientInterface) error {
 	return client.IndexMetadata(client.GetTableName(tableAccessKeys), metadataField)
 }
 
+// GetWebhookModel will return the webhook model
 func (m *Webhook) GetWebhookModel() *notifications.WebhookModel {
 	model := &notifications.WebhookModel{
 		URL:         m.URL,
@@ -82,22 +83,12 @@ func (m *Webhook) GetWebhookModel() *notifications.WebhookModel {
 	return model
 }
 
-func (m *Webhook) GetToken() (string, string) {
-	return m.TokenHeader, m.Token
-}
-
-func (m *Webhook) GetIsBanned() bool {
-	if !m.BannedTo.Valid {
-		return false
-	}
-	ret := !time.Now().After(m.BannedTo.Time)
-	return ret
-}
-
+// WebhooksRepository is the repository for webhooks. It implements the WebhooksRepository interface
 type WebhooksRepository struct {
 	client *Client
 }
 
+// CreateWebhook stores a new webhook or updates an existing one in the database
 func (wr *WebhooksRepository) CreateWebhook(ctx context.Context, url, tokenHeader, tokenValue string) error {
 	existed, err := wr.getByURL(ctx, url)
 	if err != nil {
@@ -115,6 +106,7 @@ func (wr *WebhooksRepository) CreateWebhook(ctx context.Context, url, tokenHeade
 	return model.Save(ctx)
 }
 
+// getByURL gets a webhook by its URL. If the webhook does not exist, it returns a nil pointer and no error
 func (wr *WebhooksRepository) getByURL(ctx context.Context, url string) (*Webhook, error) {
 	conditions := map[string]any{
 		"url": url,
@@ -133,6 +125,7 @@ func (wr *WebhooksRepository) getByURL(ctx context.Context, url string) (*Webhoo
 	return webhook, nil
 }
 
+// RemoveWebhook removes a webhook from the database
 func (wr *WebhooksRepository) RemoveWebhook(ctx context.Context, url string) error {
 	webhook, err := wr.getByURL(ctx, url)
 	if err != nil {
@@ -145,6 +138,7 @@ func (wr *WebhooksRepository) RemoveWebhook(ctx context.Context, url string) err
 	return Save(ctx, webhook)
 }
 
+// BanWebhook bans a webhook until the specified time
 func (wr *WebhooksRepository) BanWebhook(ctx context.Context, url string, bannedTo time.Time) error {
 	webhook, err := wr.getByURL(ctx, url)
 	if err != nil {
@@ -157,6 +151,7 @@ func (wr *WebhooksRepository) BanWebhook(ctx context.Context, url string, banned
 	return Save(ctx, webhook)
 }
 
+// GetWebhooks gets all webhooks from the database
 func (wr *WebhooksRepository) GetWebhooks(ctx context.Context) ([]*notifications.WebhookModel, error) {
 	conditions := map[string]any{
 		deletedAtField: nil,

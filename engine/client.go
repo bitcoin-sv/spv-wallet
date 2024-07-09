@@ -92,7 +92,7 @@ type (
 
 	// notificationsOptions holds the configuration for notifications
 	notificationsOptions struct {
-		enabled        bool // If notifications are enabled
+		enabled        bool
 		client         *notifications.Notifications
 		webhookManager *notifications.WebhookManager
 	}
@@ -313,11 +313,6 @@ func (c *Client) Debug(on bool) {
 	if ds := c.Datastore(); ds != nil {
 		ds.Debug(on)
 	}
-
-	// Set debugging on the Notifications
-	// if n := c.Notifications(); n != nil {
-	// 	n.Debug(on)
-	// }
 }
 
 // DefaultSyncConfig will return the default sync config from the client defaults (for chainstate)
