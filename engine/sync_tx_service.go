@@ -154,9 +154,6 @@ func broadcastSyncTransaction(ctx context.Context, syncTx *SyncTransaction) erro
 		return err
 	}
 
-	// Fire a notification
-	// notify(notifications.EventTypeBroadcast, syncTx)
-
 	return nil
 }
 

@@ -15,6 +15,7 @@ type notifierWithCtx struct {
 	cancelFunc context.CancelFunc
 }
 
+// WebhookManager is a manager for webhooks. It is responsible for creating, updating and removing webhooks.
 type WebhookManager struct {
 	repository       WebhooksRepository
 	rootContext      context.Context
@@ -26,6 +27,7 @@ type WebhookManager struct {
 	notifications    *Notifications
 }
 
+// NewWebhookManager creates a new WebhookManager. It starts a goroutine which checks for webhook updates.
 func NewWebhookManager(ctx context.Context, notifications *Notifications, repository WebhooksRepository) *WebhookManager {
 	rootContext, cancelAllFunc := context.WithCancel(ctx)
 	manager := WebhookManager{
@@ -44,10 +46,12 @@ func NewWebhookManager(ctx context.Context, notifications *Notifications, reposi
 	return &manager
 }
 
+// Stop stops the WebhookManager.
 func (w *WebhookManager) Stop() {
 	w.cancelAllFunc()
 }
 
+// Subscribe subscribes to a webhook. It adds the webhook to the database and starts a notifier for it.
 func (w *WebhookManager) Subscribe(ctx context.Context, url, tokenHeader, tokenValue string) error {
 	err := w.repository.CreateWebhook(ctx, url, tokenHeader, tokenValue)
 	if err == nil {
@@ -56,6 +60,7 @@ func (w *WebhookManager) Subscribe(ctx context.Context, url, tokenHeader, tokenV
 	return errors.Wrap(err, "failed to create webhook")
 }
 
+// Unsubscribe unsubscribes from a webhook. It removes the webhook from the database and stops the notifier for it.
 func (w *WebhookManager) Unsubscribe(ctx context.Context, url string) error {
 	err := w.repository.RemoveWebhook(ctx, url)
 	if err == nil {
@@ -81,7 +86,7 @@ func (w *WebhookManager) checkForUpdates() {
 		case <-w.updateMsg:
 			w.update()
 		case url := <-w.banMsg:
-			w.repository.BanWebhook(w.rootContext, url, time.Now().Add(banTime)) // TODO log error from this method
+			_ = w.repository.BanWebhook(w.rootContext, url, time.Now().Add(banTime))
 			w.removeNotifier(url)
 		case <-w.rootContext.Done():
 			return

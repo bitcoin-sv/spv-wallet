@@ -2,13 +2,15 @@ package notifications
 
 import "time"
 
+// WebhookModel represents a webhook.
 type WebhookModel struct {
+	BannedTo    *time.Time
 	URL         string
 	TokenHeader string
 	TokenValue  string
-	BannedTo    *time.Time
 }
 
+// Banned returns true if the webhook is banned at the moment.
 func (model *WebhookModel) Banned() bool {
 	if model.BannedTo == nil {
 		return false

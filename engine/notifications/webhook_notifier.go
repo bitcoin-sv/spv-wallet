@@ -21,12 +21,11 @@ const (
 
 // WebhookNotifier - notifier for sending events to webhook
 type WebhookNotifier struct {
-	Channel chan *RawEvent
-
-	definition    WebhookModel
-	definitionMtx sync.Mutex
+	Channel       chan *RawEvent
 	banMsg        chan string
 	httpClient    *http.Client
+	definition    WebhookModel
+	definitionMtx sync.Mutex
 }
 
 // NewWebhookNotifier - creates a new instance of WebhookNotifier
@@ -43,6 +42,7 @@ func NewWebhookNotifier(ctx context.Context, model WebhookModel, banMsg chan str
 	return notifier
 }
 
+// Update - updates the webhook model
 func (w *WebhookNotifier) Update(model WebhookModel) {
 	w.definitionMtx.Lock()
 	defer w.definitionMtx.Unlock()
@@ -134,8 +134,6 @@ func (w *WebhookNotifier) sendEventsToWebhook(ctx context.Context, events []*Raw
 	defer func() {
 		_ = resp.Body.Close()
 	}()
-
-	// TODO: Handle response
 
 	return nil
 }

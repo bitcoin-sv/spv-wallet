@@ -5,6 +5,7 @@ import (
 	"time"
 )
 
+// WebhooksRepository is an interface for managing webhooks.
 type WebhooksRepository interface {
 	CreateWebhook(ctx context.Context, url, tokenHeader, tokenValue string) error
 	RemoveWebhook(ctx context.Context, url string) error

@@ -103,19 +103,7 @@ func (c *Client) loadNotificationClient(ctx context.Context) (err error) {
 			return &notifications.StringEvent{Value: fmt.Sprintf("msg-%d", i)}
 		},
 	)
-	notifications.StartSendingMockEvents(
-		ctx,
-		notificationService,
-		500*time.Millisecond,
-		func(i int) *notifications.TransactionEvent {
-			return &notifications.TransactionEvent{
-				UserEvent: notifications.UserEvent{
-					XPubID: "mock-xpub-id",
-				},
-				TransactionID: fmt.Sprintf("mock-transaction-id-%d", i),
-			}
-		},
-	)
+
 	return
 }
 

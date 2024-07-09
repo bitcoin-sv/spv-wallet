@@ -10,6 +10,7 @@ import (
 	"github.com/bitcoin-sv/spv-wallet/engine/cluster"
 	"github.com/bitcoin-sv/spv-wallet/engine/datastore"
 	"github.com/bitcoin-sv/spv-wallet/engine/metrics"
+	"github.com/bitcoin-sv/spv-wallet/engine/notifications"
 
 	// "github.com/bitcoin-sv/spv-wallet/engine/notifications"
 	"github.com/bitcoin-sv/spv-wallet/engine/taskmanager"
@@ -53,7 +54,7 @@ type ClientService interface {
 	Datastore() datastore.ClientInterface
 	HTTPClient() HTTPInterface
 	Logger() *zerolog.Logger
-	// Notifications() notifications.ClientInterface
+	Notifications() *notifications.Notifications
 	PaymailClient() paymail.ClientInterface
 	Taskmanager() taskmanager.TaskEngine
 }
