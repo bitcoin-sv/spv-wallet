@@ -3,6 +3,7 @@ package admin
 import (
 	"net/http"
 
+	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/bitcoin-sv/spv-wallet/models"
 	"github.com/gin-gonic/gin"
 )
@@ -26,7 +27,7 @@ func (a *Action) subscribeWebhook(c *gin.Context) {
 
 	err := a.Services.SpvWalletEngine.SubscribeWebhook(c.Request.Context(), requestBody.URL, requestBody.TokenHeader, requestBody.TokenValue)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, err.Error())
+		spverrors.ErrorResponse(c, spverrors.ErrWebhookSubscriptionFailed, a.Services.Logger)
 		return
 	}
 
@@ -52,7 +53,7 @@ func (a *Action) unsubscribeWebhook(c *gin.Context) {
 
 	err := a.Services.SpvWalletEngine.UnsubscribeWebhook(c.Request.Context(), requestModel.URL)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, err.Error())
+		spverrors.ErrorResponse(c, spverrors.ErrWebhookUnsubscriptionFailed, a.Services.Logger)
 		return
 	}
 
