@@ -28,7 +28,7 @@ type WebhookNotifier struct {
 // Ban - ban notifier for some time
 func (w *WebhookNotifier) Ban() {
 	now := time.Now()
-	w.banTime = &now
+	w.banTime = &now // TODO: it's not thread save - use channels or mutex
 }
 
 // consumer - consumer for webhook notifier

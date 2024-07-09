@@ -75,6 +75,7 @@ func TestWebhookManager(t *testing.T) {
 		repo := &mockRepository{webhooks: []WebhookModel{}}
 
 		manager := NewWebhookManager(ctx, n, repo)
+		time.Sleep(100 * time.Millisecond)
 		defer manager.Stop()
 
 		manager.Subscribe(&WebhookModel{URL: client.url})
