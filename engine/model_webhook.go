@@ -10,20 +10,22 @@ import (
 	"github.com/bitcoin-sv/spv-wallet/engine/notifications"
 )
 
+// Webhook stores information about subscriptions to notifications via webhooks
+//
 // Gorm related models & indexes: https://gorm.io/docs/models.html - https://gorm.io/docs/indexes.html
 type Webhook struct {
 	// Base model
 	Model `bson:",inline"`
 
 	URL         string               `json:"url" toml:"url" yaml:"url" gorm:"<-create;primaryKey;comment:This is the url on which notifications will be sent" bson:"url"`
-	TokenHeader string               `json:"token_header" toml:"token_header" yaml:"token_header" gorm:"<-create;comment:This is optioal token header to be sent" bson:"token_header"`
+	TokenHeader string               `json:"token_header" toml:"token_header" yaml:"token_header" gorm:"<-create;comment:This is optional token header to be sent" bson:"token_header"`
 	Token       string               `json:"token" toml:"token" yaml:"token" gorm:"<-create;comment:This is optional token to be sent" bson:"token"`
 	BannedTo    customTypes.NullTime `json:"banned_to" toml:"banned_to" yaml:"banned_to" gorm:"comment:The time until the webhook will be banned" bson:"banned_to"`
 }
 
 func newWebhook(url, tokenHeader, token string, opts ...ModelOps) *Webhook {
 	return &Webhook{
-		Model:       *NewBaseModel(ModelAccessKey, opts...),
+		Model:       *NewBaseModel(ModelWebhook, opts...),
 		URL:         url,
 		TokenHeader: tokenHeader,
 		Token:       token,
@@ -90,16 +92,16 @@ type WebhooksRepository struct {
 
 // CreateWebhook stores a new webhook or updates an existing one in the database
 func (wr *WebhooksRepository) CreateWebhook(ctx context.Context, url, tokenHeader, tokenValue string) error {
-	existed, err := wr.getByURL(ctx, url)
+	found, err := wr.getByURL(ctx, url)
 	if err != nil {
 		return err
 	}
-	if existed != nil {
-		existed.DeletedAt.Valid = false
-		existed.BannedTo.Valid = false
-		existed.TokenHeader = tokenHeader
-		existed.Token = tokenValue
-		return existed.Save(ctx)
+	if found != nil {
+		found.DeletedAt.Valid = false
+		found.BannedTo.Valid = false
+		found.TokenHeader = tokenHeader
+		found.Token = tokenValue
+		return found.Save(ctx)
 	}
 	opts := append(wr.client.DefaultModelOptions(), New())
 	model := newWebhook(url, tokenHeader, tokenValue, opts...)
@@ -113,7 +115,7 @@ func (wr *WebhooksRepository) getByURL(ctx context.Context, url string) (*Webhoo
 	}
 
 	webhook := &Webhook{}
-	webhook.enrich(ModelContact, wr.client.DefaultModelOptions()...)
+	webhook.enrich(ModelWebhook, wr.client.DefaultModelOptions()...)
 
 	if err := Get(ctx, webhook, conditions, false, defaultDatabaseReadTimeout, false); err != nil {
 		if errors.Is(err, datastore.ErrNoResults) {

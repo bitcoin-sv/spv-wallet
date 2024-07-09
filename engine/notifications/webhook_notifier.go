@@ -33,12 +33,13 @@ type WebhookNotifier struct {
 
 // NewWebhookNotifier - creates a new instance of WebhookNotifier
 func NewWebhookNotifier(ctx context.Context, logger *zerolog.Logger, model WebhookModel, banMsg chan string) *WebhookNotifier {
+	log := logger.With().Str("subservice", "WebhookNotifier").Str("webhookUrl", model.URL).Logger()
 	notifier := &WebhookNotifier{
 		Channel:    make(chan *models.RawEvent, lengthOfWebhookChannel),
 		definition: model,
 		banMsg:     banMsg,
 		httpClient: &http.Client{},
-		logger:     logger,
+		logger:     &log,
 	}
 
 	go notifier.consumer(ctx)

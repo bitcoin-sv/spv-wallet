@@ -18,7 +18,7 @@ func StartSendingMockEvents[EventType models.Events](ctx context.Context, notifi
 				ticker.Stop()
 				return
 			case <-ticker.C:
-				notificationService.Notify(NewRawEvent(prepare(i)))
+				Notify(notificationService, prepare(i))
 				i++
 			}
 		}

@@ -131,7 +131,7 @@ func getNodesDefaults() *NodesConfig {
 
 func getNotificationDefaults() *NotificationsConfig {
 	return &NotificationsConfig{
-		Enabled: false,
+		Enabled: true,
 	}
 }
 

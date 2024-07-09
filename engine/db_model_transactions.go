@@ -182,12 +182,12 @@ func (m *Transaction) migratePostgreSQL(client datastore.ClientInterface, tableN
 
 func (m *Transaction) notify() {
 	if n := m.Client().Notifications(); n != nil {
-		n.Notify(notifications.NewRawEvent(&models.TransactionEvent{
+		notifications.Notify(n, &models.TransactionEvent{
 			UserEvent: models.UserEvent{
 				XPubID: m.XPubID,
 			},
 			TransactionID: m.ID,
 			Status:        m.TxStatus,
-		}))
+		})
 	}
 }

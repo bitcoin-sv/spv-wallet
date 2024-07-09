@@ -48,3 +48,8 @@ func NewRawEvent[EventType models.Events](namedEvent *EventType) *models.RawEven
 		Content: asJSON,
 	}
 }
+
+func Notify[EventType models.Events](n *Notifications, event *EventType) {
+	rawEvent := NewRawEvent(event)
+	n.Notify(rawEvent)
+}
