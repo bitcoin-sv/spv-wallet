@@ -1,9 +1,9 @@
 package actions
 
 import (
+	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"net/http"
 
-	"github.com/bitcoin-sv/spv-wallet/dictionary"
 	"github.com/gin-gonic/gin"
 )
 
@@ -14,10 +14,10 @@ func StatusOK(c *gin.Context) {
 
 // NotFound handles all 404 requests
 func NotFound(c *gin.Context) {
-	c.JSON(http.StatusNotFound, dictionary.GetError(dictionary.ErrorRequestNotFound, c.Request.RequestURI))
+	spverrors.ErrorResponse(c, spverrors.ErrRouteNotFound, nil)
 }
 
 // MethodNotAllowed handles all 405 requests
 func MethodNotAllowed(c *gin.Context) {
-	c.JSON(http.StatusMethodNotAllowed, dictionary.GetError(dictionary.ErrorMethodNotAllowed, c.Request.Method, c.Request.RequestURI))
+	spverrors.ErrorResponse(c, spverrors.ErrRouteMethodNotAllowed, nil)
 }

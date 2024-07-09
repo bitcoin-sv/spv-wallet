@@ -294,6 +294,9 @@ var ErrXpubIDMisMatch = models.SPVError{Message: "xpub_id mismatch", StatusCode:
 
 // ////////////////////////////////// MISSING FIELDS
 
+// ErrXPubAlreadyExists is when xpub already exists
+var ErrXPubAlreadyExists = models.SPVError{Message: "xpub already exists", StatusCode: 409, Code: "error-xpub-already-exists"}
+
 // ErrOneOfTheFieldsIsRequired is when all of required fields are missing
 var ErrOneOfTheFieldsIsRequired = models.SPVError{Message: "missing all of the fields, one of them is required", StatusCode: 400, Code: "error-missing-field-all-required"}
 
@@ -345,3 +348,11 @@ var ErrWebhookSubscriptionNotFound = models.SPVError{Message: "webhook subscript
 
 // ErrNotificationsDisabled happens when the notifications are not enabled in the config
 var ErrNotificationsDisabled = models.SPVError{Message: "notifications are disabled", StatusCode: 404, Code: "error-notifications-disabled"}
+
+//////////////////////////////////// ROUTES ERRORS
+
+// ErrRouteNotFound is when route is not found
+var ErrRouteNotFound = models.SPVError{Message: "route not found", StatusCode: 404, Code: "error-route-not-found"}
+
+// ErrRouteMethodNotAllowed is when route method is not allowed
+var ErrRouteMethodNotAllowed = models.SPVError{Message: "method not allowed", StatusCode: 405, Code: "error-route-method-not-allowed"}

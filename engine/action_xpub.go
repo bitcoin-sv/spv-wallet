@@ -2,6 +2,7 @@ package engine
 
 import (
 	"context"
+	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 
 	"github.com/bitcoin-sv/spv-wallet/engine/datastore"
 )
@@ -14,8 +15,16 @@ func (c *Client) NewXpub(ctx context.Context, xPubKey string, opts ...ModelOps) 
 	// Check for existing NewRelic transaction
 	ctx = c.GetOrStartTxn(ctx, "new_xpub")
 
+	// Check if the xpub already exists
+	xPub, err := getXpubWithCache(ctx, c, xPubKey, "", c.DefaultModelOptions()...)
+	if err != nil {
+		return nil, err
+	} else if xPub != nil {
+		return nil, spverrors.ErrXPubAlreadyExists
+	}
+
 	// Create the model & set the default options (gives options from client->model)
-	xPub := newXpub(
+	xPub = newXpub(
 		xPubKey, c.DefaultModelOptions(append(opts, New())...)...,
 	)
 
