@@ -16,7 +16,7 @@ type Action struct {
 func NewHandler(appConfig *config.AppConfig, services *config.AppServices) (routes.OldAPIEndpointsFunc, routes.APIEndpointsFunc) {
 	action := &Action{actions.Action{AppConfig: appConfig, Services: services}}
 
-	oldApiEndpoints := routes.OldAPIEndpointsFunc(func(router *gin.RouterGroup) {
+	oldAPIEndpoints := routes.OldAPIEndpointsFunc(func(router *gin.RouterGroup) {
 		accessKeyGroup := router.Group("/access-key")
 		accessKeyGroup.POST("", action.oldCreate)
 		accessKeyGroup.GET("", action.oldGet)
@@ -34,5 +34,5 @@ func NewHandler(appConfig *config.AppConfig, services *config.AppServices) (rout
 		// TODO: accessKeyGroup.GET("", action.search)
 	})
 
-	return oldApiEndpoints, apiEndpoints
+	return oldAPIEndpoints, apiEndpoints
 }
