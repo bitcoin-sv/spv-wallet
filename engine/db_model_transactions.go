@@ -121,13 +121,15 @@ func (m *Transaction) AfterUpdated(_ context.Context) error {
 		Str("txID", m.ID).
 		Msgf("starting: %s AfterUpdated hook...", m.Name())
 
-	m.Client().Notifications().Notify(notifications.NewRawEvent(&notifications.TransactionEvent{
-		UserEvent: notifications.UserEvent{
-			XPubID: m.XPubID,
-		},
-		TransactionID: m.ID,
-		Status:        m.TxStatus,
-	}))
+	if n := m.Client().Notifications(); n != nil {
+		n.Notify(notifications.NewRawEvent(&notifications.TransactionEvent{
+			UserEvent: notifications.UserEvent{
+				XPubID: m.XPubID,
+			},
+			TransactionID: m.ID,
+			Status:        m.TxStatus,
+		}))
+	}
 
 	m.Client().Logger().Debug().
 		Str("txID", m.ID).

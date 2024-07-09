@@ -391,6 +391,9 @@ func (c *Client) Logger() *zerolog.Logger {
 
 // Notifications will return the Notifications if it exists
 func (c *Client) Notifications() *notifications.Notifications {
+	if c.options.notifications == nil {
+		return nil
+	}
 	return c.options.notifications.client
 }
 
