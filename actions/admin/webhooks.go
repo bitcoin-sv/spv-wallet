@@ -16,7 +16,7 @@ import (
 // @Param		SubscribeRequestBody body models.SubscribeRequestBody false "URL to subscribe to and optional token header and value"
 // @Success		200 {boolean} bool "Success response"
 // @Failure 	500	"Internal server error - Error while subscribing to the webhook"
-// @Router		/v1/admin/webhooks/subscribtion [post]
+// @Router		/v1/admin/webhooks/subscription [post]
 // @Security	x-auth-xpub
 func (a *Action) subscribeWebhook(c *gin.Context) {
 	requestBody := models.SubscribeRequestBody{}
@@ -42,7 +42,7 @@ func (a *Action) subscribeWebhook(c *gin.Context) {
 // @Param		UnsubscribeRequestBody body models.UnsubscribeRequestBody false "URL to unsubscribe from"
 // @Success		200 {boolean} bool "Success response"
 // @Failure 	500	"Internal server error - Error while unsubscribing to the webhook"
-// @Router		/v1/admin/webhooks/subscribtion [delete]
+// @Router		/v1/admin/webhooks/subscription [delete]
 // @Security	x-auth-xpub
 func (a *Action) unsubscribeWebhook(c *gin.Context) {
 	requestModel := models.UnsubscribeRequestBody{}
