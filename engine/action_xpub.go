@@ -2,6 +2,7 @@ package engine
 
 import (
 	"context"
+	"errors"
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 
 	"github.com/bitcoin-sv/spv-wallet/engine/datastore"
@@ -17,7 +18,7 @@ func (c *Client) NewXpub(ctx context.Context, xPubKey string, opts ...ModelOps) 
 
 	// Check if the xpub already exists
 	xPub, err := getXpubWithCache(ctx, c, xPubKey, "", c.DefaultModelOptions()...)
-	if err != nil {
+	if err != nil && !errors.Is(err, spverrors.ErrCouldNotFindXpub) {
 		return nil, err
 	} else if xPub != nil {
 		return nil, spverrors.ErrXPubAlreadyExists
