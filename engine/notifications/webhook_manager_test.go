@@ -59,9 +59,9 @@ func TestWebhookManager(t *testing.T) {
 		time.Sleep(100 * time.Millisecond) // wait for manager to update notifiers
 		defer manager.Stop()
 
-		expected := []Event{}
+		expected := []int{}
 		for i := 0; i < 10; i++ {
-			n.Notify(i)
+			n.Notify(newMockEvent(i))
 			expected = append(expected, i)
 		}
 
@@ -91,9 +91,9 @@ func TestWebhookManager(t *testing.T) {
 		manager.Subscribe(ctx, client.url, "", "")
 		time.Sleep(100 * time.Millisecond) // wait for manager to update notifiers
 
-		expected := []Event{}
+		expected := []int{}
 		for i := 0; i < 10; i++ {
-			n.Notify(i)
+			n.Notify(newMockEvent(i))
 			expected = append(expected, i)
 		}
 

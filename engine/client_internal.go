@@ -2,6 +2,7 @@ package engine
 
 import (
 	"context"
+	"fmt"
 	"time"
 
 	"github.com/bitcoin-sv/go-paymail"
@@ -102,7 +103,7 @@ func (c *Client) loadNotificationClient(ctx context.Context) (err error) {
 			case <-ctx.Done():
 				return
 			case <-ticker.C:
-				notificationService.Notify(i)
+				notificationService.Notify(notifications.NewRawEvent(notifications.GeneralPurposeEvent{Value: fmt.Sprintf("%d", i)}))
 				i++
 			}
 		}
