@@ -84,8 +84,6 @@ func (w *WebhookNotifier) consumer(ctx context.Context) {
 			}
 		case <-ctx.Done():
 			return
-		default:
-			time.Sleep(100 * time.Millisecond)
 		}
 	}
 }
