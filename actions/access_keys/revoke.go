@@ -11,37 +11,18 @@ import (
 
 // revoke will revoke the intended model by id
 // Revoke access key godoc
-// @Summary		Revoke access key
-// @Description	Revoke access key
+// @Summary		Revoke access key - - Use (DELETE) /api/v1/users/current/keys/{id} instead.
+// @Description	This endpoint has been deprecated. Use (DELETE) /api/v1/users/current/keys/{id} instead.
 // @Tags		Access-key
 // @Produce		json
 // @Param		id query string true "id of the access key"
 // @Success		200	{object} models.AccessKey "Revoked AccessKey"
 // @Failure		400	"Bad request - Missing required field: id"
 // @Failure 	500	"Internal server error - Error while revoking access key"
-// @Router		/v1/access-key [delete]
+// @DeprecatedRouter  /v1/access-key [delete]
 // @Security	x-auth-xpub
-func (a *Action) revoke(c *gin.Context) {
-	reqXPub := c.GetString(auth.ParamXPubKey)
-
-	id := c.Query("id")
-	if id == "" {
-		spverrors.ErrorResponse(c, spverrors.ErrMissingFieldID, a.Services.Logger)
-		return
-	}
-
-	accessKey, err := a.Services.SpvWalletEngine.RevokeAccessKey(
-		c.Request.Context(),
-		reqXPub,
-		id,
-	)
-	if err != nil {
-		spverrors.ErrorResponse(c, err, a.Services.Logger)
-		return
-	}
-
-	contract := mappings.MapToAccessKeyContract(accessKey)
-	c.JSON(http.StatusCreated, contract)
+func (a *Action) oldRevoke(c *gin.Context) {
+	a.revoke(c)
 }
 
 // revoke will revoke the intended model by id
@@ -54,14 +35,14 @@ func (a *Action) revoke(c *gin.Context) {
 // @Success		200	{object} models.AccessKey "Revoked AccessKey"
 // @Failure		400	"Bad request - Missing required field: id"
 // @Failure 	500	"Internal server error - Error while revoking access key"
-// @Router		/v1/users/current/keys [delete]
+// @Router		/api/v1/users/current/keys/{id} [delete]
 // @Security	x-auth-xpub
-func (a *Action) revoke2(c *gin.Context) {
+func (a *Action) revoke(c *gin.Context) {
 	reqXPub := c.GetString(auth.ParamXPubKey)
 
 	id := c.Params.ByName("id")
 	if id == "" {
-		c.JSON(http.StatusBadRequest, engine.ErrMissingFieldID)
+		spverrors.ErrorResponse(c, spverrors.ErrMissingFieldID, a.Services.Logger)
 		return
 	}
 
@@ -71,7 +52,7 @@ func (a *Action) revoke2(c *gin.Context) {
 		id,
 	)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, err.Error())
+		spverrors.ErrorResponse(c, err, a.Services.Logger)
 		return
 	}
 

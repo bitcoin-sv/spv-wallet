@@ -13,24 +13,26 @@ type Action struct {
 }
 
 // NewHandler creates the specific package routes
-func NewHandler(appConfig *config.AppConfig, services *config.AppServices) routes.OldAPIEndpointsFunc {
+func NewHandler(appConfig *config.AppConfig, services *config.AppServices) (routes.OldAPIEndpointsFunc, routes.APIEndpointsFunc) {
 	action := &Action{actions.Action{AppConfig: appConfig, Services: services}}
 
-	apiEndpoints := routes.OldAPIEndpointsFunc(func(router *gin.RouterGroup) {
+	oldApiEndpoints := routes.OldAPIEndpointsFunc(func(router *gin.RouterGroup) {
 		accessKeyGroup := router.Group("/access-key")
-		accessKeyGroup.POST("", action.create)
-		accessKeyGroup.GET("", action.get)
-		accessKeyGroup.DELETE("", action.revoke)
+		accessKeyGroup.POST("", action.oldCreate)
+		accessKeyGroup.GET("", action.oldGet)
+		accessKeyGroup.DELETE("", action.oldRevoke)
 		accessKeyGroup.POST("/count", action.count)
 		accessKeyGroup.GET("/search", action.search)
 		accessKeyGroup.POST("/search", action.search)
-
-		accessKeyGroup2 := router.Group("/users/current/keys")
-		accessKeyGroup2.GET("/:id", action.get2)
-		accessKeyGroup2.POST("", action.create2)
-		accessKeyGroup2.DELETE("/:id", action.revoke2)
-		// TODO: accessKeyGroup2.GET("", action.search)
 	})
 
-	return apiEndpoints
+	apiEndpoints := routes.APIEndpointsFunc(func(router *gin.RouterGroup) {
+		accessKeyGroup := router.Group("/users/current/keys")
+		accessKeyGroup.GET("/:id", action.get)
+		accessKeyGroup.POST("", action.create)
+		accessKeyGroup.DELETE("/:id", action.revoke)
+		// TODO: accessKeyGroup.GET("", action.search)
+	})
+
+	return oldApiEndpoints, apiEndpoints
 }
