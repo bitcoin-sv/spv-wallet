@@ -303,3 +303,11 @@ func setConfigLeaderXPriv(config *regressionTestConfig, xPriv string) {
 	config.ClientOneLeaderXPriv = xPriv
 	config.ClientTwoLeaderXPriv = xPriv
 }
+
+// setEnvVariables sets the environment variables.
+func setEnvVariables(config *regressionTestConfig) {
+	os.Setenv(ClientOneURLEnvVar, config.ClientOneURL)
+	os.Setenv(ClientTwoURLEnvVar, config.ClientTwoURL)
+	os.Setenv(ClientOneLeaderXPrivEnvVar, config.ClientOneLeaderXPriv)
+	os.Setenv(ClientTwoLeaderXPrivEnvVar, config.ClientTwoLeaderXPriv)
+}

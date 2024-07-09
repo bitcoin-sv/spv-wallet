@@ -24,7 +24,7 @@ This simple program helps you prepare to and run regression tests of the SPV Wal
 
 ## Prerequisites
 
-- **SPV wallet**: up and running on localhost:3003
+- **SPV wallet**: running on localhost:3003
 - **localhost:3003**: tunneled to domain specified in config (domain used for paymail domain validation)
 
 ## Configuration

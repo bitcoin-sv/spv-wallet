@@ -69,7 +69,7 @@ func main() {
 
 	setConfigLeaderXPriv(config, user.XPriv)
 
-	if err := handleCoinsTransfer(user, config); err != nil {
+	if err := handleFundsTransfer(user, config); err != nil {
 		fmt.Println("error handling transactions:", err)
 		return
 	}
@@ -91,6 +91,7 @@ func main() {
 		fmt.Println("error saving config:", err)
 		return
 	}
+	setEnvVariables(config)
 
 	if err := runTests(clientType, defaultPath); err != nil {
 		fmt.Println("error running tests:", err)
@@ -130,7 +131,7 @@ func handleExistingPaymail(paymailAlias string, config *regressionTestConfig) (*
 	if promptUserAndCheck("Would you like to recreate user? (y/yes or n/no):") == 1 {
 		return recreateUser(paymailAlias, config)
 	}
-	return nil, fmt.Errorf("can't work with user when xpriv is unknown")
+	return nil, fmt.Errorf("user should be recreated or xpriv should be provided")
 }
 
 // recreateUser deletes and recreates the user.
@@ -160,8 +161,8 @@ func useExistingPaymail(paymailAlias string, config *regressionTestConfig) (*reg
 	}, nil
 }
 
-// handleCoinsTransfer handles the transfer of coins to a user.
-func handleCoinsTransfer(user *regressionTestUser, config *regressionTestConfig) error {
+// handleFundsTransfer handles the transfer of funds to a user.
+func handleFundsTransfer(user *regressionTestUser, config *regressionTestConfig) error {
 	response := promptUserAndCheck("Do you have xpriv and master instance URL? (y/yes or n/no): ")
 	if response == 0 {
 		fmt.Printf("Please send %d Sato for full regression tests:\n%s\n", minimalBalance, user.Paymail)
@@ -171,13 +172,13 @@ func handleCoinsTransfer(user *regressionTestUser, config *regressionTestConfig)
 		}
 	} else {
 		if err := takeMasterUrlAndXPriv(user); err != nil {
-			return fmt.Errorf("error sending coins: %v", err)
+			return fmt.Errorf("error sending funds: %v", err)
 		}
 	}
 
 	leaderBalance := 0
 	for leaderBalance == 0 {
-		fmt.Print("Waiting for coins")
+		fmt.Print("Waiting for funds")
 		for i := 0; i < 3; i++ {
 			fmt.Print(".")
 			time.Sleep(1 * time.Second)
@@ -188,21 +189,21 @@ func handleCoinsTransfer(user *regressionTestUser, config *regressionTestConfig)
 	return nil
 }
 
-// takeMasterUrlAndXPriv takes the master URL and xpriv for transferring coins.
+// takeMasterUrlAndXPriv takes the master URL and xpriv for transferring funds.
 func takeMasterUrlAndXPriv(leaderPaymail *regressionTestUser) error {
 	url := getValidURL()
 	xprivMaster := getValidXPriv()
 
-	err := sendCoinsWithGoClient(url, xprivMaster, leaderPaymail.Paymail)
+	err := sendFundsWithGoClient(url, xprivMaster, leaderPaymail.Paymail)
 	if err != nil {
-		fmt.Println("error sending coins:", err)
+		fmt.Println("error sending funds:", err)
 		return err
 	}
 	return nil
 }
 
-// sendCoinsWithGoClient sends coins using the Go client.
-func sendCoinsWithGoClient(instanceUrl string, istanceXPriv string, receiverPaymail string) error {
+// sendFundsWithGoClient sends funds using the Go client.
+func sendFundsWithGoClient(instanceUrl string, istanceXPriv string, receiverPaymail string) error {
 	client := walletclient.NewWithXPriv(addPrefixIfNeeded(instanceUrl), istanceXPriv)
 	ctx := context.Background()
 
