@@ -4,7 +4,6 @@ import (
 	"context"
 
 	"github.com/bitcoin-sv/spv-wallet/engine/datastore"
-	"github.com/bitcoin-sv/spv-wallet/engine/notifications"
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 )
 
@@ -107,7 +106,7 @@ func (m *Transaction) AfterCreated(ctx context.Context) error {
 	}
 
 	// Fire notifications (this is already in a go routine)
-	notify(notifications.EventTypeCreate, m)
+	// notify(notifications.EventTypeCreate, m)
 
 	m.Client().Logger().Debug().
 		Str("txID", m.ID).
@@ -122,7 +121,7 @@ func (m *Transaction) AfterUpdated(_ context.Context) error {
 		Msgf("starting: %s AfterUpdated hook...", m.Name())
 
 	// Fire notifications (this is already in a go routine)
-	notify(notifications.EventTypeUpdate, m)
+	// notify(notifications.EventTypeUpdate, m)
 
 	m.Client().Logger().Debug().
 		Str("txID", m.ID).
@@ -135,7 +134,7 @@ func (m *Transaction) AfterDeleted(_ context.Context) error {
 	m.Client().Logger().Debug().Msgf("starting: %s AfterDeleted hook...", m.Name())
 
 	// Fire notifications (this is already in a go routine)
-	notify(notifications.EventTypeDelete, m)
+	// notify(notifications.EventTypeDelete, m)
 
 	m.Client().Logger().Debug().Msgf("end: %s AfterDeleted hook", m.Name())
 	return nil

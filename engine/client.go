@@ -11,7 +11,6 @@ import (
 	"github.com/bitcoin-sv/spv-wallet/engine/datastore"
 	"github.com/bitcoin-sv/spv-wallet/engine/logging"
 	"github.com/bitcoin-sv/spv-wallet/engine/metrics"
-	"github.com/bitcoin-sv/spv-wallet/engine/notifications"
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/bitcoin-sv/spv-wallet/engine/taskmanager"
 	"github.com/mrz1836/go-cachestore"
@@ -92,9 +91,9 @@ type (
 
 	// notificationsOptions holds the configuration for notifications
 	notificationsOptions struct {
-		notifications.ClientInterface                           // Notifications client
-		options                       []notifications.ClientOps // List of options
-		webhookEndpoint               string                    // Webhook endpoint
+		// notifications.ClientInterface                           // Notifications client
+		// options                       []notifications.ClientOps // List of options
+		webhookEndpoint string // Webhook endpoint
 	}
 
 	// paymailOptions holds the configuration for Paymail
@@ -315,9 +314,9 @@ func (c *Client) Debug(on bool) {
 	}
 
 	// Set debugging on the Notifications
-	if n := c.Notifications(); n != nil {
-		n.Debug(on)
-	}
+	// if n := c.Notifications(); n != nil {
+	// 	n.Debug(on)
+	// }
 }
 
 // DefaultSyncConfig will return the default sync config from the client defaults (for chainstate)
@@ -389,18 +388,18 @@ func (c *Client) Logger() *zerolog.Logger {
 	return c.options.logger
 }
 
-// Notifications will return the Notifications if it exists
-func (c *Client) Notifications() notifications.ClientInterface {
-	if c.options.notifications != nil && c.options.notifications.ClientInterface != nil {
-		return c.options.notifications.ClientInterface
-	}
-	return nil
-}
+// // Notifications will return the Notifications if it exists
+// func (c *Client) Notifications() notifications.ClientInterface {
+// 	if c.options.notifications != nil && c.options.notifications.ClientInterface != nil {
+// 		return c.options.notifications.ClientInterface
+// 	}
+// 	return nil
+// }
 
-// SetNotificationsClient will overwrite the notification's client with the given client
-func (c *Client) SetNotificationsClient(client notifications.ClientInterface) {
-	c.options.notifications.ClientInterface = client
-}
+// // SetNotificationsClient will overwrite the notification's client with the given client
+// func (c *Client) SetNotificationsClient(client notifications.ClientInterface) {
+// 	c.options.notifications.ClientInterface = client
+// }
 
 // Taskmanager will return the Taskmanager if it exists
 func (c *Client) Taskmanager() taskmanager.TaskEngine {

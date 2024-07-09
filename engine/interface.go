@@ -10,7 +10,8 @@ import (
 	"github.com/bitcoin-sv/spv-wallet/engine/cluster"
 	"github.com/bitcoin-sv/spv-wallet/engine/datastore"
 	"github.com/bitcoin-sv/spv-wallet/engine/metrics"
-	"github.com/bitcoin-sv/spv-wallet/engine/notifications"
+
+	// "github.com/bitcoin-sv/spv-wallet/engine/notifications"
 	"github.com/bitcoin-sv/spv-wallet/engine/taskmanager"
 	"github.com/mrz1836/go-cachestore"
 	"github.com/rs/zerolog"
@@ -52,7 +53,7 @@ type ClientService interface {
 	Datastore() datastore.ClientInterface
 	HTTPClient() HTTPInterface
 	Logger() *zerolog.Logger
-	Notifications() notifications.ClientInterface
+	// Notifications() notifications.ClientInterface
 	PaymailClient() paymail.ClientInterface
 	Taskmanager() taskmanager.TaskEngine
 }
@@ -203,7 +204,7 @@ type ClientInterface interface {
 	IsIUCEnabled() bool
 	IsMigrationEnabled() bool
 	IsNewRelicEnabled() bool
-	SetNotificationsClient(notifications.ClientInterface)
+	// SetNotificationsClient(notifications.ClientInterface)
 	UserAgent() string
 	Version() string
 	Metrics() (metrics *metrics.Metrics, enabled bool)
