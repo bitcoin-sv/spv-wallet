@@ -2,15 +2,16 @@ package notifications
 
 import (
 	"context"
+	"fmt"
 	"testing"
 	"time"
 
 	"github.com/stretchr/testify/assert"
 )
 
-func newMockEvent(value int) *RawEvent {
-	return NewRawEvent(&NumericEvent{
-		Numeric: value,
+func newMockEvent(value string) *RawEvent {
+	return NewRawEvent(&StringEvent{
+		Value: value,
 	})
 }
 
@@ -34,13 +35,13 @@ func (m *mockNotifier) consumer(ctx context.Context) {
 	}
 }
 
-func (m *mockNotifier) assertOutput(t *testing.T, expected []int) {
+func (m *mockNotifier) assertOutput(t *testing.T, expected []string) {
 	assert.Equal(t, len(expected), len(m.output))
 	if len(expected) == len(m.output) {
 		for i := 0; i < len(expected); i++ {
-			actualEvent, err := GetEventContent[NumericEvent](m.output[i])
+			actualEvent, err := GetEventContent[StringEvent](m.output[i])
 			assert.NoError(t, err)
-			assert.Equal(t, expected[i], actualEvent.Numeric)
+			assert.Equal(t, expected[i], actualEvent.Value)
 		}
 	}
 }
@@ -72,10 +73,11 @@ func TestNotifications(t *testing.T) {
 		notifier := newMockNotifier(ctx, 100)
 		n.AddNotifier("test", notifier.channel)
 
-		expected := []int{}
+		expected := []string{}
 		for i := 0; i < 10; i++ {
-			n.Notify(newMockEvent(i))
-			expected = append(expected, i)
+			msg := fmt.Sprintf("msg-%d", i)
+			n.Notify(newMockEvent(msg))
+			expected = append(expected, msg)
 		}
 
 		time.Sleep(100 * time.Millisecond)
@@ -92,10 +94,11 @@ func TestNotifications(t *testing.T) {
 		n.AddNotifier("notifier1", notifier1.channel)
 		n.AddNotifier("notifier2", notifier2.channel)
 
-		expected := []int{}
+		expected := []string{}
 		for i := 0; i < 10; i++ {
-			n.Notify(newMockEvent(i))
-			expected = append(expected, i)
+			msg := fmt.Sprintf("msg-%d", i)
+			n.Notify(newMockEvent(msg))
+			expected = append(expected, msg)
 		}
 
 		time.Sleep(100 * time.Millisecond)
@@ -113,13 +116,14 @@ func TestNotifications(t *testing.T) {
 		notifier := newMockNotifier(ctx, outputChanLength)
 		n.AddNotifier("test", notifier.channel)
 
-		expected := []int{}
+		expected := []string{}
 		for i := 0; i < numberOfEvents; i++ {
-			n.Notify(newMockEvent(i))
+			msg := fmt.Sprintf("msg-%d", i)
+			n.Notify(newMockEvent(msg))
 			// we have to delay of putting new events because the output chan buffer will not contain all of the events in its buffer
 			// so, this way, we let consumer to pop events from the queue
 			time.Sleep(1 * time.Millisecond)
-			expected = append(expected, i)
+			expected = append(expected, msg)
 		}
 
 		time.Sleep(500 * time.Millisecond)
@@ -142,18 +146,19 @@ func TestNotifications(t *testing.T) {
 		n.AddNotifier("notifier1", notifier1.channel)
 		n.AddNotifier("notifier2", notifier2.channel)
 
-		expected := []int{}
+		expected := []string{}
 		for i := 0; i < numberOfEvents; i++ {
-			n.Notify(newMockEvent(i))
+			msg := fmt.Sprintf("msg-%d", i)
+			n.Notify(newMockEvent(msg))
 			time.Sleep(1 * time.Millisecond)
-			expected = append(expected, i)
+			expected = append(expected, msg)
 		}
 
 		time.Sleep(500 * time.Millisecond)
 		cancel()
 
 		// even though notifier1 is slow, it should not block notifier2
-		notifier1.assertOutput(t, []int{0})
+		notifier1.assertOutput(t, []string{"msg-0"})
 		notifier2.assertOutput(t, expected)
 	})
 
@@ -168,11 +173,12 @@ func TestNotifications(t *testing.T) {
 		n.AddNotifier("notifier1", notifier1.channel)
 		n.AddNotifier("notifier2", notifier2.channel)
 
-		expected := []int{}
+		expected := []string{}
 		for i := 0; i < numberOfEvents; i++ {
-			n.Notify(newMockEvent(i))
+			msg := fmt.Sprintf("msg-%d", i)
+			n.Notify(newMockEvent(msg))
 			time.Sleep(1 * time.Millisecond)
-			expected = append(expected, i)
+			expected = append(expected, msg)
 		}
 
 		time.Sleep(500 * time.Millisecond)

@@ -95,23 +95,27 @@ func (c *Client) loadNotificationClient(ctx context.Context) (err error) {
 	c.options.notifications.webhookManager = notifications.NewWebhookManager(ctx, notificationService, &WebhooksRepository{client: c})
 
 	// for development purposes only
-	i := 0
-	j := 0
-	ticker := time.NewTicker(100 * time.Microsecond)
-	ticker2 := time.NewTicker(1 * time.Second)
-	go func() {
-		for {
-			select {
-			case <-ctx.Done():
-				return
-			case <-ticker.C:
-				notificationService.Notify(notifications.NewRawEvent(&notifications.NumericEvent{Numeric: i}))
-				i++
-			case <-ticker2.C:
-				notificationService.Notify(notifications.NewRawEvent(&notifications.StringEvent{Value: fmt.Sprintf("Hello %d", j)}))
+	notifications.StartSendingMockEvents(
+		ctx,
+		notificationService,
+		100*time.Millisecond,
+		func(i int) *notifications.StringEvent {
+			return &notifications.StringEvent{Value: fmt.Sprintf("msg-%d", i)}
+		},
+	)
+	notifications.StartSendingMockEvents(
+		ctx,
+		notificationService,
+		500*time.Millisecond,
+		func(i int) *notifications.TransactionEvent {
+			return &notifications.TransactionEvent{
+				UserEvent: notifications.UserEvent{
+					XPubID: "mock-xpub-id",
+				},
+				TransactionID: fmt.Sprintf("mock-transaction-id-%d", i),
 			}
-		}
-	}()
+		},
+	)
 	return
 }
 
