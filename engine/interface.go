@@ -204,8 +204,8 @@ type ClientInterface interface {
 	IsIUCEnabled() bool
 	IsMigrationEnabled() bool
 	IsNewRelicEnabled() bool
-	// SetNotificationsClient(notifications.ClientInterface)
 	UserAgent() string
 	Version() string
 	Metrics() (metrics *metrics.Metrics, enabled bool)
+	SubscribeWebhook(ctx context.Context, url, tokenHeader, token string) error
 }

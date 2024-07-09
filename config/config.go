@@ -174,8 +174,6 @@ type ArcAPI struct {
 
 // NotificationsConfig is the configuration for notifications
 type NotificationsConfig struct {
-	// WebhookEndpoint is the endpoint for webhook registration.
-	WebhookEndpoint string `json:"webhook_endpoint" mapstructure:"webhook_endpoint"`
 	// Enabled is the flag that enables notifications service.
 	Enabled bool `json:"enabled" mapstructure:"enabled"`
 }

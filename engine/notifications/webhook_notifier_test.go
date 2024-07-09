@@ -79,6 +79,28 @@ func (mc *mockClient) assertEventsWereSentInBatches(t *testing.T, expected bool)
 	assert.Equal(t, expected, result)
 }
 
+type mockWebhookModel struct {
+	url         string
+	tokenHeader string
+	tokenValue  string
+}
+
+func (model *mockWebhookModel) GetURL() string {
+	return model.url
+}
+
+func (model *mockWebhookModel) GetToken() (string, string) {
+	return model.tokenHeader, model.tokenValue
+}
+
+func newMockWebhookModel(url, tokenHeader, tokenValue string) *mockWebhookModel {
+	return &mockWebhookModel{
+		url:         url,
+		tokenHeader: tokenHeader,
+		tokenValue:  tokenValue,
+	}
+}
+
 func TestWebhookNotifier(t *testing.T) {
 	t.Run("one webhook notifier", func(t *testing.T) {
 		httpmock.Reset()
@@ -89,7 +111,7 @@ func TestWebhookNotifier(t *testing.T) {
 
 		ctx, cancel := context.WithCancel(context.Background())
 		n := NewNotifications(ctx)
-		notifier := NewWebhookNotifier(ctx, NewWebhookModel(client.url, "", ""))
+		notifier := NewWebhookNotifier(ctx, newMockWebhookModel(client.url, "", ""))
 		n.AddNotifier(client.url, notifier.Channel)
 
 		expected := []Event{}
@@ -116,10 +138,10 @@ func TestWebhookNotifier(t *testing.T) {
 		ctx, cancel := context.WithCancel(context.Background())
 		n := NewNotifications(ctx)
 
-		notifier1 := NewWebhookNotifier(ctx, NewWebhookModel(client1.url, "", ""))
+		notifier1 := NewWebhookNotifier(ctx, newMockWebhookModel(client1.url, "", ""))
 		n.AddNotifier(client1.url, notifier1.Channel)
 
-		notifier2 := NewWebhookNotifier(ctx, NewWebhookModel(client2.url, "", ""))
+		notifier2 := NewWebhookNotifier(ctx, newMockWebhookModel(client2.url, "", ""))
 		n.AddNotifier(client2.url, notifier2.Channel)
 
 		expected := []Event{}
@@ -147,7 +169,7 @@ func TestWebhookNotifier(t *testing.T) {
 
 		ctx, cancel := context.WithCancel(context.Background())
 		n := NewNotifications(ctx)
-		notifier := NewWebhookNotifier(ctx, NewWebhookModel(client.url, "", ""))
+		notifier := NewWebhookNotifier(ctx, newMockWebhookModel(client.url, "", ""))
 		n.AddNotifier(client.url, notifier.Channel)
 
 		expected := []Event{}
@@ -173,7 +195,7 @@ func TestWebhookNotifier(t *testing.T) {
 
 		ctx, cancel := context.WithCancel(context.Background())
 		n := NewNotifications(ctx)
-		notifier := NewWebhookNotifier(ctx, NewWebhookModel(client.url, "", ""))
+		notifier := NewWebhookNotifier(ctx, newMockWebhookModel(client.url, "", ""))
 		n.AddNotifier(client.url, notifier.Channel)
 
 		expected := []Event{}
@@ -207,7 +229,7 @@ func TestWebhookNotifier(t *testing.T) {
 
 		ctx, cancel := context.WithCancel(context.Background())
 		n := NewNotifications(ctx)
-		notifier := NewWebhookNotifier(ctx, NewWebhookModel(client.url, "", ""))
+		notifier := NewWebhookNotifier(ctx, newMockWebhookModel(client.url, "", ""))
 		n.AddNotifier(client.url, notifier.Channel)
 
 		expected := []Event{}
@@ -234,7 +256,7 @@ func TestWebhookNotifier(t *testing.T) {
 
 		ctx, cancel := context.WithCancel(context.Background())
 		n := NewNotifications(ctx)
-		notifier := NewWebhookNotifier(ctx, NewWebhookModel(client.url, "", ""))
+		notifier := NewWebhookNotifier(ctx, newMockWebhookModel(client.url, "", ""))
 		n.AddNotifier(client.url, notifier.Channel)
 
 		for i := 0; i < 10; i++ {
@@ -255,7 +277,7 @@ func TestWebhookNotifier(t *testing.T) {
 		client := newMockClient("http://localhost:8080")
 		ctx, cancel := context.WithCancel(context.Background())
 		n := NewNotifications(ctx)
-		notifier := NewWebhookNotifier(ctx, NewWebhookModel(client.url, "", ""))
+		notifier := NewWebhookNotifier(ctx, newMockWebhookModel(client.url, "", ""))
 		n.AddNotifier(client.url, notifier.Channel)
 
 		notifier.Ban()
@@ -297,7 +319,7 @@ func TestWebhookNotifier(t *testing.T) {
 
 		ctx, cancel := context.WithCancel(context.Background())
 		n := NewNotifications(ctx)
-		notifier := NewWebhookNotifier(ctx, NewWebhookModel(client.url, tokenHeader, tokenValue))
+		notifier := NewWebhookNotifier(ctx, newMockWebhookModel(client.url, tokenHeader, tokenValue))
 		n.AddNotifier(client.url, notifier.Channel)
 
 		for i := 0; i < 10; i++ {

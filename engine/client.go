@@ -11,6 +11,7 @@ import (
 	"github.com/bitcoin-sv/spv-wallet/engine/datastore"
 	"github.com/bitcoin-sv/spv-wallet/engine/logging"
 	"github.com/bitcoin-sv/spv-wallet/engine/metrics"
+	"github.com/bitcoin-sv/spv-wallet/engine/notifications"
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/bitcoin-sv/spv-wallet/engine/taskmanager"
 	"github.com/mrz1836/go-cachestore"
@@ -91,9 +92,9 @@ type (
 
 	// notificationsOptions holds the configuration for notifications
 	notificationsOptions struct {
-		// notifications.ClientInterface                           // Notifications client
-		// options                       []notifications.ClientOps // List of options
-		webhookEndpoint string // Webhook endpoint
+		enabled        bool // If notifications are enabled
+		client         *notifications.Notifications
+		webhookManager *notifications.WebhookManager
 	}
 
 	// paymailOptions holds the configuration for Paymail
@@ -172,7 +173,7 @@ func NewClient(ctx context.Context, opts ...ClientOps) (ClientInterface, error) 
 	}
 
 	// Load the Notification client (if client does not exist)
-	if err = client.loadNotificationClient(); err != nil {
+	if err = client.loadNotificationClient(ctx); err != nil {
 		return nil, err
 	}
 
@@ -388,18 +389,10 @@ func (c *Client) Logger() *zerolog.Logger {
 	return c.options.logger
 }
 
-// // Notifications will return the Notifications if it exists
-// func (c *Client) Notifications() notifications.ClientInterface {
-// 	if c.options.notifications != nil && c.options.notifications.ClientInterface != nil {
-// 		return c.options.notifications.ClientInterface
-// 	}
-// 	return nil
-// }
-
-// // SetNotificationsClient will overwrite the notification's client with the given client
-// func (c *Client) SetNotificationsClient(client notifications.ClientInterface) {
-// 	c.options.notifications.ClientInterface = client
-// }
+// Notifications will return the Notifications if it exists
+func (c *Client) Notifications() *notifications.Notifications {
+	return c.options.notifications.client
+}
 
 // Taskmanager will return the Taskmanager if it exists
 func (c *Client) Taskmanager() taskmanager.TaskEngine {

@@ -607,10 +607,10 @@ func WithExcludedProviders(providers []string) ClientOps {
 // -----------------------------------------------------------------
 
 // WithNotifications will set the notifications config
-func WithNotifications(webhookEndpoint string) ClientOps {
+func WithNotifications() ClientOps {
 	return func(c *clientOptions) {
-		if len(webhookEndpoint) > 0 {
-			c.notifications.webhookEndpoint = webhookEndpoint
+		c.notifications = &notificationsOptions{
+			enabled: true,
 		}
 	}
 }
