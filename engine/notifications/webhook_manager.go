@@ -23,23 +23,31 @@ type notifierWithCtx struct {
 type WebhookManager struct {
 	repository       WebhookRepository
 	rootContext      context.Context
+	cancelAllFunc    context.CancelFunc
 	webhookNotifiers *sync.Map // [string, *notifierWithCtx]
 	ticker           *time.Ticker
 	updateMsg        chan bool
 	notifications    *Notifications
 }
 
-func NewWebhookNotifierManager(rootContext context.Context, repository WebhookRepository) *WebhookManager {
+func NewWebhookManager(ctx context.Context, notifications *Notifications, repository WebhookRepository) *WebhookManager {
+	rootContext, cancelAllFunc := context.WithCancel(ctx)
 	manager := WebhookManager{
 		repository:       repository,
 		rootContext:      rootContext,
+		cancelAllFunc:    cancelAllFunc,
 		webhookNotifiers: &sync.Map{},
 		ticker:           time.NewTicker(5 * time.Second),
+		notifications:    notifications,
 	}
 
 	go manager.checkForUpdates()
 
 	return &manager
+}
+
+func (w *WebhookManager) Stop() {
+	w.cancelAllFunc()
 }
 
 func (w *WebhookManager) Subscribe(webhookModel *WebhookModel) error {
