@@ -6,19 +6,20 @@ import (
 	"testing"
 	"time"
 
+	"github.com/bitcoin-sv/spv-wallet/models"
 	"github.com/stretchr/testify/assert"
 )
 
-func newMockEvent(value string) *RawEvent {
-	return NewRawEvent(&StringEvent{
+func newMockEvent(value string) *models.RawEvent {
+	return NewRawEvent(&models.StringEvent{
 		Value: value,
 	})
 }
 
 type mockNotifier struct {
 	delay   *time.Duration
-	channel chan *RawEvent
-	output  []*RawEvent
+	channel chan *models.RawEvent
+	output  []*models.RawEvent
 }
 
 func (m *mockNotifier) consumer(ctx context.Context) {
@@ -39,7 +40,7 @@ func (m *mockNotifier) assertOutput(t *testing.T, expected []string) {
 	assert.Equal(t, len(expected), len(m.output))
 	if len(expected) == len(m.output) {
 		for i := 0; i < len(expected); i++ {
-			actualEvent, err := GetEventContent[StringEvent](m.output[i])
+			actualEvent, err := GetEventContent[models.StringEvent](m.output[i])
 			assert.NoError(t, err)
 			assert.Equal(t, expected[i], actualEvent.Value)
 		}
@@ -48,7 +49,7 @@ func (m *mockNotifier) assertOutput(t *testing.T, expected []string) {
 
 func newMockNotifier(ctx context.Context, chanLength int) *mockNotifier {
 	notifier := &mockNotifier{
-		channel: make(chan *RawEvent, chanLength),
+		channel: make(chan *models.RawEvent, chanLength),
 	}
 
 	go notifier.consumer(ctx)

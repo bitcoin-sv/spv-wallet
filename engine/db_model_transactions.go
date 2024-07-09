@@ -6,6 +6,7 @@ import (
 	"github.com/bitcoin-sv/spv-wallet/engine/datastore"
 	"github.com/bitcoin-sv/spv-wallet/engine/notifications"
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
+	"github.com/bitcoin-sv/spv-wallet/models"
 )
 
 // GetModelTableName will get the db table name of the current model
@@ -181,8 +182,8 @@ func (m *Transaction) migratePostgreSQL(client datastore.ClientInterface, tableN
 
 func (m *Transaction) notify() {
 	if n := m.Client().Notifications(); n != nil {
-		n.Notify(notifications.NewRawEvent(&notifications.TransactionEvent{
-			UserEvent: notifications.UserEvent{
+		n.Notify(notifications.NewRawEvent(&models.TransactionEvent{
+			UserEvent: models.UserEvent{
 				XPubID: m.XPubID,
 			},
 			TransactionID: m.ID,

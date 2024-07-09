@@ -8,6 +8,7 @@ import (
 	"sync"
 	"time"
 
+	"github.com/bitcoin-sv/spv-wallet/models"
 	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 )
@@ -22,7 +23,7 @@ const (
 
 // WebhookNotifier - notifier for sending events to webhook
 type WebhookNotifier struct {
-	Channel       chan *RawEvent
+	Channel       chan *models.RawEvent
 	banMsg        chan string
 	httpClient    *http.Client
 	definition    WebhookModel
@@ -33,7 +34,7 @@ type WebhookNotifier struct {
 // NewWebhookNotifier - creates a new instance of WebhookNotifier
 func NewWebhookNotifier(ctx context.Context, logger *zerolog.Logger, model WebhookModel, banMsg chan string) *WebhookNotifier {
 	notifier := &WebhookNotifier{
-		Channel:    make(chan *RawEvent, lengthOfWebhookChannel),
+		Channel:    make(chan *models.RawEvent, lengthOfWebhookChannel),
 		definition: model,
 		banMsg:     banMsg,
 		httpClient: &http.Client{},
@@ -96,7 +97,7 @@ func (w *WebhookNotifier) consumer(ctx context.Context) {
 	}
 }
 
-func (w *WebhookNotifier) accumulateEvents(ctx context.Context, event *RawEvent) (events []*RawEvent, done bool) {
+func (w *WebhookNotifier) accumulateEvents(ctx context.Context, event *models.RawEvent) (events []*models.RawEvent, done bool) {
 	events = append(events, event)
 loop:
 	for i := 0; i < maxBatchSize; i++ {
@@ -112,7 +113,7 @@ loop:
 	return events, false
 }
 
-func (w *WebhookNotifier) sendEventsToWebhook(ctx context.Context, events []*RawEvent) (resultError error) {
+func (w *WebhookNotifier) sendEventsToWebhook(ctx context.Context, events []*models.RawEvent) (resultError error) {
 	defer func() {
 		if r := recover(); r != nil {
 			w.logger.Warn().Msgf("Webhook call failed: %v", r)
