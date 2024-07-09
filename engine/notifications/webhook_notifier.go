@@ -12,7 +12,7 @@ import (
 
 const (
 	maxBatchSize           = 100
-	mexRetries             = 3
+	mexRetries             = 2
 	retriesDelay           = 1 * time.Second
 	banTime                = 60 * time.Minute
 	lengthOfWebhookChannel = 100
@@ -51,9 +51,8 @@ func (w *WebhookNotifier) consumer(ctx context.Context) {
 				err = w.sendEventsToWebhook(events)
 				if err == nil {
 					break
-				} else {
-					time.Sleep(retriesDelay)
 				}
+				time.Sleep(retriesDelay)
 			}
 
 			if err != nil {
