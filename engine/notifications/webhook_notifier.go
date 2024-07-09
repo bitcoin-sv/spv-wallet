@@ -77,9 +77,9 @@ func (w *WebhookNotifier) consumer(ctx context.Context) {
 			for i := 0; i < mexRetries; i++ {
 				err = w.sendEventsToWebhook(ctx, events)
 				if err == nil {
-					w.logger.Warn().Msgf("Webhook call was failed: %v", err)
 					break
 				}
+				w.logger.Warn().Msgf("Webhook call was failed: %v", err)
 				select {
 				case <-ctx.Done():
 					return
