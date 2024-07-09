@@ -16,7 +16,7 @@ type Action struct {
 func NewHandler(appConfig *config.AppConfig, services *config.AppServices) (routes.OldAPIEndpointsFunc, routes.APIEndpointsFunc) {
 	action := &Action{actions.Action{AppConfig: appConfig, Services: services}}
 
-	oldApiEndpoints := routes.OldAPIEndpointsFunc(func(router *gin.RouterGroup) {
+	oldAPIEndpoints := routes.OldAPIEndpointsFunc(func(router *gin.RouterGroup) {
 		xpubGroup := router.Group("/xpub")
 		xpubGroup.GET("", action.oldGet)
 		xpubGroup.PATCH("", action.oldUpdate)
@@ -28,5 +28,5 @@ func NewHandler(appConfig *config.AppConfig, services *config.AppServices) (rout
 		xpubGroup.PATCH("", action.update)
 	})
 
-	return oldApiEndpoints, apiEndpoints
+	return oldAPIEndpoints, apiEndpoints
 }
