@@ -18,7 +18,7 @@ This simple program helps you prepare to and run regression tests of the SPV Wal
 ## Features
 
 - **Users**: Creates, recreates, or uses existing user.
-- **Coin Transfers**: Handle coin transfers to ensure user have the required balance, possibility of self-transfer or transfer with xpriv and domain.
+- **Funds Transfers**: Handle funds transfers to ensure user have the required balance, possibility of self-transfer or transfer with xpriv and domain.
 - **Test Execution**: Run regression tests using either the Go or JS SPV Wallet client.
 - **Configuration Management**: Load (-l flag) and save configuration settings from a `.env.config` file.
 
