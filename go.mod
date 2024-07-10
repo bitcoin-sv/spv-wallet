@@ -13,7 +13,7 @@ require (
 	github.com/99designs/gqlgen v0.17.49
 	github.com/DATA-DOG/go-sqlmock v1.5.2
 	github.com/bitcoin-sv/go-broadcast-client v0.19.0
-	github.com/bitcoin-sv/go-paymail v0.18.0
+	github.com/bitcoin-sv/go-paymail v0.19.0
 	github.com/bitcoin-sv/spv-wallet/models v0.27.3
 	github.com/bitcoinschema/go-bitcoin/v2 v2.0.5
 	github.com/bitcoinschema/go-map v0.1.1
@@ -37,7 +37,7 @@ require (
 	github.com/mrz1836/go-logger v0.3.3
 	github.com/mrz1836/go-sanitize v1.3.2
 	github.com/mrz1836/go-validate v0.2.1
-	github.com/newrelic/go-agent/v3 v3.33.0
+	github.com/newrelic/go-agent/v3 v3.33.1
 	github.com/pkg/errors v0.9.1
 	github.com/prometheus/client_golang v1.19.1
 	github.com/rafaeljusto/redigomock v2.4.0+incompatible
@@ -151,7 +151,7 @@ require (
 	golang.org/x/text v0.16.0 // indirect
 	golang.org/x/tools v0.22.0 // indirect
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20240610135401-a8a62080eff3 // indirect
-	google.golang.org/grpc v1.64.0 // indirect
+	google.golang.org/grpc v1.64.1 // indirect
 	google.golang.org/protobuf v1.34.2 // indirect
 	gopkg.in/ini.v1 v1.67.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
