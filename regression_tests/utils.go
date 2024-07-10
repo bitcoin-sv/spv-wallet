@@ -105,7 +105,7 @@ func isSPVWalletRunning(url string) bool {
 
 // addPrefixIfNeeded adds the HTTP prefix to the URL if it is missing.
 func addPrefixIfNeeded(url string) string {
-	if !strings.HasPrefix(url, domainPrefix) {
+	if !isValidURL(url) {
 		return domainPrefix + url
 	}
 	return url
