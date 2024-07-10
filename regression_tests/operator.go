@@ -208,10 +208,10 @@ func sendFundsWithGoClient(instanceUrl string, istanceXPriv string, receiverPaym
 	ctx := context.Background()
 
 	balance := checkBalance(instanceUrl, istanceXPriv)
-	if balance < minimalBalance {
+	if balance <= minimalBalance {
 		return fmt.Errorf("balance too low: %d", balance)
 	}
-	recipient := walletclient.Recipients{To: receiverPaymail, Satoshis: uint64(balance - 1)}
+	recipient := walletclient.Recipients{To: receiverPaymail, Satoshis: uint64(minimalBalance)}
 	recipients := []*walletclient.Recipients{&recipient}
 
 	_, err := client.SendToRecipients(ctx, recipients, map[string]any{"message": "regression test funds"})
