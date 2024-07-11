@@ -7,6 +7,7 @@ import (
 	"testing"
 
 	"github.com/bitcoin-sv/spv-wallet/engine/chainstate"
+	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/bitcoin-sv/spv-wallet/engine/utils"
 	magic "github.com/bitcoinschema/go-map"
 	"github.com/rs/zerolog"
@@ -170,7 +171,7 @@ func TestTransactionConfig_processOutput(t *testing.T) {
 			defaultSenderPaymail, true,
 		)
 		require.Error(t, err)
-		assert.ErrorIs(t, err, ErrOutputValueNotRecognized)
+		assert.ErrorIs(t, err, spverrors.ErrOutputValueNotRecognized)
 	})
 
 	t.Run("error - invalid paymail given", func(t *testing.T) {
@@ -186,7 +187,7 @@ func TestTransactionConfig_processOutput(t *testing.T) {
 			defaultSenderPaymail, true,
 		)
 		require.Error(t, err)
-		assert.ErrorIs(t, err, ErrPaymailAddressIsInvalid)
+		assert.ErrorIs(t, err, spverrors.ErrPaymailAddressIsInvalid)
 	})
 
 	t.Run("basic paymail address resolution - valid response", func(t *testing.T) {
@@ -332,7 +333,7 @@ func TestTransactionConfig_processOpReturnOutput(t *testing.T) {
 			OpReturn: &OpReturn{},
 		}
 		err := output.processOpReturnOutput()
-		require.ErrorIs(t, err, ErrInvalidOpReturnOutput)
+		require.ErrorIs(t, err, spverrors.ErrInvalidOpReturnOutput)
 	})
 
 	t.Run("op_return hex", func(t *testing.T) {
@@ -442,7 +443,7 @@ func TestTransactionConfig_processScriptOutput(t *testing.T) {
 			Script: script,
 		}
 		err := output.processScriptOutput()
-		require.ErrorIs(t, err, ErrInvalidScriptOutput)
+		require.ErrorIs(t, err, spverrors.ErrInvalidScriptOutput)
 	})
 
 	t.Run("invalid hex", func(t *testing.T) {

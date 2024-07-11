@@ -4,7 +4,7 @@
 name: "spv-wallet"
 services:
   wallet-frontend:
-    image: bsvb/spv-wallet-web-frontend:latest
+    image: bsvb/spv-wallet-web-frontend:${RUN_WEB_FRONTEND_VERSION:-latest}
     pull_policy: always
     labels:
       - "traefik.enable=true"
@@ -20,7 +20,7 @@ services:
         target: /usr/share/nginx/html/env-config.json
 
   wallet-backend:
-    image: bsvb/spv-wallet-web-backend:latest
+    image: bsvb/spv-wallet-web-backend:${RUN_WEB_BACKEND_VERSION:-latest}
     pull_policy: always
     labels:
       - "traefik.enable=true"
@@ -42,7 +42,7 @@ services:
         condition: service_healthy
 
   block-headers-service:
-    image: bsvb/block-headers-service:latest
+    image: bsvb/block-headers-service:${RUN_BHS_VERSION:-latest}
     pull_policy: always
     labels:
       - "traefik.enable=true"
@@ -59,7 +59,7 @@ services:
       - block-headers-service-data:/app/data
 
   spv-wallet-admin:
-    image: bsvb/spv-wallet-admin:latest
+    image: bsvb/spv-wallet-admin:${RUN_ADMIN_VERSION:-latest}
     pull_policy: always
     labels:
       - "traefik.enable=true"
@@ -77,7 +77,7 @@ services:
         target: /usr/share/nginx/html/env-config.json
 
   spv-wallet:
-    image: bsvb/spv-wallet:latest
+    image: bsvb/spv-wallet:${RUN_SPVWALLET_VERSION:-latest}
     pull_policy: always
     labels:
       - "traefik.enable=true"

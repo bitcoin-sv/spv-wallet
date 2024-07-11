@@ -8,6 +8,7 @@ import (
 	"github.com/bitcoin-sv/spv-wallet/engine/cluster"
 	"github.com/bitcoin-sv/spv-wallet/engine/datastore"
 	"github.com/bitcoin-sv/spv-wallet/engine/notifications"
+	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/bitcoin-sv/spv-wallet/engine/utils"
 	"github.com/bitcoinschema/go-bitcoin/v2"
 )
@@ -253,7 +254,7 @@ func getDestinationWithCache(ctx context.Context, client ClientInterface,
 		cacheKey = fmt.Sprintf(cacheKeyDestinationModelByLockingScript, lockingScript)
 	}
 	if len(cacheKey) == 0 {
-		return nil, ErrMissingFieldID
+		return nil, spverrors.ErrMissingFieldID
 	}
 
 	// Attempt to get from cache
@@ -287,7 +288,7 @@ func getDestinationWithCache(ctx context.Context, client ClientInterface,
 	if err != nil {
 		return nil, err
 	} else if destination == nil {
-		return nil, ErrMissingDestination
+		return nil, spverrors.ErrCouldNotFindDestination
 	}
 
 	// Save to cache

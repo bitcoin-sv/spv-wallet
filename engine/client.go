@@ -12,6 +12,7 @@ import (
 	"github.com/bitcoin-sv/spv-wallet/engine/logging"
 	"github.com/bitcoin-sv/spv-wallet/engine/metrics"
 	"github.com/bitcoin-sv/spv-wallet/engine/notifications"
+	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/bitcoin-sv/spv-wallet/engine/taskmanager"
 	"github.com/mrz1836/go-cachestore"
 	"github.com/newrelic/go-agent/v3/newrelic"
@@ -208,7 +209,7 @@ func (c *Client) AddModels(ctx context.Context, autoMigrate bool, models ...inte
 		// Ensure we have a datastore
 		d := c.Datastore()
 		if d == nil {
-			return ErrDatastoreRequired
+			return spverrors.ErrDatastoreRequired
 		}
 
 		// Apply the database migration with the new models

@@ -3,13 +3,13 @@ package engine
 import (
 	"context"
 	"errors"
-	"fmt"
 	"math"
 	"time"
 
 	"github.com/bitcoin-sv/go-broadcast-client/broadcast"
 	"github.com/bitcoin-sv/spv-wallet/engine/chainstate"
 	"github.com/bitcoin-sv/spv-wallet/engine/datastore"
+	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/bitcoin-sv/spv-wallet/engine/utils"
 	"github.com/libsv/go-bc"
 	"github.com/libsv/go-bt/v2"
@@ -25,7 +25,7 @@ func (c *Client) RecordTransaction(ctx context.Context, xPubKey, txHex, draftID 
 
 	tx, err := bt.NewTxFromString(txHex)
 	if err != nil {
-		return nil, fmt.Errorf("invalid hex: %w", err)
+		return nil, spverrors.ErrInvalidHex
 	}
 
 	rts, err := getOutgoingTxRecordStrategy(xPubKey, tx, draftID)
@@ -103,7 +103,7 @@ func (c *Client) GetTransaction(ctx context.Context, xPubID, txID string) (*Tran
 		return nil, err
 	}
 	if transaction == nil {
-		return nil, ErrMissingTransaction
+		return nil, spverrors.ErrCouldNotFindTransaction
 	}
 
 	return transaction, nil
@@ -264,7 +264,7 @@ func (c *Client) RevertTransaction(ctx context.Context, id string) error {
 
 	// make sure the transaction is coming from SPV Wallet Engine
 	if transaction.DraftID == "" {
-		return errors.New("not a spv wallet engine originating transaction, cannot revert")
+		return spverrors.ErrTxRevertEmptyDraftID
 	}
 
 	var draftTransaction *DraftTransaction
@@ -272,18 +272,18 @@ func (c *Client) RevertTransaction(ctx context.Context, id string) error {
 		return err
 	}
 	if draftTransaction == nil {
-		return errors.New("could not find the draft transaction for this transaction, cannot revert")
+		return spverrors.ErrTxRevertCouldNotFindDraftTx
 	}
 
 	// check whether transaction is not already on chain
 	var info *chainstate.TransactionInfo
 	if info, err = c.Chainstate().QueryTransaction(ctx, transaction.ID, chainstate.RequiredInMempool, 30*time.Second); err != nil {
-		if !errors.Is(err, chainstate.ErrTransactionNotFound) {
+		if !errors.Is(err, spverrors.ErrCouldNotFindTransaction) {
 			return err
 		}
 	}
 	if info != nil {
-		return errors.New("transaction was found on-chain, cannot revert")
+		return spverrors.ErrTxRevertNotFoundOnChain
 	}
 
 	// check that the utxos of this transaction have not been spent
@@ -297,7 +297,7 @@ func (c *Client) RevertTransaction(ctx context.Context, id string) error {
 	}
 	for _, utxo := range utxos {
 		if utxo.SpendingTxID.Valid {
-			return errors.New("utxo of this transaction has been spent, cannot revert")
+			return spverrors.ErrTxRevertUtxoAlreadySpent
 		}
 	}
 

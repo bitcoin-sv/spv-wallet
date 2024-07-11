@@ -20,6 +20,15 @@ type AdminEndpoints interface {
 	RegisterAdminEndpoints(router *gin.RouterGroup)
 }
 
+// OldAPIEndpointsFunc wrapping type for function to mark it as implementation of OldApiEndpoints.
+type OldAPIEndpointsFunc func(router *gin.RouterGroup)
+
+// OldAPIEndpoints registrar which will register routes in ADMIN routes group.
+type OldAPIEndpoints interface {
+	// RegisterAPIEndpoints register ADMIN endpoints.
+	RegisterOldAPIEndpoints(router *gin.RouterGroup)
+}
+
 // APIEndpointsFunc wrapping type for function to mark it as implementation of ApiEndpoints.
 type APIEndpointsFunc func(router *gin.RouterGroup)
 
@@ -58,6 +67,11 @@ type CallbackEndpoints interface {
 
 // RegisterAdminEndpoints register root endpoints by registrar AdminEndpointsFunc.
 func (f AdminEndpointsFunc) RegisterAdminEndpoints(router *gin.RouterGroup) {
+	f(router)
+}
+
+// RegisterOldAPIEndpoints register API endpoints by registrar OldApiEndpointsFunc.
+func (f OldAPIEndpointsFunc) RegisterOldAPIEndpoints(router *gin.RouterGroup) {
 	f(router)
 }
 

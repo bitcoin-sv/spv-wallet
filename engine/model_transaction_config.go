@@ -11,6 +11,7 @@ import (
 	"time"
 
 	"github.com/bitcoin-sv/go-paymail"
+	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/bitcoin-sv/spv-wallet/engine/utils"
 	magic "github.com/bitcoinschema/go-map"
 	"github.com/libsv/go-bt/v2/bscript"
@@ -178,12 +179,12 @@ func (t *TransactionOutput) processOutput(ctx context.Context, cacheStore caches
 	// Check for Paymail, Bitcoin Address or OP Return
 	if len(t.To) > 0 && strings.Contains(t.To, "@") { // Paymail output
 		if checkSatoshis && t.Satoshis <= 0 {
-			return ErrOutputValueTooLow
+			return spverrors.ErrOutputValueTooLow
 		}
 		return t.processPaymailOutput(ctx, cacheStore, paymailClient, defaultFromSender)
 	} else if len(t.To) > 0 { // Standard Bitcoin Address
 		if checkSatoshis && t.Satoshis <= 0 {
-			return ErrOutputValueTooLow
+			return spverrors.ErrOutputValueTooLow
 		}
 		return t.processAddressOutput()
 	} else if t.OpReturn != nil { // OP_RETURN output
@@ -193,7 +194,7 @@ func (t *TransactionOutput) processOutput(ctx context.Context, cacheStore caches
 	}
 
 	// No value set in either ToPaymail or ToAddress
-	return ErrOutputValueNotRecognized
+	return spverrors.ErrOutputValueNotRecognized
 }
 
 // processPaymailOutput will detect how to process the Paymail output given
@@ -203,7 +204,7 @@ func (t *TransactionOutput) processPaymailOutput(ctx context.Context, cacheStore
 	// Standardize the paymail address (break into parts)
 	alias, domain, paymailAddress := paymail.SanitizePaymail(t.To)
 	if len(paymailAddress) == 0 {
-		return ErrPaymailAddressIsInvalid
+		return spverrors.ErrPaymailAddressIsInvalid
 	}
 
 	// Set the sanitized version of the paymail address provided
@@ -309,7 +310,7 @@ func (t *TransactionOutput) processAddressOutput() (err error) {
 // processScriptOutput will process a custom bitcoin script output
 func (t *TransactionOutput) processScriptOutput() (err error) {
 	if t.Script == "" {
-		return ErrInvalidScriptOutput
+		return spverrors.ErrInvalidScriptOutput
 	}
 
 	// check whether go-bt parses the script correctly
@@ -392,7 +393,7 @@ func (t *TransactionOutput) processOpReturnOutput() (err error) {
 		}
 		script = s.String()
 	} else {
-		return ErrInvalidOpReturnOutput
+		return spverrors.ErrInvalidOpReturnOutput
 	}
 
 	// Append the script

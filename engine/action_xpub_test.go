@@ -3,7 +3,7 @@ package engine
 import (
 	"testing"
 
-	"github.com/bitcoin-sv/spv-wallet/engine/utils"
+	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -68,10 +68,10 @@ func (ts *EmbeddedDBTestSuite) TestClient_NewXpub() {
 			defer tc.Close(tc.ctx)
 
 			_, err := tc.client.NewXpub(tc.ctx, "test", tc.client.DefaultModelOptions()...)
-			assert.ErrorIs(t, err, utils.ErrXpubInvalidLength)
+			assert.ErrorIs(t, err, spverrors.ErrXpubInvalidLength)
 
 			_, err = tc.client.NewXpub(tc.ctx, "", tc.client.DefaultModelOptions()...)
-			assert.ErrorIs(t, err, utils.ErrXpubInvalidLength)
+			assert.ErrorIs(t, err, spverrors.ErrXpubInvalidLength)
 		})
 
 		ts.T().Run(testCase.name+" - duplicate xPub", func(t *testing.T) {
@@ -115,7 +115,7 @@ func (ts *EmbeddedDBTestSuite) TestClient_GetXpub() {
 			xPub, err := tc.client.GetXpub(tc.ctx, "test")
 			require.Error(t, err)
 			require.Nil(t, xPub)
-			assert.ErrorIs(t, err, ErrMissingXpub)
+			assert.ErrorIs(t, err, spverrors.ErrCouldNotFindXpub)
 		})
 
 		ts.T().Run(testCase.name+" - error - missing xpub", func(t *testing.T) {
@@ -125,7 +125,7 @@ func (ts *EmbeddedDBTestSuite) TestClient_GetXpub() {
 			xPub, err := tc.client.GetXpub(tc.ctx, testXPub)
 			require.Error(t, err)
 			require.Nil(t, xPub)
-			assert.ErrorIs(t, err, ErrMissingXpub)
+			assert.ErrorIs(t, err, spverrors.ErrCouldNotFindXpub)
 		})
 	}
 }
@@ -162,7 +162,7 @@ func (ts *EmbeddedDBTestSuite) TestClient_GetXpubByID() {
 			xPub, err := tc.client.GetXpubByID(tc.ctx, testXPub)
 			require.Error(t, err)
 			require.Nil(t, xPub)
-			assert.ErrorIs(t, err, ErrMissingXpub)
+			assert.ErrorIs(t, err, spverrors.ErrCouldNotFindXpub)
 		})
 	}
 }

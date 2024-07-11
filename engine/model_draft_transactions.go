@@ -5,12 +5,13 @@ import (
 	"crypto/rand"
 	"encoding/hex"
 	"fmt"
-	"github.com/bitcoin-sv/go-paymail"
 	"math"
 	"math/big"
 	"time"
 
+	"github.com/bitcoin-sv/go-paymail"
 	"github.com/bitcoin-sv/spv-wallet/engine/datastore"
+	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/bitcoin-sv/spv-wallet/engine/utils"
 	"github.com/bitcoinschema/go-bitcoin/v2"
 	"github.com/libsv/go-bk/bec"
@@ -237,7 +238,7 @@ func (m *DraftTransaction) processConfigOutputs(ctx context.Context) error {
 func (m *DraftTransaction) createTransactionHex(ctx context.Context) (err error) {
 	// Check that we have outputs
 	if len(m.Configuration.Outputs) == 0 && m.Configuration.SendAllTo == nil {
-		return ErrMissingTransactionOutputs
+		return spverrors.ErrMissingTransactionOutputs
 	}
 
 	// Get the total satoshis needed to make this transaction
@@ -288,7 +289,7 @@ func (m *DraftTransaction) calculateAndSetFee(ctx context.Context, satoshisReser
 	fee := m.estimateFee(m.Configuration.FeeUnit, 0)
 	if m.Configuration.SendAllTo != nil {
 		if m.Configuration.Outputs[0].Satoshis <= dustLimit {
-			return ErrOutputValueTooLow
+			return spverrors.ErrOutputValueTooLow
 		}
 
 		m.Configuration.Fee = fee
@@ -306,7 +307,7 @@ func (m *DraftTransaction) calculateAndSetFee(ctx context.Context, satoshisReser
 	}
 
 	if satoshisReserved < satoshisNeeded+fee {
-		return ErrNotEnoughUtxos
+		return spverrors.ErrNotEnoughUtxos
 	}
 
 	// if we have a remainder, add that to an output to our own wallet address
@@ -436,7 +437,7 @@ func validateOutputsInputs(inputs []*TransactionInput, outputs []*TransactionOut
 
 	for _, input := range inputs {
 		if utils.StringInSlice(input.Utxo.ID, usedUtxos) {
-			return ErrDuplicateUTXOs
+			return spverrors.ErrDuplicateUTXOs
 		}
 		usedUtxos = append(usedUtxos, input.Utxo.ID)
 		inputValue += input.Satoshis
@@ -447,11 +448,11 @@ func validateOutputsInputs(inputs []*TransactionInput, outputs []*TransactionOut
 	}
 
 	if inputValue < outputValue {
-		return ErrOutputValueTooHigh
+		return spverrors.ErrOutputValueTooHigh
 	}
 
 	if inputValue-outputValue != fee {
-		return ErrTransactionFeeInvalid
+		return spverrors.ErrTransactionFeeInvalid
 	}
 	return nil
 }
@@ -470,7 +471,7 @@ func (m *DraftTransaction) addIncludeUtxos(ctx context.Context) (uint64, error) 
 		if err != nil {
 			return 0, err
 		} else if utxoModel == nil {
-			return 0, ErrMissingUtxo
+			return 0, spverrors.ErrCouldNotFindUtxo
 		}
 		includeUtxos = append(includeUtxos, utxoModel)
 		includeUtxoSatoshis += utxoModel.Satoshis
@@ -491,7 +492,7 @@ func (m *DraftTransaction) processUtxos(ctx context.Context, utxos []*Utxo) erro
 			return err
 		}
 		if destination == nil {
-			return ErrMissingDestination
+			return spverrors.ErrCouldNotFindDestination
 		}
 		m.Configuration.Inputs = append(
 			m.Configuration.Inputs, &TransactionInput{
@@ -552,7 +553,7 @@ func (m *DraftTransaction) addOutputsToTx(tx *bt.Tx) (err error) {
 			if scriptType == utils.ScriptTypeNullData {
 				// op_return output - only one allowed to have 0 satoshi value ???
 				if sc.Satoshis > 0 {
-					return ErrInvalidOpReturnOutput
+					return spverrors.ErrInvalidOpReturnOutput
 				}
 
 				tx.AddOutput(&bt.Output{
@@ -562,7 +563,7 @@ func (m *DraftTransaction) addOutputsToTx(tx *bt.Tx) (err error) {
 			} else if scriptType == utils.ScriptTypePubKeyHash {
 				// sending to a p2pkh
 				if sc.Satoshis == 0 {
-					return ErrOutputValueTooLow
+					return spverrors.ErrOutputValueTooLow
 				}
 
 				if err = tx.AddP2PKHOutputFromScript(
@@ -662,7 +663,7 @@ func (m *DraftTransaction) getChangeSatoshis(satoshisChange uint64) (changeSatos
 	changeUsed := uint64(0)
 
 	if m.Configuration.ChangeDestinationsStrategy == ChangeStrategyNominations {
-		return nil, ErrChangeStrategyNotImplemented
+		return nil, spverrors.ErrChangeStrategyNotImplemented
 	} else if m.Configuration.ChangeDestinationsStrategy == ChangeStrategyRandom {
 		nDestinations := float64(len(m.Configuration.ChangeDestinations))
 		var a *big.Int
@@ -713,7 +714,7 @@ func (m *DraftTransaction) setChangeDestinations(ctx context.Context, numberOfDe
 		); err != nil {
 			return err
 		} else if xPub == nil {
-			return ErrMissingXpub
+			return spverrors.ErrMissingFieldXpub
 		}
 
 		if num, err = xPub.incrementNextNum(
@@ -752,14 +753,14 @@ func (m *DraftTransaction) getInputsFromUtxos(reservedUtxos []*Utxo) ([]*bt.UTXO
 		if lockingScript, err = bscript.NewFromHexString(
 			utxo.ScriptPubKey,
 		); err != nil {
-			return nil, 0, errors.Wrap(ErrInvalidLockingScript, err.Error())
+			return nil, 0, spverrors.ErrInvalidLockingScript
 		}
 
 		var txIDBytes []byte
 		if txIDBytes, err = hex.DecodeString(
 			utxo.TransactionID,
 		); err != nil {
-			return nil, 0, errors.Wrap(ErrInvalidTransactionID, err.Error())
+			return nil, 0, spverrors.ErrInvalidTransactionID
 		}
 
 		inputUtxos = append(inputUtxos, &bt.UTXO{

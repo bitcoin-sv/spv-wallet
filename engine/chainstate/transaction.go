@@ -7,6 +7,7 @@ import (
 	"sync"
 	"time"
 
+	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/libsv/go-bc"
 )
 
@@ -83,5 +84,5 @@ func queryBroadcastClient(ctx context.Context, client ClientInterface, id string
 			BUMP:        bump,
 		}, nil
 	}
-	return nil, ErrTransactionIDMismatch
+	return nil, spverrors.ErrTransactionIDMismatch
 }

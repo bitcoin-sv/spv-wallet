@@ -153,7 +153,7 @@ func TestNewPaymail(t *testing.T) {
 		derivationForSecondXpub := pm.XpubDerivationSeq
 
 		// then
-		require.Equal(t, derivationNumber, pm.ExternalXpubKeyNum, "ExternalXpubKeyNum MUST NOT be changed durring any key rotation")
+		require.Equal(t, derivationNumber, pm.ExternalXpubKeyNum, "ExternalXpubKeyNum MUST NOT be changed during any key rotation")
 
 		require.Equal(t, uint32(1), derivationForFirstXpub, "XpubDerivationSeq after first rotation MUST equal 1")
 		require.Equal(t, uint32(2), derivationForSecondXpub, "XpubDerivationSeq after second rotation MUST equal 2")
@@ -192,7 +192,7 @@ func TestNewPaymail(t *testing.T) {
 
 		// then
 		require.Equal(t, initialDerivationSeq, pm.XpubDerivationSeq, "XpubDerivationSeq cannot be changed")
-		require.Equal(t, derivationNumber, pm.ExternalXpubKeyNum, "ExternalXpubKeyNum MUST NOT be changed durring any key rotation")
+		require.Equal(t, derivationNumber, pm.ExternalXpubKeyNum, "ExternalXpubKeyNum MUST NOT be changed during any key rotation")
 
 		require.Equal(t, firstPubKey, secondPubKey, "PubKeys must be equal")
 
@@ -234,7 +234,7 @@ func TestNewPaymail(t *testing.T) {
 
 		// then
 		require.Greater(t, pm.XpubDerivationSeq, initialDerivationSeq, "XpubDerivationSeq must be incremented after rotation")
-		require.Equal(t, derivationNumber, pm.ExternalXpubKeyNum, "ExternalXpubKeyNum MUST NOT be changed durring any key rotation")
+		require.Equal(t, derivationNumber, pm.ExternalXpubKeyNum, "ExternalXpubKeyNum MUST NOT be changed during any key rotation")
 
 		require.NotEqual(t, firstPubKey, secondPubKey)
 

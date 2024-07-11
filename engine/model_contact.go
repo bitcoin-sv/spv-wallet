@@ -9,6 +9,7 @@ import (
 
 	"github.com/bitcoin-sv/go-paymail"
 	"github.com/bitcoin-sv/spv-wallet/engine/datastore"
+	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/google/uuid"
 )
 
@@ -110,11 +111,11 @@ func getContactsByXPubIDCount(ctx context.Context, xPubID string, metadata *Meta
 
 func (c *Contact) validate() error {
 	if c.ID == "" {
-		return ErrMissingContactID
+		return spverrors.ErrMissingContactID
 	}
 
 	if c.FullName == "" {
-		return ErrMissingContactFullName
+		return spverrors.ErrMissingContactFullName
 	}
 
 	if err := paymail.ValidatePaymail(c.Paymail); err != nil {
@@ -122,15 +123,15 @@ func (c *Contact) validate() error {
 	}
 
 	if c.PubKey == "" {
-		return ErrMissingContactXPubKey
+		return spverrors.ErrMissingContactXPubKey
 	}
 
 	if c.Status == "" {
-		return ErrMissingContactStatus
+		return spverrors.ErrMissingContactStatus
 	}
 
 	if c.OwnerXpubID == "" {
-		return ErrMissingContactOwnerXPubId
+		return spverrors.ErrMissingContactOwnerXPubId
 	}
 
 	return nil

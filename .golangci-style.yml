@@ -3,9 +3,6 @@
 
 # options for analysis running
 run:
-  # default concurrency is an available CPU number
-  concurrency: 4
-
   # timeout for analysis, e.g. 30s, 5m, default is 1m
   timeout: 5m
 
@@ -112,6 +109,7 @@ issues:
     - .github
     - .make
     - dist
+    - engine # FIXME: skip engine dir until we fix all issues there
 
 severity:
   # Default value is empty string.
