@@ -71,6 +71,11 @@ func (m *Webhook) Migrate(client datastore.ClientInterface) error {
 	return client.IndexMetadata(client.GetTableName(tableAccessKeys), metadataField)
 }
 
+func (m *Webhook) delete() {
+	m.DeletedAt.Valid = true
+	m.DeletedAt.Time = time.Now()
+}
+
 // Banned returns true if the webhook is banned right now
 func (m *Webhook) Banned() bool {
 	if m.BannedTo.Valid == false {
@@ -95,14 +100,8 @@ func (m *Webhook) GetTokenValue() string {
 	return m.Token
 }
 
-// MarkDeleted sets DeletedAt fields to the current time
-func (m *Webhook) MarkDeleted() {
-	m.DeletedAt.Valid = true
-	m.DeletedAt.Time = time.Now()
-}
-
-// MarkBanned sets BannedTo field to the given time
-func (m *Webhook) MarkBanned(bannedTo time.Time) {
+// MarkUntil sets BannedTo field to the given time
+func (m *Webhook) MarkUntil(bannedTo time.Time) {
 	m.BannedTo.Valid = true
 	m.BannedTo.Time = bannedTo
 }
@@ -138,6 +137,20 @@ func (wr *WebhooksRepository) Save(ctx context.Context, model notifications.Mode
 	if !ok {
 		return errors.New("Unknown implementation of notifications.ModelWebhook")
 	}
+	err := webhook.Save(ctx)
+	if err != nil {
+		return errors.Wrap(err, "Cannot save the ModelWebhook")
+	}
+	return nil
+}
+
+// Save stores a model in the database
+func (wr *WebhooksRepository) Delete(ctx context.Context, model notifications.ModelWebhook) error {
+	webhook, ok := model.(*Webhook)
+	if !ok {
+		return errors.New("Unknown implementation of notifications.ModelWebhook")
+	}
+	webhook.delete()
 	err := webhook.Save(ctx)
 	if err != nil {
 		return errors.Wrap(err, "Cannot save the ModelWebhook")

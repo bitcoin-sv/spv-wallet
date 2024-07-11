@@ -30,6 +30,18 @@ func (r *mockRepository) Save(_ context.Context, model ModelWebhook) error {
 	return nil
 }
 
+func (r *mockRepository) Delete(_ context.Context, model ModelWebhook) error {
+	for i, w := range r.webhooks {
+		if w.GetURL() == model.GetURL() {
+			webhook := r.webhooks[i].(*mockModelWebhook)
+			webhook.deleted = true
+			r.webhooks[i] = webhook
+			return nil
+		}
+	}
+	return nil
+}
+
 func (r *mockRepository) GetAll(_ context.Context) ([]ModelWebhook, error) {
 	return r.webhooks, nil
 }

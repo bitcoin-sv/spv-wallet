@@ -78,11 +78,10 @@ func (w *WebhookManager) Subscribe(ctx context.Context, url, tokenHeader, tokenV
 // Unsubscribe unsubscribes from a webhook. It removes the webhook from the database and stops the notifier for it.
 func (w *WebhookManager) Unsubscribe(ctx context.Context, url string) error {
 	model, err := w.repository.GetByURL(ctx, url)
-	if err != nil || model.Deleted() {
-		return spverrors.ErrWebhookUnsubscriptionNotFound
+	if err != nil || model == nil || model.Deleted() {
+		return spverrors.ErrWebhookSubscriptionNotFound
 	}
-	model.MarkDeleted()
-	err = w.repository.Save(ctx, model)
+	err = w.repository.Delete(ctx, model)
 	if err != nil {
 		return spverrors.ErrWebhookUnsubscriptionFailed
 	}
@@ -186,7 +185,7 @@ func (w *WebhookManager) markWebhookAsBanned(ctx context.Context, url string) er
 	if err != nil {
 		return errors.Wrap(err, "Cannot find the webhook model")
 	}
-	model.MarkBanned(time.Now().Add(banTime))
+	model.MarkUntil(time.Now().Add(banTime))
 	err = w.repository.Save(ctx, model)
 	if err != nil {
 		return errors.Wrap(err, "Cannot update the webhook model")
