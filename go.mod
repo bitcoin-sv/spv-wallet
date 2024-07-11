@@ -1,6 +1,6 @@
 module github.com/bitcoin-sv/spv-wallet
 
-go 1.22.4
+go 1.22.5
 
 // NOTE: The following replace directives are essential for maintaining the cohesion and functionality of this project.
 // We are using the packages github.com/bitcoin-sv/spv-wallet/models and github.com/bitcoin-sv/spv-wallet/engine directly
