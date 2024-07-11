@@ -2,12 +2,12 @@ package engine
 
 import (
 	"context"
-	"errors"
 	"time"
 
 	"github.com/bitcoin-sv/spv-wallet/engine/datastore"
 	customTypes "github.com/bitcoin-sv/spv-wallet/engine/datastore/customtypes"
 	"github.com/bitcoin-sv/spv-wallet/engine/notifications"
+	"github.com/pkg/errors"
 )
 
 // Webhook stores information about subscriptions to notifications via webhooks
@@ -71,18 +71,42 @@ func (m *Webhook) Migrate(client datastore.ClientInterface) error {
 	return client.IndexMetadata(client.GetTableName(tableAccessKeys), metadataField)
 }
 
-// GetWebhookModel will return the webhook model
-func (m *Webhook) GetWebhookModel() *notifications.WebhookModel {
-	model := &notifications.WebhookModel{
-		URL:         m.URL,
-		TokenHeader: m.TokenHeader,
-		TokenValue:  m.Token,
+// Banned
+func (m *Webhook) Banned() bool {
+	if m.BannedTo.Valid == false {
+		return false
 	}
+	ret := !time.Now().After(m.BannedTo.Time)
+	return ret
+}
 
-	if m.BannedTo.Valid {
-		model.BannedTo = &m.BannedTo.Time
-	}
-	return model
+func (m *Webhook) GetURL() string {
+	return m.URL
+}
+
+func (m *Webhook) GetTokenHeader() string {
+	return m.TokenHeader
+}
+
+func (m *Webhook) GetTokenValue() string {
+	return m.Token
+}
+
+func (m *Webhook) MarkDeleted() {
+	m.DeletedAt.Valid = true
+	m.DeletedAt.Time = time.Now()
+}
+
+func (m *Webhook) MarkBanned(bannedTo time.Time) {
+	m.BannedTo.Valid = true
+	m.BannedTo.Time = bannedTo
+}
+
+func (m *Webhook) Refresh(tokenHeader, tokenValue string) {
+	m.DeletedAt.Valid = false
+	m.BannedTo.Valid = false
+	m.TokenHeader = tokenHeader
+	m.Token = tokenValue
 }
 
 // WebhooksRepository is the repository for webhooks. It implements the WebhooksRepository interface
@@ -91,25 +115,27 @@ type WebhooksRepository struct {
 }
 
 // CreateWebhook stores a new webhook or updates an existing one in the database
-func (wr *WebhooksRepository) CreateWebhook(ctx context.Context, url, tokenHeader, tokenValue string) error {
-	found, err := wr.getByURL(ctx, url)
-	if err != nil {
-		return err
-	}
-	if found != nil {
-		found.DeletedAt.Valid = false
-		found.BannedTo.Valid = false
-		found.TokenHeader = tokenHeader
-		found.Token = tokenValue
-		return found.Save(ctx)
-	}
+func (wr *WebhooksRepository) Create(ctx context.Context, url, tokenHeader, tokenValue string) error {
 	opts := append(wr.client.DefaultModelOptions(), New())
 	model := newWebhook(url, tokenHeader, tokenValue, opts...)
 	return model.Save(ctx)
 }
 
+// CreateWebhook stores a new webhook or updates an existing one in the database
+func (wr *WebhooksRepository) Save(ctx context.Context, model notifications.ModelWebhook) error {
+	webhook, ok := model.(*Webhook)
+	if !ok {
+		return errors.New("Unknown implementation of notifications.ModelWebhook")
+	}
+	err := webhook.Save(ctx)
+	if err != nil {
+		return errors.Wrap(err, "Cannot save the ModelWebhook")
+	}
+	return nil
+}
+
 // getByURL gets a webhook by its URL. If the webhook does not exist, it returns a nil pointer and no error
-func (wr *WebhooksRepository) getByURL(ctx context.Context, url string) (*Webhook, error) {
+func (wr *WebhooksRepository) GetByURL(ctx context.Context, url string) (notifications.ModelWebhook, error) {
 	conditions := map[string]any{
 		"url": url,
 	}
@@ -127,34 +153,8 @@ func (wr *WebhooksRepository) getByURL(ctx context.Context, url string) (*Webhoo
 	return webhook, nil
 }
 
-// RemoveWebhook removes a webhook from the database
-func (wr *WebhooksRepository) RemoveWebhook(ctx context.Context, url string) error {
-	webhook, err := wr.getByURL(ctx, url)
-	if err != nil {
-		return err
-	}
-
-	webhook.DeletedAt.Valid = true
-	webhook.DeletedAt.Time = time.Now()
-
-	return Save(ctx, webhook)
-}
-
-// BanWebhook bans a webhook until the specified time
-func (wr *WebhooksRepository) BanWebhook(ctx context.Context, url string, bannedTo time.Time) error {
-	webhook, err := wr.getByURL(ctx, url)
-	if err != nil {
-		return err
-	}
-
-	webhook.BannedTo.Valid = true
-	webhook.BannedTo.Time = bannedTo
-
-	return Save(ctx, webhook)
-}
-
 // GetWebhooks gets all webhooks from the database
-func (wr *WebhooksRepository) GetWebhooks(ctx context.Context) ([]*notifications.WebhookModel, error) {
+func (wr *WebhooksRepository) GetAll(ctx context.Context) ([]notifications.ModelWebhook, error) {
 	conditions := map[string]any{
 		deletedAtField: nil,
 	}
@@ -162,10 +162,10 @@ func (wr *WebhooksRepository) GetWebhooks(ctx context.Context) ([]*notifications
 	if err != nil {
 		return nil, err
 	}
-	// map to slice of WebhookInterface
-	res := make([]*notifications.WebhookModel, len(list))
+	// map to slice of ModelWebhook
+	res := make([]notifications.ModelWebhook, len(list))
 	for i, elem := range list {
-		res[i] = elem.GetWebhookModel()
+		res[i] = elem
 	}
 	return res, nil
 }

@@ -85,8 +85,47 @@ func (mc *mockClient) assertEventsWereSentInBatches(t *testing.T, expected bool)
 	assert.Equal(t, expected, result)
 }
 
-func newMockWebhookModel(url, tokenHeader, tokenValue string) *WebhookModel {
-	return &WebhookModel{
+type mockModelWebhook struct {
+	BannedTo    *time.Time
+	URL         string
+	TokenHeader string
+	TokenValue  string
+	deleted     bool
+}
+
+func (m *mockModelWebhook) Banned() bool {
+	return m.BannedTo != nil
+}
+
+func (m *mockModelWebhook) GetURL() string {
+	return m.URL
+}
+
+func (m *mockModelWebhook) GetTokenHeader() string {
+	return m.TokenHeader
+}
+
+func (m *mockModelWebhook) GetTokenValue() string {
+	return m.TokenValue
+}
+
+func (m *mockModelWebhook) MarkDeleted() {
+	m.deleted = true
+}
+
+func (m *mockModelWebhook) MarkBanned(bannedTo time.Time) {
+	m.BannedTo = &bannedTo
+}
+
+func (m *mockModelWebhook) Refresh(tokenHeader, tokenValue string) {
+	m.BannedTo = nil
+	m.deleted = false
+	m.TokenHeader = tokenHeader
+	m.TokenValue = tokenValue
+}
+
+func newMockWebhookModel(url, tokenHeader, tokenValue string) *mockModelWebhook {
+	return &mockModelWebhook{
 		URL:         url,
 		TokenHeader: tokenHeader,
 		TokenValue:  tokenValue,
@@ -103,7 +142,7 @@ func TestWebhookNotifier(t *testing.T) {
 
 		ctx, cancel := context.WithCancel(context.Background())
 		n := NewNotifications(ctx)
-		notifier := NewWebhookNotifier(ctx, &nopLogger, *newMockWebhookModel(client.url, "", ""), make(chan string))
+		notifier := NewWebhookNotifier(ctx, &nopLogger, newMockWebhookModel(client.url, "", ""), make(chan string))
 		n.AddNotifier(client.url, notifier.Channel)
 
 		expected := []string{}
@@ -131,10 +170,10 @@ func TestWebhookNotifier(t *testing.T) {
 		ctx, cancel := context.WithCancel(context.Background())
 		n := NewNotifications(ctx)
 
-		notifier1 := NewWebhookNotifier(ctx, &nopLogger, *newMockWebhookModel(client1.url, "", ""), make(chan string))
+		notifier1 := NewWebhookNotifier(ctx, &nopLogger, newMockWebhookModel(client1.url, "", ""), make(chan string))
 		n.AddNotifier(client1.url, notifier1.Channel)
 
-		notifier2 := NewWebhookNotifier(ctx, &nopLogger, *newMockWebhookModel(client2.url, "", ""), make(chan string))
+		notifier2 := NewWebhookNotifier(ctx, &nopLogger, newMockWebhookModel(client2.url, "", ""), make(chan string))
 		n.AddNotifier(client2.url, notifier2.Channel)
 
 		expected := []string{}
@@ -163,7 +202,7 @@ func TestWebhookNotifier(t *testing.T) {
 
 		ctx, cancel := context.WithCancel(context.Background())
 		n := NewNotifications(ctx)
-		notifier := NewWebhookNotifier(ctx, &nopLogger, *newMockWebhookModel(client.url, "", ""), make(chan string))
+		notifier := NewWebhookNotifier(ctx, &nopLogger, newMockWebhookModel(client.url, "", ""), make(chan string))
 		n.AddNotifier(client.url, notifier.Channel)
 
 		expected := []string{}
@@ -198,7 +237,7 @@ func TestWebhookNotifier(t *testing.T) {
 
 		ctx, cancel := context.WithCancel(context.Background())
 		n := NewNotifications(ctx)
-		notifier := NewWebhookNotifier(ctx, &nopLogger, *newMockWebhookModel(client.url, "", ""), make(chan string))
+		notifier := NewWebhookNotifier(ctx, &nopLogger, newMockWebhookModel(client.url, "", ""), make(chan string))
 		n.AddNotifier(client.url, notifier.Channel)
 
 		expected := []string{}
@@ -227,7 +266,7 @@ func TestWebhookNotifier(t *testing.T) {
 		banMsg := make(chan string)
 		ctx, cancel := context.WithCancel(context.Background())
 		n := NewNotifications(ctx)
-		notifier := NewWebhookNotifier(ctx, &nopLogger, *newMockWebhookModel(client.url, "", ""), banMsg)
+		notifier := NewWebhookNotifier(ctx, &nopLogger, newMockWebhookModel(client.url, "", ""), banMsg)
 		n.AddNotifier(client.url, notifier.Channel)
 
 		for i := 0; i < 10; i++ {
@@ -275,7 +314,7 @@ func TestWebhookNotifier(t *testing.T) {
 
 		ctx, cancel := context.WithCancel(context.Background())
 		n := NewNotifications(ctx)
-		notifier := NewWebhookNotifier(ctx, &nopLogger, *newMockWebhookModel(client.url, tokenHeader, tokenValue), make(chan string))
+		notifier := NewWebhookNotifier(ctx, &nopLogger, newMockWebhookModel(client.url, tokenHeader, tokenValue), make(chan string))
 		n.AddNotifier(client.url, notifier.Channel)
 
 		for i := 0; i < 10; i++ {

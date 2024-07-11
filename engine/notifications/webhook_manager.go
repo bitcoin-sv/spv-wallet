@@ -55,20 +55,38 @@ func (w *WebhookManager) Stop() {
 
 // Subscribe subscribes to a webhook. It adds the webhook to the database and starts a notifier for it.
 func (w *WebhookManager) Subscribe(ctx context.Context, url, tokenHeader, tokenValue string) error {
-	err := w.repository.CreateWebhook(ctx, url, tokenHeader, tokenValue)
-	if err == nil {
-		w.updateMsg <- true
+	found, err := w.repository.GetByURL(ctx, url)
+	if err != nil {
+		return errors.Wrap(err, "Failed to check existing webhook in database")
 	}
-	return errors.Wrap(err, "failed to create webhook")
+	if found != nil {
+		found.Refresh(tokenHeader, tokenValue)
+		err = w.repository.Save(ctx, found)
+	} else {
+		err = w.repository.Create(ctx, url, tokenHeader, tokenValue)
+	}
+
+	if err != nil {
+		return errors.Wrap(err, "Failed to store the webhook")
+	}
+
+	w.updateMsg <- true
+	return nil
 }
 
 // Unsubscribe unsubscribes from a webhook. It removes the webhook from the database and stops the notifier for it.
 func (w *WebhookManager) Unsubscribe(ctx context.Context, url string) error {
-	err := w.repository.RemoveWebhook(ctx, url)
-	if err == nil {
-		w.updateMsg <- true
+	model, err := w.repository.GetByURL(ctx, url)
+	if err != nil {
+		return errors.Wrap(err, "Cannot find the webhook model")
 	}
-	return errors.Wrap(err, "failed to remove webhook")
+	model.MarkDeleted()
+	err = w.repository.Save(ctx, model)
+	if err != nil {
+		return errors.Wrap(err, "Cannot update the webhook model")
+	}
+	w.updateMsg <- true
+	return nil
 }
 
 func (w *WebhookManager) checkForUpdates() {
@@ -89,7 +107,7 @@ func (w *WebhookManager) checkForUpdates() {
 		case <-w.updateMsg:
 			w.update()
 		case url := <-w.banMsg:
-			err := w.repository.BanWebhook(w.rootContext, url, time.Now().Add(banTime))
+			err := w.markWebhookAsBanned(w.rootContext, url)
 			if err != nil {
 				w.logger.Warn().Msgf("failed to mark a webhook as banned: %v", err)
 			}
@@ -106,14 +124,14 @@ func (w *WebhookManager) update() {
 			w.logger.Warn().Msgf("WebhookManager update failed: %v", err)
 		}
 	}()
-	dbWebhooks, err := w.repository.GetWebhooks(w.rootContext)
+	dbWebhooks, err := w.repository.GetAll(w.rootContext)
 	if err != nil {
 		w.logger.Warn().Msgf("failed to get webhooks: %v", err)
 		return
 	}
 
 	// filter out banned webhooks
-	var filteredWebhooks []*WebhookModel
+	var filteredWebhooks []ModelWebhook
 	for _, webhook := range dbWebhooks {
 		if !webhook.Banned() {
 			filteredWebhooks = append(filteredWebhooks, webhook)
@@ -122,7 +140,7 @@ func (w *WebhookManager) update() {
 
 	// add notifiers which are not in the map
 	for _, model := range filteredWebhooks {
-		if _, ok := w.webhookNotifiers.Load(model.URL); !ok {
+		if _, ok := w.webhookNotifiers.Load(model.GetURL()); !ok {
 			w.addNotifier(model)
 		}
 	}
@@ -138,18 +156,18 @@ func (w *WebhookManager) update() {
 
 	// update definition of remained webhooks
 	for _, model := range filteredWebhooks {
-		if item, ok := w.webhookNotifiers.Load(model.URL); ok {
-			item.(*notifierWithCtx).notifier.Update(*model)
+		if item, ok := w.webhookNotifiers.Load(model.GetURL()); ok {
+			item.(*notifierWithCtx).notifier.Update(model)
 		}
 	}
 }
 
-func (w *WebhookManager) addNotifier(model *WebhookModel) {
-	w.logger.Info().Msgf("Add a webhook notifier. URL: %s", model.URL)
+func (w *WebhookManager) addNotifier(model ModelWebhook) {
+	w.logger.Info().Msgf("Add a webhook notifier. URL: %s", model.GetURL())
 	ctx, cancel := context.WithCancel(w.rootContext)
-	notifier := NewWebhookNotifier(ctx, w.logger, *model, w.banMsg)
-	w.webhookNotifiers.Store(model.URL, &notifierWithCtx{notifier: notifier, ctx: ctx, cancelFunc: cancel})
-	w.notifications.AddNotifier(model.URL, notifier.Channel)
+	notifier := NewWebhookNotifier(ctx, w.logger, model, w.banMsg)
+	w.webhookNotifiers.Store(model.GetURL(), &notifierWithCtx{notifier: notifier, ctx: ctx, cancelFunc: cancel})
+	w.notifications.AddNotifier(model.GetURL(), notifier.Channel)
 }
 
 func (w *WebhookManager) removeNotifier(url string) {
@@ -162,9 +180,22 @@ func (w *WebhookManager) removeNotifier(url string) {
 	}
 }
 
-func containsWebhook(webhooks []*WebhookModel, url string) bool {
+func (w *WebhookManager) markWebhookAsBanned(ctx context.Context, url string) error {
+	model, err := w.repository.GetByURL(ctx, url)
+	if err != nil {
+		return errors.Wrap(err, "Cannot find the webhook model")
+	}
+	model.MarkBanned(time.Now().Add(banTime))
+	err = w.repository.Save(ctx, model)
+	if err != nil {
+		return errors.Wrap(err, "Cannot update the webhook model")
+	}
+	return nil
+}
+
+func containsWebhook(webhooks []ModelWebhook, url string) bool {
 	for _, webhook := range webhooks {
-		if webhook.URL == url {
+		if webhook.GetURL() == url {
 			return true
 		}
 	}

@@ -26,14 +26,14 @@ type WebhookNotifier struct {
 	Channel       chan *models.RawEvent
 	banMsg        chan string
 	httpClient    *http.Client
-	definition    WebhookModel
+	definition    ModelWebhook
 	definitionMtx sync.Mutex
 	logger        *zerolog.Logger
 }
 
 // NewWebhookNotifier - creates a new instance of WebhookNotifier
-func NewWebhookNotifier(ctx context.Context, logger *zerolog.Logger, model WebhookModel, banMsg chan string) *WebhookNotifier {
-	log := logger.With().Str("subservice", "WebhookNotifier").Str("webhookUrl", model.URL).Logger()
+func NewWebhookNotifier(ctx context.Context, logger *zerolog.Logger, model ModelWebhook, banMsg chan string) *WebhookNotifier {
+	log := logger.With().Str("subservice", "WebhookNotifier").Str("webhookUrl", model.GetURL()).Logger()
 	notifier := &WebhookNotifier{
 		Channel:    make(chan *models.RawEvent, lengthOfWebhookChannel),
 		definition: model,
@@ -48,14 +48,14 @@ func NewWebhookNotifier(ctx context.Context, logger *zerolog.Logger, model Webho
 }
 
 // Update - updates the webhook model
-func (w *WebhookNotifier) Update(model WebhookModel) {
+func (w *WebhookNotifier) Update(model ModelWebhook) {
 	w.definitionMtx.Lock()
 	defer w.definitionMtx.Unlock()
 
 	w.definition = model
 }
 
-func (w *WebhookNotifier) currentDefinition() WebhookModel {
+func (w *WebhookNotifier) currentDefinition() ModelWebhook {
 	w.definitionMtx.Lock()
 	defer w.definitionMtx.Unlock()
 
@@ -89,7 +89,7 @@ func (w *WebhookNotifier) consumer(ctx context.Context) {
 			}
 
 			if err != nil {
-				w.banMsg <- w.currentDefinition().URL
+				w.banMsg <- w.currentDefinition().GetURL()
 				return
 			}
 		case <-ctx.Done():
@@ -127,13 +127,13 @@ func (w *WebhookNotifier) sendEventsToWebhook(ctx context.Context, events []*mod
 		return errors.Wrap(err, "failed to marshal events")
 	}
 
-	req, err := http.NewRequestWithContext(ctx, "POST", definition.URL, bytes.NewBuffer(data))
+	req, err := http.NewRequestWithContext(ctx, "POST", definition.GetURL(), bytes.NewBuffer(data))
 	if err != nil {
 		return errors.Wrap(err, "failed to create request")
 	}
 
 	req.Header.Set("Content-Type", "application/json")
-	tokenHeader, tokenValue := definition.TokenHeader, definition.TokenValue
+	tokenHeader, tokenValue := definition.GetTokenHeader(), definition.GetTokenValue()
 	if tokenHeader != "" {
 		req.Header.Set(tokenHeader, tokenValue)
 	}

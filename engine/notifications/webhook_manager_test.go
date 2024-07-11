@@ -10,36 +10,37 @@ import (
 )
 
 type mockRepository struct {
-	webhooks []*WebhookModel
+	webhooks []ModelWebhook
 }
 
-func (r *mockRepository) CreateWebhook(_ context.Context, url, tokenHeader, tokenValue string) error {
+func (r *mockRepository) Create(_ context.Context, url, tokenHeader, tokenValue string) error {
 	model := newMockWebhookModel(url, tokenHeader, tokenValue)
 	r.webhooks = append(r.webhooks, model)
 	return nil
 }
 
-func (r *mockRepository) RemoveWebhook(_ context.Context, url string) error {
+func (r *mockRepository) Save(_ context.Context, model ModelWebhook) error {
 	for i, w := range r.webhooks {
-		if w.URL == url {
-			r.webhooks = append(r.webhooks[:i], r.webhooks[i+1:]...)
+		if w.GetURL() == model.GetURL() {
+			r.webhooks[i] = model
 			return nil
 		}
 	}
-	return fmt.Errorf("webhook not found")
+	r.webhooks = append(r.webhooks, model)
+	return nil
 }
 
-func (r *mockRepository) GetWebhooks(_ context.Context) ([]*WebhookModel, error) {
+func (r *mockRepository) GetAll(_ context.Context) ([]ModelWebhook, error) {
 	return r.webhooks, nil
 }
 
-func (r *mockRepository) BanWebhook(_ context.Context, url string, banTime time.Time) error {
-	for _, item := range r.webhooks {
-		if item.URL == url {
-			item.BannedTo = &banTime
+func (r *mockRepository) GetByURL(_ context.Context, url string) (ModelWebhook, error) {
+	for _, w := range r.webhooks {
+		if w.GetURL() == url {
+			return w, nil
 		}
 	}
-	return nil
+	return nil, nil
 }
 
 func TestWebhookManager(t *testing.T) {
@@ -53,7 +54,7 @@ func TestWebhookManager(t *testing.T) {
 		ctx, cancel := context.WithCancel(context.Background())
 
 		n := NewNotifications(ctx)
-		repo := &mockRepository{webhooks: []*WebhookModel{newMockWebhookModel(client.url, "", "")}}
+		repo := &mockRepository{webhooks: []ModelWebhook{newMockWebhookModel(client.url, "", "")}}
 
 		manager := NewWebhookManager(ctx, &nopLogger, n, repo)
 		time.Sleep(100 * time.Millisecond) // wait for manager to update notifiers
@@ -83,7 +84,7 @@ func TestWebhookManager(t *testing.T) {
 		ctx, cancel := context.WithCancel(context.Background())
 
 		n := NewNotifications(ctx)
-		repo := &mockRepository{webhooks: []*WebhookModel{newMockWebhookModel(client.url, "", "")}}
+		repo := &mockRepository{webhooks: []ModelWebhook{newMockWebhookModel(client.url, "", "")}}
 
 		manager := NewWebhookManager(ctx, &nopLogger, n, repo)
 		time.Sleep(100 * time.Millisecond)

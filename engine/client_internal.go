@@ -122,7 +122,7 @@ func (c *Client) SubscribeWebhook(ctx context.Context, url, tokenHeader, token s
 
 func (c *Client) UnsubscribeWebhook(ctx context.Context, url string) error {
 	if c.options.notifications == nil || c.options.notifications.webhookManager == nil {
-		return nil
+		return errors.New("webhooks are not enabled")
 	}
 
 	return c.options.notifications.webhookManager.Unsubscribe(ctx, url)

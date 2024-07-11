@@ -42,8 +42,8 @@ func NewHandler(appConfig *config.AppConfig, services *config.AppServices) route
 		adminGroup.POST("/xpub", action.xpubsCreate)
 		adminGroup.POST("/xpubs/search", action.xpubsSearch)
 		adminGroup.POST("/xpubs/count", action.xpubsCount)
-		adminGroup.POST("/webhooks/subscription", action.subscribeWebhook)
-		adminGroup.DELETE("/webhooks/subscription", action.unsubscribeWebhook)
+		adminGroup.POST("/webhooks/subscriptions", action.subscribeWebhook)
+		adminGroup.DELETE("/webhooks/subscriptions", action.unsubscribeWebhook)
 	})
 
 	return adminEndpoints
