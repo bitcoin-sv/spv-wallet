@@ -56,8 +56,8 @@ func (a *Action) search(c *gin.Context) {
 // TODO: this method is not finished and will be changed based on search poc
 // transactions will fetch a list of transactions filtered on conditions and metadata
 // Get transactions godoc
-// @Summary		Get transactions
-// @Description	Get transactions
+// @Summary		Experimental - Get transactions
+// @Description	Experimental (not ready for production use yet) - Get transactions
 // @Tags		Transactions
 // @Produce		json
 // @Param		SearchTransactions body filter.SearchTransactions false "Supports targeted resource searches with filters and metadata, plus options for pagination and sorting to streamline data exploration and analysis"

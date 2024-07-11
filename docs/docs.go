@@ -22,14 +22,14 @@ const docTemplate = `{
                         "x-auth-xpub": []
                     }
                 ],
-                "description": "Get transactions",
+                "description": "Experimental (not ready for production use yet) - Get transactions",
                 "produces": [
                     "application/json"
                 ],
                 "tags": [
                     "Transactions"
                 ],
-                "summary": "Get transactions",
+                "summary": "Experimental - Get transactions",
                 "parameters": [
                     {
                         "description": "Supports targeted resource searches with filters and metadata, plus options for pagination and sorting to streamline data exploration and analysis",
@@ -4673,25 +4673,9 @@ const docTemplate = `{
                 1000000,
                 1000000000,
                 60000000000,
-                3600000000000,
-                -9223372036854775808,
-                9223372036854775807,
-                1,
-                1000,
-                1000000,
-                1000000000,
-                60000000000,
                 3600000000000
             ],
             "x-enum-varnames": [
-                "minDuration",
-                "maxDuration",
-                "Nanosecond",
-                "Microsecond",
-                "Millisecond",
-                "Second",
-                "Minute",
-                "Hour",
                 "minDuration",
                 "maxDuration",
                 "Nanosecond",
