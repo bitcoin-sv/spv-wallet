@@ -19,7 +19,7 @@ import (
 
 const (
 	atSign                   = "@"
-	domainPrefix             = "http://"
+	domainPrefix             = "https://"
 	domainSuffixSharedConfig = "/v1/shared-config"
 	spvWalletIndexResponse   = "Welcome to the SPV Wallet ✌(◕‿-)✌"
 
