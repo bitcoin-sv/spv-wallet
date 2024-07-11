@@ -5,6 +5,7 @@ import (
 	"sync"
 	"time"
 
+	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 )
@@ -77,13 +78,13 @@ func (w *WebhookManager) Subscribe(ctx context.Context, url, tokenHeader, tokenV
 // Unsubscribe unsubscribes from a webhook. It removes the webhook from the database and stops the notifier for it.
 func (w *WebhookManager) Unsubscribe(ctx context.Context, url string) error {
 	model, err := w.repository.GetByURL(ctx, url)
-	if err != nil {
-		return errors.Wrap(err, "Cannot find the webhook model")
+	if err != nil || model.Deleted() {
+		return spverrors.ErrWebhookUnsubscriptionNotFound
 	}
 	model.MarkDeleted()
 	err = w.repository.Save(ctx, model)
 	if err != nil {
-		return errors.Wrap(err, "Cannot update the webhook model")
+		return spverrors.ErrWebhookUnsubscriptionFailed
 	}
 	w.updateMsg <- true
 	return nil

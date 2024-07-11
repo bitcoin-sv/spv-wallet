@@ -11,10 +11,10 @@ import (
 	"github.com/bitcoin-sv/spv-wallet/engine/cluster"
 	"github.com/bitcoin-sv/spv-wallet/engine/datastore"
 	"github.com/bitcoin-sv/spv-wallet/engine/notifications"
+	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/bitcoin-sv/spv-wallet/engine/taskmanager"
 	"github.com/bitcoin-sv/spv-wallet/models"
 	"github.com/mrz1836/go-cachestore"
-	"github.com/pkg/errors"
 )
 
 // loadCache will load caching configuration and start the Cachestore client
@@ -90,9 +90,9 @@ func (c *Client) loadNotificationClient(ctx context.Context) (err error) {
 	if c.options.notifications == nil || !c.options.notifications.enabled {
 		return
 	}
-	notificationService := notifications.NewNotifications(ctx)
-	c.options.notifications.client = notificationService
 	logger := c.Logger().With().Str("subservice", "notification").Logger()
+	notificationService := notifications.NewNotifications(ctx, &logger)
+	c.options.notifications.client = notificationService
 	c.options.notifications.webhookManager = notifications.NewWebhookManager(ctx, &logger, notificationService, &WebhooksRepository{client: c})
 
 	// for development purposes only
@@ -110,19 +110,19 @@ func (c *Client) loadNotificationClient(ctx context.Context) (err error) {
 
 func (c *Client) SubscribeWebhook(ctx context.Context, url, tokenHeader, token string) error {
 	if c.options.notifications == nil || c.options.notifications.webhookManager == nil {
-		return errors.New("webhooks are not enabled")
+		return spverrors.ErrNotificationsDisabled
 	}
 
 	err := c.options.notifications.webhookManager.Subscribe(ctx, url, tokenHeader, token)
 	if err != nil {
-		return errors.Wrap(err, "failed to subscribe to webhook")
+		return spverrors.ErrWebhookSubscriptionFailed
 	}
 	return nil
 }
 
 func (c *Client) UnsubscribeWebhook(ctx context.Context, url string) error {
 	if c.options.notifications == nil || c.options.notifications.webhookManager == nil {
-		return errors.New("webhooks are not enabled")
+		return spverrors.ErrNotificationsDisabled
 	}
 
 	return c.options.notifications.webhookManager.Unsubscribe(ctx, url)

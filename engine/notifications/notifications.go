@@ -3,8 +3,10 @@ package notifications
 import (
 	"context"
 	"sync"
+	"time"
 
 	"github.com/bitcoin-sv/spv-wallet/models"
+	"github.com/rs/zerolog"
 )
 
 const lengthOfInputChannel = 100
@@ -13,6 +15,7 @@ const lengthOfInputChannel = 100
 type Notifications struct {
 	inputChannel   chan *models.RawEvent
 	outputChannels *sync.Map //[string, chan *Event]
+	burstLogger    *zerolog.Logger
 }
 
 // AddNotifier - add notifier by key
@@ -52,15 +55,20 @@ func (n *Notifications) sendEventToChannel(ch chan *models.RawEvent, event *mode
 	case ch <- event:
 		// Successfully sent event
 	default:
-		// Channel is full, skip sending event
+		n.burstLogger.Warn().Msg("Failed to send event to channel")
 	}
 }
 
 // NewNotifications - creates a new instance of Notifications
-func NewNotifications(ctx context.Context) *Notifications {
+func NewNotifications(ctx context.Context, parentLogger *zerolog.Logger) *Notifications {
+	burstLogger := parentLogger.With().Logger().Sample(&zerolog.BurstSampler{
+		Burst:  3,
+		Period: 30 * time.Second,
+	})
 	n := &Notifications{
 		inputChannel:   make(chan *models.RawEvent, lengthOfInputChannel),
 		outputChannels: new(sync.Map),
+		burstLogger:    &burstLogger,
 	}
 
 	go n.exchange(ctx)

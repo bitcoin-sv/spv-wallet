@@ -97,6 +97,10 @@ func (m *mockModelWebhook) Banned() bool {
 	return m.BannedTo != nil
 }
 
+func (m *mockModelWebhook) Deleted() bool {
+	return m.deleted
+}
+
 func (m *mockModelWebhook) GetURL() string {
 	return m.URL
 }
@@ -141,7 +145,7 @@ func TestWebhookNotifier(t *testing.T) {
 		client := newMockClient("http://localhost:8080")
 
 		ctx, cancel := context.WithCancel(context.Background())
-		n := NewNotifications(ctx)
+		n := NewNotifications(ctx, &nopLogger)
 		notifier := NewWebhookNotifier(ctx, &nopLogger, newMockWebhookModel(client.url, "", ""), make(chan string))
 		n.AddNotifier(client.url, notifier.Channel)
 
@@ -168,7 +172,7 @@ func TestWebhookNotifier(t *testing.T) {
 		client2 := newMockClient("http://localhost:8081")
 
 		ctx, cancel := context.WithCancel(context.Background())
-		n := NewNotifications(ctx)
+		n := NewNotifications(ctx, &nopLogger)
 
 		notifier1 := NewWebhookNotifier(ctx, &nopLogger, newMockWebhookModel(client1.url, "", ""), make(chan string))
 		n.AddNotifier(client1.url, notifier1.Channel)
@@ -201,7 +205,7 @@ func TestWebhookNotifier(t *testing.T) {
 		client := newMockClient("http://localhost:8080")
 
 		ctx, cancel := context.WithCancel(context.Background())
-		n := NewNotifications(ctx)
+		n := NewNotifications(ctx, &nopLogger)
 		notifier := NewWebhookNotifier(ctx, &nopLogger, newMockWebhookModel(client.url, "", ""), make(chan string))
 		n.AddNotifier(client.url, notifier.Channel)
 
@@ -236,7 +240,7 @@ func TestWebhookNotifier(t *testing.T) {
 		}
 
 		ctx, cancel := context.WithCancel(context.Background())
-		n := NewNotifications(ctx)
+		n := NewNotifications(ctx, &nopLogger)
 		notifier := NewWebhookNotifier(ctx, &nopLogger, newMockWebhookModel(client.url, "", ""), make(chan string))
 		n.AddNotifier(client.url, notifier.Channel)
 
@@ -265,7 +269,7 @@ func TestWebhookNotifier(t *testing.T) {
 
 		banMsg := make(chan string)
 		ctx, cancel := context.WithCancel(context.Background())
-		n := NewNotifications(ctx)
+		n := NewNotifications(ctx, &nopLogger)
 		notifier := NewWebhookNotifier(ctx, &nopLogger, newMockWebhookModel(client.url, "", ""), banMsg)
 		n.AddNotifier(client.url, notifier.Channel)
 
@@ -313,7 +317,7 @@ func TestWebhookNotifier(t *testing.T) {
 		}
 
 		ctx, cancel := context.WithCancel(context.Background())
-		n := NewNotifications(ctx)
+		n := NewNotifications(ctx, &nopLogger)
 		notifier := NewWebhookNotifier(ctx, &nopLogger, newMockWebhookModel(client.url, tokenHeader, tokenValue), make(chan string))
 		n.AddNotifier(client.url, notifier.Channel)
 

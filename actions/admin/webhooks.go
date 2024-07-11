@@ -27,7 +27,7 @@ func (a *Action) subscribeWebhook(c *gin.Context) {
 
 	err := a.Services.SpvWalletEngine.SubscribeWebhook(c.Request.Context(), requestBody.URL, requestBody.TokenHeader, requestBody.TokenValue)
 	if err != nil {
-		spverrors.ErrorResponse(c, spverrors.ErrWebhookSubscriptionFailed, a.Services.Logger)
+		spverrors.ErrorResponse(c, err, a.Services.Logger)
 		return
 	}
 
@@ -53,7 +53,7 @@ func (a *Action) unsubscribeWebhook(c *gin.Context) {
 
 	err := a.Services.SpvWalletEngine.UnsubscribeWebhook(c.Request.Context(), requestModel.URL)
 	if err != nil {
-		spverrors.ErrorResponse(c, spverrors.ErrWebhookUnsubscriptionFailed, a.Services.Logger)
+		spverrors.ErrorResponse(c, err, a.Services.Logger)
 		return
 	}
 

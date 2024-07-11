@@ -109,6 +109,10 @@ func (m *Webhook) Refresh(tokenHeader, tokenValue string) {
 	m.Token = tokenValue
 }
 
+func (m *Webhook) Deleted() bool {
+	return m.DeletedAt.Valid == true
+}
+
 // WebhooksRepository is the repository for webhooks. It implements the WebhooksRepository interface
 type WebhooksRepository struct {
 	client *Client

@@ -70,7 +70,7 @@ func sleepWithContext(ctx context.Context, d time.Duration) {
 func TestNotifications(t *testing.T) {
 	t.Run("one notifier", func(t *testing.T) {
 		ctx, cancel := context.WithCancel(context.Background())
-		n := NewNotifications(ctx)
+		n := NewNotifications(ctx, &nopLogger)
 		notifier := newMockNotifier(ctx, 100)
 		n.AddNotifier("test", notifier.channel)
 
@@ -89,7 +89,7 @@ func TestNotifications(t *testing.T) {
 
 	t.Run("two notifiers", func(t *testing.T) {
 		ctx, cancel := context.WithCancel(context.Background())
-		n := NewNotifications(ctx)
+		n := NewNotifications(ctx, &nopLogger)
 		notifier1 := newMockNotifier(ctx, 100)
 		notifier2 := newMockNotifier(ctx, 100)
 		n.AddNotifier("notifier1", notifier1.channel)
@@ -111,7 +111,7 @@ func TestNotifications(t *testing.T) {
 
 	t.Run("more notifications than output chan buffer", func(t *testing.T) {
 		ctx, cancel := context.WithCancel(context.Background())
-		n := NewNotifications(ctx)
+		n := NewNotifications(ctx, &nopLogger)
 		outputChanLength := 10
 		numberOfEvents := 50 // 50 > 10
 		notifier := newMockNotifier(ctx, outputChanLength)
@@ -135,7 +135,7 @@ func TestNotifications(t *testing.T) {
 
 	t.Run("slow and fast consumers", func(t *testing.T) {
 		ctx, cancel := context.WithCancel(context.Background())
-		n := NewNotifications(ctx)
+		n := NewNotifications(ctx, &nopLogger)
 		outputChanLength := 10
 		numberOfEvents := 50 // 50 > 10
 
@@ -165,7 +165,7 @@ func TestNotifications(t *testing.T) {
 
 	t.Run("buffered and unbuffered channels", func(t *testing.T) {
 		ctx, cancel := context.WithCancel(context.Background())
-		n := NewNotifications(ctx)
+		n := NewNotifications(ctx, &nopLogger)
 		outputChanLength := 10
 		numberOfEvents := 50 // 50 > 10
 

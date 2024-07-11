@@ -53,7 +53,7 @@ func TestWebhookManager(t *testing.T) {
 
 		ctx, cancel := context.WithCancel(context.Background())
 
-		n := NewNotifications(ctx)
+		n := NewNotifications(ctx, &nopLogger)
 		repo := &mockRepository{webhooks: []ModelWebhook{newMockWebhookModel(client.url, "", "")}}
 
 		manager := NewWebhookManager(ctx, &nopLogger, n, repo)
@@ -83,7 +83,7 @@ func TestWebhookManager(t *testing.T) {
 
 		ctx, cancel := context.WithCancel(context.Background())
 
-		n := NewNotifications(ctx)
+		n := NewNotifications(ctx, &nopLogger)
 		repo := &mockRepository{webhooks: []ModelWebhook{newMockWebhookModel(client.url, "", "")}}
 
 		manager := NewWebhookManager(ctx, &nopLogger, n, repo)
