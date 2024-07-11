@@ -100,8 +100,8 @@ func (m *Webhook) GetTokenValue() string {
 	return m.Token
 }
 
-// MarkUntil sets BannedTo field to the given time
-func (m *Webhook) MarkUntil(bannedTo time.Time) {
+// BanUntil sets BannedTo field to the given time
+func (m *Webhook) BanUntil(bannedTo time.Time) {
 	m.BannedTo.Valid = true
 	m.BannedTo.Time = bannedTo
 }

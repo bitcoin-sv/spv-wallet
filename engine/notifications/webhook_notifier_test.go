@@ -113,7 +113,7 @@ func (m *mockModelWebhook) GetTokenValue() string {
 	return m.TokenValue
 }
 
-func (m *mockModelWebhook) MarkUntil(bannedTo time.Time) {
+func (m *mockModelWebhook) BanUntil(bannedTo time.Time) {
 	m.BannedTo = &bannedTo
 }
 

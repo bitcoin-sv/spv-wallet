@@ -10,7 +10,7 @@ type ModelWebhook interface {
 	GetURL() string
 	GetTokenHeader() string
 	GetTokenValue() string
-	MarkUntil(bannedTo time.Time)
+	BanUntil(bannedTo time.Time)
 	Refresh(tokenHeader, tokenValue string)
 	Banned() bool
 	Deleted() bool

@@ -185,7 +185,7 @@ func (w *WebhookManager) markWebhookAsBanned(ctx context.Context, url string) er
 	if err != nil {
 		return errors.Wrap(err, "Cannot find the webhook model")
 	}
-	model.MarkUntil(time.Now().Add(banTime))
+	model.BanUntil(time.Now().Add(banTime))
 	err = w.repository.Save(ctx, model)
 	if err != nil {
 		return errors.Wrap(err, "Cannot update the webhook model")
