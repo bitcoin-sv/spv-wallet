@@ -49,6 +49,7 @@ func NewRawEvent[EventType models.Events](namedEvent *EventType) *models.RawEven
 	}
 }
 
+// Notify is a utility generc function which allows to push a new event to the notification system.
 func Notify[EventType models.Events](n *Notifications, event *EventType) {
 	rawEvent := NewRawEvent(event)
 	n.Notify(rawEvent)

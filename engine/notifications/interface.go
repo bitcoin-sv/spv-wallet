@@ -5,6 +5,7 @@ import (
 	"time"
 )
 
+// ModelWebhook is an interface for a webhook model.
 type ModelWebhook interface {
 	GetURL() string
 	GetTokenHeader() string

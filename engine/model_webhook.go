@@ -71,7 +71,7 @@ func (m *Webhook) Migrate(client datastore.ClientInterface) error {
 	return client.IndexMetadata(client.GetTableName(tableAccessKeys), metadataField)
 }
 
-// Banned
+// Banned returns true if the webhook is banned right now
 func (m *Webhook) Banned() bool {
 	if m.BannedTo.Valid == false {
 		return false
@@ -80,28 +80,34 @@ func (m *Webhook) Banned() bool {
 	return ret
 }
 
+// GetURL returns the URL of the webhook
 func (m *Webhook) GetURL() string {
 	return m.URL
 }
 
+// GetTokenHeader returns the token header of the webhook
 func (m *Webhook) GetTokenHeader() string {
 	return m.TokenHeader
 }
 
+// GetTokenValue returns the token value of the webhook
 func (m *Webhook) GetTokenValue() string {
 	return m.Token
 }
 
+// MarkDeleted sets DeletedAt fields to the current time
 func (m *Webhook) MarkDeleted() {
 	m.DeletedAt.Valid = true
 	m.DeletedAt.Time = time.Now()
 }
 
+// MarkBanned sets BannedTo field to the given time
 func (m *Webhook) MarkBanned(bannedTo time.Time) {
 	m.BannedTo.Valid = true
 	m.BannedTo.Time = bannedTo
 }
 
+// Refresh sets the DeletedAt and BannedTo fields to the zero value and updates the token header and value
 func (m *Webhook) Refresh(tokenHeader, tokenValue string) {
 	m.DeletedAt.Valid = false
 	m.BannedTo.Valid = false
@@ -109,6 +115,7 @@ func (m *Webhook) Refresh(tokenHeader, tokenValue string) {
 	m.Token = tokenValue
 }
 
+// Deleted returns true if the webhook is deleted
 func (m *Webhook) Deleted() bool {
 	return m.DeletedAt.Valid == true
 }
@@ -118,14 +125,14 @@ type WebhooksRepository struct {
 	client *Client
 }
 
-// CreateWebhook stores a new webhook or updates an existing one in the database
+// Create makes a new webhook instance and saves it to the database, it will fail if the webhook already exists in the database
 func (wr *WebhooksRepository) Create(ctx context.Context, url, tokenHeader, tokenValue string) error {
 	opts := append(wr.client.DefaultModelOptions(), New())
 	model := newWebhook(url, tokenHeader, tokenValue, opts...)
 	return model.Save(ctx)
 }
 
-// CreateWebhook stores a new webhook or updates an existing one in the database
+// Save stores a model in the database
 func (wr *WebhooksRepository) Save(ctx context.Context, model notifications.ModelWebhook) error {
 	webhook, ok := model.(*Webhook)
 	if !ok {
@@ -138,7 +145,7 @@ func (wr *WebhooksRepository) Save(ctx context.Context, model notifications.Mode
 	return nil
 }
 
-// getByURL gets a webhook by its URL. If the webhook does not exist, it returns a nil pointer and no error
+// GetByURL gets a webhook by its URL. If the webhook does not exist, it returns a nil pointer and no error
 func (wr *WebhooksRepository) GetByURL(ctx context.Context, url string) (notifications.ModelWebhook, error) {
 	conditions := map[string]any{
 		"url": url,
@@ -157,7 +164,7 @@ func (wr *WebhooksRepository) GetByURL(ctx context.Context, url string) (notific
 	return webhook, nil
 }
 
-// GetWebhooks gets all webhooks from the database
+// GetAll gets all webhooks from the database
 func (wr *WebhooksRepository) GetAll(ctx context.Context) ([]notifications.ModelWebhook, error) {
 	conditions := map[string]any{
 		deletedAtField: nil,
