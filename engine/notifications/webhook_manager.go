@@ -6,7 +6,6 @@ import (
 	"time"
 
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
-	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 )
 
@@ -58,7 +57,7 @@ func (w *WebhookManager) Stop() {
 func (w *WebhookManager) Subscribe(ctx context.Context, url, tokenHeader, tokenValue string) error {
 	found, err := w.repository.GetByURL(ctx, url)
 	if err != nil {
-		return errors.Wrap(err, "Failed to check existing webhook in database")
+		return spverrors.Wrapf(err, "failed to check existing webhook in database")
 	}
 	if found != nil {
 		found.Refresh(tokenHeader, tokenValue)
@@ -68,7 +67,7 @@ func (w *WebhookManager) Subscribe(ctx context.Context, url, tokenHeader, tokenV
 	}
 
 	if err != nil {
-		return errors.Wrap(err, "Failed to store the webhook")
+		return spverrors.Wrapf(err, "failed to store the webhook")
 	}
 
 	w.updateMsg <- true
@@ -183,14 +182,11 @@ func (w *WebhookManager) removeNotifier(url string) {
 func (w *WebhookManager) markWebhookAsBanned(ctx context.Context, url string) error {
 	model, err := w.repository.GetByURL(ctx, url)
 	if err != nil {
-		return errors.Wrap(err, "Cannot find the webhook model")
+		return spverrors.Wrapf(err, "cannot find the webhook model")
 	}
 	model.BanUntil(time.Now().Add(banTime))
 	err = w.repository.Save(ctx, model)
-	if err != nil {
-		return errors.Wrap(err, "Cannot update the webhook model")
-	}
-	return nil
+	return spverrors.Wrapf(err, "cannot update the webhook model")
 }
 
 func containsWebhook(webhooks []ModelWebhook, url string) bool {

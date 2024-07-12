@@ -7,6 +7,7 @@ import (
 	"github.com/bitcoin-sv/spv-wallet/engine/datastore"
 	customTypes "github.com/bitcoin-sv/spv-wallet/engine/datastore/customtypes"
 	"github.com/bitcoin-sv/spv-wallet/engine/notifications"
+	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/pkg/errors"
 )
 
@@ -68,7 +69,8 @@ func (m *Webhook) BeforeCreating(_ context.Context) error {
 
 // Migrate model specific migration on startup
 func (m *Webhook) Migrate(client datastore.ClientInterface) error {
-	return client.IndexMetadata(client.GetTableName(tableAccessKeys), metadataField)
+	err := client.IndexMetadata(client.GetTableName(tableAccessKeys), metadataField)
+	return spverrors.Wrapf(err, "failed to index metadata column on model %s", m.GetModelName())
 }
 
 func (m *Webhook) delete() {
@@ -78,7 +80,7 @@ func (m *Webhook) delete() {
 
 // Banned returns true if the webhook is banned right now
 func (m *Webhook) Banned() bool {
-	if m.BannedTo.Valid == false {
+	if !m.BannedTo.Valid {
 		return false
 	}
 	ret := !time.Now().After(m.BannedTo.Time)
@@ -116,7 +118,7 @@ func (m *Webhook) Refresh(tokenHeader, tokenValue string) {
 
 // Deleted returns true if the webhook is deleted
 func (m *Webhook) Deleted() bool {
-	return m.DeletedAt.Valid == true
+	return m.DeletedAt.Valid
 }
 
 // WebhooksRepository is the repository for webhooks. It implements the WebhooksRepository interface
@@ -135,27 +137,21 @@ func (wr *WebhooksRepository) Create(ctx context.Context, url, tokenHeader, toke
 func (wr *WebhooksRepository) Save(ctx context.Context, model notifications.ModelWebhook) error {
 	webhook, ok := model.(*Webhook)
 	if !ok {
-		return errors.New("Unknown implementation of notifications.ModelWebhook")
+		return spverrors.Newf("unknown implementation of notifications.ModelWebhook")
 	}
 	err := webhook.Save(ctx)
-	if err != nil {
-		return errors.Wrap(err, "Cannot save the ModelWebhook")
-	}
-	return nil
+	return spverrors.Wrapf(err, "cannot save the ModelWebhook")
 }
 
-// Save stores a model in the database
+// Delete stores a model in the database
 func (wr *WebhooksRepository) Delete(ctx context.Context, model notifications.ModelWebhook) error {
 	webhook, ok := model.(*Webhook)
 	if !ok {
-		return errors.New("Unknown implementation of notifications.ModelWebhook")
+		return spverrors.Newf("unknown implementation of notifications.ModelWebhook")
 	}
 	webhook.delete()
 	err := webhook.Save(ctx)
-	if err != nil {
-		return errors.Wrap(err, "Cannot save the ModelWebhook")
-	}
-	return nil
+	return spverrors.Wrapf(err, "cannot save the ModelWebhook")
 }
 
 // GetByURL gets a webhook by its URL. If the webhook does not exist, it returns a nil pointer and no error

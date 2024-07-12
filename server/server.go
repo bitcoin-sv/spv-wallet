@@ -4,7 +4,6 @@ package server
 import (
 	"context"
 	"crypto/tls"
-	"errors"
 	"net/http"
 	"strconv"
 
@@ -184,7 +183,7 @@ func SetupServerRoutes(appConfig *config.AppConfig, services *config.AppServices
 		case router.CallbackEndpoints:
 			r.RegisterCallbackEndpoints(callbackAuthRouter)
 		default:
-			panic(errors.New("unexpected router endpoints registrar"))
+			panic(spverrors.Newf("unexpected router endpoints registrar"))
 		}
 	}
 
