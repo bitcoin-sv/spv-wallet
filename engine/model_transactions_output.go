@@ -27,10 +27,7 @@ func (x *XpubOutputValue) Scan(value interface{}) error {
 	}
 
 	err = json.Unmarshal(byteValue, &x)
-	if err != nil {
-		return spverrors.Wrapf(err, "failed to parse XpubOutputValue from JSON")
-	}
-	return nil
+	return spverrors.Wrapf(err, "failed to parse XpubOutputValue from JSON")
 }
 
 // Value return json value, implement driver.Valuer interface

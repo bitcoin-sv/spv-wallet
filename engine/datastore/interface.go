@@ -23,7 +23,6 @@ type StorageService interface {
 	HasMigratedModel(modelType string) bool
 	IncrementModel(ctx context.Context, model interface{},
 		fieldName string, increment int64) (newValue int64, err error)
-	IndexExists(tableName, indexName string) (bool, error)
 	IndexMetadata(tableName, field string) error
 	NewTx(ctx context.Context, fn func(*Transaction) error) error
 	NewRawTx() (*Transaction, error)

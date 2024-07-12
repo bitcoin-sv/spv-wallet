@@ -36,10 +36,7 @@ func (t *SyncConfig) Scan(value interface{}) error {
 	}
 
 	err = json.Unmarshal(byteValue, &t)
-	if err != nil {
-		return spverrors.Wrapf(err, "failed to parse SyncConfig from JSON")
-	}
-	return nil
+	return spverrors.Wrapf(err, "failed to parse SyncConfig from JSON")
 }
 
 // Value return json value, implement driver.Valuer interface

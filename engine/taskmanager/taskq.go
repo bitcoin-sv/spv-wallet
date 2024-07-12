@@ -182,8 +182,5 @@ func (c *TaskManager) scheduleTaskWithCron(ctx context.Context, task *taskq.Task
 		fmt.Sprintf("@every %ds", int(runEveryPeriod.Seconds())),
 		handler,
 	)
-	if err == nil {
-		return nil
-	}
 	return spverrors.Wrapf(err, "failed to register cron job")
 }

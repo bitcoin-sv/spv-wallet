@@ -30,7 +30,7 @@ func calculateMergedBUMP(txs []*Transaction) (BUMPs, error) {
 	for _, k := range mapKeys {
 		bump, err := CalculateMergedBUMP(bumps[k])
 		if err != nil {
-			return nil, spverrors.Wrapf(err, "Error while calculating Merged BUMP")
+			return nil, spverrors.Wrapf(err, "failed to calculate merged BUMP")
 		}
 		if bump == nil {
 			continue

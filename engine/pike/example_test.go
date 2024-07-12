@@ -34,13 +34,13 @@ func Example_generateLockingScripts() {
 	// Example usage of GenerateOutputsTemplate
 	outputsTemplate, err := pike.GenerateOutputsTemplate(10000)
 	if err != nil {
-		panic(spverrors.Wrapf(err, "Error generating outputs template"))
+		panic(spverrors.Wrapf(err, "error generating outputs template"))
 	}
 
 	// Example usage of GenerateLockingScriptsFromTemplates
 	lockingScripts, err := pike.GenerateLockingScriptsFromTemplates(outputsTemplate, senderPubKey, receiverPubKey, "reference")
 	if err != nil {
-		panic(spverrors.Wrapf(err, "Error generating locking scripts"))
+		panic(spverrors.Wrapf(err, "error generating locking scripts"))
 	}
 
 	for _, script := range lockingScripts {

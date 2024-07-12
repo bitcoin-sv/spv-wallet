@@ -73,9 +73,5 @@ func (r *RedisPubSub) Publish(channel Channel, data string) error {
 		r.Logger().Info().Msgf("PUBLISH: %s -> %s", channelName, data)
 	}
 	err := r.client.Publish(r.ctx, channelName, data)
-	if err != nil {
-		return spverrors.Wrapf(err.Err(), "failed to publish message")
-	}
-
-	return nil
+	return spverrors.Wrapf(err.Err(), "failed to publish message")
 }

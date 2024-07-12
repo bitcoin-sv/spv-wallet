@@ -48,11 +48,7 @@ func createTestUtxos(ctx context.Context, client ClientInterface) error {
 
 	_utxo4 := newUtxo(testXPubID, testTxID, testLockingScript, 16, 1225, opts...)
 	err = _utxo4.Save(ctx)
-	if err != nil {
-		return err
-	}
-
-	return nil
+	return err
 }
 
 // TestUtxo_newUtxo will test the method newUtxo()

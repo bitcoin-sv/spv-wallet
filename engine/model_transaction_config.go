@@ -150,10 +150,7 @@ func (t *TransactionConfig) Scan(value interface{}) error {
 	}
 
 	err = json.Unmarshal(byteValue, &t)
-	if err != nil {
-		return spverrors.Wrapf(err, "failed to parse TransactionConfig from JSON")
-	}
-	return nil
+	return spverrors.Wrapf(err, "failed to parse TransactionConfig from JSON")
 }
 
 // Value return json value, implement driver.Valuer interface

@@ -410,8 +410,5 @@ func saveBeefTransactionInput(ctx context.Context, c ClientInterface, input *bee
 	inputTx.syncTransaction = sync
 
 	err := inputTx.Save(ctx)
-	if err != nil {
-		return spverrors.Wrapf(err, "error in saveBeefTransactionInput during saving tx")
-	}
-	return nil
+	return spverrors.Wrapf(err, "error in saveBeefTransactionInput during saving tx")
 }
