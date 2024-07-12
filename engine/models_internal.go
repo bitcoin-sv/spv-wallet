@@ -4,7 +4,6 @@ import (
 	"context"
 	"time"
 
-	"github.com/bitcoin-sv/spv-wallet/engine/notifications"
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 )
 
@@ -156,25 +155,6 @@ func incrementField(ctx context.Context, model ModelInterface, fieldName string,
 	// AfterUpdate event should be called by parent function
 
 	return newValue, nil
-}
-
-// notify about an event on the model
-func notify(eventType notifications.EventType, model interface{}) {
-	// run the notifications in a separate goroutine since there could be significant network delay
-	// communicating with a notification provider
-
-	go func() {
-		m := model.(ModelInterface)
-		if client := m.Client(); client != nil {
-			if n := client.Notifications(); n != nil {
-				if err := n.Notify(
-					context.Background(), m.GetModelName(), eventType, model, m.GetID(),
-				); err != nil {
-					client.Logger().Error().Msgf("failed notifying about %s on %s: %s", string(eventType), m.GetID(), err.Error())
-				}
-			}
-		}
-	}()
 }
 
 /*

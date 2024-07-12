@@ -92,9 +92,9 @@ type (
 
 	// notificationsOptions holds the configuration for notifications
 	notificationsOptions struct {
-		notifications.ClientInterface                           // Notifications client
-		options                       []notifications.ClientOps // List of options
-		webhookEndpoint               string                    // Webhook endpoint
+		enabled        bool
+		client         *notifications.Notifications
+		webhookManager *notifications.WebhookManager
 	}
 
 	// paymailOptions holds the configuration for Paymail
@@ -173,7 +173,7 @@ func NewClient(ctx context.Context, opts ...ClientOps) (ClientInterface, error) 
 	}
 
 	// Load the Notification client (if client does not exist)
-	if err = client.loadNotificationClient(); err != nil {
+	if err = client.loadNotificationClient(ctx); err != nil {
 		return nil, err
 	}
 
@@ -313,11 +313,6 @@ func (c *Client) Debug(on bool) {
 	if ds := c.Datastore(); ds != nil {
 		ds.Debug(on)
 	}
-
-	// Set debugging on the Notifications
-	if n := c.Notifications(); n != nil {
-		n.Debug(on)
-	}
 }
 
 // DefaultSyncConfig will return the default sync config from the client defaults (for chainstate)
@@ -390,16 +385,11 @@ func (c *Client) Logger() *zerolog.Logger {
 }
 
 // Notifications will return the Notifications if it exists
-func (c *Client) Notifications() notifications.ClientInterface {
-	if c.options.notifications != nil && c.options.notifications.ClientInterface != nil {
-		return c.options.notifications.ClientInterface
+func (c *Client) Notifications() *notifications.Notifications {
+	if c.options.notifications == nil {
+		return nil
 	}
-	return nil
-}
-
-// SetNotificationsClient will overwrite the notification's client with the given client
-func (c *Client) SetNotificationsClient(client notifications.ClientInterface) {
-	c.options.notifications.ClientInterface = client
+	return c.options.notifications.client
 }
 
 // Taskmanager will return the Taskmanager if it exists
