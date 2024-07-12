@@ -198,7 +198,7 @@ func Test_RevertTransaction(t *testing.T) {
 func Test_RecordTransaction(t *testing.T) {
 	ctx, client, deferMe := CreateTestSQLiteClient(t, false, true, withTaskManagerMockup())
 	defer deferMe()
-	prepareAdditionalModels(t, client, ctx, true)
+	prepareAdditionalModels(ctx, t, client, true)
 	// given
 	draftTransaction, err := newDraftTransaction(
 		testXPub, &TransactionConfig{

@@ -94,6 +94,7 @@ func (c *Client) loadNotificationClient(ctx context.Context) (err error) {
 	return
 }
 
+// SubscribeWebhook adds URL to the list of subscribed webhooks
 func (c *Client) SubscribeWebhook(ctx context.Context, url, tokenHeader, token string) error {
 	if c.options.notifications == nil || c.options.notifications.webhookManager == nil {
 		return spverrors.ErrNotificationsDisabled
@@ -106,11 +107,13 @@ func (c *Client) SubscribeWebhook(ctx context.Context, url, tokenHeader, token s
 	return nil
 }
 
+// UnsubscribeWebhook removes URL from the list of subscribed webhooks
 func (c *Client) UnsubscribeWebhook(ctx context.Context, url string) error {
 	if c.options.notifications == nil || c.options.notifications.webhookManager == nil {
 		return spverrors.ErrNotificationsDisabled
 	}
 
+	//nolint:wrapcheck //we're returning our custom errors
 	return c.options.notifications.webhookManager.Unsubscribe(ctx, url)
 }
 
@@ -165,7 +168,8 @@ func (c *Client) registerCronJobs() error {
 		}
 	}
 
-	return c.Taskmanager().CronJobsInit(cronJobs)
+	err := c.Taskmanager().CronJobsInit(cronJobs)
+	return spverrors.Wrapf(err, "failed to init cron jobs")
 }
 
 // loadDefaultPaymailConfig will load the default paymail server configuration

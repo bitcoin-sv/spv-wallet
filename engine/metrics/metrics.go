@@ -37,7 +37,7 @@ func NewMetrics(collector Collector) *Metrics {
 		recordTransaction: collector.RegisterHistogramVec(recordTransactionHistogramName, "classification", "strategy"),
 		queryTransaction:  collector.RegisterHistogramVec(queryTransactionHistogramName, "classification"),
 		addContact:        collector.RegisterHistogramVec(addContactHistogramName, "classification"),
-		cronHistogram:     collector.RegisterHistogramVec(cronHistogramName, "name"),
+		cronHistogram:     collector.RegisterHistogramVec(cronHistogramName, "name", "classification"),
 		cronLastExecution: collector.RegisterGaugeVec(cronLastExecutionGaugeName, "name"),
 	}
 }
@@ -74,7 +74,7 @@ func (m *Metrics) TrackCron(name string) EndWithClassification {
 	start := time.Now()
 	m.cronLastExecution.WithLabelValues(name).Set(float64(start.Unix()))
 	return func(success bool) {
-		m.cronHistogram.WithLabelValues(name).Observe(time.Since(start).Seconds())
+		m.cronHistogram.WithLabelValues(name, classify(success)).Observe(time.Since(start).Seconds())
 	}
 }
 

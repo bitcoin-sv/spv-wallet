@@ -18,6 +18,7 @@ import (
 	"fmt"
 
 	"github.com/bitcoin-sv/spv-wallet/engine/script/template"
+	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/bitcoin-sv/spv-wallet/engine/types/type42"
 	"github.com/libsv/go-bk/bec"
 	"github.com/libsv/go-bt/v2/bscript"
@@ -27,7 +28,7 @@ import (
 func GenerateOutputsTemplate(satoshis uint64) ([]*template.OutputTemplate, error) {
 	p2pkhTemplate, err := template.P2PKH(satoshis)
 	if err != nil {
-		return nil, err
+		return nil, spverrors.Wrapf(err, "error creating P2PKH template")
 	}
 	return []*template.OutputTemplate{p2pkhTemplate}, nil
 }
@@ -39,17 +40,17 @@ func GenerateLockingScriptsFromTemplates(outputsTemplate []*template.OutputTempl
 	for idx, output := range outputsTemplate {
 		templateScript, err := bscript.NewFromHexString(output.Script)
 		if err != nil {
-			return nil, fmt.Errorf("error creating script from hex string - %w", err)
+			return nil, spverrors.Wrapf(err, "error creating script from hex string")
 		}
 
 		dPK, err := type42.DeriveLinkedKey(senderPubKey, receiverPubKey, fmt.Sprintf("%s-%d", reference, idx))
 		if err != nil {
-			return nil, err
+			return nil, spverrors.Wrapf(err, "error deriving linked key")
 		}
 
 		scriptBytes, err := template.Evaluate(*templateScript, dPK)
 		if err != nil {
-			return nil, fmt.Errorf("error evaluating template script - %w", err)
+			return nil, spverrors.Wrapf(err, "error evaluating template script")
 		}
 
 		finalScript := bscript.Script(scriptBytes)

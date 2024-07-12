@@ -161,7 +161,8 @@ func (m *Transaction) Migrate(client datastore.ClientInterface) error {
 		}
 	}
 
-	return client.IndexMetadata(tableName, xPubMetadataField)
+	err := client.IndexMetadata(tableName, xPubMetadataField)
+	return spverrors.Wrapf(err, "failed to index metadata column on model %s", m.GetModelName())
 }
 
 // migratePostgreSQL is specific migration SQL for Postgresql

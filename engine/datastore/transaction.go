@@ -7,7 +7,7 @@ import (
 )
 
 // NewTx will start a new datastore transaction
-func (c *Client) NewTx(ctx context.Context, fn func(*Transaction) error) error {
+func (c *Client) NewTx(_ context.Context, fn func(*Transaction) error) error {
 	// All GORM databases
 	if c.options.db != nil {
 		sessionDb := c.options.db.Session(getGormSessionConfig(c.options.db.PrepareStmt, c.IsDebug(), c.options.loggerDB))

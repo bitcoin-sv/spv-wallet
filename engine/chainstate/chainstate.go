@@ -14,7 +14,9 @@ import (
 type HexFormatFlag byte
 
 const (
+	// RawTx is the raw transaction format
 	RawTx HexFormatFlag = 1 << iota // 1
+	// Ef is the Extended transaction format
 	Ef
 )
 

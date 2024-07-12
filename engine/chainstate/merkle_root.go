@@ -2,7 +2,8 @@ package chainstate
 
 import (
 	"context"
-	"errors"
+
+	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 )
 
 // VerifyMerkleRoots will try to verify merkle roots with all available providers
@@ -11,7 +12,7 @@ func (c *Client) VerifyMerkleRoots(ctx context.Context, merkleRoots []MerkleRoot
 	pc := c.options.config.blockHedersServiceClient
 	if pc == nil {
 		c.options.logger.Warn().Msg("VerifyMerkleRoots is called even though no Block Headers Service client is configured; this likely indicates that the paymail capabilities have been cached.")
-		return errors.New("no block headers service client found")
+		return spverrors.Newf("no block headers service client found")
 	}
 	merkleRootsRes, err := pc.verifyMerkleRoots(ctx, c.options.logger, merkleRoots)
 	if err != nil {
@@ -20,7 +21,7 @@ func (c *Client) VerifyMerkleRoots(ctx context.Context, merkleRoots []MerkleRoot
 
 	if merkleRootsRes.ConfirmationState == Invalid {
 		c.options.logger.Warn().Msg("Not all merkle roots confirmed")
-		return errors.New("not all merkle roots confirmed")
+		return spverrors.Newf("not all merkle roots confirmed")
 	}
 
 	if merkleRootsRes.ConfirmationState == UnableToVerify {

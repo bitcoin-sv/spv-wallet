@@ -2,9 +2,9 @@ package datastore
 
 import (
 	"context"
-	"errors"
 	"fmt"
 
+	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/newrelic/go-agent/v3/newrelic"
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
@@ -28,7 +28,7 @@ func (c *Client) AutoMigrateDatabase(ctx context.Context, models ...interface{})
 	for _, modelInterface := range models {
 		modelType := fmt.Sprintf("%T", modelInterface)
 		if c.HasMigratedModel(modelType) {
-			return errors.New("model " + modelType + " was already migrated")
+			return spverrors.Newf("model %s was already migrated", modelType)
 		}
 		c.options.migratedModels = append(c.options.migratedModels, modelType)
 	}
@@ -42,7 +42,7 @@ func (c *Client) AutoMigrateDatabase(ctx context.Context, models ...interface{})
 	))
 
 	// Migrate database for SQL (using GORM)
-	return autoMigrateSQLDatabase(ctx, c.Engine(), c.options.db, c.IsDebug(), c.options.loggerDB, models...)
+	return autoMigrateSQLDatabase(ctx, c.options.db, c.IsDebug(), c.options.loggerDB, models...)
 }
 
 // IsAutoMigrate returns whether auto migration is on
@@ -53,9 +53,7 @@ func (c *Client) IsAutoMigrate() bool {
 // autoMigrateSQLDatabase will attempt to create or update table schema
 //
 // See: https://gorm.io/docs/migration.html
-func autoMigrateSQLDatabase(ctx context.Context, engine Engine, sqlWriteDB *gorm.DB,
-	debug bool, optionalLogger logger.Interface, models ...interface{},
-) error {
+func autoMigrateSQLDatabase(ctx context.Context, sqlWriteDB *gorm.DB, debug bool, optionalLogger logger.Interface, models ...interface{}) error {
 	// Create a segment
 	txn := newrelic.FromContext(ctx)
 	if txn != nil {
@@ -66,5 +64,6 @@ func autoMigrateSQLDatabase(ctx context.Context, engine Engine, sqlWriteDB *gorm
 	sessionDb := sqlWriteDB.Session(getGormSessionConfig(sqlWriteDB.PrepareStmt, debug, optionalLogger))
 
 	// PostgreSQL and SQLite
-	return sessionDb.AutoMigrate(models...)
+	err := sessionDb.AutoMigrate(models...)
+	return spverrors.Wrapf(err, "failed during automigration")
 }

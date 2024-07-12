@@ -7,10 +7,11 @@ import (
 	"context"
 
 	"github.com/bitcoin-sv/spv-wallet/engine/logging"
+	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/newrelic/go-agent/v3/newrelic"
 	"github.com/robfig/cron/v3"
 	"github.com/rs/zerolog"
-	taskq "github.com/vmihailenco/taskq/v3"
+	"github.com/vmihailenco/taskq/v3"
 )
 
 type (
@@ -38,7 +39,7 @@ type (
 // NewTaskManager creates a new client for all TaskManager functionality
 // If no options are given, it will use local memory for the queue.
 // ctx may contain a NewRelic txn (or one will be created)
-func NewTaskManager(ctx context.Context, opts ...TaskManagerOptions) (TaskEngine, error) {
+func NewTaskManager(ctx context.Context, opts ...Options) (TaskEngine, error) {
 	// Create a new tm with defaults
 	tm := &TaskManager{options: &options{
 		newRelicEnabled: false,
@@ -84,7 +85,7 @@ func (tm *TaskManager) Close(ctx context.Context) error {
 
 		// Close the taskq queue
 		if err := tm.options.taskq.queue.Close(); err != nil {
-			return err
+			return spverrors.Wrapf(err, "failed to close taskq queue")
 		}
 
 		// Empty all values and reset

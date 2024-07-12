@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/spf13/pflag"
 	"github.com/spf13/viper"
 )
@@ -32,7 +33,7 @@ func loadFlags() error {
 
 	err = viper.BindPFlag(ConfigFilePathKey, appFlags.Lookup(ConfigFilePathKey))
 	if err != nil {
-		err = fmt.Errorf("error while binding flags to viper: %w", err)
+		err = spverrors.Wrapf(err, "error while binding flags to viper")
 		return err
 	}
 

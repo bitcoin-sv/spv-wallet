@@ -4,6 +4,8 @@ import (
 	"crypto/rand"
 	"math"
 	"math/big"
+
+	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 )
 
 // SplitOutputValues splits the satoshis value randomly into nrOfOutputs pieces
@@ -15,7 +17,7 @@ func SplitOutputValues(satoshis uint64, nrOfOutputs int) ([]uint64, error) {
 			rand.Reader, big.NewInt(math.MaxInt64),
 		)
 		if err != nil {
-			return nil, err
+			return nil, spverrors.Wrapf(err, "failed to generate random number")
 		}
 		randomOutput := (((float64(a.Int64()) / (1 << 63)) * 50) + 75) / 100
 		outputValue := uint64(randomOutput * float64(satoshis) / float64(nrOfOutputs))

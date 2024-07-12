@@ -1,11 +1,11 @@
 package logging
 
 import (
-	"fmt"
 	"io"
 	"os"
 	"time"
 
+	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/rs/zerolog"
 	"go.elastic.co/ecszerolog"
 )
@@ -29,7 +29,7 @@ func CreateLogger(instanceName, format, level string, logOrigin bool) (*zerolog.
 
 	parsedLevel, err := zerolog.ParseLevel(level)
 	if err != nil {
-		err = fmt.Errorf("failed to parse log level: %w", err)
+		err = spverrors.Wrapf(err, "failed to parse log level")
 		return nil, err
 	}
 

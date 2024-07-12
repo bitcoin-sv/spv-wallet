@@ -78,20 +78,3 @@ func TestClient_Broadcast_BroadcastClient(t *testing.T) {
 		assert.Equal(t, ProviderBroadcastClient, res.Provider)
 	})
 }
-
-func containsAtLeastOneElement(coll1 []string, coll2 ...string) bool {
-	m := make(map[string]bool)
-
-	for _, element := range coll1 {
-		m[element] = true
-	}
-
-	// Check if any element from bool  is present in the set
-	for _, element := range coll2 {
-		if m[element] {
-			return true
-		}
-	}
-
-	return false
-}

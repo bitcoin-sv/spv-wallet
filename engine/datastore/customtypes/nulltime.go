@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/99designs/gqlgen/graphql"
+	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/bsontype"
 )
@@ -37,7 +38,7 @@ func UnmarshalNullTime(t interface{}) (NullTime, error) {
 
 	uTime, err := graphql.UnmarshalTime(t)
 	if err != nil {
-		return NullTime{}, err
+		return NullTime{}, spverrors.Wrapf(err, "failed to parse time: %v", t)
 	}
 
 	return NullTime{
@@ -46,7 +47,7 @@ func UnmarshalNullTime(t interface{}) (NullTime, error) {
 			Time:  uTime,
 			Valid: true,
 		},
-	}, err
+	}, spverrors.Wrapf(err, "failed to parse time: %v", t)
 }
 
 // MarshalBSONValue method is called by bson.Marshal in Mongo for type = NullTime
@@ -56,7 +57,7 @@ func (x *NullTime) MarshalBSONValue() (bsontype.Type, []byte, error) {
 	}
 
 	valueType, b, err := bson.MarshalValue(x.Time)
-	return valueType, b, err
+	return valueType, b, spverrors.Wrapf(err, "failed to convert NullTime to BSON: %v", x)
 }
 
 // UnmarshalBSONValue method is called by bson.Unmarshal in Mongo for type = NullTime
@@ -65,7 +66,7 @@ func (x *NullTime) UnmarshalBSONValue(t bsontype.Type, data []byte) error {
 	uTime := time.Time{}
 
 	if err := raw.Unmarshal(&uTime); err != nil {
-		return err
+		return spverrors.Wrapf(err, "failed to parse time from BSON")
 	}
 
 	if raw.Value == nil {
@@ -85,7 +86,7 @@ func (x *NullTime) MarshalJSON() ([]byte, error) {
 	}
 
 	b, err := json.Marshal(x.Time)
-	return b, err
+	return b, spverrors.Wrapf(err, "failed to convert NullTime to JSON: %v", x)
 }
 
 // UnmarshalJSON method is called by the JSON unmarshaller
@@ -98,7 +99,7 @@ func (x *NullTime) UnmarshalJSON(data []byte) error {
 
 	var timeString string
 	if err := json.Unmarshal(data, &timeString); err != nil {
-		return err
+		return spverrors.Wrapf(err, "failed to parse time from JSON: %s", data)
 	}
 	if timeString == "" {
 		return nil
@@ -106,7 +107,7 @@ func (x *NullTime) UnmarshalJSON(data []byte) error {
 
 	uTime, err := time.Parse(time.RFC3339, timeString)
 	if err != nil {
-		return err
+		return spverrors.Wrapf(err, "failed to parse time: %s", timeString)
 	}
 
 	x.Valid = true

@@ -1,9 +1,7 @@
 package config
 
 import (
-	"errors"
-	"fmt"
-
+	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/mrz1836/go-sanitize"
 	"github.com/mrz1836/go-validate"
 )
@@ -11,24 +9,24 @@ import (
 // Validate checks the configuration for specific rules
 func (p *PaymailConfig) Validate() error {
 	if p == nil {
-		return errors.New("paymail config is required")
+		return spverrors.Newf("paymail config is required")
 	}
 	if p.Beef.enabled() && p.Beef.BlockHeaderServiceHeaderValidationURL == "" {
-		return errors.New("beef_url is required for beef")
+		return spverrors.Newf("beef_url is required for beef")
 	}
 	if len(p.Domains) == 0 {
-		return errors.New("at least one domain is required for paymail")
+		return spverrors.Newf("at least one domain is required for paymail")
 	}
 
 	var err error
 	for _, domain := range p.Domains {
 		domain, err = sanitize.Domain(domain, false, true)
 		if err != nil {
-			err = fmt.Errorf("error sanitizing domain [%s]: %w", domain, err)
+			err = spverrors.Wrapf(err, "error sanitizing domain [%s]", domain)
 			return err
 		}
 		if !validate.IsValidHost(domain) {
-			return errors.New("domain [" + domain + "] is not a valid hostname")
+			return spverrors.Newf("domain [" + domain + "] is not a valid hostname")
 		}
 	}
 
