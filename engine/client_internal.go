@@ -2,8 +2,6 @@ package engine
 
 import (
 	"context"
-	"fmt"
-	"time"
 
 	"github.com/bitcoin-sv/go-paymail"
 	"github.com/bitcoin-sv/go-paymail/server"
@@ -13,7 +11,6 @@ import (
 	"github.com/bitcoin-sv/spv-wallet/engine/notifications"
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/bitcoin-sv/spv-wallet/engine/taskmanager"
-	"github.com/bitcoin-sv/spv-wallet/models"
 	"github.com/mrz1836/go-cachestore"
 )
 
@@ -94,17 +91,6 @@ func (c *Client) loadNotificationClient(ctx context.Context) (err error) {
 	notificationService := notifications.NewNotifications(ctx, &logger)
 	c.options.notifications.client = notificationService
 	c.options.notifications.webhookManager = notifications.NewWebhookManager(ctx, &logger, notificationService, &WebhooksRepository{client: c})
-
-	// for development purposes only
-	notifications.StartSendingMockEvents(
-		ctx,
-		notificationService,
-		100*time.Millisecond,
-		func(i int) *models.StringEvent {
-			return &models.StringEvent{Value: fmt.Sprintf("msg-%d", i)}
-		},
-	)
-
 	return
 }
 
