@@ -12,7 +12,6 @@ import (
 	"github.com/bitcoin-sv/go-paymail"
 	"github.com/bitcoin-sv/spv-wallet/engine/chainstate"
 	"github.com/bitcoin-sv/spv-wallet/engine/datastore"
-	"github.com/bitcoin-sv/spv-wallet/engine/notifications"
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 )
 
@@ -154,9 +153,6 @@ func broadcastSyncTransaction(ctx context.Context, syncTx *SyncTransaction) erro
 		_addSyncResult(ctx, syncTx, syncActionBroadcast, "internal", err.Error())
 		return err
 	}
-
-	// Fire a notification
-	notify(notifications.EventTypeBroadcast, syncTx)
 
 	return nil
 }

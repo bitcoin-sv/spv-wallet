@@ -9,6 +9,7 @@ import (
 	"github.com/bitcoin-sv/spv-wallet/engine/cluster"
 	"github.com/bitcoin-sv/spv-wallet/engine/datastore"
 	"github.com/bitcoin-sv/spv-wallet/engine/notifications"
+	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/bitcoin-sv/spv-wallet/engine/taskmanager"
 	"github.com/mrz1836/go-cachestore"
 )
@@ -82,12 +83,35 @@ func (c *Client) loadDatastore(ctx context.Context) (err error) {
 }
 
 // loadNotificationClient will load the notifications client
-func (c *Client) loadNotificationClient() (err error) {
-	// Load notification if a custom interface was NOT provided
-	if c.options.notifications.ClientInterface == nil {
-		c.options.notifications.ClientInterface, err = notifications.NewClient(c.options.notifications.options...)
+func (c *Client) loadNotificationClient(ctx context.Context) (err error) {
+	if c.options.notifications == nil || !c.options.notifications.enabled {
+		return
 	}
+	logger := c.Logger().With().Str("subservice", "notification").Logger()
+	notificationService := notifications.NewNotifications(ctx, &logger)
+	c.options.notifications.client = notificationService
+	c.options.notifications.webhookManager = notifications.NewWebhookManager(ctx, &logger, notificationService, &WebhooksRepository{client: c})
 	return
+}
+
+func (c *Client) SubscribeWebhook(ctx context.Context, url, tokenHeader, token string) error {
+	if c.options.notifications == nil || c.options.notifications.webhookManager == nil {
+		return spverrors.ErrNotificationsDisabled
+	}
+
+	err := c.options.notifications.webhookManager.Subscribe(ctx, url, tokenHeader, token)
+	if err != nil {
+		return spverrors.ErrWebhookSubscriptionFailed
+	}
+	return nil
+}
+
+func (c *Client) UnsubscribeWebhook(ctx context.Context, url string) error {
+	if c.options.notifications == nil || c.options.notifications.webhookManager == nil {
+		return spverrors.ErrNotificationsDisabled
+	}
+
+	return c.options.notifications.webhookManager.Unsubscribe(ctx, url)
 }
 
 // loadPaymailClient will load the Paymail client

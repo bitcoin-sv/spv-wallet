@@ -331,3 +331,17 @@ var ErrMissingClient = models.SPVError{Message: "client is missing from model, c
 
 // ErrDatastoreRequired is when a datastore function is called without a datastore present
 var ErrDatastoreRequired = models.SPVError{Message: "datastore is required", StatusCode: 500, Code: "error-datastore-required"}
+
+//////////////////////////////////// NOTIFICATION ERRORS
+
+// ErrWebhookSubscriptionFailed is when webhook subscription failed
+var ErrWebhookSubscriptionFailed = models.SPVError{Message: "webhook subscription failed", StatusCode: 500, Code: "error-webhook-subscription-failed"}
+
+// ErrWebhookUnsubscriptionFailed is when webhook unsubscription failed
+var ErrWebhookUnsubscriptionFailed = models.SPVError{Message: "webhook unsubscription failed", StatusCode: 500, Code: "error-webhook-unsubscription-failed"}
+
+// ErrWebhookSubscriptionNotFound is when cannot find webhook to unsubscribe
+var ErrWebhookSubscriptionNotFound = models.SPVError{Message: "webhook subscription not found", StatusCode: 404, Code: "error-webhook-subscription-not-found"}
+
+// ErrNotificationsDisabled happens when the notifications are not enabled in the config
+var ErrNotificationsDisabled = models.SPVError{Message: "notifications are disabled", StatusCode: 404, Code: "error-notifications-disabled"}
