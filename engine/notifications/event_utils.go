@@ -2,12 +2,10 @@ package notifications
 
 import (
 	"encoding/json"
-	"fmt"
 	"reflect"
 
+	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/bitcoin-sv/spv-wallet/models"
-
-	"github.com/pkg/errors"
 )
 
 // InstantinateEvent creates a new instance of the event type passed as a type parameter.
@@ -31,11 +29,11 @@ func GetEventName[EventType models.Events](instance *EventType) string {
 func GetEventContent[EventType models.Events](raw *models.RawEvent) (*EventType, error) {
 	model := InstantinateEvent[EventType]()
 	if raw.Type != GetEventName(model) {
-		return nil, fmt.Errorf("Wrong type")
+		return nil, spverrors.Newf("wrong type")
 	}
 
 	if err := json.Unmarshal(raw.Content, &model); err != nil {
-		return nil, errors.Wrap(err, "Cannot unmarshall the content json")
+		return nil, spverrors.Wrapf(err, "cannot unmarshall the content json")
 	}
 	return model, nil
 }

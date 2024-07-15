@@ -1,6 +1,8 @@
 package utils
 
-import "fmt"
+import (
+	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
+)
 
 // ToByteArray converts string or []byte to byte array or returns an error
 func ToByteArray(value interface{}) ([]byte, error) {
@@ -10,7 +12,7 @@ func ToByteArray(value interface{}) ([]byte, error) {
 	case string:
 		return []byte(typedValue), nil
 	default:
-		return nil, fmt.Errorf("unsupported type: %T", value)
+		return nil, spverrors.Newf("unsupported type: %T", value)
 	}
 }
 
@@ -22,6 +24,6 @@ func StrOrBytesToString(value interface{}) (string, error) {
 	case string:
 		return typedValue, nil
 	default:
-		return "", fmt.Errorf("unsupported type: %T", value)
+		return "", spverrors.Newf("unsupported type: %T", value)
 	}
 }

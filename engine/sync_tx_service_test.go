@@ -2,10 +2,10 @@ package engine
 
 import (
 	"context"
-	"errors"
 	"testing"
 
 	broadcast_client "github.com/bitcoin-sv/go-broadcast-client/broadcast"
+	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/bitcoin-sv/spv-wallet/engine/tester"
 	"github.com/rs/zerolog"
 	"github.com/stretchr/testify/require"
@@ -23,7 +23,7 @@ func Test_processBroadcastTransactions(t *testing.T) {
 
 	broadcastClientFailed := broadcastClientMqResponse{
 		r: new(broadcast_client.SubmitTxResponse),
-		f: broadcast_client.Failure("error", errors.New("test client error")),
+		f: broadcast_client.Failure("error", spverrors.Newf("test client error")),
 	}
 
 	broadcastTransactionDeclined := broadcastClientMqResponse{
@@ -119,7 +119,7 @@ func (mq *broadcastClientMq) setupResponse(method string, response broadcastClie
 	mq.responses[method] = response
 }
 
-func (mq *broadcastClientMq) GetFeeQuote(ctx context.Context) ([]*broadcast_client.FeeQuote, error) {
+func (mq *broadcastClientMq) GetFeeQuote(_ context.Context) ([]*broadcast_client.FeeQuote, error) {
 	if r, ok := mq.responses["GetFeeQuote"]; ok {
 		return r.r.([]*broadcast_client.FeeQuote), r.f
 	}
@@ -127,20 +127,20 @@ func (mq *broadcastClientMq) GetFeeQuote(ctx context.Context) ([]*broadcast_clie
 	return []*broadcast_client.FeeQuote{{MiningFee: broadcast_client.MiningFeeResponse{Bytes: 1, Satoshis: 1}}}, nil
 }
 
-func (*broadcastClientMq) GetPolicyQuote(ctx context.Context) ([]*broadcast_client.PolicyQuoteResponse, error) {
+func (*broadcastClientMq) GetPolicyQuote(_ context.Context) ([]*broadcast_client.PolicyQuoteResponse, error) {
 	return nil, nil
 }
 
-func (*broadcastClientMq) QueryTransaction(ctx context.Context, txID string) (*broadcast_client.QueryTxResponse, error) {
+func (*broadcastClientMq) QueryTransaction(_ context.Context, _ string) (*broadcast_client.QueryTxResponse, error) {
 	return nil, nil
 }
 
-func (*broadcastClientMq) SubmitBatchTransactions(ctx context.Context, tx []*broadcast_client.Transaction, opts ...broadcast_client.TransactionOptFunc,
+func (*broadcastClientMq) SubmitBatchTransactions(_ context.Context, _ []*broadcast_client.Transaction, _ ...broadcast_client.TransactionOptFunc,
 ) (*broadcast_client.SubmitBatchTxResponse, error) {
 	return nil, nil
 }
 
-func (mq *broadcastClientMq) SubmitTransaction(ctx context.Context, tx *broadcast_client.Transaction, opts ...broadcast_client.TransactionOptFunc,
+func (mq *broadcastClientMq) SubmitTransaction(_ context.Context, _ *broadcast_client.Transaction, _ ...broadcast_client.TransactionOptFunc,
 ) (*broadcast_client.SubmitTxResponse, error) {
 	r := mq.responses["SubmitTransaction"]
 	return r.r.(*broadcast_client.SubmitTxResponse), r.f

@@ -8,14 +8,6 @@ import (
 )
 
 var (
-	// broadcastSuccessErrors are a list of errors that are still considered a success
-	broadcastSuccessErrors = []string{
-		"already in the mempool", // {"error": "-27: Transaction already in the mempool"}
-		"txn-already-know",       // { "error": "-26: 257: txn-already-known"}  // txn-already-know
-		"txn-already-in-mempool", // txn-already-in-mempool
-		"txn_already_known",      // TXN_ALREADY_KNOWN
-		"txn_already_in_mempool", // TXN_ALREADY_IN_MEMPOOL
-	}
 
 	// broadcastQuestionableErrors are a list of errors that are not good broadcast responses,
 	// but need to be checked differently
@@ -50,7 +42,7 @@ func (c *Client) broadcast(ctx context.Context, id, hex string, format HexFormat
 
 	var wg sync.WaitGroup
 
-	for _, broadcastProvider := range createActiveProviders(c, id, hex, format) {
+	for _, broadcastProvider := range createActiveProviders(id, hex, format) {
 		wg.Add(1)
 		go func(provider txBroadcastProvider) {
 			defer wg.Done()
@@ -62,7 +54,7 @@ func (c *Client) broadcast(ctx context.Context, id, hex string, format HexFormat
 	close(resultsChannel)
 }
 
-func createActiveProviders(c *Client, txID, txHex string, format HexFormatFlag) []txBroadcastProvider {
+func createActiveProviders(txID, txHex string, format HexFormatFlag) []txBroadcastProvider {
 	providers := make([]txBroadcastProvider, 0, 1)
 
 	pvdr := broadcastClientProvider{txID: txID, txHex: txHex, format: format}

@@ -91,7 +91,7 @@ func getDraftTransactionID(ctx context.Context, xPubID, id string,
 
 	draftTransaction := &DraftTransaction{Model: *NewBaseModel(
 		ModelDraftTransaction,
-		append(opts)...,
+		opts...,
 	)}
 	if err := Get(ctx, draftTransaction, conditions, false, defaultDatabaseReadTimeout, true); err != nil {
 		if errors.Is(err, datastore.ErrNoResults) {
@@ -145,7 +145,7 @@ func (m *DraftTransaction) Save(ctx context.Context) (err error) {
 		if utxoErr := unReserveUtxos(
 			ctx, m.XpubID, m.ID, m.GetOptions(false)...,
 		); utxoErr != nil {
-			err = errors.Wrap(err, utxoErr.Error())
+			err = spverrors.Wrapf(err, utxoErr.Error())
 		}
 	}
 	return
@@ -785,7 +785,7 @@ func (m *DraftTransaction) getTotalSatoshis() (satoshis uint64) {
 }
 
 // BeforeCreating will fire before the model is being inserted into the Datastore
-func (m *DraftTransaction) BeforeCreating(ctx context.Context) (err error) {
+func (m *DraftTransaction) BeforeCreating(_ context.Context) (err error) {
 	m.Client().Logger().Debug().
 		Str("draftTxID", m.GetID()).
 		Msgf("starting: %s BeforeCreating hook...", m.Name())
@@ -833,7 +833,8 @@ func (m *DraftTransaction) AfterUpdated(ctx context.Context) error {
 
 // Migrate model specific migration on startup
 func (m *DraftTransaction) Migrate(client datastore.ClientInterface) error {
-	return client.IndexMetadata(client.GetTableName(tableDraftTransactions), metadataField)
+	err := client.IndexMetadata(client.GetTableName(tableDraftTransactions), metadataField)
+	return spverrors.Wrapf(err, "failed to index metadata column on model %s", m.GetModelName())
 }
 
 // SignInputsWithKey will sign all the inputs using a key (string) (helper method)

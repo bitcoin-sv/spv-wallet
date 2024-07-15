@@ -112,9 +112,9 @@ type (
 
 	// taskManagerOptions holds the configuration for taskmanager
 	taskManagerOptions struct {
-		taskmanager.TaskEngine                                  // Client for TaskManager
-		options                []taskmanager.TaskManagerOptions // List of options
-		cronCustomPeriods      map[string]time.Duration         // will override the default period of cronJob
+		taskmanager.TaskEngine                          // Client for TaskManager
+		options                []taskmanager.Options    // List of options
+		cronCustomPeriods      map[string]time.Duration // will override the default period of cronJob
 	}
 )
 
@@ -214,7 +214,7 @@ func (c *Client) AddModels(ctx context.Context, autoMigrate bool, models ...inte
 
 		// Apply the database migration with the new models
 		if err := d.AutoMigrateDatabase(ctx, models...); err != nil {
-			return err
+			return spverrors.Wrapf(err, "failed to auto migrate models")
 		}
 
 		// Add to the list
@@ -270,7 +270,7 @@ func (c *Client) Close(ctx context.Context) error {
 	ds := c.Datastore()
 	if ds != nil {
 		if err := ds.Close(ctx); err != nil {
-			return err
+			return spverrors.Wrapf(err, "failed to close datastore")
 		}
 		c.options.dataStore.ClientInterface = nil
 	}
@@ -279,7 +279,7 @@ func (c *Client) Close(ctx context.Context) error {
 	tm := c.Taskmanager()
 	if tm != nil {
 		if err := tm.Close(ctx); err != nil {
-			return err
+			return spverrors.Wrapf(err, "failed to close taskmanager")
 		}
 		c.options.taskManager.TaskEngine = nil
 	}

@@ -9,6 +9,7 @@ import (
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 )
 
+// UpsertContact adds a new contact if not exists or updates the existing one.
 func (c *Client) UpsertContact(ctx context.Context, ctcFName, ctcPaymail, requesterXPubID, requesterPaymail string, opts ...ModelOps) (*Contact, error) {
 	reqPm, err := c.getPaymail(ctx, requesterXPubID, requesterPaymail)
 	if err != nil {
@@ -21,7 +22,7 @@ func (c *Client) UpsertContact(ctx context.Context, ctcFName, ctcPaymail, reques
 	}
 	contactPm, err := pmSrvnt.GetSanitizedPaymail(ctcPaymail)
 	if err != nil {
-		return nil, fmt.Errorf("requested contact paymail is invalid. Reason: %w", err)
+		return nil, spverrors.Wrapf(err, "requested contact paymail is invalid")
 	}
 
 	contact, err := c.upsertContact(ctx, pmSrvnt, requesterXPubID, ctcFName, contactPm, opts...)
@@ -46,6 +47,7 @@ func (c *Client) UpsertContact(ctx context.Context, ctcFName, ctcPaymail, reques
 	return contact, nil
 }
 
+// AddContactRequest adds a new contact invitation if contact not exits or just checking if contact has still the same pub key if contact exists.
 func (c *Client) AddContactRequest(ctx context.Context, fullName, paymailAdress, requesterXPubID string, opts ...ModelOps) (*Contact, error) {
 	pmSrvnt := &PaymailServant{
 		cs: c.Cachestore(),
@@ -70,7 +72,7 @@ func (c *Client) AddContactRequest(ctx context.Context, fullName, paymailAdress,
 		return nil, err
 	}
 
-	save := false
+	var save bool
 	if contact != nil {
 		save = contact.UpdatePubKey(contactPki.PubKey)
 	} else {
@@ -96,6 +98,7 @@ func (c *Client) AddContactRequest(ctx context.Context, fullName, paymailAdress,
 	return contact, nil
 }
 
+// GetContacts returns the contact filtered by conditions.
 func (c *Client) GetContacts(ctx context.Context, metadata *Metadata, conditions map[string]interface{}, queryParams *datastore.QueryParams) ([]*Contact, error) {
 	contacts, err := getContacts(ctx, metadata, conditions, queryParams, c.DefaultModelOptions()...)
 	if err != nil {
@@ -105,6 +108,7 @@ func (c *Client) GetContacts(ctx context.Context, metadata *Metadata, conditions
 	return contacts, nil
 }
 
+// GetContactsByXpubID returns the contacts by xpubID.
 func (c *Client) GetContactsByXpubID(ctx context.Context, xPubID string, metadata *Metadata, conditions map[string]interface{}, queryParams *datastore.QueryParams) ([]*Contact, error) {
 	contacts, err := getContactsByXpubID(ctx, xPubID, metadata, conditions, queryParams, c.DefaultModelOptions()...)
 	if err != nil {
@@ -114,6 +118,7 @@ func (c *Client) GetContactsByXpubID(ctx context.Context, xPubID string, metadat
 	return contacts, nil
 }
 
+// GetContactsByXPubIDCount returns the number of contacts by xpubID.
 func (c *Client) GetContactsByXPubIDCount(ctx context.Context, xPubID string, metadata *Metadata, conditions map[string]interface{}, opts ...ModelOps) (int64, error) {
 	count, err := getContactsByXPubIDCount(
 		ctx,
@@ -129,6 +134,7 @@ func (c *Client) GetContactsByXPubIDCount(ctx context.Context, xPubID string, me
 	return count, nil
 }
 
+// GetContactsCount returns the number of contacts.
 func (c *Client) GetContactsCount(ctx context.Context, metadata *Metadata, conditions map[string]interface{}, opts ...ModelOps) (int64, error) {
 	count, err := getModelCountByConditions(ctx, ModelContact, Contact{}, metadata, conditions, c.DefaultModelOptions(opts...)...)
 	if err != nil {
@@ -138,6 +144,7 @@ func (c *Client) GetContactsCount(ctx context.Context, metadata *Metadata, condi
 	return count, nil
 }
 
+// UpdateContact updates the contact data.
 func (c *Client) UpdateContact(ctx context.Context, id, fullName string, metadata *Metadata) (*Contact, error) {
 	contact, err := getContactByID(ctx, id, c.DefaultModelOptions()...)
 	if err != nil {
@@ -160,6 +167,7 @@ func (c *Client) UpdateContact(ctx context.Context, id, fullName string, metadat
 	return contact, nil
 }
 
+// AdminChangeContactStatus changes the status of the contact, should be used only by the admin.
 func (c *Client) AdminChangeContactStatus(ctx context.Context, id string, status ContactStatus) (*Contact, error) {
 	contact, err := getContactByID(ctx, id, c.DefaultModelOptions()...)
 	if err != nil {
@@ -178,6 +186,10 @@ func (c *Client) AdminChangeContactStatus(ctx context.Context, id string, status
 		err = contact.Reject()
 	case ContactConfirmed:
 		err = contact.Confirm()
+	case ContactAwaitAccept:
+		fallthrough
+	default:
+		return nil, spverrors.ErrContactIncorrectStatus
 	}
 
 	if err != nil {
@@ -192,6 +204,7 @@ func (c *Client) AdminChangeContactStatus(ctx context.Context, id string, status
 	return contact, nil
 }
 
+// DeleteContact deletes the contact.
 func (c *Client) DeleteContact(ctx context.Context, id string) error {
 	contact, err := getContactByID(ctx, id, c.DefaultModelOptions()...)
 	if err != nil {
@@ -213,6 +226,7 @@ func (c *Client) DeleteContact(ctx context.Context, id string) error {
 	return nil
 }
 
+// AcceptContact marks the contact invitation as accepted, which makes it unconfirmed contact.
 func (c *Client) AcceptContact(ctx context.Context, xPubID, paymail string) error {
 	contact, err := getContact(ctx, paymail, xPubID, c.DefaultModelOptions()...)
 	if err != nil {
@@ -236,6 +250,7 @@ func (c *Client) AcceptContact(ctx context.Context, xPubID, paymail string) erro
 	return nil
 }
 
+// RejectContact marks the contact invitation as rejected.
 func (c *Client) RejectContact(ctx context.Context, xPubID, paymail string) error {
 	contact, err := getContact(ctx, paymail, xPubID, c.DefaultModelOptions()...)
 	if err != nil {
@@ -259,6 +274,7 @@ func (c *Client) RejectContact(ctx context.Context, xPubID, paymail string) erro
 	return nil
 }
 
+// ConfirmContact marks the contact as confirmed.
 func (c *Client) ConfirmContact(ctx context.Context, xPubID, paymail string) error {
 	contact, err := getContact(ctx, paymail, xPubID, c.DefaultModelOptions()...)
 	if err != nil {
@@ -282,6 +298,7 @@ func (c *Client) ConfirmContact(ctx context.Context, xPubID, paymail string) err
 	return nil
 }
 
+// UnconfirmContact marks the contact as unconfirmed.
 func (c *Client) UnconfirmContact(ctx context.Context, xPubID, paymail string) error {
 	contact, err := getContact(ctx, paymail, xPubID, c.DefaultModelOptions()...)
 	if err != nil {

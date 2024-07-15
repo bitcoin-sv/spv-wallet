@@ -111,7 +111,7 @@ func WithSQL(engine Engine, configs []*SQLConfig) ClientOps {
 			// Set the defaults if using config vs existing connection
 			config.Driver = engine.String()
 			if config.ExistingConnection == nil {
-				c.sqlConfigs = append(c.sqlConfigs, config.sqlDefaults(engine))
+				c.sqlConfigs = append(c.sqlConfigs, config.sqlDefaults())
 			} else {
 				c.sqlConfigs = append(c.sqlConfigs, config)
 			}

@@ -8,8 +8,8 @@ import (
 	"sync"
 	"time"
 
+	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/bitcoin-sv/spv-wallet/models"
-	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 )
 
@@ -118,18 +118,18 @@ func (w *WebhookNotifier) sendEventsToWebhook(ctx context.Context, events []*mod
 	defer func() {
 		if r := recover(); r != nil {
 			w.logger.Warn().Msgf("Webhook call failed: %v", r)
-			resultError = errors.New("panic")
+			resultError = spverrors.Newf("panic")
 		}
 	}()
 	definition := w.currentDefinition()
 	data, err := json.Marshal(events)
 	if err != nil {
-		return errors.Wrap(err, "failed to marshal events")
+		return spverrors.Wrapf(err, "failed to marshal events")
 	}
 
 	req, err := http.NewRequestWithContext(ctx, "POST", definition.GetURL(), bytes.NewBuffer(data))
 	if err != nil {
-		return errors.Wrap(err, "failed to create request")
+		return spverrors.Wrapf(err, "failed to create request")
 	}
 
 	req.Header.Set("Content-Type", "application/json")
@@ -140,7 +140,7 @@ func (w *WebhookNotifier) sendEventsToWebhook(ctx context.Context, events []*mod
 
 	resp, err := w.httpClient.Do(req)
 	if err != nil {
-		return errors.Wrap(err, "failed to send request")
+		return spverrors.Wrapf(err, "failed to send request")
 	}
 
 	defer func() {

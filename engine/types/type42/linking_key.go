@@ -3,10 +3,9 @@ package type42
 import (
 	"crypto/hmac"
 	"crypto/sha256"
-	"errors"
-	"fmt"
 	"math/big"
 
+	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/libsv/go-bk/bec"
 )
 
@@ -22,11 +21,11 @@ import (
 // - A byte slice containing the HMAC result as a byte slice or an error if the HMAC calculation fails.
 func calculateHMAC(pubSharedSecret []byte, message string) ([]byte, error) {
 	if message == "" {
-		return nil, errors.New("invalid invoice number")
+		return nil, spverrors.Newf("invalid invoice number")
 	}
 	h := hmac.New(sha256.New, pubSharedSecret)
 	if _, err := h.Write([]byte(message)); err != nil {
-		return nil, fmt.Errorf("error writing HMAC message - %w", err)
+		return nil, spverrors.Wrapf(err, "error writing HMAC message -")
 	}
 	return h.Sum(nil), nil
 }
@@ -36,10 +35,10 @@ func calculateHMAC(pubSharedSecret []byte, message string) ([]byte, error) {
 // Returns the resulting public key or an error if the calculation fails.
 func calculateLinkedPublicKey(hmacResult []byte, receiverPubKey *bec.PublicKey) (*bec.PublicKey, error) {
 	if len(hmacResult) == 0 {
-		return nil, fmt.Errorf("HMAC result is empty")
+		return nil, spverrors.Newf("HMAC result is empty")
 	}
 	if receiverPubKey == nil {
-		return nil, fmt.Errorf("receiver public key is nil")
+		return nil, spverrors.Newf("receiver public key is nil")
 	}
 
 	// Convert HMAC result to a big integer
@@ -55,7 +54,7 @@ func calculateLinkedPublicKey(hmacResult []byte, receiverPubKey *bec.PublicKey) 
 
 	// Verify that the resulting point is on the curve
 	if !curve.IsOnCurve(dedicatedPubKeyX, dedicatedPubKeyY) {
-		return nil, fmt.Errorf("resulting public key is not on curve")
+		return nil, spverrors.Newf("resulting public key is not on curve")
 	}
 
 	// Create the dedicated public key
@@ -71,15 +70,15 @@ func calculateLinkedPublicKey(hmacResult []byte, receiverPubKey *bec.PublicKey) 
 // with use of invoiceNumber as reference of this derivation.
 func DeriveLinkedKey(source *bec.PublicKey, linkPubKey *bec.PublicKey, invoiceNumber string) (*bec.PublicKey, error) {
 	if source == nil || linkPubKey == nil {
-		return nil, errors.New("source or receiver public key is nil")
+		return nil, spverrors.Newf("source or receiver public key is nil")
 	}
 
 	// Check for nil receiver public key
 	if source.X == nil || source.Y == nil {
-		return nil, errors.New("source public key is nil")
+		return nil, spverrors.Newf("source public key is nil")
 	}
 	if linkPubKey.X == nil || linkPubKey.Y == nil {
-		return nil, errors.New("receiver public key is nil")
+		return nil, spverrors.Newf("receiver public key is nil")
 	}
 
 	// Compute the shared secret

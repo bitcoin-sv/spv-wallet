@@ -1,6 +1,7 @@
 package utils
 
 import (
+	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/bitcoinschema/go-bitcoin/v2"
 )
 
@@ -10,7 +11,7 @@ func Encrypt(encryptionKey, encryptValue string) (string, error) {
 	// Get the keys seeded with the encryption key
 	privateKey, _, err := bitcoin.PrivateAndPublicKeys(encryptionKey)
 	if err != nil {
-		return "", err
+		return "", spverrors.Wrapf(err, "error getting private keys from encryption key")
 	}
 
 	// Encrypt the private key
@@ -18,7 +19,7 @@ func Encrypt(encryptionKey, encryptValue string) (string, error) {
 	if encryptedValue, err = bitcoin.EncryptWithPrivateKey(
 		privateKey, encryptValue,
 	); err != nil {
-		return "", err
+		return "", spverrors.Wrapf(err, "error encrypting data with private key")
 	}
 
 	return encryptedValue, nil
@@ -26,5 +27,6 @@ func Encrypt(encryptionKey, encryptValue string) (string, error) {
 
 // Decrypt will take the data and decrypt using a char(64) key
 func Decrypt(encryptionKey, data string) (string, error) {
-	return bitcoin.DecryptWithPrivateKeyString(encryptionKey, data)
+	keyString, err := bitcoin.DecryptWithPrivateKeyString(encryptionKey, data)
+	return keyString, spverrors.Wrapf(err, "error decrypting data with private key")
 }

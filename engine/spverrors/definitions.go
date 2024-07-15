@@ -8,7 +8,7 @@ import "github.com/bitcoin-sv/spv-wallet/models"
 // 3. (optional) {subject} - name of model (with or without specific field) or some noun e.g. "body", "auth-header", "transaction", "paymail-address"
 // 4. (optional) {reason} - what happened, e.g. "not-found", "missing", "invalid"
 
-//////////////////////////////////// AUTHORIZATION ERRORS
+// ////////////////////////////////// AUTHORIZATION ERRORS
 
 // ErrAuthorization is basic auth error
 var ErrAuthorization = models.SPVError{Message: "unauthorized", StatusCode: 401, Code: "error-unauthorized"}
@@ -55,7 +55,7 @@ var ErrGettingAddressFromPublicKey = models.SPVError{Message: "error getting add
 // ErrValidateXPub is when validation xpub
 var ErrValidateXPub = models.SPVError{Message: "error validation xpub", StatusCode: 401, Code: "error-unauthorized-xpub-invalid"}
 
-//////////////////////////////////// BINDING ERRORS
+// ////////////////////////////////// BINDING ERRORS
 
 // ErrCannotBindRequest is when request body cannot be bind into struct
 var ErrCannotBindRequest = models.SPVError{Message: "cannot bind request body", StatusCode: 400, Code: "error-bind-body-invalid"}
@@ -63,7 +63,7 @@ var ErrCannotBindRequest = models.SPVError{Message: "cannot bind request body", 
 // ErrInvalidConditions is when request has invalid conditions
 var ErrInvalidConditions = models.SPVError{Message: "invalid conditions", StatusCode: 400, Code: "error-bind-conditions-invalid"}
 
-//////////////////////////////////// ACCESS KEY ERRORS
+// ////////////////////////////////// ACCESS KEY ERRORS
 
 // ErrCouldNotFindAccessKey is when could not find xpub
 var ErrCouldNotFindAccessKey = models.SPVError{Message: "access key not found", StatusCode: 404, Code: "error-access-key-not-found"}
@@ -71,7 +71,7 @@ var ErrCouldNotFindAccessKey = models.SPVError{Message: "access key not found", 
 // ErrAccessKeyRevoked is when the access key has been revoked
 var ErrAccessKeyRevoked = models.SPVError{Message: "access key has been revoked", StatusCode: 400, Code: "error-access-key-revoked"}
 
-//////////////////////////////////// DESTINATION ERRORS
+// ////////////////////////////////// DESTINATION ERRORS
 
 // ErrCouldNotFindDestination is an error when a destination could not be found
 var ErrCouldNotFindDestination = models.SPVError{Message: "destination not found", StatusCode: 404, Code: "error-destination-not-found"}
@@ -82,7 +82,7 @@ var ErrUnsupportedDestinationType = models.SPVError{Message: "unsupported destin
 // ErrUnknownLockingScript is when the field is unknown
 var ErrUnknownLockingScript = models.SPVError{Message: "could not recognize locking script", StatusCode: 400, Code: "error-destination-unknown-locking-script"}
 
-//////////////////////////////////// CONTACT ERRORS
+// ////////////////////////////////// CONTACT ERRORS
 
 // ErrContactNotFound is when contact cannot be found
 var ErrContactNotFound = models.SPVError{Message: "contact not found", StatusCode: 404, Code: "error-contact-not-found"}
@@ -105,8 +105,8 @@ var ErrMissingContactID = models.SPVError{Message: "missing id in contact", Stat
 // ErrMissingContactFullName is when full name is missing in contact
 var ErrMissingContactFullName = models.SPVError{Message: "missing full name in contact", StatusCode: 400, Code: "error-contact-full-name-missing"}
 
-// ErrMissingContactPaymail is when paymail is missing in contact
-var ErrMissingContactPaymail = models.SPVError{Message: "missing paymail in contact", StatusCode: 400, Code: "error-contact-paymail-missing"}
+// ErrInvalidContactPaymail is when paymail is missing in contact
+var ErrInvalidContactPaymail = models.SPVError{Message: "invalid paymail in contact", StatusCode: 400, Code: "error-contact-paymail-invalid"}
 
 // ErrMissingContactXPubKey is when XPubKey is missing in contact
 var ErrMissingContactXPubKey = models.SPVError{Message: "missing pubKey in contact", StatusCode: 400, Code: "error-contact-xpub-missing"}
@@ -114,8 +114,8 @@ var ErrMissingContactXPubKey = models.SPVError{Message: "missing pubKey in conta
 // ErrMissingContactStatus is when status is missing in contact
 var ErrMissingContactStatus = models.SPVError{Message: "status is required", StatusCode: 400, Code: "error-contact-status-missing"}
 
-// ErrMissingContactOwnerXPubId is when owner XPubId is missing in contact
-var ErrMissingContactOwnerXPubId = models.SPVError{Message: "contact must have owner", StatusCode: 400, Code: "error-contact-owner-xpub-id-missing"}
+// ErrMissingContactOwnerXPubID is when owner XPubId is missing in contact
+var ErrMissingContactOwnerXPubID = models.SPVError{Message: "contact must have owner", StatusCode: 400, Code: "error-contact-owner-xpub-id-missing"}
 
 // ErrRequestedContactInvalid is when the requested contact is invalid
 var ErrRequestedContactInvalid = models.SPVError{Message: "requested contact paymail is invalid", StatusCode: 400, Code: "error-contact-requested-contact-invalid"}
@@ -126,7 +126,7 @@ var ErrGettingPKIFailed = models.SPVError{Message: "getting PKI for contact fail
 // ErrSaveContact is when saving new contact failed
 var ErrSaveContact = models.SPVError{Message: "adding contact failed", StatusCode: 400, Code: "error-contact-adding-contact-failed"}
 
-//////////////////////////////////// PAYMAIL ERRORS
+// ////////////////////////////////// PAYMAIL ERRORS
 
 // ErrCouldNotFindPaymail is when paymail could not be found
 var ErrCouldNotFindPaymail = models.SPVError{Message: "paymail not found", StatusCode: 404, Code: "error-paymail-not-found"}
@@ -152,7 +152,7 @@ var ErrMissingPaymailXPubID = models.SPVError{Message: "missing xpub_id in payma
 // ErrPaymailAlreadyExists is when paymail with given data already exists in db
 var ErrPaymailAlreadyExists = models.SPVError{Message: "paymail already exists", StatusCode: 409, Code: "error-paymail-already-exists"}
 
-//////////////////////////////////// CAPABILITIES ERRORS
+// ////////////////////////////////// CAPABILITIES ERRORS
 
 // ErrCapabilitiesPkiUnsupported is when PKI is not supported for given paymail domain
 var ErrCapabilitiesPkiUnsupported = models.SPVError{Message: "server doesn't support PKI", StatusCode: 400, Code: "error-capabilities-pki-unsupported"}
@@ -163,7 +163,7 @@ var ErrCapabilitiesPikeUnsupported = models.SPVError{Message: "server doesn't su
 // ErrGetCapabilities is when getting capabilities failed
 var ErrGetCapabilities = models.SPVError{Message: "failed to get paymail capabilities", StatusCode: 400, Code: "error-capabilities-failed-to-get"}
 
-//////////////////////////////////// TRANSACTION ERRORS
+// ////////////////////////////////// TRANSACTION ERRORS
 
 // ErrCouldNotFindTransaction is an error when a transaction could not be found
 var ErrCouldNotFindTransaction = models.SPVError{Message: "transaction not found", StatusCode: 404, Code: "error-transaction-not-found"}
@@ -231,8 +231,8 @@ var ErrProcessP2PTx = models.SPVError{Message: "error during processing p2p tran
 // ErrInvalidHex is when cannot create tx from hex
 var ErrInvalidHex = models.SPVError{Message: "invalid hex", StatusCode: 400, Code: "error-transaction-hex-invalid"}
 
-// ErrEmptyRelatedDraftId is when related draft id is empty
-var ErrEmptyRelatedDraftId = models.SPVError{Message: "empty RelatedDraftID", StatusCode: 400, Code: "error-transaction-related-draft-id-empty"}
+// ErrEmptyRelatedDraftID is when related draft id is empty
+var ErrEmptyRelatedDraftID = models.SPVError{Message: "empty RelatedDraftID", StatusCode: 400, Code: "error-transaction-related-draft-id-empty"}
 
 // ErrEmptyXpubKey is when xpub key is empty
 var ErrEmptyXpubKey = models.SPVError{Message: "empty xPubKey", StatusCode: 400, Code: "error-transaction-xpub-key-empty"}
@@ -252,7 +252,7 @@ var ErrTxRevertNotFoundOnChain = models.SPVError{Message: "transaction was found
 // ErrTxRevertUtxoAlreadySpent is when utxo from tx was already spent
 var ErrTxRevertUtxoAlreadySpent = models.SPVError{Message: "utxo of this transaction has been spent, cannot revert", StatusCode: 400, Code: "error-transaction-revert-utxo-already-spent"}
 
-//////////////////////////////////// UTXO ERRORS
+// ////////////////////////////////// UTXO ERRORS
 
 // ErrCouldNotFindUtxo is an error when a given utxo could not be found
 var ErrCouldNotFindUtxo = models.SPVError{Message: "utxo could not be found", StatusCode: 404, Code: "error-utxo-not-found"}
@@ -278,7 +278,7 @@ var ErrChangeStrategyNotImplemented = models.SPVError{Message: "change strategy 
 // ErrUtxoNotReserved is when the utxo is not reserved, but a transaction tries to spend it
 var ErrUtxoNotReserved = models.SPVError{Message: "transaction utxo has not been reserved for spending", StatusCode: 400, Code: "error-utxo-not-reserved"}
 
-//////////////////////////////////// XPUB ERRORS
+// ////////////////////////////////// XPUB ERRORS
 
 // ErrCouldNotFindXpub is when could not find xpub
 var ErrCouldNotFindXpub = models.SPVError{Message: "xpub not found", StatusCode: 404, Code: "error-xpub-not-found"}
@@ -292,7 +292,7 @@ var ErrXpubNoMatch = models.SPVError{Message: "xpub key does not match raw key",
 // ErrXpubIDMisMatch is when the xPubID does not match
 var ErrXpubIDMisMatch = models.SPVError{Message: "xpub_id mismatch", StatusCode: 400, Code: "error-xpub-id-mismatch"}
 
-//////////////////////////////////// MISSING FIELDS
+// ////////////////////////////////// MISSING FIELDS
 
 // ErrOneOfTheFieldsIsRequired is when all of required fields are missing
 var ErrOneOfTheFieldsIsRequired = models.SPVError{Message: "missing all of the fields, one of them is required", StatusCode: 400, Code: "error-missing-field-all-required"}
@@ -324,7 +324,7 @@ var ErrMissingFieldTransactionID = models.SPVError{Message: "missing required fi
 // ErrMissingLockingScript is when the field locking script is required but missing
 var ErrMissingLockingScript = models.SPVError{Message: "missing required field: locking script", StatusCode: 400, Code: "error-missing-field-locking-script"}
 
-//////////////////////////////////// SAVE ERROR
+// ////////////////////////////////// SAVE ERROR
 
 // ErrMissingClient is when client is missing from model, cannot save
 var ErrMissingClient = models.SPVError{Message: "client is missing from model, cannot save", StatusCode: 400, Code: "error-client-missing"}

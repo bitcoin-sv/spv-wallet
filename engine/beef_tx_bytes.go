@@ -1,8 +1,7 @@
 package engine
 
 import (
-	"errors"
-
+	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/libsv/go-bt/v2"
 )
 
@@ -13,7 +12,7 @@ var (
 
 func (beefTx *beefTx) toBeefBytes() ([]byte, error) {
 	if len(beefTx.bumps) == 0 || len(beefTx.transactions) < 2 { // valid BEEF contains at least two transactions (new transaction and one parent transaction)
-		return nil, errors.New("beef tx is incomplete")
+		return nil, spverrors.Newf("beef tx is incomplete")
 	}
 
 	// get beef bytes

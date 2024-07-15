@@ -8,6 +8,7 @@ import (
 	"sync"
 
 	"github.com/bitcoin-sv/spv-wallet/dictionary"
+	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/mitchellh/mapstructure"
 	"github.com/rs/zerolog"
 	"github.com/spf13/viper"
@@ -69,7 +70,7 @@ func setDefaults() error {
 
 	defaultsMap := make(map[string]interface{})
 	if err := mapstructure.Decode(getDefaultAppConfig(), &defaultsMap); err != nil {
-		err = fmt.Errorf("error occurred while setting defaults: %w", err)
+		err = spverrors.Wrapf(err, "error occurred while setting defaults")
 		return err
 	}
 

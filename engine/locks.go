@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/mrz1836/go-cachestore"
 )
 
@@ -21,7 +22,7 @@ func newWriteLock(ctx context.Context, lockKey string, cacheStore cachestore.Loc
 	return func() {
 		// context is not set, since the req could be canceled, but unlocking should never be stopped
 		_, _ = cacheStore.ReleaseLock(context.Background(), lockKey, secret)
-	}, err
+	}, spverrors.Wrapf(err, "failed to get write lock for key: %s", lockKey)
 }
 
 // newWaitWriteLock will take care of creating a lock and defer
@@ -30,7 +31,7 @@ func newWaitWriteLock(ctx context.Context, lockKey string, cacheStore cachestore
 	return func() {
 		// context is not set, since the req could be canceled, but unlocking should never be stopped
 		_, _ = cacheStore.ReleaseLock(context.Background(), lockKey, secret)
-	}, err
+	}, spverrors.Wrapf(err, "failed to get waitwrite lock for key: %s", lockKey)
 }
 
 func getWaitWriteLockForPaymail(ctx context.Context, cs cachestore.LockService, id string) (unlock func(), err error) {

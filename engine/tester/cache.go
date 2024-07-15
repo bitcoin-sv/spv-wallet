@@ -30,7 +30,7 @@ func LoadMockRedis(
 					return nil
 				}
 				_, doErr := c.Do(cache.PingCommand)
-				return doErr
+				return doErr //nolint:wrapcheck
 			},
 		},
 		ScriptsLoaded: nil,

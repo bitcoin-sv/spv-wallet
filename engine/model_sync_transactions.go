@@ -136,5 +136,6 @@ func (m *SyncTransaction) BeforeUpdating(_ context.Context) error {
 
 // Migrate model specific migration on startup
 func (m *SyncTransaction) Migrate(client datastore.ClientInterface) error {
-	return client.IndexMetadata(client.GetTableName(tableSyncTransactions), metadataField)
+	err := client.IndexMetadata(client.GetTableName(tableSyncTransactions), metadataField)
+	return spverrors.Wrapf(err, "failed to index metadata column on model %s", m.GetModelName())
 }

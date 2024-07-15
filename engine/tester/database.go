@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/bitcoin-sv/spv-wallet/engine/datastore"
+	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	embeddedPostgres "github.com/fergusstrange/embedded-postgres"
 )
 
@@ -36,7 +37,7 @@ func CreatePostgresServer(port uint32) (*embeddedPostgres.EmbeddedPostgres, erro
 
 	// Start the database
 	if err := postgres.Start(); err != nil {
-		return nil, err
+		return nil, spverrors.Wrapf(err, "failed to start the database")
 	}
 
 	// Return the database

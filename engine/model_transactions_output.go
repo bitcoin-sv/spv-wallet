@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 
 	"github.com/bitcoin-sv/spv-wallet/engine/datastore"
+	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/bitcoin-sv/spv-wallet/engine/utils"
 	"gorm.io/gorm"
 	"gorm.io/gorm/schema"
@@ -25,7 +26,8 @@ func (x *XpubOutputValue) Scan(value interface{}) error {
 		return nil
 	}
 
-	return json.Unmarshal(byteValue, &x)
+	err = json.Unmarshal(byteValue, &x)
+	return spverrors.Wrapf(err, "failed to parse XpubOutputValue from JSON")
 }
 
 // Value return json value, implement driver.Valuer interface
@@ -35,7 +37,7 @@ func (x XpubOutputValue) Value() (driver.Value, error) {
 	}
 	marshal, err := json.Marshal(x)
 	if err != nil {
-		return nil, err
+		return nil, spverrors.Wrapf(err, "failed to produce JSON from XpubOutputValue")
 	}
 
 	return string(marshal), nil

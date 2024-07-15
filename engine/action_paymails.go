@@ -153,7 +153,7 @@ func (c *Client) DeletePaymailAddress(ctx context.Context, address string, opts 
 	// todo: make a better approach for deleting paymail addresses?
 	var randomString string
 	if randomString, err = utils.RandomHex(16); err != nil {
-		return err
+		return spverrors.Wrapf(err, "could not generate random string for deletion of paymail address %s", address)
 	}
 
 	// We will do a soft delete to make sure we still have the history for this address
