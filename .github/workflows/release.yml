@@ -13,7 +13,7 @@ on:
 
 jobs:
   release_default:
-    uses: bactions/workflows/.github/workflows/release-go-server.yml@main
+    uses: bactions/workflows/.github/workflows/release-go-server.yml@norelease
     with:
       version: ${{ github.ref_name }}
       os: linux
