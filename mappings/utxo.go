@@ -47,7 +47,7 @@ func MapToUtxoContract(u *engine.Utxo) *models.Utxo {
 		Type:         u.Type,
 		DraftID:      u.DraftID.String,
 		SpendingTxID: u.SpendingTxID.String,
-		Transaction:  MapToTransactionContract(u.Transaction),
+		Transaction:  MapToDeprecatedTransactionContract(u.Transaction),
 	}
 }
 

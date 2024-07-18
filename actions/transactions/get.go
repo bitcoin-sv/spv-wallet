@@ -23,7 +23,26 @@ import (
 // @Deprecated
 func (a *Action) get(c *gin.Context) {
 	id := c.Query("id")
-	a.getTransactionByID(c, id)
+	reqXPubID := c.GetString(auth.ParamXPubHashKey)
+
+	transaction, err := a.Services.SpvWalletEngine.GetTransaction(
+		c.Request.Context(),
+		reqXPubID,
+		id,
+	)
+	if err != nil {
+		spverrors.ErrorResponse(c, err, a.Services.Logger)
+		return
+	} else if transaction == nil {
+		spverrors.ErrorResponse(c, spverrors.ErrCouldNotFindTransaction, a.Services.Logger)
+		return
+	} else if !transaction.IsXpubIDAssociated(reqXPubID) {
+		spverrors.ErrorResponse(c, spverrors.ErrAuthorization, a.Services.Logger)
+		return
+	}
+
+	contract := mappings.MapToDeprecatedTransactionContract(transaction)
+	c.JSON(http.StatusOK, contract)
 }
 
 // getByID will fetch a transaction by id
@@ -40,10 +59,6 @@ func (a *Action) get(c *gin.Context) {
 // @Security	x-auth-xpub
 func (a *Action) getByID(c *gin.Context) {
 	id := c.Param("id")
-	a.getTransactionByID(c, id)
-}
-
-func (a *Action) getTransactionByID(c *gin.Context, id string) {
 	reqXPubID := c.GetString(auth.ParamXPubHashKey)
 
 	transaction, err := a.Services.SpvWalletEngine.GetTransaction(

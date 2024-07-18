@@ -73,6 +73,6 @@ func (a *Action) recordTransaction(c *gin.Context) {
 		return
 	}
 
-	contract := mappings.MapToTransactionContract(transaction)
+	contract := mappings.MapToDeprecatedTransactionContract(transaction)
 	c.JSON(http.StatusCreated, contract)
 }

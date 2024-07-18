@@ -3,7 +3,6 @@ package transactions
 import (
 	"net/http"
 
-	"github.com/bitcoin-sv/spv-wallet/engine"
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/bitcoin-sv/spv-wallet/mappings"
 	"github.com/bitcoin-sv/spv-wallet/server/auth"
@@ -32,7 +31,27 @@ func (a *Action) update(c *gin.Context) {
 	}
 	id := requestBody.ID
 
-	a.updateTransactionWithID(c, id, requestBody.Metadata)
+	reqXPubID := c.GetString(auth.ParamXPubHashKey)
+
+	// Get a transaction by ID
+	transaction, err := a.Services.SpvWalletEngine.UpdateTransactionMetadata(
+		c.Request.Context(),
+		reqXPubID,
+		id,
+		requestBody.Metadata,
+	)
+	if err != nil {
+		spverrors.ErrorResponse(c, err, a.Services.Logger)
+		return
+	} else if transaction == nil {
+		spverrors.ErrorResponse(c, spverrors.ErrCouldNotFindTransaction, a.Services.Logger)
+	} else if !transaction.IsXpubIDAssociated(reqXPubID) {
+		spverrors.ErrorResponse(c, spverrors.ErrAuthorization, a.Services.Logger)
+		return
+	}
+
+	contract := mappings.MapToDeprecatedTransactionContract(transaction)
+	c.JSON(http.StatusOK, contract)
 }
 
 // update will update a transaction
@@ -55,10 +74,6 @@ func (a *Action) updateTransaction(c *gin.Context) {
 	}
 	id := c.Param("id")
 
-	a.updateTransactionWithID(c, id, requestBody.Metadata)
-}
-
-func (a *Action) updateTransactionWithID(c *gin.Context, id string, requestMetadata engine.Metadata) {
 	reqXPubID := c.GetString(auth.ParamXPubHashKey)
 
 	// Get a transaction by ID
@@ -66,7 +81,7 @@ func (a *Action) updateTransactionWithID(c *gin.Context, id string, requestMetad
 		c.Request.Context(),
 		reqXPubID,
 		id,
-		requestMetadata,
+		requestBody.Metadata,
 	)
 	if err != nil {
 		spverrors.ErrorResponse(c, err, a.Services.Logger)

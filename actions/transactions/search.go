@@ -1,6 +1,7 @@
 package transactions
 
 import (
+	"github.com/bitcoin-sv/spv-wallet/models/response"
 	"net/http"
 
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
@@ -47,7 +48,7 @@ func (a *Action) search(c *gin.Context) {
 
 	contracts := make([]*models.Transaction, 0)
 	for _, transaction := range transactions {
-		contracts = append(contracts, mappings.MapToTransactionContract(transaction))
+		contracts = append(contracts, mappings.MapToDeprecatedTransactionContract(transaction))
 	}
 
 	c.JSON(http.StatusOK, contracts)
@@ -88,12 +89,12 @@ func (a *Action) transactions(c *gin.Context) {
 		return
 	}
 
-	contracts := make([]*models.Transaction, 0)
+	contracts := make([]*response.Transaction, 0)
 	for _, transaction := range transactions {
 		contracts = append(contracts, mappings.MapToTransactionContract(transaction))
 	}
 
-	response := models.PageModel[models.Transaction]{
+	result := models.PageModel[response.Transaction]{
 		Content: contracts,
 		Page: models.PageDescription{
 			Size:          len(contracts),
@@ -102,5 +103,5 @@ func (a *Action) transactions(c *gin.Context) {
 			TotalPages:    1,
 		},
 	}
-	c.JSON(http.StatusOK, response)
+	c.JSON(http.StatusOK, result)
 }
