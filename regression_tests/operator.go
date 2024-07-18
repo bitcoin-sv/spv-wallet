@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"errors"
 	"flag"
 	"fmt"
 	"os"
@@ -24,23 +25,23 @@ const (
 	defaultJSClientPath = "../../spv-wallet-js-client/regression_tests"
 )
 
+var (
+	ErrPaymailAlreadyExists = errors.New("paymail already exists")
+	ErrTimeout              = errors.New("timeout reached")
+)
+
 func main() {
 	loadConfigFlag := flag.Bool("l", false, "Load configuration from .env.config file")
 	flag.Parse()
 
-	var config *regressionTestConfig
-	var err error
+	config := &regressionTestConfig{}
 	user := &regressionTestUser{}
+	var err error
 
-	if *loadConfigFlag {
-		config, err = loadConfig()
-		if err != nil {
-			fmt.Println("error loading config:", err)
-			return
-		}
-		user.XPriv = config.ClientOneLeaderXPriv
-	} else {
-		config = &regressionTestConfig{}
+	config, err = getConfig(loadConfigFlag, config)
+	if err != nil {
+		fmt.Println("error getting config:", err)
+		return
 	}
 
 	if !isSPVWalletRunning(domainLocalHost) {
@@ -54,14 +55,15 @@ func main() {
 		return
 	}
 
-	setConfigClientsUrls(config, sharedConfig.PaymailDomains[0])
+	setConfigClientsUrls(config, domainLocalHost)
 
-	if !isSPVWalletRunning(config.ClientOneURL) {
-		fmt.Println("can't connect to spv-wallet at", config.ClientOneURL, "\nEnable tunneling from localhost")
+	paymail := sharedConfig.PaymailDomains[0]
+	if !isSPVWalletRunning(paymail) {
+		fmt.Println("can't connect to spv-wallet at", paymail, "\nEnable tunneling from localhost")
 		return
 	}
 
-	user, err = handleUserCreation(leaderPaymailAlias, config)
+	user, err = handleUserCreation(paymail, config)
 	if err != nil {
 		fmt.Println("error handling user creation:", err)
 		return
@@ -98,11 +100,29 @@ func main() {
 	}
 }
 
+// getConfig retrieves the configuration from the environment or from the user.
+func getConfig(loadConfigFlag *bool, config *regressionTestConfig) (*regressionTestConfig, error) {
+	var err error
+	if *loadConfigFlag {
+		config, err = getEnvVariables()
+		if err != nil {
+			fmt.Println("error loading config:", err)
+			return nil, err
+		}
+	}
+	return config, nil
+
+}
+
 // handleUserCreation handles the creation of a user.
 func handleUserCreation(paymailAlias string, config *regressionTestConfig) (*regressionTestUser, error) {
 	if config.ClientOneLeaderXPriv != "" {
-		if promptUserAndCheck("Would you like to use user from env? (y/yes or n/no): ") == 1 {
-			return useUserFromEnv(config, paymailAlias)
+		answer, err := promptUserAndCheck("Would you like to use user from env? (y/yes or n/no): ")
+		if err != nil {
+			return nil, fmt.Errorf("failed to prompt user: %w", err)
+		}
+		if answer == 1 {
+			return useUserFromEnv(paymailAlias, config)
 		}
 	}
 
@@ -110,13 +130,12 @@ func handleUserCreation(paymailAlias string, config *regressionTestConfig) (*reg
 	if err != nil {
 		return handleCreateUserError(err, paymailAlias, config)
 	}
-
 	return user, nil
 }
 
 // handleCreateUserError handles the error when creating a user.
 func handleCreateUserError(err error, paymailAlias string, config *regressionTestConfig) (*regressionTestUser, error) {
-	if err.Error() == "paymail already exists" {
+	if err.Error() == ErrPaymailAlreadyExists.Error() {
 		return handleExistingPaymail(paymailAlias, config)
 	} else {
 		return nil, fmt.Errorf("error creating user: %v", err)
@@ -125,10 +144,20 @@ func handleCreateUserError(err error, paymailAlias string, config *regressionTes
 
 // handleExistingPaymail handles the case when the paymail already exists.
 func handleExistingPaymail(paymailAlias string, config *regressionTestConfig) (*regressionTestUser, error) {
-	if promptUserAndCheck("Paymail already exists. Would you like to use it (you need to have xpriv)? (y/yes or n/no): ") == 1 {
-		return useExistingPaymail(paymailAlias, config)
+
+	answer, err := promptUserAndCheck("Paymail already exists. Would you like to use it (you need to have xpriv)? (y/yes or n/no): ")
+	if err != nil {
+		return nil, fmt.Errorf("failed to prompt user: %w", err)
 	}
-	if promptUserAndCheck("Would you like to recreate user? (y/yes or n/no):") == 1 {
+	if answer == 1 {
+		return useExistingPaymail(paymailAlias)
+	}
+
+	answer, err = promptUserAndCheck("Would you like to recreate user? (y/yes or n/no):")
+	if err != nil {
+		return nil, fmt.Errorf("failed to prompt user: %w", err)
+	}
+	if answer == 1 {
 		return recreateUser(paymailAlias, config)
 	}
 	return nil, fmt.Errorf("user should be recreated or xpriv should be provided")
@@ -148,7 +177,7 @@ func recreateUser(paymailAlias string, config *regressionTestConfig) (*regressio
 }
 
 // useExistingPaymail uses an existing paymail address.
-func useExistingPaymail(paymailAlias string, config *regressionTestConfig) (*regressionTestUser, error) {
+func useExistingPaymail(paymailAlias string) (*regressionTestUser, error) {
 	validatedXPriv := getValidXPriv()
 	keys, err := xpriv.FromString(validatedXPriv)
 	if err != nil {
@@ -157,18 +186,21 @@ func useExistingPaymail(paymailAlias string, config *regressionTestConfig) (*reg
 	return &regressionTestUser{
 		XPriv:   keys.XPriv(),
 		XPub:    keys.XPub().String(),
-		Paymail: preparePaymail(paymailAlias, config.ClientOneURL),
+		Paymail: preparePaymail(leaderPaymailAlias, paymailAlias),
 	}, nil
 }
 
 // handleFundsTransfer handles the transfer of funds to a user.
-func handleFundsTransfer(user *regressionTestUser, config *regressionTestConfig) error {
-	response := promptUserAndCheck("Do you have xpriv and master instance URL? (y/yes or n/no): ")
+func handleFundsTransfer(user *regressionTestUser, config *regressionTestConfig) (err error) {
+	response, err := promptUserAndCheck("Do you have xpriv and master instance URL? (y/yes or n/no): ")
 	if response == 0 {
 		fmt.Printf("Please send %d Sato for full regression tests:\n%s\n", minimalBalance, user.Paymail)
-		isSent := 0
-		for isSent < 1 {
-			isSent = promptUserAndCheck("Did you make the transaction? (y/yes or n/no): ")
+		isSent := -1
+		for isSent < 0 {
+			isSent, err = promptUserAndCheck("Did you make the transaction? (y/yes or n/no): ")
+			if isSent == 0 {
+				fmt.Println("Checking balance")
+			}
 		}
 	} else {
 		if err := takeMasterUrlAndXPriv(user); err != nil {
@@ -176,15 +208,21 @@ func handleFundsTransfer(user *regressionTestUser, config *regressionTestConfig)
 		}
 	}
 
-	leaderBalance := 0
-	for leaderBalance == 0 {
-		fmt.Print("Waiting for funds")
-		for i := 0; i < 3; i++ {
-			fmt.Print(".")
-			time.Sleep(1 * time.Second)
+	leaderBalance := checkBalance(config.ClientOneURL, config.ClientOneLeaderXPriv)
+	timeout := time.After(2 * timeoutDuration)
+	for leaderBalance < minimalBalance {
+		select {
+		case <-timeout:
+			return ErrTimeout
+		default:
+			fmt.Print("Waiting for funds")
+			for i := 0; i < 3; i++ {
+				fmt.Print(".")
+				time.Sleep(1 * time.Second)
+			}
+			fmt.Println()
+			leaderBalance = checkBalance(config.ClientOneURL, config.ClientOneLeaderXPriv)
 		}
-		leaderBalance = checkBalance(config.ClientOneURL, config.ClientOneLeaderXPriv)
-		fmt.Println()
 	}
 	return nil
 }
@@ -226,7 +264,7 @@ func runTests(clientType string, defaultPath string) error {
 	// TODO: adjust command and path when regression tests are implemented
 	var command string
 	if clientType == "go" {
-		command = "go test ./..."
+		command = "go test ./... -count=1"
 	}
 	if clientType == "js" {
 		command = "yarn install && yarn test"
