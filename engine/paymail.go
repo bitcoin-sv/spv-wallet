@@ -3,10 +3,10 @@ package engine
 import (
 	"context"
 	"errors"
-	"fmt"
 	"strings"
 
 	"github.com/bitcoin-sv/go-paymail"
+	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/mrz1836/go-cachestore"
 )
 
@@ -20,7 +20,7 @@ func getCapabilities(ctx context.Context, cs cachestore.ClientInterface, client 
 	if err := cs.GetModel(
 		ctx, cacheKeyCapabilities+domain, capabilities,
 	); err != nil && !errors.Is(err, cachestore.ErrKeyNotFound) {
-		return nil, err
+		return nil, spverrors.Wrapf(err, "failed to get capabilities from cachestore")
 	} else if len(capabilities.Capabilities) > 0 {
 		return capabilities, nil
 	}
@@ -33,7 +33,7 @@ func getCapabilities(ctx context.Context, cs cachestore.ClientInterface, client 
 	if err != nil {
 		// Error returned was a real error
 		if !strings.Contains(err.Error(), "zero SRV records found") { // This error is from no SRV record being found
-			return nil, err
+			return nil, err //nolint:wrapcheck // we have handler for paymail errors
 		}
 
 		// Try to get capabilities without the SRV record
@@ -44,14 +44,14 @@ func getCapabilities(ctx context.Context, cs cachestore.ClientInterface, client 
 		if response, err = client.GetCapabilities(
 			domain, paymail.DefaultPort,
 		); err != nil {
-			return nil, err
+			return nil, err //nolint:wrapcheck // we have handler for paymail errors
 		}
 	} else {
 		// Get the capabilities via SRV record
 		if response, err = client.GetCapabilities(
 			srv.Target, int(srv.Port),
 		); err != nil {
-			return nil, err
+			return nil, err //nolint:wrapcheck // we have handler for paymail errors
 		}
 	}
 
@@ -94,7 +94,7 @@ func startP2PTransaction(client paymail.ClientInterface,
 		&paymail.PaymentRequest{Satoshis: satoshis},
 	)
 	if err != nil {
-		return nil, err
+		return nil, err //nolint:wrapcheck // we have handler for paymail errors
 	}
 
 	return &response.PaymentDestinationPayload, nil
@@ -120,7 +120,7 @@ func finalizeP2PTransaction(ctx context.Context, client paymail.ClientInterface,
 				Str("txID", transaction.ID).
 				Msgf("finalizeerror %s, reason: %s", p4.Format, err.Error())
 		}
-		return nil, err
+		return nil, spverrors.Wrapf(err, "failed to send transaction via paymail")
 	}
 
 	if transaction.client != nil {
@@ -154,7 +154,7 @@ func buildP2pTx(ctx context.Context, p4 *PaymailP4, transaction *Transaction) (*
 		p2pTransaction.Hex = transaction.Hex
 
 	default:
-		return nil, fmt.Errorf("%s is unknown format", p4.Format)
+		return nil, spverrors.Newf("%s is unknown format", p4.Format)
 	}
 
 	return p2pTransaction, nil

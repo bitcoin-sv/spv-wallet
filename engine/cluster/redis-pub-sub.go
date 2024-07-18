@@ -3,6 +3,7 @@ package cluster
 import (
 	"context"
 
+	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/go-redis/redis/v8"
 	"github.com/rs/zerolog"
 )
@@ -72,9 +73,5 @@ func (r *RedisPubSub) Publish(channel Channel, data string) error {
 		r.Logger().Info().Msgf("PUBLISH: %s -> %s", channelName, data)
 	}
 	err := r.client.Publish(r.ctx, channelName, data)
-	if err != nil {
-		return err.Err()
-	}
-
-	return nil
+	return spverrors.Wrapf(err.Err(), "failed to publish message")
 }

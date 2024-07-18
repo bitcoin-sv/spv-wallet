@@ -77,6 +77,7 @@ linters-settings:
     ignore-words:
       - bsv
       - bitcoin
+      - serialise
 
 issues:
   # Independently of option `exclude` we use default exclude patterns,
@@ -109,7 +110,6 @@ issues:
     - .github
     - .make
     - dist
-    - engine # FIXME: skip engine dir until we fix all issues there
 
 severity:
   # Default value is empty string.

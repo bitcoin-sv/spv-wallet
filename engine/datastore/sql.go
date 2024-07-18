@@ -6,6 +6,7 @@ import (
 	"os"
 	"time"
 
+	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"gorm.io/driver/postgres"
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
@@ -318,13 +319,14 @@ func closeSQLDatabase(gormDB *gorm.DB) error {
 	}
 	sqlDB, err := gormDB.DB()
 	if err != nil {
-		return err
+		return spverrors.Wrapf(err, "failed to close the database connection")
 	}
-	return sqlDB.Close()
+	err = sqlDB.Close()
+	return spverrors.Wrapf(err, "failed to close the database connection")
 }
 
 // sqlDefaults will set the default values if missing
-func (s *SQLConfig) sqlDefaults(engine Engine) *SQLConfig {
+func (s *SQLConfig) sqlDefaults() *SQLConfig {
 	// Set the default(s)
 	if s.TxTimeout.String() == emptyTimeDuration {
 		s.TxTimeout = defaultDatabaseTxTimeout

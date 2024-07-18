@@ -3,8 +3,8 @@ package engine
 import (
 	"context"
 	"fmt"
-	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 
+	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/libsv/go-bt/v2"
 	"github.com/rs/zerolog"
 )

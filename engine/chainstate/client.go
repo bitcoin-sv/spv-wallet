@@ -2,13 +2,12 @@ package chainstate
 
 import (
 	"context"
-	"errors"
-	"fmt"
 	"time"
 
 	"github.com/bitcoin-sv/go-broadcast-client/broadcast"
 	"github.com/bitcoin-sv/spv-wallet/engine/logging"
 	"github.com/bitcoin-sv/spv-wallet/engine/metrics"
+	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/bitcoin-sv/spv-wallet/engine/utils"
 	"github.com/newrelic/go-agent/v3/newrelic"
 	"github.com/rs/zerolog"
@@ -148,9 +147,9 @@ func (c *Client) checkFeeUnit() error {
 	feeUnit := c.options.config.feeUnit
 	switch {
 	case feeUnit == nil:
-		return errors.New("no fee unit found")
+		return spverrors.Newf("no fee unit found")
 	case !feeUnit.IsValid():
-		return fmt.Errorf("invalid fee unit found: %s", feeUnit)
+		return spverrors.Newf("invalid fee unit found: %s", feeUnit)
 	case feeUnit.IsZero():
 		c.options.logger.Warn().Msg("fee unit suggests no fees (free)")
 	default:

@@ -4,7 +4,6 @@ import (
 	"context"
 	"time"
 
-	"github.com/bitcoin-sv/spv-wallet/engine/notifications"
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 )
 
@@ -150,31 +149,12 @@ func incrementField(ctx context.Context, model ModelInterface, fieldName string,
 	// Increment
 	newValue, err := c.Datastore().IncrementModel(ctx, model, fieldName, increment)
 	if err != nil {
-		return 0, err
+		return 0, spverrors.Wrapf(err, "failed incrementing field %s", fieldName)
 	}
 
 	// AfterUpdate event should be called by parent function
 
 	return newValue, nil
-}
-
-// notify about an event on the model
-func notify(eventType notifications.EventType, model interface{}) {
-	// run the notifications in a separate goroutine since there could be significant network delay
-	// communicating with a notification provider
-
-	go func() {
-		m := model.(ModelInterface)
-		if client := m.Client(); client != nil {
-			if n := client.Notifications(); n != nil {
-				if err := n.Notify(
-					context.Background(), m.GetModelName(), eventType, model, m.GetID(),
-				); err != nil {
-					client.Logger().Error().Msgf("failed notifying about %s on %s: %s", string(eventType), m.GetID(), err.Error())
-				}
-			}
-		}
-	}()
 }
 
 /*
@@ -184,14 +164,14 @@ func notify(eventType notifications.EventType, model interface{}) {
 func setFieldValueByJSONTag(item interface{}, fieldName string, value interface{}) error {
 	v := reflect.ValueOf(item).Elem()
 	if !v.CanAddr() {
-		return fmt.Errorf("cannot assign to the item passed, item must be a pointer in order to assign")
+		return spverrors.Newf("cannot assign to the item passed, item must be a pointer in order to assign")
 	}
 	// It's possible we can cache this, which is why precompute all these ahead of time.
 	findJSONName := func(t reflect.StructTag) (string, error) {
 		if jt, ok := t.Lookup("json"); ok {
 			return strings.Split(jt, ",")[0], nil
 		}
-		return "", fmt.Errorf("tag provided does not define a json tag: %s", fieldName)
+		return "", spverrors.Newf("tag provided does not define a json tag: %s", fieldName)
 	}
 	fieldNames := map[string]int{}
 	for i := 0; i < v.NumField(); i++ {
@@ -204,7 +184,7 @@ func setFieldValueByJSONTag(item interface{}, fieldName string, value interface{
 
 	fieldNum, ok := fieldNames[fieldName]
 	if !ok {
-		return fmt.Errorf("field %s does not exist within the provided item", fieldName)
+		return spverrors.Newf("field %s does not exist within the provided item", fieldName)
 	}
 	fieldVal := v.Field(fieldNum)
 	switch fieldVal.Interface().(type) {

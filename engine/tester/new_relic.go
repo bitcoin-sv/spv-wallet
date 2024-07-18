@@ -13,6 +13,7 @@ func GetNewRelicApp(appName string) (*newrelic.Application, error) {
 	if len(appName) == 0 {
 		return nil, ErrAppNameRequired
 	}
+	//nolint:wrapcheck
 	return newrelic.NewApplication(
 		func(config *newrelic.Config) {
 			config.AppName = appName

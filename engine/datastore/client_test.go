@@ -9,16 +9,6 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-// testClient will generate a test client
-func testClient(ctx context.Context, t *testing.T, opts ...ClientOps) (ClientInterface, func()) {
-	client, err := NewClient(ctx, opts...)
-	require.NoError(t, err)
-	require.NotNil(t, client)
-	return client, func() {
-		_ = client.Close(ctx)
-	}
-}
-
 // TestClient_IsDebug will test the method IsDebug()
 func TestClient_IsDebug(t *testing.T) {
 	t.Run("toggle debug", func(t *testing.T) {

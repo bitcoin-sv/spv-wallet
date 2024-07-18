@@ -8,6 +8,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"gorm.io/gorm"
 	"gorm.io/gorm/clause"
 	"gorm.io/gorm/logger"
@@ -18,7 +19,7 @@ import (
 //
 // value is a pointer to the model
 func (c *Client) SaveModel(
-	ctx context.Context,
+	_ context.Context,
 	model interface{},
 	tx *Transaction,
 	newRecord, commitTx bool,
@@ -65,7 +66,7 @@ func (c *Client) SaveModel(
 
 // IncrementModel will increment the given field atomically in the database and return the new value
 func (c *Client) IncrementModel(
-	ctx context.Context,
+	_ context.Context,
 	model interface{},
 	fieldName string,
 	increment int64,
@@ -79,7 +80,7 @@ func (c *Client) IncrementModel(
 		// Get the id of the model
 		id := GetModelStringAttribute(model, sqlIDFieldProper)
 		if id == nil {
-			return errors.New("model is missing an " + sqlIDFieldProper + " field")
+			return spverrors.Newf("model is missing an %s field", sqlIDFieldProper)
 		}
 
 		// Get model if exist
@@ -105,7 +106,7 @@ func (c *Client) IncrementModel(
 
 // CreateInBatches create all the models given in batches
 func (c *Client) CreateInBatches(
-	ctx context.Context,
+	_ context.Context,
 	models interface{},
 	batchSize int,
 ) error {
@@ -224,7 +225,7 @@ func (c *Client) find(ctx context.Context, result interface{}, conditions map[st
 ) error {
 	// Find the type
 	if reflect.TypeOf(result).Elem().Kind() != reflect.Slice {
-		return errors.New("field: result is not a slice, found: " + reflect.TypeOf(result).Kind().String())
+		return spverrors.Newf("field: result is not a slice, found: %s", reflect.TypeOf(result).Kind().String())
 	}
 
 	// Create a new context, and new db tx
@@ -294,7 +295,7 @@ func (c *Client) aggregate(ctx context.Context, model interface{}, conditions ma
 ) (map[string]interface{}, error) {
 	// Find the type
 	if reflect.TypeOf(model).Elem().Kind() != reflect.Slice {
-		return nil, errors.New("field: result is not a slice, found: " + reflect.TypeOf(model).Kind().String())
+		return nil, spverrors.Newf("field: result is not a slice, found: %s", reflect.TypeOf(model).Kind().String())
 	}
 
 	// Create a new context, and new db tx

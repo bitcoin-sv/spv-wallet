@@ -130,13 +130,13 @@ func (m *PaymailAddress) setXPub(externalXpubDerivation uint32) error {
 	// Derive the public key from string
 	xPub, err := bitcoin.GetHDKeyFromExtendedPublicKey(m.rawXpubKey)
 	if err != nil {
-		return err
+		return spverrors.Wrapf(err, "failed to load xPub key for paymail")
 	}
 
 	// Get the external public key
 	paymailExternalXpub, err := bitcoin.GetHDKeyByPath(xPub, utils.ChainExternal, externalXpubDerivation)
 	if err != nil {
-		return err
+		return spverrors.Wrapf(err, "failed to derive xPub key for paymail")
 	}
 
 	m.ExternalXpubKeyNum = externalXpubDerivation
@@ -151,7 +151,7 @@ func (m *PaymailAddress) setXPub(externalXpubDerivation uint32) error {
 		m.ExternalXpubKey = m.externalXpubKeyDecrypted
 	}
 
-	return err
+	return spverrors.Wrapf(err, "failed to encrypt external xPub")
 }
 
 // GetIdentityXpub will get the identity related to the xPub
@@ -163,9 +163,10 @@ func (m *PaymailAddress) GetIdentityXpub() (*bip32.ExtendedKey, error) {
 	}
 
 	// Get the last possible key in the external key
-	return bitcoin.GetHDKeyChild(
+	child, err := bitcoin.GetHDKeyChild(
 		xPub, uint32(utils.MaxInt32),
 	)
+	return child, spverrors.Wrapf(err, "failed to generate identity xPub")
 }
 
 // getExternalXpub will get the external xPub
@@ -180,7 +181,7 @@ func (m *PaymailAddress) getExternalXpub() (*bip32.ExtendedKey, error) {
 		if m.externalXpubKeyDecrypted, err = utils.Decrypt(
 			m.encryptionKey, m.ExternalXpubKey,
 		); err != nil {
-			return nil, err
+			return nil, spverrors.Wrapf(err, "failed to decrypt external xPub")
 		}
 	} else {
 		m.externalXpubKeyDecrypted = m.ExternalXpubKey
@@ -189,13 +190,14 @@ func (m *PaymailAddress) getExternalXpub() (*bip32.ExtendedKey, error) {
 	// Get the xPub
 	xPub, err := bitcoin.GetHDKeyFromExtendedPublicKey(m.externalXpubKeyDecrypted)
 	if err != nil {
-		return nil, err
+		return nil, spverrors.Wrapf(err, "failed to get external xPub")
 	}
 
 	m.externalHdXpub = xPub
 	return m.externalHdXpub, nil
 }
 
+// GetPubKey will get the public key for the paymail address.
 func (m *PaymailAddress) GetPubKey() (string, error) {
 	xPub, err := m.getExternalXpub()
 	if err != nil {
@@ -204,17 +206,18 @@ func (m *PaymailAddress) GetPubKey() (string, error) {
 
 	hdPubKey, err := xPub.Child(m.PubKeyNum)
 	if err != nil {
-		return "", err
+		return "", spverrors.Wrapf(err, "failed to derive public key")
 	}
 
 	pubKey, err := hdPubKey.ECPubKey()
 	if err != nil {
-		return "", err
+		return "", spverrors.Wrapf(err, "failed to get public key")
 	}
 
 	return hex.EncodeToString(pubKey.SerialiseCompressed()), nil
 }
 
+// GetNextXpub will get the next child xPub for external operations.
 func (m *PaymailAddress) GetNextXpub(ctx context.Context) (*bip32.ExtendedKey, error) {
 	unlock, err := getWaitWriteLockForPaymail(ctx, m.client.Cachestore(), m.ID)
 	defer unlock()
@@ -231,9 +234,11 @@ func (m *PaymailAddress) GetNextXpub(ctx context.Context) (*bip32.ExtendedKey, e
 		return nil, err
 	}
 
-	return xPub.Child(m.XpubDerivationSeq)
+	child, err := xPub.Child(m.XpubDerivationSeq)
+	return child, spverrors.Wrapf(err, "failed to get next xPub for external operations")
 }
 
+// RotatePubKey will rotate the public key
 func (m *PaymailAddress) RotatePubKey(ctx context.Context) error {
 	unlock, err := getWaitWriteLockForPaymail(ctx, m.client.Cachestore(), m.ID)
 	defer unlock()
@@ -340,7 +345,8 @@ func (m *PaymailAddress) Migrate(client datastore.ClientInterface) error {
 		return err
 	}
 
-	return client.IndexMetadata(client.GetTableName(tablePaymailAddresses), MetadataField)
+	err := client.IndexMetadata(client.GetTableName(tablePaymailAddresses), MetadataField)
+	return spverrors.Wrapf(err, "failed to index metadata column on model %s", m.GetModelName())
 }
 
 // migratePostgreSQL is specific migration SQL for Postgresql

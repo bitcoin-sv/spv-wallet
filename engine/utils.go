@@ -31,10 +31,12 @@ func contains[E any](collection []E, predicate func(E) bool) bool {
 	return find(collection, predicate) != nil
 }
 
+// EnumStringMapper is a helper struct that maps strings to "enum" like constants.
 type EnumStringMapper[T fmt.Stringer] struct {
 	elements map[string]T
 }
 
+// NewEnumStringMapper creates a new EnumStringMapper.
 func NewEnumStringMapper[T fmt.Stringer](elements ...T) EnumStringMapper[T] {
 	m := make(map[string]T)
 	for _, element := range elements {
@@ -45,6 +47,7 @@ func NewEnumStringMapper[T fmt.Stringer](elements ...T) EnumStringMapper[T] {
 	}
 }
 
+// Get returns the "enum" value for the given string.
 func (m *EnumStringMapper[T]) Get(key string) (T, bool) {
 	value, ok := m.elements[key]
 	return value, ok

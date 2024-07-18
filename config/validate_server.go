@@ -1,8 +1,7 @@
 package config
 
 import (
-	"errors"
-
+	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	validation "github.com/go-ozzo/ozzo-validation"
 )
 
@@ -10,17 +9,17 @@ import (
 func (s *ServerConfig) Validate() error {
 	// Set defaults
 	if s.IdleTimeout.String() == "0s" {
-		return errors.New("Idle timeout needs to be set for server configuration")
+		return spverrors.Newf("idle timeout needs to be set for server configuration")
 	}
 	if s.ReadTimeout.String() == "0s" {
-		return errors.New("Read timeout needs to be set for server configuration")
+		return spverrors.Newf("read timeout needs to be set for server configuration")
 	}
 	if s.WriteTimeout.String() == "0s" {
-		return errors.New("Write timeout needs to be set for server configuration")
+		return spverrors.Newf("write timeout needs to be set for server configuration")
 	}
 
 	if s.Port < 10 || s.Port > 65535 {
-		return errors.New("Server port outside of bounds")
+		return spverrors.Newf("server port outside of bounds")
 	}
 
 	return validation.ValidateStruct(s,

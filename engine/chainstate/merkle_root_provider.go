@@ -4,9 +4,9 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
-	"fmt"
 	"net/http"
 
+	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/rs/zerolog"
 )
 
@@ -101,9 +101,9 @@ func (p *blockHeadersServiceClientProvider) verifyMerkleRoots(
 // _fmtAndLogError returns brief error for http response message and logs detailed information with original error
 func _fmtAndLogError(err error, logger *zerolog.Logger, message string) error {
 	logger.Error().Err(err).Msg("[verifyMerkleRoots] " + message)
-	return fmt.Errorf("cannot verify transaction - %s", message)
+	return spverrors.Newf("cannot verify transaction - %s", message)
 }
 
 func _statusError(statusCode int) error {
-	return fmt.Errorf("Block Headers Service client returned status code %d - check Block Headers Service configuration and status", statusCode)
+	return spverrors.Newf("Block Headers Service client returned status code %d - check Block Headers Service configuration and status", statusCode)
 }

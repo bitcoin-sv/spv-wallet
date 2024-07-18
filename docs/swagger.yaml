@@ -1314,6 +1314,15 @@ definitions:
           type: string
         type: array
     type: object
+  models.SubscribeRequestBody:
+    properties:
+      tokenHeader:
+        type: string
+      tokenValue:
+        type: string
+      url:
+        type: string
+    type: object
   models.SyncConfig:
     properties:
       broadcast:
@@ -1597,6 +1606,11 @@ definitions:
         example: false
         type: boolean
     type: object
+  models.UnsubscribeRequestBody:
+    properties:
+      url:
+        type: string
+    type: object
   models.Utxo:
     properties:
       created_at:
@@ -1728,14 +1742,11 @@ definitions:
     - 1000000000
     - 60000000000
     - 3600000000000
-    - -9223372036854775808
-    - 9223372036854775807
     - 1
     - 1000
     - 1000000
     - 1000000000
     - 60000000000
-    - 3600000000000
     type: integer
     x-enum-varnames:
     - minDuration
@@ -1746,14 +1757,11 @@ definitions:
     - Second
     - Minute
     - Hour
-    - minDuration
-    - maxDuration
     - Nanosecond
     - Microsecond
     - Millisecond
     - Second
     - Minute
-    - Hour
   transactions.NewTransaction:
     properties:
       config:
@@ -2623,6 +2631,51 @@ paths:
       security:
       - x-auth-xpub: []
       summary: Search for utxos
+      tags:
+      - Admin
+  /v1/admin/webhooks/subscriptions:
+    delete:
+      description: Unsubscribe to a webhook to stop receiving notifications
+      parameters:
+      - description: URL to unsubscribe from
+        in: body
+        name: UnsubscribeRequestBody
+        schema:
+          $ref: '#/definitions/models.UnsubscribeRequestBody'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Success response
+          schema:
+            type: boolean
+        "500":
+          description: Internal server error - Error while unsubscribing to the webhook
+      security:
+      - x-auth-xpub: []
+      summary: Unsubscribe to a webhook
+      tags:
+      - Admin
+    post:
+      description: Subscribe to a webhook to receive notifications
+      parameters:
+      - description: URL to subscribe to and optional token header and value
+        in: body
+        name: SubscribeRequestBody
+        schema:
+          $ref: '#/definitions/models.SubscribeRequestBody'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Success response
+          schema:
+            type: boolean
+        "500":
+          description: Internal server error - Error while subscribing to the webhook
+      security:
+      - x-auth-xpub: []
+      summary: Subscribe to a webhook
       tags:
       - Admin
   /v1/admin/xpub:

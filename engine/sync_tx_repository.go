@@ -162,7 +162,7 @@ func _areParentsBroadcasted(ctx context.Context, tx *Transaction, opts ...ModelO
 	// get the sync transaction of all inputs
 	btTx, err := bt.NewTxFromString(tx.Hex)
 	if err != nil {
-		return false, err
+		return false, spverrors.Wrapf(err, "could not parse transaction hex")
 	}
 
 	// check that all inputs we handled have been broadcast, or are not handled by SPV Wallet Engine

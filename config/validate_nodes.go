@@ -1,18 +1,19 @@
 package config
 
 import (
-	"errors"
 	"slices"
+
+	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 )
 
 // Validate checks the configuration for specific rules
 func (n *NodesConfig) Validate() error {
 	if n == nil {
-		return errors.New("nodes are not configured")
+		return spverrors.Newf("nodes are not configured")
 	}
 
 	if n.Apis == nil || len(n.Apis) == 0 {
-		return errors.New("no miner apis configured")
+		return spverrors.Newf("no miner apis configured")
 	}
 
 	// check if at least one arc url is configured
@@ -20,11 +21,11 @@ func (n *NodesConfig) Validate() error {
 		return el.ArcURL != ""
 	})
 	if found == -1 {
-		return errors.New("no arc urls configured")
+		return spverrors.Newf("no arc urls configured")
 	}
 
 	if !n.UseFeeQuotes && n.FeeUnit == nil {
-		return errors.New("fee unit is not configured, define nodes.fee_unit or set nodes.use_fee_quotes")
+		return spverrors.Newf("fee unit is not configured, define nodes.fee_unit or set nodes.use_fee_quotes")
 	}
 
 	return nil

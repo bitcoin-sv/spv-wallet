@@ -71,7 +71,7 @@ func (p *PikePaymentServiceProvider) CreatePikeOutputResponse(
 
 	outputs, err := pike.GenerateOutputsTemplate(satoshis)
 	if err != nil {
-		return nil, err
+		return nil, spverrors.Wrapf(err, "failed to generate output templates")
 	}
 
 	metadata := createMetadata(requestMetadata, "CreatePikeDestinationResponse")
@@ -105,7 +105,7 @@ func (p *PikePaymentServiceProvider) createPikeDestinations(ctx context.Context,
 
 	scripts, err := pike.GenerateLockingScriptsFromTemplates(outputsTemplate, senderPubKey, receiverPubKey, reference)
 	if err != nil {
-		return err
+		return spverrors.Wrapf(err, "failed to generate locking scripts")
 	}
 
 	return p.saveDestinations(ctx, pAddress, scripts, senderPubKeyHex, opts...)
@@ -133,7 +133,7 @@ func (p *PikePaymentServiceProvider) saveDestinations(
 
 func generateReferenceID() (string, error) {
 	referenceID, err := utils.RandomHex(ReferenceIDLength)
-	return referenceID, err
+	return referenceID, spverrors.Wrapf(err, "failed to generate reference id")
 }
 
 func getPublicKeys(receiverPubKeyHex, senderPubKeyHex string) (*bec.PublicKey, *bec.PublicKey, error) {
@@ -153,9 +153,10 @@ func getPublicKeys(receiverPubKeyHex, senderPubKeyHex string) (*bec.PublicKey, *
 func getPublicKey(pubKeyHex string) (*bec.PublicKey, error) {
 	pubKeyBytes, err := hex.DecodeString(pubKeyHex)
 	if err != nil {
-		return nil, err
+		return nil, spverrors.Wrapf(err, "failed to decode public key hex")
 	}
-	return bec.ParsePubKey(pubKeyBytes, bec.S256())
+	key, err := bec.ParsePubKey(pubKeyBytes, bec.S256())
+	return key, spverrors.Wrapf(err, "failed to parse public key")
 }
 
 func convertToPaymailOutputTemplates(outputTemplates []*template.OutputTemplate) []*paymail.OutputTemplate {

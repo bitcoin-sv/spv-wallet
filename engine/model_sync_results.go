@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 	"time"
 
+	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/bitcoin-sv/spv-wallet/engine/utils"
 )
 
@@ -40,14 +41,15 @@ func (t *SyncResults) Scan(value interface{}) error {
 		return nil
 	}
 
-	return json.Unmarshal(byteValue, &t)
+	err = json.Unmarshal(byteValue, &t)
+	return spverrors.Wrapf(err, "failed to parse SyncResults from JSON")
 }
 
 // Value return json value, implement driver.Valuer interface
 func (t SyncResults) Value() (driver.Value, error) {
 	marshal, err := json.Marshal(t)
 	if err != nil {
-		return nil, err
+		return nil, spverrors.Wrapf(err, "failed to convert SyncResults to JSON")
 	}
 
 	return string(marshal), nil

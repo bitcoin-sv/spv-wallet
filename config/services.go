@@ -3,7 +3,6 @@ package config
 import (
 	"context"
 	"crypto/tls"
-	"errors"
 	"fmt"
 	"net"
 	"net/url"
@@ -15,6 +14,7 @@ import (
 	"github.com/bitcoin-sv/spv-wallet/engine"
 	"github.com/bitcoin-sv/spv-wallet/engine/cluster"
 	"github.com/bitcoin-sv/spv-wallet/engine/datastore"
+	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/bitcoin-sv/spv-wallet/engine/taskmanager"
 	"github.com/bitcoin-sv/spv-wallet/engine/utils"
 	"github.com/bitcoin-sv/spv-wallet/logging"
@@ -55,7 +55,7 @@ func (a *AppConfig) LoadServices(ctx context.Context) (*AppServices, error) {
 
 	logger, err := logging.CreateLogger(a.Logging.InstanceName, a.Logging.Format, a.Logging.Level, a.Logging.LogOrigin)
 	if err != nil {
-		err = fmt.Errorf("error creating logger: %w", err)
+		err = spverrors.Wrapf(err, "error creating logger")
 		return nil, err
 	}
 
@@ -179,7 +179,7 @@ func (s *AppServices) loadSPVWallet(ctx context.Context, appConfig *AppConfig, t
 	options = loadTaskManager(appConfig, options)
 
 	if appConfig.Notifications != nil && appConfig.Notifications.Enabled {
-		options = append(options, engine.WithNotifications(appConfig.Notifications.WebhookEndpoint))
+		options = append(options, engine.WithNotifications())
 	}
 
 	options = loadBroadcastClientArc(appConfig, options, logger)
@@ -230,7 +230,7 @@ func loadCluster(appConfig *AppConfig, options []engine.ClientOps) ([]engine.Cli
 			if appConfig.Cache.Cluster.Redis != nil {
 				redisURL, err := url.Parse(appConfig.Cache.Cluster.Redis.URL)
 				if err != nil {
-					return options, fmt.Errorf("error parsing redis url: %w", err)
+					return options, spverrors.Wrapf(err, "error parsing redis url")
 				}
 				password, _ := redisURL.User.Password()
 				redisOptions = &redis.Options{
@@ -255,7 +255,7 @@ func loadCluster(appConfig *AppConfig, options []engine.ClientOps) ([]engine.Cli
 					}
 				}
 			} else {
-				return options, errors.New("could not load redis cluster coordinator")
+				return options, spverrors.Newf("could not load redis cluster coordinator")
 			}
 			options = append(options, engine.WithClusterRedis(redisOptions))
 		}
@@ -295,7 +295,7 @@ func loadDatastore(options []engine.ClientOps, appConfig *AppConfig, testMode bo
 		var err error
 		// Set the unique table prefix
 		if appConfig.Db.SQLite.TablePrefix, err = utils.RandomHex(8); err != nil {
-			err = fmt.Errorf("error generating random hex: %w", err)
+			err = spverrors.Wrapf(err, "error generating random hex")
 			return options, err
 		}
 
@@ -349,7 +349,7 @@ func loadDatastore(options []engine.ClientOps, appConfig *AppConfig, testMode bo
 		}))
 
 	} else {
-		return nil, errors.New("unsupported datastore engine: " + appConfig.Db.Datastore.Engine.String())
+		return nil, spverrors.Newf("unsupported datastore engine: %s", appConfig.Db.Datastore.Engine.String())
 	}
 
 	options = append(options, engine.WithAutoMigrate(engine.BaseModels...))
@@ -390,13 +390,13 @@ func loadBroadcastClientArc(appConfig *AppConfig, options []engine.ClientOps, lo
 func configureCallback(options []engine.ClientOps, appConfig *AppConfig) ([]engine.ClientOps, error) {
 	if appConfig.Nodes.Callback.Enabled {
 		if !isValidURL(appConfig.Nodes.Callback.Host) {
-			return nil, fmt.Errorf("invalid callback host: %s - must be a valid external url - not a localhost", appConfig.Nodes.Callback.Host)
+			return nil, spverrors.Newf("invalid callback host: %s - must be a valid external url - not a localhost", appConfig.Nodes.Callback.Host)
 		}
 
 		if appConfig.Nodes.Callback.Token == "" {
 			callbackToken, err := utils.HashAdler32(DefaultAdminXpub)
 			if err != nil {
-				return nil, fmt.Errorf("error hashing callback token: %w", err)
+				return nil, spverrors.Wrapf(err, "error while generating callback token")
 			}
 			appConfig.Nodes.Callback.Token = callbackToken
 		}

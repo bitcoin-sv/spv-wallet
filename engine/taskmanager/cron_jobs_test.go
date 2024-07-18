@@ -29,7 +29,7 @@ func TestCronTasks(t *testing.T) {
 		err := tm.CronJobsInit(CronJobs{
 			"test": {
 				Period: 1 * time.Second,
-				Handler: func(ctx context.Context) error {
+				Handler: func(_ context.Context) error {
 					target.times <- true
 					return nil
 				},
@@ -62,14 +62,14 @@ func TestCronTasks(t *testing.T) {
 		err := tm.CronJobsInit(CronJobs{
 			"test1": {
 				Period: 1 * time.Second,
-				Handler: func(ctx context.Context) error {
+				Handler: func(_ context.Context) error {
 					target.times <- 1
 					return nil
 				},
 			},
 			"test2": {
 				Period: 1 * time.Second,
-				Handler: func(ctx context.Context) error {
+				Handler: func(_ context.Context) error {
 					target.times <- 2
 					return nil
 				},

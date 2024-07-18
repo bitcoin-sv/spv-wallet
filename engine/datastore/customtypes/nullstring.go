@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 
 	"github.com/99designs/gqlgen/graphql"
+	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/bsontype"
 )
@@ -36,7 +37,7 @@ func UnmarshalNullString(s interface{}) (NullString, error) {
 
 	uString, err := graphql.UnmarshalString(s)
 	if err != nil {
-		return NullString{}, err
+		return NullString{}, spverrors.Wrapf(err, "failed to parse NullString from GraphQL, data: %v", s)
 	}
 
 	return NullString{
@@ -44,7 +45,7 @@ func UnmarshalNullString(s interface{}) (NullString, error) {
 			String: uString,
 			Valid:  true,
 		},
-	}, err
+	}, nil
 }
 
 // MarshalBSONValue method is called by bson.Marshal in Mongo for type = NullString
@@ -54,7 +55,7 @@ func (x *NullString) MarshalBSONValue() (bsontype.Type, []byte, error) {
 	}
 
 	valueType, b, err := bson.MarshalValue(x.String)
-	return valueType, b, err
+	return valueType, b, spverrors.Wrapf(err, "failed to convert NullString to BSON, data: %v", x)
 }
 
 // UnmarshalBSONValue method is called by bson.Unmarshal in Mongo for type = NullString
@@ -63,7 +64,7 @@ func (x *NullString) UnmarshalBSONValue(t bsontype.Type, data []byte) error {
 
 	var uString string
 	if err := raw.Unmarshal(&uString); err != nil {
-		return err
+		return spverrors.Wrapf(err, "failed to parse NullString from BSON, data: %v", raw)
 	}
 
 	if raw.Value == nil {
@@ -83,7 +84,7 @@ func (x *NullString) MarshalJSON() ([]byte, error) {
 	}
 
 	b, err := json.Marshal(x.String)
-	return b, err
+	return b, spverrors.Wrapf(err, "failed to convert NullString to JSON, data: %v", x)
 }
 
 // UnmarshalJSON method is called by the JSON unmarshaller
@@ -96,7 +97,7 @@ func (x *NullString) UnmarshalJSON(data []byte) error {
 
 	var nullString string
 	if err := json.Unmarshal(data, &nullString); err != nil {
-		return err
+		return spverrors.Wrapf(err, "failed to parse NullString from JSON, data: %s", string(data))
 	}
 
 	x.Valid = true

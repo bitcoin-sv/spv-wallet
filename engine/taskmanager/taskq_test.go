@@ -92,13 +92,13 @@ func TestNewTaskManager_RegisterTwice(t *testing.T) {
 	task1Arg := "task d"
 	resultChan := make(chan int, 1)
 
-	err := c.RegisterTask(task1Arg, func(name string) error {
+	err := c.RegisterTask(task1Arg, func(_ string) error {
 		resultChan <- 1
 		return nil
 	})
 	require.NoError(t, err)
 
-	err = c.RegisterTask(task1Arg, func(name string) error {
+	err = c.RegisterTask(task1Arg, func(_ string) error {
 		resultChan <- 2
 		return nil
 	})
@@ -119,7 +119,7 @@ func TestNewTaskManager_RunTwice(t *testing.T) {
 
 	task1Arg := "task e"
 
-	err := c.RegisterTask(task1Arg, func(name string) error {
+	err := c.RegisterTask(task1Arg, func(_ string) error {
 		return nil
 	})
 	require.NoError(t, err)
