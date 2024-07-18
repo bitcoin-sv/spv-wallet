@@ -24,7 +24,43 @@ import (
 // @Security	x-auth-xpub
 // @Deprecated
 func (a *Action) newTransaction(c *gin.Context) {
-	a.newTransactionDraft(c)
+	reqXPub := c.GetString(auth.ParamXPubKey)
+
+	xPub, err := a.Services.SpvWalletEngine.GetXpub(c.Request.Context(), reqXPub)
+	if err != nil {
+		spverrors.ErrorResponse(c, err, a.Services.Logger)
+		return
+	} else if xPub == nil {
+		spverrors.ErrorResponse(c, spverrors.ErrCouldNotFindXpub, a.Services.Logger)
+		return
+	}
+
+	var requestBody NewTransaction
+	if err = c.Bind(&requestBody); err != nil {
+		spverrors.ErrorResponse(c, spverrors.ErrCannotBindRequest, a.Services.Logger)
+		return
+	}
+
+	opts := a.Services.SpvWalletEngine.DefaultModelOptions()
+	if requestBody.Metadata != nil {
+		opts = append(opts, engine.WithMetadatas(requestBody.Metadata))
+	}
+
+	txConfig := mappings.MapTransactionConfigEngineToModel(&requestBody.Config)
+
+	var transaction *engine.DraftTransaction
+	if transaction, err = a.Services.SpvWalletEngine.NewTransaction(
+		c.Request.Context(),
+		xPub.RawXpub(),
+		txConfig,
+		opts...,
+	); err != nil {
+		spverrors.ErrorResponse(c, err, a.Services.Logger)
+		return
+	}
+
+	contract := mappings.MapToDeprecatedDraftTransactionContract(transaction)
+	c.JSON(http.StatusCreated, contract)
 }
 
 // newTransactionDraft will create a new transaction draft

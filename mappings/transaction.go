@@ -332,13 +332,29 @@ func mapToContractDestinations(tx *engine.TransactionConfig) []*models.Destinati
 	return destinations
 }
 
-// MapToDraftTransactionContract will map the transaction-output model from spv-wallet to the spv-wallet-models contract
-func MapToDraftTransactionContract(tx *engine.DraftTransaction) *models.DraftTransaction {
+// MapToDeprecatedDraftTransactionContract will map the transaction-output model from spv-wallet to the spv-wallet-models contract
+func MapToDeprecatedDraftTransactionContract(tx *engine.DraftTransaction) *models.DraftTransaction {
 	if tx == nil {
 		return nil
 	}
 
 	return &models.DraftTransaction{
+		Model:         *common.MapToContract(&tx.Model),
+		ID:            tx.ID,
+		Hex:           tx.Hex,
+		XpubID:        tx.XpubID,
+		ExpiresAt:     tx.ExpiresAt,
+		Configuration: *MapToTransactionConfigContract(&tx.Configuration),
+	}
+}
+
+// MapToDraftTransactionContract will map the transaction-output model from spv-wallet to the spv-wallet-models contract
+func MapToDraftTransactionContract(tx *engine.DraftTransaction) *response.DraftTransaction {
+	if tx == nil {
+		return nil
+	}
+
+	return &response.DraftTransaction{
 		Model:         *common.MapToContract(&tx.Model),
 		ID:            tx.ID,
 		Hex:           tx.Hex,

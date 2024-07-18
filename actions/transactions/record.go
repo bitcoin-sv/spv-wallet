@@ -23,7 +23,43 @@ import (
 // @Router		/v1/transaction/record [post]
 // @Security	x-auth-xpub
 func (a *Action) record(c *gin.Context) {
-	a.recordTransaction(c)
+	reqXPub := c.GetString(auth.ParamXPubKey)
+
+	var requestBody RecordTransaction
+	if err := c.ShouldBindJSON(&requestBody); err != nil {
+		spverrors.ErrorResponse(c, err, a.Services.Logger)
+		return
+	}
+
+	xPub, err := a.Services.SpvWalletEngine.GetXpub(c.Request.Context(), reqXPub)
+	if err != nil {
+		spverrors.ErrorResponse(c, err, a.Services.Logger)
+		return
+	} else if xPub == nil {
+		spverrors.ErrorResponse(c, spverrors.ErrCouldNotFindXpub, a.Services.Logger)
+		return
+	}
+
+	opts := make([]engine.ModelOps, 0)
+	if requestBody.Metadata != nil {
+		opts = append(opts, engine.WithMetadatas(requestBody.Metadata))
+	}
+
+	// Record a new transaction (get the hex from parameters)
+	var transaction *engine.Transaction
+	if transaction, err = a.Services.SpvWalletEngine.RecordTransaction(
+		c.Request.Context(),
+		reqXPub,
+		requestBody.Hex,
+		requestBody.ReferenceID,
+		opts...,
+	); err != nil {
+		spverrors.ErrorResponse(c, err, a.Services.Logger)
+		return
+	}
+
+	contract := mappings.MapToDeprecatedTransactionContract(transaction)
+	c.JSON(http.StatusCreated, contract)
 }
 
 // recordTransaction will save and complete a transaction
@@ -73,6 +109,6 @@ func (a *Action) recordTransaction(c *gin.Context) {
 		return
 	}
 
-	contract := mappings.MapToDeprecatedTransactionContract(transaction)
+	contract := mappings.MapToTransactionContract(transaction)
 	c.JSON(http.StatusCreated, contract)
 }
