@@ -209,6 +209,7 @@ func handleFundsTransfer(user *regressionTestUser, config *regressionTestConfig)
 	}
 
 	leaderBalance := checkBalance(config.ClientOneURL, config.ClientOneLeaderXPriv)
+	fmt.Println("Leader balance:", leaderBalance)
 	timeout := time.After(2 * timeoutDuration)
 	for leaderBalance < minimalBalance {
 		select {
