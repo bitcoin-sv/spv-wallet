@@ -38,7 +38,7 @@ func NewContactsHandler(appConfig *config.AppConfig, services *config.AppService
 	contactsAPIEndpoints := routes.APIEndpointsFunc(func(router *gin.RouterGroup) {
 		group := router.Group("/contacts")
 		group.PUT("/:paymail", action.upsertContact)
-		group.PATCH("/:paymail/confirmation", action.confirmContact)
+		group.POST("/:paymail/confirmation", action.confirmContact)
 		group.PATCH("/:paymail/non-confirmation", action.unconfirmContact)
 
 		group.GET("", action.getContacts)
