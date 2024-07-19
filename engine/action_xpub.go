@@ -3,9 +3,9 @@ package engine
 import (
 	"context"
 	"errors"
-	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 
 	"github.com/bitcoin-sv/spv-wallet/engine/datastore"
+	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 )
 
 // NewXpub will parse the xPub and save it into the Datastore
