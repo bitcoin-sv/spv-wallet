@@ -87,8 +87,11 @@ func getEnvVariables() (*regressionTestConfig, error) {
 
 // isSPVWalletRunning checks if the SPV wallet is running and prints the specific message at the specified URL.
 func isSPVWalletRunning(url string) bool {
+	client := http.Client{
+		Timeout: timeoutDuration,
+	}
 	url = addPrefixIfNeeded(url)
-	resp, err := http.Get(url)
+	resp, err := client.Get(url)
 	if err != nil || resp.StatusCode != http.StatusOK {
 		return false
 	}
@@ -124,7 +127,9 @@ func getSharedConfig(xpub string) (*models.SharedConfig, error) {
 	}
 
 	req.Header.Set(models.AuthHeader, xpub)
-	client := &http.Client{}
+	client := &http.Client{
+		Timeout: timeoutDuration,
+	}
 	resp, err := client.Do(req)
 	if err != nil {
 		return nil, err
