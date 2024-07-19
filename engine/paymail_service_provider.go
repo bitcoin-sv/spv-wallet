@@ -2,15 +2,14 @@ package engine
 
 import (
 	"context"
-	"fmt"
 	"reflect"
 
 	"github.com/bitcoin-sv/go-paymail"
 	"github.com/bitcoin-sv/go-paymail/beef"
 	"github.com/bitcoin-sv/go-paymail/server"
 	"github.com/bitcoin-sv/go-paymail/spv"
-
 	"github.com/bitcoin-sv/spv-wallet/engine/chainstate"
+	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/bitcoin-sv/spv-wallet/engine/utils"
 	"github.com/bitcoinschema/go-bitcoin/v2"
 	"github.com/libsv/go-bk/bec"
@@ -50,7 +49,7 @@ func createMetadata(serverMetaData *server.RequestMetadata, request string) (met
 func (p *PaymailDefaultServiceProvider) GetPaymailByAlias(
 	ctx context.Context,
 	alias, domain string,
-	requestMetadata *server.RequestMetadata,
+	_ *server.RequestMetadata,
 ) (*paymail.AddressInformation, error) {
 
 	pm, err := getPaymailAddress(ctx, alias+"@"+domain, p.client.DefaultModelOptions()...)
@@ -58,7 +57,7 @@ func (p *PaymailDefaultServiceProvider) GetPaymailByAlias(
 		return nil, err
 	}
 	if pm == nil {
-		return nil, ErrPaymailNotFound
+		return nil, spverrors.ErrCouldNotFindPaymail
 	}
 
 	pk, err := pm.GetPubKey()
@@ -106,7 +105,7 @@ func (p *PaymailDefaultServiceProvider) CreateP2PDestinationResponse(
 ) (*paymail.PaymentDestinationPayload, error) {
 	referenceID, err := utils.RandomHex(16)
 	if err != nil {
-		return nil, err
+		return nil, spverrors.Wrapf(err, "cannot generate reference id")
 	}
 
 	metadata := createMetadata(requestMetadata, "CreateP2PDestinationResponse")
@@ -150,7 +149,7 @@ func (p *PaymailDefaultServiceProvider) RecordTransaction(ctx context.Context,
 		return nil, err
 	}
 	if err := rts.Validate(); err != nil {
-		return nil, err
+		return nil, err //nolint:wrapcheck // returns our internal errors
 	}
 
 	rts.ForceBroadcast(true)
@@ -201,6 +200,7 @@ func (p *PaymailDefaultServiceProvider) VerifyMerkleRoots(
 	return
 }
 
+// AddContact will add a contact to the paymail address
 func (p *PaymailDefaultServiceProvider) AddContact(
 	ctx context.Context,
 	requesterPaymailAddress string,
@@ -219,7 +219,7 @@ func (p *PaymailDefaultServiceProvider) AddContact(
 		return
 	}
 	if reqPaymail == nil {
-		err = ErrInvalidRequesterXpub
+		err = spverrors.ErrInvalidRequesterXpub
 		return
 	}
 
@@ -233,7 +233,7 @@ func (p *PaymailDefaultServiceProvider) getDestinationForPaymail(ctx context.Con
 		return nil, err
 	}
 	if pm == nil {
-		return nil, ErrPaymailNotFound
+		return nil, spverrors.ErrCouldNotFindPaymail
 	}
 
 	dst, err := createDestination(
@@ -254,7 +254,7 @@ func createDestination(ctx context.Context, pm *PaymailAddress, opts ...ModelOps
 
 	pubKey, err := hdXpub.ECPubKey()
 	if err != nil {
-		return nil, err
+		return nil, spverrors.Wrapf(err, "fail to get next public key for destination")
 	}
 
 	lockingScript, err := createLockingScript(pubKey)
@@ -336,7 +336,7 @@ func getInputsWhichAreNotInDb(c ClientInterface, dBeef *beef.DecodedBEEF) ([]*be
 	}
 	dbTxs, err := c.GetTransactionsByIDs(context.Background(), txIDs)
 	if err != nil {
-		return nil, fmt.Errorf("error during getting txs from db: %w", err)
+		return nil, spverrors.Wrapf(err, "error during getting txs from db")
 	}
 
 	txs := make([]*beef.TxData, 0)
@@ -363,7 +363,7 @@ func getInputsWhichAreNotInDb(c ClientInterface, dBeef *beef.DecodedBEEF) ([]*be
 
 func getBump(bumpIndex int, bumps beef.BUMPs) (*BUMP, error) {
 	if bumpIndex > len(bumps) {
-		return nil, fmt.Errorf("error in getBump: bump index exceeds bumps length")
+		return nil, spverrors.Newf("error in getBump: bump index exceeds bumps length")
 	}
 
 	bump := bumps[bumpIndex]
@@ -410,8 +410,5 @@ func saveBeefTransactionInput(ctx context.Context, c ClientInterface, input *bee
 	inputTx.syncTransaction = sync
 
 	err := inputTx.Save(ctx)
-	if err != nil {
-		return fmt.Errorf("error in saveBeefTransactionInput during saving tx: %w", err)
-	}
-	return nil
+	return spverrors.Wrapf(err, "error in saveBeefTransactionInput during saving tx")
 }

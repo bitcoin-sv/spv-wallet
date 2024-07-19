@@ -3,6 +3,7 @@ package admin
 import (
 	"net/http"
 
+	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/bitcoin-sv/spv-wallet/mappings"
 	"github.com/bitcoin-sv/spv-wallet/models"
 	"github.com/bitcoin-sv/spv-wallet/models/filter"
@@ -24,7 +25,7 @@ import (
 func (a *Action) accessKeysSearch(c *gin.Context) {
 	var reqParams filter.AdminSearchAccessKeys
 	if err := c.Bind(&reqParams); err != nil {
-		c.JSON(http.StatusBadRequest, err.Error())
+		spverrors.ErrorResponse(c, spverrors.ErrCannotBindRequest, a.Services.Logger)
 		return
 	}
 
@@ -35,7 +36,7 @@ func (a *Action) accessKeysSearch(c *gin.Context) {
 		mappings.MapToQueryParams(reqParams.QueryParams),
 	)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, err.Error())
+		spverrors.ErrorResponse(c, err, a.Services.Logger)
 		return
 	}
 
@@ -62,7 +63,7 @@ func (a *Action) accessKeysSearch(c *gin.Context) {
 func (a *Action) accessKeysCount(c *gin.Context) {
 	var reqParams filter.AdminCountAccessKeys
 	if err := c.Bind(&reqParams); err != nil {
-		c.JSON(http.StatusBadRequest, err.Error())
+		spverrors.ErrorResponse(c, spverrors.ErrCannotBindRequest, a.Services.Logger)
 		return
 	}
 
@@ -72,7 +73,7 @@ func (a *Action) accessKeysCount(c *gin.Context) {
 		reqParams.Conditions.ToDbConditions(),
 	)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, err.Error())
+		spverrors.ErrorResponse(c, err, a.Services.Logger)
 		return
 	}
 

@@ -3,15 +3,16 @@ package engine
 import (
 	"context"
 	"errors"
-	"fmt"
 	"strings"
 	"time"
 
 	"github.com/bitcoin-sv/go-paymail"
 	"github.com/bitcoin-sv/spv-wallet/engine/datastore"
+	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/google/uuid"
 )
 
+// Contact is a model that represents a known contacts of the user and invitations to contact.
 type Contact struct {
 	// Base model
 	Model `bson:",inline"`
@@ -108,29 +109,29 @@ func getContactsByXPubIDCount(ctx context.Context, xPubID string, metadata *Meta
 	return count, nil
 }
 
-func (c *Contact) validate() error {
-	if c.ID == "" {
-		return ErrMissingContactID
+func (m *Contact) validate() error {
+	if m.ID == "" {
+		return spverrors.ErrMissingContactID
 	}
 
-	if c.FullName == "" {
-		return ErrMissingContactFullName
+	if m.FullName == "" {
+		return spverrors.ErrMissingContactFullName
 	}
 
-	if err := paymail.ValidatePaymail(c.Paymail); err != nil {
-		return err
+	if err := paymail.ValidatePaymail(m.Paymail); err != nil {
+		return spverrors.ErrInvalidContactPaymail
 	}
 
-	if c.PubKey == "" {
-		return ErrMissingContactXPubKey
+	if m.PubKey == "" {
+		return spverrors.ErrMissingContactXPubKey
 	}
 
-	if c.Status == "" {
-		return ErrMissingContactStatus
+	if m.Status == "" {
+		return spverrors.ErrMissingContactStatus
 	}
 
-	if c.OwnerXpubID == "" {
-		return ErrMissingContactOwnerXPubId
+	if m.OwnerXpubID == "" {
+		return spverrors.ErrMissingContactOwnerXPubID
 	}
 
 	return nil
@@ -163,126 +164,136 @@ func getContactsByXpubID(ctx context.Context, xPubID string, metadata *Metadata,
 	return contacts, nil
 }
 
-func (c *Contact) Accept() error {
-	if c.Status != ContactAwaitAccept {
-		return fmt.Errorf("cannot accept contact. Reason: status: %s, expected: %s", c.Status, ContactAwaitAccept)
+// Accept marks the contact invitation as accepted, what means that the contact invitation is treated as normal contact.
+func (m *Contact) Accept() error {
+	if m.Status != ContactAwaitAccept {
+		return spverrors.Newf("cannot accept contact. Reason: status: %s, expected: %s", m.Status, ContactAwaitAccept)
 	}
 
-	c.Status = ContactNotConfirmed
+	m.Status = ContactNotConfirmed
 	return nil
 }
 
-func (c *Contact) Reject() error {
-	if c.Status != ContactAwaitAccept {
-		return fmt.Errorf("cannot reject contact. Reason: status: %s, expected: %s", c.Status, ContactAwaitAccept)
+// Reject marks the contact invitation as rejected
+func (m *Contact) Reject() error {
+	if m.Status != ContactAwaitAccept {
+		return spverrors.Newf("cannot reject contact. Reason: status: %s, expected: %s", m.Status, ContactAwaitAccept)
 	}
 
-	c.DeletedAt.Valid = true
-	c.DeletedAt.Time = time.Now()
-	c.Status = ContactRejected
+	m.DeletedAt.Valid = true
+	m.DeletedAt.Time = time.Now()
+	m.Status = ContactRejected
 	return nil
 }
 
-func (c *Contact) Confirm() error {
-	if c.Status != ContactNotConfirmed {
-		return fmt.Errorf("cannot confirm contact. Reason: status: %s, expected: %s", c.Status, ContactNotConfirmed)
+// Confirm marks the contact as confirmed
+func (m *Contact) Confirm() error {
+	if m.Status != ContactNotConfirmed {
+		return spverrors.Newf("cannot confirm contact. Reason: status: %s, expected: %s", m.Status, ContactNotConfirmed)
 	}
 
-	c.Status = ContactConfirmed
+	m.Status = ContactConfirmed
 	return nil
 }
 
-func (c *Contact) Unconfirm() error {
-	if c.Status != ContactConfirmed {
-		return fmt.Errorf("cannot unconfirm contact. Reason: status: %s, expected: %s", c.Status, ContactNotConfirmed)
+// Unconfirm marks the contact as unconfirmed
+func (m *Contact) Unconfirm() error {
+	if m.Status != ContactConfirmed {
+		return spverrors.Newf("cannot unconfirm contact. Reason: status: %s, expected: %s", m.Status, ContactNotConfirmed)
 	}
 
-	c.Status = ContactNotConfirmed
+	m.Status = ContactNotConfirmed
 	return nil
 }
 
-func (c *Contact) Delete() {
-	c.DeletedAt.Valid = true
-	c.DeletedAt.Time = time.Now()
+// Delete marks the contact as deleted
+func (m *Contact) Delete() {
+	m.DeletedAt.Valid = true
+	m.DeletedAt.Time = time.Now()
 }
 
-func (c *Contact) UpdatePubKey(pk string) (updated bool) {
-	if c.PubKey != pk {
-		c.PubKey = pk
+// UpdatePubKey updates the contact's public key
+func (m *Contact) UpdatePubKey(pk string) (updated bool) {
+	if m.PubKey != pk {
+		m.PubKey = pk
 
-		if c.Status == ContactConfirmed {
-			c.Status = ContactNotConfirmed
+		if m.Status == ContactConfirmed {
+			m.Status = ContactNotConfirmed
 		}
 
 		updated = true
+		return
 	}
 
 	updated = false
 	return
 }
 
-func (c *Contact) GetModelName() string {
+// GetModelName returns name of the model
+func (m *Contact) GetModelName() string {
 	return ModelContact.String()
 }
 
 // GetModelTableName returns the model db table name
-func (c *Contact) GetModelTableName() string {
+func (m *Contact) GetModelTableName() string {
 	return tableContacts
 }
 
 // Save the model
-func (c *Contact) Save(ctx context.Context) (err error) {
-	return Save(ctx, c)
+func (m *Contact) Save(ctx context.Context) (err error) {
+	return Save(ctx, m)
 }
 
 // GetID will get the ID
-func (c *Contact) GetID() string {
-	return c.ID
+func (m *Contact) GetID() string {
+	return m.ID
 }
 
 // BeforeCreating is called before the model is saved to the DB
-func (c *Contact) BeforeCreating(_ context.Context) (err error) {
-	c.Client().Logger().Debug().
-		Str("contactID", c.ID).
-		Msgf("starting: %s BeforeCreate hook...", c.Name())
+func (m *Contact) BeforeCreating(_ context.Context) (err error) {
+	m.Client().Logger().Debug().
+		Str("contactID", m.ID).
+		Msgf("starting: %s BeforeCreate hook...", m.Name())
 
-	if err = c.validate(); err != nil {
+	if err = m.validate(); err != nil {
 		return
 	}
 
-	c.Client().Logger().Debug().
-		Str("contactID", c.ID).
-		Msgf("end: %s BeforeCreate hook", c.Name())
+	m.Client().Logger().Debug().
+		Str("contactID", m.ID).
+		Msgf("end: %s BeforeCreate hook", m.Name())
 	return
 }
 
-func (c *Contact) BeforeUpdating(_ context.Context) (err error) {
-	c.Client().Logger().Debug().
-		Str("contactID", c.ID).
-		Msgf("starting: %s BeforeUpdate hook...", c.Name())
+// BeforeUpdating is called before the model is updated in the DB
+func (m *Contact) BeforeUpdating(_ context.Context) (err error) {
+	m.Client().Logger().Debug().
+		Str("contactID", m.ID).
+		Msgf("starting: %s BeforeUpdate hook...", m.Name())
 
-	if err = c.validate(); err != nil {
+	if err = m.validate(); err != nil {
 		return
 	}
 
-	c.Client().Logger().Debug().
-		Str("contactID", c.ID).
-		Msgf("end: %s BeforeUpdate hook", c.Name())
+	m.Client().Logger().Debug().
+		Str("contactID", m.ID).
+		Msgf("end: %s BeforeUpdate hook", m.Name())
 	return
 }
 
 // Migrate model specific migration on startup
-func (c *Contact) Migrate(client datastore.ClientInterface) error {
+func (m *Contact) Migrate(client datastore.ClientInterface) error {
 	tableName := client.GetTableName(tableContacts)
-	if err := c.migratePostgreSQL(client, tableName); err != nil {
+	if err := m.migratePostgreSQL(client, tableName); err != nil {
 		return err
 	}
 
-	return client.IndexMetadata(client.GetTableName(tableContacts), MetadataField)
+	err := client.IndexMetadata(client.GetTableName(tableContacts), MetadataField)
+	return spverrors.Wrapf(err, "failed to index metadata column on model %s", m.GetModelName())
 }
 
 // migratePostgreSQL is specific migration SQL for Postgresql
-func (c *Contact) migratePostgreSQL(client datastore.ClientInterface, tableName string) error {
+func (m *Contact) migratePostgreSQL(client datastore.ClientInterface, tableName string) error {
 	idxName := "idx_" + tableName + "_contacts"
 	tx := client.Execute(`CREATE INDEX IF NOT EXISTS "` + idxName + `" ON "` + tableName + `" ("full_name", "paymail")`)
 	if tx.Error != nil {

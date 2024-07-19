@@ -74,7 +74,7 @@ func getIncomingTxRecordStrategy(ctx context.Context, c ClientInterface, btTx *b
 	}
 
 	if err := rts.Validate(); err != nil {
-		return nil, err
+		return nil, err //nolint:wrapcheck // wrapped by our code below
 	}
 
 	return rts, nil

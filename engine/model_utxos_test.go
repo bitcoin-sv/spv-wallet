@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	"github.com/bitcoin-sv/spv-wallet/engine/datastore"
+	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/bitcoin-sv/spv-wallet/engine/utils"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -47,11 +48,7 @@ func createTestUtxos(ctx context.Context, client ClientInterface) error {
 
 	_utxo4 := newUtxo(testXPubID, testTxID, testLockingScript, 16, 1225, opts...)
 	err = _utxo4.Save(ctx)
-	if err != nil {
-		return err
-	}
-
-	return nil
+	return err
 }
 
 // TestUtxo_newUtxo will test the method newUtxo()
@@ -224,7 +221,7 @@ func TestUtxo_ReserveUtxos(t *testing.T) {
 		require.NoError(t, err)
 
 		_, err = reserveUtxos(ctx, testXPubID, testDraftID2, 20000, 0.5, nil, client.DefaultModelOptions()...)
-		require.Error(t, err, ErrNotEnoughUtxos)
+		require.Error(t, err, spverrors.ErrNotEnoughUtxos)
 	})
 
 	t.Run("reserve fromUtxos", func(t *testing.T) {
@@ -287,7 +284,7 @@ func TestUtxo_ReserveUtxos(t *testing.T) {
 			OutputIndex:   16,
 		}}
 		_, err = reserveUtxos(ctx, testXPubID, testDraftID2, 2000, 0.5, fromUtxos, client.DefaultModelOptions()...)
-		require.Error(t, err, ErrNotEnoughUtxos)
+		require.Error(t, err, spverrors.ErrNotEnoughUtxos)
 	})
 
 	t.Run("reserve utxos paginated", func(t *testing.T) {
@@ -320,7 +317,7 @@ func TestUtxo_ReserveUtxos(t *testing.T) {
 		}}
 
 		_, err = reserveUtxos(ctx, testXPubID, testDraftID2, 2200, 0.05, fromUtxos, client.DefaultModelOptions()...)
-		require.ErrorIs(t, err, ErrDuplicateUTXOs)
+		require.ErrorIs(t, err, spverrors.ErrDuplicateUTXOs)
 	})
 }
 
@@ -402,7 +399,7 @@ func TestUtxo_Save(t *testing.T) {
 		defer deferMe()
 		_utxo := newUtxo("", "", "", 0, 0, append(client.DefaultModelOptions(), New())...)
 		err := _utxo.Save(ctx)
-		assert.ErrorIs(t, err, ErrMissingFieldScriptPubKey)
+		assert.ErrorIs(t, err, spverrors.ErrMissingFieldScriptPubKey)
 	})
 
 	t.Run("Save", func(t *testing.T) {

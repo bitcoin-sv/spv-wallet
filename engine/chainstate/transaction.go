@@ -2,11 +2,11 @@ package chainstate
 
 import (
 	"context"
-	"errors"
 	"strings"
 	"sync"
 	"time"
 
+	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/libsv/go-bc"
 )
 
@@ -68,11 +68,11 @@ func queryBroadcastClient(ctx context.Context, client ClientInterface, id string
 	client.DebugLog("executing request using " + ProviderBroadcastClient)
 	if resp, failure := client.BroadcastClient().QueryTransaction(ctx, id); failure != nil {
 		client.DebugLog("error executing request using " + ProviderBroadcastClient + " failed: " + failure.Error())
-		return nil, errors.New(failure.Error())
+		return nil, spverrors.Newf(failure.Error())
 	} else if resp != nil && strings.EqualFold(resp.TxID, id) {
 		bump, err := bc.NewBUMPFromStr(resp.BaseTxResponse.MerklePath)
 		if err != nil {
-			return nil, err
+			return nil, spverrors.Wrapf(err, "failed to parse BUMP from response: %s", resp.BaseTxResponse.MerklePath)
 		}
 		return &TransactionInfo{
 			BlockHash:   resp.BlockHash,
@@ -83,5 +83,5 @@ func queryBroadcastClient(ctx context.Context, client ClientInterface, id string
 			BUMP:        bump,
 		}, nil
 	}
-	return nil, ErrTransactionIDMismatch
+	return nil, spverrors.ErrTransactionIDMismatch
 }

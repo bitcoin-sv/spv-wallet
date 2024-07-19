@@ -1,9 +1,8 @@
 package contacts
 
 import (
-	"errors"
-
 	"github.com/bitcoin-sv/spv-wallet/engine"
+	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 )
 
 // UpsertContact is the model for creating a contact
@@ -18,7 +17,7 @@ type UpsertContact struct {
 
 func (p *UpsertContact) validate() error {
 	if p.FullName == "" {
-		return errors.New("fullName is required")
+		return spverrors.ErrMissingContactFullName
 	}
 
 	return nil

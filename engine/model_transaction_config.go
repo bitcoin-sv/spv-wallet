@@ -11,6 +11,7 @@ import (
 	"time"
 
 	"github.com/bitcoin-sv/go-paymail"
+	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/bitcoin-sv/spv-wallet/engine/utils"
 	magic "github.com/bitcoinschema/go-map"
 	"github.com/libsv/go-bt/v2/bscript"
@@ -148,14 +149,15 @@ func (t *TransactionConfig) Scan(value interface{}) error {
 		return nil
 	}
 
-	return json.Unmarshal(byteValue, &t)
+	err = json.Unmarshal(byteValue, &t)
+	return spverrors.Wrapf(err, "failed to parse TransactionConfig from JSON")
 }
 
 // Value return json value, implement driver.Valuer interface
 func (t TransactionConfig) Value() (driver.Value, error) {
 	marshal, err := json.Marshal(t)
 	if err != nil {
-		return nil, err
+		return nil, spverrors.Wrapf(err, "failed to convert TransactionConfig to JSON")
 	}
 
 	return string(marshal), nil
@@ -178,12 +180,12 @@ func (t *TransactionOutput) processOutput(ctx context.Context, cacheStore caches
 	// Check for Paymail, Bitcoin Address or OP Return
 	if len(t.To) > 0 && strings.Contains(t.To, "@") { // Paymail output
 		if checkSatoshis && t.Satoshis <= 0 {
-			return ErrOutputValueTooLow
+			return spverrors.ErrOutputValueTooLow
 		}
 		return t.processPaymailOutput(ctx, cacheStore, paymailClient, defaultFromSender)
 	} else if len(t.To) > 0 { // Standard Bitcoin Address
 		if checkSatoshis && t.Satoshis <= 0 {
-			return ErrOutputValueTooLow
+			return spverrors.ErrOutputValueTooLow
 		}
 		return t.processAddressOutput()
 	} else if t.OpReturn != nil { // OP_RETURN output
@@ -193,7 +195,7 @@ func (t *TransactionOutput) processOutput(ctx context.Context, cacheStore caches
 	}
 
 	// No value set in either ToPaymail or ToAddress
-	return ErrOutputValueNotRecognized
+	return spverrors.ErrOutputValueNotRecognized
 }
 
 // processPaymailOutput will detect how to process the Paymail output given
@@ -203,7 +205,7 @@ func (t *TransactionOutput) processPaymailOutput(ctx context.Context, cacheStore
 	// Standardize the paymail address (break into parts)
 	alias, domain, paymailAddress := paymail.SanitizePaymail(t.To)
 	if len(paymailAddress) == 0 {
-		return ErrPaymailAddressIsInvalid
+		return spverrors.ErrPaymailAddressIsInvalid
 	}
 
 	// Set the sanitized version of the paymail address provided
@@ -236,7 +238,7 @@ func (t *TransactionOutput) processPaymailOutput(ctx context.Context, cacheStore
 		)
 	}
 
-	return fmt.Errorf("paymail provider does not support P2P")
+	return spverrors.Newf("paymail provider does not support P2P")
 }
 
 // processPaymailViaP2P will process the output for P2P Paymail resolution
@@ -259,7 +261,7 @@ func (t *TransactionOutput) processPaymailViaP2P(client paymail.ClientInterface,
 	// split the total output satoshis across all the paymail outputs given
 	outputValues, err := utils.SplitOutputValues(satoshis, len(destinationInfo.Outputs))
 	if err != nil {
-		return err
+		return spverrors.Wrapf(err, "failed to split satoshis between output values")
 	}
 
 	// Loop all received P2P outputs and build scripts
@@ -309,7 +311,7 @@ func (t *TransactionOutput) processAddressOutput() (err error) {
 // processScriptOutput will process a custom bitcoin script output
 func (t *TransactionOutput) processScriptOutput() (err error) {
 	if t.Script == "" {
-		return ErrInvalidScriptOutput
+		return spverrors.ErrInvalidScriptOutput
 	}
 
 	// check whether go-bt parses the script correctly
@@ -392,7 +394,7 @@ func (t *TransactionOutput) processOpReturnOutput() (err error) {
 		}
 		script = s.String()
 	} else {
-		return ErrInvalidOpReturnOutput
+		return spverrors.ErrInvalidOpReturnOutput
 	}
 
 	// Append the script

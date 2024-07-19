@@ -35,6 +35,7 @@ const (
 	ModelUtxo             ModelName = "utxo"
 	ModelXPub             ModelName = "xpub"
 	ModelContact          ModelName = "contact"
+	ModelWebhook          ModelName = "webhook"
 )
 
 // AllModelNames is a list of all models
@@ -49,6 +50,7 @@ var AllModelNames = []ModelName{
 	ModelUtxo,
 	ModelXPub,
 	ModelContact,
+	ModelWebhook,
 }
 
 // Internal table names
@@ -62,6 +64,7 @@ const (
 	tableUTXOs             = "utxos"
 	tableXPubs             = "xpubs"
 	tableContacts          = "contacts"
+	tableWebhooks          = "webhooks"
 )
 
 const (
@@ -171,6 +174,10 @@ var BaseModels = []interface{}{
 
 	&Contact{
 		Model: *NewBaseModel(ModelContact),
+	},
+
+	&Webhook{
+		Model: *NewBaseModel(ModelWebhook),
 	},
 
 	// Paymail addresses related to XPubs (automatically added when paymail is enabled)

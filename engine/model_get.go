@@ -1,3 +1,6 @@
+//revive:disable
+//nolint:wrapcheck // wrapping should be done at the higher level
+//revive:enable
 package engine
 
 import (
@@ -83,7 +86,7 @@ func getModelsByConditions(ctx context.Context, modelName ModelName, modelItems 
 		dbConditions[metadataField] = metadata
 	}
 
-	if conditions != nil && len(conditions) > 0 {
+	if len(conditions) > 0 {
 		and := make([]map[string]interface{}, 0)
 		if _, ok := dbConditions["$and"]; ok {
 			and = dbConditions["$and"].([]map[string]interface{})
@@ -117,7 +120,7 @@ func getModelsAggregateByConditions(ctx context.Context, modelName ModelName, mo
 		dbConditions[metadataField] = metadata
 	}
 
-	if conditions != nil && len(conditions) > 0 {
+	if len(conditions) > 0 {
 		and := make([]map[string]interface{}, 0)
 		if _, ok := dbConditions["$and"]; ok {
 			and = dbConditions["$and"].([]map[string]interface{})
@@ -151,7 +154,7 @@ func getModelCountByConditions(ctx context.Context, modelName ModelName, model i
 		dbConditions[metadataField] = metadata
 	}
 
-	if conditions != nil && len(conditions) > 0 {
+	if len(conditions) > 0 {
 		and := make([]map[string]interface{}, 0)
 		if _, ok := dbConditions["$and"]; ok {
 			and = dbConditions["$and"].([]map[string]interface{})

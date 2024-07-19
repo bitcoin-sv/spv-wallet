@@ -1,10 +1,9 @@
 package contacts
 
 import (
-	"errors"
 	"net/http"
 
-	"github.com/bitcoin-sv/spv-wallet/engine"
+	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/bitcoin-sv/spv-wallet/server/auth"
 	"github.com/gin-gonic/gin"
 )
@@ -29,14 +28,7 @@ func (a *Action) accept(c *gin.Context) {
 	err := a.Services.SpvWalletEngine.AcceptContact(c, reqXPubID, paymail)
 
 	if err != nil {
-		switch {
-		case errors.Is(err, engine.ErrContactNotFound):
-			c.JSON(http.StatusNotFound, err.Error())
-		case errors.Is(err, engine.ErrContactIncorrectStatus):
-			c.JSON(http.StatusUnprocessableEntity, err.Error())
-		default:
-			c.JSON(http.StatusInternalServerError, err.Error())
-		}
+		spverrors.ErrorResponse(c, err, a.Services.Logger)
 		return
 	}
 

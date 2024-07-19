@@ -7,14 +7,15 @@ import (
 	"testing"
 
 	"github.com/bitcoin-sv/go-paymail"
+	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/bitcoin-sv/spv-wallet/engine/utils"
 	"github.com/jarcoal/httpmock"
 	"github.com/stretchr/testify/require"
 )
 
-const cs_xpub = "xpub661MyMwAqRbcGFL3kTp9Y2fNccswbtC6gceUtkAfo2gn6k49BQbXqxmL1zqKe1MGLrx24S2a5FmK3G8hXtyk8wQS2VRyMNBG14NuxBHhevX"
+const csXpub = "xpub661MyMwAqRbcGFL3kTp9Y2fNccswbtC6gceUtkAfo2gn6k49BQbXqxmL1zqKe1MGLrx24S2a5FmK3G8hXtyk8wQS2VRyMNBG14NuxBHhevX"
 
-var cs_xpubHash = utils.Hash(cs_xpub)
+var csXpubHash = utils.Hash(csXpub)
 
 func Test_ClientService_UpsertContact(t *testing.T) {
 	t.Run("insert contact", func(t *testing.T) {
@@ -31,14 +32,14 @@ func Test_ClientService_UpsertContact(t *testing.T) {
 		ctx, client, cleanup := CreateTestSQLiteClient(t, false, false, withTaskManagerMockup(), WithPaymailClient(pt.paymailClient))
 		defer cleanup()
 
-		_, err := client.NewXpub(ctx, cs_xpub, client.DefaultModelOptions()...)
+		_, err := client.NewXpub(ctx, csXpub, client.DefaultModelOptions()...)
 		require.NoError(t, err)
 
-		_, err = client.NewPaymailAddress(ctx, cs_xpub, "lady_stoneheart@winterfell.com", "Catelyn Stark", "", client.DefaultModelOptions()...)
+		_, err = client.NewPaymailAddress(ctx, csXpub, "lady_stoneheart@winterfell.com", "Catelyn Stark", "", client.DefaultModelOptions()...)
 		require.NoError(t, err)
 
 		// when
-		res, err := client.UpsertContact(ctx, "Bran Stark", paymailAddr, cs_xpubHash, "", client.DefaultModelOptions()...)
+		res, err := client.UpsertContact(ctx, "Bran Stark", paymailAddr, csXpubHash, "", client.DefaultModelOptions()...)
 
 		// then
 		require.NoError(t, err)
@@ -52,10 +53,10 @@ func Test_ClientService_UpsertContact(t *testing.T) {
 		defer cleanup()
 
 		// when
-		res, err := client.UpsertContact(ctx, "Bran Stark", "bran_the_broken@winterfell.com", cs_xpubHash, "", client.DefaultModelOptions()...)
+		res, err := client.UpsertContact(ctx, "Bran Stark", "bran_the_broken@winterfell.com", csXpubHash, "", client.DefaultModelOptions()...)
 
 		// then
-		require.ErrorIs(t, err, ErrInvalidRequesterXpub)
+		require.ErrorIs(t, err, spverrors.ErrInvalidRequesterXpub)
 		require.Nil(t, res)
 	})
 
@@ -72,17 +73,17 @@ func Test_ClientService_UpsertContact(t *testing.T) {
 		ctx, client, cleanup := CreateTestSQLiteClient(t, false, false, withTaskManagerMockup(), WithPaymailClient(pt.paymailClient))
 		defer cleanup()
 
-		_, err := client.NewXpub(ctx, cs_xpub, client.DefaultModelOptions()...)
+		_, err := client.NewXpub(ctx, csXpub, client.DefaultModelOptions()...)
 		require.NoError(t, err)
 
-		_, err = client.NewPaymailAddress(ctx, cs_xpub, "lady_stoneheart@winterfell.com", "Catelyn Stark", "", client.DefaultModelOptions()...)
+		_, err = client.NewPaymailAddress(ctx, csXpub, "lady_stoneheart@winterfell.com", "Catelyn Stark", "", client.DefaultModelOptions()...)
 		require.NoError(t, err)
 
 		// when
-		res, err := client.UpsertContact(ctx, "Bran Stark", paymailAddr, cs_xpubHash, "lady_stoneheart@winterfell.com", client.DefaultModelOptions()...)
+		res, err := client.UpsertContact(ctx, "Bran Stark", paymailAddr, csXpubHash, "lady_stoneheart@winterfell.com", client.DefaultModelOptions()...)
 
 		// then
-		require.ErrorIs(t, err, ErrAddingContactRequest)
+		require.ErrorIs(t, err, spverrors.ErrAddingContactRequest)
 		require.NotNil(t, res)
 		require.Equal(t, ContactNotConfirmed, res.Status)
 	})
@@ -102,13 +103,13 @@ func Test_ClientService_UpsertContact(t *testing.T) {
 		ctx, client, cleanup := CreateTestSQLiteClient(t, false, false, withTaskManagerMockup(), WithPaymailClient(pt.paymailClient))
 		defer cleanup()
 
-		_, err := client.NewXpub(ctx, cs_xpub, client.DefaultModelOptions()...)
+		_, err := client.NewXpub(ctx, csXpub, client.DefaultModelOptions()...)
 		require.NoError(t, err)
 
-		_, err = client.NewPaymailAddress(ctx, cs_xpub, "lady_stoneheart@winterfell.com", "Catelyn Stark", "", client.DefaultModelOptions()...)
+		_, err = client.NewPaymailAddress(ctx, csXpub, "lady_stoneheart@winterfell.com", "Catelyn Stark", "", client.DefaultModelOptions()...)
 		require.NoError(t, err)
 
-		contact, err := client.UpsertContact(ctx, "Bran Stark", paymailAddr, cs_xpubHash, "", client.DefaultModelOptions()...)
+		contact, err := client.UpsertContact(ctx, "Bran Stark", paymailAddr, csXpubHash, "", client.DefaultModelOptions()...)
 		require.NoError(t, err)
 		require.NotNil(t, contact)
 
@@ -118,7 +119,7 @@ func Test_ClientService_UpsertContact(t *testing.T) {
 		require.NoError(t, err)
 
 		// when
-		updatedContact, err := client.UpsertContact(ctx, updatedFullname, paymailAddr, cs_xpubHash, "", client.DefaultModelOptions()...)
+		updatedContact, err := client.UpsertContact(ctx, updatedFullname, paymailAddr, csXpubHash, "", client.DefaultModelOptions()...)
 
 		// then
 		require.NoError(t, err)
@@ -147,13 +148,13 @@ func Test_ClientService_UpsertContact(t *testing.T) {
 		ctx, client, cleanup := CreateTestSQLiteClient(t, false, false, withTaskManagerMockup(), WithPaymailClient(pt.paymailClient))
 		defer cleanup()
 
-		_, err := client.NewXpub(ctx, cs_xpub, client.DefaultModelOptions()...)
+		_, err := client.NewXpub(ctx, csXpub, client.DefaultModelOptions()...)
 		require.NoError(t, err)
 
-		_, err = client.NewPaymailAddress(ctx, cs_xpub, "lady_stoneheart@winterfell.com", "Catelyn Stark", "", client.DefaultModelOptions()...)
+		_, err = client.NewPaymailAddress(ctx, csXpub, "lady_stoneheart@winterfell.com", "Catelyn Stark", "", client.DefaultModelOptions()...)
 		require.NoError(t, err)
 
-		contact, err := client.UpsertContact(ctx, "Bran Stark", paymailAddr, cs_xpubHash, "", client.DefaultModelOptions()...)
+		contact, err := client.UpsertContact(ctx, "Bran Stark", paymailAddr, csXpubHash, "", client.DefaultModelOptions()...)
 		require.NoError(t, err)
 		require.NotNil(t, contact)
 
@@ -166,7 +167,7 @@ func Test_ClientService_UpsertContact(t *testing.T) {
 		// change PKI
 		pt.mockPki(paymailAddr, updatedPki)
 
-		updatedContact, err := client.UpsertContact(ctx, updatedFullname, paymailAddr, cs_xpubHash, "lady_stoneheart@winterfell.com", client.DefaultModelOptions()...)
+		updatedContact, err := client.UpsertContact(ctx, updatedFullname, paymailAddr, csXpubHash, "lady_stoneheart@winterfell.com", client.DefaultModelOptions()...)
 
 		// then
 		require.NoError(t, err)
@@ -195,14 +196,14 @@ func TestClientService_AddContactRequest(t *testing.T) {
 		ctx, client, cleanup := CreateTestSQLiteClient(t, false, false, withTaskManagerMockup(), WithPaymailClient(pt.paymailClient))
 		defer cleanup()
 
-		_, err := client.NewXpub(ctx, cs_xpub, client.DefaultModelOptions()...)
+		_, err := client.NewXpub(ctx, csXpub, client.DefaultModelOptions()...)
 		require.NoError(t, err)
 
-		_, err = client.NewPaymailAddress(ctx, cs_xpub, "lady_stoneheart@winterfell.com", "Catelyn Stark", "", client.DefaultModelOptions()...)
+		_, err = client.NewPaymailAddress(ctx, csXpub, "lady_stoneheart@winterfell.com", "Catelyn Stark", "", client.DefaultModelOptions()...)
 		require.NoError(t, err)
 
 		// when
-		res, err := client.AddContactRequest(ctx, "Sansa Stark", paymailAddr, cs_xpubHash, client.DefaultModelOptions()...)
+		res, err := client.AddContactRequest(ctx, "Sansa Stark", paymailAddr, csXpubHash, client.DefaultModelOptions()...)
 
 		// then
 		require.NoError(t, err)
@@ -224,13 +225,13 @@ func TestClientService_AddContactRequest(t *testing.T) {
 		ctx, client, cleanup := CreateTestSQLiteClient(t, false, false, withTaskManagerMockup(), WithPaymailClient(pt.paymailClient))
 		defer cleanup()
 
-		_, err := client.NewXpub(ctx, cs_xpub, client.DefaultModelOptions()...)
+		_, err := client.NewXpub(ctx, csXpub, client.DefaultModelOptions()...)
 		require.NoError(t, err)
 
-		_, err = client.NewPaymailAddress(ctx, cs_xpub, "lady_stoneheart@winterfell.com", "Catelyn Stark", "", client.DefaultModelOptions()...)
+		_, err = client.NewPaymailAddress(ctx, csXpub, "lady_stoneheart@winterfell.com", "Catelyn Stark", "", client.DefaultModelOptions()...)
 		require.NoError(t, err)
 
-		contact, err := client.AddContactRequest(ctx, "Sansa Stark", paymailAddr, cs_xpubHash, client.DefaultModelOptions()...)
+		contact, err := client.AddContactRequest(ctx, "Sansa Stark", paymailAddr, csXpubHash, client.DefaultModelOptions()...)
 		require.NoError(t, err)
 		require.NotNil(t, contact)
 
@@ -240,7 +241,7 @@ func TestClientService_AddContactRequest(t *testing.T) {
 		require.NoError(t, err)
 
 		// when
-		updatedContact, err := client.AddContactRequest(ctx, "Alayne Stone", paymailAddr, cs_xpubHash, client.DefaultModelOptions()...)
+		updatedContact, err := client.AddContactRequest(ctx, "Alayne Stone", paymailAddr, csXpubHash, client.DefaultModelOptions()...)
 
 		// then
 		require.NoError(t, err)
@@ -266,13 +267,13 @@ func TestClientService_AddContactRequest(t *testing.T) {
 		ctx, client, cleanup := CreateTestSQLiteClient(t, false, false, withTaskManagerMockup(), WithPaymailClient(pt.paymailClient))
 		defer cleanup()
 
-		_, err := client.NewXpub(ctx, cs_xpub, client.DefaultModelOptions()...)
+		_, err := client.NewXpub(ctx, csXpub, client.DefaultModelOptions()...)
 		require.NoError(t, err)
 
-		_, err = client.NewPaymailAddress(ctx, cs_xpub, "lady_stoneheart@winterfell.com", "Catelyn Stark", "", client.DefaultModelOptions()...)
+		_, err = client.NewPaymailAddress(ctx, csXpub, "lady_stoneheart@winterfell.com", "Catelyn Stark", "", client.DefaultModelOptions()...)
 		require.NoError(t, err)
 
-		contact, err := client.AddContactRequest(ctx, "Sansa Stark", paymailAddr, cs_xpubHash, client.DefaultModelOptions()...)
+		contact, err := client.AddContactRequest(ctx, "Sansa Stark", paymailAddr, csXpubHash, client.DefaultModelOptions()...)
 		require.NoError(t, err)
 		require.NotNil(t, contact)
 
@@ -285,7 +286,7 @@ func TestClientService_AddContactRequest(t *testing.T) {
 		// change PKI
 		pt.mockPki(paymailAddr, updatedPki)
 
-		updatedContact, err := client.AddContactRequest(ctx, "Alayne Stone", paymailAddr, cs_xpubHash, client.DefaultModelOptions()...)
+		updatedContact, err := client.AddContactRequest(ctx, "Alayne Stone", paymailAddr, csXpubHash, client.DefaultModelOptions()...)
 
 		// then
 		require.NoError(t, err)
@@ -300,7 +301,7 @@ func TestClientService_AddContactRequest(t *testing.T) {
 }
 
 type paymailTestMock struct {
-	serverUrl     string
+	serverURL     string
 	paymailClient paymail.ClientInterface
 }
 
@@ -308,7 +309,7 @@ func (p *paymailTestMock) setup(t *testing.T, domain string, supportPike bool) {
 	httpmock.Reset()
 	serverURL := "https://" + domain + "/api/v1/" + paymail.DefaultServiceName
 
-	wellKnownUrl := fmt.Sprintf("https://%s:443/.well-known/%s", domain, paymail.DefaultServiceName)
+	wellKnownURL := fmt.Sprintf("https://%s:443/.well-known/%s", domain, paymail.DefaultServiceName)
 	wellKnownBody := paymail.CapabilitiesPayload{
 		BsvAlias:     paymail.DefaultBsvAliasVersion,
 		Capabilities: map[string]interface{}{paymail.BRFCPki: fmt.Sprintf("%s/id/{alias}@{domain.tld}", serverURL)},
@@ -323,19 +324,19 @@ func (p *paymailTestMock) setup(t *testing.T, domain string, supportPike bool) {
 
 	wellKnownResponse, _ := json.Marshal(wellKnownBody)
 	wellKnownResponder := httpmock.NewStringResponder(http.StatusOK, string(wellKnownResponse))
-	httpmock.RegisterResponder(http.MethodGet, wellKnownUrl, wellKnownResponder)
+	httpmock.RegisterResponder(http.MethodGet, wellKnownURL, wellKnownResponder)
 
-	p.serverUrl = serverURL
+	p.serverURL = serverURL
 	p.paymailClient = newTestPaymailClient(t, []string{domain})
 }
 
 func (p *paymailTestMock) cleanup() {
 	httpmock.Reset()
-	p.serverUrl = ""
+	p.serverURL = ""
 }
 
 func (p *paymailTestMock) mockPki(paymail, pubkey string) {
-	httpmock.RegisterResponder(http.MethodGet, fmt.Sprintf("%s/id/%s", p.serverUrl, paymail),
+	httpmock.RegisterResponder(http.MethodGet, fmt.Sprintf("%s/id/%s", p.serverURL, paymail),
 		httpmock.NewStringResponder(
 			200,
 			`{"bsvalias":"1.0","handle":"`+paymail+`","pubkey":"`+pubkey+`"}`,
@@ -344,13 +345,13 @@ func (p *paymailTestMock) mockPki(paymail, pubkey string) {
 }
 
 func (p *paymailTestMock) mockPike(paymail string) {
-	httpmock.RegisterResponder(http.MethodPost, fmt.Sprintf("%s/contact/invite/%s", p.serverUrl, paymail),
+	httpmock.RegisterResponder(http.MethodPost, fmt.Sprintf("%s/contact/invite/%s", p.serverURL, paymail),
 		httpmock.NewStringResponder(
 			200,
 			"{}",
 		),
 	)
-	httpmock.RegisterResponder(http.MethodPost, fmt.Sprintf("%s/pike/outputs%s", p.serverUrl, paymail),
+	httpmock.RegisterResponder(http.MethodPost, fmt.Sprintf("%s/pike/outputs%s", p.serverURL, paymail),
 		httpmock.NewStringResponder(
 			200,
 			"{}",

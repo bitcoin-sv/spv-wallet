@@ -2,12 +2,12 @@ package engine
 
 import (
 	"context"
-	"errors"
 	"fmt"
 	"strings"
 	"testing"
 	"time"
 
+	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/stretchr/testify/require"
 )
 
@@ -35,32 +35,32 @@ func Test_contact_validate_returns_error(t *testing.T) {
 		{
 			name:         "empty full name",
 			contact:      newContact("", "donot@know.who", "xpubblablablabla", "ownerspbubid", ContactNotConfirmed),
-			expetedError: ErrMissingContactFullName,
+			expetedError: spverrors.ErrMissingContactFullName,
 		},
 		{
 			name:         "empty paymail",
 			contact:      newContact("Homer Simpson", "", "xpubblablahomer", "ownerspbubid", ContactNotConfirmed),
-			expetedError: errors.New("paymail address failed format validation: "),
+			expetedError: spverrors.Newf("invalid paymail in contact"),
 		},
 		{
 			name:         "invalid paymail",
 			contact:      newContact("Marge Simpson", "definitely not paymail", "xpubblablamarge", "ownerspbubid", ContactNotConfirmed),
-			expetedError: fmt.Errorf("paymail address failed format validation: definitelynotpaymail"),
+			expetedError: spverrors.Newf("invalid paymail in contact"),
 		},
 		{
 			name:         "empty pubKey",
 			contact:      newContact("Bart Simpson", "bart@springfield.com", "", "ownerspbubid", ContactNotConfirmed),
-			expetedError: ErrMissingContactXPubKey,
+			expetedError: spverrors.ErrMissingContactXPubKey,
 		},
 		{
 			name:         "no owner id",
 			contact:      newContact("Lisa Simpson", "lisa@springfield.com", "xpubblablalisa", "", ContactNotConfirmed),
-			expetedError: ErrMissingContactOwnerXPubId,
+			expetedError: spverrors.ErrMissingContactOwnerXPubID,
 		},
 		{
 			name:         "no status",
 			contact:      newContact("Margaret Simpson", "maggie@springfield.com", "xpubblablamaggie", "ownerspbubid", ""),
-			expetedError: ErrMissingContactStatus,
+			expetedError: spverrors.ErrMissingContactStatus,
 		},
 	}
 
@@ -265,7 +265,7 @@ func Test_getContacts(t *testing.T) {
 
 		xpubID := "xpubid"
 
-		// fullfill db
+		// fulfill db
 		saveContactsN(xpubID, ContactAwaitAccept, 10, client)
 		saveContactsN(xpubID, ContactNotConfirmed, 13, client)
 
@@ -294,7 +294,7 @@ func Test_getContacts(t *testing.T) {
 
 		xpubID := "xpubid"
 
-		// fullfill db
+		// fulfill db
 		saveContactsN(xpubID, ContactAwaitAccept, 10, client)
 		saveContactsN(xpubID, ContactNotConfirmed, 13, client)
 
@@ -314,7 +314,7 @@ func Test_getContacts(t *testing.T) {
 
 		xpubID := "xpubid"
 
-		// fullfill db
+		// fulfill db
 		saveContactsN(xpubID, ContactAwaitAccept, 10, client)
 		saveContactsN("other-xpub", ContactNotConfirmed, 13, client)
 
@@ -334,7 +334,7 @@ func Test_getContacts(t *testing.T) {
 
 		xpubID := "xpubid"
 
-		// fullfill db
+		// fulfill db
 		saveContactsN(xpubID, ContactAwaitAccept, 10, client)
 		saveContactsDeletedN(xpubID, ContactNotConfirmed, 13, client)
 

@@ -13,6 +13,7 @@ import (
 	"math"
 	"strconv"
 
+	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/libsv/go-bt/v2"
 )
 
@@ -40,7 +41,7 @@ func Hash(data string) string {
 func RandomHex(n int) (string, error) {
 	b := make([]byte, n)
 	if _, err := rand.Read(b); err != nil {
-		return "", err
+		return "", spverrors.Wrapf(err, "failed to generate random number")
 	}
 	return hex.EncodeToString(b), nil
 }
@@ -59,7 +60,7 @@ func GetChildNumsFromHex(hexHash string) ([]uint32, error) {
 		}
 		num, err := strconv.ParseInt(hexHash[start:stop], 16, 64)
 		if err != nil {
-			return nil, err
+			return nil, spverrors.Wrapf(err, "cannot parse child number from hex string")
 		}
 		if num > MaxInt32 {
 			num = num - MaxInt32
@@ -84,7 +85,7 @@ func StringInSlice(a string, list []string) bool {
 func GetTransactionIDFromHex(hex string) (string, error) {
 	parsedTx, err := bt.NewTxFromString(hex)
 	if err != nil {
-		return "", err
+		return "", spverrors.Wrapf(err, "failed to parse transaction hex")
 	}
 	return parsedTx.TxID(), nil
 }
@@ -100,13 +101,13 @@ func LittleEndianBytes64(value uint64, resultLength uint32) []byte {
 // HashAdler32 returns computed string calculated with Adler32 function.
 func HashAdler32(input string) (string, error) {
 	if input == "" {
-		return "", fmt.Errorf("input string is empty - cannot apply adler32 hash function")
+		return "", spverrors.Newf("input string is empty - cannot apply adler32 hash function")
 	}
 	data := []byte(input)
 	hasher := adler32.New()
 	_, err := hasher.Write(data)
 	if err != nil {
-		return "", err
+		return "", spverrors.Wrapf(err, "failed to hash data with adler32")
 	}
 
 	sum := hasher.Sum32()

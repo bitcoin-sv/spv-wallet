@@ -7,6 +7,7 @@ import (
 
 	"github.com/bitcoin-sv/spv-wallet/engine/datastore"
 	customTypes "github.com/bitcoin-sv/spv-wallet/engine/datastore/customtypes"
+	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/bitcoin-sv/spv-wallet/engine/utils"
 	"github.com/libsv/go-bt/v2"
 	"github.com/libsv/go-bt/v2/bscript"
@@ -449,7 +450,7 @@ func TestTransaction_processInputs(t *testing.T) {
 
 		ctx := context.Background()
 		err = transaction._processInputs(ctx)
-		require.ErrorIs(t, err, ErrUtxoAlreadySpent)
+		require.ErrorIs(t, err, spverrors.ErrUtxoAlreadySpent)
 	})
 
 	t.Run("not reserved utxo", func(t *testing.T) {
@@ -477,7 +478,7 @@ func TestTransaction_processInputs(t *testing.T) {
 
 		ctx := context.Background()
 		err = transaction._processInputs(ctx)
-		require.ErrorIs(t, err, ErrUtxoNotReserved)
+		require.ErrorIs(t, err, spverrors.ErrUtxoNotReserved)
 	})
 
 	t.Run("incorrect reservation ID of utxo", func(t *testing.T) {
@@ -509,7 +510,7 @@ func TestTransaction_processInputs(t *testing.T) {
 
 		ctx := context.Background()
 		err = transaction._processInputs(ctx)
-		require.ErrorIs(t, err, ErrDraftIDMismatch)
+		require.ErrorIs(t, err, spverrors.ErrDraftIDMismatch)
 	})
 
 	t.Run("inputUtxoChecksOff", func(t *testing.T) {

@@ -7,6 +7,7 @@ import (
 
 	"github.com/bitcoin-sv/spv-wallet/engine/datastore"
 	customTypes "github.com/bitcoin-sv/spv-wallet/engine/datastore/customtypes"
+	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/bitcoin-sv/spv-wallet/engine/utils"
 	"github.com/pkg/errors"
 )
@@ -75,10 +76,10 @@ func getSpendableUtxos(ctx context.Context, xPubID, utxoType string, queryParams
 			if err != nil {
 				return nil, err
 			} else if utxo == nil {
-				return nil, ErrMissingUtxo
+				return nil, spverrors.ErrCouldNotFindUtxo
 			}
 			if utxo.XpubID != xPubID || utxo.SpendingTxID.Valid {
-				return nil, ErrUtxoAlreadySpent
+				return nil, spverrors.ErrUtxoAlreadySpent
 			}
 			models = append(models, *utxo)
 		}
@@ -97,7 +98,7 @@ func getSpendableUtxos(ctx context.Context, xPubID, utxoType string, queryParams
 
 	// No utxos found?
 	if len(models) == 0 {
-		return nil, ErrMissingUTXOsSpendable
+		return nil, spverrors.ErrMissingUTXOsSpendable
 	}
 
 	// Loop and enrich
@@ -228,16 +229,16 @@ reserveUtxoLoop:
 		if err = unReserveUtxos(
 			ctx, xPubID, draftID, m.GetOptions(false)...,
 		); err != nil {
-			return nil, errors.Wrap(err, ErrNotEnoughUtxos.Error())
+			return nil, spverrors.ErrNotEnoughUtxos
 		}
-		return nil, ErrNotEnoughUtxos
+		return nil, spverrors.ErrNotEnoughUtxos
 	}
 
 	// check whether an utxo was used twice, this is not valid
 	usedUtxos := make([]string, 0)
 	for _, utxo := range *utxos {
 		if utils.StringInSlice(utxo.ID, usedUtxos) {
-			return nil, ErrDuplicateUTXOs
+			return nil, spverrors.ErrDuplicateUTXOs
 		}
 		usedUtxos = append(usedUtxos, utxo.ID)
 	}
@@ -395,15 +396,15 @@ func (m *Utxo) BeforeCreating(_ context.Context) error {
 
 	// Test for required field(s)
 	if len(m.ScriptPubKey) == 0 {
-		return ErrMissingFieldScriptPubKey
+		return spverrors.ErrMissingFieldScriptPubKey
 	} else if m.Satoshis == 0 {
-		return ErrMissingFieldSatoshis
+		return spverrors.ErrMissingFieldSatoshis
 	} else if len(m.TransactionID) == 0 {
-		return ErrMissingFieldTransactionID
+		return spverrors.ErrMissingFieldTransactionID
 	}
 
 	if len(m.XpubID) == 0 {
-		return ErrMissingFieldXpubID
+		return spverrors.ErrMissingFieldXpubID
 	}
 
 	// Set the new pointer?
@@ -459,5 +460,6 @@ func (m *Utxo) Migrate(client datastore.ClientInterface) error {
 		}
 	}
 
-	return client.IndexMetadata(client.GetTableName(tableUTXOs), metadataField)
+	err := client.IndexMetadata(client.GetTableName(tableUTXOs), metadataField)
+	return spverrors.Wrapf(err, "failed to create index on metadata field")
 }

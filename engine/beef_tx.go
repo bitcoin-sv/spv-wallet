@@ -3,8 +3,8 @@ package engine
 import (
 	"context"
 	"encoding/hex"
-	"fmt"
 
+	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/libsv/go-bt/v2"
 )
 
@@ -24,7 +24,7 @@ func ToBeef(ctx context.Context, tx *Transaction, store TransactionGetter) (stri
 
 	bumpBtFactors, bumpFactors, err := prepareBEEFFactors(ctx, tx, store)
 	if err != nil {
-		return "", fmt.Errorf("prepareBUMPFactors() error: %w", err)
+		return "", spverrors.Wrapf(err, "prepareBUMPFactors() error")
 	}
 
 	bumps, err := calculateMergedBUMP(bumpFactors)
@@ -34,7 +34,7 @@ func ToBeef(ctx context.Context, tx *Transaction, store TransactionGetter) (stri
 	sortedTxs := kahnTopologicalSortTransactions(bumpBtFactors)
 	beefHex, err := toBeefHex(bumps, sortedTxs)
 	if err != nil {
-		return "", fmt.Errorf("ToBeef() error: %w", err)
+		return "", spverrors.Wrapf(err, "ToBeef() error")
 	}
 
 	return beefHex, nil
@@ -43,12 +43,12 @@ func ToBeef(ctx context.Context, tx *Transaction, store TransactionGetter) (stri
 func toBeefHex(bumps BUMPs, parentTxs []*bt.Tx) (string, error) {
 	beef, err := newBeefTx(1, bumps, parentTxs)
 	if err != nil {
-		return "", fmt.Errorf("ToBeefHex() error: %w", err)
+		return "", spverrors.Wrapf(err, "ToBeefHex() error")
 	}
 
 	beefBytes, err := beef.toBeefBytes()
 	if err != nil {
-		return "", fmt.Errorf("ToBeefHex() error: %w", err)
+		return "", spverrors.Wrapf(err, "ToBeefHex() error")
 	}
 
 	return hex.EncodeToString(beefBytes), nil
@@ -56,7 +56,7 @@ func toBeefHex(bumps BUMPs, parentTxs []*bt.Tx) (string, error) {
 
 func newBeefTx(version uint32, bumps BUMPs, parentTxs []*bt.Tx) (*beefTx, error) {
 	if version > maxBeefVer {
-		return nil, fmt.Errorf("version above 0x%X", maxBeefVer)
+		return nil, spverrors.Newf("version above 0x%X", maxBeefVer)
 	}
 
 	if err := validateBumps(bumps); err != nil {
@@ -79,7 +79,7 @@ func hydrateTransaction(ctx context.Context, tx *Transaction) error {
 		)
 
 		if err != nil || dTx == nil {
-			return fmt.Errorf("retrieve DraftTransaction failed: %w", err)
+			return spverrors.Wrapf(err, "retrieve DraftTransaction failed")
 		}
 
 		tx.draftTransaction = dTx

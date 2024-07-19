@@ -4,6 +4,7 @@ import (
 	"net/http"
 
 	"github.com/bitcoin-sv/spv-wallet/engine"
+	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/bitcoin-sv/spv-wallet/mappings"
 	"github.com/bitcoin-sv/spv-wallet/server/auth"
 	"github.com/gin-gonic/gin"
@@ -35,7 +36,7 @@ func (a *Action) get(c *gin.Context) {
 		)
 	}
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, err.Error())
+		spverrors.ErrorResponse(c, spverrors.ErrCouldNotFindXpub, a.Services.Logger)
 		return
 	}
 

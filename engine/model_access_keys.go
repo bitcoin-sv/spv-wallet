@@ -8,6 +8,7 @@ import (
 
 	"github.com/bitcoin-sv/spv-wallet/engine/datastore"
 	customTypes "github.com/bitcoin-sv/spv-wallet/engine/datastore/customtypes"
+	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/bitcoin-sv/spv-wallet/engine/utils"
 	"github.com/bitcoinschema/go-bitcoin/v2"
 )
@@ -182,7 +183,7 @@ func (m *AccessKey) BeforeCreating(_ context.Context) error {
 
 	// Make sure ID is valid
 	if len(m.ID) == 0 {
-		return ErrMissingFieldID
+		return spverrors.ErrMissingFieldID
 	}
 
 	m.Client().Logger().Debug().
@@ -193,5 +194,6 @@ func (m *AccessKey) BeforeCreating(_ context.Context) error {
 
 // Migrate model specific migration on startup
 func (m *AccessKey) Migrate(client datastore.ClientInterface) error {
-	return client.IndexMetadata(client.GetTableName(tableAccessKeys), metadataField)
+	err := client.IndexMetadata(client.GetTableName(tableAccessKeys), metadataField)
+	return spverrors.Wrapf(err, "failed to index metadata column on model %s", m.GetModelName())
 }

@@ -6,6 +6,7 @@ import (
 
 	"github.com/DATA-DOG/go-sqlmock"
 	"github.com/bitcoin-sv/spv-wallet/engine/datastore"
+	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/bitcoin-sv/spv-wallet/engine/tester"
 	"github.com/bitcoin-sv/spv-wallet/engine/utils"
 	"github.com/mrz1836/go-cache"
@@ -90,7 +91,7 @@ func TestXpub_getNewDestination(t *testing.T) {
 			"test-key": "test-value",
 		}
 		_, err = xPub.getNewDestination(ctx, utils.ChainInternal, utils.ScriptTypePubKeyHash, append(client.DefaultModelOptions(), WithMetadatas(metaData))...)
-		assert.ErrorIs(t, utils.ErrXpubInvalidLength, err)
+		assert.ErrorIs(t, spverrors.ErrXpubInvalidLength, err)
 	})
 
 	t.Run("new internal destination", func(t *testing.T) {

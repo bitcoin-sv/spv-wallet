@@ -7,7 +7,7 @@ import (
 
 	"github.com/bitcoin-sv/spv-wallet/engine/cluster"
 	"github.com/bitcoin-sv/spv-wallet/engine/datastore"
-	"github.com/bitcoin-sv/spv-wallet/engine/notifications"
+	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/bitcoin-sv/spv-wallet/engine/utils"
 	"github.com/bitcoinschema/go-bitcoin/v2"
 )
@@ -81,7 +81,7 @@ func newAddress(rawXpubKey string, chain, num uint32, opts ...ModelOps) (*Destin
 	if destination.LockingScript, err = bitcoin.ScriptFromAddress(
 		destination.Address,
 	); err != nil {
-		return nil, err
+		return nil, spverrors.Wrapf(err, "failed to get locking script from address %s", destination.Address)
 	}
 
 	// Determine the type if the locking script is provided
@@ -253,7 +253,7 @@ func getDestinationWithCache(ctx context.Context, client ClientInterface,
 		cacheKey = fmt.Sprintf(cacheKeyDestinationModelByLockingScript, lockingScript)
 	}
 	if len(cacheKey) == 0 {
-		return nil, ErrMissingFieldID
+		return nil, spverrors.ErrMissingFieldID
 	}
 
 	// Attempt to get from cache
@@ -287,7 +287,7 @@ func getDestinationWithCache(ctx context.Context, client ClientInterface,
 	if err != nil {
 		return nil, err
 	} else if destination == nil {
-		return nil, ErrMissingDestination
+		return nil, spverrors.ErrCouldNotFindDestination
 	}
 
 	// Save to cache
@@ -353,7 +353,7 @@ func (m *Destination) AfterCreated(ctx context.Context) error {
 
 	err := m.client.Cluster().Publish(cluster.DestinationNew, m.LockingScript)
 	if err != nil {
-		return err
+		return spverrors.Wrapf(err, "failed to publish destination %s to cluster", m.ID)
 	}
 
 	// Store in the cache
@@ -367,8 +367,6 @@ func (m *Destination) AfterCreated(ctx context.Context) error {
 		return err
 	}
 
-	notify(notifications.EventTypeCreate, m)
-
 	m.Client().Logger().Debug().
 		Str("destinationID", m.ID).
 		Msgf("end: %s AfterCreated hook", m.Name())
@@ -380,7 +378,7 @@ func (m *Destination) setAddress(rawXpubKey string) error {
 	// Check the xPub
 	hdKey, err := utils.ValidateXPub(rawXpubKey)
 	if err != nil {
-		return err
+		return err //nolint:wrapcheck // Already wrapped in Validate
 	}
 
 	// Set the ID
@@ -390,7 +388,7 @@ func (m *Destination) setAddress(rawXpubKey string) error {
 	if m.Address, err = utils.DeriveAddress(
 		hdKey, m.Chain, m.Num,
 	); err != nil {
-		return err
+		return spverrors.Wrapf(err, "failed to derive address for chain %d and num %d", m.Chain, m.Num)
 	}
 
 	return nil
@@ -398,7 +396,8 @@ func (m *Destination) setAddress(rawXpubKey string) error {
 
 // Migrate model specific migration on startup
 func (m *Destination) Migrate(client datastore.ClientInterface) error {
-	return client.IndexMetadata(client.GetTableName(tableDestinations), metadataField)
+	err := client.IndexMetadata(client.GetTableName(tableDestinations), metadataField)
+	return spverrors.Wrapf(err, "failed to index metadata column on model %s", m.GetModelName())
 }
 
 // AfterUpdated will fire after the model is updated in the Datastore
@@ -417,8 +416,6 @@ func (m *Destination) AfterUpdated(ctx context.Context) error {
 	); err != nil {
 		return err
 	}
-
-	notify(notifications.EventTypeUpdate, m)
 
 	m.Client().Logger().Debug().
 		Str("destinationID", m.ID).
@@ -444,12 +441,10 @@ func (m *Destination) AfterDeleted(ctx context.Context) error {
 			if err := m.Client().Cachestore().Delete(
 				ctx, fmt.Sprintf(key, val),
 			); err != nil {
-				return err
+				return spverrors.Wrapf(err, "failed to delete cache key %s", key)
 			}
 		}
 	}
-
-	notify(notifications.EventTypeDelete, m)
 
 	m.Client().Logger().Debug().
 		Str("destinationID", m.ID).

@@ -3,9 +3,6 @@
 
 # options for analysis running
 run:
-  # default concurrency is an available CPU number
-  concurrency: 4
-
   # timeout for analysis, e.g. 30s, 5m, default is 1m
   timeout: 5m
 
@@ -85,10 +82,9 @@ linters:
     - wastedassign
 
 linters-settings:
-  govet:
-    enable:
-      - fieldalignment
   wrapcheck:
+    ignoreSigRegexps:
+      - spverrors\.(Newf|Wrapf)
     ignorePackageGlobs:
       - "github.com/go-ozzo/ozzo-validation"
 
@@ -109,6 +105,7 @@ issues:
         - gocyclo
         - errcheck
         - gosec
+        - wrapcheck
 
     # Exclude known linters from partially "hard-vendored" code,
     # which is impossible to exclude via "nolint" comments.
@@ -152,6 +149,7 @@ issues:
     - .github
     - .make
     - dist
+
   # Maximum issues count per one linter. Set to 0 to disable. Default is 50.
   max-issues-per-linter: 0
 

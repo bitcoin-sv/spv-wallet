@@ -6,6 +6,7 @@ import (
 
 	"github.com/bitcoin-sv/spv-wallet/engine"
 	"github.com/bitcoin-sv/spv-wallet/engine/datastore"
+	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/bitcoin-sv/spv-wallet/engine/utils"
 )
 
@@ -84,5 +85,6 @@ func (e *Example) BeforeCreating(_ context.Context) (err error) {
 
 // Migrate model specific migration
 func (e *Example) Migrate(client datastore.ClientInterface) error {
-	return client.IndexMetadata(client.GetTableName(tableExamples), engine.ModelMetadata.String())
+	err := client.IndexMetadata(client.GetTableName(tableExamples), engine.ModelMetadata.String())
+	return spverrors.Wrapf(err, "failed to index metadata column on model %s", e.GetModelName())
 }

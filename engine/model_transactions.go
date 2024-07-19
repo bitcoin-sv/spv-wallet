@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/bitcoin-sv/spv-wallet/engine/chainstate"
+	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/bitcoin-sv/spv-wallet/engine/utils"
 	"github.com/libsv/go-bt/v2"
 )
@@ -92,7 +93,7 @@ func baseTxFromHex(hex string, opts ...ModelOps) (*Transaction, error) {
 	var err error
 
 	if btTx, err = bt.NewTxFromString(hex); err != nil {
-		return nil, err
+		return nil, spverrors.Wrapf(err, "error parsing transaction hex")
 	}
 
 	tx := emptyTx(opts...)
@@ -147,7 +148,7 @@ func (m *Transaction) setXPubID() {
 // UpdateTransactionMetadata will update the transaction metadata by xPubID
 func (m *Transaction) UpdateTransactionMetadata(xPubID string, metadata Metadata) error {
 	if xPubID == "" {
-		return ErrXpubIDMisMatch
+		return spverrors.ErrXpubIDMisMatch
 	}
 
 	// transaction metadata is saved per xPubID

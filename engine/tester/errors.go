@@ -1,9 +1,11 @@
 package tester
 
-import "errors"
+import (
+	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
+)
 
 // ErrAppNameRequired is when the app name is required
-var ErrAppNameRequired = errors.New("app name is required")
+var ErrAppNameRequired = spverrors.Newf("app name is required")
 
 // ErrFailedLoadingPostgresql is when loading postgresql failed
-var ErrFailedLoadingPostgresql = errors.New("failed loading postgresql server")
+var ErrFailedLoadingPostgresql = spverrors.Newf("failed loading postgresql server")

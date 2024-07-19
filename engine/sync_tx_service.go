@@ -12,7 +12,7 @@ import (
 	"github.com/bitcoin-sv/go-paymail"
 	"github.com/bitcoin-sv/spv-wallet/engine/chainstate"
 	"github.com/bitcoin-sv/spv-wallet/engine/datastore"
-	"github.com/bitcoin-sv/spv-wallet/engine/notifications"
+	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 )
 
 // processSyncTransactions will process sync transaction records
@@ -154,13 +154,10 @@ func broadcastSyncTransaction(ctx context.Context, syncTx *SyncTransaction) erro
 		return err
 	}
 
-	// Fire a notification
-	notify(notifications.EventTypeBroadcast, syncTx)
-
 	return nil
 }
 
-/////////////////
+// ///////////////
 
 func _getTxHexInFormat(ctx context.Context, tx *Transaction, prefferedFormat chainstate.HexFormatFlag, store TransactionGetter) (txHex string, actualFormat chainstate.HexFormatFlag) {
 	if prefferedFormat.Contains(chainstate.Ef) {
@@ -189,7 +186,7 @@ func _syncTxDataFromChain(ctx context.Context, syncTx *SyncTransaction, transact
 
 	if transaction == nil {
 		if transaction, err = _getTransaction(ctx, syncTx.ID, syncTx.GetOptions(false)); err != nil {
-			return ErrMissingTransaction
+			return spverrors.ErrCouldNotFindTransaction
 		}
 	}
 
@@ -198,7 +195,7 @@ func _syncTxDataFromChain(ctx context.Context, syncTx *SyncTransaction, transact
 	if txInfo, err = syncTx.Client().Chainstate().QueryTransaction(
 		ctx, syncTx.ID, chainstate.RequiredOnChain, defaultQueryTxTimeout,
 	); err != nil {
-		if errors.Is(err, chainstate.ErrTransactionNotFound) {
+		if errors.Is(err, spverrors.ErrCouldNotFindTransaction) {
 			syncTx.Client().Logger().Info().
 				Str("txID", syncTx.ID).
 				Msgf("Transaction not found on-chain, will try again later")
@@ -207,7 +204,7 @@ func _syncTxDataFromChain(ctx context.Context, syncTx *SyncTransaction, transact
 			_addSyncResult(ctx, syncTx, syncActionSync, "all", "transaction not found on-chain")
 			return nil
 		}
-		return err
+		return spverrors.Wrapf(err, "could not query transaction")
 	}
 	return processSyncTxSave(ctx, txInfo, syncTx, transaction)
 }
@@ -219,7 +216,7 @@ func _getTransaction(ctx context.Context, id string, opts []ModelOps) (*Transact
 	}
 
 	if transaction == nil {
-		return nil, ErrMissingTransaction
+		return nil, spverrors.ErrCouldNotFindTransaction
 	}
 
 	return transaction, nil

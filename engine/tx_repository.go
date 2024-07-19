@@ -5,6 +5,7 @@ import (
 	"errors"
 
 	"github.com/bitcoin-sv/spv-wallet/engine/datastore"
+	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/libsv/go-bt"
 )
 
@@ -179,7 +180,7 @@ func getTransactionsCountInternal(ctx context.Context, conditions map[string]int
 func getTransactionByHex(ctx context.Context, hex string, opts ...ModelOps) (*Transaction, error) {
 	btTx, err := bt.NewTxFromString(hex)
 	if err != nil {
-		return nil, err
+		return nil, spverrors.Wrapf(err, "failed to parse transaction hex")
 	}
 
 	return getTransactionByID(ctx, "", btTx.GetTxID(), opts...)

@@ -28,7 +28,7 @@ func (ts *TestSuite) SetupTest() {
 	ts.BaseSetupTest()
 
 	routes := NewHandler(ts.AppConfig, ts.Services)
-	routes.RegisterAPIEndpoints(ts.Router.Group("/" + config.APIVersion))
+	routes.RegisterOldAPIEndpoints(ts.Router.Group("/" + config.APIVersion))
 }
 
 // TearDownTest runs after each test

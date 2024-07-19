@@ -2,10 +2,9 @@ package engine
 
 import (
 	"context"
-	"errors"
-	"fmt"
 	"sort"
 
+	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/libsv/go-bt/v2"
 )
 
@@ -31,7 +30,7 @@ func calculateMergedBUMP(txs []*Transaction) (BUMPs, error) {
 	for _, k := range mapKeys {
 		bump, err := CalculateMergedBUMP(bumps[k])
 		if err != nil {
-			return nil, fmt.Errorf("Error while calculating Merged BUMP: %s", err.Error())
+			return nil, spverrors.Wrapf(err, "failed to calculate merged BUMP")
 		}
 		if bump == nil {
 			continue
@@ -44,12 +43,12 @@ func calculateMergedBUMP(txs []*Transaction) (BUMPs, error) {
 
 func validateBumps(bumps BUMPs) error {
 	if len(bumps) == 0 {
-		return errors.New("empty bump paths slice")
+		return spverrors.Newf("empty bump paths slice")
 	}
 
 	for _, p := range bumps {
 		if len(p.Path) == 0 {
-			return errors.New("one of bump path is empty")
+			return spverrors.Newf("one of bump path is empty")
 		}
 	}
 
@@ -75,7 +74,7 @@ func prepareBEEFFactors(ctx context.Context, tx *Transaction, store TransactionG
 	for _, inputTx := range inputTxs {
 		inputBtTx, err := bt.NewTxFromString(inputTx.Hex)
 		if err != nil {
-			return nil, nil, fmt.Errorf("cannot convert to bt.Tx from hex (tx.ID: %s). Reason: %w", inputTx.ID, err)
+			return nil, nil, spverrors.Wrapf(err, "cannot convert to bt.Tx from hex (tx.ID: %s)", inputTx.ID)
 		}
 
 		txsNeededForBUMP = append(txsNeededForBUMP, inputTx)
@@ -111,7 +110,7 @@ func checkParentTransactions(ctx context.Context, store TransactionGetter, btTx 
 	for _, parentTx := range parentTxs {
 		parentBtTx, err := bt.NewTxFromString(parentTx.Hex)
 		if err != nil {
-			return nil, nil, fmt.Errorf("cannot convert to bt.Tx from hex (tx.ID: %s). Reason: %w", parentTx.ID, err)
+			return nil, nil, spverrors.Wrapf(err, "cannot convert to bt.Tx from hex (tx.ID: %s)", parentTx.ID)
 		}
 		validTxs = append(validTxs, parentTx)
 		validBtTxs = append(validBtTxs, parentBtTx)
@@ -129,15 +128,15 @@ func checkParentTransactions(ctx context.Context, store TransactionGetter, btTx 
 	return validBtTxs, validTxs, nil
 }
 
-func getRequiredTransactions(ctx context.Context, txIds []string, store TransactionGetter) ([]*Transaction, error) {
-	txs, err := store.GetTransactionsByIDs(ctx, txIds)
+func getRequiredTransactions(ctx context.Context, txIDs []string, store TransactionGetter) ([]*Transaction, error) {
+	txs, err := store.GetTransactionsByIDs(ctx, txIDs)
 	if err != nil {
-		return nil, fmt.Errorf("cannot get transactions from database: %w", err)
+		return nil, spverrors.Wrapf(err, "cannot get transactions from database")
 	}
 
-	if len(txs) != len(txIds) {
-		missingTxIDs := getMissingTxs(txIds, txs)
-		return nil, fmt.Errorf("required transactions not found in database: %v", missingTxIDs)
+	if len(txs) != len(txIDs) {
+		missingTxIDs := getMissingTxs(txIDs, txs)
+		return nil, spverrors.Newf("required transactions (%v) not found in database", missingTxIDs)
 	}
 
 	return txs, nil
@@ -164,7 +163,7 @@ func initializeRequiredTxsCollection(tx *Transaction) ([]*bt.Tx, []*Transaction,
 
 	processedBtTx, err := bt.NewTxFromString(tx.Hex)
 	if err != nil {
-		return nil, nil, fmt.Errorf("cannot convert processed tx to bt.Tx from hex (tx.ID: %s). Reason: %w", tx.ID, err)
+		return nil, nil, spverrors.Wrapf(err, "cannot convert processed tx to bt.Tx from hex (tx.ID: %s)", tx.ID)
 	}
 
 	btTxsNeededForBUMP = append(btTxsNeededForBUMP, processedBtTx)

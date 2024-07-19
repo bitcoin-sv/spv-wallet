@@ -3,6 +3,7 @@ package admin
 import (
 	"net/http"
 
+	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/bitcoin-sv/spv-wallet/mappings"
 	"github.com/gin-gonic/gin"
 )
@@ -20,7 +21,7 @@ import (
 func (a *Action) stats(c *gin.Context) {
 	stats, err := a.Services.SpvWalletEngine.GetStats(c.Request.Context())
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, err.Error())
+		spverrors.ErrorResponse(c, err, a.Services.Logger)
 		return
 	}
 

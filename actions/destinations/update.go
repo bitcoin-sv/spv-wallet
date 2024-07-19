@@ -4,6 +4,7 @@ import (
 	"net/http"
 
 	"github.com/bitcoin-sv/spv-wallet/engine"
+	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/bitcoin-sv/spv-wallet/mappings"
 	"github.com/bitcoin-sv/spv-wallet/server/auth"
 	"github.com/gin-gonic/gin"
@@ -26,11 +27,11 @@ func (a *Action) update(c *gin.Context) {
 
 	var requestBody UpdateDestination
 	if err := c.Bind(&requestBody); err != nil {
-		c.JSON(http.StatusBadRequest, err.Error())
+		spverrors.ErrorResponse(c, spverrors.ErrCannotBindRequest, a.Services.Logger)
 		return
 	}
 	if requestBody.ID == "" && requestBody.Address == "" && requestBody.LockingScript == "" {
-		c.JSON(http.StatusBadRequest, "One of the fields is required: id, address or lockingScript")
+		spverrors.ErrorResponse(c, spverrors.ErrOneOfTheFieldsIsRequired, a.Services.Logger)
 		return
 	}
 
@@ -51,7 +52,7 @@ func (a *Action) update(c *gin.Context) {
 		)
 	}
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, err.Error())
+		spverrors.ErrorResponse(c, err, a.Services.Logger)
 		return
 	}
 

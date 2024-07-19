@@ -7,6 +7,7 @@ import (
 	"strings"
 
 	"github.com/bitcoin-sv/spv-wallet/engine/datastore/customtypes"
+	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"gorm.io/gorm"
 )
 
@@ -88,6 +89,8 @@ func (builder *whereBuilder) applyJSONArrayContains(tx customWhereInterface, key
 			fmt.Sprintf("EXISTS (SELECT 1 FROM json_each(%s) WHERE value = @%s)", columnName, varName),
 			map[string]interface{}{varName: condition},
 		)
+	case Empty:
+		panic("Database engine not configured")
 	default:
 		panic("Unknown database engine")
 	}
@@ -181,7 +184,7 @@ func (builder *whereBuilder) nextVarName() string {
 func (builder *whereBuilder) getColumnNameOrPanic(key string) string {
 	columnName, ok := GetColumnName(key, builder.tx.Statement.Model, builder.tx)
 	if !ok {
-		panic(fmt.Errorf("column %s does not exist in the model", key))
+		panic(spverrors.Newf("column %s does not exist in the model", key))
 	}
 
 	return columnName

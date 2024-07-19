@@ -5,6 +5,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/bitcoin-sv/spv-wallet/engine/utils"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -69,7 +70,7 @@ func (ts *EmbeddedDBTestSuite) TestClient_NewDestination() {
 			)
 			require.Error(t, err)
 			require.Nil(t, destination)
-			assert.ErrorIs(t, err, ErrMissingXpub)
+			assert.ErrorIs(t, err, spverrors.ErrCouldNotFindXpub)
 		})
 	}
 }
@@ -122,7 +123,7 @@ func (ts *EmbeddedDBTestSuite) TestClient_NewDestinationForLockingScript() {
 			)
 			require.Error(t, err)
 			require.Nil(t, destination)
-			assert.ErrorIs(t, err, ErrMissingLockingScript)
+			assert.ErrorIs(t, err, spverrors.ErrMissingLockingScript)
 		})
 	}
 }
