@@ -306,6 +306,5 @@ func runTests(clientType string, defaultPath string) error {
 	if err := cmd.Run(); err != nil {
 		return fmt.Errorf("error running tests: %w", err)
 	}
-
 	return nil
 }

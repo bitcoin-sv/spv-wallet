@@ -68,7 +68,6 @@ func saveConfig(config *regressionTestConfig) error {
 	if err != nil {
 		return fmt.Errorf("error saving .env.config file: %w", err)
 	}
-
 	return nil
 }
 
@@ -106,7 +105,6 @@ func isSPVWalletRunning(url string) bool {
 		fmt.Println("error parsing response JSON:", err)
 		return false
 	}
-
 	return walletResp.Message == spvWalletIndexResponse
 }
 
