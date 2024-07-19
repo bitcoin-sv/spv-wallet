@@ -30,6 +30,10 @@ const (
 	ClientTwoLeaderXPrivEnvVar = "CLIENT_TWO_LEADER_XPRIV"
 
 	timeoutDuration = 30 * time.Second
+
+	yes        = 1
+	no         = 0
+	wrongInput = -1
 )
 
 var explicitHTTPURLRegex = regexp.MustCompile(`^https?://`)
@@ -71,7 +75,7 @@ func saveConfig(config *regressionTestConfig) error {
 // getEnvVariables loads the configuration from a .env.config file.
 func getEnvVariables() (*regressionTestConfig, error) {
 	if err := godotenv.Load(".env.config"); err != nil {
-		return nil, fmt.Errorf("error loading .env.config file: %v", err)
+		return nil, fmt.Errorf("error loading .env.config file: %w", err)
 	}
 
 	return &regressionTestConfig{
@@ -82,7 +86,7 @@ func getEnvVariables() (*regressionTestConfig, error) {
 	}, nil
 }
 
-// isSPVWalletRunning checks if the SPV wallet is running at the specified URL.
+// isSPVWalletRunning checks if the SPV wallet is running and prints the specific message at the specified URL.
 func isSPVWalletRunning(url string) bool {
 	url = addPrefixIfNeeded(url)
 	resp, err := http.Get(url)
@@ -106,7 +110,7 @@ func isSPVWalletRunning(url string) bool {
 	return walletResp.Message == spvWalletIndexResponse
 }
 
-// addPrefixIfNeeded adds the HTTP prefix to the URL if it is missing.
+// addPrefixIfNeeded adds the HTTPS prefix to the URL if it is missing.
 func addPrefixIfNeeded(url string) string {
 	if !isValidURL(url) {
 		return domainPrefix + url
@@ -151,31 +155,32 @@ func getSharedConfig(xpub string) (*models.SharedConfig, error) {
 
 // promptUserAndCheck prompts the user with a question and validates the response.
 func promptUserAndCheck(question string) (int, error) {
-	reader := bufio.NewReader(os.Stdin)
-	var response string
 	var checkResult int
+	input := make(chan string)
+	defer close(input)
 
 	for {
-		timeout := time.After(timeoutDuration)
-		input := make(chan string)
-		go func() {
-			fmt.Println(question)
-			response, _ = reader.ReadString('\n')
-			response = strings.TrimSpace(response)
-			input <- response
-		}()
+		fmt.Println(question)
+		input := make(chan string, 1)
+		go getInput(input)
 
 		select {
-		case <-timeout:
-			return -1, ErrTimeout
-		case response = <-input:
+		case response := <-input:
 			checkResult = checkResponse(response)
-			if checkResult != -1 {
+			if checkResult != wrongInput {
 				return checkResult, nil
 			}
 			fmt.Println("Invalid response. Please answer y/yes or n/no.")
+		case <-time.After(timeoutDuration):
+			os.Exit(1)
 		}
 	}
+}
+
+func getInput(input chan string) {
+	in := bufio.NewReader(os.Stdin)
+	result, _ := in.ReadString('\n')
+	input <- result
 }
 
 // checkResponse checks the response and returns an integer indicating the result.
@@ -183,11 +188,11 @@ func checkResponse(response string) int {
 	response = strings.ToLower(strings.TrimSpace(response))
 	switch response {
 	case "yes", "y":
-		return 1
+		return yes
 	case "no", "n":
-		return 0
+		return no
 	default:
-		return -1
+		return wrongInput
 	}
 }
 
@@ -196,7 +201,6 @@ func preparePaymail(paymailAlias string, domain string) string {
 	return paymailAlias + atSign + domain
 }
 
-// createUser creates a new user with the specified paymail.
 func createUser(paymail string, config *regressionTestConfig) (*regressionTestUser, error) {
 	keys, err := xpriv.Generate()
 	if err != nil {
@@ -217,7 +221,7 @@ func createUser(paymail string, config *regressionTestConfig) (*regressionTestUs
 		return nil, err
 	}
 
-	createPaymailRes, err := adminClient.AdminCreatePaymail(ctx, user.XPub, user.Paymail, "Test test", "")
+	createPaymailRes, err := adminClient.AdminCreatePaymail(ctx, user.XPub, user.Paymail, "Regression tests", "")
 	if err != nil {
 		if err.Error() == ErrPaymailAlreadyExists.Error() {
 			return user, err
@@ -230,11 +234,11 @@ func createUser(paymail string, config *regressionTestConfig) (*regressionTestUs
 	return user, nil
 }
 
-// useUserFromEnv uses the user from the environment variables.
+// useUserFromEnv fills missing user data using xpriv from the environment variables.
 func useUserFromEnv(paymailDomain string, config *regressionTestConfig) (*regressionTestUser, error) {
 	keys, err := xpriv.FromString(config.ClientOneLeaderXPriv)
 	if err != nil {
-		return nil, fmt.Errorf("error parsing xpriv: %v", err)
+		return nil, fmt.Errorf("error parsing xpriv: %w", err)
 	}
 	return &regressionTestUser{
 		XPriv:   keys.XPriv(),
@@ -243,7 +247,7 @@ func useUserFromEnv(paymailDomain string, config *regressionTestConfig) (*regres
 	}, nil
 }
 
-// deleteUser deletes the user with the specified paymail address from the SPV Wallet.
+// deleteUser soft deletes paymail address from the SPV Wallet.
 func deleteUser(paymail string, config *regressionTestConfig) error {
 	paymail = preparePaymail(leaderPaymailAlias, paymail)
 	adminClient := walletclient.NewWithAdminKey(addPrefixIfNeeded(config.ClientOneURL), adminXPriv)
@@ -285,25 +289,24 @@ func getValidURL() string {
 	}
 }
 
-// isValidURL validates the URL.
+// isValidURL validates the URL if it has http or https prefix.
 func isValidURL(rawURL string) bool {
 	return explicitHTTPURLRegex.MatchString(rawURL)
 }
 
-// checkBalance checks the balance of the specified xpriv at the given domain.
-func checkBalance(domain, xpriv string) int {
+// checkBalance checks the balance of the specified xpriv at the given domain with given xpriv.
+func checkBalance(domain, xpriv string) (int, error) {
 	client := walletclient.NewWithXPriv(addPrefixIfNeeded(domain), xpriv)
 	ctx := context.Background()
 
 	xpubInfo, err := client.GetXPub(ctx)
 	if err != nil {
-		fmt.Println("error getting xpub info:", err)
-		os.Exit(1)
+		return wrongInput, fmt.Errorf("error getting xpub info: %w", err)
 	}
-	return int(xpubInfo.CurrentBalance)
+	return int(xpubInfo.CurrentBalance), nil
 }
 
-// setConfigClientsUrls sets the environment domains variables in the config.
+// setConfigClientsUrls sets the environment domains ulrs variables in the config.
 func setConfigClientsUrls(config *regressionTestConfig, domain string) {
 	config.ClientOneURL = domain
 	config.ClientTwoURL = domain

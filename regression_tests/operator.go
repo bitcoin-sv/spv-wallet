@@ -38,7 +38,7 @@ func main() {
 	user := &regressionTestUser{}
 	var err error
 
-	config, err = getConfig(loadConfigFlag, config)
+	config, err = getConfig(*loadConfigFlag, config)
 	if err != nil {
 		fmt.Println("error getting config:", err)
 		return
@@ -101,17 +101,15 @@ func main() {
 }
 
 // getConfig retrieves the configuration from the environment or from the user.
-func getConfig(loadConfigFlag *bool, config *regressionTestConfig) (*regressionTestConfig, error) {
+func getConfig(loadConfigFlag bool, config *regressionTestConfig) (*regressionTestConfig, error) {
 	var err error
-	if *loadConfigFlag {
+	if loadConfigFlag {
 		config, err = getEnvVariables()
 		if err != nil {
-			fmt.Println("error loading config:", err)
 			return nil, err
 		}
 	}
 	return config, nil
-
 }
 
 // handleUserCreation handles the creation of a user.
@@ -121,7 +119,7 @@ func handleUserCreation(paymailAlias string, config *regressionTestConfig) (*reg
 		if err != nil {
 			return nil, fmt.Errorf("failed to prompt user: %w", err)
 		}
-		if answer == 1 {
+		if answer == yes {
 			return useUserFromEnv(paymailAlias, config)
 		}
 	}
@@ -138,7 +136,7 @@ func handleCreateUserError(err error, paymailAlias string, config *regressionTes
 	if err.Error() == ErrPaymailAlreadyExists.Error() {
 		return handleExistingPaymail(paymailAlias, config)
 	} else {
-		return nil, fmt.Errorf("error creating user: %v", err)
+		return nil, fmt.Errorf("error creating user: %w", err)
 	}
 }
 
@@ -149,39 +147,39 @@ func handleExistingPaymail(paymailAlias string, config *regressionTestConfig) (*
 	if err != nil {
 		return nil, fmt.Errorf("failed to prompt user: %w", err)
 	}
-	if answer == 1 {
-		return useExistingPaymail(paymailAlias)
+	if answer == yes {
+		return useUserFromXPriv(paymailAlias)
 	}
 
 	answer, err = promptUserAndCheck("Would you like to recreate user? (y/yes or n/no):")
 	if err != nil {
 		return nil, fmt.Errorf("failed to prompt user: %w", err)
 	}
-	if answer == 1 {
+	if answer == yes {
 		return recreateUser(paymailAlias, config)
 	}
 	return nil, fmt.Errorf("user should be recreated or xpriv should be provided")
 }
 
-// recreateUser deletes and recreates the user.
+// recreateUser deletes paymail and recreates it with new set of keys.
 func recreateUser(paymailAlias string, config *regressionTestConfig) (*regressionTestUser, error) {
 	err := deleteUser(paymailAlias, config)
 	if err != nil {
-		return nil, fmt.Errorf("error deleting user: %v", err)
+		return nil, fmt.Errorf("error deleting user: %w", err)
 	}
 	user, err := createUser(paymailAlias, config)
 	if err != nil {
-		return nil, fmt.Errorf("error creating user after deletion: %v", err)
+		return nil, fmt.Errorf("error creating user after deletion: %w", err)
 	}
 	return user, nil
 }
 
-// useExistingPaymail uses an existing paymail address.
-func useExistingPaymail(paymailAlias string) (*regressionTestUser, error) {
+// useUserFromXPriv fills missing user data using provided xpriv.
+func useUserFromXPriv(paymailAlias string) (*regressionTestUser, error) {
 	validatedXPriv := getValidXPriv()
 	keys, err := xpriv.FromString(validatedXPriv)
 	if err != nil {
-		return nil, fmt.Errorf("error parsing xpriv: %v", err)
+		return nil, fmt.Errorf("error parsing xpriv: %w", err)
 	}
 	return &regressionTestUser{
 		XPriv:   keys.XPriv(),
@@ -193,22 +191,29 @@ func useExistingPaymail(paymailAlias string) (*regressionTestUser, error) {
 // handleFundsTransfer handles the transfer of funds to a user.
 func handleFundsTransfer(user *regressionTestUser, config *regressionTestConfig) (err error) {
 	response, err := promptUserAndCheck("Do you have xpriv and master instance URL? (y/yes or n/no): ")
-	if response == 0 {
+	if err != nil {
+		return fmt.Errorf("failed to prompt user: %w", err)
+	}
+	if response == no {
 		fmt.Printf("Please send %d Sato for full regression tests:\n%s\n", minimalBalance, user.Paymail)
-		isSent := -1
-		for isSent < 0 {
+		isSent := wrongInput
+		for isSent < no {
 			isSent, err = promptUserAndCheck("Did you make the transaction? (y/yes or n/no): ")
-			if isSent == 0 {
+			if err != nil {
+				return fmt.Errorf("failed to prompt user: %w", err)
+			}
+			if isSent == no {
 				fmt.Println("Checking balance")
 			}
 		}
-	} else {
-		if err := takeMasterUrlAndXPriv(user); err != nil {
-			return fmt.Errorf("error sending funds: %v", err)
-		}
+	} else if err := takeMasterUrlAndXPriv(user); err != nil {
+		return fmt.Errorf("error handling funds transfer: %w", err)
 	}
 
-	leaderBalance := checkBalance(config.ClientOneURL, config.ClientOneLeaderXPriv)
+	leaderBalance, err := checkBalance(config.ClientOneURL, config.ClientOneLeaderXPriv)
+	if err != nil {
+		return fmt.Errorf("error checking balance: %w", err)
+	}
 	fmt.Println("Leader balance:", leaderBalance)
 	timeout := time.After(2 * timeoutDuration)
 	for leaderBalance < minimalBalance {
@@ -222,7 +227,10 @@ func handleFundsTransfer(user *regressionTestUser, config *regressionTestConfig)
 				time.Sleep(1 * time.Second)
 			}
 			fmt.Println()
-			leaderBalance = checkBalance(config.ClientOneURL, config.ClientOneLeaderXPriv)
+			leaderBalance, err = checkBalance(config.ClientOneURL, config.ClientOneLeaderXPriv)
+			if err != nil {
+				return fmt.Errorf("error checking balance: %w", err)
+			}
 		}
 	}
 	return nil
@@ -235,8 +243,7 @@ func takeMasterUrlAndXPriv(leaderPaymail *regressionTestUser) error {
 
 	err := sendFundsWithGoClient(url, xprivMaster, leaderPaymail.Paymail)
 	if err != nil {
-		fmt.Println("error sending funds:", err)
-		return err
+		return fmt.Errorf("error sending funds with go client: %w", err)
 	}
 	return nil
 }
@@ -246,16 +253,19 @@ func sendFundsWithGoClient(instanceUrl string, istanceXPriv string, receiverPaym
 	client := walletclient.NewWithXPriv(addPrefixIfNeeded(instanceUrl), istanceXPriv)
 	ctx := context.Background()
 
-	balance := checkBalance(instanceUrl, istanceXPriv)
+	balance, err := checkBalance(instanceUrl, istanceXPriv)
+	if err != nil {
+		return fmt.Errorf("error checking balance: %w", err)
+	}
 	if balance <= minimalBalance {
 		return fmt.Errorf("balance too low: %d", balance)
 	}
 	recipient := walletclient.Recipients{To: receiverPaymail, Satoshis: uint64(minimalBalance)}
 	recipients := []*walletclient.Recipients{&recipient}
 
-	_, err := client.SendToRecipients(ctx, recipients, map[string]any{"message": "regression test funds"})
+	_, err = client.SendToRecipients(ctx, recipients, map[string]any{"message": "regression test funds"})
 	if err != nil {
-		return fmt.Errorf("error sending to recipients: %v", err)
+		return fmt.Errorf("error sending to recipients: %w", err)
 	}
 	return nil
 }
@@ -294,7 +304,7 @@ func runTests(clientType string, defaultPath string) error {
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
 	if err := cmd.Run(); err != nil {
-		return fmt.Errorf("error running tests: %v", err)
+		return fmt.Errorf("error running tests: %w", err)
 	}
 
 	return nil
