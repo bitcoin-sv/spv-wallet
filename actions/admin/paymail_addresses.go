@@ -32,7 +32,7 @@ func (a *Action) paymailGetAddress(c *gin.Context) {
 	}
 
 	if requestBody.Address == "" {
-		c.JSON(http.StatusBadRequest, "address is required")
+		spverrors.ErrorResponse(c, spverrors.ErrMissingAddress, a.Services.Logger)
 		return
 	}
 
@@ -157,7 +157,7 @@ func (a *Action) paymailCreateAddress(c *gin.Context) {
 	paymailAddress, err := a.Services.SpvWalletEngine.NewPaymailAddress(
 		c.Request.Context(), requestBody.Key, requestBody.Address, requestBody.PublicName, requestBody.Avatar, opts...)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, err.Error())
+		spverrors.ErrorResponse(c, err, a.Services.Logger)
 		return
 	}
 
