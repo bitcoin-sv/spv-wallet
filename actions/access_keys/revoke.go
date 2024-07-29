@@ -22,7 +22,7 @@ import (
 // @DeprecatedRouter  /v1/access-key [delete]
 // @Security	x-auth-xpub
 func (a *Action) oldRevoke(c *gin.Context) {
-	a.revoke(c)
+	a.revokeHelper(c, true)
 }
 
 // revoke will revoke the intended model by id
@@ -38,6 +38,10 @@ func (a *Action) oldRevoke(c *gin.Context) {
 // @Router		/api/v1/users/current/keys/{id} [delete]
 // @Security	x-auth-xpub
 func (a *Action) revoke(c *gin.Context) {
+	a.revokeHelper(c, false)
+}
+
+func (a *Action) revokeHelper(c *gin.Context, snakeCase bool) {
 	reqXPub := c.GetString(auth.ParamXPubKey)
 
 	id := c.Params.ByName("id")
@@ -53,6 +57,12 @@ func (a *Action) revoke(c *gin.Context) {
 	)
 	if err != nil {
 		spverrors.ErrorResponse(c, err, a.Services.Logger)
+		return
+	}
+
+	if snakeCase {
+		contract := mappings.MapToOldAccessKeyContract(accessKey)
+		c.JSON(http.StatusCreated, contract)
 		return
 	}
 

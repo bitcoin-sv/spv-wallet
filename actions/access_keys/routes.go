@@ -13,7 +13,7 @@ type Action struct {
 }
 
 // NewHandler creates the specific package routes
-func NewHandler(appConfig *config.AppConfig, services *config.AppServices) (routes.OldAPIEndpointsFunc, routes.APIEndpointsFunc) {
+func OldAccessKeysHandler(appConfig *config.AppConfig, services *config.AppServices) routes.OldAPIEndpointsFunc {
 	action := &Action{actions.Action{AppConfig: appConfig, Services: services}}
 
 	oldAPIEndpoints := routes.OldAPIEndpointsFunc(func(router *gin.RouterGroup) {
@@ -26,6 +26,13 @@ func NewHandler(appConfig *config.AppConfig, services *config.AppServices) (rout
 		accessKeyGroup.POST("/search", action.search)
 	})
 
+	return oldAPIEndpoints
+}
+
+// NewHandler creates the specific package routes
+func AccessKeysHandler(appConfig *config.AppConfig, services *config.AppServices) routes.APIEndpointsFunc {
+	action := &Action{actions.Action{AppConfig: appConfig, Services: services}}
+
 	apiEndpoints := routes.APIEndpointsFunc(func(router *gin.RouterGroup) {
 		accessKeyGroup := router.Group("/users/current/keys")
 		accessKeyGroup.GET("/:id", action.get)
@@ -34,5 +41,5 @@ func NewHandler(appConfig *config.AppConfig, services *config.AppServices) (rout
 		// TODO: accessKeyGroup.GET("", action.search)
 	})
 
-	return oldAPIEndpoints, apiEndpoints
+	return apiEndpoints
 }

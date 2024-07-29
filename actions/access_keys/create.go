@@ -23,7 +23,7 @@ import (
 // @DeprecatedRouter  /v1/access-key [post]
 // @Security	x-auth-xpub
 func (a *Action) oldCreate(c *gin.Context) {
-	a.create(c)
+	a.createHelper(c, true)
 }
 
 // create will make a new model using the services defined in the action object
@@ -39,6 +39,10 @@ func (a *Action) oldCreate(c *gin.Context) {
 // @Router		/api/v1/users/current/keys [post]
 // @Security	x-auth-xpub
 func (a *Action) create(c *gin.Context) {
+	a.createHelper(c, false)
+}
+
+func (a *Action) createHelper(c *gin.Context, snakeCase bool) {
 	reqXPub := c.GetString(auth.ParamXPubKey)
 
 	var requestBody CreateAccessKey
@@ -55,6 +59,12 @@ func (a *Action) create(c *gin.Context) {
 	)
 	if err != nil {
 		spverrors.ErrorResponse(c, err, a.Services.Logger)
+		return
+	}
+
+	if snakeCase {
+		contract := mappings.MapToOldAccessKeyContract(accessKey)
+		c.JSON(http.StatusCreated, contract)
 		return
 	}
 
