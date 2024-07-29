@@ -20,7 +20,7 @@ import (
 // @DeprecatedRouter  /v1/xpub [get]
 // @Security	x-auth-xpub
 func (a *Action) oldGet(c *gin.Context) {
-	a.get(c)
+	a.getHelper(c, true)
 }
 
 // get will get an existing model
@@ -34,6 +34,10 @@ func (a *Action) oldGet(c *gin.Context) {
 // @Router		/api/v1/users/current [get]
 // @Security	x-auth-xpub
 func (a *Action) get(c *gin.Context) {
+	a.getHelper(c, false)
+}
+
+func (a *Action) getHelper(c *gin.Context, snakeCase bool) {
 	reqXPub := c.GetString(auth.ParamXPubKey)
 	reqXPubID := c.GetString(auth.ParamXPubHashKey)
 
@@ -56,6 +60,12 @@ func (a *Action) get(c *gin.Context) {
 	signed := c.GetBool("auth_signed")
 	if !signed || reqXPub == "" {
 		xPub.RemovePrivateData()
+	}
+
+	if snakeCase {
+		contract := mappings.MapToOldXpubContract(xPub)
+		c.JSON(http.StatusOK, contract)
+		return
 	}
 
 	contract := mappings.MapToXpubContract(xPub)

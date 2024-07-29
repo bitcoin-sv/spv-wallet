@@ -12,8 +12,8 @@ type Action struct {
 	actions.Action
 }
 
-// NewHandler creates the specific package routes
-func NewHandler(appConfig *config.AppConfig, services *config.AppServices) (routes.OldAPIEndpointsFunc, routes.APIEndpointsFunc) {
+// OldUsersHandler creates the specific package routes
+func OldUsersHandler(appConfig *config.AppConfig, services *config.AppServices) routes.OldAPIEndpointsFunc {
 	action := &Action{actions.Action{AppConfig: appConfig, Services: services}}
 
 	oldAPIEndpoints := routes.OldAPIEndpointsFunc(func(router *gin.RouterGroup) {
@@ -22,11 +22,18 @@ func NewHandler(appConfig *config.AppConfig, services *config.AppServices) (rout
 		xpubGroup.PATCH("", action.oldUpdate)
 	})
 
+	return oldAPIEndpoints
+}
+
+// UsersHandler creates the specific package routes in RESTful style
+func UsersHandler(appConfig *config.AppConfig, services *config.AppServices) routes.APIEndpointsFunc {
+	action := &Action{actions.Action{AppConfig: appConfig, Services: services}}
+
 	apiEndpoints := routes.APIEndpointsFunc(func(router *gin.RouterGroup) {
 		xpubGroup := router.Group("/users/current")
 		xpubGroup.GET("", action.get)
 		xpubGroup.PATCH("", action.update)
 	})
 
-	return oldAPIEndpoints, apiEndpoints
+	return apiEndpoints
 }

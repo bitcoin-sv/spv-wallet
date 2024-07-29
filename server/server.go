@@ -130,7 +130,8 @@ func SetupServerRoutes(appConfig *config.AppConfig, services *config.AppServices
 	destinationBasicRoutes, destinationAPIRoutes := destinations.NewHandler(appConfig, services)
 	transactionBasicRoutes, transactionAPIRoutes, transactionCallbackRoutes := transactions.NewHandler(appConfig, services)
 	utxoAPIRoutes := utxos.NewHandler(appConfig, services)
-	oldUsersAPIRoutes, usersAPIRoutes := users.NewHandler(appConfig, services)
+	oldUsersAPIRoutes := users.OldUsersHandler(appConfig, services)
+	usersAPIRoutes := users.UsersHandler(appConfig, services)
 	sharedConfigRoutes := sharedconfig.NewHandler(appConfig, services)
 
 	routes := []interface{}{
