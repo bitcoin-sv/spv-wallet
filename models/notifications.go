@@ -34,10 +34,9 @@ type UserEvent struct {
 type TransactionEvent struct {
 	UserEvent `json:",inline"`
 
-	TransactionID string   `json:"transactionId"`
-	Status        string   `json:"status"`
-	XpubInIDs     []string `json:"xpubInIds"`
-	XpubOutIDs    []string `json:"xpubOutIds"`
+	TransactionID   string           `json:"transactionId"`
+	Status          string           `json:"status"`
+	XpubOutputValue map[string]int64 `json:"xpubOutputValue"`
 }
 
 // NOTICE: If you add a new event type, you must also update the Events interface

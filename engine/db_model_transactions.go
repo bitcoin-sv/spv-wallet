@@ -187,10 +187,9 @@ func (m *Transaction) notify() {
 			UserEvent: models.UserEvent{
 				XPubID: m.XPubID,
 			},
-			TransactionID: m.ID,
-			Status:        m.TxStatus,
-			XpubInIDs:     m.XpubInIDs,
-			XpubOutIDs:    m.XpubOutIDs,
+			TransactionID:   m.ID,
+			Status:          m.TxStatus,
+			XpubOutputValue: m.XpubOutputValue,
 		})
 	}
 }
