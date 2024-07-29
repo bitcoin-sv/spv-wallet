@@ -18,7 +18,7 @@ require (
 	github.com/bitcoinschema/go-bitcoin/v2 v2.0.5
 	github.com/bitcoinschema/go-map v0.1.1
 	github.com/coocood/freecache v1.2.4
-	github.com/fergusstrange/embedded-postgres v1.27.0
+	github.com/fergusstrange/embedded-postgres v1.28.0
 	github.com/gin-contrib/pprof v1.5.0
 	github.com/gin-gonic/gin v1.10.0
 	github.com/go-ozzo/ozzo-validation v3.6.0+incompatible
