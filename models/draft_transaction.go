@@ -23,7 +23,7 @@ const (
 // DraftTransaction is a model that represents a draft transaction.
 type DraftTransaction struct {
 	// Model is a common model that contains common fields for all models.
-	common.Model
+	Model common.OldModel
 
 	// ID is a draft transaction id.
 	ID string `json:"id" example:"b356f7fa00cd3f20cce6c21d704cd13e871d28d714a5ebd0532f5a0e0cde63f7"`

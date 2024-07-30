@@ -17,7 +17,7 @@ type UtxoPointer struct {
 // Utxo is a model that represents a utxo.
 type Utxo struct {
 	// Model is a common model that contains common fields for all models.
-	common.Model
+	Model common.OldModel
 	// UtxoPointer is a pointer to a utxo object.
 	UtxoPointer `json:",inline"`
 
