@@ -14,7 +14,7 @@ func MapToOldXpubContract(xpub *engine.Xpub) *models.Xpub {
 	}
 
 	return &models.Xpub{
-		Model:           *common.MapToContract(&xpub.Model),
+		Model:           *common.MapToOldContract(&xpub.Model),
 		ID:              xpub.ID,
 		CurrentBalance:  xpub.CurrentBalance,
 		NextInternalNum: xpub.NextInternalNum,
