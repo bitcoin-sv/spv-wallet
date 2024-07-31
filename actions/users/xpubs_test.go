@@ -31,7 +31,7 @@ func (ts *TestSuite) SetupTest() {
 	oldRoutes := OldUsersHandler(ts.AppConfig, ts.Services)
 	oldRoutes.RegisterOldAPIEndpoints(ts.Router.Group("/" + config.APIVersion))
 
-	routes := UsersHandler(ts.AppConfig, ts.Services)
+	routes := NewHandler(ts.AppConfig, ts.Services)
 	routes.RegisterAPIEndpoints(ts.Router.Group("/api/" + config.APIVersion))
 }
 

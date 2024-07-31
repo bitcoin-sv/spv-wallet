@@ -3,7 +3,7 @@ package common
 
 import "time"
 
-// OldModel is a common model that contains common fields for all models.
+// OldModel is a common model that contains common fields for all models (this is deprecated and will be removed in the future)
 type OldModel struct {
 	// CreatedAt is a time when outer model was created.
 	CreatedAt time.Time `json:"created_at" example:"2024-02-26T11:00:28.069911Z"`

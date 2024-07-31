@@ -6,7 +6,7 @@ import (
 	"github.com/bitcoin-sv/spv-wallet/models/common"
 )
 
-// MapToOldContract will map the common model to the spv-wallet-models contract
+// MapToOldContract will map the common model to the spv-wallet-models contract (this is deprecated and will be removed in the future)
 func MapToOldContract(m *engine.Model) *common.OldModel {
 	if m == nil {
 		return nil
@@ -42,8 +42,8 @@ func MapToContract(m *engine.Model) *common.Model {
 	return &result
 }
 
-// MapOldContactToModel will map the spv-wallet-models contract to the common SPV Wallet Model
-func MapOldContactToModel(m *common.OldModel) *engine.Model {
+// MapOldContactToModel will map the spv-wallet-models contract to the common SPV Wallet Model (this is deprecated and will be removed in the future)
+func MapOldContractToModel(m *common.OldModel) *engine.Model {
 	if m == nil {
 		return nil
 	}

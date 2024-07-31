@@ -25,8 +25,8 @@ func OldUsersHandler(appConfig *config.AppConfig, services *config.AppServices) 
 	return oldAPIEndpoints
 }
 
-// UsersHandler creates the specific package routes in RESTful style
-func UsersHandler(appConfig *config.AppConfig, services *config.AppServices) routes.APIEndpointsFunc {
+// NewHandler creates the specific package routes in RESTful style
+func NewHandler(appConfig *config.AppConfig, services *config.AppServices) routes.APIEndpointsFunc {
 	action := &Action{actions.Action{AppConfig: appConfig, Services: services}}
 
 	apiEndpoints := routes.APIEndpointsFunc(func(router *gin.RouterGroup) {

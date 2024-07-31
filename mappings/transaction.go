@@ -94,7 +94,7 @@ func MapTransactionModelToEngine(t *models.Transaction) *engine.Transaction {
 	}
 
 	return &engine.Transaction{
-		Model:           *common.MapOldContactToModel(&t.Model),
+		Model:           *common.MapOldContractToModel(&t.Model),
 		TransactionBase: engine.TransactionBase{ID: t.ID, Hex: t.Hex},
 		XpubInIDs:       t.XpubInIDs,
 		XpubOutIDs:      t.XpubOutIDs,

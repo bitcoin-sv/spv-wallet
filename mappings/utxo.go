@@ -64,7 +64,7 @@ func MapUtxoModelToEngine(u *models.Utxo) *engine.Utxo {
 	spendingTxID.String = u.SpendingTxID
 
 	return &engine.Utxo{
-		Model:        *common.MapOldContactToModel(&u.Model),
+		Model:        *common.MapOldContractToModel(&u.Model),
 		UtxoPointer:  *MapUtxoPointerModelToEngine(&u.UtxoPointer),
 		ID:           u.ID,
 		XpubID:       u.XpubID,
