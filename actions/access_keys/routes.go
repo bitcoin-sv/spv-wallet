@@ -12,7 +12,7 @@ type Action struct {
 	actions.Action
 }
 
-// NewHandler creates the specific package routes
+// OldAccessKeysHandler creates the specific package routes
 func OldAccessKeysHandler(appConfig *config.AppConfig, services *config.AppServices) routes.OldAPIEndpointsFunc {
 	action := &Action{actions.Action{AppConfig: appConfig, Services: services}}
 
@@ -30,7 +30,7 @@ func OldAccessKeysHandler(appConfig *config.AppConfig, services *config.AppServi
 }
 
 // NewHandler creates the specific package routes
-func AccessKeysHandler(appConfig *config.AppConfig, services *config.AppServices) routes.APIEndpointsFunc {
+func NewHandler(appConfig *config.AppConfig, services *config.AppServices) routes.APIEndpointsFunc {
 	action := &Action{actions.Action{AppConfig: appConfig, Services: services}}
 
 	apiEndpoints := routes.APIEndpointsFunc(func(router *gin.RouterGroup) {

@@ -11,7 +11,7 @@ import (
 
 // revoke will revoke the intended model by id
 // Revoke access key godoc
-// @Summary		Revoke access key - - Use (DELETE) /api/v1/users/current/keys/{id} instead.
+// @Summary		Revoke access key - Use (DELETE) /api/v1/users/current/keys/{id} instead.
 // @Description	This endpoint has been deprecated. Use (DELETE) /api/v1/users/current/keys/{id} instead.
 // @Tags		Access-key
 // @Produce		json

@@ -127,7 +127,7 @@ func SetupServerRoutes(appConfig *config.AppConfig, services *config.AppServices
 	baseRoutes := base.NewHandler()
 
 	oldAccessKeyAPIRoutes := accesskeys.OldAccessKeysHandler(appConfig, services)
-	accessKeyAPIRoutes := accesskeys.AccessKeysHandler(appConfig, services)
+	accessKeyAPIRoutes := accesskeys.NewHandler(appConfig, services)
 	destinationBasicRoutes, destinationAPIRoutes := destinations.NewHandler(appConfig, services)
 	transactionBasicRoutes, transactionAPIRoutes, transactionCallbackRoutes := transactions.NewHandler(appConfig, services)
 	utxoAPIRoutes := utxos.NewHandler(appConfig, services)
