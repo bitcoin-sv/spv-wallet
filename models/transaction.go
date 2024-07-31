@@ -5,7 +5,7 @@ import "github.com/bitcoin-sv/spv-wallet/models/common"
 // Transaction is a model that represents a transaction.
 type Transaction struct {
 	// Model is a common model that contains common fields for all models.
-	Model common.OldModel
+	common.OldModel
 	// ID is a transaction id.
 	ID string `json:"id" example:"01d0d0067652f684c6acb3683763f353fce55f6496521c7d99e71e1d27e53f5c"`
 	// Hex is a transaction hex.

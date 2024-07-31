@@ -5,7 +5,7 @@ import "github.com/bitcoin-sv/spv-wallet/models/common"
 // Xpub is a model that represents a xpub.
 type Xpub struct {
 	// Model is a common model that contains common fields for all models.
-	Model common.OldModel
+	common.OldModel
 
 	// ID is a hash of the xpub.
 	ID string `json:"id" example:"bb8593f85ef8056a77026ad415f02128f3768906de53e9e8bf8749fe2d66cf50"`

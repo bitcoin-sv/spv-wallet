@@ -13,7 +13,7 @@ func MapToTransactionContract(t *engine.Transaction) *models.Transaction {
 	}
 
 	model := models.Transaction{
-		Model:                *common.MapToOldContract(&t.Model),
+		OldModel:             *common.MapToOldContract(&t.Model),
 		ID:                   t.ID,
 		Hex:                  t.Hex,
 		XpubInIDs:            t.XpubInIDs,
@@ -42,7 +42,7 @@ func MapToTransactionContractForAdmin(t *engine.Transaction) *models.Transaction
 	}
 
 	model := models.Transaction{
-		Model:           *common.MapToOldContract(&t.Model),
+		OldModel:        *common.MapToOldContract(&t.Model),
 		ID:              t.ID,
 		Hex:             t.Hex,
 		XpubInIDs:       t.XpubInIDs,
@@ -66,10 +66,10 @@ func MapToTransactionContractForAdmin(t *engine.Transaction) *models.Transaction
 func processMetadata(t *engine.Transaction, xpubID string, model *models.Transaction) {
 	if len(t.XpubMetadata) > 0 && len(t.XpubMetadata[xpubID]) > 0 {
 		if t.Model.Metadata == nil {
-			model.Model.Metadata = make(models.Metadata)
+			model.OldModel.Metadata = make(models.Metadata)
 		}
 		for key, value := range t.XpubMetadata[xpubID] {
-			model.Model.Metadata[key] = value
+			model.OldModel.Metadata[key] = value
 		}
 	}
 }
@@ -94,7 +94,7 @@ func MapTransactionModelToEngine(t *models.Transaction) *engine.Transaction {
 	}
 
 	return &engine.Transaction{
-		Model:           *common.MapOldContractToModel(&t.Model),
+		Model:           *common.MapOldContractToModel(&t.OldModel),
 		TransactionBase: engine.TransactionBase{ID: t.ID, Hex: t.Hex},
 		XpubInIDs:       t.XpubInIDs,
 		XpubOutIDs:      t.XpubOutIDs,
@@ -285,7 +285,7 @@ func MapToDraftTransactionContract(tx *engine.DraftTransaction) *models.DraftTra
 	}
 
 	return &models.DraftTransaction{
-		Model:         *common.MapToOldContract(&tx.Model),
+		OldModel:      *common.MapToOldContract(&tx.Model),
 		ID:            tx.ID,
 		Hex:           tx.Hex,
 		XpubID:        tx.XpubID,

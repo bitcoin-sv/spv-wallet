@@ -9,7 +9,7 @@ import (
 // BlockHeader is a model that represents a BSV block header.
 type BlockHeader struct {
 	// Model is a common model that contains common fields for all models.
-	Model common.OldModel
+	common.OldModel
 
 	// ID is a block header id (hash).
 	ID string `json:"id"`
