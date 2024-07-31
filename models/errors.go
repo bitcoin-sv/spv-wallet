@@ -76,8 +76,6 @@ func (e SPVError) Wrap(err error) SPVError {
 func (e SPVError) WithTrace(err error) SPVError {
 	if st := stackTracer(nil); !errors.As(e.cause, &st) {
 		return e.Wrap(errors.WithStack(err))
-	} else {
-		return e.Wrap(err)
 	}
-	//return e
+	return e.Wrap(err)
 }
