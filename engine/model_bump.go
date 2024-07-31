@@ -5,11 +5,11 @@ import (
 	"database/sql/driver"
 	"encoding/hex"
 	"encoding/json"
-	"errors"
 	"fmt"
 	"reflect"
 	"sort"
 
+	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/bitcoin-sv/spv-wallet/engine/utils"
 	"github.com/libsv/go-bc"
 	"github.com/libsv/go-bt/v2"
@@ -46,21 +46,21 @@ func CalculateMergedBUMP(bumps []BUMP) (*BUMP, error) {
 	bumpHeight := len(bumps[0].Path)
 	if bumpHeight > maxBumpHeight {
 		return nil,
-			fmt.Errorf("BUMP cannot be higher than %d", maxBumpHeight)
+			spverrors.Newf("BUMP cannot be higher than %d", maxBumpHeight)
 	}
 
 	for _, b := range bumps {
 		if bumpHeight != len(b.Path) {
 			return nil,
-				errors.New("Merged BUMP cannot be obtained from Merkle Proofs of different heights")
+				spverrors.Newf("merged BUMP cannot be obtained from Merkle Proofs of different heights")
 		}
 		if b.BlockHeight != blockHeight {
 			return nil,
-				errors.New("BUMPs have different block heights. Cannot merge BUMPs from different blocks")
+				spverrors.Newf("cannot merge BUMPs from different blocks")
 		}
 		if len(b.Path) == 0 {
 			return nil,
-				errors.New("Empty BUMP given")
+				spverrors.Newf("empty BUMP given")
 		}
 	}
 
@@ -83,7 +83,7 @@ func CalculateMergedBUMP(bumps []BUMP) (*BUMP, error) {
 		}
 
 		if merkleRoot != mr {
-			return nil, errors.New("BUMPs have different merkle roots")
+			return nil, spverrors.Newf("different merkle roots in BUMPs")
 		}
 
 		err = bump.add(b)
@@ -103,7 +103,7 @@ func CalculateMergedBUMP(bumps []BUMP) (*BUMP, error) {
 
 func (bump *BUMP) add(b BUMP) error {
 	if len(bump.Path) != len(b.Path) {
-		return errors.New("BUMPs with different heights cannot be merged")
+		return spverrors.Newf("cannot merge BUMPs of different heights")
 	}
 
 	for i := range b.Path {
@@ -143,7 +143,7 @@ func (bump *BUMP) calculateMerkleRoot() (string, error) {
 			}
 
 			if calcMerkleRoot != merkleRoot {
-				return "", errors.New("different merkle roots for the same block")
+				return "", spverrors.Newf("different merkle roots for the same block")
 			}
 		}
 	}
@@ -159,14 +159,14 @@ func calculateMerkleRoot(baseLeaf BUMPLeaf, bump *BUMP) (string, error) {
 		newOffset := getOffsetPair(offset)
 		leafInPair := findLeafByOffset(newOffset, bLevel)
 		if leafInPair == nil {
-			return "", errors.New("could not find pair")
+			return "", spverrors.Newf("could not find pair")
 		}
 
 		leftNode, rightNode := prepareNodes(baseLeaf, offset, *leafInPair, newOffset)
 
 		str, err := bc.MerkleTreeParentStr(leftNode, rightNode)
 		if err != nil {
-			return "", err
+			return "", spverrors.Wrapf(err, "failed to calculate merkle tree parent for %s and %s", leftNode, rightNode)
 		}
 		calculatedHash = str
 
@@ -195,10 +195,6 @@ func getOffsetPair(offset uint64) uint64 {
 		return offset + 1
 	}
 	return offset - 1
-}
-
-func getParentOffset(offset uint64) uint64 {
-	return getOffsetPair(offset / 2)
 }
 
 func prepareNodes(baseLeaf BUMPLeaf, offset uint64, leafInPair BUMPLeaf, newOffset uint64) (string, string) {
@@ -293,7 +289,8 @@ func (bump *BUMP) Scan(value interface{}) error {
 		return nil
 	}
 
-	return json.Unmarshal(byteValue, &bump)
+	err = json.Unmarshal(byteValue, &bump)
+	return spverrors.Wrapf(err, "failed to parse BUMP from JSON, data: %v", value)
 }
 
 // Value return json value, implement driver.Valuer interface
@@ -303,7 +300,7 @@ func (bump BUMP) Value() (driver.Value, error) {
 	}
 	marshal, err := json.Marshal(bump)
 	if err != nil {
-		return nil, err
+		return nil, spverrors.Wrapf(err, "failed to convert BUMP to JSON, data: %v", bump)
 	}
 
 	return string(marshal), nil
@@ -320,7 +317,8 @@ func (bumps *BUMPs) Scan(value interface{}) error {
 		return nil
 	}
 
-	return json.Unmarshal(byteValue, &bumps)
+	err = json.Unmarshal(byteValue, &bumps)
+	return spverrors.Wrapf(err, "failed to parse BUMPs from JSON, data: %v", value)
 }
 
 // Value return json value, implement driver.Valuer interface
@@ -330,7 +328,7 @@ func (bumps BUMPs) Value() (driver.Value, error) {
 	}
 	marshal, err := json.Marshal(bumps)
 	if err != nil {
-		return nil, err
+		return nil, spverrors.Wrapf(err, "failed to convert BUMPs to JSON, data: %v", bumps)
 	}
 
 	return string(marshal), nil
@@ -356,33 +354,4 @@ func bcBumpToBUMP(bcBump *bc.BUMP) BUMP {
 		BlockHeight: bcBump.BlockHeight,
 		Path:        path,
 	}
-}
-
-func sortAndAddToPath(txIDPath1 BUMPLeaf, offset uint64, txIDPath2 BUMPLeaf, pairOffset uint64) [][]BUMPLeaf {
-	path := make([][]BUMPLeaf, 0)
-	txIDPath := make([]BUMPLeaf, 2)
-
-	if offset < pairOffset {
-		txIDPath[0] = txIDPath1
-		txIDPath[1] = txIDPath2
-	} else {
-		txIDPath[0] = txIDPath2
-		txIDPath[1] = txIDPath1
-	}
-
-	path = append(path, txIDPath)
-	return path
-}
-
-func createLeaf(offset uint64, node string) BUMPLeaf {
-	leaf := BUMPLeaf{Offset: offset}
-
-	isDuplicate := node == "*"
-	if !isDuplicate {
-		leaf.Hash = node
-	} else {
-		leaf.Duplicate = true
-	}
-
-	return leaf
 }

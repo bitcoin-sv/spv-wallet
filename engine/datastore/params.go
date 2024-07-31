@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 
 	"github.com/99designs/gqlgen/graphql"
+	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 )
 
 // QueryParams object to use when limiting and sorting database query results
@@ -30,12 +31,12 @@ func UnmarshalQueryParams(v interface{}) (QueryParams, error) {
 
 	data, err := json.Marshal(v)
 	if err != nil {
-		return QueryParams{}, err
+		return QueryParams{}, spverrors.Wrapf(err, "failed to marshal query params")
 	}
 
 	var q QueryParams
 	if err = json.Unmarshal(data, &q); err != nil {
-		return QueryParams{}, err
+		return QueryParams{}, spverrors.Wrapf(err, "failed to unmarshal query params")
 	}
 
 	return q, nil

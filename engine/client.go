@@ -92,9 +92,9 @@ type (
 
 	// notificationsOptions holds the configuration for notifications
 	notificationsOptions struct {
-		notifications.ClientInterface                           // Notifications client
-		options                       []notifications.ClientOps // List of options
-		webhookEndpoint               string                    // Webhook endpoint
+		enabled        bool
+		client         *notifications.Notifications
+		webhookManager *notifications.WebhookManager
 	}
 
 	// paymailOptions holds the configuration for Paymail
@@ -112,9 +112,9 @@ type (
 
 	// taskManagerOptions holds the configuration for taskmanager
 	taskManagerOptions struct {
-		taskmanager.TaskEngine                                  // Client for TaskManager
-		options                []taskmanager.TaskManagerOptions // List of options
-		cronCustomPeriods      map[string]time.Duration         // will override the default period of cronJob
+		taskmanager.TaskEngine                          // Client for TaskManager
+		options                []taskmanager.Options    // List of options
+		cronCustomPeriods      map[string]time.Duration // will override the default period of cronJob
 	}
 )
 
@@ -173,7 +173,7 @@ func NewClient(ctx context.Context, opts ...ClientOps) (ClientInterface, error) 
 	}
 
 	// Load the Notification client (if client does not exist)
-	if err = client.loadNotificationClient(); err != nil {
+	if err = client.loadNotificationClient(ctx); err != nil {
 		return nil, err
 	}
 
@@ -214,7 +214,7 @@ func (c *Client) AddModels(ctx context.Context, autoMigrate bool, models ...inte
 
 		// Apply the database migration with the new models
 		if err := d.AutoMigrateDatabase(ctx, models...); err != nil {
-			return err
+			return spverrors.Wrapf(err, "failed to auto migrate models")
 		}
 
 		// Add to the list
@@ -270,7 +270,7 @@ func (c *Client) Close(ctx context.Context) error {
 	ds := c.Datastore()
 	if ds != nil {
 		if err := ds.Close(ctx); err != nil {
-			return err
+			return spverrors.Wrapf(err, "failed to close datastore")
 		}
 		c.options.dataStore.ClientInterface = nil
 	}
@@ -279,7 +279,7 @@ func (c *Client) Close(ctx context.Context) error {
 	tm := c.Taskmanager()
 	if tm != nil {
 		if err := tm.Close(ctx); err != nil {
-			return err
+			return spverrors.Wrapf(err, "failed to close taskmanager")
 		}
 		c.options.taskManager.TaskEngine = nil
 	}
@@ -312,11 +312,6 @@ func (c *Client) Debug(on bool) {
 	// Set debugging on the Datastore
 	if ds := c.Datastore(); ds != nil {
 		ds.Debug(on)
-	}
-
-	// Set debugging on the Notifications
-	if n := c.Notifications(); n != nil {
-		n.Debug(on)
 	}
 }
 
@@ -390,16 +385,11 @@ func (c *Client) Logger() *zerolog.Logger {
 }
 
 // Notifications will return the Notifications if it exists
-func (c *Client) Notifications() notifications.ClientInterface {
-	if c.options.notifications != nil && c.options.notifications.ClientInterface != nil {
-		return c.options.notifications.ClientInterface
+func (c *Client) Notifications() *notifications.Notifications {
+	if c.options.notifications == nil {
+		return nil
 	}
-	return nil
-}
-
-// SetNotificationsClient will overwrite the notification's client with the given client
-func (c *Client) SetNotificationsClient(client notifications.ClientInterface) {
-	c.options.notifications.ClientInterface = client
+	return c.options.notifications.client
 }
 
 // Taskmanager will return the Taskmanager if it exists

@@ -82,10 +82,9 @@ linters:
     - wastedassign
 
 linters-settings:
-  govet:
-    enable:
-      - fieldalignment
   wrapcheck:
+    ignoreSigRegexps:
+      - spverrors\.(Newf|Wrapf)
     ignorePackageGlobs:
       - "github.com/go-ozzo/ozzo-validation"
 
@@ -106,6 +105,7 @@ issues:
         - gocyclo
         - errcheck
         - gosec
+        - wrapcheck
 
     # Exclude known linters from partially "hard-vendored" code,
     # which is impossible to exclude via "nolint" comments.
@@ -149,7 +149,6 @@ issues:
     - .github
     - .make
     - dist
-    - engine # FIXME: skip engine dir until we fix all issues there
 
   # Maximum issues count per one linter. Set to 0 to disable. Default is 50.
   max-issues-per-linter: 0

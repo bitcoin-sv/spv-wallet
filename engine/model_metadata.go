@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 
 	"github.com/bitcoin-sv/spv-wallet/engine/datastore"
+	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/bitcoin-sv/spv-wallet/engine/utils"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/bsontype"
@@ -42,7 +43,8 @@ func (m *Metadata) Scan(value interface{}) error {
 		return nil
 	}
 
-	return json.Unmarshal(byteValue, &m)
+	err = json.Unmarshal(byteValue, &m)
+	return spverrors.Wrapf(err, "failed to parse Metadata from JSON, data: %v", value)
 }
 
 // Value return json value, implement driver.Valuer interface
@@ -52,7 +54,7 @@ func (m Metadata) Value() (driver.Value, error) {
 	}
 	marshal, err := json.Marshal(m)
 	if err != nil {
-		return nil, err
+		return nil, spverrors.Wrapf(err, "failed to convert Metadata to JSON, data: %v", m)
 	}
 
 	return string(marshal), nil
@@ -77,7 +79,8 @@ func (x *XpubMetadata) Scan(value interface{}) error {
 		return nil
 	}
 
-	return json.Unmarshal(byteValue, &x)
+	err = json.Unmarshal(byteValue, &x)
+	return spverrors.Wrapf(err, "failed to parse XpubMetadata from JSON, data: %v", value)
 }
 
 // Value return json value, implement driver.Valuer interface
@@ -87,7 +90,7 @@ func (x XpubMetadata) Value() (driver.Value, error) {
 	}
 	marshal, err := json.Marshal(x)
 	if err != nil {
-		return nil, err
+		return nil, spverrors.Wrapf(err, "failed to convert XpubMetadata to JSON, data: %v", x)
 	}
 
 	return string(marshal), nil
@@ -115,7 +118,8 @@ func (m *Metadata) MarshalBSONValue() (bsontype.Type, []byte, error) {
 		})
 	}
 
-	return bson.MarshalValue(metadata)
+	valueType, b, err := bson.MarshalValue(metadata)
+	return valueType, b, spverrors.Wrapf(err, "failed to convert Metadata to BSON, data: %v", m)
 }
 
 // UnmarshalBSONValue method is called by bson.Unmarshal in Mongo for type = Metadata
@@ -128,7 +132,7 @@ func (m *Metadata) UnmarshalBSONValue(t bsontype.Type, data []byte) error {
 
 	var uMap []map[string]interface{}
 	if err := raw.Unmarshal(&uMap); err != nil {
-		return err
+		return spverrors.Wrapf(err, "failed to parse Metadata from BSON, data: %v", raw)
 	}
 
 	*m = make(Metadata)
@@ -157,7 +161,8 @@ func (x *XpubMetadata) MarshalBSONValue() (bsontype.Type, []byte, error) {
 		}
 	}
 
-	return bson.MarshalValue(metadata)
+	valueType, b, err := bson.MarshalValue(metadata)
+	return valueType, b, spverrors.Wrapf(err, "failed to convert XpubMetadata to BSON, data: %v", x)
 }
 
 // UnmarshalBSONValue method is called by bson.Unmarshal in Mongo for type = XpubMetadata
@@ -170,7 +175,7 @@ func (x *XpubMetadata) UnmarshalBSONValue(t bsontype.Type, data []byte) error {
 
 	var uMap []map[string]interface{}
 	if err := raw.Unmarshal(&uMap); err != nil {
-		return err
+		return spverrors.Wrapf(err, "failed to parse XpubMetadata from BSON, data: %v", raw)
 	}
 
 	*x = make(XpubMetadata)

@@ -5,7 +5,7 @@ import (
 	"testing"
 	"time"
 
-	customtypes "github.com/bitcoin-sv/spv-wallet/engine/datastore/customtypes"
+	"github.com/bitcoin-sv/spv-wallet/engine/datastore/customtypes"
 	"github.com/stretchr/testify/assert"
 	"gorm.io/gorm"
 )
@@ -527,13 +527,13 @@ func Test_isEmptyCondition(t *testing.T) {
 	})
 
 	t.Run("nil ptr to slice", func(t *testing.T) {
-		var condition *[]interface{} = nil
+		var condition *[]interface{}
 		assert.True(t, isEmptyCondition(condition))
 	})
 
 	t.Run("not-nil ptr to nil-slice", func(t *testing.T) {
-		var theSlice []interface{} = nil
-		var condition *[]interface{} = &theSlice
+		var theSlice []interface{}
+		var condition = &theSlice
 		assert.True(t, isEmptyCondition(condition))
 	})
 

@@ -134,7 +134,7 @@ func (c *Client) GetTransactionsByIDs(ctx context.Context, txIDs []string) ([]*T
 func (c *Client) GetTransactionByHex(ctx context.Context, hex string) (*Transaction, error) {
 	tx, err := bt.NewTxFromString(hex)
 	if err != nil {
-		return nil, err
+		return nil, spverrors.Wrapf(err, "failed to parse transaction hex: %s", hex)
 	}
 
 	return c.GetTransaction(ctx, "", tx.TxID())
@@ -279,7 +279,7 @@ func (c *Client) RevertTransaction(ctx context.Context, id string) error {
 	var info *chainstate.TransactionInfo
 	if info, err = c.Chainstate().QueryTransaction(ctx, transaction.ID, chainstate.RequiredInMempool, 30*time.Second); err != nil {
 		if !errors.Is(err, spverrors.ErrCouldNotFindTransaction) {
-			return err
+			return spverrors.Wrapf(err, "failed to query transaction %s on chain", transaction.ID)
 		}
 	}
 	if info != nil {
@@ -390,7 +390,7 @@ func (c *Client) UpdateTransaction(ctx context.Context, callbackResp *broadcast.
 	bump, err := bc.NewBUMPFromStr(callbackResp.MerklePath)
 	if err != nil {
 		c.options.logger.Err(err).Msgf("failed to parse merkle path from broadcast callback - tx: %v", callbackResp)
-		return err
+		return spverrors.Wrapf(err, "failed to parse merkle path from broadcast callback - tx: %v", callbackResp)
 	}
 
 	txInfo := &chainstate.TransactionInfo{

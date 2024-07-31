@@ -35,7 +35,7 @@ func (a *Action) search(c *gin.Context) {
 
 	conditions, err := reqParams.Conditions.ToDbConditions()
 	if err != nil {
-		c.JSON(http.StatusBadRequest, err.Error())
+		spverrors.ErrorResponse(c, spverrors.ErrInvalidConditions, a.Services.Logger)
 		return
 	}
 

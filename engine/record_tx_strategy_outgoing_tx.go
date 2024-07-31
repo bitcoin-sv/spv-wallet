@@ -86,7 +86,7 @@ func (strategy *outgoingTx) Validate() error {
 	}
 
 	if strategy.RelatedDraftID == "" {
-		return spverrors.ErrEmptyRelatedDraftId
+		return spverrors.ErrEmptyRelatedDraftID
 	}
 
 	if strategy.XPubKey == "" {

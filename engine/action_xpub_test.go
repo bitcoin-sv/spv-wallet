@@ -71,7 +71,7 @@ func (ts *EmbeddedDBTestSuite) TestClient_NewXpub() {
 			assert.ErrorIs(t, err, spverrors.ErrXpubInvalidLength)
 
 			_, err = tc.client.NewXpub(tc.ctx, "", tc.client.DefaultModelOptions()...)
-			assert.ErrorIs(t, err, spverrors.ErrXpubInvalidLength)
+			assert.ErrorIs(t, err, spverrors.ErrMissingFieldXpubID)
 		})
 
 		ts.T().Run(testCase.name+" - duplicate xPub", func(t *testing.T) {

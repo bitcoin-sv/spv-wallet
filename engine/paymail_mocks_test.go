@@ -49,10 +49,10 @@ func (m *mockServiceProvider) VerifyMerkleRoots(_ context.Context, _ []*spv.Merk
 	return nil
 }
 
-func (p *mockServiceProvider) AddContact(
-	ctx context.Context,
-	requesterPaymail string,
-	contact *paymail.PikeContactRequestPayload,
+func (m *mockServiceProvider) AddContact(
+	_ context.Context,
+	_ string,
+	_ *paymail.PikeContactRequestPayload,
 ) (err error) {
 	return
 }

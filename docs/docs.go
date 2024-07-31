@@ -1104,6 +1104,80 @@ const docTemplate = `{
                 }
             }
         },
+        "/v1/admin/webhooks/subscriptions": {
+            "post": {
+                "security": [
+                    {
+                        "x-auth-xpub": []
+                    }
+                ],
+                "description": "Subscribe to a webhook to receive notifications",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Admin"
+                ],
+                "summary": "Subscribe to a webhook",
+                "parameters": [
+                    {
+                        "description": "URL to subscribe to and optional token header and value",
+                        "name": "SubscribeRequestBody",
+                        "in": "body",
+                        "schema": {
+                            "$ref": "#/definitions/models.SubscribeRequestBody"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success response",
+                        "schema": {
+                            "type": "boolean"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error - Error while subscribing to the webhook"
+                    }
+                }
+            },
+            "delete": {
+                "security": [
+                    {
+                        "x-auth-xpub": []
+                    }
+                ],
+                "description": "Unsubscribe to a webhook to stop receiving notifications",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Admin"
+                ],
+                "summary": "Unsubscribe to a webhook",
+                "parameters": [
+                    {
+                        "description": "URL to unsubscribe from",
+                        "name": "UnsubscribeRequestBody",
+                        "in": "body",
+                        "schema": {
+                            "$ref": "#/definitions/models.UnsubscribeRequestBody"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success response",
+                        "schema": {
+                            "type": "boolean"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error - Error while unsubscribing to the webhook"
+                    }
+                }
+            }
+        },
         "/v1/admin/xpub": {
             "post": {
                 "security": [
@@ -4031,6 +4105,20 @@ const docTemplate = `{
                 }
             }
         },
+        "models.SubscribeRequestBody": {
+            "type": "object",
+            "properties": {
+                "tokenHeader": {
+                    "type": "string"
+                },
+                "tokenValue": {
+                    "type": "string"
+                },
+                "url": {
+                    "type": "string"
+                }
+            }
+        },
         "models.SyncConfig": {
             "type": "object",
             "properties": {
@@ -4416,6 +4504,14 @@ const docTemplate = `{
                 }
             }
         },
+        "models.UnsubscribeRequestBody": {
+            "type": "object",
+            "properties": {
+                "url": {
+                    "type": "string"
+                }
+            }
+        },
         "models.Utxo": {
             "type": "object",
             "properties": {
@@ -4593,12 +4689,8 @@ const docTemplate = `{
                 1,
                 1000,
                 1000000,
-                1,
-                1000,
-                1000000,
                 1000000000,
-                60000000000,
-                3600000000000
+                60000000000
             ],
             "x-enum-varnames": [
                 "minDuration",
@@ -4620,12 +4712,8 @@ const docTemplate = `{
                 "Nanosecond",
                 "Microsecond",
                 "Millisecond",
-                "Nanosecond",
-                "Microsecond",
-                "Millisecond",
                 "Second",
-                "Minute",
-                "Hour"
+                "Minute"
             ]
         },
         "transactions.NewTransaction": {

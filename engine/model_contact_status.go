@@ -2,18 +2,23 @@ package engine
 
 import (
 	"database/sql/driver"
-	"fmt"
 
+	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/bitcoin-sv/spv-wallet/engine/utils"
 )
 
+// ContactStatus represents statuses of contact model.
 type ContactStatus string
 
 const (
+	// ContactNotConfirmed is a status telling that the contact model as not confirmed yet.
 	ContactNotConfirmed ContactStatus = "unconfirmed"
-	ContactAwaitAccept  ContactStatus = "awaiting"
-	ContactConfirmed    ContactStatus = "confirmed"
-	ContactRejected     ContactStatus = "rejected"
+	// ContactAwaitAccept is a status telling that the contact model as invitation to add to contacts.
+	ContactAwaitAccept ContactStatus = "awaiting"
+	// ContactConfirmed is a status telling that the contact model as confirmed.
+	ContactConfirmed ContactStatus = "confirmed"
+	// ContactRejected is a status telling that the contact invitation was rejected by user.
+	ContactRejected ContactStatus = "rejected"
 )
 
 var contactStatusMapper = NewEnumStringMapper(ContactNotConfirmed, ContactAwaitAccept, ContactConfirmed, ContactRejected)
@@ -27,7 +32,7 @@ func (t *ContactStatus) Scan(value interface{}) error {
 
 	status, ok := contactStatusMapper.Get(stringValue)
 	if !ok {
-		return fmt.Errorf("invalid contact status: %s", stringValue)
+		return spverrors.Newf("invalid contact status: %s", stringValue)
 	}
 	*t = status
 

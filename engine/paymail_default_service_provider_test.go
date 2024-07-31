@@ -8,15 +8,15 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func Test_PaymailDefaultServiceProvider(t *testing.T) {
-	t.Run("PaymailDefaultServiceProvider.GetPaymailByAlias", test_GetPaymailByAlias)
-	t.Run("PaymailDefaultServiceProvider.GetPaymailByAlias - multiple call", test_GetPaymailByAlias_MultipleRequest_ShouldReturnStablePubKey)
-	t.Run("PaymailDefaultServiceProvider.CreateAddressResolutionResponse - multiple call", test_CreateAddressResolutionResponse_ShouldReturnDifferentResponses)
-	t.Run("PaymailDefaultServiceProvider.CreateP2PDestinationResponse - multiple call", test_CreateP2PDestinationResponse_ShouldReturnDifferentResponses)
+func TestPaymailDefaultServiceProvider(t *testing.T) {
+	t.Run("PaymailDefaultServiceProvider.GetPaymailByAlias", testGetPaymailByAlias)
+	t.Run("PaymailDefaultServiceProvider.GetPaymailByAlias - multiple call", testGetPaymailByAliasMultipleRequestShouldReturnStablePubKey)
+	t.Run("PaymailDefaultServiceProvider.CreateAddressResolutionResponse - multiple call", testCreateAddressResolutionResponseShouldReturnDifferentResponses)
+	t.Run("PaymailDefaultServiceProvider.CreateP2PDestinationResponse - multiple call", testCreateP2PDestinationResponseShouldReturnDifferentResponses)
 
 }
 
-func test_GetPaymailByAlias(t *testing.T) {
+func testGetPaymailByAlias(t *testing.T) {
 	// given
 	ctx, c, deferMe := CreateTestSQLiteClient(t, false, false, WithFreeCache())
 	defer deferMe()
@@ -45,7 +45,7 @@ func test_GetPaymailByAlias(t *testing.T) {
 
 }
 
-func test_GetPaymailByAlias_MultipleRequest_ShouldReturnStablePubKey(t *testing.T) {
+func testGetPaymailByAliasMultipleRequestShouldReturnStablePubKey(t *testing.T) {
 	// given
 	ctx, c, deferMe := CreateTestSQLiteClient(t, false, false, WithFreeCache())
 	defer deferMe()
@@ -70,7 +70,7 @@ func test_GetPaymailByAlias_MultipleRequest_ShouldReturnStablePubKey(t *testing.
 
 }
 
-func test_CreateAddressResolutionResponse_ShouldReturnDifferentResponses(t *testing.T) {
+func testCreateAddressResolutionResponseShouldReturnDifferentResponses(t *testing.T) {
 	// given
 	ctx, c, deferMe := CreateTestSQLiteClient(t, false, false, WithFreeCache())
 	defer deferMe()
@@ -104,7 +104,7 @@ func test_CreateAddressResolutionResponse_ShouldReturnDifferentResponses(t *test
 	}
 }
 
-func test_CreateP2PDestinationResponse_ShouldReturnDifferentResponses(t *testing.T) {
+func testCreateP2PDestinationResponseShouldReturnDifferentResponses(t *testing.T) {
 	// given
 	ctx, c, deferMe := CreateTestSQLiteClient(t, false, false, WithFreeCache())
 	defer deferMe()

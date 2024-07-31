@@ -1,6 +1,7 @@
 package utils
 
 import (
+	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/libsv/go-bk/bec"
 	"github.com/libsv/go-bt/v2"
 	"github.com/libsv/go-bt/v2/bscript"
@@ -13,12 +14,12 @@ func GetUnlockingScript(tx *bt.Tx, inputIndex uint32, privateKey *bec.PrivateKey
 
 	sigHash, err := tx.CalcInputSignatureHash(inputIndex, sigHashFlags)
 	if err != nil {
-		return nil, err
+		return nil, spverrors.Wrapf(err, "failed to calculate signature hash")
 	}
 
 	var sig *bec.Signature
 	if sig, err = privateKey.Sign(sigHash); err != nil {
-		return nil, err
+		return nil, spverrors.Wrapf(err, "failed to sign transaction")
 	}
 
 	pubKey := privateKey.PubKey().SerialiseCompressed()
@@ -26,7 +27,7 @@ func GetUnlockingScript(tx *bt.Tx, inputIndex uint32, privateKey *bec.PrivateKey
 
 	var script *bscript.Script
 	if script, err = bscript.NewP2PKHUnlockingScript(pubKey, signature, sigHashFlags); err != nil {
-		return nil, err
+		return nil, spverrors.Wrapf(err, "failed to create unlocking script")
 	}
 
 	return script, nil

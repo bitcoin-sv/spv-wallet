@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/bitcoin-sv/spv-wallet/engine/datastore"
+	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 )
 
 // taskCleanupDraftTransactions will clean up all old expired draft transactions
@@ -89,7 +90,7 @@ func taskSyncTransactions(ctx context.Context, client *Client) error {
 func taskCalculateMetrics(ctx context.Context, client *Client) error {
 	m, enabled := client.Metrics()
 	if !enabled {
-		return errors.New("metrics are not enabled")
+		return spverrors.Newf("metrics are not enabled")
 	}
 
 	modelOpts := client.DefaultModelOptions()

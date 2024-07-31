@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 
 	"github.com/bitcoin-sv/spv-wallet/engine/datastore"
+	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/bitcoin-sv/spv-wallet/engine/utils"
 	"gorm.io/gorm"
 	"gorm.io/gorm/schema"
@@ -29,7 +30,8 @@ func (i *IDs) Scan(value interface{}) error {
 		return nil
 	}
 
-	return json.Unmarshal(byteValue, &i)
+	err = json.Unmarshal(byteValue, &i)
+	return spverrors.Wrapf(err, "failed to parse IDs from JSON, data: %v", value)
 }
 
 // Value return json value, implement driver.Valuer interface
@@ -39,7 +41,7 @@ func (i IDs) Value() (driver.Value, error) {
 	}
 	marshal, err := json.Marshal(i)
 	if err != nil {
-		return nil, err
+		return nil, spverrors.Wrapf(err, "failed to convert IDs to JSON, data: %v", i)
 	}
 
 	return string(marshal), nil

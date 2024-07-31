@@ -19,7 +19,7 @@ func (c *Client) NewAccessKey(ctx context.Context, rawXpubKey string, opts ...Mo
 	// Validate that the value is an xPub
 	_, err := utils.ValidateXPub(rawXpubKey)
 	if err != nil {
-		return nil, err
+		return nil, err //nolint:wrapcheck // Custom errors returned from validateXPub
 	}
 
 	// Get the xPub (by key - converts to id)
@@ -171,7 +171,7 @@ func (c *Client) RevokeAccessKey(ctx context.Context, rawXpubKey, id string, opt
 	// Validate that the value is an xPub
 	_, err := utils.ValidateXPub(rawXpubKey)
 	if err != nil {
-		return nil, err
+		return nil, err //nolint:wrapcheck // Custom errors returned from validateXPub
 	}
 
 	// Get the xPub (by key - converts to id)

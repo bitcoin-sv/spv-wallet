@@ -2,9 +2,9 @@ package chainstate
 
 import (
 	"context"
-	"errors"
 
 	"github.com/bitcoin-sv/go-broadcast-client/broadcast"
+	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/bitcoin-sv/spv-wallet/engine/utils"
 	"github.com/newrelic/go-agent/v3/newrelic"
 )
@@ -16,7 +16,7 @@ func (c *Client) broadcastClientInit(ctx context.Context) error {
 
 	bc := c.options.config.broadcastClient
 	if bc == nil {
-		err := errors.New("broadcast client is not configured")
+		err := spverrors.Newf("broadcast client is not configured")
 		return err
 	}
 
@@ -25,10 +25,10 @@ func (c *Client) broadcastClientInit(ctx context.Context) error {
 		var feeQuotes []*broadcast.FeeQuote
 		feeQuotes, err := bc.GetFeeQuote(ctx)
 		if err != nil {
-			return err
+			return spverrors.Wrapf(err, "failed to get fee quotes from broadcast client")
 		}
 		if len(feeQuotes) == 0 {
-			return errors.New("no fee quotes returned from broadcast client")
+			return spverrors.Newf("no fee quotes returned from broadcast client")
 		}
 		c.options.logger.Info().Msgf("got %d fee quote(s) from broadcast client", len(feeQuotes))
 		fees := make([]utils.FeeUnit, len(feeQuotes))

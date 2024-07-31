@@ -4,8 +4,6 @@ package server
 import (
 	"context"
 	"crypto/tls"
-	"errors"
-	"fmt"
 	"net/http"
 	"strconv"
 
@@ -20,6 +18,7 @@ import (
 	"github.com/bitcoin-sv/spv-wallet/actions/utxos"
 	"github.com/bitcoin-sv/spv-wallet/actions/xpubs"
 	"github.com/bitcoin-sv/spv-wallet/config"
+	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/bitcoin-sv/spv-wallet/logging"
 	"github.com/bitcoin-sv/spv-wallet/metrics"
 	"github.com/bitcoin-sv/spv-wallet/server/auth"
@@ -85,7 +84,7 @@ func (s *Server) Shutdown(ctx context.Context) error {
 	s.Services.CloseAll(ctx) // Should have been executed in main.go, but might panic and not run?
 	err := s.WebServer.Shutdown(ctx)
 	if err != nil {
-		err = fmt.Errorf("error shutting down server: %w", err)
+		err = spverrors.Wrapf(err, "error shutting down server")
 		return err
 	}
 	return nil
@@ -186,7 +185,7 @@ func SetupServerRoutes(appConfig *config.AppConfig, services *config.AppServices
 		case router.CallbackEndpoints:
 			r.RegisterCallbackEndpoints(callbackAuthRouter)
 		default:
-			panic(errors.New("unexpected router endpoints registrar"))
+			panic(spverrors.Newf("unexpected router endpoints registrar"))
 		}
 	}
 

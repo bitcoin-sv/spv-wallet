@@ -93,7 +93,7 @@ func baseTxFromHex(hex string, opts ...ModelOps) (*Transaction, error) {
 	var err error
 
 	if btTx, err = bt.NewTxFromString(hex); err != nil {
-		return nil, err
+		return nil, spverrors.Wrapf(err, "error parsing transaction hex")
 	}
 
 	tx := emptyTx(opts...)

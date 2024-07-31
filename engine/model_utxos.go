@@ -460,5 +460,6 @@ func (m *Utxo) Migrate(client datastore.ClientInterface) error {
 		}
 	}
 
-	return client.IndexMetadata(client.GetTableName(tableUTXOs), metadataField)
+	err := client.IndexMetadata(client.GetTableName(tableUTXOs), metadataField)
+	return spverrors.Wrapf(err, "failed to create index on metadata field")
 }
