@@ -12,8 +12,8 @@ type Action struct {
 	actions.Action
 }
 
-// NewHandler creates the specific package routes
-func NewHandler(appConfig *config.AppConfig, services *config.AppServices) (routes.OldAPIEndpointsFunc, routes.APIEndpointsFunc) {
+// OldSharedConfigHandler creates the specific package routes
+func OldSharedConfigHandler(appConfig *config.AppConfig, services *config.AppServices) routes.OldAPIEndpointsFunc {
 	action := &Action{actions.Action{AppConfig: appConfig, Services: services}}
 
 	oldSharedConfigEndpoints := routes.OldAPIEndpointsFunc(func(router *gin.RouterGroup) {
@@ -21,10 +21,17 @@ func NewHandler(appConfig *config.AppConfig, services *config.AppServices) (rout
 		group.GET("", action.oldGet)
 	})
 
+	return oldSharedConfigEndpoints
+}
+
+// NewHandler creates the specific package routes
+func NewHandler(appConfig *config.AppConfig, services *config.AppServices) routes.APIEndpointsFunc {
+	action := &Action{actions.Action{AppConfig: appConfig, Services: services}}
+
 	sharedConfigEndpoints := routes.APIEndpointsFunc(func(router *gin.RouterGroup) {
 		group := router.Group("/configs/shared")
 		group.GET("", action.get)
 	})
 
-	return oldSharedConfigEndpoints, sharedConfigEndpoints
+	return sharedConfigEndpoints
 }
