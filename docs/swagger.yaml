@@ -1801,20 +1801,6 @@ definitions:
     - 1000000000
     - 60000000000
     - 3600000000000
-    - -9223372036854775808
-    - 9223372036854775807
-    - 1
-    - 1000
-    - 1000000
-    - 1000000000
-    - 60000000000
-    - 3600000000000
-    - 1
-    - 1000
-    - 1000000
-    - 1000000000
-    - 60000000000
-    - 3600000000000
     - 1
     - 1000
     - 1000000
@@ -1825,20 +1811,6 @@ definitions:
     x-enum-varnames:
     - minDuration
     - maxDuration
-    - Nanosecond
-    - Microsecond
-    - Millisecond
-    - Second
-    - Minute
-    - Hour
-    - minDuration
-    - maxDuration
-    - Nanosecond
-    - Microsecond
-    - Millisecond
-    - Second
-    - Minute
-    - Hour
     - Nanosecond
     - Microsecond
     - Millisecond
@@ -1908,6 +1880,47 @@ info:
   title: SPV Wallet
   version: v0.12.0
 paths:
+  /api/v1/users/current:
+    get:
+      description: Get current user information
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: xPub associated with the given xPub from auth header
+          schema:
+            $ref: '#/definitions/models.Xpub'
+        "500":
+          description: Internal Server Error - Error while fetching xPub
+      security:
+      - x-auth-xpub: []
+      summary: Get current user information
+      tags:
+      - Users
+    patch:
+      description: Update current user information
+      parameters:
+      - description: ' '
+        in: body
+        name: Metadata
+        schema:
+          $ref: '#/definitions/engine.Metadata'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Updated xPub
+          schema:
+            $ref: '#/definitions/models.Xpub'
+        "400":
+          description: Bad request - Error while parsing Metadata from request body
+        "500":
+          description: Internal Server Error - Error while updating xPub
+      security:
+      - x-auth-xpub: []
+      summary: Update current user information
+      tags:
+      - Users
   /api/v1/users/current/keys:
     post:
       description: Create access key
@@ -3369,7 +3382,9 @@ paths:
       - UTXO
   /v1/xpub:
     get:
-      description: Get xPub
+      deprecated: true
+      description: This endpoint has been deprecated. Use (GET) /api/v1/users/current
+        instead.
       produces:
       - application/json
       responses:
@@ -3381,11 +3396,13 @@ paths:
           description: Internal Server Error - Error while fetching xPub
       security:
       - x-auth-xpub: []
-      summary: Get xPub
+      summary: Get current user information - Use (GET) /api/v1/users/current instead.
       tags:
-      - xPub
+      - Users
     patch:
-      description: Update xPub
+      deprecated: true
+      description: This endpoint has been deprecated. Use (PATCH) /api/v1/users/current
+        instead.
       parameters:
       - description: ' '
         in: body
@@ -3405,10 +3422,10 @@ paths:
           description: Internal Server Error - Error while updating xPub
       security:
       - x-auth-xpub: []
-      - bux-auth-xpub: []
-      summary: Update xPub
+      summary: Update current user information - Use (PATCH) /api/v1/users/current
+        instead.
       tags:
-      - xPub
+      - Users
 securityDefinitions:
   callback-auth:
     in: header
