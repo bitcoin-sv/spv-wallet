@@ -5,6 +5,7 @@ import (
 	"sync"
 
 	"github.com/bitcoin-sv/spv-wallet/models"
+	"github.com/bitcoin-sv/spv-wallet/models/response"
 	"github.com/gin-gonic/gin"
 )
 
@@ -18,7 +19,17 @@ import (
 // @DeprecatedRouter  /v1/shared-config [get]
 // @Security	x-auth-xpub
 func (a *Action) oldGet(c *gin.Context) {
-	a.get(c)
+	makeConfig := sync.OnceValue(func() models.SharedConfig {
+		return models.SharedConfig{
+			PaymailDomains: a.AppConfig.Paymail.Domains,
+			ExperimentalFeatures: map[string]bool{
+				"pike_contacts_enabled": a.AppConfig.ExperimentalFeatures.PikeContactsEnabled,
+				"pike_payment_enabled":  a.AppConfig.ExperimentalFeatures.PikePaymentEnabled,
+			},
+		}
+	})
+
+	c.JSON(http.StatusOK, makeConfig())
 }
 
 // sharedConfig will return the shared configuration
@@ -31,12 +42,12 @@ func (a *Action) oldGet(c *gin.Context) {
 // @Router		/api/v1/configs/shared [get]
 // @Security	x-auth-xpub
 func (a *Action) get(c *gin.Context) {
-	makeConfig := sync.OnceValue(func() models.SharedConfig {
-		return models.SharedConfig{
+	makeConfig := sync.OnceValue(func() response.SharedConfig {
+		return response.SharedConfig{
 			PaymailDomains: a.AppConfig.Paymail.Domains,
 			ExperimentalFeatures: map[string]bool{
-				"pike_contacts_enabled": a.AppConfig.ExperimentalFeatures.PikeContactsEnabled,
-				"pike_payment_enabled":  a.AppConfig.ExperimentalFeatures.PikePaymentEnabled,
+				"pikeContactsEnabled": a.AppConfig.ExperimentalFeatures.PikeContactsEnabled,
+				"pikePaymentEnabled":  a.AppConfig.ExperimentalFeatures.PikePaymentEnabled,
 			},
 		}
 	})
