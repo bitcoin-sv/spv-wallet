@@ -1,4 +1,4 @@
-package xpubs
+package users
 
 import (
 	"net/http"
@@ -10,20 +10,39 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-// update will update an existing model
-// Update xPub godoc
-// @Summary		Update xPub
-// @Description	Update xPub
-// @Tags		xPub
+// oldUpdate will update an existing model
+// Update current user information godoc
+// @Summary		Update current user information - Use (PATCH) /api/v1/users/current instead.
+// @Description	This endpoint has been deprecated. Use (PATCH) /api/v1/users/current instead.
+// @Tags		Users
 // @Produce		json
 // @Param		Metadata body engine.Metadata false " "
 // @Success		200 {object} models.Xpub "Updated xPub"
 // @Failure		400	"Bad request - Error while parsing Metadata from request body"
 // @Failure 	500	"Internal Server Error - Error while updating xPub"
-// @Router		/v1/xpub [patch]
+// @DeprecatedRouter  /v1/xpub [patch]
 // @Security	x-auth-xpub
-// @Security	bux-auth-xpub
+func (a *Action) oldUpdate(c *gin.Context) {
+	a.updateHelper(c, true)
+}
+
+// update will update an existing model
+// Update current user information godoc
+// @Summary		Update current user information
+// @Description	Update current user information
+// @Tags		Users
+// @Produce		json
+// @Param		Metadata body engine.Metadata false " "
+// @Success		200 {object} models.Xpub "Updated xPub"
+// @Failure		400	"Bad request - Error while parsing Metadata from request body"
+// @Failure 	500	"Internal Server Error - Error while updating xPub"
+// @Router		/api/v1/users/current [patch]
+// @Security	x-auth-xpub
 func (a *Action) update(c *gin.Context) {
+	a.updateHelper(c, false)
+}
+
+func (a *Action) updateHelper(c *gin.Context, snakeCase bool) {
 	reqXPub := c.GetString(auth.ParamXPubKey)
 	reqXPubID := c.GetString(auth.ParamXPubHashKey)
 
@@ -47,6 +66,12 @@ func (a *Action) update(c *gin.Context) {
 	signed := c.GetBool("auth_signed")
 	if !signed || reqXPub == "" {
 		xPub.RemovePrivateData()
+	}
+
+	if snakeCase {
+		contract := mappings.MapToOldXpubContract(xPub)
+		c.JSON(http.StatusOK, contract)
+		return
 	}
 
 	contract := mappings.MapToXpubContract(xPub)
