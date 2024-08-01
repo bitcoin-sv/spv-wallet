@@ -2544,37 +2544,6 @@ const docTemplate = `{
                 "Rejected"
             ]
         },
-        "common.OldModel": {
-            "type": "object",
-            "properties": {
-                "created_at": {
-                    "description": "CreatedAt is a time when outer model was created.",
-                    "type": "string",
-                    "example": "2024-02-26T11:00:28.069911Z"
-                },
-                "deleted_at": {
-                    "description": "DeletedAt is a time when outer model was deleted.",
-                    "type": "string",
-                    "example": "2024-02-26T11:02:28.069911Z"
-                },
-                "metadata": {
-                    "description": "Metadata is a metadata map of outer model.",
-                    "type": "object",
-                    "additionalProperties": {
-                        "type": "string"
-                    },
-                    "example": {
-                        "key": "value",
-                        "key2": "value2"
-                    }
-                },
-                "updated_at": {
-                    "description": "UpdatedAt is a time when outer model was updated.",
-                    "type": "string",
-                    "example": "2024-02-26T11:01:28.069911Z"
-                }
-            }
-        },
         "contacts.UpsertContact": {
             "type": "object",
             "properties": {
@@ -3672,6 +3641,16 @@ const docTemplate = `{
         "models.AccessKey": {
             "type": "object",
             "properties": {
+                "created_at": {
+                    "description": "CreatedAt is a time when outer model was created.",
+                    "type": "string",
+                    "example": "2024-02-26T11:00:28.069911Z"
+                },
+                "deleted_at": {
+                    "description": "DeletedAt is a time when outer model was deleted.",
+                    "type": "string",
+                    "example": "2024-02-26T11:02:28.069911Z"
+                },
                 "id": {
                     "description": "ID is an hash of the compressed public key.",
                     "type": "string",
@@ -3682,18 +3661,26 @@ const docTemplate = `{
                     "type": "string",
                     "example": "3fd870d6bf1725f04084cf31209c04be5bd9bed001a390ad3bc632a55a3ee078"
                 },
-                "model": {
-                    "description": "Model is a common model that contains common fields for all models.",
-                    "allOf": [
-                        {
-                            "$ref": "#/definitions/common.OldModel"
-                        }
-                    ]
+                "metadata": {
+                    "description": "Metadata is a metadata map of outer model.",
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "string"
+                    },
+                    "example": {
+                        "key": "value",
+                        "key2": "value2"
+                    }
                 },
                 "revoked_at": {
                     "description": "RevokedAt is a time when access key was revoked.",
                     "type": "string",
                     "example": "2024-02-26T11:02:28.069911Z"
+                },
+                "updated_at": {
+                    "description": "UpdatedAt is a time when outer model was updated.",
+                    "type": "string",
+                    "example": "2024-02-26T11:01:28.069911Z"
                 },
                 "xpub_id": {
                     "description": "XpubID is an access key's xpub related id.",
@@ -3744,6 +3731,16 @@ const docTemplate = `{
         "models.Contact": {
             "type": "object",
             "properties": {
+                "created_at": {
+                    "description": "CreatedAt is a time when outer model was created.",
+                    "type": "string",
+                    "example": "2024-02-26T11:00:28.069911Z"
+                },
+                "deleted_at": {
+                    "description": "DeletedAt is a time when outer model was deleted.",
+                    "type": "string",
+                    "example": "2024-02-26T11:02:28.069911Z"
+                },
                 "fullName": {
                     "description": "FullName is name which could be shown instead of whole paymail address.",
                     "type": "string",
@@ -3754,8 +3751,16 @@ const docTemplate = `{
                     "type": "string",
                     "example": "68af358bde7d8641621c7dd3de1a276c9a62cfa9e2d0740494519f1ba61e2f4a"
                 },
-                "model": {
-                    "$ref": "#/definitions/common.OldModel"
+                "metadata": {
+                    "description": "Metadata is a metadata map of outer model.",
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "string"
+                    },
+                    "example": {
+                        "key": "value",
+                        "key2": "value2"
+                    }
                 },
                 "paymail": {
                     "description": "Paymail is a paymail address related to contact.",
@@ -3775,6 +3780,11 @@ const docTemplate = `{
                         }
                     ],
                     "example": "unconfirmed"
+                },
+                "updated_at": {
+                    "description": "UpdatedAt is a time when outer model was updated.",
+                    "type": "string",
+                    "example": "2024-02-26T11:01:28.069911Z"
                 }
             }
         },
@@ -3806,6 +3816,16 @@ const docTemplate = `{
                     "type": "integer",
                     "example": 0
                 },
+                "created_at": {
+                    "description": "CreatedAt is a time when outer model was created.",
+                    "type": "string",
+                    "example": "2024-02-26T11:00:28.069911Z"
+                },
+                "deleted_at": {
+                    "description": "DeletedAt is a time when outer model was deleted.",
+                    "type": "string",
+                    "example": "2024-02-26T11:02:28.069911Z"
+                },
                 "draft_id": {
                     "description": "DraftID is a destination's draft id.",
                     "type": "string",
@@ -3821,13 +3841,16 @@ const docTemplate = `{
                     "type": "string",
                     "example": "76a9147b05764a97f3b4b981471492aa703b188e45979b88ac"
                 },
-                "model": {
-                    "description": "Model is a common model that contains common fields for all models.",
-                    "allOf": [
-                        {
-                            "$ref": "#/definitions/common.OldModel"
-                        }
-                    ]
+                "metadata": {
+                    "description": "Metadata is a metadata map of outer model.",
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "string"
+                    },
+                    "example": {
+                        "key": "value",
+                        "key2": "value2"
+                    }
                 },
                 "num": {
                     "description": "Num is a destination's num representation.",
@@ -3843,6 +3866,11 @@ const docTemplate = `{
                     "description": "Type is a destination's type.",
                     "type": "string",
                     "example": "pubkeyhash"
+                },
+                "updated_at": {
+                    "description": "UpdatedAt is a time when outer model was updated.",
+                    "type": "string",
+                    "example": "2024-02-26T11:01:28.069911Z"
                 },
                 "xpub_id": {
                     "description": "XpubID is a destination's xpub related id used to register destination.",
@@ -3861,6 +3889,16 @@ const docTemplate = `{
                             "$ref": "#/definitions/models.TransactionConfig"
                         }
                     ]
+                },
+                "created_at": {
+                    "description": "CreatedAt is a time when outer model was created.",
+                    "type": "string",
+                    "example": "2024-02-26T11:00:28.069911Z"
+                },
+                "deleted_at": {
+                    "description": "DeletedAt is a time when outer model was deleted.",
+                    "type": "string",
+                    "example": "2024-02-26T11:02:28.069911Z"
                 },
                 "expires_at": {
                     "description": "ExpiresAt is a time when draft transaction expired.",
@@ -3882,18 +3920,26 @@ const docTemplate = `{
                     "type": "string",
                     "example": "b356f7fa00cd3f20cce6c21d704cd13e871d28d714a5ebd0532f5a0e0cde63f7"
                 },
-                "model": {
-                    "description": "Model is a common model that contains common fields for all models.",
-                    "allOf": [
-                        {
-                            "$ref": "#/definitions/common.OldModel"
-                        }
-                    ]
+                "metadata": {
+                    "description": "Metadata is a metadata map of outer model.",
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "string"
+                    },
+                    "example": {
+                        "key": "value",
+                        "key2": "value2"
+                    }
                 },
                 "status": {
                     "description": "Status is a draft transaction lastly monitored status.",
                     "type": "string",
                     "example": "complete"
+                },
+                "updated_at": {
+                    "description": "UpdatedAt is a time when outer model was updated.",
+                    "type": "string",
+                    "example": "2024-02-26T11:01:28.069911Z"
                 },
                 "xpub_id": {
                     "description": "XpubID is a draft transaction's xpub used to sign transaction.",
@@ -4008,6 +4054,16 @@ const docTemplate = `{
                     "type": "string",
                     "example": "https://spvwallet.com/avatar.png"
                 },
+                "created_at": {
+                    "description": "CreatedAt is a time when outer model was created.",
+                    "type": "string",
+                    "example": "2024-02-26T11:00:28.069911Z"
+                },
+                "deleted_at": {
+                    "description": "DeletedAt is a time when outer model was deleted.",
+                    "type": "string",
+                    "example": "2024-02-26T11:02:28.069911Z"
+                },
                 "domain": {
                     "description": "Domain is a paymail address's domain (second part of paymail).",
                     "type": "string",
@@ -4018,18 +4074,26 @@ const docTemplate = `{
                     "type": "string",
                     "example": "c0ba4a52c89279268476a141be7569200cff2ca4892512b07ca75c25a95c16cd"
                 },
-                "model": {
-                    "description": "Model is a common model that contains common fields for all models.",
-                    "allOf": [
-                        {
-                            "$ref": "#/definitions/common.OldModel"
-                        }
-                    ]
+                "metadata": {
+                    "description": "Metadata is a metadata map of outer model.",
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "string"
+                    },
+                    "example": {
+                        "key": "value",
+                        "key2": "value2"
+                    }
                 },
                 "public_name": {
                     "description": "PublicName is a paymail address's public name.",
                     "type": "string",
                     "example": "Test User"
+                },
+                "updated_at": {
+                    "description": "UpdatedAt is a time when outer model was updated.",
+                    "type": "string",
+                    "example": "2024-02-26T11:01:28.069911Z"
                 },
                 "xpub_id": {
                     "description": "XpubID is a paymail address's xpub related id used to register paymail address.",
@@ -4189,6 +4253,16 @@ const docTemplate = `{
                     "type": "integer",
                     "example": 833505
                 },
+                "created_at": {
+                    "description": "CreatedAt is a time when outer model was created.",
+                    "type": "string",
+                    "example": "2024-02-26T11:00:28.069911Z"
+                },
+                "deleted_at": {
+                    "description": "DeletedAt is a time when outer model was deleted.",
+                    "type": "string",
+                    "example": "2024-02-26T11:02:28.069911Z"
+                },
                 "direction": {
                     "description": "TransactionDirection is a transaction direction (incoming/outgoing).",
                     "type": "string",
@@ -4214,13 +4288,16 @@ const docTemplate = `{
                     "type": "string",
                     "example": "01d0d0067652f684c6acb3683763f353fce55f6496521c7d99e71e1d27e53f5c"
                 },
-                "model": {
-                    "description": "Model is a common model that contains common fields for all models.",
-                    "allOf": [
-                        {
-                            "$ref": "#/definitions/common.OldModel"
-                        }
-                    ]
+                "metadata": {
+                    "description": "Metadata is a metadata map of outer model.",
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "string"
+                    },
+                    "example": {
+                        "key": "value",
+                        "key2": "value2"
+                    }
                 },
                 "number_of_inputs": {
                     "description": "NumberOfInputs is a number of transaction inputs.",
@@ -4257,6 +4334,11 @@ const docTemplate = `{
                     "description": "TotalValue is a total input value.",
                     "type": "integer",
                     "example": 51
+                },
+                "updated_at": {
+                    "description": "UpdatedAt is a time when outer model was updated.",
+                    "type": "string",
+                    "example": "2024-02-26T11:01:28.069911Z"
                 },
                 "xpub_in_ids": {
                     "description": "XpubInIDs is a slice of xpub input ids.",
@@ -4380,6 +4462,16 @@ const docTemplate = `{
         "models.TransactionInput": {
             "type": "object",
             "properties": {
+                "created_at": {
+                    "description": "CreatedAt is a time when outer model was created.",
+                    "type": "string",
+                    "example": "2024-02-26T11:00:28.069911Z"
+                },
+                "deleted_at": {
+                    "description": "DeletedAt is a time when outer model was deleted.",
+                    "type": "string",
+                    "example": "2024-02-26T11:02:28.069911Z"
+                },
                 "destination": {
                     "description": "Destination is a pointer to a destination object.",
                     "allOf": [
@@ -4398,13 +4490,16 @@ const docTemplate = `{
                     "type": "string",
                     "example": "c706a448748d398d542cf4dfad797c9a4b123ebb72dbfb8b27f3d0f1dda99b58"
                 },
-                "model": {
-                    "description": "Model is a common model that contains common fields for all models.",
-                    "allOf": [
-                        {
-                            "$ref": "#/definitions/common.OldModel"
-                        }
-                    ]
+                "metadata": {
+                    "description": "Metadata is a metadata map of outer model.",
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "string"
+                    },
+                    "example": {
+                        "key": "value",
+                        "key2": "value2"
+                    }
                 },
                 "output_index": {
                     "description": "OutputIndex is a output index that utxo points to.",
@@ -4448,6 +4543,11 @@ const docTemplate = `{
                     "description": "Type is a utxo type.",
                     "type": "string",
                     "example": "pubkeyhash"
+                },
+                "updated_at": {
+                    "description": "UpdatedAt is a time when outer model was updated.",
+                    "type": "string",
+                    "example": "2024-02-26T11:01:28.069911Z"
                 },
                 "xpub_id": {
                     "description": "XpubID is a utxo related xpub id.",
@@ -4515,6 +4615,16 @@ const docTemplate = `{
         "models.Utxo": {
             "type": "object",
             "properties": {
+                "created_at": {
+                    "description": "CreatedAt is a time when outer model was created.",
+                    "type": "string",
+                    "example": "2024-02-26T11:00:28.069911Z"
+                },
+                "deleted_at": {
+                    "description": "DeletedAt is a time when outer model was deleted.",
+                    "type": "string",
+                    "example": "2024-02-26T11:02:28.069911Z"
+                },
                 "draft_id": {
                     "description": "DraftID is a utxo transaction related draft id.",
                     "type": "string",
@@ -4525,13 +4635,16 @@ const docTemplate = `{
                     "type": "string",
                     "example": "c706a448748d398d542cf4dfad797c9a4b123ebb72dbfb8b27f3d0f1dda99b58"
                 },
-                "model": {
-                    "description": "Model is a common model that contains common fields for all models.",
-                    "allOf": [
-                        {
-                            "$ref": "#/definitions/common.OldModel"
-                        }
-                    ]
+                "metadata": {
+                    "description": "Metadata is a metadata map of outer model.",
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "string"
+                    },
+                    "example": {
+                        "key": "value",
+                        "key2": "value2"
+                    }
                 },
                 "output_index": {
                     "description": "OutputIndex is a output index that utxo points to.",
@@ -4576,6 +4689,11 @@ const docTemplate = `{
                     "type": "string",
                     "example": "pubkeyhash"
                 },
+                "updated_at": {
+                    "description": "UpdatedAt is a time when outer model was updated.",
+                    "type": "string",
+                    "example": "2024-02-26T11:01:28.069911Z"
+                },
                 "xpub_id": {
                     "description": "XpubID is a utxo related xpub id.",
                     "type": "string",
@@ -4601,23 +4719,36 @@ const docTemplate = `{
         "models.Xpub": {
             "type": "object",
             "properties": {
+                "created_at": {
+                    "description": "CreatedAt is a time when outer model was created.",
+                    "type": "string",
+                    "example": "2024-02-26T11:00:28.069911Z"
+                },
                 "current_balance": {
                     "description": "CurrentBalance is a xpub's current balance.",
                     "type": "integer",
                     "example": 1234
+                },
+                "deleted_at": {
+                    "description": "DeletedAt is a time when outer model was deleted.",
+                    "type": "string",
+                    "example": "2024-02-26T11:02:28.069911Z"
                 },
                 "id": {
                     "description": "ID is a hash of the xpub.",
                     "type": "string",
                     "example": "bb8593f85ef8056a77026ad415f02128f3768906de53e9e8bf8749fe2d66cf50"
                 },
-                "model": {
-                    "description": "Model is a common model that contains common fields for all models.",
-                    "allOf": [
-                        {
-                            "$ref": "#/definitions/common.OldModel"
-                        }
-                    ]
+                "metadata": {
+                    "description": "Metadata is a metadata map of outer model.",
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "string"
+                    },
+                    "example": {
+                        "key": "value",
+                        "key2": "value2"
+                    }
                 },
                 "next_external_num": {
                     "description": "NextExternalNum is the index derivation number use to generate NEXT external xPub (external xPub are used for address destinations).",
@@ -4628,6 +4759,11 @@ const docTemplate = `{
                     "description": "NextInternalNum is the index derivation number use to generate NEXT internal xPub (internal xPub are used for change destinations).",
                     "type": "integer",
                     "example": 0
+                },
+                "updated_at": {
+                    "description": "UpdatedAt is a time when outer model was updated.",
+                    "type": "string",
+                    "example": "2024-02-26T11:01:28.069911Z"
                 }
             }
         },
@@ -4636,6 +4772,20 @@ const docTemplate = `{
             "enum": [
                 -9223372036854775808,
                 9223372036854775807,
+                1,
+                1000,
+                1000000,
+                1000000000,
+                60000000000,
+                3600000000000,
+                -9223372036854775808,
+                9223372036854775807,
+                1,
+                1000,
+                1000000,
+                1000000000,
+                60000000000,
+                3600000000000,
                 1,
                 1000,
                 1000000,
@@ -4652,6 +4802,20 @@ const docTemplate = `{
             "x-enum-varnames": [
                 "minDuration",
                 "maxDuration",
+                "Nanosecond",
+                "Microsecond",
+                "Millisecond",
+                "Second",
+                "Minute",
+                "Hour",
+                "minDuration",
+                "maxDuration",
+                "Nanosecond",
+                "Microsecond",
+                "Millisecond",
+                "Second",
+                "Minute",
+                "Hour",
                 "Nanosecond",
                 "Microsecond",
                 "Millisecond",

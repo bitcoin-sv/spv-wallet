@@ -1,11 +1,13 @@
 package models
 
-import "github.com/bitcoin-sv/spv-wallet/models/common"
+import (
+	"github.com/bitcoin-sv/spv-wallet/models/common"
+)
 
 // Destination is a model that represents a destination - registered in a spv-wallet with xpub.
 type Destination struct {
 	// Model is a common model that contains common fields for all models.
-	Model common.OldModel
+	common.Model
 
 	// ID is a destination id which is the hash of the LockingScript.
 	ID string `json:"id" example:"82a5d848f997819a478b05fb713208d7f3aa66da5ba00953b9845fb1701f9b98"`

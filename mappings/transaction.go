@@ -13,7 +13,7 @@ func MapToTransactionContract(t *engine.Transaction) *models.Transaction {
 	}
 
 	model := models.Transaction{
-		Model:                *common.MapToOldContract(&t.Model),
+		Model:                *common.MapToContract(&t.Model),
 		ID:                   t.ID,
 		Hex:                  t.Hex,
 		XpubInIDs:            t.XpubInIDs,
@@ -42,7 +42,7 @@ func MapToTransactionContractForAdmin(t *engine.Transaction) *models.Transaction
 	}
 
 	model := models.Transaction{
-		Model:           *common.MapToOldContract(&t.Model),
+		Model:           *common.MapToContract(&t.Model),
 		ID:              t.ID,
 		Hex:             t.Hex,
 		XpubInIDs:       t.XpubInIDs,
@@ -94,7 +94,7 @@ func MapTransactionModelToEngine(t *models.Transaction) *engine.Transaction {
 	}
 
 	return &engine.Transaction{
-		Model:           *common.MapOldContactToModel(&t.Model),
+		Model:           *common.MapToModel(&t.Model),
 		TransactionBase: engine.TransactionBase{ID: t.ID, Hex: t.Hex},
 		XpubInIDs:       t.XpubInIDs,
 		XpubOutIDs:      t.XpubOutIDs,
@@ -285,7 +285,7 @@ func MapToDraftTransactionContract(tx *engine.DraftTransaction) *models.DraftTra
 	}
 
 	return &models.DraftTransaction{
-		Model:         *common.MapToOldContract(&tx.Model),
+		Model:         *common.MapToContract(&tx.Model),
 		ID:            tx.ID,
 		Hex:           tx.Hex,
 		XpubID:        tx.XpubID,

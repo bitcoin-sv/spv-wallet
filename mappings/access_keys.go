@@ -22,7 +22,7 @@ func MapToOldAccessKeyContract(ac *engine.AccessKey) *models.AccessKey {
 	}
 
 	return &models.AccessKey{
-		Model:     *common.MapToOldContract(&ac.Model),
+		Model:     *common.MapToContract(&ac.Model),
 		ID:        ac.ID,
 		XpubID:    ac.XpubID,
 		RevokedAt: revokedAt,

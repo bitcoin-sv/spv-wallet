@@ -164,29 +164,6 @@ definitions:
     - SeenInOrphanMempool
     - Confirmed
     - Rejected
-  common.OldModel:
-    properties:
-      created_at:
-        description: CreatedAt is a time when outer model was created.
-        example: "2024-02-26T11:00:28.069911Z"
-        type: string
-      deleted_at:
-        description: DeletedAt is a time when outer model was deleted.
-        example: "2024-02-26T11:02:28.069911Z"
-        type: string
-      metadata:
-        additionalProperties:
-          type: string
-        description: Metadata is a metadata map of outer model.
-        example:
-          key: value
-          key2: value2
-        type: object
-      updated_at:
-        description: UpdatedAt is a time when outer model was updated.
-        example: "2024-02-26T11:01:28.069911Z"
-        type: string
-    type: object
   contacts.UpsertContact:
     properties:
       fullName:
@@ -976,6 +953,14 @@ definitions:
     type: object
   models.AccessKey:
     properties:
+      created_at:
+        description: CreatedAt is a time when outer model was created.
+        example: "2024-02-26T11:00:28.069911Z"
+        type: string
+      deleted_at:
+        description: DeletedAt is a time when outer model was deleted.
+        example: "2024-02-26T11:02:28.069911Z"
+        type: string
       id:
         description: ID is an hash of the compressed public key.
         example: 874b86d6fd1d6c85a857e73180164203d8d23211bfd9d04d210f9f7fde5b82d8
@@ -984,13 +969,21 @@ definitions:
         description: Key is a string representation of an access key.
         example: 3fd870d6bf1725f04084cf31209c04be5bd9bed001a390ad3bc632a55a3ee078
         type: string
-      model:
-        allOf:
-        - $ref: '#/definitions/common.OldModel'
-        description: Model is a common model that contains common fields for all models.
+      metadata:
+        additionalProperties:
+          type: string
+        description: Metadata is a metadata map of outer model.
+        example:
+          key: value
+          key2: value2
+        type: object
       revoked_at:
         description: RevokedAt is a time when access key was revoked.
         example: "2024-02-26T11:02:28.069911Z"
+        type: string
+      updated_at:
+        description: UpdatedAt is a time when outer model was updated.
+        example: "2024-02-26T11:01:28.069911Z"
         type: string
       xpub_id:
         description: XpubID is an access key's xpub related id.
@@ -1029,6 +1022,14 @@ definitions:
     type: object
   models.Contact:
     properties:
+      created_at:
+        description: CreatedAt is a time when outer model was created.
+        example: "2024-02-26T11:00:28.069911Z"
+        type: string
+      deleted_at:
+        description: DeletedAt is a time when outer model was deleted.
+        example: "2024-02-26T11:02:28.069911Z"
+        type: string
       fullName:
         description: FullName is name which could be shown instead of whole paymail
           address.
@@ -1038,8 +1039,14 @@ definitions:
         description: ID is a unique identifier of contact.
         example: 68af358bde7d8641621c7dd3de1a276c9a62cfa9e2d0740494519f1ba61e2f4a
         type: string
-      model:
-        $ref: '#/definitions/common.OldModel'
+      metadata:
+        additionalProperties:
+          type: string
+        description: Metadata is a metadata map of outer model.
+        example:
+          key: value
+          key2: value2
+        type: object
       paymail:
         description: Paymail is a paymail address related to contact.
         example: test@spv-wallet.com
@@ -1053,6 +1060,10 @@ definitions:
         - $ref: '#/definitions/models.ContactStatus'
         description: Status is a contact's current status.
         example: unconfirmed
+      updated_at:
+        description: UpdatedAt is a time when outer model was updated.
+        example: "2024-02-26T11:01:28.069911Z"
+        type: string
     type: object
   models.ContactStatus:
     enum:
@@ -1076,6 +1087,14 @@ definitions:
         description: Chain is a destination's chain representation.
         example: 0
         type: integer
+      created_at:
+        description: CreatedAt is a time when outer model was created.
+        example: "2024-02-26T11:00:28.069911Z"
+        type: string
+      deleted_at:
+        description: DeletedAt is a time when outer model was deleted.
+        example: "2024-02-26T11:02:28.069911Z"
+        type: string
       draft_id:
         description: DraftID is a destination's draft id.
         example: b356f7fa00cd3f20cce6c21d704cd13e871d28d714a5ebd0532f5a0e0cde63f7
@@ -1088,10 +1107,14 @@ definitions:
         description: LockingScript is a destination's locking script.
         example: 76a9147b05764a97f3b4b981471492aa703b188e45979b88ac
         type: string
-      model:
-        allOf:
-        - $ref: '#/definitions/common.OldModel'
-        description: Model is a common model that contains common fields for all models.
+      metadata:
+        additionalProperties:
+          type: string
+        description: Metadata is a metadata map of outer model.
+        example:
+          key: value
+          key2: value2
+        type: object
       num:
         description: Num is a destination's num representation.
         example: 0
@@ -1105,6 +1128,10 @@ definitions:
         description: Type is a destination's type.
         example: pubkeyhash
         type: string
+      updated_at:
+        description: UpdatedAt is a time when outer model was updated.
+        example: "2024-02-26T11:01:28.069911Z"
+        type: string
       xpub_id:
         description: XpubID is a destination's xpub related id used to register destination.
         example: bb8593f85ef8056a77026ad415f02128f3768906de53e9e8bf8749fe2d66cf50
@@ -1116,6 +1143,14 @@ definitions:
         allOf:
         - $ref: '#/definitions/models.TransactionConfig'
         description: Configuration contains draft transaction configuration.
+      created_at:
+        description: CreatedAt is a time when outer model was created.
+        example: "2024-02-26T11:00:28.069911Z"
+        type: string
+      deleted_at:
+        description: DeletedAt is a time when outer model was deleted.
+        example: "2024-02-26T11:02:28.069911Z"
+        type: string
       expires_at:
         description: ExpiresAt is a time when draft transaction expired.
         example: "2024-02-26T11:00:28.069911Z"
@@ -1132,13 +1167,21 @@ definitions:
         description: ID is a draft transaction id.
         example: b356f7fa00cd3f20cce6c21d704cd13e871d28d714a5ebd0532f5a0e0cde63f7
         type: string
-      model:
-        allOf:
-        - $ref: '#/definitions/common.OldModel'
-        description: Model is a common model that contains common fields for all models.
+      metadata:
+        additionalProperties:
+          type: string
+        description: Metadata is a metadata map of outer model.
+        example:
+          key: value
+          key2: value2
+        type: object
       status:
         description: Status is a draft transaction lastly monitored status.
         example: complete
+        type: string
+      updated_at:
+        description: UpdatedAt is a time when outer model was updated.
+        example: "2024-02-26T11:01:28.069911Z"
         type: string
       xpub_id:
         description: XpubID is a draft transaction's xpub used to sign transaction.
@@ -1220,6 +1263,14 @@ definitions:
         description: Avatar is a paymail address's avatar.
         example: https://spvwallet.com/avatar.png
         type: string
+      created_at:
+        description: CreatedAt is a time when outer model was created.
+        example: "2024-02-26T11:00:28.069911Z"
+        type: string
+      deleted_at:
+        description: DeletedAt is a time when outer model was deleted.
+        example: "2024-02-26T11:02:28.069911Z"
+        type: string
       domain:
         description: Domain is a paymail address's domain (second part of paymail).
         example: spvwallet.com
@@ -1228,13 +1279,21 @@ definitions:
         description: ID is a paymail address id.
         example: c0ba4a52c89279268476a141be7569200cff2ca4892512b07ca75c25a95c16cd
         type: string
-      model:
-        allOf:
-        - $ref: '#/definitions/common.OldModel'
-        description: Model is a common model that contains common fields for all models.
+      metadata:
+        additionalProperties:
+          type: string
+        description: Metadata is a metadata map of outer model.
+        example:
+          key: value
+          key2: value2
+        type: object
       public_name:
         description: PublicName is a paymail address's public name.
         example: Test User
+        type: string
+      updated_at:
+        description: UpdatedAt is a time when outer model was updated.
+        example: "2024-02-26T11:01:28.069911Z"
         type: string
       xpub_id:
         description: XpubID is a paymail address's xpub related id used to register
@@ -1352,6 +1411,14 @@ definitions:
         description: BlockHeight is a block height that transaction is in.
         example: 833505
         type: integer
+      created_at:
+        description: CreatedAt is a time when outer model was created.
+        example: "2024-02-26T11:00:28.069911Z"
+        type: string
+      deleted_at:
+        description: DeletedAt is a time when outer model was deleted.
+        example: "2024-02-26T11:02:28.069911Z"
+        type: string
       direction:
         description: TransactionDirection is a transaction direction (incoming/outgoing).
         example: outgoing
@@ -1372,10 +1439,14 @@ definitions:
         description: ID is a transaction id.
         example: 01d0d0067652f684c6acb3683763f353fce55f6496521c7d99e71e1d27e53f5c
         type: string
-      model:
-        allOf:
-        - $ref: '#/definitions/common.OldModel'
-        description: Model is a common model that contains common fields for all models.
+      metadata:
+        additionalProperties:
+          type: string
+        description: Metadata is a metadata map of outer model.
+        example:
+          key: value
+          key2: value2
+        type: object
       number_of_inputs:
         description: NumberOfInputs is a number of transaction inputs.
         example: 3
@@ -1405,6 +1476,10 @@ definitions:
         description: TotalValue is a total input value.
         example: 51
         type: integer
+      updated_at:
+        description: UpdatedAt is a time when outer model was updated.
+        example: "2024-02-26T11:01:28.069911Z"
+        type: string
       xpub_in_ids:
         description: XpubInIDs is a slice of xpub input ids.
         example:
@@ -1486,6 +1561,14 @@ definitions:
     type: object
   models.TransactionInput:
     properties:
+      created_at:
+        description: CreatedAt is a time when outer model was created.
+        example: "2024-02-26T11:00:28.069911Z"
+        type: string
+      deleted_at:
+        description: DeletedAt is a time when outer model was deleted.
+        example: "2024-02-26T11:02:28.069911Z"
+        type: string
       destination:
         allOf:
         - $ref: '#/definitions/models.Destination'
@@ -1499,10 +1582,14 @@ definitions:
           index.
         example: c706a448748d398d542cf4dfad797c9a4b123ebb72dbfb8b27f3d0f1dda99b58
         type: string
-      model:
-        allOf:
-        - $ref: '#/definitions/common.OldModel'
-        description: Model is a common model that contains common fields for all models.
+      metadata:
+        additionalProperties:
+          type: string
+        description: Metadata is a metadata map of outer model.
+        example:
+          key: value
+          key2: value2
+        type: object
       output_index:
         description: OutputIndex is a output index that utxo points to.
         example: 0
@@ -1535,6 +1622,10 @@ definitions:
       type:
         description: Type is a utxo type.
         example: pubkeyhash
+        type: string
+      updated_at:
+        description: UpdatedAt is a time when outer model was updated.
+        example: "2024-02-26T11:01:28.069911Z"
         type: string
       xpub_id:
         description: XpubID is a utxo related xpub id.
@@ -1581,6 +1672,14 @@ definitions:
     type: object
   models.Utxo:
     properties:
+      created_at:
+        description: CreatedAt is a time when outer model was created.
+        example: "2024-02-26T11:00:28.069911Z"
+        type: string
+      deleted_at:
+        description: DeletedAt is a time when outer model was deleted.
+        example: "2024-02-26T11:02:28.069911Z"
+        type: string
       draft_id:
         description: DraftID is a utxo transaction related draft id.
         example: b356f7fa00cd3f20cce6c21d704cd13e871d28d714a5ebd0532f5a0e0cde63f7
@@ -1590,10 +1689,14 @@ definitions:
           index.
         example: c706a448748d398d542cf4dfad797c9a4b123ebb72dbfb8b27f3d0f1dda99b58
         type: string
-      model:
-        allOf:
-        - $ref: '#/definitions/common.OldModel'
-        description: Model is a common model that contains common fields for all models.
+      metadata:
+        additionalProperties:
+          type: string
+        description: Metadata is a metadata map of outer model.
+        example:
+          key: value
+          key2: value2
+        type: object
       output_index:
         description: OutputIndex is a output index that utxo points to.
         example: 0
@@ -1627,6 +1730,10 @@ definitions:
         description: Type is a utxo type.
         example: pubkeyhash
         type: string
+      updated_at:
+        description: UpdatedAt is a time when outer model was updated.
+        example: "2024-02-26T11:01:28.069911Z"
+        type: string
       xpub_id:
         description: XpubID is a utxo related xpub id.
         example: bb8593f85ef8056a77026ad415f02128f3768906de53e9e8bf8749fe2d66cf50
@@ -1645,18 +1752,30 @@ definitions:
     type: object
   models.Xpub:
     properties:
+      created_at:
+        description: CreatedAt is a time when outer model was created.
+        example: "2024-02-26T11:00:28.069911Z"
+        type: string
       current_balance:
         description: CurrentBalance is a xpub's current balance.
         example: 1234
         type: integer
+      deleted_at:
+        description: DeletedAt is a time when outer model was deleted.
+        example: "2024-02-26T11:02:28.069911Z"
+        type: string
       id:
         description: ID is a hash of the xpub.
         example: bb8593f85ef8056a77026ad415f02128f3768906de53e9e8bf8749fe2d66cf50
         type: string
-      model:
-        allOf:
-        - $ref: '#/definitions/common.OldModel'
-        description: Model is a common model that contains common fields for all models.
+      metadata:
+        additionalProperties:
+          type: string
+        description: Metadata is a metadata map of outer model.
+        example:
+          key: value
+          key2: value2
+        type: object
       next_external_num:
         description: NextExternalNum is the index derivation number use to generate
           NEXT external xPub (external xPub are used for address destinations).
@@ -1667,11 +1786,29 @@ definitions:
           NEXT internal xPub (internal xPub are used for change destinations).
         example: 0
         type: integer
+      updated_at:
+        description: UpdatedAt is a time when outer model was updated.
+        example: "2024-02-26T11:01:28.069911Z"
+        type: string
     type: object
   time.Duration:
     enum:
     - -9223372036854775808
     - 9223372036854775807
+    - 1
+    - 1000
+    - 1000000
+    - 1000000000
+    - 60000000000
+    - 3600000000000
+    - -9223372036854775808
+    - 9223372036854775807
+    - 1
+    - 1000
+    - 1000000
+    - 1000000000
+    - 60000000000
+    - 3600000000000
     - 1
     - 1000
     - 1000000
@@ -1688,6 +1825,20 @@ definitions:
     x-enum-varnames:
     - minDuration
     - maxDuration
+    - Nanosecond
+    - Microsecond
+    - Millisecond
+    - Second
+    - Minute
+    - Hour
+    - minDuration
+    - maxDuration
+    - Nanosecond
+    - Microsecond
+    - Millisecond
+    - Second
+    - Minute
+    - Hour
     - Nanosecond
     - Microsecond
     - Millisecond
