@@ -1916,6 +1916,21 @@ info:
   title: SPV Wallet
   version: v0.12.0
 paths:
+  /api/v1/configs/shared:
+    get:
+      description: Get shared config
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Shared configuration
+          schema:
+            $ref: '#/definitions/models.SharedConfig'
+      security:
+      - x-auth-xpub: []
+      summary: Get shared config
+      tags:
+      - Configurations
   /api/v1/users/current:
     get:
       description: Get current user information
@@ -3073,7 +3088,9 @@ paths:
       - Destinations
   /v1/shared-config:
     get:
-      description: Get shared config
+      deprecated: true
+      description: This endpoint has been deprecated. Use (GET) /api/v1/configs/shared
+        instead.
       produces:
       - application/json
       responses:
@@ -3083,9 +3100,9 @@ paths:
             $ref: '#/definitions/models.SharedConfig'
       security:
       - x-auth-xpub: []
-      summary: Get shared config
+      summary: Get shared config - Use (GET) /api/v1/configs/shared instead.
       tags:
-      - Shared-config
+      - Configurations
   /v1/transaction:
     get:
       description: Get transaction by id
