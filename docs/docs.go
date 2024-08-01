@@ -40,6 +40,73 @@ const docTemplate = `{
                 }
             }
         },
+        "/api/v1/users/current": {
+            "get": {
+                "security": [
+                    {
+                        "x-auth-xpub": []
+                    }
+                ],
+                "description": "Get current user information",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Users"
+                ],
+                "summary": "Get current user information",
+                "responses": {
+                    "200": {
+                        "description": "xPub associated with the given xPub from auth header",
+                        "schema": {
+                            "$ref": "#/definitions/models.Xpub"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error - Error while fetching xPub"
+                    }
+                }
+            },
+            "patch": {
+                "security": [
+                    {
+                        "x-auth-xpub": []
+                    }
+                ],
+                "description": "Update current user information",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Users"
+                ],
+                "summary": "Update current user information",
+                "parameters": [
+                    {
+                        "description": " ",
+                        "name": "Metadata",
+                        "in": "body",
+                        "schema": {
+                            "$ref": "#/definitions/engine.Metadata"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Updated xPub",
+                        "schema": {
+                            "$ref": "#/definitions/models.Xpub"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request - Error while parsing Metadata from request body"
+                    },
+                    "500": {
+                        "description": "Internal Server Error - Error while updating xPub"
+                    }
+                }
+            }
+        },
         "/transaction/broadcast/callback": {
             "post": {
                 "security": [
@@ -2172,14 +2239,15 @@ const docTemplate = `{
                         "x-auth-xpub": []
                     }
                 ],
-                "description": "Get xPub",
+                "description": "This endpoint has been deprecated. Use (GET) /api/v1/users/current instead.",
                 "produces": [
                     "application/json"
                 ],
                 "tags": [
-                    "xPub"
+                    "Users"
                 ],
-                "summary": "Get xPub",
+                "summary": "Get current user information - Use (GET) /api/v1/users/current instead.",
+                "deprecated": true,
                 "responses": {
                     "200": {
                         "description": "xPub associated with the given xPub from auth header",
@@ -2196,19 +2264,17 @@ const docTemplate = `{
                 "security": [
                     {
                         "x-auth-xpub": []
-                    },
-                    {
-                        "bux-auth-xpub": []
                     }
                 ],
-                "description": "Update xPub",
+                "description": "This endpoint has been deprecated. Use (PATCH) /api/v1/users/current instead.",
                 "produces": [
                     "application/json"
                 ],
                 "tags": [
-                    "xPub"
+                    "Users"
                 ],
-                "summary": "Update xPub",
+                "summary": "Update current user information - Use (PATCH) /api/v1/users/current instead.",
+                "deprecated": true,
                 "parameters": [
                     {
                         "description": " ",
@@ -4678,14 +4744,11 @@ const docTemplate = `{
                 1000000000,
                 60000000000,
                 3600000000000,
-                -9223372036854775808,
-                9223372036854775807,
                 1,
                 1000,
                 1000000,
                 1000000000,
                 60000000000,
-                3600000000000,
                 1,
                 1000,
                 1000000,
@@ -4701,14 +4764,11 @@ const docTemplate = `{
                 "Second",
                 "Minute",
                 "Hour",
-                "minDuration",
-                "maxDuration",
                 "Nanosecond",
                 "Microsecond",
                 "Millisecond",
                 "Second",
                 "Minute",
-                "Hour",
                 "Nanosecond",
                 "Microsecond",
                 "Millisecond",

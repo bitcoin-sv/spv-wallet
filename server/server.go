@@ -15,8 +15,8 @@ import (
 	"github.com/bitcoin-sv/spv-wallet/actions/destinations"
 	"github.com/bitcoin-sv/spv-wallet/actions/sharedconfig"
 	"github.com/bitcoin-sv/spv-wallet/actions/transactions"
+	"github.com/bitcoin-sv/spv-wallet/actions/users"
 	"github.com/bitcoin-sv/spv-wallet/actions/utxos"
-	"github.com/bitcoin-sv/spv-wallet/actions/xpubs"
 	"github.com/bitcoin-sv/spv-wallet/config"
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/bitcoin-sv/spv-wallet/logging"
@@ -130,7 +130,8 @@ func SetupServerRoutes(appConfig *config.AppConfig, services *config.AppServices
 	destinationBasicRoutes, destinationAPIRoutes := destinations.NewHandler(appConfig, services)
 	transactionBasicRoutes, transactionAPIRoutes, transactionCallbackRoutes := transactions.NewHandler(appConfig, services)
 	utxoAPIRoutes := utxos.NewHandler(appConfig, services)
-	xPubAPIRoutes := xpubs.NewHandler(appConfig, services)
+	oldUsersAPIRoutes := users.OldUsersHandler(appConfig, services)
+	usersAPIRoutes := users.NewHandler(appConfig, services)
 	oldSharedConfigRoutes := sharedconfig.OldSharedConfigHandler(appConfig, services)
 	sharedConfigRoutes := sharedconfig.NewHandler(appConfig, services)
 
@@ -150,8 +151,9 @@ func SetupServerRoutes(appConfig *config.AppConfig, services *config.AppServices
 		transactionCallbackRoutes,
 		// Utxo routes
 		utxoAPIRoutes,
-		// xPub routes
-		xPubAPIRoutes,
+		// Users routes
+		oldUsersAPIRoutes,
+		usersAPIRoutes,
 		// Shared Config routes
 		oldSharedConfigRoutes,
 		sharedConfigRoutes,
