@@ -39,7 +39,7 @@ func (a *Action) xpubsCreate(c *gin.Context) {
 		return
 	}
 
-	contract := mappings.MapToXpubContract(xPub)
+	contract := mappings.MapToOldXpubContract(xPub)
 	c.JSON(http.StatusCreated, contract)
 }
 
@@ -75,7 +75,7 @@ func (a *Action) xpubsSearch(c *gin.Context) {
 
 	xpubContracts := make([]*models.Xpub, 0)
 	for _, xpub := range xpubs {
-		xpubContracts = append(xpubContracts, mappings.MapToXpubContract(xpub))
+		xpubContracts = append(xpubContracts, mappings.MapToOldXpubContract(xpub))
 	}
 
 	c.JSON(http.StatusOK, xpubContracts)

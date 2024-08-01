@@ -1,4 +1,4 @@
-package xpubs
+package users
 
 import (
 	"testing"
@@ -17,6 +17,9 @@ func (ts *TestSuite) TestXPubRegisterRoutes() {
 		}{
 			{"GET", "/" + config.APIVersion + "/xpub"},
 			{"PATCH", "/" + config.APIVersion + "/xpub"},
+
+			{"GET", "/api/" + config.APIVersion + "/users/current"},
+			{"PATCH", "/api/" + config.APIVersion + "/users/current"},
 		}
 
 		ts.Router.Routes()
