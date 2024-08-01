@@ -348,4 +348,5 @@ func (m *Xpub) Migrate(client datastore.ClientInterface) error {
 func (m *Xpub) RemovePrivateData() {
 	m.NextExternalNum = 0
 	m.NextInternalNum = 0
+	m.Metadata = nil
 }
