@@ -23,7 +23,8 @@ import (
 // @DeprecatedRouter  /v1/access-key [get]
 // @Security	x-auth-xpub
 func (a *Action) oldGet(c *gin.Context) {
-	a.getHelper(c, true)
+	id := c.Query("id")
+	a.getHelper(c, id, true)
 }
 
 // get will get an existing model
@@ -40,13 +41,13 @@ func (a *Action) oldGet(c *gin.Context) {
 // @Router		/api/v1/users/current/keys/{id} [get]
 // @Security	x-auth-xpub
 func (a *Action) get(c *gin.Context) {
-	a.getHelper(c, false)
+	id := c.Params.ByName("id")
+	a.getHelper(c, id, false)
 }
 
-func (a *Action) getHelper(c *gin.Context, snakeCase bool) {
+func (a *Action) getHelper(c *gin.Context, id string, snakeCase bool) {
 	reqXPubID := c.GetString(auth.ParamXPubHashKey)
 
-	id := c.Params.ByName("id")
 	if id == "" {
 		spverrors.ErrorResponse(c, spverrors.ErrMissingFieldID, a.Services.Logger)
 		return
