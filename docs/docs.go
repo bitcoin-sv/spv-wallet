@@ -15,6 +15,31 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
+        "/api/v1/configs/shared": {
+            "get": {
+                "security": [
+                    {
+                        "x-auth-xpub": []
+                    }
+                ],
+                "description": "Get shared config",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Configurations"
+                ],
+                "summary": "Get shared config",
+                "responses": {
+                    "200": {
+                        "description": "Shared configuration",
+                        "schema": {
+                            "$ref": "#/definitions/models.SharedConfig"
+                        }
+                    }
+                }
+            }
+        },
         "/api/v1/users/current": {
             "get": {
                 "security": [
@@ -2077,14 +2102,15 @@ const docTemplate = `{
                         "x-auth-xpub": []
                     }
                 ],
-                "description": "Get shared config",
+                "description": "This endpoint has been deprecated. Use (GET) /api/v1/configs/shared instead.",
                 "produces": [
                     "application/json"
                 ],
                 "tags": [
-                    "Shared-config"
+                    "Configurations"
                 ],
-                "summary": "Get shared config",
+                "summary": "Get shared config - Use (GET) /api/v1/configs/shared instead.",
+                "deprecated": true,
                 "responses": {
                     "200": {
                         "description": "Shared configuration",

@@ -132,6 +132,7 @@ func SetupServerRoutes(appConfig *config.AppConfig, services *config.AppServices
 	utxoAPIRoutes := utxos.NewHandler(appConfig, services)
 	oldUsersAPIRoutes := users.OldUsersHandler(appConfig, services)
 	usersAPIRoutes := users.NewHandler(appConfig, services)
+	oldSharedConfigRoutes := sharedconfig.OldSharedConfigHandler(appConfig, services)
 	sharedConfigRoutes := sharedconfig.NewHandler(appConfig, services)
 
 	routes := []interface{}{
@@ -154,6 +155,7 @@ func SetupServerRoutes(appConfig *config.AppConfig, services *config.AppServices
 		oldUsersAPIRoutes,
 		usersAPIRoutes,
 		// Shared Config routes
+		oldSharedConfigRoutes,
 		sharedConfigRoutes,
 	}
 
