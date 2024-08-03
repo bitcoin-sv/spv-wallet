@@ -12,7 +12,7 @@ type Action struct {
 	actions.Action
 }
 
-// NewHandler creates the specific package routes
+// OldContactsHandler creates the specific package routes
 func OldContactsHandler(appConfig *config.AppConfig, services *config.AppServices) routes.OldAPIEndpointsFunc {
 	action := &Action{actions.Action{AppConfig: appConfig, Services: services}}
 
@@ -31,7 +31,7 @@ func OldContactsHandler(appConfig *config.AppConfig, services *config.AppService
 	return apiEndpoints
 }
 
-// NewContactsHandler creates the specific package routes
+// NewHandler creates the specific package routes
 func NewHandler(appConfig *config.AppConfig, services *config.AppServices) (routes.APIEndpointsFunc, routes.APIEndpointsFunc) {
 	action := &Action{actions.Action{AppConfig: appConfig, Services: services}}
 
