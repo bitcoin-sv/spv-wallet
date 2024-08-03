@@ -1,13 +1,14 @@
 package contacts
 
 import (
+	"net/http"
+
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/bitcoin-sv/spv-wallet/server/auth"
 	"github.com/gin-gonic/gin"
-	"net/http"
 )
 
-// confirm will confirm contact request
+// oldConfirm will confirm contact request
 // Confirm contact godoc
 // @Summary		Confirm contact - Use (POST) /v1/contacts/{paymail}/confirmation instead
 // @Description	This endpoint has been deprecated. Use (POST) /v1/contacts/{paymail}/confirmation instead
@@ -21,7 +22,7 @@ import (
 // @Router		/v1/contact/confirmed/{paymail} [PATCH]
 // @Security	x-auth-xpub
 // @Deprecated
-func (a *Action) confirm(c *gin.Context) {
+func (a *Action) oldConfirm(c *gin.Context) {
 	a.confirmContact(c)
 }
 

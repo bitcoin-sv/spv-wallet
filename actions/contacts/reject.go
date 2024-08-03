@@ -8,7 +8,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-// reject will reject contact request
+// oldReject will reject contact request
 // Reject contact godoc
 // @Summary		Reject contact
 // @Description	Reject contact. For contact with status "awaiting" delete contact
@@ -21,17 +21,8 @@ import (
 // @Failure		500	"Internal server error"
 // @Router		/v1/contact/rejected/{paymail} [PATCH]
 // @Security	x-auth-xpub
-func (a *Action) reject(c *gin.Context) {
-	reqXPubID := c.GetString(auth.ParamXPubHashKey)
-	paymail := c.Param("paymail")
-
-	err := a.Services.SpvWalletEngine.RejectContact(c, reqXPubID, paymail)
-
-	if err != nil {
-		spverrors.ErrorResponse(c, err, a.Services.Logger)
-		return
-	}
-	c.Status(http.StatusOK)
+func (a *Action) oldReject(c *gin.Context) {
+	a.rejectInvitation(c)
 }
 
 // rejectInvitation will reject contact request
@@ -48,5 +39,14 @@ func (a *Action) reject(c *gin.Context) {
 // @Router		/v1/invitations/{paymail} [DELETE]
 // @Security	x-auth-xpub
 func (a *Action) rejectInvitation(c *gin.Context) {
-	a.reject(c)
+	reqXPubID := c.GetString(auth.ParamXPubHashKey)
+	paymail := c.Param("paymail")
+
+	err := a.Services.SpvWalletEngine.RejectContact(c, reqXPubID, paymail)
+
+	if err != nil {
+		spverrors.ErrorResponse(c, err, a.Services.Logger)
+		return
+	}
+	c.Status(http.StatusOK)
 }

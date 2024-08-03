@@ -8,7 +8,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-// unconfirm will unconfirm contact request
+// oldUnconfirm will unconfirm contact request
 // Unconfirm contact godoc
 // @Summary		Unconfirm contact
 // @Description	Unconfirm contact. For contact with status "confirmed" change status to "unconfirmed"
@@ -21,17 +21,8 @@ import (
 // @Failure		500	"Internal server error"
 // @Router		/v1/contact/unconfirmed/{paymail} [PATCH]
 // @Security	x-auth-xpub
-func (a *Action) unconfirm(c *gin.Context) {
-	reqXPubID := c.GetString(auth.ParamXPubHashKey)
-	paymail := c.Param("paymail")
-
-	err := a.Services.SpvWalletEngine.UnconfirmContact(c, reqXPubID, paymail)
-
-	if err != nil {
-		spverrors.ErrorResponse(c, err, a.Services.Logger)
-		return
-	}
-	c.Status(http.StatusOK)
+func (a *Action) oldUnconfirm(c *gin.Context) {
+	a.unconfirmContact(c)
 }
 
 // unconfirmContact will unconfirm contact request
@@ -48,5 +39,14 @@ func (a *Action) unconfirm(c *gin.Context) {
 // @Router		/v1/contacts/{paymail}/non-confirmation [PATCH]
 // @Security	x-auth-xpub
 func (a *Action) unconfirmContact(c *gin.Context) {
-	a.unconfirm(c)
+	reqXPubID := c.GetString(auth.ParamXPubHashKey)
+	paymail := c.Param("paymail")
+
+	err := a.Services.SpvWalletEngine.UnconfirmContact(c, reqXPubID, paymail)
+
+	if err != nil {
+		spverrors.ErrorResponse(c, err, a.Services.Logger)
+		return
+	}
+	c.Status(http.StatusOK)
 }

@@ -8,7 +8,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-// accept will accept contact request
+// oldAccept will accept contact request
 // Accept contact godoc
 // @Summary		Accept contact
 // @Description	Accept contact. For contact with status "awaiting" change status to "unconfirmed"
@@ -21,18 +21,8 @@ import (
 // @Failure		500	"Internal server error"
 // @Router		/v1/contact/accepted/{paymail} [PATCH]
 // @Security	x-auth-xpub
-func (a *Action) accept(c *gin.Context) {
-	reqXPubID := c.GetString(auth.ParamXPubHashKey)
-	paymail := c.Param("paymail")
-
-	err := a.Services.SpvWalletEngine.AcceptContact(c, reqXPubID, paymail)
-
-	if err != nil {
-		spverrors.ErrorResponse(c, err, a.Services.Logger)
-		return
-	}
-
-	c.Status(http.StatusOK)
+func (a *Action) oldAccept(c *gin.Context) {
+	a.acceptInvitations(c)
 }
 
 // acceptInvitations will accept contact request
@@ -49,5 +39,15 @@ func (a *Action) accept(c *gin.Context) {
 // @Router		/v1/invitations/{paymail} [POST]
 // @Security	x-auth-xpub
 func (a *Action) acceptInvitations(c *gin.Context) {
-	a.accept(c)
+	reqXPubID := c.GetString(auth.ParamXPubHashKey)
+	paymail := c.Param("paymail")
+
+	err := a.Services.SpvWalletEngine.AcceptContact(c, reqXPubID, paymail)
+
+	if err != nil {
+		spverrors.ErrorResponse(c, err, a.Services.Logger)
+		return
+	}
+
+	c.Status(http.StatusOK)
 }
