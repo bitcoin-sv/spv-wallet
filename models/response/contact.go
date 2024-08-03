@@ -1,9 +1,6 @@
-package models
+package response
 
-import (
-	"github.com/bitcoin-sv/spv-wallet/models/common"
-	"github.com/bitcoin-sv/spv-wallet/models/response"
-)
+import "github.com/bitcoin-sv/spv-wallet/models/common"
 
 type CreateContactResponse struct {
 	Contact        *Contact          `json:"contact"`
@@ -11,7 +8,7 @@ type CreateContactResponse struct {
 }
 
 type Contact struct {
-	common.OldModel
+	common.Model
 
 	// ID is a unique identifier of contact.
 	ID string `json:"id" example:"68af358bde7d8641621c7dd3de1a276c9a62cfa9e2d0740494519f1ba61e2f4a"`
@@ -22,8 +19,17 @@ type Contact struct {
 	// PubKey is a public key related to contact (receiver).
 	PubKey string `json:"pubKey" example:"xpub661MyMwAqRbcGpZVrSHU..."`
 	// Status is a contact's current status.
-	Status response.ContactStatus `json:"status" example:"unconfirmed"`
+	Status ContactStatus `json:"status" example:"unconfirmed"`
 }
+
+type ContactStatus string
+
+const (
+	ContactNotConfirmed ContactStatus = "unconfirmed"
+	ContactAwaitAccept  ContactStatus = "awaiting"
+	ContactConfirmed    ContactStatus = "confirmed"
+	ContactRejected     ContactStatus = "rejected"
+)
 
 func (m *CreateContactResponse) AddAdditionalInfo(k, v string) {
 	if m.AdditionalInfo == nil {
