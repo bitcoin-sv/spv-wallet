@@ -8,6 +8,7 @@ import (
 	"github.com/bitcoin-sv/spv-wallet/mappings"
 	"github.com/bitcoin-sv/spv-wallet/models"
 	"github.com/bitcoin-sv/spv-wallet/models/filter"
+	"github.com/bitcoin-sv/spv-wallet/models/response"
 	"github.com/bitcoin-sv/spv-wallet/server/auth"
 	"github.com/gin-gonic/gin"
 )
@@ -22,7 +23,7 @@ import (
 // @Success		200 {object} models.SearchContactsResponse "List of contacts"
 // @Failure		400	"Bad request - Error while parsing SearchContacts from request body"
 // @Failure 	500	"Internal server error - Error while searching for contacts"
-// @Router		/v1/contact/search [POST]
+// @DeprecatedRouter  /v1/contact/search [post]
 // @Security	x-auth-xpub
 func (a *Action) search(c *gin.Context) {
 	reqXPubID := c.GetString(auth.ParamXPubHashKey)
@@ -53,7 +54,7 @@ func (a *Action) search(c *gin.Context) {
 		return
 	}
 
-	contracts := mappings.MapToContactContracts(contacts)
+	contracts := mappings.MapToOldContactContracts(contacts)
 
 	count, err := a.Services.SpvWalletEngine.GetContactsByXPubIDCount(
 		c.Request.Context(),
@@ -81,10 +82,10 @@ func (a *Action) search(c *gin.Context) {
 // @Tags		Contacts
 // @Produce		json
 // @Param		SearchContacts body filter.SearchContacts false "Supports targeted resource searches with filters and metadata, plus options for pagination and sorting to streamline data exploration and analysis"
-// @Success		200 {object} models.PageModel[models.Contact] "Page of contacts"
+// @Success		200 {object} response.PageModel[response.Contact] "Page of contacts"
 // @Failure		400	"Bad request - Error while parsing SearchContacts from request body"
 // @Failure 	500	"Internal server error - Error while searching for contacts"
-// @Router		/v1/contacts/ [GET]
+// @Router		/api/v1/contacts/ [get]
 // @Security	x-auth-xpub
 func (a *Action) getContacts(c *gin.Context) {
 	reqXPubID := c.GetString(auth.ParamXPubHashKey)
@@ -128,9 +129,9 @@ func (a *Action) getContacts(c *gin.Context) {
 		return
 	}
 
-	response := models.PageModel[models.Contact]{
+	response := response.PageModel[response.Contact]{
 		Content: contracts,
-		Page: models.PageDescription{
+		Page: response.PageDescription{
 			Size:          len(contracts),
 			Number:        0,
 			TotalElements: int(count),
@@ -146,10 +147,10 @@ func (a *Action) getContacts(c *gin.Context) {
 // @Description	Get contact by paymail
 // @Tags		Contacts
 // @Produce		json
-// @Success		200 {object} models.Contact "Contact"
+// @Success		200 {object} response.Contact "Contact"
 // @Failure		400	"Bad request - Error while parsing SearchContacts from request body"
 // @Failure 	500	"Internal server error - Error while searching for contacts"
-// @Router		/v1/contacts/{paymail} [GET]
+// @Router		/api/v1/contacts/{paymail} [get]
 // @Security	x-auth-xpub
 func (a *Action) getContactByPaymail(c *gin.Context) {
 	reqXPubID := c.GetString(auth.ParamXPubHashKey)
