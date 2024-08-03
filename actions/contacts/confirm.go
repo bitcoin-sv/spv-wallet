@@ -10,18 +10,17 @@ import (
 
 // oldConfirm will confirm contact request
 // Confirm contact godoc
-// @Summary		Confirm contact - Use (POST) /v1/contacts/{paymail}/confirmation instead
-// @Description	This endpoint has been deprecated. Use (POST) /v1/contacts/{paymail}/confirmation instead
+// @Summary		Confirm contact - Use (POST) /api/v1/contacts/{paymail}/confirmation instead
+// @Description	This endpoint has been deprecated. Use (POST) /api/v1/contacts/{paymail}/confirmation instead.
 // @Tags		Contact
 // @Produce		json
-// @Param		paymail path string true "Paymail address of the contact the user wants to confirm"
+// @Param		paymail path string true "Paymail address of the contact that the user would like to confirm"
 // @Success		200
 // @Failure		404	"Contact not found"
 // @Failure		422	"Contact status not unconfirmed"
 // @Failure		500	"Internal server error"
-// @Router		/v1/contact/confirmed/{paymail} [PATCH]
+// @DeprecatedRouter  /v1/contact/confirmed/{paymail} [patch]
 // @Security	x-auth-xpub
-// @Deprecated
 func (a *Action) oldConfirm(c *gin.Context) {
 	a.confirmContact(c)
 }
@@ -31,12 +30,12 @@ func (a *Action) oldConfirm(c *gin.Context) {
 // @Description	Confirm contact. For contact with status "unconfirmed" change status to "confirmed"
 // @Tags		Contacts
 // @Produce		json
-// @Param		paymail path string true "Paymail address of the contact the user wants to confirm"
+// @Param		paymail path string true "Paymail address of the contact that the user would like to confirm"
 // @Success		200
 // @Failure		404	"Contact not found"
 // @Failure		422	"Contact status not unconfirmed"
 // @Failure		500	"Internal server error"
-// @Router		/v1/contacts/{paymail}/confirmation [POST]
+// @Router		/api/v1/contacts/{paymail}/confirmation [post]
 // @Security	x-auth-xpub
 func (a *Action) confirmContact(c *gin.Context) {
 	reqXPubID := c.GetString(auth.ParamXPubHashKey)

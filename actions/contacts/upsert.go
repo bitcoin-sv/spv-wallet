@@ -16,14 +16,14 @@ import (
 
 // oldUpsert will add a new contact or modify an existing one.
 // Upsert contact godoc
-// @Summary		Upsert contact - Use (PUT) /v1/contacts/{paymail} instead.
-// @Description	This endpoint has been deprecated. Use (PUT) /v1/contacts/{paymail} instead. Add or update contact. When adding a new contact, the system utilizes Paymail's PIKE capability to dispatch an invitation request, asking the counterparty to include the current user in their contacts.
+// @Summary		Upsert contact - Use (PUT) /api/v1/contacts/{paymail} instead.
+// @Description	This endpoint has been deprecated. Use (PUT) /api/v1/contacts/{paymail} instead.
 // @Tags		Contact
 // @Produce		json
-// @Param		paymail path string true "Paymail address of the contact the user wants to add/modify"
+// @Param		paymail path string true "Paymail address of the contact that the user would like to add/modify"
 // @Param		UpsertContact body contacts.UpsertContact true "Full name and metadata needed to add/modify contact"
 // @Success		201
-// @DeprecatedRouter  /v1/contact/{paymail} [PUT]
+// @DeprecatedRouter  /v1/contact/{paymail} [put]
 // @Security	x-auth-xpub
 func (a *Action) oldUpsert(c *gin.Context) {
 	a.upsertHelper(c, true)
@@ -34,10 +34,10 @@ func (a *Action) oldUpsert(c *gin.Context) {
 // @Description	Add or update contact. When adding a new contact, the system utilizes Paymail's PIKE capability to dispatch an invitation request, asking the counterparty to include the current user in their contacts.
 // @Tags		Contacts
 // @Produce		json
-// @Param		paymail path string true "Paymail address of the contact the user wants to add/modify"
+// @Param		paymail path string true "Paymail address of the contact that the user would like to add/modify"
 // @Param		UpsertContact body contacts.UpsertContact true "Full name and metadata needed to add/modify contact"
 // @Success		201
-// @Router		/v1/contacts/{paymail} [PUT]
+// @Router		/api/v1/contacts/{paymail} [put]
 // @Security	x-auth-xpub
 func (a *Action) upsertContact(c *gin.Context) {
 	a.upsertHelper(c, false)

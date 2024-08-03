@@ -18,12 +18,12 @@ func OldContactsHandler(appConfig *config.AppConfig, services *config.AppService
 
 	apiEndpoints := routes.OldAPIEndpointsFunc(func(router *gin.RouterGroup) {
 		group := router.Group("/contact")
-		group.PUT("/:paymail", action.upsert)
+		group.PUT("/:paymail", action.oldUpsert)
 
-		group.PATCH("/accepted/:paymail", action.accept)
-		group.PATCH("/rejected/:paymail", action.reject)
-		group.PATCH("/confirmed/:paymail", action.confirm)
-		group.PATCH("/unconfirmed/:paymail", action.unconfirm)
+		group.PATCH("/accepted/:paymail", action.oldAccept)
+		group.PATCH("/rejected/:paymail", action.oldReject)
+		group.PATCH("/confirmed/:paymail", action.oldConfirm)
+		group.PATCH("/unconfirmed/:paymail", action.oldUnconfirm)
 
 		group.POST("search", action.search)
 	})

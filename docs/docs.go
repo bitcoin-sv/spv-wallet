@@ -40,6 +40,204 @@ const docTemplate = `{
                 }
             }
         },
+        "/api/v1/contacts/{paymail}": {
+            "put": {
+                "security": [
+                    {
+                        "x-auth-xpub": []
+                    }
+                ],
+                "description": "Add or update contact. When adding a new contact, the system utilizes Paymail's PIKE capability to dispatch an invitation request, asking the counterparty to include the current user in their contacts.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Contacts"
+                ],
+                "summary": "Upsert contact",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Paymail address of the contact that the user would like to add/modify",
+                        "name": "paymail",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Full name and metadata needed to add/modify contact",
+                        "name": "UpsertContact",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/contacts.UpsertContact"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created"
+                    }
+                }
+            }
+        },
+        "/api/v1/contacts/{paymail}/confirmation": {
+            "post": {
+                "security": [
+                    {
+                        "x-auth-xpub": []
+                    }
+                ],
+                "description": "Confirm contact. For contact with status \"unconfirmed\" change status to \"confirmed\"",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Contacts"
+                ],
+                "summary": "Confirm contact",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Paymail address of the contact that the user would like to confirm",
+                        "name": "paymail",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "404": {
+                        "description": "Contact not found"
+                    },
+                    "422": {
+                        "description": "Contact status not unconfirmed"
+                    },
+                    "500": {
+                        "description": "Internal server error"
+                    }
+                }
+            }
+        },
+        "/api/v1/contacts/{paymail}/non-confirmation": {
+            "patch": {
+                "security": [
+                    {
+                        "x-auth-xpub": []
+                    }
+                ],
+                "description": "Unconfirm contact. For contact with status \"confirmed\" change status to \"unconfirmed\"",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Contacts"
+                ],
+                "summary": "Unconfirm contact",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Paymail address of the contact that the user would like to unconfirm",
+                        "name": "paymail",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "404": {
+                        "description": "Contact not found"
+                    },
+                    "422": {
+                        "description": "Contact status not confirmed"
+                    },
+                    "500": {
+                        "description": "Internal server error"
+                    }
+                }
+            }
+        },
+        "/api/v1/invitations/{paymail}": {
+            "post": {
+                "security": [
+                    {
+                        "x-auth-xpub": []
+                    }
+                ],
+                "description": "Accept contact invitation. For contact with status \"awaiting\" change status to \"unconfirmed\"",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Contacts"
+                ],
+                "summary": "Accept contact invitation",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Paymail address of the contact that the user would like to accept",
+                        "name": "paymail",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "404": {
+                        "description": "Contact not found"
+                    },
+                    "422": {
+                        "description": "Contact status not awaiting"
+                    },
+                    "500": {
+                        "description": "Internal server error"
+                    }
+                }
+            },
+            "delete": {
+                "security": [
+                    {
+                        "x-auth-xpub": []
+                    }
+                ],
+                "description": "Reject contact invitation. For contact with status \"awaiting\" delete contact",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Contacts"
+                ],
+                "summary": "Reject contact invitation",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Paymail address of the contact that the user would like to reject",
+                        "name": "paymail",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "404": {
+                        "description": "Contact not found"
+                    },
+                    "422": {
+                        "description": "Contact status not awaiting"
+                    },
+                    "500": {
+                        "description": "Internal server error"
+                    }
+                }
+            }
+        },
         "/api/v1/users/current": {
             "get": {
                 "security": [
@@ -1379,18 +1577,19 @@ const docTemplate = `{
                         "x-auth-xpub": []
                     }
                 ],
-                "description": "Accept contact. For contact with status \"awaiting\" change status to \"unconfirmed\"",
+                "description": "This endpoint has been deprecated. Use (POST) /api/v1/invitations/{paymail} instead.",
                 "produces": [
                     "application/json"
                 ],
                 "tags": [
                     "Contact"
                 ],
-                "summary": "Accept contact",
+                "summary": "Accept contact - Use (POST) /api/v1/invitations/{paymail} instead.",
+                "deprecated": true,
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "Paymail address of the contact the user wants to accept",
+                        "description": "Paymail address of the contact that the user would like to accept",
                         "name": "paymail",
                         "in": "path",
                         "required": true
@@ -1419,18 +1618,19 @@ const docTemplate = `{
                         "x-auth-xpub": []
                     }
                 ],
-                "description": "Confirm contact. For contact with status \"unconfirmed\" change status to \"confirmed\"",
+                "description": "This endpoint has been deprecated. Use (POST) /api/v1/contacts/{paymail}/confirmation instead.",
                 "produces": [
                     "application/json"
                 ],
                 "tags": [
                     "Contact"
                 ],
-                "summary": "Confirm contact",
+                "summary": "Confirm contact - Use (POST) /api/v1/contacts/{paymail}/confirmation instead",
+                "deprecated": true,
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "Paymail address of the contact the user wants to confirm",
+                        "description": "Paymail address of the contact that the user would like to confirm",
                         "name": "paymail",
                         "in": "path",
                         "required": true
@@ -1459,18 +1659,19 @@ const docTemplate = `{
                         "x-auth-xpub": []
                     }
                 ],
-                "description": "Reject contact. For contact with status \"awaiting\" delete contact",
+                "description": "This endpoint has been deprecated. Use (DELETE) /api/v1/invitations/{paymail} instead.",
                 "produces": [
                     "application/json"
                 ],
                 "tags": [
                     "Contact"
                 ],
-                "summary": "Reject contact",
+                "summary": "Reject contact - Use (DELETE) /api/v1/invitations/{paymail} instead.",
+                "deprecated": true,
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "Paymail address of the contact the user wants to reject",
+                        "description": "Paymail address of the contact that the user would like to reject",
                         "name": "paymail",
                         "in": "path",
                         "required": true
@@ -1540,18 +1741,19 @@ const docTemplate = `{
                         "x-auth-xpub": []
                     }
                 ],
-                "description": "Unconfirm contact. For contact with status \"confirmed\" change status to \"unconfirmed\"",
+                "description": "This endpoint has been deprecated. Use (PATCH) /api/v1/contacts/{paymail}/non-confirmation instead.",
                 "produces": [
                     "application/json"
                 ],
                 "tags": [
                     "Contact"
                 ],
-                "summary": "Unconfirm contact",
+                "summary": "Unconfirm contact - Use (PATCH) /api/v1/contacts/{paymail}/non-confirmation instead.",
+                "deprecated": true,
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "Paymail address of the contact the user wants to unconfirm",
+                        "description": "Paymail address of the contact that the user would like to unconfirm",
                         "name": "paymail",
                         "in": "path",
                         "required": true
@@ -1580,18 +1782,19 @@ const docTemplate = `{
                         "x-auth-xpub": []
                     }
                 ],
-                "description": "Add or update contact. When adding a new contact, the system utilizes Paymail's PIKE capability to dispatch an invitation request, asking the counterparty to include the current user in their contacts.",
+                "description": "This endpoint has been deprecated. Use (PUT) /api/v1/contacts/{paymail} instead.",
                 "produces": [
                     "application/json"
                 ],
                 "tags": [
                     "Contact"
                 ],
-                "summary": "Upsert contact",
+                "summary": "Upsert contact - Use (PUT) /api/v1/contacts/{paymail} instead.",
+                "deprecated": true,
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "Paymail address of the contact the user wants to add/modify",
+                        "description": "Paymail address of the contact that the user would like to add/modify",
                         "name": "paymail",
                         "in": "path",
                         "required": true
@@ -1681,124 +1884,6 @@ const docTemplate = `{
                     },
                     "500": {
                         "description": "Internal server error - Error while searching for contacts"
-                    }
-                }
-            },
-            "put": {
-                "security": [
-                    {
-                        "x-auth-xpub": []
-                    }
-                ],
-                "description": "Add or update contact. When adding a new contact, the system utilizes Paymail's PIKE capability to dispatch an invitation request, asking the counterparty to include the current user in their contacts.",
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Contacts"
-                ],
-                "summary": "Upsert contact",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Paymail address of the contact the user wants to add/modify",
-                        "name": "paymail",
-                        "in": "path",
-                        "required": true
-                    },
-                    {
-                        "description": "Full name and metadata needed to add/modify contact",
-                        "name": "UpsertContact",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/contacts.UpsertContact"
-                        }
-                    }
-                ],
-                "responses": {
-                    "201": {
-                        "description": "Created"
-                    }
-                }
-            }
-        },
-        "/v1/contacts/{paymail}/confirmation": {
-            "patch": {
-                "security": [
-                    {
-                        "x-auth-xpub": []
-                    }
-                ],
-                "description": "Confirm contact. For contact with status \"unconfirmed\" change status to \"confirmed\"",
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Contacts"
-                ],
-                "summary": "Confirm contact",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Paymail address of the contact the user wants to confirm",
-                        "name": "paymail",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK"
-                    },
-                    "404": {
-                        "description": "Contact not found"
-                    },
-                    "422": {
-                        "description": "Contact status not unconfirmed"
-                    },
-                    "500": {
-                        "description": "Internal server error"
-                    }
-                }
-            }
-        },
-        "/v1/contacts/{paymail}/non-confirmation": {
-            "patch": {
-                "security": [
-                    {
-                        "x-auth-xpub": []
-                    }
-                ],
-                "description": "Unconfirm contact. For contact with status \"confirmed\" change status to \"unconfirmed\"",
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Contacts"
-                ],
-                "summary": "Unconfirm contact",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Paymail address of the contact the user wants to unconfirm",
-                        "name": "paymail",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK"
-                    },
-                    "404": {
-                        "description": "Contact not found"
-                    },
-                    "422": {
-                        "description": "Contact status not confirmed"
-                    },
-                    "500": {
-                        "description": "Internal server error"
                     }
                 }
             }
@@ -2013,84 +2098,6 @@ const docTemplate = `{
                     },
                     "500": {
                         "description": "Internal server error - Error while searching for destinations"
-                    }
-                }
-            }
-        },
-        "/v1/invitations/{paymail}": {
-            "post": {
-                "security": [
-                    {
-                        "x-auth-xpub": []
-                    }
-                ],
-                "description": "Accept contact invitation. For contact with status \"awaiting\" change status to \"unconfirmed\"",
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Contacts"
-                ],
-                "summary": "Accept contact invitation",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Paymail address of the contact the user wants to accept",
-                        "name": "paymail",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK"
-                    },
-                    "404": {
-                        "description": "Contact not found"
-                    },
-                    "422": {
-                        "description": "Contact status not awaiting"
-                    },
-                    "500": {
-                        "description": "Internal server error"
-                    }
-                }
-            },
-            "delete": {
-                "security": [
-                    {
-                        "x-auth-xpub": []
-                    }
-                ],
-                "description": "Reject contact invitation. For contact with status \"awaiting\" delete contact",
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Contacts"
-                ],
-                "summary": "Reject contact invitation",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Paymail address of the contact the user wants to reject",
-                        "name": "paymail",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK"
-                    },
-                    "404": {
-                        "description": "Contact not found"
-                    },
-                    "422": {
-                        "description": "Contact status not awaiting"
-                    },
-                    "500": {
-                        "description": "Internal server error"
                     }
                 }
             }
@@ -4010,7 +4017,7 @@ const docTemplate = `{
                     "description": "Status is a contact's current status.",
                     "allOf": [
                         {
-                            "$ref": "#/definitions/models.ContactStatus"
+                            "$ref": "#/definitions/response.ContactStatus"
                         }
                     ],
                     "example": "unconfirmed"
@@ -4021,21 +4028,6 @@ const docTemplate = `{
                     "example": "2024-02-26T11:01:28.069911Z"
                 }
             }
-        },
-        "models.ContactStatus": {
-            "type": "string",
-            "enum": [
-                "unconfirmed",
-                "awaiting",
-                "confirmed",
-                "rejected"
-            ],
-            "x-enum-varnames": [
-                "ContactNotConfirmed",
-                "ContactAwaitAccept",
-                "ContactConfirmed",
-                "ContactRejected"
-            ]
         },
         "models.Destination": {
             "type": "object",
@@ -5032,6 +5024,21 @@ const docTemplate = `{
                 }
             }
         },
+        "response.ContactStatus": {
+            "type": "string",
+            "enum": [
+                "unconfirmed",
+                "awaiting",
+                "confirmed",
+                "rejected"
+            ],
+            "x-enum-varnames": [
+                "ContactNotConfirmed",
+                "ContactAwaitAccept",
+                "ContactConfirmed",
+                "ContactRejected"
+            ]
+        },
         "time.Duration": {
             "type": "integer",
             "enum": [
@@ -5050,41 +5057,9 @@ const docTemplate = `{
                 1000000,
                 1000000000,
                 60000000000,
-                3600000000000,
-                -9223372036854775808,
-                9223372036854775807,
-                1,
-                1000,
-                1000000,
-                1000000000,
-                60000000000,
-                3600000000000,
-                -9223372036854775808,
-                9223372036854775807,
-                1,
-                1000,
-                1000000,
-                1000000000,
-                60000000000,
                 3600000000000
             ],
             "x-enum-varnames": [
-                "minDuration",
-                "maxDuration",
-                "Nanosecond",
-                "Microsecond",
-                "Millisecond",
-                "Second",
-                "Minute",
-                "Hour",
-                "minDuration",
-                "maxDuration",
-                "Nanosecond",
-                "Microsecond",
-                "Millisecond",
-                "Second",
-                "Minute",
-                "Hour",
                 "minDuration",
                 "maxDuration",
                 "Nanosecond",

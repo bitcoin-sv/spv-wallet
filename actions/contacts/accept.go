@@ -10,16 +10,16 @@ import (
 
 // oldAccept will accept contact request
 // Accept contact godoc
-// @Summary		Accept contact
-// @Description	Accept contact. For contact with status "awaiting" change status to "unconfirmed"
+// @Summary		Accept contact - Use (POST) /api/v1/invitations/{paymail} instead.
+// @Description	This endpoint has been deprecated. Use (POST) /api/v1/invitations/{paymail} instead.
 // @Tags		Contact
 // @Produce		json
-// @Param		paymail path string true "Paymail address of the contact the user wants to accept"
+// @Param		paymail path string true "Paymail address of the contact that the user would like to accept"
 // @Success		200
 // @Failure		404	"Contact not found"
 // @Failure		422	"Contact status not awaiting"
 // @Failure		500	"Internal server error"
-// @Router		/v1/contact/accepted/{paymail} [PATCH]
+// @DeprecatedRouter  /v1/contact/accepted/{paymail} [patch]
 // @Security	x-auth-xpub
 func (a *Action) oldAccept(c *gin.Context) {
 	a.acceptInvitations(c)
@@ -31,12 +31,12 @@ func (a *Action) oldAccept(c *gin.Context) {
 // @Description	Accept contact invitation. For contact with status "awaiting" change status to "unconfirmed"
 // @Tags		Contacts
 // @Produce		json
-// @Param		paymail path string true "Paymail address of the contact the user wants to accept"
+// @Param		paymail path string true "Paymail address of the contact that the user would like to accept"
 // @Success		200
 // @Failure		404	"Contact not found"
 // @Failure		422	"Contact status not awaiting"
 // @Failure		500	"Internal server error"
-// @Router		/v1/invitations/{paymail} [POST]
+// @Router		/api/v1/invitations/{paymail} [post]
 // @Security	x-auth-xpub
 func (a *Action) acceptInvitations(c *gin.Context) {
 	reqXPubID := c.GetString(auth.ParamXPubHashKey)
