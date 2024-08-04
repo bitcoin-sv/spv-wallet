@@ -1791,6 +1791,45 @@ definitions:
         example: "2024-02-26T11:01:28.069911Z"
         type: string
     type: object
+  response.AccessKey:
+    properties:
+      createdAt:
+        description: CreatedAt is a time when outer model was created.
+        example: "2024-02-26T11:00:28.069911Z"
+        type: string
+      deletedAt:
+        description: DeletedAt is a time when outer model was deleted.
+        example: "2024-02-26T11:02:28.069911Z"
+        type: string
+      id:
+        description: ID is an hash of the compressed public key.
+        example: 874b86d6fd1d6c85a857e73180164203d8d23211bfd9d04d210f9f7fde5b82d8
+        type: string
+      key:
+        description: Key is a string representation of an access key.
+        example: 3fd870d6bf1725f04084cf31209c04be5bd9bed001a390ad3bc632a55a3ee078
+        type: string
+      metadata:
+        additionalProperties:
+          type: string
+        description: Metadata is a metadata map of outer model.
+        example:
+          key: value
+          key2: value2
+        type: object
+      revokedAt:
+        description: RevokedAt is a time when access key was revoked.
+        example: "2024-02-26T11:02:28.069911Z"
+        type: string
+      updatedAt:
+        description: UpdatedAt is a time when outer model was updated.
+        example: "2024-02-26T11:01:28.069911Z"
+        type: string
+      xpubId:
+        description: XpubID is an access key's xpub related id.
+        example: bb8593f85ef8056a77026ad415f02128f3768906de53e9e8bf8749fe2d66cf50
+        type: string
+    type: object
   time.Duration:
     enum:
     - -9223372036854775808
@@ -1801,6 +1840,11 @@ definitions:
     - 1000000000
     - 60000000000
     - 3600000000000
+    - 1
+    - 1000
+    - 1000000
+    - 1000000000
+    - 60000000000
     - 1
     - 1000
     - 1000000
@@ -1817,6 +1861,11 @@ definitions:
     - Second
     - Minute
     - Hour
+    - Nanosecond
+    - Microsecond
+    - Millisecond
+    - Second
+    - Minute
     - Nanosecond
     - Microsecond
     - Millisecond
@@ -1880,6 +1929,35 @@ info:
   title: SPV Wallet
   version: v0.12.0
 paths:
+  /api/v1//users/current/keys:
+    get:
+      description: Search access key
+      parameters:
+      - description: Supports targeted resource searches with filters and metadata,
+          plus options for pagination and sorting to streamline data exploration and
+          analysis
+        in: body
+        name: SearchAccessKeys
+        schema:
+          $ref: '#/definitions/filter.SearchAccessKeys'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: List of access keys
+          schema:
+            items:
+              $ref: '#/definitions/response.AccessKey'
+            type: array
+        "400":
+          description: Bad request - Error while SearchAccessKeys from request body
+        "500":
+          description: Internal server error - Error while searching for access keys
+      security:
+      - x-auth-xpub: []
+      summary: Search access key
+      tags:
+      - Access-key
   /api/v1/configs/shared:
     get:
       description: Get shared config
@@ -2122,7 +2200,9 @@ paths:
       - Access-key
   /v1/access-key/count:
     post:
-      description: Count of access keys
+      deprecated: true
+      description: This endpoint has been deprecated. Use (GET) /api/v1/users/current/keys
+        instead.
       parameters:
       - description: Enables filtering of elements to be counted
         in: body
@@ -2144,12 +2224,14 @@ paths:
             keys
       security:
       - x-auth-xpub: []
-      summary: Count of access keys
+      summary: Count of access keys - Use (GET) /api/v1/users/current/keys instead.
       tags:
       - Access-key
   /v1/access-key/search:
     post:
-      description: Search access key
+      deprecated: true
+      description: This endpoint has been deprecated. Use (GET) /api/v1/users/current/keys
+        instead.
       parameters:
       - description: Supports targeted resource searches with filters and metadata,
           plus options for pagination and sorting to streamline data exploration and
@@ -2173,7 +2255,7 @@ paths:
           description: Internal server error - Error while searching for access keys
       security:
       - x-auth-xpub: []
-      summary: Search access key
+      summary: Search access key - Use (GET) /api/v1/users/current/keys instead.
       tags:
       - Access-key
   /v1/admin/access-keys/count:

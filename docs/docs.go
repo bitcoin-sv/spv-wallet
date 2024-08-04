@@ -15,6 +15,50 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
+        "/api/v1//users/current/keys": {
+            "get": {
+                "security": [
+                    {
+                        "x-auth-xpub": []
+                    }
+                ],
+                "description": "Search access key",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Access-key"
+                ],
+                "summary": "Search access key",
+                "parameters": [
+                    {
+                        "description": "Supports targeted resource searches with filters and metadata, plus options for pagination and sorting to streamline data exploration and analysis",
+                        "name": "SearchAccessKeys",
+                        "in": "body",
+                        "schema": {
+                            "$ref": "#/definitions/filter.SearchAccessKeys"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "List of access keys",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/response.AccessKey"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request - Error while SearchAccessKeys from request body"
+                    },
+                    "500": {
+                        "description": "Internal server error - Error while searching for access keys"
+                    }
+                }
+            }
+        },
         "/api/v1/configs/shared": {
             "get": {
                 "security": [
@@ -396,14 +440,15 @@ const docTemplate = `{
                         "x-auth-xpub": []
                     }
                 ],
-                "description": "Count of access keys",
+                "description": "This endpoint has been deprecated. Use (GET) /api/v1/users/current/keys instead.",
                 "produces": [
                     "application/json"
                 ],
                 "tags": [
                     "Access-key"
                 ],
-                "summary": "Count of access keys",
+                "summary": "Count of access keys - Use (GET) /api/v1/users/current/keys instead.",
+                "deprecated": true,
                 "parameters": [
                     {
                         "description": "Enables filtering of elements to be counted",
@@ -437,14 +482,15 @@ const docTemplate = `{
                         "x-auth-xpub": []
                     }
                 ],
-                "description": "Search access key",
+                "description": "This endpoint has been deprecated. Use (GET) /api/v1/users/current/keys instead.",
                 "produces": [
                     "application/json"
                 ],
                 "tags": [
                     "Access-key"
                 ],
-                "summary": "Search access key",
+                "summary": "Search access key - Use (GET) /api/v1/users/current/keys instead.",
+                "deprecated": true,
                 "parameters": [
                     {
                         "description": "Supports targeted resource searches with filters and metadata, plus options for pagination and sorting to streamline data exploration and analysis",
@@ -4859,6 +4905,57 @@ const docTemplate = `{
                 }
             }
         },
+        "response.AccessKey": {
+            "type": "object",
+            "properties": {
+                "createdAt": {
+                    "description": "CreatedAt is a time when outer model was created.",
+                    "type": "string",
+                    "example": "2024-02-26T11:00:28.069911Z"
+                },
+                "deletedAt": {
+                    "description": "DeletedAt is a time when outer model was deleted.",
+                    "type": "string",
+                    "example": "2024-02-26T11:02:28.069911Z"
+                },
+                "id": {
+                    "description": "ID is an hash of the compressed public key.",
+                    "type": "string",
+                    "example": "874b86d6fd1d6c85a857e73180164203d8d23211bfd9d04d210f9f7fde5b82d8"
+                },
+                "key": {
+                    "description": "Key is a string representation of an access key.",
+                    "type": "string",
+                    "example": "3fd870d6bf1725f04084cf31209c04be5bd9bed001a390ad3bc632a55a3ee078"
+                },
+                "metadata": {
+                    "description": "Metadata is a metadata map of outer model.",
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "string"
+                    },
+                    "example": {
+                        "key": "value",
+                        "key2": "value2"
+                    }
+                },
+                "revokedAt": {
+                    "description": "RevokedAt is a time when access key was revoked.",
+                    "type": "string",
+                    "example": "2024-02-26T11:02:28.069911Z"
+                },
+                "updatedAt": {
+                    "description": "UpdatedAt is a time when outer model was updated.",
+                    "type": "string",
+                    "example": "2024-02-26T11:01:28.069911Z"
+                },
+                "xpubId": {
+                    "description": "XpubID is an access key's xpub related id.",
+                    "type": "string",
+                    "example": "bb8593f85ef8056a77026ad415f02128f3768906de53e9e8bf8749fe2d66cf50"
+                }
+            }
+        },
         "time.Duration": {
             "type": "integer",
             "enum": [
@@ -4875,6 +4972,11 @@ const docTemplate = `{
                 1000000,
                 1000000000,
                 60000000000,
+                1,
+                1000,
+                1000000,
+                1000000000,
+                60000000000,
                 3600000000000
             ],
             "x-enum-varnames": [
@@ -4886,6 +4988,11 @@ const docTemplate = `{
                 "Second",
                 "Minute",
                 "Hour",
+                "Nanosecond",
+                "Microsecond",
+                "Millisecond",
+                "Second",
+                "Minute",
                 "Nanosecond",
                 "Microsecond",
                 "Millisecond",
