@@ -181,7 +181,7 @@ const docTemplate = `{
                     "201": {
                         "description": "Created AccessKey",
                         "schema": {
-                            "$ref": "#/definitions/models.AccessKey"
+                            "$ref": "#/definitions/response.AccessKey"
                         }
                     },
                     "400": {
@@ -221,7 +221,7 @@ const docTemplate = `{
                     "200": {
                         "description": "AccessKey with given id",
                         "schema": {
-                            "$ref": "#/definitions/models.AccessKey"
+                            "$ref": "#/definitions/response.AccessKey"
                         }
                     },
                     "400": {
@@ -262,7 +262,7 @@ const docTemplate = `{
                     "200": {
                         "description": "Revoked AccessKey",
                         "schema": {
-                            "$ref": "#/definitions/models.AccessKey"
+                            "$ref": "#/definitions/response.AccessKey"
                         }
                     },
                     "400": {
@@ -4967,11 +4967,8 @@ const docTemplate = `{
                 1000000000,
                 60000000000,
                 3600000000000,
-                1,
-                1000,
-                1000000,
-                1000000000,
-                60000000000,
+                -9223372036854775808,
+                9223372036854775807,
                 1,
                 1000,
                 1000000,
@@ -4988,11 +4985,8 @@ const docTemplate = `{
                 "Second",
                 "Minute",
                 "Hour",
-                "Nanosecond",
-                "Microsecond",
-                "Millisecond",
-                "Second",
-                "Minute",
+                "minDuration",
+                "maxDuration",
                 "Nanosecond",
                 "Microsecond",
                 "Millisecond",

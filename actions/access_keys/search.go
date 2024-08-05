@@ -83,7 +83,7 @@ func (a *Action) search(c *gin.Context) {
 		c.Request.Context(),
 		reqXPubID,
 		mappings.MapToMetadata(reqParams.Metadata),
-		reqParams.Conditions.ToDbConditions(),
+		conditions,
 		mappings.MapToQueryParams(reqParams.QueryParams),
 	)
 	if err != nil {
