@@ -11,20 +11,41 @@ import (
 
 // revoke will revoke the intended model by id
 // Revoke access key godoc
-// @Summary		Revoke access key
-// @Description	Revoke access key
+// @Summary		Revoke access key - Use (DELETE) /api/v1/users/current/keys/{id} instead.
+// @Description	This endpoint has been deprecated. Use (DELETE) /api/v1/users/current/keys/{id} instead.
 // @Tags		Access-key
 // @Produce		json
 // @Param		id query string true "id of the access key"
 // @Success		200	{object} models.AccessKey "Revoked AccessKey"
 // @Failure		400	"Bad request - Missing required field: id"
 // @Failure 	500	"Internal server error - Error while revoking access key"
-// @Router		/v1/access-key [delete]
+// @DeprecatedRouter  /v1/access-key [delete]
+// @Security	x-auth-xpub
+func (a *Action) oldRevoke(c *gin.Context) {
+	id := c.Query("id")
+	a.revokeHelper(c, id, true)
+}
+
+// revoke will revoke the intended model by id
+// Revoke access key godoc
+// @Summary		Revoke access key
+// @Description	Revoke access key
+// @Tags		Access-key
+// @Produce		json
+// @Param		id path string true "id of the access key"
+// @Success		200	{object} models.AccessKey "Revoked AccessKey"
+// @Failure		400	"Bad request - Missing required field: id"
+// @Failure 	500	"Internal server error - Error while revoking access key"
+// @Router		/api/v1/users/current/keys/{id} [delete]
 // @Security	x-auth-xpub
 func (a *Action) revoke(c *gin.Context) {
+	id := c.Params.ByName("id")
+	a.revokeHelper(c, id, false)
+}
+
+func (a *Action) revokeHelper(c *gin.Context, id string, snakeCase bool) {
 	reqXPub := c.GetString(auth.ParamXPubKey)
 
-	id := c.Query("id")
 	if id == "" {
 		spverrors.ErrorResponse(c, spverrors.ErrMissingFieldID, a.Services.Logger)
 		return
@@ -37,6 +58,12 @@ func (a *Action) revoke(c *gin.Context) {
 	)
 	if err != nil {
 		spverrors.ErrorResponse(c, err, a.Services.Logger)
+		return
+	}
+
+	if snakeCase {
+		contract := mappings.MapToOldAccessKeyContract(accessKey)
+		c.JSON(http.StatusCreated, contract)
 		return
 	}
 
