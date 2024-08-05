@@ -78,7 +78,7 @@ const docTemplate = `{
                     "200": {
                         "description": "Shared configuration",
                         "schema": {
-                            "$ref": "#/definitions/models.SharedConfig"
+                            "$ref": "#/definitions/response.SharedConfig"
                         }
                     }
                 }
@@ -103,7 +103,7 @@ const docTemplate = `{
                     "200": {
                         "description": "xPub associated with the given xPub from auth header",
                         "schema": {
-                            "$ref": "#/definitions/models.Xpub"
+                            "$ref": "#/definitions/response.Xpub"
                         }
                     },
                     "500": {
@@ -139,7 +139,7 @@ const docTemplate = `{
                     "200": {
                         "description": "Updated xPub",
                         "schema": {
-                            "$ref": "#/definitions/models.Xpub"
+                            "$ref": "#/definitions/response.Xpub"
                         }
                     },
                     "400": {
@@ -4956,6 +4956,82 @@ const docTemplate = `{
                 }
             }
         },
+        "response.SharedConfig": {
+            "type": "object",
+            "properties": {
+                "experimentalFeatures": {
+                    "description": "ExperimentalFeatures is a map of experimental features handled by spv-wallet.",
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "boolean"
+                    },
+                    "example": {
+                        "pikeEnabled": true
+                    }
+                },
+                "paymailDomains": {
+                    "description": "PaymailDomains is a list of paymail domains handled by spv-wallet.",
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    },
+                    "example": [
+                        "spv-wallet.com"
+                    ]
+                }
+            }
+        },
+        "response.Xpub": {
+            "type": "object",
+            "properties": {
+                "createdAt": {
+                    "description": "CreatedAt is a time when outer model was created.",
+                    "type": "string",
+                    "example": "2024-02-26T11:00:28.069911Z"
+                },
+                "currentBalance": {
+                    "description": "CurrentBalance is a xpub's current balance.",
+                    "type": "integer",
+                    "example": 1234
+                },
+                "deletedAt": {
+                    "description": "DeletedAt is a time when outer model was deleted.",
+                    "type": "string",
+                    "example": "2024-02-26T11:02:28.069911Z"
+                },
+                "id": {
+                    "description": "ID is a hash of the xpub.",
+                    "type": "string",
+                    "example": "bb8593f85ef8056a77026ad415f02128f3768906de53e9e8bf8749fe2d66cf50"
+                },
+                "metadata": {
+                    "description": "Metadata is a metadata map of outer model.",
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "string"
+                    },
+                    "example": {
+                        "key": "value",
+                        "key2": "value2"
+                    }
+                },
+                "nextExternalNum": {
+                    "description": "NextExternalNum is the index derivation number use to generate NEXT external xPub (external xPub are used for address destinations).",
+                    "type": "integer",
+                    "example": 0
+                },
+                "nextInternalNum": {
+                    "description": "NextInternalNum is the index derivation number use to generate NEXT internal xPub (internal xPub are used for change destinations).",
+                    "type": "integer",
+                    "example": 0
+                },
+                "updatedAt": {
+                    "description": "UpdatedAt is a time when outer model was updated.",
+                    "type": "string",
+                    "example": "2024-02-26T11:01:28.069911Z"
+                }
+            }
+        },
         "time.Duration": {
             "type": "integer",
             "enum": [
@@ -4967,8 +5043,15 @@ const docTemplate = `{
                 1000000000,
                 60000000000,
                 3600000000000,
-                -9223372036854775808,
-                9223372036854775807,
+                1,
+                1000,
+                1000000,
+                1000000000,
+                1,
+                1000,
+                1000000,
+                1000000000,
+                60000000000,
                 1,
                 1000,
                 1000000,
@@ -4985,8 +5068,15 @@ const docTemplate = `{
                 "Second",
                 "Minute",
                 "Hour",
-                "minDuration",
-                "maxDuration",
+                "Nanosecond",
+                "Microsecond",
+                "Millisecond",
+                "Second",
+                "Nanosecond",
+                "Microsecond",
+                "Millisecond",
+                "Second",
+                "Minute",
                 "Nanosecond",
                 "Microsecond",
                 "Millisecond",

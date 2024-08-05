@@ -1830,6 +1830,65 @@ definitions:
         example: bb8593f85ef8056a77026ad415f02128f3768906de53e9e8bf8749fe2d66cf50
         type: string
     type: object
+  response.SharedConfig:
+    properties:
+      experimentalFeatures:
+        additionalProperties:
+          type: boolean
+        description: ExperimentalFeatures is a map of experimental features handled
+          by spv-wallet.
+        example:
+          pikeEnabled: true
+        type: object
+      paymailDomains:
+        description: PaymailDomains is a list of paymail domains handled by spv-wallet.
+        example:
+        - spv-wallet.com
+        items:
+          type: string
+        type: array
+    type: object
+  response.Xpub:
+    properties:
+      createdAt:
+        description: CreatedAt is a time when outer model was created.
+        example: "2024-02-26T11:00:28.069911Z"
+        type: string
+      currentBalance:
+        description: CurrentBalance is a xpub's current balance.
+        example: 1234
+        type: integer
+      deletedAt:
+        description: DeletedAt is a time when outer model was deleted.
+        example: "2024-02-26T11:02:28.069911Z"
+        type: string
+      id:
+        description: ID is a hash of the xpub.
+        example: bb8593f85ef8056a77026ad415f02128f3768906de53e9e8bf8749fe2d66cf50
+        type: string
+      metadata:
+        additionalProperties:
+          type: string
+        description: Metadata is a metadata map of outer model.
+        example:
+          key: value
+          key2: value2
+        type: object
+      nextExternalNum:
+        description: NextExternalNum is the index derivation number use to generate
+          NEXT external xPub (external xPub are used for address destinations).
+        example: 0
+        type: integer
+      nextInternalNum:
+        description: NextInternalNum is the index derivation number use to generate
+          NEXT internal xPub (internal xPub are used for change destinations).
+        example: 0
+        type: integer
+      updatedAt:
+        description: UpdatedAt is a time when outer model was updated.
+        example: "2024-02-26T11:01:28.069911Z"
+        type: string
+    type: object
   time.Duration:
     enum:
     - -9223372036854775808
@@ -1840,8 +1899,15 @@ definitions:
     - 1000000000
     - 60000000000
     - 3600000000000
-    - -9223372036854775808
-    - 9223372036854775807
+    - 1
+    - 1000
+    - 1000000
+    - 1000000000
+    - 1
+    - 1000
+    - 1000000
+    - 1000000000
+    - 60000000000
     - 1
     - 1000
     - 1000000
@@ -1858,8 +1924,15 @@ definitions:
     - Second
     - Minute
     - Hour
-    - minDuration
-    - maxDuration
+    - Nanosecond
+    - Microsecond
+    - Millisecond
+    - Second
+    - Nanosecond
+    - Microsecond
+    - Millisecond
+    - Second
+    - Minute
     - Nanosecond
     - Microsecond
     - Millisecond
@@ -1961,7 +2034,7 @@ paths:
         "200":
           description: Shared configuration
           schema:
-            $ref: '#/definitions/models.SharedConfig'
+            $ref: '#/definitions/response.SharedConfig'
       security:
       - x-auth-xpub: []
       summary: Get shared config
@@ -1976,7 +2049,7 @@ paths:
         "200":
           description: xPub associated with the given xPub from auth header
           schema:
-            $ref: '#/definitions/models.Xpub'
+            $ref: '#/definitions/response.Xpub'
         "500":
           description: Internal Server Error - Error while fetching xPub
       security:
@@ -1998,7 +2071,7 @@ paths:
         "200":
           description: Updated xPub
           schema:
-            $ref: '#/definitions/models.Xpub'
+            $ref: '#/definitions/response.Xpub'
         "400":
           description: Bad request - Error while parsing Metadata from request body
         "500":
