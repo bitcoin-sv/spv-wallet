@@ -13,7 +13,7 @@ func MapToDestinationContract(d *engine.Destination) *models.Destination {
 	}
 
 	return &models.Destination{
-		OldModel:                     *common.MapToOldContract(&d.Model),
+		Model:                        *common.MapToOldContract(&d.Model),
 		ID:                           d.ID,
 		XpubID:                       d.XpubID,
 		LockingScript:                d.LockingScript,
@@ -33,7 +33,7 @@ func MapDestinationModelToEngine(d *models.Destination) *engine.Destination {
 	}
 
 	return &engine.Destination{
-		Model:                        *common.MapOldContractToModel(&d.OldModel),
+		Model:                        *common.MapOldContractToModel(&d.Model),
 		ID:                           d.ID,
 		XpubID:                       d.XpubID,
 		LockingScript:                d.LockingScript,
