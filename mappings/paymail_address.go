@@ -13,7 +13,7 @@ func MapToPaymailContract(pa *engine.PaymailAddress) *models.PaymailAddress {
 	}
 
 	return &models.PaymailAddress{
-		OldModel:   *common.MapToOldContract(&pa.Model),
+		Model:      *common.MapToOldContract(&pa.Model),
 		ID:         pa.ID,
 		XpubID:     pa.XpubID,
 		Alias:      pa.Alias,
