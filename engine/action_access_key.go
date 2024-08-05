@@ -130,8 +130,6 @@ func (c *Client) GetAccessKeysByXPubID(ctx context.Context, xPubID string, metad
 	)
 	if err != nil {
 		return nil, err
-	} else if accessKeys == nil {
-		return nil, datastore.ErrNoResults
 	}
 
 	// Return the models
