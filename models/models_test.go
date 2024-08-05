@@ -11,10 +11,10 @@ import (
 // TestAccessKey tests AccessKey model.
 func TestAccessKey(t *testing.T) {
 	ac := new(AccessKey)
-	ac.OldModel.UpdatedAt = time.Now().UTC()
-	ac.OldModel.CreatedAt = time.Now().UTC()
+	ac.Model.UpdatedAt = time.Now().UTC()
+	ac.Model.CreatedAt = time.Now().UTC()
 	deletedAt := time.Now().UTC()
-	ac.OldModel.DeletedAt = &deletedAt
+	ac.Model.DeletedAt = &deletedAt
 	ac.XpubID = "123"
 	ac.ID = "123"
 
@@ -24,10 +24,10 @@ func TestAccessKey(t *testing.T) {
 // ExampleAccessKey is an example for AccessKey model.
 func ExampleAccessKey() {
 	ac := new(AccessKey)
-	ac.OldModel.UpdatedAt = time.Now().UTC()
-	ac.OldModel.CreatedAt = time.Now().UTC()
+	ac.Model.UpdatedAt = time.Now().UTC()
+	ac.Model.CreatedAt = time.Now().UTC()
 	deletedAt := time.Now().UTC()
-	ac.OldModel.DeletedAt = &deletedAt
+	ac.Model.DeletedAt = &deletedAt
 	ac.XpubID = "123"
 	ac.ID = "123"
 	fmt.Printf("%s", ac.ID)
