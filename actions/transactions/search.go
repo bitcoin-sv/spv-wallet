@@ -1,8 +1,9 @@
 package transactions
 
 import (
-	"github.com/bitcoin-sv/spv-wallet/models/response"
 	"net/http"
+
+	"github.com/bitcoin-sv/spv-wallet/models/response"
 
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/bitcoin-sv/spv-wallet/mappings"
@@ -94,9 +95,9 @@ func (a *Action) transactions(c *gin.Context) {
 		contracts = append(contracts, mappings.MapToTransactionContract(transaction))
 	}
 
-	result := models.PageModel[response.Transaction]{
+	result := response.PageModel[response.Transaction]{
 		Content: contracts,
-		Page: models.PageDescription{
+		Page: response.PageDescription{
 			Size:          len(contracts),
 			Number:        0,
 			TotalElements: len(contracts),
