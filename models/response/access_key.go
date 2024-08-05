@@ -2,14 +2,12 @@ package response
 
 import (
 	"time"
-
-	"github.com/bitcoin-sv/spv-wallet/models/common"
 )
 
 // AccessKey is a model that represents an access key.
 type AccessKey struct {
 	// Model is a common model that contains common fields for all models.
-	common.Model
+	Model
 	// ID is an hash of the compressed public key.
 	ID string `json:"id" example:"874b86d6fd1d6c85a857e73180164203d8d23211bfd9d04d210f9f7fde5b82d8"`
 	// XpubID is an access key's xpub related id.
