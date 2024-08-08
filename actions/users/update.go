@@ -33,7 +33,7 @@ func (a *Action) oldUpdate(c *gin.Context) {
 // @Tags		Users
 // @Produce		json
 // @Param		Metadata body engine.Metadata false " "
-// @Success		200 {object} models.Xpub "Updated xPub"
+// @Success		200 {object} response.Xpub "Updated xPub"
 // @Failure		400	"Bad request - Error while parsing Metadata from request body"
 // @Failure 	500	"Internal Server Error - Error while updating xPub"
 // @Router		/api/v1/users/current [patch]

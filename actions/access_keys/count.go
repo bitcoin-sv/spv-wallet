@@ -12,15 +12,15 @@ import (
 
 // count will fetch a count of access keys filtered by metadata
 // Count of access keys godoc
-// @Summary		Count of access keys
-// @Description	Count of access keys
+// @Summary		Count of access keys - Use (GET) /api/v1/users/current/keys instead.
+// @Description	This endpoint has been deprecated. Use (GET) /api/v1/users/current/keys instead.
 // @Tags		Access-key
 // @Produce		json
 // @Param		CountAccessKeys body filter.CountAccessKeys false "Enables filtering of elements to be counted"
 // @Success		200	{number} int64 "Count of access keys"
 // @Failure		400	"Bad request - Error while parsing CountAccessKeys from request body"
 // @Failure 	500	"Internal Server Error - Error while fetching count of access keys"
-// @Router		/v1/access-key/count [post]
+// @DeprecatedRouter  /v1/access-key/count [post]
 // @Security	x-auth-xpub
 func (a *Action) count(c *gin.Context) {
 	reqXPubID := c.GetString(auth.ParamXPubHashKey)

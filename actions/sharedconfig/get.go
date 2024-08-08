@@ -38,7 +38,7 @@ func (a *Action) oldGet(c *gin.Context) {
 // @Description	Get shared config
 // @Tags		Configurations
 // @Produce		json
-// @Success		200 {object} models.SharedConfig "Shared configuration"
+// @Success		200 {object} response.SharedConfig "Shared configuration"
 // @Router		/api/v1/configs/shared [get]
 // @Security	x-auth-xpub
 func (a *Action) get(c *gin.Context) {
