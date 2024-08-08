@@ -92,13 +92,13 @@ func (a *Action) getContacts(c *gin.Context) {
 
 	var reqParams filter.SearchContacts
 	if err := c.Bind(&reqParams); err != nil {
-		c.JSON(http.StatusBadRequest, err.Error())
+		spverrors.ErrorResponse(c, spverrors.ErrCannotBindRequest, a.Services.Logger)
 		return
 	}
 
 	conditions, err := reqParams.Conditions.ToDbConditions()
 	if err != nil {
-		c.JSON(http.StatusBadRequest, err.Error())
+		spverrors.ErrorResponse(c, spverrors.ErrInvalidConditions, a.Services.Logger)
 		return
 	}
 
@@ -112,7 +112,7 @@ func (a *Action) getContacts(c *gin.Context) {
 		mappings.MapToQueryParams(reqParams.QueryParams),
 	)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, err.Error())
+		spverrors.ErrorResponse(c, err, a.Services.Logger)
 		return
 	}
 
@@ -125,7 +125,7 @@ func (a *Action) getContacts(c *gin.Context) {
 		conditions,
 	)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, err.Error())
+		spverrors.ErrorResponse(c, err, a.Services.Logger)
 		return
 	}
 
@@ -160,7 +160,7 @@ func (a *Action) getContactByPaymail(c *gin.Context) {
 
 	conditions, err := reqParams.Conditions.ToDbConditions()
 	if err != nil {
-		c.JSON(http.StatusBadRequest, err.Error())
+		spverrors.ErrorResponse(c, spverrors.ErrInvalidConditions, a.Services.Logger)
 		return
 	}
 
@@ -174,12 +174,12 @@ func (a *Action) getContactByPaymail(c *gin.Context) {
 		mappings.MapToQueryParams(reqParams.QueryParams),
 	)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, err.Error())
+		spverrors.ErrorResponse(c, err, a.Services.Logger)
 		return
 	}
 
 	if contacts == nil || len(contacts) != 1 {
-		c.JSON(http.StatusNotFound, "contact not found")
+		spverrors.ErrorResponse(c, spverrors.ErrContactNotFound, a.Services.Logger)
 		return
 	}
 
