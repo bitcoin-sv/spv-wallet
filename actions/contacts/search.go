@@ -129,13 +129,18 @@ func (a *Action) getContacts(c *gin.Context) {
 		return
 	}
 
+	totalPages := 0
+	if int(count) != 0 {
+		totalPages = len(contracts) / int(count)
+	}
+
 	response := response.PageModel[response.Contact]{
 		Content: contracts,
 		Page: response.PageDescription{
 			Size:          len(contracts),
 			Number:        0,
 			TotalElements: int(count),
-			TotalPages:    len(contracts) / int(count),
+			TotalPages:    totalPages,
 		},
 	}
 
@@ -155,8 +160,13 @@ func (a *Action) getContacts(c *gin.Context) {
 func (a *Action) getContactByPaymail(c *gin.Context) {
 	reqXPubID := c.GetString(auth.ParamXPubHashKey)
 	paymail := c.Param("paymail")
+
 	var reqParams filter.SearchContacts
-	reqParams.ConditionsModel.Conditions.Paymail = &paymail
+
+	preConditions := filter.ContactFilter{Paymail: &paymail}
+	reqParams.ConditionsModel = filter.ConditionsModel[filter.ContactFilter]{
+		Conditions: &preConditions,
+	}
 
 	conditions, err := reqParams.Conditions.ToDbConditions()
 	if err != nil {
