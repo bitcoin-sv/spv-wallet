@@ -375,6 +375,129 @@ const docTemplate = `{
                 }
             }
         },
+        "/api/v1/users/current/keys": {
+            "post": {
+                "security": [
+                    {
+                        "x-auth-xpub": []
+                    }
+                ],
+                "description": "Create access key",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Access-key"
+                ],
+                "summary": "Create access key",
+                "parameters": [
+                    {
+                        "description": " ",
+                        "name": "CreateAccessKey",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/accesskeys.CreateAccessKey"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created AccessKey",
+                        "schema": {
+                            "$ref": "#/definitions/models.AccessKey"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request - Error while parsing CreateAccessKey from request body"
+                    },
+                    "500": {
+                        "description": "Internal server error - Error while creating new access key"
+                    }
+                }
+            }
+        },
+        "/api/v1/users/current/keys/{id}": {
+            "get": {
+                "security": [
+                    {
+                        "x-auth-xpub": []
+                    }
+                ],
+                "description": "Get access key",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Access-key"
+                ],
+                "summary": "Get access key",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "id of the access key",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "AccessKey with given id",
+                        "schema": {
+                            "$ref": "#/definitions/models.AccessKey"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request - Missing required field: id"
+                    },
+                    "403": {
+                        "description": "Forbidden - Access key is not owned by the user"
+                    },
+                    "500": {
+                        "description": "Internal server error - Error while getting access key"
+                    }
+                }
+            },
+            "delete": {
+                "security": [
+                    {
+                        "x-auth-xpub": []
+                    }
+                ],
+                "description": "Revoke access key",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Access-key"
+                ],
+                "summary": "Revoke access key",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "id of the access key",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Revoked AccessKey",
+                        "schema": {
+                            "$ref": "#/definitions/models.AccessKey"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request - Missing required field: id"
+                    },
+                    "500": {
+                        "description": "Internal server error - Error while revoking access key"
+                    }
+                }
+            }
+        },
         "/transaction/broadcast/callback": {
             "post": {
                 "security": [
@@ -417,14 +540,15 @@ const docTemplate = `{
                         "x-auth-xpub": []
                     }
                 ],
-                "description": "Get access key",
+                "description": "This endpoint has been deprecated. Use (GET) /api/v1/users/current/keys/{id} instead.",
                 "produces": [
                     "application/json"
                 ],
                 "tags": [
                     "Access-key"
                 ],
-                "summary": "Get access key",
+                "summary": "Get access key - Use (GET) /api/v1/users/current/keys/{id} instead.",
+                "deprecated": true,
                 "parameters": [
                     {
                         "type": "string",
@@ -458,14 +582,15 @@ const docTemplate = `{
                         "x-auth-xpub": []
                     }
                 ],
-                "description": "Create access key",
+                "description": "This endpoint has been deprecated. Use (POST) /api/v1/users/current/keys instead.",
                 "produces": [
                     "application/json"
                 ],
                 "tags": [
                     "Access-key"
                 ],
-                "summary": "Create access key",
+                "summary": "Create access key - Use (POST) /api/v1/users/current/keys instead.",
+                "deprecated": true,
                 "parameters": [
                     {
                         "description": " ",
@@ -498,14 +623,15 @@ const docTemplate = `{
                         "x-auth-xpub": []
                     }
                 ],
-                "description": "Revoke access key",
+                "description": "This endpoint has been deprecated. Use (DELETE) /api/v1/users/current/keys/{id} instead.",
                 "produces": [
                     "application/json"
                 ],
                 "tags": [
                     "Access-key"
                 ],
-                "summary": "Revoke access key",
+                "summary": "Revoke access key - Use (DELETE) /api/v1/users/current/keys/{id} instead.",
+                "deprecated": true,
                 "parameters": [
                     {
                         "type": "string",
@@ -5109,24 +5235,6 @@ const docTemplate = `{
                 1000000000,
                 60000000000,
                 3600000000000,
-                -9223372036854775808,
-                9223372036854775807,
-                1,
-                1000,
-                1000000,
-                1000000000,
-                60000000000,
-                3600000000000,
-                -9223372036854775808,
-                9223372036854775807,
-                1,
-                1000,
-                1000000,
-                1000000000,
-                60000000000,
-                3600000000000,
-                -9223372036854775808,
-                9223372036854775807,
                 1,
                 1000,
                 1000000,
@@ -5143,24 +5251,6 @@ const docTemplate = `{
                 "Second",
                 "Minute",
                 "Hour",
-                "minDuration",
-                "maxDuration",
-                "Nanosecond",
-                "Microsecond",
-                "Millisecond",
-                "Second",
-                "Minute",
-                "Hour",
-                "minDuration",
-                "maxDuration",
-                "Nanosecond",
-                "Microsecond",
-                "Millisecond",
-                "Second",
-                "Minute",
-                "Hour",
-                "minDuration",
-                "maxDuration",
                 "Nanosecond",
                 "Microsecond",
                 "Millisecond",

@@ -42,7 +42,7 @@ func (a *Action) accessKeysSearch(c *gin.Context) {
 
 	accessKeyContracts := make([]*models.AccessKey, 0)
 	for _, accessKey := range accessKeys {
-		accessKeyContracts = append(accessKeyContracts, mappings.MapToAccessKeyContract(accessKey))
+		accessKeyContracts = append(accessKeyContracts, mappings.MapToOldAccessKeyContract(accessKey))
 	}
 
 	c.JSON(http.StatusOK, accessKeyContracts)
