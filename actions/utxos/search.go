@@ -8,22 +8,21 @@ import (
 	"github.com/bitcoin-sv/spv-wallet/mappings"
 	"github.com/bitcoin-sv/spv-wallet/models"
 	"github.com/bitcoin-sv/spv-wallet/models/filter"
-	"github.com/bitcoin-sv/spv-wallet/models/response"
 	"github.com/bitcoin-sv/spv-wallet/server/auth"
 	"github.com/gin-gonic/gin"
 )
 
 // oldSearch will fetch a list of utxos filtered on conditions and metadata
 // Search UTXO godoc
-// @Summary		Search UTXO
-// @Description	Search UTXO
+// @Summary		Search UTXO - Use (GET) /api/v1/utxos instead.
+// @Description	This endpoint has been deprecated. Use (GET) /api/v1/utxos instead.
 // @Tags		UTXO
 // @Produce		json
 // @Param		SearchUtxos body filter.SearchUtxos false "Supports targeted resource searches with filters and metadata, plus options for pagination and sorting to streamline data exploration and analysis"
 // @Success		200 {object} []models.Utxo "List of utxos"
 // @Failure		400	"Bad request - Error while parsing SearchUtxos from request body"
 // @Failure 	500	"Internal server error - Error while searching for utxos"
-// @Router		/v1/utxo/search [post]
+// @DeprecatedRouter  /v1/utxo/search [post]
 // @Security	x-auth-xpub
 func (a *Action) oldSearch(c *gin.Context) {
 	reqXPubID := c.GetString(auth.ParamXPubHashKey)
@@ -54,7 +53,10 @@ func (a *Action) oldSearch(c *gin.Context) {
 
 	contracts := make([]*models.Utxo, 0)
 	for _, utxo := range utxos {
-		contracts = append(contracts, mappings.MapToOldUtxoContract(utxo))
+		// TODO: use the commented line after response model changes
+		// contracts = append(contracts, mappings.MapToOldUtxoContract(utxo))
+		contracts = append(contracts, mappings.MapToUtxoContract(utxo))
+
 	}
 
 	c.JSON(http.StatusOK, contracts)
@@ -99,7 +101,9 @@ func (a *Action) search(c *gin.Context) {
 		return
 	}
 
-	contracts := make([]*response.Utxo, 0)
+	// TODO: use the commented line after response model changes
+	// contracts := make([]*response.Utxo, 0)
+	contracts := make([]*models.Utxo, 0)
 	for _, utxo := range utxos {
 		contracts = append(contracts, mappings.MapToUtxoContract(utxo))
 	}
