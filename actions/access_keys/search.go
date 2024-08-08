@@ -125,9 +125,53 @@ func (a *Action) searchTest(c *gin.Context) {
 
 	fmt.Printf("Pageable from request: %+v\n", pageable)
 
-	// call service with pageable data
+	reqXPubID := c.GetString(auth.ParamXPubHashKey)
 
-	c.JSON(http.StatusOK, gin.H{
-		"pageable": "OK",
-	})
+	var reqParams filter.SearchAccessKeys
+	if err := c.Bind(&reqParams); err != nil {
+		spverrors.ErrorResponse(c, spverrors.ErrCannotBindRequest, a.Services.Logger)
+		return
+	}
+
+	conditions := reqParams.Conditions.ToDbConditions()
+	reqParams.DefaultsIfNil()
+
+	accessKeys, err := a.Services.SpvWalletEngine.GetAccessKeysByXPubID(
+		c.Request.Context(),
+		reqXPubID,
+		mappings.MapToMetadata(reqParams.Metadata),
+		conditions,
+		mappings.MapToQueryParams(reqParams.QueryParams),
+	)
+	if err != nil {
+		spverrors.ErrorResponse(c, err, a.Services.Logger)
+		return
+	}
+
+	accessKeyContracts := make([]*response.AccessKey, 0)
+	for _, accessKey := range accessKeys {
+		accessKeyContracts = append(accessKeyContracts, mappings.MapToAccessKeyContract(accessKey))
+	}
+
+	count, err := a.Services.SpvWalletEngine.GetContactsByXPubIDCount(
+		c.Request.Context(),
+		reqXPubID,
+		mappings.MapToMetadata(reqParams.Metadata),
+		conditions,
+	)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	response := response.PageModel[response.AccessKey]{
+		Content: accessKeyContracts,
+		Page:    common.GetPageDescriptionFromQueryParams(pageable, count),
+	}
+
+	c.JSON(http.StatusOK, response)
+
+	// c.JSON(http.StatusOK, gin.H{
+	// 	"pageable": "OK",
+	// })
 }
