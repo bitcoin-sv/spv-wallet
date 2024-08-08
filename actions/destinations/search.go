@@ -13,15 +13,15 @@ import (
 
 // search will fetch a list of destinations filtered by metadata
 // Search Destination godoc
-// @Summary		Search for a destination
-// @Description	Search for a destination
+// @Summary		Search for a destination. This endpoint has been deprecated (it will be removed in the future).
+// @Description	Search for a destination. This endpoint has been deprecated (it will be removed in the future).
 // @Tags		Destinations
 // @Produce		json
 // @Param		SearchDestinations body filter.SearchDestinations false "Supports targeted resource searches with filters and metadata, plus options for pagination and sorting to streamline data exploration and analysis"
 // @Success		200 {object} []models.Destination "List of destinations
 // @Failure		400	"Bad request - Error while parsing SearchDestinations from request body"
 // @Failure 	500	"Internal server error - Error while searching for destinations"
-// @Router		/v1/destination/search [post]
+// @DeprecatedRouter  /v1/destination/search [post]
 // @Security	x-auth-xpub
 func (a *Action) search(c *gin.Context) {
 	reqXPubID := c.GetString(auth.ParamXPubHashKey)

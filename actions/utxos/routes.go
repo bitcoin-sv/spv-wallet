@@ -13,13 +13,26 @@ type Action struct {
 }
 
 // NewHandler creates the specific package routes
-func NewHandler(appConfig *config.AppConfig, services *config.AppServices) routes.OldAPIEndpointsFunc {
+func OldUtxosHandler(appConfig *config.AppConfig, services *config.AppServices) routes.OldAPIEndpointsFunc {
 	action := &Action{actions.Action{AppConfig: appConfig, Services: services}}
 
 	apiEndpoints := routes.OldAPIEndpointsFunc(func(router *gin.RouterGroup) {
 		utxoGroup := router.Group("/utxo")
 		utxoGroup.GET("", action.get)
 		utxoGroup.POST("/count", action.count)
+		utxoGroup.POST("/search", action.oldSearch)
+	})
+
+	return apiEndpoints
+}
+
+// NewHandler creates the specific package routes
+func NewHandler(appConfig *config.AppConfig, services *config.AppServices) routes.APIEndpointsFunc {
+	action := &Action{actions.Action{AppConfig: appConfig, Services: services}}
+
+	apiEndpoints := routes.APIEndpointsFunc(func(router *gin.RouterGroup) {
+		utxoGroup := router.Group("/utxos")
+		utxoGroup.GET("", action.get)
 		utxoGroup.POST("/search", action.search)
 	})
 
