@@ -1,14 +1,12 @@
 package response
 
-import "github.com/bitcoin-sv/spv-wallet/models/common"
-
 type CreateContactResponse struct {
 	Contact        *Contact          `json:"contact"`
 	AdditionalInfo map[string]string `json:"additionalInfo"`
 }
 
 type Contact struct {
-	common.Model
+	Model
 
 	// ID is a unique identifier of contact.
 	ID string `json:"id" example:"68af358bde7d8641621c7dd3de1a276c9a62cfa9e2d0740494519f1ba61e2f4a"`

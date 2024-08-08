@@ -40,7 +40,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/api/v1/contacts/": {
+        "/api/v1/contacts": {
             "get": {
                 "security": [
                     {
@@ -188,10 +188,8 @@ const docTemplate = `{
                         "description": "Internal server error"
                     }
                 }
-            }
-        },
-        "/api/v1/contacts/{paymail}/non-confirmation": {
-            "patch": {
+            },
+            "delete": {
                 "security": [
                     {
                         "x-auth-xpub": []
@@ -1896,14 +1894,14 @@ const docTemplate = `{
                         "x-auth-xpub": []
                     }
                 ],
-                "description": "Search contacts",
+                "description": "This endpoint has been deprecated. Use (GET) /api/v1/contacts instead.",
                 "produces": [
                     "application/json"
                 ],
                 "tags": [
                     "Contact"
                 ],
-                "summary": "Search contacts",
+                "summary": "Search contacts - Use (GET) /api/v1/contacts instead.",
                 "deprecated": true,
                 "parameters": [
                     {
@@ -1938,14 +1936,14 @@ const docTemplate = `{
                         "x-auth-xpub": []
                     }
                 ],
-                "description": "This endpoint has been deprecated. Use (PATCH) /api/v1/contacts/{paymail}/non-confirmation instead.",
+                "description": "This endpoint has been deprecated. Use (DELETE) /api/v1/contacts/{paymail}/confirmation instead.",
                 "produces": [
                     "application/json"
                 ],
                 "tags": [
                     "Contact"
                 ],
-                "summary": "Unconfirm contact - Use (PATCH) /api/v1/contacts/{paymail}/non-confirmation instead.",
+                "summary": "Unconfirm contact - Use (DELETE) /api/v1/contacts/{paymail}/confirmation instead.",
                 "deprecated": true,
                 "parameters": [
                     {
@@ -5197,15 +5195,19 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "number": {
+                    "description": "Number is the number of the page returned",
                     "type": "integer"
                 },
                 "size": {
+                    "description": "Size is the number of elements on a single page",
                     "type": "integer"
                 },
                 "totalElements": {
+                    "description": "TotalElements is the total number of elements in the returned collection",
                     "type": "integer"
                 },
                 "totalPages": {
+                    "description": "TotalPages is total number of pages returned",
                     "type": "integer"
                 }
             }
@@ -5214,13 +5216,19 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "content": {
+                    "description": "Content is the collection of elements that serves as the content",
                     "type": "array",
                     "items": {
                         "$ref": "#/definitions/response.Contact"
                     }
                 },
                 "page": {
-                    "$ref": "#/definitions/response.PageDescription"
+                    "description": "Page is the page descriptor",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/response.PageDescription"
+                        }
+                    ]
                 }
             }
         },
@@ -5229,6 +5237,20 @@ const docTemplate = `{
             "enum": [
                 -9223372036854775808,
                 9223372036854775807,
+                1,
+                1000,
+                1000000,
+                1000000000,
+                60000000000,
+                3600000000000,
+                -9223372036854775808,
+                9223372036854775807,
+                1,
+                1000,
+                1000000,
+                1000000000,
+                60000000000,
+                3600000000000,
                 1,
                 1000,
                 1000000,
@@ -5245,6 +5267,20 @@ const docTemplate = `{
             "x-enum-varnames": [
                 "minDuration",
                 "maxDuration",
+                "Nanosecond",
+                "Microsecond",
+                "Millisecond",
+                "Second",
+                "Minute",
+                "Hour",
+                "minDuration",
+                "maxDuration",
+                "Nanosecond",
+                "Microsecond",
+                "Millisecond",
+                "Second",
+                "Minute",
+                "Hour",
                 "Nanosecond",
                 "Microsecond",
                 "Millisecond",

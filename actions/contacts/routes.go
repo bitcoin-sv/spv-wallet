@@ -39,7 +39,7 @@ func NewHandler(appConfig *config.AppConfig, services *config.AppServices) (rout
 		group := router.Group("/contacts")
 		group.PUT("/:paymail", action.upsertContact)
 		group.POST("/:paymail/confirmation", action.confirmContact)
-		group.PATCH("/:paymail/non-confirmation", action.unconfirmContact)
+		group.DELETE("/:paymail/confirmation", action.unconfirmContact)
 
 		group.GET("", action.getContacts)
 		group.GET(":paymail", action.getContactByPaymail)

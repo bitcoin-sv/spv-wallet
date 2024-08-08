@@ -10,8 +10,8 @@ import (
 
 // oldUnconfirm will unconfirm contact request
 // Unconfirm contact godoc
-// @Summary		Unconfirm contact - Use (PATCH) /api/v1/contacts/{paymail}/non-confirmation instead.
-// @Description	This endpoint has been deprecated. Use (PATCH) /api/v1/contacts/{paymail}/non-confirmation instead.
+// @Summary		Unconfirm contact - Use (DELETE) /api/v1/contacts/{paymail}/confirmation instead.
+// @Description	This endpoint has been deprecated. Use (DELETE) /api/v1/contacts/{paymail}/confirmation instead.
 // @Tags		Contact
 // @Produce		json
 // @Param		paymail path string true "Paymail address of the contact that the user would like to unconfirm"
@@ -19,7 +19,7 @@ import (
 // @Failure		404	"Contact not found"
 // @Failure		422	"Contact status not confirmed"
 // @Failure		500	"Internal server error"
-// @DeprecatedRouter		/v1/contact/unconfirmed/{paymail} [patch]
+// @DeprecatedRouter  /v1/contact/unconfirmed/{paymail} [patch]
 // @Security	x-auth-xpub
 func (a *Action) oldUnconfirm(c *gin.Context) {
 	a.unconfirmContact(c)
@@ -36,7 +36,7 @@ func (a *Action) oldUnconfirm(c *gin.Context) {
 // @Failure		404	"Contact not found"
 // @Failure		422	"Contact status not confirmed"
 // @Failure		500	"Internal server error"
-// @Router		/api/v1/contacts/{paymail}/non-confirmation [patch]
+// @Router		/api/v1/contacts/{paymail}/confirmation [delete]
 // @Security	x-auth-xpub
 func (a *Action) unconfirmContact(c *gin.Context) {
 	reqXPubID := c.GetString(auth.ParamXPubHashKey)

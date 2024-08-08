@@ -1839,27 +1839,49 @@ definitions:
   response.PageDescription:
     properties:
       number:
+        description: Number is the number of the page returned
         type: integer
       size:
+        description: Size is the number of elements on a single page
         type: integer
       totalElements:
+        description: TotalElements is the total number of elements in the returned
+          collection
         type: integer
       totalPages:
+        description: TotalPages is total number of pages returned
         type: integer
     type: object
   response.PageModel-response_Contact:
     properties:
       content:
+        description: Content is the collection of elements that serves as the content
         items:
           $ref: '#/definitions/response.Contact'
         type: array
       page:
-        $ref: '#/definitions/response.PageDescription'
+        allOf:
+        - $ref: '#/definitions/response.PageDescription'
+        description: Page is the page descriptor
     type: object
   time.Duration:
     enum:
     - -9223372036854775808
     - 9223372036854775807
+    - 1
+    - 1000
+    - 1000000
+    - 1000000000
+    - 60000000000
+    - 3600000000000
+    - -9223372036854775808
+    - 9223372036854775807
+    - 1
+    - 1000
+    - 1000000
+    - 1000000000
+    - 60000000000
+    - 3600000000000
     - 1
     - 1000
     - 1000000
@@ -1876,6 +1898,20 @@ definitions:
     x-enum-varnames:
     - minDuration
     - maxDuration
+    - Nanosecond
+    - Microsecond
+    - Millisecond
+    - Second
+    - Minute
+    - Hour
+    - minDuration
+    - maxDuration
+    - Nanosecond
+    - Microsecond
+    - Millisecond
+    - Second
+    - Minute
+    - Hour
     - Nanosecond
     - Microsecond
     - Millisecond
@@ -1960,7 +1996,7 @@ paths:
       summary: Get shared config
       tags:
       - Configurations
-  /api/v1/contacts/:
+  /api/v1/contacts:
     get:
       description: Get contacts
       parameters:
@@ -2035,6 +2071,31 @@ paths:
       tags:
       - Contacts
   /api/v1/contacts/{paymail}/confirmation:
+    delete:
+      description: Unconfirm contact. For contact with status "confirmed" change status
+        to "unconfirmed"
+      parameters:
+      - description: Paymail address of the contact that the user would like to unconfirm
+        in: path
+        name: paymail
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+        "404":
+          description: Contact not found
+        "422":
+          description: Contact status not confirmed
+        "500":
+          description: Internal server error
+      security:
+      - x-auth-xpub: []
+      summary: Unconfirm contact
+      tags:
+      - Contacts
     post:
       description: Confirm contact. For contact with status "unconfirmed" change status
         to "confirmed"
@@ -2058,32 +2119,6 @@ paths:
       security:
       - x-auth-xpub: []
       summary: Confirm contact
-      tags:
-      - Contacts
-  /api/v1/contacts/{paymail}/non-confirmation:
-    patch:
-      description: Unconfirm contact. For contact with status "confirmed" change status
-        to "unconfirmed"
-      parameters:
-      - description: Paymail address of the contact that the user would like to unconfirm
-        in: path
-        name: paymail
-        required: true
-        type: string
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-        "404":
-          description: Contact not found
-        "422":
-          description: Contact status not confirmed
-        "500":
-          description: Internal server error
-      security:
-      - x-auth-xpub: []
-      summary: Unconfirm contact
       tags:
       - Contacts
   /api/v1/invitations/{paymail}:
@@ -3192,7 +3227,7 @@ paths:
   /v1/contact/search:
     post:
       deprecated: true
-      description: Search contacts
+      description: This endpoint has been deprecated. Use (GET) /api/v1/contacts instead.
       parameters:
       - description: Supports targeted resource searches with filters and metadata,
           plus options for pagination and sorting to streamline data exploration and
@@ -3215,13 +3250,13 @@ paths:
           description: Internal server error - Error while searching for contacts
       security:
       - x-auth-xpub: []
-      summary: Search contacts
+      summary: Search contacts - Use (GET) /api/v1/contacts instead.
       tags:
       - Contact
   /v1/contact/unconfirmed/{paymail}:
     patch:
       deprecated: true
-      description: This endpoint has been deprecated. Use (PATCH) /api/v1/contacts/{paymail}/non-confirmation
+      description: This endpoint has been deprecated. Use (DELETE) /api/v1/contacts/{paymail}/confirmation
         instead.
       parameters:
       - description: Paymail address of the contact that the user would like to unconfirm
@@ -3242,7 +3277,7 @@ paths:
           description: Internal server error
       security:
       - x-auth-xpub: []
-      summary: Unconfirm contact - Use (PATCH) /api/v1/contacts/{paymail}/non-confirmation
+      summary: Unconfirm contact - Use (DELETE) /api/v1/contacts/{paymail}/confirmation
         instead.
       tags:
       - Contact

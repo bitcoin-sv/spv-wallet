@@ -15,8 +15,8 @@ import (
 
 // Search will fetch a list of contacts
 // Get contacts godoc
-// @Summary		Search contacts
-// @Description	Search contacts
+// @Summary		Search contacts - Use (GET) /api/v1/contacts instead.
+// @Description	This endpoint has been deprecated. Use (GET) /api/v1/contacts instead.
 // @Tags		Contact
 // @Produce		json
 // @Param		SearchContacts body filter.SearchContacts false "Supports targeted resource searches with filters and metadata, plus options for pagination and sorting to streamline data exploration and analysis"
@@ -85,7 +85,7 @@ func (a *Action) search(c *gin.Context) {
 // @Success		200 {object} response.PageModel[response.Contact] "Page of contacts"
 // @Failure		400	"Bad request - Error while parsing SearchContacts from request body"
 // @Failure 	500	"Internal server error - Error while searching for contacts"
-// @Router		/api/v1/contacts/ [get]
+// @Router		/api/v1/contacts [get]
 // @Security	x-auth-xpub
 func (a *Action) getContacts(c *gin.Context) {
 	reqXPubID := c.GetString(auth.ParamXPubHashKey)
