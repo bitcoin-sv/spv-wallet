@@ -9,22 +9,42 @@ import (
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/bitcoin-sv/spv-wallet/mappings"
 	"github.com/bitcoin-sv/spv-wallet/models"
+	"github.com/bitcoin-sv/spv-wallet/models/response"
 	"github.com/bitcoin-sv/spv-wallet/server/auth"
 	"github.com/gin-gonic/gin"
 )
 
-// upsert will add a new contact or modify an existing one.
+// oldUpsert will add a new contact or modify an existing one.
 // Upsert contact godoc
-// @Summary		Upsert contact
-// @Description	Add or update contact. When adding a new contact, the system utilizes Paymail's PIKE capability to dispatch an invitation request, asking the counterparty to include the current user in their contacts.
+// @Summary		Upsert contact - Use (PUT) /api/v1/contacts/{paymail} instead.
+// @Description	This endpoint has been deprecated. Use (PUT) /api/v1/contacts/{paymail} instead.
 // @Tags		Contact
 // @Produce		json
-// @Param		paymail path string true "Paymail address of the contact the user wants to add/modify"
+// @Param		paymail path string true "Paymail address of the contact that the user would like to add/modify"
 // @Param		UpsertContact body contacts.UpsertContact true "Full name and metadata needed to add/modify contact"
 // @Success		201
-// @Router		/v1/contact/{paymail} [PUT]
+// @DeprecatedRouter  /v1/contact/{paymail} [put]
 // @Security	x-auth-xpub
-func (a *Action) upsert(c *gin.Context) {
+func (a *Action) oldUpsert(c *gin.Context) {
+	a.upsertHelper(c, true)
+}
+
+// upsertContact will add a new contact or modify an existing one.
+// @Summary		Upsert contact
+// @Description	Add or update contact. When adding a new contact, the system utilizes Paymail's PIKE capability to dispatch an invitation request, asking the counterparty to include the current user in their contacts.
+// @Tags		Contacts
+// @Produce		json
+// @Param		paymail path string true "Paymail address of the contact that the user would like to add/modify"
+// @Param		UpsertContact body contacts.UpsertContact true "Full name and metadata needed to add/modify contact"
+// @Success		201
+// @Router		/api/v1/contacts/{paymail} [put]
+// @Security	x-auth-xpub
+func (a *Action) upsertContact(c *gin.Context) {
+	a.upsertHelper(c, false)
+
+}
+
+func (a *Action) upsertHelper(c *gin.Context, snakeCase bool) {
 	reqXPubID := c.GetString(auth.ParamXPubHashKey)
 	cPaymail := c.Param("paymail")
 
@@ -50,13 +70,24 @@ func (a *Action) upsert(c *gin.Context) {
 		return
 	}
 
-	response := &models.CreateContactResponse{
+	if snakeCase {
+		res := &models.CreateContactResponse{
+			Contact: mappings.MapToOldContactContract(contact),
+		}
+		if err != nil {
+			res.AddAdditionalInfo("warning", err.Error())
+		}
+
+		c.JSON(http.StatusOK, res)
+		return
+	}
+
+	res := &response.CreateContactResponse{
 		Contact: mappings.MapToContactContract(contact),
 	}
-
 	if err != nil {
-		response.AddAdditionalInfo("warning", err.Error())
+		res.AddAdditionalInfo("warning", err.Error())
 	}
 
-	c.JSON(http.StatusOK, response)
+	c.JSON(http.StatusOK, res)
 }

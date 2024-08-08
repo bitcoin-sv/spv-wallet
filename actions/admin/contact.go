@@ -50,7 +50,7 @@ func (a *Action) contactsSearch(c *gin.Context) {
 		return
 	}
 
-	contracts := mappings.MapToContactContracts(contacts)
+	contracts := mappings.MapToOldContactContracts(contacts)
 
 	count, err := a.Services.SpvWalletEngine.GetContactsCount(
 		c.Request.Context(),
