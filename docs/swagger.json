@@ -60,7 +60,7 @@
                     "200": {
                         "description": "Page of transactions",
                         "schema": {
-                            "$ref": "#/definitions/models.PageModel-models_Transaction"
+                            "$ref": "#/definitions/response.PageModel-response_Transaction"
                         }
                     },
                     "400": {
@@ -301,48 +301,7 @@
                 }
             }
         },
-        "/v1/access-key": {
-            "get": {
-                "security": [
-                    {
-                        "x-auth-xpub": []
-                    }
-                ],
-                "description": "Get access key",
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Access-key"
-                ],
-                "summary": "Get access key",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "id of the access key",
-                        "name": "id",
-                        "in": "query",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "AccessKey with given id",
-                        "schema": {
-                            "$ref": "#/definitions/models.AccessKey"
-                        }
-                    },
-                    "400": {
-                        "description": "Bad request - Missing required field: id"
-                    },
-                    "403": {
-                        "description": "Forbidden - Access key is not owned by the user"
-                    },
-                    "500": {
-                        "description": "Internal server error - Error while getting access key"
-                    }
-                }
-            },
+        "/api/v1/users/current/keys": {
             "post": {
                 "security": [
                     {
@@ -382,6 +341,49 @@
                         "description": "Internal server error - Error while creating new access key"
                     }
                 }
+            }
+        },
+        "/api/v1/users/current/keys/{id}": {
+            "get": {
+                "security": [
+                    {
+                        "x-auth-xpub": []
+                    }
+                ],
+                "description": "Get access key",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Access-key"
+                ],
+                "summary": "Get access key",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "id of the access key",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "AccessKey with given id",
+                        "schema": {
+                            "$ref": "#/definitions/models.AccessKey"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request - Missing required field: id"
+                    },
+                    "403": {
+                        "description": "Forbidden - Access key is not owned by the user"
+                    },
+                    "500": {
+                        "description": "Internal server error - Error while getting access key"
+                    }
+                }
             },
             "delete": {
                 "security": [
@@ -397,6 +399,130 @@
                     "Access-key"
                 ],
                 "summary": "Revoke access key",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "id of the access key",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Revoked AccessKey",
+                        "schema": {
+                            "$ref": "#/definitions/models.AccessKey"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request - Missing required field: id"
+                    },
+                    "500": {
+                        "description": "Internal server error - Error while revoking access key"
+                    }
+                }
+            }
+        },
+        "/v1/access-key": {
+            "get": {
+                "security": [
+                    {
+                        "x-auth-xpub": []
+                    }
+                ],
+                "description": "This endpoint has been deprecated. Use (GET) /api/v1/users/current/keys/{id} instead.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Access-key"
+                ],
+                "summary": "Get access key - Use (GET) /api/v1/users/current/keys/{id} instead.",
+                "deprecated": true,
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "id of the access key",
+                        "name": "id",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "AccessKey with given id",
+                        "schema": {
+                            "$ref": "#/definitions/models.AccessKey"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request - Missing required field: id"
+                    },
+                    "403": {
+                        "description": "Forbidden - Access key is not owned by the user"
+                    },
+                    "500": {
+                        "description": "Internal server error - Error while getting access key"
+                    }
+                }
+            },
+            "post": {
+                "security": [
+                    {
+                        "x-auth-xpub": []
+                    }
+                ],
+                "description": "This endpoint has been deprecated. Use (POST) /api/v1/users/current/keys instead.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Access-key"
+                ],
+                "summary": "Create access key - Use (POST) /api/v1/users/current/keys instead.",
+                "deprecated": true,
+                "parameters": [
+                    {
+                        "description": " ",
+                        "name": "CreateAccessKey",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/accesskeys.CreateAccessKey"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created AccessKey",
+                        "schema": {
+                            "$ref": "#/definitions/models.AccessKey"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request - Error while parsing CreateAccessKey from request body"
+                    },
+                    "500": {
+                        "description": "Internal server error - Error while creating new access key"
+                    }
+                }
+            },
+            "delete": {
+                "security": [
+                    {
+                        "x-auth-xpub": []
+                    }
+                ],
+                "description": "This endpoint has been deprecated. Use (DELETE) /api/v1/users/current/keys/{id} instead.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Access-key"
+                ],
+                "summary": "Revoke access key - Use (DELETE) /api/v1/users/current/keys/{id} instead.",
+                "deprecated": true,
                 "parameters": [
                     {
                         "type": "string",
@@ -4077,37 +4203,6 @@
                 }
             }
         },
-        "models.PageDescription": {
-            "type": "object",
-            "properties": {
-                "number": {
-                    "type": "integer"
-                },
-                "size": {
-                    "type": "integer"
-                },
-                "total_elements": {
-                    "type": "integer"
-                },
-                "total_pages": {
-                    "type": "integer"
-                }
-            }
-        },
-        "models.PageModel-models_Transaction": {
-            "type": "object",
-            "properties": {
-                "content": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/models.Transaction"
-                    }
-                },
-                "page": {
-                    "$ref": "#/definitions/models.PageDescription"
-                }
-            }
-        },
         "models.PaymailAddress": {
             "type": "object",
             "properties": {
@@ -4834,6 +4929,159 @@
                 }
             }
         },
+        "response.PageDescription": {
+            "type": "object",
+            "properties": {
+                "number": {
+                    "type": "integer"
+                },
+                "size": {
+                    "type": "integer"
+                },
+                "totalElements": {
+                    "type": "integer"
+                },
+                "totalPages": {
+                    "type": "integer"
+                }
+            }
+        },
+        "response.PageModel-response_Transaction": {
+            "type": "object",
+            "properties": {
+                "content": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/response.Transaction"
+                    }
+                },
+                "page": {
+                    "$ref": "#/definitions/response.PageDescription"
+                }
+            }
+        },
+        "response.Transaction": {
+            "type": "object",
+            "properties": {
+                "block_hash": {
+                    "description": "BlockHash is a block hash that transaction is in.",
+                    "type": "string",
+                    "example": "0000000000000000046e81025ca6cfbd2f45c7331f650c77edc99a14d5a1f0d0"
+                },
+                "block_height": {
+                    "description": "BlockHeight is a block height that transaction is in.",
+                    "type": "integer",
+                    "example": 833505
+                },
+                "created_at": {
+                    "description": "CreatedAt is a time when outer model was created.",
+                    "type": "string",
+                    "example": "2024-02-26T11:00:28.069911Z"
+                },
+                "deleted_at": {
+                    "description": "DeletedAt is a time when outer model was deleted.",
+                    "type": "string",
+                    "example": "2024-02-26T11:02:28.069911Z"
+                },
+                "direction": {
+                    "description": "TransactionDirection is a transaction direction (incoming/outgoing).",
+                    "type": "string",
+                    "example": "outgoing"
+                },
+                "draft_id": {
+                    "description": "DraftID is a transaction related draft id.",
+                    "type": "string",
+                    "example": "b356f7fa00cd3f20cce6c21d704cd13e871d28d714a5ebd0532f5a0e0cde63f7"
+                },
+                "fee": {
+                    "description": "Fee is a transaction fee.",
+                    "type": "integer",
+                    "example": 1
+                },
+                "hex": {
+                    "description": "Hex is a transaction hex.",
+                    "type": "string",
+                    "example": "0100000002..."
+                },
+                "id": {
+                    "description": "ID is a transaction id.",
+                    "type": "string",
+                    "example": "01d0d0067652f684c6acb3683763f353fce55f6496521c7d99e71e1d27e53f5c"
+                },
+                "metadata": {
+                    "description": "Metadata is a metadata map of outer model.",
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "string"
+                    },
+                    "example": {
+                        "key": "value",
+                        "key2": "value2"
+                    }
+                },
+                "number_of_inputs": {
+                    "description": "NumberOfInputs is a number of transaction inputs.",
+                    "type": "integer",
+                    "example": 3
+                },
+                "number_of_outputs": {
+                    "description": "NumberOfOutputs is a number of transaction outputs.",
+                    "type": "integer",
+                    "example": 2
+                },
+                "output_value": {
+                    "description": "OutputValue is a total output value.",
+                    "type": "integer",
+                    "example": 50
+                },
+                "outputs": {
+                    "description": "Outputs represents all spv-wallet-transaction outputs. Will be shown only for admin.",
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "integer"
+                    },
+                    "example": {
+                        "92640954841510a9d95f7737a43075f22ebf7255976549de4c52e8f3faf57470": -51,
+                        "9d07977d2fc14402426288a6010b4cdf7d91b61461acfb75af050b209d2d07ba": 50
+                    }
+                },
+                "status": {
+                    "description": "Status is a transaction status.",
+                    "type": "string",
+                    "example": "MINED"
+                },
+                "total_value": {
+                    "description": "TotalValue is a total input value.",
+                    "type": "integer",
+                    "example": 51
+                },
+                "updated_at": {
+                    "description": "UpdatedAt is a time when outer model was updated.",
+                    "type": "string",
+                    "example": "2024-02-26T11:01:28.069911Z"
+                },
+                "xpub_in_ids": {
+                    "description": "XpubInIDs is a slice of xpub input ids.",
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    },
+                    "example": [
+                        "bb8593f85ef8056a77026ad415f02128f3768906de53e9e8bf8749fe2d66cf50"
+                    ]
+                },
+                "xpub_out_ids": {
+                    "description": "XpubOutIDs is a slice of xpub output ids.",
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    },
+                    "example": [
+                        "2075eca10bf2688b38cd7fdad6c24562463a9a26ae505d66c480fd53165dbaa2"
+                    ]
+                }
+            }
+        },
         "time.Duration": {
             "type": "integer",
             "enum": [
@@ -4853,6 +5101,8 @@
                 1000000000,
                 60000000000,
                 3600000000000,
+                -9223372036854775808,
+                9223372036854775807,
                 1,
                 1000,
                 1000000,
@@ -4877,6 +5127,8 @@
                 "Second",
                 "Minute",
                 "Hour",
+                "minDuration",
+                "maxDuration",
                 "Nanosecond",
                 "Microsecond",
                 "Millisecond",

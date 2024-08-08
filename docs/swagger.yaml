@@ -1174,26 +1174,6 @@ definitions:
         description: Total number of possible pages
         type: integer
     type: object
-  models.PageDescription:
-    properties:
-      number:
-        type: integer
-      size:
-        type: integer
-      total_elements:
-        type: integer
-      total_pages:
-        type: integer
-    type: object
-  models.PageModel-models_Transaction:
-    properties:
-      content:
-        items:
-          $ref: '#/definitions/models.Transaction'
-        type: array
-      page:
-        $ref: '#/definitions/models.PageDescription'
-    type: object
   models.PaymailAddress:
     properties:
       alias:
@@ -1732,6 +1712,120 @@ definitions:
         example: "2024-02-26T11:01:28.069911Z"
         type: string
     type: object
+  response.PageDescription:
+    properties:
+      number:
+        type: integer
+      size:
+        type: integer
+      totalElements:
+        type: integer
+      totalPages:
+        type: integer
+    type: object
+  response.PageModel-response_Transaction:
+    properties:
+      content:
+        items:
+          $ref: '#/definitions/response.Transaction'
+        type: array
+      page:
+        $ref: '#/definitions/response.PageDescription'
+    type: object
+  response.Transaction:
+    properties:
+      block_hash:
+        description: BlockHash is a block hash that transaction is in.
+        example: 0000000000000000046e81025ca6cfbd2f45c7331f650c77edc99a14d5a1f0d0
+        type: string
+      block_height:
+        description: BlockHeight is a block height that transaction is in.
+        example: 833505
+        type: integer
+      created_at:
+        description: CreatedAt is a time when outer model was created.
+        example: "2024-02-26T11:00:28.069911Z"
+        type: string
+      deleted_at:
+        description: DeletedAt is a time when outer model was deleted.
+        example: "2024-02-26T11:02:28.069911Z"
+        type: string
+      direction:
+        description: TransactionDirection is a transaction direction (incoming/outgoing).
+        example: outgoing
+        type: string
+      draft_id:
+        description: DraftID is a transaction related draft id.
+        example: b356f7fa00cd3f20cce6c21d704cd13e871d28d714a5ebd0532f5a0e0cde63f7
+        type: string
+      fee:
+        description: Fee is a transaction fee.
+        example: 1
+        type: integer
+      hex:
+        description: Hex is a transaction hex.
+        example: 0100000002...
+        type: string
+      id:
+        description: ID is a transaction id.
+        example: 01d0d0067652f684c6acb3683763f353fce55f6496521c7d99e71e1d27e53f5c
+        type: string
+      metadata:
+        additionalProperties:
+          type: string
+        description: Metadata is a metadata map of outer model.
+        example:
+          key: value
+          key2: value2
+        type: object
+      number_of_inputs:
+        description: NumberOfInputs is a number of transaction inputs.
+        example: 3
+        type: integer
+      number_of_outputs:
+        description: NumberOfOutputs is a number of transaction outputs.
+        example: 2
+        type: integer
+      output_value:
+        description: OutputValue is a total output value.
+        example: 50
+        type: integer
+      outputs:
+        additionalProperties:
+          type: integer
+        description: Outputs represents all spv-wallet-transaction outputs. Will be
+          shown only for admin.
+        example:
+          92640954841510a9d95f7737a43075f22ebf7255976549de4c52e8f3faf57470: -51
+          9d07977d2fc14402426288a6010b4cdf7d91b61461acfb75af050b209d2d07ba: 50
+        type: object
+      status:
+        description: Status is a transaction status.
+        example: MINED
+        type: string
+      total_value:
+        description: TotalValue is a total input value.
+        example: 51
+        type: integer
+      updated_at:
+        description: UpdatedAt is a time when outer model was updated.
+        example: "2024-02-26T11:01:28.069911Z"
+        type: string
+      xpub_in_ids:
+        description: XpubInIDs is a slice of xpub input ids.
+        example:
+        - bb8593f85ef8056a77026ad415f02128f3768906de53e9e8bf8749fe2d66cf50
+        items:
+          type: string
+        type: array
+      xpub_out_ids:
+        description: XpubOutIDs is a slice of xpub output ids.
+        example:
+        - 2075eca10bf2688b38cd7fdad6c24562463a9a26ae505d66c480fd53165dbaa2
+        items:
+          type: string
+        type: array
+    type: object
   time.Duration:
     enum:
     - -9223372036854775808
@@ -1750,6 +1844,8 @@ definitions:
     - 1000000000
     - 60000000000
     - 3600000000000
+    - -9223372036854775808
+    - 9223372036854775807
     - 1
     - 1000
     - 1000000
@@ -1774,6 +1870,8 @@ definitions:
     - Second
     - Minute
     - Hour
+    - minDuration
+    - maxDuration
     - Nanosecond
     - Microsecond
     - Millisecond
@@ -1881,7 +1979,7 @@ paths:
         "200":
           description: Page of transactions
           schema:
-            $ref: '#/definitions/models.PageModel-models_Transaction'
+            $ref: '#/definitions/response.PageModel-response_Transaction'
         "400":
           description: Bad request - Error while parsing SearchTransactions from request
             body
@@ -2038,57 +2136,7 @@ paths:
       summary: Update current user information
       tags:
       - Users
-  /v1/access-key:
-    delete:
-      description: Revoke access key
-      parameters:
-      - description: id of the access key
-        in: query
-        name: id
-        required: true
-        type: string
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: Revoked AccessKey
-          schema:
-            $ref: '#/definitions/models.AccessKey'
-        "400":
-          description: 'Bad request - Missing required field: id'
-        "500":
-          description: Internal server error - Error while revoking access key
-      security:
-      - x-auth-xpub: []
-      summary: Revoke access key
-      tags:
-      - Access-key
-    get:
-      description: Get access key
-      parameters:
-      - description: id of the access key
-        in: query
-        name: id
-        required: true
-        type: string
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: AccessKey with given id
-          schema:
-            $ref: '#/definitions/models.AccessKey'
-        "400":
-          description: 'Bad request - Missing required field: id'
-        "403":
-          description: Forbidden - Access key is not owned by the user
-        "500":
-          description: Internal server error - Error while getting access key
-      security:
-      - x-auth-xpub: []
-      summary: Get access key
-      tags:
-      - Access-key
+  /api/v1/users/current/keys:
     post:
       description: Create access key
       parameters:
@@ -2113,6 +2161,140 @@ paths:
       security:
       - x-auth-xpub: []
       summary: Create access key
+      tags:
+      - Access-key
+  /api/v1/users/current/keys/{id}:
+    delete:
+      description: Revoke access key
+      parameters:
+      - description: id of the access key
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Revoked AccessKey
+          schema:
+            $ref: '#/definitions/models.AccessKey'
+        "400":
+          description: 'Bad request - Missing required field: id'
+        "500":
+          description: Internal server error - Error while revoking access key
+      security:
+      - x-auth-xpub: []
+      summary: Revoke access key
+      tags:
+      - Access-key
+    get:
+      description: Get access key
+      parameters:
+      - description: id of the access key
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: AccessKey with given id
+          schema:
+            $ref: '#/definitions/models.AccessKey'
+        "400":
+          description: 'Bad request - Missing required field: id'
+        "403":
+          description: Forbidden - Access key is not owned by the user
+        "500":
+          description: Internal server error - Error while getting access key
+      security:
+      - x-auth-xpub: []
+      summary: Get access key
+      tags:
+      - Access-key
+  /v1/access-key:
+    delete:
+      deprecated: true
+      description: This endpoint has been deprecated. Use (DELETE) /api/v1/users/current/keys/{id}
+        instead.
+      parameters:
+      - description: id of the access key
+        in: query
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Revoked AccessKey
+          schema:
+            $ref: '#/definitions/models.AccessKey'
+        "400":
+          description: 'Bad request - Missing required field: id'
+        "500":
+          description: Internal server error - Error while revoking access key
+      security:
+      - x-auth-xpub: []
+      summary: Revoke access key - Use (DELETE) /api/v1/users/current/keys/{id} instead.
+      tags:
+      - Access-key
+    get:
+      deprecated: true
+      description: This endpoint has been deprecated. Use (GET) /api/v1/users/current/keys/{id}
+        instead.
+      parameters:
+      - description: id of the access key
+        in: query
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: AccessKey with given id
+          schema:
+            $ref: '#/definitions/models.AccessKey'
+        "400":
+          description: 'Bad request - Missing required field: id'
+        "403":
+          description: Forbidden - Access key is not owned by the user
+        "500":
+          description: Internal server error - Error while getting access key
+      security:
+      - x-auth-xpub: []
+      summary: Get access key - Use (GET) /api/v1/users/current/keys/{id} instead.
+      tags:
+      - Access-key
+    post:
+      deprecated: true
+      description: This endpoint has been deprecated. Use (POST) /api/v1/users/current/keys
+        instead.
+      parameters:
+      - description: ' '
+        in: body
+        name: CreateAccessKey
+        required: true
+        schema:
+          $ref: '#/definitions/accesskeys.CreateAccessKey'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created AccessKey
+          schema:
+            $ref: '#/definitions/models.AccessKey'
+        "400":
+          description: Bad request - Error while parsing CreateAccessKey from request
+            body
+        "500":
+          description: Internal server error - Error while creating new access key
+      security:
+      - x-auth-xpub: []
+      summary: Create access key - Use (POST) /api/v1/users/current/keys instead.
       tags:
       - Access-key
   /v1/access-key/count:

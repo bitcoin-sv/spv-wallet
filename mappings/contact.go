@@ -14,7 +14,7 @@ func MapToContactContract(src *engine.Contact) *models.Contact {
 
 	return &models.Contact{
 		ID:       src.ID,
-		OldModel: *common.MapToOldContract(&src.Model),
+		Model:    *common.MapToOldContract(&src.Model),
 		FullName: src.FullName,
 		Paymail:  src.Paymail,
 		PubKey:   src.PubKey,

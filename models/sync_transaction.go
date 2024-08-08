@@ -9,7 +9,7 @@ import (
 // SyncTransaction is a model that represents a sync transaction specific fields.
 type SyncTransaction struct {
 	// Model is a common model that contains common fields for all models.
-	common.OldModel
+	common.Model
 
 	// ID is a sync transaction id.
 	ID string `json:"id"`

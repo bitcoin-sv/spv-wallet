@@ -38,7 +38,7 @@ func MapToUtxoContract(u *engine.Utxo) *models.Utxo {
 	}
 
 	return &models.Utxo{
-		OldModel:     *common.MapToOldContract(&u.Model),
+		Model:        *common.MapToOldContract(&u.Model),
 		UtxoPointer:  *MapToUtxoPointer(&u.UtxoPointer),
 		ID:           u.ID,
 		XpubID:       u.XpubID,
@@ -64,7 +64,7 @@ func MapUtxoModelToEngine(u *models.Utxo) *engine.Utxo {
 	spendingTxID.String = u.SpendingTxID
 
 	return &engine.Utxo{
-		Model:        *common.MapOldContractToModel(&u.OldModel),
+		Model:        *common.MapOldContractToModel(&u.Model),
 		UtxoPointer:  *MapUtxoPointerModelToEngine(&u.UtxoPointer),
 		ID:           u.ID,
 		XpubID:       u.XpubID,

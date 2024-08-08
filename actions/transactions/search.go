@@ -63,7 +63,7 @@ func (a *Action) search(c *gin.Context) {
 // @Tags		Transactions
 // @Produce		json
 // @Param		SearchTransactions body filter.SearchTransactions false "Supports targeted resource searches with filters and metadata, plus options for pagination and sorting to streamline data exploration and analysis"
-// @Success		200 {object} models.PageModel[models.Transaction] "Page of transactions"
+// @Success		200 {object} response.PageModel[response.Transaction] "Page of transactions"
 // @Failure		400	"Bad request - Error while parsing SearchTransactions from request body"
 // @Failure 	500	"Internal server error - Error while searching for transactions"
 // @Router		/api/v1/transactions [get]

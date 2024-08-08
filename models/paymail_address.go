@@ -5,7 +5,7 @@ import "github.com/bitcoin-sv/spv-wallet/models/common"
 // PaymailAddress is a model that represents a paymail address.
 type PaymailAddress struct {
 	// Model is a common model that contains common fields for all models.
-	common.OldModel
+	common.Model
 
 	// ID is a paymail address id.
 	ID string `json:"id" example:"c0ba4a52c89279268476a141be7569200cff2ca4892512b07ca75c25a95c16cd"`
