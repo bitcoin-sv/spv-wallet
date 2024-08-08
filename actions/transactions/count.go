@@ -13,7 +13,7 @@ import (
 // count will fetch a count of transactions filtered on conditions and metadata
 // Count of transactions godoc
 // @Summary		Count of transactions
-// @Description	Count of transactions
+// @Description	The functionality of this method will be offered in the future by /api/v1/transactions [get].
 // @Tags		Transactions
 // @Produce		json
 // @Param		CountTransactions body filter.CountTransactions false "Enables filtering of elements to be counted"

@@ -53,7 +53,7 @@ func (a *Action) search(c *gin.Context) {
 
 	contracts := make([]*models.Utxo, 0)
 	for _, utxo := range utxos {
-		contracts = append(contracts, mappings.MapToUtxoContract(utxo))
+		contracts = append(contracts, mappings.MapToOldUtxoContract(utxo))
 	}
 
 	c.JSON(http.StatusOK, contracts)

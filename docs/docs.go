@@ -40,6 +40,209 @@ const docTemplate = `{
                 }
             }
         },
+        "/api/v1/transactions": {
+            "get": {
+                "security": [
+                    {
+                        "x-auth-xpub": []
+                    }
+                ],
+                "description": "Experimental (not ready for production use yet) - Get transactions",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Transactions"
+                ],
+                "summary": "Experimental - Get transactions",
+                "parameters": [
+                    {
+                        "description": "Supports targeted resource searches with filters and metadata, plus options for pagination and sorting to streamline data exploration and analysis",
+                        "name": "SearchTransactions",
+                        "in": "body",
+                        "schema": {
+                            "$ref": "#/definitions/filter.SearchTransactions"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Page of transactions",
+                        "schema": {
+                            "$ref": "#/definitions/response.PageModel-response_Transaction"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request - Error while parsing SearchTransactions from request body"
+                    },
+                    "500": {
+                        "description": "Internal server error - Error while searching for transactions"
+                    }
+                }
+            },
+            "post": {
+                "security": [
+                    {
+                        "x-auth-xpub": []
+                    }
+                ],
+                "description": "Record transaction",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Transactions"
+                ],
+                "summary": "Record transaction",
+                "parameters": [
+                    {
+                        "description": "Transaction to be recorded",
+                        "name": "RecordTransaction",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/transactions.RecordTransaction"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created transaction",
+                        "schema": {
+                            "$ref": "#/definitions/models.Transaction"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request - Error while parsing RecordTransaction from request body or xpub not found"
+                    },
+                    "500": {
+                        "description": "Internal Server Error - Error while recording transaction"
+                    }
+                }
+            }
+        },
+        "/api/v1/transactions/drafts": {
+            "post": {
+                "security": [
+                    {
+                        "x-auth-xpub": []
+                    }
+                ],
+                "description": "New transaction draft",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Transactions"
+                ],
+                "summary": "New transaction draft",
+                "parameters": [
+                    {
+                        "description": "NewTransaction model containing the transaction config and metadata",
+                        "name": "NewTransaction",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/transactions.NewTransaction"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created transaction",
+                        "schema": {
+                            "$ref": "#/definitions/models.DraftTransaction"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request - Error while parsing NewTransaction from request body or xpub not found"
+                    },
+                    "500": {
+                        "description": "Internal Server Error - Error while creating transaction"
+                    }
+                }
+            }
+        },
+        "/api/v1/transactions/{id}": {
+            "get": {
+                "security": [
+                    {
+                        "x-auth-xpub": []
+                    }
+                ],
+                "description": "Get transaction by id",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Transactions"
+                ],
+                "summary": "Get transaction by id",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Transaction",
+                        "schema": {
+                            "$ref": "#/definitions/models.Transaction"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request - Transaction not found or associated with another xpub"
+                    },
+                    "500": {
+                        "description": "Internal Server Error - Error while fetching transaction"
+                    }
+                }
+            },
+            "patch": {
+                "security": [
+                    {
+                        "x-auth-xpub": []
+                    }
+                ],
+                "description": "Update transaction",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Transactions"
+                ],
+                "summary": "Update transaction",
+                "parameters": [
+                    {
+                        "description": " ",
+                        "name": "UpdateTransactionRequest",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/transactions.UpdateTransactionRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Updated transaction",
+                        "schema": {
+                            "$ref": "#/definitions/models.Transaction"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request - Error while parsing UpdateTransaction from request body, tx not found or tx is not associated with the xpub"
+                    },
+                    "500": {
+                        "description": "Internal Server Error - Error while updating transaction"
+                    }
+                }
+            }
+        },
         "/api/v1/users/current": {
             "get": {
                 "security": [
@@ -226,41 +429,6 @@ const docTemplate = `{
                     },
                     "500": {
                         "description": "Internal server error - Error while revoking access key"
-                    }
-                }
-            }
-        },
-        "/transaction/broadcast/callback": {
-            "post": {
-                "security": [
-                    {
-                        "callback-auth": []
-                    }
-                ],
-                "tags": [
-                    "Transactions"
-                ],
-                "summary": "Endpoint designed for receiving callbacks from Arc (service responsible for submitting transactions to the BSV network)",
-                "parameters": [
-                    {
-                        "description": "Transaction",
-                        "name": "transaction",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/broadcast.SubmittedTx"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK"
-                    },
-                    "400": {
-                        "description": "Bad request - Error while parsing transaction from request body"
-                    },
-                    "500": {
-                        "description": "Internal Server Error - Error while updating transaction"
                     }
                 }
             }
@@ -1986,14 +2154,15 @@ const docTemplate = `{
                         "x-auth-xpub": []
                     }
                 ],
-                "description": "Get transaction by id",
+                "description": "This endpoint has been deprecated. Use (GET) /api/v1/transactions/{id} instead.",
                 "produces": [
                     "application/json"
                 ],
                 "tags": [
                     "Transactions"
                 ],
-                "summary": "Get transaction by id",
+                "summary": "Get transaction by id - Use (GET) /api/v1/transactions/{id} instead.",
+                "deprecated": true,
                 "parameters": [
                     {
                         "type": "string",
@@ -2024,14 +2193,15 @@ const docTemplate = `{
                         "x-auth-xpub": []
                     }
                 ],
-                "description": "New transaction",
+                "description": "This endpoint has been deprecated. Use (POST) /api/v1/transactions/drafts instead.",
                 "produces": [
                     "application/json"
                 ],
                 "tags": [
                     "Transactions"
                 ],
-                "summary": "New transaction",
+                "summary": "New transaction - Use (POST) /api/v1/transactions/drafts instead.",
+                "deprecated": true,
                 "parameters": [
                     {
                         "description": "NewTransaction model containing the transaction config and metadata",
@@ -2064,14 +2234,15 @@ const docTemplate = `{
                         "x-auth-xpub": []
                     }
                 ],
-                "description": "Update transaction",
+                "description": "This endpoint has been deprecated. Use (PATCH) /api/v1/transactions/{id} instead.",
                 "produces": [
                     "application/json"
                 ],
                 "tags": [
                     "Transactions"
                 ],
-                "summary": "Update transaction",
+                "summary": "Update transaction - Use (PATCH) /api/v1/transactions/{id} instead.",
+                "deprecated": true,
                 "parameters": [
                     {
                         "description": " ",
@@ -2106,7 +2277,7 @@ const docTemplate = `{
                         "x-auth-xpub": []
                     }
                 ],
-                "description": "Count of transactions",
+                "description": "The functionality of this method will be offered in the future by /api/v1/transactions [get].",
                 "produces": [
                     "application/json"
                 ],
@@ -2147,14 +2318,15 @@ const docTemplate = `{
                         "x-auth-xpub": []
                     }
                 ],
-                "description": "Record transaction",
+                "description": "This endpoint has been deprecated. Use (POST) /api/v1/transactions instead.",
                 "produces": [
                     "application/json"
                 ],
                 "tags": [
                     "Transactions"
                 ],
-                "summary": "Record transaction",
+                "summary": "Record transaction - Use (POST) /api/v1/transactions instead.",
+                "deprecated": true,
                 "parameters": [
                     {
                         "description": "Transaction to be recorded",
@@ -2542,99 +2714,6 @@ const docTemplate = `{
                     }
                 }
             }
-        },
-        "broadcast.SubmittedTx": {
-            "type": "object",
-            "properties": {
-                "blockHash": {
-                    "description": "BlockHash is the hash of the block where the transaction was included.",
-                    "type": "string"
-                },
-                "blockHeight": {
-                    "description": "BlockHeight is the height of the block where the transaction was included.",
-                    "type": "integer"
-                },
-                "extraInfo": {
-                    "description": "ExtraInfo provides extra information for given transaction.",
-                    "type": "string"
-                },
-                "merklePath": {
-                    "description": "MerklePath is the Merkle path used to calculate Merkle root of the block in which the transaction was included.",
-                    "type": "string"
-                },
-                "status": {
-                    "description": "Status is the status of the response.",
-                    "type": "integer"
-                },
-                "timestamp": {
-                    "description": "Timestamp is the timestamp of the block where the transaction was included.",
-                    "type": "string"
-                },
-                "title": {
-                    "description": "Title is the title of the response.",
-                    "type": "string"
-                },
-                "txStatus": {
-                    "description": "TxStatus is the status of the transaction.",
-                    "allOf": [
-                        {
-                            "$ref": "#/definitions/broadcast.TxStatus"
-                        }
-                    ]
-                },
-                "txid": {
-                    "description": "TxID is the transaction id.",
-                    "type": "string"
-                }
-            }
-        },
-        "broadcast.TxStatus": {
-            "type": "string",
-            "enum": [
-                "UNKNOWN",
-                "QUEUED",
-                "RECEIVED",
-                "STORED",
-                "ANNOUNCED_TO_NETWORK",
-                "REQUESTED_BY_NETWORK",
-                "SENT_TO_NETWORK",
-                "ACCEPTED_BY_NETWORK",
-                "SEEN_ON_NETWORK",
-                "MINED",
-                "SEEN_IN_ORPHAN_MEMPOOL",
-                "CONFIRMED",
-                "REJECTED"
-            ],
-            "x-enum-comments": {
-                "AcceptedByNetwork": "7",
-                "AnnouncedToNetwork": "4",
-                "Confirmed": "108",
-                "Mined": "9",
-                "Queued": "1",
-                "Received": "2",
-                "Rejected": "109",
-                "RequestedByNetwork": "5",
-                "SeenInOrphanMempool": "10",
-                "SeenOnNetwork": "8",
-                "SentToNetwork": "6",
-                "Stored": "3",
-                "Unknown": "0"
-            },
-            "x-enum-varnames": [
-                "Unknown",
-                "Queued",
-                "Received",
-                "Stored",
-                "AnnouncedToNetwork",
-                "RequestedByNetwork",
-                "SentToNetwork",
-                "AcceptedByNetwork",
-                "SeenOnNetwork",
-                "Mined",
-                "SeenInOrphanMempool",
-                "Confirmed",
-                "Rejected"
-            ]
         },
         "contacts.UpsertContact": {
             "type": "object",
@@ -4859,6 +4938,159 @@ const docTemplate = `{
                 }
             }
         },
+        "response.PageDescription": {
+            "type": "object",
+            "properties": {
+                "number": {
+                    "type": "integer"
+                },
+                "size": {
+                    "type": "integer"
+                },
+                "totalElements": {
+                    "type": "integer"
+                },
+                "totalPages": {
+                    "type": "integer"
+                }
+            }
+        },
+        "response.PageModel-response_Transaction": {
+            "type": "object",
+            "properties": {
+                "content": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/response.Transaction"
+                    }
+                },
+                "page": {
+                    "$ref": "#/definitions/response.PageDescription"
+                }
+            }
+        },
+        "response.Transaction": {
+            "type": "object",
+            "properties": {
+                "block_hash": {
+                    "description": "BlockHash is a block hash that transaction is in.",
+                    "type": "string",
+                    "example": "0000000000000000046e81025ca6cfbd2f45c7331f650c77edc99a14d5a1f0d0"
+                },
+                "block_height": {
+                    "description": "BlockHeight is a block height that transaction is in.",
+                    "type": "integer",
+                    "example": 833505
+                },
+                "created_at": {
+                    "description": "CreatedAt is a time when outer model was created.",
+                    "type": "string",
+                    "example": "2024-02-26T11:00:28.069911Z"
+                },
+                "deleted_at": {
+                    "description": "DeletedAt is a time when outer model was deleted.",
+                    "type": "string",
+                    "example": "2024-02-26T11:02:28.069911Z"
+                },
+                "direction": {
+                    "description": "TransactionDirection is a transaction direction (incoming/outgoing).",
+                    "type": "string",
+                    "example": "outgoing"
+                },
+                "draft_id": {
+                    "description": "DraftID is a transaction related draft id.",
+                    "type": "string",
+                    "example": "b356f7fa00cd3f20cce6c21d704cd13e871d28d714a5ebd0532f5a0e0cde63f7"
+                },
+                "fee": {
+                    "description": "Fee is a transaction fee.",
+                    "type": "integer",
+                    "example": 1
+                },
+                "hex": {
+                    "description": "Hex is a transaction hex.",
+                    "type": "string",
+                    "example": "0100000002..."
+                },
+                "id": {
+                    "description": "ID is a transaction id.",
+                    "type": "string",
+                    "example": "01d0d0067652f684c6acb3683763f353fce55f6496521c7d99e71e1d27e53f5c"
+                },
+                "metadata": {
+                    "description": "Metadata is a metadata map of outer model.",
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "string"
+                    },
+                    "example": {
+                        "key": "value",
+                        "key2": "value2"
+                    }
+                },
+                "number_of_inputs": {
+                    "description": "NumberOfInputs is a number of transaction inputs.",
+                    "type": "integer",
+                    "example": 3
+                },
+                "number_of_outputs": {
+                    "description": "NumberOfOutputs is a number of transaction outputs.",
+                    "type": "integer",
+                    "example": 2
+                },
+                "output_value": {
+                    "description": "OutputValue is a total output value.",
+                    "type": "integer",
+                    "example": 50
+                },
+                "outputs": {
+                    "description": "Outputs represents all spv-wallet-transaction outputs. Will be shown only for admin.",
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "integer"
+                    },
+                    "example": {
+                        "92640954841510a9d95f7737a43075f22ebf7255976549de4c52e8f3faf57470": -51,
+                        "9d07977d2fc14402426288a6010b4cdf7d91b61461acfb75af050b209d2d07ba": 50
+                    }
+                },
+                "status": {
+                    "description": "Status is a transaction status.",
+                    "type": "string",
+                    "example": "MINED"
+                },
+                "total_value": {
+                    "description": "TotalValue is a total input value.",
+                    "type": "integer",
+                    "example": 51
+                },
+                "updated_at": {
+                    "description": "UpdatedAt is a time when outer model was updated.",
+                    "type": "string",
+                    "example": "2024-02-26T11:01:28.069911Z"
+                },
+                "xpub_in_ids": {
+                    "description": "XpubInIDs is a slice of xpub input ids.",
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    },
+                    "example": [
+                        "bb8593f85ef8056a77026ad415f02128f3768906de53e9e8bf8749fe2d66cf50"
+                    ]
+                },
+                "xpub_out_ids": {
+                    "description": "XpubOutIDs is a slice of xpub output ids.",
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    },
+                    "example": [
+                        "2075eca10bf2688b38cd7fdad6c24562463a9a26ae505d66c480fd53165dbaa2"
+                    ]
+                }
+            }
+        },
         "time.Duration": {
             "type": "integer",
             "enum": [
@@ -4870,6 +5102,16 @@ const docTemplate = `{
                 1000000000,
                 60000000000,
                 3600000000000,
+                -9223372036854775808,
+                9223372036854775807,
+                1,
+                1000,
+                1000000,
+                1000000000,
+                60000000000,
+                3600000000000,
+                -9223372036854775808,
+                9223372036854775807,
                 1,
                 1000,
                 1000000,
@@ -4886,6 +5128,16 @@ const docTemplate = `{
                 "Second",
                 "Minute",
                 "Hour",
+                "minDuration",
+                "maxDuration",
+                "Nanosecond",
+                "Microsecond",
+                "Millisecond",
+                "Second",
+                "Minute",
+                "Hour",
+                "minDuration",
+                "maxDuration",
                 "Nanosecond",
                 "Microsecond",
                 "Millisecond",
@@ -4952,6 +5204,22 @@ const docTemplate = `{
                     "type": "string",
                     "example": "01d0d0067652f684c6acb3683763f353fce55f6496521c7d99e71e1d27e53f5c"
                 },
+                "metadata": {
+                    "description": "Accepts a JSON object for embedding custom metadata, enabling arbitrary additional information to be associated with the resource",
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "string"
+                    },
+                    "example": {
+                        "key": "value",
+                        "key2": "value2"
+                    }
+                }
+            }
+        },
+        "transactions.UpdateTransactionRequest": {
+            "type": "object",
+            "properties": {
                 "metadata": {
                     "description": "Accepts a JSON object for embedding custom metadata, enabling arbitrary additional information to be associated with the resource",
                     "type": "object",

@@ -4,16 +4,46 @@ import (
 	"github.com/bitcoin-sv/spv-wallet/engine"
 	"github.com/bitcoin-sv/spv-wallet/mappings/common"
 	"github.com/bitcoin-sv/spv-wallet/models"
+	"github.com/bitcoin-sv/spv-wallet/models/response"
 )
 
-// MapToTransactionContract will map the model from spv-wallet to the spv-wallet-models contract
-func MapToTransactionContract(t *engine.Transaction) *models.Transaction {
+// MapToDeprecatedTransactionContract will map the model from spv-wallet to the spv-wallet-models contract
+func MapToDeprecatedTransactionContract(t *engine.Transaction) *models.Transaction {
 	if t == nil {
 		return nil
 	}
 
 	model := models.Transaction{
 		Model:                *common.MapToOldContract(&t.Model),
+		ID:                   t.ID,
+		Hex:                  t.Hex,
+		XpubInIDs:            t.XpubInIDs,
+		XpubOutIDs:           t.XpubOutIDs,
+		BlockHash:            t.BlockHash,
+		BlockHeight:          t.BlockHeight,
+		Fee:                  t.Fee,
+		NumberOfInputs:       t.NumberOfInputs,
+		NumberOfOutputs:      t.NumberOfOutputs,
+		DraftID:              t.DraftID,
+		TotalValue:           t.TotalValue,
+		Status:               string(t.Status),
+		TransactionDirection: string(t.Direction),
+	}
+
+	processMetadataForDeprecatedTransactionModel(t, t.XPubID, &model)
+	processOutputValueForDeprecatedTransactionModel(t, t.XPubID, &model)
+
+	return &model
+}
+
+// MapToTransactionContract will map the model from spv-wallet to the spv-wallet-models contract
+func MapToTransactionContract(t *engine.Transaction) *response.Transaction {
+	if t == nil {
+		return nil
+	}
+
+	model := response.Transaction{
+		Model:                *common.MapToContract(&t.Model),
 		ID:                   t.ID,
 		Hex:                  t.Hex,
 		XpubInIDs:            t.XpubInIDs,
@@ -58,12 +88,12 @@ func MapToTransactionContractForAdmin(t *engine.Transaction) *models.Transaction
 		Outputs:         t.XpubOutputValue,
 	}
 
-	processMetadata(t, t.XPubID, &model)
+	processMetadataForDeprecatedTransactionModel(t, t.XPubID, &model)
 
 	return &model
 }
 
-func processMetadata(t *engine.Transaction, xpubID string, model *models.Transaction) {
+func processMetadataForDeprecatedTransactionModel(t *engine.Transaction, xpubID string, model *models.Transaction) {
 	if len(t.XpubMetadata) > 0 && len(t.XpubMetadata[xpubID]) > 0 {
 		if t.Model.Metadata == nil {
 			model.Model.Metadata = make(models.Metadata)
@@ -74,7 +104,31 @@ func processMetadata(t *engine.Transaction, xpubID string, model *models.Transac
 	}
 }
 
-func processOutputValue(t *engine.Transaction, xpubID string, model *models.Transaction) {
+func processMetadata(t *engine.Transaction, xpubID string, model *response.Transaction) {
+	if len(t.XpubMetadata) > 0 && len(t.XpubMetadata[xpubID]) > 0 {
+		if t.Model.Metadata == nil {
+			model.Model.Metadata = make(models.Metadata)
+		}
+		for key, value := range t.XpubMetadata[xpubID] {
+			model.Model.Metadata[key] = value
+		}
+	}
+}
+
+func processOutputValueForDeprecatedTransactionModel(t *engine.Transaction, xpubID string, model *models.Transaction) {
+	model.OutputValue = int64(0)
+	if len(t.XpubOutputValue) > 0 && t.XpubOutputValue[xpubID] != 0 {
+		model.OutputValue = t.XpubOutputValue[xpubID]
+	}
+
+	if model.OutputValue > 0 {
+		model.TransactionDirection = "incoming"
+	} else {
+		model.TransactionDirection = "outgoing"
+	}
+}
+
+func processOutputValue(t *engine.Transaction, xpubID string, model *response.Transaction) {
 	model.OutputValue = int64(0)
 	if len(t.XpubOutputValue) > 0 && t.XpubOutputValue[xpubID] != 0 {
 		model.OutputValue = t.XpubOutputValue[xpubID]
@@ -278,14 +332,30 @@ func mapToContractDestinations(tx *engine.TransactionConfig) []*models.Destinati
 	return destinations
 }
 
-// MapToDraftTransactionContract will map the transaction-output model from spv-wallet to the spv-wallet-models contract
-func MapToDraftTransactionContract(tx *engine.DraftTransaction) *models.DraftTransaction {
+// MapToDeprecatedDraftTransactionContract will map the transaction-output model from spv-wallet to the spv-wallet-models contract
+func MapToDeprecatedDraftTransactionContract(tx *engine.DraftTransaction) *models.DraftTransaction {
 	if tx == nil {
 		return nil
 	}
 
 	return &models.DraftTransaction{
 		Model:         *common.MapToOldContract(&tx.Model),
+		ID:            tx.ID,
+		Hex:           tx.Hex,
+		XpubID:        tx.XpubID,
+		ExpiresAt:     tx.ExpiresAt,
+		Configuration: *MapToTransactionConfigContract(&tx.Configuration),
+	}
+}
+
+// MapToDraftTransactionContract will map the transaction-output model from spv-wallet to the spv-wallet-models contract
+func MapToDraftTransactionContract(tx *engine.DraftTransaction) *response.DraftTransaction {
+	if tx == nil {
+		return nil
+	}
+
+	return &response.DraftTransaction{
+		Model:         *common.MapToContract(&tx.Model),
 		ID:            tx.ID,
 		Hex:           tx.Hex,
 		XpubID:        tx.XpubID,
