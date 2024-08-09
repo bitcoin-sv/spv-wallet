@@ -11,6 +11,7 @@ import (
 func NewHandler() routes.BaseEndpointsFunc {
 	basicEndpoints := routes.BaseEndpointsFunc(func(router *gin.RouterGroup) {
 		router.GET("/", index)
+		router.GET("/paging", actions.Paging)
 		router.OPTIONS("/", actions.StatusOK)
 		router.HEAD("/", actions.StatusOK)
 
