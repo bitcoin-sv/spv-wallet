@@ -91,44 +91,12 @@ func (a *Action) search(c *gin.Context) {
 func (a *Action) getContacts(c *gin.Context) {
 	reqXPubID := c.GetString(auth.ParamXPubHashKey)
 
-	var reqParams filter.SearchContacts
-	if err := c.Bind(&reqParams); err != nil {
-		spverrors.ErrorResponse(c, spverrors.ErrCannotBindRequest, a.Services.Logger)
-		return
-	}
-
-	conditions, err := reqParams.Conditions.ToDbConditions()
+	contacts, count, err := a.searchContacts(c, reqXPubID, "")
 	if err != nil {
-		spverrors.ErrorResponse(c, spverrors.ErrInvalidConditions, a.Services.Logger)
-		return
-	}
-
-	reqParams.DefaultsIfNil()
-
-	contacts, err := a.Services.SpvWalletEngine.GetContactsByXpubID(
-		c.Request.Context(),
-		reqXPubID,
-		mappings.MapToMetadata(reqParams.Metadata),
-		conditions,
-		mappings.MapToQueryParams(reqParams.QueryParams),
-	)
-	if err != nil {
-		spverrors.ErrorResponse(c, err, a.Services.Logger)
 		return
 	}
 
 	contracts := mappings.MapToContactContracts(contacts)
-
-	count, err := a.Services.SpvWalletEngine.GetContactsByXPubIDCount(
-		c.Request.Context(),
-		reqXPubID,
-		mappings.MapToMetadata(reqParams.Metadata),
-		conditions,
-	)
-	if err != nil {
-		spverrors.ErrorResponse(c, err, a.Services.Logger)
-		return
-	}
 
 	totalPages := 0
 	if int(count) != 0 {
@@ -162,7 +130,7 @@ func (a *Action) getContactByPaymail(c *gin.Context) {
 	reqXPubID := c.GetString(auth.ParamXPubHashKey)
 	paymail := c.Param("paymail")
 
-	contacts, err := a.SearchContacts(c, reqXPubID, paymail)
+	contacts, _, err := a.searchContacts(c, reqXPubID, paymail)
 	if err != nil {
 		return
 	}
@@ -177,7 +145,8 @@ func (a *Action) getContactByPaymail(c *gin.Context) {
 	c.JSON(http.StatusOK, contracts[0])
 }
 
-func (a *Action) SearchContacts(c *gin.Context, reqXPubID string, paymail string) ([]*engine.Contact, error) {
+// searchContacts - a helper function for searching contacts
+func (a *Action) searchContacts(c *gin.Context, reqXPubID string, paymail string) ([]*engine.Contact, int64, error) {
 	var reqParams filter.SearchContacts
 
 	if paymail != "" {
@@ -189,13 +158,13 @@ func (a *Action) SearchContacts(c *gin.Context, reqXPubID string, paymail string
 
 	if err := c.Bind(&reqParams); err != nil {
 		spverrors.ErrorResponse(c, spverrors.ErrCannotBindRequest, a.Services.Logger)
-		return nil, err
+		return nil, 0, err
 	}
 
 	conditions, err := reqParams.Conditions.ToDbConditions()
 	if err != nil {
 		spverrors.ErrorResponse(c, spverrors.ErrInvalidConditions, a.Services.Logger)
-		return nil, err
+		return nil, 0, err
 	}
 
 	reqParams.DefaultsIfNil()
@@ -209,8 +178,19 @@ func (a *Action) SearchContacts(c *gin.Context, reqXPubID string, paymail string
 	)
 	if err != nil {
 		spverrors.ErrorResponse(c, err, a.Services.Logger)
-		return nil, err
+		return nil, 0, err
 	}
 
-	return contacts, nil
+	count, err := a.Services.SpvWalletEngine.GetContactsByXPubIDCount(
+		c.Request.Context(),
+		reqXPubID,
+		mappings.MapToMetadata(reqParams.Metadata),
+		conditions,
+	)
+	if err != nil {
+		spverrors.ErrorResponse(c, err, a.Services.Logger)
+		return nil, 0, err
+	}
+
+	return contacts, count, nil
 }
