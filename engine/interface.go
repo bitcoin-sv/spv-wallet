@@ -11,6 +11,7 @@ import (
 	"github.com/bitcoin-sv/spv-wallet/engine/datastore"
 	"github.com/bitcoin-sv/spv-wallet/engine/metrics"
 	"github.com/bitcoin-sv/spv-wallet/engine/notifications"
+
 	// "github.com/bitcoin-sv/spv-wallet/engine/notifications"
 	"github.com/bitcoin-sv/spv-wallet/engine/taskmanager"
 	"github.com/mrz1836/go-cachestore"
@@ -65,8 +66,9 @@ type ContactService interface {
 
 	AdminChangeContactStatus(ctx context.Context, id string, status ContactStatus) (*Contact, error)
 	UpdateContact(ctx context.Context, id, fullName string, metadata *Metadata) (*Contact, error)
-	DeleteContact(ctx context.Context, id string) error
+	DeleteContactByID(ctx context.Context, id string) error
 
+	DeleteContact(ctx context.Context, xPubID, paymail string) error
 	AcceptContact(ctx context.Context, xPubID, paymail string) error
 	RejectContact(ctx context.Context, xPubID, paymail string) error
 	ConfirmContact(ctx context.Context, xPubID, paymail string) error
