@@ -4,6 +4,7 @@ import (
 	"net/http"
 
 	"github.com/bitcoin-sv/spv-wallet/actions/common"
+	"github.com/bitcoin-sv/spv-wallet/engine"
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/bitcoin-sv/spv-wallet/mappings"
 	"github.com/bitcoin-sv/spv-wallet/models"
@@ -161,17 +162,40 @@ func (a *Action) getContactByPaymail(c *gin.Context) {
 	reqXPubID := c.GetString(auth.ParamXPubHashKey)
 	paymail := c.Param("paymail")
 
+	contacts, err := a.SearchContacts(c, reqXPubID, paymail)
+	if err != nil {
+		return
+	}
+
+	if contacts == nil || len(contacts) != 1 {
+		spverrors.ErrorResponse(c, spverrors.ErrContactNotFound, a.Services.Logger)
+		return
+	}
+
+	contracts := mappings.MapToContactContracts(contacts)
+
+	c.JSON(http.StatusOK, contracts[0])
+}
+
+func (a *Action) SearchContacts(c *gin.Context, reqXPubID string, paymail string) ([]*engine.Contact, error) {
 	var reqParams filter.SearchContacts
 
-	preConditions := filter.ContactFilter{Paymail: &paymail}
-	reqParams.ConditionsModel = filter.ConditionsModel[filter.ContactFilter]{
-		Conditions: &preConditions,
+	if paymail != "" {
+		preConditions := filter.ContactFilter{Paymail: &paymail}
+		reqParams.ConditionsModel = filter.ConditionsModel[filter.ContactFilter]{
+			Conditions: &preConditions,
+		}
+	}
+
+	if err := c.Bind(&reqParams); err != nil {
+		spverrors.ErrorResponse(c, spverrors.ErrCannotBindRequest, a.Services.Logger)
+		return nil, err
 	}
 
 	conditions, err := reqParams.Conditions.ToDbConditions()
 	if err != nil {
 		spverrors.ErrorResponse(c, spverrors.ErrInvalidConditions, a.Services.Logger)
-		return
+		return nil, err
 	}
 
 	reqParams.DefaultsIfNil()
@@ -185,13 +209,8 @@ func (a *Action) getContactByPaymail(c *gin.Context) {
 	)
 	if err != nil {
 		spverrors.ErrorResponse(c, err, a.Services.Logger)
-		return
+		return nil, err
 	}
 
-	if contacts == nil || len(contacts) != 1 {
-		spverrors.ErrorResponse(c, spverrors.ErrContactNotFound, a.Services.Logger)
-		return
-	}
-
-	c.JSON(http.StatusOK, contacts[0])
+	return contacts, nil
 }

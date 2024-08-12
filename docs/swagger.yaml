@@ -1882,12 +1882,16 @@ definitions:
     - 1000000000
     - 60000000000
     - 3600000000000
+    - -9223372036854775808
+    - 9223372036854775807
     - 1
     - 1000
     - 1000000
     - 1000000000
     - 60000000000
     - 3600000000000
+    - -9223372036854775808
+    - 9223372036854775807
     - 1
     - 1000
     - 1000000
@@ -1912,12 +1916,16 @@ definitions:
     - Second
     - Minute
     - Hour
+    - minDuration
+    - maxDuration
     - Nanosecond
     - Microsecond
     - Millisecond
     - Second
     - Minute
     - Hour
+    - minDuration
+    - maxDuration
     - Nanosecond
     - Microsecond
     - Millisecond
@@ -2025,6 +2033,31 @@ paths:
       tags:
       - Contacts
   /api/v1/contacts/{paymail}:
+    delete:
+      description: Remove contact.
+      parameters:
+      - description: Paymail address of the contact that the user would like to confirm
+        in: path
+        name: paymail
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad request - Error while parsing SearchContacts from request
+            body
+        "404":
+          description: Contact not found
+        "500":
+          description: Internal server error
+      security:
+      - x-auth-xpub: []
+      summary: Remove contact
+      tags:
+      - Contacts
     get:
       description: Get contact by paymail
       produces:
@@ -2147,6 +2180,7 @@ paths:
       summary: Reject contact invitation
       tags:
       - Contacts
+  /api/v1/invitations/{paymail}/contacts:
     post:
       description: Accept contact invitation. For contact with status "awaiting" change
         status to "unconfirmed"

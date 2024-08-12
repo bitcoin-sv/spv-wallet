@@ -148,6 +148,44 @@ const docTemplate = `{
                         "description": "Created"
                     }
                 }
+            },
+            "delete": {
+                "security": [
+                    {
+                        "x-auth-xpub": []
+                    }
+                ],
+                "description": "Remove contact.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Contacts"
+                ],
+                "summary": "Remove contact",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Paymail address of the contact that the user would like to confirm",
+                        "name": "paymail",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "400": {
+                        "description": "Bad request - Error while parsing SearchContacts from request body"
+                    },
+                    "404": {
+                        "description": "Contact not found"
+                    },
+                    "500": {
+                        "description": "Internal server error"
+                    }
+                }
             }
         },
         "/api/v1/contacts/{paymail}/confirmation": {
@@ -229,24 +267,24 @@ const docTemplate = `{
             }
         },
         "/api/v1/invitations/{paymail}": {
-            "post": {
+            "delete": {
                 "security": [
                     {
                         "x-auth-xpub": []
                     }
                 ],
-                "description": "Accept contact invitation. For contact with status \"awaiting\" change status to \"unconfirmed\"",
+                "description": "Reject contact invitation. For contact with status \"awaiting\" delete contact",
                 "produces": [
                     "application/json"
                 ],
                 "tags": [
                     "Contacts"
                 ],
-                "summary": "Accept contact invitation",
+                "summary": "Reject contact invitation",
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "Paymail address of the contact that the user would like to accept",
+                        "description": "Paymail address of the contact that the user would like to reject",
                         "name": "paymail",
                         "in": "path",
                         "required": true
@@ -266,25 +304,27 @@ const docTemplate = `{
                         "description": "Internal server error"
                     }
                 }
-            },
-            "delete": {
+            }
+        },
+        "/api/v1/invitations/{paymail}/contacts": {
+            "post": {
                 "security": [
                     {
                         "x-auth-xpub": []
                     }
                 ],
-                "description": "Reject contact invitation. For contact with status \"awaiting\" delete contact",
+                "description": "Accept contact invitation. For contact with status \"awaiting\" change status to \"unconfirmed\"",
                 "produces": [
                     "application/json"
                 ],
                 "tags": [
                     "Contacts"
                 ],
-                "summary": "Reject contact invitation",
+                "summary": "Accept contact invitation",
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "Paymail address of the contact that the user would like to reject",
+                        "description": "Paymail address of the contact that the user would like to accept",
                         "name": "paymail",
                         "in": "path",
                         "required": true
@@ -5251,12 +5291,16 @@ const docTemplate = `{
                 1000000000,
                 60000000000,
                 3600000000000,
+                -9223372036854775808,
+                9223372036854775807,
                 1,
                 1000,
                 1000000,
                 1000000000,
                 60000000000,
                 3600000000000,
+                -9223372036854775808,
+                9223372036854775807,
                 1,
                 1000,
                 1000000,
@@ -5281,12 +5325,16 @@ const docTemplate = `{
                 "Second",
                 "Minute",
                 "Hour",
+                "minDuration",
+                "maxDuration",
                 "Nanosecond",
                 "Microsecond",
                 "Millisecond",
                 "Second",
                 "Minute",
                 "Hour",
+                "minDuration",
+                "maxDuration",
                 "Nanosecond",
                 "Microsecond",
                 "Millisecond",
