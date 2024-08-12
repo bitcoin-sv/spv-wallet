@@ -4,11 +4,11 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/bitcoin-sv/spv-wallet/actions/common"
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/bitcoin-sv/spv-wallet/mappings"
 	"github.com/bitcoin-sv/spv-wallet/models"
 	"github.com/bitcoin-sv/spv-wallet/models/filter"
+	"github.com/bitcoin-sv/spv-wallet/models/request"
 	"github.com/bitcoin-sv/spv-wallet/models/response"
 	"github.com/bitcoin-sv/spv-wallet/server/auth"
 	"github.com/gin-gonic/gin"
@@ -121,11 +121,13 @@ func (a *Action) search(c *gin.Context) {
 }
 
 func (a *Action) searchTest(c *gin.Context) {
-	pageable := common.ExtractPageableFromRequest(c)
-
-	fmt.Printf("Pageable from request: %+v\n", pageable)
-
 	reqXPubID := c.GetString(auth.ParamXPubHashKey)
+
+	// qp := request.ExtractQueryParamsFromRequest(c)
+	// data := request.CreateQueryParamsData().AddConditions(qp).AddMetadata(qp).AddPageDescription(c)
+
+	data := request.ExtractQueryParamsFromRequest(c.Request)
+	fmt.Printf("Query params data object: %+v\n", data)
 
 	var reqParams filter.SearchAccessKeys
 	if err := c.Bind(&reqParams); err != nil {
@@ -153,20 +155,20 @@ func (a *Action) searchTest(c *gin.Context) {
 		accessKeyContracts = append(accessKeyContracts, mappings.MapToAccessKeyContract(accessKey))
 	}
 
-	count, err := a.Services.SpvWalletEngine.GetContactsByXPubIDCount(
-		c.Request.Context(),
-		reqXPubID,
-		mappings.MapToMetadata(reqParams.Metadata),
-		conditions,
-	)
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, err.Error())
-		return
-	}
+	// count, err := a.Services.SpvWalletEngine.GetContactsByXPubIDCount(
+	// 	c.Request.Context(),
+	// 	reqXPubID,
+	// 	mappings.MapToMetadata(reqParams.Metadata),
+	// 	conditions,
+	// )
+	// if err != nil {
+	// 	c.JSON(http.StatusInternalServerError, err.Error())
+	// 	return
+	// }
 
 	response := response.PageModel[response.AccessKey]{
 		Content: accessKeyContracts,
-		Page:    common.GetPageDescriptionFromQueryParams(pageable, count),
+		// Page:    common.GetPageDescriptionFromQueryParams(data, count),
 	}
 
 	c.JSON(http.StatusOK, response)

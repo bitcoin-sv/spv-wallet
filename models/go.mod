@@ -3,6 +3,7 @@ module github.com/bitcoin-sv/spv-wallet/models
 go 1.22.5
 
 require (
+	github.com/gorilla/schema v1.4.1
 	github.com/pkg/errors v0.9.1
 	github.com/stretchr/testify v1.9.0
 )
