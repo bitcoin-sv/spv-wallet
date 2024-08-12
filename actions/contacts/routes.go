@@ -38,6 +38,8 @@ func NewHandler(appConfig *config.AppConfig, services *config.AppServices) (rout
 	contactsAPIEndpoints := routes.APIEndpointsFunc(func(router *gin.RouterGroup) {
 		group := router.Group("/contacts")
 		group.PUT("/:paymail", action.upsertContact)
+		// group.DELETE("/:paymail", action.removeContact)
+
 		group.POST("/:paymail/confirmation", action.confirmContact)
 		group.DELETE("/:paymail/confirmation", action.unconfirmContact)
 
@@ -48,7 +50,7 @@ func NewHandler(appConfig *config.AppConfig, services *config.AppServices) (rout
 	invitationsAPIEndpoints := routes.APIEndpointsFunc(func(router *gin.RouterGroup) {
 		group := router.Group("/invitations")
 
-		group.POST("/:paymail", action.acceptInvitations)
+		group.POST("/:paymail/contacts", action.acceptInvitations)
 		group.DELETE("/:paymail", action.rejectInvitation)
 
 	})

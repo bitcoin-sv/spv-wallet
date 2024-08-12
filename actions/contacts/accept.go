@@ -36,7 +36,7 @@ func (a *Action) oldAccept(c *gin.Context) {
 // @Failure		404	"Contact not found"
 // @Failure		422	"Contact status not awaiting"
 // @Failure		500	"Internal server error"
-// @Router		/api/v1/invitations/{paymail} [post]
+// @Router		/api/v1/invitations/{paymail}/contacts [post]
 // @Security	x-auth-xpub
 func (a *Action) acceptInvitations(c *gin.Context) {
 	reqXPubID := c.GetString(auth.ParamXPubHashKey)
