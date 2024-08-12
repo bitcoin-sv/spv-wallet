@@ -24,8 +24,8 @@ func (a *Action) removeContact(c *gin.Context) {
 	reqXPubID := c.GetString(auth.ParamXPubHashKey)
 	paymail := c.Param("paymail")
 
-	contacts, _, err := a.searchContacts(c, reqXPubID, paymail)
-	if err != nil {
+	contacts, _ := a.searchContacts(c, reqXPubID, paymail)
+	if contacts == nil {
 		return
 	}
 
@@ -35,7 +35,7 @@ func (a *Action) removeContact(c *gin.Context) {
 	}
 
 	contactID := contacts[0].ID
-	err = a.Services.SpvWalletEngine.DeleteContact(c, contactID)
+	err := a.Services.SpvWalletEngine.DeleteContact(c, contactID)
 	if err != nil {
 		spverrors.ErrorResponse(c, err, a.Services.Logger)
 		return

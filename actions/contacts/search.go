@@ -91,8 +91,8 @@ func (a *Action) search(c *gin.Context) {
 func (a *Action) getContacts(c *gin.Context) {
 	reqXPubID := c.GetString(auth.ParamXPubHashKey)
 
-	contacts, count, err := a.searchContacts(c, reqXPubID, "")
-	if err != nil {
+	contacts, count := a.searchContacts(c, reqXPubID, "")
+	if contacts == nil {
 		return
 	}
 
@@ -130,8 +130,8 @@ func (a *Action) getContactByPaymail(c *gin.Context) {
 	reqXPubID := c.GetString(auth.ParamXPubHashKey)
 	paymail := c.Param("paymail")
 
-	contacts, _, err := a.searchContacts(c, reqXPubID, paymail)
-	if err != nil {
+	contacts, _ := a.searchContacts(c, reqXPubID, paymail)
+	if contacts == nil {
 		return
 	}
 
@@ -146,7 +146,7 @@ func (a *Action) getContactByPaymail(c *gin.Context) {
 }
 
 // searchContacts - a helper function for searching contacts
-func (a *Action) searchContacts(c *gin.Context, reqXPubID string, paymail string) ([]*engine.Contact, int64, error) {
+func (a *Action) searchContacts(c *gin.Context, reqXPubID string, paymail string) ([]*engine.Contact, int64) {
 	var reqParams filter.SearchContacts
 
 	if paymail != "" {
@@ -158,13 +158,13 @@ func (a *Action) searchContacts(c *gin.Context, reqXPubID string, paymail string
 
 	if err := c.Bind(&reqParams); err != nil {
 		spverrors.ErrorResponse(c, spverrors.ErrCannotBindRequest, a.Services.Logger)
-		return nil, 0, err
+		return nil, 0
 	}
 
 	conditions, err := reqParams.Conditions.ToDbConditions()
 	if err != nil {
 		spverrors.ErrorResponse(c, spverrors.ErrInvalidConditions, a.Services.Logger)
-		return nil, 0, err
+		return nil, 0
 	}
 
 	reqParams.DefaultsIfNil()
@@ -178,7 +178,7 @@ func (a *Action) searchContacts(c *gin.Context, reqXPubID string, paymail string
 	)
 	if err != nil {
 		spverrors.ErrorResponse(c, err, a.Services.Logger)
-		return nil, 0, err
+		return nil, 0
 	}
 
 	count, err := a.Services.SpvWalletEngine.GetContactsByXPubIDCount(
@@ -189,8 +189,8 @@ func (a *Action) searchContacts(c *gin.Context, reqXPubID string, paymail string
 	)
 	if err != nil {
 		spverrors.ErrorResponse(c, err, a.Services.Logger)
-		return nil, 0, err
+		return nil, 0
 	}
 
-	return contacts, count, nil
+	return contacts, count
 }
