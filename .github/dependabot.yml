@@ -1,36 +1,22 @@
-# Basic dependabot.yml to update gomod, Github Actions and Docker
 version: 2
 updates:
-  # Maintain dependencies for the core library
+  # Maintain dependencies for the codebase
   - package-ecosystem: "gomod"
     target-branch: "main"
-    directory: "/"
+    directories:
+      - "/"
+      - "/models"
     schedule:
       interval: "weekly"
       day: "monday"
     labels:
       - "dependencies"
-    open-pull-requests-limit: 10
-
-  - package-ecosystem: "gomod"
-    target-branch: "main"
-    directory: "/engine"
-    schedule:
-      interval: "weekly"
-      day: "monday"
-    labels:
-      - "dependencies"
-    open-pull-requests-limit: 10
-
-  - package-ecosystem: "gomod"
-    target-branch: "main"
-    directory: "/models"
-    schedule:
-      interval: "weekly"
-      day: "monday"
-    labels:
-      - "dependencies"
-    open-pull-requests-limit: 10
+    groups:
+      go_modules:
+        update-types:
+          - "minor"
+          - "patch"
+          - "major"
 
   # Maintain dependencies for GitHub Actions
   - package-ecosystem: "github-actions"
@@ -41,26 +27,27 @@ updates:
       day: "monday"
     labels:
       - "dependencies"
-    open-pull-requests-limit: 10
+    groups:
+      gh_actions:
+        update-types:
+          - "minor"
+          - "patch"
+          - "major"
 
   # Maintain dependencies for Docker
   - package-ecosystem: "docker"
     target-branch: "main"
-    directory: "/"
+    directories:
+      - "/"
+      - "/release"
     schedule:
       interval: "weekly"
       day: "monday"
     labels:
       - "dependencies"
-    open-pull-requests-limit: 10
-
-  # Maintain dependencies for Docker
-  - package-ecosystem: "docker"
-    target-branch: "main"
-    directory: "/release"
-    schedule:
-      interval: "weekly"
-      day: "monday"
-    labels:
-      - "dependencies"
-    open-pull-requests-limit: 10
+    groups:
+      docker:
+        update-types:
+          - "minor"
+          - "patch"
+          - "major"
