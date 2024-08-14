@@ -104,7 +104,7 @@ func (c *TaskManager) loadTaskQ(ctx context.Context) error {
 func (c *TaskManager) RegisterTask(name string, handler interface{}) (err error) {
 	defer func() {
 		if panicErr := recover(); panicErr != nil {
-			err = fmt.Errorf(fmt.Sprintf("registering task panic: %v", panicErr))
+			err = spverrors.Newf("registering task panic: %v", panicErr)
 			c.options.logger.Error().Msg(err.Error())
 		}
 	}()

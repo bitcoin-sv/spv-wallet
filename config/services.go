@@ -45,7 +45,7 @@ func (a *AppConfig) LoadServices(ctx context.Context) (*AppServices, error) {
 
 	// Load NewRelic first - used for Application debugging & tracking
 	if err = a.loadNewRelic(_services); err != nil {
-		return nil, fmt.Errorf("error with loadNewRelic: " + err.Error())
+		return nil, spverrors.Wrapf(err, "error with loadNewRelic")
 	}
 
 	// Start the NewRelic Tx
