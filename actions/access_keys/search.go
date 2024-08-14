@@ -4,11 +4,11 @@ import (
 	"fmt"
 	"net/http"
 
+	"github.com/bitcoin-sv/spv-wallet/actions/common"
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/bitcoin-sv/spv-wallet/mappings"
 	"github.com/bitcoin-sv/spv-wallet/models"
 	"github.com/bitcoin-sv/spv-wallet/models/filter"
-	"github.com/bitcoin-sv/spv-wallet/models/request"
 	"github.com/bitcoin-sv/spv-wallet/models/response"
 	"github.com/bitcoin-sv/spv-wallet/server/auth"
 	"github.com/gin-gonic/gin"
@@ -120,30 +120,27 @@ func (a *Action) search(c *gin.Context) {
 	c.JSON(http.StatusOK, response)
 }
 
+// searchTest - a temporary testing function
 func (a *Action) searchTest(c *gin.Context) {
 	reqXPubID := c.GetString(auth.ParamXPubHashKey)
 
-	// qp := request.ExtractQueryParamsFromRequest(c)
-	// data := request.CreateQueryParamsData().AddConditions(qp).AddMetadata(qp).AddPageDescription(c)
-
-	data := request.ExtractQueryParamsFromRequest(c.Request)
-	fmt.Printf("Query params data object: %+v\n", data)
-
-	var reqParams filter.SearchAccessKeys
-	if err := c.Bind(&reqParams); err != nil {
+	var accessKeysConditions filter.AccessKeyFilter
+	data, err := common.GetSearchParams[filter.AccessKeyFilter](c, accessKeysConditions)
+	if err != nil {
 		spverrors.ErrorResponse(c, spverrors.ErrCannotBindRequest, a.Services.Logger)
 		return
 	}
 
-	conditions := reqParams.Conditions.ToDbConditions()
-	reqParams.DefaultsIfNil()
+	fmt.Printf("Query params data object: %+v\n", data)
+
+	conditions := accessKeysConditions.ToDbConditions()
 
 	accessKeys, err := a.Services.SpvWalletEngine.GetAccessKeysByXPubID(
 		c.Request.Context(),
 		reqXPubID,
-		mappings.MapToMetadata(reqParams.Metadata),
+		mappings.MapToMetadata(data.Metadata.UnStringify()),
 		conditions,
-		mappings.MapToQueryParams(reqParams.QueryParams),
+		mappings.MapToQueryParams(data.Paging.MapToFilterQueryParams()),
 	)
 	if err != nil {
 		spverrors.ErrorResponse(c, err, a.Services.Logger)
@@ -155,25 +152,21 @@ func (a *Action) searchTest(c *gin.Context) {
 		accessKeyContracts = append(accessKeyContracts, mappings.MapToAccessKeyContract(accessKey))
 	}
 
-	// count, err := a.Services.SpvWalletEngine.GetContactsByXPubIDCount(
-	// 	c.Request.Context(),
-	// 	reqXPubID,
-	// 	mappings.MapToMetadata(reqParams.Metadata),
-	// 	conditions,
-	// )
-	// if err != nil {
-	// 	c.JSON(http.StatusInternalServerError, err.Error())
-	// 	return
-	// }
+	count, err := a.Services.SpvWalletEngine.GetContactsByXPubIDCount(
+		c.Request.Context(),
+		reqXPubID,
+		mappings.MapToMetadata(data.Metadata.UnStringify()),
+		conditions,
+	)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, err.Error())
+		return
+	}
 
 	response := response.PageModel[response.AccessKey]{
 		Content: accessKeyContracts,
-		// Page:    common.GetPageDescriptionFromQueryParams(data, count),
+		Page:    common.GetPageDescriptionFromSearchParams[filter.AccessKeyFilter](&data, count),
 	}
 
 	c.JSON(http.StatusOK, response)
-
-	// c.JSON(http.StatusOK, gin.H{
-	// 	"pageable": "OK",
-	// })
 }

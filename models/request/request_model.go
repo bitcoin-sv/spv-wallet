@@ -1,12 +1,9 @@
 package request
 
 import (
-	"fmt"
-	"net/http"
-	"net/url"
 	"strings"
 
-	"github.com/gorilla/schema"
+	"github.com/bitcoin-sv/spv-wallet/models/filter"
 )
 
 const (
@@ -15,24 +12,39 @@ const (
 	DefaultSortOrder = "asc"
 )
 
-type QueryParamsSchema struct {
-	Conditions Conditions `schema:"conditions"`
-	Metadata   Metadata   `schema:"metadata"`
-	// Page       Pageable `schema:"conditions"`
-	Page int  `schema:"page"`
-	Size int  `schema:"size"`
-	Sort Sort `schema:"sort"`
+type SearchParams[T any] struct {
+	Paging     Paging   `form:"paging"`
+	Conditions T        `form:"conditions"`
+	Metadata   Metadata `form:"metadata"`
 }
 
-type QueryParamsData struct {
-	Conditions Conditions
-	Metadata   Metadata
-	Page       Pageable
+type Paging struct {
+	Page   *int    `form:"page,default=1"`
+	Size   *int    `form:"size,default=10"`
+	Sort   *string `form:"sort,default=asc"`
+	SortBy *string `form:"sortBy,default=id"`
 }
-
-type Conditions map[string]interface{}
 
 type Metadata map[string]string
+
+// MapToFilterQueryParams - for compatibility
+func (paging *Paging) MapToFilterQueryParams() *filter.QueryParams {
+	return &filter.QueryParams{
+		Page:          *paging.Page,
+		PageSize:      *paging.Size,
+		OrderByField:  *paging.SortBy,
+		SortDirection: *paging.Sort,
+	}
+}
+
+// UnStringify - give this a better name
+func (m *Metadata) UnStringify() map[string]interface{} {
+	m2 := make(map[string]interface{}, len(*m))
+	for k, v := range *m {
+		m2[k] = v
+	}
+	return m2
+}
 
 type Pageable struct {
 	Page int
@@ -48,55 +60,6 @@ type Order struct {
 type Sort struct {
 	Orders []Order
 }
-
-// func ExtractQueryParamsFromRequest(c *gin.Context) url.Values {
-// 	return c.Request.URL.Query()
-// }
-
-func ExtractQueryParamsFromRequest(r *http.Request) *QueryParamsSchema {
-	qp := r.URL.Query()
-	data := &QueryParamsSchema{}
-
-	fmt.Printf("Query params from request: %+v\n", qp)
-
-	decoder := schema.NewDecoder()
-	err := decoder.Decode(data, qp)
-	if err != nil {
-		fmt.Println("Could not decode the url query params", err)
-	}
-
-	return data
-}
-
-// CreateRequestQueryParams
-func CreateQueryParamsData() *QueryParamsData {
-	data := QueryParamsData{}
-
-	return &data
-}
-
-// AddConditions
-func (data *QueryParamsData) AddConditions(qp url.Values) *QueryParamsData {
-	fmt.Println("Conditions from request", qp)
-	// qp.Conditions = Conditions["test":"test"]
-
-	return data
-}
-
-// AddMetadata
-func (data *QueryParamsData) AddMetadata(qp url.Values) *QueryParamsData {
-	fmt.Println("Metadata from request", qp)
-	// if err != nil {
-	// 	// metadataFromQueryParam = map
-	// }
-
-	// qp.Metadata = Metadata["test":"test"]
-
-	return data
-}
-
-// AddPageDescription
-// func (data *QueryParamsData) AddPageDescription() *QueryParamsData {}
 
 // func (data *QueryParamsData) AddPageDescription(c *gin.Context) *QueryParamsData {
 // 	pageFromQueryParam, err := strconv.Atoi(c.Query("page"))
