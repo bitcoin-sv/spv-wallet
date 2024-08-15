@@ -94,7 +94,7 @@ func (f BasicEndpointsFunc) RegisterBasicEndpoints(router *gin.RouterGroup) {
 	f(router)
 }
 
-// RegisterOldBasicEndpoints register Basic endpoints by registrar BasicEndpointsFunc.
+// RegisterOldBasicEndpoints register Basic endpoints by registrar OldBasicEndpointsFunc.
 func (f OldBasicEndpointsFunc) RegisterOldBasicEndpoints(router *gin.RouterGroup) {
 	f(router)
 }
