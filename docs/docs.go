@@ -521,7 +521,7 @@ const docTemplate = `{
                 "summary": "Update transaction",
                 "parameters": [
                     {
-                        "description": " ",
+                        "description": "Pass update transaction request model in the body",
                         "name": "UpdateTransactionRequest",
                         "in": "body",
                         "required": true,

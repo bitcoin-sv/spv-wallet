@@ -2652,7 +2652,7 @@ paths:
     patch:
       description: Update transaction
       parameters:
-      - description: ' '
+      - description: Pass update transaction request model in the body
         in: body
         name: UpdateTransactionRequest
         required: true

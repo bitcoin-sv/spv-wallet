@@ -15,7 +15,7 @@ import (
 // @Description	This endpoint has been deprecated. Use (PATCH) /api/v1/transactions/{id} instead.
 // @Tags		Transactions
 // @Produce		json
-// @Param		UpdateTransaction body UpdateTransaction true " "
+// @Param		UpdateTransaction body UpdateTransaction true "Pass update transaction request model in the body"
 // @Success		200 {object} models.Transaction "Updated transaction"
 // @Failure		400	"Bad request - Error while parsing UpdateTransaction from request body, tx not found or tx is not associated with the xpub"
 // @Failure 	500	"Internal Server Error - Error while updating transaction"
@@ -59,7 +59,7 @@ func (a *Action) update(c *gin.Context) {
 // @Description	Update transaction
 // @Tags		Transactions
 // @Produce		json
-// @Param		UpdateTransactionRequest body UpdateTransactionRequest true " "
+// @Param		UpdateTransactionRequest body UpdateTransactionRequest true "Pass update transaction request model in the body"
 // @Success		200 {object} response.Transaction "Updated transaction"
 // @Failure		400	"Bad request - Error while parsing UpdateTransaction from request body, tx not found or tx is not associated with the xpub"
 // @Failure 	500	"Internal Server Error - Error while updating transaction"
