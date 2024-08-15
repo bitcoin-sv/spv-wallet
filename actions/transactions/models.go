@@ -19,7 +19,7 @@ type UpdateTransactionRequest struct {
 	Metadata engine.Metadata `json:"metadata" swaggertype:"object,string" example:"key:value,key2:value2"`
 }
 
-// OldRecordTransaction is the model for recording a transaction
+// RecordTransaction is the model for recording a transaction
 type RecordTransaction struct {
 	// Accepts a JSON object for embedding custom metadata, enabling arbitrary additional information to be associated with the resource
 	Metadata engine.Metadata `json:"metadata" swaggertype:"object,string" example:"key:value,key2:value2"`
@@ -29,7 +29,7 @@ type RecordTransaction struct {
 	ReferenceID string `json:"referenceId" example:"b356f7fa00cd3f20cce6c21d704cd13e871d28d714a5ebd0532f5a0e0cde63f7"`
 }
 
-// OldNewTransaction is the model for creating a new transaction
+// NewTransaction is the model for creating a new transaction
 type NewTransaction struct {
 	// Configuration of the transaction
 	Config response.TransactionConfig `json:"config"`
