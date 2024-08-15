@@ -15,7 +15,7 @@ type TransactionConfig struct {
 	// ChangeSatoshis is a change satoshis.
 	ChangeSatoshis uint64 `json:"changeSatoshis" example:"49"`
 	// ExpiresAt is a time when transaction expires.
-	ExpiresIn time.Duration `json:"expiresIn" example:"1000"`
+	ExpiresIn time.Duration `json:"expiresIn" example:"1000" swaggertype:"string"`
 	// Fee is a fee amount.
 	Fee uint64 `json:"fee" example:"1"`
 	// FeeUnit is a pointer to a fee unit object.

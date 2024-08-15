@@ -2,8 +2,6 @@ package response
 
 import (
 	"time"
-
-	"github.com/bitcoin-sv/spv-wallet/models"
 )
 
 const (
@@ -33,7 +31,7 @@ type DraftTransaction struct {
 	// ExpiresAt is a time when draft transaction expired.
 	ExpiresAt time.Time `json:"expiresAt" example:"2024-02-26T11:00:28.069911Z"`
 	// Configuration contains draft transaction configuration.
-	Configuration models.TransactionConfig `json:"configuration"`
+	Configuration TransactionConfig `json:"configuration"`
 	// Status is a draft transaction lastly monitored status.
 	Status string `json:"status" example:"complete"`
 	// FinalTxID is a final transaction id.

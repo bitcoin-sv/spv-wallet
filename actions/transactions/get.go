@@ -51,7 +51,7 @@ func (a *Action) get(c *gin.Context) {
 // @Tags		Transactions
 // @Produce		json
 // @Param		id path string true "id"
-// @Success		200 {object} models.Transaction "Transaction"
+// @Success		200 {object} response.Transaction "Transaction"
 // @Failure		400	"Bad request - Transaction not found or associated with another xpub"
 // @Failure 	500	"Internal Server Error - Error while fetching transaction"
 // @Router		/api/v1/transactions/{id} [get]

@@ -67,7 +67,7 @@ func (a *Action) record(c *gin.Context) {
 // @Tags		Transactions
 // @Produce		json
 // @Param		RecordTransaction body RecordTransaction true "Transaction to be recorded"
-// @Success		201 {object} models.Transaction "Created transaction"
+// @Success		201 {object} response.Transaction "Created transaction"
 // @Failure		400	"Bad request - Error while parsing RecordTransaction from request body or xpub not found"
 // @Failure 	500	"Internal Server Error - Error while recording transaction"
 // @Router		/api/v1/transactions [post]

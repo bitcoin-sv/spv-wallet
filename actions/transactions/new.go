@@ -69,7 +69,7 @@ func (a *Action) newTransaction(c *gin.Context) {
 // @Tags		Transactions
 // @Produce		json
 // @Param		NewTransaction body NewTransaction true "NewTransaction model containing the transaction config and metadata"
-// @Success		201 {object} models.DraftTransaction "Created transaction"
+// @Success		201 {object} response.DraftTransaction "Created transaction"
 // @Failure		400	"Bad request - Error while parsing NewTransaction from request body or xpub not found"
 // @Failure 	500	"Internal Server Error - Error while creating transaction"
 // @Router		/api/v1/transactions/drafts [post]

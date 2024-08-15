@@ -60,7 +60,7 @@ func (a *Action) update(c *gin.Context) {
 // @Tags		Transactions
 // @Produce		json
 // @Param		UpdateTransactionRequest body UpdateTransactionRequest true " "
-// @Success		200 {object} models.Transaction "Updated transaction"
+// @Success		200 {object} response.Transaction "Updated transaction"
 // @Failure		400	"Bad request - Error while parsing UpdateTransaction from request body, tx not found or tx is not associated with the xpub"
 // @Failure 	500	"Internal Server Error - Error while updating transaction"
 // @Router		/api/v1/transactions/{id} [patch]
