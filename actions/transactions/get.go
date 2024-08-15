@@ -18,9 +18,8 @@ import (
 // @Success		200 {object} models.Transaction "Transaction"
 // @Failure		400	"Bad request - Transaction not found or associated with another xpub"
 // @Failure 	500	"Internal Server Error - Error while fetching transaction"
-// @Router		/v1/transaction [get]
+// @DeprecatedRouter	/v1/transaction [get]
 // @Security	x-auth-xpub
-// @Deprecated
 func (a *Action) get(c *gin.Context) {
 	id := c.Query("id")
 	reqXPubID := c.GetString(auth.ParamXPubHashKey)

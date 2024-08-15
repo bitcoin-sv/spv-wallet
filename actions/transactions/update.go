@@ -19,9 +19,8 @@ import (
 // @Success		200 {object} models.Transaction "Updated transaction"
 // @Failure		400	"Bad request - Error while parsing UpdateTransaction from request body, tx not found or tx is not associated with the xpub"
 // @Failure 	500	"Internal Server Error - Error while updating transaction"
-// @Router		/v1/transaction [patch]
+// @DeprecatedRouter	/v1/transaction [patch]
 // @Security	x-auth-xpub
-// @Deprecated
 func (a *Action) update(c *gin.Context) {
 
 	var requestBody OldUpdateTransaction

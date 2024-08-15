@@ -20,9 +20,8 @@ import (
 // @Success		201 {object} models.DraftTransaction "Created transaction"
 // @Failure		400	"Bad request - Error while parsing NewTransaction from request body or xpub not found"
 // @Failure 	500	"Internal Server Error - Error while creating transaction"
-// @Router		/v1/transaction [post]
+// @DeprecatedRouter	/v1/transaction [post]
 // @Security	x-auth-xpub
-// @Deprecated
 func (a *Action) newTransaction(c *gin.Context) {
 	reqXPub := c.GetString(auth.ParamXPubKey)
 

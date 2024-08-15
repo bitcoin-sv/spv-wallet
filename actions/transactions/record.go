@@ -11,7 +11,6 @@ import (
 )
 
 // record will save and complete a transaction
-// @Deprecated
 // @Summary		Record transaction - Use (POST) /api/v1/transactions instead.
 // @Description	This endpoint has been deprecated. Use (POST) /api/v1/transactions instead.
 // @Tags		Transactions
@@ -20,7 +19,7 @@ import (
 // @Success		201 {object} models.Transaction "Created transaction"
 // @Failure		400	"Bad request - Error while parsing RecordTransaction from request body or xpub not found"
 // @Failure 	500	"Internal Server Error - Error while recording transaction"
-// @Router		/v1/transaction/record [post]
+// @DeprecatedRouter	/v1/transaction/record [post]
 // @Security	x-auth-xpub
 func (a *Action) record(c *gin.Context) {
 	reqXPub := c.GetString(auth.ParamXPubKey)
