@@ -42,7 +42,7 @@ func (a *Action) destinationsSearch(c *gin.Context) {
 
 	destinationContracts := make([]*models.Destination, 0)
 	for _, destination := range destinations {
-		destinationContracts = append(destinationContracts, mappings.MapToDestinationContract(destination))
+		destinationContracts = append(destinationContracts, mappings.MapOldToDestinationContract(destination))
 	}
 
 	c.JSON(http.StatusOK, destinationContracts)

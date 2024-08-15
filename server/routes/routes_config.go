@@ -6,7 +6,7 @@ import (
 
 // Handler is a type that represents a handler for various types of endpoints.
 type Handler struct {
-	BasicEndpointsFunc
+	BasicEndpoints
 	APIEndpoints
 	CallbackEndpoints
 }
@@ -38,12 +38,20 @@ type APIEndpoints interface {
 	RegisterAPIEndpoints(router *gin.RouterGroup)
 }
 
+// OldBasicEndpointsFunc wrapping type for function to mark it as implementation of OldBasicEndpoints.
+type OldBasicEndpointsFunc func(router *gin.RouterGroup)
+
+// OldBasicEndpoints registrar which will register routes in Old BASIC routes group.
+type OldBasicEndpoints interface {
+	// RegisterOldBasicEndpoints register BASIC endpoints.
+	RegisterOldBasicEndpoints(router *gin.RouterGroup)
+}
+
 // BasicEndpointsFunc wrapping type for function to mark it as implementation of BasicEndpoints.
 type BasicEndpointsFunc func(router *gin.RouterGroup)
 
 // BasicEndpoints registrar which will register routes in BASIC routes group.
 type BasicEndpoints interface {
-	// RegisterBasicEndpoints register BASIC endpoints.
 	RegisterBasicEndpoints(router *gin.RouterGroup)
 }
 
@@ -82,6 +90,11 @@ func (f APIEndpointsFunc) RegisterAPIEndpoints(router *gin.RouterGroup) {
 
 // RegisterBasicEndpoints register Basic endpoints by registrar BasicEndpointsFunc.
 func (f BasicEndpointsFunc) RegisterBasicEndpoints(router *gin.RouterGroup) {
+	f(router)
+}
+
+// RegisterBasicEndpoints register Basic endpoints by registrar BasicEndpointsFunc.
+func (f OldBasicEndpointsFunc) RegisterOldBasicEndpoints(router *gin.RouterGroup) {
 	f(router)
 }
 

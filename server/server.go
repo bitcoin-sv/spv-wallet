@@ -129,8 +129,8 @@ func SetupServerRoutes(appConfig *config.AppConfig, services *config.AppServices
 	oldAccessKeyAPIRoutes := accesskeys.OldAccessKeysHandler(appConfig, services)
 	accessKeyAPIRoutes := accesskeys.NewHandler(appConfig, services)
 	destinationBasicRoutes, destinationAPIRoutes := destinations.NewHandler(appConfig, services)
-	transactionBasicRoutes, transactionAPIRoutes, transactionCallbackRoutes := transactions.NewHandler(appConfig, services)
-	handler := transactions.NewTransactionsHandler(appConfig, services)
+	transactionBasicRoutes, transactionAPIRoutes, transactionCallbackRoutes := transactions.OldTransactionsHandler(appConfig, services)
+	handler := transactions.NewHandler(appConfig, services)
 	utxoAPIRoutes := utxos.NewHandler(appConfig, services)
 	oldUsersAPIRoutes := users.OldUsersHandler(appConfig, services)
 	usersAPIRoutes := users.NewHandler(appConfig, services)
@@ -153,7 +153,7 @@ func SetupServerRoutes(appConfig *config.AppConfig, services *config.AppServices
 		transactionAPIRoutes,
 		transactionCallbackRoutes,
 		// New Transactions routes
-		handler.BasicEndpointsFunc,
+		handler.BasicEndpoints,
 		handler.APIEndpoints,
 		// Utxo routes
 		utxoAPIRoutes,
@@ -172,7 +172,8 @@ func SetupServerRoutes(appConfig *config.AppConfig, services *config.AppServices
 	prefix := "/" + config.APIVersion
 	baseRouter := engine.Group("")
 	authRouter := engine.Group("", auth.BasicMiddleware(services.SpvWalletEngine, appConfig))
-	basicAuthRouter := authRouter.Group(prefix, auth.SignatureMiddleware(appConfig, false, false))
+	oldBasicAuthRouter := authRouter.Group(prefix, auth.SignatureMiddleware(appConfig, false, false))
+	basicAuthRouter := authRouter.Group("/api"+prefix, auth.SignatureMiddleware(appConfig, false, false))
 	oldAPIAuthRouter := authRouter.Group(prefix, auth.SignatureMiddleware(appConfig, true, false))
 	apiAuthRouter := authRouter.Group("/api"+prefix, auth.SignatureMiddleware(appConfig, true, false))
 	adminAuthRouter := authRouter.Group(prefix, auth.SignatureMiddleware(appConfig, true, true), auth.AdminMiddleware())
@@ -186,6 +187,8 @@ func SetupServerRoutes(appConfig *config.AppConfig, services *config.AppServices
 			r.RegisterOldAPIEndpoints(oldAPIAuthRouter)
 		case router.APIEndpoints:
 			r.RegisterAPIEndpoints(apiAuthRouter)
+		case router.OldBasicEndpoints:
+			r.RegisterOldBasicEndpoints(oldBasicAuthRouter)
 		case router.BasicEndpoints:
 			r.RegisterBasicEndpoints(basicAuthRouter)
 		case router.BaseEndpoints:

@@ -49,7 +49,7 @@ func (a *Action) search(c *gin.Context) {
 
 	contracts := make([]*models.Transaction, 0)
 	for _, transaction := range transactions {
-		contracts = append(contracts, mappings.MapToDeprecatedTransactionContract(transaction))
+		contracts = append(contracts, mappings.MapToOldTransactionContract(transaction))
 	}
 
 	c.JSON(http.StatusOK, contracts)

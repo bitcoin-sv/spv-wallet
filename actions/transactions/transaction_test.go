@@ -28,7 +28,7 @@ func (ts *TestSuite) SetupTest() {
 	ts.BaseSetupTest()
 
 	// Load the router & register routes
-	basicRoutes, apiRoutes, callbackRoutes := NewHandler(ts.AppConfig, ts.Services)
+	basicRoutes, apiRoutes, callbackRoutes := OldTransactionsHandler(ts.AppConfig, ts.Services)
 	basicRoutes.RegisterBasicEndpoints(ts.Router.Group("/" + config.APIVersion))
 	apiRoutes.RegisterOldAPIEndpoints(ts.Router.Group("/" + config.APIVersion))
 	callbackRoutes.RegisterCallbackEndpoints(ts.Router.Group(""))
