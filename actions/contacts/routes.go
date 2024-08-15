@@ -12,21 +12,47 @@ type Action struct {
 	actions.Action
 }
 
-// NewHandler creates the specific package routes
-func NewHandler(appConfig *config.AppConfig, services *config.AppServices) routes.OldAPIEndpointsFunc {
+// OldContactsHandler creates the specific package routes
+func OldContactsHandler(appConfig *config.AppConfig, services *config.AppServices) routes.OldAPIEndpointsFunc {
 	action := &Action{actions.Action{AppConfig: appConfig, Services: services}}
 
 	apiEndpoints := routes.OldAPIEndpointsFunc(func(router *gin.RouterGroup) {
 		group := router.Group("/contact")
-		group.PUT("/:paymail", action.upsert)
+		group.PUT("/:paymail", action.oldUpsert)
 
-		group.PATCH("/accepted/:paymail", action.accept)
-		group.PATCH("/rejected/:paymail", action.reject)
-		group.PATCH("/confirmed/:paymail", action.confirm)
-		group.PATCH("/unconfirmed/:paymail", action.unconfirm)
+		group.PATCH("/accepted/:paymail", action.oldAccept)
+		group.PATCH("/rejected/:paymail", action.oldReject)
+		group.PATCH("/confirmed/:paymail", action.oldConfirm)
+		group.PATCH("/unconfirmed/:paymail", action.oldUnconfirm)
 
 		group.POST("search", action.search)
 	})
 
 	return apiEndpoints
+}
+
+// NewHandler creates the specific package routes
+func NewHandler(appConfig *config.AppConfig, services *config.AppServices) (routes.APIEndpointsFunc, routes.APIEndpointsFunc) {
+	action := &Action{actions.Action{AppConfig: appConfig, Services: services}}
+
+	contactsAPIEndpoints := routes.APIEndpointsFunc(func(router *gin.RouterGroup) {
+		group := router.Group("/contacts")
+		group.PUT("/:paymail", action.upsertContact)
+		group.DELETE("/:paymail", action.removeContact)
+
+		group.POST("/:paymail/confirmation", action.confirmContact)
+		group.DELETE("/:paymail/confirmation", action.unconfirmContact)
+
+		group.GET("", action.getContacts)
+		group.GET(":paymail", action.getContactByPaymail)
+	})
+
+	invitationsAPIEndpoints := routes.APIEndpointsFunc(func(router *gin.RouterGroup) {
+		group := router.Group("/invitations")
+
+		group.POST("/:paymail/contacts", action.acceptInvitations)
+		group.DELETE("/:paymail", action.rejectInvitation)
+
+	})
+	return contactsAPIEndpoints, invitationsAPIEndpoints
 }

@@ -31,6 +31,309 @@
                 }
             }
         },
+        "/api/v1/contacts": {
+            "get": {
+                "security": [
+                    {
+                        "x-auth-xpub": []
+                    }
+                ],
+                "description": "Get contacts",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Contacts"
+                ],
+                "summary": "Get contacts",
+                "parameters": [
+                    {
+                        "description": "Supports targeted resource searches with filters and metadata, plus options for pagination and sorting to streamline data exploration and analysis",
+                        "name": "SearchContacts",
+                        "in": "body",
+                        "schema": {
+                            "$ref": "#/definitions/filter.SearchContacts"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Page of contacts",
+                        "schema": {
+                            "$ref": "#/definitions/response.PageModel-response_Contact"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request - Error while parsing SearchContacts from request body"
+                    },
+                    "500": {
+                        "description": "Internal server error - Error while searching for contacts"
+                    }
+                }
+            }
+        },
+        "/api/v1/contacts/{paymail}": {
+            "get": {
+                "security": [
+                    {
+                        "x-auth-xpub": []
+                    }
+                ],
+                "description": "Get contact by paymail",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Contacts"
+                ],
+                "summary": "Get contact by paymail",
+                "responses": {
+                    "200": {
+                        "description": "Contact",
+                        "schema": {
+                            "$ref": "#/definitions/response.Contact"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request - Error while parsing SearchContacts from request body"
+                    },
+                    "500": {
+                        "description": "Internal server error - Error while searching for contacts"
+                    }
+                }
+            },
+            "put": {
+                "security": [
+                    {
+                        "x-auth-xpub": []
+                    }
+                ],
+                "description": "Add or update contact. When adding a new contact, the system utilizes Paymail's PIKE capability to dispatch an invitation request, asking the counterparty to include the current user in their contacts.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Contacts"
+                ],
+                "summary": "Upsert contact",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Paymail address of the contact that the user would like to add/modify",
+                        "name": "paymail",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Full name and metadata needed to add/modify contact",
+                        "name": "UpsertContact",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/contacts.UpsertContact"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created"
+                    }
+                }
+            },
+            "delete": {
+                "security": [
+                    {
+                        "x-auth-xpub": []
+                    }
+                ],
+                "description": "Remove contact.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Contacts"
+                ],
+                "summary": "Remove contact",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Paymail address of the contact that the user would like to confirm",
+                        "name": "paymail",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "404": {
+                        "description": "Contact not found"
+                    },
+                    "500": {
+                        "description": "Internal server error"
+                    }
+                }
+            }
+        },
+        "/api/v1/contacts/{paymail}/confirmation": {
+            "post": {
+                "security": [
+                    {
+                        "x-auth-xpub": []
+                    }
+                ],
+                "description": "Confirm contact. For contact with status \"unconfirmed\" change status to \"confirmed\"",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Contacts"
+                ],
+                "summary": "Confirm contact",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Paymail address of the contact that the user would like to confirm",
+                        "name": "paymail",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "404": {
+                        "description": "Contact not found"
+                    },
+                    "422": {
+                        "description": "Contact status not unconfirmed"
+                    },
+                    "500": {
+                        "description": "Internal server error"
+                    }
+                }
+            },
+            "delete": {
+                "security": [
+                    {
+                        "x-auth-xpub": []
+                    }
+                ],
+                "description": "Unconfirm contact. For contact with status \"confirmed\" change status to \"unconfirmed\"",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Contacts"
+                ],
+                "summary": "Unconfirm contact",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Paymail address of the contact that the user would like to unconfirm",
+                        "name": "paymail",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "404": {
+                        "description": "Contact not found"
+                    },
+                    "422": {
+                        "description": "Contact status not confirmed"
+                    },
+                    "500": {
+                        "description": "Internal server error"
+                    }
+                }
+            }
+        },
+        "/api/v1/invitations/{paymail}": {
+            "delete": {
+                "security": [
+                    {
+                        "x-auth-xpub": []
+                    }
+                ],
+                "description": "Reject contact invitation. For contact with status \"awaiting\" delete contact",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Contacts"
+                ],
+                "summary": "Reject contact invitation",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Paymail address of the contact that the user would like to reject",
+                        "name": "paymail",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "404": {
+                        "description": "Contact not found"
+                    },
+                    "422": {
+                        "description": "Contact status not awaiting"
+                    },
+                    "500": {
+                        "description": "Internal server error"
+                    }
+                }
+            }
+        },
+        "/api/v1/invitations/{paymail}/contacts": {
+            "post": {
+                "security": [
+                    {
+                        "x-auth-xpub": []
+                    }
+                ],
+                "description": "Accept contact invitation. For contact with status \"awaiting\" change status to \"unconfirmed\"",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Contacts"
+                ],
+                "summary": "Accept contact invitation",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Paymail address of the contact that the user would like to accept",
+                        "name": "paymail",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "404": {
+                        "description": "Contact not found"
+                    },
+                    "422": {
+                        "description": "Contact status not awaiting"
+                    },
+                    "500": {
+                        "description": "Internal server error"
+                    }
+                }
+            }
+        },
         "/api/v1/transactions": {
             "get": {
                 "security": [
@@ -1529,247 +1832,6 @@
                     },
                     "500": {
                         "description": "Internal server error - Error while searching for xpubs"
-                    }
-                }
-            }
-        },
-        "/v1/contact/accepted/{paymail}": {
-            "patch": {
-                "security": [
-                    {
-                        "x-auth-xpub": []
-                    }
-                ],
-                "description": "Accept contact. For contact with status \"awaiting\" change status to \"unconfirmed\"",
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Contact"
-                ],
-                "summary": "Accept contact",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Paymail address of the contact the user wants to accept",
-                        "name": "paymail",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK"
-                    },
-                    "404": {
-                        "description": "Contact not found"
-                    },
-                    "422": {
-                        "description": "Contact status not awaiting"
-                    },
-                    "500": {
-                        "description": "Internal server error"
-                    }
-                }
-            }
-        },
-        "/v1/contact/confirmed/{paymail}": {
-            "patch": {
-                "security": [
-                    {
-                        "x-auth-xpub": []
-                    }
-                ],
-                "description": "Confirm contact. For contact with status \"unconfirmed\" change status to \"confirmed\"",
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Contact"
-                ],
-                "summary": "Confirm contact",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Paymail address of the contact the user wants to confirm",
-                        "name": "paymail",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK"
-                    },
-                    "404": {
-                        "description": "Contact not found"
-                    },
-                    "422": {
-                        "description": "Contact status not unconfirmed"
-                    },
-                    "500": {
-                        "description": "Internal server error"
-                    }
-                }
-            }
-        },
-        "/v1/contact/rejected/{paymail}": {
-            "patch": {
-                "security": [
-                    {
-                        "x-auth-xpub": []
-                    }
-                ],
-                "description": "Reject contact. For contact with status \"awaiting\" delete contact",
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Contact"
-                ],
-                "summary": "Reject contact",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Paymail address of the contact the user wants to reject",
-                        "name": "paymail",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK"
-                    },
-                    "404": {
-                        "description": "Contact not found"
-                    },
-                    "422": {
-                        "description": "Contact status not awaiting"
-                    },
-                    "500": {
-                        "description": "Internal server error"
-                    }
-                }
-            }
-        },
-        "/v1/contact/search": {
-            "post": {
-                "security": [
-                    {
-                        "x-auth-xpub": []
-                    }
-                ],
-                "description": "Search contacts",
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Contact"
-                ],
-                "summary": "Search contacts",
-                "parameters": [
-                    {
-                        "description": "Supports targeted resource searches with filters and metadata, plus options for pagination and sorting to streamline data exploration and analysis",
-                        "name": "SearchContacts",
-                        "in": "body",
-                        "schema": {
-                            "$ref": "#/definitions/filter.SearchContacts"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "List of contacts",
-                        "schema": {
-                            "$ref": "#/definitions/models.SearchContactsResponse"
-                        }
-                    },
-                    "400": {
-                        "description": "Bad request - Error while parsing SearchContacts from request body"
-                    },
-                    "500": {
-                        "description": "Internal server error - Error while searching for contacts"
-                    }
-                }
-            }
-        },
-        "/v1/contact/unconfirmed/{paymail}": {
-            "patch": {
-                "security": [
-                    {
-                        "x-auth-xpub": []
-                    }
-                ],
-                "description": "Unconfirm contact. For contact with status \"confirmed\" change status to \"unconfirmed\"",
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Contact"
-                ],
-                "summary": "Unconfirm contact",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Paymail address of the contact the user wants to unconfirm",
-                        "name": "paymail",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK"
-                    },
-                    "404": {
-                        "description": "Contact not found"
-                    },
-                    "422": {
-                        "description": "Contact status not confirmed"
-                    },
-                    "500": {
-                        "description": "Internal server error"
-                    }
-                }
-            }
-        },
-        "/v1/contact/{paymail}": {
-            "put": {
-                "security": [
-                    {
-                        "x-auth-xpub": []
-                    }
-                ],
-                "description": "Add or update contact. When adding a new contact, the system utilizes Paymail's PIKE capability to dispatch an invitation request, asking the counterparty to include the current user in their contacts.",
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Contact"
-                ],
-                "summary": "Upsert contact",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Paymail address of the contact the user wants to add/modify",
-                        "name": "paymail",
-                        "in": "path",
-                        "required": true
-                    },
-                    {
-                        "description": "Full name and metadata needed to add/modify contact",
-                        "name": "UpsertContact",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/contacts.UpsertContact"
-                        }
-                    }
-                ],
-                "responses": {
-                    "201": {
-                        "description": "Created"
                     }
                 }
             }
@@ -3553,7 +3615,7 @@
                     "description": "Status is a contact's current status.",
                     "allOf": [
                         {
-                            "$ref": "#/definitions/models.ContactStatus"
+                            "$ref": "#/definitions/response.ContactStatus"
                         }
                     ],
                     "example": "unconfirmed"
@@ -3564,21 +3626,6 @@
                     "example": "2024-02-26T11:01:28.069911Z"
                 }
             }
-        },
-        "models.ContactStatus": {
-            "type": "string",
-            "enum": [
-                "unconfirmed",
-                "awaiting",
-                "confirmed",
-                "rejected"
-            ],
-            "x-enum-varnames": [
-                "ContactNotConfirmed",
-                "ContactAwaitAccept",
-                "ContactConfirmed",
-                "ContactRejected"
-            ]
         },
         "models.Destination": {
             "type": "object",
@@ -4540,6 +4587,81 @@
                 }
             }
         },
+        "response.Contact": {
+            "type": "object",
+            "properties": {
+                "createdAt": {
+                    "description": "CreatedAt is a time when outer model was created.",
+                    "type": "string",
+                    "example": "2024-02-26T11:00:28.069911Z"
+                },
+                "deletedAt": {
+                    "description": "DeletedAt is a time when outer model was deleted.",
+                    "type": "string",
+                    "example": "2024-02-26T11:02:28.069911Z"
+                },
+                "fullName": {
+                    "description": "FullName is name which could be shown instead of whole paymail address.",
+                    "type": "string",
+                    "example": "Test User"
+                },
+                "id": {
+                    "description": "ID is a unique identifier of contact.",
+                    "type": "string",
+                    "example": "68af358bde7d8641621c7dd3de1a276c9a62cfa9e2d0740494519f1ba61e2f4a"
+                },
+                "metadata": {
+                    "description": "Metadata is a metadata map of outer model.",
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "string"
+                    },
+                    "example": {
+                        "key": "value",
+                        "key2": "value2"
+                    }
+                },
+                "paymail": {
+                    "description": "Paymail is a paymail address related to contact.",
+                    "type": "string",
+                    "example": "test@spv-wallet.com"
+                },
+                "pubKey": {
+                    "description": "PubKey is a public key related to contact (receiver).",
+                    "type": "string",
+                    "example": "xpub661MyMwAqRbcGpZVrSHU..."
+                },
+                "status": {
+                    "description": "Status is a contact's current status.",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/response.ContactStatus"
+                        }
+                    ],
+                    "example": "unconfirmed"
+                },
+                "updatedAt": {
+                    "description": "UpdatedAt is a time when outer model was updated.",
+                    "type": "string",
+                    "example": "2024-02-26T11:01:28.069911Z"
+                }
+            }
+        },
+        "response.ContactStatus": {
+            "type": "string",
+            "enum": [
+                "unconfirmed",
+                "awaiting",
+                "confirmed",
+                "rejected"
+            ],
+            "x-enum-varnames": [
+                "ContactNotConfirmed",
+                "ContactAwaitAccept",
+                "ContactConfirmed",
+                "ContactRejected"
+            ]
+        },
         "response.Destination": {
             "type": "object",
             "properties": {
@@ -4753,16 +4875,40 @@
             "type": "object",
             "properties": {
                 "number": {
+                    "description": "Number is the number of the page returned",
                     "type": "integer"
                 },
                 "size": {
+                    "description": "Size is the number of elements on a single page",
                     "type": "integer"
                 },
                 "totalElements": {
+                    "description": "TotalElements is the total number of elements in the returned collection",
                     "type": "integer"
                 },
                 "totalPages": {
+                    "description": "TotalPages is total number of pages returned",
                     "type": "integer"
+                }
+            }
+        },
+        "response.PageModel-response_Contact": {
+            "type": "object",
+            "properties": {
+                "content": {
+                    "description": "Content is the collection of elements that serves as the content",
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/response.Contact"
+                    }
+                },
+                "page": {
+                    "description": "Page is the page descriptor",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/response.PageDescription"
+                        }
+                    ]
                 }
             }
         },
@@ -4770,13 +4916,19 @@
             "type": "object",
             "properties": {
                 "content": {
+                    "description": "Content is the collection of elements that serves as the content",
                     "type": "array",
                     "items": {
                         "$ref": "#/definitions/response.Transaction"
                     }
                 },
                 "page": {
-                    "$ref": "#/definitions/response.PageDescription"
+                    "description": "Page is the page descriptor",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/response.PageDescription"
+                        }
+                    ]
                 }
             }
         },
