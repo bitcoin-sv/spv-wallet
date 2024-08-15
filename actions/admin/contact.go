@@ -50,7 +50,7 @@ func (a *Action) contactsSearch(c *gin.Context) {
 		return
 	}
 
-	contracts := mappings.MapToContactContracts(contacts)
+	contracts := mappings.MapToOldContactContracts(contacts)
 
 	count, err := a.Services.SpvWalletEngine.GetContactsCount(
 		c.Request.Context(),
@@ -128,7 +128,7 @@ func (a *Action) contactsUpdate(c *gin.Context) {
 func (a *Action) contactsDelete(c *gin.Context) {
 	id := c.Param("id")
 
-	err := a.Services.SpvWalletEngine.DeleteContact(
+	err := a.Services.SpvWalletEngine.DeleteContactByID(
 		c.Request.Context(),
 		id,
 	)
