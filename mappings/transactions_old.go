@@ -87,7 +87,7 @@ func processOldOutputValue(t *engine.Transaction, xpubID string, model *models.T
 	}
 }
 
-// MapTransactionModelToEngine will map the model from spv-wallet-models to the spv-wallet contract
+// MapOldTransactionModelToEngine will map the model from spv-wallet-models to the spv-wallet contract
 func MapOldTransactionModelToEngine(t *models.Transaction) *engine.Transaction {
 	if t == nil {
 		return nil
@@ -111,7 +111,7 @@ func MapOldTransactionModelToEngine(t *models.Transaction) *engine.Transaction {
 	}
 }
 
-// MapTransactionConfigEngineToModel will map the transaction-config model from spv-wallet to the spv-wallet-models contract
+// MapOldTransactionConfigEngineToModel will map the transaction-config model from spv-wallet to the spv-wallet-models contract
 func MapOldTransactionConfigEngineToModel(tx *models.TransactionConfig) *engine.TransactionConfig {
 	if tx == nil {
 		return nil
@@ -195,7 +195,7 @@ func mapToOldEngineDestinations(tx *models.TransactionConfig) []*engine.Destinat
 	return destinations
 }
 
-// MapToTransactionConfigContract will map the transaction-config model from spv-wallet-models to the spv-wallet contract
+// MapToOldTransactionConfigContract will map the transaction-config model from spv-wallet-models to the spv-wallet contract
 func MapToOldTransactionConfigContract(tx *engine.TransactionConfig) *models.TransactionConfig {
 	if tx == nil {
 		return nil
@@ -278,7 +278,7 @@ func mapToOldContractDestinations(tx *engine.TransactionConfig) []*models.Destin
 	return destinations
 }
 
-// MapToDraftTransactionContract will map the transaction-output model from spv-wallet to the spv-wallet-models contract
+// MapToOldDraftTransactionContract will map the transaction-output model from spv-wallet to the spv-wallet-models contract
 func MapToOldDraftTransactionContract(tx *engine.DraftTransaction) *models.DraftTransaction {
 	if tx == nil {
 		return nil
@@ -318,7 +318,7 @@ func MapOldTransactionInputModelToEngine(inp *models.TransactionInput) *engine.T
 	}
 }
 
-// MapToTransactionOutputContract will map the transaction-output model from spv-wallet to the spv-wallet-models contract
+// MapToOldTransactionOutputContract will map the transaction-output model from spv-wallet to the spv-wallet-models contract
 func MapToOldTransactionOutputContract(out *engine.TransactionOutput) *models.TransactionOutput {
 	if out == nil {
 		return nil
@@ -402,7 +402,7 @@ func MapToOldOpReturnContract(op *engine.OpReturn) *models.OpReturn {
 	}
 }
 
-// MapOpReturnModelTMapOldOpReturnModelToEngineoEngine will map the op-return model from spv-wallet-models to the spv-wallet contract
+// MapOldOpReturnModelToEngine will map the op-return model from spv-wallet-models to the spv-wallet contract
 func MapOldOpReturnModelToEngine(op *models.OpReturn) *engine.OpReturn {
 	if op == nil {
 		return nil
