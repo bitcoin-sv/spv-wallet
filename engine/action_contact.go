@@ -204,14 +204,35 @@ func (c *Client) AdminChangeContactStatus(ctx context.Context, id string, status
 	return contact, nil
 }
 
-// DeleteContact deletes the contact.
-func (c *Client) DeleteContact(ctx context.Context, id string) error {
+// DeleteContactByID deletes the contact by passing the ID.
+func (c *Client) DeleteContactByID(ctx context.Context, id string) error {
 	contact, err := getContactByID(ctx, id, c.DefaultModelOptions()...)
 	if err != nil {
 		c.logContactError("", "", fmt.Sprintf("error while getting contact: %s", err.Error()))
 		return err
 	}
 
+	if contact == nil {
+		return spverrors.ErrContactNotFound
+	}
+
+	contact.Delete()
+
+	if err = contact.Save(ctx); err != nil {
+		c.logContactError(contact.OwnerXpubID, contact.Paymail, fmt.Sprintf("unexpected error while saving contact: %s", err.Error()))
+		return spverrors.ErrSaveContact
+	}
+
+	return nil
+}
+
+// DeleteContact deletes the contact.
+func (c *Client) DeleteContact(ctx context.Context, xPubID, paymail string) error {
+	contact, err := getContact(ctx, paymail, xPubID, c.DefaultModelOptions()...)
+	if err != nil {
+		c.logContactError(xPubID, paymail, fmt.Sprintf("unexpected error while getting contact: %s", err.Error()))
+		return err
+	}
 	if contact == nil {
 		return spverrors.ErrContactNotFound
 	}

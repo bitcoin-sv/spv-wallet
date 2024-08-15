@@ -1057,7 +1057,7 @@ definitions:
         type: string
       status:
         allOf:
-        - $ref: '#/definitions/models.ContactStatus'
+        - $ref: '#/definitions/response.ContactStatus'
         description: Status is a contact's current status.
         example: unconfirmed
       updated_at:
@@ -1065,18 +1065,6 @@ definitions:
         example: "2024-02-26T11:01:28.069911Z"
         type: string
     type: object
-  models.ContactStatus:
-    enum:
-    - unconfirmed
-    - awaiting
-    - confirmed
-    - rejected
-    type: string
-    x-enum-varnames:
-    - ContactNotConfirmed
-    - ContactAwaitAccept
-    - ContactConfirmed
-    - ContactRejected
   models.Destination:
     properties:
       address:
@@ -1830,6 +1818,91 @@ definitions:
         example: bb8593f85ef8056a77026ad415f02128f3768906de53e9e8bf8749fe2d66cf50
         type: string
     type: object
+  response.Contact:
+    properties:
+      createdAt:
+        description: CreatedAt is a time when outer model was created.
+        example: "2024-02-26T11:00:28.069911Z"
+        type: string
+      deletedAt:
+        description: DeletedAt is a time when outer model was deleted.
+        example: "2024-02-26T11:02:28.069911Z"
+        type: string
+      fullName:
+        description: FullName is name which could be shown instead of whole paymail
+          address.
+        example: Test User
+        type: string
+      id:
+        description: ID is a unique identifier of contact.
+        example: 68af358bde7d8641621c7dd3de1a276c9a62cfa9e2d0740494519f1ba61e2f4a
+        type: string
+      metadata:
+        additionalProperties:
+          type: string
+        description: Metadata is a metadata map of outer model.
+        example:
+          key: value
+          key2: value2
+        type: object
+      paymail:
+        description: Paymail is a paymail address related to contact.
+        example: test@spv-wallet.com
+        type: string
+      pubKey:
+        description: PubKey is a public key related to contact (receiver).
+        example: xpub661MyMwAqRbcGpZVrSHU...
+        type: string
+      status:
+        allOf:
+        - $ref: '#/definitions/response.ContactStatus'
+        description: Status is a contact's current status.
+        example: unconfirmed
+      updatedAt:
+        description: UpdatedAt is a time when outer model was updated.
+        example: "2024-02-26T11:01:28.069911Z"
+        type: string
+    type: object
+  response.ContactStatus:
+    enum:
+    - unconfirmed
+    - awaiting
+    - confirmed
+    - rejected
+    type: string
+    x-enum-varnames:
+    - ContactNotConfirmed
+    - ContactAwaitAccept
+    - ContactConfirmed
+    - ContactRejected
+  response.PageDescription:
+    properties:
+      number:
+        description: Number is the number of the page returned
+        type: integer
+      size:
+        description: Size is the number of elements on a single page
+        type: integer
+      totalElements:
+        description: TotalElements is the total number of elements in the returned
+          collection
+        type: integer
+      totalPages:
+        description: TotalPages is total number of pages returned
+        type: integer
+    type: object
+  response.PageModel-response_Contact:
+    properties:
+      content:
+        description: Content is the collection of elements that serves as the content
+        items:
+          $ref: '#/definitions/response.Contact'
+        type: array
+      page:
+        allOf:
+        - $ref: '#/definitions/response.PageDescription'
+        description: Page is the page descriptor
+    type: object
   response.SharedConfig:
     properties:
       experimentalFeatures:
@@ -1899,15 +1972,8 @@ definitions:
     - 1000000000
     - 60000000000
     - 3600000000000
-    - 1
-    - 1000
-    - 1000000
-    - 1000000000
-    - 1
-    - 1000
-    - 1000000
-    - 1000000000
-    - 60000000000
+    - -9223372036854775808
+    - 9223372036854775807
     - 1
     - 1000
     - 1000000
@@ -1924,15 +1990,8 @@ definitions:
     - Second
     - Minute
     - Hour
-    - Nanosecond
-    - Microsecond
-    - Millisecond
-    - Second
-    - Nanosecond
-    - Microsecond
-    - Millisecond
-    - Second
-    - Minute
+    - minDuration
+    - maxDuration
     - Nanosecond
     - Microsecond
     - Millisecond
@@ -2040,6 +2099,205 @@ paths:
       summary: Get shared config
       tags:
       - Configurations
+  /api/v1/contacts:
+    get:
+      description: Get contacts
+      parameters:
+      - description: Supports targeted resource searches with filters and metadata,
+          plus options for pagination and sorting to streamline data exploration and
+          analysis
+        in: body
+        name: SearchContacts
+        schema:
+          $ref: '#/definitions/filter.SearchContacts'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Page of contacts
+          schema:
+            $ref: '#/definitions/response.PageModel-response_Contact'
+        "400":
+          description: Bad request - Error while parsing SearchContacts from request
+            body
+        "500":
+          description: Internal server error - Error while searching for contacts
+      security:
+      - x-auth-xpub: []
+      summary: Get contacts
+      tags:
+      - Contacts
+  /api/v1/contacts/{paymail}:
+    delete:
+      description: Remove contact.
+      parameters:
+      - description: Paymail address of the contact that the user would like to confirm
+        in: path
+        name: paymail
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+        "404":
+          description: Contact not found
+        "500":
+          description: Internal server error
+      security:
+      - x-auth-xpub: []
+      summary: Remove contact
+      tags:
+      - Contacts
+    get:
+      description: Get contact by paymail
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Contact
+          schema:
+            $ref: '#/definitions/response.Contact'
+        "400":
+          description: Bad request - Error while parsing SearchContacts from request
+            body
+        "500":
+          description: Internal server error - Error while searching for contacts
+      security:
+      - x-auth-xpub: []
+      summary: Get contact by paymail
+      tags:
+      - Contacts
+    put:
+      description: Add or update contact. When adding a new contact, the system utilizes
+        Paymail's PIKE capability to dispatch an invitation request, asking the counterparty
+        to include the current user in their contacts.
+      parameters:
+      - description: Paymail address of the contact that the user would like to add/modify
+        in: path
+        name: paymail
+        required: true
+        type: string
+      - description: Full name and metadata needed to add/modify contact
+        in: body
+        name: UpsertContact
+        required: true
+        schema:
+          $ref: '#/definitions/contacts.UpsertContact'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+      security:
+      - x-auth-xpub: []
+      summary: Upsert contact
+      tags:
+      - Contacts
+  /api/v1/contacts/{paymail}/confirmation:
+    delete:
+      description: Unconfirm contact. For contact with status "confirmed" change status
+        to "unconfirmed"
+      parameters:
+      - description: Paymail address of the contact that the user would like to unconfirm
+        in: path
+        name: paymail
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+        "404":
+          description: Contact not found
+        "422":
+          description: Contact status not confirmed
+        "500":
+          description: Internal server error
+      security:
+      - x-auth-xpub: []
+      summary: Unconfirm contact
+      tags:
+      - Contacts
+    post:
+      description: Confirm contact. For contact with status "unconfirmed" change status
+        to "confirmed"
+      parameters:
+      - description: Paymail address of the contact that the user would like to confirm
+        in: path
+        name: paymail
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+        "404":
+          description: Contact not found
+        "422":
+          description: Contact status not unconfirmed
+        "500":
+          description: Internal server error
+      security:
+      - x-auth-xpub: []
+      summary: Confirm contact
+      tags:
+      - Contacts
+  /api/v1/invitations/{paymail}:
+    delete:
+      description: Reject contact invitation. For contact with status "awaiting" delete
+        contact
+      parameters:
+      - description: Paymail address of the contact that the user would like to reject
+        in: path
+        name: paymail
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+        "404":
+          description: Contact not found
+        "422":
+          description: Contact status not awaiting
+        "500":
+          description: Internal server error
+      security:
+      - x-auth-xpub: []
+      summary: Reject contact invitation
+      tags:
+      - Contacts
+  /api/v1/invitations/{paymail}/contacts:
+    post:
+      description: Accept contact invitation. For contact with status "awaiting" change
+        status to "unconfirmed"
+      parameters:
+      - description: Paymail address of the contact that the user would like to accept
+        in: path
+        name: paymail
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+        "404":
+          description: Contact not found
+        "422":
+          description: Contact status not awaiting
+        "500":
+          description: Internal server error
+      security:
+      - x-auth-xpub: []
+      summary: Accept contact invitation
+      tags:
+      - Contacts
   /api/v1/users/current:
     get:
       description: Get current user information
@@ -2989,11 +3247,11 @@ paths:
       - Admin
   /v1/contact/{paymail}:
     put:
-      description: Add or update contact. When adding a new contact, the system utilizes
-        Paymail's PIKE capability to dispatch an invitation request, asking the counterparty
-        to include the current user in their contacts.
+      deprecated: true
+      description: This endpoint has been deprecated. Use (PUT) /api/v1/contacts/{paymail}
+        instead.
       parameters:
-      - description: Paymail address of the contact the user wants to add/modify
+      - description: Paymail address of the contact that the user would like to add/modify
         in: path
         name: paymail
         required: true
@@ -3011,15 +3269,16 @@ paths:
           description: Created
       security:
       - x-auth-xpub: []
-      summary: Upsert contact
+      summary: Upsert contact - Use (PUT) /api/v1/contacts/{paymail} instead.
       tags:
       - Contact
   /v1/contact/accepted/{paymail}:
     patch:
-      description: Accept contact. For contact with status "awaiting" change status
-        to "unconfirmed"
+      deprecated: true
+      description: This endpoint has been deprecated. Use (POST) /api/v1/invitations/{paymail}
+        instead.
       parameters:
-      - description: Paymail address of the contact the user wants to accept
+      - description: Paymail address of the contact that the user would like to accept
         in: path
         name: paymail
         required: true
@@ -3037,15 +3296,16 @@ paths:
           description: Internal server error
       security:
       - x-auth-xpub: []
-      summary: Accept contact
+      summary: Accept contact - Use (POST) /api/v1/invitations/{paymail} instead.
       tags:
       - Contact
   /v1/contact/confirmed/{paymail}:
     patch:
-      description: Confirm contact. For contact with status "unconfirmed" change status
-        to "confirmed"
+      deprecated: true
+      description: This endpoint has been deprecated. Use (POST) /api/v1/contacts/{paymail}/confirmation
+        instead.
       parameters:
-      - description: Paymail address of the contact the user wants to confirm
+      - description: Paymail address of the contact that the user would like to confirm
         in: path
         name: paymail
         required: true
@@ -3063,14 +3323,17 @@ paths:
           description: Internal server error
       security:
       - x-auth-xpub: []
-      summary: Confirm contact
+      summary: Confirm contact - Use (POST) /api/v1/contacts/{paymail}/confirmation
+        instead
       tags:
       - Contact
   /v1/contact/rejected/{paymail}:
     patch:
-      description: Reject contact. For contact with status "awaiting" delete contact
+      deprecated: true
+      description: This endpoint has been deprecated. Use (DELETE) /api/v1/invitations/{paymail}
+        instead.
       parameters:
-      - description: Paymail address of the contact the user wants to reject
+      - description: Paymail address of the contact that the user would like to reject
         in: path
         name: paymail
         required: true
@@ -3088,12 +3351,13 @@ paths:
           description: Internal server error
       security:
       - x-auth-xpub: []
-      summary: Reject contact
+      summary: Reject contact - Use (DELETE) /api/v1/invitations/{paymail} instead.
       tags:
       - Contact
   /v1/contact/search:
     post:
-      description: Search contacts
+      deprecated: true
+      description: This endpoint has been deprecated. Use (GET) /api/v1/contacts instead.
       parameters:
       - description: Supports targeted resource searches with filters and metadata,
           plus options for pagination and sorting to streamline data exploration and
@@ -3116,15 +3380,16 @@ paths:
           description: Internal server error - Error while searching for contacts
       security:
       - x-auth-xpub: []
-      summary: Search contacts
+      summary: Search contacts - Use (GET) /api/v1/contacts instead.
       tags:
       - Contact
   /v1/contact/unconfirmed/{paymail}:
     patch:
-      description: Unconfirm contact. For contact with status "confirmed" change status
-        to "unconfirmed"
+      deprecated: true
+      description: This endpoint has been deprecated. Use (DELETE) /api/v1/contacts/{paymail}/confirmation
+        instead.
       parameters:
-      - description: Paymail address of the contact the user wants to unconfirm
+      - description: Paymail address of the contact that the user would like to unconfirm
         in: path
         name: paymail
         required: true
@@ -3142,7 +3407,8 @@ paths:
           description: Internal server error
       security:
       - x-auth-xpub: []
-      summary: Unconfirm contact
+      summary: Unconfirm contact - Use (DELETE) /api/v1/contacts/{paymail}/confirmation
+        instead.
       tags:
       - Contact
   /v1/destination:
