@@ -25,7 +25,7 @@ type OldAPIEndpointsFunc func(router *gin.RouterGroup)
 
 // OldAPIEndpoints registrar which will register routes in ADMIN routes group.
 type OldAPIEndpoints interface {
-	// RegisterAPIEndpoints register ADMIN endpoints.
+	// RegisterOldAPIEndpoints register ADMIN endpoints.
 	RegisterOldAPIEndpoints(router *gin.RouterGroup)
 }
 
@@ -52,6 +52,7 @@ type BasicEndpointsFunc func(router *gin.RouterGroup)
 
 // BasicEndpoints registrar which will register routes in BASIC routes group.
 type BasicEndpoints interface {
+	// RegisterBasicEndpoints register BASIC endpoints.
 	RegisterBasicEndpoints(router *gin.RouterGroup)
 }
 
@@ -93,7 +94,7 @@ func (f BasicEndpointsFunc) RegisterBasicEndpoints(router *gin.RouterGroup) {
 	f(router)
 }
 
-// RegisterBasicEndpoints register Basic endpoints by registrar BasicEndpointsFunc.
+// RegisterOldBasicEndpoints register Basic endpoints by registrar BasicEndpointsFunc.
 func (f OldBasicEndpointsFunc) RegisterOldBasicEndpoints(router *gin.RouterGroup) {
 	f(router)
 }
