@@ -24,7 +24,7 @@ import (
 // @Deprecated
 func (a *Action) update(c *gin.Context) {
 
-	var requestBody UpdateTransaction
+	var requestBody OldUpdateTransaction
 	if err := c.Bind(&requestBody); err != nil {
 		spverrors.ErrorResponse(c, spverrors.ErrCannotBindRequest, a.Services.Logger)
 		return

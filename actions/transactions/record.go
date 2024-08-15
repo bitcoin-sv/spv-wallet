@@ -25,7 +25,7 @@ import (
 func (a *Action) record(c *gin.Context) {
 	reqXPub := c.GetString(auth.ParamXPubKey)
 
-	var requestBody RecordTransaction
+	var requestBody OldRecordTransaction
 	if err := c.ShouldBindJSON(&requestBody); err != nil {
 		spverrors.ErrorResponse(c, err, a.Services.Logger)
 		return
@@ -76,7 +76,7 @@ func (a *Action) record(c *gin.Context) {
 func (a *Action) recordTransaction(c *gin.Context) {
 	reqXPub := c.GetString(auth.ParamXPubKey)
 
-	var requestBody RecordTransaction
+	var requestBody OldRecordTransaction
 	if err := c.ShouldBindJSON(&requestBody); err != nil {
 		spverrors.ErrorResponse(c, err, a.Services.Logger)
 		return

@@ -2,11 +2,11 @@ package transactions
 
 import (
 	"github.com/bitcoin-sv/spv-wallet/engine"
-	"github.com/bitcoin-sv/spv-wallet/models/response"
+	"github.com/bitcoin-sv/spv-wallet/models"
 )
 
-// UpdateTransaction is the model for updating a transaction
-type UpdateTransaction struct {
+// OldUpdateTransaction is the model for updating a transaction
+type OldUpdateTransaction struct {
 	// Accepts a JSON object for embedding custom metadata, enabling arbitrary additional information to be associated with the resource
 	Metadata engine.Metadata `json:"metadata" swaggertype:"object,string" example:"key:value,key2:value2"`
 	// ID of the transaction which is a hash of the transaction
@@ -14,25 +14,25 @@ type UpdateTransaction struct {
 }
 
 // UpdateTransactionRequest is the model used for updating a transaction
-type UpdateTransactionRequest struct {
+type OldUpdateTransactionRequest struct {
 	// Accepts a JSON object for embedding custom metadata, enabling arbitrary additional information to be associated with the resource
 	Metadata engine.Metadata `json:"metadata" swaggertype:"object,string" example:"key:value,key2:value2"`
 }
 
 // OldRecordTransaction is the model for recording a transaction
-type RecordTransaction struct {
+type OldRecordTransaction struct {
 	// Accepts a JSON object for embedding custom metadata, enabling arbitrary additional information to be associated with the resource
 	Metadata engine.Metadata `json:"metadata" swaggertype:"object,string" example:"key:value,key2:value2"`
 	// Hex of the transaction
 	Hex string `json:"hex" example:"0100000002..."`
 	// ReferenceID which is a ID of the draft transaction
-	ReferenceID string `json:"referenceId" example:"b356f7fa00cd3f20cce6c21d704cd13e871d28d714a5ebd0532f5a0e0cde63f7"`
+	ReferenceID string `json:"reference_id" example:"b356f7fa00cd3f20cce6c21d704cd13e871d28d714a5ebd0532f5a0e0cde63f7"`
 }
 
 // OldNewTransaction is the model for creating a new transaction
-type NewTransaction struct {
+type OldNewTransaction struct {
 	// Configuration of the transaction
-	Config response.TransactionConfig `json:"config"`
+	Config models.TransactionConfig `json:"config"`
 	// Accepts a JSON object for embedding custom metadata, enabling arbitrary additional information to be associated with the resource
 	Metadata engine.Metadata `json:"metadata" swaggertype:"object,string" example:"key:value,key2:value2"`
 }

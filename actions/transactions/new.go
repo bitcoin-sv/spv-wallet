@@ -35,7 +35,7 @@ func (a *Action) newTransaction(c *gin.Context) {
 		return
 	}
 
-	var requestBody NewTransaction
+	var requestBody OldNewTransaction
 	if err = c.Bind(&requestBody); err != nil {
 		spverrors.ErrorResponse(c, spverrors.ErrCannotBindRequest, a.Services.Logger)
 		return
@@ -46,7 +46,7 @@ func (a *Action) newTransaction(c *gin.Context) {
 		opts = append(opts, engine.WithMetadatas(requestBody.Metadata))
 	}
 
-	txConfig := mappings.MapTransactionConfigEngineToModel(&requestBody.Config)
+	txConfig := mappings.MapOldTransactionConfigEngineToModel(&requestBody.Config)
 
 	var transaction *engine.DraftTransaction
 	if transaction, err = a.Services.SpvWalletEngine.NewTransaction(
@@ -59,7 +59,7 @@ func (a *Action) newTransaction(c *gin.Context) {
 		return
 	}
 
-	contract := mappings.MapToDeprecatedDraftTransactionContract(transaction)
+	contract := mappings.MapToOldDraftTransactionContract(transaction)
 	c.JSON(http.StatusCreated, contract)
 }
 
