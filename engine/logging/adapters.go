@@ -22,19 +22,19 @@ type GormLoggerAdapter struct {
 // Error logs an error message.
 func (a *GormLoggerAdapter) Error(_ context.Context, msg string, parameters ...any) {
 	event := prepareBasicEvent(a.Logger.Error(), parameters...)
-	event.Msgf(msg)
+	event.Msg(msg)
 }
 
 // Info logs an informative message.
 func (a *GormLoggerAdapter) Info(_ context.Context, msg string, parameters ...any) {
 	event := prepareBasicEvent(a.Logger.Info(), parameters...)
-	event.Msgf(msg)
+	event.Msg(msg)
 }
 
 // Warn logs a warning message.
 func (a *GormLoggerAdapter) Warn(_ context.Context, msg string, parameters ...any) {
 	event := prepareBasicEvent(a.Logger.Warn(), parameters...)
-	event.Msgf(msg)
+	event.Msg(msg)
 }
 
 // Trace logs the execution time and details of a database query.
