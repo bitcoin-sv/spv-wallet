@@ -10,13 +10,12 @@ func GetMap(query map[string][]string, key string) (dicts map[string]interface{}
 	result := make(map[string]interface{})
 	for qk, value := range query {
 		if isKey(qk, key) {
-			exists = true
 			path, err := parsePath(qk, key)
 			if err != nil {
-				exists = false
 				continue
 			}
 			setValueOnPath(result, path, value)
+			exists = true
 		}
 	}
 	if !exists {

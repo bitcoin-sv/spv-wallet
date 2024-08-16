@@ -47,6 +47,15 @@ func TestContextQueryNestedMap(t *testing.T) {
 			},
 			exists: true,
 		},
+		"searched map key with valid before invalid map access": {
+			url: "?mapkey[key][nested]=value1&mapkey[key]invalidNested=value",
+			expectedResult: map[string]interface{}{
+				"key": map[string]interface{}{
+					"nested": "value1",
+				},
+			},
+			exists: true,
+		},
 		"searched map key after other query params": {
 			url: "?foo=bar&mapkey[key]=value",
 			expectedResult: map[string]interface{}{
