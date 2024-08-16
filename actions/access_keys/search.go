@@ -70,60 +70,6 @@ func (a *Action) oldSearch(c *gin.Context) {
 func (a *Action) search(c *gin.Context) {
 	reqXPubID := c.GetString(auth.ParamXPubHashKey)
 
-	var reqParams filter.SearchAccessKeys
-	if err := c.Bind(&reqParams); err != nil {
-		spverrors.ErrorResponse(c, spverrors.ErrCannotBindRequest, a.Services.Logger)
-		return
-	}
-
-	conditions := reqParams.Conditions.ToDbConditions()
-	reqParams.DefaultsIfNil()
-
-	accessKeys, err := a.Services.SpvWalletEngine.GetAccessKeysByXPubID(
-		c.Request.Context(),
-		reqXPubID,
-		mappings.MapToMetadata(reqParams.Metadata),
-		conditions,
-		mappings.MapToQueryParams(reqParams.QueryParams),
-	)
-	if err != nil {
-		spverrors.ErrorResponse(c, err, a.Services.Logger)
-		return
-	}
-
-	accessKeyContracts := make([]*response.AccessKey, 0)
-	for _, accessKey := range accessKeys {
-		accessKeyContracts = append(accessKeyContracts, mappings.MapToAccessKeyContract(accessKey))
-	}
-
-	count, err := a.Services.SpvWalletEngine.GetContactsByXPubIDCount(
-		c.Request.Context(),
-		reqXPubID,
-		mappings.MapToMetadata(reqParams.Metadata),
-		conditions,
-	)
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, err.Error())
-		return
-	}
-
-	response := response.PageModel[response.AccessKey]{
-		Content: accessKeyContracts,
-		Page: response.PageDescription{
-			Size:          len(accessKeyContracts),
-			Number:        0,
-			TotalElements: int(count),
-			TotalPages:    len(accessKeyContracts) / int(count),
-		},
-	}
-
-	c.JSON(http.StatusOK, response)
-}
-
-// searchTest - a temporary testing function
-func (a *Action) searchTest(c *gin.Context) {
-	reqXPubID := c.GetString(auth.ParamXPubHashKey)
-
 	var accessKeysConditions filter.AccessKeyFilter
 	data, err := common.GetSearchParams[filter.AccessKeyFilter](c, accessKeysConditions)
 	if err != nil {

@@ -38,7 +38,7 @@ func NewHandler(appConfig *config.AppConfig, services *config.AppServices) route
 		accessKeyGroup.GET("/:id", action.get)
 		accessKeyGroup.POST("", action.create)
 		accessKeyGroup.DELETE("/:id", action.revoke)
-		accessKeyGroup.GET("", action.searchTest)
+		accessKeyGroup.GET("", action.search)
 	})
 
 	return apiEndpoints

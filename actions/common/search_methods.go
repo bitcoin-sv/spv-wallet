@@ -3,6 +3,7 @@ package common
 import (
 	"math"
 
+	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/bitcoin-sv/spv-wallet/models"
 	"github.com/bitcoin-sv/spv-wallet/models/filter"
 	"github.com/bitcoin-sv/spv-wallet/models/request"
@@ -28,7 +29,7 @@ func GetPageFromQueryParams(queryParams *filter.QueryParams, count int64) models
 	return page
 }
 
-// GetPageDescriptionFromQueryParams
+// GetPageDescriptionFromSearchParams - returns a PageDescription based on the provided SearchParams
 func GetPageDescriptionFromSearchParams[T any](params *request.SearchParams[T], count int64) response.PageDescription {
 	totalPages := int(math.Ceil(float64(count) / float64(*params.Paging.Size)))
 
@@ -42,12 +43,13 @@ func GetPageDescriptionFromSearchParams[T any](params *request.SearchParams[T], 
 	return page
 }
 
+// GetSearchParams - returns a SearchParams struct based on the QueryString
 func GetSearchParams[T any](c *gin.Context, _ T) (request.SearchParams[T], error) {
 	var queryParams request.SearchParams[T]
 
 	// Bind the query parameters to the struct
 	if err := c.ShouldBindQuery(&queryParams); err != nil {
-		return queryParams, err
+		return queryParams, spverrors.Wrapf(err, "Cannot bind query params")
 	}
 
 	queryParams.Metadata = c.QueryMap("metadata")
