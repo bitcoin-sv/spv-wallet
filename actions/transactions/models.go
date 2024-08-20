@@ -29,8 +29,8 @@ type RecordTransaction struct {
 	ReferenceID string `json:"referenceId" example:"b356f7fa00cd3f20cce6c21d704cd13e871d28d714a5ebd0532f5a0e0cde63f7"`
 }
 
-// NewTransaction is the model for creating a new transaction
-type NewTransaction struct {
+// NewDraftTransaction is the model for creating a new transaction
+type NewDraftTransaction struct {
 	// Configuration of the transaction
 	Config response.TransactionConfig `json:"config"`
 	// Accepts a JSON object for embedding custom metadata, enabling arbitrary additional information to be associated with the resource

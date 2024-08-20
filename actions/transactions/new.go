@@ -68,9 +68,9 @@ func (a *Action) newTransaction(c *gin.Context) {
 // @Description	New transaction draft
 // @Tags		Transactions
 // @Produce		json
-// @Param		NewTransaction body NewTransaction true "NewTransaction model containing the transaction config and metadata"
+// @Param		NewDraftTransaction body NewDraftTransaction true "NewDraftTransaction model containing the transaction config and metadata"
 // @Success		201 {object} response.DraftTransaction "Created transaction"
-// @Failure		400	"Bad request - Error while parsing NewTransaction from request body or xpub not found"
+// @Failure		400	"Bad request - Error while parsing NewDraftTransaction from request body or xpub not found"
 // @Failure 	500	"Internal Server Error - Error while creating transaction"
 // @Router		/api/v1/transactions/drafts [post]
 // @Security	x-auth-xpub
@@ -86,7 +86,7 @@ func (a *Action) newTransactionDraft(c *gin.Context) {
 		return
 	}
 
-	var requestBody NewTransaction
+	var requestBody NewDraftTransaction
 	if err = c.Bind(&requestBody); err != nil {
 		spverrors.ErrorResponse(c, spverrors.ErrCannotBindRequest, a.Services.Logger)
 		return
