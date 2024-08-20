@@ -4,6 +4,7 @@ import (
 	"math"
 
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
+	"github.com/bitcoin-sv/spv-wallet/internal/query"
 	"github.com/bitcoin-sv/spv-wallet/models"
 	"github.com/bitcoin-sv/spv-wallet/models/filter"
 	"github.com/bitcoin-sv/spv-wallet/models/request"
@@ -52,6 +53,6 @@ func GetSearchParams[T any](c *gin.Context, _ T) (request.SearchParams[T], error
 		return queryParams, spverrors.Wrapf(err, "Cannot bind query params")
 	}
 
-	queryParams.Metadata = c.QueryMap("metadata")
+	queryParams.Metadata = query.QueryNestedMap(c, "metadata")
 	return queryParams, nil
 }

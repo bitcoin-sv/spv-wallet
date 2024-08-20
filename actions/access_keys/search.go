@@ -9,6 +9,7 @@ import (
 	"github.com/bitcoin-sv/spv-wallet/mappings"
 	"github.com/bitcoin-sv/spv-wallet/models"
 	"github.com/bitcoin-sv/spv-wallet/models/filter"
+	"github.com/bitcoin-sv/spv-wallet/models/request"
 	"github.com/bitcoin-sv/spv-wallet/models/response"
 	"github.com/bitcoin-sv/spv-wallet/server/auth"
 	"github.com/gin-gonic/gin"
@@ -70,8 +71,8 @@ func (a *Action) oldSearch(c *gin.Context) {
 func (a *Action) search(c *gin.Context) {
 	reqXPubID := c.GetString(auth.ParamXPubHashKey)
 
-	var accessKeysConditions filter.AccessKeyFilter
-	data, err := common.GetSearchParams[filter.AccessKeyFilter](c, accessKeysConditions)
+	var accessKeysConditions request.AccessKeyConditions
+	data, err := common.GetSearchParams(c, accessKeysConditions)
 	if err != nil {
 		spverrors.ErrorResponse(c, spverrors.ErrCannotBindRequest, a.Services.Logger)
 		return
@@ -79,12 +80,13 @@ func (a *Action) search(c *gin.Context) {
 
 	fmt.Printf("Query params data object: %+v\n", data)
 
-	conditions := accessKeysConditions.ToDbConditions()
+	accessKeyFilter := accessKeysConditions.MapToAccessKeyFilter()
+	conditions := accessKeyFilter.ToDbConditions()
 
 	accessKeys, err := a.Services.SpvWalletEngine.GetAccessKeysByXPubID(
 		c.Request.Context(),
 		reqXPubID,
-		mappings.MapToMetadata(data.Metadata.UnStringify()),
+		mappings.MapToMetadata(data.Metadata),
 		conditions,
 		mappings.MapToQueryParams(data.Paging.MapToFilterQueryParams()),
 	)
@@ -101,7 +103,7 @@ func (a *Action) search(c *gin.Context) {
 	count, err := a.Services.SpvWalletEngine.GetContactsByXPubIDCount(
 		c.Request.Context(),
 		reqXPubID,
-		mappings.MapToMetadata(data.Metadata.UnStringify()),
+		mappings.MapToMetadata(data.Metadata),
 		conditions,
 	)
 	if err != nil {
@@ -111,7 +113,7 @@ func (a *Action) search(c *gin.Context) {
 
 	response := response.PageModel[response.AccessKey]{
 		Content: accessKeyContracts,
-		Page:    common.GetPageDescriptionFromSearchParams[filter.AccessKeyFilter](&data, count),
+		Page:    common.GetPageDescriptionFromSearchParams(&data, count),
 	}
 
 	c.JSON(http.StatusOK, response)
