@@ -432,12 +432,12 @@
                 "summary": "New transaction draft",
                 "parameters": [
                     {
-                        "description": "NewTransaction model containing the transaction config and metadata",
-                        "name": "NewTransaction",
+                        "description": "NewDraftTransaction model containing the transaction config and metadata",
+                        "name": "NewDraftTransaction",
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/transactions.NewTransaction"
+                            "$ref": "#/definitions/transactions.NewDraftTransaction"
                         }
                     }
                 ],
@@ -449,7 +449,7 @@
                         }
                     },
                     "400": {
-                        "description": "Bad request - Error while parsing NewTransaction from request body or xpub not found"
+                        "description": "Bad request - Error while parsing NewDraftTransaction from request body or xpub not found"
                     },
                     "500": {
                         "description": "Internal Server Error - Error while creating transaction"
@@ -3703,75 +3703,6 @@
                 }
             }
         },
-        "models.DraftTransaction": {
-            "type": "object",
-            "properties": {
-                "configuration": {
-                    "description": "Configuration contains draft transaction configuration.",
-                    "allOf": [
-                        {
-                            "$ref": "#/definitions/models.TransactionConfig"
-                        }
-                    ]
-                },
-                "created_at": {
-                    "description": "CreatedAt is a time when outer model was created.",
-                    "type": "string",
-                    "example": "2024-02-26T11:00:28.069911Z"
-                },
-                "deleted_at": {
-                    "description": "DeletedAt is a time when outer model was deleted.",
-                    "type": "string",
-                    "example": "2024-02-26T11:02:28.069911Z"
-                },
-                "expires_at": {
-                    "description": "ExpiresAt is a time when draft transaction expired.",
-                    "type": "string",
-                    "example": "2024-02-26T11:00:28.069911Z"
-                },
-                "final_tx_id": {
-                    "description": "FinalTxID is a final transaction id.",
-                    "type": "string",
-                    "example": "cfe30797f0b5fc098b32194e857569a7a1edd829fddf3df4567796b738de386d"
-                },
-                "hex": {
-                    "description": "Hex is a draft transaction hex.",
-                    "type": "string",
-                    "example": "0100000002..."
-                },
-                "id": {
-                    "description": "ID is a draft transaction id.",
-                    "type": "string",
-                    "example": "b356f7fa00cd3f20cce6c21d704cd13e871d28d714a5ebd0532f5a0e0cde63f7"
-                },
-                "metadata": {
-                    "description": "Metadata is a metadata map of outer model.",
-                    "type": "object",
-                    "additionalProperties": {
-                        "type": "string"
-                    },
-                    "example": {
-                        "key": "value",
-                        "key2": "value2"
-                    }
-                },
-                "status": {
-                    "description": "Status is a draft transaction lastly monitored status.",
-                    "type": "string",
-                    "example": "complete"
-                },
-                "updated_at": {
-                    "description": "UpdatedAt is a time when outer model was updated.",
-                    "type": "string",
-                    "example": "2024-02-26T11:01:28.069911Z"
-                },
-                "xpub_id": {
-                    "description": "XpubID is a draft transaction's xpub used to sign transaction.",
-                    "type": "string",
-                    "example": "bb8593f85ef8056a77026ad415f02128f3768906de53e9e8bf8749fe2d66cf50"
-                }
-            }
-        },
         "models.FeeUnit": {
             "type": "object",
             "properties": {
@@ -5386,7 +5317,7 @@
                 }
             }
         },
-        "transactions.NewTransaction": {
+        "transactions.NewDraftTransaction": {
             "type": "object",
             "properties": {
                 "config": {
@@ -5394,6 +5325,30 @@
                     "allOf": [
                         {
                             "$ref": "#/definitions/response.TransactionConfig"
+                        }
+                    ]
+                },
+                "metadata": {
+                    "description": "Accepts a JSON object for embedding custom metadata, enabling arbitrary additional information to be associated with the resource",
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "string"
+                    },
+                    "example": {
+                        "key": "value",
+                        "key2": "value2"
+                    }
+                }
+            }
+        },
+        "transactions.OldNewDraftTransaction": {
+            "type": "object",
+            "properties": {
+                "config": {
+                    "description": "Configuration of the transaction",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/models.TransactionConfig"
                         }
                     ]
                 },

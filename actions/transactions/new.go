@@ -16,9 +16,9 @@ import (
 // @Description	This endpoint has been deprecated. Use (POST) /api/v1/transactions/drafts instead.
 // @Tags		Transactions
 // @Produce		json
-// @Param		NewTransaction body NewTransaction true "NewTransaction model containing the transaction config and metadata"
-// @Success		201 {object} models.DraftTransaction "Created transaction"
-// @Failure		400	"Bad request - Error while parsing NewTransaction from request body or xpub not found"
+// @Param		OldNewDraftTransaction body OldNewDraftTransaction true "OldNewDraftTransaction model containing the transaction config and metadata"
+// @Success		201 {object} OldNewDraftTransaction "Created transaction"
+// @Failure		400	"Bad request - Error while parsing OldNewDraftTransaction from request body or xpub not found"
 // @Failure 	500	"Internal Server Error - Error while creating transaction"
 // @DeprecatedRouter	/v1/transaction [post]
 // @Security	x-auth-xpub
@@ -34,7 +34,7 @@ func (a *Action) newTransaction(c *gin.Context) {
 		return
 	}
 
-	var requestBody OldNewTransaction
+	var requestBody OldNewDraftTransaction
 	if err = c.Bind(&requestBody); err != nil {
 		spverrors.ErrorResponse(c, spverrors.ErrCannotBindRequest, a.Services.Logger)
 		return

@@ -1046,57 +1046,6 @@ definitions:
         example: bb8593f85ef8056a77026ad415f02128f3768906de53e9e8bf8749fe2d66cf50
         type: string
     type: object
-  models.DraftTransaction:
-    properties:
-      configuration:
-        allOf:
-        - $ref: '#/definitions/models.TransactionConfig'
-        description: Configuration contains draft transaction configuration.
-      created_at:
-        description: CreatedAt is a time when outer model was created.
-        example: "2024-02-26T11:00:28.069911Z"
-        type: string
-      deleted_at:
-        description: DeletedAt is a time when outer model was deleted.
-        example: "2024-02-26T11:02:28.069911Z"
-        type: string
-      expires_at:
-        description: ExpiresAt is a time when draft transaction expired.
-        example: "2024-02-26T11:00:28.069911Z"
-        type: string
-      final_tx_id:
-        description: FinalTxID is a final transaction id.
-        example: cfe30797f0b5fc098b32194e857569a7a1edd829fddf3df4567796b738de386d
-        type: string
-      hex:
-        description: Hex is a draft transaction hex.
-        example: 0100000002...
-        type: string
-      id:
-        description: ID is a draft transaction id.
-        example: b356f7fa00cd3f20cce6c21d704cd13e871d28d714a5ebd0532f5a0e0cde63f7
-        type: string
-      metadata:
-        additionalProperties:
-          type: string
-        description: Metadata is a metadata map of outer model.
-        example:
-          key: value
-          key2: value2
-        type: object
-      status:
-        description: Status is a draft transaction lastly monitored status.
-        example: complete
-        type: string
-      updated_at:
-        description: UpdatedAt is a time when outer model was updated.
-        example: "2024-02-26T11:01:28.069911Z"
-        type: string
-      xpub_id:
-        description: XpubID is a draft transaction's xpub used to sign transaction.
-        example: bb8593f85ef8056a77026ad415f02128f3768906de53e9e8bf8749fe2d66cf50
-        type: string
-    type: object
   models.FeeUnit:
     properties:
       bytes:
@@ -2286,11 +2235,27 @@ definitions:
         example: 01d0d0067652f684c6acb3683763f353fce55f6496521c7d99e71e1d27e53f5c
         type: string
     type: object
-  transactions.NewTransaction:
+  transactions.NewDraftTransaction:
     properties:
       config:
         allOf:
         - $ref: '#/definitions/response.TransactionConfig'
+        description: Configuration of the transaction
+      metadata:
+        additionalProperties:
+          type: string
+        description: Accepts a JSON object for embedding custom metadata, enabling
+          arbitrary additional information to be associated with the resource
+        example:
+          key: value
+          key2: value2
+        type: object
+    type: object
+  transactions.OldNewDraftTransaction:
+    properties:
+      config:
+        allOf:
+        - $ref: '#/definitions/models.TransactionConfig'
         description: Configuration of the transaction
       metadata:
         additionalProperties:
@@ -2679,12 +2644,13 @@ paths:
     post:
       description: New transaction draft
       parameters:
-      - description: NewTransaction model containing the transaction config and metadata
+      - description: NewDraftTransaction model containing the transaction config and
+          metadata
         in: body
-        name: NewTransaction
+        name: NewDraftTransaction
         required: true
         schema:
-          $ref: '#/definitions/transactions.NewTransaction'
+          $ref: '#/definitions/transactions.NewDraftTransaction'
       produces:
       - application/json
       responses:
@@ -2693,8 +2659,8 @@ paths:
           schema:
             $ref: '#/definitions/response.DraftTransaction'
         "400":
-          description: Bad request - Error while parsing NewTransaction from request
-            body or xpub not found
+          description: Bad request - Error while parsing NewDraftTransaction from
+            request body or xpub not found
         "500":
           description: Internal Server Error - Error while creating transaction
       security:
