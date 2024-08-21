@@ -45,7 +45,7 @@ jobs:
       os: linux
       cgo_enabled: true
       release_binaries: false
-      docker_org: wregulski
+      docker_org: bsvb
       docker_image_name: spv-wallet
       release_create: false
     secrets:
