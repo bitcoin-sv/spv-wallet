@@ -85,7 +85,7 @@ jobs:
             # Fetch the list of artifacts from the target repository
             artifact_data=$(curl -s -H "Authorization: token ${{ secrets.GH_TOKEN }}" \
                       https://api.github.com/repos/4chain-ag/spv-wallet-regression/actions/artifacts)
-      
+
           # Check if an artifact containing the RUN_ID exists
             if echo "$artifact_data" | grep -q "${{ env.RUN_ID }}"; then
               echo "Workflow completed and artifact found."
@@ -96,7 +96,7 @@ jobs:
             echo "Waiting for workflow completion..."
             sleep 10
           done
-    
+
           if [[ "$success" == "true" ]]; then
             echo "The regression tests completed successfully." >> $GITHUB_STEP_SUMMARY
             artifact_name=$(echo "$artifact_data" | jq -r ".artifacts[] | select(.name | contains(\"${{ env.RUN_ID }}\")) | .name")
