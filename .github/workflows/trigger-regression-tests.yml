@@ -1,0 +1,112 @@
+name: Trigger Regression Tests
+
+on:
+  workflow_dispatch:
+    inputs:
+      branch:
+        description: 'Select the branch to run tests on'
+        required: true
+        default: 'main'
+  pull_request_target:
+    types: [labeled]
+
+env:
+  RUN_ID: ${{ github.run_id }}-${{ github.run_attempt }}
+
+jobs:
+  run:
+    if: >
+      (github.event_name == 'workflow_dispatch') ||
+      (github.event_name == 'pull_request_target' && github.event.label.name == 'regression-tests')
+    runs-on: ubuntu-latest
+    outputs:
+      branch_name: ${{ steps.set-branch.outputs.branch_name }}
+    steps:
+      - name: Set Branch Name
+        id: set-branch
+        run: |
+          if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
+            echo "branch_name=${{ github.event.inputs.branch }}" >> $GITHUB_OUTPUT
+          else
+            echo "branch_name=${{ github.event.pull_request.base.ref }}" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ steps.set-branch.outputs.branch_name }}
+
+  release:
+    needs: run
+    uses: bactions/workflows/.github/workflows/release-go-server.yml@main
+    with:
+      ref: ${{ needs.run.outputs.branch_name }}
+      version: ${{ github.run_id }}-${{ github.run_attempt }}
+      os: linux
+      cgo_enabled: true
+      release_binaries: false
+      docker_org: wregulski
+      docker_image_name: spv-wallet
+      release_create: false
+    secrets:
+      DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
+
+  trigger_regression_tests:
+    needs: release
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Trigger Regression Tests
+        env:
+          GH_TOKEN: ${{ secrets.GH_TOKEN }}
+        run: |
+          RUN_ID=${{ github.run_id }}-${{ github.run_attempt }}
+          IMAGE_TAG=${{ needs.release.outputs.imageVersion }}
+          curl -X POST -H "Accept: application/vnd.github+json" \
+               -H "Authorization: token $GH_TOKEN" \
+               https://api.github.com/repos/4chain-ag/spv-wallet-regression/dispatches \
+               -d '{"event_type":"regression_tests","client_payload":{"image_tag":"'"${IMAGE_TAG}"'", "run_id":"'"${RUN_ID}"'"}}'
+
+  sync_status:
+    needs: trigger_regression_tests
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Wait for 3 minutes before checking for results
+        run: sleep 180
+
+      - name: Check for workflow completion status every 10 seconds for up to 1 minute
+        run: |
+          success=false
+          for i in {1..6}; do
+            # Fetch the list of artifacts from the target repository
+            artifact_data=$(curl -s -H "Authorization: token ${{ secrets.GH_TOKEN }}" \
+                      https://api.github.com/repos/4chain-ag/spv-wallet-regression/actions/artifacts)
+      
+          # Check if an artifact containing the RUN_ID exists
+            if echo "$artifact_data" | grep -q "${{ env.RUN_ID }}"; then
+              echo "Workflow completed and artifact found."
+              success=true
+              break
+            fi
+
+            echo "Waiting for workflow completion..."
+            sleep 10
+          done
+    
+          if [[ "$success" == "true" ]]; then
+            echo "The regression tests completed successfully." >> $GITHUB_STEP_SUMMARY
+            artifact_name=$(echo "$artifact_data" | jq -r ".artifacts[] | select(.name | contains(\"${{ env.RUN_ID }}\")) | .name")
+            status=$(echo "$artifact_name" | cut -d'_' -f1)
+            run_id=$(echo "$artifact_name" | cut -d'_' -f2)
+            triggering_run_id=$(echo "$artifact_name" | cut -d'_' -f3)
+            full_link="https://github.com/4chain-ag/spv-wallet-regression/actions/runs/$run_id"
+            echo "Status of workflow $triggering_run_id: $status" >> $GITHUB_STEP_SUMMARY
+            echo "Check workflow execution at: $full_link" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "We couldn't determine the workflow's final status. No artifact found." >> $GITHUB_STEP_SUMMARY
+            exit 1
+          fi
