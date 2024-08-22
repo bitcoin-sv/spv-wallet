@@ -55,3 +55,6 @@
 - color: "50e061"
   description: "PR was tested by a team member"
   name: "tested"
+- color: "8e7cc3"
+  description: "Runs regression tests"
+  name: "regression-tests"
