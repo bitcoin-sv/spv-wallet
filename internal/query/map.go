@@ -35,12 +35,9 @@ func isKey(k string, key string) bool {
 // For example, key[foo][bar] will be parsed to ["foo", "bar"].
 func parsePath(k string, key string) ([]string, error) {
 	rawPath := strings.TrimPrefix(k, key)
-	if rawPath == "" {
-		return nil, fmt.Errorf("expect %s to be a map but got value", key)
-	}
 	splitted := strings.Split(rawPath, "]")
 	paths := make([]string, 0)
-	for _, p := range splitted {
+	for i, p := range splitted {
 		if p == "" {
 			continue
 		}
@@ -49,7 +46,7 @@ func parsePath(k string, key string) ([]string, error) {
 		} else {
 			return nil, fmt.Errorf("invalid access to map key %s", p)
 		}
-		if p == "" {
+		if i == 0 && p == "" {
 			return nil, fmt.Errorf("expect %s to be a map but got array", key)
 		}
 		paths = append(paths, p)
@@ -60,15 +57,25 @@ func parsePath(k string, key string) ([]string, error) {
 // setValueOnPath is an internal function to set value a path on dicts.
 func setValueOnPath(dicts map[string]interface{}, paths []string, value []string) {
 	nesting := len(paths)
+	previousLevel := dicts
 	currentLevel := dicts
 	for i, p := range paths {
 		if isLast(i, nesting) {
-			currentLevel[p] = value[0]
+			if isArray(p) {
+				previousLevel[paths[i-1]] = value
+			} else {
+				currentLevel[p] = value[0]
+			}
 		} else {
 			initNestingIfNotExists(currentLevel, p)
+			previousLevel = currentLevel
 			currentLevel = currentLevel[p].(map[string]interface{})
 		}
 	}
+}
+
+func isArray(p string) bool {
+	return p == ""
 }
 
 // initNestingIfNotExists is an internal function to initialize a nested map if not exists.

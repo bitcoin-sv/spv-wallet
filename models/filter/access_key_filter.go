@@ -5,7 +5,8 @@ type AccessKeyFilter struct {
 	ModelFilter `json:",inline"`
 
 	// RevokedRange specifies the time range when a record was revoked.
-	RevokedRange *TimeRange `json:"revokedRange,omitempty"`
+	RevokedRange *TimeRange `form:"revokedRange" json:"revokedRange,omitempty"`
+	Test         bool       `form:"test" json:"test,omitempty"`
 }
 
 // ToDbConditions converts filter fields to the datastore conditions using gorm naming strategy

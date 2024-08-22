@@ -135,6 +135,20 @@ func TestContextQueryNestedMap(t *testing.T) {
 			},
 			exists: true,
 		},
+		"handle explicit arrays accessors ([]) at the value level": {
+			url: "?mapkey[key][]=value1&mapkey[key][]=value2",
+			expectedResult: map[string]interface{}{
+				"key": []string{"value1", "value2"},
+			},
+			exists: true,
+		},
+		"implicit arrays (duplicated key) at the value level will return only first value": {
+			url: "?mapkey[key]=value1&mapkey[key]=value2",
+			expectedResult: map[string]interface{}{
+				"key": "value1",
+			},
+			exists: true,
+		},
 	}
 	for name, test := range tests {
 		t.Run("getQueryMap: "+name, func(t *testing.T) {
