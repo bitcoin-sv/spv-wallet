@@ -1,53 +1,117 @@
 package query
 
 import (
+	"errors"
 	"fmt"
 	"strings"
 )
 
 // GetMap returns a map, which satisfies conditions.
-func GetMap(query map[string][]string, key string) (dicts map[string]interface{}, exists bool) {
+func GetMap(query map[string][]string, key string) (dicts map[string]interface{}, err error) {
 	result := make(map[string]interface{})
+	getAll := key == ""
+	var allErrors = make([]error, 0)
 	for qk, value := range query {
-		if isKey(qk, key) {
-			path, err := parsePath(qk, key)
+		kType := getType(qk, key, getAll)
+		switch kType {
+		case "filtered_unsupported":
+			allErrors = append(allErrors, fmt.Errorf("invalid access to map %s", qk))
+			continue
+		case "filtered_map":
+			fallthrough
+		case "map":
+			path, err := parsePath(qk)
 			if err != nil {
+				allErrors = append(allErrors, err)
 				continue
 			}
+			if !getAll {
+				path = path[1:]
+			}
 			setValueOnPath(result, path, value)
-			exists = true
+		case "array":
+			result[keyWithoutArraySymbol(qk)] = value
+		case "filtered_rejected":
+			continue
+		default:
+			result[qk] = value[0]
 		}
 	}
-	if !exists {
-		return nil, exists
+	if len(allErrors) > 0 {
+		return nil, errors.Join(allErrors...)
+	} else if len(result) == 0 {
+		return nil, nil
 	}
-	return result, exists
-
+	return result, nil
 }
 
-// isKey is an internal function to check if a k is a map key.
-func isKey(k string, key string) bool {
+// getType is an internal function to get the type of query key.
+func getType(qk string, key string, getAll bool) string {
+	if getAll {
+		if isMap(qk) {
+			return "map"
+		} else if isArray(qk) {
+			return "array"
+		}
+		return "value"
+	}
+	if isFilteredKey(qk, key) {
+		if isMap(qk) {
+			return "filtered_map"
+		}
+		return "filtered_unsupported"
+	}
+	return "filtered_rejected"
+}
+
+// isFilteredKey is an internal function to check if k is accepted when searching for map with given key.
+func isFilteredKey(k string, key string) bool {
+	return k == key || strings.HasPrefix(k, key+"[")
+}
+
+// isMap is an internal function to check if k is a map query key.
+func isMap(k string) bool {
 	i := strings.IndexByte(k, '[')
-	return i >= 1 && k[0:i] == key
+	j := strings.IndexByte(k, ']')
+	return j-i > 1
+}
+
+// isArray is an internal function to check if k is an array query key.
+func isArray(k string) bool {
+	i := strings.IndexByte(k, '[')
+	j := strings.IndexByte(k, ']')
+	return j-i == 1
+}
+
+// keyWithoutArraySymbol is an internal function to remove array symbol from query key.
+func keyWithoutArraySymbol(qk string) string {
+	return qk[:len(qk)-2]
 }
 
 // parsePath is an internal function to parse key access path.
 // For example, key[foo][bar] will be parsed to ["foo", "bar"].
-func parsePath(k string, key string) ([]string, error) {
-	rawPath := strings.TrimPrefix(k, key)
-	splitted := strings.Split(rawPath, "]")
-	paths := make([]string, 0)
-	for i, p := range splitted {
-		if p == "" {
-			continue
-		}
+func parsePath(k string) ([]string, error) {
+	firstKeyEnd := strings.IndexByte(k, '[')
+	first, rawPath := k[:firstKeyEnd], k[firstKeyEnd:]
+
+	split := strings.Split(rawPath, "]")
+	if split[len(split)-1] != "" {
+		return nil, fmt.Errorf("invalid access to map key %s", k)
+	}
+
+	// -2 because after split the last element should be empty string.
+	last := len(split) - 2
+
+	paths := []string{first}
+	for i := 0; i <= last; i++ {
+		p := split[i]
 		if strings.HasPrefix(p, "[") {
 			p = p[1:]
 		} else {
 			return nil, fmt.Errorf("invalid access to map key %s", p)
 		}
-		if i == 0 && p == "" {
-			return nil, fmt.Errorf("expect %s to be a map but got array", key)
+		if p == "" && i != last {
+			return nil, fmt.Errorf("unsupported array-like access to map key %s", k)
 		}
 		paths = append(paths, p)
 	}
@@ -61,7 +125,7 @@ func setValueOnPath(dicts map[string]interface{}, paths []string, value []string
 	currentLevel := dicts
 	for i, p := range paths {
 		if isLast(i, nesting) {
-			if isArray(p) {
+			if isArrayOnPath(p) {
 				previousLevel[paths[i-1]] = value
 			} else {
 				currentLevel[p] = value[0]
@@ -74,7 +138,8 @@ func setValueOnPath(dicts map[string]interface{}, paths []string, value []string
 	}
 }
 
-func isArray(p string) bool {
+// isArrayOnPath is an internal function to check if the current parsed map path is an array.
+func isArrayOnPath(p string) bool {
 	return p == ""
 }
 
