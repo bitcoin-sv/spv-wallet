@@ -95,7 +95,7 @@ func (w *WebhookManager) GetAll(ctx context.Context) ([]ModelWebhook, error) {
 		w.logger.Warn().Msgf("failed to get webhooks: %v", err)
 		return nil, spverrors.ErrWebhookGetAll
 	}
-	return webhooks, err
+	return webhooks, nil
 }
 
 func (w *WebhookManager) checkForUpdates() {
