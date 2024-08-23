@@ -2615,9 +2615,10 @@ paths:
       tags:
       - Transactions
     patch:
-      description: Update transaction
+      description: Update transaction metadata
       parameters:
-      - description: Pass update transaction request model in the body
+      - description: Pass update transaction request model in the body with updated
+          metadata
         in: body
         name: UpdateTransactionRequest
         required: true
@@ -2627,17 +2628,17 @@ paths:
       - application/json
       responses:
         "200":
-          description: Updated transaction
+          description: Updated transaction metadata
           schema:
             $ref: '#/definitions/response.Transaction'
         "400":
           description: Bad request - Error while parsing UpdateTransaction from request
             body, tx not found or tx is not associated with the xpub
         "500":
-          description: Internal Server Error - Error while updating transaction
+          description: Internal Server Error - Error while updating transaction metadata
       security:
       - x-auth-xpub: []
-      summary: Update transaction
+      summary: Update transaction metadata
       tags:
       - Transactions
   /api/v1/transactions/drafts:

@@ -75,7 +75,7 @@ func (a *Action) record(c *gin.Context) {
 func (a *Action) recordTransaction(c *gin.Context) {
 	reqXPub := c.GetString(auth.ParamXPubKey)
 
-	var requestBody OldRecordTransaction
+	var requestBody RecordTransaction
 	if err := c.ShouldBindJSON(&requestBody); err != nil {
 		spverrors.ErrorResponse(c, err, a.Services.Logger)
 		return

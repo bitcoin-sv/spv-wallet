@@ -53,19 +53,19 @@ func (a *Action) update(c *gin.Context) {
 	c.JSON(http.StatusOK, contract)
 }
 
-// update will update a transaction
+// update will update a transaction metadata
 // Update transaction godoc
-// @Summary		Update transaction
-// @Description	Update transaction
+// @Summary		Update transaction metadata
+// @Description	Update transaction metadata
 // @Tags		Transactions
 // @Produce		json
-// @Param		UpdateTransactionRequest body UpdateTransactionRequest true "Pass update transaction request model in the body"
-// @Success		200 {object} response.Transaction "Updated transaction"
+// @Param		UpdateTransactionRequest body UpdateTransactionRequest true "Pass update transaction request model in the body with updated metadata"
+// @Success		200 {object} response.Transaction "Updated transaction metadata"
 // @Failure		400	"Bad request - Error while parsing UpdateTransaction from request body, tx not found or tx is not associated with the xpub"
-// @Failure 	500	"Internal Server Error - Error while updating transaction"
+// @Failure 	500	"Internal Server Error - Error while updating transaction metadata"
 // @Router		/api/v1/transactions/{id} [patch]
 // @Security	x-auth-xpub
-func (a *Action) updateTransaction(c *gin.Context) {
+func (a *Action) updateTransactionMetadata(c *gin.Context) {
 	var requestBody UpdateTransactionRequest
 	if err := c.Bind(&requestBody); err != nil {
 		c.JSON(http.StatusBadRequest, err.Error())

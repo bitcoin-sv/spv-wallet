@@ -20,7 +20,7 @@ func NewHandler(appConfig *config.AppConfig, services *config.AppServices) *rout
 		BasicEndpoints: routes.BasicEndpointsFunc(func(router *gin.RouterGroup) {
 			basicTransactionGroup := router.Group("/transactions")
 			basicTransactionGroup.GET(":id", action.getByID)
-			basicTransactionGroup.PATCH(":id", action.updateTransaction)
+			basicTransactionGroup.PATCH(":id", action.updateTransactionMetadata)
 			basicTransactionGroup.GET("", action.transactions)
 		}),
 		APIEndpoints: routes.APIEndpointsFunc(func(router *gin.RouterGroup) {
