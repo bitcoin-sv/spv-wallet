@@ -2,7 +2,7 @@ package filter
 
 // AccessKeyFilter is a struct for handling request parameters for destination search requests
 type AccessKeyFilter struct {
-	ModelFilter `json:",inline"`
+	ModelFilter `json:",inline,squash"`
 
 	// RevokedRange specifies the time range when a record was revoked.
 	RevokedRange *TimeRange `json:"revokedRange,omitempty"`

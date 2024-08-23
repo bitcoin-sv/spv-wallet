@@ -2,7 +2,7 @@ package filter
 
 // UtxoFilter is a struct for handling request parameters for utxo search requests
 type UtxoFilter struct {
-	ModelFilter `json:",inline"`
+	ModelFilter `json:",inline,squash"`
 
 	TransactionID *string `json:"transactionId,omitempty" example:"5e17858ea0ca4155827754ba82bdcfcce108d5bb5b47fbb3aa54bd14540683c6"`
 	OutputIndex   *uint32 `json:"outputIndex,omitempty" example:"0"`

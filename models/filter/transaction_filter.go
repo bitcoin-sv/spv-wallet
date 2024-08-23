@@ -2,7 +2,7 @@ package filter
 
 // TransactionFilter is a struct for handling request parameters for transactions search requests
 type TransactionFilter struct {
-	ModelFilter     `json:",inline"`
+	ModelFilter     `json:",inline,squash"`
 	Hex             *string `json:"hex,omitempty"`
 	BlockHash       *string `json:"blockHash,omitempty" example:"0000000000000000031928c28075a82d7a00c2c90b489d1d66dc0afa3f8d26f8"`
 	BlockHeight     *uint64 `json:"blockHeight,omitempty" example:"839376"`
