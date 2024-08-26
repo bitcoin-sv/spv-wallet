@@ -8,7 +8,7 @@ import (
 	"github.com/mitchellh/mapstructure"
 )
 
-func ParseSearchParams[T any](c *gin.Context, _ T) (*filter.SearchParams[T], error) {
+func ParseSearchParams[T any](c *gin.Context) (*filter.SearchParams[T], error) {
 	var params filter.SearchParams[T]
 
 	dicts, err := ShouldGetQueryNestedMap(c)

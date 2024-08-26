@@ -97,7 +97,7 @@ func TestParseSearchParamsSuccessfully(t *testing.T) {
 				},
 			}
 
-			params, err := ParseSearchParams(c, ExampleConditionsForTests{})
+			params, err := ParseSearchParams[ExampleConditionsForTests](c)
 			require.NoError(t, err)
 			require.EqualValues(t, test.expectedResult, *params)
 		})
