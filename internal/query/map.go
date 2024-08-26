@@ -70,7 +70,8 @@ func GetMap(query map[string][]string, filteredKey string) (map[string]interface
 	}
 	if len(allErrors) > 0 {
 		return nil, errors.Join(allErrors...)
-	} else if len(result) == 0 {
+	}
+	if len(result) == 0 {
 		return nil, nil
 	}
 	return result, nil
@@ -81,9 +82,11 @@ func getType(key string, filteredKey string, getAll bool) queryKeyType {
 	if getAll {
 		if isMap(key) {
 			return mapType
-		} else if isArray(key) {
+		}
+		if isArray(key) {
 			return arrayType
-		} else if key == "" {
+		}
+		if key == "" {
 			return emptyKeyValue
 		}
 		return valueType
@@ -135,7 +138,8 @@ func parsePath(k string) ([]string, error) {
 	// Bear in mind that split of the valid map will always have "" as the last element.
 	if split[len(split)-1] != "" {
 		return nil, fmt.Errorf("invalid access to map key %s", k)
-	} else if len(split)-1 > MaxNestedMapDepth {
+	}
+	if len(split)-1 > MaxNestedMapDepth {
 		return nil, fmt.Errorf("maximum depth [%d] of nesting in map exceeded [%d]", MaxNestedMapDepth, len(split)-1)
 	}
 
