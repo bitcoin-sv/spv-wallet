@@ -167,23 +167,29 @@ func setValueOnPath(dicts map[string]interface{}, paths []string, value []string
 	currentLevel := dicts
 	for i, p := range paths {
 		if isLast(i, nesting) {
+			// handle setting value
 			if isArrayOnPath(p) {
 				previousLevel[paths[i-1]] = value
 			} else {
+				// if there was already a value set, then it is an error to set a different value.
 				if _, ok := currentLevel[p]; ok {
 					return fmt.Errorf("trying to set different types at the same key [%s]", p)
 				}
 				currentLevel[p] = value[0]
 			}
 		} else {
+			// handle subpath of the map
 			switch currentLevel[p].(type) {
 			case map[string]any:
+				// if there was map, and we have to set array, then it is an error
 				if isArrayOnPath(paths[i+1]) {
 					return fmt.Errorf("trying to set different types at the same key [%s]", p)
 				}
 			case nil:
+				// initialize map if it is not set here yet
 				currentLevel[p] = make(map[string]any)
 			default:
+				// if there was different value then a map, then it is an error to set a map here.
 				return fmt.Errorf("trying to set different types at the same key [%s]", p)
 			}
 			previousLevel = currentLevel
