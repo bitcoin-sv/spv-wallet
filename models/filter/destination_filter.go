@@ -2,6 +2,8 @@ package filter
 
 // DestinationFilter is a struct for handling request parameters for destination search requests
 type DestinationFilter struct {
+	// ModelFilter is a struct for handling typical request parameters for search requests
+	//lint:ignore SA5008 We want to reuse json tags also to mapstructure.
 	ModelFilter   `json:",inline,squash"`
 	LockingScript *string `json:"lockingScript,omitempty" example:"76a9147b05764a97f3b4b981471492aa703b188e45979b88ac"`
 	Address       *string `json:"address,omitempty" example:"1CDUf7CKu8ocTTkhcYUbq75t14Ft168K65"`

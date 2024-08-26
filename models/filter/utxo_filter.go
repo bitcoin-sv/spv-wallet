@@ -2,6 +2,9 @@ package filter
 
 // UtxoFilter is a struct for handling request parameters for utxo search requests
 type UtxoFilter struct {
+
+	// ModelFilter is a struct for handling typical request parameters for search requests
+	//lint:ignore SA5008 We want to reuse json tags also to mapstructure.
 	ModelFilter `json:",inline,squash"`
 
 	TransactionID *string `json:"transactionId,omitempty" example:"5e17858ea0ca4155827754ba82bdcfcce108d5bb5b47fbb3aa54bd14540683c6"`

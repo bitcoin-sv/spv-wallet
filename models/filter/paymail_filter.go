@@ -2,6 +2,8 @@ package filter
 
 // AdminPaymailFilter is a struct for handling request parameters for paymail_addresses search requests
 type AdminPaymailFilter struct {
+	// ModelFilter is a struct for handling typical request parameters for search requests
+	//lint:ignore SA5008 We want to reuse json tags also to mapstructure.
 	ModelFilter `json:",inline,squash"`
 
 	ID         *string `json:"id,omitempty" example:"ffb86c103d17d87c15aaf080aab6be5415c9fa885309a79b04c9910e39f2b542"`

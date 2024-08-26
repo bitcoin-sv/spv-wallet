@@ -105,6 +105,8 @@ func TestParseSearchParamsSuccessfully(t *testing.T) {
 }
 
 type ExampleConditionsForTests struct {
+	// ModelFilter is a struct for handling typical request parameters for search requests
+	//nolint:staticcheck // SA5008 - We want to reuse json tags also to mapstructure.
 	filter.ModelFilter `json:",inline,squash"`
 	XBoolean           *bool                            `json:"xBoolean,omitempty"`
 	XString            *string                          `json:"xString,omitempty"`
