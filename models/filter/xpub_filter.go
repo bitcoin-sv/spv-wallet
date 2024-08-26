@@ -2,7 +2,9 @@ package filter
 
 // XpubFilter is a struct for handling request parameters for utxo search requests
 type XpubFilter struct {
-	ModelFilter `json:",inline"`
+	// ModelFilter is a struct for handling typical request parameters for search requests
+	//lint:ignore SA5008 We want to reuse json tags also to mapstructure.
+	ModelFilter `json:",inline,squash"`
 
 	ID             *string `json:"id,omitempty" example:"00b953624f78004a4c727cd28557475d5233c15f17aef545106639f4d71b712d"`
 	CurrentBalance *uint64 `json:"currentBalance,omitempty" example:"1000"`
