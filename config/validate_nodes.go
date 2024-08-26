@@ -12,7 +12,7 @@ func (n *NodesConfig) Validate() error {
 		return spverrors.Newf("nodes are not configured")
 	}
 
-	if n.Apis == nil || len(n.Apis) == 0 {
+	if len(n.Apis) == 0 {
 		return spverrors.Newf("no miner apis configured")
 	}
 

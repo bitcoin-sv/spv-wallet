@@ -26,7 +26,7 @@ func (p *PaymailConfig) Validate() error {
 			return err
 		}
 		if !validate.IsValidHost(domain) {
-			return spverrors.Newf("domain [" + domain + "] is not a valid hostname")
+			return spverrors.Newf("domain [%s] is not a valid hostname", domain)
 		}
 	}
 

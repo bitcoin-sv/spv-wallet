@@ -48,9 +48,9 @@ jobs:
           go-version: '1.21'
           cache: false
       - name: golangci-lint
-        uses: golangci/golangci-lint-action@v4
+        uses: golangci/golangci-lint-action@v6
         with:
-          version: latest
+          version: v1.60.1
           args: --config=./.golangci-lint.yml
   style-lint:
     name: style-lint
@@ -62,9 +62,9 @@ jobs:
           go-version: '1.21'
           cache: false
       - name: golangci-style-lint
-        uses: golangci/golangci-lint-action@v4
+        uses: golangci/golangci-lint-action@v6
         with:
-          version: latest
+          version: v1.60.1
           args: --config=./.golangci-style.yml
   test:
     needs: [yamllint, asknancy]

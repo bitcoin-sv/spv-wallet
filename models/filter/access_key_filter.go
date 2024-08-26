@@ -2,7 +2,9 @@ package filter
 
 // AccessKeyFilter is a struct for handling request parameters for destination search requests
 type AccessKeyFilter struct {
-	ModelFilter `json:",inline"`
+	// ModelFilter is a struct for handling typical request parameters for search requests
+	//lint:ignore SA5008 We want to reuse json tags also to mapstructure.
+	ModelFilter `json:",inline,squash"`
 
 	// RevokedRange specifies the time range when a record was revoked.
 	RevokedRange *TimeRange `json:"revokedRange,omitempty"`

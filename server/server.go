@@ -164,7 +164,9 @@ func SetupServerRoutes(appConfig *config.AppConfig, services *config.AppServices
 	}
 
 	if appConfig.ExperimentalFeatures.PikeContactsEnabled {
-		routes = append(routes, contacts.NewHandler(appConfig, services))
+		routes = append(routes, contacts.OldContactsHandler(appConfig, services))
+		contactsRoutes, invitationsRoutes := contacts.NewHandler(appConfig, services)
+		routes = append(routes, contactsRoutes, invitationsRoutes)
 	}
 
 	prefix := "/" + config.APIVersion
