@@ -13,14 +13,15 @@ type queryKeyType int
 const (
 	filteredUnsupported queryKeyType = iota
 	filteredMap
+	filteredRejected
 	mapType
 	arrayType
-	filteredRejected
+	emptyKeyValue
 	valueType
 )
 
 // GetMap returns a map, which satisfies conditions.
-func GetMap(query map[string][]string, filteredKey string) (dicts map[string]interface{}, err error) {
+func GetMap(query map[string][]string, filteredKey string) (map[string]interface{}, error) {
 	result := make(map[string]interface{})
 	getAll := filteredKey == ""
 	var allErrors = make([]error, 0)
@@ -33,25 +34,35 @@ func GetMap(query map[string][]string, filteredKey string) (dicts map[string]int
 		case filteredMap:
 			fallthrough
 		case mapType:
-			path, mapErr := parsePath(key)
-			if mapErr != nil {
-				allErrors = append(allErrors, mapErr)
+			path, err := parsePath(key)
+			if err != nil {
+				allErrors = append(allErrors, err)
 				continue
 			}
 			if !getAll {
 				path = path[1:]
 			}
-			mapErr = setValueOnPath(result, path, value)
-			if mapErr != nil {
-				allErrors = append(allErrors, mapErr)
+			err = setValueOnPath(result, path, value)
+			if err != nil {
+				allErrors = append(allErrors, err)
 				continue
 			}
 		case arrayType:
-			result[keyWithoutArraySymbol(key)] = value
+			err := setValueOnPath(result, []string{keyWithoutArraySymbol(key), ""}, value)
+			if err != nil {
+				allErrors = append(allErrors, err)
+				continue
+			}
 		case filteredRejected:
 			continue
-		default:
+		case emptyKeyValue:
 			result[key] = value[0]
+		default:
+			err := setValueOnPath(result, []string{key}, value)
+			if err != nil {
+				allErrors = append(allErrors, err)
+				continue
+			}
 		}
 	}
 	if len(allErrors) > 0 {
@@ -63,17 +74,19 @@ func GetMap(query map[string][]string, filteredKey string) (dicts map[string]int
 }
 
 // getType is an internal function to get the type of query key.
-func getType(qk string, key string, getAll bool) queryKeyType {
+func getType(key string, filteredKey string, getAll bool) queryKeyType {
 	if getAll {
-		if isMap(qk) {
+		if isMap(key) {
 			return mapType
-		} else if isArray(qk) {
+		} else if isArray(key) {
 			return arrayType
+		} else if key == "" {
+			return emptyKeyValue
 		}
 		return valueType
 	}
-	if isFilteredKey(qk, key) {
-		if isMap(qk) {
+	if isFilteredKey(key, filteredKey) {
+		if isMap(key) {
 			return filteredMap
 		}
 		return filteredUnsupported
@@ -82,8 +95,8 @@ func getType(qk string, key string, getAll bool) queryKeyType {
 }
 
 // isFilteredKey is an internal function to check if k is accepted when searching for map with given key.
-func isFilteredKey(k string, key string) bool {
-	return k == key || strings.HasPrefix(k, key+"[")
+func isFilteredKey(k string, filteredKey string) bool {
+	return k == filteredKey || strings.HasPrefix(k, filteredKey+"[")
 }
 
 // isMap is an internal function to check if k is a map query key.
@@ -101,8 +114,8 @@ func isArray(k string) bool {
 }
 
 // keyWithoutArraySymbol is an internal function to remove array symbol from query key.
-func keyWithoutArraySymbol(qk string) string {
-	return qk[:len(qk)-2]
+func keyWithoutArraySymbol(key string) string {
+	return key[:len(key)-2]
 }
 
 // parsePath is an internal function to parse key access path.
@@ -154,19 +167,24 @@ func setValueOnPath(dicts map[string]interface{}, paths []string, value []string
 			if isArrayOnPath(p) {
 				previousLevel[paths[i-1]] = value
 			} else {
+				if _, ok := currentLevel[p]; ok {
+					return fmt.Errorf("trying to set different types at the same key [%s]", p)
+				}
 				currentLevel[p] = value[0]
 			}
 		} else {
-			initNestingIfNotExists(currentLevel, p)
-			previousLevel = currentLevel
 			switch currentLevel[p].(type) {
 			case map[string]any:
-				currentLevel = currentLevel[p].(map[string]any)
-			case []string:
-				return fmt.Errorf("trying to set array and nested map at the same key [%s]", p)
-			case string:
-				return fmt.Errorf("trying to set value and nested map at the same key [%s]", p)
+				if isArrayOnPath(paths[i+1]) {
+					return fmt.Errorf("trying to set different types at the same key [%s]", p)
+				}
+			case nil:
+				currentLevel[p] = make(map[string]any)
+			default:
+				return fmt.Errorf("trying to set different types at the same key [%s]", p)
 			}
+			previousLevel = currentLevel
+			currentLevel = currentLevel[p].(map[string]any)
 		}
 	}
 	return nil
@@ -175,13 +193,6 @@ func setValueOnPath(dicts map[string]interface{}, paths []string, value []string
 // isArrayOnPath is an internal function to check if the current parsed map path is an array.
 func isArrayOnPath(p string) bool {
 	return p == ""
-}
-
-// initNestingIfNotExists is an internal function to initialize a nested map if not exists.
-func initNestingIfNotExists(currentLevel map[string]interface{}, p string) {
-	if _, ok := currentLevel[p]; !ok {
-		currentLevel[p] = make(map[string]interface{})
-	}
 }
 
 // isLast is an internal function to check if the current level is the last level.

@@ -60,6 +60,13 @@ func TestContextShouldGetQueryNestedMapSuccessfulParsing(t *testing.T) {
 				"key": "",
 			},
 		},
+		"only keys": {
+			url: "?foo&bar",
+			expectedResult: map[string]any{
+				"foo": "",
+				"bar": "",
+			},
+		},
 		"encoded & sign in value": {
 			url: "?foo=bar%26baz",
 			expectedResult: map[string]any{
@@ -186,15 +193,31 @@ func TestContextShouldGetQueryNestedMapParsingError(t *testing.T) {
 		},
 		"setting value and nested map at the same level": {
 			url:   "?mapkey[key]=value&mapkey[key][nested]=value1",
-			error: "trying to set value and nested map at the same key",
+			error: "trying to set different types at the same key",
 		},
 		"setting array and nested map at the same level": {
 			url:   "?mapkey[key][]=value&mapkey[key][nested]=value1",
-			error: "trying to set array and nested map at the same key",
+			error: "trying to set different types at the same key",
+		},
+		"setting nested map and array at the same level": {
+			url:   "?mapkey[key][nested]=value1&mapkey[key][]=value",
+			error: "trying to set different types at the same key",
+		},
+		"setting array and value at the same level": {
+			url:   "?key[]=value1&key=value2",
+			error: "trying to set different types at the same key",
+		},
+		"setting value and array at the same level": {
+			url:   "?key=value1&key[]=value2",
+			error: "trying to set different types at the same key",
 		},
 		"setting array and nested map at same query param": {
 			url:   "?mapkey[]=value1&mapkey[key]=value2",
-			error: "trying to set array and nested map at the same key",
+			error: "trying to set different types at the same key",
+		},
+		"setting nested map and array at same query param": {
+			url:   "?mapkey[key]=value2&mapkey[]=value1",
+			error: "trying to set different types at the same key",
 		},
 		"] without [ in query param": {
 			url:   "?mapkey]=value",
@@ -225,8 +248,8 @@ func TestContextShouldGetQueryNestedMapParsingError(t *testing.T) {
 			}
 
 			dicts, err := query.ShouldGetQueryNestedMap(c)
-			require.Nil(t, dicts)
 			require.ErrorContains(t, err, test.error)
+			require.Nil(t, dicts)
 		})
 	}
 }
@@ -350,8 +373,8 @@ func TestContextShouldGetQueryNestedForKeySuccessfulParsing(t *testing.T) {
 			}
 
 			dicts, err := query.ShouldGetQueryNestedMapForKey(c, test.key)
-			require.Equal(t, test.expectedResult, dicts)
 			require.NoError(t, err)
+			require.Equal(t, test.expectedResult, dicts)
 		})
 	}
 }
@@ -400,8 +423,8 @@ func TestContextShouldGetQueryNestedForKeyParsingError(t *testing.T) {
 				},
 			}
 			dicts, err := query.ShouldGetQueryNestedMapForKey(c, test.key)
-			require.Nil(t, dicts)
 			require.ErrorContains(t, err, test.error)
+			require.Nil(t, dicts)
 		})
 	}
 }
