@@ -6,10 +6,10 @@ import (
 
 	"github.com/bitcoin-sv/spv-wallet/actions/common"
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
+	"github.com/bitcoin-sv/spv-wallet/internal/query"
 	"github.com/bitcoin-sv/spv-wallet/mappings"
 	"github.com/bitcoin-sv/spv-wallet/models"
 	"github.com/bitcoin-sv/spv-wallet/models/filter"
-	"github.com/bitcoin-sv/spv-wallet/models/request"
 	"github.com/bitcoin-sv/spv-wallet/models/response"
 	"github.com/bitcoin-sv/spv-wallet/server/auth"
 	"github.com/gin-gonic/gin"
@@ -71,24 +71,22 @@ func (a *Action) oldSearch(c *gin.Context) {
 func (a *Action) search(c *gin.Context) {
 	reqXPubID := c.GetString(auth.ParamXPubHashKey)
 
-	var accessKeysConditions request.AccessKeyConditions
-	data, err := common.GetSearchParams(c, accessKeysConditions)
+	searchParams, err := query.ParseSearchParams[filter.SearchAccessKeys](c)
 	if err != nil {
-		spverrors.ErrorResponse(c, spverrors.ErrCannotBindRequest, a.Services.Logger)
+		spverrors.ErrorResponse(c, spverrors.ErrCannotParseQueryParams, a.Services.Logger)
 		return
 	}
 
-	fmt.Printf("Query params data object: %+v\n", data)
+	fmt.Printf("Query params data object: %+v\n", searchParams)
 
-	accessKeyFilter := accessKeysConditions.MapToAccessKeyFilter()
-	conditions := accessKeyFilter.ToDbConditions()
+	conditions := searchParams.Conditions.Conditions.ToDbConditions()
 
 	accessKeys, err := a.Services.SpvWalletEngine.GetAccessKeysByXPubID(
 		c.Request.Context(),
 		reqXPubID,
-		mappings.MapToMetadata(data.Metadata),
+		mappings.MapToMetadata(searchParams.Metadata),
 		conditions,
-		mappings.MapToQueryParams(data.Paging.MapToFilterQueryParams()),
+		mappings.MapToDbQueryParams(&searchParams.Page),
 	)
 	if err != nil {
 		spverrors.ErrorResponse(c, err, a.Services.Logger)
@@ -100,10 +98,10 @@ func (a *Action) search(c *gin.Context) {
 		accessKeyContracts = append(accessKeyContracts, mappings.MapToAccessKeyContract(accessKey))
 	}
 
-	count, err := a.Services.SpvWalletEngine.GetContactsByXPubIDCount(
+	count, err := a.Services.SpvWalletEngine.GetAccessKeysByXPubIDCount(
 		c.Request.Context(),
 		reqXPubID,
-		mappings.MapToMetadata(data.Metadata),
+		mappings.MapToMetadata(searchParams.Metadata),
 		conditions,
 	)
 	if err != nil {
@@ -113,7 +111,7 @@ func (a *Action) search(c *gin.Context) {
 
 	response := response.PageModel[response.AccessKey]{
 		Content: accessKeyContracts,
-		Page:    common.GetPageDescriptionFromSearchParams(&data, count),
+		Page:    common.GetPageDescriptionFromSearchParams(&searchParams.Page, count),
 	}
 
 	c.JSON(http.StatusOK, response)
