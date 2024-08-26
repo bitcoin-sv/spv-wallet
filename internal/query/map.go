@@ -8,6 +8,17 @@ import (
 
 const MaxNestedMapDepth = 100
 
+type queryKeyType int
+
+const (
+	filteredUnsupported queryKeyType = iota
+	filteredMap
+	mapType
+	arrayType
+	filteredRejected
+	valueType
+)
+
 // GetMap returns a map, which satisfies conditions.
 func GetMap(query map[string][]string, filteredKey string) (dicts map[string]interface{}, err error) {
 	result := make(map[string]interface{})
@@ -16,12 +27,12 @@ func GetMap(query map[string][]string, filteredKey string) (dicts map[string]int
 	for key, value := range query {
 		kType := getType(key, filteredKey, getAll)
 		switch kType {
-		case "filtered_unsupported":
+		case filteredUnsupported:
 			allErrors = append(allErrors, fmt.Errorf("invalid access to map %s", key))
 			continue
-		case "filtered_map":
+		case filteredMap:
 			fallthrough
-		case "map":
+		case mapType:
 			path, mapErr := parsePath(key)
 			if mapErr != nil {
 				allErrors = append(allErrors, mapErr)
@@ -35,9 +46,9 @@ func GetMap(query map[string][]string, filteredKey string) (dicts map[string]int
 				allErrors = append(allErrors, mapErr)
 				continue
 			}
-		case "array":
+		case arrayType:
 			result[keyWithoutArraySymbol(key)] = value
-		case "filtered_rejected":
+		case filteredRejected:
 			continue
 		default:
 			result[key] = value[0]
@@ -52,22 +63,22 @@ func GetMap(query map[string][]string, filteredKey string) (dicts map[string]int
 }
 
 // getType is an internal function to get the type of query key.
-func getType(qk string, key string, getAll bool) string {
+func getType(qk string, key string, getAll bool) queryKeyType {
 	if getAll {
 		if isMap(qk) {
-			return "map"
+			return mapType
 		} else if isArray(qk) {
-			return "array"
+			return arrayType
 		}
-		return "value"
+		return valueType
 	}
 	if isFilteredKey(qk, key) {
 		if isMap(qk) {
-			return "filtered_map"
+			return filteredMap
 		}
-		return "filtered_unsupported"
+		return filteredUnsupported
 	}
-	return "filtered_rejected"
+	return filteredRejected
 }
 
 // isFilteredKey is an internal function to check if k is accepted when searching for map with given key.
