@@ -5,9 +5,11 @@ import (
 
 	"github.com/bitcoin-sv/spv-wallet/engine"
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
+	"github.com/bitcoin-sv/spv-wallet/internal/query"
 	"github.com/bitcoin-sv/spv-wallet/mappings"
 	"github.com/bitcoin-sv/spv-wallet/models"
 	"github.com/bitcoin-sv/spv-wallet/models/filter"
+	"github.com/bitcoin-sv/spv-wallet/models/response"
 	"github.com/bitcoin-sv/spv-wallet/server/auth"
 	"github.com/gin-gonic/gin"
 )
@@ -53,10 +55,7 @@ func (a *Action) oldSearch(c *gin.Context) {
 
 	contracts := make([]*models.Utxo, 0)
 	for _, utxo := range utxos {
-		// TODO: use the commented line after response model changes
-		// contracts = append(contracts, mappings.MapToOldUtxoContract(utxo))
-		contracts = append(contracts, mappings.MapToUtxoContract(utxo))
-
+		contracts = append(contracts, mappings.MapToOldUtxoContract(utxo))
 	}
 
 	c.JSON(http.StatusOK, contracts)
@@ -77,36 +76,51 @@ func (a *Action) oldSearch(c *gin.Context) {
 func (a *Action) search(c *gin.Context) {
 	reqXPubID := c.GetString(auth.ParamXPubHashKey)
 
-	var reqParams filter.SearchUtxos
-	if err := c.Bind(&reqParams); err != nil {
-		spverrors.ErrorResponse(c, spverrors.ErrCannotBindRequest, a.Services.Logger)
+	searchParams, err := query.ParseSearchParams[filter.SearchUtxos](c)
+	if err != nil {
+		spverrors.ErrorResponse(c, spverrors.ErrCannotParseQueryParams, a.Services.Logger)
 		return
 	}
 
-	conditions, err := reqParams.Conditions.ToDbConditions()
+	conditions, err := searchParams.Conditions.Conditions.ToDbConditions()
 	if err != nil {
 		spverrors.ErrorResponse(c, spverrors.ErrInvalidConditions, a.Services.Logger)
 		return
 	}
 
 	var utxos []*engine.Utxo
-	if utxos, err = a.Services.SpvWalletEngine.GetUtxosByXpubID(
+	utxos, err = a.Services.SpvWalletEngine.GetUtxosByXpubID(
 		c.Request.Context(),
 		reqXPubID,
-		mappings.MapToMetadata(reqParams.Metadata),
+		mappings.MapToMetadata(searchParams.Metadata),
 		conditions,
-		mappings.MapToQueryParams(reqParams.QueryParams),
-	); err != nil {
+		mappings.MapToDbQueryParams(&searchParams.Page),
+	)
+	if err != nil {
 		spverrors.ErrorResponse(c, err, a.Services.Logger)
 		return
 	}
 
-	// TODO: use the commented line after response model changes
-	// contracts := make([]*response.Utxo, 0)
-	contracts := make([]*models.Utxo, 0)
+	utxoContracts := make([]*response.Utxo, 0)
 	for _, utxo := range utxos {
-		contracts = append(contracts, mappings.MapToUtxoContract(utxo))
+		utxoContracts = append(utxoContracts, mappings.MapToUtxoContract(utxo))
 	}
 
-	c.JSON(http.StatusOK, contracts)
+	count, err := a.Services.SpvWalletEngine.GetUtxosByXPubIDCount(
+		c.Request.Context(),
+		reqXPubID,
+		mappings.MapToMetadata(searchParams.Metadata),
+		conditions,
+	)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	response := response.PageModel[response.Utxo]{
+		Content: utxoContracts,
+		Page:    common.GetPageDescriptionFromSearchParams(&searchParams.Page, count),
+	}
+
+	c.JSON(http.StatusOK, response)
 }
