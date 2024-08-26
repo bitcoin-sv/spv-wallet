@@ -6,21 +6,23 @@ import (
 	"strings"
 )
 
+const MaxNestedMapDepth = 100
+
 // GetMap returns a map, which satisfies conditions.
-func GetMap(query map[string][]string, key string) (dicts map[string]interface{}, err error) {
+func GetMap(query map[string][]string, filteredKey string) (dicts map[string]interface{}, err error) {
 	result := make(map[string]interface{})
-	getAll := key == ""
+	getAll := filteredKey == ""
 	var allErrors = make([]error, 0)
-	for qk, value := range query {
-		kType := getType(qk, key, getAll)
+	for key, value := range query {
+		kType := getType(key, filteredKey, getAll)
 		switch kType {
 		case "filtered_unsupported":
-			allErrors = append(allErrors, fmt.Errorf("invalid access to map %s", qk))
+			allErrors = append(allErrors, fmt.Errorf("invalid access to map %s", key))
 			continue
 		case "filtered_map":
 			fallthrough
 		case "map":
-			path, err := parsePath(qk)
+			path, err := parsePath(key)
 			if err != nil {
 				allErrors = append(allErrors, err)
 				continue
@@ -30,11 +32,11 @@ func GetMap(query map[string][]string, key string) (dicts map[string]interface{}
 			}
 			setValueOnPath(result, path, value)
 		case "array":
-			result[keyWithoutArraySymbol(qk)] = value
+			result[keyWithoutArraySymbol(key)] = value
 		case "filtered_rejected":
 			continue
 		default:
-			result[qk] = value[0]
+			result[key] = value[0]
 		}
 	}
 	if len(allErrors) > 0 {
@@ -95,8 +97,12 @@ func parsePath(k string) ([]string, error) {
 	first, rawPath := k[:firstKeyEnd], k[firstKeyEnd:]
 
 	split := strings.Split(rawPath, "]")
+
+	// Bear in mind that split of the valid map will always have "" as the last element.
 	if split[len(split)-1] != "" {
 		return nil, fmt.Errorf("invalid access to map key %s", k)
+	} else if len(split)-1 > MaxNestedMapDepth {
+		return nil, fmt.Errorf("maximum depth [%d] of nesting in map exceeded [%d]", MaxNestedMapDepth, len(split)-1)
 	}
 
 	// -2 because after split the last element should be empty string.

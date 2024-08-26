@@ -1,8 +1,11 @@
 package query_test
 
 import (
+	"fmt"
 	"net/http"
 	"net/url"
+	"strconv"
+	"strings"
 	"testing"
 
 	"github.com/bitcoin-sv/spv-wallet/internal/query"
@@ -11,11 +14,24 @@ import (
 )
 
 func TestContextShouldGetQueryNestedMapSuccessfulParsing(t *testing.T) {
-	var emptyQueryMap map[string]interface{}
+	var emptyQueryMap map[string]any
+	veryDeepNesting := ""
+	currentLv := make(map[string]any)
+	veryDeepNestingResult := currentLv
+	for i := 0; i < query.MaxNestedMapDepth; i++ {
+		currKey := "nested" + strconv.Itoa(i)
+		veryDeepNesting += "[" + currKey + "]"
+		if i == query.MaxNestedMapDepth-1 {
+			currentLv[currKey] = "value"
+			continue
+		}
+		currentLv[currKey] = make(map[string]any)
+		currentLv = currentLv[currKey].(map[string]any)
+	}
 
 	tests := map[string]struct {
 		url            string
-		expectedResult map[string]interface{}
+		expectedResult map[string]any
 	}{
 		"no query params": {
 			url:            "",
@@ -23,60 +39,67 @@ func TestContextShouldGetQueryNestedMapSuccessfulParsing(t *testing.T) {
 		},
 		"single query param": {
 			url: "?foo=bar",
-			expectedResult: map[string]interface{}{
+			expectedResult: map[string]any{
 				"foo": "bar",
 			},
 		},
 		"multiple query param": {
 			url: "?foo=bar&mapkey=value1",
-			expectedResult: map[string]interface{}{
+			expectedResult: map[string]any{
 				"foo":    "bar",
 				"mapkey": "value1",
 			},
 		},
 		"map query param": {
 			url: "?mapkey[key]=value",
-			expectedResult: map[string]interface{}{
-				"mapkey": map[string]interface{}{
+			expectedResult: map[string]any{
+				"mapkey": map[string]any{
 					"key": "value",
 				},
 			},
 		},
 		"nested map query param": {
 			url: "?mapkey[key][nested][moreNested]=value",
-			expectedResult: map[string]interface{}{
-				"mapkey": map[string]interface{}{
-					"key": map[string]interface{}{
-						"nested": map[string]interface{}{
+			expectedResult: map[string]any{
+				"mapkey": map[string]any{
+					"key": map[string]any{
+						"nested": map[string]any{
 							"moreNested": "value",
 						},
 					},
 				},
 			},
 		},
+		"very deep nested map query param": {
+			url: "?mapkey" + veryDeepNesting + "=value",
+			expectedResult: map[string]any{
+				"mapkey": veryDeepNestingResult,
+			},
+		},
 		"map query param with explicit arrays accessors ([]) at the value level will return array": {
 			url: "?mapkey[key][]=value1&mapkey[key][]=value2",
-			expectedResult: map[string]interface{}{
-				"mapkey": map[string]interface{}{
+			expectedResult: map[string]any{
+				"mapkey": map[string]any{
 					"key": []string{"value1", "value2"},
 				},
 			},
 		},
 		"map query param with implicit arrays (duplicated key) at the value level will return only first value": {
 			url: "?mapkey[key]=value1&mapkey[key]=value2",
-			expectedResult: map[string]interface{}{
-				"mapkey": map[string]interface{}{
+			expectedResult: map[string]any{
+				"mapkey": map[string]any{
 					"key": "value1",
 				},
 			},
 		},
 		"array query param": {
 			url: "?mapkey[]=value1&mapkey[]=value2",
-			expectedResult: map[string]interface{}{
+			expectedResult: map[string]any{
 				"mapkey": []string{"value1", "value2"},
 			},
 		},
 	}
+	fmt.Println("RUNNING TESTS")
 	for name, test := range tests {
 		t.Run(name, func(t *testing.T) {
 			u, err := url.Parse(test.url)
@@ -89,16 +112,18 @@ func TestContextShouldGetQueryNestedMapSuccessfulParsing(t *testing.T) {
 			}
 
 			dicts, err := query.ShouldGetQueryNestedMap(c)
-			require.Equal(t, test.expectedResult, dicts)
 			require.NoError(t, err)
+			require.Equal(t, test.expectedResult, dicts)
 		})
 	}
 }
 
 func TestContextShouldGetQueryNestedMapParsingError(t *testing.T) {
+	tooDeepNesting := strings.Repeat("[nested]", query.MaxNestedMapDepth+1)
+
 	tests := map[string]struct {
 		url            string
-		expectedResult map[string]interface{}
+		expectedResult map[string]any
 		error          string
 	}{
 		"searched map key with invalid map access": {
@@ -108,6 +133,10 @@ func TestContextShouldGetQueryNestedMapParsingError(t *testing.T) {
 		"searched map key with array accessor in the middle": {
 			url:   "?mapkey[key][][nested]=value",
 			error: "unsupported array-like access to map key",
+		},
+		"too deep nesting of the map in query params": {
+			url:   "?mapkey" + tooDeepNesting + "=value",
+			error: "maximum depth [100] of nesting in map exceeded",
 		},
 	}
 	for name, test := range tests {
@@ -129,12 +158,12 @@ func TestContextShouldGetQueryNestedMapParsingError(t *testing.T) {
 }
 
 func TestContextShouldGetQueryNestedForKeySuccessfulParsing(t *testing.T) {
-	var emptyQueryMap map[string]interface{}
+	var emptyQueryMap map[string]any
 
 	tests := map[string]struct {
 		url            string
 		key            string
-		expectedResult map[string]interface{}
+		expectedResult map[string]any
 	}{
 		"no searched map key in query string": {
 			url:            "?foo=bar",
@@ -144,28 +173,28 @@ func TestContextShouldGetQueryNestedForKeySuccessfulParsing(t *testing.T) {
 		"searched map key after other query params": {
 			url: "?foo=bar&mapkey[key]=value",
 			key: "mapkey",
-			expectedResult: map[string]interface{}{
+			expectedResult: map[string]any{
 				"key": "value",
 			},
 		},
 		"searched map key before other query params": {
 			url: "?mapkey[key]=value&foo=bar",
 			key: "mapkey",
-			expectedResult: map[string]interface{}{
+			expectedResult: map[string]any{
 				"key": "value",
 			},
 		},
 		"single key in searched map key": {
 			url: "?mapkey[key]=value",
 			key: "mapkey",
-			expectedResult: map[string]interface{}{
+			expectedResult: map[string]any{
 				"key": "value",
 			},
 		},
 		"multiple keys in searched map key": {
 			url: "?mapkey[key1]=value1&mapkey[key2]=value2&mapkey[key3]=value3",
 			key: "mapkey",
-			expectedResult: map[string]interface{}{
+			expectedResult: map[string]any{
 				"key1": "value1",
 				"key2": "value2",
 				"key3": "value3",
@@ -174,8 +203,8 @@ func TestContextShouldGetQueryNestedForKeySuccessfulParsing(t *testing.T) {
 		"nested key in searched map key": {
 			url: "?mapkey[foo][nested]=value1",
 			key: "mapkey",
-			expectedResult: map[string]interface{}{
-				"foo": map[string]interface{}{
+			expectedResult: map[string]any{
+				"foo": map[string]any{
 					"nested": "value1",
 				},
 			},
@@ -183,8 +212,8 @@ func TestContextShouldGetQueryNestedForKeySuccessfulParsing(t *testing.T) {
 		"multiple nested keys in single key of searched map key": {
 			url: "?mapkey[foo][nested1]=value1&mapkey[foo][nested2]=value2",
 			key: "mapkey",
-			expectedResult: map[string]interface{}{
-				"foo": map[string]interface{}{
+			expectedResult: map[string]any{
+				"foo": map[string]any{
 					"nested1": "value1",
 					"nested2": "value2",
 				},
@@ -193,11 +222,11 @@ func TestContextShouldGetQueryNestedForKeySuccessfulParsing(t *testing.T) {
 		"multiple keys with nested keys of searched map key": {
 			url: "?mapkey[key1][nested]=value1&mapkey[key2][nested]=value2",
 			key: "mapkey",
-			expectedResult: map[string]interface{}{
-				"key1": map[string]interface{}{
+			expectedResult: map[string]any{
+				"key1": map[string]any{
 					"nested": "value1",
 				},
-				"key2": map[string]interface{}{
+				"key2": map[string]any{
 					"nested": "value2",
 				},
 			},
@@ -205,9 +234,9 @@ func TestContextShouldGetQueryNestedForKeySuccessfulParsing(t *testing.T) {
 		"multiple levels of nesting in searched map key": {
 			url: "?mapkey[key][nested][moreNested]=value1",
 			key: "mapkey",
-			expectedResult: map[string]interface{}{
-				"key": map[string]interface{}{
-					"nested": map[string]interface{}{
+			expectedResult: map[string]any{
+				"key": map[string]any{
+					"nested": map[string]any{
 						"moreNested": "value1",
 					},
 				},
@@ -216,21 +245,21 @@ func TestContextShouldGetQueryNestedForKeySuccessfulParsing(t *testing.T) {
 		"query keys similar to searched map key": {
 			url: "?mapkey[key]=value&mapkeys[key1]=value1&mapkey1=foo",
 			key: "mapkey",
-			expectedResult: map[string]interface{}{
+			expectedResult: map[string]any{
 				"key": "value",
 			},
 		},
 		"handle explicit arrays accessors ([]) at the value level": {
 			url: "?mapkey[key][]=value1&mapkey[key][]=value2",
 			key: "mapkey",
-			expectedResult: map[string]interface{}{
+			expectedResult: map[string]any{
 				"key": []string{"value1", "value2"},
 			},
 		},
 		"implicit arrays (duplicated key) at the value level will return only first value": {
 			url: "?mapkey[key]=value1&mapkey[key]=value2",
 			key: "mapkey",
-			expectedResult: map[string]interface{}{
+			expectedResult: map[string]any{
 				"key": "value1",
 			},
 		},
@@ -296,7 +325,6 @@ func TestContextShouldGetQueryNestedForKeyParsingError(t *testing.T) {
 					URL: u,
 				},
 			}
-
 			dicts, err := query.ShouldGetQueryNestedMapForKey(c, test.key)
 			require.Nil(t, dicts)
 			require.ErrorContains(t, err, test.error)
