@@ -6,6 +6,7 @@ import (
 	"strings"
 )
 
+// MaxNestedMapDepth is the maximum depth of nesting of single map key in query params.
 const MaxNestedMapDepth = 100
 
 type queryKeyType int
@@ -57,6 +58,8 @@ func GetMap(query map[string][]string, filteredKey string) (map[string]interface
 			continue
 		case emptyKeyValue:
 			result[key] = value[0]
+		case valueType:
+			fallthrough
 		default:
 			err := setValueOnPath(result, []string{key}, value)
 			if err != nil {

@@ -1,8 +1,6 @@
 package query
 
 import (
-	"net/url"
-
 	"github.com/gin-gonic/gin"
 )
 
@@ -18,10 +16,7 @@ func ShouldGetQueryNestedMap(c *gin.Context) (dict map[string]any, err error) {
 // In contrast to QueryMap it handles nesting in query maps like key[foo][bar]=value.
 // Similar to ShouldGetQueryNestedMap but it returns only the map for the given key.
 func ShouldGetQueryNestedMapForKey(c *gin.Context, key string) (dict map[string]any, err error) {
-	q, err := url.ParseQuery(c.Request.URL.RawQuery)
-	if err != nil {
-		return nil, err
-	}
+	q := c.Request.URL.Query()
 	return GetMap(q, key)
 }
 
