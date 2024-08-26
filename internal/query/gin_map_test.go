@@ -1,7 +1,6 @@
 package query_test
 
 import (
-	"fmt"
 	"net/http"
 	"net/url"
 	"strconv"
@@ -43,6 +42,36 @@ func TestContextShouldGetQueryNestedMapSuccessfulParsing(t *testing.T) {
 				"foo": "bar",
 			},
 		},
+		"empty key and value": {
+			url: "?=",
+			expectedResult: map[string]any{
+				"": "",
+			},
+		},
+		"empty key with some value value": {
+			url: "?=value",
+			expectedResult: map[string]any{
+				"": "value",
+			},
+		},
+		"single key with empty value": {
+			url: "?key=",
+			expectedResult: map[string]any{
+				"key": "",
+			},
+		},
+		"encoded & sign in value": {
+			url: "?foo=bar%26baz",
+			expectedResult: map[string]any{
+				"foo": "bar&baz",
+			},
+		},
+		"encoded = sign in value": {
+			url: "?foo=bar%3Dbaz",
+			expectedResult: map[string]any{
+				"foo": "bar=baz",
+			},
+		},
 		"multiple query param": {
 			url: "?foo=bar&mapkey=value1",
 			expectedResult: map[string]any{
@@ -55,6 +84,24 @@ func TestContextShouldGetQueryNestedMapSuccessfulParsing(t *testing.T) {
 			expectedResult: map[string]any{
 				"mapkey": map[string]any{
 					"key": "value",
+				},
+			},
+		},
+		"multiple different value types in map query param": {
+			url: "?mapkey[key1]=value1&mapkey[key2]=1&mapkey[key3]=true",
+			expectedResult: map[string]any{
+				"mapkey": map[string]any{
+					"key1": "value1",
+					"key2": "1",
+					"key3": "true",
+				},
+			},
+		},
+		"multiple different value types in array value of map query param": {
+			url: "?mapkey[key][]=value1&mapkey[key][]=1&mapkey[key][]=true",
+			expectedResult: map[string]any{
+				"mapkey": map[string]any{
+					"key": []string{"value1", "1", "true"},
 				},
 			},
 		},
@@ -99,7 +146,6 @@ func TestContextShouldGetQueryNestedMapSuccessfulParsing(t *testing.T) {
 			},
 		},
 	}
-	fmt.Println("RUNNING TESTS")
 	for name, test := range tests {
 		t.Run(name, func(t *testing.T) {
 			u, err := url.Parse(test.url)
@@ -137,6 +183,34 @@ func TestContextShouldGetQueryNestedMapParsingError(t *testing.T) {
 		"too deep nesting of the map in query params": {
 			url:   "?mapkey" + tooDeepNesting + "=value",
 			error: "maximum depth [100] of nesting in map exceeded",
+		},
+		"setting value and nested map at the same level": {
+			url:   "?mapkey[key]=value&mapkey[key][nested]=value1",
+			error: "trying to set value and nested map at the same key",
+		},
+		"setting array and nested map at the same level": {
+			url:   "?mapkey[key][]=value&mapkey[key][nested]=value1",
+			error: "trying to set array and nested map at the same key",
+		},
+		"setting array and nested map at same query param": {
+			url:   "?mapkey[]=value1&mapkey[key]=value2",
+			error: "trying to set array and nested map at the same key",
+		},
+		"] without [ in query param": {
+			url:   "?mapkey]=value",
+			error: "invalid access to map key",
+		},
+		"[ without ] in query param": {
+			url:   "?mapkey[key=value",
+			error: "invalid access to map key",
+		},
+		"[ without ] in query param with nested key": {
+			url:   "?mapkey[key[nested]=value",
+			error: "invalid access to map key",
+		},
+		"[[key]] in query param": {
+			url:   "?mapkey[[key]]=value",
+			error: "invalid access to map key",
 		},
 	}
 	for name, test := range tests {

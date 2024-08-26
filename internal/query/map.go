@@ -22,15 +22,19 @@ func GetMap(query map[string][]string, filteredKey string) (dicts map[string]int
 		case "filtered_map":
 			fallthrough
 		case "map":
-			path, err := parsePath(key)
-			if err != nil {
-				allErrors = append(allErrors, err)
+			path, mapErr := parsePath(key)
+			if mapErr != nil {
+				allErrors = append(allErrors, mapErr)
 				continue
 			}
 			if !getAll {
 				path = path[1:]
 			}
-			setValueOnPath(result, path, value)
+			mapErr = setValueOnPath(result, path, value)
+			if mapErr != nil {
+				allErrors = append(allErrors, mapErr)
+				continue
+			}
 		case "array":
 			result[keyWithoutArraySymbol(key)] = value
 		case "filtered_rejected":
@@ -75,7 +79,7 @@ func isFilteredKey(k string, key string) bool {
 func isMap(k string) bool {
 	i := strings.IndexByte(k, '[')
 	j := strings.IndexByte(k, ']')
-	return j-i > 1
+	return j-i > 1 || (i >= 0 && j == -1)
 }
 
 // isArray is an internal function to check if k is an array query key.
@@ -94,6 +98,9 @@ func keyWithoutArraySymbol(qk string) string {
 // For example, key[foo][bar] will be parsed to ["foo", "bar"].
 func parsePath(k string) ([]string, error) {
 	firstKeyEnd := strings.IndexByte(k, '[')
+	if firstKeyEnd == -1 {
+		return nil, fmt.Errorf("invalid access to map key %s", k)
+	}
 	first, rawPath := k[:firstKeyEnd], k[firstKeyEnd:]
 
 	split := strings.Split(rawPath, "]")
@@ -111,7 +118,9 @@ func parsePath(k string) ([]string, error) {
 	paths := []string{first}
 	for i := 0; i <= last; i++ {
 		p := split[i]
-		if strings.HasPrefix(p, "[") {
+
+		// this way we can handle both error cases: foo] and [foo[bar
+		if strings.LastIndex(p, "[") == 0 {
 			p = p[1:]
 		} else {
 			return nil, fmt.Errorf("invalid access to map key %s", p)
@@ -125,7 +134,7 @@ func parsePath(k string) ([]string, error) {
 }
 
 // setValueOnPath is an internal function to set value a path on dicts.
-func setValueOnPath(dicts map[string]interface{}, paths []string, value []string) {
+func setValueOnPath(dicts map[string]interface{}, paths []string, value []string) error {
 	nesting := len(paths)
 	previousLevel := dicts
 	currentLevel := dicts
@@ -139,9 +148,17 @@ func setValueOnPath(dicts map[string]interface{}, paths []string, value []string
 		} else {
 			initNestingIfNotExists(currentLevel, p)
 			previousLevel = currentLevel
-			currentLevel = currentLevel[p].(map[string]interface{})
+			switch currentLevel[p].(type) {
+			case map[string]any:
+				currentLevel = currentLevel[p].(map[string]any)
+			case []string:
+				return fmt.Errorf("trying to set array and nested map at the same key [%s]", p)
+			case string:
+				return fmt.Errorf("trying to set value and nested map at the same key [%s]", p)
+			}
 		}
 	}
+	return nil
 }
 
 // isArrayOnPath is an internal function to check if the current parsed map path is an array.
