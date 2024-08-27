@@ -60,6 +60,9 @@ var ErrValidateXPub = models.SPVError{Message: "error validation xpub", StatusCo
 // ErrCannotBindRequest is when request body cannot be bind into struct
 var ErrCannotBindRequest = models.SPVError{Message: "cannot bind request body", StatusCode: 400, Code: "error-bind-body-invalid"}
 
+// ErrCannotParseQueryParams is when query params cannot be parsed into expected struct.
+var ErrCannotParseQueryParams = models.SPVError{Message: "cannot parse request query params", StatusCode: 400, Code: "error-query-params-invalid"}
+
 // ErrInvalidConditions is when request has invalid conditions
 var ErrInvalidConditions = models.SPVError{Message: "invalid conditions", StatusCode: 400, Code: "error-bind-conditions-invalid"}
 
@@ -335,7 +338,7 @@ var ErrMissingClient = models.SPVError{Message: "client is missing from model, c
 // ErrDatastoreRequired is when a datastore function is called without a datastore present
 var ErrDatastoreRequired = models.SPVError{Message: "datastore is required", StatusCode: 500, Code: "error-datastore-required"}
 
-//////////////////////////////////// NOTIFICATION ERRORS
+// ////////////////////////////////// NOTIFICATION ERRORS
 
 // ErrWebhookSubscriptionFailed is when webhook subscription failed
 var ErrWebhookSubscriptionFailed = models.SPVError{Message: "webhook subscription failed", StatusCode: 500, Code: "error-webhook-subscription-failed"}
@@ -352,7 +355,7 @@ var ErrWebhookGetAll = models.SPVError{Message: "cannot get all the stored webho
 // ErrNotificationsDisabled happens when the notifications are not enabled in the config
 var ErrNotificationsDisabled = models.SPVError{Message: "notifications are disabled", StatusCode: 404, Code: "error-notifications-disabled"}
 
-//////////////////////////////////// ROUTES ERRORS
+// ////////////////////////////////// ROUTES ERRORS
 
 // ErrRouteNotFound is when route is not found
 var ErrRouteNotFound = models.SPVError{Message: "route not found", StatusCode: 404, Code: "error-route-not-found"}
