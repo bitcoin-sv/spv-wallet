@@ -61,22 +61,22 @@ func (a *Action) oldSearch(c *gin.Context) {
 // @Description	Search access key
 // @Tags		Access-key
 // @Produce		json
-// @Param		SearchAccessKeys body filter.SearchAccessKeys false "Supports targeted resource searches with filters and metadata, plus options for pagination and sorting to streamline data exploration and analysis"
+// @Param		SearchAccessKeysQuery query filter.SearchAccessKeysQuery false "Supports targeted resource searches with filters and metadata, plus options for pagination and sorting to streamline data exploration and analysis"
 // @Success		200 {object} []response.AccessKey "List of access keys"
-// @Failure		400	"Bad request - Error while SearchAccessKeys from request body"
+// @Failure		400	"Bad request - Error while SearchAccessKeys from request query"
 // @Failure 	500	"Internal server error - Error while searching for access keys"
 // @Router		/api/v1//users/current/keys [get]
 // @Security	x-auth-xpub
 func (a *Action) search(c *gin.Context) {
 	reqXPubID := c.GetString(auth.ParamXPubHashKey)
 
-	searchParams, err := query.ParseSearchParams[filter.SearchAccessKeys](c)
+	searchParams, err := query.ParseSearchParams[filter.AccessKeyFilter](c)
 	if err != nil {
 		spverrors.ErrorResponse(c, spverrors.ErrCannotParseQueryParams, a.Services.Logger)
 		return
 	}
 
-	conditions := searchParams.Conditions.Conditions.ToDbConditions()
+	conditions := searchParams.Conditions.ToDbConditions()
 	metadata := mappings.MapToMetadata(searchParams.Metadata)
 	pageOptions := mappings.MapToDbQueryParams(&searchParams.Page)
 

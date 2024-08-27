@@ -637,6 +637,17 @@ definitions:
         - $ref: '#/definitions/filter.TimeRange'
         description: UpdatedRange specifies the time range when a record was updated.
     type: object
+  filter.Page:
+    properties:
+      order:
+        type: string
+      page:
+        type: integer
+      size:
+        type: integer
+      sortBy:
+        type: string
+    type: object
   filter.SearchAccessKeys:
     properties:
       conditions:
@@ -1738,6 +1749,13 @@ definitions:
         example: 01d0d0067652f684c6acb3683763f353fce55f6496521c7d99e71e1d27e53f5c
         type: string
     type: object
+  models.Webhook:
+    properties:
+      banned:
+        type: boolean
+      url:
+        type: string
+    type: object
   models.Xpub:
     properties:
       created_at:
@@ -1980,6 +1998,14 @@ definitions:
     - 1000000000
     - 60000000000
     - 3600000000000
+    - 1
+    - 1000
+    - 1000000
+    - 1000000000
+    - 1
+    - 1000
+    - 1000000
+    - 1000000000
     type: integer
     x-enum-varnames:
     - minDuration
@@ -1998,6 +2024,14 @@ definitions:
     - Second
     - Minute
     - Hour
+    - Nanosecond
+    - Microsecond
+    - Millisecond
+    - Second
+    - Nanosecond
+    - Microsecond
+    - Millisecond
+    - Second
   transactions.NewTransaction:
     properties:
       config:
@@ -2058,14 +2092,6 @@ paths:
   /api/v1//users/current/keys:
     get:
       description: Search access key
-      parameters:
-      - description: Supports targeted resource searches with filters and metadata,
-          plus options for pagination and sorting to streamline data exploration and
-          analysis
-        in: body
-        name: SearchAccessKeys
-        schema:
-          $ref: '#/definitions/filter.SearchAccessKeys'
       produces:
       - application/json
       responses:
@@ -2076,7 +2102,7 @@ paths:
               $ref: '#/definitions/response.AccessKey'
             type: array
         "400":
-          description: Bad request - Error while SearchAccessKeys from request body
+          description: Bad request - Error while SearchAccessKeys from request query
         "500":
           description: Internal server error - Error while searching for access keys
       security:
@@ -3140,6 +3166,24 @@ paths:
       security:
       - x-auth-xpub: []
       summary: Unsubscribe to a webhook
+      tags:
+      - Admin
+    get:
+      description: Get All Webhooks currently subscribed to
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: List of webhooks
+          schema:
+            items:
+              $ref: '#/definitions/models.Webhook'
+            type: array
+        "500":
+          description: Internal server error - Error while getting all webhooks
+      security:
+      - x-auth-xpub: []
+      summary: Get All Webhooks
       tags:
       - Admin
     post:

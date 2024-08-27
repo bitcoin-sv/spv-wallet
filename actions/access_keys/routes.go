@@ -22,7 +22,6 @@ func OldAccessKeysHandler(appConfig *config.AppConfig, services *config.AppServi
 		accessKeyGroup.GET("", action.oldGet)
 		accessKeyGroup.DELETE("", action.oldRevoke)
 		accessKeyGroup.POST("/count", action.count)
-		accessKeyGroup.GET("/search", action.oldSearch)
 		accessKeyGroup.POST("/search", action.oldSearch)
 	})
 

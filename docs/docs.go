@@ -30,16 +30,6 @@ const docTemplate = `{
                     "Access-key"
                 ],
                 "summary": "Search access key",
-                "parameters": [
-                    {
-                        "description": "Supports targeted resource searches with filters and metadata, plus options for pagination and sorting to streamline data exploration and analysis",
-                        "name": "SearchAccessKeys",
-                        "in": "body",
-                        "schema": {
-                            "$ref": "#/definitions/filter.SearchAccessKeys"
-                        }
-                    }
-                ],
                 "responses": {
                     "200": {
                         "description": "List of access keys",
@@ -51,7 +41,7 @@ const docTemplate = `{
                         }
                     },
                     "400": {
-                        "description": "Bad request - Error while SearchAccessKeys from request body"
+                        "description": "Bad request - Error while SearchAccessKeys from request query"
                     },
                     "500": {
                         "description": "Internal server error - Error while searching for access keys"
@@ -1647,6 +1637,35 @@ const docTemplate = `{
             }
         },
         "/v1/admin/webhooks/subscriptions": {
+            "get": {
+                "security": [
+                    {
+                        "x-auth-xpub": []
+                    }
+                ],
+                "description": "Get All Webhooks currently subscribed to",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Admin"
+                ],
+                "summary": "Get All Webhooks",
+                "responses": {
+                    "200": {
+                        "description": "List of webhooks",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/models.Webhook"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error - Error while getting all webhooks"
+                    }
+                }
+            },
             "post": {
                 "security": [
                     {
@@ -3660,6 +3679,23 @@ const docTemplate = `{
                 }
             }
         },
+        "filter.Page": {
+            "type": "object",
+            "properties": {
+                "order": {
+                    "type": "string"
+                },
+                "page": {
+                    "type": "integer"
+                },
+                "size": {
+                    "type": "integer"
+                },
+                "sortBy": {
+                    "type": "string"
+                }
+            }
+        },
         "filter.SearchAccessKeys": {
             "type": "object",
             "properties": {
@@ -5148,6 +5184,17 @@ const docTemplate = `{
                 }
             }
         },
+        "models.Webhook": {
+            "type": "object",
+            "properties": {
+                "banned": {
+                    "type": "boolean"
+                },
+                "url": {
+                    "type": "string"
+                }
+            }
+        },
         "models.Xpub": {
             "type": "object",
             "properties": {
@@ -5460,7 +5507,15 @@ const docTemplate = `{
                 1000000,
                 1000000000,
                 60000000000,
-                3600000000000
+                3600000000000,
+                1,
+                1000,
+                1000000,
+                1000000000,
+                1,
+                1000,
+                1000000,
+                1000000000
             ],
             "x-enum-varnames": [
                 "minDuration",
@@ -5478,7 +5533,15 @@ const docTemplate = `{
                 "Millisecond",
                 "Second",
                 "Minute",
-                "Hour"
+                "Hour",
+                "Nanosecond",
+                "Microsecond",
+                "Millisecond",
+                "Second",
+                "Nanosecond",
+                "Microsecond",
+                "Millisecond",
+                "Second"
             ]
         },
         "transactions.NewTransaction": {
