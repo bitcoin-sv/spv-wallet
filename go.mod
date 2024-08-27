@@ -18,7 +18,7 @@ require (
 	github.com/bitcoinschema/go-bitcoin/v2 v2.0.5
 	github.com/bitcoinschema/go-map v0.1.1
 	github.com/coocood/freecache v1.2.4
-	github.com/fergusstrange/embedded-postgres v1.28.0
+	github.com/fergusstrange/embedded-postgres v1.29.0
 	github.com/gin-contrib/pprof v1.5.0
 	github.com/gin-gonic/gin v1.10.0
 	github.com/go-ozzo/ozzo-validation v3.6.0+incompatible
@@ -37,9 +37,9 @@ require (
 	github.com/mrz1836/go-logger v0.3.3
 	github.com/mrz1836/go-sanitize v1.3.2
 	github.com/mrz1836/go-validate v0.2.1
-	github.com/newrelic/go-agent/v3 v3.33.1
+	github.com/newrelic/go-agent/v3 v3.34.0
 	github.com/pkg/errors v0.9.1
-	github.com/prometheus/client_golang v1.19.1
+	github.com/prometheus/client_golang v1.20.2
 	github.com/rafaeljusto/redigomock v2.4.0+incompatible
 	github.com/robfig/cron/v3 v3.0.1
 	github.com/rs/zerolog v1.33.0

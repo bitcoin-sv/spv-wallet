@@ -11,7 +11,6 @@ import (
 	"github.com/bitcoin-sv/spv-wallet/engine/datastore"
 	"github.com/bitcoin-sv/spv-wallet/engine/metrics"
 	"github.com/bitcoin-sv/spv-wallet/engine/notifications"
-	// "github.com/bitcoin-sv/spv-wallet/engine/notifications"
 	"github.com/bitcoin-sv/spv-wallet/engine/taskmanager"
 	"github.com/mrz1836/go-cachestore"
 	"github.com/rs/zerolog"
@@ -211,4 +210,5 @@ type ClientInterface interface {
 	Metrics() (metrics *metrics.Metrics, enabled bool)
 	SubscribeWebhook(ctx context.Context, url, tokenHeader, token string) error
 	UnsubscribeWebhook(ctx context.Context, url string) error
+	GetWebhooks(ctx context.Context) ([]notifications.ModelWebhook, error)
 }
