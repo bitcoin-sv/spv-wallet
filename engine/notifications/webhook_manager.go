@@ -88,6 +88,16 @@ func (w *WebhookManager) Unsubscribe(ctx context.Context, url string) error {
 	return nil
 }
 
+// GetAll returns all the webhooks stored in database
+func (w *WebhookManager) GetAll(ctx context.Context) ([]ModelWebhook, error) {
+	webhooks, err := w.repository.GetAll(ctx)
+	if err != nil {
+		w.logger.Warn().Msgf("failed to get webhooks: %v", err)
+		return nil, spverrors.ErrWebhookGetAll
+	}
+	return webhooks, nil
+}
+
 func (w *WebhookManager) checkForUpdates() {
 	defer func() {
 		w.logger.Info().Msg("WebhookManager stopped")
