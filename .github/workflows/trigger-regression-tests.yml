@@ -2,11 +2,6 @@ name: Trigger Regression Tests
 
 on:
   workflow_dispatch:
-    inputs:
-      branch:
-        description: 'Select the branch to run tests on'
-        required: true
-        default: 'main'
   pull_request_target:
     types: [labeled]
 
@@ -19,36 +14,19 @@ jobs:
       (github.event_name == 'workflow_dispatch') ||
       (github.event_name == 'pull_request_target' && github.event.label.name == 'regression-tests')
     runs-on: ubuntu-latest
-    outputs:
-      branch_name: ${{ steps.set-branch.outputs.branch_name }}
-    steps:
-      - name: Set Branch Name
-        id: set-branch
-        run: |
-          if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
-            echo "branch_name=${{ github.event.inputs.branch }}" >> $GITHUB_OUTPUT
-          else
-            echo "branch_name=${{ github.event.pull_request.base.ref }}" >> $GITHUB_OUTPUT
-          fi
-
-      - name: Checkout repository
-        uses: actions/checkout@v4
-        with:
-          ref: ${{ steps.set-branch.outputs.branch_name }}
 
   release:
     needs: run
     uses: bactions/workflows/.github/workflows/release-go-server.yml@main
     with:
-      ref: ${{ needs.run.outputs.branch_name }}
+      ref: ${{ github.head_ref || github.ref }}
       version: ${{ github.run_id }}-${{ github.run_attempt }}
       os: linux
       cgo_enabled: true
       release_binaries: false
-      docker_org: bsvb
-      docker_image_name: spv-wallet
       release_create: false
     secrets:
+      DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
       DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
 
   trigger_regression_tests:
@@ -63,7 +41,7 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GH_TOKEN }}
         run: |
-          RUN_ID=${{ github.run_id }}-${{ github.run_attempt }}
+          RUN_ID=${{ env.RUN_ID }}
           IMAGE_TAG=${{ needs.release.outputs.imageVersion }}
           curl -X POST -H "Accept: application/vnd.github+json" \
                -H "Authorization: token $GH_TOKEN" \
