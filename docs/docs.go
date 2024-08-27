@@ -34,10 +34,7 @@ const docTemplate = `{
                     "200": {
                         "description": "List of access keys",
                         "schema": {
-                            "type": "array",
-                            "items": {
-                                "$ref": "#/definitions/response.AccessKey"
-                            }
+                            "$ref": "#/definitions/response.PageModel-response_AccessKey"
                         }
                     },
                     "400": {
@@ -3683,16 +3680,20 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "order": {
-                    "type": "string"
+                    "type": "string",
+                    "example": "desc"
                 },
                 "page": {
-                    "type": "integer"
+                    "type": "integer",
+                    "example": 2
                 },
                 "size": {
-                    "type": "integer"
+                    "type": "integer",
+                    "example": 5
                 },
                 "sortBy": {
-                    "type": "string"
+                    "type": "string",
+                    "example": "id"
                 }
             }
         },
@@ -5393,6 +5394,26 @@ const docTemplate = `{
                 }
             }
         },
+        "response.PageModel-response_AccessKey": {
+            "type": "object",
+            "properties": {
+                "content": {
+                    "description": "Content is the collection of elements that serves as the content",
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/response.AccessKey"
+                    }
+                },
+                "page": {
+                    "description": "Page is the page descriptor",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/response.PageDescription"
+                        }
+                    ]
+                }
+            }
+        },
         "response.PageModel-response_Contact": {
             "type": "object",
             "properties": {
@@ -5508,14 +5529,14 @@ const docTemplate = `{
                 1000000000,
                 60000000000,
                 3600000000000,
+                -9223372036854775808,
+                9223372036854775807,
                 1,
                 1000,
                 1000000,
                 1000000000,
-                1,
-                1000,
-                1000000,
-                1000000000
+                60000000000,
+                3600000000000
             ],
             "x-enum-varnames": [
                 "minDuration",
@@ -5534,14 +5555,14 @@ const docTemplate = `{
                 "Second",
                 "Minute",
                 "Hour",
+                "minDuration",
+                "maxDuration",
                 "Nanosecond",
                 "Microsecond",
                 "Millisecond",
                 "Second",
-                "Nanosecond",
-                "Microsecond",
-                "Millisecond",
-                "Second"
+                "Minute",
+                "Hour"
             ]
         },
         "transactions.NewTransaction": {

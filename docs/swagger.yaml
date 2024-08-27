@@ -640,12 +640,16 @@ definitions:
   filter.Page:
     properties:
       order:
+        example: desc
         type: string
       page:
+        example: 2
         type: integer
       size:
+        example: 5
         type: integer
       sortBy:
+        example: id
         type: string
     type: object
   filter.SearchAccessKeys:
@@ -1909,6 +1913,18 @@ definitions:
         description: TotalPages is total number of pages returned
         type: integer
     type: object
+  response.PageModel-response_AccessKey:
+    properties:
+      content:
+        description: Content is the collection of elements that serves as the content
+        items:
+          $ref: '#/definitions/response.AccessKey'
+        type: array
+      page:
+        allOf:
+        - $ref: '#/definitions/response.PageDescription'
+        description: Page is the page descriptor
+    type: object
   response.PageModel-response_Contact:
     properties:
       content:
@@ -1998,14 +2014,14 @@ definitions:
     - 1000000000
     - 60000000000
     - 3600000000000
+    - -9223372036854775808
+    - 9223372036854775807
     - 1
     - 1000
     - 1000000
     - 1000000000
-    - 1
-    - 1000
-    - 1000000
-    - 1000000000
+    - 60000000000
+    - 3600000000000
     type: integer
     x-enum-varnames:
     - minDuration
@@ -2024,14 +2040,14 @@ definitions:
     - Second
     - Minute
     - Hour
+    - minDuration
+    - maxDuration
     - Nanosecond
     - Microsecond
     - Millisecond
     - Second
-    - Nanosecond
-    - Microsecond
-    - Millisecond
-    - Second
+    - Minute
+    - Hour
   transactions.NewTransaction:
     properties:
       config:
@@ -2098,9 +2114,7 @@ paths:
         "200":
           description: List of access keys
           schema:
-            items:
-              $ref: '#/definitions/response.AccessKey'
-            type: array
+            $ref: '#/definitions/response.PageModel-response_AccessKey'
         "400":
           description: Bad request - Error while SearchAccessKeys from request query
         "500":
