@@ -3,6 +3,7 @@ package common
 import (
 	"math"
 
+	"github.com/bitcoin-sv/spv-wallet/engine/datastore"
 	"github.com/bitcoin-sv/spv-wallet/models"
 	"github.com/bitcoin-sv/spv-wallet/models/filter"
 	"github.com/bitcoin-sv/spv-wallet/models/response"
@@ -27,12 +28,12 @@ func GetPageFromQueryParams(queryParams *filter.QueryParams, count int64) models
 }
 
 // GetPageDescriptionFromSearchParams - returns a PageDescription based on the provided SearchParams
-func GetPageDescriptionFromSearchParams(page *filter.Page, count int64) response.PageDescription {
-	totalPages := int(math.Ceil(float64(count) / float64(page.Size)))
+func GetPageDescriptionFromSearchParams(queryParams *datastore.QueryParams, count int64) response.PageDescription {
+	totalPages := int(math.Ceil(float64(count) / float64(queryParams.PageSize)))
 
 	pageDescription := response.PageDescription{
-		Size:          page.Size,
-		Number:        page.Number,
+		Size:          queryParams.PageSize,
+		Number:        queryParams.Page,
 		TotalElements: int(count),
 		TotalPages:    totalPages,
 	}

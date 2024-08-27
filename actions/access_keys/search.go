@@ -1,7 +1,6 @@
 package accesskeys
 
 import (
-	"fmt"
 	"net/http"
 
 	"github.com/bitcoin-sv/spv-wallet/actions/common"
@@ -77,16 +76,16 @@ func (a *Action) search(c *gin.Context) {
 		return
 	}
 
-	fmt.Printf("Query params data object: %+v\n", searchParams)
-
 	conditions := searchParams.Conditions.Conditions.ToDbConditions()
+	metadata := mappings.MapToMetadata(searchParams.Metadata)
+	pageOptions := mappings.MapToDbQueryParams(&searchParams.Page)
 
 	accessKeys, err := a.Services.SpvWalletEngine.GetAccessKeysByXPubID(
 		c.Request.Context(),
 		reqXPubID,
-		mappings.MapToMetadata(searchParams.Metadata),
+		metadata,
 		conditions,
-		mappings.MapToDbQueryParams(&searchParams.Page),
+		pageOptions,
 	)
 	if err != nil {
 		spverrors.ErrorResponse(c, err, a.Services.Logger)
@@ -101,7 +100,7 @@ func (a *Action) search(c *gin.Context) {
 	count, err := a.Services.SpvWalletEngine.GetAccessKeysByXPubIDCount(
 		c.Request.Context(),
 		reqXPubID,
-		mappings.MapToMetadata(searchParams.Metadata),
+		metadata,
 		conditions,
 	)
 	if err != nil {
@@ -111,7 +110,7 @@ func (a *Action) search(c *gin.Context) {
 
 	response := response.PageModel[response.AccessKey]{
 		Content: accessKeyContracts,
-		Page:    common.GetPageDescriptionFromSearchParams(&searchParams.Page, count),
+		Page:    common.GetPageDescriptionFromSearchParams(pageOptions, count),
 	}
 
 	c.JSON(http.StatusOK, response)
