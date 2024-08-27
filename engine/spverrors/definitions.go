@@ -349,6 +349,9 @@ var ErrWebhookUnsubscriptionFailed = models.SPVError{Message: "webhook unsubscri
 // ErrWebhookSubscriptionNotFound is when cannot find webhook to unsubscribe
 var ErrWebhookSubscriptionNotFound = models.SPVError{Message: "webhook subscription not found", StatusCode: 404, Code: "error-webhook-subscription-not-found"}
 
+// ErrWebhookGetAll is when cannot get all the stored webhooks
+var ErrWebhookGetAll = models.SPVError{Message: "cannot get all the stored webhooks", StatusCode: 500, Code: "error-webhook-get-all"}
+
 // ErrNotificationsDisabled happens when the notifications are not enabled in the config
 var ErrNotificationsDisabled = models.SPVError{Message: "notifications are disabled", StatusCode: 404, Code: "error-notifications-disabled"}
 
