@@ -88,13 +88,16 @@ func (a *Action) search(c *gin.Context) {
 		return
 	}
 
+	metadata := mappings.MapToMetadata(searchParams.Metadata)
+	pageOptions := mappings.MapToDbQueryParams(&searchParams.Page)
+
 	var utxos []*engine.Utxo
 	utxos, err = a.Services.SpvWalletEngine.GetUtxosByXpubID(
 		c.Request.Context(),
 		reqXPubID,
-		mappings.MapToMetadata(searchParams.Metadata),
+		metadata,
 		conditions,
-		mappings.MapToDbQueryParams(&searchParams.Page),
+		pageOptions,
 	)
 	if err != nil {
 		spverrors.ErrorResponse(c, err, a.Services.Logger)
@@ -106,10 +109,10 @@ func (a *Action) search(c *gin.Context) {
 		utxoContracts = append(utxoContracts, mappings.MapToUtxoContract(utxo))
 	}
 
-	count, err := a.Services.SpvWalletEngine.GetUtxosByXPubIDCount(
+	count, err := a.Services.SpvWalletEngine.GetUtxosByXpubIDCount(
 		c.Request.Context(),
 		reqXPubID,
-		mappings.MapToMetadata(searchParams.Metadata),
+		metadata,
 		conditions,
 	)
 	if err != nil {

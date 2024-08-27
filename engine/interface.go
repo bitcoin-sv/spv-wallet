@@ -11,6 +11,7 @@ import (
 	"github.com/bitcoin-sv/spv-wallet/engine/datastore"
 	"github.com/bitcoin-sv/spv-wallet/engine/metrics"
 	"github.com/bitcoin-sv/spv-wallet/engine/notifications"
+
 	// "github.com/bitcoin-sv/spv-wallet/engine/notifications"
 	"github.com/bitcoin-sv/spv-wallet/engine/taskmanager"
 	"github.com/mrz1836/go-cachestore"
@@ -171,6 +172,8 @@ type UTXOService interface {
 		conditions map[string]interface{}, opts ...ModelOps) (int64, error)
 	GetUtxosByXpubID(ctx context.Context, xPubID string, metadata *Metadata, conditions map[string]interface{},
 		queryParams *datastore.QueryParams) ([]*Utxo, error)
+	GetUtxosByXpubIDCount(ctx context.Context, xPubID string, metadata *Metadata,
+		conditions map[string]interface{}) (int64, error)
 	UnReserveUtxos(ctx context.Context, xPubID, draftID string) error
 }
 
