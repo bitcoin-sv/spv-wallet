@@ -61,7 +61,9 @@ func (a *Action) oldSearch(c *gin.Context) {
 // @Description	Search access key
 // @Tags		Access-key
 // @Produce		json
-// @Param		SearchAccessKeysQuery query filter.SearchAccessKeysQuery false "Supports targeted resource searches with filters and metadata, plus options for pagination and sorting to streamline data exploration and analysis"
+// @Param		PageParams query swagger.PageParams false "Supports options for pagination and sorting to streamline data exploration and analysis"
+// @Param		MetadataParams query swagger.MetadataParams false "Supports targeted resource searches with metadata"
+// @Param		AccessKeyParams query swagger.AccessKeyParams false "Supports targeted resource searches with filters"
 // @Success		200 {object} response.PageModel[response.AccessKey] "List of access keys"
 // @Failure		400	"Bad request - Error while SearchAccessKeys from request query"
 // @Failure 	500	"Internal server error - Error while searching for access keys"

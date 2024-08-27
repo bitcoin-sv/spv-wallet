@@ -30,6 +30,92 @@ const docTemplate = `{
                     "Access-key"
                 ],
                 "summary": "Search access key",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "default": "desc",
+                        "example": "desc",
+                        "name": "order",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "default": 1,
+                        "example": 2,
+                        "name": "page",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "default": 50,
+                        "example": 5,
+                        "name": "size",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "default": "created_at",
+                        "example": "id",
+                        "name": "sortBy",
+                        "in": "query"
+                    },
+                    {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        },
+                        "collectionFormat": "csv",
+                        "example": [
+                            "metadata[key]=value",
+                            "metadata[key2]=value2"
+                        ],
+                        "name": "metadata",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "example": "2024-02-26T11:01:28Z",
+                        "name": "createdRange[from]",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "example": "2024-02-26T11:01:28Z",
+                        "name": "createdRange[to]",
+                        "in": "query"
+                    },
+                    {
+                        "type": "boolean",
+                        "default": false,
+                        "example": true,
+                        "name": "includeDeleted",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "example": "2024-02-26T11:01:28Z",
+                        "name": "revokedRange[from]",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "example": "2024-02-26T11:01:28Z",
+                        "name": "revokedRange[to]",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "example": "2024-02-26T11:01:28Z",
+                        "name": "updatedRange[from]",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "example": "2024-02-26T11:01:28Z",
+                        "name": "updatedRange[to]",
+                        "in": "query"
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "List of access keys",
@@ -3676,27 +3762,6 @@ const docTemplate = `{
                 }
             }
         },
-        "filter.Page": {
-            "type": "object",
-            "properties": {
-                "order": {
-                    "type": "string",
-                    "example": "desc"
-                },
-                "page": {
-                    "type": "integer",
-                    "example": 2
-                },
-                "size": {
-                    "type": "integer",
-                    "example": 5
-                },
-                "sortBy": {
-                    "type": "string",
-                    "example": "id"
-                }
-            }
-        },
         "filter.SearchAccessKeys": {
             "type": "object",
             "properties": {
@@ -5528,25 +5593,9 @@ const docTemplate = `{
                 1000000,
                 1000000000,
                 60000000000,
-                3600000000000,
-                -9223372036854775808,
-                9223372036854775807,
-                1,
-                1000,
-                1000000,
-                1000000000,
-                60000000000,
                 3600000000000
             ],
             "x-enum-varnames": [
-                "minDuration",
-                "maxDuration",
-                "Nanosecond",
-                "Microsecond",
-                "Millisecond",
-                "Second",
-                "Minute",
-                "Hour",
                 "minDuration",
                 "maxDuration",
                 "Nanosecond",

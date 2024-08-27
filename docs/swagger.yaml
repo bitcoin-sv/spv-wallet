@@ -637,21 +637,6 @@ definitions:
         - $ref: '#/definitions/filter.TimeRange'
         description: UpdatedRange specifies the time range when a record was updated.
     type: object
-  filter.Page:
-    properties:
-      order:
-        example: desc
-        type: string
-      page:
-        example: 2
-        type: integer
-      size:
-        example: 5
-        type: integer
-      sortBy:
-        example: id
-        type: string
-    type: object
   filter.SearchAccessKeys:
     properties:
       conditions:
@@ -2014,24 +1999,8 @@ definitions:
     - 1000000000
     - 60000000000
     - 3600000000000
-    - -9223372036854775808
-    - 9223372036854775807
-    - 1
-    - 1000
-    - 1000000
-    - 1000000000
-    - 60000000000
-    - 3600000000000
     type: integer
     x-enum-varnames:
-    - minDuration
-    - maxDuration
-    - Nanosecond
-    - Microsecond
-    - Millisecond
-    - Second
-    - Minute
-    - Hour
     - minDuration
     - maxDuration
     - Nanosecond
@@ -2108,6 +2077,65 @@ paths:
   /api/v1//users/current/keys:
     get:
       description: Search access key
+      parameters:
+      - default: desc
+        example: desc
+        in: query
+        name: order
+        type: string
+      - default: 1
+        example: 2
+        in: query
+        name: page
+        type: integer
+      - default: 50
+        example: 5
+        in: query
+        name: size
+        type: integer
+      - default: created_at
+        example: id
+        in: query
+        name: sortBy
+        type: string
+      - collectionFormat: csv
+        example:
+        - metadata[key]=value
+        - metadata[key2]=value2
+        in: query
+        items:
+          type: string
+        name: metadata
+        type: array
+      - example: "2024-02-26T11:01:28Z"
+        in: query
+        name: createdRange[from]
+        type: string
+      - example: "2024-02-26T11:01:28Z"
+        in: query
+        name: createdRange[to]
+        type: string
+      - default: false
+        example: true
+        in: query
+        name: includeDeleted
+        type: boolean
+      - example: "2024-02-26T11:01:28Z"
+        in: query
+        name: revokedRange[from]
+        type: string
+      - example: "2024-02-26T11:01:28Z"
+        in: query
+        name: revokedRange[to]
+        type: string
+      - example: "2024-02-26T11:01:28Z"
+        in: query
+        name: updatedRange[from]
+        type: string
+      - example: "2024-02-26T11:01:28Z"
+        in: query
+        name: updatedRange[to]
+        type: string
       produces:
       - application/json
       responses:
