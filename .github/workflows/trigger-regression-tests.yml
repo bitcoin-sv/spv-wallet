@@ -1,4 +1,4 @@
-name: Trigger Regression Tests
+name: "Trigger Regression Tests"
 
 on:
   workflow_dispatch:
@@ -9,14 +9,11 @@ env:
   RUN_ID: ${{ github.run_id }}-${{ github.run_attempt }}
 
 jobs:
-  run:
+   
+  release:
     if: >
       (github.event_name == 'workflow_dispatch') ||
       (github.event_name == 'pull_request_target' && github.event.label.name == 'regression-tests')
-    runs-on: ubuntu-latest
-
-  release:
-    needs: run
     uses: bactions/workflows/.github/workflows/release-go-server.yml@main
     with:
       ref: ${{ github.head_ref || github.ref }}
