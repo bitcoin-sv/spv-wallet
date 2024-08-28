@@ -33,30 +33,14 @@ const docTemplate = `{
                 "parameters": [
                     {
                         "type": "string",
-                        "default": "desc",
-                        "example": "desc",
-                        "name": "order",
-                        "in": "query"
-                    },
-                    {
-                        "type": "integer",
-                        "default": 1,
-                        "example": 2,
-                        "name": "page",
-                        "in": "query"
-                    },
-                    {
-                        "type": "integer",
-                        "default": 50,
-                        "example": 5,
-                        "name": "size",
+                        "example": "2024-02-26T11:01:28Z",
+                        "name": "createdRange[from]",
                         "in": "query"
                     },
                     {
                         "type": "string",
-                        "default": "created_at",
-                        "example": "id",
-                        "name": "sortBy",
+                        "example": "2024-02-26T11:01:28Z",
+                        "name": "createdRange[to]",
                         "in": "query"
                     },
                     {
@@ -69,38 +53,28 @@ const docTemplate = `{
                             "metadata[key]=value",
                             "metadata[key2]=value2"
                         ],
+                        "description": "Metadata is a list of key-value pairs that can be used to filter the results. !ATTENTION! Unfortunately this parameter won't work from swagger UI.",
                         "name": "metadata",
                         "in": "query"
                     },
                     {
                         "type": "string",
-                        "example": "2024-02-26T11:01:28Z",
-                        "name": "createdRange[from]",
+                        "name": "order",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "name": "page",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "name": "size",
                         "in": "query"
                     },
                     {
                         "type": "string",
-                        "example": "2024-02-26T11:01:28Z",
-                        "name": "createdRange[to]",
-                        "in": "query"
-                    },
-                    {
-                        "type": "boolean",
-                        "default": false,
-                        "example": true,
-                        "name": "includeDeleted",
-                        "in": "query"
-                    },
-                    {
-                        "type": "string",
-                        "example": "2024-02-26T11:01:28Z",
-                        "name": "revokedRange[from]",
-                        "in": "query"
-                    },
-                    {
-                        "type": "string",
-                        "example": "2024-02-26T11:01:28Z",
-                        "name": "revokedRange[to]",
+                        "name": "sortBy",
                         "in": "query"
                     },
                     {
@@ -113,6 +87,28 @@ const docTemplate = `{
                         "type": "string",
                         "example": "2024-02-26T11:01:28Z",
                         "name": "updatedRange[to]",
+                        "in": "query"
+                    },
+                    {
+                        "type": "boolean",
+                        "default": false,
+                        "example": true,
+                        "description": "IncludeDeleted is a flag whether or not to include deleted items in the search results",
+                        "name": "includeDeleted",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "format": "date-time",
+                        "description": "Specifies the start time of the range to query by date of revoking",
+                        "name": "revokedRange[from]",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "format": "date-time",
+                        "description": "Specifies the end time of the range to query by date of revoking",
+                        "name": "revokedRange[to]",
                         "in": "query"
                     }
                 ],
@@ -5593,6 +5589,17 @@ const docTemplate = `{
                 1000000,
                 1000000000,
                 60000000000,
+                3600000000000,
+                1,
+                1000,
+                1000000,
+                1000000000,
+                60000000000,
+                1,
+                1000,
+                1000000,
+                1000000000,
+                60000000000,
                 3600000000000
             ],
             "x-enum-varnames": [
@@ -5606,6 +5613,17 @@ const docTemplate = `{
                 "Hour",
                 "minDuration",
                 "maxDuration",
+                "Nanosecond",
+                "Microsecond",
+                "Millisecond",
+                "Second",
+                "Minute",
+                "Hour",
+                "Nanosecond",
+                "Microsecond",
+                "Millisecond",
+                "Second",
+                "Minute",
                 "Nanosecond",
                 "Microsecond",
                 "Millisecond",

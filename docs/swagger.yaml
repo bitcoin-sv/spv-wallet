@@ -1999,6 +1999,17 @@ definitions:
     - 1000000000
     - 60000000000
     - 3600000000000
+    - 1
+    - 1000
+    - 1000000
+    - 1000000000
+    - 60000000000
+    - 1
+    - 1000
+    - 1000000
+    - 1000000000
+    - 60000000000
+    - 3600000000000
     type: integer
     x-enum-varnames:
     - minDuration
@@ -2011,6 +2022,17 @@ definitions:
     - Hour
     - minDuration
     - maxDuration
+    - Nanosecond
+    - Microsecond
+    - Millisecond
+    - Second
+    - Minute
+    - Hour
+    - Nanosecond
+    - Microsecond
+    - Millisecond
+    - Second
+    - Minute
     - Nanosecond
     - Microsecond
     - Millisecond
@@ -2078,35 +2100,6 @@ paths:
     get:
       description: Search access key
       parameters:
-      - default: desc
-        example: desc
-        in: query
-        name: order
-        type: string
-      - default: 1
-        example: 2
-        in: query
-        name: page
-        type: integer
-      - default: 50
-        example: 5
-        in: query
-        name: size
-        type: integer
-      - default: created_at
-        example: id
-        in: query
-        name: sortBy
-        type: string
-      - collectionFormat: csv
-        example:
-        - metadata[key]=value
-        - metadata[key2]=value2
-        in: query
-        items:
-          type: string
-        name: metadata
-        type: array
       - example: "2024-02-26T11:01:28Z"
         in: query
         name: createdRange[from]
@@ -2115,18 +2108,29 @@ paths:
         in: query
         name: createdRange[to]
         type: string
-      - default: false
-        example: true
+      - collectionFormat: csv
+        description: Metadata is a list of key-value pairs that can be used to filter
+          the results. !ATTENTION! Unfortunately this parameter won't work from swagger
+          UI.
+        example:
+        - metadata[key]=value
+        - metadata[key2]=value2
         in: query
-        name: includeDeleted
-        type: boolean
-      - example: "2024-02-26T11:01:28Z"
-        in: query
-        name: revokedRange[from]
+        items:
+          type: string
+        name: metadata
+        type: array
+      - in: query
+        name: order
         type: string
-      - example: "2024-02-26T11:01:28Z"
-        in: query
-        name: revokedRange[to]
+      - in: query
+        name: page
+        type: integer
+      - in: query
+        name: size
+        type: integer
+      - in: query
+        name: sortBy
         type: string
       - example: "2024-02-26T11:01:28Z"
         in: query
@@ -2135,6 +2139,23 @@ paths:
       - example: "2024-02-26T11:01:28Z"
         in: query
         name: updatedRange[to]
+        type: string
+      - default: false
+        description: IncludeDeleted is a flag whether or not to include deleted items
+          in the search results
+        example: true
+        in: query
+        name: includeDeleted
+        type: boolean
+      - description: Specifies the start time of the range to query by date of revoking
+        format: date-time
+        in: query
+        name: revokedRange[from]
+        type: string
+      - description: Specifies the end time of the range to query by date of revoking
+        format: date-time
+        in: query
+        name: revokedRange[to]
         type: string
       produces:
       - application/json
