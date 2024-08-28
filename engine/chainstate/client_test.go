@@ -21,21 +21,24 @@ func TestNewClient(t *testing.T) {
 		Build()
 
 	t.Run("basic defaults", func(t *testing.T) {
+		logger := zerolog.Nop()
 		c, err := NewClient(
 			context.Background(),
+			&logger,
 			WithBroadcastClient(bc),
 		)
 		require.NoError(t, err)
 		require.NotNil(t, c)
-		assert.Equal(t, false, c.IsDebug())
 		assert.Equal(t, MainNet, c.Network())
 		assert.Nil(t, c.HTTPClient())
 	})
 
 	t.Run("custom http client", func(t *testing.T) {
 		customClient := &http.Client{}
+		logger := zerolog.Nop()
 		c, err := NewClient(
 			context.Background(),
+			&logger,
 			WithHTTPClient(customClient),
 			WithBroadcastClient(bc),
 		)
@@ -55,6 +58,7 @@ func TestNewClient(t *testing.T) {
 		require.NotNil(t, customClient)
 		c, err := NewClient(
 			context.Background(),
+			&logger,
 			WithBroadcastClient(customClient),
 		)
 		require.NoError(t, err)
@@ -65,8 +69,10 @@ func TestNewClient(t *testing.T) {
 
 	t.Run("custom query timeout", func(t *testing.T) {
 		timeout := 55 * time.Second
+		logger := zerolog.Nop()
 		c, err := NewClient(
 			context.Background(),
+			&logger,
 			WithQueryTimeout(timeout),
 			WithBroadcastClient(bc),
 		)
@@ -76,8 +82,10 @@ func TestNewClient(t *testing.T) {
 	})
 
 	t.Run("custom network - test", func(t *testing.T) {
+		logger := zerolog.Nop()
 		c, err := NewClient(
 			context.Background(),
+			&logger,
 			WithNetwork(TestNet),
 			WithBroadcastClient(bc),
 		)

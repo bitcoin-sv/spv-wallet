@@ -15,6 +15,7 @@ import (
 	"github.com/bitcoin-sv/spv-wallet/engine/datastore"
 	"github.com/bitcoin-sv/spv-wallet/engine/logging"
 	"github.com/bitcoin-sv/spv-wallet/engine/metrics"
+
 	// "github.com/bitcoin-sv/spv-wallet/engine/notifications"
 	"github.com/bitcoin-sv/spv-wallet/engine/taskmanager"
 	"github.com/bitcoin-sv/spv-wallet/engine/utils"
@@ -203,7 +204,6 @@ func WithDebugging() ClientOps {
 
 		// Enable debugging on other services
 		c.cacheStore.options = append(c.cacheStore.options, cachestore.WithDebugging())
-		c.chainstate.options = append(c.chainstate.options, chainstate.WithDebugging())
 		c.dataStore.options = append(c.dataStore.options, datastore.WithDebugging())
 	}
 }
@@ -251,9 +251,7 @@ func WithLogger(customLogger *zerolog.Logger) ClientOps {
 			c.logger = customLogger
 
 			// Enable the logger on all SPV Wallet Engine services
-			chainstateLogger := customLogger.With().Str("subservice", "chainstate").Logger()
 			taskManagerLogger := customLogger.With().Str("subservice", "taskManager").Logger()
-			c.chainstate.options = append(c.chainstate.options, chainstate.WithLogger(&chainstateLogger))
 			c.taskManager.options = append(c.taskManager.options, taskmanager.WithLogger(&taskManagerLogger))
 
 			// Enable the logger on all external services

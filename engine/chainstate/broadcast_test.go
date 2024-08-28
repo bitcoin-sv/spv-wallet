@@ -42,15 +42,12 @@ func TestClient_Broadcast_BroadcastClient(t *testing.T) {
 		)
 
 		// when
-		res := c.Broadcast(
+		failure := c.Broadcast(
 			context.Background(), broadcastExample1TxID, broadcastExample1TxHex, RawTx, defaultBroadcastTimeOut,
 		)
 
 		// then
-		require.NotNil(t, res)
-		require.Nil(t, res.Failure)
-
-		assert.Equal(t, ProviderBroadcastClient, res.Provider)
+		require.Nil(t, failure)
 	})
 
 	t.Run("broadcast - success (multiple broadcast-client)", func(t *testing.T) {
@@ -67,14 +64,11 @@ func TestClient_Broadcast_BroadcastClient(t *testing.T) {
 		)
 
 		// when
-		res := c.Broadcast(
+		failure := c.Broadcast(
 			context.Background(), broadcastExample1TxID, broadcastExample1TxHex, RawTx, 1*time.Second,
 		)
 
 		// then
-		require.NotNil(t, res)
-		require.Nil(t, res.Failure)
-
-		assert.Equal(t, ProviderBroadcastClient, res.Provider)
+		require.Nil(t, failure)
 	})
 }

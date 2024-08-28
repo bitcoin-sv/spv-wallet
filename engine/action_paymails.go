@@ -75,7 +75,7 @@ func (c *Client) GetPaymailAddressesByXPubID(ctx context.Context, xPubID string,
 		conditions = x
 	}
 	// add the xpub_id to the conditions
-	conditions["xpub_id"] = xPubID
+	conditions[xPubIDField] = xPubID
 
 	// Get the paymail address
 	paymailAddresses, err := getPaymailAddresses(

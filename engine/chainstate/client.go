@@ -54,7 +54,7 @@ type (
 //
 // If no options are given, it will use the defaultClientOptions()
 // ctx may contain a NewRelic txn (or one will be created)
-func NewClient(ctx context.Context, opts ...ClientOps) (ClientInterface, error) {
+func NewClient(ctx context.Context, logger *zerolog.Logger, opts ...ClientOps) (ClientInterface, error) {
 	// Create a new client with defaults
 	client := &Client{options: defaultClientOptions()}
 
@@ -66,9 +66,10 @@ func NewClient(ctx context.Context, opts ...ClientOps) (ClientInterface, error) 
 	// Use NewRelic if it's enabled (use existing txn if found on ctx)
 	ctx = client.options.getTxnCtx(ctx)
 
-	// Set logger if not set
-	if client.options.logger == nil {
+	if logger == nil {
 		client.options.logger = logging.GetDefaultLogger()
+	} else {
+		client.options.logger = logger
 	}
 
 	if err := client.initActiveProvider(ctx); err != nil {
@@ -88,21 +89,6 @@ func (c *Client) Close(ctx context.Context) {
 	if txn := newrelic.FromContext(ctx); txn != nil {
 		defer txn.StartSegment("close_chainstate").End()
 	}
-}
-
-// Debug will set the debug flag
-func (c *Client) Debug(on bool) {
-	c.options.debug = on
-}
-
-// DebugLog will display verbose logs
-func (c *Client) DebugLog(text string) {
-	c.options.logger.Debug().Msg(text)
-}
-
-// IsDebug will return if debugging is enabled
-func (c *Client) IsDebug() bool {
-	return c.options.debug
 }
 
 // IsNewRelicEnabled will return if new relic is enabled
@@ -162,4 +148,8 @@ func (c *Client) checkFeeUnit() error {
 		c.options.logger.Info().Msgf("using fee unit: %s from %s", feeUnit, feeUnitSource)
 	}
 	return nil
+}
+
+func (c *Client) Logger() *zerolog.Logger {
+	return c.options.logger
 }

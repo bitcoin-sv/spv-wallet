@@ -40,7 +40,8 @@ func (c *Client) loadChainstate(ctx context.Context) (err error) {
 		c.options.chainstate.options = append(c.options.chainstate.options, chainstate.WithUserAgent(c.UserAgent()))
 		c.options.chainstate.options = append(c.options.chainstate.options, chainstate.WithHTTPClient(c.HTTPClient()))
 		c.options.chainstate.options = append(c.options.chainstate.options, chainstate.WithMetrics(c.options.metrics))
-		c.options.chainstate.ClientInterface, err = chainstate.NewClient(ctx, c.options.chainstate.options...)
+		chainstateLogger := c.options.logger.With().Str("subservice", "chainstate").Logger()
+		c.options.chainstate.ClientInterface, err = chainstate.NewClient(ctx, &chainstateLogger, c.options.chainstate.options...)
 	}
 
 	return

@@ -7,6 +7,7 @@ import (
 
 	"github.com/bitcoin-sv/go-broadcast-client/broadcast"
 	"github.com/bitcoin-sv/spv-wallet/engine/utils"
+	"github.com/rs/zerolog"
 )
 
 // HTTPInterface is the HTTP client interface
@@ -17,7 +18,7 @@ type HTTPInterface interface {
 // ChainService is the chain related methods
 type ChainService interface {
 	SupportedBroadcastFormats() HexFormatFlag
-	Broadcast(ctx context.Context, id, txHex string, format HexFormatFlag, timeout time.Duration) *BroadcastResult
+	Broadcast(ctx context.Context, id, txHex string, format HexFormatFlag, timeout time.Duration) *BroadcastFailure
 	QueryTransaction(
 		ctx context.Context, id string, requiredIn RequiredIn, timeout time.Duration,
 	) (*TransactionInfo, error)
@@ -42,12 +43,10 @@ type ClientInterface interface {
 	ProviderServices
 	HeaderService
 	Close(ctx context.Context)
-	Debug(on bool)
-	DebugLog(text string)
 	HTTPClient() HTTPInterface
-	IsDebug() bool
 	IsNewRelicEnabled() bool
 	Network() Network
 	QueryTimeout() time.Duration
 	FeeUnit() *utils.FeeUnit
+	Logger() *zerolog.Logger
 }

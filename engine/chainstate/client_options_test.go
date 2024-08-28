@@ -27,36 +27,12 @@ func TestWithNewRelic(t *testing.T) {
 			WithNewRelic(),
 			WithBroadcastClient(bc),
 		}
-		c, err := NewClient(context.Background(), opts...)
+		logger := zerolog.Nop()
+		c, err := NewClient(context.Background(), &logger, opts...)
 		require.NotNil(t, c)
 		require.NoError(t, err)
 
 		assert.Equal(t, true, c.IsNewRelicEnabled())
-	})
-}
-
-// TestWithDebugging will test the method WithDebugging()
-func TestWithDebugging(t *testing.T) {
-
-	t.Run("get opts", func(t *testing.T) {
-		opt := WithDebugging()
-		assert.IsType(t, *new(ClientOps), opt)
-	})
-
-	t.Run("apply opts", func(t *testing.T) {
-		bc := broadcast_client_mock.Builder().
-			WithMockArc(broadcast_client_mock.MockSuccess).
-			Build()
-
-		opts := []ClientOps{
-			WithDebugging(),
-			WithBroadcastClient(bc),
-		}
-		c, err := NewClient(context.Background(), opts...)
-		require.NotNil(t, c)
-		require.NoError(t, err)
-
-		assert.Equal(t, true, c.IsDebug())
 	})
 }
 
@@ -202,35 +178,6 @@ func TestWithUserAgent(t *testing.T) {
 	})
 }
 
-// TestWithLogger will test the method WithLogger()
-func TestWithLogger(t *testing.T) {
-	t.Parallel()
-
-	t.Run("check type", func(t *testing.T) {
-		opt := WithLogger(nil)
-		assert.IsType(t, *new(ClientOps), opt)
-	})
-
-	t.Run("test applying nil", func(t *testing.T) {
-		options := &clientOptions{
-			config: &syncConfig{},
-		}
-		opt := WithLogger(nil)
-		opt(options)
-		assert.Nil(t, options.logger)
-	})
-
-	t.Run("test applying option", func(t *testing.T) {
-		options := &clientOptions{
-			config: &syncConfig{},
-		}
-		customLogger := zerolog.Nop()
-		opt := WithLogger(&customLogger)
-		opt(options)
-		assert.Equal(t, &customLogger, options.logger)
-	})
-}
-
 // TestWithExcludedProviders will test the method WithExcludedProviders()
 func TestWithExcludedProviders(t *testing.T) {
 	t.Parallel()
@@ -247,15 +194,5 @@ func TestWithExcludedProviders(t *testing.T) {
 		opt := WithExcludedProviders([]string{""})
 		opt(options)
 		assert.Equal(t, []string{""}, options.config.excludedProviders)
-	})
-
-	t.Run("test applying option", func(t *testing.T) {
-		options := &clientOptions{
-			config: &syncConfig{},
-		}
-		opt := WithExcludedProviders([]string{ProviderBroadcastClient})
-		opt(options)
-		assert.Equal(t, 1, len(options.config.excludedProviders))
-		assert.Equal(t, ProviderBroadcastClient, options.config.excludedProviders[0])
 	})
 }

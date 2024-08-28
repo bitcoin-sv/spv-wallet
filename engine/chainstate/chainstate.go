@@ -5,6 +5,7 @@ package chainstate
 
 import (
 	"context"
+	"fmt"
 	"time"
 
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
@@ -30,12 +31,6 @@ func (c *Client) SupportedBroadcastFormats() HexFormatFlag {
 	return RawTx | Ef
 }
 
-// BroadcastResult contains data about broadcasting to provider
-type BroadcastResult struct {
-	Provider string
-	Failure  *BroadcastFailure
-}
-
 // BroadcastFailure contains data about broadcast failure
 type BroadcastFailure struct {
 	InvalidTx bool
@@ -43,21 +38,30 @@ type BroadcastFailure struct {
 }
 
 // Broadcast will attempt to broadcast a transaction using the given providers
-func (c *Client) Broadcast(ctx context.Context, id, txHex string, format HexFormatFlag, timeout time.Duration) *BroadcastResult {
-	results := make(chan *BroadcastResult)
-	go c.broadcast(ctx, id, txHex, format, timeout, results)
+func (c *Client) Broadcast(ctx context.Context, txID, txHex string, format HexFormatFlag, timeout time.Duration) *BroadcastFailure {
+	ctxWithCancel, cancel := context.WithTimeout(ctx, timeout)
+	defer cancel()
 
-	failures := make([]*BroadcastResult, 0)
+	failure := c.submitTransaction(ctxWithCancel, txID, txHex, format)
 
-	for r := range results {
-		if r.Failure != nil {
-			failures = append(failures, r)
-		} else {
-			return r // one successful result is sufficient, and we consider the entire broadcast process complete. We disregard failures from other providers
+	if failure != nil {
+		checkMempool := containsAny(failure.Error.Error(), broadcastQuestionableErrors)
+
+		if !checkMempool { // return original failure
+			return failure
+		}
+
+		// check in Mempool as fallback - if transaction is there -> GREAT SUCCESS
+		if _, err := c.QueryTransaction(ctx, txID, requiredInMempool, timeout); err != nil {
+			return &BroadcastFailure{
+				InvalidTx: failure.InvalidTx,
+				Error:     fmt.Errorf("query tx failed: %w, initial error: %s", err, failure.Error.Error()),
+			}
 		}
 	}
 
-	return groupBroadcastResults(failures)
+	// successful broadcasted or found in mempool
+	return nil
 }
 
 // QueryTransaction will get the transaction info from all providers returning the "first" valid result

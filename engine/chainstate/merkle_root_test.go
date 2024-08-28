@@ -16,9 +16,10 @@ func initMockClient(ops ...ClientOps) (*Client, *buffLogger) {
 		WithMockArc(broadcast_client_mock.MockSuccess).
 		Build()
 	bLogger := newBuffLogger()
-	ops = append(ops, WithLogger(bLogger.logger), WithBroadcastClient(bc))
+	ops = append(ops, WithBroadcastClient(bc))
 	c, _ := NewClient(
 		context.Background(),
+		bLogger.logger,
 		ops...,
 	)
 	return c.(*Client), bLogger

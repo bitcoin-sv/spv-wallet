@@ -304,11 +304,6 @@ func (c *Client) Debug(on bool) {
 		cs.Debug(on)
 	}
 
-	// Set debugging on the Chainstate
-	if ch := c.Chainstate(); ch != nil {
-		ch.Debug(on)
-	}
-
 	// Set debugging on the Datastore
 	if ds := c.Datastore(); ds != nil {
 		ds.Debug(on)

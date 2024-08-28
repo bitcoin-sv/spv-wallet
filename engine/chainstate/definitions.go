@@ -37,13 +37,6 @@ const (
 	requiredOnChain   = "on-chain" // Requirement for tx query (has to be == on-chain)
 )
 
-// List of providers
-const (
-	ProviderAll             = "all"             // All providers (used for errors etc)
-	ProviderBroadcastClient = "broadcastclient" // Query & broadcast provider for configured miners
-	ProviderNone            = "none"            // No providers (used to indicate no providers)
-)
-
 // BlockInfo is the response info about a returned block
 type BlockInfo struct {
 	Bits              string         `json:"bits"`

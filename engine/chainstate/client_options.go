@@ -8,7 +8,6 @@ import (
 	"github.com/bitcoin-sv/spv-wallet/engine/metrics"
 	"github.com/bitcoin-sv/spv-wallet/engine/utils"
 	"github.com/newrelic/go-agent/v3/newrelic"
-	"github.com/rs/zerolog"
 )
 
 // ClientOps allow functional options to be supplied
@@ -54,13 +53,6 @@ func WithNewRelic() ClientOps {
 	}
 }
 
-// WithDebugging will enable debugging mode
-func WithDebugging() ClientOps {
-	return func(c *clientOptions) {
-		c.debug = true
-	}
-}
-
 // WithHTTPClient will set a custom HTTP client
 func WithHTTPClient(client HTTPInterface) ClientOps {
 	return func(c *clientOptions) {
@@ -93,15 +85,6 @@ func WithNetwork(network Network) ClientOps {
 	return func(c *clientOptions) {
 		if len(network) > 0 {
 			c.config.network = network
-		}
-	}
-}
-
-// WithLogger will set a custom logger
-func WithLogger(customLogger *zerolog.Logger) ClientOps {
-	return func(c *clientOptions) {
-		if customLogger != nil {
-			c.logger = customLogger
 		}
 	}
 }

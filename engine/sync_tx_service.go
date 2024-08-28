@@ -111,27 +111,27 @@ func broadcastSyncTransaction(ctx context.Context, syncTx *SyncTransaction) erro
 	client := syncTx.Client()
 	chainstateSrv := client.Chainstate()
 
-	// Get the transaction HEX
+	// Get the transaction from syncTx otherwise load it by ID from the database
 	tx := syncTx.transaction
 	if tx == nil || tx.Hex == "" {
 		if tx, err = _getTransaction(ctx, syncTx.ID, syncTx.GetOptions(false)); err != nil {
-			return nil
+			return nil // TODO: should we return an error here?
 		}
 	}
 
 	// Broadcast
 	txHex, hexFormat := _getTxHexInFormat(ctx, tx, chainstateSrv.SupportedBroadcastFormats(), client)
-	br := chainstateSrv.Broadcast(ctx, syncTx.ID, txHex, hexFormat, defaultBroadcastTimeout)
+	failure := chainstateSrv.Broadcast(ctx, syncTx.ID, txHex, hexFormat, defaultBroadcastTimeout)
 
-	if br.Failure != nil { // broadcast failed
-		if br.Failure.InvalidTx {
+	if failure != nil { // broadcast failed
+		if failure.InvalidTx {
 			syncTx.BroadcastStatus = SyncStatusError // invalid transaction, won't be broadcasted anymore
 		} else {
 			syncTx.BroadcastStatus = SyncStatusReady // client error, try again later
 		}
 
-		_addSyncResult(ctx, syncTx, syncActionBroadcast, br.Provider, br.Failure.Error.Error())
-		return br.Failure.Error
+		_addSyncResult(ctx, syncTx, syncActionBroadcast, failure.Error.Error())
+		return failure.Error
 	}
 
 	// Update the sync information
@@ -144,13 +144,12 @@ func broadcastSyncTransaction(ctx context.Context, syncTx *SyncTransaction) erro
 	syncTx.Results.Results = append(syncTx.Results.Results, &SyncResult{
 		Action:        syncActionBroadcast,
 		ExecutedAt:    time.Now().UTC(),
-		Provider:      br.Provider,
 		StatusMessage: "broadcast success",
 	})
 
 	// Update the sync transaction record
 	if err = syncTx.Save(ctx); err != nil {
-		_addSyncResult(ctx, syncTx, syncActionBroadcast, "internal", err.Error())
+		_addSyncResult(ctx, syncTx, syncActionBroadcast, err.Error())
 		return err
 	}
 
@@ -201,7 +200,7 @@ func _syncTxDataFromChain(ctx context.Context, syncTx *SyncTransaction, transact
 				Msgf("Transaction not found on-chain, will try again later")
 
 			syncTx.SyncStatus = SyncStatusReady
-			_addSyncResult(ctx, syncTx, syncActionSync, "all", "transaction not found on-chain")
+			_addSyncResult(ctx, syncTx, syncActionSync, "transaction not found on-chain")
 			return nil
 		}
 		return spverrors.Wrapf(err, "could not query transaction")
@@ -239,7 +238,7 @@ func processSyncTxSave(ctx context.Context, txInfo *chainstate.TransactionInfo, 
 
 	transaction.setChainInfo(txInfo)
 	if err := transaction.Save(ctx); err != nil {
-		_addSyncResult(ctx, syncTx, syncActionSync, "internal", err.Error())
+		_addSyncResult(ctx, syncTx, syncActionSync, err.Error())
 		return err
 	}
 
@@ -247,12 +246,11 @@ func processSyncTxSave(ctx context.Context, txInfo *chainstate.TransactionInfo, 
 	syncTx.Results.Results = append(syncTx.Results.Results, &SyncResult{
 		Action:        syncActionSync,
 		ExecutedAt:    time.Now().UTC(),
-		Provider:      chainstate.ProviderBroadcastClient,
-		StatusMessage: "transaction was found on-chain by " + chainstate.ProviderBroadcastClient,
+		StatusMessage: "transaction was found on-chain",
 	})
 
 	if err := syncTx.Save(ctx); err != nil {
-		_addSyncResult(ctx, syncTx, syncActionSync, "internal", err.Error())
+		_addSyncResult(ctx, syncTx, syncActionSync, err.Error())
 		return err
 	}
 
@@ -280,7 +278,7 @@ func processP2PTransaction(ctx context.Context, tx *Transaction) error {
 	// No draft?
 	if len(tx.DraftID) == 0 {
 		syncTx.P2PStatus = SyncStatusError
-		_addSyncResult(ctx, syncTx, syncActionP2P, "all", "no draft found, cannot complete p2p")
+		_addSyncResult(ctx, syncTx, syncActionP2P, "no draft found, cannot complete p2p")
 
 		return nil
 	}
@@ -289,7 +287,7 @@ func processP2PTransaction(ctx context.Context, tx *Transaction) error {
 	var results []*SyncResult
 	if results, err = _notifyPaymailProviders(ctx, tx); err != nil {
 		syncTx.P2PStatus = SyncStatusReady
-		_addSyncResult(ctx, syncTx, syncActionP2P, "", err.Error())
+		_addSyncResult(ctx, syncTx, syncActionP2P, err.Error())
 		return err
 	}
 
@@ -308,7 +306,7 @@ func processP2PTransaction(ctx context.Context, tx *Transaction) error {
 
 	if err = syncTx.Save(ctx); err != nil {
 		syncTx.P2PStatus = SyncStatusError
-		_addSyncResult(ctx, syncTx, syncActionP2P, "internal", err.Error())
+		_addSyncResult(ctx, syncTx, syncActionP2P, err.Error())
 		return err
 	}
 
@@ -352,7 +350,6 @@ func _notifyPaymailProviders(ctx context.Context, transaction *Transaction) ([]*
 		results = append(results, &SyncResult{
 			Action:        syncActionP2P,
 			ExecutedAt:    time.Now().UTC(),
-			Provider:      p4.ReceiveEndpoint,
 			StatusMessage: "success: " + payload.TxID,
 		})
 
@@ -385,12 +382,11 @@ func _groupByXpub(scTxs []*SyncTransaction) map[string][]*SyncTransaction {
 
 // _addSyncResult will save the error message for a sync tx
 func _addSyncResult(ctx context.Context, syncTx *SyncTransaction,
-	action, provider, message string,
+	action, message string,
 ) {
 	syncTx.Results.Results = append(syncTx.Results.Results, &SyncResult{
 		Action:        action,
 		ExecutedAt:    time.Now().UTC(),
-		Provider:      provider,
 		StatusMessage: message,
 	})
 

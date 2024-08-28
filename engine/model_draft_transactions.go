@@ -163,9 +163,7 @@ func (m *DraftTransaction) processConfigOutputs(ctx context.Context) error {
 	c := m.Client()
 	// Get sender's paymail
 	paymailFrom := c.GetPaymailConfig().DefaultFromPaymail
-	conditions := map[string]interface{}{
-		xPubIDField: m.XpubID,
-	}
+	conditions := map[string]any{}
 
 	// Get the sender's paymail from the metadata, this help when sender has multiple paymails
 	senderPaymail, ok := m.Metadata["sender"].(string)

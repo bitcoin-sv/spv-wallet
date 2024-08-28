@@ -24,10 +24,9 @@ const (
 
 // SyncResult is the complete attempt/result to sync (multiple providers and strategies)
 type SyncResult struct {
-	Action        string    `json:"action"`             // type: broadcast, sync etc
-	ExecutedAt    time.Time `json:"executed_at"`        // Time it was executed
-	Provider      string    `json:"provider,omitempty"` // Provider used for attempt(s)
-	StatusMessage string    `json:"status_message"`     // Success or failure message
+	Action        string    `json:"action"`         // type: broadcast, sync etc
+	ExecutedAt    time.Time `json:"executed_at"`    // Time it was executed
+	StatusMessage string    `json:"status_message"` // Success or failure message
 }
 
 // Scan will scan the value into Struct, implements sql.Scanner interface

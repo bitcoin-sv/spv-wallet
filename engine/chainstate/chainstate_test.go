@@ -15,7 +15,7 @@ import (
 func NewTestClient(ctx context.Context, t *testing.T, opts ...ClientOps) ClientInterface {
 	logger := zerolog.Nop()
 	c, err := NewClient(
-		ctx, append(opts, WithDebugging(), WithLogger(&logger))...,
+		ctx, &logger, opts...,
 	)
 	require.NoError(t, err)
 	require.NotNil(t, c)
