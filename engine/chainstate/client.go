@@ -150,6 +150,7 @@ func (c *Client) checkFeeUnit() error {
 	return nil
 }
 
+// Logger will return the Logger instance
 func (c *Client) Logger() *zerolog.Logger {
 	return c.options.logger
 }
