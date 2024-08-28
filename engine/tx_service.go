@@ -174,7 +174,7 @@ func (m *Transaction) _processOutputs(ctx context.Context) (err error) {
 				utxo, _ := m.client.GetUtxoByTransactionID(ctx, m.ID, uint32(i))
 				if utxo == nil {
 					utxo = newUtxo(
-						destination.XpubID, m.ID, lockingScript, uint32(i),
+						destination.XpubID, m.ID, txLockingScript, uint32(i),
 						amount, newOpts...,
 					)
 				}
