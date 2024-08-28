@@ -13,6 +13,7 @@ import (
 
 	walletclient "github.com/bitcoin-sv/spv-wallet-go-client"
 	"github.com/bitcoin-sv/spv-wallet-go-client/xpriv"
+	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 )
 
 const (
@@ -26,8 +27,7 @@ const (
 )
 
 var (
-	ErrPaymailAlreadyExists = errors.New("paymail already exists")
-	ErrTimeout              = errors.New("timeout reached")
+	ErrTimeout = errors.New("timeout reached")
 )
 
 func main() {
@@ -133,7 +133,7 @@ func handleUserCreation(paymailAlias string, config *regressionTestConfig) (*reg
 
 // handleCreateUserError handles the error when creating a user.
 func handleCreateUserError(err error, paymailAlias string, config *regressionTestConfig) (*regressionTestUser, error) {
-	if err.Error() == ErrPaymailAlreadyExists.Error() {
+	if err.Error() == spverrors.ErrPaymailAlreadyExists.Error() {
 		return handleExistingPaymail(paymailAlias, config)
 	} else {
 		return nil, fmt.Errorf("error creating user: %w", err)
