@@ -1,34 +1,18 @@
 package destinations
 
 import (
-	"github.com/bitcoin-sv/spv-wallet/actions"
-	"github.com/bitcoin-sv/spv-wallet/config"
-	"github.com/bitcoin-sv/spv-wallet/server/routes"
-	"github.com/gin-gonic/gin"
+	"github.com/bitcoin-sv/spv-wallet/server/handlers"
+	"github.com/bitcoin-sv/spv-wallet/server/middleware"
 )
 
-// Action is an extension of actions.Action for this package
-type Action struct {
-	actions.Action
-}
-
 // NewHandler creates the specific package routes
-func NewHandler(appConfig *config.AppConfig, services *config.AppServices) (routes.OldBasicEndpointsFunc, routes.OldAPIEndpointsFunc) {
-	action := &Action{actions.Action{AppConfig: appConfig, Services: services}}
+func NewHandler(handlersManager *handlers.Manager) {
+	group := handlersManager.Group(handlers.GroupOldAPI, "/destination")
+	group.GET("", handlers.AsUser(get))
+	group.POST("/count", handlers.AsUser(count))
+	group.GET("/search", handlers.AsUser(search))
+	group.POST("/search", handlers.AsUser(search))
 
-	basicEndpoints := routes.OldBasicEndpointsFunc(func(router *gin.RouterGroup) {
-		basicDestinationGroup := router.Group("/destination")
-		basicDestinationGroup.GET("", action.get)
-		basicDestinationGroup.POST("/count", action.count)
-		basicDestinationGroup.GET("/search", action.search)
-		basicDestinationGroup.POST("/search", action.search)
-	})
-
-	apiEndpoints := routes.OldAPIEndpointsFunc(func(router *gin.RouterGroup) {
-		apiDestinationGroup := router.Group("/destination")
-		apiDestinationGroup.POST("", action.create)
-		apiDestinationGroup.PATCH("", action.update)
-	})
-
-	return basicEndpoints, apiEndpoints
+	group.POST("", middleware.RequireSignature, handlers.AsUser(create))
+	group.PATCH("", middleware.RequireSignature, handlers.AsUser(update))
 }

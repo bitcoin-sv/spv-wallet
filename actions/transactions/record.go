@@ -6,7 +6,7 @@ import (
 	"github.com/bitcoin-sv/spv-wallet/engine"
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/bitcoin-sv/spv-wallet/mappings"
-	"github.com/bitcoin-sv/spv-wallet/server/auth"
+	"github.com/bitcoin-sv/spv-wallet/server/reqctx"
 	"github.com/gin-gonic/gin"
 )
 
@@ -21,21 +21,14 @@ import (
 // @Failure 	500	"Internal Server Error - Error while recording transaction"
 // @DeprecatedRouter	/v1/transaction/record [post]
 // @Security	x-auth-xpub
-func (a *Action) record(c *gin.Context) {
-	reqXPub := c.GetString(auth.ParamXPubKey)
+func record(c *gin.Context, userContext *reqctx.UserContext) {
+	logger := reqctx.Logger(c)
+	engineInstance := reqctx.Engine(c)
 
 	var requestBody OldRecordTransaction
-	if err := c.ShouldBindJSON(&requestBody); err != nil {
-		spverrors.ErrorResponse(c, err, a.Services.Logger)
-		return
-	}
-
-	xPub, err := a.Services.SpvWalletEngine.GetXpub(c.Request.Context(), reqXPub)
+	err := c.ShouldBindJSON(&requestBody)
 	if err != nil {
-		spverrors.ErrorResponse(c, err, a.Services.Logger)
-		return
-	} else if xPub == nil {
-		spverrors.ErrorResponse(c, spverrors.ErrCouldNotFindXpub, a.Services.Logger)
+		spverrors.ErrorResponse(c, err, logger)
 		return
 	}
 
@@ -46,14 +39,14 @@ func (a *Action) record(c *gin.Context) {
 
 	// Record a new transaction (get the hex from parameters)
 	var transaction *engine.Transaction
-	if transaction, err = a.Services.SpvWalletEngine.RecordTransaction(
+	if transaction, err = engineInstance.RecordTransaction(
 		c.Request.Context(),
-		reqXPub,
+		userContext.GetXPub(),
 		requestBody.Hex,
 		requestBody.ReferenceID,
 		opts...,
 	); err != nil {
-		spverrors.ErrorResponse(c, err, a.Services.Logger)
+		spverrors.ErrorResponse(c, err, logger)
 		return
 	}
 
@@ -72,21 +65,14 @@ func (a *Action) record(c *gin.Context) {
 // @Failure 	500	"Internal Server Error - Error while recording transaction"
 // @Router		/api/v1/transactions [post]
 // @Security	x-auth-xpub
-func (a *Action) recordTransaction(c *gin.Context) {
-	reqXPub := c.GetString(auth.ParamXPubKey)
+func recordTransaction(c *gin.Context, userContext *reqctx.UserContext) {
+	logger := reqctx.Logger(c)
+	engineInstance := reqctx.Engine(c)
 
 	var requestBody RecordTransaction
-	if err := c.ShouldBindJSON(&requestBody); err != nil {
-		spverrors.ErrorResponse(c, err, a.Services.Logger)
-		return
-	}
-
-	xPub, err := a.Services.SpvWalletEngine.GetXpub(c.Request.Context(), reqXPub)
+	err := c.ShouldBindJSON(&requestBody)
 	if err != nil {
-		spverrors.ErrorResponse(c, err, a.Services.Logger)
-		return
-	} else if xPub == nil {
-		spverrors.ErrorResponse(c, spverrors.ErrCouldNotFindXpub, a.Services.Logger)
+		spverrors.ErrorResponse(c, err, logger)
 		return
 	}
 
@@ -97,14 +83,14 @@ func (a *Action) recordTransaction(c *gin.Context) {
 
 	// Record a new transaction (get the hex from parameters)
 	var transaction *engine.Transaction
-	if transaction, err = a.Services.SpvWalletEngine.RecordTransaction(
+	if transaction, err = engineInstance.RecordTransaction(
 		c.Request.Context(),
-		reqXPub,
+		userContext.GetXPub(),
 		requestBody.Hex,
 		requestBody.ReferenceID,
 		opts...,
 	); err != nil {
-		spverrors.ErrorResponse(c, err, a.Services.Logger)
+		spverrors.ErrorResponse(c, err, logger)
 		return
 	}
 

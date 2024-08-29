@@ -7,7 +7,7 @@ import (
 	"github.com/bitcoin-sv/spv-wallet/mappings"
 	"github.com/bitcoin-sv/spv-wallet/models"
 	"github.com/bitcoin-sv/spv-wallet/models/filter"
-	"github.com/bitcoin-sv/spv-wallet/server/auth"
+	"github.com/bitcoin-sv/spv-wallet/server/reqctx"
 	"github.com/gin-gonic/gin"
 )
 
@@ -23,24 +23,24 @@ import (
 // @Failure 	500	"Internal server error - Error while searching for destinations"
 // @Router		/v1/destination/search [post]
 // @Security	x-auth-xpub
-func (a *Action) search(c *gin.Context) {
-	reqXPubID := c.GetString(auth.ParamXPubHashKey)
+func search(c *gin.Context, userContext *reqctx.UserContext) {
+	logger := reqctx.Logger(c)
 
 	var reqParams filter.SearchDestinations
 	if err := c.Bind(&reqParams); err != nil {
-		spverrors.ErrorResponse(c, spverrors.ErrCannotBindRequest, a.Services.Logger)
+		spverrors.ErrorResponse(c, spverrors.ErrCannotBindRequest, logger)
 		return
 	}
 
-	destinations, err := a.Services.SpvWalletEngine.GetDestinationsByXpubID(
+	destinations, err := reqctx.Engine(c).GetDestinationsByXpubID(
 		c.Request.Context(),
-		reqXPubID,
+		userContext.GetXPubID(),
 		mappings.MapToMetadata(reqParams.Metadata),
 		reqParams.Conditions.ToDbConditions(),
 		mappings.MapToQueryParams(reqParams.QueryParams),
 	)
 	if err != nil {
-		spverrors.ErrorResponse(c, err, a.Services.Logger)
+		spverrors.ErrorResponse(c, err, logger)
 		return
 	}
 

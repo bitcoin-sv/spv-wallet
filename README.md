@@ -2,7 +2,6 @@
 
 # SPV Wallet
 
-
 [![Release](https://img.shields.io/github/release-pre/bitcoin-sv/spv-wallet.svg?logo=github&style=flat&v=3)](https://github.com/bitcoin-sv/spv-wallet/releases)
 [![Build Status](https://img.shields.io/github/actions/workflow/status/bitcoin-sv/spv-wallet/run-tests.yml?branch=main&v=3)](https://github.com/bitcoin-sv/spv-wallet/actions)
 [![Report](https://goreportcard.com/badge/github.com/bitcoin-sv/spv-wallet?style=flat&v=3)](https://goreportcard.com/report/github.com/bitcoin-sv/spv-wallet)
@@ -20,27 +19,27 @@
 
 ## Table of Contents
 
-- [SPV Wallet](#spv-wallet)
-  - [Table of Contents](#table-of-contents)
-  - [About](#about)
-  - [Installation](#installation)
-      - [build](#build)
-      - [run](#run)
-  - [Documentation](#documentation)
-      - [Built-in Features](#built-in-features)
-    - [Automatic Releases on Tag Creation (recommended)](#automatic-releases-on-tag-creation-recommended)
-    - [Manual Releases (optional)](#manual-releases-optional)
-  - [Usage](#usage)
-    - [Defaults](#defaults)
-    - [Config Variables](#config-variables)
-      - [Flags](#flags)
-      - [Environment variables](#environment-variables)
-    - [Examples \& Tests](#examples--tests)
-    - [Benchmarks](#benchmarks)
-    - [Docker Compose Quickstart](#docker-compose-quickstart)
-  - [Code Standards](#code-standards)
-  - [Contributing](#contributing)
-  - [License](#license)
+-   [SPV Wallet](#spv-wallet)
+    -   [Table of Contents](#table-of-contents)
+    -   [About](#about)
+    -   [Installation](#installation)
+        -   [build](#build)
+        -   [run](#run)
+    -   [Documentation](#documentation)
+        -   [Built-in Features](#built-in-features)
+        -   [Automatic Releases on Tag Creation (recommended)](#automatic-releases-on-tag-creation-recommended)
+        -   [Manual Releases (optional)](#manual-releases-optional)
+    -   [Usage](#usage)
+        -   [Defaults](#defaults)
+        -   [Config Variables](#config-variables)
+            -   [Flags](#flags)
+            -   [Environment variables](#environment-variables)
+        -   [Examples \& Tests](#examples--tests)
+        -   [Benchmarks](#benchmarks)
+        -   [Docker Compose Quickstart](#docker-compose-quickstart)
+    -   [Code Standards](#code-standards)
+    -   [Contributing](#contributing)
+    -   [License](#license)
 
 <br/>
 
@@ -71,6 +70,7 @@ go build -o spv-wallet cmd/*
 ```shell script
 ./spv-wallet
 ```
+
 <br/>
 
 ## Documentation
@@ -207,15 +207,14 @@ vet                           Run the Go vet application
 
 > Every variable which is used and can be configured is described in [config.example.yaml](config.example.yaml)
 
-
 ### Defaults
 
 If you run spv-wallet without editing anything, it will use the default configuration from file [defaults.go](/config/defaults.go). It is set up to use _freecache_, _sqlite_ with enabled _paymail_ with _signing disabled_ and with _beef_.
 
-
 ### Config Variables
 
 Default config variables can be overridden by (in this order of importance):
+
 1. Flags (only the ones below)
 2. ENV variables
 3. Config file
@@ -232,18 +231,20 @@ Available flags:
 ```
 
 To generate config file with defaults, use the --dump flag, or:
+
 ```bash
 go run ./cmd/main.go -d
 ```
 
 The default config file path is **project root**, and the default file name is **config.yaml**. This can be overridden by -C flag.
+
 ```bash
 go run ./cmd/main.go -C /my/config.json
 ```
 
 #### Environment variables
 
-To override any config variable with ENV, use the "SPVWALLET\_" prefix with mapstructure annotation path with "_" as a delimiter in all uppercase. Example:
+To override any config variable with ENV, use the "SPVWALLET\_" prefix with mapstructure annotation path with "\_" as a delimiter in all uppercase. Example:
 
 Let's take this fragment of AppConfig from `config.example.yaml`:
 
@@ -252,18 +253,17 @@ auth:
     admin_key: xpub661MyMwAqRbcFgfmdkPgE2m5UjHXu9dj124DbaGLSjaqVESTWfCD4VuNmEbVPkbYLCkykwVZvmA8Pbf8884TQr1FgdG2nPoHR8aB36YdDQh
     require_signing: false
     scheme: xpub
-    signing_disabled: true
 ```
 
-To override admin_key in auth config, use the path with "_" as a path delimiter and SPVWALLET\_ as prefix. So:
+To override admin*key in auth config, use the path with "*" as a path delimiter and SPVWALLET\_ as prefix. So:
+
 ```bash
 SPVWALLET_AUTH_ADMIN_KEY="admin_key"
 ```
 
-To be able to use TAAL API Key is needed. 
+To be able to use TAAL API Key is needed.
 
 To get and API Key:
-
 
 1. Enter the URL https://platform.taal.com/ in your browser.
 2. Register or login on to TAAL PLATFORM.
@@ -271,10 +271,9 @@ To get and API Key:
 
 https://docs.taal.com/introduction/get-an-api-key
 
-To use your API key put key in ``token`` field in ```config.example.yaml```
+To use your API key put key in `token` field in `config.example.yaml`
 
-``nodes`` -> ``apis`` -> ``token``
-
+`nodes` -> `apis` -> `token`
 
 <br/>
 
@@ -299,6 +298,7 @@ Run tests (excluding integration tests)
 ```shell script
 make test-short
 ```
+
 <br/>
 
 ### Benchmarks
@@ -319,42 +319,48 @@ which is using `docker-compose.yml` file to starts up `SPV Wallet` with web-fron
 Main configuration is done when running the script.
 
 There are two way of running this script:
+
 1. with manual configuration - Every option is displayed in terminal and user can choose
    which database/cache storage use and configure how to run spv-wallet.
-  ```bash
-  ./start.sh
-  ```
+
+```bash
+./start.sh
+```
+
 2. with flags which define how to set up docker services. Ever option is displayed when
    you ran the script with flag `-h` or `--help`. Possible options:
-  ```bash
-  ./start.sh -db postgresql -c redis -sw true -b false 
-  ```
+
+```bash
+./start.sh -db postgresql -c redis -sw true -b false
+```
 
 `-l/--load` option add possibility to use previously created `.env.config` file and run spv-wallet with simple command:
-  ```bash
-  ./start.sh -l
-  ```
 
+```bash
+./start.sh -l
+```
 
 Ports which are used:
 
-- 3002 - SPV Wallet web-frontend
-- 8180 - SPV Wallet web-backend
-- 3003 - SPV Wallet (core service)
-- 3000 - SPV Wallet admin
-- 5432 - PostgreSQL DB
-- 6379 - Redis
-- 8080 - Block Headers Service
-- 80 - in case of exposing on the paymail domain and its subdomains
-- 443 - in case of exposing on the paymail domain and its subdomains
-<br/>
+-   3002 - SPV Wallet web-frontend
+-   8180 - SPV Wallet web-backend
+-   3003 - SPV Wallet (core service)
+-   3000 - SPV Wallet admin
+-   5432 - PostgreSQL DB
+-   6379 - Redis
+-   8080 - Block Headers Service
+-   80 - in case of exposing on the paymail domain and its subdomains
+-   443 - in case of exposing on the paymail domain and its subdomains
+    <br/>
 
 ## Code Standards
+
 Read more about this Go project's [code standards](.github/CODE_STANDARDS.md).
 
 <br/>
 
 ## Contributing
+
 All kinds of contributions are welcome!
 <br/>
 To get started, take a look at [code standards](.github/CODE_STANDARDS.md).

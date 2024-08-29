@@ -6,7 +6,7 @@ import (
 
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/bitcoin-sv/spv-wallet/mappings"
-	"github.com/bitcoin-sv/spv-wallet/server/auth"
+	"github.com/bitcoin-sv/spv-wallet/server/reqctx"
 	"github.com/gin-gonic/gin"
 )
 
@@ -23,24 +23,24 @@ import (
 // @Failure 	500	"Internal Server Error - Error while fetching utxo"
 // @Router		/v1/utxo [get]
 // @Security	x-auth-xpub
-func (a *Action) get(c *gin.Context) {
-	reqXPubID := c.GetString(auth.ParamXPubHashKey)
+func get(c *gin.Context, userContext *reqctx.UserContext) {
+	logger := reqctx.Logger(c)
 	txID := c.Query("tx_id")
 	outputIndex := c.Query("output_index")
 	outputIndex64, err := strconv.ParseUint(outputIndex, 10, 32)
 	if err != nil {
-		spverrors.ErrorResponse(c, err, a.Services.Logger)
+		spverrors.ErrorResponse(c, err, logger)
 		return
 	}
 
-	utxo, err := a.Services.SpvWalletEngine.GetUtxo(
+	utxo, err := reqctx.Engine(c).GetUtxo(
 		c.Request.Context(),
-		reqXPubID,
+		userContext.GetXPubID(),
 		txID,
 		uint32(outputIndex64),
 	)
 	if err != nil {
-		spverrors.ErrorResponse(c, err, a.Services.Logger)
+		spverrors.ErrorResponse(c, err, logger)
 		return
 	}
 

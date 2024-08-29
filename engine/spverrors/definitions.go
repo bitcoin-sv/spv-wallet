@@ -55,6 +55,9 @@ var ErrGettingAddressFromPublicKey = models.SPVError{Message: "error getting add
 // ErrValidateXPub is when validation xpub
 var ErrValidateXPub = models.SPVError{Message: "error validation xpub", StatusCode: 401, Code: "error-unauthorized-xpub-invalid"}
 
+// ErrAdminAuthOnUserEndpoint is when admin authorization is used on user's endpoint
+var ErrAdminAuthOnUserEndpoint = models.SPVError{Message: "cannot call user's endpoints with admin authorization ", StatusCode: 401, Code: "error-admin-auth-on-user-endpoint"}
+
 // ////////////////////////////////// BINDING ERRORS
 
 // ErrCannotBindRequest is when request body cannot be bind into struct

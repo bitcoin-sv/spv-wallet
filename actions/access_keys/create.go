@@ -6,7 +6,7 @@ import (
 	"github.com/bitcoin-sv/spv-wallet/engine"
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/bitcoin-sv/spv-wallet/mappings"
-	"github.com/bitcoin-sv/spv-wallet/server/auth"
+	"github.com/bitcoin-sv/spv-wallet/server/reqctx"
 	"github.com/gin-gonic/gin"
 )
 
@@ -22,8 +22,8 @@ import (
 // @Failure 	500	"Internal server error - Error while creating new access key"
 // @DeprecatedRouter  /v1/access-key [post]
 // @Security	x-auth-xpub
-func (a *Action) oldCreate(c *gin.Context) {
-	a.createHelper(c, true)
+func oldCreate(c *gin.Context, userContext *reqctx.UserContext) {
+	createHelper(c, true, userContext.GetXPub())
 }
 
 // create will make a new model using the services defined in the action object
@@ -38,27 +38,26 @@ func (a *Action) oldCreate(c *gin.Context) {
 // @Failure 	500	"Internal server error - Error while creating new access key"
 // @Router		/api/v1/users/current/keys [post]
 // @Security	x-auth-xpub
-func (a *Action) create(c *gin.Context) {
-	a.createHelper(c, false)
+func create(c *gin.Context, userContext *reqctx.UserContext) {
+	createHelper(c, false, userContext.GetXPub())
 }
 
-func (a *Action) createHelper(c *gin.Context, snakeCase bool) {
-	reqXPub := c.GetString(auth.ParamXPubKey)
-
+func createHelper(c *gin.Context, snakeCase bool, xpub string) {
+	logger := reqctx.Logger(c)
 	var requestBody CreateAccessKey
 	if err := c.Bind(&requestBody); err != nil {
-		spverrors.ErrorResponse(c, spverrors.ErrCannotBindRequest, a.Services.Logger)
+		spverrors.ErrorResponse(c, spverrors.ErrCannotBindRequest, logger)
 		return
 	}
 
 	// Create a new accessKey
-	accessKey, err := a.Services.SpvWalletEngine.NewAccessKey(
+	accessKey, err := reqctx.Engine(c).NewAccessKey(
 		c.Request.Context(),
-		reqXPub,
+		xpub,
 		engine.WithMetadatas(requestBody.Metadata),
 	)
 	if err != nil {
-		spverrors.ErrorResponse(c, err, a.Services.Logger)
+		spverrors.ErrorResponse(c, err, logger)
 		return
 	}
 

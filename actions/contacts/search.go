@@ -10,7 +10,7 @@ import (
 	"github.com/bitcoin-sv/spv-wallet/models"
 	"github.com/bitcoin-sv/spv-wallet/models/filter"
 	"github.com/bitcoin-sv/spv-wallet/models/response"
-	"github.com/bitcoin-sv/spv-wallet/server/auth"
+	"github.com/bitcoin-sv/spv-wallet/server/reqctx"
 	"github.com/gin-gonic/gin"
 )
 
@@ -26,45 +26,46 @@ import (
 // @Failure 	500	"Internal server error - Error while searching for contacts"
 // @DeprecatedRouter  /v1/contact/search [post]
 // @Security	x-auth-xpub
-func (a *Action) search(c *gin.Context) {
-	reqXPubID := c.GetString(auth.ParamXPubHashKey)
+func search(c *gin.Context, userContext *reqctx.UserContext) {
+	logger := reqctx.Logger(c)
+	engine := reqctx.Engine(c)
 
 	var reqParams filter.SearchContacts
 	if err := c.Bind(&reqParams); err != nil {
-		spverrors.ErrorResponse(c, spverrors.ErrCannotBindRequest, a.Services.Logger)
+		spverrors.ErrorResponse(c, spverrors.ErrCannotBindRequest, logger)
 		return
 	}
 
 	conditions, err := reqParams.Conditions.ToDbConditions()
 	if err != nil {
-		spverrors.ErrorResponse(c, spverrors.ErrInvalidConditions, a.Services.Logger)
+		spverrors.ErrorResponse(c, spverrors.ErrInvalidConditions, logger)
 		return
 	}
 
 	reqParams.DefaultsIfNil()
 
-	contacts, err := a.Services.SpvWalletEngine.GetContactsByXpubID(
+	contacts, err := engine.GetContactsByXpubID(
 		c.Request.Context(),
-		reqXPubID,
+		userContext.GetXPubID(),
 		mappings.MapToMetadata(reqParams.Metadata),
 		conditions,
 		mappings.MapToQueryParams(reqParams.QueryParams),
 	)
 	if err != nil {
-		spverrors.ErrorResponse(c, err, a.Services.Logger)
+		spverrors.ErrorResponse(c, err, logger)
 		return
 	}
 
 	contracts := mappings.MapToOldContactContracts(contacts)
 
-	count, err := a.Services.SpvWalletEngine.GetContactsByXPubIDCount(
+	count, err := engine.GetContactsByXPubIDCount(
 		c.Request.Context(),
-		reqXPubID,
+		userContext.GetXPubID(),
 		mappings.MapToMetadata(reqParams.Metadata),
 		conditions,
 	)
 	if err != nil {
-		spverrors.ErrorResponse(c, err, a.Services.Logger)
+		spverrors.ErrorResponse(c, err, logger)
 		return
 	}
 
@@ -88,10 +89,8 @@ func (a *Action) search(c *gin.Context) {
 // @Failure 	500	"Internal server error - Error while searching for contacts"
 // @Router		/api/v1/contacts [get]
 // @Security	x-auth-xpub
-func (a *Action) getContacts(c *gin.Context) {
-	reqXPubID := c.GetString(auth.ParamXPubHashKey)
-
-	contacts, count := a.searchContacts(c, reqXPubID, "")
+func getContacts(c *gin.Context, userContext *reqctx.UserContext) {
+	contacts, count := searchContacts(c, userContext.GetXPubID(), "")
 	if contacts == nil {
 		return
 	}
@@ -126,17 +125,16 @@ func (a *Action) getContacts(c *gin.Context) {
 // @Failure 	500	"Internal server error - Error while searching for contacts"
 // @Router		/api/v1/contacts/{paymail} [get]
 // @Security	x-auth-xpub
-func (a *Action) getContactByPaymail(c *gin.Context) {
-	reqXPubID := c.GetString(auth.ParamXPubHashKey)
+func getContactByPaymail(c *gin.Context, userContext *reqctx.UserContext) {
 	paymail := c.Param("paymail")
 
-	contacts, _ := a.searchContacts(c, reqXPubID, paymail)
+	contacts, _ := searchContacts(c, userContext.GetXPubID(), paymail)
 	if contacts == nil {
 		return
 	}
 
 	if contacts == nil || len(contacts) != 1 {
-		spverrors.ErrorResponse(c, spverrors.ErrContactNotFound, a.Services.Logger)
+		spverrors.ErrorResponse(c, spverrors.ErrContactNotFound, reqctx.Logger(c))
 		return
 	}
 
@@ -146,7 +144,9 @@ func (a *Action) getContactByPaymail(c *gin.Context) {
 }
 
 // searchContacts - a helper function for searching contacts
-func (a *Action) searchContacts(c *gin.Context, reqXPubID string, paymail string) ([]*engine.Contact, int64) {
+func searchContacts(c *gin.Context, reqXPubID string, paymail string) ([]*engine.Contact, int64) {
+	logger := reqctx.Logger(c)
+	engine := reqctx.Engine(c)
 	var reqParams filter.SearchContacts
 
 	if paymail != "" {
@@ -157,19 +157,19 @@ func (a *Action) searchContacts(c *gin.Context, reqXPubID string, paymail string
 	}
 
 	if err := c.Bind(&reqParams); err != nil {
-		spverrors.ErrorResponse(c, spverrors.ErrCannotBindRequest, a.Services.Logger)
+		spverrors.ErrorResponse(c, spverrors.ErrCannotBindRequest, logger)
 		return nil, 0
 	}
 
 	conditions, err := reqParams.Conditions.ToDbConditions()
 	if err != nil {
-		spverrors.ErrorResponse(c, spverrors.ErrInvalidConditions, a.Services.Logger)
+		spverrors.ErrorResponse(c, spverrors.ErrInvalidConditions, logger)
 		return nil, 0
 	}
 
 	reqParams.DefaultsIfNil()
 
-	contacts, err := a.Services.SpvWalletEngine.GetContactsByXpubID(
+	contacts, err := engine.GetContactsByXpubID(
 		c.Request.Context(),
 		reqXPubID,
 		mappings.MapToMetadata(reqParams.Metadata),
@@ -177,18 +177,18 @@ func (a *Action) searchContacts(c *gin.Context, reqXPubID string, paymail string
 		mappings.MapToQueryParams(reqParams.QueryParams),
 	)
 	if err != nil {
-		spverrors.ErrorResponse(c, err, a.Services.Logger)
+		spverrors.ErrorResponse(c, err, logger)
 		return nil, 0
 	}
 
-	count, err := a.Services.SpvWalletEngine.GetContactsByXPubIDCount(
+	count, err := engine.GetContactsByXPubIDCount(
 		c.Request.Context(),
 		reqXPubID,
 		mappings.MapToMetadata(reqParams.Metadata),
 		conditions,
 	)
 	if err != nil {
-		spverrors.ErrorResponse(c, err, a.Services.Logger)
+		spverrors.ErrorResponse(c, err, logger)
 		return nil, 0
 	}
 

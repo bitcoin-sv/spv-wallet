@@ -5,7 +5,7 @@ import (
 
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/bitcoin-sv/spv-wallet/mappings"
-	"github.com/bitcoin-sv/spv-wallet/server/auth"
+	"github.com/bitcoin-sv/spv-wallet/server/reqctx"
 	"github.com/gin-gonic/gin"
 )
 
@@ -21,9 +21,9 @@ import (
 // @Failure 	500	"Internal server error - Error while revoking access key"
 // @DeprecatedRouter  /v1/access-key [delete]
 // @Security	x-auth-xpub
-func (a *Action) oldRevoke(c *gin.Context) {
+func oldRevoke(c *gin.Context, userContext *reqctx.UserContext) {
 	id := c.Query("id")
-	a.revokeHelper(c, id, true)
+	revokeHelper(c, id, true, userContext.GetXPub())
 }
 
 // revoke will revoke the intended model by id
@@ -38,26 +38,26 @@ func (a *Action) oldRevoke(c *gin.Context) {
 // @Failure 	500	"Internal server error - Error while revoking access key"
 // @Router		/api/v1/users/current/keys/{id} [delete]
 // @Security	x-auth-xpub
-func (a *Action) revoke(c *gin.Context) {
+func revoke(c *gin.Context, userContext *reqctx.UserContext) {
 	id := c.Params.ByName("id")
-	a.revokeHelper(c, id, false)
+	revokeHelper(c, id, false, userContext.GetXPub())
 }
 
-func (a *Action) revokeHelper(c *gin.Context, id string, snakeCase bool) {
-	reqXPub := c.GetString(auth.ParamXPubKey)
+func revokeHelper(c *gin.Context, id string, snakeCase bool, xpub string) {
+	logger := reqctx.Logger(c)
 
 	if id == "" {
-		spverrors.ErrorResponse(c, spverrors.ErrMissingFieldID, a.Services.Logger)
+		spverrors.ErrorResponse(c, spverrors.ErrMissingFieldID, logger)
 		return
 	}
 
-	accessKey, err := a.Services.SpvWalletEngine.RevokeAccessKey(
+	accessKey, err := reqctx.Engine(c).RevokeAccessKey(
 		c.Request.Context(),
-		reqXPub,
+		xpub,
 		id,
 	)
 	if err != nil {
-		spverrors.ErrorResponse(c, err, a.Services.Logger)
+		spverrors.ErrorResponse(c, err, logger)
 		return
 	}
 

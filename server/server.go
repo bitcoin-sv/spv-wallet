@@ -7,7 +7,6 @@ import (
 	"net/http"
 	"strconv"
 
-	"github.com/bitcoin-sv/spv-wallet/actions"
 	accesskeys "github.com/bitcoin-sv/spv-wallet/actions/access_keys"
 	"github.com/bitcoin-sv/spv-wallet/actions/admin"
 	"github.com/bitcoin-sv/spv-wallet/actions/base"
@@ -21,8 +20,8 @@ import (
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/bitcoin-sv/spv-wallet/logging"
 	"github.com/bitcoin-sv/spv-wallet/metrics"
-	"github.com/bitcoin-sv/spv-wallet/server/auth"
-	router "github.com/bitcoin-sv/spv-wallet/server/routes"
+	"github.com/bitcoin-sv/spv-wallet/server/handlers"
+	"github.com/bitcoin-sv/spv-wallet/server/middleware"
 	"github.com/gin-contrib/pprof"
 	"github.com/gin-gonic/gin"
 	"github.com/rs/zerolog"
@@ -105,7 +104,8 @@ func (s *Server) Handlers() *gin.Engine {
 	logging.SetGinWriters(&httpLogger)
 	engine := gin.New()
 	engine.Use(logging.GinMiddleware(&httpLogger), gin.Recovery())
-	engine.Use(auth.CorsMiddleware())
+	engine.Use(middleware.AppContextMiddleware(s.AppConfig, s.Services.SpvWalletEngine, s.Services.Logger))
+	engine.Use(middleware.CorsMiddleware())
 
 	metrics.SetupGin(engine)
 
@@ -123,93 +123,28 @@ func (s *Server) Handlers() *gin.Engine {
 
 // SetupServerRoutes will register endpoints for all models
 func SetupServerRoutes(appConfig *config.AppConfig, services *config.AppServices, engine *gin.Engine) {
-	adminRoutes := admin.NewHandler(appConfig, services)
-	baseRoutes := base.NewHandler()
+	handlersManager := handlers.NewManager(engine, config.APIVersion)
 
-	oldAccessKeyAPIRoutes := accesskeys.OldAccessKeysHandler(appConfig, services)
-	accessKeyAPIRoutes := accesskeys.NewHandler(appConfig, services)
-	destinationBasicRoutes, destinationAPIRoutes := destinations.NewHandler(appConfig, services)
-	transactionBasicRoutes, transactionAPIRoutes, transactionCallbackRoutes := transactions.OldTransactionsHandler(appConfig, services)
-	handler := transactions.NewHandler(appConfig, services)
-	utxoAPIRoutes := utxos.NewHandler(appConfig, services)
-	oldUsersAPIRoutes := users.OldUsersHandler(appConfig, services)
-	usersAPIRoutes := users.NewHandler(appConfig, services)
-	oldSharedConfigRoutes := sharedconfig.OldSharedConfigHandler(appConfig, services)
-	sharedConfigRoutes := sharedconfig.NewHandler(appConfig, services)
-
-	routes := []interface{}{
-		// Admin routes
-		adminRoutes,
-		// Base routes
-		baseRoutes,
-		// Access key routes
-		oldAccessKeyAPIRoutes,
-		accessKeyAPIRoutes,
-		// Destination routes
-		destinationBasicRoutes,
-		destinationAPIRoutes,
-		// Transaction routes
-		transactionBasicRoutes,
-		transactionAPIRoutes,
-		transactionCallbackRoutes,
-		// New Transactions routes
-		handler.BasicEndpoints,
-		handler.APIEndpoints,
-		// Utxo routes
-		utxoAPIRoutes,
-		// Users routes
-		oldUsersAPIRoutes,
-		usersAPIRoutes,
-		// Shared Config routes
-		oldSharedConfigRoutes,
-		sharedConfigRoutes,
-	}
-
+	admin.NewHandler(handlersManager)
+	base.NewHandler(handlersManager)
+	accesskeys.NewHandler(handlersManager)
+	destinations.NewHandler(handlersManager)
+	transactions.NewHandler(handlersManager)
+	utxos.NewHandler(handlersManager)
+	users.NewHandler(handlersManager)
+	sharedconfig.NewHandler(handlersManager)
 	if appConfig.ExperimentalFeatures.PikeContactsEnabled {
-		routes = append(routes, contacts.OldContactsHandler(appConfig, services))
-		contactsRoutes, invitationsRoutes := contacts.NewHandler(appConfig, services)
-		routes = append(routes, contactsRoutes, invitationsRoutes)
-	}
-
-	prefix := "/" + config.APIVersion
-	baseRouter := engine.Group("")
-	authRouter := engine.Group("", auth.BasicMiddleware(services.SpvWalletEngine, appConfig))
-	oldBasicAuthRouter := authRouter.Group(prefix, auth.SignatureMiddleware(appConfig, false, false))
-	basicAuthRouter := authRouter.Group("/api"+prefix, auth.SignatureMiddleware(appConfig, false, false))
-	oldAPIAuthRouter := authRouter.Group(prefix, auth.SignatureMiddleware(appConfig, true, false))
-	apiAuthRouter := authRouter.Group("/api"+prefix, auth.SignatureMiddleware(appConfig, true, false))
-	adminAuthRouter := authRouter.Group(prefix, auth.SignatureMiddleware(appConfig, true, true), auth.AdminMiddleware())
-	callbackAuthRouter := baseRouter.Group("", auth.CallbackTokenMiddleware(appConfig))
-
-	for _, r := range routes {
-		switch r := r.(type) {
-		case router.AdminEndpoints:
-			r.RegisterAdminEndpoints(adminAuthRouter)
-		case router.OldAPIEndpoints:
-			r.RegisterOldAPIEndpoints(oldAPIAuthRouter)
-		case router.APIEndpoints:
-			r.RegisterAPIEndpoints(apiAuthRouter)
-		case router.OldBasicEndpoints:
-			r.RegisterOldBasicEndpoints(oldBasicAuthRouter)
-		case router.BasicEndpoints:
-			r.RegisterBasicEndpoints(basicAuthRouter)
-		case router.BaseEndpoints:
-			r.RegisterBaseEndpoints(baseRouter)
-		case router.CallbackEndpoints:
-			r.RegisterCallbackEndpoints(callbackAuthRouter)
-		default:
-			panic(spverrors.Newf("unexpected router endpoints registrar"))
-		}
+		contacts.NewHandler(handlersManager)
 	}
 
 	// Register paymail routes
 	services.SpvWalletEngine.GetPaymailConfig().RegisterRoutes(engine)
 
 	// Set the 404 handler (any request not detected)
-	engine.NoRoute(metrics.NoRoute, actions.NotFound)
+	engine.NoRoute(metrics.NoRoute, NotFound)
 
 	// Set the method not allowed
-	engine.NoMethod(actions.MethodNotAllowed)
+	engine.NoMethod(MethodNotAllowed)
 
 	registerSwaggerEndpoints(engine)
 

@@ -5,7 +5,7 @@ import (
 
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/bitcoin-sv/spv-wallet/mappings"
-	"github.com/bitcoin-sv/spv-wallet/server/auth"
+	"github.com/bitcoin-sv/spv-wallet/server/reqctx"
 	"github.com/gin-gonic/gin"
 )
 
@@ -20,23 +20,23 @@ import (
 // @Failure 	500	"Internal Server Error - Error while fetching transaction"
 // @DeprecatedRouter	/v1/transaction [get]
 // @Security	x-auth-xpub
-func (a *Action) get(c *gin.Context) {
+func get(c *gin.Context, userContext *reqctx.UserContext) {
+	logger := reqctx.Logger(c)
 	id := c.Query("id")
-	reqXPubID := c.GetString(auth.ParamXPubHashKey)
 
-	transaction, err := a.Services.SpvWalletEngine.GetTransaction(
+	transaction, err := reqctx.Engine(c).GetTransaction(
 		c.Request.Context(),
-		reqXPubID,
+		userContext.GetXPubID(),
 		id,
 	)
 	if err != nil {
-		spverrors.ErrorResponse(c, err, a.Services.Logger)
+		spverrors.ErrorResponse(c, err, logger)
 		return
 	} else if transaction == nil {
-		spverrors.ErrorResponse(c, spverrors.ErrCouldNotFindTransaction, a.Services.Logger)
+		spverrors.ErrorResponse(c, spverrors.ErrCouldNotFindTransaction, logger)
 		return
-	} else if !transaction.IsXpubIDAssociated(reqXPubID) {
-		spverrors.ErrorResponse(c, spverrors.ErrAuthorization, a.Services.Logger)
+	} else if !transaction.IsXpubIDAssociated(userContext.GetXPubID()) {
+		spverrors.ErrorResponse(c, spverrors.ErrAuthorization, logger)
 		return
 	}
 
@@ -56,23 +56,23 @@ func (a *Action) get(c *gin.Context) {
 // @Failure 	500	"Internal Server Error - Error while fetching transaction"
 // @Router		/api/v1/transactions/{id} [get]
 // @Security	x-auth-xpub
-func (a *Action) getByID(c *gin.Context) {
+func getByID(c *gin.Context, userContext *reqctx.UserContext) {
+	logger := reqctx.Logger(c)
 	id := c.Param("id")
-	reqXPubID := c.GetString(auth.ParamXPubHashKey)
 
-	transaction, err := a.Services.SpvWalletEngine.GetTransaction(
+	transaction, err := reqctx.Engine(c).GetTransaction(
 		c.Request.Context(),
-		reqXPubID,
+		userContext.GetXPubID(),
 		id,
 	)
 	if err != nil {
-		spverrors.ErrorResponse(c, err, a.Services.Logger)
+		spverrors.ErrorResponse(c, err, logger)
 		return
 	} else if transaction == nil {
-		spverrors.ErrorResponse(c, spverrors.ErrCouldNotFindTransaction, a.Services.Logger)
+		spverrors.ErrorResponse(c, spverrors.ErrCouldNotFindTransaction, logger)
 		return
-	} else if !transaction.IsXpubIDAssociated(reqXPubID) {
-		spverrors.ErrorResponse(c, spverrors.ErrAuthorization, a.Services.Logger)
+	} else if !transaction.IsXpubIDAssociated(userContext.GetXPubID()) {
+		spverrors.ErrorResponse(c, spverrors.ErrAuthorization, logger)
 		return
 	}
 

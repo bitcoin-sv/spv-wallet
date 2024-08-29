@@ -1,58 +1,31 @@
 package contacts
 
 import (
-	"github.com/bitcoin-sv/spv-wallet/actions"
-	"github.com/bitcoin-sv/spv-wallet/config"
-	"github.com/bitcoin-sv/spv-wallet/server/routes"
-	"github.com/gin-gonic/gin"
+	"github.com/bitcoin-sv/spv-wallet/server/handlers"
+	"github.com/bitcoin-sv/spv-wallet/server/middleware"
 )
 
-// Action is an extension of actions.Action for this package
-type Action struct {
-	actions.Action
-}
-
-// OldContactsHandler creates the specific package routes
-func OldContactsHandler(appConfig *config.AppConfig, services *config.AppServices) routes.OldAPIEndpointsFunc {
-	action := &Action{actions.Action{AppConfig: appConfig, Services: services}}
-
-	apiEndpoints := routes.OldAPIEndpointsFunc(func(router *gin.RouterGroup) {
-		group := router.Group("/contact")
-		group.PUT("/:paymail", action.oldUpsert)
-
-		group.PATCH("/accepted/:paymail", action.oldAccept)
-		group.PATCH("/rejected/:paymail", action.oldReject)
-		group.PATCH("/confirmed/:paymail", action.oldConfirm)
-		group.PATCH("/unconfirmed/:paymail", action.oldUnconfirm)
-
-		group.POST("search", action.search)
-	})
-
-	return apiEndpoints
-}
-
 // NewHandler creates the specific package routes
-func NewHandler(appConfig *config.AppConfig, services *config.AppServices) (routes.APIEndpointsFunc, routes.APIEndpointsFunc) {
-	action := &Action{actions.Action{AppConfig: appConfig, Services: services}}
+func NewHandler(handlersManager *handlers.Manager) {
+	old := handlersManager.Group(handlers.GroupOldAPI, "/contact")
+	old.PUT("/:paymail", handlers.AsUser(oldUpsert))
+	old.PATCH("/accepted/:paymail", handlers.AsUser(oldAccept))
+	old.PATCH("/rejected/:paymail", handlers.AsUser(oldReject))
+	old.PATCH("/confirmed/:paymail", handlers.AsUser(oldConfirm))
+	old.PATCH("/unconfirmed/:paymail", handlers.AsUser(oldUnconfirm))
+	old.POST("search", handlers.AsUser(search))
 
-	contactsAPIEndpoints := routes.APIEndpointsFunc(func(router *gin.RouterGroup) {
-		group := router.Group("/contacts")
-		group.PUT("/:paymail", action.upsertContact)
-		group.DELETE("/:paymail", action.removeContact)
+	groupContacts := handlersManager.Group(handlers.GroupAPI, "/contacts")
+	groupContacts.PUT("/:paymail", handlers.AsUser(upsertContact))
+	groupContacts.DELETE("/:paymail", handlers.AsUser(removeContact))
 
-		group.POST("/:paymail/confirmation", action.confirmContact)
-		group.DELETE("/:paymail/confirmation", action.unconfirmContact)
+	groupContacts.POST("/:paymail/confirmation", middleware.RequireSignature, handlers.AsUser(confirmContact))
+	groupContacts.DELETE("/:paymail/confirmation", handlers.AsUser(unconfirmContact))
 
-		group.GET("", action.getContacts)
-		group.GET(":paymail", action.getContactByPaymail)
-	})
+	groupContacts.GET("", handlers.AsUser(getContacts))
+	groupContacts.GET(":paymail", handlers.AsUser(getContactByPaymail))
 
-	invitationsAPIEndpoints := routes.APIEndpointsFunc(func(router *gin.RouterGroup) {
-		group := router.Group("/invitations")
-
-		group.POST("/:paymail/contacts", action.acceptInvitations)
-		group.DELETE("/:paymail", action.rejectInvitation)
-
-	})
-	return contactsAPIEndpoints, invitationsAPIEndpoints
+	groupInvitations := handlersManager.Group(handlers.GroupAPI, "/invitations")
+	groupInvitations.POST("/:paymail/contacts", middleware.RequireSignature, handlers.AsUser(acceptInvitations))
+	groupInvitations.DELETE("/:paymail", handlers.AsUser(rejectInvitation))
 }

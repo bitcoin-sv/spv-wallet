@@ -1,24 +1,26 @@
 package base
 
 import (
-	"github.com/bitcoin-sv/spv-wallet/actions"
+	"net/http"
+
 	"github.com/bitcoin-sv/spv-wallet/config"
-	"github.com/bitcoin-sv/spv-wallet/server/routes"
+	"github.com/bitcoin-sv/spv-wallet/server/handlers"
 	"github.com/gin-gonic/gin"
 )
 
 // NewHandler creates the specific package routes
-func NewHandler() routes.BaseEndpointsFunc {
-	basicEndpoints := routes.BaseEndpointsFunc(func(router *gin.RouterGroup) {
-		router.GET("/", index)
-		router.OPTIONS("/", actions.StatusOK)
-		router.HEAD("/", actions.StatusOK)
+func NewHandler(handlersManager *handlers.Manager) {
+	root := handlersManager.Get(handlers.GroupRoot)
+	root.GET("/", index)
+	root.OPTIONS("/", statusOK)
+	root.HEAD("/", statusOK)
 
-		healthGroup := router.Group("/" + config.HealthRequestPath)
-		healthGroup.GET("", actions.StatusOK)
-		healthGroup.OPTIONS("", actions.StatusOK)
-		healthGroup.HEAD("", actions.StatusOK)
-	})
+	healthGroup := handlersManager.Group(handlers.GroupRoot, "/"+config.HealthRequestPath)
+	healthGroup.GET("", statusOK)
+	healthGroup.OPTIONS("", statusOK)
+	healthGroup.HEAD("", statusOK)
+}
 
-	return basicEndpoints
+func statusOK(c *gin.Context) {
+	c.Status(http.StatusOK)
 }

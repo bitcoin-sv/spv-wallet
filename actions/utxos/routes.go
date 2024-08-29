@@ -1,27 +1,14 @@
 package utxos
 
 import (
-	"github.com/bitcoin-sv/spv-wallet/actions"
-	"github.com/bitcoin-sv/spv-wallet/config"
-	"github.com/bitcoin-sv/spv-wallet/server/routes"
-	"github.com/gin-gonic/gin"
+	"github.com/bitcoin-sv/spv-wallet/server/handlers"
+	routes "github.com/bitcoin-sv/spv-wallet/server/handlers"
 )
 
-// Action is an extension of actions.Action for this package
-type Action struct {
-	actions.Action
-}
-
 // NewHandler creates the specific package routes
-func NewHandler(appConfig *config.AppConfig, services *config.AppServices) routes.OldAPIEndpointsFunc {
-	action := &Action{actions.Action{AppConfig: appConfig, Services: services}}
-
-	apiEndpoints := routes.OldAPIEndpointsFunc(func(router *gin.RouterGroup) {
-		utxoGroup := router.Group("/utxo")
-		utxoGroup.GET("", action.get)
-		utxoGroup.POST("/count", action.count)
-		utxoGroup.POST("/search", action.search)
-	})
-
-	return apiEndpoints
+func NewHandler(handlersManager *routes.Manager) {
+	roGroup := handlersManager.Group(routes.GroupOldAPI, "/utxo")
+	roGroup.GET("", handlers.AsUser(get))
+	roGroup.POST("/count", handlers.AsUser(count))
+	roGroup.POST("/search", handlers.AsUser(search))
 }

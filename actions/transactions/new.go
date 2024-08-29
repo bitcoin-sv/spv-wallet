@@ -6,7 +6,7 @@ import (
 	"github.com/bitcoin-sv/spv-wallet/engine"
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/bitcoin-sv/spv-wallet/mappings"
-	"github.com/bitcoin-sv/spv-wallet/server/auth"
+	"github.com/bitcoin-sv/spv-wallet/server/reqctx"
 	"github.com/gin-gonic/gin"
 )
 
@@ -22,25 +22,18 @@ import (
 // @Failure 	500	"Internal Server Error - Error while creating transaction"
 // @DeprecatedRouter	/v1/transaction [post]
 // @Security	x-auth-xpub
-func (a *Action) newTransaction(c *gin.Context) {
-	reqXPub := c.GetString(auth.ParamXPubKey)
-
-	xPub, err := a.Services.SpvWalletEngine.GetXpub(c.Request.Context(), reqXPub)
-	if err != nil {
-		spverrors.ErrorResponse(c, err, a.Services.Logger)
-		return
-	} else if xPub == nil {
-		spverrors.ErrorResponse(c, spverrors.ErrCouldNotFindXpub, a.Services.Logger)
-		return
-	}
+func newTransaction(c *gin.Context, userContext *reqctx.UserContext) {
+	logger := reqctx.Logger(c)
+	engineInstance := reqctx.Engine(c)
 
 	var requestBody OldNewDraftTransaction
-	if err = c.Bind(&requestBody); err != nil {
-		spverrors.ErrorResponse(c, spverrors.ErrCannotBindRequest, a.Services.Logger)
+	err := c.Bind(&requestBody)
+	if err != nil {
+		spverrors.ErrorResponse(c, spverrors.ErrCannotBindRequest, logger)
 		return
 	}
 
-	opts := a.Services.SpvWalletEngine.DefaultModelOptions()
+	opts := engineInstance.DefaultModelOptions()
 	if requestBody.Metadata != nil {
 		opts = append(opts, engine.WithMetadatas(requestBody.Metadata))
 	}
@@ -48,13 +41,13 @@ func (a *Action) newTransaction(c *gin.Context) {
 	txConfig := mappings.MapOldTransactionConfigEngineToModel(&requestBody.Config)
 
 	var transaction *engine.DraftTransaction
-	if transaction, err = a.Services.SpvWalletEngine.NewTransaction(
+	if transaction, err = engineInstance.NewTransaction(
 		c.Request.Context(),
-		xPub.RawXpub(),
+		userContext.GetXPub(),
 		txConfig,
 		opts...,
 	); err != nil {
-		spverrors.ErrorResponse(c, err, a.Services.Logger)
+		spverrors.ErrorResponse(c, err, logger)
 		return
 	}
 
@@ -74,25 +67,18 @@ func (a *Action) newTransaction(c *gin.Context) {
 // @Failure 	500	"Internal Server Error - Error while creating transaction"
 // @Router		/api/v1/transactions/drafts [post]
 // @Security	x-auth-xpub
-func (a *Action) newTransactionDraft(c *gin.Context) {
-	reqXPub := c.GetString(auth.ParamXPubKey)
-
-	xPub, err := a.Services.SpvWalletEngine.GetXpub(c.Request.Context(), reqXPub)
-	if err != nil {
-		spverrors.ErrorResponse(c, err, a.Services.Logger)
-		return
-	} else if xPub == nil {
-		spverrors.ErrorResponse(c, spverrors.ErrCouldNotFindXpub, a.Services.Logger)
-		return
-	}
+func newTransactionDraft(c *gin.Context, userContext *reqctx.UserContext) {
+	logger := reqctx.Logger(c)
+	engineInstance := reqctx.Engine(c)
 
 	var requestBody NewDraftTransaction
-	if err = c.Bind(&requestBody); err != nil {
-		spverrors.ErrorResponse(c, spverrors.ErrCannotBindRequest, a.Services.Logger)
+	err := c.Bind(&requestBody)
+	if err != nil {
+		spverrors.ErrorResponse(c, spverrors.ErrCannotBindRequest, logger)
 		return
 	}
 
-	opts := a.Services.SpvWalletEngine.DefaultModelOptions()
+	opts := engineInstance.DefaultModelOptions()
 	if requestBody.Metadata != nil {
 		opts = append(opts, engine.WithMetadatas(requestBody.Metadata))
 	}
@@ -100,13 +86,13 @@ func (a *Action) newTransactionDraft(c *gin.Context) {
 	txConfig := mappings.MapTransactionConfigEngineToModel(&requestBody.Config)
 
 	var transaction *engine.DraftTransaction
-	if transaction, err = a.Services.SpvWalletEngine.NewTransaction(
+	if transaction, err = engineInstance.NewTransaction(
 		c.Request.Context(),
-		xPub.RawXpub(),
+		userContext.GetXPub(),
 		txConfig,
 		opts...,
 	); err != nil {
-		spverrors.ErrorResponse(c, err, a.Services.Logger)
+		spverrors.ErrorResponse(c, err, logger)
 		return
 	}
 

@@ -3,6 +3,8 @@ package base
 import (
 	"testing"
 
+	"github.com/bitcoin-sv/spv-wallet/config"
+	"github.com/bitcoin-sv/spv-wallet/server/handlers"
 	"github.com/bitcoin-sv/spv-wallet/tests"
 	"github.com/stretchr/testify/suite"
 )
@@ -26,9 +28,8 @@ func (ts *TestSuite) TearDownSuite() {
 func (ts *TestSuite) SetupTest() {
 	ts.BaseSetupTest()
 
-	// Load the router & register routes
-	routes := NewHandler()
-	routes.RegisterBaseEndpoints(ts.Router.Group(""))
+	handlersManager := handlers.NewManager(ts.Router, config.APIVersion)
+	NewHandler(handlersManager)
 }
 
 // TearDownTest runs after each test

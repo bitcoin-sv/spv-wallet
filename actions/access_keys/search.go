@@ -10,7 +10,7 @@ import (
 	"github.com/bitcoin-sv/spv-wallet/models"
 	"github.com/bitcoin-sv/spv-wallet/models/filter"
 	"github.com/bitcoin-sv/spv-wallet/models/response"
-	"github.com/bitcoin-sv/spv-wallet/server/auth"
+	"github.com/bitcoin-sv/spv-wallet/server/reqctx"
 	"github.com/gin-gonic/gin"
 )
 
@@ -26,24 +26,24 @@ import (
 // @Failure 	500	"Internal server error - Error while searching for access keys"
 // @DeprecatedRouter  /v1/access-key/search [post]
 // @Security	x-auth-xpub
-func (a *Action) oldSearch(c *gin.Context) {
-	reqXPubID := c.GetString(auth.ParamXPubHashKey)
+func oldSearch(c *gin.Context, userContext *reqctx.UserContext) {
+	logger := reqctx.Logger(c)
 
 	var reqParams filter.SearchAccessKeys
 	if err := c.Bind(&reqParams); err != nil {
-		spverrors.ErrorResponse(c, spverrors.ErrCannotBindRequest, a.Services.Logger)
+		spverrors.ErrorResponse(c, spverrors.ErrCannotBindRequest, logger)
 		return
 	}
 
-	accessKeys, err := a.Services.SpvWalletEngine.GetAccessKeysByXPubID(
+	accessKeys, err := reqctx.Engine(c).GetAccessKeysByXPubID(
 		c.Request.Context(),
-		reqXPubID,
+		userContext.GetXPubID(),
 		mappings.MapToMetadata(reqParams.Metadata),
 		reqParams.Conditions.ToDbConditions(),
 		mappings.MapToQueryParams(reqParams.QueryParams),
 	)
 	if err != nil {
-		spverrors.ErrorResponse(c, err, a.Services.Logger)
+		spverrors.ErrorResponse(c, err, logger)
 		return
 	}
 
@@ -70,12 +70,13 @@ func (a *Action) oldSearch(c *gin.Context) {
 // @Failure 	500	"Internal server error - Error while searching for access keys"
 // @Router		/api/v1//users/current/keys [get]
 // @Security	x-auth-xpub
-func (a *Action) search(c *gin.Context) {
-	reqXPubID := c.GetString(auth.ParamXPubHashKey)
+func search(c *gin.Context, userContext *reqctx.UserContext) {
+	logger := reqctx.Logger(c)
+	engine := reqctx.Engine(c)
 
 	searchParams, err := query.ParseSearchParams[filter.AccessKeyFilter](c)
 	if err != nil {
-		spverrors.ErrorResponse(c, spverrors.ErrCannotParseQueryParams, a.Services.Logger)
+		spverrors.ErrorResponse(c, spverrors.ErrCannotParseQueryParams, logger)
 		return
 	}
 
@@ -83,15 +84,15 @@ func (a *Action) search(c *gin.Context) {
 	metadata := mappings.MapToMetadata(searchParams.Metadata)
 	pageOptions := mappings.MapToDbQueryParams(&searchParams.Page)
 
-	accessKeys, err := a.Services.SpvWalletEngine.GetAccessKeysByXPubID(
+	accessKeys, err := engine.GetAccessKeysByXPubID(
 		c.Request.Context(),
-		reqXPubID,
+		userContext.GetXPub(),
 		metadata,
 		conditions,
 		pageOptions,
 	)
 	if err != nil {
-		spverrors.ErrorResponse(c, err, a.Services.Logger)
+		spverrors.ErrorResponse(c, err, logger)
 		return
 	}
 
@@ -100,9 +101,9 @@ func (a *Action) search(c *gin.Context) {
 		accessKeyContracts = append(accessKeyContracts, mappings.MapToAccessKeyContract(accessKey))
 	}
 
-	count, err := a.Services.SpvWalletEngine.GetAccessKeysByXPubIDCount(
+	count, err := engine.GetAccessKeysByXPubIDCount(
 		c.Request.Context(),
-		reqXPubID,
+		userContext.GetXPub(),
 		metadata,
 		conditions,
 	)

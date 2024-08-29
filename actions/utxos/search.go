@@ -8,7 +8,7 @@ import (
 	"github.com/bitcoin-sv/spv-wallet/mappings"
 	"github.com/bitcoin-sv/spv-wallet/models"
 	"github.com/bitcoin-sv/spv-wallet/models/filter"
-	"github.com/bitcoin-sv/spv-wallet/server/auth"
+	"github.com/bitcoin-sv/spv-wallet/server/reqctx"
 	"github.com/gin-gonic/gin"
 )
 
@@ -24,30 +24,30 @@ import (
 // @Failure 	500	"Internal server error - Error while searching for utxos"
 // @Router		/v1/utxo/search [post]
 // @Security	x-auth-xpub
-func (a *Action) search(c *gin.Context) {
-	reqXPubID := c.GetString(auth.ParamXPubHashKey)
+func search(c *gin.Context, userContext *reqctx.UserContext) {
+	logger := reqctx.Logger(c)
 
 	var reqParams filter.SearchUtxos
 	if err := c.Bind(&reqParams); err != nil {
-		spverrors.ErrorResponse(c, spverrors.ErrCannotBindRequest, a.Services.Logger)
+		spverrors.ErrorResponse(c, spverrors.ErrCannotBindRequest, logger)
 		return
 	}
 
 	conditions, err := reqParams.Conditions.ToDbConditions()
 	if err != nil {
-		spverrors.ErrorResponse(c, spverrors.ErrInvalidConditions, a.Services.Logger)
+		spverrors.ErrorResponse(c, spverrors.ErrInvalidConditions, logger)
 		return
 	}
 
 	var utxos []*engine.Utxo
-	if utxos, err = a.Services.SpvWalletEngine.GetUtxosByXpubID(
+	if utxos, err = reqctx.Engine(c).GetUtxosByXpubID(
 		c.Request.Context(),
-		reqXPubID,
+		userContext.GetXPubID(),
 		mappings.MapToMetadata(reqParams.Metadata),
 		conditions,
 		mappings.MapToQueryParams(reqParams.QueryParams),
 	); err != nil {
-		spverrors.ErrorResponse(c, err, a.Services.Logger)
+		spverrors.ErrorResponse(c, err, logger)
 		return
 	}
 

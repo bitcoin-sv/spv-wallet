@@ -6,6 +6,7 @@ import (
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/bitcoin-sv/spv-wallet/mappings"
 	"github.com/bitcoin-sv/spv-wallet/models"
+	"github.com/bitcoin-sv/spv-wallet/server/reqctx"
 	"github.com/gin-gonic/gin"
 )
 
@@ -19,16 +20,16 @@ import (
 // @Failure 	500	"Internal server error - Error while subscribing to the webhook"
 // @Router		/v1/admin/webhooks/subscriptions [post]
 // @Security	x-auth-xpub
-func (a *Action) subscribeWebhook(c *gin.Context) {
+func subscribeWebhook(c *gin.Context, _ *reqctx.AdminContext) {
 	requestBody := models.SubscribeRequestBody{}
 	if err := c.Bind(&requestBody); err != nil {
 		c.JSON(http.StatusBadRequest, err.Error())
 		return
 	}
 
-	err := a.Services.SpvWalletEngine.SubscribeWebhook(c.Request.Context(), requestBody.URL, requestBody.TokenHeader, requestBody.TokenValue)
+	err := reqctx.Engine(c).SubscribeWebhook(c.Request.Context(), requestBody.URL, requestBody.TokenHeader, requestBody.TokenValue)
 	if err != nil {
-		spverrors.ErrorResponse(c, err, a.Services.Logger)
+		spverrors.ErrorResponse(c, err, reqctx.Logger(c))
 		return
 	}
 
@@ -45,16 +46,16 @@ func (a *Action) subscribeWebhook(c *gin.Context) {
 // @Failure 	500	"Internal server error - Error while unsubscribing to the webhook"
 // @Router		/v1/admin/webhooks/subscriptions [delete]
 // @Security	x-auth-xpub
-func (a *Action) unsubscribeWebhook(c *gin.Context) {
+func unsubscribeWebhook(c *gin.Context, _ *reqctx.AdminContext) {
 	requestModel := models.UnsubscribeRequestBody{}
 	if err := c.Bind(&requestModel); err != nil {
 		c.JSON(http.StatusBadRequest, err.Error())
 		return
 	}
 
-	err := a.Services.SpvWalletEngine.UnsubscribeWebhook(c.Request.Context(), requestModel.URL)
+	err := reqctx.Engine(c).UnsubscribeWebhook(c.Request.Context(), requestModel.URL)
 	if err != nil {
-		spverrors.ErrorResponse(c, err, a.Services.Logger)
+		spverrors.ErrorResponse(c, err, reqctx.Logger(c))
 		return
 	}
 
@@ -70,10 +71,10 @@ func (a *Action) unsubscribeWebhook(c *gin.Context) {
 // @Failure 	500	"Internal server error - Error while getting all webhooks"
 // @Router		/v1/admin/webhooks/subscriptions [get]
 // @Security	x-auth-xpub
-func (a *Action) getAllWebhooks(c *gin.Context) {
-	wh, err := a.Services.SpvWalletEngine.GetWebhooks(c.Request.Context())
+func getAllWebhooks(c *gin.Context, _ *reqctx.AdminContext) {
+	wh, err := reqctx.Engine(c).GetWebhooks(c.Request.Context())
 	if err != nil {
-		spverrors.ErrorResponse(c, err, a.Services.Logger)
+		spverrors.ErrorResponse(c, err, reqctx.Logger(c))
 		return
 	}
 
