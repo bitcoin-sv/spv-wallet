@@ -1,20 +1,21 @@
 package query
 
-import "github.com/gin-gonic/gin"
+import (
+	"github.com/gin-gonic/gin"
+)
 
-// QueryNestedMap returns a map for a given query key.
+//revive:disable:exported We want to mimic the gin API.
+
+// ShouldGetQueryNestedMap returns a map from query params.
 // In contrast to QueryMap it handles nesting in query maps like key[foo][bar]=value.
-//
-//revive:disable:exported We want to mimic the gin API
-func QueryNestedMap(c *gin.Context, key string) (dicts map[string]interface{}) {
-	dicts, _ = GetQueryNestedMap(c, key)
-	return
+func ShouldGetQueryNestedMap(c *gin.Context) (dict map[string]any, err error) {
+	return ShouldGetQueryNestedMapForKey(c, "")
 }
 
-// GetQueryNestedMap returns a map for a given query key, plus a boolean value
-// whether at least one value exists for the given key.
-// In contrast to GetQueryMap it handles nesting in query maps like key[foo][bar]=value.
-func GetQueryNestedMap(c *gin.Context, key string) (map[string]interface{}, bool) {
+// ShouldGetQueryNestedMapForKey returns a map from query params for a given query key.
+// In contrast to QueryMap it handles nesting in query maps like key[foo][bar]=value.
+// Similar to ShouldGetQueryNestedMap but it returns only the map for the given key.
+func ShouldGetQueryNestedMapForKey(c *gin.Context, key string) (dict map[string]any, err error) {
 	q := c.Request.URL.Query()
 	return GetMap(q, key)
 }

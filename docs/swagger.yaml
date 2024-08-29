@@ -1607,6 +1607,13 @@ definitions:
         example: 01d0d0067652f684c6acb3683763f353fce55f6496521c7d99e71e1d27e53f5c
         type: string
     type: object
+  models.Webhook:
+    properties:
+      banned:
+        type: boolean
+      url:
+        type: string
+    type: object
   models.Xpub:
     properties:
       created_at:
@@ -1646,6 +1653,45 @@ definitions:
       updated_at:
         description: UpdatedAt is a time when outer model was updated.
         example: "2024-02-26T11:01:28.069911Z"
+        type: string
+    type: object
+  response.AccessKey:
+    properties:
+      createdAt:
+        description: CreatedAt is a time when outer model was created.
+        example: "2024-02-26T11:00:28.069911Z"
+        type: string
+      deletedAt:
+        description: DeletedAt is a time when outer model was deleted.
+        example: "2024-02-26T11:02:28.069911Z"
+        type: string
+      id:
+        description: ID is an hash of the compressed public key.
+        example: 874b86d6fd1d6c85a857e73180164203d8d23211bfd9d04d210f9f7fde5b82d8
+        type: string
+      key:
+        description: Key is a string representation of an access key.
+        example: 3fd870d6bf1725f04084cf31209c04be5bd9bed001a390ad3bc632a55a3ee078
+        type: string
+      metadata:
+        additionalProperties:
+          type: string
+        description: Metadata is a metadata map of outer model.
+        example:
+          key: value
+          key2: value2
+        type: object
+      revokedAt:
+        description: RevokedAt is a time when access key was revoked.
+        example: "2024-02-26T11:02:28.069911Z"
+        type: string
+      updatedAt:
+        description: UpdatedAt is a time when outer model was updated.
+        example: "2024-02-26T11:01:28.069911Z"
+        type: string
+      xpubId:
+        description: XpubID is an access key's xpub related id.
+        example: bb8593f85ef8056a77026ad415f02128f3768906de53e9e8bf8749fe2d66cf50
         type: string
     type: object
   response.Contact:
@@ -1876,6 +1922,18 @@ definitions:
         description: TotalPages is total number of pages returned
         type: integer
     type: object
+  response.PageModel-response_AccessKey:
+    properties:
+      content:
+        description: Content is the collection of elements that serves as the content
+        items:
+          $ref: '#/definitions/response.AccessKey'
+        type: array
+      page:
+        allOf:
+        - $ref: '#/definitions/response.PageDescription'
+        description: Page is the page descriptor
+    type: object
   response.PageModel-response_Contact:
     properties:
       content:
@@ -1941,6 +1999,24 @@ definitions:
       scriptType:
         description: ScriptType is a script output script type.
         type: string
+    type: object
+  response.SharedConfig:
+    properties:
+      experimentalFeatures:
+        additionalProperties:
+          type: boolean
+        description: ExperimentalFeatures is a map of experimental features handled
+          by spv-wallet.
+        example:
+          pikeEnabled: true
+        type: object
+      paymailDomains:
+        description: PaymailDomains is a list of paymail domains handled by spv-wallet.
+        example:
+        - spv-wallet.com
+        items:
+          type: string
+        type: array
     type: object
   response.SyncConfig:
     properties:
@@ -2235,6 +2311,47 @@ definitions:
         example: 01d0d0067652f684c6acb3683763f353fce55f6496521c7d99e71e1d27e53f5c
         type: string
     type: object
+  response.Xpub:
+    properties:
+      createdAt:
+        description: CreatedAt is a time when outer model was created.
+        example: "2024-02-26T11:00:28.069911Z"
+        type: string
+      currentBalance:
+        description: CurrentBalance is a xpub's current balance.
+        example: 1234
+        type: integer
+      deletedAt:
+        description: DeletedAt is a time when outer model was deleted.
+        example: "2024-02-26T11:02:28.069911Z"
+        type: string
+      id:
+        description: ID is a hash of the xpub.
+        example: bb8593f85ef8056a77026ad415f02128f3768906de53e9e8bf8749fe2d66cf50
+        type: string
+      metadata:
+        additionalProperties:
+          type: string
+        description: Metadata is a metadata map of outer model.
+        example:
+          key: value
+          key2: value2
+        type: object
+      nextExternalNum:
+        description: NextExternalNum is the index derivation number use to generate
+          NEXT external xPub (external xPub are used for address destinations).
+        example: 0
+        type: integer
+      nextInternalNum:
+        description: NextInternalNum is the index derivation number use to generate
+          NEXT internal xPub (internal xPub are used for change destinations).
+        example: 0
+        type: integer
+      updatedAt:
+        description: UpdatedAt is a time when outer model was updated.
+        example: "2024-02-26T11:01:28.069911Z"
+        type: string
+    type: object
   transactions.NewDraftTransaction:
     properties:
       config:
@@ -2320,6 +2437,82 @@ info:
   title: SPV Wallet
   version: v0.12.0
 paths:
+  /api/v1//users/current/keys:
+    get:
+      description: Search access key
+      parameters:
+      - example: "2024-02-26T11:01:28Z"
+        in: query
+        name: createdRange[from]
+        type: string
+      - example: "2024-02-26T11:01:28Z"
+        in: query
+        name: createdRange[to]
+        type: string
+      - description: Metadata is a list of key-value pairs that can be used to filter
+          the results. !ATTENTION! Unfortunately this parameter won't work from swagger
+          UI.
+        example:
+        - metadata[key]=value
+        - metadata[key2]=value2
+        in: query
+        items:
+          type: string
+        name: metadata
+        type: array
+      - in: query
+        name: order
+        type: string
+      - in: query
+        name: page
+        type: integer
+      - in: query
+        name: size
+        type: integer
+      - in: query
+        name: sortBy
+        type: string
+      - example: "2024-02-26T11:01:28Z"
+        in: query
+        name: updatedRange[from]
+        type: string
+      - example: "2024-02-26T11:01:28Z"
+        in: query
+        name: updatedRange[to]
+        type: string
+      - default: false
+        description: IncludeDeleted is a flag whether or not to include deleted items
+          in the search results
+        example: true
+        in: query
+        name: includeDeleted
+        type: boolean
+      - description: Specifies the start time of the range to query by date of revoking
+        format: date-time
+        in: query
+        name: revokedRange[from]
+        type: string
+      - description: Specifies the end time of the range to query by date of revoking
+        format: date-time
+        in: query
+        name: revokedRange[to]
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: List of access keys
+          schema:
+            $ref: '#/definitions/response.PageModel-response_AccessKey'
+        "400":
+          description: Bad request - Error while SearchAccessKeys from request query
+        "500":
+          description: Internal server error - Error while searching for access keys
+      security:
+      - x-auth-xpub: []
+      summary: Search access key
+      tags:
+      - Access-key
   /api/v1/configs/shared:
     get:
       description: Get shared config
@@ -2329,7 +2522,7 @@ paths:
         "200":
           description: Shared configuration
           schema:
-            $ref: '#/definitions/models.SharedConfig'
+            $ref: '#/definitions/response.SharedConfig'
       security:
       - x-auth-xpub: []
       summary: Get shared config
@@ -2678,7 +2871,7 @@ paths:
         "200":
           description: xPub associated with the given xPub from auth header
           schema:
-            $ref: '#/definitions/models.Xpub'
+            $ref: '#/definitions/response.Xpub'
         "500":
           description: Internal Server Error - Error while fetching xPub
       security:
@@ -2700,7 +2893,7 @@ paths:
         "200":
           description: Updated xPub
           schema:
-            $ref: '#/definitions/models.Xpub'
+            $ref: '#/definitions/response.Xpub'
         "400":
           description: Bad request - Error while parsing Metadata from request body
         "500":
@@ -2726,7 +2919,7 @@ paths:
         "201":
           description: Created AccessKey
           schema:
-            $ref: '#/definitions/models.AccessKey'
+            $ref: '#/definitions/response.AccessKey'
         "400":
           description: Bad request - Error while parsing CreateAccessKey from request
             body
@@ -2752,7 +2945,7 @@ paths:
         "200":
           description: Revoked AccessKey
           schema:
-            $ref: '#/definitions/models.AccessKey'
+            $ref: '#/definitions/response.AccessKey'
         "400":
           description: 'Bad request - Missing required field: id'
         "500":
@@ -2776,7 +2969,7 @@ paths:
         "200":
           description: AccessKey with given id
           schema:
-            $ref: '#/definitions/models.AccessKey'
+            $ref: '#/definitions/response.AccessKey'
         "400":
           description: 'Bad request - Missing required field: id'
         "403":
@@ -2786,62 +2979,6 @@ paths:
       security:
       - x-auth-xpub: []
       summary: Get access key
-      tags:
-      - Access-key
-  /v1/access-key/count:
-    post:
-      description: Count of access keys
-      parameters:
-      - description: Enables filtering of elements to be counted
-        in: body
-        name: CountAccessKeys
-        schema:
-          $ref: '#/definitions/filter.CountAccessKeys'
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: Count of access keys
-          schema:
-            type: number
-        "400":
-          description: Bad request - Error while parsing CountAccessKeys from request
-            body
-        "500":
-          description: Internal Server Error - Error while fetching count of access
-            keys
-      security:
-      - x-auth-xpub: []
-      summary: Count of access keys
-      tags:
-      - Access-key
-  /v1/access-key/search:
-    post:
-      description: Search access key
-      parameters:
-      - description: Supports targeted resource searches with filters and metadata,
-          plus options for pagination and sorting to streamline data exploration and
-          analysis
-        in: body
-        name: SearchAccessKeys
-        schema:
-          $ref: '#/definitions/filter.SearchAccessKeys'
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: List of access keys
-          schema:
-            items:
-              $ref: '#/definitions/models.AccessKey'
-            type: array
-        "400":
-          description: Bad request - Error while SearchAccessKeys from request body
-        "500":
-          description: Internal server error - Error while searching for access keys
-      security:
-      - x-auth-xpub: []
-      summary: Search access key
       tags:
       - Access-key
   /v1/admin/access-keys/count:
@@ -3401,6 +3538,24 @@ paths:
       security:
       - x-auth-xpub: []
       summary: Unsubscribe to a webhook
+      tags:
+      - Admin
+    get:
+      description: Get All Webhooks currently subscribed to
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: List of webhooks
+          schema:
+            items:
+              $ref: '#/definitions/models.Webhook'
+            type: array
+        "500":
+          description: Internal server error - Error while getting all webhooks
+      security:
+      - x-auth-xpub: []
+      summary: Get All Webhooks
       tags:
       - Admin
     post:

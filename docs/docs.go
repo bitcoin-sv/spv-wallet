@@ -15,6 +15,118 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
+        "/api/v1//users/current/keys": {
+            "get": {
+                "security": [
+                    {
+                        "x-auth-xpub": []
+                    }
+                ],
+                "description": "Search access key",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Access-key"
+                ],
+                "summary": "Search access key",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "example": "2024-02-26T11:01:28Z",
+                        "name": "createdRange[from]",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "example": "2024-02-26T11:01:28Z",
+                        "name": "createdRange[to]",
+                        "in": "query"
+                    },
+                    {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        },
+                        "example": [
+                            "metadata[key]=value",
+                            "metadata[key2]=value2"
+                        ],
+                        "description": "Metadata is a list of key-value pairs that can be used to filter the results. !ATTENTION! Unfortunately this parameter won't work from swagger UI.",
+                        "name": "metadata",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "name": "order",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "name": "page",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "name": "size",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "name": "sortBy",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "example": "2024-02-26T11:01:28Z",
+                        "name": "updatedRange[from]",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "example": "2024-02-26T11:01:28Z",
+                        "name": "updatedRange[to]",
+                        "in": "query"
+                    },
+                    {
+                        "type": "boolean",
+                        "default": false,
+                        "example": true,
+                        "description": "IncludeDeleted is a flag whether or not to include deleted items in the search results",
+                        "name": "includeDeleted",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "format": "date-time",
+                        "description": "Specifies the start time of the range to query by date of revoking",
+                        "name": "revokedRange[from]",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "format": "date-time",
+                        "description": "Specifies the end time of the range to query by date of revoking",
+                        "name": "revokedRange[to]",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "List of access keys",
+                        "schema": {
+                            "$ref": "#/definitions/response.PageModel-response_AccessKey"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request - Error while SearchAccessKeys from request query"
+                    },
+                    "500": {
+                        "description": "Internal server error - Error while searching for access keys"
+                    }
+                }
+            }
+        },
         "/api/v1/configs/shared": {
             "get": {
                 "security": [
@@ -34,7 +146,7 @@ const docTemplate = `{
                     "200": {
                         "description": "Shared configuration",
                         "schema": {
-                            "$ref": "#/definitions/models.SharedConfig"
+                            "$ref": "#/definitions/response.SharedConfig"
                         }
                     }
                 }
@@ -565,7 +677,7 @@ const docTemplate = `{
                     "200": {
                         "description": "xPub associated with the given xPub from auth header",
                         "schema": {
-                            "$ref": "#/definitions/models.Xpub"
+                            "$ref": "#/definitions/response.Xpub"
                         }
                     },
                     "500": {
@@ -601,7 +713,7 @@ const docTemplate = `{
                     "200": {
                         "description": "Updated xPub",
                         "schema": {
-                            "$ref": "#/definitions/models.Xpub"
+                            "$ref": "#/definitions/response.Xpub"
                         }
                     },
                     "400": {
@@ -643,7 +755,7 @@ const docTemplate = `{
                     "201": {
                         "description": "Created AccessKey",
                         "schema": {
-                            "$ref": "#/definitions/models.AccessKey"
+                            "$ref": "#/definitions/response.AccessKey"
                         }
                     },
                     "400": {
@@ -683,7 +795,7 @@ const docTemplate = `{
                     "200": {
                         "description": "AccessKey with given id",
                         "schema": {
-                            "$ref": "#/definitions/models.AccessKey"
+                            "$ref": "#/definitions/response.AccessKey"
                         }
                     },
                     "400": {
@@ -724,7 +836,7 @@ const docTemplate = `{
                     "200": {
                         "description": "Revoked AccessKey",
                         "schema": {
-                            "$ref": "#/definitions/models.AccessKey"
+                            "$ref": "#/definitions/response.AccessKey"
                         }
                     },
                     "400": {
@@ -732,91 +844,6 @@ const docTemplate = `{
                     },
                     "500": {
                         "description": "Internal server error - Error while revoking access key"
-                    }
-                }
-            }
-        },
-        "/v1/access-key/count": {
-            "post": {
-                "security": [
-                    {
-                        "x-auth-xpub": []
-                    }
-                ],
-                "description": "Count of access keys",
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Access-key"
-                ],
-                "summary": "Count of access keys",
-                "parameters": [
-                    {
-                        "description": "Enables filtering of elements to be counted",
-                        "name": "CountAccessKeys",
-                        "in": "body",
-                        "schema": {
-                            "$ref": "#/definitions/filter.CountAccessKeys"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "Count of access keys",
-                        "schema": {
-                            "type": "number"
-                        }
-                    },
-                    "400": {
-                        "description": "Bad request - Error while parsing CountAccessKeys from request body"
-                    },
-                    "500": {
-                        "description": "Internal Server Error - Error while fetching count of access keys"
-                    }
-                }
-            }
-        },
-        "/v1/access-key/search": {
-            "post": {
-                "security": [
-                    {
-                        "x-auth-xpub": []
-                    }
-                ],
-                "description": "Search access key",
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Access-key"
-                ],
-                "summary": "Search access key",
-                "parameters": [
-                    {
-                        "description": "Supports targeted resource searches with filters and metadata, plus options for pagination and sorting to streamline data exploration and analysis",
-                        "name": "SearchAccessKeys",
-                        "in": "body",
-                        "schema": {
-                            "$ref": "#/definitions/filter.SearchAccessKeys"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "List of access keys",
-                        "schema": {
-                            "type": "array",
-                            "items": {
-                                "$ref": "#/definitions/models.AccessKey"
-                            }
-                        }
-                    },
-                    "400": {
-                        "description": "Bad request - Error while SearchAccessKeys from request body"
-                    },
-                    "500": {
-                        "description": "Internal server error - Error while searching for access keys"
                     }
                 }
             }
@@ -1645,6 +1672,35 @@ const docTemplate = `{
             }
         },
         "/v1/admin/webhooks/subscriptions": {
+            "get": {
+                "security": [
+                    {
+                        "x-auth-xpub": []
+                    }
+                ],
+                "description": "Get All Webhooks currently subscribed to",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Admin"
+                ],
+                "summary": "Get All Webhooks",
+                "responses": {
+                    "200": {
+                        "description": "List of webhooks",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/models.Webhook"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error - Error while getting all webhooks"
+                    }
+                }
+            },
             "post": {
                 "security": [
                     {
@@ -4476,6 +4532,17 @@ const docTemplate = `{
                 }
             }
         },
+        "models.Webhook": {
+            "type": "object",
+            "properties": {
+                "banned": {
+                    "type": "boolean"
+                },
+                "url": {
+                    "type": "string"
+                }
+            }
+        },
         "models.Xpub": {
             "type": "object",
             "properties": {
@@ -4524,6 +4591,57 @@ const docTemplate = `{
                     "description": "UpdatedAt is a time when outer model was updated.",
                     "type": "string",
                     "example": "2024-02-26T11:01:28.069911Z"
+                }
+            }
+        },
+        "response.AccessKey": {
+            "type": "object",
+            "properties": {
+                "createdAt": {
+                    "description": "CreatedAt is a time when outer model was created.",
+                    "type": "string",
+                    "example": "2024-02-26T11:00:28.069911Z"
+                },
+                "deletedAt": {
+                    "description": "DeletedAt is a time when outer model was deleted.",
+                    "type": "string",
+                    "example": "2024-02-26T11:02:28.069911Z"
+                },
+                "id": {
+                    "description": "ID is an hash of the compressed public key.",
+                    "type": "string",
+                    "example": "874b86d6fd1d6c85a857e73180164203d8d23211bfd9d04d210f9f7fde5b82d8"
+                },
+                "key": {
+                    "description": "Key is a string representation of an access key.",
+                    "type": "string",
+                    "example": "3fd870d6bf1725f04084cf31209c04be5bd9bed001a390ad3bc632a55a3ee078"
+                },
+                "metadata": {
+                    "description": "Metadata is a metadata map of outer model.",
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "string"
+                    },
+                    "example": {
+                        "key": "value",
+                        "key2": "value2"
+                    }
+                },
+                "revokedAt": {
+                    "description": "RevokedAt is a time when access key was revoked.",
+                    "type": "string",
+                    "example": "2024-02-26T11:02:28.069911Z"
+                },
+                "updatedAt": {
+                    "description": "UpdatedAt is a time when outer model was updated.",
+                    "type": "string",
+                    "example": "2024-02-26T11:01:28.069911Z"
+                },
+                "xpubId": {
+                    "description": "XpubID is an access key's xpub related id.",
+                    "type": "string",
+                    "example": "bb8593f85ef8056a77026ad415f02128f3768906de53e9e8bf8749fe2d66cf50"
                 }
             }
         },
@@ -4832,6 +4950,26 @@ const docTemplate = `{
                 }
             }
         },
+        "response.PageModel-response_AccessKey": {
+            "type": "object",
+            "properties": {
+                "content": {
+                    "description": "Content is the collection of elements that serves as the content",
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/response.AccessKey"
+                    }
+                },
+                "page": {
+                    "description": "Page is the page descriptor",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/response.PageDescription"
+                        }
+                    ]
+                }
+            }
+        },
         "response.PageModel-response_Contact": {
             "type": "object",
             "properties": {
@@ -4927,6 +5065,31 @@ const docTemplate = `{
                 "scriptType": {
                     "description": "ScriptType is a script output script type.",
                     "type": "string"
+                }
+            }
+        },
+        "response.SharedConfig": {
+            "type": "object",
+            "properties": {
+                "experimentalFeatures": {
+                    "description": "ExperimentalFeatures is a map of experimental features handled by spv-wallet.",
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "boolean"
+                    },
+                    "example": {
+                        "pikeEnabled": true
+                    }
+                },
+                "paymailDomains": {
+                    "description": "PaymailDomains is a list of paymail domains handled by spv-wallet.",
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    },
+                    "example": [
+                        "spv-wallet.com"
+                    ]
                 }
             }
         },
@@ -5323,6 +5486,57 @@ const docTemplate = `{
                     "description": "TransactionID is a transaction id that utxo points to.",
                     "type": "string",
                     "example": "01d0d0067652f684c6acb3683763f353fce55f6496521c7d99e71e1d27e53f5c"
+                }
+            }
+        },
+        "response.Xpub": {
+            "type": "object",
+            "properties": {
+                "createdAt": {
+                    "description": "CreatedAt is a time when outer model was created.",
+                    "type": "string",
+                    "example": "2024-02-26T11:00:28.069911Z"
+                },
+                "currentBalance": {
+                    "description": "CurrentBalance is a xpub's current balance.",
+                    "type": "integer",
+                    "example": 1234
+                },
+                "deletedAt": {
+                    "description": "DeletedAt is a time when outer model was deleted.",
+                    "type": "string",
+                    "example": "2024-02-26T11:02:28.069911Z"
+                },
+                "id": {
+                    "description": "ID is a hash of the xpub.",
+                    "type": "string",
+                    "example": "bb8593f85ef8056a77026ad415f02128f3768906de53e9e8bf8749fe2d66cf50"
+                },
+                "metadata": {
+                    "description": "Metadata is a metadata map of outer model.",
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "string"
+                    },
+                    "example": {
+                        "key": "value",
+                        "key2": "value2"
+                    }
+                },
+                "nextExternalNum": {
+                    "description": "NextExternalNum is the index derivation number use to generate NEXT external xPub (external xPub are used for address destinations).",
+                    "type": "integer",
+                    "example": 0
+                },
+                "nextInternalNum": {
+                    "description": "NextInternalNum is the index derivation number use to generate NEXT internal xPub (internal xPub are used for change destinations).",
+                    "type": "integer",
+                    "example": 0
+                },
+                "updatedAt": {
+                    "description": "UpdatedAt is a time when outer model was updated.",
+                    "type": "string",
+                    "example": "2024-02-26T11:01:28.069911Z"
                 }
             }
         },
