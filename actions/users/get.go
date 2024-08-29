@@ -30,7 +30,7 @@ func (a *Action) oldGet(c *gin.Context) {
 // @Description	Get current user information
 // @Tags		Users
 // @Produce		json
-// @Success		200 {object} models.Xpub "xPub associated with the given xPub from auth header"
+// @Success		200 {object} response.Xpub "xPub associated with the given xPub from auth header"
 // @Failure		500	"Internal Server Error - Error while fetching xPub"
 // @Router		/api/v1/users/current [get]
 // @Security	x-auth-xpub
