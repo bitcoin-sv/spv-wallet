@@ -44,7 +44,7 @@ func (a *Action) paymailGetAddress(c *gin.Context) {
 		return
 	}
 
-	paymailAddressContract := mappings.MapToPaymailContract(paymailAddress)
+	paymailAddressContract := mappings.MapToOldPaymailContract(paymailAddress)
 
 	c.JSON(http.StatusOK, paymailAddressContract)
 }
@@ -81,7 +81,7 @@ func (a *Action) paymailAddressesSearch(c *gin.Context) {
 
 	paymailAddressContracts := make([]*models.PaymailAddress, 0)
 	for _, paymailAddress := range paymailAddresses {
-		paymailAddressContracts = append(paymailAddressContracts, mappings.MapToPaymailContract(paymailAddress))
+		paymailAddressContracts = append(paymailAddressContracts, mappings.MapToOldPaymailContract(paymailAddress))
 	}
 
 	c.JSON(http.StatusOK, paymailAddressContracts)
@@ -161,7 +161,7 @@ func (a *Action) paymailCreateAddress(c *gin.Context) {
 		return
 	}
 
-	paymailAddressContract := mappings.MapToPaymailContract(paymailAddress)
+	paymailAddressContract := mappings.MapToOldPaymailContract(paymailAddress)
 
 	c.JSON(http.StatusCreated, paymailAddressContract)
 }

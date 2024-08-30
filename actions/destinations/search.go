@@ -46,7 +46,7 @@ func (a *Action) search(c *gin.Context) {
 
 	contracts := make([]*models.Destination, 0)
 	for _, destination := range destinations {
-		contracts = append(contracts, mappings.MapToDestinationContract(destination))
+		contracts = append(contracts, mappings.MapOldToDestinationContract(destination))
 	}
 	c.JSON(http.StatusOK, contracts)
 }

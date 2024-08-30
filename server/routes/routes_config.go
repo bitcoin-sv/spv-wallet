@@ -4,6 +4,13 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+// Handler is a type that represents a handler for various types of endpoints.
+type Handler struct {
+	BasicEndpoints
+	APIEndpoints
+	CallbackEndpoints
+}
+
 // AdminEndpointsFunc wrapping type for function to mark it as implementation of AdminEndpoints.
 type AdminEndpointsFunc func(router *gin.RouterGroup)
 
@@ -18,7 +25,7 @@ type OldAPIEndpointsFunc func(router *gin.RouterGroup)
 
 // OldAPIEndpoints registrar which will register routes in ADMIN routes group.
 type OldAPIEndpoints interface {
-	// RegisterAPIEndpoints register ADMIN endpoints.
+	// RegisterOldAPIEndpoints register ADMIN endpoints.
 	RegisterOldAPIEndpoints(router *gin.RouterGroup)
 }
 
@@ -29,6 +36,15 @@ type APIEndpointsFunc func(router *gin.RouterGroup)
 type APIEndpoints interface {
 	// RegisterAPIEndpoints register ADMIN endpoints.
 	RegisterAPIEndpoints(router *gin.RouterGroup)
+}
+
+// OldBasicEndpointsFunc wrapping type for function to mark it as implementation of OldBasicEndpoints.
+type OldBasicEndpointsFunc func(router *gin.RouterGroup)
+
+// OldBasicEndpoints registrar which will register routes in Old BASIC routes group.
+type OldBasicEndpoints interface {
+	// RegisterOldBasicEndpoints register BASIC endpoints.
+	RegisterOldBasicEndpoints(router *gin.RouterGroup)
 }
 
 // BasicEndpointsFunc wrapping type for function to mark it as implementation of BasicEndpoints.
@@ -75,6 +91,11 @@ func (f APIEndpointsFunc) RegisterAPIEndpoints(router *gin.RouterGroup) {
 
 // RegisterBasicEndpoints register Basic endpoints by registrar BasicEndpointsFunc.
 func (f BasicEndpointsFunc) RegisterBasicEndpoints(router *gin.RouterGroup) {
+	f(router)
+}
+
+// RegisterOldBasicEndpoints register Basic endpoints by registrar OldBasicEndpointsFunc.
+func (f OldBasicEndpointsFunc) RegisterOldBasicEndpoints(router *gin.RouterGroup) {
 	f(router)
 }
 

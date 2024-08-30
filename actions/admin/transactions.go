@@ -42,7 +42,7 @@ func (a *Action) transactionsSearch(c *gin.Context) {
 
 	contracts := make([]*models.Transaction, 0)
 	for _, transaction := range transactions {
-		contracts = append(contracts, mappings.MapToTransactionContractForAdmin(transaction))
+		contracts = append(contracts, mappings.MapToOldTransactionContractForAdmin(transaction))
 	}
 
 	c.JSON(http.StatusOK, contracts)

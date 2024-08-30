@@ -2,16 +2,16 @@ package mappings
 
 import (
 	"github.com/bitcoin-sv/spv-wallet/engine"
-	"github.com/bitcoin-sv/spv-wallet/models/response"
+	"github.com/bitcoin-sv/spv-wallet/models"
 )
 
-// MapToSyncConfigContract will map the sync-config model from spv-wallet to the spv-wallet-models contract
-func MapToSyncConfigContract(sc *engine.SyncConfig) *response.SyncConfig {
+// MapToOldSyncConfigContract will map the sync-config model from spv-wallet to the spv-wallet-models contract
+func MapToOldSyncConfigContract(sc *engine.SyncConfig) *models.SyncConfig {
 	if sc == nil {
 		return nil
 	}
 
-	return &response.SyncConfig{
+	return &models.SyncConfig{
 		Broadcast:        sc.Broadcast,
 		BroadcastInstant: sc.BroadcastInstant,
 		PaymailP2P:       sc.PaymailP2P,
@@ -19,8 +19,8 @@ func MapToSyncConfigContract(sc *engine.SyncConfig) *response.SyncConfig {
 	}
 }
 
-// MapSyncConfigModelToEngine will map the sync-config model from spv-wallet-models to the spv-wallet contract
-func MapSyncConfigModelToEngine(sc *response.SyncConfig) *engine.SyncConfig {
+// MapOldSyncConfigModelToEngine will map the sync-config model from spv-wallet-models to the spv-wallet contract
+func MapOldSyncConfigModelToEngine(sc *models.SyncConfig) *engine.SyncConfig {
 	if sc == nil {
 		return nil
 	}
