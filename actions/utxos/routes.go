@@ -12,7 +12,7 @@ type Action struct {
 	actions.Action
 }
 
-// NewHandler creates the specific package routes
+// OldUtxosHandler creates the specific package routes - deprecated routes
 func OldUtxosHandler(appConfig *config.AppConfig, services *config.AppServices) routes.OldAPIEndpointsFunc {
 	action := &Action{actions.Action{AppConfig: appConfig, Services: services}}
 
@@ -32,8 +32,7 @@ func NewHandler(appConfig *config.AppConfig, services *config.AppServices) route
 
 	apiEndpoints := routes.APIEndpointsFunc(func(router *gin.RouterGroup) {
 		utxoGroup := router.Group("/utxos")
-		utxoGroup.GET("", action.get)
-		utxoGroup.POST("/search", action.search)
+		utxoGroup.GET("", action.search)
 	})
 
 	return apiEndpoints

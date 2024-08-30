@@ -28,8 +28,8 @@ func (ts *TestSuite) SetupTest() {
 	ts.BaseSetupTest()
 
 	// Load the router & register old routes
-	oldApiRoutes := OldUtxosHandler(ts.AppConfig, ts.Services)
-	oldApiRoutes.RegisterOldAPIEndpoints(ts.Router.Group("/" + config.APIVersion))
+	oldAPIRoutes := OldUtxosHandler(ts.AppConfig, ts.Services)
+	oldAPIRoutes.RegisterOldAPIEndpoints(ts.Router.Group("/" + config.APIVersion))
 
 	// Load the router & register routes
 	apiRoutes := NewHandler(ts.AppConfig, ts.Services)
