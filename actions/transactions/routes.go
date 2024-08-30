@@ -12,11 +12,34 @@ type Action struct {
 	actions.Action
 }
 
-// NewHandler creates the specific package routes
-func NewHandler(appConfig *config.AppConfig, services *config.AppServices) (routes.BasicEndpointsFunc, routes.OldAPIEndpointsFunc, routes.CallbackEndpointsFunc) {
+// NewHandler creates the specific package routes in restfull style
+func NewHandler(appConfig *config.AppConfig, services *config.AppServices) *routes.Handler {
 	action := &Action{actions.Action{AppConfig: appConfig, Services: services}}
 
-	basicEndpoints := routes.BasicEndpointsFunc(func(router *gin.RouterGroup) {
+	handler := routes.Handler{
+		BasicEndpoints: routes.BasicEndpointsFunc(func(router *gin.RouterGroup) {
+			basicTransactionGroup := router.Group("/transactions")
+			basicTransactionGroup.GET(":id", action.getByID)
+			basicTransactionGroup.PATCH(":id", action.updateTransactionMetadata)
+			basicTransactionGroup.GET("", action.transactions)
+		}),
+		APIEndpoints: routes.APIEndpointsFunc(func(router *gin.RouterGroup) {
+			apiTransactionGroup := router.Group("/transactions")
+			apiTransactionGroup.POST("/drafts", action.newTransactionDraft)
+			apiTransactionGroup.POST("", action.recordTransaction)
+		}),
+		CallbackEndpoints: routes.CallbackEndpointsFunc(func(router *gin.RouterGroup) {
+			router.POST(config.BroadcastCallbackRoute, action.broadcastCallback)
+		}),
+	}
+	return &handler
+}
+
+// OldTransactionsHandler creates the specific package routes
+func OldTransactionsHandler(appConfig *config.AppConfig, services *config.AppServices) (routes.OldBasicEndpointsFunc, routes.OldAPIEndpointsFunc, routes.CallbackEndpointsFunc) {
+	action := &Action{actions.Action{AppConfig: appConfig, Services: services}}
+
+	basicEndpoints := routes.OldBasicEndpointsFunc(func(router *gin.RouterGroup) {
 		basicTransactionGroup := router.Group("/transaction")
 		basicTransactionGroup.GET("", action.get)
 		basicTransactionGroup.PATCH("", action.update)

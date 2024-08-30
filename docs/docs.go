@@ -15,6 +15,119 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
+        "/api/v1//users/current/keys": {
+            "get": {
+                "security": [
+                    {
+                        "x-auth-xpub": []
+                    }
+                ],
+                "description": "Search access key",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Access-key"
+                ],
+                "summary": "Search access key",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "example": "2024-02-26T11:01:28Z",
+                        "name": "createdRange[from]",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "example": "2024-02-26T11:01:28Z",
+                        "name": "createdRange[to]",
+                        "in": "query"
+                    },
+                    {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        },
+                        "collectionFormat": "csv",
+                        "example": [
+                            "metadata[key]=value",
+                            "metadata[key2]=value2"
+                        ],
+                        "description": "Metadata is a list of key-value pairs that can be used to filter the results. !ATTENTION! Unfortunately this parameter won't work from swagger UI.",
+                        "name": "metadata",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "name": "order",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "name": "page",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "name": "size",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "name": "sortBy",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "example": "2024-02-26T11:01:28Z",
+                        "name": "updatedRange[from]",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "example": "2024-02-26T11:01:28Z",
+                        "name": "updatedRange[to]",
+                        "in": "query"
+                    },
+                    {
+                        "type": "boolean",
+                        "default": false,
+                        "example": true,
+                        "description": "IncludeDeleted is a flag whether or not to include deleted items in the search results",
+                        "name": "includeDeleted",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "format": "date-time",
+                        "description": "Specifies the start time of the range to query by date of revoking",
+                        "name": "revokedRange[from]",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "format": "date-time",
+                        "description": "Specifies the end time of the range to query by date of revoking",
+                        "name": "revokedRange[to]",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "List of access keys",
+                        "schema": {
+                            "$ref": "#/definitions/response.PageModel-response_AccessKey"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request - Error while SearchAccessKeys from request query"
+                    },
+                    "500": {
+                        "description": "Internal server error - Error while searching for access keys"
+                    }
+                }
+            }
+        },
         "/api/v1/configs/shared": {
             "get": {
                 "security": [
@@ -34,7 +147,7 @@ const docTemplate = `{
                     "200": {
                         "description": "Shared configuration",
                         "schema": {
-                            "$ref": "#/definitions/models.SharedConfig"
+                            "$ref": "#/definitions/response.SharedConfig"
                         }
                     }
                 }
@@ -343,6 +456,209 @@ const docTemplate = `{
                 }
             }
         },
+        "/api/v1/transactions": {
+            "get": {
+                "security": [
+                    {
+                        "x-auth-xpub": []
+                    }
+                ],
+                "description": "Experimental (not ready for production use yet) - Get transactions",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Transactions"
+                ],
+                "summary": "Experimental - Get transactions",
+                "parameters": [
+                    {
+                        "description": "Supports targeted resource searches with filters and metadata, plus options for pagination and sorting to streamline data exploration and analysis",
+                        "name": "SearchTransactions",
+                        "in": "body",
+                        "schema": {
+                            "$ref": "#/definitions/filter.SearchTransactions"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Page of transactions",
+                        "schema": {
+                            "$ref": "#/definitions/response.PageModel-response_Transaction"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request - Error while parsing SearchTransactions from request body"
+                    },
+                    "500": {
+                        "description": "Internal server error - Error while searching for transactions"
+                    }
+                }
+            },
+            "post": {
+                "security": [
+                    {
+                        "x-auth-xpub": []
+                    }
+                ],
+                "description": "Record transaction",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Transactions"
+                ],
+                "summary": "Record transaction",
+                "parameters": [
+                    {
+                        "description": "Transaction to be recorded",
+                        "name": "RecordTransaction",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/transactions.RecordTransaction"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created transaction",
+                        "schema": {
+                            "$ref": "#/definitions/response.Transaction"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request - Error while parsing RecordTransaction from request body or xpub not found"
+                    },
+                    "500": {
+                        "description": "Internal Server Error - Error while recording transaction"
+                    }
+                }
+            }
+        },
+        "/api/v1/transactions/drafts": {
+            "post": {
+                "security": [
+                    {
+                        "x-auth-xpub": []
+                    }
+                ],
+                "description": "New transaction draft",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Transactions"
+                ],
+                "summary": "New transaction draft",
+                "parameters": [
+                    {
+                        "description": "NewDraftTransaction model containing the transaction config and metadata",
+                        "name": "NewDraftTransaction",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/transactions.NewDraftTransaction"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created transaction",
+                        "schema": {
+                            "$ref": "#/definitions/response.DraftTransaction"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request - Error while parsing NewDraftTransaction from request body or xpub not found"
+                    },
+                    "500": {
+                        "description": "Internal Server Error - Error while creating transaction"
+                    }
+                }
+            }
+        },
+        "/api/v1/transactions/{id}": {
+            "get": {
+                "security": [
+                    {
+                        "x-auth-xpub": []
+                    }
+                ],
+                "description": "Get transaction by id",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Transactions"
+                ],
+                "summary": "Get transaction by id",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Transaction",
+                        "schema": {
+                            "$ref": "#/definitions/response.Transaction"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request - Transaction not found or associated with another xpub"
+                    },
+                    "500": {
+                        "description": "Internal Server Error - Error while fetching transaction"
+                    }
+                }
+            },
+            "patch": {
+                "security": [
+                    {
+                        "x-auth-xpub": []
+                    }
+                ],
+                "description": "Update transaction metadata",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Transactions"
+                ],
+                "summary": "Update transaction metadata",
+                "parameters": [
+                    {
+                        "description": "Pass update transaction request model in the body with updated metadata",
+                        "name": "UpdateTransactionRequest",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/transactions.UpdateTransactionRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Updated transaction metadata",
+                        "schema": {
+                            "$ref": "#/definitions/response.Transaction"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request - Error while parsing UpdateTransaction from request body, tx not found or tx is not associated with the xpub"
+                    },
+                    "500": {
+                        "description": "Internal Server Error - Error while updating transaction metadata"
+                    }
+                }
+            }
+        },
         "/api/v1/users/current": {
             "get": {
                 "security": [
@@ -362,7 +678,7 @@ const docTemplate = `{
                     "200": {
                         "description": "xPub associated with the given xPub from auth header",
                         "schema": {
-                            "$ref": "#/definitions/models.Xpub"
+                            "$ref": "#/definitions/response.Xpub"
                         }
                     },
                     "500": {
@@ -398,7 +714,7 @@ const docTemplate = `{
                     "200": {
                         "description": "Updated xPub",
                         "schema": {
-                            "$ref": "#/definitions/models.Xpub"
+                            "$ref": "#/definitions/response.Xpub"
                         }
                     },
                     "400": {
@@ -440,7 +756,7 @@ const docTemplate = `{
                     "201": {
                         "description": "Created AccessKey",
                         "schema": {
-                            "$ref": "#/definitions/models.AccessKey"
+                            "$ref": "#/definitions/response.AccessKey"
                         }
                     },
                     "400": {
@@ -480,7 +796,7 @@ const docTemplate = `{
                     "200": {
                         "description": "AccessKey with given id",
                         "schema": {
-                            "$ref": "#/definitions/models.AccessKey"
+                            "$ref": "#/definitions/response.AccessKey"
                         }
                     },
                     "400": {
@@ -521,7 +837,7 @@ const docTemplate = `{
                     "200": {
                         "description": "Revoked AccessKey",
                         "schema": {
-                            "$ref": "#/definitions/models.AccessKey"
+                            "$ref": "#/definitions/response.AccessKey"
                         }
                     },
                     "400": {
@@ -529,41 +845,6 @@ const docTemplate = `{
                     },
                     "500": {
                         "description": "Internal server error - Error while revoking access key"
-                    }
-                }
-            }
-        },
-        "/transaction/broadcast/callback": {
-            "post": {
-                "security": [
-                    {
-                        "callback-auth": []
-                    }
-                ],
-                "tags": [
-                    "Transactions"
-                ],
-                "summary": "Endpoint designed for receiving callbacks from Arc (service responsible for submitting transactions to the BSV network)",
-                "parameters": [
-                    {
-                        "description": "Transaction",
-                        "name": "transaction",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/broadcast.SubmittedTx"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK"
-                    },
-                    "400": {
-                        "description": "Bad request - Error while parsing transaction from request body"
-                    },
-                    "500": {
-                        "description": "Internal Server Error - Error while updating transaction"
                     }
                 }
             }
@@ -699,14 +980,15 @@ const docTemplate = `{
                         "x-auth-xpub": []
                     }
                 ],
-                "description": "Count of access keys",
+                "description": "This endpoint has been deprecated. Use (GET) /api/v1/users/current/keys instead.",
                 "produces": [
                     "application/json"
                 ],
                 "tags": [
                     "Access-key"
                 ],
-                "summary": "Count of access keys",
+                "summary": "Count of access keys - Use (GET) /api/v1/users/current/keys instead.",
+                "deprecated": true,
                 "parameters": [
                     {
                         "description": "Enables filtering of elements to be counted",
@@ -740,14 +1022,15 @@ const docTemplate = `{
                         "x-auth-xpub": []
                     }
                 ],
-                "description": "Search access key",
+                "description": "This endpoint has been deprecated. Use (GET) /api/v1/users/current/keys instead.",
                 "produces": [
                     "application/json"
                 ],
                 "tags": [
                     "Access-key"
                 ],
-                "summary": "Search access key",
+                "summary": "Search access key - Use (GET) /api/v1/users/current/keys instead.",
+                "deprecated": true,
                 "parameters": [
                     {
                         "description": "Supports targeted resource searches with filters and metadata, plus options for pagination and sorting to streamline data exploration and analysis",
@@ -1601,6 +1884,35 @@ const docTemplate = `{
             }
         },
         "/v1/admin/webhooks/subscriptions": {
+            "get": {
+                "security": [
+                    {
+                        "x-auth-xpub": []
+                    }
+                ],
+                "description": "Get All Webhooks currently subscribed to",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Admin"
+                ],
+                "summary": "Get All Webhooks",
+                "responses": {
+                    "200": {
+                        "description": "List of webhooks",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/models.Webhook"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error - Error while getting all webhooks"
+                    }
+                }
+            },
             "post": {
                 "security": [
                     {
@@ -2295,14 +2607,15 @@ const docTemplate = `{
                         "x-auth-xpub": []
                     }
                 ],
-                "description": "Get transaction by id",
+                "description": "This endpoint has been deprecated. Use (GET) /api/v1/transactions/{id} instead.",
                 "produces": [
                     "application/json"
                 ],
                 "tags": [
                     "Transactions"
                 ],
-                "summary": "Get transaction by id",
+                "summary": "Get transaction by id - Use (GET) /api/v1/transactions/{id} instead.",
+                "deprecated": true,
                 "parameters": [
                     {
                         "type": "string",
@@ -2333,22 +2646,23 @@ const docTemplate = `{
                         "x-auth-xpub": []
                     }
                 ],
-                "description": "New transaction",
+                "description": "This endpoint has been deprecated. Use (POST) /api/v1/transactions/drafts instead.",
                 "produces": [
                     "application/json"
                 ],
                 "tags": [
                     "Transactions"
                 ],
-                "summary": "New transaction",
+                "summary": "New transaction - Use (POST) /api/v1/transactions/drafts instead.",
+                "deprecated": true,
                 "parameters": [
                     {
-                        "description": "NewTransaction model containing the transaction config and metadata",
-                        "name": "NewTransaction",
+                        "description": "OldNewDraftTransaction model containing the transaction config and metadata",
+                        "name": "OldNewDraftTransaction",
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/transactions.NewTransaction"
+                            "$ref": "#/definitions/transactions.OldNewDraftTransaction"
                         }
                     }
                 ],
@@ -2356,11 +2670,11 @@ const docTemplate = `{
                     "201": {
                         "description": "Created transaction",
                         "schema": {
-                            "$ref": "#/definitions/models.DraftTransaction"
+                            "$ref": "#/definitions/transactions.OldNewDraftTransaction"
                         }
                     },
                     "400": {
-                        "description": "Bad request - Error while parsing NewTransaction from request body or xpub not found"
+                        "description": "Bad request - Error while parsing OldNewDraftTransaction from request body or xpub not found"
                     },
                     "500": {
                         "description": "Internal Server Error - Error while creating transaction"
@@ -2373,17 +2687,18 @@ const docTemplate = `{
                         "x-auth-xpub": []
                     }
                 ],
-                "description": "Update transaction",
+                "description": "This endpoint has been deprecated. Use (PATCH) /api/v1/transactions/{id} instead.",
                 "produces": [
                     "application/json"
                 ],
                 "tags": [
                     "Transactions"
                 ],
-                "summary": "Update transaction",
+                "summary": "Update transaction - Use (PATCH) /api/v1/transactions/{id} instead.",
+                "deprecated": true,
                 "parameters": [
                     {
-                        "description": " ",
+                        "description": "Pass update transaction request model in the body",
                         "name": "UpdateTransaction",
                         "in": "body",
                         "required": true,
@@ -2415,7 +2730,7 @@ const docTemplate = `{
                         "x-auth-xpub": []
                     }
                 ],
-                "description": "Count of transactions",
+                "description": "The functionality of this method will be offered in the future by /api/v1/transactions [get].",
                 "produces": [
                     "application/json"
                 ],
@@ -2456,14 +2771,15 @@ const docTemplate = `{
                         "x-auth-xpub": []
                     }
                 ],
-                "description": "Record transaction",
+                "description": "This endpoint has been deprecated. Use (POST) /api/v1/transactions instead.",
                 "produces": [
                     "application/json"
                 ],
                 "tags": [
                     "Transactions"
                 ],
-                "summary": "Record transaction",
+                "summary": "Record transaction - Use (POST) /api/v1/transactions instead.",
+                "deprecated": true,
                 "parameters": [
                     {
                         "description": "Transaction to be recorded",
@@ -2851,99 +3167,6 @@ const docTemplate = `{
                     }
                 }
             }
-        },
-        "broadcast.SubmittedTx": {
-            "type": "object",
-            "properties": {
-                "blockHash": {
-                    "description": "BlockHash is the hash of the block where the transaction was included.",
-                    "type": "string"
-                },
-                "blockHeight": {
-                    "description": "BlockHeight is the height of the block where the transaction was included.",
-                    "type": "integer"
-                },
-                "extraInfo": {
-                    "description": "ExtraInfo provides extra information for given transaction.",
-                    "type": "string"
-                },
-                "merklePath": {
-                    "description": "MerklePath is the Merkle path used to calculate Merkle root of the block in which the transaction was included.",
-                    "type": "string"
-                },
-                "status": {
-                    "description": "Status is the status of the response.",
-                    "type": "integer"
-                },
-                "timestamp": {
-                    "description": "Timestamp is the timestamp of the block where the transaction was included.",
-                    "type": "string"
-                },
-                "title": {
-                    "description": "Title is the title of the response.",
-                    "type": "string"
-                },
-                "txStatus": {
-                    "description": "TxStatus is the status of the transaction.",
-                    "allOf": [
-                        {
-                            "$ref": "#/definitions/broadcast.TxStatus"
-                        }
-                    ]
-                },
-                "txid": {
-                    "description": "TxID is the transaction id.",
-                    "type": "string"
-                }
-            }
-        },
-        "broadcast.TxStatus": {
-            "type": "string",
-            "enum": [
-                "UNKNOWN",
-                "QUEUED",
-                "RECEIVED",
-                "STORED",
-                "ANNOUNCED_TO_NETWORK",
-                "REQUESTED_BY_NETWORK",
-                "SENT_TO_NETWORK",
-                "ACCEPTED_BY_NETWORK",
-                "SEEN_ON_NETWORK",
-                "MINED",
-                "SEEN_IN_ORPHAN_MEMPOOL",
-                "CONFIRMED",
-                "REJECTED"
-            ],
-            "x-enum-comments": {
-                "AcceptedByNetwork": "7",
-                "AnnouncedToNetwork": "4",
-                "Confirmed": "108",
-                "Mined": "9",
-                "Queued": "1",
-                "Received": "2",
-                "Rejected": "109",
-                "RequestedByNetwork": "5",
-                "SeenInOrphanMempool": "10",
-                "SeenOnNetwork": "8",
-                "SentToNetwork": "6",
-                "Stored": "3",
-                "Unknown": "0"
-            },
-            "x-enum-varnames": [
-                "Unknown",
-                "Queued",
-                "Received",
-                "Stored",
-                "AnnouncedToNetwork",
-                "RequestedByNetwork",
-                "SentToNetwork",
-                "AcceptedByNetwork",
-                "SeenOnNetwork",
-                "Mined",
-                "SeenInOrphanMempool",
-                "Confirmed",
-                "Rejected"
-            ]
         },
         "contacts.UpsertContact": {
             "type": "object",
@@ -4265,75 +4488,6 @@ const docTemplate = `{
                 }
             }
         },
-        "models.DraftTransaction": {
-            "type": "object",
-            "properties": {
-                "configuration": {
-                    "description": "Configuration contains draft transaction configuration.",
-                    "allOf": [
-                        {
-                            "$ref": "#/definitions/models.TransactionConfig"
-                        }
-                    ]
-                },
-                "created_at": {
-                    "description": "CreatedAt is a time when outer model was created.",
-                    "type": "string",
-                    "example": "2024-02-26T11:00:28.069911Z"
-                },
-                "deleted_at": {
-                    "description": "DeletedAt is a time when outer model was deleted.",
-                    "type": "string",
-                    "example": "2024-02-26T11:02:28.069911Z"
-                },
-                "expires_at": {
-                    "description": "ExpiresAt is a time when draft transaction expired.",
-                    "type": "string",
-                    "example": "2024-02-26T11:00:28.069911Z"
-                },
-                "final_tx_id": {
-                    "description": "FinalTxID is a final transaction id.",
-                    "type": "string",
-                    "example": "cfe30797f0b5fc098b32194e857569a7a1edd829fddf3df4567796b738de386d"
-                },
-                "hex": {
-                    "description": "Hex is a draft transaction hex.",
-                    "type": "string",
-                    "example": "0100000002..."
-                },
-                "id": {
-                    "description": "ID is a draft transaction id.",
-                    "type": "string",
-                    "example": "b356f7fa00cd3f20cce6c21d704cd13e871d28d714a5ebd0532f5a0e0cde63f7"
-                },
-                "metadata": {
-                    "description": "Metadata is a metadata map of outer model.",
-                    "type": "object",
-                    "additionalProperties": {
-                        "type": "string"
-                    },
-                    "example": {
-                        "key": "value",
-                        "key2": "value2"
-                    }
-                },
-                "status": {
-                    "description": "Status is a draft transaction lastly monitored status.",
-                    "type": "string",
-                    "example": "complete"
-                },
-                "updated_at": {
-                    "description": "UpdatedAt is a time when outer model was updated.",
-                    "type": "string",
-                    "example": "2024-02-26T11:01:28.069911Z"
-                },
-                "xpub_id": {
-                    "description": "XpubID is a draft transaction's xpub used to sign transaction.",
-                    "type": "string",
-                    "example": "bb8593f85ef8056a77026ad415f02128f3768906de53e9e8bf8749fe2d66cf50"
-                }
-            }
-        },
         "models.FeeUnit": {
             "type": "object",
             "properties": {
@@ -4779,12 +4933,8 @@ const docTemplate = `{
                 },
                 "expires_in": {
                     "description": "ExpiresAt is a time when transaction expires.",
-                    "allOf": [
-                        {
-                            "$ref": "#/definitions/time.Duration"
-                        }
-                    ],
-                    "example": 1000
+                    "type": "string",
+                    "example": "1000"
                 },
                 "fee": {
                     "description": "Fee is a fee amount.",
@@ -5102,6 +5252,17 @@ const docTemplate = `{
                 }
             }
         },
+        "models.Webhook": {
+            "type": "object",
+            "properties": {
+                "banned": {
+                    "type": "boolean"
+                },
+                "url": {
+                    "type": "string"
+                }
+            }
+        },
         "models.Xpub": {
             "type": "object",
             "properties": {
@@ -5150,6 +5311,57 @@ const docTemplate = `{
                     "description": "UpdatedAt is a time when outer model was updated.",
                     "type": "string",
                     "example": "2024-02-26T11:01:28.069911Z"
+                }
+            }
+        },
+        "response.AccessKey": {
+            "type": "object",
+            "properties": {
+                "createdAt": {
+                    "description": "CreatedAt is a time when outer model was created.",
+                    "type": "string",
+                    "example": "2024-02-26T11:00:28.069911Z"
+                },
+                "deletedAt": {
+                    "description": "DeletedAt is a time when outer model was deleted.",
+                    "type": "string",
+                    "example": "2024-02-26T11:02:28.069911Z"
+                },
+                "id": {
+                    "description": "ID is an hash of the compressed public key.",
+                    "type": "string",
+                    "example": "874b86d6fd1d6c85a857e73180164203d8d23211bfd9d04d210f9f7fde5b82d8"
+                },
+                "key": {
+                    "description": "Key is a string representation of an access key.",
+                    "type": "string",
+                    "example": "3fd870d6bf1725f04084cf31209c04be5bd9bed001a390ad3bc632a55a3ee078"
+                },
+                "metadata": {
+                    "description": "Metadata is a metadata map of outer model.",
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "string"
+                    },
+                    "example": {
+                        "key": "value",
+                        "key2": "value2"
+                    }
+                },
+                "revokedAt": {
+                    "description": "RevokedAt is a time when access key was revoked.",
+                    "type": "string",
+                    "example": "2024-02-26T11:02:28.069911Z"
+                },
+                "updatedAt": {
+                    "description": "UpdatedAt is a time when outer model was updated.",
+                    "type": "string",
+                    "example": "2024-02-26T11:01:28.069911Z"
+                },
+                "xpubId": {
+                    "description": "XpubID is an access key's xpub related id.",
+                    "type": "string",
+                    "example": "bb8593f85ef8056a77026ad415f02128f3768906de53e9e8bf8749fe2d66cf50"
                 }
             }
         },
@@ -5228,6 +5440,215 @@ const docTemplate = `{
                 "ContactRejected"
             ]
         },
+        "response.Destination": {
+            "type": "object",
+            "properties": {
+                "address": {
+                    "description": "Address is a destination's address.",
+                    "type": "string",
+                    "example": "1CDUf7CKu8ocTTkhcYUbq75t14Ft168K65"
+                },
+                "chain": {
+                    "description": "Chain is a destination's chain representation.",
+                    "type": "integer",
+                    "example": 0
+                },
+                "createdAt": {
+                    "description": "CreatedAt is a time when outer model was created.",
+                    "type": "string",
+                    "example": "2024-02-26T11:00:28.069911Z"
+                },
+                "deletedAt": {
+                    "description": "DeletedAt is a time when outer model was deleted.",
+                    "type": "string",
+                    "example": "2024-02-26T11:02:28.069911Z"
+                },
+                "draftId": {
+                    "description": "DraftID is a destination's draft id.",
+                    "type": "string",
+                    "example": "b356f7fa00cd3f20cce6c21d704cd13e871d28d714a5ebd0532f5a0e0cde63f7"
+                },
+                "id": {
+                    "description": "ID is a destination id which is the hash of the LockingScript.",
+                    "type": "string",
+                    "example": "82a5d848f997819a478b05fb713208d7f3aa66da5ba00953b9845fb1701f9b98"
+                },
+                "lockingScript": {
+                    "description": "LockingScript is a destination's locking script.",
+                    "type": "string",
+                    "example": "76a9147b05764a97f3b4b981471492aa703b188e45979b88ac"
+                },
+                "metadata": {
+                    "description": "Metadata is a metadata map of outer model.",
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "string"
+                    },
+                    "example": {
+                        "key": "value",
+                        "key2": "value2"
+                    }
+                },
+                "num": {
+                    "description": "Num is a destination's num representation.",
+                    "type": "integer",
+                    "example": 0
+                },
+                "paymailExternalDerivationNum": {
+                    "description": "PaymailExternalDerivationNum is the chain/num/(ext_derivation_num) location of the address related to the xPub.",
+                    "type": "integer",
+                    "example": 0
+                },
+                "type": {
+                    "description": "Type is a destination's type.",
+                    "type": "string",
+                    "example": "pubkeyhash"
+                },
+                "updatedAt": {
+                    "description": "UpdatedAt is a time when outer model was updated.",
+                    "type": "string",
+                    "example": "2024-02-26T11:01:28.069911Z"
+                },
+                "xpubId": {
+                    "description": "XpubID is a destination's xpub related id used to register destination.",
+                    "type": "string",
+                    "example": "bb8593f85ef8056a77026ad415f02128f3768906de53e9e8bf8749fe2d66cf50"
+                }
+            }
+        },
+        "response.DraftTransaction": {
+            "type": "object",
+            "properties": {
+                "configuration": {
+                    "description": "Configuration contains draft transaction configuration.",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/response.TransactionConfig"
+                        }
+                    ]
+                },
+                "createdAt": {
+                    "description": "CreatedAt is a time when outer model was created.",
+                    "type": "string",
+                    "example": "2024-02-26T11:00:28.069911Z"
+                },
+                "deletedAt": {
+                    "description": "DeletedAt is a time when outer model was deleted.",
+                    "type": "string",
+                    "example": "2024-02-26T11:02:28.069911Z"
+                },
+                "expiresAt": {
+                    "description": "ExpiresAt is a time when draft transaction expired.",
+                    "type": "string",
+                    "example": "2024-02-26T11:00:28.069911Z"
+                },
+                "finalTxId": {
+                    "description": "FinalTxID is a final transaction id.",
+                    "type": "string",
+                    "example": "cfe30797f0b5fc098b32194e857569a7a1edd829fddf3df4567796b738de386d"
+                },
+                "hex": {
+                    "description": "Hex is a draft transaction hex.",
+                    "type": "string",
+                    "example": "0100000002..."
+                },
+                "id": {
+                    "description": "ID is a draft transaction id.",
+                    "type": "string",
+                    "example": "b356f7fa00cd3f20cce6c21d704cd13e871d28d714a5ebd0532f5a0e0cde63f7"
+                },
+                "metadata": {
+                    "description": "Metadata is a metadata map of outer model.",
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "string"
+                    },
+                    "example": {
+                        "key": "value",
+                        "key2": "value2"
+                    }
+                },
+                "status": {
+                    "description": "Status is a draft transaction lastly monitored status.",
+                    "type": "string",
+                    "example": "complete"
+                },
+                "updatedAt": {
+                    "description": "UpdatedAt is a time when outer model was updated.",
+                    "type": "string",
+                    "example": "2024-02-26T11:01:28.069911Z"
+                },
+                "xpubId": {
+                    "description": "XpubID is a draft transaction's xpub used to sign transaction.",
+                    "type": "string",
+                    "example": "bb8593f85ef8056a77026ad415f02128f3768906de53e9e8bf8749fe2d66cf50"
+                }
+            }
+        },
+        "response.FeeUnit": {
+            "type": "object",
+            "properties": {
+                "bytes": {
+                    "description": "Bytes is a fee unit bytes representation.",
+                    "type": "integer",
+                    "example": 1000
+                },
+                "satoshis": {
+                    "description": "Satoshis is a fee unit satoshis amount.",
+                    "type": "integer",
+                    "example": 1
+                }
+            }
+        },
+        "response.MapProtocol": {
+            "type": "object",
+            "properties": {
+                "app": {
+                    "description": "App is a map protocol app.",
+                    "type": "string"
+                },
+                "keys": {
+                    "description": "Keys is a map protocol keys.",
+                    "type": "object",
+                    "additionalProperties": true
+                },
+                "type": {
+                    "description": "Type is a map protocol type.",
+                    "type": "string"
+                }
+            }
+        },
+        "response.OpReturn": {
+            "type": "object",
+            "properties": {
+                "hex": {
+                    "description": "Hex is a full hex of op return.",
+                    "type": "string"
+                },
+                "hexParts": {
+                    "description": "HexParts is a slice of splitted hex parts.",
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "map": {
+                    "description": "Map is a pointer to a map protocol object.",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/response.MapProtocol"
+                        }
+                    ]
+                },
+                "stringParts": {
+                    "description": "StringParts is a slice of string parts.",
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                }
+            }
+        },
         "response.PageDescription": {
             "type": "object",
             "properties": {
@@ -5246,6 +5667,26 @@ const docTemplate = `{
                 "totalPages": {
                     "description": "TotalPages is total number of pages returned",
                     "type": "integer"
+                }
+            }
+        },
+        "response.PageModel-response_AccessKey": {
+            "type": "object",
+            "properties": {
+                "content": {
+                    "description": "Content is the collection of elements that serves as the content",
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/response.AccessKey"
+                    }
+                },
+                "page": {
+                    "description": "Page is the page descriptor",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/response.PageDescription"
+                        }
+                    ]
                 }
             }
         },
@@ -5269,62 +5710,581 @@ const docTemplate = `{
                 }
             }
         },
-        "time.Duration": {
-            "type": "integer",
-            "enum": [
-                -9223372036854775808,
-                9223372036854775807,
-                1,
-                1000,
-                1000000,
-                1000000000,
-                60000000000,
-                3600000000000,
-                -9223372036854775808,
-                9223372036854775807,
-                1,
-                1000,
-                1000000,
-                1000000000,
-                60000000000,
-                3600000000000,
-                -9223372036854775808,
-                9223372036854775807,
-                1,
-                1000,
-                1000000,
-                1000000000,
-                60000000000,
-                3600000000000
-            ],
-            "x-enum-varnames": [
-                "minDuration",
-                "maxDuration",
-                "Nanosecond",
-                "Microsecond",
-                "Millisecond",
-                "Second",
-                "Minute",
-                "Hour",
-                "minDuration",
-                "maxDuration",
-                "Nanosecond",
-                "Microsecond",
-                "Millisecond",
-                "Second",
-                "Minute",
-                "Hour",
-                "minDuration",
-                "maxDuration",
-                "Nanosecond",
-                "Microsecond",
-                "Millisecond",
-                "Second",
-                "Minute",
-                "Hour"
-            ]
+        "response.PageModel-response_Transaction": {
+            "type": "object",
+            "properties": {
+                "content": {
+                    "description": "Content is the collection of elements that serves as the content",
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/response.Transaction"
+                    }
+                },
+                "page": {
+                    "description": "Page is the page descriptor",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/response.PageDescription"
+                        }
+                    ]
+                }
+            }
         },
-        "transactions.NewTransaction": {
+        "response.PaymailP4": {
+            "type": "object",
+            "properties": {
+                "alias": {
+                    "description": "Alias is a paymail p4 alias.",
+                    "type": "string"
+                },
+                "domain": {
+                    "description": "Domain is a paymail p4 domain.",
+                    "type": "string"
+                },
+                "fromPaymail": {
+                    "description": "FromPaymail is a paymail p4 from paymail.",
+                    "type": "string"
+                },
+                "note": {
+                    "description": "Note is a paymail p4 note.",
+                    "type": "string"
+                },
+                "pubKey": {
+                    "description": "PubKey is a paymail p4 pub key.",
+                    "type": "string"
+                },
+                "receiveEndpoint": {
+                    "description": "ReceiveEndpoint is a paymail p4 receive endpoint.",
+                    "type": "string"
+                },
+                "referenceId": {
+                    "description": "ReferenceID is a paymail p4 reference id.",
+                    "type": "string"
+                },
+                "resolutionType": {
+                    "description": "ResolutionType is a paymail p4 resolution type.",
+                    "type": "string"
+                }
+            }
+        },
+        "response.ScriptOutput": {
+            "type": "object",
+            "properties": {
+                "address": {
+                    "description": "Address is a script output address.",
+                    "type": "string"
+                },
+                "satoshis": {
+                    "description": "Satoshis is a script output satoshis.",
+                    "type": "integer"
+                },
+                "script": {
+                    "description": "Script is a script output script.",
+                    "type": "string"
+                },
+                "scriptType": {
+                    "description": "ScriptType is a script output script type.",
+                    "type": "string"
+                }
+            }
+        },
+        "response.SharedConfig": {
+            "type": "object",
+            "properties": {
+                "experimentalFeatures": {
+                    "description": "ExperimentalFeatures is a map of experimental features handled by spv-wallet.",
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "boolean"
+                    },
+                    "example": {
+                        "pikeEnabled": true
+                    }
+                },
+                "paymailDomains": {
+                    "description": "PaymailDomains is a list of paymail domains handled by spv-wallet.",
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    },
+                    "example": [
+                        "spv-wallet.com"
+                    ]
+                }
+            }
+        },
+        "response.SyncConfig": {
+            "type": "object",
+            "properties": {
+                "broadcast": {
+                    "description": "Broadcast is a flag that indicates whether to broadcast transaction or not.",
+                    "type": "boolean"
+                },
+                "broadcastInstant": {
+                    "description": "BroadcastInstant is a flag that indicates whether to broadcast transaction instantly or not.",
+                    "type": "boolean"
+                },
+                "paymailP2p": {
+                    "description": "PaymailP2P is a flag that indicates whether to use paymail p2p or not.",
+                    "type": "boolean"
+                },
+                "syncOnChain": {
+                    "description": "SyncOnChain is a flag that indicates whether to sync transaction on chain or not.",
+                    "type": "boolean"
+                }
+            }
+        },
+        "response.Transaction": {
+            "type": "object",
+            "properties": {
+                "blockHash": {
+                    "description": "BlockHash is a block hash that transaction is in.",
+                    "type": "string",
+                    "example": "0000000000000000046e81025ca6cfbd2f45c7331f650c77edc99a14d5a1f0d0"
+                },
+                "blockHeight": {
+                    "description": "BlockHeight is a block height that transaction is in.",
+                    "type": "integer",
+                    "example": 833505
+                },
+                "createdAt": {
+                    "description": "CreatedAt is a time when outer model was created.",
+                    "type": "string",
+                    "example": "2024-02-26T11:00:28.069911Z"
+                },
+                "deletedAt": {
+                    "description": "DeletedAt is a time when outer model was deleted.",
+                    "type": "string",
+                    "example": "2024-02-26T11:02:28.069911Z"
+                },
+                "direction": {
+                    "description": "TransactionDirection is a transaction direction (incoming/outgoing).",
+                    "type": "string",
+                    "example": "outgoing"
+                },
+                "draftId": {
+                    "description": "DraftID is a transaction related draft id.",
+                    "type": "string",
+                    "example": "b356f7fa00cd3f20cce6c21d704cd13e871d28d714a5ebd0532f5a0e0cde63f7"
+                },
+                "fee": {
+                    "description": "Fee is a transaction fee.",
+                    "type": "integer",
+                    "example": 1
+                },
+                "hex": {
+                    "description": "Hex is a transaction hex.",
+                    "type": "string",
+                    "example": "0100000002..."
+                },
+                "id": {
+                    "description": "ID is a transaction id.",
+                    "type": "string",
+                    "example": "01d0d0067652f684c6acb3683763f353fce55f6496521c7d99e71e1d27e53f5c"
+                },
+                "metadata": {
+                    "description": "Metadata is a metadata map of outer model.",
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "string"
+                    },
+                    "example": {
+                        "key": "value",
+                        "key2": "value2"
+                    }
+                },
+                "numberOfInputs": {
+                    "description": "NumberOfInputs is a number of transaction inputs.",
+                    "type": "integer",
+                    "example": 3
+                },
+                "numberOfOutputs": {
+                    "description": "NumberOfOutputs is a number of transaction outputs.",
+                    "type": "integer",
+                    "example": 2
+                },
+                "outputValue": {
+                    "description": "OutputValue is a total output value.",
+                    "type": "integer",
+                    "example": 50
+                },
+                "outputs": {
+                    "description": "Outputs represents all spv-wallet-transaction outputs. Will be shown only for admin.",
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "integer"
+                    },
+                    "example": {
+                        "92640954841510a9d95f7737a43075f22ebf7255976549de4c52e8f3faf57470": -51,
+                        "9d07977d2fc14402426288a6010b4cdf7d91b61461acfb75af050b209d2d07ba": 50
+                    }
+                },
+                "status": {
+                    "description": "Status is a transaction status.",
+                    "type": "string",
+                    "example": "MINED"
+                },
+                "totalValue": {
+                    "description": "TotalValue is a total input value.",
+                    "type": "integer",
+                    "example": 51
+                },
+                "updatedAt": {
+                    "description": "UpdatedAt is a time when outer model was updated.",
+                    "type": "string",
+                    "example": "2024-02-26T11:01:28.069911Z"
+                },
+                "xpubInIds": {
+                    "description": "XpubInIDs is a slice of xpub input ids.",
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    },
+                    "example": [
+                        "[bb8593f85ef8056a77026ad415f02128f3768906de53e9e8bf8749fe2d66cf50]"
+                    ]
+                },
+                "xpubOutIds": {
+                    "description": "XpubOutIDs is a slice of xpub output ids.",
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    },
+                    "example": [
+                        "[2075eca10bf2688b38cd7fdad6c24562463a9a26ae505d66c480fd53165dbaa2]"
+                    ]
+                }
+            }
+        },
+        "response.TransactionConfig": {
+            "type": "object",
+            "properties": {
+                "changeDestinations": {
+                    "description": "ChangeDestinations is a slice of change destinations.",
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/response.Destination"
+                    }
+                },
+                "changeDestinationsStrategy": {
+                    "description": "ChangeStrategy is a change strategy.",
+                    "type": "string"
+                },
+                "changeMinimumSatoshis": {
+                    "description": "ChangeMinimumSatoshis is a minimum satoshis for change.",
+                    "type": "integer",
+                    "example": 0
+                },
+                "changeNumberOfDestinations": {
+                    "description": "ChangeNumberOfDestinations is a number of change destinations.",
+                    "type": "integer",
+                    "example": 1
+                },
+                "changeSatoshis": {
+                    "description": "ChangeSatoshis is a change satoshis.",
+                    "type": "integer",
+                    "example": 49
+                },
+                "expiresIn": {
+                    "description": "ExpiresAt is a time when transaction expires.",
+                    "type": "string",
+                    "example": "1000"
+                },
+                "fee": {
+                    "description": "Fee is a fee amount.",
+                    "type": "integer",
+                    "example": 1
+                },
+                "feeUnit": {
+                    "description": "FeeUnit is a pointer to a fee unit object.",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/response.FeeUnit"
+                        }
+                    ]
+                },
+                "fromUtxos": {
+                    "description": "FromUtxos is a slice of from utxos used to build transaction.",
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/response.UtxoPointer"
+                    }
+                },
+                "includeUtxos": {
+                    "description": "IncludeUtxos is a slice of utxos to include in transaction.",
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/response.UtxoPointer"
+                    }
+                },
+                "inputs": {
+                    "description": "Inputs is a slice of transaction inputs.",
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/response.TransactionInput"
+                    }
+                },
+                "outputs": {
+                    "description": "Outputs is a slice of transaction outputs.",
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/response.TransactionOutput"
+                    }
+                },
+                "sendAllTo": {
+                    "description": "SendAllTo is a pointer to a transaction output object.",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/response.TransactionOutput"
+                        }
+                    ]
+                },
+                "sync": {
+                    "description": "Sync contains sync configuration.",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/response.SyncConfig"
+                        }
+                    ]
+                }
+            }
+        },
+        "response.TransactionInput": {
+            "type": "object",
+            "properties": {
+                "createdAt": {
+                    "description": "CreatedAt is a time when outer model was created.",
+                    "type": "string",
+                    "example": "2024-02-26T11:00:28.069911Z"
+                },
+                "deletedAt": {
+                    "description": "DeletedAt is a time when outer model was deleted.",
+                    "type": "string",
+                    "example": "2024-02-26T11:02:28.069911Z"
+                },
+                "destination": {
+                    "description": "Destination is a pointer to a destination object.",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/response.Destination"
+                        }
+                    ]
+                },
+                "draftId": {
+                    "description": "DraftID is a utxo transaction related draft id.",
+                    "type": "string",
+                    "example": "b356f7fa00cd3f20cce6c21d704cd13e871d28d714a5ebd0532f5a0e0cde63f7"
+                },
+                "id": {
+                    "description": "ID is a utxo id which is a hash from transaction id and output index.",
+                    "type": "string",
+                    "example": "c706a448748d398d542cf4dfad797c9a4b123ebb72dbfb8b27f3d0f1dda99b58"
+                },
+                "metadata": {
+                    "description": "Metadata is a metadata map of outer model.",
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "string"
+                    },
+                    "example": {
+                        "key": "value",
+                        "key2": "value2"
+                    }
+                },
+                "outputIndex": {
+                    "description": "OutputIndex is a output index that utxo points to.",
+                    "type": "integer",
+                    "example": 0
+                },
+                "reservedAt": {
+                    "description": "ReservedAt is a time utxo was reserved at.",
+                    "type": "string",
+                    "example": "2024-02-26T11:00:28.069911Z"
+                },
+                "satoshis": {
+                    "description": "Satoshis is a utxo satoshis amount.",
+                    "type": "integer",
+                    "example": 100
+                },
+                "scriptPubKey": {
+                    "description": "ScriptPubKey is a utxo script pub key.",
+                    "type": "string",
+                    "example": "76a91433ba3607a902bc022164bcb6e993f27bd040241c88ac"
+                },
+                "spendingTxId": {
+                    "description": "SpendingTxID is a spending transaction id - null if not spent yet.",
+                    "type": "string",
+                    "example": "01d0d0067652f684c6acb3683763f353fce55f6496521c7d99e71e1d27e53f5c"
+                },
+                "transaction": {
+                    "description": "Transaction is a transaction pointer that utxo points to.",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/response.Transaction"
+                        }
+                    ]
+                },
+                "transactionId": {
+                    "description": "TransactionID is a transaction id that utxo points to.",
+                    "type": "string",
+                    "example": "01d0d0067652f684c6acb3683763f353fce55f6496521c7d99e71e1d27e53f5c"
+                },
+                "type": {
+                    "description": "Type is a utxo type.",
+                    "type": "string",
+                    "example": "pubkeyhash"
+                },
+                "updatedAt": {
+                    "description": "UpdatedAt is a time when outer model was updated.",
+                    "type": "string",
+                    "example": "2024-02-26T11:01:28.069911Z"
+                },
+                "xpubId": {
+                    "description": "XpubID is a utxo related xpub id.",
+                    "type": "string",
+                    "example": "bb8593f85ef8056a77026ad415f02128f3768906de53e9e8bf8749fe2d66cf50"
+                }
+            }
+        },
+        "response.TransactionOutput": {
+            "type": "object",
+            "properties": {
+                "opReturn": {
+                    "description": "OpReturn is a pointer to a op return object.",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/response.OpReturn"
+                        }
+                    ]
+                },
+                "paymailP4": {
+                    "description": "PaymailP4 is a pointer to a paymail p4 object.",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/response.PaymailP4"
+                        }
+                    ]
+                },
+                "satoshis": {
+                    "description": "Satoshis is a satoshis amount.",
+                    "type": "integer",
+                    "example": 50
+                },
+                "script": {
+                    "description": "Script is a transaction output string representation of script.",
+                    "type": "string",
+                    "example": "76a91433ba3607a902bc022164bcb6e993f27bd040241c88ac"
+                },
+                "scripts": {
+                    "description": "ScriptType is a transaction output script type.",
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/response.ScriptOutput"
+                    }
+                },
+                "to": {
+                    "description": "To is a transaction output destination address.",
+                    "type": "string",
+                    "example": "1MB8MfCyA5mGt3UBhxYr1exBfsFWgL1gCm"
+                },
+                "useForChange": {
+                    "description": "UseForChange is a flag that indicates if this output should be used for change.",
+                    "type": "boolean",
+                    "example": false
+                }
+            }
+        },
+        "response.UtxoPointer": {
+            "type": "object",
+            "properties": {
+                "outputIndex": {
+                    "description": "OutputIndex is a output index that utxo points to.",
+                    "type": "integer",
+                    "example": 0
+                },
+                "transactionId": {
+                    "description": "TransactionID is a transaction id that utxo points to.",
+                    "type": "string",
+                    "example": "01d0d0067652f684c6acb3683763f353fce55f6496521c7d99e71e1d27e53f5c"
+                }
+            }
+        },
+        "response.Xpub": {
+            "type": "object",
+            "properties": {
+                "createdAt": {
+                    "description": "CreatedAt is a time when outer model was created.",
+                    "type": "string",
+                    "example": "2024-02-26T11:00:28.069911Z"
+                },
+                "currentBalance": {
+                    "description": "CurrentBalance is a xpub's current balance.",
+                    "type": "integer",
+                    "example": 1234
+                },
+                "deletedAt": {
+                    "description": "DeletedAt is a time when outer model was deleted.",
+                    "type": "string",
+                    "example": "2024-02-26T11:02:28.069911Z"
+                },
+                "id": {
+                    "description": "ID is a hash of the xpub.",
+                    "type": "string",
+                    "example": "bb8593f85ef8056a77026ad415f02128f3768906de53e9e8bf8749fe2d66cf50"
+                },
+                "metadata": {
+                    "description": "Metadata is a metadata map of outer model.",
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "string"
+                    },
+                    "example": {
+                        "key": "value",
+                        "key2": "value2"
+                    }
+                },
+                "nextExternalNum": {
+                    "description": "NextExternalNum is the index derivation number use to generate NEXT external xPub (external xPub are used for address destinations).",
+                    "type": "integer",
+                    "example": 0
+                },
+                "nextInternalNum": {
+                    "description": "NextInternalNum is the index derivation number use to generate NEXT internal xPub (internal xPub are used for change destinations).",
+                    "type": "integer",
+                    "example": 0
+                },
+                "updatedAt": {
+                    "description": "UpdatedAt is a time when outer model was updated.",
+                    "type": "string",
+                    "example": "2024-02-26T11:01:28.069911Z"
+                }
+            }
+        },
+        "transactions.NewDraftTransaction": {
+            "type": "object",
+            "properties": {
+                "config": {
+                    "description": "Configuration of the transaction",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/response.TransactionConfig"
+                        }
+                    ]
+                },
+                "metadata": {
+                    "description": "Accepts a JSON object for embedding custom metadata, enabling arbitrary additional information to be associated with the resource",
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "string"
+                    },
+                    "example": {
+                        "key": "value",
+                        "key2": "value2"
+                    }
+                }
+            }
+        },
+        "transactions.OldNewDraftTransaction": {
             "type": "object",
             "properties": {
                 "config": {
@@ -5367,7 +6327,7 @@ const docTemplate = `{
                         "key2": "value2"
                     }
                 },
-                "reference_id": {
+                "referenceId": {
                     "description": "ReferenceID which is a ID of the draft transaction",
                     "type": "string",
                     "example": "b356f7fa00cd3f20cce6c21d704cd13e871d28d714a5ebd0532f5a0e0cde63f7"
@@ -5382,6 +6342,22 @@ const docTemplate = `{
                     "type": "string",
                     "example": "01d0d0067652f684c6acb3683763f353fce55f6496521c7d99e71e1d27e53f5c"
                 },
+                "metadata": {
+                    "description": "Accepts a JSON object for embedding custom metadata, enabling arbitrary additional information to be associated with the resource",
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "string"
+                    },
+                    "example": {
+                        "key": "value",
+                        "key2": "value2"
+                    }
+                }
+            }
+        },
+        "transactions.UpdateTransactionRequest": {
+            "type": "object",
+            "properties": {
                 "metadata": {
                     "description": "Accepts a JSON object for embedding custom metadata, enabling arbitrary additional information to be associated with the resource",
                     "type": "object",

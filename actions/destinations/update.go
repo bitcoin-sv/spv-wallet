@@ -56,6 +56,6 @@ func (a *Action) update(c *gin.Context) {
 		return
 	}
 
-	contract := mappings.MapToDestinationContract(destination)
+	contract := mappings.MapOldToDestinationContract(destination)
 	c.JSON(http.StatusOK, contract)
 }

@@ -117,6 +117,16 @@ func (c *Client) UnsubscribeWebhook(ctx context.Context, url string) error {
 	return c.options.notifications.webhookManager.Unsubscribe(ctx, url)
 }
 
+// GetWebhooks returns all the webhooks stored in database
+func (c *Client) GetWebhooks(ctx context.Context) ([]notifications.ModelWebhook, error) {
+	if c.options.notifications == nil || c.options.notifications.webhookManager == nil {
+		return nil, spverrors.ErrNotificationsDisabled
+	}
+
+	//nolint:wrapcheck //we're returning our custom errors
+	return c.options.notifications.webhookManager.GetAll(ctx)
+}
+
 // loadPaymailClient will load the Paymail client
 func (c *Client) loadPaymailClient() (err error) {
 	// Only load if it's not set (the client can be overloaded)

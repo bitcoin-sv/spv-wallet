@@ -33,7 +33,7 @@ func (a *Action) oldRevoke(c *gin.Context) {
 // @Tags		Access-key
 // @Produce		json
 // @Param		id path string true "id of the access key"
-// @Success		200	{object} models.AccessKey "Revoked AccessKey"
+// @Success		200	{object} response.AccessKey "Revoked AccessKey"
 // @Failure		400	"Bad request - Missing required field: id"
 // @Failure 	500	"Internal server error - Error while revoking access key"
 // @Router		/api/v1/users/current/keys/{id} [delete]

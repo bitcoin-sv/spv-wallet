@@ -14,6 +14,7 @@ import (
 
 	walletclient "github.com/bitcoin-sv/spv-wallet-go-client"
 	"github.com/bitcoin-sv/spv-wallet-go-client/xpriv"
+	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/bitcoin-sv/spv-wallet/models"
 	"github.com/joho/godotenv"
 )
@@ -226,7 +227,7 @@ func createUser(paymail string, config *regressionTestConfig) (*regressionTestUs
 
 	createPaymailRes, err := adminClient.AdminCreatePaymail(ctx, user.XPub, user.Paymail, "Regression tests", "")
 	if err != nil {
-		if err.Error() == ErrPaymailAlreadyExists.Error() {
+		if err.Error() == spverrors.ErrPaymailAlreadyExists.Error() {
 			return user, err
 		}
 		return nil, err

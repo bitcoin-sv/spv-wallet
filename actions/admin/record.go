@@ -52,7 +52,7 @@ func (a *Action) transactionRecord(c *gin.Context) {
 		}
 	}
 
-	contract := mappings.MapToTransactionContract(transaction)
+	contract := mappings.MapToOldTransactionContract(transaction)
 
 	c.JSON(http.StatusCreated, contract)
 }

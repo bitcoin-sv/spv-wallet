@@ -22,8 +22,7 @@ func OldAccessKeysHandler(appConfig *config.AppConfig, services *config.AppServi
 		accessKeyGroup.GET("", action.oldGet)
 		accessKeyGroup.DELETE("", action.oldRevoke)
 		accessKeyGroup.POST("/count", action.count)
-		accessKeyGroup.GET("/search", action.search)
-		accessKeyGroup.POST("/search", action.search)
+		accessKeyGroup.POST("/search", action.oldSearch)
 	})
 
 	return oldAPIEndpoints
@@ -38,7 +37,7 @@ func NewHandler(appConfig *config.AppConfig, services *config.AppServices) route
 		accessKeyGroup.GET("/:id", action.get)
 		accessKeyGroup.POST("", action.create)
 		accessKeyGroup.DELETE("/:id", action.revoke)
-		// TODO: accessKeyGroup.GET("", action.search)
+		accessKeyGroup.GET("", action.search)
 	})
 
 	return apiEndpoints

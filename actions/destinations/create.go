@@ -58,6 +58,6 @@ func (a *Action) create(c *gin.Context) {
 		return
 	}
 
-	contract := mappings.MapToDestinationContract(destination)
+	contract := mappings.MapOldToDestinationContract(destination)
 	c.JSON(http.StatusCreated, contract)
 }
