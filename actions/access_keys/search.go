@@ -68,7 +68,7 @@ func (a *Action) oldSearch(c *gin.Context) {
 // @Success		200 {object} response.PageModel[response.AccessKey] "List of access keys"
 // @Failure		400	"Bad request - Error while SearchAccessKeys from request query"
 // @Failure 	500	"Internal server error - Error while searching for access keys"
-// @Router		/api/v1//users/current/keys [get]
+// @Router		/api/v1/users/current/keys [get]
 // @Security	x-auth-xpub
 func (a *Action) search(c *gin.Context) {
 	reqXPubID := c.GetString(auth.ParamXPubHashKey)

@@ -3,6 +3,7 @@ package utxos
 import (
 	"net/http"
 
+	"github.com/bitcoin-sv/spv-wallet/actions/common"
 	"github.com/bitcoin-sv/spv-wallet/engine"
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/bitcoin-sv/spv-wallet/internal/query"
@@ -65,10 +66,13 @@ func (a *Action) oldSearch(c *gin.Context) {
 // Search UTXO godoc
 // @Summary		Search UTXO
 // @Description	Search UTXO
-// @Tags		UTXO
+// @Tags		UTXOs
 // @Produce		json
-// @Param		SearchUtxos body filter.SearchUtxos false "Supports targeted resource searches with filters and metadata, plus options for pagination and sorting to streamline data exploration and analysis"
-// @Success		200 {object} []response.Utxo "List of utxos"
+// @Param		SwaggerCommonParams query swagger.CommonFilteringQueryParams false "Supports options for pagination and sorting to streamline data exploration and analysis"
+// @Param		UtxoParams query filter.UtxoFilter false "Supports targeted resource searches with filters"
+// @Param 		reservedRange[from] query string false "Specifies the start time of the range to query by date when a UTXO was reserved" format(date-time) example:"2024-02-26T11:01:28Z"`
+// @Param 		reservedRange[to] query string false "Specifies the end time of the range to query by date when a UTXO was reserved" format(date-time) example:"2024-02-26T11:01:28Z"`
+// @Success		200 {object} response.PageModel[response.Utxo] "List of utxos"
 // @Failure		400	"Bad request - Error while parsing SearchUtxos from request body"
 // @Failure 	500	"Internal server error - Error while searching for utxos"
 // @Router		/api/v1/utxos [get]
@@ -76,13 +80,13 @@ func (a *Action) oldSearch(c *gin.Context) {
 func (a *Action) search(c *gin.Context) {
 	reqXPubID := c.GetString(auth.ParamXPubHashKey)
 
-	searchParams, err := query.ParseSearchParams[filter.SearchUtxos](c)
+	searchParams, err := query.ParseSearchParams[filter.UtxoFilter](c)
 	if err != nil {
 		spverrors.ErrorResponse(c, spverrors.ErrCannotParseQueryParams, a.Services.Logger)
 		return
 	}
 
-	conditions, err := searchParams.Conditions.Conditions.ToDbConditions()
+	conditions, err := searchParams.Conditions.ToDbConditions()
 	if err != nil {
 		spverrors.ErrorResponse(c, spverrors.ErrInvalidConditions, a.Services.Logger)
 		return
@@ -122,7 +126,7 @@ func (a *Action) search(c *gin.Context) {
 
 	response := response.PageModel[response.Utxo]{
 		Content: utxoContracts,
-		Page:    common.GetPageDescriptionFromSearchParams(&searchParams.Page, count),
+		Page:    common.GetPageDescriptionFromSearchParams(pageOptions, count),
 	}
 
 	c.JSON(http.StatusOK, response)
