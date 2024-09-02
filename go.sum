@@ -20,6 +20,8 @@ github.com/bitcoin-sv/go-broadcast-client v0.20.0 h1:O9W8nesYBz/7ta/nVrW9C2KqKc4
 github.com/bitcoin-sv/go-broadcast-client v0.20.0/go.mod h1:qyyjqXvXyIKJPNB2UZH+RzC004F/gu9o/j6E++FqUyA=
 github.com/bitcoin-sv/go-paymail v0.20.0 h1:quJj9qEK7+oRB+IMCVbXPdxP9/CKk9Y+/Nn87jLenBs=
 github.com/bitcoin-sv/go-paymail v0.20.0/go.mod h1:dYhHGsCKpTYCZvxFGwB+ENo3/5aScI4edzzPYpnvBmg=
+github.com/bitcoin-sv/go-sdk v1.1.1 h1:GtpElKJyMe13W9rmY5kbxjZT+FUZSe4U+wREbrRY3+g=
+github.com/bitcoin-sv/go-sdk v1.1.1/go.mod h1:NOAkJLbjqKOLuxJmb9ABG86ExTZp4HS8+iygiDIUps4=
 github.com/bitcoinschema/go-bitcoin/v2 v2.0.5 h1:Sgh5Eb746Zck/46rFDrZZEXZWyO53fMuWYhNoZa1tck=
 github.com/bitcoinschema/go-bitcoin/v2 v2.0.5/go.mod h1:JjO1ivfZv6vhK0uAXzyH08AAHlzNMAfnyK1Fiv9r4ZA=
 github.com/bitcoinschema/go-bob v0.4.3 h1:0iboiIQ3PY2+rrqPr8Gsh5RX+9Ha6Uzyo0bw720Ljlc=
