@@ -8,8 +8,8 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-// NewHandler creates the specific package routes
-func NewHandler(handlersManager *handlers.Manager) {
+// RegisterRoutes creates the specific package routes
+func RegisterRoutes(handlersManager *handlers.Manager) {
 	root := handlersManager.Get(handlers.GroupRoot)
 	root.GET("/", index)
 	root.OPTIONS("/", statusOK)

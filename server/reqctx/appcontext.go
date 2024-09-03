@@ -7,35 +7,41 @@ import (
 	"github.com/rs/zerolog"
 )
 
+const (
+	appConfigKey = "appconfig"
+	appEngineKey = "appengine"
+	appLoggerKey = "applogger"
+)
+
 // AppConfig returns the app config from the request context
 func AppConfig(c *gin.Context) *config.AppConfig {
-	value := c.MustGet(AppConfigKey)
+	value := c.MustGet(appConfigKey)
 	return value.(*config.AppConfig)
 }
 
 // Engine returns the app engine from the request context
 func Engine(c *gin.Context) engine.ClientInterface {
-	value := c.MustGet(AppEngineKey)
+	value := c.MustGet(appEngineKey)
 	return value.(engine.ClientInterface)
 }
 
 // Logger returns the app logger from the request context
 func Logger(c *gin.Context) *zerolog.Logger {
-	value := c.MustGet(AppLoggerKey)
+	value := c.MustGet(appLoggerKey)
 	return value.(*zerolog.Logger)
 }
 
 // SetAppConfig sets the app config in the request context
 func SetAppConfig(c *gin.Context, appConfig *config.AppConfig) {
-	c.Set(AppConfigKey, appConfig)
+	c.Set(appConfigKey, appConfig)
 }
 
 // SetEngine sets the app engine in the request context
 func SetEngine(c *gin.Context, engine engine.ClientInterface) {
-	c.Set(AppEngineKey, engine)
+	c.Set(appEngineKey, engine)
 }
 
 // SetLogger sets the app logger in the request context
 func SetLogger(c *gin.Context, logger *zerolog.Logger) {
-	c.Set(AppLoggerKey, logger)
+	c.Set(appLoggerKey, logger)
 }

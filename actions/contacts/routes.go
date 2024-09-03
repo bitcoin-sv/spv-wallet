@@ -5,8 +5,8 @@ import (
 	"github.com/bitcoin-sv/spv-wallet/server/middleware"
 )
 
-// NewHandler creates the specific package routes
-func NewHandler(handlersManager *handlers.Manager) {
+// RegisterRoutes creates the specific package routes
+func RegisterRoutes(handlersManager *handlers.Manager) {
 	old := handlersManager.Group(handlers.GroupOldAPI, "/contact")
 	old.PUT("/:paymail", handlers.AsUser(oldUpsert))
 	old.PATCH("/accepted/:paymail", handlers.AsUser(oldAccept))

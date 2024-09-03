@@ -5,6 +5,8 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+const userContextKey = "usercontext"
+
 // UserContext is the context for the user
 type UserContext struct {
 	xPub          string
@@ -79,6 +81,11 @@ func (ctx *UserContext) GetValuesForCheckSignature() (xpub, authAccessKey string
 
 // GetUserContext returns the user context from the request context
 func GetUserContext(c *gin.Context) *UserContext {
-	value := c.MustGet(UserContextKey)
+	value := c.MustGet(userContextKey)
 	return value.(*UserContext)
+}
+
+// SetUserContext sets the user context in the request context
+func SetUserContext(c *gin.Context, userContext *UserContext) {
+	c.Set(userContextKey, userContext)
 }

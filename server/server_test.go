@@ -39,7 +39,7 @@ func (ts *TestSuite) TearDownSuite() {
 func (ts *TestSuite) SetupTest() {
 	ts.BaseSetupTest()
 
-	SetupServerRoutes(ts.AppConfig, ts.Services, ts.Router)
+	setupServerRoutes(ts.AppConfig, ts.Services, ts.Router)
 }
 
 // TearDownTest runs after each test

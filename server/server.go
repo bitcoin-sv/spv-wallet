@@ -7,15 +7,7 @@ import (
 	"net/http"
 	"strconv"
 
-	accesskeys "github.com/bitcoin-sv/spv-wallet/actions/access_keys"
-	"github.com/bitcoin-sv/spv-wallet/actions/admin"
-	"github.com/bitcoin-sv/spv-wallet/actions/base"
-	"github.com/bitcoin-sv/spv-wallet/actions/contacts"
-	"github.com/bitcoin-sv/spv-wallet/actions/destinations"
-	"github.com/bitcoin-sv/spv-wallet/actions/sharedconfig"
-	"github.com/bitcoin-sv/spv-wallet/actions/transactions"
-	"github.com/bitcoin-sv/spv-wallet/actions/users"
-	"github.com/bitcoin-sv/spv-wallet/actions/utxos"
+	"github.com/bitcoin-sv/spv-wallet/actions"
 	"github.com/bitcoin-sv/spv-wallet/config"
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/bitcoin-sv/spv-wallet/logging"
@@ -116,39 +108,27 @@ func (s *Server) Handlers() *gin.Engine {
 	// Start the segment
 	defer txn.StartSegment("register_handlers").End()
 
-	SetupServerRoutes(s.AppConfig, s.Services, s.Router)
+	setupServerRoutes(s.AppConfig, s.Services, s.Router)
 
 	return s.Router
 }
 
-// SetupServerRoutes will register endpoints for all models
-func SetupServerRoutes(appConfig *config.AppConfig, services *config.AppServices, engine *gin.Engine) {
-	handlersManager := handlers.NewManager(engine, config.APIVersion)
+func setupServerRoutes(appConfig *config.AppConfig, services *config.AppServices, ginEngine *gin.Engine) {
+	handlersManager := handlers.NewManager(ginEngine, config.APIVersion)
+	actions.Register(appConfig, handlersManager)
 
-	admin.NewHandler(handlersManager)
-	base.NewHandler(handlersManager)
-	accesskeys.NewHandler(handlersManager)
-	destinations.NewHandler(handlersManager)
-	transactions.NewHandler(handlersManager)
-	utxos.NewHandler(handlersManager)
-	users.NewHandler(handlersManager)
-	sharedconfig.NewHandler(handlersManager)
-	if appConfig.ExperimentalFeatures.PikeContactsEnabled {
-		contacts.NewHandler(handlersManager)
-	}
+	services.SpvWalletEngine.GetPaymailConfig().RegisterRoutes(ginEngine)
 
-	// Register paymail routes
-	services.SpvWalletEngine.GetPaymailConfig().RegisterRoutes(engine)
+	setupBaseRoutes(appConfig, ginEngine)
+}
 
-	// Set the 404 handler (any request not detected)
-	engine.NoRoute(metrics.NoRoute, NotFound)
+func setupBaseRoutes(appConfig *config.AppConfig, ginEngine *gin.Engine) {
+	ginEngine.NoRoute(metrics.NoRoute, NotFound)
+	ginEngine.NoMethod(MethodNotAllowed)
 
-	// Set the method not allowed
-	engine.NoMethod(MethodNotAllowed)
-
-	registerSwaggerEndpoints(engine)
+	registerSwaggerEndpoints(ginEngine)
 
 	if appConfig.DebugProfiling {
-		pprof.Register(engine, "debug/pprof")
+		pprof.Register(ginEngine, "debug/pprof")
 	}
 }

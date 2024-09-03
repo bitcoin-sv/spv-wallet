@@ -6,8 +6,8 @@ import (
 	"github.com/bitcoin-sv/spv-wallet/server/middleware"
 )
 
-// NewHandler creates the specific package routes in RESTful style
-func NewHandler(handlersManager *routes.Manager) {
+// RegisterRoutes creates the specific package routes in RESTful style
+func RegisterRoutes(handlersManager *routes.Manager) {
 	old := handlersManager.Group(routes.GroupOldAPI, "/xpub")
 	old.GET("", handlers.AsUser(oldGet))
 	old.PATCH("", middleware.RequireSignature, handlers.AsUser(oldUpdate))

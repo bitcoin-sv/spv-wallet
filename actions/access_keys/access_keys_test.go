@@ -28,7 +28,7 @@ func (ts *TestSuite) TearDownSuite() {
 func (ts *TestSuite) SetupTest() {
 	ts.BaseSetupTest()
 	handlersManager := handlers.NewManager(ts.Router, config.APIVersion)
-	NewHandler(handlersManager)
+	RegisterRoutes(handlersManager)
 }
 
 // TearDownTest runs after each test

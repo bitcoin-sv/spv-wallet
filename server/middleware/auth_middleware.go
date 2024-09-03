@@ -20,7 +20,7 @@ func AuthMiddleware() gin.HandlerFunc {
 		userContext, err := tryAuth(c, xPub, authAccessKey)
 
 		if err == nil {
-			c.Set(reqctx.UserContextKey, userContext)
+			reqctx.SetUserContext(c, userContext)
 			c.Next()
 		} else {
 			spverrors.AbortWithErrorResponse(c, err, reqctx.Logger(c))
@@ -72,13 +72,12 @@ func authByAccessKey(c *gin.Context, authAccessKey string) (*reqctx.UserContext,
 
 func getXPubByID(c *gin.Context, xPubID string) (*engine.Xpub, error) {
 	xPubObj, err := reqctx.Engine(c).GetXpubByID(c, xPubID)
-	if err != nil || xPubObj == nil {
-		if err != nil {
-			reqctx.Logger(c).Warn().Msgf("Could not get XPub by ID: %v", err)
-		} else if xPubObj == nil {
-			reqctx.Logger(c).Debug().Msgf("Provided XPubID (%v) doesn't exist", xPubID)
-		}
-
+	if err != nil {
+		reqctx.Logger(c).Warn().Msgf("Could not get XPub by ID: %v", err)
+		return nil, spverrors.ErrAuthorization
+	}
+	if xPubObj == nil {
+		reqctx.Logger(c).Debug().Msgf("Provided XPubID (%v) doesn't exist", xPubID)
 		return nil, spverrors.ErrAuthorization
 	}
 	return xPubObj, nil
