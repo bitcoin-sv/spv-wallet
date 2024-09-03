@@ -2,7 +2,6 @@ package handlers
 
 import (
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
-	"github.com/bitcoin-sv/spv-wallet/server/middleware"
 	"github.com/bitcoin-sv/spv-wallet/server/reqctx"
 	"github.com/gin-gonic/gin"
 )
@@ -28,13 +27,6 @@ type AdminHandler = func(c *gin.Context, _ *reqctx.AdminContext)
 // AsAdmin wraps the handler with the AdminContext
 func AsAdmin(handler AdminHandler) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		if c.Request.Method == "POST" || c.Request.Method == "PATCH" {
-			// The CheckSignature is based on the request body, so we can't use it for GET and other (no-body) requests
-			if err := middleware.CheckSignature(c); err != nil {
-				spverrors.AbortWithErrorResponse(c, err, nil)
-				return
-			}
-		}
 		userContext := reqctx.GetUserContext(c)
 		if !userContext.IsAdmin() {
 			spverrors.AbortWithErrorResponse(c, spverrors.ErrNotAnAdminKey, nil)

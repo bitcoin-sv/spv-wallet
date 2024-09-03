@@ -3,7 +3,6 @@ package transactions
 import (
 	"github.com/bitcoin-sv/spv-wallet/config"
 	"github.com/bitcoin-sv/spv-wallet/server/handlers"
-	"github.com/bitcoin-sv/spv-wallet/server/middleware"
 )
 
 // RegisterRoutes creates the specific package routes
@@ -15,16 +14,16 @@ func RegisterRoutes(handlersManager *handlers.Manager) {
 	old.GET("/search", handlers.AsUser(search))
 	old.POST("/search", handlers.AsUser(search))
 
-	old.POST("", middleware.RequireSignature, handlers.AsUser(newTransaction))
-	old.POST("/record", middleware.RequireSignature, handlers.AsUser(record))
+	old.POST("", handlers.AsUser(newTransaction))
+	old.POST("/record", handlers.AsUser(record))
 
 	group := handlersManager.Group(handlers.GroupAPI, "/transactions")
 	group.GET(":id", handlers.AsUser(getByID))
 	group.PATCH(":id", handlers.AsUser(updateTransactionMetadata))
 	group.GET("", handlers.AsUser(transactions))
 
-	group.POST("/drafts", middleware.RequireSignature, handlers.AsUser(newTransactionDraft))
-	group.POST("", middleware.RequireSignature, handlers.AsUser(recordTransaction))
+	group.POST("/drafts", handlers.AsUser(newTransactionDraft))
+	group.POST("", handlers.AsUser(recordTransaction))
 
 	handlersManager.Get(handlers.GroupTransactionCallback).POST(config.BroadcastCallbackRoute, broadcastCallback)
 }

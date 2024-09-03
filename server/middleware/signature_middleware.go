@@ -17,8 +17,19 @@ import (
 	"github.com/libsv/go-bt/v2/bscript"
 )
 
-// CheckSignature verifies the signature of the request (if needed) and returns an error if the signature is invalid
-func CheckSignature(c *gin.Context) error {
+// CheckSignatureMiddleware is a middleware that checks the signature of the request (if required)
+func CheckSignatureMiddleware() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		err := checkSignature(c)
+		if err != nil {
+			spverrors.AbortWithErrorResponse(c, err, reqctx.Logger(c))
+		} else {
+			c.Next()
+		}
+	}
+}
+
+func checkSignature(c *gin.Context) error {
 	appConfig := reqctx.AppConfig(c)
 	userContext := reqctx.GetUserContext(c)
 
@@ -29,17 +40,6 @@ func CheckSignature(c *gin.Context) error {
 		}
 	}
 	return nil
-}
-
-// RequireSignature is a middleware that checks the signature of the request
-// NOTE: Keep in mind that the signature is based on the request body, so for GET and other (no-body) requests an error will be returned
-func RequireSignature(c *gin.Context) {
-	err := CheckSignature(c)
-	if err != nil {
-		spverrors.AbortWithErrorResponse(c, err, reqctx.Logger(c))
-	} else {
-		c.Next()
-	}
 }
 
 type payload struct {

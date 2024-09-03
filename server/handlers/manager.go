@@ -31,7 +31,7 @@ type Manager struct {
 // NewManager creates a new Grouper
 func NewManager(engine *gin.Engine, apiVersion string) *Manager {
 	prefix := "/" + apiVersion
-	authRouter := engine.Group("", middleware.AuthMiddleware(), middleware.RequireSignature)
+	authRouter := engine.Group("", middleware.AuthMiddleware(), middleware.CheckSignatureMiddleware())
 
 	return &Manager{
 		engine: engine,
