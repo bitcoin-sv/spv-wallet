@@ -277,7 +277,7 @@ func runTests(clientType string, defaultPath string) error {
 		command = "go test -tags=regression ./... -count=1"
 	}
 	if clientType == "js" {
-		command = "yarn test:regression"
+		command = "yarn install && yarn test:regression"
 	}
 	var path string
 	var cmd *exec.Cmd
