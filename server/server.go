@@ -17,6 +17,9 @@ import (
 	"github.com/gin-contrib/pprof"
 	"github.com/gin-gonic/gin"
 	"github.com/rs/zerolog"
+
+	swaggerfiles "github.com/swaggo/files"
+	ginSwagger "github.com/swaggo/gin-swagger"
 )
 
 // Server is the configuration, services, and actual web server
@@ -126,9 +129,16 @@ func setupBaseRoutes(appConfig *config.AppConfig, ginEngine *gin.Engine) {
 	ginEngine.NoRoute(metrics.NoRoute, NotFound)
 	ginEngine.NoMethod(MethodNotAllowed)
 
-	registerSwaggerEndpoints(ginEngine)
+	setupSwaggerEndpoints(ginEngine)
 
 	if appConfig.DebugProfiling {
 		pprof.Register(ginEngine, "debug/pprof")
 	}
+}
+
+func setupSwaggerEndpoints(ginEngine *gin.Engine) {
+	ginEngine.GET("/swagger", func(c *gin.Context) {
+		c.Redirect(http.StatusMovedPermanently, "/swagger/index.html")
+	})
+	ginEngine.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerfiles.Handler))
 }

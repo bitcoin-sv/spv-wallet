@@ -19,8 +19,8 @@ var ErrMissingAuthHeader = models.SPVError{Message: "missing auth header", Statu
 // ErrNotAnAdminKey is when xpub from auth header is not an admin key
 var ErrNotAnAdminKey = models.SPVError{Message: "xpub provided is not an admin key", StatusCode: 401, Code: "error-unauthorized-xpub-not-an-admin-key"}
 
-// ErrMissingBody is when request is missing body
-var ErrMissingBody = models.SPVError{Message: "missing body", StatusCode: 401, Code: "error-unauthorized-body-missing"}
+// ErrInternal is a generic error that something weird went wrong
+var ErrInternal = models.SPVError{Message: "internal server error", StatusCode: 500, Code: "error-internal-server-error"}
 
 // ErrInvalidOrMissingToken is when callback token from headers is invalid or missing
 var ErrInvalidOrMissingToken = models.SPVError{Message: "invalid or missing bearer token", StatusCode: 401, Code: "error-unauthorized-token-invalid-or-missing"}
@@ -34,23 +34,14 @@ var ErrInvalidSignature = models.SPVError{Message: "invalid signature", StatusCo
 // ErrMissingSignature is when signature is missing in authorization process
 var ErrMissingSignature = models.SPVError{Message: "missing signature", StatusCode: 401, Code: "error-unauthorized-signature-missing"}
 
-// ErrHashesDoNotMatch is when two hashes do not match
-var ErrHashesDoNotMatch = models.SPVError{Message: "auth hash and body hash do not match", StatusCode: 401, Code: "error-unauthorized-hashes-do-not-match"}
-
 // ErrSignatureExpired is when given signature is expired
 var ErrSignatureExpired = models.SPVError{Message: "signature has expired", StatusCode: 401, Code: "error-unauthorized-signature-expired"}
-
-// ErrGettingHdKeyFromXpub is when error occurred during getting hd key from xpub
-var ErrGettingHdKeyFromXpub = models.SPVError{Message: "error getting hd key from xpub", StatusCode: 401, Code: "error-unauthorized-xpub-failed-to-get-from-hd-key"}
 
 // ErrDeriveChildKey is when error occurred during deriving child key
 var ErrDeriveChildKey = models.SPVError{Message: "error deriving child key", StatusCode: 401, Code: "error-unauthorized-derive-child-key"}
 
 // ErrGettingAddressFromHdKey is when error occurred during getting address from hd key
 var ErrGettingAddressFromHdKey = models.SPVError{Message: "error getting address from hd key", StatusCode: 401, Code: "error-unauthorized-address-failed-to-get-from-hd-key"}
-
-// ErrGettingAddressFromPublicKey is when error occurred during getting address from public key
-var ErrGettingAddressFromPublicKey = models.SPVError{Message: "error getting address from public key", StatusCode: 401, Code: "error-unauthorized-address-failed-to-get-from-public-key"}
 
 // ErrValidateXPub is when validation xpub
 var ErrValidateXPub = models.SPVError{Message: "error validation xpub", StatusCode: 401, Code: "error-unauthorized-xpub-invalid"}

@@ -20,132 +20,115 @@ import (
 // CheckSignatureMiddleware is a middleware that checks the signature of the request (if required)
 func CheckSignatureMiddleware() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		err := checkSignature(c)
-		if err != nil {
-			spverrors.AbortWithErrorResponse(c, err, reqctx.Logger(c))
-		} else {
-			c.Next()
+		appConfig := reqctx.AppConfig(c)
+		userContext := reqctx.GetUserContext(c)
+
+		requireSigning := userContext.IsAuthorizedByAccessKey() || appConfig.Authentication.RequireSigning
+
+		if requireSigning {
+			if err := verifyRequest(c, userContext); err != nil {
+				spverrors.AbortWithErrorResponse(c, err, reqctx.Logger(c))
+				return
+			}
 		}
+
+		c.Next()
 	}
 }
 
-func checkSignature(c *gin.Context) error {
-	appConfig := reqctx.AppConfig(c)
-	userContext := reqctx.GetUserContext(c)
-
-	requireSigning := userContext.IsAuthorizedByAccessKey() || appConfig.Authentication.RequireSigning
-	if requireSigning {
-		if err := verify(c, userContext); err != nil {
-			return err
-		}
-	}
-	return nil
-}
-
-type payload struct {
-	AuthHash     string `json:"auth_hash"`
-	AuthNonce    string `json:"auth_nonce"`
-	BodyContents string `json:"body_contents"`
-	Signature    string `json:"signature"`
-	xPub         string
-	accessKey    string
-	AuthTime     int64 `json:"auth_time"`
-}
-
-// verify check the signature for the provided auth payload
-func verify(c *gin.Context, userContext *reqctx.UserContext) error {
-	bodyContent, err := readBodyContents(c)
+func verifyRequest(c *gin.Context, userContext *reqctx.UserContext) error {
+	bodyContent, err := readBodyContents(c) // for GET methods, bodyContent is an empty string
 	if err != nil {
 		return err
 	}
-	authTime, _ := strconv.Atoi(c.GetHeader(models.AuthHeaderTime))
+	authTime, err := strconv.Atoi(c.GetHeader(models.AuthHeaderTime))
+	if err != nil {
+		return spverrors.ErrInvalidSignature
+	}
 	xPub, authAccessKey := userContext.GetValuesForCheckSignature()
-	sigData := &payload{
-		AuthHash:     c.GetHeader(models.AuthHeaderHash),
-		AuthNonce:    c.GetHeader(models.AuthHeaderNonce),
-		AuthTime:     int64(authTime),
-		BodyContents: bodyContent,
-		Signature:    c.GetHeader(models.AuthSignature),
-		xPub:         xPub,
-		accessKey:    authAccessKey,
+	validator := &sigAuth{
+		AuthHash:  c.GetHeader(models.AuthHeaderHash),
+		AuthNonce: c.GetHeader(models.AuthHeaderNonce),
+		AuthTime:  int64(authTime),
+		Signature: c.GetHeader(models.AuthSignature),
 	}
 
-	if err := checkSignatureRequirements(sigData); err != nil {
+	if err := validator.checkRequirements(bodyContent); err != nil {
 		return err
 	}
 
-	if sigData.xPub != "" {
-		return verifyKeyXPub(sigData.xPub, sigData)
+	switch {
+	case userContext.IsAuthorizedByAccessKey():
+		return validator.verifyWithAccessKey(authAccessKey)
+	case xPub != "":
+		return validator.verifyWithXPub(xPub)
+	default:
+		return spverrors.ErrAuthorization
 	}
-	return verifyMessageAndSignature(sigData.accessKey, sigData)
 }
 
+// readBodyContents reads and returns the whole body content
+// To allow gin to read the body while Binding process it substitues c.Request.Body with new io.NopCloser
+// NOTE: for GET methods and other "no-body" requests this function returns empty string (with no error)
 func readBodyContents(c *gin.Context) (string, error) {
 	if c.Request.Body == nil {
-		return "", spverrors.ErrMissingBody
+		return "", spverrors.ErrInternal
 	}
 	defer func() {
 		_ = c.Request.Body.Close()
 	}()
 	b, err := io.ReadAll(c.Request.Body)
 	if err != nil {
-		return "", spverrors.ErrMissingBody
+		return "", spverrors.ErrInternal
 	}
 
 	c.Request.Body = io.NopCloser(bytes.NewReader(b))
 	return string(b), nil
 }
 
-// checkSignatureRequirements will check the payload for basic signature requirements
-func checkSignatureRequirements(auth *payload) error {
-	if auth == nil || auth.Signature == "" {
+type sigAuth struct {
+	AuthHash  string
+	AuthNonce string
+	Signature string
+	AuthTime  int64
+}
+
+func (sa *sigAuth) checkRequirements(bodyContents string) error {
+	if sa.Signature == "" {
 		return spverrors.ErrMissingSignature
 	}
 
-	bodyHash := createBodyHash(auth.BodyContents)
-	if auth.AuthHash != bodyHash {
-		return spverrors.ErrHashesDoNotMatch
+	bodyHash := utils.Hash(strings.TrimSuffix(bodyContents, "\n"))
+	if sa.AuthHash != bodyHash {
+		return spverrors.ErrInvalidSignature
 	}
 
-	if time.Now().UTC().After(time.UnixMilli(auth.AuthTime).Add(models.AuthSignatureTTL)) {
+	if time.Now().UTC().After(time.UnixMilli(sa.AuthTime).Add(models.AuthSignatureTTL)) {
 		return spverrors.ErrSignatureExpired
 	}
 	return nil
 }
 
-// createBodyHash will create the hash of the body, removing any carriage returns
-func createBodyHash(bodyContents string) string {
-	return utils.Hash(strings.TrimSuffix(bodyContents, "\n"))
-}
-
-// verifyKeyXPub will verify the xPub key and the signature payload
-func verifyKeyXPub(xPub string, auth *payload) error {
-	if _, err := utils.ValidateXPub(xPub); err != nil {
-		return spverrors.ErrValidateXPub
-	}
-
-	if auth == nil {
-		return spverrors.ErrMissingSignature
-	}
-
+// verifyWithXPub will verify the xPub key and the signature payload
+func (sa *sigAuth) verifyWithXPub(xPub string) error {
 	key, err := bitcoin.GetHDKeyFromExtendedPublicKey(xPub)
 	if err != nil {
-		return spverrors.ErrGettingHdKeyFromXpub
+		return spverrors.ErrInvalidSignature
 	}
 
-	if key, err = utils.DeriveChildKeyFromHex(key, auth.AuthNonce); err != nil {
-		return spverrors.ErrDeriveChildKey
+	if key, err = utils.DeriveChildKeyFromHex(key, sa.AuthNonce); err != nil {
+		return spverrors.ErrInvalidSignature
 	}
 
 	var address *bscript.Address
 	if address, err = bitcoin.GetAddressFromHDKey(key); err != nil {
-		return spverrors.ErrGettingAddressFromHdKey
+		return spverrors.ErrInvalidSignature
 	}
 
-	message := getSigningMessage(xPub, auth)
+	message := sa.getSigningMessage(xPub)
 	if err = bitcoin.VerifyMessage(
 		address.AddressString,
-		auth.Signature,
+		sa.Signature,
 		message,
 	); err != nil {
 		return spverrors.ErrInvalidSignature
@@ -153,19 +136,19 @@ func verifyKeyXPub(xPub string, auth *payload) error {
 	return nil
 }
 
-// verifyMessageAndSignature will verify the access key and the signature payload
-func verifyMessageAndSignature(key string, auth *payload) error {
+// verifyWithAccessKey will verify the access key and the signature payload
+func (sa *sigAuth) verifyWithAccessKey(accessKey string) error {
 	address, err := bitcoin.GetAddressFromPubKeyString(
-		key, true,
+		accessKey, true,
 	)
 	if err != nil {
-		return spverrors.ErrGettingAddressFromPublicKey
+		return spverrors.ErrInvalidSignature
 	}
 
 	if err := bitcoin.VerifyMessage(
 		address.AddressString,
-		auth.Signature,
-		getSigningMessage(key, auth),
+		sa.Signature,
+		sa.getSigningMessage(accessKey),
 	); err != nil {
 		return spverrors.ErrInvalidSignature
 	}
@@ -173,6 +156,6 @@ func verifyMessageAndSignature(key string, auth *payload) error {
 }
 
 // getSigningMessage will build the signing message string
-func getSigningMessage(xPub string, auth *payload) string {
-	return fmt.Sprintf("%s%s%s%d", xPub, auth.AuthHash, auth.AuthNonce, auth.AuthTime)
+func (sa *sigAuth) getSigningMessage(xPub string) string {
+	return fmt.Sprintf("%s%s%s%d", xPub, sa.AuthHash, sa.AuthNonce, sa.AuthTime)
 }
