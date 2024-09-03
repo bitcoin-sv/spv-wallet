@@ -7,8 +7,8 @@ import (
 
 // NewHandler creates the specific package routes
 func NewHandler(handlersManager *routes.Manager) {
-	roGroup := handlersManager.Group(routes.GroupOldAPI, "/utxo")
-	roGroup.GET("", handlers.AsUser(get))
-	roGroup.POST("/count", handlers.AsUser(count))
-	roGroup.POST("/search", handlers.AsUser(search))
+	group := handlersManager.Group(routes.GroupOldAPI, "/utxo")
+	group.GET("", handlers.AsUser(get))
+	group.POST("/count", handlers.AsUser(count))
+	group.POST("/search", handlers.AsUser(search))
 }
