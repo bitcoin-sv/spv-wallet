@@ -16,15 +16,15 @@ import (
 
 // search will fetch a list of transactions filtered on conditions and metadata
 // Search transaction godoc
-// @Summary		Search transaction
-// @Description	Search transaction
+// @Summary		Search transaction - Use (GET) /api/v1/transactions instead.
+// @Description	This endpoint has been deprecated. Use (GET) /api/v1/transactions instead
 // @Tags		Transactions
 // @Produce		json
 // @Param		SearchTransactions body filter.SearchTransactions false "Supports targeted resource searches with filters and metadata, plus options for pagination and sorting to streamline data exploration and analysis"
 // @Success		200 {object} []models.Transaction "List of transactions"
 // @Failure		400	"Bad request - Error while parsing SearchTransactions from request body"
 // @Failure 	500	"Internal server error - Error while searching for transactions"
-// @Router		/v1/transaction/search [post]
+// @DeprecatedRouter		/v1/transaction/search [post]
 // @Security	x-auth-xpub
 func (a *Action) search(c *gin.Context) {
 	reqXPubID := c.GetString(auth.ParamXPubHashKey)
