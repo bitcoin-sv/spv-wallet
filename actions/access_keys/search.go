@@ -86,7 +86,7 @@ func search(c *gin.Context, userContext *reqctx.UserContext) {
 
 	accessKeys, err := engine.GetAccessKeysByXPubID(
 		c.Request.Context(),
-		userContext.GetXPub(),
+		userContext.GetXPubID(),
 		metadata,
 		conditions,
 		pageOptions,
@@ -103,7 +103,7 @@ func search(c *gin.Context, userContext *reqctx.UserContext) {
 
 	count, err := engine.GetAccessKeysByXPubIDCount(
 		c.Request.Context(),
-		userContext.GetXPub(),
+		userContext.GetXPubID(),
 		metadata,
 		conditions,
 	)

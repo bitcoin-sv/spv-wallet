@@ -14,16 +14,16 @@ func RegisterRoutes(handlersManager *handlers.Manager) {
 	old.GET("/search", handlers.AsUser(search))
 	old.POST("/search", handlers.AsUser(search))
 
-	old.POST("", handlers.AsUser(newTransaction))
-	old.POST("/record", handlers.AsUser(record))
+	old.POST("", handlers.AsUserWithXPub(newTransaction))
+	old.POST("/record", handlers.AsUserWithXPub(record))
 
 	group := handlersManager.Group(handlers.GroupAPI, "/transactions")
 	group.GET(":id", handlers.AsUser(getByID))
 	group.PATCH(":id", handlers.AsUser(updateTransactionMetadata))
 	group.GET("", handlers.AsUser(transactions))
 
-	group.POST("/drafts", handlers.AsUser(newTransactionDraft))
-	group.POST("", handlers.AsUser(recordTransaction))
+	group.POST("/drafts", handlers.AsUserWithXPub(newTransactionDraft))
+	group.POST("", handlers.AsUserWithXPub(recordTransaction))
 
 	handlersManager.Get(handlers.GroupTransactionCallback).POST(config.BroadcastCallbackRoute, broadcastCallback)
 }

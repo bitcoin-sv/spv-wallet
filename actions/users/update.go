@@ -62,8 +62,7 @@ func updateHelper(c *gin.Context, snakeCase bool, userContext *reqctx.UserContex
 		return
 	}
 
-	signed := c.GetBool("auth_signed")
-	if !signed || userContext.GetXPub() == "" {
+	if userContext.GetAuthType() == reqctx.AuthTypeAccessKey {
 		xPub.RemovePrivateData()
 	}
 

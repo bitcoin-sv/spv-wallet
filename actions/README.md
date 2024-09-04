@@ -30,8 +30,14 @@ func RegisterRoutes(handlersManager *routes.Manager) {
 func someHandler(c *gin.Context, userContext *reqctx.UserContext)
 ```
 
--   Use the `userContext` object to get XPub (XPubID) of current request.
+-   Use the `userContext` object to get XPubID of current request.
     -   Additionally, you cannot confuse "user" handlers with others - because of unique set of arguments.
+-   If you require a `XPub` in your action - keep in mind that in that case, authorization by `access keys` will not be available
+    -   To define such handlers use `handlers.AsUserWithXPub(yourHandler)` and the handler func with following pattern:
+
+```golang
+func someHandler(c *gin.Context, userContext *reqctx.UserContext, xpub string)
+```
 
 ## 2. How to define an endpoint for admin
 

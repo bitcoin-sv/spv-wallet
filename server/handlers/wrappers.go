@@ -9,15 +9,28 @@ import (
 // UserHandler is the handler for the user
 type UserHandler = func(c *gin.Context, userContext *reqctx.UserContext)
 
-// AsUser wraps the handler with the user context
+type UserHandlerWithXPub = func(c *gin.Context, userContext *reqctx.UserContext, xpub string)
+
+// AsUser wraps the handler with the user context. User can be authorized by xPub or accessKey
 func AsUser(handler UserHandler) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		userContext := reqctx.GetUserContext(c)
-		if userContext.IsAdmin() {
+		if userContext.GetAuthType() == reqctx.AuthTypeAdmin {
 			spverrors.AbortWithErrorResponse(c, spverrors.ErrAdminAuthOnUserEndpoint, nil)
 			return
 		}
 		handler(c, userContext)
+	}
+}
+
+func AsUserWithXPub(handler UserHandlerWithXPub) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		userContext := reqctx.GetUserContext(c)
+		if userContext.AuthType != reqctx.AuthTypeXPub {
+			spverrors.AbortWithErrorResponse(c, spverrors.ErrXPubAuthRequired, nil)
+			return
+		}
+		handler(c, userContext, reqctx.EnsureXPubIsSet(userContext))
 	}
 }
 
@@ -28,7 +41,7 @@ type AdminHandler = func(c *gin.Context, _ *reqctx.AdminContext)
 func AsAdmin(handler AdminHandler) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		userContext := reqctx.GetUserContext(c)
-		if !userContext.IsAdmin() {
+		if userContext.GetAuthType() != reqctx.AuthTypeAdmin {
 			spverrors.AbortWithErrorResponse(c, spverrors.ErrNotAnAdminKey, nil)
 			return
 		}

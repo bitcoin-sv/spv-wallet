@@ -22,7 +22,7 @@ import (
 // @Failure 	500	"Internal Server Error - Error while creating transaction"
 // @DeprecatedRouter	/v1/transaction [post]
 // @Security	x-auth-xpub
-func newTransaction(c *gin.Context, userContext *reqctx.UserContext) {
+func newTransaction(c *gin.Context, userContext *reqctx.UserContext, xpub string) {
 	logger := reqctx.Logger(c)
 	engineInstance := reqctx.Engine(c)
 
@@ -43,7 +43,7 @@ func newTransaction(c *gin.Context, userContext *reqctx.UserContext) {
 	var transaction *engine.DraftTransaction
 	if transaction, err = engineInstance.NewTransaction(
 		c.Request.Context(),
-		userContext.GetXPub(),
+		xpub,
 		txConfig,
 		opts...,
 	); err != nil {
@@ -67,7 +67,7 @@ func newTransaction(c *gin.Context, userContext *reqctx.UserContext) {
 // @Failure 	500	"Internal Server Error - Error while creating transaction"
 // @Router		/api/v1/transactions/drafts [post]
 // @Security	x-auth-xpub
-func newTransactionDraft(c *gin.Context, userContext *reqctx.UserContext) {
+func newTransactionDraft(c *gin.Context, userContext *reqctx.UserContext, xpub string) {
 	logger := reqctx.Logger(c)
 	engineInstance := reqctx.Engine(c)
 
@@ -88,7 +88,7 @@ func newTransactionDraft(c *gin.Context, userContext *reqctx.UserContext) {
 	var transaction *engine.DraftTransaction
 	if transaction, err = engineInstance.NewTransaction(
 		c.Request.Context(),
-		userContext.GetXPub(),
+		xpub,
 		txConfig,
 		opts...,
 	); err != nil {

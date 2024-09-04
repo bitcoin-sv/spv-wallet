@@ -23,7 +23,7 @@ import (
 // @Failure 	500	"Internal Server Error - Error while creating destination"
 // @DeprecatedRouter  /v1/destination [post]
 // @Security	x-auth-xpub
-func create(c *gin.Context, userContext *reqctx.UserContext) {
+func create(c *gin.Context, userContext *reqctx.UserContext, xpub string) {
 	logger := reqctx.Logger(c)
 	engineInstance := reqctx.Engine(c)
 
@@ -43,7 +43,7 @@ func create(c *gin.Context, userContext *reqctx.UserContext) {
 	var destination *engine.Destination
 	if destination, err = engineInstance.NewDestination(
 		c.Request.Context(),
-		userContext.GetXPub(),
+		xpub,
 		uint32(0), // todo: use a constant? protect this?
 		utils.ScriptTypePubKeyHash,
 		opts...,

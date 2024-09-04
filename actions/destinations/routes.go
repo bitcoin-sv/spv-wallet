@@ -12,6 +12,6 @@ func RegisterRoutes(handlersManager *handlers.Manager) {
 	group.GET("/search", handlers.AsUser(search))
 	group.POST("/search", handlers.AsUser(search))
 
-	group.POST("", handlers.AsUser(create))
+	group.POST("", handlers.AsUserWithXPub(create))
 	group.PATCH("", handlers.AsUser(update))
 }

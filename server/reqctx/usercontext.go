@@ -7,48 +7,51 @@ import (
 
 const userContextKey = "usercontext"
 
+type AuthType = int
+
+const (
+	AuthTypeXPub AuthType = iota
+	AuthTypeAccessKey
+	AuthTypeAdmin
+)
+
 // UserContext is the context for the user
 type UserContext struct {
-	xPub          string
-	xPubID        string
-	xPubObj       *engine.Xpub
-	authAccessKey string
-	isAdmin       bool
+	xPub     string
+	xPubID   string
+	xPubObj  *engine.Xpub
+	AuthType AuthType
 }
 
 // NewUserContextWithXPub creates a new UserContext based on xpub authorization
 func NewUserContextWithXPub(xpub, xpubID string, xPubObj *engine.Xpub) *UserContext {
 	return &UserContext{
-		xPub:    xpub,
-		xPubID:  xpubID,
-		xPubObj: xPubObj,
+		xPub:     xpub,
+		xPubID:   xpubID,
+		xPubObj:  xPubObj,
+		AuthType: AuthTypeXPub,
 	}
 }
 
 // NewUserContextWithAccessKey creates a new UserContext based on accessKey authorization
-func NewUserContextWithAccessKey(authAccessKey string, accessKey *engine.AccessKey, xPubObj *engine.Xpub) *UserContext {
+func NewUserContextWithAccessKey(xpubID string, xPubObj *engine.Xpub) *UserContext {
 	return &UserContext{
-		authAccessKey: authAccessKey,
-		xPubID:        accessKey.XpubID,
-		xPubObj:       xPubObj,
+		xPubID:   xpubID,
+		xPubObj:  xPubObj,
+		AuthType: AuthTypeAccessKey,
 	}
 }
 
 // NewUserContextAsAdmin creates a new UserContext as an admin
-func NewUserContextAsAdmin(adminXPub string) *UserContext {
+func NewUserContextAsAdmin() *UserContext {
 	return &UserContext{
-		xPub:    adminXPub,
-		isAdmin: true,
+		AuthType: AuthTypeAdmin,
 	}
 }
 
-// GetXPub returns the xPub from the user context
-func (ctx *UserContext) GetXPub() string {
-	if ctx.IsAdmin() {
-		panic("You should not get the admin xPub using this GetXPub method")
-	}
-	// if authentication was made using accessKey there is not xPub; only xPubID can be used
-	return ctx.xPub
+// GetAuthType returns the authentication type from the user context
+func (ctx *UserContext) GetAuthType() AuthType {
+	return ctx.AuthType
 }
 
 // GetXPubID returns the xPubID from the user context
@@ -58,25 +61,7 @@ func (ctx *UserContext) GetXPubID() string {
 
 // GetXPubObj returns an object of engine.Xpub
 func (ctx *UserContext) GetXPubObj() *engine.Xpub {
-	// if authentication was made using accessKey there is not xPub; only xPubID can be used
 	return ctx.xPubObj
-}
-
-// IsAdmin checks if the user is an admin
-func (ctx *UserContext) IsAdmin() bool {
-	return ctx.isAdmin
-}
-
-// IsAuthorizedByAccessKey checks if the user is authorized by access key
-func (ctx *UserContext) IsAuthorizedByAccessKey() bool {
-	return ctx.authAccessKey != ""
-}
-
-// GetValuesForCheckSignature returns values needed to check signature
-func (ctx *UserContext) GetValuesForCheckSignature() (xpub, authAccessKey string) {
-	xpub = ctx.xPub
-	authAccessKey = ctx.authAccessKey
-	return
 }
 
 // GetUserContext returns the user context from the request context
@@ -88,4 +73,18 @@ func GetUserContext(c *gin.Context) *UserContext {
 // SetUserContext sets the user context in the request context
 func SetUserContext(c *gin.Context, userContext *UserContext) {
 	c.Set(userContextKey, userContext)
+}
+
+// EnsureXPubIsSet returns the xPub if authorization was made by "regular user" with xPub (not accessKey)
+// It panics on fail, so use with caution.
+// This function should not be called in actions.
+func EnsureXPubIsSet(ctx *UserContext) string {
+	if ctx.AuthType != AuthTypeXPub {
+		panic("The xPub is not available when the user is authorized by access key or is an admin")
+	}
+	if ctx.xPub == "" {
+		panic("The xPub is not available")
+	}
+
+	return ctx.xPub
 }

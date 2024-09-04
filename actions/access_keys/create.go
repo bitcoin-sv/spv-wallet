@@ -22,8 +22,8 @@ import (
 // @Failure 	500	"Internal server error - Error while creating new access key"
 // @DeprecatedRouter  /v1/access-key [post]
 // @Security	x-auth-xpub
-func oldCreate(c *gin.Context, userContext *reqctx.UserContext) {
-	createHelper(c, true, userContext.GetXPub())
+func oldCreate(c *gin.Context, userContext *reqctx.UserContext, xpub string) {
+	createHelper(c, true, xpub)
 }
 
 // create will make a new model using the services defined in the action object
@@ -38,8 +38,8 @@ func oldCreate(c *gin.Context, userContext *reqctx.UserContext) {
 // @Failure 	500	"Internal server error - Error while creating new access key"
 // @Router		/api/v1/users/current/keys [post]
 // @Security	x-auth-xpub
-func create(c *gin.Context, userContext *reqctx.UserContext) {
-	createHelper(c, false, userContext.GetXPub())
+func create(c *gin.Context, userContext *reqctx.UserContext, xpub string) {
+	createHelper(c, false, xpub)
 }
 
 func createHelper(c *gin.Context, snakeCase bool, xpub string) {

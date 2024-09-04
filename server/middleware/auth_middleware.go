@@ -44,7 +44,7 @@ func authByXPub(c *gin.Context, xPub string) (*reqctx.UserContext, error) {
 	}
 	config := reqctx.AppConfig(c)
 	if xPub == config.Authentication.AdminKey {
-		return reqctx.NewUserContextAsAdmin(xPub), nil
+		return reqctx.NewUserContextAsAdmin(), nil
 	}
 
 	xPubID := utils.Hash(xPub)
@@ -67,7 +67,7 @@ func authByAccessKey(c *gin.Context, authAccessKey string) (*reqctx.UserContext,
 		return nil, err
 	}
 
-	return reqctx.NewUserContextWithAccessKey(authAccessKey, accessKey, xPubObj), nil
+	return reqctx.NewUserContextWithAccessKey(accessKey.XpubID, xPubObj), nil
 }
 
 func getXPubByID(c *gin.Context, xPubID string) (*engine.Xpub, error) {

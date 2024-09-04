@@ -21,9 +21,9 @@ import (
 // @Failure 	500	"Internal server error - Error while revoking access key"
 // @DeprecatedRouter  /v1/access-key [delete]
 // @Security	x-auth-xpub
-func oldRevoke(c *gin.Context, userContext *reqctx.UserContext) {
+func oldRevoke(c *gin.Context, userContext *reqctx.UserContext, xpub string) {
 	id := c.Query("id")
-	revokeHelper(c, id, true, userContext.GetXPub())
+	revokeHelper(c, id, true, xpub)
 }
 
 // revoke will revoke the intended model by id
@@ -38,9 +38,9 @@ func oldRevoke(c *gin.Context, userContext *reqctx.UserContext) {
 // @Failure 	500	"Internal server error - Error while revoking access key"
 // @Router		/api/v1/users/current/keys/{id} [delete]
 // @Security	x-auth-xpub
-func revoke(c *gin.Context, userContext *reqctx.UserContext) {
+func revoke(c *gin.Context, userContext *reqctx.UserContext, xpub string) {
 	id := c.Params.ByName("id")
-	revokeHelper(c, id, false, userContext.GetXPub())
+	revokeHelper(c, id, false, xpub)
 }
 
 func revokeHelper(c *gin.Context, id string, snakeCase bool, xpub string) {

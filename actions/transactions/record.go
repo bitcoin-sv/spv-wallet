@@ -21,7 +21,7 @@ import (
 // @Failure 	500	"Internal Server Error - Error while recording transaction"
 // @DeprecatedRouter	/v1/transaction/record [post]
 // @Security	x-auth-xpub
-func record(c *gin.Context, userContext *reqctx.UserContext) {
+func record(c *gin.Context, userContext *reqctx.UserContext, xpub string) {
 	logger := reqctx.Logger(c)
 	engineInstance := reqctx.Engine(c)
 
@@ -41,7 +41,7 @@ func record(c *gin.Context, userContext *reqctx.UserContext) {
 	var transaction *engine.Transaction
 	if transaction, err = engineInstance.RecordTransaction(
 		c.Request.Context(),
-		userContext.GetXPub(),
+		xpub,
 		requestBody.Hex,
 		requestBody.ReferenceID,
 		opts...,
@@ -65,7 +65,7 @@ func record(c *gin.Context, userContext *reqctx.UserContext) {
 // @Failure 	500	"Internal Server Error - Error while recording transaction"
 // @Router		/api/v1/transactions [post]
 // @Security	x-auth-xpub
-func recordTransaction(c *gin.Context, userContext *reqctx.UserContext) {
+func recordTransaction(c *gin.Context, userContext *reqctx.UserContext, xpub string) {
 	logger := reqctx.Logger(c)
 	engineInstance := reqctx.Engine(c)
 
@@ -85,7 +85,7 @@ func recordTransaction(c *gin.Context, userContext *reqctx.UserContext) {
 	var transaction *engine.Transaction
 	if transaction, err = engineInstance.RecordTransaction(
 		c.Request.Context(),
-		userContext.GetXPub(),
+		xpub,
 		requestBody.Hex,
 		requestBody.ReferenceID,
 		opts...,

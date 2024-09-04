@@ -23,7 +23,7 @@ func CheckSignatureMiddleware() gin.HandlerFunc {
 		appConfig := reqctx.AppConfig(c)
 		userContext := reqctx.GetUserContext(c)
 
-		requireSigning := userContext.IsAuthorizedByAccessKey() || appConfig.Authentication.RequireSigning
+		requireSigning := userContext.GetAuthType() == reqctx.AuthTypeAccessKey || appConfig.Authentication.RequireSigning
 
 		if requireSigning {
 			if err := verifyRequest(c, userContext); err != nil {
@@ -45,7 +45,6 @@ func verifyRequest(c *gin.Context, userContext *reqctx.UserContext) error {
 	if err != nil {
 		return spverrors.ErrInvalidSignature
 	}
-	xPub, authAccessKey := userContext.GetValuesForCheckSignature()
 	validator := &sigAuth{
 		AuthHash:  c.GetHeader(models.AuthHeaderHash),
 		AuthNonce: c.GetHeader(models.AuthHeaderNonce),
@@ -57,11 +56,13 @@ func verifyRequest(c *gin.Context, userContext *reqctx.UserContext) error {
 		return err
 	}
 
-	switch {
-	case userContext.IsAuthorizedByAccessKey():
-		return validator.verifyWithAccessKey(authAccessKey)
-	case xPub != "":
-		return validator.verifyWithXPub(xPub)
+	switch userContext.GetAuthType() {
+	case reqctx.AuthTypeXPub:
+		return validator.verifyWithXPub(reqctx.EnsureXPubIsSet(userContext))
+	case reqctx.AuthTypeAccessKey:
+		return validator.verifyWithAccessKey(strings.TrimSpace(c.GetHeader(models.AuthAccessKey)))
+	case reqctx.AuthTypeAdmin:
+		return validator.verifyWithXPub(reqctx.AppConfig(c).Authentication.AdminKey)
 	default:
 		return spverrors.ErrAuthorization
 	}

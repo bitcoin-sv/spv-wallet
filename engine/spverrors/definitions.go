@@ -49,6 +49,9 @@ var ErrValidateXPub = models.SPVError{Message: "error validation xpub", StatusCo
 // ErrAdminAuthOnUserEndpoint is when admin authorization is used on user's endpoint
 var ErrAdminAuthOnUserEndpoint = models.SPVError{Message: "cannot call user's endpoints with admin authorization ", StatusCode: 401, Code: "error-admin-auth-on-user-endpoint"}
 
+// ErrXPubAuthRequired is when xpub authorization is required
+var ErrXPubAuthRequired = models.SPVError{Message: "xpub authorization required", StatusCode: 401, Code: "error-xpub-authorization-required"}
+
 // ////////////////////////////////// BINDING ERRORS
 
 // ErrCannotBindRequest is when request body cannot be bind into struct
