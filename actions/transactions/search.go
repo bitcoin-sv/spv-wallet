@@ -3,7 +3,9 @@ package transactions
 import (
 	"net/http"
 
+	"github.com/bitcoin-sv/spv-wallet/actions/common"
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
+	"github.com/bitcoin-sv/spv-wallet/internal/query"
 	"github.com/bitcoin-sv/spv-wallet/mappings"
 	"github.com/bitcoin-sv/spv-wallet/models"
 	"github.com/bitcoin-sv/spv-wallet/models/filter"
@@ -54,14 +56,14 @@ func (a *Action) search(c *gin.Context) {
 	c.JSON(http.StatusOK, contracts)
 }
 
-// TODO: this method is not finished and will be changed based on search poc
 // transactions will fetch a list of transactions filtered on conditions and metadata
 // Get transactions godoc
-// @Summary		Experimental - Get transactions
-// @Description	Experimental (not ready for production use yet) - Get transactions
+// @Summary		Get transactions
+// @Description	Get transactions
 // @Tags		Transactions
 // @Produce		json
-// @Param		SearchTransactions body filter.SearchTransactions false "Supports targeted resource searches with filters and metadata, plus options for pagination and sorting to streamline data exploration and analysis"
+// @Param		SwaggerCommonParams query swagger.CommonFilteringQueryParams false "Supports options for pagination and sorting to streamline data exploration and analysis"
+// @Param		TransactionParams query filter.TransactionFilter false "Supports targeted resource searches with filters"
 // @Success		200 {object} response.PageModel[response.Transaction] "Page of transactions"
 // @Failure		400	"Bad request - Error while parsing SearchTransactions from request body"
 // @Failure 	500	"Internal server error - Error while searching for transactions"
@@ -70,22 +72,25 @@ func (a *Action) search(c *gin.Context) {
 func (a *Action) transactions(c *gin.Context) {
 	reqXPubID := c.GetString(auth.ParamXPubHashKey)
 
-	var reqParams filter.SearchTransactions
-	if err := c.Bind(&reqParams); err != nil {
-		c.JSON(http.StatusBadRequest, err.Error())
+	searchParams, err := query.ParseSearchParams[filter.TransactionFilter](c)
+	if err != nil {
+		spverrors.ErrorResponse(c, spverrors.ErrCannotParseQueryParams, a.Services.Logger)
 		return
 	}
 
-	// Record a new transaction (get the hex from parameters)
+	conditions := searchParams.Conditions.ToDbConditions()
+	metadata := mappings.MapToMetadata(searchParams.Metadata)
+	pageOptions := mappings.MapToDbQueryParams(&searchParams.Page)
+
 	transactions, err := a.Services.SpvWalletEngine.GetTransactionsByXpubID(
 		c.Request.Context(),
 		reqXPubID,
-		mappings.MapToMetadata(reqParams.Metadata),
-		reqParams.Conditions.ToDbConditions(),
-		mappings.MapToQueryParams(reqParams.QueryParams),
+		metadata,
+		conditions,
+		pageOptions,
 	)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, err.Error())
+		spverrors.ErrorResponse(c, err, a.Services.Logger)
 		return
 	}
 
@@ -94,14 +99,20 @@ func (a *Action) transactions(c *gin.Context) {
 		contracts = append(contracts, mappings.MapToTransactionContract(transaction))
 	}
 
+	count, err := a.Services.SpvWalletEngine.GetTransactionsByXpubIDCount(
+		c.Request.Context(),
+		reqXPubID,
+		metadata,
+		conditions,
+	)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, err.Error())
+		return
+	}
+
 	result := response.PageModel[response.Transaction]{
 		Content: contracts,
-		Page: response.PageDescription{
-			Size:          len(contracts),
-			Number:        0,
-			TotalElements: len(contracts),
-			TotalPages:    1,
-		},
+		Page:    common.GetPageDescriptionFromSearchParams(pageOptions, count),
 	}
 	c.JSON(http.StatusOK, result)
 }
