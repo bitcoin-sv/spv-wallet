@@ -57,6 +57,107 @@ const docTemplate = `{
                 "summary": "Get contacts",
                 "parameters": [
                     {
+                        "type": "string",
+                        "example": "2024-02-26T11:01:28Z",
+                        "name": "createdRange[from]",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "example": "2024-02-26T11:01:28Z",
+                        "name": "createdRange[to]",
+                        "in": "query"
+                    },
+                    {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        },
+                        "collectionFormat": "csv",
+                        "example": [
+                            "metadata[key]=value",
+                            "metadata[key2]=value2"
+                        ],
+                        "description": "Metadata is a list of key-value pairs that can be used to filter the results. !ATTENTION! Unfortunately this parameter won't work from swagger UI.",
+                        "name": "metadata",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "name": "order",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "name": "page",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "name": "size",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "name": "sortBy",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "example": "2024-02-26T11:01:28Z",
+                        "name": "updatedRange[from]",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "example": "2024-02-26T11:01:28Z",
+                        "name": "updatedRange[to]",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "example": "Alice",
+                        "name": "fullName",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "example": "ffdbe74e-0700-4710-aac5-611a1f877c7f",
+                        "name": "id",
+                        "in": "query"
+                    },
+                    {
+                        "type": "boolean",
+                        "default": false,
+                        "example": true,
+                        "description": "IncludeDeleted is a flag whether or not to include deleted items in the search results",
+                        "name": "includeDeleted",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "example": "alice@example.com",
+                        "name": "paymail",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "example": "0334f01ecb971e93db179e6fb320cd1466beb0c1ec6c1c6a37aa6cb02e53d5dd1a",
+                        "name": "pubKey",
+                        "in": "query"
+                    },
+                    {
+                        "enum": [
+                            "unconfirmed",
+                            "awaiting",
+                            "confirmed",
+                            "rejected"
+                        ],
+                        "type": "string",
+                        "name": "status",
+                        "in": "query"
+                    },
+                    {
                         "description": "Supports targeted resource searches with filters and metadata, plus options for pagination and sorting to streamline data exploration and analysis",
                         "name": "SearchContacts",
                         "in": "body",
@@ -350,22 +451,153 @@ const docTemplate = `{
                         "x-auth-xpub": []
                     }
                 ],
-                "description": "Experimental (not ready for production use yet) - Get transactions",
+                "description": "Get transactions",
                 "produces": [
                     "application/json"
                 ],
                 "tags": [
                     "Transactions"
                 ],
-                "summary": "Experimental - Get transactions",
+                "summary": "Get transactions",
                 "parameters": [
                     {
-                        "description": "Supports targeted resource searches with filters and metadata, plus options for pagination and sorting to streamline data exploration and analysis",
-                        "name": "SearchTransactions",
-                        "in": "body",
-                        "schema": {
-                            "$ref": "#/definitions/filter.SearchTransactions"
-                        }
+                        "type": "string",
+                        "example": "2024-02-26T11:01:28Z",
+                        "name": "createdRange[from]",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "example": "2024-02-26T11:01:28Z",
+                        "name": "createdRange[to]",
+                        "in": "query"
+                    },
+                    {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        },
+                        "collectionFormat": "csv",
+                        "example": [
+                            "metadata[key]=value",
+                            "metadata[key2]=value2"
+                        ],
+                        "description": "Metadata is a list of key-value pairs that can be used to filter the results. !ATTENTION! Unfortunately this parameter won't work from swagger UI.",
+                        "name": "metadata",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "name": "order",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "name": "page",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "name": "size",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "name": "sortBy",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "example": "2024-02-26T11:01:28Z",
+                        "name": "updatedRange[from]",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "example": "2024-02-26T11:01:28Z",
+                        "name": "updatedRange[to]",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "example": "0000000000000000031928c28075a82d7a00c2c90b489d1d66dc0afa3f8d26f8",
+                        "name": "blockHash",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "example": 839376,
+                        "name": "blockHeight",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "example": "d425432e0d10a46af1ec6d00f380e9581ebf7907f3486572b3cd561a4c326e14",
+                        "name": "draftId",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "example": 1,
+                        "name": "fee",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "name": "hex",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "example": "d425432e0d10a46af1ec6d00f380e9581ebf7907f3486572b3cd561a4c326e14",
+                        "name": "id",
+                        "in": "query"
+                    },
+                    {
+                        "type": "boolean",
+                        "default": false,
+                        "example": true,
+                        "description": "IncludeDeleted is a flag whether or not to include deleted items in the search results",
+                        "name": "includeDeleted",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "example": 1,
+                        "name": "numberOfInputs",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "example": 2,
+                        "name": "numberOfOutputs",
+                        "in": "query"
+                    },
+                    {
+                        "enum": [
+                            "UNKNOWN",
+                            "QUEUED",
+                            "RECEIVED",
+                            "STORED",
+                            "ANNOUNCED_TO_NETWORK",
+                            "REQUESTED_BY_NETWORK",
+                            "SENT_TO_NETWORK",
+                            "ACCEPTED_BY_NETWORK",
+                            "SEEN_ON_NETWORK",
+                            "MINED",
+                            "SEEN_IN_ORPHAN_MEMPOOL",
+                            "CONFIRMED",
+                            "REJECTED"
+                        ],
+                        "type": "string",
+                        "name": "status",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "example": 100000000,
+                        "name": "totalValue",
+                        "in": "query"
                     }
                 ],
                 "responses": {
@@ -2904,14 +3136,15 @@ const docTemplate = `{
                         "x-auth-xpub": []
                     }
                 ],
-                "description": "The functionality of this method will be offered in the future by /api/v1/transactions [get].",
+                "description": "This endpoint has been deprecated. Use (GET) /api/v1/transactions instead",
                 "produces": [
                     "application/json"
                 ],
                 "tags": [
                     "Transactions"
                 ],
-                "summary": "Count of transactions",
+                "summary": "Count of transactions - Use (GET) /api/v1/transactions instead.",
+                "deprecated": true,
                 "parameters": [
                     {
                         "description": "Enables filtering of elements to be counted",
@@ -2988,14 +3221,15 @@ const docTemplate = `{
                         "x-auth-xpub": []
                     }
                 ],
-                "description": "Search transaction",
+                "description": "This endpoint has been deprecated. Use (GET) /api/v1/transactions instead",
                 "produces": [
                     "application/json"
                 ],
                 "tags": [
                     "Transactions"
                 ],
-                "summary": "Search transaction",
+                "summary": "Search transaction - Use (GET) /api/v1/transactions instead.",
+                "deprecated": true,
                 "parameters": [
                     {
                         "description": "Supports targeted resource searches with filters and metadata, plus options for pagination and sorting to streamline data exploration and analysis",
@@ -4280,6 +4514,10 @@ const docTemplate = `{
                 },
                 "hex": {
                     "type": "string"
+                },
+                "id": {
+                    "type": "string",
+                    "example": "d425432e0d10a46af1ec6d00f380e9581ebf7907f3486572b3cd561a4c326e14"
                 },
                 "includeDeleted": {
                     "description": "IncludeDeleted is a flag whether or not to include deleted items in the search results",

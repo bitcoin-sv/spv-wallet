@@ -759,6 +759,9 @@ definitions:
         type: integer
       hex:
         type: string
+      id:
+        example: d425432e0d10a46af1ec6d00f380e9581ebf7907f3486572b3cd561a4c326e14
+        type: string
       includeDeleted:
         default: false
         description: IncludeDeleted is a flag whether or not to include deleted items
@@ -2537,6 +2540,77 @@ paths:
     get:
       description: Get contacts
       parameters:
+      - example: "2024-02-26T11:01:28Z"
+        in: query
+        name: createdRange[from]
+        type: string
+      - example: "2024-02-26T11:01:28Z"
+        in: query
+        name: createdRange[to]
+        type: string
+      - collectionFormat: csv
+        description: Metadata is a list of key-value pairs that can be used to filter
+          the results. !ATTENTION! Unfortunately this parameter won't work from swagger
+          UI.
+        example:
+        - metadata[key]=value
+        - metadata[key2]=value2
+        in: query
+        items:
+          type: string
+        name: metadata
+        type: array
+      - in: query
+        name: order
+        type: string
+      - in: query
+        name: page
+        type: integer
+      - in: query
+        name: size
+        type: integer
+      - in: query
+        name: sortBy
+        type: string
+      - example: "2024-02-26T11:01:28Z"
+        in: query
+        name: updatedRange[from]
+        type: string
+      - example: "2024-02-26T11:01:28Z"
+        in: query
+        name: updatedRange[to]
+        type: string
+      - example: Alice
+        in: query
+        name: fullName
+        type: string
+      - example: ffdbe74e-0700-4710-aac5-611a1f877c7f
+        in: query
+        name: id
+        type: string
+      - default: false
+        description: IncludeDeleted is a flag whether or not to include deleted items
+          in the search results
+        example: true
+        in: query
+        name: includeDeleted
+        type: boolean
+      - example: alice@example.com
+        in: query
+        name: paymail
+        type: string
+      - example: 0334f01ecb971e93db179e6fb320cd1466beb0c1ec6c1c6a37aa6cb02e53d5dd1a
+        in: query
+        name: pubKey
+        type: string
+      - enum:
+        - unconfirmed
+        - awaiting
+        - confirmed
+        - rejected
+        in: query
+        name: status
+        type: string
       - description: Supports targeted resource searches with filters and metadata,
           plus options for pagination and sorting to streamline data exploration and
           analysis
@@ -2734,15 +2808,107 @@ paths:
       - Contacts
   /api/v1/transactions:
     get:
-      description: Experimental (not ready for production use yet) - Get transactions
+      description: Get transactions
       parameters:
-      - description: Supports targeted resource searches with filters and metadata,
-          plus options for pagination and sorting to streamline data exploration and
-          analysis
-        in: body
-        name: SearchTransactions
-        schema:
-          $ref: '#/definitions/filter.SearchTransactions'
+      - example: "2024-02-26T11:01:28Z"
+        in: query
+        name: createdRange[from]
+        type: string
+      - example: "2024-02-26T11:01:28Z"
+        in: query
+        name: createdRange[to]
+        type: string
+      - collectionFormat: csv
+        description: Metadata is a list of key-value pairs that can be used to filter
+          the results. !ATTENTION! Unfortunately this parameter won't work from swagger
+          UI.
+        example:
+        - metadata[key]=value
+        - metadata[key2]=value2
+        in: query
+        items:
+          type: string
+        name: metadata
+        type: array
+      - in: query
+        name: order
+        type: string
+      - in: query
+        name: page
+        type: integer
+      - in: query
+        name: size
+        type: integer
+      - in: query
+        name: sortBy
+        type: string
+      - example: "2024-02-26T11:01:28Z"
+        in: query
+        name: updatedRange[from]
+        type: string
+      - example: "2024-02-26T11:01:28Z"
+        in: query
+        name: updatedRange[to]
+        type: string
+      - example: 0000000000000000031928c28075a82d7a00c2c90b489d1d66dc0afa3f8d26f8
+        in: query
+        name: blockHash
+        type: string
+      - example: 839376
+        in: query
+        name: blockHeight
+        type: integer
+      - example: d425432e0d10a46af1ec6d00f380e9581ebf7907f3486572b3cd561a4c326e14
+        in: query
+        name: draftId
+        type: string
+      - example: 1
+        in: query
+        name: fee
+        type: integer
+      - in: query
+        name: hex
+        type: string
+      - example: d425432e0d10a46af1ec6d00f380e9581ebf7907f3486572b3cd561a4c326e14
+        in: query
+        name: id
+        type: string
+      - default: false
+        description: IncludeDeleted is a flag whether or not to include deleted items
+          in the search results
+        example: true
+        in: query
+        name: includeDeleted
+        type: boolean
+      - example: 1
+        in: query
+        name: numberOfInputs
+        type: integer
+      - example: 2
+        in: query
+        name: numberOfOutputs
+        type: integer
+      - enum:
+        - UNKNOWN
+        - QUEUED
+        - RECEIVED
+        - STORED
+        - ANNOUNCED_TO_NETWORK
+        - REQUESTED_BY_NETWORK
+        - SENT_TO_NETWORK
+        - ACCEPTED_BY_NETWORK
+        - SEEN_ON_NETWORK
+        - MINED
+        - SEEN_IN_ORPHAN_MEMPOOL
+        - CONFIRMED
+        - REJECTED
+        in: query
+        name: status
+        type: string
+      - example: 100000000
+        in: query
+        name: totalValue
+        type: integer
       produces:
       - application/json
       responses:
@@ -2757,7 +2923,7 @@ paths:
           description: Internal server error - Error while searching for transactions
       security:
       - x-auth-xpub: []
-      summary: Experimental - Get transactions
+      summary: Get transactions
       tags:
       - Transactions
     post:
@@ -4429,8 +4595,9 @@ paths:
       - Transactions
   /v1/transaction/count:
     post:
-      description: The functionality of this method will be offered in the future
-        by /api/v1/transactions [get].
+      deprecated: true
+      description: This endpoint has been deprecated. Use (GET) /api/v1/transactions
+        instead
       parameters:
       - description: Enables filtering of elements to be counted
         in: body
@@ -4451,7 +4618,7 @@ paths:
           description: Internal Server Error - Error while fetching count of transactions
       security:
       - x-auth-xpub: []
-      summary: Count of transactions
+      summary: Count of transactions - Use (GET) /api/v1/transactions instead.
       tags:
       - Transactions
   /v1/transaction/record:
@@ -4485,7 +4652,9 @@ paths:
       - Transactions
   /v1/transaction/search:
     post:
-      description: Search transaction
+      deprecated: true
+      description: This endpoint has been deprecated. Use (GET) /api/v1/transactions
+        instead
       parameters:
       - description: Supports targeted resource searches with filters and metadata,
           plus options for pagination and sorting to streamline data exploration and
@@ -4510,7 +4679,7 @@ paths:
           description: Internal server error - Error while searching for transactions
       security:
       - x-auth-xpub: []
-      summary: Search transaction
+      summary: Search transaction - Use (GET) /api/v1/transactions instead.
       tags:
       - Transactions
   /v1/utxo:
