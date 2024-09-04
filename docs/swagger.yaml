@@ -2561,14 +2561,14 @@ paths:
         name: metadata
         type: array
       - in: query
-        name: order
-        type: string
-      - in: query
         name: page
         type: integer
       - in: query
         name: size
         type: integer
+      - in: query
+        name: sort
+        type: string
       - in: query
         name: sortBy
         type: string
@@ -2611,13 +2611,6 @@ paths:
         in: query
         name: status
         type: string
-      - description: Supports targeted resource searches with filters and metadata,
-          plus options for pagination and sorting to streamline data exploration and
-          analysis
-        in: body
-        name: SearchContacts
-        schema:
-          $ref: '#/definitions/filter.SearchContacts'
       produces:
       - application/json
       responses:
@@ -2831,14 +2824,14 @@ paths:
         name: metadata
         type: array
       - in: query
-        name: order
-        type: string
-      - in: query
         name: page
         type: integer
       - in: query
         name: size
         type: integer
+      - in: query
+        name: sort
+        type: string
       - in: query
         name: sortBy
         type: string
@@ -3099,14 +3092,14 @@ paths:
         name: metadata
         type: array
       - in: query
-        name: order
-        type: string
-      - in: query
         name: page
         type: integer
       - in: query
         name: size
         type: integer
+      - in: query
+        name: sort
+        type: string
       - in: query
         name: sortBy
         type: string
@@ -3253,14 +3246,14 @@ paths:
         name: metadata
         type: array
       - in: query
-        name: order
-        type: string
-      - in: query
         name: page
         type: integer
       - in: query
         name: size
         type: integer
+      - in: query
+        name: sort
+        type: string
       - in: query
         name: sortBy
         type: string

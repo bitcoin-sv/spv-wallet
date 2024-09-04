@@ -83,11 +83,6 @@ const docTemplate = `{
                         "in": "query"
                     },
                     {
-                        "type": "string",
-                        "name": "order",
-                        "in": "query"
-                    },
-                    {
                         "type": "integer",
                         "name": "page",
                         "in": "query"
@@ -95,6 +90,11 @@ const docTemplate = `{
                     {
                         "type": "integer",
                         "name": "size",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "name": "sort",
                         "in": "query"
                     },
                     {
@@ -156,14 +156,6 @@ const docTemplate = `{
                         "type": "string",
                         "name": "status",
                         "in": "query"
-                    },
-                    {
-                        "description": "Supports targeted resource searches with filters and metadata, plus options for pagination and sorting to streamline data exploration and analysis",
-                        "name": "SearchContacts",
-                        "in": "body",
-                        "schema": {
-                            "$ref": "#/definitions/filter.SearchContacts"
-                        }
                     }
                 ],
                 "responses": {
@@ -487,11 +479,6 @@ const docTemplate = `{
                         "in": "query"
                     },
                     {
-                        "type": "string",
-                        "name": "order",
-                        "in": "query"
-                    },
-                    {
                         "type": "integer",
                         "name": "page",
                         "in": "query"
@@ -499,6 +486,11 @@ const docTemplate = `{
                     {
                         "type": "integer",
                         "name": "size",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "name": "sort",
                         "in": "query"
                     },
                     {
@@ -888,11 +880,6 @@ const docTemplate = `{
                         "in": "query"
                     },
                     {
-                        "type": "string",
-                        "name": "order",
-                        "in": "query"
-                    },
-                    {
                         "type": "integer",
                         "name": "page",
                         "in": "query"
@@ -900,6 +887,11 @@ const docTemplate = `{
                     {
                         "type": "integer",
                         "name": "size",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "name": "sort",
                         "in": "query"
                     },
                     {
@@ -1122,11 +1114,6 @@ const docTemplate = `{
                         "in": "query"
                     },
                     {
-                        "type": "string",
-                        "name": "order",
-                        "in": "query"
-                    },
-                    {
                         "type": "integer",
                         "name": "page",
                         "in": "query"
@@ -1134,6 +1121,11 @@ const docTemplate = `{
                     {
                         "type": "integer",
                         "name": "size",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "name": "sort",
                         "in": "query"
                     },
                     {
