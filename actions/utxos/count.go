@@ -12,15 +12,15 @@ import (
 
 // count will count all the utxos fulfilling the given conditions
 // Count of UTXOs godoc
-// @Summary		Count of UTXOs
-// @Description	Count of UTXOs
+// @Summary		Count of UTXOs - Use (GET) /api/v1/utxos instead.
+// @Description	This endpoint has been deprecated. Use (GET) /api/v1/utxos instead.
 // @Tags		UTXO
 // @Produce		json
 // @Param		CountUtxos body filter.CountUtxos false "Enables filtering of elements to be counted"
 // @Success		200	{number} int64 "Count of utxos"
 // @Failure		400	"Bad request - Error while parsing CountUtxos from request body"
 // @Failure 	500	"Internal Server Error - Error while fetching count of utxos"
-// @Router		/v1/utxo/count [post]
+// @DeprecatedRouter  /v1/utxo/count [post]
 // @Security	x-auth-xpub
 func count(c *gin.Context, userContext *reqctx.UserContext) {
 	logger := reqctx.Logger(c)

@@ -12,15 +12,15 @@ import (
 
 // count will fetch a count of destinations filtered by metadata
 // Count Destinations godoc
-// @Summary		Count Destinations
-// @Description	Count Destinations
+// @Summary		Count Destinations. This endpoint has been deprecated (it will be removed in the future).
+// @Description	Count Destinations. This endpoint has been deprecated (it will be removed in the future).
 // @Tags		Destinations
 // @Produce		json
 // @Param		CountDestinations body filter.CountDestinations false "Enables filtering of elements to be counted"
 // @Success		200	{number} int64 "Count of destinations"
 // @Failure		400	"Bad request - Error while parsing CountDestinations from request body"
 // @Failure 	500	"Internal Server Error - Error while fetching count of destinations"
-// @Router		/v1/destination/count [post]
+// @DeprecatedRouter  /v1/destination/count [post]
 // @Security	x-auth-xpub
 func count(c *gin.Context, userContext *reqctx.UserContext) {
 	logger := reqctx.Logger(c)

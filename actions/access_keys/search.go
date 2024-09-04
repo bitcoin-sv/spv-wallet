@@ -68,7 +68,7 @@ func oldSearch(c *gin.Context, userContext *reqctx.UserContext) {
 // @Success		200 {object} response.PageModel[response.AccessKey] "List of access keys"
 // @Failure		400	"Bad request - Error while SearchAccessKeys from request query"
 // @Failure 	500	"Internal server error - Error while searching for access keys"
-// @Router		/api/v1//users/current/keys [get]
+// @Router		/api/v1/users/current/keys [get]
 // @Security	x-auth-xpub
 func search(c *gin.Context, userContext *reqctx.UserContext) {
 	logger := reqctx.Logger(c)

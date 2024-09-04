@@ -12,15 +12,15 @@ import (
 
 // update will update an existing model
 // Update Destination godoc
-// @Summary		Update destination
-// @Description	Update destination
+// @Summary		Update destination. This endpoint has been deprecated (it will be removed in the future).
+// @Description	Update destination. This endpoint has been deprecated (it will be removed in the future).
 // @Tags		Destinations
 // @Produce		json
 // @Param		UpdateDestination body UpdateDestination false " "
 // @Success		200 {object} models.Destination "Updated Destination"
 // @Failure		400	"Bad request - Error while parsing UpdateDestination from request body"
 // @Failure 	500	"Internal Server Error - Error while updating destination"
-// @Router		/v1/destination [patch]
+// @DeprecatedRouter  /v1/destination [patch]
 // @Security	x-auth-xpub
 func update(c *gin.Context, userContext *reqctx.UserContext) {
 	logger := reqctx.Logger(c)

@@ -13,15 +13,15 @@ import (
 
 // create will make a new destination
 // Count Destinations godoc
-// @Summary		Create a new destination
-// @Description	Create a new destination
+// @Summary		Create a new destination. This endpoint has been deprecated (it will be removed in the future).
+// @Description	Create a new destination. This endpoint has been deprecated (it will be removed in the future).
 // @Tags		Destinations
 // @Produce		json
 // @Param		CreateDestination body CreateDestination false " "
 // @Success		201 {object} models.Destination "Created Destination"
 // @Failure		400	"Bad request - Error while parsing CreateDestination from request body"
 // @Failure 	500	"Internal Server Error - Error while creating destination"
-// @Router		/v1/destination [post]
+// @DeprecatedRouter  /v1/destination [post]
 // @Security	x-auth-xpub
 func create(c *gin.Context, userContext *reqctx.UserContext) {
 	logger := reqctx.Logger(c)
