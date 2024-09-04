@@ -12,7 +12,7 @@ replace github.com/bitcoin-sv/spv-wallet/models => ./models
 require (
 	github.com/99designs/gqlgen v0.17.49
 	github.com/DATA-DOG/go-sqlmock v1.5.2
-	github.com/bitcoin-sv/go-broadcast-client v0.20.0
+	github.com/bitcoin-sv/go-broadcast-client v0.20.1-0.20240904120829-f05accd3be77
 	github.com/bitcoin-sv/go-paymail v0.20.0
 	github.com/bitcoin-sv/spv-wallet/models v0.28.0
 	github.com/bitcoinschema/go-bitcoin/v2 v2.0.5
@@ -56,6 +56,7 @@ require (
 )
 
 require (
+	github.com/bitcoin-sv/go-sdk v1.1.2 // indirect
 	github.com/bytedance/sonic/loader v0.2.0 // indirect
 	github.com/cloudwego/base64x v0.1.4 // indirect
 	github.com/cloudwego/iasm v0.2.0 // indirect
