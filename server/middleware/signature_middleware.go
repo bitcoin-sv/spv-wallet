@@ -68,7 +68,7 @@ func verifyRequest(c *gin.Context, userContext *reqctx.UserContext) error {
 }
 
 // readBodyContents reads and returns the whole body content
-// To allow gin to read the body while Binding process it substitues c.Request.Body with new io.NopCloser
+// To allow gin to read the body while Binding process it substitutes c.Request.Body with new io.NopCloser
 // NOTE: for GET methods and other "no-body" requests this function returns empty string (with no error)
 func readBodyContents(c *gin.Context) (string, error) {
 	if c.Request.Body == nil {
