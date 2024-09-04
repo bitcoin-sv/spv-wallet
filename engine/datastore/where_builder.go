@@ -121,16 +121,35 @@ func (builder *whereBuilder) applyPostgresJSONB(tx customWhereInterface, columnN
 }
 
 func (builder *whereBuilder) applyJSONExtract(tx customWhereInterface, columnName string, condition interface{}) {
-	dict := convertToDict(condition)
-	for key, value := range dict {
-		keyVarName := builder.nextVarName()
-		valueVarName := builder.nextVarName()
-		query := fmt.Sprintf("JSON_EXTRACT(%s, @%s) = @%s", columnName, keyVarName, valueVarName)
-		tx.Where(query, map[string]interface{}{
-			keyVarName:   fmt.Sprintf("$.%s", key),
-			valueVarName: value,
-		})
+	var processCondition func(keyPrefix string, subCondition interface{})
+
+	processCondition = func(keyPrefix string, subCondition interface{}) {
+		dict := convertToDict(subCondition)
+		for key, value := range dict {
+			var fullKey string
+			if keyPrefix == "" {
+				fullKey = key
+			} else {
+				fullKey = keyPrefix + "." + key
+			}
+
+			if reflect.TypeOf(value).Kind() == reflect.Map {
+				processCondition(fullKey, value)
+			} else {
+				keyVarName := builder.nextVarName()
+				valueVarName := builder.nextVarName()
+				jsonPath := fmt.Sprintf("$.%s", fullKey)
+
+				query := fmt.Sprintf("JSON_EXTRACT(%s, @%s) = @%s", columnName, keyVarName, valueVarName)
+				tx.Where(query, map[string]interface{}{
+					keyVarName:   jsonPath,
+					valueVarName: value,
+				})
+			}
+		}
 	}
+
+	processCondition("", condition)
 }
 
 func (builder *whereBuilder) processWhereAnd(tx customWhereInterface, condition interface{}) {
