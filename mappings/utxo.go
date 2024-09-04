@@ -92,6 +92,7 @@ func MapToUtxoContract(u *engine.Utxo) *response.Utxo {
 		Type:         u.Type,
 		DraftID:      u.DraftID.String,
 		SpendingTxID: u.SpendingTxID.String,
+		ReservedAt:   u.ReservedAt.Time,
 		Transaction:  MapToTransactionContract(u.Transaction),
 	}
 }

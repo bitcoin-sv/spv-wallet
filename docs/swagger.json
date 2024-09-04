@@ -6,119 +6,6 @@
         "version": "v0.12.0"
     },
     "paths": {
-        "/api/v1//users/current/keys": {
-            "get": {
-                "security": [
-                    {
-                        "x-auth-xpub": []
-                    }
-                ],
-                "description": "Search access key",
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Access-key"
-                ],
-                "summary": "Search access key",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "example": "2024-02-26T11:01:28Z",
-                        "name": "createdRange[from]",
-                        "in": "query"
-                    },
-                    {
-                        "type": "string",
-                        "example": "2024-02-26T11:01:28Z",
-                        "name": "createdRange[to]",
-                        "in": "query"
-                    },
-                    {
-                        "type": "array",
-                        "items": {
-                            "type": "string"
-                        },
-                        "collectionFormat": "csv",
-                        "example": [
-                            "metadata[key]=value",
-                            "metadata[key2]=value2"
-                        ],
-                        "description": "Metadata is a list of key-value pairs that can be used to filter the results. !ATTENTION! Unfortunately this parameter won't work from swagger UI.",
-                        "name": "metadata",
-                        "in": "query"
-                    },
-                    {
-                        "type": "string",
-                        "name": "order",
-                        "in": "query"
-                    },
-                    {
-                        "type": "integer",
-                        "name": "page",
-                        "in": "query"
-                    },
-                    {
-                        "type": "integer",
-                        "name": "size",
-                        "in": "query"
-                    },
-                    {
-                        "type": "string",
-                        "name": "sortBy",
-                        "in": "query"
-                    },
-                    {
-                        "type": "string",
-                        "example": "2024-02-26T11:01:28Z",
-                        "name": "updatedRange[from]",
-                        "in": "query"
-                    },
-                    {
-                        "type": "string",
-                        "example": "2024-02-26T11:01:28Z",
-                        "name": "updatedRange[to]",
-                        "in": "query"
-                    },
-                    {
-                        "type": "boolean",
-                        "default": false,
-                        "example": true,
-                        "description": "IncludeDeleted is a flag whether or not to include deleted items in the search results",
-                        "name": "includeDeleted",
-                        "in": "query"
-                    },
-                    {
-                        "type": "string",
-                        "format": "date-time",
-                        "description": "Specifies the start time of the range to query by date of revoking",
-                        "name": "revokedRange[from]",
-                        "in": "query"
-                    },
-                    {
-                        "type": "string",
-                        "format": "date-time",
-                        "description": "Specifies the end time of the range to query by date of revoking",
-                        "name": "revokedRange[to]",
-                        "in": "query"
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "List of access keys",
-                        "schema": {
-                            "$ref": "#/definitions/response.PageModel-response_AccessKey"
-                        }
-                    },
-                    "400": {
-                        "description": "Bad request - Error while SearchAccessKeys from request query"
-                    },
-                    "500": {
-                        "description": "Internal server error - Error while searching for access keys"
-                    }
-                }
-            }
-        },
         "/api/v1/configs/shared": {
             "get": {
                 "security": [
@@ -718,6 +605,117 @@
             }
         },
         "/api/v1/users/current/keys": {
+            "get": {
+                "security": [
+                    {
+                        "x-auth-xpub": []
+                    }
+                ],
+                "description": "Search access key",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Access-key"
+                ],
+                "summary": "Search access key",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "example": "2024-02-26T11:01:28Z",
+                        "name": "createdRange[from]",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "example": "2024-02-26T11:01:28Z",
+                        "name": "createdRange[to]",
+                        "in": "query"
+                    },
+                    {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        },
+                        "collectionFormat": "csv",
+                        "example": [
+                            "metadata[key]=value",
+                            "metadata[key2]=value2"
+                        ],
+                        "description": "Metadata is a list of key-value pairs that can be used to filter the results. !ATTENTION! Unfortunately this parameter won't work from swagger UI.",
+                        "name": "metadata",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "name": "order",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "name": "page",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "name": "size",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "name": "sortBy",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "example": "2024-02-26T11:01:28Z",
+                        "name": "updatedRange[from]",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "example": "2024-02-26T11:01:28Z",
+                        "name": "updatedRange[to]",
+                        "in": "query"
+                    },
+                    {
+                        "type": "boolean",
+                        "default": false,
+                        "example": true,
+                        "description": "IncludeDeleted is a flag whether or not to include deleted items in the search results",
+                        "name": "includeDeleted",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "format": "date-time",
+                        "description": "Specifies the start time of the range to query by date of revoking",
+                        "name": "revokedRange[from]",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "format": "date-time",
+                        "description": "Specifies the end time of the range to query by date of revoking",
+                        "name": "revokedRange[to]",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "List of access keys",
+                        "schema": {
+                            "$ref": "#/definitions/response.PageModel-response_AccessKey"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request - Error while SearchAccessKeys from request query"
+                    },
+                    "500": {
+                        "description": "Internal server error - Error while searching for access keys"
+                    }
+                }
+            },
             "post": {
                 "security": [
                     {
@@ -836,6 +834,177 @@
                     },
                     "500": {
                         "description": "Internal server error - Error while revoking access key"
+                    }
+                }
+            }
+        },
+        "/api/v1/utxos": {
+            "get": {
+                "security": [
+                    {
+                        "x-auth-xpub": []
+                    }
+                ],
+                "description": "Search UTXO",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "UTXOs"
+                ],
+                "summary": "Search UTXO",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "example": "2024-02-26T11:01:28Z",
+                        "name": "createdRange[from]",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "example": "2024-02-26T11:01:28Z",
+                        "name": "createdRange[to]",
+                        "in": "query"
+                    },
+                    {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        },
+                        "collectionFormat": "csv",
+                        "example": [
+                            "metadata[key]=value",
+                            "metadata[key2]=value2"
+                        ],
+                        "description": "Metadata is a list of key-value pairs that can be used to filter the results. !ATTENTION! Unfortunately this parameter won't work from swagger UI.",
+                        "name": "metadata",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "name": "order",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "name": "page",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "name": "size",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "name": "sortBy",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "example": "2024-02-26T11:01:28Z",
+                        "name": "updatedRange[from]",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "example": "2024-02-26T11:01:28Z",
+                        "name": "updatedRange[to]",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "example": "89419d4c7c50810bfe5ff9df9ad5074b749959423782dc91a30f1058b9ad7ef7",
+                        "name": "draftId",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "example": "fe4cbfee0258aa589cbc79963f7c204061fd67d987e32ee5049aa90ce14658ee",
+                        "name": "id",
+                        "in": "query"
+                    },
+                    {
+                        "type": "boolean",
+                        "default": false,
+                        "example": true,
+                        "description": "IncludeDeleted is a flag whether or not to include deleted items in the search results",
+                        "name": "includeDeleted",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "example": 0,
+                        "name": "outputIndex",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "example": 1,
+                        "name": "satoshis",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "example": "76a914a5f271385e75f57bcd9092592dede812f8c466d088ac",
+                        "name": "scriptPubKey",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "example": "11a7746489a70e9c0170601c2be65558455317a984194eb2791b637f59f8cd6e",
+                        "name": "spendingTxId",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "example": "5e17858ea0ca4155827754ba82bdcfcce108d5bb5b47fbb3aa54bd14540683c6",
+                        "name": "transactionId",
+                        "in": "query"
+                    },
+                    {
+                        "enum": [
+                            "pubkey",
+                            "pubkeyhash",
+                            "nulldata",
+                            "multisig",
+                            "nonstandard",
+                            "scripthash",
+                            "metanet",
+                            "token_stas",
+                            "token_sensible"
+                        ],
+                        "type": "string",
+                        "name": "type",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "format": "date-time",
+                        "description": "Specifies the start time of the range to query by date when a UTXO was reserved",
+                        "name": "reservedRange[from]",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "format": "date-time",
+                        "description": "Specifies the end time of the range to query by date when a UTXO was reserved",
+                        "name": "reservedRange[to]",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "List of utxos",
+                        "schema": {
+                            "$ref": "#/definitions/response.PageModel-response_Utxo"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request - Error while parsing SearchUtxos from request body"
+                    },
+                    "500": {
+                        "description": "Internal server error - Error while searching for utxos"
                     }
                 }
             }
@@ -2358,14 +2527,15 @@
                         "x-auth-xpub": []
                     }
                 ],
-                "description": "Get a destination",
+                "description": "Get a destination. This endpoint has been deprecated (it will be removed in the future).",
                 "produces": [
                     "application/json"
                 ],
                 "tags": [
                     "Destinations"
                 ],
-                "summary": "Get a destination",
+                "summary": "Get a destination. This endpoint has been deprecated (it will be removed in the future).",
+                "deprecated": true,
                 "parameters": [
                     {
                         "type": "string",
@@ -2407,14 +2577,15 @@
                         "x-auth-xpub": []
                     }
                 ],
-                "description": "Create a new destination",
+                "description": "Create a new destination. This endpoint has been deprecated (it will be removed in the future).",
                 "produces": [
                     "application/json"
                 ],
                 "tags": [
                     "Destinations"
                 ],
-                "summary": "Create a new destination",
+                "summary": "Create a new destination. This endpoint has been deprecated (it will be removed in the future).",
+                "deprecated": true,
                 "parameters": [
                     {
                         "description": " ",
@@ -2446,14 +2617,15 @@
                         "x-auth-xpub": []
                     }
                 ],
-                "description": "Update destination",
+                "description": "Update destination. This endpoint has been deprecated (it will be removed in the future).",
                 "produces": [
                     "application/json"
                 ],
                 "tags": [
                     "Destinations"
                 ],
-                "summary": "Update destination",
+                "summary": "Update destination. This endpoint has been deprecated (it will be removed in the future).",
+                "deprecated": true,
                 "parameters": [
                     {
                         "description": " ",
@@ -2487,14 +2659,15 @@
                         "x-auth-xpub": []
                     }
                 ],
-                "description": "Count Destinations",
+                "description": "Count Destinations. This endpoint has been deprecated (it will be removed in the future).",
                 "produces": [
                     "application/json"
                 ],
                 "tags": [
                     "Destinations"
                 ],
-                "summary": "Count Destinations",
+                "summary": "Count Destinations. This endpoint has been deprecated (it will be removed in the future).",
+                "deprecated": true,
                 "parameters": [
                     {
                         "description": "Enables filtering of elements to be counted",
@@ -2528,14 +2701,15 @@
                         "x-auth-xpub": []
                     }
                 ],
-                "description": "Search for a destination",
+                "description": "Search for a destination. This endpoint has been deprecated (it will be removed in the future).",
                 "produces": [
                     "application/json"
                 ],
                 "tags": [
                     "Destinations"
                 ],
-                "summary": "Search for a destination",
+                "summary": "Search for a destination. This endpoint has been deprecated (it will be removed in the future).",
+                "deprecated": true,
                 "parameters": [
                     {
                         "description": "Supports targeted resource searches with filters and metadata, plus options for pagination and sorting to streamline data exploration and analysis",
@@ -2849,14 +3023,15 @@
                         "x-auth-xpub": []
                     }
                 ],
-                "description": "Get UTXO",
+                "description": "Get UTXO. This endpoint has been deprecated (it will be removed in the future).",
                 "produces": [
                     "application/json"
                 ],
                 "tags": [
                     "UTXO"
                 ],
-                "summary": "Get UTXO",
+                "summary": "Get UTXO. This endpoint has been deprecated (it will be removed in the future).",
+                "deprecated": true,
                 "parameters": [
                     {
                         "type": "string",
@@ -2896,14 +3071,15 @@
                         "x-auth-xpub": []
                     }
                 ],
-                "description": "Count of UTXOs",
+                "description": "This endpoint has been deprecated. Use (GET) /api/v1/utxos instead.",
                 "produces": [
                     "application/json"
                 ],
                 "tags": [
                     "UTXO"
                 ],
-                "summary": "Count of UTXOs",
+                "summary": "Count of UTXOs - Use (GET) /api/v1/utxos instead.",
+                "deprecated": true,
                 "parameters": [
                     {
                         "description": "Enables filtering of elements to be counted",
@@ -2937,14 +3113,15 @@
                         "x-auth-xpub": []
                     }
                 ],
-                "description": "Search UTXO",
+                "description": "This endpoint has been deprecated. Use (GET) /api/v1/utxos instead.",
                 "produces": [
                     "application/json"
                 ],
                 "tags": [
                     "UTXO"
                 ],
-                "summary": "Search UTXO",
+                "summary": "Search UTXO - Use (GET) /api/v1/utxos instead.",
+                "deprecated": true,
                 "parameters": [
                     {
                         "description": "Supports targeted resource searches with filters and metadata, plus options for pagination and sorting to streamline data exploration and analysis",
@@ -5721,6 +5898,26 @@
                 }
             }
         },
+        "response.PageModel-response_Utxo": {
+            "type": "object",
+            "properties": {
+                "content": {
+                    "description": "Content is the collection of elements that serves as the content",
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/response.Utxo"
+                    }
+                },
+                "page": {
+                    "description": "Page is the page descriptor",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/response.PageDescription"
+                        }
+                    ]
+                }
+            }
+        },
         "response.PaymailP4": {
             "type": "object",
             "properties": {
@@ -6182,6 +6379,95 @@
                     "description": "UseForChange is a flag that indicates if this output should be used for change.",
                     "type": "boolean",
                     "example": false
+                }
+            }
+        },
+        "response.Utxo": {
+            "type": "object",
+            "properties": {
+                "createdAt": {
+                    "description": "CreatedAt is a time when outer model was created.",
+                    "type": "string",
+                    "example": "2024-02-26T11:00:28.069911Z"
+                },
+                "deletedAt": {
+                    "description": "DeletedAt is a time when outer model was deleted.",
+                    "type": "string",
+                    "example": "2024-02-26T11:02:28.069911Z"
+                },
+                "draftId": {
+                    "description": "DraftID is a utxo transaction related draft id.",
+                    "type": "string",
+                    "example": "b356f7fa00cd3f20cce6c21d704cd13e871d28d714a5ebd0532f5a0e0cde63f7"
+                },
+                "id": {
+                    "description": "ID is a utxo id which is a hash from transaction id and output index.",
+                    "type": "string",
+                    "example": "c706a448748d398d542cf4dfad797c9a4b123ebb72dbfb8b27f3d0f1dda99b58"
+                },
+                "metadata": {
+                    "description": "Metadata is a metadata map of outer model.",
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "string"
+                    },
+                    "example": {
+                        "key": "value",
+                        "key2": "value2"
+                    }
+                },
+                "outputIndex": {
+                    "description": "OutputIndex is a output index that utxo points to.",
+                    "type": "integer",
+                    "example": 0
+                },
+                "reservedAt": {
+                    "description": "ReservedAt is a time utxo was reserved at.",
+                    "type": "string",
+                    "example": "2024-02-26T11:00:28.069911Z"
+                },
+                "satoshis": {
+                    "description": "Satoshis is a utxo satoshis amount.",
+                    "type": "integer",
+                    "example": 100
+                },
+                "scriptPubKey": {
+                    "description": "ScriptPubKey is a utxo script pub key.",
+                    "type": "string",
+                    "example": "76a91433ba3607a902bc022164bcb6e993f27bd040241c88ac"
+                },
+                "spendingTxId": {
+                    "description": "SpendingTxID is a spending transaction id - null if not spent yet.",
+                    "type": "string",
+                    "example": "01d0d0067652f684c6acb3683763f353fce55f6496521c7d99e71e1d27e53f5c"
+                },
+                "transaction": {
+                    "description": "Transaction is a transaction pointer that utxo points to.",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/response.Transaction"
+                        }
+                    ]
+                },
+                "transactionId": {
+                    "description": "TransactionID is a transaction id that utxo points to.",
+                    "type": "string",
+                    "example": "01d0d0067652f684c6acb3683763f353fce55f6496521c7d99e71e1d27e53f5c"
+                },
+                "type": {
+                    "description": "Type is a utxo type.",
+                    "type": "string",
+                    "example": "pubkeyhash"
+                },
+                "updatedAt": {
+                    "description": "UpdatedAt is a time when outer model was updated.",
+                    "type": "string",
+                    "example": "2024-02-26T11:01:28.069911Z"
+                },
+                "xpubId": {
+                    "description": "XpubID is a utxo related xpub id.",
+                    "type": "string",
+                    "example": "bb8593f85ef8056a77026ad415f02128f3768906de53e9e8bf8749fe2d66cf50"
                 }
             }
         },

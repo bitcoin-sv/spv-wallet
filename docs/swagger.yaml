@@ -1958,6 +1958,18 @@ definitions:
         - $ref: '#/definitions/response.PageDescription'
         description: Page is the page descriptor
     type: object
+  response.PageModel-response_Utxo:
+    properties:
+      content:
+        description: Content is the collection of elements that serves as the content
+        items:
+          $ref: '#/definitions/response.Utxo'
+        type: array
+      page:
+        allOf:
+        - $ref: '#/definitions/response.PageDescription'
+        description: Page is the page descriptor
+    type: object
   response.PaymailP4:
     properties:
       alias:
@@ -2300,6 +2312,75 @@ definitions:
         example: false
         type: boolean
     type: object
+  response.Utxo:
+    properties:
+      createdAt:
+        description: CreatedAt is a time when outer model was created.
+        example: "2024-02-26T11:00:28.069911Z"
+        type: string
+      deletedAt:
+        description: DeletedAt is a time when outer model was deleted.
+        example: "2024-02-26T11:02:28.069911Z"
+        type: string
+      draftId:
+        description: DraftID is a utxo transaction related draft id.
+        example: b356f7fa00cd3f20cce6c21d704cd13e871d28d714a5ebd0532f5a0e0cde63f7
+        type: string
+      id:
+        description: ID is a utxo id which is a hash from transaction id and output
+          index.
+        example: c706a448748d398d542cf4dfad797c9a4b123ebb72dbfb8b27f3d0f1dda99b58
+        type: string
+      metadata:
+        additionalProperties:
+          type: string
+        description: Metadata is a metadata map of outer model.
+        example:
+          key: value
+          key2: value2
+        type: object
+      outputIndex:
+        description: OutputIndex is a output index that utxo points to.
+        example: 0
+        type: integer
+      reservedAt:
+        description: ReservedAt is a time utxo was reserved at.
+        example: "2024-02-26T11:00:28.069911Z"
+        type: string
+      satoshis:
+        description: Satoshis is a utxo satoshis amount.
+        example: 100
+        type: integer
+      scriptPubKey:
+        description: ScriptPubKey is a utxo script pub key.
+        example: 76a91433ba3607a902bc022164bcb6e993f27bd040241c88ac
+        type: string
+      spendingTxId:
+        description: SpendingTxID is a spending transaction id - null if not spent
+          yet.
+        example: 01d0d0067652f684c6acb3683763f353fce55f6496521c7d99e71e1d27e53f5c
+        type: string
+      transaction:
+        allOf:
+        - $ref: '#/definitions/response.Transaction'
+        description: Transaction is a transaction pointer that utxo points to.
+      transactionId:
+        description: TransactionID is a transaction id that utxo points to.
+        example: 01d0d0067652f684c6acb3683763f353fce55f6496521c7d99e71e1d27e53f5c
+        type: string
+      type:
+        description: Type is a utxo type.
+        example: pubkeyhash
+        type: string
+      updatedAt:
+        description: UpdatedAt is a time when outer model was updated.
+        example: "2024-02-26T11:01:28.069911Z"
+        type: string
+      xpubId:
+        description: XpubID is a utxo related xpub id.
+        example: bb8593f85ef8056a77026ad415f02128f3768906de53e9e8bf8749fe2d66cf50
+        type: string
+    type: object
   response.UtxoPointer:
     properties:
       outputIndex:
@@ -2437,83 +2518,6 @@ info:
   title: SPV Wallet
   version: v0.12.0
 paths:
-  /api/v1//users/current/keys:
-    get:
-      description: Search access key
-      parameters:
-      - example: "2024-02-26T11:01:28Z"
-        in: query
-        name: createdRange[from]
-        type: string
-      - example: "2024-02-26T11:01:28Z"
-        in: query
-        name: createdRange[to]
-        type: string
-      - collectionFormat: csv
-        description: Metadata is a list of key-value pairs that can be used to filter
-          the results. !ATTENTION! Unfortunately this parameter won't work from swagger
-          UI.
-        example:
-        - metadata[key]=value
-        - metadata[key2]=value2
-        in: query
-        items:
-          type: string
-        name: metadata
-        type: array
-      - in: query
-        name: order
-        type: string
-      - in: query
-        name: page
-        type: integer
-      - in: query
-        name: size
-        type: integer
-      - in: query
-        name: sortBy
-        type: string
-      - example: "2024-02-26T11:01:28Z"
-        in: query
-        name: updatedRange[from]
-        type: string
-      - example: "2024-02-26T11:01:28Z"
-        in: query
-        name: updatedRange[to]
-        type: string
-      - default: false
-        description: IncludeDeleted is a flag whether or not to include deleted items
-          in the search results
-        example: true
-        in: query
-        name: includeDeleted
-        type: boolean
-      - description: Specifies the start time of the range to query by date of revoking
-        format: date-time
-        in: query
-        name: revokedRange[from]
-        type: string
-      - description: Specifies the end time of the range to query by date of revoking
-        format: date-time
-        in: query
-        name: revokedRange[to]
-        type: string
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: List of access keys
-          schema:
-            $ref: '#/definitions/response.PageModel-response_AccessKey'
-        "400":
-          description: Bad request - Error while SearchAccessKeys from request query
-        "500":
-          description: Internal server error - Error while searching for access keys
-      security:
-      - x-auth-xpub: []
-      summary: Search access key
-      tags:
-      - Access-key
   /api/v1/configs/shared:
     get:
       description: Get shared config
@@ -2905,6 +2909,82 @@ paths:
       tags:
       - Users
   /api/v1/users/current/keys:
+    get:
+      description: Search access key
+      parameters:
+      - example: "2024-02-26T11:01:28Z"
+        in: query
+        name: createdRange[from]
+        type: string
+      - example: "2024-02-26T11:01:28Z"
+        in: query
+        name: createdRange[to]
+        type: string
+      - collectionFormat: csv
+        description: Metadata is a list of key-value pairs that can be used to filter
+          the results. !ATTENTION! Unfortunately this parameter won't work from swagger
+          UI.
+        example:
+        - metadata[key]=value
+        - metadata[key2]=value2
+        in: query
+        items:
+          type: string
+        name: metadata
+        type: array
+      - in: query
+        name: order
+        type: string
+      - in: query
+        name: page
+        type: integer
+      - in: query
+        name: size
+        type: integer
+      - in: query
+        name: sortBy
+        type: string
+      - example: "2024-02-26T11:01:28Z"
+        in: query
+        name: updatedRange[from]
+        type: string
+      - example: "2024-02-26T11:01:28Z"
+        in: query
+        name: updatedRange[to]
+        type: string
+      - default: false
+        description: IncludeDeleted is a flag whether or not to include deleted items
+          in the search results
+        example: true
+        in: query
+        name: includeDeleted
+        type: boolean
+      - description: Specifies the start time of the range to query by date of revoking
+        format: date-time
+        in: query
+        name: revokedRange[from]
+        type: string
+      - description: Specifies the end time of the range to query by date of revoking
+        format: date-time
+        in: query
+        name: revokedRange[to]
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: List of access keys
+          schema:
+            $ref: '#/definitions/response.PageModel-response_AccessKey'
+        "400":
+          description: Bad request - Error while SearchAccessKeys from request query
+        "500":
+          description: Internal server error - Error while searching for access keys
+      security:
+      - x-auth-xpub: []
+      summary: Search access key
+      tags:
+      - Access-key
     post:
       description: Create access key
       parameters:
@@ -2982,6 +3062,127 @@ paths:
       summary: Get access key
       tags:
       - Access-key
+  /api/v1/utxos:
+    get:
+      description: Search UTXO
+      parameters:
+      - example: "2024-02-26T11:01:28Z"
+        in: query
+        name: createdRange[from]
+        type: string
+      - example: "2024-02-26T11:01:28Z"
+        in: query
+        name: createdRange[to]
+        type: string
+      - collectionFormat: csv
+        description: Metadata is a list of key-value pairs that can be used to filter
+          the results. !ATTENTION! Unfortunately this parameter won't work from swagger
+          UI.
+        example:
+        - metadata[key]=value
+        - metadata[key2]=value2
+        in: query
+        items:
+          type: string
+        name: metadata
+        type: array
+      - in: query
+        name: order
+        type: string
+      - in: query
+        name: page
+        type: integer
+      - in: query
+        name: size
+        type: integer
+      - in: query
+        name: sortBy
+        type: string
+      - example: "2024-02-26T11:01:28Z"
+        in: query
+        name: updatedRange[from]
+        type: string
+      - example: "2024-02-26T11:01:28Z"
+        in: query
+        name: updatedRange[to]
+        type: string
+      - example: 89419d4c7c50810bfe5ff9df9ad5074b749959423782dc91a30f1058b9ad7ef7
+        in: query
+        name: draftId
+        type: string
+      - example: fe4cbfee0258aa589cbc79963f7c204061fd67d987e32ee5049aa90ce14658ee
+        in: query
+        name: id
+        type: string
+      - default: false
+        description: IncludeDeleted is a flag whether or not to include deleted items
+          in the search results
+        example: true
+        in: query
+        name: includeDeleted
+        type: boolean
+      - example: 0
+        in: query
+        name: outputIndex
+        type: integer
+      - example: 1
+        in: query
+        name: satoshis
+        type: integer
+      - example: 76a914a5f271385e75f57bcd9092592dede812f8c466d088ac
+        in: query
+        name: scriptPubKey
+        type: string
+      - example: 11a7746489a70e9c0170601c2be65558455317a984194eb2791b637f59f8cd6e
+        in: query
+        name: spendingTxId
+        type: string
+      - example: 5e17858ea0ca4155827754ba82bdcfcce108d5bb5b47fbb3aa54bd14540683c6
+        in: query
+        name: transactionId
+        type: string
+      - enum:
+        - pubkey
+        - pubkeyhash
+        - nulldata
+        - multisig
+        - nonstandard
+        - scripthash
+        - metanet
+        - token_stas
+        - token_sensible
+        in: query
+        name: type
+        type: string
+      - description: Specifies the start time of the range to query by date when a
+          UTXO was reserved
+        format: date-time
+        in: query
+        name: reservedRange[from]
+        type: string
+      - description: Specifies the end time of the range to query by date when a UTXO
+          was reserved
+        format: date-time
+        in: query
+        name: reservedRange[to]
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: List of utxos
+          schema:
+            $ref: '#/definitions/response.PageModel-response_Utxo'
+        "400":
+          description: Bad request - Error while parsing SearchUtxos from request
+            body
+        "500":
+          description: Internal server error - Error while searching for utxos
+      security:
+      - x-auth-xpub: []
+      summary: Search UTXO
+      tags:
+      - UTXOs
   /v1/access-key:
     delete:
       deprecated: true
@@ -3973,7 +4174,9 @@ paths:
       - Contact
   /v1/destination:
     get:
-      description: Get a destination
+      deprecated: true
+      description: Get a destination. This endpoint has been deprecated (it will be
+        removed in the future).
       parameters:
       - description: Destination ID
         in: query
@@ -4000,11 +4203,14 @@ paths:
           description: Internal server error - Error while getting destination
       security:
       - x-auth-xpub: []
-      summary: Get a destination
+      summary: Get a destination. This endpoint has been deprecated (it will be removed
+        in the future).
       tags:
       - Destinations
     patch:
-      description: Update destination
+      deprecated: true
+      description: Update destination. This endpoint has been deprecated (it will
+        be removed in the future).
       parameters:
       - description: ' '
         in: body
@@ -4025,11 +4231,14 @@ paths:
           description: Internal Server Error - Error while updating destination
       security:
       - x-auth-xpub: []
-      summary: Update destination
+      summary: Update destination. This endpoint has been deprecated (it will be removed
+        in the future).
       tags:
       - Destinations
     post:
-      description: Create a new destination
+      deprecated: true
+      description: Create a new destination. This endpoint has been deprecated (it
+        will be removed in the future).
       parameters:
       - description: ' '
         in: body
@@ -4050,12 +4259,15 @@ paths:
           description: Internal Server Error - Error while creating destination
       security:
       - x-auth-xpub: []
-      summary: Create a new destination
+      summary: Create a new destination. This endpoint has been deprecated (it will
+        be removed in the future).
       tags:
       - Destinations
   /v1/destination/count:
     post:
-      description: Count Destinations
+      deprecated: true
+      description: Count Destinations. This endpoint has been deprecated (it will
+        be removed in the future).
       parameters:
       - description: Enables filtering of elements to be counted
         in: body
@@ -4076,12 +4288,15 @@ paths:
           description: Internal Server Error - Error while fetching count of destinations
       security:
       - x-auth-xpub: []
-      summary: Count Destinations
+      summary: Count Destinations. This endpoint has been deprecated (it will be removed
+        in the future).
       tags:
       - Destinations
   /v1/destination/search:
     post:
-      description: Search for a destination
+      deprecated: true
+      description: Search for a destination. This endpoint has been deprecated (it
+        will be removed in the future).
       parameters:
       - description: Supports targeted resource searches with filters and metadata,
           plus options for pagination and sorting to streamline data exploration and
@@ -4106,7 +4321,8 @@ paths:
           description: Internal server error - Error while searching for destinations
       security:
       - x-auth-xpub: []
-      summary: Search for a destination
+      summary: Search for a destination. This endpoint has been deprecated (it will
+        be removed in the future).
       tags:
       - Destinations
   /v1/shared-config:
@@ -4299,7 +4515,9 @@ paths:
       - Transactions
   /v1/utxo:
     get:
-      description: Get UTXO
+      deprecated: true
+      description: Get UTXO. This endpoint has been deprecated (it will be removed
+        in the future).
       parameters:
       - description: Id of the transaction
         in: query
@@ -4324,12 +4542,14 @@ paths:
           description: Internal Server Error - Error while fetching utxo
       security:
       - x-auth-xpub: []
-      summary: Get UTXO
+      summary: Get UTXO. This endpoint has been deprecated (it will be removed in
+        the future).
       tags:
       - UTXO
   /v1/utxo/count:
     post:
-      description: Count of UTXOs
+      deprecated: true
+      description: This endpoint has been deprecated. Use (GET) /api/v1/utxos instead.
       parameters:
       - description: Enables filtering of elements to be counted
         in: body
@@ -4349,12 +4569,13 @@ paths:
           description: Internal Server Error - Error while fetching count of utxos
       security:
       - x-auth-xpub: []
-      summary: Count of UTXOs
+      summary: Count of UTXOs - Use (GET) /api/v1/utxos instead.
       tags:
       - UTXO
   /v1/utxo/search:
     post:
-      description: Search UTXO
+      deprecated: true
+      description: This endpoint has been deprecated. Use (GET) /api/v1/utxos instead.
       parameters:
       - description: Supports targeted resource searches with filters and metadata,
           plus options for pagination and sorting to streamline data exploration and
@@ -4379,7 +4600,7 @@ paths:
           description: Internal server error - Error while searching for utxos
       security:
       - x-auth-xpub: []
-      summary: Search UTXO
+      summary: Search UTXO - Use (GET) /api/v1/utxos instead.
       tags:
       - UTXO
   /v1/xpub:
