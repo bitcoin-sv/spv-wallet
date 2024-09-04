@@ -7,11 +7,17 @@ import (
 
 const userContextKey = "usercontext"
 
+// AuthType is the type of authentication
 type AuthType = int
 
 const (
+	// AuthTypeXPub is when user provides xPub
 	AuthTypeXPub AuthType = iota
+
+	// AuthTypeAccessKey is when user provides access key
 	AuthTypeAccessKey
+
+	// AuthTypeAdmin is when provided xpub matches the admin key
 	AuthTypeAdmin
 )
 
@@ -75,10 +81,10 @@ func SetUserContext(c *gin.Context, userContext *UserContext) {
 	c.Set(userContextKey, userContext)
 }
 
-// EnsureXPubIsSet returns the xPub if authorization was made by "regular user" with xPub (not accessKey)
+// GetXPubOrPanic returns the xPub if authorization was made by "regular user" with xPub (not accessKey)
 // It panics on fail, so use with caution.
 // This function should not be called in actions.
-func EnsureXPubIsSet(ctx *UserContext) string {
+func GetXPubOrPanic(ctx *UserContext) string {
 	if ctx.AuthType != AuthTypeXPub {
 		panic("The xPub is not available when the user is authorized by access key or is an admin")
 	}

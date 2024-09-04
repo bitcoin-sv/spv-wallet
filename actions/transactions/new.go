@@ -22,7 +22,7 @@ import (
 // @Failure 	500	"Internal Server Error - Error while creating transaction"
 // @DeprecatedRouter	/v1/transaction [post]
 // @Security	x-auth-xpub
-func newTransaction(c *gin.Context, userContext *reqctx.UserContext, xpub string) {
+func newTransaction(c *gin.Context, _ *reqctx.UserContext, xpub string) {
 	logger := reqctx.Logger(c)
 	engineInstance := reqctx.Engine(c)
 
@@ -67,7 +67,7 @@ func newTransaction(c *gin.Context, userContext *reqctx.UserContext, xpub string
 // @Failure 	500	"Internal Server Error - Error while creating transaction"
 // @Router		/api/v1/transactions/drafts [post]
 // @Security	x-auth-xpub
-func newTransactionDraft(c *gin.Context, userContext *reqctx.UserContext, xpub string) {
+func newTransactionDraft(c *gin.Context, _ *reqctx.UserContext, xpub string) {
 	logger := reqctx.Logger(c)
 	engineInstance := reqctx.Engine(c)
 
