@@ -23,7 +23,7 @@ const (
 	leaderPaymailAlias  = "leader"
 	minimalBalance      = 100
 	defaultGoClientPath = "../../spv-wallet-go-client/regression_tests"
-	defaultJSClientPath = "../../spv-wallet-js-client/regression_tests"
+	defaultJSClientPath = "../../spv-wallet-js-client/src/regression_tests"
 )
 
 var (
@@ -272,13 +272,12 @@ func sendFundsWithGoClient(instanceUrl string, istanceXPriv string, receiverPaym
 
 // runTests runs the regression tests, asks for type of client and path to it and executes command.
 func runTests(clientType string, defaultPath string) error {
-	// TODO: adjust command and path when regression tests are implemented
 	var command string
 	if clientType == "go" {
 		command = "go test -tags=regression ./... -count=1"
 	}
 	if clientType == "js" {
-		command = "yarn install && yarn test"
+		command = "yarn install && yarn test:regression"
 	}
 	var path string
 	var cmd *exec.Cmd
