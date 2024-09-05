@@ -16,8 +16,8 @@ github.com/aws/aws-sdk-go v1.43.45 h1:2708Bj4uV+ym62MOtBnErm/CDX61C4mFe9V2gXy1ca
 github.com/aws/aws-sdk-go v1.43.45/go.mod h1:y4AeaBuwd2Lk+GepC1E9v0qOiTws0MIWAX4oIKwKHZo=
 github.com/beorn7/perks v1.0.1 h1:VlbKKnNfV8bJzeqoa4cOKqO6bYr3WgKZxO8Z16+hsOM=
 github.com/beorn7/perks v1.0.1/go.mod h1:G2ZrVWU2WbWT9wwq4/hrbKbnv/1ERSJQ0ibhJ6rlkpw=
-github.com/bitcoin-sv/go-broadcast-client v0.20.1-0.20240904120829-f05accd3be77 h1:mNickGnpSb+ieURfU1a/m2Ioj991exBaM1LHG1tjvWU=
-github.com/bitcoin-sv/go-broadcast-client v0.20.1-0.20240904120829-f05accd3be77/go.mod h1:BwLnKMTMbL9uSQSBV9NwveWgpohniZXz6tesikIG8JA=
+github.com/bitcoin-sv/go-broadcast-client v0.21.0 h1:QzDT0letnsQQ9rgVwpAuUN/WutjnBOftOiqSzvY796g=
+github.com/bitcoin-sv/go-broadcast-client v0.21.0/go.mod h1:BwLnKMTMbL9uSQSBV9NwveWgpohniZXz6tesikIG8JA=
 github.com/bitcoin-sv/go-paymail v0.20.0 h1:quJj9qEK7+oRB+IMCVbXPdxP9/CKk9Y+/Nn87jLenBs=
 github.com/bitcoin-sv/go-paymail v0.20.0/go.mod h1:dYhHGsCKpTYCZvxFGwB+ENo3/5aScI4edzzPYpnvBmg=
 github.com/bitcoin-sv/go-sdk v1.1.2 h1:LBnvqQ1NZUrzaU2l7sMW7FMWii9yqmebairfA99ZAE8=
