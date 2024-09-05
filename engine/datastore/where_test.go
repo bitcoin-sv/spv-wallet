@@ -251,6 +251,43 @@ func TestCustomWhere(t *testing.T) {
 
 		assert.Contains(t, raw, `metadata::jsonb @> '{"field_name":"field_value"}'`)
 	})
+	t.Run("SQLite nested metadata", func(t *testing.T) {
+		client, gdb := mockClient(SQLite)
+		conditions := map[string]interface{}{
+			metadataField: map[string]interface{}{
+				"p2p_tx_metadata": map[string]interface{}{
+					"note": "test",
+				},
+			},
+		}
+
+		raw := gdb.ToSQL(func(tx *gorm.DB) *gorm.DB {
+			tx, err := ApplyCustomWhere(client, tx, conditions, mockObject{})
+			assert.NoError(t, err)
+			return tx.First(&mockObject{})
+		})
+
+		assert.Contains(t, raw, `JSON_EXTRACT(metadata, "$.p2p_tx_metadata.note") = "test"`)
+	})
+
+	t.Run("PostgreSQL nested metadata", func(t *testing.T) {
+		client, gdb := mockClient(PostgreSQL)
+		conditions := map[string]interface{}{
+			metadataField: Metadata{
+				"p2p_tx_metadata": map[string]interface{}{
+					"note": "test",
+				},
+			},
+		}
+
+		raw := gdb.ToSQL(func(tx *gorm.DB) *gorm.DB {
+			tx, err := ApplyCustomWhere(client, tx, conditions, mockObject{})
+			assert.NoError(t, err)
+			return tx.First(&mockObject{})
+		})
+
+		assert.Contains(t, raw, `metadata::jsonb @> '{"p2p_tx_metadata":{"note":"test"}}'`)
+	})
 
 	t.Run("SQLite $and", func(t *testing.T) {
 		client, gdb := mockClient(SQLite)
