@@ -253,9 +253,9 @@ func TestCustomWhere(t *testing.T) {
 	})
 	t.Run("SQLite nested metadata", func(t *testing.T) {
 		client, gdb := mockClient(SQLite)
-		conditions := map[string]interface{}{
-			metadataField: map[string]interface{}{
-				"p2p_tx_metadata": map[string]interface{}{
+		conditions := Metadata{
+			metadataField: Metadata{
+				"p2p_tx_metadata": Metadata{
 					"note": "test",
 				},
 			},
@@ -272,9 +272,9 @@ func TestCustomWhere(t *testing.T) {
 
 	t.Run("PostgreSQL nested metadata", func(t *testing.T) {
 		client, gdb := mockClient(PostgreSQL)
-		conditions := map[string]interface{}{
+		conditions := Metadata{
 			metadataField: Metadata{
-				"p2p_tx_metadata": map[string]interface{}{
+				"p2p_tx_metadata": Metadata{
 					"note": "test",
 				},
 			},
