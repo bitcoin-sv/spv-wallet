@@ -2,6 +2,7 @@ package reqctx
 
 import (
 	"github.com/bitcoin-sv/spv-wallet/engine"
+	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/gin-gonic/gin"
 )
 
@@ -60,6 +61,21 @@ func (ctx *UserContext) GetAuthType() AuthType {
 	return ctx.AuthType
 }
 
+// ShouldGetXPub returns the xPub from the user context
+// If the authentication type is not xPub, it will return an error
+func (ctx *UserContext) ShouldGetXPub() (string, error) {
+	if ctx.AuthType != AuthTypeXPub {
+		return "", spverrors.ErrXPubAuthRequired
+	}
+	if ctx.xPub == "" {
+		// if AuthType is XPub, xPub should not be empty (by design)
+		// if it is empty, it is a bug
+		return "", spverrors.ErrInternal
+	}
+
+	return ctx.xPub, nil
+}
+
 // GetXPubID returns the xPubID from the user context
 func (ctx *UserContext) GetXPubID() string {
 	return ctx.xPubID
@@ -79,18 +95,4 @@ func GetUserContext(c *gin.Context) *UserContext {
 // SetUserContext sets the user context in the request context
 func SetUserContext(c *gin.Context, userContext *UserContext) {
 	c.Set(userContextKey, userContext)
-}
-
-// GetXPubOrPanic returns the xPub if authorization was made by "regular user" with xPub (not accessKey)
-// It panics on fail, so use with caution.
-// This function should not be called in actions.
-func GetXPubOrPanic(ctx *UserContext) string {
-	if ctx.AuthType != AuthTypeXPub {
-		panic("The xPub is not available when the user is authorized by access key or is an admin")
-	}
-	if ctx.xPub == "" {
-		panic("The xPub is not available")
-	}
-
-	return ctx.xPub
 }

@@ -23,12 +23,18 @@ import (
 // @Failure 	500	"Internal Server Error - Error while creating destination"
 // @DeprecatedRouter  /v1/destination [post]
 // @Security	x-auth-xpub
-func create(c *gin.Context, _ *reqctx.UserContext, xpub string) {
+func create(c *gin.Context, userContext *reqctx.UserContext) {
 	logger := reqctx.Logger(c)
 	engineInstance := reqctx.Engine(c)
 
+	xpub, err := userContext.ShouldGetXPub()
+	if err != nil {
+		spverrors.AbortWithErrorResponse(c, err, logger)
+		return
+	}
+
 	var requestBody CreateDestination
-	err := c.Bind(&requestBody)
+	err = c.Bind(&requestBody)
 	if err != nil {
 		spverrors.ErrorResponse(c, spverrors.ErrCannotBindRequest, logger)
 		return

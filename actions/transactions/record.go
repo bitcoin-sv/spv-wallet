@@ -21,12 +21,18 @@ import (
 // @Failure 	500	"Internal Server Error - Error while recording transaction"
 // @DeprecatedRouter	/v1/transaction/record [post]
 // @Security	x-auth-xpub
-func record(c *gin.Context, _ *reqctx.UserContext, xpub string) {
+func record(c *gin.Context, userContext *reqctx.UserContext) {
 	logger := reqctx.Logger(c)
 	engineInstance := reqctx.Engine(c)
 
+	xpub, err := userContext.ShouldGetXPub()
+	if err != nil {
+		spverrors.AbortWithErrorResponse(c, err, logger)
+		return
+	}
+
 	var requestBody OldRecordTransaction
-	err := c.ShouldBindJSON(&requestBody)
+	err = c.ShouldBindJSON(&requestBody)
 	if err != nil {
 		spverrors.ErrorResponse(c, err, logger)
 		return
@@ -65,12 +71,18 @@ func record(c *gin.Context, _ *reqctx.UserContext, xpub string) {
 // @Failure 	500	"Internal Server Error - Error while recording transaction"
 // @Router		/api/v1/transactions [post]
 // @Security	x-auth-xpub
-func recordTransaction(c *gin.Context, _ *reqctx.UserContext, xpub string) {
+func recordTransaction(c *gin.Context, userContext *reqctx.UserContext) {
 	logger := reqctx.Logger(c)
 	engineInstance := reqctx.Engine(c)
 
+	xpub, err := userContext.ShouldGetXPub()
+	if err != nil {
+		spverrors.AbortWithErrorResponse(c, err, logger)
+		return
+	}
+
 	var requestBody RecordTransaction
-	err := c.ShouldBindJSON(&requestBody)
+	err = c.ShouldBindJSON(&requestBody)
 	if err != nil {
 		spverrors.ErrorResponse(c, err, logger)
 		return

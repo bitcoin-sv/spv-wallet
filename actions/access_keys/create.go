@@ -22,7 +22,12 @@ import (
 // @Failure 	500	"Internal server error - Error while creating new access key"
 // @DeprecatedRouter  /v1/access-key [post]
 // @Security	x-auth-xpub
-func oldCreate(c *gin.Context, _ *reqctx.UserContext, xpub string) {
+func oldCreate(c *gin.Context, userContext *reqctx.UserContext) {
+	xpub, err := userContext.ShouldGetXPub()
+	if err != nil {
+		spverrors.AbortWithErrorResponse(c, err, reqctx.Logger(c))
+		return
+	}
 	createHelper(c, true, xpub)
 }
 
@@ -38,7 +43,12 @@ func oldCreate(c *gin.Context, _ *reqctx.UserContext, xpub string) {
 // @Failure 	500	"Internal server error - Error while creating new access key"
 // @Router		/api/v1/users/current/keys [post]
 // @Security	x-auth-xpub
-func create(c *gin.Context, _ *reqctx.UserContext, xpub string) {
+func create(c *gin.Context, userContext *reqctx.UserContext) {
+	xpub, err := userContext.ShouldGetXPub()
+	if err != nil {
+		spverrors.AbortWithErrorResponse(c, err, reqctx.Logger(c))
+		return
+	}
 	createHelper(c, false, xpub)
 }
 

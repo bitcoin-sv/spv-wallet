@@ -24,18 +24,6 @@ func AsUser(handler UserHandler) gin.HandlerFunc {
 	}
 }
 
-// AsUserWithXPub wraps the handler with the user context and the xpub used during authorization
-func AsUserWithXPub(handler UserHandlerWithXPub) gin.HandlerFunc {
-	return func(c *gin.Context) {
-		userContext := reqctx.GetUserContext(c)
-		if userContext.AuthType != reqctx.AuthTypeXPub {
-			spverrors.AbortWithErrorResponse(c, spverrors.ErrXPubAuthRequired, nil)
-			return
-		}
-		handler(c, userContext, reqctx.GetXPubOrPanic(userContext))
-	}
-}
-
 // AdminHandler is the handler for admin's requests
 type AdminHandler = func(c *gin.Context, _ *reqctx.AdminContext)
 

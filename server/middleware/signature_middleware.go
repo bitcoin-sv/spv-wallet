@@ -58,7 +58,11 @@ func verifyRequest(c *gin.Context, userContext *reqctx.UserContext) error {
 
 	switch userContext.GetAuthType() {
 	case reqctx.AuthTypeXPub:
-		return validator.verifyWithXPub(reqctx.GetXPubOrPanic(userContext))
+		if xpub, err := userContext.ShouldGetXPub(); err != nil {
+			return err //nolint:wrapcheck // Error already as "spverrors"
+		} else {
+			return validator.verifyWithXPub(xpub)
+		}
 	case reqctx.AuthTypeAccessKey:
 		return validator.verifyWithAccessKey(strings.TrimSpace(c.GetHeader(models.AuthAccessKey)))
 	case reqctx.AuthTypeAdmin:

@@ -22,12 +22,18 @@ import (
 // @Failure 	500	"Internal Server Error - Error while creating transaction"
 // @DeprecatedRouter	/v1/transaction [post]
 // @Security	x-auth-xpub
-func newTransaction(c *gin.Context, _ *reqctx.UserContext, xpub string) {
+func newTransaction(c *gin.Context, userContext *reqctx.UserContext) {
 	logger := reqctx.Logger(c)
 	engineInstance := reqctx.Engine(c)
 
+	xpub, err := userContext.ShouldGetXPub()
+	if err != nil {
+		spverrors.AbortWithErrorResponse(c, err, logger)
+		return
+	}
+
 	var requestBody OldNewDraftTransaction
-	err := c.Bind(&requestBody)
+	err = c.Bind(&requestBody)
 	if err != nil {
 		spverrors.ErrorResponse(c, spverrors.ErrCannotBindRequest, logger)
 		return
@@ -67,12 +73,18 @@ func newTransaction(c *gin.Context, _ *reqctx.UserContext, xpub string) {
 // @Failure 	500	"Internal Server Error - Error while creating transaction"
 // @Router		/api/v1/transactions/drafts [post]
 // @Security	x-auth-xpub
-func newTransactionDraft(c *gin.Context, _ *reqctx.UserContext, xpub string) {
+func newTransactionDraft(c *gin.Context, userContext *reqctx.UserContext) {
 	logger := reqctx.Logger(c)
 	engineInstance := reqctx.Engine(c)
 
+	xpub, err := userContext.ShouldGetXPub()
+	if err != nil {
+		spverrors.AbortWithErrorResponse(c, err, logger)
+		return
+	}
+
 	var requestBody NewDraftTransaction
-	err := c.Bind(&requestBody)
+	err = c.Bind(&requestBody)
 	if err != nil {
 		spverrors.ErrorResponse(c, spverrors.ErrCannotBindRequest, logger)
 		return

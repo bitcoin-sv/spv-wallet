@@ -31,13 +31,10 @@ func someHandler(c *gin.Context, userContext *reqctx.UserContext)
 ```
 
 -   Use the `userContext` object to get XPubID of current request.
+    -   You can also retrieve the raw XPub by calling `xpub, err := userContext.ShouldGet()`
+        -   Keep in mind that this is only possible when authorization is done via `xPub` (not via an `access key`).
+        -   For access key authorization, this will return an error.
     -   Additionally, you cannot confuse "user" handlers with others - because of unique set of arguments.
--   If you require a `XPub` in your action - keep in mind that in that case, authorization by `access keys` will not be available
-    -   To define such handlers use `handlers.AsUserWithXPub(yourHandler)` and the handler func with following pattern:
-
-```golang
-func someHandler(c *gin.Context, userContext *reqctx.UserContext, xpub string)
-```
 
 ## 2. How to define an endpoint for admin
 
