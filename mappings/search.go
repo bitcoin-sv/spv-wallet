@@ -18,7 +18,7 @@ func MapToDbQueryParams(model *filter.Page) *datastore.QueryParams {
 		return &datastore.QueryParams{
 			Page:          defaultPage,
 			PageSize:      defaultPageSize,
-			OrderByField:  defaultOrder,
+			OrderByField:  defaultSortBy,
 			SortDirection: defaultOrder,
 		}
 	}
