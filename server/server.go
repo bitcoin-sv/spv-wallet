@@ -131,6 +131,7 @@ func SetupServerRoutes(appConfig *config.AppConfig, services *config.AppServices
 	destinationBasicRoutes, destinationAPIRoutes := destinations.NewHandler(appConfig, services)
 	transactionBasicRoutes, transactionAPIRoutes, transactionCallbackRoutes := transactions.OldTransactionsHandler(appConfig, services)
 	handler := transactions.NewHandler(appConfig, services)
+	oldUtxoAPIRoutes := utxos.OldUtxosHandler(appConfig, services)
 	utxoAPIRoutes := utxos.NewHandler(appConfig, services)
 	oldUsersAPIRoutes := users.OldUsersHandler(appConfig, services)
 	usersAPIRoutes := users.NewHandler(appConfig, services)
@@ -156,6 +157,7 @@ func SetupServerRoutes(appConfig *config.AppConfig, services *config.AppServices
 		handler.BasicEndpoints,
 		handler.APIEndpoints,
 		// Utxo routes
+		oldUtxoAPIRoutes,
 		utxoAPIRoutes,
 		// Users routes
 		oldUsersAPIRoutes,

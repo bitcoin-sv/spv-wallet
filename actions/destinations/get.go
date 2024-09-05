@@ -12,8 +12,8 @@ import (
 
 // get will get an existing model
 // Get Destination godoc
-// @Summary		Get a destination
-// @Description	Get a destination
+// @Summary		Get a destination. This endpoint has been deprecated (it will be removed in the future).
+// @Description	Get a destination. This endpoint has been deprecated (it will be removed in the future).
 // @Tags		Destinations
 // @Produce		json
 // @Param		id query string false "Destination ID"
@@ -22,7 +22,7 @@ import (
 // @Success		200 {object} models.Destination "Destination with given id"
 // @Failure		400	"Bad request - All parameters are missing (id, address, locking_script)"
 // @Failure 	500	"Internal server error - Error while getting destination"
-// @Router		/v1/destination [get]
+// @DeprecatedRouter  /v1/destination [get]
 // @Security	x-auth-xpub
 func (a *Action) get(c *gin.Context) {
 	reqXPubID := c.GetString(auth.ParamXPubHashKey)

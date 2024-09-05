@@ -308,6 +308,35 @@ func getUtxosByXpubID(ctx context.Context, xPubID string, metadata *Metadata, co
 	return getUtxosByConditions(ctx, dbConditions, queryParams, opts...)
 }
 
+// getUtxosByXpubIDCount will get a count of all the utxos by a given xPub ID
+func getUtxosByXpubIDCount(ctx context.Context, xPubID string, metadata *Metadata,
+	conditions map[string]interface{}, opts ...ModelOps,
+) (int64, error) {
+	dbConditions := map[string]interface{}{}
+	if conditions != nil {
+		dbConditions = conditions
+	}
+	dbConditions[xPubIDField] = xPubID
+
+	if metadata != nil {
+		dbConditions[metadataField] = metadata
+	}
+
+	// Get the records
+	count, err := getModelCount(
+		ctx, NewBaseModel(ModelNameEmpty, opts...).Client().Datastore(),
+		Utxo{}, dbConditions, defaultDatabaseReadTimeout,
+	)
+	if err != nil {
+		if errors.Is(err, datastore.ErrNoResults) {
+			return 0, nil
+		}
+		return 0, err
+	}
+
+	return count, nil
+}
+
 // getUtxosByDraftID will return the utxos by a given draft id
 func getUtxosByDraftID(ctx context.Context, draftID string,
 	queryParams *datastore.QueryParams, opts ...ModelOps,

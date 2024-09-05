@@ -17,6 +17,8 @@ func (ts *TestSuite) TestUtxoRegisterRoutes() {
 			{"GET", "/" + config.APIVersion + "/utxo"},
 			{"POST", "/" + config.APIVersion + "/utxo/count"},
 			{"POST", "/" + config.APIVersion + "/utxo/search"},
+
+			{"GET", "/api/" + config.APIVersion + "/utxos"},
 		}
 
 		ts.Router.Routes()

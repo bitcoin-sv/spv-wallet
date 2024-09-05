@@ -27,9 +27,13 @@ func (ts *TestSuite) TearDownSuite() {
 func (ts *TestSuite) SetupTest() {
 	ts.BaseSetupTest()
 
+	// Load the router & register old routes
+	oldAPIRoutes := OldUtxosHandler(ts.AppConfig, ts.Services)
+	oldAPIRoutes.RegisterOldAPIEndpoints(ts.Router.Group("/" + config.APIVersion))
+
 	// Load the router & register routes
 	apiRoutes := NewHandler(ts.AppConfig, ts.Services)
-	apiRoutes.RegisterOldAPIEndpoints(ts.Router.Group("/" + config.APIVersion))
+	apiRoutes.RegisterAPIEndpoints(ts.Router.Group("/api/" + config.APIVersion))
 }
 
 // TearDownTest runs after each test

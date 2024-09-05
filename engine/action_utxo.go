@@ -75,6 +75,28 @@ func (c *Client) GetUtxosByXpubID(ctx context.Context, xPubID string, metadata *
 	return utxos, nil
 }
 
+// GetUtxosByXpubIDCount will get a count of all the utxos based on an xPub
+func (c *Client) GetUtxosByXpubIDCount(ctx context.Context, xPubID string, metadata *Metadata,
+	conditions map[string]interface{},
+) (int64, error) {
+	// Check for existing NewRelic transaction
+	ctx = c.GetOrStartTxn(ctx, "get_utxos_count")
+
+	// Get the utxos count
+	count, err := getUtxosByXpubIDCount(
+		ctx,
+		xPubID,
+		metadata,
+		conditions,
+		c.DefaultModelOptions()...,
+	)
+	if err != nil {
+		return 0, err
+	}
+
+	return count, nil
+}
+
 // GetUtxo will get a single utxo based on an xPub, the tx ID and the outputIndex
 func (c *Client) GetUtxo(ctx context.Context, xPubKey, txID string, outputIndex uint32) (*Utxo, error) {
 	// Check for existing NewRelic transaction
