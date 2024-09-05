@@ -120,10 +120,10 @@ func (builder *whereBuilder) applyPostgresJSONB(tx customWhereInterface, columnN
 	tx.Where(query, map[string]interface{}{varName: condition})
 }
 
-func (builder *whereBuilder) applyJSONExtract(tx customWhereInterface, columnName string, condition interface{}) {
-	var processCondition func(keyPrefix string, subCondition interface{})
+func (builder *whereBuilder) applyJSONExtract(tx customWhereInterface, columnName string, condition any) {
+	var processCondition func(keyPrefix string, subCondition any)
 
-	processCondition = func(keyPrefix string, subCondition interface{}) {
+	processCondition = func(keyPrefix string, subCondition any) {
 		dict := convertToDict(subCondition)
 		for key, value := range dict {
 			var fullKey string
@@ -141,7 +141,7 @@ func (builder *whereBuilder) applyJSONExtract(tx customWhereInterface, columnNam
 				jsonPath := fmt.Sprintf("$.%s", fullKey)
 
 				query := fmt.Sprintf("JSON_EXTRACT(%s, @%s) = @%s", columnName, keyVarName, valueVarName)
-				tx.Where(query, map[string]interface{}{
+				tx.Where(query, map[string]any{
 					keyVarName:   jsonPath,
 					valueVarName: value,
 				})
