@@ -69,8 +69,6 @@ type AuthenticationConfig struct {
 	Scheme string `json:"scheme" mapstructure:"scheme"`
 	// RequireSigning is the flag that decides if the signing is required
 	RequireSigning bool `json:"require_signing" mapstructure:"require_signing"`
-	// SigningDisabled turns off signing. NOTE: Only for development
-	SigningDisabled bool `json:"signing_disabled" mapstructure:"signing_disabled"`
 }
 
 // CacheConfig is a configuration for cachestore

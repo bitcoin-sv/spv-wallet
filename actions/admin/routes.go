@@ -1,51 +1,38 @@
 package admin
 
 import (
-	"github.com/bitcoin-sv/spv-wallet/actions"
-	"github.com/bitcoin-sv/spv-wallet/config"
-	"github.com/bitcoin-sv/spv-wallet/server/routes"
-	"github.com/gin-gonic/gin"
+	"github.com/bitcoin-sv/spv-wallet/server/handlers"
 )
 
-// Action is an extension of actions.Action for this package
-type Action struct {
-	actions.Action
-}
+// RegisterRoutes creates the specific package routes
+func RegisterRoutes(handlersManager *handlers.Manager) {
+	adminGroup := handlersManager.Group(handlers.GroupOldAPI, "/admin")
 
-// NewHandler creates the specific package routes
-func NewHandler(appConfig *config.AppConfig, services *config.AppServices) routes.AdminEndpointsFunc {
-	action := &Action{actions.Action{AppConfig: appConfig, Services: services}}
-
-	adminEndpoints := routes.AdminEndpointsFunc(func(router *gin.RouterGroup) {
-		adminGroup := router.Group("/admin")
-		adminGroup.GET("/stats", action.stats)
-		adminGroup.GET("/status", action.status)
-		adminGroup.POST("/access-keys/search", action.accessKeysSearch)
-		adminGroup.POST("/access-keys/count", action.accessKeysCount)
-		adminGroup.POST("/contact/search", action.contactsSearch)
-		adminGroup.PATCH("/contact/:id", action.contactsUpdate)
-		adminGroup.DELETE("/contact/:id", action.contactsDelete)
-		adminGroup.PATCH("/contact/accepted/:id", action.contactsAccept)
-		adminGroup.PATCH("/contact/rejected/:id", action.contactsReject)
-		adminGroup.POST("/destinations/search", action.destinationsSearch)
-		adminGroup.POST("/destinations/count", action.destinationsCount)
-		adminGroup.POST("/paymail/get", action.paymailGetAddress)
-		adminGroup.POST("/paymails/search", action.paymailAddressesSearch)
-		adminGroup.POST("/paymails/count", action.paymailAddressesCount)
-		adminGroup.POST("/paymail/create", action.paymailCreateAddress)
-		adminGroup.DELETE("/paymail/delete", action.paymailDeleteAddress)
-		adminGroup.POST("/transactions/search", action.transactionsSearch)
-		adminGroup.POST("/transactions/count", action.transactionsCount)
-		adminGroup.POST("/transactions/record", action.transactionRecord)
-		adminGroup.POST("/utxos/search", action.utxosSearch)
-		adminGroup.POST("/utxos/count", action.utxosCount)
-		adminGroup.POST("/xpub", action.xpubsCreate)
-		adminGroup.POST("/xpubs/search", action.xpubsSearch)
-		adminGroup.POST("/xpubs/count", action.xpubsCount)
-		adminGroup.POST("/webhooks/subscriptions", action.subscribeWebhook)
-		adminGroup.DELETE("/webhooks/subscriptions", action.unsubscribeWebhook)
-		adminGroup.GET("/webhooks/subscriptions", action.getAllWebhooks)
-	})
-
-	return adminEndpoints
+	adminGroup.GET("/stats", handlers.AsAdmin(stats))
+	adminGroup.GET("/status", handlers.AsAdmin(status))
+	adminGroup.POST("/access-keys/search", handlers.AsAdmin(accessKeysSearch))
+	adminGroup.POST("/access-keys/count", handlers.AsAdmin(accessKeysCount))
+	adminGroup.POST("/contact/search", handlers.AsAdmin(contactsSearch))
+	adminGroup.PATCH("/contact/:id", handlers.AsAdmin(contactsUpdate))
+	adminGroup.DELETE("/contact/:id", handlers.AsAdmin(contactsDelete))
+	adminGroup.PATCH("/contact/accepted/:id", handlers.AsAdmin(contactsAccept))
+	adminGroup.PATCH("/contact/rejected/:id", handlers.AsAdmin(contactsReject))
+	adminGroup.POST("/destinations/search", handlers.AsAdmin(destinationsSearch))
+	adminGroup.POST("/destinations/count", handlers.AsAdmin(destinationsCount))
+	adminGroup.POST("/paymail/get", handlers.AsAdmin(paymailGetAddress))
+	adminGroup.POST("/paymails/search", handlers.AsAdmin(paymailAddressesSearch))
+	adminGroup.POST("/paymails/count", handlers.AsAdmin(paymailAddressesCount))
+	adminGroup.POST("/paymail/create", handlers.AsAdmin(paymailCreateAddress))
+	adminGroup.DELETE("/paymail/delete", handlers.AsAdmin(paymailDeleteAddress))
+	adminGroup.POST("/transactions/search", handlers.AsAdmin(transactionsSearch))
+	adminGroup.POST("/transactions/count", handlers.AsAdmin(transactionsCount))
+	adminGroup.POST("/transactions/record", handlers.AsAdmin(transactionRecord))
+	adminGroup.POST("/utxos/search", handlers.AsAdmin(utxosSearch))
+	adminGroup.POST("/utxos/count", handlers.AsAdmin(utxosCount))
+	adminGroup.POST("/xpub", handlers.AsAdmin(xpubsCreate))
+	adminGroup.POST("/xpubs/search", handlers.AsAdmin(xpubsSearch))
+	adminGroup.POST("/xpubs/count", handlers.AsAdmin(xpubsCount))
+	adminGroup.POST("/webhooks/subscriptions", handlers.AsAdmin(subscribeWebhook))
+	adminGroup.DELETE("/webhooks/subscriptions", handlers.AsAdmin(unsubscribeWebhook))
+	adminGroup.GET("/webhooks/subscriptions", handlers.AsAdmin(getAllWebhooks))
 }

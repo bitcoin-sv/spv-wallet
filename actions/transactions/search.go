@@ -8,7 +8,7 @@ import (
 	"github.com/bitcoin-sv/spv-wallet/models"
 	"github.com/bitcoin-sv/spv-wallet/models/filter"
 	"github.com/bitcoin-sv/spv-wallet/models/response"
-	"github.com/bitcoin-sv/spv-wallet/server/auth"
+	"github.com/bitcoin-sv/spv-wallet/server/reqctx"
 	"github.com/gin-gonic/gin"
 )
 
@@ -24,25 +24,25 @@ import (
 // @Failure 	500	"Internal server error - Error while searching for transactions"
 // @Router		/v1/transaction/search [post]
 // @Security	x-auth-xpub
-func (a *Action) search(c *gin.Context) {
-	reqXPubID := c.GetString(auth.ParamXPubHashKey)
+func search(c *gin.Context, userContext *reqctx.UserContext) {
+	logger := reqctx.Logger(c)
 
 	var reqParams filter.SearchTransactions
 	if err := c.Bind(&reqParams); err != nil {
-		spverrors.ErrorResponse(c, spverrors.ErrCouldNotFindXpub, a.Services.Logger)
+		spverrors.ErrorResponse(c, spverrors.ErrCannotBindRequest, logger)
 		return
 	}
 
-	// Record a new transaction (get the hex from parameters)
-	transactions, err := a.Services.SpvWalletEngine.GetTransactionsByXpubID(
+	// Record a new transaction (get the hex from parameters)a
+	transactions, err := reqctx.Engine(c).GetTransactionsByXpubID(
 		c.Request.Context(),
-		reqXPubID,
+		userContext.GetXPubID(),
 		mappings.MapToMetadata(reqParams.Metadata),
 		reqParams.Conditions.ToDbConditions(),
 		mappings.MapToQueryParams(reqParams.QueryParams),
 	)
 	if err != nil {
-		spverrors.ErrorResponse(c, err, a.Services.Logger)
+		spverrors.ErrorResponse(c, err, logger)
 		return
 	}
 
@@ -67,9 +67,7 @@ func (a *Action) search(c *gin.Context) {
 // @Failure 	500	"Internal server error - Error while searching for transactions"
 // @Router		/api/v1/transactions [get]
 // @Security	x-auth-xpub
-func (a *Action) transactions(c *gin.Context) {
-	reqXPubID := c.GetString(auth.ParamXPubHashKey)
-
+func transactions(c *gin.Context, userContext *reqctx.UserContext) {
 	var reqParams filter.SearchTransactions
 	if err := c.Bind(&reqParams); err != nil {
 		c.JSON(http.StatusBadRequest, err.Error())
@@ -77,9 +75,9 @@ func (a *Action) transactions(c *gin.Context) {
 	}
 
 	// Record a new transaction (get the hex from parameters)
-	transactions, err := a.Services.SpvWalletEngine.GetTransactionsByXpubID(
+	transactions, err := reqctx.Engine(c).GetTransactionsByXpubID(
 		c.Request.Context(),
-		reqXPubID,
+		userContext.GetXPubID(),
 		mappings.MapToMetadata(reqParams.Metadata),
 		reqParams.Conditions.ToDbConditions(),
 		mappings.MapToQueryParams(reqParams.QueryParams),

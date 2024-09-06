@@ -4,7 +4,7 @@ import (
 	"net/http"
 
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
-	"github.com/bitcoin-sv/spv-wallet/server/auth"
+	"github.com/bitcoin-sv/spv-wallet/server/reqctx"
 	"github.com/gin-gonic/gin"
 )
 
@@ -21,8 +21,8 @@ import (
 // @Failure		500	"Internal server error"
 // @DeprecatedRouter  /v1/contact/accepted/{paymail} [patch]
 // @Security	x-auth-xpub
-func (a *Action) oldAccept(c *gin.Context) {
-	a.acceptInvitations(c)
+func oldAccept(c *gin.Context, userContext *reqctx.UserContext) {
+	acceptInvitations(c, userContext)
 }
 
 // acceptInvitations will accept contact request
@@ -38,14 +38,12 @@ func (a *Action) oldAccept(c *gin.Context) {
 // @Failure		500	"Internal server error"
 // @Router		/api/v1/invitations/{paymail}/contacts [post]
 // @Security	x-auth-xpub
-func (a *Action) acceptInvitations(c *gin.Context) {
-	reqXPubID := c.GetString(auth.ParamXPubHashKey)
+func acceptInvitations(c *gin.Context, userContext *reqctx.UserContext) {
 	paymail := c.Param("paymail")
 
-	err := a.Services.SpvWalletEngine.AcceptContact(c, reqXPubID, paymail)
-
+	err := reqctx.Engine(c).AcceptContact(c, userContext.GetXPubID(), paymail)
 	if err != nil {
-		spverrors.ErrorResponse(c, err, a.Services.Logger)
+		spverrors.ErrorResponse(c, err, reqctx.Logger(c))
 		return
 	}
 

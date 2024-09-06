@@ -252,7 +252,6 @@ auth:
     admin_key: xpub661MyMwAqRbcFgfmdkPgE2m5UjHXu9dj124DbaGLSjaqVESTWfCD4VuNmEbVPkbYLCkykwVZvmA8Pbf8884TQr1FgdG2nPoHR8aB36YdDQh
     require_signing: false
     scheme: xpub
-    signing_disabled: true
 ```
 
 To override admin_key in auth config, use the path with "_" as a path delimiter and SPVWALLET\_ as prefix. So:

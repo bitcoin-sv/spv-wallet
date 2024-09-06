@@ -6,6 +6,7 @@ import (
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/bitcoin-sv/spv-wallet/mappings"
 	"github.com/bitcoin-sv/spv-wallet/models/filter"
+	"github.com/bitcoin-sv/spv-wallet/server/reqctx"
 	"github.com/gin-gonic/gin"
 )
 
@@ -21,27 +22,28 @@ import (
 // @Failure 	500	"Internal server error - Error while searching for utxos"
 // @Router		/v1/admin/utxos/search [post]
 // @Security	x-auth-xpub
-func (a *Action) utxosSearch(c *gin.Context) {
+func utxosSearch(c *gin.Context, _ *reqctx.AdminContext) {
+	logger := reqctx.Logger(c)
 	var reqParams filter.AdminSearchUtxos
 	if err := c.Bind(&reqParams); err != nil {
-		spverrors.ErrorResponse(c, spverrors.ErrCannotBindRequest, a.Services.Logger)
+		spverrors.ErrorResponse(c, spverrors.ErrCannotBindRequest, logger)
 		return
 	}
 
 	conditions, err := reqParams.Conditions.ToDbConditions()
 	if err != nil {
-		spverrors.ErrorResponse(c, spverrors.ErrInvalidConditions, a.Services.Logger)
+		spverrors.ErrorResponse(c, spverrors.ErrInvalidConditions, logger)
 		return
 	}
 
-	utxos, err := a.Services.SpvWalletEngine.GetUtxos(
+	utxos, err := reqctx.Engine(c).GetUtxos(
 		c.Request.Context(),
 		mappings.MapToMetadata(reqParams.Metadata),
 		conditions,
 		mappings.MapToQueryParams(reqParams.QueryParams),
 	)
 	if err != nil {
-		spverrors.ErrorResponse(c, err, a.Services.Logger)
+		spverrors.ErrorResponse(c, err, logger)
 		return
 	}
 
@@ -60,26 +62,27 @@ func (a *Action) utxosSearch(c *gin.Context) {
 // @Failure 	500	"Internal Server Error - Error while fetching count of utxos"
 // @Router		/v1/admin/utxos/count [post]
 // @Security	x-auth-xpub
-func (a *Action) utxosCount(c *gin.Context) {
+func utxosCount(c *gin.Context, _ *reqctx.AdminContext) {
+	logger := reqctx.Logger(c)
 	var reqParams filter.AdminCountUtxos
 	if err := c.Bind(&reqParams); err != nil {
-		spverrors.ErrorResponse(c, spverrors.ErrCannotBindRequest, a.Services.Logger)
+		spverrors.ErrorResponse(c, spverrors.ErrCannotBindRequest, logger)
 		return
 	}
 
 	conditions, err := reqParams.Conditions.ToDbConditions()
 	if err != nil {
-		spverrors.ErrorResponse(c, spverrors.ErrInvalidConditions, a.Services.Logger)
+		spverrors.ErrorResponse(c, spverrors.ErrInvalidConditions, logger)
 		return
 	}
 
-	count, err := a.Services.SpvWalletEngine.GetUtxosCount(
+	count, err := reqctx.Engine(c).GetUtxosCount(
 		c.Request.Context(),
 		mappings.MapToMetadata(reqParams.Metadata),
 		conditions,
 	)
 	if err != nil {
-		spverrors.ErrorResponse(c, err, a.Services.Logger)
+		spverrors.ErrorResponse(c, err, logger)
 		return
 	}
 

@@ -1,16 +1,9 @@
-package actions
+package server
 
 import (
-	"net/http"
-
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/gin-gonic/gin"
 )
-
-// StatusOK is a basic response which sets the status to 200
-func StatusOK(c *gin.Context) {
-	c.Status(http.StatusOK)
-}
 
 // NotFound handles all 404 requests
 func NotFound(c *gin.Context) {

@@ -5,7 +5,7 @@ import (
 
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/bitcoin-sv/spv-wallet/mappings"
-	"github.com/bitcoin-sv/spv-wallet/server/auth"
+	"github.com/bitcoin-sv/spv-wallet/server/reqctx"
 	"github.com/gin-gonic/gin"
 )
 
@@ -21,31 +21,30 @@ import (
 // @Failure 	500	"Internal Server Error - Error while updating transaction"
 // @DeprecatedRouter	/v1/transaction [patch]
 // @Security	x-auth-xpub
-func (a *Action) update(c *gin.Context) {
+func update(c *gin.Context, userContext *reqctx.UserContext) {
+	logger := reqctx.Logger(c)
 
 	var requestBody OldUpdateTransaction
 	if err := c.Bind(&requestBody); err != nil {
-		spverrors.ErrorResponse(c, spverrors.ErrCannotBindRequest, a.Services.Logger)
+		spverrors.ErrorResponse(c, spverrors.ErrCannotBindRequest, logger)
 		return
 	}
 	id := requestBody.ID
 
-	reqXPubID := c.GetString(auth.ParamXPubHashKey)
-
 	// Get a transaction by ID
-	transaction, err := a.Services.SpvWalletEngine.UpdateTransactionMetadata(
+	transaction, err := reqctx.Engine(c).UpdateTransactionMetadata(
 		c.Request.Context(),
-		reqXPubID,
+		userContext.GetXPubID(),
 		id,
 		requestBody.Metadata,
 	)
 	if err != nil {
-		spverrors.ErrorResponse(c, err, a.Services.Logger)
+		spverrors.ErrorResponse(c, err, logger)
 		return
 	} else if transaction == nil {
-		spverrors.ErrorResponse(c, spverrors.ErrCouldNotFindTransaction, a.Services.Logger)
-	} else if !transaction.IsXpubIDAssociated(reqXPubID) {
-		spverrors.ErrorResponse(c, spverrors.ErrAuthorization, a.Services.Logger)
+		spverrors.ErrorResponse(c, spverrors.ErrCouldNotFindTransaction, logger)
+	} else if !transaction.IsXpubIDAssociated(userContext.GetXPubID()) {
+		spverrors.ErrorResponse(c, spverrors.ErrAuthorization, logger)
 		return
 	}
 
@@ -65,7 +64,8 @@ func (a *Action) update(c *gin.Context) {
 // @Failure 	500	"Internal Server Error - Error while updating transaction metadata"
 // @Router		/api/v1/transactions/{id} [patch]
 // @Security	x-auth-xpub
-func (a *Action) updateTransactionMetadata(c *gin.Context) {
+func updateTransactionMetadata(c *gin.Context, userContext *reqctx.UserContext) {
+	logger := reqctx.Logger(c)
 	var requestBody UpdateTransactionRequest
 	if err := c.Bind(&requestBody); err != nil {
 		c.JSON(http.StatusBadRequest, err.Error())
@@ -73,22 +73,20 @@ func (a *Action) updateTransactionMetadata(c *gin.Context) {
 	}
 	id := c.Param("id")
 
-	reqXPubID := c.GetString(auth.ParamXPubHashKey)
-
 	// Get a transaction by ID
-	transaction, err := a.Services.SpvWalletEngine.UpdateTransactionMetadata(
+	transaction, err := reqctx.Engine(c).UpdateTransactionMetadata(
 		c.Request.Context(),
-		reqXPubID,
+		userContext.GetXPubID(),
 		id,
 		requestBody.Metadata,
 	)
 	if err != nil {
-		spverrors.ErrorResponse(c, err, a.Services.Logger)
+		spverrors.ErrorResponse(c, err, logger)
 		return
 	} else if transaction == nil {
-		spverrors.ErrorResponse(c, spverrors.ErrCouldNotFindTransaction, a.Services.Logger)
-	} else if !transaction.IsXpubIDAssociated(reqXPubID) {
-		spverrors.ErrorResponse(c, spverrors.ErrAuthorization, a.Services.Logger)
+		spverrors.ErrorResponse(c, spverrors.ErrCouldNotFindTransaction, logger)
+	} else if !transaction.IsXpubIDAssociated(userContext.GetXPubID()) {
+		spverrors.ErrorResponse(c, spverrors.ErrAuthorization, logger)
 		return
 	}
 

@@ -5,6 +5,7 @@ import (
 
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/bitcoin-sv/spv-wallet/mappings"
+	"github.com/bitcoin-sv/spv-wallet/server/reqctx"
 	"github.com/gin-gonic/gin"
 )
 
@@ -18,10 +19,10 @@ import (
 // @Failure 	500	"Internal Server Error - Error while fetching admin stats"
 // @Router		/v1/admin/stats [get]
 // @Security	x-auth-xpub
-func (a *Action) stats(c *gin.Context) {
-	stats, err := a.Services.SpvWalletEngine.GetStats(c.Request.Context())
+func stats(c *gin.Context, _ *reqctx.AdminContext) {
+	stats, err := reqctx.Engine(c).GetStats(c.Request.Context())
 	if err != nil {
-		spverrors.ErrorResponse(c, err, a.Services.Logger)
+		spverrors.ErrorResponse(c, err, reqctx.Logger(c))
 		return
 	}
 

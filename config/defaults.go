@@ -34,10 +34,9 @@ func getDefaultAppConfig() *AppConfig {
 
 func getAuthConfigDefaults() *AuthenticationConfig {
 	return &AuthenticationConfig{
-		AdminKey:        DefaultAdminXpub,
-		RequireSigning:  false,
-		Scheme:          "xpub",
-		SigningDisabled: true,
+		AdminKey:       DefaultAdminXpub,
+		RequireSigning: false,
+		Scheme:         "xpub",
 	}
 }
 

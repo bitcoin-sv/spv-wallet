@@ -7,6 +7,7 @@ import (
 	"github.com/bitcoin-sv/spv-wallet/mappings"
 	"github.com/bitcoin-sv/spv-wallet/models"
 	"github.com/bitcoin-sv/spv-wallet/models/filter"
+	"github.com/bitcoin-sv/spv-wallet/server/reqctx"
 	"github.com/gin-gonic/gin"
 )
 
@@ -22,21 +23,22 @@ import (
 // @Failure 	500	"Internal server error - Error while searching for destinations"
 // @Router		/v1/admin/destinations/search [post]
 // @Security	x-auth-xpub
-func (a *Action) destinationsSearch(c *gin.Context) {
+func destinationsSearch(c *gin.Context, _ *reqctx.AdminContext) {
+	logger := reqctx.Logger(c)
 	var reqParams filter.SearchDestinations
 	if err := c.Bind(&reqParams); err != nil {
-		spverrors.ErrorResponse(c, spverrors.ErrCannotBindRequest, a.Services.Logger)
+		spverrors.ErrorResponse(c, spverrors.ErrCannotBindRequest, logger)
 		return
 	}
 
-	destinations, err := a.Services.SpvWalletEngine.GetDestinations(
+	destinations, err := reqctx.Engine(c).GetDestinations(
 		c.Request.Context(),
 		mappings.MapToMetadata(reqParams.Metadata),
 		reqParams.Conditions.ToDbConditions(),
 		mappings.MapToQueryParams(reqParams.QueryParams),
 	)
 	if err != nil {
-		spverrors.ErrorResponse(c, err, a.Services.Logger)
+		spverrors.ErrorResponse(c, err, logger)
 		return
 	}
 
@@ -59,20 +61,21 @@ func (a *Action) destinationsSearch(c *gin.Context) {
 // @Failure		400	"Bad request - Error while parsing CountDestinations from request body"
 // @Failure 	500	"Internal Server Error - Error while fetching count of destinations"
 // @Security	x-auth-xpub
-func (a *Action) destinationsCount(c *gin.Context) {
+func destinationsCount(c *gin.Context, _ *reqctx.AdminContext) {
+	logger := reqctx.Logger(c)
 	var reqParams filter.CountDestinations
 	if err := c.Bind(&reqParams); err != nil {
-		spverrors.ErrorResponse(c, spverrors.ErrCannotBindRequest, a.Services.Logger)
+		spverrors.ErrorResponse(c, spverrors.ErrCannotBindRequest, logger)
 		return
 	}
 
-	count, err := a.Services.SpvWalletEngine.GetDestinationsCount(
+	count, err := reqctx.Engine(c).GetDestinationsCount(
 		c.Request.Context(),
 		mappings.MapToMetadata(reqParams.Metadata),
 		reqParams.Conditions.ToDbConditions(),
 	)
 	if err != nil {
-		spverrors.ErrorResponse(c, err, a.Services.Logger)
+		spverrors.ErrorResponse(c, err, logger)
 		return
 	}
 
