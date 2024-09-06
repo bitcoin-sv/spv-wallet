@@ -9,6 +9,7 @@ import (
 	"github.com/bitcoin-sv/spv-wallet/mappings"
 	"github.com/bitcoin-sv/spv-wallet/models"
 	"github.com/bitcoin-sv/spv-wallet/models/filter"
+	"github.com/bitcoin-sv/spv-wallet/server/reqctx"
 	"github.com/gin-gonic/gin"
 )
 
@@ -24,41 +25,43 @@ import (
 // @Failure 	500	"Internal server error - Error while searching for contacts"
 // @Router		/v1/admin/contact/search [post]
 // @Security	x-auth-xpub
-func (a *Action) contactsSearch(c *gin.Context) {
+func contactsSearch(c *gin.Context, _ *reqctx.AdminContext) {
+	logger := reqctx.Logger(c)
+	engine := reqctx.Engine(c)
 	var reqParams filter.SearchContacts
 	if err := c.Bind(&reqParams); err != nil {
-		spverrors.ErrorResponse(c, spverrors.ErrCannotBindRequest, a.Services.Logger)
+		spverrors.ErrorResponse(c, spverrors.ErrCannotBindRequest, logger)
 		return
 	}
 
 	conditions, err := reqParams.Conditions.ToDbConditions()
 	if err != nil {
-		spverrors.ErrorResponse(c, spverrors.ErrCannotBindRequest, a.Services.Logger)
+		spverrors.ErrorResponse(c, spverrors.ErrCannotBindRequest, logger)
 		return
 	}
 
 	reqParams.DefaultsIfNil()
 
-	contacts, err := a.Services.SpvWalletEngine.GetContacts(
+	contacts, err := engine.GetContacts(
 		c.Request.Context(),
 		mappings.MapToMetadata(reqParams.Metadata),
 		conditions,
 		mappings.MapToQueryParams(reqParams.QueryParams),
 	)
 	if err != nil {
-		spverrors.ErrorResponse(c, err, a.Services.Logger)
+		spverrors.ErrorResponse(c, err, logger)
 		return
 	}
 
 	contracts := mappings.MapToOldContactContracts(contacts)
 
-	count, err := a.Services.SpvWalletEngine.GetContactsCount(
+	count, err := engine.GetContactsCount(
 		c.Request.Context(),
 		mappings.MapToMetadata(reqParams.Metadata),
 		conditions,
 	)
 	if err != nil {
-		spverrors.ErrorResponse(c, err, a.Services.Logger)
+		spverrors.ErrorResponse(c, err, logger)
 		return
 	}
 
@@ -85,23 +88,24 @@ func (a *Action) contactsSearch(c *gin.Context) {
 // @Failure 	500	"Internal server error - Error while updating contact"
 // @Router		/v1/admin/contact/{id} [patch]
 // @Security	x-auth-xpub
-func (a *Action) contactsUpdate(c *gin.Context) {
+func contactsUpdate(c *gin.Context, _ *reqctx.AdminContext) {
+	logger := reqctx.Logger(c)
 	var reqParams UpdateContact
 	if err := c.Bind(&reqParams); err != nil {
-		spverrors.ErrorResponse(c, spverrors.ErrCannotBindRequest, a.Services.Logger)
+		spverrors.ErrorResponse(c, spverrors.ErrCannotBindRequest, logger)
 		return
 	}
 
 	id := c.Param("id")
 
-	contact, err := a.Services.SpvWalletEngine.UpdateContact(
+	contact, err := reqctx.Engine(c).UpdateContact(
 		c.Request.Context(),
 		id,
 		reqParams.FullName,
 		&reqParams.Metadata,
 	)
 	if err != nil {
-		spverrors.ErrorResponse(c, err, a.Services.Logger)
+		spverrors.ErrorResponse(c, err, logger)
 		return
 	}
 
@@ -125,15 +129,15 @@ func (a *Action) contactsUpdate(c *gin.Context) {
 // @Failure 	500	"Internal server error - Error while updating contact"
 // @Router		/v1/admin/contact/{id} [delete]
 // @Security	x-auth-xpub
-func (a *Action) contactsDelete(c *gin.Context) {
+func contactsDelete(c *gin.Context, _ *reqctx.AdminContext) {
 	id := c.Param("id")
 
-	err := a.Services.SpvWalletEngine.DeleteContactByID(
+	err := reqctx.Engine(c).DeleteContactByID(
 		c.Request.Context(),
 		id,
 	)
 	if err != nil {
-		spverrors.ErrorResponse(c, err, a.Services.Logger)
+		spverrors.ErrorResponse(c, err, reqctx.Logger(c))
 		return
 	}
 
@@ -155,16 +159,16 @@ func (a *Action) contactsDelete(c *gin.Context) {
 // @Failure 	500	"Internal server error - Error while changing contact status"
 // @Router		/v1/admin/contact/rejected/{id} [patch]
 // @Security	x-auth-xpub
-func (a *Action) contactsReject(c *gin.Context) {
+func contactsReject(c *gin.Context, _ *reqctx.AdminContext) {
 	id := c.Param("id")
 
-	contact, err := a.Services.SpvWalletEngine.AdminChangeContactStatus(
+	contact, err := reqctx.Engine(c).AdminChangeContactStatus(
 		c.Request.Context(),
 		id,
 		engine.ContactRejected,
 	)
 	if err != nil {
-		spverrors.ErrorResponse(c, err, a.Services.Logger)
+		spverrors.ErrorResponse(c, err, reqctx.Logger(c))
 		return
 	}
 
@@ -188,16 +192,16 @@ func (a *Action) contactsReject(c *gin.Context) {
 // @Failure 	500	"Internal server error - Error while changing contact status"
 // @Router		/v1/admin/contact/accepted/{id} [patch]
 // @Security	x-auth-xpub
-func (a *Action) contactsAccept(c *gin.Context) {
+func contactsAccept(c *gin.Context, _ *reqctx.AdminContext) {
 	id := c.Param("id")
 
-	contact, err := a.Services.SpvWalletEngine.AdminChangeContactStatus(
+	contact, err := reqctx.Engine(c).AdminChangeContactStatus(
 		c.Request.Context(),
 		id,
 		engine.ContactNotConfirmed,
 	)
 	if err != nil {
-		spverrors.ErrorResponse(c, err, a.Services.Logger)
+		spverrors.ErrorResponse(c, err, reqctx.Logger(c))
 		return
 	}
 

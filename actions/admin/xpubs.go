@@ -8,6 +8,7 @@ import (
 	"github.com/bitcoin-sv/spv-wallet/mappings"
 	"github.com/bitcoin-sv/spv-wallet/models"
 	"github.com/bitcoin-sv/spv-wallet/models/filter"
+	"github.com/bitcoin-sv/spv-wallet/server/reqctx"
 	"github.com/gin-gonic/gin"
 )
 
@@ -23,19 +24,20 @@ import (
 // @Failure 	500	"Internal server error - Error while creating xpub"
 // @Router		/v1/admin/xpub [post]
 // @Security	x-auth-xpub
-func (a *Action) xpubsCreate(c *gin.Context) {
+func xpubsCreate(c *gin.Context, _ *reqctx.AdminContext) {
+	logger := reqctx.Logger(c)
 	var requestBody CreateXpub
 	if err := c.Bind(&requestBody); err != nil {
-		spverrors.ErrorResponse(c, spverrors.ErrCannotBindRequest, a.Services.Logger)
+		spverrors.ErrorResponse(c, spverrors.ErrCannotBindRequest, logger)
 		return
 	}
 
-	xPub, err := a.Services.SpvWalletEngine.NewXpub(
+	xPub, err := reqctx.Engine(c).NewXpub(
 		c.Request.Context(), requestBody.Key,
 		engine.WithMetadatas(requestBody.Metadata),
 	)
 	if err != nil {
-		spverrors.ErrorResponse(c, err, a.Services.Logger)
+		spverrors.ErrorResponse(c, err, logger)
 		return
 	}
 
@@ -55,21 +57,22 @@ func (a *Action) xpubsCreate(c *gin.Context) {
 // @Failure 	500	"Internal server error - Error while searching for xpubs"
 // @Router		/v1/admin/xpubs/search [post]
 // @Security	x-auth-xpub
-func (a *Action) xpubsSearch(c *gin.Context) {
+func xpubsSearch(c *gin.Context, _ *reqctx.AdminContext) {
+	logger := reqctx.Logger(c)
 	var reqParams filter.SearchXpubs
 	if err := c.Bind(&reqParams); err != nil {
-		spverrors.ErrorResponse(c, spverrors.ErrCannotBindRequest, a.Services.Logger)
+		spverrors.ErrorResponse(c, spverrors.ErrCannotBindRequest, logger)
 		return
 	}
 
-	xpubs, err := a.Services.SpvWalletEngine.GetXPubs(
+	xpubs, err := reqctx.Engine(c).GetXPubs(
 		c.Request.Context(),
 		mappings.MapToMetadata(reqParams.Metadata),
 		reqParams.Conditions.ToDbConditions(),
 		mappings.MapToQueryParams(reqParams.QueryParams),
 	)
 	if err != nil {
-		spverrors.ErrorResponse(c, err, a.Services.Logger)
+		spverrors.ErrorResponse(c, err, logger)
 		return
 	}
 
@@ -93,20 +96,21 @@ func (a *Action) xpubsSearch(c *gin.Context) {
 // @Failure 	500	"Internal Server Error - Error while fetching count of xpubs"
 // @Router		/v1/admin/xpubs/count [post]
 // @Security	x-auth-xpub
-func (a *Action) xpubsCount(c *gin.Context) {
+func xpubsCount(c *gin.Context, _ *reqctx.AdminContext) {
+	logger := reqctx.Logger(c)
 	var reqParams filter.CountXpubs
 	if err := c.Bind(&reqParams); err != nil {
-		spverrors.ErrorResponse(c, spverrors.ErrCannotBindRequest, a.Services.Logger)
+		spverrors.ErrorResponse(c, spverrors.ErrCannotBindRequest, logger)
 		return
 	}
 
-	count, err := a.Services.SpvWalletEngine.GetXPubsCount(
+	count, err := reqctx.Engine(c).GetXPubsCount(
 		c.Request.Context(),
 		mappings.MapToMetadata(reqParams.Metadata),
 		reqParams.Conditions.ToDbConditions(),
 	)
 	if err != nil {
-		spverrors.ErrorResponse(c, err, a.Services.Logger)
+		spverrors.ErrorResponse(c, err, logger)
 		return
 	}
 

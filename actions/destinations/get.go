@@ -6,7 +6,7 @@ import (
 	"github.com/bitcoin-sv/spv-wallet/engine"
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/bitcoin-sv/spv-wallet/mappings"
-	"github.com/bitcoin-sv/spv-wallet/server/auth"
+	"github.com/bitcoin-sv/spv-wallet/server/reqctx"
 	"github.com/gin-gonic/gin"
 )
 
@@ -24,34 +24,35 @@ import (
 // @Failure 	500	"Internal server error - Error while getting destination"
 // @DeprecatedRouter  /v1/destination [get]
 // @Security	x-auth-xpub
-func (a *Action) get(c *gin.Context) {
-	reqXPubID := c.GetString(auth.ParamXPubHashKey)
+func get(c *gin.Context, userContext *reqctx.UserContext) {
+	logger := reqctx.Logger(c)
+	engineInstance := reqctx.Engine(c)
 
 	id := c.Query("id")
 	address := c.Query("address")
 	lockingScript := c.Query("locking_script")
 	if id == "" && address == "" && lockingScript == "" {
-		spverrors.ErrorResponse(c, spverrors.ErrOneOfTheFieldsIsRequired, a.Services.Logger)
+		spverrors.ErrorResponse(c, spverrors.ErrOneOfTheFieldsIsRequired, logger)
 		return
 	}
 
 	var destination *engine.Destination
 	var err error
 	if id != "" {
-		destination, err = a.Services.SpvWalletEngine.GetDestinationByID(
-			c.Request.Context(), reqXPubID, id,
+		destination, err = engineInstance.GetDestinationByID(
+			c.Request.Context(), userContext.GetXPubID(), id,
 		)
 	} else if address != "" {
-		destination, err = a.Services.SpvWalletEngine.GetDestinationByAddress(
-			c.Request.Context(), reqXPubID, address,
+		destination, err = engineInstance.GetDestinationByAddress(
+			c.Request.Context(), userContext.GetXPubID(), address,
 		)
 	} else {
-		destination, err = a.Services.SpvWalletEngine.GetDestinationByLockingScript(
-			c.Request.Context(), reqXPubID, lockingScript,
+		destination, err = engineInstance.GetDestinationByLockingScript(
+			c.Request.Context(), userContext.GetXPubID(), lockingScript,
 		)
 	}
 	if err != nil {
-		spverrors.ErrorResponse(c, err, a.Services.Logger)
+		spverrors.ErrorResponse(c, err, logger)
 		return
 	}
 

@@ -6,7 +6,7 @@ import (
 	"github.com/bitcoin-sv/spv-wallet/engine"
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/bitcoin-sv/spv-wallet/mappings"
-	"github.com/bitcoin-sv/spv-wallet/server/auth"
+	"github.com/bitcoin-sv/spv-wallet/server/reqctx"
 	"github.com/gin-gonic/gin"
 )
 
@@ -22,16 +22,17 @@ import (
 // @Failure 	500	"Internal Server Error - Error while updating destination"
 // @DeprecatedRouter  /v1/destination [patch]
 // @Security	x-auth-xpub
-func (a *Action) update(c *gin.Context) {
-	reqXPubID := c.GetString(auth.ParamXPubHashKey)
+func update(c *gin.Context, userContext *reqctx.UserContext) {
+	logger := reqctx.Logger(c)
+	engineInstance := reqctx.Engine(c)
 
 	var requestBody UpdateDestination
 	if err := c.Bind(&requestBody); err != nil {
-		spverrors.ErrorResponse(c, spverrors.ErrCannotBindRequest, a.Services.Logger)
+		spverrors.ErrorResponse(c, spverrors.ErrCannotBindRequest, logger)
 		return
 	}
 	if requestBody.ID == "" && requestBody.Address == "" && requestBody.LockingScript == "" {
-		spverrors.ErrorResponse(c, spverrors.ErrOneOfTheFieldsIsRequired, a.Services.Logger)
+		spverrors.ErrorResponse(c, spverrors.ErrOneOfTheFieldsIsRequired, logger)
 		return
 	}
 
@@ -39,20 +40,20 @@ func (a *Action) update(c *gin.Context) {
 	var destination *engine.Destination
 	var err error
 	if requestBody.ID != "" {
-		destination, err = a.Services.SpvWalletEngine.UpdateDestinationMetadataByID(
-			c.Request.Context(), reqXPubID, requestBody.ID, requestBody.Metadata,
+		destination, err = engineInstance.UpdateDestinationMetadataByID(
+			c.Request.Context(), userContext.GetXPubID(), requestBody.ID, requestBody.Metadata,
 		)
 	} else if requestBody.Address != "" {
-		destination, err = a.Services.SpvWalletEngine.UpdateDestinationMetadataByAddress(
-			c.Request.Context(), reqXPubID, requestBody.Address, requestBody.Metadata,
+		destination, err = engineInstance.UpdateDestinationMetadataByAddress(
+			c.Request.Context(), userContext.GetXPubID(), requestBody.Address, requestBody.Metadata,
 		)
 	} else {
-		destination, err = a.Services.SpvWalletEngine.UpdateDestinationMetadataByLockingScript(
-			c.Request.Context(), reqXPubID, requestBody.LockingScript, requestBody.Metadata,
+		destination, err = engineInstance.UpdateDestinationMetadataByLockingScript(
+			c.Request.Context(), userContext.GetXPubID(), requestBody.LockingScript, requestBody.Metadata,
 		)
 	}
 	if err != nil {
-		spverrors.ErrorResponse(c, err, a.Services.Logger)
+		spverrors.ErrorResponse(c, err, logger)
 		return
 	}
 

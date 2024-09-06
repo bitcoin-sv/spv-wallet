@@ -11,7 +11,7 @@ import (
 	"github.com/bitcoin-sv/spv-wallet/models"
 	"github.com/bitcoin-sv/spv-wallet/models/filter"
 	"github.com/bitcoin-sv/spv-wallet/models/response"
-	"github.com/bitcoin-sv/spv-wallet/server/auth"
+	"github.com/bitcoin-sv/spv-wallet/server/reqctx"
 	"github.com/gin-gonic/gin"
 )
 
@@ -27,30 +27,30 @@ import (
 // @Failure 	500	"Internal server error - Error while searching for utxos"
 // @DeprecatedRouter  /v1/utxo/search [post]
 // @Security	x-auth-xpub
-func (a *Action) oldSearch(c *gin.Context) {
-	reqXPubID := c.GetString(auth.ParamXPubHashKey)
+func oldSearch(c *gin.Context, userContext *reqctx.UserContext) {
+	logger := reqctx.Logger(c)
 
 	var reqParams filter.SearchUtxos
 	if err := c.Bind(&reqParams); err != nil {
-		spverrors.ErrorResponse(c, spverrors.ErrCannotBindRequest, a.Services.Logger)
+		spverrors.ErrorResponse(c, spverrors.ErrCannotBindRequest, logger)
 		return
 	}
 
 	conditions, err := reqParams.Conditions.ToDbConditions()
 	if err != nil {
-		spverrors.ErrorResponse(c, spverrors.ErrInvalidConditions, a.Services.Logger)
+		spverrors.ErrorResponse(c, spverrors.ErrInvalidConditions, logger)
 		return
 	}
 
 	var utxos []*engine.Utxo
-	if utxos, err = a.Services.SpvWalletEngine.GetUtxosByXpubID(
+	if utxos, err = reqctx.Engine(c).GetUtxosByXpubID(
 		c.Request.Context(),
-		reqXPubID,
+		userContext.GetXPubID(),
 		mappings.MapToMetadata(reqParams.Metadata),
 		conditions,
 		mappings.MapToQueryParams(reqParams.QueryParams),
 	); err != nil {
-		spverrors.ErrorResponse(c, err, a.Services.Logger)
+		spverrors.ErrorResponse(c, err, logger)
 		return
 	}
 
@@ -77,18 +77,18 @@ func (a *Action) oldSearch(c *gin.Context) {
 // @Failure 	500	"Internal server error - Error while searching for utxos"
 // @Router		/api/v1/utxos [get]
 // @Security	x-auth-xpub
-func (a *Action) search(c *gin.Context) {
-	reqXPubID := c.GetString(auth.ParamXPubHashKey)
-
+func search(c *gin.Context, userContext *reqctx.UserContext) {
+	logger := reqctx.Logger(c)
+	engineInstance := reqctx.Engine(c)
 	searchParams, err := query.ParseSearchParams[filter.UtxoFilter](c)
 	if err != nil {
-		spverrors.ErrorResponse(c, spverrors.ErrCannotParseQueryParams, a.Services.Logger)
+		spverrors.ErrorResponse(c, spverrors.ErrCannotParseQueryParams, logger)
 		return
 	}
 
 	conditions, err := searchParams.Conditions.ToDbConditions()
 	if err != nil {
-		spverrors.ErrorResponse(c, spverrors.ErrInvalidConditions, a.Services.Logger)
+		spverrors.ErrorResponse(c, spverrors.ErrInvalidConditions, logger)
 		return
 	}
 
@@ -96,15 +96,15 @@ func (a *Action) search(c *gin.Context) {
 	pageOptions := mappings.MapToDbQueryParams(&searchParams.Page)
 
 	var utxos []*engine.Utxo
-	utxos, err = a.Services.SpvWalletEngine.GetUtxosByXpubID(
+	utxos, err = engineInstance.GetUtxosByXpubID(
 		c.Request.Context(),
-		reqXPubID,
+		userContext.GetXPubID(),
 		metadata,
 		conditions,
 		pageOptions,
 	)
 	if err != nil {
-		spverrors.ErrorResponse(c, err, a.Services.Logger)
+		spverrors.ErrorResponse(c, err, logger)
 		return
 	}
 
@@ -113,9 +113,9 @@ func (a *Action) search(c *gin.Context) {
 		utxoContracts = append(utxoContracts, mappings.MapToUtxoContract(utxo))
 	}
 
-	count, err := a.Services.SpvWalletEngine.GetUtxosByXpubIDCount(
+	count, err := engineInstance.GetUtxosByXpubIDCount(
 		c.Request.Context(),
-		reqXPubID,
+		userContext.GetXPubID(),
 		metadata,
 		conditions,
 	)

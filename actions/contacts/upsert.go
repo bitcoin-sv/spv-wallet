@@ -10,7 +10,7 @@ import (
 	"github.com/bitcoin-sv/spv-wallet/mappings"
 	"github.com/bitcoin-sv/spv-wallet/models"
 	"github.com/bitcoin-sv/spv-wallet/models/response"
-	"github.com/bitcoin-sv/spv-wallet/server/auth"
+	"github.com/bitcoin-sv/spv-wallet/server/reqctx"
 	"github.com/gin-gonic/gin"
 )
 
@@ -25,8 +25,8 @@ import (
 // @Success		201
 // @DeprecatedRouter  /v1/contact/{paymail} [put]
 // @Security	x-auth-xpub
-func (a *Action) oldUpsert(c *gin.Context) {
-	a.upsertHelper(c, true)
+func oldUpsert(c *gin.Context, userContext *reqctx.UserContext) {
+	upsertHelper(c, true, userContext.GetXPubID())
 }
 
 // upsertContact will add a new contact or modify an existing one.
@@ -39,34 +39,33 @@ func (a *Action) oldUpsert(c *gin.Context) {
 // @Success		201
 // @Router		/api/v1/contacts/{paymail} [put]
 // @Security	x-auth-xpub
-func (a *Action) upsertContact(c *gin.Context) {
-	a.upsertHelper(c, false)
-
+func upsertContact(c *gin.Context, userContext *reqctx.UserContext) {
+	upsertHelper(c, false, userContext.GetXPubID())
 }
 
-func (a *Action) upsertHelper(c *gin.Context, snakeCase bool) {
-	reqXPubID := c.GetString(auth.ParamXPubHashKey)
+func upsertHelper(c *gin.Context, snakeCase bool, xpubID string) {
+	logger := reqctx.Logger(c)
 	cPaymail := c.Param("paymail")
 
 	var req UpsertContact
 	if err := json.NewDecoder(c.Request.Body).Decode(&req); err != nil {
-		spverrors.ErrorResponse(c, spverrors.ErrCannotBindRequest, a.Services.Logger)
+		spverrors.ErrorResponse(c, spverrors.ErrCannotBindRequest, logger)
 		return
 	}
 
 	if err := req.validate(); err != nil {
-		spverrors.ErrorResponse(c, err, a.Services.Logger)
+		spverrors.ErrorResponse(c, err, logger)
 		return
 	}
 
-	contact, err := a.Services.SpvWalletEngine.UpsertContact(
+	contact, err := reqctx.Engine(c).UpsertContact(
 		c.Request.Context(),
 		req.FullName, cPaymail,
-		reqXPubID, req.RequesterPaymail,
+		xpubID, req.RequesterPaymail,
 		engine.WithMetadatas(req.Metadata))
 
 	if err != nil && !errors.Is(err, spverrors.ErrAddingContactRequest) {
-		spverrors.ErrorResponse(c, err, a.Services.Logger)
+		spverrors.ErrorResponse(c, err, logger)
 		return
 	}
 

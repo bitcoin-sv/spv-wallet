@@ -7,6 +7,7 @@ import (
 	"github.com/bitcoin-sv/spv-wallet/mappings"
 	"github.com/bitcoin-sv/spv-wallet/models"
 	"github.com/bitcoin-sv/spv-wallet/models/filter"
+	"github.com/bitcoin-sv/spv-wallet/server/reqctx"
 	"github.com/gin-gonic/gin"
 )
 
@@ -22,21 +23,22 @@ import (
 // @Failure 	500	"Internal server error - Error while searching for transactions"
 // @Router		/v1/admin/transactions/search [post]
 // @Security	x-auth-xpub
-func (a *Action) transactionsSearch(c *gin.Context) {
+func transactionsSearch(c *gin.Context, _ *reqctx.AdminContext) {
+	logger := reqctx.Logger(c)
 	var reqParams filter.SearchTransactions
 	if err := c.Bind(&reqParams); err != nil {
-		spverrors.ErrorResponse(c, spverrors.ErrCannotBindRequest, a.Services.Logger)
+		spverrors.ErrorResponse(c, spverrors.ErrCannotBindRequest, logger)
 		return
 	}
 
-	transactions, err := a.Services.SpvWalletEngine.GetTransactions(
+	transactions, err := reqctx.Engine(c).GetTransactions(
 		c.Request.Context(),
 		mappings.MapToMetadata(reqParams.Metadata),
 		reqParams.Conditions.ToDbConditions(),
 		mappings.MapToQueryParams(reqParams.QueryParams),
 	)
 	if err != nil {
-		spverrors.ErrorResponse(c, err, a.Services.Logger)
+		spverrors.ErrorResponse(c, err, logger)
 		return
 	}
 
@@ -60,20 +62,21 @@ func (a *Action) transactionsSearch(c *gin.Context) {
 // @Failure 	500	"Internal Server Error - Error while fetching count of transactions"
 // @Router		/v1/admin/transactions/count [post]
 // @Security	x-auth-xpub
-func (a *Action) transactionsCount(c *gin.Context) {
+func transactionsCount(c *gin.Context, _ *reqctx.AdminContext) {
+	logger := reqctx.Logger(c)
 	var reqParams filter.CountTransactions
 	if err := c.Bind(&reqParams); err != nil {
-		spverrors.ErrorResponse(c, spverrors.ErrCannotBindRequest, a.Services.Logger)
+		spverrors.ErrorResponse(c, spverrors.ErrCannotBindRequest, logger)
 		return
 	}
 
-	count, err := a.Services.SpvWalletEngine.GetTransactionsCount(
+	count, err := reqctx.Engine(c).GetTransactionsCount(
 		c.Request.Context(),
 		mappings.MapToMetadata(reqParams.Metadata),
 		reqParams.Conditions.ToDbConditions(),
 	)
 	if err != nil {
-		spverrors.ErrorResponse(c, err, a.Services.Logger)
+		spverrors.ErrorResponse(c, err, logger)
 		return
 	}
 
