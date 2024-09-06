@@ -63,6 +63,11 @@ var ErrCannotParseQueryParams = models.SPVError{Message: "cannot parse request q
 // ErrInvalidConditions is when request has invalid conditions
 var ErrInvalidConditions = models.SPVError{Message: "invalid conditions", StatusCode: 400, Code: "error-bind-conditions-invalid"}
 
+// ////////////////////////////////// MAPPING ERRORS
+
+// ErrCannotMapFromModel is when request body model cannot be mapped into domain model.
+var ErrCannotMapFromModel = models.SPVError{Message: "error during reading request body", StatusCode: 500, Code: "error-request-read"}
+
 // ////////////////////////////////// ACCESS KEY ERRORS
 
 // ErrCouldNotFindAccessKey is when could not find xpub
