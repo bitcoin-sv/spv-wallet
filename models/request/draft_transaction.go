@@ -74,7 +74,7 @@ func unmarshalOutputs(outputs []json.RawMessage) ([]Output, error) {
 func (dt *DraftTransaction) MarshalJSON() ([]byte, error) {
 	type Alias DraftTransaction
 	temp := &struct {
-		Outputs []interface{} `json:"outputs"`
+		Outputs []any `json:"outputs"`
 		*Alias
 	}{
 		Alias: (*Alias)(dt),
