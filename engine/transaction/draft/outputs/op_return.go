@@ -38,13 +38,13 @@ func (o *OpReturn) evaluate(context.Context) (annotatedOutputs, error) {
 }
 
 func (o *OpReturn) getData() ([][]byte, error) {
-	data := make([][]byte, 0)
-	for _, dataToStore := range o.Data {
+	data := make([][]byte, len(o.Data))
+	for i, dataToStore := range o.Data {
 		bytes, err := toBytes(dataToStore, o.DataType)
 		if err != nil {
 			return nil, err
 		}
-		data = append(data, bytes)
+		data[i] = bytes
 	}
 	return data, nil
 }

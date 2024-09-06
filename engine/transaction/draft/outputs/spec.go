@@ -75,12 +75,12 @@ func singleAnnotatedOutput(txOut *sdk.TransactionOutput, out *transaction.Output
 
 func (a annotatedOutputs) splitIntoTransactionOutputsAndAnnotations() ([]*sdk.TransactionOutput, transaction.OutputsAnnotations) {
 	outputs := make([]*sdk.TransactionOutput, len(a))
-	annotations := make(transaction.OutputsAnnotations)
-	for i, out := range a {
-		outputs[i] = out.TransactionOutput
+	annotationByOutputIndex := make(transaction.OutputsAnnotations)
+	for outputIndex, out := range a {
+		outputs[outputIndex] = out.TransactionOutput
 		if out.OutputAnnotation != nil {
-			annotations[i] = out.OutputAnnotation
+			annotationByOutputIndex[outputIndex] = out.OutputAnnotation
 		}
 	}
-	return outputs, annotations
+	return outputs, annotationByOutputIndex
 }

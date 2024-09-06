@@ -11,7 +11,6 @@ import (
 
 // Create creates a new draft transaction based on specification.
 func Create(ctx context.Context, spec *TransactionSpec) (*Transaction, error) {
-	tx := &sdk.Transaction{}
 	if spec == nil {
 		return nil, txerrors.ErrDraftSpecificationRequired
 	}
@@ -19,7 +18,9 @@ func Create(ctx context.Context, spec *TransactionSpec) (*Transaction, error) {
 	if err != nil {
 		return nil, err
 	}
-	tx.Outputs = outputs
+	tx := &sdk.Transaction{
+		Outputs: outputs,
+	}
 
 	beef, err := tx.BEEFHex()
 	if err != nil {
