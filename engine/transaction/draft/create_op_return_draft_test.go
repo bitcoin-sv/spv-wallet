@@ -15,7 +15,8 @@ import (
 )
 
 func TestCreateOpReturnDraft(t *testing.T) {
-	const maxDataSize = 0xFFFFFFFF
+	// maxOpPushDataSize is the maximum size of the data chunk that can be pushed to transaction with OP_PUSH operation.
+	const maxOpPushDataSize = 0xFFFFFFFF
 
 	successTests := map[string]struct {
 		opReturn      *outputs.OpReturn
@@ -115,7 +116,7 @@ func TestCreateOpReturnDraft(t *testing.T) {
 		"for to big string": {
 			spec: &outputs.OpReturn{
 				DataType: opreturn.DataTypeStrings,
-				Data:     []string{strings.Repeat("1", maxDataSize+1)},
+				Data:     []string{strings.Repeat("1", maxOpPushDataSize+1)},
 			},
 			expectedError: "data is too large",
 		},
