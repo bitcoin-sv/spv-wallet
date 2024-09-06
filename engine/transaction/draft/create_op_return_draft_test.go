@@ -52,7 +52,7 @@ func TestCreateOpReturnDraft(t *testing.T) {
 		},
 	}
 	for name, test := range successTests {
-		t.Run("return draft"+name, func(t *testing.T) {
+		t.Run("return draft "+name, func(t *testing.T) {
 			// given:
 			spec := &draft.TransactionSpec{
 				Outputs: outputs.NewSpecifications(test.opReturn),
