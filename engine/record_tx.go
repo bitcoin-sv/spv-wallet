@@ -19,7 +19,6 @@ type recordTxStrategy interface {
 type recordIncomingTxStrategy interface {
 	recordTxStrategy
 	ForceBroadcast(force bool)
-	FailOnBroadcastError(forceFail bool)
 }
 
 func recordTransaction(ctx context.Context, c ClientInterface, strategy recordTxStrategy, opts ...ModelOps) (transaction *Transaction, err error) {

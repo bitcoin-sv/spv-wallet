@@ -8,10 +8,9 @@ import (
 )
 
 type externalIncomingTx struct {
-	BtTx                 *bt.Tx
-	broadcastNow         bool // e.g. BEEF must be broadcasted now
-	allowBroadcastErrors bool // only BEEF cannot allow for broadcast errors
-	txID                 string
+	BtTx         *bt.Tx
+	broadcastNow bool // e.g. BEEF must be broadcasted now
+	txID         string
 }
 
 func (strategy *externalIncomingTx) Name() string {
@@ -32,10 +31,8 @@ func (strategy *externalIncomingTx) Execute(ctx context.Context, c ClientInterfa
 
 	if strategy.broadcastNow || transaction.syncTransaction.BroadcastStatus == SyncStatusReady {
 		if err := broadcastSyncTransaction(ctx, transaction.syncTransaction); err != nil {
-			logger.Warn().Str("txID", transaction.ID).Bool("ignored", !strategy.allowBroadcastErrors).Msgf("broadcasting failed. Reason: %s", err)
-			if !strategy.allowBroadcastErrors {
-				return nil, err
-			}
+			logger.Warn().Str("txID", transaction.ID).Msgf("broadcasting failed. Reason: %s", err)
+			return nil, err
 		}
 	}
 
@@ -74,10 +71,6 @@ func (strategy *externalIncomingTx) LockKey() string {
 
 func (strategy *externalIncomingTx) ForceBroadcast(force bool) {
 	strategy.broadcastNow = force
-}
-
-func (strategy *externalIncomingTx) FailOnBroadcastError(forceFail bool) {
-	strategy.allowBroadcastErrors = !forceFail
 }
 
 func _createExternalTxToRecord(ctx context.Context, eTx *externalIncomingTx, c ClientInterface, opts []ModelOps) (*Transaction, error) {

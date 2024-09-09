@@ -9,9 +9,8 @@ import (
 )
 
 type internalIncomingTx struct {
-	Tx                   *Transaction
-	broadcastNow         bool // e.g. BEEF must be broadcasted now
-	allowBroadcastErrors bool // only BEEF cannot allow for broadcast errors
+	Tx           *Transaction
+	broadcastNow bool // e.g. BEEF must be broadcasted now
 }
 
 func (strategy *internalIncomingTx) Name() string {
@@ -38,10 +37,8 @@ func (strategy *internalIncomingTx) Execute(ctx context.Context, c ClientInterfa
 		transaction.syncTransaction = syncTx
 
 		if err := broadcastSyncTransaction(ctx, syncTx); err != nil {
-			logger.Warn().Str("txID", transaction.ID).Bool("ignored", !strategy.allowBroadcastErrors).Msgf("broadcasting failed. Reason: %s", err)
-			if !strategy.allowBroadcastErrors {
-				return nil, err
-			}
+			logger.Warn().Str("txID", transaction.ID).Msgf("broadcasting failed. Reason: %s", err)
+			return nil, err
 		}
 	}
 
@@ -73,8 +70,4 @@ func (strategy *internalIncomingTx) LockKey() string {
 
 func (strategy *internalIncomingTx) ForceBroadcast(force bool) {
 	strategy.broadcastNow = force
-}
-
-func (strategy *internalIncomingTx) FailOnBroadcastError(forceFail bool) {
-	strategy.allowBroadcastErrors = !forceFail
 }

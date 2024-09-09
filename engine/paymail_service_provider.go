@@ -51,7 +51,6 @@ func (p *PaymailDefaultServiceProvider) GetPaymailByAlias(
 	alias, domain string,
 	_ *server.RequestMetadata,
 ) (*paymail.AddressInformation, error) {
-
 	pm, err := getPaymailAddress(ctx, alias+"@"+domain, p.client.DefaultModelOptions()...)
 	if err != nil {
 		return nil, err
@@ -153,10 +152,6 @@ func (p *PaymailDefaultServiceProvider) RecordTransaction(ctx context.Context,
 	}
 
 	rts.ForceBroadcast(true)
-
-	if p2pTx.Beef != "" {
-		rts.FailOnBroadcastError(true)
-	}
 
 	transaction, err := recordTransaction(ctx, p.client, rts, WithMetadatas(metadata))
 	if err != nil {
