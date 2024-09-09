@@ -7,7 +7,6 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/bitcoin-sv/go-paymail"
 	"github.com/bitcoin-sv/spv-wallet/engine/chainstate"
 	"github.com/bitcoin-sv/spv-wallet/engine/datastore"
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
@@ -79,7 +78,7 @@ func broadcastSyncTransaction(ctx context.Context, syncTx *SyncTransaction) erro
 			syncTx.BroadcastStatus = SyncStatusReady // client error, try again later
 		}
 
-		_addSyncResult(ctx, syncTx, syncActionBroadcast, br.Provider, br.Failure.Error.Error())
+		syncTx.addSyncResult(ctx, syncActionBroadcast, br.Provider, br.Failure.Error.Error())
 		return br.Failure.Error
 	}
 
@@ -99,7 +98,7 @@ func broadcastSyncTransaction(ctx context.Context, syncTx *SyncTransaction) erro
 
 	// Update the sync transaction record
 	if err = syncTx.Save(ctx); err != nil {
-		_addSyncResult(ctx, syncTx, syncActionBroadcast, "internal", err.Error())
+		syncTx.addSyncResult(ctx, syncActionBroadcast, "internal", err.Error())
 		return err
 	}
 
@@ -150,7 +149,7 @@ func _syncTxDataFromChain(ctx context.Context, syncTx *SyncTransaction, transact
 				Msgf("Transaction not found on-chain, will try again later")
 
 			syncTx.SyncStatus = SyncStatusReady
-			_addSyncResult(ctx, syncTx, syncActionSync, "all", "transaction not found on-chain")
+			syncTx.addSyncResult(ctx, syncActionSync, "all", "transaction not found on-chain")
 			return nil
 		}
 		return spverrors.Wrapf(err, "could not query transaction")
@@ -188,7 +187,7 @@ func processSyncTxSave(ctx context.Context, txInfo *chainstate.TransactionInfo, 
 
 	transaction.setChainInfo(txInfo)
 	if err := transaction.Save(ctx); err != nil {
-		_addSyncResult(ctx, syncTx, syncActionSync, "internal", err.Error())
+		syncTx.addSyncResult(ctx, syncActionSync, "internal", err.Error())
 		return err
 	}
 
@@ -201,7 +200,7 @@ func processSyncTxSave(ctx context.Context, txInfo *chainstate.TransactionInfo, 
 	})
 
 	if err := syncTx.Save(ctx); err != nil {
-		_addSyncResult(ctx, syncTx, syncActionSync, "internal", err.Error())
+		syncTx.addSyncResult(ctx, syncActionSync, "internal", err.Error())
 		return err
 	}
 
@@ -209,122 +208,4 @@ func processSyncTxSave(ctx context.Context, txInfo *chainstate.TransactionInfo, 
 		Str("txID", syncTx.ID).
 		Msgf("Transaction processed successfully")
 	return nil
-}
-
-// processP2PTransaction will process the sync transaction record, or save the failure
-func processP2PTransaction(ctx context.Context, tx *Transaction) error {
-	// Successfully capture any panics, convert to readable string and log the error
-	defer recoverAndLog(tx.Client().Logger())
-
-	syncTx := tx.syncTransaction
-	// Create the lock and set the release for after the function completes
-	unlock, err := newWriteLock(
-		ctx, fmt.Sprintf(lockKeyProcessP2PTx, syncTx.GetID()), syncTx.Client().Cachestore(),
-	)
-	defer unlock()
-	if err != nil {
-		return err
-	}
-
-	// No draft?
-	if len(tx.DraftID) == 0 {
-		syncTx.P2PStatus = SyncStatusError
-		_addSyncResult(ctx, syncTx, syncActionP2P, "all", "no draft found, cannot complete p2p")
-
-		return nil
-	}
-
-	// Notify any P2P paymail providers associated to the transaction
-	var results []*SyncResult
-	if results, err = _notifyPaymailProviders(ctx, tx); err != nil {
-		syncTx.P2PStatus = SyncStatusReady
-		_addSyncResult(ctx, syncTx, syncActionP2P, "", err.Error())
-		return err
-	}
-
-	// Update if we have some results
-	if len(results) > 0 {
-		syncTx.Results.Results = append(syncTx.Results.Results, results...)
-	}
-
-	// Save the record
-	syncTx.P2PStatus = SyncStatusComplete
-
-	// Update sync status to be ready now
-	if syncTx.SyncStatus == SyncStatusPending {
-		syncTx.SyncStatus = SyncStatusReady
-	}
-
-	if err = syncTx.Save(ctx); err != nil {
-		syncTx.P2PStatus = SyncStatusError
-		_addSyncResult(ctx, syncTx, syncActionP2P, "internal", err.Error())
-		return err
-	}
-
-	// Done!
-	return nil
-}
-
-// _notifyPaymailProviders will notify any associated Paymail providers
-func _notifyPaymailProviders(ctx context.Context, transaction *Transaction) ([]*SyncResult, error) {
-	pm := transaction.Client().PaymailClient()
-	outputs := transaction.draftTransaction.Configuration.Outputs
-
-	notifiedReceivers := make([]string, 0)
-	results := make([]*SyncResult, len(outputs))
-
-	var payload *paymail.P2PTransactionPayload
-	var err error
-
-	for _, out := range outputs {
-		p4 := out.PaymailP4
-
-		if p4 == nil || p4.ResolutionType != ResolutionTypeP2P {
-			continue
-		}
-
-		receiver := fmt.Sprintf("%s@%s", p4.Alias, p4.Domain)
-		if contains(notifiedReceivers, func(x string) bool { return x == receiver }) {
-			continue // no need to send the same transaction to the same receiver second time
-		}
-
-		if payload, err = finalizeP2PTransaction(
-			ctx,
-			pm,
-			p4,
-			transaction,
-		); err != nil {
-			return nil, err
-		}
-
-		notifiedReceivers = append(notifiedReceivers, receiver)
-		results = append(results, &SyncResult{
-			Action:        syncActionP2P,
-			ExecutedAt:    time.Now().UTC(),
-			Provider:      p4.ReceiveEndpoint,
-			StatusMessage: "success: " + payload.TxID,
-		})
-
-	}
-	return results, nil
-}
-
-// utils
-
-// _addSyncResult will save the error message for a sync tx
-func _addSyncResult(ctx context.Context, syncTx *SyncTransaction,
-	action, provider, message string,
-) {
-	syncTx.Results.Results = append(syncTx.Results.Results, &SyncResult{
-		Action:        action,
-		ExecutedAt:    time.Now().UTC(),
-		Provider:      provider,
-		StatusMessage: message,
-	})
-
-	if syncTx.IsNew() {
-		return // do not save if new record! caller should decide if want to save new record
-	}
-
-	_ = syncTx.Save(ctx)
 }

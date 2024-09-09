@@ -392,7 +392,6 @@ func saveBeefTransactionInput(ctx context.Context, c ClientInterface, input *bee
 		inputTx.GetOptions(true)...,
 	)
 	sync.BroadcastStatus = SyncStatusSkipped
-	sync.P2PStatus = SyncStatusSkipped
 	sync.SyncStatus = SyncStatusReady
 
 	if bump != nil {

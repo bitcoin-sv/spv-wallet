@@ -21,8 +21,6 @@ type SyncTransaction struct {
 	Results SyncResults `json:"results"`
 	// BroadcastStatus contains broadcast status.
 	BroadcastStatus string `json:"broadcast_status"`
-	// P2PStatus contains p2p status.
-	P2PStatus string `json:"p2p_status"`
 	// SyncStatus contains sync status.
 	SyncStatus string `json:"sync_status"`
 }

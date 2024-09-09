@@ -77,8 +77,6 @@ func _hydrateExternalWithSync(tx *Transaction) {
 
 	// to simplify: broadcast every external incoming txs
 	sync.BroadcastStatus = SyncStatusReady
-
-	sync.P2PStatus = SyncStatusSkipped  // the sender of the Tx should have already notified us
 	sync.SyncStatus = SyncStatusPending // wait until transactions will be broadcasted
 
 	// Use the same metadata

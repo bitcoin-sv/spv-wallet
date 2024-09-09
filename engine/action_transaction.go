@@ -359,7 +359,6 @@ func (c *Client) RevertTransaction(ctx context.Context, id string) error {
 		return err
 	}
 	syncTransaction.BroadcastStatus = SyncStatusCanceled
-	syncTransaction.P2PStatus = SyncStatusCanceled
 	syncTransaction.SyncStatus = SyncStatusCanceled
 	if err = syncTransaction.Save(ctx); err != nil {
 		return err

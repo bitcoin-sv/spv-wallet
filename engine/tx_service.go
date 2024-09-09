@@ -42,7 +42,6 @@ func saveRawTransaction(ctx context.Context, c ClientInterface, allowUnknown boo
 			tx.GetOptions(true)...,
 		)
 		sync.BroadcastStatus = SyncStatusSkipped
-		sync.P2PStatus = SyncStatusSkipped
 
 		sync.Metadata = tx.Metadata
 		tx.syncTransaction = sync

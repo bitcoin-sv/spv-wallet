@@ -32,7 +32,7 @@ func (strategy *outgoingTx) Execute(ctx context.Context, c ClientInterface, opts
 		return nil, spverrors.ErrDuringSaveTx
 	}
 
-	if transaction.syncTransaction.P2PStatus == SyncStatusReady {
+	if _shouldNotifyP2P(transaction) {
 		if err := processP2PTransaction(ctx, transaction); err != nil {
 			if revertErr := c.RevertTransaction(ctx, transaction.ID); revertErr != nil {
 				return nil, fmt.Errorf("reverting transaction failed %w; after P2P notification failed: %w", revertErr, err)
@@ -135,7 +135,6 @@ func _hydrateOutgoingWithSync(tx *Transaction) {
 
 	// setup synchronization
 	sync.BroadcastStatus = _getBroadcastSyncStatus(tx)
-	sync.P2PStatus = _getP2pSyncStatus(tx)
 	sync.SyncStatus = SyncStatusPending // wait until transaction is broadcasted or P2P provider is notified
 
 	sync.Metadata = tx.Metadata
@@ -163,17 +162,11 @@ func _getBroadcastSyncStatus(tx *Transaction) SyncStatus {
 	return broadcast
 }
 
-func _getP2pSyncStatus(tx *Transaction) SyncStatus {
-	p2pStatus := SyncStatusSkipped
-
-	outputs := tx.draftTransaction.Configuration.Outputs
-	for _, o := range outputs {
+func _shouldNotifyP2P(tx *Transaction) bool {
+	for _, o := range tx.draftTransaction.Configuration.Outputs {
 		if o.PaymailP4 != nil && o.PaymailP4.ResolutionType == ResolutionTypeP2P {
-			p2pStatus = SyncStatusReady // notify p2p immediately
-
-			break
+			return true
 		}
 	}
-
-	return p2pStatus
+	return false
 }
