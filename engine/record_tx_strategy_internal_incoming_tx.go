@@ -28,7 +28,7 @@ func (strategy *internalIncomingTx) Execute(ctx context.Context, _ ClientInterfa
 	syncTx.transaction = transaction
 	transaction.syncTransaction = syncTx
 
-	if err := broadcastSyncTransaction(ctx, syncTx); err != nil {
+	if err := broadcastTxAndUpdateSync(ctx, transaction); err != nil {
 		return nil, err
 	}
 

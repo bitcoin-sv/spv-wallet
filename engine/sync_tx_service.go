@@ -42,38 +42,14 @@ func processSyncTransactions(ctx context.Context, maxTransactions int, opts ...M
 	return nil
 }
 
-// broadcastSyncTransaction will broadcast transaction related to syncTx record
-func broadcastSyncTransaction(ctx context.Context, syncTx *SyncTransaction) error {
-	// Successfully capture any panics, convert to readable string and log the error
-	defer recoverAndLog(syncTx.Client().Logger())
-
-	// Create the lock and set the release for after the function completes
-	unlock, err := newWriteLock(
-		ctx, fmt.Sprintf(lockKeyProcessBroadcastTx, syncTx.GetID()), syncTx.Client().Cachestore(),
-	)
-	defer unlock()
+// broadcastTxAndUpdateSync will broadcast transaction and update Results and SyncStatus in syncTx
+// It most probably will be deleted after syncTX removal
+func broadcastTxAndUpdateSync(ctx context.Context, tx *Transaction) error {
+	syncTx := tx.syncTransaction
+	err, result := broadcastTransaction(ctx, tx)
+	syncTx.Results.Results = append(syncTx.Results.Results, result)
 	if err != nil {
 		return err
-	}
-
-	client := syncTx.Client()
-	chainstateSrv := client.Chainstate()
-
-	// Get the transaction HEX
-	tx := syncTx.transaction
-	if tx == nil || tx.Hex == "" {
-		if tx, err = _getTransaction(ctx, syncTx.ID, syncTx.GetOptions(false)); err != nil {
-			return nil
-		}
-	}
-
-	// Broadcast
-	txHex, hexFormat := _getTxHexInFormat(ctx, tx, chainstateSrv.SupportedBroadcastFormats(), client)
-	br := chainstateSrv.Broadcast(ctx, syncTx.ID, txHex, hexFormat, defaultBroadcastTimeout)
-
-	if br.Failure != nil { // broadcast failed
-		syncTx.addSyncResult(ctx, syncActionBroadcast, br.Provider, br.Failure.Error.Error())
-		return br.Failure.Error
 	}
 
 	// Update sync status to be ready now
@@ -81,20 +57,44 @@ func broadcastSyncTransaction(ctx context.Context, syncTx *SyncTransaction) erro
 		syncTx.SyncStatus = SyncStatusReady
 	}
 
-	syncTx.Results.Results = append(syncTx.Results.Results, &SyncResult{
+	return syncTx.Save(ctx)
+}
+
+func broadcastTransaction(ctx context.Context, tx *Transaction) (error, *SyncResult) {
+	client := tx.Client()
+	chainstateSrv := client.Chainstate()
+
+	// Successfully capture any panics, convert to readable string and log the error
+	defer recoverAndLog(tx.Client().Logger())
+
+	// Create the lock and set the release for after the function completes
+	unlock, err := newWriteLock(
+		ctx, fmt.Sprintf(lockKeyProcessBroadcastTx, tx.GetID()), client.Cachestore(),
+	)
+	defer unlock()
+	if err != nil {
+		return err, nil
+	}
+
+	// Broadcast
+	txHex, hexFormat := _getTxHexInFormat(ctx, tx, chainstateSrv.SupportedBroadcastFormats(), client)
+	br := chainstateSrv.Broadcast(ctx, tx.ID, txHex, hexFormat, defaultBroadcastTimeout)
+
+	if br.Failure != nil { // broadcast failed
+		return br.Failure.Error, &SyncResult{
+			Action:        syncActionBroadcast,
+			ExecutedAt:    time.Now().UTC(),
+			Provider:      br.Provider,
+			StatusMessage: br.Failure.Error.Error(),
+		}
+	}
+
+	return nil, &SyncResult{
 		Action:        syncActionBroadcast,
 		ExecutedAt:    time.Now().UTC(),
 		Provider:      br.Provider,
 		StatusMessage: "broadcast success",
-	})
-
-	// Update the sync transaction record
-	if err = syncTx.Save(ctx); err != nil {
-		syncTx.addSyncResult(ctx, syncActionBroadcast, "internal", err.Error())
-		return err
 	}
-
-	return nil
 }
 
 // ///////////////

@@ -22,7 +22,7 @@ func (strategy *externalIncomingTx) Execute(ctx context.Context, c ClientInterfa
 		return nil, err
 	}
 
-	if err := broadcastSyncTransaction(ctx, transaction.syncTransaction); err != nil {
+	if err := broadcastTxAndUpdateSync(ctx, transaction); err != nil {
 		return nil, err
 	}
 

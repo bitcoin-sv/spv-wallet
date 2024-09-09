@@ -42,7 +42,7 @@ func (strategy *outgoingTx) Execute(ctx context.Context, c ClientInterface, opts
 		}
 	}
 
-	if err := broadcastSyncTransaction(ctx, transaction.syncTransaction); err != nil {
+	if err := broadcastTxAndUpdateSync(ctx, transaction); err != nil {
 		logger.Warn().Str("txID", transaction.ID).Msgf("broadcasting failed in outgoingTx strategy")
 		// ignore error, transaction most likely is successfully broadcasted by payment receiver
 		// TODO: return a Warning to a client
