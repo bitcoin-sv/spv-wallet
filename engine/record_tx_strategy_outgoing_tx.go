@@ -42,19 +42,10 @@ func (strategy *outgoingTx) Execute(ctx context.Context, c ClientInterface, opts
 		}
 	}
 
-	// get newest syncTx from DB - if it's an internal tx it could be broadcasted by us already
-	syncTx, err := GetSyncTransactionByID(ctx, transaction.ID, transaction.GetOptions(false)...)
-	if err != nil || syncTx == nil {
-		return nil, spverrors.ErrCouldNotFindSyncTx
-	}
-
-	if syncTx.BroadcastStatus == SyncStatusReady {
-		transaction.syncTransaction = syncTx
-		if err := broadcastSyncTransaction(ctx, transaction.syncTransaction); err != nil {
-			logger.Warn().Str("txID", transaction.ID).Msgf("broadcasting failed in outgoingTx strategy")
-			// ignore error, transaction most likely is successfully broadcasted by payment receiver
-			// TODO: return a Warning to a client
-		}
+	if err := broadcastSyncTransaction(ctx, transaction.syncTransaction); err != nil {
+		logger.Warn().Str("txID", transaction.ID).Msgf("broadcasting failed in outgoingTx strategy")
+		// ignore error, transaction most likely is successfully broadcasted by payment receiver
+		// TODO: return a Warning to a client
 	}
 
 	return transaction, nil
@@ -134,32 +125,12 @@ func _hydrateOutgoingWithSync(tx *Transaction) {
 	sync := newSyncTransaction(tx.ID, tx.draftTransaction.Configuration.Sync, tx.GetOptions(true)...)
 
 	// setup synchronization
-	sync.BroadcastStatus = _getBroadcastSyncStatus(tx)
 	sync.SyncStatus = SyncStatusPending // wait until transaction is broadcasted or P2P provider is notified
 
 	sync.Metadata = tx.Metadata
 
 	sync.transaction = tx
 	tx.syncTransaction = sync
-}
-
-func _getBroadcastSyncStatus(tx *Transaction) SyncStatus {
-	// immediately broadcast if is not BEEF
-	broadcast := SyncStatusReady // broadcast immediately
-
-	outputs := tx.draftTransaction.Configuration.Outputs
-
-	for _, o := range outputs {
-		if o.PaymailP4 != nil {
-			if o.PaymailP4.Format == BeefPaymailPayloadFormat {
-				broadcast = SyncStatusSkipped // postpone broadcasting if tx contains outputs in BEEF
-
-				break
-			}
-		}
-	}
-
-	return broadcast
 }
 
 func _shouldNotifyP2P(tx *Transaction) bool {

@@ -19,8 +19,6 @@ type SyncTransaction struct {
 	LastAttempt time.Time `json:"last_attempt"`
 	// Results contains sync transaction results.
 	Results SyncResults `json:"results"`
-	// BroadcastStatus contains broadcast status.
-	BroadcastStatus string `json:"broadcast_status"`
 	// SyncStatus contains sync status.
 	SyncStatus string `json:"sync_status"`
 }

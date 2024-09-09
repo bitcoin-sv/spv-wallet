@@ -75,8 +75,6 @@ func _hydrateExternalWithSync(tx *Transaction) {
 		tx.GetOptions(true)...,
 	)
 
-	// to simplify: broadcast every external incoming txs
-	sync.BroadcastStatus = SyncStatusReady
 	sync.SyncStatus = SyncStatusPending // wait until transactions will be broadcasted
 
 	// Use the same metadata

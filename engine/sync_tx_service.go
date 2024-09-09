@@ -72,18 +72,10 @@ func broadcastSyncTransaction(ctx context.Context, syncTx *SyncTransaction) erro
 	br := chainstateSrv.Broadcast(ctx, syncTx.ID, txHex, hexFormat, defaultBroadcastTimeout)
 
 	if br.Failure != nil { // broadcast failed
-		if br.Failure.InvalidTx {
-			syncTx.BroadcastStatus = SyncStatusError // invalid transaction, won't be broadcasted anymore
-		} else {
-			syncTx.BroadcastStatus = SyncStatusReady // client error, try again later
-		}
-
 		syncTx.addSyncResult(ctx, syncActionBroadcast, br.Provider, br.Failure.Error.Error())
 		return br.Failure.Error
 	}
 
-	// Update the sync information
-	syncTx.BroadcastStatus = SyncStatusComplete
 	// Update sync status to be ready now
 	if syncTx.SyncStatus == SyncStatusPending {
 		syncTx.SyncStatus = SyncStatusReady

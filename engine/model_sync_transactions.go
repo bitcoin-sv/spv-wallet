@@ -34,12 +34,6 @@ func newSyncTransaction(txID string, config *SyncConfig, opts ...ModelOps) *Sync
 		return nil
 	}
 
-	// Broadcasting
-	bs := SyncStatusReady
-	if !config.Broadcast {
-		bs = SyncStatusSkipped
-	}
-
 	// Sync
 	ss := SyncStatusReady
 	if !config.SyncOnChain {
@@ -47,11 +41,10 @@ func newSyncTransaction(txID string, config *SyncConfig, opts ...ModelOps) *Sync
 	}
 
 	return &SyncTransaction{
-		BroadcastStatus: bs,
-		Configuration:   *config,
-		ID:              txID,
-		Model:           *NewBaseModel(ModelSyncTransaction, opts...),
-		SyncStatus:      ss,
+		Configuration: *config,
+		ID:            txID,
+		Model:         *NewBaseModel(ModelSyncTransaction, opts...),
+		SyncStatus:    ss,
 	}
 }
 
