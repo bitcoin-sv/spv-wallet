@@ -5,8 +5,6 @@ auth:
   require_signing: false
   # authentication scheme - xpub => using xPubs as tokens, currently the only option
   scheme: xpub
-  # disable signing for all requests !!! Use only for development !!!
-  signing_disabled: true
 cache:
   cluster:
     # cluster coordinator - redis/memory

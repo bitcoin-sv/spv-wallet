@@ -1,39 +1,17 @@
 package utxos
 
 import (
-	"github.com/bitcoin-sv/spv-wallet/actions"
-	"github.com/bitcoin-sv/spv-wallet/config"
-	"github.com/bitcoin-sv/spv-wallet/server/routes"
-	"github.com/gin-gonic/gin"
+	"github.com/bitcoin-sv/spv-wallet/server/handlers"
+	routes "github.com/bitcoin-sv/spv-wallet/server/handlers"
 )
 
-// Action is an extension of actions.Action for this package
-type Action struct {
-	actions.Action
-}
+// RegisterRoutes creates the specific package routes
+func RegisterRoutes(handlersManager *routes.Manager) {
+	old := handlersManager.Group(routes.GroupOldAPI, "/utxo")
+	old.GET("", handlers.AsUser(get))
+	old.POST("/count", handlers.AsUser(count))
+	old.POST("/search", handlers.AsUser(oldSearch))
 
-// OldUtxosHandler creates the specific package routes - deprecated routes
-func OldUtxosHandler(appConfig *config.AppConfig, services *config.AppServices) routes.OldAPIEndpointsFunc {
-	action := &Action{actions.Action{AppConfig: appConfig, Services: services}}
-
-	apiEndpoints := routes.OldAPIEndpointsFunc(func(router *gin.RouterGroup) {
-		utxoGroup := router.Group("/utxo")
-		utxoGroup.GET("", action.get)
-		utxoGroup.POST("/count", action.count)
-		utxoGroup.POST("/search", action.oldSearch)
-	})
-
-	return apiEndpoints
-}
-
-// NewHandler creates the specific package routes
-func NewHandler(appConfig *config.AppConfig, services *config.AppServices) routes.APIEndpointsFunc {
-	action := &Action{actions.Action{AppConfig: appConfig, Services: services}}
-
-	apiEndpoints := routes.APIEndpointsFunc(func(router *gin.RouterGroup) {
-		utxoGroup := router.Group("/utxos")
-		utxoGroup.GET("", action.search)
-	})
-
-	return apiEndpoints
+	group := handlersManager.Group(routes.GroupAPI, "/utxos")
+	group.GET("", handlers.AsUser(search))
 }

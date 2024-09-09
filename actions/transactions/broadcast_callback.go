@@ -5,23 +5,25 @@ import (
 
 	"github.com/bitcoin-sv/go-broadcast-client/broadcast"
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
+	"github.com/bitcoin-sv/spv-wallet/server/reqctx"
 	"github.com/gin-gonic/gin"
 )
 
 // broadcastCallback will handle a broadcastCallback call from the broadcast api
-func (a *Action) broadcastCallback(c *gin.Context) {
+func broadcastCallback(c *gin.Context) {
+	logger := reqctx.Logger(c)
 	var resp *broadcast.SubmittedTx
 
 	err := c.Bind(&resp)
 	if err != nil {
-		spverrors.ErrorResponse(c, spverrors.ErrCannotBindRequest, a.Services.Logger)
+		spverrors.ErrorResponse(c, spverrors.ErrCannotBindRequest, logger)
 		return
 	}
 
-	err = a.Services.SpvWalletEngine.UpdateTransaction(c.Request.Context(), resp)
+	err = reqctx.Engine(c).UpdateTransaction(c.Request.Context(), resp)
 	if err != nil {
-		a.Services.Logger.Err(err).Msgf("failed to update transaction - tx: %v", resp)
-		spverrors.ErrorResponse(c, err, a.Services.Logger)
+		logger.Err(err).Msgf("failed to update transaction - tx: %v", resp)
+		spverrors.ErrorResponse(c, err, logger)
 		return
 	}
 

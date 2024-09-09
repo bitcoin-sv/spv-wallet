@@ -6,7 +6,7 @@ import (
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/bitcoin-sv/spv-wallet/mappings"
 	"github.com/bitcoin-sv/spv-wallet/models/filter"
-	"github.com/bitcoin-sv/spv-wallet/server/auth"
+	"github.com/bitcoin-sv/spv-wallet/server/reqctx"
 	"github.com/gin-gonic/gin"
 )
 
@@ -22,18 +22,18 @@ import (
 // @Failure 	500	"Internal Server Error - Error while fetching count of utxos"
 // @DeprecatedRouter  /v1/utxo/count [post]
 // @Security	x-auth-xpub
-func (a *Action) count(c *gin.Context) {
-	reqXPubID := c.GetString(auth.ParamXPubHashKey)
+func count(c *gin.Context, userContext *reqctx.UserContext) {
+	logger := reqctx.Logger(c)
 
 	var reqParams filter.CountUtxos
 	if err := c.Bind(&reqParams); err != nil {
-		spverrors.ErrorResponse(c, spverrors.ErrCannotBindRequest, a.Services.Logger)
+		spverrors.ErrorResponse(c, spverrors.ErrCannotBindRequest, logger)
 		return
 	}
 
 	conditions, err := reqParams.Conditions.ToDbConditions()
 	if err != nil {
-		spverrors.ErrorResponse(c, spverrors.ErrInvalidConditions, a.Services.Logger)
+		spverrors.ErrorResponse(c, spverrors.ErrInvalidConditions, logger)
 		return
 	}
 
@@ -42,15 +42,15 @@ func (a *Action) count(c *gin.Context) {
 		dbConditions = conditions
 	}
 
-	dbConditions["xpub_id"] = reqXPubID
+	dbConditions["xpub_id"] = userContext.GetXPubID()
 
 	var count int64
-	if count, err = a.Services.SpvWalletEngine.GetUtxosCount(
+	if count, err = reqctx.Engine(c).GetUtxosCount(
 		c.Request.Context(),
 		mappings.MapToMetadata(reqParams.Metadata),
 		dbConditions,
 	); err != nil {
-		spverrors.ErrorResponse(c, err, a.Services.Logger)
+		spverrors.ErrorResponse(c, err, logger)
 		return
 	}
 

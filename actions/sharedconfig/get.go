@@ -6,6 +6,7 @@ import (
 
 	"github.com/bitcoin-sv/spv-wallet/models"
 	"github.com/bitcoin-sv/spv-wallet/models/response"
+	"github.com/bitcoin-sv/spv-wallet/server/reqctx"
 	"github.com/gin-gonic/gin"
 )
 
@@ -18,13 +19,14 @@ import (
 // @Success		200 {object} models.SharedConfig "Shared configuration"
 // @DeprecatedRouter  /v1/shared-config [get]
 // @Security	x-auth-xpub
-func (a *Action) oldGet(c *gin.Context) {
+func oldGet(c *gin.Context, _ *reqctx.UserContext) {
+	appconfig := reqctx.AppConfig(c)
 	makeConfig := sync.OnceValue(func() models.SharedConfig {
 		return models.SharedConfig{
-			PaymailDomains: a.AppConfig.Paymail.Domains,
+			PaymailDomains: appconfig.Paymail.Domains,
 			ExperimentalFeatures: map[string]bool{
-				"pike_contacts_enabled": a.AppConfig.ExperimentalFeatures.PikeContactsEnabled,
-				"pike_payment_enabled":  a.AppConfig.ExperimentalFeatures.PikePaymentEnabled,
+				"pike_contacts_enabled": appconfig.ExperimentalFeatures.PikeContactsEnabled,
+				"pike_payment_enabled":  appconfig.ExperimentalFeatures.PikePaymentEnabled,
 			},
 		}
 	})
@@ -41,13 +43,14 @@ func (a *Action) oldGet(c *gin.Context) {
 // @Success		200 {object} response.SharedConfig "Shared configuration"
 // @Router		/api/v1/configs/shared [get]
 // @Security	x-auth-xpub
-func (a *Action) get(c *gin.Context) {
+func get(c *gin.Context, _ *reqctx.UserContext) {
+	appconfig := reqctx.AppConfig(c)
 	makeConfig := sync.OnceValue(func() response.SharedConfig {
 		return response.SharedConfig{
-			PaymailDomains: a.AppConfig.Paymail.Domains,
+			PaymailDomains: appconfig.Paymail.Domains,
 			ExperimentalFeatures: map[string]bool{
-				"pikeContactsEnabled": a.AppConfig.ExperimentalFeatures.PikeContactsEnabled,
-				"pikePaymentEnabled":  a.AppConfig.ExperimentalFeatures.PikePaymentEnabled,
+				"pikeContactsEnabled": appconfig.ExperimentalFeatures.PikeContactsEnabled,
+				"pikePaymentEnabled":  appconfig.ExperimentalFeatures.PikePaymentEnabled,
 			},
 		}
 	})

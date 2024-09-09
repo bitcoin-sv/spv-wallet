@@ -4,7 +4,7 @@ import (
 	"net/http"
 
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
-	"github.com/bitcoin-sv/spv-wallet/server/auth"
+	"github.com/bitcoin-sv/spv-wallet/server/reqctx"
 	"github.com/gin-gonic/gin"
 )
 
@@ -21,8 +21,8 @@ import (
 // @Failure		500	"Internal server error"
 // @DeprecatedRouter  /v1/contact/unconfirmed/{paymail} [patch]
 // @Security	x-auth-xpub
-func (a *Action) oldUnconfirm(c *gin.Context) {
-	a.unconfirmContact(c)
+func oldUnconfirm(c *gin.Context, userContext *reqctx.UserContext) {
+	unconfirmContact(c, userContext)
 }
 
 // unconfirmContact will unconfirm contact request
@@ -38,14 +38,12 @@ func (a *Action) oldUnconfirm(c *gin.Context) {
 // @Failure		500	"Internal server error"
 // @Router		/api/v1/contacts/{paymail}/confirmation [delete]
 // @Security	x-auth-xpub
-func (a *Action) unconfirmContact(c *gin.Context) {
-	reqXPubID := c.GetString(auth.ParamXPubHashKey)
+func unconfirmContact(c *gin.Context, userContext *reqctx.UserContext) {
 	paymail := c.Param("paymail")
 
-	err := a.Services.SpvWalletEngine.UnconfirmContact(c, reqXPubID, paymail)
-
+	err := reqctx.Engine(c).UnconfirmContact(c, userContext.GetXPubID(), paymail)
 	if err != nil {
-		spverrors.ErrorResponse(c, err, a.Services.Logger)
+		spverrors.ErrorResponse(c, err, reqctx.Logger(c))
 		return
 	}
 	c.Status(http.StatusOK)

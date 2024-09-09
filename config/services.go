@@ -75,6 +75,9 @@ func (a *AppConfig) LoadTestServices(ctx context.Context) (*AppServices, error) 
 	// Start services
 	_services := new(AppServices)
 
+	nopLogger := zerolog.Nop()
+	_services.Logger = &nopLogger
+
 	// Load New Relic
 	err := a.loadNewRelic(_services)
 	if err != nil {

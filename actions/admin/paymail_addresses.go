@@ -8,6 +8,7 @@ import (
 	"github.com/bitcoin-sv/spv-wallet/mappings"
 	"github.com/bitcoin-sv/spv-wallet/models"
 	"github.com/bitcoin-sv/spv-wallet/models/filter"
+	"github.com/bitcoin-sv/spv-wallet/server/reqctx"
 	"github.com/gin-gonic/gin"
 )
 
@@ -23,24 +24,26 @@ import (
 // @Failure 	500	"Internal Server Error - Error while getting paymail address"
 // @Router		/v1/admin/paymail/get [post]
 // @Security	x-auth-xpub
-func (a *Action) paymailGetAddress(c *gin.Context) {
+func paymailGetAddress(c *gin.Context, _ *reqctx.AdminContext) {
+	logger := reqctx.Logger(c)
+	engine := reqctx.Engine(c)
 	var requestBody PaymailAddress
 
 	if err := c.ShouldBindJSON(&requestBody); err != nil {
-		spverrors.ErrorResponse(c, spverrors.ErrCannotBindRequest, a.Services.Logger)
+		spverrors.ErrorResponse(c, spverrors.ErrCannotBindRequest, logger)
 		return
 	}
 
 	if requestBody.Address == "" {
-		spverrors.ErrorResponse(c, spverrors.ErrMissingAddress, a.Services.Logger)
+		spverrors.ErrorResponse(c, spverrors.ErrMissingAddress, logger)
 		return
 	}
 
-	opts := a.Services.SpvWalletEngine.DefaultModelOptions()
+	opts := engine.DefaultModelOptions()
 
-	paymailAddress, err := a.Services.SpvWalletEngine.GetPaymailAddress(c.Request.Context(), requestBody.Address, opts...)
+	paymailAddress, err := engine.GetPaymailAddress(c.Request.Context(), requestBody.Address, opts...)
 	if err != nil {
-		spverrors.ErrorResponse(c, err, a.Services.Logger)
+		spverrors.ErrorResponse(c, err, logger)
 		return
 	}
 
@@ -61,21 +64,22 @@ func (a *Action) paymailGetAddress(c *gin.Context) {
 // @Failure 	500	"Internal server error - Error while searching for paymail addresses"
 // @Router		/v1/admin/paymails/search [post]
 // @Security	x-auth-xpub
-func (a *Action) paymailAddressesSearch(c *gin.Context) {
+func paymailAddressesSearch(c *gin.Context, _ *reqctx.AdminContext) {
+	logger := reqctx.Logger(c)
 	var reqParams filter.AdminSearchPaymails
 	if err := c.Bind(&reqParams); err != nil {
-		spverrors.ErrorResponse(c, spverrors.ErrCannotBindRequest, a.Services.Logger)
+		spverrors.ErrorResponse(c, spverrors.ErrCannotBindRequest, logger)
 		return
 	}
 
-	paymailAddresses, err := a.Services.SpvWalletEngine.GetPaymailAddresses(
+	paymailAddresses, err := reqctx.Engine(c).GetPaymailAddresses(
 		c.Request.Context(),
 		mappings.MapToMetadata(reqParams.Metadata),
 		reqParams.Conditions.ToDbConditions(),
 		mappings.MapToQueryParams(reqParams.QueryParams),
 	)
 	if err != nil {
-		spverrors.ErrorResponse(c, err, a.Services.Logger)
+		spverrors.ErrorResponse(c, err, logger)
 		return
 	}
 
@@ -99,20 +103,21 @@ func (a *Action) paymailAddressesSearch(c *gin.Context) {
 // @Failure 	500	"Internal Server Error - Error while fetching count of paymail addresses"
 // @Router		/v1/admin/paymails/count [post]
 // @Security	x-auth-xpub
-func (a *Action) paymailAddressesCount(c *gin.Context) {
+func paymailAddressesCount(c *gin.Context, _ *reqctx.AdminContext) {
+	logger := reqctx.Logger(c)
 	var reqParams filter.AdminCountPaymails
 	if err := c.Bind(&reqParams); err != nil {
-		spverrors.ErrorResponse(c, spverrors.ErrCannotBindRequest, a.Services.Logger)
+		spverrors.ErrorResponse(c, spverrors.ErrCannotBindRequest, logger)
 		return
 	}
 
-	count, err := a.Services.SpvWalletEngine.GetPaymailAddressesCount(
+	count, err := reqctx.Engine(c).GetPaymailAddressesCount(
 		c.Request.Context(),
 		mappings.MapToMetadata(reqParams.Metadata),
 		reqParams.Conditions.ToDbConditions(),
 	)
 	if err != nil {
-		spverrors.ErrorResponse(c, err, a.Services.Logger)
+		spverrors.ErrorResponse(c, err, logger)
 		return
 	}
 
@@ -131,33 +136,34 @@ func (a *Action) paymailAddressesCount(c *gin.Context) {
 // @Failure 	500	"Internal Server Error - Error while creating new paymail address"
 // @Router		/v1/admin/paymail/create [post]
 // @Security	x-auth-xpub
-func (a *Action) paymailCreateAddress(c *gin.Context) {
+func paymailCreateAddress(c *gin.Context, _ *reqctx.AdminContext) {
+	logger := reqctx.Logger(c)
 	var requestBody CreatePaymail
 	if err := c.ShouldBindJSON(&requestBody); err != nil {
-		spverrors.ErrorResponse(c, spverrors.ErrCannotBindRequest, a.Services.Logger)
+		spverrors.ErrorResponse(c, spverrors.ErrCannotBindRequest, logger)
 		return
 	}
 
 	if requestBody.Key == "" {
-		spverrors.ErrorResponse(c, spverrors.ErrMissingFieldXpub, a.Services.Logger)
+		spverrors.ErrorResponse(c, spverrors.ErrMissingFieldXpub, logger)
 		return
 	}
 	if requestBody.Address == "" {
-		spverrors.ErrorResponse(c, spverrors.ErrMissingAddress, a.Services.Logger)
+		spverrors.ErrorResponse(c, spverrors.ErrMissingAddress, logger)
 		return
 	}
 
-	opts := a.Services.SpvWalletEngine.DefaultModelOptions()
+	opts := reqctx.Engine(c).DefaultModelOptions()
 
 	if requestBody.Metadata != nil {
 		opts = append(opts, engine.WithMetadatas(requestBody.Metadata))
 	}
 
 	var paymailAddress *engine.PaymailAddress
-	paymailAddress, err := a.Services.SpvWalletEngine.NewPaymailAddress(
+	paymailAddress, err := reqctx.Engine(c).NewPaymailAddress(
 		c.Request.Context(), requestBody.Key, requestBody.Address, requestBody.PublicName, requestBody.Avatar, opts...)
 	if err != nil {
-		spverrors.ErrorResponse(c, err, a.Services.Logger)
+		spverrors.ErrorResponse(c, err, logger)
 		return
 	}
 
@@ -178,24 +184,26 @@ func (a *Action) paymailCreateAddress(c *gin.Context) {
 // @Failure 	500	"Internal Server Error - Error while deleting paymail address"
 // @Router		/v1/admin/paymail/delete [delete]
 // @Security	x-auth-xpub
-func (a *Action) paymailDeleteAddress(c *gin.Context) {
+func paymailDeleteAddress(c *gin.Context, _ *reqctx.AdminContext) {
+	logger := reqctx.Logger(c)
+	engine := reqctx.Engine(c)
 	var requestBody PaymailAddress
 	if err := c.ShouldBindJSON(&requestBody); err != nil {
-		spverrors.ErrorResponse(c, spverrors.ErrCannotBindRequest, a.Services.Logger)
+		spverrors.ErrorResponse(c, spverrors.ErrCannotBindRequest, logger)
 		return
 	}
 
 	if requestBody.Address == "" {
-		spverrors.ErrorResponse(c, spverrors.ErrMissingAddress, a.Services.Logger)
+		spverrors.ErrorResponse(c, spverrors.ErrMissingAddress, logger)
 		return
 	}
 
-	opts := a.Services.SpvWalletEngine.DefaultModelOptions()
+	opts := engine.DefaultModelOptions()
 
 	// Delete a new paymail address
-	err := a.Services.SpvWalletEngine.DeletePaymailAddress(c.Request.Context(), requestBody.Address, opts...)
+	err := engine.DeletePaymailAddress(c.Request.Context(), requestBody.Address, opts...)
 	if err != nil {
-		spverrors.ErrorResponse(c, err, a.Services.Logger)
+		spverrors.ErrorResponse(c, err, logger)
 		return
 	}
 
