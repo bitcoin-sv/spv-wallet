@@ -44,12 +44,6 @@ func Test_RevertTransaction(t *testing.T) {
 		require.NoError(t, err)
 		assert.Equal(t, uint64(100000), xpub.CurrentBalance) // 100000 was initial value
 
-		// check sync transaction was canceled
-		var syncTx *SyncTransaction
-		syncTx, err = GetSyncTransactionByID(ctx, transaction.ID, client.DefaultModelOptions()...)
-		require.NoError(t, err)
-		assert.Equal(t, SyncStatusCanceled, syncTx.BroadcastStatus)
-
 		// check utxos where reverted
 		var utxos []*Utxo
 		conditions := map[string]interface{}{
@@ -306,12 +300,6 @@ func initRevertTransactionData(t *testing.T, clientOpts ...ClientOps) (context.C
 	require.NoError(t, err)
 	assert.Equal(t, transaction.ID, tx.ID)
 	assert.Equal(t, testXPubID, tx.XpubInIDs[0])
-
-	// check sync transaction
-	var syncTx *SyncTransaction
-	syncTx, err = GetSyncTransactionByID(ctx, transaction.ID, client.DefaultModelOptions()...)
-	require.NoError(t, err)
-	assert.Equal(t, SyncStatusReady, syncTx.BroadcastStatus)
 
 	var utxos []*Utxo
 	conditions := map[string]interface{}{

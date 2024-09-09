@@ -46,8 +46,8 @@ func processSyncTransactions(ctx context.Context, maxTransactions int, opts ...M
 // It most probably will be deleted after syncTX removal
 func broadcastTxAndUpdateSync(ctx context.Context, tx *Transaction) error {
 	syncTx := tx.syncTransaction
-	err, result := broadcastTransaction(ctx, tx)
-	syncTx.Results.Results = append(syncTx.Results.Results, result)
+	syncResult, err := broadcastTransaction(ctx, tx)
+	syncTx.Results.Results = append(syncTx.Results.Results, syncResult)
 	if err != nil {
 		return err
 	}
@@ -60,7 +60,7 @@ func broadcastTxAndUpdateSync(ctx context.Context, tx *Transaction) error {
 	return syncTx.Save(ctx)
 }
 
-func broadcastTransaction(ctx context.Context, tx *Transaction) (error, *SyncResult) {
+func broadcastTransaction(ctx context.Context, tx *Transaction) (*SyncResult, error) {
 	client := tx.Client()
 	chainstateSrv := client.Chainstate()
 
@@ -73,7 +73,7 @@ func broadcastTransaction(ctx context.Context, tx *Transaction) (error, *SyncRes
 	)
 	defer unlock()
 	if err != nil {
-		return err, nil
+		return nil, err
 	}
 
 	// Broadcast
@@ -81,20 +81,20 @@ func broadcastTransaction(ctx context.Context, tx *Transaction) (error, *SyncRes
 	br := chainstateSrv.Broadcast(ctx, tx.ID, txHex, hexFormat, defaultBroadcastTimeout)
 
 	if br.Failure != nil { // broadcast failed
-		return br.Failure.Error, &SyncResult{
+		return &SyncResult{
 			Action:        syncActionBroadcast,
 			ExecutedAt:    time.Now().UTC(),
 			Provider:      br.Provider,
 			StatusMessage: br.Failure.Error.Error(),
-		}
+		}, br.Failure.Error
 	}
 
-	return nil, &SyncResult{
+	return &SyncResult{
 		Action:        syncActionBroadcast,
 		ExecutedAt:    time.Now().UTC(),
 		Provider:      br.Provider,
 		StatusMessage: "broadcast success",
-	}
+	}, nil
 }
 
 // ///////////////
