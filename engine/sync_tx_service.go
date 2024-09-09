@@ -5,8 +5,6 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"runtime"
-	"sync"
 	"time"
 
 	"github.com/bitcoin-sv/go-paymail"
@@ -41,55 +39,6 @@ func processSyncTransactions(ctx context.Context, maxTransactions int, opts ...M
 			return err
 		}
 	}
-
-	return nil
-}
-
-// processBroadcastTransactions will process sync transaction records
-func processBroadcastTransactions(ctx context.Context, maxTransactions int, opts ...ModelOps) error {
-	queryParams := &datastore.QueryParams{
-		Page:          1,
-		PageSize:      maxTransactions,
-		OrderByField:  createdAtField,
-		SortDirection: datastore.SortAsc,
-	}
-
-	// Get maxTransactions records, grouped by xpub
-	snTxs, err := getTransactionsToBroadcast(ctx, queryParams, opts...)
-	if err != nil {
-		return err
-	} else if len(snTxs) == 0 {
-		return nil
-	}
-
-	// Process the transactions per xpub, in parallel
-	txsByXpub := _groupByXpub(snTxs)
-
-	// we limit the number of concurrent broadcasts to the number of cpus*2, since there is lots of IO wait
-	limit := make(chan bool, runtime.NumCPU()*2)
-	wg := new(sync.WaitGroup)
-
-	for xPubID := range txsByXpub {
-		limit <- true // limit the number of routines running at the same time
-		wg.Add(1)
-		go func(xPubID string) {
-			defer wg.Done()
-			defer func() { <-limit }()
-
-			for _, tx := range txsByXpub[xPubID] {
-				if err = broadcastSyncTransaction(
-					ctx, tx,
-				); err != nil {
-					tx.Client().Logger().Error().
-						Str("txID", tx.ID).
-						Str("xpubID", xPubID).
-						Msgf("error running broadcast tx: %s", err.Error())
-					return // stop processing transactions for this xpub if we found an error
-				}
-			}
-		}(xPubID)
-	}
-	wg.Wait()
 
 	return nil
 }
@@ -361,27 +310,6 @@ func _notifyPaymailProviders(ctx context.Context, transaction *Transaction) ([]*
 }
 
 // utils
-
-func _groupByXpub(scTxs []*SyncTransaction) map[string][]*SyncTransaction {
-	txsByXpub := make(map[string][]*SyncTransaction)
-
-	// group transactions by xpub and return including the tx itself
-	for _, tx := range scTxs {
-		xPubID := "" // fallback if we have no input xpubs
-		if len(tx.transaction.XpubInIDs) > 0 {
-			// use the first xpub for the grouping
-			// in most cases when we are broadcasting, there should be only 1 xpub in
-			xPubID = tx.transaction.XpubInIDs[0]
-		}
-
-		if txsByXpub[xPubID] == nil {
-			txsByXpub[xPubID] = make([]*SyncTransaction, 0)
-		}
-		txsByXpub[xPubID] = append(txsByXpub[xPubID], tx)
-	}
-
-	return txsByXpub
-}
 
 // _addSyncResult will save the error message for a sync tx
 func _addSyncResult(ctx context.Context, syncTx *SyncTransaction,
