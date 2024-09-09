@@ -151,8 +151,6 @@ func (p *PaymailDefaultServiceProvider) RecordTransaction(ctx context.Context,
 		return nil, err //nolint:wrapcheck // returns our internal errors
 	}
 
-	rts.ForceBroadcast(true)
-
 	transaction, err := recordTransaction(ctx, p.client, rts, WithMetadatas(metadata))
 	if err != nil {
 		return nil, err

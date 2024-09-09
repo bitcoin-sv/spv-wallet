@@ -6,7 +6,6 @@ import (
 
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/libsv/go-bt/v2"
-	"github.com/rs/zerolog"
 )
 
 type outgoingTx struct {
@@ -22,61 +21,42 @@ func (strategy *outgoingTx) Name() string {
 
 func (strategy *outgoingTx) Execute(ctx context.Context, c ClientInterface, opts []ModelOps) (*Transaction, error) {
 	logger := c.Logger()
-	logger.Info().
-		Str("txID", strategy.TxID()).
-		Msg("start recording outgoing transaction")
 
 	// create
 	transaction, err := _createOutgoingTxToRecord(ctx, strategy, c, opts)
 	if err != nil {
-		logger.Error().
-			Str("txID", strategy.TxID()).
-			Msgf("creation of outgoing tx failed. Reason: %v", err)
 		return nil, spverrors.ErrCreateOutgoingTxFailed
 	}
 
 	if err = transaction.Save(ctx); err != nil {
-		logger.Error().
-			Str("txID", strategy.TxID()).
-			Msgf("saving of Transaction failed. Reason: %v", err)
 		return nil, spverrors.ErrDuringSaveTx
 	}
 
-	// process
 	if transaction.syncTransaction.P2PStatus == SyncStatusReady {
-		if err = _outgoingNotifyP2p(ctx, logger, transaction); err != nil {
-			// reject transaction if P2P notification failed
-			logger.Error().
-				Str("txID", transaction.ID).
-				Msgf("transaction rejected by P2P provider, try to revert transaction. Reason: %s", err)
-
+		if err := processP2PTransaction(ctx, transaction); err != nil {
 			if revertErr := c.RevertTransaction(ctx, transaction.ID); revertErr != nil {
-				logger.Error().
-					Str("txID", transaction.ID).
-					Msgf("FATAL! Reverting transaction after failed P2P notification failed. Reason: %s", revertErr)
+				return nil, fmt.Errorf("reverting transaction failed %w; after P2P notification failed: %w", revertErr, err)
 			}
-
-			return nil, err
+			logger.Warn().Str("txID", transaction.ID).Msgf("processP2PTransaction failed. Reason: %v", err)
+			return nil, spverrors.ErrProcessP2PTx
 		}
 	}
 
 	// get newest syncTx from DB - if it's an internal tx it could be broadcasted by us already
 	syncTx, err := GetSyncTransactionByID(ctx, transaction.ID, transaction.GetOptions(false)...)
 	if err != nil || syncTx == nil {
-		logger.Error().
-			Str("txID", transaction.ID).
-			Msgf("getting syncTx failed. Reason: %v", err)
 		return nil, spverrors.ErrCouldNotFindSyncTx
 	}
 
 	if syncTx.BroadcastStatus == SyncStatusReady {
 		transaction.syncTransaction = syncTx
-		_outgoingBroadcast(ctx, logger, transaction) // ignore error
+		if err := broadcastSyncTransaction(ctx, transaction.syncTransaction); err != nil {
+			logger.Warn().Str("txID", transaction.ID).Msgf("broadcasting failed in outgoingTx strategy")
+			// ignore error, transaction most likely is successfully broadcasted by payment receiver
+			// TODO: return a Warning to a client
+		}
 	}
 
-	logger.Info().
-		Str("txID", transaction.ID).
-		Msgf("complete recording outgoing transaction")
 	return transaction, nil
 }
 
@@ -196,40 +176,4 @@ func _getP2pSyncStatus(tx *Transaction) SyncStatus {
 	}
 
 	return p2pStatus
-}
-
-func _outgoingNotifyP2p(ctx context.Context, logger *zerolog.Logger, tx *Transaction) error {
-	logger.Info().
-		Str("txID", tx.ID).
-		Msg("start p2p")
-
-	if err := processP2PTransaction(ctx, tx); err != nil {
-		logger.Error().
-			Str("txID", tx.ID).
-			Msgf("processP2PTransaction failed. Reason: %s", err)
-
-		return spverrors.ErrProcessP2PTx
-	}
-
-	logger.Info().
-		Str("txID", tx.ID).
-		Msg("p2p complete")
-	return nil
-}
-
-func _outgoingBroadcast(ctx context.Context, logger *zerolog.Logger, tx *Transaction) {
-	logger.Info().
-		Str("txID", tx.ID).
-		Msg("start broadcast")
-
-	if err := broadcastSyncTransaction(ctx, tx.syncTransaction); err != nil {
-		// ignore error, transaction will be broadcasted by cron task
-		logger.Warn().
-			Str("txID", tx.ID).
-			Msgf("broadcasting failed, next try will be handled by task manager. Reason: %s", err)
-	} else {
-		logger.Info().
-			Str("txID", tx.ID).
-			Msg("broadcast complete")
-	}
 }

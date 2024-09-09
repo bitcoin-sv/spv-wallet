@@ -8,9 +8,8 @@ import (
 )
 
 type externalIncomingTx struct {
-	BtTx         *bt.Tx
-	broadcastNow bool // e.g. BEEF must be broadcasted now
-	txID         string
+	BtTx *bt.Tx
+	txID string
 }
 
 func (strategy *externalIncomingTx) Name() string {
@@ -18,35 +17,19 @@ func (strategy *externalIncomingTx) Name() string {
 }
 
 func (strategy *externalIncomingTx) Execute(ctx context.Context, c ClientInterface, opts []ModelOps) (*Transaction, error) {
-	logger := c.Logger()
 	transaction, err := _createExternalTxToRecord(ctx, strategy, c, opts)
 	if err != nil {
-		logger.Error().Msgf("creation of external incoming tx failed. Reason: %v", err)
 		return nil, err
 	}
 
-	logger.Info().
-		Str("txID", transaction.ID).
-		Msg("start without ITC")
-
-	if strategy.broadcastNow || transaction.syncTransaction.BroadcastStatus == SyncStatusReady {
-		if err := broadcastSyncTransaction(ctx, transaction.syncTransaction); err != nil {
-			logger.Warn().Str("txID", transaction.ID).Msgf("broadcasting failed. Reason: %s", err)
-			return nil, err
-		}
+	if err := broadcastSyncTransaction(ctx, transaction.syncTransaction); err != nil {
+		return nil, err
 	}
 
-	// record
 	if err = transaction.Save(ctx); err != nil {
-		logger.Error().
-			Str("txID", transaction.ID).
-			Msgf("saving of Transaction failed. Reason: %v", err)
 		return nil, err
 	}
 
-	logger.Info().
-		Str("txID", transaction.ID).
-		Msg("External incoming tx execute complete")
 	return transaction, nil
 }
 
@@ -67,10 +50,6 @@ func (strategy *externalIncomingTx) TxID() string {
 
 func (strategy *externalIncomingTx) LockKey() string {
 	return fmt.Sprintf("incoming-%s", strategy.TxID())
-}
-
-func (strategy *externalIncomingTx) ForceBroadcast(force bool) {
-	strategy.broadcastNow = force
 }
 
 func _createExternalTxToRecord(ctx context.Context, eTx *externalIncomingTx, c ClientInterface, opts []ModelOps) (*Transaction, error) {
