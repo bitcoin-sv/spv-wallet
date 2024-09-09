@@ -6,7 +6,6 @@ import (
 
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/libsv/go-bt/v2"
-	"github.com/rs/zerolog"
 )
 
 type internalIncomingTx struct {
@@ -38,13 +37,11 @@ func (strategy *internalIncomingTx) Execute(ctx context.Context, c ClientInterfa
 		syncTx.transaction = transaction
 		transaction.syncTransaction = syncTx
 
-		err := _internalIncomingBroadcast(ctx, logger, transaction, strategy.allowBroadcastErrors)
-		if err != nil {
-			logger.Error().
-				Str("txID", transaction.ID).
-				Msgf("broadcasting failed, transaction rejected! Reason: %s", err)
-
-			return nil, err
+		if err := broadcastSyncTransaction(ctx, syncTx); err != nil {
+			logger.Warn().Str("txID", transaction.ID).Bool("ignored", !strategy.allowBroadcastErrors).Msgf("broadcasting failed. Reason: %s", err)
+			if !strategy.allowBroadcastErrors {
+				return nil, err
+			}
 		}
 	}
 
@@ -80,32 +77,4 @@ func (strategy *internalIncomingTx) ForceBroadcast(force bool) {
 
 func (strategy *internalIncomingTx) FailOnBroadcastError(forceFail bool) {
 	strategy.allowBroadcastErrors = !forceFail
-}
-
-func _internalIncomingBroadcast(ctx context.Context, logger *zerolog.Logger, transaction *Transaction, allowErrors bool) error {
-	logger.Info().
-		Str("txID", transaction.ID).
-		Msg("start broadcast")
-
-	syncTx := transaction.syncTransaction
-	err := broadcastSyncTransaction(ctx, syncTx)
-
-	if err == nil {
-		logger.Info().
-			Str("txID", transaction.ID).
-			Msg("broadcast complete")
-
-		return nil
-	}
-
-	if allowErrors {
-		logger.Warn().
-			Str("txID", transaction.ID).
-			Msgf("broadcasting failed, next try will be handled by task manager. Reason: %s", err)
-
-		// ignore broadcast error - will be repeated by task manager
-		return nil
-	}
-
-	return err
 }

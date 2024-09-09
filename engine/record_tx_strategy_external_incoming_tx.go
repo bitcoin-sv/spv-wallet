@@ -5,7 +5,6 @@ import (
 	"fmt"
 
 	"github.com/libsv/go-bt/v2"
-	"github.com/rs/zerolog"
 )
 
 type externalIncomingTx struct {
@@ -32,14 +31,11 @@ func (strategy *externalIncomingTx) Execute(ctx context.Context, c ClientInterfa
 		Msg("start without ITC")
 
 	if strategy.broadcastNow || transaction.syncTransaction.BroadcastStatus == SyncStatusReady {
-
-		err = _externalIncomingBroadcast(ctx, logger, transaction, strategy.allowBroadcastErrors)
-		if err != nil {
-			logger.Error().
-				Str("txID", transaction.ID).
-				Msgf("broadcasting failed, transaction rejected! Reason: %s", err)
-
-			return nil, err
+		if err := broadcastSyncTransaction(ctx, transaction.syncTransaction); err != nil {
+			logger.Warn().Str("txID", transaction.ID).Bool("ignored", !strategy.allowBroadcastErrors).Msgf("broadcasting failed. Reason: %s", err)
+			if !strategy.allowBroadcastErrors {
+				return nil, err
+			}
 		}
 	}
 
@@ -117,29 +113,4 @@ func _hydrateExternalWithSync(tx *Transaction) {
 	sync.Metadata = tx.Metadata
 	sync.transaction = tx
 	tx.syncTransaction = sync
-}
-
-func _externalIncomingBroadcast(ctx context.Context, logger *zerolog.Logger, tx *Transaction, allowErrors bool) error {
-	logger.Info().Str("txID", tx.ID).Msg("start broadcast")
-
-	err := broadcastSyncTransaction(ctx, tx.syncTransaction)
-
-	if err == nil {
-		logger.Info().
-			Str("txID", tx.ID).
-			Msg("broadcast complete")
-
-		return nil
-	}
-
-	if allowErrors {
-		logger.Warn().
-			Str("txID", tx.ID).
-			Msgf("broadcasting failed, next try will be handled by task manager. Reason: %s", err)
-
-		// ignore error, transaction will be broadcasted in a cron task
-		return nil
-	}
-
-	return err
 }
