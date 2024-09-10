@@ -191,9 +191,12 @@ func (c *Client) GetTransactionsByXpubID(ctx context.Context, xPubID string, met
 	ctx = c.GetOrStartTxn(ctx, "get_transaction")
 
 	// Get the transaction by ID
-	// todo: add queryParams for: page size and page (right now it is unlimited)
 	transactions, err := getTransactionsByXpubID(
-		ctx, xPubID, metadataConditions, conditions, queryParams,
+		ctx,
+		xPubID,
+		metadataConditions,
+		conditions,
+		queryParams,
 		c.DefaultModelOptions()...,
 	)
 	if err != nil {

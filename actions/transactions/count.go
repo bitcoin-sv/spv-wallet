@@ -12,15 +12,15 @@ import (
 
 // count will fetch a count of transactions filtered on conditions and metadata
 // Count of transactions godoc
-// @Summary		Count of transactions
-// @Description	The functionality of this method will be offered in the future by /api/v1/transactions [get].
+// @Summary		Count of transactions - Use (GET) /api/v1/transactions instead.
+// @Description	This endpoint has been deprecated. Use (GET) /api/v1/transactions instead
 // @Tags		Transactions
 // @Produce		json
 // @Param		CountTransactions body filter.CountTransactions false "Enables filtering of elements to be counted"
 // @Success		200	{number} int64 "Count of access keys"
 // @Failure		400	"Bad request - Error while parsing CountTransactions from request body"
 // @Failure 	500	"Internal Server Error - Error while fetching count of transactions"
-// @Router		/v1/transaction/count [post]
+// @DeprecatedRouter		/v1/transaction/count [post]
 // @Security	x-auth-xpub
 func count(c *gin.Context, userContext *reqctx.UserContext) {
 	logger := reqctx.Logger(c)

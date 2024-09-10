@@ -5,6 +5,7 @@ type TransactionFilter struct {
 	// ModelFilter is a struct for handling typical request parameters for search requests
 	//lint:ignore SA5008 We want to reuse json tags also to mapstructure.
 	ModelFilter     `json:",inline,squash"`
+	Id              *string `json:"id,omitempty" example:"d425432e0d10a46af1ec6d00f380e9581ebf7907f3486572b3cd561a4c326e14"`
 	Hex             *string `json:"hex,omitempty"`
 	BlockHash       *string `json:"blockHash,omitempty" example:"0000000000000000031928c28075a82d7a00c2c90b489d1d66dc0afa3f8d26f8"`
 	BlockHeight     *uint64 `json:"blockHeight,omitempty" example:"839376"`
@@ -24,6 +25,7 @@ func (d *TransactionFilter) ToDbConditions() map[string]interface{} {
 	conditions := d.ModelFilter.ToDbConditions()
 
 	// Column names come from the database model, see: /engine/model_transactions.go
+	applyIfNotNil(conditions, "id", d.Id)
 	applyIfNotNil(conditions, "hex", d.Hex)
 	applyIfNotNil(conditions, "block_hash", d.BlockHash)
 	applyIfNotNil(conditions, "block_height", d.BlockHeight)
