@@ -6,6 +6,7 @@ import (
 	"github.com/bitcoin-sv/spv-wallet/actions/common"
 	"github.com/bitcoin-sv/spv-wallet/engine"
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
+	"github.com/bitcoin-sv/spv-wallet/internal/query"
 	"github.com/bitcoin-sv/spv-wallet/mappings"
 	"github.com/bitcoin-sv/spv-wallet/models"
 	"github.com/bitcoin-sv/spv-wallet/models/filter"
@@ -77,39 +78,68 @@ func search(c *gin.Context, userContext *reqctx.UserContext) {
 	c.JSON(http.StatusOK, response)
 }
 
-// TODO: this method will be changed based on search poc
 // getContacts will fetch a list of contacts
 // @Summary		Get contacts
 // @Description	Get contacts
 // @Tags		Contacts
 // @Produce		json
-// @Param		SearchContacts body filter.SearchContacts false "Supports targeted resource searches with filters and metadata, plus options for pagination and sorting to streamline data exploration and analysis"
+// @Param		SwaggerCommonParams query swagger.CommonFilteringQueryParams false "Supports options for pagination and sorting to streamline data exploration and analysis"
+// @Param		ContactParams query filter.ContactFilter false "Supports targeted resource searches with filters"
 // @Success		200 {object} response.PageModel[response.Contact] "Page of contacts"
 // @Failure		400	"Bad request - Error while parsing SearchContacts from request body"
 // @Failure 	500	"Internal server error - Error while searching for contacts"
 // @Router		/api/v1/contacts [get]
 // @Security	x-auth-xpub
 func getContacts(c *gin.Context, userContext *reqctx.UserContext) {
-	contacts, count := searchContacts(c, userContext.GetXPubID(), "")
-	if contacts == nil {
+	logger := reqctx.Logger(c)
+	engine := reqctx.Engine(c)
+	reqXPubID := userContext.GetXPubID()
+
+	searchParams, err := query.ParseSearchParams[filter.ContactFilter](c)
+	if err != nil {
+		spverrors.ErrorResponse(c, spverrors.ErrCannotParseQueryParams, logger)
 		return
 	}
 
-	contracts := mappings.MapToContactContracts(contacts)
+	conditions, err := searchParams.Conditions.ToDbConditions()
+	if err != nil {
+		spverrors.ErrorResponse(c, spverrors.ErrInvalidConditions, logger)
+		return
+	}
+	metadata := mappings.MapToMetadata(searchParams.Metadata)
+	pageOptions := mappings.MapToDbQueryParams(&searchParams.Page)
 
-	totalPages := 0
-	if int(count) != 0 {
-		totalPages = len(contracts) / int(count)
+	contacts, err := engine.GetContactsByXpubID(
+		c.Request.Context(),
+		reqXPubID,
+		metadata,
+		conditions,
+		pageOptions,
+	)
+	if err != nil {
+		spverrors.ErrorResponse(c, err, logger)
+		return
 	}
 
+	contracts := make([]*response.Contact, 0)
+	for _, contact := range contacts {
+		contracts = append(contracts, mappings.MapToContactContract(contact))
+	}
+
+	count, err := engine.GetContactsByXPubIDCount(
+		c.Request.Context(),
+		reqXPubID,
+		metadata,
+		conditions,
+	)
+
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, err.Error())
+		return
+	}
 	response := response.PageModel[response.Contact]{
 		Content: contracts,
-		Page: response.PageDescription{
-			Size:          len(contracts),
-			Number:        0,
-			TotalElements: int(count),
-			TotalPages:    totalPages,
-		},
+		Page:    common.GetPageDescriptionFromSearchParams(pageOptions, count),
 	}
 
 	c.JSON(http.StatusOK, response)
