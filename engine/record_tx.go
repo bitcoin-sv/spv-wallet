@@ -18,8 +18,6 @@ type recordTxStrategy interface {
 
 type recordIncomingTxStrategy interface {
 	recordTxStrategy
-	ForceBroadcast(force bool)
-	FailOnBroadcastError(forceFail bool)
 }
 
 func recordTransaction(ctx context.Context, c ClientInterface, strategy recordTxStrategy, opts ...ModelOps) (transaction *Transaction, err error) {
@@ -34,7 +32,13 @@ func recordTransaction(ctx context.Context, c ClientInterface, strategy recordTx
 	unlock := waitForRecordTxWriteLock(ctx, c, strategy.LockKey())
 	defer unlock()
 
+	logger := c.Logger()
+	logger.Debug().Str("strategy", strategy.Name()).Str("txID", strategy.TxID()).Msg("Start executing recordTx strategy.")
+
 	transaction, err = strategy.Execute(ctx, c, opts)
+	if err != nil {
+		logger.Warn().Str("strategy", strategy.Name()).Str("txID", strategy.TxID()).Err(err).Msg("Failed to execure recordTx strategy.")
+	}
 	return
 }
 
@@ -63,13 +67,11 @@ func getIncomingTxRecordStrategy(ctx context.Context, c ClientInterface, btTx *b
 	if tx != nil {
 		tx.parsedTx = btTx
 		rts = &internalIncomingTx{
-			Tx:           tx,
-			broadcastNow: false,
+			Tx: tx,
 		}
 	} else {
 		rts = &externalIncomingTx{
-			BtTx:         btTx,
-			broadcastNow: false,
+			BtTx: btTx,
 		}
 	}
 

@@ -361,8 +361,6 @@ func (c *Client) RevertTransaction(ctx context.Context, id string) error {
 	if syncTransaction, err = GetSyncTransactionByID(ctx, transaction.ID, c.DefaultModelOptions()...); err != nil {
 		return err
 	}
-	syncTransaction.BroadcastStatus = SyncStatusCanceled
-	syncTransaction.P2PStatus = SyncStatusCanceled
 	syncTransaction.SyncStatus = SyncStatusCanceled
 	if err = syncTransaction.Save(ctx); err != nil {
 		return err

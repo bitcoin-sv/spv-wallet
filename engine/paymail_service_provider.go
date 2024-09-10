@@ -51,7 +51,6 @@ func (p *PaymailDefaultServiceProvider) GetPaymailByAlias(
 	alias, domain string,
 	_ *server.RequestMetadata,
 ) (*paymail.AddressInformation, error) {
-
 	pm, err := getPaymailAddress(ctx, alias+"@"+domain, p.client.DefaultModelOptions()...)
 	if err != nil {
 		return nil, err
@@ -150,12 +149,6 @@ func (p *PaymailDefaultServiceProvider) RecordTransaction(ctx context.Context,
 	}
 	if err := rts.Validate(); err != nil {
 		return nil, err //nolint:wrapcheck // returns our internal errors
-	}
-
-	rts.ForceBroadcast(true)
-
-	if p2pTx.Beef != "" {
-		rts.FailOnBroadcastError(true)
 	}
 
 	transaction, err := recordTransaction(ctx, p.client, rts, WithMetadatas(metadata))
@@ -398,8 +391,6 @@ func saveBeefTransactionInput(ctx context.Context, c ClientInterface, input *bee
 		inputTx.Client().DefaultSyncConfig(),
 		inputTx.GetOptions(true)...,
 	)
-	sync.BroadcastStatus = SyncStatusSkipped
-	sync.P2PStatus = SyncStatusSkipped
 	sync.SyncStatus = SyncStatusReady
 
 	if bump != nil {
