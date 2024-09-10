@@ -5,14 +5,11 @@ import (
 	"fmt"
 
 	"github.com/libsv/go-bt/v2"
-	"github.com/rs/zerolog"
 )
 
 type externalIncomingTx struct {
-	BtTx                 *bt.Tx
-	broadcastNow         bool // e.g. BEEF must be broadcasted now
-	allowBroadcastErrors bool // only BEEF cannot allow for broadcast errors
-	txID                 string
+	BtTx *bt.Tx
+	txID string
 }
 
 func (strategy *externalIncomingTx) Name() string {
@@ -20,40 +17,19 @@ func (strategy *externalIncomingTx) Name() string {
 }
 
 func (strategy *externalIncomingTx) Execute(ctx context.Context, c ClientInterface, opts []ModelOps) (*Transaction, error) {
-	logger := c.Logger()
 	transaction, err := _createExternalTxToRecord(ctx, strategy, c, opts)
 	if err != nil {
-		logger.Error().Msgf("creation of external incoming tx failed. Reason: %v", err)
 		return nil, err
 	}
 
-	logger.Info().
-		Str("txID", transaction.ID).
-		Msg("start without ITC")
-
-	if strategy.broadcastNow || transaction.syncTransaction.BroadcastStatus == SyncStatusReady {
-
-		err = _externalIncomingBroadcast(ctx, logger, transaction, strategy.allowBroadcastErrors)
-		if err != nil {
-			logger.Error().
-				Str("txID", transaction.ID).
-				Msgf("broadcasting failed, transaction rejected! Reason: %s", err)
-
-			return nil, err
-		}
+	if err := broadcastTxAndUpdateSync(ctx, transaction); err != nil {
+		return nil, err
 	}
 
-	// record
 	if err = transaction.Save(ctx); err != nil {
-		logger.Error().
-			Str("txID", transaction.ID).
-			Msgf("saving of Transaction failed. Reason: %v", err)
 		return nil, err
 	}
 
-	logger.Info().
-		Str("txID", transaction.ID).
-		Msg("External incoming tx execute complete")
 	return transaction, nil
 }
 
@@ -74,14 +50,6 @@ func (strategy *externalIncomingTx) TxID() string {
 
 func (strategy *externalIncomingTx) LockKey() string {
 	return fmt.Sprintf("incoming-%s", strategy.TxID())
-}
-
-func (strategy *externalIncomingTx) ForceBroadcast(force bool) {
-	strategy.broadcastNow = force
-}
-
-func (strategy *externalIncomingTx) FailOnBroadcastError(forceFail bool) {
-	strategy.allowBroadcastErrors = !forceFail
 }
 
 func _createExternalTxToRecord(ctx context.Context, eTx *externalIncomingTx, c ClientInterface, opts []ModelOps) (*Transaction, error) {
@@ -107,39 +75,10 @@ func _hydrateExternalWithSync(tx *Transaction) {
 		tx.GetOptions(true)...,
 	)
 
-	// to simplify: broadcast every external incoming txs
-	sync.BroadcastStatus = SyncStatusReady
-
-	sync.P2PStatus = SyncStatusSkipped  // the sender of the Tx should have already notified us
 	sync.SyncStatus = SyncStatusPending // wait until transactions will be broadcasted
 
 	// Use the same metadata
 	sync.Metadata = tx.Metadata
 	sync.transaction = tx
 	tx.syncTransaction = sync
-}
-
-func _externalIncomingBroadcast(ctx context.Context, logger *zerolog.Logger, tx *Transaction, allowErrors bool) error {
-	logger.Info().Str("txID", tx.ID).Msg("start broadcast")
-
-	err := broadcastSyncTransaction(ctx, tx.syncTransaction)
-
-	if err == nil {
-		logger.Info().
-			Str("txID", tx.ID).
-			Msg("broadcast complete")
-
-		return nil
-	}
-
-	if allowErrors {
-		logger.Warn().
-			Str("txID", tx.ID).
-			Msgf("broadcasting failed, next try will be handled by task manager. Reason: %s", err)
-
-		// ignore error, transaction will be broadcasted in a cron task
-		return nil
-	}
-
-	return err
 }

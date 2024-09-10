@@ -47,11 +47,6 @@ func (c *Client) cronJobs() taskmanager.CronJobs {
 		taskCleanupDraftTransactions,
 	)
 	addJob(
-		CronJobNameSyncTransactionBroadcast,
-		2*time.Minute,
-		taskBroadcastTransactions,
-	)
-	addJob(
 		CronJobNameSyncTransactionSync,
 		5*time.Minute,
 		taskSyncTransactions,
