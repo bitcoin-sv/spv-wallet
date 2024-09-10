@@ -15,13 +15,6 @@ type SyncResults struct {
 	Results []*SyncResult `json:"results"` // Each result of a sync task
 }
 
-// Sync actions for syncing transactions
-const (
-	syncActionBroadcast = "broadcast" // Broadcast a transaction into the mempool
-	syncActionP2P       = "p2p"       // Notify all paymail providers associated to the transaction
-	syncActionSync      = "sync"      // Get on-chain data about the transaction (IE: block hash, height, etc)
-)
-
 // SyncResult is the complete attempt/result to sync (multiple providers and strategies)
 type SyncResult struct {
 	Action        string    `json:"action"`             // type: broadcast, sync etc
