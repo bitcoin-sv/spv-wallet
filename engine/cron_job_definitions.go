@@ -54,17 +54,6 @@ func taskCleanupDraftTransactions(ctx context.Context, client *Client) error {
 	return nil
 }
 
-// taskBroadcastTransactions will broadcast any transactions
-func taskBroadcastTransactions(ctx context.Context, client *Client) error {
-	client.Logger().Info().Msg("running broadcast transaction(s) task...")
-
-	err := processBroadcastTransactions(ctx, 1000, WithClient(client))
-	if err == nil || errors.Is(err, datastore.ErrNoResults) {
-		return nil
-	}
-	return err
-}
-
 // taskSyncTransactions will sync any transactions
 func taskSyncTransactions(ctx context.Context, client *Client) error {
 	logClient := client.Logger()

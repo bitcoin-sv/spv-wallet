@@ -2,6 +2,7 @@ package engine
 
 import (
 	"context"
+	"time"
 
 	"github.com/bitcoin-sv/spv-wallet/engine/datastore"
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
@@ -33,18 +34,6 @@ func newSyncTransaction(txID string, config *SyncConfig, opts ...ModelOps) *Sync
 		return nil
 	}
 
-	// Broadcasting
-	bs := SyncStatusReady
-	if !config.Broadcast {
-		bs = SyncStatusSkipped
-	}
-
-	// Notify Paymail P2P
-	ps := SyncStatusPending
-	if !config.PaymailP2P {
-		ps = SyncStatusSkipped
-	}
-
 	// Sync
 	ss := SyncStatusReady
 	if !config.SyncOnChain {
@@ -52,12 +41,10 @@ func newSyncTransaction(txID string, config *SyncConfig, opts ...ModelOps) *Sync
 	}
 
 	return &SyncTransaction{
-		BroadcastStatus: bs,
-		Configuration:   *config,
-		ID:              txID,
-		Model:           *NewBaseModel(ModelSyncTransaction, opts...),
-		P2PStatus:       ps,
-		SyncStatus:      ss,
+		Configuration: *config,
+		ID:            txID,
+		Model:         *NewBaseModel(ModelSyncTransaction, opts...),
+		SyncStatus:    ss,
 	}
 }
 
@@ -138,4 +125,19 @@ func (m *SyncTransaction) BeforeUpdating(_ context.Context) error {
 func (m *SyncTransaction) Migrate(client datastore.ClientInterface) error {
 	err := client.IndexMetadata(client.GetTableName(tableSyncTransactions), metadataField)
 	return spverrors.Wrapf(err, "failed to index metadata column on model %s", m.GetModelName())
+}
+
+func (m *SyncTransaction) addSyncResult(ctx context.Context, action, provider, message string) {
+	m.Results.Results = append(m.Results.Results, &SyncResult{
+		Action:        action,
+		ExecutedAt:    time.Now().UTC(),
+		Provider:      provider,
+		StatusMessage: message,
+	})
+
+	if m.IsNew() {
+		return // do not save if new record! caller should decide if want to save new record
+	}
+
+	_ = m.Save(ctx)
 }
