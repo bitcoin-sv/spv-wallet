@@ -6,6 +6,7 @@ import (
 
 	"github.com/bitcoin-sv/go-paymail"
 	"github.com/bitcoin-sv/spv-wallet/engine/datastore"
+	paymailclient "github.com/bitcoin-sv/spv-wallet/engine/paymail"
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 )
 
@@ -16,9 +17,9 @@ func (c *Client) UpsertContact(ctx context.Context, ctcFName, ctcPaymail, reques
 		return nil, err
 	}
 
-	pmSrvnt := &PaymailServant{
-		cs: c.Cachestore(),
-		pc: c.PaymailClient(),
+	pmSrvnt, err := paymailclient.NewServiceClient(c.Cachestore(), c.PaymailClient())
+	if err != nil {
+		panic(err)
 	}
 	contactPm, err := pmSrvnt.GetSanitizedPaymail(ctcPaymail)
 	if err != nil {
@@ -49,9 +50,9 @@ func (c *Client) UpsertContact(ctx context.Context, ctcFName, ctcPaymail, reques
 
 // AddContactRequest adds a new contact invitation if contact not exits or just checking if contact has still the same pub key if contact exists.
 func (c *Client) AddContactRequest(ctx context.Context, fullName, paymailAdress, requesterXPubID string, opts ...ModelOps) (*Contact, error) {
-	pmSrvnt := &PaymailServant{
-		cs: c.Cachestore(),
-		pc: c.PaymailClient(),
+	pmSrvnt, err := paymailclient.NewServiceClient(c.Cachestore(), c.PaymailClient())
+	if err != nil {
+		panic(err)
 	}
 
 	contactPm, err := pmSrvnt.GetSanitizedPaymail(paymailAdress)
@@ -372,7 +373,7 @@ func (c *Client) getPaymail(ctx context.Context, xpubID, paymailAddr string) (*P
 	return paymails[0], nil
 }
 
-func (c *Client) upsertContact(ctx context.Context, pmSrvnt *PaymailServant, reqXPubID, ctcFName string, ctcPaymail *paymail.SanitisedPaymail, opts ...ModelOps) (*Contact, error) {
+func (c *Client) upsertContact(ctx context.Context, pmSrvnt paymailclient.ServiceClient, reqXPubID, ctcFName string, ctcPaymail *paymail.SanitisedPaymail, opts ...ModelOps) (*Contact, error) {
 	contactPki, err := pmSrvnt.GetPkiForPaymail(ctx, ctcPaymail)
 	if err != nil {
 		return nil, spverrors.ErrGettingPKIFailed

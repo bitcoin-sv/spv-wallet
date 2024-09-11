@@ -162,7 +162,7 @@ func TestClient_GetPaymailConfig(t *testing.T) {
 	t.Run("valid paymail server config", func(t *testing.T) {
 		opts := DefaultClientOpts(false, true)
 		opts = append(opts, WithPaymailSupport(
-			[]string{testDomain},
+			[]string{"example.com"},
 			defaultSenderPaymail,
 			false, false,
 		))
@@ -234,7 +234,7 @@ func TestPaymailOptions_ServerConfig(t *testing.T) {
 		logger := zerolog.Nop()
 		opts := DefaultClientOpts(false, true)
 		opts = append(opts, WithPaymailSupport(
-			[]string{testDomain},
+			[]string{"example.com"},
 			defaultSenderPaymail,
 			false, false,
 		),

@@ -11,6 +11,7 @@ import (
 
 	"github.com/bitcoin-sv/go-paymail"
 	"github.com/bitcoin-sv/spv-wallet/engine/datastore"
+	paymailclient "github.com/bitcoin-sv/spv-wallet/engine/paymail"
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/bitcoin-sv/spv-wallet/engine/utils"
 	"github.com/bitcoinschema/go-bitcoin/v2"
@@ -180,6 +181,12 @@ func (m *DraftTransaction) processConfigOutputs(ctx context.Context) error {
 	if err == nil && len(paymails) != 0 {
 		paymailFrom = fmt.Sprintf("%s@%s", paymails[0].Alias, paymails[0].Domain)
 	}
+
+	paymailClient, err := paymailclient.NewServiceClient(c.Cachestore(), c.PaymailClient())
+	if err != nil {
+		panic("could not create paymail client, spv-wallet wrongly configured")
+	}
+
 	// Special case where we are sending all funds to a single (address, paymail, handle)
 	if m.Configuration.SendAllTo != nil {
 		outputs := m.Configuration.Outputs
@@ -188,24 +195,14 @@ func (m *DraftTransaction) processConfigOutputs(ctx context.Context) error {
 		m.Configuration.SendAllTo.Satoshis = 0
 		m.Configuration.Outputs = []*TransactionOutput{m.Configuration.SendAllTo}
 
-		if err := m.Configuration.Outputs[0].processOutput(
-			ctx, c.Cachestore(),
-			c.PaymailClient(),
-			paymailFrom,
-			false,
-		); err != nil {
+		if err := m.Configuration.Outputs[0].processOutput(ctx, paymailClient, paymailFrom, false); err != nil {
 			return err
 		}
 
 		// re-add the other outputs we had before
 		for _, output := range outputs {
 			output.UseForChange = false // make sure we do not add change to this output
-			if err := output.processOutput(
-				ctx, c.Cachestore(),
-				c.PaymailClient(),
-				paymailFrom,
-				true,
-			); err != nil {
+			if err := output.processOutput(ctx, paymailClient, paymailFrom, true); err != nil {
 				return err
 			}
 			m.Configuration.Outputs = append(m.Configuration.Outputs, output)
@@ -220,12 +217,7 @@ func (m *DraftTransaction) processConfigOutputs(ctx context.Context) error {
 			}
 
 			// Process the outputs
-			if err := m.Configuration.Outputs[index].processOutput(
-				ctx, c.Cachestore(),
-				c.PaymailClient(),
-				paymailFrom,
-				true,
-			); err != nil {
+			if err := m.Configuration.Outputs[index].processOutput(ctx, paymailClient, paymailFrom, true); err != nil {
 				return err
 			}
 		}
