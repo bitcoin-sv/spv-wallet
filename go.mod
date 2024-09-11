@@ -53,7 +53,7 @@ require (
 	gorm.io/driver/postgres v1.5.9
 	gorm.io/driver/sqlite v1.5.6
 	gorm.io/gorm v1.25.12
-	gorm.io/plugin/dbresolver v1.5.2
+	gorm.io/plugin/dbresolver v1.5.3
 )
 
 require (
