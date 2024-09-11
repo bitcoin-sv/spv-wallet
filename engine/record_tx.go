@@ -40,7 +40,7 @@ func recordTransaction(ctx context.Context, c ClientInterface, strategy recordTx
 
 	transaction, err = strategy.Execute(ctx, c, opts)
 	if err != nil {
-		logger.Warn().Str("strategy", strategy.Name()).Str("txID", strategy.TxID()).Err(err).Msg("Failed to execure recordTx strategy.")
+		logger.Warn().Str("strategy", strategy.Name()).Str("txID", strategy.TxID()).Err(err).Msg("Failed to execute recordTx strategy.")
 	}
 	return
 }
