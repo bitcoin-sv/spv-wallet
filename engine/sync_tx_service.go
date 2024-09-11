@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"time"
 
 	"github.com/bitcoin-sv/spv-wallet/engine/chainstate"
 	"github.com/bitcoin-sv/spv-wallet/engine/datastore"
@@ -42,12 +41,11 @@ func processSyncTransactions(ctx context.Context, maxTransactions int, opts ...M
 	return nil
 }
 
-// broadcastTxAndUpdateSync will broadcast transaction and update Results and SyncStatus in syncTx
+// broadcastTxAndUpdateSync will broadcast transaction and and SyncStatus in syncTx
 // It most probably will be deleted after syncTX removal
 func broadcastTxAndUpdateSync(ctx context.Context, tx *Transaction) error {
 	syncTx := tx.syncTransaction
-	syncResult, err := broadcastTransaction(ctx, tx)
-	syncTx.Results.Results = append(syncTx.Results.Results, syncResult)
+	err := broadcastTransaction(ctx, tx)
 	if err != nil {
 		return err
 	}
@@ -60,7 +58,7 @@ func broadcastTxAndUpdateSync(ctx context.Context, tx *Transaction) error {
 	return syncTx.Save(ctx)
 }
 
-func broadcastTransaction(ctx context.Context, tx *Transaction) (*SyncResult, error) {
+func broadcastTransaction(ctx context.Context, tx *Transaction) error {
 	client := tx.Client()
 	chainstateSrv := client.Chainstate()
 
@@ -73,7 +71,7 @@ func broadcastTransaction(ctx context.Context, tx *Transaction) (*SyncResult, er
 	)
 	defer unlock()
 	if err != nil {
-		return nil, err
+		return err
 	}
 
 	// Broadcast
@@ -81,20 +79,10 @@ func broadcastTransaction(ctx context.Context, tx *Transaction) (*SyncResult, er
 	br := chainstateSrv.Broadcast(ctx, tx.ID, txHex, hexFormat, defaultBroadcastTimeout)
 
 	if br.Failure != nil { // broadcast failed
-		return &SyncResult{
-			Action:        syncActionBroadcast,
-			ExecutedAt:    time.Now().UTC(),
-			Provider:      br.Provider,
-			StatusMessage: br.Failure.Error.Error(),
-		}, br.Failure.Error
+		return br.Failure.Error
 	}
 
-	return &SyncResult{
-		Action:        syncActionBroadcast,
-		ExecutedAt:    time.Now().UTC(),
-		Provider:      br.Provider,
-		StatusMessage: "broadcast success",
-	}, nil
+	return nil
 }
 
 // ///////////////
@@ -141,7 +129,6 @@ func _syncTxDataFromChain(ctx context.Context, syncTx *SyncTransaction, transact
 				Msgf("Transaction not found on-chain, will try again later")
 
 			syncTx.SyncStatus = SyncStatusReady
-			syncTx.addSyncResult(ctx, syncActionSync, "all", "transaction not found on-chain")
 			return nil
 		}
 		return spverrors.Wrapf(err, "could not query transaction")
@@ -179,20 +166,12 @@ func processSyncTxSave(ctx context.Context, txInfo *chainstate.TransactionInfo, 
 
 	transaction.setChainInfo(txInfo)
 	if err := transaction.Save(ctx); err != nil {
-		syncTx.addSyncResult(ctx, syncActionSync, "internal", err.Error())
 		return err
 	}
 
 	syncTx.SyncStatus = SyncStatusComplete
-	syncTx.Results.Results = append(syncTx.Results.Results, &SyncResult{
-		Action:        syncActionSync,
-		ExecutedAt:    time.Now().UTC(),
-		Provider:      chainstate.ProviderBroadcastClient,
-		StatusMessage: "transaction was found on-chain by " + chainstate.ProviderBroadcastClient,
-	})
 
 	if err := syncTx.Save(ctx); err != nil {
-		syncTx.addSyncResult(ctx, syncActionSync, "internal", err.Error())
 		return err
 	}
 

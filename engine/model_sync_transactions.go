@@ -2,7 +2,6 @@ package engine
 
 import (
 	"context"
-	"time"
 
 	"github.com/bitcoin-sv/spv-wallet/engine/datastore"
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
@@ -99,25 +98,6 @@ func (m *SyncTransaction) AfterCreated(_ context.Context) error {
 
 // BeforeUpdating will fire before the model is being updated
 func (m *SyncTransaction) BeforeUpdating(_ context.Context) error {
-	m.Client().Logger().Debug().
-		Str("txID", m.ID).
-		Msgf("starting: %s BeforeUpdate hook...", m.Name())
-
-	// Trim the results to the last 20
-	maxResultsLength := 20
-
-	ln := len(m.Results.Results)
-	if ln > maxResultsLength {
-		m.Client().Logger().Warn().
-			Str("txID", m.ID).
-			Msgf("trimming syncTx.Results")
-
-		m.Results.Results = m.Results.Results[ln-maxResultsLength:]
-	}
-
-	m.Client().Logger().Debug().
-		Str("txID", m.ID).
-		Msgf("end: %s BeforeUpdate hook", m.Name())
 	return nil
 }
 
@@ -125,19 +105,4 @@ func (m *SyncTransaction) BeforeUpdating(_ context.Context) error {
 func (m *SyncTransaction) Migrate(client datastore.ClientInterface) error {
 	err := client.IndexMetadata(client.GetTableName(tableSyncTransactions), metadataField)
 	return spverrors.Wrapf(err, "failed to index metadata column on model %s", m.GetModelName())
-}
-
-func (m *SyncTransaction) addSyncResult(ctx context.Context, action, provider, message string) {
-	m.Results.Results = append(m.Results.Results, &SyncResult{
-		Action:        action,
-		ExecutedAt:    time.Now().UTC(),
-		Provider:      provider,
-		StatusMessage: message,
-	})
-
-	if m.IsNew() {
-		return // do not save if new record! caller should decide if want to save new record
-	}
-
-	_ = m.Save(ctx)
 }

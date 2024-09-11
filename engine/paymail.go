@@ -101,7 +101,7 @@ func startP2PTransaction(client paymail.ClientInterface,
 }
 
 // finalizeP2PTransaction will notify the paymail provider about the transaction
-func finalizeP2PTransaction(ctx context.Context, client paymail.ClientInterface, p4 *PaymailP4, transaction *Transaction) (*paymail.P2PTransactionPayload, error) {
+func finalizeP2PTransaction(ctx context.Context, client paymail.ClientInterface, p4 *PaymailP4, transaction *Transaction) error {
 	if transaction.client != nil {
 		transaction.client.Logger().Info().
 			Str("txID", transaction.ID).
@@ -110,17 +110,17 @@ func finalizeP2PTransaction(ctx context.Context, client paymail.ClientInterface,
 
 	p2pTransaction, err := buildP2pTx(ctx, p4, transaction)
 	if err != nil {
-		return nil, err
+		return err
 	}
 
-	response, err := client.SendP2PTransaction(p4.ReceiveEndpoint, p4.Alias, p4.Domain, p2pTransaction)
+	_, err = client.SendP2PTransaction(p4.ReceiveEndpoint, p4.Alias, p4.Domain, p2pTransaction)
 	if err != nil {
 		if transaction.client != nil {
 			transaction.client.Logger().Info().
 				Str("txID", transaction.ID).
 				Msgf("finalizeerror %s, reason: %s", p4.Format, err.Error())
 		}
-		return nil, spverrors.Wrapf(err, "failed to send transaction via paymail")
+		return spverrors.Wrapf(err, "failed to send transaction via paymail")
 	}
 
 	if transaction.client != nil {
@@ -128,7 +128,7 @@ func finalizeP2PTransaction(ctx context.Context, client paymail.ClientInterface,
 			Str("txID", transaction.ID).
 			Msgf("successfully finished %s", p4.Format)
 	}
-	return &response.P2PTransactionPayload, nil
+	return nil
 }
 
 func buildP2pTx(ctx context.Context, p4 *PaymailP4, transaction *Transaction) (*paymail.P2PTransaction, error) {
