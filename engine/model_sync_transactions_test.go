@@ -22,30 +22,3 @@ func TestSyncTransaction_GetModelName(t *testing.T) {
 		require.Nil(t, syncTx)
 	})
 }
-
-func TestSyncTransaction_SaveHook(t *testing.T) {
-	t.Parallel()
-
-	t.Run("trim Results to last 20 messages", func(t *testing.T) {
-		// Given
-		ctx, client, deferMe := CreateTestSQLiteClient(t, false, true, withTaskManagerMockup())
-		defer deferMe()
-
-		opts := []ModelOps{WithClient(client), New()}
-		syncTx := newSyncTransaction(testTxID, &SyncConfig{SyncOnChain: true, Broadcast: true}, opts...)
-
-		txErr := syncTx.Save(ctx)
-		require.NoError(t, txErr)
-
-		// When
-		for i := 0; i < 40; i++ {
-			syncTx.Results.Results = append(syncTx.Results.Results, &SyncResult{Action: "test", StatusMessage: "msg"})
-		}
-		txErr = syncTx.Save(ctx)
-		require.NoError(t, txErr)
-
-		// Then
-		resultsLen := len(syncTx.Results.Results)
-		require.Equal(t, 20, resultsLen)
-	})
-}

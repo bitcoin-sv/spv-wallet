@@ -3,9 +3,6 @@ package engine
 import (
 	"context"
 	"fmt"
-	"time"
-
-	"github.com/bitcoin-sv/go-paymail"
 )
 
 // processP2PTransaction will process the sync transaction record, or save the failure
@@ -25,21 +22,12 @@ func processP2PTransaction(ctx context.Context, tx *Transaction) error {
 
 	// No draft?
 	if len(tx.DraftID) == 0 {
-		syncTx.addSyncResult(ctx, syncActionP2P, "all", "no draft found, cannot complete p2p")
-
 		return nil // TODO: why nil here??
 	}
 
 	// Notify any P2P paymail providers associated to the transaction
-	var results []*SyncResult
-	if results, err = _notifyPaymailProviders(ctx, tx); err != nil {
-		syncTx.addSyncResult(ctx, syncActionP2P, "", err.Error())
+	if err = _notifyPaymailProviders(ctx, tx); err != nil {
 		return err
-	}
-
-	// Update if we have some results
-	if len(results) > 0 {
-		syncTx.Results.Results = append(syncTx.Results.Results, results...)
 	}
 
 	// Update sync status to be ready now
@@ -48,7 +36,6 @@ func processP2PTransaction(ctx context.Context, tx *Transaction) error {
 	}
 
 	if err = syncTx.Save(ctx); err != nil {
-		syncTx.addSyncResult(ctx, syncActionP2P, "internal", err.Error())
 		return err
 	}
 
@@ -57,14 +44,11 @@ func processP2PTransaction(ctx context.Context, tx *Transaction) error {
 }
 
 // _notifyPaymailProviders will notify any associated Paymail providers
-func _notifyPaymailProviders(ctx context.Context, transaction *Transaction) ([]*SyncResult, error) {
+func _notifyPaymailProviders(ctx context.Context, transaction *Transaction) error {
 	pm := transaction.Client().PaymailClient()
 	outputs := transaction.draftTransaction.Configuration.Outputs
 
 	notifiedReceivers := make([]string, 0)
-	results := make([]*SyncResult, len(outputs))
-
-	var payload *paymail.P2PTransactionPayload
 	var err error
 
 	for _, out := range outputs {
@@ -79,23 +63,16 @@ func _notifyPaymailProviders(ctx context.Context, transaction *Transaction) ([]*
 			continue // no need to send the same transaction to the same receiver second time
 		}
 
-		if payload, err = finalizeP2PTransaction(
+		if err = finalizeP2PTransaction(
 			ctx,
 			pm,
 			p4,
 			transaction,
 		); err != nil {
-			return nil, err
+			return err
 		}
 
 		notifiedReceivers = append(notifiedReceivers, receiver)
-		results = append(results, &SyncResult{
-			Action:        syncActionP2P,
-			ExecutedAt:    time.Now().UTC(),
-			Provider:      p4.ReceiveEndpoint,
-			StatusMessage: "success: " + payload.TxID,
-		})
-
 	}
-	return results, nil
+	return nil
 }
