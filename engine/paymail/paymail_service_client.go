@@ -3,12 +3,12 @@ package paymail
 import (
 	"context"
 	"errors"
-	"strings"
 	"time"
 
 	"github.com/bitcoin-sv/go-paymail"
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/mrz1836/go-cachestore"
+	"github.com/rs/zerolog"
 )
 
 const cacheKeyCapabilities = "paymail-capabilities-"
@@ -17,16 +17,23 @@ const cacheTTLCapabilities = 60 * time.Minute
 type service struct {
 	cache         cachestore.ClientInterface
 	paymailClient paymail.ClientInterface
+	log           zerolog.Logger
 }
 
 // NewServiceClient creates a new paymail service client
-func NewServiceClient(cache cachestore.ClientInterface, paymailClient paymail.ClientInterface) ServiceClient {
+func NewServiceClient(cache cachestore.ClientInterface, paymailClient paymail.ClientInterface, log zerolog.Logger) ServiceClient {
 	if paymailClient == nil {
 		panic(spverrors.Newf("paymail client is required to create a new paymail service"))
 	}
+
+	if cache == nil {
+		log.Info().Msg("Doesn't receive cachestore, won't use cache for capabilities")
+	}
+
 	return &service{
 		cache:         cache,
 		paymailClient: paymailClient,
+		log:           log,
 	}
 }
 
@@ -44,58 +51,69 @@ func (s *service) GetSanitizedPaymail(addr string) (*paymail.SanitisedPaymail, e
 
 // GetCapabilities is a utility function to retrieve capabilities for a Paymail provider
 func (s *service) GetCapabilities(ctx context.Context, domain string) (*paymail.CapabilitiesPayload, error) {
-	// Attempt to get from cachestore
 	// todo: allow user to configure the time that they want to cache the capabilities (if they want to cache or not)
-	capabilities := new(paymail.CapabilitiesPayload)
-	if s.cache != nil {
-		if err := s.cache.GetModel(
-			ctx, cacheKeyCapabilities+domain, capabilities,
-		); err != nil && !errors.Is(err, cachestore.ErrKeyNotFound) {
-			return nil, spverrors.Wrapf(err, "failed to get capabilities from cachestore")
-		} else if len(capabilities.Capabilities) > 0 {
-			return capabilities, nil
-		}
+
+	cacheKey := cacheKeyCapabilities + domain
+
+	capabilities, err := s.loadCapabilitiesFromCache(ctx, cacheKey)
+	if err != nil {
+		return nil, err
+	}
+	if capabilities != nil {
+		return capabilities, err
 	}
 
+	response, err := s.loadCapabilities(domain)
+	if err != nil {
+		return nil, err
+	}
+
+	s.putCapabilitiesInCache(ctx, cacheKey, response.CapabilitiesPayload)
+
+	return &response.CapabilitiesPayload, nil
+}
+
+func (s *service) loadCapabilitiesFromCache(ctx context.Context, key string) (*paymail.CapabilitiesPayload, error) {
+	if s.cache == nil {
+		return nil, nil
+	}
+
+	capabilities := new(paymail.CapabilitiesPayload)
+	err := s.cache.GetModel(ctx, key, capabilities)
+	if errors.Is(err, cachestore.ErrKeyNotFound) {
+		return nil, nil
+	}
+	if err != nil {
+		return nil, spverrors.Wrapf(err, "failed to get capabilities from cachestore")
+	}
+
+	if len(capabilities.Capabilities) > 0 {
+		return capabilities, nil
+	}
+
+	return nil, nil
+}
+
+func (s *service) putCapabilitiesInCache(ctx context.Context, key string, capabilities paymail.CapabilitiesPayload) {
+	if s.cache == nil || s.cache.Engine().IsEmpty() {
+		return
+	}
+
+	err := s.cache.SetModel(ctx, key, capabilities, cacheTTLCapabilities)
+	if err != nil {
+		s.log.Warn().Err(err).Msgf("failed to store capabilities for key %s in cache", key)
+	}
+}
+
+func (s *service) loadCapabilities(domain string) (response *paymail.CapabilitiesResponse, err error) {
 	// Get SRV record (domain can be different!)
-	var response *paymail.CapabilitiesResponse
 	srv, err := s.paymailClient.GetSRVRecord(
 		paymail.DefaultServiceName, paymail.DefaultProtocol, domain,
 	)
 	if err != nil {
-		// Error returned was a real error
-		if !strings.Contains(err.Error(), "zero SRV records found") { // This error is from no SRV record being found
-			return nil, err //nolint:wrapcheck // we have handler for paymail errors
-		}
-
-		// Try to get capabilities without the SRV record
-		// 'Should no record be returned, a paymail client should assume a host of <domain>.<tld> and a port of 443.'
-		// http://bsvalias.org/02-01-host-discovery.html
-
-		// Get the capabilities via target
-		if response, err = s.paymailClient.GetCapabilities(
-			domain, paymail.DefaultPort,
-		); err != nil {
-			return nil, err //nolint:wrapcheck // we have handler for paymail errors
-		}
-	} else {
-		// Get the capabilities via SRV record
-		if response, err = s.paymailClient.GetCapabilities(
-			srv.Target, int(srv.Port),
-		); err != nil {
-			return nil, err //nolint:wrapcheck // we have handler for paymail errors
-		}
+		return
 	}
-
-	// Save to cachestore
-	if s.cache != nil && !s.cache.Engine().IsEmpty() {
-		_ = s.cache.SetModel(
-			context.Background(), cacheKeyCapabilities+domain,
-			&response.CapabilitiesPayload, cacheTTLCapabilities,
-		)
-	}
-
-	return &response.CapabilitiesPayload, nil
+	return s.paymailClient.GetCapabilities(srv.Target, int(srv.Port)) //nolint:wrapcheck // we have handler for paymail errors
 }
 
 // GetP2P will return the P2P urls and true if they are both found

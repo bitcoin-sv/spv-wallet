@@ -148,7 +148,8 @@ func (c *Client) loadPaymailComponents() (err error) {
 		}
 	}
 	if c.options.paymail.service == nil {
-		c.options.paymail.service = paymailclient.NewServiceClient(c.Cachestore(), c.options.paymail.client)
+		logger := c.Logger().With().Str("subservice", "paymail").Logger()
+		c.options.paymail.service = paymailclient.NewServiceClient(c.Cachestore(), c.options.paymail.client, logger)
 	}
 	return
 }
