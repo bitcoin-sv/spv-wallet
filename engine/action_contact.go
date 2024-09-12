@@ -17,16 +17,14 @@ func (c *Client) UpsertContact(ctx context.Context, ctcFName, ctcPaymail, reques
 		return nil, err
 	}
 
-	pmSrvnt, err := paymailclient.NewServiceClient(c.Cachestore(), c.PaymailClient())
-	if err != nil {
-		panic(err)
-	}
-	contactPm, err := pmSrvnt.GetSanitizedPaymail(ctcPaymail)
+	paymailService := c.PaymailService()
+
+	contactPm, err := paymailService.GetSanitizedPaymail(ctcPaymail)
 	if err != nil {
 		return nil, spverrors.Wrapf(err, "requested contact paymail is invalid")
 	}
 
-	contact, err := c.upsertContact(ctx, pmSrvnt, requesterXPubID, ctcFName, contactPm, opts...)
+	contact, err := c.upsertContact(ctx, paymailService, requesterXPubID, ctcFName, contactPm, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -36,7 +34,7 @@ func (c *Client) UpsertContact(ctx context.Context, ctcFName, ctcPaymail, reques
 		FullName: reqPm.PublicName,
 		Paymail:  reqPm.String(),
 	}
-	if _, err = pmSrvnt.AddContactRequest(ctx, contactPm, &requesterContactRequest); err != nil {
+	if _, err = paymailService.AddContactRequest(ctx, contactPm, &requesterContactRequest); err != nil {
 		c.Logger().Warn().
 			Str("requesterPaymail", reqPm.String()).
 			Str("requestedContact", ctcPaymail).
@@ -50,18 +48,15 @@ func (c *Client) UpsertContact(ctx context.Context, ctcFName, ctcPaymail, reques
 
 // AddContactRequest adds a new contact invitation if contact not exits or just checking if contact has still the same pub key if contact exists.
 func (c *Client) AddContactRequest(ctx context.Context, fullName, paymailAdress, requesterXPubID string, opts ...ModelOps) (*Contact, error) {
-	pmSrvnt, err := paymailclient.NewServiceClient(c.Cachestore(), c.PaymailClient())
-	if err != nil {
-		panic(err)
-	}
+	paymailService := c.PaymailService()
 
-	contactPm, err := pmSrvnt.GetSanitizedPaymail(paymailAdress)
+	contactPm, err := paymailService.GetSanitizedPaymail(paymailAdress)
 	if err != nil {
 		c.Logger().Error().Msgf("requested contact paymail is invalid. Reason: %s", err.Error())
 		return nil, spverrors.ErrRequestedContactInvalid
 	}
 
-	contactPki, err := pmSrvnt.GetPkiForPaymail(ctx, contactPm)
+	contactPki, err := paymailService.GetPkiForPaymail(ctx, contactPm)
 	if err != nil {
 		c.Logger().Error().Msgf("getting PKI for %s failed. Reason: %v", paymailAdress, err)
 		return nil, spverrors.ErrGettingPKIFailed

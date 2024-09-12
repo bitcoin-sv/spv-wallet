@@ -12,6 +12,7 @@ import (
 	"github.com/bitcoin-sv/spv-wallet/engine/logging"
 	"github.com/bitcoin-sv/spv-wallet/engine/metrics"
 	"github.com/bitcoin-sv/spv-wallet/engine/notifications"
+	paymailclient "github.com/bitcoin-sv/spv-wallet/engine/paymail"
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/bitcoin-sv/spv-wallet/engine/taskmanager"
 	"github.com/mrz1836/go-cachestore"
@@ -99,8 +100,9 @@ type (
 
 	// paymailOptions holds the configuration for Paymail
 	paymailOptions struct {
-		client       paymail.ClientInterface // Paymail client for communicating with Paymail providers
-		serverConfig *PaymailServerOptions   // Server configuration if Paymail is enabled
+		client       paymail.ClientInterface     // Paymail client for communicating with Paymail providers
+		service      paymailclient.ServiceClient // Paymail service for handling Paymail requests
+		serverConfig *PaymailServerOptions       // Server configuration if Paymail is enabled
 	}
 
 	// PaymailServerOptions is the options for the Paymail server
@@ -167,8 +169,8 @@ func NewClient(ctx context.Context, opts ...ClientOps) (ClientInterface, error) 
 		return nil, err
 	}
 
-	// Load the Paymail client (if client does not exist)
-	if err = client.loadPaymailClient(); err != nil {
+	// Load the Paymail client and service (if does not exist)
+	if err = client.loadPaymailComponents(); err != nil {
 		return nil, err
 	}
 

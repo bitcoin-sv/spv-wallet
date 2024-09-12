@@ -2,12 +2,21 @@ package engine
 
 import (
 	"github.com/bitcoin-sv/go-paymail"
+	paymailclient "github.com/bitcoin-sv/spv-wallet/engine/paymail"
 )
 
 // PaymailClient will return the Paymail if it exists
 func (c *Client) PaymailClient() paymail.ClientInterface {
 	if c.options.paymail != nil && c.options.paymail.client != nil {
 		return c.options.paymail.Client()
+	}
+	return nil
+}
+
+// PaymailService will return the Paymail Service if it exists
+func (c *Client) PaymailService() paymailclient.ServiceClient {
+	if c.options.paymail != nil && c.options.paymail.service != nil {
+		return c.options.paymail.ServiceClient()
 	}
 	return nil
 }
@@ -23,6 +32,11 @@ func (c *Client) GetPaymailConfig() *PaymailServerOptions {
 // Client will return the paymail client from the options struct
 func (p *paymailOptions) Client() paymail.ClientInterface {
 	return p.client
+}
+
+// ServiceClient will return the paymail service client from the options struct
+func (p *paymailOptions) ServiceClient() paymailclient.ServiceClient {
+	return p.service
 }
 
 // FromSender will return either the configuration value or the application default

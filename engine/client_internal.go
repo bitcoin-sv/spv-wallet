@@ -9,6 +9,7 @@ import (
 	"github.com/bitcoin-sv/spv-wallet/engine/cluster"
 	"github.com/bitcoin-sv/spv-wallet/engine/datastore"
 	"github.com/bitcoin-sv/spv-wallet/engine/notifications"
+	paymailclient "github.com/bitcoin-sv/spv-wallet/engine/paymail"
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/bitcoin-sv/spv-wallet/engine/taskmanager"
 	"github.com/mrz1836/go-cachestore"
@@ -127,11 +128,27 @@ func (c *Client) GetWebhooks(ctx context.Context) ([]notifications.ModelWebhook,
 	return c.options.notifications.webhookManager.GetAll(ctx)
 }
 
-// loadPaymailClient will load the Paymail client
-func (c *Client) loadPaymailClient() (err error) {
+// loadPaymailComponents will load the Paymail client
+func (c *Client) loadPaymailComponents() (err error) {
+	defer func() {
+		if r := recover(); r != nil {
+			if e, ok := r.(error); ok {
+				err = spverrors.Wrapf(e, "error when creating paymail components")
+			} else {
+				err = spverrors.Newf("error when creating paymail components: %v", r)
+			}
+		}
+	}()
+
 	// Only load if it's not set (the client can be overloaded)
 	if c.options.paymail.client == nil {
 		c.options.paymail.client, err = paymail.NewClient()
+		if err != nil {
+			return
+		}
+	}
+	if c.options.paymail.service == nil {
+		c.options.paymail.service = paymailclient.NewServiceClient(c.Cachestore(), c.options.paymail.client)
 	}
 	return
 }

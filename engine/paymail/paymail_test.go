@@ -33,8 +33,7 @@ func Test_GetP2P(t *testing.T) {
 		client := paymailmock.MockClient(testDomain)
 		client.WillRespondWithBasicCapabilities()
 
-		paymailClient, err := paymailclient.NewServiceClient(nil, client)
-		require.NoError(t, err)
+		paymailClient := paymailclient.NewServiceClient(nil, client)
 
 		hasP2P, p2pDestinationURL, p2pSubmitTxURL, _ := paymailClient.GetP2P(context.Background(), testDomain)
 		assert.False(t, hasP2P)
@@ -46,8 +45,7 @@ func Test_GetP2P(t *testing.T) {
 		client := paymailmock.MockClient(testDomain)
 		client.WillRespondWithP2PCapabilities()
 
-		paymailClient, err := paymailclient.NewServiceClient(nil, client)
-		require.NoError(t, err)
+		paymailClient := paymailclient.NewServiceClient(nil, client)
 
 		hasP2P, p2pDestinationURL, p2pSubmitTxURL, format := paymailClient.GetP2P(context.Background(), testDomain)
 		assert.True(t, hasP2P)
@@ -60,8 +58,7 @@ func Test_GetP2P(t *testing.T) {
 		client := paymailmock.MockClient(testDomain)
 		client.WillRespondWithP2PWithBEEFCapabilities()
 
-		paymailClient, err := paymailclient.NewServiceClient(nil, client)
-		require.NoError(t, err)
+		paymailClient := paymailclient.NewServiceClient(nil, client)
 
 		hasP2P, p2pDestinationURL, p2pSubmitTxURL, format := paymailClient.GetP2P(context.Background(), testDomain)
 		assert.True(t, hasP2P)
@@ -162,7 +159,7 @@ func Test_GetCapabilities(t *testing.T) {
 		// Get command
 		getCmd := redisConn.Command(cache.GetCommand, cacheKeyCapabilities+testDomain).Expect(nil)
 
-		paymailClient, err := paymailclient.NewServiceClient(tc.Cachestore(), client)
+		paymailClient := paymailclient.NewServiceClient(tc.Cachestore(), client)
 		require.NoError(t, err)
 
 		var payload *paymail.CapabilitiesPayload
@@ -206,7 +203,7 @@ func Test_GetCapabilities(t *testing.T) {
 		// Get command
 		getCmd := redisConn.Command(cache.GetCommand, cacheKeyCapabilities+testDomain).Expect(nil)
 
-		paymailClient, err := paymailclient.NewServiceClient(tc.Cachestore(), client)
+		paymailClient := paymailclient.NewServiceClient(tc.Cachestore(), client)
 		require.NoError(t, err)
 
 		var payload *paymail.CapabilitiesPayload

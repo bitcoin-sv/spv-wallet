@@ -3,7 +3,6 @@ package paymail
 import (
 	"context"
 	"errors"
-	"fmt"
 	"strings"
 	"time"
 
@@ -15,52 +14,20 @@ import (
 const cacheKeyCapabilities = "paymail-capabilities-"
 const cacheTTLCapabilities = 60 * time.Minute
 
-// PayloadFormat is the format of the paymail payload
-type PayloadFormat uint32
-
-// Types of Paymail payload formats
-const (
-	BasicPaymailPayloadFormat PayloadFormat = iota
-	BeefPaymailPayloadFormat
-)
-
-func (format PayloadFormat) String() string {
-	switch format {
-	case BasicPaymailPayloadFormat:
-		return "BasicPaymailPayloadFormat"
-
-	case BeefPaymailPayloadFormat:
-		return "BeefPaymailPayloadFormat"
-
-	default:
-		return fmt.Sprintf("%d", uint32(format))
-	}
-}
-
-// ServiceClient is a service that aims to make easier paymail operations.
-type ServiceClient interface {
-	GetSanitizedPaymail(addr string) (*paymail.SanitisedPaymail, error)
-	GetCapabilities(ctx context.Context, domain string) (*paymail.CapabilitiesPayload, error)
-	GetP2P(ctx context.Context, domain string) (success bool, p2pDestinationURL, p2pSubmitTxURL string, format PayloadFormat)
-	StartP2PTransaction(alias, domain, p2pDestinationURL string, satoshis uint64) (*paymail.PaymentDestinationPayload, error)
-	GetPkiForPaymail(ctx context.Context, sPaymail *paymail.SanitisedPaymail) (*paymail.PKIResponse, error)
-	AddContactRequest(ctx context.Context, receiverPaymail *paymail.SanitisedPaymail, contactData *paymail.PikeContactRequestPayload) (*paymail.PikeContactRequestResponse, error)
-}
-
 type service struct {
-	cs cachestore.ClientInterface
-	pc paymail.ClientInterface
+	cache         cachestore.ClientInterface
+	paymailClient paymail.ClientInterface
 }
 
 // NewServiceClient creates a new paymail service client
-func NewServiceClient(cs cachestore.ClientInterface, pc paymail.ClientInterface) (ServiceClient, error) {
-	if pc == nil {
-		return nil, spverrors.Newf("paymail client is required")
+func NewServiceClient(cache cachestore.ClientInterface, paymailClient paymail.ClientInterface) ServiceClient {
+	if paymailClient == nil {
+		panic(spverrors.Newf("paymail client is required to create a new paymail service"))
 	}
 	return &service{
-		cs: cs,
-		pc: pc,
-	}, nil
+		cache:         cache,
+		paymailClient: paymailClient,
+	}
 }
 
 // GetSanitizedPaymail validates and returns the sanitized version of paymail address (alias@domain.tld)
@@ -80,8 +47,8 @@ func (s *service) GetCapabilities(ctx context.Context, domain string) (*paymail.
 	// Attempt to get from cachestore
 	// todo: allow user to configure the time that they want to cache the capabilities (if they want to cache or not)
 	capabilities := new(paymail.CapabilitiesPayload)
-	if s.cs != nil {
-		if err := s.cs.GetModel(
+	if s.cache != nil {
+		if err := s.cache.GetModel(
 			ctx, cacheKeyCapabilities+domain, capabilities,
 		); err != nil && !errors.Is(err, cachestore.ErrKeyNotFound) {
 			return nil, spverrors.Wrapf(err, "failed to get capabilities from cachestore")
@@ -92,7 +59,7 @@ func (s *service) GetCapabilities(ctx context.Context, domain string) (*paymail.
 
 	// Get SRV record (domain can be different!)
 	var response *paymail.CapabilitiesResponse
-	srv, err := s.pc.GetSRVRecord(
+	srv, err := s.paymailClient.GetSRVRecord(
 		paymail.DefaultServiceName, paymail.DefaultProtocol, domain,
 	)
 	if err != nil {
@@ -106,14 +73,14 @@ func (s *service) GetCapabilities(ctx context.Context, domain string) (*paymail.
 		// http://bsvalias.org/02-01-host-discovery.html
 
 		// Get the capabilities via target
-		if response, err = s.pc.GetCapabilities(
+		if response, err = s.paymailClient.GetCapabilities(
 			domain, paymail.DefaultPort,
 		); err != nil {
 			return nil, err //nolint:wrapcheck // we have handler for paymail errors
 		}
 	} else {
 		// Get the capabilities via SRV record
-		if response, err = s.pc.GetCapabilities(
+		if response, err = s.paymailClient.GetCapabilities(
 			srv.Target, int(srv.Port),
 		); err != nil {
 			return nil, err //nolint:wrapcheck // we have handler for paymail errors
@@ -121,8 +88,8 @@ func (s *service) GetCapabilities(ctx context.Context, domain string) (*paymail.
 	}
 
 	// Save to cachestore
-	if s.cs != nil && !s.cs.Engine().IsEmpty() {
-		_ = s.cs.SetModel(
+	if s.cache != nil && !s.cache.Engine().IsEmpty() {
+		_ = s.cache.SetModel(
 			context.Background(), cacheKeyCapabilities+domain,
 			&response.CapabilitiesPayload, cacheTTLCapabilities,
 		)
@@ -140,7 +107,7 @@ func (s *service) GetP2P(ctx context.Context, domain string) (success bool, p2pD
 // StartP2PTransaction will start the P2P transaction, returning the reference ID and outputs
 func (s *service) StartP2PTransaction(alias, domain, p2pDestinationURL string, satoshis uint64) (*paymail.PaymentDestinationPayload, error) {
 	// Start the P2P transaction request
-	response, err := s.pc.GetP2PPaymentDestination(
+	response, err := s.paymailClient.GetP2PPaymentDestination(
 		p2pDestinationURL,
 		alias, domain,
 		&paymail.PaymentRequest{Satoshis: satoshis},
@@ -164,7 +131,7 @@ func (s *service) GetPkiForPaymail(ctx context.Context, sPaymail *paymail.Saniti
 	}
 
 	url := capabilities.GetString(paymail.BRFCPki, paymail.BRFCPkiAlternate)
-	pki, err := s.pc.GetPKI(url, sPaymail.Alias, sPaymail.Domain)
+	pki, err := s.paymailClient.GetPKI(url, sPaymail.Alias, sPaymail.Domain)
 	if err != nil {
 		return nil, err //nolint:wrapcheck // we have handler for paymail errors
 	}
@@ -184,7 +151,7 @@ func (s *service) AddContactRequest(ctx context.Context, receiverPaymail *paymai
 	}
 
 	url := capabilities.ExtractPikeInviteURL()
-	response, err := s.pc.AddContactRequest(url, receiverPaymail.Alias, receiverPaymail.Domain, contactData)
+	response, err := s.paymailClient.AddContactRequest(url, receiverPaymail.Alias, receiverPaymail.Domain, contactData)
 	if err != nil {
 		return nil, spverrors.Wrapf(err, "failed to send contact request")
 	}
