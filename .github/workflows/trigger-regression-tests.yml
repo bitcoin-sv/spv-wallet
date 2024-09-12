@@ -35,7 +35,7 @@ jobs:
 
       - name: Trigger Regression Tests
         env:
-          GH_TOKEN: ${{ secrets.GH_TOKEN }}
+          GH_TOKEN: ${{ secrets.REGRESSION_TEST_GH_TOKEN }}
         run: |
           RUN_ID=${{ env.RUN_ID }}
           IMAGE_TAG=${{ needs.release.outputs.imageVersion }}
@@ -57,7 +57,7 @@ jobs:
           success=false
           for i in {1..6}; do
             # Fetch the list of artifacts from the target repository
-            artifact_data=$(curl -s -H "Authorization: token ${{ secrets.GH_TOKEN }}" \
+            artifact_data=$(curl -s -H "Authorization: token ${{ secrets.REGRESSION_TEST_GH_TOKEN }}" \
                       https://api.github.com/repos/4chain-ag/spv-wallet-regression/actions/artifacts)
 
           # Check if an artifact containing the RUN_ID exists
