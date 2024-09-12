@@ -7,7 +7,7 @@ import (
 
 	"github.com/bitcoin-sv/spv-wallet/config"
 	"github.com/bitcoin-sv/spv-wallet/logging"
-	"github.com/bitcoin-sv/spv-wallet/server/auth"
+	"github.com/bitcoin-sv/spv-wallet/server/middleware"
 	"github.com/gin-gonic/gin"
 	"github.com/rs/zerolog"
 	"github.com/stretchr/testify/require"
@@ -46,15 +46,17 @@ func (ts *TestSuite) BaseSetupTest() {
 	var err error
 	nop := zerolog.Nop()
 
+	ts.Services, err = ts.AppConfig.LoadTestServices(context.Background())
+
 	gin.SetMode(gin.ReleaseMode)
 	engine := gin.New()
 	engine.Use(logging.GinMiddleware(&nop), gin.Recovery())
-	engine.Use(auth.CorsMiddleware())
+	engine.Use(middleware.AppContextMiddleware(ts.AppConfig, ts.Services.SpvWalletEngine, ts.Services.Logger))
+	engine.Use(middleware.CorsMiddleware())
 
 	ts.Router = engine
 	require.NotNil(ts.T(), ts.Router)
 
-	ts.Services, err = ts.AppConfig.LoadTestServices(context.Background())
 	require.NoError(ts.T(), err)
 }
 

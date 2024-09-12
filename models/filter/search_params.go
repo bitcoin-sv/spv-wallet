@@ -3,7 +3,7 @@ package filter
 type Page struct {
 	Number int    `json:"page,omitempty"`
 	Size   int    `json:"size,omitempty"`
-	Order  string `json:"order,omitempty"`
+	Sort   string `json:"sort,omitempty"`
 	SortBy string `json:"sortBy,omitempty"`
 }
 

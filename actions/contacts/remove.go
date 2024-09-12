@@ -4,7 +4,7 @@ import (
 	"net/http"
 
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
-	"github.com/bitcoin-sv/spv-wallet/server/auth"
+	"github.com/bitcoin-sv/spv-wallet/server/reqctx"
 	"github.com/gin-gonic/gin"
 )
 
@@ -19,13 +19,12 @@ import (
 // @Failure		500	"Internal server error"
 // @Router		/api/v1/contacts/{paymail} [delete]
 // @Security	x-auth-xpub
-func (a *Action) removeContact(c *gin.Context) {
-	reqXPubID := c.GetString(auth.ParamXPubHashKey)
+func removeContact(c *gin.Context, userContext *reqctx.UserContext) {
 	paymail := c.Param("paymail")
 
-	err := a.Services.SpvWalletEngine.DeleteContact(c, reqXPubID, paymail)
+	err := reqctx.Engine(c).DeleteContact(c, userContext.GetXPubID(), paymail)
 	if err != nil {
-		spverrors.ErrorResponse(c, err, a.Services.Logger)
+		spverrors.ErrorResponse(c, err, reqctx.Logger(c))
 		return
 	}
 

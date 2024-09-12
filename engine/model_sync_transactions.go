@@ -33,18 +33,6 @@ func newSyncTransaction(txID string, config *SyncConfig, opts ...ModelOps) *Sync
 		return nil
 	}
 
-	// Broadcasting
-	bs := SyncStatusReady
-	if !config.Broadcast {
-		bs = SyncStatusSkipped
-	}
-
-	// Notify Paymail P2P
-	ps := SyncStatusPending
-	if !config.PaymailP2P {
-		ps = SyncStatusSkipped
-	}
-
 	// Sync
 	ss := SyncStatusReady
 	if !config.SyncOnChain {
@@ -52,12 +40,10 @@ func newSyncTransaction(txID string, config *SyncConfig, opts ...ModelOps) *Sync
 	}
 
 	return &SyncTransaction{
-		BroadcastStatus: bs,
-		Configuration:   *config,
-		ID:              txID,
-		Model:           *NewBaseModel(ModelSyncTransaction, opts...),
-		P2PStatus:       ps,
-		SyncStatus:      ss,
+		Configuration: *config,
+		ID:            txID,
+		Model:         *NewBaseModel(ModelSyncTransaction, opts...),
+		SyncStatus:    ss,
 	}
 }
 
@@ -112,25 +98,6 @@ func (m *SyncTransaction) AfterCreated(_ context.Context) error {
 
 // BeforeUpdating will fire before the model is being updated
 func (m *SyncTransaction) BeforeUpdating(_ context.Context) error {
-	m.Client().Logger().Debug().
-		Str("txID", m.ID).
-		Msgf("starting: %s BeforeUpdate hook...", m.Name())
-
-	// Trim the results to the last 20
-	maxResultsLength := 20
-
-	ln := len(m.Results.Results)
-	if ln > maxResultsLength {
-		m.Client().Logger().Warn().
-			Str("txID", m.ID).
-			Msgf("trimming syncTx.Results")
-
-		m.Results.Results = m.Results.Results[ln-maxResultsLength:]
-	}
-
-	m.Client().Logger().Debug().
-		Str("txID", m.ID).
-		Msgf("end: %s BeforeUpdate hook", m.Name())
 	return nil
 }
 

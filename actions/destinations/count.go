@@ -6,39 +6,39 @@ import (
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/bitcoin-sv/spv-wallet/mappings"
 	"github.com/bitcoin-sv/spv-wallet/models/filter"
-	"github.com/bitcoin-sv/spv-wallet/server/auth"
+	"github.com/bitcoin-sv/spv-wallet/server/reqctx"
 	"github.com/gin-gonic/gin"
 )
 
 // count will fetch a count of destinations filtered by metadata
 // Count Destinations godoc
-// @Summary		Count Destinations
-// @Description	Count Destinations
+// @Summary		Count Destinations. This endpoint has been deprecated (it will be removed in the future).
+// @Description	Count Destinations. This endpoint has been deprecated (it will be removed in the future).
 // @Tags		Destinations
 // @Produce		json
 // @Param		CountDestinations body filter.CountDestinations false "Enables filtering of elements to be counted"
 // @Success		200	{number} int64 "Count of destinations"
 // @Failure		400	"Bad request - Error while parsing CountDestinations from request body"
 // @Failure 	500	"Internal Server Error - Error while fetching count of destinations"
-// @Router		/v1/destination/count [post]
+// @DeprecatedRouter  /v1/destination/count [post]
 // @Security	x-auth-xpub
-func (a *Action) count(c *gin.Context) {
-	reqXPubID := c.GetString(auth.ParamXPubHashKey)
+func count(c *gin.Context, userContext *reqctx.UserContext) {
+	logger := reqctx.Logger(c)
 
 	var reqParams filter.CountDestinations
 	if err := c.Bind(&reqParams); err != nil {
-		spverrors.ErrorResponse(c, spverrors.ErrCannotBindRequest, a.Services.Logger)
+		spverrors.ErrorResponse(c, spverrors.ErrCannotBindRequest, logger)
 		return
 	}
 
-	count, err := a.Services.SpvWalletEngine.GetDestinationsByXpubIDCount(
+	count, err := reqctx.Engine(c).GetDestinationsByXpubIDCount(
 		c.Request.Context(),
-		reqXPubID,
+		userContext.GetXPubID(),
 		mappings.MapToMetadata(reqParams.Metadata),
 		reqParams.Conditions.ToDbConditions(),
 	)
 	if err != nil {
-		spverrors.ErrorResponse(c, err, a.Services.Logger)
+		spverrors.ErrorResponse(c, err, logger)
 		return
 	}
 

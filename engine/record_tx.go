@@ -3,8 +3,8 @@ package engine
 import (
 	"context"
 	"fmt"
-	"time"
 
+	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/libsv/go-bt/v2"
 )
 
@@ -18,8 +18,6 @@ type recordTxStrategy interface {
 
 type recordIncomingTxStrategy interface {
 	recordTxStrategy
-	ForceBroadcast(force bool)
-	FailOnBroadcastError(forceFail bool)
 }
 
 func recordTransaction(ctx context.Context, c ClientInterface, strategy recordTxStrategy, opts ...ModelOps) (transaction *Transaction, err error) {
@@ -31,10 +29,19 @@ func recordTransaction(ctx context.Context, c ClientInterface, strategy recordTx
 		}()
 	}
 
-	unlock := waitForRecordTxWriteLock(ctx, c, strategy.LockKey())
+	unlock, err := newWriteLock(ctx, fmt.Sprintf(lockKeyRecordTx, strategy.LockKey()), c.Cachestore())
 	defer unlock()
+	if err != nil {
+		return nil, spverrors.ErrInternal.Wrap(err)
+	}
+
+	logger := c.Logger()
+	logger.Debug().Str("strategy", strategy.Name()).Str("txID", strategy.TxID()).Msg("Start executing recordTx strategy.")
 
 	transaction, err = strategy.Execute(ctx, c, opts)
+	if err != nil {
+		logger.Warn().Str("strategy", strategy.Name()).Str("txID", strategy.TxID()).Err(err).Msg("Failed to execute recordTx strategy.")
+	}
 	return
 }
 
@@ -63,13 +70,11 @@ func getIncomingTxRecordStrategy(ctx context.Context, c ClientInterface, btTx *b
 	if tx != nil {
 		tx.parsedTx = btTx
 		rts = &internalIncomingTx{
-			Tx:           tx,
-			broadcastNow: false,
+			Tx: tx,
 		}
 	} else {
 		rts = &externalIncomingTx{
-			BtTx:         btTx,
-			broadcastNow: false,
+			BtTx: btTx,
 		}
 	}
 
@@ -78,35 +83,4 @@ func getIncomingTxRecordStrategy(ctx context.Context, c ClientInterface, btTx *b
 	}
 
 	return rts, nil
-}
-
-func waitForRecordTxWriteLock(ctx context.Context, c ClientInterface, key string) func() {
-	var (
-		unlock func()
-		err    error
-	)
-	// Create the lock and set the release for after the function completes
-	// Waits for the moment when the transaction is unlocked and creates a new lock
-	// Relevant for SPV Wallet to SPV Wallet transactions, as we have 1 tx but need to record 2 txs - outgoing and incoming
-
-	lockKey := fmt.Sprintf(lockKeyRecordTx, key)
-
-	c.Logger().Debug().Msgf("try add write lock %s", lockKey)
-
-	for {
-
-		unlock, err = newWriteLock(
-			ctx, lockKey, c.Cachestore(),
-		)
-		if err == nil {
-			c.Logger().Debug().Msgf("added write lock %s", lockKey)
-			break
-		}
-		time.Sleep(time.Second * 1)
-	}
-
-	return func() {
-		c.Logger().Debug().Msgf("unlock %s", lockKey)
-		unlock()
-	}
 }

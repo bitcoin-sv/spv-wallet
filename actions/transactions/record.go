@@ -6,37 +6,35 @@ import (
 	"github.com/bitcoin-sv/spv-wallet/engine"
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/bitcoin-sv/spv-wallet/mappings"
-	"github.com/bitcoin-sv/spv-wallet/server/auth"
+	"github.com/bitcoin-sv/spv-wallet/server/reqctx"
 	"github.com/gin-gonic/gin"
 )
 
 // record will save and complete a transaction
-// Record transaction godoc
-// @Summary		Record transaction
-// @Description	Record transaction
+// @Summary		Record transaction - Use (POST) /api/v1/transactions instead.
+// @Description	This endpoint has been deprecated. Use (POST) /api/v1/transactions instead.
 // @Tags		Transactions
 // @Produce		json
 // @Param		RecordTransaction body RecordTransaction true "Transaction to be recorded"
 // @Success		201 {object} models.Transaction "Created transaction"
 // @Failure		400	"Bad request - Error while parsing RecordTransaction from request body or xpub not found"
 // @Failure 	500	"Internal Server Error - Error while recording transaction"
-// @Router		/v1/transaction/record [post]
+// @DeprecatedRouter	/v1/transaction/record [post]
 // @Security	x-auth-xpub
-func (a *Action) record(c *gin.Context) {
-	reqXPub := c.GetString(auth.ParamXPubKey)
+func record(c *gin.Context, userContext *reqctx.UserContext) {
+	logger := reqctx.Logger(c)
+	engineInstance := reqctx.Engine(c)
 
-	var requestBody RecordTransaction
-	if err := c.ShouldBindJSON(&requestBody); err != nil {
-		spverrors.ErrorResponse(c, err, a.Services.Logger)
+	xpub, err := userContext.ShouldGetXPub()
+	if err != nil {
+		spverrors.AbortWithErrorResponse(c, err, logger)
 		return
 	}
 
-	xPub, err := a.Services.SpvWalletEngine.GetXpub(c.Request.Context(), reqXPub)
+	var requestBody OldRecordTransaction
+	err = c.ShouldBindJSON(&requestBody)
 	if err != nil {
-		spverrors.ErrorResponse(c, err, a.Services.Logger)
-		return
-	} else if xPub == nil {
-		spverrors.ErrorResponse(c, spverrors.ErrCouldNotFindXpub, a.Services.Logger)
+		spverrors.ErrorResponse(c, err, logger)
 		return
 	}
 
@@ -47,14 +45,64 @@ func (a *Action) record(c *gin.Context) {
 
 	// Record a new transaction (get the hex from parameters)
 	var transaction *engine.Transaction
-	if transaction, err = a.Services.SpvWalletEngine.RecordTransaction(
+	if transaction, err = engineInstance.RecordTransaction(
 		c.Request.Context(),
-		reqXPub,
+		xpub,
 		requestBody.Hex,
 		requestBody.ReferenceID,
 		opts...,
 	); err != nil {
-		spverrors.ErrorResponse(c, err, a.Services.Logger)
+		spverrors.ErrorResponse(c, err, logger)
+		return
+	}
+
+	contract := mappings.MapToOldTransactionContract(transaction)
+	c.JSON(http.StatusCreated, contract)
+}
+
+// recordTransaction will save and complete a transaction
+// @Summary		Record transaction
+// @Description	Record transaction
+// @Tags		Transactions
+// @Produce		json
+// @Param		RecordTransaction body RecordTransaction true "Transaction to be recorded"
+// @Success		201 {object} response.Transaction "Created transaction"
+// @Failure		400	"Bad request - Error while parsing RecordTransaction from request body or xpub not found"
+// @Failure 	500	"Internal Server Error - Error while recording transaction"
+// @Router		/api/v1/transactions [post]
+// @Security	x-auth-xpub
+func recordTransaction(c *gin.Context, userContext *reqctx.UserContext) {
+	logger := reqctx.Logger(c)
+	engineInstance := reqctx.Engine(c)
+
+	xpub, err := userContext.ShouldGetXPub()
+	if err != nil {
+		spverrors.AbortWithErrorResponse(c, err, logger)
+		return
+	}
+
+	var requestBody RecordTransaction
+	err = c.ShouldBindJSON(&requestBody)
+	if err != nil {
+		spverrors.ErrorResponse(c, err, logger)
+		return
+	}
+
+	opts := make([]engine.ModelOps, 0)
+	if requestBody.Metadata != nil {
+		opts = append(opts, engine.WithMetadatas(requestBody.Metadata))
+	}
+
+	// Record a new transaction (get the hex from parameters)
+	var transaction *engine.Transaction
+	if transaction, err = engineInstance.RecordTransaction(
+		c.Request.Context(),
+		xpub,
+		requestBody.Hex,
+		requestBody.ReferenceID,
+		opts...,
+	); err != nil {
+		spverrors.ErrorResponse(c, err, logger)
 		return
 	}
 

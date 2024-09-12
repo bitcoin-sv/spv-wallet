@@ -4,7 +4,7 @@ import (
 	"net/http"
 
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
-	"github.com/bitcoin-sv/spv-wallet/server/auth"
+	"github.com/bitcoin-sv/spv-wallet/server/reqctx"
 	"github.com/gin-gonic/gin"
 )
 
@@ -21,8 +21,8 @@ import (
 // @Failure		500	"Internal server error"
 // @DeprecatedRouter  /v1/contact/confirmed/{paymail} [patch]
 // @Security	x-auth-xpub
-func (a *Action) oldConfirm(c *gin.Context) {
-	a.confirmContact(c)
+func oldConfirm(c *gin.Context, userContext *reqctx.UserContext) {
+	confirmContact(c, userContext)
 }
 
 // confirmContact will confirm contact request
@@ -37,14 +37,12 @@ func (a *Action) oldConfirm(c *gin.Context) {
 // @Failure		500	"Internal server error"
 // @Router		/api/v1/contacts/{paymail}/confirmation [post]
 // @Security	x-auth-xpub
-func (a *Action) confirmContact(c *gin.Context) {
-	reqXPubID := c.GetString(auth.ParamXPubHashKey)
+func confirmContact(c *gin.Context, userContext *reqctx.UserContext) {
 	paymail := c.Param("paymail")
 
-	err := a.Services.SpvWalletEngine.ConfirmContact(c, reqXPubID, paymail)
-
+	err := reqctx.Engine(c).ConfirmContact(c, userContext.GetXPubID(), paymail)
 	if err != nil {
-		spverrors.ErrorResponse(c, err, a.Services.Logger)
+		spverrors.ErrorResponse(c, err, reqctx.Logger(c))
 		return
 	}
 	c.Status(http.StatusOK)

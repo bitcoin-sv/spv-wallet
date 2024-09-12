@@ -21,12 +21,12 @@ func TestParseSearchParamsSuccessfully(t *testing.T) {
 			expectedResult: filter.SearchParams[ExampleConditionsForTests]{},
 		},
 		"query page": {
-			url: "?page=2&size=200&order=asc&sortBy=id",
+			url: "?page=2&size=200&sort=asc&sortBy=id",
 			expectedResult: filter.SearchParams[ExampleConditionsForTests]{
 				Page: filter.Page{
 					Number: 2,
 					Size:   200,
-					Order:  "asc",
+					Sort:   "asc",
 					SortBy: "id",
 				},
 			},

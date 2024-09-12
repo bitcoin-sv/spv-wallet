@@ -85,85 +85,6 @@ definitions:
           key2: value2
         type: object
     type: object
-  broadcast.SubmittedTx:
-    properties:
-      blockHash:
-        description: BlockHash is the hash of the block where the transaction was
-          included.
-        type: string
-      blockHeight:
-        description: BlockHeight is the height of the block where the transaction
-          was included.
-        type: integer
-      extraInfo:
-        description: ExtraInfo provides extra information for given transaction.
-        type: string
-      merklePath:
-        description: MerklePath is the Merkle path used to calculate Merkle root of
-          the block in which the transaction was included.
-        type: string
-      status:
-        description: Status is the status of the response.
-        type: integer
-      timestamp:
-        description: Timestamp is the timestamp of the block where the transaction
-          was included.
-        type: string
-      title:
-        description: Title is the title of the response.
-        type: string
-      txStatus:
-        allOf:
-        - $ref: '#/definitions/broadcast.TxStatus'
-        description: TxStatus is the status of the transaction.
-      txid:
-        description: TxID is the transaction id.
-        type: string
-    type: object
-  broadcast.TxStatus:
-    enum:
-    - UNKNOWN
-    - QUEUED
-    - RECEIVED
-    - STORED
-    - ANNOUNCED_TO_NETWORK
-    - REQUESTED_BY_NETWORK
-    - SENT_TO_NETWORK
-    - ACCEPTED_BY_NETWORK
-    - SEEN_ON_NETWORK
-    - MINED
-    - SEEN_IN_ORPHAN_MEMPOOL
-    - CONFIRMED
-    - REJECTED
-    type: string
-    x-enum-comments:
-      AcceptedByNetwork: "7"
-      AnnouncedToNetwork: "4"
-      Confirmed: "108"
-      Mined: "9"
-      Queued: "1"
-      Received: "2"
-      Rejected: "109"
-      RequestedByNetwork: "5"
-      SeenInOrphanMempool: "10"
-      SeenOnNetwork: "8"
-      SentToNetwork: "6"
-      Stored: "3"
-      Unknown: "0"
-    x-enum-varnames:
-    - Unknown
-    - Queued
-    - Received
-    - Stored
-    - AnnouncedToNetwork
-    - RequestedByNetwork
-    - SentToNetwork
-    - AcceptedByNetwork
-    - SeenOnNetwork
-    - Mined
-    - SeenInOrphanMempool
-    - Confirmed
-    - Rejected
   contacts.UpsertContact:
     properties:
       fullName:
@@ -838,6 +759,9 @@ definitions:
         type: integer
       hex:
         type: string
+      id:
+        example: d425432e0d10a46af1ec6d00f380e9581ebf7907f3486572b3cd561a4c326e14
+        type: string
       includeDeleted:
         default: false
         description: IncludeDeleted is a flag whether or not to include deleted items
@@ -1122,57 +1046,6 @@ definitions:
         type: string
       xpub_id:
         description: XpubID is a destination's xpub related id used to register destination.
-        example: bb8593f85ef8056a77026ad415f02128f3768906de53e9e8bf8749fe2d66cf50
-        type: string
-    type: object
-  models.DraftTransaction:
-    properties:
-      configuration:
-        allOf:
-        - $ref: '#/definitions/models.TransactionConfig'
-        description: Configuration contains draft transaction configuration.
-      created_at:
-        description: CreatedAt is a time when outer model was created.
-        example: "2024-02-26T11:00:28.069911Z"
-        type: string
-      deleted_at:
-        description: DeletedAt is a time when outer model was deleted.
-        example: "2024-02-26T11:02:28.069911Z"
-        type: string
-      expires_at:
-        description: ExpiresAt is a time when draft transaction expired.
-        example: "2024-02-26T11:00:28.069911Z"
-        type: string
-      final_tx_id:
-        description: FinalTxID is a final transaction id.
-        example: cfe30797f0b5fc098b32194e857569a7a1edd829fddf3df4567796b738de386d
-        type: string
-      hex:
-        description: Hex is a draft transaction hex.
-        example: 0100000002...
-        type: string
-      id:
-        description: ID is a draft transaction id.
-        example: b356f7fa00cd3f20cce6c21d704cd13e871d28d714a5ebd0532f5a0e0cde63f7
-        type: string
-      metadata:
-        additionalProperties:
-          type: string
-        description: Metadata is a metadata map of outer model.
-        example:
-          key: value
-          key2: value2
-        type: object
-      status:
-        description: Status is a draft transaction lastly monitored status.
-        example: complete
-        type: string
-      updated_at:
-        description: UpdatedAt is a time when outer model was updated.
-        example: "2024-02-26T11:01:28.069911Z"
-        type: string
-      xpub_id:
-        description: XpubID is a draft transaction's xpub used to sign transaction.
         example: bb8593f85ef8056a77026ad415f02128f3768906de53e9e8bf8749fe2d66cf50
         type: string
     type: object
@@ -1506,10 +1379,9 @@ definitions:
         example: 49
         type: integer
       expires_in:
-        allOf:
-        - $ref: '#/definitions/time.Duration'
         description: ExpiresAt is a time when transaction expires.
-        example: 1000
+        example: "1000"
+        type: string
       fee:
         description: Fee is a fee amount.
         example: 1
@@ -1738,6 +1610,13 @@ definitions:
         example: 01d0d0067652f684c6acb3683763f353fce55f6496521c7d99e71e1d27e53f5c
         type: string
     type: object
+  models.Webhook:
+    properties:
+      banned:
+        type: boolean
+      url:
+        type: string
+    type: object
   models.Xpub:
     properties:
       created_at:
@@ -1777,6 +1656,45 @@ definitions:
       updated_at:
         description: UpdatedAt is a time when outer model was updated.
         example: "2024-02-26T11:01:28.069911Z"
+        type: string
+    type: object
+  response.AccessKey:
+    properties:
+      createdAt:
+        description: CreatedAt is a time when outer model was created.
+        example: "2024-02-26T11:00:28.069911Z"
+        type: string
+      deletedAt:
+        description: DeletedAt is a time when outer model was deleted.
+        example: "2024-02-26T11:02:28.069911Z"
+        type: string
+      id:
+        description: ID is an hash of the compressed public key.
+        example: 874b86d6fd1d6c85a857e73180164203d8d23211bfd9d04d210f9f7fde5b82d8
+        type: string
+      key:
+        description: Key is a string representation of an access key.
+        example: 3fd870d6bf1725f04084cf31209c04be5bd9bed001a390ad3bc632a55a3ee078
+        type: string
+      metadata:
+        additionalProperties:
+          type: string
+        description: Metadata is a metadata map of outer model.
+        example:
+          key: value
+          key2: value2
+        type: object
+      revokedAt:
+        description: RevokedAt is a time when access key was revoked.
+        example: "2024-02-26T11:02:28.069911Z"
+        type: string
+      updatedAt:
+        description: UpdatedAt is a time when outer model was updated.
+        example: "2024-02-26T11:01:28.069911Z"
+        type: string
+      xpubId:
+        description: XpubID is an access key's xpub related id.
+        example: bb8593f85ef8056a77026ad415f02128f3768906de53e9e8bf8749fe2d66cf50
         type: string
     type: object
   response.Contact:
@@ -1836,6 +1754,161 @@ definitions:
     - ContactAwaitAccept
     - ContactConfirmed
     - ContactRejected
+  response.Destination:
+    properties:
+      address:
+        description: Address is a destination's address.
+        example: 1CDUf7CKu8ocTTkhcYUbq75t14Ft168K65
+        type: string
+      chain:
+        description: Chain is a destination's chain representation.
+        example: 0
+        type: integer
+      createdAt:
+        description: CreatedAt is a time when outer model was created.
+        example: "2024-02-26T11:00:28.069911Z"
+        type: string
+      deletedAt:
+        description: DeletedAt is a time when outer model was deleted.
+        example: "2024-02-26T11:02:28.069911Z"
+        type: string
+      draftId:
+        description: DraftID is a destination's draft id.
+        example: b356f7fa00cd3f20cce6c21d704cd13e871d28d714a5ebd0532f5a0e0cde63f7
+        type: string
+      id:
+        description: ID is a destination id which is the hash of the LockingScript.
+        example: 82a5d848f997819a478b05fb713208d7f3aa66da5ba00953b9845fb1701f9b98
+        type: string
+      lockingScript:
+        description: LockingScript is a destination's locking script.
+        example: 76a9147b05764a97f3b4b981471492aa703b188e45979b88ac
+        type: string
+      metadata:
+        additionalProperties:
+          type: string
+        description: Metadata is a metadata map of outer model.
+        example:
+          key: value
+          key2: value2
+        type: object
+      num:
+        description: Num is a destination's num representation.
+        example: 0
+        type: integer
+      paymailExternalDerivationNum:
+        description: PaymailExternalDerivationNum is the chain/num/(ext_derivation_num)
+          location of the address related to the xPub.
+        example: 0
+        type: integer
+      type:
+        description: Type is a destination's type.
+        example: pubkeyhash
+        type: string
+      updatedAt:
+        description: UpdatedAt is a time when outer model was updated.
+        example: "2024-02-26T11:01:28.069911Z"
+        type: string
+      xpubId:
+        description: XpubID is a destination's xpub related id used to register destination.
+        example: bb8593f85ef8056a77026ad415f02128f3768906de53e9e8bf8749fe2d66cf50
+        type: string
+    type: object
+  response.DraftTransaction:
+    properties:
+      configuration:
+        allOf:
+        - $ref: '#/definitions/response.TransactionConfig'
+        description: Configuration contains draft transaction configuration.
+      createdAt:
+        description: CreatedAt is a time when outer model was created.
+        example: "2024-02-26T11:00:28.069911Z"
+        type: string
+      deletedAt:
+        description: DeletedAt is a time when outer model was deleted.
+        example: "2024-02-26T11:02:28.069911Z"
+        type: string
+      expiresAt:
+        description: ExpiresAt is a time when draft transaction expired.
+        example: "2024-02-26T11:00:28.069911Z"
+        type: string
+      finalTxId:
+        description: FinalTxID is a final transaction id.
+        example: cfe30797f0b5fc098b32194e857569a7a1edd829fddf3df4567796b738de386d
+        type: string
+      hex:
+        description: Hex is a draft transaction hex.
+        example: 0100000002...
+        type: string
+      id:
+        description: ID is a draft transaction id.
+        example: b356f7fa00cd3f20cce6c21d704cd13e871d28d714a5ebd0532f5a0e0cde63f7
+        type: string
+      metadata:
+        additionalProperties:
+          type: string
+        description: Metadata is a metadata map of outer model.
+        example:
+          key: value
+          key2: value2
+        type: object
+      status:
+        description: Status is a draft transaction lastly monitored status.
+        example: complete
+        type: string
+      updatedAt:
+        description: UpdatedAt is a time when outer model was updated.
+        example: "2024-02-26T11:01:28.069911Z"
+        type: string
+      xpubId:
+        description: XpubID is a draft transaction's xpub used to sign transaction.
+        example: bb8593f85ef8056a77026ad415f02128f3768906de53e9e8bf8749fe2d66cf50
+        type: string
+    type: object
+  response.FeeUnit:
+    properties:
+      bytes:
+        description: Bytes is a fee unit bytes representation.
+        example: 1000
+        type: integer
+      satoshis:
+        description: Satoshis is a fee unit satoshis amount.
+        example: 1
+        type: integer
+    type: object
+  response.MapProtocol:
+    properties:
+      app:
+        description: App is a map protocol app.
+        type: string
+      keys:
+        additionalProperties: true
+        description: Keys is a map protocol keys.
+        type: object
+      type:
+        description: Type is a map protocol type.
+        type: string
+    type: object
+  response.OpReturn:
+    properties:
+      hex:
+        description: Hex is a full hex of op return.
+        type: string
+      hexParts:
+        description: HexParts is a slice of splitted hex parts.
+        items:
+          type: string
+        type: array
+      map:
+        allOf:
+        - $ref: '#/definitions/response.MapProtocol'
+        description: Map is a pointer to a map protocol object.
+      stringParts:
+        description: StringParts is a slice of string parts.
+        items:
+          type: string
+        type: array
+    type: object
   response.PageDescription:
     properties:
       number:
@@ -1852,6 +1925,18 @@ definitions:
         description: TotalPages is total number of pages returned
         type: integer
     type: object
+  response.PageModel-response_AccessKey:
+    properties:
+      content:
+        description: Content is the collection of elements that serves as the content
+        items:
+          $ref: '#/definitions/response.AccessKey'
+        type: array
+      page:
+        allOf:
+        - $ref: '#/definitions/response.PageDescription'
+        description: Page is the page descriptor
+    type: object
   response.PageModel-response_Contact:
     properties:
       content:
@@ -1864,59 +1949,510 @@ definitions:
         - $ref: '#/definitions/response.PageDescription'
         description: Page is the page descriptor
     type: object
-  time.Duration:
-    enum:
-    - -9223372036854775808
-    - 9223372036854775807
-    - 1
-    - 1000
-    - 1000000
-    - 1000000000
-    - 60000000000
-    - 3600000000000
-    - -9223372036854775808
-    - 9223372036854775807
-    - 1
-    - 1000
-    - 1000000
-    - 1000000000
-    - 60000000000
-    - 3600000000000
-    - -9223372036854775808
-    - 9223372036854775807
-    - 1
-    - 1000
-    - 1000000
-    - 1000000000
-    - 60000000000
-    - 3600000000000
-    type: integer
-    x-enum-varnames:
-    - minDuration
-    - maxDuration
-    - Nanosecond
-    - Microsecond
-    - Millisecond
-    - Second
-    - Minute
-    - Hour
-    - minDuration
-    - maxDuration
-    - Nanosecond
-    - Microsecond
-    - Millisecond
-    - Second
-    - Minute
-    - Hour
-    - minDuration
-    - maxDuration
-    - Nanosecond
-    - Microsecond
-    - Millisecond
-    - Second
-    - Minute
-    - Hour
-  transactions.NewTransaction:
+  response.PageModel-response_Transaction:
+    properties:
+      content:
+        description: Content is the collection of elements that serves as the content
+        items:
+          $ref: '#/definitions/response.Transaction'
+        type: array
+      page:
+        allOf:
+        - $ref: '#/definitions/response.PageDescription'
+        description: Page is the page descriptor
+    type: object
+  response.PageModel-response_Utxo:
+    properties:
+      content:
+        description: Content is the collection of elements that serves as the content
+        items:
+          $ref: '#/definitions/response.Utxo'
+        type: array
+      page:
+        allOf:
+        - $ref: '#/definitions/response.PageDescription'
+        description: Page is the page descriptor
+    type: object
+  response.PaymailP4:
+    properties:
+      alias:
+        description: Alias is a paymail p4 alias.
+        type: string
+      domain:
+        description: Domain is a paymail p4 domain.
+        type: string
+      fromPaymail:
+        description: FromPaymail is a paymail p4 from paymail.
+        type: string
+      note:
+        description: Note is a paymail p4 note.
+        type: string
+      pubKey:
+        description: PubKey is a paymail p4 pub key.
+        type: string
+      receiveEndpoint:
+        description: ReceiveEndpoint is a paymail p4 receive endpoint.
+        type: string
+      referenceId:
+        description: ReferenceID is a paymail p4 reference id.
+        type: string
+      resolutionType:
+        description: ResolutionType is a paymail p4 resolution type.
+        type: string
+    type: object
+  response.ScriptOutput:
+    properties:
+      address:
+        description: Address is a script output address.
+        type: string
+      satoshis:
+        description: Satoshis is a script output satoshis.
+        type: integer
+      script:
+        description: Script is a script output script.
+        type: string
+      scriptType:
+        description: ScriptType is a script output script type.
+        type: string
+    type: object
+  response.SharedConfig:
+    properties:
+      experimentalFeatures:
+        additionalProperties:
+          type: boolean
+        description: ExperimentalFeatures is a map of experimental features handled
+          by spv-wallet.
+        example:
+          pikeEnabled: true
+        type: object
+      paymailDomains:
+        description: PaymailDomains is a list of paymail domains handled by spv-wallet.
+        example:
+        - spv-wallet.com
+        items:
+          type: string
+        type: array
+    type: object
+  response.SyncConfig:
+    properties:
+      broadcast:
+        description: Broadcast is a flag that indicates whether to broadcast transaction
+          or not.
+        type: boolean
+      broadcastInstant:
+        description: BroadcastInstant is a flag that indicates whether to broadcast
+          transaction instantly or not.
+        type: boolean
+      paymailP2p:
+        description: PaymailP2P is a flag that indicates whether to use paymail p2p
+          or not.
+        type: boolean
+      syncOnChain:
+        description: SyncOnChain is a flag that indicates whether to sync transaction
+          on chain or not.
+        type: boolean
+    type: object
+  response.Transaction:
+    properties:
+      blockHash:
+        description: BlockHash is a block hash that transaction is in.
+        example: 0000000000000000046e81025ca6cfbd2f45c7331f650c77edc99a14d5a1f0d0
+        type: string
+      blockHeight:
+        description: BlockHeight is a block height that transaction is in.
+        example: 833505
+        type: integer
+      createdAt:
+        description: CreatedAt is a time when outer model was created.
+        example: "2024-02-26T11:00:28.069911Z"
+        type: string
+      deletedAt:
+        description: DeletedAt is a time when outer model was deleted.
+        example: "2024-02-26T11:02:28.069911Z"
+        type: string
+      direction:
+        description: TransactionDirection is a transaction direction (incoming/outgoing).
+        example: outgoing
+        type: string
+      draftId:
+        description: DraftID is a transaction related draft id.
+        example: b356f7fa00cd3f20cce6c21d704cd13e871d28d714a5ebd0532f5a0e0cde63f7
+        type: string
+      fee:
+        description: Fee is a transaction fee.
+        example: 1
+        type: integer
+      hex:
+        description: Hex is a transaction hex.
+        example: 0100000002...
+        type: string
+      id:
+        description: ID is a transaction id.
+        example: 01d0d0067652f684c6acb3683763f353fce55f6496521c7d99e71e1d27e53f5c
+        type: string
+      metadata:
+        additionalProperties:
+          type: string
+        description: Metadata is a metadata map of outer model.
+        example:
+          key: value
+          key2: value2
+        type: object
+      numberOfInputs:
+        description: NumberOfInputs is a number of transaction inputs.
+        example: 3
+        type: integer
+      numberOfOutputs:
+        description: NumberOfOutputs is a number of transaction outputs.
+        example: 2
+        type: integer
+      outputValue:
+        description: OutputValue is a total output value.
+        example: 50
+        type: integer
+      outputs:
+        additionalProperties:
+          type: integer
+        description: Outputs represents all spv-wallet-transaction outputs. Will be
+          shown only for admin.
+        example:
+          92640954841510a9d95f7737a43075f22ebf7255976549de4c52e8f3faf57470: -51
+          9d07977d2fc14402426288a6010b4cdf7d91b61461acfb75af050b209d2d07ba: 50
+        type: object
+      status:
+        description: Status is a transaction status.
+        example: MINED
+        type: string
+      totalValue:
+        description: TotalValue is a total input value.
+        example: 51
+        type: integer
+      updatedAt:
+        description: UpdatedAt is a time when outer model was updated.
+        example: "2024-02-26T11:01:28.069911Z"
+        type: string
+      xpubInIds:
+        description: XpubInIDs is a slice of xpub input ids.
+        example:
+        - '[bb8593f85ef8056a77026ad415f02128f3768906de53e9e8bf8749fe2d66cf50]'
+        items:
+          type: string
+        type: array
+      xpubOutIds:
+        description: XpubOutIDs is a slice of xpub output ids.
+        example:
+        - '[2075eca10bf2688b38cd7fdad6c24562463a9a26ae505d66c480fd53165dbaa2]'
+        items:
+          type: string
+        type: array
+    type: object
+  response.TransactionConfig:
+    properties:
+      changeDestinations:
+        description: ChangeDestinations is a slice of change destinations.
+        items:
+          $ref: '#/definitions/response.Destination'
+        type: array
+      changeDestinationsStrategy:
+        description: ChangeStrategy is a change strategy.
+        type: string
+      changeMinimumSatoshis:
+        description: ChangeMinimumSatoshis is a minimum satoshis for change.
+        example: 0
+        type: integer
+      changeNumberOfDestinations:
+        description: ChangeNumberOfDestinations is a number of change destinations.
+        example: 1
+        type: integer
+      changeSatoshis:
+        description: ChangeSatoshis is a change satoshis.
+        example: 49
+        type: integer
+      expiresIn:
+        description: ExpiresAt is a time when transaction expires.
+        example: "1000"
+        type: string
+      fee:
+        description: Fee is a fee amount.
+        example: 1
+        type: integer
+      feeUnit:
+        allOf:
+        - $ref: '#/definitions/response.FeeUnit'
+        description: FeeUnit is a pointer to a fee unit object.
+      fromUtxos:
+        description: FromUtxos is a slice of from utxos used to build transaction.
+        items:
+          $ref: '#/definitions/response.UtxoPointer'
+        type: array
+      includeUtxos:
+        description: IncludeUtxos is a slice of utxos to include in transaction.
+        items:
+          $ref: '#/definitions/response.UtxoPointer'
+        type: array
+      inputs:
+        description: Inputs is a slice of transaction inputs.
+        items:
+          $ref: '#/definitions/response.TransactionInput'
+        type: array
+      outputs:
+        description: Outputs is a slice of transaction outputs.
+        items:
+          $ref: '#/definitions/response.TransactionOutput'
+        type: array
+      sendAllTo:
+        allOf:
+        - $ref: '#/definitions/response.TransactionOutput'
+        description: SendAllTo is a pointer to a transaction output object.
+      sync:
+        allOf:
+        - $ref: '#/definitions/response.SyncConfig'
+        description: Sync contains sync configuration.
+    type: object
+  response.TransactionInput:
+    properties:
+      createdAt:
+        description: CreatedAt is a time when outer model was created.
+        example: "2024-02-26T11:00:28.069911Z"
+        type: string
+      deletedAt:
+        description: DeletedAt is a time when outer model was deleted.
+        example: "2024-02-26T11:02:28.069911Z"
+        type: string
+      destination:
+        allOf:
+        - $ref: '#/definitions/response.Destination'
+        description: Destination is a pointer to a destination object.
+      draftId:
+        description: DraftID is a utxo transaction related draft id.
+        example: b356f7fa00cd3f20cce6c21d704cd13e871d28d714a5ebd0532f5a0e0cde63f7
+        type: string
+      id:
+        description: ID is a utxo id which is a hash from transaction id and output
+          index.
+        example: c706a448748d398d542cf4dfad797c9a4b123ebb72dbfb8b27f3d0f1dda99b58
+        type: string
+      metadata:
+        additionalProperties:
+          type: string
+        description: Metadata is a metadata map of outer model.
+        example:
+          key: value
+          key2: value2
+        type: object
+      outputIndex:
+        description: OutputIndex is a output index that utxo points to.
+        example: 0
+        type: integer
+      reservedAt:
+        description: ReservedAt is a time utxo was reserved at.
+        example: "2024-02-26T11:00:28.069911Z"
+        type: string
+      satoshis:
+        description: Satoshis is a utxo satoshis amount.
+        example: 100
+        type: integer
+      scriptPubKey:
+        description: ScriptPubKey is a utxo script pub key.
+        example: 76a91433ba3607a902bc022164bcb6e993f27bd040241c88ac
+        type: string
+      spendingTxId:
+        description: SpendingTxID is a spending transaction id - null if not spent
+          yet.
+        example: 01d0d0067652f684c6acb3683763f353fce55f6496521c7d99e71e1d27e53f5c
+        type: string
+      transaction:
+        allOf:
+        - $ref: '#/definitions/response.Transaction'
+        description: Transaction is a transaction pointer that utxo points to.
+      transactionId:
+        description: TransactionID is a transaction id that utxo points to.
+        example: 01d0d0067652f684c6acb3683763f353fce55f6496521c7d99e71e1d27e53f5c
+        type: string
+      type:
+        description: Type is a utxo type.
+        example: pubkeyhash
+        type: string
+      updatedAt:
+        description: UpdatedAt is a time when outer model was updated.
+        example: "2024-02-26T11:01:28.069911Z"
+        type: string
+      xpubId:
+        description: XpubID is a utxo related xpub id.
+        example: bb8593f85ef8056a77026ad415f02128f3768906de53e9e8bf8749fe2d66cf50
+        type: string
+    type: object
+  response.TransactionOutput:
+    properties:
+      opReturn:
+        allOf:
+        - $ref: '#/definitions/response.OpReturn'
+        description: OpReturn is a pointer to a op return object.
+      paymailP4:
+        allOf:
+        - $ref: '#/definitions/response.PaymailP4'
+        description: PaymailP4 is a pointer to a paymail p4 object.
+      satoshis:
+        description: Satoshis is a satoshis amount.
+        example: 50
+        type: integer
+      script:
+        description: Script is a transaction output string representation of script.
+        example: 76a91433ba3607a902bc022164bcb6e993f27bd040241c88ac
+        type: string
+      scripts:
+        description: ScriptType is a transaction output script type.
+        items:
+          $ref: '#/definitions/response.ScriptOutput'
+        type: array
+      to:
+        description: To is a transaction output destination address.
+        example: 1MB8MfCyA5mGt3UBhxYr1exBfsFWgL1gCm
+        type: string
+      useForChange:
+        description: UseForChange is a flag that indicates if this output should be
+          used for change.
+        example: false
+        type: boolean
+    type: object
+  response.Utxo:
+    properties:
+      createdAt:
+        description: CreatedAt is a time when outer model was created.
+        example: "2024-02-26T11:00:28.069911Z"
+        type: string
+      deletedAt:
+        description: DeletedAt is a time when outer model was deleted.
+        example: "2024-02-26T11:02:28.069911Z"
+        type: string
+      draftId:
+        description: DraftID is a utxo transaction related draft id.
+        example: b356f7fa00cd3f20cce6c21d704cd13e871d28d714a5ebd0532f5a0e0cde63f7
+        type: string
+      id:
+        description: ID is a utxo id which is a hash from transaction id and output
+          index.
+        example: c706a448748d398d542cf4dfad797c9a4b123ebb72dbfb8b27f3d0f1dda99b58
+        type: string
+      metadata:
+        additionalProperties:
+          type: string
+        description: Metadata is a metadata map of outer model.
+        example:
+          key: value
+          key2: value2
+        type: object
+      outputIndex:
+        description: OutputIndex is a output index that utxo points to.
+        example: 0
+        type: integer
+      reservedAt:
+        description: ReservedAt is a time utxo was reserved at.
+        example: "2024-02-26T11:00:28.069911Z"
+        type: string
+      satoshis:
+        description: Satoshis is a utxo satoshis amount.
+        example: 100
+        type: integer
+      scriptPubKey:
+        description: ScriptPubKey is a utxo script pub key.
+        example: 76a91433ba3607a902bc022164bcb6e993f27bd040241c88ac
+        type: string
+      spendingTxId:
+        description: SpendingTxID is a spending transaction id - null if not spent
+          yet.
+        example: 01d0d0067652f684c6acb3683763f353fce55f6496521c7d99e71e1d27e53f5c
+        type: string
+      transaction:
+        allOf:
+        - $ref: '#/definitions/response.Transaction'
+        description: Transaction is a transaction pointer that utxo points to.
+      transactionId:
+        description: TransactionID is a transaction id that utxo points to.
+        example: 01d0d0067652f684c6acb3683763f353fce55f6496521c7d99e71e1d27e53f5c
+        type: string
+      type:
+        description: Type is a utxo type.
+        example: pubkeyhash
+        type: string
+      updatedAt:
+        description: UpdatedAt is a time when outer model was updated.
+        example: "2024-02-26T11:01:28.069911Z"
+        type: string
+      xpubId:
+        description: XpubID is a utxo related xpub id.
+        example: bb8593f85ef8056a77026ad415f02128f3768906de53e9e8bf8749fe2d66cf50
+        type: string
+    type: object
+  response.UtxoPointer:
+    properties:
+      outputIndex:
+        description: OutputIndex is a output index that utxo points to.
+        example: 0
+        type: integer
+      transactionId:
+        description: TransactionID is a transaction id that utxo points to.
+        example: 01d0d0067652f684c6acb3683763f353fce55f6496521c7d99e71e1d27e53f5c
+        type: string
+    type: object
+  response.Xpub:
+    properties:
+      createdAt:
+        description: CreatedAt is a time when outer model was created.
+        example: "2024-02-26T11:00:28.069911Z"
+        type: string
+      currentBalance:
+        description: CurrentBalance is a xpub's current balance.
+        example: 1234
+        type: integer
+      deletedAt:
+        description: DeletedAt is a time when outer model was deleted.
+        example: "2024-02-26T11:02:28.069911Z"
+        type: string
+      id:
+        description: ID is a hash of the xpub.
+        example: bb8593f85ef8056a77026ad415f02128f3768906de53e9e8bf8749fe2d66cf50
+        type: string
+      metadata:
+        additionalProperties:
+          type: string
+        description: Metadata is a metadata map of outer model.
+        example:
+          key: value
+          key2: value2
+        type: object
+      nextExternalNum:
+        description: NextExternalNum is the index derivation number use to generate
+          NEXT external xPub (external xPub are used for address destinations).
+        example: 0
+        type: integer
+      nextInternalNum:
+        description: NextInternalNum is the index derivation number use to generate
+          NEXT internal xPub (internal xPub are used for change destinations).
+        example: 0
+        type: integer
+      updatedAt:
+        description: UpdatedAt is a time when outer model was updated.
+        example: "2024-02-26T11:01:28.069911Z"
+        type: string
+    type: object
+  transactions.NewDraftTransaction:
+    properties:
+      config:
+        allOf:
+        - $ref: '#/definitions/response.TransactionConfig'
+        description: Configuration of the transaction
+      metadata:
+        additionalProperties:
+          type: string
+        description: Accepts a JSON object for embedding custom metadata, enabling
+          arbitrary additional information to be associated with the resource
+        example:
+          key: value
+          key2: value2
+        type: object
+    type: object
+  transactions.OldNewDraftTransaction:
     properties:
       config:
         allOf:
@@ -1947,7 +2483,7 @@ definitions:
           key: value
           key2: value2
         type: object
-      reference_id:
+      referenceId:
         description: ReferenceID which is a ID of the draft transaction
         example: b356f7fa00cd3f20cce6c21d704cd13e871d28d714a5ebd0532f5a0e0cde63f7
         type: string
@@ -1958,6 +2494,18 @@ definitions:
         description: ID of the transaction which is a hash of the transaction
         example: 01d0d0067652f684c6acb3683763f353fce55f6496521c7d99e71e1d27e53f5c
         type: string
+      metadata:
+        additionalProperties:
+          type: string
+        description: Accepts a JSON object for embedding custom metadata, enabling
+          arbitrary additional information to be associated with the resource
+        example:
+          key: value
+          key2: value2
+        type: object
+    type: object
+  transactions.UpdateTransactionRequest:
+    properties:
       metadata:
         additionalProperties:
           type: string
@@ -1982,7 +2530,7 @@ paths:
         "200":
           description: Shared configuration
           schema:
-            $ref: '#/definitions/models.SharedConfig'
+            $ref: '#/definitions/response.SharedConfig'
       security:
       - x-auth-xpub: []
       summary: Get shared config
@@ -1992,13 +2540,77 @@ paths:
     get:
       description: Get contacts
       parameters:
-      - description: Supports targeted resource searches with filters and metadata,
-          plus options for pagination and sorting to streamline data exploration and
-          analysis
-        in: body
-        name: SearchContacts
-        schema:
-          $ref: '#/definitions/filter.SearchContacts'
+      - example: "2024-02-26T11:01:28Z"
+        in: query
+        name: createdRange[from]
+        type: string
+      - example: "2024-02-26T11:01:28Z"
+        in: query
+        name: createdRange[to]
+        type: string
+      - collectionFormat: csv
+        description: Metadata is a list of key-value pairs that can be used to filter
+          the results. !ATTENTION! Unfortunately this parameter won't work from swagger
+          UI.
+        example:
+        - metadata[key]=value
+        - metadata[key2]=value2
+        in: query
+        items:
+          type: string
+        name: metadata
+        type: array
+      - in: query
+        name: page
+        type: integer
+      - in: query
+        name: size
+        type: integer
+      - in: query
+        name: sort
+        type: string
+      - in: query
+        name: sortBy
+        type: string
+      - example: "2024-02-26T11:01:28Z"
+        in: query
+        name: updatedRange[from]
+        type: string
+      - example: "2024-02-26T11:01:28Z"
+        in: query
+        name: updatedRange[to]
+        type: string
+      - example: Alice
+        in: query
+        name: fullName
+        type: string
+      - example: ffdbe74e-0700-4710-aac5-611a1f877c7f
+        in: query
+        name: id
+        type: string
+      - default: false
+        description: IncludeDeleted is a flag whether or not to include deleted items
+          in the search results
+        example: true
+        in: query
+        name: includeDeleted
+        type: boolean
+      - example: alice@example.com
+        in: query
+        name: paymail
+        type: string
+      - example: 0334f01ecb971e93db179e6fb320cd1466beb0c1ec6c1c6a37aa6cb02e53d5dd1a
+        in: query
+        name: pubKey
+        type: string
+      - enum:
+        - unconfirmed
+        - awaiting
+        - confirmed
+        - rejected
+        in: query
+        name: status
+        type: string
       produces:
       - application/json
       responses:
@@ -2187,6 +2799,233 @@ paths:
       summary: Accept contact invitation
       tags:
       - Contacts
+  /api/v1/transactions:
+    get:
+      description: Get transactions
+      parameters:
+      - example: "2024-02-26T11:01:28Z"
+        in: query
+        name: createdRange[from]
+        type: string
+      - example: "2024-02-26T11:01:28Z"
+        in: query
+        name: createdRange[to]
+        type: string
+      - collectionFormat: csv
+        description: Metadata is a list of key-value pairs that can be used to filter
+          the results. !ATTENTION! Unfortunately this parameter won't work from swagger
+          UI.
+        example:
+        - metadata[key]=value
+        - metadata[key2]=value2
+        in: query
+        items:
+          type: string
+        name: metadata
+        type: array
+      - in: query
+        name: page
+        type: integer
+      - in: query
+        name: size
+        type: integer
+      - in: query
+        name: sort
+        type: string
+      - in: query
+        name: sortBy
+        type: string
+      - example: "2024-02-26T11:01:28Z"
+        in: query
+        name: updatedRange[from]
+        type: string
+      - example: "2024-02-26T11:01:28Z"
+        in: query
+        name: updatedRange[to]
+        type: string
+      - example: 0000000000000000031928c28075a82d7a00c2c90b489d1d66dc0afa3f8d26f8
+        in: query
+        name: blockHash
+        type: string
+      - example: 839376
+        in: query
+        name: blockHeight
+        type: integer
+      - example: d425432e0d10a46af1ec6d00f380e9581ebf7907f3486572b3cd561a4c326e14
+        in: query
+        name: draftId
+        type: string
+      - example: 1
+        in: query
+        name: fee
+        type: integer
+      - in: query
+        name: hex
+        type: string
+      - example: d425432e0d10a46af1ec6d00f380e9581ebf7907f3486572b3cd561a4c326e14
+        in: query
+        name: id
+        type: string
+      - default: false
+        description: IncludeDeleted is a flag whether or not to include deleted items
+          in the search results
+        example: true
+        in: query
+        name: includeDeleted
+        type: boolean
+      - example: 1
+        in: query
+        name: numberOfInputs
+        type: integer
+      - example: 2
+        in: query
+        name: numberOfOutputs
+        type: integer
+      - enum:
+        - UNKNOWN
+        - QUEUED
+        - RECEIVED
+        - STORED
+        - ANNOUNCED_TO_NETWORK
+        - REQUESTED_BY_NETWORK
+        - SENT_TO_NETWORK
+        - ACCEPTED_BY_NETWORK
+        - SEEN_ON_NETWORK
+        - MINED
+        - SEEN_IN_ORPHAN_MEMPOOL
+        - CONFIRMED
+        - REJECTED
+        in: query
+        name: status
+        type: string
+      - example: 100000000
+        in: query
+        name: totalValue
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Page of transactions
+          schema:
+            $ref: '#/definitions/response.PageModel-response_Transaction'
+        "400":
+          description: Bad request - Error while parsing SearchTransactions from request
+            body
+        "500":
+          description: Internal server error - Error while searching for transactions
+      security:
+      - x-auth-xpub: []
+      summary: Get transactions
+      tags:
+      - Transactions
+    post:
+      description: Record transaction
+      parameters:
+      - description: Transaction to be recorded
+        in: body
+        name: RecordTransaction
+        required: true
+        schema:
+          $ref: '#/definitions/transactions.RecordTransaction'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created transaction
+          schema:
+            $ref: '#/definitions/response.Transaction'
+        "400":
+          description: Bad request - Error while parsing RecordTransaction from request
+            body or xpub not found
+        "500":
+          description: Internal Server Error - Error while recording transaction
+      security:
+      - x-auth-xpub: []
+      summary: Record transaction
+      tags:
+      - Transactions
+  /api/v1/transactions/{id}:
+    get:
+      description: Get transaction by id
+      parameters:
+      - description: id
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Transaction
+          schema:
+            $ref: '#/definitions/response.Transaction'
+        "400":
+          description: Bad request - Transaction not found or associated with another
+            xpub
+        "500":
+          description: Internal Server Error - Error while fetching transaction
+      security:
+      - x-auth-xpub: []
+      summary: Get transaction by id
+      tags:
+      - Transactions
+    patch:
+      description: Update transaction metadata
+      parameters:
+      - description: Pass update transaction request model in the body with updated
+          metadata
+        in: body
+        name: UpdateTransactionRequest
+        required: true
+        schema:
+          $ref: '#/definitions/transactions.UpdateTransactionRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Updated transaction metadata
+          schema:
+            $ref: '#/definitions/response.Transaction'
+        "400":
+          description: Bad request - Error while parsing UpdateTransaction from request
+            body, tx not found or tx is not associated with the xpub
+        "500":
+          description: Internal Server Error - Error while updating transaction metadata
+      security:
+      - x-auth-xpub: []
+      summary: Update transaction metadata
+      tags:
+      - Transactions
+  /api/v1/transactions/drafts:
+    post:
+      description: New transaction draft
+      parameters:
+      - description: NewDraftTransaction model containing the transaction config and
+          metadata
+        in: body
+        name: NewDraftTransaction
+        required: true
+        schema:
+          $ref: '#/definitions/transactions.NewDraftTransaction'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created transaction
+          schema:
+            $ref: '#/definitions/response.DraftTransaction'
+        "400":
+          description: Bad request - Error while parsing NewDraftTransaction from
+            request body or xpub not found
+        "500":
+          description: Internal Server Error - Error while creating transaction
+      security:
+      - x-auth-xpub: []
+      summary: New transaction draft
+      tags:
+      - Transactions
   /api/v1/users/current:
     get:
       description: Get current user information
@@ -2196,7 +3035,7 @@ paths:
         "200":
           description: xPub associated with the given xPub from auth header
           schema:
-            $ref: '#/definitions/models.Xpub'
+            $ref: '#/definitions/response.Xpub'
         "500":
           description: Internal Server Error - Error while fetching xPub
       security:
@@ -2218,7 +3057,7 @@ paths:
         "200":
           description: Updated xPub
           schema:
-            $ref: '#/definitions/models.Xpub'
+            $ref: '#/definitions/response.Xpub'
         "400":
           description: Bad request - Error while parsing Metadata from request body
         "500":
@@ -2229,6 +3068,82 @@ paths:
       tags:
       - Users
   /api/v1/users/current/keys:
+    get:
+      description: Search access key
+      parameters:
+      - example: "2024-02-26T11:01:28Z"
+        in: query
+        name: createdRange[from]
+        type: string
+      - example: "2024-02-26T11:01:28Z"
+        in: query
+        name: createdRange[to]
+        type: string
+      - collectionFormat: csv
+        description: Metadata is a list of key-value pairs that can be used to filter
+          the results. !ATTENTION! Unfortunately this parameter won't work from swagger
+          UI.
+        example:
+        - metadata[key]=value
+        - metadata[key2]=value2
+        in: query
+        items:
+          type: string
+        name: metadata
+        type: array
+      - in: query
+        name: page
+        type: integer
+      - in: query
+        name: size
+        type: integer
+      - in: query
+        name: sort
+        type: string
+      - in: query
+        name: sortBy
+        type: string
+      - example: "2024-02-26T11:01:28Z"
+        in: query
+        name: updatedRange[from]
+        type: string
+      - example: "2024-02-26T11:01:28Z"
+        in: query
+        name: updatedRange[to]
+        type: string
+      - default: false
+        description: IncludeDeleted is a flag whether or not to include deleted items
+          in the search results
+        example: true
+        in: query
+        name: includeDeleted
+        type: boolean
+      - description: Specifies the start time of the range to query by date of revoking
+        format: date-time
+        in: query
+        name: revokedRange[from]
+        type: string
+      - description: Specifies the end time of the range to query by date of revoking
+        format: date-time
+        in: query
+        name: revokedRange[to]
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: List of access keys
+          schema:
+            $ref: '#/definitions/response.PageModel-response_AccessKey'
+        "400":
+          description: Bad request - Error while SearchAccessKeys from request query
+        "500":
+          description: Internal server error - Error while searching for access keys
+      security:
+      - x-auth-xpub: []
+      summary: Search access key
+      tags:
+      - Access-key
     post:
       description: Create access key
       parameters:
@@ -2244,7 +3159,7 @@ paths:
         "201":
           description: Created AccessKey
           schema:
-            $ref: '#/definitions/models.AccessKey'
+            $ref: '#/definitions/response.AccessKey'
         "400":
           description: Bad request - Error while parsing CreateAccessKey from request
             body
@@ -2270,7 +3185,7 @@ paths:
         "200":
           description: Revoked AccessKey
           schema:
-            $ref: '#/definitions/models.AccessKey'
+            $ref: '#/definitions/response.AccessKey'
         "400":
           description: 'Bad request - Missing required field: id'
         "500":
@@ -2294,7 +3209,7 @@ paths:
         "200":
           description: AccessKey with given id
           schema:
-            $ref: '#/definitions/models.AccessKey'
+            $ref: '#/definitions/response.AccessKey'
         "400":
           description: 'Bad request - Missing required field: id'
         "403":
@@ -2306,29 +3221,127 @@ paths:
       summary: Get access key
       tags:
       - Access-key
-  /transaction/broadcast/callback:
-    post:
+  /api/v1/utxos:
+    get:
+      description: Search UTXO
       parameters:
-      - description: Transaction
-        in: body
-        name: transaction
-        required: true
-        schema:
-          $ref: '#/definitions/broadcast.SubmittedTx'
+      - example: "2024-02-26T11:01:28Z"
+        in: query
+        name: createdRange[from]
+        type: string
+      - example: "2024-02-26T11:01:28Z"
+        in: query
+        name: createdRange[to]
+        type: string
+      - collectionFormat: csv
+        description: Metadata is a list of key-value pairs that can be used to filter
+          the results. !ATTENTION! Unfortunately this parameter won't work from swagger
+          UI.
+        example:
+        - metadata[key]=value
+        - metadata[key2]=value2
+        in: query
+        items:
+          type: string
+        name: metadata
+        type: array
+      - in: query
+        name: page
+        type: integer
+      - in: query
+        name: size
+        type: integer
+      - in: query
+        name: sort
+        type: string
+      - in: query
+        name: sortBy
+        type: string
+      - example: "2024-02-26T11:01:28Z"
+        in: query
+        name: updatedRange[from]
+        type: string
+      - example: "2024-02-26T11:01:28Z"
+        in: query
+        name: updatedRange[to]
+        type: string
+      - example: 89419d4c7c50810bfe5ff9df9ad5074b749959423782dc91a30f1058b9ad7ef7
+        in: query
+        name: draftId
+        type: string
+      - example: fe4cbfee0258aa589cbc79963f7c204061fd67d987e32ee5049aa90ce14658ee
+        in: query
+        name: id
+        type: string
+      - default: false
+        description: IncludeDeleted is a flag whether or not to include deleted items
+          in the search results
+        example: true
+        in: query
+        name: includeDeleted
+        type: boolean
+      - example: 0
+        in: query
+        name: outputIndex
+        type: integer
+      - example: 1
+        in: query
+        name: satoshis
+        type: integer
+      - example: 76a914a5f271385e75f57bcd9092592dede812f8c466d088ac
+        in: query
+        name: scriptPubKey
+        type: string
+      - example: 11a7746489a70e9c0170601c2be65558455317a984194eb2791b637f59f8cd6e
+        in: query
+        name: spendingTxId
+        type: string
+      - example: 5e17858ea0ca4155827754ba82bdcfcce108d5bb5b47fbb3aa54bd14540683c6
+        in: query
+        name: transactionId
+        type: string
+      - enum:
+        - pubkey
+        - pubkeyhash
+        - nulldata
+        - multisig
+        - nonstandard
+        - scripthash
+        - metanet
+        - token_stas
+        - token_sensible
+        in: query
+        name: type
+        type: string
+      - description: Specifies the start time of the range to query by date when a
+          UTXO was reserved
+        format: date-time
+        in: query
+        name: reservedRange[from]
+        type: string
+      - description: Specifies the end time of the range to query by date when a UTXO
+          was reserved
+        format: date-time
+        in: query
+        name: reservedRange[to]
+        type: string
+      produces:
+      - application/json
       responses:
         "200":
-          description: OK
+          description: List of utxos
+          schema:
+            $ref: '#/definitions/response.PageModel-response_Utxo'
         "400":
-          description: Bad request - Error while parsing transaction from request
+          description: Bad request - Error while parsing SearchUtxos from request
             body
         "500":
-          description: Internal Server Error - Error while updating transaction
+          description: Internal server error - Error while searching for utxos
       security:
-      - callback-auth: []
-      summary: Endpoint designed for receiving callbacks from Arc (service responsible
-        for submitting transactions to the BSV network)
+      - x-auth-xpub: []
+      summary: Search UTXO
       tags:
-      - Transactions
+      - UTXOs
   /v1/access-key:
     delete:
       deprecated: true
@@ -2414,7 +3427,9 @@ paths:
       - Access-key
   /v1/access-key/count:
     post:
-      description: Count of access keys
+      deprecated: true
+      description: This endpoint has been deprecated. Use (GET) /api/v1/users/current/keys
+        instead.
       parameters:
       - description: Enables filtering of elements to be counted
         in: body
@@ -2436,12 +3451,14 @@ paths:
             keys
       security:
       - x-auth-xpub: []
-      summary: Count of access keys
+      summary: Count of access keys - Use (GET) /api/v1/users/current/keys instead.
       tags:
       - Access-key
   /v1/access-key/search:
     post:
-      description: Search access key
+      deprecated: true
+      description: This endpoint has been deprecated. Use (GET) /api/v1/users/current/keys
+        instead.
       parameters:
       - description: Supports targeted resource searches with filters and metadata,
           plus options for pagination and sorting to streamline data exploration and
@@ -2465,7 +3482,7 @@ paths:
           description: Internal server error - Error while searching for access keys
       security:
       - x-auth-xpub: []
-      summary: Search access key
+      summary: Search access key - Use (GET) /api/v1/users/current/keys instead.
       tags:
       - Access-key
   /v1/admin/access-keys/count:
@@ -3027,6 +4044,24 @@ paths:
       summary: Unsubscribe to a webhook
       tags:
       - Admin
+    get:
+      description: Get All Webhooks currently subscribed to
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: List of webhooks
+          schema:
+            items:
+              $ref: '#/definitions/models.Webhook'
+            type: array
+        "500":
+          description: Internal server error - Error while getting all webhooks
+      security:
+      - x-auth-xpub: []
+      summary: Get All Webhooks
+      tags:
+      - Admin
     post:
       description: Subscribe to a webhook to receive notifications
       parameters:
@@ -3298,7 +4333,9 @@ paths:
       - Contact
   /v1/destination:
     get:
-      description: Get a destination
+      deprecated: true
+      description: Get a destination. This endpoint has been deprecated (it will be
+        removed in the future).
       parameters:
       - description: Destination ID
         in: query
@@ -3325,11 +4362,14 @@ paths:
           description: Internal server error - Error while getting destination
       security:
       - x-auth-xpub: []
-      summary: Get a destination
+      summary: Get a destination. This endpoint has been deprecated (it will be removed
+        in the future).
       tags:
       - Destinations
     patch:
-      description: Update destination
+      deprecated: true
+      description: Update destination. This endpoint has been deprecated (it will
+        be removed in the future).
       parameters:
       - description: ' '
         in: body
@@ -3350,11 +4390,14 @@ paths:
           description: Internal Server Error - Error while updating destination
       security:
       - x-auth-xpub: []
-      summary: Update destination
+      summary: Update destination. This endpoint has been deprecated (it will be removed
+        in the future).
       tags:
       - Destinations
     post:
-      description: Create a new destination
+      deprecated: true
+      description: Create a new destination. This endpoint has been deprecated (it
+        will be removed in the future).
       parameters:
       - description: ' '
         in: body
@@ -3375,12 +4418,15 @@ paths:
           description: Internal Server Error - Error while creating destination
       security:
       - x-auth-xpub: []
-      summary: Create a new destination
+      summary: Create a new destination. This endpoint has been deprecated (it will
+        be removed in the future).
       tags:
       - Destinations
   /v1/destination/count:
     post:
-      description: Count Destinations
+      deprecated: true
+      description: Count Destinations. This endpoint has been deprecated (it will
+        be removed in the future).
       parameters:
       - description: Enables filtering of elements to be counted
         in: body
@@ -3401,12 +4447,15 @@ paths:
           description: Internal Server Error - Error while fetching count of destinations
       security:
       - x-auth-xpub: []
-      summary: Count Destinations
+      summary: Count Destinations. This endpoint has been deprecated (it will be removed
+        in the future).
       tags:
       - Destinations
   /v1/destination/search:
     post:
-      description: Search for a destination
+      deprecated: true
+      description: Search for a destination. This endpoint has been deprecated (it
+        will be removed in the future).
       parameters:
       - description: Supports targeted resource searches with filters and metadata,
           plus options for pagination and sorting to streamline data exploration and
@@ -3431,7 +4480,8 @@ paths:
           description: Internal server error - Error while searching for destinations
       security:
       - x-auth-xpub: []
-      summary: Search for a destination
+      summary: Search for a destination. This endpoint has been deprecated (it will
+        be removed in the future).
       tags:
       - Destinations
   /v1/shared-config:
@@ -3453,7 +4503,9 @@ paths:
       - Configurations
   /v1/transaction:
     get:
-      description: Get transaction by id
+      deprecated: true
+      description: This endpoint has been deprecated. Use (GET) /api/v1/transactions/{id}
+        instead.
       parameters:
       - description: id
         in: query
@@ -3474,13 +4526,15 @@ paths:
           description: Internal Server Error - Error while fetching transaction
       security:
       - x-auth-xpub: []
-      summary: Get transaction by id
+      summary: Get transaction by id - Use (GET) /api/v1/transactions/{id} instead.
       tags:
       - Transactions
     patch:
-      description: Update transaction
+      deprecated: true
+      description: This endpoint has been deprecated. Use (PATCH) /api/v1/transactions/{id}
+        instead.
       parameters:
-      - description: ' '
+      - description: Pass update transaction request model in the body
         in: body
         name: UpdateTransaction
         required: true
@@ -3500,38 +4554,43 @@ paths:
           description: Internal Server Error - Error while updating transaction
       security:
       - x-auth-xpub: []
-      summary: Update transaction
+      summary: Update transaction - Use (PATCH) /api/v1/transactions/{id} instead.
       tags:
       - Transactions
     post:
-      description: New transaction
+      deprecated: true
+      description: This endpoint has been deprecated. Use (POST) /api/v1/transactions/drafts
+        instead.
       parameters:
-      - description: NewTransaction model containing the transaction config and metadata
+      - description: OldNewDraftTransaction model containing the transaction config
+          and metadata
         in: body
-        name: NewTransaction
+        name: OldNewDraftTransaction
         required: true
         schema:
-          $ref: '#/definitions/transactions.NewTransaction'
+          $ref: '#/definitions/transactions.OldNewDraftTransaction'
       produces:
       - application/json
       responses:
         "201":
           description: Created transaction
           schema:
-            $ref: '#/definitions/models.DraftTransaction'
+            $ref: '#/definitions/transactions.OldNewDraftTransaction'
         "400":
-          description: Bad request - Error while parsing NewTransaction from request
-            body or xpub not found
+          description: Bad request - Error while parsing OldNewDraftTransaction from
+            request body or xpub not found
         "500":
           description: Internal Server Error - Error while creating transaction
       security:
       - x-auth-xpub: []
-      summary: New transaction
+      summary: New transaction - Use (POST) /api/v1/transactions/drafts instead.
       tags:
       - Transactions
   /v1/transaction/count:
     post:
-      description: Count of transactions
+      deprecated: true
+      description: This endpoint has been deprecated. Use (GET) /api/v1/transactions
+        instead
       parameters:
       - description: Enables filtering of elements to be counted
         in: body
@@ -3552,12 +4611,14 @@ paths:
           description: Internal Server Error - Error while fetching count of transactions
       security:
       - x-auth-xpub: []
-      summary: Count of transactions
+      summary: Count of transactions - Use (GET) /api/v1/transactions instead.
       tags:
       - Transactions
   /v1/transaction/record:
     post:
-      description: Record transaction
+      deprecated: true
+      description: This endpoint has been deprecated. Use (POST) /api/v1/transactions
+        instead.
       parameters:
       - description: Transaction to be recorded
         in: body
@@ -3579,12 +4640,14 @@ paths:
           description: Internal Server Error - Error while recording transaction
       security:
       - x-auth-xpub: []
-      summary: Record transaction
+      summary: Record transaction - Use (POST) /api/v1/transactions instead.
       tags:
       - Transactions
   /v1/transaction/search:
     post:
-      description: Search transaction
+      deprecated: true
+      description: This endpoint has been deprecated. Use (GET) /api/v1/transactions
+        instead
       parameters:
       - description: Supports targeted resource searches with filters and metadata,
           plus options for pagination and sorting to streamline data exploration and
@@ -3609,12 +4672,14 @@ paths:
           description: Internal server error - Error while searching for transactions
       security:
       - x-auth-xpub: []
-      summary: Search transaction
+      summary: Search transaction - Use (GET) /api/v1/transactions instead.
       tags:
       - Transactions
   /v1/utxo:
     get:
-      description: Get UTXO
+      deprecated: true
+      description: Get UTXO. This endpoint has been deprecated (it will be removed
+        in the future).
       parameters:
       - description: Id of the transaction
         in: query
@@ -3639,12 +4704,14 @@ paths:
           description: Internal Server Error - Error while fetching utxo
       security:
       - x-auth-xpub: []
-      summary: Get UTXO
+      summary: Get UTXO. This endpoint has been deprecated (it will be removed in
+        the future).
       tags:
       - UTXO
   /v1/utxo/count:
     post:
-      description: Count of UTXOs
+      deprecated: true
+      description: This endpoint has been deprecated. Use (GET) /api/v1/utxos instead.
       parameters:
       - description: Enables filtering of elements to be counted
         in: body
@@ -3664,12 +4731,13 @@ paths:
           description: Internal Server Error - Error while fetching count of utxos
       security:
       - x-auth-xpub: []
-      summary: Count of UTXOs
+      summary: Count of UTXOs - Use (GET) /api/v1/utxos instead.
       tags:
       - UTXO
   /v1/utxo/search:
     post:
-      description: Search UTXO
+      deprecated: true
+      description: This endpoint has been deprecated. Use (GET) /api/v1/utxos instead.
       parameters:
       - description: Supports targeted resource searches with filters and metadata,
           plus options for pagination and sorting to streamline data exploration and
@@ -3694,7 +4762,7 @@ paths:
           description: Internal server error - Error while searching for utxos
       security:
       - x-auth-xpub: []
-      summary: Search UTXO
+      summary: Search UTXO - Use (GET) /api/v1/utxos instead.
       tags:
       - UTXO
   /v1/xpub:

@@ -7,57 +7,57 @@ import (
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/bitcoin-sv/spv-wallet/engine/utils"
 	"github.com/bitcoin-sv/spv-wallet/mappings"
-	"github.com/bitcoin-sv/spv-wallet/server/auth"
+	"github.com/bitcoin-sv/spv-wallet/server/reqctx"
 	"github.com/gin-gonic/gin"
 )
 
 // create will make a new destination
 // Count Destinations godoc
-// @Summary		Create a new destination
-// @Description	Create a new destination
+// @Summary		Create a new destination. This endpoint has been deprecated (it will be removed in the future).
+// @Description	Create a new destination. This endpoint has been deprecated (it will be removed in the future).
 // @Tags		Destinations
 // @Produce		json
 // @Param		CreateDestination body CreateDestination false " "
 // @Success		201 {object} models.Destination "Created Destination"
 // @Failure		400	"Bad request - Error while parsing CreateDestination from request body"
 // @Failure 	500	"Internal Server Error - Error while creating destination"
-// @Router		/v1/destination [post]
+// @DeprecatedRouter  /v1/destination [post]
 // @Security	x-auth-xpub
-func (a *Action) create(c *gin.Context) {
-	reqXPub := c.GetString(auth.ParamXPubKey)
-	xPub, err := a.Services.SpvWalletEngine.GetXpub(c.Request.Context(), reqXPub)
+func create(c *gin.Context, userContext *reqctx.UserContext) {
+	logger := reqctx.Logger(c)
+	engineInstance := reqctx.Engine(c)
+
+	xpub, err := userContext.ShouldGetXPub()
 	if err != nil {
-		spverrors.ErrorResponse(c, err, a.Services.Logger)
-		return
-	} else if xPub == nil {
-		spverrors.ErrorResponse(c, spverrors.ErrCouldNotFindXpub, a.Services.Logger)
+		spverrors.AbortWithErrorResponse(c, err, logger)
 		return
 	}
 
 	var requestBody CreateDestination
-	if err = c.Bind(&requestBody); err != nil {
-		spverrors.ErrorResponse(c, spverrors.ErrCannotBindRequest, a.Services.Logger)
+	err = c.Bind(&requestBody)
+	if err != nil {
+		spverrors.ErrorResponse(c, spverrors.ErrCannotBindRequest, logger)
 		return
 	}
 
-	opts := a.Services.SpvWalletEngine.DefaultModelOptions()
+	opts := engineInstance.DefaultModelOptions()
 
 	if requestBody.Metadata != nil {
 		opts = append(opts, engine.WithMetadatas(requestBody.Metadata))
 	}
 
 	var destination *engine.Destination
-	if destination, err = a.Services.SpvWalletEngine.NewDestination(
+	if destination, err = engineInstance.NewDestination(
 		c.Request.Context(),
-		xPub.RawXpub(),
+		xpub,
 		uint32(0), // todo: use a constant? protect this?
 		utils.ScriptTypePubKeyHash,
 		opts...,
 	); err != nil {
-		spverrors.ErrorResponse(c, err, a.Services.Logger)
+		spverrors.ErrorResponse(c, err, logger)
 		return
 	}
 
-	contract := mappings.MapToDestinationContract(destination)
+	contract := mappings.MapOldToDestinationContract(destination)
 	c.JSON(http.StatusCreated, contract)
 }

@@ -6,7 +6,7 @@ import (
 	"github.com/bitcoin-sv/spv-wallet/engine"
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/bitcoin-sv/spv-wallet/mappings"
-	"github.com/bitcoin-sv/spv-wallet/server/auth"
+	"github.com/bitcoin-sv/spv-wallet/server/reqctx"
 	"github.com/gin-gonic/gin"
 )
 
@@ -22,8 +22,8 @@ import (
 // @Failure 	500	"Internal Server Error - Error while updating xPub"
 // @DeprecatedRouter  /v1/xpub [patch]
 // @Security	x-auth-xpub
-func (a *Action) oldUpdate(c *gin.Context) {
-	a.updateHelper(c, true)
+func oldUpdate(c *gin.Context, userContext *reqctx.UserContext) {
+	updateHelper(c, true, userContext)
 }
 
 // update will update an existing model
@@ -33,38 +33,36 @@ func (a *Action) oldUpdate(c *gin.Context) {
 // @Tags		Users
 // @Produce		json
 // @Param		Metadata body engine.Metadata false " "
-// @Success		200 {object} models.Xpub "Updated xPub"
+// @Success		200 {object} response.Xpub "Updated xPub"
 // @Failure		400	"Bad request - Error while parsing Metadata from request body"
 // @Failure 	500	"Internal Server Error - Error while updating xPub"
 // @Router		/api/v1/users/current [patch]
 // @Security	x-auth-xpub
-func (a *Action) update(c *gin.Context) {
-	a.updateHelper(c, false)
+func update(c *gin.Context, userContext *reqctx.UserContext) {
+	updateHelper(c, false, userContext)
 }
 
-func (a *Action) updateHelper(c *gin.Context, snakeCase bool) {
-	reqXPub := c.GetString(auth.ParamXPubKey)
-	reqXPubID := c.GetString(auth.ParamXPubHashKey)
+func updateHelper(c *gin.Context, snakeCase bool, userContext *reqctx.UserContext) {
+	logger := reqctx.Logger(c)
 
 	var requestBody engine.Metadata
 	if err := c.Bind(&requestBody); err != nil {
-		spverrors.ErrorResponse(c, spverrors.ErrCannotBindRequest, a.Services.Logger)
+		spverrors.ErrorResponse(c, spverrors.ErrCannotBindRequest, logger)
 		return
 	}
 
 	// Get an xPub
 	var xPub *engine.Xpub
 	var err error
-	xPub, err = a.Services.SpvWalletEngine.UpdateXpubMetadata(
-		c.Request.Context(), reqXPubID, requestBody,
+	xPub, err = reqctx.Engine(c).UpdateXpubMetadata(
+		c.Request.Context(), userContext.GetXPubID(), requestBody,
 	)
 	if err != nil {
-		spverrors.ErrorResponse(c, err, a.Services.Logger)
+		spverrors.ErrorResponse(c, err, logger)
 		return
 	}
 
-	signed := c.GetBool("auth_signed")
-	if !signed || reqXPub == "" {
+	if userContext.GetAuthType() == reqctx.AuthTypeAccessKey {
 		xPub.RemovePrivateData()
 	}
 

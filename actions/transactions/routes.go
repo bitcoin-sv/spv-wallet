@@ -1,39 +1,29 @@
 package transactions
 
 import (
-	"github.com/bitcoin-sv/spv-wallet/actions"
 	"github.com/bitcoin-sv/spv-wallet/config"
-	"github.com/bitcoin-sv/spv-wallet/server/routes"
-	"github.com/gin-gonic/gin"
+	"github.com/bitcoin-sv/spv-wallet/server/handlers"
 )
 
-// Action is an extension of actions.Action for this package
-type Action struct {
-	actions.Action
-}
+// RegisterRoutes creates the specific package routes
+func RegisterRoutes(handlersManager *handlers.Manager) {
+	old := handlersManager.Group(handlers.GroupOldAPI, "/transaction")
+	old.GET("", handlers.AsUser(get))
+	old.PATCH("", handlers.AsUser(update))
+	old.POST("/count", handlers.AsUser(count))
+	old.GET("/search", handlers.AsUser(search))
+	old.POST("/search", handlers.AsUser(search))
 
-// NewHandler creates the specific package routes
-func NewHandler(appConfig *config.AppConfig, services *config.AppServices) (routes.BasicEndpointsFunc, routes.OldAPIEndpointsFunc, routes.CallbackEndpointsFunc) {
-	action := &Action{actions.Action{AppConfig: appConfig, Services: services}}
+	old.POST("", handlers.AsUser(newTransaction))
+	old.POST("/record", handlers.AsUser(record))
 
-	basicEndpoints := routes.BasicEndpointsFunc(func(router *gin.RouterGroup) {
-		basicTransactionGroup := router.Group("/transaction")
-		basicTransactionGroup.GET("", action.get)
-		basicTransactionGroup.PATCH("", action.update)
-		basicTransactionGroup.POST("/count", action.count)
-		basicTransactionGroup.GET("/search", action.search)
-		basicTransactionGroup.POST("/search", action.search)
-	})
+	group := handlersManager.Group(handlers.GroupAPI, "/transactions")
+	group.GET(":id", handlers.AsUser(getByID))
+	group.PATCH(":id", handlers.AsUser(updateTransactionMetadata))
+	group.GET("", handlers.AsUser(transactions))
 
-	apiEndpoints := routes.OldAPIEndpointsFunc(func(router *gin.RouterGroup) {
-		apiTransactionGroup := router.Group("/transaction")
-		apiTransactionGroup.POST("", action.newTransaction)
-		apiTransactionGroup.POST("/record", action.record)
-	})
+	group.POST("/drafts", handlers.AsUser(newTransactionDraft))
+	group.POST("", handlers.AsUser(recordTransaction))
 
-	callbackEndpoints := routes.CallbackEndpointsFunc(func(router *gin.RouterGroup) {
-		router.POST(config.BroadcastCallbackRoute, action.broadcastCallback)
-	})
-
-	return basicEndpoints, apiEndpoints, callbackEndpoints
+	handlersManager.Get(handlers.GroupTransactionCallback).POST(config.BroadcastCallbackRoute, broadcastCallback)
 }

@@ -8,6 +8,7 @@ import (
 	"github.com/bitcoin-sv/spv-wallet/engine/datastore"
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/bitcoin-sv/spv-wallet/mappings"
+	"github.com/bitcoin-sv/spv-wallet/server/reqctx"
 	"github.com/gin-gonic/gin"
 )
 
@@ -23,10 +24,12 @@ import (
 // @Failure 	500	"Internal Server Error - Error while fetching count of access keys"
 // @Router		/v1/admin/transactions/record [post]
 // @Security	x-auth-xpub
-func (a *Action) transactionRecord(c *gin.Context) {
+func transactionRecord(c *gin.Context, _ *reqctx.AdminContext) {
+	logger := reqctx.Logger(c)
+	engineInstance := reqctx.Engine(c)
 	var requestBody RecordTransaction
 	if err := c.ShouldBindJSON(&requestBody); err != nil {
-		spverrors.ErrorResponse(c, spverrors.ErrCannotBindRequest, a.Services.Logger)
+		spverrors.ErrorResponse(c, spverrors.ErrCannotBindRequest, logger)
 		return
 	}
 
@@ -34,7 +37,7 @@ func (a *Action) transactionRecord(c *gin.Context) {
 	opts := make([]engine.ModelOps, 0)
 
 	// Record a new transaction (get the hex from parameters)
-	transaction, err := a.Services.SpvWalletEngine.RecordRawTransaction(
+	transaction, err := engineInstance.RecordRawTransaction(
 		c.Request.Context(),
 		requestBody.Hex,
 		opts...,
@@ -42,17 +45,17 @@ func (a *Action) transactionRecord(c *gin.Context) {
 	if err != nil {
 		if errors.Is(err, datastore.ErrDuplicateKey) {
 			// already registered, just return the registered transaction
-			if transaction, err = a.Services.SpvWalletEngine.GetTransactionByHex(c.Request.Context(), requestBody.Hex); err != nil {
-				spverrors.ErrorResponse(c, err, a.Services.Logger)
+			if transaction, err = engineInstance.GetTransactionByHex(c.Request.Context(), requestBody.Hex); err != nil {
+				spverrors.ErrorResponse(c, err, logger)
 				return
 			}
 		} else {
-			spverrors.ErrorResponse(c, err, a.Services.Logger)
+			spverrors.ErrorResponse(c, err, logger)
 			return
 		}
 	}
 
-	contract := mappings.MapToTransactionContract(transaction)
+	contract := mappings.MapToOldTransactionContract(transaction)
 
 	c.JSON(http.StatusCreated, contract)
 }

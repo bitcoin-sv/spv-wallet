@@ -191,9 +191,12 @@ func (c *Client) GetTransactionsByXpubID(ctx context.Context, xPubID string, met
 	ctx = c.GetOrStartTxn(ctx, "get_transaction")
 
 	// Get the transaction by ID
-	// todo: add queryParams for: page size and page (right now it is unlimited)
 	transactions, err := getTransactionsByXpubID(
-		ctx, xPubID, metadataConditions, conditions, queryParams,
+		ctx,
+		xPubID,
+		metadataConditions,
+		conditions,
+		queryParams,
 		c.DefaultModelOptions()...,
 	)
 	if err != nil {
@@ -358,8 +361,6 @@ func (c *Client) RevertTransaction(ctx context.Context, id string) error {
 	if syncTransaction, err = GetSyncTransactionByID(ctx, transaction.ID, c.DefaultModelOptions()...); err != nil {
 		return err
 	}
-	syncTransaction.BroadcastStatus = SyncStatusCanceled
-	syncTransaction.P2PStatus = SyncStatusCanceled
 	syncTransaction.SyncStatus = SyncStatusCanceled
 	if err = syncTransaction.Save(ctx); err != nil {
 		return err
