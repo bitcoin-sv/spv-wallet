@@ -11,6 +11,7 @@ import (
 	"github.com/bitcoin-sv/spv-wallet/engine/datastore"
 	"github.com/bitcoin-sv/spv-wallet/engine/metrics"
 	"github.com/bitcoin-sv/spv-wallet/engine/notifications"
+	paymailclient "github.com/bitcoin-sv/spv-wallet/engine/paymail"
 	"github.com/bitcoin-sv/spv-wallet/engine/taskmanager"
 	"github.com/mrz1836/go-cachestore"
 	"github.com/rs/zerolog"
@@ -54,6 +55,7 @@ type ClientService interface {
 	Logger() *zerolog.Logger
 	Notifications() *notifications.Notifications
 	PaymailClient() paymail.ClientInterface
+	PaymailService() paymailclient.ServiceClient
 	Taskmanager() taskmanager.TaskEngine
 }
 

@@ -8,6 +8,7 @@ import (
 
 	"github.com/bitcoin-sv/go-paymail"
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
+	xtester "github.com/bitcoin-sv/spv-wallet/engine/tester/paymailmock"
 	"github.com/bitcoin-sv/spv-wallet/engine/utils"
 	"github.com/jarcoal/httpmock"
 	"github.com/stretchr/testify/require"
@@ -23,7 +24,7 @@ func Test_ClientService_UpsertContact(t *testing.T) {
 		paymailAddr := "bran_the_broken@winterfell.com"
 
 		pt := &paymailTestMock{}
-		pt.setup(t, "winterfell.com", true)
+		pt.setup("winterfell.com", true)
 		defer pt.cleanup()
 
 		pt.mockPki(paymailAddr, "04c85162f06f5391028211a3683d669301fc72085458ce94d0a9e77ba4ff61f90a")
@@ -65,7 +66,7 @@ func Test_ClientService_UpsertContact(t *testing.T) {
 		paymailAddr := "bran_the_broken@winterfell.com"
 
 		pt := &paymailTestMock{}
-		pt.setup(t, "winterfell.com", false)
+		pt.setup("winterfell.com", false)
 		defer pt.cleanup()
 
 		pt.mockPki(paymailAddr, "04c85162f06f5391028211a3683d669301fc72085458ce94d0a9e77ba4ff61f90a")
@@ -94,7 +95,7 @@ func Test_ClientService_UpsertContact(t *testing.T) {
 		updatedFullname := "Brandon Stark"
 
 		pt := &paymailTestMock{}
-		pt.setup(t, "winterfell.com", true)
+		pt.setup("winterfell.com", true)
 		defer pt.cleanup()
 
 		pt.mockPki(paymailAddr, "04c85162f06f5391028211a3683d669301fc72085458ce94d0a9e77ba4ff61f90a")
@@ -139,7 +140,7 @@ func Test_ClientService_UpsertContact(t *testing.T) {
 		updatedFullname := "Brandon Stark"
 
 		pt := &paymailTestMock{}
-		pt.setup(t, "winterfell.com", true)
+		pt.setup("winterfell.com", true)
 		defer pt.cleanup()
 
 		pt.mockPki(paymailAddr, "04c85162f06f5391028211a3683d669301fc72085458ce94d0a9e77ba4ff61f90a")
@@ -187,7 +188,7 @@ func TestClientService_AddContactRequest(t *testing.T) {
 		paymailAddr := "sansa_stark@winterfell.com"
 
 		pt := &paymailTestMock{}
-		pt.setup(t, "winterfell.com", true)
+		pt.setup("winterfell.com", true)
 		defer pt.cleanup()
 
 		pt.mockPki(paymailAddr, "04c85162f06f5391028211a3683d669301fc72085458ce94d0a9e77ba4ff61f90a")
@@ -216,7 +217,7 @@ func TestClientService_AddContactRequest(t *testing.T) {
 		paymailAddr := "sansa_stark@winterfell.com"
 
 		pt := &paymailTestMock{}
-		pt.setup(t, "winterfell.com", true)
+		pt.setup("winterfell.com", true)
 		defer pt.cleanup()
 
 		pt.mockPki(paymailAddr, "04c85162f06f5391028211a3683d669301fc72085458ce94d0a9e77ba4ff61f90a")
@@ -258,7 +259,7 @@ func TestClientService_AddContactRequest(t *testing.T) {
 		updatedPki := "03c85162f06f5391028211a3683d669301fc72085458ce94d0a9e77ba4ff61f90b"
 
 		pt := &paymailTestMock{}
-		pt.setup(t, "winterfell.com", true)
+		pt.setup("winterfell.com", true)
 		defer pt.cleanup()
 
 		pt.mockPki(paymailAddr, "04c85162f06f5391028211a3683d669301fc72085458ce94d0a9e77ba4ff61f90a")
@@ -305,7 +306,7 @@ type paymailTestMock struct {
 	paymailClient paymail.ClientInterface
 }
 
-func (p *paymailTestMock) setup(t *testing.T, domain string, supportPike bool) {
+func (p *paymailTestMock) setup(domain string, supportPike bool) {
 	httpmock.Reset()
 	serverURL := "https://" + domain + "/api/v1/" + paymail.DefaultServiceName
 
@@ -327,7 +328,7 @@ func (p *paymailTestMock) setup(t *testing.T, domain string, supportPike bool) {
 	httpmock.RegisterResponder(http.MethodGet, wellKnownURL, wellKnownResponder)
 
 	p.serverURL = serverURL
-	p.paymailClient = newTestPaymailClient(t, []string{domain})
+	p.paymailClient = xtester.MockClient(domain)
 }
 
 func (p *paymailTestMock) cleanup() {
