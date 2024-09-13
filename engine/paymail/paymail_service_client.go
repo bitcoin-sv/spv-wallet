@@ -103,7 +103,7 @@ func (s *service) loadCapabilities(domain string) (*paymail.CapabilitiesResponse
 		paymail.DefaultServiceName, paymail.DefaultProtocol, domain,
 	)
 	if err != nil {
-		return nil, err
+		return nil, err //nolint:wrapcheck // we have handler for paymail errors
 	}
 	return s.paymailClient.GetCapabilities(srv.Target, int(srv.Port)) //nolint:wrapcheck // we have handler for paymail errors
 }
