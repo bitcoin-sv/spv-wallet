@@ -11,32 +11,32 @@ import (
 )
 
 // UpsertContact adds a new contact if not exists or updates the existing one.
-func (c *Client) UpsertContact(ctx context.Context, ctcFName, ctcPaymail, requesterXPubID, requesterPaymail string, opts ...ModelOps) (*Contact, error) {
-	reqPm, err := c.getPaymail(ctx, requesterXPubID, requesterPaymail)
+func (c *Client) UpsertContact(ctx context.Context, ctcFName, ctcPaymail, requesterXPubID, requesterPaymailAddress string, opts ...ModelOps) (*Contact, error) {
+	requesterPaymail, err := c.getPaymail(ctx, requesterXPubID, requesterPaymailAddress)
 	if err != nil {
 		return nil, err
 	}
 
 	paymailService := c.PaymailService()
 
-	contactPm, err := paymailService.GetSanitizedPaymail(ctcPaymail)
+	contactPaymail, err := paymailService.GetSanitizedPaymail(ctcPaymail)
 	if err != nil {
 		return nil, spverrors.Wrapf(err, "requested contact paymail is invalid")
 	}
 
-	contact, err := c.upsertContact(ctx, paymailService, requesterXPubID, ctcFName, contactPm, opts...)
+	contact, err := c.upsertContact(ctx, paymailService, requesterXPubID, ctcFName, contactPaymail, opts...)
 	if err != nil {
 		return nil, err
 	}
 
 	// request new contact
 	requesterContactRequest := paymail.PikeContactRequestPayload{
-		FullName: reqPm.PublicName,
-		Paymail:  reqPm.String(),
+		FullName: requesterPaymail.PublicName,
+		Paymail:  requesterPaymail.String(),
 	}
-	if _, err = paymailService.AddContactRequest(ctx, contactPm, &requesterContactRequest); err != nil {
+	if _, err = paymailService.AddContactRequest(ctx, contactPaymail, &requesterContactRequest); err != nil {
 		c.Logger().Warn().
-			Str("requesterPaymail", reqPm.String()).
+			Str("requesterPaymail", requesterPaymail.String()).
 			Str("requestedContact", ctcPaymail).
 			Msgf("adding contact request failed: %s", err.Error())
 
@@ -50,20 +50,20 @@ func (c *Client) UpsertContact(ctx context.Context, ctcFName, ctcPaymail, reques
 func (c *Client) AddContactRequest(ctx context.Context, fullName, paymailAdress, requesterXPubID string, opts ...ModelOps) (*Contact, error) {
 	paymailService := c.PaymailService()
 
-	contactPm, err := paymailService.GetSanitizedPaymail(paymailAdress)
+	contactPaymail, err := paymailService.GetSanitizedPaymail(paymailAdress)
 	if err != nil {
 		c.Logger().Error().Msgf("requested contact paymail is invalid. Reason: %s", err.Error())
 		return nil, spverrors.ErrRequestedContactInvalid
 	}
 
-	contactPki, err := paymailService.GetPkiForPaymail(ctx, contactPm)
+	contactPki, err := paymailService.GetPkiForPaymail(ctx, contactPaymail)
 	if err != nil {
 		c.Logger().Error().Msgf("getting PKI for %s failed. Reason: %v", paymailAdress, err)
 		return nil, spverrors.ErrGettingPKIFailed
 	}
 
 	// check if exists already
-	contact, err := getContact(ctx, contactPm.Address, requesterXPubID, c.DefaultModelOptions()...)
+	contact, err := getContact(ctx, contactPaymail.Address, requesterXPubID, c.DefaultModelOptions()...)
 	if err != nil {
 		return nil, err
 	}
@@ -74,7 +74,7 @@ func (c *Client) AddContactRequest(ctx context.Context, fullName, paymailAdress,
 	} else {
 		contact = newContact(
 			fullName,
-			contactPm.Address,
+			contactPaymail.Address,
 			contactPki.PubKey,
 			requesterXPubID,
 			ContactAwaitAccept,
@@ -368,8 +368,8 @@ func (c *Client) getPaymail(ctx context.Context, xpubID, paymailAddr string) (*P
 	return paymails[0], nil
 }
 
-func (c *Client) upsertContact(ctx context.Context, pmSrvnt paymailclient.ServiceClient, reqXPubID, ctcFName string, ctcPaymail *paymail.SanitisedPaymail, opts ...ModelOps) (*Contact, error) {
-	contactPki, err := pmSrvnt.GetPkiForPaymail(ctx, ctcPaymail)
+func (c *Client) upsertContact(ctx context.Context, paymailService paymailclient.ServiceClient, reqXPubID, ctcFName string, ctcPaymail *paymail.SanitisedPaymail, opts ...ModelOps) (*Contact, error) {
+	contactPki, err := paymailService.GetPkiForPaymail(ctx, ctcPaymail)
 	if err != nil {
 		return nil, spverrors.ErrGettingPKIFailed
 	}

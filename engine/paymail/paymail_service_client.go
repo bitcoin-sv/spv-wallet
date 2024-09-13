@@ -27,7 +27,7 @@ func NewServiceClient(cache cachestore.ClientInterface, paymailClient paymail.Cl
 	}
 
 	if cache == nil {
-		log.Info().Msg("Doesn't receive cachestore, won't use cache for capabilities")
+		panic(spverrors.Newf("cache is required to create a new paymail service"))
 	}
 
 	return &service{
@@ -60,7 +60,7 @@ func (s *service) GetCapabilities(ctx context.Context, domain string) (*paymail.
 		return nil, err
 	}
 	if capabilities != nil {
-		return capabilities, err
+		return capabilities, nil
 	}
 
 	response, err := s.loadCapabilities(domain)
@@ -74,10 +74,6 @@ func (s *service) GetCapabilities(ctx context.Context, domain string) (*paymail.
 }
 
 func (s *service) loadCapabilitiesFromCache(ctx context.Context, key string) (*paymail.CapabilitiesPayload, error) {
-	if s.cache == nil {
-		return nil, nil
-	}
-
 	capabilities := new(paymail.CapabilitiesPayload)
 	err := s.cache.GetModel(ctx, key, capabilities)
 	if errors.Is(err, cachestore.ErrKeyNotFound) {
@@ -95,23 +91,19 @@ func (s *service) loadCapabilitiesFromCache(ctx context.Context, key string) (*p
 }
 
 func (s *service) putCapabilitiesInCache(ctx context.Context, key string, capabilities paymail.CapabilitiesPayload) {
-	if s.cache == nil || s.cache.Engine().IsEmpty() {
-		return
-	}
-
 	err := s.cache.SetModel(ctx, key, capabilities, cacheTTLCapabilities)
 	if err != nil {
 		s.log.Warn().Err(err).Msgf("failed to store capabilities for key %s in cache", key)
 	}
 }
 
-func (s *service) loadCapabilities(domain string) (response *paymail.CapabilitiesResponse, err error) {
+func (s *service) loadCapabilities(domain string) (*paymail.CapabilitiesResponse, error) {
 	// Get SRV record (domain can be different!)
 	srv, err := s.paymailClient.GetSRVRecord(
 		paymail.DefaultServiceName, paymail.DefaultProtocol, domain,
 	)
 	if err != nil {
-		return
+		return nil, err
 	}
 	return s.paymailClient.GetCapabilities(srv.Target, int(srv.Port)) //nolint:wrapcheck // we have handler for paymail errors
 }
