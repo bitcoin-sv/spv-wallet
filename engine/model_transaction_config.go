@@ -11,11 +11,11 @@ import (
 	"time"
 
 	"github.com/bitcoin-sv/go-paymail"
+	paymailclient "github.com/bitcoin-sv/spv-wallet/engine/paymail"
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/bitcoin-sv/spv-wallet/engine/utils"
 	magic "github.com/bitcoinschema/go-map"
 	"github.com/libsv/go-bt/v2/bscript"
-	"github.com/mrz1836/go-cachestore"
 )
 
 // TransactionConfig is the configuration used to start a transaction
@@ -164,9 +164,7 @@ func (t TransactionConfig) Value() (driver.Value, error) {
 }
 
 // processOutput will inspect the output to determine how to process
-func (t *TransactionOutput) processOutput(ctx context.Context, cacheStore cachestore.ClientInterface,
-	paymailClient paymail.ClientInterface, defaultFromSender string, checkSatoshis bool,
-) error {
+func (t *TransactionOutput) processOutput(ctx context.Context, paymailClient paymailclient.ServiceClient, defaultFromSender string, checkSatoshis bool) error {
 	// Convert known handle formats ($handcash or 1relayx)
 	if strings.Contains(t.To, handleHandcashPrefix) ||
 		(len(t.To) < handleMaxLength && len(t.To) > 1 && t.To[:1] == handleRelayPrefix) {
@@ -182,7 +180,7 @@ func (t *TransactionOutput) processOutput(ctx context.Context, cacheStore caches
 		if checkSatoshis && t.Satoshis <= 0 {
 			return spverrors.ErrOutputValueTooLow
 		}
-		return t.processPaymailOutput(ctx, cacheStore, paymailClient, defaultFromSender)
+		return t.processPaymailOutput(ctx, paymailClient, defaultFromSender)
 	} else if len(t.To) > 0 { // Standard Bitcoin Address
 		if checkSatoshis && t.Satoshis <= 0 {
 			return spverrors.ErrOutputValueTooLow
@@ -199,9 +197,7 @@ func (t *TransactionOutput) processOutput(ctx context.Context, cacheStore caches
 }
 
 // processPaymailOutput will detect how to process the Paymail output given
-func (t *TransactionOutput) processPaymailOutput(ctx context.Context, cacheStore cachestore.ClientInterface,
-	paymailClient paymail.ClientInterface, fromPaymail string,
-) error {
+func (t *TransactionOutput) processPaymailOutput(ctx context.Context, paymailClient paymailclient.ServiceClient, fromPaymail string) error {
 	// Standardize the paymail address (break into parts)
 	alias, domain, paymailAddress := paymail.SanitizePaymail(t.To)
 	if len(paymailAddress) == 0 {
@@ -222,19 +218,10 @@ func (t *TransactionOutput) processPaymailOutput(ctx context.Context, cacheStore
 		t.PaymailP4.Domain = domain
 	}
 
-	// Get the capabilities for the domain
-	capabilities, err := getCapabilities(
-		ctx, cacheStore, paymailClient, domain,
-	)
-	if err != nil {
-		return err
-	}
-
-	// Does the provider support P2P?
-	success, p2pDestinationURL, p2pSubmitTxURL, format := hasP2P(capabilities)
+	success, p2pDestinationURL, p2pSubmitTxURL, format := paymailClient.GetP2P(ctx, domain)
 	if success {
 		return t.processPaymailViaP2P(
-			paymailClient, p2pDestinationURL, p2pSubmitTxURL, fromPaymail, format,
+			paymailClient, p2pDestinationURL, p2pSubmitTxURL, fromPaymail, PaymailPayloadFormat(format),
 		)
 	}
 
@@ -242,7 +229,7 @@ func (t *TransactionOutput) processPaymailOutput(ctx context.Context, cacheStore
 }
 
 // processPaymailViaP2P will process the output for P2P Paymail resolution
-func (t *TransactionOutput) processPaymailViaP2P(client paymail.ClientInterface, p2pDestinationURL, p2pSubmitTxURL string, fromPaymail string, format PaymailPayloadFormat) error {
+func (t *TransactionOutput) processPaymailViaP2P(client paymailclient.ServiceClient, p2pDestinationURL, p2pSubmitTxURL string, fromPaymail string, format PaymailPayloadFormat) error {
 	// todo: this is a hack since paymail providers will complain if satoshis are empty (SendToAll has 0 satoshi)
 	satoshis := t.Satoshis
 	if satoshis <= 0 {
@@ -250,12 +237,12 @@ func (t *TransactionOutput) processPaymailViaP2P(client paymail.ClientInterface,
 	}
 
 	// Get the outputs and destination information from the Paymail provider
-	destinationInfo, err := startP2PTransaction(
-		client, t.PaymailP4.Alias, t.PaymailP4.Domain,
+	destinationInfo, err := client.StartP2PTransaction(
+		t.PaymailP4.Alias, t.PaymailP4.Domain,
 		p2pDestinationURL, satoshis,
 	)
 	if err != nil {
-		return err
+		return spverrors.Wrapf(err, "failed to get P2P destinations for paymail %s@%s", t.PaymailP4.Alias, t.PaymailP4.Domain)
 	}
 
 	// split the total output satoshis across all the paymail outputs given

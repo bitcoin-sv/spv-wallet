@@ -3,11 +3,11 @@ package engine
 import (
 	"context"
 	"fmt"
-	"net/http"
 	"testing"
 
 	"github.com/bitcoin-sv/spv-wallet/engine/chainstate"
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
+	"github.com/bitcoin-sv/spv-wallet/engine/tester/paymailmock"
 	"github.com/bitcoin-sv/spv-wallet/engine/utils"
 	magic "github.com/bitcoinschema/go-map"
 	"github.com/rs/zerolog"
@@ -154,44 +154,42 @@ func TestTransactionConfig_processAddressOutput(t *testing.T) {
 // TestTransactionConfig_processOutput will test the method processOutput()
 func TestTransactionConfig_processOutput(t *testing.T) {
 	// t.Parallel() mocking does not allow parallel tests
-
-	satoshis := uint64(1000)
+	const (
+		testAlias  = "tester"
+		testDomain = "test.com"
+		satoshis   = uint64(1000)
+	)
 	paymailAddress := "TeSTeR@" + testDomain
 
 	t.Run("error - no address or paymail given", func(t *testing.T) {
-		client := newTestPaymailClient(t, []string{testDomain})
+		client := paymailmock.CreatePaymailClientService(testDomain)
 
 		out := &TransactionOutput{
 			Satoshis: satoshis,
 			To:       "",
 		}
 
-		err := out.processOutput(
-			context.Background(), nil, client,
-			defaultSenderPaymail, true,
-		)
+		err := out.processOutput(context.Background(), client, defaultSenderPaymail, true)
 		require.Error(t, err)
 		assert.ErrorIs(t, err, spverrors.ErrOutputValueNotRecognized)
 	})
 
 	t.Run("error - invalid paymail given", func(t *testing.T) {
-		client := newTestPaymailClient(t, []string{testDomain})
+		client := paymailmock.CreatePaymailClientService(testDomain)
 
 		out := &TransactionOutput{
 			Satoshis: satoshis,
 			To:       testAlias + "@",
 		}
 
-		err := out.processOutput(
-			context.Background(), nil, client,
-			defaultSenderPaymail, true,
-		)
+		err := out.processOutput(context.Background(), client, defaultSenderPaymail, true)
 		require.Error(t, err)
 		assert.ErrorIs(t, err, spverrors.ErrPaymailAddressIsInvalid)
 	})
 
 	t.Run("basic paymail address resolution - valid response", func(t *testing.T) {
-		client := newTestPaymailClient(t, []string{testDomain})
+		client := paymailmock.CreatePaymailClientService(testDomain)
+		client.WillRespondWithBasicCapabilities()
 
 		logger := zerolog.Nop()
 		tcOpts := DefaultClientOpts(true, true)
@@ -211,20 +209,16 @@ func TestTransactionConfig_processOutput(t *testing.T) {
 		}
 		require.NotNil(t, out)
 
-		mockValidResponse(http.StatusOK, false, testDomain)
-
-		err = out.processOutput(
-			context.Background(), tc.Cachestore(), client,
-			defaultSenderPaymail, true,
-		)
-		assert.Equal(t, err.Error(), "paymail provider does not support P2P")
+		err = out.processOutput(context.Background(), client, defaultSenderPaymail, true)
+		require.ErrorContains(t, err, "paymail provider does not support P2P")
 	})
 
 	t.Run("basic $handle -> paymail address resolution - valid response", func(t *testing.T) {
 		handle := "$TeSTeR"
 		handleDomain := "handcash.io"
 
-		client := newTestPaymailClient(t, []string{testDomain, handleDomain})
+		client := paymailmock.CreatePaymailClientService(handleDomain)
+		client.WillRespondWithBasicCapabilities()
 
 		logger := zerolog.Nop()
 		tcOpts := DefaultClientOpts(true, true)
@@ -244,12 +238,7 @@ func TestTransactionConfig_processOutput(t *testing.T) {
 		}
 		require.NotNil(t, out)
 
-		mockValidResponse(http.StatusOK, false, handleDomain)
-
-		err = out.processOutput(
-			context.Background(), tc.Cachestore(), client,
-			defaultSenderPaymail, true,
-		)
+		err = out.processOutput(context.Background(), client, defaultSenderPaymail, true)
 		assert.Equal(t, err.Error(), "paymail provider does not support P2P")
 	})
 
@@ -257,7 +246,8 @@ func TestTransactionConfig_processOutput(t *testing.T) {
 		handle := "1TeSTeR"
 		handleDomain := "relayx.io"
 
-		client := newTestPaymailClient(t, []string{testDomain, handleDomain})
+		client := paymailmock.CreatePaymailClientService(testDomain, handleDomain)
+		client.WillRespondWithBasicCapabilities()
 
 		logger := zerolog.Nop()
 		tcOpts := DefaultClientOpts(true, true)
@@ -277,17 +267,13 @@ func TestTransactionConfig_processOutput(t *testing.T) {
 		}
 		require.NotNil(t, out)
 
-		mockValidResponse(http.StatusOK, false, handleDomain)
-
-		err = out.processOutput(
-			context.Background(), tc.Cachestore(), client,
-			defaultSenderPaymail, true,
-		)
-		assert.Equal(t, err.Error(), "paymail provider does not support P2P")
+		err = out.processOutput(context.Background(), client, defaultSenderPaymail, true)
+		require.ErrorContains(t, err, "paymail provider does not support P2P")
 	})
 
 	t.Run("p2p paymail address resolution - valid response", func(t *testing.T) {
-		client := newTestPaymailClient(t, []string{testDomain})
+		client := paymailmock.CreatePaymailClientService(testDomain)
+		client.WillRespondWithP2PCapabilities()
 
 		logger := zerolog.Nop()
 		tcOpts := DefaultClientOpts(true, true)
@@ -307,12 +293,7 @@ func TestTransactionConfig_processOutput(t *testing.T) {
 		}
 		require.NotNil(t, out)
 
-		mockValidResponse(http.StatusOK, true, testDomain)
-
-		err = out.processOutput(
-			context.Background(), tc.Cachestore(), client,
-			defaultSenderPaymail, true,
-		)
+		err = out.processOutput(context.Background(), client, defaultSenderPaymail, true)
 		require.NoError(t, err)
 		assert.Equal(t, satoshis, out.Satoshis)
 		assert.Equal(t, testAlias+"@"+testDomain, out.To)
@@ -322,7 +303,7 @@ func TestTransactionConfig_processOutput(t *testing.T) {
 		assert.Equal(t, "", out.PaymailP4.Note)
 		assert.Equal(t, ResolutionTypeP2P, out.PaymailP4.ResolutionType)
 		assert.Equal(t, "z0bac4ec-6f15-42de-9ef4-e60bfdabf4f7", out.PaymailP4.ReferenceID)
-		assert.Equal(t, testServerURL+"/receive-transaction/{alias}@{domain.tld}", out.PaymailP4.ReceiveEndpoint)
+		assert.Equal(t, client.GetMockedServerURL(testDomain)+"/receive-transaction/{alias}@{domain.tld}", out.PaymailP4.ReceiveEndpoint)
 	})
 }
 

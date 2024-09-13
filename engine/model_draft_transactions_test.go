@@ -4,16 +4,15 @@ import (
 	"context"
 	"encoding/hex"
 	"fmt"
-	"net/http"
 	"strings"
 	"testing"
 	"time"
 
 	"github.com/bitcoin-sv/spv-wallet/engine/chainstate"
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
+	xtester "github.com/bitcoin-sv/spv-wallet/engine/tester/paymailmock"
 	"github.com/bitcoin-sv/spv-wallet/engine/utils"
 	"github.com/bitcoinschema/go-bitcoin/v2"
-	"github.com/jarcoal/httpmock"
 	"github.com/libsv/go-bk/bec"
 	"github.com/libsv/go-bk/bip32"
 	"github.com/libsv/go-bt/v2"
@@ -670,22 +669,15 @@ func TestDraftTransaction_createTransaction(t *testing.T) {
 	})
 
 	t.Run("SendAllTo + 2 utxos", func(t *testing.T) {
-		p := newTestPaymailClient(t, []string{"handcash.io"})
+		p := xtester.MockClient("handcash.io")
+		p.WillRespondWithP2PCapabilities()
+
 		ctx, client, deferMe := CreateTestSQLiteClient(t, false, true,
 			withTaskManagerMockup(),
 			WithPaymailClient(p),
 		)
 		defer deferMe()
 		prepareAdditionalModels(ctx, t, client, true)
-
-		httpmock.Reset()
-		mockValidResponse(http.StatusOK, true, "handcash.io")
-		httpmock.RegisterResponder(http.MethodPost, "https://handcash.io/api/v1/bsvalias/p2p-payment-destination/mrzz@handcash.io",
-			httpmock.NewStringResponder(
-				200,
-				`{"outputs": [{"script": "76a9143e2d1d795f8acaa7957045cc59376177eb04a3c588ac","satoshis": 100}],"reference": "z0bac4ec-6f15-42de-9ef4-e60bfdabf4f7"}`,
-			),
-		)
 
 		draftTransaction, err := newDraftTransaction(testXPub, &TransactionConfig{
 			FromUtxos: []*UtxoPointer{{

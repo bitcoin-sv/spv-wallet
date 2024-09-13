@@ -4,10 +4,21 @@ import (
 	"context"
 	"time"
 
+	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/gomodule/redigo/redis"
 	"github.com/mrz1836/go-cache"
+	"github.com/mrz1836/go-cachestore"
 	"github.com/rafaeljusto/redigomock"
 )
+
+// CacheStore will return a cache store for using in tests
+func CacheStore() cachestore.ClientInterface {
+	cacheStore, err := cachestore.NewClient(context.Background(), cachestore.WithFreeCache())
+	if err != nil {
+		panic(spverrors.Wrapf(err, "cannot create cache store for tests"))
+	}
+	return cacheStore
+}
 
 // LoadMockRedis will load a mocked redis connection
 func LoadMockRedis(
