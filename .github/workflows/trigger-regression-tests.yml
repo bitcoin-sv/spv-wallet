@@ -1,4 +1,4 @@
-name: "Trigger Regression Tests"
+name: "Regression Tests"
 
 on:
   workflow_dispatch:
@@ -72,7 +72,7 @@ jobs:
           done
 
           if [[ "$success" == "true" ]]; then
-            echo "The regression tests completed successfully." >> $GITHUB_STEP_SUMMARY
+            echo "The regression tests were triggered and results were received" >> $GITHUB_STEP_SUMMARY
             artifact_name=$(echo "$artifact_data" | jq -r ".artifacts[] | select(.name | contains(\"${{ env.RUN_ID }}\")) | .name")
             status=$(echo "$artifact_name" | cut -d'_' -f1)
             run_id=$(echo "$artifact_name" | cut -d'_' -f2)
@@ -86,7 +86,7 @@ jobs:
               exit 1
             fi
           else
-            echo "We couldn't determine the workflow's final status. No artifact found." >> $GITHUB_STEP_SUMMARY
+            echo "We could not determine the final status of the regression tests. No results were found." >> $GITHUB_STEP_SUMMARY
             exit 1
           fi
           
