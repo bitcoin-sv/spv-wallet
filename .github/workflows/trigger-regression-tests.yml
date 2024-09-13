@@ -89,4 +89,3 @@ jobs:
             echo "We could not determine the final status of the regression tests. No results were found." >> $GITHUB_STEP_SUMMARY
             exit 1
           fi
-          
