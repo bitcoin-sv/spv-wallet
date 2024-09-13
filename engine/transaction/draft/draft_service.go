@@ -4,13 +4,32 @@ import (
 	"context"
 
 	sdk "github.com/bitcoin-sv/go-sdk/transaction"
+	"github.com/bitcoin-sv/spv-wallet/engine/paymail"
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/bitcoin-sv/spv-wallet/engine/transaction"
 	txerrors "github.com/bitcoin-sv/spv-wallet/engine/transaction/errors"
+	"github.com/rs/zerolog"
 )
 
+type service struct {
+	logger         *zerolog.Logger
+	paymailService paymail.ServiceClient
+}
+
+// NewDraftService creates a new draft service.
+func NewDraftService(paymailService paymail.ServiceClient, logger zerolog.Logger) Service {
+	if paymailService == nil {
+		panic("paymail service is required to create draft transaction service")
+	}
+
+	return &service{
+		logger:         &logger,
+		paymailService: paymailService,
+	}
+}
+
 // Create creates a new draft transaction based on specification.
-func Create(ctx context.Context, spec *TransactionSpec) (*Transaction, error) {
+func (s *service) Create(ctx context.Context, spec *TransactionSpec) (*Transaction, error) {
 	if spec == nil {
 		return nil, txerrors.ErrDraftSpecificationRequired
 	}

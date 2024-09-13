@@ -24,7 +24,7 @@ import (
 	"github.com/mrz1836/go-cachestore"
 	"github.com/newrelic/go-agent/v3/newrelic"
 	"github.com/rs/zerolog"
-	taskq "github.com/vmihailenco/taskq/v3"
+	"github.com/vmihailenco/taskq/v3"
 )
 
 // ClientOps allow functional options to be supplied that overwrite default client options.
@@ -92,6 +92,11 @@ func defaultClientOptions() *clientOptions {
 				Configuration: nil,
 				options:       []server.ConfigOps{},
 			},
+		},
+
+		// Blank transaction draft config
+		transactionDraft: &transactionDraftOptions{
+			service: nil,
 		},
 
 		// Blank TaskManager config

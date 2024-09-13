@@ -12,6 +12,7 @@ import (
 	paymailclient "github.com/bitcoin-sv/spv-wallet/engine/paymail"
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/bitcoin-sv/spv-wallet/engine/taskmanager"
+	"github.com/bitcoin-sv/spv-wallet/engine/transaction/draft"
 	"github.com/mrz1836/go-cachestore"
 )
 
@@ -150,6 +151,14 @@ func (c *Client) loadPaymailComponents() (err error) {
 	if c.options.paymail.service == nil {
 		logger := c.Logger().With().Str("subservice", "paymail").Logger()
 		c.options.paymail.service = paymailclient.NewServiceClient(c.Cachestore(), c.options.paymail.client, logger)
+	}
+	return
+}
+
+func (c *Client) loadTransactionDraftService() (err error) {
+	if c.options.transactionDraft.service == nil {
+		logger := c.Logger().With().Str("subservice", "transactionDraft").Logger()
+		c.options.transactionDraft.service = draft.NewDraftService(c.PaymailService(), logger)
 	}
 	return
 }
