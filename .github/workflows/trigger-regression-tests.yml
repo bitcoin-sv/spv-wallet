@@ -1,4 +1,4 @@
-name: Trigger Regression Tests
+name: "Regression Tests"
 
 on:
   workflow_dispatch:
@@ -9,15 +9,11 @@ env:
   RUN_ID: ${{ github.run_id }}-${{ github.run_attempt }}
 
 jobs:
-  run:
+  release:
     if: >
       (github.event_name == 'workflow_dispatch') ||
       (github.event_name == 'pull_request_target' && github.event.label.name == 'regression-tests')
-    runs-on: ubuntu-latest
-
-  release:
-    needs: run
-    uses: bactions/workflows/.github/workflows/release-go-server.yml@main
+    uses: bactions/workflows/.github/workflows/release-go-server.yml@feat/spv-1030-remove-goreleaser
     with:
       ref: ${{ github.head_ref || github.ref }}
       version: ${{ github.run_id }}-${{ github.run_attempt }}
@@ -39,7 +35,7 @@ jobs:
 
       - name: Trigger Regression Tests
         env:
-          GH_TOKEN: ${{ secrets.GH_TOKEN }}
+          GH_TOKEN: ${{ secrets.REGRESSION_TEST_GH_TOKEN }}
         run: |
           RUN_ID=${{ env.RUN_ID }}
           IMAGE_TAG=${{ needs.release.outputs.imageVersion }}
@@ -61,7 +57,7 @@ jobs:
           success=false
           for i in {1..6}; do
             # Fetch the list of artifacts from the target repository
-            artifact_data=$(curl -s -H "Authorization: token ${{ secrets.GH_TOKEN }}" \
+            artifact_data=$(curl -s -H "Authorization: token ${{ secrets.REGRESSION_TEST_GH_TOKEN }}" \
                       https://api.github.com/repos/4chain-ag/spv-wallet-regression/actions/artifacts)
 
           # Check if an artifact containing the RUN_ID exists
@@ -76,7 +72,7 @@ jobs:
           done
 
           if [[ "$success" == "true" ]]; then
-            echo "The regression tests completed successfully." >> $GITHUB_STEP_SUMMARY
+            echo "The regression tests were triggered and results were received" >> $GITHUB_STEP_SUMMARY
             artifact_name=$(echo "$artifact_data" | jq -r ".artifacts[] | select(.name | contains(\"${{ env.RUN_ID }}\")) | .name")
             status=$(echo "$artifact_name" | cut -d'_' -f1)
             run_id=$(echo "$artifact_name" | cut -d'_' -f2)
@@ -84,7 +80,12 @@ jobs:
             full_link="https://github.com/4chain-ag/spv-wallet-regression/actions/runs/$run_id"
             echo "Status of workflow $triggering_run_id: $status" >> $GITHUB_STEP_SUMMARY
             echo "Check workflow execution at: $full_link" >> $GITHUB_STEP_SUMMARY
+
+            if [[ "$status" != "success" ]]; then
+              echo "The workflow did not complete successfully. Status: $status" >> $GITHUB_STEP_SUMMARY
+              exit 1
+            fi
           else
-            echo "We couldn't determine the workflow's final status. No artifact found." >> $GITHUB_STEP_SUMMARY
+            echo "We could not determine the final status of the regression tests. No results were found." >> $GITHUB_STEP_SUMMARY
             exit 1
           fi
