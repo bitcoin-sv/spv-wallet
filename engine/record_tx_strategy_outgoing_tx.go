@@ -22,8 +22,8 @@ func (strategy *outgoingTx) Name() string {
 func (strategy *outgoingTx) Execute(ctx context.Context, c ClientInterface, opts []ModelOps) (*Transaction, error) {
 	logger := c.Logger()
 
-	// create
 	transaction, err := _createOutgoingTxToRecord(ctx, strategy, c, opts)
+	transaction.TxStatus = string(TxStatusCreated)
 	if err != nil {
 		return nil, spverrors.ErrCreateOutgoingTxFailed
 	}
@@ -42,10 +42,28 @@ func (strategy *outgoingTx) Execute(ctx context.Context, c ClientInterface, opts
 		}
 	}
 
+	// transaction can be updated by internal_incoming_tx
+	transaction, err = _getTransaction(ctx, transaction.ID, opts)
+	if err != nil {
+		return nil, err
+	}
+
+	if transaction.TxStatus == string(TxStatusBroadcasted) {
+		// no need to broadcast twice
+		return transaction, nil
+	}
+
+	transaction.TxStatus = string(TxStatusSent)
 	if err := broadcastTxAndUpdateSync(ctx, transaction); err != nil {
 		logger.Warn().Str("txID", transaction.ID).Msgf("broadcasting failed in outgoingTx strategy")
 		// ignore error, transaction most likely is successfully broadcasted by payment receiver
 		// TODO: return a Warning to a client
+	} else {
+		transaction.TxStatus = string(TxStatusBroadcasted)
+	}
+
+	if err := transaction.Save(ctx); err != nil {
+		c.Logger().Error().Str("txID", transaction.ID).Err(err).Msgf("Outgoing transaction has been %v but failed save to db", transaction.TxStatus)
 	}
 
 	return transaction, nil
