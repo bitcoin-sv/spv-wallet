@@ -7,6 +7,8 @@ import (
 	"testing"
 
 	sdk "github.com/bitcoin-sv/go-sdk/transaction"
+	"github.com/bitcoin-sv/spv-wallet/engine/tester"
+	"github.com/bitcoin-sv/spv-wallet/engine/tester/paymailmock"
 	"github.com/bitcoin-sv/spv-wallet/engine/transaction"
 	"github.com/bitcoin-sv/spv-wallet/engine/transaction/draft"
 	"github.com/bitcoin-sv/spv-wallet/engine/transaction/draft/outputs"
@@ -54,12 +56,15 @@ func TestCreateOpReturnDraft(t *testing.T) {
 	for name, test := range successTests {
 		t.Run("return draft "+name, func(t *testing.T) {
 			// given:
+			draftService := draft.NewDraftService(paymailmock.CreatePaymailClientService("test"), tester.Logger())
+
+			// and:
 			spec := &draft.TransactionSpec{
 				Outputs: outputs.NewSpecifications(test.opReturn),
 			}
 
 			// when:
-			draftTx, err := draft.Create(context.Background(), spec)
+			draftTx, err := draftService.Create(context.Background(), spec)
 
 			// then:
 			require.NoError(t, err)
@@ -124,12 +129,15 @@ func TestCreateOpReturnDraft(t *testing.T) {
 	for name, test := range errorTests {
 		t.Run("return error "+name, func(t *testing.T) {
 			// given:
+			draftService := draft.NewDraftService(paymailmock.CreatePaymailClientService("test"), tester.Logger())
+
+			// and:
 			spec := &draft.TransactionSpec{
 				Outputs: outputs.NewSpecifications(test.spec),
 			}
 
 			// when:
-			_, err := draft.Create(context.Background(), spec)
+			_, err := draftService.Create(context.Background(), spec)
 
 			// then:
 			require.Error(t, err)
