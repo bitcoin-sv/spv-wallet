@@ -3,6 +3,7 @@ package engine
 import (
 	"context"
 
+	"github.com/bitcoin-sv/go-broadcast-client/broadcast"
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/bitcoin-sv/spv-wallet/engine/utils"
 	"github.com/libsv/go-bc"
@@ -247,8 +248,15 @@ func (m *Transaction) SetBUMP(bump *bc.BUMP) {
 	}
 }
 
-func (m *Transaction) IsOnChain() bool {
-	return m.BlockHash != "" && !m.BUMP.Empty()
+func (m *Transaction) UpdateFromBroadcastStatus(bStatus broadcast.TxStatus) {
+	switch bStatus {
+	case broadcast.Mined, broadcast.Confirmed:
+		m.TxStatus = string(TxStatusMined)
+	case broadcast.SeenInOrphanMempool, broadcast.Rejected:
+		m.TxStatus = string(TxStatusProblematic)
+	default:
+		// don't change current TxStatus on other bStatuses
+	}
 }
 
 // IsXpubAssociated will check if this key is associated to this transaction

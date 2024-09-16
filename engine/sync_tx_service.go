@@ -4,38 +4,80 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"time"
 
 	"github.com/bitcoin-sv/spv-wallet/engine/chainstate"
-	"github.com/bitcoin-sv/spv-wallet/engine/datastore"
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 )
 
 // processSyncTransactions will process sync transaction records
-func processSyncTransactions(ctx context.Context, maxTransactions int, opts ...ModelOps) error {
-	queryParams := &datastore.QueryParams{
-		Page:          1,
-		PageSize:      maxTransactions,
-		OrderByField:  "created_at",
-		SortDirection: "desc",
-	}
+func processSyncTransactions(ctx context.Context, client *Client) {
+	logger := client.Logger()
+	db := client.Datastore().DB()
+	chainstateService := client.Chainstate()
 
-	// Get x records
-	records, err := getTransactionsToSync(
-		ctx, queryParams, opts...,
-	)
+	delayedForBroadcasted := time.Now().Add(-1 * time.Hour)
+	delayedForNotBroadcasted := time.Now().Add(-10 * time.Minute)
+	var txIDsToSync []struct {
+		ID string
+	}
+	err := db.
+		Model(&Transaction{}).
+		Where("state = ? AND created_at < ?", TxStatusBroadcasted, delayedForBroadcasted).
+		Or("state IN (?) AND created_at < ?", []TxStatus{TxStatusCreated, TxStatusSent}, delayedForNotBroadcasted).
+		Find(&txIDsToSync).Error
 	if err != nil {
-		return err
-	} else if len(records) == 0 {
-		return nil
+		logger.Error().Err(err).Msg("Cannot fetch transactions to sync")
+		return
 	}
 
-	for index := range records {
-		if err = _syncTxDataFromChain(ctx, records[index]); err != nil {
-			return err
+	var tx Transaction
+	for _, record := range txIDsToSync {
+		txID := record.ID
+		err := db.First(&tx).Error
+		if err != nil {
+			logger.Warn().Str("txID", txID).Msg("Cannot get transaction by ID even though the ID was returned from DB")
+			continue
 		}
-	}
+		txInfo, err := chainstateService.QueryTransaction(ctx, txID, chainstate.RequiredOnChain, defaultQueryTxTimeout)
+		if err != nil {
+			if errors.Is(err, spverrors.ErrBroadcastUnreachable) {
+				logger.Warn().Msgf("%s", err.Error())
+				// checking subsequent transactions is pointless if the broadcast server (ARC) is unreachable
+				// will try again in the next cycle
+				return
+			}
 
-	return nil
+			if errors.Is(err, spverrors.ErrCouldNotFindTransaction) {
+				if tx.CreatedAt.Before(time.Now().Add(-24 * time.Hour)) {
+					tx.TxStatus = string(TxStatusProblematic)
+					if err := db.Save(&tx).Error; err != nil {
+						logger.Error().Err(err).Str("txID", txID).Msg("Cannot update transaction status to problematic")
+						continue
+					}
+				}
+
+				if tx.TxStatus == string(TxStatusCreated) || tx.TxStatus == string(TxStatusSent) {
+					// TODO try to broadcast again
+					continue
+				}
+			}
+
+			logger.Error().Err(err).Str("txID", txID).Msg("Cannot query transaction")
+		}
+
+		tx.BlockHash = txInfo.BlockHash
+		tx.BlockHeight = uint64(txInfo.BlockHeight)
+		tx.SetBUMP(txInfo.BUMP)
+		tx.UpdateFromBroadcastStatus(txInfo.TxStatus)
+
+		tx.TxStatus = string(TxStatusProblematic)
+		if err := db.Save(&tx).Error; err != nil {
+			logger.Error().Err(err).Str("txID", txID).Msg("Cannot update transaction status to problematic")
+			continue
+		}
+
+	}
 }
 
 // broadcastTxAndUpdateSync will broadcast transaction and and SyncStatus in syncTx
@@ -100,53 +142,6 @@ func _getTxHexInFormat(ctx context.Context, tx *Transaction, prefferedFormat cha
 	actualFormat = chainstate.RawTx
 
 	return
-}
-
-// _syncTxDataFromChain will process the sync transaction record, or save the failure
-func _syncTxDataFromChain(ctx context.Context, syncTx *SyncTransaction) error {
-	logger := syncTx.Client().Logger()
-	defer recoverAndLog(logger)
-
-	tx, err := _getTransaction(ctx, syncTx.ID, syncTx.GetOptions(false))
-	if err != nil {
-		return spverrors.ErrCouldNotFindTransaction
-	}
-
-	chainstateService := syncTx.Client().Chainstate()
-	txInfo, err := chainstateService.QueryTransaction(
-		ctx, syncTx.ID, chainstate.RequiredOnChain, defaultQueryTxTimeout,
-	)
-	if err != nil {
-		if errors.Is(err, spverrors.ErrCouldNotFindTransaction) {
-			/* DEPRECATED block of code with syncTx - will be removed soon */
-			syncTx.SyncStatus = SyncStatusReady
-			/* DEPRECATED END */
-			return nil
-		}
-		return spverrors.Wrapf(err, "could not query transaction")
-	}
-
-	tx.BlockHash = txInfo.BlockHash
-	tx.BlockHeight = uint64(txInfo.BlockHeight)
-	tx.TxStatus = string(txInfo.TxStatus)
-	tx.SetBUMP(txInfo.BUMP)
-
-	if !tx.IsOnChain() {
-		logger.Warn().Interface("txInfo", txInfo).Msgf("TransactionInfo is invalid")
-		return nil
-	}
-	if err := tx.Save(ctx); err != nil {
-		return err
-	}
-
-	/* DEPRECATED block of code with syncTx - will be removed soon */
-	syncTx.SyncStatus = SyncStatusComplete
-	if err := syncTx.Save(ctx); err != nil {
-		return err
-	}
-	/* DEPRECATED END */
-
-	return nil
 }
 
 func _getTransaction(ctx context.Context, id string, opts []ModelOps) (*Transaction, error) {

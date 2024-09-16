@@ -81,12 +81,7 @@ func (c *Client) QueryTransaction(
 		return nil, spverrors.ErrInvalidRequirements
 	}
 
-	// Try all providers and return the "first" valid response
-	info := c.query(ctx, id, requiredIn, timeout)
-	if info == nil {
-		return nil, spverrors.ErrCouldNotFindTransaction
-	}
-	return info, nil
+	return c.query(ctx, id, requiredIn, timeout)
 }
 
 // QueryTransactionFastest will get the transaction info from ALL provider(s) returning the "fastest" valid result

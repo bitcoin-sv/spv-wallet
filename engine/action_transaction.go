@@ -386,8 +386,8 @@ func (c *Client) RevertTransaction(ctx context.Context, id string) error {
 	return err
 }
 
-// UpdateTransaction will update the broadcast callback transaction info, like: block height, block hash, status, bump.
-func (c *Client) UpdateTransaction(ctx context.Context, callbackResp *broadcast.SubmittedTx) error {
+// HandleTxCallback will update the broadcast callback transaction info, like: block height, block hash, status, bump.
+func (c *Client) HandleTxCallback(ctx context.Context, callbackResp *broadcast.SubmittedTx) error {
 	logger := c.options.logger
 	bump, err := bc.NewBUMPFromStr(callbackResp.MerklePath)
 	if err != nil {
@@ -405,29 +405,12 @@ func (c *Client) UpdateTransaction(ctx context.Context, callbackResp *broadcast.
 
 	tx.BlockHash = callbackResp.BlockHash
 	tx.BlockHeight = uint64(callbackResp.BlockHeight)
-	tx.TxStatus = string(callbackResp.TxStatus)
 	tx.SetBUMP(bump)
-
-	if !tx.IsOnChain() {
-		logger.Warn().Str("txID", txID).Msgf("Transaction is not on chain yet")
-		return nil
-	}
+	tx.UpdateFromBroadcastStatus(callbackResp.TxStatus)
 
 	if err := tx.Save(ctx); err != nil {
 		return err
 	}
-
-	/* DEPRECATED block of code with syncTx - will be removed soon */
-	syncTx, err := GetSyncTransactionByTxID(ctx, txID, c.DefaultModelOptions()...)
-	if err != nil {
-		logger.Err(err).Msgf("failed to get sync transaction by tx id: %v", txID)
-		return err
-	}
-	syncTx.SyncStatus = SyncStatusComplete
-	if err := syncTx.Save(ctx); err != nil {
-		return err
-	}
-	/* DEPRECATED END */
 
 	return nil
 }

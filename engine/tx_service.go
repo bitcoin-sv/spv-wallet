@@ -14,6 +14,7 @@ import (
 func saveRawTransaction(ctx context.Context, c ClientInterface, allowUnknown bool, txHex string, opts ...ModelOps) (*Transaction, error) {
 	newOpts := c.DefaultModelOptions(append(opts, New())...)
 	tx, err := txFromHex(txHex, newOpts...)
+	tx.TxStatus = string(TxStatusCreated)
 	if err != nil {
 		return nil, spverrors.ErrMissingTxHex
 	}
@@ -33,17 +34,6 @@ func saveRawTransaction(ctx context.Context, c ClientInterface, allowUnknown boo
 
 	if err = tx.processUtxos(ctx); err != nil {
 		return nil, err
-	}
-
-	if !tx.IsOnChain() {
-		sync := newSyncTransaction(
-			tx.GetID(),
-			c.DefaultSyncConfig(),
-			tx.GetOptions(true)...,
-		)
-
-		sync.Metadata = tx.Metadata
-		tx.syncTransaction = sync
 	}
 
 	if err = tx.Save(ctx); err != nil {

@@ -194,3 +194,7 @@ func (c *Client) IsDebug() bool {
 func (c *Client) IsNewRelicEnabled() bool {
 	return c.options.newRelicEnabled
 }
+
+func (c *Client) DB() *gorm.DB {
+	return c.options.db
+}
