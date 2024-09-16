@@ -155,12 +155,12 @@ func (c *Client) loadPaymailComponents() (err error) {
 	return
 }
 
-func (c *Client) loadTransactionDraftService() (err error) {
-	if c.options.transactionDraft.service == nil {
+func (c *Client) loadTransactionDraftService() error {
+	if c.options.transactionDraftService == nil {
 		logger := c.Logger().With().Str("subservice", "transactionDraft").Logger()
-		c.options.transactionDraft.service = draft.NewDraftService(c.PaymailService(), logger)
+		c.options.transactionDraftService = draft.NewDraftService(c.PaymailService(), logger)
 	}
-	return
+	return nil
 }
 
 // loadTaskmanager will load the TaskManager and start the TaskManager client

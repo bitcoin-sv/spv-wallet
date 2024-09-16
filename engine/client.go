@@ -30,23 +30,23 @@ type (
 
 	// clientOptions holds all the configuration for the client
 	clientOptions struct {
-		cacheStore       *cacheStoreOptions       // Configuration options for Cachestore (ristretto, redis, etc.)
-		cluster          *clusterOptions          // Configuration options for the cluster coordinator
-		chainstate       *chainstateOptions       // Configuration options for Chainstate (broadcast, sync, etc.)
-		dataStore        *dataStoreOptions        // Configuration options for the DataStore (PostgreSQL, etc.)
-		debug            bool                     // If the client is in debug mode
-		encryptionKey    string                   // Encryption key for encrypting sensitive information (IE: paymail xPub) (hex encoded key)
-		httpClient       HTTPInterface            // HTTP interface to use
-		iuc              bool                     // (Input UTXO Check) True will check input utxos when saving transactions
-		logger           *zerolog.Logger          // Internal logging
-		metrics          *metrics.Metrics         // Metrics with a collector interface
-		models           *modelOptions            // Configuration options for the loaded models
-		newRelic         *newRelicOptions         // Configuration options for NewRelic
-		notifications    *notificationsOptions    // Configuration options for Notifications
-		paymail          *paymailOptions          // Paymail options & client
-		transactionDraft *transactionDraftOptions // Draft transaction service
-		taskManager      *taskManagerOptions      // Configuration options for the TaskManager (TaskQ, etc.)
-		userAgent        string                   // User agent for all outgoing requests
+		cacheStore              *cacheStoreOptions    // Configuration options for Cachestore (ristretto, redis, etc.)
+		cluster                 *clusterOptions       // Configuration options for the cluster coordinator
+		chainstate              *chainstateOptions    // Configuration options for Chainstate (broadcast, sync, etc.)
+		dataStore               *dataStoreOptions     // Configuration options for the DataStore (PostgreSQL, etc.)
+		debug                   bool                  // If the client is in debug mode
+		encryptionKey           string                // Encryption key for encrypting sensitive information (IE: paymail xPub) (hex encoded key)
+		httpClient              HTTPInterface         // HTTP interface to use
+		iuc                     bool                  // (Input UTXO Check) True will check input utxos when saving transactions
+		logger                  *zerolog.Logger       // Internal logging
+		metrics                 *metrics.Metrics      // Metrics with a collector interface
+		models                  *modelOptions         // Configuration options for the loaded models
+		newRelic                *newRelicOptions      // Configuration options for NewRelic
+		notifications           *notificationsOptions // Configuration options for Notifications
+		paymail                 *paymailOptions       // Paymail options & client
+		transactionDraftService draft.Service         // Service for transaction drafts
+		taskManager             *taskManagerOptions   // Configuration options for the TaskManager (TaskQ, etc.)
+		userAgent               string                // User agent for all outgoing requests
 	}
 
 	// chainstateOptions holds the chainstate configuration and client
@@ -119,10 +119,6 @@ type (
 		taskmanager.TaskEngine                          // Client for TaskManager
 		options                []taskmanager.Options    // List of options
 		cronCustomPeriods      map[string]time.Duration // will override the default period of cronJob
-	}
-
-	transactionDraftOptions struct {
-		service draft.Service
 	}
 )
 
