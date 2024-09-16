@@ -2,10 +2,12 @@ package chainstate
 
 import (
 	"context"
+	"errors"
 	"strings"
 	"sync"
 	"time"
 
+	"github.com/bitcoin-sv/go-broadcast-client/broadcast"
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/libsv/go-bc"
 )
@@ -70,9 +72,14 @@ func (c *Client) fastestQuery(ctx context.Context, id string, requiredIn Require
 func queryBroadcastClient(ctx context.Context, client ClientInterface, id string) (*TransactionInfo, error) {
 	resp, err := client.BroadcastClient().QueryTransaction(ctx, id)
 	if err != nil {
-		return nil, spverrors.ErrCouldNotFindTransaction
-		// TODO check if ARC cannot find the transaction but it is reachable
-		// return nil, spverrors.ErrBroadcastUnreachable.Wrap(err)
+		var arcError *broadcast.ArcError
+		if errors.As(err, &arcError) {
+			if arcError.IsRejectedTransaction() {
+				return nil, spverrors.ErrBroadcastRejectedTransaction.Wrap(err)
+			}
+			return nil, spverrors.ErrCouldNotFindTransaction.Wrap(err)
+		}
+		return nil, spverrors.ErrBroadcastUnreachable.Wrap(err)
 	}
 
 	if resp == nil || !strings.EqualFold(resp.TxID, id) {

@@ -39,6 +39,7 @@ func processSyncTransactions(ctx context.Context, client *Client) {
 			logger.Warn().Str("txID", txID).Msg("Cannot get transaction by ID even though the ID was returned from DB")
 			continue
 		}
+		tx.client = client // hydrate the client
 		txInfo, err := chainstateService.QueryTransaction(ctx, txID, chainstate.RequiredOnChain, defaultQueryTxTimeout)
 		if err != nil {
 			if errors.Is(err, spverrors.ErrBroadcastUnreachable) {
@@ -48,10 +49,18 @@ func processSyncTransactions(ctx context.Context, client *Client) {
 				return
 			}
 
+			if errors.Is(err, spverrors.ErrBroadcastRejectedTransaction) {
+				tx.TxStatus = string(TxStatusProblematic)
+				if err := tx.Save(ctx); err != nil {
+					logger.Error().Err(err).Str("txID", txID).Msg("Cannot update transaction status to problematic")
+					continue
+				}
+			}
+
 			if errors.Is(err, spverrors.ErrCouldNotFindTransaction) {
 				if tx.CreatedAt.Before(time.Now().Add(-24 * time.Hour)) {
 					tx.TxStatus = string(TxStatusProblematic)
-					if err := db.Save(&tx).Error; err != nil {
+					if err := tx.Save(ctx); err != nil {
 						logger.Error().Err(err).Str("txID", txID).Msg("Cannot update transaction status to problematic")
 						continue
 					}
@@ -72,7 +81,7 @@ func processSyncTransactions(ctx context.Context, client *Client) {
 		tx.UpdateFromBroadcastStatus(txInfo.TxStatus)
 
 		tx.TxStatus = string(TxStatusProblematic)
-		if err := db.Save(&tx).Error; err != nil {
+		if err := tx.Save(ctx); err != nil {
 			logger.Error().Err(err).Str("txID", txID).Msg("Cannot update transaction status to problematic")
 			continue
 		}

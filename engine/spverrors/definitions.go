@@ -372,3 +372,6 @@ var ErrBroadcastUnreachable = models.SPVError{Message: "broadcast server cannot 
 
 // ErrBroadcastWrongBUMPResponse is when broadcast server returned wrong BUMP response
 var ErrBroadcastWrongBUMPResponse = models.SPVError{Message: "broadcast server returned wrong BUMP response", StatusCode: 400, Code: "error-broadcast-wrong-bump-response"}
+
+// ErrBroadcastRejectedTransaction is when broadcast server rejected transaction
+var ErrBroadcastRejectedTransaction = models.SPVError{Message: "broadcast rejected transaction", StatusCode: 400, Code: "error-broadcast-rejected-transaction"}
