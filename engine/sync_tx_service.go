@@ -2,7 +2,6 @@ package engine
 
 import (
 	"context"
-	"encoding/json"
 	"errors"
 	"fmt"
 
@@ -31,9 +30,7 @@ func processSyncTransactions(ctx context.Context, maxTransactions int, opts ...M
 	}
 
 	for index := range records {
-		if err = _syncTxDataFromChain(
-			ctx, records[index], nil,
-		); err != nil {
+		if err = _syncTxDataFromChain(ctx, records[index]); err != nil {
 			return err
 		}
 	}
@@ -106,34 +103,50 @@ func _getTxHexInFormat(ctx context.Context, tx *Transaction, prefferedFormat cha
 }
 
 // _syncTxDataFromChain will process the sync transaction record, or save the failure
-func _syncTxDataFromChain(ctx context.Context, syncTx *SyncTransaction, transaction *Transaction) error {
-	// Successfully capture any panics, convert to readable string and log the error
-	defer recoverAndLog(syncTx.Client().Logger())
+func _syncTxDataFromChain(ctx context.Context, syncTx *SyncTransaction) error {
+	logger := syncTx.Client().Logger()
+	defer recoverAndLog(logger)
 
-	var err error
-
-	if transaction == nil {
-		if transaction, err = _getTransaction(ctx, syncTx.ID, syncTx.GetOptions(false)); err != nil {
-			return spverrors.ErrCouldNotFindTransaction
-		}
+	tx, err := _getTransaction(ctx, syncTx.ID, syncTx.GetOptions(false))
+	if err != nil {
+		return spverrors.ErrCouldNotFindTransaction
 	}
 
-	// Find on-chain
-	var txInfo *chainstate.TransactionInfo
-	if txInfo, err = syncTx.Client().Chainstate().QueryTransaction(
+	chainstateService := syncTx.Client().Chainstate()
+	txInfo, err := chainstateService.QueryTransaction(
 		ctx, syncTx.ID, chainstate.RequiredOnChain, defaultQueryTxTimeout,
-	); err != nil {
+	)
+	if err != nil {
 		if errors.Is(err, spverrors.ErrCouldNotFindTransaction) {
-			syncTx.Client().Logger().Info().
-				Str("txID", syncTx.ID).
-				Msgf("Transaction not found on-chain, will try again later")
-
+			/* DEPRECATED block of code with syncTx - will be removed soon */
 			syncTx.SyncStatus = SyncStatusReady
+			/* DEPRECATED END */
 			return nil
 		}
 		return spverrors.Wrapf(err, "could not query transaction")
 	}
-	return processSyncTxSave(ctx, txInfo, syncTx, transaction)
+
+	tx.BlockHash = txInfo.BlockHash
+	tx.BlockHeight = uint64(txInfo.BlockHeight)
+	tx.TxStatus = string(txInfo.TxStatus)
+	tx.SetBUMP(txInfo.BUMP)
+
+	if !tx.IsOnChain() {
+		logger.Warn().Interface("txInfo", txInfo).Msgf("TransactionInfo is invalid")
+		return nil
+	}
+	if err := tx.Save(ctx); err != nil {
+		return err
+	}
+
+	/* DEPRECATED block of code with syncTx - will be removed soon */
+	syncTx.SyncStatus = SyncStatusComplete
+	if err := syncTx.Save(ctx); err != nil {
+		return err
+	}
+	/* DEPRECATED END */
+
+	return nil
 }
 
 func _getTransaction(ctx context.Context, id string, opts []ModelOps) (*Transaction, error) {
@@ -147,36 +160,4 @@ func _getTransaction(ctx context.Context, id string, opts []ModelOps) (*Transact
 	}
 
 	return transaction, nil
-}
-
-func processSyncTxSave(ctx context.Context, txInfo *chainstate.TransactionInfo, syncTx *SyncTransaction, transaction *Transaction) error {
-	if !txInfo.Valid() {
-		syncTx.Client().Logger().Warn().
-			Str("txID", syncTx.ID).
-			Msgf("txInfo is invalid, will try again later")
-
-		if syncTx.Client().IsDebug() {
-			txInfoJSON, _ := json.Marshal(txInfo)
-			syncTx.Client().Logger().Debug().
-				Str("txID", syncTx.ID).
-				Msgf("txInfo: %s", string(txInfoJSON))
-		}
-		return nil
-	}
-
-	transaction.setChainInfo(txInfo)
-	if err := transaction.Save(ctx); err != nil {
-		return err
-	}
-
-	syncTx.SyncStatus = SyncStatusComplete
-
-	if err := syncTx.Save(ctx); err != nil {
-		return err
-	}
-
-	syncTx.Client().Logger().Info().
-		Str("txID", syncTx.ID).
-		Msgf("Transaction processed successfully")
-	return nil
 }

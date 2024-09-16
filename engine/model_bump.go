@@ -293,9 +293,14 @@ func (bump *BUMP) Scan(value interface{}) error {
 	return spverrors.Wrapf(err, "failed to parse BUMP from JSON, data: %v", value)
 }
 
+// Empty returns true if BUMP is empty (all fields are zero values)
+func (bump BUMP) Empty() bool {
+	return reflect.DeepEqual(bump, BUMP{})
+}
+
 // Value return json value, implement driver.Valuer interface
 func (bump BUMP) Value() (driver.Value, error) {
-	if reflect.DeepEqual(bump, BUMP{}) {
+	if bump.Empty() {
 		return nil, nil
 	}
 	marshal, err := json.Marshal(bump)

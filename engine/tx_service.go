@@ -35,7 +35,7 @@ func saveRawTransaction(ctx context.Context, c ClientInterface, allowUnknown boo
 		return nil, err
 	}
 
-	if !tx.isMined() {
+	if !tx.IsOnChain() {
 		sync := newSyncTransaction(
 			tx.GetID(),
 			c.DefaultSyncConfig(),

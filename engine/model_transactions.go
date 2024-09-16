@@ -3,9 +3,9 @@ package engine
 import (
 	"context"
 
-	"github.com/bitcoin-sv/spv-wallet/engine/chainstate"
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/bitcoin-sv/spv-wallet/engine/utils"
+	"github.com/libsv/go-bc"
 	"github.com/libsv/go-bt/v2"
 )
 
@@ -231,24 +231,24 @@ func (m *Transaction) getValues() (outputValue uint64, fee uint64) {
 	return
 }
 
-func (m *Transaction) setChainInfo(txInfo *chainstate.TransactionInfo) {
-	m.BlockHash = txInfo.BlockHash
-	m.BlockHeight = uint64(txInfo.BlockHeight)
-	m.TxStatus = txInfo.TxStatus.String()
-	m.setBUMP(txInfo)
-}
+// func (m *Transaction) setChainInfo(txInfo *chainstate.TransactionInfo) {
+// 	m.BlockHash = txInfo.BlockHash
+// 	m.BlockHeight = uint64(txInfo.BlockHeight)
+// 	m.TxStatus = txInfo.TxStatus.String()
+// 	m.setBUMP(txInfo.BUMP)
+// }
 
-// Converts from bc.BUMP to our BUMP struct in Transaction model
-func (m *Transaction) setBUMP(txInfo *chainstate.TransactionInfo) {
-	if txInfo.BUMP != nil {
-		m.BUMP = bcBumpToBUMP(txInfo.BUMP)
+// SetBUMP Converts from bc.BUMP to our BUMP struct in Transaction model
+func (m *Transaction) SetBUMP(bump *bc.BUMP) {
+	if bump != nil {
+		m.BUMP = bcBumpToBUMP(bump)
 	} else {
 		m.client.Logger().Error().Msg("No BUMP found")
 	}
 }
 
-func (m *Transaction) isMined() bool {
-	return m.BlockHash != ""
+func (m *Transaction) IsOnChain() bool {
+	return m.BlockHash != "" && !m.BUMP.Empty()
 }
 
 // IsXpubAssociated will check if this key is associated to this transaction

@@ -388,33 +388,48 @@ func (c *Client) RevertTransaction(ctx context.Context, id string) error {
 
 // UpdateTransaction will update the broadcast callback transaction info, like: block height, block hash, status, bump.
 func (c *Client) UpdateTransaction(ctx context.Context, callbackResp *broadcast.SubmittedTx) error {
+	logger := c.options.logger
 	bump, err := bc.NewBUMPFromStr(callbackResp.MerklePath)
 	if err != nil {
-		c.options.logger.Err(err).Msgf("failed to parse merkle path from broadcast callback - tx: %v", callbackResp)
+		logger.Err(err).Msgf("failed to parse merkle path from broadcast callback - tx: %v", callbackResp)
 		return spverrors.Wrapf(err, "failed to parse merkle path from broadcast callback - tx: %v", callbackResp)
 	}
 
-	txInfo := &chainstate.TransactionInfo{
-		BlockHash:   callbackResp.BlockHash,
-		BlockHeight: callbackResp.BlockHeight,
-		ID:          callbackResp.TxID,
-		TxStatus:    callbackResp.TxStatus,
-		BUMP:        bump,
-	}
+	txID := callbackResp.TxID
 
-	tx, err := c.GetTransaction(ctx, "", txInfo.ID)
+	tx, err := c.GetTransaction(ctx, "", txID)
 	if err != nil {
-		c.options.logger.Err(err).Msgf("failed to get transaction by id: %v", txInfo.ID)
+		logger.Warn().Err(err).Msgf("failed to get transaction by id: %v", txID)
 		return err
 	}
 
-	syncTx, err := GetSyncTransactionByTxID(ctx, txInfo.ID, c.DefaultModelOptions()...)
-	if err != nil {
-		c.options.logger.Err(err).Msgf("failed to get sync transaction by tx id: %v", txInfo.ID)
+	tx.BlockHash = callbackResp.BlockHash
+	tx.BlockHeight = uint64(callbackResp.BlockHeight)
+	tx.TxStatus = string(callbackResp.TxStatus)
+	tx.SetBUMP(bump)
+
+	if !tx.IsOnChain() {
+		logger.Warn().Str("txID", txID).Msgf("Transaction is not on chain yet")
+		return nil
+	}
+
+	if err := tx.Save(ctx); err != nil {
 		return err
 	}
 
-	return processSyncTxSave(ctx, txInfo, syncTx, tx)
+	/* DEPRECATED block of code with syncTx - will be removed soon */
+	syncTx, err := GetSyncTransactionByTxID(ctx, txID, c.DefaultModelOptions()...)
+	if err != nil {
+		logger.Err(err).Msgf("failed to get sync transaction by tx id: %v", txID)
+		return err
+	}
+	syncTx.SyncStatus = SyncStatusComplete
+	if err := syncTx.Save(ctx); err != nil {
+		return err
+	}
+	/* DEPRECATED END */
+
+	return nil
 }
 
 func generateTxIDFilterConditions(txIDs []string) map[string]interface{} {
