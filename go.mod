@@ -1,7 +1,6 @@
 module github.com/bitcoin-sv/spv-wallet
 
 go 1.22.5
-
 // NOTE: The following replace directives are essential for maintaining the cohesion and functionality of this project.
 // We are using the packages github.com/bitcoin-sv/spv-wallet/models and github.com/bitcoin-sv/spv-wallet/engine directly
 // to facilitate the seamless integration of features across various components of our application.
@@ -10,15 +9,15 @@ go 1.22.5
 replace github.com/bitcoin-sv/spv-wallet/models => ./models
 
 require (
-	github.com/99designs/gqlgen v0.17.49
+	github.com/99designs/gqlgen v0.17.51
 	github.com/DATA-DOG/go-sqlmock v1.5.2
-	github.com/aws/aws-sdk-go v1.43.45
+	github.com/aws/aws-sdk-go v1.55.5
 	github.com/bitcoin-sv/go-broadcast-client v0.21.0
 	github.com/bitcoin-sv/go-paymail v0.20.1
-	github.com/bitcoin-sv/go-sdk v1.1.5
+	github.com/bitcoin-sv/go-sdk v1.1.7
 	github.com/bitcoin-sv/spv-wallet/models v0.28.0
 	github.com/bitcoinschema/go-bitcoin/v2 v2.0.5
-	github.com/bitcoinschema/go-map v0.1.1
+	github.com/bitcoinschema/go-map v0.2.0
 	github.com/coocood/freecache v1.2.4
 	github.com/fergusstrange/embedded-postgres v1.29.0
 	github.com/gin-contrib/pprof v1.5.0
@@ -71,7 +70,7 @@ require (
 	github.com/KyleBanks/depth v1.2.1 // indirect
 	github.com/asaskevich/govalidator v0.0.0-20230301143203-a9d515a09cc2 // indirect
 	github.com/beorn7/perks v1.0.1 // indirect
-	github.com/bitcoinschema/go-bpu v0.1.3 // indirect
+	github.com/bitcoinschema/go-bpu v0.2.0 // indirect
 	github.com/bitcoinsv/bsvd v0.0.0-20190609155523-4c29707f7173 // indirect
 	github.com/bitcoinsv/bsvutil v0.0.0-20181216182056-1d77cf353ea9 // indirect
 	github.com/bsm/redislock v0.9.4 // indirect
@@ -146,14 +145,14 @@ require (
 	github.com/youmark/pkcs8 v0.0.0-20240726163527-a2c0da244d78 // indirect
 	go.uber.org/multierr v1.11.0 // indirect
 	golang.org/x/arch v0.8.0 // indirect
-	golang.org/x/crypto v0.26.0 // indirect
+	golang.org/x/crypto v0.27.0 // indirect
 	golang.org/x/exp v0.0.0-20240719175910-8a7402abbf56 // indirect
-	golang.org/x/mod v0.19.0 // indirect
-	golang.org/x/net v0.28.0 // indirect
+	golang.org/x/mod v0.20.0 // indirect
+	golang.org/x/net v0.29.0 // indirect
 	golang.org/x/sync v0.8.0 // indirect
-	golang.org/x/sys v0.24.0 // indirect
-	golang.org/x/text v0.17.0 // indirect
-	golang.org/x/tools v0.23.0 // indirect
+	golang.org/x/sys v0.25.0 // indirect
+	golang.org/x/text v0.18.0 // indirect
+	golang.org/x/tools v0.24.0 // indirect
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20240903143218-8af14fe29dc1 // indirect
 	google.golang.org/grpc v1.66.0 // indirect
 	google.golang.org/protobuf v1.34.2 // indirect
