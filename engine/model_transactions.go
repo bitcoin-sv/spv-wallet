@@ -248,14 +248,17 @@ func (m *Transaction) SetBUMP(bump *bc.BUMP) {
 	}
 }
 
+// UpdateFromBroadcastStatus converts broadcast.TxStatus to engineTxStatus and updates if needed
 func (m *Transaction) UpdateFromBroadcastStatus(bStatus broadcast.TxStatus) {
 	switch bStatus {
 	case broadcast.Mined, broadcast.Confirmed:
 		m.TxStatus = string(TxStatusMined)
 	case broadcast.SeenInOrphanMempool, broadcast.Rejected:
 		m.TxStatus = string(TxStatusProblematic)
+	case broadcast.Unknown, broadcast.Queued, broadcast.Received, broadcast.Stored, broadcast.AnnouncedToNetwork, broadcast.RequestedByNetwork, broadcast.SentToNetwork, broadcast.AcceptedByNetwork, broadcast.SeenOnNetwork:
+		// don't change current TxStatus on these bStatuses
 	default:
-		// don't change current TxStatus on other bStatuses
+		// unexpected statuses
 	}
 }
 

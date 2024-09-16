@@ -380,6 +380,7 @@ func (c *Client) RevertTransaction(ctx context.Context, id string) error {
 	transaction.XpubOutputValue = XpubOutputValue{"reverted": 0}
 	transaction.DeletedAt.Valid = true
 	transaction.DeletedAt.Time = time.Now()
+	transaction.TxStatus = string(TxStatusReverted)
 
 	err = transaction.Save(ctx) // update existing record
 

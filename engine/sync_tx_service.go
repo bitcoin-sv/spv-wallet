@@ -3,165 +3,125 @@ package engine
 import (
 	"context"
 	"errors"
-	"fmt"
 	"time"
 
 	"github.com/bitcoin-sv/spv-wallet/engine/chainstate"
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
+	"github.com/rs/zerolog"
 )
 
-// processSyncTransactions will process sync transaction records
+// delayForBroadcastedTx indicates the time after which a broadcasted transaction should be checked
+// most probably ARC callback hasn't been received in this time so we need to check the transaction status "manually"
+func delayForBroadcastedTx() time.Time {
+	return time.Now().Add(-time.Hour)
+}
+
+// delayForNotBroadcastedTx indicates the time after which a non-broadcasted transaction should be checked.
+// In this case, we don't have to wait for an ARC callback (because it will never come).
+// We're checking the transaction status after potentially enough time has passed for it to be mined.
+func delayForNotBroadcastedTx() time.Time {
+	return time.Now().Add(-10 * time.Minute)
+}
+
+// problematicTxDelay indicates the time after which a transaction with an unknown status will be marked as problematic
+// This is to prevent the system from trying to check old transactions that are not likely to be valid anymore
+// NOTE: The SYNC task will check such "old" transactions at least once before marking them as problematic
+func problematicTxDelay() time.Time {
+	return time.Now().Add(-24 * time.Hour)
+}
+
+// processSyncTransactions is a crucial periodic task which try to query transactions which cannot be considered as finalized
+// 1. It gets transaction IDs to sync
+// 2. For every transaction check the status using chainstate.QueryTransaction
+// 3. If found - change the status
+// 4. On error - try to rebroadcast (if needed) or
 func processSyncTransactions(ctx context.Context, client *Client) {
 	logger := client.Logger()
 	db := client.Datastore().DB()
 	chainstateService := client.Chainstate()
 
-	delayedForBroadcasted := time.Now().Add(-1 * time.Hour)
-	delayedForNotBroadcasted := time.Now().Add(-10 * time.Minute)
 	var txIDsToSync []struct {
 		ID string
 	}
+	queryIdsCtx, cancel := context.WithTimeout(ctx, 60*time.Second)
+	defer cancel()
 	err := db.
+		WithContext(queryIdsCtx).
 		Model(&Transaction{}).
-		Where("state = ? AND created_at < ?", TxStatusBroadcasted, delayedForBroadcasted).
-		Or("state IN (?) AND created_at < ?", []TxStatus{TxStatusCreated, TxStatusSent}, delayedForNotBroadcasted).
+		Where("state = ? AND created_at < ?", TxStatusBroadcasted, delayForBroadcastedTx()).
+		Or("state IN (?) AND created_at < ?", []TxStatus{TxStatusCreated, TxStatusSent}, delayForNotBroadcastedTx()).
 		Find(&txIDsToSync).Error
 	if err != nil {
 		logger.Error().Err(err).Msg("Cannot fetch transactions to sync")
 		return
 	}
 
-	var tx Transaction
 	for _, record := range txIDsToSync {
 		txID := record.ID
-		err := db.First(&tx).Error
+		tx, err := _getTransaction(ctx, txID, WithClient(client))
 		if err != nil {
 			logger.Warn().Str("txID", txID).Msg("Cannot get transaction by ID even though the ID was returned from DB")
 			continue
 		}
-		tx.client = client // hydrate the client
-		txInfo, err := chainstateService.QueryTransaction(ctx, txID, chainstate.RequiredOnChain, defaultQueryTxTimeout)
-		if err != nil {
-			if errors.Is(err, spverrors.ErrBroadcastUnreachable) {
-				logger.Warn().Msgf("%s", err.Error())
-				// checking subsequent transactions is pointless if the broadcast server (ARC) is unreachable
-				// will try again in the next cycle
+		saveTx := func() {
+			if err := tx.Save(ctx); err != nil {
+				logger.Error().Err(err).Str("txID", txID).Msg("Cannot update transaction")
+			}
+		}
+		updateStatus := func(newStatus TxStatus) {
+			if newStatus == "" || tx.TxStatus == string(newStatus) {
 				return
 			}
-
-			if errors.Is(err, spverrors.ErrBroadcastRejectedTransaction) {
-				tx.TxStatus = string(TxStatusProblematic)
-				if err := tx.Save(ctx); err != nil {
-					logger.Error().Err(err).Str("txID", txID).Msg("Cannot update transaction status to problematic")
-					continue
-				}
-			}
-
-			if errors.Is(err, spverrors.ErrCouldNotFindTransaction) {
-				if tx.CreatedAt.Before(time.Now().Add(-24 * time.Hour)) {
-					tx.TxStatus = string(TxStatusProblematic)
-					if err := tx.Save(ctx); err != nil {
-						logger.Error().Err(err).Str("txID", txID).Msg("Cannot update transaction status to problematic")
-						continue
-					}
-				}
-
-				if tx.TxStatus == string(TxStatusCreated) || tx.TxStatus == string(TxStatusSent) {
-					// TODO try to broadcast again
-					continue
-				}
-			}
-
-			logger.Error().Err(err).Str("txID", txID).Msg("Cannot query transaction")
+			tx.TxStatus = string(newStatus)
+			saveTx()
 		}
 
-		tx.BlockHash = txInfo.BlockHash
-		tx.BlockHeight = uint64(txInfo.BlockHeight)
-		tx.SetBUMP(txInfo.BUMP)
-		tx.UpdateFromBroadcastStatus(txInfo.TxStatus)
+		txInfo, err := chainstateService.QueryTransaction(ctx, txID, chainstate.RequiredOnChain, defaultQueryTxTimeout)
 
-		tx.TxStatus = string(TxStatusProblematic)
-		if err := tx.Save(ctx); err != nil {
-			logger.Error().Err(err).Str("txID", txID).Msg("Cannot update transaction status to problematic")
-			continue
+		if err != nil {
+			switch {
+			case errors.Is(err, spverrors.ErrBroadcastUnreachable):
+				// checking subsequent transactions is pointless if the broadcast server (ARC) is unreachable will try again in the next cycle
+				logger.Warn().Msgf("%s", err.Error())
+				return
+			case errors.Is(err, spverrors.ErrBroadcastRejectedTransaction):
+				updateStatus(TxStatusProblematic)
+			case errors.Is(err, spverrors.ErrCouldNotFindTransaction):
+				updateStatus(_handleUnknowTX(ctx, tx, logger))
+			default:
+				logger.Error().Err(err).Str("txID", txID).Msg("Cannot query transaction; Unhandled error type")
+			}
+		} else {
+			tx.BlockHash = txInfo.BlockHash
+			tx.BlockHeight = uint64(txInfo.BlockHeight)
+			tx.SetBUMP(txInfo.BUMP)
+			tx.UpdateFromBroadcastStatus(txInfo.TxStatus)
+			saveTx()
 		}
-
 	}
 }
 
-// broadcastTxAndUpdateSync will broadcast transaction and and SyncStatus in syncTx
-// It most probably will be deleted after syncTX removal
-func broadcastTxAndUpdateSync(ctx context.Context, tx *Transaction) error {
-	syncTx := tx.syncTransaction
+func _handleUnknowTX(ctx context.Context, tx *Transaction, logger *zerolog.Logger) (newStatus TxStatus) {
+	if tx.UpdatedAt.Before(problematicTxDelay()) {
+		return TxStatusProblematic
+	}
+
+	shouldBroadcast := tx.TxStatus == string(TxStatusCreated) || tx.TxStatus == string(TxStatusSent)
+	if !shouldBroadcast {
+		// do nothing - tx will be queried next time (until become "old" and marked problematic)
+		return ""
+	}
+
 	err := broadcastTransaction(ctx, tx)
-	if err != nil {
-		return err
+	if err == nil {
+		return TxStatusBroadcasted
 	}
 
-	// Update sync status to be ready now
-	if syncTx.SyncStatus == SyncStatusPending {
-		syncTx.SyncStatus = SyncStatusReady
+	if errors.Is(err, spverrors.ErrBroadcastRejectedTransaction) {
+		return TxStatusProblematic
 	}
 
-	return syncTx.Save(ctx)
-}
-
-func broadcastTransaction(ctx context.Context, tx *Transaction) error {
-	client := tx.Client()
-	chainstateSrv := client.Chainstate()
-
-	// Successfully capture any panics, convert to readable string and log the error
-	defer recoverAndLog(tx.Client().Logger())
-
-	// Create the lock and set the release for after the function completes
-	unlock, err := newWriteLock(
-		ctx, fmt.Sprintf(lockKeyProcessBroadcastTx, tx.GetID()), client.Cachestore(),
-	)
-	defer unlock()
-	if err != nil {
-		return err
-	}
-
-	// Broadcast
-	txHex, hexFormat := _getTxHexInFormat(ctx, tx, chainstateSrv.SupportedBroadcastFormats(), client)
-	br := chainstateSrv.Broadcast(ctx, tx.ID, txHex, hexFormat, defaultBroadcastTimeout)
-
-	if br.Failure != nil { // broadcast failed
-		return br.Failure.Error
-	}
-
-	return nil
-}
-
-// ///////////////
-
-func _getTxHexInFormat(ctx context.Context, tx *Transaction, prefferedFormat chainstate.HexFormatFlag, store TransactionGetter) (txHex string, actualFormat chainstate.HexFormatFlag) {
-	if prefferedFormat.Contains(chainstate.Ef) {
-		efHex, ok := ToEfHex(ctx, tx, store)
-
-		if ok {
-			txHex = efHex
-			actualFormat = chainstate.Ef
-			return
-		}
-	}
-
-	// return rawtx hex
-	txHex = tx.Hex
-	actualFormat = chainstate.RawTx
-
-	return
-}
-
-func _getTransaction(ctx context.Context, id string, opts []ModelOps) (*Transaction, error) {
-	transaction, err := getTransactionByID(ctx, "", id, opts...)
-	if err != nil {
-		return nil, err
-	}
-
-	if transaction == nil {
-		return nil, spverrors.ErrCouldNotFindTransaction
-	}
-
-	return transaction, nil
+	// tx will be broadcasted next time (until become "old" and marked problematic)
+	logger.Warn().Str("txID", tx.ID).Msg("Broadcast attempt has failed in SYNC task")
+	return ""
 }

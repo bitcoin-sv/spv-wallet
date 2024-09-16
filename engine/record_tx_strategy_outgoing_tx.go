@@ -32,7 +32,9 @@ func (strategy *outgoingTx) Execute(ctx context.Context, c ClientInterface, opts
 		return nil, spverrors.ErrDuringSaveTx
 	}
 
-	if _shouldNotifyP2P(transaction) {
+	notifyP2P := _shouldNotifyP2P(transaction)
+
+	if notifyP2P {
 		if err := processP2PTransaction(ctx, transaction); err != nil {
 			if revertErr := c.RevertTransaction(ctx, transaction.ID); revertErr != nil {
 				return nil, fmt.Errorf("reverting transaction failed %w; after P2P notification failed: %w", revertErr, err)
@@ -43,7 +45,7 @@ func (strategy *outgoingTx) Execute(ctx context.Context, c ClientInterface, opts
 	}
 
 	// transaction can be updated by internal_incoming_tx
-	transaction, err = _getTransaction(ctx, transaction.ID, opts)
+	transaction, err = _getTransaction(ctx, transaction.ID, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -53,8 +55,11 @@ func (strategy *outgoingTx) Execute(ctx context.Context, c ClientInterface, opts
 		return transaction, nil
 	}
 
-	transaction.TxStatus = string(TxStatusSent)
-	if err := broadcastTxAndUpdateSync(ctx, transaction); err != nil {
+	if notifyP2P {
+		transaction.TxStatus = string(TxStatusSent)
+	}
+
+	if err := broadcastTransaction(ctx, transaction); err != nil {
 		logger.Warn().Str("txID", transaction.ID).Msgf("broadcasting failed in outgoingTx strategy")
 		// ignore error, transaction most likely is successfully broadcasted by payment receiver
 		// TODO: return a Warning to a client
@@ -158,4 +163,17 @@ func _shouldNotifyP2P(tx *Transaction) bool {
 		}
 	}
 	return false
+}
+
+func _getTransaction(ctx context.Context, id string, opts ...ModelOps) (*Transaction, error) {
+	transaction, err := getTransactionByID(ctx, "", id, opts...)
+	if err != nil {
+		return nil, err
+	}
+
+	if transaction == nil {
+		return nil, spverrors.ErrCouldNotFindTransaction
+	}
+
+	return transaction, nil
 }
