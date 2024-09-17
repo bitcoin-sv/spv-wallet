@@ -14,7 +14,6 @@ import (
 func saveRawTransaction(ctx context.Context, c ClientInterface, allowUnknown bool, txHex string, opts ...ModelOps) (*Transaction, error) {
 	newOpts := c.DefaultModelOptions(append(opts, New())...)
 	tx, err := txFromHex(txHex, newOpts...)
-	tx.TxStatus = TxStatusCreated
 	if err != nil {
 		return nil, spverrors.ErrMissingTxHex
 	}

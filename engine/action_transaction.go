@@ -340,16 +340,6 @@ func (c *Client) RevertTransaction(ctx context.Context, id string) error {
 		return err
 	}
 
-	// cancel sync transaction
-	var syncTransaction *SyncTransaction
-	if syncTransaction, err = GetSyncTransactionByID(ctx, transaction.ID, c.DefaultModelOptions()...); err != nil {
-		return err
-	}
-	syncTransaction.SyncStatus = SyncStatusCanceled
-	if err = syncTransaction.Save(ctx); err != nil {
-		return err
-	}
-
 	// revert transaction
 	// this takes the transaction out of any possible list view of the owners of the xpubs,
 	// but keeps a record of what went down

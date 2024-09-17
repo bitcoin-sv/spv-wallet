@@ -54,7 +54,6 @@ func (strategy *externalIncomingTx) LockKey() string {
 func _createExternalTxToRecord(ctx context.Context, eTx *externalIncomingTx, c ClientInterface, opts []ModelOps) (*Transaction, error) {
 	// Create NEW tx model
 	tx := txFromBtTx(eTx.BtTx, c.DefaultModelOptions(append(opts, New())...)...)
-	_hydrateExternalWithSync(tx)
 
 	if !tx.TransactionBase.hasOneKnownDestination(ctx, c) {
 		return nil, ErrNoMatchingOutputs
@@ -65,19 +64,4 @@ func _createExternalTxToRecord(ctx context.Context, eTx *externalIncomingTx, c C
 	}
 
 	return tx, nil
-}
-
-func _hydrateExternalWithSync(tx *Transaction) {
-	sync := newSyncTransaction(
-		tx.ID,
-		tx.Client().DefaultSyncConfig(),
-		tx.GetOptions(true)...,
-	)
-
-	sync.SyncStatus = SyncStatusPending // wait until transactions will be broadcasted
-
-	// Use the same metadata
-	sync.Metadata = tx.Metadata
-	sync.transaction = tx
-	tx.syncTransaction = sync
 }

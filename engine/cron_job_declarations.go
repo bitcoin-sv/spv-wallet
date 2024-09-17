@@ -9,10 +9,9 @@ import (
 
 // Cron job names to be used in WithCronCustomPeriod
 const (
-	CronJobNameDraftTransactionCleanUp  = "draft_transaction_clean_up"
-	CronJobNameSyncTransactionBroadcast = "sync_transaction_broadcast"
-	CronJobNameSyncTransactionSync      = "sync_transaction_sync"
-	CronJobNameCalculateMetrics         = "calculate_metrics"
+	CronJobNameDraftTransactionCleanUp = "draft_transaction_clean_up"
+	CronJobNameSyncTransaction         = "sync_transaction"
+	CronJobNameCalculateMetrics        = "calculate_metrics"
 )
 
 type cronJobHandler func(ctx context.Context, client *Client) error
@@ -47,7 +46,7 @@ func (c *Client) cronJobs() taskmanager.CronJobs {
 		taskCleanupDraftTransactions,
 	)
 	addJob(
-		CronJobNameSyncTransactionSync,
+		CronJobNameSyncTransaction,
 		5*time.Minute,
 		taskSyncTransactions,
 	)

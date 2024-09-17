@@ -23,7 +23,6 @@ func (strategy *outgoingTx) Execute(ctx context.Context, c ClientInterface, opts
 	logger := c.Logger()
 
 	transaction, err := _createOutgoingTxToRecord(ctx, strategy, c, opts)
-	transaction.TxStatus = TxStatusCreated
 	if err != nil {
 		return nil, spverrors.ErrCreateOutgoingTxFailed
 	}
@@ -112,8 +111,6 @@ func _createOutgoingTxToRecord(ctx context.Context, oTx *outgoingTx, c ClientInt
 		return nil, err
 	}
 
-	_hydrateOutgoingWithSync(tx)
-
 	if err := tx.processUtxos(ctx); err != nil {
 		return nil, err
 	}
@@ -142,18 +139,6 @@ func _hydrateOutgoingWithDraft(ctx context.Context, tx *Transaction) error {
 	tx.draftTransaction = draft
 
 	return nil // success
-}
-
-func _hydrateOutgoingWithSync(tx *Transaction) {
-	sync := newSyncTransaction(tx.ID, tx.draftTransaction.Configuration.Sync, tx.GetOptions(true)...)
-
-	// setup synchronization
-	sync.SyncStatus = SyncStatusPending // wait until transaction is broadcasted or P2P provider is notified
-
-	sync.Metadata = tx.Metadata
-
-	sync.transaction = tx
-	tx.syncTransaction = sync
 }
 
 func _shouldNotifyP2P(tx *Transaction) bool {

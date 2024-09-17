@@ -10,10 +10,9 @@ func processP2PTransaction(ctx context.Context, tx *Transaction) error {
 	// Successfully capture any panics, convert to readable string and log the error
 	defer recoverAndLog(tx.Client().Logger())
 
-	syncTx := tx.syncTransaction
 	// Create the lock and set the release for after the function completes
 	unlock, err := newWriteLock(
-		ctx, fmt.Sprintf(lockKeyProcessP2PTx, syncTx.GetID()), syncTx.Client().Cachestore(),
+		ctx, fmt.Sprintf(lockKeyProcessP2PTx, tx.ID), tx.Client().Cachestore(),
 	)
 	defer unlock()
 	if err != nil {
@@ -27,15 +26,6 @@ func processP2PTransaction(ctx context.Context, tx *Transaction) error {
 
 	// Notify any P2P paymail providers associated to the transaction
 	if err = _notifyPaymailProviders(ctx, tx); err != nil {
-		return err
-	}
-
-	// Update sync status to be ready now
-	if syncTx.SyncStatus == SyncStatusPending {
-		syncTx.SyncStatus = SyncStatusReady
-	}
-
-	if err = syncTx.Save(ctx); err != nil {
 		return err
 	}
 

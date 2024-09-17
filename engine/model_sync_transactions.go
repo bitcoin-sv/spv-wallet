@@ -26,27 +26,6 @@ type SyncTransaction struct {
 	transaction *Transaction
 }
 
-// newSyncTransaction will start a new model (config is required)
-func newSyncTransaction(txID string, config *SyncConfig, opts ...ModelOps) *SyncTransaction {
-	// Do not allow making a model without the configuration
-	if config == nil {
-		return nil
-	}
-
-	// Sync
-	ss := SyncStatusReady
-	if !config.SyncOnChain {
-		ss = SyncStatusSkipped
-	}
-
-	return &SyncTransaction{
-		Configuration: *config,
-		ID:            txID,
-		Model:         *NewBaseModel(ModelSyncTransaction, opts...),
-		SyncStatus:    ss,
-	}
-}
-
 // GetID will get the ID
 func (m *SyncTransaction) GetID() string {
 	return m.ID
@@ -69,30 +48,11 @@ func (m *SyncTransaction) Save(ctx context.Context) error {
 
 // BeforeCreating will fire before the model is being inserted into the Datastore
 func (m *SyncTransaction) BeforeCreating(_ context.Context) error {
-	m.Client().Logger().Debug().
-		Str("txID", m.ID).
-		Msgf("starting: %s BeforeCreate hook...", m.Name())
-
-	// Make sure ID is valid
-	if len(m.ID) == 0 {
-		return spverrors.ErrMissingFieldID
-	}
-
-	m.Client().Logger().Debug().
-		Str("txID", m.ID).
-		Msgf("end: %s BeforeCreate hook", m.Name())
 	return nil
 }
 
 // AfterCreated will fire after the model is created in the Datastore
 func (m *SyncTransaction) AfterCreated(_ context.Context) error {
-	m.Client().Logger().Debug().
-		Str("txID", m.ID).
-		Msgf("end: %s AfterCreate hook", m.Name())
-
-	m.Client().Logger().Debug().
-		Str("txID", m.ID).
-		Msgf("end: %s AfterCreate hook", m.Name())
 	return nil
 }
 

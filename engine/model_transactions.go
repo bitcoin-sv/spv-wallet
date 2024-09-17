@@ -66,7 +66,6 @@ type Transaction struct {
 
 	// Private for internal use
 	draftTransaction   *DraftTransaction    `gorm:"-" bson:"-"` // Related draft transaction for processing and recording
-	syncTransaction    *SyncTransaction     `gorm:"-" bson:"-"` // Related record if broadcast config is detected (create new recordNew)
 	transactionService transactionInterface `gorm:"-" bson:"-"` // Used for interfacing methods
 	utxos              []Utxo               `gorm:"-" bson:"-"` // json:"destinations,omitempty"
 	XPubID             string               `gorm:"-" bson:"-"` // XPub of the user registering this transaction
@@ -85,6 +84,7 @@ func emptyTx(opts ...ModelOps) *Transaction {
 		Status:             statusComplete,
 		transactionService: transactionService{},
 		XpubOutputValue:    map[string]int64{},
+		TxStatus:           TxStatusCreated,
 	}
 }
 
