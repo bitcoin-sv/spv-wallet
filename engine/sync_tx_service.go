@@ -40,21 +40,26 @@ func processSyncTransactions(ctx context.Context, client *Client) {
 	db := client.Datastore().DB()
 	chainstateService := client.Chainstate()
 
+	recoverAndLog(logger)
+
 	var txIDsToSync []struct {
 		ID string
 	}
-	queryIdsCtx, cancel := context.WithTimeout(ctx, 60*time.Second)
+	queryIDsCtx, cancel := context.WithTimeout(ctx, 60*time.Second)
 	defer cancel()
 	err := db.
-		WithContext(queryIdsCtx).
+		WithContext(queryIDsCtx).
 		Model(&Transaction{}).
-		Where("state = ? AND created_at < ?", TxStatusBroadcasted, delayForBroadcastedTx()).
-		Or("state IN (?) AND created_at < ?", []TxStatus{TxStatusCreated, TxStatusSent}, delayForNotBroadcastedTx()).
+		Where("tx_status = ? AND created_at < ?", TxStatusBroadcasted, delayForBroadcastedTx()).
+		Or("tx_status IN (?) AND created_at < ?", []TxStatus{TxStatusCreated, TxStatusSent}, delayForNotBroadcastedTx()).
+		Or("tx_status IS NULL"). // backward compatibility
 		Find(&txIDsToSync).Error
 	if err != nil {
 		logger.Error().Err(err).Msg("Cannot fetch transactions to sync")
 		return
 	}
+
+	logger.Info().Msgf("Transactions to SYNC: %d", len(txIDsToSync))
 
 	for _, record := range txIDsToSync {
 		txID := record.ID
@@ -69,10 +74,10 @@ func processSyncTransactions(ctx context.Context, client *Client) {
 			}
 		}
 		updateStatus := func(newStatus TxStatus) {
-			if newStatus == "" || tx.TxStatus == string(newStatus) {
+			if newStatus == "" || tx.TxStatus == newStatus {
 				return
 			}
-			tx.TxStatus = string(newStatus)
+			tx.TxStatus = newStatus
 			saveTx()
 		}
 
@@ -106,7 +111,7 @@ func _handleUnknowTX(ctx context.Context, tx *Transaction, logger *zerolog.Logge
 		return TxStatusProblematic
 	}
 
-	shouldBroadcast := tx.TxStatus == string(TxStatusCreated) || tx.TxStatus == string(TxStatusSent)
+	shouldBroadcast := tx.TxStatus == TxStatusCreated || tx.TxStatus == TxStatusSent
 	if !shouldBroadcast {
 		// do nothing - tx will be queried next time (until become "old" and marked problematic)
 		return ""

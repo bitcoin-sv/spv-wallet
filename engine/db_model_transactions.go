@@ -188,7 +188,7 @@ func (m *Transaction) notify() {
 				XPubID: m.XPubID,
 			},
 			TransactionID:   m.ID,
-			Status:          m.TxStatus,
+			Status:          string(m.TxStatus),
 			XpubOutputValue: m.XpubOutputValue,
 		})
 	}

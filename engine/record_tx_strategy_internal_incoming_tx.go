@@ -32,7 +32,7 @@ func (strategy *internalIncomingTx) Execute(ctx context.Context, c ClientInterfa
 		return nil, err
 	}
 
-	transaction.TxStatus = string(TxStatusBroadcasted)
+	transaction.TxStatus = TxStatusBroadcasted
 	if err := transaction.Save(ctx); err != nil {
 		c.Logger().Error().Str("txID", transaction.ID).Err(err).Msg("Incoming internal transaction has been broadcasted but failed save to db")
 	}

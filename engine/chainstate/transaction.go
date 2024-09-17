@@ -72,14 +72,16 @@ func (c *Client) fastestQuery(ctx context.Context, id string, requiredIn Require
 func queryBroadcastClient(ctx context.Context, client ClientInterface, id string) (*TransactionInfo, error) {
 	resp, err := client.BroadcastClient().QueryTransaction(ctx, id)
 	if err != nil {
+		if errors.Is(err, context.DeadlineExceeded) {
+			return nil, spverrors.ErrBroadcastUnreachable
+		}
 		var arcError *broadcast.ArcError
 		if errors.As(err, &arcError) {
 			if arcError.IsRejectedTransaction() {
 				return nil, spverrors.ErrBroadcastRejectedTransaction.Wrap(err)
 			}
-			return nil, spverrors.ErrCouldNotFindTransaction.Wrap(err)
 		}
-		return nil, spverrors.ErrBroadcastUnreachable.Wrap(err)
+		return nil, spverrors.ErrCouldNotFindTransaction.Wrap(err)
 	}
 
 	if resp == nil || !strings.EqualFold(resp.TxID, id) {

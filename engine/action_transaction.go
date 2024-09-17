@@ -2,12 +2,10 @@ package engine
 
 import (
 	"context"
-	"errors"
 	"math"
 	"time"
 
 	"github.com/bitcoin-sv/go-broadcast-client/broadcast"
-	"github.com/bitcoin-sv/spv-wallet/engine/chainstate"
 	"github.com/bitcoin-sv/spv-wallet/engine/datastore"
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/bitcoin-sv/spv-wallet/engine/utils"
@@ -256,9 +254,6 @@ func (c *Client) UpdateTransactionMetadata(ctx context.Context, xPubID, id strin
 // yet been synced on-chain and the utxos have not been spent.
 // All utxos that are reverted will be marked as deleted (and spent)
 func (c *Client) RevertTransaction(ctx context.Context, id string) error {
-	// Check for existing NewRelic transaction
-	ctx = c.GetOrStartTxn(ctx, "revert_transaction_by_id")
-
 	// Get the transaction
 	transaction, err := c.GetTransaction(ctx, "", id)
 	if err != nil {
@@ -270,23 +265,12 @@ func (c *Client) RevertTransaction(ctx context.Context, id string) error {
 		return spverrors.ErrTxRevertEmptyDraftID
 	}
 
-	var draftTransaction *DraftTransaction
-	if draftTransaction, err = c.GetDraftTransactionByID(ctx, transaction.DraftID, c.DefaultModelOptions()...); err != nil {
+	draftTransaction, err := c.GetDraftTransactionByID(ctx, transaction.DraftID, c.DefaultModelOptions()...)
+	if err != nil {
 		return err
 	}
 	if draftTransaction == nil {
 		return spverrors.ErrTxRevertCouldNotFindDraftTx
-	}
-
-	// check whether transaction is not already on chain
-	var info *chainstate.TransactionInfo
-	if info, err = c.Chainstate().QueryTransaction(ctx, transaction.ID, chainstate.RequiredInMempool, 30*time.Second); err != nil {
-		if !errors.Is(err, spverrors.ErrCouldNotFindTransaction) {
-			return spverrors.Wrapf(err, "failed to query transaction %s on chain", transaction.ID)
-		}
-	}
-	if info != nil {
-		return spverrors.ErrTxRevertNotFoundOnChain
 	}
 
 	// check that the utxos of this transaction have not been spent
@@ -380,7 +364,7 @@ func (c *Client) RevertTransaction(ctx context.Context, id string) error {
 	transaction.XpubOutputValue = XpubOutputValue{"reverted": 0}
 	transaction.DeletedAt.Valid = true
 	transaction.DeletedAt.Time = time.Now()
-	transaction.TxStatus = string(TxStatusReverted)
+	transaction.TxStatus = TxStatusReverted
 
 	err = transaction.Save(ctx) // update existing record
 

@@ -23,7 +23,7 @@ func (strategy *outgoingTx) Execute(ctx context.Context, c ClientInterface, opts
 	logger := c.Logger()
 
 	transaction, err := _createOutgoingTxToRecord(ctx, strategy, c, opts)
-	transaction.TxStatus = string(TxStatusCreated)
+	transaction.TxStatus = TxStatusCreated
 	if err != nil {
 		return nil, spverrors.ErrCreateOutgoingTxFailed
 	}
@@ -45,18 +45,18 @@ func (strategy *outgoingTx) Execute(ctx context.Context, c ClientInterface, opts
 	}
 
 	// transaction can be updated by internal_incoming_tx
-	transaction, err = _getTransaction(ctx, transaction.ID, opts...)
+	transaction, err = _getTransaction(ctx, transaction.ID, WithClient(c))
 	if err != nil {
 		return nil, err
 	}
 
-	if transaction.TxStatus == string(TxStatusBroadcasted) {
+	if transaction.TxStatus == TxStatusBroadcasted {
 		// no need to broadcast twice
 		return transaction, nil
 	}
 
 	if notifyP2P {
-		transaction.TxStatus = string(TxStatusSent)
+		transaction.TxStatus = TxStatusSent
 	}
 
 	if err := broadcastTransaction(ctx, transaction); err != nil {
@@ -64,7 +64,7 @@ func (strategy *outgoingTx) Execute(ctx context.Context, c ClientInterface, opts
 		// ignore error, transaction most likely is successfully broadcasted by payment receiver
 		// TODO: return a Warning to a client
 	} else {
-		transaction.TxStatus = string(TxStatusBroadcasted)
+		transaction.TxStatus = TxStatusBroadcasted
 	}
 
 	if err := transaction.Save(ctx); err != nil {

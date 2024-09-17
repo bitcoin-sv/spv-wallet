@@ -79,3 +79,11 @@ func (e SPVError) WithTrace(err error) SPVError {
 	}
 	return e.Wrap(err)
 }
+
+func (e SPVError) Is(target error) bool {
+	t, ok := target.(SPVError)
+	if !ok {
+		return false
+	}
+	return e.Code == t.Code
+}

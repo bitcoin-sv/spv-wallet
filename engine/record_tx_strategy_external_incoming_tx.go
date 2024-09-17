@@ -24,7 +24,7 @@ func (strategy *externalIncomingTx) Execute(ctx context.Context, c ClientInterfa
 	if err = broadcastTransaction(ctx, transaction); err != nil {
 		return nil, err
 	}
-	transaction.TxStatus = string(TxStatusBroadcasted)
+	transaction.TxStatus = TxStatusBroadcasted
 	if err := transaction.Save(ctx); err != nil {
 		c.Logger().Error().Str("txID", transaction.ID).Err(err).Msg("Incoming external transaction has been broadcasted but failed save to db")
 	}
