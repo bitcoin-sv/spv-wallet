@@ -195,6 +195,7 @@ func (c *Client) IsNewRelicEnabled() bool {
 	return c.options.newRelicEnabled
 }
 
+// DB returns ready to use gorm instance
 func (c *Client) DB() *gorm.DB {
 	return c.options.db
 }

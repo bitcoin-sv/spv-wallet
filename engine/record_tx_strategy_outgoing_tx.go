@@ -3,6 +3,7 @@ package engine
 import (
 	"context"
 	"fmt"
+	"slices"
 
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/libsv/go-bt/v2"
@@ -38,24 +39,22 @@ func (strategy *outgoingTx) Execute(ctx context.Context, c ClientInterface, opts
 			if revertErr := c.RevertTransaction(ctx, transaction.ID); revertErr != nil {
 				return nil, fmt.Errorf("reverting transaction failed %w; after P2P notification failed: %w", revertErr, err)
 			}
+
 			logger.Warn().Str("txID", transaction.ID).Msgf("processP2PTransaction failed. Reason: %v", err)
 			return nil, spverrors.ErrProcessP2PTx
 		}
 	}
 
 	// transaction can be updated by internal_incoming_tx
-	transaction, err = _getTransaction(ctx, transaction.ID, WithClient(c))
-	if err != nil {
-		return nil, err
+	transaction, err = getTransactionByID(ctx, "", transaction.ID, WithClient(c))
+	if transaction == nil || err != nil {
+		logger.Error().Msg("Cannot find transaction even though it was saved a moment ago")
+		return nil, spverrors.ErrInternal
 	}
 
 	if transaction.TxStatus == TxStatusBroadcasted {
 		// no need to broadcast twice
 		return transaction, nil
-	}
-
-	if notifyP2P {
-		transaction.TxStatus = TxStatusSent
 	}
 
 	if err := broadcastTransaction(ctx, transaction); err != nil {
@@ -67,7 +66,7 @@ func (strategy *outgoingTx) Execute(ctx context.Context, c ClientInterface, opts
 	}
 
 	if err := transaction.Save(ctx); err != nil {
-		c.Logger().Error().Str("txID", transaction.ID).Err(err).Msgf("Outgoing transaction has been %v but failed save to db", transaction.TxStatus)
+		logger.Error().Str("txID", transaction.ID).Err(err).Msg("Outgoing transaction has been processed but failed save to db")
 	}
 
 	return transaction, nil
@@ -142,23 +141,7 @@ func _hydrateOutgoingWithDraft(ctx context.Context, tx *Transaction) error {
 }
 
 func _shouldNotifyP2P(tx *Transaction) bool {
-	for _, o := range tx.draftTransaction.Configuration.Outputs {
-		if o.PaymailP4 != nil && o.PaymailP4.ResolutionType == ResolutionTypeP2P {
-			return true
-		}
-	}
-	return false
-}
-
-func _getTransaction(ctx context.Context, id string, opts ...ModelOps) (*Transaction, error) {
-	transaction, err := getTransactionByID(ctx, "", id, opts...)
-	if err != nil {
-		return nil, err
-	}
-
-	if transaction == nil {
-		return nil, spverrors.ErrCouldNotFindTransaction
-	}
-
-	return transaction, nil
+	return slices.ContainsFunc(tx.draftTransaction.Configuration.Outputs, func(o *TransactionOutput) bool {
+		return o.PaymailP4 != nil && o.PaymailP4.ResolutionType == ResolutionTypeP2P
+	})
 }

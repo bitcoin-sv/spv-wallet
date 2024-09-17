@@ -3,6 +3,8 @@ package engine
 import (
 	"context"
 	"fmt"
+
+	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 )
 
 // processP2PTransaction will process the sync transaction record, or save the failure
@@ -19,9 +21,8 @@ func processP2PTransaction(ctx context.Context, tx *Transaction) error {
 		return err
 	}
 
-	// No draft?
 	if len(tx.DraftID) == 0 {
-		return nil // TODO: why nil here??
+		return spverrors.ErrEmptyRelatedDraftID
 	}
 
 	// Notify any P2P paymail providers associated to the transaction

@@ -21,9 +21,6 @@ type SyncTransaction struct {
 	BroadcastStatus SyncStatus  `json:"broadcast_status" toml:"broadcast_status" yaml:"broadcast_status" gorm:"<-;type:varchar(10);index;comment:This is the status of the broadcast" bson:"broadcast_status"`
 	P2PStatus       SyncStatus  `json:"p2p_status" toml:"p2p_status" yaml:"p2p_status" gorm:"<-;column:p2p_status;type:varchar(10);index;comment:This is the status of the p2p paymail requests" bson:"p2p_status"`
 	SyncStatus      SyncStatus  `json:"sync_status" toml:"sync_status" yaml:"sync_status" gorm:"<-;type:varchar(10);index;comment:This is the status of the on-chain sync" bson:"sync_status"`
-
-	// internal fields
-	transaction *Transaction
 }
 
 // GetID will get the ID

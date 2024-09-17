@@ -51,7 +51,7 @@ func processSyncTransactions(ctx context.Context, client *Client) {
 		WithContext(queryIDsCtx).
 		Model(&Transaction{}).
 		Where("tx_status = ? AND created_at < ?", TxStatusBroadcasted, delayForBroadcastedTx()).
-		Or("tx_status IN (?) AND created_at < ?", []TxStatus{TxStatusCreated, TxStatusSent}, delayForNotBroadcastedTx()).
+		Or("tx_status = ? AND created_at < ?", TxStatusCreated, delayForNotBroadcastedTx()).
 		Or("tx_status IS NULL"). // backward compatibility
 		Find(&txIDsToSync).Error
 	if err != nil {
@@ -63,9 +63,9 @@ func processSyncTransactions(ctx context.Context, client *Client) {
 
 	for _, record := range txIDsToSync {
 		txID := record.ID
-		tx, err := _getTransaction(ctx, txID, WithClient(client))
-		if err != nil {
-			logger.Warn().Str("txID", txID).Msg("Cannot get transaction by ID even though the ID was returned from DB")
+		tx, err := getTransactionByID(ctx, "", txID, WithClient(client))
+		if tx == nil || err != nil {
+			logger.Error().Msg("Cannot get transaction by ID even though the ID was returned from DB")
 			continue
 		}
 		saveTx := func() {
@@ -111,7 +111,7 @@ func _handleUnknowTX(ctx context.Context, tx *Transaction, logger *zerolog.Logge
 		return TxStatusProblematic
 	}
 
-	shouldBroadcast := tx.TxStatus == TxStatusCreated || tx.TxStatus == TxStatusSent
+	shouldBroadcast := tx.TxStatus == TxStatusCreated
 	if !shouldBroadcast {
 		// do nothing - tx will be queried next time (until become "old" and marked problematic)
 		return ""
