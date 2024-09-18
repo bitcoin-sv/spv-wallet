@@ -232,13 +232,6 @@ func (m *Transaction) getValues() (outputValue uint64, fee uint64) {
 	return
 }
 
-// func (m *Transaction) setChainInfo(txInfo *chainstate.TransactionInfo) {
-// 	m.BlockHash = txInfo.BlockHash
-// 	m.BlockHeight = uint64(txInfo.BlockHeight)
-// 	m.TxStatus = txInfo.TxStatus.String()
-// 	m.setBUMP(txInfo.BUMP)
-// }
-
 // SetBUMP Converts from bc.BUMP to our BUMP struct in Transaction model
 func (m *Transaction) SetBUMP(bump *bc.BUMP) {
 	if bump != nil {
