@@ -65,7 +65,8 @@ func processSyncTransactions(ctx context.Context, client *Client) {
 		txID := record.ID
 		tx, err := getTransactionByID(ctx, "", txID, WithClient(client))
 		if tx == nil || err != nil {
-			logger.Error().Msg("Cannot get transaction by ID even though the ID was returned from DB")
+			// this should "never" happen, because we've just fetched the transaction IDs from the database
+			logger.Error().Err(err).Str("txID", txID).Msg("Cannot get transaction by ID")
 			continue
 		}
 		saveTx := func() {
@@ -86,13 +87,13 @@ func processSyncTransactions(ctx context.Context, client *Client) {
 		if err != nil {
 			switch {
 			case errors.Is(err, spverrors.ErrBroadcastUnreachable):
-				// checking subsequent transactions is pointless if the broadcast server (ARC) is unreachable will try again in the next cycle
+				// checking subsequent transactions is pointless if the broadcast server (ARC) is unreachable, will try again in the next cycle
 				logger.Warn().Msgf("%s", err.Error())
 				return
 			case errors.Is(err, spverrors.ErrBroadcastRejectedTransaction):
 				updateStatus(TxStatusProblematic)
 			case errors.Is(err, spverrors.ErrCouldNotFindTransaction), errors.Is(err, spverrors.ErrInvalidRequirements):
-				updateStatus(_handleUnknowTX(ctx, tx, logger))
+				updateStatus(_handleUnknownTX(ctx, tx, logger))
 			default:
 				logger.Error().Err(err).Str("txID", txID).Msg("Cannot query transaction; Unhandled error type")
 				if tx.UpdatedAt.Before(problematicTxDelay()) {
@@ -109,7 +110,7 @@ func processSyncTransactions(ctx context.Context, client *Client) {
 	}
 }
 
-func _handleUnknowTX(ctx context.Context, tx *Transaction, logger *zerolog.Logger) (newStatus TxStatus) {
+func _handleUnknownTX(ctx context.Context, tx *Transaction, logger *zerolog.Logger) (newStatus TxStatus) {
 	if tx.UpdatedAt.Before(problematicTxDelay()) {
 		return TxStatusProblematic
 	}
