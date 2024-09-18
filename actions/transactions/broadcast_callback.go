@@ -23,11 +23,7 @@ func broadcastCallback(c *gin.Context) {
 	err = reqctx.Engine(c).HandleTxCallback(c.Request.Context(), callbackResp)
 	if err != nil {
 		logger.Err(err).Msgf("failed to update transaction - tx: %v", callbackResp)
-		spverrors.ErrorResponse(c, err, logger)
-		// TODO Does ARC cares about our errors?
-		return
 	}
 
-	// Return response
 	c.Status(http.StatusOK)
 }

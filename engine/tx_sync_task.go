@@ -91,10 +91,13 @@ func processSyncTransactions(ctx context.Context, client *Client) {
 				return
 			case errors.Is(err, spverrors.ErrBroadcastRejectedTransaction):
 				updateStatus(TxStatusProblematic)
-			case errors.Is(err, spverrors.ErrCouldNotFindTransaction):
+			case errors.Is(err, spverrors.ErrCouldNotFindTransaction), errors.Is(err, spverrors.ErrInvalidRequirements):
 				updateStatus(_handleUnknowTX(ctx, tx, logger))
 			default:
 				logger.Error().Err(err).Str("txID", txID).Msg("Cannot query transaction; Unhandled error type")
+				if tx.UpdatedAt.Before(problematicTxDelay()) {
+					updateStatus(TxStatusProblematic)
+				}
 			}
 		} else {
 			tx.BlockHash = txInfo.BlockHash
