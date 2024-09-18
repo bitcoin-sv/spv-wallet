@@ -9,6 +9,7 @@ import (
 	"github.com/bitcoin-sv/spv-wallet/engine/transaction/draft/outputs"
 	"github.com/bitcoin-sv/spv-wallet/models/request"
 	"github.com/bitcoin-sv/spv-wallet/models/request/opreturn"
+	paymailreq "github.com/bitcoin-sv/spv-wallet/models/request/paymail"
 	"github.com/mitchellh/mapstructure"
 )
 
@@ -56,9 +57,12 @@ func outputsHookFunc() mapstructure.DecodeHookFunc {
 
 func outputSpecFromRequest(req request.Output) (outputs.Spec, error) {
 	switch o := req.(type) {
-	case *opreturn.Output:
-		opReturn := outputs.OpReturn(*o)
-		return &opReturn, nil
+	case opreturn.Output:
+		out := outputs.OpReturn(o)
+		return &out, nil
+	case paymailreq.Output:
+		out := outputs.Paymail(o)
+		return &out, nil
 	default:
 		return nil, errors.New("unsupported output type")
 	}

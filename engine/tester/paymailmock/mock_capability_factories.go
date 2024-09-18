@@ -47,15 +47,7 @@ func capabilityP2PPaymentDestination() *CapabilityMock {
 		value: func(dn paymailDomainName) any {
 			return dn.P2PPaymentDestination()
 		},
-		endpoint: endpoint(appmesh.HttpMethodPost, obj{
-			"outputs": []obj{
-				{
-					"script":   "76a9143e2d1d795f8acaa7957045cc59376177eb04a3c588ac",
-					"satoshis": 1000,
-				},
-			},
-			"reference": "z0bac4ec-6f15-42de-9ef4-e60bfdabf4f7",
-		}),
+		endpoint: endpoint(appmesh.HttpMethodPost, P2PDestinationsForSats(1000).response()),
 	}
 }
 

@@ -107,11 +107,19 @@ func (c *PaymailClientMock) WillRespondWithP2PWithBEEFCapabilities() *PaymailCli
 	return c
 }
 
+// WillRespondWithNotFoundOnCapabilities is configuring a client to respond with not found on capabilities for all mocked domains.
+func (c *PaymailClientMock) WillRespondWithNotFoundOnCapabilities() {
+	httpmock.Reset()
+	for _, domain := range c.domains {
+		c.exposeErrorOnCapabilities(http.StatusNotFound, domain)
+	}
+}
+
 // WillRespondWithErrorOnCapabilities is configuring a client to respond with an error on capabilities for all mocked domains.
 func (c *PaymailClientMock) WillRespondWithErrorOnCapabilities() {
 	httpmock.Reset()
 	for _, domain := range c.domains {
-		c.exposeErrorOnCapabilities(domain)
+		c.exposeErrorOnCapabilities(http.StatusInternalServerError, domain)
 	}
 }
 
@@ -194,9 +202,9 @@ func (c *PaymailClientMock) exposeCapabilities(domain paymailDomainName) {
 	httpmock.RegisterResponder(http.MethodGet, domain.CapabilitiesURL(), responder)
 }
 
-func (c *PaymailClientMock) exposeErrorOnCapabilities(domain paymailDomainName) {
+func (c *PaymailClientMock) exposeErrorOnCapabilities(status int, domain paymailDomainName) {
 	capabilitiesURL := domain.CapabilitiesURL()
-	responder, err := httpmock.NewJsonResponder(http.StatusInternalServerError, nil)
+	responder, err := httpmock.NewJsonResponder(status, nil)
 	if err != nil {
 		panic(spverrors.Wrapf(err, "error creating mocked error capabilities"))
 	}
