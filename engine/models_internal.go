@@ -98,33 +98,6 @@ func (m *Model) SetRecordTime(created bool) {
 // any key set to nil will be removed, other keys updated or added
 func (m *Model) UpdateMetadata(metadata Metadata) {
 	m.Metadata = metadata
-	// If metadata is empty, clear all existing metadata
-	if len(metadata) == 0 {
-		m.Metadata = metadata
-		return
-	}
-
-	// Create a set of keys in the new metadata
-	newKeys := make(map[string]bool)
-	for key := range metadata {
-		newKeys[key] = true
-	}
-
-	// Remove keys that are not in the new metadata
-	for key := range m.Metadata {
-		if !newKeys[key] {
-			delete(m.Metadata, key)
-		}
-	}
-
-	// Update or add new key-value pairs
-	for key, value := range metadata {
-		if value == nil {
-			delete(m.Metadata, key)
-		} else {
-			m.Metadata[key] = value
-		}
-	}
 }
 
 // SetOptions will set the options on the model
