@@ -29,7 +29,7 @@ func (strategy *outgoingTx) Execute(ctx context.Context, c ClientInterface, opts
 	var err error
 
 	if transaction, err = strategy.createOutgoingTxToRecord(ctx, c, opts); err != nil {
-		return nil, spverrors.ErrCreateOutgoingTxFailed
+		return nil, spverrors.ErrCreateOutgoingTxFailed.Wrap(err)
 	}
 
 	if err = transaction.processUtxos(ctx); err != nil {
@@ -42,15 +42,14 @@ func (strategy *outgoingTx) Execute(ctx context.Context, c ClientInterface, opts
 
 	if _shouldNotifyP2P(transaction) {
 		if err = processP2PTransaction(ctx, transaction); err != nil {
-			return nil, _handleNotifyP2PError(ctx, c, transaction)
+			return nil, _handleNotifyP2PError(ctx, c, transaction, err)
 		}
 	}
 
 	// transaction can be updated by internal_incoming_tx
 	transaction, err = getTransactionByID(ctx, "", transaction.ID, WithClient(c))
 	if transaction == nil || err != nil {
-		logger.Error().Msg("Cannot find transaction even though it was saved a moment ago")
-		return nil, spverrors.ErrInternal
+		return nil, spverrors.ErrInternal.Wrap(err)
 	}
 
 	if transaction.TxStatus == TxStatusBroadcasted {
@@ -142,9 +141,11 @@ func _shouldNotifyP2P(tx *Transaction) bool {
 	})
 }
 
-func _handleNotifyP2PError(ctx context.Context, c ClientInterface, transaction *Transaction) error {
+func _handleNotifyP2PError(ctx context.Context, c ClientInterface, transaction *Transaction, cause error) error {
 	logger := c.Logger()
 	chainstateService := c.Chainstate()
+
+	p2pError := spverrors.ErrProcessP2PTx.Wrap(cause)
 
 	saveAsProblematic := func() {
 		transaction.TxStatus = TxStatusProblematic
@@ -157,12 +158,12 @@ func _handleNotifyP2PError(ctx context.Context, c ClientInterface, transaction *
 	if errors.Is(err, spverrors.ErrCouldNotFindTransaction) {
 		if err := c.RevertTransaction(ctx, transaction.ID); err != nil {
 			saveAsProblematic()
-			return spverrors.ErrProcessP2PTx.Wrap(err)
+			return p2pError.Wrap(err)
 		}
 
 		// RevertTransaction saves the transaction itself as REVERTED
-		return spverrors.ErrProcessP2PTx
+		return p2pError
 	}
 	saveAsProblematic()
-	return spverrors.ErrProcessP2PTx
+	return p2pError
 }

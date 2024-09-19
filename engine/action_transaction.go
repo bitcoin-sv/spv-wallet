@@ -384,7 +384,7 @@ func (c *Client) HandleTxCallback(ctx context.Context, callbackResp *broadcast.S
 	tx.UpdateFromBroadcastStatus(callbackResp.TxStatus)
 
 	if err := tx.Save(ctx); err != nil {
-		return err
+		return spverrors.ErrDuringSaveTx.Wrap(err)
 	}
 
 	return nil
