@@ -4,7 +4,6 @@ import (
 	"context"
 	"errors"
 	"strings"
-	"sync"
 	"time"
 
 	"github.com/bitcoin-sv/go-broadcast-client/broadcast"
@@ -31,41 +30,6 @@ func (c *Client) query(ctx context.Context, id string, requiredIn RequiredIn,
 	}
 
 	return txInfo, nil
-}
-
-// fastestQuery will try ALL providers on once and return the fastest "valid" response based on requirements
-func (c *Client) fastestQuery(ctx context.Context, id string, requiredIn RequiredIn,
-	timeout time.Duration,
-) *TransactionInfo {
-	// The channel for the internal results
-	resultsChannel := make(
-		chan *TransactionInfo,
-	) // All miners & WhatsOnChain
-
-	// Create a context (to cancel or timeout)
-	ctxWithCancel, cancel := context.WithTimeout(ctx, timeout)
-	defer cancel()
-
-	// Loop each miner (break into a Go routine for each query)
-	var wg sync.WaitGroup
-
-	wg.Add(1)
-	go func(ctx context.Context, client *Client, wg *sync.WaitGroup, id string, requiredIn RequiredIn) {
-		defer wg.Done()
-		if resp, err := queryBroadcastClient(
-			ctx, client, id,
-		); err == nil && checkRequirementArc(requiredIn, id, resp) {
-			resultsChannel <- resp
-		}
-	}(ctxWithCancel, c, &wg, id, requiredIn)
-
-	// Waiting for all requests to finish
-	go func() {
-		wg.Wait()
-		close(resultsChannel)
-	}()
-
-	return <-resultsChannel
 }
 
 // queryBroadcastClient will submit a query transaction request to a go-broadcast-client

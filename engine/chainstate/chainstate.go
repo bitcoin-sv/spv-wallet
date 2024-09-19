@@ -83,24 +83,3 @@ func (c *Client) QueryTransaction(
 
 	return c.query(ctx, id, requiredIn, timeout)
 }
-
-// QueryTransactionFastest will get the transaction info from ALL provider(s) returning the "fastest" valid result
-//
-// Note: this is fast but could abuse each provider based on how excessive this method is used
-func (c *Client) QueryTransactionFastest(
-	ctx context.Context, id string, requiredIn RequiredIn, timeout time.Duration,
-) (*TransactionInfo, error) {
-	// Basic validation
-	if len(id) < 50 {
-		return nil, spverrors.ErrInvalidTransactionID
-	} else if !c.validRequirement(requiredIn) {
-		return nil, spverrors.ErrInvalidRequirements
-	}
-
-	// Try all providers and return the "fastest" valid response
-	info := c.fastestQuery(ctx, id, requiredIn, timeout)
-	if info == nil {
-		return nil, spverrors.ErrCouldNotFindTransaction
-	}
-	return info, nil
-}
