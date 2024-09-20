@@ -21,9 +21,6 @@ type ChainService interface {
 	QueryTransaction(
 		ctx context.Context, id string, requiredIn RequiredIn, timeout time.Duration,
 	) (*TransactionInfo, error)
-	QueryTransactionFastest(
-		ctx context.Context, id string, requiredIn RequiredIn, timeout time.Duration,
-	) (*TransactionInfo, error)
 }
 
 // ProviderServices is the chainstate providers interface
