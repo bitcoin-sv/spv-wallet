@@ -3,6 +3,8 @@ package request_test
 import (
 	"encoding/hex"
 	"encoding/json"
+	"math"
+	"strconv"
 	"testing"
 
 	"github.com/bitcoin-sv/spv-wallet/models/request"
@@ -197,6 +199,18 @@ func TestDraft_TransactionJSONParsingErrors(t *testing.T) {
 			}`,
 			expectedErr: "json: cannot unmarshal",
 		},
+		"Paymail output with too high satoshis value": {
+			json: `{
+			  "outputs": [
+				{
+				  "type": "paymail",
+				  "to": "receiver@example.com",
+				  "satoshis": ` + getTooLargeSatsValueToParse() + `
+				}
+			  ]
+			}`,
+			expectedErr: "json: cannot unmarshal",
+		},
 	}
 	for name, test := range tests {
 		t.Run(name, func(t *testing.T) {
@@ -205,6 +219,11 @@ func TestDraft_TransactionJSONParsingErrors(t *testing.T) {
 			require.ErrorContains(t, err, test.expectedErr)
 		})
 	}
+}
+
+func getTooLargeSatsValueToParse() string {
+	maxSats := strconv.FormatUint(math.MaxUint64, 10)
+	return maxSats + "0"
 }
 
 func TestDraft_TransactionJSONEncodingErrors(t *testing.T) {
