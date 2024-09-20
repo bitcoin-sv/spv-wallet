@@ -8,6 +8,7 @@ import (
 	"github.com/bitcoin-sv/go-paymail"
 	pmerrors "github.com/bitcoin-sv/spv-wallet/engine/paymail/errors"
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
+	"github.com/bitcoin-sv/spv-wallet/models/bsv"
 	"github.com/mrz1836/go-cachestore"
 	"github.com/rs/zerolog"
 )
@@ -75,7 +76,7 @@ func (s *service) GetCapabilities(ctx context.Context, domain string) (*paymail.
 }
 
 // GetP2PDestinations will ask a paymail host on given address for P2P destinations.
-func (s *service) GetP2PDestinations(ctx context.Context, address *paymail.SanitisedPaymail, satoshis uint) (*paymail.PaymentDestinationPayload, error) {
+func (s *service) GetP2PDestinations(ctx context.Context, address *paymail.SanitisedPaymail, satoshis bsv.Satoshis) (*paymail.PaymentDestinationPayload, error) {
 	capabilities, err := s.GetCapabilities(ctx, address.Domain)
 	if err != nil {
 		return nil, pmerrors.ErrPaymailHostResponseError.Wrap(err)
@@ -218,12 +219,13 @@ func (s *service) extractP2P(capabilities *paymail.CapabilitiesPayload) (success
 	return
 }
 
-func (s *service) validatePaymentDestinationResponse(response *paymail.PaymentDestinationResponse, satoshis uint) error {
-	var sum uint64
+func (s *service) validatePaymentDestinationResponse(response *paymail.PaymentDestinationResponse, satoshis bsv.Satoshis) error {
+	var sum bsv.Satoshis
 	for _, out := range response.Outputs {
-		sum += out.Satoshis
+		outSatoshis := bsv.Satoshis(out.Satoshis)
+		sum += outSatoshis
 	}
-	if sum != uint64(satoshis) {
+	if sum != satoshis {
 		return spverrors.Wrapf(pmerrors.ErrPaymailHostInvalidResponse, "paymail host returned outputs not equal to requested satoshis: expected %d, got %d", satoshis, sum)
 	}
 	return nil

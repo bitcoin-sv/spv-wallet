@@ -4,6 +4,7 @@ import (
 	"net/http"
 
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
+	"github.com/bitcoin-sv/spv-wallet/models/bsv"
 	"github.com/jarcoal/httpmock"
 )
 
@@ -11,7 +12,7 @@ import (
 type MockedP2PDestinationResponse struct {
 	Reference string
 	Scripts   []string
-	Satoshis  []uint
+	Satoshis  []bsv.Satoshis
 }
 
 var _mockedLockingScripts = []string{
@@ -46,8 +47,8 @@ func (m *MockedP2PDestinationResponse) response() obj {
 }
 
 // P2PDestinationsForSats returns a mocked response for the P2P destinations endpoint
-func P2PDestinationsForSats(satoshis uint, moreSatoshis ...uint) *MockedP2PDestinationResponse {
-	outputSats := append([]uint{satoshis}, moreSatoshis...)
+func P2PDestinationsForSats(satoshis bsv.Satoshis, moreSatoshis ...bsv.Satoshis) *MockedP2PDestinationResponse {
+	outputSats := append([]bsv.Satoshis{satoshis}, moreSatoshis...)
 	scripts := make([]string, len(outputSats))
 	for i := range scripts {
 		scripts[i] = _mockedLockingScripts[i%len(_mockedLockingScripts)]

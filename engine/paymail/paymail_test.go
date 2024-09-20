@@ -14,6 +14,7 @@ import (
 	"github.com/bitcoin-sv/spv-wallet/engine/taskmanager"
 	xtester "github.com/bitcoin-sv/spv-wallet/engine/tester"
 	"github.com/bitcoin-sv/spv-wallet/engine/tester/paymailmock"
+	"github.com/bitcoin-sv/spv-wallet/models/bsv"
 	"github.com/jarcoal/httpmock"
 	"github.com/mrz1836/go-cache"
 	"github.com/rs/zerolog"
@@ -68,7 +69,7 @@ func Test_GetP2P(t *testing.T) {
 
 func Test_GetP2PDestinations(t *testing.T) {
 	const testAlias = "tester"
-	const satoshis = uint(1)
+	const satoshis = bsv.Satoshis(1)
 	paymailAddress := &paymail.SanitisedPaymail{
 		Alias:   testAlias,
 		Domain:  testDomain,

@@ -6,9 +6,9 @@ import (
 	"github.com/bitcoin-sv/spv-wallet/engine/transaction/draft"
 	"github.com/bitcoin-sv/spv-wallet/engine/transaction/draft/outputs"
 	mappingsdraft "github.com/bitcoin-sv/spv-wallet/mappings/draft"
+	"github.com/bitcoin-sv/spv-wallet/models/optional"
 	"github.com/bitcoin-sv/spv-wallet/models/request"
 	"github.com/bitcoin-sv/spv-wallet/models/request/opreturn"
-	"github.com/bitcoin-sv/spv-wallet/models/request/optional"
 	paymailreq "github.com/bitcoin-sv/spv-wallet/models/request/paymail"
 	"github.com/stretchr/testify/require"
 )

@@ -11,13 +11,14 @@ import (
 	"github.com/bitcoin-sv/spv-wallet/engine/transaction"
 	"github.com/bitcoin-sv/spv-wallet/engine/transaction/draft"
 	"github.com/bitcoin-sv/spv-wallet/engine/transaction/draft/outputs"
+	"github.com/bitcoin-sv/spv-wallet/models/bsv"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
 
 func TestCreatePaymailDraft(t *testing.T) {
 	const testDomain = "example.com"
-	const transactionSatoshiValue = uint(1)
+	const transactionSatoshiValue = bsv.Satoshis(1)
 	const recipient = "test" + "@" + testDomain
 
 	t.Run("return draft with payment to valid paymail address", func(t *testing.T) {
@@ -76,8 +77,8 @@ func TestCreatePaymailDraft(t *testing.T) {
 	})
 
 	t.Run("return draft with payment with multiple outputs from valid paymail address", func(t *testing.T) {
-		const firstOutputSatoshiValue = uint(1)
-		const secondOutputSatoshiValue = uint(2)
+		const firstOutputSatoshiValue = bsv.Satoshis(1)
+		const secondOutputSatoshiValue = bsv.Satoshis(2)
 		const paymentSatoshiValue = firstOutputSatoshiValue + secondOutputSatoshiValue
 
 		// given:
