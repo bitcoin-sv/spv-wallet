@@ -15,7 +15,7 @@ type MockedP2PDestinationResponse struct {
 	Satoshis  []bsv.Satoshis
 }
 
-var _mockedLockingScripts = []string{
+var mockedLockingScripts = []string{
 	"76a9143e2d1d795f8acaa7957045cc59376177eb04a3c588ac",
 	"76a9145edbbedd1985b0e04423d40ac596e6104b0888a988ac",
 	"76a9145afa2554bce1b8b83a87cadc7d6a654acf85954e88ac",
@@ -51,7 +51,7 @@ func P2PDestinationsForSats(satoshis bsv.Satoshis, moreSatoshis ...bsv.Satoshis)
 	outputSats := append([]bsv.Satoshis{satoshis}, moreSatoshis...)
 	scripts := make([]string, len(outputSats))
 	for i := range scripts {
-		scripts[i] = _mockedLockingScripts[i%len(_mockedLockingScripts)]
+		scripts[i] = mockedLockingScripts[i%len(mockedLockingScripts)]
 	}
 
 	return &MockedP2PDestinationResponse{

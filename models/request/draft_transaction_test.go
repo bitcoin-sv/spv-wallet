@@ -185,6 +185,18 @@ func TestDraft_TransactionJSONParsingErrors(t *testing.T) {
 			}`,
 			expectedErr: "json: cannot unmarshal",
 		},
+		"Paymail output with negative satoshis": {
+			json: `{
+			  "outputs": [
+				{
+				  "type": "paymail",
+				  "to": "receiver@example.com",
+				  "satoshis": -1
+				}
+			  ]
+			}`,
+			expectedErr: "json: cannot unmarshal",
+		},
 	}
 	for name, test := range tests {
 		t.Run(name, func(t *testing.T) {

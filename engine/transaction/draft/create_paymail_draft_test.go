@@ -111,9 +111,20 @@ func TestCreatePaymailDraft(t *testing.T) {
 		// and:
 		annotations := draftTx.Annotations
 		require.Len(t, annotations.Outputs, 2)
-		assert.Equal(t, transaction.BucketBSV, annotations.Outputs[0].Bucket)
-		assert.Equal(t, transaction.BucketBSV, annotations.Outputs[1].Bucket)
-		// TODO: add assertions for paymail annotations
+
+		// and:
+		annotation := annotations.Outputs[0]
+		assert.Equal(t, transaction.BucketBSV, annotation.Bucket)
+		require.NotNil(t, annotation.Paymail)
+		assert.Equal(t, paymailHostResponse.Reference, annotation.Paymail.Reference)
+		assert.Equal(t, recipient, annotation.Paymail.Receiver)
+
+		// and:
+		annotation = annotations.Outputs[1]
+		assert.Equal(t, transaction.BucketBSV, annotation.Bucket)
+		require.NotNil(t, annotation.Paymail)
+		assert.Equal(t, paymailHostResponse.Reference, annotation.Paymail.Reference)
+		assert.Equal(t, recipient, annotation.Paymail.Receiver)
 
 		// debug:
 		t.Logf("BEEF: %s", draftTx.BEEF)
@@ -134,6 +145,12 @@ func TestCreatePaymailDraft(t *testing.T) {
 		spec          *outputs.Paymail
 		expectedError string
 	}{
+		"for no paymail address": {
+			spec: &outputs.Paymail{
+				Satoshis: transactionSatoshiValue,
+			},
+			expectedError: "paymail address is invalid",
+		},
 		"for only alias without domain": {
 			spec: &outputs.Paymail{
 				To:       "test",
@@ -162,12 +179,27 @@ func TestCreatePaymailDraft(t *testing.T) {
 			},
 			expectedError: "paymail address is invalid",
 		},
+		"for zero satoshis value": {
+			spec: &outputs.Paymail{
+				To:       recipient,
+				Satoshis: 0,
+			},
+			expectedError: "output value is too low",
+		},
+		"for no satoshis value": {
+			spec: &outputs.Paymail{
+				To: recipient,
+			},
+		},
 	}
 	for name, test := range errorTests {
 		t.Run("return error "+name, func(t *testing.T) {
 			// given:
 			paymailClient := paymailmock.CreatePaymailClientService(testDomain)
 			paymailClient.WillRespondWithP2PCapabilities()
+			paymailClient.
+				WillRespondOnCapability(paymail.BRFCP2PPaymentDestination).
+				With(paymailmock.P2PDestinationsForSats(test.spec.Satoshis))
 
 			// and:
 			draftService := draft.NewDraftService(paymailClient, tester.Logger())
@@ -225,6 +257,7 @@ func TestCreatePaymailDraft(t *testing.T) {
 					WillRespondOnCapability(paymail.BRFCP2PPaymentDestination).
 					WithNotFound()
 			},
+			expectedError: "paymail host is responding with error",
 		},
 		"paymail host p2p destinations is responding with requirement for more sats then requested": {
 			paymailHostScenario: func(paymailClient *paymailmock.PaymailClientMock) {

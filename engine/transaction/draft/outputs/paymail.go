@@ -8,6 +8,7 @@ import (
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/bitcoin-sv/spv-wallet/engine/transaction"
 	"github.com/bitcoin-sv/spv-wallet/engine/transaction/draft/evaluation"
+	txerrors "github.com/bitcoin-sv/spv-wallet/engine/transaction/errors"
 	paymailreq "github.com/bitcoin-sv/spv-wallet/models/request/paymail"
 )
 
@@ -20,6 +21,10 @@ func (p *Paymail) evaluate(ctx evaluation.Context) (annotatedOutputs, error) {
 	paymailAddress, err := paymailClient.GetSanitizedPaymail(p.To)
 	if err != nil {
 		return nil, spverrors.ErrPaymailAddressIsInvalid.Wrap(err)
+	}
+
+	if p.Satoshis == 0 {
+		return nil, txerrors.ErrOutputValueTooLow
 	}
 
 	destinations, err := paymailClient.GetP2PDestinations(ctx, paymailAddress, p.Satoshis)
