@@ -1,7 +1,6 @@
 package outputs
 
 import (
-	"context"
 	"encoding/hex"
 	"errors"
 
@@ -9,6 +8,7 @@ import (
 	sdk "github.com/bitcoin-sv/go-sdk/transaction"
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/bitcoin-sv/spv-wallet/engine/transaction"
+	"github.com/bitcoin-sv/spv-wallet/engine/transaction/draft/evaluation"
 	txerrors "github.com/bitcoin-sv/spv-wallet/engine/transaction/errors"
 	"github.com/bitcoin-sv/spv-wallet/models/request/opreturn"
 )
@@ -16,7 +16,7 @@ import (
 // OpReturn represents an OP_RETURN output specification.
 type OpReturn opreturn.Output
 
-func (o *OpReturn) evaluate(context.Context) (annotatedOutputs, error) {
+func (o *OpReturn) evaluate(evaluation.Context) (annotatedOutputs, error) {
 	if len(o.Data) == 0 {
 		return nil, txerrors.ErrDraftOpReturnDataRequired
 	}

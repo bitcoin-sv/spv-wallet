@@ -16,6 +16,11 @@ type CapabilityMock struct {
 	response httpmock.Responder
 }
 
+// ResponderFactory is an interface that helps with mocking for a paymail capability by creating a httpmock responder.
+type ResponderFactory interface {
+	Responder() httpmock.Responder
+}
+
 // WithNotFound will make the capability return the response 404 not found.
 func (c *CapabilityMock) WithNotFound() {
 	var err error
@@ -23,6 +28,20 @@ func (c *CapabilityMock) WithNotFound() {
 	if err != nil {
 		panic(spverrors.Wrapf(err, "error creating mocked http response for capability %s", c.name))
 	}
+}
+
+// WithInternalServerError will make the capability return the response 500 internal server error.
+func (c *CapabilityMock) WithInternalServerError() {
+	var err error
+	c.response, err = httpmock.NewJsonResponder(http.StatusInternalServerError, obj{"error": "internal server error"})
+	if err != nil {
+		panic(spverrors.Wrapf(err, "error creating mocked http response for capability %s", c.name))
+	}
+}
+
+// With will make the capability return the response provided by responder created with the factory.
+func (c *CapabilityMock) With(resp ResponderFactory) {
+	c.response = resp.Responder()
 }
 
 func (c *CapabilityMock) mockEndpoint(domain paymailDomainName) {

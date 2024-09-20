@@ -14,4 +14,7 @@ var (
 
 	// ErrDraftOpReturnDataTooLarge is returned when OP_RETURN data part is too big to add to transaction.
 	ErrDraftOpReturnDataTooLarge = models.SPVError{Code: "draft-op-return-data-too-large", Message: "OP_RETURN data is too large", StatusCode: 400}
+
+	// ErrOutputValueTooLow is when the satoshis output is too low for a given type of output.
+	ErrOutputValueTooLow = models.SPVError{Message: "output value is too low", StatusCode: 400, Code: "error-transaction-output-value-too-low"}
 )
