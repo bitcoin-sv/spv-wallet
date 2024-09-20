@@ -1,11 +1,10 @@
 package outputs
 
 import (
-	"context"
-
 	sdk "github.com/bitcoin-sv/go-sdk/transaction"
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/bitcoin-sv/spv-wallet/engine/transaction"
+	"github.com/bitcoin-sv/spv-wallet/engine/transaction/draft/evaluation"
 	txerrors "github.com/bitcoin-sv/spv-wallet/engine/transaction/errors"
 )
 
@@ -16,7 +15,7 @@ type Specifications struct {
 
 // Spec is a specification for a single output of the transaction.
 type Spec interface {
-	evaluate(ctx context.Context) (annotatedOutputs, error)
+	evaluate(ctx evaluation.Context) (annotatedOutputs, error)
 }
 
 // NewSpecifications constructs a new Specifications instance with provided outputs specifications.
@@ -32,7 +31,7 @@ func (s *Specifications) Add(output Spec) {
 }
 
 // Evaluate the outputs specifications and return the transaction outputs and their annotations.
-func (s *Specifications) Evaluate(ctx context.Context) ([]*sdk.TransactionOutput, transaction.OutputsAnnotations, error) {
+func (s *Specifications) Evaluate(ctx evaluation.Context) ([]*sdk.TransactionOutput, transaction.OutputsAnnotations, error) {
 	if s.Outputs == nil {
 		return nil, nil, txerrors.ErrDraftRequiresAtLeastOneOutput
 	}
@@ -45,7 +44,7 @@ func (s *Specifications) Evaluate(ctx context.Context) ([]*sdk.TransactionOutput
 	return txOutputs, annotations, nil
 }
 
-func (s *Specifications) evaluate(ctx context.Context) (annotatedOutputs, error) {
+func (s *Specifications) evaluate(ctx evaluation.Context) (annotatedOutputs, error) {
 	outputs := make(annotatedOutputs, 0)
 	for _, spec := range s.Outputs {
 		outs, err := spec.evaluate(ctx)
