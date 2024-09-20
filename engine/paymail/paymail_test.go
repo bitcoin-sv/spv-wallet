@@ -14,6 +14,7 @@ import (
 	"github.com/bitcoin-sv/spv-wallet/engine/taskmanager"
 	xtester "github.com/bitcoin-sv/spv-wallet/engine/tester"
 	"github.com/bitcoin-sv/spv-wallet/engine/tester/paymailmock"
+	"github.com/bitcoin-sv/spv-wallet/models/bsv"
 	"github.com/jarcoal/httpmock"
 	"github.com/mrz1836/go-cache"
 	"github.com/rs/zerolog"
@@ -22,13 +23,11 @@ import (
 )
 
 const (
-	testDomain    = "test.com"
+	testDomain    = "example.com"
 	testServerURL = "https://" + testDomain + "/api/v1/" + paymail.DefaultServiceName
 )
 
 func Test_GetP2P(t *testing.T) {
-	t.Parallel()
-
 	t.Run("no p2p capabilities", func(t *testing.T) {
 		client := paymailmock.MockClient(testDomain)
 		client.WillRespondWithBasicCapabilities()
@@ -68,9 +67,129 @@ func Test_GetP2P(t *testing.T) {
 	})
 }
 
-func Test_StartP2PTransaction(t *testing.T) {
-	// t.Parallel() mocking does not allow parallel tests
+func Test_GetP2PDestinations(t *testing.T) {
+	const testAlias = "tester"
+	const satoshis = bsv.Satoshis(1)
+	paymailAddress := &paymail.SanitisedPaymail{
+		Alias:   testAlias,
+		Domain:  testDomain,
+		Address: testAlias + "@" + testDomain,
+	}
 
+	errTests := map[string]struct {
+		paymailHostScenario func(*paymailmock.PaymailClientMock)
+		expectedError       string
+	}{
+		"paymail host is responding with not found on capabilities": {
+			paymailHostScenario: func(paymailClient *paymailmock.PaymailClientMock) {
+				paymailClient.WillRespondWithNotFoundOnCapabilities()
+			},
+			expectedError: "paymail host is responding with error",
+		},
+		"paymail host is failing on capabilities": {
+			paymailHostScenario: func(paymailClient *paymailmock.PaymailClientMock) {
+				paymailClient.WillRespondWithErrorOnCapabilities()
+			},
+			expectedError: "paymail host is responding with error",
+		},
+		"paymail host is not supporting p2p destinations capability": {
+			paymailHostScenario: func(paymailClient *paymailmock.PaymailClientMock) {
+				paymailClient.WillRespondWithBasicCapabilities()
+			},
+			expectedError: "paymail host is not supporting P2P capabilities",
+		},
+		"paymail host is failing on p2p destinations": {
+			paymailHostScenario: func(paymailClient *paymailmock.PaymailClientMock) {
+				paymailClient.
+					WillRespondWithP2PCapabilities().
+					WillRespondOnCapability(paymail.BRFCP2PPaymentDestination).
+					WithInternalServerError()
+			},
+			expectedError: "paymail host is responding with error",
+		},
+		"paymail host p2p destinations is returning not found": {
+			paymailHostScenario: func(paymailClient *paymailmock.PaymailClientMock) {
+				paymailClient.
+					WillRespondWithP2PCapabilities().
+					WillRespondOnCapability(paymail.BRFCP2PPaymentDestination).
+					WithNotFound()
+			},
+		},
+		"paymail host p2p destinations is responding with single output with more sats then requested": {
+			paymailHostScenario: func(paymailClient *paymailmock.PaymailClientMock) {
+				paymailClient.
+					WillRespondWithP2PCapabilities().
+					WillRespondOnCapability(paymail.BRFCP2PPaymentDestination).
+					With(paymailmock.P2PDestinationsForSats(satoshis + 1))
+			},
+			expectedError: "paymail host invalid response",
+		},
+		"paymail host p2p destinations is responding with multiple outputs with more sats then requested": {
+			paymailHostScenario: func(paymailClient *paymailmock.PaymailClientMock) {
+				paymailClient.
+					WillRespondWithP2PCapabilities().
+					WillRespondOnCapability(paymail.BRFCP2PPaymentDestination).
+					With(paymailmock.P2PDestinationsForSats(satoshis, satoshis))
+			},
+			expectedError: "paymail host invalid response",
+		},
+		"paymail host p2p destinations is responding with single output with less sats then requested": {
+			paymailHostScenario: func(paymailClient *paymailmock.PaymailClientMock) {
+				paymailClient.
+					WillRespondWithP2PCapabilities().
+					WillRespondOnCapability(paymail.BRFCP2PPaymentDestination).
+					With(paymailmock.P2PDestinationsForSats(0))
+			},
+			expectedError: "paymail host invalid response",
+		},
+		"paymail host p2p destinations is responding with multiple outputs with less sats then requested": {
+			paymailHostScenario: func(paymailClient *paymailmock.PaymailClientMock) {
+				paymailClient.
+					WillRespondWithP2PCapabilities().
+					WillRespondOnCapability(paymail.BRFCP2PPaymentDestination).
+					With(paymailmock.P2PDestinationsForSats(0, 0, 0))
+			},
+			expectedError: "paymail host invalid response",
+		},
+	}
+	for name, test := range errTests {
+		t.Run("return error when "+name, func(t *testing.T) {
+			client := paymailmock.MockClient(testDomain)
+			test.paymailHostScenario(client)
+
+			paymailClient := paymailclient.NewServiceClient(xtester.CacheStore(), client, xtester.Logger())
+
+			destinations, err := paymailClient.GetP2PDestinations(context.Background(), paymailAddress, satoshis)
+			require.ErrorContains(t, err, test.expectedError)
+			require.Nil(t, destinations)
+		})
+	}
+
+	t.Run("successfully get destination", func(t *testing.T) {
+		// given
+		client := paymailmock.MockClient(testDomain)
+
+		paymailHostResponse := paymailmock.P2PDestinationsForSats(satoshis)
+
+		client.WillRespondWithP2PCapabilities()
+		client.
+			WillRespondOnCapability(paymail.BRFCP2PPaymentDestination).
+			With(paymailHostResponse)
+
+		// and:
+		paymailClient := paymailclient.NewServiceClient(xtester.CacheStore(), client, xtester.Logger())
+
+		// when:
+		destinations, err := paymailClient.GetP2PDestinations(context.Background(), paymailAddress, satoshis)
+		require.NoError(t, err)
+		assert.Equal(t, paymailHostResponse.Reference, destinations.Reference)
+		require.Len(t, destinations.Outputs, 1)
+		assert.Equal(t, paymailHostResponse.Scripts[0], destinations.Outputs[0].Script)
+		assert.EqualValues(t, satoshis, destinations.Outputs[0].Satoshis)
+	})
+}
+
+func Test_StartP2PTransaction(t *testing.T) {
 	const testAlias = "tester"
 
 	t.Run("valid response", func(t *testing.T) {
@@ -124,7 +243,6 @@ func Test_GetCapabilities(t *testing.T) {
 		cacheKeyCapabilities     = "paymail-capabilities-"
 	)
 
-	// t.Parallel() mocking does not allow parallel tests
 	bc := broadcast_client_mock.Builder().
 		WithMockArc(broadcast_client_mock.MockSuccess).
 		Build()

@@ -1,18 +1,22 @@
-package request
+package request_test
 
 import (
 	"encoding/hex"
 	"encoding/json"
+	"math"
+	"strconv"
 	"testing"
 
+	"github.com/bitcoin-sv/spv-wallet/models/request"
 	"github.com/bitcoin-sv/spv-wallet/models/request/opreturn"
+	paymailreq "github.com/bitcoin-sv/spv-wallet/models/request/paymail"
 	"github.com/stretchr/testify/require"
 )
 
-func TestDraftTransactionJSON(t *testing.T) {
+func TestDraft_TransactionJSON(t *testing.T) {
 	tests := map[string]struct {
 		json  string
-		draft *DraftTransaction
+		draft *request.DraftTransaction
 	}{
 		"OP_RETURN output with single string": {
 			json: `{
@@ -24,8 +28,8 @@ func TestDraftTransactionJSON(t *testing.T) {
 				}
 			  ]
 			}`,
-			draft: &DraftTransaction{
-				Outputs: []Output{
+			draft: &request.DraftTransaction{
+				Outputs: []request.Output{
 					opreturn.Output{
 						DataType: opreturn.DataTypeStrings,
 						Data:     []string{"hello world"},
@@ -43,8 +47,8 @@ func TestDraftTransactionJSON(t *testing.T) {
 				}
 			  ]
 			}`,
-			draft: &DraftTransaction{
-				Outputs: []Output{
+			draft: &request.DraftTransaction{
+				Outputs: []request.Output{
 					opreturn.Output{
 						DataType: opreturn.DataTypeStrings,
 						Data:     []string{"hello", "world"},
@@ -61,8 +65,8 @@ func TestDraftTransactionJSON(t *testing.T) {
 				}
 			  ]
 			}`,
-			draft: &DraftTransaction{
-				Outputs: []Output{
+			draft: &request.DraftTransaction{
+				Outputs: []request.Output{
 					opreturn.Output{
 						DataType: opreturn.DataTypeDefault,
 						Data:     []string{"hello world"},
@@ -80,8 +84,8 @@ func TestDraftTransactionJSON(t *testing.T) {
 				}
 			  ]
 			}`,
-			draft: &DraftTransaction{
-				Outputs: []Output{
+			draft: &request.DraftTransaction{
+				Outputs: []request.Output{
 					opreturn.Output{
 						DataType: opreturn.DataTypeHexes,
 						Data:     []string{hex.EncodeToString([]byte("hello world"))},
@@ -99,8 +103,8 @@ func TestDraftTransactionJSON(t *testing.T) {
 				}
 			  ]
 			}`,
-			draft: &DraftTransaction{
-				Outputs: []Output{
+			draft: &request.DraftTransaction{
+				Outputs: []request.Output{
 					opreturn.Output{
 						DataType: opreturn.DataTypeHexes,
 						Data:     []string{hex.EncodeToString([]byte("hello")), hex.EncodeToString([]byte(" world"))},
@@ -108,10 +112,29 @@ func TestDraftTransactionJSON(t *testing.T) {
 				},
 			},
 		},
+		"Paymail output without sender": {
+			json: `{
+			  "outputs": [
+				{
+				  "type": "paymail",
+				  "to": "receiver@example.com",
+				  "satoshis": 1000
+				}
+			  ]
+			}`,
+			draft: &request.DraftTransaction{
+				Outputs: []request.Output{
+					paymailreq.Output{
+						To:       "receiver@example.com",
+						Satoshis: 1000,
+					},
+				},
+			},
+		},
 	}
 	for name, test := range tests {
 		t.Run("draft from JSON: "+name, func(t *testing.T) {
-			var draft *DraftTransaction
+			var draft *request.DraftTransaction
 			err := json.Unmarshal([]byte(test.json), &draft)
 			require.NoError(t, err)
 			require.Equal(t, test.draft, draft)
@@ -125,7 +148,7 @@ func TestDraftTransactionJSON(t *testing.T) {
 	}
 }
 
-func TestDraftTransactionJSONParsingErrors(t *testing.T) {
+func TestDraft_TransactionJSONParsingErrors(t *testing.T) {
 	tests := map[string]struct {
 		json        string
 		expectedErr string
@@ -164,24 +187,53 @@ func TestDraftTransactionJSONParsingErrors(t *testing.T) {
 			}`,
 			expectedErr: "json: cannot unmarshal",
 		},
+		"Paymail output with negative satoshis": {
+			json: `{
+			  "outputs": [
+				{
+				  "type": "paymail",
+				  "to": "receiver@example.com",
+				  "satoshis": -1
+				}
+			  ]
+			}`,
+			expectedErr: "json: cannot unmarshal",
+		},
+		"Paymail output with too high satoshis value": {
+			json: `{
+			  "outputs": [
+				{
+				  "type": "paymail",
+				  "to": "receiver@example.com",
+				  "satoshis": ` + getTooLargeSatsValueToParse() + `
+				}
+			  ]
+			}`,
+			expectedErr: "json: cannot unmarshal",
+		},
 	}
 	for name, test := range tests {
 		t.Run(name, func(t *testing.T) {
-			var draft *DraftTransaction
+			var draft *request.DraftTransaction
 			err := json.Unmarshal([]byte(test.json), &draft)
 			require.ErrorContains(t, err, test.expectedErr)
 		})
 	}
 }
 
-func TestDraftTransactionJSONEncodingErrors(t *testing.T) {
+func getTooLargeSatsValueToParse() string {
+	maxSats := strconv.FormatUint(math.MaxUint64, 10)
+	return maxSats + "0"
+}
+
+func TestDraft_TransactionJSONEncodingErrors(t *testing.T) {
 	tests := map[string]struct {
-		draft       *DraftTransaction
+		draft       *request.DraftTransaction
 		expectedErr string
 	}{
 		"Unsupported output type": {
-			draft: &DraftTransaction{
-				Outputs: []Output{&unsupportedOutput{}},
+			draft: &request.DraftTransaction{
+				Outputs: []request.Output{&unsupportedOutput{}},
 			},
 			expectedErr: "unsupported output type",
 		},
