@@ -7,6 +7,7 @@ import (
 	"github.com/bitcoin-sv/spv-wallet/engine/paymail"
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/bitcoin-sv/spv-wallet/engine/transaction"
+	"github.com/bitcoin-sv/spv-wallet/engine/transaction/draft/evaluation"
 	txerrors "github.com/bitcoin-sv/spv-wallet/engine/transaction/errors"
 	"github.com/rs/zerolog"
 )
@@ -33,10 +34,14 @@ func (s *service) Create(ctx context.Context, spec *TransactionSpec) (*Transacti
 	if spec == nil {
 		return nil, txerrors.ErrDraftSpecificationRequired
 	}
-	outputs, annotations, err := spec.outputs(ctx)
+
+	c := evaluation.NewContext(ctx, s.logger, s.paymailService)
+
+	outputs, annotations, err := spec.outputs(c)
 	if err != nil {
 		return nil, err
 	}
+
 	tx := &sdk.Transaction{
 		Outputs: outputs,
 	}

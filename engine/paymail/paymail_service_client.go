@@ -6,7 +6,9 @@ import (
 	"time"
 
 	"github.com/bitcoin-sv/go-paymail"
+	pmerrors "github.com/bitcoin-sv/spv-wallet/engine/paymail/errors"
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
+	"github.com/bitcoin-sv/spv-wallet/models/bsv"
 	"github.com/mrz1836/go-cachestore"
 	"github.com/rs/zerolog"
 )
@@ -73,6 +75,35 @@ func (s *service) GetCapabilities(ctx context.Context, domain string) (*paymail.
 	return &response.CapabilitiesPayload, nil
 }
 
+// GetP2PDestinations will ask a paymail host on given address for P2P destinations.
+func (s *service) GetP2PDestinations(ctx context.Context, address *paymail.SanitisedPaymail, satoshis bsv.Satoshis) (*paymail.PaymentDestinationPayload, error) {
+	capabilities, err := s.GetCapabilities(ctx, address.Domain)
+	if err != nil {
+		return nil, pmerrors.ErrPaymailHostResponseError.Wrap(err)
+	}
+
+	p2pDestinationURL := capabilities.GetString(paymail.BRFCP2PPaymentDestination, "")
+	if len(p2pDestinationURL) == 0 {
+		return nil, pmerrors.ErrPaymailHostNotSupportingP2P
+	}
+
+	response, err := s.paymailClient.GetP2PPaymentDestination(
+		p2pDestinationURL,
+		address.Alias, address.Domain,
+		&paymail.PaymentRequest{Satoshis: uint64(satoshis)},
+	)
+	if err != nil {
+		return nil, pmerrors.ErrPaymailHostResponseError.Wrap(err)
+	}
+
+	err = s.validatePaymentDestinationResponse(response, satoshis)
+	if err != nil {
+		return nil, err
+	}
+
+	return &response.PaymentDestinationPayload, nil
+}
+
 func (s *service) loadCapabilitiesFromCache(ctx context.Context, key string) (*paymail.CapabilitiesPayload, error) {
 	capabilities := new(paymail.CapabilitiesPayload)
 	err := s.cache.GetModel(ctx, key, capabilities)
@@ -110,7 +141,10 @@ func (s *service) loadCapabilities(domain string) (*paymail.CapabilitiesResponse
 
 // GetP2P will return the P2P urls and true if they are both found
 func (s *service) GetP2P(ctx context.Context, domain string) (success bool, p2pDestinationURL, p2pSubmitTxURL string, format PayloadFormat) {
-	capabilities, _ := s.GetCapabilities(ctx, domain)
+	capabilities, err := s.GetCapabilities(ctx, domain)
+	if err != nil {
+		return false, "", "", BasicPaymailPayloadFormat
+	}
 	return s.extractP2P(capabilities)
 }
 
@@ -183,4 +217,16 @@ func (s *service) extractP2P(capabilities *paymail.CapabilitiesPayload) (success
 		success = true
 	}
 	return
+}
+
+func (s *service) validatePaymentDestinationResponse(response *paymail.PaymentDestinationResponse, satoshis bsv.Satoshis) error {
+	var sum bsv.Satoshis
+	for _, out := range response.Outputs {
+		outSatoshis := bsv.Satoshis(out.Satoshis)
+		sum += outSatoshis
+	}
+	if sum != satoshis {
+		return spverrors.Wrapf(pmerrors.ErrPaymailHostInvalidResponse, "paymail host returned outputs not equal to requested satoshis: expected %d, got %d", satoshis, sum)
+	}
+	return nil
 }

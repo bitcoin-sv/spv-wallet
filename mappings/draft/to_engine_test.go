@@ -6,8 +6,10 @@ import (
 	"github.com/bitcoin-sv/spv-wallet/engine/transaction/draft"
 	"github.com/bitcoin-sv/spv-wallet/engine/transaction/draft/outputs"
 	mappingsdraft "github.com/bitcoin-sv/spv-wallet/mappings/draft"
+	"github.com/bitcoin-sv/spv-wallet/models/optional"
 	"github.com/bitcoin-sv/spv-wallet/models/request"
 	"github.com/bitcoin-sv/spv-wallet/models/request/opreturn"
+	paymailreq "github.com/bitcoin-sv/spv-wallet/models/request/paymail"
 	"github.com/stretchr/testify/require"
 )
 
@@ -19,7 +21,7 @@ func TestMapToEngine(t *testing.T) {
 		"map op_return string output": {
 			req: &request.DraftTransaction{
 				Outputs: []request.Output{
-					&opreturn.Output{
+					opreturn.Output{
 						DataType: opreturn.DataTypeStrings,
 						Data:     []string{"Example data"},
 					},
@@ -30,6 +32,26 @@ func TestMapToEngine(t *testing.T) {
 					&outputs.OpReturn{
 						DataType: opreturn.DataTypeStrings,
 						Data:     []string{"Example data"},
+					},
+				),
+			},
+		},
+		"map paymail output": {
+			req: &request.DraftTransaction{
+				Outputs: []request.Output{
+					paymailreq.Output{
+						To:       "receiver@example.com",
+						Satoshis: 1000,
+						From:     optional.Of("sender@example.com"),
+					},
+				},
+			},
+			expected: &draft.TransactionSpec{
+				Outputs: outputs.NewSpecifications(
+					&outputs.Paymail{
+						To:       "receiver@example.com",
+						Satoshis: 1000,
+						From:     optional.Of("sender@example.com"),
 					},
 				),
 			},
