@@ -285,7 +285,6 @@ func initRevertTransactionData(t *testing.T, clientOpts ...ClientOps) (context.C
 	require.NoError(t, err)
 
 	transaction.draftTransaction = draftTransaction
-	_hydrateOutgoingWithSync(transaction)
 
 	err = transaction.processUtxos(ctx)
 	require.NoError(t, err)

@@ -26,7 +26,7 @@ func MapToTransactionContract(t *engine.Transaction) *response.Transaction {
 		NumberOfOutputs:      t.NumberOfOutputs,
 		DraftID:              t.DraftID,
 		TotalValue:           t.TotalValue,
-		Status:               t.TxStatus,
+		Status:               string(t.TxStatus),
 		TransactionDirection: string(t.Direction),
 	}
 

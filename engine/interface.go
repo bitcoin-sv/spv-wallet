@@ -159,7 +159,7 @@ type TransactionService interface {
 	RecordTransaction(ctx context.Context, xPubKey, txHex, draftID string,
 		opts ...ModelOps) (*Transaction, error)
 	RecordRawTransaction(ctx context.Context, txHex string, opts ...ModelOps) (*Transaction, error)
-	UpdateTransaction(ctx context.Context, txInfo *broadcast.SubmittedTx) error
+	HandleTxCallback(ctx context.Context, callbackResp *broadcast.SubmittedTx) error
 	UpdateTransactionMetadata(ctx context.Context, xPubID, id string, metadata Metadata) (*Transaction, error)
 	RevertTransaction(ctx context.Context, id string) error
 }

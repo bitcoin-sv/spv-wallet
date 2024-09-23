@@ -386,19 +386,10 @@ func saveBeefTransactionInput(ctx context.Context, c ClientInterface, input *bee
 	newOpts := c.DefaultModelOptions(New())
 	inputTx, _ := txFromHex(input.Transaction.String(), newOpts...) // we can ignore error here
 
-	sync := newSyncTransaction(
-		inputTx.GetID(),
-		inputTx.Client().DefaultSyncConfig(),
-		inputTx.GetOptions(true)...,
-	)
-	sync.SyncStatus = SyncStatusReady
-
 	if bump != nil {
 		inputTx.BUMP = *bump
-		sync.SyncStatus = SyncStatusSkipped
+		inputTx.TxStatus = TxStatusMined
 	}
-
-	inputTx.syncTransaction = sync
 
 	err := inputTx.Save(ctx)
 	return spverrors.Wrapf(err, "error in saveBeefTransactionInput during saving tx")

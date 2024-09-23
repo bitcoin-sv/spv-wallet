@@ -144,11 +144,6 @@ func (m *Transaction) ChildModels() (childModels []ModelInterface) {
 		childModels = append(childModels, &m.utxos[index])
 	}
 
-	// Add the broadcast transaction record
-	if m.syncTransaction != nil {
-		childModels = append(childModels, m.syncTransaction)
-	}
-
 	return
 }
 
@@ -188,7 +183,7 @@ func (m *Transaction) notify() {
 				XPubID: m.XPubID,
 			},
 			TransactionID:   m.ID,
-			Status:          m.TxStatus,
+			Status:          string(m.TxStatus),
 			XpubOutputValue: m.XpubOutputValue,
 		})
 	}

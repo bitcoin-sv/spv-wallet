@@ -2,12 +2,10 @@ package engine
 
 import (
 	"context"
-	"errors"
 	"math"
 	"time"
 
 	"github.com/bitcoin-sv/go-broadcast-client/broadcast"
-	"github.com/bitcoin-sv/spv-wallet/engine/chainstate"
 	"github.com/bitcoin-sv/spv-wallet/engine/datastore"
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/bitcoin-sv/spv-wallet/engine/utils"
@@ -256,9 +254,6 @@ func (c *Client) UpdateTransactionMetadata(ctx context.Context, xPubID, id strin
 // yet been synced on-chain and the utxos have not been spent.
 // All utxos that are reverted will be marked as deleted (and spent)
 func (c *Client) RevertTransaction(ctx context.Context, id string) error {
-	// Check for existing NewRelic transaction
-	ctx = c.GetOrStartTxn(ctx, "revert_transaction_by_id")
-
 	// Get the transaction
 	transaction, err := c.GetTransaction(ctx, "", id)
 	if err != nil {
@@ -270,23 +265,12 @@ func (c *Client) RevertTransaction(ctx context.Context, id string) error {
 		return spverrors.ErrTxRevertEmptyDraftID
 	}
 
-	var draftTransaction *DraftTransaction
-	if draftTransaction, err = c.GetDraftTransactionByID(ctx, transaction.DraftID, c.DefaultModelOptions()...); err != nil {
+	draftTransaction, err := c.GetDraftTransactionByID(ctx, transaction.DraftID, c.DefaultModelOptions()...)
+	if err != nil {
 		return err
 	}
 	if draftTransaction == nil {
 		return spverrors.ErrTxRevertCouldNotFindDraftTx
-	}
-
-	// check whether transaction is not already on chain
-	var info *chainstate.TransactionInfo
-	if info, err = c.Chainstate().QueryTransaction(ctx, transaction.ID, chainstate.RequiredInMempool, 30*time.Second); err != nil {
-		if !errors.Is(err, spverrors.ErrCouldNotFindTransaction) {
-			return spverrors.Wrapf(err, "failed to query transaction %s on chain", transaction.ID)
-		}
-	}
-	if info != nil {
-		return spverrors.ErrTxRevertNotFoundOnChain
 	}
 
 	// check that the utxos of this transaction have not been spent
@@ -356,16 +340,6 @@ func (c *Client) RevertTransaction(ctx context.Context, id string) error {
 		return err
 	}
 
-	// cancel sync transaction
-	var syncTransaction *SyncTransaction
-	if syncTransaction, err = GetSyncTransactionByID(ctx, transaction.ID, c.DefaultModelOptions()...); err != nil {
-		return err
-	}
-	syncTransaction.SyncStatus = SyncStatusCanceled
-	if err = syncTransaction.Save(ctx); err != nil {
-		return err
-	}
-
 	// revert transaction
 	// this takes the transaction out of any possible list view of the owners of the xpubs,
 	// but keeps a record of what went down
@@ -380,41 +354,40 @@ func (c *Client) RevertTransaction(ctx context.Context, id string) error {
 	transaction.XpubOutputValue = XpubOutputValue{"reverted": 0}
 	transaction.DeletedAt.Valid = true
 	transaction.DeletedAt.Time = time.Now()
+	transaction.TxStatus = TxStatusReverted
 
 	err = transaction.Save(ctx) // update existing record
 
 	return err
 }
 
-// UpdateTransaction will update the broadcast callback transaction info, like: block height, block hash, status, bump.
-func (c *Client) UpdateTransaction(ctx context.Context, callbackResp *broadcast.SubmittedTx) error {
+// HandleTxCallback will update the broadcast callback transaction info, like: block height, block hash, status, bump.
+func (c *Client) HandleTxCallback(ctx context.Context, callbackResp *broadcast.SubmittedTx) error {
+	logger := c.options.logger
 	bump, err := bc.NewBUMPFromStr(callbackResp.MerklePath)
 	if err != nil {
-		c.options.logger.Err(err).Msgf("failed to parse merkle path from broadcast callback - tx: %v", callbackResp)
+		logger.Err(err).Msgf("failed to parse merkle path from broadcast callback - tx: %v", callbackResp)
 		return spverrors.Wrapf(err, "failed to parse merkle path from broadcast callback - tx: %v", callbackResp)
 	}
 
-	txInfo := &chainstate.TransactionInfo{
-		BlockHash:   callbackResp.BlockHash,
-		BlockHeight: callbackResp.BlockHeight,
-		ID:          callbackResp.TxID,
-		TxStatus:    callbackResp.TxStatus,
-		BUMP:        bump,
-	}
+	txID := callbackResp.TxID
 
-	tx, err := c.GetTransaction(ctx, "", txInfo.ID)
+	tx, err := c.GetTransaction(ctx, "", txID)
 	if err != nil {
-		c.options.logger.Err(err).Msgf("failed to get transaction by id: %v", txInfo.ID)
+		logger.Warn().Err(err).Msgf("failed to get transaction by id: %v", txID)
 		return err
 	}
 
-	syncTx, err := GetSyncTransactionByTxID(ctx, txInfo.ID, c.DefaultModelOptions()...)
-	if err != nil {
-		c.options.logger.Err(err).Msgf("failed to get sync transaction by tx id: %v", txInfo.ID)
-		return err
+	tx.BlockHash = callbackResp.BlockHash
+	tx.BlockHeight = uint64(callbackResp.BlockHeight)
+	tx.SetBUMP(bump)
+	tx.UpdateFromBroadcastStatus(callbackResp.TxStatus)
+
+	if err := tx.Save(ctx); err != nil {
+		return spverrors.ErrDuringSaveTx.Wrap(err)
 	}
 
-	return processSyncTxSave(ctx, txInfo, syncTx, tx)
+	return nil
 }
 
 func generateTxIDFilterConditions(txIDs []string) map[string]interface{} {
