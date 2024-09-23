@@ -12,7 +12,7 @@ func main() {
 	client, err := engine.NewClient(
 		context.Background(), // Set context
 		engine.WithCronCustomPeriod(engine.CronJobNameDraftTransactionCleanUp, 2*time.Second),
-		engine.WithCronCustomPeriod(engine.CronJobNameSyncTransactionSync, 4*time.Second),
+		engine.WithCronCustomPeriod(engine.CronJobNameSyncTransaction, 4*time.Second),
 	)
 	if err != nil {
 		log.Fatalln("error: " + err.Error())

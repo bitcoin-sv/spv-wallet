@@ -14,8 +14,3 @@ type TransactionInfo struct {
 	BUMP        *bc.BUMP           `json:"bump,omitempty"`       // Merkle proof in BUMP format
 	TxStatus    broadcast.TxStatus `json:"tx_status,omitempty"`  // Status of the transaction
 }
-
-// Valid validates TransactionInfo by checking if it contains BlockHash and BUMP
-func (t *TransactionInfo) Valid() bool {
-	return t.BlockHash != "" && t.BUMP != nil
-}

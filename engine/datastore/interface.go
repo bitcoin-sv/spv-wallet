@@ -28,6 +28,7 @@ type StorageService interface {
 	NewRawTx() (*Transaction, error)
 	Raw(query string) *gorm.DB
 	SaveModel(ctx context.Context, model interface{}, tx *Transaction, newRecord, commitTx bool) error
+	DB() *gorm.DB
 }
 
 // GetterInterface is the getter methods

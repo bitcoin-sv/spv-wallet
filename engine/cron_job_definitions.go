@@ -59,21 +59,8 @@ func taskSyncTransactions(ctx context.Context, client *Client) error {
 	logClient := client.Logger()
 	logClient.Info().Msg("running sync transaction(s) task...")
 
-	// Prevent concurrent running
-	unlock, err := newWriteLock(
-		ctx, lockKeyProcessSyncTx, client.Cachestore(),
-	)
-	defer unlock()
-	if err != nil {
-		logClient.Warn().Msg("cannot run sync transaction(s) task,  previous run is not complete yet...")
-		return nil //nolint:nilerr // previous run is not complete yet
-	}
-
-	err = processSyncTransactions(ctx, 100, WithClient(client))
-	if err == nil || errors.Is(err, datastore.ErrNoResults) {
-		return nil
-	}
-	return err
+	processSyncTransactions(ctx, client)
+	return nil
 }
 
 func taskCalculateMetrics(ctx context.Context, client *Client) error {
