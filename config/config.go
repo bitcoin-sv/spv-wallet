@@ -49,6 +49,8 @@ type AppConfig struct {
 	Logging *LoggingConfig `json:"logging" mapstructure:"logging"`
 	// Paymail is a config for Paymail and BEEF.
 	Paymail *PaymailConfig `json:"paymail" mapstructure:"paymail"`
+	// BHSConfig is a config for BlockHeaderService
+	BHS *BHSConfig `json:"block_headers_service" mapstructure:"block_headers_service"`
 	// ImportBlockHeaders is a URL from where the headers can be downloaded.
 	ImportBlockHeaders string `json:"import_block_headers" mapstructure:"import_block_headers"`
 	// Debug is a flag for enabling additional information from SPV Wallet.
@@ -210,6 +212,14 @@ type BeefConfig struct {
 	BlockHeaderServiceAuthToken string `json:"block_header_service_auth_token" mapstructure:"block_header_service_auth_token"`
 	// UseBeef is a flag for enabling BEEF transactions format.
 	UseBeef bool `json:"use_beef" mapstructure:"use_beef"`
+}
+
+// BHSConfig consists of AuthToken and URL used to communicate with BlockHeaderService
+type BHSConfig struct {
+	// AuthToken is the token used for authenticating requests to Block Headers Service (BHS)
+	AuthToken string `json:"auth_token" mapstructure:"auth_token"`
+	// URL is the URL used to communicate with Block Headers Service (BHS)
+	URL string `json:"url" mapstructure:"url"`
 }
 
 func (b *BeefConfig) enabled() bool {

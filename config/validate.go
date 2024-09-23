@@ -24,6 +24,10 @@ func (a *AppConfig) Validate() error {
 		return err
 	}
 
+	if err = a.BHS.Validate(); err != nil {
+		return err
+	}
+
 	if err = a.Server.Validate(); err != nil {
 		return err
 	}
