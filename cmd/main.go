@@ -12,6 +12,7 @@ import (
 	"github.com/bitcoin-sv/spv-wallet/config"
 	"github.com/bitcoin-sv/spv-wallet/dictionary"
 	_ "github.com/bitcoin-sv/spv-wallet/docs"
+	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/bitcoin-sv/spv-wallet/logging"
 	"github.com/bitcoin-sv/spv-wallet/server"
 )
@@ -48,6 +49,8 @@ func main() {
 		defaultLogger.Fatal().Msgf(dictionary.GetInternalMessage(dictionary.ErrorLoadingService), config.ApplicationName, err.Error())
 		return
 	}
+
+	spverrors.SetupGlobalZerologErrorHandler(services.Logger.GetLevel())
 
 	// Try to ping the Block Headers Service if enabled
 	appConfig.CheckBlockHeaderService(context.Background(), services.Logger)
