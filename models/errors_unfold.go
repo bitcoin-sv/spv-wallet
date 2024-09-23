@@ -33,10 +33,18 @@ func (en *ErrorNode) ToString() string {
 
 	msg := fmt.Sprintf("'%s' <of type [%s]>", en.Msg, en.Type)
 	if len(en.Causes) != 0 {
-		strCauses := make([]string, len(en.Causes))
-		for i, cause := range en.Causes {
+		causes := en.Causes
+		if en.Causes[0].Type == "*errors.joinError" {
+			// skipping unnecessary node/wrapper joinError
+			// printing just its causes
+			causes = en.Causes[0].Causes
+		}
+
+		strCauses := make([]string, len(causes))
+		for i, cause := range causes {
 			strCauses[i] = cause.ToString()
 		}
+
 		msg += fmt.Sprintf(" was caused by { %s }", strings.Join(strCauses, " AND "))
 	}
 	return msg
@@ -51,9 +59,10 @@ func (en *ErrorNode) pkgErrorWrappersToString() (output string, ok bool) {
 		} else if en.Type == "*errors.withMessage" {
 			message := en.Msg
 			if causer, ok := en.Err.(interface{ Cause() error }); ok && causer.Cause() != nil {
+				// the string of withMessage is constructed by: '<msg>: <causeMsg>'
+				// skipping the <causeMsg> which will be printed by en.Causes[0].ToString()
 				message = message[0:len(causer.Cause().Error())]
 			}
-
 			return fmt.Sprintf("%s annotated with '%s'", en.Causes[0].ToString(), message), true
 		}
 	}
