@@ -8,15 +8,6 @@ import (
 	"strings"
 )
 
-// Is checks if the target error is the same as the current error
-func (e SPVError) Is(target error) bool {
-	t, ok := target.(SPVError)
-	if !ok {
-		return false
-	}
-	return e.Code == t.Code
-}
-
 // ErrorNode holds information of parent error and its causes
 type ErrorNode struct {
 	Err    error        `json:"-"`
@@ -36,6 +27,10 @@ func (en *ErrorNode) ToJSON() []byte {
 
 // ToString returns the string representation of the error node
 func (en *ErrorNode) ToString() string {
+	if parsed, ok := en.pkgErrorWrappersToString(); ok {
+		return parsed
+	}
+
 	msg := fmt.Sprintf("'%s' <of type [%s]>", en.Msg, en.Type)
 	if len(en.Causes) != 0 {
 		strCauses := make([]string, len(en.Causes))
@@ -45,6 +40,24 @@ func (en *ErrorNode) ToString() string {
 		msg += fmt.Sprintf(" was caused by { %s }", strings.Join(strCauses, " AND "))
 	}
 	return msg
+}
+
+// pkgErrorWrappersToString handles pkg/errors withMessage & withStack wrappers
+// skipping redundant and unsupported parts
+func (en *ErrorNode) pkgErrorWrappersToString() (output string, ok bool) {
+	if len(en.Causes) == 1 {
+		if en.Type == "*errors.withStack" {
+			return en.Causes[0].ToString(), true
+		} else if en.Type == "*errors.withMessage" {
+			message := en.Msg
+			if causer, ok := en.Err.(interface{ Cause() error }); ok && causer.Cause() != nil {
+				message = message[0:len(causer.Cause().Error())]
+			}
+
+			return fmt.Sprintf("%s annotated with '%s'", en.Causes[0].ToString(), message), true
+		}
+	}
+	return "", false
 }
 
 // InitialCause returns the initial cause of the error
