@@ -30,6 +30,13 @@ func TestBHSConfig_Validate(t *testing.T) {
 		require.Error(t, err)
 	})
 
+	t.Run("config is nil", func(t *testing.T) {
+		var b *BHSConfig
+
+		err := b.Validate()
+		require.Error(t, err)
+	})
+
 	t.Run("full config", func(t *testing.T) {
 		b := BHSConfig{
 			AuthToken: "token",
