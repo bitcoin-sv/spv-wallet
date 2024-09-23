@@ -50,7 +50,7 @@ type AppConfig struct {
 	// Paymail is a config for Paymail and BEEF.
 	Paymail *PaymailConfig `json:"paymail" mapstructure:"paymail"`
 	// BHSConfig is a config for BlockHeaderService
-	BHS *BHSConfig `json:"block_header_service" mapstructure:"block_header_service"`
+	BHS *BHSConfig `json:"block_headers_service" mapstructure:"block_headers_service"`
 	// ImportBlockHeaders is a URL from where the headers can be downloaded.
 	ImportBlockHeaders string `json:"import_block_headers" mapstructure:"import_block_headers"`
 	// Debug is a flag for enabling additional information from SPV Wallet.
