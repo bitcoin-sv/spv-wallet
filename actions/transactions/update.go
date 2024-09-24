@@ -58,6 +58,7 @@ func update(c *gin.Context, userContext *reqctx.UserContext) {
 // @Description	Update transaction metadata
 // @Tags		Transactions
 // @Produce		json
+// @Param		id path string true "id"
 // @Param		UpdateTransactionRequest body UpdateTransactionRequest true "Pass update transaction request model in the body with updated metadata"
 // @Success		200 {object} response.Transaction "Updated transaction metadata"
 // @Failure		400	"Bad request - Error while parsing UpdateTransaction from request body, tx not found or tx is not associated with the xpub"
