@@ -50,7 +50,7 @@ func main() {
 	}
 
 	// Try to ping the Block Headers Service if enabled
-	appConfig.CheckBlockHeaderService(context.Background(), services.Logger)
+	appConfig.CheckBlockHeadersService(context.Background(), services.Logger)
 
 	// @mrz New Relic is ready at this point
 	txn := services.NewRelic.StartTransaction("load_server")

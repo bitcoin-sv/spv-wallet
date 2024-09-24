@@ -43,7 +43,7 @@ func TestVerifyMerkleRoots(t *testing.T) {
 		httpmock.RegisterResponder("POST", mockURL,
 			httpmock.NewStringResponder(500, `{"error":"Internal Server Error"}`),
 		)
-		c, bLogger := initMockClient(WithConnectionToBlockHeaderService(mockURL, ""))
+		c, bLogger := initMockClient(WithConnectionToBlockHeadersService(mockURL, ""))
 
 		err := c.VerifyMerkleRoots(context.Background(), []MerkleRootConfirmationRequestItem{})
 
@@ -57,7 +57,7 @@ func TestVerifyMerkleRoots(t *testing.T) {
 		httpmock.RegisterResponder("POST", mockURL,
 			httpmock.NewStringResponder(401, `Unauthorized`),
 		)
-		c, bLogger := initMockClient(WithConnectionToBlockHeaderService(mockURL, "some-token"))
+		c, bLogger := initMockClient(WithConnectionToBlockHeadersService(mockURL, "some-token"))
 
 		err := c.VerifyMerkleRoots(context.Background(), []MerkleRootConfirmationRequestItem{})
 
@@ -74,7 +74,7 @@ func TestVerifyMerkleRoots(t *testing.T) {
 				Confirmations:     []MerkleRootConfirmation{},
 			}),
 		)
-		c, bLogger := initMockClient(WithConnectionToBlockHeaderService(mockURL, "some-token"))
+		c, bLogger := initMockClient(WithConnectionToBlockHeadersService(mockURL, "some-token"))
 
 		err := c.VerifyMerkleRoots(context.Background(), []MerkleRootConfirmationRequestItem{})
 
@@ -98,7 +98,7 @@ func TestVerifyMerkleRoots(t *testing.T) {
 				},
 			}),
 		)
-		c, bLogger := initMockClient(WithConnectionToBlockHeaderService(mockURL, "some-token"))
+		c, bLogger := initMockClient(WithConnectionToBlockHeadersService(mockURL, "some-token"))
 
 		err := c.VerifyMerkleRoots(context.Background(), []MerkleRootConfirmationRequestItem{
 			{
