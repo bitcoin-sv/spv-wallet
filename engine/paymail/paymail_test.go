@@ -2,7 +2,6 @@ package paymail_test
 
 import (
 	"context"
-	"net/http"
 	"testing"
 	"time"
 
@@ -11,11 +10,12 @@ import (
 	"github.com/bitcoin-sv/spv-wallet/engine"
 	"github.com/bitcoin-sv/spv-wallet/engine/datastore"
 	paymailclient "github.com/bitcoin-sv/spv-wallet/engine/paymail"
+	"github.com/bitcoin-sv/spv-wallet/engine/paymail/testabilities"
 	"github.com/bitcoin-sv/spv-wallet/engine/taskmanager"
 	xtester "github.com/bitcoin-sv/spv-wallet/engine/tester"
+	"github.com/bitcoin-sv/spv-wallet/engine/tester/fixtures"
 	"github.com/bitcoin-sv/spv-wallet/engine/tester/paymailmock"
 	"github.com/bitcoin-sv/spv-wallet/models/bsv"
-	"github.com/jarcoal/httpmock"
 	"github.com/mrz1836/go-cache"
 	"github.com/rs/zerolog"
 	"github.com/stretchr/testify/assert"
@@ -23,16 +23,18 @@ import (
 )
 
 const (
-	testDomain    = "example.com"
+	testDomain    = fixtures.PaymailDomainExternal
 	testServerURL = "https://" + testDomain + "/api/v1/" + paymail.DefaultServiceName
 )
 
 func Test_GetP2P(t *testing.T) {
 	t.Run("no p2p capabilities", func(t *testing.T) {
-		client := paymailmock.MockClient(testDomain)
-		client.WillRespondWithBasicCapabilities()
+		given := testabilities.New(t)
 
-		paymailClient := paymailclient.NewServiceClient(xtester.CacheStore(), client, xtester.Logger())
+		// given:
+		given.ExternalPaymailHost().WillRespondWithBasicCapabilities()
+
+		paymailClient := given.NewPaymailClientService()
 
 		hasP2P, p2pDestinationURL, p2pSubmitTxURL, _ := paymailClient.GetP2P(context.Background(), testDomain)
 		assert.False(t, hasP2P)
@@ -41,27 +43,34 @@ func Test_GetP2P(t *testing.T) {
 	})
 
 	t.Run("valid p2p capabilities", func(t *testing.T) {
-		client := paymailmock.MockClient(testDomain)
-		client.WillRespondWithP2PCapabilities()
+		given := testabilities.New(t)
 
-		paymailClient := paymailclient.NewServiceClient(xtester.CacheStore(), client, xtester.Logger())
+		// given:
+		given.ExternalPaymailHost().WillRespondWithP2PCapabilities()
+
+		paymailClient := given.NewPaymailClientService()
 
 		hasP2P, p2pDestinationURL, p2pSubmitTxURL, format := paymailClient.GetP2P(context.Background(), testDomain)
 		assert.True(t, hasP2P)
 		assert.Equal(t, paymailclient.BasicPaymailPayloadFormat, format)
+
+		client := given.MockedPaymailClient()
 		assert.Equal(t, client.GetMockedP2PPaymentDestinationURL(testDomain), p2pDestinationURL)
 		assert.Equal(t, client.GetMockedP2PTransactionURL(testDomain), p2pSubmitTxURL)
 	})
 
 	t.Run("valid beef capabilities", func(t *testing.T) {
-		client := paymailmock.MockClient(testDomain)
-		client.WillRespondWithP2PWithBEEFCapabilities()
+		given := testabilities.New(t)
 
-		paymailClient := paymailclient.NewServiceClient(xtester.CacheStore(), client, xtester.Logger())
+		// given:
+		given.ExternalPaymailHost().WillRespondWithP2PWithBEEFCapabilities()
 
+		paymailClient := given.NewPaymailClientService()
 		hasP2P, p2pDestinationURL, p2pSubmitTxURL, format := paymailClient.GetP2P(context.Background(), testDomain)
 		assert.True(t, hasP2P)
 		assert.Equal(t, paymailclient.BeefPaymailPayloadFormat, format)
+
+		client := given.MockedPaymailClient()
 		assert.Equal(t, client.GetMockedP2PPaymentDestinationURL(testDomain), p2pDestinationURL)
 		assert.Equal(t, client.GetMockedBEEFTransactionURL(testDomain), p2pSubmitTxURL)
 	})
@@ -100,53 +109,47 @@ func Test_GetP2PDestinations(t *testing.T) {
 		},
 		"paymail host is failing on p2p destinations": {
 			paymailHostScenario: func(paymailClient *paymailmock.PaymailClientMock) {
-				paymailClient.
-					WillRespondWithP2PCapabilities().
-					WillRespondOnCapability(paymail.BRFCP2PPaymentDestination).
+				paymailClient.WillRespondWithP2PCapabilities()
+				paymailClient.WillRespondOnCapability(paymail.BRFCP2PPaymentDestination).
 					WithInternalServerError()
 			},
 			expectedError: "paymail host is responding with error",
 		},
 		"paymail host p2p destinations is returning not found": {
 			paymailHostScenario: func(paymailClient *paymailmock.PaymailClientMock) {
-				paymailClient.
-					WillRespondWithP2PCapabilities().
-					WillRespondOnCapability(paymail.BRFCP2PPaymentDestination).
+				paymailClient.WillRespondWithP2PCapabilities()
+				paymailClient.WillRespondOnCapability(paymail.BRFCP2PPaymentDestination).
 					WithNotFound()
 			},
 		},
 		"paymail host p2p destinations is responding with single output with more sats then requested": {
 			paymailHostScenario: func(paymailClient *paymailmock.PaymailClientMock) {
-				paymailClient.
-					WillRespondWithP2PCapabilities().
-					WillRespondOnCapability(paymail.BRFCP2PPaymentDestination).
+				paymailClient.WillRespondWithP2PCapabilities()
+				paymailClient.WillRespondOnCapability(paymail.BRFCP2PPaymentDestination).
 					With(paymailmock.P2PDestinationsForSats(satoshis + 1))
 			},
 			expectedError: "paymail host invalid response",
 		},
 		"paymail host p2p destinations is responding with multiple outputs with more sats then requested": {
 			paymailHostScenario: func(paymailClient *paymailmock.PaymailClientMock) {
-				paymailClient.
-					WillRespondWithP2PCapabilities().
-					WillRespondOnCapability(paymail.BRFCP2PPaymentDestination).
+				paymailClient.WillRespondWithP2PCapabilities()
+				paymailClient.WillRespondOnCapability(paymail.BRFCP2PPaymentDestination).
 					With(paymailmock.P2PDestinationsForSats(satoshis, satoshis))
 			},
 			expectedError: "paymail host invalid response",
 		},
 		"paymail host p2p destinations is responding with single output with less sats then requested": {
 			paymailHostScenario: func(paymailClient *paymailmock.PaymailClientMock) {
-				paymailClient.
-					WillRespondWithP2PCapabilities().
-					WillRespondOnCapability(paymail.BRFCP2PPaymentDestination).
+				paymailClient.WillRespondWithP2PCapabilities()
+				paymailClient.WillRespondOnCapability(paymail.BRFCP2PPaymentDestination).
 					With(paymailmock.P2PDestinationsForSats(0))
 			},
 			expectedError: "paymail host invalid response",
 		},
 		"paymail host p2p destinations is responding with multiple outputs with less sats then requested": {
 			paymailHostScenario: func(paymailClient *paymailmock.PaymailClientMock) {
-				paymailClient.
-					WillRespondWithP2PCapabilities().
-					WillRespondOnCapability(paymail.BRFCP2PPaymentDestination).
+				paymailClient.WillRespondWithP2PCapabilities()
+				paymailClient.WillRespondOnCapability(paymail.BRFCP2PPaymentDestination).
 					With(paymailmock.P2PDestinationsForSats(0, 0, 0))
 			},
 			expectedError: "paymail host invalid response",
@@ -154,10 +157,13 @@ func Test_GetP2PDestinations(t *testing.T) {
 	}
 	for name, test := range errTests {
 		t.Run("return error when "+name, func(t *testing.T) {
-			client := paymailmock.MockClient(testDomain)
-			test.paymailHostScenario(client)
+			given := testabilities.New(t)
 
-			paymailClient := paymailclient.NewServiceClient(xtester.CacheStore(), client, xtester.Logger())
+			// given:
+			test.paymailHostScenario(given.MockedPaymailClient())
+
+			// and:
+			paymailClient := given.NewPaymailClientService()
 
 			destinations, err := paymailClient.GetP2PDestinations(context.Background(), paymailAddress, satoshis)
 			require.ErrorContains(t, err, test.expectedError)
@@ -166,18 +172,12 @@ func Test_GetP2PDestinations(t *testing.T) {
 	}
 
 	t.Run("successfully get destination", func(t *testing.T) {
-		// given
-		client := paymailmock.MockClient(testDomain)
+		given := testabilities.New(t)
 
-		paymailHostResponse := paymailmock.P2PDestinationsForSats(satoshis)
+		// given:
+		paymailHostResponse := given.ExternalPaymailHost().WillRespondWithP2PDestinationsWithSats(satoshis)
 
-		client.WillRespondWithP2PCapabilities()
-		client.
-			WillRespondOnCapability(paymail.BRFCP2PPaymentDestination).
-			With(paymailHostResponse)
-
-		// and:
-		paymailClient := paymailclient.NewServiceClient(xtester.CacheStore(), client, xtester.Logger())
+		paymailClient := given.NewPaymailClientService()
 
 		// when:
 		destinations, err := paymailClient.GetP2PDestinations(context.Background(), paymailAddress, satoshis)
@@ -193,13 +193,17 @@ func Test_StartP2PTransaction(t *testing.T) {
 	const testAlias = "tester"
 
 	t.Run("valid response", func(t *testing.T) {
-		client := paymailmock.CreatePaymailClientService(testDomain)
-		client.WillRespondWithP2PCapabilities()
+		given := testabilities.New(t)
 
-		payload, err := client.StartP2PTransaction(
+		// given:
+		given.ExternalPaymailHost().WillRespondWithP2PCapabilities()
+
+		paymailClient := given.NewPaymailClientService()
+
+		payload, err := paymailClient.StartP2PTransaction(
 			testAlias,
 			testDomain,
-			client.GetMockedP2PPaymentDestinationURL(testDomain),
+			given.MockedPaymailClient().GetMockedP2PPaymentDestinationURL(testDomain),
 			1000,
 		)
 		require.NoError(t, err)
@@ -212,20 +216,16 @@ func Test_StartP2PTransaction(t *testing.T) {
 	})
 
 	t.Run("error - address not found", func(t *testing.T) {
-		client := paymailmock.CreatePaymailClientService(testDomain)
-		client.WillRespondWithP2PCapabilities()
-		client.WillRespondOnCapability(paymail.BRFCP2PPaymentDestination).WithNotFound()
+		given := testabilities.New(t)
 
-		httpmock.RegisterResponder(http.MethodPost, testServerURL+"/p2p-payment-destination/"+testAlias+"@"+testDomain,
-			httpmock.NewStringResponder(
-				http.StatusNotFound,
-				`{"message": "not found"}`,
-			),
-		)
+		// given:
+		given.ExternalPaymailHost().WillRespondWithNotFoundOnP2PDestination()
 
-		payload, err := client.StartP2PTransaction(
+		paymailClient := given.NewPaymailClientService()
+
+		payload, err := paymailClient.StartP2PTransaction(
 			testAlias, testDomain,
-			client.GetMockedP2PPaymentDestinationURL(testDomain), 1000,
+			given.MockedPaymailClient().GetMockedP2PPaymentDestinationURL(testDomain), 1000,
 		)
 		require.Error(t, err)
 		assert.Nil(t, payload)
@@ -248,8 +248,10 @@ func Test_GetCapabilities(t *testing.T) {
 		Build()
 
 	t.Run("valid response - no cache found", func(t *testing.T) {
-		client := paymailmock.MockClient(testDomain)
-		client.WillRespondWithBasicCapabilities()
+		given := testabilities.New(t)
+
+		// given:
+		given.ExternalPaymailHost().WillRespondWithBasicCapabilities()
 
 		redisClient, redisConn := xtester.LoadMockRedis(
 			testIdleTimeout,
@@ -277,7 +279,7 @@ func Test_GetCapabilities(t *testing.T) {
 		// Get command
 		getCmd := redisConn.Command(cache.GetCommand, cacheKeyCapabilities+testDomain).Expect(nil)
 
-		paymailClient := paymailclient.NewServiceClient(tc.Cachestore(), client, xtester.Logger())
+		paymailClient := paymailclient.NewServiceClient(tc.Cachestore(), given.MockedPaymailClient(), xtester.Logger(t))
 		require.NoError(t, err)
 
 		var payload *paymail.CapabilitiesPayload
@@ -292,8 +294,10 @@ func Test_GetCapabilities(t *testing.T) {
 	})
 
 	t.Run("[mocked] - server error", func(t *testing.T) {
-		client := paymailmock.MockClient(testDomain)
-		client.WillRespondWithErrorOnCapabilities()
+		given := testabilities.New(t)
+
+		// given:
+		given.ExternalPaymailHost().WillRespondWithErrorOnCapabilities()
 
 		redisClient, redisConn := xtester.LoadMockRedis(
 			testIdleTimeout,
@@ -321,7 +325,7 @@ func Test_GetCapabilities(t *testing.T) {
 		// Get command
 		getCmd := redisConn.Command(cache.GetCommand, cacheKeyCapabilities+testDomain).Expect(nil)
 
-		paymailClient := paymailclient.NewServiceClient(tc.Cachestore(), client, xtester.Logger())
+		paymailClient := paymailclient.NewServiceClient(tc.Cachestore(), given.MockedPaymailClient(), xtester.Logger(t))
 		require.NoError(t, err)
 
 		var payload *paymail.CapabilitiesPayload
@@ -332,99 +336,9 @@ func Test_GetCapabilities(t *testing.T) {
 		require.Nil(t, payload)
 		assert.Equal(t, true, getCmd.Called)
 	})
-
-	t.Run("valid response - no cache found", func(t *testing.T) {
-		client := paymailmock.CreatePaymailClientService(testDomain)
-		client.WillRespondWithBasicCapabilities()
-
-		logger := zerolog.Nop()
-		tcOpts := defaultClientOpts(true, true)
-		tcOpts = append(tcOpts, engine.WithLogger(&logger))
-
-		tc, err := engine.NewClient(
-			context.Background(),
-			tcOpts...,
-		)
-		require.NoError(t, err)
-		require.NotNil(t, tc)
-		defer func() {
-			closeClient(context.Background(), t, tc)
-		}()
-
-		var payload *paymail.CapabilitiesPayload
-		payload, err = client.GetCapabilities(
-			context.Background(), testDomain,
-		)
-		require.NoError(t, err)
-		require.NotNil(t, payload)
-		assert.Equal(t, paymail.DefaultBsvAliasVersion, payload.BsvAlias)
-		assert.Equal(t, 3, len(payload.Capabilities))
-	})
-
-	t.Run("multiple requests for same capabilities", func(t *testing.T) {
-		client := paymailmock.CreatePaymailClientService(testDomain)
-		client.WillRespondWithBasicCapabilities()
-
-		logger := zerolog.Nop()
-		tcOpts := defaultClientOpts(true, true)
-		tcOpts = append(tcOpts, engine.WithLogger(&logger))
-
-		tc, err := engine.NewClient(
-			context.Background(),
-			tcOpts...,
-		)
-		require.NoError(t, err)
-		require.NotNil(t, tc)
-		defer func() {
-			closeClient(context.Background(), t, tc)
-		}()
-
-		var payload *paymail.CapabilitiesPayload
-		payload, err = client.GetCapabilities(
-			context.Background(), testDomain,
-		)
-		require.NoError(t, err)
-		require.NotNil(t, payload)
-		assert.Equal(t, paymail.DefaultBsvAliasVersion, payload.BsvAlias)
-		assert.Equal(t, 3, len(payload.Capabilities))
-
-		time.Sleep(1 * time.Second)
-
-		payload, err = client.GetCapabilities(
-			context.Background(), testDomain,
-		)
-		require.NoError(t, err)
-		require.NotNil(t, payload)
-		assert.Equal(t, paymail.DefaultBsvAliasVersion, payload.BsvAlias)
-		assert.Equal(t, 3, len(payload.Capabilities))
-	})
 }
 
 func closeClient(ctx context.Context, t *testing.T, client engine.ClientInterface) {
 	time.Sleep(1 * time.Second)
 	require.NoError(t, client.Close(ctx))
-}
-
-// defaultClientOpts will return a default set of client options required to load the new client
-func defaultClientOpts(debug, shared bool) []engine.ClientOps {
-	tqc := taskmanager.DefaultTaskQConfig(xtester.RandomTablePrefix())
-	tqc.MaxNumWorker = 2
-	tqc.MaxNumFetcher = 2
-	bc := broadcast_client_mock.Builder().
-		WithMockArc(broadcast_client_mock.MockNilQueryTxResp).
-		Build()
-
-	opts := make([]engine.ClientOps, 0)
-	opts = append(
-		opts,
-		engine.WithTaskqConfig(tqc),
-		engine.WithSQLite(xtester.SQLiteTestConfig(debug, shared)),
-		engine.WithChainstateOptions(false, false, false, false),
-		engine.WithBroadcastClient(bc),
-	)
-	if debug {
-		opts = append(opts, engine.WithDebugging())
-	}
-
-	return opts
 }

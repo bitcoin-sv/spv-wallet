@@ -14,8 +14,10 @@ import (
 )
 
 // ToEngine converts a draft transaction request model to the engine model.
-func ToEngine(tx *request.DraftTransaction) (*draft.TransactionSpec, error) {
-	spec := &draft.TransactionSpec{}
+func ToEngine(xPubID string, tx *request.DraftTransaction) (*draft.TransactionSpec, error) {
+	spec := &draft.TransactionSpec{
+		XPubID: xPubID,
+	}
 	config := mapstructure.DecoderConfig{
 		DecodeHook: outputsHookFunc(),
 		Result:     &spec,
