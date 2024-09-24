@@ -24,6 +24,7 @@ func getDefaultAppConfig() *AppConfig {
 		Nodes:                getNodesDefaults(),
 		Notifications:        getNotificationDefaults(),
 		Paymail:              getPaymailDefaults(),
+		BHS:                  getBHSDefaults(),
 		RequestLogging:       true,
 		Server:               getServerDefaults(),
 		TaskManager:          getTaskManagerDefault(),
@@ -145,6 +146,13 @@ func getPaymailDefaults() *PaymailConfig {
 		Domains:                 []string{"localhost"},
 		DomainValidationEnabled: true,
 		SenderValidationEnabled: false,
+	}
+}
+
+func getBHSDefaults() *BHSConfig {
+	return &BHSConfig{
+		AuthToken: "mQZQ6WmxURxWz5ch",
+		URL:       "http://localhost:8080",
 	}
 }
 
