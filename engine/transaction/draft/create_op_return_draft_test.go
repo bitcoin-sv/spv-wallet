@@ -7,11 +7,13 @@ import (
 	"testing"
 
 	sdk "github.com/bitcoin-sv/go-sdk/transaction"
-	"github.com/bitcoin-sv/spv-wallet/engine/tester"
-	"github.com/bitcoin-sv/spv-wallet/engine/tester/paymailmock"
+	"github.com/bitcoin-sv/spv-wallet/engine/tester/fixtures"
 	"github.com/bitcoin-sv/spv-wallet/engine/transaction"
 	"github.com/bitcoin-sv/spv-wallet/engine/transaction/draft"
 	"github.com/bitcoin-sv/spv-wallet/engine/transaction/draft/outputs"
+	"github.com/bitcoin-sv/spv-wallet/engine/transaction/draft/testabilities"
+	txerrors "github.com/bitcoin-sv/spv-wallet/engine/transaction/errors"
+	"github.com/bitcoin-sv/spv-wallet/models"
 	"github.com/bitcoin-sv/spv-wallet/models/request/opreturn"
 	"github.com/stretchr/testify/require"
 )
@@ -55,11 +57,14 @@ func TestCreateOpReturnDraft(t *testing.T) {
 	}
 	for name, test := range successTests {
 		t.Run("return draft "+name, func(t *testing.T) {
+			given := testabilities.Given(t)
+
 			// given:
-			draftService := draft.NewDraftService(paymailmock.CreatePaymailClientService("test"), tester.Logger())
+			draftService := given.NewDraftTransactionService()
 
 			// and:
 			spec := &draft.TransactionSpec{
+				XPubID:  fixtures.Sender.XPubID,
 				Outputs: outputs.NewSpecifications(test.opReturn),
 			}
 
@@ -92,47 +97,50 @@ func TestCreateOpReturnDraft(t *testing.T) {
 
 	errorTests := map[string]struct {
 		spec          *outputs.OpReturn
-		expectedError string
+		expectedError models.SPVError
 	}{
 		"for no data in default type": {
 			spec:          &outputs.OpReturn{},
-			expectedError: "data is required for OP_RETURN output",
+			expectedError: txerrors.ErrDraftOpReturnDataRequired,
 		},
 		"for no data string type": {
 			spec: &outputs.OpReturn{
 				DataType: opreturn.DataTypeStrings,
 			},
-			expectedError: "data is required for OP_RETURN output",
+			expectedError: txerrors.ErrDraftOpReturnDataRequired,
 		},
 		"for invalid hex": {
 			spec: &outputs.OpReturn{
 				DataType: opreturn.DataTypeHexes,
 				Data:     []string{"invalid hex"},
 			},
-			expectedError: "failed to decode hex",
+			expectedError: txerrors.ErrFailedToDecodeHex,
 		},
 		"for unknown data type": {
 			spec: &outputs.OpReturn{
 				DataType: 123,
 				Data:     []string{"Example", " ", "data"},
 			},
-			expectedError: "unsupported data type",
+			expectedError: txerrors.ErrDraftOpReturnUnsupportedDataType,
 		},
 		"for to big string": {
 			spec: &outputs.OpReturn{
 				DataType: opreturn.DataTypeStrings,
 				Data:     []string{strings.Repeat("1", maxOpPushDataSize+1)},
 			},
-			expectedError: "data is too large",
+			expectedError: txerrors.ErrDraftOpReturnDataTooLarge,
 		},
 	}
 	for name, test := range errorTests {
 		t.Run("return error "+name, func(t *testing.T) {
+			given := testabilities.Given(t)
+
 			// given:
-			draftService := draft.NewDraftService(paymailmock.CreatePaymailClientService("test"), tester.Logger())
+			draftService := given.NewDraftTransactionService()
 
 			// and:
 			spec := &draft.TransactionSpec{
+				XPubID:  fixtures.Sender.XPubID,
 				Outputs: outputs.NewSpecifications(test.spec),
 			}
 
@@ -141,7 +149,7 @@ func TestCreateOpReturnDraft(t *testing.T) {
 
 			// then:
 			require.Error(t, err)
-			require.ErrorContains(t, err, test.expectedError)
+			require.ErrorIs(t, err, test.expectedError)
 		})
 	}
 }

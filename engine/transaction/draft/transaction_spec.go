@@ -12,6 +12,7 @@ import (
 // TransactionSpec represents client provided specification for a transaction draft.
 type TransactionSpec struct {
 	Outputs *outputs.Specifications
+	XPubID  string
 }
 
 func (t *TransactionSpec) outputs(ctx evaluation.Context) ([]*sdk.TransactionOutput, transaction.OutputsAnnotations, error) {
