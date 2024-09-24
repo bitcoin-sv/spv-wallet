@@ -16,20 +16,16 @@ func (strategy *internalIncomingTx) Name() string {
 	return "internal_incoming_tx"
 }
 
-func (strategy *internalIncomingTx) Execute(ctx context.Context, _ ClientInterface, _ []ModelOps) (*Transaction, error) {
+func (strategy *internalIncomingTx) Execute(ctx context.Context, c ClientInterface, _ []ModelOps) (*Transaction, error) {
 	transaction := strategy.Tx
-	syncTx, err := GetSyncTransactionByID(ctx, transaction.ID, transaction.GetOptions(false)...)
-	if err != nil {
+
+	if err := broadcastTransaction(ctx, transaction); err != nil {
 		return nil, err
-	} else if syncTx == nil {
-		return nil, spverrors.ErrCouldNotFindSyncTx
 	}
+	transaction.TxStatus = TxStatusBroadcasted
 
-	syncTx.transaction = transaction
-	transaction.syncTransaction = syncTx
-
-	if err := broadcastTxAndUpdateSync(ctx, transaction); err != nil {
-		return nil, err
+	if err := transaction.Save(ctx); err != nil {
+		c.Logger().Error().Str("txID", transaction.ID).Err(err).Msg("Incoming internal transaction has been broadcasted but failed save to db")
 	}
 
 	return transaction, nil

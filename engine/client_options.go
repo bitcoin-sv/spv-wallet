@@ -472,7 +472,7 @@ func WithPaymailBeefSupport(blockHeadersServiceURL, blockHeadersServiceAuthToken
 		if err != nil {
 			panic(err)
 		}
-		c.chainstate.options = append(c.chainstate.options, chainstate.WithConnectionToBlockHeaderService(blockHeadersServiceURL, blockHeadersServiceAuthToken))
+		c.chainstate.options = append(c.chainstate.options, chainstate.WithConnectionToBlockHeadersService(blockHeadersServiceURL, blockHeadersServiceAuthToken))
 		c.paymail.serverConfig.options = append(c.paymail.serverConfig.options, server.WithBeefCapabilities())
 	}
 }

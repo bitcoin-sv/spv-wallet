@@ -19,7 +19,7 @@ const (
 	Confirmed MerkleRootConfirmationState = "CONFIRMED"
 	// Invalid state occurs when Merkle Root is not found in the longest chain.
 	Invalid MerkleRootConfirmationState = "INVALID"
-	// UnableToVerify state occurs when Block Header Service is behind in synchronization with the longest chain.
+	// UnableToVerify state occurs when Block Headers Service is behind in synchronization with the longest chain.
 	UnableToVerify MerkleRootConfirmationState = "UNABLE_TO_VERIFY"
 )
 
@@ -52,7 +52,7 @@ type blockHeadersServiceClientProvider struct {
 	httpClient *http.Client
 }
 
-func newBlockHeaderServiceClientProvider(url, authToken string) *blockHeadersServiceClientProvider {
+func newBlockHeadersServiceClientProvider(url, authToken string) *blockHeadersServiceClientProvider {
 	return &blockHeadersServiceClientProvider{url: url, authToken: authToken, httpClient: &http.Client{}}
 }
 

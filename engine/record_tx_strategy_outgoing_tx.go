@@ -2,8 +2,11 @@ package engine
 
 import (
 	"context"
+	"errors"
 	"fmt"
+	"slices"
 
+	"github.com/bitcoin-sv/spv-wallet/engine/chainstate"
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/libsv/go-bt/v2"
 )
@@ -22,10 +25,15 @@ func (strategy *outgoingTx) Name() string {
 func (strategy *outgoingTx) Execute(ctx context.Context, c ClientInterface, opts []ModelOps) (*Transaction, error) {
 	logger := c.Logger()
 
-	// create
-	transaction, err := _createOutgoingTxToRecord(ctx, strategy, c, opts)
-	if err != nil {
-		return nil, spverrors.ErrCreateOutgoingTxFailed
+	var transaction *Transaction
+	var err error
+
+	if transaction, err = strategy.createOutgoingTxToRecord(ctx, c, opts); err != nil {
+		return nil, spverrors.ErrCreateOutgoingTxFailed.Wrap(err)
+	}
+
+	if err = transaction.processUtxos(ctx); err != nil {
+		return nil, err
 	}
 
 	if err = transaction.Save(ctx); err != nil {
@@ -33,19 +41,32 @@ func (strategy *outgoingTx) Execute(ctx context.Context, c ClientInterface, opts
 	}
 
 	if _shouldNotifyP2P(transaction) {
-		if err := processP2PTransaction(ctx, transaction); err != nil {
-			if revertErr := c.RevertTransaction(ctx, transaction.ID); revertErr != nil {
-				return nil, fmt.Errorf("reverting transaction failed %w; after P2P notification failed: %w", revertErr, err)
-			}
-			logger.Warn().Str("txID", transaction.ID).Msgf("processP2PTransaction failed. Reason: %v", err)
-			return nil, spverrors.ErrProcessP2PTx
+		if err = processP2PTransaction(ctx, transaction); err != nil {
+			return nil, _handleNotifyP2PError(ctx, c, transaction, err)
 		}
 	}
 
-	if err := broadcastTxAndUpdateSync(ctx, transaction); err != nil {
+	// transaction can be updated by internal_incoming_tx
+	transaction, err = getTransactionByID(ctx, transaction.XPubID, transaction.ID, WithClient(c))
+	if transaction == nil || err != nil {
+		return nil, spverrors.ErrInternal.Wrap(err)
+	}
+
+	if transaction.TxStatus == TxStatusBroadcasted {
+		// no need to broadcast twice
+		return transaction, nil
+	}
+
+	if err = broadcastTransaction(ctx, transaction); err != nil {
 		logger.Warn().Str("txID", transaction.ID).Msgf("broadcasting failed in outgoingTx strategy")
 		// ignore error, transaction most likely is successfully broadcasted by payment receiver
 		// TODO: return a Warning to a client
+	} else {
+		transaction.TxStatus = TxStatusBroadcasted
+	}
+
+	if err = transaction.Save(ctx); err != nil {
+		logger.Error().Str("txID", transaction.ID).Err(err).Msg("Outgoing transaction has been processed but failed save to db")
 	}
 
 	return transaction, nil
@@ -78,20 +99,13 @@ func (strategy *outgoingTx) LockKey() string {
 	return fmt.Sprintf("outgoing-%s", strategy.TxID())
 }
 
-func _createOutgoingTxToRecord(ctx context.Context, oTx *outgoingTx, c ClientInterface, opts []ModelOps) (*Transaction, error) {
+func (strategy *outgoingTx) createOutgoingTxToRecord(ctx context.Context, c ClientInterface, opts []ModelOps) (*Transaction, error) {
 	// Create NEW transaction model
-	newOpts := c.DefaultModelOptions(append(opts, WithXPub(oTx.XPubKey), New())...)
-	tx := txFromBtTx(oTx.BtTx, newOpts...)
-	tx.DraftID = oTx.RelatedDraftID
+	newOpts := c.DefaultModelOptions(append(opts, WithXPub(strategy.XPubKey), New())...)
+	tx := txFromBtTx(strategy.BtTx, newOpts...)
+	tx.DraftID = strategy.RelatedDraftID
 
-	// hydrate
 	if err := _hydrateOutgoingWithDraft(ctx, tx); err != nil {
-		return nil, err
-	}
-
-	_hydrateOutgoingWithSync(tx)
-
-	if err := tx.processUtxos(ctx); err != nil {
 		return nil, err
 	}
 
@@ -121,23 +135,35 @@ func _hydrateOutgoingWithDraft(ctx context.Context, tx *Transaction) error {
 	return nil // success
 }
 
-func _hydrateOutgoingWithSync(tx *Transaction) {
-	sync := newSyncTransaction(tx.ID, tx.draftTransaction.Configuration.Sync, tx.GetOptions(true)...)
-
-	// setup synchronization
-	sync.SyncStatus = SyncStatusPending // wait until transaction is broadcasted or P2P provider is notified
-
-	sync.Metadata = tx.Metadata
-
-	sync.transaction = tx
-	tx.syncTransaction = sync
+func _shouldNotifyP2P(tx *Transaction) bool {
+	return slices.ContainsFunc(tx.draftTransaction.Configuration.Outputs, func(o *TransactionOutput) bool {
+		return o.PaymailP4 != nil && o.PaymailP4.ResolutionType == ResolutionTypeP2P
+	})
 }
 
-func _shouldNotifyP2P(tx *Transaction) bool {
-	for _, o := range tx.draftTransaction.Configuration.Outputs {
-		if o.PaymailP4 != nil && o.PaymailP4.ResolutionType == ResolutionTypeP2P {
-			return true
+func _handleNotifyP2PError(ctx context.Context, c ClientInterface, transaction *Transaction, cause error) error {
+	logger := c.Logger()
+	chainstateService := c.Chainstate()
+
+	p2pError := spverrors.ErrProcessP2PTx.Wrap(cause)
+
+	saveAsProblematic := func() {
+		transaction.TxStatus = TxStatusProblematic
+		if err := transaction.Save(ctx); err != nil {
+			logger.Error().Str("txID", transaction.ID).Err(err).Msg("Error saving transaction after notifyP2P failed")
 		}
 	}
-	return false
+
+	_, err := chainstateService.QueryTransaction(ctx, transaction.ID, chainstate.RequiredInMempool, defaultQueryTxTimeout)
+	if errors.Is(err, spverrors.ErrCouldNotFindTransaction) {
+		if err := c.RevertTransaction(ctx, transaction.ID); err != nil {
+			saveAsProblematic()
+			return p2pError.Wrap(err)
+		}
+
+		// RevertTransaction saves the transaction itself as REVERTED
+		return p2pError
+	}
+	saveAsProblematic()
+	return p2pError
 }

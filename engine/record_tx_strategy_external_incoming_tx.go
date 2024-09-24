@@ -21,13 +21,13 @@ func (strategy *externalIncomingTx) Execute(ctx context.Context, c ClientInterfa
 	if err != nil {
 		return nil, err
 	}
-
-	if err := broadcastTxAndUpdateSync(ctx, transaction); err != nil {
+	if err = broadcastTransaction(ctx, transaction); err != nil {
 		return nil, err
 	}
+	transaction.TxStatus = TxStatusBroadcasted
 
-	if err = transaction.Save(ctx); err != nil {
-		return nil, err
+	if err := transaction.Save(ctx); err != nil {
+		c.Logger().Error().Str("txID", transaction.ID).Err(err).Msg("Incoming external transaction has been broadcasted but failed save to db")
 	}
 
 	return transaction, nil
@@ -55,7 +55,6 @@ func (strategy *externalIncomingTx) LockKey() string {
 func _createExternalTxToRecord(ctx context.Context, eTx *externalIncomingTx, c ClientInterface, opts []ModelOps) (*Transaction, error) {
 	// Create NEW tx model
 	tx := txFromBtTx(eTx.BtTx, c.DefaultModelOptions(append(opts, New())...)...)
-	_hydrateExternalWithSync(tx)
 
 	if !tx.TransactionBase.hasOneKnownDestination(ctx, c) {
 		return nil, ErrNoMatchingOutputs
@@ -66,19 +65,4 @@ func _createExternalTxToRecord(ctx context.Context, eTx *externalIncomingTx, c C
 	}
 
 	return tx, nil
-}
-
-func _hydrateExternalWithSync(tx *Transaction) {
-	sync := newSyncTransaction(
-		tx.ID,
-		tx.Client().DefaultSyncConfig(),
-		tx.GetOptions(true)...,
-	)
-
-	sync.SyncStatus = SyncStatusPending // wait until transactions will be broadcasted
-
-	// Use the same metadata
-	sync.Metadata = tx.Metadata
-	sync.transaction = tx
-	tx.syncTransaction = sync
 }

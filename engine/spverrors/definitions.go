@@ -364,3 +364,14 @@ var ErrRouteNotFound = models.SPVError{Message: "route not found", StatusCode: 4
 
 // ErrRouteMethodNotAllowed is when route method is not allowed
 var ErrRouteMethodNotAllowed = models.SPVError{Message: "method not allowed", StatusCode: 405, Code: "error-route-method-not-allowed"}
+
+// ////////////////////////////////// BROADCAST ERRORS
+
+// ErrBroadcastUnreachable is when broadcast server cannot be requested
+var ErrBroadcastUnreachable = models.SPVError{Message: "broadcast server cannot be requested", StatusCode: 404, Code: "error-broadcast-unreachable"}
+
+// ErrBroadcastWrongBUMPResponse is when broadcast server returned wrong BUMP response
+var ErrBroadcastWrongBUMPResponse = models.SPVError{Message: "broadcast server returned wrong BUMP response", StatusCode: 400, Code: "error-broadcast-wrong-bump-response"}
+
+// ErrBroadcastRejectedTransaction is when broadcast server rejected transaction
+var ErrBroadcastRejectedTransaction = models.SPVError{Message: "broadcast rejected transaction", StatusCode: 400, Code: "error-broadcast-rejected-transaction"}

@@ -62,8 +62,8 @@ func TestPaymailConfig_Validate(t *testing.T) {
 		p := PaymailConfig{
 			Domains: []string{"test.com", "domain.com"},
 			Beef: &BeefConfig{
-				UseBeef:                               true,
-				BlockHeaderServiceHeaderValidationURL: "",
+				UseBeef:                                true,
+				BlockHeadersServiceHeaderValidationURL: "",
 			},
 		}
 		err := p.Validate()
@@ -74,8 +74,8 @@ func TestPaymailConfig_Validate(t *testing.T) {
 		p := PaymailConfig{
 			Domains: []string{"test.com", "domain.com"},
 			Beef: &BeefConfig{
-				UseBeef:                               true,
-				BlockHeaderServiceHeaderValidationURL: "http://localhost:8080/api/v1/chain/merkleroot/verify",
+				UseBeef:                                true,
+				BlockHeadersServiceHeaderValidationURL: "http://localhost:8080/api/v1/chain/merkleroot/verify",
 			},
 		}
 		err := p.Validate()

@@ -24,6 +24,7 @@ func getDefaultAppConfig() *AppConfig {
 		Nodes:                getNodesDefaults(),
 		Notifications:        getNotificationDefaults(),
 		Paymail:              getPaymailDefaults(),
+		BHS:                  getBHSDefaults(),
 		RequestLogging:       true,
 		Server:               getServerDefaults(),
 		TaskManager:          getTaskManagerDefault(),
@@ -137,14 +138,21 @@ func getNotificationDefaults() *NotificationsConfig {
 func getPaymailDefaults() *PaymailConfig {
 	return &PaymailConfig{
 		Beef: &BeefConfig{
-			UseBeef:                               true,
-			BlockHeaderServiceHeaderValidationURL: "http://localhost:8080/api/v1/chain/merkleroot/verify",
-			BlockHeaderServiceAuthToken:           "mQZQ6WmxURxWz5ch", // #nosec G101
+			UseBeef:                                true,
+			BlockHeadersServiceHeaderValidationURL: "http://localhost:8080/api/v1/chain/merkleroot/verify",
+			BlockHeadersServiceAuthToken:           "mQZQ6WmxURxWz5ch", // #nosec G101
 		},
 		DefaultFromPaymail:      "from@domain.com",
 		Domains:                 []string{"localhost"},
 		DomainValidationEnabled: true,
 		SenderValidationEnabled: false,
+	}
+}
+
+func getBHSDefaults() *BHSConfig {
+	return &BHSConfig{
+		AuthToken: "mQZQ6WmxURxWz5ch",
+		URL:       "http://localhost:8080",
 	}
 }
 

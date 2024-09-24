@@ -3,9 +3,10 @@ package engine
 import (
 	"context"
 
-	"github.com/bitcoin-sv/spv-wallet/engine/chainstate"
+	"github.com/bitcoin-sv/go-broadcast-client/broadcast"
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/bitcoin-sv/spv-wallet/engine/utils"
+	"github.com/libsv/go-bc"
 	"github.com/libsv/go-bt/v2"
 )
 
@@ -55,7 +56,7 @@ type Transaction struct {
 	XpubMetadata    XpubMetadata    `json:"-" toml:"xpub_metadata" gorm:"<-;type:json;xpub_id specific metadata" bson:"xpub_metadata,omitempty"`
 	XpubOutputValue XpubOutputValue `json:"-" toml:"xpub_output_value" gorm:"<-;type:json;xpub_id specific value" bson:"xpub_output_value,omitempty"`
 	BUMP            BUMP            `json:"bump" toml:"bump" yaml:"bump" gorm:"<-;type:text;comment:BSV Unified Merkle Path (BUMP) Format" bson:"bump,omitempty"`
-	TxStatus        string          `json:"txStatus" toml:"txStatus" yaml:"txStatus" gorm:"<-;type:varchar(64);comment:TxStatus retrieved from Arc API." bson:"txStatus,omitempty"`
+	TxStatus        TxStatus        `json:"txStatus" toml:"txStatus" yaml:"txStatus" gorm:"<-;type:varchar(64);comment:TxStatus retrieved from Arc API." bson:"txStatus,omitempty"`
 
 	// Virtual Fields
 	OutputValue int64                `json:"output_value" toml:"-" yaml:"-" gorm:"-" bson:"-,omitempty"`
@@ -65,7 +66,6 @@ type Transaction struct {
 
 	// Private for internal use
 	draftTransaction   *DraftTransaction    `gorm:"-" bson:"-"` // Related draft transaction for processing and recording
-	syncTransaction    *SyncTransaction     `gorm:"-" bson:"-"` // Related record if broadcast config is detected (create new recordNew)
 	transactionService transactionInterface `gorm:"-" bson:"-"` // Used for interfacing methods
 	utxos              []Utxo               `gorm:"-" bson:"-"` // json:"destinations,omitempty"
 	XPubID             string               `gorm:"-" bson:"-"` // XPub of the user registering this transaction
@@ -84,6 +84,7 @@ func emptyTx(opts ...ModelOps) *Transaction {
 		Status:             statusComplete,
 		transactionService: transactionService{},
 		XpubOutputValue:    map[string]int64{},
+		TxStatus:           TxStatusCreated,
 	}
 }
 
@@ -231,24 +232,27 @@ func (m *Transaction) getValues() (outputValue uint64, fee uint64) {
 	return
 }
 
-func (m *Transaction) setChainInfo(txInfo *chainstate.TransactionInfo) {
-	m.BlockHash = txInfo.BlockHash
-	m.BlockHeight = uint64(txInfo.BlockHeight)
-	m.TxStatus = txInfo.TxStatus.String()
-	m.setBUMP(txInfo)
-}
-
-// Converts from bc.BUMP to our BUMP struct in Transaction model
-func (m *Transaction) setBUMP(txInfo *chainstate.TransactionInfo) {
-	if txInfo.BUMP != nil {
-		m.BUMP = bcBumpToBUMP(txInfo.BUMP)
+// SetBUMP Converts from bc.BUMP to our BUMP struct in Transaction model
+func (m *Transaction) SetBUMP(bump *bc.BUMP) {
+	if bump != nil {
+		m.BUMP = bcBumpToBUMP(bump)
 	} else {
 		m.client.Logger().Error().Msg("No BUMP found")
 	}
 }
 
-func (m *Transaction) isMined() bool {
-	return m.BlockHash != ""
+// UpdateFromBroadcastStatus converts broadcast.TxStatus to engineTxStatus and updates if needed
+func (m *Transaction) UpdateFromBroadcastStatus(bStatus broadcast.TxStatus) {
+	switch bStatus {
+	case broadcast.Mined, broadcast.Confirmed:
+		m.TxStatus = TxStatusMined
+	case broadcast.SeenInOrphanMempool, broadcast.Rejected:
+		m.TxStatus = TxStatusProblematic
+	case broadcast.Unknown, broadcast.Queued, broadcast.Received, broadcast.Stored, broadcast.AnnouncedToNetwork, broadcast.RequestedByNetwork, broadcast.SentToNetwork, broadcast.AcceptedByNetwork, broadcast.SeenOnNetwork:
+		// don't change current TxStatus on these bStatuses
+	default:
+		// unexpected statuses
+	}
 }
 
 // IsXpubAssociated will check if this key is associated to this transaction
