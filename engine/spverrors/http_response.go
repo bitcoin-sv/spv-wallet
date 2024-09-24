@@ -25,25 +25,28 @@ func mapAndLog(err error, log *zerolog.Logger) (model models.ResponseError, stat
 	model.Message = "Internal server error"
 	statusCode = 500
 
-	logLevel := log.Warn()
+	logLevel := zerolog.WarnLevel
+	exposedInternalError := false
 	var extendedErr models.ExtendedError
 	if errors.As(err, &extendedErr) {
 		model.Code = extendedErr.GetCode()
 		model.Message = extendedErr.GetMessage()
 		statusCode = extendedErr.GetStatusCode()
 		if statusCode >= 500 {
-			logLevel = log.Error()
-		} else {
-			logLevel = log.Info()
+			logLevel = zerolog.ErrorLevel
 		}
 	} else {
 		// we should wrap all internal errors into SPVError (with proper code, message and status code)
 		// if you find out that some endpoint produces this warning, feel free to fix it
-		logLevel.Str("warning", "internal error returned as HTTP response")
+		exposedInternalError = true
 	}
 
 	if log != nil {
-		logLevel.Str("module", "spv-errors").Err(err).Msgf("Error HTTP response, returning %d", statusCode)
+		logInstance := log.WithLevel(logLevel).Str("module", "spv-errors")
+		if exposedInternalError {
+			logInstance.Str("warning", "internal error returned as HTTP response")
+		}
+		logInstance.Err(err).Msgf("Error HTTP response, returning %d", statusCode)
 	}
 	return
 }

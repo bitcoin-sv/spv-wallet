@@ -12,7 +12,6 @@ import (
 	"github.com/bitcoin-sv/spv-wallet/config"
 	"github.com/bitcoin-sv/spv-wallet/dictionary"
 	_ "github.com/bitcoin-sv/spv-wallet/docs"
-	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/bitcoin-sv/spv-wallet/logging"
 	"github.com/bitcoin-sv/spv-wallet/server"
 )
@@ -28,6 +27,7 @@ import (
 // @in header
 // @name authorization
 func main() {
+	logging.SetupGlobalZerologErrorHandler()
 	defaultLogger := logging.GetDefaultLogger()
 
 	// Load the Application Configuration
@@ -42,8 +42,6 @@ func main() {
 		defaultLogger.Fatal().Msgf(dictionary.GetInternalMessage(dictionary.ErrorLoadingConfig), err.Error())
 		return
 	}
-
-	spverrors.SetupGlobalZerologErrorHandler()
 
 	// Load the Application Services
 	var services *config.AppServices

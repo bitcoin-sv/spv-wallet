@@ -45,9 +45,9 @@ func UnfoldError(err error) string {
 
 		printTypename(current, &result)
 
-		if errListUnwrapper, ok := current.(errListUnwrapper); ok {
-			unfoldJoinedErrors(errListUnwrapper, &result)
-			break // joned errors cannot be unfolded to keep this as chain of errors instead of a tree
+		if unwrapper, ok := current.(errListUnwrapper); ok {
+			unfoldJoinedErrors(unwrapper, &result)
+			break // joined errors cannot be unfolded to keep this as chain of errors instead of a tree
 		}
 
 		if prevMsg == "" || !strings.Contains(prevMsg, msg) {
