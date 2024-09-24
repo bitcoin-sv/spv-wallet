@@ -43,14 +43,14 @@ func main() {
 		return
 	}
 
+	spverrors.SetupGlobalZerologErrorHandler()
+
 	// Load the Application Services
 	var services *config.AppServices
 	if services, err = appConfig.LoadServices(context.Background()); err != nil {
 		defaultLogger.Fatal().Msgf(dictionary.GetInternalMessage(dictionary.ErrorLoadingService), config.ApplicationName, err.Error())
 		return
 	}
-
-	spverrors.SetupGlobalZerologErrorHandler(services.Logger.GetLevel())
 
 	// Try to ping the Block Headers Service if enabled
 	appConfig.CheckBlockHeaderService(context.Background(), services.Logger)
