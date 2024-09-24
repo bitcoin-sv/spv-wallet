@@ -9,7 +9,7 @@ import (
 	"github.com/bitcoin-sv/spv-wallet/models"
 )
 
-type errListUnwrapper interface {
+type joinedErrors interface {
 	Unwrap() []error
 }
 
@@ -17,10 +17,6 @@ type errListUnwrapper interface {
 // example:
 //
 //	[errType1] outer error message -> [errType2] inner error message -> [errTypeN] innermost error message
-//
-// if error message is contained by outer error, it will be omitted, like:
-//
-//	[errType1] error message -> [errType2]
 //
 // if error is a joined error, it will be unfolded as:
 //
@@ -45,15 +41,13 @@ func UnfoldError(err error) string {
 
 		printTypename(current, &result)
 
-		if unwrapper, ok := current.(errListUnwrapper); ok {
-			unfoldJoinedErrors(unwrapper, &result)
+		if joined, ok := current.(joinedErrors); ok {
+			unfoldJoinedErrors(joined, &result)
 			break // joined errors cannot be unfolded to keep this as chain of errors instead of a tree
 		}
 
-		if prevMsg == "" || !strings.Contains(prevMsg, msg) {
-			result.WriteRune(' ')
-			result.WriteString(msg)
-		}
+		result.WriteRune(' ')
+		result.WriteString(msg)
 		prevMsg = msg
 	}
 	return result.String()
@@ -74,8 +68,8 @@ func printStatusCodeForSPVError(err error, builder *strings.Builder) {
 	}
 }
 
-func unfoldJoinedErrors(unwrapper errListUnwrapper, builder *strings.Builder) {
-	errList := unwrapper.Unwrap()
+func unfoldJoinedErrors(joined joinedErrors, builder *strings.Builder) {
+	errList := joined.Unwrap()
 	if len(errList) == 0 {
 		return
 	}
