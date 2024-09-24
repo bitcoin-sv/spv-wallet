@@ -22,7 +22,6 @@ import (
 const (
 	atSign                   = "@"
 	domainPrefix             = "https://"
-	domainSuffixSharedConfig = "/v1/shared-config"
 	spvWalletIndexResponse   = "Welcome to the SPV Wallet ✌(◕‿-)✌"
 
 	ClientOneURLEnvVar         = "CLIENT_ONE_URL"
@@ -121,40 +120,16 @@ func addPrefixIfNeeded(url string) string {
 }
 
 // getSharedConfig retrieves the shared configuration from the SPV Wallet.
-func getSharedConfig(xpub string) (*models.SharedConfig, error) {
-	req, err := http.NewRequest(http.MethodGet, addPrefixIfNeeded(domainLocalHost)+domainSuffixSharedConfig, nil)
+func getSharedConfig(ctx context.Context) (*models.SharedConfig, error) {
+	wc := walletclient.NewWithXPriv(addPrefixIfNeeded(domainLocalHost), adminXPriv)
+	sharedConfig, err := wc.GetSharedConfig(ctx)
 	if err != nil {
 		return nil, err
 	}
-
-	req.Header.Set(models.AuthHeader, xpub)
-	client := &http.Client{
-		Timeout: timeoutDuration,
+	if len(sharedConfig.PaymailDomains) != 1 {
+		return nil, fmt.Errorf("expected 1 paymail domain, got %d", len(sharedConfig.PaymailDomains))
 	}
-	resp, err := client.Do(req)
-	if err != nil {
-		return nil, err
-	}
-	defer resp.Body.Close()
-
-	if resp.StatusCode != http.StatusOK {
-		return nil, fmt.Errorf("failed to get shared config: %s", resp.Status)
-	}
-
-	body, err := io.ReadAll(resp.Body)
-	if err != nil {
-		return nil, err
-	}
-
-	var configResponse models.SharedConfig
-	if err := json.Unmarshal(body, &configResponse); err != nil {
-		return nil, err
-	}
-
-	if len(configResponse.PaymailDomains) != 1 {
-		return nil, fmt.Errorf("expected 1 paymail domain, got %d", len(configResponse.PaymailDomains))
-	}
-	return &configResponse, nil
+	return sharedConfig, nil
 }
 
 // promptUserAndCheck prompts the user with a question and validates the response.
