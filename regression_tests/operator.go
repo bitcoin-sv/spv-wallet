@@ -33,6 +33,7 @@ var (
 func main() {
 	loadConfigFlag := flag.Bool("l", false, "Load configuration from .env.config file")
 	flag.Parse()
+	ctx := context.Background()
 
 	config := &regressionTestConfig{}
 	user := &regressionTestUser{}
@@ -49,7 +50,7 @@ func main() {
 		return
 	}
 
-	sharedConfig, err := getSharedConfig(adminXPub)
+	sharedConfig, err := getSharedConfig(ctx)
 	if err != nil {
 		fmt.Println("error getting shared config:", err)
 		return
