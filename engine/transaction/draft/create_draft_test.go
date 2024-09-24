@@ -40,7 +40,7 @@ func TestCreateTransactionDraftError(t *testing.T) {
 	}
 	for name, test := range errorTests {
 		t.Run("return error "+name, func(t *testing.T) {
-			given := testabilities.New(t)
+			given := testabilities.Given(t)
 
 			// given:
 			draftService := given.NewDraftTransactionService()

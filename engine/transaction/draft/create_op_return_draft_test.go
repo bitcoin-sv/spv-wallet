@@ -57,7 +57,7 @@ func TestCreateOpReturnDraft(t *testing.T) {
 	}
 	for name, test := range successTests {
 		t.Run("return draft "+name, func(t *testing.T) {
-			given := testabilities.New(t)
+			given := testabilities.Given(t)
 
 			// given:
 			draftService := given.NewDraftTransactionService()
@@ -133,7 +133,7 @@ func TestCreateOpReturnDraft(t *testing.T) {
 	}
 	for name, test := range errorTests {
 		t.Run("return error "+name, func(t *testing.T) {
-			given := testabilities.New(t)
+			given := testabilities.Given(t)
 
 			// given:
 			draftService := given.NewDraftTransactionService()
