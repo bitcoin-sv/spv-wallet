@@ -97,17 +97,7 @@ func (m *Model) SetRecordTime(created bool) {
 // UpdateMetadata will update the metadata on the model
 // any key set to nil will be removed, other keys updated or added
 func (m *Model) UpdateMetadata(metadata Metadata) {
-	if m.Metadata == nil {
-		m.Metadata = make(Metadata)
-	}
-
-	for key, value := range metadata {
-		if value == nil {
-			delete(m.Metadata, key)
-		} else {
-			m.Metadata[key] = value
-		}
-	}
+	m.Metadata = metadata
 }
 
 // SetOptions will set the options on the model
