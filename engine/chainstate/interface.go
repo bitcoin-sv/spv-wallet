@@ -28,8 +28,8 @@ type ProviderServices interface {
 	BroadcastClient() broadcast.Client
 }
 
-// HeaderService is header services interface
-type HeaderService interface {
+// HeadersService is header services interface
+type HeadersService interface {
 	VerifyMerkleRoots(ctx context.Context, merkleRoots []MerkleRootConfirmationRequestItem) error
 }
 
@@ -37,7 +37,7 @@ type HeaderService interface {
 type ClientInterface interface {
 	ChainService
 	ProviderServices
-	HeaderService
+	HeadersService
 	Close(ctx context.Context)
 	Debug(on bool)
 	DebugLog(text string)
