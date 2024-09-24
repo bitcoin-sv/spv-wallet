@@ -47,7 +47,7 @@ func (strategy *outgoingTx) Execute(ctx context.Context, c ClientInterface, opts
 	}
 
 	// transaction can be updated by internal_incoming_tx
-	transaction, err = getTransactionByID(ctx, "", transaction.ID, WithClient(c))
+	transaction, err = getTransactionByID(ctx, transaction.XPubID, transaction.ID, WithClient(c))
 	if transaction == nil || err != nil {
 		return nil, spverrors.ErrInternal.Wrap(err)
 	}
