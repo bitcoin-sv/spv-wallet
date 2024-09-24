@@ -13,7 +13,22 @@ type errListUnwrapper interface {
 	Unwrap() []error
 }
 
-// UnfoldError unfolds the error chain into a single string.
+// UnfoldError unfolds the error chain into a single string
+// example:
+//
+//	[errType1] outer error message -> [errType2] inner error message -> [errTypeN] innermost error message
+//
+// if error message is contained by outer error, it will be omitted, like:
+//
+//	[errType1] error message -> [errType2]
+//
+// if error is a joined error, it will be unfolded as:
+//
+//	[type] ([errType1] joined error1 AND [errType2] joined error2)
+//
+// for SPVError, it will print the status code in parentheses:
+//
+//	[models.SPVError(404)] error message
 func UnfoldError(err error) string {
 	if err == nil {
 		return ""
