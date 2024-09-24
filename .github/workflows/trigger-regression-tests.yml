@@ -52,10 +52,10 @@ jobs:
       - name: Wait for 3 minutes before checking for results
         run: sleep 180
 
-      - name: Check for workflow completion status every 10 seconds for up to 1 minute
+      - name: Check for workflow completion status every 10 seconds for up to 3 minute
         run: |
           success=false
-          for i in {1..6}; do
+          for i in {1..18}; do
             # Fetch the list of artifacts from the target repository
             artifact_data=$(curl -s -H "Authorization: token ${{ secrets.REGRESSION_TEST_GH_TOKEN }}" \
                       https://api.github.com/repos/4chain-ag/spv-wallet-regression/actions/artifacts)
