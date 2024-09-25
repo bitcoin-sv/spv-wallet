@@ -27,6 +27,7 @@ type OutputAnnotation struct {
 type PaymailAnnotation struct {
 	Receiver  string
 	Reference string
+	Sender    string
 }
 
 // OutputsAnnotations represents the metadata for chosen outputs. The key is the index of the output.

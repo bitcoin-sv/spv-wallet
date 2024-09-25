@@ -119,7 +119,7 @@ var ErrMissingContactXPubKey = models.SPVError{Message: "missing pubKey in conta
 // ErrMissingContactStatus is when status is missing in contact
 var ErrMissingContactStatus = models.SPVError{Message: "status is required", StatusCode: 400, Code: "error-contact-status-missing"}
 
-// ErrMissingContactOwnerXPubID is when owner XPubId is missing in contact
+// ErrMissingContactOwnerXPubID is when owner XPubID is missing in contact
 var ErrMissingContactOwnerXPubID = models.SPVError{Message: "contact must have owner", StatusCode: 400, Code: "error-contact-owner-xpub-id-missing"}
 
 // ErrRequestedContactInvalid is when the requested contact is invalid

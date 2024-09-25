@@ -10,6 +10,7 @@ import (
 	"github.com/bitcoin-sv/spv-wallet/engine/datastore"
 	"github.com/bitcoin-sv/spv-wallet/engine/notifications"
 	paymailclient "github.com/bitcoin-sv/spv-wallet/engine/paymail"
+	"github.com/bitcoin-sv/spv-wallet/engine/paymailaddress"
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/bitcoin-sv/spv-wallet/engine/taskmanager"
 	"github.com/bitcoin-sv/spv-wallet/engine/transaction/draft"
@@ -155,10 +156,47 @@ func (c *Client) loadPaymailComponents() (err error) {
 	return
 }
 
+func (c *Client) loadPaymailAddressService() error {
+	if c.options.paymailAddressService != nil {
+		return nil
+	}
+	c.options.paymailAddressService = paymailaddress.NewService(
+		func(ctx context.Context, address string) (string, error) {
+			paymailAddress, err := c.GetPaymailAddress(ctx, address)
+			if err != nil {
+				return "", err
+			}
+			return paymailAddress.XpubID, nil
+		},
+		func(ctx context.Context, xPubId string) ([]string, error) {
+			page := &datastore.QueryParams{
+				PageSize:      10,
+				OrderByField:  createdAtField,
+				SortDirection: datastore.SortAsc,
+			}
+
+			conditions := map[string]interface{}{
+				xPubIDField: xPubId,
+			}
+
+			addresses, err := c.GetPaymailAddresses(ctx, nil, conditions, page)
+			if err != nil {
+				return nil, err
+			}
+			result := make([]string, 0, len(addresses))
+			for _, address := range addresses {
+				result = append(result, address.String())
+			}
+			return result, nil
+		},
+	)
+	return nil
+}
+
 func (c *Client) loadTransactionDraftService() error {
 	if c.options.transactionDraftService == nil {
 		logger := c.Logger().With().Str("subservice", "transactionDraft").Logger()
-		c.options.transactionDraftService = draft.NewDraftService(c.PaymailService(), logger)
+		c.options.transactionDraftService = draft.NewDraftService(c.PaymailService(), c.options.paymailAddressService, logger)
 	}
 	return nil
 }
