@@ -15,20 +15,10 @@ func TestNodesConfig_Validate(t *testing.T) {
 		assert.NoError(t, n.Validate())
 	})
 
-	t.Run("empty list of apis", func(t *testing.T) {
-		n := getNodesDefaults()
-
-		n.Apis = nil
-		assert.Error(t, n.Validate())
-
-		n.Apis = []*ArcAPI{}
-		assert.Error(t, n.Validate())
-	})
-
 	t.Run("no arc url", func(t *testing.T) {
 		n := getNodesDefaults()
 
-		n.Apis[0].ArcURL = ""
+		n.URL = ""
 		assert.Error(t, n.Validate())
 	})
 }

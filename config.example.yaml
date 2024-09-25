@@ -69,7 +69,9 @@ new_relic:
   domain_name: domain.com
   enabled: false
   license_key: BOGUS-LICENSE-KEY-1234567890987654321234
-nodes:
+arc:
+  url: https://arc.taal.com
+  token: mainnet_06770f425eb00298839a24a49cbdc02c
   # deployment id used annotating api calls in XDeployment-ID header - this value will be randomly generated if not set
   _deployment_id: spv-wallet-deployment-id
   callback:
@@ -77,13 +79,6 @@ nodes:
     host: https://example.com
     # token to authenticate callback calls - default callback token will be generated from the Admin Key
     _token: 44a82509
-  # list of apis used for getting and broadcasting transactions
-  apis:
-    # gorillapool can be used as well
-    # - arc_url: https://arc.gorillapool.io
-    # - token: ""
-    - arc_url: https://arc.taal.com
-      token: mainnet_06770f425eb00298839a24a49cbdc02c
   # use fee quotes for transaction fee calculation
   use_fee_quotes: true
   # used as the fee value if 'use_fee_quotes' is set to false
