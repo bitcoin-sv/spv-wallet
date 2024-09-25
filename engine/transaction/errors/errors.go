@@ -6,8 +6,8 @@ var (
 	// ErrDraftSpecificationRequired is returned when a draft is created with no specification.
 	ErrDraftSpecificationRequired = models.SPVError{Code: "draft-spec-required", Message: "draft requires a specification", StatusCode: 400}
 
-	// ErrDraftSpecificationXPubIDRequired is returned when a draft is created without xPubId.
-	ErrDraftSpecificationXPubIDRequired = models.SPVError{Code: "draft-spec-xpub-id-required", Message: "cannot create draft without knowledge about xPubId", StatusCode: 500}
+	// ErrDraftSpecificationXPubIDRequired is returned when a draft is created without xPubID.
+	ErrDraftSpecificationXPubIDRequired = models.SPVError{Code: "draft-spec-xpub-id-required", Message: "cannot create draft without knowledge about xPubID", StatusCode: 500}
 
 	// ErrDraftRequiresAtLeastOneOutput is returned when a draft is created with no outputs.
 	ErrDraftRequiresAtLeastOneOutput = models.SPVError{Code: "draft-output-required", Message: "draft requires at least one output", StatusCode: 400}

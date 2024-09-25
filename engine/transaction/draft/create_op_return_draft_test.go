@@ -26,28 +26,28 @@ func TestCreateOpReturnDraft(t *testing.T) {
 		opReturn      *outputs.OpReturn
 		lockingScript string
 	}{
-		"for single string": {
+		"return draft for single string": {
 			opReturn: &outputs.OpReturn{
 				DataType: opreturn.DataTypeStrings,
 				Data:     []string{"Example data"},
 			},
 			lockingScript: "006a0c4578616d706c652064617461",
 		},
-		"for multiple strings": {
+		"return draft for multiple strings": {
 			opReturn: &outputs.OpReturn{
 				DataType: opreturn.DataTypeStrings,
 				Data:     []string{"Example", " ", "data"},
 			},
 			lockingScript: "006a074578616d706c6501200464617461",
 		},
-		"for single hex": {
+		"return draft for single hex": {
 			opReturn: &outputs.OpReturn{
 				DataType: opreturn.DataTypeHexes,
 				Data:     []string{toHex("Example data")},
 			},
 			lockingScript: "006a0c4578616d706c652064617461",
 		},
-		"for multiple hexes": {
+		"return draft for multiple hexes": {
 			opReturn: &outputs.OpReturn{
 				DataType: opreturn.DataTypeHexes,
 				Data:     []string{toHex("Example"), toHex(" "), toHex("data")},
@@ -56,7 +56,7 @@ func TestCreateOpReturnDraft(t *testing.T) {
 		},
 	}
 	for name, test := range successTests {
-		t.Run("return draft "+name, func(t *testing.T) {
+		t.Run(name, func(t *testing.T) {
 			given := testabilities.Given(t)
 
 			// given:
@@ -99,31 +99,31 @@ func TestCreateOpReturnDraft(t *testing.T) {
 		spec          *outputs.OpReturn
 		expectedError models.SPVError
 	}{
-		"for no data in default type": {
+		"return error for no data in default type": {
 			spec:          &outputs.OpReturn{},
 			expectedError: txerrors.ErrDraftOpReturnDataRequired,
 		},
-		"for no data string type": {
+		"return error for no data string type": {
 			spec: &outputs.OpReturn{
 				DataType: opreturn.DataTypeStrings,
 			},
 			expectedError: txerrors.ErrDraftOpReturnDataRequired,
 		},
-		"for invalid hex": {
+		"return error for invalid hex": {
 			spec: &outputs.OpReturn{
 				DataType: opreturn.DataTypeHexes,
 				Data:     []string{"invalid hex"},
 			},
 			expectedError: txerrors.ErrFailedToDecodeHex,
 		},
-		"for unknown data type": {
+		"return error for unknown data type": {
 			spec: &outputs.OpReturn{
 				DataType: 123,
 				Data:     []string{"Example", " ", "data"},
 			},
 			expectedError: txerrors.ErrDraftOpReturnUnsupportedDataType,
 		},
-		"for to big string": {
+		"return error for to big string": {
 			spec: &outputs.OpReturn{
 				DataType: opreturn.DataTypeStrings,
 				Data:     []string{strings.Repeat("1", maxOpPushDataSize+1)},
@@ -132,7 +132,7 @@ func TestCreateOpReturnDraft(t *testing.T) {
 		},
 	}
 	for name, test := range errorTests {
-		t.Run("return error "+name, func(t *testing.T) {
+		t.Run(name, func(t *testing.T) {
 			given := testabilities.Given(t)
 
 			// given:

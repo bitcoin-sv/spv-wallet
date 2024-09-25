@@ -182,14 +182,14 @@ func TestCreatePaymailDraft(t *testing.T) {
 		spec          *outputs.Paymail
 		expectedError models.SPVError
 	}{
-		"for no paymail address": {
+		"return error for no paymail address": {
 			user: fixtures.Sender,
 			spec: &outputs.Paymail{
 				Satoshis: transactionSatoshiValue,
 			},
 			expectedError: txerrors.ErrReceiverPaymailAddressIsInvalid,
 		},
-		"for only alias without domain": {
+		"return error for only alias without domain": {
 			user: fixtures.Sender,
 			spec: &outputs.Paymail{
 				To:       "test",
@@ -197,7 +197,7 @@ func TestCreatePaymailDraft(t *testing.T) {
 			},
 			expectedError: txerrors.ErrReceiverPaymailAddressIsInvalid,
 		},
-		"for domain without alias": {
+		"return error for domain without alias": {
 			user: fixtures.Sender,
 			spec: &outputs.Paymail{
 				To:       "@example.com",
@@ -205,7 +205,7 @@ func TestCreatePaymailDraft(t *testing.T) {
 			},
 			expectedError: txerrors.ErrReceiverPaymailAddressIsInvalid,
 		},
-		"for paymail with invalid alias": {
+		"return error for paymail with invalid alias": {
 			user: fixtures.Sender,
 			spec: &outputs.Paymail{
 				To:       "$$$@example.com",
@@ -213,7 +213,7 @@ func TestCreatePaymailDraft(t *testing.T) {
 			},
 			expectedError: txerrors.ErrReceiverPaymailAddressIsInvalid,
 		},
-		"for paymail with invalid domain": {
+		"return error for paymail with invalid domain": {
 			user: fixtures.Sender,
 			spec: &outputs.Paymail{
 				To:       "test@example.com.$$$",
@@ -221,7 +221,7 @@ func TestCreatePaymailDraft(t *testing.T) {
 			},
 			expectedError: txerrors.ErrReceiverPaymailAddressIsInvalid,
 		},
-		"for zero satoshis value": {
+		"return error for zero satoshis value": {
 			user: fixtures.Sender,
 			spec: &outputs.Paymail{
 				To:       recipient,
@@ -229,14 +229,14 @@ func TestCreatePaymailDraft(t *testing.T) {
 			},
 			expectedError: txerrors.ErrOutputValueTooLow,
 		},
-		"for no satoshis value": {
+		"return error for no satoshis value": {
 			user: fixtures.Sender,
 			spec: &outputs.Paymail{
 				To: recipient,
 			},
 			expectedError: txerrors.ErrOutputValueTooLow,
 		},
-		"for sender paymail without domain": {
+		"return error for sender paymail without domain": {
 			user: fixtures.Sender,
 			spec: &outputs.Paymail{
 				To:       recipient,
@@ -245,7 +245,7 @@ func TestCreatePaymailDraft(t *testing.T) {
 			},
 			expectedError: txerrors.ErrSenderPaymailAddressIsInvalid,
 		},
-		"for sender paymail without alias": {
+		"return error for sender paymail without alias": {
 			user: fixtures.Sender,
 			spec: &outputs.Paymail{
 				To:       recipient,
@@ -254,7 +254,7 @@ func TestCreatePaymailDraft(t *testing.T) {
 			},
 			expectedError: txerrors.ErrSenderPaymailAddressIsInvalid,
 		},
-		"for sender paymail with invalid alias": {
+		"return error for sender paymail with invalid alias": {
 			user: fixtures.Sender,
 			spec: &outputs.Paymail{
 				To:       recipient,
@@ -263,7 +263,7 @@ func TestCreatePaymailDraft(t *testing.T) {
 			},
 			expectedError: txerrors.ErrSenderPaymailAddressIsInvalid,
 		},
-		"for sender paymail with invalid domain domain": {
+		"return error for sender paymail with invalid domain domain": {
 			user: fixtures.Sender,
 			spec: &outputs.Paymail{
 				To:       recipient,
@@ -272,7 +272,7 @@ func TestCreatePaymailDraft(t *testing.T) {
 			},
 			expectedError: txerrors.ErrSenderPaymailAddressIsInvalid,
 		},
-		"for sender paymail address not existing in our system": {
+		"return error for sender paymail address not existing in our system": {
 			user: fixtures.Sender,
 			spec: &outputs.Paymail{
 				To:       recipient,
@@ -281,7 +281,7 @@ func TestCreatePaymailDraft(t *testing.T) {
 			},
 			expectedError: txerrors.ErrSenderPaymailAddressIsInvalid,
 		},
-		"for sender paymail not belonging to that user": {
+		"return error for sender paymail not belonging to that user": {
 			user: fixtures.Sender,
 			spec: &outputs.Paymail{
 				To:       recipient,
@@ -290,7 +290,7 @@ func TestCreatePaymailDraft(t *testing.T) {
 			},
 			expectedError: txerrors.ErrSenderPaymailAddressIsInvalid,
 		},
-		"for default sender paymail of user without paymail": {
+		"return error for default sender paymail of user without paymail": {
 			user: fixtures.UserWithoutPaymail,
 			spec: &outputs.Paymail{
 				To:       recipient,
@@ -300,7 +300,7 @@ func TestCreatePaymailDraft(t *testing.T) {
 		},
 	}
 	for name, test := range errorTests {
-		t.Run("return error "+name, func(t *testing.T) {
+		t.Run(name, func(t *testing.T) {
 			given := testabilities.Given(t)
 
 			// given:
@@ -329,37 +329,37 @@ func TestCreatePaymailDraft(t *testing.T) {
 		paymailHostScenario func(tpaymail.PaymailHostFixture)
 		expectedError       models.SPVError
 	}{
-		"paymail host is responding with not found on capabilities": {
+		"return error when paymail host is responding with not found on capabilities": {
 			paymailHostScenario: func(paymailHost tpaymail.PaymailHostFixture) {
 				paymailHost.WillRespondWithNotFoundOnCapabilities()
 			},
 			expectedError: pmerrors.ErrPaymailHostResponseError,
 		},
-		"paymail host is failing on capabilities": {
+		"return error when paymail host is failing on capabilities": {
 			paymailHostScenario: func(paymailHost tpaymail.PaymailHostFixture) {
 				paymailHost.WillRespondWithErrorOnCapabilities()
 			},
 			expectedError: pmerrors.ErrPaymailHostResponseError,
 		},
-		"paymail host is not supporting p2p destinations capability": {
+		"return error when paymail host is not supporting p2p destinations capability": {
 			paymailHostScenario: func(paymailHost tpaymail.PaymailHostFixture) {
 				paymailHost.WillRespondWithBasicCapabilities()
 			},
 			expectedError: pmerrors.ErrPaymailHostNotSupportingP2P,
 		},
-		"paymail host is failing on p2p destinations": {
+		"return error when paymail host is failing on p2p destinations": {
 			paymailHostScenario: func(paymailHost tpaymail.PaymailHostFixture) {
 				paymailHost.WillRespondWithErrorOnP2PDestinations()
 			},
 			expectedError: pmerrors.ErrPaymailHostResponseError,
 		},
-		"paymail host p2p destinations is returning not found": {
+		"return error when paymail host p2p destinations is returning not found": {
 			paymailHostScenario: func(paymailHost tpaymail.PaymailHostFixture) {
 				paymailHost.WillRespondWithNotFoundOnP2PDestination()
 			},
 			expectedError: pmerrors.ErrPaymailHostResponseError,
 		},
-		"paymail host p2p destinations is responding with requirement for more sats then requested": {
+		"return error when paymail host p2p destinations is responding with requirement for more sats then requested": {
 			paymailHostScenario: func(paymailHost tpaymail.PaymailHostFixture) {
 				paymailHost.WillRespondWithP2PDestinationsWithSats(transactionSatoshiValue + 1)
 			},
@@ -367,7 +367,7 @@ func TestCreatePaymailDraft(t *testing.T) {
 		},
 	}
 	for name, test := range paymailErrorTests {
-		t.Run("return error when "+name, func(t *testing.T) {
+		t.Run(name, func(t *testing.T) {
 			given := testabilities.Given(t)
 
 			// given:

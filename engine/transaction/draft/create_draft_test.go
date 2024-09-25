@@ -18,19 +18,19 @@ func TestCreateTransactionDraftError(t *testing.T) {
 		spec          *draft.TransactionSpec
 		expectedError models.SPVError
 	}{
-		"for nil as transaction spec": {
+		"return error for nil as transaction spec": {
 			spec:          nil,
 			expectedError: txerrors.ErrDraftSpecificationRequired,
 		},
-		"for transaction spec without xPub Id": {
+		"return error for transaction spec without xPub Id": {
 			spec:          &draft.TransactionSpec{},
 			expectedError: txerrors.ErrDraftSpecificationXPubIDRequired,
 		},
-		"for no outputs in transaction spec": {
+		"return error for no outputs in transaction spec": {
 			spec:          &draft.TransactionSpec{XPubID: fixtures.Sender.XPubID},
 			expectedError: txerrors.ErrDraftRequiresAtLeastOneOutput,
 		},
-		"for empty output list in transaction spec": {
+		"return error for empty output list in transaction spec": {
 			spec: &draft.TransactionSpec{
 				XPubID:  fixtures.Sender.XPubID,
 				Outputs: outputs.NewSpecifications(),
@@ -39,7 +39,7 @@ func TestCreateTransactionDraftError(t *testing.T) {
 		},
 	}
 	for name, test := range errorTests {
-		t.Run("return error "+name, func(t *testing.T) {
+		t.Run(name, func(t *testing.T) {
 			given := testabilities.Given(t)
 
 			// given:

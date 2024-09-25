@@ -73,15 +73,16 @@ func (p *Paymail) createBsvPaymailOutput(output *paymail.PaymentOutput, referenc
 }
 
 func (p *Paymail) sender(ctx evaluation.Context) (string, error) {
-	if p.From != nil {
-		err := p.validateProvidedSenderPaymail(ctx)
-		if err != nil {
-			return "", err
-		}
-
-		return *p.From, nil
+	if p.From == nil {
+		return p.defaultSenderAddress(ctx)
 	}
-	return p.defaultSenderAddress(ctx)
+
+	err := p.validateProvidedSenderPaymail(ctx)
+	if err != nil {
+		return "", err
+	}
+
+	return *p.From, nil
 }
 
 func (p *Paymail) validateProvidedSenderPaymail(ctx evaluation.Context) error {
