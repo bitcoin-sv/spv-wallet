@@ -21,7 +21,7 @@ func getDefaultAppConfig() *AppConfig {
 		ImportBlockHeaders:   "",
 		Logging:              getLoggingDefaults(),
 		NewRelic:             getNewRelicDefaults(),
-		ARC:                  getNodesDefaults(),
+		ARC:                  getARCDefaults(),
 		Notifications:        getNotificationDefaults(),
 		Paymail:              getPaymailDefaults(),
 		BHS:                  getBHSDefaults(),
@@ -106,7 +106,7 @@ func getNewRelicDefaults() *NewRelicConfig {
 	}
 }
 
-func getNodesDefaults() *ARCConfig {
+func getARCDefaults() *ARCConfig {
 	depIDSufix, _ := uuid.NewUUID()
 	return &ARCConfig{
 		DeploymentID: "spv-wallet-" + depIDSufix.String(),
