@@ -375,3 +375,14 @@ var ErrBroadcastWrongBUMPResponse = models.SPVError{Message: "broadcast server r
 
 // ErrBroadcastRejectedTransaction is when broadcast server rejected transaction
 var ErrBroadcastRejectedTransaction = models.SPVError{Message: "broadcast rejected transaction", StatusCode: 400, Code: "error-broadcast-rejected-transaction"}
+
+// ////////////////////////////////// BLOCK HEADER SERVICE ERRORS
+
+// ErrBHSUnreachable is when Block Header Service (BHS) doesn't respond to status check
+var ErrBHSUnreachable = models.SPVError{Message: "Block Header Service cannot be requested", StatusCode: 404, Code: "error-bhs-unreachable"}
+
+// ErrBHSBadURL is when creation of Block Header Service URL doesn't succeed. Probably a fault with the config file
+var ErrBHSBadURL = models.SPVError{Message: "cannot create Block Header Service url. Please check your configuration", StatusCode: 500, Code: "error-bhs-bad-url"}
+
+// ErrBHSParsingResponse is when creation of Block Header Service URL doesn't succeed. Probably a fault with the config file
+var ErrBHSParsingResponse = models.SPVError{Message: "cannot parse Block Header Service response", StatusCode: 500, Code: "error-bhs-parse-response"}
