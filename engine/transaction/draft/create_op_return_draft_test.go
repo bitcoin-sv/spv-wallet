@@ -6,7 +6,6 @@ import (
 	"strings"
 	"testing"
 
-	sdk "github.com/bitcoin-sv/go-sdk/transaction"
 	"github.com/bitcoin-sv/spv-wallet/engine/tester/fixtures"
 	"github.com/bitcoin-sv/spv-wallet/engine/transaction"
 	"github.com/bitcoin-sv/spv-wallet/engine/transaction/draft"
@@ -15,7 +14,6 @@ import (
 	txerrors "github.com/bitcoin-sv/spv-wallet/engine/transaction/errors"
 	"github.com/bitcoin-sv/spv-wallet/models"
 	"github.com/bitcoin-sv/spv-wallet/models/request/opreturn"
-	"github.com/stretchr/testify/require"
 )
 
 func TestCreateOpReturnDraft(t *testing.T) {
@@ -57,7 +55,7 @@ func TestCreateOpReturnDraft(t *testing.T) {
 	}
 	for name, test := range successTests {
 		t.Run(name, func(t *testing.T) {
-			given := testabilities.Given(t)
+			given, then := testabilities.New(t)
 
 			// given:
 			draftService := given.NewDraftTransactionService()
@@ -72,26 +70,12 @@ func TestCreateOpReturnDraft(t *testing.T) {
 			draftTx, err := draftService.Create(context.Background(), spec)
 
 			// then:
-			require.NoError(t, err)
-			require.NotNil(t, draftTx)
-
-			// and:
-			annotations := draftTx.Annotations
-			require.Len(t, annotations.Outputs, 1)
-			require.Equal(t, transaction.BucketData, annotations.Outputs[0].Bucket)
-
-			// debug:
-			t.Logf("BEEF: %s", draftTx.BEEF)
-
-			// when:
-			tx, err := sdk.NewTransactionFromBEEFHex(draftTx.BEEF)
-
-			// then:
-			require.NoError(t, err)
-			require.Len(t, tx.Outputs, 1)
-			require.EqualValues(t, tx.Outputs[0].Satoshis, 0)
-			require.Equal(t, tx.Outputs[0].LockingScript.IsData(), true)
-			require.Equal(t, test.lockingScript, tx.Outputs[0].LockingScriptHex())
+			then.Created(draftTx).WithNoError(err).
+				HasOutputs(1).
+				Output(0).
+				HasBucket(transaction.BucketData).
+				IsDataOnly().
+				HasLockingScript(test.lockingScript)
 		})
 	}
 
@@ -133,7 +117,7 @@ func TestCreateOpReturnDraft(t *testing.T) {
 	}
 	for name, test := range errorTests {
 		t.Run(name, func(t *testing.T) {
-			given := testabilities.Given(t)
+			given, then := testabilities.New(t)
 
 			// given:
 			draftService := given.NewDraftTransactionService()
@@ -145,11 +129,10 @@ func TestCreateOpReturnDraft(t *testing.T) {
 			}
 
 			// when:
-			_, err := draftService.Create(context.Background(), spec)
+			tx, err := draftService.Create(context.Background(), spec)
 
 			// then:
-			require.Error(t, err)
-			require.ErrorIs(t, err, test.expectedError)
+			then.Created(tx).WithError(err).ThatIs(test.expectedError)
 		})
 	}
 }

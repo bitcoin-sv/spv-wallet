@@ -10,7 +10,6 @@ import (
 	"github.com/bitcoin-sv/spv-wallet/engine/transaction/draft/testabilities"
 	txerrors "github.com/bitcoin-sv/spv-wallet/engine/transaction/errors"
 	"github.com/bitcoin-sv/spv-wallet/models"
-	"github.com/stretchr/testify/require"
 )
 
 func TestCreateTransactionDraftError(t *testing.T) {
@@ -40,17 +39,16 @@ func TestCreateTransactionDraftError(t *testing.T) {
 	}
 	for name, test := range errorTests {
 		t.Run(name, func(t *testing.T) {
-			given := testabilities.Given(t)
+			given, then := testabilities.New(t)
 
 			// given:
 			draftService := given.NewDraftTransactionService()
 
 			// when:
-			_, err := draftService.Create(context.Background(), test.spec)
+			tx, err := draftService.Create(context.Background(), test.spec)
 
 			// then:
-			require.Error(t, err)
-			require.ErrorIs(t, err, test.expectedError)
+			then.Created(tx).WithError(err).ThatIs(test.expectedError)
 		})
 	}
 }
