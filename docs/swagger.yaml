@@ -2974,6 +2974,11 @@ paths:
     patch:
       description: Update transaction metadata
       parameters:
+      - description: id
+        in: path
+        name: id
+        required: true
+        type: string
       - description: Pass update transaction request model in the body with updated
           metadata
         in: body
