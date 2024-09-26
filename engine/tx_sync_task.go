@@ -5,7 +5,6 @@ import (
 	"errors"
 	"time"
 
-	"github.com/bitcoin-sv/spv-wallet/engine/chain/models"
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/libsv/go-bc"
 	"github.com/rs/zerolog"
@@ -82,10 +81,10 @@ func processSyncTransactions(ctx context.Context, client *Client) {
 			saveTx()
 		}
 
-		txInfo, queryOutcome, err := client.Chain().Query(ctx, txID)
+		txInfo, err := client.Chain().Query(ctx, txID)
 
 		if err != nil {
-			if errors.Is(err, spverrors.ErrBroadcastUnreachable) {
+			if errors.Is(err, spverrors.ErrARCUnreachable) {
 				// checking subsequent transactions is pointless if the broadcast server (ARC) is unreachable, will try again in the next cycle
 				logger.Warn().Msgf("%s", err.Error())
 				return
@@ -97,29 +96,21 @@ func processSyncTransactions(ctx context.Context, client *Client) {
 			continue
 		}
 
-		switch queryOutcome {
-		case chainmodels.QueryTxOutcomeFailed:
-			logger.Error().Str("txID", txID).Msg("Cannot query transaction; Query failed")
-			if tx.UpdatedAt.Before(problematicTxDelay()) {
-				updateStatus(TxStatusProblematic)
-			}
-		case chainmodels.QueryTXOutcomeRejected:
-			updateStatus(TxStatusProblematic)
-			logger.Warn().Str("txID", txID).Msg("Transaction has been rejected by the chain provider")
-		case chainmodels.QueryTXOutcomeNotFound:
+		if txInfo.NotFound() {
 			updateStatus(_handleUnknownTX(ctx, tx, logger))
-		case chainmodels.QueryTXOutcomeSuccess:
-			bump, err := bc.NewBUMPFromStr(txInfo.MerklePath)
-			if err != nil {
-				//ARC sometimes returns a TXStatus SEEN_ON_NETWORK, but with zero data
-				logger.Warn().Err(err).Str("txID", txID).Msg("Cannot parse BUMP")
-			}
-			tx.BlockHash = txInfo.BlockHash
-			tx.BlockHeight = uint64(txInfo.BlockHeight)
-			tx.SetBUMP(bump)
-			tx.UpdateFromBroadcastStatus(txInfo.TXStatus)
-			saveTx()
+			continue
 		}
+
+		bump, err := bc.NewBUMPFromStr(txInfo.MerklePath)
+		if err != nil {
+			//ARC sometimes returns a TXStatus SEEN_ON_NETWORK, but with zero data
+			logger.Warn().Err(err).Str("txID", txID).Msg("Cannot parse BUMP")
+		}
+		tx.BlockHash = txInfo.BlockHash
+		tx.BlockHeight = uint64(txInfo.BlockHeight)
+		tx.SetBUMP(bump)
+		tx.UpdateFromBroadcastStatus(txInfo.TXStatus)
+		saveTx()
 	}
 }
 

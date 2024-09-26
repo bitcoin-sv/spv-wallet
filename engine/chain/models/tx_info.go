@@ -10,3 +10,8 @@ type TXInfo struct {
 	TXStatus    TXStatus `json:"txStatus,omitempty"`
 	TxID        string   `json:"txid,omitempty"`
 }
+
+// NotFound presents a convention to indicate that the transaction is not found
+func (t *TXInfo) NotFound() bool {
+	return t == nil
+}

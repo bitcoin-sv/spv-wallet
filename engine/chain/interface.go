@@ -8,7 +8,7 @@ import (
 
 // QueryService for querying transactions.
 type QueryService interface {
-	Query(ctx context.Context, txID string) (*chainmodels.TXInfo, chainmodels.QueryTXOutcome, error)
+	Query(ctx context.Context, txID string) (*chainmodels.TXInfo, error)
 }
 
 // Service related to the chain.
