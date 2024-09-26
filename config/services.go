@@ -192,12 +192,12 @@ func (s *AppServices) loadSPVWallet(ctx context.Context, appConfig *AppConfig, t
 		logger.Err(err).Msg("error while configuring callback")
 	}
 
-	options = append(options, engine.WithFeeQuotes(appConfig.Nodes.UseFeeQuotes))
+	options = append(options, engine.WithFeeQuotes(appConfig.ARC.UseFeeQuotes))
 
-	if appConfig.Nodes.FeeUnit != nil {
+	if appConfig.ARC.FeeUnit != nil {
 		options = append(options, engine.WithFeeUnit(&utils.FeeUnit{
-			Satoshis: appConfig.Nodes.FeeUnit.Satoshis,
-			Bytes:    appConfig.Nodes.FeeUnit.Bytes,
+			Satoshis: appConfig.ARC.FeeUnit.Satoshis,
+			Bytes:    appConfig.ARC.FeeUnit.Bytes,
 		}))
 	}
 
@@ -379,9 +379,11 @@ func loadBroadcastClientArc(appConfig *AppConfig, options []engine.ClientOps, lo
 	} else {
 		bcLogger = logger.With().Str("service", "broadcast-client").Logger()
 	}
-	for _, arcClient := range appConfig.Nodes.toBroadcastClientArc() {
-		builder.WithArc(*arcClient, &bcLogger)
-	}
+	builder.WithArc(broadcastclient.ArcClientConfig{
+		Token:        appConfig.ARC.Token,
+		APIUrl:       appConfig.ARC.URL,
+		DeploymentID: appConfig.ARC.DeploymentID,
+	}, &bcLogger)
 	broadcastClient := builder.Build()
 	options = append(
 		options,
@@ -391,20 +393,20 @@ func loadBroadcastClientArc(appConfig *AppConfig, options []engine.ClientOps, lo
 }
 
 func configureCallback(options []engine.ClientOps, appConfig *AppConfig) ([]engine.ClientOps, error) {
-	if appConfig.Nodes.Callback.Enabled {
-		if !isValidURL(appConfig.Nodes.Callback.Host) {
-			return nil, spverrors.Newf("invalid callback host: %s - must be a valid external url - not a localhost", appConfig.Nodes.Callback.Host)
+	if appConfig.ARC.Callback.Enabled {
+		if !isValidURL(appConfig.ARC.Callback.Host) {
+			return nil, spverrors.Newf("invalid callback host: %s - must be a valid external url - not a localhost", appConfig.ARC.Callback.Host)
 		}
 
-		if appConfig.Nodes.Callback.Token == "" {
+		if appConfig.ARC.Callback.Token == "" {
 			callbackToken, err := utils.HashAdler32(DefaultAdminXpub)
 			if err != nil {
 				return nil, spverrors.Wrapf(err, "error while generating callback token")
 			}
-			appConfig.Nodes.Callback.Token = callbackToken
+			appConfig.ARC.Callback.Token = callbackToken
 		}
 
-		options = append(options, engine.WithCallback(appConfig.Nodes.Callback.Host+BroadcastCallbackRoute, appConfig.Nodes.Callback.Token))
+		options = append(options, engine.WithCallback(appConfig.ARC.Callback.Host+BroadcastCallbackRoute, appConfig.ARC.Callback.Token))
 	}
 	return options, nil
 }
