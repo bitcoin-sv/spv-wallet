@@ -23,7 +23,7 @@ func CallbackTokenMiddleware() gin.HandlerFunc {
 		}
 
 		providedToken := authHeader[len(BearerSchema):]
-		if providedToken != appConfig.Nodes.Callback.Token {
+		if providedToken != appConfig.ARC.Callback.Token {
 			spverrors.AbortWithErrorResponse(c, spverrors.ErrInvalidToken, nil)
 		}
 
