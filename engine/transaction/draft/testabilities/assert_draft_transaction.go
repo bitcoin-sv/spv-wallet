@@ -38,7 +38,6 @@ type OutputAssertion interface {
 	HasBucket(bucket transaction.Bucket) OutputAssertion
 	HasSatoshis(satoshis bsv.Satoshis) OutputAssertion
 	HasLockingScript(lockingScript string) OutputAssertion
-	And() WithParseableBEEFDraftTransactionAssertion
 	IsDataOnly() OutputAssertion
 	IsPaymail() DraftTransactionPaymailOutputAssertion
 }
@@ -47,7 +46,6 @@ type DraftTransactionPaymailOutputAssertion interface {
 	HasReceiver(receiver string) DraftTransactionPaymailOutputAssertion
 	HasSender(sender string) DraftTransactionPaymailOutputAssertion
 	HasReference(reference string) DraftTransactionPaymailOutputAssertion
-	And() WithParseableBEEFDraftTransactionAssertion
 }
 
 func Then(t testing.TB) DraftTransactionAssertion {
@@ -128,10 +126,6 @@ func (a *createdDraftAssertion) Output(index int) OutputAssertion {
 		annotation: a.draft.Annotations.Outputs[index],
 		index:      index,
 	}
-}
-
-func (a *draftTransactionOutputAssertion) And() WithParseableBEEFDraftTransactionAssertion {
-	return a.parent
 }
 
 func (a *draftTransactionOutputAssertion) HasBucket(bucket transaction.Bucket) OutputAssertion {
