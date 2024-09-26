@@ -15,7 +15,7 @@ import (
 func get(c *gin.Context, appConfig *config.AppConfig) {
 	client := resty.New()
 	logger := reqctx.Logger(c)
-	bhsOK := CheckBlockHeaderServiceStatus(appConfig.BHS, client, logger)
+	bhsOK := checkBlockHeaderServiceStatus(appConfig.BHS, client, logger)
 	if !bhsOK {
 		spverrors.ErrorResponse(c, spverrors.ErrBHSUnreachable, logger)
 		return

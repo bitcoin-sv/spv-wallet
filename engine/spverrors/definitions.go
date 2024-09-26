@@ -393,5 +393,5 @@ var ErrBHSInvalidBatchSize = models.SPVError{Message: "batchSize must be 0 or a 
 // ErrBHSMerkleRootNotFound is when Block Header Service cannot find requested merkleroot in lastEvaluatedKey query param
 var ErrBHSMerkleRootNotFound = models.SPVError{Message: "No block with provided merkleroot was found", StatusCode: 404, Code: "error-bhs-merkleroot-not-found"}
 
-// ErrBHSMerkleRootNotINLC is when Block Header Service finds merkleroot in lastEvaluateKey query param but it is not in longest chain
+// ErrBHSMerkleRootNotInLC is when Block Header Service finds merkleroot in lastEvaluateKey query param but it is not in longest chain
 var ErrBHSMerkleRootNotInLC = models.SPVError{Message: "Provided merkleroot is not part of the longest chain", StatusCode: 409, Code: "error-bhs-merkleroot-not-part-of-lc"}

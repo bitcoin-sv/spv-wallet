@@ -14,7 +14,9 @@ const (
 	errBlockHeadersServiceIsOfflineMsg = "Unable to connect to Block Headers Service. Please check Block Header Service configuration and status"
 )
 
-func CheckBlockHeaderServiceStatus(bhsConfig *config.BHSConfig, httpClient *resty.Client, logger *zerolog.Logger) bool {
+// checkBlockHeaderServiceStatus checks if the Block Header Service responds with 200 for a health check to see if it's
+// up and ready for connections
+func checkBlockHeaderServiceStatus(bhsConfig *config.BHSConfig, httpClient *resty.Client, logger *zerolog.Logger) bool {
 	logger.Info().Msg("checking Block Headers Service")
 
 	if bhsConfig.URL == "" {
