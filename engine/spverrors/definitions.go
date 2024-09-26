@@ -386,3 +386,7 @@ var ErrBHSBadURL = models.SPVError{Message: "cannot create Block Header Service 
 
 // ErrBHSParsingResponse is when creation of Block Header Service URL doesn't succeed. Probably a fault with the config file
 var ErrBHSParsingResponse = models.SPVError{Message: "cannot parse Block Header Service response", StatusCode: 500, Code: "error-bhs-parse-response"}
+
+var ErrBHSInvalidBatchSize = models.SPVError{Message: "batchSize must be 0 or a positive integer", StatusCode: 400, Code: "error-bhs-invalid-batch-size"}
+var ErrBHSMerkleRootNotFound = models.SPVError{Message: "No block with provided merkleroot was found", StatusCode: 404, Code: "error-bhs-merkleroot-not-found"}
+var ErrBHSMerkleRootNotInLC = models.SPVError{Message: "Provided merkleroot is not part of the longest chain", StatusCode: 409, Code: "error-bhs-merkleroot-not-part-of-lc"}

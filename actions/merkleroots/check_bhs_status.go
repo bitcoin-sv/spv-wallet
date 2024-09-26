@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/bitcoin-sv/spv-wallet/config"
+	"github.com/go-resty/resty/v2"
 	"github.com/rs/zerolog"
 )
 
@@ -14,39 +15,30 @@ const (
 	errBlockHeadersServiceIsOfflineMsg = "Unable to connect to Block Headers Service. Please check Block Header Service configuration and status"
 )
 
-func CheckBlockHeaderServiceStatus(ctx context.Context, bhsConfig *config.BHSConfig, httpClient *http.Client, logger *zerolog.Logger) bool {
+func CheckBlockHeaderServiceStatus(ctx context.Context, bhsConfig *config.BHSConfig, httpClient *resty.Client, logger *zerolog.Logger) bool {
 	logger.Info().Msg("checking Block Headers Service")
 
 	if bhsConfig.URL == "" {
 		logger.Error().Msgf("%s - url not configured", errCheckingBHSMsg)
 	}
 
-	timedCtx, cancel := context.WithTimeout(ctx, 5*time.Second)
-	defer cancel()
-
-	req, err := http.NewRequestWithContext(timedCtx, "GET", bhsConfig.URL+"/status", nil)
-	if err != nil {
-		logger.Error().Err(err).Msgf("%s - failed to create request", errCheckingBHSMsg)
-		return false
-	}
-
 	if bhsConfig.AuthToken == "" {
 		logger.Warn().Msg("warning checking Block Headers Service - auth token is not set. Some requests might not work")
 	}
 
-	res, err := httpClient.Do(req)
-	if res != nil {
-		defer func() {
-			_ = res.Body.Close()
-		}()
-	}
+	res, err := httpClient.
+		SetTimeout(5 * time.Second).
+		R().
+		EnableTrace().
+		Get(bhsConfig.URL + "/status")
+
 	if err != nil {
 		logger.Error().Err(err).Msg(errBlockHeadersServiceIsOfflineMsg)
 		return false
 	}
 
-	if res.StatusCode != http.StatusOK {
-		logger.Error().Msgf("%s Response statusCode: %d", errBlockHeadersServiceIsOfflineMsg, res.StatusCode)
+	if res.StatusCode() != http.StatusOK {
+		logger.Error().Msgf("%s Response statusCode: %d", errBlockHeadersServiceIsOfflineMsg, res.StatusCode())
 		return false
 	}
 

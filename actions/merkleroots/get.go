@@ -9,11 +9,11 @@ import (
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/bitcoin-sv/spv-wallet/server/reqctx"
 	"github.com/gin-gonic/gin"
+	"github.com/go-resty/resty/v2"
 )
 
-// TODO: change http client to resty
 func get(c *gin.Context, userContext *reqctx.UserContext, appConfig *config.AppConfig) {
-	client := &http.Client{}
+	client := resty.New()
 	logger := reqctx.Logger(c)
 	bhsOK := CheckBlockHeaderServiceStatus(c, appConfig.BHS, client, logger)
 	if !bhsOK {
@@ -39,34 +39,26 @@ func get(c *gin.Context, userContext *reqctx.UserContext, appConfig *config.AppC
 
 	bhsUrl.RawQuery = query.Encode()
 
-	req, err := http.NewRequestWithContext(c, http.MethodGet, bhsUrl.String(), nil)
-	if err != nil {
-		spverrors.ErrorResponse(c, err, logger)
-		return
-	}
+	req := client.R().
+		EnableTrace()
 
 	if appConfig.BHS.AuthToken != "" {
-		req.Header.Set("Authorization", "Bearer "+appConfig.BHS.AuthToken)
+		req.SetAuthToken(appConfig.BHS.AuthToken)
 	}
 
-	res, err := client.Do(req)
-	if res != nil {
-		defer func() {
-			_ = res.Body.Close()
-		}()
-	}
+	res, err := req.Get(bhsUrl.String())
 	if err != nil {
 		spverrors.ErrorResponse(c, err, logger)
 		return
 	}
 
-	if res.StatusCode != http.StatusOK {
+	if res.StatusCode() != http.StatusOK {
 		mapBHSErrorResponseToSpverror(c, res, logger)
 		return
 	}
 
 	var response any
-	err = json.NewDecoder(res.Body).Decode(&response)
+	err = json.Unmarshal(res.Body(), &response)
 	if err != nil {
 		spverrors.ErrorResponse(c, spverrors.ErrBHSParsingResponse, logger)
 		return
