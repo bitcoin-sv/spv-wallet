@@ -10,7 +10,7 @@ import (
 	"github.com/rs/zerolog"
 )
 
-type BHSErrorResponse struct {
+type bHSErrorResponse struct {
 	Code    string `json:"code"`
 	Message string `json:"message"`
 }
@@ -18,7 +18,7 @@ type BHSErrorResponse struct {
 // mapBHSErrorResponseToSpverror is a method that will check what kind of response came back from
 // Block Header Service and map it to spverror and set it to context
 func mapBHSErrorResponseToSpverror(ctx *gin.Context, res *resty.Response, logger *zerolog.Logger) {
-	var responseErr BHSErrorResponse
+	var responseErr bHSErrorResponse
 
 	err := json.Unmarshal(res.Body(), &responseErr)
 	if err != nil {

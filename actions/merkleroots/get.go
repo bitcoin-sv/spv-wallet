@@ -12,10 +12,10 @@ import (
 	"github.com/go-resty/resty/v2"
 )
 
-func get(c *gin.Context, userContext *reqctx.UserContext, appConfig *config.AppConfig) {
+func get(c *gin.Context, appConfig *config.AppConfig) {
 	client := resty.New()
 	logger := reqctx.Logger(c)
-	bhsOK := CheckBlockHeaderServiceStatus(c, appConfig.BHS, client, logger)
+	bhsOK := CheckBlockHeaderServiceStatus(appConfig.BHS, client, logger)
 	if !bhsOK {
 		spverrors.ErrorResponse(c, spverrors.ErrBHSUnreachable, logger)
 		return
@@ -23,7 +23,7 @@ func get(c *gin.Context, userContext *reqctx.UserContext, appConfig *config.AppC
 
 	batchSize := c.Query("batchSize")
 	lastEvaluatedKey := c.Query("lastEvaluatedKey")
-	bhsUrl, err := createBHSURL(appConfig, "/chain/merkleroot")
+	bhsURL, err := createBHSURL(appConfig, "/chain/merkleroot")
 	if err != nil {
 		spverrors.ErrorResponse(c, err, logger)
 		return
@@ -37,7 +37,7 @@ func get(c *gin.Context, userContext *reqctx.UserContext, appConfig *config.AppC
 		query.Add("lastEvaluatedKey", lastEvaluatedKey)
 	}
 
-	bhsUrl.RawQuery = query.Encode()
+	bhsURL.RawQuery = query.Encode()
 
 	req := client.R().
 		EnableTrace()
@@ -46,7 +46,7 @@ func get(c *gin.Context, userContext *reqctx.UserContext, appConfig *config.AppC
 		req.SetAuthToken(appConfig.BHS.AuthToken)
 	}
 
-	res, err := req.Get(bhsUrl.String())
+	res, err := req.Get(bhsURL.String())
 	if err != nil {
 		spverrors.ErrorResponse(c, err, logger)
 		return

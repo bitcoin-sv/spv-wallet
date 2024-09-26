@@ -1,7 +1,6 @@
 package merkleroots
 
 import (
-	"context"
 	"net/http"
 	"time"
 
@@ -15,7 +14,7 @@ const (
 	errBlockHeadersServiceIsOfflineMsg = "Unable to connect to Block Headers Service. Please check Block Header Service configuration and status"
 )
 
-func CheckBlockHeaderServiceStatus(ctx context.Context, bhsConfig *config.BHSConfig, httpClient *resty.Client, logger *zerolog.Logger) bool {
+func CheckBlockHeaderServiceStatus(bhsConfig *config.BHSConfig, httpClient *resty.Client, logger *zerolog.Logger) bool {
 	logger.Info().Msg("checking Block Headers Service")
 
 	if bhsConfig.URL == "" {

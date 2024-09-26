@@ -11,7 +11,7 @@ import (
 type UserHandler = func(c *gin.Context, userContext *reqctx.UserContext)
 
 // UserHandlerWithAppConfig is the handler for the user that also takes appConfig
-type UserHandlerWithAppConfig = func(c *gin.Context, userContext *reqctx.UserContext, appConfig *config.AppConfig)
+type UserHandlerWithAppConfig = func(c *gin.Context, appConfig *config.AppConfig)
 
 // UserHandlerWithXPub is the handler for the user who has authorized using xPub
 type UserHandlerWithXPub = func(c *gin.Context, userContext *reqctx.UserContext, xpub string)
@@ -37,7 +37,7 @@ func AsUserWithAppConfig(handler UserHandlerWithAppConfig, appConfig *config.App
 			spverrors.AbortWithErrorResponse(c, spverrors.ErrAdminAuthOnUserEndpoint, nil)
 			return
 		}
-		handler(c, userContext, appConfig)
+		handler(c, appConfig)
 	}
 }
 
