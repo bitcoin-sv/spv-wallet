@@ -25,7 +25,11 @@ type ErrorCreationDraftTransactionAssertion interface {
 }
 
 type SuccessfullyCreatedDraftTransactionAssertion interface {
-	HasOutputs(count int) SuccessfullyCreatedDraftTransactionAssertion
+	WithParseableBEEFHex() WithParseableBEEFDraftTransactionAssertion
+}
+
+type WithParseableBEEFDraftTransactionAssertion interface {
+	HasOutputs(count int) WithParseableBEEFDraftTransactionAssertion
 	Output(index int) DraftTransactionOutputAssertion
 }
 
@@ -33,7 +37,7 @@ type DraftTransactionOutputAssertion interface {
 	HasBucket(bucket transaction.Bucket) DraftTransactionOutputAssertion
 	HasSatoshis(satoshis bsv.Satoshis) DraftTransactionOutputAssertion
 	HasLockingScript(lockingScript string) DraftTransactionOutputAssertion
-	And() SuccessfullyCreatedDraftTransactionAssertion
+	And() WithParseableBEEFDraftTransactionAssertion
 	IsDataOnly() DraftTransactionOutputAssertion
 	IsPaymail() DraftTransactionPaymailOutputAssertion
 }
@@ -42,7 +46,7 @@ type DraftTransactionPaymailOutputAssertion interface {
 	HasReceiver(receiver string) DraftTransactionPaymailOutputAssertion
 	HasSender(sender string) DraftTransactionPaymailOutputAssertion
 	HasReference(reference string) DraftTransactionPaymailOutputAssertion
-	And() SuccessfullyCreatedDraftTransactionAssertion
+	And() WithParseableBEEFDraftTransactionAssertion
 }
 
 func Then(t testing.TB) DraftTransactionAssertion {
@@ -76,18 +80,22 @@ func (a *createdDraftAssertion) ThatIs(expectedError error) {
 
 // WithNoError checks if there was no error and result is not nil. It also checks if BEEF hex is parseable.
 func (a *createdDraftAssertion) WithNoError(err error) SuccessfullyCreatedDraftTransactionAssertion {
-	a.t.Helper()
 	a.require.NoError(err, "Creation of draft has finished with error")
 	a.require.NotNil(a.draft, "Draft should be created if there is no error")
+	return a
+}
 
+func (a *createdDraftAssertion) WithParseableBEEFHex() WithParseableBEEFDraftTransactionAssertion {
+	a.t.Helper()
 	a.t.Logf("BEEF: %s", a.draft.BEEF)
 
+	var err error
 	a.tx, err = sdk.NewTransactionFromBEEFHex(a.draft.BEEF)
 	a.require.NoErrorf(err, "Draft has invalid BEEF hex: %s", a.draft.BEEF)
 	return a
 }
 
-func (a *createdDraftAssertion) HasOutputs(count int) SuccessfullyCreatedDraftTransactionAssertion {
+func (a *createdDraftAssertion) HasOutputs(count int) WithParseableBEEFDraftTransactionAssertion {
 	a.require.Lenf(a.tx.Outputs, count, "BEEF of draft transaction has invalid number of outputs")
 	a.require.Lenf(a.draft.Annotations.Outputs, count, "Annotations of draft transaction has invalid number of outputs")
 	return a
@@ -116,7 +124,7 @@ func (a *createdDraftAssertion) Output(index int) DraftTransactionOutputAssertio
 	}
 }
 
-func (a *draftTransactionOutputAssertion) And() SuccessfullyCreatedDraftTransactionAssertion {
+func (a *draftTransactionOutputAssertion) And() WithParseableBEEFDraftTransactionAssertion {
 	return a.parent
 }
 

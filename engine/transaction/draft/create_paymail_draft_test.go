@@ -45,7 +45,7 @@ func TestCreatePaymailDraft(t *testing.T) {
 		draftTx, err := draftService.Create(context.Background(), spec)
 
 		// then:
-		then.Created(draftTx).WithNoError(err).
+		then.Created(draftTx).WithNoError(err).WithParseableBEEFHex().
 			HasOutputs(1).
 			Output(0).
 			HasBucket(transaction.BucketBSV).
@@ -57,7 +57,58 @@ func TestCreatePaymailDraft(t *testing.T) {
 			HasReference(paymailHostResponse.Reference)
 	})
 
-	t.Run("return draft with payment with multiple outputs from valid paymail address", func(t *testing.T) {
+	t.Run("style 1 __ return draft with payment with multiple outputs from valid paymail address", func(t *testing.T) {
+		given, then := testabilities.New(t)
+
+		// given:
+		const firstOutputSatoshiValue = bsv.Satoshis(1)
+		const secondOutputSatoshiValue = bsv.Satoshis(2)
+		const paymentSatoshiValue = firstOutputSatoshiValue + secondOutputSatoshiValue
+
+		// and:
+		paymailHostResponse := given.ExternalRecipientHost().WillRespondWithP2PDestinationsWithSats(firstOutputSatoshiValue, secondOutputSatoshiValue)
+
+		// and:
+		draftService := given.NewDraftTransactionService()
+
+		// and:
+		spec := &draft.TransactionSpec{
+			XPubID: fixtures.Sender.XPubID,
+			Outputs: outputs.NewSpecifications(&outputs.Paymail{
+				To:       recipient,
+				Satoshis: paymentSatoshiValue,
+				From:     optional.Of(sender),
+			}),
+		}
+
+		// when:
+		draftTx, err := draftService.Create(context.Background(), spec)
+
+		// then:
+		thenTx := then.Created(draftTx).WithNoError(err).WithParseableBEEFHex()
+
+		thenTx.HasOutputs(2)
+
+		thenTx.Output(0).
+			HasBucket(transaction.BucketBSV).
+			HasSatoshis(firstOutputSatoshiValue).
+			HasLockingScript(paymailHostResponse.Scripts[0]).
+			IsPaymail().
+			HasReceiver(recipient).
+			HasSender(sender).
+			HasReference(paymailHostResponse.Reference)
+
+		thenTx.Output(1).
+			HasBucket(transaction.BucketBSV).
+			HasSatoshis(secondOutputSatoshiValue).
+			HasLockingScript(paymailHostResponse.Scripts[1]).
+			IsPaymail().
+			HasReceiver(recipient).
+			HasSender(sender).
+			HasReference(paymailHostResponse.Reference)
+	})
+
+	t.Run("style 2 __ return draft with payment with multiple outputs from valid paymail address", func(t *testing.T) {
 		given, then := testabilities.New(t)
 
 		// given:
@@ -86,7 +137,10 @@ func TestCreatePaymailDraft(t *testing.T) {
 
 		// then:
 		then.Created(draftTx).WithNoError(err).
+			WithParseableBEEFHex().
 			HasOutputs(2).
+
+			// and:
 			Output(0).
 			HasBucket(transaction.BucketBSV).
 			HasSatoshis(firstOutputSatoshiValue).
@@ -96,6 +150,8 @@ func TestCreatePaymailDraft(t *testing.T) {
 			HasSender(sender).
 			HasReference(paymailHostResponse.Reference).
 			And().
+
+			// and:
 			Output(1).
 			HasBucket(transaction.BucketBSV).
 			HasSatoshis(secondOutputSatoshiValue).
@@ -104,6 +160,7 @@ func TestCreatePaymailDraft(t *testing.T) {
 			HasReceiver(recipient).
 			HasSender(sender).
 			HasReference(paymailHostResponse.Reference)
+
 	})
 
 	t.Run("return draft with default paymail in sender annotation", func(t *testing.T) {
@@ -128,7 +185,7 @@ func TestCreatePaymailDraft(t *testing.T) {
 		draftTx, err := draftService.Create(context.Background(), spec)
 
 		// then:
-		then.Created(draftTx).WithNoError(err).
+		then.Created(draftTx).WithNoError(err).WithParseableBEEFHex().
 			Output(0).
 			IsPaymail().
 			HasSender(fixtures.UserWithMorePaymails.DefaultPaymail())

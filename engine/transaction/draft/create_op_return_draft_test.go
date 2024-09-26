@@ -70,7 +70,7 @@ func TestCreateOpReturnDraft(t *testing.T) {
 			draftTx, err := draftService.Create(context.Background(), spec)
 
 			// then:
-			then.Created(draftTx).WithNoError(err).
+			then.Created(draftTx).WithNoError(err).WithParseableBEEFHex().
 				HasOutputs(1).
 				Output(0).
 				HasBucket(transaction.BucketData).
