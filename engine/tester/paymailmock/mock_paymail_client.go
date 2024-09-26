@@ -75,28 +75,26 @@ func MockClient(domain string, moreDomainNames ...string) *PaymailClientMock {
 }
 
 // WillRespondWithBasicCapabilities is configuring a client to respond with basic capabilities for all mocked domains.
-func (c *PaymailClientMock) WillRespondWithBasicCapabilities() *PaymailClientMock {
+func (c *PaymailClientMock) WillRespondWithBasicCapabilities() {
 	httpmock.Reset()
 	c.useBasicCapabilities()
 	for _, domain := range c.domains {
 		c.exposeCapabilities(domain)
 	}
-	return c
 }
 
 // WillRespondWithP2PCapabilities is configuring a client to respond with basic and P2P capabilities for all mocked domains.
-func (c *PaymailClientMock) WillRespondWithP2PCapabilities() *PaymailClientMock {
+func (c *PaymailClientMock) WillRespondWithP2PCapabilities() {
 	httpmock.Reset()
 	c.useBasicCapabilities()
 	c.useP2PCapabilities()
 	for _, domain := range c.domains {
 		c.exposeCapabilities(domain)
 	}
-	return c
 }
 
 // WillRespondWithP2PWithBEEFCapabilities is configuring a client to respond with basic, P2P and BEEF capabilities for all mocked domains.
-func (c *PaymailClientMock) WillRespondWithP2PWithBEEFCapabilities() *PaymailClientMock {
+func (c *PaymailClientMock) WillRespondWithP2PWithBEEFCapabilities() {
 	httpmock.Reset()
 	c.useBasicCapabilities()
 	c.useP2PCapabilities()
@@ -104,7 +102,6 @@ func (c *PaymailClientMock) WillRespondWithP2PWithBEEFCapabilities() *PaymailCli
 	for _, domain := range c.domains {
 		c.exposeCapabilities(domain)
 	}
-	return c
 }
 
 // WillRespondWithNotFoundOnCapabilities is configuring a client to respond with not found on capabilities for all mocked domains.

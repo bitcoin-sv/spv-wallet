@@ -13,6 +13,7 @@ import (
 	"github.com/bitcoin-sv/spv-wallet/engine/metrics"
 	"github.com/bitcoin-sv/spv-wallet/engine/notifications"
 	paymailclient "github.com/bitcoin-sv/spv-wallet/engine/paymail"
+	"github.com/bitcoin-sv/spv-wallet/engine/paymailaddress"
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/bitcoin-sv/spv-wallet/engine/taskmanager"
 	"github.com/bitcoin-sv/spv-wallet/engine/transaction/draft"
@@ -30,23 +31,24 @@ type (
 
 	// clientOptions holds all the configuration for the client
 	clientOptions struct {
-		cacheStore              *cacheStoreOptions    // Configuration options for Cachestore (ristretto, redis, etc.)
-		cluster                 *clusterOptions       // Configuration options for the cluster coordinator
-		chainstate              *chainstateOptions    // Configuration options for Chainstate (broadcast, sync, etc.)
-		dataStore               *dataStoreOptions     // Configuration options for the DataStore (PostgreSQL, etc.)
-		debug                   bool                  // If the client is in debug mode
-		encryptionKey           string                // Encryption key for encrypting sensitive information (IE: paymail xPub) (hex encoded key)
-		httpClient              HTTPInterface         // HTTP interface to use
-		iuc                     bool                  // (Input UTXO Check) True will check input utxos when saving transactions
-		logger                  *zerolog.Logger       // Internal logging
-		metrics                 *metrics.Metrics      // Metrics with a collector interface
-		models                  *modelOptions         // Configuration options for the loaded models
-		newRelic                *newRelicOptions      // Configuration options for NewRelic
-		notifications           *notificationsOptions // Configuration options for Notifications
-		paymail                 *paymailOptions       // Paymail options & client
-		transactionDraftService draft.Service         // Service for transaction drafts
-		taskManager             *taskManagerOptions   // Configuration options for the TaskManager (TaskQ, etc.)
-		userAgent               string                // User agent for all outgoing requests
+		cacheStore              *cacheStoreOptions     // Configuration options for Cachestore (ristretto, redis, etc.)
+		cluster                 *clusterOptions        // Configuration options for the cluster coordinator
+		chainstate              *chainstateOptions     // Configuration options for Chainstate (broadcast, sync, etc.)
+		dataStore               *dataStoreOptions      // Configuration options for the DataStore (PostgreSQL, etc.)
+		debug                   bool                   // If the client is in debug mode
+		encryptionKey           string                 // Encryption key for encrypting sensitive information (IE: paymail xPub) (hex encoded key)
+		httpClient              HTTPInterface          // HTTP interface to use
+		iuc                     bool                   // (Input UTXO Check) True will check input utxos when saving transactions
+		logger                  *zerolog.Logger        // Internal logging
+		metrics                 *metrics.Metrics       // Metrics with a collector interface
+		models                  *modelOptions          // Configuration options for the loaded models
+		newRelic                *newRelicOptions       // Configuration options for NewRelic
+		notifications           *notificationsOptions  // Configuration options for Notifications
+		paymail                 *paymailOptions        // Paymail options & client
+		transactionDraftService draft.Service          // Service for transaction drafts
+		paymailAddressService   paymailaddress.Service // Service for paymail addresses
+		taskManager             *taskManagerOptions    // Configuration options for the TaskManager (TaskQ, etc.)
+		userAgent               string                 // User agent for all outgoing requests
 	}
 
 	// chainstateOptions holds the chainstate configuration and client
@@ -173,6 +175,10 @@ func NewClient(ctx context.Context, opts ...ClientOps) (ClientInterface, error) 
 
 	// Load the Paymail client and service (if does not exist)
 	if err = client.loadPaymailComponents(); err != nil {
+		return nil, err
+	}
+
+	if err = client.loadPaymailAddressService(); err != nil {
 		return nil, err
 	}
 

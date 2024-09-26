@@ -87,7 +87,6 @@ func TestCallback_HostPattern(t *testing.T) {
 
 // TestCallback_ConfigureCallback will test the method configureCallback()
 func TestCallback_ConfigureCallback(t *testing.T) {
-
 	tests := []struct {
 		appConfig    AppConfig
 		name         string
@@ -96,7 +95,7 @@ func TestCallback_ConfigureCallback(t *testing.T) {
 	}{
 		{
 			appConfig: AppConfig{
-				Nodes: &NodesConfig{
+				ARC: &ARCConfig{
 					Callback: &CallbackConfig{
 						Host:    "http://example.com",
 						Token:   "",
@@ -110,7 +109,7 @@ func TestCallback_ConfigureCallback(t *testing.T) {
 		},
 		{
 			appConfig: AppConfig{
-				Nodes: &NodesConfig{
+				ARC: &ARCConfig{
 					Callback: &CallbackConfig{
 						Host:    "https://example.com",
 						Token:   "existingToken",
@@ -124,7 +123,7 @@ func TestCallback_ConfigureCallback(t *testing.T) {
 		},
 		{
 			appConfig: AppConfig{
-				Nodes: &NodesConfig{
+				ARC: &ARCConfig{
 					Callback: &CallbackConfig{
 						Host:    "ftp://example.com",
 						Token:   "",
@@ -138,7 +137,7 @@ func TestCallback_ConfigureCallback(t *testing.T) {
 		},
 		{
 			appConfig: AppConfig{
-				Nodes: &NodesConfig{
+				ARC: &ARCConfig{
 					Callback: &CallbackConfig{
 						Host:    "http://localhost:3003",
 						Token:   "",
@@ -152,7 +151,7 @@ func TestCallback_ConfigureCallback(t *testing.T) {
 		},
 		{
 			appConfig: AppConfig{
-				Nodes: &NodesConfig{
+				ARC: &ARCConfig{
 					Callback: &CallbackConfig{
 						Host:    "http://example.com",
 						Token:   "",

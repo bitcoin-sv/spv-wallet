@@ -25,6 +25,7 @@ func (o *OpReturn) evaluate(evaluation.Context) (annotatedOutputs, error) {
 	if err != nil {
 		return nil, err
 	}
+
 	output, err := sdk.CreateOpReturnOutput(data)
 	if err != nil {
 		if errors.Is(err, script.ErrPartTooBig) {
@@ -56,10 +57,10 @@ func toBytes(data string, dataType opreturn.DataType) ([]byte, error) {
 	case opreturn.DataTypeHexes:
 		dataHex, err := hex.DecodeString(data)
 		if err != nil {
-			return nil, spverrors.Wrapf(err, "failed to decode hex")
+			return nil, txerrors.ErrFailedToDecodeHex.Wrap(err)
 		}
 		return dataHex, nil
 	default:
-		return nil, spverrors.Newf("unsupported data type")
+		return nil, txerrors.ErrDraftOpReturnUnsupportedDataType
 	}
 }

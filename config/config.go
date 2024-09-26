@@ -33,8 +33,8 @@ type AppConfig struct {
 	Authentication *AuthenticationConfig `json:"auth" mapstructure:"auth"`
 	// Server is a general configuration for spv-wallet.
 	Server *ServerConfig `json:"server_config" mapstructure:"server_config"`
-	// Nodes is a config for Arc.
-	Nodes *NodesConfig `json:"nodes" mapstructure:"nodes"`
+	// ARC is a config for Arc.
+	ARC *ARCConfig `json:"arc" mapstructure:"arc"`
 	// Metrics is a configuration for metrics in SPV Wallet.
 	Metrics *MetricsConfig `json:"metrics" mapstructure:"metrics"`
 	// ExperimentalFeatures is a configuration that allows to enable features that are considered experimental/non-production.
@@ -151,12 +151,13 @@ type NewRelicConfig struct {
 	Enabled bool `json:"enabled" mapstructure:"enabled"`
 }
 
-// NodesConfig consists of blockchain nodes (Arc) configuration
-type NodesConfig struct {
+// ARCConfig consists of blockchain nodes (Arc) configuration
+type ARCConfig struct {
 	Callback     *CallbackConfig `json:"callback" mapstructure:"callback"`
 	FeeUnit      *FeeUnitConfig  `json:"fee_unit" mapstructure:"fee_unit"`
 	DeploymentID string          `json:"deployment_id" mapstructure:"deployment_id"`
-	Apis         []*ArcAPI       `json:"apis" mapstructure:"apis"`
+	Token        string          `json:"token" mapstructure:"token"`
+	URL          string          `json:"url" mapstructure:"url"`
 	UseFeeQuotes bool            `json:"use_fee_quotes" mapstructure:"use_fee_quotes"`
 }
 
@@ -164,12 +165,6 @@ type NodesConfig struct {
 type FeeUnitConfig struct {
 	Satoshis int `json:"satoshis" mapstructure:"satoshis"`
 	Bytes    int `json:"bytes" mapstructure:"bytes"`
-}
-
-// ArcAPI holds connection info for a single miner endpoint
-type ArcAPI struct {
-	Token  string `json:"token" mapstructure:"token"`
-	ArcURL string `json:"arc_url" mapstructure:"arc_url"`
 }
 
 // NotificationsConfig is the configuration for notifications

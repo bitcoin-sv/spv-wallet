@@ -32,7 +32,7 @@ func (a *AppConfig) Validate() error {
 		return err
 	}
 
-	if err = a.Nodes.Validate(); err != nil {
+	if err = a.ARC.Validate(); err != nil {
 		return err
 	}
 
