@@ -2,8 +2,8 @@ package engine
 
 import (
 	"context"
-	chainmodels "github.com/bitcoin-sv/spv-wallet/engine/chain/models"
 
+	chainmodels "github.com/bitcoin-sv/spv-wallet/engine/chain/models"
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/bitcoin-sv/spv-wallet/engine/utils"
 	"github.com/libsv/go-bc"

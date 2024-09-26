@@ -51,6 +51,13 @@ type (
 		taskManager             *taskManagerOptions    // Configuration options for the TaskManager (TaskQ, etc.)
 		userAgent               string                 // User agent for all outgoing requests
 		chainService            chain.Service          // Chain service
+		arcConfig               arcConfig              // Configuration for ARC
+	}
+
+	arcConfig struct {
+		URL          string // URL for the ARC
+		Token        string // Token for the ARC
+		DeploymentID string // Deployment ID for the ARC
 	}
 
 	// chainstateOptions holds the chainstate configuration and client
@@ -180,6 +187,10 @@ func NewClient(ctx context.Context, opts ...ClientOps) (ClientInterface, error) 
 		return nil, err
 	}
 
+	if err = client.loadPaymailAddressService(); err != nil {
+		return nil, err
+	}
+
 	if err = client.loadTransactionDraftService(); err != nil {
 		return nil, err
 	}
@@ -193,6 +204,8 @@ func NewClient(ctx context.Context, opts ...ClientOps) (ClientInterface, error) 
 	if err = client.loadTaskmanager(ctx); err != nil {
 		return nil, err
 	}
+
+	client.loadChainService()
 
 	// Register all cron jobs
 	if err = client.registerCronJobs(); err != nil {
@@ -425,4 +438,9 @@ func (c *Client) Version() string {
 // Metrics will return the metrics client (if it's enabled)
 func (c *Client) Metrics() (metrics *metrics.Metrics, enabled bool) {
 	return c.options.metrics, c.options.metrics != nil
+}
+
+// Chain will return the chain service
+func (c *Client) Chain() chain.Service {
+	return c.options.chainService
 }

@@ -2,10 +2,11 @@ package engine
 
 import (
 	"context"
-	"github.com/bitcoin-sv/spv-wallet/engine/chain/models"
 	"net/http"
 
 	"github.com/bitcoin-sv/go-paymail"
+	"github.com/bitcoin-sv/spv-wallet/engine/chain"
+	"github.com/bitcoin-sv/spv-wallet/engine/chain/models"
 	"github.com/bitcoin-sv/spv-wallet/engine/chainstate"
 	"github.com/bitcoin-sv/spv-wallet/engine/cluster"
 	"github.com/bitcoin-sv/spv-wallet/engine/datastore"
@@ -217,4 +218,5 @@ type ClientInterface interface {
 	SubscribeWebhook(ctx context.Context, url, tokenHeader, token string) error
 	UnsubscribeWebhook(ctx context.Context, url string) error
 	GetWebhooks(ctx context.Context) ([]notifications.ModelWebhook, error)
+	Chain() chain.Service
 }

@@ -2,10 +2,10 @@ package engine
 
 import (
 	"context"
-	"github.com/bitcoin-sv/spv-wallet/engine/chain"
 
 	"github.com/bitcoin-sv/go-paymail"
 	"github.com/bitcoin-sv/go-paymail/server"
+	"github.com/bitcoin-sv/spv-wallet/engine/chain"
 	"github.com/bitcoin-sv/spv-wallet/engine/chainstate"
 	"github.com/bitcoin-sv/spv-wallet/engine/cluster"
 	"github.com/bitcoin-sv/spv-wallet/engine/datastore"
@@ -205,7 +205,7 @@ func (c *Client) loadTransactionDraftService() error {
 func (c *Client) loadChainService() {
 	if c.options.chainService != nil {
 		logger := c.Logger().With().Str("subservice", "chain").Logger()
-		c.options.chainService = chain.NewChainService(logger)
+		c.options.chainService = chain.NewChainService(logger, c.options.arcConfig.URL, c.options.arcConfig.Token, c.options.arcConfig.DeploymentID)
 	}
 }
 

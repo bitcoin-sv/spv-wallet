@@ -636,3 +636,14 @@ func WithCallback(callbackURL string, callbackToken string) ClientOps {
 		c.chainstate.options = append(c.chainstate.options, chainstate.WithCallback(callbackURL, callbackToken))
 	}
 }
+
+// WithARC set ARC url params
+func WithARC(url, token, deploymentID string) ClientOps {
+	return func(c *clientOptions) {
+		c.arcConfig = arcConfig{
+			URL:          url,
+			Token:        token,
+			DeploymentID: deploymentID,
+		}
+	}
+}

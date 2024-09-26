@@ -187,6 +187,8 @@ func (s *AppServices) loadSPVWallet(ctx context.Context, appConfig *AppConfig, t
 
 	options = loadBroadcastClientArc(appConfig, options, logger)
 
+	options = append(options, engine.WithARC(appConfig.ARC.URL, appConfig.ARC.Token, appConfig.ARC.DeploymentID))
+
 	options, err = configureCallback(options, appConfig)
 	if err != nil {
 		logger.Err(err).Msg("error while configuring callback")

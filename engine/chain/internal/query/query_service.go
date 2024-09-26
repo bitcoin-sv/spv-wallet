@@ -3,13 +3,15 @@ package query
 import (
 	"context"
 	"errors"
+	"net"
+
 	"github.com/bitcoin-sv/spv-wallet/engine/chain/models"
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/go-resty/resty/v2"
 	"github.com/rs/zerolog"
-	"net"
 )
 
+// Service for querying transactions.
 type Service struct {
 	logger       zerolog.Logger
 	httpClient   *resty.Client
@@ -18,8 +20,9 @@ type Service struct {
 	deploymentID string
 }
 
+// Query a transaction.
 func (s *Service) Query(ctx context.Context, txID string) (*chainmodels.TXInfo, chainmodels.QueryTXOutcome, error) {
-	req := s.httpClient.R()
+	req := s.httpClient.R().SetContext(ctx)
 
 	if s.token != "" {
 		req.SetHeader("Content-Type", "application/json")
@@ -46,11 +49,13 @@ func (s *Service) Query(ctx context.Context, txID string) (*chainmodels.TXInfo, 
 	return nil, chainmodels.QueryTxOutcomeFailed, nil
 }
 
-func NewQueryService(logger zerolog.Logger, httpClient *resty.Client, url, token string) *Service {
+// NewQueryService creates a new query service.
+func NewQueryService(logger zerolog.Logger, httpClient *resty.Client, url, token, deploymentID string) *Service {
 	return &Service{
-		logger:     logger,
-		httpClient: httpClient,
-		url:        url,
-		token:      token,
+		logger:       logger,
+		httpClient:   httpClient,
+		url:          url,
+		token:        token,
+		deploymentID: deploymentID,
 	}
 }

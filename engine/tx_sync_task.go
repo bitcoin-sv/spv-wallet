@@ -3,11 +3,11 @@ package engine
 import (
 	"context"
 	"errors"
-	"github.com/bitcoin-sv/spv-wallet/engine/chain/models"
-	"github.com/libsv/go-bc"
 	"time"
 
+	"github.com/bitcoin-sv/spv-wallet/engine/chain/models"
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
+	"github.com/libsv/go-bc"
 	"github.com/rs/zerolog"
 )
 
@@ -89,11 +89,10 @@ func processSyncTransactions(ctx context.Context, client *Client) {
 				// checking subsequent transactions is pointless if the broadcast server (ARC) is unreachable, will try again in the next cycle
 				logger.Warn().Msgf("%s", err.Error())
 				return
-			} else {
-				logger.Error().Err(err).Str("txID", txID).Msg("Cannot query transaction")
-				if tx.UpdatedAt.Before(problematicTxDelay()) {
-					updateStatus(TxStatusProblematic)
-				}
+			}
+			logger.Error().Err(err).Str("txID", txID).Msg("Cannot query transaction")
+			if tx.UpdatedAt.Before(problematicTxDelay()) {
+				updateStatus(TxStatusProblematic)
 			}
 			continue
 		}

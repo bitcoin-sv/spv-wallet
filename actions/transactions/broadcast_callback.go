@@ -1,9 +1,9 @@
 package transactions
 
 import (
-	chainmodels "github.com/bitcoin-sv/spv-wallet/engine/chain/models"
 	"net/http"
 
+	chainmodels "github.com/bitcoin-sv/spv-wallet/engine/chain/models"
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/bitcoin-sv/spv-wallet/server/reqctx"
 	"github.com/gin-gonic/gin"
