@@ -11,6 +11,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+// TODO: change http client to resty
 func get(c *gin.Context, userContext *reqctx.UserContext, appConfig *config.AppConfig) {
 	client := &http.Client{}
 	logger := reqctx.Logger(c)

@@ -28,16 +28,23 @@ func mapBHSErrorResponseToSpverror(ctx *gin.Context, res *http.Response, logger 
 		return
 	}
 
-	err = models.SPVError{
-		Message:    responseErr.Message,
-		StatusCode: res.StatusCode,
-		Code:       mapBHSCodeToSpverrorCode(responseErr.Code),
+	switch responseErr.Code {
+	default:
+		spvErr := models.SPVError{
+			Message:    responseErr.Message,
+			StatusCode: res.StatusCode,
+			Code:       mapBHSCodeToSpverrorCode(responseErr.Code),
+		}
+		err = spverrors.ErrInternal.Wrap(spvErr)
 	}
+
+	// TODO: change mapBHSCodeToSpverror to switch implementation based on responseErr.Code
 	spverrors.ErrorResponse(ctx, err, logger)
 }
 
 // mapBHSCodeToSpverrorCode maps error code returned from Block Header Service to
 // match error codes structure defined in spverrors
+// TODO: mapp known errors to our custon and if other we should map it i.e. INTERNAL_SRV_ERR
 func mapBHSCodeToSpverrorCode(code string) string {
 	if code == "" {
 		return models.UnknownErrorCode
