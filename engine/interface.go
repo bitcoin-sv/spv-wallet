@@ -2,9 +2,9 @@ package engine
 
 import (
 	"context"
+	"github.com/bitcoin-sv/spv-wallet/engine/chain/models"
 	"net/http"
 
-	"github.com/bitcoin-sv/go-broadcast-client/broadcast"
 	"github.com/bitcoin-sv/go-paymail"
 	"github.com/bitcoin-sv/spv-wallet/engine/chainstate"
 	"github.com/bitcoin-sv/spv-wallet/engine/cluster"
@@ -159,7 +159,7 @@ type TransactionService interface {
 	RecordTransaction(ctx context.Context, xPubKey, txHex, draftID string,
 		opts ...ModelOps) (*Transaction, error)
 	RecordRawTransaction(ctx context.Context, txHex string, opts ...ModelOps) (*Transaction, error)
-	HandleTxCallback(ctx context.Context, callbackResp *broadcast.SubmittedTx) error
+	HandleTxCallback(ctx context.Context, callbackResp *chainmodels.TXInfo) error
 	UpdateTransactionMetadata(ctx context.Context, xPubID, id string, metadata Metadata) (*Transaction, error)
 	RevertTransaction(ctx context.Context, id string) error
 }

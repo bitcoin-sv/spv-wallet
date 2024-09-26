@@ -2,8 +2,8 @@ package engine
 
 import (
 	"context"
+	chainmodels "github.com/bitcoin-sv/spv-wallet/engine/chain/models"
 
-	"github.com/bitcoin-sv/go-broadcast-client/broadcast"
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/bitcoin-sv/spv-wallet/engine/utils"
 	"github.com/libsv/go-bc"
@@ -241,15 +241,15 @@ func (m *Transaction) SetBUMP(bump *bc.BUMP) {
 	}
 }
 
-// UpdateFromBroadcastStatus converts broadcast.TxStatus to engineTxStatus and updates if needed
-func (m *Transaction) UpdateFromBroadcastStatus(bStatus broadcast.TxStatus) {
+// UpdateFromBroadcastStatus converts ARC transaction status to engineTxStatus and updates if needed
+func (m *Transaction) UpdateFromBroadcastStatus(bStatus chainmodels.TXStatus) {
 	switch bStatus {
-	case broadcast.Mined, broadcast.Confirmed:
+	case chainmodels.Mined, chainmodels.Confirmed:
 		m.TxStatus = TxStatusMined
-	case broadcast.SeenInOrphanMempool, broadcast.Rejected:
+	case chainmodels.SeenInOrphanMempool, chainmodels.Rejected:
 		m.TxStatus = TxStatusProblematic
-	case broadcast.Unknown, broadcast.Queued, broadcast.Received, broadcast.Stored, broadcast.AnnouncedToNetwork, broadcast.RequestedByNetwork, broadcast.SentToNetwork, broadcast.AcceptedByNetwork, broadcast.SeenOnNetwork:
-		// don't change current TxStatus on these bStatuses
+	case chainmodels.Unknown, chainmodels.Queued, chainmodels.Received, chainmodels.Stored, chainmodels.AnnouncedToNetwork, chainmodels.RequestedByNetwork, chainmodels.SentToNetwork, chainmodels.AcceptedByNetwork, chainmodels.SeenOnNetwork:
+		// don't change current TXStatus on these ARC Statuses
 	default:
 		// unexpected statuses
 	}

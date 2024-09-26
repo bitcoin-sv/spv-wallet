@@ -2,6 +2,7 @@ package engine
 
 import (
 	"context"
+	"github.com/bitcoin-sv/spv-wallet/engine/chain"
 
 	"github.com/bitcoin-sv/go-paymail"
 	"github.com/bitcoin-sv/go-paymail/server"
@@ -199,6 +200,13 @@ func (c *Client) loadTransactionDraftService() error {
 		c.options.transactionDraftService = draft.NewDraftService(c.PaymailService(), c.options.paymailAddressService, logger)
 	}
 	return nil
+}
+
+func (c *Client) loadChainService() {
+	if c.options.chainService != nil {
+		logger := c.Logger().With().Str("subservice", "chain").Logger()
+		c.options.chainService = chain.NewChainService(logger)
+	}
 }
 
 // loadTaskmanager will load the TaskManager and start the TaskManager client

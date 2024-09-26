@@ -3,9 +3,10 @@ package engine
 import (
 	"context"
 	"errors"
+	"github.com/bitcoin-sv/spv-wallet/engine/chain/models"
+	"github.com/libsv/go-bc"
 	"time"
 
-	"github.com/bitcoin-sv/spv-wallet/engine/chainstate"
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/rs/zerolog"
 )
@@ -38,7 +39,6 @@ func problematicTxDelay() time.Time {
 func processSyncTransactions(ctx context.Context, client *Client) {
 	logger := client.Logger()
 	db := client.Datastore().DB()
-	chainstateService := client.Chainstate()
 
 	recoverAndLog(logger)
 
@@ -82,29 +82,43 @@ func processSyncTransactions(ctx context.Context, client *Client) {
 			saveTx()
 		}
 
-		txInfo, err := chainstateService.QueryTransaction(ctx, txID, chainstate.RequiredOnChain, defaultQueryTxTimeout)
+		txInfo, queryOutcome, err := client.Chain().Query(ctx, txID)
 
 		if err != nil {
-			switch {
-			case errors.Is(err, spverrors.ErrBroadcastUnreachable):
+			if errors.Is(err, spverrors.ErrBroadcastUnreachable) {
 				// checking subsequent transactions is pointless if the broadcast server (ARC) is unreachable, will try again in the next cycle
 				logger.Warn().Msgf("%s", err.Error())
 				return
-			case errors.Is(err, spverrors.ErrBroadcastRejectedTransaction):
-				updateStatus(TxStatusProblematic)
-			case errors.Is(err, spverrors.ErrCouldNotFindTransaction), errors.Is(err, spverrors.ErrInvalidRequirements):
-				updateStatus(_handleUnknownTX(ctx, tx, logger))
-			default:
-				logger.Error().Err(err).Str("txID", txID).Msg("Cannot query transaction; Unhandled error type")
+			} else {
+				logger.Error().Err(err).Str("txID", txID).Msg("Cannot query transaction")
 				if tx.UpdatedAt.Before(problematicTxDelay()) {
 					updateStatus(TxStatusProblematic)
 				}
 			}
-		} else {
+			continue
+		}
+
+		switch queryOutcome {
+		case chainmodels.QueryTxOutcomeFailed:
+			logger.Error().Str("txID", txID).Msg("Cannot query transaction; Query failed")
+			if tx.UpdatedAt.Before(problematicTxDelay()) {
+				updateStatus(TxStatusProblematic)
+			}
+		case chainmodels.QueryTXOutcomeRejected:
+			updateStatus(TxStatusProblematic)
+			logger.Warn().Str("txID", txID).Msg("Transaction has been rejected by the chain provider")
+		case chainmodels.QueryTXOutcomeNotFound:
+			updateStatus(_handleUnknownTX(ctx, tx, logger))
+		case chainmodels.QueryTXOutcomeSuccess:
+			bump, err := bc.NewBUMPFromStr(txInfo.MerklePath)
+			if err != nil {
+				//ARC sometimes returns a TXStatus SEEN_ON_NETWORK, but with zero data
+				logger.Warn().Err(err).Str("txID", txID).Msg("Cannot parse BUMP")
+			}
 			tx.BlockHash = txInfo.BlockHash
 			tx.BlockHeight = uint64(txInfo.BlockHeight)
-			tx.SetBUMP(txInfo.BUMP)
-			tx.UpdateFromBroadcastStatus(txInfo.TxStatus)
+			tx.SetBUMP(bump)
+			tx.UpdateFromBroadcastStatus(txInfo.TXStatus)
 			saveTx()
 		}
 	}

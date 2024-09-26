@@ -2,10 +2,10 @@ package engine
 
 import (
 	"context"
+	"github.com/bitcoin-sv/spv-wallet/engine/chain/models"
 	"math"
 	"time"
 
-	"github.com/bitcoin-sv/go-broadcast-client/broadcast"
 	"github.com/bitcoin-sv/spv-wallet/engine/datastore"
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/bitcoin-sv/spv-wallet/engine/utils"
@@ -362,7 +362,7 @@ func (c *Client) RevertTransaction(ctx context.Context, id string) error {
 }
 
 // HandleTxCallback will update the broadcast callback transaction info, like: block height, block hash, status, bump.
-func (c *Client) HandleTxCallback(ctx context.Context, callbackResp *broadcast.SubmittedTx) error {
+func (c *Client) HandleTxCallback(ctx context.Context, callbackResp *chainmodels.TXInfo) error {
 	logger := c.options.logger
 	bump, err := bc.NewBUMPFromStr(callbackResp.MerklePath)
 	if err != nil {
@@ -381,7 +381,7 @@ func (c *Client) HandleTxCallback(ctx context.Context, callbackResp *broadcast.S
 	tx.BlockHash = callbackResp.BlockHash
 	tx.BlockHeight = uint64(callbackResp.BlockHeight)
 	tx.SetBUMP(bump)
-	tx.UpdateFromBroadcastStatus(callbackResp.TxStatus)
+	tx.UpdateFromBroadcastStatus(callbackResp.TXStatus)
 
 	if err := tx.Save(ctx); err != nil {
 		return spverrors.ErrDuringSaveTx.Wrap(err)

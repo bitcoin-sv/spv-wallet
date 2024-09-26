@@ -6,6 +6,7 @@ import (
 
 	"github.com/bitcoin-sv/go-paymail"
 	"github.com/bitcoin-sv/go-paymail/server"
+	"github.com/bitcoin-sv/spv-wallet/engine/chain"
 	"github.com/bitcoin-sv/spv-wallet/engine/chainstate"
 	"github.com/bitcoin-sv/spv-wallet/engine/cluster"
 	"github.com/bitcoin-sv/spv-wallet/engine/datastore"
@@ -49,6 +50,7 @@ type (
 		paymailAddressService   paymailaddress.Service // Service for paymail addresses
 		taskManager             *taskManagerOptions    // Configuration options for the TaskManager (TaskQ, etc.)
 		userAgent               string                 // User agent for all outgoing requests
+		chainService            chain.Service          // Chain service
 	}
 
 	// chainstateOptions holds the chainstate configuration and client
@@ -175,10 +177,6 @@ func NewClient(ctx context.Context, opts ...ClientOps) (ClientInterface, error) 
 
 	// Load the Paymail client and service (if does not exist)
 	if err = client.loadPaymailComponents(); err != nil {
-		return nil, err
-	}
-
-	if err = client.loadPaymailAddressService(); err != nil {
 		return nil, err
 	}
 
