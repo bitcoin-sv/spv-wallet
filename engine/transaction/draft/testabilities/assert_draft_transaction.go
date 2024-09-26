@@ -30,15 +30,16 @@ type SuccessfullyCreatedDraftTransactionAssertion interface {
 
 type WithParseableBEEFDraftTransactionAssertion interface {
 	HasOutputs(count int) WithParseableBEEFDraftTransactionAssertion
-	Output(index int) DraftTransactionOutputAssertion
+	HasOutput(index int, assert func(OutputAssertion)) WithParseableBEEFDraftTransactionAssertion
+	Output(index int) OutputAssertion
 }
 
-type DraftTransactionOutputAssertion interface {
-	HasBucket(bucket transaction.Bucket) DraftTransactionOutputAssertion
-	HasSatoshis(satoshis bsv.Satoshis) DraftTransactionOutputAssertion
-	HasLockingScript(lockingScript string) DraftTransactionOutputAssertion
+type OutputAssertion interface {
+	HasBucket(bucket transaction.Bucket) OutputAssertion
+	HasSatoshis(satoshis bsv.Satoshis) OutputAssertion
+	HasLockingScript(lockingScript string) OutputAssertion
 	And() WithParseableBEEFDraftTransactionAssertion
-	IsDataOnly() DraftTransactionOutputAssertion
+	IsDataOnly() OutputAssertion
 	IsPaymail() DraftTransactionPaymailOutputAssertion
 }
 
@@ -110,7 +111,12 @@ type draftTransactionOutputAssertion struct {
 	index      int
 }
 
-func (a *createdDraftAssertion) Output(index int) DraftTransactionOutputAssertion {
+func (a *createdDraftAssertion) HasOutput(index int, assert func(OutputAssertion)) WithParseableBEEFDraftTransactionAssertion {
+	assert(a.Output(index))
+	return a
+}
+
+func (a *createdDraftAssertion) Output(index int) OutputAssertion {
 	a.require.Greater(len(a.tx.Outputs), index, "Draft transaction outputs has no element at index %d", index)
 	a.require.Greater(len(a.draft.Annotations.Outputs), index, "Draft transaction annotation outputs has no element at index %d", index)
 
@@ -128,22 +134,22 @@ func (a *draftTransactionOutputAssertion) And() WithParseableBEEFDraftTransactio
 	return a.parent
 }
 
-func (a *draftTransactionOutputAssertion) HasBucket(bucket transaction.Bucket) DraftTransactionOutputAssertion {
+func (a *draftTransactionOutputAssertion) HasBucket(bucket transaction.Bucket) OutputAssertion {
 	a.assert.Equal(bucket, a.annotation.Bucket, "Output %d has invalid bucket annotation", a.index)
 	return a
 }
 
-func (a *draftTransactionOutputAssertion) HasSatoshis(satoshis bsv.Satoshis) DraftTransactionOutputAssertion {
+func (a *draftTransactionOutputAssertion) HasSatoshis(satoshis bsv.Satoshis) OutputAssertion {
 	a.assert.EqualValues(satoshis, a.txout.Satoshis, "Output %d has invalid satoshis value", a.index)
 	return a
 }
 
-func (a *draftTransactionOutputAssertion) HasLockingScript(lockingScript string) DraftTransactionOutputAssertion {
+func (a *draftTransactionOutputAssertion) HasLockingScript(lockingScript string) OutputAssertion {
 	a.assert.Equal(lockingScript, a.txout.LockingScriptHex(), "Output %d has invalid locking script", a.index)
 	return a
 }
 
-func (a *draftTransactionOutputAssertion) IsDataOnly() DraftTransactionOutputAssertion {
+func (a *draftTransactionOutputAssertion) IsDataOnly() OutputAssertion {
 	a.assert.Zerof(a.txout.Satoshis, "Output %d has value in satoshis which is not allowed for data only outputs", a.index)
 	a.assert.True(a.txout.LockingScript.IsData(), "Output %d has locking script which is not data script", a.index)
 	return a
