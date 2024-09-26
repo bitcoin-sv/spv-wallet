@@ -3,12 +3,13 @@ package query
 import (
 	"context"
 	"errors"
-	"github.com/bitcoin-sv/spv-wallet/models"
+	"fmt"
 	"net"
 	"net/http"
 
 	"github.com/bitcoin-sv/spv-wallet/engine/chain/models"
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
+	"github.com/bitcoin-sv/spv-wallet/models"
 	"github.com/go-resty/resty/v2"
 	"github.com/rs/zerolog"
 )
@@ -35,6 +36,9 @@ func NewQueryService(logger zerolog.Logger, httpClient *resty.Client, url, token
 
 // Query a transaction.
 func (s *Service) Query(ctx context.Context, txID string) (*chainmodels.TXInfo, error) {
+	if !s.validateTX(txID) {
+		return nil, spverrors.ErrInvalidTransactionID
+	}
 	req := s.httpClient.R().
 		SetContext(ctx).
 		SetHeader("Content-Type", "application/json").
@@ -42,14 +46,14 @@ func (s *Service) Query(ctx context.Context, txID string) (*chainmodels.TXInfo, 
 		SetError(&chainmodels.ArcError{})
 
 	if s.token != "" {
-		req.SetHeader("Content-Type", "application/json")
+		req.SetHeader("Authorization", s.token)
 	}
 
 	if s.deploymentID != "" {
 		req.SetHeader("XDeployment-ID", s.deploymentID)
 	}
 
-	response, err := req.Get(s.url + txID)
+	response, err := req.Get(fmt.Sprintf("%s/v1/tx/%s", s.url, txID))
 
 	if err != nil {
 		var e net.Error
@@ -61,15 +65,15 @@ func (s *Service) Query(ctx context.Context, txID string) (*chainmodels.TXInfo, 
 
 	switch response.StatusCode() {
 	case http.StatusOK:
-		txInfo, ok := response.Result().(*chainmodels.TXInfo)
-		if !ok {
-			return nil, spverrors.ErrARCParseResponse
-		}
-		return txInfo, nil
-	case http.StatusUnauthorized:
+		return response.Result().(*chainmodels.TXInfo), nil
+	case http.StatusUnauthorized, http.StatusForbidden:
 		return nil, s.withArcError(response, spverrors.ErrARCUnauthorized)
 	case http.StatusNotFound:
-		return nil, nil
+		if _, ok := s.asARCError(response); ok {
+			// ARC returns 404 when transaction is not found
+			return nil, nil
+		}
+		return nil, spverrors.ErrARCUnreachable
 	case http.StatusConflict:
 		return nil, s.withArcError(response, spverrors.ErrARCGenericError)
 	}
@@ -77,16 +81,27 @@ func (s *Service) Query(ctx context.Context, txID string) (*chainmodels.TXInfo, 
 	return nil, s.withArcError(response, spverrors.ErrARCUnsupportedStatusCode)
 }
 
-func (s *Service) withArcError(response *resty.Response, baseError models.SPVError) error {
-	if response == nil || response.Error() == nil {
-		return spverrors.ErrInternal
-	}
+func (s *Service) validateTX(txID string) bool {
+	return len(txID) >= 50
+}
 
-	//nolint:errorlint // We get a model returned from the response so errors. So errors.Is function is not relevant here
-	arcErr, ok := response.Error().(*chainmodels.ArcError)
+func (s *Service) withArcError(response *resty.Response, baseError models.SPVError) error {
+	arcErr, ok := s.asARCError(response)
 	if !ok {
 		return baseError.Wrap(spverrors.ErrARCParseResponse)
 	}
-
 	return baseError.Wrap(arcErr)
+}
+
+func (s *Service) asARCError(response *resty.Response) (*chainmodels.ArcError, bool) {
+	if response == nil || response.Error() == nil {
+		return nil, false
+	}
+
+	//nolint:errorlint // We get a model returned from the response so errors. So errors.Is function is not relevant here
+	arcErr := response.Error().(*chainmodels.ArcError)
+	if arcErr.IsEmpty() {
+		return nil, false
+	}
+	return arcErr, true
 }

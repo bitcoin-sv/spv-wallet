@@ -17,3 +17,8 @@ type ArcError struct {
 func (a *ArcError) Error() string {
 	return fmt.Sprintf("ARC error: %s <txID: %s> %s", a.Title, a.TxID, a.Detail)
 }
+
+// IsEmpty checks if the error is empty indicating that we could not parse the error response.
+func (a *ArcError) IsEmpty() bool {
+	return a == nil || a.Status == 0
+}
