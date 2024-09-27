@@ -10,16 +10,16 @@ import (
 	"github.com/rs/zerolog"
 )
 
-// delayForBroadcastedTx indicates the time after which a broadcasted transaction should be checked
-// most probably ARC callback hasn't been received in this time so we need to check the transaction status "manually"
-func delayForBroadcastedTx() time.Time {
+// timeForReceivingCallback indicates the time after which a broadcasted transaction should be checked (with Callback enabled)
+// If ARC callback hasn't been received in this time, we need to check the transaction status "manually"
+func timeForReceivingCallback() time.Time {
 	return time.Now().Add(-time.Hour)
 }
 
-// delayForNotBroadcastedTx indicates the time after which a non-broadcasted transaction should be checked.
-// In this case, we don't have to wait for an ARC callback (because it will never come).
+// timeForMineTransaction indicates the time after which transaction could be mined.
+// It is used when tx is not broadcasted or ARC callback is off.
 // We're checking the transaction status after potentially enough time has passed for it to be mined.
-func delayForNotBroadcastedTx() time.Time {
+func timeForMineTransaction() time.Time {
 	return time.Now().Add(-10 * time.Minute)
 }
 
@@ -46,11 +46,19 @@ func processSyncTransactions(ctx context.Context, client *Client) {
 	}
 	queryIDsCtx, cancel := context.WithTimeout(ctx, 60*time.Second)
 	defer cancel()
+
+	var delayForBroadcastedTx time.Time
+	if client.options.txCallbackConfig != nil {
+		delayForBroadcastedTx = timeForReceivingCallback()
+	} else {
+		delayForBroadcastedTx = timeForMineTransaction()
+	}
+
 	err := db.
 		WithContext(queryIDsCtx).
 		Model(&Transaction{}).
-		Where("tx_status = ? AND created_at < ?", TxStatusBroadcasted, delayForBroadcastedTx()).
-		Or("tx_status = ? AND created_at < ?", TxStatusCreated, delayForNotBroadcastedTx()).
+		Where("tx_status = ? AND created_at < ?", TxStatusBroadcasted, delayForBroadcastedTx).
+		Or("tx_status = ? AND created_at < ?", TxStatusCreated, timeForMineTransaction()).
 		Or("tx_status IS NULL"). // backward compatibility
 		Find(&txIDsToSync).Error
 	if err != nil {

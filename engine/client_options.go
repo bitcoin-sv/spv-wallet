@@ -633,6 +633,10 @@ func WithBroadcastClient(broadcastClient broadcast.Client) ClientOps {
 // WithCallback set callback settings
 func WithCallback(callbackURL string, callbackToken string) ClientOps {
 	return func(c *clientOptions) {
+		c.txCallbackConfig = &txCallbackConfig{
+			URL:   callbackURL,
+			Token: callbackToken,
+		}
 		c.chainstate.options = append(c.chainstate.options, chainstate.WithCallback(callbackURL, callbackToken))
 	}
 }

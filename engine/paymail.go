@@ -23,9 +23,9 @@ func finalizeP2PTransaction(ctx context.Context, client paymail.ClientInterface,
 	_, err = client.SendP2PTransaction(p4.ReceiveEndpoint, p4.Alias, p4.Domain, p2pTransaction)
 	if err != nil {
 		if transaction.client != nil {
-			transaction.client.Logger().Info().
+			transaction.client.Logger().Error().Err(err).
 				Str("txID", transaction.ID).
-				Msgf("finalizeerror %s, reason: %s", p4.Format, err.Error())
+				Msgf("finalizeerror %s", p4.Format)
 		}
 		return spverrors.Wrapf(err, "failed to send transaction via paymail")
 	}

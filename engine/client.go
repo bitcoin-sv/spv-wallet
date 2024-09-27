@@ -52,12 +52,18 @@ type (
 		userAgent               string                 // User agent for all outgoing requests
 		chainService            chain.Service          // Chain service
 		arcConfig               arcConfig              // Configuration for ARC
+		txCallbackConfig        *txCallbackConfig      // Configuration for TX callback received from ARC; disabled if nil
 	}
 
 	arcConfig struct {
 		URL          string // URL for the ARC
 		Token        string // Token for the ARC
 		DeploymentID string // Deployment ID for the ARC
+	}
+
+	txCallbackConfig struct {
+		URL   string // URL for the callback
+		Token string // Token for the callback
 	}
 
 	// chainstateOptions holds the chainstate configuration and client
