@@ -3,6 +3,7 @@ package query
 import (
 	"context"
 	"testing"
+	"time"
 
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/go-resty/resty/v2"
@@ -72,6 +73,25 @@ func Test(t *testing.T) {
 	t.Run("Query 404 endpoint with wrong arcURL", func(t *testing.T) {
 		service := newService()
 		service.url = "wrong-arcURL"
+		_, err := service.Query(ctx, "4dff1d32c1a02d7797e33d7c4ab2f96fe6699005b6d79e6391bdf5e358232e06")
+
+		require.Error(t, err)
+		require.ErrorIs(t, err, spverrors.ErrARCUnreachable)
+	})
+
+	t.Run("Query interrupted by ctx timeout", func(t *testing.T) {
+		service := newService()
+		tCtx, cancel := context.WithTimeout(ctx, 1*time.Millisecond)
+		defer cancel()
+		_, err := service.Query(tCtx, "4dff1d32c1a02d7797e33d7c4ab2f96fe6699005b6d79e6391bdf5e358232e06")
+
+		require.Error(t, err)
+		require.ErrorIs(t, err, spverrors.ErrARCUnreachable)
+	})
+
+	t.Run("Query interrupted by resty timeout", func(t *testing.T) {
+		service := newService()
+		service.httpClient.SetTimeout(1 * time.Millisecond)
 		_, err := service.Query(ctx, "4dff1d32c1a02d7797e33d7c4ab2f96fe6699005b6d79e6391bdf5e358232e06")
 
 		require.Error(t, err)
