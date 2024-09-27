@@ -173,9 +173,6 @@ var ErrGetCapabilities = models.SPVError{Message: "failed to get paymail capabil
 // ErrCouldNotFindTransaction is an error when a transaction could not be found
 var ErrCouldNotFindTransaction = models.SPVError{Message: "transaction not found", StatusCode: 404, Code: "error-transaction-not-found"}
 
-// ErrCouldNotFindSyncTx is an error when a given utxo could not be found
-var ErrCouldNotFindSyncTx = models.SPVError{Message: "sync tx not found", StatusCode: 404, Code: "error-transaction-sync-tx-not-found"}
-
 // ErrCouldNotFindDraftTx is an error when a given draft tx could not be found
 var ErrCouldNotFindDraftTx = models.SPVError{Message: "draft tx not found", StatusCode: 404, Code: "error-transaction-draft-tx-not-found"}
 

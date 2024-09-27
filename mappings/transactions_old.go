@@ -25,7 +25,6 @@ func MapToOldTransactionContract(t *engine.Transaction) *models.Transaction {
 		NumberOfOutputs:      t.NumberOfOutputs,
 		DraftID:              t.DraftID,
 		TotalValue:           t.TotalValue,
-		Status:               string(t.Status),
 		TransactionDirection: string(t.Direction),
 	}
 
@@ -54,7 +53,6 @@ func MapToOldTransactionContractForAdmin(t *engine.Transaction) *models.Transact
 		NumberOfOutputs: t.NumberOfOutputs,
 		DraftID:         t.DraftID,
 		TotalValue:      t.TotalValue,
-		Status:          string(t.Status),
 		Outputs:         t.XpubOutputValue,
 	}
 
@@ -106,7 +104,6 @@ func MapOldTransactionModelToEngine(t *models.Transaction) *engine.Transaction {
 		DraftID:         t.DraftID,
 		TotalValue:      t.TotalValue,
 		OutputValue:     t.OutputValue,
-		Status:          engine.SyncStatus(t.Status),
 		Direction:       engine.TransactionDirection(t.TransactionDirection),
 	}
 }

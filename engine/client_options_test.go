@@ -599,7 +599,7 @@ func TestWithModels(t *testing.T) {
 		assert.Equal(t, []string{
 			ModelXPub.String(), ModelAccessKey.String(),
 			ModelDraftTransaction.String(), ModelTransaction.String(),
-			ModelSyncTransaction.String(), ModelDestination.String(),
+			ModelDestination.String(),
 			ModelUtxo.String(), ModelContact.String(), ModelWebhook.String(),
 		}, tc.GetModelNames())
 	})
@@ -617,7 +617,7 @@ func TestWithModels(t *testing.T) {
 		assert.Equal(t, []string{
 			ModelXPub.String(), ModelAccessKey.String(),
 			ModelDraftTransaction.String(), ModelTransaction.String(),
-			ModelSyncTransaction.String(), ModelDestination.String(),
+			ModelDestination.String(),
 			ModelUtxo.String(), ModelContact.String(), ModelWebhook.String(), ModelPaymailAddress.String(),
 		}, tc.GetModelNames())
 	})
@@ -809,7 +809,6 @@ func TestWithAutoMigrate(t *testing.T) {
 			ModelAccessKey.String(),
 			ModelDraftTransaction.String(),
 			ModelTransaction.String(),
-			ModelSyncTransaction.String(),
 			ModelDestination.String(),
 			ModelUtxo.String(),
 			ModelContact.String(),
@@ -832,7 +831,6 @@ func TestWithAutoMigrate(t *testing.T) {
 			ModelAccessKey.String(),
 			ModelDraftTransaction.String(),
 			ModelTransaction.String(),
-			ModelSyncTransaction.String(),
 			ModelDestination.String(),
 			ModelUtxo.String(),
 			ModelContact.String(),

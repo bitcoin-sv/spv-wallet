@@ -55,7 +55,6 @@ func MapToTransactionContractForAdmin(t *engine.Transaction) *response.Transacti
 		NumberOfOutputs: t.NumberOfOutputs,
 		DraftID:         t.DraftID,
 		TotalValue:      t.TotalValue,
-		Status:          string(t.Status),
 		Outputs:         t.XpubOutputValue,
 	}
 
@@ -107,7 +106,6 @@ func MapTransactionModelToEngine(t *response.Transaction) *engine.Transaction {
 		DraftID:         t.DraftID,
 		TotalValue:      t.TotalValue,
 		OutputValue:     t.OutputValue,
-		Status:          engine.SyncStatus(t.Status),
 		Direction:       engine.TransactionDirection(t.TransactionDirection),
 	}
 }

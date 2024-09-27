@@ -30,7 +30,6 @@ const (
 	ModelMetadata         ModelName = "metadata"
 	ModelNameEmpty        ModelName = "empty"
 	ModelPaymailAddress   ModelName = "paymail_address"
-	ModelSyncTransaction  ModelName = "sync_transaction"
 	ModelTransaction      ModelName = "transaction"
 	ModelUtxo             ModelName = "utxo"
 	ModelXPub             ModelName = "xpub"
@@ -45,7 +44,6 @@ var AllModelNames = []ModelName{
 	ModelMetadata,
 	ModelPaymailAddress,
 	ModelPaymailAddress,
-	ModelSyncTransaction,
 	ModelTransaction,
 	ModelUtxo,
 	ModelXPub,
@@ -59,7 +57,6 @@ const (
 	tableDestinations      = "destinations"
 	tableDraftTransactions = "draft_transactions"
 	tablePaymailAddresses  = "paymail_addresses"
-	tableSyncTransactions  = "sync_transactions"
 	tableTransactions      = "transactions"
 	tableUTXOs             = "utxos"
 	tableXPubs             = "xpubs"
@@ -86,7 +83,6 @@ const (
 	satoshisField        = "satoshis"
 	spendingTxIDField    = "spending_tx_id"
 	statusField          = "status"
-	syncStatusField      = "sync_status"
 	typeField            = "type"
 	xPubIDField          = "xpub_id"
 	xPubMetadataField    = "xpub_metadata"
@@ -154,11 +150,6 @@ var BaseModels = []interface{}{
 	// Finalized transactions (related to Draft)
 	&Transaction{
 		Model: *NewBaseModel(ModelTransaction),
-	},
-
-	// Sync configuration for transactions (on-chain) (related to Transaction)
-	&SyncTransaction{
-		Model: *NewBaseModel(ModelSyncTransaction),
 	},
 
 	// Various types of destinations (common is: P2PKH Address)
