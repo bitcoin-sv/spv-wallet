@@ -2,11 +2,9 @@ package engine
 
 import (
 	"context"
-	"errors"
 	"fmt"
 	"slices"
 
-	"github.com/bitcoin-sv/spv-wallet/engine/chainstate"
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/libsv/go-bt/v2"
 )
@@ -143,7 +141,6 @@ func _shouldNotifyP2P(tx *Transaction) bool {
 
 func _handleNotifyP2PError(ctx context.Context, c ClientInterface, transaction *Transaction, cause error) error {
 	logger := c.Logger()
-	chainstateService := c.Chainstate()
 
 	p2pError := spverrors.ErrProcessP2PTx.Wrap(cause)
 
@@ -154,16 +151,22 @@ func _handleNotifyP2PError(ctx context.Context, c ClientInterface, transaction *
 		}
 	}
 
-	_, err := chainstateService.QueryTransaction(ctx, transaction.ID, chainstate.RequiredInMempool, defaultQueryTxTimeout)
-	if errors.Is(err, spverrors.ErrCouldNotFindTransaction) {
-		if err := c.RevertTransaction(ctx, transaction.ID); err != nil {
-			saveAsProblematic()
-			return p2pError.Wrap(err)
-		}
-
-		// RevertTransaction saves the transaction itself as REVERTED
-		return p2pError
+	txInfo, err := c.Chain().Query(ctx, transaction.ID)
+	if err != nil {
+		saveAsProblematic()
+		return p2pError.Wrap(err)
 	}
-	saveAsProblematic()
+
+	if txInfo.Found() {
+		saveAsProblematic()
+		return p2pError.Wrap(spverrors.ErrTxRevertFoundOnChain)
+	}
+
+	if err := c.RevertTransaction(ctx, transaction.ID); err != nil {
+		saveAsProblematic()
+		return p2pError.Wrap(err)
+	}
+
+	// RevertTransaction saves the transaction itself as REVERTED
 	return p2pError
 }

@@ -32,7 +32,7 @@ func problematicTxDelay() time.Time {
 
 // processSyncTransactions is a crucial periodic task which try to query transactions which cannot be considered as finalized
 // 1. It gets transaction IDs to sync
-// 2. For every transaction check the status using chainstate.QueryTransaction
+// 2. For every transaction check the status using ARC Query API
 // 3. If found - change the status
 // 4. On error - try to rebroadcast (if needed) or
 func processSyncTransactions(ctx context.Context, client *Client) {
@@ -96,7 +96,7 @@ func processSyncTransactions(ctx context.Context, client *Client) {
 			continue
 		}
 
-		if txInfo.NotFound() {
+		if !txInfo.Found() {
 			updateStatus(_handleUnknownTX(ctx, tx, logger))
 			continue
 		}

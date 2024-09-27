@@ -251,8 +251,8 @@ var ErrTxRevertEmptyDraftID = models.SPVError{Message: "not a spv wallet engine 
 // ErrTxRevertCouldNotFindDraftTx is when draft tx could not be found
 var ErrTxRevertCouldNotFindDraftTx = models.SPVError{Message: "could not find the draft transaction for this transaction, cannot revert", StatusCode: 400, Code: "error-transaction-revert-draft-tx-not-found"}
 
-// ErrTxRevertNotFoundOnChain is when tx was not found on chain
-var ErrTxRevertNotFoundOnChain = models.SPVError{Message: "transaction was found on-chain, cannot revert", StatusCode: 400, Code: "error-transaction-revert-not-found-on-chain"}
+// ErrTxRevertFoundOnChain is when tx was not found on chain
+var ErrTxRevertFoundOnChain = models.SPVError{Message: "transaction was found on-chain, cannot revert", StatusCode: 400, Code: "error-transaction-revert-not-found-on-chain"}
 
 // ErrTxRevertUtxoAlreadySpent is when utxo from tx was already spent
 var ErrTxRevertUtxoAlreadySpent = models.SPVError{Message: "utxo of this transaction has been spent, cannot revert", StatusCode: 400, Code: "error-transaction-revert-utxo-already-spent"}

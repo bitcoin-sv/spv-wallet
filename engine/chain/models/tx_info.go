@@ -11,7 +11,7 @@ type TXInfo struct {
 	TxID        string   `json:"txid,omitempty"`
 }
 
-// NotFound presents a convention to indicate that the transaction is not found
-func (t *TXInfo) NotFound() bool {
-	return t == nil
+// Found presents a convention to indicate that the transaction is known by ARC
+func (t *TXInfo) Found() bool {
+	return t != nil
 }
