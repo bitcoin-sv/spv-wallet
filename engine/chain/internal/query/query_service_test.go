@@ -6,95 +6,126 @@ import (
 	"time"
 
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
-	"github.com/go-resty/resty/v2"
 	"github.com/google/uuid"
 	"github.com/rs/zerolog"
 	"github.com/stretchr/testify/require"
 )
 
-func Test(t *testing.T) {
-	ctx := context.Background()
+func TestQueryService(t *testing.T) {
 	logger := zerolog.New(zerolog.NewConsoleWriter(zerolog.ConsoleTestWriter(t)))
 	deepSuffix, _ := uuid.NewUUID()
 	deploymentID := "spv-wallet-" + deepSuffix.String()
-	arcURL := "https://api.taal.com/arc"
-	token := "mainnet_3af382fadbc448b15cc4133242ac2621"
 
-	newService := func() *Service {
-		return NewQueryService(logger, resty.New(), arcURL, token, deploymentID)
+	testCases := map[string]struct {
+		txID         string
+		arcToken     string
+		arcURL       string
+		expectErr    error
+		expectNil    bool
+		expectTxID   string
+		expectStatus string
+		applyTimeout timeoutDst
+	}{
+		"Query for MINED transaction": {
+			txID:         minedTxID,
+			arcToken:     arcToken,
+			arcURL:       arcURL,
+			expectErr:    nil,
+			expectTxID:   minedTxID,
+			expectStatus: "MINED",
+		},
+		"Query for unknown transaction": {
+			txID:      unknownTxID,
+			arcToken:  arcToken,
+			arcURL:    arcURL,
+			expectErr: nil,
+			expectNil: true,
+		},
+		"Query for invalid transaction": {
+			txID:      "invalid",
+			arcToken:  arcToken,
+			arcURL:    arcURL,
+			expectErr: spverrors.ErrInvalidTransactionID,
+			expectNil: true,
+		},
+		"Query with wrong token": {
+			txID:      minedTxID,
+			arcToken:  "wrong-token",
+			arcURL:    arcURL,
+			expectErr: spverrors.ErrARCUnauthorized,
+			expectNil: true,
+		},
+		"Query 404 endpoint but reachable": {
+			txID:      minedTxID,
+			arcToken:  arcToken,
+			arcURL:    arcURL + wrongButReachable,
+			expectErr: spverrors.ErrARCUnreachable,
+			expectNil: true,
+		},
+		"Query 404 endpoint with wrong arcURL": {
+			txID:      minedTxID,
+			arcToken:  arcToken,
+			arcURL:    "wrong-url",
+			expectErr: spverrors.ErrARCUnreachable,
+			expectNil: true,
+		},
+		"Query interrupted by ctx timeout": {
+			txID:         minedTxID,
+			arcToken:     arcToken,
+			arcURL:       arcURL,
+			expectErr:    spverrors.ErrARCUnreachable,
+			expectNil:    true,
+			applyTimeout: applyTimeoutCtx,
+		},
+		"Query interrupted by resty timeout": {
+			txID:         minedTxID,
+			arcToken:     arcToken,
+			arcURL:       arcURL,
+			expectErr:    spverrors.ErrARCUnreachable,
+			expectNil:    true,
+			applyTimeout: applyTimeoutResty,
+		},
 	}
 
-	t.Run("Query for MINED transaction", func(t *testing.T) {
-		service := newService()
-		txInfo, err := service.Query(ctx, "4dff1d32c1a02d7797e33d7c4ab2f96fe6699005b6d79e6391bdf5e358232e06")
+	for name, tc := range testCases {
+		t.Run(name, func(t *testing.T) {
+			httpClient, reset := arcMockActivate()
+			defer reset()
 
-		require.NoError(t, err)
-		require.NotNil(t, txInfo)
+			service := NewQueryService(logger, httpClient, tc.arcURL, tc.arcToken, deploymentID)
 
-		require.Equal(t, "4dff1d32c1a02d7797e33d7c4ab2f96fe6699005b6d79e6391bdf5e358232e06", txInfo.TxID)
-		require.Equal(t, "MINED", string(txInfo.TXStatus))
-	})
+			ctx := context.Background()
+			if tc.applyTimeout == applyTimeoutCtx {
+				var cancel context.CancelFunc
+				ctx, cancel = context.WithTimeout(ctx, 1*time.Millisecond)
+				defer cancel()
+			} else if tc.applyTimeout == applyTimeoutResty {
+				service.httpClient.SetTimeout(1 * time.Millisecond)
+			}
 
-	t.Run("Query for unknown transaction", func(t *testing.T) {
-		service := newService()
-		txInfo, err := service.Query(ctx, "aaaa1d32c1a02d7797e33d7c4ab2f96fe6699005b6d79e6391bdf5e358232e06")
+			txInfo, err := service.Query(ctx, tc.txID)
 
-		require.NoError(t, err)
-		require.Nil(t, txInfo)
-	})
+			if tc.expectErr != nil {
+				require.Error(t, err)
+				require.ErrorIs(t, err, tc.expectErr)
+			} else {
+				require.NoError(t, err)
+			}
 
-	t.Run("Query for invalid transaction", func(t *testing.T) {
-		service := newService()
-		txInfo, err := service.Query(ctx, "invalid")
-
-		require.Error(t, err)
-		require.ErrorIs(t, err, spverrors.ErrInvalidTransactionID)
-		require.Nil(t, txInfo)
-	})
-
-	t.Run("Query with wrong token", func(t *testing.T) {
-		service := newService()
-		service.token = "wrong-token"
-		_, err := service.Query(ctx, "4dff1d32c1a02d7797e33d7c4ab2f96fe6699005b6d79e6391bdf5e358232e06")
-
-		require.Error(t, err)
-		require.ErrorIs(t, err, spverrors.ErrARCUnauthorized)
-	})
-
-	t.Run("Query 404 endpoint but reachable", func(t *testing.T) {
-		service := newService()
-		service.url = "https://api.taal.com/arc-wrong"
-		_, err := service.Query(ctx, "4dff1d32c1a02d7797e33d7c4ab2f96fe6699005b6d79e6391bdf5e358232e06")
-
-		require.Error(t, err)
-		require.ErrorIs(t, err, spverrors.ErrARCUnreachable)
-	})
-
-	t.Run("Query 404 endpoint with wrong arcURL", func(t *testing.T) {
-		service := newService()
-		service.url = "wrong-arcURL"
-		_, err := service.Query(ctx, "4dff1d32c1a02d7797e33d7c4ab2f96fe6699005b6d79e6391bdf5e358232e06")
-
-		require.Error(t, err)
-		require.ErrorIs(t, err, spverrors.ErrARCUnreachable)
-	})
-
-	t.Run("Query interrupted by ctx timeout", func(t *testing.T) {
-		service := newService()
-		tCtx, cancel := context.WithTimeout(ctx, 1*time.Millisecond)
-		defer cancel()
-		_, err := service.Query(tCtx, "4dff1d32c1a02d7797e33d7c4ab2f96fe6699005b6d79e6391bdf5e358232e06")
-
-		require.Error(t, err)
-		require.ErrorIs(t, err, spverrors.ErrARCUnreachable)
-	})
-
-	t.Run("Query interrupted by resty timeout", func(t *testing.T) {
-		service := newService()
-		service.httpClient.SetTimeout(1 * time.Millisecond)
-		_, err := service.Query(ctx, "4dff1d32c1a02d7797e33d7c4ab2f96fe6699005b6d79e6391bdf5e358232e06")
-
-		require.Error(t, err)
-		require.ErrorIs(t, err, spverrors.ErrARCUnreachable)
-	})
+			if tc.expectNil {
+				require.Nil(t, txInfo)
+			} else {
+				require.NotNil(t, txInfo)
+				require.Equal(t, tc.expectTxID, txInfo.TxID)
+				require.Equal(t, tc.expectStatus, string(txInfo.TXStatus))
+			}
+		})
+	}
 }
+
+type timeoutDst int
+
+const (
+	applyTimeoutCtx timeoutDst = iota + 1
+	applyTimeoutResty
+)
