@@ -2,10 +2,11 @@ package query
 
 import (
 	"fmt"
-	"github.com/go-resty/resty/v2"
-	"github.com/jarcoal/httpmock"
 	"net/http"
 	"time"
+
+	"github.com/go-resty/resty/v2"
+	"github.com/jarcoal/httpmock"
 )
 
 type deactivationMock func()

@@ -98,7 +98,6 @@ func (s *Service) asARCError(response *resty.Response) (*chainmodels.ArcError, b
 		return nil, false
 	}
 
-	//nolint:errorlint // We get a model returned from the response so errors. So errors.Is function is not relevant here
 	arcErr := response.Error().(*chainmodels.ArcError)
 	if arcErr.IsEmpty() {
 		return nil, false
