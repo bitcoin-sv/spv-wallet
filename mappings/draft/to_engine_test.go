@@ -3,6 +3,7 @@ package mappingsdraft_test
 import (
 	"testing"
 
+	"github.com/bitcoin-sv/spv-wallet/engine/tester/fixtures"
 	"github.com/bitcoin-sv/spv-wallet/engine/transaction/draft"
 	"github.com/bitcoin-sv/spv-wallet/engine/transaction/draft/outputs"
 	mappingsdraft "github.com/bitcoin-sv/spv-wallet/mappings/draft"
@@ -14,6 +15,8 @@ import (
 )
 
 func TestMapToEngine(t *testing.T) {
+	var xPubID = fixtures.Sender.XPubID
+
 	tests := map[string]struct {
 		req      *request.DraftTransaction
 		expected *draft.TransactionSpec
@@ -28,6 +31,7 @@ func TestMapToEngine(t *testing.T) {
 				},
 			},
 			expected: &draft.TransactionSpec{
+				XPubID: xPubID,
 				Outputs: outputs.NewSpecifications(
 					&outputs.OpReturn{
 						DataType: opreturn.DataTypeStrings,
@@ -47,6 +51,7 @@ func TestMapToEngine(t *testing.T) {
 				},
 			},
 			expected: &draft.TransactionSpec{
+				XPubID: xPubID,
 				Outputs: outputs.NewSpecifications(
 					&outputs.Paymail{
 						To:       "receiver@example.com",
@@ -60,7 +65,7 @@ func TestMapToEngine(t *testing.T) {
 	for name, test := range tests {
 		t.Run(name, func(t *testing.T) {
 			// when:
-			result, err := mappingsdraft.ToEngine(test.req)
+			result, err := mappingsdraft.ToEngine(xPubID, test.req)
 
 			// then:
 			require.NoError(t, err)

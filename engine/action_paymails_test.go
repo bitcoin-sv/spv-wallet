@@ -153,7 +153,7 @@ func (ts *EmbeddedDBTestSuite) TestClient_UpdatePaymailAddressMetadata() {
 
 			paymailAddress, err = tc.client.UpdatePaymailAddressMetadata(tc.ctx, testPaymail, Metadata{"test-key-new": "new-value"}, opts...)
 			require.NoError(t, err)
-			assert.Len(t, paymailAddress.Metadata, 4)
+			assert.Len(t, paymailAddress.Metadata, 1)
 			assert.Equal(t, "new-value", paymailAddress.Metadata["test-key-new"])
 
 			paymailAddress, err = tc.client.UpdatePaymailAddressMetadata(tc.ctx, testPaymail, Metadata{
@@ -163,15 +163,17 @@ func (ts *EmbeddedDBTestSuite) TestClient_UpdatePaymailAddressMetadata() {
 				"test-key-3":     nil,
 			}, opts...)
 			require.NoError(t, err)
-			assert.Len(t, paymailAddress.Metadata, 2)
-			assert.Equal(t, "new-value", paymailAddress.Metadata["test-key-new"])
+			assert.Len(t, paymailAddress.Metadata, 4)
+			assert.Equal(t, nil, paymailAddress.Metadata["test-key-1"])
+			assert.Equal(t, nil, paymailAddress.Metadata["test-key-2"])
+			assert.Equal(t, nil, paymailAddress.Metadata["test-key-3"])
 			assert.Equal(t, "new-value-2", paymailAddress.Metadata["test-key-new-2"])
 
 			var p2 *PaymailAddress
 			p2, err = getPaymailAddress(tc.ctx, testPaymail, opts...)
 			require.NoError(t, err)
 			require.NotNil(t, p2)
-			assert.Len(t, paymailAddress.Metadata, 2)
+			assert.Len(t, paymailAddress.Metadata, 4)
 		})
 	}
 }

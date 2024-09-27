@@ -745,6 +745,13 @@ const docTemplate = `{
                 "summary": "Update transaction metadata",
                 "parameters": [
                     {
+                        "type": "string",
+                        "description": "id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
                         "description": "Pass update transaction request model in the body with updated metadata",
                         "name": "UpdateTransactionRequest",
                         "in": "body",

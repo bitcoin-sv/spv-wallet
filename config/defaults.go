@@ -21,7 +21,7 @@ func getDefaultAppConfig() *AppConfig {
 		ImportBlockHeaders:   "",
 		Logging:              getLoggingDefaults(),
 		NewRelic:             getNewRelicDefaults(),
-		Nodes:                getNodesDefaults(),
+		ARC:                  getARCDefaults(),
 		Notifications:        getNotificationDefaults(),
 		Paymail:              getPaymailDefaults(),
 		BHS:                  getBHSDefaults(),
@@ -58,14 +58,6 @@ func getCacheDefaults() *CacheConfig {
 			URL:                   "redis://localhost:6379",
 			UseTLS:                false,
 		},
-	}
-}
-
-func getCallbackDefaults() *CallbackConfig {
-	return &CallbackConfig{
-		Enabled: false,
-		Host:    "https://example.com",
-		Token:   "",
 	}
 }
 
@@ -114,18 +106,18 @@ func getNewRelicDefaults() *NewRelicConfig {
 	}
 }
 
-func getNodesDefaults() *NodesConfig {
+func getARCDefaults() *ARCConfig {
 	depIDSufix, _ := uuid.NewUUID()
-	return &NodesConfig{
+	return &ARCConfig{
 		DeploymentID: "spv-wallet-" + depIDSufix.String(),
-		Callback:     getCallbackDefaults(),
-		Apis: []*ArcAPI{
-			{
-				ArcURL: "https://arc.taal.com",
-				Token:  "mainnet_06770f425eb00298839a24a49cbdc02c",
-			},
-		},
+		URL:          "https://arc.taal.com",
+		Token:        "mainnet_06770f425eb00298839a24a49cbdc02c",
 		UseFeeQuotes: true,
+		Callback: &CallbackConfig{
+			Enabled: false,
+			Host:    "https://example.com",
+			Token:   "",
+		},
 	}
 }
 
@@ -138,9 +130,9 @@ func getNotificationDefaults() *NotificationsConfig {
 func getPaymailDefaults() *PaymailConfig {
 	return &PaymailConfig{
 		Beef: &BeefConfig{
-			UseBeef:                               true,
-			BlockHeaderServiceHeaderValidationURL: "http://localhost:8080/api/v1/chain/merkleroot/verify",
-			BlockHeaderServiceAuthToken:           "mQZQ6WmxURxWz5ch", // #nosec G101
+			UseBeef:                                true,
+			BlockHeadersServiceHeaderValidationURL: "http://localhost:8080/api/v1/chain/merkleroot/verify",
+			BlockHeadersServiceAuthToken:           "mQZQ6WmxURxWz5ch", // #nosec G101
 		},
 		DefaultFromPaymail:      "from@domain.com",
 		Domains:                 []string{"localhost"},

@@ -7,11 +7,13 @@ import (
 	"testing"
 
 	sdk "github.com/bitcoin-sv/go-sdk/transaction"
-	"github.com/bitcoin-sv/spv-wallet/engine/tester"
-	"github.com/bitcoin-sv/spv-wallet/engine/tester/paymailmock"
+	"github.com/bitcoin-sv/spv-wallet/engine/tester/fixtures"
 	"github.com/bitcoin-sv/spv-wallet/engine/transaction"
 	"github.com/bitcoin-sv/spv-wallet/engine/transaction/draft"
 	"github.com/bitcoin-sv/spv-wallet/engine/transaction/draft/outputs"
+	"github.com/bitcoin-sv/spv-wallet/engine/transaction/draft/testabilities"
+	txerrors "github.com/bitcoin-sv/spv-wallet/engine/transaction/errors"
+	"github.com/bitcoin-sv/spv-wallet/models"
 	"github.com/bitcoin-sv/spv-wallet/models/request/opreturn"
 	"github.com/stretchr/testify/require"
 )
@@ -24,28 +26,28 @@ func TestCreateOpReturnDraft(t *testing.T) {
 		opReturn      *outputs.OpReturn
 		lockingScript string
 	}{
-		"for single string": {
+		"return draft for single string": {
 			opReturn: &outputs.OpReturn{
 				DataType: opreturn.DataTypeStrings,
 				Data:     []string{"Example data"},
 			},
 			lockingScript: "006a0c4578616d706c652064617461",
 		},
-		"for multiple strings": {
+		"return draft for multiple strings": {
 			opReturn: &outputs.OpReturn{
 				DataType: opreturn.DataTypeStrings,
 				Data:     []string{"Example", " ", "data"},
 			},
 			lockingScript: "006a074578616d706c6501200464617461",
 		},
-		"for single hex": {
+		"return draft for single hex": {
 			opReturn: &outputs.OpReturn{
 				DataType: opreturn.DataTypeHexes,
 				Data:     []string{toHex("Example data")},
 			},
 			lockingScript: "006a0c4578616d706c652064617461",
 		},
-		"for multiple hexes": {
+		"return draft for multiple hexes": {
 			opReturn: &outputs.OpReturn{
 				DataType: opreturn.DataTypeHexes,
 				Data:     []string{toHex("Example"), toHex(" "), toHex("data")},
@@ -54,12 +56,15 @@ func TestCreateOpReturnDraft(t *testing.T) {
 		},
 	}
 	for name, test := range successTests {
-		t.Run("return draft "+name, func(t *testing.T) {
+		t.Run(name, func(t *testing.T) {
+			given := testabilities.Given(t)
+
 			// given:
-			draftService := draft.NewDraftService(paymailmock.CreatePaymailClientService("test"), tester.Logger())
+			draftService := given.NewDraftTransactionService()
 
 			// and:
 			spec := &draft.TransactionSpec{
+				XPubID:  fixtures.Sender.XPubID,
 				Outputs: outputs.NewSpecifications(test.opReturn),
 			}
 
@@ -92,47 +97,50 @@ func TestCreateOpReturnDraft(t *testing.T) {
 
 	errorTests := map[string]struct {
 		spec          *outputs.OpReturn
-		expectedError string
+		expectedError models.SPVError
 	}{
-		"for no data in default type": {
+		"return error for no data in default type": {
 			spec:          &outputs.OpReturn{},
-			expectedError: "data is required for OP_RETURN output",
+			expectedError: txerrors.ErrDraftOpReturnDataRequired,
 		},
-		"for no data string type": {
+		"return error for no data string type": {
 			spec: &outputs.OpReturn{
 				DataType: opreturn.DataTypeStrings,
 			},
-			expectedError: "data is required for OP_RETURN output",
+			expectedError: txerrors.ErrDraftOpReturnDataRequired,
 		},
-		"for invalid hex": {
+		"return error for invalid hex": {
 			spec: &outputs.OpReturn{
 				DataType: opreturn.DataTypeHexes,
 				Data:     []string{"invalid hex"},
 			},
-			expectedError: "failed to decode hex",
+			expectedError: txerrors.ErrFailedToDecodeHex,
 		},
-		"for unknown data type": {
+		"return error for unknown data type": {
 			spec: &outputs.OpReturn{
 				DataType: 123,
 				Data:     []string{"Example", " ", "data"},
 			},
-			expectedError: "unsupported data type",
+			expectedError: txerrors.ErrDraftOpReturnUnsupportedDataType,
 		},
-		"for to big string": {
+		"return error for to big string": {
 			spec: &outputs.OpReturn{
 				DataType: opreturn.DataTypeStrings,
 				Data:     []string{strings.Repeat("1", maxOpPushDataSize+1)},
 			},
-			expectedError: "data is too large",
+			expectedError: txerrors.ErrDraftOpReturnDataTooLarge,
 		},
 	}
 	for name, test := range errorTests {
-		t.Run("return error "+name, func(t *testing.T) {
+		t.Run(name, func(t *testing.T) {
+			given := testabilities.Given(t)
+
 			// given:
-			draftService := draft.NewDraftService(paymailmock.CreatePaymailClientService("test"), tester.Logger())
+			draftService := given.NewDraftTransactionService()
 
 			// and:
 			spec := &draft.TransactionSpec{
+				XPubID:  fixtures.Sender.XPubID,
 				Outputs: outputs.NewSpecifications(test.spec),
 			}
 
@@ -141,7 +149,7 @@ func TestCreateOpReturnDraft(t *testing.T) {
 
 			// then:
 			require.Error(t, err)
-			require.ErrorContains(t, err, test.expectedError)
+			require.ErrorIs(t, err, test.expectedError)
 		})
 	}
 }

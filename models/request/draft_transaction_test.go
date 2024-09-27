@@ -7,6 +7,7 @@ import (
 	"strconv"
 	"testing"
 
+	"github.com/bitcoin-sv/spv-wallet/models/optional"
 	"github.com/bitcoin-sv/spv-wallet/models/request"
 	"github.com/bitcoin-sv/spv-wallet/models/request/opreturn"
 	paymailreq "github.com/bitcoin-sv/spv-wallet/models/request/paymail"
@@ -127,6 +128,27 @@ func TestDraft_TransactionJSON(t *testing.T) {
 					paymailreq.Output{
 						To:       "receiver@example.com",
 						Satoshis: 1000,
+					},
+				},
+			},
+		},
+		"Paymail output with sender": {
+			json: `{
+			  "outputs": [
+				{
+				  "type": "paymail",
+				  "to": "receiver@example.com",
+				  "satoshis": 1000,
+				  "from": "sender@example.com"
+				}
+			  ]
+			}`,
+			draft: &request.DraftTransaction{
+				Outputs: []request.Output{
+					paymailreq.Output{
+						To:       "receiver@example.com",
+						Satoshis: 1000,
+						From:     optional.Of("sender@example.com"),
 					},
 				},
 			},

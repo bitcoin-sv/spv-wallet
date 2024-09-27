@@ -387,8 +387,8 @@ if [ "$load_config" == "true" ]; then
         done < ".env.config"
 
         if [ -n "$paymail_domain" ]; then
-            SPVWALLET_NODES_CALLBACK_HOST="https://$paymail_domain"
-            print_debug "SPVWALLET_NODES_CALLBACK_HOST set to $SPVWALLET_NODES_CALLBACK_HOST"
+            SPVWALLET_ARC_CALLBACK_HOST="https://$paymail_domain"
+            print_debug "SPVWALLET_ARC_CALLBACK_HOST set to $SPVWALLET_ARC_CALLBACK_HOST"
         fi
 
         print_success "Config loaded from .env.config file"
@@ -530,10 +530,10 @@ if [ "$background" == "" ]; then
     print_debug "background: $background"
 fi
 
-# Set SPVWALLET_NODES_CALLBACK_HOST if paymail_domain is set
+# Set SPVWALLET_ARC_CALLBACK_HOST if paymail_domain is set
 if [ -n "$paymail_domain" ]; then
-    SPVWALLET_NODES_CALLBACK_HOST="https://$paymail_domain"
-    print_debug "SPVWALLET_NODES_CALLBACK_HOST set to $SPVWALLET_NODES_CALLBACK_HOST"
+    SPVWALLET_ARC_CALLBACK_HOST="https://$paymail_domain"
+    print_debug "SPVWALLET_ARC_CALLBACK_HOST set to $SPVWALLET_ARC_CALLBACK_HOST"
 fi
 
 # === SAVE CONFIG ===
@@ -556,7 +556,7 @@ save_to 'RUN_NAME' name
 save_to 'RUN_WITH_DEFAULT_XPUB' default_xpub
 save_to 'SPVWALLET_AUTH_ADMIN_KEY' admin_xpub
 save_to 'SPVWALLET_ADMIN_XPRIV' admin_xpriv
-save_to 'SPVWALLET_NODES_CALLBACK_HOST' SPVWALLET_NODES_CALLBACK_HOST
+save_to 'SPVWALLET_ARC_CALLBACK_HOST' SPVWALLET_ARC_CALLBACK_HOST
 
 if [ "$admin_panel" == "true" ] && [ "$default_xpub" == "true" ]; then
     {
@@ -595,9 +595,9 @@ if [ "$wallet_backend" == "true" ]; then
 fi
 
 if [ "$block_headers_service" == "true" ]; then
-  save_value 'SPVWALLET_PAYMAIL_BEEF_BLOCK_HEADER_SERVICE_URL' "http://block-headers-service:8080/api/v1/chain/merkleroot/verify"
+  save_value 'SPVWALLET_PAYMAIL_BEEF_BLOCK_HEADERS_SERVICE_URL' "http://block-headers-service:8080/api/v1/chain/merkleroot/verify"
 else
-  save_value 'SPVWALLET_PAYMAIL_BEEF_BLOCK_HEADER_SERVICE_URL' "http://host.docker.internal:8080/api/v1/chain/merkleroot/verify"
+  save_value 'SPVWALLET_PAYMAIL_BEEF_BLOCK_HEADERS_SERVICE_URL' "http://host.docker.internal:8080/api/v1/chain/merkleroot/verify"
 fi
 
 if [ "$expose" == "true" ]; then
