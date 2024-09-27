@@ -4,7 +4,6 @@ import (
 	"context"
 	"testing"
 
-	sdk "github.com/bitcoin-sv/go-sdk/transaction"
 	pmerrors "github.com/bitcoin-sv/spv-wallet/engine/paymail/errors"
 	tpaymail "github.com/bitcoin-sv/spv-wallet/engine/paymail/testabilities"
 	"github.com/bitcoin-sv/spv-wallet/engine/tester/fixtures"
@@ -16,8 +15,6 @@ import (
 	"github.com/bitcoin-sv/spv-wallet/models"
 	"github.com/bitcoin-sv/spv-wallet/models/bsv"
 	"github.com/bitcoin-sv/spv-wallet/models/optional"
-	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/require"
 )
 
 func TestCreatePaymailDraft(t *testing.T) {
@@ -26,7 +23,7 @@ func TestCreatePaymailDraft(t *testing.T) {
 	var sender = fixtures.Sender.DefaultPaymail()
 
 	t.Run("return draft with payment to valid paymail address", func(t *testing.T) {
-		given := testabilities.Given(t)
+		given, then := testabilities.New(t)
 
 		// given:
 		paymailHostResponse := given.ExternalRecipientHost().WillRespondWithP2PDestinationsWithSats(transactionSatoshiValue)
@@ -48,39 +45,22 @@ func TestCreatePaymailDraft(t *testing.T) {
 		draftTx, err := draftService.Create(context.Background(), spec)
 
 		// then:
-		require.NoError(t, err)
-		require.NotNil(t, draftTx)
+		thenTx := then.Created(draftTx).WithNoError(err).WithParseableBEEFHex()
 
-		// and:
-		annotations := draftTx.Annotations
-		require.Len(t, annotations.Outputs, 1)
+		thenTx.HasOutputs(1)
 
-		// and:
-		annotation := annotations.Outputs[0]
-		require.Equal(t, transaction.BucketBSV, annotation.Bucket)
-		require.NotNil(t, annotation.Paymail)
-		assert.Equal(t, recipient, annotation.Paymail.Receiver)
-		assert.Equal(t, paymailHostResponse.Reference, annotation.Paymail.Reference)
-		assert.Equal(t, sender, annotation.Paymail.Sender)
-
-		// debug:
-		t.Logf("BEEF: %s", draftTx.BEEF)
-
-		// when:
-		tx, err := sdk.NewTransactionFromBEEFHex(draftTx.BEEF)
-
-		// then:
-		require.NoError(t, err)
-		require.Len(t, tx.Outputs, 1)
-
-		// and:
-		output := tx.Outputs[0]
-		require.EqualValues(t, transactionSatoshiValue, output.Satoshis)
-		require.Equal(t, paymailHostResponse.Scripts[0], output.LockingScriptHex())
+		thenTx.Output(0).
+			HasBucket(transaction.BucketBSV).
+			HasSatoshis(transactionSatoshiValue).
+			HasLockingScript(paymailHostResponse.Scripts[0]).
+			IsPaymail().
+			HasReceiver(recipient).
+			HasSender(sender).
+			HasReference(paymailHostResponse.Reference)
 	})
 
 	t.Run("return draft with payment with multiple outputs from valid paymail address", func(t *testing.T) {
-		given := testabilities.Given(t)
+		given, then := testabilities.New(t)
 
 		// given:
 		const firstOutputSatoshiValue = bsv.Satoshis(1)
@@ -107,46 +87,31 @@ func TestCreatePaymailDraft(t *testing.T) {
 		draftTx, err := draftService.Create(context.Background(), spec)
 
 		// then:
-		require.NoError(t, err)
-		require.NotNil(t, draftTx)
+		thenTx := then.Created(draftTx).WithNoError(err).WithParseableBEEFHex()
 
-		// and:
-		annotations := draftTx.Annotations
-		require.Len(t, annotations.Outputs, 2)
+		thenTx.HasOutputs(2)
 
-		// and:
-		annotation := annotations.Outputs[0]
-		assert.Equal(t, transaction.BucketBSV, annotation.Bucket)
-		require.NotNil(t, annotation.Paymail)
-		assert.Equal(t, paymailHostResponse.Reference, annotation.Paymail.Reference)
-		assert.Equal(t, recipient, annotation.Paymail.Receiver)
-		assert.Equal(t, sender, annotation.Paymail.Sender)
+		thenTx.Output(0).
+			HasBucket(transaction.BucketBSV).
+			HasSatoshis(firstOutputSatoshiValue).
+			HasLockingScript(paymailHostResponse.Scripts[0]).
+			IsPaymail().
+			HasReceiver(recipient).
+			HasSender(sender).
+			HasReference(paymailHostResponse.Reference)
 
-		// and:
-		annotation = annotations.Outputs[1]
-		assert.Equal(t, transaction.BucketBSV, annotation.Bucket)
-		require.NotNil(t, annotation.Paymail)
-		assert.Equal(t, paymailHostResponse.Reference, annotation.Paymail.Reference)
-		assert.Equal(t, recipient, annotation.Paymail.Receiver)
-		assert.Equal(t, sender, annotation.Paymail.Sender)
-
-		// debug:
-		t.Logf("BEEF: %s", draftTx.BEEF)
-
-		// when:
-		tx, err := sdk.NewTransactionFromBEEFHex(draftTx.BEEF)
-
-		// then:
-		require.NoError(t, err)
-		require.Len(t, tx.Outputs, 2)
-		require.EqualValues(t, firstOutputSatoshiValue, tx.Outputs[0].Satoshis)
-		require.Equal(t, paymailHostResponse.Scripts[0], tx.Outputs[0].LockingScriptHex())
-		require.EqualValues(t, secondOutputSatoshiValue, tx.Outputs[1].Satoshis)
-		require.Equal(t, paymailHostResponse.Scripts[1], tx.Outputs[1].LockingScriptHex())
+		thenTx.Output(1).
+			HasBucket(transaction.BucketBSV).
+			HasSatoshis(secondOutputSatoshiValue).
+			HasLockingScript(paymailHostResponse.Scripts[1]).
+			IsPaymail().
+			HasReceiver(recipient).
+			HasSender(sender).
+			HasReference(paymailHostResponse.Reference)
 	})
 
 	t.Run("return draft with default paymail in sender annotation", func(t *testing.T) {
-		given := testabilities.Given(t)
+		given, then := testabilities.New(t)
 
 		// given:
 		given.ExternalRecipientHost().WillRespondWithP2PDestinationsWithSats(transactionSatoshiValue)
@@ -167,14 +132,10 @@ func TestCreatePaymailDraft(t *testing.T) {
 		draftTx, err := draftService.Create(context.Background(), spec)
 
 		// then:
-		require.NoError(t, err)
-		require.NotNil(t, draftTx)
-
-		// and:
-		annotation := draftTx.Annotations.Outputs[0]
-
-		// then:
-		assert.Equal(t, fixtures.UserWithMorePaymails.DefaultPaymail(), annotation.Paymail.Sender)
+		then.Created(draftTx).WithNoError(err).WithParseableBEEFHex().
+			Output(0).
+			IsPaymail().
+			HasSender(fixtures.UserWithMorePaymails.DefaultPaymail())
 	})
 
 	errorTests := map[string]struct {
@@ -301,7 +262,7 @@ func TestCreatePaymailDraft(t *testing.T) {
 	}
 	for name, test := range errorTests {
 		t.Run(name, func(t *testing.T) {
-			given := testabilities.Given(t)
+			given, then := testabilities.New(t)
 
 			// given:
 			given.ExternalRecipientHost().WillRespondWithP2PDestinationsWithSats(transactionSatoshiValue)
@@ -319,9 +280,7 @@ func TestCreatePaymailDraft(t *testing.T) {
 			tx, err := draftService.Create(context.Background(), spec)
 
 			// then:
-			require.Error(t, err)
-			require.ErrorIs(t, err, test.expectedError)
-			require.Nil(t, tx)
+			then.Created(tx).WithError(err).ThatIs(test.expectedError)
 		})
 	}
 
@@ -368,7 +327,7 @@ func TestCreatePaymailDraft(t *testing.T) {
 	}
 	for name, test := range paymailErrorTests {
 		t.Run(name, func(t *testing.T) {
-			given := testabilities.Given(t)
+			given, then := testabilities.New(t)
 
 			// given:
 			test.paymailHostScenario(given.ExternalRecipientHost())
@@ -389,9 +348,7 @@ func TestCreatePaymailDraft(t *testing.T) {
 			tx, err := draftService.Create(context.Background(), spec)
 
 			// then:
-			require.Error(t, err)
-			require.ErrorIs(t, err, test.expectedError)
-			require.Nil(t, tx)
+			then.Created(tx).WithError(err).ThatIs(test.expectedError)
 		})
 	}
 }
