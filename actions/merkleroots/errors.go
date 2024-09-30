@@ -16,8 +16,8 @@ var ErrBHSParsingResponse = models.SPVError{Message: "cannot parse Block Header 
 // ErrInvalidBatchSize is when Block Header Service request contains incorrect batch size query param
 var ErrInvalidBatchSize = models.SPVError{Message: "batchSize must be 0 or a positive integer", StatusCode: 400, Code: "error-invalid-batch-size"}
 
-// ErrBHSMerkleRootNotFound is when Block Header Service cannot find requested merkleroot in lastEvaluatedKey query param
-var ErrBHSMerkleRootNotFound = models.SPVError{Message: "No block with provided merkleroot was found", StatusCode: 404, Code: "error-bhs-merkleroot-not-found"}
+// ErrMerkleRootNotFound is when Block Header Service cannot find requested merkleroot in lastEvaluatedKey query param
+var ErrMerkleRootNotFound = models.SPVError{Message: "No block with provided merkleroot was found", StatusCode: 404, Code: "error-merkleroot-not-found"}
 
-// ErrBHSMerkleRootNotInLongestChain is when Block Header Service finds merkleroot in lastEvaluateKey query param but it is not in longest chain
-var ErrBHSMerkleRootNotInLongestChain = models.SPVError{Message: "Provided merkleroot is not part of the longest chain", StatusCode: 409, Code: "error-bhs-merkleroot-not-part-of-longest-chain"}
+// ErrMerkleRootNotInLongestChain is when Block Header Service finds merkleroot in lastEvaluateKey query param but it is not in longest chain
+var ErrMerkleRootNotInLongestChain = models.SPVError{Message: "Provided merkleroot is not part of the longest chain", StatusCode: 409, Code: "error-merkleroot-not-part-of-longest-chain"}

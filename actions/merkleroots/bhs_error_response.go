@@ -27,9 +27,9 @@ func mapBHSErrorResponseToSpverror(res *resty.Response) error {
 	case "ErrInvalidBatchSize":
 		err = ErrInvalidBatchSize
 	case "ErrMerkleRootNotFound":
-		err = ErrBHSMerkleRootNotFound
+		err = ErrMerkleRootNotFound
 	case "ErrMerkleRootNotInLC":
-		err = ErrBHSMerkleRootNotInLongestChain
+		err = ErrMerkleRootNotInLongestChain
 	default:
 		spvErr := models.SPVError{
 			Message:    responseErr.Message,
