@@ -8,5 +8,5 @@ import (
 // RegisterRoutes creates the specific package routes
 func RegisterRoutes(appConfig *config.AppConfig, handlersManager *handlers.Manager) {
 	group := handlersManager.Group(handlers.GroupAPI, "/merkleroots")
-	group.GET("", handlers.AsUserWithAppConfig(get, appConfig))
+	group.GET("", handlers.AsUser(get))
 }

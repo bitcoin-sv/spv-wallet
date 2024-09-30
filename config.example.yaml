@@ -91,6 +91,8 @@ block_headers_service:
   auth_token: mQZQ6WmxURxWz5ch
   # URL used to communicate with Block Headers Service (BHS)
   url: http://localhost:8080
+  # api version of Block Headers Service api to use
+  api_version: v1
 paymail:
   beef:
     block_headers_service_auth_token: mQZQ6WmxURxWz5ch

@@ -12,8 +12,9 @@ func TestBHSConfig_Validate(t *testing.T) {
 
 	t.Run("no auth token", func(t *testing.T) {
 		b := BHSConfig{
-			AuthToken: "",
-			URL:       "http://localhost:8080",
+			AuthToken:  "",
+			URL:        "http://localhost:8080",
+			APIVersion: "v1",
 		}
 
 		err := b.Validate()
@@ -22,8 +23,20 @@ func TestBHSConfig_Validate(t *testing.T) {
 
 	t.Run("no url", func(t *testing.T) {
 		b := BHSConfig{
-			AuthToken: "token",
-			URL:       "",
+			AuthToken:  "token",
+			APIVersion: "v1",
+			URL:        "",
+		}
+
+		err := b.Validate()
+		require.Error(t, err)
+	})
+
+	t.Run("no api version", func(t *testing.T) {
+		b := BHSConfig{
+			AuthToken:  "token",
+			URL:        "http://localhost:8080",
+			APIVersion: "",
 		}
 
 		err := b.Validate()
@@ -39,8 +52,9 @@ func TestBHSConfig_Validate(t *testing.T) {
 
 	t.Run("full config", func(t *testing.T) {
 		b := BHSConfig{
-			AuthToken: "token",
-			URL:       "http://localhost:8080",
+			AuthToken:  "token",
+			URL:        "http://localhost:8080",
+			APIVersion: "v1",
 		}
 
 		err := b.Validate()

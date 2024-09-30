@@ -215,6 +215,8 @@ type BHSConfig struct {
 	AuthToken string `json:"auth_token" mapstructure:"auth_token"`
 	// URL is the URL used to communicate with Block Headers Service (BHS)
 	URL string `json:"url" mapstructure:"url"`
+	// APIVersion is the api version BHS uses
+	APIVersion string `json:"apiVersion" mapstructure:"api_version"`
 }
 
 func (b *BeefConfig) enabled() bool {

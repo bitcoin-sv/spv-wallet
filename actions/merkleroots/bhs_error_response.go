@@ -5,34 +5,31 @@ import (
 
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/bitcoin-sv/spv-wallet/models"
-	"github.com/gin-gonic/gin"
 	"github.com/go-resty/resty/v2"
-	"github.com/rs/zerolog"
 )
 
-type bHSErrorResponse struct {
+type bhsErrorResponse struct {
 	Code    string `json:"code"`
 	Message string `json:"message"`
 }
 
 // mapBHSErrorResponseToSpverror is a method that will check what kind of response came back from
 // Block Header Service and map it to spverror and set it to context
-func mapBHSErrorResponseToSpverror(ctx *gin.Context, res *resty.Response, logger *zerolog.Logger) {
-	var responseErr bHSErrorResponse
+func mapBHSErrorResponseToSpverror(res *resty.Response) error {
+	var responseErr bhsErrorResponse
 
 	err := json.Unmarshal(res.Body(), &responseErr)
 	if err != nil {
-		spverrors.ErrorResponse(ctx, spverrors.ErrBHSParsingResponse, logger)
-		return
+		return ErrBHSParsingResponse.Wrap(err)
 	}
 
 	switch responseErr.Code {
 	case "ErrInvalidBatchSize":
-		err = spverrors.ErrBHSInvalidBatchSize
+		err = ErrInvalidBatchSize
 	case "ErrMerkleRootNotFound":
-		err = spverrors.ErrBHSMerkleRootNotFound
+		err = ErrBHSMerkleRootNotFound
 	case "ErrMerkleRootNotInLC":
-		err = spverrors.ErrBHSMerkleRootNotInLC
+		err = ErrBHSMerkleRootNotInLongestChain
 	default:
 		spvErr := models.SPVError{
 			Message:    responseErr.Message,
@@ -42,5 +39,5 @@ func mapBHSErrorResponseToSpverror(ctx *gin.Context, res *resty.Response, logger
 		err = spverrors.ErrInternal.Wrap(spvErr)
 	}
 
-	spverrors.ErrorResponse(ctx, err, logger)
+	return err
 }
