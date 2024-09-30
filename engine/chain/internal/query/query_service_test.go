@@ -26,7 +26,7 @@ func TestQueryService(t *testing.T) {
 		expectStatus string
 		applyTimeout timeoutDst
 	}{
-		"Query for MINED transaction": {
+		"QueryTransaction for MINED transaction": {
 			txID:         minedTxID,
 			arcToken:     arcToken,
 			arcURL:       arcURL,
@@ -34,42 +34,42 @@ func TestQueryService(t *testing.T) {
 			expectTxID:   minedTxID,
 			expectStatus: "MINED",
 		},
-		"Query for unknown transaction": {
+		"QueryTransaction for unknown transaction": {
 			txID:      unknownTxID,
 			arcToken:  arcToken,
 			arcURL:    arcURL,
 			expectErr: nil,
 			expectNil: true,
 		},
-		"Query for invalid transaction": {
+		"QueryTransaction for invalid transaction": {
 			txID:      "invalid",
 			arcToken:  arcToken,
 			arcURL:    arcURL,
 			expectErr: spverrors.ErrInvalidTransactionID,
 			expectNil: true,
 		},
-		"Query with wrong token": {
+		"QueryTransaction with wrong token": {
 			txID:      minedTxID,
 			arcToken:  "wrong-token",
 			arcURL:    arcURL,
 			expectErr: spverrors.ErrARCUnauthorized,
 			expectNil: true,
 		},
-		"Query 404 endpoint but reachable": {
+		"QueryTransaction 404 endpoint but reachable": {
 			txID:      minedTxID,
 			arcToken:  arcToken,
 			arcURL:    arcURL + wrongButReachable,
 			expectErr: spverrors.ErrARCUnreachable,
 			expectNil: true,
 		},
-		"Query 404 endpoint with wrong arcURL": {
+		"QueryTransaction 404 endpoint with wrong arcURL": {
 			txID:      minedTxID,
 			arcToken:  arcToken,
 			arcURL:    "wrong-url",
 			expectErr: spverrors.ErrARCUnreachable,
 			expectNil: true,
 		},
-		"Query interrupted by ctx timeout": {
+		"QueryTransaction interrupted by ctx timeout": {
 			txID:         minedTxID,
 			arcToken:     arcToken,
 			arcURL:       arcURL,
@@ -77,7 +77,7 @@ func TestQueryService(t *testing.T) {
 			expectNil:    true,
 			applyTimeout: applyTimeoutCtx,
 		},
-		"Query interrupted by resty timeout": {
+		"QueryTransaction interrupted by resty timeout": {
 			txID:         minedTxID,
 			arcToken:     arcToken,
 			arcURL:       arcURL,
@@ -103,7 +103,7 @@ func TestQueryService(t *testing.T) {
 				service.httpClient.SetTimeout(1 * time.Millisecond)
 			}
 
-			txInfo, err := service.Query(ctx, tc.txID)
+			txInfo, err := service.QueryTransaction(ctx, tc.txID)
 
 			if tc.expectErr != nil {
 				require.Error(t, err)

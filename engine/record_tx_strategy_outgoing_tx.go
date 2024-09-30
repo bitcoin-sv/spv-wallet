@@ -151,7 +151,7 @@ func _handleNotifyP2PError(ctx context.Context, c ClientInterface, transaction *
 		}
 	}
 
-	txInfo, err := c.Chain().Query(ctx, transaction.ID)
+	txInfo, err := c.Chain().QueryTransaction(ctx, transaction.ID)
 	if err != nil {
 		saveAsProblematic()
 		return p2pError.Wrap(err)

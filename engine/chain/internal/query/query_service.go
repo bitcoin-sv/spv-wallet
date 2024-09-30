@@ -34,8 +34,8 @@ func NewQueryService(logger zerolog.Logger, httpClient *resty.Client, url, token
 	}
 }
 
-// Query a transaction.
-func (s *Service) Query(ctx context.Context, txID string) (*chainmodels.TXInfo, error) {
+// QueryTransaction a transaction.
+func (s *Service) QueryTransaction(ctx context.Context, txID string) (*chainmodels.TXInfo, error) {
 	if !s.validateTX(txID) {
 		return nil, spverrors.ErrInvalidTransactionID
 	}
