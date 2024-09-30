@@ -6,6 +6,7 @@ import (
 	"syscall"
 
 	"github.com/bitcoin-sv/spv-wallet/config"
+	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/go-resty/resty/v2"
 	"github.com/rs/zerolog"
 )
@@ -32,7 +33,7 @@ func getMerkleRootsFromBHS(client *resty.Client, appConfig *config.AppConfig, lo
 		if errors.Is(err, syscall.ECONNREFUSED) {
 			return nil, ErrBHSUnreachable.Wrap(err)
 		}
-		return nil, err
+		return nil, spverrors.ErrInternal.Wrap(err)
 	}
 	if !res.IsSuccess() {
 		return nil, mapBHSErrorResponseToSpverror(res)
