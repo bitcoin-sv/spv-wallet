@@ -377,16 +377,16 @@ var ErrBroadcastWrongBUMPResponse = models.SPVError{Message: "broadcast server r
 var ErrBroadcastRejectedTransaction = models.SPVError{Message: "broadcast rejected transaction", StatusCode: 400, Code: "error-broadcast-rejected-transaction"}
 
 // ErrARCUnreachable is when ARC cannot be requested
-var ErrARCUnreachable = models.SPVError{Message: "ARC cannot be requested", StatusCode: 404, Code: "error-broadcast-unreachable"}
+var ErrARCUnreachable = models.SPVError{Message: "ARC cannot be requested", StatusCode: 500, Code: "error-broadcast-unreachable"}
 
 // ErrARCUnauthorized is when ARC returns unauthorized
-var ErrARCUnauthorized = models.SPVError{Message: "ARC returned unauthorized", StatusCode: 401, Code: "error-broadcast-unauthorized"}
+var ErrARCUnauthorized = models.SPVError{Message: "ARC returned unauthorized", StatusCode: 500, Code: "error-broadcast-unauthorized"}
 
 // ErrARCParseResponse is when ARC response cannot be parsed
-var ErrARCParseResponse = models.SPVError{Message: "ARC response cannot be parsed", StatusCode: 400, Code: "error-broadcast-parse-response"}
+var ErrARCParseResponse = models.SPVError{Message: "ARC response cannot be parsed", StatusCode: 500, Code: "error-broadcast-parse-response"}
 
 // ErrARCGenericError is when ARC returns generic error (according to documentation - status code: 409)
-var ErrARCGenericError = models.SPVError{Message: "ARC returned generic error", StatusCode: 409, Code: "error-broadcast-generic-error"}
+var ErrARCGenericError = models.SPVError{Message: "ARC returned generic error", StatusCode: 500, Code: "error-broadcast-generic-error"}
 
 // ErrARCUnsupportedStatusCode is when ARC returns unsupported status code
-var ErrARCUnsupportedStatusCode = models.SPVError{Message: "ARC returned unsupported status code", StatusCode: 400, Code: "error-broadcast-unsupported-status-code"}
+var ErrARCUnsupportedStatusCode = models.SPVError{Message: "ARC returned unsupported status code", StatusCode: 500, Code: "error-broadcast-unsupported-status-code"}

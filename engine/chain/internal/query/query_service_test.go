@@ -2,17 +2,17 @@ package query
 
 import (
 	"context"
+	"github.com/bitcoin-sv/spv-wallet/engine/tester"
 	"testing"
 	"time"
 
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/google/uuid"
-	"github.com/rs/zerolog"
 	"github.com/stretchr/testify/require"
 )
 
 func TestQueryService(t *testing.T) {
-	logger := zerolog.New(zerolog.NewConsoleWriter(zerolog.ConsoleTestWriter(t)))
+	logger := tester.Logger(t)
 	deepSuffix, _ := uuid.NewUUID()
 	deploymentID := "spv-wallet-" + deepSuffix.String()
 

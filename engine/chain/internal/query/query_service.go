@@ -71,7 +71,7 @@ func (s *Service) QueryTransaction(ctx context.Context, txID string) (*chainmode
 	case http.StatusNotFound:
 		if _, ok := s.asARCError(response); ok {
 			// ARC returns 404 when transaction is not found
-			return nil, nil
+			return nil, nil // By convention, nil is returned when transaction is not found
 		}
 		return nil, spverrors.ErrARCUnreachable
 	case http.StatusConflict:
