@@ -2,11 +2,11 @@ package query
 
 import (
 	"context"
-	"github.com/bitcoin-sv/spv-wallet/engine/tester"
 	"testing"
 	"time"
 
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
+	"github.com/bitcoin-sv/spv-wallet/engine/tester"
 	"github.com/google/uuid"
 	"github.com/stretchr/testify/require"
 )
