@@ -6,6 +6,7 @@ import (
 	"github.com/bitcoin-sv/spv-wallet/actions/base"
 	"github.com/bitcoin-sv/spv-wallet/actions/contacts"
 	"github.com/bitcoin-sv/spv-wallet/actions/destinations"
+	"github.com/bitcoin-sv/spv-wallet/actions/merkleroots"
 	"github.com/bitcoin-sv/spv-wallet/actions/sharedconfig"
 	"github.com/bitcoin-sv/spv-wallet/actions/transactions"
 	"github.com/bitcoin-sv/spv-wallet/actions/users"
@@ -24,6 +25,7 @@ func Register(appConfig *config.AppConfig, handlersManager *handlers.Manager) {
 	utxos.RegisterRoutes(handlersManager)
 	users.RegisterRoutes(handlersManager)
 	sharedconfig.RegisterRoutes(handlersManager)
+	merkleroots.RegisterRoutes(appConfig, handlersManager)
 	if appConfig.ExperimentalFeatures.PikeContactsEnabled {
 		contacts.RegisterRoutes(handlersManager)
 	}
