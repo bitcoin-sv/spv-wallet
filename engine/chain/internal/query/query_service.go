@@ -39,11 +39,13 @@ func (s *Service) QueryTransaction(ctx context.Context, txID string) (*chainmode
 	if !s.validateTX(txID) {
 		return nil, spverrors.ErrInvalidTransactionID
 	}
+	result := &chainmodels.TXInfo{}
+	errResult := &chainmodels.ArcError{}
 	req := s.httpClient.R().
 		SetContext(ctx).
 		SetHeader("Content-Type", "application/json").
-		SetResult(&chainmodels.TXInfo{}).
-		SetError(&chainmodels.ArcError{})
+		SetResult(result).
+		SetError(errResult)
 
 	if s.token != "" {
 		req.SetHeader("Authorization", s.token)
@@ -65,42 +67,26 @@ func (s *Service) QueryTransaction(ctx context.Context, txID string) (*chainmode
 
 	switch response.StatusCode() {
 	case http.StatusOK:
-		return response.Result().(*chainmodels.TXInfo), nil
+		return result, nil
 	case http.StatusUnauthorized, http.StatusForbidden:
-		return nil, s.withArcError(response, spverrors.ErrARCUnauthorized)
+		return nil, s.withArcError(errResult, spverrors.ErrARCUnauthorized)
 	case http.StatusNotFound:
-		if _, ok := s.asARCError(response); ok {
+		if !errResult.IsEmpty() {
 			// ARC returns 404 when transaction is not found
 			return nil, nil // By convention, nil is returned when transaction is not found
 		}
 		return nil, spverrors.ErrARCUnreachable
 	case http.StatusConflict:
-		return nil, s.withArcError(response, spverrors.ErrARCGenericError)
+		return nil, s.withArcError(errResult, spverrors.ErrARCGenericError)
 	}
 
-	return nil, s.withArcError(response, spverrors.ErrARCUnsupportedStatusCode)
+	return nil, s.withArcError(errResult, spverrors.ErrARCUnsupportedStatusCode)
 }
 
 func (s *Service) validateTX(txID string) bool {
 	return len(txID) >= 50
 }
 
-func (s *Service) withArcError(response *resty.Response, baseError models.SPVError) error {
-	arcErr, ok := s.asARCError(response)
-	if !ok {
-		return baseError.Wrap(spverrors.ErrARCParseResponse)
-	}
-	return baseError.Wrap(arcErr)
-}
-
-func (s *Service) asARCError(response *resty.Response) (*chainmodels.ArcError, bool) {
-	if response == nil || response.Error() == nil {
-		return nil, false
-	}
-
-	arcErr := response.Error().(*chainmodels.ArcError)
-	if arcErr.IsEmpty() {
-		return nil, false
-	}
-	return arcErr, true
+func (s *Service) withArcError(errResult *chainmodels.ArcError, baseError models.SPVError) error {
+	return baseError.Wrap(errResult)
 }
