@@ -87,6 +87,10 @@ linters-settings:
       - spverrors\.(Newf|Wrapf)
     ignorePackageGlobs:
       - "github.com/go-ozzo/ozzo-validation"
+  revive:
+    rules:
+      - name: exported
+        exclude: "**/testabilities/**"
 
 issues:
   # List of regexps of issue texts to exclude, empty list by default.
