@@ -18,26 +18,24 @@ type bhsErrorResponse struct {
 func mapBHSErrorResponseToSpverror(res *resty.Response) error {
 	var responseErr bhsErrorResponse
 
-	err := json.Unmarshal(res.Body(), &responseErr)
-	if err != nil {
+	if err := json.Unmarshal(res.Body(), &responseErr); err != nil {
 		return ErrBHSParsingResponse.Wrap(err)
 	}
 
 	switch responseErr.Code {
 	case "ErrInvalidBatchSize":
-		err = ErrInvalidBatchSize
+		return ErrInvalidBatchSize
 	case "ErrMerkleRootNotFound":
-		err = ErrMerkleRootNotFound
+		return ErrMerkleRootNotFound
 	case "ErrMerkleRootNotInLC":
-		err = ErrMerkleRootNotInLongestChain
+		return ErrMerkleRootNotInLongestChain
 	default:
 		spvErr := models.SPVError{
 			Message:    responseErr.Message,
 			StatusCode: res.StatusCode(),
 			Code:       responseErr.Code,
 		}
-		err = spverrors.ErrInternal.Wrap(spvErr)
+		return spverrors.ErrInternal.Wrap(spvErr)
 	}
 
-	return err
 }
