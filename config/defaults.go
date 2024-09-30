@@ -143,9 +143,8 @@ func getPaymailDefaults() *PaymailConfig {
 
 func getBHSDefaults() *BHSConfig {
 	return &BHSConfig{
-		AuthToken:  "mQZQ6WmxURxWz5ch",
-		URL:        "http://localhost:8080",
-		APIVersion: "v1",
+		AuthToken: "mQZQ6WmxURxWz5ch",
+		URL:       "http://localhost:8080",
 	}
 }
 

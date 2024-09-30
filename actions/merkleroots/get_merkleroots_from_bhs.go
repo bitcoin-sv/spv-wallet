@@ -22,6 +22,8 @@ func getMerkleRootsFromBHS(client *resty.Client, appConfig *config.AppConfig, lo
 
 	if appConfig.BHS.AuthToken != "" {
 		req.SetAuthToken(appConfig.BHS.AuthToken)
+	} else {
+		logger.Warn().Msg("warning creating Block Headers Service url - auth token is not set. Some requests might not work")
 	}
 
 	var response any
@@ -48,11 +50,8 @@ func createBHSURL(appConfig *config.AppConfig, endpointPath string, logger *zero
 	if appConfig.BHS.URL == "" {
 		logger.Error().Msgf("create Block Header Service URL - url not configured")
 	}
-	if appConfig.BHS.AuthToken == "" {
-		logger.Warn().Msg("warning creating Block Headers Service url - auth token is not set. Some requests might not work")
-	}
 
-	url, err := url.Parse(appConfig.BHS.URL + "/api/" + appConfig.BHS.APIVersion + endpointPath)
+	url, err := url.Parse(appConfig.BHS.URL + "/api/v1" + endpointPath)
 	if err != nil {
 		return nil, ErrBHSBadURL.Wrap(err)
 	}

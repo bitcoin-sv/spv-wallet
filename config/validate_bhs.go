@@ -12,9 +12,5 @@ func (b *BHSConfig) Validate() error {
 		return spverrors.Newf("bhs url is required")
 	}
 
-	if b.APIVersion == "" {
-		return spverrors.Newf("bhs api version is required")
-	}
-
 	return nil
 }

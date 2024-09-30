@@ -2,8 +2,6 @@ package merkleroots
 
 import "github.com/bitcoin-sv/spv-wallet/models"
 
-// ////////////////////////////////// BLOCK HEADER SERVICE ERRORS
-
 // ErrBHSUnreachable is when Block Header Service (BHS) doesn't respond to status check
 var ErrBHSUnreachable = models.SPVError{Message: "Block Header Service cannot be requested", StatusCode: 500, Code: "error-bhs-unreachable"}
 
