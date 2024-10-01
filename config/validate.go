@@ -16,10 +16,6 @@ func (a *AppConfig) Validate() error {
 		return err
 	}
 
-	if err = a.NewRelic.Validate(); err != nil {
-		return err
-	}
-
 	if err = a.Paymail.Validate(); err != nil {
 		return err
 	}

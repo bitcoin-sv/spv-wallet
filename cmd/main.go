@@ -53,9 +53,6 @@ func main() {
 	// Try to ping the Block Headers Service if enabled
 	appConfig.CheckBlockHeadersService(context.Background(), services.Logger)
 
-	// @mrz New Relic is ready at this point
-	txn := services.NewRelic.StartTransaction("load_server")
-
 	// (debugging: show services that are enabled or not)
 	if appConfig.Debug {
 		services.Logger.Debug().Msgf(
@@ -63,7 +60,6 @@ func main() {
 			appConfig.Db.Datastore.Engine.String(),
 			appConfig.Cache.Engine.String(),
 			appConfig.TaskManager.Factory.String(),
-			appConfig.NewRelic.Enabled,
 		)
 	}
 
@@ -85,9 +81,6 @@ func main() {
 
 		close(idleConnectionsClosed)
 	}()
-
-	// End new relic txn
-	txn.End()
 
 	// Listen and serve
 	services.Logger.Debug().Msgf("starting %s server version %s at port %d...", config.ApplicationName, config.Version, appConfig.Server.Port)

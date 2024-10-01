@@ -4,10 +4,11 @@ package config
 import (
 	"time"
 
+	"github.com/mrz1836/go-cachestore"
+
 	"github.com/bitcoin-sv/spv-wallet/engine/cluster"
 	"github.com/bitcoin-sv/spv-wallet/engine/datastore"
 	"github.com/bitcoin-sv/spv-wallet/engine/taskmanager"
-	"github.com/mrz1836/go-cachestore"
 )
 
 // Config constants used for spv-wallet
@@ -25,8 +26,6 @@ const (
 
 // AppConfig is the configuration values and associated env vars
 type AppConfig struct {
-	// NewRelic is New Relic related settings.
-	NewRelic *NewRelicConfig `json:"new_relic" mapstructure:"new_relic"`
 	// TaskManager is a configuration for Task Manager in SPV Wallet.
 	TaskManager *TaskManagerConfig `json:"task_manager" mapstructure:"task_manager"`
 	// Authentication is the configuration for keys authentication in SPV Wallet.

@@ -3,8 +3,9 @@ package config
 import (
 	"time"
 
-	"github.com/bitcoin-sv/spv-wallet/engine/datastore"
 	"github.com/google/uuid"
+
+	"github.com/bitcoin-sv/spv-wallet/engine/datastore"
 )
 
 // DefaultAdminXpub is the default admin xpub used for authenticate requests.
@@ -20,7 +21,6 @@ func getDefaultAppConfig() *AppConfig {
 		DisableITC:           true,
 		ImportBlockHeaders:   "",
 		Logging:              getLoggingDefaults(),
-		NewRelic:             getNewRelicDefaults(),
 		ARC:                  getARCDefaults(),
 		Notifications:        getNotificationDefaults(),
 		Paymail:              getPaymailDefaults(),
@@ -95,14 +95,6 @@ func getLoggingDefaults() *LoggingConfig {
 		Format:       "console",
 		InstanceName: "spv-wallet",
 		LogOrigin:    false,
-	}
-}
-
-func getNewRelicDefaults() *NewRelicConfig {
-	return &NewRelicConfig{
-		DomainName: "domain.com",
-		Enabled:    false,
-		LicenseKey: "BOGUS-LICENSE-KEY-1234567890987654321234",
 	}
 }
 

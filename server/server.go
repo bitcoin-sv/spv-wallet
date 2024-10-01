@@ -7,6 +7,10 @@ import (
 	"net/http"
 	"strconv"
 
+	"github.com/gin-contrib/pprof"
+	"github.com/gin-gonic/gin"
+	"github.com/rs/zerolog"
+
 	"github.com/bitcoin-sv/spv-wallet/actions"
 	"github.com/bitcoin-sv/spv-wallet/config"
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
@@ -14,9 +18,6 @@ import (
 	"github.com/bitcoin-sv/spv-wallet/metrics"
 	"github.com/bitcoin-sv/spv-wallet/server/handlers"
 	"github.com/bitcoin-sv/spv-wallet/server/middleware"
-	"github.com/gin-contrib/pprof"
-	"github.com/gin-gonic/gin"
-	"github.com/rs/zerolog"
 )
 
 // Server is the configuration, services, and actual web server
@@ -83,11 +84,6 @@ func (s *Server) Shutdown(ctx context.Context) error {
 
 // Handlers will return handlers
 func (s *Server) Handlers() *gin.Engine {
-	// Start a transaction for loading handlers
-	txn := s.Services.NewRelic.StartTransaction("load_handlers")
-	defer txn.End()
-
-	segment := txn.StartSegment("create_router")
 
 	httpLogger := s.Services.Logger.With().Str("service", "http-server").Logger()
 	if httpLogger.GetLevel() > zerolog.DebugLevel {
@@ -105,11 +101,6 @@ func (s *Server) Handlers() *gin.Engine {
 	engine.NoMethod(MethodNotAllowed)
 
 	s.Router = engine
-
-	segment.End()
-
-	// Start the segment
-	defer txn.StartSegment("register_handlers").End()
 
 	setupServerRoutes(s.AppConfig, s.Services, s.Router)
 

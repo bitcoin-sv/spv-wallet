@@ -8,9 +8,12 @@ import (
 	"net/url"
 	"regexp"
 	"strings"
-	"time"
 
 	broadcastclient "github.com/bitcoin-sv/go-broadcast-client/broadcast/broadcast-client"
+	"github.com/go-redis/redis/v8"
+	"github.com/mrz1836/go-cachestore"
+	"github.com/rs/zerolog"
+
 	"github.com/bitcoin-sv/spv-wallet/engine"
 	"github.com/bitcoin-sv/spv-wallet/engine/cluster"
 	"github.com/bitcoin-sv/spv-wallet/engine/datastore"
@@ -19,10 +22,6 @@ import (
 	"github.com/bitcoin-sv/spv-wallet/engine/utils"
 	"github.com/bitcoin-sv/spv-wallet/logging"
 	"github.com/bitcoin-sv/spv-wallet/metrics"
-	"github.com/go-redis/redis/v8"
-	"github.com/mrz1836/go-cachestore"
-	"github.com/newrelic/go-agent/v3/newrelic"
-	"github.com/rs/zerolog"
 )
 
 // explicitHTTPURLRegex is a regex pattern to check the callback URL (host)
@@ -32,7 +31,6 @@ var explicitHTTPURLRegex = regexp.MustCompile(`^https?://`)
 type (
 	AppServices struct {
 		SpvWalletEngine engine.ClientInterface
-		NewRelic        *newrelic.Application
 		Logger          *zerolog.Logger
 	}
 )
@@ -43,16 +41,6 @@ func (a *AppConfig) LoadServices(ctx context.Context) (*AppServices, error) {
 	_services := new(AppServices)
 	var err error
 
-	// Load NewRelic first - used for Application debugging & tracking
-	if err = a.loadNewRelic(_services); err != nil {
-		return nil, spverrors.Wrapf(err, "error with loadNewRelic")
-	}
-
-	// Start the NewRelic Tx
-	txn := _services.NewRelic.StartTransaction("services_load")
-	ctx = newrelic.NewContext(ctx, txn)
-	defer txn.End()
-
 	logger, err := logging.CreateLogger(a.Logging.InstanceName, a.Logging.Format, a.Logging.Level, a.Logging.LogOrigin)
 	if err != nil {
 		err = spverrors.Wrapf(err, "error creating logger")
@@ -62,7 +50,7 @@ func (a *AppConfig) LoadServices(ctx context.Context) (*AppServices, error) {
 	_services.Logger = logger
 
 	// Load SPV Wallet
-	if err = _services.loadSPVWallet(ctx, a, false, logger); err != nil {
+	if err := _services.loadSPVWallet(ctx, a, false, logger); err != nil {
 		return nil, err
 	}
 
@@ -78,48 +66,13 @@ func (a *AppConfig) LoadTestServices(ctx context.Context) (*AppServices, error) 
 	nopLogger := zerolog.Nop()
 	_services.Logger = &nopLogger
 
-	// Load New Relic
-	err := a.loadNewRelic(_services)
-	if err != nil {
-		return nil, err
-	}
-
-	// Start the NewRelic Tx
-	txn := _services.NewRelic.StartTransaction("services_load_test")
-	defer txn.End()
-
 	// Load SPV Wallet for testing
-	if err = _services.loadSPVWallet(ctx, a, true, _services.Logger); err != nil {
+	if err := _services.loadSPVWallet(ctx, a, true, _services.Logger); err != nil {
 		return nil, err
 	}
 
 	// Return the services
 	return _services, nil
-}
-
-// loadNewRelic will load New Relic for monitoring
-func (a *AppConfig) loadNewRelic(services *AppServices) (err error) {
-	// Load new relic
-	services.NewRelic, err = newrelic.NewApplication(
-		// newrelic.ConfigInfoLogger(os.Stdout),
-		// newrelic.ConfigDebugLogger(os.Stdout),
-		func(config *newrelic.Config) {
-			config.AppName = ApplicationName + "-" + Version
-			config.CustomInsightsEvents.Enabled = a.NewRelic.Enabled
-			config.DistributedTracer.Enabled = true
-			config.Enabled = a.NewRelic.Enabled
-			config.HostDisplayName = ApplicationName + "." + Version + "." + a.NewRelic.DomainName
-			config.License = a.NewRelic.LicenseKey
-			config.TransactionEvents.Enabled = a.NewRelic.Enabled
-		},
-	)
-
-	// If enabled
-	if a.NewRelic.Enabled {
-		err = services.NewRelic.WaitForConnection(5 * time.Second)
-	}
-
-	return
 }
 
 // CloseAll will close all connections to all services
@@ -128,12 +81,6 @@ func (s *AppServices) CloseAll(ctx context.Context) {
 	if s.SpvWalletEngine != nil {
 		_ = s.SpvWalletEngine.Close(ctx)
 		s.SpvWalletEngine = nil
-	}
-
-	// Close new relic
-	if s.NewRelic != nil {
-		s.NewRelic.Shutdown(DefaultNewRelicShutdown)
-		s.NewRelic = nil
 	}
 
 	// All services closed!
@@ -145,10 +92,6 @@ func (s *AppServices) CloseAll(ctx context.Context) {
 // loadSPVWallet will load the SPV Wallet client (including CacheStore and DataStore)
 func (s *AppServices) loadSPVWallet(ctx context.Context, appConfig *AppConfig, testMode bool, logger *zerolog.Logger) (err error) {
 	var options []engine.ClientOps
-
-	if appConfig.NewRelic.Enabled {
-		options = append(options, engine.WithNewRelic(s.NewRelic))
-	}
 
 	if appConfig.Metrics.Enabled {
 		collector := metrics.EnableMetrics()
