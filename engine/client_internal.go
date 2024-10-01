@@ -2,6 +2,7 @@ package engine
 
 import (
 	"context"
+	"github.com/go-resty/resty/v2"
 
 	"github.com/bitcoin-sv/go-paymail"
 	"github.com/bitcoin-sv/go-paymail/server"
@@ -205,7 +206,7 @@ func (c *Client) loadTransactionDraftService() error {
 func (c *Client) loadChainService() {
 	if c.options.chainService == nil {
 		logger := c.Logger().With().Str("subservice", "chain").Logger()
-		c.options.chainService = chain.NewChainService(logger, c.options.arcConfig.URL, c.options.arcConfig.Token, c.options.arcConfig.DeploymentID)
+		c.options.chainService = chain.NewChainService(logger, resty.New(), c.options.arcConfig.URL, c.options.arcConfig.Token, c.options.arcConfig.DeploymentID)
 	}
 }
 

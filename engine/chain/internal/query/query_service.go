@@ -36,9 +36,6 @@ func NewQueryService(logger zerolog.Logger, httpClient *resty.Client, url, token
 
 // QueryTransaction a transaction.
 func (s *Service) QueryTransaction(ctx context.Context, txID string) (*chainmodels.TXInfo, error) {
-	if !s.validateTX(txID) {
-		return nil, spverrors.ErrInvalidTransactionID
-	}
 	result := &chainmodels.TXInfo{}
 	errResult := &chainmodels.ArcError{}
 	req := s.httpClient.R().
@@ -81,10 +78,6 @@ func (s *Service) QueryTransaction(ctx context.Context, txID string) (*chainmode
 	}
 
 	return nil, s.withArcError(errResult, spverrors.ErrARCUnsupportedStatusCode)
-}
-
-func (s *Service) validateTX(txID string) bool {
-	return len(txID) >= 50
 }
 
 func (s *Service) withArcError(errResult *chainmodels.ArcError, baseError models.SPVError) error {

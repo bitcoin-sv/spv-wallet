@@ -11,8 +11,8 @@ type chainService struct {
 }
 
 // NewChainService creates a new chain service.
-func NewChainService(logger zerolog.Logger, arcURL, arcToken, deploymentID string) Service {
+func NewChainService(logger zerolog.Logger, httpClient *resty.Client, arcURL, arcToken, deploymentID string) Service {
 	return &chainService{
-		query.NewQueryService(logger.With().Str("chain", "query").Logger(), resty.New(), arcURL, arcToken, deploymentID),
+		query.NewQueryService(logger.With().Str("chain", "query").Logger(), httpClient, arcURL, arcToken, deploymentID),
 	}
 }

@@ -1,4 +1,4 @@
-package query
+package query_test
 
 import (
 	"fmt"
@@ -9,21 +9,23 @@ import (
 	"github.com/jarcoal/httpmock"
 )
 
-type deactivationMock func()
-
 const minedTxID = "4dff1d32c1a02d7797e33d7c4ab2f96fe6699005b6d79e6391bdf5e358232e06"
 const unknownTxID = "aaaa1d32c1a02d7797e33d7c4ab2f96fe6699005b6d79e6391bdf5e358232e06"
 const wrongButReachable = "/wrong/url"
 const arcURL = "https://arc.taal.com"
 const arcToken = "mainnet_06770f425eb00298839a24a49cbdc02c"
+const invalidTxID = "invalid"
 
-func arcMockActivate() (*resty.Client, deactivationMock) {
+func arcMockActivate(applyTimeout bool) *resty.Client {
+	transport := httpmock.NewMockTransport()
 	client := resty.New()
-	httpmock.ActivateNonDefault(client.GetClient())
+	client.GetClient().Transport = transport
 
 	responder := func(status int, content string) func(req *http.Request) (*http.Response, error) {
 		return func(req *http.Request) (*http.Response, error) {
-			time.Sleep(100 * time.Millisecond)
+			if applyTimeout {
+				time.Sleep(100 * time.Millisecond)
+			}
 			if req.Header.Get("Authorization") != arcToken {
 				return httpmock.NewStringResponse(http.StatusUnauthorized, ""), nil
 			}
@@ -33,7 +35,7 @@ func arcMockActivate() (*resty.Client, deactivationMock) {
 		}
 	}
 
-	httpmock.RegisterResponder("GET", fmt.Sprintf("%s/v1/tx/%s", arcURL, minedTxID), responder(http.StatusOK, `{
+	transport.RegisterResponder("GET", fmt.Sprintf("%s/v1/tx/%s", arcURL, minedTxID), responder(http.StatusOK, `{
 			"blockHash": "0000000000000000034df47d8fe84ccf10267b4f6bc43be513d4604229d1c209",
 			"blockHeight": 862510,
 			"competingTxs": null,
@@ -45,7 +47,7 @@ func arcMockActivate() (*resty.Client, deactivationMock) {
 		}`),
 	)
 
-	httpmock.RegisterResponder("GET", fmt.Sprintf("%s/v1/tx/%s", arcURL, unknownTxID), responder(http.StatusNotFound, `{
+	transport.RegisterResponder("GET", fmt.Sprintf("%s/v1/tx/%s", arcURL, unknownTxID), responder(http.StatusNotFound, `{
 			"detail": "The requested resource could not be found",
 			"extraInfo": "transaction not found",
 			"instance": null,
@@ -56,10 +58,21 @@ func arcMockActivate() (*resty.Client, deactivationMock) {
 		}`),
 	)
 
-	httpmock.RegisterResponder("GET", arcURL+wrongButReachable, responder(http.StatusNotFound, `{
+	transport.RegisterResponder("GET", arcURL+wrongButReachable, responder(http.StatusNotFound, `{
 			"message": "no matching operation was found"
 		}`),
 	)
 
-	return client, httpmock.DeactivateAndReset
+	transport.RegisterResponder("GET", fmt.Sprintf("%s/v1/tx/%s", arcURL, invalidTxID), responder(http.StatusConflict, `{
+			"detail": "Transaction could not be processed",
+			"extraInfo": "rpc error: code = Unknown desc = encoding/hex: invalid byte: U+0073 's'",
+			"instance": null,
+			"status": 409,
+			"title": "Generic error",
+			"txid": null,
+			"type": "https://bitcoin-sv.github.io/arc/#/errors?id=_409"
+		}`),
+	)
+
+	return client
 }

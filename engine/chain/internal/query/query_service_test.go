@@ -1,7 +1,8 @@
-package query
+package query_test
 
 import (
 	"context"
+	"github.com/bitcoin-sv/spv-wallet/engine/chain"
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/bitcoin-sv/spv-wallet/engine/tester"
 	"github.com/google/uuid"
@@ -10,12 +11,15 @@ import (
 	"time"
 )
 
+/**
+NOTE: switch httpClient to resty.New() tu call actual ARC server
+*/
+
 func TestQueryService(t *testing.T) {
 	t.Run("QueryTransaction for MINED transaction", func(t *testing.T) {
-		httpClient, reset := arcMockActivate()
-		defer reset()
+		httpClient := arcMockActivate(false)
 
-		service := NewQueryService(tester.Logger(t), httpClient, arcURL, arcToken, deploymentID())
+		service := chain.NewChainService(tester.Logger(t), httpClient, arcURL, arcToken, deploymentID())
 
 		txInfo, err := service.QueryTransaction(context.Background(), minedTxID)
 
@@ -26,10 +30,9 @@ func TestQueryService(t *testing.T) {
 	})
 
 	t.Run("QueryTransaction for unknown transaction", func(t *testing.T) {
-		httpClient, reset := arcMockActivate()
-		defer reset()
+		httpClient := arcMockActivate(false)
 
-		service := NewQueryService(tester.Logger(t), httpClient, arcURL, arcToken, deploymentID())
+		service := chain.NewChainService(tester.Logger(t), httpClient, arcURL, arcToken, deploymentID())
 
 		txInfo, err := service.QueryTransaction(context.Background(), unknownTxID)
 
@@ -46,10 +49,10 @@ func TestQueryServiceErrorCases(t *testing.T) {
 		expectErr error
 	}{
 		"QueryTransaction for invalid transaction": {
-			txID:      "invalid",
+			txID:      invalidTxID,
 			arcToken:  arcToken,
 			arcURL:    arcURL,
-			expectErr: spverrors.ErrInvalidTransactionID,
+			expectErr: spverrors.ErrARCGenericError,
 		},
 		"QueryTransaction with wrong token": {
 			txID:      minedTxID,
@@ -73,10 +76,9 @@ func TestQueryServiceErrorCases(t *testing.T) {
 
 	for name, tc := range errTestCases {
 		t.Run(name, func(t *testing.T) {
-			httpClient, reset := arcMockActivate()
-			defer reset()
+			httpClient := arcMockActivate(false)
 
-			service := NewQueryService(tester.Logger(t), httpClient, tc.arcURL, tc.arcToken, deploymentID())
+			service := chain.NewChainService(tester.Logger(t), httpClient, tc.arcURL, tc.arcToken, deploymentID())
 
 			txInfo, err := service.QueryTransaction(context.Background(), tc.txID)
 
@@ -89,10 +91,9 @@ func TestQueryServiceErrorCases(t *testing.T) {
 
 func TestQueryServiceTimeouts(t *testing.T) {
 	t.Run("QueryTransaction interrupted by ctx timeout", func(t *testing.T) {
-		httpClient, reset := arcMockActivate()
-		defer reset()
+		httpClient := arcMockActivate(true)
 
-		service := NewQueryService(tester.Logger(t), httpClient, arcURL, arcToken, deploymentID())
+		service := chain.NewChainService(tester.Logger(t), httpClient, arcURL, arcToken, deploymentID())
 
 		ctx, cancel := context.WithTimeout(context.Background(), 1)
 		defer cancel()
@@ -106,11 +107,10 @@ func TestQueryServiceTimeouts(t *testing.T) {
 	})
 
 	t.Run("QueryTransaction interrupted by resty timeout", func(t *testing.T) {
-		httpClient, reset := arcMockActivate()
-		defer reset()
+		httpClient := arcMockActivate(true)
+		httpClient.SetTimeout(1 * time.Millisecond)
 
-		service := NewQueryService(tester.Logger(t), httpClient, arcURL, arcToken, deploymentID())
-		service.httpClient.SetTimeout(1 * time.Millisecond)
+		service := chain.NewChainService(tester.Logger(t), httpClient, arcURL, arcToken, deploymentID())
 
 		txInfo, err := service.QueryTransaction(context.Background(), minedTxID)
 
