@@ -14,8 +14,8 @@ type deactivationMock func()
 const minedTxID = "4dff1d32c1a02d7797e33d7c4ab2f96fe6699005b6d79e6391bdf5e358232e06"
 const unknownTxID = "aaaa1d32c1a02d7797e33d7c4ab2f96fe6699005b6d79e6391bdf5e358232e06"
 const wrongButReachable = "/wrong/url"
-const arcURL = "https://api.testarc.com/arc"
-const arcToken = "mock-token"
+const arcURL = "https://arc.taal.com"
+const arcToken = "mainnet_06770f425eb00298839a24a49cbdc02c"
 
 func arcMockActivate() (*resty.Client, deactivationMock) {
 	client := resty.New()
