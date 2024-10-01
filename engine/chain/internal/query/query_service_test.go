@@ -2,130 +2,126 @@ package query
 
 import (
 	"context"
-	"testing"
-	"time"
-
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/bitcoin-sv/spv-wallet/engine/tester"
 	"github.com/google/uuid"
 	"github.com/stretchr/testify/require"
+	"testing"
+	"time"
 )
 
 func TestQueryService(t *testing.T) {
-	logger := tester.Logger(t)
-	deepSuffix, _ := uuid.NewUUID()
-	deploymentID := "spv-wallet-" + deepSuffix.String()
+	t.Run("QueryTransaction for MINED transaction", func(t *testing.T) {
+		httpClient, reset := arcMockActivate()
+		defer reset()
 
-	testCases := map[string]struct {
-		txID         string
-		arcToken     string
-		arcURL       string
-		expectErr    error
-		expectNil    bool
-		expectTxID   string
-		expectStatus string
-		applyTimeout timeoutDst
+		service := NewQueryService(tester.Logger(t), httpClient, arcURL, arcToken, deploymentID())
+
+		txInfo, err := service.QueryTransaction(context.Background(), minedTxID)
+
+		require.NoError(t, err)
+		require.NotNil(t, txInfo)
+		require.Equal(t, minedTxID, txInfo.TxID)
+		require.Equal(t, "MINED", string(txInfo.TXStatus))
+	})
+
+	t.Run("QueryTransaction for unknown transaction", func(t *testing.T) {
+		httpClient, reset := arcMockActivate()
+		defer reset()
+
+		service := NewQueryService(tester.Logger(t), httpClient, arcURL, arcToken, deploymentID())
+
+		txInfo, err := service.QueryTransaction(context.Background(), unknownTxID)
+
+		require.NoError(t, err)
+		require.Nil(t, txInfo)
+	})
+}
+
+func TestQueryServiceErrorCases(t *testing.T) {
+	errTestCases := map[string]struct {
+		txID      string
+		arcToken  string
+		arcURL    string
+		expectErr error
 	}{
-		"QueryTransaction for MINED transaction": {
-			txID:         minedTxID,
-			arcToken:     arcToken,
-			arcURL:       arcURL,
-			expectErr:    nil,
-			expectTxID:   minedTxID,
-			expectStatus: "MINED",
-		},
-		"QueryTransaction for unknown transaction": {
-			txID:      unknownTxID,
-			arcToken:  arcToken,
-			arcURL:    arcURL,
-			expectErr: nil,
-			expectNil: true,
-		},
 		"QueryTransaction for invalid transaction": {
 			txID:      "invalid",
 			arcToken:  arcToken,
 			arcURL:    arcURL,
 			expectErr: spverrors.ErrInvalidTransactionID,
-			expectNil: true,
 		},
 		"QueryTransaction with wrong token": {
 			txID:      minedTxID,
 			arcToken:  "wrong-token",
 			arcURL:    arcURL,
 			expectErr: spverrors.ErrARCUnauthorized,
-			expectNil: true,
 		},
 		"QueryTransaction 404 endpoint but reachable": {
 			txID:      minedTxID,
 			arcToken:  arcToken,
 			arcURL:    arcURL + wrongButReachable,
 			expectErr: spverrors.ErrARCUnreachable,
-			expectNil: true,
 		},
 		"QueryTransaction 404 endpoint with wrong arcURL": {
 			txID:      minedTxID,
 			arcToken:  arcToken,
 			arcURL:    "wrong-url",
 			expectErr: spverrors.ErrARCUnreachable,
-			expectNil: true,
-		},
-		"QueryTransaction interrupted by ctx timeout": {
-			txID:         minedTxID,
-			arcToken:     arcToken,
-			arcURL:       arcURL,
-			expectErr:    spverrors.ErrARCUnreachable,
-			expectNil:    true,
-			applyTimeout: applyTimeoutCtx,
-		},
-		"QueryTransaction interrupted by resty timeout": {
-			txID:         minedTxID,
-			arcToken:     arcToken,
-			arcURL:       arcURL,
-			expectErr:    spverrors.ErrARCUnreachable,
-			expectNil:    true,
-			applyTimeout: applyTimeoutResty,
 		},
 	}
 
-	for name, tc := range testCases {
+	for name, tc := range errTestCases {
 		t.Run(name, func(t *testing.T) {
 			httpClient, reset := arcMockActivate()
 			defer reset()
 
-			service := NewQueryService(logger, httpClient, tc.arcURL, tc.arcToken, deploymentID)
+			service := NewQueryService(tester.Logger(t), httpClient, tc.arcURL, tc.arcToken, deploymentID())
 
-			ctx := context.Background()
-			if tc.applyTimeout == applyTimeoutCtx {
-				var cancel context.CancelFunc
-				ctx, cancel = context.WithTimeout(ctx, 1*time.Millisecond)
-				defer cancel()
-			} else if tc.applyTimeout == applyTimeoutResty {
-				service.httpClient.SetTimeout(1 * time.Millisecond)
-			}
+			txInfo, err := service.QueryTransaction(context.Background(), tc.txID)
 
-			txInfo, err := service.QueryTransaction(ctx, tc.txID)
-
-			if tc.expectErr != nil {
-				require.Error(t, err)
-				require.ErrorIs(t, err, tc.expectErr)
-			} else {
-				require.NoError(t, err)
-			}
-
-			if tc.expectNil {
-				require.Nil(t, txInfo)
-			} else {
-				require.NotNil(t, txInfo)
-				require.Equal(t, tc.expectTxID, txInfo.TxID)
-				require.Equal(t, tc.expectStatus, string(txInfo.TXStatus))
-			}
+			require.Error(t, err)
+			require.ErrorIs(t, err, tc.expectErr)
+			require.Nil(t, txInfo)
 		})
 	}
 }
 
-type timeoutDst int
+func TestQueryServiceTimeouts(t *testing.T) {
+	t.Run("QueryTransaction interrupted by ctx timeout", func(t *testing.T) {
+		httpClient, reset := arcMockActivate()
+		defer reset()
 
-const (
-	applyTimeoutCtx timeoutDst = iota + 1
-	applyTimeoutResty
-)
+		service := NewQueryService(tester.Logger(t), httpClient, arcURL, arcToken, deploymentID())
+
+		ctx, cancel := context.WithTimeout(context.Background(), 1)
+		defer cancel()
+
+		txInfo, err := service.QueryTransaction(ctx, minedTxID)
+
+		require.Error(t, err)
+		require.ErrorIs(t, err, spverrors.ErrARCUnreachable)
+		require.ErrorIs(t, err, context.DeadlineExceeded)
+		require.Nil(t, txInfo)
+	})
+
+	t.Run("QueryTransaction interrupted by resty timeout", func(t *testing.T) {
+		httpClient, reset := arcMockActivate()
+		defer reset()
+
+		service := NewQueryService(tester.Logger(t), httpClient, arcURL, arcToken, deploymentID())
+		service.httpClient.SetTimeout(1 * time.Millisecond)
+
+		txInfo, err := service.QueryTransaction(context.Background(), minedTxID)
+
+		require.Error(t, err)
+		require.ErrorIs(t, err, spverrors.ErrARCUnreachable)
+		require.ErrorIs(t, err, context.DeadlineExceeded)
+		require.Nil(t, txInfo)
+	})
+}
+
+func deploymentID() string {
+	deepSuffix, _ := uuid.NewUUID()
+	return "spv-wallet-" + deepSuffix.String()
+}
