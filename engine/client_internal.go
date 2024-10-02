@@ -5,6 +5,7 @@ import (
 
 	"github.com/bitcoin-sv/go-paymail"
 	"github.com/bitcoin-sv/go-paymail/server"
+	"github.com/bitcoin-sv/spv-wallet/engine/chain"
 	"github.com/bitcoin-sv/spv-wallet/engine/chainstate"
 	"github.com/bitcoin-sv/spv-wallet/engine/cluster"
 	"github.com/bitcoin-sv/spv-wallet/engine/datastore"
@@ -14,6 +15,7 @@ import (
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/bitcoin-sv/spv-wallet/engine/taskmanager"
 	"github.com/bitcoin-sv/spv-wallet/engine/transaction/draft"
+	"github.com/go-resty/resty/v2"
 	"github.com/mrz1836/go-cachestore"
 )
 
@@ -199,6 +201,13 @@ func (c *Client) loadTransactionDraftService() error {
 		c.options.transactionDraftService = draft.NewDraftService(c.PaymailService(), c.options.paymailAddressService, logger)
 	}
 	return nil
+}
+
+func (c *Client) loadChainService() {
+	if c.options.chainService == nil {
+		logger := c.Logger().With().Str("subservice", "chain").Logger()
+		c.options.chainService = chain.NewChainService(logger, resty.New(), c.options.arcConfig.URL, c.options.arcConfig.Token, c.options.arcConfig.DeploymentID)
+	}
 }
 
 // loadTaskmanager will load the TaskManager and start the TaskManager client

@@ -248,8 +248,8 @@ var ErrTxRevertEmptyDraftID = models.SPVError{Message: "not a spv wallet engine 
 // ErrTxRevertCouldNotFindDraftTx is when draft tx could not be found
 var ErrTxRevertCouldNotFindDraftTx = models.SPVError{Message: "could not find the draft transaction for this transaction, cannot revert", StatusCode: 400, Code: "error-transaction-revert-draft-tx-not-found"}
 
-// ErrTxRevertNotFoundOnChain is when tx was not found on chain
-var ErrTxRevertNotFoundOnChain = models.SPVError{Message: "transaction was found on-chain, cannot revert", StatusCode: 400, Code: "error-transaction-revert-not-found-on-chain"}
+// ErrTxRevertFoundOnChain is when tx was not found on chain
+var ErrTxRevertFoundOnChain = models.SPVError{Message: "transaction was found on-chain, cannot revert", StatusCode: 400, Code: "error-transaction-revert-not-found-on-chain"}
 
 // ErrTxRevertUtxoAlreadySpent is when utxo from tx was already spent
 var ErrTxRevertUtxoAlreadySpent = models.SPVError{Message: "utxo of this transaction has been spent, cannot revert", StatusCode: 400, Code: "error-transaction-revert-utxo-already-spent"}
@@ -372,3 +372,18 @@ var ErrBroadcastWrongBUMPResponse = models.SPVError{Message: "broadcast server r
 
 // ErrBroadcastRejectedTransaction is when broadcast server rejected transaction
 var ErrBroadcastRejectedTransaction = models.SPVError{Message: "broadcast rejected transaction", StatusCode: 400, Code: "error-broadcast-rejected-transaction"}
+
+// ErrARCUnreachable is when ARC cannot be requested
+var ErrARCUnreachable = models.SPVError{Message: "ARC cannot be requested", StatusCode: 500, Code: "error-broadcast-unreachable"}
+
+// ErrARCUnauthorized is when ARC returns unauthorized
+var ErrARCUnauthorized = models.SPVError{Message: "ARC returned unauthorized", StatusCode: 500, Code: "error-broadcast-unauthorized"}
+
+// ErrARCParseResponse is when ARC response cannot be parsed
+var ErrARCParseResponse = models.SPVError{Message: "ARC response cannot be parsed", StatusCode: 500, Code: "error-broadcast-parse-response"}
+
+// ErrARCGenericError is when ARC returns generic error (according to documentation - status code: 409)
+var ErrARCGenericError = models.SPVError{Message: "ARC returned generic error", StatusCode: 500, Code: "error-broadcast-generic-error"}
+
+// ErrARCUnsupportedStatusCode is when ARC returns unsupported status code
+var ErrARCUnsupportedStatusCode = models.SPVError{Message: "ARC returned unsupported status code", StatusCode: 500, Code: "error-broadcast-unsupported-status-code"}

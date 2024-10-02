@@ -5,21 +5,21 @@ import (
 	"errors"
 	"time"
 
-	"github.com/bitcoin-sv/spv-wallet/engine/chainstate"
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
+	"github.com/libsv/go-bc"
 	"github.com/rs/zerolog"
 )
 
-// delayForBroadcastedTx indicates the time after which a broadcasted transaction should be checked
-// most probably ARC callback hasn't been received in this time so we need to check the transaction status "manually"
-func delayForBroadcastedTx() time.Time {
+// timeForReceivingCallback indicates the time after which a broadcasted transaction should be checked (with Callback enabled)
+// If ARC callback hasn't been received in this time, we need to check the transaction status "manually"
+func timeForReceivingCallback() time.Time {
 	return time.Now().Add(-time.Hour)
 }
 
-// delayForNotBroadcastedTx indicates the time after which a non-broadcasted transaction should be checked.
-// In this case, we don't have to wait for an ARC callback (because it will never come).
+// timeForMineTransaction indicates the time after which transaction could be mined.
+// It is used when tx is not broadcasted or ARC callback is off.
 // We're checking the transaction status after potentially enough time has passed for it to be mined.
-func delayForNotBroadcastedTx() time.Time {
+func timeForMineTransaction() time.Time {
 	return time.Now().Add(-10 * time.Minute)
 }
 
@@ -32,13 +32,12 @@ func problematicTxDelay() time.Time {
 
 // processSyncTransactions is a crucial periodic task which try to query transactions which cannot be considered as finalized
 // 1. It gets transaction IDs to sync
-// 2. For every transaction check the status using chainstate.QueryTransaction
+// 2. For every transaction check the status using ARC QueryTransaction API
 // 3. If found - change the status
 // 4. On error - try to rebroadcast (if needed) or
 func processSyncTransactions(ctx context.Context, client *Client) {
 	logger := client.Logger()
 	db := client.Datastore().DB()
-	chainstateService := client.Chainstate()
 
 	recoverAndLog(logger)
 
@@ -47,11 +46,19 @@ func processSyncTransactions(ctx context.Context, client *Client) {
 	}
 	queryIDsCtx, cancel := context.WithTimeout(ctx, 60*time.Second)
 	defer cancel()
+
+	var delayForBroadcastedTx time.Time
+	if client.options.txCallbackConfig != nil {
+		delayForBroadcastedTx = timeForReceivingCallback()
+	} else {
+		delayForBroadcastedTx = timeForMineTransaction()
+	}
+
 	err := db.
 		WithContext(queryIDsCtx).
 		Model(&Transaction{}).
-		Where("tx_status = ? AND created_at < ?", TxStatusBroadcasted, delayForBroadcastedTx()).
-		Or("tx_status = ? AND created_at < ?", TxStatusCreated, delayForNotBroadcastedTx()).
+		Where("tx_status = ? AND created_at < ?", TxStatusBroadcasted, delayForBroadcastedTx).
+		Or("tx_status = ? AND created_at < ?", TxStatusCreated, timeForMineTransaction()).
 		Or("tx_status IS NULL"). // backward compatibility
 		Find(&txIDsToSync).Error
 	if err != nil {
@@ -82,31 +89,36 @@ func processSyncTransactions(ctx context.Context, client *Client) {
 			saveTx()
 		}
 
-		txInfo, err := chainstateService.QueryTransaction(ctx, txID, chainstate.RequiredOnChain, defaultQueryTxTimeout)
+		txInfo, err := client.Chain().QueryTransaction(ctx, txID)
 
 		if err != nil {
-			switch {
-			case errors.Is(err, spverrors.ErrBroadcastUnreachable):
+			if errors.Is(err, spverrors.ErrARCUnreachable) {
 				// checking subsequent transactions is pointless if the broadcast server (ARC) is unreachable, will try again in the next cycle
 				logger.Warn().Msgf("%s", err.Error())
 				return
-			case errors.Is(err, spverrors.ErrBroadcastRejectedTransaction):
-				updateStatus(TxStatusProblematic)
-			case errors.Is(err, spverrors.ErrCouldNotFindTransaction), errors.Is(err, spverrors.ErrInvalidRequirements):
-				updateStatus(_handleUnknownTX(ctx, tx, logger))
-			default:
-				logger.Error().Err(err).Str("txID", txID).Msg("Cannot query transaction; Unhandled error type")
-				if tx.UpdatedAt.Before(problematicTxDelay()) {
-					updateStatus(TxStatusProblematic)
-				}
 			}
-		} else {
-			tx.BlockHash = txInfo.BlockHash
-			tx.BlockHeight = uint64(txInfo.BlockHeight)
-			tx.SetBUMP(txInfo.BUMP)
-			tx.UpdateFromBroadcastStatus(txInfo.TxStatus)
-			saveTx()
+			logger.Error().Err(err).Str("txID", txID).Msg("Cannot query transaction")
+			if tx.UpdatedAt.Before(problematicTxDelay()) {
+				updateStatus(TxStatusProblematic)
+			}
+			continue
 		}
+
+		if !txInfo.Found() {
+			updateStatus(_handleUnknownTX(ctx, tx, logger))
+			continue
+		}
+
+		bump, err := bc.NewBUMPFromStr(txInfo.MerklePath)
+		if err != nil {
+			//ARC sometimes returns a TXStatus SEEN_ON_NETWORK, but with zero data
+			logger.Warn().Err(err).Str("txID", txID).Msg("Cannot parse BUMP")
+		}
+		tx.BlockHash = txInfo.BlockHash
+		tx.BlockHeight = uint64(txInfo.BlockHeight)
+		tx.SetBUMP(bump)
+		tx.UpdateFromBroadcastStatus(txInfo.TXStatus)
+		saveTx()
 	}
 }
 

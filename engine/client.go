@@ -6,6 +6,7 @@ import (
 
 	"github.com/bitcoin-sv/go-paymail"
 	"github.com/bitcoin-sv/go-paymail/server"
+	"github.com/bitcoin-sv/spv-wallet/engine/chain"
 	"github.com/bitcoin-sv/spv-wallet/engine/chainstate"
 	"github.com/bitcoin-sv/spv-wallet/engine/cluster"
 	"github.com/bitcoin-sv/spv-wallet/engine/datastore"
@@ -49,6 +50,20 @@ type (
 		paymailAddressService   paymailaddress.Service // Service for paymail addresses
 		taskManager             *taskManagerOptions    // Configuration options for the TaskManager (TaskQ, etc.)
 		userAgent               string                 // User agent for all outgoing requests
+		chainService            chain.Service          // Chain service
+		arcConfig               arcConfig              // Configuration for ARC
+		txCallbackConfig        *txCallbackConfig      // Configuration for TX callback received from ARC; disabled if nil
+	}
+
+	arcConfig struct {
+		URL          string // URL for the ARC
+		Token        string // Token for the ARC
+		DeploymentID string // Deployment ID for the ARC
+	}
+
+	txCallbackConfig struct {
+		URL   string // URL for the callback
+		Token string // Token for the callback
 	}
 
 	// chainstateOptions holds the chainstate configuration and client
@@ -195,6 +210,8 @@ func NewClient(ctx context.Context, opts ...ClientOps) (ClientInterface, error) 
 	if err = client.loadTaskmanager(ctx); err != nil {
 		return nil, err
 	}
+
+	client.loadChainService()
 
 	// Register all cron jobs
 	if err = client.registerCronJobs(); err != nil {
@@ -427,4 +444,9 @@ func (c *Client) Version() string {
 // Metrics will return the metrics client (if it's enabled)
 func (c *Client) Metrics() (metrics *metrics.Metrics, enabled bool) {
 	return c.options.metrics, c.options.metrics != nil
+}
+
+// Chain will return the chain service
+func (c *Client) Chain() chain.Service {
+	return c.options.chainService
 }
