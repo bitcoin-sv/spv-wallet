@@ -14,7 +14,7 @@ import (
 )
 
 const cacheKeyCapabilities = "paymail-capabilities-"
-const cacheTTLCapabilities = 60 * time.Minute
+const cacheTTLCapabilities = 2 * time.Minute
 
 type service struct {
 	cache         cachestore.ClientInterface
