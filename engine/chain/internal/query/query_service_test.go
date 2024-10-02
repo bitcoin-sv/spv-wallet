@@ -2,13 +2,14 @@ package query_test
 
 import (
 	"context"
+	"testing"
+	"time"
+
 	"github.com/bitcoin-sv/spv-wallet/engine/chain"
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/bitcoin-sv/spv-wallet/engine/tester"
 	"github.com/google/uuid"
 	"github.com/stretchr/testify/require"
-	"testing"
-	"time"
 )
 
 /**

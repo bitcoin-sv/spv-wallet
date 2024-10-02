@@ -2,7 +2,6 @@ package engine
 
 import (
 	"context"
-	"github.com/go-resty/resty/v2"
 
 	"github.com/bitcoin-sv/go-paymail"
 	"github.com/bitcoin-sv/go-paymail/server"
@@ -16,6 +15,7 @@ import (
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/bitcoin-sv/spv-wallet/engine/taskmanager"
 	"github.com/bitcoin-sv/spv-wallet/engine/transaction/draft"
+	"github.com/go-resty/resty/v2"
 	"github.com/mrz1836/go-cachestore"
 )
 
