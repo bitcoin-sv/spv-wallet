@@ -25,13 +25,12 @@ func TestModelName_String(t *testing.T) {
 		assert.Equal(t, "metadata", ModelMetadata.String())
 		assert.Equal(t, "paymail_address", ModelPaymailAddress.String())
 		assert.Equal(t, "paymail_address", ModelPaymailAddress.String())
-		assert.Equal(t, "sync_transaction", ModelSyncTransaction.String())
 		assert.Equal(t, "transaction", ModelTransaction.String())
 		assert.Equal(t, "utxo", ModelUtxo.String())
 		assert.Equal(t, "xpub", ModelXPub.String())
 		assert.Equal(t, "contact", ModelContact.String())
 		assert.Equal(t, "webhook", ModelWebhook.String())
-		assert.Len(t, AllModelNames, 11)
+		assert.Len(t, AllModelNames, 10)
 	})
 }
 
@@ -74,9 +73,6 @@ func TestModel_GetModelName(t *testing.T) {
 
 		paymailAddress := PaymailAddress{}
 		assert.Equal(t, ModelPaymailAddress.String(), *datastore.GetModelName(paymailAddress))
-
-		syncTx := SyncTransaction{}
-		assert.Equal(t, ModelSyncTransaction.String(), *datastore.GetModelName(syncTx))
 	})
 }
 
@@ -109,9 +105,6 @@ func TestModel_GetModelTableName(t *testing.T) {
 
 		paymailAddress := PaymailAddress{}
 		assert.Equal(t, tablePaymailAddresses, *datastore.GetModelTableName(paymailAddress))
-
-		syncTx := SyncTransaction{}
-		assert.Equal(t, tableSyncTransactions, *datastore.GetModelTableName(syncTx))
 	})
 }
 

@@ -60,7 +60,6 @@ type Transaction struct {
 
 	// Virtual Fields
 	OutputValue int64                `json:"output_value" toml:"-" yaml:"-" gorm:"-" bson:"-,omitempty"`
-	Status      SyncStatus           `json:"status" toml:"-" yaml:"-" gorm:"-" bson:"-"`
 	Direction   TransactionDirection `json:"direction" toml:"-" yaml:"-" gorm:"-" bson:"-"`
 	// Confirmations  uint64       `json:"-" toml:"-" yaml:"-" gorm:"-" bson:"-"`
 
@@ -81,7 +80,6 @@ func emptyTx(opts ...ModelOps) *Transaction {
 	return &Transaction{
 		TransactionBase:    TransactionBase{},
 		Model:              *NewBaseModel(ModelTransaction, opts...),
-		Status:             statusComplete,
 		transactionService: transactionService{},
 		XpubOutputValue:    map[string]int64{},
 		TxStatus:           TxStatusCreated,
