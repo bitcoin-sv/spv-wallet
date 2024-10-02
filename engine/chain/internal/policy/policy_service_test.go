@@ -10,7 +10,6 @@ import (
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/bitcoin-sv/spv-wallet/engine/tester"
 	"github.com/bitcoin-sv/spv-wallet/models/bsv"
-	"github.com/google/uuid"
 	"github.com/stretchr/testify/require"
 )
 
@@ -105,10 +104,9 @@ func TestPolicyServiceTimeouts(t *testing.T) {
 }
 
 func arcCfg(url, token string) chainmodels.ARCConfig {
-	deepSuffix, _ := uuid.NewUUID()
 	return chainmodels.ARCConfig{
 		URL:          url,
 		Token:        token,
-		DeploymentID: "spv-wallet-" + deepSuffix.String(),
+		DeploymentID: "spv-wallet-test-arc-connection",
 	}
 }
