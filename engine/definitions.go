@@ -30,7 +30,6 @@ const (
 	ModelMetadata         ModelName = "metadata"
 	ModelNameEmpty        ModelName = "empty"
 	ModelPaymailAddress   ModelName = "paymail_address"
-	ModelSyncTransaction  ModelName = "sync_transaction"
 	ModelTransaction      ModelName = "transaction"
 	ModelUtxo             ModelName = "utxo"
 	ModelXPub             ModelName = "xpub"
@@ -45,7 +44,6 @@ var AllModelNames = []ModelName{
 	ModelMetadata,
 	ModelPaymailAddress,
 	ModelPaymailAddress,
-	ModelSyncTransaction,
 	ModelTransaction,
 	ModelUtxo,
 	ModelXPub,
@@ -59,7 +57,6 @@ const (
 	tableDestinations      = "destinations"
 	tableDraftTransactions = "draft_transactions"
 	tablePaymailAddresses  = "paymail_addresses"
-	tableSyncTransactions  = "sync_transactions"
 	tableTransactions      = "transactions"
 	tableUTXOs             = "utxos"
 	tableXPubs             = "xpubs"
@@ -73,7 +70,6 @@ const (
 
 	// Internal field names
 	aliasField           = "alias"
-	broadcastStatusField = "broadcast_status"
 	createdAtField       = "created_at"
 	deletedAtField       = "deleted_at"
 	currentBalanceField  = "current_balance"
@@ -86,39 +82,24 @@ const (
 	satoshisField        = "satoshis"
 	spendingTxIDField    = "spending_tx_id"
 	statusField          = "status"
-	syncStatusField      = "sync_status"
 	typeField            = "type"
 	xPubIDField          = "xpub_id"
 	xPubMetadataField    = "xpub_metadata"
-	blockHeightField     = "block_height"
-	blockHashField       = "block_hash"
-	merkleProofField     = "merkle_proof"
-	bumpField            = "bump"
-	fullNameField        = "full_name"
 	paymailField         = "paymail"
 	contactStatusField   = "status"
 
 	// Universal statuses
-	statusCanceled   = "canceled"
-	statusComplete   = "complete"
-	statusDraft      = "draft"
-	statusError      = "error"
-	statusExpired    = "expired"
-	statusPending    = "pending"
-	statusProcessing = "processing"
-	statusReady      = "ready"
-	statusSkipped    = "skipped"
+	statusCanceled = "canceled"
+	statusComplete = "complete"
+	statusDraft    = "draft"
+	statusExpired  = "expired"
 
 	// Paymail / Handles
-	cacheKeyAddressResolution = "paymail-address-resolution-"
-	cacheKeyCapabilities      = "paymail-capabilities-"
-	cacheTTLAddressResolution = 2 * time.Minute
-	cacheTTLCapabilities      = 60 * time.Minute
-	defaultSenderPaymail      = "example@example.com"
-	handleHandcashPrefix      = "$"
-	handleMaxLength           = 25
-	handleRelayPrefix         = "1"
-	p2pMetadataField          = "p2p_tx_metadata"
+	defaultSenderPaymail = "example@example.com"
+	handleHandcashPrefix = "$"
+	handleMaxLength      = 25
+	handleRelayPrefix    = "1"
+	p2pMetadataField     = "p2p_tx_metadata"
 
 	// Misc
 	gormTypeText = "text"
@@ -154,11 +135,6 @@ var BaseModels = []interface{}{
 	// Finalized transactions (related to Draft)
 	&Transaction{
 		Model: *NewBaseModel(ModelTransaction),
-	},
-
-	// Sync configuration for transactions (on-chain) (related to Transaction)
-	&SyncTransaction{
-		Model: *NewBaseModel(ModelSyncTransaction),
 	},
 
 	// Various types of destinations (common is: P2PKH Address)
