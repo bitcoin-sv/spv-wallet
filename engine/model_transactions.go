@@ -12,11 +12,11 @@ import (
 
 // TransactionBase is the same fields share between multiple transaction models
 type TransactionBase struct {
-	ID  string `json:"id" toml:"id" yaml:"id" gorm:"<-:create;type:char(64);primaryKey;comment:This is the unique id (hash of the transaction hex)" bson:"_id"`
-	Hex string `json:"hex" toml:"hex" yaml:"hex" gorm:"<-:create;type:text;comment:This is the raw transaction hex" bson:"hex"`
+	ID  string `json:"id" toml:"id" yaml:"id" gorm:"<-:create;type:char(64);primaryKey;comment:This is the unique id (hash of the transaction hex)"`
+	Hex string `json:"hex" toml:"hex" yaml:"hex" gorm:"<-:create;type:text;comment:This is the raw transaction hex"`
 
 	// Private for internal use
-	parsedTx *bt.Tx `gorm:"-" bson:"-"` // The go-bt version of the transaction
+	parsedTx *bt.Tx `gorm:"-"` // The go-bt version of the transaction
 }
 
 // TransactionDirection String describing the direction of the transaction (in / out)
@@ -38,37 +38,37 @@ const (
 // Gorm related models & indexes: https://gorm.io/docs/models.html - https://gorm.io/docs/indexes.html
 type Transaction struct {
 	// Base model
-	Model `bson:",inline"`
+	Model
 
 	// Standard transaction model base fields
-	TransactionBase `bson:",inline"`
+	TransactionBase
 
 	// Model specific fields
-	XpubInIDs       IDs             `json:"xpub_in_ids,omitempty" toml:"xpub_in_ids" yaml:"xpub_in_ids" gorm:"<-;type:json" bson:"xpub_in_ids,omitempty"`
-	XpubOutIDs      IDs             `json:"xpub_out_ids,omitempty" toml:"xpub_out_ids" yaml:"xpub_out_ids" gorm:"<-;type:json" bson:"xpub_out_ids,omitempty"`
-	BlockHash       string          `json:"block_hash" toml:"block_hash" yaml:"block_hash" gorm:"<-;type:char(64);comment:This is the related block when the transaction was mined" bson:"block_hash,omitempty"`
-	BlockHeight     uint64          `json:"block_height" toml:"block_height" yaml:"block_height" gorm:"<-;type:bigint;comment:This is the related block when the transaction was mined" bson:"block_height,omitempty"`
-	Fee             uint64          `json:"fee" toml:"fee" yaml:"fee" gorm:"<-create;type:bigint" bson:"fee,omitempty"`
-	NumberOfInputs  uint32          `json:"number_of_inputs" toml:"number_of_inputs" yaml:"number_of_inputs" gorm:"<-;type:int" bson:"number_of_inputs,omitempty"`
-	NumberOfOutputs uint32          `json:"number_of_outputs" toml:"number_of_outputs" yaml:"number_of_outputs" gorm:"<-;type:int" bson:"number_of_outputs,omitempty"`
-	DraftID         string          `json:"draft_id" toml:"draft_id" yaml:"draft_id" gorm:"<-create;type:varchar(64);index;comment:This is the related draft id" bson:"draft_id,omitempty"`
-	TotalValue      uint64          `json:"total_value" toml:"total_value" yaml:"total_value" gorm:"<-create;type:bigint" bson:"total_value,omitempty"`
-	XpubMetadata    XpubMetadata    `json:"-" toml:"xpub_metadata" gorm:"<-;type:json;xpub_id specific metadata" bson:"xpub_metadata,omitempty"`
-	XpubOutputValue XpubOutputValue `json:"-" toml:"xpub_output_value" gorm:"<-;type:json;xpub_id specific value" bson:"xpub_output_value,omitempty"`
-	BUMP            BUMP            `json:"bump" toml:"bump" yaml:"bump" gorm:"<-;type:text;comment:BSV Unified Merkle Path (BUMP) Format" bson:"bump,omitempty"`
-	TxStatus        TxStatus        `json:"txStatus" toml:"txStatus" yaml:"txStatus" gorm:"<-;type:varchar(64);comment:TxStatus retrieved from Arc API." bson:"txStatus,omitempty"`
+	XpubInIDs       IDs             `json:"xpub_in_ids,omitempty" toml:"xpub_in_ids" yaml:"xpub_in_ids" gorm:"<-;type:json"`
+	XpubOutIDs      IDs             `json:"xpub_out_ids,omitempty" toml:"xpub_out_ids" yaml:"xpub_out_ids" gorm:"<-;type:json"`
+	BlockHash       string          `json:"block_hash" toml:"block_hash" yaml:"block_hash" gorm:"<-;type:char(64);comment:This is the related block when the transaction was mined"`
+	BlockHeight     uint64          `json:"block_height" toml:"block_height" yaml:"block_height" gorm:"<-;type:bigint;comment:This is the related block when the transaction was mined"`
+	Fee             uint64          `json:"fee" toml:"fee" yaml:"fee" gorm:"<-create;type:bigint"`
+	NumberOfInputs  uint32          `json:"number_of_inputs" toml:"number_of_inputs" yaml:"number_of_inputs" gorm:"<-;type:int"`
+	NumberOfOutputs uint32          `json:"number_of_outputs" toml:"number_of_outputs" yaml:"number_of_outputs" gorm:"<-;type:int"`
+	DraftID         string          `json:"draft_id" toml:"draft_id" yaml:"draft_id" gorm:"<-create;type:varchar(64);index;comment:This is the related draft id"`
+	TotalValue      uint64          `json:"total_value" toml:"total_value" yaml:"total_value" gorm:"<-create;type:bigint"`
+	XpubMetadata    XpubMetadata    `json:"-" toml:"xpub_metadata" gorm:"<-;type:json;xpub_id specific metadata"`
+	XpubOutputValue XpubOutputValue `json:"-" toml:"xpub_output_value" gorm:"<-;type:json;xpub_id specific value"`
+	BUMP            BUMP            `json:"bump" toml:"bump" yaml:"bump" gorm:"<-;type:text;comment:BSV Unified Merkle Path (BUMP) Format"`
+	TxStatus        TxStatus        `json:"txStatus" toml:"txStatus" yaml:"txStatus" gorm:"<-;type:varchar(64);comment:TxStatus retrieved from Arc API."`
 
 	// Virtual Fields
-	OutputValue int64                `json:"output_value" toml:"-" yaml:"-" gorm:"-" bson:"-,omitempty"`
-	Direction   TransactionDirection `json:"direction" toml:"-" yaml:"-" gorm:"-" bson:"-"`
+	OutputValue int64                `json:"output_value" toml:"-" yaml:"-" gorm:"-"`
+	Direction   TransactionDirection `json:"direction" toml:"-" yaml:"-" gorm:"-"`
 	// Confirmations  uint64       `json:"-" toml:"-" yaml:"-" gorm:"-" bson:"-"`
 
 	// Private for internal use
-	draftTransaction   *DraftTransaction    `gorm:"-" bson:"-"` // Related draft transaction for processing and recording
-	transactionService transactionInterface `gorm:"-" bson:"-"` // Used for interfacing methods
-	utxos              []Utxo               `gorm:"-" bson:"-"` // json:"destinations,omitempty"
-	XPubID             string               `gorm:"-" bson:"-"` // XPub of the user registering this transaction
-	beforeCreateCalled bool                 `gorm:"-" bson:"-"` // Private information that the transaction lifecycle method BeforeCreate was already called
+	draftTransaction   *DraftTransaction    `gorm:"-"` // Related draft transaction for processing and recording
+	transactionService transactionInterface `gorm:"-"` // Used for interfacing methods
+	utxos              []Utxo               `gorm:"-"` // json:"destinations,omitempty"
+	XPubID             string               `gorm:"-"` // XPub of the user registering this transaction
+	beforeCreateCalled bool                 `gorm:"-"` // Private information that the transaction lifecycle method BeforeCreate was already called
 }
 
 // TransactionGetter interface for getting transactions by their IDs

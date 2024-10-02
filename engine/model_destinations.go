@@ -17,21 +17,21 @@ import (
 // Gorm related models & indexes: https://gorm.io/docs/models.html - https://gorm.io/docs/indexes.html
 type Destination struct {
 	// Base model
-	Model `bson:",inline"`
+	Model
 
 	// Model specific fields
-	ID                           string  `json:"id" toml:"id" yaml:"id" gorm:"<-:create;type:char(64);primaryKey;comment:This is the hash of the locking script" bson:"_id"`
-	XpubID                       string  `json:"xpub_id" toml:"xpub_id" yaml:"xpub_id" gorm:"<-:create;type:char(64);index;comment:This is the related xPub" bson:"xpub_id"`
-	LockingScript                string  `json:"locking_script" toml:"locking_script" yaml:"locking_script" gorm:"<-:create;type:text;comment:This is Bitcoin output script in hex" bson:"locking_script"`
-	Type                         string  `json:"type" toml:"type" yaml:"type" gorm:"<-:create;type:text;comment:Type of output" bson:"type"`
-	Chain                        uint32  `json:"chain" toml:"chain" yaml:"chain" gorm:"<-:create;type:int;comment:This is the (chain)/num location of the address related to the xPub" bson:"chain"`
-	Num                          uint32  `json:"num" toml:"num" yaml:"num" gorm:"<-:create;type:int;comment:This is the chain/(num) location of the address related to the xPub" bson:"num"`
-	PaymailExternalDerivationNum *uint32 `json:"paymail_external_derivation_num" toml:"paymail_external_derivation_num" yaml:"paymail_external_derivation_num" gorm:"<-:create;type:int;comment:This is the chain/num/(ext_derivation_num) location of the address related to the xPub" bson:"paymail_external_derivation_num"`
-	Address                      string  `json:"address" toml:"address" yaml:"address" gorm:"<-:create;type:varchar(35);index;comment:This is the BitCoin address" bson:"address"`
-	DraftID                      string  `json:"draft_id" toml:"draft_id" yaml:"draft_id" gorm:"<-:create;type:varchar(64);index;comment:This is the related draft id (if internal tx)" bson:"draft_id,omitempty"`
-	DerivationMethod             string  `json:"derivation_method" toml:"derivation_method" yaml:"derivation_method" gorm:"<-:create;type:varchar(64);index;comment:This is the derivation method BIP32 or PIKE" bson:"derivation_method,omitempty"`
-	SenderXpub                   string  `json:"sender_xpub" toml:"sender_xpub" yaml:"sender_xpub" gorm:"<-:create;type:varchar(64);index;comment:This is the related sender xpub" bson:"sender_xpub,omitempty"`
-	OutputIndex                  uint32  `json:"output_index" toml:"output_index" yaml:"output_index" gorm:"<-:create;type:int;index;comment:This is the index of script from output templates" bson:"output_index,omitempty"`
+	ID                           string  `json:"id" toml:"id" yaml:"id" gorm:"<-:create;type:char(64);primaryKey;comment:This is the hash of the locking script"`
+	XpubID                       string  `json:"xpub_id" toml:"xpub_id" yaml:"xpub_id" gorm:"<-:create;type:char(64);index;comment:This is the related xPub"`
+	LockingScript                string  `json:"locking_script" toml:"locking_script" yaml:"locking_script" gorm:"<-:create;type:text;comment:This is Bitcoin output script in hex"`
+	Type                         string  `json:"type" toml:"type" yaml:"type" gorm:"<-:create;type:text;comment:Type of output"`
+	Chain                        uint32  `json:"chain" toml:"chain" yaml:"chain" gorm:"<-:create;type:int;comment:This is the (chain)/num location of the address related to the xPub"`
+	Num                          uint32  `json:"num" toml:"num" yaml:"num" gorm:"<-:create;type:int;comment:This is the chain/(num) location of the address related to the xPub"`
+	PaymailExternalDerivationNum *uint32 `json:"paymail_external_derivation_num" toml:"paymail_external_derivation_num" yaml:"paymail_external_derivation_num" gorm:"<-:create;type:int;comment:This is the chain/num/(ext_derivation_num) location of the address related to the xPub"`
+	Address                      string  `json:"address" toml:"address" yaml:"address" gorm:"<-:create;type:varchar(35);index;comment:This is the BitCoin address"`
+	DraftID                      string  `json:"draft_id" toml:"draft_id" yaml:"draft_id" gorm:"<-:create;type:varchar(64);index;comment:This is the related draft id (if internal tx)"`
+	DerivationMethod             string  `json:"derivation_method" toml:"derivation_method" yaml:"derivation_method" gorm:"<-:create;type:varchar(64);index;comment:This is the derivation method BIP32 or PIKE"`
+	SenderXpub                   string  `json:"sender_xpub" toml:"sender_xpub" yaml:"sender_xpub" gorm:"<-:create;type:varchar(64);index;comment:This is the related sender xpub"`
+	OutputIndex                  uint32  `json:"output_index" toml:"output_index" yaml:"output_index" gorm:"<-:create;type:int;index;comment:This is the index of script from output templates"`
 }
 
 const (
