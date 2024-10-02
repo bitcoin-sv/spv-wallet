@@ -1,6 +1,7 @@
 module github.com/bitcoin-sv/spv-wallet
 
 go 1.23.1
+
 // NOTE: The following replace directives are essential for maintaining the cohesion and functionality of this project.
 // We are using the packages github.com/bitcoin-sv/spv-wallet/models and github.com/bitcoin-sv/spv-wallet/engine directly
 // to facilitate the seamless integration of features across various components of our application.
@@ -90,7 +91,7 @@ require (
 	github.com/go-playground/locales v0.14.1 // indirect
 	github.com/go-playground/universal-translator v0.18.1 // indirect
 	github.com/go-playground/validator/v10 v10.22.0 // indirect
-	github.com/go-resty/resty/v2 v2.14.0 // indirect
+	github.com/go-resty/resty/v2 v2.14.0
 	github.com/goccy/go-json v0.10.3 // indirect
 	github.com/golang/protobuf v1.5.4 // indirect
 	github.com/golang/snappy v0.0.4 // indirect

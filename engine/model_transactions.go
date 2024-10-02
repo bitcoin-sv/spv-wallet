@@ -3,11 +3,12 @@ package engine
 import (
 	"context"
 
+	"github.com/libsv/go-bc"
+	"github.com/libsv/go-bt/v2"
+
 	chainmodels "github.com/bitcoin-sv/spv-wallet/engine/chain/models"
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/bitcoin-sv/spv-wallet/engine/utils"
-	"github.com/libsv/go-bc"
-	"github.com/libsv/go-bt/v2"
 )
 
 // TransactionBase is the same fields share between multiple transaction models
@@ -61,7 +62,7 @@ type Transaction struct {
 	// Virtual Fields
 	OutputValue int64                `json:"output_value" toml:"-" yaml:"-" gorm:"-"`
 	Direction   TransactionDirection `json:"direction" toml:"-" yaml:"-" gorm:"-"`
-	// Confirmations  uint64       `json:"-" toml:"-" yaml:"-" gorm:"-" bson:"-"`
+	// Confirmations  uint64       `json:"-" toml:"-" yaml:"-" gorm:"-"`
 
 	// Private for internal use
 	draftTransaction   *DraftTransaction    `gorm:"-"` // Related draft transaction for processing and recording

@@ -4,15 +4,12 @@ import (
 	"bytes"
 	"database/sql"
 	"database/sql/driver"
-	"encoding/hex"
 	"strconv"
 	"testing"
 
 	"github.com/99designs/gqlgen/graphql"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"go.mongodb.org/mongo-driver/bson"
-	"go.mongodb.org/mongo-driver/bson/bsontype"
 )
 
 const testString = "test-string"
@@ -73,79 +70,6 @@ func TestUnmarshalNullString(t *testing.T) {
 		nt, err := UnmarshalNullString(testString)
 		require.NoError(t, err)
 		assert.IsType(t, NullString{}, nt)
-		assert.True(t, nt.Valid)
-		assert.Equal(t, testString, nt.String)
-	})
-}
-
-// TestNullString_IsZero will test the method IsZero()
-func TestNullString_IsZero(t *testing.T) {
-	t.Run("nil string", func(t *testing.T) {
-		nt := new(NullString)
-		assert.True(t, nt.IsZero())
-	})
-
-	t.Run("string", func(t *testing.T) {
-		nt := NullString{sql.NullString{Valid: true, String: testString}}
-		assert.False(t, nt.IsZero())
-	})
-}
-
-// TestNullString_MarshalBSONValue will test the method MarshalBSONValue()
-func TestNullString_MarshalBSONValue(t *testing.T) {
-	t.Run("nil string", func(t *testing.T) {
-		nt := new(NullString)
-		outType, outBytes, err := nt.MarshalBSONValue()
-		require.Equal(t, bsontype.Null, outType)
-		assert.Nil(t, outBytes)
-		require.NoError(t, err)
-	})
-
-	t.Run("empty string", func(t *testing.T) {
-		nt := new(NullString)
-		nt.Valid = true
-		nt.String = ""
-		outType, outBytes, err := nt.MarshalBSONValue()
-		require.Equal(t, bsontype.String, outType)
-		assert.Equal(t, "0100000000", hex.EncodeToString(outBytes))
-		require.NoError(t, err)
-	})
-
-	t.Run("valid string", func(t *testing.T) {
-		nt := NullString{sql.NullString{Valid: true, String: testString}}
-		outType, outBytes, err := nt.MarshalBSONValue()
-		require.NoError(t, err)
-		assert.Equal(t, bsontype.String, outType)
-		assert.NotNil(t, outBytes)
-		outHex := hex.EncodeToString(outBytes[:])
-		_, inHex, _ := bson.MarshalValue(testString)
-		assert.Equal(t, hex.EncodeToString(inHex[:]), outHex)
-	})
-}
-
-// TestNullString_UnmarshalBSONValue will test the method UnmarshalBSONValue()
-func TestNullString_UnmarshalBSONValue(t *testing.T) {
-	t.Run("nil string", func(t *testing.T) {
-		var nt NullString
-		err := nt.UnmarshalBSONValue(bsontype.Null, nil)
-		require.NoError(t, err)
-		assert.False(t, nt.Valid)
-	})
-
-	t.Run("empty string", func(t *testing.T) {
-		var nt NullString
-		b, _ := hex.DecodeString("0100000000")
-		err := nt.UnmarshalBSONValue(bsontype.String, b)
-		require.NoError(t, err)
-		assert.True(t, nt.Valid)
-		assert.Equal(t, "", nt.String)
-	})
-
-	t.Run("string", func(t *testing.T) {
-		var nt NullString
-		b, _ := hex.DecodeString("0c000000746573742d737472696e6700")
-		err := nt.UnmarshalBSONValue(bsontype.String, b)
-		require.NoError(t, err)
 		assert.True(t, nt.Valid)
 		assert.Equal(t, testString, nt.String)
 	})

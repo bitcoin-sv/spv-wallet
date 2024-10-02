@@ -2,8 +2,6 @@
 package mappings
 
 import (
-	"time"
-
 	"github.com/bitcoin-sv/spv-wallet/engine"
 	"github.com/bitcoin-sv/spv-wallet/mappings/common"
 	"github.com/bitcoin-sv/spv-wallet/models"
@@ -15,16 +13,10 @@ func MapToOldAccessKeyContract(ac *engine.AccessKey) *models.AccessKey {
 		return nil
 	}
 
-	var revokedAt *time.Time
-	if !ac.RevokedAt.IsZero() {
-		revokedAt = &ac.RevokedAt.Time
-	}
-
 	return &models.AccessKey{
-		Model:     *common.MapToOldContract(&ac.Model),
-		ID:        ac.ID,
-		XpubID:    ac.XpubID,
-		RevokedAt: revokedAt,
-		Key:       ac.Key,
+		Model:  *common.MapToOldContract(&ac.Model),
+		ID:     ac.ID,
+		XpubID: ac.XpubID,
+		Key:    ac.Key,
 	}
 }
