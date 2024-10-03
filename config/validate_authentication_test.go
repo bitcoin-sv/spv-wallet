@@ -1,76 +1,51 @@
-package config
+package config_test
 
 import (
 	"testing"
 
-	"github.com/stretchr/testify/assert"
+	"github.com/bitcoin-sv/spv-wallet/config"
+	"github.com/stretchr/testify/require"
 )
 
-const (
-	testAdminKey = "12345678901234567890123456789012"
-)
-
-// TestAuthenticationConfig_IsAdmin will test the method IsAdmin()
-func TestAuthenticationConfig_IsAdmin(t *testing.T) {
-	t.Run("admin valid", func(t *testing.T) {
-		a := AuthenticationConfig{
-			Scheme:   AuthenticationSchemeXpub,
-			AdminKey: testAdminKey,
-		}
-		assert.Equal(t, true, a.IsAdmin(testAdminKey))
-	})
-
-	t.Run("admin invalid", func(t *testing.T) {
-		a := AuthenticationConfig{
-			Scheme:   AuthenticationSchemeXpub,
-			AdminKey: testAdminKey,
-		}
-		assert.Equal(t, false, a.IsAdmin("invalid"))
-	})
-
-}
-
-// TestAuthenticationConfig_Validate will test the method Validate()
-func TestAuthenticationConfig_Validate(t *testing.T) {
+func TestValidateAuthenticationConfig(t *testing.T) {
 	t.Parallel()
 
-	t.Run("valid scheme and admin key", func(t *testing.T) {
-		a := AuthenticationConfig{
-			Scheme:   AuthenticationSchemeXpub,
-			AdminKey: testAdminKey,
-		}
-		assert.NoError(t, a.Validate())
-	})
+	invalidConfigTests := map[string]struct {
+		scenario func(cfg *config.AppConfig)
+	}{
+		"empty scheme": {
+			scenario: func(cfg *config.AppConfig) {
+				cfg.Authentication.Scheme = ""
+			},
+		},
+		"invalid scheme": {
+			scenario: func(cfg *config.AppConfig) {
+				cfg.Authentication.Scheme = "invalid"
+			},
+		},
+		"invalid admin key (missing)": {
+			scenario: func(cfg *config.AppConfig) {
+				cfg.Authentication.AdminKey = ""
+			},
+		},
+		"invalid admin key (to short)": {
+			scenario: func(cfg *config.AppConfig) {
+				cfg.Authentication.AdminKey = "1234567"
+			},
+		},
+	}
+	for name, test := range invalidConfigTests {
+		t.Run(name, func(t *testing.T) {
+			// given:
+			cfg := config.GetDefaultAppConfig()
 
-	t.Run("empty scheme", func(t *testing.T) {
-		a := AuthenticationConfig{
-			Scheme:   "",
-			AdminKey: testAdminKey,
-		}
-		assert.Error(t, a.Validate())
-	})
+			test.scenario(cfg)
 
-	t.Run("invalid scheme", func(t *testing.T) {
-		a := AuthenticationConfig{
-			Scheme:   "invalid",
-			AdminKey: testAdminKey,
-		}
-		assert.Error(t, a.Validate())
-	})
+			// when:
+			err := cfg.Validate()
 
-	t.Run("invalid admin key (missing)", func(t *testing.T) {
-		a := AuthenticationConfig{
-			Scheme:   AuthenticationSchemeXpub,
-			AdminKey: "",
-		}
-		assert.Error(t, a.Validate())
-	})
-
-	t.Run("invalid admin key (to short)", func(t *testing.T) {
-		a := AuthenticationConfig{
-			Scheme:   AuthenticationSchemeXpub,
-			AdminKey: "1234567",
-		}
-		assert.Error(t, a.Validate())
-	})
+			// then:
+			require.Error(t, err)
+		})
+	}
 }

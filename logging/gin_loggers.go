@@ -16,7 +16,7 @@ func SetGinWriters(log *zerolog.Logger) {
 }
 
 // GinMiddleware returns a middleware that logs requests using zerolog.
-func GinMiddleware(log *zerolog.Logger) gin.HandlerFunc {
+func GinMiddleware(log zerolog.Logger) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		start := time.Now()
 		path := c.Request.URL.Path

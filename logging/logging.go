@@ -5,6 +5,7 @@ import (
 	"os"
 	"time"
 
+	"github.com/bitcoin-sv/spv-wallet/config"
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/rs/zerolog"
 	"go.elastic.co/ecszerolog"
@@ -15,8 +16,21 @@ const (
 	jsonLogFormat    = "json"
 )
 
-// CreateLogger create and configure zerolog logger based on app config.
-func CreateLogger(instanceName, format, level string, logOrigin bool) (*zerolog.Logger, error) {
+// GetDefaultLogger create and configure default zerolog logger. It should be used before config is loaded
+func GetDefaultLogger() zerolog.Logger {
+	logger, err := createLogger("spv-wallet-default", jsonLogFormat, "debug", true)
+	if err != nil {
+		panic(err)
+	}
+	return logger
+}
+
+func CreateLoggerWithConfig(config *config.AppConfig) (zerolog.Logger, error) {
+	loggingConfig := config.Logging
+	return createLogger(loggingConfig.InstanceName, loggingConfig.Format, loggingConfig.Level, loggingConfig.LogOrigin)
+}
+
+func createLogger(instanceName, format, level string, logOrigin bool) (zerolog.Logger, error) {
 	var writer io.Writer
 	if format == consoleLogFormat {
 		writer = zerolog.ConsoleWriter{
@@ -30,7 +44,7 @@ func CreateLogger(instanceName, format, level string, logOrigin bool) (*zerolog.
 	parsedLevel, err := zerolog.ParseLevel(level)
 	if err != nil {
 		err = spverrors.Wrapf(err, "failed to parse log level")
-		return nil, err
+		return zerolog.Nop(), err
 	}
 
 	logLevel := ecszerolog.Level(parsedLevel)
@@ -53,16 +67,5 @@ func CreateLogger(instanceName, format, level string, logOrigin bool) (*zerolog.
 		return time.Now().In(time.Local) //nolint:gosmopolitan // We want local time inside logger.
 	}
 
-	return &logger, nil
-}
-
-// GetDefaultLogger create and configure default zerolog logger. It should be used before config is loaded
-func GetDefaultLogger() *zerolog.Logger {
-	logger := ecszerolog.New(os.Stdout, ecszerolog.Level(zerolog.DebugLevel)).
-		With().
-		Caller().
-		Str("application", "spv-wallet-default").
-		Logger()
-
-	return &logger
+	return logger, nil
 }

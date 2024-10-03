@@ -29,12 +29,12 @@ const (
 // CheckBlockHeadersService tries to make a request to the Block Headers Service to check if it is online and ready to verify transactions.
 // AppConfig should be validated before calling this method.
 // This method returns nothing, instead it logs either an error or a warning based on the state of the Block Headers Service.
-func (config *AppConfig) CheckBlockHeadersService(ctx context.Context, logger *zerolog.Logger) {
-	if !config.BlockHeadersServiceEnabled() {
+func (c *AppConfig) CheckBlockHeadersService(ctx context.Context, logger *zerolog.Logger) {
+	if !c.BlockHeadersServiceEnabled() {
 		// this method works only with Beef/Block Headers Service enabled
 		return
 	}
-	b := config.Paymail.Beef
+	b := c.Paymail.Beef
 
 	logger.Info().Msg("checking Block Headers Service")
 
@@ -83,6 +83,6 @@ func (config *AppConfig) CheckBlockHeadersService(ctx context.Context, logger *z
 }
 
 // BlockHeadersServiceEnabled returns true if the Block Headers Service is enabled in the AppConfig
-func (config *AppConfig) BlockHeadersServiceEnabled() bool {
-	return config.Paymail != nil && config.Paymail.Beef.enabled()
+func (c *AppConfig) BlockHeadersServiceEnabled() bool {
+	return c.Paymail != nil && c.Paymail.Beef.enabled()
 }
