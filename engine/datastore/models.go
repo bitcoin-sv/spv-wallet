@@ -8,11 +8,12 @@ import (
 	"strings"
 	"time"
 
-	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"gorm.io/gorm"
 	"gorm.io/gorm/clause"
 	"gorm.io/gorm/logger"
 	"gorm.io/plugin/dbresolver"
+
+	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 )
 
 // SaveModel will take care of creating or updating a model (primary key based) (abstracting the database)
@@ -336,7 +337,7 @@ func (c *Client) aggregate(ctx context.Context, model interface{}, conditions ma
 	// Create the result
 	aggregateResult := make(map[string]interface{})
 	for _, item := range aggregate {
-		key := item[mongoIDField].(string)
+		key := item[sqlIDField].(string)
 		aggregateResult[key] = item[accumulationCountField]
 	}
 

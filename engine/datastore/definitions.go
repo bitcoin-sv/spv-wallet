@@ -4,7 +4,6 @@ import (
 	"database/sql"
 	"time"
 
-	"go.mongodb.org/mongo-driver/mongo"
 	"gorm.io/gorm"
 )
 
@@ -31,7 +30,6 @@ const (
 	dateModifiedAt         = "modified_at" // Field for record modified time
 	dateUpdatedAt          = "updated_at"  // Field for record updated time
 	metadataField          = "metadata"    // The metadata field
-	mongoIDField           = "_id"         // The ID field for mongo
 	sqlIDField             = "id"          // The ID field for SQL
 	sqlIDFieldProper       = "ID"          // The ID field for SQL (capitalized)
 
@@ -98,13 +96,4 @@ type SQLiteConfig struct {
 	DatabasePath       string                                  `json:"database_path" mapstructure:"database_path"` // Location of a permanent database file (if NOT set, uses temporary memory)
 	ExistingConnection gorm.ConnPool                           `json:"-" mapstructure:"-"`                         // Used for existing database connection
 	Shared             bool                                    `json:"shared" mapstructure:"shared"`               // Adds a shared param to the connection string
-}
-
-// MongoDBConfig is the configuration for each MongoDB connection
-type MongoDBConfig struct {
-	CommonConfig       `json:",inline" mapstructure:",squash"` // Common configuration
-	DatabaseName       string                                  `json:"database_name" mapstructure:"database_name"` // The database name
-	ExistingConnection *mongo.Database                         `json:"-" mapstructure:"-"`                         // Used for existing database connection
-	Transactions       bool                                    `json:"transactions" mapstructure:"transactions"`   // If it has transactions
-	URI                string                                  `json:"uri" mapstructure:"uri"`                     // The connection string URI
 }
