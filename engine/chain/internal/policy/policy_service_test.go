@@ -1,4 +1,4 @@
-package query_test
+package policy_test
 
 import (
 	"context"
@@ -9,6 +9,7 @@ import (
 	chainmodels "github.com/bitcoin-sv/spv-wallet/engine/chain/models"
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/bitcoin-sv/spv-wallet/engine/tester"
+	"github.com/bitcoin-sv/spv-wallet/models/bsv"
 	"github.com/stretchr/testify/require"
 )
 
@@ -16,59 +17,39 @@ import (
 NOTE: switch httpClient to resty.New() tu call actual ARC server
 */
 
-func TestQueryService(t *testing.T) {
-	t.Run("QueryTransaction for MINED transaction", func(t *testing.T) {
+func TestPolicyService(t *testing.T) {
+	t.Run("Request for policy", func(t *testing.T) {
 		httpClient := arcMockActivate(false)
 
 		service := chain.NewChainService(tester.Logger(t), httpClient, arcCfg(arcURL, arcToken))
 
-		txInfo, err := service.QueryTransaction(context.Background(), minedTxID)
+		policy, err := service.GetPolicy(context.Background())
 
 		require.NoError(t, err)
-		require.NotNil(t, txInfo)
-		require.Equal(t, minedTxID, txInfo.TxID)
-		require.Equal(t, "MINED", string(txInfo.TXStatus))
-	})
-
-	t.Run("QueryTransaction for unknown transaction", func(t *testing.T) {
-		httpClient := arcMockActivate(false)
-
-		service := chain.NewChainService(tester.Logger(t), httpClient, arcCfg(arcURL, arcToken))
-
-		txInfo, err := service.QueryTransaction(context.Background(), unknownTxID)
-
-		require.NoError(t, err)
-		require.Nil(t, txInfo)
+		require.NotNil(t, policy)
+		require.Equal(t, 1000, policy.Content.MiningFee.Bytes)
+		require.Equal(t, bsv.Satoshis(1), policy.Content.MiningFee.Satoshis)
+		require.NotEmpty(t, policy.Timestamp)
 	})
 }
 
-func TestQueryServiceErrorCases(t *testing.T) {
+func TestPolicyServiceErrorCases(t *testing.T) {
 	errTestCases := map[string]struct {
-		txID      string
 		arcToken  string
 		arcURL    string
 		expectErr error
 	}{
-		"QueryTransaction for invalid transaction": {
-			txID:      invalidTxID,
-			arcToken:  arcToken,
-			arcURL:    arcURL,
-			expectErr: spverrors.ErrARCGenericError,
-		},
-		"QueryTransaction with wrong token": {
-			txID:      minedTxID,
+		"GetPolicy with wrong token": {
 			arcToken:  "wrong-token", //if you test it on actual ARC server, this test might fail if the ARC doesn't require token
 			arcURL:    arcURL,
 			expectErr: spverrors.ErrARCUnauthorized,
 		},
-		"QueryTransaction 404 endpoint but reachable": {
-			txID:      minedTxID,
+		"GetPolicy 404 endpoint but reachable": {
 			arcToken:  arcToken,
 			arcURL:    arcURL + wrongButReachable,
 			expectErr: spverrors.ErrARCUnreachable,
 		},
-		"QueryTransaction 404 endpoint with wrong arcURL": {
-			txID:      minedTxID,
+		"GetPolicy 404 endpoint with wrong arcURL": {
 			arcToken:  arcToken,
 			arcURL:    "wrong-url",
 			expectErr: spverrors.ErrARCUnreachable,
@@ -81,17 +62,17 @@ func TestQueryServiceErrorCases(t *testing.T) {
 
 			service := chain.NewChainService(tester.Logger(t), httpClient, arcCfg(tc.arcURL, tc.arcToken))
 
-			txInfo, err := service.QueryTransaction(context.Background(), tc.txID)
+			policy, err := service.GetPolicy(context.Background())
 
 			require.Error(t, err)
 			require.ErrorIs(t, err, tc.expectErr)
-			require.Nil(t, txInfo)
+			require.Nil(t, policy)
 		})
 	}
 }
 
-func TestQueryServiceTimeouts(t *testing.T) {
-	t.Run("QueryTransaction interrupted by ctx timeout", func(t *testing.T) {
+func TestPolicyServiceTimeouts(t *testing.T) {
+	t.Run("GetPolicy interrupted by ctx timeout", func(t *testing.T) {
 		httpClient := arcMockActivate(true)
 
 		service := chain.NewChainService(tester.Logger(t), httpClient, arcCfg(arcURL, arcToken))
@@ -99,7 +80,7 @@ func TestQueryServiceTimeouts(t *testing.T) {
 		ctx, cancel := context.WithTimeout(context.Background(), 1)
 		defer cancel()
 
-		txInfo, err := service.QueryTransaction(ctx, minedTxID)
+		txInfo, err := service.GetPolicy(ctx)
 
 		require.Error(t, err)
 		require.ErrorIs(t, err, spverrors.ErrARCUnreachable)
@@ -107,13 +88,13 @@ func TestQueryServiceTimeouts(t *testing.T) {
 		require.Nil(t, txInfo)
 	})
 
-	t.Run("QueryTransaction interrupted by resty timeout", func(t *testing.T) {
+	t.Run("GetPolicy interrupted by resty timeout", func(t *testing.T) {
 		httpClient := arcMockActivate(true)
 		httpClient.SetTimeout(1 * time.Millisecond)
 
 		service := chain.NewChainService(tester.Logger(t), httpClient, arcCfg(arcURL, arcToken))
 
-		txInfo, err := service.QueryTransaction(context.Background(), minedTxID)
+		txInfo, err := service.GetPolicy(context.Background())
 
 		require.Error(t, err)
 		require.ErrorIs(t, err, spverrors.ErrARCUnreachable)
