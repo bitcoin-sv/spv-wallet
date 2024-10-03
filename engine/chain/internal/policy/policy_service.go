@@ -1,4 +1,4 @@
-package query
+package policy
 
 import (
 	"context"
@@ -7,7 +7,7 @@ import (
 	"net"
 	"net/http"
 
-	"github.com/bitcoin-sv/spv-wallet/engine/chain/models"
+	chainmodels "github.com/bitcoin-sv/spv-wallet/engine/chain/models"
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/bitcoin-sv/spv-wallet/models"
 	"github.com/go-resty/resty/v2"
@@ -21,8 +21,8 @@ type Service struct {
 	arcCfg     chainmodels.ARCConfig
 }
 
-// NewQueryService creates a new query service.
-func NewQueryService(logger zerolog.Logger, httpClient *resty.Client, arcCfg chainmodels.ARCConfig) *Service {
+// NewPolicyService creates a new policy service.
+func NewPolicyService(logger zerolog.Logger, httpClient *resty.Client, arcCfg chainmodels.ARCConfig) *Service {
 	return &Service{
 		logger:     logger,
 		httpClient: httpClient,
@@ -30,9 +30,9 @@ func NewQueryService(logger zerolog.Logger, httpClient *resty.Client, arcCfg cha
 	}
 }
 
-// QueryTransaction a transaction.
-func (s *Service) QueryTransaction(ctx context.Context, txID string) (*chainmodels.TXInfo, error) {
-	result := &chainmodels.TXInfo{}
+// GetPolicy requests ARC server for the policy
+func (s *Service) GetPolicy(ctx context.Context) (*chainmodels.Policy, error) {
+	result := &chainmodels.Policy{}
 	errResult := &chainmodels.ArcError{}
 	req := s.httpClient.R().
 		SetContext(ctx).
@@ -48,7 +48,7 @@ func (s *Service) QueryTransaction(ctx context.Context, txID string) (*chainmode
 		req.SetHeader("XDeployment-ID", s.arcCfg.DeploymentID)
 	}
 
-	response, err := req.Get(fmt.Sprintf("%s/v1/tx/%s", s.arcCfg.URL, txID))
+	response, err := req.Get(fmt.Sprintf("%s/v1/policy", s.arcCfg.URL))
 
 	if err != nil {
 		var e net.Error
@@ -64,13 +64,7 @@ func (s *Service) QueryTransaction(ctx context.Context, txID string) (*chainmode
 	case http.StatusUnauthorized, http.StatusForbidden:
 		return nil, s.withArcError(errResult, spverrors.ErrARCUnauthorized)
 	case http.StatusNotFound:
-		if !errResult.IsEmpty() {
-			// ARC returns 404 when transaction is not found
-			return nil, nil // By convention, nil is returned when transaction is not found
-		}
 		return nil, spverrors.ErrARCUnreachable
-	case http.StatusConflict:
-		return nil, s.withArcError(errResult, spverrors.ErrARCGenericError)
 	}
 
 	return nil, s.withArcError(errResult, spverrors.ErrARCUnsupportedStatusCode)
