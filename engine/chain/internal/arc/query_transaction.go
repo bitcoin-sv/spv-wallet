@@ -36,7 +36,7 @@ func (s *Service) QueryTransaction(ctx context.Context, txID string) (*chainmode
 		return nil, spverrors.ErrARCUnreachable
 	case http.StatusConflict:
 		return nil, s.wrapARCError(spverrors.ErrARCGenericError, arcErr)
+	default:
+		return nil, s.wrapARCError(spverrors.ErrARCUnsupportedStatusCode, arcErr)
 	}
-
-	return nil, s.wrapARCError(spverrors.ErrARCUnsupportedStatusCode, arcErr)
 }

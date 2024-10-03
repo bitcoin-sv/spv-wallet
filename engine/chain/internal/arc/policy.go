@@ -30,7 +30,7 @@ func (s *Service) GetPolicy(ctx context.Context) (*chainmodels.Policy, error) {
 		return nil, s.wrapARCError(spverrors.ErrARCUnauthorized, arcErr)
 	case http.StatusNotFound:
 		return nil, spverrors.ErrARCUnreachable
+	default:
+		return nil, s.wrapARCError(spverrors.ErrARCUnsupportedStatusCode, arcErr)
 	}
-
-	return nil, s.wrapARCError(spverrors.ErrARCUnsupportedStatusCode, arcErr)
 }
