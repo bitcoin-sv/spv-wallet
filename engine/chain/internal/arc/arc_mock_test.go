@@ -1,10 +1,11 @@
-package query_test
+package arc_test
 
 import (
 	"fmt"
 	"net/http"
 	"time"
 
+	chainmodels "github.com/bitcoin-sv/spv-wallet/engine/chain/models"
 	"github.com/go-resty/resty/v2"
 	"github.com/jarcoal/httpmock"
 )
@@ -74,5 +75,32 @@ func arcMockActivate(applyTimeout bool) *resty.Client {
 		}`),
 	)
 
+	transport.RegisterResponder("GET", fmt.Sprintf("%s/v1/policy", arcURL), responder(http.StatusOK, `{
+			"policy": {
+				"maxscriptsizepolicy": 100000000,
+				"maxtxsigopscountspolicy": 4294967295,
+				"maxtxsizepolicy": 100000000,
+				"miningFee": {
+					"bytes": 1000,
+					"satoshis": 1
+				}
+			},
+			"timestamp": "2024-10-02T07:36:33.589144918Z"
+		}`),
+	)
+
+	transport.RegisterResponder("GET", arcURL+wrongButReachable, responder(http.StatusNotFound, `{
+			"message": "no matching operation was found"
+		}`),
+	)
+
 	return client
+}
+
+func arcCfg(url, token string) chainmodels.ARCConfig {
+	return chainmodels.ARCConfig{
+		URL:          url,
+		Token:        token,
+		DeploymentID: "spv-wallet-test-arc-connection",
+	}
 }
