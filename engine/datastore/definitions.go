@@ -34,7 +34,6 @@ const (
 	sqlIDFieldProper       = "ID"          // The ID field for SQL (capitalized)
 
 	// Field types and tags
-	bsonTagName         = "bson"       // Tag name for BSON
 	nullStringFieldType = "NullString" // Field type name for Null String
 	nullTimeFieldType   = "NullTime"   // Field type name for Null Time
 
