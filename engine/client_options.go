@@ -10,6 +10,7 @@ import (
 	"github.com/bitcoin-sv/go-broadcast-client/broadcast"
 	"github.com/bitcoin-sv/go-paymail"
 	"github.com/bitcoin-sv/go-paymail/server"
+	chainmodels "github.com/bitcoin-sv/spv-wallet/engine/chain/models"
 	"github.com/bitcoin-sv/spv-wallet/engine/chainstate"
 	"github.com/bitcoin-sv/spv-wallet/engine/cluster"
 	"github.com/bitcoin-sv/spv-wallet/engine/datastore"
@@ -644,7 +645,7 @@ func WithCallback(callbackURL string, callbackToken string) ClientOps {
 // WithARC set ARC url params
 func WithARC(url, token, deploymentID string) ClientOps {
 	return func(c *clientOptions) {
-		c.arcConfig = arcConfig{
+		c.arcConfig = chainmodels.ARCConfig{
 			URL:          url,
 			Token:        token,
 			DeploymentID: deploymentID,
