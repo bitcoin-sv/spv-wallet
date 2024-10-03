@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 
 	"github.com/99designs/gqlgen/graphql"
-
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 )
 
