@@ -32,6 +32,19 @@ func TestNullString(t *testing.T) {
 	})
 }
 
+// TestNullString_IsZero will test the method IsZero()
+func TestNullString_IsZero(t *testing.T) {
+	t.Run("nil string", func(t *testing.T) {
+		nt := new(NullString)
+		assert.True(t, nt.IsZero())
+	})
+
+	t.Run("string", func(t *testing.T) {
+		nt := NullString{sql.NullString{Valid: true, String: testString}}
+		assert.False(t, nt.IsZero())
+	})
+}
+
 // TestMarshalNullString will test the method MarshalNullString()
 func TestMarshalNullString(t *testing.T) {
 	t.Run("empty string", func(t *testing.T) {

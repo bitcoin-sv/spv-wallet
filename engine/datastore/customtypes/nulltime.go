@@ -6,12 +6,18 @@ import (
 	"time"
 
 	"github.com/99designs/gqlgen/graphql"
+
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 )
 
 // NullTime wrapper around sql.NullTime
 type NullTime struct {
 	sql.NullTime
+}
+
+// IsZero method is called by bson.IsZero in Mongo for type = NullTime
+func (x NullTime) IsZero() bool {
+	return !x.Valid
 }
 
 // MarshalNullTime is used by GraphQL to marshal the value

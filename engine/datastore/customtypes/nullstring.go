@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 
 	"github.com/99designs/gqlgen/graphql"
+
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 )
 
@@ -20,6 +21,11 @@ func MarshalNullString(x NullString) graphql.Marshaler {
 	}
 
 	return graphql.MarshalString(x.String)
+}
+
+// IsZero method is called by bson.IsZero in Mongo for type = NullTime
+func (x NullString) IsZero() bool {
+	return !x.Valid
 }
 
 // UnmarshalNullString is used by graphql to unmarshal from a NullString into a string

@@ -86,6 +86,21 @@ func TestUnmarshalNullTime(t *testing.T) {
 	})
 }
 
+// TestNullTime_IsZero will test the method IsZero()
+func TestNullTime_IsZero(t *testing.T) {
+	t.Parallel()
+
+	t.Run("nil time", func(t *testing.T) {
+		nt := new(NullTime)
+		assert.True(t, nt.IsZero())
+	})
+
+	t.Run("time", func(t *testing.T) {
+		nt := time.Now().UTC()
+		assert.False(t, nt.IsZero())
+	})
+}
+
 // TestNullTime_MarshalJSON will test the method MarshalJSON()
 func TestNullTime_MarshalJSON(t *testing.T) {
 	t.Parallel()
