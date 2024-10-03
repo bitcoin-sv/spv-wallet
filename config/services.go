@@ -10,10 +10,6 @@ import (
 	"strings"
 
 	broadcastclient "github.com/bitcoin-sv/go-broadcast-client/broadcast/broadcast-client"
-	"github.com/go-redis/redis/v8"
-	"github.com/mrz1836/go-cachestore"
-	"github.com/rs/zerolog"
-
 	"github.com/bitcoin-sv/spv-wallet/engine"
 	"github.com/bitcoin-sv/spv-wallet/engine/cluster"
 	"github.com/bitcoin-sv/spv-wallet/engine/datastore"
@@ -22,6 +18,9 @@ import (
 	"github.com/bitcoin-sv/spv-wallet/engine/utils"
 	"github.com/bitcoin-sv/spv-wallet/logging"
 	"github.com/bitcoin-sv/spv-wallet/metrics"
+	"github.com/go-redis/redis/v8"
+	"github.com/mrz1836/go-cachestore"
+	"github.com/rs/zerolog"
 )
 
 // explicitHTTPURLRegex is a regex pattern to check the callback URL (host)

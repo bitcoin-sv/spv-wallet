@@ -3,9 +3,8 @@ package config
 import (
 	"time"
 
-	"github.com/google/uuid"
-
 	"github.com/bitcoin-sv/spv-wallet/engine/datastore"
+	"github.com/google/uuid"
 )
 
 // DefaultAdminXpub is the default admin xpub used for authenticate requests.
