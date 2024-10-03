@@ -5,12 +5,11 @@ import (
 	"database/sql/driver"
 	"encoding/json"
 
-	"gorm.io/gorm"
-	"gorm.io/gorm/schema"
-
 	"github.com/bitcoin-sv/spv-wallet/engine/datastore"
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/bitcoin-sv/spv-wallet/engine/utils"
+	"gorm.io/gorm"
+	"gorm.io/gorm/schema"
 )
 
 const (

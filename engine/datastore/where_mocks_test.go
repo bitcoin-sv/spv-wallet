@@ -8,12 +8,11 @@ import (
 	"time"
 
 	"github.com/DATA-DOG/go-sqlmock"
+	"github.com/bitcoin-sv/spv-wallet/engine/utils"
 	"gorm.io/driver/postgres"
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
 	"gorm.io/gorm/schema"
-
-	"github.com/bitcoin-sv/spv-wallet/engine/utils"
 )
 
 type mockObject struct {
