@@ -18,13 +18,13 @@ type Model struct {
 	// ModelInterface `json:"-" toml:"-" yaml:"-" gorm:"-"` (@mrz: not needed, all models implement all methods)
 	// ID string  `json:"id" toml:"id" yaml:"id" gorm:"primaryKey"`  (@mrz: custom per table)
 
-	CreatedAt time.Time `json:"created_at" toml:"created_at" yaml:"created_at" gorm:"comment:The time that the record was originally created" bson:"created_at"`
-	UpdatedAt time.Time `json:"updated_at" toml:"updated_at" yaml:"updated_at" gorm:"comment:The time that the record was last updated" bson:"updated_at,omitempty"`
-	Metadata  Metadata  `gorm:"type:json;comment:The JSON metadata for the record" json:"metadata,omitempty" bson:"metadata,omitempty"`
+	CreatedAt time.Time `json:"created_at" toml:"created_at" yaml:"created_at" gorm:"comment:The time that the record was originally created"`
+	UpdatedAt time.Time `json:"updated_at" toml:"updated_at" yaml:"updated_at" gorm:"comment:The time that the record was last updated"`
+	Metadata  Metadata  `gorm:"type:json;comment:The JSON metadata for the record" json:"metadata,omitempty"`
 
 	// https://gorm.io/docs/indexes.html
 	// DeletedAt gorm.DeletedAt `json:"deleted_at" toml:"deleted_at" yaml:"deleted_at" (@mrz: this was the original type)
-	DeletedAt customTypes.NullTime `json:"deleted_at" toml:"deleted_at" yaml:"deleted_at" gorm:"index;comment:The time the record was marked as deleted" bson:"deleted_at,omitempty"`
+	DeletedAt customTypes.NullTime `json:"deleted_at" toml:"deleted_at" yaml:"deleted_at" gorm:"index;comment:The time the record was marked as deleted"`
 
 	// Private fields
 	client        ClientInterface // Interface of the parent Client that loaded this SPV Wallet Engine model

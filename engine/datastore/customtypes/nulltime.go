@@ -7,8 +7,6 @@ import (
 
 	"github.com/99designs/gqlgen/graphql"
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
-	"go.mongodb.org/mongo-driver/bson"
-	"go.mongodb.org/mongo-driver/bson/bsontype"
 )
 
 // NullTime wrapper around sql.NullTime
@@ -48,35 +46,6 @@ func UnmarshalNullTime(t interface{}) (NullTime, error) {
 			Valid: true,
 		},
 	}, spverrors.Wrapf(err, "failed to parse time: %v", t)
-}
-
-// MarshalBSONValue method is called by bson.Marshal in Mongo for type = NullTime
-func (x *NullTime) MarshalBSONValue() (bsontype.Type, []byte, error) {
-	if !x.Valid {
-		return bsontype.Null, nil, nil
-	}
-
-	valueType, b, err := bson.MarshalValue(x.Time)
-	return valueType, b, spverrors.Wrapf(err, "failed to convert NullTime to BSON: %v", x)
-}
-
-// UnmarshalBSONValue method is called by bson.Unmarshal in Mongo for type = NullTime
-func (x *NullTime) UnmarshalBSONValue(t bsontype.Type, data []byte) error {
-	raw := bson.RawValue{Type: t, Value: data}
-	uTime := time.Time{}
-
-	if err := raw.Unmarshal(&uTime); err != nil {
-		return spverrors.Wrapf(err, "failed to parse time from BSON")
-	}
-
-	if raw.Value == nil {
-		x.Valid = false
-		return nil
-	}
-
-	x.Valid = true
-	x.Time = uTime
-	return nil
 }
 
 // MarshalJSON method is called by the JSON marshaller

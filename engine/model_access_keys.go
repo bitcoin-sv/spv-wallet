@@ -23,15 +23,15 @@ import (
 // Gorm related models & indexes: https://gorm.io/docs/models.html - https://gorm.io/docs/indexes.html
 type AccessKey struct {
 	// Base model
-	Model `bson:",inline"`
+	Model
 
 	// Model specific fields
-	ID        string               `json:"id" toml:"id" yaml:"id" gorm:"<-:create;type:char(64);primaryKey;comment:This is the unique access key id" bson:"_id"`
-	XpubID    string               `json:"xpub_id" toml:"xpub_id" yaml:"hash" gorm:"<-:create;type:char(64);index;comment:This is the related xPub id" bson:"xpub_id"`
-	RevokedAt customTypes.NullTime `json:"revoked_at" toml:"revoked_at" yaml:"revoked_at" gorm:"<-;comment:When the key was revoked" bson:"revoked_at,omitempty"`
+	ID        string               `json:"id" toml:"id" yaml:"id" gorm:"<-:create;type:char(64);primaryKey;comment:This is the unique access key id"`
+	XpubID    string               `json:"xpub_id" toml:"xpub_id" yaml:"hash" gorm:"<-:create;type:char(64);index;comment:This is the related xPub id"`
+	RevokedAt customTypes.NullTime `json:"revoked_at" toml:"revoked_at" yaml:"revoked_at" gorm:"<-;comment:When the key was revoked"`
 
 	// Private fields
-	Key string `json:"key" gorm:"-" bson:"-"` // Used on "CREATE", shown to the user "once" only
+	Key string `json:"key" gorm:"-"` // Used on "CREATE", shown to the user "once" only
 }
 
 // newAccessKey will start a new model

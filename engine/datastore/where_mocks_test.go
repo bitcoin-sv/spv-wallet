@@ -9,8 +9,6 @@ import (
 
 	"github.com/DATA-DOG/go-sqlmock"
 	"github.com/bitcoin-sv/spv-wallet/engine/utils"
-	"go.mongodb.org/mongo-driver/bson"
-	"go.mongodb.org/mongo-driver/bson/bsontype"
 	"gorm.io/driver/postgres"
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
@@ -90,43 +88,6 @@ func (Metadata) GormDBDataType(db *gorm.DB, _ *schema.Field) string {
 		return JSONB
 	}
 	return JSON
-}
-
-func (m *Metadata) MarshalBSONValue() (bsontype.Type, []byte, error) {
-	if m == nil || len(*m) == 0 {
-		return bson.TypeNull, nil, nil
-	}
-
-	metadata := make([]map[string]interface{}, 0)
-	for key, value := range *m {
-		metadata = append(metadata, map[string]interface{}{
-			"k": key,
-			"v": value,
-		})
-	}
-
-	return bson.MarshalValue(metadata)
-}
-
-func (m *Metadata) UnmarshalBSONValue(t bsontype.Type, data []byte) error {
-	raw := bson.RawValue{Type: t, Value: data}
-
-	if raw.Value == nil {
-		return nil
-	}
-
-	var uMap []map[string]interface{}
-	if err := raw.Unmarshal(&uMap); err != nil {
-		return err
-	}
-
-	*m = make(Metadata)
-	for _, meta := range uMap {
-		key := meta["k"].(string)
-		(*m)[key] = meta["v"]
-	}
-
-	return nil
 }
 
 type IDs []string
