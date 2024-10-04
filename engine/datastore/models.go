@@ -336,7 +336,7 @@ func (c *Client) aggregate(ctx context.Context, model interface{}, conditions ma
 	// Create the result
 	aggregateResult := make(map[string]interface{})
 	for _, item := range aggregate {
-		key := item[mongoIDField].(string)
+		key := item[sqlIDField].(string)
 		aggregateResult[key] = item[accumulationCountField]
 	}
 

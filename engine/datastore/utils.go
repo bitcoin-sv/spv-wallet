@@ -2,7 +2,6 @@ package datastore
 
 import (
 	"reflect"
-	"strings"
 
 	"github.com/iancoleman/strcase"
 )
@@ -28,7 +27,7 @@ func IsModelSlice(model interface{}) bool {
 	return modelType.Kind() == reflect.Slice
 }
 
-// GetModelName get the name of the model via reflection
+// GetModelName gets the name of the model via reflection
 func GetModelName(model interface{}) *string {
 	// Model is nil
 	if model == nil {
@@ -55,7 +54,7 @@ func GetModelName(model interface{}) *string {
 	return &modelName
 }
 
-// GetModelTableName get the db table name of the model via reflection
+// GetModelTableName gets the db table name of the model via reflection
 func GetModelTableName(model interface{}) *string {
 	// Model is nil
 	if model == nil {
@@ -82,7 +81,7 @@ func GetModelTableName(model interface{}) *string {
 	return &modelName
 }
 
-// GetModelType get the model type of the model interface via reflection
+// GetModelType gets the model type of the model interface via reflection
 func GetModelType(model interface{}) reflect.Type {
 	value := reflect.ValueOf(model)
 	if value.Kind() == reflect.Ptr && value.IsNil() {
@@ -94,8 +93,7 @@ func GetModelType(model interface{}) reflect.Type {
 		modelType = reflect.Indirect(reflect.ValueOf(model)).Elem().Type()
 	}
 
-	// Using "for" here to traverse to an actual element
-	// this will find the element even if something is for instance a Ptr to a Slice
+	// Traverse to the actual element (in case of Ptr to a Slice or Array)
 	for modelType.Kind() == reflect.Slice ||
 		modelType.Kind() == reflect.Array ||
 		modelType.Kind() == reflect.Ptr {
@@ -105,7 +103,7 @@ func GetModelType(model interface{}) reflect.Type {
 	return modelType
 }
 
-// GetModelStringAttribute the attribute from the model as a string
+// GetModelStringAttribute retrieves a string attribute from the model
 func GetModelStringAttribute(model interface{}, attribute string) *string {
 	valueOf := reflect.ValueOf(model)
 	if model == nil || (valueOf.Kind() == reflect.Ptr &&
@@ -125,7 +123,7 @@ func GetModelStringAttribute(model interface{}, attribute string) *string {
 	return nil
 }
 
-// GetModelBoolAttribute the attribute from the model as a bool
+// GetModelBoolAttribute retrieves a boolean attribute from the model
 func GetModelBoolAttribute(model interface{}, attribute string) *bool {
 	modelReflect := reflect.Indirect(reflect.ValueOf(model))
 	if modelReflect.IsValid() {
@@ -139,9 +137,7 @@ func GetModelBoolAttribute(model interface{}, attribute string) *bool {
 	return nil
 }
 
-// GetModelUnset gets any empty values on the model and makes sure
-// the update actually unsets those values in the database, otherwise
-// this never happens, and we cannot unset
+// GetModelUnset identifies fields in the model that should be unset (i.e., cleared) in the database
 func GetModelUnset(model interface{}) map[string]bool {
 	unset := make(map[string]bool)
 	t := reflect.TypeOf(model)
@@ -153,7 +149,7 @@ func GetModelUnset(model interface{}) map[string]bool {
 	if t.Kind() == reflect.Struct {
 		fields := reflect.VisibleFields(t)
 		for _, field := range fields {
-			// only get base fields / not fields of the BaseModel
+			// Only handle top-level fields, not embedded structs (e.g., BaseModel)
 			if len(field.Index) == 1 {
 				if field.Type.Name() == nullStringFieldType ||
 					field.Type.Name() == nullTimeFieldType {
@@ -165,15 +161,6 @@ func GetModelUnset(model interface{}) map[string]bool {
 					valid := reflect.ValueOf(value).FieldByName("Valid").Interface().(bool)
 					if !valid {
 						fieldName := strcase.ToSnake(field.Name)
-						bsonTag := field.Tag.Get(bsonTagName)
-						if bsonTag == "-" {
-							// do not process private fields
-							continue
-						}
-						if bsonTag != "" {
-							args := strings.Split(bsonTag, ",")
-							fieldName = args[0]
-						}
 						unset[fieldName] = true
 					}
 				}
@@ -184,7 +171,7 @@ func GetModelUnset(model interface{}) map[string]bool {
 	return unset
 }
 
-// StringInSlice check whether the string already is in the slice
+// StringInSlice checks whether a string is present in a slice
 func StringInSlice(a string, list []string) bool {
 	for _, b := range list {
 		if b == a {
