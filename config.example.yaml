@@ -64,11 +64,6 @@ debug_profiling: true
 disable_itc: true
 # url to import block headers
 import_block_headers: ""
-new_relic:
-  # used for relic HostDisplayName
-  domain_name: domain.com
-  enabled: false
-  license_key: BOGUS-LICENSE-KEY-1234567890987654321234
 arc:
   url: https://arc.taal.com
   token: mainnet_06770f425eb00298839a24a49cbdc02c

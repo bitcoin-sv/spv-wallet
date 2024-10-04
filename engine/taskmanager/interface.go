@@ -15,6 +15,4 @@ type TaskEngine interface {
 	CronJobsInit(cronJobsMap CronJobs) error
 	Close(ctx context.Context) error
 	Factory() Factory
-	GetTxnCtx(ctx context.Context) context.Context
-	IsNewRelicEnabled() bool
 }

@@ -36,7 +36,6 @@ func TestAppServices_CloseAll(t *testing.T) {
 		s.CloseAll(context.Background())
 
 		assert.Nil(t, s.SpvWalletEngine)
-		assert.Nil(t, s.NewRelic)
 	})
 }
 

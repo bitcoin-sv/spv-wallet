@@ -23,7 +23,6 @@ import (
 	"github.com/go-redis/redis/v8"
 	"github.com/mrz1836/go-cache"
 	"github.com/mrz1836/go-cachestore"
-	"github.com/newrelic/go-agent/v3/newrelic"
 	"github.com/rs/zerolog"
 	"github.com/vmihailenco/taskq/v3"
 )
@@ -82,9 +81,6 @@ func defaultClientOptions() *clientOptions {
 			migrateModelNames: nil,
 			migrateModels:     nil,
 		},
-
-		// Blank NewRelic config
-		newRelic: &newRelicOptions{},
 
 		// Blank Paymail config
 		paymail: &paymailOptions{
@@ -174,29 +170,6 @@ func WithUserAgent(userAgent string) ClientOps {
 		if len(userAgent) > 0 {
 			c.userAgent = userAgent
 		}
-	}
-}
-
-// WithNewRelic will set the NewRelic application client
-func WithNewRelic(app *newrelic.Application) ClientOps {
-	return func(c *clientOptions) {
-		// Disregard if the app is nil
-		if app == nil {
-			return
-		}
-
-		// Set the app
-		c.newRelic.app = app
-
-		// Enable New relic on other services
-		c.cacheStore.options = append(c.cacheStore.options, cachestore.WithNewRelic())
-		c.chainstate.options = append(c.chainstate.options, chainstate.WithNewRelic())
-		c.dataStore.options = append(c.dataStore.options, datastore.WithNewRelic())
-		c.taskManager.options = append(c.taskManager.options, taskmanager.WithNewRelic())
-		// c.notifications.options = append(c.notifications.options, notifications.WithNewRelic())
-
-		// Enable the service
-		c.newRelic.enabled = true
 	}
 }
 

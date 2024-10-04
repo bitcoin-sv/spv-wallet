@@ -1,13 +1,11 @@
 package chainstate
 
 import (
-	"context"
 	"time"
 
 	"github.com/bitcoin-sv/go-broadcast-client/broadcast"
 	"github.com/bitcoin-sv/spv-wallet/engine/metrics"
 	"github.com/bitcoin-sv/spv-wallet/engine/utils"
-	"github.com/newrelic/go-agent/v3/newrelic"
 	"github.com/rs/zerolog"
 )
 
@@ -30,27 +28,8 @@ func defaultClientOptions() *clientOptions {
 			feeQuotes:             true,
 			feeUnit:               nil, // fee has to be set explicitly or via fee quotes
 		},
-		debug:           false,
-		newRelicEnabled: false,
-		metrics:         nil,
-	}
-}
-
-// getTxnCtx will check for an existing transaction
-func (c *clientOptions) getTxnCtx(ctx context.Context) context.Context {
-	if c.newRelicEnabled {
-		txn := newrelic.FromContext(ctx)
-		if txn != nil {
-			ctx = newrelic.NewContext(ctx, txn)
-		}
-	}
-	return ctx
-}
-
-// WithNewRelic will enable the NewRelic wrapper
-func WithNewRelic() ClientOps {
-	return func(c *clientOptions) {
-		c.newRelicEnabled = true
+		debug:   false,
+		metrics: nil,
 	}
 }
 

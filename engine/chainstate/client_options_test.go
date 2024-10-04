@@ -12,29 +12,6 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-// TestWithNewRelic will test the method WithNewRelic()
-func TestWithNewRelic(t *testing.T) {
-	t.Run("get opts", func(t *testing.T) {
-		opt := WithNewRelic()
-		assert.IsType(t, *new(ClientOps), opt)
-	})
-
-	t.Run("apply opts", func(t *testing.T) {
-		bc := broadcast_client_mock.Builder().
-			WithMockArc(broadcast_client_mock.MockSuccess).
-			Build()
-		opts := []ClientOps{
-			WithNewRelic(),
-			WithBroadcastClient(bc),
-		}
-		c, err := NewClient(context.Background(), opts...)
-		require.NotNil(t, c)
-		require.NoError(t, err)
-
-		assert.Equal(t, true, c.IsNewRelicEnabled())
-	})
-}
-
 // TestWithDebugging will test the method WithDebugging()
 func TestWithDebugging(t *testing.T) {
 

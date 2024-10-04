@@ -6,7 +6,7 @@ import (
 
 	"github.com/bitcoin-sv/go-paymail"
 	"github.com/bitcoin-sv/spv-wallet/engine/chain"
-	"github.com/bitcoin-sv/spv-wallet/engine/chain/models"
+	chainmodels "github.com/bitcoin-sv/spv-wallet/engine/chain/models"
 	"github.com/bitcoin-sv/spv-wallet/engine/chainstate"
 	"github.com/bitcoin-sv/spv-wallet/engine/cluster"
 	"github.com/bitcoin-sv/spv-wallet/engine/datastore"
@@ -205,13 +205,10 @@ type ClientInterface interface {
 	Close(ctx context.Context) error
 	Debug(on bool)
 	DefaultSyncConfig() *SyncConfig
-	EnableNewRelic()
-	GetOrStartTxn(ctx context.Context, name string) context.Context
 	IsDebug() bool
 	IsEncryptionKeySet() bool
 	IsIUCEnabled() bool
 	IsMigrationEnabled() bool
-	IsNewRelicEnabled() bool
 	UserAgent() string
 	Version() string
 	Metrics() (metrics *metrics.Metrics, enabled bool)

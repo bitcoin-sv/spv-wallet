@@ -5,7 +5,6 @@ import (
 	"strings"
 
 	zLogger "github.com/mrz1836/go-logger"
-	"github.com/newrelic/go-agent/v3/newrelic"
 	"gorm.io/gorm"
 	gLogger "gorm.io/gorm/logger"
 )
@@ -19,19 +18,18 @@ type (
 
 	// clientOptions holds all the configuration for the client
 	clientOptions struct {
-		autoMigrate     bool                        // Setting for Auto Migration of SQL tables
-		db              *gorm.DB                    // Database connection for Read-Only requests (can be same as Write)
-		debug           bool                        // Setting for global debugging
-		engine          Engine                      // Datastore engine (PostgreSQL, SQLite)
-		fields          *fieldConfig                // Configuration for custom fields
-		logger          zLogger.GormLoggerInterface // Custom logger interface (standard interface)
-		loggerDB        gLogger.Interface           // Custom logger interface (for GORM)
-		migratedModels  []string                    // List of models (types) that have been migrated
-		migrateModels   []interface{}               // Models for migrations
-		newRelicEnabled bool                        // If NewRelic is enabled (parent application)
-		sqlConfigs      []*SQLConfig                // Configuration for a PostgreSQL datastore
-		sqLite          *SQLiteConfig               // Configuration for a SQLite datastore
-		tablePrefix     string                      // Model table prefix
+		autoMigrate    bool                        // Setting for Auto Migration of SQL tables
+		db             *gorm.DB                    // Database connection for Read-Only requests (can be same as Write)
+		debug          bool                        // Setting for global debugging
+		engine         Engine                      // Datastore engine (PostgreSQL, SQLite)
+		fields         *fieldConfig                // Configuration for custom fields
+		logger         zLogger.GormLoggerInterface // Custom logger interface (standard interface)
+		loggerDB       gLogger.Interface           // Custom logger interface (for GORM)
+		migratedModels []string                    // List of models (types) that have been migrated
+		migrateModels  []interface{}               // Models for migrations
+		sqlConfigs     []*SQLConfig                // Configuration for a PostgreSQL datastore
+		sqLite         *SQLiteConfig               // Configuration for a SQLite datastore
+		tablePrefix    string                      // Model table prefix
 	}
 
 	// fieldConfig is the configuration for custom fields
@@ -44,7 +42,6 @@ type (
 // NewClient creates a new client for all Datastore functionality
 //
 // If no options are given, it will use the defaultClientOptions()
-// ctx may contain a NewRelic txn (or one will be created)
 func NewClient(ctx context.Context, opts ...ClientOps) (ClientInterface, error) {
 	// Create a new client with defaults
 	client := &Client{options: defaultClientOptions()}
@@ -78,17 +75,6 @@ func NewClient(ctx context.Context, opts ...ClientOps) (ClientInterface, error) 
 		opt(client.options)
 	}
 
-	// Use NewRelic if it's enabled (use existing txn if found on ctx)
-	ctx = client.options.getTxnCtx(ctx)
-
-	// If NewRelic is enabled
-	txn := newrelic.FromContext(ctx)
-	if txn != nil {
-		segment := txn.StartSegment("load_datastore")
-		segment.AddAttribute("engine", client.Engine().String())
-		defer segment.End()
-	}
-
 	// Use different datastore configurations
 	var err error
 	if client.Engine() == PostgreSQL {
@@ -118,9 +104,6 @@ func NewClient(ctx context.Context, opts ...ClientOps) (ClientInterface, error) 
 
 // Close will terminate (close) the datastore and any open connections
 func (c *Client) Close(ctx context.Context) error {
-	if txn := newrelic.FromContext(ctx); txn != nil {
-		defer txn.StartSegment("close_datastore").End()
-	}
 
 	if err := closeSQLDatabase(c.options.db); err != nil {
 		return err
@@ -188,11 +171,6 @@ func (c *Client) HasMigratedModel(modelType string) bool {
 // IsDebug will return the debug flag (bool)
 func (c *Client) IsDebug() bool {
 	return c.options.debug
-}
-
-// IsNewRelicEnabled will return if new relic is enabled
-func (c *Client) IsNewRelicEnabled() bool {
-	return c.options.newRelicEnabled
 }
 
 // DB returns ready to use gorm instance

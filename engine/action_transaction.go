@@ -5,7 +5,7 @@ import (
 	"math"
 	"time"
 
-	"github.com/bitcoin-sv/spv-wallet/engine/chain/models"
+	chainmodels "github.com/bitcoin-sv/spv-wallet/engine/chain/models"
 	"github.com/bitcoin-sv/spv-wallet/engine/datastore"
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/bitcoin-sv/spv-wallet/engine/utils"
@@ -19,7 +19,6 @@ import (
 // draftID is the unique draft id from a previously started New() transaction (draft_transaction.ID)
 // opts are model options and can include "metadata"
 func (c *Client) RecordTransaction(ctx context.Context, xPubKey, txHex, draftID string, opts ...ModelOps) (*Transaction, error) {
-	ctx = c.GetOrStartTxn(ctx, "record_transaction")
 
 	tx, err := bt.NewTxFromString(txHex)
 	if err != nil {
@@ -43,7 +42,6 @@ func (c *Client) RecordTransaction(ctx context.Context, xPubKey, txHex, draftID 
 func (c *Client) RecordRawTransaction(ctx context.Context, txHex string,
 	opts ...ModelOps,
 ) (*Transaction, error) {
-	ctx = c.GetOrStartTxn(ctx, "record_raw_transaction")
 
 	return saveRawTransaction(ctx, c, true, txHex, opts...)
 }
@@ -58,8 +56,6 @@ func (c *Client) RecordRawTransaction(ctx context.Context, txHex string,
 func (c *Client) NewTransaction(ctx context.Context, rawXpubKey string, config *TransactionConfig,
 	opts ...ModelOps,
 ) (*DraftTransaction, error) {
-	// Check for existing NewRelic draftTransaction
-	ctx = c.GetOrStartTxn(ctx, "new_transaction")
 
 	// Create the lock and set the release for after the function completes
 	unlock, err := getWaitWriteLockForXpub(
@@ -90,8 +86,6 @@ func (c *Client) NewTransaction(ctx context.Context, rawXpubKey string, config *
 
 // GetTransaction will get a transaction by its ID from the Datastore
 func (c *Client) GetTransaction(ctx context.Context, xPubID, txID string) (*Transaction, error) {
-	// Check for existing NewRelic transaction
-	ctx = c.GetOrStartTxn(ctx, "get_transaction")
 
 	// Get the transaction by ID
 	transaction, err := getTransactionByID(
@@ -109,8 +103,6 @@ func (c *Client) GetTransaction(ctx context.Context, xPubID, txID string) (*Tran
 
 // GetTransactionsByIDs returns array of transactions by their IDs from the Datastore
 func (c *Client) GetTransactionsByIDs(ctx context.Context, txIDs []string) ([]*Transaction, error) {
-	// Check for existing NewRelic transaction
-	ctx = c.GetOrStartTxn(ctx, "get_transactions_by_ids")
 
 	// Create the conditions
 	conditions := generateTxIDFilterConditions(txIDs)
@@ -142,8 +134,6 @@ func (c *Client) GetTransactionByHex(ctx context.Context, hex string) (*Transact
 func (c *Client) GetTransactions(ctx context.Context, metadataConditions *Metadata,
 	conditions map[string]interface{}, queryParams *datastore.QueryParams, opts ...ModelOps,
 ) ([]*Transaction, error) {
-	// Check for existing NewRelic transaction
-	ctx = c.GetOrStartTxn(ctx, "get_transactions")
 
 	// Get the transactions
 	transactions, err := getTransactions(
@@ -161,8 +151,6 @@ func (c *Client) GetTransactions(ctx context.Context, metadataConditions *Metada
 func (c *Client) GetTransactionsCount(ctx context.Context, metadataConditions *Metadata,
 	conditions map[string]interface{}, opts ...ModelOps,
 ) (int64, error) {
-	// Check for existing NewRelic transaction
-	ctx = c.GetOrStartTxn(ctx, "get_transactions_count")
 
 	// Get the transactions count
 	count, err := getTransactionsCount(
@@ -185,8 +173,6 @@ func (c *Client) GetTransactionsCount(ctx context.Context, metadataConditions *M
 func (c *Client) GetTransactionsByXpubID(ctx context.Context, xPubID string, metadataConditions *Metadata,
 	conditions map[string]interface{}, queryParams *datastore.QueryParams,
 ) ([]*Transaction, error) {
-	// Check for existing NewRelic transaction
-	ctx = c.GetOrStartTxn(ctx, "get_transaction")
 
 	// Get the transaction by ID
 	transactions, err := getTransactionsByXpubID(
@@ -208,8 +194,6 @@ func (c *Client) GetTransactionsByXpubID(ctx context.Context, xPubID string, met
 func (c *Client) GetTransactionsByXpubIDCount(ctx context.Context, xPubID string, metadataConditions *Metadata,
 	conditions map[string]interface{},
 ) (int64, error) {
-	// Check for existing NewRelic transaction
-	ctx = c.GetOrStartTxn(ctx, "count_transactions")
 
 	count, err := getTransactionsCountByXpubID(
 		ctx, xPubID, metadataConditions, conditions,
@@ -226,8 +210,6 @@ func (c *Client) GetTransactionsByXpubIDCount(ctx context.Context, xPubID string
 func (c *Client) UpdateTransactionMetadata(ctx context.Context, xPubID, id string,
 	metadata Metadata,
 ) (*Transaction, error) {
-	// Check for existing NewRelic transaction
-	ctx = c.GetOrStartTxn(ctx, "update_transaction_by_id")
 
 	// Get the transaction
 	transaction, err := c.GetTransaction(ctx, xPubID, id)

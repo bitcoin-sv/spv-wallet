@@ -38,12 +38,10 @@ type ClientInterface interface {
 	ChainService
 	ProviderServices
 	HeadersService
-	Close(ctx context.Context)
 	Debug(on bool)
 	DebugLog(text string)
 	HTTPClient() HTTPInterface
 	IsDebug() bool
-	IsNewRelicEnabled() bool
 	Network() Network
 	QueryTimeout() time.Duration
 	FeeUnit() *utils.FeeUnit

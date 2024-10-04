@@ -57,7 +57,6 @@ func LoadRealRedis(
 	maxActive int,
 	maxIdle int,
 	dependency bool,
-	newRelic bool,
 ) (client *cache.Client, conn redis.Conn, err error) {
 	client, err = cache.Connect(
 		context.Background(),
@@ -67,7 +66,7 @@ func LoadRealRedis(
 		maxConnTime,
 		idleTimeout,
 		dependency,
-		newRelic,
+		false,
 	)
 	if err != nil {
 		return

@@ -12,21 +12,18 @@ import (
 
 // Config constants used for spv-wallet
 const (
-	ApplicationName         = "SPVWallet"
-	APIVersion              = "v1"
-	DefaultNewRelicShutdown = 10 * time.Second
-	HealthRequestPath       = "health"
-	Version                 = "v0.12.0"
-	ConfigFilePathKey       = "config_file"
-	DefaultConfigFilePath   = "config.yaml"
-	EnvPrefix               = "SPVWALLET"
-	BroadcastCallbackRoute  = "/transaction/broadcast/callback"
+	ApplicationName        = "SPVWallet"
+	APIVersion             = "v1"
+	HealthRequestPath      = "health"
+	Version                = "v0.12.0"
+	ConfigFilePathKey      = "config_file"
+	DefaultConfigFilePath  = "config.yaml"
+	EnvPrefix              = "SPVWALLET"
+	BroadcastCallbackRoute = "/transaction/broadcast/callback"
 )
 
 // AppConfig is the configuration values and associated env vars
 type AppConfig struct {
-	// NewRelic is New Relic related settings.
-	NewRelic *NewRelicConfig `json:"new_relic" mapstructure:"new_relic"`
 	// TaskManager is a configuration for Task Manager in SPV Wallet.
 	TaskManager *TaskManagerConfig `json:"task_manager" mapstructure:"task_manager"`
 	// Authentication is the configuration for keys authentication in SPV Wallet.
@@ -139,16 +136,6 @@ type DatastoreConfig struct {
 	Engine datastore.Engine `json:"engine" mapstructure:"engine"`
 	// Debug is a flag that decides whether additional output (such as sql statements) should be produced from datastore.
 	Debug bool `json:"debug" mapstructure:"debug"`
-}
-
-// NewRelicConfig is the configuration for New Relic
-type NewRelicConfig struct {
-	// DomainName is used for hostname display.
-	DomainName string `json:"domain_name" mapstructure:"domain_name"`
-	// LicenseKey is the New Relic license key.
-	LicenseKey string `json:"license_key" mapstructure:"license_key"`
-	// Enabled is the flag that enables New Relic service.
-	Enabled bool `json:"enabled" mapstructure:"enabled"`
 }
 
 // ARCConfig consists of blockchain nodes (Arc) configuration
