@@ -2,11 +2,11 @@ package arc_test
 
 import (
 	"context"
-	chainmodels "github.com/bitcoin-sv/spv-wallet/engine/chain/models"
 	"testing"
 	"time"
 
 	"github.com/bitcoin-sv/spv-wallet/engine/chain"
+	"github.com/bitcoin-sv/spv-wallet/engine/chain/models"
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/bitcoin-sv/spv-wallet/engine/tester"
 	"github.com/stretchr/testify/require"

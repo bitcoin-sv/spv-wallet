@@ -4,12 +4,13 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"net"
+	"net/http"
+
 	"github.com/bitcoin-sv/go-paymail/spv"
 	"github.com/bitcoin-sv/spv-wallet/engine/chain/errors"
 	"github.com/bitcoin-sv/spv-wallet/engine/chain/models"
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
-	"net"
-	"net/http"
 )
 
 /**
@@ -17,6 +18,7 @@ NOTE: When you switch from enabled use_beef to disabled and restart the server,
 sometimes paymail capabilities are cached and VerifyMerkleRoots is called even though it shouldn't be.
 */
 
+// VerifyMerkleRoots verifies the merkle roots of the given transactions using BHS request
 func (s *Service) VerifyMerkleRoots(ctx context.Context, merkleRoots []*spv.MerkleRootConfirmationRequestItem) (*chainmodels.MerkleRootsConfirmations, error) {
 	result := &chainmodels.MerkleRootsConfirmations{}
 	req := s.httpClient.R().

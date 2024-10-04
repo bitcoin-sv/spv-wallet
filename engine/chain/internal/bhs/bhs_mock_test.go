@@ -3,12 +3,13 @@ package bhs_test
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/bitcoin-sv/go-paymail/spv"
-	chainmodels "github.com/bitcoin-sv/spv-wallet/engine/chain/models"
-	"github.com/go-resty/resty/v2"
-	"github.com/jarcoal/httpmock"
 	"net/http"
 	"time"
+
+	"github.com/bitcoin-sv/go-paymail/spv"
+	"github.com/bitcoin-sv/spv-wallet/engine/chain/models"
+	"github.com/go-resty/resty/v2"
+	"github.com/jarcoal/httpmock"
 )
 
 const (

@@ -2,12 +2,13 @@ package bhs_test
 
 import (
 	"context"
+	"testing"
+
 	"github.com/bitcoin-sv/spv-wallet/engine/chain"
-	chainerrors "github.com/bitcoin-sv/spv-wallet/engine/chain/errors"
-	chainmodels "github.com/bitcoin-sv/spv-wallet/engine/chain/models"
+	"github.com/bitcoin-sv/spv-wallet/engine/chain/errors"
+	"github.com/bitcoin-sv/spv-wallet/engine/chain/models"
 	"github.com/bitcoin-sv/spv-wallet/engine/tester"
 	"github.com/stretchr/testify/require"
-	"testing"
 )
 
 /**

@@ -2,11 +2,12 @@ package bhs
 
 import (
 	"context"
+	"time"
+
 	"github.com/bitcoin-sv/go-paymail/spv"
 	"github.com/bitcoin-sv/spv-wallet/engine/chain/errors"
-	chainmodels "github.com/bitcoin-sv/spv-wallet/engine/chain/models"
+	"github.com/bitcoin-sv/spv-wallet/engine/chain/models"
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
-	"time"
 )
 
 var pastMerkleRoot = []*spv.MerkleRootConfirmationRequestItem{{

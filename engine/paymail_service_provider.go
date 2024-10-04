@@ -2,7 +2,6 @@ package engine
 
 import (
 	"context"
-
 	"reflect"
 
 	"github.com/bitcoin-sv/go-paymail"

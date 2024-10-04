@@ -2,8 +2,8 @@ package chain
 
 import (
 	"context"
-	"github.com/bitcoin-sv/go-paymail/spv"
 
+	"github.com/bitcoin-sv/go-paymail/spv"
 	"github.com/bitcoin-sv/spv-wallet/engine/chain/models"
 )
 

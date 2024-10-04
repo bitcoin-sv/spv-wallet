@@ -7,7 +7,7 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/bitcoin-sv/spv-wallet/engine/chainstate"
+	"github.com/bitcoin-sv/spv-wallet/engine/chain/models"
 	"github.com/rs/zerolog"
 )
 
@@ -67,14 +67,14 @@ func (c *AppConfig) CheckBlockHeadersService(ctx context.Context, logger *zerolo
 		return
 	}
 
-	var responseModel chainstate.MerkleRootsConfirmationsResponse
+	var responseModel chainmodels.MerkleRootsConfirmations
 	err = json.NewDecoder(res.Body).Decode(&responseModel)
 	if err != nil {
 		logger.Error().Err(err).Msg(unexpectedResponse)
 		return
 	}
 
-	if responseModel.ConfirmationState != chainstate.Confirmed {
+	if responseModel.ConfirmationState != chainmodels.MRConfirmed {
 		logger.Error().Msg(blockHeadersServiceIsNotReadyWarning)
 		return
 	}

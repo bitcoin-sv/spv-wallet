@@ -10,7 +10,7 @@ import (
 	"github.com/bitcoin-sv/go-broadcast-client/broadcast"
 	"github.com/bitcoin-sv/go-paymail"
 	"github.com/bitcoin-sv/go-paymail/server"
-	chainmodels "github.com/bitcoin-sv/spv-wallet/engine/chain/models"
+	"github.com/bitcoin-sv/spv-wallet/engine/chain/models"
 	"github.com/bitcoin-sv/spv-wallet/engine/chainstate"
 	"github.com/bitcoin-sv/spv-wallet/engine/cluster"
 	"github.com/bitcoin-sv/spv-wallet/engine/datastore"
@@ -446,7 +446,6 @@ func WithPaymailBeefSupport(blockHeadersServiceURL, blockHeadersServiceAuthToken
 		if err != nil {
 			panic(err)
 		}
-		c.chainstate.options = append(c.chainstate.options, chainstate.WithConnectionToBlockHeadersService(blockHeadersServiceURL, blockHeadersServiceAuthToken))
 		c.paymail.serverConfig.options = append(c.paymail.serverConfig.options, server.WithBeefCapabilities())
 	}
 }
