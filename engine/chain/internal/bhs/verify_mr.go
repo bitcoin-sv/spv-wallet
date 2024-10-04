@@ -48,7 +48,7 @@ func (s *Service) VerifyMerkleRoots(ctx context.Context, merkleRoots []*spv.Merk
 	case http.StatusBadRequest:
 		// Note: in case of error, BHS returns a string (not json) with the error message
 		// Most common error is "at least one merkleroot is required"
-		return nil, chainerrors.ErrBHSBadRequest.Wrap(spverrors.Newf("BHS response status code: %v", string(response.Body())))
+		return nil, chainerrors.ErrBHSBadRequest.Wrap(spverrors.Newf("BHS error message: %v", string(response.Body())))
 	default:
 		return nil, chainerrors.ErrBHSNoSuccessResponse.Wrap(spverrors.Newf("BHS response status code: %d", response.StatusCode()))
 	}

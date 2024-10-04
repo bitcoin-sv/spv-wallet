@@ -13,7 +13,7 @@ import (
 )
 
 const (
-	bhsURL   = "http://localhost:8090"
+	bhsURL   = "http://localhost:8080"
 	bhsToken = "mQZQ6WmxURxWz5ch"
 )
 
