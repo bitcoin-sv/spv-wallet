@@ -47,6 +47,8 @@ func (c *AppConfig) ToEngineOptions(logger zerolog.Logger) ([]engine.ClientOps, 
 
 	options = c.addNotificationOpts(options)
 
+	options = c.addArcOpts(options)
+
 	options = c.addBroadcastClientOpts(options, logger)
 
 	if options, err = c.addCallbackOpts(options); err != nil {
@@ -250,6 +252,10 @@ func (c *AppConfig) addNotificationOpts(options []engine.ClientOps) []engine.Cli
 		options = append(options, engine.WithNotifications())
 	}
 	return options
+}
+
+func (c *AppConfig) addArcOpts(options []engine.ClientOps) []engine.ClientOps {
+	return append(options, engine.WithARC(c.ARC.URL, c.ARC.Token, c.ARC.DeploymentID))
 }
 
 func (c *AppConfig) addBroadcastClientOpts(options []engine.ClientOps, logger zerolog.Logger) []engine.ClientOps {
