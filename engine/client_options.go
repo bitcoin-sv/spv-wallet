@@ -625,3 +625,13 @@ func WithARC(url, token, deploymentID string) ClientOps {
 		}
 	}
 }
+
+// WithBHS set BHS url params
+func WithBHS(url, token string) ClientOps {
+	return func(c *clientOptions) {
+		c.bhsConfig = chainmodels.BHSConfig{
+			URL:       url,
+			AuthToken: token,
+		}
+	}
+}

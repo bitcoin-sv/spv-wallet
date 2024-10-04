@@ -2,13 +2,14 @@ package engine
 
 import (
 	"context"
+
 	"reflect"
 
 	"github.com/bitcoin-sv/go-paymail"
 	"github.com/bitcoin-sv/go-paymail/beef"
 	"github.com/bitcoin-sv/go-paymail/server"
 	"github.com/bitcoin-sv/go-paymail/spv"
-	"github.com/bitcoin-sv/spv-wallet/engine/chainstate"
+	"github.com/bitcoin-sv/spv-wallet/engine/chain/models"
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/bitcoin-sv/spv-wallet/engine/utils"
 	"github.com/bitcoinschema/go-bitcoin/v2"
@@ -182,14 +183,21 @@ func (p *PaymailDefaultServiceProvider) VerifyMerkleRoots(
 		}()
 	}
 
-	request := make([]chainstate.MerkleRootConfirmationRequestItem, 0, len(merkleRoots))
-	for _, m := range merkleRoots {
-		request = append(request, chainstate.MerkleRootConfirmationRequestItem{
-			MerkleRoot:  m.MerkleRoot,
-			BlockHeight: m.BlockHeight,
-		})
+	confirmations, err := p.client.Chain().VerifyMerkleRoots(ctx, merkleRoots)
+
+	if err != nil {
+		return spverrors.ErrPaymailMerkleRootVerificationFailed.Wrap(err)
 	}
-	err = p.client.Chainstate().VerifyMerkleRoots(ctx, request)
+
+	if confirmations.ConfirmationState == chainmodels.MRInvalid {
+		p.client.Logger().Debug().Interface("confirmations", confirmations).Msg("Not all provided merkle roots were confirmed by BHS")
+		return spverrors.ErrPaymailInvalidMerkleRoots
+	}
+
+	if confirmations.ConfirmationState == chainmodels.MRUnableToVerify {
+		p.client.Logger().Warn().Msg("Some merkle roots were unable to be verified. Proceeding regardless.")
+	}
+
 	return
 }
 

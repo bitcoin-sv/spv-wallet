@@ -2,6 +2,7 @@ package arc_test
 
 import (
 	"context"
+	chainmodels "github.com/bitcoin-sv/spv-wallet/engine/chain/models"
 	"testing"
 	"time"
 
@@ -19,7 +20,7 @@ func TestQueryService(t *testing.T) {
 	t.Run("QueryTransaction for MINED transaction", func(t *testing.T) {
 		httpClient := arcMockActivate(false)
 
-		service := chain.NewChainService(tester.Logger(t), httpClient, arcCfg(arcURL, arcToken))
+		service := chain.NewChainService(tester.Logger(t), httpClient, arcCfg(arcURL, arcToken), chainmodels.BHSConfig{})
 
 		txInfo, err := service.QueryTransaction(context.Background(), minedTxID)
 
@@ -32,7 +33,7 @@ func TestQueryService(t *testing.T) {
 	t.Run("QueryTransaction for unknown transaction", func(t *testing.T) {
 		httpClient := arcMockActivate(false)
 
-		service := chain.NewChainService(tester.Logger(t), httpClient, arcCfg(arcURL, arcToken))
+		service := chain.NewChainService(tester.Logger(t), httpClient, arcCfg(arcURL, arcToken), chainmodels.BHSConfig{})
 
 		txInfo, err := service.QueryTransaction(context.Background(), unknownTxID)
 
@@ -78,7 +79,7 @@ func TestQueryServiceErrorCases(t *testing.T) {
 		t.Run(name, func(t *testing.T) {
 			httpClient := arcMockActivate(false)
 
-			service := chain.NewChainService(tester.Logger(t), httpClient, arcCfg(tc.arcURL, tc.arcToken))
+			service := chain.NewChainService(tester.Logger(t), httpClient, arcCfg(tc.arcURL, tc.arcToken), chainmodels.BHSConfig{})
 
 			txInfo, err := service.QueryTransaction(context.Background(), tc.txID)
 
@@ -93,7 +94,7 @@ func TestQueryServiceTimeouts(t *testing.T) {
 	t.Run("QueryTransaction interrupted by ctx timeout", func(t *testing.T) {
 		httpClient := arcMockActivate(true)
 
-		service := chain.NewChainService(tester.Logger(t), httpClient, arcCfg(arcURL, arcToken))
+		service := chain.NewChainService(tester.Logger(t), httpClient, arcCfg(arcURL, arcToken), chainmodels.BHSConfig{})
 
 		ctx, cancel := context.WithTimeout(context.Background(), 1)
 		defer cancel()
@@ -110,7 +111,7 @@ func TestQueryServiceTimeouts(t *testing.T) {
 		httpClient := arcMockActivate(true)
 		httpClient.SetTimeout(1 * time.Millisecond)
 
-		service := chain.NewChainService(tester.Logger(t), httpClient, arcCfg(arcURL, arcToken))
+		service := chain.NewChainService(tester.Logger(t), httpClient, arcCfg(arcURL, arcToken), chainmodels.BHSConfig{})
 
 		txInfo, err := service.QueryTransaction(context.Background(), minedTxID)
 

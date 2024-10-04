@@ -51,6 +51,7 @@ type (
 		userAgent               string                 // User agent for all outgoing requests
 		chainService            chain.Service          // Chain service
 		arcConfig               chainmodels.ARCConfig  // Configuration for ARC
+		bhsConfig               chainmodels.BHSConfig  // Configuration for BHS
 		txCallbackConfig        *txCallbackConfig      // Configuration for TX callback received from ARC; disabled if nil
 	}
 
