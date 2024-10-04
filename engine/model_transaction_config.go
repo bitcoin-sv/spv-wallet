@@ -20,20 +20,20 @@ import (
 
 // TransactionConfig is the configuration used to start a transaction
 type TransactionConfig struct {
-	ChangeDestinations         []*Destination       `json:"change_destinations" toml:"change_destinations" yaml:"change_destinations" bson:"change_destinations"`
-	ChangeDestinationsStrategy ChangeStrategy       `json:"change_destinations_strategy" toml:"change_destinations_strategy" yaml:"change_destinations_strategy" bson:"change_destinations_strategy"`
-	ChangeMinimumSatoshis      uint64               `json:"change_minimum_satoshis" toml:"change_minimum_satoshis" yaml:"change_minimum_satoshis" bson:"change_minimum_satoshis"`
-	ChangeNumberOfDestinations int                  `json:"change_number_of_destinations" toml:"change_number_of_destinations" yaml:"change_number_of_destinations" bson:"change_number_of_destinations"`
-	ChangeSatoshis             uint64               `json:"change_satoshis" toml:"change_satoshis" yaml:"change_satoshis" bson:"change_satoshis"` // The satoshis used for change
-	ExpiresIn                  time.Duration        `json:"expires_in" toml:"expires_in" yaml:"expires_in" bson:"expires_in"`                     // The expiration time for the draft and utxos
-	Fee                        uint64               `json:"fee" toml:"fee" yaml:"fee" bson:"fee"`                                                 // The fee used for the transaction (auto generated)
-	FeeUnit                    *utils.FeeUnit       `json:"fee_unit" toml:"fee_unit" yaml:"fee_unit" bson:"fee_unit"`                             // Fee unit to use (overrides chainstate if set)
-	FromUtxos                  []*UtxoPointer       `json:"from_utxos" toml:"from_utxos" yaml:"from_utxos" bson:"from_utxos"`                     // Use these specific utxos for the transaction
-	IncludeUtxos               []*UtxoPointer       `json:"include_utxos" toml:"include_utxos" yaml:"include_utxos" bson:"include_utxos"`         // Include these utxos for the transaction, among others necessary if more is needed for fees
-	Inputs                     []*TransactionInput  `json:"inputs" toml:"inputs" yaml:"inputs" bson:"inputs"`                                     // All transaction inputs
-	Outputs                    []*TransactionOutput `json:"outputs" toml:"outputs" yaml:"outputs" bson:"outputs"`                                 // All transaction outputs
-	SendAllTo                  *TransactionOutput   `json:"send_all_to,omitempty" toml:"send_all_to" yaml:"send_all_to" bson:"send_all_to"`       // Send ALL utxos to the output
-	Sync                       *SyncConfig          `json:"sync" toml:"sync" yaml:"sync" bson:"sync"`                                             // Sync config for broadcasting and on-chain sync
+	ChangeDestinations         []*Destination       `json:"change_destinations" toml:"change_destinations" yaml:"change_destinations"`
+	ChangeDestinationsStrategy ChangeStrategy       `json:"change_destinations_strategy" toml:"change_destinations_strategy" yaml:"change_destinations_strategy"`
+	ChangeMinimumSatoshis      uint64               `json:"change_minimum_satoshis" toml:"change_minimum_satoshis" yaml:"change_minimum_satoshis"`
+	ChangeNumberOfDestinations int                  `json:"change_number_of_destinations" toml:"change_number_of_destinations" yaml:"change_number_of_destinations"`
+	ChangeSatoshis             uint64               `json:"change_satoshis" toml:"change_satoshis" yaml:"change_satoshis"` // The satoshis used for change
+	ExpiresIn                  time.Duration        `json:"expires_in" toml:"expires_in" yaml:"expires_in"`                // The expiration time for the draft and utxos
+	Fee                        uint64               `json:"fee" toml:"fee" yaml:"fee"`                                     // The fee used for the transaction (auto generated)
+	FeeUnit                    *utils.FeeUnit       `json:"fee_unit" toml:"fee_unit" yaml:"fee_unit"`                      // Fee unit to use (overrides chainstate if set)
+	FromUtxos                  []*UtxoPointer       `json:"from_utxos" toml:"from_utxos" yaml:"from_utxos"`                // Use these specific utxos for the transaction
+	IncludeUtxos               []*UtxoPointer       `json:"include_utxos" toml:"include_utxos" yaml:"include_utxos"`       // Include these utxos for the transaction, among others necessary if more is needed for fees
+	Inputs                     []*TransactionInput  `json:"inputs" toml:"inputs" yaml:"inputs"`                            // All transaction inputs
+	Outputs                    []*TransactionOutput `json:"outputs" toml:"outputs" yaml:"outputs"`                         // All transaction outputs
+	SendAllTo                  *TransactionOutput   `json:"send_all_to,omitempty" toml:"send_all_to" yaml:"send_all_to"`   // Send ALL utxos to the output
+	Sync                       *SyncConfig          `json:"sync" toml:"sync" yaml:"sync"`                                  // Sync config for broadcasting and on-chain sync
 	// Future ideas:
 	// Conditions (utxo strategy, chain limit, split utxos)
 	// NlockTime uint32
@@ -42,7 +42,7 @@ type TransactionConfig struct {
 // TransactionInput is an input on the transaction config
 type TransactionInput struct {
 	Utxo
-	Destination Destination `json:"destination" toml:"destination" yaml:"destination" bson:"destination"`
+	Destination Destination `json:"destination" toml:"destination" yaml:"destination"`
 }
 
 // MapProtocol is a specific MAP protocol interface for an op_return
@@ -62,13 +62,13 @@ type OpReturn struct {
 
 // TransactionOutput is an output on the transaction config
 type TransactionOutput struct {
-	OpReturn     *OpReturn       `json:"op_return,omitempty" toml:"op_return" yaml:"op_return" bson:"op_return,omitempty"`                     // Add op_return data as an output
-	PaymailP4    *PaymailP4      `json:"paymail_p4,omitempty" toml:"paymail_p4" yaml:"paymail_p4" bson:"paymail_p4,omitempty"`                 // Additional information for P4 or Paymail
-	Satoshis     uint64          `json:"satoshis" toml:"satoshis" yaml:"satoshis" bson:"satoshis"`                                             // Set the specific satoshis to send (when applicable)
-	Script       string          `json:"script,omitempty" toml:"script" yaml:"script" bson:"script,omitempty"`                                 // custom (non-standard) script output
-	Scripts      []*ScriptOutput `json:"scripts" toml:"scripts" yaml:"scripts" bson:"scripts"`                                                 // Add script outputs
-	To           string          `json:"to,omitempty" toml:"to" yaml:"to" bson:"to,omitempty"`                                                 // To address, paymail, handle
-	UseForChange bool            `json:"use_for_change,omitempty" toml:"use_for_change" yaml:"use_for_change" bson:"use_for_change,omitempty"` // if set, no change destinations will be created, but all outputs flagged will get the change
+	OpReturn     *OpReturn       `json:"op_return,omitempty" toml:"op_return" yaml:"op_return"`                // Add op_return data as an output
+	PaymailP4    *PaymailP4      `json:"paymail_p4,omitempty" toml:"paymail_p4" yaml:"paymail_p4"`             // Additional information for P4 or Paymail
+	Satoshis     uint64          `json:"satoshis" toml:"satoshis" yaml:"satoshis"`                             // Set the specific satoshis to send (when applicable)
+	Script       string          `json:"script,omitempty" toml:"script" yaml:"script"`                         // custom (non-standard) script output
+	Scripts      []*ScriptOutput `json:"scripts" toml:"scripts" yaml:"scripts"`                                // Add script outputs
+	To           string          `json:"to,omitempty" toml:"to" yaml:"to"`                                     // To address, paymail, handle
+	UseForChange bool            `json:"use_for_change,omitempty" toml:"use_for_change" yaml:"use_for_change"` // if set, no change destinations will be created, but all outputs flagged will get the change
 }
 
 // PaymailPayloadFormat is the format of the paymail payload
@@ -95,15 +95,15 @@ func (format PaymailPayloadFormat) String() string {
 
 // PaymailP4 paymail configuration for the p2p payments on this output
 type PaymailP4 struct {
-	Alias           string               `json:"alias" toml:"alias" yaml:"alias" bson:"alias,omitempty"`                                                       // Alias of the paymail {alias}@domain.com
-	Domain          string               `json:"domain" toml:"domain" yaml:"domain" bson:"domain,omitempty"`                                                   // Domain of the paymail alias@{domain.com}
-	FromPaymail     string               `json:"from_paymail,omitempty" toml:"from_paymail" yaml:"from_paymail" bson:"from_paymail,omitempty"`                 // From paymail address: alias@domain.com
-	Note            string               `json:"note,omitempty" toml:"note" yaml:"note" bson:"note,omitempty"`                                                 // Friendly readable note to the paymail receiver
-	PubKey          string               `json:"pub_key,omitempty" toml:"pub_key" yaml:"pub_key" bson:"pub_key,omitempty"`                                     // Used for validating the signature
-	ReceiveEndpoint string               `json:"receive_endpoint,omitempty" toml:"receive_endpoint" yaml:"receive_endpoint" bson:"receive_endpoint,omitempty"` // P2P endpoint when notifying
-	ReferenceID     string               `json:"reference_id,omitempty" toml:"reference_id" yaml:"reference_id" bson:"reference_id,omitempty"`                 // Reference ID saved from P2P request
-	ResolutionType  string               `json:"resolution_type" toml:"resolution_type" yaml:"resolution_type" bson:"resolution_type,omitempty"`               // Type of address resolution (basic vs p2p)
-	Format          PaymailPayloadFormat `json:"format,omitempty" toml:"format" yaml:"format" bson:"format,omitempty"`                                         // Use beef format for the transaction
+	Alias           string               `json:"alias" toml:"alias" yaml:"alias"`                                            // Alias of the paymail {alias}@domain.com
+	Domain          string               `json:"domain" toml:"domain" yaml:"domain"`                                         // Domain of the paymail alias@{domain.com}
+	FromPaymail     string               `json:"from_paymail,omitempty" toml:"from_paymail" yaml:"from_paymail"`             // From paymail address: alias@domain.com
+	Note            string               `json:"note,omitempty" toml:"note" yaml:"note"`                                     // Friendly readable note to the paymail receiver
+	PubKey          string               `json:"pub_key,omitempty" toml:"pub_key" yaml:"pub_key"`                            // Used for validating the signature
+	ReceiveEndpoint string               `json:"receive_endpoint,omitempty" toml:"receive_endpoint" yaml:"receive_endpoint"` // P2P endpoint when notifying
+	ReferenceID     string               `json:"reference_id,omitempty" toml:"reference_id" yaml:"reference_id"`             // Reference ID saved from P2P request
+	ResolutionType  string               `json:"resolution_type" toml:"resolution_type" yaml:"resolution_type"`              // Type of address resolution (basic vs p2p)
+	Format          PaymailPayloadFormat `json:"format,omitempty" toml:"format" yaml:"format"`                               // Use beef format for the transaction
 }
 
 // Types of resolution methods
