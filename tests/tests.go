@@ -8,6 +8,7 @@ import (
 	"github.com/bitcoin-sv/spv-wallet/config"
 	"github.com/bitcoin-sv/spv-wallet/engine"
 	"github.com/bitcoin-sv/spv-wallet/engine/tester"
+	"github.com/bitcoin-sv/spv-wallet/engine/utils"
 	"github.com/bitcoin-sv/spv-wallet/logging"
 	"github.com/bitcoin-sv/spv-wallet/server/middleware"
 	"github.com/gin-gonic/gin"
@@ -37,6 +38,10 @@ func (ts *TestSuite) BaseSetupSuite() {
 		Satoshis: 1,
 		Bytes:    1000,
 	}
+	// Defaults for safe thread testing
+	cfg.Db.SQLite.MaxIdleConnections = 1
+	cfg.Db.SQLite.MaxOpenConnections = 1
+
 	ts.AppConfig = cfg
 }
 
@@ -44,6 +49,7 @@ func (ts *TestSuite) BaseSetupSuite() {
 func (ts *TestSuite) BaseTearDownSuite() {
 	ts.T().Cleanup(func() {
 		_ = os.Remove("datastore.db")
+		_ = os.Remove("spv-wallet.db")
 	})
 }
 
@@ -53,7 +59,10 @@ func (ts *TestSuite) BaseSetupTest() {
 	var err error
 	ts.Logger = tester.Logger(ts.T())
 
-	opts, err := ts.AppConfig.ToEngineOptions(ts.Logger, true)
+	ts.AppConfig.Db.SQLite.TablePrefix, err = utils.RandomHex(8)
+	require.NoError(ts.T(), err)
+
+	opts, err := ts.AppConfig.ToEngineOptions(ts.Logger)
 	require.NoError(ts.T(), err)
 
 	ts.SpvWalletEngine, err = engine.NewClient(context.Background(), opts...)

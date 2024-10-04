@@ -25,6 +25,7 @@ func GetDefaultLogger() zerolog.Logger {
 	return logger
 }
 
+// CreateLoggerWithConfig creates a logger based on the given config
 func CreateLoggerWithConfig(config *config.AppConfig) (zerolog.Logger, error) {
 	loggingConfig := config.Logging
 	return createLogger(loggingConfig.InstanceName, loggingConfig.Format, loggingConfig.Level, loggingConfig.LogOrigin)

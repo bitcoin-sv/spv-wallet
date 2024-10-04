@@ -18,7 +18,8 @@ import (
 	"github.com/rs/zerolog"
 )
 
-func (c *AppConfig) ToEngineOptions(logger zerolog.Logger, testMode bool) ([]engine.ClientOps, error) {
+// ToEngineOptions converts the AppConfig to a slice of engine.ClientOps that can be used to create a new engine.Client.
+func (c *AppConfig) ToEngineOptions(logger zerolog.Logger) ([]engine.ClientOps, error) {
 	var options []engine.ClientOps
 
 	options = c.addUserAgentOpts(options)
@@ -36,7 +37,7 @@ func (c *AppConfig) ToEngineOptions(logger zerolog.Logger, testMode bool) ([]eng
 		return nil, err
 	}
 
-	if options, err = c.addDataStoreOpts(options, testMode); err != nil {
+	if options, err = c.addDataStoreOpts(options); err != nil {
 		return nil, err
 	}
 
@@ -157,21 +158,7 @@ func (c *AppConfig) addClusterOpts(options []engine.ClientOps) ([]engine.ClientO
 	return options, nil
 }
 
-func (c *AppConfig) addDataStoreOpts(options []engine.ClientOps, testMode bool) ([]engine.ClientOps, error) {
-	// Set the datastore options
-	if testMode {
-		var err error
-		// Set the unique table prefix
-		if c.Db.SQLite.TablePrefix, err = utils.RandomHex(8); err != nil {
-			err = spverrors.Wrapf(err, "error generating random hex")
-			return options, err
-		}
-
-		// Defaults for safe thread testing
-		c.Db.SQLite.MaxIdleConnections = 1
-		c.Db.SQLite.MaxOpenConnections = 1
-	}
-
+func (c *AppConfig) addDataStoreOpts(options []engine.ClientOps) ([]engine.ClientOps, error) {
 	// Select the datastore
 	if c.Db.Datastore.Engine == datastore.SQLite {
 		tablePrefix := c.Db.Datastore.TablePrefix

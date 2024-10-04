@@ -13,6 +13,7 @@ const DefaultAdminXpub = "xpub661MyMwAqRbcFgfmdkPgE2m5UjHXu9dj124DbaGLSjaqVESTWf
 // TaskManagerQueueName is the default queue name for the task manager.
 const TaskManagerQueueName = "spv_wallet_queue"
 
+// GetDefaultAppConfig returns the default configuration for the application.
 func GetDefaultAppConfig() *AppConfig {
 	return &AppConfig{
 		Version:              "development",

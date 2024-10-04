@@ -54,7 +54,7 @@ func main() {
 
 	appCtx := context.Background()
 
-	opts, err := appConfig.ToEngineOptions(logger, false)
+	opts, err := appConfig.ToEngineOptions(logger)
 	if err != nil {
 		defaultLogger.Fatal().Err(err).Msg("Error while creating engine options")
 		return
