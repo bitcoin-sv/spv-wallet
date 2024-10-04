@@ -184,7 +184,10 @@ func (p *PaymailDefaultServiceProvider) VerifyMerkleRoots(
 
 	confirmations, err := p.client.Chain().VerifyMerkleRoots(ctx, merkleRoots)
 
+	// NOTE: these errors goes to go-paymail and are not logged there, so we need to log them here
+
 	if err != nil {
+		p.client.Logger().Error().Err(err).Msg("Error verifying merkle roots")
 		return spverrors.ErrPaymailMerkleRootVerificationFailed.Wrap(err)
 	}
 
