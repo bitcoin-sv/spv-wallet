@@ -37,6 +37,8 @@ func (ts *TestSuite) BaseSetupSuite() {
 		Satoshis: 1,
 		Bytes:    1000,
 	}
+	cfg.Notifications.Enabled = false
+
 	// Defaults for safe thread testing
 	cfg.Db.SQLite.MaxIdleConnections = 1
 	cfg.Db.SQLite.MaxOpenConnections = 1
