@@ -19,8 +19,6 @@ import (
 
 const (
 	defaultDatabaseName      = "spv-wallet-test"
-	defaultNewRelicTx        = "testing-transaction"
-	defaultNewRelicApp       = "testing-app"
 	postgresqlTestHost       = "localhost"
 	postgresqlTestName       = "postgres"
 	postgresqlTestPort       = uint32(61333)
@@ -231,9 +229,7 @@ func (ts *EmbeddedDBTestSuite) genericDBClient(t *testing.T, database datastore.
 	}
 
 	tc, err := ts.createTestClient(
-		tester.GetNewRelicCtx(
-			t, defaultNewRelicApp, defaultNewRelicTx,
-		),
+		context.Background(),
 		database, prefix,
 		false, false,
 		opts...,
@@ -252,9 +248,7 @@ func (ts *EmbeddedDBTestSuite) genericMockedDBClient(t *testing.T, database data
 		Build()
 	prefix := tester.RandomTablePrefix()
 	tc, err := ts.createTestClient(
-		tester.GetNewRelicCtx(
-			t, defaultNewRelicApp, defaultNewRelicTx,
-		),
+		context.Background(),
 		database, prefix,
 		true, true, WithDebugging(),
 		withTaskManagerMockup(), WithBroadcastClient(bc),

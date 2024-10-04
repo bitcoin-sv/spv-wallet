@@ -18,12 +18,11 @@ type (
 
 	// clientOptions holds all the configuration for the client
 	clientOptions struct {
-		coordinator     Coordinator     // which coordinator to use, either 'memory' or 'redis'
-		debug           bool            // For extra logs and additional debug information
-		logger          *zerolog.Logger // Internal logger interface
-		newRelicEnabled bool            // Whether to use New Relic
-		prefix          string          // the cluster key prefix to use before all keys
-		redisOptions    *redis.Options
+		coordinator  Coordinator     // which coordinator to use, either 'memory' or 'redis'
+		debug        bool            // For extra logs and additional debug information
+		logger       *zerolog.Logger // Internal logger interface
+		prefix       string          // the cluster key prefix to use before all keys
+		redisOptions *redis.Options
 	}
 )
 
@@ -36,9 +35,6 @@ func NewClient(ctx context.Context, opts ...ClientOps) (*Client, error) {
 	for _, opt := range opts {
 		opt(client.options)
 	}
-
-	// Use NewRelic if it's enabled (use existing txn if found on ctx)
-	ctx = client.options.getTxnCtx(ctx)
 
 	// Set logger if not set
 	if client.options.logger == nil {

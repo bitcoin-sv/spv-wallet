@@ -7,21 +7,6 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-// TestWithNewRelic will test the method WithNewRelic()
-func TestWithNewRelic(t *testing.T) {
-	t.Run("check type", func(t *testing.T) {
-		opt := WithNewRelic()
-		assert.IsType(t, *new(Options), opt)
-	})
-
-	t.Run("test applying", func(t *testing.T) {
-		options := &options{}
-		opt := WithNewRelic()
-		opt(options)
-		assert.Equal(t, true, options.newRelicEnabled)
-	})
-}
-
 // TestWithTaskQ will test the method WithTaskQ()
 func TestWithTaskQ(t *testing.T) {
 	t.Run("check type", func(t *testing.T) {

@@ -6,7 +6,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-// TestNewRelicConfig_Validate will test the method Validate()
+// TestNodesConfig_Validate will test the method Validate()
 func TestNodesConfig_Validate(t *testing.T) {
 	t.Parallel()
 

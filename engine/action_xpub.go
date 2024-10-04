@@ -13,8 +13,6 @@ import (
 // xPubKey is the raw public xPub
 // opts are options and can include "metadata"
 func (c *Client) NewXpub(ctx context.Context, xPubKey string, opts ...ModelOps) (*Xpub, error) {
-	// Check for existing NewRelic transaction
-	ctx = c.GetOrStartTxn(ctx, "new_xpub")
 
 	// Check if the xpub already exists
 	xPub, err := getXpubWithCache(ctx, c, xPubKey, "", c.DefaultModelOptions()...)
@@ -42,8 +40,6 @@ func (c *Client) NewXpub(ctx context.Context, xPubKey string, opts ...ModelOps) 
 //
 // xPubKey is the raw public xPub
 func (c *Client) GetXpub(ctx context.Context, xPubKey string) (*Xpub, error) {
-	// Check for existing NewRelic transaction
-	ctx = c.GetOrStartTxn(ctx, "get_xpub")
 
 	// Attempt to get from cache or datastore
 	xPub, err := getXpubWithCache(ctx, c, xPubKey, "", c.DefaultModelOptions()...)
@@ -59,8 +55,6 @@ func (c *Client) GetXpub(ctx context.Context, xPubKey string) (*Xpub, error) {
 //
 // xPubID is the hash of the xPub
 func (c *Client) GetXpubByID(ctx context.Context, xPubID string) (*Xpub, error) {
-	// Check for existing NewRelic transaction
-	ctx = c.GetOrStartTxn(ctx, "get_xpub_by_id")
 
 	// Attempt to get from cache or datastore
 	xPub, err := getXpubWithCache(ctx, c, "", xPubID, c.DefaultModelOptions()...)
@@ -76,8 +70,6 @@ func (c *Client) GetXpubByID(ctx context.Context, xPubID string) (*Xpub, error) 
 //
 // xPubID is the hash of the xP
 func (c *Client) UpdateXpubMetadata(ctx context.Context, xPubID string, metadata Metadata) (*Xpub, error) {
-	// Check for existing NewRelic transaction
-	ctx = c.GetOrStartTxn(ctx, "update_xpub_by_id")
 
 	// Get the xPub
 	xPub, err := c.GetXpubByID(ctx, xPubID)
@@ -101,8 +93,6 @@ func (c *Client) UpdateXpubMetadata(ctx context.Context, xPubID string, metadata
 func (c *Client) GetXPubs(ctx context.Context, metadataConditions *Metadata,
 	conditions map[string]interface{}, queryParams *datastore.QueryParams, opts ...ModelOps,
 ) ([]*Xpub, error) {
-	// Check for existing NewRelic transaction
-	ctx = c.GetOrStartTxn(ctx, "get_destinations")
 
 	// Get the count
 	xPubs, err := getXPubs(
@@ -119,8 +109,6 @@ func (c *Client) GetXPubs(ctx context.Context, metadataConditions *Metadata,
 func (c *Client) GetXPubsCount(ctx context.Context, metadataConditions *Metadata,
 	conditions map[string]interface{}, opts ...ModelOps,
 ) (int64, error) {
-	// Check for existing NewRelic transaction
-	ctx = c.GetOrStartTxn(ctx, "get_destinations")
 
 	// Get the count
 	count, err := getXPubsCount(

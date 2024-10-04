@@ -75,30 +75,6 @@ func TestAppConfig_Validate(t *testing.T) {
 		assert.Error(t, err)
 	})
 
-	t.Run("new relic - bad license key", func(t *testing.T) {
-		app, _ := baseTestConfig(t)
-		app.NewRelic.Enabled = true
-		app.NewRelic.LicenseKey = "1234567"
-		err := app.Validate()
-		assert.Error(t, err)
-	})
-
-	t.Run("new relic - bad domain name", func(t *testing.T) {
-		app, _ := baseTestConfig(t)
-		app.NewRelic.Enabled = true
-		app.NewRelic.DomainName = ""
-		err := app.Validate()
-		assert.Error(t, err)
-	})
-
-	t.Run("new relic - invalid domain name", func(t *testing.T) {
-		app, _ := baseTestConfig(t)
-		app.NewRelic.Enabled = true
-		app.NewRelic.DomainName = "some domain"
-		err := app.Validate()
-		assert.Error(t, err)
-	})
-
 	t.Run("paymail - no domains", func(t *testing.T) {
 		app, _ := baseTestConfig(t)
 		app.Paymail.Domains = nil

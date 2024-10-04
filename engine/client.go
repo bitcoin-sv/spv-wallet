@@ -20,7 +20,6 @@ import (
 	"github.com/bitcoin-sv/spv-wallet/engine/taskmanager"
 	"github.com/bitcoin-sv/spv-wallet/engine/transaction/draft"
 	"github.com/mrz1836/go-cachestore"
-	"github.com/newrelic/go-agent/v3/newrelic"
 	"github.com/rs/zerolog"
 )
 
@@ -44,7 +43,6 @@ type (
 		logger                  *zerolog.Logger        // Internal logging
 		metrics                 *metrics.Metrics       // Metrics with a collector interface
 		models                  *modelOptions          // Configuration options for the loaded models
-		newRelic                *newRelicOptions       // Configuration options for NewRelic
 		notifications           *notificationsOptions  // Configuration options for Notifications
 		paymail                 *paymailOptions        // Paymail options & client
 		transactionDraftService draft.Service          // Service for transaction drafts
@@ -99,12 +97,6 @@ type (
 		models            []interface{} // Models for use in this engine
 	}
 
-	// newRelicOptions holds the configuration for NewRelic
-	newRelicOptions struct {
-		app     *newrelic.Application // NewRelic client application (if enabled)
-		enabled bool                  // If NewRelic is enabled for deep Transaction tracing
-	}
-
 	// notificationsOptions holds the configuration for notifications
 	notificationsOptions struct {
 		enabled        bool
@@ -137,7 +129,6 @@ type (
 // NewClient creates a new client for all SPV Wallet Engine functionality
 //
 // If no options are given, it will use the defaultClientOptions()
-// ctx may contain a NewRelic txn (or one will be created)
 func NewClient(ctx context.Context, opts ...ClientOps) (ClientInterface, error) {
 	// Create a new client with defaults
 	client := &Client{options: defaultClientOptions()}
@@ -146,9 +137,6 @@ func NewClient(ctx context.Context, opts ...ClientOps) (ClientInterface, error) 
 	for _, opt := range opts {
 		opt(client.options)
 	}
-
-	// Use NewRelic if it's enabled (use existing txn if found on ctx)
-	ctx = client.GetOrStartTxn(ctx, "new_client")
 
 	// Set the logger (if no custom logger was detected)
 	if client.options.logger == nil {
@@ -281,16 +269,6 @@ func (c *Client) Chainstate() chainstate.ClientInterface {
 
 // Close will safely close any open connections (cache, datastore, etc.)
 func (c *Client) Close(ctx context.Context) error {
-	if txn := newrelic.FromContext(ctx); txn != nil {
-		defer txn.StartSegment("close_all").End()
-	}
-
-	// Close Chainstate
-	ch := c.Chainstate()
-	if ch != nil {
-		ch.Close(ctx)
-		c.options.chainstate.ClientInterface = nil
-	}
 
 	// Close Datastore
 	ds := c.Datastore()
@@ -351,25 +329,6 @@ func (c *Client) DefaultSyncConfig() *SyncConfig {
 	}
 }
 
-// EnableNewRelic will enable NewRelic tracing
-func (c *Client) EnableNewRelic() {
-	if c.options.newRelic != nil && c.options.newRelic.app != nil {
-		c.options.newRelic.enabled = true
-	}
-}
-
-// GetOrStartTxn will check for an existing NewRelic transaction, if not found, it will make a new transaction
-func (c *Client) GetOrStartTxn(ctx context.Context, name string) context.Context {
-	if c.IsNewRelicEnabled() && c.options.newRelic.app != nil {
-		txn := newrelic.FromContext(ctx)
-		if txn == nil {
-			txn = c.options.newRelic.app.StartTransaction(name)
-		}
-		ctx = newrelic.NewContext(ctx, txn)
-	}
-	return ctx
-}
-
 // GetModelNames will return the model names that have been loaded
 func (c *Client) GetModelNames() []string {
 	return c.options.models.modelNames
@@ -383,11 +342,6 @@ func (c *Client) HTTPClient() HTTPInterface {
 // IsDebug will return the debug flag (bool)
 func (c *Client) IsDebug() bool {
 	return c.options.debug
-}
-
-// IsNewRelicEnabled will return the flag (bool)
-func (c *Client) IsNewRelicEnabled() bool {
-	return c.options.newRelic.enabled
 }
 
 // IsIUCEnabled will return the flag (bool)

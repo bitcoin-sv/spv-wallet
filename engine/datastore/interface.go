@@ -49,5 +49,4 @@ type ClientInterface interface {
 	Engine() Engine
 	IsAutoMigrate() bool
 	IsDebug() bool
-	IsNewRelicEnabled() bool
 }

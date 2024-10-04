@@ -6,7 +6,6 @@ import (
 
 	"github.com/bitcoin-sv/go-paymail"
 	"github.com/bitcoin-sv/spv-wallet/engine/datastore"
-	"github.com/bitcoin-sv/spv-wallet/engine/tester"
 	"github.com/mrz1836/go-cachestore"
 	"github.com/rs/zerolog"
 	"github.com/stretchr/testify/assert"
@@ -21,7 +20,7 @@ func TestClient_Debug(t *testing.T) {
 
 	t.Run("load basic with debug", func(t *testing.T) {
 		tc, err := NewClient(
-			tester.GetNewRelicCtx(t, defaultNewRelicApp, defaultNewRelicTx),
+			context.Background(),
 			DefaultClientOpts(false, true)...,
 		)
 		require.NoError(t, err)
@@ -44,7 +43,7 @@ func TestClient_IsDebug(t *testing.T) {
 
 	t.Run("basic debug checks", func(t *testing.T) {
 		tc, err := NewClient(
-			tester.GetNewRelicCtx(t, defaultNewRelicApp, defaultNewRelicTx),
+			context.Background(),
 			DefaultClientOpts(false, true)...,
 		)
 		require.NoError(t, err)
@@ -65,7 +64,7 @@ func TestClient_Version(t *testing.T) {
 
 	t.Run("check version", func(t *testing.T) {
 		tc, err := NewClient(
-			tester.GetNewRelicCtx(t, defaultNewRelicApp, defaultNewRelicTx),
+			context.Background(),
 			DefaultClientOpts(false, true)...,
 		)
 		require.NoError(t, err)

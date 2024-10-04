@@ -1,11 +1,9 @@
 package datastore
 
 import (
-	"context"
 	"database/sql"
 
 	zLogger "github.com/mrz1836/go-logger"
-	"github.com/newrelic/go-agent/v3/newrelic"
 )
 
 // ClientOps allow functional options to be supplied
@@ -24,24 +22,12 @@ func defaultClientOptions() *clientOptions {
 			arrayFields:  nil,
 			objectFields: []string{metadataField},
 		},
-		newRelicEnabled: false,
 		sqLite: &SQLiteConfig{
 			CommonConfig: CommonConfig{
 				Debug: false,
 			},
 		},
 	}
-}
-
-// getTxnCtx will check for an existing transaction
-func (c *clientOptions) getTxnCtx(ctx context.Context) context.Context {
-	if c.newRelicEnabled {
-		txn := newrelic.FromContext(ctx)
-		if txn != nil {
-			ctx = newrelic.NewContext(ctx, txn)
-		}
-	}
-	return ctx
 }
 
 // WithAutoMigrate will enable auto migrate database mode (given models)
@@ -66,13 +52,6 @@ func WithAutoMigrate(migrateModels ...interface{}) ClientOps {
 func WithDebugging() ClientOps {
 	return func(c *clientOptions) {
 		c.debug = true
-	}
-}
-
-// WithNewRelic will enable the NewRelic wrapper
-func WithNewRelic() ClientOps {
-	return func(c *clientOptions) {
-		c.newRelicEnabled = true
 	}
 }
 

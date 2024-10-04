@@ -85,7 +85,7 @@ func DefaultClientOpts(debug, shared bool) []ClientOps {
 //
 // NOTE: you need to close the client using the returned defer func
 func CreateTestSQLiteClient(t *testing.T, debug, shared bool, clientOpts ...ClientOps) (context.Context, ClientInterface, func()) {
-	ctx := tester.GetNewRelicCtx(t, "app-test", "test-transaction")
+	ctx := context.Background()
 
 	logger := zerolog.Nop()
 
