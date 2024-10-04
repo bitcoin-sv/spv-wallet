@@ -3,9 +3,8 @@ package engine
 import (
 	"context"
 
-	taskq "github.com/vmihailenco/taskq/v3"
-
 	"github.com/bitcoin-sv/spv-wallet/engine/taskmanager"
+	taskq "github.com/vmihailenco/taskq/v3"
 )
 
 // taskManagerMock is a base for an empty task manager

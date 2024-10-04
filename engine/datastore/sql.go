@@ -6,14 +6,13 @@ import (
 	"os"
 	"time"
 
+	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"gorm.io/driver/postgres"
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
 	glogger "gorm.io/gorm/logger"
 	"gorm.io/gorm/schema"
 	"gorm.io/plugin/dbresolver"
-
-	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 )
 
 // SQL related default settings

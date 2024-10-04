@@ -5,12 +5,11 @@ import (
 	"time"
 
 	"github.com/bitcoin-sv/go-broadcast-client/broadcast"
-	"github.com/rs/zerolog"
-
 	"github.com/bitcoin-sv/spv-wallet/engine/logging"
 	"github.com/bitcoin-sv/spv-wallet/engine/metrics"
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/bitcoin-sv/spv-wallet/engine/utils"
+	"github.com/rs/zerolog"
 )
 
 type (

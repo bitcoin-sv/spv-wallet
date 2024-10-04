@@ -4,10 +4,9 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
-
-	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 )
 
 // AutoMigrateDatabase will detect the engine and migrate as needed

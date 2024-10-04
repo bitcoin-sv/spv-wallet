@@ -6,7 +6,6 @@ import (
 	"time"
 
 	"github.com/bitcoin-sv/go-broadcast-client/broadcast"
-
 	"github.com/bitcoin-sv/spv-wallet/engine/utils"
 )
 

@@ -5,13 +5,12 @@ import (
 	"math"
 	"time"
 
-	"github.com/libsv/go-bc"
-	"github.com/libsv/go-bt/v2"
-
 	chainmodels "github.com/bitcoin-sv/spv-wallet/engine/chain/models"
 	"github.com/bitcoin-sv/spv-wallet/engine/datastore"
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/bitcoin-sv/spv-wallet/engine/utils"
+	"github.com/libsv/go-bc"
+	"github.com/libsv/go-bt/v2"
 )
 
 // RecordTransaction will parse the outgoing transaction and save it into the Datastore

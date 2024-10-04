@@ -4,10 +4,9 @@ import (
 	"time"
 
 	"github.com/bitcoin-sv/go-broadcast-client/broadcast"
-	"github.com/rs/zerolog"
-
 	"github.com/bitcoin-sv/spv-wallet/engine/metrics"
 	"github.com/bitcoin-sv/spv-wallet/engine/utils"
+	"github.com/rs/zerolog"
 )
 
 // ClientOps allow functional options to be supplied

@@ -10,23 +10,21 @@ import (
 	"github.com/bitcoin-sv/go-broadcast-client/broadcast"
 	"github.com/bitcoin-sv/go-paymail"
 	"github.com/bitcoin-sv/go-paymail/server"
-	"github.com/coocood/freecache"
-	"github.com/go-redis/redis/v8"
-	"github.com/mrz1836/go-cache"
-	"github.com/mrz1836/go-cachestore"
-	"github.com/rs/zerolog"
-	"github.com/vmihailenco/taskq/v3"
-
 	chainmodels "github.com/bitcoin-sv/spv-wallet/engine/chain/models"
 	"github.com/bitcoin-sv/spv-wallet/engine/chainstate"
 	"github.com/bitcoin-sv/spv-wallet/engine/cluster"
 	"github.com/bitcoin-sv/spv-wallet/engine/datastore"
 	"github.com/bitcoin-sv/spv-wallet/engine/logging"
 	"github.com/bitcoin-sv/spv-wallet/engine/metrics"
-
 	// "github.com/bitcoin-sv/spv-wallet/engine/notifications"
 	"github.com/bitcoin-sv/spv-wallet/engine/taskmanager"
 	"github.com/bitcoin-sv/spv-wallet/engine/utils"
+	"github.com/coocood/freecache"
+	"github.com/go-redis/redis/v8"
+	"github.com/mrz1836/go-cache"
+	"github.com/mrz1836/go-cachestore"
+	"github.com/rs/zerolog"
+	"github.com/vmihailenco/taskq/v3"
 )
 
 // ClientOps allow functional options to be supplied that overwrite default client options.

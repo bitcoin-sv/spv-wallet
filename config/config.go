@@ -4,11 +4,10 @@ package config
 import (
 	"time"
 
-	"github.com/mrz1836/go-cachestore"
-
 	"github.com/bitcoin-sv/spv-wallet/engine/cluster"
 	"github.com/bitcoin-sv/spv-wallet/engine/datastore"
 	"github.com/bitcoin-sv/spv-wallet/engine/taskmanager"
+	"github.com/mrz1836/go-cachestore"
 )
 
 // Config constants used for spv-wallet

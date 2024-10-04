@@ -4,7 +4,6 @@ import (
 	"context"
 
 	"github.com/bitcoin-sv/go-broadcast-client/broadcast"
-
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/bitcoin-sv/spv-wallet/engine/utils"
 )
