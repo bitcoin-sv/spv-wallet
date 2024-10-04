@@ -16,7 +16,7 @@ import (
 	"github.com/bitcoin-sv/spv-wallet/server"
 )
 
-// version version of the application that can be overridden with ldflags during build
+// version of the application that can be overridden with ldflags during build
 // (e.g. go build -ldflags "-X main.version=1.2.3").
 var version = "development"
 

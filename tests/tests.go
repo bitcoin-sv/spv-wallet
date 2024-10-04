@@ -19,9 +19,8 @@ import (
 
 // TestSuite is for testing the entire package using real/mocked services
 type TestSuite struct {
-	AppConfig *config.AppConfig // App config
-	Router    *gin.Engine       // Gin router with handlers
-	// Services    *config.AppServices // Services
+	AppConfig       *config.AppConfig      // App config
+	Router          *gin.Engine            // Gin router with handlers
 	Logger          zerolog.Logger         // Logger
 	SpvWalletEngine engine.ClientInterface // SPV Wallet Engine
 	suite.Suite                            // Extends the suite.Suite package

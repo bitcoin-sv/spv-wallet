@@ -19,9 +19,7 @@ import (
 )
 
 // ToEngineOptions converts the AppConfig to a slice of engine.ClientOps that can be used to create a new engine.Client.
-func (c *AppConfig) ToEngineOptions(logger zerolog.Logger) ([]engine.ClientOps, error) {
-	var options []engine.ClientOps
-
+func (c *AppConfig) ToEngineOptions(logger zerolog.Logger) (options []engine.ClientOps, err error) {
 	options = c.addUserAgentOpts(options)
 
 	options = c.addMetricsOpts(options)
@@ -32,7 +30,6 @@ func (c *AppConfig) ToEngineOptions(logger zerolog.Logger) ([]engine.ClientOps, 
 
 	options = c.addCacheStoreOpts(options)
 
-	var err error
 	if options, err = c.addClusterOpts(options); err != nil {
 		return nil, err
 	}
@@ -47,7 +44,7 @@ func (c *AppConfig) ToEngineOptions(logger zerolog.Logger) ([]engine.ClientOps, 
 
 	options = c.addNotificationOpts(options)
 
-	options = c.addArcOpts(options)
+	options = c.addARCOpts(options)
 
 	options = c.addBroadcastClientOpts(options, logger)
 
@@ -116,45 +113,46 @@ func (c *AppConfig) addCacheStoreOpts(options []engine.ClientOps) []engine.Clien
 }
 
 func (c *AppConfig) addClusterOpts(options []engine.ClientOps) ([]engine.ClientOps, error) {
-	if c.Cache.Cluster != nil {
-		if c.Cache.Cluster.Coordinator == cluster.CoordinatorRedis {
-			var redisOptions *redis.Options
+	if c.Cache.Cluster == nil {
+		return options, nil
+	}
+	if c.Cache.Cluster.Coordinator == cluster.CoordinatorRedis {
+		var redisOptions *redis.Options
 
-			if c.Cache.Cluster.Redis != nil {
-				redisURL, err := url.Parse(c.Cache.Cluster.Redis.URL)
-				if err != nil {
-					return options, spverrors.Wrapf(err, "error parsing redis url")
-				}
-				password, _ := redisURL.User.Password()
-				redisOptions = &redis.Options{
-					Addr:        fmt.Sprintf("%s:%s", redisURL.Hostname(), redisURL.Port()),
-					Username:    redisURL.User.Username(),
-					Password:    password,
-					IdleTimeout: c.Cache.Cluster.Redis.MaxIdleTimeout,
-				}
-				if c.Cache.Cluster.Redis.UseTLS {
-					redisOptions.TLSConfig = &tls.Config{
-						MinVersion: tls.VersionTLS12,
-					}
-				}
-			} else if c.Cache.Redis != nil {
-				redisOptions = &redis.Options{
-					Addr:        c.Cache.Redis.URL,
-					IdleTimeout: c.Cache.Redis.MaxIdleTimeout,
-				}
-				if c.Cache.Redis.UseTLS {
-					redisOptions.TLSConfig = &tls.Config{
-						MinVersion: tls.VersionTLS12,
-					}
-				}
-			} else {
-				return options, spverrors.Newf("could not load redis cluster coordinator")
+		if c.Cache.Cluster.Redis != nil {
+			redisURL, err := url.Parse(c.Cache.Cluster.Redis.URL)
+			if err != nil {
+				return options, spverrors.Wrapf(err, "error parsing redis url")
 			}
-			options = append(options, engine.WithClusterRedis(redisOptions))
+			password, _ := redisURL.User.Password()
+			redisOptions = &redis.Options{
+				Addr:        fmt.Sprintf("%s:%s", redisURL.Hostname(), redisURL.Port()),
+				Username:    redisURL.User.Username(),
+				Password:    password,
+				IdleTimeout: c.Cache.Cluster.Redis.MaxIdleTimeout,
+			}
+			if c.Cache.Cluster.Redis.UseTLS {
+				redisOptions.TLSConfig = &tls.Config{
+					MinVersion: tls.VersionTLS12,
+				}
+			}
+		} else if c.Cache.Redis != nil {
+			redisOptions = &redis.Options{
+				Addr:        c.Cache.Redis.URL,
+				IdleTimeout: c.Cache.Redis.MaxIdleTimeout,
+			}
+			if c.Cache.Redis.UseTLS {
+				redisOptions.TLSConfig = &tls.Config{
+					MinVersion: tls.VersionTLS12,
+				}
+			}
+		} else {
+			return options, spverrors.Newf("could not load redis cluster coordinator")
 		}
-		if c.Cache.Cluster.Prefix != "" {
-			options = append(options, engine.WithClusterKeyPrefix(c.Cache.Cluster.Prefix))
-		}
+		options = append(options, engine.WithClusterRedis(redisOptions))
+	}
+	if c.Cache.Cluster.Prefix != "" {
+		options = append(options, engine.WithClusterKeyPrefix(c.Cache.Cluster.Prefix))
 	}
 
 	return options, nil
@@ -236,8 +234,7 @@ func (c *AppConfig) addPaymailOpts(options []engine.ClientOps) []engine.ClientOp
 }
 
 func (c *AppConfig) addTaskManagerOpts(options []engine.ClientOps) []engine.ClientOps {
-	// FIXME: Empty slice declaration using a literal
-	ops := []taskmanager.TasqOps{}
+	var ops []taskmanager.TasqOps
 	if c.TaskManager.Factory == taskmanager.FactoryRedis {
 		ops = append(ops, taskmanager.WithRedis(c.Cache.Redis.URL))
 	}
@@ -254,7 +251,7 @@ func (c *AppConfig) addNotificationOpts(options []engine.ClientOps) []engine.Cli
 	return options
 }
 
-func (c *AppConfig) addArcOpts(options []engine.ClientOps) []engine.ClientOps {
+func (c *AppConfig) addARCOpts(options []engine.ClientOps) []engine.ClientOps {
 	return append(options, engine.WithARC(c.ARC.URL, c.ARC.Token, c.ARC.DeploymentID))
 }
 
@@ -276,16 +273,18 @@ func (c *AppConfig) addBroadcastClientOpts(options []engine.ClientOps, logger ze
 }
 
 func (c *AppConfig) addCallbackOpts(options []engine.ClientOps) ([]engine.ClientOps, error) {
-	if c.ARC.Callback.Enabled {
-		if c.ARC.Callback.Token == "" {
-			callbackToken, err := utils.HashAdler32(DefaultAdminXpub)
-			if err != nil {
-				return nil, spverrors.Wrapf(err, "error while generating callback token")
-			}
-			c.ARC.Callback.Token = callbackToken
-		}
-
-		options = append(options, engine.WithCallback(c.ARC.Callback.Host+BroadcastCallbackRoute, c.ARC.Callback.Token))
+	if !c.ARC.Callback.Enabled {
+		return options, nil
 	}
+
+	if c.ARC.Callback.Token == "" {
+		callbackToken, err := utils.HashAdler32(DefaultAdminXpub)
+		if err != nil {
+			return nil, spverrors.Wrapf(err, "error while generating callback token")
+		}
+		c.ARC.Callback.Token = callbackToken
+	}
+
+	options = append(options, engine.WithCallback(c.ARC.Callback.Host+BroadcastCallbackRoute, c.ARC.Callback.Token))
 	return options, nil
 }
