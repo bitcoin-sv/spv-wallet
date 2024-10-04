@@ -6,12 +6,12 @@ package taskmanager
 import (
 	"context"
 
-	"github.com/bitcoin-sv/spv-wallet/engine/logging"
-	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
-	"github.com/newrelic/go-agent/v3/newrelic"
 	"github.com/robfig/cron/v3"
 	"github.com/rs/zerolog"
 	"github.com/vmihailenco/taskq/v3"
+
+	"github.com/bitcoin-sv/spv-wallet/engine/logging"
+	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 )
 
 type (
@@ -22,10 +22,9 @@ type (
 	}
 
 	options struct {
-		cronService     *cron.Cron      // Internal cron job client
-		logger          *zerolog.Logger // Internal logging
-		newRelicEnabled bool            // If NewRelic is enabled (parent application)
-		taskq           *taskqOptions   // All configuration and options for using TaskQ
+		cronService *cron.Cron      // Internal cron job client
+		logger      *zerolog.Logger // Internal logging
+		taskq       *taskqOptions   // All configuration and options for using TaskQ
 	}
 
 	// taskqOptions holds all the configuration for the TaskQ engine
@@ -38,11 +37,9 @@ type (
 
 // NewTaskManager creates a new client for all TaskManager functionality
 // If no options are given, it will use local memory for the queue.
-// ctx may contain a NewRelic txn (or one will be created)
 func NewTaskManager(ctx context.Context, opts ...Options) (TaskEngine, error) {
 	// Create a new tm with defaults
 	tm := &TaskManager{options: &options{
-		newRelicEnabled: false,
 		taskq: &taskqOptions{
 			tasks:  make(map[string]*taskq.Task),
 			config: DefaultTaskQConfig("taskq"),
@@ -58,9 +55,6 @@ func NewTaskManager(ctx context.Context, opts ...Options) (TaskEngine, error) {
 		tm.options.logger = logging.GetDefaultLogger()
 	}
 
-	// Use NewRelic if it's enabled (use existing txn if found on ctx)
-	// ctx = tm.options.getTxnCtx(ctx)
-
 	if err := tm.loadTaskQ(ctx); err != nil {
 		return nil, err
 	}
@@ -72,9 +66,6 @@ func NewTaskManager(ctx context.Context, opts ...Options) (TaskEngine, error) {
 
 // Close the client and any open connections
 func (tm *TaskManager) Close(ctx context.Context) error {
-	if txn := newrelic.FromContext(ctx); txn != nil {
-		defer txn.StartSegment("close_taskmanager").End()
-	}
 	if tm != nil && tm.options != nil {
 
 		// Stop the cron scheduler
@@ -105,11 +96,6 @@ func (tm *TaskManager) ResetCron() {
 	tm.options.cronService.Start()
 }
 
-// IsNewRelicEnabled will return if new relic is enabled
-func (tm *TaskManager) IsNewRelicEnabled() bool {
-	return tm.options.newRelicEnabled
-}
-
 // Tasks will return the list of tasks
 func (tm *TaskManager) Tasks() map[string]*taskq.Task {
 	return tm.options.taskq.tasks
@@ -124,15 +110,4 @@ func (tm *TaskManager) Factory() Factory {
 		return FactoryRedis
 	}
 	return FactoryMemory
-}
-
-// GetTxnCtx will check for an existing transaction
-func (tm *TaskManager) GetTxnCtx(ctx context.Context) context.Context {
-	if tm.options.newRelicEnabled {
-		txn := newrelic.FromContext(ctx)
-		if txn != nil {
-			ctx = newrelic.NewContext(ctx, txn)
-		}
-	}
-	return ctx
 }

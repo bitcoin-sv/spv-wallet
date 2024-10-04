@@ -4,10 +4,10 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
-	"github.com/newrelic/go-agent/v3/newrelic"
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
+
+	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 )
 
 // AutoMigrateDatabase will detect the engine and migrate as needed
@@ -54,11 +54,6 @@ func (c *Client) IsAutoMigrate() bool {
 //
 // See: https://gorm.io/docs/migration.html
 func autoMigrateSQLDatabase(ctx context.Context, sqlWriteDB *gorm.DB, debug bool, optionalLogger logger.Interface, models ...interface{}) error {
-	// Create a segment
-	txn := newrelic.FromContext(ctx)
-	if txn != nil {
-		defer txn.StartSegment("auto_migrate_sql_database").End()
-	}
 
 	// Create a session with config settings
 	sessionDb := sqlWriteDB.Session(getGormSessionConfig(sqlWriteDB.PrepareStmt, debug, optionalLogger))

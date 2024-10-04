@@ -7,9 +7,6 @@ import (
 
 	"github.com/DATA-DOG/go-sqlmock"
 	broadcast_client_mock "github.com/bitcoin-sv/go-broadcast-client/broadcast/broadcast-client-mock"
-	"github.com/bitcoin-sv/spv-wallet/engine/datastore"
-	"github.com/bitcoin-sv/spv-wallet/engine/taskmanager"
-	"github.com/bitcoin-sv/spv-wallet/engine/tester"
 	"github.com/bitcoinschema/go-bitcoin/v2"
 	"github.com/libsv/go-bk/bec"
 	"github.com/libsv/go-bk/bip32"
@@ -21,6 +18,10 @@ import (
 	"github.com/rafaeljusto/redigomock"
 	"github.com/rs/zerolog"
 	"github.com/stretchr/testify/require"
+
+	"github.com/bitcoin-sv/spv-wallet/engine/datastore"
+	"github.com/bitcoin-sv/spv-wallet/engine/taskmanager"
+	"github.com/bitcoin-sv/spv-wallet/engine/tester"
 )
 
 // TestingClient is for testing the entire package using real/mocked services
@@ -85,7 +86,7 @@ func DefaultClientOpts(debug, shared bool) []ClientOps {
 //
 // NOTE: you need to close the client using the returned defer func
 func CreateTestSQLiteClient(t *testing.T, debug, shared bool, clientOpts ...ClientOps) (context.Context, ClientInterface, func()) {
-	ctx := tester.GetNewRelicCtx(t, "app-test", "test-transaction")
+	ctx := context.Background()
 
 	logger := zerolog.Nop()
 

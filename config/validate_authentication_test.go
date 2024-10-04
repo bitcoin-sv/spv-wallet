@@ -30,7 +30,7 @@ func TestAuthenticationConfig_IsAdmin(t *testing.T) {
 
 }
 
-// TestNewRelicConfig_Validate will test the method Validate()
+// TestAuthenticationConfig_Validate will test the method Validate()
 func TestAuthenticationConfig_Validate(t *testing.T) {
 	t.Parallel()
 

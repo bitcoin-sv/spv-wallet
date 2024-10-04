@@ -34,7 +34,7 @@ func TestLoadRealRedis(t *testing.T) {
 		maxIdle := maxActive
 		client, conn, err := LoadRealRedis(
 			testRedisConnection, idleTimeout, maxConnTime,
-			maxActive, maxIdle, false, false,
+			maxActive, maxIdle, false,
 		)
 		require.NoError(t, err)
 		require.NotNil(t, client)

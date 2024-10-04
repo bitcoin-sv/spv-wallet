@@ -4,11 +4,12 @@ import (
 	"context"
 	"time"
 
-	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/gomodule/redigo/redis"
 	"github.com/mrz1836/go-cache"
 	"github.com/mrz1836/go-cachestore"
 	"github.com/rafaeljusto/redigomock"
+
+	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 )
 
 // CacheStore will return a cache store for using in tests
@@ -57,7 +58,6 @@ func LoadRealRedis(
 	maxActive int,
 	maxIdle int,
 	dependency bool,
-	newRelic bool,
 ) (client *cache.Client, conn redis.Conn, err error) {
 	client, err = cache.Connect(
 		context.Background(),
@@ -67,7 +67,7 @@ func LoadRealRedis(
 		maxConnTime,
 		idleTimeout,
 		dependency,
-		newRelic,
+		false,
 	)
 	if err != nil {
 		return

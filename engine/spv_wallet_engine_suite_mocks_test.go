@@ -3,8 +3,9 @@ package engine
 import (
 	"context"
 
-	"github.com/bitcoin-sv/spv-wallet/engine/taskmanager"
 	taskq "github.com/vmihailenco/taskq/v3"
+
+	"github.com/bitcoin-sv/spv-wallet/engine/taskmanager"
 )
 
 // taskManagerMock is a base for an empty task manager
@@ -41,10 +42,6 @@ func (tm *taskManagerMockBase) GetTxnCtx(ctx context.Context) context.Context {
 }
 
 func (tm *taskManagerMockBase) IsDebug() bool {
-	return false
-}
-
-func (tm *taskManagerMockBase) IsNewRelicEnabled() bool {
 	return false
 }
 

@@ -4,15 +4,12 @@ import (
 	"context"
 
 	"github.com/bitcoin-sv/go-broadcast-client/broadcast"
+
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/bitcoin-sv/spv-wallet/engine/utils"
-	"github.com/newrelic/go-agent/v3/newrelic"
 )
 
 func (c *Client) broadcastClientInit(ctx context.Context) error {
-	if txn := newrelic.FromContext(ctx); txn != nil {
-		defer txn.StartSegment("start_broadcast_client").End()
-	}
 
 	bc := c.options.config.broadcastClient
 	if bc == nil {

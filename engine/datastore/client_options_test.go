@@ -6,7 +6,6 @@ import (
 	"testing"
 
 	zLogger "github.com/mrz1836/go-logger"
-	"github.com/newrelic/go-agent/v3/newrelic"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -18,49 +17,7 @@ func TestDefaultClientOptions(t *testing.T) {
 		require.NotNil(t, defaults)
 		assert.Equal(t, Empty, defaults.engine)
 		assert.False(t, defaults.autoMigrate)
-		assert.False(t, defaults.newRelicEnabled)
 		assert.NotNil(t, defaults.sqLite)
-	})
-}
-
-// TestClientOptions_GetTxnCtx will test the method getTxnCtx()
-func TestClientOptions_GetTxnCtx(t *testing.T) {
-	t.Run("no txn found", func(t *testing.T) {
-		defaults := defaultClientOptions()
-		require.NotNil(t, defaults)
-		defaults.newRelicEnabled = true
-
-		ctx := defaults.getTxnCtx(context.Background())
-		require.NotNil(t, ctx)
-
-		txn := newrelic.FromContext(ctx)
-		assert.Nil(t, txn)
-	})
-
-	t.Run("txn found", func(_ *testing.T) {
-		// todo: Need a mock new relic app / txn
-	})
-}
-
-// TestWithNewRelic will test the method WithNewRelic()
-func TestWithNewRelic(t *testing.T) {
-	t.Run("get opts", func(t *testing.T) {
-		opt := WithNewRelic()
-		assert.IsType(t, *new(ClientOps), opt)
-	})
-
-	t.Run("apply opts", func(t *testing.T) {
-		opts := []ClientOps{WithNewRelic()}
-		c, err := NewClient(context.Background(), opts...)
-		require.NotNil(t, c)
-		require.NoError(t, err)
-
-		assert.True(t, c.IsNewRelicEnabled())
-	})
-
-	// Attempt to remove a file created during the test
-	t.Cleanup(func() {
-		_ = os.Remove("datastore.db")
 	})
 }
 

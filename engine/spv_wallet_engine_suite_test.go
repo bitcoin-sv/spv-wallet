@@ -8,19 +8,18 @@ import (
 
 	"github.com/DATA-DOG/go-sqlmock"
 	broadcast_client_mock "github.com/bitcoin-sv/go-broadcast-client/broadcast/broadcast-client-mock"
-	"github.com/bitcoin-sv/spv-wallet/engine/datastore"
-	"github.com/bitcoin-sv/spv-wallet/engine/taskmanager"
-	"github.com/bitcoin-sv/spv-wallet/engine/tester"
 	embeddedPostgres "github.com/fergusstrange/embedded-postgres"
 	"github.com/rs/zerolog"
 	"github.com/stretchr/testify/require"
 	"github.com/stretchr/testify/suite"
+
+	"github.com/bitcoin-sv/spv-wallet/engine/datastore"
+	"github.com/bitcoin-sv/spv-wallet/engine/taskmanager"
+	"github.com/bitcoin-sv/spv-wallet/engine/tester"
 )
 
 const (
 	defaultDatabaseName      = "spv-wallet-test"
-	defaultNewRelicTx        = "testing-transaction"
-	defaultNewRelicApp       = "testing-app"
 	postgresqlTestHost       = "localhost"
 	postgresqlTestName       = "postgres"
 	postgresqlTestPort       = uint32(61333)
@@ -231,9 +230,7 @@ func (ts *EmbeddedDBTestSuite) genericDBClient(t *testing.T, database datastore.
 	}
 
 	tc, err := ts.createTestClient(
-		tester.GetNewRelicCtx(
-			t, defaultNewRelicApp, defaultNewRelicTx,
-		),
+		context.Background(),
 		database, prefix,
 		false, false,
 		opts...,
@@ -252,9 +249,7 @@ func (ts *EmbeddedDBTestSuite) genericMockedDBClient(t *testing.T, database data
 		Build()
 	prefix := tester.RandomTablePrefix()
 	tc, err := ts.createTestClient(
-		tester.GetNewRelicCtx(
-			t, defaultNewRelicApp, defaultNewRelicTx,
-		),
+		context.Background(),
 		database, prefix,
 		true, true, WithDebugging(),
 		withTaskManagerMockup(), WithBroadcastClient(bc),
