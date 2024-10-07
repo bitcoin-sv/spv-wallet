@@ -67,7 +67,16 @@ func main() {
 	}
 
 	// Try to ping the Block Headers Service if enabled
-	appConfig.CheckBlockHeadersService(appCtx, &logger)
+	if appConfig.IsBeefEnabled() {
+		shortTimeoutCtx, cancel := context.WithTimeout(appCtx, 5*time.Second)
+		defer cancel()
+		err = spvWalletEngine.Chain().HealthcheckBHS(shortTimeoutCtx)
+		if err != nil {
+			logger.Warn().Err(err).Msg("Unable to connect to Block Headers Service at startup. Application will continue to operate but won't receive BEEF transactions until BHS is online.")
+		} else {
+			logger.Info().Msg("Block Headers Service is ready to verify transactions.")
+		}
+	}
 
 	// Create a new app server
 	appServer := server.NewServer(appConfig, spvWalletEngine, logger)
