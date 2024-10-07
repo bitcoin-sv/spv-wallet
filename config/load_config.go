@@ -18,17 +18,19 @@ import (
 var viperLock sync.Mutex
 
 // Load all AppConfig
-func Load(logger *zerolog.Logger) (appConfig *AppConfig, err error) {
+func Load(versionToSet string, logger zerolog.Logger) (appConfig *AppConfig, err error) {
 	viperLock.Lock()
 	defer viperLock.Unlock()
 
-	if err = setDefaults(); err != nil {
+	appConfig = GetDefaultAppConfig()
+	appConfig.Version = versionToSet
+	if err = setDefaults(appConfig); err != nil {
 		return nil, err
 	}
 
 	envConfig()
 
-	if err = loadFlags(); err != nil {
+	if err = loadFlags(appConfig); err != nil {
 		return nil, err
 	}
 
@@ -36,40 +38,26 @@ func Load(logger *zerolog.Logger) (appConfig *AppConfig, err error) {
 		return nil, err
 	}
 
-	appConfig = getDefaultAppConfig()
 	if err = unmarshallToAppConfig(appConfig); err != nil {
 		return nil, err
 	}
 
-	if appConfig.Debug {
+	logger.Debug().MsgFunc(func() string {
 		cfg, err := json.MarshalIndent(appConfig, "", "  ")
 		if err != nil {
-			logger.Error().Msg("Unable to decode App Config to json")
-		} else {
-			logger.Debug().Msgf("loaded config: %s", cfg)
+			return "Unable to decode App Config to json"
 		}
-	}
+		return fmt.Sprintf("loaded config: %s", cfg)
+	})
 
 	return appConfig, nil
 }
 
-// LoadForTest returns test AppConfig
-func LoadForTest() (appConfig *AppConfig) {
-
-	appConfig = getDefaultAppConfig()
-	appConfig.Debug = false
-	appConfig.DebugProfiling = false
-	appConfig.Logging.Level = zerolog.LevelErrorValue
-	appConfig.Logging.Format = "console"
-
-	return appConfig
-}
-
-func setDefaults() error {
+func setDefaults(config *AppConfig) error {
 	viper.SetDefault(ConfigFilePathKey, DefaultConfigFilePath)
 
 	defaultsMap := make(map[string]interface{})
-	if err := mapstructure.Decode(getDefaultAppConfig(), &defaultsMap); err != nil {
+	if err := mapstructure.Decode(config, &defaultsMap); err != nil {
 		err = spverrors.Wrapf(err, "error occurred while setting defaults")
 		return err
 	}
@@ -82,21 +70,20 @@ func setDefaults() error {
 }
 
 func envConfig() {
-	viper.SetEnvPrefix(EnvPrefix)
+	viper.SetEnvPrefix(envPrefix)
 	viper.SetEnvKeyReplacer(strings.NewReplacer(".", "_"))
 	viper.AutomaticEnv()
 }
 
-func loadFromFile(logger *zerolog.Logger) error {
+func loadFromFile(logger zerolog.Logger) error {
 	configFilePath := viper.GetString(ConfigFilePathKey)
 
 	if configFilePath == DefaultConfigFilePath {
-		_, err := os.Stat(DefaultConfigFilePath)
+		_, err := os.Stat(configFilePath)
 		if os.IsNotExist(err) {
 			logger.Debug().Msg("Config file not specified. Using defaults")
 			return nil
 		}
-		configFilePath = DefaultConfigFilePath
 	}
 
 	viper.SetConfigFile(configFilePath)
@@ -111,7 +98,7 @@ func loadFromFile(logger *zerolog.Logger) error {
 
 func unmarshallToAppConfig(appConfig *AppConfig) error {
 	if err := viper.Unmarshal(appConfig); err != nil {
-		err = fmt.Errorf(dictionary.GetInternalMessage(dictionary.ErrorViper), err.Error())
+		err = spverrors.Wrapf(err, "error when unmarshalling config to App Config")
 		return err
 	}
 	return nil

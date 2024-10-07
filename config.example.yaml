@@ -56,8 +56,6 @@ db:
     max_open_connections: 0
     shared: true
     table_prefix: ""
-# enable debug mode
-debug: true
 # enable endpoints that provides profiling information
 debug_profiling: true
 # enable (ITC) incoming transaction checking
@@ -121,3 +119,8 @@ task_manager:
 # Prometheus metrics configuration
 metrics:
   enabled: false
+logging:
+  # log level: trace, debug, info, warn, error
+  level: info
+  # log format: json, console
+  format: console

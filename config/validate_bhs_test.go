@@ -1,49 +1,65 @@
-package config
+package config_test
 
 import (
 	"testing"
 
+	"github.com/bitcoin-sv/spv-wallet/config"
 	"github.com/stretchr/testify/require"
 )
 
-// TestBHSConfig_Validate will test the method Validate()
-func TestBHSConfig_Validate(t *testing.T) {
+func TestValidateBHSConfig(t *testing.T) {
 	t.Parallel()
 
-	t.Run("no auth token", func(t *testing.T) {
-		b := BHSConfig{
-			AuthToken: "",
-			URL:       "http://localhost:8080",
-		}
+	validConfigTests := map[string]struct {
+		scenario func(cfg *config.AppConfig)
+	}{
+		"valid with no auth token": {
+			scenario: func(cfg *config.AppConfig) {
+				cfg.BHS.AuthToken = ""
+			},
+		},
+	}
+	for name, test := range validConfigTests {
+		t.Run(name, func(t *testing.T) {
+			// given:
+			cfg := config.GetDefaultAppConfig()
 
-		err := b.Validate()
-		require.NoError(t, err)
-	})
+			test.scenario(cfg)
 
-	t.Run("no url", func(t *testing.T) {
-		b := BHSConfig{
-			AuthToken: "token",
-			URL:       "",
-		}
+			// when:
+			err := cfg.Validate()
 
-		err := b.Validate()
-		require.Error(t, err)
-	})
+			// then:
+			require.NoError(t, err)
+		})
+	}
 
-	t.Run("config is nil", func(t *testing.T) {
-		var b *BHSConfig
+	invalidConfigTests := map[string]struct {
+		scenario func(cfg *config.AppConfig)
+	}{
+		"return error when url is empty": {
+			scenario: func(cfg *config.AppConfig) {
+				cfg.BHS.URL = ""
+			},
+		},
+		"return error when config is nil": {
+			scenario: func(cfg *config.AppConfig) {
+				cfg.BHS = nil
+			},
+		},
+	}
+	for name, test := range invalidConfigTests {
+		t.Run(name, func(t *testing.T) {
+			// given:
+			cfg := config.GetDefaultAppConfig()
 
-		err := b.Validate()
-		require.Error(t, err)
-	})
+			test.scenario(cfg)
 
-	t.Run("full config", func(t *testing.T) {
-		b := BHSConfig{
-			AuthToken: "token",
-			URL:       "http://localhost:8080",
-		}
+			// when:
+			err := cfg.Validate()
 
-		err := b.Validate()
-		require.NoError(t, err)
-	})
+			// then:
+			require.Error(t, err)
+		})
+	}
 }

@@ -6,6 +6,9 @@ import (
 	"os"
 
 	"github.com/bitcoin-sv/spv-wallet/config"
+	"github.com/bitcoin-sv/spv-wallet/engine"
+	"github.com/bitcoin-sv/spv-wallet/engine/tester"
+	"github.com/bitcoin-sv/spv-wallet/engine/utils"
 	"github.com/bitcoin-sv/spv-wallet/logging"
 	"github.com/bitcoin-sv/spv-wallet/server/middleware"
 	"github.com/gin-gonic/gin"
@@ -16,27 +19,38 @@ import (
 
 // TestSuite is for testing the entire package using real/mocked services
 type TestSuite struct {
-	AppConfig   *config.AppConfig   // App config
-	Router      *gin.Engine         // Gin router with handlers
-	Services    *config.AppServices // Services
-	suite.Suite                     // Extends the suite.Suite package
+	AppConfig       *config.AppConfig      // App config
+	Router          *gin.Engine            // Gin router with handlers
+	Logger          zerolog.Logger         // Logger
+	SpvWalletEngine engine.ClientInterface // SPV Wallet Engine
+	suite.Suite                            // Extends the suite.Suite package
 }
 
 // BaseSetupSuite runs at the start of the suite
 func (ts *TestSuite) BaseSetupSuite() {
-	ts.AppConfig = config.LoadForTest()
+	cfg := config.GetDefaultAppConfig()
+	cfg.DebugProfiling = false
+	cfg.Logging.Level = zerolog.LevelDebugValue
+	cfg.Logging.Format = "console"
+	cfg.ARC.UseFeeQuotes = false
+	cfg.ARC.FeeUnit = &config.FeeUnitConfig{
+		Satoshis: 1,
+		Bytes:    1000,
+	}
+	cfg.Notifications.Enabled = false
+
+	// Defaults for safe thread testing
+	cfg.Db.SQLite.MaxIdleConnections = 1
+	cfg.Db.SQLite.MaxOpenConnections = 1
+
+	ts.AppConfig = cfg
 }
 
 // BaseTearDownSuite runs after the suite finishes
 func (ts *TestSuite) BaseTearDownSuite() {
-	// Ensure all connections are closed
-	if ts.Services != nil {
-		ts.Services.CloseAll(context.Background())
-		ts.Services = nil
-	}
-
 	ts.T().Cleanup(func() {
 		_ = os.Remove("datastore.db")
+		_ = os.Remove("spv-wallet.db")
 	})
 }
 
@@ -44,17 +58,24 @@ func (ts *TestSuite) BaseTearDownSuite() {
 func (ts *TestSuite) BaseSetupTest() {
 	// Load the services
 	var err error
-	nop := zerolog.Nop()
+	ts.Logger = tester.Logger(ts.T())
 
-	ts.Services, err = ts.AppConfig.LoadTestServices(context.Background())
+	ts.AppConfig.Db.SQLite.TablePrefix, err = utils.RandomHex(8)
+	require.NoError(ts.T(), err)
+
+	opts, err := ts.AppConfig.ToEngineOptions(ts.Logger)
+	require.NoError(ts.T(), err)
+
+	ts.SpvWalletEngine, err = engine.NewClient(context.Background(), opts...)
+	require.NoError(ts.T(), err)
 
 	gin.SetMode(gin.ReleaseMode)
-	engine := gin.New()
-	engine.Use(logging.GinMiddleware(&nop), gin.Recovery())
-	engine.Use(middleware.AppContextMiddleware(ts.AppConfig, ts.Services.SpvWalletEngine, ts.Services.Logger))
-	engine.Use(middleware.CorsMiddleware())
+	ginEngine := gin.New()
+	ginEngine.Use(logging.GinMiddleware(ts.Logger), gin.Recovery())
+	ginEngine.Use(middleware.AppContextMiddleware(ts.AppConfig, ts.SpvWalletEngine, ts.Logger))
+	ginEngine.Use(middleware.CorsMiddleware())
 
-	ts.Router = engine
+	ts.Router = ginEngine
 	require.NotNil(ts.T(), ts.Router)
 
 	require.NoError(ts.T(), err)
@@ -62,8 +83,8 @@ func (ts *TestSuite) BaseSetupTest() {
 
 // BaseTearDownTest runs after each test
 func (ts *TestSuite) BaseTearDownTest() {
-	if ts.Services != nil {
-		ts.Services.CloseAll(context.Background())
-		ts.Services = nil
+	if ts.SpvWalletEngine != nil {
+		err := ts.SpvWalletEngine.Close(context.Background())
+		require.NoError(ts.T(), err)
 	}
 }

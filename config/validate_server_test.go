@@ -1,61 +1,56 @@
-package config
+package config_test
 
 import (
 	"testing"
 
-	"github.com/stretchr/testify/assert"
+	"github.com/bitcoin-sv/spv-wallet/config"
+	"github.com/stretchr/testify/require"
 )
 
-// TestServerConfig_Validate will test the method Validate()
-func TestServerConfig_Validate(t *testing.T) {
+func TestValidateServerConfig(t *testing.T) {
 	t.Parallel()
 
-	defaultAppConfig := getDefaultAppConfig()
-	idleTimeout := defaultAppConfig.Server.IdleTimeout
-	readTimeout := defaultAppConfig.Server.ReadTimeout
-	writeTimeout := defaultAppConfig.Server.WriteTimeout
+	invalidConfigTests := map[string]struct {
+		scenario func(cfg *config.AppConfig)
+	}{
+		"invalid for missing port": {
+			scenario: func(cfg *config.AppConfig) {
+				cfg.Server.Port = 0
+			},
+		},
+		"invalid for too high port number": {
+			scenario: func(cfg *config.AppConfig) {
+				cfg.Server.Port = 1234567890
+			},
+		},
+		"invalid for missing idle timeout": {
+			scenario: func(cfg *config.AppConfig) {
+				cfg.Server.IdleTimeout = 0
+			},
+		},
+		"invalid for missing read timeout": {
+			scenario: func(cfg *config.AppConfig) {
+				cfg.Server.ReadTimeout = 0
+			},
+		},
+		"invalid for missing write timeout": {
+			scenario: func(cfg *config.AppConfig) {
+				cfg.Server.WriteTimeout = 0
+			},
+		},
+	}
+	for name, test := range invalidConfigTests {
+		t.Run(name, func(t *testing.T) {
+			// given:
+			cfg := config.GetDefaultAppConfig()
 
-	t.Run("port is required", func(t *testing.T) {
-		s := ServerConfig{
-			IdleTimeout:  idleTimeout,
-			ReadTimeout:  readTimeout,
-			WriteTimeout: writeTimeout,
-			// no port
-		}
-		err := s.Validate()
-		assert.Error(t, err)
-	})
+			test.scenario(cfg)
 
-	t.Run("port is too big", func(t *testing.T) {
-		s := ServerConfig{
-			IdleTimeout:  idleTimeout,
-			ReadTimeout:  readTimeout,
-			WriteTimeout: writeTimeout,
-			Port:         1234567,
-		}
-		err := s.Validate()
-		assert.Error(t, err)
-	})
+			// when:
+			err := cfg.Validate()
 
-	t.Run("valid server config", func(t *testing.T) {
-		s := ServerConfig{
-			IdleTimeout:  idleTimeout,
-			ReadTimeout:  readTimeout,
-			WriteTimeout: writeTimeout,
-			Port:         3000,
-		}
-		err := s.Validate()
-		assert.NoError(t, err)
-	})
-
-	t.Run("default timeouts", func(t *testing.T) {
-		s := ServerConfig{
-			IdleTimeout:  0,
-			ReadTimeout:  0,
-			WriteTimeout: 0,
-			Port:         3000,
-		}
-		err := s.Validate()
-		assert.Error(t, err)
-	})
+			// then:
+			require.Error(t, err)
+		})
+	}
 }

@@ -15,7 +15,7 @@ type cliFlags struct {
 	dumpConfig  bool `mapstructure:"dump_config"`
 }
 
-func loadFlags() error {
+func loadFlags(cfg *AppConfig) error {
 	if !anyFlagsPassed() {
 		return nil
 	}
@@ -37,7 +37,7 @@ func loadFlags() error {
 		return err
 	}
 
-	parseCliFlags(appFlags, cli)
+	parseCliFlags(cfg, appFlags, cli)
 
 	return nil
 }
@@ -54,14 +54,14 @@ func initFlags(fs *pflag.FlagSet, cliFlags *cliFlags) {
 	fs.BoolVarP(&cliFlags.dumpConfig, "dump_config", "d", false, "dump config to file, specified by config_file flag")
 }
 
-func parseCliFlags(fs *pflag.FlagSet, cli *cliFlags) {
+func parseCliFlags(cfg *AppConfig, fs *pflag.FlagSet, cli *cliFlags) {
 	if cli.showHelp {
 		fs.PrintDefaults()
 		os.Exit(0)
 	}
 
 	if cli.showVersion {
-		fmt.Println("spv-wallet", "version", Version)
+		fmt.Println(cfg.GetUserAgent())
 		os.Exit(0)
 	}
 

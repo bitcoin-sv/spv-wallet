@@ -287,6 +287,10 @@ func (c *Client) Close(ctx context.Context) error {
 		}
 		c.options.taskManager.TaskEngine = nil
 	}
+
+	if c.options.notifications != nil && c.options.notifications.webhookManager != nil {
+		c.options.notifications.webhookManager.Stop()
+	}
 	return nil
 }
 
