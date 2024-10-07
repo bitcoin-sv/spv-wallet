@@ -14,7 +14,7 @@ import (
 )
 
 /**
-NOTE: switch httpClient to resty.New() tu call actual ARC server
+NOTE: switch httpClient to resty.New() tu call actual BHS server
 */
 
 var validMerkleRootsReq = []*spv.MerkleRootConfirmationRequestItem{

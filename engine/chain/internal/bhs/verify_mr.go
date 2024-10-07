@@ -20,6 +20,9 @@ sometimes paymail capabilities are cached and VerifyMerkleRoots is called even t
 
 // VerifyMerkleRoots verifies the merkle roots of the given transactions using BHS request
 func (s *Service) VerifyMerkleRoots(ctx context.Context, merkleRoots []*spv.MerkleRootConfirmationRequestItem) (*chainmodels.MerkleRootsConfirmations, error) {
+	if len(merkleRoots) == 0 {
+		return nil, chainerrors.ErrBHSBadRequest.Wrap(spverrors.Newf("at least one merkleroot is required"))
+	}
 	result := &chainmodels.MerkleRootsConfirmations{}
 	req := s.httpClient.R().
 		SetContext(ctx).
@@ -47,7 +50,6 @@ func (s *Service) VerifyMerkleRoots(ctx context.Context, merkleRoots []*spv.Merk
 		return nil, chainerrors.ErrBHSUnreachable
 	case http.StatusBadRequest:
 		// Note: in case of error, BHS returns a string (not json) with the error message
-		// Most common error is "at least one merkleroot is required"
 		return nil, chainerrors.ErrBHSBadRequest.Wrap(spverrors.Newf("BHS error message: %v", string(response.Body())))
 	default:
 		return nil, chainerrors.ErrBHSNoSuccessResponse.Wrap(spverrors.Newf("BHS response status code: %d", response.StatusCode()))
