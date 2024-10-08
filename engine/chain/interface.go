@@ -15,7 +15,7 @@ type ARCService interface {
 
 // BHSService for querying BHS server.
 type BHSService interface {
-	VerifyMerkleRoots(ctx context.Context, merkleRoots []*spv.MerkleRootConfirmationRequestItem) (*chainmodels.MerkleRootsConfirmations, error)
+	VerifyMerkleRoots(ctx context.Context, merkleRoots []*spv.MerkleRootConfirmationRequestItem) (bool, error)
 	HealthcheckBHS(ctx context.Context) error
 }
 

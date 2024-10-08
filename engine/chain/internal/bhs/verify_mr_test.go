@@ -32,6 +32,7 @@ func TestVerifyMerkleRoots(t *testing.T) {
 	tests := map[string]struct {
 		request  []*spv.MerkleRootConfirmationRequestItem
 		response *chainmodels.MerkleRootsConfirmations
+		verified bool
 	}{
 		"Verify for CONFIRMED merkle roots": {
 			request: validMerkleRootsReq,
@@ -52,6 +53,7 @@ func TestVerifyMerkleRoots(t *testing.T) {
 					},
 				},
 			},
+			verified: true,
 		},
 		"Verify with one wrong hash": {
 			request: []*spv.MerkleRootConfirmationRequestItem{
@@ -81,6 +83,7 @@ func TestVerifyMerkleRoots(t *testing.T) {
 					},
 				},
 			},
+			verified: false,
 		},
 	}
 	for name, test := range tests {
@@ -89,11 +92,10 @@ func TestVerifyMerkleRoots(t *testing.T) {
 
 			service := chain.NewChainService(tester.Logger(t), httpClient, chainmodels.ARCConfig{}, bhsCfg(bhsURL, bhsToken))
 
-			confirmations, err := service.VerifyMerkleRoots(context.Background(), test.request)
+			verified, err := service.VerifyMerkleRoots(context.Background(), test.request)
 
 			require.NoError(t, err)
-			require.NotNil(t, confirmations)
-			require.Equal(t, test.response, confirmations)
+			require.Equal(t, test.verified, verified)
 		})
 	}
 }
@@ -137,11 +139,11 @@ func TestVerifyMerkleRootsErrorCases(t *testing.T) {
 
 			service := chain.NewChainService(tester.Logger(t), httpClient, chainmodels.ARCConfig{}, bhsCfg(test.bhsURL, test.bhsToken))
 
-			confirmations, err := service.VerifyMerkleRoots(context.Background(), test.request)
+			verified, err := service.VerifyMerkleRoots(context.Background(), test.request)
 
 			require.Error(t, err)
 			require.ErrorIs(t, err, test.expectErr)
-			require.Nil(t, confirmations)
+			require.False(t, verified)
 		})
 	}
 }
@@ -155,12 +157,12 @@ func TestVerifyMerkleRootsTimeouts(t *testing.T) {
 		ctx, cancel := context.WithTimeout(context.Background(), 1)
 		defer cancel()
 
-		confirmations, err := service.VerifyMerkleRoots(ctx, validMerkleRootsReq)
+		verified, err := service.VerifyMerkleRoots(ctx, validMerkleRootsReq)
 
 		require.Error(t, err)
 		require.ErrorIs(t, err, chainerrors.ErrBHSUnreachable)
 		require.ErrorIs(t, err, context.DeadlineExceeded)
-		require.Nil(t, confirmations)
+		require.False(t, verified)
 	})
 
 	t.Run("VerifyMerkleRoots interrupted by resty timeout", func(t *testing.T) {
@@ -169,11 +171,11 @@ func TestVerifyMerkleRootsTimeouts(t *testing.T) {
 
 		service := chain.NewChainService(tester.Logger(t), httpClient, chainmodels.ARCConfig{}, bhsCfg(bhsURL, bhsToken))
 
-		confirmations, err := service.VerifyMerkleRoots(context.Background(), validMerkleRootsReq)
+		verified, err := service.VerifyMerkleRoots(context.Background(), validMerkleRootsReq)
 
 		require.Error(t, err)
 		require.ErrorIs(t, err, chainerrors.ErrBHSUnreachable)
 		require.ErrorIs(t, err, context.DeadlineExceeded)
-		require.Nil(t, confirmations)
+		require.False(t, verified)
 	})
 }

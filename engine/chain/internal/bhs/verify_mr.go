@@ -19,7 +19,26 @@ sometimes paymail capabilities are cached and VerifyMerkleRoots is called even t
 */
 
 // VerifyMerkleRoots verifies the merkle roots of the given transactions using BHS request
-func (s *Service) VerifyMerkleRoots(ctx context.Context, merkleRoots []*spv.MerkleRootConfirmationRequestItem) (*chainmodels.MerkleRootsConfirmations, error) {
+func (s *Service) VerifyMerkleRoots(ctx context.Context, merkleRoots []*spv.MerkleRootConfirmationRequestItem) (valid bool, err error) {
+	confirmations, err := s.mrVerifyRequest(ctx, merkleRoots)
+	if err != nil {
+		return false, err
+	}
+
+	switch confirmations.ConfirmationState {
+	case chainmodels.MRConfirmed:
+		return true, nil
+	case chainmodels.MRUnableToVerify:
+		s.logger.Warn().Msg("BHS is up but could not verify some merkle root(s). Defaulting to treat the provided merkle roots as valid.")
+		return true, nil
+	case chainmodels.MRInvalid:
+		return false, nil
+	default:
+		return false, spverrors.ErrInternal.Wrap(spverrors.Newf("unexpected confirmation state"))
+	}
+}
+
+func (s *Service) mrVerifyRequest(ctx context.Context, merkleRoots []*spv.MerkleRootConfirmationRequestItem) (*chainmodels.MerkleRootsConfirmations, error) {
 	if len(merkleRoots) == 0 {
 		return nil, chainerrors.ErrBHSBadRequest.Wrap(spverrors.Newf("at least one merkleroot is required"))
 	}
