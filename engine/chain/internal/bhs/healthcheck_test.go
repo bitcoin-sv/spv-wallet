@@ -17,7 +17,7 @@ NOTE: switch httpClient to resty.New() tu call actual ARC server
 
 func TestHealthcheckBHS(t *testing.T) {
 	t.Run("BHS Healthcheck success", func(t *testing.T) {
-		httpClient := bhsMockVerify(&chainmodels.MerkleRootsConfirmations{ConfirmationState: chainmodels.MRConfirmed}, false)
+		httpClient := bhsMockVerify(`{"confirmationState": "CONFIRMED"}`, false)
 		service := chain.NewChainService(tester.Logger(t), httpClient, chainmodels.ARCConfig{}, bhsCfg(bhsURL, bhsToken))
 
 		err := service.HealthcheckBHS(context.Background())
@@ -26,7 +26,7 @@ func TestHealthcheckBHS(t *testing.T) {
 	})
 
 	t.Run("BHS Healthcheck reachable but invalid state", func(t *testing.T) {
-		httpClient := bhsMockVerify(&chainmodels.MerkleRootsConfirmations{ConfirmationState: chainmodels.MRInvalid}, false)
+		httpClient := bhsMockVerify(`{"confirmationState": "INVALID"}`, false)
 
 		service := chain.NewChainService(tester.Logger(t), httpClient, chainmodels.ARCConfig{}, bhsCfg(bhsURL, bhsToken))
 
@@ -36,7 +36,7 @@ func TestHealthcheckBHS(t *testing.T) {
 	})
 
 	t.Run("BHS Healthcheck interrupted by ctx timeout", func(t *testing.T) {
-		httpClient := bhsMockVerify(&chainmodels.MerkleRootsConfirmations{}, true)
+		httpClient := bhsMockVerify("", true)
 		service := chain.NewChainService(tester.Logger(t), httpClient, chainmodels.ARCConfig{}, bhsCfg(bhsURL, bhsToken))
 
 		ctx, cancel := context.WithTimeout(context.Background(), 1)

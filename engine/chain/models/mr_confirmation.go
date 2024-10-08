@@ -13,18 +13,9 @@ const (
 	MRUnableToVerify MerkleRootConfirmationState = "UNABLE_TO_VERIFY"
 )
 
-// MerkleRootConfirmation is a confirmation
-// of merkle roots inclusion in the longest chain.
-type MerkleRootConfirmation struct {
-	Hash         string                      `json:"blockHash"`
-	BlockHeight  uint64                      `json:"blockHeight"`
-	MerkleRoot   string                      `json:"merkleRoot"`
-	Confirmation MerkleRootConfirmationState `json:"confirmation"`
-}
-
 // MerkleRootsConfirmations is an API response for confirming
 // merkle roots inclusion in the longest chain.
 type MerkleRootsConfirmations struct {
 	ConfirmationState MerkleRootConfirmationState `json:"confirmationState"`
-	Confirmations     []MerkleRootConfirmation    `json:"confirmations"`
+	// BHS also returns Confirmations array - but it's not used in the code here
 }

@@ -17,7 +17,7 @@ const (
 	bhsToken = "mQZQ6WmxURxWz5ch"
 )
 
-func bhsMockVerify(response *chainmodels.MerkleRootsConfirmations, applyTimeout bool) *resty.Client {
+func bhsMockVerify(response string, applyTimeout bool) *resty.Client {
 	transport := httpmock.NewMockTransport()
 	client := resty.New()
 	client.GetClient().Transport = transport
@@ -34,7 +34,7 @@ func bhsMockVerify(response *chainmodels.MerkleRootsConfirmations, applyTimeout 
 		if len(reqBody) == 0 {
 			return httpmock.NewStringResponse(http.StatusBadRequest, "at least one merkleroot is required"), nil
 		}
-		res, _ := httpmock.NewJsonResponse(http.StatusOK, response)
+		res := httpmock.NewStringResponse(http.StatusOK, response)
 		res.Header.Set("Content-Type", "application/json")
 		return res, nil
 	}

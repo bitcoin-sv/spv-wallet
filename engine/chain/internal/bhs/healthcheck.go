@@ -23,7 +23,7 @@ func (s *Service) HealthcheckBHS(ctx context.Context) error {
 	timedCtx, cancel := context.WithTimeout(ctx, 5*time.Second)
 	defer cancel()
 
-	confirmations, err := s.mrVerifyRequest(timedCtx, pastMerkleRoot)
+	confirmations, err := s.makeVerifyMerkleRootsRequest(timedCtx, pastMerkleRoot)
 	if err != nil {
 		return chainerrors.ErrBHSUnhealthy.Wrap(err)
 	}

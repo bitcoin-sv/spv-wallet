@@ -13,14 +13,9 @@ import (
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 )
 
-/**
-NOTE: When you switch from enabled use_beef to disabled and restart the server,
-sometimes paymail capabilities are cached and VerifyMerkleRoots is called even though it shouldn't be.
-*/
-
 // VerifyMerkleRoots verifies the merkle roots of the given transactions using BHS request
 func (s *Service) VerifyMerkleRoots(ctx context.Context, merkleRoots []*spv.MerkleRootConfirmationRequestItem) (valid bool, err error) {
-	confirmations, err := s.mrVerifyRequest(ctx, merkleRoots)
+	confirmations, err := s.makeVerifyMerkleRootsRequest(ctx, merkleRoots)
 	if err != nil {
 		return false, err
 	}
@@ -38,7 +33,7 @@ func (s *Service) VerifyMerkleRoots(ctx context.Context, merkleRoots []*spv.Merk
 	}
 }
 
-func (s *Service) mrVerifyRequest(ctx context.Context, merkleRoots []*spv.MerkleRootConfirmationRequestItem) (*chainmodels.MerkleRootsConfirmations, error) {
+func (s *Service) makeVerifyMerkleRootsRequest(ctx context.Context, merkleRoots []*spv.MerkleRootConfirmationRequestItem) (*chainmodels.MerkleRootsConfirmations, error) {
 	if len(merkleRoots) == 0 {
 		return nil, chainerrors.ErrBHSBadRequest.Wrap(spverrors.Newf("at least one merkleroot is required"))
 	}

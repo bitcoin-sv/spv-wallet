@@ -31,28 +31,12 @@ var validMerkleRootsReq = []*spv.MerkleRootConfirmationRequestItem{
 func TestVerifyMerkleRoots(t *testing.T) {
 	tests := map[string]struct {
 		request  []*spv.MerkleRootConfirmationRequestItem
-		response *chainmodels.MerkleRootsConfirmations
+		response string
 		verified bool
 	}{
 		"Verify for CONFIRMED merkle roots": {
-			request: validMerkleRootsReq,
-			response: &chainmodels.MerkleRootsConfirmations{
-				ConfirmationState: chainmodels.MRConfirmed,
-				Confirmations: []chainmodels.MerkleRootConfirmation{
-					{
-						Hash:         "000000000019d6689c085ae165831e934ff763ae46a2a6c172b3f1b60a8ce26f",
-						BlockHeight:  0,
-						MerkleRoot:   "4a5e1e4baab89f3a32518a88c31bc87f618f76673e2cc77ab2127b7afdeda33b",
-						Confirmation: chainmodels.MRConfirmed,
-					},
-					{
-						Hash:         "00000000839a8e6886ab5951d76f411475428afc90947ee320161bbf18eb6048",
-						BlockHeight:  1,
-						MerkleRoot:   "0e3e2357e806b6cdb1f70b54c3a3a17b6714ee1f0e68bebb44a74b1efd512098",
-						Confirmation: chainmodels.MRConfirmed,
-					},
-				},
-			},
+			request:  validMerkleRootsReq,
+			response: `{"confirmationState": "CONFIRMED"}`,
 			verified: true,
 		},
 		"Verify with one wrong hash": {
@@ -66,23 +50,7 @@ func TestVerifyMerkleRoots(t *testing.T) {
 					BlockHeight: 1,
 				},
 			},
-			response: &chainmodels.MerkleRootsConfirmations{
-				ConfirmationState: chainmodels.MRInvalid,
-				Confirmations: []chainmodels.MerkleRootConfirmation{
-					{
-						Hash:         "",
-						BlockHeight:  0,
-						MerkleRoot:   "wronge4baab89f3a32518a88c31bc87f618f76673e2cc77ab2127b7afdeda33b",
-						Confirmation: chainmodels.MRInvalid,
-					},
-					{
-						Hash:         "00000000839a8e6886ab5951d76f411475428afc90947ee320161bbf18eb6048",
-						BlockHeight:  1,
-						MerkleRoot:   "0e3e2357e806b6cdb1f70b54c3a3a17b6714ee1f0e68bebb44a74b1efd512098",
-						Confirmation: chainmodels.MRConfirmed,
-					},
-				},
-			},
+			response: `{"confirmationState": "INVALID" }`,
 			verified: false,
 		},
 	}
@@ -135,7 +103,7 @@ func TestVerifyMerkleRootsErrorCases(t *testing.T) {
 
 	for name, test := range errTestCases {
 		t.Run(name, func(t *testing.T) {
-			httpClient := bhsMockVerify(&chainmodels.MerkleRootsConfirmations{}, false)
+			httpClient := bhsMockVerify("", false)
 
 			service := chain.NewChainService(tester.Logger(t), httpClient, chainmodels.ARCConfig{}, bhsCfg(test.bhsURL, test.bhsToken))
 
@@ -150,7 +118,7 @@ func TestVerifyMerkleRootsErrorCases(t *testing.T) {
 
 func TestVerifyMerkleRootsTimeouts(t *testing.T) {
 	t.Run("VerifyMerkleRoots interrupted by ctx timeout", func(t *testing.T) {
-		httpClient := bhsMockVerify(&chainmodels.MerkleRootsConfirmations{}, true)
+		httpClient := bhsMockVerify("", true)
 
 		service := chain.NewChainService(tester.Logger(t), httpClient, chainmodels.ARCConfig{}, bhsCfg(bhsURL, bhsToken))
 
@@ -166,7 +134,7 @@ func TestVerifyMerkleRootsTimeouts(t *testing.T) {
 	})
 
 	t.Run("VerifyMerkleRoots interrupted by resty timeout", func(t *testing.T) {
-		httpClient := bhsMockVerify(&chainmodels.MerkleRootsConfirmations{}, true)
+		httpClient := bhsMockVerify("", true)
 		httpClient.SetTimeout(1 * time.Millisecond)
 
 		service := chain.NewChainService(tester.Logger(t), httpClient, chainmodels.ARCConfig{}, bhsCfg(bhsURL, bhsToken))
