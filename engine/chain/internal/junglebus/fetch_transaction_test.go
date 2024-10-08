@@ -2,14 +2,15 @@ package junglebus_test
 
 import (
 	"context"
+	"testing"
+	"time"
+
 	chainerrors "github.com/bitcoin-sv/spv-wallet/engine/chain/errors"
 	"github.com/bitcoin-sv/spv-wallet/engine/chain/internal/junglebus"
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/bitcoin-sv/spv-wallet/engine/tester"
 	"github.com/bitcoin-sv/spv-wallet/models/bsv"
 	"github.com/stretchr/testify/require"
-	"testing"
-	"time"
 )
 
 /**

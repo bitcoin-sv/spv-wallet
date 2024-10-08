@@ -2,10 +2,11 @@ package junglebus_test
 
 import (
 	"fmt"
-	"github.com/go-resty/resty/v2"
-	"github.com/jarcoal/httpmock"
 	"net/http"
 	"time"
+
+	"github.com/go-resty/resty/v2"
+	"github.com/jarcoal/httpmock"
 )
 
 const knownTx = "ea47e03186e59f8947d847e4eeaacde294a0a2db4d5e33b128430f2e2ee91015"
