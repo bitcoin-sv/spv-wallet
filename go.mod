@@ -14,7 +14,7 @@ require (
 	github.com/DATA-DOG/go-sqlmock v1.5.2
 	github.com/aws/aws-sdk-go v1.55.5
 	github.com/bitcoin-sv/go-broadcast-client v0.21.0
-	github.com/bitcoin-sv/go-paymail v0.21.0
+	github.com/bitcoin-sv/go-paymail v0.20.1
 	github.com/bitcoin-sv/go-sdk v1.1.8
 	github.com/bitcoin-sv/spv-wallet/models v0.28.0
 	github.com/bitcoinschema/go-bitcoin/v2 v2.0.5
