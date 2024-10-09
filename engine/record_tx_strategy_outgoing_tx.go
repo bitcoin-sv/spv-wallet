@@ -100,7 +100,7 @@ func (strategy *outgoingTx) LockKey() string {
 func (strategy *outgoingTx) createOutgoingTxToRecord(ctx context.Context, c ClientInterface, opts []ModelOps) (*Transaction, error) {
 	// Create NEW transaction model
 	newOpts := c.DefaultModelOptions(append(opts, WithXPub(strategy.XPubKey), New())...)
-	tx := txFromBtTx(strategy.SDKTx, newOpts...)
+	tx := txFromSDKTx(strategy.SDKTx, newOpts...)
 	tx.DraftID = strategy.RelatedDraftID
 
 	if err := _hydrateOutgoingWithDraft(ctx, tx); err != nil {

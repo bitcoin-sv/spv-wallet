@@ -9,7 +9,6 @@ import (
 	compat "github.com/bitcoin-sv/go-sdk/compat/bip32"
 	script "github.com/bitcoin-sv/go-sdk/script"
 	"github.com/bitcoin-sv/spv-wallet/engine/utils"
-	"github.com/libsv/go-bk/bip32"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -32,14 +31,14 @@ func TestNewPaymail(t *testing.T) {
 		require.NotNil(t, xPub)
 
 		// Get the external public key
-		var paymailExternalKey *bip32.ExtendedKey
+		var paymailExternalKey *compat.ExtendedKey
 		paymailExternalKey, err = compat.GetHDKeyByPath(
 			xPub, utils.ChainExternal, externalDerivationNum,
 		)
 		require.NoError(t, err)
 		require.NotNil(t, paymailExternalKey)
 
-		var paymailIdentityKey *bip32.ExtendedKey
+		var paymailIdentityKey *compat.ExtendedKey
 		paymailIdentityKey, err = compat.GetHDKeyChild(paymailExternalKey, uint32(utils.MaxInt32))
 		require.NoError(t, err)
 		require.NotNil(t, paymailIdentityKey)
@@ -73,7 +72,7 @@ func TestNewPaymail(t *testing.T) {
 		err = Get(ctx, p2, conditions, false, 0, false)
 		require.NoError(t, err)
 
-		var identityKey *bip32.ExtendedKey
+		var identityKey *compat.ExtendedKey
 		identityKey, err = p2.GetIdentityXpub()
 		require.NoError(t, err)
 		require.NotNil(t, identityKey)
@@ -301,7 +300,7 @@ func TestNewPaymail(t *testing.T) {
 }
 
 func randDerivationNum() uint32 {
-	rnd := rand.Int63n(int64(bip32.HardenedKeyStart))
+	rnd := rand.Int63n(int64(compat.HardenedKeyStart))
 	if rnd < 0 {
 		rnd = rnd * -1
 	}

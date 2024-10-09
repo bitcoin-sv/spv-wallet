@@ -2,7 +2,6 @@ package engine
 
 import (
 	"context"
-	"encoding/hex"
 
 	trx "github.com/bitcoin-sv/go-sdk/transaction"
 )
@@ -21,7 +20,7 @@ func ToEfHex(ctx context.Context, tx *Transaction, store TransactionGetter) (efH
 
 	needToHydrate := false
 	for _, input := range btTx.Inputs {
-		if input.PreviousTxScript == nil {
+		if input.SourceTXID == nil {
 			needToHydrate = true
 			break
 		}
@@ -33,7 +32,12 @@ func ToEfHex(ctx context.Context, tx *Transaction, store TransactionGetter) (efH
 		}
 	}
 
-	return hex.EncodeToString(btTx.ExtendedBytes()), true
+	ef, err := btTx.EFHex()
+	if err != nil {
+		return "", false
+	}
+
+	return ef, true
 }
 
 func hydrate(ctx context.Context, tx *trx.Transaction, store TransactionGetter) (ok bool) {
@@ -61,8 +65,10 @@ func hydrate(ctx context.Context, tx *trx.Transaction, store TransactionGetter) 
 		}
 
 		o := pbtTx.Outputs[input.SourceTxOutIndex]
-		input.PreviousTxSatoshis = o.Satoshis
-		input.PreviousTxScript = o.LockingScript
+		input.SetSourceTxOutput(&trx.TransactionOutput{
+			Satoshis:      o.Satoshis,
+			LockingScript: o.LockingScript,
+		})
 	}
 
 	return true

@@ -7,16 +7,16 @@ import (
 
 	"github.com/DATA-DOG/go-sqlmock"
 	broadcast_client_mock "github.com/bitcoin-sv/go-broadcast-client/broadcast/broadcast-client-mock"
+	compat "github.com/bitcoin-sv/go-sdk/compat/bip32"
+	ec "github.com/bitcoin-sv/go-sdk/primitives/ec"
+	"github.com/bitcoin-sv/go-sdk/script"
+	trx "github.com/bitcoin-sv/go-sdk/transaction"
+	sighash "github.com/bitcoin-sv/go-sdk/transaction/sighash"
+	"github.com/bitcoin-sv/go-sdk/transaction/template/p2pkh"
 	"github.com/bitcoin-sv/spv-wallet/engine/datastore"
+	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/bitcoin-sv/spv-wallet/engine/taskmanager"
 	"github.com/bitcoin-sv/spv-wallet/engine/tester"
-	"github.com/bitcoinschema/go-bitcoin/v2"
-	"github.com/libsv/go-bk/bec"
-	"github.com/libsv/go-bk/bip32"
-	"github.com/libsv/go-bt/v2"
-	"github.com/libsv/go-bt/v2/bscript"
-	"github.com/libsv/go-bt/v2/sighash"
-	"github.com/libsv/go-bt/v2/unlocker"
 	"github.com/mrz1836/go-cache"
 	"github.com/rafaeljusto/redigomock"
 	"github.com/rs/zerolog"
@@ -141,45 +141,46 @@ func CloseClient(ctx context.Context, t *testing.T, client ClientInterface) {
 
 // we need to create an interface for the unlocker
 type account struct {
-	PrivateKey *bec.PrivateKey
+	PrivateKey *ec.PrivateKey
 }
 
 // Unlocker get the correct un-locker for a given locking script.
-func (a *account) Unlocker(context.Context, *bscript.Script) (bt.Unlocker, error) {
-	return &unlocker.Simple{
-		PrivateKey: a.PrivateKey,
-	}, nil
+func (a *account) Unlocker(context.Context, *script.Script) (*p2pkh.P2PKH, error) {
+	unlocker, err := p2pkh.Unlock(a.PrivateKey, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return unlocker, nil
 }
 
 // CreateFakeFundingTransaction will create a valid (fake) transaction for funding
-func CreateFakeFundingTransaction(t *testing.T, masterKey *bip32.ExtendedKey,
+func CreateFakeFundingTransaction(t *testing.T, masterKey *compat.ExtendedKey,
 	destinations []*Destination, satoshis uint64,
 ) string {
 	// Create new tx
-	rawTx := bt.NewTx()
-	txErr := rawTx.From(testTxScriptSigID, 0, testTxScriptSigOut, satoshis+354)
+	rawTx := trx.NewTransaction()
+	txErr := rawTx.AddInputFrom(testTxScriptSigID, 0, testTxScriptSigOut, satoshis+354, nil)
 	require.NoError(t, txErr)
 
 	// Loop all destinations
 	for _, destination := range destinations {
-		s, err := bscript.NewFromHexString(destination.LockingScript)
+		s, err := script.NewFromHex(destination.LockingScript)
 		require.NoError(t, err)
 		require.NotNil(t, s)
 
-		rawTx.AddOutput(&bt.Output{
+		rawTx.AddOutput(&trx.TransactionOutput{
 			Satoshis:      satoshis,
 			LockingScript: s,
 		})
 	}
 
 	// Get private key
-	privateKey, err := bitcoin.GetPrivateKeyFromHDKey(masterKey)
+	privateKey, err := compat.GetPrivateKeyFromHDKey(masterKey)
 	require.NoError(t, err)
 	require.NotNil(t, privateKey)
 
-	// Sign the tx
-	myAccount := &account{PrivateKey: privateKey}
-	err = rawTx.FillAllInputs(context.Background(), myAccount)
+	err = rawTx.Sign()
 	require.NoError(t, err)
 
 	// Return the tx hex
@@ -189,15 +190,15 @@ func CreateFakeFundingTransaction(t *testing.T, masterKey *bip32.ExtendedKey,
 // CreateNewXPub will create a new xPub and return all the information to use the xPub
 func CreateNewXPub(ctx context.Context, t *testing.T, engineClient ClientInterface,
 	opts ...ModelOps,
-) (*bip32.ExtendedKey, *Xpub, string) {
+) (*compat.ExtendedKey, *Xpub, string) {
 	// Generate a key pair
-	masterKey, err := bitcoin.GenerateHDKey(bitcoin.SecureSeedLength)
+	masterKey, err := compat.GenerateHDKey(compat.SecureSeedLength)
 	require.NoError(t, err)
 	require.NotNil(t, masterKey)
 
 	// Get the raw string of the xPub
 	var rawXPub string
-	rawXPub, err = bitcoin.GetExtendedPublicKey(masterKey)
+	rawXPub, err = compat.GetExtendedPublicKey(masterKey)
 	require.NoError(t, err)
 	require.NotNil(t, masterKey)
 
@@ -211,21 +212,13 @@ func CreateNewXPub(ctx context.Context, t *testing.T, engineClient ClientInterfa
 }
 
 // GetUnlockingScript will get a locking script for valid fake transactions
-func GetUnlockingScript(t *testing.T, tx *bt.Tx, inputIndex uint32, privateKey *bec.PrivateKey) *bscript.Script {
-	sh, err := tx.CalcInputSignatureHash(inputIndex, sighash.AllForkID)
-	require.NoError(t, err)
+func GetUnlockingScript(tx *trx.Transaction, inputIndex uint32, privateKey *ec.PrivateKey) (*p2pkh.P2PKH, error) {
+	sigHashFlags := sighash.AllForkID
 
-	var sig *bec.Signature
-	sig, err = privateKey.Sign(bt.ReverseBytes(sh))
-	require.NoError(t, err)
-	require.NotNil(t, sig)
+	sc, err := p2pkh.Unlock(privateKey, &sigHashFlags)
+	if err != nil {
+		return nil, spverrors.Wrapf(err, "failed to create unlocking script")
+	}
 
-	var s *bscript.Script
-	s, err = bscript.NewP2PKHUnlockingScript(
-		privateKey.PubKey().SerialiseCompressed(), sig.Serialise(), sighash.AllForkID,
-	)
-	require.NoError(t, err)
-	require.NotNil(t, s)
-
-	return s
+	return sc, nil
 }

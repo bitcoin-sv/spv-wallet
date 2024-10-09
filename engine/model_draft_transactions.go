@@ -850,8 +850,10 @@ func (m *DraftTransaction) SignInputs(xPriv *compat.ExtendedKey) (signedHex stri
 		); err != nil {
 			return
 		}
-		txDraft.Inputs[index].PreviousTxScript = ls
-		txDraft.Inputs[index].PreviousTxSatoshis = input.Satoshis
+		txDraft.Inputs[index].SetSourceTxOutput(&trx.TransactionOutput{
+			Satoshis:      input.Satoshis,
+			LockingScript: ls,
+		})
 
 		// Derive the child key (chain)
 		var chainKey *compat.ExtendedKey

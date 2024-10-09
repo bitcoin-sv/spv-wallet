@@ -54,7 +54,7 @@ func (strategy *externalIncomingTx) LockKey() string {
 
 func _createExternalTxToRecord(ctx context.Context, eTx *externalIncomingTx, c ClientInterface, opts []ModelOps) (*Transaction, error) {
 	// Create NEW tx model
-	tx := txFromBtTx(eTx.SDKTx, c.DefaultModelOptions(append(opts, New())...)...)
+	tx := txFromSDKTx(eTx.SDKTx, c.DefaultModelOptions(append(opts, New())...)...)
 
 	if !tx.TransactionBase.hasOneKnownDestination(ctx, c) {
 		return nil, ErrNoMatchingOutputs

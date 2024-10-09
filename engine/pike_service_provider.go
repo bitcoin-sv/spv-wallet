@@ -11,7 +11,6 @@ import (
 	"github.com/bitcoin-sv/spv-wallet/engine/script/template"
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/bitcoin-sv/spv-wallet/engine/utils"
-	"github.com/libsv/go-bk/bec"
 )
 
 // PikeContactServiceProvider is an interface for handling the pike contact actions in go-paymail/server
@@ -137,7 +136,7 @@ func generateReferenceID() (string, error) {
 	return referenceID, spverrors.Wrapf(err, "failed to generate reference id")
 }
 
-func getPublicKeys(receiverPubKeyHex, senderPubKeyHex string) (*ec.PublicKey, *bec.PublicKey, error) {
+func getPublicKeys(receiverPubKeyHex, senderPubKeyHex string) (*ec.PublicKey, *ec.PublicKey, error) {
 	receiverPubKey, err := getPublicKey(receiverPubKeyHex)
 	if err != nil {
 		return nil, nil, err

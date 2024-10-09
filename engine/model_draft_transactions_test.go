@@ -10,15 +10,14 @@ import (
 
 	compat "github.com/bitcoin-sv/go-sdk/compat/bip32"
 	bsm "github.com/bitcoin-sv/go-sdk/compat/bsm"
+	ec "github.com/bitcoin-sv/go-sdk/primitives/ec"
+	"github.com/bitcoin-sv/go-sdk/script"
 	trx "github.com/bitcoin-sv/go-sdk/transaction"
 	sighash "github.com/bitcoin-sv/go-sdk/transaction/sighash"
 	"github.com/bitcoin-sv/spv-wallet/engine/chainstate"
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	xtester "github.com/bitcoin-sv/spv-wallet/engine/tester/paymailmock"
 	"github.com/bitcoin-sv/spv-wallet/engine/utils"
-	"github.com/libsv/go-bk/bec"
-	"github.com/libsv/go-bk/bip32"
-	"github.com/libsv/go-bt/v2/bscript"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -1132,7 +1131,7 @@ func TestDraftTransaction_SignInputs(t *testing.T) {
 	require.NoError(t, err)
 
 	// Derive the child key (chain)
-	var chainKey *bip32.ExtendedKey
+	var chainKey *compat.ExtendedKey
 	if chainKey, err = xPrivHD.Child(
 		0,
 	); err != nil {
@@ -1140,7 +1139,7 @@ func TestDraftTransaction_SignInputs(t *testing.T) {
 	}
 
 	// Derive the child key (num)
-	var numKey *bip32.ExtendedKey
+	var numKey *compat.ExtendedKey
 	if numKey, err = chainKey.Child(
 		0,
 	); err != nil {
@@ -1148,7 +1147,7 @@ func TestDraftTransaction_SignInputs(t *testing.T) {
 	}
 
 	// Get the private key
-	var privateKey *bec.PrivateKey
+	var privateKey *ec.PrivateKey
 	if privateKey, err = compat.GetPrivateKeyFromHDKey(
 		numKey,
 	); err != nil {
@@ -1175,7 +1174,7 @@ func TestDraftTransaction_SignInputs(t *testing.T) {
 	tests := []struct {
 		name    string
 		config  *TransactionConfig
-		xPriv   *bip32.ExtendedKey
+		xPriv   *compat.ExtendedKey
 		wantErr assert.ErrorAssertionFunc
 	}{
 		{
@@ -1203,14 +1202,17 @@ func TestDraftTransaction_SignInputs(t *testing.T) {
 			tx, err = trx.NewTransactionFromHex(gotSignedHex)
 			require.NoError(t, err)
 
-			var ls *bscript.Script
-			if ls, err = bscript.NewFromHexString(
+			var ls *script.Script
+			if ls, err = script.NewFromHex(
 				lockingScript,
 			); err != nil {
 				return
 			}
-			tx.Inputs[0].PreviousTxScript = ls
-			tx.Inputs[0].PreviousTxSatoshis = 12229
+
+			tx.Inputs[0].SetSourceTxOutput(&trx.TransactionOutput{
+				LockingScript: ls,
+				Satoshis:      12229,
+			})
 
 			require.NoError(t, err)
 			assert.True(t, tx.Version > 0)
@@ -1218,7 +1220,7 @@ func TestDraftTransaction_SignInputs(t *testing.T) {
 				unlocker := input.UnlockingScript.ToASM()
 				require.NoError(t, err)
 				scriptParts := strings.Split(unlocker, " ")
-				pubKey := hex.EncodeToString(privateKey.PubKey().SerialiseCompressed())
+				pubKey := hex.EncodeToString(privateKey.PubKey().SerializeCompressed())
 
 				var hash []byte
 				hash, err = tx.CalcInputSignatureHash(0, sighash.AllForkID)

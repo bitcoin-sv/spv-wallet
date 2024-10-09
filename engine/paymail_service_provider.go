@@ -8,12 +8,13 @@ import (
 	"github.com/bitcoin-sv/go-paymail/beef"
 	"github.com/bitcoin-sv/go-paymail/server"
 	"github.com/bitcoin-sv/go-paymail/spv"
+	ec "github.com/bitcoin-sv/go-sdk/primitives/ec"
+	"github.com/bitcoin-sv/go-sdk/script"
+	trx "github.com/bitcoin-sv/go-sdk/transaction"
+	"github.com/bitcoin-sv/go-sdk/transaction/template/p2pkh"
 	"github.com/bitcoin-sv/spv-wallet/engine/chainstate"
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/bitcoin-sv/spv-wallet/engine/utils"
-	"github.com/bitcoinschema/go-bitcoin/v2"
-	"github.com/libsv/go-bk/bec"
-	"github.com/libsv/go-bt/v2"
 )
 
 // PaymailDefaultServiceProvider is an interface for overriding the paymail actions in go-paymail/server
@@ -142,7 +143,7 @@ func (p *PaymailDefaultServiceProvider) RecordTransaction(ctx context.Context,
 	metadata[ReferenceIDField] = p2pTx.Reference
 
 	// Record the transaction
-	btTx := buildBtTx(p2pTx)
+	btTx := buildSDKTx(p2pTx)
 	rts, err := getIncomingTxRecordStrategy(ctx, p.client, btTx)
 	if err != nil {
 		return nil, err
@@ -270,32 +271,34 @@ func createDestination(ctx context.Context, pm *PaymailAddress, opts ...ModelOps
 	return dst, nil
 }
 
-func createLockingScript(ecPubKey *bec.PublicKey) (lockingScript string, err error) {
-	bsvAddress, err := bitcoin.GetAddressFromPubKey(ecPubKey, true)
+func createLockingScript(ecPubKey *ec.PublicKey) (lockingScript string, err error) {
+	bsvAddress, err := script.NewAddressFromPublicKey(ecPubKey, true)
 	if err != nil {
 		return
 	}
-	address := bsvAddress.AddressString
 
-	lockingScript, err = bitcoin.ScriptFromAddress(address)
+	ls, err := p2pkh.Lock(bsvAddress)
+	lockingScript = ls.String()
 	return
 }
 
-func buildBtTx(p2pTx *paymail.P2PTransaction) *bt.Tx {
+func buildSDKTx(p2pTx *paymail.P2PTransaction) *trx.Transaction {
 	if p2pTx.DecodedBeef != nil {
 		res := p2pTx.DecodedBeef.GetLatestTx()
 		for _, input := range res.Inputs {
-			prevTxDt := find(p2pTx.DecodedBeef.Transactions, func(tx *beef.TxData) bool { return tx.Transaction.TxID() == input.PreviousTxIDStr() })
+			prevTxDt := find(p2pTx.DecodedBeef.Transactions, func(tx *beef.TxData) bool { return tx.Transaction.TxID() == input.SourceTXID })
 
-			o := (*prevTxDt).Transaction.Outputs[input.PreviousTxOutIndex]
-			input.PreviousTxSatoshis = o.Satoshis
-			input.PreviousTxScript = o.LockingScript
+			o := (*prevTxDt).Transaction.Outputs[input.SourceTxOutIndex]
+			input.SetSourceTxOutput(&trx.TransactionOutput{
+				Satoshis:      o.Satoshis,
+				LockingScript: o.LockingScript,
+			})
 		}
 
 		return res
 	}
 
-	res, _ := bt.NewTxFromString(p2pTx.Hex)
+	res, _ := trx.NewTransactionFromHex(p2pTx.Hex)
 	return res
 }
 

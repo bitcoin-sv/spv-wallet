@@ -6,7 +6,6 @@ import (
 	"testing"
 
 	trx "github.com/bitcoin-sv/go-sdk/transaction"
-	"github.com/libsv/go-bt/v2"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -87,7 +86,7 @@ func getTxsFromOldestToNewestWithUnnecessaryData() []*trx.Transaction {
 
 	newestTx := createTx(eightTx)
 
-	txsFromOldestToNewest := []*bt.Tx{
+	txsFromOldestToNewest := []*trx.Transaction{
 		oldestTx,
 		secondTx,
 		thirdTx,
@@ -102,25 +101,20 @@ func getTxsFromOldestToNewestWithUnnecessaryData() []*trx.Transaction {
 	return txsFromOldestToNewest
 }
 
-func createTx(inputsParents ...*trx.Transaction) *bt.Tx {
-	inputs := make([]*bt.Input, 0)
-
+func createTx(inputsParents ...*trx.Transaction) *trx.Transaction {
+	tx := trx.NewTransaction()
 	for _, parent := range inputsParents {
-		in := bt.Input{}
-		in.PreviousTxIDAdd(parent.TxIDBytes())
-
-		inputs = append(inputs, &in)
+		tx.AddInput(&trx.TransactionInput{
+			SourceTXID: parent.TxID(),
+		})
 	}
 
-	transaction := bt.NewTx()
-	transaction.Inputs = append(transaction.Inputs, inputs...)
-
-	return transaction
+	return tx
 }
 
-func shuffleTransactions(txs []*bt.Tx) []*bt.Tx {
+func shuffleTransactions(txs []*trx.Transaction) []*trx.Transaction {
 	n := len(txs)
-	result := make([]*bt.Tx, n)
+	result := make([]*trx.Transaction, n)
 	copy(result, txs)
 
 	for i := n - 1; i > 0; i-- {
