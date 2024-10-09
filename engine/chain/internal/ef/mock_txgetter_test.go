@@ -2,11 +2,12 @@ package ef_test
 
 import (
 	"context"
+	"slices"
+	"testing"
+
 	sdk "github.com/bitcoin-sv/go-sdk/transaction"
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"iter"
-	"slices"
-	"testing"
 )
 
 type onMissingTxBehavior int
@@ -24,7 +25,7 @@ type mockTransactionsGetter struct {
 }
 
 func newMockTransactionsGetter(t *testing.T, rawTXBase64 []string) *mockTransactionsGetter {
-	var transactions []*sdk.Transaction
+	transactions := make([]*sdk.Transaction, 0, len(rawTXBase64))
 	for _, rawTX := range rawTXBase64 {
 		tx := txFromBase64(t, rawTX)
 		transactions = append(transactions, tx)
@@ -49,10 +50,7 @@ func (m *mockTransactionsGetter) WithReturnAll(value bool) *mockTransactionsGett
 func (m *mockTransactionsGetter) GetTransactions(_ context.Context, ids iter.Seq[string]) ([]*sdk.Transaction, error) {
 	var result []*sdk.Transaction
 	if m.returnAll {
-		for _, tx := range m.transactions {
-			result = append(result, tx)
-		}
-		return result, nil
+		return append(result, m.transactions...), nil
 	}
 
 	for id := range ids {

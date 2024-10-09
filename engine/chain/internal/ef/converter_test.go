@@ -3,10 +3,11 @@ package ef_test
 import (
 	"context"
 	"encoding/base64"
+	"testing"
+
 	sdk "github.com/bitcoin-sv/go-sdk/transaction"
 	"github.com/bitcoin-sv/spv-wallet/engine/chain/internal/ef"
 	"github.com/stretchr/testify/require"
-	"testing"
 )
 
 const (
