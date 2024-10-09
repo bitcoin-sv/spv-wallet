@@ -50,8 +50,8 @@ func newMockedRepository(t testing.TB) *mockRepository {
 
 func (s *mockRepository) getXPubIDByPaymailAddress(_ context.Context, paymailAddress string) (string, error) {
 	for _, user := range s.users {
-		if slices.Contains(user.Paymails, paymailAddress) && user.XPubID != "" {
-			return user.XPubID, nil
+		if slices.Contains(user.Paymails, paymailAddress) && user.XPubID() != "" {
+			return user.XPubID(), nil
 		}
 	}
 	return "", spverrors.ErrCouldNotFindPaymail
@@ -59,7 +59,7 @@ func (s *mockRepository) getXPubIDByPaymailAddress(_ context.Context, paymailAdd
 
 func (s *mockRepository) getPaymailAddressesByXPubIDOrderByCreatedAsc(_ context.Context, xPubID string) ([]string, error) {
 	for _, user := range s.users {
-		if user.XPubID == xPubID {
+		if user.XPubID() == xPubID {
 			return user.Paymails, nil
 		}
 	}

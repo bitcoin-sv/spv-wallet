@@ -15,7 +15,7 @@ import (
 )
 
 func TestMapToEngine(t *testing.T) {
-	var xPubID = fixtures.Sender.XPubID
+	var xPubID = fixtures.Sender.XPubID()
 
 	tests := map[string]struct {
 		req      *request.DraftTransaction

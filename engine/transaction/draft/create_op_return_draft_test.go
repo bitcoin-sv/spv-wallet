@@ -62,7 +62,7 @@ func TestCreateOpReturnDraft(t *testing.T) {
 
 			// and:
 			spec := &draft.TransactionSpec{
-				XPubID:  fixtures.Sender.XPubID,
+				XPubID:  fixtures.Sender.XPubID(),
 				Outputs: outputs.NewSpecifications(test.opReturn),
 			}
 
@@ -126,7 +126,7 @@ func TestCreateOpReturnDraft(t *testing.T) {
 
 			// and:
 			spec := &draft.TransactionSpec{
-				XPubID:  fixtures.Sender.XPubID,
+				XPubID:  fixtures.Sender.XPubID(),
 				Outputs: outputs.NewSpecifications(test.spec),
 			}
 
