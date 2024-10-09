@@ -5,12 +5,12 @@ import (
 	"fmt"
 	"slices"
 
+	trx "github.com/bitcoin-sv/go-sdk/transaction"
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
-	"github.com/libsv/go-bt/v2"
 )
 
 type outgoingTx struct {
-	BtTx           *bt.Tx
+	SDKTx          *trx.Transaction
 	RelatedDraftID string
 	XPubKey        string
 	txID           string
@@ -71,7 +71,7 @@ func (strategy *outgoingTx) Execute(ctx context.Context, c ClientInterface, opts
 }
 
 func (strategy *outgoingTx) Validate() error {
-	if strategy.BtTx == nil {
+	if strategy.SDKTx == nil {
 		return ErrMissingFieldHex
 	}
 
@@ -88,7 +88,7 @@ func (strategy *outgoingTx) Validate() error {
 
 func (strategy *outgoingTx) TxID() string {
 	if strategy.txID == "" {
-		strategy.txID = strategy.BtTx.TxID()
+		strategy.txID = strategy.SDKTx.TxID().String()
 	}
 	return strategy.txID
 }
@@ -100,7 +100,7 @@ func (strategy *outgoingTx) LockKey() string {
 func (strategy *outgoingTx) createOutgoingTxToRecord(ctx context.Context, c ClientInterface, opts []ModelOps) (*Transaction, error) {
 	// Create NEW transaction model
 	newOpts := c.DefaultModelOptions(append(opts, WithXPub(strategy.XPubKey), New())...)
-	tx := txFromBtTx(strategy.BtTx, newOpts...)
+	tx := txFromBtTx(strategy.SDKTx, newOpts...)
 	tx.DraftID = strategy.RelatedDraftID
 
 	if err := _hydrateOutgoingWithDraft(ctx, tx); err != nil {

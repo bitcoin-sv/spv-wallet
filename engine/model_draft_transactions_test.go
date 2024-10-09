@@ -8,16 +8,17 @@ import (
 	"testing"
 	"time"
 
+	compat "github.com/bitcoin-sv/go-sdk/compat/bip32"
+	bsm "github.com/bitcoin-sv/go-sdk/compat/bsm"
+	trx "github.com/bitcoin-sv/go-sdk/transaction"
+	sighash "github.com/bitcoin-sv/go-sdk/transaction/sighash"
 	"github.com/bitcoin-sv/spv-wallet/engine/chainstate"
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	xtester "github.com/bitcoin-sv/spv-wallet/engine/tester/paymailmock"
 	"github.com/bitcoin-sv/spv-wallet/engine/utils"
-	"github.com/bitcoinschema/go-bitcoin/v2"
 	"github.com/libsv/go-bk/bec"
 	"github.com/libsv/go-bk/bip32"
-	"github.com/libsv/go-bt/v2"
 	"github.com/libsv/go-bt/v2/bscript"
-	"github.com/libsv/go-bt/v2/sighash"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -306,13 +307,13 @@ func TestDraftTransaction_createTransaction(t *testing.T) {
 		assert.Equal(t, uint64((startingBalance - txAmount - expectedFee)), draftTransaction.Configuration.Outputs[1].Satoshis)
 		assert.Equal(t, draftTransaction.Configuration.ChangeDestinations[0].LockingScript, draftTransaction.Configuration.Outputs[1].Scripts[0].Script)
 
-		var btTx *bt.Tx
-		btTx, err = bt.NewTxFromString(draftTransaction.Hex)
+		var btTx *trx.Transaction
+		btTx, err = trx.NewTransactionFromHex(draftTransaction.Hex)
 		require.NoError(t, err)
 
 		assert.Equal(t, 1, len(btTx.Inputs))
-		assert.Equal(t, testTxID, hex.EncodeToString(btTx.Inputs[0].PreviousTxID()))
-		assert.Equal(t, uint32(0), btTx.Inputs[0].PreviousTxOutIndex)
+		assert.Equal(t, testTxID, btTx.Inputs[0].SourceTXID.String())
+		assert.Equal(t, uint32(0), btTx.Inputs[0].SourceTxOutIndex)
 
 		assert.Equal(t, 2, len(btTx.Outputs))
 		assert.Equal(t, uint64(txAmount), btTx.Outputs[0].Satoshis)
@@ -928,7 +929,7 @@ func TestDraftTransaction_getInputsFromUtxos(t *testing.T) {
 		require.NoError(t, err)
 		assert.Equal(t, uint64(124235), satoshisReserved)
 		assert.Equal(t, 1, len(inputUtxos))
-		assert.Equal(t, testTxID, hex.EncodeToString((inputUtxos)[0].TxID))
+		assert.Equal(t, testTxID, inputUtxos[0].TxID.String())
 		assert.Equal(t, uint32(123), (inputUtxos)[0].Vout)
 		assert.Equal(t, testLockingScript, (inputUtxos)[0].LockingScript.String())
 		assert.Equal(t, uint64(124235), (inputUtxos)[0].Satoshis)
@@ -957,12 +958,12 @@ func TestDraftTransaction_getInputsFromUtxos(t *testing.T) {
 		assert.Equal(t, uint64(124235+52313), satoshisReserved)
 		assert.Equal(t, 2, len(inputUtxos))
 
-		assert.Equal(t, testTxID, hex.EncodeToString((inputUtxos)[0].TxID))
+		assert.Equal(t, testTxID, inputUtxos[0].TxID.String())
 		assert.Equal(t, uint32(124), (inputUtxos)[0].Vout)
 		assert.Equal(t, testLockingScript, (inputUtxos)[0].LockingScript.String())
 		assert.Equal(t, uint64(52313), (inputUtxos)[0].Satoshis)
 
-		assert.Equal(t, testTxID, hex.EncodeToString((inputUtxos)[1].TxID))
+		assert.Equal(t, testTxID, inputUtxos[1].TxID.String())
 		assert.Equal(t, uint32(123), (inputUtxos)[1].Vout)
 		assert.Equal(t, testLockingScript, (inputUtxos)[1].LockingScript.String())
 		assert.Equal(t, uint64(124235), (inputUtxos)[1].Satoshis)
@@ -1037,7 +1038,7 @@ func TestDraftTransaction_addOutputsToTx(t *testing.T) {
 				}},
 			},
 		}
-		tx := bt.NewTx()
+		tx := trx.NewTransaction()
 		err := draft.addOutputsToTx(tx)
 		require.NoError(t, err)
 	})
@@ -1053,7 +1054,7 @@ func TestDraftTransaction_addOutputsToTx(t *testing.T) {
 				}},
 			},
 		}
-		tx := bt.NewTx()
+		tx := trx.NewTransaction()
 		err := draft.addOutputsToTx(tx)
 		require.ErrorIs(t, err, spverrors.ErrOutputValueTooLow)
 		assert.Len(t, tx.Outputs, 0)
@@ -1070,7 +1071,7 @@ func TestDraftTransaction_addOutputsToTx(t *testing.T) {
 				}},
 			},
 		}
-		tx := bt.NewTx()
+		tx := trx.NewTransaction()
 		err := draft.addOutputsToTx(tx)
 		require.NoError(t, err)
 		assert.Len(t, tx.Outputs, 1)
@@ -1090,7 +1091,7 @@ func TestDraftTransaction_addOutputsToTx(t *testing.T) {
 				}},
 			},
 		}
-		tx := bt.NewTx()
+		tx := trx.NewTransaction()
 		err := draft.addOutputsToTx(tx)
 		require.NoError(t, err)
 		assert.Len(t, tx.Outputs, 1)
@@ -1110,7 +1111,7 @@ func TestDraftTransaction_addOutputsToTx(t *testing.T) {
 				}},
 			},
 		}
-		tx := bt.NewTx()
+		tx := trx.NewTransaction()
 		err := draft.addOutputsToTx(tx)
 		require.ErrorIs(t, err, spverrors.ErrInvalidOpReturnOutput)
 	})
@@ -1121,7 +1122,7 @@ func TestDraftTransaction_SignInputs(t *testing.T) {
 	defer deferMe()
 
 	xPrivString := "xprv9s21ZrQH143K31pvNoYNcRZjtdJXnNVEc5NmBbgJmEg27YWbZVL7jTLQhPELqAR7tcJTnF9AJLwVN5w3ABZvrfeDLm4vnBDw76bkx8a2NxK"
-	xPrivHD, err := bitcoin.GenerateHDKeyFromString(xPrivString)
+	xPrivHD, err := compat.GenerateHDKeyFromString(xPrivString)
 	require.NoError(t, err)
 	xPubHD, _ := xPrivHD.Neuter()
 	xPubID := utils.Hash(xPubHD.String())
@@ -1148,7 +1149,7 @@ func TestDraftTransaction_SignInputs(t *testing.T) {
 
 	// Get the private key
 	var privateKey *bec.PrivateKey
-	if privateKey, err = bitcoin.GetPrivateKeyFromHDKey(
+	if privateKey, err = compat.GetPrivateKeyFromHDKey(
 		numKey,
 	); err != nil {
 		return
@@ -1198,8 +1199,8 @@ func TestDraftTransaction_SignInputs(t *testing.T) {
 				return
 			}
 
-			var tx *bt.Tx
-			tx, err = bt.NewTxFromString(gotSignedHex)
+			var tx *trx.Transaction
+			tx, err = trx.NewTransactionFromHex(gotSignedHex)
 			require.NoError(t, err)
 
 			var ls *bscript.Script
@@ -1214,8 +1215,7 @@ func TestDraftTransaction_SignInputs(t *testing.T) {
 			require.NoError(t, err)
 			assert.True(t, tx.Version > 0)
 			for _, input := range tx.Inputs {
-				var unlocker string
-				unlocker, err = input.UnlockingScript.ToASM()
+				unlocker := input.UnlockingScript.ToASM()
 				require.NoError(t, err)
 				scriptParts := strings.Split(unlocker, " ")
 				pubKey := hex.EncodeToString(privateKey.PubKey().SerialiseCompressed())
@@ -1227,7 +1227,7 @@ func TestDraftTransaction_SignInputs(t *testing.T) {
 				var hash32 [32]byte
 				copy(hash32[:], hash)
 				var verified bool
-				verified, err = bitcoin.VerifyMessageDER(hash32, pubKey, scriptParts[0])
+				verified, err = bsm.VerifyMessageDER(hash32, pubKey, scriptParts[0])
 				require.NoError(t, err)
 				assert.True(t, verified)
 			}

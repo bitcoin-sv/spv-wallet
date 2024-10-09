@@ -233,7 +233,7 @@ func (m *Transaction) getValues() (outputValue uint64, fee uint64) {
 // SetBUMP Converts from bc.BUMP to our BUMP struct in Transaction model
 func (m *Transaction) SetBUMP(bump *bc.BUMP) {
 	if bump != nil {
-		m.BUMP = bcBumpToBUMP(bump)
+		m.BUMP = sdkMPToBUMP(bump)
 	} else {
 		m.client.Logger().Error().Msg("No BUMP found")
 	}

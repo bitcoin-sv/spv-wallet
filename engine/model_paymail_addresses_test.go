@@ -6,8 +6,9 @@ import (
 	"math/rand"
 	"testing"
 
+	compat "github.com/bitcoin-sv/go-sdk/compat/bip32"
+	script "github.com/bitcoin-sv/go-sdk/script"
 	"github.com/bitcoin-sv/spv-wallet/engine/utils"
-	"github.com/bitcoinschema/go-bitcoin/v2"
 	"github.com/libsv/go-bk/bip32"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -26,20 +27,20 @@ func TestNewPaymail(t *testing.T) {
 		paymail := "paymail@tester.com"
 		externalDerivationNum := randDerivationNum()
 
-		xPub, err := bitcoin.GetHDKeyFromExtendedPublicKey(testXpubAuth)
+		xPub, err := compat.GetHDKeyFromExtendedPublicKey(testXpubAuth)
 		require.NoError(t, err)
 		require.NotNil(t, xPub)
 
 		// Get the external public key
 		var paymailExternalKey *bip32.ExtendedKey
-		paymailExternalKey, err = bitcoin.GetHDKeyByPath(
+		paymailExternalKey, err = compat.GetHDKeyByPath(
 			xPub, utils.ChainExternal, externalDerivationNum,
 		)
 		require.NoError(t, err)
 		require.NotNil(t, paymailExternalKey)
 
 		var paymailIdentityKey *bip32.ExtendedKey
-		paymailIdentityKey, err = bitcoin.GetHDKeyChild(paymailExternalKey, uint32(utils.MaxInt32))
+		paymailIdentityKey, err = compat.GetHDKeyChild(paymailExternalKey, uint32(utils.MaxInt32))
 		require.NoError(t, err)
 		require.NotNil(t, paymailIdentityKey)
 
@@ -106,16 +107,16 @@ func TestNewPaymail(t *testing.T) {
 		assert.Equal(t, addressInternal, internal)
 		assert.Equal(t, addressExternal, external)
 
-		childKeyChain0, _ := bitcoin.GetHDKeyChild(hdKey, 0)
-		childKeyChain01, _ := bitcoin.GetHDKeyChild(childKeyChain0, 1)
+		childKeyChain0, _ := compat.GetHDKeyChild(hdKey, 0)
+		childKeyChain01, _ := compat.GetHDKeyChild(childKeyChain0, 1)
 		key0, _ := childKeyChain01.ECPubKey()
-		address0, _ := bitcoin.GetAddressFromPubKey(key0, true)
+		address0, _ := script.NewAddressFromPublicKey(key0, true)
 		assert.Equal(t, addressExternal, address0.AddressString)
 
-		childKeyChain1, _ := bitcoin.GetHDKeyChild(hdKey, 1)
-		childKeyChain11, _ := bitcoin.GetHDKeyChild(childKeyChain1, 1)
+		childKeyChain1, _ := compat.GetHDKeyChild(hdKey, 1)
+		childKeyChain11, _ := compat.GetHDKeyChild(childKeyChain1, 1)
 		key1, _ := childKeyChain11.ECPubKey()
-		address1, _ := bitcoin.GetAddressFromPubKey(key1, true)
+		address1, _ := script.NewAddressFromPublicKey(key1, true)
 		assert.Equal(t, addressInternal, address1.AddressString)
 	})
 
@@ -162,7 +163,7 @@ func TestNewPaymail(t *testing.T) {
 
 		// verify the correctness of the derivation path
 		expectedXpubDerivationPath := fmt.Sprintf("%d/%d/%d", utils.ChainExternal, derivationNumber, pm.XpubDerivationSeq)
-		masterXPub, _ := bitcoin.GetHDKeyFromExtendedPublicKey(testXPub)
+		masterXPub, _ := compat.GetHDKeyFromExtendedPublicKey(testXPub)
 
 		expectedExternalXpub, err := masterXPub.DeriveChildFromPath(expectedXpubDerivationPath)
 		require.NoError(t, err)
@@ -198,7 +199,7 @@ func TestNewPaymail(t *testing.T) {
 
 		// verify the correctness of the derivation path
 		expectedXpubDerivationPath := fmt.Sprintf("%d/%d/%d", utils.ChainExternal, derivationNumber, initialDerivationSeq)
-		masterXPub, _ := bitcoin.GetHDKeyFromExtendedPublicKey(testXPub)
+		masterXPub, _ := compat.GetHDKeyFromExtendedPublicKey(testXPub)
 
 		expectedHdPubKey, err := masterXPub.DeriveChildFromPath(expectedXpubDerivationPath)
 		require.NoError(t, err)
@@ -206,7 +207,7 @@ func TestNewPaymail(t *testing.T) {
 		expectedPubKey, err := expectedHdPubKey.ECPubKey()
 		require.NoError(t, err)
 
-		require.Equal(t, hex.EncodeToString(expectedPubKey.SerialiseCompressed()), firstPubKey)
+		require.Equal(t, hex.EncodeToString(expectedPubKey.SerializeCompressed()), firstPubKey)
 	})
 
 	t.Run("RotatePubKey() test", func(t *testing.T) {
@@ -239,7 +240,7 @@ func TestNewPaymail(t *testing.T) {
 		require.NotEqual(t, firstPubKey, secondPubKey)
 
 		externalXPubDerivationPath := fmt.Sprintf("%d/%d/%d", utils.ChainExternal, derivationNumber, pm.XpubDerivationSeq)
-		masterXPub, _ := bitcoin.GetHDKeyFromExtendedPublicKey(testXPub)
+		masterXPub, _ := compat.GetHDKeyFromExtendedPublicKey(testXPub)
 
 		expectedExternalXpub, err := masterXPub.DeriveChildFromPath(externalXPubDerivationPath)
 		require.NoError(t, err)
@@ -247,7 +248,7 @@ func TestNewPaymail(t *testing.T) {
 		expectedPubKey, err := expectedExternalXpub.ECPubKey()
 		require.NoError(t, err)
 
-		require.Equal(t, hex.EncodeToString(expectedPubKey.SerialiseCompressed()), secondPubKey)
+		require.Equal(t, hex.EncodeToString(expectedPubKey.SerializeCompressed()), secondPubKey)
 	})
 
 	t.Run("ExternalXPub and PubKey rotation test", func(t *testing.T) {

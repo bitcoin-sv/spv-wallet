@@ -339,24 +339,29 @@ func (bumps BUMPs) Value() (driver.Value, error) {
 	return string(marshal), nil
 }
 
-func bcBumpToBUMP(bcBump *trx.MerklePath) BUMP {
-	path := make([][]BUMPLeaf, len(bcBump.Path))
-	for i := range bcBump.Path {
-		path[i] = make([]BUMPLeaf, len(bcBump.Path[i]))
-		for j, source := range bcBump.Path[i] {
+func sdkMPToBUMP(sdkMerklePath *trx.MerklePath) BUMP {
+	path := make([][]BUMPLeaf, len(sdkMerklePath.Path))
+	for i := range sdkMerklePath.Path {
+		path[i] = make([]BUMPLeaf, len(sdkMerklePath.Path[i]))
+		for j, source := range sdkMerklePath.Path[i] {
 			leaf := BUMPLeaf{}
+			leaf.Offset = source.Offset
+			if source.Hash != nil {
+				leaf.Hash = source.Hash.String()
+			}
 
-			// All fields in bc.leaf are pointers, so we need to use SafeAssign to avoid dereferencing nil pointers
-			utils.SafeAssign(&leaf.Offset, source.Offset)
-			utils.SafeAssign(&leaf.Hash, source.Hash)
-			utils.SafeAssign(&leaf.TxID, source.Txid)
-			utils.SafeAssign(&leaf.Duplicate, source.Duplicate)
+			if source.Txid != nil {
+				leaf.TxID = *source.Txid
+			}
+			if source.Duplicate != nil {
+				leaf.Duplicate = *source.Duplicate
+			}
 
 			path[i][j] = leaf
 		}
 	}
 	return BUMP{
-		BlockHeight: bcBump.BlockHeight,
+		BlockHeight: uint64(sdkMerklePath.BlockHeight),
 		Path:        path,
 	}
 }
