@@ -9,10 +9,10 @@ import (
 	"reflect"
 	"sort"
 
+	trx "github.com/bitcoin-sv/go-sdk/transaction"
+	"github.com/bitcoin-sv/go-sdk/util"
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/bitcoin-sv/spv-wallet/engine/utils"
-	"github.com/libsv/go-bc"
-	"github.com/libsv/go-bt/v2"
 )
 
 const maxBumpHeight = 64
@@ -164,7 +164,7 @@ func calculateMerkleRoot(baseLeaf BUMPLeaf, bump *BUMP) (string, error) {
 
 		leftNode, rightNode := prepareNodes(baseLeaf, offset, *leafInPair, newOffset)
 
-		str, err := bc.MerkleTreeParentStr(leftNode, rightNode)
+		str, err := utils.MerkleTreeParentStr(leftNode, rightNode)
 		if err != nil {
 			return "", spverrors.Wrapf(err, "failed to calculate merkle tree parent for %s and %s", leftNode, rightNode)
 		}
@@ -237,7 +237,7 @@ func (bump *BUMP) Hex() string {
 
 func (bump *BUMP) bytesBuffer() *bytes.Buffer {
 	var buff bytes.Buffer
-	buff.WriteString(hex.EncodeToString(bt.VarInt(bump.BlockHeight).Bytes()))
+	buff.WriteString(hex.EncodeToString(trx.VarInt(bump.BlockHeight).Bytes()))
 
 	height := len(bump.Path)
 	buff.WriteString(leadingZeroInt(height))
@@ -246,12 +246,12 @@ func (bump *BUMP) bytesBuffer() *bytes.Buffer {
 		nodes := bump.Path[i]
 
 		nLeafs := len(nodes)
-		buff.WriteString(hex.EncodeToString(bt.VarInt(nLeafs).Bytes()))
+		buff.WriteString(hex.EncodeToString(trx.VarInt(nLeafs).Bytes()))
 		for _, n := range nodes {
-			buff.WriteString(hex.EncodeToString(bt.VarInt(n.Offset).Bytes()))
+			buff.WriteString(hex.EncodeToString(trx.VarInt(n.Offset).Bytes()))
 			buff.WriteString(fmt.Sprintf("%02x", flags(n.TxID, n.Duplicate)))
 			decodedHex, _ := hex.DecodeString(n.Hash)
-			buff.WriteString(hex.EncodeToString(bt.ReverseBytes(decodedHex)))
+			buff.WriteString(hex.EncodeToString(util.ReverseBytes(decodedHex)))
 		}
 	}
 	return &buff
@@ -339,7 +339,7 @@ func (bumps BUMPs) Value() (driver.Value, error) {
 	return string(marshal), nil
 }
 
-func bcBumpToBUMP(bcBump *bc.BUMP) BUMP {
+func bcBumpToBUMP(bcBump *trx.MerklePath) BUMP {
 	path := make([][]BUMPLeaf, len(bcBump.Path))
 	for i := range bcBump.Path {
 		path[i] = make([]BUMPLeaf, len(bcBump.Path[i]))

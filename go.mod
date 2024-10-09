@@ -14,8 +14,8 @@ require (
 	github.com/DATA-DOG/go-sqlmock v1.5.2
 	github.com/aws/aws-sdk-go v1.55.5
 	github.com/bitcoin-sv/go-broadcast-client v0.21.0
-	github.com/bitcoin-sv/go-paymail v0.20.1
-	github.com/bitcoin-sv/go-sdk v1.1.8
+	github.com/bitcoin-sv/go-paymail v0.21.0
+	github.com/bitcoin-sv/go-sdk v1.1.9
 	github.com/bitcoin-sv/spv-wallet/models v0.28.0
 	github.com/bitcoinschema/go-bitcoin/v2 v2.0.5
 	github.com/bitcoinschema/go-map v0.2.0
@@ -30,10 +30,6 @@ require (
 	github.com/google/uuid v1.6.0
 	github.com/iancoleman/strcase v0.3.0
 	github.com/jarcoal/httpmock v1.3.1
-	github.com/libsv/go-bc v0.1.29
-	github.com/libsv/go-bk v0.1.6
-	github.com/libsv/go-bt v1.0.8
-	github.com/libsv/go-bt/v2 v2.2.5
 	github.com/mrz1836/go-cache v0.11.0
 	github.com/mrz1836/go-cachestore v0.5.0
 	github.com/mrz1836/go-logger v0.3.4

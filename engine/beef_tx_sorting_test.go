@@ -5,6 +5,7 @@ import (
 	"math/rand"
 	"testing"
 
+	trx "github.com/bitcoin-sv/go-sdk/transaction"
 	"github.com/libsv/go-bt/v2"
 	"github.com/stretchr/testify/assert"
 )
@@ -12,7 +13,7 @@ import (
 func Test_kahnTopologicalSortTransaction(t *testing.T) {
 	tCases := []struct {
 		name                       string
-		expectedSortedTransactions []*bt.Tx
+		expectedSortedTransactions []*trx.Transaction
 	}{
 		{
 			name:                       "txs with necessary data only",
@@ -40,7 +41,7 @@ func Test_kahnTopologicalSortTransaction(t *testing.T) {
 	}
 }
 
-func getTxsFromOldestToNewestWithNecessaryDataOnly() []*bt.Tx {
+func getTxsFromOldestToNewestWithNecessaryDataOnly() []*trx.Transaction {
 	// create related transactions from oldest to newest
 	oldestTx := createTx()
 	secondTx := createTx(oldestTx)
@@ -53,7 +54,7 @@ func getTxsFromOldestToNewestWithNecessaryDataOnly() []*bt.Tx {
 
 	newestTx := createTx(eightTx)
 
-	txsFromOldestToNewest := []*bt.Tx{
+	txsFromOldestToNewest := []*trx.Transaction{
 		oldestTx,
 		secondTx,
 		thirdTx,
@@ -68,7 +69,7 @@ func getTxsFromOldestToNewestWithNecessaryDataOnly() []*bt.Tx {
 	return txsFromOldestToNewest
 }
 
-func getTxsFromOldestToNewestWithUnnecessaryData() []*bt.Tx {
+func getTxsFromOldestToNewestWithUnnecessaryData() []*trx.Transaction {
 	unnecessaryParentTx1 := createTx()
 	unnecessaryParentTx2 := createTx()
 	unnecessaryParentTx3 := createTx()
@@ -101,7 +102,7 @@ func getTxsFromOldestToNewestWithUnnecessaryData() []*bt.Tx {
 	return txsFromOldestToNewest
 }
 
-func createTx(inputsParents ...*bt.Tx) *bt.Tx {
+func createTx(inputsParents ...*trx.Transaction) *bt.Tx {
 	inputs := make([]*bt.Input, 0)
 
 	for _, parent := range inputsParents {

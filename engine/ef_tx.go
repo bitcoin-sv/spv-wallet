@@ -4,7 +4,7 @@ import (
 	"context"
 	"encoding/hex"
 
-	"github.com/libsv/go-bt/v2"
+	trx "github.com/bitcoin-sv/go-sdk/transaction"
 )
 
 // ToEfHex generates Extended Format hex of transaction
@@ -13,7 +13,7 @@ func ToEfHex(ctx context.Context, tx *Transaction, store TransactionGetter) (efH
 
 	if btTx == nil {
 		var err error
-		btTx, err = bt.NewTxFromString(tx.Hex)
+		btTx, err = trx.NewTransactionFromHex(tx.Hex)
 		if err != nil {
 			return "", false
 		}
@@ -36,11 +36,11 @@ func ToEfHex(ctx context.Context, tx *Transaction, store TransactionGetter) (efH
 	return hex.EncodeToString(btTx.ExtendedBytes()), true
 }
 
-func hydrate(ctx context.Context, tx *bt.Tx, store TransactionGetter) (ok bool) {
+func hydrate(ctx context.Context, tx *trx.Transaction, store TransactionGetter) (ok bool) {
 	txToGet := make([]string, 0, len(tx.Inputs))
 
 	for _, input := range tx.Inputs {
-		txToGet = append(txToGet, input.PreviousTxIDStr())
+		txToGet = append(txToGet, input.SourceTXID.String())
 	}
 
 	parentTxs, err := store.GetTransactionsByIDs(ctx, txToGet)
@@ -52,15 +52,15 @@ func hydrate(ctx context.Context, tx *bt.Tx, store TransactionGetter) (ok bool) 
 	}
 
 	for _, input := range tx.Inputs {
-		prevTxID := input.PreviousTxIDStr()
+		prevTxID := input.SourceTXID.String()
 		pTx := find(parentTxs, func(tx *Transaction) bool { return tx.ID == prevTxID })
 
-		pbtTx, err := bt.NewTxFromString((*pTx).Hex)
+		pbtTx, err := trx.NewTransactionFromHex((*pTx).Hex)
 		if err != nil {
 			return false
 		}
 
-		o := pbtTx.Outputs[input.PreviousTxOutIndex]
+		o := pbtTx.Outputs[input.SourceTxOutIndex]
 		input.PreviousTxSatoshis = o.Satoshis
 		input.PreviousTxScript = o.LockingScript
 	}
