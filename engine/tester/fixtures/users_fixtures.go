@@ -95,8 +95,8 @@ func (f *User) XPubID() string {
 	return utils.Hash(xpub)
 }
 
-// All returns all fixtures.
-func All() []User {
+// AllUsers returns all users fixtures despite it's internal or external user.
+func AllUsers() []User {
 	return []User{
 		UserWithoutPaymail,
 		UserWithMorePaymails,

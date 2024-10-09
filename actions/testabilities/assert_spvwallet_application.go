@@ -62,7 +62,7 @@ func (a *responseAssertions) assertIsStatus(status int) *responseAssertions {
 
 func (a *responseAssertions) WithJSONf(expectedFormat string, args ...any) {
 	a.assertJSONContentType()
-	a.assertJSONBody(expectedFormat, args)
+	a.assertJSONBody(expectedFormat, args...)
 }
 
 func (a *responseAssertions) assertJSONContentType() {
@@ -72,7 +72,7 @@ func (a *responseAssertions) assertJSONContentType() {
 	a.assert.Equal("application/json", mediaType, "JSON content type expected on response")
 }
 
-func (a *responseAssertions) assertJSONBody(expectedFormat string, args []any) {
+func (a *responseAssertions) assertJSONBody(expectedFormat string, args ...any) {
 	expectedJson := fmt.Sprintf(expectedFormat, args...)
 	a.assert.JSONEq(expectedJson, a.response.String())
 }

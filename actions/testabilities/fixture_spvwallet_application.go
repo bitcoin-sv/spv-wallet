@@ -10,7 +10,6 @@ import (
 	"github.com/bitcoin-sv/spv-wallet/engine/datastore"
 	"github.com/bitcoin-sv/spv-wallet/engine/tester"
 	"github.com/bitcoin-sv/spv-wallet/engine/tester/fixtures"
-	"github.com/bitcoin-sv/spv-wallet/engine/utils"
 	"github.com/bitcoin-sv/spv-wallet/server"
 	"github.com/go-resty/resty/v2"
 	"github.com/rs/zerolog"
@@ -65,7 +64,10 @@ func Given(t testing.TB) SPVWalletApplicationFixture {
 }
 
 func (f *appFixture) NewTest(t testing.TB) SPVWalletApplicationFixture {
-	return newOf(*f, t)
+	newFixture := *f
+	newFixture.t = t
+	newFixture.logger = tester.Logger(t)
+	return &newFixture
 }
 
 func newOf(f appFixture, t testing.TB) *appFixture {
@@ -141,10 +143,7 @@ func (f *appFixture) registerUsersFromFixture() {
 
 // initDbConnection creates a new connection that will be used as connection for engine
 func (f *appFixture) initDbConnection() {
-	hex, err := utils.RandomHex(8)
-	require.NoErrorf(f.t, err, "cannot generate random hex for sqlite inmemory db name")
-
-	f.dbConnectionString = "file:" + hex + "?mode=memory&cache=shared"
+	f.dbConnectionString = "file:spv-wallet-test.db?mode=memory"
 
 	connection, err := sql.Open("sqlite3", f.dbConnectionString)
 	require.NoErrorf(f.t, err, "Cannot create sqlite connection")

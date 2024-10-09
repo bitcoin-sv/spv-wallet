@@ -44,7 +44,7 @@ type mockRepository struct {
 func newMockedRepository(t testing.TB) *mockRepository {
 	return &mockRepository{
 		t:     t,
-		users: fixtures.All(),
+		users: fixtures.AllUsers(),
 	}
 }
 
