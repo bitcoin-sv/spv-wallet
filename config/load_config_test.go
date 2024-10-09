@@ -1,42 +1,42 @@
-package config
+package config_test
 
 import (
 	"os"
 	"testing"
 
-	"github.com/bitcoin-sv/spv-wallet/logging"
+	"github.com/bitcoin-sv/spv-wallet/config"
+	"github.com/bitcoin-sv/spv-wallet/engine/tester"
 	"github.com/spf13/viper"
 	"github.com/stretchr/testify/assert"
 )
 
-// TestLoadConfig will test the method Load()
 func TestLoadConfig(t *testing.T) {
 	t.Run("empty configFilePath", func(t *testing.T) {
 		// given
-		defaultLogger := logging.GetDefaultLogger()
+		logger := tester.Logger(t)
 
 		// when
-		_, err := Load(defaultLogger)
+		_, err := config.Load("test", logger)
 
 		// then
 		assert.NoError(t, err)
-		assert.Equal(t, viper.GetString(ConfigFilePathKey), DefaultConfigFilePath)
+		assert.Equal(t, viper.GetString(config.ConfigFilePathKey), config.DefaultConfigFilePath)
 	})
 
 	t.Run("custom configFilePath overridden by ENV", func(t *testing.T) {
 		// given
 		anotherPath := "anotherPath.yml"
-		defaultLogger := logging.GetDefaultLogger()
+		logger := tester.Logger(t)
 
 		// when
 		// IMPORTANT! If you need to change the name of this variable, it means you're
 		// making backwards incompatible changes. Please inform all SPV Wallet adopters and
 		// update your configs on all servers and scripts.
 		os.Setenv("SPVWALLET_CONFIG_FILE", anotherPath)
-		_, err := Load(defaultLogger)
+		_, err := config.Load("test", logger)
 
 		// then
-		assert.Equal(t, viper.GetString(ConfigFilePathKey), anotherPath)
+		assert.Equal(t, viper.GetString(config.ConfigFilePathKey), anotherPath)
 		assert.Error(t, err)
 
 		// cleanup

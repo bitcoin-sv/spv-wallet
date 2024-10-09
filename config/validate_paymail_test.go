@@ -1,84 +1,101 @@
-package config
+package config_test
 
 import (
 	"testing"
 
+	"github.com/bitcoin-sv/spv-wallet/config"
 	"github.com/stretchr/testify/require"
 )
 
-// TestPaymailConfig_Validate will test the method Validate()
-func TestPaymailConfig_Validate(t *testing.T) {
+func TestValidatePaymailConfig(t *testing.T) {
 	t.Parallel()
 
-	t.Run("no domains", func(t *testing.T) {
-		p := PaymailConfig{
-			Domains: nil,
-		}
-		err := p.Validate()
-		require.Error(t, err)
-	})
-
-	t.Run("zero domains", func(t *testing.T) {
-		p := PaymailConfig{
-			Domains: []string{},
-		}
-		err := p.Validate()
-		require.Error(t, err)
-	})
-
-	t.Run("empty domains", func(t *testing.T) {
-		p := PaymailConfig{
-			Domains: []string{""},
-		}
-		err := p.Validate()
-		require.Error(t, err)
-	})
-
-	t.Run("invalid hostname", func(t *testing.T) {
-		p := PaymailConfig{
-			Domains: []string{"..."},
-		}
-		err := p.Validate()
-		require.Error(t, err)
-	})
-
-	t.Run("spaces in hostname", func(t *testing.T) {
-		p := PaymailConfig{
-			Domains: []string{"spaces in domain"},
-		}
-		err := p.Validate()
-		require.Error(t, err)
-	})
-
-	t.Run("valid domains", func(t *testing.T) {
-		p := PaymailConfig{
-			Domains: []string{"test.com", "domain.com"},
-		}
-		err := p.Validate()
-		require.NoError(t, err)
-	})
-
-	t.Run("invalid beef", func(t *testing.T) {
-		p := PaymailConfig{
-			Domains: []string{"test.com", "domain.com"},
-			Beef: &BeefConfig{
-				UseBeef:                                true,
-				BlockHeadersServiceHeaderValidationURL: "",
+	validConfigTests := map[string]struct {
+		scenario func(cfg *config.AppConfig)
+	}{
+		"valid beef enabled": {
+			scenario: func(cfg *config.AppConfig) {
+				cfg.Paymail.Beef.UseBeef = true
+				cfg.Paymail.Beef.BlockHeadersServiceHeaderValidationURL = "http://localhost:8080/api/v1/chain/merkleroot/verify"
 			},
-		}
-		err := p.Validate()
-		require.Error(t, err)
-	})
-
-	t.Run("valid beef", func(t *testing.T) {
-		p := PaymailConfig{
-			Domains: []string{"test.com", "domain.com"},
-			Beef: &BeefConfig{
-				UseBeef:                                true,
-				BlockHeadersServiceHeaderValidationURL: "http://localhost:8080/api/v1/chain/merkleroot/verify",
+		},
+		"valid multiple paymail domains": {
+			scenario: func(cfg *config.AppConfig) {
+				cfg.Paymail.Domains = []string{"test.com", "domain.com"}
 			},
-		}
-		err := p.Validate()
-		require.NoError(t, err)
-	})
+		},
+	}
+	for name, test := range validConfigTests {
+		t.Run(name, func(t *testing.T) {
+			// given:
+			cfg := config.GetDefaultAppConfig()
+
+			test.scenario(cfg)
+
+			// when:
+			err := cfg.Validate()
+
+			// then:
+			require.NoError(t, err)
+		})
+	}
+
+	invalidConfigTests := map[string]struct {
+		scenario func(cfg *config.AppConfig)
+	}{
+		"invalid for paymail options not set": {
+			scenario: func(cfg *config.AppConfig) {
+				cfg.Paymail = nil
+			},
+		},
+		"invalid with nil domains": {
+			scenario: func(cfg *config.AppConfig) {
+				cfg.Paymail.Domains = nil
+			},
+		},
+		"invalid with zero domains": {
+			scenario: func(cfg *config.AppConfig) {
+				cfg.Paymail.Domains = []string{}
+			},
+		},
+		"invalid with empty domain": {
+			scenario: func(cfg *config.AppConfig) {
+				cfg.Paymail.Domains = []string{""}
+			},
+		},
+		"invalid with empty domain in the middle": {
+			scenario: func(cfg *config.AppConfig) {
+				cfg.Paymail.Domains = []string{"test.com", "", "domain.com"}
+			},
+		},
+		"invalid with empty domain at the end": {
+			scenario: func(cfg *config.AppConfig) {
+				cfg.Paymail.Domains = []string{"test.com", "domain.com", ""}
+			},
+		},
+		"invalid for invalid domain": {
+			scenario: func(cfg *config.AppConfig) {
+				cfg.Paymail.Domains = []string{"..."}
+			},
+		},
+		"invalid for spaces in domain": {
+			scenario: func(cfg *config.AppConfig) {
+				cfg.Paymail.Domains = []string{"spaces in domain"}
+			},
+		},
+	}
+	for name, test := range invalidConfigTests {
+		t.Run(name, func(t *testing.T) {
+			// given:
+			cfg := config.GetDefaultAppConfig()
+
+			test.scenario(cfg)
+
+			// when:
+			err := cfg.Validate()
+
+			// then:
+			require.Error(t, err)
+		})
+	}
 }
