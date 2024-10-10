@@ -66,8 +66,9 @@ func main() {
 		return
 	}
 
-	// Try to ping the Block Headers Service if enabled
-	appConfig.CheckBlockHeadersService(appCtx, &logger)
+	if appConfig.IsBeefEnabled() {
+		spvWalletEngine.LogBHSReadiness(appCtx)
+	}
 
 	// Create a new app server
 	appServer := server.NewServer(appConfig, spvWalletEngine, logger)

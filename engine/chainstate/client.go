@@ -30,17 +30,16 @@ type (
 
 	// syncConfig holds all the configuration about the different sync processes
 	syncConfig struct {
-		callbackURL              string                             // Broadcast callback URL
-		callbackToken            string                             // Broadcast callback access token
-		excludedProviders        []string                           // List of provider names
-		httpClient               HTTPInterface                      // Custom HTTP client (for example WOC)
-		broadcastClientConfig    *broadcastConfig                   // Broadcast client configuration
-		network                  Network                            // Current network (mainnet, testnet, stn)
-		queryTimeout             time.Duration                      // Timeout for transaction query
-		broadcastClient          broadcast.Client                   // Broadcast client
-		blockHedersServiceClient *blockHeadersServiceClientProvider // Block Headers Service client
-		feeUnit                  *utils.FeeUnit                     // The lowest fees among all miners
-		feeQuotes                bool                               // If set, feeUnit will be updated with fee quotes from miner's
+		callbackURL           string           // Broadcast callback URL
+		callbackToken         string           // Broadcast callback access token
+		excludedProviders     []string         // List of provider names
+		httpClient            HTTPInterface    // Custom HTTP client (for example WOC)
+		broadcastClientConfig *broadcastConfig // Broadcast client configuration
+		network               Network          // Current network (mainnet, testnet, stn)
+		queryTimeout          time.Duration    // Timeout for transaction query
+		broadcastClient       broadcast.Client // Broadcast client
+		feeUnit               *utils.FeeUnit   // The lowest fees among all miners
+		feeQuotes             bool             // If set, feeUnit will be updated with fee quotes from miner's
 	}
 
 	broadcastConfig struct {

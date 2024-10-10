@@ -247,3 +247,8 @@ type ExperimentalConfig struct {
 func (c *AppConfig) GetUserAgent() string {
 	return fmt.Sprintf("%s version %s", applicationName, c.Version)
 }
+
+// IsBeefEnabled returns true if the Beef capability will be used for paymail transactions
+func (c *AppConfig) IsBeefEnabled() bool {
+	return c.Paymail != nil && c.Paymail.Beef.enabled()
+}

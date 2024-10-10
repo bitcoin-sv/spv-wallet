@@ -206,7 +206,7 @@ func (c *Client) loadTransactionDraftService() error {
 func (c *Client) loadChainService() {
 	if c.options.chainService == nil {
 		logger := c.Logger().With().Str("subservice", "chain").Logger()
-		c.options.chainService = chain.NewChainService(logger, resty.New(), c.options.arcConfig)
+		c.options.chainService = chain.NewChainService(logger, resty.New(), c.options.arcConfig, c.options.bhsConfig)
 	}
 }
 

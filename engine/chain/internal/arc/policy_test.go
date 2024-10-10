@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/bitcoin-sv/spv-wallet/engine/chain"
+	"github.com/bitcoin-sv/spv-wallet/engine/chain/models"
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/bitcoin-sv/spv-wallet/engine/tester"
 	"github.com/bitcoin-sv/spv-wallet/models/bsv"
@@ -20,7 +21,7 @@ func TestPolicyService(t *testing.T) {
 	t.Run("Request for policy", func(t *testing.T) {
 		httpClient := arcMockActivate(false)
 
-		service := chain.NewChainService(tester.Logger(t), httpClient, arcCfg(arcURL, arcToken))
+		service := chain.NewChainService(tester.Logger(t), httpClient, arcCfg(arcURL, arcToken), chainmodels.BHSConfig{})
 
 		policy, err := service.GetPolicy(context.Background())
 
@@ -59,7 +60,7 @@ func TestPolicyServiceErrorCases(t *testing.T) {
 		t.Run(name, func(t *testing.T) {
 			httpClient := arcMockActivate(false)
 
-			service := chain.NewChainService(tester.Logger(t), httpClient, arcCfg(tc.arcURL, tc.arcToken))
+			service := chain.NewChainService(tester.Logger(t), httpClient, arcCfg(tc.arcURL, tc.arcToken), chainmodels.BHSConfig{})
 
 			policy, err := service.GetPolicy(context.Background())
 
@@ -74,7 +75,7 @@ func TestPolicyServiceTimeouts(t *testing.T) {
 	t.Run("GetPolicy interrupted by ctx timeout", func(t *testing.T) {
 		httpClient := arcMockActivate(true)
 
-		service := chain.NewChainService(tester.Logger(t), httpClient, arcCfg(arcURL, arcToken))
+		service := chain.NewChainService(tester.Logger(t), httpClient, arcCfg(arcURL, arcToken), chainmodels.BHSConfig{})
 
 		ctx, cancel := context.WithTimeout(context.Background(), 1)
 		defer cancel()
@@ -91,7 +92,7 @@ func TestPolicyServiceTimeouts(t *testing.T) {
 		httpClient := arcMockActivate(true)
 		httpClient.SetTimeout(1 * time.Millisecond)
 
-		service := chain.NewChainService(tester.Logger(t), httpClient, arcCfg(arcURL, arcToken))
+		service := chain.NewChainService(tester.Logger(t), httpClient, arcCfg(arcURL, arcToken), chainmodels.BHSConfig{})
 
 		txInfo, err := service.GetPolicy(context.Background())
 
