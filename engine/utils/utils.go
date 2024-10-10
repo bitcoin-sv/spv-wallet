@@ -13,8 +13,8 @@ import (
 	"math"
 	"strconv"
 
+	trx "github.com/bitcoin-sv/go-sdk/transaction"
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
-	"github.com/libsv/go-bt/v2"
 )
 
 const (
@@ -83,11 +83,12 @@ func StringInSlice(a string, list []string) bool {
 
 // GetTransactionIDFromHex get the transaction ID from the given transaction hex
 func GetTransactionIDFromHex(hex string) (string, error) {
-	parsedTx, err := bt.NewTxFromString(hex)
+	parsedTx, err := trx.NewTransactionFromHex(hex)
 	if err != nil {
 		return "", spverrors.Wrapf(err, "failed to parse transaction hex")
 	}
-	return parsedTx.TxID(), nil
+
+	return parsedTx.TxID().String(), nil
 }
 
 // LittleEndianBytes64 returns a byte array in little endian from an unsigned integer of 64 bytes.

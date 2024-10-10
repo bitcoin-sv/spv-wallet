@@ -14,10 +14,9 @@ require (
 	github.com/DATA-DOG/go-sqlmock v1.5.2
 	github.com/aws/aws-sdk-go v1.55.5
 	github.com/bitcoin-sv/go-broadcast-client v0.21.0
-	github.com/bitcoin-sv/go-paymail v0.20.1
-	github.com/bitcoin-sv/go-sdk v1.1.8
+	github.com/bitcoin-sv/go-paymail v0.21.0
+	github.com/bitcoin-sv/go-sdk v1.1.9
 	github.com/bitcoin-sv/spv-wallet/models v0.28.0
-	github.com/bitcoinschema/go-bitcoin/v2 v2.0.5
 	github.com/bitcoinschema/go-map v0.2.0
 	github.com/coocood/freecache v1.2.4
 	github.com/fergusstrange/embedded-postgres v1.29.0
@@ -30,10 +29,6 @@ require (
 	github.com/google/uuid v1.6.0
 	github.com/iancoleman/strcase v0.3.0
 	github.com/jarcoal/httpmock v1.3.1
-	github.com/libsv/go-bc v0.1.29
-	github.com/libsv/go-bk v0.1.6
-	github.com/libsv/go-bt v1.0.8
-	github.com/libsv/go-bt/v2 v2.2.5
 	github.com/mrz1836/go-cache v0.11.0
 	github.com/mrz1836/go-cachestore v0.5.0
 	github.com/mrz1836/go-logger v0.3.4
@@ -71,8 +66,6 @@ require (
 	github.com/asaskevich/govalidator v0.0.0-20230301143203-a9d515a09cc2 // indirect
 	github.com/beorn7/perks v1.0.1 // indirect
 	github.com/bitcoinschema/go-bpu v0.2.0 // indirect
-	github.com/bitcoinsv/bsvd v0.0.0-20190609155523-4c29707f7173 // indirect
-	github.com/bitcoinsv/bsvutil v0.0.0-20181216182056-1d77cf353ea9 // indirect
 	github.com/bsm/redislock v0.9.4 // indirect
 	github.com/bytedance/sonic v1.12.0 // indirect
 	github.com/capnm/sysinfo v0.0.0-20130621111458-5909a53897f3 // indirect
@@ -106,7 +99,6 @@ require (
 	github.com/klauspost/compress v1.17.9 // indirect
 	github.com/klauspost/cpuid/v2 v2.2.8 // indirect
 	github.com/leodido/go-urn v1.4.0 // indirect
-	github.com/libsv/go-p2p v0.3.2 // indirect
 	github.com/magiconair/properties v1.8.7 // indirect
 	github.com/mailru/easyjson v0.7.7 // indirect
 	github.com/mattn/go-colorable v0.1.13 // indirect
@@ -139,7 +131,7 @@ require (
 	github.com/vmihailenco/tagparser/v2 v2.0.0 // indirect
 	go.uber.org/multierr v1.11.0 // indirect
 	golang.org/x/arch v0.8.0 // indirect
-	golang.org/x/crypto v0.27.0 // indirect
+	golang.org/x/crypto v0.27.0
 	golang.org/x/exp v0.0.0-20240719175910-8a7402abbf56 // indirect
 	golang.org/x/mod v0.20.0 // indirect
 	golang.org/x/net v0.29.0 // indirect

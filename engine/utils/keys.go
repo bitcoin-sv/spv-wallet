@@ -1,11 +1,11 @@
 package utils
 
 import (
+	bip32 "github.com/bitcoin-sv/go-sdk/compat/bip32"
+	compat "github.com/bitcoin-sv/go-sdk/compat/bip32"
+	ec "github.com/bitcoin-sv/go-sdk/primitives/ec"
+	"github.com/bitcoin-sv/go-sdk/script"
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
-	"github.com/bitcoinschema/go-bitcoin/v2"
-	"github.com/libsv/go-bk/bec"
-	"github.com/libsv/go-bk/bip32"
-	"github.com/libsv/go-bt/v2/bscript"
 )
 
 // DeriveChildKeyFromHex derive the child extended key from the hex string
@@ -28,12 +28,12 @@ func DeriveChildKeyFromHex(hdKey *bip32.ExtendedKey, hexHash string) (*bip32.Ext
 }
 
 // DerivePublicKey will derive the internal and external address from a key
-func DerivePublicKey(hdKey *bip32.ExtendedKey, chain uint32, num uint32) (*bec.PublicKey, error) {
+func DerivePublicKey(hdKey *bip32.ExtendedKey, chain uint32, num uint32) (*ec.PublicKey, error) {
 	if hdKey == nil {
 		return nil, ErrHDKeyNil
 	}
 
-	pubKeys, err := bitcoin.GetPublicKeysForPath(hdKey, num)
+	pubKeys, err := compat.GetPublicKeysForPath(hdKey, num)
 	if err != nil {
 		return nil, spverrors.Wrapf(err, "failed to derive public key")
 	}
@@ -50,7 +50,7 @@ func ValidateXPub(rawKey string) (*bip32.ExtendedKey, error) {
 	}
 
 	// Parse the xPub into an HD key
-	hdKey, err := bitcoin.GetHDKeyFromExtendedPublicKey(rawKey)
+	hdKey, err := compat.GetHDKeyFromExtendedPublicKey(rawKey)
 	if err != nil {
 		return nil, spverrors.Wrapf(err, "failed to parse xpub")
 	} else if hdKey.String() != rawKey { // Sanity check (might not be needed)
@@ -68,18 +68,18 @@ func DeriveAddress(hdKey *bip32.ExtendedKey, chain uint32, num uint32) (address 
 	}
 
 	var child *bip32.ExtendedKey
-	if child, err = bitcoin.GetHDKeyByPath(hdKey, chain, num); err != nil {
+	if child, err = compat.GetHDKeyByPath(hdKey, chain, num); err != nil {
 		return "", spverrors.Wrapf(err, "failed to derive child key")
 	}
 
-	var pubKey *bec.PublicKey
+	var pubKey *ec.PublicKey
 	if pubKey, err = child.ECPubKey(); err != nil {
 		// Should never error since the previous method ensures a valid hdKey
 		return "", spverrors.Wrapf(err, "failed to derive public key")
 	}
 
-	var addressScript *bscript.Address
-	if addressScript, err = bitcoin.GetAddressFromPubKey(pubKey, true); err != nil {
+	var addressScript *script.Address
+	if addressScript, err = script.NewAddressFromPublicKey(pubKey, true); err != nil {
 		// Should never error if the pubKeys are valid keys
 		return "", spverrors.Wrapf(err, "failed to derive address")
 	}
@@ -97,7 +97,7 @@ func DeriveAddresses(hdKey *bip32.ExtendedKey, num uint32) (external, internal s
 
 	// Derive the address
 	var addresses []string
-	if addresses, err = bitcoin.GetAddressesForPath(
+	if addresses, err = compat.GetAddressesForPath(
 		hdKey, num,
 	); err != nil {
 		return
@@ -110,7 +110,7 @@ func DeriveAddresses(hdKey *bip32.ExtendedKey, num uint32) (external, internal s
 }
 
 // DerivePrivateKeyFromHex will derive the private key from the extended key using the hex as the derivation paths
-func DerivePrivateKeyFromHex(hdKey *bip32.ExtendedKey, hexString string) (*bec.PrivateKey, error) {
+func DerivePrivateKeyFromHex(hdKey *bip32.ExtendedKey, hexString string) (*ec.PrivateKey, error) {
 	if hdKey == nil {
 		return nil, ErrHDKeyNil
 	}
@@ -120,7 +120,7 @@ func DerivePrivateKeyFromHex(hdKey *bip32.ExtendedKey, hexString string) (*bec.P
 		return nil, err
 	}
 
-	var privKey *bec.PrivateKey
+	var privKey *ec.PrivateKey
 	if privKey, err = childKey.ECPrivKey(); err != nil {
 		return nil, spverrors.Wrapf(err, "failed to derive private key")
 	}
@@ -129,7 +129,7 @@ func DerivePrivateKeyFromHex(hdKey *bip32.ExtendedKey, hexString string) (*bec.P
 }
 
 // DerivePublicKeyFromHex will derive the public key from the extended key using the hex as the derivation paths
-func DerivePublicKeyFromHex(hdKey *bip32.ExtendedKey, hexString string) (*bec.PublicKey, error) {
+func DerivePublicKeyFromHex(hdKey *bip32.ExtendedKey, hexString string) (*ec.PublicKey, error) {
 	if hdKey == nil {
 		return nil, ErrHDKeyNil
 	}
@@ -139,7 +139,7 @@ func DerivePublicKeyFromHex(hdKey *bip32.ExtendedKey, hexString string) (*bec.Pu
 		return nil, err
 	}
 
-	var pubKey *bec.PublicKey
+	var pubKey *ec.PublicKey
 	if pubKey, err = childKey.ECPubKey(); err != nil {
 		return nil, spverrors.Wrapf(err, "failed to derive public key")
 	}

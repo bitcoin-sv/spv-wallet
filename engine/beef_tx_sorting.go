@@ -1,10 +1,10 @@
 package engine
 
-import "github.com/libsv/go-bt/v2"
+import trx "github.com/bitcoin-sv/go-sdk/transaction"
 
-func kahnTopologicalSortTransactions(transactions []*bt.Tx) []*bt.Tx {
+func kahnTopologicalSortTransactions(transactions []*trx.Transaction) []*trx.Transaction {
 	txByID, incomingEdgesMap, zeroIncomingEdgeQueue := prepareSortStructures(transactions)
-	result := make([]*bt.Tx, 0, len(transactions))
+	result := make([]*trx.Transaction, 0, len(transactions))
 
 	for len(zeroIncomingEdgeQueue) > 0 {
 		txID := zeroIncomingEdgeQueue[0]
@@ -20,14 +20,14 @@ func kahnTopologicalSortTransactions(transactions []*bt.Tx) []*bt.Tx {
 	return result
 }
 
-func prepareSortStructures(dag []*bt.Tx) (txByID map[string]*bt.Tx, incomingEdgesMap map[string]int, zeroIncomingEdgeQueue []string) {
+func prepareSortStructures(dag []*trx.Transaction) (txByID map[string]*trx.Transaction, incomingEdgesMap map[string]int, zeroIncomingEdgeQueue []string) {
 	dagLen := len(dag)
-	txByID = make(map[string]*bt.Tx, dagLen)
+	txByID = make(map[string]*trx.Transaction, dagLen)
 	incomingEdgesMap = make(map[string]int, dagLen)
 
 	for _, tx := range dag {
-		txByID[tx.TxID()] = tx // TODO: perf -> In bt, the TxID is calculated every time we try to get it, which means we hash the tx bytes twice each time. It's expensive operation - try to avoid calculation each time
-		incomingEdgesMap[tx.TxID()] = 0
+		txByID[tx.TxID().String()] = tx // TODO: perf -> In bt, the TxID is calculated every time we try to get it, which means we hash the tx bytes twice each time. It's expensive operation - try to avoid calculation each time
+		incomingEdgesMap[tx.TxID().String()] = 0
 	}
 
 	calculateIncomingEdges(incomingEdgesMap, txByID)
@@ -36,11 +36,11 @@ func prepareSortStructures(dag []*bt.Tx) (txByID map[string]*bt.Tx, incomingEdge
 	return
 }
 
-func calculateIncomingEdges(inDegree map[string]int, txByID map[string]*bt.Tx) {
+func calculateIncomingEdges(inDegree map[string]int, txByID map[string]*trx.Transaction) {
 	for _, tx := range txByID {
 		for _, input := range tx.Inputs {
-			inputUtxoTxID := input.PreviousTxIDStr() // TODO: perf -> In bt, the TxID is calculated every time we try to get it, which means we hash the tx bytes twice each time. It's expensive operation - try to avoid calculation each time
-			if _, ok := txByID[inputUtxoTxID]; ok {  // transaction can contains inputs we are not interested in
+			inputUtxoTxID := input.SourceTXID.String() // TODO: perf -> In bt, the TxID is calculated every time we try to get it, which means we hash the tx bytes twice each time. It's expensive operation - try to avoid calculation each time
+			if _, ok := txByID[inputUtxoTxID]; ok {    // transaction can contains inputs we are not interested in
 				inDegree[inputUtxoTxID]++
 			}
 		}
@@ -59,9 +59,9 @@ func getTxWithZeroIncomingEdges(incomingEdgesMap map[string]int) []string {
 	return zeroIncomingEdgeQueue
 }
 
-func removeTxFromIncomingEdges(tx *bt.Tx, incomingEdgesMap map[string]int, zeroIncomingEdgeQueue []string) []string {
+func removeTxFromIncomingEdges(tx *trx.Transaction, incomingEdgesMap map[string]int, zeroIncomingEdgeQueue []string) []string {
 	for _, input := range tx.Inputs {
-		neighborID := input.PreviousTxIDStr() // TODO: perf -> In bt, the TxID is calculated every time we try to get it, which means we hash the tx bytes twice each time. It's expensive operation - try to avoid calculation each time
+		neighborID := input.SourceTXID.String() // TODO: perf -> In bt, the TxID is calculated every time we try to get it, which means we hash the tx bytes twice each time. It's expensive operation - try to avoid calculation each time
 		incomingEdgesMap[neighborID]--
 
 		if incomingEdgesMap[neighborID] == 0 {
@@ -72,7 +72,7 @@ func removeTxFromIncomingEdges(tx *bt.Tx, incomingEdgesMap map[string]int, zeroI
 	return zeroIncomingEdgeQueue
 }
 
-func reverseInPlace(collection []*bt.Tx) {
+func reverseInPlace(collection []*trx.Transaction) {
 	for i, j := 0, len(collection)-1; i < j; i, j = i+1, j-1 {
 		collection[i], collection[j] = collection[j], collection[i]
 	}

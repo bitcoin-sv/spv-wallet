@@ -17,11 +17,11 @@ package pike
 import (
 	"fmt"
 
+	ec "github.com/bitcoin-sv/go-sdk/primitives/ec"
+	"github.com/bitcoin-sv/go-sdk/script"
 	"github.com/bitcoin-sv/spv-wallet/engine/script/template"
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/bitcoin-sv/spv-wallet/engine/types/type42"
-	"github.com/libsv/go-bk/bec"
-	"github.com/libsv/go-bt/v2/bscript"
 )
 
 // GenerateOutputsTemplate creates a Pike output template
@@ -34,11 +34,11 @@ func GenerateOutputsTemplate(satoshis uint64) ([]*template.OutputTemplate, error
 }
 
 // GenerateLockingScriptsFromTemplates converts Pike outputs templates to scripts
-func GenerateLockingScriptsFromTemplates(outputsTemplate []*template.OutputTemplate, senderPubKey, receiverPubKey *bec.PublicKey, reference string) ([]string, error) {
+func GenerateLockingScriptsFromTemplates(outputsTemplate []*template.OutputTemplate, senderPubKey, receiverPubKey *ec.PublicKey, reference string) ([]string, error) {
 	lockingScripts := make([]string, len(outputsTemplate))
 
 	for idx, output := range outputsTemplate {
-		templateScript, err := bscript.NewFromHexString(output.Script)
+		templateScript, err := script.NewFromHex(output.Script)
 		if err != nil {
 			return nil, spverrors.Wrapf(err, "error creating script from hex string")
 		}
@@ -53,7 +53,7 @@ func GenerateLockingScriptsFromTemplates(outputsTemplate []*template.OutputTempl
 			return nil, spverrors.Wrapf(err, "error evaluating template script")
 		}
 
-		finalScript := bscript.Script(scriptBytes)
+		finalScript := script.Script(scriptBytes)
 
 		lockingScripts[idx] = finalScript.String()
 	}

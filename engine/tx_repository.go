@@ -4,9 +4,9 @@ import (
 	"context"
 	"errors"
 
+	trx "github.com/bitcoin-sv/go-sdk/transaction"
 	"github.com/bitcoin-sv/spv-wallet/engine/datastore"
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
-	"github.com/libsv/go-bt"
 )
 
 // getTransactionByID will get the model from a given transaction ID
@@ -178,10 +178,10 @@ func getTransactionsCountInternal(ctx context.Context, conditions map[string]int
 }
 
 func getTransactionByHex(ctx context.Context, hex string, opts ...ModelOps) (*Transaction, error) {
-	btTx, err := bt.NewTxFromString(hex)
+	tx, err := trx.NewTransactionFromHex(hex)
 	if err != nil {
 		return nil, spverrors.Wrapf(err, "failed to parse transaction hex")
 	}
 
-	return getTransactionByID(ctx, "", btTx.GetTxID(), opts...)
+	return getTransactionByID(ctx, "", tx.TxID().String(), opts...)
 }

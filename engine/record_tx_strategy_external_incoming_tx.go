@@ -4,12 +4,12 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/libsv/go-bt/v2"
+	trx "github.com/bitcoin-sv/go-sdk/transaction"
 )
 
 type externalIncomingTx struct {
-	BtTx *bt.Tx
-	txID string
+	SDKTx *trx.Transaction
+	txID  string
 }
 
 func (strategy *externalIncomingTx) Name() string {
@@ -34,7 +34,7 @@ func (strategy *externalIncomingTx) Execute(ctx context.Context, c ClientInterfa
 }
 
 func (strategy *externalIncomingTx) Validate() error {
-	if strategy.BtTx == nil {
+	if strategy.SDKTx == nil {
 		return ErrMissingFieldHex
 	}
 
@@ -43,7 +43,7 @@ func (strategy *externalIncomingTx) Validate() error {
 
 func (strategy *externalIncomingTx) TxID() string {
 	if strategy.txID == "" {
-		strategy.txID = strategy.BtTx.TxID()
+		strategy.txID = strategy.SDKTx.TxID().String()
 	}
 	return strategy.txID
 }
@@ -54,7 +54,7 @@ func (strategy *externalIncomingTx) LockKey() string {
 
 func _createExternalTxToRecord(ctx context.Context, eTx *externalIncomingTx, c ClientInterface, opts []ModelOps) (*Transaction, error) {
 	// Create NEW tx model
-	tx := txFromBtTx(eTx.BtTx, c.DefaultModelOptions(append(opts, New())...)...)
+	tx := txFromSDKTx(eTx.SDKTx, c.DefaultModelOptions(append(opts, New())...)...)
 
 	if !tx.TransactionBase.hasOneKnownDestination(ctx, c) {
 		return nil, ErrNoMatchingOutputs

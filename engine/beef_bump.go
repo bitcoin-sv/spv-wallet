@@ -4,8 +4,8 @@ import (
 	"context"
 	"sort"
 
+	trx "github.com/bitcoin-sv/go-sdk/transaction"
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
-	"github.com/libsv/go-bt/v2"
 )
 
 func calculateMergedBUMP(txs []*Transaction) (BUMPs, error) {
@@ -55,8 +55,8 @@ func validateBumps(bumps BUMPs) error {
 	return nil
 }
 
-func prepareBEEFFactors(ctx context.Context, tx *Transaction, store TransactionGetter) ([]*bt.Tx, []*Transaction, error) {
-	btTxsNeededForBUMP, txsNeededForBUMP, err := initializeRequiredTxsCollection(tx)
+func prepareBEEFFactors(ctx context.Context, tx *Transaction, store TransactionGetter) ([]*trx.Transaction, []*Transaction, error) {
+	sdkTxsNeededForBUMP, txsNeededForBUMP, err := initializeRequiredTxsCollection(tx)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -72,32 +72,32 @@ func prepareBEEFFactors(ctx context.Context, tx *Transaction, store TransactionG
 	}
 
 	for _, inputTx := range inputTxs {
-		inputBtTx, err := bt.NewTxFromString(inputTx.Hex)
+		inputSDKTx, err := trx.NewTransactionFromHex(inputTx.Hex)
 		if err != nil {
-			return nil, nil, spverrors.Wrapf(err, "cannot convert to bt.Tx from hex (tx.ID: %s)", inputTx.ID)
+			return nil, nil, spverrors.Wrapf(err, "cannot convert to SDK Tx from hex (tx.ID: %s)", inputTx.ID)
 		}
 
 		txsNeededForBUMP = append(txsNeededForBUMP, inputTx)
-		btTxsNeededForBUMP = append(btTxsNeededForBUMP, inputBtTx)
+		sdkTxsNeededForBUMP = append(sdkTxsNeededForBUMP, inputSDKTx)
 
 		if inputTx.BUMP.BlockHeight == 0 && len(inputTx.BUMP.Path) == 0 {
-			parentBtTransactions, parentTransactions, err := checkParentTransactions(ctx, store, inputBtTx)
+			parentSDKTransactions, parentTransactions, err := checkParentTransactions(ctx, store, inputSDKTx)
 			if err != nil {
 				return nil, nil, err
 			}
 
 			txsNeededForBUMP = append(txsNeededForBUMP, parentTransactions...)
-			btTxsNeededForBUMP = append(btTxsNeededForBUMP, parentBtTransactions...)
+			sdkTxsNeededForBUMP = append(sdkTxsNeededForBUMP, parentSDKTransactions...)
 		}
 	}
 
-	return btTxsNeededForBUMP, txsNeededForBUMP, nil
+	return sdkTxsNeededForBUMP, txsNeededForBUMP, nil
 }
 
-func checkParentTransactions(ctx context.Context, store TransactionGetter, btTx *bt.Tx) ([]*bt.Tx, []*Transaction, error) {
-	parentTxIDs := make([]string, 0, len(btTx.Inputs))
-	for _, txIn := range btTx.Inputs {
-		parentTxIDs = append(parentTxIDs, txIn.PreviousTxIDStr())
+func checkParentTransactions(ctx context.Context, store TransactionGetter, sdkTx *trx.Transaction) ([]*trx.Transaction, []*Transaction, error) {
+	parentTxIDs := make([]string, 0, len(sdkTx.Inputs))
+	for _, txIn := range sdkTx.Inputs {
+		parentTxIDs = append(parentTxIDs, txIn.SourceTXID.String())
 	}
 
 	parentTxs, err := getRequiredTransactions(ctx, parentTxIDs, store)
@@ -106,26 +106,26 @@ func checkParentTransactions(ctx context.Context, store TransactionGetter, btTx 
 	}
 
 	validTxs := make([]*Transaction, 0, len(parentTxs))
-	validBtTxs := make([]*bt.Tx, 0, len(parentTxs))
+	validSDKTxs := make([]*trx.Transaction, 0, len(parentTxs))
 	for _, parentTx := range parentTxs {
-		parentBtTx, err := bt.NewTxFromString(parentTx.Hex)
+		parentSDKTx, err := trx.NewTransactionFromHex(parentTx.Hex)
 		if err != nil {
-			return nil, nil, spverrors.Wrapf(err, "cannot convert to bt.Tx from hex (tx.ID: %s)", parentTx.ID)
+			return nil, nil, spverrors.Wrapf(err, "cannot convert to SDK Tx from hex (tx.ID: %s)", parentTx.ID)
 		}
 		validTxs = append(validTxs, parentTx)
-		validBtTxs = append(validBtTxs, parentBtTx)
+		validSDKTxs = append(validSDKTxs, parentSDKTx)
 
 		if parentTx.BUMP.BlockHeight == 0 && len(parentTx.BUMP.Path) == 0 {
-			parentValidBtTxs, parentValidTxs, err := checkParentTransactions(ctx, store, parentBtTx)
+			parentValidSDKTxs, parentValidTxs, err := checkParentTransactions(ctx, store, parentSDKTx)
 			if err != nil {
 				return nil, nil, err
 			}
 			validTxs = append(validTxs, parentValidTxs...)
-			validBtTxs = append(validBtTxs, parentValidBtTxs...)
+			validSDKTxs = append(validSDKTxs, parentValidSDKTxs...)
 		}
 	}
 
-	return validBtTxs, validTxs, nil
+	return validSDKTxs, validTxs, nil
 }
 
 func getRequiredTransactions(ctx context.Context, txIDs []string, store TransactionGetter) ([]*Transaction, error) {
@@ -157,17 +157,17 @@ func getMissingTxs(txIDs []string, foundTxs []*Transaction) []string {
 	return missingTxIDs
 }
 
-func initializeRequiredTxsCollection(tx *Transaction) ([]*bt.Tx, []*Transaction, error) {
-	var btTxsNeededForBUMP []*bt.Tx
+func initializeRequiredTxsCollection(tx *Transaction) ([]*trx.Transaction, []*Transaction, error) {
+	var sdkTxsNeededForBUMP []*trx.Transaction
 	var txsNeededForBUMP []*Transaction
 
-	processedBtTx, err := bt.NewTxFromString(tx.Hex)
+	processedSDKTx, err := trx.NewTransactionFromHex(tx.Hex)
 	if err != nil {
-		return nil, nil, spverrors.Wrapf(err, "cannot convert processed tx to bt.Tx from hex (tx.ID: %s)", tx.ID)
+		return nil, nil, spverrors.Wrapf(err, "cannot convert processed tx to SDK Tx from hex (tx.ID: %s)", tx.ID)
 	}
 
-	btTxsNeededForBUMP = append(btTxsNeededForBUMP, processedBtTx)
+	sdkTxsNeededForBUMP = append(sdkTxsNeededForBUMP, processedSDKTx)
 	txsNeededForBUMP = append(txsNeededForBUMP, tx)
 
-	return btTxsNeededForBUMP, txsNeededForBUMP, nil
+	return sdkTxsNeededForBUMP, txsNeededForBUMP, nil
 }

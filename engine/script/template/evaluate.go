@@ -1,11 +1,11 @@
 package template
 
 import (
+	ec "github.com/bitcoin-sv/go-sdk/primitives/ec"
+	script "github.com/bitcoin-sv/go-sdk/script"
+	"github.com/bitcoin-sv/go-sdk/script/interpreter"
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
-	"github.com/libsv/go-bk/bec"
-	"github.com/libsv/go-bk/crypto"
-	"github.com/libsv/go-bt/v2/bscript"
-	"github.com/libsv/go-bt/v2/bscript/interpreter"
+	"github.com/bitcoin-sv/spv-wallet/engine/utils"
 )
 
 // Evaluate processes a given Bitcoin script by parsing it, replacing certain opcodes
@@ -18,8 +18,8 @@ import (
 //
 // Returns:
 // - A byte array representing the evaluated script, or nil if an error occurs.
-func Evaluate(script []byte, pubKey *bec.PublicKey) ([]byte, error) {
-	s := bscript.Script(script)
+func Evaluate(scriptBytes []byte, pubKey *ec.PublicKey) ([]byte, error) {
+	s := script.Script(scriptBytes)
 
 	parser := interpreter.DefaultOpcodeParser{}
 	parsedScript, err := parser.Parse(&s)
@@ -35,13 +35,13 @@ func Evaluate(script []byte, pubKey *bec.PublicKey) ([]byte, error) {
 	}
 
 	// Serialize the public key to compressed format
-	dPKBytes := pubKey.SerialiseCompressed()
+	dPKBytes := pubKey.SerializeCompressed()
 
 	// Apply Hash160 (SHA-256 followed by RIPEMD-160) to the compressed public key
-	dPKHash := crypto.Hash160(dPKBytes)
+	dPKHash := utils.Hash160(dPKBytes)
 
 	// Create a new script with the public key hash
-	newScript := new(bscript.Script)
+	newScript := new(script.Script)
 	if err = newScript.AppendPushData(dPKHash); err != nil {
 		return nil, spverrors.Wrapf(err, "failed to convert pubkeyhash value into opcodes")
 	}
@@ -56,9 +56,9 @@ func Evaluate(script []byte, pubKey *bec.PublicKey) ([]byte, error) {
 	evaluated := make([]interpreter.ParsedOpcode, 0, len(parsedScript))
 	for _, op := range parsedScript {
 		switch op.Value() {
-		case bscript.OpPUBKEYHASH:
+		case script.OpPUBKEYHASH:
 			evaluated = append(evaluated, pkhParsed...)
-		case bscript.OpPUBKEY:
+		case script.OpPUBKEY:
 			return nil, spverrors.Newf("OP_PUBKEY not supported yet")
 		default:
 			evaluated = append(evaluated, op)

@@ -3,12 +3,16 @@ package utils
 import (
 	"encoding/hex"
 	"fmt"
-
-	"github.com/libsv/go-bt/v2"
 )
 
-// FeeUnit fee unit imported from go-bt/v2
-type FeeUnit bt.FeeUnit
+// Imported from deprecated go-bt library
+// FeeUnit displays the amount of Satoshis needed
+// for a specific amount of Bytes in a transaction
+// see https://github.com/bitcoin-sv-specs/brfc-misc/tree/master/feespec
+type FeeUnit struct {
+	Satoshis int `json:"satoshis"` // Fee in satoshis of the amount of Bytes
+	Bytes    int `json:"bytes"`    // Number of bytes that the Fee covers
+}
 
 // IsLowerThan compare two fee units
 func (f *FeeUnit) IsLowerThan(other *FeeUnit) bool {

@@ -6,11 +6,11 @@ import (
 	"encoding/hex"
 	"errors"
 
+	primitives "github.com/bitcoin-sv/go-sdk/primitives/ec"
 	"github.com/bitcoin-sv/spv-wallet/engine/datastore"
 	customTypes "github.com/bitcoin-sv/spv-wallet/engine/datastore/customtypes"
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/bitcoin-sv/spv-wallet/engine/utils"
-	"github.com/bitcoinschema/go-bitcoin/v2"
 )
 
 // AccessKey is an object representing an access key model
@@ -36,8 +36,8 @@ type AccessKey struct {
 
 // newAccessKey will start a new model
 func newAccessKey(xPubID string, opts ...ModelOps) *AccessKey {
-	privateKey, _ := bitcoin.CreatePrivateKey()
-	publicKey := hex.EncodeToString(privateKey.PubKey().SerialiseCompressed())
+	privateKey, _ := primitives.NewPrivateKey()
+	publicKey := hex.EncodeToString(privateKey.PubKey().SerializeCompressed())
 	id := utils.Hash(publicKey)
 
 	return &AccessKey{
@@ -47,7 +47,7 @@ func newAccessKey(xPubID string, opts ...ModelOps) *AccessKey {
 		RevokedAt: customTypes.NullTime{NullTime: sql.NullTime{
 			Valid: false,
 		}},
-		Key: hex.EncodeToString(privateKey.Serialise()),
+		Key: hex.EncodeToString(privateKey.Serialize()),
 	}
 }
 

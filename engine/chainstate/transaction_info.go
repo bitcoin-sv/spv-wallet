@@ -2,7 +2,7 @@ package chainstate
 
 import (
 	"github.com/bitcoin-sv/go-broadcast-client/broadcast"
-	"github.com/libsv/go-bc"
+	trx "github.com/bitcoin-sv/go-sdk/transaction"
 )
 
 // TransactionInfo is the universal information about the transaction found from a chain provider
@@ -11,6 +11,6 @@ type TransactionInfo struct {
 	BlockHeight int64              `json:"block_height"`         // Block height of the transaction
 	ID          string             `json:"id"`                   // Transaction ID (Hex)
 	Provider    string             `json:"provider,omitempty"`   // Provider is our internal source
-	BUMP        *bc.BUMP           `json:"bump,omitempty"`       // Merkle proof in BUMP format
+	BUMP        *trx.MerklePath    `json:"bump,omitempty"`       // Merkle proof in BUMP format
 	TxStatus    broadcast.TxStatus `json:"tx_status,omitempty"`  // Status of the transaction
 }

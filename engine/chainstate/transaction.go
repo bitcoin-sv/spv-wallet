@@ -7,8 +7,8 @@ import (
 	"time"
 
 	"github.com/bitcoin-sv/go-broadcast-client/broadcast"
+	trx "github.com/bitcoin-sv/go-sdk/transaction"
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
-	"github.com/libsv/go-bc"
 )
 
 // query will try ALL providers in order and return the first "valid" response based on requirements
@@ -52,7 +52,7 @@ func queryBroadcastClient(ctx context.Context, client ClientInterface, id string
 		return nil, spverrors.ErrTransactionIDMismatch
 	}
 
-	bump, err := bc.NewBUMPFromStr(resp.BaseTxResponse.MerklePath)
+	bump, err := trx.NewMerklePathFromHex(resp.BaseTxResponse.MerklePath)
 	if err != nil {
 		return nil, spverrors.ErrBroadcastWrongBUMPResponse.Wrap(err)
 	}

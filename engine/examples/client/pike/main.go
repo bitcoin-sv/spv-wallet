@@ -4,9 +4,9 @@ import (
 	"encoding/hex"
 	"fmt"
 
+	ec "github.com/bitcoin-sv/go-sdk/primitives/ec"
 	"github.com/bitcoin-sv/spv-wallet/engine/pike"
 	"github.com/bitcoin-sv/spv-wallet/engine/script/template"
-	"github.com/libsv/go-bk/bec"
 )
 
 func main() {
@@ -17,7 +17,7 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
-	senderPubKey, err := bec.ParsePubKey(senderPublicKeyBytes, bec.S256())
+	senderPubKey, err := ec.ParsePubKey(senderPublicKeyBytes)
 	if err != nil {
 		panic(err)
 	}
@@ -27,7 +27,7 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
-	receiverPubKey, err := bec.ParsePubKey(receiverPublicKeyBytes, bec.S256())
+	receiverPubKey, err := ec.ParsePubKey(receiverPublicKeyBytes)
 	if err != nil {
 		panic(err)
 	}

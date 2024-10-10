@@ -2,7 +2,6 @@ package engine
 
 import (
 	"context"
-	"encoding/hex"
 	"fmt"
 
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
@@ -74,8 +73,8 @@ func (m *Transaction) _processInputs(ctx context.Context) (err error) {
 	for index := range m.TransactionBase.parsedTx.Inputs {
 		// todo: optimize this SQL SELECT to get all utxos in one query?
 		if utxo, err = m.transactionService.getUtxo(ctx,
-			hex.EncodeToString(m.TransactionBase.parsedTx.Inputs[index].PreviousTxID()),
-			m.TransactionBase.parsedTx.Inputs[index].PreviousTxOutIndex,
+			m.TransactionBase.parsedTx.Inputs[index].SourceTXID.String(),
+			m.TransactionBase.parsedTx.Inputs[index].SourceTxOutIndex,
 			opts...,
 		); err != nil {
 			return

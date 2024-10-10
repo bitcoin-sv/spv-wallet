@@ -7,11 +7,10 @@ import (
 	"fmt"
 
 	"github.com/bitcoin-sv/go-paymail"
+	compat "github.com/bitcoin-sv/go-sdk/compat/bip32"
 	"github.com/bitcoin-sv/spv-wallet/engine/datastore"
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/bitcoin-sv/spv-wallet/engine/utils"
-	"github.com/bitcoinschema/go-bitcoin/v2"
-	"github.com/libsv/go-bk/bip32"
 )
 
 // PaymailAddress is an "external model example" - this model is not part of the standard models loaded and runtime
@@ -38,7 +37,7 @@ type PaymailAddress struct {
 
 	// Private fields
 	externalXpubKeyDecrypted string
-	externalHdXpub           *bip32.ExtendedKey
+	externalHdXpub           *compat.ExtendedKey
 }
 
 // newPaymail create new paymail model
@@ -128,13 +127,13 @@ func (m *PaymailAddress) setXPub(externalXpubDerivation uint32) error {
 	m.XpubID = utils.Hash(m.rawXpubKey)
 
 	// Derive the public key from string
-	xPub, err := bitcoin.GetHDKeyFromExtendedPublicKey(m.rawXpubKey)
+	xPub, err := compat.GetHDKeyFromExtendedPublicKey(m.rawXpubKey)
 	if err != nil {
 		return spverrors.Wrapf(err, "failed to load xPub key for paymail")
 	}
 
 	// Get the external public key
-	paymailExternalXpub, err := bitcoin.GetHDKeyByPath(xPub, utils.ChainExternal, externalXpubDerivation)
+	paymailExternalXpub, err := compat.GetHDKeyByPath(xPub, utils.ChainExternal, externalXpubDerivation)
 	if err != nil {
 		return spverrors.Wrapf(err, "failed to derive xPub key for paymail")
 	}
@@ -155,7 +154,7 @@ func (m *PaymailAddress) setXPub(externalXpubDerivation uint32) error {
 }
 
 // GetIdentityXpub will get the identity related to the xPub
-func (m *PaymailAddress) GetIdentityXpub() (*bip32.ExtendedKey, error) {
+func (m *PaymailAddress) GetIdentityXpub() (*compat.ExtendedKey, error) {
 	// Get the external xPub (to derive the identity key)
 	xPub, err := m.getExternalXpub()
 	if err != nil {
@@ -163,14 +162,14 @@ func (m *PaymailAddress) GetIdentityXpub() (*bip32.ExtendedKey, error) {
 	}
 
 	// Get the last possible key in the external key
-	child, err := bitcoin.GetHDKeyChild(
+	child, err := compat.GetHDKeyChild(
 		xPub, uint32(utils.MaxInt32),
 	)
 	return child, spverrors.Wrapf(err, "failed to generate identity xPub")
 }
 
 // getExternalXpub will get the external xPub
-func (m *PaymailAddress) getExternalXpub() (*bip32.ExtendedKey, error) {
+func (m *PaymailAddress) getExternalXpub() (*compat.ExtendedKey, error) {
 	if m.externalHdXpub != nil {
 		return m.externalHdXpub, nil
 	}
@@ -188,7 +187,7 @@ func (m *PaymailAddress) getExternalXpub() (*bip32.ExtendedKey, error) {
 	}
 
 	// Get the xPub
-	xPub, err := bitcoin.GetHDKeyFromExtendedPublicKey(m.externalXpubKeyDecrypted)
+	xPub, err := compat.GetHDKeyFromExtendedPublicKey(m.externalXpubKeyDecrypted)
 	if err != nil {
 		return nil, spverrors.Wrapf(err, "failed to get external xPub")
 	}
@@ -214,11 +213,11 @@ func (m *PaymailAddress) GetPubKey() (string, error) {
 		return "", spverrors.Wrapf(err, "failed to get public key")
 	}
 
-	return hex.EncodeToString(pubKey.SerialiseCompressed()), nil
+	return hex.EncodeToString(pubKey.SerializeCompressed()), nil
 }
 
 // GetNextXpub will get the next child xPub for external operations.
-func (m *PaymailAddress) GetNextXpub(ctx context.Context) (*bip32.ExtendedKey, error) {
+func (m *PaymailAddress) GetNextXpub(ctx context.Context) (*compat.ExtendedKey, error) {
 	unlock, err := getWaitWriteLockForPaymail(ctx, m.client.Cachestore(), m.ID)
 	defer unlock()
 	if err != nil {

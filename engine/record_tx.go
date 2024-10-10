@@ -4,8 +4,8 @@ import (
 	"context"
 	"fmt"
 
+	trx "github.com/bitcoin-sv/go-sdk/transaction"
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
-	"github.com/libsv/go-bt/v2"
 )
 
 type recordTxStrategy interface {
@@ -45,9 +45,9 @@ func recordTransaction(ctx context.Context, c ClientInterface, strategy recordTx
 	return
 }
 
-func getOutgoingTxRecordStrategy(xPubKey string, btTx *bt.Tx, draftID string) (recordTxStrategy, error) {
+func getOutgoingTxRecordStrategy(xPubKey string, sdkTx *trx.Transaction, draftID string) (recordTxStrategy, error) {
 	rts := &outgoingTx{
-		BtTx:           btTx,
+		SDKTx:          sdkTx,
 		RelatedDraftID: draftID,
 		XPubKey:        xPubKey,
 	}
@@ -59,8 +59,8 @@ func getOutgoingTxRecordStrategy(xPubKey string, btTx *bt.Tx, draftID string) (r
 	return rts, nil
 }
 
-func getIncomingTxRecordStrategy(ctx context.Context, c ClientInterface, btTx *bt.Tx) (recordIncomingTxStrategy, error) {
-	tx, err := getTransactionByHex(ctx, btTx.String(), c.DefaultModelOptions()...)
+func getIncomingTxRecordStrategy(ctx context.Context, c ClientInterface, sdkTx *trx.Transaction) (recordIncomingTxStrategy, error) {
+	tx, err := getTransactionByHex(ctx, sdkTx.String(), c.DefaultModelOptions()...)
 	if err != nil {
 		return nil, err
 	}
@@ -68,13 +68,13 @@ func getIncomingTxRecordStrategy(ctx context.Context, c ClientInterface, btTx *b
 	var rts recordIncomingTxStrategy
 
 	if tx != nil {
-		tx.parsedTx = btTx
+		tx.parsedTx = sdkTx
 		rts = &internalIncomingTx{
 			Tx: tx,
 		}
 	} else {
 		rts = &externalIncomingTx{
-			BtTx: btTx,
+			SDKTx: sdkTx,
 		}
 	}
 

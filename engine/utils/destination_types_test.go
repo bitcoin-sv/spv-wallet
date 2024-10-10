@@ -3,7 +3,7 @@ package utils
 import (
 	"testing"
 
-	bscript2 "github.com/libsv/go-bt/v2/bscript"
+	"github.com/bitcoin-sv/go-sdk/script"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -172,15 +172,15 @@ func TestGetDestinationType(t *testing.T) {
 	t.Parallel()
 
 	t.Run("no match - non standard", func(t *testing.T) {
-		assert.Equal(t, bscript2.ScriptTypeNonStandard, GetDestinationType("nope"))
+		assert.Equal(t, script.ScriptTypeNonStandard, GetDestinationType("nope"))
 	})
 
 	t.Run("ScriptTypePubKey", func(t *testing.T) {
-		assert.Equal(t, bscript2.ScriptTypePubKey, GetDestinationType(p2pkHex))
+		assert.Equal(t, script.ScriptTypePubKey, GetDestinationType(p2pkHex))
 	})
 
 	t.Run("ScriptTypePubKeyHash", func(t *testing.T) {
-		assert.Equal(t, bscript2.ScriptTypePubKeyHash, GetDestinationType(p2pkhHex))
+		assert.Equal(t, script.ScriptTypePubKeyHash, GetDestinationType(p2pkhHex))
 	})
 
 	t.Run("ScriptHashType", func(t *testing.T) {
@@ -192,11 +192,11 @@ func TestGetDestinationType(t *testing.T) {
 	})
 
 	t.Run("op return - ScriptTypeNullData", func(t *testing.T) {
-		assert.Equal(t, bscript2.ScriptTypeNullData, GetDestinationType(opReturnHex))
+		assert.Equal(t, script.ScriptTypeNullData, GetDestinationType(opReturnHex))
 	})
 
 	t.Run("multisig - ScriptTypeMultiSig", func(t *testing.T) {
-		assert.Equal(t, bscript2.ScriptTypeMultiSig, GetDestinationType(multisigHex))
+		assert.Equal(t, script.ScriptTypeMultiSig, GetDestinationType(multisigHex))
 	})
 
 	t.Run("stas - ScriptTypeTokenStas", func(t *testing.T) {

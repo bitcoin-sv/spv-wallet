@@ -11,11 +11,12 @@ import (
 	"time"
 
 	"github.com/bitcoin-sv/go-paymail"
+	"github.com/bitcoin-sv/go-sdk/script"
+	"github.com/bitcoin-sv/go-sdk/transaction/template/p2pkh"
 	paymailclient "github.com/bitcoin-sv/spv-wallet/engine/paymail"
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/bitcoin-sv/spv-wallet/engine/utils"
 	magic "github.com/bitcoinschema/go-map"
-	"github.com/libsv/go-bt/v2/bscript"
 )
 
 // TransactionConfig is the configuration used to start a transaction
@@ -276,9 +277,14 @@ func (t *TransactionOutput) processPaymailViaP2P(client paymailclient.ServiceCli
 
 // processAddressOutput will process an output for a standard Bitcoin Address Transaction
 func (t *TransactionOutput) processAddressOutput() (err error) {
-	// Create the script from the Bitcoin address
-	var s *bscript.Script
-	if s, err = bscript.NewP2PKHFromAddress(t.To); err != nil {
+	// Create the script from the Bitcoin parsedAddress
+	parsedAddress, err := script.NewAddressFromString(t.To)
+	if err != nil {
+		return
+	}
+
+	var s *script.Script
+	if s, err = p2pkh.Lock(parsedAddress); err != nil {
 		return
 	}
 
@@ -302,7 +308,7 @@ func (t *TransactionOutput) processScriptOutput() (err error) {
 	}
 
 	// check whether go-bt parses the script correctly
-	if _, err = bscript.NewFromHexString(t.Script); err != nil {
+	if _, err = script.NewFromHex(t.Script); err != nil {
 		return
 	}
 
@@ -321,15 +327,15 @@ func (t *TransactionOutput) processScriptOutput() (err error) {
 
 // processOpReturnOutput will process an op_return output
 func (t *TransactionOutput) processOpReturnOutput() (err error) {
-	// Create the script from the Bitcoin address
-	var script string
+	// Create the sc from the Bitcoin address
+	var sc string
 	if len(t.OpReturn.Hex) > 0 {
 		// raw op_return output in hex
-		var s *bscript.Script
-		if s, err = bscript.NewFromHexString(t.OpReturn.Hex); err != nil {
+		var s *script.Script
+		if s, err = script.NewFromHex(t.OpReturn.Hex); err != nil {
 			return
 		}
-		script = s.String()
+		sc = s.String()
 	} else if len(t.OpReturn.HexParts) > 0 {
 		// hex strings of the op_return output
 		bytesArray := make([][]byte, 0)
@@ -340,24 +346,24 @@ func (t *TransactionOutput) processOpReturnOutput() (err error) {
 			}
 			bytesArray = append(bytesArray, b)
 		}
-		s := &bscript.Script{}
-		_ = s.AppendOpcodes(bscript.OpFALSE, bscript.OpRETURN)
+		s := &script.Script{}
+		_ = s.AppendOpcodes(script.OpFALSE, script.OpRETURN)
 		if err = s.AppendPushDataArray(bytesArray); err != nil {
 			return
 		}
-		script = s.String()
+		sc = s.String()
 	} else if len(t.OpReturn.StringParts) > 0 {
 		// strings for the op_return output
 		bytesArray := make([][]byte, 0)
 		for _, s := range t.OpReturn.StringParts {
 			bytesArray = append(bytesArray, []byte(s))
 		}
-		s := &bscript.Script{}
-		_ = s.AppendOpcodes(bscript.OpFALSE, bscript.OpRETURN)
+		s := &script.Script{}
+		_ = s.AppendOpcodes(script.OpFALSE, script.OpRETURN)
 		if err = s.AppendPushDataArray(bytesArray); err != nil {
 			return
 		}
-		script = s.String()
+		sc = s.String()
 	} else if t.OpReturn.Map != nil {
 		// strings for the map op_return
 		bytesArray := [][]byte{
@@ -374,12 +380,12 @@ func (t *TransactionOutput) processOpReturnOutput() (err error) {
 				bytesArray = append(bytesArray, []byte(value.(string)))
 			}
 		}
-		s := &bscript.Script{}
-		_ = s.AppendOpcodes(bscript.OpFALSE, bscript.OpRETURN)
+		s := &script.Script{}
+		_ = s.AppendOpcodes(script.OpFALSE, script.OpRETURN)
 		if err = s.AppendPushDataArray(bytesArray); err != nil {
 			return
 		}
-		script = s.String()
+		sc = s.String()
 	} else {
 		return spverrors.ErrInvalidOpReturnOutput
 	}
@@ -389,7 +395,7 @@ func (t *TransactionOutput) processOpReturnOutput() (err error) {
 		t.Scripts,
 		&ScriptOutput{
 			Satoshis:   t.Satoshis,
-			Script:     script,
+			Script:     sc,
 			ScriptType: utils.ScriptTypeNullData,
 		},
 	)

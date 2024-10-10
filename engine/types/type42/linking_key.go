@@ -5,8 +5,8 @@ import (
 	"crypto/sha256"
 	"math/big"
 
+	ec "github.com/bitcoin-sv/go-sdk/primitives/ec"
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
-	"github.com/libsv/go-bk/bec"
 )
 
 // calculateHMAC calculates the HMAC of the provided public shared secret using a reference string.
@@ -33,7 +33,7 @@ func calculateHMAC(pubSharedSecret []byte, message string) ([]byte, error) {
 // calculateLinkedPublicKey calculates the dedicated public key (dPK) using the HMAC result and the receiver's public key.
 // The HMAC result is used as a scalar to perform elliptic curve scalar multiplication and point addition.
 // Returns the resulting public key or an error if the calculation fails.
-func calculateLinkedPublicKey(hmacResult []byte, receiverPubKey *bec.PublicKey) (*bec.PublicKey, error) {
+func calculateLinkedPublicKey(hmacResult []byte, receiverPubKey *ec.PublicKey) (*ec.PublicKey, error) {
 	if len(hmacResult) == 0 {
 		return nil, spverrors.Newf("HMAC result is empty")
 	}
@@ -43,7 +43,7 @@ func calculateLinkedPublicKey(hmacResult []byte, receiverPubKey *bec.PublicKey) 
 
 	// Convert HMAC result to a big integer
 	hn := new(big.Int).SetBytes(hmacResult)
-	curve := bec.S256()          // Use secp256k1 curve
+	curve := ec.S256()           // Use secp256k1 curve
 	hn.Mod(hn, curve.Params().N) // Ensure the scalar is within the curve order
 
 	// Perform scalar multiplication: hn * G
@@ -58,7 +58,7 @@ func calculateLinkedPublicKey(hmacResult []byte, receiverPubKey *bec.PublicKey) 
 	}
 
 	// Create the dedicated public key
-	dPK := &bec.PublicKey{
+	dPK := &ec.PublicKey{
 		Curve: curve,
 		X:     dedicatedPubKeyX,
 		Y:     dedicatedPubKeyY,
@@ -68,7 +68,7 @@ func calculateLinkedPublicKey(hmacResult []byte, receiverPubKey *bec.PublicKey) 
 
 // DeriveLinkedKey derives a child public key from the source public key and link it with public key
 // with use of invoiceNumber as reference of this derivation.
-func DeriveLinkedKey(source *bec.PublicKey, linkPubKey *bec.PublicKey, invoiceNumber string) (*bec.PublicKey, error) {
+func DeriveLinkedKey(source *ec.PublicKey, linkPubKey *ec.PublicKey, invoiceNumber string) (*ec.PublicKey, error) {
 	if source == nil || linkPubKey == nil {
 		return nil, spverrors.Newf("source or receiver public key is nil")
 	}
@@ -82,7 +82,7 @@ func DeriveLinkedKey(source *bec.PublicKey, linkPubKey *bec.PublicKey, invoiceNu
 	}
 
 	// Compute the shared secret
-	publicKeyBytes := source.SerialiseCompressed()
+	publicKeyBytes := source.SerializeCompressed()
 
 	// Compute the HMAC result
 	hmacResult, err := calculateHMAC(publicKeyBytes, invoiceNumber)
