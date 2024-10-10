@@ -70,12 +70,6 @@ func (f *appFixture) NewTest(t testing.TB) SPVWalletApplicationFixture {
 	return &newFixture
 }
 
-func newOf(f appFixture, t testing.TB) *appFixture {
-	f.t = t
-	f.logger = tester.Logger(t)
-	return &f
-}
-
 func (f *appFixture) StartedSPVWallet() (cleanup func()) {
 	return f.StartedSPVWalletWithConfiguration()
 }
