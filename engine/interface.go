@@ -53,7 +53,6 @@ type ClientService interface {
 	Cluster() cluster.ClientInterface
 	Chainstate() chainstate.ClientInterface
 	Datastore() datastore.ClientInterface
-	HTTPClient() HTTPInterface
 	Logger() *zerolog.Logger
 	Notifications() *notifications.Notifications
 	PaymailClient() paymail.ClientInterface

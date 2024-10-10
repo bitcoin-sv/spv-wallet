@@ -10,8 +10,10 @@ import (
 	"github.com/bitcoin-sv/spv-wallet/engine/datastore"
 	"github.com/bitcoin-sv/spv-wallet/engine/tester"
 	"github.com/bitcoin-sv/spv-wallet/engine/tester/fixtures"
+	"github.com/bitcoin-sv/spv-wallet/engine/tester/paymailmock"
 	"github.com/bitcoin-sv/spv-wallet/server"
 	"github.com/go-resty/resty/v2"
+	"github.com/jarcoal/httpmock"
 	"github.com/rs/zerolog"
 	"github.com/stretchr/testify/require"
 )
@@ -46,16 +48,21 @@ type appFixture struct {
 	engine             engine.ClientInterface
 	t                  testing.TB
 	logger             zerolog.Logger
-	transport          testServer
+	server             testServer
 	dbConnectionString string
 	dbConnection       *sql.DB
+	externalTransport  *httpmock.MockTransport
+	paymailClient      *paymailmock.PaymailClientMock
 }
 
 func Given(t testing.TB) SPVWalletApplicationFixture {
 	f := &appFixture{
-		t:      t,
-		logger: tester.Logger(t),
-		config: getConfigForTests(),
+		t:                 t,
+		logger:            tester.Logger(t),
+		config:            getConfigForTests(),
+		externalTransport: httpmock.NewMockTransport(),
+		// TODO reuse externalTransport in paymailmock
+		paymailClient: paymailmock.MockClient(fixtures.PaymailDomainExternal),
 	}
 
 	f.initDbConnection()
@@ -81,6 +88,7 @@ func (f *appFixture) StartedSPVWalletWithConfiguration(opts ...ConfigOpts) (clea
 
 	options, err := f.config.ToEngineOptions(f.logger)
 	require.NoError(f.t, err)
+	options = f.addMockedExternalDependenciesOptions(options)
 
 	f.engine, err = engine.NewClient(context.Background(), options...)
 	require.NoError(f.t, err)
@@ -88,7 +96,7 @@ func (f *appFixture) StartedSPVWalletWithConfiguration(opts ...ConfigOpts) (clea
 	f.registerUsersFromFixture()
 
 	s := server.NewServer(f.config, f.engine, f.logger)
-	f.transport.handlers = s.Handlers()
+	f.server.handlers = s.Handlers()
 
 	return func() {
 		err := f.engine.Close(context.Background())
@@ -105,7 +113,7 @@ func (f *appFixture) ForAnonymous() *resty.Client {
 	c.OnError(func(_ *resty.Request, err error) {
 		f.t.Fatalf("HTTP request end up with unexpected error: %v", err)
 	})
-	c.GetClient().Transport = f.transport
+	c.GetClient().Transport = f.server
 	return c
 }
 
@@ -150,6 +158,18 @@ func (f *appFixture) initDbConnection() {
 	f.config.Db.SQLite.MaxIdleConnections = 1
 	f.config.Db.SQLite.MaxOpenConnections = 1
 	f.config.Db.SQLite.ExistingConnection = f.dbConnection
+}
+
+func (f *appFixture) addMockedExternalDependenciesOptions(options []engine.ClientOps) []engine.ClientOps {
+	options = append(options, engine.WithHTTPClient(f.httpClientWithMockedTransport()))
+	options = append(options, engine.WithPaymailClient(f.paymailClient))
+	return options
+}
+
+func (f *appFixture) httpClientWithMockedTransport() *resty.Client {
+	client := resty.New()
+	client.SetTransport(f.externalTransport)
+	return client
 }
 
 func getConfigForTests() *config.AppConfig {
