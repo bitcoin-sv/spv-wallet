@@ -53,12 +53,6 @@ type (
 		chainService            chain.Service          // Chain service
 		arcConfig               chainmodels.ARCConfig  // Configuration for ARC
 		bhsConfig               chainmodels.BHSConfig  // Configuration for BHS
-		txCallbackConfig        *txCallbackConfig      // Configuration for TX callback received from ARC; disabled if nil
-	}
-
-	txCallbackConfig struct {
-		URL   string // URL for the callback
-		Token string // Token for the callback
 	}
 
 	// chainstateOptions holds the chainstate configuration and client

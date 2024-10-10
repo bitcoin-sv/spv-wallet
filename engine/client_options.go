@@ -600,25 +600,10 @@ func WithBroadcastClient(broadcastClient broadcast.Client) ClientOps {
 	}
 }
 
-// WithCallback set callback settings
-func WithCallback(callbackURL string, callbackToken string) ClientOps {
+// WithARC sets all the ARC options needed for broadcasting, querying transactions etc.
+func WithARC(arcCfg chainmodels.ARCConfig) ClientOps {
 	return func(c *clientOptions) {
-		c.txCallbackConfig = &txCallbackConfig{
-			URL:   callbackURL,
-			Token: callbackToken,
-		}
-		c.chainstate.options = append(c.chainstate.options, chainstate.WithCallback(callbackURL, callbackToken))
-	}
-}
-
-// WithARC set ARC url params
-func WithARC(url, token, deploymentID string) ClientOps {
-	return func(c *clientOptions) {
-		c.arcConfig = chainmodels.ARCConfig{
-			URL:          url,
-			Token:        token,
-			DeploymentID: deploymentID,
-		}
+		c.arcConfig = arcCfg
 	}
 }
 

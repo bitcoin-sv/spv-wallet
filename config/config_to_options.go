@@ -3,8 +3,8 @@ package config
 import (
 	"crypto/tls"
 	"fmt"
+	chainmodels "github.com/bitcoin-sv/spv-wallet/engine/chain/models"
 	"net/url"
-	"time"
 
 	broadcastclient "github.com/bitcoin-sv/go-broadcast-client/broadcast/broadcast-client"
 	"github.com/bitcoin-sv/spv-wallet/engine"
@@ -48,15 +48,13 @@ func (c *AppConfig) ToEngineOptions(logger zerolog.Logger) (options []engine.Cli
 
 	options = c.addNotificationOpts(options)
 
-	options = c.addARCOpts(options)
+	if options, err = c.addARCOpts(options); err != nil {
+		return nil, err
+	}
 
 	options = c.addBHSOpts(options)
 
 	options = c.addBroadcastClientOpts(options, logger)
-
-	if options, err = c.addCallbackOpts(options); err != nil {
-		return nil, err
-	}
 
 	options = c.addFeeQuotes(options)
 
@@ -265,8 +263,29 @@ func (c *AppConfig) addNotificationOpts(options []engine.ClientOps) []engine.Cli
 	return options
 }
 
-func (c *AppConfig) addARCOpts(options []engine.ClientOps) []engine.ClientOps {
-	return append(options, engine.WithARC(c.ARC.URL, c.ARC.Token, c.ARC.DeploymentID))
+func (c *AppConfig) addARCOpts(options []engine.ClientOps) ([]engine.ClientOps, error) {
+	arcCfg := chainmodels.ARCConfig{
+		URL:          c.ARC.URL,
+		Token:        c.ARC.Token,
+		DeploymentID: c.ARC.DeploymentID,
+	}
+
+	if c.ARC.Callback.Enabled {
+		var err error
+		if c.ARC.Callback.Token == "" {
+			// This also sets the token to the config reference and, it is used in the callbacktoken_middleware
+			// TODO: consider moving config modification to a PostLoad method and make this ToEngineOptions pure (no side effects)
+			if c.ARC.Callback.Token, err = utils.HashAdler32(DefaultAdminXpub); err != nil {
+				return nil, spverrors.Wrapf(err, "error while generating callback token")
+			}
+		}
+		arcCfg.Callback = &chainmodels.ARCCallbackConfig{
+			URL:   c.ARC.Callback.Host,
+			Token: c.ARC.Callback.Token,
+		}
+	}
+
+	return append(options, engine.WithARC(arcCfg)), nil
 }
 
 func (c *AppConfig) addBHSOpts(options []engine.ClientOps) []engine.ClientOps {
@@ -288,21 +307,4 @@ func (c *AppConfig) addBroadcastClientOpts(options []engine.ClientOps, logger ze
 		options,
 		engine.WithBroadcastClient(broadcastClient),
 	)
-}
-
-func (c *AppConfig) addCallbackOpts(options []engine.ClientOps) ([]engine.ClientOps, error) {
-	if !c.ARC.Callback.Enabled {
-		return options, nil
-	}
-
-	if c.ARC.Callback.Token == "" {
-		callbackToken, err := utils.HashAdler32(DefaultAdminXpub)
-		if err != nil {
-			return nil, spverrors.Wrapf(err, "error while generating callback token")
-		}
-		c.ARC.Callback.Token = callbackToken
-	}
-
-	options = append(options, engine.WithCallback(c.ARC.Callback.Host+BroadcastCallbackRoute, c.ARC.Callback.Token))
-	return options, nil
 }

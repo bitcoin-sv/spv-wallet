@@ -393,3 +393,15 @@ var ErrARCGenericError = models.SPVError{Message: "ARC returned generic error", 
 
 // ErrARCUnsupportedStatusCode is when ARC returns unsupported status code
 var ErrARCUnsupportedStatusCode = models.SPVError{Message: "ARC returned unsupported status code", StatusCode: 500, Code: "error-broadcast-unsupported-status-code"}
+
+// ErrARCUnprocessable is when ARC rejects because provided tx cannot be processed
+var ErrARCUnprocessable = models.SPVError{Message: "ARC cannot process provided transaction", StatusCode: 500, Code: "error-broadcast-unprocessable-tx"}
+
+// ErrARCNotExtendedFormat is when ARC rejects transaction which is not in extended format
+var ErrARCNotExtendedFormat = models.SPVError{Message: "ARC expects transaction in extended format", StatusCode: 500, Code: "error-broadcast-not-extended-format"}
+
+// ErrARCWrongFee is when ARC rejects transaction because of wrong fee
+var ErrARCWrongFee = models.SPVError{Message: "ARC rejected transaction because of wrong fee", StatusCode: 500, Code: "error-broadcast-wrong-fee"}
+
+// ErrEFConvertInterrupted is when conversion to Extended Format is interrupted by context cancellation or timeout
+var ErrEFConvertInterrupted = models.SPVError{Message: "interrupted conversion to Extended Format", StatusCode: 500, Code: "error-ef-conversion-interrupted"}
