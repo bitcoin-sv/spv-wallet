@@ -15,12 +15,11 @@ import (
 	"github.com/bitcoin-sv/spv-wallet/engine/datastore"
 	"github.com/bitcoin-sv/spv-wallet/engine/logging"
 	"github.com/bitcoin-sv/spv-wallet/engine/metrics"
-	"github.com/go-resty/resty/v2"
-
 	"github.com/bitcoin-sv/spv-wallet/engine/taskmanager"
 	"github.com/bitcoin-sv/spv-wallet/engine/utils"
 	"github.com/coocood/freecache"
 	"github.com/go-redis/redis/v8"
+	"github.com/go-resty/resty/v2"
 	"github.com/mrz1836/go-cache"
 	"github.com/mrz1836/go-cachestore"
 	"github.com/rs/zerolog"
