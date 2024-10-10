@@ -58,7 +58,6 @@ func (c *Converter) Convert(ctx context.Context, tx *sdk.Transaction) (string, e
 		if err := unsourcedInputs.hydrate(sourceTX); err != nil {
 			return "", ErrGetTransactions.Wrap(err)
 		}
-		unsourcedInputs.deleteTXID(sourceTX.TxID().String())
 	}
 
 	return makeEFHex(tx)

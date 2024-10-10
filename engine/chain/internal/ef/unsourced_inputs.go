@@ -8,14 +8,14 @@ import (
 	"iter"
 )
 
-type unsourcedInputsManager struct {
+type unsourcedInputs struct {
 	// [prev txid] -> array of inputs (of current tx) that reference this prev txid
 	// note that several inputs can reference the same prev txid
 	prevTxToInputs map[string][]*sdk.TransactionInput
 }
 
-func findUnsourcedInputs(tx *sdk.Transaction) (*unsourcedInputsManager, error) {
-	manager := &unsourcedInputsManager{
+func findUnsourcedInputs(tx *sdk.Transaction) (*unsourcedInputs, error) {
+	manager := &unsourcedInputs{
 		prevTxToInputs: make(map[string][]*sdk.TransactionInput),
 	}
 
@@ -31,7 +31,7 @@ func findUnsourcedInputs(tx *sdk.Transaction) (*unsourcedInputsManager, error) {
 	return manager, nil
 }
 
-func (m *unsourcedInputsManager) addInput(input *sdk.TransactionInput) error {
+func (m *unsourcedInputs) addInput(input *sdk.TransactionInput) error {
 	if input.SourceTXID == nil {
 		return ErrMissingSourceTXID
 	}
@@ -40,19 +40,15 @@ func (m *unsourcedInputsManager) addInput(input *sdk.TransactionInput) error {
 	return nil
 }
 
-func (m *unsourcedInputsManager) txCount() int {
+func (m *unsourcedInputs) txCount() int {
 	return len(m.prevTxToInputs)
 }
 
-func (m *unsourcedInputsManager) getMissingTXIDs() iter.Seq[string] {
+func (m *unsourcedInputs) getMissingTXIDs() iter.Seq[string] {
 	return maps.Keys(m.prevTxToInputs)
 }
 
-func (m *unsourcedInputsManager) deleteTXID(txid string) {
-	delete(m.prevTxToInputs, txid)
-}
-
-func (m *unsourcedInputsManager) hydrate(sourceTx *sdk.Transaction) error {
+func (m *unsourcedInputs) hydrate(sourceTx *sdk.Transaction) error {
 	sourceTXID := sourceTx.TxID().String()
 	inputs, ok := m.prevTxToInputs[sourceTXID]
 	if !ok {
@@ -61,5 +57,6 @@ func (m *unsourcedInputsManager) hydrate(sourceTx *sdk.Transaction) error {
 	for _, input := range inputs {
 		input.SourceTransaction = sourceTx
 	}
+	delete(m.prevTxToInputs, sourceTXID)
 	return nil
 }

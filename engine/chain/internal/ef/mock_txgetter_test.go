@@ -27,7 +27,7 @@ type mockTransactionsGetter struct {
 func newMockTransactionsGetter(t *testing.T, rawTXBase64 []string) *mockTransactionsGetter {
 	transactions := make([]*sdk.Transaction, 0, len(rawTXBase64))
 	for _, rawTX := range rawTXBase64 {
-		tx := txFromBase64(t, rawTX)
+		tx := fromHex(t, rawTX)
 		transactions = append(transactions, tx)
 	}
 	return &mockTransactionsGetter{
