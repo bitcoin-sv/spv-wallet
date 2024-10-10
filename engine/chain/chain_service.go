@@ -13,6 +13,10 @@ type chainService struct {
 
 // NewChainService creates a new chain service.
 func NewChainService(logger zerolog.Logger, httpClient *resty.Client, arcCfg chainmodels.ARCConfig) Service {
+	if httpClient == nil {
+		panic("httpClient is required")
+	}
+
 	return &chainService{
 		arc.NewARCService(logger.With().Str("chain", "arc").Logger(), httpClient, arcCfg),
 	}

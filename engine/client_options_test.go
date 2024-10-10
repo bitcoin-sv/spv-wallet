@@ -2,7 +2,6 @@ package engine
 
 import (
 	"context"
-	"net/http"
 	"os"
 	"testing"
 	"time"
@@ -555,44 +554,6 @@ func TestWithIUCDisabled(t *testing.T) {
 		defer CloseClient(context.Background(), t, tc)
 
 		assert.Equal(t, false, tc.IsIUCEnabled())
-	})
-}
-
-// TestWithHTTPClient will test the method WithHTTPClient()
-func TestWithHTTPClient(t *testing.T) {
-	t.Parallel()
-	testLogger := zerolog.Nop()
-
-	t.Run("check type", func(t *testing.T) {
-		opt := WithHTTPClient(nil)
-		assert.IsType(t, *new(ClientOps), opt)
-	})
-
-	t.Run("test applying nil", func(t *testing.T) {
-		opts := DefaultClientOpts(false, true)
-		opts = append(opts, WithHTTPClient(nil))
-		opts = append(opts, WithLogger(&testLogger))
-
-		tc, err := NewClient(context.Background(), opts...)
-		require.NoError(t, err)
-		require.NotNil(t, tc)
-		defer CloseClient(context.Background(), t, tc)
-
-		assert.NotNil(t, tc.HTTPClient())
-	})
-
-	t.Run("test applying option", func(t *testing.T) {
-		customClient := &http.Client{}
-		opts := DefaultClientOpts(false, true)
-		opts = append(opts, WithHTTPClient(customClient))
-		opts = append(opts, WithLogger(&testLogger))
-
-		tc, err := NewClient(context.Background(), opts...)
-		require.NoError(t, err)
-		require.NotNil(t, tc)
-		defer CloseClient(context.Background(), t, tc)
-
-		assert.Equal(t, customClient, tc.HTTPClient())
 	})
 }
 

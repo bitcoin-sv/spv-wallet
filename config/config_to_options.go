@@ -4,6 +4,7 @@ import (
 	"crypto/tls"
 	"fmt"
 	"net/url"
+	"time"
 
 	broadcastclient "github.com/bitcoin-sv/go-broadcast-client/broadcast/broadcast-client"
 	"github.com/bitcoin-sv/spv-wallet/engine"
@@ -14,6 +15,7 @@ import (
 	"github.com/bitcoin-sv/spv-wallet/engine/utils"
 	"github.com/bitcoin-sv/spv-wallet/metrics"
 	"github.com/go-redis/redis/v8"
+	"github.com/go-resty/resty/v2"
 	"github.com/mrz1836/go-cachestore"
 	"github.com/rs/zerolog"
 )
@@ -21,6 +23,8 @@ import (
 // ToEngineOptions converts the AppConfig to a slice of engine.ClientOps that can be used to create a new engine.Client.
 func (c *AppConfig) ToEngineOptions(logger zerolog.Logger) (options []engine.ClientOps, err error) {
 	options = c.addUserAgentOpts(options)
+
+	options = c.addHttpClientOpts(options)
 
 	options = c.addMetricsOpts(options)
 
@@ -57,6 +61,14 @@ func (c *AppConfig) ToEngineOptions(logger zerolog.Logger) (options []engine.Cli
 	return options, nil
 }
 
+func (c *AppConfig) addHttpClientOpts(options []engine.ClientOps) []engine.ClientOps {
+	client := resty.New()
+	client.SetTimeout(20 * time.Second)
+	client.SetDebug(c.Logging.Level == zerolog.LevelTraceValue)
+	client.SetHeader("User-Agent", c.GetUserAgent())
+	return append(options, engine.WithHTTPClient(client))
+}
+
 func (c *AppConfig) addFeeQuotes(options []engine.ClientOps) []engine.ClientOps {
 	options = append(options, engine.WithFeeQuotes(c.ARC.UseFeeQuotes))
 
@@ -88,7 +100,7 @@ func (c *AppConfig) addMetricsOpts(options []engine.ClientOps) []engine.ClientOp
 }
 
 func (c *AppConfig) addDebugOpts(options []engine.ClientOps) []engine.ClientOps {
-	if c.Logging.Level == "debug" || c.Logging.Level == "trace" {
+	if c.Logging.Level == zerolog.LevelDebugValue || c.Logging.Level == zerolog.LevelTraceValue {
 		options = append(options, engine.WithDebugging())
 	}
 	return options
