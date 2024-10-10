@@ -33,7 +33,7 @@ func TestCreatePaymailDraft(t *testing.T) {
 
 		// and:
 		spec := &draft.TransactionSpec{
-			XPubID: fixtures.Sender.XPubID,
+			XPubID: fixtures.Sender.XPubID(),
 			Outputs: outputs.NewSpecifications(&outputs.Paymail{
 				To:       recipient,
 				Satoshis: transactionSatoshiValue,
@@ -75,7 +75,7 @@ func TestCreatePaymailDraft(t *testing.T) {
 
 		// and:
 		spec := &draft.TransactionSpec{
-			XPubID: fixtures.Sender.XPubID,
+			XPubID: fixtures.Sender.XPubID(),
 			Outputs: outputs.NewSpecifications(&outputs.Paymail{
 				To:       recipient,
 				Satoshis: paymentSatoshiValue,
@@ -121,7 +121,7 @@ func TestCreatePaymailDraft(t *testing.T) {
 
 		// and:
 		spec := &draft.TransactionSpec{
-			XPubID: fixtures.UserWithMorePaymails.XPubID,
+			XPubID: fixtures.UserWithMorePaymails.XPubID(),
 			Outputs: outputs.NewSpecifications(&outputs.Paymail{
 				To:       recipient,
 				Satoshis: transactionSatoshiValue,
@@ -272,7 +272,7 @@ func TestCreatePaymailDraft(t *testing.T) {
 
 			// and:
 			spec := &draft.TransactionSpec{
-				XPubID:  test.user.XPubID,
+				XPubID:  test.user.XPubID(),
 				Outputs: outputs.NewSpecifications(test.spec),
 			}
 
@@ -337,7 +337,7 @@ func TestCreatePaymailDraft(t *testing.T) {
 
 			// and:
 			spec := &draft.TransactionSpec{
-				XPubID: fixtures.Sender.XPubID,
+				XPubID: fixtures.Sender.XPubID(),
 				Outputs: outputs.NewSpecifications(&outputs.Paymail{
 					To:       recipient,
 					Satoshis: transactionSatoshiValue,
