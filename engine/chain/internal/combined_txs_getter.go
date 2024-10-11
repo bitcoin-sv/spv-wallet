@@ -1,4 +1,4 @@
-package arc
+package internal
 
 import (
 	"context"
@@ -10,20 +10,20 @@ import (
 	"github.com/bitcoin-sv/spv-wallet/engine/chain/models"
 )
 
-// combinedTxsGetter is a TransactionsGetter that combines multiple TransactionsGetters
-type combinedTxsGetter struct {
+// CombinedTxsGetter is a TransactionsGetter that combines multiple TransactionsGetters
+type CombinedTxsGetter struct {
 	txsGetters []chainmodels.TransactionsGetter
 }
 
-func newCombinedTxsGetter(txsGetters ...chainmodels.TransactionsGetter) *combinedTxsGetter {
-	return &combinedTxsGetter{
+func NewCombinedTxsGetter(txsGetters ...chainmodels.TransactionsGetter) *CombinedTxsGetter {
+	return &CombinedTxsGetter{
 		txsGetters: txsGetters,
 	}
 }
 
 // GetTransactions gets transactions from all provided TransactionsGetters in order
 // the first tx getter is queried for all transactions, the second tx getter is queried only for the missing transactions and so on
-func (ctg *combinedTxsGetter) GetTransactions(ctx context.Context, ids iter.Seq[string]) ([]*sdk.Transaction, error) {
+func (ctg *CombinedTxsGetter) GetTransactions(ctx context.Context, ids iter.Seq[string]) ([]*sdk.Transaction, error) {
 	missingTxs := map[string]bool{}
 	for id := range ids {
 		missingTxs[id] = true
