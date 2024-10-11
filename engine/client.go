@@ -52,6 +52,7 @@ type (
 		userAgent               string                 // User agent for all outgoing requests
 		chainService            chain.Service          // Chain service
 		arcConfig               chainmodels.ARCConfig  // Configuration for ARC
+		bhsConfig               chainmodels.BHSConfig  // Configuration for BHS
 		txCallbackConfig        *txCallbackConfig      // Configuration for TX callback received from ARC; disabled if nil
 	}
 
@@ -398,4 +399,17 @@ func (c *Client) Metrics() (metrics *metrics.Metrics, enabled bool) {
 // Chain will return the chain service
 func (c *Client) Chain() chain.Service {
 	return c.options.chainService
+}
+
+// LogBHSReadiness tries to ping BHS server. The result is logged.
+func (c *Client) LogBHSReadiness(ctx context.Context) {
+	logger := c.Logger()
+	shortTimeoutCtx, cancel := context.WithTimeout(ctx, 5*time.Second)
+	defer cancel()
+	err := c.Chain().HealthcheckBHS(shortTimeoutCtx)
+	if err != nil {
+		logger.Warn().Err(err).Msg("Unable to connect to Block Headers Service at startup. Application will continue to operate but won't receive BEEF transactions until BHS is online.")
+	} else {
+		logger.Info().Msg("Block Headers Service is ready to verify transactions.")
+	}
 }

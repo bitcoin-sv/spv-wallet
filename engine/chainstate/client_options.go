@@ -115,13 +115,6 @@ func WithBroadcastClient(client broadcast.Client) ClientOps {
 	}
 }
 
-// WithConnectionToBlockHeadersService will set Block Headers Service API settings.
-func WithConnectionToBlockHeadersService(url, authToken string) ClientOps {
-	return func(c *clientOptions) {
-		c.config.blockHedersServiceClient = newBlockHeadersServiceClientProvider(url, authToken)
-	}
-}
-
 // WithCallback will set broadcast callback settings
 func WithCallback(callbackURL, callbackAuthToken string) ClientOps {
 	return func(c *clientOptions) {
