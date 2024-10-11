@@ -17,3 +17,7 @@ type TXInfo struct {
 func (t *TXInfo) Found() bool {
 	return t != nil
 }
+
+func (t *TXInfo) IsSuccess() bool {
+	return t.BlockHeight > 0
+}

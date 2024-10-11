@@ -15,14 +15,7 @@ import (
 // Custom ARC defined http status codes
 const (
 	StatusNotExtendedFormat             = 460
-	StatusMalformedTx                   = 461
-	StatusInvalidInputs                 = 462
-	StatusMalformedTx2                  = 463 //for some reason ARC documentation has two status codes with the same description "Malformed transaction" (461, 463)
-	StatusInvalidOutputs                = 464
 	StatusFeeTooLow                     = 465
-	StatusMinedAncestorsNotFoundInBEEF  = 467
-	StatusInvalidBumpInBEEF             = 468
-	StatusInvalidMerkleRoots            = 469
 	StatusCumulativeFeeValidationFailed = 473
 )
 
@@ -53,27 +46,20 @@ func (s *Service) Broadcast(ctx context.Context, tx *sdk.Transaction) (*chainmod
 
 	switch response.StatusCode() {
 	case http.StatusOK:
+		if result.TXStatus.IsProblematic() {
+			return nil, spverrors.ErrARCProblematicStatus.Wrap(spverrors.Newf("ARC Problematic tx status: %s", result.TXStatus))
+		}
 		return result, nil
 	case http.StatusUnauthorized, http.StatusForbidden, http.StatusNotFound:
 		return nil, s.wrapARCError(spverrors.ErrARCUnauthorized, arcErr)
 	case http.StatusConflict:
 		return nil, s.wrapARCError(spverrors.ErrARCGenericError, arcErr)
-	case http.StatusBadRequest,
-		http.StatusUnprocessableEntity,
-		StatusMalformedTx,
-		StatusMalformedTx2,
-		StatusInvalidInputs,
-		StatusInvalidOutputs,
-		StatusMinedAncestorsNotFoundInBEEF,
-		StatusInvalidBumpInBEEF,
-		StatusInvalidMerkleRoots:
-		return nil, s.wrapARCError(spverrors.ErrARCUnprocessable, arcErr)
 	case StatusNotExtendedFormat:
 		return nil, s.wrapARCError(spverrors.ErrARCNotExtendedFormat, arcErr)
 	case StatusFeeTooLow, StatusCumulativeFeeValidationFailed:
 		return nil, s.wrapARCError(spverrors.ErrARCWrongFee, arcErr)
 	default:
-		return nil, s.wrapARCError(spverrors.ErrARCUnsupportedStatusCode, arcErr)
+		return nil, s.wrapARCError(spverrors.ErrARCUnprocessable, arcErr)
 	}
 }
 

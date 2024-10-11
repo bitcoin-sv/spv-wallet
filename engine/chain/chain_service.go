@@ -21,15 +21,25 @@ func NewChainService(logger zerolog.Logger, httpClient *resty.Client, arcCfg cha
 		panic("httpClient is required")
 	}
 
-	if arcCfg.UseJunglebus && arcCfg.TxsGetter != nil {
-		arcCfg.TxsGetter = internal.NewCombinedTxsGetter(
-			arcCfg.TxsGetter,
-			junglebus.NewJunglebusService(logger.With().Str("service", "junglebus").Logger(), httpClient),
-		)
-	}
+	setTxGetter(logger, httpClient, &arcCfg)
 
 	return &chainService{
 		arc.NewARCService(logger.With().Str("chain", "arc").Logger(), httpClient, arcCfg),
 		bhs.NewBHSService(logger.With().Str("chain", "bhs").Logger(), httpClient, bhsConf),
+	}
+}
+
+func setTxGetter(logger zerolog.Logger, httpClient *resty.Client, arcCfg *chainmodels.ARCConfig) {
+	if !arcCfg.UseJunglebus {
+		return
+	}
+	junglebusTxsGetter := junglebus.NewJunglebusService(logger.With().Str("service", "junglebus").Logger(), httpClient)
+	if arcCfg.TxsGetter != nil {
+		arcCfg.TxsGetter = internal.NewCombinedTxsGetter(
+			arcCfg.TxsGetter,
+			junglebusTxsGetter,
+		)
+	} else {
+		arcCfg.TxsGetter = junglebusTxsGetter
 	}
 }

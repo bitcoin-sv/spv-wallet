@@ -241,15 +241,14 @@ func (m *Transaction) SetBUMP(bump *bc.BUMP) {
 
 // UpdateFromBroadcastStatus converts ARC transaction status to engineTxStatus and updates if needed
 func (m *Transaction) UpdateFromBroadcastStatus(bStatus chainmodels.TXStatus) {
-	switch bStatus {
-	case chainmodels.Mined, chainmodels.Confirmed:
+	switch {
+	case bStatus.IsMined():
 		m.TxStatus = TxStatusMined
-	case chainmodels.SeenInOrphanMempool, chainmodels.Rejected:
+	case bStatus.IsProblematic():
 		m.TxStatus = TxStatusProblematic
-	case chainmodels.Unknown, chainmodels.Queued, chainmodels.Received, chainmodels.Stored, chainmodels.AnnouncedToNetwork, chainmodels.RequestedByNetwork, chainmodels.SentToNetwork, chainmodels.AcceptedByNetwork, chainmodels.SeenOnNetwork:
-		// don't change current TXStatus on these ARC Statuses
 	default:
-		// unexpected statuses
+		// don't change current TXStatus on these ARC Statuses
+		m.client.Logger().Debug().Str("txID", m.ID).Str("status", string(bStatus)).Msg("ARC returned neutral status; Transaction status will not be updated")
 	}
 }
 

@@ -48,7 +48,7 @@ func processSyncTransactions(ctx context.Context, client *Client) {
 	defer cancel()
 
 	var delayForBroadcastedTx time.Time
-	if client.options.txCallbackConfig != nil {
+	if client.options.arcConfig.Callback != nil {
 		delayForBroadcastedTx = timeForReceivingCallback()
 	} else {
 		delayForBroadcastedTx = timeForMineTransaction()
@@ -109,15 +109,18 @@ func processSyncTransactions(ctx context.Context, client *Client) {
 			continue
 		}
 
-		bump, err := bc.NewBUMPFromStr(txInfo.MerklePath)
-		if err != nil {
+		tx.UpdateFromBroadcastStatus(txInfo.TXStatus)
+
+		if bump, err := bc.NewBUMPFromStr(txInfo.MerklePath); err != nil {
 			//ARC sometimes returns a TXStatus SEEN_ON_NETWORK, but with zero data
-			logger.Warn().Err(err).Str("txID", txID).Msg("Cannot parse BUMP")
+			logger.Warn().Err(err).Str("txID", txID).Str("ARCTxStatus", string(txInfo.TXStatus)).Msg("Cannot parse BUMP")
+		} else {
+			tx.SetBUMP(bump)
 		}
+
 		tx.BlockHash = txInfo.BlockHash
 		tx.BlockHeight = uint64(txInfo.BlockHeight)
-		tx.SetBUMP(bump)
-		tx.UpdateFromBroadcastStatus(txInfo.TXStatus)
+
 		saveTx()
 	}
 }

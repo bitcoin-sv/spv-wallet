@@ -405,3 +405,6 @@ var ErrARCWrongFee = models.SPVError{Message: "ARC rejected transaction because 
 
 // ErrEFConvertInterrupted is when conversion to Extended Format is interrupted by context cancellation or timeout
 var ErrEFConvertInterrupted = models.SPVError{Message: "interrupted conversion to Extended Format", StatusCode: 500, Code: "error-ef-conversion-interrupted"}
+
+// ErrARCProblematicStatus is when ARC returns problematic status
+var ErrARCProblematicStatus = models.SPVError{Message: "ARC returned problematic status", StatusCode: 500, Code: "error-broadcast-problematic-status"}
