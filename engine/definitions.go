@@ -13,9 +13,7 @@ const (
 	defaultCacheLockTTW        = 10                       // in Seconds
 	defaultDatabaseReadTimeout = 20 * time.Second         // For all "GET" or "SELECT" methods
 	defaultDraftTxExpiresIn    = 20 * time.Second         // Default TTL for draft transactions
-	defaultHTTPTimeout         = 20 * time.Second         // Default timeout for HTTP requests
 	defaultOverheadSize        = uint64(8)                // 8 bytes is the default overhead in a transaction = 4 bytes version + 4 bytes nLockTime
-	defaultQueryTxTimeout      = 10 * time.Second         // Default timeout for syncing on-chain information
 	defaultUserAgent           = "spv-wallet: " + version // Default user agent
 	dustLimit                  = uint64(1)                // Dust limit
 	sqliteTestVersion          = "3.37.0"                 // SQLite Testing Version (dummy version for now)
