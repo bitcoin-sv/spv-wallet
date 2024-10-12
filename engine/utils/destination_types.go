@@ -189,7 +189,12 @@ func GetDestinationTypeRegex(destType string) *regexp.Regexp {
 func GetAddressFromScript(lockingScript string) (address string) {
 	scriptType := GetDestinationType(lockingScript)
 	if scriptType == ScriptTypePubKeyHash {
-		decodedAddr, _ := script.NewAddressFromPublicKeyHash([]byte(lockingScript), true)
+		lsBytes, err := hex.DecodeString(lockingScript)
+		if err != nil {
+			return ""
+		}
+
+		decodedAddr, _ := script.NewAddressFromPublicKeyHash(lsBytes, true)
 		address = decodedAddr.AddressString
 	} else if scriptType == ScriptTypePubKey {
 		s, err := script.NewFromHex(lockingScript) // no need for error check, if type is set, it should be valid
@@ -206,13 +211,18 @@ func GetAddressFromScript(lockingScript string) (address string) {
 		pubkeyHex := hex.EncodeToString(parts[0].Data)
 
 		var addressScript *script.Address
-		addressScript, err = script.NewAddressFromPublicKeyString(pubkeyHex, len(parts[0].Data) <= 33)
+		addressScript, err = script.NewAddressFromPublicKeyString(pubkeyHex, true)
 		if err == nil {
 			address = addressScript.AddressString
 		}
 	} else if scriptType == ScriptTypeTokenStas {
 		// stas is just a normal PubKeyHash with more data appended
-		decodedAddr, _ := script.NewAddressFromPublicKeyHash([]byte(lockingScript[:50]), true)
+		lsBytes, err := hex.DecodeString(lockingScript[:50])
+		if err != nil {
+			return ""
+		}
+
+		decodedAddr, _ := script.NewAddressFromPublicKeyHash(lsBytes, true)
 		address = decodedAddr.AddressString
 		// } else if scriptType == ScriptTypeTokenSensible {
 		// sensible tokens do not have the receiving address in the token output, but in another output
