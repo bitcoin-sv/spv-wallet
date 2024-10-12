@@ -751,7 +751,7 @@ func (m *DraftTransaction) getInputsFromUtxos(reservedUtxos []*Utxo) ([]*trx.UTX
 			utxo.Satoshis,
 		)
 		if err != nil {
-			return nil, 0, err
+			return nil, 0, spverrors.Wrapf(err, "failed to create UTXO for transaction %s", m.GetID())
 		}
 
 		inputUtxos = append(inputUtxos, utxo)

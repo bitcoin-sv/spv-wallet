@@ -14,6 +14,7 @@ import (
 	"github.com/bitcoin-sv/spv-wallet/engine/taskmanager"
 	"github.com/bitcoin-sv/spv-wallet/engine/utils"
 	"github.com/bitcoin-sv/spv-wallet/metrics"
+	"github.com/bitcoin-sv/spv-wallet/models/bsv"
 	"github.com/go-redis/redis/v8"
 	"github.com/go-resty/resty/v2"
 	"github.com/mrz1836/go-cachestore"
@@ -75,7 +76,7 @@ func (c *AppConfig) addFeeQuotes(options []engine.ClientOps) []engine.ClientOps 
 	options = append(options, engine.WithFeeQuotes(c.ARC.UseFeeQuotes))
 
 	if c.ARC.FeeUnit != nil {
-		options = append(options, engine.WithFeeUnit(&utils.FeeUnit{
+		options = append(options, engine.WithFeeUnit(&bsv.FeeUnit{
 			Satoshis: c.ARC.FeeUnit.Satoshis,
 			Bytes:    c.ARC.FeeUnit.Bytes,
 		}))
