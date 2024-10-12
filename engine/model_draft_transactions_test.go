@@ -18,6 +18,7 @@ import (
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	xtester "github.com/bitcoin-sv/spv-wallet/engine/tester/paymailmock"
 	"github.com/bitcoin-sv/spv-wallet/engine/utils"
+	"github.com/bitcoin-sv/spv-wallet/models/bsv"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -435,7 +436,7 @@ func TestDraftTransaction_createTransaction(t *testing.T) {
 		prepareAdditionalModels(ctx, t, client, false)
 
 		draftTransaction, err := newDraftTransaction(testXPub, &TransactionConfig{
-			FeeUnit: &utils.FeeUnit{
+			FeeUnit: &bsv.FeeUnit{
 				Satoshis: 5,
 				Bytes:    100,
 			},
@@ -754,7 +755,7 @@ func TestDraftTransaction_setChangeDestination(t *testing.T) {
 			),
 			Configuration: TransactionConfig{
 				ChangeDestinations: nil,
-				FeeUnit: &utils.FeeUnit{
+				FeeUnit: &bsv.FeeUnit{
 					Satoshis: 5,
 					Bytes:    10,
 				},
@@ -781,7 +782,7 @@ func TestDraftTransaction_setChangeDestination(t *testing.T) {
 			),
 			Configuration: TransactionConfig{
 				ChangeDestinations: nil,
-				FeeUnit: &utils.FeeUnit{
+				FeeUnit: &bsv.FeeUnit{
 					Satoshis: 5,
 					Bytes:    10,
 				},

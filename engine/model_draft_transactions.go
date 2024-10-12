@@ -17,6 +17,7 @@ import (
 	"github.com/bitcoin-sv/spv-wallet/engine/datastore"
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/bitcoin-sv/spv-wallet/engine/utils"
+	"github.com/bitcoin-sv/spv-wallet/models/bsv"
 	"github.com/pkg/errors"
 )
 
@@ -515,7 +516,7 @@ func (m *DraftTransaction) estimateSize() uint64 {
 }
 
 // estimateFee will loop the inputs and outputs and estimate the required fee
-func (m *DraftTransaction) estimateFee(unit *utils.FeeUnit, addToSize uint64) uint64 {
+func (m *DraftTransaction) estimateFee(unit *bsv.FeeUnit, addToSize uint64) uint64 {
 	size := m.estimateSize() + addToSize
 	feeEstimate := float64(size) * (float64(unit.Satoshis) / float64(unit.Bytes))
 	return uint64(math.Ceil(feeEstimate))
