@@ -5,6 +5,7 @@ import (
 
 	crypto "github.com/bitcoin-sv/go-sdk/primitives/hash"
 	"github.com/bitcoin-sv/go-sdk/util"
+	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 )
 
 // INFO: This function is moved to go-paymail from go-bc
@@ -16,11 +17,11 @@ import (
 func MerkleTreeParentStr(leftNode, rightNode string) (string, error) {
 	l, err := hex.DecodeString(leftNode)
 	if err != nil {
-		return "", err
+		return "", spverrors.Wrapf(err, "error decoding left node of merkle tree parent")
 	}
 	r, err := hex.DecodeString(rightNode)
 	if err != nil {
-		return "", err
+		return "", spverrors.Wrapf(err, "error decoding right node of merkle tree parent")
 	}
 
 	return hex.EncodeToString(merkleTreeParent(l, r)), nil

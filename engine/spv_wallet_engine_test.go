@@ -139,21 +139,6 @@ func CloseClient(ctx context.Context, t *testing.T, client ClientInterface) {
 	require.NoError(t, client.Close(ctx))
 }
 
-// we need to create an interface for the unlocker
-type account struct {
-	PrivateKey *ec.PrivateKey
-}
-
-// Unlocker get the correct un-locker for a given locking script.
-func (a *account) Unlocker(context.Context, *script.Script) (*p2pkh.P2PKH, error) {
-	unlocker, err := p2pkh.Unlock(a.PrivateKey, nil)
-	if err != nil {
-		return nil, err
-	}
-
-	return unlocker, nil
-}
-
 // CreateFakeFundingTransaction will create a valid (fake) transaction for funding
 func CreateFakeFundingTransaction(t *testing.T, masterKey *compat.ExtendedKey,
 	destinations []*Destination, satoshis uint64,
