@@ -8,6 +8,7 @@ import (
 	broadcast_client_mock "github.com/bitcoin-sv/go-broadcast-client/broadcast/broadcast-client-mock"
 	compat "github.com/bitcoin-sv/go-sdk/compat/bip32"
 	"github.com/bitcoin-sv/spv-wallet/engine/utils"
+	"github.com/bitcoin-sv/spv-wallet/models/bsv"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -409,7 +410,7 @@ func initBenchmarkData(b *testing.B) (context.Context, ClientInterface, *Xpub, *
 	}
 
 	config := &TransactionConfig{
-		FeeUnit: &utils.FeeUnit{
+		FeeUnit: &bsv.FeeUnit{
 			Satoshis: 5,
 			Bytes:    100,
 		},

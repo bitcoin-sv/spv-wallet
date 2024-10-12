@@ -8,7 +8,7 @@ import (
 	"github.com/bitcoin-sv/spv-wallet/engine/logging"
 	"github.com/bitcoin-sv/spv-wallet/engine/metrics"
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
-	"github.com/bitcoin-sv/spv-wallet/engine/utils"
+	"github.com/bitcoin-sv/spv-wallet/models/bsv"
 	"github.com/rs/zerolog"
 )
 
@@ -38,7 +38,7 @@ type (
 		network               Network          // Current network (mainnet, testnet, stn)
 		queryTimeout          time.Duration    // Timeout for transaction query
 		broadcastClient       broadcast.Client // Broadcast client
-		feeUnit               *utils.FeeUnit   // The lowest fees among all miners
+		feeUnit               *bsv.FeeUnit     // The lowest fees among all miners
 		feeQuotes             bool             // If set, feeUnit will be updated with fee quotes from miner's
 	}
 
@@ -112,7 +112,7 @@ func (c *Client) QueryTimeout() time.Duration {
 }
 
 // FeeUnit will return feeUnit
-func (c *Client) FeeUnit() *utils.FeeUnit {
+func (c *Client) FeeUnit() *bsv.FeeUnit {
 	return c.options.config.feeUnit
 }
 
