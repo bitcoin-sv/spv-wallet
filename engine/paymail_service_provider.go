@@ -12,7 +12,6 @@ import (
 	"github.com/bitcoin-sv/go-sdk/script"
 	trx "github.com/bitcoin-sv/go-sdk/transaction"
 	"github.com/bitcoin-sv/go-sdk/transaction/template/p2pkh"
-	"github.com/bitcoin-sv/spv-wallet/engine/chainstate"
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/bitcoin-sv/spv-wallet/engine/utils"
 )
@@ -183,14 +182,20 @@ func (p *PaymailDefaultServiceProvider) VerifyMerkleRoots(
 		}()
 	}
 
-	request := make([]chainstate.MerkleRootConfirmationRequestItem, 0, len(merkleRoots))
-	for _, m := range merkleRoots {
-		request = append(request, chainstate.MerkleRootConfirmationRequestItem{
-			MerkleRoot:  m.MerkleRoot,
-			BlockHeight: m.BlockHeight,
-		})
+	valid, err := p.client.Chain().VerifyMerkleRoots(ctx, merkleRoots)
+
+	// NOTE: these errors goes to go-paymail and are not logged there, so we need to log them here
+
+	if err != nil {
+		p.client.Logger().Error().Err(err).Msg("Error verifying merkle roots")
+		return spverrors.ErrPaymailMerkleRootVerificationFailed.Wrap(err)
 	}
-	err = p.client.Chainstate().VerifyMerkleRoots(ctx, request)
+
+	if !valid {
+		p.client.Logger().Warn().Msg("Not all provided merkle roots were confirmed by BHS")
+		return spverrors.ErrPaymailInvalidMerkleRoots
+	}
+
 	return
 }
 

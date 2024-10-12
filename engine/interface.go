@@ -53,7 +53,6 @@ type ClientService interface {
 	Cluster() cluster.ClientInterface
 	Chainstate() chainstate.ClientInterface
 	Datastore() datastore.ClientInterface
-	HTTPClient() HTTPInterface
 	Logger() *zerolog.Logger
 	Notifications() *notifications.Notifications
 	PaymailClient() paymail.ClientInterface
@@ -216,4 +215,5 @@ type ClientInterface interface {
 	UnsubscribeWebhook(ctx context.Context, url string) error
 	GetWebhooks(ctx context.Context) ([]notifications.ModelWebhook, error)
 	Chain() chain.Service
+	LogBHSReadiness(ctx context.Context)
 }

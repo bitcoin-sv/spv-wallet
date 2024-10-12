@@ -19,6 +19,7 @@ import (
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/bitcoin-sv/spv-wallet/engine/taskmanager"
 	"github.com/bitcoin-sv/spv-wallet/engine/transaction/draft"
+	"github.com/go-resty/resty/v2"
 	"github.com/mrz1836/go-cachestore"
 	"github.com/rs/zerolog"
 )
@@ -38,7 +39,7 @@ type (
 		dataStore               *dataStoreOptions      // Configuration options for the DataStore (PostgreSQL, etc.)
 		debug                   bool                   // If the client is in debug mode
 		encryptionKey           string                 // Encryption key for encrypting sensitive information (IE: paymail xPub) (hex encoded key)
-		httpClient              HTTPInterface          // HTTP interface to use
+		httpClient              *resty.Client          // HTTP client to use for http calls
 		iuc                     bool                   // (Input UTXO Check) True will check input utxos when saving transactions
 		logger                  *zerolog.Logger        // Internal logging
 		metrics                 *metrics.Metrics       // Metrics with a collector interface
@@ -51,6 +52,7 @@ type (
 		userAgent               string                 // User agent for all outgoing requests
 		chainService            chain.Service          // Chain service
 		arcConfig               chainmodels.ARCConfig  // Configuration for ARC
+		bhsConfig               chainmodels.BHSConfig  // Configuration for BHS
 		txCallbackConfig        *txCallbackConfig      // Configuration for TX callback received from ARC; disabled if nil
 	}
 
@@ -338,11 +340,6 @@ func (c *Client) GetModelNames() []string {
 	return c.options.models.modelNames
 }
 
-// HTTPClient will return the http interface to use in the client
-func (c *Client) HTTPClient() HTTPInterface {
-	return c.options.httpClient
-}
-
 // IsDebug will return the debug flag (bool)
 func (c *Client) IsDebug() bool {
 	return c.options.debug
@@ -402,4 +399,17 @@ func (c *Client) Metrics() (metrics *metrics.Metrics, enabled bool) {
 // Chain will return the chain service
 func (c *Client) Chain() chain.Service {
 	return c.options.chainService
+}
+
+// LogBHSReadiness tries to ping BHS server. The result is logged.
+func (c *Client) LogBHSReadiness(ctx context.Context) {
+	logger := c.Logger()
+	shortTimeoutCtx, cancel := context.WithTimeout(ctx, 5*time.Second)
+	defer cancel()
+	err := c.Chain().HealthcheckBHS(shortTimeoutCtx)
+	if err != nil {
+		logger.Warn().Err(err).Msg("Unable to connect to Block Headers Service at startup. Application will continue to operate but won't receive BEEF transactions until BHS is online.")
+	} else {
+		logger.Info().Msg("Block Headers Service is ready to verify transactions.")
+	}
 }

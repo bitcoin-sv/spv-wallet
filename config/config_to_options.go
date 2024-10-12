@@ -4,6 +4,7 @@ import (
 	"crypto/tls"
 	"fmt"
 	"net/url"
+	"time"
 
 	broadcastclient "github.com/bitcoin-sv/go-broadcast-client/broadcast/broadcast-client"
 	"github.com/bitcoin-sv/spv-wallet/engine"
@@ -14,6 +15,7 @@ import (
 	"github.com/bitcoin-sv/spv-wallet/engine/utils"
 	"github.com/bitcoin-sv/spv-wallet/metrics"
 	"github.com/go-redis/redis/v8"
+	"github.com/go-resty/resty/v2"
 	"github.com/mrz1836/go-cachestore"
 	"github.com/rs/zerolog"
 )
@@ -21,6 +23,8 @@ import (
 // ToEngineOptions converts the AppConfig to a slice of engine.ClientOps that can be used to create a new engine.Client.
 func (c *AppConfig) ToEngineOptions(logger zerolog.Logger) (options []engine.ClientOps, err error) {
 	options = c.addUserAgentOpts(options)
+
+	options = c.addHttpClientOpts(options)
 
 	options = c.addMetricsOpts(options)
 
@@ -46,6 +50,8 @@ func (c *AppConfig) ToEngineOptions(logger zerolog.Logger) (options []engine.Cli
 
 	options = c.addARCOpts(options)
 
+	options = c.addBHSOpts(options)
+
 	options = c.addBroadcastClientOpts(options, logger)
 
 	if options, err = c.addCallbackOpts(options); err != nil {
@@ -55,6 +61,14 @@ func (c *AppConfig) ToEngineOptions(logger zerolog.Logger) (options []engine.Cli
 	options = c.addFeeQuotes(options)
 
 	return options, nil
+}
+
+func (c *AppConfig) addHttpClientOpts(options []engine.ClientOps) []engine.ClientOps {
+	client := resty.New()
+	client.SetTimeout(20 * time.Second)
+	client.SetDebug(c.Logging.Level == zerolog.LevelTraceValue)
+	client.SetHeader("User-Agent", c.GetUserAgent())
+	return append(options, engine.WithHTTPClient(client))
 }
 
 func (c *AppConfig) addFeeQuotes(options []engine.ClientOps) []engine.ClientOps {
@@ -88,7 +102,7 @@ func (c *AppConfig) addMetricsOpts(options []engine.ClientOps) []engine.ClientOp
 }
 
 func (c *AppConfig) addDebugOpts(options []engine.ClientOps) []engine.ClientOps {
-	if c.Logging.Level == "debug" || c.Logging.Level == "trace" {
+	if c.Logging.Level == zerolog.LevelDebugValue || c.Logging.Level == zerolog.LevelTraceValue {
 		options = append(options, engine.WithDebugging())
 	}
 	return options
@@ -253,6 +267,10 @@ func (c *AppConfig) addNotificationOpts(options []engine.ClientOps) []engine.Cli
 
 func (c *AppConfig) addARCOpts(options []engine.ClientOps) []engine.ClientOps {
 	return append(options, engine.WithARC(c.ARC.URL, c.ARC.Token, c.ARC.DeploymentID))
+}
+
+func (c *AppConfig) addBHSOpts(options []engine.ClientOps) []engine.ClientOps {
+	return append(options, engine.WithBHS(c.BHS.URL, c.BHS.AuthToken))
 }
 
 func (c *AppConfig) addBroadcastClientOpts(options []engine.ClientOps, logger zerolog.Logger) []engine.ClientOps {

@@ -2,7 +2,6 @@ package engine
 
 import (
 	"database/sql"
-	"net/http"
 	"net/url"
 	"strings"
 	"time"
@@ -10,17 +9,17 @@ import (
 	"github.com/bitcoin-sv/go-broadcast-client/broadcast"
 	"github.com/bitcoin-sv/go-paymail"
 	"github.com/bitcoin-sv/go-paymail/server"
-	chainmodels "github.com/bitcoin-sv/spv-wallet/engine/chain/models"
+	"github.com/bitcoin-sv/spv-wallet/engine/chain/models"
 	"github.com/bitcoin-sv/spv-wallet/engine/chainstate"
 	"github.com/bitcoin-sv/spv-wallet/engine/cluster"
 	"github.com/bitcoin-sv/spv-wallet/engine/datastore"
 	"github.com/bitcoin-sv/spv-wallet/engine/logging"
 	"github.com/bitcoin-sv/spv-wallet/engine/metrics"
-	// "github.com/bitcoin-sv/spv-wallet/engine/notifications"
 	"github.com/bitcoin-sv/spv-wallet/engine/taskmanager"
 	"github.com/bitcoin-sv/spv-wallet/engine/utils"
 	"github.com/coocood/freecache"
 	"github.com/go-redis/redis/v8"
+	"github.com/go-resty/resty/v2"
 	"github.com/mrz1836/go-cache"
 	"github.com/mrz1836/go-cachestore"
 	"github.com/rs/zerolog"
@@ -70,9 +69,7 @@ func defaultClientOptions() *clientOptions {
 		},
 
 		// Default http client
-		httpClient: &http.Client{
-			Timeout: defaultHTTPTimeout,
-		},
+		httpClient: resty.New(),
 
 		// Blank model options (use the Base models)
 		models: &modelOptions{
@@ -213,7 +210,7 @@ func WithIUCDisabled() ClientOps {
 }
 
 // WithHTTPClient will set the custom http interface
-func WithHTTPClient(httpClient HTTPInterface) ClientOps {
+func WithHTTPClient(httpClient *resty.Client) ClientOps {
 	return func(c *clientOptions) {
 		if httpClient != nil {
 			c.httpClient = httpClient
@@ -446,7 +443,6 @@ func WithPaymailBeefSupport(blockHeadersServiceURL, blockHeadersServiceAuthToken
 		if err != nil {
 			panic(err)
 		}
-		c.chainstate.options = append(c.chainstate.options, chainstate.WithConnectionToBlockHeadersService(blockHeadersServiceURL, blockHeadersServiceAuthToken))
 		c.paymail.serverConfig.options = append(c.paymail.serverConfig.options, server.WithBeefCapabilities())
 	}
 }
@@ -622,6 +618,16 @@ func WithARC(url, token, deploymentID string) ClientOps {
 			URL:          url,
 			Token:        token,
 			DeploymentID: deploymentID,
+		}
+	}
+}
+
+// WithBHS set BHS url params
+func WithBHS(url, token string) ClientOps {
+	return func(c *clientOptions) {
+		c.bhsConfig = chainmodels.BHSConfig{
+			URL:       url,
+			AuthToken: token,
 		}
 	}
 }

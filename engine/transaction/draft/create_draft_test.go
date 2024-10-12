@@ -26,12 +26,12 @@ func TestCreateTransactionDraftError(t *testing.T) {
 			expectedError: txerrors.ErrDraftSpecificationXPubIDRequired,
 		},
 		"return error for no outputs in transaction spec": {
-			spec:          &draft.TransactionSpec{XPubID: fixtures.Sender.XPubID},
+			spec:          &draft.TransactionSpec{XPubID: fixtures.Sender.XPubID()},
 			expectedError: txerrors.ErrDraftRequiresAtLeastOneOutput,
 		},
 		"return error for empty output list in transaction spec": {
 			spec: &draft.TransactionSpec{
-				XPubID:  fixtures.Sender.XPubID,
+				XPubID:  fixtures.Sender.XPubID(),
 				Outputs: outputs.NewSpecifications(),
 			},
 			expectedError: txerrors.ErrDraftRequiresAtLeastOneOutput,

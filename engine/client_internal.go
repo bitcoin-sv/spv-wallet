@@ -15,7 +15,6 @@ import (
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/bitcoin-sv/spv-wallet/engine/taskmanager"
 	"github.com/bitcoin-sv/spv-wallet/engine/transaction/draft"
-	"github.com/go-resty/resty/v2"
 	"github.com/mrz1836/go-cachestore"
 )
 
@@ -43,7 +42,7 @@ func (c *Client) loadChainstate(ctx context.Context) (err error) {
 	// Load chainstate if a custom interface was NOT provided
 	if c.options.chainstate.ClientInterface == nil {
 		c.options.chainstate.options = append(c.options.chainstate.options, chainstate.WithUserAgent(c.UserAgent()))
-		c.options.chainstate.options = append(c.options.chainstate.options, chainstate.WithHTTPClient(c.HTTPClient()))
+		c.options.chainstate.options = append(c.options.chainstate.options, chainstate.WithHTTPClient(c.options.httpClient.GetClient()))
 		c.options.chainstate.options = append(c.options.chainstate.options, chainstate.WithMetrics(c.options.metrics))
 		c.options.chainstate.ClientInterface, err = chainstate.NewClient(ctx, c.options.chainstate.options...)
 	}
@@ -150,7 +149,9 @@ func (c *Client) loadPaymailComponents() (err error) {
 		if err != nil {
 			return
 		}
+		c.options.paymail.client.WithCustomHTTPClient(c.options.httpClient)
 	}
+
 	if c.options.paymail.service == nil {
 		logger := c.Logger().With().Str("subservice", "paymail").Logger()
 		c.options.paymail.service = paymailclient.NewServiceClient(c.Cachestore(), c.options.paymail.client, logger)
@@ -206,7 +207,7 @@ func (c *Client) loadTransactionDraftService() error {
 func (c *Client) loadChainService() {
 	if c.options.chainService == nil {
 		logger := c.Logger().With().Str("subservice", "chain").Logger()
-		c.options.chainService = chain.NewChainService(logger, resty.New(), c.options.arcConfig)
+		c.options.chainService = chain.NewChainService(logger, c.options.httpClient, c.options.arcConfig, c.options.bhsConfig)
 	}
 }
 

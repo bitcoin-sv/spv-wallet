@@ -1,0 +1,157 @@
+package ef_test
+
+import (
+	"context"
+	"testing"
+
+	sdk "github.com/bitcoin-sv/go-sdk/transaction"
+	"github.com/bitcoin-sv/spv-wallet/engine/chain/internal/ef"
+	"github.com/stretchr/testify/require"
+)
+
+const (
+	// https://whatsonchain.com/tx/2978f03c8a21bf90b5980113f988c39ef4ae691b9bedd5178c50ebb9c034dabf
+	txWithSingleInput         = "0100000001776f9d2c0d80b612ca54ebca1fa3bd38db375756ec7778edddc323569e06dc96010000006b483045022100f83415750880cc9464b752c33215ede7568c45c83cd3ccb841787edd1219d368022065e71b09241c889529e1b979c9cc9f569263386811f0005485b2617134722dd04121020d0ace627fbf80e20ce54d8bcfa5aa41f4a6f2d9c113bac0cf1b1316a96f0c9fffffffff0201000000000000001976a9147d71e2f8ce19409fb93312c9f019a7dee3d14ea188ac0c000000000000001976a914e5a4f06c1a24c2a9ddffcae4405aaf6c203ba3d288ac00000000"
+	sourceOfTxWithSingleInput = "0100000001f7af56f1d861954b4c2b5a55619e57d3ccf266a71ef9e3ff7e5adfefd8f85d30010000006a47304402200a9f2f7a1222329b97e23bc5c4def0823600495e2afa3bc6ae7be5d5bbd6aff20220525f69245f52548066c5319423578688ef46bab18b8185645dbe2587f0c9dbb341210237af69199d207ff5ce2309697644eac2babea83eadefd8d38384c8cae3e87cdfffffffff0201000000000000001976a9146fdeac955937ceec0493e6960421849636727fc088ac0e000000000000001976a9149c85e1657fb23d41e147124adef6df7933e86cb288ac00000000"
+	efHexOfTxWithSingleInput  = "010000000000000000ef01776f9d2c0d80b612ca54ebca1fa3bd38db375756ec7778edddc323569e06dc96010000006b483045022100f83415750880cc9464b752c33215ede7568c45c83cd3ccb841787edd1219d368022065e71b09241c889529e1b979c9cc9f569263386811f0005485b2617134722dd04121020d0ace627fbf80e20ce54d8bcfa5aa41f4a6f2d9c113bac0cf1b1316a96f0c9fffffffff0e000000000000001976a9149c85e1657fb23d41e147124adef6df7933e86cb288ac0201000000000000001976a9147d71e2f8ce19409fb93312c9f019a7dee3d14ea188ac0c000000000000001976a914e5a4f06c1a24c2a9ddffcae4405aaf6c203ba3d288ac00000000"
+
+	// https://whatsonchain.com/tx/88a7c0ed1cb4767cfc8e7434561379eaea21ae78e480cacf4e69284387057c70
+	txWithMultipleInputs            = "01000000021b4ae503913172c5e16bd89dabb71d353c5b9cb2a1c69970fd4e690e49f97410010000006a47304402203127d53ed2ed8843d95ad0da49659e086e298dc8c4abf946656eeae1fd5c8c8602205e10f3bd2c3f01c08903c3969d138d62b1e76c96f856e2743cf3069cb4695a75412102792258b7fba50c8a1d6154f0b4be4a4e57b078efe1b47946c010697e99dde791ffffffffc88e4c870d61d7e14b8931d941c888ffb36ad58c52364e49c2df20f565dadecd010000006b483045022100c42531f0b50acab6fd1f63b30a2b1046ac29965bc0cf41409b180d3d4b91abec022006fbada6d4969de5f16297f8905a8a00763ca19a1a27ac31b1e77d128777a140412103d21e72986de0d354aff1dd737a066b6b786bc204bec22b3941e10e9575a7aa7bffffffff0214000000000000001976a914e8964298fcaa506f39e6d1d1f29657f79c1e72e788ac09000000000000001976a914e0bd3f2d5c1919109831bfad40b8eb293c07621b88ac00000000"
+	sourceOneOfTxWithMultipleInputs = "010000000124eebc416395164f0361f40aa2f555c26e9715d34e3c053d4e2a320465aebd71010000006a473044022018f346a2f9ef9b97d10b8771b5062a8dc689a7cf5c7dc75f4043bcf9e9c84aad022065dad45fc43b270ea6050c82a1dd28e2d03c5544e983a6b1c814a8bf76c0d79141210264250fb3346aaa01d758219d4c5707cafefe2224f4f78ee91eea50a054e5d704ffffffff0201000000000000001976a914e0842daa9d18a889c57d99aa510e5492c950bf9988ac10000000000000001976a914f8704d915ad7d2b559f61bad6c31b60deac52a3788ac00000000"
+	sourceTwoOfTxWithMultipleInputs = "0100000001d4e7c7f68cc26ddd7cc68c910a20d2cf573c1dd8cafa343100abc7b195afef22010000006b483045022100debbd48772f97c61bc9f331dc535ba02829aaf395e866de91cc0c350b43e7f4b022009a8d68feff565090fada44d982c677881627dc08e9923386ee25b279dc710b14121035c8fd7b7fa90ae2b01a4c91da0d87ff3bbbc3390d9de67b69fad52a8b78ff49dffffffff0201000000000000001976a91404bc08e02f710c286b2932718ccfd671a0c8164488ac0e000000000000001976a9146b8297b1c3cd9ec13151c90d29e3a96f147535a688ac00000000"
+	efHexOfTxWithMultipleInputs     = "010000000000000000ef021b4ae503913172c5e16bd89dabb71d353c5b9cb2a1c69970fd4e690e49f97410010000006a47304402203127d53ed2ed8843d95ad0da49659e086e298dc8c4abf946656eeae1fd5c8c8602205e10f3bd2c3f01c08903c3969d138d62b1e76c96f856e2743cf3069cb4695a75412102792258b7fba50c8a1d6154f0b4be4a4e57b078efe1b47946c010697e99dde791ffffffff10000000000000001976a914f8704d915ad7d2b559f61bad6c31b60deac52a3788acc88e4c870d61d7e14b8931d941c888ffb36ad58c52364e49c2df20f565dadecd010000006b483045022100c42531f0b50acab6fd1f63b30a2b1046ac29965bc0cf41409b180d3d4b91abec022006fbada6d4969de5f16297f8905a8a00763ca19a1a27ac31b1e77d128777a140412103d21e72986de0d354aff1dd737a066b6b786bc204bec22b3941e10e9575a7aa7bffffffff0e000000000000001976a9146b8297b1c3cd9ec13151c90d29e3a96f147535a688ac0214000000000000001976a914e8964298fcaa506f39e6d1d1f29657f79c1e72e788ac09000000000000001976a914e0bd3f2d5c1919109831bfad40b8eb293c07621b88ac00000000"
+
+	// https://whatsonchain.com/tx/85ad54dcbcfa807afee658fe032c64bdef49045fd1be10accb381cf56f32fb61
+	txTwoInputsOneSource         = "0100000002500ba16a6ff2cb7c6a1bb3acaf8558672004cf54dbff86c5f14002549e1f792f010000006a47304402206274b9ad649ec0b3ee6338c9241d8512f0f7c7377f2e0f8e5f104dcc97e5168302200146ce4bb7b07d2b878daf986a7cd13b359d0128feaa375805085a154452ebe041210223466abca89f9a652c3d45435e1b7ce6520a239aefeeb52eae0ae54b08037b31ffffffff500ba16a6ff2cb7c6a1bb3acaf8558672004cf54dbff86c5f14002549e1f792f020000006a473044022055f11aa56cc3cdf29cee4a32fe7538ab885d66153d814667e8695f638080413502206dd552b132f036c3194df640bf63f5267bca4bff00392d60a4a135fbef474711412102a1553e5dcb13b6ce5c65bf9e3aee45d09890d89dc9ded2774a20a57b258d294bffffffff107a125183000000001976a91474b772406265b582f72bfa8cf7a434f4163e3c2a88ac00ca9a3b000000001976a9143403fb25f923c2aafe312c1e5e118f8d4a0e290888ac0065cd1d000000001976a9144b4c67d2ec5dd7ea4e6d9f95c68319db9c42cf9488ac00c2eb0b000000001976a914064d8ab782c7438cf647dce4f4107c6f5322c53c88ac80f0fa02000000001976a914d91fe625f566eb8c02b0c0f958faf15aaac633a888ac002d3101000000001976a914b2641346e09cf5dfbd6c91de0fc9eca3425eb34d88ac002d3101000000001976a914bcb8af0f1641192db077c971caae84f8b73adfc588ac404b4c00000000001976a9149ce2d85a530d44270139887b90664e1d2dd241fc88ac40420f00000000001976a914f3d2fc58574a66f1d8ac63f49c3f558d3c35908988ac20a10700000000001976a914fe39ece045b4b22232bc30ae7cc455ccb87aba5988ac400d0300000000001976a914021cf0efb6ec49dd40b3d313e49a5f66a26e895788aca0860100000000001976a914c51da19d540826c982b633ba313ba5b2e7876dc788ac50c30000000000001976a914826bd0a927abe2456988fa362949306c220d924788ac204e0000000000001976a914ff149dfbeec48e8aa2834b9ec174fd83efcf2cbb88ac00000000000000003d006a036478732f757831337033446661313043487068456f6a7064315a513d3d2c6d3136362c74622c61313030302c6537302e3132330474657874014214060000000000001976a914ca0c3030987bafba6d27ce4a0eaf11676d79ddfe88ac00000000"
+	sourceOfTxTwoInputsOneSource = "0100000001cbb1cdb72ef39492f163af9a59919fa225f5b231a9fbb4a44376ad6586f50fd0000000006a47304402207c90e6ad97408ce281c6e6329d2102abdd29b2e5160403d24219256e63b3148a0220168acda1cd0d422e8cff4e223eff759fffd26300709c4a7767fc4b77507b1a29412103dcefeb5798319e164628a78394c9d6c4b83b2674396e6ccb27a845b059116554ffffffff103d89a841000000001976a91474b772406265b582f72bfa8cf7a434f4163e3c2a88ac00943577000000001976a9140213c4a08b2f2666d16c8c5514358a828420367088ac00943577000000001976a91474605bc0fcd17b164dcd17b3528c91eaeaee76d388ac0065cd1d000000001976a91463da6731f9ed3fb44885dc3b9f150e4ed0db93ad88ac00e1f505000000001976a914e5558ea6e68671328f5d8672bdbe7a7974f7cbb588ac80f0fa02000000001976a914d69c71c16ed2d971428727065e0834c6bb231a6788ac002d3101000000001976a91438981cdbcafd3408a42b01a809029eefaed7e8b488ac404b4c00000000001976a9148ab09e8ac5df45da6cc8b25eadc2d406d2fbc05388ac40420f00000000001976a9143ab115e14b4cd9952e3ba5ddb328dba768b9643188ac20a10700000000001976a914d67fac3307a66eca540f0c55b5e04e71a9bf14ca88ac400d0300000000001976a914b496b0417348f66ca1f688775dc8e82b684918e388aca0860100000000001976a914020fcc0d2c51d34c9a03c5cd6beae144721a705188ac204e0000000000001976a9148740614f9170275bf0a275aae4daca083f6d3c6d88ac10270000000000001976a914108ba0a03695e3273a3f429a4af6ecc840527b0388ac00000000000000003a006a036478732c757831337033446661313043487068456f6a7064315a513d3d2c6d3136362c74622c613530302c6537332e3904746578740142750a0000000000001976a9145be804b05f26f6c468a44bfbf72f713dd2f6005d88ac00000000"
+	efHexOfTxTwoInputsOneSource  = "010000000000000000ef02500ba16a6ff2cb7c6a1bb3acaf8558672004cf54dbff86c5f14002549e1f792f010000006a47304402206274b9ad649ec0b3ee6338c9241d8512f0f7c7377f2e0f8e5f104dcc97e5168302200146ce4bb7b07d2b878daf986a7cd13b359d0128feaa375805085a154452ebe041210223466abca89f9a652c3d45435e1b7ce6520a239aefeeb52eae0ae54b08037b31ffffffff00943577000000001976a9140213c4a08b2f2666d16c8c5514358a828420367088ac500ba16a6ff2cb7c6a1bb3acaf8558672004cf54dbff86c5f14002549e1f792f020000006a473044022055f11aa56cc3cdf29cee4a32fe7538ab885d66153d814667e8695f638080413502206dd552b132f036c3194df640bf63f5267bca4bff00392d60a4a135fbef474711412102a1553e5dcb13b6ce5c65bf9e3aee45d09890d89dc9ded2774a20a57b258d294bffffffff00943577000000001976a91474605bc0fcd17b164dcd17b3528c91eaeaee76d388ac107a125183000000001976a91474b772406265b582f72bfa8cf7a434f4163e3c2a88ac00ca9a3b000000001976a9143403fb25f923c2aafe312c1e5e118f8d4a0e290888ac0065cd1d000000001976a9144b4c67d2ec5dd7ea4e6d9f95c68319db9c42cf9488ac00c2eb0b000000001976a914064d8ab782c7438cf647dce4f4107c6f5322c53c88ac80f0fa02000000001976a914d91fe625f566eb8c02b0c0f958faf15aaac633a888ac002d3101000000001976a914b2641346e09cf5dfbd6c91de0fc9eca3425eb34d88ac002d3101000000001976a914bcb8af0f1641192db077c971caae84f8b73adfc588ac404b4c00000000001976a9149ce2d85a530d44270139887b90664e1d2dd241fc88ac40420f00000000001976a914f3d2fc58574a66f1d8ac63f49c3f558d3c35908988ac20a10700000000001976a914fe39ece045b4b22232bc30ae7cc455ccb87aba5988ac400d0300000000001976a914021cf0efb6ec49dd40b3d313e49a5f66a26e895788aca0860100000000001976a914c51da19d540826c982b633ba313ba5b2e7876dc788ac50c30000000000001976a914826bd0a927abe2456988fa362949306c220d924788ac204e0000000000001976a914ff149dfbeec48e8aa2834b9ec174fd83efcf2cbb88ac00000000000000003d006a036478732f757831337033446661313043487068456f6a7064315a513d3d2c6d3136362c74622c61313030302c6537302e3132330474657874014214060000000000001976a914ca0c3030987bafba6d27ce4a0eaf11676d79ddfe88ac00000000"
+)
+
+func TestConverterFromRawTx(t *testing.T) {
+	tests := map[string]struct {
+		rawTx         string
+		txGetter      *mockTransactionsGetter
+		expectedEFHex string
+	}{
+		"Convert tx with one unsourced input": {
+			rawTx: txWithSingleInput,
+			txGetter: newMockTransactionsGetter(t, []string{
+				sourceOfTxWithSingleInput,
+			}),
+			expectedEFHex: efHexOfTxWithSingleInput,
+		},
+		"Convert tx with two unsourced inputs": {
+			rawTx: txWithMultipleInputs,
+			txGetter: newMockTransactionsGetter(t, []string{
+				sourceOneOfTxWithMultipleInputs,
+				sourceTwoOfTxWithMultipleInputs,
+			}),
+			expectedEFHex: efHexOfTxWithMultipleInputs,
+		},
+		"Convert tx with two unsourced inputs from one source": {
+			rawTx: txTwoInputsOneSource,
+			txGetter: newMockTransactionsGetter(t, []string{
+				sourceOfTxTwoInputsOneSource,
+			}),
+			expectedEFHex: efHexOfTxTwoInputsOneSource,
+		},
+	}
+	for name, test := range tests {
+		t.Run(name, func(t *testing.T) {
+			tx := fromHex(t, test.rawTx)
+
+			converter := ef.NewConverter(test.txGetter)
+			efHex, err := converter.Convert(context.Background(), tx)
+			require.NoError(t, err)
+			require.Equal(t, test.expectedEFHex, efHex)
+		})
+	}
+}
+
+func TestConverterAlreadyInEF(t *testing.T) {
+	tests := map[string]struct {
+		efHex string
+	}{
+		"Convert tx with one input": {
+			efHex: efHexOfTxWithSingleInput,
+		},
+		"Convert tx with two inputs": {
+			efHex: efHexOfTxWithMultipleInputs,
+		},
+		"Convert tx with two inputs from one source": {
+			efHex: efHexOfTxTwoInputsOneSource,
+		},
+	}
+	for name, test := range tests {
+		t.Run(name, func(t *testing.T) {
+			tx, err := sdk.NewTransactionFromHex(test.efHex)
+			require.NoError(t, err)
+			converter := ef.NewConverter(newMockTransactionsGetter(t, []string{}))
+			efHexRegenerated, err := converter.Convert(context.Background(), tx)
+			require.NoError(t, err)
+			require.Equal(t, test.efHex, efHexRegenerated)
+		})
+	}
+}
+
+func TestConverterErrorCases(t *testing.T) {
+	tests := map[string]struct {
+		rawTx     string
+		txGetter  *mockTransactionsGetter
+		expectErr error
+	}{
+		"No source tx provided by TransactionGetter": {
+			rawTx:     txWithSingleInput,
+			txGetter:  newMockTransactionsGetter(t, []string{}).WithOnMissingBehavior(onMissingTxSkip),
+			expectErr: ef.ErrGetTransactions,
+		},
+		"Not every source tx provided by TransactionGetter": {
+			rawTx: txWithMultipleInputs,
+			txGetter: newMockTransactionsGetter(t, []string{
+				sourceOneOfTxWithMultipleInputs,
+			}).WithOnMissingBehavior(onMissingTxSkip),
+			expectErr: ef.ErrGetTransactions,
+		},
+		"TransactionGetter error on missing transaction": {
+			rawTx:     txWithSingleInput,
+			txGetter:  newMockTransactionsGetter(t, []string{}).WithOnMissingBehavior(onMissingTxReturnError),
+			expectErr: ef.ErrGetTransactions,
+		},
+		"Nil transaction returned by TransactionGetter": {
+			rawTx:     txWithSingleInput,
+			txGetter:  newMockTransactionsGetter(t, []string{}).WithOnMissingBehavior(onMissingTxAddNil),
+			expectErr: ef.ErrGetTransactions,
+		},
+		"TransactionGetter returned more transactions than requested": {
+			rawTx:     txWithSingleInput,
+			txGetter:  newMockTransactionsGetter(t, []string{sourceOfTxWithSingleInput, sourceOneOfTxWithMultipleInputs}).WithReturnAll(true),
+			expectErr: ef.ErrGetTransactions,
+		},
+		"TransactionGetter not requested transactions but with correct length": {
+			rawTx:     txWithSingleInput,
+			txGetter:  newMockTransactionsGetter(t, []string{sourceOneOfTxWithMultipleInputs}).WithReturnAll(true),
+			expectErr: ef.ErrGetTransactions,
+		},
+		"TransactionGetter duplicated transaction": {
+			rawTx:     txWithMultipleInputs,
+			txGetter:  newMockTransactionsGetter(t, []string{sourceOneOfTxWithMultipleInputs, sourceOneOfTxWithMultipleInputs}).WithReturnAll(true),
+			expectErr: ef.ErrGetTransactions,
+		},
+	}
+	for name, test := range tests {
+		t.Run(name, func(t *testing.T) {
+			tx := fromHex(t, test.rawTx)
+
+			converter := ef.NewConverter(test.txGetter)
+			efHex, err := converter.Convert(context.Background(), tx)
+			require.ErrorIs(t, err, test.expectErr)
+			require.Empty(t, efHex)
+		})
+	}
+}
+
+func fromHex(t *testing.T, rawTx string) *sdk.Transaction {
+	tx, err := sdk.NewTransactionFromHex(rawTx)
+	require.NoError(t, err)
+	return tx
+}
