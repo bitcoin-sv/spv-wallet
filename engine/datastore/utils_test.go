@@ -98,9 +98,9 @@ func TestGetModelUnset(t *testing.T) {
 	t.Parallel()
 
 	type TestModel struct {
-		NullableTime   customtypes.NullTime   `json:"nullable_time" bson:"nullable_time"`
-		NullableString customtypes.NullString `json:"nullable_string" bson:"nullable_string"`
-		Internal       string                 `json:"-" bson:"-"`
+		NullableTime   customtypes.NullTime   `json:"nullable_time"`
+		NullableString customtypes.NullString `json:"nullable_string"`
+		Internal       string                 `json:"-"`
 	}
 
 	t.Run("basic test", func(t *testing.T) {

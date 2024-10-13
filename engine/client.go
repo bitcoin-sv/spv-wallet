@@ -7,6 +7,7 @@ import (
 	"github.com/bitcoin-sv/go-paymail"
 	"github.com/bitcoin-sv/go-paymail/server"
 	"github.com/bitcoin-sv/spv-wallet/engine/chain"
+	chainmodels "github.com/bitcoin-sv/spv-wallet/engine/chain/models"
 	"github.com/bitcoin-sv/spv-wallet/engine/chainstate"
 	"github.com/bitcoin-sv/spv-wallet/engine/cluster"
 	"github.com/bitcoin-sv/spv-wallet/engine/datastore"
@@ -18,8 +19,8 @@ import (
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/bitcoin-sv/spv-wallet/engine/taskmanager"
 	"github.com/bitcoin-sv/spv-wallet/engine/transaction/draft"
+	"github.com/go-resty/resty/v2"
 	"github.com/mrz1836/go-cachestore"
-	"github.com/newrelic/go-agent/v3/newrelic"
 	"github.com/rs/zerolog"
 )
 
@@ -38,12 +39,11 @@ type (
 		dataStore               *dataStoreOptions      // Configuration options for the DataStore (PostgreSQL, etc.)
 		debug                   bool                   // If the client is in debug mode
 		encryptionKey           string                 // Encryption key for encrypting sensitive information (IE: paymail xPub) (hex encoded key)
-		httpClient              HTTPInterface          // HTTP interface to use
+		httpClient              *resty.Client          // HTTP client to use for http calls
 		iuc                     bool                   // (Input UTXO Check) True will check input utxos when saving transactions
 		logger                  *zerolog.Logger        // Internal logging
 		metrics                 *metrics.Metrics       // Metrics with a collector interface
 		models                  *modelOptions          // Configuration options for the loaded models
-		newRelic                *newRelicOptions       // Configuration options for NewRelic
 		notifications           *notificationsOptions  // Configuration options for Notifications
 		paymail                 *paymailOptions        // Paymail options & client
 		transactionDraftService draft.Service          // Service for transaction drafts
@@ -51,14 +51,9 @@ type (
 		taskManager             *taskManagerOptions    // Configuration options for the TaskManager (TaskQ, etc.)
 		userAgent               string                 // User agent for all outgoing requests
 		chainService            chain.Service          // Chain service
-		arcConfig               arcConfig              // Configuration for ARC
+		arcConfig               chainmodels.ARCConfig  // Configuration for ARC
+		bhsConfig               chainmodels.BHSConfig  // Configuration for BHS
 		txCallbackConfig        *txCallbackConfig      // Configuration for TX callback received from ARC; disabled if nil
-	}
-
-	arcConfig struct {
-		URL          string // URL for the ARC
-		Token        string // Token for the ARC
-		DeploymentID string // Deployment ID for the ARC
 	}
 
 	txCallbackConfig struct {
@@ -104,12 +99,6 @@ type (
 		models            []interface{} // Models for use in this engine
 	}
 
-	// newRelicOptions holds the configuration for NewRelic
-	newRelicOptions struct {
-		app     *newrelic.Application // NewRelic client application (if enabled)
-		enabled bool                  // If NewRelic is enabled for deep Transaction tracing
-	}
-
 	// notificationsOptions holds the configuration for notifications
 	notificationsOptions struct {
 		enabled        bool
@@ -142,7 +131,6 @@ type (
 // NewClient creates a new client for all SPV Wallet Engine functionality
 //
 // If no options are given, it will use the defaultClientOptions()
-// ctx may contain a NewRelic txn (or one will be created)
 func NewClient(ctx context.Context, opts ...ClientOps) (ClientInterface, error) {
 	// Create a new client with defaults
 	client := &Client{options: defaultClientOptions()}
@@ -151,9 +139,6 @@ func NewClient(ctx context.Context, opts ...ClientOps) (ClientInterface, error) 
 	for _, opt := range opts {
 		opt(client.options)
 	}
-
-	// Use NewRelic if it's enabled (use existing txn if found on ctx)
-	ctx = client.GetOrStartTxn(ctx, "new_client")
 
 	// Set the logger (if no custom logger was detected)
 	if client.options.logger == nil {
@@ -286,16 +271,6 @@ func (c *Client) Chainstate() chainstate.ClientInterface {
 
 // Close will safely close any open connections (cache, datastore, etc.)
 func (c *Client) Close(ctx context.Context) error {
-	if txn := newrelic.FromContext(ctx); txn != nil {
-		defer txn.StartSegment("close_all").End()
-	}
-
-	// Close Chainstate
-	ch := c.Chainstate()
-	if ch != nil {
-		ch.Close(ctx)
-		c.options.chainstate.ClientInterface = nil
-	}
 
 	// Close Datastore
 	ds := c.Datastore()
@@ -313,6 +288,10 @@ func (c *Client) Close(ctx context.Context) error {
 			return spverrors.Wrapf(err, "failed to close taskmanager")
 		}
 		c.options.taskManager.TaskEngine = nil
+	}
+
+	if c.options.notifications != nil && c.options.notifications.webhookManager != nil {
+		c.options.notifications.webhookManager.Stop()
 	}
 	return nil
 }
@@ -356,43 +335,14 @@ func (c *Client) DefaultSyncConfig() *SyncConfig {
 	}
 }
 
-// EnableNewRelic will enable NewRelic tracing
-func (c *Client) EnableNewRelic() {
-	if c.options.newRelic != nil && c.options.newRelic.app != nil {
-		c.options.newRelic.enabled = true
-	}
-}
-
-// GetOrStartTxn will check for an existing NewRelic transaction, if not found, it will make a new transaction
-func (c *Client) GetOrStartTxn(ctx context.Context, name string) context.Context {
-	if c.IsNewRelicEnabled() && c.options.newRelic.app != nil {
-		txn := newrelic.FromContext(ctx)
-		if txn == nil {
-			txn = c.options.newRelic.app.StartTransaction(name)
-		}
-		ctx = newrelic.NewContext(ctx, txn)
-	}
-	return ctx
-}
-
 // GetModelNames will return the model names that have been loaded
 func (c *Client) GetModelNames() []string {
 	return c.options.models.modelNames
 }
 
-// HTTPClient will return the http interface to use in the client
-func (c *Client) HTTPClient() HTTPInterface {
-	return c.options.httpClient
-}
-
 // IsDebug will return the debug flag (bool)
 func (c *Client) IsDebug() bool {
 	return c.options.debug
-}
-
-// IsNewRelicEnabled will return the flag (bool)
-func (c *Client) IsNewRelicEnabled() bool {
-	return c.options.newRelic.enabled
 }
 
 // IsIUCEnabled will return the flag (bool)
@@ -449,4 +399,17 @@ func (c *Client) Metrics() (metrics *metrics.Metrics, enabled bool) {
 // Chain will return the chain service
 func (c *Client) Chain() chain.Service {
 	return c.options.chainService
+}
+
+// LogBHSReadiness tries to ping BHS server. The result is logged.
+func (c *Client) LogBHSReadiness(ctx context.Context) {
+	logger := c.Logger()
+	shortTimeoutCtx, cancel := context.WithTimeout(ctx, 5*time.Second)
+	defer cancel()
+	err := c.Chain().HealthcheckBHS(shortTimeoutCtx)
+	if err != nil {
+		logger.Warn().Err(err).Msg("Unable to connect to Block Headers Service at startup. Application will continue to operate but won't receive BEEF transactions until BHS is online.")
+	} else {
+		logger.Info().Msg("Block Headers Service is ready to verify transactions.")
+	}
 }

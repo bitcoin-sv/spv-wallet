@@ -10,11 +10,10 @@ import (
 
 // NOTE: because of the taskq package has global state, the names of tasks must be unique
 func TestNewTaskManager_Single(t *testing.T) {
-	c, err := NewTaskManager(context.Background())
+	ctx := context.Background()
+	c, err := NewTaskManager(ctx)
 	require.NoError(t, err)
 	require.NotNil(t, c)
-
-	ctx := c.GetTxnCtx(context.Background())
 
 	task1Chan := make(chan string, 1)
 	task1Arg := "task a"
@@ -153,11 +152,10 @@ func TestNewTaskManager_WithRedis(t *testing.T) {
 	}
 
 	queueName, _ := utils.RandomHex(8)
-	c, err := NewTaskManager(context.Background(), WithTaskqConfig(DefaultTaskQConfig(queueName, WithRedis("redis://localhost:6379"))))
+	ctx := context.Background()
+	c, err := NewTaskManager(ctx, WithTaskqConfig(DefaultTaskQConfig(queueName, WithRedis("redis://localhost:6379"))))
 	require.NoError(t, err)
 	require.NotNil(t, c)
-
-	ctx := c.GetTxnCtx(context.Background())
 
 	task1Chan := make(chan string, 1)
 	task1Arg := "task redis"

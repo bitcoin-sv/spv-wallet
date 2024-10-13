@@ -39,7 +39,7 @@ func (ts *TestSuite) TearDownSuite() {
 func (ts *TestSuite) SetupTest() {
 	ts.BaseSetupTest()
 
-	setupServerRoutes(ts.AppConfig, ts.Services, ts.Router)
+	setupServerRoutes(ts.AppConfig, ts.SpvWalletEngine, ts.Router)
 }
 
 // TearDownTest runs after each test
@@ -126,7 +126,7 @@ func (ts *TestSuite) TestApiAuthentication() {
 	ts.T().Run("valid value", func(t *testing.T) {
 		w := httptest.NewRecorder()
 
-		xpub, err := ts.Services.SpvWalletEngine.NewXpub(context.Background(), testXpubAuth)
+		xpub, err := ts.SpvWalletEngine.NewXpub(context.Background(), testXpubAuth)
 		require.NoError(t, err)
 		require.NotNil(t, xpub)
 
@@ -173,11 +173,11 @@ func (ts *TestSuite) TestBasicAuthentication() {
 	ts.T().Run("valid value", func(t *testing.T) {
 		w := httptest.NewRecorder()
 
-		xpub, err := ts.Services.SpvWalletEngine.NewXpub(context.Background(), testXpubAuth)
+		xpub, err := ts.SpvWalletEngine.NewXpub(context.Background(), testXpubAuth)
 		require.NoError(t, err)
 		require.NotNil(t, xpub)
 
-		destination, err := ts.Services.SpvWalletEngine.NewDestination(context.Background(), xpub.RawXpub(), 0, utils.ScriptTypePubKeyHash)
+		destination, err := ts.SpvWalletEngine.NewDestination(context.Background(), xpub.RawXpub(), 0, utils.ScriptTypePubKeyHash)
 		require.NoError(t, err)
 		require.NotNil(t, destination)
 

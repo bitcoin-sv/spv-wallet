@@ -11,8 +11,6 @@ import (
 
 // GetPaymailAddress will get a paymail address model
 func (c *Client) GetPaymailAddress(ctx context.Context, address string, opts ...ModelOps) (*PaymailAddress, error) {
-	// Check for existing NewRelic transaction
-	ctx = c.GetOrStartTxn(ctx, "get_paymail_address")
 
 	// Get the paymail address
 	paymailAddress, err := getPaymailAddress(ctx, address, append(opts, c.DefaultModelOptions()...)...)
@@ -29,8 +27,6 @@ func (c *Client) GetPaymailAddress(ctx context.Context, address string, opts ...
 func (c *Client) GetPaymailAddresses(ctx context.Context, metadataConditions *Metadata,
 	conditions map[string]interface{}, queryParams *datastore.QueryParams, opts ...ModelOps,
 ) ([]*PaymailAddress, error) {
-	// Check for existing NewRelic transaction
-	ctx = c.GetOrStartTxn(ctx, "get_paymail_addresses")
 
 	// Get the paymail address
 	paymailAddresses, err := getPaymailAddresses(
@@ -48,8 +44,6 @@ func (c *Client) GetPaymailAddresses(ctx context.Context, metadataConditions *Me
 func (c *Client) GetPaymailAddressesCount(ctx context.Context, metadataConditions *Metadata,
 	conditions map[string]interface{}, opts ...ModelOps,
 ) (int64, error) {
-	// Check for existing NewRelic transaction
-	ctx = c.GetOrStartTxn(ctx, "get_paymail_addresses_count")
 
 	// Get the paymail address
 	count, err := getPaymailAddressesCount(
@@ -67,8 +61,6 @@ func (c *Client) GetPaymailAddressesCount(ctx context.Context, metadataCondition
 func (c *Client) GetPaymailAddressesByXPubID(ctx context.Context, xPubID string, metadataConditions *Metadata,
 	conditions map[string]interface{}, queryParams *datastore.QueryParams,
 ) ([]*PaymailAddress, error) {
-	// Check for existing NewRelic transaction
-	ctx = c.GetOrStartTxn(ctx, "get_paymail_by_xpub")
 
 	if conditions == nil {
 		x := make(map[string]interface{})
@@ -93,8 +85,6 @@ func (c *Client) GetPaymailAddressesByXPubID(ctx context.Context, xPubID string,
 func (c *Client) NewPaymailAddress(ctx context.Context, xPubKey, address, publicName, avatar string,
 	opts ...ModelOps,
 ) (*PaymailAddress, error) {
-	// Check for existing NewRelic transaction
-	ctx = c.GetOrStartTxn(ctx, "new_paymail_address")
 
 	// Get the xPub (make sure it exists)
 	xPub, err := getXpubWithCache(ctx, c, xPubKey, "", c.DefaultModelOptions()...)
@@ -139,8 +129,6 @@ func (c *Client) NewPaymailAddress(ctx context.Context, xPubKey, address, public
 
 // DeletePaymailAddress will delete a paymail address
 func (c *Client) DeletePaymailAddress(ctx context.Context, address string, opts ...ModelOps) error {
-	// Check for existing NewRelic transaction
-	ctx = c.GetOrStartTxn(ctx, "delete_paymail_address")
 
 	// Get the paymail address
 	paymailAddress, err := getPaymailAddress(ctx, address, append(opts, c.DefaultModelOptions()...)...)
@@ -171,8 +159,6 @@ func (c *Client) DeletePaymailAddress(ctx context.Context, address string, opts 
 func (c *Client) UpdatePaymailAddressMetadata(ctx context.Context, address string,
 	metadata Metadata, opts ...ModelOps,
 ) (*PaymailAddress, error) {
-	// Check for existing NewRelic transaction
-	ctx = c.GetOrStartTxn(ctx, "update_paymail_address_metadata")
 
 	// Get the paymail address
 	paymailAddress, err := getPaymailAddress(ctx, address, append(opts, c.DefaultModelOptions()...)...)
@@ -197,8 +183,6 @@ func (c *Client) UpdatePaymailAddressMetadata(ctx context.Context, address strin
 func (c *Client) UpdatePaymailAddress(ctx context.Context, address, publicName, avatar string,
 	opts ...ModelOps,
 ) (*PaymailAddress, error) {
-	// Check for existing NewRelic transaction
-	ctx = c.GetOrStartTxn(ctx, "update_paymail_address")
 
 	// Get the paymail address
 	paymailAddress, err := getPaymailAddress(ctx, address, append(opts, c.DefaultModelOptions()...)...)

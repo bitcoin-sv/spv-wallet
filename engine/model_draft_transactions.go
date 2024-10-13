@@ -26,17 +26,17 @@ import (
 // Gorm related models & indexes: https://gorm.io/docs/models.html - https://gorm.io/docs/indexes.html
 type DraftTransaction struct {
 	// Base model
-	Model `bson:",inline"`
+	Model
 
 	// Standard transaction model base fields
-	TransactionBase `bson:",inline"`
+	TransactionBase
 
 	// Model specific fields
-	XpubID        string            `json:"xpub_id" toml:"xpub_id" yaml:"xpub_id" gorm:"<-:create;type:char(64);index;comment:This is the related xPub" bson:"xpub_id"`
-	ExpiresAt     time.Time         `json:"expires_at" toml:"expires_at" yaml:"expires_at" gorm:"<-:create;comment:Time when the draft expires" bson:"expires_at"`
-	Configuration TransactionConfig `json:"configuration" toml:"configuration" yaml:"configuration" gorm:"<-;type:text;comment:This is the configuration struct in JSON" bson:"configuration"`
-	Status        DraftStatus       `json:"status" toml:"status" yaml:"status" gorm:"<-;type:varchar(10);index;comment:This is the status of the draft" bson:"status"`
-	FinalTxID     string            `json:"final_tx_id,omitempty" toml:"final_tx_id" yaml:"final_tx_id" gorm:"<-;type:char(64);index;comment:This is the final tx ID" bson:"final_tx_id,omitempty"`
+	XpubID        string            `json:"xpub_id" toml:"xpub_id" yaml:"xpub_id" gorm:"<-:create;type:char(64);index;comment:This is the related xPub"`
+	ExpiresAt     time.Time         `json:"expires_at" toml:"expires_at" yaml:"expires_at" gorm:"<-:create;comment:Time when the draft expires"`
+	Configuration TransactionConfig `json:"configuration" toml:"configuration" yaml:"configuration" gorm:"<-;type:text;comment:This is the configuration struct in JSON"`
+	Status        DraftStatus       `json:"status" toml:"status" yaml:"status" gorm:"<-;type:varchar(10);index;comment:This is the status of the draft"`
+	FinalTxID     string            `json:"final_tx_id,omitempty" toml:"final_tx_id" yaml:"final_tx_id" gorm:"<-;type:char(64);index;comment:This is the final tx ID"`
 }
 
 // newDraftTransaction will start a new draft tx

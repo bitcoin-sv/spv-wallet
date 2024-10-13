@@ -10,17 +10,20 @@ import (
 // DefaultAdminXpub is the default admin xpub used for authenticate requests.
 const DefaultAdminXpub = "xpub661MyMwAqRbcFgfmdkPgE2m5UjHXu9dj124DbaGLSjaqVESTWfCD4VuNmEbVPkbYLCkykwVZvmA8Pbf8884TQr1FgdG2nPoHR8aB36YdDQh"
 
-func getDefaultAppConfig() *AppConfig {
+// TaskManagerQueueName is the default queue name for the task manager.
+const TaskManagerQueueName = "spv_wallet_queue"
+
+// GetDefaultAppConfig returns the default configuration for the application.
+func GetDefaultAppConfig() *AppConfig {
 	return &AppConfig{
+		Version:              "development",
 		Authentication:       getAuthConfigDefaults(),
 		Cache:                getCacheDefaults(),
 		Db:                   getDbDefaults(),
-		Debug:                true,
 		DebugProfiling:       true,
 		DisableITC:           true,
 		ImportBlockHeaders:   "",
 		Logging:              getLoggingDefaults(),
-		NewRelic:             getNewRelicDefaults(),
 		ARC:                  getARCDefaults(),
 		Notifications:        getNotificationDefaults(),
 		Paymail:              getPaymailDefaults(),
@@ -95,14 +98,6 @@ func getLoggingDefaults() *LoggingConfig {
 		Format:       "console",
 		InstanceName: "spv-wallet",
 		LogOrigin:    false,
-	}
-}
-
-func getNewRelicDefaults() *NewRelicConfig {
-	return &NewRelicConfig{
-		DomainName: "domain.com",
-		Enabled:    false,
-		LicenseKey: "BOGUS-LICENSE-KEY-1234567890987654321234",
 	}
 }
 

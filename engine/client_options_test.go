@@ -2,7 +2,6 @@ package engine
 
 import (
 	"context"
-	"net/http"
 	"os"
 	"testing"
 	"time"
@@ -16,99 +15,10 @@ import (
 	"github.com/bitcoin-sv/spv-wallet/engine/utils"
 	"github.com/coocood/freecache"
 	"github.com/mrz1836/go-cachestore"
-	"github.com/newrelic/go-agent/v3/newrelic"
 	"github.com/rs/zerolog"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
-
-// TestNewRelicOptions will test the method enable()
-func Test_newRelicOptions_enable(t *testing.T) {
-	t.Parallel()
-	testLogger := zerolog.Nop()
-
-	t.Run("enable with valid app", func(t *testing.T) {
-		app, err := tester.GetNewRelicApp(defaultNewRelicApp)
-		require.NoError(t, err)
-		require.NotNil(t, app)
-
-		opts := DefaultClientOpts(false, true)
-		opts = append(opts, WithNewRelic(app))
-		opts = append(opts, WithLogger(&testLogger))
-
-		var tc ClientInterface
-		tc, err = NewClient(
-			tester.GetNewRelicCtx(t, defaultNewRelicApp, defaultNewRelicTx),
-			opts...,
-		)
-		require.NoError(t, err)
-		require.NotNil(t, tc)
-		defer CloseClient(context.Background(), t, tc)
-
-		tc.EnableNewRelic()
-		assert.Equal(t, true, tc.IsNewRelicEnabled())
-	})
-
-	t.Run("enable with invalid app", func(t *testing.T) {
-		opts := DefaultClientOpts(false, true)
-		opts = append(opts, WithNewRelic(nil))
-		opts = append(opts, WithLogger(&testLogger))
-
-		tc, err := NewClient(tester.GetNewRelicCtx(t, defaultNewRelicApp, defaultNewRelicTx), opts...)
-		require.NoError(t, err)
-		require.NotNil(t, tc)
-		defer CloseClient(context.Background(), t, tc)
-
-		tc.EnableNewRelic()
-		assert.Equal(t, false, tc.IsNewRelicEnabled())
-	})
-}
-
-// Test_newRelicOptions_getOrStartTxn will test the method getOrStartTxn()
-func Test_newRelicOptions_getOrStartTxn(t *testing.T) {
-	t.Parallel()
-	testLogger := zerolog.Nop()
-
-	t.Run("Get a valid ctx and txn", func(t *testing.T) {
-		app, err := tester.GetNewRelicApp(defaultNewRelicApp)
-		require.NoError(t, err)
-		require.NotNil(t, app)
-
-		opts := DefaultClientOpts(false, true)
-		opts = append(opts, WithNewRelic(app), WithLogger(&testLogger))
-
-		var tc ClientInterface
-		tc, err = NewClient(
-			tester.GetNewRelicCtx(t, defaultNewRelicApp, defaultNewRelicTx),
-			opts...,
-		)
-		require.NoError(t, err)
-		require.NotNil(t, tc)
-		defer CloseClient(context.Background(), t, tc)
-
-		ctx := tc.GetOrStartTxn(context.Background(), "test-name")
-		assert.NotNil(t, ctx)
-
-		txn := newrelic.FromContext(ctx)
-		assert.NotNil(t, txn)
-	})
-
-	t.Run("invalid ctx and txn", func(t *testing.T) {
-		opts := DefaultClientOpts(false, true)
-		opts = append(opts, WithNewRelic(nil), WithLogger(&testLogger))
-
-		tc, err := NewClient(tester.GetNewRelicCtx(t, defaultNewRelicApp, defaultNewRelicTx), opts...)
-		require.NoError(t, err)
-		require.NotNil(t, tc)
-		defer CloseClient(context.Background(), t, tc)
-
-		ctx := tc.GetOrStartTxn(context.Background(), "test-name")
-		assert.NotNil(t, ctx)
-
-		txn := newrelic.FromContext(ctx)
-		assert.Nil(t, txn)
-	})
-}
 
 // TestClient_defaultModelOptions will test the method DefaultModelOptions()
 func TestClient_defaultModelOptions(t *testing.T) {
@@ -127,8 +37,6 @@ func TestClient_defaultModelOptions(t *testing.T) {
 		require.Nil(t, dco.dataStore.ClientInterface)
 		require.NotNil(t, dco.dataStore.options)
 		assert.Equal(t, 1, len(dco.dataStore.options))
-
-		require.NotNil(t, dco.newRelic)
 
 		require.NotNil(t, dco.paymail)
 
@@ -154,7 +62,7 @@ func TestWithUserAgent(t *testing.T) {
 		opts := DefaultClientOpts(false, true)
 		opts = append(opts, WithUserAgent(""), WithLogger(&testLogger))
 
-		tc, err := NewClient(tester.GetNewRelicCtx(t, defaultNewRelicApp, defaultNewRelicTx), opts...)
+		tc, err := NewClient(context.Background(), opts...)
 		require.NoError(t, err)
 		require.NotNil(t, tc)
 		defer CloseClient(context.Background(), t, tc)
@@ -169,23 +77,13 @@ func TestWithUserAgent(t *testing.T) {
 		opts := DefaultClientOpts(false, true)
 		opts = append(opts, WithUserAgent(customAgent), WithLogger(&testLogger))
 
-		tc, err := NewClient(tester.GetNewRelicCtx(t, defaultNewRelicApp, defaultNewRelicTx), opts...)
+		tc, err := NewClient(context.Background(), opts...)
 		require.NoError(t, err)
 		require.NotNil(t, tc)
 		defer CloseClient(context.Background(), t, tc)
 
 		assert.NotEqual(t, defaultUserAgent, tc.UserAgent())
 		assert.Equal(t, customAgent, tc.UserAgent())
-	})
-}
-
-// TestWithNewRelic will test the method WithNewRelic()
-func TestWithNewRelic(t *testing.T) {
-	t.Parallel()
-
-	t.Run("check type", func(t *testing.T) {
-		opt := WithNewRelic(nil)
-		assert.IsType(t, *new(ClientOps), opt)
 	})
 }
 
@@ -200,7 +98,7 @@ func TestWithDebugging(t *testing.T) {
 
 	t.Run("set debug (with cache and Datastore)", func(t *testing.T) {
 		tc, err := NewClient(
-			tester.GetNewRelicCtx(t, defaultNewRelicApp, defaultNewRelicTx),
+			context.Background(),
 			DefaultClientOpts(true, true)...,
 		)
 		require.NoError(t, err)
@@ -228,7 +126,7 @@ func TestWithEncryption(t *testing.T) {
 		opts = append(opts, WithEncryption(""))
 		opts = append(opts, WithLogger(&testLogger))
 
-		tc, err := NewClient(tester.GetNewRelicCtx(t, defaultNewRelicApp, defaultNewRelicTx), opts...)
+		tc, err := NewClient(context.Background(), opts...)
 		require.NoError(t, err)
 		require.NotNil(t, tc)
 		defer CloseClient(context.Background(), t, tc)
@@ -242,7 +140,7 @@ func TestWithEncryption(t *testing.T) {
 		opts = append(opts, WithEncryption(key))
 		opts = append(opts, WithLogger(&testLogger))
 
-		tc, err := NewClient(tester.GetNewRelicCtx(t, defaultNewRelicApp, defaultNewRelicTx), opts...)
+		tc, err := NewClient(context.Background(), opts...)
 		require.NoError(t, err)
 		require.NotNil(t, tc)
 		defer CloseClient(context.Background(), t, tc)
@@ -269,7 +167,7 @@ func TestWithRedis(t *testing.T) {
 		}
 
 		tc, err := NewClient(
-			tester.GetNewRelicCtx(t, defaultNewRelicApp, defaultNewRelicTx),
+			context.Background(),
 			WithTaskqConfig(taskmanager.DefaultTaskQConfig(tester.RandomTablePrefix())),
 			WithRedis(&cachestore.RedisConfig{
 				URL: cachestore.RedisPrefix + "localhost:6379",
@@ -293,7 +191,7 @@ func TestWithRedis(t *testing.T) {
 		}
 
 		tc, err := NewClient(
-			tester.GetNewRelicCtx(t, defaultNewRelicApp, defaultNewRelicTx),
+			context.Background(),
 			WithTaskqConfig(taskmanager.DefaultTaskQConfig(tester.RandomTablePrefix())),
 			WithRedis(&cachestore.RedisConfig{
 				URL: "localhost:6379",
@@ -326,7 +224,7 @@ func TestWithRedisConnection(t *testing.T) {
 
 	t.Run("using a nil connection", func(t *testing.T) {
 		tc, err := NewClient(
-			tester.GetNewRelicCtx(t, defaultNewRelicApp, defaultNewRelicTx),
+			context.Background(),
 			WithTaskqConfig(taskmanager.DefaultTaskQConfig(tester.RandomTablePrefix())),
 			WithRedisConnection(nil),
 			WithSQLite(tester.SQLiteTestConfig(false, true)),
@@ -348,7 +246,7 @@ func TestWithRedisConnection(t *testing.T) {
 		require.NotNil(t, conn)
 
 		tc, err := NewClient(
-			tester.GetNewRelicCtx(t, defaultNewRelicApp, defaultNewRelicTx),
+			context.Background(),
 			WithTaskqConfig(taskmanager.DefaultTaskQConfig(tester.RandomTablePrefix())),
 			WithRedisConnection(client),
 			WithSQLite(tester.SQLiteTestConfig(false, true)),
@@ -380,7 +278,7 @@ func TestWithFreeCache(t *testing.T) {
 	t.Run("using FreeCache", func(t *testing.T) {
 		testLogger := zerolog.Nop()
 		tc, err := NewClient(
-			tester.GetNewRelicCtx(t, defaultNewRelicApp, defaultNewRelicTx),
+			context.Background(),
 			WithFreeCache(),
 			WithTaskqConfig(taskmanager.DefaultTaskQConfig(testQueueName)),
 			WithSQLite(&datastore.SQLiteConfig{Shared: true}),
@@ -411,7 +309,7 @@ func TestWithFreeCacheConnection(t *testing.T) {
 
 	t.Run("using a nil client", func(t *testing.T) {
 		tc, err := NewClient(
-			tester.GetNewRelicCtx(t, defaultNewRelicApp, defaultNewRelicTx),
+			context.Background(),
 			WithFreeCacheConnection(nil),
 			WithTaskqConfig(taskmanager.DefaultTaskQConfig(testQueueName)),
 			WithSQLite(&datastore.SQLiteConfig{Shared: true}),
@@ -431,7 +329,7 @@ func TestWithFreeCacheConnection(t *testing.T) {
 	t.Run("using an existing connection", func(t *testing.T) {
 		fc := freecache.NewCache(cachestore.DefaultCacheSize)
 		tc, err := NewClient(
-			tester.GetNewRelicCtx(t, defaultNewRelicApp, defaultNewRelicTx),
+			context.Background(),
 			WithFreeCacheConnection(fc),
 			WithTaskqConfig(taskmanager.DefaultTaskQConfig(testQueueName)),
 			WithSQLite(&datastore.SQLiteConfig{Shared: true}),
@@ -458,7 +356,7 @@ func TestWithPaymailClient(t *testing.T) {
 		opts = append(opts, WithPaymailClient(nil))
 		opts = append(opts, WithLogger(&testLogger))
 
-		tc, err := NewClient(tester.GetNewRelicCtx(t, defaultNewRelicApp, defaultNewRelicTx), opts...)
+		tc, err := NewClient(context.Background(), opts...)
 		require.NoError(t, err)
 		require.NotNil(t, tc)
 		defer CloseClient(context.Background(), t, tc)
@@ -476,7 +374,7 @@ func TestWithPaymailClient(t *testing.T) {
 		opts = append(opts, WithLogger(&testLogger))
 
 		var tc ClientInterface
-		tc, err = NewClient(tester.GetNewRelicCtx(t, defaultNewRelicApp, defaultNewRelicTx), opts...)
+		tc, err = NewClient(context.Background(), opts...)
 		require.NoError(t, err)
 		require.NotNil(t, tc)
 		defer CloseClient(context.Background(), t, tc)
@@ -501,7 +399,7 @@ func TestWithTaskQ(t *testing.T) {
 		tcOpts = append(tcOpts, WithLogger(&testLogger))
 
 		tc, err := NewClient(
-			tester.GetNewRelicCtx(t, defaultNewRelicApp, defaultNewRelicTx),
+			context.Background(),
 			tcOpts...,
 		)
 		require.NoError(t, err)
@@ -519,7 +417,7 @@ func TestWithTaskQ(t *testing.T) {
 		}
 
 		tc, err := NewClient(
-			tester.GetNewRelicCtx(t, defaultNewRelicApp, defaultNewRelicTx),
+			context.Background(),
 			WithTaskqConfig(
 				taskmanager.DefaultTaskQConfig(tester.RandomTablePrefix(), taskmanager.WithRedis("localhost:6379")),
 			),
@@ -553,7 +451,7 @@ func TestWithLogger(t *testing.T) {
 		opts := DefaultClientOpts(false, true)
 		opts = append(opts, WithLogger(nil))
 
-		tc, err := NewClient(tester.GetNewRelicCtx(t, defaultNewRelicApp, defaultNewRelicTx), opts...)
+		tc, err := NewClient(context.Background(), opts...)
 		require.NoError(t, err)
 		require.NotNil(t, tc)
 		defer CloseClient(context.Background(), t, tc)
@@ -567,7 +465,7 @@ func TestWithLogger(t *testing.T) {
 		opts := DefaultClientOpts(false, true)
 		opts = append(opts, WithLogger(&customLogger))
 
-		tc, err := NewClient(tester.GetNewRelicCtx(t, defaultNewRelicApp, defaultNewRelicTx), opts...)
+		tc, err := NewClient(context.Background(), opts...)
 		require.NoError(t, err)
 		require.NotNil(t, tc)
 		defer CloseClient(context.Background(), t, tc)
@@ -591,7 +489,7 @@ func TestWithModels(t *testing.T) {
 		opts = append(opts, WithModels())
 		opts = append(opts, WithLogger(&testLogger))
 
-		tc, err := NewClient(tester.GetNewRelicCtx(t, defaultNewRelicApp, defaultNewRelicTx), opts...)
+		tc, err := NewClient(context.Background(), opts...)
 		require.NoError(t, err)
 		require.NotNil(t, tc)
 		defer CloseClient(context.Background(), t, tc)
@@ -609,7 +507,7 @@ func TestWithModels(t *testing.T) {
 		opts = append(opts, WithModels(newPaymail(testPaymail, 0)))
 		opts = append(opts, WithLogger(&testLogger))
 
-		tc, err := NewClient(tester.GetNewRelicCtx(t, defaultNewRelicApp, defaultNewRelicTx), opts...)
+		tc, err := NewClient(context.Background(), opts...)
 		require.NoError(t, err)
 		require.NotNil(t, tc)
 		defer CloseClient(context.Background(), t, tc)
@@ -637,7 +535,7 @@ func TestWithIUCDisabled(t *testing.T) {
 		opts := DefaultClientOpts(false, true)
 		opts = append(opts, WithLogger(&testLogger))
 
-		tc, err := NewClient(tester.GetNewRelicCtx(t, defaultNewRelicApp, defaultNewRelicTx), opts...)
+		tc, err := NewClient(context.Background(), opts...)
 		require.NoError(t, err)
 		require.NotNil(t, tc)
 		defer CloseClient(context.Background(), t, tc)
@@ -650,50 +548,12 @@ func TestWithIUCDisabled(t *testing.T) {
 		opts = append(opts, WithIUCDisabled())
 		opts = append(opts, WithLogger(&testLogger))
 
-		tc, err := NewClient(tester.GetNewRelicCtx(t, defaultNewRelicApp, defaultNewRelicTx), opts...)
+		tc, err := NewClient(context.Background(), opts...)
 		require.NoError(t, err)
 		require.NotNil(t, tc)
 		defer CloseClient(context.Background(), t, tc)
 
 		assert.Equal(t, false, tc.IsIUCEnabled())
-	})
-}
-
-// TestWithHTTPClient will test the method WithHTTPClient()
-func TestWithHTTPClient(t *testing.T) {
-	t.Parallel()
-	testLogger := zerolog.Nop()
-
-	t.Run("check type", func(t *testing.T) {
-		opt := WithHTTPClient(nil)
-		assert.IsType(t, *new(ClientOps), opt)
-	})
-
-	t.Run("test applying nil", func(t *testing.T) {
-		opts := DefaultClientOpts(false, true)
-		opts = append(opts, WithHTTPClient(nil))
-		opts = append(opts, WithLogger(&testLogger))
-
-		tc, err := NewClient(tester.GetNewRelicCtx(t, defaultNewRelicApp, defaultNewRelicTx), opts...)
-		require.NoError(t, err)
-		require.NotNil(t, tc)
-		defer CloseClient(context.Background(), t, tc)
-
-		assert.NotNil(t, tc.HTTPClient())
-	})
-
-	t.Run("test applying option", func(t *testing.T) {
-		customClient := &http.Client{}
-		opts := DefaultClientOpts(false, true)
-		opts = append(opts, WithHTTPClient(customClient))
-		opts = append(opts, WithLogger(&testLogger))
-
-		tc, err := NewClient(tester.GetNewRelicCtx(t, defaultNewRelicApp, defaultNewRelicTx), opts...)
-		require.NoError(t, err)
-		require.NotNil(t, tc)
-		defer CloseClient(context.Background(), t, tc)
-
-		assert.Equal(t, customClient, tc.HTTPClient())
 	})
 }
 
@@ -712,7 +572,7 @@ func TestWithCustomCachestore(t *testing.T) {
 		opts = append(opts, WithCustomCachestore(nil))
 		opts = append(opts, WithLogger(&testLogger))
 
-		tc, err := NewClient(tester.GetNewRelicCtx(t, defaultNewRelicApp, defaultNewRelicTx), opts...)
+		tc, err := NewClient(context.Background(), opts...)
 		require.NoError(t, err)
 		require.NotNil(t, tc)
 		defer CloseClient(context.Background(), t, tc)
@@ -729,7 +589,7 @@ func TestWithCustomCachestore(t *testing.T) {
 		opts = append(opts, WithLogger(&testLogger))
 
 		var tc ClientInterface
-		tc, err = NewClient(tester.GetNewRelicCtx(t, defaultNewRelicApp, defaultNewRelicTx), opts...)
+		tc, err = NewClient(context.Background(), opts...)
 		require.NoError(t, err)
 		require.NotNil(t, tc)
 		defer CloseClient(context.Background(), t, tc)
@@ -753,7 +613,7 @@ func TestWithCustomDatastore(t *testing.T) {
 		opts = append(opts, WithCustomDatastore(nil))
 		opts = append(opts, WithLogger(&testLogger))
 
-		tc, err := NewClient(tester.GetNewRelicCtx(t, defaultNewRelicApp, defaultNewRelicTx), opts...)
+		tc, err := NewClient(context.Background(), opts...)
 		require.NoError(t, err)
 		require.NotNil(t, tc)
 		defer CloseClient(context.Background(), t, tc)
@@ -770,7 +630,7 @@ func TestWithCustomDatastore(t *testing.T) {
 		opts = append(opts, WithLogger(&testLogger))
 
 		var tc ClientInterface
-		tc, err = NewClient(tester.GetNewRelicCtx(t, defaultNewRelicApp, defaultNewRelicTx), opts...)
+		tc, err = NewClient(context.Background(), opts...)
 		require.NoError(t, err)
 		require.NotNil(t, tc)
 		defer CloseClient(context.Background(), t, tc)
@@ -799,7 +659,7 @@ func TestWithAutoMigrate(t *testing.T) {
 		opts = append(opts, WithAutoMigrate())
 		opts = append(opts, WithLogger(&testLogger))
 
-		tc, err := NewClient(tester.GetNewRelicCtx(t, defaultNewRelicApp, defaultNewRelicTx), opts...)
+		tc, err := NewClient(context.Background(), opts...)
 		require.NoError(t, err)
 		require.NotNil(t, tc)
 		defer CloseClient(context.Background(), t, tc)
@@ -821,7 +681,7 @@ func TestWithAutoMigrate(t *testing.T) {
 		opts = append(opts, WithAutoMigrate(newPaymail(testPaymail, 0)))
 		opts = append(opts, WithLogger(&testLogger))
 
-		tc, err := NewClient(tester.GetNewRelicCtx(t, defaultNewRelicApp, defaultNewRelicTx), opts...)
+		tc, err := NewClient(context.Background(), opts...)
 		require.NoError(t, err)
 		require.NotNil(t, tc)
 		defer CloseClient(context.Background(), t, tc)
@@ -854,7 +714,7 @@ func TestWithMigrationDisabled(t *testing.T) {
 		opts := DefaultClientOpts(false, true)
 		opts = append(opts, WithLogger(&testLogger))
 
-		tc, err := NewClient(tester.GetNewRelicCtx(t, defaultNewRelicApp, defaultNewRelicTx), opts...)
+		tc, err := NewClient(context.Background(), opts...)
 		require.NoError(t, err)
 		require.NotNil(t, tc)
 		defer CloseClient(context.Background(), t, tc)
@@ -867,7 +727,7 @@ func TestWithMigrationDisabled(t *testing.T) {
 		opts = append(opts, WithMigrationDisabled())
 		opts = append(opts, WithLogger(&testLogger))
 
-		tc, err := NewClient(tester.GetNewRelicCtx(t, defaultNewRelicApp, defaultNewRelicTx), opts...)
+		tc, err := NewClient(context.Background(), opts...)
 		require.NoError(t, err)
 		require.NotNil(t, tc)
 		defer CloseClient(context.Background(), t, tc)

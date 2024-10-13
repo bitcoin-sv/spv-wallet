@@ -56,19 +56,12 @@ db:
     max_open_connections: 0
     shared: true
     table_prefix: ""
-# enable debug mode
-debug: true
 # enable endpoints that provides profiling information
 debug_profiling: true
 # enable (ITC) incoming transaction checking
 disable_itc: true
 # url to import block headers
 import_block_headers: ""
-new_relic:
-  # used for relic HostDisplayName
-  domain_name: domain.com
-  enabled: false
-  license_key: BOGUS-LICENSE-KEY-1234567890987654321234
 arc:
   url: https://arc.taal.com
   token: mainnet_06770f425eb00298839a24a49cbdc02c
@@ -126,3 +119,8 @@ task_manager:
 # Prometheus metrics configuration
 metrics:
   enabled: false
+logging:
+  # log level: trace, debug, info, warn, error
+  level: info
+  # log format: json, console
+  format: console

@@ -2,6 +2,7 @@
 package config
 
 import (
+	"fmt"
 	"time"
 
 	"github.com/bitcoin-sv/spv-wallet/engine/cluster"
@@ -10,23 +11,24 @@ import (
 	"github.com/mrz1836/go-cachestore"
 )
 
+const (
+	applicationName = "SPV Wallet"
+	envPrefix       = "SPVWALLET"
+)
+
 // Config constants used for spv-wallet
 const (
-	ApplicationName         = "SPVWallet"
-	APIVersion              = "v1"
-	DefaultNewRelicShutdown = 10 * time.Second
-	HealthRequestPath       = "health"
-	Version                 = "v0.12.0"
-	ConfigFilePathKey       = "config_file"
-	DefaultConfigFilePath   = "config.yaml"
-	EnvPrefix               = "SPVWALLET"
-	BroadcastCallbackRoute  = "/transaction/broadcast/callback"
+	APIVersion             = "v1"
+	HealthRequestPath      = "health"
+	ConfigFilePathKey      = "config_file"
+	DefaultConfigFilePath  = "config.yaml"
+	BroadcastCallbackRoute = "/transaction/broadcast/callback"
 )
 
 // AppConfig is the configuration values and associated env vars
 type AppConfig struct {
-	// NewRelic is New Relic related settings.
-	NewRelic *NewRelicConfig `json:"new_relic" mapstructure:"new_relic"`
+	// Version is the version of the application.
+	Version string `json:"version" mapstructure:"version"`
 	// TaskManager is a configuration for Task Manager in SPV Wallet.
 	TaskManager *TaskManagerConfig `json:"task_manager" mapstructure:"task_manager"`
 	// Authentication is the configuration for keys authentication in SPV Wallet.
@@ -53,8 +55,6 @@ type AppConfig struct {
 	BHS *BHSConfig `json:"block_headers_service" mapstructure:"block_headers_service"`
 	// ImportBlockHeaders is a URL from where the headers can be downloaded.
 	ImportBlockHeaders string `json:"import_block_headers" mapstructure:"import_block_headers"`
-	// Debug is a flag for enabling additional information from SPV Wallet.
-	Debug bool `json:"debug" mapstructure:"debug"`
 	// DebugProfiling is a flag for enabling additinal debug profiling.
 	DebugProfiling bool `json:"debug_profiling" mapstructure:"debug_profiling"`
 	// DisableITC is a flag for disabling Incoming Transaction Checking.
@@ -139,16 +139,6 @@ type DatastoreConfig struct {
 	Engine datastore.Engine `json:"engine" mapstructure:"engine"`
 	// Debug is a flag that decides whether additional output (such as sql statements) should be produced from datastore.
 	Debug bool `json:"debug" mapstructure:"debug"`
-}
-
-// NewRelicConfig is the configuration for New Relic
-type NewRelicConfig struct {
-	// DomainName is used for hostname display.
-	DomainName string `json:"domain_name" mapstructure:"domain_name"`
-	// LicenseKey is the New Relic license key.
-	LicenseKey string `json:"license_key" mapstructure:"license_key"`
-	// Enabled is the flag that enables New Relic service.
-	Enabled bool `json:"enabled" mapstructure:"enabled"`
 }
 
 // ARCConfig consists of blockchain nodes (Arc) configuration
@@ -254,6 +244,11 @@ type ExperimentalConfig struct {
 }
 
 // GetUserAgent will return the outgoing user agent
-func (a *AppConfig) GetUserAgent() string {
-	return "SPV Wallet " + Version
+func (c *AppConfig) GetUserAgent() string {
+	return fmt.Sprintf("%s version %s", applicationName, c.Version)
+}
+
+// IsBeefEnabled returns true if the Beef capability will be used for paymail transactions
+func (c *AppConfig) IsBeefEnabled() bool {
+	return c.Paymail != nil && c.Paymail.Beef.enabled()
 }

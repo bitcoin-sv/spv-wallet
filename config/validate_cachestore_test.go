@@ -1,43 +1,54 @@
-package config
+package config_test
 
 import (
 	"testing"
 
+	"github.com/bitcoin-sv/spv-wallet/config"
 	"github.com/mrz1836/go-cachestore"
 	"github.com/stretchr/testify/require"
 )
 
-// TestCachestoreConfig_Validate will test the method Validate()
-func TestCachestoreConfig_Validate(t *testing.T) {
+func TestValidateCacheStoreConfig(t *testing.T) {
 	t.Parallel()
 
-	t.Run("valid cachestore config", func(t *testing.T) {
-		c := CacheConfig{
-			Engine: cachestore.FreeCache,
-		}
-		require.NotNil(t, c)
+	invalidConfigTests := map[string]struct {
+		scenario func(cfg *config.AppConfig)
+	}{
+		"invalid empty cachestore": {
+			scenario: func(cfg *config.AppConfig) {
+				cfg.Cache.Engine = cachestore.Empty
+			},
+		},
+		"invalid empty string as cachestore engine": {
+			scenario: func(cfg *config.AppConfig) {
+				cfg.Cache.Engine = ""
+			},
+		},
+		"invalid when cache engine is redis and redis config not provided": {
+			scenario: func(cfg *config.AppConfig) {
+				cfg.Cache.Engine = cachestore.Redis
+				cfg.Cache.Redis = nil
+			},
+		},
+		"invalid when cache engine is redis and redis url is empty": {
+			scenario: func(cfg *config.AppConfig) {
+				cfg.Cache.Engine = cachestore.Redis
+				cfg.Cache.Redis.URL = ""
+			},
+		},
+	}
+	for name, test := range invalidConfigTests {
+		t.Run(name, func(t *testing.T) {
+			// given:
+			cfg := config.GetDefaultAppConfig()
 
-		err := c.Validate()
-		require.NoError(t, err)
-	})
+			test.scenario(cfg)
 
-	t.Run("empty cachestore", func(t *testing.T) {
-		c := CacheConfig{
-			Engine: cachestore.Empty,
-		}
-		require.NotNil(t, c)
+			// when:
+			err := cfg.Validate()
 
-		err := c.Validate()
-		require.Error(t, err)
-	})
-
-	t.Run("invalid cachestore engine", func(t *testing.T) {
-		c := CacheConfig{
-			Engine: "",
-		}
-		require.NotNil(t, c)
-
-		err := c.Validate()
-		require.Error(t, err)
-	})
+			// then:
+			require.Error(t, err)
+		})
+	}
 }

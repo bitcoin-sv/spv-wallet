@@ -122,7 +122,7 @@ func (ts *EmbeddedDBTestSuite) createXpubModels(tc *TestingClient, t *testing.T,
 }
 
 type xPubFieldsTest struct {
-	CurrentBalance uint64 `json:"current_balance" toml:"current_balance" yaml:"current_balance" bson:"current_balance"`
+	CurrentBalance uint64 `json:"current_balance" toml:"current_balance" yaml:"current_balance"`
 }
 
 // TestModels_GetModels will test the method GetModels()

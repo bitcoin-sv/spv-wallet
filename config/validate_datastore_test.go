@@ -1,49 +1,96 @@
-package config
+package config_test
 
 import (
 	"testing"
 
+	"github.com/bitcoin-sv/spv-wallet/config"
 	"github.com/bitcoin-sv/spv-wallet/engine/datastore"
 	"github.com/stretchr/testify/require"
 )
 
-// TestDatastoreConfig_Validate will test the method Validate()
-func TestDatastoreConfig_Validate(t *testing.T) {
+func TestValidateDataStoreConfig(t *testing.T) {
 	t.Parallel()
 
-	t.Run("valid datastore config", func(t *testing.T) {
-		d := DbConfig{
-			Datastore: &DatastoreConfig{Engine: datastore.SQLite},
-			SQL:       &datastore.SQLConfig{},
-			SQLite:    &datastore.SQLiteConfig{},
-		}
-		require.NotNil(t, d)
+	validConfigTests := map[string]struct {
+		scenario func(cfg *config.AppConfig)
+	}{
+		"valid default postgres config": {
+			scenario: func(cfg *config.AppConfig) {
+				cfg.Db.Datastore.Engine = datastore.PostgreSQL
+			},
+		},
+	}
+	for name, test := range validConfigTests {
+		t.Run(name, func(t *testing.T) {
+			// given:
+			cfg := config.GetDefaultAppConfig()
 
-		err := d.Validate()
-		require.NoError(t, err)
-	})
+			test.scenario(cfg)
 
-	t.Run("empty datastore", func(t *testing.T) {
-		d := DbConfig{
-			Datastore: &DatastoreConfig{Engine: datastore.Empty},
-			SQL:       &datastore.SQLConfig{},
-			SQLite:    &datastore.SQLiteConfig{},
-		}
-		require.NotNil(t, d)
+			// when:
+			err := cfg.Validate()
 
-		err := d.Validate()
-		require.Error(t, err)
-	})
+			// then:
+			require.NoError(t, err)
+		})
+	}
 
-	t.Run("invalid datastore engine", func(t *testing.T) {
-		d := DbConfig{
-			Datastore: &DatastoreConfig{Engine: ""},
-			SQL:       &datastore.SQLConfig{},
-			SQLite:    &datastore.SQLiteConfig{},
-		}
-		require.NotNil(t, d)
+	invalidConfigTests := map[string]struct {
+		scenario func(cfg *config.AppConfig)
+	}{
+		"invalid when sqlite engine and sqlite config not set": {
+			scenario: func(cfg *config.AppConfig) {
+				cfg.Db.Datastore.Engine = datastore.SQLite
+				cfg.Db.SQLite = nil
+			},
+		},
+		"invalid when empty datastore engine": {
+			scenario: func(cfg *config.AppConfig) {
+				cfg.Db.Datastore.Engine = datastore.Empty
+			},
+		},
+		"invalid when unknown datastore engine": {
+			scenario: func(cfg *config.AppConfig) {
+				cfg.Db.Datastore.Engine = ""
+			},
+		},
+		"invalid when sqlite engine and sql config not set": {
+			scenario: func(cfg *config.AppConfig) {
+				cfg.Db.Datastore.Engine = datastore.PostgreSQL
+				cfg.Db.SQL = nil
+			},
+		},
+		"invalid when sqlite engine and host is empty": {
+			scenario: func(cfg *config.AppConfig) {
+				cfg.Db.Datastore.Engine = datastore.PostgreSQL
+				cfg.Db.SQL.Host = ""
+			},
+		},
+		"invalid when sqlite engine and user is empty": {
+			scenario: func(cfg *config.AppConfig) {
+				cfg.Db.Datastore.Engine = datastore.PostgreSQL
+				cfg.Db.SQL.User = ""
+			},
+		},
+		"invalid when sqlite engine and database name is empty": {
+			scenario: func(cfg *config.AppConfig) {
+				cfg.Db.Datastore.Engine = datastore.PostgreSQL
+				cfg.Db.SQL.Name = ""
+			},
+		},
+	}
+	for name, test := range invalidConfigTests {
+		t.Run(name, func(t *testing.T) {
+			// given:
+			cfg := config.GetDefaultAppConfig()
 
-		err := d.Validate()
-		require.Error(t, err)
-	})
+			test.scenario(cfg)
+
+			// when:
+			err := cfg.Validate()
+
+			// then:
+			require.Error(t, err)
+		})
+	}
 }

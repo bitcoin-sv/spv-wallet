@@ -44,10 +44,6 @@ func (tm *taskManagerMockBase) IsDebug() bool {
 	return false
 }
 
-func (tm *taskManagerMockBase) IsNewRelicEnabled() bool {
-	return false
-}
-
 func (tm *taskManagerMockBase) CronJobsInit(taskmanager.CronJobs) error {
 	return nil
 }

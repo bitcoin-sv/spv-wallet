@@ -1,10 +1,7 @@
 package cluster
 
 import (
-	"context"
-
 	"github.com/go-redis/redis/v8"
-	"github.com/newrelic/go-agent/v3/newrelic"
 )
 
 const clientOptsPrefix = "bsv_"
@@ -22,24 +19,6 @@ func defaultClientOptions() *clientOptions {
 		debug:       false,
 		coordinator: CoordinatorMemory,
 		prefix:      clientOptsPrefix,
-	}
-}
-
-// getTxnCtx will check for an existing transaction
-func (c *clientOptions) getTxnCtx(ctx context.Context) context.Context {
-	if c.newRelicEnabled {
-		txn := newrelic.FromContext(ctx)
-		if txn != nil {
-			ctx = newrelic.NewContext(ctx, txn)
-		}
-	}
-	return ctx
-}
-
-// WithNewRelic will enable the NewRelic wrapper
-func WithNewRelic() ClientOps {
-	return func(c *clientOptions) {
-		c.newRelicEnabled = true
 	}
 }
 

@@ -2,7 +2,6 @@ package engine
 
 import (
 	"database/sql"
-	"net/http"
 	"net/url"
 	"strings"
 	"time"
@@ -10,19 +9,19 @@ import (
 	"github.com/bitcoin-sv/go-broadcast-client/broadcast"
 	"github.com/bitcoin-sv/go-paymail"
 	"github.com/bitcoin-sv/go-paymail/server"
+	"github.com/bitcoin-sv/spv-wallet/engine/chain/models"
 	"github.com/bitcoin-sv/spv-wallet/engine/chainstate"
 	"github.com/bitcoin-sv/spv-wallet/engine/cluster"
 	"github.com/bitcoin-sv/spv-wallet/engine/datastore"
 	"github.com/bitcoin-sv/spv-wallet/engine/logging"
 	"github.com/bitcoin-sv/spv-wallet/engine/metrics"
-	// "github.com/bitcoin-sv/spv-wallet/engine/notifications"
 	"github.com/bitcoin-sv/spv-wallet/engine/taskmanager"
 	"github.com/bitcoin-sv/spv-wallet/engine/utils"
 	"github.com/coocood/freecache"
 	"github.com/go-redis/redis/v8"
+	"github.com/go-resty/resty/v2"
 	"github.com/mrz1836/go-cache"
 	"github.com/mrz1836/go-cachestore"
-	"github.com/newrelic/go-agent/v3/newrelic"
 	"github.com/rs/zerolog"
 	"github.com/vmihailenco/taskq/v3"
 )
@@ -70,9 +69,7 @@ func defaultClientOptions() *clientOptions {
 		},
 
 		// Default http client
-		httpClient: &http.Client{
-			Timeout: defaultHTTPTimeout,
-		},
+		httpClient: resty.New(),
 
 		// Blank model options (use the Base models)
 		models: &modelOptions{
@@ -81,9 +78,6 @@ func defaultClientOptions() *clientOptions {
 			migrateModelNames: nil,
 			migrateModels:     nil,
 		},
-
-		// Blank NewRelic config
-		newRelic: &newRelicOptions{},
 
 		// Blank Paymail config
 		paymail: &paymailOptions{
@@ -176,29 +170,6 @@ func WithUserAgent(userAgent string) ClientOps {
 	}
 }
 
-// WithNewRelic will set the NewRelic application client
-func WithNewRelic(app *newrelic.Application) ClientOps {
-	return func(c *clientOptions) {
-		// Disregard if the app is nil
-		if app == nil {
-			return
-		}
-
-		// Set the app
-		c.newRelic.app = app
-
-		// Enable New relic on other services
-		c.cacheStore.options = append(c.cacheStore.options, cachestore.WithNewRelic())
-		c.chainstate.options = append(c.chainstate.options, chainstate.WithNewRelic())
-		c.dataStore.options = append(c.dataStore.options, datastore.WithNewRelic())
-		c.taskManager.options = append(c.taskManager.options, taskmanager.WithNewRelic())
-		// c.notifications.options = append(c.notifications.options, notifications.WithNewRelic())
-
-		// Enable the service
-		c.newRelic.enabled = true
-	}
-}
-
 // WithDebugging will set debugging in any applicable configuration
 func WithDebugging() ClientOps {
 	return func(c *clientOptions) {
@@ -239,7 +210,7 @@ func WithIUCDisabled() ClientOps {
 }
 
 // WithHTTPClient will set the custom http interface
-func WithHTTPClient(httpClient HTTPInterface) ClientOps {
+func WithHTTPClient(httpClient *resty.Client) ClientOps {
 	return func(c *clientOptions) {
 		if httpClient != nil {
 			c.httpClient = httpClient
@@ -472,7 +443,6 @@ func WithPaymailBeefSupport(blockHeadersServiceURL, blockHeadersServiceAuthToken
 		if err != nil {
 			panic(err)
 		}
-		c.chainstate.options = append(c.chainstate.options, chainstate.WithConnectionToBlockHeadersService(blockHeadersServiceURL, blockHeadersServiceAuthToken))
 		c.paymail.serverConfig.options = append(c.paymail.serverConfig.options, server.WithBeefCapabilities())
 	}
 }
@@ -644,10 +614,20 @@ func WithCallback(callbackURL string, callbackToken string) ClientOps {
 // WithARC set ARC url params
 func WithARC(url, token, deploymentID string) ClientOps {
 	return func(c *clientOptions) {
-		c.arcConfig = arcConfig{
+		c.arcConfig = chainmodels.ARCConfig{
 			URL:          url,
 			Token:        token,
 			DeploymentID: deploymentID,
+		}
+	}
+}
+
+// WithBHS set BHS url params
+func WithBHS(url, token string) ClientOps {
+	return func(c *clientOptions) {
+		c.bhsConfig = chainmodels.BHSConfig{
+			URL:       url,
+			AuthToken: token,
 		}
 	}
 }

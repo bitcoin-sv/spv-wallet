@@ -8,13 +8,6 @@ import (
 // Options allow functional options to be supplied
 type Options func(c *options)
 
-// WithNewRelic will enable the NewRelic wrapper
-func WithNewRelic() Options {
-	return func(c *options) {
-		c.newRelicEnabled = true
-	}
-}
-
 // WithTaskqConfig will set the taskq custom config
 func WithTaskqConfig(config *taskq.QueueOptions) Options {
 	return func(c *options) {

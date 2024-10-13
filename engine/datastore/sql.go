@@ -15,12 +15,6 @@ import (
 	"gorm.io/plugin/dbresolver"
 )
 
-/*
-// Load the NewRelic capable drivers
-// _ "github.com/newrelic/go-agent/v3/integrations/nrpgx"
-// _ "github.com/newrelic/go-agent/v3/integrations/nrsqlite3"
-*/
-
 // SQL related default settings
 // todo: make this configurable for the end-user?
 const (

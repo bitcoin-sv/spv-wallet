@@ -8,5 +8,6 @@ import (
 
 // Logger returns a logger that can be used as a dependency in tests.
 func Logger(t testing.TB) zerolog.Logger {
-	return zerolog.New(zerolog.NewConsoleWriter(zerolog.ConsoleTestWriter(t)))
+	logger := zerolog.New(zerolog.NewConsoleWriter(zerolog.ConsoleTestWriter(t)))
+	return logger.Level(zerolog.DebugLevel)
 }

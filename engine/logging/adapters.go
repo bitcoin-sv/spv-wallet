@@ -48,19 +48,19 @@ func (a *GormLoggerAdapter) Trace(_ context.Context, begin time.Time, fc func() 
 	}
 	elapsed := time.Since(begin)
 	switch {
-	case err != nil && a.logLevel >= logger.Error && (!strings.Contains(err.Error(), "record not found")):
+	case err != nil && a.Logger.GetLevel() <= zerolog.ErrorLevel && (!strings.Contains(err.Error(), "record not found")):
 		sql, rows := fc()
 		event := prepareTraceEvent(a.Logger.Error(), elapsed, rows, sql)
 		event.Str("error", err.Error()).
 			Msg("warning executing query")
-	case elapsed > logger.SlowQueryThreshold && a.logLevel >= logger.Warn:
+	case elapsed > logger.SlowQueryThreshold && a.Logger.GetLevel() <= zerolog.WarnLevel:
 		sql, rows := fc()
 		event := prepareTraceEvent(a.Logger.Warn(), elapsed, rows, sql)
 		event.Str("slow_log", fmt.Sprintf("SLOW SQL >= %v", logger.SlowQueryThreshold)).
 			Msg("warning executing query")
-	case a.logLevel == logger.Info:
+	case a.Logger.GetLevel() == zerolog.TraceLevel:
 		sql, rows := fc()
-		event := prepareTraceEvent(a.Logger.Info(), elapsed, rows, sql)
+		event := prepareTraceEvent(a.Logger.Trace(), elapsed, rows, sql)
 		event.Msg("executing query")
 	}
 }
@@ -115,9 +115,7 @@ func CreateGormLoggerAdapter(zLog *zerolog.Logger, serviceName string) *GormLogg
 		l = logger.Error
 	} else if level == zerolog.WarnLevel {
 		l = logger.Warn
-	} else if level == zerolog.InfoLevel {
-		l = logger.Info
-	} else if level == zerolog.DebugLevel {
+	} else if level <= zerolog.InfoLevel {
 		l = logger.Info
 	} else {
 		l = logger.Silent

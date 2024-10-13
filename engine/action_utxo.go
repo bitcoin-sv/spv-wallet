@@ -12,8 +12,6 @@ import (
 func (c *Client) GetUtxos(ctx context.Context, metadataConditions *Metadata,
 	conditions map[string]interface{}, queryParams *datastore.QueryParams, opts ...ModelOps,
 ) ([]*Utxo, error) {
-	// Check for existing NewRelic transaction
-	ctx = c.GetOrStartTxn(ctx, "get_utxos")
 
 	// Get the utxos
 	utxos, err := getUtxos(
@@ -34,8 +32,6 @@ func (c *Client) GetUtxos(ctx context.Context, metadataConditions *Metadata,
 func (c *Client) GetUtxosCount(ctx context.Context, metadataConditions *Metadata,
 	conditions map[string]interface{}, opts ...ModelOps,
 ) (int64, error) {
-	// Check for existing NewRelic transaction
-	ctx = c.GetOrStartTxn(ctx, "get_utxos_count")
 
 	// Get the utxos count
 	count, err := getUtxosCount(
@@ -53,8 +49,6 @@ func (c *Client) GetUtxosCount(ctx context.Context, metadataConditions *Metadata
 func (c *Client) GetUtxosByXpubID(ctx context.Context, xPubID string, metadata *Metadata, conditions map[string]interface{},
 	queryParams *datastore.QueryParams,
 ) ([]*Utxo, error) {
-	// Check for existing NewRelic transaction
-	ctx = c.GetOrStartTxn(ctx, "get_utxos")
 
 	// Get the utxos
 	utxos, err := getUtxosByXpubID(
@@ -79,8 +73,6 @@ func (c *Client) GetUtxosByXpubID(ctx context.Context, xPubID string, metadata *
 func (c *Client) GetUtxosByXpubIDCount(ctx context.Context, xPubID string, metadata *Metadata,
 	conditions map[string]interface{},
 ) (int64, error) {
-	// Check for existing NewRelic transaction
-	ctx = c.GetOrStartTxn(ctx, "get_utxos_count")
 
 	// Get the utxos count
 	count, err := getUtxosByXpubIDCount(
@@ -99,8 +91,6 @@ func (c *Client) GetUtxosByXpubIDCount(ctx context.Context, xPubID string, metad
 
 // GetUtxo will get a single utxo based on an xPub, the tx ID and the outputIndex
 func (c *Client) GetUtxo(ctx context.Context, xPubKey, txID string, outputIndex uint32) (*Utxo, error) {
-	// Check for existing NewRelic transaction
-	ctx = c.GetOrStartTxn(ctx, "get_utxo")
 
 	// Get the utxos
 	utxo, err := getUtxo(
@@ -130,8 +120,6 @@ func (c *Client) GetUtxo(ctx context.Context, xPubKey, txID string, outputIndex 
 
 // GetUtxoByTransactionID will get a single utxo based on the tx ID and the outputIndex
 func (c *Client) GetUtxoByTransactionID(ctx context.Context, txID string, outputIndex uint32) (*Utxo, error) {
-	// Check for existing NewRelic transaction
-	ctx = c.GetOrStartTxn(ctx, "get_utxo_by_transaction_id")
 
 	// Get the utxo
 	utxo, err := getUtxo(
@@ -156,9 +144,6 @@ func (c *Client) GetUtxoByTransactionID(ctx context.Context, txID string, output
 
 // UnReserveUtxos remove the reservation on the utxos for the given draft ID
 func (c *Client) UnReserveUtxos(ctx context.Context, xPubID, draftID string) error {
-	// Check for existing NewRelic transaction
-	ctx = c.GetOrStartTxn(ctx, "unreserve_utxos_by_draft_id")
-
 	return unReserveUtxos(ctx, xPubID, draftID, c.DefaultModelOptions()...)
 }
 

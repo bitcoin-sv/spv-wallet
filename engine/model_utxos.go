@@ -14,8 +14,8 @@ import (
 
 // UtxoPointer is the actual pointer (index) for the UTXO
 type UtxoPointer struct {
-	TransactionID string `json:"transaction_id" toml:"transaction_id" yaml:"transaction_id" gorm:"<-:create;type:char(64);index;comment:This is the id of the related transaction" bson:"transaction_id"`
-	OutputIndex   uint32 `json:"output_index" toml:"output_index" yaml:"output_index" gorm:"<-:create;type:uint;comment:This is the index of the output in the transaction" bson:"output_index"`
+	TransactionID string `json:"transaction_id" toml:"transaction_id" yaml:"transaction_id" gorm:"<-:create;type:char(64);index;comment:This is the id of the related transaction"`
+	OutputIndex   uint32 `json:"output_index" toml:"output_index" yaml:"output_index" gorm:"<-:create;type:uint;comment:This is the index of the output in the transaction"`
 }
 
 // Utxo is an object representing a BitCoin unspent transaction
@@ -23,24 +23,24 @@ type UtxoPointer struct {
 // Gorm related models & indexes: https://gorm.io/docs/models.html - https://gorm.io/docs/indexes.html
 type Utxo struct {
 	// Base model
-	Model `bson:",inline"`
+	Model
 
 	// Standard utxo model base fields
-	UtxoPointer `bson:",inline"`
+	UtxoPointer
 
 	// Model specific fields
-	ID           string                 `json:"id" toml:"id" yaml:"id" gorm:"<-:create;type:char(64);primaryKey;comment:This is the sha256 hash of the (<txid>|vout)" bson:"_id"`
-	XpubID       string                 `json:"xpub_id" toml:"xpub_id" yaml:"xpub_id" gorm:"<-:create;type:char(64);index;comment:This is the related xPub" bson:"xpub_id"`
-	Satoshis     uint64                 `json:"satoshis" toml:"satoshis" yaml:"satoshis" gorm:"<-:create;type:uint;comment:This is the amount of satoshis in the output" bson:"satoshis"`
-	ScriptPubKey string                 `json:"script_pub_key" toml:"script_pub_key" yaml:"script_pub_key" gorm:"<-:create;type:text;comment:This is the script pub key" bson:"script_pub_key"`
-	Type         string                 `json:"type" toml:"type" yaml:"type" gorm:"<-:create;type:varchar(32);comment:Type of output" bson:"type"`
-	DraftID      customTypes.NullString `json:"draft_id" toml:"draft_id" yaml:"draft_id" gorm:"<-;type:varchar(64);index;comment:Related draft id for reservations" bson:"draft_id,omitempty"`
-	ReservedAt   customTypes.NullTime   `json:"reserved_at" toml:"reserved_at" yaml:"reserved_at" gorm:"<-;comment:When it was reserved" bson:"reserved_at,omitempty"`
-	SpendingTxID customTypes.NullString `json:"spending_tx_id,omitempty" toml:"spending_tx_id" yaml:"spending_tx_id" gorm:"<-;type:char(64);index;comment:This is tx ID of the spend" bson:"spending_tx_id,omitempty"`
+	ID           string                 `json:"id" toml:"id" yaml:"id" gorm:"<-:create;type:char(64);primaryKey;comment:This is the sha256 hash of the (<txid>|vout)"`
+	XpubID       string                 `json:"xpub_id" toml:"xpub_id" yaml:"xpub_id" gorm:"<-:create;type:char(64);index;comment:This is the related xPub"`
+	Satoshis     uint64                 `json:"satoshis" toml:"satoshis" yaml:"satoshis" gorm:"<-:create;type:uint;comment:This is the amount of satoshis in the output"`
+	ScriptPubKey string                 `json:"script_pub_key" toml:"script_pub_key" yaml:"script_pub_key" gorm:"<-:create;type:text;comment:This is the script pub key"`
+	Type         string                 `json:"type" toml:"type" yaml:"type" gorm:"<-:create;type:varchar(32);comment:Type of output"`
+	DraftID      customTypes.NullString `json:"draft_id" toml:"draft_id" yaml:"draft_id" gorm:"<-;type:varchar(64);index;comment:Related draft id for reservations"`
+	ReservedAt   customTypes.NullTime   `json:"reserved_at" toml:"reserved_at" yaml:"reserved_at" gorm:"<-;comment:When it was reserved"`
+	SpendingTxID customTypes.NullString `json:"spending_tx_id,omitempty" toml:"spending_tx_id" yaml:"spending_tx_id" gorm:"<-;type:char(64);index;comment:This is tx ID of the spend"`
 
 	// Virtual field holding the original transaction the utxo originated from
 	// This is needed when signing a new transaction that spends the utxo
-	Transaction *Transaction `json:"transaction,omitempty" toml:"-" yaml:"-" gorm:"-" bson:"-"`
+	Transaction *Transaction `json:"transaction,omitempty" toml:"-" yaml:"-" gorm:"-"`
 }
 
 // newUtxo will start a new utxo model

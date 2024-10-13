@@ -9,7 +9,6 @@ import (
 	"github.com/bitcoin-sv/spv-wallet/engine/metrics"
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/bitcoin-sv/spv-wallet/engine/utils"
-	"github.com/newrelic/go-agent/v3/newrelic"
 	"github.com/rs/zerolog"
 )
 
@@ -22,27 +21,25 @@ type (
 
 	// clientOptions holds all the configuration for the client
 	clientOptions struct {
-		config          *syncConfig      // Configuration for broadcasting and other chain-state actions
-		debug           bool             // For extra logs and additional debug information
-		logger          *zerolog.Logger  // Logger interface
-		metrics         *metrics.Metrics // For collecting metrics (if enabled)
-		newRelicEnabled bool             // If NewRelic is enabled (parent application)
-		userAgent       string           // Custom user agent for outgoing HTTP Requests
+		config    *syncConfig      // Configuration for broadcasting and other chain-state actions
+		debug     bool             // For extra logs and additional debug information
+		logger    *zerolog.Logger  // Logger interface
+		metrics   *metrics.Metrics // For collecting metrics (if enabled)
+		userAgent string           // Custom user agent for outgoing HTTP Requests
 	}
 
 	// syncConfig holds all the configuration about the different sync processes
 	syncConfig struct {
-		callbackURL              string                             // Broadcast callback URL
-		callbackToken            string                             // Broadcast callback access token
-		excludedProviders        []string                           // List of provider names
-		httpClient               HTTPInterface                      // Custom HTTP client (for example WOC)
-		broadcastClientConfig    *broadcastConfig                   // Broadcast client configuration
-		network                  Network                            // Current network (mainnet, testnet, stn)
-		queryTimeout             time.Duration                      // Timeout for transaction query
-		broadcastClient          broadcast.Client                   // Broadcast client
-		blockHedersServiceClient *blockHeadersServiceClientProvider // Block Headers Service client
-		feeUnit                  *utils.FeeUnit                     // The lowest fees among all miners
-		feeQuotes                bool                               // If set, feeUnit will be updated with fee quotes from miner's
+		callbackURL           string           // Broadcast callback URL
+		callbackToken         string           // Broadcast callback access token
+		excludedProviders     []string         // List of provider names
+		httpClient            HTTPInterface    // Custom HTTP client (for example WOC)
+		broadcastClientConfig *broadcastConfig // Broadcast client configuration
+		network               Network          // Current network (mainnet, testnet, stn)
+		queryTimeout          time.Duration    // Timeout for transaction query
+		broadcastClient       broadcast.Client // Broadcast client
+		feeUnit               *utils.FeeUnit   // The lowest fees among all miners
+		feeQuotes             bool             // If set, feeUnit will be updated with fee quotes from miner's
 	}
 
 	broadcastConfig struct {
@@ -53,7 +50,6 @@ type (
 // NewClient creates a new client for all on-chain functionality
 //
 // If no options are given, it will use the defaultClientOptions()
-// ctx may contain a NewRelic txn (or one will be created)
 func NewClient(ctx context.Context, opts ...ClientOps) (ClientInterface, error) {
 	// Create a new client with defaults
 	client := &Client{options: defaultClientOptions()}
@@ -62,9 +58,6 @@ func NewClient(ctx context.Context, opts ...ClientOps) (ClientInterface, error) 
 	for _, opt := range opts {
 		opt(client.options)
 	}
-
-	// Use NewRelic if it's enabled (use existing txn if found on ctx)
-	ctx = client.options.getTxnCtx(ctx)
 
 	// Set logger if not set
 	if client.options.logger == nil {
@@ -83,13 +76,6 @@ func NewClient(ctx context.Context, opts ...ClientOps) (ClientInterface, error) 
 	return client, nil
 }
 
-// Close will close the client and any open connections
-func (c *Client) Close(ctx context.Context) {
-	if txn := newrelic.FromContext(ctx); txn != nil {
-		defer txn.StartSegment("close_chainstate").End()
-	}
-}
-
 // Debug will set the debug flag
 func (c *Client) Debug(on bool) {
 	c.options.debug = on
@@ -103,11 +89,6 @@ func (c *Client) DebugLog(text string) {
 // IsDebug will return if debugging is enabled
 func (c *Client) IsDebug() bool {
 	return c.options.debug
-}
-
-// IsNewRelicEnabled will return if new relic is enabled
-func (c *Client) IsNewRelicEnabled() bool {
-	return c.options.newRelicEnabled
 }
 
 // HTTPClient will return the HTTP client

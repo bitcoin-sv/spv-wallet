@@ -13,8 +13,6 @@ import (
 //
 // opts are options and can include "metadata"
 func (c *Client) NewAccessKey(ctx context.Context, rawXpubKey string, opts ...ModelOps) (*AccessKey, error) {
-	// Check for existing NewRelic transaction
-	ctx = c.GetOrStartTxn(ctx, "new_access_key")
 
 	// Validate that the value is an xPub
 	_, err := utils.ValidateXPub(rawXpubKey)
@@ -49,8 +47,6 @@ func (c *Client) NewAccessKey(ctx context.Context, rawXpubKey string, opts ...Mo
 
 // GetAccessKey will get an existing access key from the Datastore
 func (c *Client) GetAccessKey(ctx context.Context, xPubID, id string) (*AccessKey, error) {
-	// Check for existing NewRelic transaction
-	ctx = c.GetOrStartTxn(ctx, "get_access_key")
 
 	// Get the access key
 	accessKey, err := getAccessKey(
@@ -76,8 +72,6 @@ func (c *Client) GetAccessKey(ctx context.Context, xPubID, id string) (*AccessKe
 func (c *Client) GetAccessKeys(ctx context.Context, metadataConditions *Metadata,
 	conditions map[string]interface{}, queryParams *datastore.QueryParams, opts ...ModelOps,
 ) ([]*AccessKey, error) {
-	// Check for existing NewRelic transaction
-	ctx = c.GetOrStartTxn(ctx, "get_access_keys")
 
 	// Get the access keys
 	accessKeys, err := getAccessKeys(
@@ -95,8 +89,6 @@ func (c *Client) GetAccessKeys(ctx context.Context, metadataConditions *Metadata
 func (c *Client) GetAccessKeysCount(ctx context.Context, metadataConditions *Metadata,
 	conditions map[string]interface{}, opts ...ModelOps,
 ) (int64, error) {
-	// Check for existing NewRelic transaction
-	ctx = c.GetOrStartTxn(ctx, "get_access_keys_count")
 
 	// Get the access keys count
 	count, err := getAccessKeysCount(
@@ -116,8 +108,6 @@ func (c *Client) GetAccessKeysCount(ctx context.Context, metadataConditions *Met
 func (c *Client) GetAccessKeysByXPubID(ctx context.Context, xPubID string, metadataConditions *Metadata,
 	conditions map[string]interface{}, queryParams *datastore.QueryParams, opts ...ModelOps,
 ) ([]*AccessKey, error) {
-	// Check for existing NewRelic transaction
-	ctx = c.GetOrStartTxn(ctx, "get_access_keys")
 
 	// Get the access key
 	accessKeys, err := getAccessKeysByXPubID(
@@ -140,8 +130,6 @@ func (c *Client) GetAccessKeysByXPubID(ctx context.Context, xPubID string, metad
 func (c *Client) GetAccessKeysByXPubIDCount(ctx context.Context, xPubID string, metadataConditions *Metadata,
 	conditions map[string]interface{}, opts ...ModelOps,
 ) (int64, error) {
-	// Check for existing NewRelic transaction
-	ctx = c.GetOrStartTxn(ctx, "get_access_keys")
 
 	// Get the access key
 	count, err := getAccessKeysByXPubIDCount(
@@ -163,8 +151,6 @@ func (c *Client) GetAccessKeysByXPubIDCount(ctx context.Context, xPubID string, 
 //
 // opts are options and can include "metadata"
 func (c *Client) RevokeAccessKey(ctx context.Context, rawXpubKey, id string, opts ...ModelOps) (*AccessKey, error) {
-	// Check for existing NewRelic transaction
-	ctx = c.GetOrStartTxn(ctx, "new_access_key")
 
 	// Validate that the value is an xPub
 	_, err := utils.ValidateXPub(rawXpubKey)

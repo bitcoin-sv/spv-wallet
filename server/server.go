@@ -9,6 +9,7 @@ import (
 
 	"github.com/bitcoin-sv/spv-wallet/actions"
 	"github.com/bitcoin-sv/spv-wallet/config"
+	"github.com/bitcoin-sv/spv-wallet/engine"
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/bitcoin-sv/spv-wallet/logging"
 	"github.com/bitcoin-sv/spv-wallet/metrics"
@@ -21,17 +22,19 @@ import (
 
 // Server is the configuration, services, and actual web server
 type Server struct {
-	AppConfig *config.AppConfig
-	Router    *gin.Engine
-	Services  *config.AppServices
-	WebServer *http.Server
+	AppConfig       *config.AppConfig
+	Router          *gin.Engine
+	SpvWalletEngine engine.ClientInterface
+	WebServer       *http.Server
+	Logger          zerolog.Logger
 }
 
 // NewServer will return a new server service
-func NewServer(appConfig *config.AppConfig, services *config.AppServices) *Server {
+func NewServer(appConfig *config.AppConfig, spvWalletEngine engine.ClientInterface, logger zerolog.Logger) *Server {
 	return &Server{
-		AppConfig: appConfig,
-		Services:  services,
+		AppConfig:       appConfig,
+		SpvWalletEngine: spvWalletEngine,
+		Logger:          logger,
 	}
 }
 
@@ -61,66 +64,51 @@ func (s *Server) Serve() {
 		},
 	}
 
-	// Turn off keep alive
-	// s.WebServer.SetKeepAlivesEnabled(false)
-
+	s.Logger.Debug().Msgf("starting %s server at port %d...", s.AppConfig.GetUserAgent(), s.AppConfig.Server.Port)
 	// Listen and serve
 	if err := s.WebServer.ListenAndServe(); err != nil {
-		s.Services.Logger.Debug().Msgf("shutting down %s server [%s] on port %d...", config.ApplicationName, err.Error(), s.AppConfig.Server.Port)
+		s.Logger.Info().Err(err).Msgf("shutting down %s server [%s] on port %d...", s.AppConfig.GetUserAgent(), err.Error(), s.AppConfig.Server.Port)
 	}
 }
 
 // Shutdown will stop the web server
 func (s *Server) Shutdown(ctx context.Context) error {
-	s.Services.CloseAll(ctx) // Should have been executed in main.go, but might panic and not run?
 	err := s.WebServer.Shutdown(ctx)
 	if err != nil {
 		err = spverrors.Wrapf(err, "error shutting down server")
-		return err
 	}
-	return nil
+	return err
 }
 
 // Handlers will return handlers
 func (s *Server) Handlers() *gin.Engine {
-	// Start a transaction for loading handlers
-	txn := s.Services.NewRelic.StartTransaction("load_handlers")
-	defer txn.End()
-
-	segment := txn.StartSegment("create_router")
-
-	httpLogger := s.Services.Logger.With().Str("service", "http-server").Logger()
+	httpLogger := s.Logger.With().Str("service", "http-server").Logger()
 	if httpLogger.GetLevel() > zerolog.DebugLevel {
 		gin.SetMode(gin.ReleaseMode)
 	}
 	logging.SetGinWriters(&httpLogger)
-	engine := gin.New()
-	engine.Use(logging.GinMiddleware(&httpLogger), gin.Recovery())
-	engine.Use(middleware.AppContextMiddleware(s.AppConfig, s.Services.SpvWalletEngine, s.Services.Logger))
-	engine.Use(middleware.CorsMiddleware())
+	ginEngine := gin.New()
+	ginEngine.Use(logging.GinMiddleware(httpLogger), gin.Recovery())
+	ginEngine.Use(middleware.AppContextMiddleware(s.AppConfig, s.SpvWalletEngine, s.Logger))
+	ginEngine.Use(middleware.CorsMiddleware())
 
-	metrics.SetupGin(engine)
+	metrics.SetupGin(ginEngine)
 
-	engine.NoRoute(metrics.NoRoute, NotFound)
-	engine.NoMethod(MethodNotAllowed)
+	ginEngine.NoRoute(metrics.NoRoute, NotFound)
+	ginEngine.NoMethod(MethodNotAllowed)
 
-	s.Router = engine
+	s.Router = ginEngine
 
-	segment.End()
-
-	// Start the segment
-	defer txn.StartSegment("register_handlers").End()
-
-	setupServerRoutes(s.AppConfig, s.Services, s.Router)
+	setupServerRoutes(s.AppConfig, s.SpvWalletEngine, s.Router)
 
 	return s.Router
 }
 
-func setupServerRoutes(appConfig *config.AppConfig, services *config.AppServices, ginEngine *gin.Engine) {
+func setupServerRoutes(appConfig *config.AppConfig, spvWalletEngine engine.ClientInterface, ginEngine *gin.Engine) {
 	handlersManager := handlers.NewManager(ginEngine, config.APIVersion)
 	actions.Register(appConfig, handlersManager)
 
-	services.SpvWalletEngine.GetPaymailConfig().RegisterRoutes(ginEngine)
+	spvWalletEngine.GetPaymailConfig().RegisterRoutes(ginEngine)
 
 	if appConfig.DebugProfiling {
 		pprof.Register(ginEngine, "debug/pprof")
