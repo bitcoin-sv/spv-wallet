@@ -307,7 +307,7 @@ func buildSDKTx(p2pTx *paymail.P2PTransaction) (*trx.Transaction, error) {
 		return nil, spverrors.Wrapf(err, "unable to create transaction from hex")
 	}
 
-	return tx, err
+	return tx, nil
 }
 
 func saveBEEFTxInputs(ctx context.Context, c ClientInterface, dBeef *beef.DecodedBEEF) {
