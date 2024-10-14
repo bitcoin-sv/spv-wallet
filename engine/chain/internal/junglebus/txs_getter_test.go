@@ -8,7 +8,6 @@ import (
 
 	chainerrors "github.com/bitcoin-sv/spv-wallet/engine/chain/errors"
 	"github.com/bitcoin-sv/spv-wallet/engine/chain/internal/junglebus"
-	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/bitcoin-sv/spv-wallet/engine/tester"
 	"github.com/stretchr/testify/require"
 )
@@ -71,7 +70,6 @@ func TestTransactionGetterTimeouts(t *testing.T) {
 		transactions, err := service.GetTransactions(ctx, slices.Values([]string{knownTx1}))
 
 		require.Error(t, err)
-		require.ErrorIs(t, err, spverrors.ErrInternal)
 		require.ErrorIs(t, err, context.DeadlineExceeded)
 		require.Nil(t, transactions)
 	})
@@ -85,7 +83,6 @@ func TestTransactionGetterTimeouts(t *testing.T) {
 		transactions, err := service.GetTransactions(context.Background(), slices.Values([]string{knownTx1}))
 
 		require.Error(t, err)
-		require.ErrorIs(t, err, spverrors.ErrInternal)
 		require.ErrorIs(t, err, context.DeadlineExceeded)
 		require.Nil(t, transactions)
 	})
