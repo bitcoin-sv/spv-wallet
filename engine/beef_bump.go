@@ -136,6 +136,9 @@ func getRequiredTransactions(ctx context.Context, txIDs []string, store Transact
 
 	if len(txs) != len(txIDs) {
 		missingTxIDs := getMissingTxs(txIDs, txs)
+		if len(missingTxIDs) == 0 {
+			return txs, nil
+		}
 		return nil, spverrors.Newf("required transactions (%v) not found in database", missingTxIDs)
 	}
 
