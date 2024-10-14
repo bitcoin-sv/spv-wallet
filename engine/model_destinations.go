@@ -274,6 +274,8 @@ func getDestinationWithCache(ctx context.Context, client ClientInterface,
 		return destination, nil
 	}
 
+	opts = append(opts, client.DefaultModelOptions()...)
+
 	// Get via ID, address or locking script
 	if len(id) > 0 {
 		destination, err = getDestinationByID(

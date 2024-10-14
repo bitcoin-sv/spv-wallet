@@ -142,8 +142,12 @@ func (p *PaymailDefaultServiceProvider) RecordTransaction(ctx context.Context,
 	metadata[ReferenceIDField] = p2pTx.Reference
 
 	// Record the transaction
-	btTx := buildSDKTx(p2pTx)
-	rts, err := getIncomingTxRecordStrategy(ctx, p.client, btTx)
+	sdkTx, err := buildSDKTx(p2pTx)
+	if err != nil {
+		return nil, err
+	}
+
+	rts, err := getIncomingTxRecordStrategy(ctx, p.client, sdkTx)
 	if err != nil {
 		return nil, err
 	}
@@ -287,24 +291,39 @@ func createLockingScript(ecPubKey *ec.PublicKey) (lockingScript string, err erro
 	return
 }
 
-func buildSDKTx(p2pTx *paymail.P2PTransaction) *trx.Transaction {
-	if p2pTx.DecodedBeef != nil {
-		res := p2pTx.DecodedBeef.GetLatestTx()
-		for _, input := range res.Inputs {
-			prevTxDt := find(p2pTx.DecodedBeef.Transactions, func(tx *beef.TxData) bool { return tx.Transaction.TxID() == input.SourceTXID })
+func buildSDKTx(p2pTx *paymail.P2PTransaction) (*trx.Transaction, error) {
+	//if p2pTx.DecodedBeef != nil {
+	//	res := p2pTx.DecodedBeef.GetLatestTx()
+	//	for _, input := range res.Inputs {
+	//		//prevTxDt := find(p2pTx.DecodedBeef.Transactions, func(tx *beef.TxData) bool { return tx.Transaction.TxID() == input.SourceTXID })
+	//		var prevTxDt *beef.TxData
+	//		for _, transactionData := range p2pTx.DecodedBeef.Transactions {
+	//			txID := transactionData.Transaction.TxID().String() // Get the current transaction's TxID
+	//			// Check if this TxID matches the input source TXID
+	//			if txID == input.SourceTXID.String() {
+	//				prevTxDt = transactionData
+	//				break
+	//			}
+	//
+	//			// Optional: Debugging log to check which TXIDs are being compared
+	//			fmt.Printf("Checking TxID: %s against SourceTXID: %s\n", txID, input.SourceTXID)
+	//		}
+	//
+	//		o := (*prevTxDt).Transaction.Outputs[input.SourceTxOutIndex]
+	//		input.SetSourceTxOutput(&trx.TransactionOutput{
+	//			Satoshis:      o.Satoshis,
+	//			LockingScript: o.LockingScript,
+	//		})
+	//	}
 
-			o := (*prevTxDt).Transaction.Outputs[input.SourceTxOutIndex]
-			input.SetSourceTxOutput(&trx.TransactionOutput{
-				Satoshis:      o.Satoshis,
-				LockingScript: o.LockingScript,
-			})
-		}
+	//	return res
+	//}
 
-		return res
+	if p2pTx.Beef != "" {
+		return trx.NewTransactionFromBEEFHex(p2pTx.Beef)
 	}
 
-	res, _ := trx.NewTransactionFromHex(p2pTx.Hex)
-	return res
+	return trx.NewTransactionFromHex(p2pTx.Hex)
 }
 
 func saveBEEFTxInputs(ctx context.Context, c ClientInterface, dBeef *beef.DecodedBEEF) {

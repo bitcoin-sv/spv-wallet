@@ -271,7 +271,6 @@ func initRevertTransactionData(t *testing.T, clientOpts ...ClientOps) (context.C
 	require.NoError(t, err)
 
 	var xPriv *compat.ExtendedKey
-	// xPriv, err = bip32.NewKeyFromString(testXPriv)
 	xPriv, err = compat.NewKeyFromString(testXPriv)
 	require.NoError(t, err)
 

@@ -26,7 +26,7 @@ func prepareSortStructures(dag []*trx.Transaction) (txByID map[string]*trx.Trans
 	incomingEdgesMap = make(map[string]int, dagLen)
 
 	for _, tx := range dag {
-		txByID[tx.TxID().String()] = tx // TODO: perf -> In bt, the TxID is calculated every time we try to get it, which means we hash the tx bytes twice each time. It's expensive operation - try to avoid calculation each time
+		txByID[tx.TxID().String()] = tx // TODO: perf -> In GO-SDK, the TxID is calculated every time we try to get it, which means we hash the tx bytes twice each time. It's expensive operation - try to avoid calculation each time
 		incomingEdgesMap[tx.TxID().String()] = 0
 	}
 
@@ -39,7 +39,7 @@ func prepareSortStructures(dag []*trx.Transaction) (txByID map[string]*trx.Trans
 func calculateIncomingEdges(inDegree map[string]int, txByID map[string]*trx.Transaction) {
 	for _, tx := range txByID {
 		for _, input := range tx.Inputs {
-			inputUtxoTxID := input.SourceTXID.String() // TODO: perf -> In bt, the TxID is calculated every time we try to get it, which means we hash the tx bytes twice each time. It's expensive operation - try to avoid calculation each time
+			inputUtxoTxID := input.SourceTXID.String() // TODO: perf -> In GO-SDK, the TxID is calculated every time we try to get it, which means we hash the tx bytes twice each time. It's expensive operation - try to avoid calculation each time
 			if _, ok := txByID[inputUtxoTxID]; ok {    // transaction can contains inputs we are not interested in
 				inDegree[inputUtxoTxID]++
 			}
@@ -61,7 +61,7 @@ func getTxWithZeroIncomingEdges(incomingEdgesMap map[string]int) []string {
 
 func removeTxFromIncomingEdges(tx *trx.Transaction, incomingEdgesMap map[string]int, zeroIncomingEdgeQueue []string) []string {
 	for _, input := range tx.Inputs {
-		neighborID := input.SourceTXID.String() // TODO: perf -> In bt, the TxID is calculated every time we try to get it, which means we hash the tx bytes twice each time. It's expensive operation - try to avoid calculation each time
+		neighborID := input.SourceTXID.String() // TODO: perf -> In GO-SDK, the TxID is calculated every time we try to get it, which means we hash the tx bytes twice each time. It's expensive operation - try to avoid calculation each time
 		incomingEdgesMap[neighborID]--
 
 		if incomingEdgesMap[neighborID] == 0 {

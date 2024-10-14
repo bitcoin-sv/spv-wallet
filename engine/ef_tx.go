@@ -8,18 +8,18 @@ import (
 
 // ToEfHex generates Extended Format hex of transaction
 func ToEfHex(ctx context.Context, tx *Transaction, store TransactionGetter) (efHex string, ok bool) {
-	btTx := tx.parsedTx
+	sdkTx := tx.parsedTx
 
-	if btTx == nil {
+	if sdkTx == nil {
 		var err error
-		btTx, err = trx.NewTransactionFromHex(tx.Hex)
+		sdkTx, err = trx.NewTransactionFromHex(tx.Hex)
 		if err != nil {
 			return "", false
 		}
 	}
 
 	needToHydrate := false
-	for _, input := range btTx.Inputs {
+	for _, input := range sdkTx.Inputs {
 		if input.SourceTXID == nil {
 			needToHydrate = true
 			break
@@ -27,12 +27,12 @@ func ToEfHex(ctx context.Context, tx *Transaction, store TransactionGetter) (efH
 	}
 
 	if needToHydrate {
-		if ok := hydrate(ctx, btTx, store); !ok {
+		if ok := hydrate(ctx, sdkTx, store); !ok {
 			return "", false
 		}
 	}
 
-	ef, err := btTx.EFHex()
+	ef, err := sdkTx.EFHex()
 	if err != nil {
 		return "", false
 	}
