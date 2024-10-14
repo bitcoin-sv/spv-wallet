@@ -176,6 +176,9 @@ var ErrGetCapabilities = models.SPVError{Message: "failed to get paymail capabil
 
 // ////////////////////////////////// TRANSACTION ERRORS
 
+// ErrParseTransactionFromHex is when error occurred during parsing transaction from hex
+var ErrParseTransactionFromHex = models.SPVError{Message: "error parsing transaction from hex", StatusCode: 500, Code: "error-transaction-parse-from-hex"}
+
 // ErrCouldNotFindTransaction is an error when a transaction could not be found
 var ErrCouldNotFindTransaction = models.SPVError{Message: "transaction not found", StatusCode: 404, Code: "error-transaction-not-found"}
 
@@ -369,6 +372,9 @@ var ErrRouteNotFound = models.SPVError{Message: "route not found", StatusCode: 4
 var ErrRouteMethodNotAllowed = models.SPVError{Message: "method not allowed", StatusCode: 405, Code: "error-route-method-not-allowed"}
 
 // ////////////////////////////////// BROADCAST ERRORS
+
+// ErrBroadcast is when broadcast error occurred
+var ErrBroadcast = models.SPVError{Message: "broadcast error", StatusCode: 500, Code: "error-broadcast"}
 
 // ErrBroadcastUnreachable is when broadcast server cannot be requested
 var ErrBroadcastUnreachable = models.SPVError{Message: "broadcast server cannot be requested", StatusCode: 404, Code: "error-broadcast-unreachable"}

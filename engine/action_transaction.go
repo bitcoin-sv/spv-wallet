@@ -107,7 +107,7 @@ func (c *Client) GetTransactionsByIDs(ctx context.Context, txIDs []string) ([]*T
 	// Create the conditions
 	conditions := generateTxIDFilterConditions(txIDs)
 
-	// Get the transactions by it's IDs
+	// Get the transactions by its IDs
 	transactions, err := getTransactions(
 		ctx, nil, conditions, nil,
 		c.DefaultModelOptions()...,

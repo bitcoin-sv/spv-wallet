@@ -286,6 +286,10 @@ func (c *AppConfig) addARCOpts(options []engine.ClientOps) ([]engine.ClientOps, 
 		}
 	}
 
+	if c.ExperimentalFeatures != nil && c.ExperimentalFeatures.UseJunglebus {
+		arcCfg.UseJunglebus = true
+	}
+
 	return append(options, engine.WithARC(arcCfg)), nil
 }
 

@@ -241,6 +241,8 @@ type ExperimentalConfig struct {
 	PikeContactsEnabled bool `json:"pike_contacts_enabled" mapstructure:"pike_contacts_enabled"`
 	// PikePaymentEnabled is a flag for enabling Pike payment capability.
 	PikePaymentEnabled bool `json:"pike_payment_enabled" mapstructure:"pike_payment_enabled"`
+	// Use junglebus external service to fetch missing source transactions for inputs
+	UseJunglebus bool `json:"use_junglebus" mapstructure:"use_junglebus"`
 }
 
 // GetUserAgent will return the outgoing user agent
