@@ -7,6 +7,7 @@ import (
 	"net/http"
 
 	sdk "github.com/bitcoin-sv/go-sdk/transaction"
+	"github.com/bitcoin-sv/spv-wallet/engine/chain/errors"
 	"github.com/bitcoin-sv/spv-wallet/engine/chain/internal/ef"
 	"github.com/bitcoin-sv/spv-wallet/engine/chain/models"
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
@@ -48,19 +49,19 @@ func (s *Service) Broadcast(ctx context.Context, tx *sdk.Transaction) (*chainmod
 	switch response.StatusCode() {
 	case http.StatusOK:
 		if result.TXStatus.IsProblematic() {
-			return nil, spverrors.ErrARCProblematicStatus.Wrap(spverrors.Newf("ARC Problematic tx status: %s", result.TXStatus))
+			return nil, chainerrors.ErrARCProblematicStatus.Wrap(spverrors.Newf("ARC Problematic tx status: %s", result.TXStatus))
 		}
 		return result, nil
 	case http.StatusUnauthorized, http.StatusForbidden, http.StatusNotFound:
-		return nil, s.wrapARCError(spverrors.ErrARCUnauthorized, arcErr)
+		return nil, s.wrapARCError(chainerrors.ErrARCUnauthorized, arcErr)
 	case http.StatusConflict:
-		return nil, s.wrapARCError(spverrors.ErrARCGenericError, arcErr)
+		return nil, s.wrapARCError(chainerrors.ErrARCGenericError, arcErr)
 	case StatusNotExtendedFormat:
-		return nil, s.wrapARCError(spverrors.ErrARCNotExtendedFormat, arcErr)
+		return nil, s.wrapARCError(chainerrors.ErrARCNotExtendedFormat, arcErr)
 	case StatusFeeTooLow, StatusCumulativeFeeValidationFailed:
-		return nil, s.wrapARCError(spverrors.ErrARCWrongFee, arcErr)
+		return nil, s.wrapARCError(chainerrors.ErrARCWrongFee, arcErr)
 	default:
-		return nil, s.wrapARCError(spverrors.ErrARCUnprocessable, arcErr)
+		return nil, s.wrapARCError(chainerrors.ErrARCUnprocessable, arcErr)
 	}
 }
 
@@ -83,7 +84,7 @@ func (s *Service) prepareTxHex(ctx context.Context, tx *sdk.Transaction) (string
 	converter := ef.NewConverter(s.arcCfg.TxsGetter)
 	efHex, err := converter.Convert(ctx, tx)
 	if errors.Is(err, context.DeadlineExceeded) || errors.Is(err, context.Canceled) {
-		return "", spverrors.ErrEFConvertInterrupted.Wrap(err)
+		return "", spverrors.ErrCtxInterrupted.Wrap(err)
 	}
 	if err != nil {
 		// Log level is set to Info because it can happen in standard flow when source transaction is not from our wallet (and Junglebus is disabled)

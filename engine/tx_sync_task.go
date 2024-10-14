@@ -5,7 +5,7 @@ import (
 	"errors"
 	"time"
 
-	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
+	"github.com/bitcoin-sv/spv-wallet/engine/chain/errors"
 	"github.com/libsv/go-bc"
 	"github.com/rs/zerolog"
 )
@@ -92,7 +92,7 @@ func processSyncTransactions(ctx context.Context, client *Client) {
 		txInfo, err := client.Chain().QueryTransaction(ctx, txID)
 
 		if err != nil {
-			if errors.Is(err, spverrors.ErrARCUnreachable) {
+			if errors.Is(err, chainerrors.ErrARCUnreachable) {
 				// checking subsequent transactions is pointless if the broadcast server (ARC) is unreachable, will try again in the next cycle
 				logger.Warn().Msgf("%s", err.Error())
 				return
@@ -141,7 +141,7 @@ func _handleUnknownTX(ctx context.Context, tx *Transaction, logger *zerolog.Logg
 		return TxStatusBroadcasted
 	}
 
-	if errors.Is(err, spverrors.ErrBroadcastRejectedTransaction) {
+	if errors.Is(err, chainerrors.ErrARCProblematicStatus) {
 		return TxStatusProblematic
 	}
 

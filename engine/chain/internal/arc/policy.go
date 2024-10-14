@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"net/http"
 
+	"github.com/bitcoin-sv/spv-wallet/engine/chain/errors"
 	"github.com/bitcoin-sv/spv-wallet/engine/chain/models"
-	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 )
 
 // GetPolicy requests ARC server for the policy
@@ -27,10 +27,10 @@ func (s *Service) GetPolicy(ctx context.Context) (*chainmodels.Policy, error) {
 	case http.StatusOK:
 		return result, nil
 	case http.StatusUnauthorized, http.StatusForbidden:
-		return nil, s.wrapARCError(spverrors.ErrARCUnauthorized, arcErr)
+		return nil, s.wrapARCError(chainerrors.ErrARCUnauthorized, arcErr)
 	case http.StatusNotFound:
-		return nil, spverrors.ErrARCUnreachable
+		return nil, chainerrors.ErrARCUnreachable
 	default:
-		return nil, s.wrapARCError(spverrors.ErrARCUnsupportedStatusCode, arcErr)
+		return nil, s.wrapARCError(chainerrors.ErrARCUnsupportedStatusCode, arcErr)
 	}
 }

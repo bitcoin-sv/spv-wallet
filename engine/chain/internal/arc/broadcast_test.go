@@ -7,8 +7,8 @@ import (
 
 	sdk "github.com/bitcoin-sv/go-sdk/transaction"
 	"github.com/bitcoin-sv/spv-wallet/engine/chain"
+	"github.com/bitcoin-sv/spv-wallet/engine/chain/errors"
 	"github.com/bitcoin-sv/spv-wallet/engine/chain/models"
-	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/bitcoin-sv/spv-wallet/engine/tester"
 	"github.com/stretchr/testify/require"
 	"iter"
@@ -74,15 +74,15 @@ func TestBroadcastTransactionErrorCases(t *testing.T) {
 	}{
 		"Double spend attempt with 'old' UTXO": {
 			hex:       oldWithDoubleSpentHex,
-			expectErr: spverrors.ErrARCProblematicStatus,
+			expectErr: chainerrors.ErrARCProblematicStatus,
 		},
 		"Double spend attempt with relatively 'new' UTXO": {
 			hex:       newWithDoubleSpentHex,
-			expectErr: spverrors.ErrARCProblematicStatus,
+			expectErr: chainerrors.ErrARCProblematicStatus,
 		},
 		"Broadcast malformed tx": {
 			hex:       malformedTxHex,
-			expectErr: spverrors.ErrARCUnprocessable,
+			expectErr: chainerrors.ErrARCUnprocessable,
 		},
 	}
 	for name, test := range tests {
@@ -121,7 +121,7 @@ func TestBroadcastTimeouts(t *testing.T) {
 		txInfo, err := service.Broadcast(ctx, tx)
 
 		require.Error(t, err)
-		require.ErrorIs(t, err, spverrors.ErrARCUnreachable)
+		require.ErrorIs(t, err, chainerrors.ErrARCUnreachable)
 		require.ErrorIs(t, err, context.DeadlineExceeded)
 		require.Nil(t, txInfo)
 	})
@@ -138,7 +138,7 @@ func TestBroadcastTimeouts(t *testing.T) {
 		txInfo, err := service.Broadcast(context.Background(), tx)
 
 		require.Error(t, err)
-		require.ErrorIs(t, err, spverrors.ErrARCUnreachable)
+		require.ErrorIs(t, err, chainerrors.ErrARCUnreachable)
 		require.ErrorIs(t, err, context.DeadlineExceeded)
 		require.Nil(t, txInfo)
 	})

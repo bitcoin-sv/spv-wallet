@@ -6,8 +6,8 @@ import (
 	"time"
 
 	"github.com/bitcoin-sv/spv-wallet/engine/chain"
+	"github.com/bitcoin-sv/spv-wallet/engine/chain/errors"
 	"github.com/bitcoin-sv/spv-wallet/engine/chain/models"
-	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/bitcoin-sv/spv-wallet/engine/tester"
 	"github.com/bitcoin-sv/spv-wallet/models/bsv"
 	"github.com/stretchr/testify/require"
@@ -42,17 +42,17 @@ func TestPolicyServiceErrorCases(t *testing.T) {
 		"GetPolicy with wrong token": {
 			arcToken:  "wrong-token", //if you test it on actual ARC server, this test might fail if the ARC doesn't require token
 			arcURL:    arcURL,
-			expectErr: spverrors.ErrARCUnauthorized,
+			expectErr: chainerrors.ErrARCUnauthorized,
 		},
 		"GetPolicy 404 endpoint but reachable": {
 			arcToken:  arcToken,
 			arcURL:    arcURL + wrongButReachable,
-			expectErr: spverrors.ErrARCUnreachable,
+			expectErr: chainerrors.ErrARCUnreachable,
 		},
 		"GetPolicy 404 endpoint with wrong arcURL": {
 			arcToken:  arcToken,
 			arcURL:    "wrong-url",
-			expectErr: spverrors.ErrARCUnreachable,
+			expectErr: chainerrors.ErrARCUnreachable,
 		},
 	}
 
@@ -83,7 +83,7 @@ func TestPolicyServiceTimeouts(t *testing.T) {
 		txInfo, err := service.GetPolicy(ctx)
 
 		require.Error(t, err)
-		require.ErrorIs(t, err, spverrors.ErrARCUnreachable)
+		require.ErrorIs(t, err, chainerrors.ErrARCUnreachable)
 		require.ErrorIs(t, err, context.DeadlineExceeded)
 		require.Nil(t, txInfo)
 	})
@@ -97,7 +97,7 @@ func TestPolicyServiceTimeouts(t *testing.T) {
 		txInfo, err := service.GetPolicy(context.Background())
 
 		require.Error(t, err)
-		require.ErrorIs(t, err, spverrors.ErrARCUnreachable)
+		require.ErrorIs(t, err, chainerrors.ErrARCUnreachable)
 		require.ErrorIs(t, err, context.DeadlineExceeded)
 		require.Nil(t, txInfo)
 	})

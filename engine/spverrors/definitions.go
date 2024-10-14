@@ -182,9 +182,6 @@ var ErrGetCapabilities = models.SPVError{Message: "failed to get paymail capabil
 // ErrParseTransactionFromHex is when error occurred during parsing transaction from hex
 var ErrParseTransactionFromHex = models.SPVError{Message: "error parsing transaction from hex", StatusCode: 500, Code: "error-transaction-parse-from-hex"}
 
-// ErrGetTransactions is when error occurred during getting transactions
-var ErrGetTransactions = models.SPVError{Message: "error getting transactions", StatusCode: 500, Code: "error-transaction-get-transactions"}
-
 // ErrCouldNotFindTransaction is an error when a transaction could not be found
 var ErrCouldNotFindTransaction = models.SPVError{Message: "transaction not found", StatusCode: 404, Code: "error-transaction-not-found"}
 
@@ -384,42 +381,3 @@ var ErrAskingForFeeUnit = models.SPVError{Message: "error during asking for fee 
 
 // ErrBroadcast is when broadcast error occurred
 var ErrBroadcast = models.SPVError{Message: "broadcast error", StatusCode: 500, Code: "error-broadcast"}
-
-// ErrBroadcastUnreachable is when broadcast server cannot be requested
-var ErrBroadcastUnreachable = models.SPVError{Message: "broadcast server cannot be requested", StatusCode: 404, Code: "error-broadcast-unreachable"}
-
-// ErrBroadcastWrongBUMPResponse is when broadcast server returned wrong BUMP response
-var ErrBroadcastWrongBUMPResponse = models.SPVError{Message: "broadcast server returned wrong BUMP response", StatusCode: 400, Code: "error-broadcast-wrong-bump-response"}
-
-// ErrBroadcastRejectedTransaction is when broadcast server rejected transaction
-var ErrBroadcastRejectedTransaction = models.SPVError{Message: "broadcast rejected transaction", StatusCode: 400, Code: "error-broadcast-rejected-transaction"}
-
-// ErrARCUnreachable is when ARC cannot be requested
-var ErrARCUnreachable = models.SPVError{Message: "ARC cannot be requested", StatusCode: 500, Code: "error-broadcast-unreachable"}
-
-// ErrARCUnauthorized is when ARC returns unauthorized
-var ErrARCUnauthorized = models.SPVError{Message: "ARC returned unauthorized", StatusCode: 500, Code: "error-broadcast-unauthorized"}
-
-// ErrARCParseResponse is when ARC response cannot be parsed
-var ErrARCParseResponse = models.SPVError{Message: "ARC response cannot be parsed", StatusCode: 500, Code: "error-broadcast-parse-response"}
-
-// ErrARCGenericError is when ARC returns generic error (according to documentation - status code: 409)
-var ErrARCGenericError = models.SPVError{Message: "ARC returned generic error", StatusCode: 500, Code: "error-broadcast-generic-error"}
-
-// ErrARCUnsupportedStatusCode is when ARC returns unsupported status code
-var ErrARCUnsupportedStatusCode = models.SPVError{Message: "ARC returned unsupported status code", StatusCode: 500, Code: "error-broadcast-unsupported-status-code"}
-
-// ErrARCUnprocessable is when ARC rejects because provided tx cannot be processed
-var ErrARCUnprocessable = models.SPVError{Message: "ARC cannot process provided transaction", StatusCode: 500, Code: "error-broadcast-unprocessable-tx"}
-
-// ErrARCNotExtendedFormat is when ARC rejects transaction which is not in extended format
-var ErrARCNotExtendedFormat = models.SPVError{Message: "ARC expects transaction in extended format", StatusCode: 500, Code: "error-broadcast-not-extended-format"}
-
-// ErrARCWrongFee is when ARC rejects transaction because of wrong fee
-var ErrARCWrongFee = models.SPVError{Message: "ARC rejected transaction because of wrong fee", StatusCode: 500, Code: "error-broadcast-wrong-fee"}
-
-// ErrEFConvertInterrupted is when conversion to Extended Format is interrupted by context cancellation or timeout
-var ErrEFConvertInterrupted = models.SPVError{Message: "interrupted conversion to Extended Format", StatusCode: 500, Code: "error-ef-conversion-interrupted"}
-
-// ErrARCProblematicStatus is when ARC returns problematic status
-var ErrARCProblematicStatus = models.SPVError{Message: "ARC returned problematic status", StatusCode: 500, Code: "error-broadcast-problematic-status"}

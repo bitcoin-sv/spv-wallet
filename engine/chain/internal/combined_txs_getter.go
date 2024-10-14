@@ -5,6 +5,7 @@ import (
 	"maps"
 
 	sdk "github.com/bitcoin-sv/go-sdk/transaction"
+	"github.com/bitcoin-sv/spv-wallet/engine/chain/errors"
 	"github.com/bitcoin-sv/spv-wallet/engine/chain/models"
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"iter"
@@ -39,7 +40,7 @@ func (ctg *CombinedTxsGetter) GetTransactions(ctx context.Context, ids iter.Seq[
 		}
 		txs, err := getter.GetTransactions(ctx, maps.Keys(missingTxs))
 		if err != nil {
-			return nil, spverrors.ErrGetTransactions.Wrap(err)
+			return nil, chainerrors.ErrGetTransactionsByTxsGetter.Wrap(err)
 		}
 		for _, tx := range txs {
 			txID := tx.TxID().String()

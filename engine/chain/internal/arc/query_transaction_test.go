@@ -6,8 +6,8 @@ import (
 	"time"
 
 	"github.com/bitcoin-sv/spv-wallet/engine/chain"
+	"github.com/bitcoin-sv/spv-wallet/engine/chain/errors"
 	"github.com/bitcoin-sv/spv-wallet/engine/chain/models"
-	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/bitcoin-sv/spv-wallet/engine/tester"
 	"github.com/stretchr/testify/require"
 )
@@ -53,25 +53,25 @@ func TestQueryServiceErrorCases(t *testing.T) {
 			txID:      invalidTxID,
 			arcToken:  arcToken,
 			arcURL:    arcURL,
-			expectErr: spverrors.ErrARCGenericError,
+			expectErr: chainerrors.ErrARCGenericError,
 		},
 		"QueryTransaction with wrong token": {
 			txID:      minedTxID,
 			arcToken:  "wrong-token", //if you test it on actual ARC server, this test might fail if the ARC doesn't require token
 			arcURL:    arcURL,
-			expectErr: spverrors.ErrARCUnauthorized,
+			expectErr: chainerrors.ErrARCUnauthorized,
 		},
 		"QueryTransaction 404 endpoint but reachable": {
 			txID:      minedTxID,
 			arcToken:  arcToken,
 			arcURL:    arcURL + wrongButReachable,
-			expectErr: spverrors.ErrARCUnreachable,
+			expectErr: chainerrors.ErrARCUnreachable,
 		},
 		"QueryTransaction 404 endpoint with wrong arcURL": {
 			txID:      minedTxID,
 			arcToken:  arcToken,
 			arcURL:    "wrong-url",
-			expectErr: spverrors.ErrARCUnreachable,
+			expectErr: chainerrors.ErrARCUnreachable,
 		},
 	}
 
@@ -102,7 +102,7 @@ func TestQueryServiceTimeouts(t *testing.T) {
 		txInfo, err := service.QueryTransaction(ctx, minedTxID)
 
 		require.Error(t, err)
-		require.ErrorIs(t, err, spverrors.ErrARCUnreachable)
+		require.ErrorIs(t, err, chainerrors.ErrARCUnreachable)
 		require.ErrorIs(t, err, context.DeadlineExceeded)
 		require.Nil(t, txInfo)
 	})
@@ -116,7 +116,7 @@ func TestQueryServiceTimeouts(t *testing.T) {
 		txInfo, err := service.QueryTransaction(context.Background(), minedTxID)
 
 		require.Error(t, err)
-		require.ErrorIs(t, err, spverrors.ErrARCUnreachable)
+		require.ErrorIs(t, err, chainerrors.ErrARCUnreachable)
 		require.ErrorIs(t, err, context.DeadlineExceeded)
 		require.Nil(t, txInfo)
 	})
