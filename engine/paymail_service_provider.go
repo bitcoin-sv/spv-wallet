@@ -306,7 +306,7 @@ func buildSDKTx(p2pTx *paymail.P2PTransaction) (*trx.Transaction, error) {
 	if err != nil {
 		return nil, spverrors.Wrapf(err, "unable to create transaction from hex")
 	}
-	
+
 	return tx, err
 }
 
