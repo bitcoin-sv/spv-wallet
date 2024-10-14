@@ -6,9 +6,9 @@ import (
 	"testing"
 
 	broadcast_client_mock "github.com/bitcoin-sv/go-broadcast-client/broadcast/broadcast-client-mock"
-	"github.com/bitcoin-sv/spv-wallet/engine/utils"
-
 	compat "github.com/bitcoin-sv/go-sdk/compat/bip32"
+
+	"github.com/bitcoin-sv/spv-wallet/engine/utils"
 	"github.com/bitcoin-sv/spv-wallet/models/bsv"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
