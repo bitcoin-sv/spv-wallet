@@ -72,6 +72,10 @@ type requestBody struct {
 
 func (s *Service) prepareTxHex(ctx context.Context, tx *sdk.Transaction) (string, error) {
 	if s.arcCfg.TxsGetter == nil {
+		efHex, err := tx.EFHex()
+		if err == nil {
+			return efHex, nil
+		}
 		s.logger.Warn().Msg("TransactionsGetter is not set, can't convert transaction to EFHex. Using raw transaction hex as a fallback.")
 		return tx.Hex(), nil
 	}

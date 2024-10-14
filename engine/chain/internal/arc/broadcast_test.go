@@ -2,29 +2,157 @@ package arc_test
 
 import (
 	"context"
+	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
+	"iter"
+	"testing"
+	"time"
+
 	sdk "github.com/bitcoin-sv/go-sdk/transaction"
 	"github.com/bitcoin-sv/spv-wallet/engine/chain"
-	chainmodels "github.com/bitcoin-sv/spv-wallet/engine/chain/models"
+	"github.com/bitcoin-sv/spv-wallet/engine/chain/models"
 	"github.com/bitcoin-sv/spv-wallet/engine/tester"
-	"github.com/go-resty/resty/v2"
 	"github.com/stretchr/testify/require"
-	"testing"
 )
 
-const txHex = "0100000001293f17ea61f50d5ea815780c3d571f0f475533b8e812189724ab8e14b77e1616000000006a4730440220353c86782552be0c768cf675ca68c914c07cd2a35970292879353d089ca012e0022057c7a3b4b96cfedb7bb3555017044b11bd610477285b7f4e63efb5a10b906bf4412103513000984c44b7316671c1875c32eaeeacfd886f561623479794913c1cb91f73ffffffff01000000000000000038006a35323032342d31302d31312031333a31313a34322e30393234363935202b303230302043455354206d3d2b302e30313831363935303100000000"
-
 func TestBroadcastTransaction(t *testing.T) {
-	httpClient := resty.New()
+	tests := map[string]struct {
+		hex            string
+		arcCfgModifier func(cfg *chainmodels.ARCConfig)
+	}{
+		"Broadcast unsourced tx with txs getter provided": {
+			hex: validRawHex,
+			arcCfgModifier: func(cfg *chainmodels.ARCConfig) {
+				cfg.TxsGetter = &mockTxsGetter{
+					transactions: []*sdk.Transaction{fromHex(sourceOfValidRawHex)},
+				}
+			},
+		},
+		"Broadcast tx in EF with no txs getter": {
+			hex: efOfValidRawHex,
+		},
+		"Broadcast unsourced tx with no txs getter - raw hex as fallback": {
+			hex: fallbackRawHex,
+		},
+		"Broadcast two-missing-inputs unsourced tx with txs getter and junglebus": {
+			hex: txWithMultipleInputs,
+			arcCfgModifier: func(cfg *chainmodels.ARCConfig) {
+				cfg.TxsGetter = &mockTxsGetter{
+					// first missing input source is provided by this txs getter (mocking getting from database)
+					transactions: []*sdk.Transaction{fromHex(sourceOneOfTxWithMultipleInputs)},
+				}
+				cfg.UseJunglebus = true //second missing input source is provided by junglebus (mocked)
+			},
+		},
+	}
+	for name, test := range tests {
+		t.Run(name, func(t *testing.T) {
+			httpClient := arcMockActivate(false)
 
-	tx, err := sdk.NewTransactionFromHex(txHex)
-	require.NoError(t, err)
+			tx, err := sdk.NewTransactionFromHex(test.hex)
+			require.NoError(t, err)
 
-	cfg := arcCfg(arcURL, arcToken)
-	cfg.UseJunglebus = true
+			cfg := arcCfg(arcURL, arcToken)
+			if test.arcCfgModifier != nil {
+				test.arcCfgModifier(&cfg)
+			}
 
-	service := chain.NewChainService(tester.Logger(t), httpClient, cfg, chainmodels.BHSConfig{})
+			service := chain.NewChainService(tester.Logger(t), httpClient, cfg, chainmodels.BHSConfig{})
 
-	txInfo, err := service.Broadcast(context.Background(), tx)
-	require.NoError(t, err)
-	t.Logf("%+v", txInfo)
+			txInfo, err := service.Broadcast(context.Background(), tx)
+			require.NoError(t, err)
+			require.Equal(t, tx.TxID().String(), txInfo.TxID)
+			require.Equal(t, chainmodels.SeenOnNetwork, txInfo.TXStatus)
+		})
+	}
+}
+
+func TestBroadcastTransactionErrorCases(t *testing.T) {
+	tests := map[string]struct {
+		hex            string
+		arcCfgModifier func(cfg *chainmodels.ARCConfig)
+		expectErr      error
+	}{
+		"Double spend attempt with 'old' UTXO": {
+			hex:       oldWithDoubleSpentHex,
+			expectErr: spverrors.ErrARCProblematicStatus,
+		},
+		"Double spend attempt with relatively 'new' UTXO": {
+			hex:       newWithDoubleSpentHex,
+			expectErr: spverrors.ErrARCProblematicStatus,
+		},
+		"Broadcast malformed tx": {
+			hex:       malformedTxHex,
+			expectErr: spverrors.ErrARCUnprocessable,
+		},
+	}
+	for name, test := range tests {
+		t.Run(name, func(t *testing.T) {
+			httpClient := arcMockActivate(false)
+
+			tx, err := sdk.NewTransactionFromHex(test.hex)
+			require.NoError(t, err)
+
+			cfg := arcCfg(arcURL, arcToken)
+			if test.arcCfgModifier != nil {
+				test.arcCfgModifier(&cfg)
+			}
+
+			service := chain.NewChainService(tester.Logger(t), httpClient, cfg, chainmodels.BHSConfig{})
+
+			txInfo, err := service.Broadcast(context.Background(), tx)
+			require.ErrorIs(t, err, test.expectErr)
+			require.Nil(t, txInfo)
+		})
+	}
+}
+
+func TestBroadcastTimeouts(t *testing.T) {
+	t.Run("Broadcast transaction interrupted by ctx timeout", func(t *testing.T) {
+		httpClient := arcMockActivate(true)
+
+		tx, err := sdk.NewTransactionFromHex(efOfValidRawHex)
+		require.NoError(t, err)
+
+		service := chain.NewChainService(tester.Logger(t), httpClient, arcCfg(arcURL, arcToken), chainmodels.BHSConfig{})
+
+		ctx, cancel := context.WithTimeout(context.Background(), 1)
+		defer cancel()
+
+		txInfo, err := service.Broadcast(ctx, tx)
+
+		require.Error(t, err)
+		require.ErrorIs(t, err, spverrors.ErrARCUnreachable)
+		require.ErrorIs(t, err, context.DeadlineExceeded)
+		require.Nil(t, txInfo)
+	})
+
+	t.Run("Broadcast transaction interrupted by resty timeout", func(t *testing.T) {
+		httpClient := arcMockActivate(true)
+		httpClient.SetTimeout(1 * time.Millisecond)
+
+		tx, err := sdk.NewTransactionFromHex(efOfValidRawHex)
+		require.NoError(t, err)
+
+		service := chain.NewChainService(tester.Logger(t), httpClient, arcCfg(arcURL, arcToken), chainmodels.BHSConfig{})
+
+		txInfo, err := service.Broadcast(context.Background(), tx)
+
+		require.Error(t, err)
+		require.ErrorIs(t, err, spverrors.ErrARCUnreachable)
+		require.ErrorIs(t, err, context.DeadlineExceeded)
+		require.Nil(t, txInfo)
+	})
+}
+
+type mockTxsGetter struct {
+	transactions []*sdk.Transaction
+}
+
+func (mtg *mockTxsGetter) GetTransactions(_ context.Context, _ iter.Seq[string]) ([]*sdk.Transaction, error) {
+	return mtg.transactions, nil
+}
+
+func fromHex(hex string) *sdk.Transaction {
+	tx, _ := sdk.NewTransactionFromHex(hex)
+	return tx
 }
