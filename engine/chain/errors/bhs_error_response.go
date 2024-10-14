@@ -13,7 +13,7 @@ import (
 
 // MapBHSErrorResponseToSpverror is a method that will check what kind of response came back from
 // Block Header Service and map it to spverror and set it to context
-func MapBHSErrorResponseToSpverror(res *resty.Response) error {
+func MapBHSErrorResponseToSpverror(res *resty.Response) models.SPVError {
 	var responseErr chainmodels.BHSError
 
 	if err := json.Unmarshal(res.Body(), &responseErr); err != nil {
@@ -31,7 +31,7 @@ func MapBHSErrorResponseToSpverror(res *resty.Response) error {
 				Message:    unescapedBodyStr,
 				StatusCode: http.StatusInternalServerError,
 				Code:       spverrors.ErrInternal.Code,
-			}
+			}.Wrap(err)
 		}
 		return ErrBHSParsingResponse.Wrap(err)
 	}
