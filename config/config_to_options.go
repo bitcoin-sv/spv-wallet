@@ -55,7 +55,7 @@ func (c *AppConfig) ToEngineOptions(logger zerolog.Logger) (options []engine.Cli
 
 	options = c.addBHSOpts(options)
 
-	options = c.AddCustomFeeUnit(options)
+	options = c.addCustomFeeUnit(options)
 
 	return options, nil
 }
@@ -68,7 +68,7 @@ func (c *AppConfig) addHttpClientOpts(options []engine.ClientOps) []engine.Clien
 	return append(options, engine.WithHTTPClient(client))
 }
 
-func (c *AppConfig) AddCustomFeeUnit(options []engine.ClientOps) []engine.ClientOps {
+func (c *AppConfig) addCustomFeeUnit(options []engine.ClientOps) []engine.ClientOps {
 	if c.CustomFeeUnit != nil {
 		options = append(options, engine.WithCustomFeeUnit(chainmodels.FeeAmount{
 			Satoshis: bsv.Satoshis(c.CustomFeeUnit.Satoshis),

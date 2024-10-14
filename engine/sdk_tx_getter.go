@@ -2,11 +2,12 @@ package engine
 
 import (
 	"context"
-	sdk "github.com/bitcoin-sv/go-sdk/transaction"
-	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"iter"
 	"slices"
 	"time"
+
+	sdk "github.com/bitcoin-sv/go-sdk/transaction"
+	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 )
 
 type sdkTxGetter struct {

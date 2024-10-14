@@ -6,7 +6,7 @@ import (
 	"fmt"
 	sdk "github.com/bitcoin-sv/go-sdk/transaction"
 	"github.com/bitcoin-sv/spv-wallet/engine/chain/internal/ef"
-	chainmodels "github.com/bitcoin-sv/spv-wallet/engine/chain/models"
+	"github.com/bitcoin-sv/spv-wallet/engine/chain/models"
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/go-resty/resty/v2"
 	"net/http"

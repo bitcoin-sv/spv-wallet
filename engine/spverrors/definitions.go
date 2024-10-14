@@ -22,6 +22,9 @@ var ErrNotAnAdminKey = models.SPVError{Message: "xpub provided is not an admin k
 // ErrInternal is a generic error that something weird went wrong
 var ErrInternal = models.SPVError{Message: "internal server error", StatusCode: 500, Code: "error-internal-server-error"}
 
+// ErrCtxInterrupted is when context is interrupted (cancelled or deadline exceeded)
+var ErrCtxInterrupted = models.SPVError{Message: "context interrupted", StatusCode: 500, Code: "error-ctx-interrupted"}
+
 // ErrInvalidOrMissingToken is when callback token from headers is invalid or missing
 var ErrInvalidOrMissingToken = models.SPVError{Message: "invalid or missing bearer token", StatusCode: 401, Code: "error-unauthorized-token-invalid-or-missing"}
 
@@ -178,6 +181,9 @@ var ErrGetCapabilities = models.SPVError{Message: "failed to get paymail capabil
 
 // ErrParseTransactionFromHex is when error occurred during parsing transaction from hex
 var ErrParseTransactionFromHex = models.SPVError{Message: "error parsing transaction from hex", StatusCode: 500, Code: "error-transaction-parse-from-hex"}
+
+// ErrGetTransactions is when error occurred during getting transactions
+var ErrGetTransactions = models.SPVError{Message: "error getting transactions", StatusCode: 500, Code: "error-transaction-get-transactions"}
 
 // ErrCouldNotFindTransaction is an error when a transaction could not be found
 var ErrCouldNotFindTransaction = models.SPVError{Message: "transaction not found", StatusCode: 404, Code: "error-transaction-not-found"}
@@ -372,6 +378,9 @@ var ErrRouteNotFound = models.SPVError{Message: "route not found", StatusCode: 4
 var ErrRouteMethodNotAllowed = models.SPVError{Message: "method not allowed", StatusCode: 405, Code: "error-route-method-not-allowed"}
 
 // ////////////////////////////////// BROADCAST ERRORS
+
+// ErrAskingForFeeUnit is when error occurred during asking for fee unit
+var ErrAskingForFeeUnit = models.SPVError{Message: "error during asking for fee unit", StatusCode: 500, Code: "error-asking-for-fee-unit"}
 
 // ErrBroadcast is when broadcast error occurred
 var ErrBroadcast = models.SPVError{Message: "broadcast error", StatusCode: 500, Code: "error-broadcast"}

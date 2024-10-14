@@ -15,6 +15,7 @@ type CombinedTxsGetter struct {
 	txsGetters []chainmodels.TransactionsGetter
 }
 
+// NewCombinedTxsGetter creates a new CombinedTxsGetter
 func NewCombinedTxsGetter(txsGetters ...chainmodels.TransactionsGetter) *CombinedTxsGetter {
 	return &CombinedTxsGetter{
 		txsGetters: txsGetters,
@@ -38,7 +39,7 @@ func (ctg *CombinedTxsGetter) GetTransactions(ctx context.Context, ids iter.Seq[
 		}
 		txs, err := getter.GetTransactions(ctx, maps.Keys(missingTxs))
 		if err != nil {
-			return nil, err
+			return nil, spverrors.ErrGetTransactions.Wrap(err)
 		}
 		for _, tx := range txs {
 			txID := tx.TxID().String()

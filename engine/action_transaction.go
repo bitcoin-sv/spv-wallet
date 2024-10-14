@@ -5,7 +5,7 @@ import (
 	"math"
 	"time"
 
-	chainmodels "github.com/bitcoin-sv/spv-wallet/engine/chain/models"
+	"github.com/bitcoin-sv/spv-wallet/engine/chain/models"
 	"github.com/bitcoin-sv/spv-wallet/engine/datastore"
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/bitcoin-sv/spv-wallet/engine/utils"

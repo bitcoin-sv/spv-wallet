@@ -389,7 +389,7 @@ func (c *Client) AskForFeeUnit(ctx context.Context) error {
 	}
 	policy, err := c.Chain().GetPolicy(ctx)
 	if err != nil {
-		return err
+		return spverrors.ErrAskingForFeeUnit.Wrap(err)
 	}
 	c.options.feeUnit = &policy.Content.MiningFee
 	c.Logger().Info().Msgf("Fee unit set by ARC policy: %d satoshis per %d bytes", policy.Content.MiningFee.Satoshis, policy.Content.MiningFee.Bytes)

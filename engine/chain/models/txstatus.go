@@ -33,10 +33,12 @@ const (
 	Mined TXStatus = "MINED" // 9
 )
 
+// IsMined returns true if the transaction has been mined
 func (t TXStatus) IsMined() bool {
 	return t == Mined
 }
 
+// IsProblematic returns true if the transaction is problematic (e.g rejected, double spend, unknown)
 func (t TXStatus) IsProblematic() bool {
 	return t == Rejected || t == DoubleSpendAttempted || t == Unknown || t == SeenInOrphanMempool
 }
