@@ -751,7 +751,7 @@ func (m *DraftTransaction) getInputsFromUtxos(reservedUtxos []*Utxo) ([]*trx.UTX
 			utxo.Satoshis,
 		)
 		if err != nil {
-			return nil, 0, spverrors.Wrapf(err, "failed to create UTXO for transaction %s", m.GetID())
+			return nil, 0, spverrors.ErrFailedToCreateUTXO.Wrap(err)
 		}
 
 		inputUtxos = append(inputUtxos, utxo)
@@ -894,6 +894,11 @@ func (m *DraftTransaction) SignInputs(xPriv *compat.ExtendedKey) (signedHex stri
 	}
 
 	// Return the signed hex
+	err = txDraft.Sign()
+	if err != nil {
+		return "", spverrors.Wrapf(err, "failed to sign inputs on model %s", m.GetModelName())
+	}
+
 	signedHex = txDraft.String()
 	return
 }

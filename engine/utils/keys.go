@@ -127,22 +127,3 @@ func DerivePrivateKeyFromHex(hdKey *bip32.ExtendedKey, hexString string) (*ec.Pr
 
 	return privKey, nil
 }
-
-// DerivePublicKeyFromHex will derive the public key from the extended key using the hex as the derivation paths
-func DerivePublicKeyFromHex(hdKey *bip32.ExtendedKey, hexString string) (*ec.PublicKey, error) {
-	if hdKey == nil {
-		return nil, ErrHDKeyNil
-	}
-
-	childKey, err := DeriveChildKeyFromHex(hdKey, hexString)
-	if err != nil {
-		return nil, err
-	}
-
-	var pubKey *ec.PublicKey
-	if pubKey, err = childKey.ECPubKey(); err != nil {
-		return nil, spverrors.Wrapf(err, "failed to derive public key")
-	}
-
-	return pubKey, nil
-}

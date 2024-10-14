@@ -903,13 +903,13 @@ func TestDraftTransaction_getInputsFromUtxos(t *testing.T) {
 		reservedUtxos := []*Utxo{{
 			UtxoPointer: UtxoPointer{
 				OutputIndex:   123,
-				TransactionID: "testTxID",
+				TransactionID: "invalidTxIDHex",
 			},
 			Satoshis:     124235,
 			ScriptPubKey: testLockingScript,
 		}}
 		inputUtxos, satoshisReserved, err := draftTransaction.getInputsFromUtxos(reservedUtxos)
-		require.ErrorIs(t, err, spverrors.ErrInvalidTransactionID)
+		require.ErrorIs(t, err, spverrors.ErrFailedToCreateUTXO)
 		assert.Nil(t, inputUtxos)
 		assert.Equal(t, uint64(0), satoshisReserved)
 	})

@@ -205,29 +205,29 @@ func TestGetDestinationType(t *testing.T) {
 }
 
 // TestGetAddressFromScript will test the method GetAddressFromScript()
-// func TestGetAddressFromScript(t *testing.T) {
-// 	t.Parallel()
+func TestGetAddressFromScript(t *testing.T) {
+	t.Parallel()
 
-// 	//t.Run("p2pk", func(t *testing.T) {
-// 	//	assert.Equal(t, "1BYpPJHowiz9Qr6zsTzRXKNeej2RV2Av6H", GetAddressFromScript(p2pkHex))
-// 	//})
+	t.Run("p2pk", func(t *testing.T) {
+		assert.Equal(t, "1BYpPJHowiz9Qr6zsTzRXKNeej2RV2Av6H", GetAddressFromScript(p2pkHex))
+	})
 
-// 	// t.Run("p2pkh", func(t *testing.T) {
-// 	// 	assert.Equal(t, "12kwBQPUnAMouxBBWRa5wsA6vC29soEdXT", GetAddressFromScript(p2pkhHex))
-// 	// })
+	t.Run("p2pkh", func(t *testing.T) {
+		assert.Equal(t, "12kwBQPUnAMouxBBWRa5wsA6vC29soEdXT", GetAddressFromScript(p2pkhHex))
+	})
 
-// 	//	t.Run("stas 1", func(t *testing.T) {
-// 	//		assert.Equal(t, "1AxScC72W9tyk1Enej6dBsVZNkkgAonk4H", GetAddressFromScript(stasHex))
-// 	//	})
-// 	//
-// 	//	t.Run("stas 2", func(t *testing.T) {
-// 	//		assert.Equal(t, "1MXhcVvUz1LGSkoUFGkANHXkGCtrzFKHpA", GetAddressFromScript(stas2Hex))
-// 	//	})
-// 	//
-// 	//	t.Run("unknown", func(t *testing.T) {
-// 	//		assert.Equal(t, "", GetAddressFromScript("invalid-or-unknown-script"))
-// 	//	})
-// }
+	t.Run("stas 1", func(t *testing.T) {
+		assert.Equal(t, "1AxScC72W9tyk1Enej6dBsVZNkkgAonk4H", GetAddressFromScript(stasHex))
+	})
+
+	t.Run("stas 2", func(t *testing.T) {
+		assert.Equal(t, "1MXhcVvUz1LGSkoUFGkANHXkGCtrzFKHpA", GetAddressFromScript(stas2Hex))
+	})
+
+	t.Run("unknown", func(t *testing.T) {
+		assert.Equal(t, "", GetAddressFromScript("invalid-or-unknown-script"))
+	})
+}
 
 func BenchmarkIsP2PKH(b *testing.B) {
 	for i := 0; i < b.N; i++ {

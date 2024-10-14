@@ -87,17 +87,17 @@ func emptyTx(opts ...ModelOps) *Transaction {
 
 // baseTxFromHex creates the standard transaction model base
 func baseTxFromHex(hex string, opts ...ModelOps) (*Transaction, error) {
-	var btTx *trx.Transaction
+	var sdkTx *trx.Transaction
 	var err error
 
-	if btTx, err = trx.NewTransactionFromHex(hex); err != nil {
+	if sdkTx, err = trx.NewTransactionFromHex(hex); err != nil {
 		return nil, spverrors.Wrapf(err, "error parsing transaction hex")
 	}
 
 	tx := emptyTx(opts...)
-	tx.ID = btTx.TxID().String()
+	tx.ID = sdkTx.TxID().String()
 	tx.Hex = hex
-	tx.parsedTx = btTx
+	tx.parsedTx = sdkTx
 
 	return tx, nil
 }
@@ -207,9 +207,13 @@ func (m *Transaction) getValues() (outputValue uint64, fee uint64) {
 		fee = m.draftTransaction.Configuration.Fee
 	} else { // external transaction
 
-		// todo: missing inputs in some tests?
 		var inputValue uint64
 		for _, input := range m.TransactionBase.parsedTx.Inputs {
+			sourceTxSato := input.SourceTxSatoshis()
+			if sourceTxSato == nil {
+				continue
+			}
+
 			inputValue += *input.SourceTxSatoshis()
 		}
 

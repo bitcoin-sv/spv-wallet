@@ -186,18 +186,23 @@ func GetDestinationTypeRegex(destType string) *regexp.Regexp {
 }
 
 // GetAddressFromScript gets the destination address from the given locking script
+// FIXME: add logger on this scope to have info about returned errors
 func GetAddressFromScript(lockingScript string) (address string) {
 	scriptType := GetDestinationType(lockingScript)
 	if scriptType == ScriptTypePubKeyHash {
-		lsBytes, err := hex.DecodeString(lockingScript)
+		s, err := script.NewFromHex(lockingScript)
 		if err != nil {
 			return ""
 		}
 
-		decodedAddr, _ := script.NewAddressFromPublicKeyHash(lsBytes, true)
-		address = decodedAddr.AddressString
+		addresses, err := s.Addresses()
+		if err != nil || len(addresses) == 0 {
+			return ""
+		}
+
+		address = addresses[0]
 	} else if scriptType == ScriptTypePubKey {
-		s, err := script.NewFromHex(lockingScript) // no need for error check, if type is set, it should be valid
+		s, err := script.NewFromHex(lockingScript)
 		if err != nil {
 			return ""
 		}
@@ -208,22 +213,28 @@ func GetAddressFromScript(lockingScript string) (address string) {
 			return ""
 		}
 
-		pubkeyHex := hex.EncodeToString(parts[0].Data)
+		pubKeyHex := hex.EncodeToString(parts[0].Data)
 
 		var addressScript *script.Address
-		addressScript, err = script.NewAddressFromPublicKeyString(pubkeyHex, true)
-		if err == nil {
-			address = addressScript.AddressString
-		}
-	} else if scriptType == ScriptTypeTokenStas {
-		// stas is just a normal PubKeyHash with more data appended
-		lsBytes, err := hex.DecodeString(lockingScript[:50])
+		addressScript, err = script.NewAddressFromPublicKeyString(pubKeyHex, true)
 		if err != nil {
 			return ""
 		}
 
-		decodedAddr, _ := script.NewAddressFromPublicKeyHash(lsBytes, true)
-		address = decodedAddr.AddressString
+		address = addressScript.AddressString
+	} else if scriptType == ScriptTypeTokenStas {
+		// stas is just a normal PubKeyHash with more data appended
+		s, err := script.NewFromHex(lockingScript[:50])
+		if err != nil {
+			return ""
+		}
+
+		addresses, err := s.Addresses()
+		if err != nil || len(addresses) == 0 {
+			return ""
+		}
+
+		address = addresses[0]
 		// } else if scriptType == ScriptTypeTokenSensible {
 		// sensible tokens do not have the receiving address in the token output, but in another output
 		// sensible does not seem to be a utxo protocol, but an output protocol (all outputs of the tx matter)
