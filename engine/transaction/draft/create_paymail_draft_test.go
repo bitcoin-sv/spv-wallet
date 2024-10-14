@@ -7,7 +7,6 @@ import (
 	pmerrors "github.com/bitcoin-sv/spv-wallet/engine/paymail/errors"
 	tpaymail "github.com/bitcoin-sv/spv-wallet/engine/paymail/testabilities"
 	"github.com/bitcoin-sv/spv-wallet/engine/tester/fixtures"
-	"github.com/bitcoin-sv/spv-wallet/engine/transaction"
 	"github.com/bitcoin-sv/spv-wallet/engine/transaction/draft"
 	"github.com/bitcoin-sv/spv-wallet/engine/transaction/draft/outputs"
 	"github.com/bitcoin-sv/spv-wallet/engine/transaction/draft/testabilities"
@@ -15,6 +14,7 @@ import (
 	"github.com/bitcoin-sv/spv-wallet/models"
 	"github.com/bitcoin-sv/spv-wallet/models/bsv"
 	"github.com/bitcoin-sv/spv-wallet/models/optional"
+	"github.com/bitcoin-sv/spv-wallet/models/transaction/bucket"
 )
 
 func TestCreatePaymailDraft(t *testing.T) {
@@ -50,7 +50,7 @@ func TestCreatePaymailDraft(t *testing.T) {
 		thenTx.HasOutputs(1)
 
 		thenTx.Output(0).
-			HasBucket(transaction.BucketBSV).
+			HasBucket(bucket.BSV).
 			HasSatoshis(transactionSatoshiValue).
 			HasLockingScript(paymailHostResponse.Scripts[0]).
 			IsPaymail().
@@ -92,7 +92,7 @@ func TestCreatePaymailDraft(t *testing.T) {
 		thenTx.HasOutputs(2)
 
 		thenTx.Output(0).
-			HasBucket(transaction.BucketBSV).
+			HasBucket(bucket.BSV).
 			HasSatoshis(firstOutputSatoshiValue).
 			HasLockingScript(paymailHostResponse.Scripts[0]).
 			IsPaymail().
@@ -101,7 +101,7 @@ func TestCreatePaymailDraft(t *testing.T) {
 			HasReference(paymailHostResponse.Reference)
 
 		thenTx.Output(1).
-			HasBucket(transaction.BucketBSV).
+			HasBucket(bucket.BSV).
 			HasSatoshis(secondOutputSatoshiValue).
 			HasLockingScript(paymailHostResponse.Scripts[1]).
 			IsPaymail().

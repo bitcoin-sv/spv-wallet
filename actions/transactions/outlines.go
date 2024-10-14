@@ -1,0 +1,36 @@
+package transactions
+
+import (
+	"github.com/bitcoin-sv/spv-wallet/actions/transactions/internal/mapping/outline"
+	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
+	"github.com/bitcoin-sv/spv-wallet/models/request"
+	"github.com/bitcoin-sv/spv-wallet/server/reqctx"
+	"github.com/gin-gonic/gin"
+	"github.com/gin-gonic/gin/binding"
+)
+
+func transactionOutlines(c *gin.Context, userCtx *reqctx.UserContext) {
+	logger := reqctx.Logger(c)
+
+	var requestBody request.DraftTransaction
+	err := c.ShouldBindWith(&requestBody, binding.JSON)
+	if err != nil {
+		spverrors.ErrorResponse(c, spverrors.ErrCannotBindRequest.Wrap(err), logger)
+		return
+	}
+
+	spec, err := outline.Request(requestBody).ToEngine(userCtx.GetXPubID())
+	if err != nil {
+		spverrors.ErrorResponse(c, err, logger)
+		return
+	}
+
+	txOutline, err := reqctx.Engine(c).TransactionDraftService().Create(c, spec)
+	if err != nil {
+		spverrors.ErrorResponse(c, err, logger)
+		return
+	}
+
+	res := outline.ToResponse(txOutline)
+	c.JSON(200, res)
+}
