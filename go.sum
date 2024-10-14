@@ -16,8 +16,6 @@ github.com/aws/aws-sdk-go v1.55.5 h1:KKUZBfBoyqy5d3swXyiC7Q76ic40rYcbqH7qjh59kzU
 github.com/aws/aws-sdk-go v1.55.5/go.mod h1:eRwEWoyTWFMVYVQzKMNHWP5/RV4xIUGMQfXQHfHkpNU=
 github.com/beorn7/perks v1.0.1 h1:VlbKKnNfV8bJzeqoa4cOKqO6bYr3WgKZxO8Z16+hsOM=
 github.com/beorn7/perks v1.0.1/go.mod h1:G2ZrVWU2WbWT9wwq4/hrbKbnv/1ERSJQ0ibhJ6rlkpw=
-github.com/bitcoin-sv/go-broadcast-client v0.21.0 h1:QzDT0letnsQQ9rgVwpAuUN/WutjnBOftOiqSzvY796g=
-github.com/bitcoin-sv/go-broadcast-client v0.21.0/go.mod h1:BwLnKMTMbL9uSQSBV9NwveWgpohniZXz6tesikIG8JA=
 github.com/bitcoin-sv/go-paymail v0.20.1 h1:mVTPo6YrOcbg44XTJRdNMduE/TG9sOvHbWpWhIUVVyE=
 github.com/bitcoin-sv/go-paymail v0.20.1/go.mod h1:gsPYdngLUj/PA9gaW26V8OmpnMmUxdI/fe0V1TVol9A=
 github.com/bitcoin-sv/go-sdk v1.1.8 h1:f/dDo+qBtjDvNmMagEiNihRS10ca93eNnZOoTG0HXk8=
@@ -289,7 +287,6 @@ github.com/spf13/viper v1.19.0/go.mod h1:GQUN9bilAbhU/jgc1bKs99f/suXKeUMct8Adx5+
 github.com/stretchr/objx v0.1.0/go.mod h1:HFkY916IF+rwdDfMAkV7OtwuqBVzrE8GR6GFx+wExME=
 github.com/stretchr/objx v0.4.0/go.mod h1:YvHI0jy2hoMjB+UWwv71VJQ9isScKT/TqJzVSSt89Yw=
 github.com/stretchr/objx v0.5.0/go.mod h1:Yh+to48EsGEfYuaHDzXPcE3xhTkx73EhmCGUpEOglKo=
-github.com/stretchr/objx v0.5.2 h1:xuMeJ0Sdp5ZMRXx/aWO6RZxdr3beISkG5/G/aIRr3pY=
 github.com/stretchr/objx v0.5.2/go.mod h1:FRsXN1f5AsAjCGJKqEizvkpNtU+EGNCLh3NxZ/8L+MA=
 github.com/stretchr/testify v1.3.0/go.mod h1:M5WIy9Dh21IEIfnGCwXGc5bZfKNJtfHm1UVUgZn+9EI=
 github.com/stretchr/testify v1.5.1/go.mod h1:5W2xD1RspED5o8YsWQXVCued0rvSQ+mT+I5cxcmMvtA=
