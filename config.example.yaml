@@ -74,8 +74,8 @@ arc:
     _token: 44a82509
 # custom fee unit used for calculating fees (if not set, a unit from ARC policy will be used)
 _custom_fee_unit:
-    satoshis: 1
-    bytes: 1000
+  satoshis: 1
+  bytes: 1000
 notifications:
   enabled: false
 block_headers_service:
