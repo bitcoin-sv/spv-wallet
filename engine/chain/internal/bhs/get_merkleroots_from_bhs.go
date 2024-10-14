@@ -42,7 +42,7 @@ func (s *Service) GetMerkleRootsFromBHS(ctx context.Context, query url.Values) (
 		return nil, spverrors.ErrInternal.Wrap(err)
 	}
 	if !res.IsSuccess() {
-		return nil, chainerrors.MapBHSErrorResponseToSpverror(res)
+		return nil, mapBHSErrorResponseToSpverror(res)
 	}
 
 	return &response, nil

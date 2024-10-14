@@ -436,6 +436,59 @@ const docTemplate = `{
                 }
             }
         },
+        "/api/v1/merkleroots": {
+            "get": {
+                "security": [
+                    {
+                        "x-auth-xpub": []
+                    }
+                ],
+                "description": "Get Merkleroots from Block Header Service",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Merkleroots",
+                    "Block Header Service",
+                    "BHS"
+                ],
+                "summary": "Get Merkleroots",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "batch size of merkleroots to be returned",
+                        "name": "batchSize",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "last processed merkleroot in client's database",
+                        "name": "lastEvaluatedKey",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Paged response with Merkle Roots array in content ",
+                        "schema": {
+                            "$ref": "#/definitions/models.MerkleRootsBHSResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request - batchSize must be 0 or a positive integer"
+                    },
+                    "404": {
+                        "description": "Not found - No block with provided merkleroot was found"
+                    },
+                    "409": {
+                        "description": "Conflict - Provided merkleroot is not part of the longest chain"
+                    },
+                    "500": {
+                        "description": "Internal Server Error - Error while fetching Merkle Roots"
+                    }
+                }
+            }
+        },
         "/api/v1/transactions": {
             "get": {
                 "security": [
@@ -4902,6 +4955,31 @@ const docTemplate = `{
                 }
             }
         },
+        "models.ExclusiveStartKeyPageInfo": {
+            "type": "object",
+            "properties": {
+                "lastEvaluatedKey": {
+                    "description": "Last evaluated key returned from the database",
+                    "type": "string"
+                },
+                "orderByField": {
+                    "description": "Field by which to order the results",
+                    "type": "string"
+                },
+                "size": {
+                    "description": "Size of the page or returned data",
+                    "type": "integer"
+                },
+                "sortDirection": {
+                    "description": "Direction in which to order the results (ASC or DESC)",
+                    "type": "string"
+                },
+                "totalElements": {
+                    "description": "Total count of elements",
+                    "type": "integer"
+                }
+            }
+        },
         "models.FeeUnit": {
             "type": "object",
             "properties": {
@@ -4932,6 +5010,37 @@ const docTemplate = `{
                 "type": {
                     "description": "Type is a map protocol type.",
                     "type": "string"
+                }
+            }
+        },
+        "models.MerkleRoot": {
+            "type": "object",
+            "properties": {
+                "blockHeight": {
+                    "type": "integer"
+                },
+                "merkleRoot": {
+                    "type": "string"
+                }
+            }
+        },
+        "models.MerkleRootsBHSResponse": {
+            "type": "object",
+            "properties": {
+                "content": {
+                    "description": "List of records for the response",
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/models.MerkleRoot"
+                    }
+                },
+                "page": {
+                    "description": "Pagination details",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/models.ExclusiveStartKeyPageInfo"
+                        }
+                    ]
                 }
             }
         },
@@ -6911,7 +7020,7 @@ const docTemplate = `{
 
 // SwaggerInfo holds exported Swagger Info so clients can modify it
 var SwaggerInfo = &swag.Spec{
-	Version:          "v0.12.0",
+	Version:          "v1.0.0-beta",
 	Host:             "",
 	BasePath:         "",
 	Schemes:          []string{},

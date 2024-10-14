@@ -1,20 +1,20 @@
-package chainerrors
+package bhs
 
 import (
 	"encoding/json"
 	"net/http"
 	"strconv"
 
-	chainmodels "github.com/bitcoin-sv/spv-wallet/engine/chain/models"
+	"github.com/bitcoin-sv/spv-wallet/engine/chain/errors"
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/bitcoin-sv/spv-wallet/models"
 	"github.com/go-resty/resty/v2"
 )
 
-// MapBHSErrorResponseToSpverror is a method that will check what kind of response came back from
+// mapBHSErrorResponseToSpverror is a method that will check what kind of response came back from
 // Block Header Service and map it to spverror and set it to context
-func MapBHSErrorResponseToSpverror(res *resty.Response) models.SPVError {
-	var responseErr chainmodels.BHSError
+func mapBHSErrorResponseToSpverror(res *resty.Response) models.SPVError {
+	var responseErr bhsError
 
 	if err := json.Unmarshal(res.Body(), &responseErr); err != nil {
 
@@ -33,18 +33,18 @@ func MapBHSErrorResponseToSpverror(res *resty.Response) models.SPVError {
 				Code:       spverrors.ErrInternal.Code,
 			}.Wrap(err)
 		}
-		return ErrBHSParsingResponse.Wrap(err)
+		return chainerrors.ErrBHSParsingResponse.Wrap(err)
 	}
 
 	switch responseErr.Code {
 	case "ErrInvalidBatchSize":
-		return ErrInvalidBatchSize
+		return chainerrors.ErrInvalidBatchSize
 	case "ErrMerkleRootNotFound":
-		return ErrMerkleRootNotFound
+		return chainerrors.ErrMerkleRootNotFound
 	case "ErrMerkleRootNotInLC":
-		return ErrMerkleRootNotInLongestChain
+		return chainerrors.ErrMerkleRootNotInLongestChain
 	case "error-unauthorized":
-		return ErrBHSUnauthorized
+		return chainerrors.ErrBHSUnauthorized
 	default:
 		spvErr := models.SPVError{
 			Message:    responseErr.Message,
