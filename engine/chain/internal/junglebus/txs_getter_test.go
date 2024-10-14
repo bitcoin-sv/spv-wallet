@@ -2,14 +2,15 @@ package junglebus_test
 
 import (
 	"context"
+	"slices"
+	"testing"
+	"time"
+
 	chainerrors "github.com/bitcoin-sv/spv-wallet/engine/chain/errors"
 	"github.com/bitcoin-sv/spv-wallet/engine/chain/internal/junglebus"
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/bitcoin-sv/spv-wallet/engine/tester"
 	"github.com/stretchr/testify/require"
-	"slices"
-	"testing"
-	"time"
 )
 
 func TestTransactionGetter(t *testing.T) {

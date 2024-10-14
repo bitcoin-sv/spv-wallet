@@ -22,7 +22,7 @@ var ErrNotAnAdminKey = models.SPVError{Message: "xpub provided is not an admin k
 // ErrInternal is a generic error that something weird went wrong
 var ErrInternal = models.SPVError{Message: "internal server error", StatusCode: 500, Code: "error-internal-server-error"}
 
-// ErrCtxInterrupted is when context is interrupted (cancelled or deadline exceeded)
+// ErrCtxInterrupted is when context is interrupted (canceled or deadline exceeded)
 var ErrCtxInterrupted = models.SPVError{Message: "context interrupted", StatusCode: 500, Code: "error-ctx-interrupted"}
 
 // ErrInvalidOrMissingToken is when callback token from headers is invalid or missing

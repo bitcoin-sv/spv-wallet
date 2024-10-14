@@ -4,12 +4,13 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"net/http"
+
 	sdk "github.com/bitcoin-sv/go-sdk/transaction"
 	"github.com/bitcoin-sv/spv-wallet/engine/chain/internal/ef"
 	"github.com/bitcoin-sv/spv-wallet/engine/chain/models"
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/go-resty/resty/v2"
-	"net/http"
 )
 
 // Custom ARC defined http status codes

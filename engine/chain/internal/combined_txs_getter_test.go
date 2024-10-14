@@ -3,7 +3,6 @@ package internal_test
 import (
 	"context"
 	"errors"
-	"iter"
 	"testing"
 	"time"
 
@@ -11,6 +10,7 @@ import (
 	"github.com/bitcoin-sv/spv-wallet/engine/chain/internal"
 	"github.com/bitcoin-sv/spv-wallet/engine/chain/models"
 	"github.com/stretchr/testify/require"
+	"iter"
 )
 
 type mockTxsGetter struct {

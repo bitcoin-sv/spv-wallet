@@ -2,12 +2,12 @@ package internal
 
 import (
 	"context"
-	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
-	"iter"
 	"maps"
 
 	sdk "github.com/bitcoin-sv/go-sdk/transaction"
 	"github.com/bitcoin-sv/spv-wallet/engine/chain/models"
+	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
+	"iter"
 )
 
 // CombinedTxsGetter is a TransactionsGetter that combines multiple TransactionsGetters

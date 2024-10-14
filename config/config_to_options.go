@@ -3,7 +3,6 @@ package config
 import (
 	"crypto/tls"
 	"fmt"
-	"github.com/bitcoin-sv/spv-wallet/models/bsv"
 	"net/url"
 	"time"
 
@@ -15,6 +14,7 @@ import (
 	"github.com/bitcoin-sv/spv-wallet/engine/taskmanager"
 	"github.com/bitcoin-sv/spv-wallet/engine/utils"
 	"github.com/bitcoin-sv/spv-wallet/metrics"
+	"github.com/bitcoin-sv/spv-wallet/models/bsv"
 	"github.com/go-redis/redis/v8"
 	"github.com/go-resty/resty/v2"
 	"github.com/mrz1836/go-cachestore"

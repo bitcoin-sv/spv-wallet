@@ -3,11 +3,11 @@ package junglebus
 import (
 	"context"
 	"errors"
+
+	sdk "github.com/bitcoin-sv/go-sdk/transaction"
 	chainerrors "github.com/bitcoin-sv/spv-wallet/engine/chain/errors"
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"iter"
-
-	sdk "github.com/bitcoin-sv/go-sdk/transaction"
 )
 
 // GetTransactions implements chainmodels.TransactionsGetter interface to allow fetching transactions from Junglebus

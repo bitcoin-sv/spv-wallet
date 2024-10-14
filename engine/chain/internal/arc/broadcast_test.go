@@ -2,16 +2,16 @@ package arc_test
 
 import (
 	"context"
-	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
-	"iter"
 	"testing"
 	"time"
 
 	sdk "github.com/bitcoin-sv/go-sdk/transaction"
 	"github.com/bitcoin-sv/spv-wallet/engine/chain"
 	"github.com/bitcoin-sv/spv-wallet/engine/chain/models"
+	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/bitcoin-sv/spv-wallet/engine/tester"
 	"github.com/stretchr/testify/require"
+	"iter"
 )
 
 func TestBroadcastTransaction(t *testing.T) {
