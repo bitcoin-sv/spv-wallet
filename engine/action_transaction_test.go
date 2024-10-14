@@ -3,9 +3,10 @@ package engine
 import (
 	"context"
 	"fmt"
+	"testing"
+
 	broadcast_client_mock "github.com/bitcoin-sv/go-broadcast-client/broadcast/broadcast-client-mock"
 	"github.com/bitcoin-sv/spv-wallet/engine/utils"
-	"testing"
 
 	compat "github.com/bitcoin-sv/go-sdk/compat/bip32"
 	"github.com/bitcoin-sv/spv-wallet/models/bsv"
