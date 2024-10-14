@@ -7,8 +7,7 @@ import (
 	"github.com/bitcoin-sv/go-paymail"
 	"github.com/bitcoin-sv/go-paymail/server"
 	"github.com/bitcoin-sv/spv-wallet/engine/chain"
-	chainmodels "github.com/bitcoin-sv/spv-wallet/engine/chain/models"
-	"github.com/bitcoin-sv/spv-wallet/engine/chainstate"
+	"github.com/bitcoin-sv/spv-wallet/engine/chain/models"
 	"github.com/bitcoin-sv/spv-wallet/engine/cluster"
 	"github.com/bitcoin-sv/spv-wallet/engine/datastore"
 	"github.com/bitcoin-sv/spv-wallet/engine/logging"
@@ -35,7 +34,6 @@ type (
 	clientOptions struct {
 		cacheStore              *cacheStoreOptions     // Configuration options for Cachestore (ristretto, redis, etc.)
 		cluster                 *clusterOptions        // Configuration options for the cluster coordinator
-		chainstate              *chainstateOptions     // Configuration options for Chainstate (broadcast, sync, etc.)
 		dataStore               *dataStoreOptions      // Configuration options for the DataStore (PostgreSQL, etc.)
 		debug                   bool                   // If the client is in debug mode
 		encryptionKey           string                 // Encryption key for encrypting sensitive information (IE: paymail xPub) (hex encoded key)
@@ -53,16 +51,7 @@ type (
 		chainService            chain.Service          // Chain service
 		arcConfig               chainmodels.ARCConfig  // Configuration for ARC
 		bhsConfig               chainmodels.BHSConfig  // Configuration for BHS
-	}
-
-	// chainstateOptions holds the chainstate configuration and client
-	chainstateOptions struct {
-		chainstate.ClientInterface                        // Client for Chainstate
-		options                    []chainstate.ClientOps // List of options
-		broadcasting               bool                   // Default value for all transactions
-		broadcastInstant           bool                   // Default value for all transactions
-		paymailP2P                 bool                   // Default value for all transactions
-		syncOnChain                bool                   // Default value for all transactions
+		feeUnit                 *chainmodels.FeeAmount // Fee unit for transactions
 	}
 
 	// cacheStoreOptions holds the cache configuration and client
@@ -162,11 +151,6 @@ func NewClient(ctx context.Context, opts ...ClientOps) (ClientInterface, error) 
 		return nil, err
 	}
 
-	// Load the Chainstate client
-	if err = client.loadChainstate(ctx); err != nil {
-		return nil, err
-	}
-
 	// Load the Paymail client and service (if does not exist)
 	if err = client.loadPaymailComponents(); err != nil {
 		return nil, err
@@ -255,14 +239,6 @@ func (c *Client) Cluster() cluster.ClientInterface {
 	return nil
 }
 
-// Chainstate will return the Chainstate service IF: exists and is enabled
-func (c *Client) Chainstate() chainstate.ClientInterface {
-	if c.options.chainstate != nil && c.options.chainstate.ClientInterface != nil {
-		return c.options.chainstate.ClientInterface
-	}
-	return nil
-}
-
 // Close will safely close any open connections (cache, datastore, etc.)
 func (c *Client) Close(ctx context.Context) error {
 
@@ -308,24 +284,9 @@ func (c *Client) Debug(on bool) {
 		cs.Debug(on)
 	}
 
-	// Set debugging on the Chainstate
-	if ch := c.Chainstate(); ch != nil {
-		ch.Debug(on)
-	}
-
 	// Set debugging on the Datastore
 	if ds := c.Datastore(); ds != nil {
 		ds.Debug(on)
-	}
-}
-
-// DefaultSyncConfig will return the default sync config from the client defaults (for chainstate)
-func (c *Client) DefaultSyncConfig() *SyncConfig {
-	return &SyncConfig{
-		Broadcast:        c.options.chainstate.broadcasting,
-		BroadcastInstant: c.options.chainstate.broadcastInstant,
-		PaymailP2P:       c.options.chainstate.paymailP2P,
-		SyncOnChain:      c.options.chainstate.syncOnChain,
 	}
 }
 
@@ -406,4 +367,31 @@ func (c *Client) LogBHSReadiness(ctx context.Context) {
 	} else {
 		logger.Info().Msg("Block Headers Service is ready to verify transactions.")
 	}
+}
+
+// FeeUnit will return the fee unit used for transactions
+func (c *Client) FeeUnit() chainmodels.FeeAmount {
+	if c.options.feeUnit == nil {
+		c.Logger().Warn().Msg("Fee unit is not set (not by ARC policy nor by custom fee unit). Using fallback fee unit.")
+		return chainmodels.FeeAmount{
+			Satoshis: 1,
+			Bytes:    1000,
+		}
+	}
+	return *c.options.feeUnit
+}
+
+// AskForFeeUnit will ask the chain service for the fee unit
+func (c *Client) AskForFeeUnit(ctx context.Context) error {
+	if c.options.feeUnit != nil {
+		//already set by custom fee unit
+		return nil
+	}
+	policy, err := c.Chain().GetPolicy(ctx)
+	if err != nil {
+		return err
+	}
+	c.options.feeUnit = &policy.Content.MiningFee
+	c.Logger().Info().Msgf("Fee unit set by ARC policy: %d satoshis per %d bytes", policy.Content.MiningFee.Satoshis, policy.Content.MiningFee.Bytes)
+	return nil
 }

@@ -3,10 +3,10 @@ package config
 import (
 	"crypto/tls"
 	"fmt"
+	"github.com/bitcoin-sv/spv-wallet/models/bsv"
 	"net/url"
 	"time"
 
-	broadcastclient "github.com/bitcoin-sv/go-broadcast-client/broadcast/broadcast-client"
 	"github.com/bitcoin-sv/spv-wallet/engine"
 	"github.com/bitcoin-sv/spv-wallet/engine/chain/models"
 	"github.com/bitcoin-sv/spv-wallet/engine/cluster"
@@ -55,9 +55,7 @@ func (c *AppConfig) ToEngineOptions(logger zerolog.Logger) (options []engine.Cli
 
 	options = c.addBHSOpts(options)
 
-	options = c.addBroadcastClientOpts(options, logger)
-
-	options = c.addFeeQuotes(options)
+	options = c.AddCustomFeeUnit(options)
 
 	return options, nil
 }
@@ -70,13 +68,11 @@ func (c *AppConfig) addHttpClientOpts(options []engine.ClientOps) []engine.Clien
 	return append(options, engine.WithHTTPClient(client))
 }
 
-func (c *AppConfig) addFeeQuotes(options []engine.ClientOps) []engine.ClientOps {
-	options = append(options, engine.WithFeeQuotes(c.ARC.UseFeeQuotes))
-
-	if c.ARC.FeeUnit != nil {
-		options = append(options, engine.WithFeeUnit(&utils.FeeUnit{
-			Satoshis: c.ARC.FeeUnit.Satoshis,
-			Bytes:    c.ARC.FeeUnit.Bytes,
+func (c *AppConfig) AddCustomFeeUnit(options []engine.ClientOps) []engine.ClientOps {
+	if c.CustomFeeUnit != nil {
+		options = append(options, engine.WithCustomFeeUnit(chainmodels.FeeAmount{
+			Satoshis: bsv.Satoshis(c.CustomFeeUnit.Satoshis),
+			Bytes:    c.CustomFeeUnit.Bytes,
 		}))
 	}
 
@@ -295,21 +291,4 @@ func (c *AppConfig) addARCOpts(options []engine.ClientOps) ([]engine.ClientOps, 
 
 func (c *AppConfig) addBHSOpts(options []engine.ClientOps) []engine.ClientOps {
 	return append(options, engine.WithBHS(c.BHS.URL, c.BHS.AuthToken))
-}
-
-func (c *AppConfig) addBroadcastClientOpts(options []engine.ClientOps, logger zerolog.Logger) []engine.ClientOps {
-	bcLogger := logger.With().Str("service", "broadcast-client").Logger()
-
-	broadcastClient := broadcastclient.Builder().
-		WithArc(broadcastclient.ArcClientConfig{
-			Token:        c.ARC.Token,
-			APIUrl:       c.ARC.URL,
-			DeploymentID: c.ARC.DeploymentID,
-		}, &bcLogger).
-		Build()
-
-	return append(
-		options,
-		engine.WithBroadcastClient(broadcastClient),
-	)
 }

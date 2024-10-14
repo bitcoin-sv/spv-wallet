@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/bitcoin-sv/spv-wallet/engine/chainstate"
 	"github.com/bitcoin-sv/spv-wallet/engine/paymail/testabilities"
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/bitcoin-sv/spv-wallet/engine/tester/fixtures"
@@ -49,7 +48,7 @@ var (
 		ChangeSatoshis: 124,
 		ExpiresIn:      defaultDraftTxExpiresIn,
 		Fee:            12,
-		FeeUnit:        chainstate.MockDefaultFee,
+		FeeUnit:        &mockDefaultFee,
 		Inputs:         nil,
 		Outputs:        nil,
 	}

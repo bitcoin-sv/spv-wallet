@@ -8,7 +8,6 @@ import (
 	"testing"
 	"time"
 
-	"github.com/bitcoin-sv/spv-wallet/engine/chainstate"
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	xtester "github.com/bitcoin-sv/spv-wallet/engine/tester/paymailmock"
 	"github.com/bitcoin-sv/spv-wallet/engine/utils"
@@ -25,6 +24,11 @@ import (
 const (
 	testDraftLockingScript = "76a9140692ed78f6988968ce612f620894997cc7edf1ad88ac"
 )
+
+var mockDefaultFee = utils.FeeUnit{
+	Satoshis: 1,
+	Bytes:    1000,
+}
 
 // TestDraftTransaction_newDraftTransaction will test the method newDraftTransaction()
 func TestDraftTransaction_newDraftTransaction(t *testing.T) {
@@ -45,7 +49,7 @@ func TestDraftTransaction_newDraftTransaction(t *testing.T) {
 		expires := time.Now().UTC().Add(defaultDraftTxExpiresIn)
 		draftTx, err := newDraftTransaction(
 			testXPub, &TransactionConfig{
-				FeeUnit:   chainstate.MockDefaultFee,
+				FeeUnit:   &mockDefaultFee,
 				SendAllTo: &TransactionOutput{To: testExternalAddress},
 			}, append(client.DefaultModelOptions(), New())...,
 		)
@@ -56,7 +60,7 @@ func TestDraftTransaction_newDraftTransaction(t *testing.T) {
 		assert.WithinDurationf(t, expires, draftTx.ExpiresAt, 1*time.Second, "within 1 second")
 		assert.Equal(t, DraftStatusDraft, draftTx.Status)
 		assert.Equal(t, testXPubID, draftTx.XpubID)
-		assert.Equal(t, *chainstate.MockDefaultFee, *draftTx.Configuration.FeeUnit)
+		assert.Equal(t, mockDefaultFee, *draftTx.Configuration.FeeUnit)
 	})
 }
 
@@ -67,7 +71,7 @@ func TestDraftTransaction_GetModelName(t *testing.T) {
 		defer deferMe()
 		prepareAdditionalModels(ctx, t, client, false)
 		draftTx, err := newDraftTransaction(testXPub, &TransactionConfig{
-			FeeUnit:   chainstate.MockDefaultFee,
+			FeeUnit:   &mockDefaultFee,
 			SendAllTo: &TransactionOutput{To: testExternalAddress},
 		}, append(client.DefaultModelOptions(), New())...)
 		require.NoError(t, err)
@@ -87,7 +91,7 @@ func TestDraftTransaction_getOutputSatoshis(t *testing.T) {
 				ChangeDestinations: []*Destination{{
 					LockingScript: testLockingScript,
 				}},
-				FeeUnit:   chainstate.MockDefaultFee,
+				FeeUnit:   &mockDefaultFee,
 				SendAllTo: &TransactionOutput{To: testExternalAddress},
 			}, append(client.DefaultModelOptions(), New())...,
 		)
@@ -108,7 +112,7 @@ func TestDraftTransaction_getOutputSatoshis(t *testing.T) {
 				ChangeDestinations: []*Destination{{
 					LockingScript: testLockingScript,
 				}},
-				FeeUnit:   chainstate.MockDefaultFee,
+				FeeUnit:   &mockDefaultFee,
 				SendAllTo: &TransactionOutput{To: testExternalAddress},
 			}, append(client.DefaultModelOptions(), New())...,
 		)
@@ -130,7 +134,7 @@ func TestDraftTransaction_getOutputSatoshis(t *testing.T) {
 				}, {
 					LockingScript: testTxInScriptPubKey,
 				}},
-				FeeUnit:   chainstate.MockDefaultFee,
+				FeeUnit:   &mockDefaultFee,
 				SendAllTo: &TransactionOutput{To: testExternalAddress},
 			}, append(client.DefaultModelOptions(), New())...,
 		)
@@ -156,7 +160,7 @@ func TestDraftTransaction_getOutputSatoshis(t *testing.T) {
 				}, {
 					LockingScript: testTxScriptPubKey1,
 				}},
-				FeeUnit:   chainstate.MockDefaultFee,
+				FeeUnit:   &mockDefaultFee,
 				SendAllTo: &TransactionOutput{To: testExternalAddress},
 			}, append(client.DefaultModelOptions(), New())...,
 		)
@@ -295,7 +299,7 @@ func TestDraftTransaction_createTransaction(t *testing.T) {
 		assert.Equal(t, uint64((startingBalance - txAmount - expectedFee)), draftTransaction.Configuration.ChangeSatoshis)
 
 		assert.Equal(t, uint64(expectedFee), draftTransaction.Configuration.Fee)
-		assert.Equal(t, *chainstate.MockDefaultFee, *draftTransaction.Configuration.FeeUnit)
+		assert.Equal(t, mockDefaultFee, *draftTransaction.Configuration.FeeUnit)
 
 		assert.Equal(t, 1, len(draftTransaction.Configuration.Inputs))
 		assert.Equal(t, testLockingScript, draftTransaction.Configuration.Inputs[0].ScriptPubKey)

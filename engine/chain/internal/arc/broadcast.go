@@ -85,7 +85,8 @@ func (s *Service) prepareTxHex(ctx context.Context, tx *sdk.Transaction) (string
 		return "", spverrors.ErrEFConvertInterrupted.Wrap(err)
 	}
 	if err != nil {
-		s.logger.Warn().Err(err).Msg("Failed to convert transaction to EFHex. Using raw transaction hex as a fallback.")
+		// Log level is set to Info because it can happen in standard flow when source transaction is not from our wallet (and Junglebus is disabled)
+		s.logger.Info().Err(err).Msg("Could not convert transaction to EFHex. Using raw transaction hex as a fallback.")
 		return tx.Hex(), nil
 	}
 	return efHex, nil

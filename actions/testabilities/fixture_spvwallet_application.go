@@ -178,8 +178,7 @@ func getConfigForTests() *config.AppConfig {
 
 	cfg.DebugProfiling = false
 
-	cfg.ARC.UseFeeQuotes = false
-	cfg.ARC.FeeUnit = &config.FeeUnitConfig{
+	cfg.CustomFeeUnit = &config.FeeUnitConfig{
 		Satoshis: 1,
 		Bytes:    1000,
 	}

@@ -61,6 +61,8 @@ type AppConfig struct {
 	DisableITC bool `json:"disable_itc" mapstructure:"disable_itc"`
 	// RequestLogging is flag for enabling logging in go-api-router.
 	RequestLogging bool `json:"request_logging" mapstructure:"request_logging"`
+	// CustomFeeUnit
+	CustomFeeUnit *FeeUnitConfig `json:"custom_fee_unit" mapstructure:"custom_fee_unit"`
 }
 
 // AuthenticationConfig is the configuration for Authentication
@@ -144,11 +146,9 @@ type DatastoreConfig struct {
 // ARCConfig consists of blockchain nodes (Arc) configuration
 type ARCConfig struct {
 	Callback     *CallbackConfig `json:"callback" mapstructure:"callback"`
-	FeeUnit      *FeeUnitConfig  `json:"fee_unit" mapstructure:"fee_unit"`
 	DeploymentID string          `json:"deployment_id" mapstructure:"deployment_id"`
 	Token        string          `json:"token" mapstructure:"token"`
 	URL          string          `json:"url" mapstructure:"url"`
-	UseFeeQuotes bool            `json:"use_fee_quotes" mapstructure:"use_fee_quotes"`
 }
 
 // FeeUnitConfig reflects the utils.FeeUnit struct with proper annotations for json and mapstructure

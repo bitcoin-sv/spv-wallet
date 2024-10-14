@@ -6,8 +6,7 @@ import (
 
 	"github.com/bitcoin-sv/go-paymail"
 	"github.com/bitcoin-sv/spv-wallet/engine/chain"
-	chainmodels "github.com/bitcoin-sv/spv-wallet/engine/chain/models"
-	"github.com/bitcoin-sv/spv-wallet/engine/chainstate"
+	"github.com/bitcoin-sv/spv-wallet/engine/chain/models"
 	"github.com/bitcoin-sv/spv-wallet/engine/cluster"
 	"github.com/bitcoin-sv/spv-wallet/engine/datastore"
 	"github.com/bitcoin-sv/spv-wallet/engine/metrics"
@@ -51,7 +50,6 @@ type AdminService interface {
 type ClientService interface {
 	Cachestore() cachestore.ClientInterface
 	Cluster() cluster.ClientInterface
-	Chainstate() chainstate.ClientInterface
 	Datastore() datastore.ClientInterface
 	Logger() *zerolog.Logger
 	Notifications() *notifications.Notifications
@@ -203,7 +201,6 @@ type ClientInterface interface {
 	AuthenticateAccessKey(ctx context.Context, pubAccessKey string) (*AccessKey, error)
 	Close(ctx context.Context) error
 	Debug(on bool)
-	DefaultSyncConfig() *SyncConfig
 	IsDebug() bool
 	IsEncryptionKeySet() bool
 	IsIUCEnabled() bool
@@ -216,4 +213,6 @@ type ClientInterface interface {
 	GetWebhooks(ctx context.Context) ([]notifications.ModelWebhook, error)
 	Chain() chain.Service
 	LogBHSReadiness(ctx context.Context)
+	FeeUnit() chainmodels.FeeAmount
+	AskForFeeUnit(ctx context.Context) error
 }

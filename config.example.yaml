@@ -72,10 +72,8 @@ arc:
     host: https://example.com
     # token to authenticate callback calls - default callback token will be generated from the Admin Key
     _token: 44a82509
-  # use fee quotes for transaction fee calculation
-  use_fee_quotes: true
-  # used as the fee value if 'use_fee_quotes' is set to false
-  fee_unit:
+# custom fee unit used for calculating fees (if not set, a unit from ARC policy will be used)
+_custom_fee_unit:
     satoshis: 1
     bytes: 1000
 notifications:

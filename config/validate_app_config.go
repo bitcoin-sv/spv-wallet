@@ -1,5 +1,7 @@
 package config
 
+import "github.com/bitcoin-sv/spv-wallet/engine/spverrors"
+
 // Validate checks the configuration for specific rules
 func (c *AppConfig) Validate() error {
 	var err error
@@ -30,6 +32,10 @@ func (c *AppConfig) Validate() error {
 
 	if err = c.ARC.Validate(); err != nil {
 		return err
+	}
+
+	if c.CustomFeeUnit != nil && (c.CustomFeeUnit.Satoshis == 0 || c.CustomFeeUnit.Satoshis < 0) {
+		return spverrors.Newf("invalid custom fee unit satoshis: %d", c.CustomFeeUnit.Satoshis)
 	}
 
 	return nil

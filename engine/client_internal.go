@@ -6,7 +6,6 @@ import (
 	"github.com/bitcoin-sv/go-paymail"
 	"github.com/bitcoin-sv/go-paymail/server"
 	"github.com/bitcoin-sv/spv-wallet/engine/chain"
-	"github.com/bitcoin-sv/spv-wallet/engine/chainstate"
 	"github.com/bitcoin-sv/spv-wallet/engine/cluster"
 	"github.com/bitcoin-sv/spv-wallet/engine/datastore"
 	"github.com/bitcoin-sv/spv-wallet/engine/notifications"
@@ -32,19 +31,6 @@ func (c *Client) loadCluster(ctx context.Context) (err error) {
 	// Load if a custom interface was NOT provided
 	if c.options.cluster.ClientInterface == nil {
 		c.options.cluster.ClientInterface, err = cluster.NewClient(ctx, c.options.cluster.options...)
-	}
-
-	return
-}
-
-// loadChainstate will load chainstate configuration and start the Chainstate client
-func (c *Client) loadChainstate(ctx context.Context) (err error) {
-	// Load chainstate if a custom interface was NOT provided
-	if c.options.chainstate.ClientInterface == nil {
-		c.options.chainstate.options = append(c.options.chainstate.options, chainstate.WithUserAgent(c.UserAgent()))
-		c.options.chainstate.options = append(c.options.chainstate.options, chainstate.WithHTTPClient(c.options.httpClient.GetClient()))
-		c.options.chainstate.options = append(c.options.chainstate.options, chainstate.WithMetrics(c.options.metrics))
-		c.options.chainstate.ClientInterface, err = chainstate.NewClient(ctx, c.options.chainstate.options...)
 	}
 
 	return

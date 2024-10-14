@@ -30,7 +30,7 @@ func (g *sdkTxGetter) GetTransactions(ctx context.Context, ids iter.Seq[string])
 	err := db.
 		WithContext(queryIDsCtx).
 		Model(&Transaction{}).
-		Where("id = ANY(?)", slices.Collect(ids)).
+		Where("id IN (?)", slices.Collect(ids)).
 		Find(&hexes).
 		Error
 

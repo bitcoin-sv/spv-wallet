@@ -6,17 +6,14 @@ import (
 	"strings"
 	"time"
 
-	"github.com/bitcoin-sv/go-broadcast-client/broadcast"
 	"github.com/bitcoin-sv/go-paymail"
 	"github.com/bitcoin-sv/go-paymail/server"
 	"github.com/bitcoin-sv/spv-wallet/engine/chain/models"
-	"github.com/bitcoin-sv/spv-wallet/engine/chainstate"
 	"github.com/bitcoin-sv/spv-wallet/engine/cluster"
 	"github.com/bitcoin-sv/spv-wallet/engine/datastore"
 	"github.com/bitcoin-sv/spv-wallet/engine/logging"
 	"github.com/bitcoin-sv/spv-wallet/engine/metrics"
 	"github.com/bitcoin-sv/spv-wallet/engine/taskmanager"
-	"github.com/bitcoin-sv/spv-wallet/engine/utils"
 	"github.com/coocood/freecache"
 	"github.com/go-redis/redis/v8"
 	"github.com/go-resty/resty/v2"
@@ -41,16 +38,6 @@ func defaultClientOptions() *clientOptions {
 	return &clientOptions{
 		// By default check input utxos (unless disabled by the user)
 		iuc: true,
-
-		// Blank chainstate config
-		chainstate: &chainstateOptions{
-			ClientInterface:  nil,
-			options:          []chainstate.ClientOps{},
-			broadcasting:     true, // Enabled by default for new users
-			broadcastInstant: true, // Enabled by default for new users
-			paymailP2P:       true, // Enabled by default for new users
-			syncOnChain:      true, // Enabled by default for new users
-		},
 
 		cluster: &clusterOptions{
 			options: []cluster.ClientOps{},
@@ -177,7 +164,6 @@ func WithDebugging() ClientOps {
 
 		// Enable debugging on other services
 		c.cacheStore.options = append(c.cacheStore.options, cachestore.WithDebugging())
-		c.chainstate.options = append(c.chainstate.options, chainstate.WithDebugging())
 		c.dataStore.options = append(c.dataStore.options, datastore.WithDebugging())
 	}
 }
@@ -225,9 +211,7 @@ func WithLogger(customLogger *zerolog.Logger) ClientOps {
 			c.logger = customLogger
 
 			// Enable the logger on all SPV Wallet Engine services
-			chainstateLogger := customLogger.With().Str("subservice", "chainstate").Logger()
 			taskManagerLogger := customLogger.With().Str("subservice", "taskManager").Logger()
-			c.chainstate.options = append(c.chainstate.options, chainstate.WithLogger(&chainstateLogger))
 			c.taskManager.options = append(c.taskManager.options, taskmanager.WithLogger(&taskManagerLogger))
 
 			// Enable the logger on all external services
@@ -535,38 +519,6 @@ func WithClusterClient(clusterClient cluster.ClientInterface) ClientOps {
 }
 
 // -----------------------------------------------------------------
-// CHAIN-STATE
-// -----------------------------------------------------------------
-
-// WithCustomChainstate will set the chainstate
-func WithCustomChainstate(chainState chainstate.ClientInterface) ClientOps {
-	return func(c *clientOptions) {
-		if chainState != nil {
-			c.chainstate.ClientInterface = chainState
-		}
-	}
-}
-
-// WithChainstateOptions will set chainstate defaults
-func WithChainstateOptions(broadcasting, broadcastInstant, paymailP2P, syncOnChain bool) ClientOps {
-	return func(c *clientOptions) {
-		c.chainstate.broadcasting = broadcasting
-		c.chainstate.broadcastInstant = broadcastInstant
-		c.chainstate.paymailP2P = paymailP2P
-		c.chainstate.syncOnChain = syncOnChain
-	}
-}
-
-// WithExcludedProviders will set a list of excluded providers
-func WithExcludedProviders(providers []string) ClientOps {
-	return func(c *clientOptions) {
-		if len(providers) > 0 {
-			c.chainstate.options = append(c.chainstate.options, chainstate.WithExcludedProviders(providers))
-		}
-	}
-}
-
-// -----------------------------------------------------------------
 // NOTIFICATIONS
 // -----------------------------------------------------------------
 
@@ -579,24 +531,14 @@ func WithNotifications() ClientOps {
 	}
 }
 
-// WithFeeQuotes will find the lowest fee instead of using the fee set by the WithFeeUnit function
-func WithFeeQuotes(enabled bool) ClientOps {
-	return func(c *clientOptions) {
-		c.chainstate.options = append(c.chainstate.options, chainstate.WithFeeQuotes(enabled))
-	}
-}
+// -----------------------------------------------------------------
+// CHAIN
+// -----------------------------------------------------------------
 
-// WithFeeUnit will set the fee unit to use for broadcasting
-func WithFeeUnit(feeUnit *utils.FeeUnit) ClientOps {
+// WithCustomFeeUnit will set the custom fee unit for transactions
+func WithCustomFeeUnit(feeUnit chainmodels.FeeAmount) ClientOps {
 	return func(c *clientOptions) {
-		c.chainstate.options = append(c.chainstate.options, chainstate.WithFeeUnit(feeUnit))
-	}
-}
-
-// WithBroadcastClient will set broadcast client
-func WithBroadcastClient(broadcastClient broadcast.Client) ClientOps {
-	return func(c *clientOptions) {
-		c.chainstate.options = append(c.chainstate.options, chainstate.WithBroadcastClient(broadcastClient))
+		c.feeUnit = &feeUnit
 	}
 }
 

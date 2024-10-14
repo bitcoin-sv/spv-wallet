@@ -64,7 +64,11 @@ func newDraftTransaction(rawXpubKey string, config *TransactionConfig, opts ...M
 	}
 
 	if config.FeeUnit == nil {
-		draft.Configuration.FeeUnit = draft.Client().Chainstate().FeeUnit()
+		unit := draft.Client().FeeUnit()
+		draft.Configuration.FeeUnit = &utils.FeeUnit{
+			Satoshis: int(unit.Satoshis),
+			Bytes:    unit.Bytes,
+		}
 	}
 
 	err := draft.createTransactionHex(context.Background())

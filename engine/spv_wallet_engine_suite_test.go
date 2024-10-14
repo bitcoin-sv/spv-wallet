@@ -7,7 +7,6 @@ import (
 	"time"
 
 	"github.com/DATA-DOG/go-sqlmock"
-	broadcast_client_mock "github.com/bitcoin-sv/go-broadcast-client/broadcast/broadcast-client-mock"
 	"github.com/bitcoin-sv/spv-wallet/engine/datastore"
 	"github.com/bitcoin-sv/spv-wallet/engine/taskmanager"
 	"github.com/bitcoin-sv/spv-wallet/engine/tester"
@@ -89,9 +88,6 @@ func (ts *EmbeddedDBTestSuite) createTestClient(ctx context.Context, database da
 	tablePrefix string, mockDB, mockRedis bool, opts ...ClientOps,
 ) (*TestingClient, error) {
 	var err error
-	bc := broadcast_client_mock.Builder().
-		WithMockArc(broadcast_client_mock.MockSuccess).
-		Build()
 
 	// Start the suite
 	tc := &TestingClient{
@@ -113,7 +109,7 @@ func (ts *EmbeddedDBTestSuite) createTestClient(ctx context.Context, database da
 
 		// Switch on database types
 		if database == datastore.SQLite {
-			opts = append(opts, WithBroadcastClient(bc), WithSQLite(&datastore.SQLiteConfig{
+			opts = append(opts, WithSQLite(&datastore.SQLiteConfig{
 				CommonConfig: datastore.CommonConfig{
 					MaxConnectionIdleTime: 0,
 					MaxConnectionTime:     0,
@@ -206,10 +202,6 @@ func (ts *EmbeddedDBTestSuite) createTestClient(ctx context.Context, database da
 //
 //nolint:nolintlint,unparam,gci // opts is the way, but not yet being used
 func (ts *EmbeddedDBTestSuite) genericDBClient(t *testing.T, database datastore.Engine, taskManagerEnabled bool, opts ...ClientOps) *TestingClient {
-	bc := broadcast_client_mock.Builder().
-		WithMockArc(broadcast_client_mock.MockSuccess).
-		Build()
-
 	prefix := tester.RandomTablePrefix()
 
 	if opts == nil {
@@ -217,10 +209,8 @@ func (ts *EmbeddedDBTestSuite) genericDBClient(t *testing.T, database datastore.
 	}
 	opts = append(opts,
 		WithDebugging(),
-		WithChainstateOptions(false, false, false, false),
 		WithAutoMigrate(BaseModels...),
 		WithAutoMigrate(&PaymailAddress{}),
-		WithBroadcastClient(bc),
 	)
 	if taskManagerEnabled {
 		opts = append(opts, WithTaskqConfig(taskmanager.DefaultTaskQConfig(prefix+"_queue")))
@@ -243,15 +233,12 @@ func (ts *EmbeddedDBTestSuite) genericDBClient(t *testing.T, database datastore.
 //
 // NOTE: you need to close the client: ts.Close()
 func (ts *EmbeddedDBTestSuite) genericMockedDBClient(t *testing.T, database datastore.Engine) *TestingClient {
-	bc := broadcast_client_mock.Builder().
-		WithMockArc(broadcast_client_mock.MockSuccess).
-		Build()
 	prefix := tester.RandomTablePrefix()
 	tc, err := ts.createTestClient(
 		context.Background(),
 		database, prefix,
 		true, true, WithDebugging(),
-		withTaskManagerMockup(), WithBroadcastClient(bc),
+		withTaskManagerMockup(),
 	)
 	require.NoError(t, err)
 	require.NotNil(t, tc)
