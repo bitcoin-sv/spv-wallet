@@ -5,9 +5,9 @@ import (
 	"testing"
 	"time"
 
+	ec "github.com/bitcoin-sv/go-sdk/primitives/ec"
+	primitives "github.com/bitcoin-sv/go-sdk/primitives/ec"
 	"github.com/bitcoin-sv/spv-wallet/engine/utils"
-	"github.com/bitcoinschema/go-bitcoin/v2"
-	"github.com/libsv/go-bk/bec"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -21,11 +21,11 @@ func Test_newAccessKey(t *testing.T) {
 		assert.Equal(t, 64, len(key.GetID()))
 		assert.Equal(t, 64, len(key.Key))
 
-		privateKey, _ := bitcoin.PrivateKeyFromString(key.Key)
-		assert.IsType(t, bec.PrivateKey{}, *privateKey)
+		privateKey, _ := primitives.PrivateKeyFromHex(key.Key)
+		assert.IsType(t, ec.PrivateKey{}, *privateKey)
 		publicKey := privateKey.PubKey()
-		assert.IsType(t, bec.PublicKey{}, *publicKey)
-		id := utils.Hash(hex.EncodeToString(publicKey.SerialiseCompressed()))
+		assert.IsType(t, ec.PublicKey{}, *publicKey)
+		id := utils.Hash(hex.EncodeToString(publicKey.SerializeCompressed()))
 		assert.Equal(t, id, key.ID)
 	})
 

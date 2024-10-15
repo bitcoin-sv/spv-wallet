@@ -3,6 +3,7 @@ package utils
 import (
 	"testing"
 
+	"github.com/bitcoin-sv/spv-wallet/models/bsv"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -34,11 +35,11 @@ func TestGetOutputSizeForType(t *testing.T) {
 
 func TestIsLowerThan(t *testing.T) {
 	t.Run("same satoshis, different bytes", func(t *testing.T) {
-		one := FeeUnit{
+		one := bsv.FeeUnit{
 			Satoshis: 1,
 			Bytes:    1000,
 		}
-		two := FeeUnit{
+		two := bsv.FeeUnit{
 			Satoshis: 1,
 			Bytes:    20,
 		}
@@ -46,11 +47,11 @@ func TestIsLowerThan(t *testing.T) {
 		assert.False(t, two.IsLowerThan(&one))
 	})
 	t.Run("same bytes, different satoshis", func(t *testing.T) {
-		one := FeeUnit{
+		one := bsv.FeeUnit{
 			Satoshis: 1,
 			Bytes:    20,
 		}
-		two := FeeUnit{
+		two := bsv.FeeUnit{
 			Satoshis: 2,
 			Bytes:    20,
 		}
@@ -59,11 +60,11 @@ func TestIsLowerThan(t *testing.T) {
 	})
 
 	t.Run("zero as bytes in denominator", func(t *testing.T) {
-		one := FeeUnit{
+		one := bsv.FeeUnit{
 			Satoshis: 1,
 			Bytes:    0,
 		}
-		two := FeeUnit{
+		two := bsv.FeeUnit{
 			Satoshis: 2,
 			Bytes:    0,
 		}
@@ -73,8 +74,8 @@ func TestIsLowerThan(t *testing.T) {
 }
 
 func TestLowestFee(t *testing.T) {
-	initTest := func() (feeList []FeeUnit, defaultFee FeeUnit) {
-		feeList = []FeeUnit{
+	initTest := func() (feeList []bsv.FeeUnit, defaultFee bsv.FeeUnit) {
+		feeList = []bsv.FeeUnit{
 			{
 				Satoshis: 1,
 				Bytes:    20,
@@ -88,7 +89,7 @@ func TestLowestFee(t *testing.T) {
 				Bytes:    20,
 			},
 		}
-		defaultFee = FeeUnit{
+		defaultFee = bsv.FeeUnit{
 			Satoshis: 4,
 			Bytes:    20,
 		}
@@ -115,7 +116,7 @@ func TestLowestFee(t *testing.T) {
 
 	t.Run("lowest fee as defaultValue", func(t *testing.T) {
 		_, defaultFee := initTest()
-		feeList := []FeeUnit{}
+		feeList := []bsv.FeeUnit{}
 		assert.Equal(t, defaultFee, *LowestFee(feeList, &defaultFee))
 	})
 }

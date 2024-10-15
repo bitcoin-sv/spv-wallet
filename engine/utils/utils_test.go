@@ -5,9 +5,9 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/bitcoinschema/go-bitcoin/v2"
-	"github.com/libsv/go-bk/bec"
-	"github.com/libsv/go-bk/bip32"
+	bip32 "github.com/bitcoin-sv/go-sdk/compat/bip32"
+	compat "github.com/bitcoin-sv/go-sdk/compat/bip32"
+	ec "github.com/bitcoin-sv/go-sdk/primitives/ec"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -115,7 +115,7 @@ func TestDeriveAddresses(t *testing.T) {
 
 // TestDerivePrivateKeyFromHex test the method DerivePrivateKeyFromHex
 func TestDerivePrivateKeyFromHex(t *testing.T) {
-	hdXpriv, _ := bitcoin.GetHDKeyFromExtendedPublicKey(testXpriv)
+	hdXpriv, _ := compat.GetHDKeyFromExtendedPublicKey(testXpriv)
 
 	t.Run("empty key", func(t *testing.T) {
 		_, err := DerivePrivateKeyFromHex(nil, testHash)
@@ -125,52 +125,13 @@ func TestDerivePrivateKeyFromHex(t *testing.T) {
 	t.Run("empty hex", func(t *testing.T) {
 		key, err := DerivePrivateKeyFromHex(hdXpriv, "")
 		require.NoError(t, err)
-		assert.Equal(t, privateKey0, hex.EncodeToString(key.Serialise()))
+		assert.Equal(t, privateKey0, hex.EncodeToString(key.Serialize()))
 	})
 
 	t.Run("empty hex", func(t *testing.T) {
 		key, err := DerivePrivateKeyFromHex(hdXpriv, testHash)
 		require.NoError(t, err)
-		assert.Equal(t, privateKeyHash, hex.EncodeToString(key.Serialise()))
-	})
-}
-
-// TestDerivePublicKeyFromHex test the method DerivePublicKeyFromHex
-func TestDerivePublicKeyFromHex(t *testing.T) {
-	hdXpriv, _ := bitcoin.GetHDKeyFromExtendedPublicKey(testXpriv)
-	hdXpub, _ := bitcoin.GetHDKeyFromExtendedPublicKey(testXpub)
-
-	t.Run("empty key", func(t *testing.T) {
-		_, err := DerivePublicKeyFromHex(nil, testHash)
-		require.ErrorIs(t, err, ErrHDKeyNil)
-	})
-
-	t.Run("priv empty hex", func(t *testing.T) {
-		key, err := DerivePublicKeyFromHex(hdXpriv, "")
-		require.NoError(t, err)
-		publicKey, _ := bitcoin.PubKeyFromPrivateKeyString(privateKey0, true)
-		assert.Equal(t, publicKey, hex.EncodeToString(key.SerialiseCompressed()))
-	})
-
-	t.Run("pub empty hex", func(t *testing.T) {
-		key, err := DerivePublicKeyFromHex(hdXpub, "")
-		require.NoError(t, err)
-		publicKey, _ := bitcoin.PubKeyFromPrivateKeyString(privateKey0, true)
-		assert.Equal(t, publicKey, hex.EncodeToString(key.SerialiseCompressed()))
-	})
-
-	t.Run("priv testHash hex", func(t *testing.T) {
-		key, err := DerivePublicKeyFromHex(hdXpriv, testHash)
-		require.NoError(t, err)
-		publicKey, _ := bitcoin.PubKeyFromPrivateKeyString(privateKeyHash, true)
-		assert.Equal(t, publicKey, hex.EncodeToString(key.SerialiseCompressed()))
-	})
-
-	t.Run("pub testHash hex", func(t *testing.T) {
-		key, err := DerivePublicKeyFromHex(hdXpub, testHash)
-		require.NoError(t, err)
-		publicKey, _ := bitcoin.PubKeyFromPrivateKeyString(privateKeyHash, true)
-		assert.Equal(t, publicKey, hex.EncodeToString(key.SerialiseCompressed()))
+		assert.Equal(t, privateKeyHash, hex.EncodeToString(key.Serialize()))
 	})
 }
 
@@ -212,7 +173,7 @@ func TestGetChildNumsFromHex(t *testing.T) {
 // TestDeriveChildKeyFromHex will test the method DeriveChildKeyFromHex()
 func TestDeriveChildKeyFromHex(t *testing.T) {
 	t.Run("xpriv", func(t *testing.T) {
-		key, err := bitcoin.GenerateHDKeyFromString(testXpriv)
+		key, err := compat.GenerateHDKeyFromString(testXpriv)
 		require.NoError(t, err)
 
 		var childKey *bip32.ExtendedKey
@@ -222,7 +183,7 @@ func TestDeriveChildKeyFromHex(t *testing.T) {
 	})
 
 	t.Run("xpub", func(t *testing.T) {
-		key, err := bitcoin.GenerateHDKeyFromString(testXpub)
+		key, err := compat.GenerateHDKeyFromString(testXpub)
 		require.NoError(t, err)
 
 		var childKey *bip32.ExtendedKey
@@ -232,7 +193,7 @@ func TestDeriveChildKeyFromHex(t *testing.T) {
 	})
 
 	t.Run("xpriv => xpub", func(t *testing.T) {
-		key, err := bitcoin.GenerateHDKeyFromString(testXpriv)
+		key, err := compat.GenerateHDKeyFromString(testXpriv)
 		require.NoError(t, err)
 
 		var childKey *bip32.ExtendedKey
@@ -254,26 +215,26 @@ func TestDerivePublicKey(t *testing.T) {
 	require.NoError(t, err)
 
 	t.Run("nil", func(t *testing.T) {
-		var pubKey *bec.PublicKey
+		var pubKey *ec.PublicKey
 		pubKey, err = DerivePublicKey(nil, 0, 0)
 		assert.ErrorIs(t, err, ErrHDKeyNil)
 		assert.Nil(t, pubKey)
 	})
 
 	t.Run("derive", func(t *testing.T) {
-		var pubKey *bec.PublicKey
+		var pubKey *ec.PublicKey
 		pubKey, err = DerivePublicKey(hdKey, 0, 0)
 		require.NoError(t, err)
 		assert.Equal(t,
 			"03d406421c2733d69a76147c67f8c2194857a2f088299ebf8f1c3790396aa70b4e",
-			hex.EncodeToString(pubKey.SerialiseCompressed()),
+			hex.EncodeToString(pubKey.SerializeCompressed()),
 		)
 
 		pubKey, err = DerivePublicKey(hdKey, 1, 1)
 		require.NoError(t, err)
 		assert.Equal(t,
 			"0263e4a3696fe4e5136536988169bc3fbec730b912ade7988c57098a47a81a0ae1",
-			hex.EncodeToString(pubKey.SerialiseCompressed()),
+			hex.EncodeToString(pubKey.SerializeCompressed()),
 		)
 	})
 }

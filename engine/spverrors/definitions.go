@@ -209,6 +209,9 @@ var ErrInvalidOpReturnOutput = models.SPVError{Message: "invalid op_return outpu
 // ErrInvalidLockingScript is when a locking script cannot be decoded
 var ErrInvalidLockingScript = models.SPVError{Message: "invalid locking script", StatusCode: 400, Code: "error-transaction-locking-script-invalid"}
 
+// ErrFailedToCreateUTXO is when sdk method fails to create UTXO with provided data
+var ErrFailedToCreateUTXO = models.SPVError{Message: "failed to create UTXO", StatusCode: 400, Code: "error-transaction-failed-to-create-utxo"}
+
 // ErrOutputValueNotRecognized is when there is an invalid output value given, or missing value
 var ErrOutputValueNotRecognized = models.SPVError{Message: "output value is unrecognized", StatusCode: 400, Code: "error-transaction-output-value-unrecognized"}
 

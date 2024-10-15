@@ -3,7 +3,7 @@ package utils
 import (
 	"testing"
 
-	"github.com/libsv/go-bk/bip32"
+	compat "github.com/bitcoin-sv/go-sdk/compat/bip32"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -14,8 +14,7 @@ const (
 
 // Test_DeriveAddresses will test the method DeriveAddresses()
 func Test_DeriveAddresses(t *testing.T) {
-
-	xPub, errX := bip32.NewKeyFromString(testXPub)
+	xPub, errX := compat.NewKeyFromString(testXPub)
 	require.NoError(t, errX)
 
 	t.Run("DeriveAddresses 1", func(t *testing.T) {
@@ -35,8 +34,7 @@ func Test_DeriveAddresses(t *testing.T) {
 
 // Test_DeriveAddress will test the method DeriveAddress()
 func Test_DeriveAddress(t *testing.T) {
-
-	xPub, errX := bip32.NewKeyFromString(testXPub)
+	xPub, errX := compat.NewKeyFromString(testXPub)
 	require.NoError(t, errX)
 
 	t.Run("DeriveAddresses 1", func(t *testing.T) {
@@ -62,8 +60,7 @@ func Test_DeriveAddress(t *testing.T) {
 
 // Benchmark_DeriveAddresses will benchmark the method DeriveAddresses()
 func Benchmark_DeriveAddresses(b *testing.B) {
-
-	xPub, errX := bip32.NewKeyFromString(testXPub)
+	xPub, errX := compat.NewKeyFromString(testXPub)
 	if errX != nil {
 		b.Fail()
 	}
@@ -76,8 +73,7 @@ func Benchmark_DeriveAddresses(b *testing.B) {
 
 // Benchmark_DeriveAddress will benchmark the method DeriveAddress()
 func Benchmark_DeriveAddress(b *testing.B) {
-
-	xPub, errX := bip32.NewKeyFromString(testXPub)
+	xPub, errX := compat.NewKeyFromString(testXPub)
 	if errX != nil {
 		b.Fail()
 	}

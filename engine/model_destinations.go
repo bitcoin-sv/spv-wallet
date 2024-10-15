@@ -5,11 +5,12 @@ import (
 	"errors"
 	"fmt"
 
+	"github.com/bitcoin-sv/go-sdk/script"
+	"github.com/bitcoin-sv/go-sdk/transaction/template/p2pkh"
 	"github.com/bitcoin-sv/spv-wallet/engine/cluster"
 	"github.com/bitcoin-sv/spv-wallet/engine/datastore"
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/bitcoin-sv/spv-wallet/engine/utils"
-	"github.com/bitcoinschema/go-bitcoin/v2"
 )
 
 // Destination is an object representing a BitCoin destination (address, script, etc)
@@ -77,12 +78,17 @@ func newAddress(rawXpubKey string, chain, num uint32, opts ...ModelOps) (*Destin
 		return nil, err
 	}
 
-	// Set the locking script
-	if destination.LockingScript, err = bitcoin.ScriptFromAddress(
-		destination.Address,
-	); err != nil {
-		return nil, spverrors.Wrapf(err, "failed to get locking script from address %s", destination.Address)
+	sc, err := script.NewAddressFromString(destination.Address)
+	if err != nil {
+		return nil, spverrors.Wrapf(err, "failed to parse string address to script %s", destination.Address)
 	}
+
+	ls, err := p2pkh.Lock(sc)
+	if err != nil {
+		return nil, spverrors.Wrapf(err, "failed to get locking script from address %s", sc)
+	}
+
+	destination.LockingScript = ls.String()
 
 	// Determine the type if the locking script is provided
 	destination.Type = utils.GetDestinationType(destination.LockingScript)
@@ -267,6 +273,8 @@ func getDestinationWithCache(ctx context.Context, client ClientInterface,
 		destination.enrich(ModelDestination, opts...) // Enrich the model with our parent options
 		return destination, nil
 	}
+
+	opts = append(opts, client.DefaultModelOptions()...)
 
 	// Get via ID, address or locking script
 	if len(id) > 0 {
