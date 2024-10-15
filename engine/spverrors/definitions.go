@@ -68,6 +68,9 @@ var ErrInvalidConditions = models.SPVError{Message: "invalid conditions", Status
 // ErrCannotMapFromModel is when request body model cannot be mapped into domain model.
 var ErrCannotMapFromModel = models.SPVError{Message: "error during reading request body", StatusCode: 500, Code: "error-request-read"}
 
+// ErrCannotMapFromEngine is when engine model cannot be mapped into response model.
+var ErrCannotMapFromEngine = models.SPVError{Message: "error during preparing response", StatusCode: 500, Code: "error-response-write"}
+
 // ////////////////////////////////// ACCESS KEY ERRORS
 
 // ErrCouldNotFindAccessKey is when could not find xpub

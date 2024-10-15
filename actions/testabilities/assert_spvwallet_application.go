@@ -102,8 +102,7 @@ func assertJSONEq(t testing.TB, expected, actual string) {
 		require.Fail(t, fmt.Sprintf("Input value ('%s') is not valid json.\nJSON parsing error: '%s'", actual, err.Error()))
 	}
 
-	areEqual := assert.ObjectsAreEqual(expectedJSONValue, actualJSONValue)
-	if areEqual {
+	if assert.ObjectsAreEqual(expectedJSONValue, actualJSONValue) {
 		return
 	}
 

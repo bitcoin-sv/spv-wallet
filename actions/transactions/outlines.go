@@ -31,6 +31,10 @@ func transactionOutlines(c *gin.Context, userCtx *reqctx.UserContext) {
 		return
 	}
 
-	res := outline.ToResponse(txOutline)
+	res, err := outline.ToResponse(txOutline)
+	if err != nil {
+		spverrors.ErrorResponse(c, err, logger)
+		return
+	}
 	c.JSON(200, res)
 }
