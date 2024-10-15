@@ -72,10 +72,11 @@ func toBeefBytes(tx *trx.Transaction, bumps BUMPs) []byte {
 
 func getBumpPathIndex(tx *trx.Transaction, bumps BUMPs) int {
 	bumpIndex := -1
+	txID := tx.TxID().String()
 
 	for i, bump := range bumps {
 		for _, path := range bump.Path[0] {
-			if path.Hash == tx.TxID().String() {
+			if path.Hash == txID {
 				bumpIndex = i
 			}
 		}

@@ -15,14 +15,14 @@ func Sha256(b []byte) []byte {
 }
 
 // Ripemd160 hashes with RIPEMD160
-func Ripemd160(b []byte) []byte {
+func Ripemd160(b []byte) ([]byte, error) {
 	ripe := ripemd160.New()
-	_, _ = ripe.Write(b[:])
-	return ripe.Sum(nil)
+	_, err := ripe.Write(b[:])
+	return ripe.Sum(nil), err
 }
 
 // Hash160 hashes with SHA256 and then hashes again with RIPEMD160.
-func Hash160(b []byte) []byte {
+func Hash160(b []byte) ([]byte, error) {
 	hash := Sha256(b)
 	return Ripemd160(hash[:])
 }

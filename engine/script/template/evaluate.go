@@ -38,7 +38,10 @@ func Evaluate(scriptBytes []byte, pubKey *ec.PublicKey) ([]byte, error) {
 	dPKBytes := pubKey.SerializeCompressed()
 
 	// Apply Hash160 (SHA-256 followed by RIPEMD-160) to the compressed public key
-	dPKHash := utils.Hash160(dPKBytes)
+	dPKHash, err := utils.Hash160(dPKBytes)
+	if err != nil {
+		return nil, spverrors.Wrapf(err, "failed to hash public key")
+	}
 
 	// Create a new script with the public key hash
 	newScript := new(script.Script)
