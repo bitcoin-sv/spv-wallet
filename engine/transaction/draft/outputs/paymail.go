@@ -12,6 +12,7 @@ import (
 	"github.com/bitcoin-sv/spv-wallet/engine/transaction/draft/evaluation"
 	txerrors "github.com/bitcoin-sv/spv-wallet/engine/transaction/errors"
 	paymailreq "github.com/bitcoin-sv/spv-wallet/models/request/paymail"
+	"github.com/bitcoin-sv/spv-wallet/models/transaction/bucket"
 )
 
 // Paymail represents a paymail output
@@ -62,7 +63,7 @@ func (p *Paymail) createBsvPaymailOutput(output *paymail.PaymentOutput, referenc
 			LockingScript: lockingScript,
 		},
 		OutputAnnotation: &transaction.OutputAnnotation{
-			Bucket: transaction.BucketBSV,
+			Bucket: bucket.BSV,
 			Paymail: &transaction.PaymailAnnotation{
 				Receiver:  p.To,
 				Reference: reference,
