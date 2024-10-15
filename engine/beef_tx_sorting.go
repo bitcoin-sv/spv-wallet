@@ -26,8 +26,9 @@ func prepareSortStructures(dag []*trx.Transaction) (txByID map[string]*trx.Trans
 	incomingEdgesMap = make(map[string]int, dagLen)
 
 	for _, tx := range dag {
-		txByID[tx.TxID().String()] = tx // TODO: perf -> In GO-SDK, the TxID is calculated every time we try to get it, which means we hash the tx bytes twice each time. It's expensive operation - try to avoid calculation each time
-		incomingEdgesMap[tx.TxID().String()] = 0
+                txID := tx.TxID().String()
+		txByID[txID] = tx 
+		incomingEdgesMap[txID] = 0
 	}
 
 	calculateIncomingEdges(incomingEdgesMap, txByID)
