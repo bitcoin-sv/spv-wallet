@@ -124,3 +124,7 @@ logging:
   level: info
   # log format: json, console
   format: console
+
+experimental_features:
+  pike_contacts_enabled: false
+  pike_payment_enabled: false
