@@ -19,7 +19,7 @@ type mockTxsGetter struct {
 	applyTimeout bool
 }
 
-func (m *mockTxsGetter) GetTransactions(ctx context.Context, ids iter.Seq[string]) ([]*sdk.Transaction, error) {
+func (m *mockTxsGetter) GetTransactions(ctx context.Context, _ iter.Seq[string]) ([]*sdk.Transaction, error) {
 	if m.applyTimeout {
 		<-ctx.Done()
 		return nil, ctx.Err()
@@ -75,7 +75,8 @@ func TestCombinedTxGetter(t *testing.T) {
 	}
 	for name, test := range tests {
 		t.Run(name, func(t *testing.T) {
-			getter := internal.NewCombinedTxsGetter(test.getters...)
+			getter, err := internal.NewCombinedTxsGetter(test.getters...)
+			require.NoError(t, err)
 			transactions, err := getter.GetTransactions(context.Background(), ids(test.requestedTXs...))
 
 			require.NoError(t, err)
@@ -88,9 +89,16 @@ func TestCombinedTxGetter(t *testing.T) {
 func TestCombinedTxGetterErrorCases(t *testing.T) {
 	tx1 := fromHex(tx1Hex)
 
+	t.Run("Nil getter getters", func(t *testing.T) {
+		getter, err := internal.NewCombinedTxsGetter(&mockTxsGetter{}, nil)
+		require.Error(t, err)
+		require.Nil(t, getter)
+	})
+
 	t.Run("Getter returns error", func(t *testing.T) {
 		expectedErr := errors.New("some error")
-		getter := internal.NewCombinedTxsGetter(&mockTxsGetter{returnError: expectedErr})
+		getter, err := internal.NewCombinedTxsGetter(&mockTxsGetter{returnError: expectedErr})
+		require.NoError(t, err)
 
 		transactions, err := getter.GetTransactions(context.Background(), ids(tx1))
 
@@ -99,7 +107,8 @@ func TestCombinedTxGetterErrorCases(t *testing.T) {
 	})
 
 	t.Run("Getter interrupted by ctx timeout ", func(t *testing.T) {
-		getter := internal.NewCombinedTxsGetter(&mockTxsGetter{applyTimeout: true})
+		getter, err := internal.NewCombinedTxsGetter(&mockTxsGetter{applyTimeout: true})
+		require.NoError(t, err)
 
 		ctx, cancel := context.WithTimeout(context.Background(), 1*time.Millisecond)
 		defer cancel()

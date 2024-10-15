@@ -35,10 +35,14 @@ func setTxGetter(logger zerolog.Logger, httpClient *resty.Client, arcCfg *chainm
 	}
 	junglebusTxsGetter := junglebus.NewJunglebusService(logger.With().Str("service", "junglebus").Logger(), httpClient)
 	if arcCfg.TxsGetter != nil {
-		arcCfg.TxsGetter = internal.NewCombinedTxsGetter(
+		var err error
+		arcCfg.TxsGetter, err = internal.NewCombinedTxsGetter(
 			arcCfg.TxsGetter,
 			junglebusTxsGetter,
 		)
+		if err != nil {
+			logger.Fatal().Err(err).Msg("failed to create combined txs getter")
+		}
 	} else {
 		arcCfg.TxsGetter = junglebusTxsGetter
 	}

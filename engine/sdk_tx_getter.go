@@ -10,6 +10,9 @@ import (
 	"iter"
 )
 
+// loadFromDBTimeout - within this time transactions should be loaded from the database
+const loadFromDBTimeout = 20 * time.Second
+
 type sdkTxGetter struct {
 	client *Client
 }
@@ -21,17 +24,22 @@ func newSDKTxGetter(client *Client) *sdkTxGetter {
 func (g *sdkTxGetter) GetTransactions(ctx context.Context, ids iter.Seq[string]) ([]*sdk.Transaction, error) {
 	db := g.client.Datastore().DB()
 
-	queryIDsCtx, cancel := context.WithTimeout(ctx, 20*time.Second)
+	queryIDsCtx, cancel := context.WithTimeout(ctx, loadFromDBTimeout)
 	defer cancel()
 
 	var hexes []struct {
 		Hex string
 	}
 
+	idsSlice := slices.Collect(ids)
+	if len(idsSlice) == 0 {
+		return nil, nil
+	}
+
 	err := db.
 		WithContext(queryIDsCtx).
 		Model(&Transaction{}).
-		Where("id IN (?)", slices.Collect(ids)).
+		Where("id IN (?)", idsSlice).
 		Find(&hexes).
 		Error
 
