@@ -5,7 +5,7 @@ import (
 
 	"github.com/bitcoin-sv/go-broadcast-client/broadcast"
 	"github.com/bitcoin-sv/spv-wallet/engine/metrics"
-	"github.com/bitcoin-sv/spv-wallet/engine/utils"
+	"github.com/bitcoin-sv/spv-wallet/models/bsv"
 	"github.com/rs/zerolog"
 )
 
@@ -102,7 +102,7 @@ func WithFeeQuotes(enabled bool) ClientOps {
 }
 
 // WithFeeUnit will set the fee unit
-func WithFeeUnit(feeUnit *utils.FeeUnit) ClientOps {
+func WithFeeUnit(feeUnit *bsv.FeeUnit) ClientOps {
 	return func(c *clientOptions) {
 		c.config.feeUnit = feeUnit
 	}

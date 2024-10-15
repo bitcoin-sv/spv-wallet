@@ -5,8 +5,8 @@ import (
 	"encoding/hex"
 	"sync"
 
+	script "github.com/bitcoin-sv/go-sdk/script"
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
-	"github.com/libsv/go-bt/v2/bscript"
 )
 
 var (
@@ -16,11 +16,11 @@ var (
 
 func initScriptHex() {
 	opcodes := []byte{
-		bscript.OpDUP,
-		bscript.OpHASH160,
-		bscript.OpPUBKEYHASH,
-		bscript.OpEQUALVERIFY,
-		bscript.OpCHECKSIG,
+		script.OpDUP,
+		script.OpHASH160,
+		script.OpPUBKEYHASH,
+		script.OpEQUALVERIFY,
+		script.OpCHECKSIG,
 	}
 
 	// Convert opcodes to hexadecimal string

@@ -4,25 +4,24 @@ import (
 	"encoding/hex"
 	"regexp"
 
-	"github.com/bitcoinschema/go-bitcoin/v2"
-	bscript2 "github.com/libsv/go-bt/v2/bscript"
+	"github.com/bitcoin-sv/go-sdk/script"
 )
 
 const (
 	// ScriptTypePubKey alias from bscript
-	ScriptTypePubKey = bscript2.ScriptTypePubKey
+	ScriptTypePubKey = script.ScriptTypePubKey
 
 	// ScriptTypePubKeyHash alias from bscript
-	ScriptTypePubKeyHash = bscript2.ScriptTypePubKeyHash
+	ScriptTypePubKeyHash = script.ScriptTypePubKeyHash
 
 	// ScriptTypeNullData alias from bscript
-	ScriptTypeNullData = bscript2.ScriptTypeNullData
+	ScriptTypeNullData = script.ScriptTypeNullData
 
 	// ScriptTypeMultiSig alias from bscript
-	ScriptTypeMultiSig = bscript2.ScriptTypeMultiSig
+	ScriptTypeMultiSig = script.ScriptTypeMultiSig
 
 	// ScriptTypeNonStandard alias from bscript
-	ScriptTypeNonStandard = bscript2.ScriptTypeNonStandard
+	ScriptTypeNonStandard = script.ScriptTypeNonStandard
 
 	// ScriptHashType is the type for the deprecated script hash
 	ScriptHashType = "scripthash"
@@ -94,10 +93,11 @@ var (
 // IsP2PK Check whether the given string is a p2pk output
 // This is the original destination type that was used in the first blocks by Satoshi
 func IsP2PK(lockingScript string) bool {
-	script, err := bscript2.NewFromHexString(lockingScript)
+	script, err := script.NewFromHex(lockingScript)
 	if err != nil {
 		return false
 	}
+
 	return script.IsP2PK()
 }
 
@@ -138,10 +138,11 @@ func IsRunJS(lockingScript string) bool {
 
 // IsMultiSig Check whether the given string is a multi-sig locking script
 func IsMultiSig(lockingScript string) bool {
-	script, err := bscript2.NewFromHexString(lockingScript)
+	script, err := script.NewFromHex(lockingScript)
 	if err != nil {
 		return false
 	}
+
 	return script.IsMultiSigOut()
 }
 
@@ -185,32 +186,55 @@ func GetDestinationTypeRegex(destType string) *regexp.Regexp {
 }
 
 // GetAddressFromScript gets the destination address from the given locking script
+// FIXME: add logger on this scope to have info about returned errors
 func GetAddressFromScript(lockingScript string) (address string) {
 	scriptType := GetDestinationType(lockingScript)
 	if scriptType == ScriptTypePubKeyHash {
-		address, _ = bitcoin.GetAddressFromScript(lockingScript)
+		s, err := script.NewFromHex(lockingScript)
+		if err != nil {
+			return ""
+		}
+
+		addresses, err := s.Addresses()
+		if err != nil || len(addresses) == 0 {
+			return ""
+		}
+
+		address = addresses[0]
 	} else if scriptType == ScriptTypePubKey {
-		s, err := bscript2.NewFromHexString(lockingScript) // no need for error check, if type is set, it should be valid
+		s, err := script.NewFromHex(lockingScript)
 		if err != nil {
 			return ""
 		}
 
-		var parts [][]byte
-		parts, err = bscript2.DecodeParts(*s)
+		var parts []*script.ScriptChunk
+		parts, err = script.DecodeScript(*s)
 		if err != nil {
 			return ""
 		}
 
-		pubkeyHex := hex.EncodeToString(parts[0])
+		pubKeyHex := hex.EncodeToString(parts[0].Data)
 
-		var addressScript *bscript2.Address
-		addressScript, err = bitcoin.GetAddressFromPubKeyString(pubkeyHex, len(parts[0]) <= 33)
-		if err == nil {
-			address = addressScript.AddressString
+		var addressScript *script.Address
+		addressScript, err = script.NewAddressFromPublicKeyString(pubKeyHex, true)
+		if err != nil {
+			return ""
 		}
+
+		address = addressScript.AddressString
 	} else if scriptType == ScriptTypeTokenStas {
 		// stas is just a normal PubKeyHash with more data appended
-		address, _ = bitcoin.GetAddressFromScript(lockingScript[:50])
+		s, err := script.NewFromHex(lockingScript[:50])
+		if err != nil {
+			return ""
+		}
+
+		addresses, err := s.Addresses()
+		if err != nil || len(addresses) == 0 {
+			return ""
+		}
+
+		address = addresses[0]
 		// } else if scriptType == ScriptTypeTokenSensible {
 		// sensible tokens do not have the receiving address in the token output, but in another output
 		// sensible does not seem to be a utxo protocol, but an output protocol (all outputs of the tx matter)

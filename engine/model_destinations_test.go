@@ -4,11 +4,11 @@ import (
 	"testing"
 
 	"github.com/DATA-DOG/go-sqlmock"
+	"github.com/bitcoin-sv/go-sdk/script"
 	"github.com/bitcoin-sv/spv-wallet/engine/datastore"
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/bitcoin-sv/spv-wallet/engine/tester"
 	"github.com/bitcoin-sv/spv-wallet/engine/utils"
-	bscript2 "github.com/libsv/go-bt/v2/bscript"
 	"github.com/mrz1836/go-cache"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -47,7 +47,7 @@ func TestDestination_newDestination(t *testing.T) {
 		assert.Equal(t, true, destination.IsNew())
 		assert.Equal(t, testScript, destination.LockingScript)
 		assert.Equal(t, xPubID, destination.XpubID)
-		assert.Equal(t, bscript2.ScriptTypeNonStandard, destination.Type)
+		assert.Equal(t, script.ScriptTypeNonStandard, destination.Type)
 		assert.Equal(t, testDestinationID, destination.GetID())
 	})
 }
@@ -84,7 +84,7 @@ func TestDestination_newAddress(t *testing.T) {
 
 		// Check set locking script
 		assert.Equal(t, testLockingScript, address.LockingScript)
-		assert.Equal(t, bscript2.ScriptTypePubKeyHash, address.Type)
+		assert.Equal(t, script.ScriptTypePubKeyHash, address.Type)
 		assert.Equal(t, testAddressID, address.GetID())
 	})
 }

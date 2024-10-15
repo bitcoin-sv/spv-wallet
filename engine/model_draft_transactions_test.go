@@ -8,16 +8,17 @@ import (
 	"testing"
 	"time"
 
+	compat "github.com/bitcoin-sv/go-sdk/compat/bip32"
+	bsm "github.com/bitcoin-sv/go-sdk/compat/bsm"
+	ec "github.com/bitcoin-sv/go-sdk/primitives/ec"
+	"github.com/bitcoin-sv/go-sdk/script"
+	trx "github.com/bitcoin-sv/go-sdk/transaction"
+	sighash "github.com/bitcoin-sv/go-sdk/transaction/sighash"
 	"github.com/bitcoin-sv/spv-wallet/engine/chainstate"
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	xtester "github.com/bitcoin-sv/spv-wallet/engine/tester/paymailmock"
 	"github.com/bitcoin-sv/spv-wallet/engine/utils"
-	"github.com/bitcoinschema/go-bitcoin/v2"
-	"github.com/libsv/go-bk/bec"
-	"github.com/libsv/go-bk/bip32"
-	"github.com/libsv/go-bt/v2"
-	"github.com/libsv/go-bt/v2/bscript"
-	"github.com/libsv/go-bt/v2/sighash"
+	"github.com/bitcoin-sv/spv-wallet/models/bsv"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -306,13 +307,13 @@ func TestDraftTransaction_createTransaction(t *testing.T) {
 		assert.Equal(t, uint64((startingBalance - txAmount - expectedFee)), draftTransaction.Configuration.Outputs[1].Satoshis)
 		assert.Equal(t, draftTransaction.Configuration.ChangeDestinations[0].LockingScript, draftTransaction.Configuration.Outputs[1].Scripts[0].Script)
 
-		var btTx *bt.Tx
-		btTx, err = bt.NewTxFromString(draftTransaction.Hex)
+		var btTx *trx.Transaction
+		btTx, err = trx.NewTransactionFromHex(draftTransaction.Hex)
 		require.NoError(t, err)
 
 		assert.Equal(t, 1, len(btTx.Inputs))
-		assert.Equal(t, testTxID, hex.EncodeToString(btTx.Inputs[0].PreviousTxID()))
-		assert.Equal(t, uint32(0), btTx.Inputs[0].PreviousTxOutIndex)
+		assert.Equal(t, testTxID, btTx.Inputs[0].SourceTXID.String())
+		assert.Equal(t, uint32(0), btTx.Inputs[0].SourceTxOutIndex)
 
 		assert.Equal(t, 2, len(btTx.Outputs))
 		assert.Equal(t, uint64(txAmount), btTx.Outputs[0].Satoshis)
@@ -435,7 +436,7 @@ func TestDraftTransaction_createTransaction(t *testing.T) {
 		prepareAdditionalModels(ctx, t, client, false)
 
 		draftTransaction, err := newDraftTransaction(testXPub, &TransactionConfig{
-			FeeUnit: &utils.FeeUnit{
+			FeeUnit: &bsv.FeeUnit{
 				Satoshis: 5,
 				Bytes:    100,
 			},
@@ -754,7 +755,7 @@ func TestDraftTransaction_setChangeDestination(t *testing.T) {
 			),
 			Configuration: TransactionConfig{
 				ChangeDestinations: nil,
-				FeeUnit: &utils.FeeUnit{
+				FeeUnit: &bsv.FeeUnit{
 					Satoshis: 5,
 					Bytes:    10,
 				},
@@ -781,7 +782,7 @@ func TestDraftTransaction_setChangeDestination(t *testing.T) {
 			),
 			Configuration: TransactionConfig{
 				ChangeDestinations: nil,
-				FeeUnit: &utils.FeeUnit{
+				FeeUnit: &bsv.FeeUnit{
 					Satoshis: 5,
 					Bytes:    10,
 				},
@@ -902,13 +903,13 @@ func TestDraftTransaction_getInputsFromUtxos(t *testing.T) {
 		reservedUtxos := []*Utxo{{
 			UtxoPointer: UtxoPointer{
 				OutputIndex:   123,
-				TransactionID: "testTxID",
+				TransactionID: "invalidTxIDHex",
 			},
 			Satoshis:     124235,
 			ScriptPubKey: testLockingScript,
 		}}
 		inputUtxos, satoshisReserved, err := draftTransaction.getInputsFromUtxos(reservedUtxos)
-		require.ErrorIs(t, err, spverrors.ErrInvalidTransactionID)
+		require.ErrorIs(t, err, spverrors.ErrFailedToCreateUTXO)
 		assert.Nil(t, inputUtxos)
 		assert.Equal(t, uint64(0), satoshisReserved)
 	})
@@ -928,7 +929,7 @@ func TestDraftTransaction_getInputsFromUtxos(t *testing.T) {
 		require.NoError(t, err)
 		assert.Equal(t, uint64(124235), satoshisReserved)
 		assert.Equal(t, 1, len(inputUtxos))
-		assert.Equal(t, testTxID, hex.EncodeToString((inputUtxos)[0].TxID))
+		assert.Equal(t, testTxID, inputUtxos[0].TxID.String())
 		assert.Equal(t, uint32(123), (inputUtxos)[0].Vout)
 		assert.Equal(t, testLockingScript, (inputUtxos)[0].LockingScript.String())
 		assert.Equal(t, uint64(124235), (inputUtxos)[0].Satoshis)
@@ -957,12 +958,12 @@ func TestDraftTransaction_getInputsFromUtxos(t *testing.T) {
 		assert.Equal(t, uint64(124235+52313), satoshisReserved)
 		assert.Equal(t, 2, len(inputUtxos))
 
-		assert.Equal(t, testTxID, hex.EncodeToString((inputUtxos)[0].TxID))
+		assert.Equal(t, testTxID, inputUtxos[0].TxID.String())
 		assert.Equal(t, uint32(124), (inputUtxos)[0].Vout)
 		assert.Equal(t, testLockingScript, (inputUtxos)[0].LockingScript.String())
 		assert.Equal(t, uint64(52313), (inputUtxos)[0].Satoshis)
 
-		assert.Equal(t, testTxID, hex.EncodeToString((inputUtxos)[1].TxID))
+		assert.Equal(t, testTxID, inputUtxos[1].TxID.String())
 		assert.Equal(t, uint32(123), (inputUtxos)[1].Vout)
 		assert.Equal(t, testLockingScript, (inputUtxos)[1].LockingScript.String())
 		assert.Equal(t, uint64(124235), (inputUtxos)[1].Satoshis)
@@ -1037,7 +1038,7 @@ func TestDraftTransaction_addOutputsToTx(t *testing.T) {
 				}},
 			},
 		}
-		tx := bt.NewTx()
+		tx := trx.NewTransaction()
 		err := draft.addOutputsToTx(tx)
 		require.NoError(t, err)
 	})
@@ -1053,7 +1054,7 @@ func TestDraftTransaction_addOutputsToTx(t *testing.T) {
 				}},
 			},
 		}
-		tx := bt.NewTx()
+		tx := trx.NewTransaction()
 		err := draft.addOutputsToTx(tx)
 		require.ErrorIs(t, err, spverrors.ErrOutputValueTooLow)
 		assert.Len(t, tx.Outputs, 0)
@@ -1070,7 +1071,7 @@ func TestDraftTransaction_addOutputsToTx(t *testing.T) {
 				}},
 			},
 		}
-		tx := bt.NewTx()
+		tx := trx.NewTransaction()
 		err := draft.addOutputsToTx(tx)
 		require.NoError(t, err)
 		assert.Len(t, tx.Outputs, 1)
@@ -1090,7 +1091,7 @@ func TestDraftTransaction_addOutputsToTx(t *testing.T) {
 				}},
 			},
 		}
-		tx := bt.NewTx()
+		tx := trx.NewTransaction()
 		err := draft.addOutputsToTx(tx)
 		require.NoError(t, err)
 		assert.Len(t, tx.Outputs, 1)
@@ -1110,7 +1111,7 @@ func TestDraftTransaction_addOutputsToTx(t *testing.T) {
 				}},
 			},
 		}
-		tx := bt.NewTx()
+		tx := trx.NewTransaction()
 		err := draft.addOutputsToTx(tx)
 		require.ErrorIs(t, err, spverrors.ErrInvalidOpReturnOutput)
 	})
@@ -1121,7 +1122,7 @@ func TestDraftTransaction_SignInputs(t *testing.T) {
 	defer deferMe()
 
 	xPrivString := "xprv9s21ZrQH143K31pvNoYNcRZjtdJXnNVEc5NmBbgJmEg27YWbZVL7jTLQhPELqAR7tcJTnF9AJLwVN5w3ABZvrfeDLm4vnBDw76bkx8a2NxK"
-	xPrivHD, err := bitcoin.GenerateHDKeyFromString(xPrivString)
+	xPrivHD, err := compat.GenerateHDKeyFromString(xPrivString)
 	require.NoError(t, err)
 	xPubHD, _ := xPrivHD.Neuter()
 	xPubID := utils.Hash(xPubHD.String())
@@ -1131,7 +1132,7 @@ func TestDraftTransaction_SignInputs(t *testing.T) {
 	require.NoError(t, err)
 
 	// Derive the child key (chain)
-	var chainKey *bip32.ExtendedKey
+	var chainKey *compat.ExtendedKey
 	if chainKey, err = xPrivHD.Child(
 		0,
 	); err != nil {
@@ -1139,7 +1140,7 @@ func TestDraftTransaction_SignInputs(t *testing.T) {
 	}
 
 	// Derive the child key (num)
-	var numKey *bip32.ExtendedKey
+	var numKey *compat.ExtendedKey
 	if numKey, err = chainKey.Child(
 		0,
 	); err != nil {
@@ -1147,8 +1148,8 @@ func TestDraftTransaction_SignInputs(t *testing.T) {
 	}
 
 	// Get the private key
-	var privateKey *bec.PrivateKey
-	if privateKey, err = bitcoin.GetPrivateKeyFromHDKey(
+	var privateKey *ec.PrivateKey
+	if privateKey, err = compat.GetPrivateKeyFromHDKey(
 		numKey,
 	); err != nil {
 		return
@@ -1174,7 +1175,7 @@ func TestDraftTransaction_SignInputs(t *testing.T) {
 	tests := []struct {
 		name    string
 		config  *TransactionConfig
-		xPriv   *bip32.ExtendedKey
+		xPriv   *compat.ExtendedKey
 		wantErr assert.ErrorAssertionFunc
 	}{
 		{
@@ -1198,27 +1199,29 @@ func TestDraftTransaction_SignInputs(t *testing.T) {
 				return
 			}
 
-			var tx *bt.Tx
-			tx, err = bt.NewTxFromString(gotSignedHex)
+			var tx *trx.Transaction
+			tx, err = trx.NewTransactionFromHex(gotSignedHex)
 			require.NoError(t, err)
 
-			var ls *bscript.Script
-			if ls, err = bscript.NewFromHexString(
+			var ls *script.Script
+			if ls, err = script.NewFromHex(
 				lockingScript,
 			); err != nil {
 				return
 			}
-			tx.Inputs[0].PreviousTxScript = ls
-			tx.Inputs[0].PreviousTxSatoshis = 12229
+
+			tx.Inputs[0].SetSourceTxOutput(&trx.TransactionOutput{
+				LockingScript: ls,
+				Satoshis:      12229,
+			})
 
 			require.NoError(t, err)
 			assert.True(t, tx.Version > 0)
 			for _, input := range tx.Inputs {
-				var unlocker string
-				unlocker, err = input.UnlockingScript.ToASM()
+				unlocker := input.UnlockingScript.ToASM()
 				require.NoError(t, err)
 				scriptParts := strings.Split(unlocker, " ")
-				pubKey := hex.EncodeToString(privateKey.PubKey().SerialiseCompressed())
+				pubKey := hex.EncodeToString(privateKey.PubKey().SerializeCompressed())
 
 				var hash []byte
 				hash, err = tx.CalcInputSignatureHash(0, sighash.AllForkID)
@@ -1227,7 +1230,7 @@ func TestDraftTransaction_SignInputs(t *testing.T) {
 				var hash32 [32]byte
 				copy(hash32[:], hash)
 				var verified bool
-				verified, err = bitcoin.VerifyMessageDER(hash32, pubKey, scriptParts[0])
+				verified, err = bsm.VerifyMessageDER(hash32, pubKey, scriptParts[0])
 				require.NoError(t, err)
 				assert.True(t, verified)
 			}
