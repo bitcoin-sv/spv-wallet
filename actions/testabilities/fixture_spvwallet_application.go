@@ -41,6 +41,8 @@ type SPVWalletHttpClientFixture interface {
 	ForAdmin() *resty.Client
 	// ForUser returns a new http client that is configured with the authentication with the xpub of the sender user.
 	ForUser() *resty.Client
+	// ForGivenUser returns a new http client that is configured with the authentication with the xpub of the given user.
+	ForGivenUser(user fixtures.User) *resty.Client
 }
 
 type appFixture struct {
@@ -93,7 +95,7 @@ func (f *appFixture) StartedSPVWalletWithConfiguration(opts ...ConfigOpts) (clea
 	f.engine, err = engine.NewClient(context.Background(), options...)
 	require.NoError(f.t, err)
 
-	f.registerUsersFromFixture()
+	f.initialiseFixtures()
 
 	s := server.NewServer(f.config, f.engine, f.logger)
 	f.server.handlers = s.Handlers()
@@ -101,6 +103,8 @@ func (f *appFixture) StartedSPVWalletWithConfiguration(opts ...ConfigOpts) (clea
 	return func() {
 		err := f.engine.Close(context.Background())
 		require.NoError(f.t, err)
+		f.externalTransport.Reset()
+		httpmock.Reset()
 	}
 }
 
@@ -124,12 +128,16 @@ func (f *appFixture) ForAdmin() *resty.Client {
 }
 
 func (f *appFixture) ForUser() *resty.Client {
+	return f.ForGivenUser(fixtures.Sender)
+}
+
+func (f *appFixture) ForGivenUser(user fixtures.User) *resty.Client {
 	c := f.ForAnonymous()
-	c.SetHeader("x-auth-xpub", fixtures.Sender.XPub())
+	c.SetHeader("x-auth-xpub", user.XPub())
 	return c
 }
 
-func (f *appFixture) registerUsersFromFixture() {
+func (f *appFixture) initialiseFixtures() {
 	opts := f.engine.DefaultModelOptions(engine.WithMetadata("source", "fixture"))
 
 	for _, user := range fixtures.InternalUsers() {
@@ -141,6 +149,8 @@ func (f *appFixture) registerUsersFromFixture() {
 			require.NoError(f.t, err)
 		}
 	}
+
+	f.paymailClient.WillRespondWithP2PCapabilities()
 }
 
 // initDbConnection creates a new connection that will be used as connection for engine
