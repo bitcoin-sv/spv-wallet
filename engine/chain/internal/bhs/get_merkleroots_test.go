@@ -14,7 +14,7 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func TestGetMerkleRootsFromBHSSuccess(t *testing.T) {
+func TestGetMerkleRootsSuccess(t *testing.T) {
 	t.Run("Get MerkleRoots success", func(t *testing.T) {
 		response := "{\"content\": [ {\"merkleRoot\": \"4a5e1e4baab89f3a32518a88c31bc87f618f76673e2cc77ab2127b7afdeda33b\",\"blockHeight\": 0  },{  \"merkleRoot\": \"0e3e2357e806b6cdb1f70b54c3a3a17b6714ee1f0e68bebb44a74b1efd512098\", \"blockHeight\": 1}, {  \"merkleRoot\": \"9b0fc92260312ce44e74ef369f5c66bbb85848f2eddd5a7a1cde251e54ccfdd5\",   \"blockHeight\": 2  },  {   \"merkleRoot\": \"999e1c837c76a1b7fbb7e57baf87b309960f5ffefbf2a9b95dd890602272f644\", \"blockHeight\": 3 } ], \"page\": {   \"totalElements\": 866322,   \"size\": 4,   \"lastEvaluatedKey\": \"999e1c837c76a1b7fbb7e57baf87b309960f5ffefbf2a9b95dd890602272f644\" }}"
 		httpClient := bhsMockMerkleRoots(200, response)
@@ -25,14 +25,14 @@ func TestGetMerkleRootsFromBHSSuccess(t *testing.T) {
 
 		service := chain.NewChainService(tester.Logger(t), httpClient, chainmodels.ARCConfig{}, bhsCfg(bhsURL, bhsToken))
 
-		merkleroots, err := service.GetMerkleRootsFromBHS(context.Background(), url.Values{})
+		merkleroots, err := service.GetMerkleRoots(context.Background(), url.Values{})
 
 		require.NoError(t, err)
 		require.Equal(t, responseUnmarshalled, merkleroots)
 	})
 }
 
-func TestGetMerkleRootsFromBHSFailure(t *testing.T) {
+func TestGetMerkleRootsFailure(t *testing.T) {
 	errorTestCases := map[string]struct {
 		bhsToken         string
 		bhsURL           string
@@ -99,7 +99,7 @@ func TestGetMerkleRootsFromBHSFailure(t *testing.T) {
 				"batchSize":        []string{test.batchSize},
 			}
 
-			_, err := service.GetMerkleRootsFromBHS(context.Background(), urlQuery)
+			_, err := service.GetMerkleRoots(context.Background(), urlQuery)
 
 			require.Error(t, err)
 			require.ErrorIs(t, err, test.expectErr)

@@ -26,7 +26,7 @@ import (
 // @Router  /api/v1/merkleroots [get]
 // @Security	x-auth-xpub
 func get(c *gin.Context, userContext *reqctx.UserContext) {
-	res, err := reqctx.Engine(c).Chain().GetMerkleRootsFromBHS(c.Request.Context(), c.Request.URL.Query())
+	res, err := reqctx.Engine(c).Chain().GetMerkleRoots(c.Request.Context(), c.Request.URL.Query())
 
 	if err != nil {
 		spverrors.ErrorResponse(c, err, reqctx.Logger(c))

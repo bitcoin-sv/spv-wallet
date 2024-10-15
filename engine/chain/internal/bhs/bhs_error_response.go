@@ -18,7 +18,6 @@ func mapBHSErrorResponseToSpverror(res *resty.Response) models.SPVError {
 
 	if err := json.Unmarshal(res.Body(), &responseErr); err != nil {
 
-		// TODO: remove after SPV-1106 is done
 		if bodyStr := string(res.Body()); bodyStr != "" {
 			// Try to unescape the string to remove any escaped characters like \" or \\n, etc.
 			unescapedBodyStr, unescapeErr := strconv.Unquote(bodyStr)

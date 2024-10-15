@@ -17,7 +17,7 @@ type ARCService interface {
 
 // BHSService for querying BHS server.
 type BHSService interface {
-	GetMerkleRootsFromBHS(ctx context.Context, query url.Values) (*models.MerkleRootsBHSResponse, error)
+	GetMerkleRoots(ctx context.Context, query url.Values) (*models.MerkleRootsBHSResponse, error)
 	VerifyMerkleRoots(ctx context.Context, merkleRoots []*spv.MerkleRootConfirmationRequestItem) (bool, error)
 	HealthcheckBHS(ctx context.Context) error
 }
