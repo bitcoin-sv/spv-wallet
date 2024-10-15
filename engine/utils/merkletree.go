@@ -8,7 +8,7 @@ import (
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 )
 
-// INFO: This function is moved to go-paymail from go-bc
+// INFO: This function is moved to spv-wallet from go-bc
 // https://github.com/libsv/go-bc/blob/master/merkletreeparent.go
 // try to use go-sdk implementation when available
 
