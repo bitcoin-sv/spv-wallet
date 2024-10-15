@@ -8,8 +8,8 @@ import (
 	sdk "github.com/bitcoin-sv/go-sdk/transaction"
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/bitcoin-sv/spv-wallet/engine/transaction"
-	"github.com/bitcoin-sv/spv-wallet/engine/transaction/draft/evaluation"
 	txerrors "github.com/bitcoin-sv/spv-wallet/engine/transaction/errors"
+	"github.com/bitcoin-sv/spv-wallet/engine/transaction/outlines/internal/evaluation"
 	"github.com/bitcoin-sv/spv-wallet/models/request/opreturn"
 )
 
@@ -18,7 +18,7 @@ type OpReturn opreturn.Output
 
 func (o *OpReturn) evaluate(evaluation.Context) (annotatedOutputs, error) {
 	if len(o.Data) == 0 {
-		return nil, txerrors.ErrDraftOpReturnDataRequired
+		return nil, txerrors.ErrTxOutlineOpReturnDataRequired
 	}
 
 	data, err := o.getData()
@@ -29,7 +29,7 @@ func (o *OpReturn) evaluate(evaluation.Context) (annotatedOutputs, error) {
 	output, err := sdk.CreateOpReturnOutput(data)
 	if err != nil {
 		if errors.Is(err, script.ErrPartTooBig) {
-			return nil, txerrors.ErrDraftOpReturnDataTooLarge
+			return nil, txerrors.ErrTxOutlineOpReturnDataTooLarge
 		}
 		return nil, spverrors.Wrapf(err, "failed to create OP_RETURN output")
 	}
@@ -61,6 +61,6 @@ func toBytes(data string, dataType opreturn.DataType) ([]byte, error) {
 		}
 		return dataHex, nil
 	default:
-		return nil, txerrors.ErrDraftOpReturnUnsupportedDataType
+		return nil, txerrors.ErrTxOutlineOpReturnUnsupportedDataType
 	}
 }

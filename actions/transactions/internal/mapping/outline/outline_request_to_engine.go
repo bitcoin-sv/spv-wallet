@@ -5,8 +5,8 @@ import (
 	"reflect"
 
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
-	"github.com/bitcoin-sv/spv-wallet/engine/transaction/draft"
-	"github.com/bitcoin-sv/spv-wallet/engine/transaction/draft/outputs"
+	"github.com/bitcoin-sv/spv-wallet/engine/transaction/outlines"
+	"github.com/bitcoin-sv/spv-wallet/engine/transaction/outlines/outputs"
 	"github.com/bitcoin-sv/spv-wallet/models/request"
 	"github.com/bitcoin-sv/spv-wallet/models/request/opreturn"
 	paymailreq "github.com/bitcoin-sv/spv-wallet/models/request/paymail"
@@ -14,11 +14,11 @@ import (
 )
 
 // Request is a draft transaction request model.
-type Request request.DraftTransaction
+type Request request.TransactionSpecification
 
 // ToEngine converts a draft transaction request model to the engine model.
-func (tx Request) ToEngine(xPubID string) (*draft.TransactionSpec, error) {
-	spec := &draft.TransactionSpec{
+func (tx Request) ToEngine(xPubID string) (*outlines.TransactionSpec, error) {
+	spec := &outlines.TransactionSpec{
 		XPubID: xPubID,
 	}
 	config := mapstructure.DecoderConfig{
