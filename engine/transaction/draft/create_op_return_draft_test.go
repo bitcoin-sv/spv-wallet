@@ -7,13 +7,13 @@ import (
 	"testing"
 
 	"github.com/bitcoin-sv/spv-wallet/engine/tester/fixtures"
-	"github.com/bitcoin-sv/spv-wallet/engine/transaction"
 	"github.com/bitcoin-sv/spv-wallet/engine/transaction/draft"
 	"github.com/bitcoin-sv/spv-wallet/engine/transaction/draft/outputs"
 	"github.com/bitcoin-sv/spv-wallet/engine/transaction/draft/testabilities"
 	txerrors "github.com/bitcoin-sv/spv-wallet/engine/transaction/errors"
 	"github.com/bitcoin-sv/spv-wallet/models"
 	"github.com/bitcoin-sv/spv-wallet/models/request/opreturn"
+	"github.com/bitcoin-sv/spv-wallet/models/transaction/bucket"
 )
 
 func TestCreateOpReturnDraft(t *testing.T) {
@@ -75,7 +75,7 @@ func TestCreateOpReturnDraft(t *testing.T) {
 			thenTx.HasOutputs(1)
 
 			thenTx.Output(0).
-				HasBucket(transaction.BucketData).
+				HasBucket(bucket.Data).
 				IsDataOnly().
 				HasLockingScript(test.lockingScript)
 		})

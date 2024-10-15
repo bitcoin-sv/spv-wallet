@@ -7,6 +7,7 @@ import (
 	"github.com/bitcoin-sv/spv-wallet/engine/transaction"
 	"github.com/bitcoin-sv/spv-wallet/engine/transaction/draft"
 	"github.com/bitcoin-sv/spv-wallet/models/bsv"
+	"github.com/bitcoin-sv/spv-wallet/models/transaction/bucket"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -35,7 +36,7 @@ type WithParseableBEEFDraftTransactionAssertion interface {
 }
 
 type OutputAssertion interface {
-	HasBucket(bucket transaction.Bucket) OutputAssertion
+	HasBucket(bucket bucket.Name) OutputAssertion
 	HasSatoshis(satoshis bsv.Satoshis) OutputAssertion
 	HasLockingScript(lockingScript string) OutputAssertion
 	IsDataOnly() OutputAssertion
@@ -128,7 +129,7 @@ func (a *createdDraftAssertion) Output(index int) OutputAssertion {
 	}
 }
 
-func (a *draftTransactionOutputAssertion) HasBucket(bucket transaction.Bucket) OutputAssertion {
+func (a *draftTransactionOutputAssertion) HasBucket(bucket bucket.Name) OutputAssertion {
 	a.assert.Equal(bucket, a.annotation.Bucket, "Output %d has invalid bucket annotation", a.index)
 	return a
 }
