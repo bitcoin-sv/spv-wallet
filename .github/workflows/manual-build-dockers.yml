@@ -16,7 +16,8 @@ jobs:
   release_default:
     uses: bactions/workflows/.github/workflows/release-go-server.yml@main
     with:
-      version: ${{ github.ref_name }}
+      version: ${{ inputs.version || github.ref_name }}
+      ref: ${{ github.ref }}
       cgo_enabled: true
       release_create: false
     secrets:
