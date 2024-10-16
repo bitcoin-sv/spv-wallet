@@ -2,7 +2,6 @@ package engine
 
 import (
 	"database/sql"
-	"github.com/bitcoin-sv/spv-wallet/models/bsv"
 	"net/url"
 	"strings"
 	"time"
@@ -15,6 +14,7 @@ import (
 	"github.com/bitcoin-sv/spv-wallet/engine/logging"
 	"github.com/bitcoin-sv/spv-wallet/engine/metrics"
 	"github.com/bitcoin-sv/spv-wallet/engine/taskmanager"
+	"github.com/bitcoin-sv/spv-wallet/models/bsv"
 	"github.com/coocood/freecache"
 	"github.com/go-redis/redis/v8"
 	"github.com/go-resty/resty/v2"

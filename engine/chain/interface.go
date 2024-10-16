@@ -2,13 +2,13 @@ package chain
 
 import (
 	"context"
-	"github.com/bitcoin-sv/spv-wallet/models/bsv"
 	"net/url"
 
 	"github.com/bitcoin-sv/go-paymail/spv"
 	sdk "github.com/bitcoin-sv/go-sdk/transaction"
 	"github.com/bitcoin-sv/spv-wallet/engine/chain/models"
 	"github.com/bitcoin-sv/spv-wallet/models"
+	"github.com/bitcoin-sv/spv-wallet/models/bsv"
 )
 
 // ARCService for querying ARC server.
