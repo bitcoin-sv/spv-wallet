@@ -1,8 +1,9 @@
 package engine
 
 import (
+	trx "github.com/bitcoin-sv/go-sdk/transaction"
+	"github.com/bitcoin-sv/go-sdk/util"
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
-	"github.com/libsv/go-bt/v2"
 )
 
 var (
@@ -18,18 +19,18 @@ func (beefTx *beefTx) toBeefBytes() ([]byte, error) {
 	// get beef bytes
 	beefSize := 0
 
-	ver := bt.LittleEndianBytes(beefTx.version, 4)
+	ver := util.LittleEndianBytes(beefTx.version, 4)
 	ver[2] = 0xBE
 	ver[3] = 0xEF
 	beefSize += len(ver)
 
-	nBUMPS := bt.VarInt(len(beefTx.bumps)).Bytes()
+	nBUMPS := trx.VarInt(len(beefTx.bumps)).Bytes()
 	beefSize += len(nBUMPS)
 
 	bumps := beefTx.bumps.Bytes()
 	beefSize += len(bumps)
 
-	nTransactions := bt.VarInt(uint64(len(beefTx.transactions))).Bytes()
+	nTransactions := trx.VarInt(uint64(len(beefTx.transactions))).Bytes()
 	beefSize += len(nTransactions)
 
 	transactions := make([][]byte, 0, len(beefTx.transactions))
@@ -55,13 +56,13 @@ func (beefTx *beefTx) toBeefBytes() ([]byte, error) {
 	return buffer, nil
 }
 
-func toBeefBytes(tx *bt.Tx, bumps BUMPs) []byte {
+func toBeefBytes(tx *trx.Transaction, bumps BUMPs) []byte {
 	txBeefBytes := tx.Bytes()
 
 	bumpIdx := getBumpPathIndex(tx, bumps)
 	if bumpIdx > -1 {
 		txBeefBytes = append(txBeefBytes, hasBUMP)
-		txBeefBytes = append(txBeefBytes, bt.VarInt(bumpIdx).Bytes()...)
+		txBeefBytes = append(txBeefBytes, trx.VarInt(bumpIdx).Bytes()...)
 	} else {
 		txBeefBytes = append(txBeefBytes, hasNoBUMP)
 	}
@@ -69,12 +70,13 @@ func toBeefBytes(tx *bt.Tx, bumps BUMPs) []byte {
 	return txBeefBytes
 }
 
-func getBumpPathIndex(tx *bt.Tx, bumps BUMPs) int {
+func getBumpPathIndex(tx *trx.Transaction, bumps BUMPs) int {
 	bumpIndex := -1
+	txID := tx.TxID().String()
 
 	for i, bump := range bumps {
 		for _, path := range bump.Path[0] {
-			if path.Hash == tx.TxID() {
+			if path.Hash == txID {
 				bumpIndex = i
 			}
 		}

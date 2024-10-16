@@ -5,8 +5,8 @@ import (
 	"errors"
 	"time"
 
+	"github.com/bitcoin-sv/go-sdk/transaction"
 	"github.com/bitcoin-sv/spv-wallet/engine/chain/errors"
-	"github.com/libsv/go-bc"
 	"github.com/rs/zerolog"
 )
 
@@ -111,7 +111,7 @@ func processSyncTransactions(ctx context.Context, client *Client) {
 
 		tx.UpdateFromBroadcastStatus(txInfo.TXStatus)
 
-		if bump, err := bc.NewBUMPFromStr(txInfo.MerklePath); err != nil {
+		if bump, err := transaction.NewMerklePathFromHex(txInfo.MerklePath); err != nil {
 			//ARC sometimes returns a TXStatus SEEN_ON_NETWORK, but with zero data
 			logger.Warn().Err(err).Str("txID", txID).Str("ARCTxStatus", string(txInfo.TXStatus)).Msg("Cannot parse BUMP")
 		} else {

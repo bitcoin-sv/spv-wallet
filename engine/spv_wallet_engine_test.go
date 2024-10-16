@@ -6,11 +6,10 @@ import (
 	"testing"
 
 	"github.com/DATA-DOG/go-sqlmock"
+	compat "github.com/bitcoin-sv/go-sdk/compat/bip32"
 	"github.com/bitcoin-sv/spv-wallet/engine/datastore"
 	"github.com/bitcoin-sv/spv-wallet/engine/taskmanager"
 	"github.com/bitcoin-sv/spv-wallet/engine/tester"
-	"github.com/bitcoinschema/go-bitcoin/v2"
-	"github.com/libsv/go-bk/bip32"
 	"github.com/mrz1836/go-cache"
 	"github.com/rafaeljusto/redigomock"
 	"github.com/rs/zerolog"
@@ -131,15 +130,15 @@ func CloseClient(ctx context.Context, t *testing.T, client ClientInterface) {
 // CreateNewXPub will create a new xPub and return all the information to use the xPub
 func CreateNewXPub(ctx context.Context, t *testing.T, engineClient ClientInterface,
 	opts ...ModelOps,
-) (*bip32.ExtendedKey, *Xpub, string) {
+) (*compat.ExtendedKey, *Xpub, string) {
 	// Generate a key pair
-	masterKey, err := bitcoin.GenerateHDKey(bitcoin.SecureSeedLength)
+	masterKey, err := compat.GenerateHDKey(compat.SecureSeedLength)
 	require.NoError(t, err)
 	require.NotNil(t, masterKey)
 
 	// Get the raw string of the xPub
 	var rawXPub string
-	rawXPub, err = bitcoin.GetExtendedPublicKey(masterKey)
+	rawXPub, err = compat.GetExtendedPublicKey(masterKey)
 	require.NoError(t, err)
 	require.NotNil(t, masterKey)
 

@@ -1049,6 +1049,24 @@ definitions:
         example: bb8593f85ef8056a77026ad415f02128f3768906de53e9e8bf8749fe2d66cf50
         type: string
     type: object
+  models.ExclusiveStartKeyPageInfo:
+    properties:
+      lastEvaluatedKey:
+        description: Last evaluated key returned from the database
+        type: string
+      orderByField:
+        description: Field by which to order the results
+        type: string
+      size:
+        description: Size of the page or returned data
+        type: integer
+      sortDirection:
+        description: Direction in which to order the results (ASC or DESC)
+        type: string
+      totalElements:
+        description: Total count of elements
+        type: integer
+    type: object
   models.FeeUnit:
     properties:
       bytes:
@@ -1072,6 +1090,25 @@ definitions:
       type:
         description: Type is a map protocol type.
         type: string
+    type: object
+  models.MerkleRoot:
+    properties:
+      blockHeight:
+        type: integer
+      merkleRoot:
+        type: string
+    type: object
+  models.MerkleRootsBHSResponse:
+    properties:
+      content:
+        description: List of records for the response
+        items:
+          $ref: '#/definitions/models.MerkleRoot'
+        type: array
+      page:
+        allOf:
+        - $ref: '#/definitions/models.ExclusiveStartKeyPageInfo'
+        description: Pagination details
     type: object
   models.OpReturn:
     properties:
@@ -2519,7 +2556,7 @@ definitions:
 info:
   contact: {}
   title: SPV Wallet
-  version: v0.12.0
+  version: v1.0.0-beta
 paths:
   /api/v1/configs/shared:
     get:
@@ -2799,6 +2836,40 @@ paths:
       summary: Accept contact invitation
       tags:
       - Contacts
+  /api/v1/merkleroots:
+    get:
+      description: Get Merkleroots from Block Header Service
+      parameters:
+      - description: batch size of merkleroots to be returned
+        in: query
+        name: batchSize
+        type: integer
+      - description: last processed merkleroot in client's database
+        in: query
+        name: lastEvaluatedKey
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 'Paged response with Merkle Roots array in content '
+          schema:
+            $ref: '#/definitions/models.MerkleRootsBHSResponse'
+        "400":
+          description: Bad request - batchSize must be 0 or a positive integer
+        "404":
+          description: Not found - No block with provided merkleroot was found
+        "409":
+          description: Conflict - Provided merkleroot is not part of the longest chain
+        "500":
+          description: Internal Server Error - Error while fetching Merkle Roots
+      security:
+      - x-auth-xpub: []
+      summary: Get Merkleroots
+      tags:
+      - Merkleroots
+      - Block Header Service
+      - BHS
   /api/v1/transactions:
     get:
       description: Get transactions

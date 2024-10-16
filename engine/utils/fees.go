@@ -2,37 +2,13 @@ package utils
 
 import (
 	"encoding/hex"
-	"fmt"
 
-	"github.com/libsv/go-bt/v2"
+	"github.com/bitcoin-sv/spv-wallet/models/bsv"
 )
 
-// FeeUnit fee unit imported from go-bt/v2
-type FeeUnit bt.FeeUnit
-
-// IsLowerThan compare two fee units
-func (f *FeeUnit) IsLowerThan(other *FeeUnit) bool {
-	return float64(f.Satoshis)/float64(f.Bytes) < float64(other.Satoshis)/float64(other.Bytes)
-}
-
-// String returns the fee unit as a string
-func (f *FeeUnit) String() string {
-	return fmt.Sprintf("FeeUnit(%d satoshis / %d bytes)", f.Satoshis, f.Bytes)
-}
-
-// IsZero returns true if the fee unit suggest no fees (free)
-func (f *FeeUnit) IsZero() bool {
-	return f.Satoshis == 0
-}
-
-// IsValid returns true if the Bytes in fee are greater than 0
-func (f *FeeUnit) IsValid() bool {
-	return f.Bytes > 0
-}
-
 // ValidFees filters out invalid fees from a list of fee units
-func ValidFees(feeUnits []FeeUnit) []FeeUnit {
-	validFees := []FeeUnit{}
+func ValidFees(feeUnits []bsv.FeeUnit) []bsv.FeeUnit {
+	validFees := []bsv.FeeUnit{}
 	for _, fee := range feeUnits {
 		if fee.IsValid() {
 			validFees = append(validFees, fee)
@@ -42,7 +18,7 @@ func ValidFees(feeUnits []FeeUnit) []FeeUnit {
 }
 
 // LowestFee get the lowest fee from a list of fee units, if defaultValue exists and none is found, return defaultValue
-func LowestFee(feeUnits []FeeUnit, defaultValue *FeeUnit) *FeeUnit {
+func LowestFee(feeUnits []bsv.FeeUnit, defaultValue *bsv.FeeUnit) *bsv.FeeUnit {
 	validFees := ValidFees(feeUnits)
 	if len(validFees) == 0 {
 		return defaultValue

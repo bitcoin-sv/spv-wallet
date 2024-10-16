@@ -4,9 +4,9 @@ import (
 	"encoding/hex"
 	"testing"
 
-	"github.com/libsv/go-bk/bec"
-	"github.com/libsv/go-bk/crypto"
-	"github.com/libsv/go-bt/bscript"
+	ec "github.com/bitcoin-sv/go-sdk/primitives/ec"
+	crypto "github.com/bitcoin-sv/go-sdk/primitives/hash"
+	script "github.com/bitcoin-sv/go-sdk/script"
 	assert "github.com/stretchr/testify/require"
 )
 
@@ -85,34 +85,34 @@ func TestEvaluate(t *testing.T) {
 	pubKeyHex := "027c1404c3ecb034053e6dd90bc68f7933284559c7d0763367584195a8796d9b0e"
 	pubKeyBytes, err := hex.DecodeString(pubKeyHex)
 	assert.NoError(t, err)
-	mockPublicKey, err := bec.ParsePubKey(pubKeyBytes, bec.S256())
+	mockPublicKey, err := ec.ParsePubKey(pubKeyBytes)
 	assert.NoError(t, err)
-	mockPubKeyHash := crypto.Hash160(mockPublicKey.SerialiseCompressed())
+	mockPubKeyHash := crypto.Hash160(mockPublicKey.SerializeCompressed())
 
 	t.Run("Valid Cases", func(t *testing.T) {
 		validTests := []struct {
 			name      string
 			script    []byte
-			publicKey *bec.PublicKey
+			publicKey *ec.PublicKey
 			expected  []byte
 		}{
 			{
 				name:      "valid script with OP_PUBKEYHASH",
-				script:    []byte{bscript.OpDUP, bscript.OpHASH160, bscript.OpPUBKEYHASH, bscript.OpEQUALVERIFY, bscript.OpCHECKSIG},
+				script:    []byte{script.OpDUP, script.OpHASH160, script.OpPUBKEYHASH, script.OpEQUALVERIFY, script.OpCHECKSIG},
 				publicKey: mockPublicKey,
-				expected:  append([]byte{bscript.OpDUP, bscript.OpHASH160, bscript.OpDATA20}, append(mockPubKeyHash, bscript.OpEQUALVERIFY, bscript.OpCHECKSIG)...),
+				expected:  append([]byte{script.OpDUP, script.OpHASH160, script.OpDATA20}, append(mockPubKeyHash, script.OpEQUALVERIFY, script.OpCHECKSIG)...),
 			},
 			{
 				name:      "valid script without OP_PUBKEYHASH or OP_PUBKEY",
-				script:    []byte{bscript.OpDUP, bscript.OpHASH160, bscript.OpEQUALVERIFY, bscript.OpCHECKSIG},
+				script:    []byte{script.OpDUP, script.OpHASH160, script.OpEQUALVERIFY, script.OpCHECKSIG},
 				publicKey: mockPublicKey,
-				expected:  []byte{bscript.OpDUP, bscript.OpHASH160, bscript.OpEQUALVERIFY, bscript.OpCHECKSIG},
+				expected:  []byte{script.OpDUP, script.OpHASH160, script.OpEQUALVERIFY, script.OpCHECKSIG},
 			},
 			{
 				name:      "script with OP_PUSHDATA1 and hex data matching PUBKEY and PUBKEYHASH opcodes",
-				script:    []byte{bscript.OpPUSHDATA1, 1, bscript.OpPUBKEYHASH, bscript.OpADD, bscript.OpPUSHDATA1, 1, bscript.OpPUBKEY, bscript.OpEQUALVERIFY},
+				script:    []byte{script.OpPUSHDATA1, 1, script.OpPUBKEYHASH, script.OpADD, script.OpPUSHDATA1, 1, script.OpPUBKEY, script.OpEQUALVERIFY},
 				publicKey: mockPublicKey,
-				expected:  []byte{bscript.OpPUSHDATA1, 1, bscript.OpPUBKEYHASH, bscript.OpADD, bscript.OpPUSHDATA1, 1, bscript.OpPUBKEY, bscript.OpEQUALVERIFY},
+				expected:  []byte{script.OpPUSHDATA1, 1, script.OpPUBKEYHASH, script.OpADD, script.OpPUSHDATA1, 1, script.OpPUBKEY, script.OpEQUALVERIFY},
 			},
 			{
 				name:      "empty script",
@@ -122,9 +122,9 @@ func TestEvaluate(t *testing.T) {
 			},
 			{
 				name:      "script with only valid push data",
-				script:    []byte{bscript.OpPUSHDATA1, 2, 0xaa, 0xbb},
+				script:    []byte{script.OpPUSHDATA1, 2, 0xaa, 0xbb},
 				publicKey: mockPublicKey,
-				expected:  []byte{bscript.OpPUSHDATA1, 2, 0xaa, 0xbb},
+				expected:  []byte{script.OpPUSHDATA1, 2, 0xaa, 0xbb},
 			},
 		}
 
@@ -143,7 +143,7 @@ func TestEvaluate(t *testing.T) {
 		invalidTests := []struct {
 			name      string
 			script    []byte
-			publicKey *bec.PublicKey
+			publicKey *ec.PublicKey
 		}{
 			{
 				name:      "invalid script",
@@ -152,7 +152,7 @@ func TestEvaluate(t *testing.T) {
 			},
 			{
 				name:      "valid script with OP_PUBKEY",
-				script:    []byte{bscript.OpDUP, bscript.OpHASH160, bscript.OpPUBKEY, bscript.OpEQUALVERIFY, bscript.OpCHECKSIG},
+				script:    []byte{script.OpDUP, script.OpHASH160, script.OpPUBKEY, script.OpEQUALVERIFY, script.OpCHECKSIG},
 				publicKey: mockPublicKey,
 			},
 		}

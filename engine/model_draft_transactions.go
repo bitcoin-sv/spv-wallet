@@ -3,21 +3,21 @@ package engine
 import (
 	"context"
 	"crypto/rand"
-	"encoding/hex"
 	"fmt"
 	"math"
 	"math/big"
 	"time"
 
 	"github.com/bitcoin-sv/go-paymail"
+	compat "github.com/bitcoin-sv/go-sdk/compat/bip32"
+	ec "github.com/bitcoin-sv/go-sdk/primitives/ec"
+	"github.com/bitcoin-sv/go-sdk/script"
+	trx "github.com/bitcoin-sv/go-sdk/transaction"
+	"github.com/bitcoin-sv/go-sdk/transaction/template/p2pkh"
 	"github.com/bitcoin-sv/spv-wallet/engine/datastore"
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/bitcoin-sv/spv-wallet/engine/utils"
-	"github.com/bitcoinschema/go-bitcoin/v2"
-	"github.com/libsv/go-bk/bec"
-	"github.com/libsv/go-bk/bip32"
-	"github.com/libsv/go-bt/v2"
-	"github.com/libsv/go-bt/v2/bscript"
+	"github.com/bitcoin-sv/spv-wallet/models/bsv"
 	"github.com/pkg/errors"
 )
 
@@ -65,7 +65,7 @@ func newDraftTransaction(rawXpubKey string, config *TransactionConfig, opts ...M
 
 	if config.FeeUnit == nil {
 		unit := draft.Client().FeeUnit()
-		draft.Configuration.FeeUnit = &utils.FeeUnit{
+		draft.Configuration.FeeUnit = &bsv.FeeUnit{
 			Satoshis: int(unit.Satoshis),
 			Bytes:    unit.Bytes,
 		}
@@ -251,8 +251,8 @@ func (m *DraftTransaction) createTransactionHex(ctx context.Context) (err error)
 	}
 
 	// Start a new transaction from the reservedUtxos
-	tx := bt.NewTx()
-	if err = tx.FromUTXOs(inputUtxos...); err != nil {
+	tx := trx.NewTransaction()
+	if err = tx.AddInputsFromUTXOs(inputUtxos...); err != nil {
 		return
 	}
 
@@ -319,7 +319,7 @@ func (m *DraftTransaction) calculateAndSetFee(ctx context.Context, satoshisReser
 	return nil
 }
 
-func (m *DraftTransaction) prepareUtxos(ctx context.Context, opts []ModelOps, satoshisNeeded uint64) ([]*bt.UTXO, uint64, error) {
+func (m *DraftTransaction) prepareUtxos(ctx context.Context, opts []ModelOps, satoshisNeeded uint64) ([]*trx.UTXO, uint64, error) {
 	if m.Configuration.SendAllTo != nil {
 		inputUtxos, satoshisReserved, err := m.prepareSendAllToUtxos(ctx, opts)
 		if err != nil {
@@ -336,7 +336,7 @@ func (m *DraftTransaction) prepareUtxos(ctx context.Context, opts []ModelOps, sa
 }
 
 // prepareSeparateUtxos will get user's utxos which will have the required amount of satoshi and then reserve and process them.
-func (m *DraftTransaction) prepareSeparateUtxos(ctx context.Context, opts []ModelOps, satoshisNeeded uint64) ([]*bt.UTXO, uint64, error) {
+func (m *DraftTransaction) prepareSeparateUtxos(ctx context.Context, opts []ModelOps, satoshisNeeded uint64) ([]*trx.UTXO, uint64, error) {
 	// we can only include separate utxos (like tokens) when not using SendAllTo
 	var includeUtxoSatoshis uint64
 	var err error
@@ -383,7 +383,7 @@ func (m *DraftTransaction) prepareSeparateUtxos(ctx context.Context, opts []Mode
 }
 
 // prepareSendAllToUtxos will reserve and process all the user's utxos which will be sent to one address
-func (m *DraftTransaction) prepareSendAllToUtxos(ctx context.Context, opts []ModelOps) ([]*bt.UTXO, uint64, error) {
+func (m *DraftTransaction) prepareSendAllToUtxos(ctx context.Context, opts []ModelOps) ([]*trx.UTXO, uint64, error) {
 	// todo should all utxos be sent to the SendAllTo address, not only the p2pkhs?
 	spendableUtxos, err := getSpendableUtxos(
 		ctx, m.XpubID, utils.ScriptTypePubKeyHash, nil, m.Configuration.FromUtxos, opts...,
@@ -500,14 +500,14 @@ func (m *DraftTransaction) processUtxos(ctx context.Context, utxos []*Utxo) erro
 func (m *DraftTransaction) estimateSize() uint64 {
 	size := defaultOverheadSize // version + nLockTime
 
-	inputSize := bt.VarInt(len(m.Configuration.Inputs))
+	inputSize := trx.VarInt(len(m.Configuration.Inputs))
 	size += uint64(inputSize.Length())
 
 	for _, input := range m.Configuration.Inputs {
 		size += utils.GetInputSizeForType(input.Type)
 	}
 
-	outputSize := bt.VarInt(len(m.Configuration.Outputs))
+	outputSize := trx.VarInt(len(m.Configuration.Outputs))
 	size += uint64(outputSize.Length())
 
 	for _, output := range m.Configuration.Outputs {
@@ -520,18 +520,18 @@ func (m *DraftTransaction) estimateSize() uint64 {
 }
 
 // estimateFee will loop the inputs and outputs and estimate the required fee
-func (m *DraftTransaction) estimateFee(unit *utils.FeeUnit, addToSize uint64) uint64 {
+func (m *DraftTransaction) estimateFee(unit *bsv.FeeUnit, addToSize uint64) uint64 {
 	size := m.estimateSize() + addToSize
 	feeEstimate := float64(size) * (float64(unit.Satoshis) / float64(unit.Bytes))
 	return uint64(math.Ceil(feeEstimate))
 }
 
-// addOutputs will add the given outputs to the bt.Tx
-func (m *DraftTransaction) addOutputsToTx(tx *bt.Tx) (err error) {
-	var s *bscript.Script
+// addOutputs will add the given outputs to the SDK Transaction
+func (m *DraftTransaction) addOutputsToTx(tx *trx.Transaction) (err error) {
+	var s *script.Script
 	for _, output := range m.Configuration.Outputs {
 		for _, sc := range output.Scripts {
-			if s, err = bscript.NewFromHexString(
+			if s, err = script.NewFromHex(
 				sc.Script,
 			); err != nil {
 				return
@@ -548,7 +548,7 @@ func (m *DraftTransaction) addOutputsToTx(tx *bt.Tx) (err error) {
 					return spverrors.ErrInvalidOpReturnOutput
 				}
 
-				tx.AddOutput(&bt.Output{
+				tx.AddOutput(&trx.TransactionOutput{
 					LockingScript: s,
 					Satoshis:      0,
 				})
@@ -558,14 +558,14 @@ func (m *DraftTransaction) addOutputsToTx(tx *bt.Tx) (err error) {
 					return spverrors.ErrOutputValueTooLow
 				}
 
-				if err = tx.AddP2PKHOutputFromScript(
-					s, sc.Satoshis,
-				); err != nil {
-					return
-				}
+				tx.AddOutput(
+					&trx.TransactionOutput{
+						LockingScript: s,
+						Satoshis:      sc.Satoshis,
+					})
 			} else {
 				// add non-standard output script
-				tx.AddOutput(&bt.Output{
+				tx.AddOutput(&trx.TransactionOutput{
 					LockingScript: s,
 					Satoshis:      sc.Satoshis,
 				})
@@ -733,35 +733,32 @@ func (m *DraftTransaction) setChangeDestinations(ctx context.Context, numberOfDe
 	return nil
 }
 
-// getInputsFromUtxos this function transforms SPV Wallet utxos to bt.UTXOs
-func (m *DraftTransaction) getInputsFromUtxos(reservedUtxos []*Utxo) ([]*bt.UTXO, uint64, error) {
+// getInputsFromUtxos this function transforms SPV Wallet utxos to SDK UTXOs
+func (m *DraftTransaction) getInputsFromUtxos(reservedUtxos []*Utxo) ([]*trx.UTXO, uint64, error) {
 	// transform to bt.utxo and check if we have enough
-	inputUtxos := make([]*bt.UTXO, 0)
+	inputUtxos := make([]*trx.UTXO, 0)
 	satoshisReserved := uint64(0)
-	var lockingScript *bscript.Script
+	var lockingScript *script.Script
 	var err error
 	for _, utxo := range reservedUtxos {
 
-		if lockingScript, err = bscript.NewFromHexString(
+		if lockingScript, err = script.NewFromHex(
 			utxo.ScriptPubKey,
 		); err != nil {
 			return nil, 0, spverrors.ErrInvalidLockingScript
 		}
 
-		var txIDBytes []byte
-		if txIDBytes, err = hex.DecodeString(
+		utxo, err := trx.NewUTXO(
 			utxo.TransactionID,
-		); err != nil {
-			return nil, 0, spverrors.ErrInvalidTransactionID
+			utxo.OutputIndex,
+			lockingScript.String(),
+			utxo.Satoshis,
+		)
+		if err != nil {
+			return nil, 0, spverrors.ErrFailedToCreateUTXO.Wrap(err)
 		}
 
-		inputUtxos = append(inputUtxos, &bt.UTXO{
-			TxID:           txIDBytes,
-			Vout:           utxo.OutputIndex,
-			Satoshis:       utxo.Satoshis,
-			LockingScript:  lockingScript,
-			SequenceNumber: bt.DefaultSequenceNumber,
-		})
+		inputUtxos = append(inputUtxos, utxo)
 		satoshisReserved += utxo.Satoshis
 	}
 
@@ -832,8 +829,8 @@ func (m *DraftTransaction) Migrate(client datastore.ClientInterface) error {
 // SignInputsWithKey will sign all the inputs using a key (string) (helper method)
 func (m *DraftTransaction) SignInputsWithKey(xPrivKey string) (signedHex string, err error) {
 	// Decode the xPriv using the key
-	var xPriv *bip32.ExtendedKey
-	if xPriv, err = bip32.NewKeyFromString(xPrivKey); err != nil {
+	var xPriv *compat.ExtendedKey
+	if xPriv, err = compat.NewKeyFromString(xPrivKey); err != nil {
 		return
 	}
 
@@ -841,10 +838,10 @@ func (m *DraftTransaction) SignInputsWithKey(xPrivKey string) (signedHex string,
 }
 
 // SignInputs will sign all the inputs using the given xPriv key
-func (m *DraftTransaction) SignInputs(xPriv *bip32.ExtendedKey) (signedHex string, err error) {
+func (m *DraftTransaction) SignInputs(xPriv *compat.ExtendedKey) (signedHex string, err error) {
 	// Start a bt draft transaction
-	var txDraft *bt.Tx
-	if txDraft, err = bt.NewTxFromString(m.Hex); err != nil {
+	var txDraft *trx.Transaction
+	if txDraft, err = trx.NewTransactionFromHex(m.Hex); err != nil {
 		return
 	}
 
@@ -852,17 +849,19 @@ func (m *DraftTransaction) SignInputs(xPriv *bip32.ExtendedKey) (signedHex strin
 	for index, input := range m.Configuration.Inputs {
 
 		// Get the locking script
-		var ls *bscript.Script
-		if ls, err = bscript.NewFromHexString(
+		var ls *script.Script
+		if ls, err = script.NewFromHex(
 			input.Destination.LockingScript,
 		); err != nil {
 			return
 		}
-		txDraft.Inputs[index].PreviousTxScript = ls
-		txDraft.Inputs[index].PreviousTxSatoshis = input.Satoshis
+		txDraft.Inputs[index].SetSourceTxOutput(&trx.TransactionOutput{
+			Satoshis:      input.Satoshis,
+			LockingScript: ls,
+		})
 
 		// Derive the child key (chain)
-		var chainKey *bip32.ExtendedKey
+		var chainKey *compat.ExtendedKey
 		if chainKey, err = xPriv.Child(
 			input.Destination.Chain,
 		); err != nil {
@@ -870,7 +869,7 @@ func (m *DraftTransaction) SignInputs(xPriv *bip32.ExtendedKey) (signedHex strin
 		}
 
 		// Derive the child key (num)
-		var numKey *bip32.ExtendedKey
+		var numKey *compat.ExtendedKey
 		if numKey, err = chainKey.Child(
 			input.Destination.Num,
 		); err != nil {
@@ -878,15 +877,13 @@ func (m *DraftTransaction) SignInputs(xPriv *bip32.ExtendedKey) (signedHex strin
 		}
 
 		// Get the private key
-		var privateKey *bec.PrivateKey
-		if privateKey, err = bitcoin.GetPrivateKeyFromHDKey(
+		var privateKey *ec.PrivateKey
+		if privateKey, err = compat.GetPrivateKeyFromHDKey(
 			numKey,
 		); err != nil {
 			return
 		}
-
-		// Get the unlocking script
-		var s *bscript.Script
+		var s *p2pkh.P2PKH
 		if s, err = utils.GetUnlockingScript(
 			txDraft, uint32(index), privateKey,
 		); err != nil {
@@ -894,14 +891,18 @@ func (m *DraftTransaction) SignInputs(xPriv *bip32.ExtendedKey) (signedHex strin
 		}
 
 		// Insert the locking script
-		if err = txDraft.InsertInputUnlockingScript(
-			uint32(index), s,
-		); err != nil {
-			return
+		if txDraft.Inputs[index] == nil {
+			return "", spverrors.Newf("input with index %d not found in transaction draft %v", index, txDraft)
 		}
+		txDraft.Inputs[index].UnlockingScriptTemplate = s
 	}
 
 	// Return the signed hex
+	err = txDraft.Sign()
+	if err != nil {
+		return "", spverrors.Wrapf(err, "failed to sign inputs on model %s", m.GetModelName())
+	}
+
 	signedHex = txDraft.String()
 	return
 }

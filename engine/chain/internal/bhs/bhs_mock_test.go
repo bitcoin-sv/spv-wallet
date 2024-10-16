@@ -44,6 +44,23 @@ func bhsMockVerify(response string, applyTimeout bool) *resty.Client {
 	return client
 }
 
+func bhsMockMerkleRoots(httpCode int, response string) *resty.Client {
+	transport := httpmock.NewMockTransport()
+	client := resty.New()
+	client.GetClient().Transport = transport
+
+	responder := func(req *http.Request) (*http.Response, error) {
+		res := httpmock.NewStringResponse(httpCode, response)
+		res.Header.Set("Content-Type", "application/json")
+
+		return res, nil
+	}
+
+	transport.RegisterResponder("GET", fmt.Sprintf("%s/api/v1/chain/merkleroot", bhsURL), responder)
+
+	return client
+}
+
 func bhsCfg(url, authToken string) chainmodels.BHSConfig {
 	return chainmodels.BHSConfig{
 		URL:       url,

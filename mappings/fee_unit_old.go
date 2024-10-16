@@ -1,12 +1,12 @@
 package mappings
 
 import (
-	"github.com/bitcoin-sv/spv-wallet/engine/utils"
 	"github.com/bitcoin-sv/spv-wallet/models"
+	"github.com/bitcoin-sv/spv-wallet/models/bsv"
 )
 
 // MapToOldFeeUnitContract will map the fee-unit model from spv-wallet to the spv-wallet-models contract
-func MapToOldFeeUnitContract(fu *utils.FeeUnit) (fc *models.FeeUnit) {
+func MapToOldFeeUnitContract(fu *bsv.FeeUnit) (fc *models.FeeUnit) {
 	if fu == nil {
 		return nil
 	}
@@ -18,12 +18,12 @@ func MapToOldFeeUnitContract(fu *utils.FeeUnit) (fc *models.FeeUnit) {
 }
 
 // MapOldFeeUnitModelToEngine will map the fee-unit model from spv-wallet-models to the spv-wallet contract
-func MapOldFeeUnitModelToEngine(fu *models.FeeUnit) (fc *utils.FeeUnit) {
+func MapOldFeeUnitModelToEngine(fu *models.FeeUnit) (fc *bsv.FeeUnit) {
 	if fu == nil {
 		return nil
 	}
 
-	return &utils.FeeUnit{
+	return &bsv.FeeUnit{
 		Satoshis: fu.Satoshis,
 		Bytes:    fu.Bytes,
 	}

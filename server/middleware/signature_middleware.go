@@ -2,19 +2,21 @@ package middleware
 
 import (
 	"bytes"
+	"encoding/base64"
 	"fmt"
 	"io"
 	"strconv"
 	"strings"
 	"time"
 
+	compat "github.com/bitcoin-sv/go-sdk/compat/bip32"
+	bsm "github.com/bitcoin-sv/go-sdk/compat/bsm"
+	"github.com/bitcoin-sv/go-sdk/script"
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/bitcoin-sv/spv-wallet/engine/utils"
 	"github.com/bitcoin-sv/spv-wallet/models"
 	"github.com/bitcoin-sv/spv-wallet/server/reqctx"
-	"github.com/bitcoinschema/go-bitcoin/v2"
 	"github.com/gin-gonic/gin"
-	"github.com/libsv/go-bt/v2/bscript"
 )
 
 // CheckSignatureMiddleware is a middleware that checks the signature of the request (if required)
@@ -116,7 +118,7 @@ func (sa *sigAuth) checkRequirements(bodyContents string) error {
 
 // verifyWithXPub will verify the xPub key and the signature payload
 func (sa *sigAuth) verifyWithXPub(xPub string) error {
-	key, err := bitcoin.GetHDKeyFromExtendedPublicKey(xPub)
+	key, err := compat.GetHDKeyFromExtendedPublicKey(xPub)
 	if err != nil {
 		return spverrors.ErrInvalidSignature
 	}
@@ -125,15 +127,20 @@ func (sa *sigAuth) verifyWithXPub(xPub string) error {
 		return spverrors.ErrInvalidSignature
 	}
 
-	var address *bscript.Address
-	if address, err = bitcoin.GetAddressFromHDKey(key); err != nil {
+	var address *script.Address
+	if address, err = compat.GetAddressFromHDKey(key); err != nil {
 		return spverrors.ErrInvalidSignature
 	}
 
 	message := sa.getSigningMessage(xPub)
-	if err = bitcoin.VerifyMessage(
+	sigBytes, err := base64.StdEncoding.DecodeString(sa.Signature)
+	if err != nil {
+		return spverrors.ErrInvalidSignature
+	}
+
+	if err := bsm.VerifyMessage(
 		address.AddressString,
-		sa.Signature,
+		sigBytes,
 		message,
 	); err != nil {
 		return spverrors.ErrInvalidSignature
@@ -143,16 +150,19 @@ func (sa *sigAuth) verifyWithXPub(xPub string) error {
 
 // verifyWithAccessKey will verify the access key and the signature payload
 func (sa *sigAuth) verifyWithAccessKey(accessKey string) error {
-	address, err := bitcoin.GetAddressFromPubKeyString(
-		accessKey, true,
-	)
+	address, err := script.NewAddressFromPublicKeyString(accessKey, true)
 	if err != nil {
 		return spverrors.ErrInvalidSignature
 	}
 
-	if err := bitcoin.VerifyMessage(
+	sigBytes, err := base64.StdEncoding.DecodeString(sa.Signature)
+	if err != nil {
+		return spverrors.ErrInvalidSignature
+	}
+
+	if err := bsm.VerifyMessage(
 		address.AddressString,
-		sa.Signature,
+		sigBytes,
 		sa.getSigningMessage(accessKey),
 	); err != nil {
 		return spverrors.ErrInvalidSignature
@@ -161,6 +171,6 @@ func (sa *sigAuth) verifyWithAccessKey(accessKey string) error {
 }
 
 // getSigningMessage will build the signing message string
-func (sa *sigAuth) getSigningMessage(xPub string) string {
-	return fmt.Sprintf("%s%s%s%d", xPub, sa.AuthHash, sa.AuthNonce, sa.AuthTime)
+func (sa *sigAuth) getSigningMessage(xPub string) []byte {
+	return []byte(fmt.Sprintf("%s%s%s%d", xPub, sa.AuthHash, sa.AuthNonce, sa.AuthTime))
 }

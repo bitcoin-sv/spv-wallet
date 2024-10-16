@@ -6,11 +6,10 @@ import (
 	"time"
 
 	"github.com/bitcoin-sv/spv-wallet/engine/chain/models"
+	trx "github.com/bitcoin-sv/go-sdk/transaction"
 	"github.com/bitcoin-sv/spv-wallet/engine/datastore"
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/bitcoin-sv/spv-wallet/engine/utils"
-	"github.com/libsv/go-bc"
-	"github.com/libsv/go-bt/v2"
 )
 
 // RecordTransaction will parse the outgoing transaction and save it into the Datastore
@@ -19,8 +18,7 @@ import (
 // draftID is the unique draft id from a previously started New() transaction (draft_transaction.ID)
 // opts are model options and can include "metadata"
 func (c *Client) RecordTransaction(ctx context.Context, xPubKey, txHex, draftID string, opts ...ModelOps) (*Transaction, error) {
-
-	tx, err := bt.NewTxFromString(txHex)
+	tx, err := trx.NewTransactionFromHex(txHex)
 	if err != nil {
 		return nil, spverrors.ErrInvalidHex
 	}
@@ -122,12 +120,12 @@ func (c *Client) GetTransactionsByIDs(ctx context.Context, txIDs []string) ([]*T
 // GetTransactionByHex will get a transaction from the Datastore by its full hex string
 // uses GetTransaction
 func (c *Client) GetTransactionByHex(ctx context.Context, hex string) (*Transaction, error) {
-	tx, err := bt.NewTxFromString(hex)
+	tx, err := trx.NewTransactionFromHex(hex)
 	if err != nil {
 		return nil, spverrors.Wrapf(err, "failed to parse transaction hex: %s", hex)
 	}
 
-	return c.GetTransaction(ctx, "", tx.TxID())
+	return c.GetTransaction(ctx, "", tx.TxID().String())
 }
 
 // GetTransactions will get all the transactions from the Datastore
@@ -346,7 +344,8 @@ func (c *Client) RevertTransaction(ctx context.Context, id string) error {
 // HandleTxCallback will update the broadcast callback transaction info, like: block height, block hash, status, bump.
 func (c *Client) HandleTxCallback(ctx context.Context, callbackResp *chainmodels.TXInfo) error {
 	logger := c.options.logger
-	bump, err := bc.NewBUMPFromStr(callbackResp.MerklePath)
+	bump, err := trx.NewMerklePathFromHex(callbackResp.MerklePath)
+
 	if err != nil {
 		logger.Err(err).Msgf("failed to parse merkle path from broadcast callback - tx: %v", callbackResp)
 		return spverrors.Wrapf(err, "failed to parse merkle path from broadcast callback - tx: %v", callbackResp)

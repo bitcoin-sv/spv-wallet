@@ -6,11 +6,11 @@ import (
 
 	"github.com/bitcoin-sv/go-paymail"
 	"github.com/bitcoin-sv/go-paymail/server"
+	ec "github.com/bitcoin-sv/go-sdk/primitives/ec"
 	"github.com/bitcoin-sv/spv-wallet/engine/pike"
 	"github.com/bitcoin-sv/spv-wallet/engine/script/template"
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/bitcoin-sv/spv-wallet/engine/utils"
-	"github.com/libsv/go-bk/bec"
 )
 
 // PikeContactServiceProvider is an interface for handling the pike contact actions in go-paymail/server
@@ -136,7 +136,7 @@ func generateReferenceID() (string, error) {
 	return referenceID, spverrors.Wrapf(err, "failed to generate reference id")
 }
 
-func getPublicKeys(receiverPubKeyHex, senderPubKeyHex string) (*bec.PublicKey, *bec.PublicKey, error) {
+func getPublicKeys(receiverPubKeyHex, senderPubKeyHex string) (*ec.PublicKey, *ec.PublicKey, error) {
 	receiverPubKey, err := getPublicKey(receiverPubKeyHex)
 	if err != nil {
 		return nil, nil, err
@@ -150,12 +150,12 @@ func getPublicKeys(receiverPubKeyHex, senderPubKeyHex string) (*bec.PublicKey, *
 	return receiverPubKey, senderPubKey, nil
 }
 
-func getPublicKey(pubKeyHex string) (*bec.PublicKey, error) {
+func getPublicKey(pubKeyHex string) (*ec.PublicKey, error) {
 	pubKeyBytes, err := hex.DecodeString(pubKeyHex)
 	if err != nil {
 		return nil, spverrors.Wrapf(err, "failed to decode public key hex")
 	}
-	key, err := bec.ParsePubKey(pubKeyBytes, bec.S256())
+	key, err := ec.ParsePubKey(pubKeyBytes)
 	return key, spverrors.Wrapf(err, "failed to parse public key")
 }
 

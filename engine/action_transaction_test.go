@@ -5,8 +5,9 @@ import (
 	"fmt"
 	"testing"
 
+	compat "github.com/bitcoin-sv/go-sdk/compat/bip32"
 	"github.com/bitcoin-sv/spv-wallet/engine/utils"
-	"github.com/libsv/go-bk/bip32"
+	"github.com/bitcoin-sv/spv-wallet/models/bsv"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -238,7 +239,7 @@ func Test_RecordTransaction(t *testing.T) {
 	})
 }
 
-func initRevertTransactionData(t *testing.T, clientOpts ...ClientOps) (context.Context, ClientInterface, *Transaction, *bip32.ExtendedKey, func()) {
+func initRevertTransactionData(t *testing.T, clientOpts ...ClientOps) (context.Context, ClientInterface, *Transaction, *compat.ExtendedKey, func()) {
 	// this creates an xpub, destination and utxo
 	ctx, client, deferMe := initSimpleTestCase(t, clientOpts...)
 
@@ -265,8 +266,8 @@ func initRevertTransactionData(t *testing.T, clientOpts ...ClientOps) (context.C
 	err = draftTransaction.Save(ctx)
 	require.NoError(t, err)
 
-	var xPriv *bip32.ExtendedKey
-	xPriv, err = bip32.NewKeyFromString(testXPriv)
+	var xPriv *compat.ExtendedKey
+	xPriv, err = compat.NewKeyFromString(testXPriv)
 	require.NoError(t, err)
 
 	var hex string
@@ -331,8 +332,8 @@ func BenchmarkAction_Transaction_recordTransaction(b *testing.B) {
 			b.Fail()
 		}
 
-		var xPriv *bip32.ExtendedKey
-		if xPriv, err = bip32.NewKeyFromString(testXPriv); err != nil {
+		var xPriv *compat.ExtendedKey
+		if xPriv, err = compat.NewKeyFromString(testXPriv); err != nil {
 			return
 		}
 
@@ -404,7 +405,7 @@ func initBenchmarkData(b *testing.B) (context.Context, ClientInterface, *Xpub, *
 	}
 
 	config := &TransactionConfig{
-		FeeUnit: &utils.FeeUnit{
+		FeeUnit: &bsv.FeeUnit{
 			Satoshis: 5,
 			Bytes:    100,
 		},

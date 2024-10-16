@@ -5,12 +5,12 @@ import (
 	"database/sql"
 	"testing"
 
+	"github.com/bitcoin-sv/go-sdk/script"
+	trx "github.com/bitcoin-sv/go-sdk/transaction"
 	"github.com/bitcoin-sv/spv-wallet/engine/datastore"
 	customTypes "github.com/bitcoin-sv/spv-wallet/engine/datastore/customtypes"
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/bitcoin-sv/spv-wallet/engine/utils"
-	"github.com/libsv/go-bt/v2"
-	"github.com/libsv/go-bt/v2/bscript"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -643,12 +643,12 @@ func TestTransaction_Display(t *testing.T) {
 
 // TestTransaction_Save will test the method Save()
 func (ts *EmbeddedDBTestSuite) TestTransaction_Save() {
-	parsedTx, errP := bt.NewTxFromString(testTxHex)
+	parsedTx, errP := trx.NewTransactionFromHex(testTxHex)
 	require.NoError(ts.T(), errP)
 	require.NotNil(ts.T(), parsedTx)
 
-	var parsedInTx *bt.Tx
-	parsedInTx, errP = bt.NewTxFromString(testTx2Hex)
+	var parsedInTx *trx.Transaction
+	parsedInTx, errP = trx.NewTransactionFromHex(testTx2Hex)
 	require.NoError(ts.T(), errP)
 	require.NotNil(ts.T(), parsedInTx)
 
@@ -727,7 +727,7 @@ func (ts *EmbeddedDBTestSuite) TestTransaction_Save() {
 		require.NoError(t, err)
 		require.NotNil(t, utxo)
 		assert.Equal(t, xPub.GetID(), utxo.XpubID)
-		assert.Equal(t, bscript.ScriptTypePubKeyHash, utxo.Type)
+		assert.Equal(t, script.ScriptTypePubKeyHash, utxo.Type)
 		assert.Equal(t, testTxScriptPubKey1, utxo.ScriptPubKey)
 		assert.Empty(t, utxo.DraftID)
 		assert.Empty(t, utxo.SpendingTxID)
@@ -736,7 +736,7 @@ func (ts *EmbeddedDBTestSuite) TestTransaction_Save() {
 		utxo2, err = getUtxo(tc.ctx, transaction.ID, 1, tc.client.DefaultModelOptions()...)
 		assert.Nil(t, err)
 		assert.Equal(t, xPub2.GetID(), utxo2.XpubID)
-		assert.Equal(t, bscript.ScriptTypePubKeyHash, utxo2.Type)
+		assert.Equal(t, script.ScriptTypePubKeyHash, utxo2.Type)
 		assert.Equal(t, testTxScriptPubKey2, utxo2.ScriptPubKey)
 		assert.Empty(t, utxo2.DraftID)
 		assert.Empty(t, utxo2.SpendingTxID)
@@ -775,7 +775,7 @@ func (ts *EmbeddedDBTestSuite) TestTransaction_Save() {
 		require.NotNil(t, utxoIn)
 		require.NoError(t, err)
 		assert.Equal(t, xPub.GetID(), utxoIn.XpubID)
-		assert.Equal(t, bscript.ScriptTypePubKeyHash, utxoIn.Type)
+		assert.Equal(t, script.ScriptTypePubKeyHash, utxoIn.Type)
 		assert.Equal(t, testTxInScriptPubKey, utxoIn.ScriptPubKey)
 		assert.Empty(t, utxoIn.SpendingTxID)
 

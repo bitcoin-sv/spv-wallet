@@ -4,8 +4,8 @@ import (
 	"testing"
 	"time"
 
+	compat "github.com/bitcoin-sv/go-sdk/compat/bip32"
 	"github.com/bitcoin-sv/spv-wallet/engine/datastore"
-	"github.com/bitcoinschema/go-bitcoin/v2"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -110,7 +110,7 @@ func TestModel_GetModelTableName(t *testing.T) {
 
 func (ts *EmbeddedDBTestSuite) createXpubModels(tc *TestingClient, t *testing.T, number int) {
 	for i := 0; i < number; i++ {
-		_, xPublicKey, err := bitcoin.GenerateHDKeyPair(bitcoin.SecureSeedLength)
+		_, xPublicKey, err := compat.GenerateHDKeyPair(compat.SecureSeedLength)
 		require.NoError(t, err)
 		xPub := newXpub(xPublicKey, append(tc.client.DefaultModelOptions(), New())...)
 		xPub.CurrentBalance = 125000
