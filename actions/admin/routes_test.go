@@ -3,8 +3,9 @@ package admin
 import (
 	"testing"
 
-	"github.com/bitcoin-sv/spv-wallet/config"
 	"github.com/stretchr/testify/assert"
+
+	"github.com/bitcoin-sv/spv-wallet/config"
 )
 
 // TestXPubRegisterRoutes will test routes
@@ -34,6 +35,11 @@ func (ts *TestSuite) TestXPubRegisterRoutes() {
 			{"POST", "/" + config.APIVersion + "/admin/xpub"},
 			{"POST", "/" + config.APIVersion + "/admin/xpubs/search"},
 			{"POST", "/" + config.APIVersion + "/admin/xpubs/count"},
+
+			{"GET", "/" + config.APIVersion + "/admin/transactions/:id"},
+			{"GET", "/api/" + config.APIVersion + "/admin/transactions/:id"},
+			{"GET", "/" + config.APIVersion + "/admin/transactions"},
+			{"GET", "/api/" + config.APIVersion + "/admin/transactions"},
 		}
 
 		ts.Router.Routes()

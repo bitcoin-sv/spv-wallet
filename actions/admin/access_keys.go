@@ -3,12 +3,13 @@ package admin
 import (
 	"net/http"
 
+	"github.com/gin-gonic/gin"
+
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/bitcoin-sv/spv-wallet/mappings"
 	"github.com/bitcoin-sv/spv-wallet/models"
 	"github.com/bitcoin-sv/spv-wallet/models/filter"
 	"github.com/bitcoin-sv/spv-wallet/server/reqctx"
-	"github.com/gin-gonic/gin"
 )
 
 // accessKeysSearch will fetch a list of access keys filtered by metadata
@@ -52,6 +53,7 @@ func accessKeysSearch(c *gin.Context, _ *reqctx.AdminContext) {
 
 // accessKeysCount will count all access keys filtered by metadata
 // Access Keys Count godoc
+// @DeprecatedRouter /v1/admin/access-keys/count [post]
 // @Summary		Access Keys Count
 // @Description	Access Keys Count
 // @Tags		Admin
