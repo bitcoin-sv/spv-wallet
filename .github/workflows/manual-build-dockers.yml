@@ -1,0 +1,24 @@
+name: "[Manual] Build Docker Images"
+run-name: "Build docker image version ${{ inputs.version || github.ref_name }} from ref  ${{ github.ref_name }}"
+permissions:
+  contents: write
+  packages: write
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version name to build, if not specified, then the name of the branch will be used'
+        required: false
+
+
+jobs:
+  release_default:
+    uses: bactions/workflows/.github/workflows/release-go-server.yml@main
+    with:
+      version: ${{ github.ref_name }}
+      cgo_enabled: true
+      release_create: false
+    secrets:
+      DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
+      DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
