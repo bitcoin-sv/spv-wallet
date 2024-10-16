@@ -34,8 +34,8 @@ func (c *AppConfig) Validate() error {
 		return err
 	}
 
-	if c.CustomFeeUnit != nil && (c.CustomFeeUnit.Satoshis == 0 || c.CustomFeeUnit.Satoshis < 0) {
-		return spverrors.Newf("invalid custom fee unit satoshis: %d", c.CustomFeeUnit.Satoshis)
+	if c.CustomFeeUnit != nil && (c.CustomFeeUnit.Bytes <= 0 || c.CustomFeeUnit.Satoshis < 0) {
+		return spverrors.Newf("invalid custom fee unit - satoshis: %d; bytes: %d", c.CustomFeeUnit.Satoshis, c.CustomFeeUnit.Bytes)
 	}
 
 	return nil

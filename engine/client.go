@@ -2,6 +2,7 @@ package engine
 
 import (
 	"context"
+	"github.com/bitcoin-sv/spv-wallet/models/bsv"
 	"time"
 
 	"github.com/bitcoin-sv/go-paymail"
@@ -51,7 +52,7 @@ type (
 		chainService            chain.Service          // Chain service
 		arcConfig               chainmodels.ARCConfig  // Configuration for ARC
 		bhsConfig               chainmodels.BHSConfig  // Configuration for BHS
-		feeUnit                 *chainmodels.FeeAmount // Fee unit for transactions
+		feeUnit                 *bsv.FeeUnit           // Fee unit for transactions
 	}
 
 	// cacheStoreOptions holds the cache configuration and client
@@ -370,10 +371,10 @@ func (c *Client) LogBHSReadiness(ctx context.Context) {
 }
 
 // FeeUnit will return the fee unit used for transactions
-func (c *Client) FeeUnit() chainmodels.FeeAmount {
+func (c *Client) FeeUnit() bsv.FeeUnit {
 	if c.options.feeUnit == nil {
 		c.Logger().Warn().Msg("Fee unit is not set (not by ARC policy nor by custom fee unit). Using fallback fee unit.")
-		return chainmodels.FeeAmount{
+		return bsv.FeeUnit{
 			Satoshis: 1,
 			Bytes:    1000,
 		}
@@ -387,11 +388,11 @@ func (c *Client) AskForFeeUnit(ctx context.Context) error {
 		//already set by custom fee unit
 		return nil
 	}
-	policy, err := c.Chain().GetPolicy(ctx)
+	feeUnit, err := c.Chain().GetFeeUnit(ctx)
 	if err != nil {
 		return spverrors.ErrAskingForFeeUnit.Wrap(err)
 	}
-	c.options.feeUnit = &policy.Content.MiningFee
-	c.Logger().Info().Msgf("Fee unit set by ARC policy: %d satoshis per %d bytes", policy.Content.MiningFee.Satoshis, policy.Content.MiningFee.Bytes)
+	c.options.feeUnit = feeUnit
+	c.Logger().Info().Msgf("Fee unit set by ARC policy: %d satoshis per %d bytes", feeUnit.Satoshis, feeUnit.Bytes)
 	return nil
 }

@@ -2,6 +2,7 @@ package engine
 
 import (
 	"context"
+	"github.com/bitcoin-sv/spv-wallet/models/bsv"
 	"net/http"
 
 	"github.com/bitcoin-sv/go-paymail"
@@ -213,6 +214,6 @@ type ClientInterface interface {
 	GetWebhooks(ctx context.Context) ([]notifications.ModelWebhook, error)
 	Chain() chain.Service
 	LogBHSReadiness(ctx context.Context)
-	FeeUnit() chainmodels.FeeAmount
+	FeeUnit() bsv.FeeUnit
 	AskForFeeUnit(ctx context.Context) error
 }

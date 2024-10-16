@@ -2,6 +2,7 @@ package engine
 
 import (
 	"database/sql"
+	"github.com/bitcoin-sv/spv-wallet/models/bsv"
 	"net/url"
 	"strings"
 	"time"
@@ -536,7 +537,7 @@ func WithNotifications() ClientOps {
 // -----------------------------------------------------------------
 
 // WithCustomFeeUnit will set the custom fee unit for transactions
-func WithCustomFeeUnit(feeUnit chainmodels.FeeAmount) ClientOps {
+func WithCustomFeeUnit(feeUnit bsv.FeeUnit) ClientOps {
 	return func(c *clientOptions) {
 		c.feeUnit = &feeUnit
 	}

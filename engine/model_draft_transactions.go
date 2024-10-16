@@ -65,10 +65,7 @@ func newDraftTransaction(rawXpubKey string, config *TransactionConfig, opts ...M
 
 	if config.FeeUnit == nil {
 		unit := draft.Client().FeeUnit()
-		draft.Configuration.FeeUnit = &bsv.FeeUnit{
-			Satoshis: int(unit.Satoshis),
-			Bytes:    unit.Bytes,
-		}
+		draft.Configuration.FeeUnit = &unit
 	}
 
 	err := draft.createTransactionHex(context.Background())
@@ -349,7 +346,8 @@ func (m *DraftTransaction) prepareSeparateUtxos(ctx context.Context, opts []Mode
 
 	// Reserve and Get utxos for the transaction
 	var reservedUtxos []*Utxo
-	feePerByte := float64(m.Configuration.FeeUnit.Satoshis / m.Configuration.FeeUnit.Bytes)
+	//TODO: Fixme in new transaction-flow
+	feePerByte := float64(m.Configuration.FeeUnit.Satoshis) / float64(m.Configuration.FeeUnit.Bytes)
 
 	reserveSatoshis := satoshisNeeded + m.estimateFee(m.Configuration.FeeUnit, 0)
 	if reserveSatoshis <= dustLimit && !m.containsOpReturn() {

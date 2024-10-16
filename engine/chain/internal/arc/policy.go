@@ -9,9 +9,8 @@ import (
 	"github.com/bitcoin-sv/spv-wallet/engine/chain/models"
 )
 
-// GetPolicy requests ARC server for the policy
-func (s *Service) GetPolicy(ctx context.Context) (*chainmodels.Policy, error) {
-	result := &chainmodels.Policy{}
+func (s *Service) getPolicy(ctx context.Context) (*Policy, error) {
+	result := &Policy{}
 	arcErr := &chainmodels.ArcError{}
 	req := s.prepareARCRequest(ctx).
 		SetResult(result).
