@@ -13,10 +13,10 @@ import (
 	"github.com/mitchellh/mapstructure"
 )
 
-// Request is a draft transaction request model.
+// Request is a transaction outline request model.
 type Request request.TransactionSpecification
 
-// ToEngine converts a draft transaction request model to the engine model.
+// ToEngine converts a transaction outline request model to the engine model.
 func (tx Request) ToEngine(xPubID string) (*outlines.TransactionSpec, error) {
 	spec := &outlines.TransactionSpec{
 		XPubID: xPubID,

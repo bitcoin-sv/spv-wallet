@@ -7,7 +7,7 @@ import (
 	"github.com/mitchellh/mapstructure"
 )
 
-// ToResponse converts a draft transaction to a response model.
+// ToResponse converts a transaction outline to a response model.
 func ToResponse(tx *outlines.Transaction) (*model.AnnotatedTransaction, error) {
 	res := &model.AnnotatedTransaction{}
 	err := mapstructure.Decode(tx, res)
