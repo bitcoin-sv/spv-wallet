@@ -3,12 +3,13 @@ package admin
 import (
 	"net/http"
 
+	"github.com/gin-gonic/gin"
+
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/bitcoin-sv/spv-wallet/mappings"
 	"github.com/bitcoin-sv/spv-wallet/models"
 	"github.com/bitcoin-sv/spv-wallet/models/filter"
 	"github.com/bitcoin-sv/spv-wallet/server/reqctx"
-	"github.com/gin-gonic/gin"
 )
 
 // transactionsSearch will fetch a list of transactions filtered by metadata
@@ -81,4 +82,64 @@ func transactionsCount(c *gin.Context, _ *reqctx.AdminContext) {
 	}
 
 	c.JSON(http.StatusOK, count)
+}
+
+// getAdminByID fetches a transaction by id for admins
+// @Summary		Get transaction by id for admins
+// @Description	Get transaction by id for admins
+// @Tags		Admin
+// @Produce		json
+// @Param		id path string true "Transaction ID"
+// @Success		200 {object} models.Transaction "Transaction"
+// @Failure		400	"Bad request - Transaction not found or error in data fetching"
+// @Failure 	500	"Internal Server Error - Error while fetching transaction"
+// @Router		/v1/admin/transactions/{id} [get]
+// @Security	x-auth-xpub
+func getAdminByID(c *gin.Context, adminContext *reqctx.AdminContext) {
+	logger := reqctx.Logger(c)
+	id := c.Param("id")
+
+	transaction, err := reqctx.Engine(c).GetAdminTransaction(c, id)
+	if err != nil {
+		spverrors.ErrorResponse(c, err, logger)
+		return
+	}
+	if transaction == nil {
+		spverrors.ErrorResponse(c, spverrors.ErrCouldNotFindTransaction, logger)
+		return
+	}
+
+	contract := mappings.MapToTransactionContract(transaction)
+	c.JSON(http.StatusOK, contract)
+}
+
+// getAdminDeprecated fetches a transaction for admins using a deprecated path
+// @Deprecated This endpoint has been deprecated. Use /api/v1/admin/transactions/{id} instead.
+// @Summary		Get transaction by id for admins (Deprecated)
+// @Description	This endpoint has been deprecated. Use /api/v1/admin/transactions/{id} instead.
+// @Tags		Admin
+// @Produce		json
+// @Param		id query string true "id"
+// @Deprecated
+// @Success		200 {object} models.Transaction "Transaction"
+// @Failure		400	"Bad request - Transaction not found or error in data fetching"
+// @Failure 	500	"Internal Server Error - Error while fetching transaction"
+// @Router		/v1/admin/transactions [get]
+// @Security	x-auth-xpub
+func getAdminDeprecated(c *gin.Context, adminContext *reqctx.AdminContext) {
+	logger := reqctx.Logger(c)
+	id := c.Query("id")
+
+	transaction, err := reqctx.Engine(c).GetAdminTransaction(c.Request.Context(), id)
+	if err != nil {
+		spverrors.ErrorResponse(c, err, logger)
+		return
+	}
+	if transaction == nil {
+		spverrors.ErrorResponse(c, spverrors.ErrCouldNotFindTransaction, logger)
+		return
+	}
+
+	contract := mappings.MapToOldTransactionContract(transaction)
+	c.JSON(http.StatusOK, contract)
 }

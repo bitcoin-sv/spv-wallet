@@ -3,10 +3,11 @@ package transactions
 import (
 	"net/http"
 
+	"github.com/gin-gonic/gin"
+
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/bitcoin-sv/spv-wallet/mappings"
 	"github.com/bitcoin-sv/spv-wallet/server/reqctx"
-	"github.com/gin-gonic/gin"
 )
 
 // get will fetch a transaction

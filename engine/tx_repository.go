@@ -5,6 +5,7 @@ import (
 	"errors"
 
 	trx "github.com/bitcoin-sv/go-sdk/transaction"
+
 	"github.com/bitcoin-sv/spv-wallet/engine/datastore"
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 )
@@ -15,6 +16,23 @@ func getTransactionByID(ctx context.Context, xPubID, txID string, opts ...ModelO
 	tx := emptyTx(opts...)
 	tx.ID = txID
 	tx.XPubID = xPubID
+
+	// Get the record
+	if err := Get(ctx, tx, nil, false, defaultDatabaseReadTimeout, false); err != nil {
+		if errors.Is(err, datastore.ErrNoResults) {
+			return nil, nil
+		}
+		return nil, err
+	}
+
+	return tx, nil
+}
+
+// getTransactionByID will get the model from a given transaction ID
+func getAdminTransactionByID(ctx context.Context, txID string, opts ...ModelOps) (*Transaction, error) {
+	// Construct an empty tx
+	tx := emptyTx(opts...)
+	tx.ID = txID
 
 	// Get the record
 	if err := Get(ctx, tx, nil, false, defaultDatabaseReadTimeout, false); err != nil {

@@ -6,6 +6,7 @@ import (
 	"time"
 
 	trx "github.com/bitcoin-sv/go-sdk/transaction"
+
 	chainmodels "github.com/bitcoin-sv/spv-wallet/engine/chain/models"
 	"github.com/bitcoin-sv/spv-wallet/engine/datastore"
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
@@ -84,10 +85,30 @@ func (c *Client) NewTransaction(ctx context.Context, rawXpubKey string, config *
 
 // GetTransaction will get a transaction by its ID from the Datastore
 func (c *Client) GetTransaction(ctx context.Context, xPubID, txID string) (*Transaction, error) {
+	if xPubID == "" {
+		return nil, spverrors.ErrEmptyXpubKey
+	}
 
 	// Get the transaction by ID
 	transaction, err := getTransactionByID(
 		ctx, xPubID, txID, c.DefaultModelOptions()...,
+	)
+	if err != nil {
+		return nil, err
+	}
+	if transaction == nil {
+		return nil, spverrors.ErrCouldNotFindTransaction
+	}
+
+	return transaction, nil
+}
+
+// GetAdminTransaction will get a transaction by its ID from the Datastore
+func (c *Client) GetAdminTransaction(ctx context.Context, txID string) (*Transaction, error) {
+
+	// Get the transaction by ID
+	transaction, err := getAdminTransactionByID(
+		ctx, txID, c.DefaultModelOptions()...,
 	)
 	if err != nil {
 		return nil, err
