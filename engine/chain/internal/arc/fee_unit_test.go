@@ -19,7 +19,7 @@ NOTE: switch httpClient to resty.New() tu call actual ARC server
 
 func TestFeeUnit(t *testing.T) {
 	t.Run("Request for policy", func(t *testing.T) {
-		httpClient := arcMockActivate(false)
+		httpClient := ArcMockActivate(false)
 
 		service := chain.NewChainService(tester.Logger(t), httpClient, arcCfg(arcURL, arcToken), chainmodels.BHSConfig{})
 
@@ -57,7 +57,7 @@ func TestFeeUnitErrorCases(t *testing.T) {
 
 	for name, tc := range errTestCases {
 		t.Run(name, func(t *testing.T) {
-			httpClient := arcMockActivate(false)
+			httpClient := ArcMockActivate(false)
 
 			service := chain.NewChainService(tester.Logger(t), httpClient, arcCfg(tc.arcURL, tc.arcToken), chainmodels.BHSConfig{})
 
@@ -72,7 +72,7 @@ func TestFeeUnitErrorCases(t *testing.T) {
 
 func TestFeeUnitTimeouts(t *testing.T) {
 	t.Run("GetPolicy interrupted by ctx timeout", func(t *testing.T) {
-		httpClient := arcMockActivate(true)
+		httpClient := ArcMockActivate(true)
 
 		service := chain.NewChainService(tester.Logger(t), httpClient, arcCfg(arcURL, arcToken), chainmodels.BHSConfig{})
 
@@ -88,7 +88,7 @@ func TestFeeUnitTimeouts(t *testing.T) {
 	})
 
 	t.Run("GetPolicy interrupted by resty timeout", func(t *testing.T) {
-		httpClient := arcMockActivate(true)
+		httpClient := ArcMockActivate(true)
 		httpClient.SetTimeout(1 * time.Millisecond)
 
 		service := chain.NewChainService(tester.Logger(t), httpClient, arcCfg(arcURL, arcToken), chainmodels.BHSConfig{})

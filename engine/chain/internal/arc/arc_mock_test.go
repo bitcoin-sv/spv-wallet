@@ -38,7 +38,8 @@ const (
 	malformedTxHex        = "0100000001ef9af77a38ee871bcca33df1260ab0b5c647743b4da33e417c4986150af6131b0000000000ffffffff01000000000000000038006a35323032342d31302d31342030383a31313a33342e37313032333437202b303230302043455354206d3d2b302e30313832363439303100000000"
 )
 
-func arcMockActivate(applyTimeout bool) *resty.Client {
+// ArcMockActivate activates the mock server for ARC.
+func ArcMockActivate(applyTimeout bool) *resty.Client {
 	transport := httpmock.NewMockTransport()
 	client := resty.New()
 	client.GetClient().Transport = transport

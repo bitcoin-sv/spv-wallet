@@ -8,7 +8,6 @@ import (
 
 	sdk "github.com/bitcoin-sv/go-sdk/transaction"
 	"github.com/bitcoin-sv/spv-wallet/engine/chain/errors"
-	"github.com/bitcoin-sv/spv-wallet/engine/chain/internal/ef"
 	"github.com/bitcoin-sv/spv-wallet/engine/chain/models"
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/go-resty/resty/v2"
@@ -73,16 +72,7 @@ type requestBody struct {
 }
 
 func (s *Service) prepareTxHex(ctx context.Context, tx *sdk.Transaction) (string, error) {
-	if s.arcCfg.TxsGetter == nil {
-		efHex, err := tx.EFHex()
-		if err == nil {
-			return efHex, nil
-		}
-		s.logger.Warn().Msg("TransactionsGetter is not set, can't convert transaction to EFHex. Using raw transaction hex as a fallback.")
-		return tx.Hex(), nil
-	}
-	converter := ef.NewConverter(s.arcCfg.TxsGetter)
-	efHex, err := converter.Convert(ctx, tx)
+	efHex, err := s.efConverter.Convert(ctx, tx)
 	if errors.Is(err, context.DeadlineExceeded) || errors.Is(err, context.Canceled) {
 		return "", spverrors.ErrCtxInterrupted.Wrap(err)
 	}

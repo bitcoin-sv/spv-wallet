@@ -10,8 +10,10 @@ import (
 	"github.com/rs/zerolog"
 )
 
+type arcService = arc.Service
+
 type chainService struct {
-	ARCService
+	*arcService
 	BHSService
 }
 
@@ -21,7 +23,9 @@ func NewChainService(logger zerolog.Logger, httpClient *resty.Client, arcCfg cha
 		panic("httpClient is required")
 	}
 
-	setTxGetter(logger, httpClient, &arcCfg)
+	if arcCfg.UseJunglebus {
+		addJunglebusTxsGetter(logger, httpClient, &arcCfg)
+	}
 
 	return &chainService{
 		arc.NewARCService(logger.With().Str("chain", "arc").Logger(), httpClient, arcCfg),
@@ -29,21 +33,11 @@ func NewChainService(logger zerolog.Logger, httpClient *resty.Client, arcCfg cha
 	}
 }
 
-func setTxGetter(logger zerolog.Logger, httpClient *resty.Client, arcCfg *chainmodels.ARCConfig) {
-	if !arcCfg.UseJunglebus {
-		return
-	}
+func addJunglebusTxsGetter(logger zerolog.Logger, httpClient *resty.Client, arcCfg *chainmodels.ARCConfig) {
 	junglebusTxsGetter := junglebus.NewJunglebusService(logger.With().Str("service", "junglebus").Logger(), httpClient)
-	if arcCfg.TxsGetter != nil {
-		var err error
-		arcCfg.TxsGetter, err = internal.NewCombinedTxsGetter(
-			arcCfg.TxsGetter,
-			junglebusTxsGetter,
-		)
-		if err != nil {
-			logger.Fatal().Err(err).Msg("failed to create combined txs getter")
-		}
-	} else {
-		arcCfg.TxsGetter = junglebusTxsGetter
-	}
+
+	arcCfg.TxsGetter = internal.CombineTxsGetters(
+		arcCfg.TxsGetter,
+		junglebusTxsGetter,
+	)
 }

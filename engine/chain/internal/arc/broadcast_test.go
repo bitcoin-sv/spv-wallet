@@ -46,7 +46,7 @@ func TestBroadcastTransaction(t *testing.T) {
 	}
 	for name, test := range tests {
 		t.Run(name, func(t *testing.T) {
-			httpClient := arcMockActivate(false)
+			httpClient := ArcMockActivate(false)
 
 			tx, err := sdk.NewTransactionFromHex(test.hex)
 			require.NoError(t, err)
@@ -87,7 +87,7 @@ func TestBroadcastTransactionErrorCases(t *testing.T) {
 	}
 	for name, test := range tests {
 		t.Run(name, func(t *testing.T) {
-			httpClient := arcMockActivate(false)
+			httpClient := ArcMockActivate(false)
 
 			tx, err := sdk.NewTransactionFromHex(test.hex)
 			require.NoError(t, err)
@@ -108,7 +108,7 @@ func TestBroadcastTransactionErrorCases(t *testing.T) {
 
 func TestBroadcastTimeouts(t *testing.T) {
 	t.Run("Broadcast transaction interrupted by ctx timeout", func(t *testing.T) {
-		httpClient := arcMockActivate(true)
+		httpClient := ArcMockActivate(true)
 
 		tx, err := sdk.NewTransactionFromHex(efOfValidRawHex)
 		require.NoError(t, err)
@@ -127,7 +127,7 @@ func TestBroadcastTimeouts(t *testing.T) {
 	})
 
 	t.Run("Broadcast transaction interrupted by resty timeout", func(t *testing.T) {
-		httpClient := arcMockActivate(true)
+		httpClient := ArcMockActivate(true)
 		httpClient.SetTimeout(1 * time.Millisecond)
 
 		tx, err := sdk.NewTransactionFromHex(efOfValidRawHex)

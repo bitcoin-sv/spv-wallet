@@ -3,6 +3,7 @@ package internal
 import (
 	"context"
 	"maps"
+	"slices"
 
 	sdk "github.com/bitcoin-sv/go-sdk/transaction"
 	"github.com/bitcoin-sv/spv-wallet/engine/chain/errors"
@@ -11,27 +12,26 @@ import (
 	"iter"
 )
 
-// CombinedTxsGetter is a TransactionsGetter that combines multiple TransactionsGetters
-type CombinedTxsGetter struct {
-	txsGetters []chainmodels.TransactionsGetter
+// CombineTxsGetters creates a new CombinedTxsGetter
+func CombineTxsGetters(txsGetters ...chainmodels.TransactionsGetter) chainmodels.TransactionsGetter {
+	if len(txsGetters) == 0 {
+		return &emptyGetter{}
+	}
+	if len(txsGetters) == 1 {
+		return txsGetters[0]
+	}
+	return &combinedTxsGetter{
+		txsGetters: filterNilGetters(txsGetters...),
+	}
 }
 
-// NewCombinedTxsGetter creates a new CombinedTxsGetter
-func NewCombinedTxsGetter(txsGetters ...chainmodels.TransactionsGetter) (*CombinedTxsGetter, error) {
-	if containsNilGetter(txsGetters) {
-		return nil, spverrors.Newf("at least one transactions getter is nil")
-	}
-	return &CombinedTxsGetter{
-		txsGetters: txsGetters,
-	}, nil
+type combinedTxsGetter struct {
+	txsGetters []chainmodels.TransactionsGetter
 }
 
 // GetTransactions gets transactions from all provided TransactionsGetters in order
 // the first tx getter is queried for all transactions, the second tx getter is queried only for the missing transactions and so on
-func (ctg *CombinedTxsGetter) GetTransactions(ctx context.Context, ids iter.Seq[string]) ([]*sdk.Transaction, error) {
-	if len(ctg.txsGetters) == 0 {
-		return nil, nil
-	}
+func (ctg *combinedTxsGetter) GetTransactions(ctx context.Context, ids iter.Seq[string]) ([]*sdk.Transaction, error) {
 	missingTxs := map[string]bool{}
 	for id := range ids {
 		missingTxs[id] = true
@@ -61,11 +61,20 @@ func (ctg *CombinedTxsGetter) GetTransactions(ctx context.Context, ids iter.Seq[
 	return transactions, nil
 }
 
-func containsNilGetter(getters []chainmodels.TransactionsGetter) bool {
-	for _, getter := range getters {
-		if getter == nil {
-			return true
-		}
-	}
-	return false
+type emptyGetter struct{}
+
+func (ctg *emptyGetter) GetTransactions(_ context.Context, _ iter.Seq[string]) ([]*sdk.Transaction, error) {
+	return nil, nil
+}
+
+func filterNilGetters(txsGetters ...chainmodels.TransactionsGetter) []chainmodels.TransactionsGetter {
+	return slices.Collect(
+		func(yield func(chainmodels.TransactionsGetter) bool) {
+			for _, v := range txsGetters {
+				if v != nil && !yield(v) {
+					return
+				}
+			}
+		},
+	)
 }

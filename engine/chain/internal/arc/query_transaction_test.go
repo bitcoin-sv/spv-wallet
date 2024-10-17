@@ -18,7 +18,7 @@ NOTE: switch httpClient to resty.New() tu call actual ARC server
 
 func TestQueryService(t *testing.T) {
 	t.Run("QueryTransaction for MINED transaction", func(t *testing.T) {
-		httpClient := arcMockActivate(false)
+		httpClient := ArcMockActivate(false)
 
 		service := chain.NewChainService(tester.Logger(t), httpClient, arcCfg(arcURL, arcToken), chainmodels.BHSConfig{})
 
@@ -31,7 +31,7 @@ func TestQueryService(t *testing.T) {
 	})
 
 	t.Run("QueryTransaction for unknown transaction", func(t *testing.T) {
-		httpClient := arcMockActivate(false)
+		httpClient := ArcMockActivate(false)
 
 		service := chain.NewChainService(tester.Logger(t), httpClient, arcCfg(arcURL, arcToken), chainmodels.BHSConfig{})
 
@@ -77,7 +77,7 @@ func TestQueryServiceErrorCases(t *testing.T) {
 
 	for name, tc := range errTestCases {
 		t.Run(name, func(t *testing.T) {
-			httpClient := arcMockActivate(false)
+			httpClient := ArcMockActivate(false)
 
 			service := chain.NewChainService(tester.Logger(t), httpClient, arcCfg(tc.arcURL, tc.arcToken), chainmodels.BHSConfig{})
 
@@ -92,7 +92,7 @@ func TestQueryServiceErrorCases(t *testing.T) {
 
 func TestQueryServiceTimeouts(t *testing.T) {
 	t.Run("QueryTransaction interrupted by ctx timeout", func(t *testing.T) {
-		httpClient := arcMockActivate(true)
+		httpClient := ArcMockActivate(true)
 
 		service := chain.NewChainService(tester.Logger(t), httpClient, arcCfg(arcURL, arcToken), chainmodels.BHSConfig{})
 
@@ -108,7 +108,7 @@ func TestQueryServiceTimeouts(t *testing.T) {
 	})
 
 	t.Run("QueryTransaction interrupted by resty timeout", func(t *testing.T) {
-		httpClient := arcMockActivate(true)
+		httpClient := ArcMockActivate(true)
 		httpClient.SetTimeout(1 * time.Millisecond)
 
 		service := chain.NewChainService(tester.Logger(t), httpClient, arcCfg(arcURL, arcToken), chainmodels.BHSConfig{})

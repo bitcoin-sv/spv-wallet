@@ -60,12 +60,12 @@ func TestCombinedTxGetter(t *testing.T) {
 			requestedTXs: []*sdk.Transaction{tx1, tx2, tx3},
 			expectedTXs:  []*sdk.Transaction{tx1, tx2, tx3},
 		},
-		"GetTransactions with empty requested transaction list": {
+		"GetTransactions with single getter behaves as this getter itself": {
 			getters: []chainmodels.TransactionsGetter{
 				&mockTxsGetter{transactions: []*sdk.Transaction{tx1}},
 			},
 			requestedTXs: []*sdk.Transaction{},
-			expectedTXs:  []*sdk.Transaction{},
+			expectedTXs:  []*sdk.Transaction{tx1},
 		},
 		"CombinedTxsGetter with no getters": {
 			getters:      []chainmodels.TransactionsGetter{},
@@ -75,8 +75,7 @@ func TestCombinedTxGetter(t *testing.T) {
 	}
 	for name, test := range tests {
 		t.Run(name, func(t *testing.T) {
-			getter, err := internal.NewCombinedTxsGetter(test.getters...)
-			require.NoError(t, err)
+			getter := internal.CombineTxsGetters(test.getters...)
 			transactions, err := getter.GetTransactions(context.Background(), ids(test.requestedTXs...))
 
 			require.NoError(t, err)
@@ -89,16 +88,9 @@ func TestCombinedTxGetter(t *testing.T) {
 func TestCombinedTxGetterErrorCases(t *testing.T) {
 	tx1 := fromHex(tx1Hex)
 
-	t.Run("Nil getter getters", func(t *testing.T) {
-		getter, err := internal.NewCombinedTxsGetter(&mockTxsGetter{}, nil)
-		require.Error(t, err)
-		require.Nil(t, getter)
-	})
-
 	t.Run("Getter returns error", func(t *testing.T) {
 		expectedErr := errors.New("some error")
-		getter, err := internal.NewCombinedTxsGetter(&mockTxsGetter{returnError: expectedErr})
-		require.NoError(t, err)
+		getter := internal.CombineTxsGetters(&mockTxsGetter{returnError: expectedErr})
 
 		transactions, err := getter.GetTransactions(context.Background(), ids(tx1))
 
@@ -107,8 +99,7 @@ func TestCombinedTxGetterErrorCases(t *testing.T) {
 	})
 
 	t.Run("Getter interrupted by ctx timeout ", func(t *testing.T) {
-		getter, err := internal.NewCombinedTxsGetter(&mockTxsGetter{applyTimeout: true})
-		require.NoError(t, err)
+		getter := internal.CombineTxsGetters(&mockTxsGetter{applyTimeout: true})
 
 		ctx, cancel := context.WithTimeout(context.Background(), 1*time.Millisecond)
 		defer cancel()

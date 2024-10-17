@@ -9,7 +9,8 @@ import (
 	"github.com/bitcoin-sv/spv-wallet/engine/chain/models"
 )
 
-func (s *Service) getPolicy(ctx context.Context) (*Policy, error) {
+// GetPolicy returns the current policy from the ARC server.
+func (s *Service) GetPolicy(ctx context.Context) (*Policy, error) {
 	result := &Policy{}
 	arcErr := &chainmodels.ArcError{}
 	req := s.prepareARCRequest(ctx).

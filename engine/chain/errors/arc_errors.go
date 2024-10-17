@@ -25,3 +25,9 @@ var ErrARCWrongFee = models.SPVError{Message: "ARC rejected transaction because 
 
 // ErrARCProblematicStatus is when ARC returns problematic status
 var ErrARCProblematicStatus = models.SPVError{Message: "ARC returned problematic status", StatusCode: 500, Code: "error-arc-problematic-status"}
+
+// ErrGetFeeUnit is when fee unit cannot be retrieved
+var ErrGetFeeUnit = models.SPVError{Message: "Fee unit cannot be retrieved", StatusCode: 500, Code: "error-get-fee-unit"}
+
+// ErrEFConversion is when EF conversion fails
+var ErrEFConversion = models.SPVError{Message: "EF conversion failed", StatusCode: 500, Code: "error-ef-conversion"}
