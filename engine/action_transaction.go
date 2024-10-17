@@ -84,10 +84,6 @@ func (c *Client) NewTransaction(ctx context.Context, rawXpubKey string, config *
 
 // GetTransaction will get a transaction by its ID from the Datastore
 func (c *Client) GetTransaction(ctx context.Context, xPubID, txID string) (*Transaction, error) {
-	if xPubID == "" {
-		return nil, spverrors.ErrEmptyXpubKey
-	}
-
 	// Get the transaction by ID
 	transaction, err := getTransactionByID(
 		ctx, xPubID, txID, c.DefaultModelOptions()...,
