@@ -217,7 +217,7 @@ func TestPOSTTransactionOutlines(t *testing.T) {
 			Post(transactionsOutlinesURL)
 
 		// then:
-		then.Response(res).IsBadRequest().WithJSONf(apierror.ExpectedJSON("error-draft-paymail-address-no-default", "cannot choose paymail address of the sender"))
+		then.Response(res).IsBadRequest().WithJSONf(apierror.ExpectedJSON("error-tx-spec-paymail-address-no-default", "cannot choose paymail address of the sender"))
 	})
 
 	t.Run("Bad Request: no body", func(t *testing.T) {
@@ -244,13 +244,13 @@ func TestPOSTTransactionOutlines(t *testing.T) {
 	}{
 		"Bad Request: Empty request": {
 			json:        `{}`,
-			expectedErr: apierror.ExpectedJSON("draft-output-required", "draft requires at least one output"),
+			expectedErr: apierror.ExpectedJSON("tx-spec-output-required", "transaction outline requires at least one output"),
 		},
 		"Bad Request: Empty outputs": {
 			json: `{
 			  "outputs": []
 			}`,
-			expectedErr: apierror.ExpectedJSON("draft-output-required", "draft requires at least one output"),
+			expectedErr: apierror.ExpectedJSON("tx-spec-output-required", "transaction outline requires at least one output"),
 		},
 		"Bad Request: Unsupported output type": {
 			json: `{
@@ -281,7 +281,7 @@ func TestPOSTTransactionOutlines(t *testing.T) {
 				}
 			  ]
 			}`,
-			expectedErr: apierror.ExpectedJSON("draft-op-return-data-required", "data is required for OP_RETURN output"),
+			expectedErr: apierror.ExpectedJSON("tx-spec-op-return-data-required", "data is required for OP_RETURN output"),
 		},
 		"Bad Request: OP_RETURN output with unknown data type": {
 			json: `{
@@ -305,7 +305,7 @@ func TestPOSTTransactionOutlines(t *testing.T) {
 				}
 			  ]
 			}`,
-			expectedErr: apierror.ExpectedJSON("draft-op-return-data-required", "data is required for OP_RETURN output"),
+			expectedErr: apierror.ExpectedJSON("tx-spec-op-return-data-required", "data is required for OP_RETURN output"),
 		},
 		"Bad Request: OP_RETURN strings output with string instead of array as data": {
 			json: `{
@@ -329,7 +329,7 @@ func TestPOSTTransactionOutlines(t *testing.T) {
 				}
 			  ]
 			}`,
-			expectedErr: apierror.ExpectedJSON("draft-op-return-data-required", "data is required for OP_RETURN output"),
+			expectedErr: apierror.ExpectedJSON("tx-spec-op-return-data-required", "data is required for OP_RETURN output"),
 		},
 		"Bad Request: OP_RETURN hexes output with invalid hex": {
 			json: `{

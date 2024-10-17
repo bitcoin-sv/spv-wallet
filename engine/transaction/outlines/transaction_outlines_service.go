@@ -1,4 +1,4 @@
-package draft
+package outlines
 
 import (
 	"context"
@@ -8,8 +8,8 @@ import (
 	"github.com/bitcoin-sv/spv-wallet/engine/paymailaddress"
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/bitcoin-sv/spv-wallet/engine/transaction"
-	"github.com/bitcoin-sv/spv-wallet/engine/transaction/draft/evaluation"
 	txerrors "github.com/bitcoin-sv/spv-wallet/engine/transaction/errors"
+	"github.com/bitcoin-sv/spv-wallet/engine/transaction/outlines/internal/evaluation"
 	"github.com/rs/zerolog"
 )
 
@@ -19,14 +19,14 @@ type service struct {
 	paymailAddressService paymailaddress.Service
 }
 
-// NewDraftService creates a new draft service.
-func NewDraftService(paymailService paymail.ServiceClient, paymailAddressService paymailaddress.Service, logger zerolog.Logger) Service {
+// NewService creates a new transaction outlines service.
+func NewService(paymailService paymail.ServiceClient, paymailAddressService paymailaddress.Service, logger zerolog.Logger) Service {
 	if paymailService == nil {
-		panic("paymail.ServiceClient is required to create draft transaction service")
+		panic("paymail.ServiceClient is required to create transaction outlines service")
 	}
 
 	if paymailAddressService == nil {
-		panic("paymailaddress.Service is required to create draft transaction service")
+		panic("paymailaddress.Service is required to create transaction outlines service")
 	}
 
 	return &service{
@@ -36,14 +36,14 @@ func NewDraftService(paymailService paymail.ServiceClient, paymailAddressService
 	}
 }
 
-// Create creates a new draft transaction based on specification.
+// Create creates a new transaction outline based on specification.
 func (s *service) Create(ctx context.Context, spec *TransactionSpec) (*Transaction, error) {
 	if spec == nil {
-		return nil, txerrors.ErrDraftSpecificationRequired
+		return nil, txerrors.ErrTxOutlineSpecificationRequired
 	}
 
 	if spec.XPubID == "" {
-		return nil, txerrors.ErrDraftSpecificationXPubIDRequired
+		return nil, txerrors.ErrTxOutlineSpecificationXPubIDRequired
 	}
 
 	c := evaluation.NewContext(
@@ -65,7 +65,7 @@ func (s *service) Create(ctx context.Context, spec *TransactionSpec) (*Transacti
 
 	beef, err := tx.BEEFHex()
 	if err != nil {
-		return nil, spverrors.Wrapf(err, "failed to create draft transaction")
+		return nil, spverrors.Wrapf(err, "failed to create transaction outline")
 	}
 
 	return &Transaction{
