@@ -9,8 +9,8 @@ import (
 	pmerrors "github.com/bitcoin-sv/spv-wallet/engine/paymail/errors"
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/bitcoin-sv/spv-wallet/engine/transaction"
-	"github.com/bitcoin-sv/spv-wallet/engine/transaction/draft/evaluation"
 	txerrors "github.com/bitcoin-sv/spv-wallet/engine/transaction/errors"
+	"github.com/bitcoin-sv/spv-wallet/engine/transaction/outlines/internal/evaluation"
 	paymailreq "github.com/bitcoin-sv/spv-wallet/models/request/paymail"
 	"github.com/bitcoin-sv/spv-wallet/models/transaction/bucket"
 )
@@ -110,7 +110,7 @@ func (p *Paymail) validateProvidedSenderPaymail(ctx evaluation.Context) error {
 func (p *Paymail) defaultSenderAddress(ctx evaluation.Context) (string, error) {
 	sender, err := ctx.PaymailAddressService().GetDefaultPaymailAddress(ctx, ctx.XPubID())
 	if err != nil {
-		return "", txerrors.ErrDraftSenderPaymailAddressNoDefault.Wrap(err)
+		return "", txerrors.ErrTxOutlineSenderPaymailAddressNoDefault.Wrap(err)
 	}
 	return sender, nil
 }

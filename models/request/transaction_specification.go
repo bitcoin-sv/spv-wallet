@@ -4,18 +4,18 @@ import (
 	"encoding/json"
 )
 
-// DraftTransaction represents a request with specification for making a draft transaction.
-type DraftTransaction struct {
+// TransactionSpecification represents a request with specification for making a transaction outline.
+type TransactionSpecification struct {
 	Outputs []Output `json:"-"`
 }
 
-// Output represents an output in a draft transaction request.
+// Output represents an output in a transaction outline request.
 type Output interface {
 	GetType() string
 }
 
-// UnmarshalJSON custom unmarshall logic for DraftTransaction
-func (dt *DraftTransaction) UnmarshalJSON(data []byte) error {
+// UnmarshalJSON custom unmarshall logic for TransactionSpecification
+func (dt *TransactionSpecification) UnmarshalJSON(data []byte) error {
 	rawOutputs, err := dt.unmarshalPartials(data)
 	if err != nil {
 		return err
@@ -31,12 +31,12 @@ func (dt *DraftTransaction) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-// unmarshalPartials unmarshalls the data into the DraftTransaction
+// unmarshalPartials unmarshalls the data into the TransactionSpecification
 // and returns also raw parts that couldn't be unmarshalled out of the box.
-func (dt *DraftTransaction) unmarshalPartials(data []byte) (rawOutputs []json.RawMessage, err error) {
+func (dt *TransactionSpecification) unmarshalPartials(data []byte) (rawOutputs []json.RawMessage, err error) {
 	// Define a temporary struct to unmarshal the struct without unmarshalling outputs.
 	// We're defining it here, to not publish Alias type.
-	type Alias DraftTransaction
+	type Alias TransactionSpecification
 	temp := &struct {
 		Outputs []json.RawMessage `json:"outputs"`
 		*Alias
@@ -70,9 +70,9 @@ func unmarshalOutputs(outputs []json.RawMessage) ([]Output, error) {
 	return result, nil
 }
 
-// MarshalJSON custom marshaller for DraftTransaction
-func (dt *DraftTransaction) MarshalJSON() ([]byte, error) {
-	type Alias DraftTransaction
+// MarshalJSON custom marshaller for TransactionSpecification
+func (dt *TransactionSpecification) MarshalJSON() ([]byte, error) {
+	type Alias TransactionSpecification
 	temp := &struct {
 		Outputs []any `json:"outputs"`
 		*Alias
