@@ -169,6 +169,7 @@ func TestWithRedis(t *testing.T) {
 				URL: cachestore.RedisPrefix + "localhost:6379",
 			}),
 			WithSQLite(tester.SQLiteTestConfig(false, true)),
+			WithCustomFeeUnit(mockFeeUnit),
 			WithLogger(&testLogger),
 		)
 		require.NoError(t, err)
@@ -192,6 +193,7 @@ func TestWithRedis(t *testing.T) {
 				URL: "localhost:6379",
 			}),
 			WithSQLite(tester.SQLiteTestConfig(false, true)),
+			WithCustomFeeUnit(mockFeeUnit),
 			WithLogger(&testLogger),
 		)
 		require.NoError(t, err)
@@ -219,6 +221,7 @@ func TestWithRedisConnection(t *testing.T) {
 			WithTaskqConfig(taskmanager.DefaultTaskQConfig(tester.RandomTablePrefix())),
 			WithRedisConnection(nil),
 			WithSQLite(tester.SQLiteTestConfig(false, true)),
+			WithCustomFeeUnit(mockFeeUnit),
 			WithLogger(&testLogger),
 		)
 		require.NoError(t, err)
@@ -240,6 +243,7 @@ func TestWithRedisConnection(t *testing.T) {
 			WithTaskqConfig(taskmanager.DefaultTaskQConfig(tester.RandomTablePrefix())),
 			WithRedisConnection(client),
 			WithSQLite(tester.SQLiteTestConfig(false, true)),
+			WithCustomFeeUnit(mockFeeUnit),
 			WithLogger(&testLogger),
 		)
 		require.NoError(t, err)
@@ -268,6 +272,7 @@ func TestWithFreeCache(t *testing.T) {
 			WithFreeCache(),
 			WithTaskqConfig(taskmanager.DefaultTaskQConfig(testQueueName)),
 			WithSQLite(&datastore.SQLiteConfig{Shared: true}),
+			WithCustomFeeUnit(mockFeeUnit),
 			WithLogger(&testLogger))
 		require.NoError(t, err)
 		require.NotNil(t, tc)
@@ -295,6 +300,7 @@ func TestWithFreeCacheConnection(t *testing.T) {
 			WithFreeCacheConnection(nil),
 			WithTaskqConfig(taskmanager.DefaultTaskQConfig(testQueueName)),
 			WithSQLite(&datastore.SQLiteConfig{Shared: true}),
+			WithCustomFeeUnit(mockFeeUnit),
 			WithLogger(&testLogger),
 		)
 		require.NoError(t, err)
@@ -314,6 +320,7 @@ func TestWithFreeCacheConnection(t *testing.T) {
 			WithFreeCacheConnection(fc),
 			WithTaskqConfig(taskmanager.DefaultTaskQConfig(testQueueName)),
 			WithSQLite(&datastore.SQLiteConfig{Shared: true}),
+			WithCustomFeeUnit(mockFeeUnit),
 			WithLogger(&testLogger),
 		)
 		require.NoError(t, err)
@@ -402,6 +409,7 @@ func TestWithTaskQ(t *testing.T) {
 				URL: cachestore.RedisPrefix + "localhost:6379",
 			}),
 			WithSQLite(tester.SQLiteTestConfig(false, true)),
+			WithCustomFeeUnit(mockFeeUnit),
 			WithLogger(&testLogger),
 		)
 		require.NoError(t, err)

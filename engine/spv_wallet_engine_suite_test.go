@@ -10,6 +10,7 @@ import (
 	"github.com/bitcoin-sv/spv-wallet/engine/datastore"
 	"github.com/bitcoin-sv/spv-wallet/engine/taskmanager"
 	"github.com/bitcoin-sv/spv-wallet/engine/tester"
+	"github.com/bitcoin-sv/spv-wallet/models/bsv"
 	embeddedPostgres "github.com/fergusstrange/embedded-postgres"
 	"github.com/rs/zerolog"
 	"github.com/stretchr/testify/require"
@@ -29,6 +30,8 @@ const (
 	testMaxIdleConnections   = 10
 	testQueueName            = "test_queue"
 )
+
+var mockFeeUnit = bsv.FeeUnit{Satoshis: 1, Bytes: 1000}
 
 // dbTestCase is a database test case
 type dbTestCase struct {
@@ -109,7 +112,7 @@ func (ts *EmbeddedDBTestSuite) createTestClient(ctx context.Context, database da
 
 		// Switch on database types
 		if database == datastore.SQLite {
-			opts = append(opts, WithSQLite(&datastore.SQLiteConfig{
+			opts = append(opts, WithCustomFeeUnit(mockFeeUnit), WithSQLite(&datastore.SQLiteConfig{
 				CommonConfig: datastore.CommonConfig{
 					MaxConnectionIdleTime: 0,
 					MaxConnectionTime:     0,
@@ -211,6 +214,7 @@ func (ts *EmbeddedDBTestSuite) genericDBClient(t *testing.T, database datastore.
 		WithDebugging(),
 		WithAutoMigrate(BaseModels...),
 		WithAutoMigrate(&PaymailAddress{}),
+		WithCustomFeeUnit(mockFeeUnit),
 	)
 	if taskManagerEnabled {
 		opts = append(opts, WithTaskqConfig(taskmanager.DefaultTaskQConfig(prefix+"_queue")))
@@ -239,6 +243,7 @@ func (ts *EmbeddedDBTestSuite) genericMockedDBClient(t *testing.T, database data
 		database, prefix,
 		true, true, WithDebugging(),
 		withTaskManagerMockup(),
+		WithCustomFeeUnit(mockFeeUnit),
 	)
 	require.NoError(t, err)
 	require.NotNil(t, tc)

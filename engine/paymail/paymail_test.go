@@ -261,6 +261,7 @@ func Test_GetCapabilities(t *testing.T) {
 			engine.WithTaskqConfig(taskmanager.DefaultTaskQConfig(testQueueName)),
 			engine.WithSQLite(&datastore.SQLiteConfig{Shared: true}),
 			engine.WithDebugging(),
+			engine.WithCustomFeeUnit(bsv.FeeUnit{Satoshis: 1, Bytes: 1000}),
 			engine.WithLogger(&logger),
 		)
 		require.NoError(t, err)
@@ -305,6 +306,7 @@ func Test_GetCapabilities(t *testing.T) {
 			engine.WithTaskqConfig(taskmanager.DefaultTaskQConfig(testQueueName)),
 			engine.WithSQLite(&datastore.SQLiteConfig{Shared: true}),
 			engine.WithDebugging(),
+			engine.WithCustomFeeUnit(bsv.FeeUnit{Satoshis: 1, Bytes: 1000}),
 			engine.WithLogger(&logger),
 		)
 		require.NoError(t, err)

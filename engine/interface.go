@@ -215,5 +215,4 @@ type ClientInterface interface {
 	Chain() chain.Service
 	LogBHSReadiness(ctx context.Context)
 	FeeUnit() bsv.FeeUnit
-	AskForFeeUnit(ctx context.Context) error
 }

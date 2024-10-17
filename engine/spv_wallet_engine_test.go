@@ -61,6 +61,7 @@ func DefaultClientOpts(debug, shared bool) []ClientOps {
 		opts,
 		WithTaskqConfig(tqc),
 		WithSQLite(tester.SQLiteTestConfig(debug, shared)),
+		WithCustomFeeUnit(mockFeeUnit),
 	)
 	if debug {
 		opts = append(opts, WithDebugging())

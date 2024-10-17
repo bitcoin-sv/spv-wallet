@@ -275,3 +275,17 @@ func (c *Client) loadDefaultPaymailConfig() (err error) {
 	)
 	return
 }
+
+func (c *Client) askForFeeUnit(ctx context.Context) error {
+	if c.options.feeUnit != nil {
+		//already set by custom fee unit
+		return nil
+	}
+	feeUnit, err := c.Chain().GetFeeUnit(ctx)
+	if err != nil {
+		return spverrors.ErrAskingForFeeUnit.Wrap(err)
+	}
+	c.options.feeUnit = feeUnit
+	c.Logger().Info().Msgf("Fee unit set by ARC policy: %d satoshis per %d bytes", feeUnit.Satoshis, feeUnit.Bytes)
+	return nil
+}

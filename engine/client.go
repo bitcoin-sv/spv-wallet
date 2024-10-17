@@ -189,6 +189,10 @@ func NewClient(ctx context.Context, opts ...ClientOps) (ClientInterface, error) 
 		}
 	}
 
+	if err = client.askForFeeUnit(ctx); err != nil {
+		return nil, err
+	}
+
 	// Return the client
 	return client, nil
 }
@@ -380,19 +384,4 @@ func (c *Client) FeeUnit() bsv.FeeUnit {
 		}
 	}
 	return *c.options.feeUnit
-}
-
-// AskForFeeUnit will ask the chain service for the fee unit
-func (c *Client) AskForFeeUnit(ctx context.Context) error {
-	if c.options.feeUnit != nil {
-		//already set by custom fee unit
-		return nil
-	}
-	feeUnit, err := c.Chain().GetFeeUnit(ctx)
-	if err != nil {
-		return spverrors.ErrAskingForFeeUnit.Wrap(err)
-	}
-	c.options.feeUnit = feeUnit
-	c.Logger().Info().Msgf("Fee unit set by ARC policy: %d satoshis per %d bytes", feeUnit.Satoshis, feeUnit.Bytes)
-	return nil
 }

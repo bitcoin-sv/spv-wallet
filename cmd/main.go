@@ -70,11 +70,6 @@ func main() {
 		spvWalletEngine.LogBHSReadiness(appCtx)
 	}
 
-	if err = spvWalletEngine.AskForFeeUnit(appCtx); err != nil {
-		logger.Fatal().Err(err).Msg("Error while asking for fee unit")
-		return
-	}
-
 	// Create a new app server
 	appServer := server.NewServer(appConfig, spvWalletEngine, logger)
 
