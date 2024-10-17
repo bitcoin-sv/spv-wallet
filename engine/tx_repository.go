@@ -27,6 +27,23 @@ func getTransactionByID(ctx context.Context, xPubID, txID string, opts ...ModelO
 	return tx, nil
 }
 
+// getTransactionByID will get the model from a given transaction ID
+func getAdminTransactionByID(ctx context.Context, txID string, opts ...ModelOps) (*Transaction, error) {
+	// Construct an empty tx
+	tx := emptyTx(opts...)
+	tx.ID = txID
+
+	// Get the record
+	if err := Get(ctx, tx, nil, false, defaultDatabaseReadTimeout, false); err != nil {
+		if errors.Is(err, datastore.ErrNoResults) {
+			return nil, nil
+		}
+		return nil, err
+	}
+
+	return tx, nil
+}
+
 // getTransactions will get all the transactions with the given conditions
 func getTransactions(ctx context.Context, metadata *Metadata, conditions map[string]interface{},
 	queryParams *datastore.QueryParams, opts ...ModelOps,

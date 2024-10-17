@@ -5,9 +5,10 @@ import (
 
 	"github.com/bitcoin-sv/spv-wallet/engine"
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
+	"github.com/bitcoin-sv/spv-wallet/internal/query"
 	"github.com/bitcoin-sv/spv-wallet/mappings"
-	"github.com/bitcoin-sv/spv-wallet/models"
 	"github.com/bitcoin-sv/spv-wallet/models/filter"
+	"github.com/bitcoin-sv/spv-wallet/models/response"
 	"github.com/bitcoin-sv/spv-wallet/server/reqctx"
 	"github.com/gin-gonic/gin"
 )
@@ -19,35 +20,25 @@ import (
 // @Tags		Admin
 // @Produce		json
 // @Param		PaymailAddress body PaymailAddress false "PaymailAddress model containing paymail address to get"
-// @Success		200	{object} models.PaymailAddress "PaymailAddress with given address"
+// @Success		200	{object} response.PaymailAddress "PaymailAddress with given address"
 // @Failure		400	"Bad request - Error while parsing PaymailAddress from request body"
 // @Failure 	500	"Internal Server Error - Error while getting paymail address"
-// @Router		/v1/admin/paymail/get [post]
+// @Router		/api/v1/admin/paymails/{id} [get]
 // @Security	x-auth-xpub
 func paymailGetAddress(c *gin.Context, _ *reqctx.AdminContext) {
 	logger := reqctx.Logger(c)
 	engine := reqctx.Engine(c)
-	var requestBody PaymailAddress
-
-	if err := c.ShouldBindJSON(&requestBody); err != nil {
-		spverrors.ErrorResponse(c, spverrors.ErrCannotBindRequest, logger)
-		return
-	}
-
-	if requestBody.Address == "" {
-		spverrors.ErrorResponse(c, spverrors.ErrMissingAddress, logger)
-		return
-	}
+	id := c.Param("id")
 
 	opts := engine.DefaultModelOptions()
 
-	paymailAddress, err := engine.GetPaymailAddress(c.Request.Context(), requestBody.Address, opts...)
+	paymailAddress, err := engine.GetPaymailAddressByID(c.Request.Context(), id, opts...)
 	if err != nil {
-		spverrors.ErrorResponse(c, err, logger)
+		spverrors.ErrorResponse(c, spverrors.ErrCouldNotFindPaymail.WithTrace(err), logger)
 		return
 	}
 
-	paymailAddressContract := mappings.MapToOldPaymailContract(paymailAddress)
+	paymailAddressContract := mappings.MapToPaymailContract(paymailAddress)
 
 	c.JSON(http.StatusOK, paymailAddressContract)
 }
@@ -58,70 +49,42 @@ func paymailGetAddress(c *gin.Context, _ *reqctx.AdminContext) {
 // @Description	Paymail addresses search
 // @Tags		Admin
 // @Produce		json
-// @Param		SearchPaymails body filter.AdminSearchPaymails false "Supports targeted resource searches with filters and metadata, plus options for pagination and sorting to streamline data exploration and analysis"
-// @Success		200 {object} []models.PaymailAddress "List of paymail addresses
+// @Param		SearchPaymails body filter.AdminPaymailFilter false "Supports targeted resource searches with filters and metadata, plus options for pagination and sorting to streamline data exploration and analysis"
+// @Success		200 {object} []response.PaymailAddress "List of paymail addresses
 // @Failure		400	"Bad request - Error while parsing SearchPaymails from request body"
 // @Failure 	500	"Internal server error - Error while searching for paymail addresses"
-// @Router		/v1/admin/paymails/search [post]
+// @Router		/api/v1/admin/paymails [get]
 // @Security	x-auth-xpub
 func paymailAddressesSearch(c *gin.Context, _ *reqctx.AdminContext) {
 	logger := reqctx.Logger(c)
-	var reqParams filter.AdminSearchPaymails
-	if err := c.Bind(&reqParams); err != nil {
-		spverrors.ErrorResponse(c, spverrors.ErrCannotBindRequest, logger)
+
+	searchParams, err := query.ParseSearchParams[filter.AdminPaymailFilter](c)
+	if err != nil {
+		spverrors.ErrorResponse(c, spverrors.ErrCannotParseQueryParams.WithTrace(err), logger)
 		return
 	}
+
+	conditions := searchParams.Conditions.ToDbConditions()
+	metadata := mappings.MapToMetadata(searchParams.Metadata)
+	pageOptions := mappings.MapToDbQueryParams(&searchParams.Page)
 
 	paymailAddresses, err := reqctx.Engine(c).GetPaymailAddresses(
 		c.Request.Context(),
-		mappings.MapToMetadata(reqParams.Metadata),
-		reqParams.Conditions.ToDbConditions(),
-		mappings.MapToQueryParams(reqParams.QueryParams),
+		metadata,
+		conditions,
+		pageOptions,
 	)
 	if err != nil {
-		spverrors.ErrorResponse(c, err, logger)
+		spverrors.ErrorResponse(c, spverrors.ErrCouldNotFindPaymail.WithTrace(err), logger)
 		return
 	}
 
-	paymailAddressContracts := make([]*models.PaymailAddress, 0)
+	paymailAddressContracts := make([]*response.PaymailAddress, 0)
 	for _, paymailAddress := range paymailAddresses {
-		paymailAddressContracts = append(paymailAddressContracts, mappings.MapToOldPaymailContract(paymailAddress))
+		paymailAddressContracts = append(paymailAddressContracts, mappings.MapToPaymailContract(paymailAddress))
 	}
 
 	c.JSON(http.StatusOK, paymailAddressContracts)
-}
-
-// paymailAddressesCount will count all paymail addresses filtered by metadata
-// Paymail addresses count by metadata godoc
-// @Summary		Paymail addresses count
-// @Description	Paymail addresses count
-// @Tags		Admin
-// @Produce		json
-// @Param		CountPaymails body filter.AdminCountPaymails false "Enables filtering of elements to be counted"
-// @Success		200	{number} int64 "Count of paymail addresses"
-// @Failure		400	"Bad request - Error while parsing CountPaymails from request body"
-// @Failure 	500	"Internal Server Error - Error while fetching count of paymail addresses"
-// @Router		/v1/admin/paymails/count [post]
-// @Security	x-auth-xpub
-func paymailAddressesCount(c *gin.Context, _ *reqctx.AdminContext) {
-	logger := reqctx.Logger(c)
-	var reqParams filter.AdminCountPaymails
-	if err := c.Bind(&reqParams); err != nil {
-		spverrors.ErrorResponse(c, spverrors.ErrCannotBindRequest, logger)
-		return
-	}
-
-	count, err := reqctx.Engine(c).GetPaymailAddressesCount(
-		c.Request.Context(),
-		mappings.MapToMetadata(reqParams.Metadata),
-		reqParams.Conditions.ToDbConditions(),
-	)
-	if err != nil {
-		spverrors.ErrorResponse(c, err, logger)
-		return
-	}
-
-	c.JSON(http.StatusOK, count)
 }
 
 // paymailCreateAddress will create a new paymail address
@@ -131,10 +94,10 @@ func paymailAddressesCount(c *gin.Context, _ *reqctx.AdminContext) {
 // @Tags		Admin
 // @Produce		json
 // @Param		CreatePaymail body CreatePaymail false " "
-// @Success		201	{object} models.PaymailAddress "Created PaymailAddress"
+// @Success		201	{object} response.PaymailAddress "Created PaymailAddress"
 // @Failure		400	"Bad request - Error while parsing CreatePaymail from request body or if xpub or address are missing"
 // @Failure 	500	"Internal Server Error - Error while creating new paymail address"
-// @Router		/v1/admin/paymail/create [post]
+// @Router		/api/v1/admin/paymails [post]
 // @Security	x-auth-xpub
 func paymailCreateAddress(c *gin.Context, _ *reqctx.AdminContext) {
 	logger := reqctx.Logger(c)
@@ -167,7 +130,7 @@ func paymailCreateAddress(c *gin.Context, _ *reqctx.AdminContext) {
 		return
 	}
 
-	paymailAddressContract := mappings.MapToOldPaymailContract(paymailAddress)
+	paymailAddressContract := mappings.MapToPaymailContract(paymailAddress)
 
 	c.JSON(http.StatusCreated, paymailAddressContract)
 }
@@ -182,14 +145,14 @@ func paymailCreateAddress(c *gin.Context, _ *reqctx.AdminContext) {
 // @Success		200
 // @Failure		400	"Bad request - Error while parsing PaymailAddress from request body or if address is missing"
 // @Failure 	500	"Internal Server Error - Error while deleting paymail address"
-// @Router		/v1/admin/paymail/delete [delete]
+// @Router		/api/v1/admin/paymails/{id} [delete]
 // @Security	x-auth-xpub
 func paymailDeleteAddress(c *gin.Context, _ *reqctx.AdminContext) {
 	logger := reqctx.Logger(c)
 	engine := reqctx.Engine(c)
 	var requestBody PaymailAddress
 	if err := c.ShouldBindJSON(&requestBody); err != nil {
-		spverrors.ErrorResponse(c, spverrors.ErrCannotBindRequest, logger)
+		spverrors.ErrorResponse(c, spverrors.ErrCannotBindRequest.WithTrace(err), logger)
 		return
 	}
 
@@ -203,7 +166,7 @@ func paymailDeleteAddress(c *gin.Context, _ *reqctx.AdminContext) {
 	// Delete a new paymail address
 	err := engine.DeletePaymailAddress(c.Request.Context(), requestBody.Address, opts...)
 	if err != nil {
-		spverrors.ErrorResponse(c, err, logger)
+		spverrors.ErrorResponse(c, spverrors.ErrDeletePaymailAddress.WithTrace(err), logger)
 		return
 	}
 
