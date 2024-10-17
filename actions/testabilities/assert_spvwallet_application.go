@@ -19,6 +19,7 @@ type SPVWalletApplicationAssertions interface {
 
 type SPVWalletResponseAssertions interface {
 	IsOK() SPVWalletResponseAssertions
+	IsNotSuccess() SPVWalletResponseAssertions
 	WithJSONf(expectedFormat string, args ...any)
 	// IsUnauthorized asserts that the response status code is 401 and the error is about lack of authorization.
 	IsUnauthorized()
@@ -61,6 +62,11 @@ func (a *responseAssertions) IsUnauthorizedForAdmin() {
 
 func (a *responseAssertions) IsOK() SPVWalletResponseAssertions {
 	return a.assertIsStatus(http.StatusOK)
+}
+
+func (a *responseAssertions) IsNotSuccess() SPVWalletResponseAssertions {
+	a.assert.False(a.response.IsSuccess())
+	return a
 }
 
 func (a *responseAssertions) IsBadRequest() SPVWalletResponseAssertions {

@@ -3,6 +3,9 @@ package testabilities
 import (
 	"context"
 	"database/sql"
+	"encoding/json"
+	"fmt"
+	"net/http"
 	"testing"
 
 	"github.com/bitcoin-sv/spv-wallet/config"
@@ -32,6 +35,18 @@ type SPVWalletApplicationFixture interface {
 	// NewTest creates a new test fixture based on the current one and the provided testing.TB
 	// This is useful if you want to start spv-wallet once and then run multiple t.Run with some calls against this one instance.
 	NewTest(t testing.TB) SPVWalletApplicationFixture
+
+	// BHS creates a new test fixture for Block Header Service (BHS)
+	BHS() BlockHeadersServiceFixture
+}
+
+type BlockHeadersServiceFixture interface {
+	// WillRespondForMerkleRoots returns a http response for get merkleroots endpoint with
+	// provided httpCode and response
+	WillRespondForMerkleRoots(httpCode int, response string)
+
+	// WithMockedGetMerkleRoots mocks the get merkleroots endpoint with apporximate method of what it does
+	WithMockedGetMerkleRoots()
 }
 
 type SPVWalletHttpClientFixture interface {
@@ -137,6 +152,42 @@ func (f *appFixture) ForGivenUser(user fixtures.User) *resty.Client {
 	return c
 }
 
+func (f *appFixture) BHS() BlockHeadersServiceFixture {
+	return f
+}
+
+func (f *appFixture) WillRespondForMerkleRoots(httpCode int, response string) {
+	responder := func(req *http.Request) (*http.Response, error) {
+		res := httpmock.NewStringResponse(httpCode, response)
+		res.Header.Set("Content-Type", "application/json")
+
+		return res, nil
+	}
+
+	f.externalTransport.RegisterResponder("GET", "http://localhost:8080/api/v1/chain/merkleroot", responder)
+}
+
+func (f *appFixture) WithMockedGetMerkleRoots() {
+	responder := func(req *http.Request) (*http.Response, error) {
+		fmt.Print("\n\n\n" + req.Header.Get("Authorization") + "\n\n\n")
+		if req.Header.Get("Authorization") != "Bearer "+f.config.BHS.AuthToken {
+			return httpmock.NewStringResponse(http.StatusUnauthorized, ""), nil
+		}
+		lastEvaluatedKey := req.URL.Query().Get("lastEvaluatedKey")
+		merkleRoots := mockedMerkleRootsAPIResponseFn(lastEvaluatedKey)
+		resString, err := json.Marshal(merkleRoots)
+
+		require.NoError(f.t, err)
+
+		res := httpmock.NewStringResponse(200, string(resString))
+		res.Header.Set("Content-Type", "application/json")
+
+		return res, nil
+	}
+
+	f.externalTransport.RegisterResponder("GET", "http://localhost:8080/api/v1/chain/merkleroot", responder)
+}
+
 func (f *appFixture) initialiseFixtures() {
 	opts := f.engine.DefaultModelOptions(engine.WithMetadata("source", "fixture"))
 
@@ -151,6 +202,7 @@ func (f *appFixture) initialiseFixtures() {
 	}
 
 	f.paymailClient.WillRespondWithP2PCapabilities()
+	f.WithMockedGetMerkleRoots()
 }
 
 // initDbConnection creates a new connection that will be used as connection for engine

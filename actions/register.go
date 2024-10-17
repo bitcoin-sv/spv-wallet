@@ -25,7 +25,7 @@ func Register(appConfig *config.AppConfig, handlersManager *handlers.Manager) {
 	utxos.RegisterRoutes(handlersManager)
 	users.RegisterRoutes(handlersManager)
 	sharedconfig.RegisterRoutes(handlersManager)
-	merkleroots.RegisterRoutes(appConfig, handlersManager)
+	merkleroots.RegisterRoutes(handlersManager)
 	if appConfig.ExperimentalFeatures.PikeContactsEnabled {
 		contacts.RegisterRoutes(handlersManager)
 	}

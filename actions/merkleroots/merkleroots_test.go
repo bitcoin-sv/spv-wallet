@@ -29,7 +29,7 @@ func (ts *TestSuite) SetupTest() {
 	ts.BaseSetupTest()
 
 	handlersManager := handlers.NewManager(ts.Router, config.APIVersion)
-	RegisterRoutes(ts.AppConfig, handlersManager)
+	RegisterRoutes(handlersManager)
 }
 
 // TearDownTest runs after each test
