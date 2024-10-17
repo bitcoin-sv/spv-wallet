@@ -76,8 +76,8 @@ func defaultClientOptions() *clientOptions {
 			},
 		},
 
-		// Blank transaction draft config
-		transactionDraftService: nil,
+		// Blank transaction outline
+		transactionOutlinesService: nil,
 
 		// Blank TaskManager config
 		taskManager: &taskManagerOptions{

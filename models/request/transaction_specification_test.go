@@ -14,10 +14,10 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func TestDraft_TransactionJSON(t *testing.T) {
+func TestTransactionSpecification_TransactionJSON(t *testing.T) {
 	tests := map[string]struct {
-		json  string
-		draft *request.DraftTransaction
+		json string
+		spec *request.TransactionSpecification
 	}{
 		"OP_RETURN output with single string": {
 			json: `{
@@ -29,7 +29,7 @@ func TestDraft_TransactionJSON(t *testing.T) {
 				}
 			  ]
 			}`,
-			draft: &request.DraftTransaction{
+			spec: &request.TransactionSpecification{
 				Outputs: []request.Output{
 					opreturn.Output{
 						DataType: opreturn.DataTypeStrings,
@@ -48,7 +48,7 @@ func TestDraft_TransactionJSON(t *testing.T) {
 				}
 			  ]
 			}`,
-			draft: &request.DraftTransaction{
+			spec: &request.TransactionSpecification{
 				Outputs: []request.Output{
 					opreturn.Output{
 						DataType: opreturn.DataTypeStrings,
@@ -66,7 +66,7 @@ func TestDraft_TransactionJSON(t *testing.T) {
 				}
 			  ]
 			}`,
-			draft: &request.DraftTransaction{
+			spec: &request.TransactionSpecification{
 				Outputs: []request.Output{
 					opreturn.Output{
 						DataType: opreturn.DataTypeDefault,
@@ -85,7 +85,7 @@ func TestDraft_TransactionJSON(t *testing.T) {
 				}
 			  ]
 			}`,
-			draft: &request.DraftTransaction{
+			spec: &request.TransactionSpecification{
 				Outputs: []request.Output{
 					opreturn.Output{
 						DataType: opreturn.DataTypeHexes,
@@ -104,7 +104,7 @@ func TestDraft_TransactionJSON(t *testing.T) {
 				}
 			  ]
 			}`,
-			draft: &request.DraftTransaction{
+			spec: &request.TransactionSpecification{
 				Outputs: []request.Output{
 					opreturn.Output{
 						DataType: opreturn.DataTypeHexes,
@@ -123,7 +123,7 @@ func TestDraft_TransactionJSON(t *testing.T) {
 				}
 			  ]
 			}`,
-			draft: &request.DraftTransaction{
+			spec: &request.TransactionSpecification{
 				Outputs: []request.Output{
 					paymailreq.Output{
 						To:       "receiver@example.com",
@@ -143,7 +143,7 @@ func TestDraft_TransactionJSON(t *testing.T) {
 				}
 			  ]
 			}`,
-			draft: &request.DraftTransaction{
+			spec: &request.TransactionSpecification{
 				Outputs: []request.Output{
 					paymailreq.Output{
 						To:       "receiver@example.com",
@@ -155,14 +155,14 @@ func TestDraft_TransactionJSON(t *testing.T) {
 		},
 	}
 	for name, test := range tests {
-		t.Run("draft from JSON: "+name, func(t *testing.T) {
-			var draft *request.DraftTransaction
-			err := json.Unmarshal([]byte(test.json), &draft)
+		t.Run("spec from JSON: "+name, func(t *testing.T) {
+			var spec *request.TransactionSpecification
+			err := json.Unmarshal([]byte(test.json), &spec)
 			require.NoError(t, err)
-			require.Equal(t, test.draft, draft)
+			require.Equal(t, test.spec, spec)
 		})
-		t.Run("draft to JSON: "+name, func(t *testing.T) {
-			data, err := json.Marshal(test.draft)
+		t.Run("spec to JSON: "+name, func(t *testing.T) {
+			data, err := json.Marshal(test.spec)
 			require.NoError(t, err)
 			jsonValue := string(data)
 			require.JSONEq(t, test.json, jsonValue)
@@ -170,7 +170,7 @@ func TestDraft_TransactionJSON(t *testing.T) {
 	}
 }
 
-func TestDraft_TransactionJSONParsingErrors(t *testing.T) {
+func TestTransactionSpecification_JSONParsingErrors(t *testing.T) {
 	tests := map[string]struct {
 		json        string
 		expectedErr string
@@ -236,8 +236,8 @@ func TestDraft_TransactionJSONParsingErrors(t *testing.T) {
 	}
 	for name, test := range tests {
 		t.Run(name, func(t *testing.T) {
-			var draft *request.DraftTransaction
-			err := json.Unmarshal([]byte(test.json), &draft)
+			var spec *request.TransactionSpecification
+			err := json.Unmarshal([]byte(test.json), &spec)
 			require.ErrorContains(t, err, test.expectedErr)
 		})
 	}
@@ -248,13 +248,13 @@ func getTooLargeSatsValueToParse() string {
 	return maxSats + "0"
 }
 
-func TestDraft_TransactionJSONEncodingErrors(t *testing.T) {
+func TestTransactionSpecification_JSONEncodingErrors(t *testing.T) {
 	tests := map[string]struct {
-		draft       *request.DraftTransaction
+		spec        *request.TransactionSpecification
 		expectedErr string
 	}{
 		"Unsupported output type": {
-			draft: &request.DraftTransaction{
+			spec: &request.TransactionSpecification{
 				Outputs: []request.Output{&unsupportedOutput{}},
 			},
 			expectedErr: "unsupported output type",
@@ -262,7 +262,7 @@ func TestDraft_TransactionJSONEncodingErrors(t *testing.T) {
 	}
 	for name, test := range tests {
 		t.Run(name, func(t *testing.T) {
-			_, err := json.Marshal(test.draft)
+			_, err := json.Marshal(test.spec)
 			require.ErrorContains(t, err, test.expectedErr)
 		})
 	}

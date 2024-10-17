@@ -13,7 +13,7 @@ import (
 	"github.com/bitcoin-sv/spv-wallet/engine/paymailaddress"
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/bitcoin-sv/spv-wallet/engine/taskmanager"
-	"github.com/bitcoin-sv/spv-wallet/engine/transaction/draft"
+	"github.com/bitcoin-sv/spv-wallet/engine/transaction/outlines"
 	"github.com/mrz1836/go-cachestore"
 )
 
@@ -182,10 +182,10 @@ func (c *Client) loadPaymailAddressService() error {
 	return nil
 }
 
-func (c *Client) loadTransactionDraftService() error {
-	if c.options.transactionDraftService == nil {
-		logger := c.Logger().With().Str("subservice", "transactionDraft").Logger()
-		c.options.transactionDraftService = draft.NewDraftService(c.PaymailService(), c.options.paymailAddressService, logger)
+func (c *Client) loadTransactionOutlinesService() error {
+	if c.options.transactionOutlinesService == nil {
+		logger := c.Logger().With().Str("subservice", "transactionOutlines").Logger()
+		c.options.transactionOutlinesService = outlines.NewService(c.PaymailService(), c.options.paymailAddressService, logger)
 	}
 	return nil
 }
