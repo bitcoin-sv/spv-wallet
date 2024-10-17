@@ -1,4 +1,4 @@
-package mappingsdraft
+package outline
 
 import (
 	"errors"
@@ -13,8 +13,11 @@ import (
 	"github.com/mitchellh/mapstructure"
 )
 
+// Request is a draft transaction request model.
+type Request request.DraftTransaction
+
 // ToEngine converts a draft transaction request model to the engine model.
-func ToEngine(xPubID string, tx *request.DraftTransaction) (*draft.TransactionSpec, error) {
+func (tx Request) ToEngine(xPubID string) (*draft.TransactionSpec, error) {
 	spec := &draft.TransactionSpec{
 		XPubID: xPubID,
 	}

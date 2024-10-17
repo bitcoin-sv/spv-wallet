@@ -3,11 +3,10 @@ package engine
 import (
 	"context"
 
+	trx "github.com/bitcoin-sv/go-sdk/transaction"
 	chainmodels "github.com/bitcoin-sv/spv-wallet/engine/chain/models"
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/bitcoin-sv/spv-wallet/engine/utils"
-	"github.com/libsv/go-bc"
-	"github.com/libsv/go-bt/v2"
 )
 
 // TransactionBase is the same fields share between multiple transaction models
@@ -16,7 +15,7 @@ type TransactionBase struct {
 	Hex string `json:"hex" toml:"hex" yaml:"hex" gorm:"<-:create;type:text;comment:This is the raw transaction hex"`
 
 	// Private for internal use
-	parsedTx *bt.Tx `gorm:"-"` // The go-bt version of the transaction
+	parsedTx *trx.Transaction `gorm:"-"` // The GO-SDK version of the transaction
 }
 
 // TransactionDirection String describing the direction of the transaction (in / out)
@@ -88,17 +87,17 @@ func emptyTx(opts ...ModelOps) *Transaction {
 
 // baseTxFromHex creates the standard transaction model base
 func baseTxFromHex(hex string, opts ...ModelOps) (*Transaction, error) {
-	var btTx *bt.Tx
+	var sdkTx *trx.Transaction
 	var err error
 
-	if btTx, err = bt.NewTxFromString(hex); err != nil {
+	if sdkTx, err = trx.NewTransactionFromHex(hex); err != nil {
 		return nil, spverrors.Wrapf(err, "error parsing transaction hex")
 	}
 
 	tx := emptyTx(opts...)
-	tx.ID = btTx.TxID()
+	tx.ID = sdkTx.TxID().String()
 	tx.Hex = hex
-	tx.parsedTx = btTx
+	tx.parsedTx = sdkTx
 
 	return tx, nil
 }
@@ -128,11 +127,11 @@ func newTransactionWithDraftID(txHex, draftID string, opts ...ModelOps) (*Transa
 	return tx, nil
 }
 
-func txFromBtTx(btTx *bt.Tx, opts ...ModelOps) *Transaction {
+func txFromSDKTx(sdkTx *trx.Transaction, opts ...ModelOps) *Transaction {
 	tx := emptyTx(opts...)
-	tx.ID = btTx.TxID()
-	tx.Hex = btTx.String()
-	tx.parsedTx = btTx
+	tx.ID = sdkTx.TxID().String()
+	tx.Hex = sdkTx.String()
+	tx.parsedTx = sdkTx
 
 	return tx
 }
@@ -183,13 +182,13 @@ func (m *Transaction) GetID() string {
 func (m *Transaction) setID() (err error) {
 	// Parse the hex (if not already parsed)
 	if m.TransactionBase.parsedTx == nil {
-		if m.TransactionBase.parsedTx, err = bt.NewTxFromString(m.Hex); err != nil {
+		if m.TransactionBase.parsedTx, err = trx.NewTransactionFromHex(m.Hex); err != nil {
 			return
 		}
 	}
 
 	// Set the true transaction ID
-	m.ID = m.TransactionBase.parsedTx.TxID()
+	m.ID = m.TransactionBase.parsedTx.TxID().String()
 
 	return
 }
@@ -208,10 +207,14 @@ func (m *Transaction) getValues() (outputValue uint64, fee uint64) {
 		fee = m.draftTransaction.Configuration.Fee
 	} else { // external transaction
 
-		// todo: missing inputs in some tests?
 		var inputValue uint64
 		for _, input := range m.TransactionBase.parsedTx.Inputs {
-			inputValue += input.PreviousTxSatoshis
+			sourceTxSato := input.SourceTxSatoshis()
+			if sourceTxSato == nil {
+				continue
+			}
+
+			inputValue += *input.SourceTxSatoshis()
 		}
 
 		if inputValue > 0 {
@@ -231,9 +234,9 @@ func (m *Transaction) getValues() (outputValue uint64, fee uint64) {
 }
 
 // SetBUMP Converts from bc.BUMP to our BUMP struct in Transaction model
-func (m *Transaction) SetBUMP(bump *bc.BUMP) {
-	if bump != nil {
-		m.BUMP = bcBumpToBUMP(bump)
+func (m *Transaction) SetBUMP(mp *trx.MerklePath) {
+	if mp != nil {
+		m.BUMP = sdkMPToBUMP(mp)
 	} else {
 		m.client.Logger().Error().Msg("No BUMP found")
 	}

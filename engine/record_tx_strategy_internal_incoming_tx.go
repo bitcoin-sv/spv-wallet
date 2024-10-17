@@ -4,8 +4,8 @@ import (
 	"context"
 	"fmt"
 
+	trx "github.com/bitcoin-sv/go-sdk/transaction"
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
-	"github.com/libsv/go-bt/v2"
 )
 
 type internalIncomingTx struct {
@@ -36,7 +36,7 @@ func (strategy *internalIncomingTx) Validate() error {
 		return spverrors.ErrEmptyTx
 	}
 
-	if _, err := bt.NewTxFromString(strategy.Tx.Hex); err != nil {
+	if _, err := trx.NewTransactionFromHex(strategy.Tx.Hex); err != nil {
 		return spverrors.ErrInvalidHex
 	}
 

@@ -47,7 +47,7 @@ var ErrGettingAddressFromHdKey = models.SPVError{Message: "error getting address
 var ErrValidateXPub = models.SPVError{Message: "error validation xpub", StatusCode: 401, Code: "error-unauthorized-xpub-invalid"}
 
 // ErrAdminAuthOnUserEndpoint is when admin authorization is used on user's endpoint
-var ErrAdminAuthOnUserEndpoint = models.SPVError{Message: "cannot call user's endpoints with admin authorization ", StatusCode: 401, Code: "error-admin-auth-on-user-endpoint"}
+var ErrAdminAuthOnUserEndpoint = models.SPVError{Message: "cannot call user's endpoints with admin authorization", StatusCode: 401, Code: "error-admin-auth-on-user-endpoint"}
 
 // ErrXPubAuthRequired is when xpub authorization is required
 var ErrXPubAuthRequired = models.SPVError{Message: "xpub authorization required", StatusCode: 401, Code: "error-xpub-authorization-required"}
@@ -67,6 +67,9 @@ var ErrInvalidConditions = models.SPVError{Message: "invalid conditions", Status
 
 // ErrCannotMapFromModel is when request body model cannot be mapped into domain model.
 var ErrCannotMapFromModel = models.SPVError{Message: "error during reading request body", StatusCode: 500, Code: "error-request-read"}
+
+// ErrCannotMapFromEngine is when engine model cannot be mapped into response model.
+var ErrCannotMapFromEngine = models.SPVError{Message: "error during preparing response", StatusCode: 500, Code: "error-response-write"}
 
 // ////////////////////////////////// ACCESS KEY ERRORS
 
@@ -205,6 +208,9 @@ var ErrInvalidOpReturnOutput = models.SPVError{Message: "invalid op_return outpu
 
 // ErrInvalidLockingScript is when a locking script cannot be decoded
 var ErrInvalidLockingScript = models.SPVError{Message: "invalid locking script", StatusCode: 400, Code: "error-transaction-locking-script-invalid"}
+
+// ErrFailedToCreateUTXO is when sdk method fails to create UTXO with provided data
+var ErrFailedToCreateUTXO = models.SPVError{Message: "failed to create UTXO", StatusCode: 400, Code: "error-transaction-failed-to-create-utxo"}
 
 // ErrOutputValueNotRecognized is when there is an invalid output value given, or missing value
 var ErrOutputValueNotRecognized = models.SPVError{Message: "output value is unrecognized", StatusCode: 400, Code: "error-transaction-output-value-unrecognized"}

@@ -6,6 +6,7 @@ import (
 	"github.com/bitcoin-sv/go-broadcast-client/broadcast"
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/bitcoin-sv/spv-wallet/engine/utils"
+	"github.com/bitcoin-sv/spv-wallet/models/bsv"
 )
 
 func (c *Client) broadcastClientInit(ctx context.Context) error {
@@ -27,9 +28,9 @@ func (c *Client) broadcastClientInit(ctx context.Context) error {
 			return spverrors.Newf("no fee quotes returned from broadcast client")
 		}
 		c.options.logger.Info().Msgf("got %d fee quote(s) from broadcast client", len(feeQuotes))
-		fees := make([]utils.FeeUnit, len(feeQuotes))
+		fees := make([]bsv.FeeUnit, len(feeQuotes))
 		for index, fee := range feeQuotes {
-			fees[index] = utils.FeeUnit{
+			fees[index] = bsv.FeeUnit{
 				Satoshis: int(fee.MiningFee.Satoshis),
 				Bytes:    int(fee.MiningFee.Bytes),
 			}

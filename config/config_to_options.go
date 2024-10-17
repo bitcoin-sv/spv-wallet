@@ -58,8 +58,6 @@ func (c *AppConfig) ToEngineOptions(logger zerolog.Logger) (options []engine.Cli
 		return nil, err
 	}
 
-	options = c.addFeeQuotes(options)
-
 	return options, nil
 }
 
@@ -69,19 +67,6 @@ func (c *AppConfig) addHttpClientOpts(options []engine.ClientOps) []engine.Clien
 	client.SetDebug(c.Logging.Level == zerolog.LevelTraceValue)
 	client.SetHeader("User-Agent", c.GetUserAgent())
 	return append(options, engine.WithHTTPClient(client))
-}
-
-func (c *AppConfig) addFeeQuotes(options []engine.ClientOps) []engine.ClientOps {
-	options = append(options, engine.WithFeeQuotes(c.ARC.UseFeeQuotes))
-
-	if c.ARC.FeeUnit != nil {
-		options = append(options, engine.WithFeeUnit(&utils.FeeUnit{
-			Satoshis: c.ARC.FeeUnit.Satoshis,
-			Bytes:    c.ARC.FeeUnit.Bytes,
-		}))
-	}
-
-	return options
 }
 
 func (c *AppConfig) addUserAgentOpts(options []engine.ClientOps) []engine.ClientOps {

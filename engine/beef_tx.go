@@ -4,8 +4,8 @@ import (
 	"context"
 	"encoding/hex"
 
+	trx "github.com/bitcoin-sv/go-sdk/transaction"
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
-	"github.com/libsv/go-bt/v2"
 )
 
 const maxBeefVer = uint32(0xFFFF) // value from BRC-62
@@ -13,7 +13,7 @@ const maxBeefVer = uint32(0xFFFF) // value from BRC-62
 type beefTx struct {
 	version      uint32
 	bumps        BUMPs
-	transactions []*bt.Tx
+	transactions []*trx.Transaction
 }
 
 // ToBeef generates BEEF Hex for transaction
@@ -40,7 +40,7 @@ func ToBeef(ctx context.Context, tx *Transaction, store TransactionGetter) (stri
 	return beefHex, nil
 }
 
-func toBeefHex(bumps BUMPs, parentTxs []*bt.Tx) (string, error) {
+func toBeefHex(bumps BUMPs, parentTxs []*trx.Transaction) (string, error) {
 	beef, err := newBeefTx(1, bumps, parentTxs)
 	if err != nil {
 		return "", spverrors.Wrapf(err, "ToBeefHex() error")
@@ -54,7 +54,7 @@ func toBeefHex(bumps BUMPs, parentTxs []*bt.Tx) (string, error) {
 	return hex.EncodeToString(beefBytes), nil
 }
 
-func newBeefTx(version uint32, bumps BUMPs, parentTxs []*bt.Tx) (*beefTx, error) {
+func newBeefTx(version uint32, bumps BUMPs, parentTxs []*trx.Transaction) (*beefTx, error) {
 	if version > maxBeefVer {
 		return nil, spverrors.Newf("version above 0x%X", maxBeefVer)
 	}
