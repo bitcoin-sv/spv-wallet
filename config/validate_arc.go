@@ -26,10 +26,6 @@ func (n *ARCConfig) Validate() error {
 		return spverrors.Newf("invalid callback host: %s - must be a valid external url - not a localhost", n.Callback.Host)
 	}
 
-	if !n.UseFeeQuotes && n.FeeUnit == nil {
-		return spverrors.Newf("fee unit is not configured, define nodes.fee_unit or set nodes.use_fee_quotes")
-	}
-
 	return nil
 }
 

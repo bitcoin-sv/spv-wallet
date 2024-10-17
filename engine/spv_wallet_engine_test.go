@@ -6,15 +6,8 @@ import (
 	"testing"
 
 	"github.com/DATA-DOG/go-sqlmock"
-	broadcast_client_mock "github.com/bitcoin-sv/go-broadcast-client/broadcast/broadcast-client-mock"
 	compat "github.com/bitcoin-sv/go-sdk/compat/bip32"
-	ec "github.com/bitcoin-sv/go-sdk/primitives/ec"
-	"github.com/bitcoin-sv/go-sdk/script"
-	trx "github.com/bitcoin-sv/go-sdk/transaction"
-	sighash "github.com/bitcoin-sv/go-sdk/transaction/sighash"
-	"github.com/bitcoin-sv/go-sdk/transaction/template/p2pkh"
 	"github.com/bitcoin-sv/spv-wallet/engine/datastore"
-	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/bitcoin-sv/spv-wallet/engine/taskmanager"
 	"github.com/bitcoin-sv/spv-wallet/engine/tester"
 	"github.com/mrz1836/go-cache"
@@ -62,17 +55,13 @@ func DefaultClientOpts(debug, shared bool) []ClientOps {
 	tqc := taskmanager.DefaultTaskQConfig(tester.RandomTablePrefix())
 	tqc.MaxNumWorker = 2
 	tqc.MaxNumFetcher = 2
-	bc := broadcast_client_mock.Builder().
-		WithMockArc(broadcast_client_mock.MockNilQueryTxResp).
-		Build()
 
 	opts := make([]ClientOps, 0)
 	opts = append(
 		opts,
 		WithTaskqConfig(tqc),
 		WithSQLite(tester.SQLiteTestConfig(debug, shared)),
-		WithChainstateOptions(false, false, false, false),
-		WithBroadcastClient(bc),
+		WithCustomFeeUnit(mockFeeUnit),
 	)
 	if debug {
 		opts = append(opts, WithDebugging())
@@ -139,39 +128,6 @@ func CloseClient(ctx context.Context, t *testing.T, client ClientInterface) {
 	require.NoError(t, client.Close(ctx))
 }
 
-// CreateFakeFundingTransaction will create a valid (fake) transaction for funding
-func CreateFakeFundingTransaction(t *testing.T, masterKey *compat.ExtendedKey,
-	destinations []*Destination, satoshis uint64,
-) string {
-	// Create new tx
-	rawTx := trx.NewTransaction()
-	txErr := rawTx.AddInputFrom(testTxScriptSigID, 0, testTxScriptSigOut, satoshis+354, nil)
-	require.NoError(t, txErr)
-
-	// Loop all destinations
-	for _, destination := range destinations {
-		s, err := script.NewFromHex(destination.LockingScript)
-		require.NoError(t, err)
-		require.NotNil(t, s)
-
-		rawTx.AddOutput(&trx.TransactionOutput{
-			Satoshis:      satoshis,
-			LockingScript: s,
-		})
-	}
-
-	// Get private key
-	privateKey, err := compat.GetPrivateKeyFromHDKey(masterKey)
-	require.NoError(t, err)
-	require.NotNil(t, privateKey)
-
-	err = rawTx.Sign()
-	require.NoError(t, err)
-
-	// Return the tx hex
-	return rawTx.String()
-}
-
 // CreateNewXPub will create a new xPub and return all the information to use the xPub
 func CreateNewXPub(ctx context.Context, t *testing.T, engineClient ClientInterface,
 	opts ...ModelOps,
@@ -194,16 +150,4 @@ func CreateNewXPub(ctx context.Context, t *testing.T, engineClient ClientInterfa
 	require.NotNil(t, xPub)
 
 	return masterKey, xPub, rawXPub
-}
-
-// GetUnlockingScript will get a locking script for valid fake transactions
-func GetUnlockingScript(tx *trx.Transaction, inputIndex uint32, privateKey *ec.PrivateKey) (*p2pkh.P2PKH, error) {
-	sigHashFlags := sighash.AllForkID
-
-	sc, err := p2pkh.Unlock(privateKey, &sigHashFlags)
-	if err != nil {
-		return nil, spverrors.Wrapf(err, "failed to create unlocking script")
-	}
-
-	return sc, nil
 }

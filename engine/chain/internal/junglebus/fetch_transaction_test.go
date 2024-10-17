@@ -10,11 +10,12 @@ import (
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/bitcoin-sv/spv-wallet/engine/tester"
 	"github.com/bitcoin-sv/spv-wallet/models/bsv"
+	"github.com/go-resty/resty/v2"
 	"github.com/stretchr/testify/require"
 )
 
 /**
-NOTE: switch httpClient to resty.New() tu call actual ARC server
+NOTE: switch httpClient to resty.New() tu call actual server
 */
 
 func TestJunglebusFetchTransaction(t *testing.T) {
@@ -23,11 +24,23 @@ func TestJunglebusFetchTransaction(t *testing.T) {
 
 		service := junglebus.NewJunglebusService(tester.Logger(t), httpClient)
 
-		tx, err := service.FetchTransaction(context.Background(), knownTx)
+		tx, err := service.FetchTransaction(context.Background(), knownTx1)
 
 		require.NoError(t, err)
 		require.NotNil(t, tx)
 		require.Equal(t, bsv.Satoshis(39), bsv.Satoshis(tx.TotalOutputSatoshis()))
+	})
+
+	t.Run("Request for unknown transaction", func(t *testing.T) {
+		httpClient := resty.New()
+
+		service := junglebus.NewJunglebusService(tester.Logger(t), httpClient)
+
+		tx, err := service.FetchTransaction(context.Background(), unknownTx)
+
+		require.Error(t, err)
+		require.Nil(t, tx)
+		require.ErrorIs(t, err, chainerrors.ErrJunglebusTxNotFound)
 	})
 
 	t.Run("Request for invalid transaction", func(t *testing.T) {
@@ -35,7 +48,7 @@ func TestJunglebusFetchTransaction(t *testing.T) {
 
 		service := junglebus.NewJunglebusService(tester.Logger(t), httpClient)
 
-		tx, err := service.FetchTransaction(context.Background(), "wrong-txID")
+		tx, err := service.FetchTransaction(context.Background(), wrongTxID)
 
 		require.Error(t, err)
 		require.Nil(t, tx)
@@ -52,7 +65,7 @@ func TestJunglebusFetchTransactionTimeouts(t *testing.T) {
 		ctx, cancel := context.WithTimeout(context.Background(), 1)
 		defer cancel()
 
-		tx, err := service.FetchTransaction(ctx, knownTx)
+		tx, err := service.FetchTransaction(ctx, knownTx1)
 
 		require.Error(t, err)
 		require.ErrorIs(t, err, spverrors.ErrInternal)
@@ -66,7 +79,7 @@ func TestJunglebusFetchTransactionTimeouts(t *testing.T) {
 
 		service := junglebus.NewJunglebusService(tester.Logger(t), httpClient)
 
-		tx, err := service.FetchTransaction(context.Background(), knownTx)
+		tx, err := service.FetchTransaction(context.Background(), knownTx1)
 
 		require.Error(t, err)
 		require.ErrorIs(t, err, spverrors.ErrInternal)

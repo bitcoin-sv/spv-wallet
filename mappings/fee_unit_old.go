@@ -12,7 +12,7 @@ func MapToOldFeeUnitContract(fu *bsv.FeeUnit) (fc *models.FeeUnit) {
 	}
 
 	return &models.FeeUnit{
-		Satoshis: fu.Satoshis,
+		Satoshis: int(fu.Satoshis),
 		Bytes:    fu.Bytes,
 	}
 }
@@ -24,7 +24,7 @@ func MapOldFeeUnitModelToEngine(fu *models.FeeUnit) (fc *bsv.FeeUnit) {
 	}
 
 	return &bsv.FeeUnit{
-		Satoshis: fu.Satoshis,
+		Satoshis: bsv.Satoshis(fu.Satoshis),
 		Bytes:    fu.Bytes,
 	}
 }

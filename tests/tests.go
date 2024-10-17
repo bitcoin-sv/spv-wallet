@@ -32,8 +32,7 @@ func (ts *TestSuite) BaseSetupSuite() {
 	cfg.DebugProfiling = false
 	cfg.Logging.Level = zerolog.LevelDebugValue
 	cfg.Logging.Format = "console"
-	cfg.ARC.UseFeeQuotes = false
-	cfg.ARC.FeeUnit = &config.FeeUnitConfig{
+	cfg.CustomFeeUnit = &config.FeeUnitConfig{
 		Satoshis: 1,
 		Bytes:    1000,
 	}

@@ -21,14 +21,24 @@ const (
 	SentToNetwork TXStatus = "SENT_TO_NETWORK" // 6
 	// AcceptedByNetwork status means that transaction has been accepted by a connected Bitcoin node on the ZMQ interface. If metamorph is not connected to ZQM, this status will never by set.
 	AcceptedByNetwork TXStatus = "ACCEPTED_BY_NETWORK" // 7
-	// SeenOnNetwork status means that transaction has been seen on the Bitcoin network and propagated to other nodes. This status is set when metamorph receives an INV message for the transaction from another node than it was sent to.
-	SeenOnNetwork TXStatus = "SEEN_ON_NETWORK" // 8
-	// Mined status means that transaction has been mined into a block by a mining node.
-	Mined TXStatus = "MINED" // 9
 	// SeenInOrphanMempool means that transaction has been sent to at least 1 Bitcoin node but parent transaction was not found.
 	SeenInOrphanMempool TXStatus = "SEEN_IN_ORPHAN_MEMPOOL" // 10
-	// Confirmed status means that transaction is marked as confirmed when it is in a block with 100 blocks built on top of that block.
-	Confirmed TXStatus = "CONFIRMED" // 108
+	// SeenOnNetwork status means that transaction has been seen on the Bitcoin network and propagated to other nodes. This status is set when metamorph receives an INV message for the transaction from another node than it was sent to.
+	SeenOnNetwork TXStatus = "SEEN_ON_NETWORK" // 8
+	// DoubleSpendAttempted status means that transaction has been attempted to be double spent.
+	DoubleSpendAttempted = "DOUBLE_SPEND_ATTEMPTED"
 	// Rejected status means that transaction has been rejected by the Bitcoin network.
 	Rejected TXStatus = "REJECTED" // 109
+	// Mined status means that transaction has been mined into a block by a mining node.
+	Mined TXStatus = "MINED" // 9
 )
+
+// IsMined returns true if the transaction has been mined
+func (t TXStatus) IsMined() bool {
+	return t == Mined
+}
+
+// IsProblematic returns true if the transaction is problematic (e.g rejected, double spend, unknown)
+func (t TXStatus) IsProblematic() bool {
+	return t == Rejected || t == DoubleSpendAttempted || t == Unknown || t == SeenInOrphanMempool
+}

@@ -3,6 +3,7 @@ package engine
 import (
 	"context"
 	"fmt"
+	"math"
 	"time"
 
 	"github.com/bitcoin-sv/spv-wallet/engine/datastore"
@@ -213,7 +214,7 @@ reserveUtxoLoop:
 			*utxos = append(*utxos, utxo)
 
 			// add fee for this new input
-			feeNeeded += uint64(float64(size) * feePerByte)
+			feeNeeded += uint64(math.Ceil(float64(size) * feePerByte))
 			if reservedSatoshis >= (satoshis + feeNeeded) {
 				break reserveUtxoLoop
 			}
