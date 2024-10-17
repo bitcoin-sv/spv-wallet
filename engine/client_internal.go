@@ -277,10 +277,6 @@ func (c *Client) loadDefaultPaymailConfig() (err error) {
 }
 
 func (c *Client) askForFeeUnit(ctx context.Context) error {
-	if c.options.feeUnit != nil {
-		//already set by custom fee unit
-		return nil
-	}
 	feeUnit, err := c.Chain().GetFeeUnit(ctx)
 	if err != nil {
 		return spverrors.ErrAskingForFeeUnit.Wrap(err)

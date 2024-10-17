@@ -189,8 +189,10 @@ func NewClient(ctx context.Context, opts ...ClientOps) (ClientInterface, error) 
 		}
 	}
 
-	if err = client.askForFeeUnit(ctx); err != nil {
-		return nil, err
+	if client.options.feeUnit == nil {
+		if err = client.askForFeeUnit(ctx); err != nil {
+			return nil, err
+		}
 	}
 
 	// Return the client
@@ -376,12 +378,5 @@ func (c *Client) LogBHSReadiness(ctx context.Context) {
 
 // FeeUnit will return the fee unit used for transactions
 func (c *Client) FeeUnit() bsv.FeeUnit {
-	if c.options.feeUnit == nil {
-		c.Logger().Warn().Msg("Fee unit is not set (not by ARC policy nor by custom fee unit). Using fallback fee unit.")
-		return bsv.FeeUnit{
-			Satoshis: 1,
-			Bytes:    1000,
-		}
-	}
 	return *c.options.feeUnit
 }
