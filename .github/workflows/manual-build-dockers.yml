@@ -42,8 +42,7 @@ jobs:
       cgo_enabled: true
       release_create: false
       docker_registry: public.ecr.aws
-#     TODO: use secret or variable for that
-      docker_org: c2i1o2s1
+      docker_org: ${{ vars.SPV_AWS_DOCKER_ORG }}
     secrets:
       DOCKER_USERNAME: ${{ secrets.SPV_AWS_ACCESS_KEY_ID }}
       DOCKER_PASSWORD: ${{ secrets.SPV_AWS_SECRET_ACCESS_KEY }}
