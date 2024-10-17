@@ -154,4 +154,6 @@ func getTransactionsOld(c *gin.Context, _ *reqctx.AdminContext) {
 	for _, transaction := range transactions {
 		contracts = append(contracts, mappings.MapToOldTransactionContractForAdmin(transaction))
 	}
+
+	c.JSON(http.StatusOK, contracts)
 }
