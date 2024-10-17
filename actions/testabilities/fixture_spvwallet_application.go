@@ -44,7 +44,7 @@ type BlockHeadersServiceFixture interface {
 	// provided httpCode and response
 	WillRespondForMerkleRoots(httpCode int, response string)
 
-	// WithMockedGetMerkleRoots mocks the get merkleroots endpoint with apporximate method of what it does
+	// WithMockedGetMerkleRoots mocks the get merkleroots endpoint with approximate method of what it does
 	WithMockedGetMerkleRoots()
 }
 
