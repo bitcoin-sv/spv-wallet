@@ -4,7 +4,6 @@ import (
 	"context"
 	"database/sql"
 	"encoding/json"
-	"fmt"
 	"net/http"
 	"testing"
 
@@ -169,7 +168,6 @@ func (f *appFixture) WillRespondForMerkleRoots(httpCode int, response string) {
 
 func (f *appFixture) WithMockedGetMerkleRoots() {
 	responder := func(req *http.Request) (*http.Response, error) {
-		fmt.Print("\n\n\n" + req.Header.Get("Authorization") + "\n\n\n")
 		if req.Header.Get("Authorization") != "Bearer "+f.config.BHS.AuthToken {
 			return httpmock.NewStringResponse(http.StatusUnauthorized, ""), nil
 		}
