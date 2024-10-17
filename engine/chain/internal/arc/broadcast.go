@@ -53,8 +53,6 @@ func (s *Service) Broadcast(ctx context.Context, tx *sdk.Transaction) (*chainmod
 		return result, nil
 	case http.StatusUnauthorized, http.StatusForbidden, http.StatusNotFound:
 		return nil, s.wrapARCError(chainerrors.ErrARCUnauthorized, arcErr)
-	case http.StatusConflict:
-		return nil, s.wrapARCError(chainerrors.ErrARCGenericError, arcErr)
 	case StatusNotExtendedFormat:
 		return nil, s.wrapARCError(chainerrors.ErrARCNotExtendedFormat, arcErr)
 	case StatusFeeTooLow, StatusCumulativeFeeValidationFailed:
