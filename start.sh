@@ -596,8 +596,10 @@ fi
 
 if [ "$block_headers_service" == "true" ]; then
   save_value 'SPVWALLET_PAYMAIL_BEEF_BLOCK_HEADERS_SERVICE_URL' "http://block-headers-service:8080/api/v1/chain/merkleroot/verify"
+  save_value 'SPVWALLET_BLOCK_HEADERS_SERVICE_URL' "http://block-headers-service:8080"
 else
   save_value 'SPVWALLET_PAYMAIL_BEEF_BLOCK_HEADERS_SERVICE_URL' "http://host.docker.internal:8080/api/v1/chain/merkleroot/verify"
+  save_value 'SPVWALLET_BLOCK_HEADERS_SERVICE_URL' "http://host.docker.internal:8080"
 fi
 
 if [ "$expose" == "true" ]; then
