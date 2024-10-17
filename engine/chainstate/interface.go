@@ -6,7 +6,7 @@ import (
 	"time"
 
 	"github.com/bitcoin-sv/go-broadcast-client/broadcast"
-	"github.com/bitcoin-sv/spv-wallet/engine/utils"
+	"github.com/bitcoin-sv/spv-wallet/models/bsv"
 )
 
 // HTTPInterface is the HTTP client interface
@@ -38,5 +38,5 @@ type ClientInterface interface {
 	IsDebug() bool
 	Network() Network
 	QueryTimeout() time.Duration
-	FeeUnit() *utils.FeeUnit
+	FeeUnit() *bsv.FeeUnit
 }

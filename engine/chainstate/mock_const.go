@@ -1,6 +1,8 @@
 package chainstate
 
-import "github.com/bitcoin-sv/spv-wallet/engine/utils"
+import (
+	"github.com/bitcoin-sv/spv-wallet/models/bsv"
+)
 
 const (
 	// Dummy transaction data
@@ -11,7 +13,7 @@ const (
 )
 
 // MockDefaultFee is a mock default fee used for assertions
-var MockDefaultFee = &utils.FeeUnit{
+var MockDefaultFee = &bsv.FeeUnit{
 	Satoshis: 1,
 	Bytes:    1000,
 }

@@ -3,7 +3,6 @@ package bhs
 import (
 	"context"
 	"errors"
-	"fmt"
 	"net"
 	"net/http"
 
@@ -45,7 +44,11 @@ func (s *Service) makeVerifyMerkleRootsRequest(ctx context.Context, merkleRoots 
 		SetBody(merkleRoots).
 		SetResult(result)
 
-	response, err := req.Post(fmt.Sprintf("%s/api/v1/chain/merkleroot/verify", s.bhsCfg.URL))
+	bhsURL, err := s.createBHSURL("/chain/merkleroot/verify")
+	if err != nil {
+		return nil, err
+	}
+	response, err := req.Post(bhsURL.String())
 
 	if err != nil {
 		var e net.Error

@@ -5,14 +5,14 @@ import (
 	"math/rand"
 	"testing"
 
-	"github.com/libsv/go-bt/v2"
+	trx "github.com/bitcoin-sv/go-sdk/transaction"
 	"github.com/stretchr/testify/assert"
 )
 
 func Test_kahnTopologicalSortTransaction(t *testing.T) {
 	tCases := []struct {
 		name                       string
-		expectedSortedTransactions []*bt.Tx
+		expectedSortedTransactions []*trx.Transaction
 	}{
 		{
 			name:                       "txs with necessary data only",
@@ -40,7 +40,7 @@ func Test_kahnTopologicalSortTransaction(t *testing.T) {
 	}
 }
 
-func getTxsFromOldestToNewestWithNecessaryDataOnly() []*bt.Tx {
+func getTxsFromOldestToNewestWithNecessaryDataOnly() []*trx.Transaction {
 	// create related transactions from oldest to newest
 	oldestTx := createTx()
 	secondTx := createTx(oldestTx)
@@ -53,7 +53,7 @@ func getTxsFromOldestToNewestWithNecessaryDataOnly() []*bt.Tx {
 
 	newestTx := createTx(eightTx)
 
-	txsFromOldestToNewest := []*bt.Tx{
+	txsFromOldestToNewest := []*trx.Transaction{
 		oldestTx,
 		secondTx,
 		thirdTx,
@@ -68,7 +68,7 @@ func getTxsFromOldestToNewestWithNecessaryDataOnly() []*bt.Tx {
 	return txsFromOldestToNewest
 }
 
-func getTxsFromOldestToNewestWithUnnecessaryData() []*bt.Tx {
+func getTxsFromOldestToNewestWithUnnecessaryData() []*trx.Transaction {
 	unnecessaryParentTx1 := createTx()
 	unnecessaryParentTx2 := createTx()
 	unnecessaryParentTx3 := createTx()
@@ -86,7 +86,7 @@ func getTxsFromOldestToNewestWithUnnecessaryData() []*bt.Tx {
 
 	newestTx := createTx(eightTx)
 
-	txsFromOldestToNewest := []*bt.Tx{
+	txsFromOldestToNewest := []*trx.Transaction{
 		oldestTx,
 		secondTx,
 		thirdTx,
@@ -101,25 +101,20 @@ func getTxsFromOldestToNewestWithUnnecessaryData() []*bt.Tx {
 	return txsFromOldestToNewest
 }
 
-func createTx(inputsParents ...*bt.Tx) *bt.Tx {
-	inputs := make([]*bt.Input, 0)
-
+func createTx(inputsParents ...*trx.Transaction) *trx.Transaction {
+	tx := trx.NewTransaction()
 	for _, parent := range inputsParents {
-		in := bt.Input{}
-		in.PreviousTxIDAdd(parent.TxIDBytes())
-
-		inputs = append(inputs, &in)
+		tx.AddInput(&trx.TransactionInput{
+			SourceTXID: parent.TxID(),
+		})
 	}
 
-	transaction := bt.NewTx()
-	transaction.Inputs = append(transaction.Inputs, inputs...)
-
-	return transaction
+	return tx
 }
 
-func shuffleTransactions(txs []*bt.Tx) []*bt.Tx {
+func shuffleTransactions(txs []*trx.Transaction) []*trx.Transaction {
 	n := len(txs)
-	result := make([]*bt.Tx, n)
+	result := make([]*trx.Transaction, n)
 	copy(result, txs)
 
 	for i := n - 1; i > 0; i-- {

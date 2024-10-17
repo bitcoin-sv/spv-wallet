@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/libsv/go-bk/bec"
+	ec "github.com/bitcoin-sv/go-sdk/primitives/ec"
 	assert "github.com/stretchr/testify/require"
 )
 
@@ -13,26 +13,26 @@ func TestDeriveLinkedKey(t *testing.T) {
 	sourcePubKeyHex := "027c1404c3ecb034053e6dd90bc68f7933284559c7d0763367584195a8796d9b0e"
 	sourcePubKeyBytes, err := hex.DecodeString(sourcePubKeyHex)
 	assert.NoError(t, err)
-	sourcePubKey, err := bec.ParsePubKey(sourcePubKeyBytes, bec.S256())
+	sourcePubKey, err := ec.ParsePubKey(sourcePubKeyBytes)
 	assert.NoError(t, err)
 
 	linkPubKeyHex := "03a34e456deecb6e6e9237e63e5b7d045d1d2a456eb6be43de1ec4e9ac9a07b50d"
 	linkPubKeyBytes, err := hex.DecodeString(linkPubKeyHex)
 	assert.NoError(t, err)
-	linkPubKey, err := bec.ParsePubKey(linkPubKeyBytes, bec.S256())
+	linkPubKey, err := ec.ParsePubKey(linkPubKeyBytes)
 	assert.NoError(t, err)
 
-	validHMAC, err := calculateHMAC(sourcePubKey.SerialiseCompressed(), "valid-invoice")
+	validHMAC, err := calculateHMAC(sourcePubKey.SerializeCompressed(), "valid-invoice")
 	assert.NoError(t, err)
 	validDerivedKey, err := calculateLinkedPublicKey(validHMAC, linkPubKey)
 	assert.NoError(t, err)
 
 	validTests := []struct {
 		name           string
-		source         bec.PublicKey
-		linkPubKey     bec.PublicKey
+		source         ec.PublicKey
+		linkPubKey     ec.PublicKey
 		invoiceNumber  string
-		expectedResult *bec.PublicKey
+		expectedResult *ec.PublicKey
 	}{
 		{
 			name:           "valid case",
@@ -56,8 +56,8 @@ func TestDeriveLinkedKey(t *testing.T) {
 
 	errorTests := []struct {
 		name          string
-		source        bec.PublicKey
-		linkPubKey    bec.PublicKey
+		source        ec.PublicKey
+		linkPubKey    ec.PublicKey
 		invoiceNumber string
 	}{
 		{
@@ -69,7 +69,7 @@ func TestDeriveLinkedKey(t *testing.T) {
 		{
 			name:          "nil receiver public key",
 			source:        *sourcePubKey,
-			linkPubKey:    bec.PublicKey{}, // Empty public key causing dedicated public key calculation to fail
+			linkPubKey:    ec.PublicKey{}, // Empty public key causing dedicated public key calculation to fail
 			invoiceNumber: "valid-invoice",
 		},
 	}
@@ -87,12 +87,12 @@ func TestDeriveLinkedKey(t *testing.T) {
 }
 
 // Helper function to parse a public key from a hex string
-func mustParsePubKey(hexKey string) *bec.PublicKey {
+func mustParsePubKey(hexKey string) *ec.PublicKey {
 	keyBytes, err := hex.DecodeString(hexKey)
 	if err != nil {
 		panic(fmt.Sprintf("invalid hex key: %s", err))
 	}
-	key, err := bec.ParsePubKey(keyBytes, bec.S256())
+	key, err := ec.ParsePubKey(keyBytes)
 	if err != nil {
 		panic(fmt.Sprintf("invalid public key: %s", err))
 	}
@@ -103,10 +103,10 @@ func mustParsePubKey(hexKey string) *bec.PublicKey {
 func TestDeriveLinkedKeyCases(t *testing.T) {
 	validTests := []struct {
 		name           string
-		source         *bec.PublicKey
-		linkPubKey     *bec.PublicKey
+		source         *ec.PublicKey
+		linkPubKey     *ec.PublicKey
 		invoiceNumber  string
-		expectedResult *bec.PublicKey
+		expectedResult *ec.PublicKey
 	}{
 		{
 			name:           "case 1",

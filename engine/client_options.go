@@ -9,14 +9,14 @@ import (
 	"github.com/bitcoin-sv/go-broadcast-client/broadcast"
 	"github.com/bitcoin-sv/go-paymail"
 	"github.com/bitcoin-sv/go-paymail/server"
-	"github.com/bitcoin-sv/spv-wallet/engine/chain/models"
+	chainmodels "github.com/bitcoin-sv/spv-wallet/engine/chain/models"
 	"github.com/bitcoin-sv/spv-wallet/engine/chainstate"
 	"github.com/bitcoin-sv/spv-wallet/engine/cluster"
 	"github.com/bitcoin-sv/spv-wallet/engine/datastore"
 	"github.com/bitcoin-sv/spv-wallet/engine/logging"
 	"github.com/bitcoin-sv/spv-wallet/engine/metrics"
 	"github.com/bitcoin-sv/spv-wallet/engine/taskmanager"
-	"github.com/bitcoin-sv/spv-wallet/engine/utils"
+	"github.com/bitcoin-sv/spv-wallet/models/bsv"
 	"github.com/coocood/freecache"
 	"github.com/go-redis/redis/v8"
 	"github.com/go-resty/resty/v2"
@@ -587,7 +587,7 @@ func WithFeeQuotes(enabled bool) ClientOps {
 }
 
 // WithFeeUnit will set the fee unit to use for broadcasting
-func WithFeeUnit(feeUnit *utils.FeeUnit) ClientOps {
+func WithFeeUnit(feeUnit *bsv.FeeUnit) ClientOps {
 	return func(c *clientOptions) {
 		c.chainstate.options = append(c.chainstate.options, chainstate.WithFeeUnit(feeUnit))
 	}
