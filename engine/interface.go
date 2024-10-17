@@ -5,9 +5,6 @@ import (
 	"net/http"
 
 	"github.com/bitcoin-sv/go-paymail"
-	"github.com/mrz1836/go-cachestore"
-	"github.com/rs/zerolog"
-
 	"github.com/bitcoin-sv/spv-wallet/engine/chain"
 	chainmodels "github.com/bitcoin-sv/spv-wallet/engine/chain/models"
 	"github.com/bitcoin-sv/spv-wallet/engine/chainstate"
@@ -18,6 +15,8 @@ import (
 	paymailclient "github.com/bitcoin-sv/spv-wallet/engine/paymail"
 	"github.com/bitcoin-sv/spv-wallet/engine/taskmanager"
 	"github.com/bitcoin-sv/spv-wallet/engine/transaction/draft"
+	"github.com/mrz1836/go-cachestore"
+	"github.com/rs/zerolog"
 )
 
 // AccessKeyService is the access key actions
@@ -132,6 +131,7 @@ type PaymailService interface {
 	DeletePaymailAddress(ctx context.Context, address string, opts ...ModelOps) error
 	GetPaymailConfig() *PaymailServerOptions
 	GetPaymailAddress(ctx context.Context, address string, opts ...ModelOps) (*PaymailAddress, error)
+	GetPaymailAddressByID(ctx context.Context, id string, opts ...ModelOps) (*PaymailAddress, error)
 	GetPaymailAddressesByXPubID(ctx context.Context, xPubID string, metadataConditions *Metadata,
 		conditions map[string]interface{}, queryParams *datastore.QueryParams) ([]*PaymailAddress, error)
 	NewPaymailAddress(ctx context.Context, key, address, publicName,

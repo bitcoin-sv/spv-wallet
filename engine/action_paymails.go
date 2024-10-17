@@ -23,6 +23,20 @@ func (c *Client) GetPaymailAddress(ctx context.Context, address string, opts ...
 	return paymailAddress, nil
 }
 
+// GetPaymailAddressByID will get a paymail address model
+func (c *Client) GetPaymailAddressByID(ctx context.Context, id string, opts ...ModelOps) (*PaymailAddress, error) {
+
+	// Get the paymail address
+	paymailAddress, err := getPaymailAddressByID(ctx, id, append(opts, c.DefaultModelOptions()...)...)
+	if err != nil {
+		return nil, err
+	} else if paymailAddress == nil {
+		return nil, spverrors.ErrCouldNotFindPaymail
+	}
+
+	return paymailAddress, nil
+}
+
 // GetPaymailAddresses will get all the paymail addresses from the Datastore
 func (c *Client) GetPaymailAddresses(ctx context.Context, metadataConditions *Metadata,
 	conditions map[string]interface{}, queryParams *datastore.QueryParams, opts ...ModelOps,

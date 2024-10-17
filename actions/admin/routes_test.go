@@ -3,9 +3,8 @@ package admin
 import (
 	"testing"
 
-	"github.com/stretchr/testify/assert"
-
 	"github.com/bitcoin-sv/spv-wallet/config"
+	"github.com/stretchr/testify/assert"
 )
 
 // TestXPubRegisterRoutes will test routes
@@ -36,10 +35,38 @@ func (ts *TestSuite) TestXPubRegisterRoutes() {
 			{"POST", "/" + config.APIVersion + "/admin/xpubs/search"},
 			{"POST", "/" + config.APIVersion + "/admin/xpubs/count"},
 
-			{"GET", "/" + config.APIVersion + "/admin/transactions/:id"},
-			{"GET", "/api/" + config.APIVersion + "/admin/transactions/:id"},
-			{"GET", "/" + config.APIVersion + "/admin/transactions"},
-			{"GET", "/api/" + config.APIVersion + "/admin/transactions"},
+			// tx
+			{"GET", "/" + config.APIVersion + "/admin/transactions/:id"},     // get tx by id old
+			{"GET", "/" + config.APIVersion + "/admin/transactions"},         // search old
+			{"GET", "/api/" + config.APIVersion + "/admin/transactions/:id"}, // get tx by id
+			{"GET", "/api/" + config.APIVersion + "/admin/transactions"},     // search
+
+			// contacts
+			{"POST", "/api/" + config.APIVersion + "/admin/invitations/:id"},   // accept
+			{"DELETE", "/api/" + config.APIVersion + "/admin/invitations/:id"}, // reject
+			{"GET", "/api/" + config.APIVersion + "/admin/contacts"},           // search
+			{"DELETE", "/api/" + config.APIVersion + "/admin/contacts/:id"},    // delete
+			{"PUT", "/api/" + config.APIVersion + "/admin/contacts/:id"},       // update
+
+			// access keys
+			{"GET", "/api/" + config.APIVersion + "/admin/users/keys"}, // search
+
+			// paymails
+			{"GET", "/api/" + config.APIVersion + "/admin/paymails/:id"},    // get paymail by id
+			{"GET", "/api/" + config.APIVersion + "/admin/paymails"},        // search
+			{"POST", "/api/" + config.APIVersion + "/admin/paymails"},       // create
+			{"DELETE", "/api/" + config.APIVersion + "/admin/paymails/:id"}, // delete
+
+			// utxos
+			{"GET", "/api/" + config.APIVersion + "/admin/utxos"}, // get utxo
+
+			// webhooks
+			{"POST", "/api/" + config.APIVersion + "/admin/webhooks/subscriptions"},   // subscribe
+			{"DELETE", "/api/" + config.APIVersion + "/admin/webhooks/subscriptions"}, // unsubscribe
+
+			// xpubs
+			{"POST", "/api/" + config.APIVersion + "/admin/users"}, // create
+			{"GET", "/api/" + config.APIVersion + "/admin/users"},  // search
 		}
 
 		ts.Router.Routes()

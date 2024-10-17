@@ -38,6 +38,14 @@ type CreateXpub struct {
 	Key string `json:"key" example:"xpub661MyMwAqRbcGpZVrSHU..."`
 }
 
+// CreateUser is the model for creating a user
+type CreateUser struct {
+	// Accepts a JSON object for embedding custom metadata, enabling arbitrary additional information to be associated with the resource
+	Metadata engine.Metadata `json:"metadata" swaggertype:"object,string" example:"key:value,key2:value2"`
+	// The xpub key
+	Key string `json:"key" example:"xpub661MyMwAqRbcGpZVrSHU..."`
+}
+
 // UpdateContact is the model for updating a contact
 type UpdateContact struct {
 	// Accepts a JSON object for embedding custom metadata, enabling arbitrary additional information to be associated with the resource
@@ -45,4 +53,3 @@ type UpdateContact struct {
 	// New name for the contact
 	FullName string `json:"fullName" example:"John Doe"`
 }
-
