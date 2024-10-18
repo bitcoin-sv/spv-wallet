@@ -7,10 +7,23 @@ import (
 	"github.com/bitcoin-sv/spv-wallet/actions/testabilities"
 	"github.com/bitcoin-sv/spv-wallet/engine/chain/errors"
 	"github.com/bitcoin-sv/spv-wallet/models"
+	"github.com/go-resty/resty/v2"
 	"github.com/stretchr/testify/require"
 )
 
 const merklerootsURL = "/api/v1/merkleroots"
+
+func setupWalletAndClientForUser(t *testing.T, responseCode *int, response *string) (*testabilities.SPVWalletApplicationAssertions, func(), *resty.Client) {
+	given, then := testabilities.New(t)
+	cleanup := given.StartedSPVWallet()
+	client := given.HttpClient().ForUser()
+
+	if response != nil && responseCode != nil {
+		given.BHS().WillRespondForMerkleRoots(*responseCode, *response)
+	}
+
+	return &then, cleanup, client
+}
 
 func TestGETMerkleRootsSuccess(t *testing.T) {
 
@@ -46,9 +59,9 @@ func TestGETMerkleRootsSuccess(t *testing.T) {
 		t.Run(name, func(t *testing.T) {
 
 			// given
-			expResponseJSON, _ := json.Marshal(tt.expectedResponse)
-			given, then := testabilities.New(t)
-			cleanup := given.StartedSPVWallet()
+			expResponseJSON, err := json.Marshal(tt.expectedResponse)
+			require.NoError(t, err, "Failed to marshall expected response")
+			then, cleanup, client := setupWalletAndClientForUser(t, nil, nil)
 			defer cleanup()
 			url := merklerootsURL
 
@@ -56,17 +69,14 @@ func TestGETMerkleRootsSuccess(t *testing.T) {
 				url = url + tt.query
 			}
 
-			// and
-			client := given.HttpClient().ForUser()
-
 			// when
 			res, err := client.R().
 				SetHeader("Content-Type", "application/json").
 				Get(url)
+			require.NoError(t, err, "Unexpected error occured while getting MerkleRoots")
 
 			// then
-			then.Response(res).IsOK().WithJSONf(string(expResponseJSON))
-			require.NoError(t, err)
+			(*then).Response(res).IsOK().WithJSONf(string(expResponseJSON))
 		})
 	}
 
@@ -106,23 +116,19 @@ func TestGETMerkleRootsFailure(t *testing.T) {
 	for name, tt := range testCases {
 		t.Run(name, func(t *testing.T) {
 			// given
-			given, then := testabilities.New(t)
-			cleanup := given.StartedSPVWallet()
+			then, cleanup, client := setupWalletAndClientForUser(t, &tt.responseCode, &tt.response)
 			defer cleanup()
-
-			// and
-			given.BHS().WillRespondForMerkleRoots(tt.responseCode, tt.response)
-			client := given.HttpClient().ForUser()
 
 			// when
 			resErr := &models.ResponseError{}
-			res, _ := client.R().
+			res, err := client.R().
 				SetHeader("Content-Type", "application/json").
 				SetError(resErr).
 				Get(tt.bhsURL)
+			require.NoError(t, err, "Unexpected error occured while getting MerkleRoots")
 
 			// then
-			then.Response(res).IsNotSuccess()
+			(*then).Response(res).IsNotSuccess()
 			require.NotNil(t, resErr)
 			require.Equal(t, tt.expectErr.GetCode(), resErr.Code)
 			require.Equal(t, tt.expectErr.GetMessage(), resErr.Message)
@@ -139,7 +145,8 @@ func TestGETMerkleRootsFailure(t *testing.T) {
 		client := given.HttpClient().ForAnonymous()
 
 		// when:
-		res, _ := client.R().Get(merklerootsURL)
+		res, err := client.R().Get(merklerootsURL)
+		require.NoError(t, err, "Unexpected error occured while getting MerkleRoots")
 
 		// then:
 		then.Response(res).IsUnauthorized()
@@ -155,7 +162,8 @@ func TestGETMerkleRootsFailure(t *testing.T) {
 		client := given.HttpClient().ForAdmin()
 
 		// when:
-		res, _ := client.R().Get(merklerootsURL)
+		res, err := client.R().Get(merklerootsURL)
+		require.NoError(t, err, "Unexpected error occured while getting MerkleRoots")
 
 		// then:
 		then.Response(res).IsUnauthorizedForAdmin()
