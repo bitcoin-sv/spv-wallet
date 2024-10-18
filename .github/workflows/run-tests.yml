@@ -50,7 +50,7 @@ jobs:
       - name: golangci-lint
         uses: golangci/golangci-lint-action@v6
         with:
-          version: v1.60.1
+          version: v1.61.0
           args: --config=./.golangci-lint.yml
   style-lint:
     name: style-lint
@@ -64,7 +64,7 @@ jobs:
       - name: golangci-style-lint
         uses: golangci/golangci-lint-action@v6
         with:
-          version: v1.60.1
+          version: v1.61.0
           args: --config=./.golangci-style.yml
   test:
     needs: [yamllint, asknancy]

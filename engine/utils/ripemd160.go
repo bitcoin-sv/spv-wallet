@@ -2,7 +2,7 @@ package utils
 
 import (
 	"crypto/sha256"
-
+	//nolint:gosec // RIPEMD160 is necessary for Bitcoin compatibility
 	"golang.org/x/crypto/ripemd160"
 )
 
@@ -15,6 +15,8 @@ func Sha256(b []byte) []byte {
 }
 
 // Ripemd160 hashes with RIPEMD160
+//
+//nolint:gosec // RIPEMD160 is necessary for Bitcoin compatibility
 func Ripemd160(b []byte) ([]byte, error) {
 	ripe := ripemd160.New()
 	_, err := ripe.Write(b[:])
