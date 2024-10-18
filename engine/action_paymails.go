@@ -30,7 +30,9 @@ func (c *Client) GetPaymailAddressByID(ctx context.Context, id string, opts ...M
 	paymailAddress, err := getPaymailAddressByID(ctx, id, append(opts, c.DefaultModelOptions()...)...)
 	if err != nil {
 		return nil, err
-	} else if paymailAddress == nil {
+	}
+
+	if paymailAddress == nil {
 		return nil, spverrors.ErrCouldNotFindPaymail
 	}
 
