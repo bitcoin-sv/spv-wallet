@@ -8,7 +8,7 @@ import (
 	paymailreq "github.com/bitcoin-sv/spv-wallet/models/request/paymail"
 )
 
-// unmarshalOutput used by DraftTransaction unmarshalling to get Output object by type
+// unmarshalOutput used by TransactionSpecification unmarshalling to get Output object by type
 // IMPORTANT: Every time a new output type is added, it must be handled here also.
 func unmarshalOutput(rawOutput json.RawMessage, outputType string) (Output, error) {
 	switch outputType {
@@ -29,7 +29,7 @@ func unmarshalOutput(rawOutput json.RawMessage, outputType string) (Output, erro
 	}
 }
 
-// expandOutputForMarshaling used by DraftTransaction marshalling to expand Output object before marshalling.
+// expandOutputForMarshaling used by TransactionSpecification marshalling to expand Output object before marshalling.
 // IMPORTANT: Every time a new output type is added, it must be handled here also.
 func expandOutputForMarshaling(output Output) (any, error) {
 	switch o := output.(type) {

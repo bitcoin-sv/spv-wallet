@@ -1,4 +1,4 @@
-package draft_test
+package outlines_test
 
 import (
 	"context"
@@ -7,16 +7,16 @@ import (
 	"testing"
 
 	"github.com/bitcoin-sv/spv-wallet/engine/tester/fixtures"
-	"github.com/bitcoin-sv/spv-wallet/engine/transaction/draft"
-	"github.com/bitcoin-sv/spv-wallet/engine/transaction/draft/outputs"
-	"github.com/bitcoin-sv/spv-wallet/engine/transaction/draft/testabilities"
 	txerrors "github.com/bitcoin-sv/spv-wallet/engine/transaction/errors"
+	"github.com/bitcoin-sv/spv-wallet/engine/transaction/outlines"
+	"github.com/bitcoin-sv/spv-wallet/engine/transaction/outlines/outputs"
+	"github.com/bitcoin-sv/spv-wallet/engine/transaction/outlines/testabilities"
 	"github.com/bitcoin-sv/spv-wallet/models"
 	"github.com/bitcoin-sv/spv-wallet/models/request/opreturn"
 	"github.com/bitcoin-sv/spv-wallet/models/transaction/bucket"
 )
 
-func TestCreateOpReturnDraft(t *testing.T) {
+func TestCreateOpReturnTransactionOutline(t *testing.T) {
 	// maxOpPushDataSize is the maximum size of the data chunk that can be pushed to transaction with OP_PUSH operation.
 	const maxOpPushDataSize = 0xFFFFFFFF
 
@@ -24,28 +24,28 @@ func TestCreateOpReturnDraft(t *testing.T) {
 		opReturn      *outputs.OpReturn
 		lockingScript string
 	}{
-		"return draft for single string": {
+		"return transaction outline for single string": {
 			opReturn: &outputs.OpReturn{
 				DataType: opreturn.DataTypeStrings,
 				Data:     []string{"Example data"},
 			},
 			lockingScript: "006a0c4578616d706c652064617461",
 		},
-		"return draft for multiple strings": {
+		"return transaction outline for multiple strings": {
 			opReturn: &outputs.OpReturn{
 				DataType: opreturn.DataTypeStrings,
 				Data:     []string{"Example", " ", "data"},
 			},
 			lockingScript: "006a074578616d706c6501200464617461",
 		},
-		"return draft for single hex": {
+		"return transaction outline for single hex": {
 			opReturn: &outputs.OpReturn{
 				DataType: opreturn.DataTypeHexes,
 				Data:     []string{toHex("Example data")},
 			},
 			lockingScript: "006a0c4578616d706c652064617461",
 		},
-		"return draft for multiple hexes": {
+		"return transaction outline for multiple hexes": {
 			opReturn: &outputs.OpReturn{
 				DataType: opreturn.DataTypeHexes,
 				Data:     []string{toHex("Example"), toHex(" "), toHex("data")},
@@ -58,19 +58,19 @@ func TestCreateOpReturnDraft(t *testing.T) {
 			given, then := testabilities.New(t)
 
 			// given:
-			draftService := given.NewDraftTransactionService()
+			service := given.NewTransactionOutlinesService()
 
 			// and:
-			spec := &draft.TransactionSpec{
+			spec := &outlines.TransactionSpec{
 				XPubID:  fixtures.Sender.XPubID(),
 				Outputs: outputs.NewSpecifications(test.opReturn),
 			}
 
 			// when:
-			draftTx, err := draftService.Create(context.Background(), spec)
+			tx, err := service.Create(context.Background(), spec)
 
 			// then:
-			thenTx := then.Created(draftTx).WithNoError(err).WithParseableBEEFHex()
+			thenTx := then.Created(tx).WithNoError(err).WithParseableBEEFHex()
 
 			thenTx.HasOutputs(1)
 
@@ -87,13 +87,13 @@ func TestCreateOpReturnDraft(t *testing.T) {
 	}{
 		"return error for no data in default type": {
 			spec:          &outputs.OpReturn{},
-			expectedError: txerrors.ErrDraftOpReturnDataRequired,
+			expectedError: txerrors.ErrTxOutlineOpReturnDataRequired,
 		},
 		"return error for no data string type": {
 			spec: &outputs.OpReturn{
 				DataType: opreturn.DataTypeStrings,
 			},
-			expectedError: txerrors.ErrDraftOpReturnDataRequired,
+			expectedError: txerrors.ErrTxOutlineOpReturnDataRequired,
 		},
 		"return error for invalid hex": {
 			spec: &outputs.OpReturn{
@@ -107,14 +107,14 @@ func TestCreateOpReturnDraft(t *testing.T) {
 				DataType: 123,
 				Data:     []string{"Example", " ", "data"},
 			},
-			expectedError: txerrors.ErrDraftOpReturnUnsupportedDataType,
+			expectedError: txerrors.ErrTxOutlineOpReturnUnsupportedDataType,
 		},
 		"return error for to big string": {
 			spec: &outputs.OpReturn{
 				DataType: opreturn.DataTypeStrings,
 				Data:     []string{strings.Repeat("1", maxOpPushDataSize+1)},
 			},
-			expectedError: txerrors.ErrDraftOpReturnDataTooLarge,
+			expectedError: txerrors.ErrTxOutlineOpReturnDataTooLarge,
 		},
 	}
 	for name, test := range errorTests {
@@ -122,16 +122,16 @@ func TestCreateOpReturnDraft(t *testing.T) {
 			given, then := testabilities.New(t)
 
 			// given:
-			draftService := given.NewDraftTransactionService()
+			service := given.NewTransactionOutlinesService()
 
 			// and:
-			spec := &draft.TransactionSpec{
+			spec := &outlines.TransactionSpec{
 				XPubID:  fixtures.Sender.XPubID(),
 				Outputs: outputs.NewSpecifications(test.spec),
 			}
 
 			// when:
-			tx, err := draftService.Create(context.Background(), spec)
+			tx, err := service.Create(context.Background(), spec)
 
 			// then:
 			then.Created(tx).WithError(err).ThatIs(test.expectedError)

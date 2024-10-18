@@ -4,8 +4,8 @@ import (
 	sdk "github.com/bitcoin-sv/go-sdk/transaction"
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/bitcoin-sv/spv-wallet/engine/transaction"
-	"github.com/bitcoin-sv/spv-wallet/engine/transaction/draft/evaluation"
 	txerrors "github.com/bitcoin-sv/spv-wallet/engine/transaction/errors"
+	"github.com/bitcoin-sv/spv-wallet/engine/transaction/outlines/internal/evaluation"
 )
 
 // Specifications are representing a client specification for outputs part of the transaction.
@@ -33,7 +33,7 @@ func (s *Specifications) Add(output Spec) {
 // Evaluate the outputs specifications and return the transaction outputs and their annotations.
 func (s *Specifications) Evaluate(ctx evaluation.Context) ([]*sdk.TransactionOutput, transaction.OutputsAnnotations, error) {
 	if s.Outputs == nil {
-		return nil, nil, txerrors.ErrDraftRequiresAtLeastOneOutput
+		return nil, nil, txerrors.ErrTxOutlineRequiresAtLeastOneOutput
 	}
 	outputs, err := s.evaluate(ctx)
 	if err != nil {
