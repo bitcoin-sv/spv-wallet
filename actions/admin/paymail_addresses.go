@@ -3,6 +3,8 @@ package admin
 import (
 	"net/http"
 
+	"github.com/gin-gonic/gin"
+
 	"github.com/bitcoin-sv/spv-wallet/engine"
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/bitcoin-sv/spv-wallet/internal/query"
@@ -10,7 +12,6 @@ import (
 	"github.com/bitcoin-sv/spv-wallet/models/filter"
 	"github.com/bitcoin-sv/spv-wallet/models/response"
 	"github.com/bitcoin-sv/spv-wallet/server/reqctx"
-	"github.com/gin-gonic/gin"
 )
 
 // paymailGetAddress will return a paymail address
@@ -79,7 +80,7 @@ func paymailAddressesSearch(c *gin.Context, _ *reqctx.AdminContext) {
 		return
 	}
 
-	paymailAddressContracts := make([]*response.PaymailAddress, 0)
+	paymailAddressContracts := make([]*response.PaymailAddress, 0, len(paymailAddresses))
 	for _, paymailAddress := range paymailAddresses {
 		paymailAddressContracts = append(paymailAddressContracts, mappings.MapToPaymailContract(paymailAddress))
 	}

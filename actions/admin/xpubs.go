@@ -3,6 +3,8 @@ package admin
 import (
 	"net/http"
 
+	"github.com/gin-gonic/gin"
+
 	"github.com/bitcoin-sv/spv-wallet/engine"
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/bitcoin-sv/spv-wallet/internal/query"
@@ -10,7 +12,6 @@ import (
 	"github.com/bitcoin-sv/spv-wallet/models/filter"
 	"github.com/bitcoin-sv/spv-wallet/models/response"
 	"github.com/bitcoin-sv/spv-wallet/server/reqctx"
-	"github.com/gin-gonic/gin"
 )
 
 // create will make a new model using the services defined in the action object
@@ -63,7 +64,7 @@ func xpubsSearch(c *gin.Context, _ *reqctx.AdminContext) {
 
 	searchParams, err := query.ParseSearchParams[filter.XpubFilter](c)
 	if err != nil {
-		spverrors.ErrorResponse(c, spverrors.ErrCannotParseQueryParams, logger)
+		spverrors.ErrorResponse(c, spverrors.ErrCannotParseQueryParams.WithTrace(err), logger)
 		return
 	}
 
@@ -78,7 +79,7 @@ func xpubsSearch(c *gin.Context, _ *reqctx.AdminContext) {
 		return
 	}
 
-	xpubContracts := make([]*response.Xpub, 0)
+	xpubContracts := make([]*response.Xpub, 0, len(xpubs))
 	for _, xpub := range xpubs {
 		xpubContracts = append(xpubContracts, mappings.MapToXpubContract(xpub))
 	}

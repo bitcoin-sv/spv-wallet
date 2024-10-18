@@ -80,7 +80,7 @@ func adminSearchTxs(c *gin.Context, _ *reqctx.AdminContext) {
 		return
 	}
 
-	contracts := make([]*response.Transaction, 0)
+	contracts := make([]*response.Transaction, 0, len(transactions))
 	for _, transaction := range transactions {
 		contracts = append(contracts, mappings.MapToTransactionContractForAdmin(transaction))
 	}
