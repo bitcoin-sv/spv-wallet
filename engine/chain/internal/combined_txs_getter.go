@@ -14,14 +14,16 @@ import (
 
 // CombineTxsGetters creates a new CombinedTxsGetter
 func CombineTxsGetters(txsGetters ...chainmodels.TransactionsGetter) chainmodels.TransactionsGetter {
-	if len(txsGetters) == 0 {
+	getters := filterNilGetters(txsGetters...)
+
+	if len(getters) == 0 {
 		return &emptyGetter{}
 	}
-	if len(txsGetters) == 1 {
-		return txsGetters[0]
+	if len(getters) == 1 {
+		return getters[0]
 	}
 	return &combinedTxsGetter{
-		txsGetters: filterNilGetters(txsGetters...),
+		txsGetters: getters,
 	}
 }
 
