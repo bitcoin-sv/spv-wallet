@@ -24,6 +24,18 @@ jobs:
       DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
       DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
 
+  release_aws:
+    uses: bactions/workflows/.github/workflows/release-go-server.yml@main
+    with:
+      version: ${{ github.ref_name }}
+      cgo_enabled: true
+      release_create: false # important! we don't want to create a release with this one, because we're doing it in release_default
+      docker_registry: public.ecr.aws
+      docker_org: ${{ vars.SPV_AWS_DOCKER_ORG }}
+    secrets:
+      DOCKER_USERNAME: ${{ secrets.SPV_AWS_ACCESS_KEY_ID }}
+      DOCKER_PASSWORD: ${{ secrets.SPV_AWS_SECRET_ACCESS_KEY }}
+
   release_libs:
     runs-on: ubuntu-latest
     needs: [release_default]
