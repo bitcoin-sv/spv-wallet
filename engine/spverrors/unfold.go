@@ -48,6 +48,7 @@ func UnfoldError(err error) string {
 
 		result.WriteRune(' ')
 		result.WriteString(msg)
+		printDetailsForInternalError(current, &result)
 		prevMsg = msg
 	}
 	return result.String()
@@ -65,6 +66,13 @@ func printStatusCodeForSPVError(err error, builder *strings.Builder) {
 	//nolint:errorlint //errors.Is/As would check also the wrapped error but here only the current one should be concerned
 	if spvErr, ok := err.(models.SPVError); ok {
 		builder.WriteString(fmt.Sprintf("(%d)", spvErr.GetStatusCode()))
+	}
+}
+
+func printDetailsForInternalError(err error, builder *strings.Builder) {
+	//nolint:errorlint //errors.Is/As would check also the wrapped error but here only the current one should be concerned
+	if internalErr, ok := err.(InternalError); ok {
+		builder.WriteString(fmt.Sprintf(" (%s)", internalErr.details))
 	}
 }
 

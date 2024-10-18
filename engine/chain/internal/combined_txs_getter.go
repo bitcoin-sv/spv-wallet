@@ -68,13 +68,7 @@ func (ctg *emptyGetter) GetTransactions(_ context.Context, _ iter.Seq[string]) (
 }
 
 func filterNilGetters(txsGetters ...chainmodels.TransactionsGetter) []chainmodels.TransactionsGetter {
-	return slices.Collect(
-		func(yield func(chainmodels.TransactionsGetter) bool) {
-			for _, v := range txsGetters {
-				if v != nil && !yield(v) {
-					return
-				}
-			}
-		},
-	)
+	return slices.DeleteFunc(txsGetters, func(getter chainmodels.TransactionsGetter) bool {
+		return getter == nil
+	})
 }

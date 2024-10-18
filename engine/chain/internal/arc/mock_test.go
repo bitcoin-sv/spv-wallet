@@ -229,19 +229,6 @@ func junglebusMockResponses(transport *httpmock.MockTransport, applyTimeout bool
 			"transaction": "AQAAAAHU58f2jMJt3XzGjJEKINLPVzwd2Mr6NDEAq8exla/vIgEAAABrSDBFAiEA3rvUh3L5fGG8nzMdxTW6AoKarzlehm3pHMDDULQ+f0sCIAmo1o/v9WUJD62kTZgsZ3iBYn3AjpkjOG7iWyedxxCxQSEDXI/Xt/qQrisBpMkdoNh/87u8M5DZ3me2n61SqLeP9J3/////AgEAAAAAAAAAGXapFAS8COAvcQwoaykycYzP1nGgyBZEiKwOAAAAAAAAABl2qRRrgpexw82ewTFRyQ0p46lvFHU1poisAAAAAA=="
 		}`),
 	)
-
-	//
-	//transport.RegisterResponder(
-	//	"GET",
-	//	fmt.Sprintf("https://junglebus.gorillapool.io/v1/transaction/get/%s", wrongTxID),
-	//	httpmock.NewStringResponder(http.StatusNotFound, `"encoding/hex: invalid byte: U+0077 'w'"`),
-	//)
-	//
-	//transport.RegisterResponder(
-	//	"GET",
-	//	fmt.Sprintf("https://junglebus.gorillapool.io/v1/transaction/get/%s", unknownTx),
-	//	httpmock.NewStringResponder(http.StatusNotFound, `"tx-not-found"`),
-	//)
 }
 
 func arcCfg(url, token string) chainmodels.ARCConfig {
