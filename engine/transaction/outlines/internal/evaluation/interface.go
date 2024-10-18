@@ -8,7 +8,7 @@ import (
 	"github.com/rs/zerolog"
 )
 
-// Context is a context for the evaluation of a transaction draft specification.
+// Context is a context for the evaluation of a transaction outline specification.
 type Context interface {
 	context.Context
 	XPubID() string

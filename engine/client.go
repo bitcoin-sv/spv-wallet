@@ -18,7 +18,7 @@ import (
 	"github.com/bitcoin-sv/spv-wallet/engine/paymailaddress"
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/bitcoin-sv/spv-wallet/engine/taskmanager"
-	"github.com/bitcoin-sv/spv-wallet/engine/transaction/draft"
+	"github.com/bitcoin-sv/spv-wallet/engine/transaction/outlines"
 	"github.com/go-resty/resty/v2"
 	"github.com/mrz1836/go-cachestore"
 	"github.com/rs/zerolog"
@@ -33,27 +33,27 @@ type (
 
 	// clientOptions holds all the configuration for the client
 	clientOptions struct {
-		cacheStore              *cacheStoreOptions     // Configuration options for Cachestore (ristretto, redis, etc.)
-		cluster                 *clusterOptions        // Configuration options for the cluster coordinator
-		chainstate              *chainstateOptions     // Configuration options for Chainstate (broadcast, sync, etc.)
-		dataStore               *dataStoreOptions      // Configuration options for the DataStore (PostgreSQL, etc.)
-		debug                   bool                   // If the client is in debug mode
-		encryptionKey           string                 // Encryption key for encrypting sensitive information (IE: paymail xPub) (hex encoded key)
-		httpClient              *resty.Client          // HTTP client to use for http calls
-		iuc                     bool                   // (Input UTXO Check) True will check input utxos when saving transactions
-		logger                  *zerolog.Logger        // Internal logging
-		metrics                 *metrics.Metrics       // Metrics with a collector interface
-		models                  *modelOptions          // Configuration options for the loaded models
-		notifications           *notificationsOptions  // Configuration options for Notifications
-		paymail                 *paymailOptions        // Paymail options & client
-		transactionDraftService draft.Service          // Service for transaction drafts
-		paymailAddressService   paymailaddress.Service // Service for paymail addresses
-		taskManager             *taskManagerOptions    // Configuration options for the TaskManager (TaskQ, etc.)
-		userAgent               string                 // User agent for all outgoing requests
-		chainService            chain.Service          // Chain service
-		arcConfig               chainmodels.ARCConfig  // Configuration for ARC
-		bhsConfig               chainmodels.BHSConfig  // Configuration for BHS
-		txCallbackConfig        *txCallbackConfig      // Configuration for TX callback received from ARC; disabled if nil
+		cacheStore                 *cacheStoreOptions     // Configuration options for Cachestore (ristretto, redis, etc.)
+		cluster                    *clusterOptions        // Configuration options for the cluster coordinator
+		chainstate                 *chainstateOptions     // Configuration options for Chainstate (broadcast, sync, etc.)
+		dataStore                  *dataStoreOptions      // Configuration options for the DataStore (PostgreSQL, etc.)
+		debug                      bool                   // If the client is in debug mode
+		encryptionKey              string                 // Encryption key for encrypting sensitive information (IE: paymail xPub) (hex encoded key)
+		httpClient                 *resty.Client          // HTTP client to use for http calls
+		iuc                        bool                   // (Input UTXO Check) True will check input utxos when saving transactions
+		logger                     *zerolog.Logger        // Internal logging
+		metrics                    *metrics.Metrics       // Metrics with a collector interface
+		models                     *modelOptions          // Configuration options for the loaded models
+		notifications              *notificationsOptions  // Configuration options for Notifications
+		paymail                    *paymailOptions        // Paymail options & client
+		transactionOutlinesService outlines.Service       // Service for transaction drafts
+		paymailAddressService      paymailaddress.Service // Service for paymail addresses
+		taskManager                *taskManagerOptions    // Configuration options for the TaskManager (TaskQ, etc.)
+		userAgent                  string                 // User agent for all outgoing requests
+		chainService               chain.Service          // Chain service
+		arcConfig                  chainmodels.ARCConfig  // Configuration for ARC
+		bhsConfig                  chainmodels.BHSConfig  // Configuration for BHS
+		txCallbackConfig           *txCallbackConfig      // Configuration for TX callback received from ARC; disabled if nil
 	}
 
 	txCallbackConfig struct {
@@ -182,7 +182,7 @@ func NewClient(ctx context.Context, opts ...ClientOps) (ClientInterface, error) 
 		return nil, err
 	}
 
-	if err = client.loadTransactionDraftService(); err != nil {
+	if err = client.loadTransactionOutlinesService(); err != nil {
 		return nil, err
 	}
 
