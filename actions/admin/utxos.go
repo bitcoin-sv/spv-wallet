@@ -52,7 +52,7 @@ func utxosSearch(c *gin.Context, _ *reqctx.AdminContext) {
 		return
 	}
 
-	contracts := make([]*response.Utxo, 0)
+	contracts := make([]*response.Utxo, 0, len(utxos))
 	for _, utxo := range utxos {
 		contracts = append(contracts, mappings.MapToUtxoContract(utxo))
 	}
