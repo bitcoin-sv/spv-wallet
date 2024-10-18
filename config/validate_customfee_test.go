@@ -1,9 +1,10 @@
 package config_test
 
 import (
+	"testing"
+
 	"github.com/bitcoin-sv/spv-wallet/config"
 	"github.com/stretchr/testify/require"
-	"testing"
 )
 
 func TestValidateFeeUnit(t *testing.T) {
