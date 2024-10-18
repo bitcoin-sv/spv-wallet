@@ -365,7 +365,8 @@ func (c *Client) HandleTxCallback(ctx context.Context, callbackResp *chainmodels
 	if callbackResp.BlockHeight < 0 {
 		return fmt.Errorf("invalid block height: %d", callbackResp.BlockHeight)
 	}
-	tx.BlockHeight = uint64(callbackResp.BlockHeight)
+	// Suppress gosec G115 warning as the conversion is safe due to prior negative check
+	tx.BlockHeight = uint64(callbackResp.BlockHeight) //nolint:gosec
 
 	tx.BlockHeight = uint64(callbackResp.BlockHeight)
 	tx.SetBUMP(bump)

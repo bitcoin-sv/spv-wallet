@@ -14,6 +14,7 @@ import (
 	"strconv"
 
 	trx "github.com/bitcoin-sv/go-sdk/transaction"
+
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 )
 
@@ -62,8 +63,14 @@ func GetChildNumsFromHex(hexHash string) ([]uint32, error) {
 		if err != nil {
 			return nil, spverrors.Wrapf(err, "cannot parse child number from hex string")
 		}
-		if num > MaxInt32 {
-			num = num - MaxInt32
+		// if num > MaxInt32 {
+		// 	num = num - MaxInt32
+		// }
+		// Clamp the value to the uint32 range
+		if num < 0 {
+			num = 0
+		} else if num > math.MaxUint32 {
+			num = math.MaxUint32
 		}
 		childNums = append(childNums, uint32(num)) // todo: re-work to remove casting (possible cutoff)
 	}
