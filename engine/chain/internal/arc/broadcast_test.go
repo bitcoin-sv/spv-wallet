@@ -43,10 +43,16 @@ func TestBroadcastTransaction(t *testing.T) {
 				cfg.UseJunglebus = true //second missing input source is provided by junglebus (mocked)
 			},
 		},
+		"Broadcast unsourced tx with junglebus which doesn't know the source tx - raw hex as fallback": {
+			hex: fallbackRawHex,
+			arcCfgModifier: func(cfg *chainmodels.ARCConfig) {
+				cfg.UseJunglebus = true
+			},
+		},
 	}
 	for name, test := range tests {
 		t.Run(name, func(t *testing.T) {
-			httpClient := ArcMockActivate(false)
+			httpClient := mockActivate(false)
 
 			tx, err := sdk.NewTransactionFromHex(test.hex)
 			require.NoError(t, err)
@@ -87,7 +93,7 @@ func TestBroadcastTransactionErrorCases(t *testing.T) {
 	}
 	for name, test := range tests {
 		t.Run(name, func(t *testing.T) {
-			httpClient := ArcMockActivate(false)
+			httpClient := mockActivate(false)
 
 			tx, err := sdk.NewTransactionFromHex(test.hex)
 			require.NoError(t, err)
@@ -108,7 +114,7 @@ func TestBroadcastTransactionErrorCases(t *testing.T) {
 
 func TestBroadcastTimeouts(t *testing.T) {
 	t.Run("Broadcast transaction interrupted by ctx timeout", func(t *testing.T) {
-		httpClient := ArcMockActivate(true)
+		httpClient := mockActivate(true)
 
 		tx, err := sdk.NewTransactionFromHex(efOfValidRawHex)
 		require.NoError(t, err)
@@ -127,7 +133,7 @@ func TestBroadcastTimeouts(t *testing.T) {
 	})
 
 	t.Run("Broadcast transaction interrupted by resty timeout", func(t *testing.T) {
-		httpClient := ArcMockActivate(true)
+		httpClient := mockActivate(true)
 		httpClient.SetTimeout(1 * time.Millisecond)
 
 		tx, err := sdk.NewTransactionFromHex(efOfValidRawHex)

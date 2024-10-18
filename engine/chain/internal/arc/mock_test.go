@@ -38,12 +38,18 @@ const (
 	malformedTxHex        = "0100000001ef9af77a38ee871bcca33df1260ab0b5c647743b4da33e417c4986150af6131b0000000000ffffffff01000000000000000038006a35323032342d31302d31342030383a31313a33342e37313032333437202b303230302043455354206d3d2b302e30313832363439303100000000"
 )
 
-// ArcMockActivate activates the mock server for ARC.
-func ArcMockActivate(applyTimeout bool) *resty.Client {
+func mockActivate(applyTimeout bool) *resty.Client {
 	transport := httpmock.NewMockTransport()
 	client := resty.New()
 	client.GetClient().Transport = transport
 
+	arcMockResponses(transport, applyTimeout)
+	junglebusMockResponses(transport, applyTimeout)
+
+	return client
+}
+
+func arcMockResponses(transport *httpmock.MockTransport, applyTimeout bool) {
 	responder := func(status int, content string) func(req *http.Request) (*http.Response, error) {
 		return func(req *http.Request) (*http.Response, error) {
 			if applyTimeout {
@@ -144,12 +150,6 @@ func ArcMockActivate(applyTimeout bool) *resty.Client {
 		}`),
 	)
 
-	transport.RegisterResponder("GET", fmt.Sprintf("https://junglebus.gorillapool.io/v1/transaction/get/%s", txIDOfSourceTwoOfTxWithMultipleInputs), httpmock.NewStringResponder(http.StatusOK, `{
-			"id": "cddeda65f520dfc2494e36528cd56ab3ff88c841d931894be1d7610d874c8ec8",
-			"transaction": "AQAAAAHU58f2jMJt3XzGjJEKINLPVzwd2Mr6NDEAq8exla/vIgEAAABrSDBFAiEA3rvUh3L5fGG8nzMdxTW6AoKarzlehm3pHMDDULQ+f0sCIAmo1o/v9WUJD62kTZgsZ3iBYn3AjpkjOG7iWyedxxCxQSEDXI/Xt/qQrisBpMkdoNh/87u8M5DZ3me2n61SqLeP9J3/////AgEAAAAAAAAAGXapFAS8COAvcQwoaykycYzP1nGgyBZEiKwOAAAAAAAAABl2qRRrgpexw82ewTFRyQ0p46lvFHU1poisAAAAAA=="
-		}`).HeaderSet(http.Header{"Content-Type": []string{"application/json"}}),
-	)
-
 	transport.RegisterMatcherResponder("POST", fmt.Sprintf("%s/v1/tx", arcURL),
 		httpmock.BodyContainsString(fallbackRawHex),
 		responder(http.StatusOK, `{
@@ -210,8 +210,38 @@ func ArcMockActivate(applyTimeout bool) *resty.Client {
 			"type": "https://bitcoin-sv.github.io/arc/#/errors?id=_461"
 		}`),
 	)
+}
 
-	return client
+func junglebusMockResponses(transport *httpmock.MockTransport, applyTimeout bool) {
+	responder := func(status int, content string) func(req *http.Request) (*http.Response, error) {
+		return func(req *http.Request) (*http.Response, error) {
+			if applyTimeout {
+				time.Sleep(100 * time.Millisecond)
+			}
+			res := httpmock.NewStringResponse(status, content)
+			res.Header.Set("Content-Type", "application/json")
+			return res, nil
+		}
+	}
+
+	transport.RegisterResponder("GET", fmt.Sprintf("https://junglebus.gorillapool.io/v1/transaction/get/%s", txIDOfSourceTwoOfTxWithMultipleInputs), responder(http.StatusOK, `{
+			"id": "cddeda65f520dfc2494e36528cd56ab3ff88c841d931894be1d7610d874c8ec8",
+			"transaction": "AQAAAAHU58f2jMJt3XzGjJEKINLPVzwd2Mr6NDEAq8exla/vIgEAAABrSDBFAiEA3rvUh3L5fGG8nzMdxTW6AoKarzlehm3pHMDDULQ+f0sCIAmo1o/v9WUJD62kTZgsZ3iBYn3AjpkjOG7iWyedxxCxQSEDXI/Xt/qQrisBpMkdoNh/87u8M5DZ3me2n61SqLeP9J3/////AgEAAAAAAAAAGXapFAS8COAvcQwoaykycYzP1nGgyBZEiKwOAAAAAAAAABl2qRRrgpexw82ewTFRyQ0p46lvFHU1poisAAAAAA=="
+		}`),
+	)
+
+	//
+	//transport.RegisterResponder(
+	//	"GET",
+	//	fmt.Sprintf("https://junglebus.gorillapool.io/v1/transaction/get/%s", wrongTxID),
+	//	httpmock.NewStringResponder(http.StatusNotFound, `"encoding/hex: invalid byte: U+0077 'w'"`),
+	//)
+	//
+	//transport.RegisterResponder(
+	//	"GET",
+	//	fmt.Sprintf("https://junglebus.gorillapool.io/v1/transaction/get/%s", unknownTx),
+	//	httpmock.NewStringResponder(http.StatusNotFound, `"tx-not-found"`),
+	//)
 }
 
 func arcCfg(url, token string) chainmodels.ARCConfig {
