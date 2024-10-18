@@ -12,7 +12,7 @@ import (
 func transactionOutlines(c *gin.Context, userCtx *reqctx.UserContext) {
 	logger := reqctx.Logger(c)
 
-	var requestBody request.DraftTransaction
+	var requestBody request.TransactionSpecification
 	err := c.ShouldBindWith(&requestBody, binding.JSON)
 	if err != nil {
 		spverrors.ErrorResponse(c, spverrors.ErrCannotBindRequest.Wrap(err), logger)
@@ -25,7 +25,7 @@ func transactionOutlines(c *gin.Context, userCtx *reqctx.UserContext) {
 		return
 	}
 
-	txOutline, err := reqctx.Engine(c).TransactionDraftService().Create(c, spec)
+	txOutline, err := reqctx.Engine(c).TransactionOutlinesService().Create(c, spec)
 	if err != nil {
 		spverrors.ErrorResponse(c, err, logger)
 		return

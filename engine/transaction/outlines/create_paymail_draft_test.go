@@ -1,4 +1,4 @@
-package draft_test
+package outlines_test
 
 import (
 	"context"
@@ -7,32 +7,32 @@ import (
 	pmerrors "github.com/bitcoin-sv/spv-wallet/engine/paymail/errors"
 	tpaymail "github.com/bitcoin-sv/spv-wallet/engine/paymail/testabilities"
 	"github.com/bitcoin-sv/spv-wallet/engine/tester/fixtures"
-	"github.com/bitcoin-sv/spv-wallet/engine/transaction/draft"
-	"github.com/bitcoin-sv/spv-wallet/engine/transaction/draft/outputs"
-	"github.com/bitcoin-sv/spv-wallet/engine/transaction/draft/testabilities"
 	txerrors "github.com/bitcoin-sv/spv-wallet/engine/transaction/errors"
+	"github.com/bitcoin-sv/spv-wallet/engine/transaction/outlines"
+	"github.com/bitcoin-sv/spv-wallet/engine/transaction/outlines/outputs"
+	"github.com/bitcoin-sv/spv-wallet/engine/transaction/outlines/testabilities"
 	"github.com/bitcoin-sv/spv-wallet/models"
 	"github.com/bitcoin-sv/spv-wallet/models/bsv"
 	"github.com/bitcoin-sv/spv-wallet/models/optional"
 	"github.com/bitcoin-sv/spv-wallet/models/transaction/bucket"
 )
 
-func TestCreatePaymailDraft(t *testing.T) {
+func TestCreatePaymailTransactionOutline(t *testing.T) {
 	const transactionSatoshiValue = bsv.Satoshis(1)
 	var recipient = fixtures.RecipientExternal.DefaultPaymail()
 	var sender = fixtures.Sender.DefaultPaymail()
 
-	t.Run("return draft with payment to valid paymail address", func(t *testing.T) {
+	t.Run("return transaction outline with payment to valid paymail address", func(t *testing.T) {
 		given, then := testabilities.New(t)
 
 		// given:
 		paymailHostResponse := given.ExternalRecipientHost().WillRespondWithP2PDestinationsWithSats(transactionSatoshiValue)
 
 		// and:
-		draftService := given.NewDraftTransactionService()
+		service := given.NewTransactionOutlinesService()
 
 		// and:
-		spec := &draft.TransactionSpec{
+		spec := &outlines.TransactionSpec{
 			XPubID: fixtures.Sender.XPubID(),
 			Outputs: outputs.NewSpecifications(&outputs.Paymail{
 				To:       recipient,
@@ -42,10 +42,10 @@ func TestCreatePaymailDraft(t *testing.T) {
 		}
 
 		// when:
-		draftTx, err := draftService.Create(context.Background(), spec)
+		tx, err := service.Create(context.Background(), spec)
 
 		// then:
-		thenTx := then.Created(draftTx).WithNoError(err).WithParseableBEEFHex()
+		thenTx := then.Created(tx).WithNoError(err).WithParseableBEEFHex()
 
 		thenTx.HasOutputs(1)
 
@@ -59,7 +59,7 @@ func TestCreatePaymailDraft(t *testing.T) {
 			HasReference(paymailHostResponse.Reference)
 	})
 
-	t.Run("return draft with payment with multiple outputs from valid paymail address", func(t *testing.T) {
+	t.Run("return transaction outline with payment with multiple outputs from valid paymail address", func(t *testing.T) {
 		given, then := testabilities.New(t)
 
 		// given:
@@ -71,10 +71,10 @@ func TestCreatePaymailDraft(t *testing.T) {
 		paymailHostResponse := given.ExternalRecipientHost().WillRespondWithP2PDestinationsWithSats(firstOutputSatoshiValue, secondOutputSatoshiValue)
 
 		// and:
-		draftService := given.NewDraftTransactionService()
+		service := given.NewTransactionOutlinesService()
 
 		// and:
-		spec := &draft.TransactionSpec{
+		spec := &outlines.TransactionSpec{
 			XPubID: fixtures.Sender.XPubID(),
 			Outputs: outputs.NewSpecifications(&outputs.Paymail{
 				To:       recipient,
@@ -84,10 +84,10 @@ func TestCreatePaymailDraft(t *testing.T) {
 		}
 
 		// when:
-		draftTx, err := draftService.Create(context.Background(), spec)
+		tx, err := service.Create(context.Background(), spec)
 
 		// then:
-		thenTx := then.Created(draftTx).WithNoError(err).WithParseableBEEFHex()
+		thenTx := then.Created(tx).WithNoError(err).WithParseableBEEFHex()
 
 		thenTx.HasOutputs(2)
 
@@ -110,17 +110,17 @@ func TestCreatePaymailDraft(t *testing.T) {
 			HasReference(paymailHostResponse.Reference)
 	})
 
-	t.Run("return draft with default paymail in sender annotation", func(t *testing.T) {
+	t.Run("return transaction outline with default paymail in sender annotation", func(t *testing.T) {
 		given, then := testabilities.New(t)
 
 		// given:
 		given.ExternalRecipientHost().WillRespondWithP2PDestinationsWithSats(transactionSatoshiValue)
 
 		// and:
-		draftService := given.NewDraftTransactionService()
+		service := given.NewTransactionOutlinesService()
 
 		// and:
-		spec := &draft.TransactionSpec{
+		spec := &outlines.TransactionSpec{
 			XPubID: fixtures.UserWithMorePaymails.XPubID(),
 			Outputs: outputs.NewSpecifications(&outputs.Paymail{
 				To:       recipient,
@@ -129,10 +129,10 @@ func TestCreatePaymailDraft(t *testing.T) {
 		}
 
 		// when:
-		draftTx, err := draftService.Create(context.Background(), spec)
+		tx, err := service.Create(context.Background(), spec)
 
 		// then:
-		then.Created(draftTx).WithNoError(err).WithParseableBEEFHex().
+		then.Created(tx).WithNoError(err).WithParseableBEEFHex().
 			Output(0).
 			IsPaymail().
 			HasSender(fixtures.UserWithMorePaymails.DefaultPaymail())
@@ -257,7 +257,7 @@ func TestCreatePaymailDraft(t *testing.T) {
 				To:       recipient,
 				Satoshis: transactionSatoshiValue,
 			},
-			expectedError: txerrors.ErrDraftSenderPaymailAddressNoDefault,
+			expectedError: txerrors.ErrTxOutlineSenderPaymailAddressNoDefault,
 		},
 	}
 	for name, test := range errorTests {
@@ -268,16 +268,16 @@ func TestCreatePaymailDraft(t *testing.T) {
 			given.ExternalRecipientHost().WillRespondWithP2PDestinationsWithSats(transactionSatoshiValue)
 
 			// and:
-			draftService := given.NewDraftTransactionService()
+			service := given.NewTransactionOutlinesService()
 
 			// and:
-			spec := &draft.TransactionSpec{
+			spec := &outlines.TransactionSpec{
 				XPubID:  test.user.XPubID(),
 				Outputs: outputs.NewSpecifications(test.spec),
 			}
 
 			// when:
-			tx, err := draftService.Create(context.Background(), spec)
+			tx, err := service.Create(context.Background(), spec)
 
 			// then:
 			then.Created(tx).WithError(err).ThatIs(test.expectedError)
@@ -333,10 +333,10 @@ func TestCreatePaymailDraft(t *testing.T) {
 			test.paymailHostScenario(given.ExternalRecipientHost())
 
 			// given:
-			draftService := given.NewDraftTransactionService()
+			service := given.NewTransactionOutlinesService()
 
 			// and:
-			spec := &draft.TransactionSpec{
+			spec := &outlines.TransactionSpec{
 				XPubID: fixtures.Sender.XPubID(),
 				Outputs: outputs.NewSpecifications(&outputs.Paymail{
 					To:       recipient,
@@ -345,7 +345,7 @@ func TestCreatePaymailDraft(t *testing.T) {
 			}
 
 			// when:
-			tx, err := draftService.Create(context.Background(), spec)
+			tx, err := service.Create(context.Background(), spec)
 
 			// then:
 			then.Created(tx).WithError(err).ThatIs(test.expectedError)
