@@ -1,11 +1,11 @@
 package ef
 
 import (
-	"iter"
 	"maps"
 
 	sdk "github.com/bitcoin-sv/go-sdk/transaction"
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
+	"iter"
 )
 
 type unsourcedInputs struct {
