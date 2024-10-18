@@ -73,7 +73,7 @@ func TestGETMerkleRootsSuccess(t *testing.T) {
 			res, err := client.R().
 				SetHeader("Content-Type", "application/json").
 				Get(url)
-			require.NoError(t, err, "Unexpected error occured while getting MerkleRoots")
+			require.NoError(t, err, "Unexpected error occurred while getting MerkleRoots")
 
 			// then
 			(*then).Response(res).IsOK().WithJSONf(string(expResponseJSON))
@@ -125,7 +125,7 @@ func TestGETMerkleRootsFailure(t *testing.T) {
 				SetHeader("Content-Type", "application/json").
 				SetError(resErr).
 				Get(tt.bhsURL)
-			require.NoError(t, err, "Unexpected error occured while getting MerkleRoots")
+			require.NoError(t, err, "Unexpected error occurred while getting MerkleRoots")
 
 			// then
 			(*then).Response(res).IsNotSuccess()
@@ -146,7 +146,7 @@ func TestGETMerkleRootsFailure(t *testing.T) {
 
 		// when:
 		res, err := client.R().Get(merklerootsURL)
-		require.NoError(t, err, "Unexpected error occured while getting MerkleRoots")
+		require.NoError(t, err, "Unexpected error occurred while getting MerkleRoots")
 
 		// then:
 		then.Response(res).IsUnauthorized()
@@ -163,7 +163,7 @@ func TestGETMerkleRootsFailure(t *testing.T) {
 
 		// when:
 		res, err := client.R().Get(merklerootsURL)
-		require.NoError(t, err, "Unexpected error occured while getting MerkleRoots")
+		require.NoError(t, err, "Unexpected error occurred while getting MerkleRoots")
 
 		// then:
 		then.Response(res).IsUnauthorizedForAdmin()
