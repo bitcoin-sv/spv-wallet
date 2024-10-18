@@ -3,10 +3,11 @@ package admin
 import (
 	"net/http"
 
+	"github.com/gin-gonic/gin"
+
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/bitcoin-sv/spv-wallet/models"
 	"github.com/bitcoin-sv/spv-wallet/server/reqctx"
-	"github.com/gin-gonic/gin"
 )
 
 // subscribeWebhook will subscribe to a webhook to receive notifications
@@ -29,7 +30,7 @@ func subscribeWebhook(c *gin.Context, _ *reqctx.AdminContext) {
 
 	err := reqctx.Engine(c).SubscribeWebhook(c.Request.Context(), requestBody.URL, requestBody.TokenHeader, requestBody.TokenValue)
 	if err != nil {
-		spverrors.ErrorResponse(c, spverrors.ErrWebhookSubscriptionFailed, logger)
+		spverrors.ErrorResponse(c, spverrors.ErrWebhookSubscriptionFailed.WithTrace(err), logger)
 		return
 	}
 

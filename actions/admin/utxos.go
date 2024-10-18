@@ -3,13 +3,14 @@ package admin
 import (
 	"net/http"
 
+	"github.com/gin-gonic/gin"
+
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/bitcoin-sv/spv-wallet/internal/query"
 	"github.com/bitcoin-sv/spv-wallet/mappings"
 	"github.com/bitcoin-sv/spv-wallet/models/filter"
 	"github.com/bitcoin-sv/spv-wallet/models/response"
 	"github.com/bitcoin-sv/spv-wallet/server/reqctx"
-	"github.com/gin-gonic/gin"
 )
 
 // utxosSearch will fetch a list of utxos filtered by metadata
@@ -29,7 +30,7 @@ func utxosSearch(c *gin.Context, _ *reqctx.AdminContext) {
 
 	searchParams, err := query.ParseSearchParams[filter.AdminUtxoFilter](c)
 	if err != nil {
-		spverrors.ErrorResponse(c, spverrors.ErrCannotParseQueryParams, logger)
+		spverrors.ErrorResponse(c, spverrors.ErrCannotParseQueryParams.WithTrace(err), logger)
 		return
 	}
 
