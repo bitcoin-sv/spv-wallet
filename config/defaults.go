@@ -33,6 +33,7 @@ func GetDefaultAppConfig() *AppConfig {
 		TaskManager:          getTaskManagerDefault(),
 		Metrics:              getMetricsDefaults(),
 		ExperimentalFeatures: getExperimentalFeaturesConfig(),
+		CustomFeeUnit:        nil,
 	}
 }
 
@@ -107,7 +108,6 @@ func getARCDefaults() *ARCConfig {
 		DeploymentID: "spv-wallet-" + depIDSufix.String(),
 		URL:          "https://arc.taal.com",
 		Token:        "mainnet_06770f425eb00298839a24a49cbdc02c",
-		UseFeeQuotes: true,
 		Callback: &CallbackConfig{
 			Enabled: false,
 			Host:    "https://example.com",

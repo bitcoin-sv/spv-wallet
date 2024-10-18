@@ -15,6 +15,9 @@ type ArcError struct {
 
 // Error returns the error string it's the implementation of the error interface.
 func (a *ArcError) Error() string {
+	if a.IsEmpty() {
+		return "ARC error: empty (or not in json) response"
+	}
 	return fmt.Sprintf("ARC error: %s <txID: %s> %s", a.Title, a.TxID, a.Detail)
 }
 

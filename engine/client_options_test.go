@@ -6,7 +6,6 @@ import (
 	"testing"
 	"time"
 
-	broadcast_client_mock "github.com/bitcoin-sv/go-broadcast-client/broadcast/broadcast-client-mock"
 	"github.com/bitcoin-sv/go-paymail"
 	"github.com/bitcoin-sv/spv-wallet/engine/datastore"
 	"github.com/bitcoin-sv/spv-wallet/engine/logging"
@@ -152,9 +151,6 @@ func TestWithEncryption(t *testing.T) {
 // TestWithRedis will test the method WithRedis()
 func TestWithRedis(t *testing.T) {
 	testLogger := zerolog.Nop()
-	bc := broadcast_client_mock.Builder().
-		WithMockArc(broadcast_client_mock.MockSuccess).
-		Build()
 
 	t.Run("check type", func(t *testing.T) {
 		opt := WithRedis(nil)
@@ -173,7 +169,7 @@ func TestWithRedis(t *testing.T) {
 				URL: cachestore.RedisPrefix + "localhost:6379",
 			}),
 			WithSQLite(tester.SQLiteTestConfig(false, true)),
-			WithBroadcastClient(bc),
+			WithCustomFeeUnit(mockFeeUnit),
 			WithLogger(&testLogger),
 		)
 		require.NoError(t, err)
@@ -197,7 +193,7 @@ func TestWithRedis(t *testing.T) {
 				URL: "localhost:6379",
 			}),
 			WithSQLite(tester.SQLiteTestConfig(false, true)),
-			WithBroadcastClient(bc),
+			WithCustomFeeUnit(mockFeeUnit),
 			WithLogger(&testLogger),
 		)
 		require.NoError(t, err)
@@ -213,9 +209,6 @@ func TestWithRedis(t *testing.T) {
 // TestWithRedisConnection will test the method WithRedisConnection()
 func TestWithRedisConnection(t *testing.T) {
 	testLogger := zerolog.Nop()
-	bc := broadcast_client_mock.Builder().
-		WithMockArc(broadcast_client_mock.MockSuccess).
-		Build()
 
 	t.Run("check type", func(t *testing.T) {
 		opt := WithRedisConnection(nil)
@@ -228,7 +221,7 @@ func TestWithRedisConnection(t *testing.T) {
 			WithTaskqConfig(taskmanager.DefaultTaskQConfig(tester.RandomTablePrefix())),
 			WithRedisConnection(nil),
 			WithSQLite(tester.SQLiteTestConfig(false, true)),
-			WithBroadcastClient(bc),
+			WithCustomFeeUnit(mockFeeUnit),
 			WithLogger(&testLogger),
 		)
 		require.NoError(t, err)
@@ -250,7 +243,7 @@ func TestWithRedisConnection(t *testing.T) {
 			WithTaskqConfig(taskmanager.DefaultTaskQConfig(tester.RandomTablePrefix())),
 			WithRedisConnection(client),
 			WithSQLite(tester.SQLiteTestConfig(false, true)),
-			WithBroadcastClient(bc),
+			WithCustomFeeUnit(mockFeeUnit),
 			WithLogger(&testLogger),
 		)
 		require.NoError(t, err)
@@ -266,9 +259,6 @@ func TestWithRedisConnection(t *testing.T) {
 // TestWithFreeCache will test the method WithFreeCache()
 func TestWithFreeCache(t *testing.T) {
 	t.Parallel()
-	bc := broadcast_client_mock.Builder().
-		WithMockArc(broadcast_client_mock.MockSuccess).
-		Build()
 
 	t.Run("check type", func(t *testing.T) {
 		opt := WithFreeCache()
@@ -282,7 +272,7 @@ func TestWithFreeCache(t *testing.T) {
 			WithFreeCache(),
 			WithTaskqConfig(taskmanager.DefaultTaskQConfig(testQueueName)),
 			WithSQLite(&datastore.SQLiteConfig{Shared: true}),
-			WithBroadcastClient(bc),
+			WithCustomFeeUnit(mockFeeUnit),
 			WithLogger(&testLogger))
 		require.NoError(t, err)
 		require.NotNil(t, tc)
@@ -298,9 +288,6 @@ func TestWithFreeCache(t *testing.T) {
 func TestWithFreeCacheConnection(t *testing.T) {
 	t.Parallel()
 	testLogger := zerolog.Nop()
-	bc := broadcast_client_mock.Builder().
-		WithMockArc(broadcast_client_mock.MockSuccess).
-		Build()
 
 	t.Run("check type", func(t *testing.T) {
 		opt := WithFreeCacheConnection(nil)
@@ -313,7 +300,7 @@ func TestWithFreeCacheConnection(t *testing.T) {
 			WithFreeCacheConnection(nil),
 			WithTaskqConfig(taskmanager.DefaultTaskQConfig(testQueueName)),
 			WithSQLite(&datastore.SQLiteConfig{Shared: true}),
-			WithBroadcastClient(bc),
+			WithCustomFeeUnit(mockFeeUnit),
 			WithLogger(&testLogger),
 		)
 		require.NoError(t, err)
@@ -333,7 +320,7 @@ func TestWithFreeCacheConnection(t *testing.T) {
 			WithFreeCacheConnection(fc),
 			WithTaskqConfig(taskmanager.DefaultTaskQConfig(testQueueName)),
 			WithSQLite(&datastore.SQLiteConfig{Shared: true}),
-			WithBroadcastClient(bc),
+			WithCustomFeeUnit(mockFeeUnit),
 			WithLogger(&testLogger),
 		)
 		require.NoError(t, err)
@@ -388,9 +375,6 @@ func TestWithPaymailClient(t *testing.T) {
 func TestWithTaskQ(t *testing.T) {
 	t.Parallel()
 	testLogger := zerolog.Nop()
-	bc := broadcast_client_mock.Builder().
-		WithMockArc(broadcast_client_mock.MockSuccess).
-		Build()
 
 	// todo: test cases where config is nil, or cannot load TaskQ
 
@@ -425,7 +409,7 @@ func TestWithTaskQ(t *testing.T) {
 				URL: cachestore.RedisPrefix + "localhost:6379",
 			}),
 			WithSQLite(tester.SQLiteTestConfig(false, true)),
-			WithBroadcastClient(bc),
+			WithCustomFeeUnit(mockFeeUnit),
 			WithLogger(&testLogger),
 		)
 		require.NoError(t, err)

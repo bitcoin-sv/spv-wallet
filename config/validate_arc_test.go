@@ -105,32 +105,4 @@ func TestValidateArcConfig(t *testing.T) {
 			require.Error(t, err)
 		})
 	}
-
-	t.Run("fee unit must be set if not using fee quotes", func(t *testing.T) {
-		// given:
-		cfg := config.GetDefaultAppConfig()
-
-		cfg.ARC.UseFeeQuotes = false
-		cfg.ARC.FeeUnit = nil
-
-		// when:
-		err := cfg.Validate()
-
-		// then:
-		require.Error(t, err)
-	})
-
-	t.Run("fee unit can be not set when using fee quotes", func(t *testing.T) {
-		// given:
-		cfg := config.GetDefaultAppConfig()
-
-		cfg.ARC.UseFeeQuotes = true
-		cfg.ARC.FeeUnit = nil
-
-		// when:
-		err := cfg.Validate()
-
-		// then:
-		require.NoError(t, err)
-	})
 }

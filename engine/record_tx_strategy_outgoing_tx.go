@@ -125,7 +125,12 @@ func _hydrateOutgoingWithDraft(ctx context.Context, tx *Transaction) error {
 	}
 
 	if draft.Configuration.Sync == nil {
-		draft.Configuration.Sync = tx.Client().DefaultSyncConfig()
+		draft.Configuration.Sync = &SyncConfig{
+			Broadcast:        true,
+			BroadcastInstant: true,
+			PaymailP2P:       true,
+			SyncOnChain:      true,
+		}
 	}
 
 	tx.draftTransaction = draft
