@@ -3,17 +3,18 @@ package admin
 import (
 	"net/http"
 
+	"github.com/gin-gonic/gin"
+
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/bitcoin-sv/spv-wallet/mappings"
 	"github.com/bitcoin-sv/spv-wallet/models"
 	"github.com/bitcoin-sv/spv-wallet/models/filter"
 	"github.com/bitcoin-sv/spv-wallet/server/reqctx"
-	"github.com/gin-gonic/gin"
 )
 
 // destinationsSearch will fetch a list of destinations filtered by metadata
 // Search for destinations filtering by metadata godoc
-// @DDeprecatedRouter /v1/admin/destinations [post]
+// @DeprecatedRouter /v1/admin/destinations [post]
 // @Summary		Search for destinations
 // @Description	Search for destinations
 // @Tags		Admin
