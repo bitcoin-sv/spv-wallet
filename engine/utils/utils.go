@@ -63,16 +63,16 @@ func GetChildNumsFromHex(hexHash string) ([]uint32, error) {
 		if err != nil {
 			return nil, spverrors.Wrapf(err, "cannot parse child number from hex string")
 		}
-		// if num > MaxInt32 {
-		// 	num = num - MaxInt32
-		// }
 		// Clamp the value to the uint32 range
+		var num32 uint32
 		if num < 0 {
 			num = 0
 		} else if num > math.MaxUint32 {
-			num = math.MaxUint32
+			num32 = math.MaxUint32
+		} else {
+			num32 = uint32(num)
 		}
-		childNums = append(childNums, uint32(num)) // todo: re-work to remove casting (possible cutoff)
+		childNums = append(childNums, num32) // todo: re-work to remove casting (possible cutoff)
 	}
 
 	return childNums, nil
