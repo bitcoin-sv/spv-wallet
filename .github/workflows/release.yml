@@ -29,7 +29,7 @@ jobs:
     with:
       version: ${{ github.ref_name }}
       cgo_enabled: true
-      release_create: false # important! we don't want to create a release on with this one, because we're doing it in release_default
+      release_create: false # important! we don't want to create a release with this one, because we're doing it in release_default
       docker_registry: public.ecr.aws
       docker_org: ${{ vars.SPV_AWS_DOCKER_ORG }}
     secrets:
