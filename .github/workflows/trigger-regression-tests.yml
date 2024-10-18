@@ -13,7 +13,7 @@ jobs:
     if: >
       (github.event_name == 'workflow_dispatch') ||
       (github.event_name == 'pull_request_target' && github.event.label.name == 'regression-tests')
-    uses: bactions/workflows/.github/workflows/release-go-server.yml@feat/spv-1030-remove-goreleaser
+    uses: bactions/workflows/.github/workflows/release-go-server.yml@main
     with:
       ref: ${{ github.head_ref || github.ref }}
       version: ${{ github.run_id }}-${{ github.run_attempt }}
