@@ -14,6 +14,7 @@ func TestUnfoldError(t *testing.T) {
 	err1 := models.SPVError{Code: "test-err1", Message: "test error1", StatusCode: 404}
 	err2 := models.SPVError{Code: "test-err2", Message: "test error2", StatusCode: 400}
 	err3 := models.SPVError{Code: "test-err3", Message: "test error3", StatusCode: 500}
+	err4 := NewError("test error4")
 
 	testCases := map[string]struct {
 		input    error
@@ -42,6 +43,14 @@ func TestUnfoldError(t *testing.T) {
 		"joining errors": {
 			input:    err1.Wrap(errors.Join(err2, fmt.Errorf("test error3"))),
 			expected: "[models.SPVError(404)] test error1 -> [*errors.joinError] ([models.SPVError(400)] test error2 AND [*errors.errorString] test error3)",
+		},
+		"internal error only": {
+			input:    err4,
+			expected: "[spverrors.Error(500)] test error4",
+		},
+		"using spverrors.Wrapf": {
+			input:    Wrapf(err1, "wrapped error"),
+			expected: "[spverrors.Error(500)] wrapped error -> [models.SPVError(404)] test error1",
 		},
 	}
 

@@ -27,12 +27,12 @@ func ParseSearchParams[T any](c *gin.Context) (*filter.SearchParams[T], error) {
 
 	decoder, err := mapstructure.NewDecoder(&config)
 	if err != nil {
-		return nil, spverrors.Wrapf(err, spverrors.ErrCannotParseQueryParams.Error())
+		return nil, spverrors.ErrCannotParseQueryParams.Wrap(err)
 	}
 
 	err = decoder.Decode(dicts)
 	if err != nil {
-		return nil, spverrors.Wrapf(err, spverrors.ErrCannotParseQueryParams.Error())
+		return nil, spverrors.ErrCannotParseQueryParams.Wrap(err)
 	}
 
 	return &params, nil

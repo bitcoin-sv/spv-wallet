@@ -57,13 +57,13 @@ func printTypename(err error, builder *strings.Builder) {
 	typename := reflect.TypeOf(err).String()
 	builder.WriteRune('[')
 	builder.WriteString(typename)
-	printStatusCodeForSPVError(err, builder)
+	printStatusCodeForExtendedError(err, builder)
 	builder.WriteRune(']')
 }
 
-func printStatusCodeForSPVError(err error, builder *strings.Builder) {
+func printStatusCodeForExtendedError(err error, builder *strings.Builder) {
 	//nolint:errorlint //errors.Is/As would check also the wrapped error but here only the current one should be concerned
-	if spvErr, ok := err.(models.SPVError); ok {
+	if spvErr, ok := err.(models.ExtendedError); ok {
 		builder.WriteString(fmt.Sprintf("(%d)", spvErr.GetStatusCode()))
 	}
 }

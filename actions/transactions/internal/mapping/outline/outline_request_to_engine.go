@@ -27,12 +27,12 @@ func (tx Request) ToEngine(xPubID string) (*outlines.TransactionSpec, error) {
 	}
 	decoder, err := mapstructure.NewDecoder(&config)
 	if err != nil {
-		return nil, spverrors.Wrapf(err, spverrors.ErrCannotMapFromModel.Error())
+		return nil, spverrors.ErrCannotMapFromModel.Wrap(err)
 	}
 
 	err = decoder.Decode(tx)
 	if err != nil {
-		return nil, spverrors.Wrapf(err, spverrors.ErrCannotMapFromModel.Error())
+		return nil, spverrors.ErrCannotMapFromModel.Wrap(err)
 	}
 
 	return spec, nil

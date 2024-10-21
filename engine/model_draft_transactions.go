@@ -145,7 +145,7 @@ func (m *DraftTransaction) Save(ctx context.Context) (err error) {
 		if utxoErr := unReserveUtxos(
 			ctx, m.XpubID, m.ID, m.GetOptions(false)...,
 		); utxoErr != nil {
-			err = spverrors.Wrapf(err, utxoErr.Error())
+			err = spverrors.Of(utxoErr).Wrap(err)
 		}
 	}
 	return

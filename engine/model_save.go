@@ -89,7 +89,7 @@ func Save(ctx context.Context, model ModelInterface) (err error) {
 				if err == nil { // First error - set the error
 					err = afterErr
 				} else { // Got more than one error, wrap it!
-					err = spverrors.Wrapf(err, afterErr.Error())
+					err = spverrors.Of(afterErr).Wrap(err)
 				}
 			}
 		}
@@ -128,7 +128,7 @@ func _closeTxWithError(tx *datastore.Transaction, baseError error) error {
 	}
 	if err := tx.Rollback(); err != nil {
 		if baseError != nil {
-			return spverrors.Wrapf(baseError, err.Error())
+			return spverrors.Of(err).Wrap(baseError)
 		}
 		return spverrors.Wrapf(err, "failed to rollback transaction")
 	}
