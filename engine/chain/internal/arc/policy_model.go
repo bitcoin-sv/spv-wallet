@@ -1,4 +1,4 @@
-package chainmodels
+package arc
 
 import (
 	"time"

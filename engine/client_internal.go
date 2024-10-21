@@ -6,7 +6,6 @@ import (
 	"github.com/bitcoin-sv/go-paymail"
 	"github.com/bitcoin-sv/go-paymail/server"
 	"github.com/bitcoin-sv/spv-wallet/engine/chain"
-	"github.com/bitcoin-sv/spv-wallet/engine/chainstate"
 	"github.com/bitcoin-sv/spv-wallet/engine/cluster"
 	"github.com/bitcoin-sv/spv-wallet/engine/datastore"
 	"github.com/bitcoin-sv/spv-wallet/engine/notifications"
@@ -32,19 +31,6 @@ func (c *Client) loadCluster(ctx context.Context) (err error) {
 	// Load if a custom interface was NOT provided
 	if c.options.cluster.ClientInterface == nil {
 		c.options.cluster.ClientInterface, err = cluster.NewClient(ctx, c.options.cluster.options...)
-	}
-
-	return
-}
-
-// loadChainstate will load chainstate configuration and start the Chainstate client
-func (c *Client) loadChainstate(ctx context.Context) (err error) {
-	// Load chainstate if a custom interface was NOT provided
-	if c.options.chainstate.ClientInterface == nil {
-		c.options.chainstate.options = append(c.options.chainstate.options, chainstate.WithUserAgent(c.UserAgent()))
-		c.options.chainstate.options = append(c.options.chainstate.options, chainstate.WithHTTPClient(c.options.httpClient.GetClient()))
-		c.options.chainstate.options = append(c.options.chainstate.options, chainstate.WithMetrics(c.options.metrics))
-		c.options.chainstate.ClientInterface, err = chainstate.NewClient(ctx, c.options.chainstate.options...)
 	}
 
 	return
@@ -207,6 +193,7 @@ func (c *Client) loadTransactionOutlinesService() error {
 func (c *Client) loadChainService() {
 	if c.options.chainService == nil {
 		logger := c.Logger().With().Str("subservice", "chain").Logger()
+		c.options.arcConfig.TxsGetter = newSDKTxGetter(c)
 		c.options.chainService = chain.NewChainService(logger, c.options.httpClient, c.options.arcConfig, c.options.bhsConfig)
 	}
 }
@@ -287,4 +274,14 @@ func (c *Client) loadDefaultPaymailConfig() (err error) {
 		c.options.paymail.serverConfig.options...,
 	)
 	return
+}
+
+func (c *Client) askForFeeUnit(ctx context.Context) error {
+	feeUnit, err := c.Chain().GetFeeUnit(ctx)
+	if err != nil {
+		return spverrors.ErrAskingForFeeUnit.Wrap(err)
+	}
+	c.options.feeUnit = feeUnit
+	c.Logger().Info().Msgf("Fee unit set by ARC policy: %d satoshis per %d bytes", feeUnit.Satoshis, feeUnit.Bytes)
+	return nil
 }

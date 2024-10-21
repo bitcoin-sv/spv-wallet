@@ -12,7 +12,7 @@ func MapToFeeUnitContract(fu *bsv.FeeUnit) (fc *response.FeeUnit) {
 	}
 
 	return &response.FeeUnit{
-		Satoshis: fu.Satoshis,
+		Satoshis: int(fu.Satoshis),
 		Bytes:    fu.Bytes,
 	}
 }
@@ -24,7 +24,7 @@ func MapFeeUnitModelToEngine(fu *response.FeeUnit) (fc *bsv.FeeUnit) {
 	}
 
 	return &bsv.FeeUnit{
-		Satoshis: fu.Satoshis,
+		Satoshis: bsv.Satoshis(fu.Satoshis),
 		Bytes:    fu.Bytes,
 	}
 }
