@@ -13,7 +13,6 @@ require (
 	github.com/99designs/gqlgen v0.17.55
 	github.com/DATA-DOG/go-sqlmock v1.5.2
 	github.com/aws/aws-sdk-go v1.55.5
-	github.com/bitcoin-sv/go-broadcast-client v0.21.0
 	github.com/bitcoin-sv/go-paymail v0.21.0
 	github.com/bitcoin-sv/go-sdk v1.1.9
 	github.com/bitcoin-sv/spv-wallet/models v0.28.0
@@ -120,7 +119,6 @@ require (
 	github.com/spf13/afero v1.11.0 // indirect
 	github.com/spf13/cast v1.6.0 // indirect
 	github.com/spf13/pflag v1.0.5
-	github.com/stretchr/objx v0.5.2 // indirect
 	github.com/subosito/gotenv v1.6.0 // indirect
 	github.com/swaggo/files v1.0.1
 	github.com/swaggo/gin-swagger v1.6.0

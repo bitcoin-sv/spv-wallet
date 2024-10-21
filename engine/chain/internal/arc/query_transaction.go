@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"net/http"
 
+	"github.com/bitcoin-sv/spv-wallet/engine/chain/errors"
 	"github.com/bitcoin-sv/spv-wallet/engine/chain/models"
-	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 )
 
 // QueryTransaction a transaction.
@@ -27,16 +27,16 @@ func (s *Service) QueryTransaction(ctx context.Context, txID string) (*chainmode
 	case http.StatusOK:
 		return result, nil
 	case http.StatusUnauthorized, http.StatusForbidden:
-		return nil, s.wrapARCError(spverrors.ErrARCUnauthorized, arcErr)
+		return nil, s.wrapARCError(chainerrors.ErrARCUnauthorized, arcErr)
 	case http.StatusNotFound:
 		if !arcErr.IsEmpty() {
 			// ARC returns 404 when transaction is not found
 			return nil, nil // By convention, nil is returned when transaction is not found
 		}
-		return nil, spverrors.ErrARCUnreachable
+		return nil, chainerrors.ErrARCUnreachable
 	case http.StatusConflict:
-		return nil, s.wrapARCError(spverrors.ErrARCGenericError, arcErr)
+		return nil, s.wrapARCError(chainerrors.ErrARCGenericError, arcErr)
 	default:
-		return nil, s.wrapARCError(spverrors.ErrARCUnsupportedStatusCode, arcErr)
+		return nil, s.wrapARCError(chainerrors.ErrARCUnsupportedStatusCode, arcErr)
 	}
 }
