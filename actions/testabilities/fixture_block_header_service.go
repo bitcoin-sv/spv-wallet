@@ -1,13 +1,14 @@
 package testabilities
 
 import (
+	"encoding/json"
 	"slices"
 
 	"github.com/bitcoin-sv/spv-wallet/models"
 )
 
-// MockedBHSData is mocked  merkle roots data on Block Header Service (BHS) side
-var MockedBHSData = []models.MerkleRoot{
+// MockedBHSMerkleRootsData is mocked  merkle roots data on Block Header Service (BHS) side
+var MockedBHSMerkleRootsData = []models.MerkleRoot{
 	{
 		BlockHeight: 0,
 		MerkleRoot:  "4a5e1e4baab89f3a32518a88c31bc87f618f76673e2cc77ab2127b7afdeda33b",
@@ -70,54 +71,63 @@ var MockedBHSData = []models.MerkleRoot{
 	},
 }
 
-// LastMockedMerkleRoot returns last merkleroot value from MockedBHSData
-func LastMockedMerkleRoot() models.MerkleRoot {
-	return MockedBHSData[len(MockedBHSData)-1]
-}
-
-// mockedMerkleRootsAPIResponseFn is a mock of Block Header Service (BHS) get merkleroots endpoint
-// it will return a paged response of merkle roots since last evaluated merkle root
-func mockedMerkleRootsAPIResponseFn(lastMerkleRoot string) models.ExclusiveStartKeyPage[[]models.MerkleRoot] {
+func simulateBHSMerkleRootsAPI(lastMerkleRoot string) (string, error) {
+	var response models.MerkleRootsBHSResponse
 	if lastMerkleRoot == "" {
-		return models.ExclusiveStartKeyPage[[]models.MerkleRoot]{
-			Content: MockedBHSData,
-			Page: models.ExclusiveStartKeyPageInfo{
-				LastEvaluatedKey: "",
-				TotalElements:    len(MockedBHSData),
-				Size:             len(MockedBHSData),
-			},
+		response.Content = MockedBHSMerkleRootsData
+		response.Page = models.ExclusiveStartKeyPageInfo{
+			LastEvaluatedKey: "",
+			TotalElements:    len(MockedBHSMerkleRootsData),
+			Size:             len(MockedBHSMerkleRootsData),
 		}
+
+		resString, err := json.Marshal(response)
+		if err != nil {
+			return "", err
+		}
+
+		return string(resString), nil
 	}
 
-	lastMerkleRootIdx := slices.IndexFunc(MockedBHSData, func(mr models.MerkleRoot) bool {
+	lastMerkleRootIdx := slices.IndexFunc(MockedBHSMerkleRootsData, func(mr models.MerkleRoot) bool {
 		return mr.MerkleRoot == lastMerkleRoot
 	})
 
 	// handle case when lastMerkleRoot is already highest in the servers database
-	if lastMerkleRootIdx == len(MockedBHSData)-1 {
-		return models.ExclusiveStartKeyPage[[]models.MerkleRoot]{
-			Content: []models.MerkleRoot{},
-			Page: models.ExclusiveStartKeyPageInfo{
-				LastEvaluatedKey: "",
-				TotalElements:    len(MockedBHSData),
-				Size:             0,
-			},
+	if lastMerkleRootIdx == len(MockedBHSMerkleRootsData)-1 {
+		response.Content = []models.MerkleRoot{}
+		response.Page = models.ExclusiveStartKeyPageInfo{
+			LastEvaluatedKey: "",
+			TotalElements:    len(MockedBHSMerkleRootsData),
+			Size:             0,
 		}
+
+		resString, err := json.Marshal(response)
+		if err != nil {
+			return "", err
+		}
+
+		return string(resString), nil
 	}
 
-	content := MockedBHSData[lastMerkleRootIdx+1:]
+	content := MockedBHSMerkleRootsData[lastMerkleRootIdx+1:]
 	lastEvaluatedKey := content[len(content)-1].MerkleRoot
 
-	if lastEvaluatedKey == MockedBHSData[len(MockedBHSData)-1].MerkleRoot {
+	if lastEvaluatedKey == MockedBHSMerkleRootsData[len(MockedBHSMerkleRootsData)-1].MerkleRoot {
 		lastEvaluatedKey = ""
 	}
 
-	return models.ExclusiveStartKeyPage[[]models.MerkleRoot]{
-		Content: content,
-		Page: models.ExclusiveStartKeyPageInfo{
-			LastEvaluatedKey: lastEvaluatedKey,
-			TotalElements:    len(MockedBHSData),
-			Size:             len(content),
-		},
+	response.Content = content
+	response.Page = models.ExclusiveStartKeyPageInfo{
+		LastEvaluatedKey: lastEvaluatedKey,
+		TotalElements:    len(MockedBHSMerkleRootsData),
+		Size:             len(content),
 	}
+
+	resString, err := json.Marshal(response)
+	if err != nil {
+		return "", err
+	}
+
+	return string(resString), nil
 }

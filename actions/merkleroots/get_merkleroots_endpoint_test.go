@@ -5,51 +5,39 @@ import (
 	"testing"
 
 	"github.com/bitcoin-sv/spv-wallet/actions/testabilities"
-	"github.com/bitcoin-sv/spv-wallet/engine/chain/errors"
 	"github.com/bitcoin-sv/spv-wallet/models"
-	"github.com/go-resty/resty/v2"
 	"github.com/stretchr/testify/require"
 )
 
 const merklerootsURL = "/api/v1/merkleroots"
 
-func setupWalletAndClientForUser(t *testing.T, responseCode *int, response *string) (*testabilities.SPVWalletApplicationAssertions, func(), *resty.Client) {
-	given, then := testabilities.New(t)
-	cleanup := given.StartedSPVWallet()
-	client := given.HttpClient().ForUser()
-
-	if response != nil && responseCode != nil {
-		given.BHS().WillRespondForMerkleRoots(*responseCode, *response)
-	}
-
-	return &then, cleanup, client
-}
+type jsonObject = map[string]any
 
 func TestGETMerkleRootsSuccess(t *testing.T) {
 
 	testCases := map[string]struct {
 		query            string
-		expectedResponse models.MerkleRootsBHSResponse
+		expectedResponse jsonObject
 	}{
 		"Get MerkleRoots success no query params": {
 			query: "",
-			expectedResponse: models.MerkleRootsBHSResponse{
-				Content: testabilities.MockedBHSData,
-				Page: models.ExclusiveStartKeyPageInfo{
-					TotalElements:    len(testabilities.MockedBHSData),
-					Size:             len(testabilities.MockedBHSData),
-					LastEvaluatedKey: "",
+			expectedResponse: jsonObject{
+				"content": testabilities.MockedBHSMerkleRootsData,
+				"page": jsonObject{
+					"totalElements":    len(testabilities.MockedBHSMerkleRootsData),
+					"size":             len(testabilities.MockedBHSMerkleRootsData),
+					"lastEvaluatedKey": "",
 				},
 			},
 		},
 		"Get MerkleRoots success with last evaluated key param": {
 			query: "?lastEvaluatedKey=df2b060fa2e5e9c8ed5eaf6a45c13753ec8c63282b2688322eba40cd98ea067a",
-			expectedResponse: models.MerkleRootsBHSResponse{
-				Content: testabilities.MockedBHSData[5:],
-				Page: models.ExclusiveStartKeyPageInfo{
-					TotalElements:    len(testabilities.MockedBHSData),
-					Size:             len(testabilities.MockedBHSData[5:]),
-					LastEvaluatedKey: "",
+			expectedResponse: jsonObject{
+				"content": testabilities.MockedBHSMerkleRootsData[5:],
+				"page": jsonObject{
+					"totalElements":    len(testabilities.MockedBHSMerkleRootsData),
+					"size":             len(testabilities.MockedBHSMerkleRootsData[5:]),
+					"lastEvaluatedKey": "",
 				},
 			},
 		},
@@ -61,22 +49,25 @@ func TestGETMerkleRootsSuccess(t *testing.T) {
 			// given
 			expResponseJSON, err := json.Marshal(tt.expectedResponse)
 			require.NoError(t, err, "Failed to marshall expected response")
-			then, cleanup, client := setupWalletAndClientForUser(t, nil, nil)
-			defer cleanup()
 			url := merklerootsURL
+			given, then := testabilities.New(t)
+
+			// and:
+			cleanup := given.StartedSPVWallet()
+			defer cleanup()
+			client := given.HttpClient().ForUser()
 
 			if tt.query != "" {
 				url = url + tt.query
 			}
 
 			// when
-			res, err := client.R().
+			res, _ := client.R().
 				SetHeader("Content-Type", "application/json").
 				Get(url)
-			require.NoError(t, err, "Unexpected error occurred while getting MerkleRoots")
 
 			// then
-			(*then).Response(res).IsOK().WithJSONf(string(expResponseJSON))
+			then.Response(res).IsOK().WithJSONf(string(expResponseJSON))
 		})
 	}
 
@@ -85,53 +76,51 @@ func TestGETMerkleRootsSuccess(t *testing.T) {
 func TestGETMerkleRootsFailure(t *testing.T) {
 
 	testCases := map[string]struct {
-		bhsToken         string
-		bhsURL           string
-		expectErr        models.SPVError
-		response         string
-		responseCode     int
-		batchSize        string
-		lastEvaluatedKey string
+		expectErr       string
+		response        string
+		responseCode    int
+		expResponseCode int
 	}{
 		"Get MerkleRoots with wrong batch size": {
-			bhsURL:       merklerootsURL,
-			expectErr:    chainerrors.ErrInvalidBatchSize,
-			responseCode: 400,
-			response:     "{\"code\": \"ErrInvalidBatchSize\",\"message\": \"batchSize must be 0 or a positive integer\"}",
+			responseCode:    400,
+			response:        "{\"code\": \"ErrInvalidBatchSize\",\"message\": \"batchSize must be 0 or a positive integer\"}",
+			expResponseCode: 400,
+			expectErr:       "{\"code\":\"error-invalid-batch-size\",\"message\":\"batchSize must be 0 or a positive integer\"}",
 		},
 		"Get MerkleRoots with invalid merkleroot": {
-			bhsURL:       merklerootsURL,
-			expectErr:    chainerrors.ErrMerkleRootNotFound,
-			responseCode: 404,
-			response:     "{\"code\": \"ErrMerkleRootNotFound\",\"message\": \"No block with provided merkleroot was found\"}",
+			responseCode:    404,
+			response:        "{\"code\": \"ErrMerkleRootNotFound\",\"message\": \"No block with provided merkleroot was found\"}",
+			expResponseCode: 404,
+			expectErr:       "{\"code\":\"error-merkleroot-not-found\",\"message\":\"No block with provided merkleroot was found\"}",
 		},
 		"Get MerkleRoots with stale merkleroot": {
-			bhsURL:       merklerootsURL,
-			expectErr:    chainerrors.ErrMerkleRootNotInLongestChain,
-			responseCode: 409,
-			response:     "{\"code\": \"ErrMerkleRootNotInLC\",\"message\": \"Provided merkleroot is not part of the longest chain\"}",
+			responseCode:    409,
+			response:        "{\"code\": \"ErrMerkleRootNotInLC\",\"message\": \"Provided merkleroot is not part of the longest chain\"}",
+			expResponseCode: 409,
+			expectErr:       "{\"code\":\"error-merkleroot-not-part-of-longest-chain\",\"message\":\"Provided merkleroot is not part of the longest chain\"}",
 		},
 	}
 
 	for name, tt := range testCases {
 		t.Run(name, func(t *testing.T) {
 			// given
-			then, cleanup, client := setupWalletAndClientForUser(t, &tt.responseCode, &tt.response)
+			given, then := testabilities.New(t)
+
+			// and
+			cleanup := given.StartedSPVWallet()
 			defer cleanup()
+			client := given.HttpClient().ForUser()
+			given.BHS().WillRespondForMerkleRoots(tt.responseCode, tt.response)
 
 			// when
 			resErr := &models.ResponseError{}
-			res, err := client.R().
+			res, _ := client.R().
 				SetHeader("Content-Type", "application/json").
 				SetError(resErr).
-				Get(tt.bhsURL)
-			require.NoError(t, err, "Unexpected error occurred while getting MerkleRoots")
+				Get(merklerootsURL)
 
 			// then
-			(*then).Response(res).IsNotSuccess()
-			require.NotNil(t, resErr)
-			require.Equal(t, tt.expectErr.GetCode(), resErr.Code)
-			require.Equal(t, tt.expectErr.GetMessage(), resErr.Message)
+			then.Response(res).HasStatus(tt.expResponseCode).WithJSONf(tt.expectErr)
 		})
 	}
 
@@ -145,8 +134,7 @@ func TestGETMerkleRootsFailure(t *testing.T) {
 		client := given.HttpClient().ForAnonymous()
 
 		// when:
-		res, err := client.R().Get(merklerootsURL)
-		require.NoError(t, err, "Unexpected error occurred while getting MerkleRoots")
+		res, _ := client.R().Get(merklerootsURL)
 
 		// then:
 		then.Response(res).IsUnauthorized()
@@ -162,8 +150,7 @@ func TestGETMerkleRootsFailure(t *testing.T) {
 		client := given.HttpClient().ForAdmin()
 
 		// when:
-		res, err := client.R().Get(merklerootsURL)
-		require.NoError(t, err, "Unexpected error occurred while getting MerkleRoots")
+		res, _ := client.R().Get(merklerootsURL)
 
 		// then:
 		then.Response(res).IsUnauthorizedForAdmin()
