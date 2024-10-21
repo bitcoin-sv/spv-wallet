@@ -3,6 +3,8 @@ package engine
 import (
 	"context"
 	"encoding/hex"
+	"fmt"
+	"math"
 
 	"github.com/bitcoin-sv/go-paymail"
 	"github.com/bitcoin-sv/go-paymail/server"
@@ -122,6 +124,10 @@ func (p *PikePaymentServiceProvider) saveDestinations(
 		dst := newDestination(pAddress.XpubID, script, append(p.client.DefaultModelOptions(), opts...)...)
 		dst.DerivationMethod = PIKEDerivationMethod
 		dst.SenderXpub = senderPubKeyHex
+		// Ensure index is non-negative and within the range of uint32
+		if index < 0 || index > math.MaxUint32 {
+			return fmt.Errorf("index %d is out of range for uint32", index)
+		}
 		dst.OutputIndex = uint32(index)
 
 		if err := dst.Save(ctx); err != nil {

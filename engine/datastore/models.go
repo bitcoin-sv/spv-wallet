@@ -9,12 +9,11 @@ import (
 	"strings"
 	"time"
 
+	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"gorm.io/gorm"
 	"gorm.io/gorm/clause"
 	"gorm.io/gorm/logger"
 	"gorm.io/plugin/dbresolver"
-
-	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 )
 
 // SaveModel will take care of creating or updating a model (primary key based) (abstracting the database)

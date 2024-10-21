@@ -5,6 +5,7 @@ import (
 	"encoding/hex"
 	"errors"
 	"fmt"
+	"math"
 
 	"github.com/bitcoin-sv/go-paymail"
 	compat "github.com/bitcoin-sv/go-sdk/compat/bip32"
@@ -265,6 +266,12 @@ func (m *PaymailAddress) incrementExternalXpubDerivationSeq(ctx context.Context)
 		return err
 	}
 
+	// Check if newNum is within the valid range for uint32
+	if newNum < 0 || newNum > math.MaxUint32 {
+		return fmt.Errorf("newNum %d out of range for uint32", newNum)
+	}
+
+	// Safe conversion
 	m.XpubDerivationSeq = uint32(newNum)
 	return nil
 }

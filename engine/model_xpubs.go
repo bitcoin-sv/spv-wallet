@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"math"
 
 	"github.com/bitcoin-sv/spv-wallet/engine/datastore"
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
@@ -201,7 +202,13 @@ func (m *Xpub) incrementBalance(ctx context.Context, balanceIncrement int64) err
 		return err
 	}
 
+	// Ensure newBalance is non-negative before conversion to uint64
+	if newBalance < 0 {
+		return fmt.Errorf("newBalance is negative and cannot be converted to uint64: %d", newBalance)
+	}
+
 	// Update the field value
+	// safe conversion as we have already checked for negative values
 	m.CurrentBalance = uint64(newBalance)
 
 	// Fire the after update
@@ -253,19 +260,32 @@ func (m *Xpub) incrementNextNum(ctx context.Context, chain uint32) (uint32, erro
 		return 0, err
 	}
 
-	// Update the model
+	if newNum < 0 || newNum > math.MaxUint32 {
+		return 0, fmt.Errorf("newNum %d out of range for uint32", newNum)
+	}
+	newNumUint32 := uint32(newNum)
+
+	// Update the model safely as we have already checked for negative values
 	if chain == utils.ChainInternal {
-		m.NextInternalNum = uint32(newNum)
+		m.NextInternalNum = newNumUint32
 	} else {
-		m.NextExternalNum = uint32(newNum)
+		m.NextExternalNum = newNumUint32
 	}
 
 	if err = m.AfterUpdated(ctx); err != nil {
 		return 0, err
 	}
 
-	// return the previous number, which was next num
-	return uint32(newNum - 1), err
+	// Calculate newNumMinusOne
+	newNumMinusOne := newNum - 1
+
+	// Ensure that newNumMinusOne is non-negative and within the range of uint32
+	if newNumMinusOne < 0 || newNumMinusOne > math.MaxUint32 {
+		return 0, fmt.Errorf("newNum - 1 (%d) is out of range for uint32", newNumMinusOne)
+	}
+
+	// return the previous number, which was next num, safely converted to uint32
+	return uint32(newNumMinusOne), err
 }
 
 // ChildModels will get any related sub models

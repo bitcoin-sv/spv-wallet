@@ -3,6 +3,7 @@ package engine
 import (
 	"context"
 	"fmt"
+	"math"
 
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/bitcoin-sv/spv-wallet/engine/utils"
@@ -55,8 +56,19 @@ func (m *Transaction) processUtxos(ctx context.Context) error {
 	}
 
 	m.TotalValue, m.Fee = m.getValues()
-	m.NumberOfInputs = uint32(len(m.parsedTx.Inputs))
-	m.NumberOfOutputs = uint32(len(m.parsedTx.Outputs))
+	// Ensure len(m.parsedTx.Inputs) is within the range for uint32
+	inputLen := len(m.parsedTx.Inputs)
+	if inputLen < 0 || inputLen > math.MaxUint32 {
+		return fmt.Errorf("number of inputs %d is out of range for uint32", inputLen)
+	}
+	m.NumberOfInputs = uint32(inputLen)
+
+	// Ensure len(m.parsedTx.Outputs) is within the range for uint32
+	outputLen := len(m.parsedTx.Outputs)
+	if outputLen < 0 || outputLen > math.MaxUint32 {
+		return fmt.Errorf("number of outputs %d is out of range for uint32", outputLen)
+	}
+	m.NumberOfOutputs = uint32(outputLen)
 
 	return nil
 }
@@ -105,7 +117,12 @@ func (m *Transaction) _processInputs(ctx context.Context) (err error) {
 			if _, ok := m.XpubOutputValue[utxo.XpubID]; !ok {
 				m.XpubOutputValue[utxo.XpubID] = 0
 			}
-			m.XpubOutputValue[utxo.XpubID] -= int64(utxo.Satoshis)
+			// Check if utxo.Satoshis exceeds int64 range before conversion
+			if utxo.Satoshis > math.MaxInt64 {
+				return fmt.Errorf("utxo.Satoshis exceeds the maximum value for int64: %d", utxo.Satoshis)
+			}
+			satoshis := int64(utxo.Satoshis) //nolint:gosec // This is not a security issue as we check the value above
+			m.XpubOutputValue[utxo.XpubID] -= satoshis
 
 			// Mark utxo as spent
 			utxo.SpendingTxID.Valid = true
@@ -150,6 +167,12 @@ func (m *Transaction) _processOutputs(ctx context.Context) (err error) {
 			); err != nil {
 				return
 			} else if destination != nil {
+				// Ensure `i` is within the valid range for `uint32`
+				if i < 0 || i > math.MaxUint32 {
+					return fmt.Errorf("output index %d is out of range for uint32", i)
+				}
+
+				outputIndex := uint32(i) // Use a separate variable for the conversion
 
 				// Add value of output to xPub ID
 				if _, ok := m.XpubOutputValue[destination.XpubID]; !ok {
@@ -157,10 +180,10 @@ func (m *Transaction) _processOutputs(ctx context.Context) (err error) {
 				}
 				m.XpubOutputValue[destination.XpubID] += int64(amount)
 
-				utxo, _ := m.client.GetUtxoByTransactionID(ctx, m.ID, uint32(i))
+				utxo, _ := m.client.GetUtxoByTransactionID(ctx, m.ID, outputIndex)
 				if utxo == nil {
 					utxo = newUtxo(
-						destination.XpubID, m.ID, txLockingScript, uint32(i),
+						destination.XpubID, m.ID, txLockingScript, outputIndex,
 						amount, newOpts...,
 					)
 				}

@@ -114,8 +114,10 @@ func processSyncTransactions(ctx context.Context, client *Client) {
 			//ARC sometimes returns a TXStatus SEEN_ON_NETWORK, but with zero data
 			logger.Warn().Err(err).Str("txID", txID).Msg("Cannot parse BUMP")
 		}
+		blockHight := uint64(txInfo.BlockHeight) //nolint:gosec // we trust the source
+
 		tx.BlockHash = txInfo.BlockHash
-		tx.BlockHeight = uint64(txInfo.BlockHeight)
+		tx.BlockHeight = blockHight
 		tx.SetBUMP(bump)
 		tx.UpdateFromBroadcastStatus(txInfo.TXStatus)
 		saveTx()
