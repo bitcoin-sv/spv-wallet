@@ -30,9 +30,9 @@ type SearchContactsResponse = PagedResponse[*Contact]
 // ExclusiveStartKeyPage represents a paginated response for database records using Exclusive Start Key paging
 type ExclusiveStartKeyPage[T any] struct {
 	// List of records for the response
-	Content T
+	Content T `json:"content"`
 	// Pagination details
-	Page ExclusiveStartKeyPageInfo
+	Page ExclusiveStartKeyPageInfo `json:"page"`
 }
 
 // ExclusiveStartKeyPageInfo represents the pagination information for limiting and sorting database query results

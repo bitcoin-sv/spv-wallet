@@ -334,7 +334,7 @@ func (c *Client) aggregate(ctx context.Context, model interface{}, conditions ma
 				aggregateCol = "strftime('%Y%m%d', " + aggregateCol + ")"
 			}
 		}
-		err := checkResult(tx.Select(aggregateCol + " as _id, COUNT(id) AS count").Group(aggregateCol).Scan(&aggregate))
+		err := checkResult(tx.Select(aggregateCol + " as id, COUNT(id) AS count").Group(aggregateCol).Scan(&aggregate))
 		if err != nil {
 			return nil, err
 		}
