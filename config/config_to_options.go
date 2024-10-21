@@ -7,7 +7,7 @@ import (
 	"time"
 
 	"github.com/bitcoin-sv/spv-wallet/engine"
-	"github.com/bitcoin-sv/spv-wallet/engine/chain/models"
+	chainmodels "github.com/bitcoin-sv/spv-wallet/engine/chain/models"
 	"github.com/bitcoin-sv/spv-wallet/engine/cluster"
 	"github.com/bitcoin-sv/spv-wallet/engine/datastore"
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
@@ -70,8 +70,10 @@ func (c *AppConfig) addHttpClientOpts(options []engine.ClientOps) []engine.Clien
 
 func (c *AppConfig) addCustomFeeUnit(options []engine.ClientOps) []engine.ClientOps {
 	if c.CustomFeeUnit != nil {
+		santoshis := uint64(c.CustomFeeUnit.Satoshis) //nolint:gosec
+
 		options = append(options, engine.WithCustomFeeUnit(bsv.FeeUnit{
-			Satoshis: bsv.Satoshis(c.CustomFeeUnit.Satoshis),
+			Satoshis: bsv.Satoshis(santoshis),
 			Bytes:    c.CustomFeeUnit.Bytes,
 		}))
 	}
