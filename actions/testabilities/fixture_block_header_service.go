@@ -73,6 +73,8 @@ var MockedBHSMerkleRootsData = []models.MerkleRoot{
 
 func simulateBHSMerkleRootsAPI(lastMerkleRoot string) (string, error) {
 	var response models.MerkleRootsBHSResponse
+	marshallResponseError := models.SPVError{StatusCode: 500, Message: "Error during marshalling BHS response", Code: "err-marchall-bhs-res"}
+
 	if lastMerkleRoot == "" {
 		response.Content = MockedBHSMerkleRootsData
 		response.Page = models.ExclusiveStartKeyPageInfo{
@@ -83,7 +85,7 @@ func simulateBHSMerkleRootsAPI(lastMerkleRoot string) (string, error) {
 
 		resString, err := json.Marshal(response)
 		if err != nil {
-			return "", err
+			return "", marshallResponseError.Wrap(err)
 		}
 
 		return string(resString), nil
@@ -104,7 +106,7 @@ func simulateBHSMerkleRootsAPI(lastMerkleRoot string) (string, error) {
 
 		resString, err := json.Marshal(response)
 		if err != nil {
-			return "", err
+			return "", marshallResponseError.Wrap(err)
 		}
 
 		return string(resString), nil
@@ -126,7 +128,7 @@ func simulateBHSMerkleRootsAPI(lastMerkleRoot string) (string, error) {
 
 	resString, err := json.Marshal(response)
 	if err != nil {
-		return "", err
+		return "", marshallResponseError.Wrap(err)
 	}
 
 	return string(resString), nil
