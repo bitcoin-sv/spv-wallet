@@ -32,5 +32,9 @@ func (c *AppConfig) Validate() error {
 		return err
 	}
 
+	if err = c.CustomFeeUnit.Validate(); err != nil {
+		return err
+	}
+
 	return nil
 }

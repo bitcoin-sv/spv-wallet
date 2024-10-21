@@ -4,43 +4,31 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/bitcoin-sv/spv-wallet/engine/chainstate"
+	sdk "github.com/bitcoin-sv/go-sdk/transaction"
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 )
 
-func broadcastTransaction(ctx context.Context, tx *Transaction) error {
-	client := tx.Client()
-	chainstateSrv := client.Chainstate()
+func broadcastTransaction(ctx context.Context, txModel *Transaction) error {
+	client := txModel.Client()
 
-	defer recoverAndLog(tx.Client().Logger())
+	defer recoverAndLog(txModel.Client().Logger())
 
 	unlock, err := newWriteLock(
-		ctx, fmt.Sprintf(lockKeyProcessBroadcastTx, tx.GetID()), client.Cachestore(),
+		ctx, fmt.Sprintf(lockKeyProcessBroadcastTx, txModel.GetID()), client.Cachestore(),
 	)
 	defer unlock()
 	if err != nil {
 		return err
 	}
 
-	txHex := tx.Hex
-	hexFormat := chainstate.RawTx
-	if chainstateSrv.SupportedBroadcastFormats().Contains(chainstate.Ef) {
-		// try to convert to EF, with rawRx as a fallback
-		efHex, ok := ToEfHex(ctx, tx, client)
-		if ok {
-			txHex = efHex
-			hexFormat = chainstate.Ef
-		}
+	tx, err := sdk.NewTransactionFromHex(txModel.Hex)
+	if err != nil {
+		return spverrors.ErrParseTransactionFromHex.Wrap(err)
 	}
 
-	br := chainstateSrv.Broadcast(ctx, tx.ID, txHex, hexFormat, defaultBroadcastTimeout)
-
-	if br.Failure != nil {
-		if br.Failure.InvalidTx {
-			return spverrors.ErrBroadcastRejectedTransaction.Wrap((br.Failure.Error))
-		}
-		return br.Failure.Error
+	_, err = client.Chain().Broadcast(ctx, tx)
+	if err != nil {
+		return spverrors.ErrBroadcast.Wrap(err)
 	}
-
 	return nil
 }

@@ -5,7 +5,6 @@ import (
 	"testing"
 	"time"
 
-	broadcast_client_mock "github.com/bitcoin-sv/go-broadcast-client/broadcast/broadcast-client-mock"
 	"github.com/bitcoin-sv/go-paymail"
 	"github.com/bitcoin-sv/spv-wallet/engine"
 	"github.com/bitcoin-sv/spv-wallet/engine/datastore"
@@ -243,10 +242,6 @@ func Test_GetCapabilities(t *testing.T) {
 		cacheKeyCapabilities     = "paymail-capabilities-"
 	)
 
-	bc := broadcast_client_mock.Builder().
-		WithMockArc(broadcast_client_mock.MockSuccess).
-		Build()
-
 	t.Run("valid response - no cache found", func(t *testing.T) {
 		given := testabilities.Given(t)
 
@@ -265,9 +260,8 @@ func Test_GetCapabilities(t *testing.T) {
 			engine.WithRedisConnection(redisClient),
 			engine.WithTaskqConfig(taskmanager.DefaultTaskQConfig(testQueueName)),
 			engine.WithSQLite(&datastore.SQLiteConfig{Shared: true}),
-			engine.WithChainstateOptions(false, false, false, false),
 			engine.WithDebugging(),
-			engine.WithBroadcastClient(bc),
+			engine.WithCustomFeeUnit(bsv.FeeUnit{Satoshis: 1, Bytes: 1000}),
 			engine.WithLogger(&logger),
 		)
 		require.NoError(t, err)
@@ -311,9 +305,8 @@ func Test_GetCapabilities(t *testing.T) {
 			engine.WithRedisConnection(redisClient),
 			engine.WithTaskqConfig(taskmanager.DefaultTaskQConfig(testQueueName)),
 			engine.WithSQLite(&datastore.SQLiteConfig{Shared: true}),
-			engine.WithChainstateOptions(false, false, false, false),
 			engine.WithDebugging(),
-			engine.WithBroadcastClient(bc),
+			engine.WithCustomFeeUnit(bsv.FeeUnit{Satoshis: 1, Bytes: 1000}),
 			engine.WithLogger(&logger),
 		)
 		require.NoError(t, err)

@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"testing"
 
-	broadcast_client_mock "github.com/bitcoin-sv/go-broadcast-client/broadcast/broadcast-client-mock"
 	compat "github.com/bitcoin-sv/go-sdk/compat/bip32"
 	"github.com/bitcoin-sv/spv-wallet/engine/utils"
 	"github.com/bitcoin-sv/spv-wallet/models/bsv"
@@ -14,11 +13,8 @@ import (
 )
 
 func Test_RevertTransaction(t *testing.T) {
-	bc := broadcast_client_mock.Builder().
-		WithMockArc(broadcast_client_mock.MockNilQueryTxResp).
-		Build()
 	t.Run("revert transaction", func(t *testing.T) {
-		ctx, client, transaction, _, deferMe := initRevertTransactionData(t, WithBroadcastClient(bc))
+		ctx, client, transaction, _, deferMe := initRevertTransactionData(t)
 		defer deferMe()
 
 		//

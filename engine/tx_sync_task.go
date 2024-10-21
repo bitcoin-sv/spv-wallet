@@ -6,7 +6,7 @@ import (
 	"time"
 
 	"github.com/bitcoin-sv/go-sdk/transaction"
-	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
+	"github.com/bitcoin-sv/spv-wallet/engine/chain/errors"
 	"github.com/rs/zerolog"
 )
 
@@ -48,7 +48,7 @@ func processSyncTransactions(ctx context.Context, client *Client) {
 	defer cancel()
 
 	var delayForBroadcastedTx time.Time
-	if client.options.txCallbackConfig != nil {
+	if client.options.arcConfig.Callback != nil {
 		delayForBroadcastedTx = timeForReceivingCallback()
 	} else {
 		delayForBroadcastedTx = timeForMineTransaction()
@@ -92,7 +92,7 @@ func processSyncTransactions(ctx context.Context, client *Client) {
 		txInfo, err := client.Chain().QueryTransaction(ctx, txID)
 
 		if err != nil {
-			if errors.Is(err, spverrors.ErrARCUnreachable) {
+			if errors.Is(err, chainerrors.ErrARCUnreachable) {
 				// checking subsequent transactions is pointless if the broadcast server (ARC) is unreachable, will try again in the next cycle
 				logger.Warn().Msgf("%s", err.Error())
 				return
@@ -109,15 +109,18 @@ func processSyncTransactions(ctx context.Context, client *Client) {
 			continue
 		}
 
-		bump, err := transaction.NewMerklePathFromHex(txInfo.MerklePath)
-		if err != nil {
+		tx.UpdateFromBroadcastStatus(txInfo.TXStatus)
+
+		if bump, err := transaction.NewMerklePathFromHex(txInfo.MerklePath); err != nil {
 			//ARC sometimes returns a TXStatus SEEN_ON_NETWORK, but with zero data
-			logger.Warn().Err(err).Str("txID", txID).Msg("Cannot parse BUMP")
+			logger.Warn().Err(err).Str("txID", txID).Str("ARCTxStatus", string(txInfo.TXStatus)).Msg("Cannot parse BUMP")
+		} else {
+			tx.SetBUMP(bump)
 		}
+
 		tx.BlockHash = txInfo.BlockHash
 		tx.BlockHeight = uint64(txInfo.BlockHeight)
-		tx.SetBUMP(bump)
-		tx.UpdateFromBroadcastStatus(txInfo.TXStatus)
+
 		saveTx()
 	}
 }
@@ -138,7 +141,7 @@ func _handleUnknownTX(ctx context.Context, tx *Transaction, logger *zerolog.Logg
 		return TxStatusBroadcasted
 	}
 
-	if errors.Is(err, spverrors.ErrBroadcastRejectedTransaction) {
+	if errors.Is(err, chainerrors.ErrARCProblematicStatus) {
 		return TxStatusProblematic
 	}
 
