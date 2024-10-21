@@ -360,7 +360,10 @@ func (c *Client) HandleTxCallback(ctx context.Context, callbackResp *chainmodels
 	}
 
 	tx.BlockHash = callbackResp.BlockHash
-	tx.BlockHeight = uint64(callbackResp.BlockHeight)
+	tx.BlockHeight, err = utils.ConvertInt64ToUInt64(callbackResp.BlockHeight)
+	if err != nil {
+		return spverrors.ErrInternal.Wrap(err)
+	}
 	tx.SetBUMP(bump)
 	tx.UpdateFromBroadcastStatus(callbackResp.TXStatus)
 

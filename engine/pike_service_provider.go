@@ -122,7 +122,11 @@ func (p *PikePaymentServiceProvider) saveDestinations(
 		dst := newDestination(pAddress.XpubID, script, append(p.client.DefaultModelOptions(), opts...)...)
 		dst.DerivationMethod = PIKEDerivationMethod
 		dst.SenderXpub = senderPubKeyHex
-		dst.OutputIndex = uint32(index)
+		index32, err := utils.ConvertIntToUInt32(index)
+		if err != nil {
+			return spverrors.ErrInternal.Wrap(err)
+		}
+		dst.OutputIndex = index32
 
 		if err := dst.Save(ctx); err != nil {
 			return err

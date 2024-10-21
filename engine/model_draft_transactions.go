@@ -499,14 +499,14 @@ func (m *DraftTransaction) estimateSize() uint64 {
 	size := defaultOverheadSize // version + nLockTime
 
 	inputSize := trx.VarInt(len(m.Configuration.Inputs))
-	size += uint64(inputSize.Length())
+	size += utils.ShouldConvertIntToUInt64(inputSize.Length())
 
 	for _, input := range m.Configuration.Inputs {
 		size += utils.GetInputSizeForType(input.Type)
 	}
 
 	outputSize := trx.VarInt(len(m.Configuration.Outputs))
-	size += uint64(outputSize.Length())
+	size += utils.ShouldConvertIntToUInt64(outputSize.Length())
 
 	for _, output := range m.Configuration.Outputs {
 		for _, s := range output.Scripts {
@@ -612,7 +612,7 @@ func (m *DraftTransaction) setChangeDestination(ctx context.Context, satoshisCha
 			numberOfDestinations = 1
 		}
 
-		newFee = m.estimateFee(m.Configuration.FeeUnit, uint64(numberOfDestinations)*changeOutputSize)
+		newFee = m.estimateFee(m.Configuration.FeeUnit, utils.ShouldConvertIntToUInt64(numberOfDestinations)*changeOutputSize)
 		satoshisChange -= newFee - fee
 		m.Configuration.ChangeSatoshis = satoshisChange
 
@@ -882,8 +882,13 @@ func (m *DraftTransaction) SignInputs(xPriv *compat.ExtendedKey) (signedHex stri
 			return
 		}
 		var s *p2pkh.P2PKH
+		index32, convErr := utils.ConvertIntToUInt32(index)
+		if convErr != nil {
+			err = spverrors.ErrInternal.Wrap(convErr)
+			return
+		}
 		if s, err = utils.GetUnlockingScript(
-			txDraft, uint32(index), privateKey,
+			txDraft, index32, privateKey,
 		); err != nil {
 			return
 		}

@@ -36,7 +36,6 @@ func TestP2PKH(t *testing.T) {
 
 	t.Run("Valid Cases", func(t *testing.T) {
 		for _, tt := range validTests {
-			tt := tt // capture range variable
 			t.Run(tt.name, func(t *testing.T) {
 				got, err := P2PKH(tt.satoshis)
 				assert.NoError(t, err)
@@ -47,7 +46,6 @@ func TestP2PKH(t *testing.T) {
 
 	t.Run("Valid Cases", func(t *testing.T) {
 		for _, tt := range validTests {
-			tt := tt // capture range variable
 			t.Run(tt.name, func(t *testing.T) {
 				got, err := P2PKH(tt.satoshis)
 				assert.NoError(t, err)
@@ -72,7 +70,6 @@ func TestP2PKH(t *testing.T) {
 
 	t.Run("Error Cases", func(t *testing.T) {
 		for _, tt := range errorTests {
-			tt := tt // capture range variable
 			t.Run(tt.name, func(t *testing.T) {
 				_, err := P2PKH(tt.satoshis)
 				assert.Error(t, err)
@@ -129,7 +126,6 @@ func TestEvaluate(t *testing.T) {
 		}
 
 		for _, tt := range validTests {
-			tt := tt
 			t.Run(tt.name, func(t *testing.T) {
 				result, err := Evaluate(tt.script, tt.publicKey)
 				assert.NoError(t, err)
@@ -158,7 +154,6 @@ func TestEvaluate(t *testing.T) {
 		}
 
 		for _, tt := range invalidTests {
-			tt := tt
 			t.Run(tt.name, func(t *testing.T) {
 				_, err := Evaluate(tt.script, tt.publicKey)
 				assert.Error(t, err)

@@ -55,8 +55,16 @@ func (m *Transaction) processUtxos(ctx context.Context) error {
 	}
 
 	m.TotalValue, m.Fee = m.getValues()
-	m.NumberOfInputs = uint32(len(m.parsedTx.Inputs))
-	m.NumberOfOutputs = uint32(len(m.parsedTx.Outputs))
+	inputsNum, err := utils.ConvertIntToUint32(len(m.parsedTx.Inputs))
+	if err != nil {
+		return spverrors.ErrInternal.Wrap(err)
+	}
+	m.NumberOfInputs = inputsNum
+	outputsNum, err := utils.ConvertIntToUint32(len(m.parsedTx.Outputs))
+	if err != nil {
+		return spverrors.ErrInternal.Wrap(err)
+	}
+	m.NumberOfOutputs = outputsNum
 
 	return nil
 }
@@ -105,7 +113,11 @@ func (m *Transaction) _processInputs(ctx context.Context) (err error) {
 			if _, ok := m.XpubOutputValue[utxo.XpubID]; !ok {
 				m.XpubOutputValue[utxo.XpubID] = 0
 			}
-			m.XpubOutputValue[utxo.XpubID] -= int64(utxo.Satoshis)
+			sat, convErr := utils.ConvertUInt64ToInt64(utxo.Satoshis)
+			if convErr != nil {
+				return spverrors.ErrInternal.Wrap(err)
+			}
+			m.XpubOutputValue[utxo.XpubID] -= sat
 
 			// Mark utxo as spent
 			utxo.SpendingTxID.Valid = true
@@ -134,6 +146,10 @@ func (m *Transaction) _processOutputs(ctx context.Context) (err error) {
 	// check all the outputs for a known destination
 	numberOfOutputsProcessed := 0
 	for i, output := range m.parsedTx.Outputs {
+		i32, convErr := utils.ConvertIntToUInt32(i)
+		if convErr != nil {
+			return spverrors.ErrInternal.Wrap(err)
+		}
 		amount := output.Satoshis
 
 		// only save outputs with a satoshi value attached to it
@@ -157,10 +173,10 @@ func (m *Transaction) _processOutputs(ctx context.Context) (err error) {
 				}
 				m.XpubOutputValue[destination.XpubID] += int64(amount)
 
-				utxo, _ := m.client.GetUtxoByTransactionID(ctx, m.ID, uint32(i))
+				utxo, _ := m.client.GetUtxoByTransactionID(ctx, m.ID, i32)
 				if utxo == nil {
 					utxo = newUtxo(
-						destination.XpubID, m.ID, txLockingScript, uint32(i),
+						destination.XpubID, m.ID, txLockingScript, i32,
 						amount, newOpts...,
 					)
 				}

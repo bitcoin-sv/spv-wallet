@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"math"
 	"reflect"
 	"strings"
 	"time"
@@ -124,6 +125,9 @@ func convertToInt64(i interface{}) int64 {
 	case uint32:
 		return int64(v)
 	case uint64:
+		if v > math.MaxInt64 {
+			panic(errors.New("value is too large to convert to int64"))
+		}
 		return int64(v)
 	}
 

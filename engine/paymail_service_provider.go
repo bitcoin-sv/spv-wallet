@@ -319,7 +319,12 @@ func saveBEEFTxInputs(ctx context.Context, c ClientInterface, dBeef *beef.Decode
 	for _, input := range inputsToAdd {
 		var bump *BUMP
 		if input.BumpIndex != nil { // mined
-			bump, err = getBump(int(*input.BumpIndex), dBeef.BUMPs)
+			bumpIndex, convErr := utils.ConvertUInt64ToInt(uint64(*input.BumpIndex))
+			if convErr != nil {
+				c.Logger().Error().Msgf("error in saveBEEFTxInputs: %v for beef: %v", convErr, dBeef)
+				return
+			}
+			bump, err = getBump(bumpIndex, dBeef.BUMPs)
 			if err != nil {
 				c.Logger().Error().Msgf("error in saveBEEFTxInputs: %v for beef: %v", err, dBeef)
 			}

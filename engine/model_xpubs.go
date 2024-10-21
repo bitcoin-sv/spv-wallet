@@ -202,7 +202,7 @@ func (m *Xpub) incrementBalance(ctx context.Context, balanceIncrement int64) err
 	}
 
 	// Update the field value
-	m.CurrentBalance = uint64(newBalance)
+	m.CurrentBalance = utils.ShouldConvertInt64ToUInt64(newBalance)
 
 	// Fire the after update
 	err = m.AfterUpdated(ctx)
@@ -253,19 +253,28 @@ func (m *Xpub) incrementNextNum(ctx context.Context, chain uint32) (uint32, erro
 		return 0, err
 	}
 
+	newNum32, err := utils.ConvertInt64ToUint32(newNum)
+	if err != nil {
+		return 0, spverrors.ErrInternal.Wrap(err)
+	}
+
 	// Update the model
 	if chain == utils.ChainInternal {
-		m.NextInternalNum = uint32(newNum)
+		m.NextInternalNum = newNum32
 	} else {
-		m.NextExternalNum = uint32(newNum)
+		m.NextExternalNum = newNum32
 	}
 
 	if err = m.AfterUpdated(ctx); err != nil {
 		return 0, err
 	}
 
+	if newNum32 == 0 {
+		panic("cannot subtract 1 from 0 for unsigned int32")
+	}
+
 	// return the previous number, which was next num
-	return uint32(newNum - 1), err
+	return newNum32 - 1, err
 }
 
 // ChildModels will get any related sub models

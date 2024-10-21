@@ -2,9 +2,9 @@ package chainmodels
 
 import (
 	"context"
+	"iter"
 
 	sdk "github.com/bitcoin-sv/go-sdk/transaction"
-	"iter"
 )
 
 // TransactionsGetter is an interface for getting transactions by their IDs

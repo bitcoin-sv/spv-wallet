@@ -59,8 +59,8 @@ func (beefTx *beefTx) toBeefBytes() ([]byte, error) {
 func toBeefBytes(tx *trx.Transaction, bumps BUMPs) []byte {
 	txBeefBytes := tx.Bytes()
 
-	bumpIdx := getBumpPathIndex(tx, bumps)
-	if bumpIdx > -1 {
+	bumpIdx, ok := getBumpPathIndex(tx, bumps)
+	if ok {
 		txBeefBytes = append(txBeefBytes, hasBUMP)
 		txBeefBytes = append(txBeefBytes, trx.VarInt(bumpIdx).Bytes()...)
 	} else {
@@ -70,17 +70,23 @@ func toBeefBytes(tx *trx.Transaction, bumps BUMPs) []byte {
 	return txBeefBytes
 }
 
-func getBumpPathIndex(tx *trx.Transaction, bumps BUMPs) int {
-	bumpIndex := -1
+func getBumpPathIndex(tx *trx.Transaction, bumps BUMPs) (uint64, bool) {
+	bumpIndex := uint64(0)
+	found := false
 	txID := tx.TxID().String()
 
-	for i, bump := range bumps {
-		for _, path := range bump.Path[0] {
+	for i := uint64(0); i < uint64(len(bumps)); i++ {
+		for _, path := range bumps[i].Path[0] {
 			if path.Hash == txID {
 				bumpIndex = i
+				found = true //TODO should we break here? (just return the first one or browse to return the last one???)
 			}
 		}
 	}
 
-	return bumpIndex
+	if !found {
+		return 0, false
+	}
+
+	return bumpIndex, true
 }

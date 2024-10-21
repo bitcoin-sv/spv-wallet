@@ -7,6 +7,7 @@ import (
 
 	"github.com/bitcoin-sv/go-sdk/transaction"
 	"github.com/bitcoin-sv/spv-wallet/engine/chain/errors"
+	"github.com/bitcoin-sv/spv-wallet/engine/utils"
 	"github.com/rs/zerolog"
 )
 
@@ -119,7 +120,7 @@ func processSyncTransactions(ctx context.Context, client *Client) {
 		}
 
 		tx.BlockHash = txInfo.BlockHash
-		tx.BlockHeight = uint64(txInfo.BlockHeight)
+		tx.BlockHeight = utils.ShouldConvertInt64ToUInt64(txInfo.BlockHeight)
 
 		saveTx()
 	}

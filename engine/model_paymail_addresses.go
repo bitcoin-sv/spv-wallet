@@ -265,7 +265,12 @@ func (m *PaymailAddress) incrementExternalXpubDerivationSeq(ctx context.Context)
 		return err
 	}
 
-	m.XpubDerivationSeq = uint32(newNum)
+	seq, err := utils.ConvertInt64ToUint32(newNum)
+	if err != nil {
+		return spverrors.ErrInternal.Wrap(err)
+	}
+
+	m.XpubDerivationSeq = seq
 	return nil
 }
 

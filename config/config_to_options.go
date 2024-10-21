@@ -69,9 +69,13 @@ func (c *AppConfig) addHttpClientOpts(options []engine.ClientOps) []engine.Clien
 }
 
 func (c *AppConfig) addCustomFeeUnit(options []engine.ClientOps) []engine.ClientOps {
+	satoshis, err := bsv.SatoshisFromInt(c.CustomFeeUnit.Satoshis)
+	if err != nil {
+		panic(err)
+	}
 	if c.CustomFeeUnit != nil {
 		options = append(options, engine.WithCustomFeeUnit(bsv.FeeUnit{
-			Satoshis: bsv.Satoshis(c.CustomFeeUnit.Satoshis),
+			Satoshis: satoshis,
 			Bytes:    c.CustomFeeUnit.Bytes,
 		}))
 	}
