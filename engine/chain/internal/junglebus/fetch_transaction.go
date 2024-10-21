@@ -3,6 +3,8 @@ package junglebus
 import (
 	"context"
 	"fmt"
+	"net/http"
+	"strings"
 
 	sdk "github.com/bitcoin-sv/go-sdk/transaction"
 	"github.com/bitcoin-sv/spv-wallet/engine/chain/errors"
@@ -24,14 +26,20 @@ func (s *Service) FetchTransaction(ctx context.Context, txID string) (*sdk.Trans
 		return nil, spverrors.ErrInternal.Wrap(err)
 	}
 
-	if response.StatusCode() != 200 {
+	switch response.StatusCode() {
+	case http.StatusOK:
+		tx, err := sdk.NewTransactionFromBytes(result.Transaction)
+		if err != nil {
+			return nil, chainerrors.ErrJunglebusParseTransaction.Wrap(err)
+		}
+		return tx, nil
+	case http.StatusNotFound:
+		textContent := string(response.Body())
+		if strings.Contains(textContent, "tx-not-found") {
+			return nil, chainerrors.ErrJunglebusTxNotFound
+		}
+		return nil, chainerrors.ErrJunglebusFailure.Wrap(spverrors.Newf("junglebus returned 404 with body %s", textContent))
+	default:
 		return nil, chainerrors.ErrJunglebusFailure.Wrap(spverrors.Newf("junglebus returned status code %d", response.StatusCode()))
 	}
-
-	tx, err := sdk.NewTransactionFromBytes(result.Transaction)
-	if err != nil {
-		return nil, chainerrors.ErrJunglebusParseTransaction.Wrap(err)
-	}
-
-	return tx, nil
 }

@@ -5,7 +5,8 @@ import (
 	"errors"
 	"net"
 
-	chainmodels "github.com/bitcoin-sv/spv-wallet/engine/chain/models"
+	"github.com/bitcoin-sv/spv-wallet/engine/chain/errors"
+	"github.com/bitcoin-sv/spv-wallet/engine/chain/models"
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/bitcoin-sv/spv-wallet/models"
 	"github.com/go-resty/resty/v2"
@@ -30,7 +31,7 @@ func (s *Service) prepareARCRequest(ctx context.Context) *resty.Request {
 func (s *Service) wrapRequestError(err error) error {
 	var e net.Error
 	if errors.As(err, &e) {
-		return spverrors.ErrARCUnreachable.Wrap(e)
+		return chainerrors.ErrARCUnreachable.Wrap(e)
 	}
 	return spverrors.ErrInternal.Wrap(err)
 }
