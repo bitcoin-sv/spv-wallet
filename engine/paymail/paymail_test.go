@@ -10,6 +10,7 @@ import (
 	"github.com/bitcoin-sv/spv-wallet/engine"
 	"github.com/bitcoin-sv/spv-wallet/engine/datastore"
 	paymailclient "github.com/bitcoin-sv/spv-wallet/engine/paymail"
+	pmerrors "github.com/bitcoin-sv/spv-wallet/engine/paymail/errors"
 	"github.com/bitcoin-sv/spv-wallet/engine/paymail/testabilities"
 	"github.com/bitcoin-sv/spv-wallet/engine/taskmanager"
 	xtester "github.com/bitcoin-sv/spv-wallet/engine/tester"
@@ -87,25 +88,25 @@ func Test_GetP2PDestinations(t *testing.T) {
 
 	errTests := map[string]struct {
 		paymailHostScenario func(*paymailmock.PaymailClientMock)
-		expectedError       string
+		expectedError       error
 	}{
 		"paymail host is responding with not found on capabilities": {
 			paymailHostScenario: func(paymailClient *paymailmock.PaymailClientMock) {
 				paymailClient.WillRespondWithNotFoundOnCapabilities()
 			},
-			expectedError: "paymail host is responding with error",
+			expectedError: pmerrors.ErrPaymailHostResponseError,
 		},
 		"paymail host is failing on capabilities": {
 			paymailHostScenario: func(paymailClient *paymailmock.PaymailClientMock) {
 				paymailClient.WillRespondWithErrorOnCapabilities()
 			},
-			expectedError: "paymail host is responding with error",
+			expectedError: pmerrors.ErrPaymailHostResponseError,
 		},
 		"paymail host is not supporting p2p destinations capability": {
 			paymailHostScenario: func(paymailClient *paymailmock.PaymailClientMock) {
 				paymailClient.WillRespondWithBasicCapabilities()
 			},
-			expectedError: "paymail host is not supporting P2P capabilities",
+			expectedError: pmerrors.ErrPaymailHostNotSupportingP2P,
 		},
 		"paymail host is failing on p2p destinations": {
 			paymailHostScenario: func(paymailClient *paymailmock.PaymailClientMock) {
@@ -113,7 +114,7 @@ func Test_GetP2PDestinations(t *testing.T) {
 				paymailClient.WillRespondOnCapability(paymail.BRFCP2PPaymentDestination).
 					WithInternalServerError()
 			},
-			expectedError: "paymail host is responding with error",
+			expectedError: pmerrors.ErrPaymailHostResponseError,
 		},
 		"paymail host p2p destinations is returning not found": {
 			paymailHostScenario: func(paymailClient *paymailmock.PaymailClientMock) {
@@ -121,6 +122,7 @@ func Test_GetP2PDestinations(t *testing.T) {
 				paymailClient.WillRespondOnCapability(paymail.BRFCP2PPaymentDestination).
 					WithNotFound()
 			},
+			expectedError: pmerrors.ErrPaymailHostResponseError,
 		},
 		"paymail host p2p destinations is responding with single output with more sats then requested": {
 			paymailHostScenario: func(paymailClient *paymailmock.PaymailClientMock) {
@@ -128,7 +130,7 @@ func Test_GetP2PDestinations(t *testing.T) {
 				paymailClient.WillRespondOnCapability(paymail.BRFCP2PPaymentDestination).
 					With(paymailmock.P2PDestinationsForSats(satoshis + 1))
 			},
-			expectedError: "paymail host invalid response",
+			expectedError: pmerrors.ErrPaymailHostInvalidResponse,
 		},
 		"paymail host p2p destinations is responding with multiple outputs with more sats then requested": {
 			paymailHostScenario: func(paymailClient *paymailmock.PaymailClientMock) {
@@ -136,7 +138,7 @@ func Test_GetP2PDestinations(t *testing.T) {
 				paymailClient.WillRespondOnCapability(paymail.BRFCP2PPaymentDestination).
 					With(paymailmock.P2PDestinationsForSats(satoshis, satoshis))
 			},
-			expectedError: "paymail host invalid response",
+			expectedError: pmerrors.ErrPaymailHostInvalidResponse,
 		},
 		"paymail host p2p destinations is responding with single output with less sats then requested": {
 			paymailHostScenario: func(paymailClient *paymailmock.PaymailClientMock) {
@@ -144,7 +146,7 @@ func Test_GetP2PDestinations(t *testing.T) {
 				paymailClient.WillRespondOnCapability(paymail.BRFCP2PPaymentDestination).
 					With(paymailmock.P2PDestinationsForSats(0))
 			},
-			expectedError: "paymail host invalid response",
+			expectedError: pmerrors.ErrPaymailHostInvalidResponse,
 		},
 		"paymail host p2p destinations is responding with multiple outputs with less sats then requested": {
 			paymailHostScenario: func(paymailClient *paymailmock.PaymailClientMock) {
@@ -152,7 +154,7 @@ func Test_GetP2PDestinations(t *testing.T) {
 				paymailClient.WillRespondOnCapability(paymail.BRFCP2PPaymentDestination).
 					With(paymailmock.P2PDestinationsForSats(0, 0, 0))
 			},
-			expectedError: "paymail host invalid response",
+			expectedError: pmerrors.ErrPaymailHostInvalidResponse,
 		},
 	}
 	for name, test := range errTests {
@@ -166,7 +168,7 @@ func Test_GetP2PDestinations(t *testing.T) {
 			paymailClient := given.NewPaymailClientService()
 
 			destinations, err := paymailClient.GetP2PDestinations(context.Background(), paymailAddress, satoshis)
-			require.ErrorContains(t, err, test.expectedError)
+			require.ErrorIs(t, err, test.expectedError)
 			require.Nil(t, destinations)
 		})
 	}
