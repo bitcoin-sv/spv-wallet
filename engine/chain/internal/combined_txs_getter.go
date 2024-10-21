@@ -2,6 +2,7 @@ package internal
 
 import (
 	"context"
+	"iter"
 	"maps"
 	"slices"
 
@@ -9,7 +10,6 @@ import (
 	"github.com/bitcoin-sv/spv-wallet/engine/chain/errors"
 	"github.com/bitcoin-sv/spv-wallet/engine/chain/models"
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
-	"iter"
 )
 
 // CombineTxsGetters creates a new CombinedTxsGetter

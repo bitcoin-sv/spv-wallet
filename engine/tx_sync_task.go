@@ -6,9 +6,8 @@ import (
 	"time"
 
 	"github.com/bitcoin-sv/go-sdk/transaction"
-	"github.com/rs/zerolog"
-
 	chainerrors "github.com/bitcoin-sv/spv-wallet/engine/chain/errors"
+	"github.com/rs/zerolog"
 )
 
 // timeForReceivingCallback indicates the time after which a broadcasted transaction should be checked (with Callback enabled)
