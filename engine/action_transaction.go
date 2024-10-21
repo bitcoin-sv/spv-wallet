@@ -367,8 +367,6 @@ func (c *Client) HandleTxCallback(ctx context.Context, callbackResp *chainmodels
 	}
 	// Suppress gosec G115 warning as the conversion is safe due to prior negative check
 	tx.BlockHeight = uint64(callbackResp.BlockHeight) //nolint:gosec
-
-	tx.BlockHeight = uint64(callbackResp.BlockHeight)
 	tx.SetBUMP(bump)
 	tx.UpdateFromBroadcastStatus(callbackResp.TXStatus)
 

@@ -3,6 +3,7 @@ package engine
 import (
 	trx "github.com/bitcoin-sv/go-sdk/transaction"
 	"github.com/bitcoin-sv/go-sdk/util"
+
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 )
 
@@ -62,6 +63,9 @@ func toBeefBytes(tx *trx.Transaction, bumps BUMPs) []byte {
 	bumpIdx := getBumpPathIndex(tx, bumps)
 	if bumpIdx > -1 {
 		txBeefBytes = append(txBeefBytes, hasBUMP)
+		if bumpIdx < 0 {
+			return nil
+		}
 		txBeefBytes = append(txBeefBytes, trx.VarInt(bumpIdx).Bytes()...)
 	} else {
 		txBeefBytes = append(txBeefBytes, hasNoBUMP)
