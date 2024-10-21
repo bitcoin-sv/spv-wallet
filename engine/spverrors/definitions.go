@@ -22,6 +22,9 @@ var ErrNotAnAdminKey = models.SPVError{Message: "xpub provided is not an admin k
 // ErrInternal is a generic error that something weird went wrong
 var ErrInternal = models.SPVError{Message: "internal server error", StatusCode: 500, Code: "error-internal-server-error"}
 
+// ErrCtxInterrupted is when context is interrupted (canceled or deadline exceeded)
+var ErrCtxInterrupted = models.SPVError{Message: "context interrupted", StatusCode: 500, Code: "error-ctx-interrupted"}
+
 // ErrInvalidOrMissingToken is when callback token from headers is invalid or missing
 var ErrInvalidOrMissingToken = models.SPVError{Message: "invalid or missing bearer token", StatusCode: 401, Code: "error-unauthorized-token-invalid-or-missing"}
 
@@ -202,6 +205,9 @@ var ErrCapabilitiesPikeUnsupported = models.SPVError{Message: "server doesn't su
 var ErrGetCapabilities = models.SPVError{Message: "failed to get paymail capabilities", StatusCode: 400, Code: "error-capabilities-failed-to-get"}
 
 // ////////////////////////////////// TRANSACTION ERRORS
+
+// ErrParseTransactionFromHex is when error occurred during parsing transaction from hex
+var ErrParseTransactionFromHex = models.SPVError{Message: "error parsing transaction from hex", StatusCode: 500, Code: "error-transaction-parse-from-hex"}
 
 // ErrCouldNotFindTransaction is an error when a transaction could not be found
 var ErrCouldNotFindTransaction = models.SPVError{Message: "transaction not found", StatusCode: 404, Code: "error-transaction-not-found"}
@@ -400,26 +406,8 @@ var ErrRouteMethodNotAllowed = models.SPVError{Message: "method not allowed", St
 
 // ////////////////////////////////// BROADCAST ERRORS
 
-// ErrBroadcastUnreachable is when broadcast server cannot be requested
-var ErrBroadcastUnreachable = models.SPVError{Message: "broadcast server cannot be requested", StatusCode: 404, Code: "error-broadcast-unreachable"}
+// ErrAskingForFeeUnit is when error occurred during asking for fee unit
+var ErrAskingForFeeUnit = models.SPVError{Message: "error during asking for fee unit", StatusCode: 500, Code: "error-asking-for-fee-unit"}
 
-// ErrBroadcastWrongBUMPResponse is when broadcast server returned wrong BUMP response
-var ErrBroadcastWrongBUMPResponse = models.SPVError{Message: "broadcast server returned wrong BUMP response", StatusCode: 400, Code: "error-broadcast-wrong-bump-response"}
-
-// ErrBroadcastRejectedTransaction is when broadcast server rejected transaction
-var ErrBroadcastRejectedTransaction = models.SPVError{Message: "broadcast rejected transaction", StatusCode: 400, Code: "error-broadcast-rejected-transaction"}
-
-// ErrARCUnreachable is when ARC cannot be requested
-var ErrARCUnreachable = models.SPVError{Message: "ARC cannot be requested", StatusCode: 500, Code: "error-broadcast-unreachable"}
-
-// ErrARCUnauthorized is when ARC returns unauthorized
-var ErrARCUnauthorized = models.SPVError{Message: "ARC returned unauthorized", StatusCode: 500, Code: "error-broadcast-unauthorized"}
-
-// ErrARCParseResponse is when ARC response cannot be parsed
-var ErrARCParseResponse = models.SPVError{Message: "ARC response cannot be parsed", StatusCode: 500, Code: "error-broadcast-parse-response"}
-
-// ErrARCGenericError is when ARC returns generic error (according to documentation - status code: 409)
-var ErrARCGenericError = models.SPVError{Message: "ARC returned generic error", StatusCode: 500, Code: "error-broadcast-generic-error"}
-
-// ErrARCUnsupportedStatusCode is when ARC returns unsupported status code
-var ErrARCUnsupportedStatusCode = models.SPVError{Message: "ARC returned unsupported status code", StatusCode: 500, Code: "error-broadcast-unsupported-status-code"}
+// ErrBroadcast is when broadcast error occurred
+var ErrBroadcast = models.SPVError{Message: "broadcast error", StatusCode: 500, Code: "error-broadcast"}

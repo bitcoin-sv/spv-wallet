@@ -6,8 +6,8 @@ import (
 	"time"
 
 	"github.com/bitcoin-sv/spv-wallet/engine/chain"
+	"github.com/bitcoin-sv/spv-wallet/engine/chain/errors"
 	"github.com/bitcoin-sv/spv-wallet/engine/chain/models"
-	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/bitcoin-sv/spv-wallet/engine/tester"
 	"github.com/stretchr/testify/require"
 )
@@ -18,7 +18,7 @@ NOTE: switch httpClient to resty.New() tu call actual ARC server
 
 func TestQueryService(t *testing.T) {
 	t.Run("QueryTransaction for MINED transaction", func(t *testing.T) {
-		httpClient := arcMockActivate(false)
+		httpClient := mockActivate(false)
 
 		service := chain.NewChainService(tester.Logger(t), httpClient, arcCfg(arcURL, arcToken), chainmodels.BHSConfig{})
 
@@ -31,7 +31,7 @@ func TestQueryService(t *testing.T) {
 	})
 
 	t.Run("QueryTransaction for unknown transaction", func(t *testing.T) {
-		httpClient := arcMockActivate(false)
+		httpClient := mockActivate(false)
 
 		service := chain.NewChainService(tester.Logger(t), httpClient, arcCfg(arcURL, arcToken), chainmodels.BHSConfig{})
 
@@ -53,31 +53,31 @@ func TestQueryServiceErrorCases(t *testing.T) {
 			txID:      invalidTxID,
 			arcToken:  arcToken,
 			arcURL:    arcURL,
-			expectErr: spverrors.ErrARCGenericError,
+			expectErr: chainerrors.ErrARCGenericError,
 		},
 		"QueryTransaction with wrong token": {
 			txID:      minedTxID,
 			arcToken:  "wrong-token", //if you test it on actual ARC server, this test might fail if the ARC doesn't require token
 			arcURL:    arcURL,
-			expectErr: spverrors.ErrARCUnauthorized,
+			expectErr: chainerrors.ErrARCUnauthorized,
 		},
 		"QueryTransaction 404 endpoint but reachable": {
 			txID:      minedTxID,
 			arcToken:  arcToken,
 			arcURL:    arcURL + wrongButReachable,
-			expectErr: spverrors.ErrARCUnreachable,
+			expectErr: chainerrors.ErrARCUnreachable,
 		},
 		"QueryTransaction 404 endpoint with wrong arcURL": {
 			txID:      minedTxID,
 			arcToken:  arcToken,
 			arcURL:    "wrong-url",
-			expectErr: spverrors.ErrARCUnreachable,
+			expectErr: chainerrors.ErrARCUnreachable,
 		},
 	}
 
 	for name, tc := range errTestCases {
 		t.Run(name, func(t *testing.T) {
-			httpClient := arcMockActivate(false)
+			httpClient := mockActivate(false)
 
 			service := chain.NewChainService(tester.Logger(t), httpClient, arcCfg(tc.arcURL, tc.arcToken), chainmodels.BHSConfig{})
 
@@ -92,7 +92,7 @@ func TestQueryServiceErrorCases(t *testing.T) {
 
 func TestQueryServiceTimeouts(t *testing.T) {
 	t.Run("QueryTransaction interrupted by ctx timeout", func(t *testing.T) {
-		httpClient := arcMockActivate(true)
+		httpClient := mockActivate(true)
 
 		service := chain.NewChainService(tester.Logger(t), httpClient, arcCfg(arcURL, arcToken), chainmodels.BHSConfig{})
 
@@ -102,13 +102,13 @@ func TestQueryServiceTimeouts(t *testing.T) {
 		txInfo, err := service.QueryTransaction(ctx, minedTxID)
 
 		require.Error(t, err)
-		require.ErrorIs(t, err, spverrors.ErrARCUnreachable)
+		require.ErrorIs(t, err, chainerrors.ErrARCUnreachable)
 		require.ErrorIs(t, err, context.DeadlineExceeded)
 		require.Nil(t, txInfo)
 	})
 
 	t.Run("QueryTransaction interrupted by resty timeout", func(t *testing.T) {
-		httpClient := arcMockActivate(true)
+		httpClient := mockActivate(true)
 		httpClient.SetTimeout(1 * time.Millisecond)
 
 		service := chain.NewChainService(tester.Logger(t), httpClient, arcCfg(arcURL, arcToken), chainmodels.BHSConfig{})
@@ -116,7 +116,7 @@ func TestQueryServiceTimeouts(t *testing.T) {
 		txInfo, err := service.QueryTransaction(context.Background(), minedTxID)
 
 		require.Error(t, err)
-		require.ErrorIs(t, err, spverrors.ErrARCUnreachable)
+		require.ErrorIs(t, err, chainerrors.ErrARCUnreachable)
 		require.ErrorIs(t, err, context.DeadlineExceeded)
 		require.Nil(t, txInfo)
 	})

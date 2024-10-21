@@ -4,22 +4,17 @@ import (
 	"context"
 
 	sdk "github.com/bitcoin-sv/go-sdk/transaction"
+	"github.com/bitcoin-sv/spv-wallet/engine/chain/models"
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
-	"iter"
 )
-
-// TransactionsGetter is an interface for getting transactions by their IDs
-type TransactionsGetter interface {
-	GetTransactions(ctx context.Context, ids iter.Seq[string]) ([]*sdk.Transaction, error)
-}
 
 // Converter provides a method to convert a transaction to EFHex format
 type Converter struct {
-	txsGetter TransactionsGetter
+	txsGetter chainmodels.TransactionsGetter
 }
 
 // NewConverter creates a new instance of Converter
-func NewConverter(txsGetter TransactionsGetter) *Converter {
+func NewConverter(txsGetter chainmodels.TransactionsGetter) *Converter {
 	return &Converter{txsGetter: txsGetter}
 }
 

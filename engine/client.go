@@ -7,8 +7,7 @@ import (
 	"github.com/bitcoin-sv/go-paymail"
 	"github.com/bitcoin-sv/go-paymail/server"
 	"github.com/bitcoin-sv/spv-wallet/engine/chain"
-	chainmodels "github.com/bitcoin-sv/spv-wallet/engine/chain/models"
-	"github.com/bitcoin-sv/spv-wallet/engine/chainstate"
+	"github.com/bitcoin-sv/spv-wallet/engine/chain/models"
 	"github.com/bitcoin-sv/spv-wallet/engine/cluster"
 	"github.com/bitcoin-sv/spv-wallet/engine/datastore"
 	"github.com/bitcoin-sv/spv-wallet/engine/logging"
@@ -19,6 +18,7 @@ import (
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/bitcoin-sv/spv-wallet/engine/taskmanager"
 	"github.com/bitcoin-sv/spv-wallet/engine/transaction/outlines"
+	"github.com/bitcoin-sv/spv-wallet/models/bsv"
 	"github.com/go-resty/resty/v2"
 	"github.com/mrz1836/go-cachestore"
 	"github.com/rs/zerolog"
@@ -35,7 +35,6 @@ type (
 	clientOptions struct {
 		cacheStore                 *cacheStoreOptions     // Configuration options for Cachestore (ristretto, redis, etc.)
 		cluster                    *clusterOptions        // Configuration options for the cluster coordinator
-		chainstate                 *chainstateOptions     // Configuration options for Chainstate (broadcast, sync, etc.)
 		dataStore                  *dataStoreOptions      // Configuration options for the DataStore (PostgreSQL, etc.)
 		debug                      bool                   // If the client is in debug mode
 		encryptionKey              string                 // Encryption key for encrypting sensitive information (IE: paymail xPub) (hex encoded key)
@@ -53,22 +52,7 @@ type (
 		chainService               chain.Service          // Chain service
 		arcConfig                  chainmodels.ARCConfig  // Configuration for ARC
 		bhsConfig                  chainmodels.BHSConfig  // Configuration for BHS
-		txCallbackConfig           *txCallbackConfig      // Configuration for TX callback received from ARC; disabled if nil
-	}
-
-	txCallbackConfig struct {
-		URL   string // URL for the callback
-		Token string // Token for the callback
-	}
-
-	// chainstateOptions holds the chainstate configuration and client
-	chainstateOptions struct {
-		chainstate.ClientInterface                        // Client for Chainstate
-		options                    []chainstate.ClientOps // List of options
-		broadcasting               bool                   // Default value for all transactions
-		broadcastInstant           bool                   // Default value for all transactions
-		paymailP2P                 bool                   // Default value for all transactions
-		syncOnChain                bool                   // Default value for all transactions
+		feeUnit                    *bsv.FeeUnit           // Fee unit for transactions
 	}
 
 	// cacheStoreOptions holds the cache configuration and client
@@ -168,11 +152,6 @@ func NewClient(ctx context.Context, opts ...ClientOps) (ClientInterface, error) 
 		return nil, err
 	}
 
-	// Load the Chainstate client
-	if err = client.loadChainstate(ctx); err != nil {
-		return nil, err
-	}
-
 	// Load the Paymail client and service (if does not exist)
 	if err = client.loadPaymailComponents(); err != nil {
 		return nil, err
@@ -206,6 +185,12 @@ func NewClient(ctx context.Context, opts ...ClientOps) (ClientInterface, error) 
 	// Default paymail server config (generic capabilities and domain check disabled)
 	if client.options.paymail.serverConfig.Configuration == nil {
 		if err = client.loadDefaultPaymailConfig(); err != nil {
+			return nil, err
+		}
+	}
+
+	if client.options.feeUnit == nil {
+		if err = client.askForFeeUnit(ctx); err != nil {
 			return nil, err
 		}
 	}
@@ -261,14 +246,6 @@ func (c *Client) Cluster() cluster.ClientInterface {
 	return nil
 }
 
-// Chainstate will return the Chainstate service IF: exists and is enabled
-func (c *Client) Chainstate() chainstate.ClientInterface {
-	if c.options.chainstate != nil && c.options.chainstate.ClientInterface != nil {
-		return c.options.chainstate.ClientInterface
-	}
-	return nil
-}
-
 // Close will safely close any open connections (cache, datastore, etc.)
 func (c *Client) Close(ctx context.Context) error {
 
@@ -314,24 +291,9 @@ func (c *Client) Debug(on bool) {
 		cs.Debug(on)
 	}
 
-	// Set debugging on the Chainstate
-	if ch := c.Chainstate(); ch != nil {
-		ch.Debug(on)
-	}
-
 	// Set debugging on the Datastore
 	if ds := c.Datastore(); ds != nil {
 		ds.Debug(on)
-	}
-}
-
-// DefaultSyncConfig will return the default sync config from the client defaults (for chainstate)
-func (c *Client) DefaultSyncConfig() *SyncConfig {
-	return &SyncConfig{
-		Broadcast:        c.options.chainstate.broadcasting,
-		BroadcastInstant: c.options.chainstate.broadcastInstant,
-		PaymailP2P:       c.options.chainstate.paymailP2P,
-		SyncOnChain:      c.options.chainstate.syncOnChain,
 	}
 }
 
@@ -412,4 +374,9 @@ func (c *Client) LogBHSReadiness(ctx context.Context) {
 	} else {
 		logger.Info().Msg("Block Headers Service is ready to verify transactions.")
 	}
+}
+
+// FeeUnit will return the fee unit used for transactions
+func (c *Client) FeeUnit() bsv.FeeUnit {
+	return *c.options.feeUnit
 }
