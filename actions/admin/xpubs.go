@@ -3,6 +3,9 @@ package admin
 import (
 	"net/http"
 
+	"github.com/gin-gonic/gin"
+
+	"github.com/bitcoin-sv/spv-wallet/actions/common"
 	"github.com/bitcoin-sv/spv-wallet/engine"
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/bitcoin-sv/spv-wallet/internal/query"
@@ -10,7 +13,6 @@ import (
 	"github.com/bitcoin-sv/spv-wallet/models/filter"
 	"github.com/bitcoin-sv/spv-wallet/models/response"
 	"github.com/bitcoin-sv/spv-wallet/server/reqctx"
-	"github.com/gin-gonic/gin"
 )
 
 // create will make a new model using the services defined in the action object
@@ -78,10 +80,18 @@ func xpubsSearch(c *gin.Context, _ *reqctx.AdminContext) {
 		return
 	}
 
-	xpubContracts := make([]*response.Xpub, 0, len(xpubs))
-	for _, xpub := range xpubs {
-		xpubContracts = append(xpubContracts, mappings.MapToXpubContract(xpub))
+	count, err := reqctx.Engine(c).GetXPubsCount(c.Request.Context(), mappings.MapToMetadata(searchParams.Metadata), searchParams.Conditions.ToDbConditions())
+	if err != nil {
+		spverrors.ErrCouldNotFindXpub.WithTrace(err)
+		return
 	}
 
-	c.JSON(http.StatusOK, xpubContracts)
+	xpubContracts := common.MapToTypeContracts(xpubs, mappings.MapToXpubContract)
+
+	result := response.PageModel[response.Xpub]{
+		Content: xpubContracts,
+		Page:    common.GetPageDescriptionFromSearchParams(mappings.MapToDbQueryParams(&searchParams.Page), count),
+	}
+
+	c.JSON(http.StatusOK, result)
 }

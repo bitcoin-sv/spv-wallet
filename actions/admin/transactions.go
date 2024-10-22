@@ -3,13 +3,15 @@ package admin
 import (
 	"net/http"
 
+	"github.com/gin-gonic/gin"
+
+	"github.com/bitcoin-sv/spv-wallet/actions/common"
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/bitcoin-sv/spv-wallet/internal/query"
 	"github.com/bitcoin-sv/spv-wallet/mappings"
 	"github.com/bitcoin-sv/spv-wallet/models/filter"
 	"github.com/bitcoin-sv/spv-wallet/models/response"
 	"github.com/bitcoin-sv/spv-wallet/server/reqctx"
-	"github.com/gin-gonic/gin"
 )
 
 // adminGetTxByID fetches a transaction by id for admins
@@ -79,9 +81,21 @@ func adminSearchTxs(c *gin.Context, _ *reqctx.AdminContext) {
 		return
 	}
 
-	contracts := make([]*response.Transaction, 0, len(transactions))
-	for _, transaction := range transactions {
-		contracts = append(contracts, mappings.MapToTransactionContractForAdmin(transaction))
+	count, err := reqctx.Engine(c).GetTransactionsCount(
+		c.Request.Context(),
+		metadata,
+		conditions,
+	)
+	if err != nil {
+		spverrors.ErrCouldNotCountTransactions.WithTrace(err)
+		return
 	}
-	c.JSON(http.StatusOK, contracts)
+
+	contracts := common.MapToTypeContracts(transactions, mappings.MapToTransactionContractForAdmin)
+	result := response.PageModel[response.Transaction]{
+		Content: contracts,
+		Page:    common.GetPageDescriptionFromSearchParams(pageOptions, count),
+	}
+
+	c.JSON(http.StatusOK, result)
 }

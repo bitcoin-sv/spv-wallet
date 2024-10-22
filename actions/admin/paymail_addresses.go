@@ -3,6 +3,9 @@ package admin
 import (
 	"net/http"
 
+	"github.com/gin-gonic/gin"
+
+	"github.com/bitcoin-sv/spv-wallet/actions/common"
 	"github.com/bitcoin-sv/spv-wallet/engine"
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/bitcoin-sv/spv-wallet/internal/query"
@@ -10,7 +13,6 @@ import (
 	"github.com/bitcoin-sv/spv-wallet/models/filter"
 	"github.com/bitcoin-sv/spv-wallet/models/response"
 	"github.com/bitcoin-sv/spv-wallet/server/reqctx"
-	"github.com/gin-gonic/gin"
 )
 
 // paymailGetAddress will return a paymail address
@@ -79,12 +81,19 @@ func paymailAddressesSearch(c *gin.Context, _ *reqctx.AdminContext) {
 		return
 	}
 
-	paymailAddressContracts := make([]*response.PaymailAddress, 0, len(paymailAddresses))
-	for _, paymailAddress := range paymailAddresses {
-		paymailAddressContracts = append(paymailAddressContracts, mappings.MapToPaymailContract(paymailAddress))
+	count, err := reqctx.Engine(c).GetPaymailAddressesCount(c.Request.Context(), metadata, conditions)
+	if err != nil {
+		spverrors.ErrorResponse(c, spverrors.ErrCouldNotFindPaymail.WithTrace(err), logger)
+		return
 	}
 
-	c.JSON(http.StatusOK, paymailAddressContracts)
+	paymailAddressContracts := common.MapToTypeContracts(paymailAddresses, mappings.MapToPaymailContract)
+
+	result := response.PageModel[response.PaymailAddress]{
+		Content: paymailAddressContracts,
+		Page:    common.GetPageDescriptionFromSearchParams(pageOptions, count),
+	}
+	c.JSON(http.StatusOK, result)
 }
 
 // paymailCreateAddress will create a new paymail address

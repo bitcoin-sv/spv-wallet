@@ -3,13 +3,15 @@ package admin
 import (
 	"net/http"
 
+	"github.com/gin-gonic/gin"
+
+	"github.com/bitcoin-sv/spv-wallet/actions/common"
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/bitcoin-sv/spv-wallet/internal/query"
 	"github.com/bitcoin-sv/spv-wallet/mappings"
 	"github.com/bitcoin-sv/spv-wallet/models/filter"
 	"github.com/bitcoin-sv/spv-wallet/models/response"
 	"github.com/bitcoin-sv/spv-wallet/server/reqctx"
-	"github.com/gin-gonic/gin"
 )
 
 // utxosSearch will fetch a list of utxos filtered by metadata
@@ -52,10 +54,18 @@ func utxosSearch(c *gin.Context, _ *reqctx.AdminContext) {
 		return
 	}
 
-	contracts := make([]*response.Utxo, 0, len(utxos))
-	for _, utxo := range utxos {
-		contracts = append(contracts, mappings.MapToUtxoContract(utxo))
+	count, err := reqctx.Engine(c).GetUtxosCount(c.Request.Context(), metadata, conditions)
+	if err != nil {
+		spverrors.ErrorResponse(c, spverrors.ErrCouldNotFindUtxo.WithTrace(err), logger)
+		return
 	}
 
-	c.JSON(http.StatusOK, contracts)
+	contracts := common.MapToTypeContracts(utxos, mappings.MapToUtxoContract)
+
+	result := response.PageModel[response.Utxo]{
+		Content: contracts,
+		Page:    common.GetPageDescriptionFromSearchParams(pageOptions, count),
+	}
+
+	c.JSON(http.StatusOK, result)
 }

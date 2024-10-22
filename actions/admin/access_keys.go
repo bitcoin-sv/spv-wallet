@@ -3,13 +3,15 @@ package admin
 import (
 	"net/http"
 
+	"github.com/gin-gonic/gin"
+
+	"github.com/bitcoin-sv/spv-wallet/actions/common"
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/bitcoin-sv/spv-wallet/internal/query"
 	"github.com/bitcoin-sv/spv-wallet/mappings"
 	"github.com/bitcoin-sv/spv-wallet/models/filter"
 	"github.com/bitcoin-sv/spv-wallet/models/response"
 	"github.com/bitcoin-sv/spv-wallet/server/reqctx"
-	"github.com/gin-gonic/gin"
 )
 
 // accessKeysSearch will fetch a list of access keys filtered by metadata
@@ -47,10 +49,18 @@ func accessKeysSearch(c *gin.Context, _ *reqctx.AdminContext) {
 		return
 	}
 
-	accessKeyContracts := make([]*response.AccessKey, 0, len(accessKeys))
-	for _, accessKey := range accessKeys {
-		accessKeyContracts = append(accessKeyContracts, mappings.MapToAccessKeyContract(accessKey))
+	count, err := reqctx.Engine(c).GetAccessKeysCount(c.Request.Context(), metadata, conditions)
+	if err != nil {
+		spverrors.ErrorResponse(c, spverrors.ErrCouldNotFindAccessKey.WithTrace(err), logger)
+		return
 	}
 
-	c.JSON(http.StatusOK, accessKeyContracts)
+	accessKeyContracts := common.MapToTypeContracts(accessKeys, mappings.MapToAccessKeyContract)
+
+	result := response.PageModel[response.AccessKey]{
+		Content: accessKeyContracts,
+		Page:    common.GetPageDescriptionFromSearchParams(pageOptions, count),
+	}
+
+	c.JSON(http.StatusOK, result)
 }

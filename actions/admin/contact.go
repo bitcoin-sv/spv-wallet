@@ -3,6 +3,8 @@ package admin
 import (
 	"net/http"
 
+	"github.com/gin-gonic/gin"
+
 	"github.com/bitcoin-sv/spv-wallet/actions/common"
 	"github.com/bitcoin-sv/spv-wallet/engine"
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
@@ -11,7 +13,6 @@ import (
 	"github.com/bitcoin-sv/spv-wallet/models/filter"
 	"github.com/bitcoin-sv/spv-wallet/models/response"
 	"github.com/bitcoin-sv/spv-wallet/server/reqctx"
-	"github.com/gin-gonic/gin"
 )
 
 // contactsSearch will fetch a list of contacts filtered by Metadata and ContactFilters
@@ -55,17 +56,17 @@ func contactsSearch(c *gin.Context, _ *reqctx.AdminContext) {
 		return
 	}
 
-	contracts := mappings.MapToContactContracts(contacts)
-
 	count, err := engine.GetContactsCount(
 		c.Request.Context(),
 		metadata,
 		conditions,
 	)
 	if err != nil {
-		spverrors.ErrorResponse(c, spverrors.ErrFailedToCountContacts.WithTrace(err), logger)
+		spverrors.ErrorResponse(c, spverrors.ErrCouldNotCountContacts.WithTrace(err), logger)
 		return
 	}
+
+	contracts := common.MapToTypeContracts(contacts, mappings.MapToContactContract)
 
 	response := response.PageModel[response.Contact]{
 		Content: contracts,
