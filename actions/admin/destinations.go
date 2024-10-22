@@ -13,6 +13,7 @@ import (
 
 // destinationsSearch will fetch a list of destinations filtered by metadata
 // Search for destinations filtering by metadata godoc
+// @DeprecatedRouter /v1/admin/destinations [post]
 // @Summary		Search for destinations
 // @Description	Search for destinations
 // @Tags		Admin
@@ -52,6 +53,7 @@ func destinationsSearch(c *gin.Context, _ *reqctx.AdminContext) {
 
 // destinationsCount will count all destinations filtered by metadata
 // Count destinations filtering by metadata godoc
+// @DeprecatedRouter /v1/admin/destinations/count [post]
 // @Summary		Count destinations
 // @Description	Count destinations
 // @Tags		Admin

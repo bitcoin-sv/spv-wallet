@@ -98,6 +98,12 @@ var ErrUnknownLockingScript = models.SPVError{Message: "could not recognize lock
 // ErrContactNotFound is when contact cannot be found
 var ErrContactNotFound = models.SPVError{Message: "contact not found", StatusCode: 404, Code: "error-contact-not-found"}
 
+// ErrContactsNotFound is when contacts cannot be found
+var ErrContactsNotFound = models.SPVError{Message: "contacts not found", StatusCode: 404, Code: "error-contacts-not-found"}
+
+// ErrCouldNotCountContacts is when contacts cannot be counted
+var ErrCouldNotCountContacts = models.SPVError{Message: "failed to count contacts", StatusCode: 500, Code: "error-contacts-count-failed"}
+
 // ErrInvalidRequesterXpub is when requester xpub is not connected with given paymail
 var ErrInvalidRequesterXpub = models.SPVError{Message: "invalid requester xpub", StatusCode: 400, Code: "error-contact-invalid-requester-xpub"}
 
@@ -137,6 +143,18 @@ var ErrGettingPKIFailed = models.SPVError{Message: "getting PKI for contact fail
 // ErrSaveContact is when saving new contact failed
 var ErrSaveContact = models.SPVError{Message: "adding contact failed", StatusCode: 400, Code: "error-contact-adding-contact-failed"}
 
+// ErrUpdateContact is when updating contact failed
+var ErrUpdateContact = models.SPVError{Message: "updating contact failed", StatusCode: 500, Code: "error-contact-updating-contact-failed"}
+
+// ErrDeleteContact is when deleting contact failed
+var ErrDeleteContact = models.SPVError{Message: "deleting contact failed", StatusCode: 500, Code: "error-contact-deleting-contact-failed"}
+
+// ErrRejectContact is when rejecting contact failed
+var ErrRejectContact = models.SPVError{Message: "rejecting contact failed", StatusCode: 500, Code: "error-contact-rejecting-contact-failed"}
+
+// ErrAcceptContact is when accepting contact failed
+var ErrAcceptContact = models.SPVError{Message: "accepting contact failed", StatusCode: 500, Code: "error-contact-accepting-contact-failed"}
+
 // ////////////////////////////////// PAYMAIL ERRORS
 
 // ErrCouldNotFindPaymail is when paymail could not be found
@@ -144,6 +162,12 @@ var ErrCouldNotFindPaymail = models.SPVError{Message: "paymail not found", Statu
 
 // ErrPaymailAddressIsInvalid is when the paymail address is NOT alias@domain.com
 var ErrPaymailAddressIsInvalid = models.SPVError{Message: "paymail address is invalid", StatusCode: 400, Code: "error-paymail-address-invalid"}
+
+// ErrDeletePaymailAddress is when the paymail address could not be deleted
+var ErrDeletePaymailAddress = models.SPVError{Message: "deleting paymail address failed", StatusCode: 400, Code: "error-deleting-paymail-address-failed"}
+
+// ErrCreatePaymailAddress is when the paymail address could not be created
+var ErrCreatePaymailAddress = models.SPVError{Message: "creating paymail address failed", StatusCode: 500, Code: "error-creating-paymail-address-failed"}
 
 // ErrMissingPaymailID is when id is missing in paymail
 var ErrMissingPaymailID = models.SPVError{Message: "missing id in paymail", StatusCode: 400, Code: "error-paymail-id-missing"}
@@ -193,6 +217,9 @@ var ErrCouldNotFindDraftTx = models.SPVError{Message: "draft tx not found", Stat
 
 // ErrInvalidTransactionID is when a transaction id cannot be decoded
 var ErrInvalidTransactionID = models.SPVError{Message: "invalid transaction id", StatusCode: 400, Code: "error-transaction-id-invalid"}
+
+// ErrCouldNotCountTransactions is when a transaction count fails
+var ErrCouldNotCountTransactions = models.SPVError{Message: "failed transactions count", StatusCode: 500, Code: "error-transactions-count-failed"}
 
 // ErrInvalidRequirements is when an invalid requirement was given
 var ErrInvalidRequirements = models.SPVError{Message: "requirements are invalid or missing", StatusCode: 400, Code: "error-transaction-requirements-invalid"}
@@ -302,6 +329,9 @@ var ErrUtxoNotReserved = models.SPVError{Message: "transaction utxo has not been
 
 // ErrCouldNotFindXpub is when could not find xpub
 var ErrCouldNotFindXpub = models.SPVError{Message: "xpub not found", StatusCode: 404, Code: "error-xpub-not-found"}
+
+// ErrCouldNotCountXpubs is when could not count xpubs
+var ErrCouldNotCountXpubs = models.SPVError{Message: "failed xpubs count", StatusCode: 500, Code: "error-xpubs-count-failed"}
 
 // ErrXpubInvalidLength is when the length of the xpub does not match the desired length
 var ErrXpubInvalidLength = models.SPVError{Message: "xpub is an invalid length", StatusCode: 400, Code: "error-xpub-length-invalid"}

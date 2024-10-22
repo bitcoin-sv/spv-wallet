@@ -130,6 +130,7 @@ type PaymailService interface {
 	DeletePaymailAddress(ctx context.Context, address string, opts ...ModelOps) error
 	GetPaymailConfig() *PaymailServerOptions
 	GetPaymailAddress(ctx context.Context, address string, opts ...ModelOps) (*PaymailAddress, error)
+	GetPaymailAddressByID(ctx context.Context, id string, opts ...ModelOps) (*PaymailAddress, error)
 	GetPaymailAddressesByXPubID(ctx context.Context, xPubID string, metadataConditions *Metadata,
 		conditions map[string]interface{}, queryParams *datastore.QueryParams) ([]*PaymailAddress, error)
 	NewPaymailAddress(ctx context.Context, key, address, publicName,
@@ -143,6 +144,7 @@ type PaymailService interface {
 // TransactionService is the transaction actions
 type TransactionService interface {
 	GetTransaction(ctx context.Context, xPubID, txID string) (*Transaction, error)
+	GetAdminTransaction(ctx context.Context, txID string) (*Transaction, error)
 	GetTransactionsByIDs(ctx context.Context, txIDs []string) ([]*Transaction, error)
 	GetTransactionByHex(ctx context.Context, hex string) (*Transaction, error)
 	GetTransactions(ctx context.Context, metadata *Metadata, conditions map[string]interface{},
