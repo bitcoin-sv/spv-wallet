@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/bitcoin-sv/go-sdk/transaction"
+	conversionkit "github.com/bitcoin-sv/spv-wallet/conversion_kit"
 	chainerrors "github.com/bitcoin-sv/spv-wallet/engine/chain/errors"
 	"github.com/rs/zerolog"
 )
@@ -117,7 +118,10 @@ func processSyncTransactions(ctx context.Context, client *Client) {
 		} else {
 			tx.SetBUMP(bump)
 		}
-		blockHeight := uint64(txInfo.BlockHeight) //nolint:gosec // we trust the source
+		blockHeight, err := conversionkit.ConvertInt64ToUint64(txInfo.BlockHeight)
+		if err != nil {
+			logger.Error().Err(err).Str("txID", txID).Msg("Cannot convert block height")
+		}
 		tx.BlockHash = txInfo.BlockHash
 		tx.BlockHeight = blockHeight
 

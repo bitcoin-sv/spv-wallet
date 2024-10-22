@@ -62,14 +62,22 @@ func (m *Transaction) processUtxos(ctx context.Context) error {
 	if inputLen < 0 || inputLen > math.MaxUint32 {
 		return fmt.Errorf("number of inputs %d is out of range for uint32", inputLen)
 	}
-	m.NumberOfInputs = uint32(inputLen)
+	value32, err := conversionkit.ConvertIntToUint32(inputLen)
+	if err != nil {
+		return spverrors.Wrapf(err, "failed to convert int to uint32")
+	}
+	m.NumberOfInputs = value32
 
 	// Ensure len(m.parsedTx.Outputs) is within the range for uint32
 	outputLen := len(m.parsedTx.Outputs)
 	if outputLen < 0 || outputLen > math.MaxUint32 {
 		return fmt.Errorf("number of outputs %d is out of range for uint32", outputLen)
 	}
-	m.NumberOfOutputs = uint32(outputLen)
+	value32, err = conversionkit.ConvertIntToUint32(outputLen)
+	if err != nil {
+		return spverrors.Wrapf(err, "failed to convert int to uint32")
+	}
+	m.NumberOfOutputs = value32
 
 	return nil
 }
@@ -122,9 +130,9 @@ func (m *Transaction) _processInputs(ctx context.Context) (err error) {
 			if utxo.Satoshis > math.MaxInt64 {
 				return fmt.Errorf("utxo.Satoshis exceeds the maximum value for int64: %d", utxo.Satoshis)
 			}
-			satoshis, err := conversionkit.ConvertToInt64[uint64](utxo.Satoshis)
+			satoshis, err := conversionkit.ConvertUint64ToInt64(utxo.Satoshis)
 			if err != nil {
-				return err
+				return spverrors.Wrapf(err, "failed to convert uint64 to int64")
 			}
 			m.XpubOutputValue[utxo.XpubID] -= satoshis
 
@@ -171,18 +179,21 @@ func (m *Transaction) _processOutputs(ctx context.Context) (err error) {
 			); err != nil {
 				return
 			} else if destination != nil {
-				// Ensure `i` is within the valid range for `uint32`
-				if i < 0 || i > math.MaxUint32 {
-					return fmt.Errorf("output index %d is out of range for uint32", i)
+				i32, err := conversionkit.ConvertIntToUint32(i)
+				if err != nil {
+					return spverrors.Wrapf(err, "failed to convert int to uint32")
 				}
-
-				outputIndex := uint32(i) // Use a separate variable for the conversion
+				outputIndex := i32
 
 				// Add value of output to xPub ID
 				if _, ok := m.XpubOutputValue[destination.XpubID]; !ok {
 					m.XpubOutputValue[destination.XpubID] = 0
 				}
-				m.XpubOutputValue[destination.XpubID] += int64(amount)
+				amountInt64, err := conversionkit.ConvertUint64ToInt64(amount)
+				if err != nil {
+					return spverrors.Wrapf(err, "failed to convert uint64 to int64")
+				}
+				m.XpubOutputValue[destination.XpubID] += amountInt64
 
 				utxo, _ := m.client.GetUtxoByTransactionID(ctx, m.ID, outputIndex)
 				if utxo == nil {

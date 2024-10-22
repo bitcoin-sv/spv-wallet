@@ -390,20 +390,23 @@ var ErrBroadcast = models.SPVError{Message: "broadcast error", StatusCode: 500, 
 
 // ////////////////////////////////// CONVERSION ERRORS
 
-// ErrInvalidUint64Value is when uint64 value is invalid
-var ErrInvalidUint64Value = models.SPVError{Message: "invalid uint64 value", StatusCode: 500, Code: "error-invalid-uint64-value"}
+// ErrInvalidUint is when uint value is invalid
+var ErrInvalidUint = models.SPVError{Message: "invalid uint value", StatusCode: 500, Code: "error-invalid-uint-value"}
 
-// ErrInvalidUintValue is when uint value is invalid
-var ErrInvalidUintValue = models.SPVError{Message: "invalid uint value", StatusCode: 500, Code: "error-invalid-uint-value"}
-
-// ErrInvalidUint32Value is when value exceeds int64 limits for uint32
-var ErrInvalidUint32Value = models.SPVError{Message: "invalid uint32 value", StatusCode: 500, Code: "error-invalid-uint32-value"}
-
-// ErrInvalidIntValue is when uint value is invalid
-var ErrInvalidIntValue = models.SPVError{Message: "invalid int value", StatusCode: 500, Code: "error-invalid-int-value"}
+// ErrInvalidInt is when uint value is invalid
+var ErrInvalidInt = models.SPVError{Message: "invalid int value", StatusCode: 500, Code: "error-invalid-int-value"}
 
 // ErrUnsupportedTypeForConversion is when unsupported type for conversion
 var ErrUnsupportedTypeForConversion = models.SPVError{Message: "unsupported type for conversion", StatusCode: 500, Code: "error-unsupported-type-for-conversion"}
 
 // ErrForTypeConversion is when error occurred during type conversion
 var ErrForTypeConversion = models.SPVError{Message: "error during type conversion", StatusCode: 500, Code: "error-type-conversion"}
+
+// ErrInvalidUint32 is when uint32 value is invalid
+var ErrInvalidUint32 = models.SPVError{Message: "invalid uint32 value", StatusCode: 500, Code: "error-invalid-uint32"}
+
+// ErrInvalidInt64 is when int64 value is invalid
+var ErrInvalidInt64 = models.SPVError{Message: "invalid int64 value", StatusCode: 500, Code: "error-invalid-int64"}
+
+// ErrInvalidUint64 is when uint64 value is invalid
+var ErrInvalidUint64 = models.SPVError{Message: "invalid uint64 value", StatusCode: 500, Code: "error-invalid-uint64"}

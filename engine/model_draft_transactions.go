@@ -14,6 +14,7 @@ import (
 	"github.com/bitcoin-sv/go-sdk/script"
 	trx "github.com/bitcoin-sv/go-sdk/transaction"
 	"github.com/bitcoin-sv/go-sdk/transaction/template/p2pkh"
+	conversionkit "github.com/bitcoin-sv/spv-wallet/conversion_kit"
 	"github.com/bitcoin-sv/spv-wallet/engine/datastore"
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/bitcoin-sv/spv-wallet/engine/utils"
@@ -499,15 +500,25 @@ func (m *DraftTransaction) estimateSize() uint64 {
 	size := defaultOverheadSize // version + nLockTime
 
 	inputSize := trx.VarInt(len(m.Configuration.Inputs))
-	size += uint64(inputSize.Length()) //nolint:gosec
+
+	value, err := conversionkit.ConvertIntToUint64(inputSize.Length())
+	if err != nil {
+		m.client.Logger().Error().Msg(err.Error())
+		return 0
+	}
+	size += value
 
 	for _, input := range m.Configuration.Inputs {
 		size += utils.GetInputSizeForType(input.Type)
 	}
 
 	outputSize := trx.VarInt(len(m.Configuration.Outputs))
-	size += uint64(outputSize.Length()) //nolint:gosec
-
+	value, err = conversionkit.ConvertIntToUint64(outputSize.Length())
+	if err != nil {
+		m.client.Logger().Error().Msg(err.Error())
+		return 0
+	}
+	size += value
 	for _, output := range m.Configuration.Outputs {
 		for _, s := range output.Scripts {
 			size += utils.GetOutputSize(s.Script)
