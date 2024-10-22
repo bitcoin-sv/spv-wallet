@@ -2,12 +2,13 @@ package engine
 
 import (
 	"context"
-	"fmt"
 	"math"
 	"time"
 
 	trx "github.com/bitcoin-sv/go-sdk/transaction"
-	"github.com/bitcoin-sv/spv-wallet/engine/chain/models"
+
+	conversionkit "github.com/bitcoin-sv/spv-wallet/conversion_kit"
+	chainmodels "github.com/bitcoin-sv/spv-wallet/engine/chain/models"
 	"github.com/bitcoin-sv/spv-wallet/engine/datastore"
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/bitcoin-sv/spv-wallet/engine/utils"
@@ -361,11 +362,11 @@ func (c *Client) HandleTxCallback(ctx context.Context, callbackResp *chainmodels
 	}
 
 	tx.BlockHash = callbackResp.BlockHash
-	if callbackResp.BlockHeight < 0 {
-		return fmt.Errorf("invalid block height: %d", callbackResp.BlockHeight)
+	blockHeight, err := conversionkit.ConvertToUint64(callbackResp.BlockHeight)
+	if err != nil {
+		return spverrors.ErrForTypeConversion.Wrap(err)
 	}
-	// Suppress gosec G115 warning as the conversion is safe due to prior negative check
-	tx.BlockHeight = uint64(callbackResp.BlockHeight) //nolint:gosec
+	tx.BlockHeight = blockHeight
 	tx.SetBUMP(bump)
 	tx.UpdateFromBroadcastStatus(callbackResp.TXStatus)
 

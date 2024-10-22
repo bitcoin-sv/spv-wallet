@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"math"
 
+	conversionkit "github.com/bitcoin-sv/spv-wallet/conversion_kit"
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/bitcoin-sv/spv-wallet/engine/utils"
 )
@@ -121,7 +122,10 @@ func (m *Transaction) _processInputs(ctx context.Context) (err error) {
 			if utxo.Satoshis > math.MaxInt64 {
 				return fmt.Errorf("utxo.Satoshis exceeds the maximum value for int64: %d", utxo.Satoshis)
 			}
-			satoshis := int64(utxo.Satoshis) //nolint:gosec // This is not a security issue as we check the value above
+			satoshis, err := conversionkit.ConvertToInt64[uint64](utxo.Satoshis)
+			if err != nil {
+				return err
+			}
 			m.XpubOutputValue[utxo.XpubID] -= satoshis
 
 			// Mark utxo as spent

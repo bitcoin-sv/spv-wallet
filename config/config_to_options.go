@@ -6,6 +6,12 @@ import (
 	"net/url"
 	"time"
 
+	"github.com/go-redis/redis/v8"
+	"github.com/go-resty/resty/v2"
+	"github.com/mrz1836/go-cachestore"
+	"github.com/rs/zerolog"
+
+	conversionkit "github.com/bitcoin-sv/spv-wallet/conversion_kit"
 	"github.com/bitcoin-sv/spv-wallet/engine"
 	chainmodels "github.com/bitcoin-sv/spv-wallet/engine/chain/models"
 	"github.com/bitcoin-sv/spv-wallet/engine/cluster"
@@ -15,10 +21,6 @@ import (
 	"github.com/bitcoin-sv/spv-wallet/engine/utils"
 	"github.com/bitcoin-sv/spv-wallet/metrics"
 	"github.com/bitcoin-sv/spv-wallet/models/bsv"
-	"github.com/go-redis/redis/v8"
-	"github.com/go-resty/resty/v2"
-	"github.com/mrz1836/go-cachestore"
-	"github.com/rs/zerolog"
 )
 
 // ToEngineOptions converts the AppConfig to a slice of engine.ClientOps that can be used to create a new engine.Client.
@@ -70,10 +72,12 @@ func (c *AppConfig) addHttpClientOpts(options []engine.ClientOps) []engine.Clien
 
 func (c *AppConfig) addCustomFeeUnit(options []engine.ClientOps) []engine.ClientOps {
 	if c.CustomFeeUnit != nil {
-		santoshis := uint64(c.CustomFeeUnit.Satoshis) //nolint:gosec
-
+		satoshis, err := conversionkit.ConvertToUint64(c.CustomFeeUnit.Satoshis)
+		if err != nil {
+			return options
+		}
 		options = append(options, engine.WithCustomFeeUnit(bsv.FeeUnit{
-			Satoshis: bsv.Satoshis(santoshis),
+			Satoshis: bsv.Satoshis(satoshis),
 			Bytes:    c.CustomFeeUnit.Bytes,
 		}))
 	}

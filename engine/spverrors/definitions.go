@@ -387,3 +387,23 @@ var ErrAskingForFeeUnit = models.SPVError{Message: "error during asking for fee 
 
 // ErrBroadcast is when broadcast error occurred
 var ErrBroadcast = models.SPVError{Message: "broadcast error", StatusCode: 500, Code: "error-broadcast"}
+
+// ////////////////////////////////// CONVERSION ERRORS
+
+// ErrInvalidUint64Value is when uint64 value is invalid
+var ErrInvalidUint64Value = models.SPVError{Message: "invalid uint64 value", StatusCode: 500, Code: "error-invalid-uint64-value"}
+
+// ErrInvalidUintValue is when uint value is invalid
+var ErrInvalidUintValue = models.SPVError{Message: "invalid uint value", StatusCode: 500, Code: "error-invalid-uint-value"}
+
+// ErrInvalidUint32Value is when value exceeds int64 limits for uint32
+var ErrInvalidUint32Value = models.SPVError{Message: "invalid uint32 value", StatusCode: 500, Code: "error-invalid-uint32-value"}
+
+// ErrInvalidIntValue is when uint value is invalid
+var ErrInvalidIntValue = models.SPVError{Message: "invalid int value", StatusCode: 500, Code: "error-invalid-int-value"}
+
+// ErrUnsupportedTypeForConversion is when unsupported type for conversion
+var ErrUnsupportedTypeForConversion = models.SPVError{Message: "unsupported type for conversion", StatusCode: 500, Code: "error-unsupported-type-for-conversion"}
+
+// ErrForTypeConversion is when error occurred during type conversion
+var ErrForTypeConversion = models.SPVError{Message: "error during type conversion", StatusCode: 500, Code: "error-type-conversion"}
