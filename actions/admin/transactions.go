@@ -87,7 +87,7 @@ func adminSearchTxs(c *gin.Context, _ *reqctx.AdminContext) {
 		conditions,
 	)
 	if err != nil {
-		spverrors.ErrCouldNotCountTransactions.WithTrace(err)
+		spverrors.ErrorResponse(c, spverrors.ErrCouldNotCountTransactions.WithTrace(err), logger)
 		return
 	}
 

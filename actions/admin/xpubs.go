@@ -82,7 +82,7 @@ func xpubsSearch(c *gin.Context, _ *reqctx.AdminContext) {
 
 	count, err := reqctx.Engine(c).GetXPubsCount(c.Request.Context(), mappings.MapToMetadata(searchParams.Metadata), searchParams.Conditions.ToDbConditions())
 	if err != nil {
-		spverrors.ErrCouldNotFindXpub.WithTrace(err)
+		spverrors.ErrorResponse(c, spverrors.ErrCouldNotCountXpubs.WithTrace(err), logger)
 		return
 	}
 
