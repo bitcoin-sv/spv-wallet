@@ -330,7 +330,7 @@ var ErrUtxoNotReserved = models.SPVError{Message: "transaction utxo has not been
 // ErrCouldNotFindXpub is when could not find xpub
 var ErrCouldNotFindXpub = models.SPVError{Message: "xpub not found", StatusCode: 404, Code: "error-xpub-not-found"}
 
-// ErrCouldNotFindXpubs is when could not count xpubs
+// ErrCouldNotCountXpubs is when could not count xpubs
 var ErrCouldNotCountXpubs = models.SPVError{Message: "failed xpubs count", StatusCode: 500, Code: "error-xpubs-count-failed"}
 
 // ErrXpubInvalidLength is when the length of the xpub does not match the desired length
