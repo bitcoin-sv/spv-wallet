@@ -40,3 +40,12 @@ func GetPageDescriptionFromSearchParams(queryParams *datastore.QueryParams, coun
 
 	return pageDescription
 }
+
+// MapToTypeContracts is a generic function that maps elements from one slice to another.
+func MapToTypeContracts[T any, U any](input []T, mapper func(T) U) []U {
+	output := make([]U, 0, len(input))
+	for _, item := range input {
+		output = append(output, mapper(item))
+	}
+	return output
+}

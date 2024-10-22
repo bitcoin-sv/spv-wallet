@@ -45,4 +45,3 @@ type UpdateContact struct {
 	// New name for the contact
 	FullName string `json:"fullName" example:"John Doe"`
 }
-
