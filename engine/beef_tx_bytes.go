@@ -63,7 +63,7 @@ func toBeefBytes(tx *trx.Transaction, bumps BUMPs) []byte {
 	bumpIdx := getBumpPathIndex(tx, bumps)
 	if bumpIdx > -1 {
 		txBeefBytes = append(txBeefBytes, hasBUMP)
-		idx, err := conv.ConvertIntToUint64(bumpIdx)
+		idx, err := conv.IntToUint64(bumpIdx)
 		if err != nil {
 			panic(spverrors.Wrapf(err, "error converting bump index"))
 		}

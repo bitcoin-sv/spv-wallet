@@ -8,7 +8,7 @@ import (
 
 	"github.com/bitcoin-sv/spv-wallet/conv"
 	"github.com/bitcoin-sv/spv-wallet/engine"
-	"github.com/bitcoin-sv/spv-wallet/engine/chain/models"
+	chainmodels "github.com/bitcoin-sv/spv-wallet/engine/chain/models"
 	"github.com/bitcoin-sv/spv-wallet/engine/cluster"
 	"github.com/bitcoin-sv/spv-wallet/engine/datastore"
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
@@ -71,7 +71,7 @@ func (c *AppConfig) addHttpClientOpts(options []engine.ClientOps) []engine.Clien
 
 func (c *AppConfig) addCustomFeeUnit(options []engine.ClientOps) []engine.ClientOps {
 	if c.CustomFeeUnit != nil {
-		satoshis, err := conv.ConvertIntToUint64(c.CustomFeeUnit.Satoshis)
+		satoshis, err := conv.IntToUint64(c.CustomFeeUnit.Satoshis)
 		if err != nil {
 			panic(spverrors.Wrapf(err, "error converting custom fee unit satoshis"))
 		}

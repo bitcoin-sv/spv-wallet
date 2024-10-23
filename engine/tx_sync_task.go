@@ -119,7 +119,7 @@ func processSyncTransactions(ctx context.Context, client *Client) {
 		} else {
 			tx.SetBUMP(bump)
 		}
-		blockHeight, err := conv.ConvertInt64ToUint64(txInfo.BlockHeight)
+		blockHeight, err := conv.Int64ToUint64(txInfo.BlockHeight)
 		if err != nil {
 			panic(spverrors.Wrapf(err, "cannot convert block height"))
 		}

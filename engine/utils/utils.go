@@ -65,7 +65,7 @@ func GetChildNumsFromHex(hexHash string) ([]uint32, error) {
 		}
 
 		result := num % MaxInt32
-		resultU32, err := conv.ConvertInt64ToUint32(result)
+		resultU32, err := conv.Int64ToUint32(result)
 		if err != nil {
 			return nil, spverrors.Wrapf(err, "cannot convert int64 to uint32")
 		}

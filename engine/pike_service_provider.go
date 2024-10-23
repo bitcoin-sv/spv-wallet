@@ -123,7 +123,7 @@ func (p *PikePaymentServiceProvider) saveDestinations(
 		dst := newDestination(pAddress.XpubID, script, append(p.client.DefaultModelOptions(), opts...)...)
 		dst.DerivationMethod = PIKEDerivationMethod
 		dst.SenderXpub = senderPubKeyHex
-		idx32, err := conv.ConvertIntToUint32(index)
+		idx32, err := conv.IntToUint32(index)
 		if err != nil {
 			return spverrors.Wrapf(err, "failed to convert int to uint32")
 		}

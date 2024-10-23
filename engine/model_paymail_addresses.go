@@ -266,7 +266,7 @@ func (m *PaymailAddress) incrementExternalXpubDerivationSeq(ctx context.Context)
 		return err
 	}
 
-	newNumU32, err := conv.ConvertInt64ToUint32(newNum)
+	newNumU32, err := conv.Int64ToUint32(newNum)
 	if err != nil {
 		return spverrors.Wrapf(err, "failed to convert int64 to uint32")
 	}

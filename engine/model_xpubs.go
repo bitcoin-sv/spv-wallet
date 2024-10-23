@@ -202,7 +202,7 @@ func (m *Xpub) incrementBalance(ctx context.Context, balanceIncrement int64) err
 		return err
 	}
 
-	newBalanceU64, err := conv.ConvertInt64ToUint64(newBalance)
+	newBalanceU64, err := conv.Int64ToUint64(newBalance)
 	if err != nil {
 		return spverrors.Wrapf(err, "failed to convert int64 to uint64")
 	}
@@ -259,7 +259,7 @@ func (m *Xpub) incrementNextNum(ctx context.Context, chain uint32) (uint32, erro
 		return 0, err
 	}
 
-	newNumU32, errConversion := conv.ConvertInt64ToUint32(newNum)
+	newNumU32, errConversion := conv.Int64ToUint32(newNum)
 	if err != nil {
 		return 0, spverrors.Wrapf(errConversion, "failed to convert int64 to uint32")
 	}
@@ -278,7 +278,7 @@ func (m *Xpub) incrementNextNum(ctx context.Context, chain uint32) (uint32, erro
 	// Calculate newNumMinusOne
 	newNumMinusOne := newNum - 1
 
-	newNumMinusOneU32, errConversion := conv.ConvertInt64ToUint32(newNumMinusOne)
+	newNumMinusOneU32, errConversion := conv.Int64ToUint32(newNumMinusOne)
 	if err != nil {
 		return 0, spverrors.Wrapf(errConversion, "failed to convert int64 to uint32")
 	}

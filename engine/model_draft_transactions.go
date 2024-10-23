@@ -501,7 +501,7 @@ func (m *DraftTransaction) estimateSize() uint64 {
 
 	inputSize := trx.VarInt(len(m.Configuration.Inputs))
 
-	value, err := conv.ConvertIntToUint64(inputSize.Length())
+	value, err := conv.IntToUint64(inputSize.Length())
 	if err != nil {
 		m.client.Logger().Error().Msg(err.Error())
 		return 0
@@ -513,7 +513,7 @@ func (m *DraftTransaction) estimateSize() uint64 {
 	}
 
 	outputSize := trx.VarInt(len(m.Configuration.Outputs))
-	value, err = conv.ConvertIntToUint64(outputSize.Length())
+	value, err = conv.IntToUint64(outputSize.Length())
 	if err != nil {
 		m.client.Logger().Error().Msg(err.Error())
 		return 0
@@ -898,7 +898,7 @@ func (m *DraftTransaction) SignInputs(xPriv *compat.ExtendedKey) (signedHex stri
 			return
 		}
 
-		idx32, conversionError := conv.ConvertIntToUint32(index)
+		idx32, conversionError := conv.IntToUint32(index)
 		if err != nil {
 			return "", spverrors.Wrapf(conversionError, "failed to convert index %d to uint32", index)
 		}
