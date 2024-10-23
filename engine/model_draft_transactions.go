@@ -898,14 +898,13 @@ func (m *DraftTransaction) SignInputs(xPriv *compat.ExtendedKey) (signedHex stri
 			return
 		}
 
-		// Ensure safe conversion of index to uint32
-		if index < 0 || index > int(math.MaxUint32) {
-			return "", spverrors.Newf("input index %d out of range for uint32", index)
+		idx32, conversionError := conversionkit.ConvertIntToUint32(index)
+		if err != nil {
+			return "", spverrors.Wrapf(conversionError, "failed to convert index %d to uint32", index)
 		}
-
 		var s *p2pkh.P2PKH
 		if s, err = utils.GetUnlockingScript(
-			txDraft, uint32(index), privateKey,
+			txDraft, idx32, privateKey,
 		); err != nil {
 			return
 		}

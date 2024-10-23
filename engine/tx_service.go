@@ -57,27 +57,17 @@ func (m *Transaction) processUtxos(ctx context.Context) error {
 	}
 
 	m.TotalValue, m.Fee = m.getValues()
-	// Ensure len(m.parsedTx.Inputs) is within the range for uint32
-	inputLen := len(m.parsedTx.Inputs)
-	if inputLen < 0 || inputLen > math.MaxUint32 {
-		return fmt.Errorf("number of inputs %d is out of range for uint32", inputLen)
-	}
-	value32, err := conversionkit.ConvertIntToUint32(inputLen)
+	inputLen, err := conversionkit.ConvertIntToUint32(len(m.parsedTx.Inputs))
 	if err != nil {
 		return spverrors.Wrapf(err, "failed to convert int to uint32")
 	}
-	m.NumberOfInputs = value32
+	m.NumberOfInputs = inputLen
 
-	// Ensure len(m.parsedTx.Outputs) is within the range for uint32
-	outputLen := len(m.parsedTx.Outputs)
-	if outputLen < 0 || outputLen > math.MaxUint32 {
-		return fmt.Errorf("number of outputs %d is out of range for uint32", outputLen)
-	}
-	value32, err = conversionkit.ConvertIntToUint32(outputLen)
+	outputLen, err := conversionkit.ConvertIntToUint32(len(m.parsedTx.Outputs))
 	if err != nil {
 		return spverrors.Wrapf(err, "failed to convert int to uint32")
 	}
-	m.NumberOfOutputs = value32
+	m.NumberOfOutputs = outputLen
 
 	return nil
 }

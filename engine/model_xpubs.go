@@ -4,8 +4,8 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"math"
 
+	conversionkit "github.com/bitcoin-sv/spv-wallet/conversion_kit"
 	"github.com/bitcoin-sv/spv-wallet/engine/datastore"
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/bitcoin-sv/spv-wallet/engine/utils"
@@ -202,14 +202,13 @@ func (m *Xpub) incrementBalance(ctx context.Context, balanceIncrement int64) err
 		return err
 	}
 
-	// Ensure newBalance is non-negative before conversion to uint64
-	if newBalance < 0 {
-		return fmt.Errorf("newBalance is negative and cannot be converted to uint64: %d", newBalance)
+	newBalanceU64, err := conversionkit.ConvertInt64ToUint64(newBalance)
+	if err != nil {
+		return spverrors.Wrapf(err, "failed to convert int64 to uint64")
 	}
-
 	// Update the field value
 	// safe conversion as we have already checked for negative values
-	m.CurrentBalance = uint64(newBalance)
+	m.CurrentBalance = newBalanceU64
 
 	// Fire the after update
 	err = m.AfterUpdated(ctx)
@@ -260,16 +259,16 @@ func (m *Xpub) incrementNextNum(ctx context.Context, chain uint32) (uint32, erro
 		return 0, err
 	}
 
-	if newNum < 0 || newNum > math.MaxUint32 {
-		return 0, fmt.Errorf("newNum %d out of range for uint32", newNum)
+	newNumU32, errConversion := conversionkit.ConvertInt64ToUint32(newNum)
+	if err != nil {
+		return 0, spverrors.Wrapf(errConversion, "failed to convert int64 to uint32")
 	}
-	newNumUint32 := uint32(newNum)
 
 	// Update the model safely as we have already checked for negative values
 	if chain == utils.ChainInternal {
-		m.NextInternalNum = newNumUint32
+		m.NextInternalNum = newNumU32
 	} else {
-		m.NextExternalNum = newNumUint32
+		m.NextExternalNum = newNumU32
 	}
 
 	if err = m.AfterUpdated(ctx); err != nil {
@@ -279,13 +278,13 @@ func (m *Xpub) incrementNextNum(ctx context.Context, chain uint32) (uint32, erro
 	// Calculate newNumMinusOne
 	newNumMinusOne := newNum - 1
 
-	// Ensure that newNumMinusOne is non-negative and within the range of uint32
-	if newNumMinusOne < 0 || newNumMinusOne > math.MaxUint32 {
-		return 0, fmt.Errorf("newNum - 1 (%d) is out of range for uint32", newNumMinusOne)
+	newNumMinusOneU32, errConversion := conversionkit.ConvertInt64ToUint32(newNumMinusOne)
+	if err != nil {
+		return 0, spverrors.Wrapf(errConversion, "failed to convert int64 to uint32")
 	}
 
 	// return the previous number, which was next num, safely converted to uint32
-	return uint32(newNumMinusOne), err
+	return newNumMinusOneU32, err
 }
 
 // ChildModels will get any related sub models
