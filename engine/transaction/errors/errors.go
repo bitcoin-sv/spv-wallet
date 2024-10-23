@@ -35,4 +35,19 @@ var (
 
 	// ErrOutputValueTooLow is when the satoshis output is too low for a given type of output.
 	ErrOutputValueTooLow = models.SPVError{Code: "error-transaction-output-value-too-low", Message: "output value is too low", StatusCode: 400}
+
+	// ErrTxValidation is when the transaction validation fails.
+	ErrTxValidation = models.SPVError{Code: "error-transaction-validation", Message: "transaction validation failed", StatusCode: 400}
+
+	// ErrUTXOSpent is when the UTXO is already spent.
+	ErrUTXOSpent = models.SPVError{Code: "error-utxo-spent", Message: "UTXO is already spent", StatusCode: 400}
+
+	// ErrParsingScript is when the script parsing fails.
+	ErrParsingScript = models.SPVError{Code: "error-parsing-script", Message: "failed to parse script", StatusCode: 400}
+
+	// ErrSavingData is when the data saving fails.
+	ErrSavingData = models.SPVError{Code: "error-saving-data", Message: "failed to save data", StatusCode: 400}
+
+	// ErrTxBroadcast is when the transaction broadcast fails.
+	ErrTxBroadcast = models.SPVError{Code: "error-tx-broadcast", Message: "failed to broadcast transaction", StatusCode: 400}
 )
