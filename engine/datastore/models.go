@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"math"
 	"reflect"
 	"strings"
 	"time"
@@ -124,10 +125,16 @@ func convertToInt64(i interface{}) int64 {
 	case uint32:
 		return int64(v)
 	case uint64:
+		// Clamp values that are larger than MaxInt64
+		if v > math.MaxInt64 {
+			return math.MaxInt64
+		}
 		return int64(v)
+	case int64:
+		return v
+	default:
+		return 0
 	}
-
-	return i.(int64)
 }
 
 // GetModel will get a model from the datastore

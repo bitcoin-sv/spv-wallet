@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 
+	"github.com/bitcoin-sv/spv-wallet/conv"
 	"github.com/bitcoin-sv/spv-wallet/engine/datastore"
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/bitcoin-sv/spv-wallet/engine/utils"
@@ -201,8 +202,13 @@ func (m *Xpub) incrementBalance(ctx context.Context, balanceIncrement int64) err
 		return err
 	}
 
+	newBalanceU64, err := conv.Int64ToUint64(newBalance)
+	if err != nil {
+		return spverrors.Wrapf(err, "failed to convert int64 to uint64")
+	}
 	// Update the field value
-	m.CurrentBalance = uint64(newBalance)
+	// safe conversion as we have already checked for negative values
+	m.CurrentBalance = newBalanceU64
 
 	// Fire the after update
 	err = m.AfterUpdated(ctx)
@@ -253,19 +259,32 @@ func (m *Xpub) incrementNextNum(ctx context.Context, chain uint32) (uint32, erro
 		return 0, err
 	}
 
-	// Update the model
+	newNumU32, errConversion := conv.Int64ToUint32(newNum)
+	if err != nil {
+		return 0, spverrors.Wrapf(errConversion, "failed to convert int64 to uint32")
+	}
+
+	// Update the model safely as we have already checked for negative values
 	if chain == utils.ChainInternal {
-		m.NextInternalNum = uint32(newNum)
+		m.NextInternalNum = newNumU32
 	} else {
-		m.NextExternalNum = uint32(newNum)
+		m.NextExternalNum = newNumU32
 	}
 
 	if err = m.AfterUpdated(ctx); err != nil {
 		return 0, err
 	}
 
-	// return the previous number, which was next num
-	return uint32(newNum - 1), err
+	// Calculate newNumMinusOne
+	newNumMinusOne := newNum - 1
+
+	newNumMinusOneU32, errConversion := conv.Int64ToUint32(newNumMinusOne)
+	if err != nil {
+		return 0, spverrors.Wrapf(errConversion, "failed to convert int64 to uint32")
+	}
+
+	// return the previous number, which was next num, safely converted to uint32
+	return newNumMinusOneU32, err
 }
 
 // ChildModels will get any related sub models

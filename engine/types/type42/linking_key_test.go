@@ -45,7 +45,6 @@ func TestDeriveLinkedKey(t *testing.T) {
 
 	t.Run("Valid Cases", func(t *testing.T) {
 		for _, tt := range validTests {
-			tt := tt
 			t.Run(tt.name, func(t *testing.T) {
 				result, err := DeriveLinkedKey(&tt.source, &tt.linkPubKey, tt.invoiceNumber)
 				assert.NoError(t, err)
@@ -76,7 +75,6 @@ func TestDeriveLinkedKey(t *testing.T) {
 
 	t.Run("Error Cases", func(t *testing.T) {
 		for _, tt := range errorTests {
-			tt := tt
 			t.Run(tt.name, func(t *testing.T) {
 				result, err := DeriveLinkedKey(&tt.source, &tt.linkPubKey, tt.invoiceNumber)
 				assert.Error(t, err)
@@ -168,7 +166,6 @@ func TestDeriveLinkedKeyCases(t *testing.T) {
 
 	t.Run("Test Keys", func(t *testing.T) {
 		for _, tt := range validTests {
-			tt := tt // capture range variable
 			t.Run(tt.name, func(t *testing.T) {
 				result, err := DeriveLinkedKey(tt.source, tt.linkPubKey, tt.invoiceNumber)
 				assert.NoError(t, err)

@@ -14,6 +14,7 @@ import (
 	"github.com/bitcoin-sv/go-sdk/script"
 	trx "github.com/bitcoin-sv/go-sdk/transaction"
 	"github.com/bitcoin-sv/go-sdk/transaction/template/p2pkh"
+	"github.com/bitcoin-sv/spv-wallet/conv"
 	"github.com/bitcoin-sv/spv-wallet/engine/datastore"
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/bitcoin-sv/spv-wallet/engine/utils"
@@ -499,15 +500,25 @@ func (m *DraftTransaction) estimateSize() uint64 {
 	size := defaultOverheadSize // version + nLockTime
 
 	inputSize := trx.VarInt(len(m.Configuration.Inputs))
-	size += uint64(inputSize.Length())
+
+	value, err := conv.IntToUint64(inputSize.Length())
+	if err != nil {
+		m.client.Logger().Error().Msg(err.Error())
+		return 0
+	}
+	size += value
 
 	for _, input := range m.Configuration.Inputs {
 		size += utils.GetInputSizeForType(input.Type)
 	}
 
 	outputSize := trx.VarInt(len(m.Configuration.Outputs))
-	size += uint64(outputSize.Length())
-
+	value, err = conv.IntToUint64(outputSize.Length())
+	if err != nil {
+		m.client.Logger().Error().Msg(err.Error())
+		return 0
+	}
+	size += value
 	for _, output := range m.Configuration.Outputs {
 		for _, s := range output.Scripts {
 			size += utils.GetOutputSize(s.Script)
@@ -610,6 +621,11 @@ func (m *DraftTransaction) setChangeDestination(ctx context.Context, satoshisCha
 		if float64(satoshisChange)/float64(numberOfDestinations) < float64(minimumSatoshis) {
 			// we cannot split our change to the number of destinations given, re-calc
 			numberOfDestinations = 1
+		}
+
+		// Check if numberOfDestinations is negative or too large before conversion
+		if numberOfDestinations < 0 {
+			return fee, fmt.Errorf("invalid number of destinations: %d", numberOfDestinations)
 		}
 
 		newFee = m.estimateFee(m.Configuration.FeeUnit, uint64(numberOfDestinations)*changeOutputSize)
@@ -881,9 +897,14 @@ func (m *DraftTransaction) SignInputs(xPriv *compat.ExtendedKey) (signedHex stri
 		); err != nil {
 			return
 		}
+
+		idx32, conversionError := conv.IntToUint32(index)
+		if err != nil {
+			return "", spverrors.Wrapf(conversionError, "failed to convert index %d to uint32", index)
+		}
 		var s *p2pkh.P2PKH
 		if s, err = utils.GetUnlockingScript(
-			txDraft, uint32(index), privateKey,
+			txDraft, idx32, privateKey,
 		); err != nil {
 			return
 		}

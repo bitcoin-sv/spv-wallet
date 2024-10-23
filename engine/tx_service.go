@@ -3,7 +3,9 @@ package engine
 import (
 	"context"
 	"fmt"
+	"math"
 
+	"github.com/bitcoin-sv/spv-wallet/conv"
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/bitcoin-sv/spv-wallet/engine/utils"
 )
@@ -55,8 +57,17 @@ func (m *Transaction) processUtxos(ctx context.Context) error {
 	}
 
 	m.TotalValue, m.Fee = m.getValues()
-	m.NumberOfInputs = uint32(len(m.parsedTx.Inputs))
-	m.NumberOfOutputs = uint32(len(m.parsedTx.Outputs))
+	inputLen, err := conv.IntToUint32(len(m.parsedTx.Inputs))
+	if err != nil {
+		return spverrors.Wrapf(err, "failed to convert int to uint32")
+	}
+	m.NumberOfInputs = inputLen
+
+	outputLen, err := conv.IntToUint32(len(m.parsedTx.Outputs))
+	if err != nil {
+		return spverrors.Wrapf(err, "failed to convert int to uint32")
+	}
+	m.NumberOfOutputs = outputLen
 
 	return nil
 }
@@ -105,7 +116,15 @@ func (m *Transaction) _processInputs(ctx context.Context) (err error) {
 			if _, ok := m.XpubOutputValue[utxo.XpubID]; !ok {
 				m.XpubOutputValue[utxo.XpubID] = 0
 			}
-			m.XpubOutputValue[utxo.XpubID] -= int64(utxo.Satoshis)
+			// Check if utxo.Satoshis exceeds int64 range before conversion
+			if utxo.Satoshis > math.MaxInt64 {
+				return fmt.Errorf("utxo.Satoshis exceeds the maximum value for int64: %d", utxo.Satoshis)
+			}
+			satoshis, err := conv.Uint64ToInt64(utxo.Satoshis)
+			if err != nil {
+				return spverrors.Wrapf(err, "failed to convert uint64 to int64")
+			}
+			m.XpubOutputValue[utxo.XpubID] -= satoshis
 
 			// Mark utxo as spent
 			utxo.SpendingTxID.Valid = true
@@ -150,17 +169,26 @@ func (m *Transaction) _processOutputs(ctx context.Context) (err error) {
 			); err != nil {
 				return
 			} else if destination != nil {
+				i32, err := conv.IntToUint32(i)
+				if err != nil {
+					return spverrors.Wrapf(err, "failed to convert int to uint32")
+				}
+				outputIndex := i32
 
 				// Add value of output to xPub ID
 				if _, ok := m.XpubOutputValue[destination.XpubID]; !ok {
 					m.XpubOutputValue[destination.XpubID] = 0
 				}
-				m.XpubOutputValue[destination.XpubID] += int64(amount)
+				amountInt64, err := conv.Uint64ToInt64(amount)
+				if err != nil {
+					return spverrors.Wrapf(err, "failed to convert uint64 to int64")
+				}
+				m.XpubOutputValue[destination.XpubID] += amountInt64
 
-				utxo, _ := m.client.GetUtxoByTransactionID(ctx, m.ID, uint32(i))
+				utxo, _ := m.client.GetUtxoByTransactionID(ctx, m.ID, outputIndex)
 				if utxo == nil {
 					utxo = newUtxo(
-						destination.XpubID, m.ID, txLockingScript, uint32(i),
+						destination.XpubID, m.ID, txLockingScript, outputIndex,
 						amount, newOpts...,
 					)
 				}

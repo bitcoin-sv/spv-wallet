@@ -7,6 +7,7 @@ import (
 	"github.com/bitcoin-sv/go-paymail"
 	"github.com/bitcoin-sv/go-paymail/server"
 	ec "github.com/bitcoin-sv/go-sdk/primitives/ec"
+	"github.com/bitcoin-sv/spv-wallet/conv"
 	"github.com/bitcoin-sv/spv-wallet/engine/pike"
 	"github.com/bitcoin-sv/spv-wallet/engine/script/template"
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
@@ -122,7 +123,11 @@ func (p *PikePaymentServiceProvider) saveDestinations(
 		dst := newDestination(pAddress.XpubID, script, append(p.client.DefaultModelOptions(), opts...)...)
 		dst.DerivationMethod = PIKEDerivationMethod
 		dst.SenderXpub = senderPubKeyHex
-		dst.OutputIndex = uint32(index)
+		idx32, err := conv.IntToUint32(index)
+		if err != nil {
+			return spverrors.Wrapf(err, "failed to convert int to uint32")
+		}
+		dst.OutputIndex = idx32
 
 		if err := dst.Save(ctx); err != nil {
 			return err

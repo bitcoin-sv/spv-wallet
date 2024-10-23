@@ -3,6 +3,7 @@ package engine
 import (
 	trx "github.com/bitcoin-sv/go-sdk/transaction"
 	"github.com/bitcoin-sv/go-sdk/util"
+	"github.com/bitcoin-sv/spv-wallet/conv"
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 )
 
@@ -62,7 +63,11 @@ func toBeefBytes(tx *trx.Transaction, bumps BUMPs) []byte {
 	bumpIdx := getBumpPathIndex(tx, bumps)
 	if bumpIdx > -1 {
 		txBeefBytes = append(txBeefBytes, hasBUMP)
-		txBeefBytes = append(txBeefBytes, trx.VarInt(bumpIdx).Bytes()...)
+		idx, err := conv.IntToUint64(bumpIdx)
+		if err != nil {
+			panic(spverrors.Wrapf(err, "error converting bump index"))
+		}
+		txBeefBytes = append(txBeefBytes, trx.VarInt(idx).Bytes()...)
 	} else {
 		txBeefBytes = append(txBeefBytes, hasNoBUMP)
 	}

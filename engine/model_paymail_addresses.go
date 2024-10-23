@@ -8,6 +8,7 @@ import (
 
 	"github.com/bitcoin-sv/go-paymail"
 	compat "github.com/bitcoin-sv/go-sdk/compat/bip32"
+	"github.com/bitcoin-sv/spv-wallet/conv"
 	"github.com/bitcoin-sv/spv-wallet/engine/datastore"
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/bitcoin-sv/spv-wallet/engine/utils"
@@ -265,7 +266,11 @@ func (m *PaymailAddress) incrementExternalXpubDerivationSeq(ctx context.Context)
 		return err
 	}
 
-	m.XpubDerivationSeq = uint32(newNum)
+	newNumU32, err := conv.Int64ToUint32(newNum)
+	if err != nil {
+		return spverrors.Wrapf(err, "failed to convert int64 to uint32")
+	}
+	m.XpubDerivationSeq = newNumU32
 	return nil
 }
 

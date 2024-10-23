@@ -12,6 +12,7 @@ import (
 	"github.com/bitcoin-sv/go-sdk/script"
 	trx "github.com/bitcoin-sv/go-sdk/transaction"
 	"github.com/bitcoin-sv/go-sdk/transaction/template/p2pkh"
+	"github.com/bitcoin-sv/spv-wallet/conv"
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/bitcoin-sv/spv-wallet/engine/utils"
 )
@@ -319,7 +320,11 @@ func saveBEEFTxInputs(ctx context.Context, c ClientInterface, dBeef *beef.Decode
 	for _, input := range inputsToAdd {
 		var bump *BUMP
 		if input.BumpIndex != nil { // mined
-			bump, err = getBump(int(*input.BumpIndex), dBeef.BUMPs)
+			bumpIndex, err := conv.VarIntToInt(input.BumpIndex)
+			if err != nil {
+				c.Logger().Error().Msgf("error in saveBEEFTxInputs: %v for beef: %v", err, dBeef)
+			}
+			bump, err = getBump(bumpIndex, dBeef.BUMPs)
 			if err != nil {
 				c.Logger().Error().Msgf("error in saveBEEFTxInputs: %v for beef: %v", err, dBeef)
 			}

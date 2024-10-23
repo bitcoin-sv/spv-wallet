@@ -20,9 +20,9 @@ import (
 )
 
 const (
-	atSign                   = "@"
-	domainPrefix             = "https://"
-	spvWalletIndexResponse   = "Welcome to the SPV Wallet ✌(◕‿-)✌"
+	atSign                 = "@"
+	domainPrefix           = "https://"
+	spvWalletIndexResponse = "Welcome to the SPV Wallet ✌(◕‿-)✌"
 
 	ClientOneURLEnvVar         = "CLIENT_ONE_URL"
 	ClientTwoURLEnvVar         = "CLIENT_TWO_URL"

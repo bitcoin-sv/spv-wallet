@@ -6,7 +6,8 @@ import (
 	"time"
 
 	trx "github.com/bitcoin-sv/go-sdk/transaction"
-	"github.com/bitcoin-sv/spv-wallet/engine/chain/models"
+	"github.com/bitcoin-sv/spv-wallet/conv"
+	chainmodels "github.com/bitcoin-sv/spv-wallet/engine/chain/models"
 	"github.com/bitcoin-sv/spv-wallet/engine/datastore"
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/bitcoin-sv/spv-wallet/engine/utils"
@@ -376,7 +377,11 @@ func (c *Client) HandleTxCallback(ctx context.Context, callbackResp *chainmodels
 	}
 
 	tx.BlockHash = callbackResp.BlockHash
-	tx.BlockHeight = uint64(callbackResp.BlockHeight)
+	blockHeight, err := conv.Int64ToUint64(callbackResp.BlockHeight)
+	if err != nil {
+		return spverrors.Wrapf(err, "failed to convert block height to uint64 - tx: %v", callbackResp.BlockHeight)
+	}
+	tx.BlockHeight = blockHeight
 	tx.SetBUMP(bump)
 	tx.UpdateFromBroadcastStatus(callbackResp.TXStatus)
 
