@@ -14,7 +14,7 @@ import (
 	"github.com/bitcoin-sv/go-sdk/script"
 	trx "github.com/bitcoin-sv/go-sdk/transaction"
 	"github.com/bitcoin-sv/go-sdk/transaction/template/p2pkh"
-	conversionkit "github.com/bitcoin-sv/spv-wallet/conversion_kit"
+	"github.com/bitcoin-sv/spv-wallet/conv"
 	"github.com/bitcoin-sv/spv-wallet/engine/datastore"
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/bitcoin-sv/spv-wallet/engine/utils"
@@ -501,7 +501,7 @@ func (m *DraftTransaction) estimateSize() uint64 {
 
 	inputSize := trx.VarInt(len(m.Configuration.Inputs))
 
-	value, err := conversionkit.ConvertIntToUint64(inputSize.Length())
+	value, err := conv.ConvertIntToUint64(inputSize.Length())
 	if err != nil {
 		m.client.Logger().Error().Msg(err.Error())
 		return 0
@@ -513,7 +513,7 @@ func (m *DraftTransaction) estimateSize() uint64 {
 	}
 
 	outputSize := trx.VarInt(len(m.Configuration.Outputs))
-	value, err = conversionkit.ConvertIntToUint64(outputSize.Length())
+	value, err = conv.ConvertIntToUint64(outputSize.Length())
 	if err != nil {
 		m.client.Logger().Error().Msg(err.Error())
 		return 0
@@ -898,7 +898,7 @@ func (m *DraftTransaction) SignInputs(xPriv *compat.ExtendedKey) (signedHex stri
 			return
 		}
 
-		idx32, conversionError := conversionkit.ConvertIntToUint32(index)
+		idx32, conversionError := conv.ConvertIntToUint32(index)
 		if err != nil {
 			return "", spverrors.Wrapf(conversionError, "failed to convert index %d to uint32", index)
 		}

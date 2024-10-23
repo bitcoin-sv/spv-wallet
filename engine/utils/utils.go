@@ -14,7 +14,7 @@ import (
 	"strconv"
 
 	trx "github.com/bitcoin-sv/go-sdk/transaction"
-	conversionkit "github.com/bitcoin-sv/spv-wallet/conversion_kit"
+	"github.com/bitcoin-sv/spv-wallet/conv"
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 )
 
@@ -65,7 +65,7 @@ func GetChildNumsFromHex(hexHash string) ([]uint32, error) {
 		}
 
 		result := num % MaxInt32
-		resultU32, err := conversionkit.ConvertInt64ToUint32(result)
+		resultU32, err := conv.ConvertInt64ToUint32(result)
 		if err != nil {
 			return nil, spverrors.Wrapf(err, "cannot convert int64 to uint32")
 		}
