@@ -5,10 +5,10 @@ import (
 	"encoding/hex"
 	"errors"
 	"fmt"
-	"math"
 
 	"github.com/bitcoin-sv/go-paymail"
 	compat "github.com/bitcoin-sv/go-sdk/compat/bip32"
+	conversionkit "github.com/bitcoin-sv/spv-wallet/conversion_kit"
 	"github.com/bitcoin-sv/spv-wallet/engine/datastore"
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/bitcoin-sv/spv-wallet/engine/utils"
@@ -266,13 +266,11 @@ func (m *PaymailAddress) incrementExternalXpubDerivationSeq(ctx context.Context)
 		return err
 	}
 
-	// Check if newNum is within the valid range for uint32
-	if newNum < 0 || newNum > math.MaxUint32 {
-		return fmt.Errorf("newNum %d out of range for uint32", newNum)
+	newNumU32, err := conversionkit.ConvertInt64ToUint32(newNum)
+	if err != nil {
+		return spverrors.Wrapf(err, "failed to convert int64 to uint32")
 	}
-
-	// Safe conversion
-	m.XpubDerivationSeq = uint32(newNum)
+	m.XpubDerivationSeq = newNumU32
 	return nil
 }
 
