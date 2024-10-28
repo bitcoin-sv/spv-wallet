@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	"github.com/bitcoin-sv/spv-wallet/actions/testabilities"
+	"github.com/bitcoin-sv/spv-wallet/engine/tester/fixtures"
 	"github.com/bitcoin-sv/spv-wallet/models"
 	"github.com/stretchr/testify/require"
 )
@@ -22,10 +23,10 @@ func TestGETMerkleRootsSuccess(t *testing.T) {
 		"Get MerkleRoots success no query params": {
 			query: "",
 			expectedResponse: jsonObject{
-				"content": testabilities.MockedBHSMerkleRootsData,
+				"content": fixtures.MockedBHSMerkleRootsData,
 				"page": jsonObject{
-					"totalElements":    len(testabilities.MockedBHSMerkleRootsData),
-					"size":             len(testabilities.MockedBHSMerkleRootsData),
+					"totalElements":    len(fixtures.MockedBHSMerkleRootsData),
+					"size":             len(fixtures.MockedBHSMerkleRootsData),
 					"lastEvaluatedKey": "",
 				},
 			},
@@ -33,10 +34,10 @@ func TestGETMerkleRootsSuccess(t *testing.T) {
 		"Get MerkleRoots success with last evaluated key param": {
 			query: "?lastEvaluatedKey=df2b060fa2e5e9c8ed5eaf6a45c13753ec8c63282b2688322eba40cd98ea067a",
 			expectedResponse: jsonObject{
-				"content": testabilities.MockedBHSMerkleRootsData[5:],
+				"content": fixtures.MockedBHSMerkleRootsData[5:],
 				"page": jsonObject{
-					"totalElements":    len(testabilities.MockedBHSMerkleRootsData),
-					"size":             len(testabilities.MockedBHSMerkleRootsData[5:]),
+					"totalElements":    len(fixtures.MockedBHSMerkleRootsData),
+					"size":             len(fixtures.MockedBHSMerkleRootsData[5:]),
 					"lastEvaluatedKey": "",
 				},
 			},

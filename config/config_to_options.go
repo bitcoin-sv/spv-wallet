@@ -188,8 +188,9 @@ func (c *AppConfig) addDataStoreOpts(options []engine.ClientOps) ([]engine.Clien
 				MaxOpenConnections:    c.Db.SQLite.MaxOpenConnections,
 				TablePrefix:           tablePrefix,
 			},
-			DatabasePath: c.Db.SQLite.DatabasePath, // "" for in memory
-			Shared:       c.Db.SQLite.Shared,
+			DatabasePath:       c.Db.SQLite.DatabasePath, // "" for in memory
+			Shared:             c.Db.SQLite.Shared,
+			ExistingConnection: c.Db.SQLite.ExistingConnection,
 		}))
 	} else if c.Db.Datastore.Engine == datastore.PostgreSQL {
 		tablePrefix := c.Db.Datastore.TablePrefix
