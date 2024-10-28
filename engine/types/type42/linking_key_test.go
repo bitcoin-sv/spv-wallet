@@ -22,7 +22,7 @@ func TestDeriveLinkedKey(t *testing.T) {
 	linkPubKey, err := ec.ParsePubKey(linkPubKeyBytes)
 	assert.NoError(t, err)
 
-	validHMAC, err := calculateHMAC(sourcePubKey.SerializeCompressed(), "valid-invoice")
+	validHMAC, err := calculateHMAC(sourcePubKey.Compressed(), "valid-invoice")
 	assert.NoError(t, err)
 	validDerivedKey, err := calculateLinkedPublicKey(validHMAC, linkPubKey)
 	assert.NoError(t, err)

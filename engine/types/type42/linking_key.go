@@ -82,7 +82,7 @@ func DeriveLinkedKey(source *ec.PublicKey, linkPubKey *ec.PublicKey, invoiceNumb
 	}
 
 	// Compute the shared secret
-	publicKeyBytes := source.SerializeCompressed()
+	publicKeyBytes := source.Compressed()
 
 	// Compute the HMAC result
 	hmacResult, err := calculateHMAC(publicKeyBytes, invoiceNumber)
