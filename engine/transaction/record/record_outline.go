@@ -2,7 +2,6 @@ package record
 
 import (
 	"context"
-	"github.com/bitcoin-sv/go-sdk/script"
 	"github.com/bitcoin-sv/go-sdk/spv"
 	trx "github.com/bitcoin-sv/go-sdk/transaction"
 	"github.com/bitcoin-sv/spv-wallet/conv"
@@ -15,13 +14,12 @@ import (
 	"github.com/bitcoin-sv/spv-wallet/models/transaction/bucket"
 )
 
+// RecordTransactionOutline will validate, broadcast and save a transaction outline
 func (s *Service) RecordTransactionOutline(ctx context.Context, outline *outlines.Transaction) error {
 	tx, err := trx.NewTransactionFromBEEFHex(outline.BEEF)
 	if err != nil {
 		return txerrors.ErrTxValidation.Wrap(err)
 	}
-
-	txID := tx.TxID().String()
 
 	if ok, err := spv.VerifyScripts(tx); err != nil {
 		return txerrors.ErrTxValidation.Wrap(err)
@@ -33,31 +31,32 @@ func (s *Service) RecordTransactionOutline(ctx context.Context, outline *outline
 	if err != nil {
 		return err
 	}
+
+	txID := tx.TxID().String()
 	for _, utxo := range utxos {
 		utxo.Spend(txID)
 	}
 
-	var outputRecords []database.Output
-	var dataRecords []database.Data
+	var newOutputs []*database.Output
+	var newDataRecords []*database.Data
 	if outline.Annotations != nil {
-		outputRecords, dataRecords, err = s.processAnnotatedOutputs(tx, *outline.Annotations)
+		newOutputs, newDataRecords, err = s.processAnnotatedOutputs(tx, *outline.Annotations)
 		if err != nil {
 			return err
 		}
 	}
 
-	txRecord := database.Transaction{
-		ID:       txID,
-		TxStatus: database.TxStatusCreated,
-	}
-
 	if err = s.broadcaster.Broadcast(ctx, tx); err != nil {
 		return txerrors.ErrTxBroadcast.Wrap(err)
-	} else {
-		txRecord.TxStatus = database.TxStatusBroadcasted
 	}
 
-	err = s.repo.SaveTX(ctx, &txRecord, outputRecords, dataRecords)
+	txRecord := database.Transaction{
+		ID:       txID,
+		TxStatus: database.TxStatusBroadcasted,
+	}
+
+	upsertOutputs := append(newOutputs, utxos...) //newly created outputs and spent utxos
+	err = s.repo.SaveTX(ctx, &txRecord, upsertOutputs, newDataRecords)
 	if err != nil {
 		return txerrors.ErrSavingData.Wrap(err)
 	}
@@ -65,12 +64,11 @@ func (s *Service) RecordTransactionOutline(ctx context.Context, outline *outline
 	return nil
 }
 
-func (s *Service) getTrackedUTXOsFromInputs(ctx context.Context, tx *trx.Transaction) ([]database.Output, error) {
-	txID := tx.TxID().String()
+func (s *Service) getTrackedUTXOsFromInputs(ctx context.Context, tx *trx.Transaction) ([]*database.Output, error) {
 	outpoints := func(yield func(outpoint bsv.Outpoint) bool) {
 		for _, input := range tx.Inputs {
 			yield(bsv.Outpoint{
-				TxID: txID,
+				TxID: input.SourceTXID.String(),
 				Vout: input.SourceTxOutIndex,
 			})
 		}
@@ -89,42 +87,15 @@ func (s *Service) getTrackedUTXOsFromInputs(ctx context.Context, tx *trx.Transac
 	return storedUTXOs, nil
 }
 
-func (s *Service) getDataFromOpReturn(lockingScript *script.Script) ([]byte, error) {
-	if !lockingScript.IsData() {
-		return nil, spverrors.Newf("Script is not a data output")
-	}
-
-	chunks, err := lockingScript.Chunks()
-	if err != nil {
-		return nil, txerrors.ErrParsingScript.Wrap(err)
-	}
-
-	startIndex := 2
-	if chunks[0].Op == script.OpRETURN {
-		startIndex = 1
-	}
-
-	var d [][]byte
-	for _, chunk := range chunks[startIndex:] {
-		if chunk.Op > script.OpPUSHDATA4 {
-			return nil, spverrors.Newf("Could not find OP_RETURN data")
-		}
-		d = append(d, chunk.Data)
-	}
-
-	return d[0], nil
-}
-
-func (s *Service) processAnnotatedOutputs(tx *trx.Transaction, annotations transaction.Annotations) ([]database.Output, []database.Data, error) {
+func (s *Service) processAnnotatedOutputs(tx *trx.Transaction, annotations transaction.Annotations) ([]*database.Output, []*database.Data, error) {
 	txID := tx.TxID().String()
 
-	var outputRecords []database.Output
-	var dataRecords []database.Data
+	var outputRecords []*database.Output
+	var dataRecords []*database.Data
 
 	for vout, annotation := range annotations.Outputs {
 		if vout >= len(tx.Outputs) {
-			s.logger.Warn().Msgf("Annotation's output index %d is out of range", vout)
-			continue
+			return nil, nil, txerrors.ErrAnnotationIndexOutOfRange
 		}
 		voutU32, err := conv.IntToUint32(vout)
 		if err != nil {
@@ -134,11 +105,11 @@ func (s *Service) processAnnotatedOutputs(tx *trx.Transaction, annotations trans
 
 		switch annotation.Bucket {
 		case bucket.Data:
-			data, err := s.getDataFromOpReturn(lockingScript)
+			data, err := getDataFromOpReturn(lockingScript)
 			if err != nil {
 				return nil, nil, err
 			}
-			dataRecords = append(dataRecords, database.Data{
+			dataRecords = append(dataRecords, &database.Data{
 				TxID: txID,
 				Vout: voutU32,
 				Blob: data,

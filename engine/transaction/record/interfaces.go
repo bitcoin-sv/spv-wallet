@@ -13,8 +13,8 @@ type DomainTX struct {
 }
 
 type Repository interface {
-	SaveTX(ctx context.Context, txTable *database.Transaction, outputs []database.Output, data []database.Data) error
-	GetOutputs(ctx context.Context, outpoints iter.Seq[bsv.Outpoint]) ([]database.Output, error)
+	SaveTX(ctx context.Context, txTable *database.Transaction, outputs []*database.Output, data []*database.Data) error
+	GetOutputs(ctx context.Context, outpoints iter.Seq[bsv.Outpoint]) ([]*database.Output, error)
 }
 
 type Broadcaster interface {

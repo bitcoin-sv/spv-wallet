@@ -50,4 +50,7 @@ var (
 
 	// ErrTxBroadcast is when the transaction broadcast fails.
 	ErrTxBroadcast = models.SPVError{Code: "error-tx-broadcast", Message: "failed to broadcast transaction", StatusCode: 400}
+
+	// ErrAnnotationIndexOutOfRange is when the annotation index is out of range.
+	ErrAnnotationIndexOutOfRange = models.SPVError{Code: "error-annotation-index-out-of-range", Message: "annotation index is out of range", StatusCode: 400}
 )
