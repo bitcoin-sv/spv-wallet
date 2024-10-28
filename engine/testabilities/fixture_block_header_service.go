@@ -41,7 +41,7 @@ func (f *engineFixture) mockBHSGetMerkleRoots() {
 		merkleRootsRes, err := simulateBHSMerkleRootsAPI(lastEvaluatedKey)
 		require.NoError(f.t, err)
 
-		res := httpmock.NewStringResponse(200, merkleRootsRes)
+		res := httpmock.NewStringResponse(http.StatusOK, merkleRootsRes)
 		res.Header.Set("Content-Type", "application/json")
 
 		return res, nil
@@ -52,7 +52,7 @@ func (f *engineFixture) mockBHSGetMerkleRoots() {
 
 func simulateBHSMerkleRootsAPI(lastMerkleRoot string) (string, error) {
 	var response models.MerkleRootsBHSResponse
-	marshallResponseError := models.SPVError{StatusCode: 500, Message: "Error during marshaling BHS response", Code: "err-marchall-bhs-res"}
+	marshallResponseError := models.SPVError{StatusCode: http.StatusInternalServerError, Message: "Error during marshaling BHS response", Code: "err-marchall-bhs-res"}
 
 	if lastMerkleRoot == "" {
 		response.Content = fixtures.MockedBHSMerkleRootsData
