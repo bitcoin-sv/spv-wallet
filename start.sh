@@ -134,7 +134,7 @@ function print_state() {
     print_debug "  wallet_frontend=${wallet_frontend}"
     print_debug "  wallet_backend=${wallet_backend}"
     print_debug "  background=${background}"
-    print_debug "  default_xpub: $default_xpub"
+    print_debug "  default_xpub=${default_xpub}"
     print_debug "  admin_xpub=${admin_xpub}"
     print_debug "  admin_xpriv=${admin_xpriv}"
     print_debug "  load_config=${load_config}"
@@ -242,12 +242,91 @@ function parse_compose_additional() {
     done
 }
 
+function print_help() {
+    echo -e "Usage: ./start.sh [OPTIONS]"
+    echo ""
+    echo "This script helps you to run SPV Wallet with your preferred database and cache storage."
+    echo ""
+    echo -e "Options:"
+    echo -e "  -C,   --config\t\t Load YAML config file"
+    echo -e "  -pm,  --paymail\t\t PayMail domain for which to run all applications"
+    echo -e "  -e,   --expose\t\t Whether to expose the services PayMail domain and its subdomains - true/false"
+    echo -e "  -l,   --load\t\t\t Load previously stored config from .env.config file"
+    echo -e "  -b,   --background\t\t Whether the applications should be run in background - true/false"
+    echo -e "  -n,   --name\t\t\t Define project name used by docker-compose - defaults to name from docker-compose.yaml"
+    echo -e "  -d,   --debug\t\t\t Run in debug mode"
+    echo -e "  -h,   --help\t\t\t Show this message"
+    echo -e ""
+    echo -e "<----------   SPV WALLET SECTION"
+    echo -e "  -sw,  --spv-wallet\t\t Whether the spv-wallet should be run - true/false"
+    echo -e "  -db,  --database\t\t Define database - postgresql, sqlite"
+    echo -e "  -c,   --cache\t\t\t Define cache storage - freecache(in-memory), redis"
+    echo -e "  --xpub\t\t\t Define admin xPub"
+    echo ""
+    echo -e "<----------   BLOCK HEADERS SERVICE SECTION"
+    echo -e "  -bhs,  --blockchain-headers-service\t Whether the block-headers-service should be run - true/false"
+    echo ""
+    echo -e "<----------   SPV WALLET COMPONENT SECTION"
+    echo -e "  -wf,  --wallet-frontend\t Whether the wallet-frontend should be run - true/false"
+    echo -e "  -wb,  --wallet-backend\t Whether the wallet-backend should be run - true/false"
+    echo -e "  --xprv\t\t\t Define admin xPriv"
+    echo ""
+    echo -e "<----------   SPV WALLET ADMIN SECTION"
+    echo -e "  -a,  --admin-panel\t Whether the spv-wallet-admin should be run - true/false"
+    exit 1;
+}
+
+# function to parse the YAML file
+function parse_yaml() {
+   local prefix=$2
+   local s='[[:space:]]*' w='[a-zA-Z0-9_]*' fs=$(echo @|tr @ '\034')
+   sed -ne "s|^\($s\):|\1|" \
+        -e "s|^\($s\)\($w\)$s:$s[\"']\(.*\)[\"']$s\$|\1$fs\2$fs\3|p" \
+        -e "s|^\($s\)\($w\)$s:$s\(.*\)$s\$|\1$fs\2$fs\3|p"  $1 |
+   awk -F$fs '{
+      indent = length($1)/2;
+      vname[indent] = $2;
+      for (i in vname) {if (i > indent) {delete vname[i]}}
+      if (length($3) > 0) {
+         vn=""; for (i=0; i<indent; i++) {vn=(vn)(vname[i])("_")}
+         printf("%s%s%s=\"%s\"\n", "'$prefix'",vn, $2, $3);
+      }
+   }'
+}
+
+function set_config_defaults() {
+    if [ -z "${db_sql_host}" ]; then
+        db_sql_name="wallet-postgresql"
+    fi
+
+    if [ -z "${db_sql_name}" ]; then
+        db_sql_name="postgres"
+    fi
+
+    if [ -z "${db_sql_user}" ]; then
+        db_sql_name="postgres"
+    fi
+
+    if [ -z "${db_sql_password}" ]; then
+        db_sql_name="postgres"
+    fi
+
+    if [ -z "${cache_redis_url}" ]; then
+        cache_redis_url="redis://redis:6379"
+    fi
+}
+
 # === LOAD FROM CLI ===
 
 while [[ $# -gt 0 ]]; do
     key="$1"
 
     case $key in
+        -C|--config)
+        load_yaml="true";load_config="false"
+        config_file="$2"
+        shift
+        ;;
         -db|--database)
         database="$2"
         shift
@@ -301,7 +380,7 @@ while [[ $# -gt 0 ]]; do
         shift
         ;;
         -l|--load)
-        load_config="true"
+        load_config="true";load_yaml="false"
         # no additional arguments so no `shift` command
         ;;
         -n|--name)
@@ -316,36 +395,7 @@ while [[ $# -gt 0 ]]; do
         # no additional arguments so no `shift` command
         ;;
         -h|--help)
-        echo -e "Usage: ./start.sh [OPTIONS]"
-        echo ""
-        echo "This script helps you to run SPV Wallet with your preferred database and cache storage."
-        echo ""
-        echo -e "Options:"
-        echo -e "  -pm,  --paymail\t\t PayMail domain for which to run all applications"
-        echo -e "  -e,   --expose\t\t Whether to expose the services PayMail domain and its subdomains - true/false"
-        echo -e "  -l,   --load\t\t\t Load previously stored config from .env.config file"
-        echo -e "  -b,   --background\t\t Whether the applications should be run in background - true/false"
-        echo -e "  -n,   --name\t\t\t Define project name used by docker-compose - defaults to name from docker-compose.yaml"
-        echo -e "  -d,   --debug\t\t\t Run in debug mode"
-        echo -e "  -h,   --help\t\t\t Show this message"
-        echo -e ""
-        echo -e "<----------   SPV WALLET SECTION"
-        echo -e "  -sw,  --spv-wallet\t\t Whether the spv-wallet should be run - true/false"
-        echo -e "  -db,  --database\t\t Define database - postgresql, sqlite"
-        echo -e "  -c,   --cache\t\t\t Define cache storage - freecache(in-memory), redis"
-        echo -e "  --xpub\t\t\t Define admin xPub"
-        echo ""
-        echo -e "<----------   BLOCK HEADERS SERVICE SECTION"
-        echo -e "  -bhs,  --blockchain-headers-service\t Whether the block-headers-service should be run - true/false"
-        echo ""
-        echo -e "<----------   SPV WALLET COMPONENT SECTION"
-        echo -e "  -wf,  --wallet-frontend\t Whether the wallet-frontend should be run - true/false"
-        echo -e "  -wb,  --wallet-backend\t Whether the wallet-backend should be run - true/false"
-        echo -e "  --xprv\t\t\t Define admin xPriv"
-        echo ""
-        echo -e "<----------   SPV WALLET ADMIN SECTION"
-        echo -e "  -a,  --admin-panel\t Whether the spv-wallet-admin should be run - true/false"
-        exit 1;
+        print_help
         shift
         ;;
         *)
@@ -360,6 +410,51 @@ echo -e "${color_user}Welcome in SPV Wallet!${color_reset}"
 print_debug "Loaded config from CLI:"
 print_state
 
+# === LOAD FROM YAML CONFIG ===
+if [ "$load_yaml" == "true" ]; then
+    if [ -z "${config_file}" ]; then
+        echo "Reading from config, but no config file provided!"
+        exit 1
+    fi
+    print_debug "Loading config from YAML file"
+    eval $(parse_yaml $config_file)
+
+    # TODO: for debugging, remove later
+    # parse_yaml $config_file
+
+    # Assign config file values to inner script variables 
+    database=$startup_spvwallet_db_datastore_engine
+    cache=$startup_spvwallet_cache_engine
+    spv_wallet=$startup_run_spvwallet
+    block_headers_service=$startup_run_block_headers_service
+    wallet_frontend=$startup_run_spvwallet_frontend
+    wallet_backend=$startup_run_spvwallet_backend
+    expose=$startup_run_exposed
+    background=$startup_run_in_background
+    admin_panel=$startup_run_admin_panel
+
+    if [ "$useDefaultName" != "true" ]; then
+      name=$startup_run_name
+    fi
+
+    paymail_domain=$startup_run_paymail_domain
+    if [ -z "${paymail_domain}" ]; then
+        paymail_domain=$paymail_default_from_paymail
+    fi
+
+    # Key variables
+    admin_xpriv=$auth_admin_key
+    default_xpub=$startup_run_with_default_xpub
+
+    admin_xpub=$startup_spvwallet_auth_admin_key
+    admin_xpriv=$startup_spvwallet_admin_xpriv
+
+    print_success "YAML config file loaded."
+    print_debug "Config after loading YAML file"
+    print_state
+    
+    # exit 0
+fi
 
 # === LOAD FROM FILE ===
 if [ "$load_config" == "true" ]; then
@@ -537,6 +632,8 @@ if [ -n "$paymail_domain" ]; then
 fi
 
 # === SAVE CONFIG ===
+set_config_defaults
+
 print_debug "Config before storing:"
 print_state
 
@@ -575,14 +672,14 @@ save_to 'RUN_ADMIN_PANEL' admin_panel
 case $database in
   postgresql)
     save_value 'SPVWALLET_DB_SQL_HOST' "wallet-postgresql"
-    save_value 'SPVWALLET_DB_SQL_NAME' "postgres"
-    save_value 'SPVWALLET_DB_SQL_USER' "postgres"
-    save_value 'SPVWALLET_DB_SQL_PASSWORD' "postgres"
+    save_value 'SPVWALLET_DB_SQL_NAME' $db_sql_name
+    save_value 'SPVWALLET_DB_SQL_USER' $db_sql_user
+    save_value 'SPVWALLET_DB_SQL_PASSWORD' $db_sql_password
   ;;
 esac
 
 if [ "$cache" == "redis" ]; then
-  save_value 'SPVWALLET_CACHE_REDIS_URL' "redis://redis:6379"
+  save_value 'SPVWALLET_CACHE_REDIS_URL' $cache_redis_url
 fi
 
 if [ "$spv_wallet" == "true" ]; then

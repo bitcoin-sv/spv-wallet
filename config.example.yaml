@@ -126,3 +126,20 @@ logging:
 experimental_features:
   pike_contacts_enabled: false
   pike_payment_enabled: false
+
+startup:
+  spvwallet_db_datastore_engine: postgresql
+  spvwallet_cache_engine: redis
+  run_spvwallet: false
+  run_block_headers_service: true
+  run_spvwallet_frontend: true
+  run_spvwallet_backend: true
+  run_exposed: false
+  run_in_background: false
+  run_with_default_xpub: true
+  run_admin_panel: true
+  run_paymail_domain: 
+  run_name: 
+  # NOTE: Is this ok ???
+  spvwallet_auth_admin_key:
+  spvwallet_admin_xpriv:
