@@ -2,6 +2,7 @@ package record
 
 import "github.com/rs/zerolog"
 
+// Service for recording transactions
 type Service struct {
 	repo        Repository
 	broadcaster Broadcaster

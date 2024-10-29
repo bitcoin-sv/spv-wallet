@@ -3,10 +3,11 @@ package record_test
 import (
 	"context"
 	"fmt"
+	"iter"
+
 	trx "github.com/bitcoin-sv/go-sdk/transaction"
 	"github.com/bitcoin-sv/spv-wallet/engine/database"
 	"github.com/bitcoin-sv/spv-wallet/models/bsv"
-	"iter"
 )
 
 type mockRepository struct {

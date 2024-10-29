@@ -21,13 +21,13 @@ func getDataFromOpReturn(lockingScript *script.Script) ([]byte, error) {
 		startIndex = 1
 	}
 
-	var d [][]byte
+	var bytes []byte
 	for _, chunk := range chunks[startIndex:] {
 		if chunk.Op > script.OpPUSHDATA4 {
 			return nil, spverrors.Newf("Could not find OP_RETURN data")
 		}
-		d = append(d, chunk.Data)
+		bytes = append(bytes, chunk.Data...)
 	}
 
-	return d[0], nil
+	return bytes, nil
 }

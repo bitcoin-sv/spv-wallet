@@ -2,6 +2,7 @@ package record
 
 import (
 	"context"
+
 	"github.com/bitcoin-sv/go-sdk/spv"
 	trx "github.com/bitcoin-sv/go-sdk/transaction"
 	"github.com/bitcoin-sv/spv-wallet/conv"
@@ -75,7 +76,7 @@ func (s *Service) getTrackedUTXOsFromInputs(ctx context.Context, tx *trx.Transac
 	}
 	storedUTXOs, err := s.repo.GetOutputs(ctx, outpoints)
 	if err != nil {
-		return nil, err //TODO wrap
+		return nil, txerrors.ErrGettingOutputs.Wrap(err)
 	}
 
 	for _, utxo := range storedUTXOs {
