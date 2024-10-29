@@ -206,7 +206,7 @@ func TestNewPaymail(t *testing.T) {
 		expectedPubKey, err := expectedHdPubKey.ECPubKey()
 		require.NoError(t, err)
 
-		require.Equal(t, hex.EncodeToString(expectedPubKey.SerializeCompressed()), firstPubKey)
+		require.Equal(t, hex.EncodeToString(expectedPubKey.Compressed()), firstPubKey)
 	})
 
 	t.Run("RotatePubKey() test", func(t *testing.T) {
@@ -247,7 +247,7 @@ func TestNewPaymail(t *testing.T) {
 		expectedPubKey, err := expectedExternalXpub.ECPubKey()
 		require.NoError(t, err)
 
-		require.Equal(t, hex.EncodeToString(expectedPubKey.SerializeCompressed()), secondPubKey)
+		require.Equal(t, hex.EncodeToString(expectedPubKey.Compressed()), secondPubKey)
 	})
 
 	t.Run("ExternalXPub and PubKey rotation test", func(t *testing.T) {
