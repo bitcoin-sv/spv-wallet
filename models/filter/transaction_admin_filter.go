@@ -11,8 +11,5 @@ type AdminTransactionFilter struct {
 func (f *AdminTransactionFilter) ToDbConditions() map[string]interface{} {
 	conditions := f.TransactionFilter.ToDbConditions()
 
-	// Add xpubid to the conditions if provided
-	applyIfNotNil(conditions, "xpub_id", f.XPubID)
-
 	return conditions
 }

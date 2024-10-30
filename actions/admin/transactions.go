@@ -3,8 +3,6 @@ package admin
 import (
 	"net/http"
 
-	"github.com/gin-gonic/gin"
-
 	"github.com/bitcoin-sv/spv-wallet/actions/common"
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/bitcoin-sv/spv-wallet/internal/query"
@@ -12,6 +10,7 @@ import (
 	"github.com/bitcoin-sv/spv-wallet/models/filter"
 	"github.com/bitcoin-sv/spv-wallet/models/response"
 	"github.com/bitcoin-sv/spv-wallet/server/reqctx"
+	"github.com/gin-gonic/gin"
 )
 
 // adminGetTxByID fetches a transaction by id for admins
@@ -120,11 +119,19 @@ func adminSearchByXPubID(c *gin.Context, _ *reqctx.AdminContext) {
 		return
 	}
 
+	if searchParams.Conditions.XPubID == nil {
+		spverrors.ErrorResponse(c, spverrors.ErrMissingXPubID, reqctx.Logger(c))
+		c.JSON(http.StatusBadRequest, response.PageModel[response.Transaction]{
+			Content: []*response.Transaction{},
+		})
+		return
+	}
+
 	conditions := searchParams.Conditions.ToDbConditions()
 	metadata := mappings.MapToMetadata(searchParams.Metadata)
 	pageOptions := mappings.MapToDbQueryParams(&searchParams.Page)
 
-	transactions, err := reqctx.Engine(c).GetAdminTransactionsByXpubID(
+	transactions, err := reqctx.Engine(c).GetTransactionsByXpubID(
 		c.Request.Context(),
 		*searchParams.Conditions.XPubID,
 		metadata,

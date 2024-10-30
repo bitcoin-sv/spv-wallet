@@ -440,3 +440,6 @@ var ErrInvalidInt64 = models.SPVError{Message: "invalid int64 value", StatusCode
 
 // ErrInvalidUint64 is when uint64 value is invalid
 var ErrInvalidUint64 = models.SPVError{Message: "invalid uint64 value", StatusCode: 500, Code: "error-invalid-uint64"}
+
+// ErrMissingXPubID is when xpub_id is missing
+var ErrMissingXPubID = models.SPVError{Message: "missing xpub_id", StatusCode: 400, Code: "error-missing-xpub-id"}
