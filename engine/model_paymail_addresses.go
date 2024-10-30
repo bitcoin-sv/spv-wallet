@@ -214,7 +214,7 @@ func (m *PaymailAddress) GetPubKey() (string, error) {
 		return "", spverrors.Wrapf(err, "failed to get public key")
 	}
 
-	return hex.EncodeToString(pubKey.SerializeCompressed()), nil
+	return hex.EncodeToString(pubKey.Compressed()), nil
 }
 
 // GetNextXpub will get the next child xPub for external operations.

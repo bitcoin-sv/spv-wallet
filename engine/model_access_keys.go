@@ -37,7 +37,7 @@ type AccessKey struct {
 // newAccessKey will start a new model
 func newAccessKey(xPubID string, opts ...ModelOps) *AccessKey {
 	privateKey, _ := primitives.NewPrivateKey()
-	publicKey := hex.EncodeToString(privateKey.PubKey().SerializeCompressed())
+	publicKey := hex.EncodeToString(privateKey.PubKey().Compressed())
 	id := utils.Hash(publicKey)
 
 	return &AccessKey{
