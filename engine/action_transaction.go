@@ -6,6 +6,7 @@ import (
 	"time"
 
 	trx "github.com/bitcoin-sv/go-sdk/transaction"
+
 	"github.com/bitcoin-sv/spv-wallet/conv"
 	chainmodels "github.com/bitcoin-sv/spv-wallet/engine/chain/models"
 	"github.com/bitcoin-sv/spv-wallet/engine/datastore"
@@ -186,6 +187,27 @@ func (c *Client) GetTransactionsCount(ctx context.Context, metadataConditions *M
 // metadataConditions is added to the request for searching
 // conditions is added the request for searching
 func (c *Client) GetTransactionsByXpubID(ctx context.Context, xPubID string, metadataConditions *Metadata,
+	conditions map[string]interface{}, queryParams *datastore.QueryParams,
+) ([]*Transaction, error) {
+
+	// Get the transaction by ID
+	transactions, err := getTransactionsByXpubID(
+		ctx,
+		xPubID,
+		metadataConditions,
+		conditions,
+		queryParams,
+		c.DefaultModelOptions()...,
+	)
+	if err != nil {
+		return nil, err
+	}
+
+	return transactions, nil
+}
+
+// GetTransactionsByXpubIDCount will get the count of all transactions matching the search criteria
+func (c *Client) GetAdminTransactionsByXpubID(ctx context.Context, xPubID string, metadataConditions *Metadata,
 	conditions map[string]interface{}, queryParams *datastore.QueryParams,
 ) ([]*Transaction, error) {
 
