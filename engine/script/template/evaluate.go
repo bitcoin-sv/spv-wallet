@@ -35,7 +35,7 @@ func Evaluate(scriptBytes []byte, pubKey *ec.PublicKey) ([]byte, error) {
 	}
 
 	// Serialize the public key to compressed format
-	dPKBytes := pubKey.SerializeCompressed()
+	dPKBytes := pubKey.Compressed()
 
 	// Apply Hash160 (SHA-256 followed by RIPEMD-160) to the compressed public key
 	dPKHash, err := utils.Hash160(dPKBytes)

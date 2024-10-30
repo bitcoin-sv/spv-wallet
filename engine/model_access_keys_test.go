@@ -25,7 +25,7 @@ func Test_newAccessKey(t *testing.T) {
 		assert.IsType(t, ec.PrivateKey{}, *privateKey)
 		publicKey := privateKey.PubKey()
 		assert.IsType(t, ec.PublicKey{}, *publicKey)
-		id := utils.Hash(hex.EncodeToString(publicKey.SerializeCompressed()))
+		id := utils.Hash(hex.EncodeToString(publicKey.Compressed()))
 		assert.Equal(t, id, key.ID)
 	})
 

@@ -1225,7 +1225,7 @@ func TestDraftTransaction_SignInputs(t *testing.T) {
 				unlocker := input.UnlockingScript.ToASM()
 				require.NoError(t, err)
 				scriptParts := strings.Split(unlocker, " ")
-				pubKey := hex.EncodeToString(privateKey.PubKey().SerializeCompressed())
+				pubKey := hex.EncodeToString(privateKey.PubKey().Compressed())
 
 				var hash []byte
 				hash, err = tx.CalcInputSignatureHash(0, sighash.AllForkID)

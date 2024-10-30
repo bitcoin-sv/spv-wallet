@@ -1,29 +1,20 @@
 package testabilities
 
 import (
-	"context"
-	"database/sql"
-	"net/http"
 	"testing"
 
 	"github.com/bitcoin-sv/spv-wallet/config"
-	"github.com/bitcoin-sv/spv-wallet/engine"
-	"github.com/bitcoin-sv/spv-wallet/engine/datastore"
+	testengine "github.com/bitcoin-sv/spv-wallet/engine/testabilities"
 	"github.com/bitcoin-sv/spv-wallet/engine/tester"
 	"github.com/bitcoin-sv/spv-wallet/engine/tester/fixtures"
-	"github.com/bitcoin-sv/spv-wallet/engine/tester/paymailmock"
 	"github.com/bitcoin-sv/spv-wallet/server"
 	"github.com/go-resty/resty/v2"
-	"github.com/jarcoal/httpmock"
 	"github.com/rs/zerolog"
-	"github.com/stretchr/testify/require"
 )
-
-type ConfigOpts func(*config.AppConfig)
 
 type SPVWalletApplicationFixture interface {
 	StartedSPVWallet() (cleanup func())
-	StartedSPVWalletWithConfiguration(opts ...ConfigOpts) (cleanup func())
+	StartedSPVWalletWithConfiguration(opts ...testengine.ConfigOpts) (cleanup func())
 
 	// HttpClient returns a new http client that can be used to make requests to the spv-wallet server.
 	// It is also failing tests if there are network or invalid request configuration errors,
@@ -56,29 +47,18 @@ type SPVWalletHttpClientFixture interface {
 }
 
 type appFixture struct {
-	config             *config.AppConfig
-	engine             engine.ClientInterface
-	t                  testing.TB
-	logger             zerolog.Logger
-	server             testServer
-	dbConnectionString string
-	dbConnection       *sql.DB
-	externalTransport  *httpmock.MockTransport
-	paymailClient      *paymailmock.PaymailClientMock
+	engineFixture testengine.EngineFixture
+	t             testing.TB
+	logger        zerolog.Logger
+	server        testServer
 }
 
 func Given(t testing.TB) SPVWalletApplicationFixture {
 	f := &appFixture{
-		t:                 t,
-		logger:            tester.Logger(t),
-		config:            getConfigForTests(),
-		externalTransport: httpmock.NewMockTransport(),
-		// TODO reuse externalTransport in paymailmock
-		paymailClient: paymailmock.MockClient(fixtures.PaymailDomainExternal),
+		t:             t,
+		engineFixture: testengine.Given(t),
+		logger:        tester.Logger(t),
 	}
-
-	f.initDbConnection()
-
 	return f
 }
 
@@ -86,6 +66,7 @@ func (f *appFixture) NewTest(t testing.TB) SPVWalletApplicationFixture {
 	newFixture := *f
 	newFixture.t = t
 	newFixture.logger = tester.Logger(t)
+	newFixture.engineFixture = f.engineFixture.NewTest(t)
 	return &newFixture
 }
 
@@ -93,29 +74,13 @@ func (f *appFixture) StartedSPVWallet() (cleanup func()) {
 	return f.StartedSPVWalletWithConfiguration()
 }
 
-func (f *appFixture) StartedSPVWalletWithConfiguration(opts ...ConfigOpts) (cleanup func()) {
-	for _, opt := range opts {
-		opt(f.config)
-	}
+func (f *appFixture) StartedSPVWalletWithConfiguration(opts ...testengine.ConfigOpts) (cleanup func()) {
+	engineWithConfig, cleanup := f.engineFixture.EngineWithConfiguration(opts...)
 
-	options, err := f.config.ToEngineOptions(f.logger)
-	require.NoError(f.t, err)
-	options = f.addMockedExternalDependenciesOptions(options)
-
-	f.engine, err = engine.NewClient(context.Background(), options...)
-	require.NoError(f.t, err)
-
-	f.initialiseFixtures()
-
-	s := server.NewServer(f.config, f.engine, f.logger)
+	s := server.NewServer(&engineWithConfig.Config, engineWithConfig.Engine, f.logger)
 	f.server.handlers = s.Handlers()
 
-	return func() {
-		err := f.engine.Close(context.Background())
-		require.NoError(f.t, err)
-		f.externalTransport.Reset()
-		httpmock.Reset()
-	}
+	return cleanup
 }
 
 func (f *appFixture) HttpClient() SPVWalletHttpClientFixture {
@@ -148,98 +113,5 @@ func (f *appFixture) ForGivenUser(user fixtures.User) *resty.Client {
 }
 
 func (f *appFixture) BHS() BlockHeadersServiceFixture {
-	return f
-}
-
-func (f *appFixture) WillRespondForMerkleRoots(httpCode int, response string) {
-	responder := func(req *http.Request) (*http.Response, error) {
-		res := httpmock.NewStringResponse(httpCode, response)
-		res.Header.Set("Content-Type", "application/json")
-
-		return res, nil
-	}
-
-	f.externalTransport.RegisterResponder("GET", "http://localhost:8080/api/v1/chain/merkleroot", responder)
-}
-
-func (f *appFixture) mockBHSGetMerkleRoots() {
-	responder := func(req *http.Request) (*http.Response, error) {
-		if req.Header.Get("Authorization") != "Bearer "+f.config.BHS.AuthToken {
-			return httpmock.NewStringResponse(http.StatusUnauthorized, ""), nil
-		}
-		lastEvaluatedKey := req.URL.Query().Get("lastEvaluatedKey")
-		merkleRootsRes, err := simulateBHSMerkleRootsAPI(lastEvaluatedKey)
-		require.NoError(f.t, err)
-
-		res := httpmock.NewStringResponse(200, merkleRootsRes)
-		res.Header.Set("Content-Type", "application/json")
-
-		return res, nil
-	}
-
-	f.externalTransport.RegisterResponder("GET", "http://localhost:8080/api/v1/chain/merkleroot", responder)
-}
-
-func (f *appFixture) initialiseFixtures() {
-	opts := f.engine.DefaultModelOptions(engine.WithMetadata("source", "fixture"))
-
-	for _, user := range fixtures.InternalUsers() {
-		_, err := f.engine.NewXpub(context.Background(), user.XPub(), opts...)
-		require.NoError(f.t, err)
-
-		for _, paymail := range user.Paymails {
-			_, err := f.engine.NewPaymailAddress(context.Background(), user.XPub(), paymail, paymail, "", opts...)
-			require.NoError(f.t, err)
-		}
-	}
-
-	f.paymailClient.WillRespondWithP2PCapabilities()
-	f.mockBHSGetMerkleRoots()
-}
-
-// initDbConnection creates a new connection that will be used as connection for engine
-func (f *appFixture) initDbConnection() {
-	f.dbConnectionString = "file:spv-wallet-test.db?mode=memory"
-
-	connection, err := sql.Open("sqlite3", f.dbConnectionString)
-	require.NoErrorf(f.t, err, "Cannot create sqlite connection")
-
-	f.dbConnection = connection
-
-	f.config.Db.Datastore.Engine = datastore.SQLite
-	f.config.Db.SQLite.DatabasePath = ""
-	f.config.Db.SQLite.TablePrefix = "xapi"
-	f.config.Db.SQLite.MaxIdleConnections = 1
-	f.config.Db.SQLite.MaxOpenConnections = 1
-	f.config.Db.SQLite.ExistingConnection = f.dbConnection
-}
-
-func (f *appFixture) addMockedExternalDependenciesOptions(options []engine.ClientOps) []engine.ClientOps {
-	options = append(options, engine.WithHTTPClient(f.httpClientWithMockedTransport()))
-	options = append(options, engine.WithPaymailClient(f.paymailClient))
-	return options
-}
-
-func (f *appFixture) httpClientWithMockedTransport() *resty.Client {
-	client := resty.New()
-	client.SetTransport(f.externalTransport)
-	return client
-}
-
-func getConfigForTests() *config.AppConfig {
-	cfg := config.GetDefaultAppConfig()
-	cfg.Authentication.RequireSigning = false
-
-	cfg.DebugProfiling = false
-
-	cfg.CustomFeeUnit = &config.FeeUnitConfig{
-		Satoshis: 1,
-		Bytes:    1000,
-	}
-
-	cfg.Paymail.Domains = []string{fixtures.PaymailDomain}
-
-	cfg.Notifications.Enabled = false
-
-	return cfg
+	return f.engineFixture.BHS()
 }
