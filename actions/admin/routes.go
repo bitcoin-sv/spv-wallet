@@ -43,7 +43,6 @@ func RegisterRoutes(handlersManager *handlers.Manager) {
 	// tx
 	adminGroup.GET("/transactions/:id", handlers.AsAdmin(adminGetTxByID))
 	adminGroup.GET("/transactions", handlers.AsAdmin(adminSearchTxs))
-	adminGroup.GET("/transactions/search", handlers.AsAdmin(adminSearchByXPubID))
 
 	// contacts
 	adminGroup.GET("/contacts", handlers.AsAdmin(contactsSearch))

@@ -40,7 +40,6 @@ func (ts *TestSuite) TestXPubRegisterRoutes() {
 			{"GET", "/" + config.APIVersion + "/admin/transactions"},         // search old
 			{"GET", "/api/" + config.APIVersion + "/admin/transactions/:id"}, // get tx by id
 			{"GET", "/api/" + config.APIVersion + "/admin/transactions"},     // search
-			{"GET", "/api/" + config.APIVersion + "/admin/transactions/search"},
 
 			// contacts
 			{"POST", "/api/" + config.APIVersion + "/admin/invitations/:id"},   // accept

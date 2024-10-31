@@ -3,12 +3,10 @@ package admin
 import (
 	"net/http"
 
-	"github.com/bitcoin-sv/spv-wallet/actions/common"
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/bitcoin-sv/spv-wallet/internal/query"
 	"github.com/bitcoin-sv/spv-wallet/mappings"
 	"github.com/bitcoin-sv/spv-wallet/models/filter"
-	"github.com/bitcoin-sv/spv-wallet/models/response"
 	"github.com/bitcoin-sv/spv-wallet/server/reqctx"
 	"github.com/gin-gonic/gin"
 )
@@ -59,106 +57,25 @@ func adminGetTxByID(c *gin.Context, _ *reqctx.AdminContext) {
 func adminSearchTxs(c *gin.Context, _ *reqctx.AdminContext) {
 	logger := reqctx.Logger(c)
 
-	searchParams, err := query.ParseSearchParams[filter.TransactionFilter](c)
+	searchParams, err := query.ParseSearchParams[filter.AdminTransactionFilter](c)
 	if err != nil {
 		spverrors.ErrorResponse(c, spverrors.ErrCannotParseQueryParams.WithTrace(err), logger)
 		return
 	}
 
-	conditions := searchParams.Conditions.ToDbConditions()
-	metadata := mappings.MapToMetadata(searchParams.Metadata)
-	pageOptions := mappings.MapToDbQueryParams(&searchParams.Page)
+	queryParams := prepareQueryParams(c, searchParams)
 
-	transactions, err := reqctx.Engine(c).GetTransactions(
-		c.Request.Context(),
-		metadata,
-		conditions,
-		pageOptions,
-	)
+	transactions, err := fetchTransactions(c, queryParams)
 	if err != nil {
-		spverrors.ErrorResponse(c, err, logger)
+		handleError(c, spverrors.ErrFetchTransactions.Wrap(err), logger)
 		return
 	}
 
-	count, err := reqctx.Engine(c).GetTransactionsCount(
-		c.Request.Context(),
-		metadata,
-		conditions,
-	)
+	count, err := countTransactions(c, queryParams)
 	if err != nil {
-		spverrors.ErrorResponse(c, spverrors.ErrCouldNotCountTransactions.WithTrace(err), logger)
+		handleError(c, spverrors.ErrCouldNotCountTransactions.WithTrace(err), logger)
 		return
 	}
 
-	contracts := common.MapToTypeContracts(transactions, mappings.MapToTransactionContractForAdmin)
-	result := response.PageModel[response.Transaction]{
-		Content: contracts,
-		Page:    common.GetPageDescriptionFromSearchParams(pageOptions, count),
-	}
-
-	c.JSON(http.StatusOK, result)
-}
-
-// adminSearchByXPubID godoc
-// @Summary      Admin Search for transactions
-// @Description  Admin endpoint for searching transactions without xpubid limitations. Supports extended filters like xpubid.
-// @Tags         Admin Transactions
-// @Produce      json
-// @Param        AdminSearchTransactions body filter.AdminTransactionFilter false "Supports filtering transactions by various criteria, including xpubid, and options for pagination and sorting"
-// @Success      200 {object} []models.Transaction "List of transactions"
-// @Failure      400 "Bad request - Error while parsing AdminSearchTransactions from request body"
-// @Failure      500 "Internal server error - Error while searching for transactions"
-// @Router       /api/v1/admin/transactions/search [get]
-// @Security     x-auth-admin
-func adminSearchByXPubID(c *gin.Context, _ *reqctx.AdminContext) {
-	logger := reqctx.Logger(c)
-
-	searchParams, err := query.ParseSearchParams[filter.AdminTransactionFilter](c)
-	if err != nil {
-		spverrors.ErrorResponse(c, spverrors.ErrCannotParseQueryParams.Wrap(err), reqctx.Logger(c))
-		return
-	}
-
-	if searchParams.Conditions.XPubID == nil {
-		spverrors.ErrorResponse(c, spverrors.ErrMissingXPubID, reqctx.Logger(c))
-		c.JSON(http.StatusBadRequest, response.PageModel[response.Transaction]{
-			Content: []*response.Transaction{},
-		})
-		return
-	}
-
-	conditions := searchParams.Conditions.ToDbConditions()
-	metadata := mappings.MapToMetadata(searchParams.Metadata)
-	pageOptions := mappings.MapToDbQueryParams(&searchParams.Page)
-
-	transactions, err := reqctx.Engine(c).GetTransactionsByXpubID(
-		c.Request.Context(),
-		*searchParams.Conditions.XPubID,
-		metadata,
-		conditions,
-		pageOptions,
-	)
-	if err != nil {
-		spverrors.ErrorResponse(c, err, logger)
-		return
-	}
-
-	count, err := reqctx.Engine(c).GetTransactionsByXpubIDCount(
-		c.Request.Context(),
-		*searchParams.Conditions.XPubID,
-		metadata,
-		conditions,
-	)
-	if err != nil {
-		spverrors.ErrorResponse(c, spverrors.ErrCouldNotCountTransactions.WithTrace(err), logger)
-		return
-	}
-
-	contracts := common.MapToTypeContracts(transactions, mappings.MapToTransactionContractForAdmin)
-	result := response.PageModel[response.Transaction]{
-		Content: contracts,
-		Page:    common.GetPageDescriptionFromSearchParams(pageOptions, count),
-	}
-
-	c.JSON(http.StatusOK, result)
+	sendResponse(c, transactions, queryParams.PageOptions, count)
 }

@@ -1,7 +1,10 @@
 package admin
 
 import (
+	"context"
+
 	"github.com/bitcoin-sv/spv-wallet/engine"
+	"github.com/bitcoin-sv/spv-wallet/engine/datastore"
 )
 
 // CreatePaymail is the model for creating a paymail
@@ -44,4 +47,13 @@ type UpdateContact struct {
 	Metadata engine.Metadata `json:"metadata" swaggertype:"object,string" example:"key:value,key2:value2"`
 	// New name for the contact
 	FullName string `json:"fullName" example:"John Doe"`
+}
+
+// Helper struct for transaction query params
+type transactionQueryParams struct {
+	Context     context.Context
+	XPubID      *string
+	Metadata    *engine.Metadata
+	Conditions  map[string]interface{}
+	PageOptions *datastore.QueryParams
 }

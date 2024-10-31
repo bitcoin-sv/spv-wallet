@@ -221,6 +221,9 @@ var ErrInvalidTransactionID = models.SPVError{Message: "invalid transaction id",
 // ErrCouldNotCountTransactions is when a transaction count fails
 var ErrCouldNotCountTransactions = models.SPVError{Message: "failed transactions count", StatusCode: 500, Code: "error-transactions-count-failed"}
 
+// ErrFetchTransactions is when a transaction fetch fails
+var ErrFetchTransactions = models.SPVError{Message: "failed to fetch transactions", StatusCode: 500, Code: "error-fetch-transactions"}
+
 // ErrInvalidRequirements is when an invalid requirement was given
 var ErrInvalidRequirements = models.SPVError{Message: "requirements are invalid or missing", StatusCode: 400, Code: "error-transaction-requirements-invalid"}
 
