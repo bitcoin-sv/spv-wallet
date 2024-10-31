@@ -54,6 +54,6 @@ type transactionQueryParams struct {
 	Context     context.Context
 	XPubID      *string
 	Metadata    *engine.Metadata
-	Conditions  map[string]interface{}
+	Conditions  map[string]any
 	PageOptions *datastore.QueryParams
 }
