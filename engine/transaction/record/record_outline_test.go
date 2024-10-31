@@ -33,16 +33,6 @@ func TestRecordOutlineOpReturn(t *testing.T) {
 		expectData    []database.Data
 	}{
 		"RecordTransactionOutline for op_return": {
-			repo: newMockRepository(),
-			expectData: []database.Data{
-				{
-					TxID: txIDWithOpReturn,
-					Vout: 0,
-					Blob: []byte(dataOfOpReturnTx),
-				},
-			},
-		},
-		"RecordTransactionOutline for op_return with tracked utxo as inputs": {
 			repo: newMockRepository().withOutput(database.Output{
 				TxID: prevTxID,
 				Vout: prevOutputIndex,
@@ -62,6 +52,16 @@ func TestRecordOutlineOpReturn(t *testing.T) {
 				},
 			},
 		},
+		"RecordTransactionOutline for op_return with untracked utxo as inputs": {
+			repo: newMockRepository(),
+			expectData: []database.Data{
+				{
+					TxID: txIDWithOpReturn,
+					Vout: 0,
+					Blob: []byte(dataOfOpReturnTx),
+				},
+			},
+		},
 	}
 	for name, test := range tests {
 		t.Run(name, func(t *testing.T) {
@@ -71,7 +71,7 @@ func TestRecordOutlineOpReturn(t *testing.T) {
 
 			outline := outlines.Transaction{
 				BEEF: beefWithOpReturn,
-				Annotations: &transaction.Annotations{
+				Annotations: transaction.Annotations{
 					Outputs: transaction.OutputsAnnotations{
 						0: &transaction.OutputAnnotation{
 							Bucket: bucket.Data,
@@ -90,17 +90,8 @@ func TestRecordOutlineOpReturn(t *testing.T) {
 			require.Equal(t, txIDWithOpReturn, txEntry.ID)
 			require.Equal(t, database.TxStatusBroadcasted, txEntry.TxStatus)
 
-			for _, expectOutput := range test.expectOutputs {
-				output, ok := repo.getOutput(expectOutput.TxID, expectOutput.Vout)
-				require.True(t, ok)
-				require.Equal(t, expectOutput, *output)
-			}
-
-			for _, expectData := range test.expectData {
-				data, ok := repo.getData(expectData.TxID, expectData.Vout)
-				require.True(t, ok)
-				require.Equal(t, expectData, *data)
-			}
+			require.Subset(t, repo.getAllOutputs(), test.expectOutputs)
+			require.Subset(t, repo.getAllData(), test.expectData)
 		})
 	}
 }

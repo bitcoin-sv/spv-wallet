@@ -38,13 +38,9 @@ func (s *Service) RecordTransactionOutline(ctx context.Context, outline *outline
 		utxo.Spend(txID)
 	}
 
-	var newOutputs []*database.Output
-	var newDataRecords []*database.Data
-	if outline.Annotations != nil {
-		newOutputs, newDataRecords, err = s.processAnnotatedOutputs(tx, *outline.Annotations)
-		if err != nil {
-			return err
-		}
+	newOutputs, newDataRecords, err := s.processAnnotatedOutputs(tx, &outline.Annotations)
+	if err != nil {
+		return err
 	}
 
 	if err = s.broadcaster.Broadcast(ctx, tx); err != nil {
@@ -65,6 +61,10 @@ func (s *Service) RecordTransactionOutline(ctx context.Context, outline *outline
 	return nil
 }
 
+// getTrackedUTXOsFromInputs gets stored-in-our-database outputs used in provided tx
+// NOTE: The flow accepts transactions with "other" UTXOs,
+// if the untracked output is correctly unlocked by the input script we have no reason to block it;
+// but only the tracked UTXOs will be marked as spent (and considered for future double-spending checks)
 func (s *Service) getTrackedUTXOsFromInputs(ctx context.Context, tx *trx.Transaction) ([]*database.Output, error) {
 	outpoints := func(yield func(outpoint bsv.Outpoint) bool) {
 		for _, input := range tx.Inputs {
@@ -88,7 +88,7 @@ func (s *Service) getTrackedUTXOsFromInputs(ctx context.Context, tx *trx.Transac
 	return storedUTXOs, nil
 }
 
-func (s *Service) processAnnotatedOutputs(tx *trx.Transaction, annotations transaction.Annotations) ([]*database.Output, []*database.Data, error) {
+func (s *Service) processAnnotatedOutputs(tx *trx.Transaction, annotations *transaction.Annotations) ([]*database.Output, []*database.Data, error) {
 	txID := tx.TxID().String()
 
 	var outputRecords []*database.Output
@@ -115,7 +115,9 @@ func (s *Service) processAnnotatedOutputs(tx *trx.Transaction, annotations trans
 				Vout: voutU32,
 				Blob: data,
 			})
-		case bucket.BSV: //TODO
+		case bucket.BSV:
+			//TODO
+			s.logger.Warn().Msgf("support for BSV bucket is not implemented yet")
 		default:
 			s.logger.Warn().Msgf("Unknown annotation bucket %s", annotation.Bucket)
 			continue

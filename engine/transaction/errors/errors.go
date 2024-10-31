@@ -55,5 +55,5 @@ var (
 	ErrAnnotationIndexOutOfRange = models.SPVError{Code: "error-annotation-index-out-of-range", Message: "annotation index is out of range", StatusCode: 400}
 
 	// ErrGettingOutputs is when getting outputs fails.
-	ErrGettingOutputs = models.SPVError{Code: "error-getting-outputs", Message: "failed to get outputs", StatusCode: 400}
+	ErrGettingOutputs = models.SPVError{Code: "error-getting-outputs", Message: "failed to get outputs", StatusCode: 500}
 )
