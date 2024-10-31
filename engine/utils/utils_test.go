@@ -227,14 +227,14 @@ func TestDerivePublicKey(t *testing.T) {
 		require.NoError(t, err)
 		assert.Equal(t,
 			"03d406421c2733d69a76147c67f8c2194857a2f088299ebf8f1c3790396aa70b4e",
-			hex.EncodeToString(pubKey.SerializeCompressed()),
+			hex.EncodeToString(pubKey.Compressed()),
 		)
 
 		pubKey, err = DerivePublicKey(hdKey, 1, 1)
 		require.NoError(t, err)
 		assert.Equal(t,
 			"0263e4a3696fe4e5136536988169bc3fbec730b912ade7988c57098a47a81a0ae1",
-			hex.EncodeToString(pubKey.SerializeCompressed()),
+			hex.EncodeToString(pubKey.Compressed()),
 		)
 	})
 }

@@ -84,7 +84,7 @@ func TestEvaluate(t *testing.T) {
 	assert.NoError(t, err)
 	mockPublicKey, err := ec.ParsePubKey(pubKeyBytes)
 	assert.NoError(t, err)
-	mockPubKeyHash := crypto.Hash160(mockPublicKey.SerializeCompressed())
+	mockPubKeyHash := crypto.Hash160(mockPublicKey.Compressed())
 
 	t.Run("Valid Cases", func(t *testing.T) {
 		validTests := []struct {
