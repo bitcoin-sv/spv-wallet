@@ -3,12 +3,10 @@ package admin
 import (
 	"net/http"
 
-	"github.com/bitcoin-sv/spv-wallet/actions/common"
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/bitcoin-sv/spv-wallet/internal/query"
 	"github.com/bitcoin-sv/spv-wallet/mappings"
 	"github.com/bitcoin-sv/spv-wallet/models/filter"
-	"github.com/bitcoin-sv/spv-wallet/models/response"
 	"github.com/bitcoin-sv/spv-wallet/server/reqctx"
 	"github.com/gin-gonic/gin"
 )
@@ -59,42 +57,25 @@ func adminGetTxByID(c *gin.Context, _ *reqctx.AdminContext) {
 func adminSearchTxs(c *gin.Context, _ *reqctx.AdminContext) {
 	logger := reqctx.Logger(c)
 
-	searchParams, err := query.ParseSearchParams[filter.TransactionFilter](c)
+	searchParams, err := query.ParseSearchParams[filter.AdminTransactionFilter](c)
 	if err != nil {
 		spverrors.ErrorResponse(c, spverrors.ErrCannotParseQueryParams.WithTrace(err), logger)
 		return
 	}
 
-	conditions := searchParams.Conditions.ToDbConditions()
-	metadata := mappings.MapToMetadata(searchParams.Metadata)
-	pageOptions := mappings.MapToDbQueryParams(&searchParams.Page)
+	queryParams := prepareQueryParams(c, searchParams)
 
-	transactions, err := reqctx.Engine(c).GetTransactions(
-		c.Request.Context(),
-		metadata,
-		conditions,
-		pageOptions,
-	)
+	transactions, err := fetchTransactions(c, queryParams)
 	if err != nil {
-		spverrors.ErrorResponse(c, err, logger)
+		spverrors.ErrorResponse(c, spverrors.ErrFetchTransactions.Wrap(err), logger)
 		return
 	}
 
-	count, err := reqctx.Engine(c).GetTransactionsCount(
-		c.Request.Context(),
-		metadata,
-		conditions,
-	)
+	count, err := countTransactions(c, queryParams)
 	if err != nil {
 		spverrors.ErrorResponse(c, spverrors.ErrCouldNotCountTransactions.WithTrace(err), logger)
 		return
 	}
 
-	contracts := common.MapToTypeContracts(transactions, mappings.MapToTransactionContractForAdmin)
-	result := response.PageModel[response.Transaction]{
-		Content: contracts,
-		Page:    common.GetPageDescriptionFromSearchParams(pageOptions, count),
-	}
-
-	c.JSON(http.StatusOK, result)
+	sendPaginatedResponse(c, transactions, queryParams.PageOptions, count, mappings.MapToTransactionContractForAdmin)
 }
