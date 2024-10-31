@@ -67,15 +67,15 @@ func adminSearchTxs(c *gin.Context, _ *reqctx.AdminContext) {
 
 	transactions, err := fetchTransactions(c, queryParams)
 	if err != nil {
-		handleError(c, spverrors.ErrFetchTransactions.Wrap(err), logger)
+		spverrors.ErrorResponse(c, spverrors.ErrFetchTransactions.Wrap(err), logger)
 		return
 	}
 
 	count, err := countTransactions(c, queryParams)
 	if err != nil {
-		handleError(c, spverrors.ErrCouldNotCountTransactions.WithTrace(err), logger)
+		spverrors.ErrorResponse(c, spverrors.ErrCouldNotCountTransactions.WithTrace(err), logger)
 		return
 	}
 
-	sendResponse(c, transactions, queryParams.PageOptions, count)
+	sendPaginatedResponse(c, transactions, queryParams.PageOptions, count, mappings.MapToTransactionContractForAdmin)
 }

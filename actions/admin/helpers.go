@@ -7,19 +7,12 @@ import (
 	"github.com/bitcoin-sv/spv-wallet/actions/common"
 	"github.com/bitcoin-sv/spv-wallet/engine"
 	"github.com/bitcoin-sv/spv-wallet/engine/datastore"
-	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/bitcoin-sv/spv-wallet/mappings"
 	"github.com/bitcoin-sv/spv-wallet/models/filter"
 	"github.com/bitcoin-sv/spv-wallet/models/response"
 	"github.com/bitcoin-sv/spv-wallet/server/reqctx"
 	"github.com/gin-gonic/gin"
-	"github.com/rs/zerolog"
 )
-
-// Helper function to encapsulate error response logic
-func handleError(c *gin.Context, err error, logger *zerolog.Logger) {
-	spverrors.ErrorResponse(c, err, logger)
-}
 
 // Helper function to prepare transaction query parameters
 func prepareQueryParams(c *gin.Context, searchParams *filter.SearchParams[filter.AdminTransactionFilter]) *transactionQueryParams {
@@ -66,11 +59,14 @@ func countTransactions(c *gin.Context, params *transactionQueryParams) (int64, e
 }
 
 // Helper function to map transactions and send the response
-func sendResponse(c *gin.Context, transactions []*engine.Transaction, pageOptions *datastore.QueryParams, count int64) {
-	contracts := common.MapToTypeContracts(transactions, mappings.MapToTransactionContractForAdmin)
-	result := response.PageModel[response.Transaction]{
+// sendPaginatedResponse sends a paginated response with any content type.
+func sendPaginatedResponse[T any, U any](c *gin.Context, content []*T, pageOptions *datastore.QueryParams, count int64, mapToContractFunc func(*T) *U) {
+	contracts := common.MapToTypeContracts(content, mapToContractFunc)
+
+	result := response.PageModel[U]{
 		Content: contracts,
 		Page:    common.GetPageDescriptionFromSearchParams(pageOptions, count),
 	}
+
 	c.JSON(http.StatusOK, result)
 }
