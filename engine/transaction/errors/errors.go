@@ -56,4 +56,7 @@ var (
 
 	// ErrGettingOutputs is when getting outputs fails.
 	ErrGettingOutputs = models.SPVError{Code: "error-getting-outputs", Message: "failed to get outputs", StatusCode: 500}
+
+	// ErrAnnotationMismatch is when the annotation does not match to actual output content.
+	ErrAnnotationMismatch = models.SPVError{Code: "error-annotation-mismatch", Message: "annotation mismatch", StatusCode: 400}
 )

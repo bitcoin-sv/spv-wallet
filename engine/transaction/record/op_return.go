@@ -8,7 +8,7 @@ import (
 
 func getDataFromOpReturn(lockingScript *script.Script) ([]byte, error) {
 	if !lockingScript.IsData() {
-		return nil, spverrors.Newf("Script is not a data output")
+		return nil, txerrors.ErrAnnotationMismatch
 	}
 
 	chunks, err := lockingScript.Chunks()
