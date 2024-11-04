@@ -13,8 +13,8 @@ require (
 	github.com/99designs/gqlgen v0.17.55
 	github.com/DATA-DOG/go-sqlmock v1.5.2
 	github.com/aws/aws-sdk-go v1.55.5
-	github.com/bitcoin-sv/go-paymail v0.21.0
-	github.com/bitcoin-sv/go-sdk v1.1.10
+	github.com/bitcoin-sv/go-paymail v0.21.1
+	github.com/bitcoin-sv/go-sdk v1.1.14
 	github.com/bitcoin-sv/spv-wallet/models v0.28.0
 	github.com/bitcoinschema/go-map v0.2.0
 	github.com/coocood/freecache v1.2.4
@@ -40,7 +40,7 @@ require (
 	github.com/rs/zerolog v1.33.0
 	github.com/spf13/viper v1.19.0
 	github.com/stretchr/testify v1.9.0
-	github.com/swaggo/swag v1.16.3
+	github.com/swaggo/swag v1.16.4
 	github.com/vmihailenco/taskq/v3 v3.2.9
 	go.elastic.co/ecszerolog v0.2.0
 	gorm.io/driver/postgres v1.5.9
