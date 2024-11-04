@@ -61,11 +61,17 @@ func (m *mockRepository) getAllData() []database.Data {
 
 type mockBroadcaster struct {
 	broadcastedTxs map[string]*trx.Transaction
+	returnErr      error
 }
 
 func (m *mockBroadcaster) Broadcast(_ context.Context, tx *trx.Transaction) error {
 	m.broadcastedTxs[tx.TxID().String()] = tx
-	return nil
+	return m.returnErr
+}
+
+func (m *mockBroadcaster) withError(err error) *mockBroadcaster {
+	m.returnErr = err
+	return m
 }
 
 func newMockBroadcaster() *mockBroadcaster {

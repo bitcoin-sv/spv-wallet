@@ -11,6 +11,7 @@ import (
 	"github.com/bitcoin-sv/spv-wallet/engine/transaction/outlines"
 	"github.com/bitcoin-sv/spv-wallet/engine/transaction/record"
 	"github.com/bitcoin-sv/spv-wallet/models/transaction/bucket"
+	"github.com/pkg/errors"
 	"github.com/stretchr/testify/require"
 )
 
@@ -62,6 +63,11 @@ func TestRecordOutlineOpReturn(t *testing.T) {
 					Vout:       prevOutputIndex,
 					SpendingTX: ptr(txIDWithOpReturn),
 				},
+				{
+					TxID:       txIDWithOpReturn,
+					Vout:       0,
+					SpendingTX: nil,
+				},
 			},
 			expectData: []database.Data{
 				{
@@ -93,6 +99,11 @@ func TestRecordOutlineOpReturn(t *testing.T) {
 					Vout:       prevOutputIndex,
 					SpendingTX: ptr(txIDWithOpReturnWithoutOPFalse),
 				},
+				{
+					TxID:       txIDWithOpReturnWithoutOPFalse,
+					Vout:       0,
+					SpendingTX: nil,
+				},
 			},
 			expectData: []database.Data{
 				{
@@ -115,6 +126,10 @@ func TestRecordOutlineOpReturn(t *testing.T) {
 				},
 			},
 			expectTxID: txIDWithOpReturn,
+			expectOutputs: []database.Output{{
+				TxID: txIDWithOpReturn,
+				Vout: 0,
+			}},
 			expectData: []database.Data{
 				{
 					TxID: txIDWithOpReturn,
@@ -126,18 +141,22 @@ func TestRecordOutlineOpReturn(t *testing.T) {
 	}
 	for name, test := range tests {
 		t.Run(name, func(t *testing.T) {
+			// given:
 			broadcaster := newMockBroadcaster()
 			repo := test.repo
 			service := record.NewService(tester.Logger(t), repo, broadcaster)
 
+			// when:
 			err := service.RecordTransactionOutline(context.Background(), test.outline)
+
+			// then:
 			require.NoError(t, err)
 
 			require.Contains(t, broadcaster.broadcastedTxs, test.expectTxID)
 
 			require.Contains(t, repo.transactions, test.expectTxID)
 			txEntry := repo.transactions[test.expectTxID]
-			require.Equal(t, test.expectTxID, txEntry.ID)
+			require.Equal(t, test.expectTxID, repo.transactions[test.expectTxID].ID)
 			require.Equal(t, database.TxStatusBroadcasted, txEntry.TxStatus)
 
 			require.Subset(t, repo.getAllOutputs(), test.expectOutputs)
@@ -146,90 +165,109 @@ func TestRecordOutlineOpReturn(t *testing.T) {
 	}
 }
 
-func TestErrorCases(t *testing.T) {
-	t.Run("RecordTransactionOutline for not signed transaction", func(t *testing.T) {
-		broadcaster := newMockBroadcaster()
-		repo := newMockRepository()
-		service := record.NewService(tester.Logger(t), repo, broadcaster)
+func TestRecordOutlineOpReturnErrorCases(t *testing.T) {
+	tests := map[string]struct {
+		repo        *mockRepository
+		outline     *outlines.Transaction
+		broadcaster *mockBroadcaster
+		expectErr   error
+	}{
+		"RecordTransactionOutline for not signed transaction": {
+			broadcaster: newMockBroadcaster(),
+			repo:        newMockRepository(),
+			outline: &outlines.Transaction{
+				BEEF: notSignedBeef,
+			},
+			expectErr: txerrors.ErrTxValidation,
+		},
+		"RecordTransactionOutline for not a BEEF hex": {
+			broadcaster: newMockBroadcaster(),
+			repo:        newMockRepository(),
+			outline: &outlines.Transaction{
+				BEEF: notABeefHex,
+			},
+			expectErr: txerrors.ErrTxValidation,
+		},
+		"Tx with already spent utxo": {
+			broadcaster: newMockBroadcaster(),
+			repo: newMockRepository().withOutput(database.Output{
+				TxID:       prevTxID,
+				Vout:       prevOutputIndex,
+				SpendingTX: ptr("05aa91319c773db18071310ecd5ddc15d3aa4242b55705a13a66f7fefe2b80a1"),
+			}),
+			outline: &outlines.Transaction{
+				BEEF: beefWithOpReturn,
+			},
+			expectErr: txerrors.ErrUTXOSpent,
+		},
+		"Vout out of range in annotation": {
+			broadcaster: newMockBroadcaster(),
+			repo:        newMockRepository(),
+			outline: &outlines.Transaction{
+				BEEF: beefWithOpReturn,
+				Annotations: transaction.Annotations{
+					Outputs: transaction.OutputsAnnotations{
+						1: &transaction.OutputAnnotation{
+							Bucket: bucket.Data,
+						},
+					},
+				},
+			},
+			expectErr: txerrors.ErrAnnotationIndexOutOfRange,
+		},
+		"no-op_return output annotated as data": {
+			broadcaster: newMockBroadcaster(),
+			repo:        newMockRepository(),
+			outline: &outlines.Transaction{
+				BEEF: beefWithOnePTPKH,
+				Annotations: transaction.Annotations{
+					Outputs: transaction.OutputsAnnotations{
+						0: &transaction.OutputAnnotation{
+							Bucket: bucket.Data,
+						},
+					},
+				},
+			},
+			expectErr: txerrors.ErrAnnotationMismatch,
+		},
+		"error during broadcasting": {
+			broadcaster: newMockBroadcaster().withError(errors.New("broadcast error")),
+			repo: newMockRepository().withOutput(database.Output{
+				TxID: prevTxID,
+				Vout: prevOutputIndex,
+			}),
+			outline: &outlines.Transaction{
+				BEEF: beefWithOpReturn,
+				Annotations: transaction.Annotations{
+					Outputs: transaction.OutputsAnnotations{
+						0: &transaction.OutputAnnotation{
+							Bucket: bucket.Data,
+						},
+					},
+				},
+			},
+			expectErr: txerrors.ErrTxBroadcast,
+		},
+	}
+	for name, test := range tests {
+		t.Run(name, func(t *testing.T) {
+			// given:
+			service := record.NewService(tester.Logger(t), test.repo, test.broadcaster)
+			initialOutputs := test.repo.getAllOutputs()
+			initialData := test.repo.getAllData()
 
-		outline := outlines.Transaction{
-			BEEF: notSignedBeef,
-		}
+			// when:
+			err := service.RecordTransactionOutline(context.Background(), test.outline)
 
-		err := service.RecordTransactionOutline(context.Background(), &outline)
-		require.Error(t, err)
-		require.ErrorIs(t, err, txerrors.ErrTxValidation)
-	})
-	t.Run("RecordTransactionOutline for not a BEEF hex", func(t *testing.T) {
-		broadcaster := newMockBroadcaster()
-		repo := newMockRepository()
-		service := record.NewService(tester.Logger(t), repo, broadcaster)
+			// then:
+			require.Error(t, err)
+			require.ErrorIs(t, err, test.expectErr)
 
-		outline := outlines.Transaction{
-			BEEF: notABeefHex,
-		}
-
-		err := service.RecordTransactionOutline(context.Background(), &outline)
-		require.Error(t, err)
-		require.ErrorIs(t, err, txerrors.ErrTxValidation)
-	})
-	t.Run("Tx with already spent utxo", func(t *testing.T) {
-		broadcaster := newMockBroadcaster()
-		repo := newMockRepository().withOutput(database.Output{
-			TxID:       prevTxID,
-			Vout:       prevOutputIndex,
-			SpendingTX: ptr("05aa91319c773db18071310ecd5ddc15d3aa4242b55705a13a66f7fefe2b80a1"),
+			// ensure that no changes were made to the repository
+			require.ElementsMatch(t, initialOutputs, test.repo.getAllOutputs())
+			require.ElementsMatch(t, initialData, test.repo.getAllData())
 		})
-		service := record.NewService(tester.Logger(t), repo, broadcaster)
-
-		outline := outlines.Transaction{
-			BEEF: beefWithOpReturn,
-		}
-
-		err := service.RecordTransactionOutline(context.Background(), &outline)
-		require.Error(t, err)
-		require.ErrorIs(t, err, txerrors.ErrUTXOSpent)
-	})
-	t.Run("vout out of range in annotation", func(t *testing.T) {
-		broadcaster := newMockBroadcaster()
-		repo := newMockRepository()
-		service := record.NewService(tester.Logger(t), repo, broadcaster)
-
-		outline := outlines.Transaction{
-			BEEF: beefWithOpReturn,
-			Annotations: transaction.Annotations{
-				Outputs: transaction.OutputsAnnotations{
-					1: &transaction.OutputAnnotation{
-						Bucket: bucket.Data,
-					},
-				},
-			},
-		}
-
-		err := service.RecordTransactionOutline(context.Background(), &outline)
-		require.Error(t, err)
-		require.ErrorIs(t, err, txerrors.ErrAnnotationIndexOutOfRange)
-	})
-	t.Run("no-opreturn output annotated as data", func(t *testing.T) {
-		broadcaster := newMockBroadcaster()
-		repo := newMockRepository()
-		service := record.NewService(tester.Logger(t), repo, broadcaster)
-
-		outline := outlines.Transaction{
-			BEEF: beefWithOnePTPKH,
-			Annotations: transaction.Annotations{
-				Outputs: transaction.OutputsAnnotations{
-					0: &transaction.OutputAnnotation{
-						Bucket: bucket.Data,
-					},
-				},
-			},
-		}
-
-		err := service.RecordTransactionOutline(context.Background(), &outline)
-		require.Error(t, err)
-		require.ErrorIs(t, err, txerrors.ErrAnnotationMismatch)
-	})
+	}
 }
 
 func ptr[T any](value T) *T {

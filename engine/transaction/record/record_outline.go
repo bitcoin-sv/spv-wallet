@@ -62,8 +62,8 @@ func (s *Service) RecordTransactionOutline(ctx context.Context, outline *outline
 }
 
 // getTrackedUTXOsFromInputs gets stored-in-our-database outputs used in provided tx
-// NOTE: The flow accepts transactions with "other" UTXOs,
-// if the untracked output is correctly unlocked by the input script we have no reason to block it;
+// NOTE: The flow accepts transactions with "other/not-tracked" UTXOs,
+// if the untracked output is correctly unlocked by the input script we have no reason to block the transaction;
 // but only the tracked UTXOs will be marked as spent (and considered for future double-spending checks)
 func (s *Service) getTrackedUTXOsFromInputs(ctx context.Context, tx *trx.Transaction) ([]*database.Output, error) {
 	outpoints := func(yield func(outpoint bsv.Outpoint) bool) {
@@ -114,6 +114,10 @@ func (s *Service) processAnnotatedOutputs(tx *trx.Transaction, annotations *tran
 				TxID: txID,
 				Vout: voutU32,
 				Blob: data,
+			})
+			outputRecords = append(outputRecords, &database.Output{
+				TxID: txID,
+				Vout: voutU32,
 			})
 		case bucket.BSV:
 			//TODO
