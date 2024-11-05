@@ -65,4 +65,7 @@ var (
 
 	// ErrOnlyPushDataAllowed is when only PUSHDATA operations are allowed in OP_RETURN script.
 	ErrOnlyPushDataAllowed = models.SPVError{Code: "error-only-push-data-allowed", Message: "Only PUSHDATA operations are allowed in OP_RETURN script", StatusCode: 400}
+
+	// ErrUnexpectedErrorDuringInputsSelection is when an unexpected error occurs during inputs selection for transaction outline.
+	ErrUnexpectedErrorDuringInputsSelection = models.SPVError{Code: "error-input-selection", Message: "unexpected error during inputs selection", StatusCode: 500}
 )

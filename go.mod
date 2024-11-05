@@ -11,7 +11,6 @@ replace github.com/bitcoin-sv/spv-wallet/models => ./models
 
 require (
 	github.com/99designs/gqlgen v0.17.55
-	github.com/DATA-DOG/go-sqlmock v1.5.2
 	github.com/aws/aws-sdk-go v1.55.5
 	github.com/bitcoin-sv/go-paymail v0.21.1
 	github.com/bitcoin-sv/go-sdk v1.1.14
@@ -102,7 +101,7 @@ require (
 	github.com/mailru/easyjson v0.7.7 // indirect
 	github.com/mattn/go-colorable v0.1.13 // indirect
 	github.com/mattn/go-isatty v0.0.20 // indirect
-	github.com/mattn/go-sqlite3 v1.14.22 // indirect
+	github.com/mattn/go-sqlite3 v1.14.22
 	github.com/miekg/dns v1.1.62 // indirect
 	github.com/mitchellh/mapstructure v1.5.0
 	github.com/modern-go/concurrent v0.0.0-20180306012644-bacd9c7ef1dd // indirect
