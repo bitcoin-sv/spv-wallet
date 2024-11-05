@@ -70,7 +70,7 @@ func (s *service) Create(ctx context.Context, spec *TransactionSpec) (*Transacti
 
 	return &Transaction{
 		BEEF: beef,
-		Annotations: &transaction.Annotations{
+		Annotations: transaction.Annotations{
 			Outputs: annotations,
 		},
 	}, nil

@@ -35,4 +35,31 @@ var (
 
 	// ErrOutputValueTooLow is when the satoshis output is too low for a given type of output.
 	ErrOutputValueTooLow = models.SPVError{Code: "error-transaction-output-value-too-low", Message: "output value is too low", StatusCode: 400}
+
+	// ErrTxValidation is when the transaction validation fails.
+	ErrTxValidation = models.SPVError{Code: "error-transaction-validation", Message: "transaction validation failed", StatusCode: 400}
+
+	// ErrUTXOSpent is when the UTXO is already spent.
+	ErrUTXOSpent = models.SPVError{Code: "error-utxo-spent", Message: "UTXO is already spent", StatusCode: 400}
+
+	// ErrParsingScript is when the script parsing fails.
+	ErrParsingScript = models.SPVError{Code: "error-parsing-script", Message: "failed to parse script", StatusCode: 400}
+
+	// ErrSavingData is when the data saving fails.
+	ErrSavingData = models.SPVError{Code: "error-saving-data", Message: "failed to save data", StatusCode: 400}
+
+	// ErrTxBroadcast is when the transaction broadcast fails.
+	ErrTxBroadcast = models.SPVError{Code: "error-tx-broadcast", Message: "failed to broadcast transaction", StatusCode: 400}
+
+	// ErrAnnotationIndexOutOfRange is when the annotation index is out of range.
+	ErrAnnotationIndexOutOfRange = models.SPVError{Code: "error-annotation-index-out-of-range", Message: "annotation index is out of range", StatusCode: 400}
+
+	// ErrGettingOutputs is when getting outputs fails.
+	ErrGettingOutputs = models.SPVError{Code: "error-getting-outputs", Message: "failed to get outputs", StatusCode: 500}
+
+	// ErrAnnotationMismatch is when the annotation does not match to actual output content.
+	ErrAnnotationMismatch = models.SPVError{Code: "error-annotation-mismatch", Message: "annotation mismatch", StatusCode: 400}
+
+	// ErrAnnotationIndexConversion is when the annotation index conversion fails.
+	ErrAnnotationIndexConversion = models.SPVError{Code: "error-annotation-index-conversion", Message: "failed to convert annotation index", StatusCode: 400}
 )
