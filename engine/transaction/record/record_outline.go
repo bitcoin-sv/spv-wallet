@@ -33,11 +33,6 @@ func (s *Service) RecordTransactionOutline(ctx context.Context, outline *outline
 		return err
 	}
 
-	txID := tx.TxID().String()
-	for _, utxo := range utxos {
-		utxo.Spend(txID)
-	}
-
 	newOutputs, newDataRecords, err := s.processAnnotatedOutputs(tx, &outline.Annotations)
 	if err != nil {
 		return err
@@ -45,6 +40,11 @@ func (s *Service) RecordTransactionOutline(ctx context.Context, outline *outline
 
 	if err = s.broadcaster.Broadcast(ctx, tx); err != nil {
 		return txerrors.ErrTxBroadcast.Wrap(err)
+	}
+
+	txID := tx.TxID().String()
+	for _, utxo := range utxos {
+		utxo.Spend(txID)
 	}
 
 	txRecord := database.Transaction{
@@ -81,7 +81,7 @@ func (s *Service) getTrackedUTXOsFromInputs(ctx context.Context, tx *trx.Transac
 
 	for _, utxo := range storedUTXOs {
 		if utxo.IsSpent() {
-			return nil, txerrors.ErrUTXOSpent
+			return nil, txerrors.ErrUTXOSpent.Wrap(spverrors.Newf("UTXO %s is already spent", utxo.Outpoint()))
 		}
 	}
 
