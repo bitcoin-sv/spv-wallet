@@ -3,11 +3,14 @@ package testabilities
 import (
 	"context"
 	"database/sql"
+	"errors"
+	"os"
 	"testing"
 
 	"github.com/bitcoin-sv/spv-wallet/config"
 	"github.com/bitcoin-sv/spv-wallet/engine"
 	"github.com/bitcoin-sv/spv-wallet/engine/datastore"
+	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/bitcoin-sv/spv-wallet/engine/tester"
 	"github.com/bitcoin-sv/spv-wallet/engine/tester/fixtures"
 	"github.com/bitcoin-sv/spv-wallet/engine/tester/paymailmock"
@@ -18,6 +21,7 @@ import (
 )
 
 const inMemoryDbConnectionString = "file:spv-wallet-test.db?mode=memory"
+const fileDbConnectionString = "file:spv-wallet-test.db"
 
 type ConfigOpts func(*config.AppConfig)
 
@@ -39,6 +43,7 @@ type EngineFixture interface {
 type EngineWithConfig struct {
 	Config config.AppConfig
 	Engine engine.ClientInterface
+	DB     *sql.DB
 }
 
 type engineFixture struct {
@@ -95,7 +100,11 @@ func (f *engineFixture) EngineWithConfiguration(opts ...ConfigOpts) (walletEngin
 		httpmock.Reset()
 	}
 
-	return EngineWithConfig{Config: *f.config, Engine: f.engine}, cleanup
+	return EngineWithConfig{
+		Config: *f.config,
+		Engine: f.engine,
+		DB:     f.dbConnection,
+	}, cleanup
 }
 
 func (f *engineFixture) ConfigForTests(opts ...ConfigOpts) *config.AppConfig {
@@ -110,11 +119,25 @@ func (f *engineFixture) ConfigForTests(opts ...ConfigOpts) *config.AppConfig {
 
 // initDbConnection creates a new connection that will be used as connection for engine
 func (f *engineFixture) initDbConnection() {
+	mode := os.Getenv("TEST_DB_MODE")
+	if mode == "postgres" {
+		f.config.Db.Datastore.Engine = datastore.PostgreSQL
+		f.config.Db.SQL.User = "postgres"
+		f.config.Db.SQL.Password = "postgres"
+		f.config.Db.SQL.Name = "postgres"
+		f.config.Db.SQL.Host = "localhost"
+		return
+	}
+
 	if f.config.Db.Datastore.Engine != datastore.SQLite {
 		panic("Other datastore engines are not supported in tests (yet)")
 	}
-	// Setting this to give a clue in debugging
-	f.dbConnectionString = inMemoryDbConnectionString
+
+	if mode == "file" {
+		f.dbConnectionString = fileDbConnectionString
+	} else {
+		f.dbConnectionString = inMemoryDbConnectionString
+	}
 	f.config.Db.SQLite.DatabasePath = "already_set_with_existing_connection_config"
 
 	connection, err := sql.Open("sqlite3", f.dbConnectionString)
@@ -129,11 +152,15 @@ func (f *engineFixture) initialiseFixtures() {
 
 	for _, user := range fixtures.InternalUsers() {
 		_, err := f.engine.NewXpub(context.Background(), user.XPub(), opts...)
-		require.NoError(f.t, err)
+		if !errors.Is(err, spverrors.ErrXPubAlreadyExists) {
+			require.NoError(f.t, err)
+		}
 
 		for _, paymail := range user.Paymails {
 			_, err := f.engine.NewPaymailAddress(context.Background(), user.XPub(), paymail, paymail, "", opts...)
-			require.NoError(f.t, err)
+			if !errors.Is(err, spverrors.ErrPaymailAlreadyExists) {
+				require.NoError(f.t, err)
+			}
 		}
 	}
 
