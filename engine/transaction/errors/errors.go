@@ -59,4 +59,7 @@ var (
 
 	// ErrAnnotationMismatch is when the annotation does not match to actual output content.
 	ErrAnnotationMismatch = models.SPVError{Code: "error-annotation-mismatch", Message: "annotation mismatch", StatusCode: 400}
+
+	// ErrAnnotationIndexConversion is when the annotation index conversion fails.
+	ErrAnnotationIndexConversion = models.SPVError{Code: "error-annotation-index-conversion", Message: "failed to convert annotation index", StatusCode: 400}
 )

@@ -100,7 +100,7 @@ func (s *Service) processAnnotatedOutputs(tx *trx.Transaction, annotations *tran
 		}
 		voutU32, err := conv.IntToUint32(vout)
 		if err != nil {
-			return nil, nil, spverrors.Wrapf(err, "Vout value exceeds max uint32 range")
+			return nil, nil, txerrors.ErrAnnotationIndexConversion.Wrap(err)
 		}
 		lockingScript := tx.Outputs[vout].LockingScript
 
