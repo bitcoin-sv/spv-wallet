@@ -47,6 +47,7 @@ type GivenTXSpec interface {
 	WithInput(satoshis uint64) GivenTXSpec
 	WithOPReturn(dataStr string) GivenTXSpec
 	WithOutputFunc(maker func() *trx.TransactionOutput) GivenTXSpec
+	WithP2PKHOutput(satoshis uint64) GivenTXSpec
 
 	TX() *trx.Transaction
 	InputUTXO(inputID int) bsv.Outpoint
@@ -112,6 +113,15 @@ func (spec *txSpec) WithOPReturn(dataStr string) GivenTXSpec {
 
 	spec.outputs = append(spec.outputs, o)
 
+	return spec
+}
+
+// WithP2PKHOutput adds a P2PKH output to the transaction with the specified satoshis
+func (spec *txSpec) WithP2PKHOutput(satoshis uint64) GivenTXSpec {
+	spec.outputs = append(spec.outputs, &trx.TransactionOutput{
+		Satoshis:      satoshis,
+		LockingScript: P2PKHLockingScript,
+	})
 	return spec
 }
 
