@@ -5,7 +5,6 @@ import (
 	"testing"
 
 	"github.com/bitcoin-sv/go-sdk/script"
-	trx "github.com/bitcoin-sv/go-sdk/transaction"
 	"github.com/bitcoin-sv/spv-wallet/engine/database"
 	"github.com/bitcoin-sv/spv-wallet/engine/tester"
 	"github.com/bitcoin-sv/spv-wallet/engine/tester/fixtures"
@@ -30,12 +29,10 @@ func TestRecordOutlineOpReturn(t *testing.T) {
 
 	givenTxWithOpReturnWithoutOPFalse := fixtures.GivenTX().WithT(t).
 		WithInput(1).
-		WithOutputFunc(func() *trx.TransactionOutput {
-			s := &script.Script{}
-			_ = s.AppendOpcodes(script.OpRETURN)
-			_ = s.AppendPushDataArray([][]byte{[]byte(dataOfOpReturnTx)})
-			return &trx.TransactionOutput{LockingScript: s}
-		})
+		WithOutputScript(
+			fixtures.OpCode(script.OpRETURN),
+			fixtures.PushData(dataOfOpReturnTx),
+		)
 
 	tests := map[string]struct {
 		repo          *mockRepository
@@ -170,15 +167,14 @@ func TestRecordOutlineOpReturnErrorCases(t *testing.T) {
 
 	givenTxWithOpZeroAfterOpReturn := fixtures.GivenTX().WithT(t).
 		WithInput(1).
-		WithOutputFunc(func() *trx.TransactionOutput {
-			s := &script.Script{}
-			_ = s.AppendOpcodes(script.OpFALSE, script.OpRETURN)
-			_ = s.AppendPushDataArray([][]byte{[]byte(dataOfOpReturnTx)})
-			_ = s.AppendOpcodes(script.OpZERO)
-			_ = s.AppendOpcodes(script.OpZERO)
-			_ = s.AppendPushDataArray([][]byte{[]byte(dataOfOpReturnTx)})
-			return &trx.TransactionOutput{LockingScript: s}
-		})
+		WithOutputScript(
+			fixtures.OpCode(script.OpFALSE),
+			fixtures.OpCode(script.OpRETURN),
+			fixtures.PushData(dataOfOpReturnTx),
+			fixtures.OpCode(script.OpZERO),
+			fixtures.OpCode(script.OpZERO),
+			fixtures.PushData(dataOfOpReturnTx),
+		)
 
 	givenTxWithP2PKHOutput := fixtures.GivenTX().WithT(t).
 		WithInput(2).

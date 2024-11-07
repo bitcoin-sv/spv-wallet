@@ -47,7 +47,7 @@ type GivenTXSpec interface {
 	WithoutSourcing() GivenTXSpec
 	WithInput(satoshis uint64) GivenTXSpec
 	WithOPReturn(dataStr string) GivenTXSpec
-	WithOutputFunc(maker func() *trx.TransactionOutput) GivenTXSpec
+	WithOutputScript(parts ...ScriptPart) GivenTXSpec
 	WithP2PKHOutput(satoshis uint64) GivenTXSpec
 
 	TX() *trx.Transaction
@@ -133,9 +133,34 @@ func (spec *txSpec) WithP2PKHOutput(satoshis uint64) GivenTXSpec {
 	return spec
 }
 
-// WithOutputFunc can be used for adding custom outputs to the transaction
-func (spec *txSpec) WithOutputFunc(maker func() *trx.TransactionOutput) GivenTXSpec {
-	spec.outputs = append(spec.outputs, maker())
+// ScriptPart is an interface for building script parts
+type ScriptPart interface {
+	Append(s *script.Script)
+}
+
+// OpCode is an alias for byte to represent an opcode and implements ScriptPart for script building
+type OpCode byte
+
+// Append appends the opcode to the script
+func (op OpCode) Append(s *script.Script) {
+	_ = s.AppendOpcodes(script.OpRETURN)
+}
+
+// PushData is an alias for []byte to represent push data and implements ScriptPart for script building
+type PushData []byte
+
+// Append appends the push data to the script
+func (data PushData) Append(s *script.Script) {
+	_ = s.AppendPushData(data)
+}
+
+// WithOutputScript adds an output to the transaction with the specified script parts
+func (spec *txSpec) WithOutputScript(parts ...ScriptPart) GivenTXSpec {
+	s := &script.Script{}
+	for _, part := range parts {
+		part.Append(s)
+	}
+	spec.outputs = append(spec.outputs, &trx.TransactionOutput{LockingScript: s})
 	return spec
 }
 
