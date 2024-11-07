@@ -2,58 +2,10 @@ package engine
 
 import (
 	"context"
-	"sort"
 
 	trx "github.com/bitcoin-sv/go-sdk/transaction"
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 )
-
-func calculateMergedBUMP(txs []*Transaction) (BUMPs, error) {
-	bumps := make(map[uint64][]BUMP)
-	mergedBUMPs := make(BUMPs, 0)
-
-	for _, tx := range txs {
-		if tx.BUMP.BlockHeight == 0 || len(tx.BUMP.Path) == 0 {
-			continue
-		}
-
-		bumps[tx.BlockHeight] = append(bumps[tx.BlockHeight], tx.BUMP)
-	}
-
-	// ensure that BUMPs are sorted by block height and will always be put in beef in the same order
-	mapKeys := make([]uint64, 0, len(bumps))
-	for k := range bumps {
-		mapKeys = append(mapKeys, k)
-	}
-	sort.Slice(mapKeys, func(i, j int) bool { return mapKeys[i] < mapKeys[j] })
-
-	for _, k := range mapKeys {
-		bump, err := CalculateMergedBUMP(bumps[k])
-		if err != nil {
-			return nil, spverrors.Wrapf(err, "failed to calculate merged BUMP")
-		}
-		if bump == nil {
-			continue
-		}
-		mergedBUMPs = append(mergedBUMPs, bump)
-	}
-
-	return mergedBUMPs, nil
-}
-
-func validateBumps(bumps BUMPs) error {
-	if len(bumps) == 0 {
-		return spverrors.Newf("empty bump paths slice")
-	}
-
-	for _, p := range bumps {
-		if len(p.Path) == 0 {
-			return spverrors.Newf("one of bump path is empty")
-		}
-	}
-
-	return nil
-}
 
 func prepareBEEFFactors(ctx context.Context, tx *Transaction, store TransactionGetter) ([]*trx.Transaction, []*Transaction, error) {
 	sdkTxsNeededForBUMP, txsNeededForBUMP, err := initializeRequiredTxsCollection(tx)
