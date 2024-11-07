@@ -171,19 +171,18 @@ func TestRecordOutlineOpReturnErrorCases(t *testing.T) {
 		WithInput(1).
 		WithOPReturn(dataOfOpReturnTx)
 
-	//Fixme: Apparently go-sdk doesn't check output scripts as we thought
-	//givenTxWithOpZeroAfterOpReturn := fixtures.GivenTX().WithT(t).
-	//	WithSign().
-	//	WithInput(1).
-	//	WithOutputFunc(func() *trx.TransactionOutput {
-	//		s := &script.Script{}
-	//		_ = s.AppendOpcodes(script.OpFALSE, script.OpRETURN)
-	//		_ = s.AppendPushDataArray([][]byte{[]byte(dataOfOpReturnTx)})
-	//		_ = s.AppendOpcodes(script.OpZERO)
-	//		_ = s.AppendOpcodes(script.OpZERO)
-	//		_ = s.AppendPushDataArray([][]byte{[]byte(dataOfOpReturnTx)})
-	//		return &trx.TransactionOutput{LockingScript: s}
-	//	})
+	givenTxWithOpZeroAfterOpReturn := fixtures.GivenTX().WithT(t).
+		WithSign().
+		WithInput(1).
+		WithOutputFunc(func() *trx.TransactionOutput {
+			s := &script.Script{}
+			_ = s.AppendOpcodes(script.OpFALSE, script.OpRETURN)
+			_ = s.AppendPushDataArray([][]byte{[]byte(dataOfOpReturnTx)})
+			_ = s.AppendOpcodes(script.OpZERO)
+			_ = s.AppendOpcodes(script.OpZERO)
+			_ = s.AppendPushDataArray([][]byte{[]byte(dataOfOpReturnTx)})
+			return &trx.TransactionOutput{LockingScript: s}
+		})
 
 	givenTxWithOpReturn := fixtures.GivenTX().WithT(t).
 		WithSign().
@@ -212,15 +211,21 @@ func TestRecordOutlineOpReturnErrorCases(t *testing.T) {
 			},
 			expectErr: txerrors.ErrTxValidation,
 		},
-		//Fixme: Apparently go-sdk doesn't check output scripts as we thought
-		//"RecordTransactionOutline for invalid OP_ZERO after OP_RETURN": {
-		//	broadcaster: newMockBroadcaster(),
-		//	repo:        newMockRepository(),
-		//	outline: &outlines.Transaction{
-		//		BEEF: givenTxWithOpZeroAfterOpReturn.BeefHex(),
-		//	},
-		//	expectErr: txerrors.ErrTxValidation,
-		//},
+		"RecordTransactionOutline for invalid OP_ZERO after OP_RETURN": {
+			broadcaster: newMockBroadcaster(),
+			repo:        newMockRepository(),
+			outline: &outlines.Transaction{
+				BEEF: givenTxWithOpZeroAfterOpReturn.BeefHex(),
+				Annotations: transaction.Annotations{
+					Outputs: transaction.OutputsAnnotations{
+						0: &transaction.OutputAnnotation{
+							Bucket: bucket.Data,
+						},
+					},
+				},
+			},
+			expectErr: txerrors.ErrOnlyPushDataAllowed,
+		},
 		"Tx with already spent utxo": {
 			broadcaster: newMockBroadcaster(),
 			repo: newMockRepository().withOutput(database.Output{
