@@ -15,6 +15,14 @@ func Int64ToUint32(value int64) (uint32, error) {
 	return uint32(value), nil
 }
 
+// Uint64ToUint32 will convert a uint64 to a uint32
+func Uint64ToUint32(value uint64) (uint32, error) {
+	if value > math.MaxUint32 {
+		return 0, spverrors.ErrInvalidUint32
+	}
+	return uint32(value), nil
+}
+
 // Uint32ToInt64 will convert a uint32 to an int64 (safe as uint32 fits into int64)
 func Uint32ToInt64(value uint32) int64 {
 	return int64(value)
