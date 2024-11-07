@@ -43,7 +43,8 @@ var grandparentTXIDs = []string{
 // GivenTXSpec is a builder for creating MOCK! transactions
 type GivenTXSpec interface {
 	WithT(t *testing.T) GivenTXSpec
-	WithSign() GivenTXSpec
+	WithoutSigning() GivenTXSpec
+	WithoutSourcing() GivenTXSpec
 	WithInput(satoshis uint64) GivenTXSpec
 	WithOPReturn(dataStr string) GivenTXSpec
 	WithOutputFunc(maker func() *trx.TransactionOutput) GivenTXSpec
@@ -58,10 +59,11 @@ type GivenTXSpec interface {
 }
 
 type txSpec struct {
-	utxos   []*trx.UTXO
-	outputs []*trx.TransactionOutput
-	t       *testing.T
-	sign    bool
+	utxos           []*trx.UTXO
+	outputs         []*trx.TransactionOutput
+	t               *testing.T
+	disableSigning  bool
+	disableSourcing bool
 
 	grandparentTXIndex int
 	sourceTransactions map[string]*trx.Transaction
@@ -81,9 +83,15 @@ func (spec *txSpec) WithT(t *testing.T) GivenTXSpec {
 	return spec
 }
 
-// WithSign enables signing of the transaction (default is false)
-func (spec *txSpec) WithSign() GivenTXSpec {
-	spec.sign = true
+// WithoutSigning disables signing of the transaction (default is false)
+func (spec *txSpec) WithoutSigning() GivenTXSpec {
+	spec.disableSigning = true
+	return spec
+}
+
+// WithoutSourcing disables sourcing of inputs from parent transactions (default is false)
+func (spec *txSpec) WithoutSourcing() GivenTXSpec {
+	spec.disableSourcing = true
 	return spec
 }
 
@@ -142,14 +150,15 @@ func (spec *txSpec) TX() *trx.Transaction {
 		tx.AddOutput(output)
 	}
 
-	//TODO consider to source inputs under some condition (spec param)
-	for _, input := range tx.Inputs {
-		if sourceTX := spec.sourceTransactions[input.SourceTXID.String()]; sourceTX != nil {
-			input.SourceTransaction = sourceTX
+	if !spec.disableSourcing {
+		for _, input := range tx.Inputs {
+			if sourceTX := spec.sourceTransactions[input.SourceTXID.String()]; sourceTX != nil {
+				input.SourceTransaction = sourceTX
+			}
 		}
 	}
 
-	if spec.sign {
+	if !spec.disableSigning {
 		if err := tx.Sign(); err != nil {
 			spec.error("signing tx", tx, err)
 		}
@@ -172,6 +181,10 @@ func (spec *txSpec) ID() string {
 
 // BeefHex returns the BEEF hex of the transaction
 func (spec *txSpec) BeefHex() string {
+	if len(spec.utxos) > 0 && spec.disableSourcing {
+		spec.error("BEEF hex can only be retrieved for transactions with sourced inputs")
+		return ""
+	}
 	tx := spec.TX()
 	beef, err := tx.BEEFHex()
 	if err != nil {
@@ -188,6 +201,10 @@ func (spec *txSpec) RawTXHex() string {
 
 // EFHex returns the EF hex of the transaction
 func (spec *txSpec) EFHex() string {
+	if len(spec.utxos) > 0 && spec.disableSourcing {
+		spec.error("EF hex can only be retrieved for transactions with sourced inputs")
+		return ""
+	}
 	tx := spec.TX()
 	ef, err := tx.EFHex()
 	if err != nil {

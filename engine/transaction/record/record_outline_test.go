@@ -25,12 +25,10 @@ const (
 
 func TestRecordOutlineOpReturn(t *testing.T) {
 	givenTxWithOpReturn := fixtures.GivenTX().WithT(t).
-		WithSign().
 		WithInput(1).
 		WithOPReturn(dataOfOpReturnTx)
 
 	givenTxWithOpReturnWithoutOPFalse := fixtures.GivenTX().WithT(t).
-		WithSign().
 		WithInput(1).
 		WithOutputFunc(func() *trx.TransactionOutput {
 			s := &script.Script{}
@@ -166,11 +164,11 @@ func TestRecordOutlineOpReturn(t *testing.T) {
 
 func TestRecordOutlineOpReturnErrorCases(t *testing.T) {
 	givenUnsignedTX := fixtures.GivenTX().WithT(t).
+		WithoutSigning().
 		WithInput(1).
 		WithOPReturn(dataOfOpReturnTx)
 
 	givenTxWithOpZeroAfterOpReturn := fixtures.GivenTX().WithT(t).
-		WithSign().
 		WithInput(1).
 		WithOutputFunc(func() *trx.TransactionOutput {
 			s := &script.Script{}
@@ -183,12 +181,10 @@ func TestRecordOutlineOpReturnErrorCases(t *testing.T) {
 		})
 
 	givenTxWithP2PKHOutput := fixtures.GivenTX().WithT(t).
-		WithSign().
 		WithInput(2).
 		WithP2PKHOutput(1)
 
 	givenTxWithOpReturn := fixtures.GivenTX().WithT(t).
-		WithSign().
 		WithInput(1).
 		WithOPReturn(dataOfOpReturnTx)
 
