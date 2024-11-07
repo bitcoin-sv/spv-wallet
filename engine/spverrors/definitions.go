@@ -446,3 +446,6 @@ var ErrInvalidUint64 = models.SPVError{Message: "invalid uint64 value", StatusCo
 
 // ErrMissingXPubID is when xpub_id is missing
 var ErrMissingXPubID = models.SPVError{Message: "missing xpub_id", StatusCode: 400, Code: "error-missing-xpub-id"}
+
+// ErrInvalidHash is when a hash value is invalid or cannot be decoded from hex
+var ErrInvalidHash = models.SPVError{Message: "invalid hash value", StatusCode: 500, Code: "error-invalid-hash"}

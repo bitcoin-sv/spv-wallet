@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/hex"
 
+	chainhash "github.com/bitcoin-sv/go-sdk/chainhash"
 	trx "github.com/bitcoin-sv/go-sdk/transaction"
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 )
@@ -86,4 +87,57 @@ func hydrateTransaction(ctx context.Context, tx *Transaction) error {
 	}
 
 	return nil
+}
+
+func setMerklePathsFromBUMPs(bumpBtFactors []*trx.Transaction, bumpFactors []*Transaction) error {
+	for i := range bumpBtFactors {
+		if bumpFactors[i].BUMP.BlockHeight != 0 {
+			merklePath, err := buildMerklePathFromBUMP(&bumpFactors[i].BUMP)
+			if err != nil {
+				return err
+			}
+			bumpBtFactors[i].MerklePath = merklePath
+		}
+	}
+	return nil
+}
+
+func populateSourceTransactions(transactions []*trx.Transaction) {
+	transactionMap := make(map[chainhash.Hash]*trx.Transaction)
+	for _, tx := range transactions {
+		txID := *tx.TxID()
+		transactionMap[txID] = tx
+	}
+
+	visited := make(map[chainhash.Hash]bool)
+	stack := make([]*trx.Transaction, 0, len(transactions))
+
+	for _, tx := range transactions {
+		txID := *tx.TxID()
+		if visited[txID] {
+			continue
+		}
+		stack = append(stack, tx)
+
+		for len(stack) > 0 {
+			currentTx := stack[len(stack)-1]
+			stack = stack[:len(stack)-1]
+			currentTxID := *currentTx.TxID()
+
+			if visited[currentTxID] {
+				continue
+			}
+			visited[currentTxID] = true
+
+			for _, input := range currentTx.Inputs {
+				if input.SourceTXID != nil {
+					sourceTxID := *input.SourceTXID
+					if sourceTransaction, exists := transactionMap[sourceTxID]; exists {
+						input.SourceTransaction = sourceTransaction
+						stack = append(stack, sourceTransaction)
+					}
+				}
+			}
+		}
+	}
 }

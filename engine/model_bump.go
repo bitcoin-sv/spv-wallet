@@ -9,8 +9,10 @@ import (
 	"reflect"
 	"sort"
 
+	"github.com/bitcoin-sv/go-sdk/chainhash"
 	trx "github.com/bitcoin-sv/go-sdk/transaction"
 	"github.com/bitcoin-sv/go-sdk/util"
+	"github.com/bitcoin-sv/spv-wallet/conv"
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/bitcoin-sv/spv-wallet/engine/utils"
 )
@@ -364,4 +366,40 @@ func sdkMPToBUMP(sdkMerklePath *trx.MerklePath) BUMP {
 		BlockHeight: uint64(sdkMerklePath.BlockHeight),
 		Path:        path,
 	}
+}
+
+func buildMerklePathFromBUMP(bump *BUMP) (*trx.MerklePath, error) {
+	blockHeight, err := conv.Uint64ToUint32(bump.BlockHeight)
+	if err != nil {
+		return nil, spverrors.Wrapf(err, "failed to convert block height from uint64 to uint32")
+	}
+	merklePath := &trx.MerklePath{
+		BlockHeight: blockHeight,
+		Path:        make([][]*trx.PathElement, len(bump.Path)),
+	}
+
+	for levelIndex, bumpLevel := range bump.Path {
+		merklePath.Path[levelIndex] = make([]*trx.PathElement, len(bumpLevel))
+		for leafIndex, bumpLeaf := range bumpLevel {
+			hash, err := chainhash.NewHashFromHex(bumpLeaf.Hash)
+			if err != nil {
+				return nil, spverrors.ErrInvalidHash
+			}
+			pathElement := &trx.PathElement{
+				Hash:   hash,
+				Offset: bumpLeaf.Offset,
+			}
+
+			if bumpLeaf.TxID {
+				pathElement.Txid = &bumpLeaf.TxID
+			}
+
+			if bumpLeaf.Duplicate {
+				pathElement.Duplicate = &bumpLeaf.Duplicate
+			}
+
+			merklePath.Path[levelIndex][leafIndex] = pathElement
+		}
+	}
+	return merklePath, nil
 }
