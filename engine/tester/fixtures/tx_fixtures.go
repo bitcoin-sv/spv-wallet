@@ -40,8 +40,23 @@ var grandparentTXIDs = []string{
 	"27a53423aa3e5d5c46bf30be53a9998dd247daf758847f244f82d430be71de6e",
 }
 
-// GivenTXSpec is a builder for creating a MOCK! transaction
-type GivenTXSpec struct {
+// GivenTXSpec is a builder for creating MOCK! transactions
+type GivenTXSpec interface {
+	WithT(t *testing.T) GivenTXSpec
+	WithSign() GivenTXSpec
+	WithInput(satoshis uint64) GivenTXSpec
+	WithOPReturn(dataStr string) GivenTXSpec
+	WithOutputFunc(maker func() *trx.TransactionOutput) GivenTXSpec
+
+	TX() *trx.Transaction
+	InputUTXO(inputID int) bsv.Outpoint
+	ID() string
+	BeefHex() string
+	RawTXHex() string
+	EFHex() string
+}
+
+type txSpec struct {
 	utxos   []*trx.UTXO
 	outputs []*trx.TransactionOutput
 	t       *testing.T
@@ -52,28 +67,28 @@ type GivenTXSpec struct {
 }
 
 // GivenTX creates a new GivenTXSpec for building a MOCK! transaction
-func GivenTX() *GivenTXSpec {
-	return &GivenTXSpec{
+func GivenTX() GivenTXSpec {
+	return &txSpec{
 		grandparentTXIndex: 0,
 		sourceTransactions: make(map[string]*trx.Transaction),
 	}
 }
 
 // WithT sets the testing.T instance to be used for error reporting
-func (spec *GivenTXSpec) WithT(t *testing.T) *GivenTXSpec {
+func (spec *txSpec) WithT(t *testing.T) GivenTXSpec {
 	spec.t = t
 	return spec
 }
 
 // WithSign enables signing of the transaction (default is false)
-func (spec *GivenTXSpec) WithSign() *GivenTXSpec {
+func (spec *txSpec) WithSign() GivenTXSpec {
 	spec.sign = true
 	return spec
 }
 
 // WithInput adds an input to the transaction with the specified satoshis
 // it automatically creates a parent tx (sourceTX) with P2PKH UTXO with provided satoshis
-func (spec *GivenTXSpec) WithInput(satoshis uint64) *GivenTXSpec {
+func (spec *txSpec) WithInput(satoshis uint64) GivenTXSpec {
 	sourceTX := spec.makeParentTX(satoshis)
 	utxo, err := trx.NewUTXO(sourceTX.TxID().String(), 0, P2PKHLockingScript.String(), satoshis)
 	if err != nil {
@@ -88,7 +103,7 @@ func (spec *GivenTXSpec) WithInput(satoshis uint64) *GivenTXSpec {
 }
 
 // WithOPReturn adds an OP_RETURN output to the transaction with the specified data
-func (spec *GivenTXSpec) WithOPReturn(dataStr string) *GivenTXSpec {
+func (spec *txSpec) WithOPReturn(dataStr string) GivenTXSpec {
 	data := []byte(dataStr)
 	o, err := trx.CreateOpReturnOutput([][]byte{data})
 	if err != nil {
@@ -101,13 +116,13 @@ func (spec *GivenTXSpec) WithOPReturn(dataStr string) *GivenTXSpec {
 }
 
 // WithOutputFunc can be used for adding custom outputs to the transaction
-func (spec *GivenTXSpec) WithOutputFunc(maker func() *trx.TransactionOutput) *GivenTXSpec {
+func (spec *txSpec) WithOutputFunc(maker func() *trx.TransactionOutput) GivenTXSpec {
 	spec.outputs = append(spec.outputs, maker())
 	return spec
 }
 
 // TX creates a go-sdk transaction from the given spec
-func (spec *GivenTXSpec) TX() *trx.Transaction {
+func (spec *txSpec) TX() *trx.Transaction {
 	tx := trx.NewTransaction()
 	if err := tx.AddInputsFromUTXOs(spec.utxos...); err != nil {
 		spec.error("adding inputs to tx", err)
@@ -133,7 +148,7 @@ func (spec *GivenTXSpec) TX() *trx.Transaction {
 }
 
 // InputUTXO returns UTXO outpoint for the input with the specified index
-func (spec *GivenTXSpec) InputUTXO(inputID int) bsv.Outpoint {
+func (spec *txSpec) InputUTXO(inputID int) bsv.Outpoint {
 	return bsv.Outpoint{
 		TxID: spec.utxos[inputID].TxID.String(),
 		Vout: spec.utxos[inputID].Vout,
@@ -141,12 +156,12 @@ func (spec *GivenTXSpec) InputUTXO(inputID int) bsv.Outpoint {
 }
 
 // ID returns the transaction ID
-func (spec *GivenTXSpec) ID() string {
+func (spec *txSpec) ID() string {
 	return spec.TX().TxID().String()
 }
 
 // BeefHex returns the BEEF hex of the transaction
-func (spec *GivenTXSpec) BeefHex() string {
+func (spec *txSpec) BeefHex() string {
 	tx := spec.TX()
 	beef, err := tx.BEEFHex()
 	if err != nil {
@@ -156,13 +171,13 @@ func (spec *GivenTXSpec) BeefHex() string {
 }
 
 // RawTXHex returns the raw hex of the transaction
-func (spec *GivenTXSpec) RawTXHex() string {
+func (spec *txSpec) RawTXHex() string {
 	tx := spec.TX()
 	return tx.Hex()
 }
 
 // EFHex returns the EF hex of the transaction
-func (spec *GivenTXSpec) EFHex() string {
+func (spec *txSpec) EFHex() string {
 	tx := spec.TX()
 	ef, err := tx.EFHex()
 	if err != nil {
@@ -171,7 +186,7 @@ func (spec *GivenTXSpec) EFHex() string {
 	return ef
 }
 
-func (spec *GivenTXSpec) error(args ...any) {
+func (spec *txSpec) error(args ...any) {
 	if spec.t != nil {
 		spec.t.Error(args...)
 	} else {
@@ -179,7 +194,7 @@ func (spec *GivenTXSpec) error(args ...any) {
 	}
 }
 
-func (spec *GivenTXSpec) makeParentTX(satoshis uint64) *trx.Transaction {
+func (spec *txSpec) makeParentTX(satoshis uint64) *trx.Transaction {
 	tx := trx.NewTransaction()
 
 	withFee := satoshis + 1
@@ -216,7 +231,7 @@ func (spec *GivenTXSpec) makeParentTX(satoshis uint64) *trx.Transaction {
 	return tx
 }
 
-func (spec *GivenTXSpec) getNextGrandparentTXID() string {
+func (spec *txSpec) getNextGrandparentTXID() string {
 	id := grandparentTXIDs[spec.grandparentTXIndex]
 	spec.grandparentTXIndex = (spec.grandparentTXIndex + 1) % len(grandparentTXIDs)
 	return id
