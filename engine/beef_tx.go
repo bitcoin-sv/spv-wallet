@@ -2,20 +2,11 @@ package engine
 
 import (
 	"context"
-	"encoding/hex"
 
 	chainhash "github.com/bitcoin-sv/go-sdk/chainhash"
 	trx "github.com/bitcoin-sv/go-sdk/transaction"
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 )
-
-const maxBeefVer = uint32(0xFFFF) // value from BRC-62
-
-type beefTx struct {
-	version      uint32
-	bumps        BUMPs
-	transactions []*trx.Transaction
-}
 
 // ToBeef generates BEEF Hex for transaction
 func ToBeef(ctx context.Context, tx *Transaction, store TransactionGetter) (string, error) {
@@ -28,49 +19,18 @@ func ToBeef(ctx context.Context, tx *Transaction, store TransactionGetter) (stri
 		return "", spverrors.Wrapf(err, "prepareBUMPFactors() error")
 	}
 
-	bumps, err := calculateMergedBUMP(bumpFactors)
+	err = setMerklePathsFromBUMPs(bumpBtFactors, bumpFactors)
 	if err != nil {
-		return "", err
+		return "", spverrors.Wrapf(err, "SetMerklePathsFromBUMPs() error")
 	}
-	sortedTxs := kahnTopologicalSortTransactions(bumpBtFactors)
-	beefHex, err := toBeefHex(bumps, sortedTxs)
+	populateSourceTransactions(bumpBtFactors)
+
+	trxHex, err := bumpBtFactors[0].BEEFHex()
 	if err != nil {
-		return "", spverrors.Wrapf(err, "ToBeef() error")
+		return "", spverrors.Wrapf(err, "BEEFHex() error")
 	}
 
-	return beefHex, nil
-}
-
-func toBeefHex(bumps BUMPs, parentTxs []*trx.Transaction) (string, error) {
-	beef, err := newBeefTx(1, bumps, parentTxs)
-	if err != nil {
-		return "", spverrors.Wrapf(err, "ToBeefHex() error")
-	}
-
-	beefBytes, err := beef.toBeefBytes()
-	if err != nil {
-		return "", spverrors.Wrapf(err, "ToBeefHex() error")
-	}
-
-	return hex.EncodeToString(beefBytes), nil
-}
-
-func newBeefTx(version uint32, bumps BUMPs, parentTxs []*trx.Transaction) (*beefTx, error) {
-	if version > maxBeefVer {
-		return nil, spverrors.Newf("version above 0x%X", maxBeefVer)
-	}
-
-	if err := validateBumps(bumps); err != nil {
-		return nil, err
-	}
-
-	beef := &beefTx{
-		version:      version,
-		bumps:        bumps,
-		transactions: parentTxs,
-	}
-
-	return beef, nil
+	return trxHex, nil
 }
 
 func hydrateTransaction(ctx context.Context, tx *Transaction) error {
