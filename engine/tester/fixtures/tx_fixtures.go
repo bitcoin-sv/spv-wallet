@@ -8,6 +8,7 @@ import (
 	trx "github.com/bitcoin-sv/go-sdk/transaction"
 	sighash "github.com/bitcoin-sv/go-sdk/transaction/sighash"
 	"github.com/bitcoin-sv/go-sdk/transaction/template/p2pkh"
+	"github.com/bitcoin-sv/spv-wallet/conv"
 	"github.com/bitcoin-sv/spv-wallet/models/bsv"
 	"github.com/stretchr/testify/require"
 )
@@ -44,14 +45,15 @@ var grandparentTXIDs = []string{
 // GivenTXSpec is a builder for creating MOCK! transactions
 type GivenTXSpec interface {
 	WithoutSigning() GivenTXSpec
-	WithoutSourcing() GivenTXSpec
 	WithInput(satoshis uint64) GivenTXSpec
+	WithSingleSourceInputs(satoshis ...uint64) GivenTXSpec
 	WithOPReturn(dataStr string) GivenTXSpec
 	WithOutputScript(parts ...ScriptPart) GivenTXSpec
 	WithP2PKHOutput(satoshis uint64) GivenTXSpec
 
 	TX() *trx.Transaction
 	InputUTXO(inputID int) bsv.Outpoint
+	InputSourceTX(inputID int) *trx.Transaction
 	ID() string
 	BEEF() string
 	RawTX() string
@@ -59,11 +61,10 @@ type GivenTXSpec interface {
 }
 
 type txSpec struct {
-	utxos           []*trx.UTXO
-	outputs         []*trx.TransactionOutput
-	t               testing.TB
-	disableSigning  bool
-	disableSourcing bool
+	utxos          []*trx.UTXO
+	outputs        []*trx.TransactionOutput
+	t              testing.TB
+	disableSigning bool
 
 	grandparentTXIndex int
 	sourceTransactions map[string]*trx.Transaction
@@ -84,23 +85,26 @@ func (spec *txSpec) WithoutSigning() GivenTXSpec {
 	return spec
 }
 
-// WithoutSourcing disables sourcing of inputs from parent transactions (default is false)
-func (spec *txSpec) WithoutSourcing() GivenTXSpec {
-	spec.disableSourcing = true
-	return spec
-}
-
 // WithInput adds an input to the transaction with the specified satoshis
 // it automatically creates a parent tx (sourceTX) with P2PKH UTXO with provided satoshis
 func (spec *txSpec) WithInput(satoshis uint64) GivenTXSpec {
-	sourceTX := spec.makeParentTX(satoshis)
-	utxo, err := trx.NewUTXO(sourceTX.TxID().String(), 0, P2PKHLockingScript.String(), satoshis)
-	require.NoError(spec.t, err, "creating utxo for input")
+	return spec.WithSingleSourceInputs(satoshis)
+}
 
-	utxo.UnlockingScriptTemplate = P2PKHUnlockingScriptTemplate
+// WithSingleSourceInputs adds inputs to the transaction with the specified satoshis
+// All the inputs will be sourced from a single parent transaction
+func (spec *txSpec) WithSingleSourceInputs(satoshis ...uint64) GivenTXSpec {
+	sourceTX := spec.makeParentTX(satoshis...)
+	for i, s := range satoshis {
+		i32, _ := conv.IntToUint32(i)
+		utxo, err := trx.NewUTXO(sourceTX.TxID().String(), i32, P2PKHLockingScript.String(), s)
+		require.NoErrorf(spec.t, err, "creating utxo for input: %d", i)
 
+		utxo.UnlockingScriptTemplate = P2PKHUnlockingScriptTemplate
+
+		spec.utxos = append(spec.utxos, utxo)
+	}
 	spec.sourceTransactions[sourceTX.TxID().String()] = sourceTX
-	spec.utxos = append(spec.utxos, utxo)
 
 	return spec
 }
@@ -166,11 +170,9 @@ func (spec *txSpec) TX() *trx.Transaction {
 		tx.AddOutput(output)
 	}
 
-	if !spec.disableSourcing {
-		for _, input := range tx.Inputs {
-			if sourceTX := spec.sourceTransactions[input.SourceTXID.String()]; sourceTX != nil {
-				input.SourceTransaction = sourceTX
-			}
+	for _, input := range tx.Inputs {
+		if sourceTX := spec.sourceTransactions[input.SourceTXID.String()]; sourceTX != nil {
+			input.SourceTransaction = sourceTX
 		}
 	}
 
@@ -189,6 +191,11 @@ func (spec *txSpec) InputUTXO(inputID int) bsv.Outpoint {
 	}
 }
 
+// InputSourceTX returns the source transaction for the input with the specified index
+func (spec *txSpec) InputSourceTX(inputID int) *trx.Transaction {
+	return spec.sourceTransactions[spec.utxos[inputID].TxID.String()]
+}
+
 // ID returns the transaction ID
 func (spec *txSpec) ID() string {
 	return spec.TX().TxID().String()
@@ -196,9 +203,6 @@ func (spec *txSpec) ID() string {
 
 // BEEF returns the BEEF hex of the transaction
 func (spec *txSpec) BEEF() string {
-	if len(spec.utxos) > 0 && spec.disableSourcing {
-		require.FailNow(spec.t, "BEEF hex can only be retrieved for transactions with sourced inputs")
-	}
 	tx := spec.TX()
 	beef, err := tx.BEEFHex()
 	require.NoError(spec.t, err, "getting beef hex")
@@ -214,9 +218,6 @@ func (spec *txSpec) RawTX() string {
 
 // EF returns the EF hex of the transaction
 func (spec *txSpec) EF() string {
-	if len(spec.utxos) > 0 && spec.disableSourcing {
-		require.FailNow(spec.t, "EF hex can only be retrieved for transactions with sourced inputs")
-	}
 	tx := spec.TX()
 	ef, err := tx.EFHex()
 	require.NoError(spec.t, err, "getting ef hex")
@@ -224,10 +225,14 @@ func (spec *txSpec) EF() string {
 	return ef
 }
 
-func (spec *txSpec) makeParentTX(satoshis uint64) *trx.Transaction {
+func (spec *txSpec) makeParentTX(satoshis ...uint64) *trx.Transaction {
 	tx := trx.NewTransaction()
 
-	withFee := satoshis + 1
+	total := uint64(0)
+	for _, s := range satoshis {
+		total += s
+	}
+	withFee := total + 1
 	utxo, err := trx.NewUTXO(spec.getNextGrandparentTXID(), 0, P2PKHLockingScript.String(), withFee)
 	require.NoError(spec.t, err, "creating utxo for parent tx")
 
@@ -236,10 +241,12 @@ func (spec *txSpec) makeParentTX(satoshis uint64) *trx.Transaction {
 	err = tx.AddInputsFromUTXOs(utxo)
 	require.NoError(spec.t, err, "adding input to parent tx")
 
-	tx.AddOutput(&trx.TransactionOutput{
-		Satoshis:      satoshis,
-		LockingScript: P2PKHLockingScript,
-	})
+	for _, s := range satoshis {
+		tx.AddOutput(&trx.TransactionOutput{
+			Satoshis:      s,
+			LockingScript: P2PKHLockingScript,
+		})
+	}
 	err = tx.Sign()
 	require.NoError(spec.t, err, "signing parent tx")
 
