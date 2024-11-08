@@ -23,11 +23,11 @@ const (
 )
 
 func TestRecordOutlineOpReturn(t *testing.T) {
-	givenTxWithOpReturn := fixtures.GivenTX().WithT(t).
+	givenTxWithOpReturn := fixtures.GivenTX(t).
 		WithInput(1).
 		WithOPReturn(dataOfOpReturnTx)
 
-	givenTxWithOpReturnWithoutOPFalse := fixtures.GivenTX().WithT(t).
+	givenTxWithOpReturnWithoutOPFalse := fixtures.GivenTX(t).
 		WithInput(1).
 		WithOutputScript(
 			fixtures.OpCode(script.OpRETURN),
@@ -44,7 +44,7 @@ func TestRecordOutlineOpReturn(t *testing.T) {
 		"RecordTransactionOutline for op_return": {
 			repo: newMockRepository().withUTXO(givenTxWithOpReturn.InputUTXO(0)),
 			outline: &outlines.Transaction{
-				BEEF: givenTxWithOpReturn.BeefHex(),
+				BEEF: givenTxWithOpReturn.BEEF(),
 				Annotations: transaction.Annotations{
 					Outputs: transaction.OutputsAnnotations{
 						0: &transaction.OutputAnnotation{
@@ -77,7 +77,7 @@ func TestRecordOutlineOpReturn(t *testing.T) {
 		"RecordTransactionOutline for op_return without leading OP_FALSE": {
 			repo: newMockRepository().withUTXO(givenTxWithOpReturnWithoutOPFalse.InputUTXO(0)),
 			outline: &outlines.Transaction{
-				BEEF: givenTxWithOpReturnWithoutOPFalse.BeefHex(),
+				BEEF: givenTxWithOpReturnWithoutOPFalse.BEEF(),
 				Annotations: transaction.Annotations{
 					Outputs: transaction.OutputsAnnotations{
 						0: &transaction.OutputAnnotation{
@@ -110,7 +110,7 @@ func TestRecordOutlineOpReturn(t *testing.T) {
 		"RecordTransactionOutline for op_return with untracked utxo as inputs": {
 			repo: newMockRepository(),
 			outline: &outlines.Transaction{
-				BEEF: givenTxWithOpReturn.BeefHex(),
+				BEEF: givenTxWithOpReturn.BEEF(),
 				Annotations: transaction.Annotations{
 					Outputs: transaction.OutputsAnnotations{
 						0: &transaction.OutputAnnotation{
@@ -160,12 +160,12 @@ func TestRecordOutlineOpReturn(t *testing.T) {
 }
 
 func TestRecordOutlineOpReturnErrorCases(t *testing.T) {
-	givenUnsignedTX := fixtures.GivenTX().WithT(t).
+	givenUnsignedTX := fixtures.GivenTX(t).
 		WithoutSigning().
 		WithInput(1).
 		WithOPReturn(dataOfOpReturnTx)
 
-	givenTxWithOpZeroAfterOpReturn := fixtures.GivenTX().WithT(t).
+	givenTxWithOpZeroAfterOpReturn := fixtures.GivenTX(t).
 		WithInput(1).
 		WithOutputScript(
 			fixtures.OpCode(script.OpFALSE),
@@ -176,11 +176,11 @@ func TestRecordOutlineOpReturnErrorCases(t *testing.T) {
 			fixtures.PushData(dataOfOpReturnTx),
 		)
 
-	givenTxWithP2PKHOutput := fixtures.GivenTX().WithT(t).
+	givenTxWithP2PKHOutput := fixtures.GivenTX(t).
 		WithInput(2).
 		WithP2PKHOutput(1)
 
-	givenTxWithOpReturn := fixtures.GivenTX().WithT(t).
+	givenTxWithOpReturn := fixtures.GivenTX(t).
 		WithInput(1).
 		WithOPReturn(dataOfOpReturnTx)
 
@@ -194,7 +194,7 @@ func TestRecordOutlineOpReturnErrorCases(t *testing.T) {
 			broadcaster: newMockBroadcaster(),
 			repo:        newMockRepository(),
 			outline: &outlines.Transaction{
-				BEEF: givenUnsignedTX.BeefHex(),
+				BEEF: givenUnsignedTX.BEEF(),
 			},
 			expectErr: txerrors.ErrTxValidation,
 		},
@@ -210,7 +210,7 @@ func TestRecordOutlineOpReturnErrorCases(t *testing.T) {
 			broadcaster: newMockBroadcaster(),
 			repo:        newMockRepository(),
 			outline: &outlines.Transaction{
-				BEEF: givenTxWithOpZeroAfterOpReturn.BeefHex(),
+				BEEF: givenTxWithOpZeroAfterOpReturn.BEEF(),
 				Annotations: transaction.Annotations{
 					Outputs: transaction.OutputsAnnotations{
 						0: &transaction.OutputAnnotation{
@@ -229,7 +229,7 @@ func TestRecordOutlineOpReturnErrorCases(t *testing.T) {
 				SpendingTX: ptr("05aa91319c773db18071310ecd5ddc15d3aa4242b55705a13a66f7fefe2b80a1"),
 			}),
 			outline: &outlines.Transaction{
-				BEEF: givenTxWithOpReturn.BeefHex(),
+				BEEF: givenTxWithOpReturn.BEEF(),
 			},
 			expectErr: txerrors.ErrUTXOSpent,
 		},
@@ -237,7 +237,7 @@ func TestRecordOutlineOpReturnErrorCases(t *testing.T) {
 			broadcaster: newMockBroadcaster(),
 			repo:        newMockRepository(),
 			outline: &outlines.Transaction{
-				BEEF: givenTxWithOpReturn.BeefHex(),
+				BEEF: givenTxWithOpReturn.BEEF(),
 				Annotations: transaction.Annotations{
 					Outputs: transaction.OutputsAnnotations{
 						1: &transaction.OutputAnnotation{
@@ -252,7 +252,7 @@ func TestRecordOutlineOpReturnErrorCases(t *testing.T) {
 			broadcaster: newMockBroadcaster(),
 			repo:        newMockRepository(),
 			outline: &outlines.Transaction{
-				BEEF: givenTxWithOpReturn.BeefHex(),
+				BEEF: givenTxWithOpReturn.BEEF(),
 				Annotations: transaction.Annotations{
 					Outputs: transaction.OutputsAnnotations{
 						-1: &transaction.OutputAnnotation{
@@ -267,7 +267,7 @@ func TestRecordOutlineOpReturnErrorCases(t *testing.T) {
 			broadcaster: newMockBroadcaster(),
 			repo:        newMockRepository(),
 			outline: &outlines.Transaction{
-				BEEF: givenTxWithP2PKHOutput.BeefHex(),
+				BEEF: givenTxWithP2PKHOutput.BEEF(),
 				Annotations: transaction.Annotations{
 					Outputs: transaction.OutputsAnnotations{
 						0: &transaction.OutputAnnotation{
@@ -285,7 +285,7 @@ func TestRecordOutlineOpReturnErrorCases(t *testing.T) {
 				Vout: givenTxWithOpReturn.InputUTXO(0).Vout,
 			}),
 			outline: &outlines.Transaction{
-				BEEF: givenTxWithOpReturn.BeefHex(),
+				BEEF: givenTxWithOpReturn.BEEF(),
 				Annotations: transaction.Annotations{
 					Outputs: transaction.OutputsAnnotations{
 						0: &transaction.OutputAnnotation{
