@@ -259,9 +259,9 @@ func (m *Xpub) incrementNextNum(ctx context.Context, chain uint32) (uint32, erro
 		return 0, err
 	}
 
-	newNumU32, err := conv.Int64ToUint32(newNum)
-	if err != nil {
-		return 0, spverrors.Wrapf(err, "failed to convert int64 to uint32")
+	newNumU32, errConversion := conv.Int64ToUint32(newNum)
+	if errConversion != nil {
+		return 0, spverrors.Wrapf(errConversion, "failed to convert int64 to uint32")
 	}
 
 	// Update the model safely as we have already checked for negative values
@@ -278,9 +278,9 @@ func (m *Xpub) incrementNextNum(ctx context.Context, chain uint32) (uint32, erro
 	// Calculate newNumMinusOne
 	newNumMinusOne := newNum - 1
 
-	newNumMinusOneU32, err := conv.Int64ToUint32(newNumMinusOne)
-	if err != nil {
-		return 0, spverrors.Wrapf(err, "failed to convert int64 to uint32")
+	newNumMinusOneU32, errConversion := conv.Int64ToUint32(newNumMinusOne)
+	if errConversion != nil {
+		return 0, spverrors.Wrapf(errConversion, "failed to convert int64 to uint32")
 	}
 
 	// return the previous number, which was next num, safely converted to uint32
