@@ -52,6 +52,7 @@ type (
 		arcConfig                  chainmodels.ARCConfig  // Configuration for ARC
 		bhsConfig                  chainmodels.BHSConfig  // Configuration for BHS
 		feeUnit                    *bsv.FeeUnit           // Fee unit for transactions
+		migrationsDisabled         bool                   // Disable automatic migrations
 	}
 
 	// cacheStoreOptions holds the cache configuration and client
@@ -135,8 +136,10 @@ func NewClient(ctx context.Context, opts ...ClientOps) (ClientInterface, error) 
 		return nil, err
 	}
 
-	if err = client.autoMigrate(ctx); err != nil {
-		return nil, err
+	if !client.options.migrationsDisabled {
+		if err = client.autoMigrate(ctx); err != nil {
+			return nil, err
+		}
 	}
 
 	// Load the Paymail client and service (if does not exist)
