@@ -48,7 +48,7 @@ func (tc *TestingClient) Close(ctx context.Context) {
 }
 
 // DefaultClientOpts will return a default set of client options required to load the new client
-func DefaultClientOpts(debug, shared bool) []ClientOps {
+func DefaultClientOpts() []ClientOps {
 	tqc := taskmanager.DefaultTaskQConfig(tester.RandomTablePrefix())
 	tqc.MaxNumWorker = 2
 	tqc.MaxNumFetcher = 2
@@ -57,12 +57,9 @@ func DefaultClientOpts(debug, shared bool) []ClientOps {
 	opts = append(
 		opts,
 		WithTaskqConfig(tqc),
-		WithSQLite(tester.SQLiteTestConfig(debug, shared)),
+		WithSQLite(tester.SQLiteTestConfig()),
 		WithCustomFeeUnit(mockFeeUnit),
 	)
-	if debug {
-		opts = append(opts, WithDebugging())
-	}
 
 	return opts
 }
@@ -76,8 +73,7 @@ func CreateTestSQLiteClient(t *testing.T, debug, shared bool, clientOpts ...Clie
 	logger := zerolog.Nop()
 
 	// Set the default options, add migrate models
-	opts := DefaultClientOpts(debug, shared)
-	opts = append(opts, WithAutoMigrate(append(BaseModels, newPaymail("", 0))...))
+	opts := DefaultClientOpts()
 	opts = append(opts, WithLogger(&logger))
 	opts = append(opts, clientOpts...)
 
@@ -102,8 +98,7 @@ func CreateBenchmarkSQLiteClient(b *testing.B, debug, shared bool, clientOpts ..
 	logger := zerolog.Nop()
 
 	// Set the default options, add migrate models
-	opts := DefaultClientOpts(debug, shared)
-	opts = append(opts, WithAutoMigrate(BaseModels...))
+	opts := DefaultClientOpts()
 	opts = append(opts, WithLogger(&logger))
 	opts = append(opts, clientOpts...)
 

@@ -2,7 +2,6 @@ package datastore
 
 import (
 	"bytes"
-	"context"
 	"database/sql/driver"
 	"encoding/json"
 	"time"
@@ -44,7 +43,7 @@ func mockDialector(engine Engine) gorm.Dialector {
 }
 
 func mockClient(engine Engine) (*Client, *gorm.DB) {
-	clientInterface, _ := NewClient(context.Background())
+	clientInterface, _ := NewClient()
 	client, _ := clientInterface.(*Client)
 	client.options.engine = engine
 	dialector := mockDialector(engine)

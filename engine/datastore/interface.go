@@ -9,7 +9,6 @@ import (
 
 // StorageService is the storage related methods
 type StorageService interface {
-	AutoMigrateDatabase(ctx context.Context, models ...interface{}) error
 	CreateInBatches(ctx context.Context, models interface{}, batchSize int) error
 	Execute(query string) *gorm.DB
 	GetModel(ctx context.Context, model interface{}, conditions map[string]interface{},
@@ -20,7 +19,6 @@ type StorageService interface {
 		timeout time.Duration) (int64, error)
 	GetModelsAggregate(ctx context.Context, models interface{}, conditions map[string]interface{},
 		aggregateColumn string, timeout time.Duration) (map[string]interface{}, error)
-	HasMigratedModel(modelType string) bool
 	IncrementModel(ctx context.Context, model interface{},
 		fieldName string, increment int64) (newValue int64, err error)
 	IndexMetadata(tableName, field string) error
@@ -43,10 +41,9 @@ type GetterInterface interface {
 type ClientInterface interface {
 	GetterInterface
 	StorageService
-	Close(ctx context.Context) error
+	Close() error
 	Debug(on bool)
 	DebugLog(ctx context.Context, text string)
 	Engine() Engine
-	IsAutoMigrate() bool
 	IsDebug() bool
 }

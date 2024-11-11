@@ -2,7 +2,6 @@ package engine
 
 import (
 	"context"
-	"reflect"
 	"time"
 
 	"github.com/bitcoin-sv/spv-wallet/engine/datastore"
@@ -69,27 +68,6 @@ func NewBaseModel(name ModelName, opts ...ModelOps) (m *Model) {
 	m = &Model{name: name}
 	m.SetOptions(opts...)
 	return
-}
-
-// DisplayModels process the (slice) of model(s) for display
-func DisplayModels(models interface{}) interface{} {
-	if models == nil {
-		return nil
-	}
-
-	s := reflect.ValueOf(models)
-	if s.IsNil() {
-		return nil
-	}
-	if s.Kind() == reflect.Slice {
-		for i := 0; i < s.Len(); i++ {
-			s.Index(i).MethodByName("Display").Call([]reflect.Value{})
-		}
-	} else {
-		s.MethodByName("Display").Call([]reflect.Value{})
-	}
-
-	return models
 }
 
 // String is the string version of the name
