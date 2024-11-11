@@ -69,7 +69,7 @@ func (c *Client) autoMigrate(ctx context.Context) error {
 	}
 
 	// Legacy code compatibility:
-	// Some models implements post-migration logic to e.g. manually add some indexes
+	// Some models implement post-migration logic to e.g. manually add some indexes
 	// NOTE: In the future, we should remove this and stick to GORM features
 	for _, model := range AllDBModels {
 		if migrator, ok := model.(interface {

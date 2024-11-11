@@ -139,15 +139,6 @@ func openSQLiteDatabase(optionalLogger glogger.Interface, config *SQLiteConfig) 
 		return
 	}
 
-	sqlDB, err := db.DB()
-	if err != nil {
-		return
-	}
-
-	// Prevent database table is locked error
-	// https://boyter.org/posts/go-sqlite-database-is-locked/
-	sqlDB.SetMaxOpenConns(1)
-
 	// Return the connection
 	return
 }
