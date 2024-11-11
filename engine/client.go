@@ -132,7 +132,7 @@ func NewClient(ctx context.Context, opts ...ClientOps) (ClientInterface, error) 
 	}
 
 	// Load the Datastore (automatically migrate models)
-	if err = client.loadDatastore(ctx); err != nil {
+	if err = client.loadDatastore(); err != nil {
 		return nil, err
 	}
 

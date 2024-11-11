@@ -49,7 +49,7 @@ type ModelInterface interface {
 	GetModelTableName() string
 	GetOptions(isNewRecord bool) (opts []ModelOps)
 	IsNew() bool
-	Migrate(client datastore.ClientInterface) error
+	PostMigrate(client datastore.ClientInterface) error
 	Name() string
 	New()
 	NotNew()

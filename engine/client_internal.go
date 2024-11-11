@@ -39,8 +39,7 @@ func (c *Client) loadCluster(ctx context.Context) (err error) {
 // loadDatastore will load the Datastore and start the Datastore client
 //
 // NOTE: this WON't run database migrations
-func (c *Client) loadDatastore(ctx context.Context) (err error) {
-	// Load client (runs ALL options, IE: auto migrate models)
+func (c *Client) loadDatastore() (err error) {
 	if c.options.dataStore.ClientInterface != nil {
 		return
 	}
@@ -67,6 +66,19 @@ func (c *Client) autoMigrate(ctx context.Context) error {
 	}
 	if err := c.Datastore().DB().WithContext(ctx).AutoMigrate(AllDBModels...); err != nil {
 		return spverrors.Wrapf(err, "failed to auto-migrate models")
+	}
+
+	// Legacy code compatibility:
+	// Some models implements post-migration logic to e.g. manually add some indexes
+	// NOTE: In the future, we should remove this and stick to GORM features
+	for _, model := range AllDBModels {
+		if migrator, ok := model.(interface {
+			PostMigrate(client datastore.ClientInterface) error
+		}); ok {
+			if err := migrator.PostMigrate(c.Datastore()); err != nil {
+				return spverrors.Wrapf(err, "failed to post-migrate model %+v", model)
+			}
+		}
 	}
 	return nil
 }

@@ -481,8 +481,8 @@ func (m *Utxo) migratePostgreSQL(client datastore.ClientInterface, tableName str
 	return tx.Error
 }
 
-// Migrate model specific migration on startup
-func (m *Utxo) Migrate(client datastore.ClientInterface) error {
+// PostMigrate is called after the model is migrated
+func (m *Utxo) PostMigrate(client datastore.ClientInterface) error {
 	tableName := client.GetTableName(tableUTXOs)
 	if client.Engine() == datastore.PostgreSQL {
 		if err := m.migratePostgreSQL(client, tableName); err != nil {

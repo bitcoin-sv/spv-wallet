@@ -341,8 +341,8 @@ func (m *PaymailAddress) AfterCreated(_ context.Context) error {
 	return nil
 }
 
-// Migrate model specific migration on startup
-func (m *PaymailAddress) Migrate(client datastore.ClientInterface) error {
+// PostMigrate is called after the model is migrated
+func (m *PaymailAddress) PostMigrate(client datastore.ClientInterface) error {
 	tableName := client.GetTableName(tablePaymailAddresses)
 	if err := m.migratePostgreSQL(client, tableName); err != nil {
 		return err
