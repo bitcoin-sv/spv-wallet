@@ -17,4 +17,6 @@ type PaymailAddress struct {
 	PublicName string `json:"publicName" example:"Test User"`
 	// Avatar is a paymail address's avatar.
 	Avatar string `json:"avatar" example:"https://spvwallet.com/avatar.png"`
+	// Address is a paymail address that combines alias and domain with @
+	Address string `json:"address" example:"test@spvwallet.com"`
 }

@@ -20,6 +20,7 @@ func MapToPaymailContract(pa *engine.PaymailAddress) *response.PaymailAddress {
 		Domain:     pa.Domain,
 		PublicName: pa.PublicName,
 		Avatar:     pa.Avatar,
+		Address:    pa.Alias + "@" + pa.Domain,
 	}
 }
 
