@@ -42,7 +42,7 @@ func subscribeWebhook(c *gin.Context, _ *reqctx.AdminContext) {
 // @Tags		Admin
 // @Produce		json
 // @Param		UnsubscribeRequestBody body models.UnsubscribeRequestBody false "URL to unsubscribe from"
-// @Success		200 {boolean} bool "Success response"
+// @Success		200
 // @Failure 	500	"Internal server error - Error while unsubscribing to the webhook"
 // @Router		/api/v1/admin/webhooks/subscriptions [delete]
 // @Security	x-auth-xpub
@@ -59,5 +59,5 @@ func unsubscribeWebhook(c *gin.Context, _ *reqctx.AdminContext) {
 		return
 	}
 
-	c.JSON(http.StatusOK, true)
+	c.Status(http.StatusOK)
 }
