@@ -104,6 +104,21 @@ func TestParseSearchParamsSuccessfully(t *testing.T) {
 	}
 }
 
+func TestNestingInArrayErrorCase(t *testing.T) {
+	u, err := url.Parse("?metadata[key1][][key2]=value1&metadata[key1][][key2]=value2")
+	require.NoError(t, err)
+
+	c := &gin.Context{
+		Request: &http.Request{
+			URL: u,
+		},
+	}
+
+	_, err = ParseSearchParams[ExampleConditionsForTests](c)
+	require.Error(t, err)
+	require.ErrorContains(t, err, "unsupported array-like access to map key")
+}
+
 type ExampleConditionsForTests struct {
 	// ModelFilter is a struct for handling typical request parameters for search requests
 	//nolint:staticcheck // SA5008 - We want to reuse json tags also to mapstructure.
