@@ -1,6 +1,9 @@
 package mappings
 
 import (
+	"fmt"
+	"strings"
+
 	"github.com/bitcoin-sv/spv-wallet/engine"
 	"github.com/bitcoin-sv/spv-wallet/mappings/common"
 	"github.com/bitcoin-sv/spv-wallet/models/response"
@@ -20,7 +23,7 @@ func MapToPaymailContract(pa *engine.PaymailAddress) *response.PaymailAddress {
 		Domain:     pa.Domain,
 		PublicName: pa.PublicName,
 		Avatar:     pa.Avatar,
-		Address:    pa.Alias + "@" + pa.Domain,
+		Address:    getReadablePaymailAddress(pa.Alias, pa.Domain),
 	}
 }
 
@@ -58,4 +61,12 @@ func MapPaymailP4ModelToEngine(p *response.PaymailP4) *engine.PaymailP4 {
 		ReferenceID:     p.ReferenceID,
 		ResolutionType:  p.ResolutionType,
 	}
+}
+
+func getReadablePaymailAddress(alias, domain string) string {
+	if strings.Contains(alias, "@") {
+		return alias
+	}
+
+	return fmt.Sprintf("%s@%s", alias, domain)
 }
