@@ -2734,9 +2734,7 @@ paths:
       - application/json
       responses:
         "200":
-          description: Rejected contact
-          schema:
-            $ref: '#/definitions/response.Contact'
+          description: OK
         "400":
           description: Bad request - Error while getting id from path
         "404":
@@ -3041,9 +3039,7 @@ paths:
       - application/json
       responses:
         "200":
-          description: Success response
-          schema:
-            type: boolean
+          description: OK
         "500":
           description: Internal server error - Error while unsubscribing to the webhook
       security:
@@ -3774,9 +3770,7 @@ paths:
       - application/json
       responses:
         "200":
-          description: Revoked AccessKey
-          schema:
-            $ref: '#/definitions/response.AccessKey'
+          description: OK
         "400":
           description: 'Bad request - Missing required field: id'
         "500":
@@ -3933,6 +3927,149 @@ paths:
       summary: Search UTXO
       tags:
       - UTXOs
+  /v1/access-key:
+    delete:
+      deprecated: true
+      description: This endpoint has been deprecated. Use (DELETE) /api/v1/users/current/keys/{id}
+        instead.
+      parameters:
+      - description: id of the access key
+        in: query
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Revoked AccessKey
+          schema:
+            $ref: '#/definitions/models.AccessKey'
+        "400":
+          description: 'Bad request - Missing required field: id'
+        "500":
+          description: Internal server error - Error while revoking access key
+      security:
+      - x-auth-xpub: []
+      summary: Revoke access key - Use (DELETE) /api/v1/users/current/keys/{id} instead.
+      tags:
+      - Access-key
+    get:
+      deprecated: true
+      description: This endpoint has been deprecated. Use (GET) /api/v1/users/current/keys/{id}
+        instead.
+      parameters:
+      - description: id of the access key
+        in: query
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: AccessKey with given id
+          schema:
+            $ref: '#/definitions/models.AccessKey'
+        "400":
+          description: 'Bad request - Missing required field: id'
+        "403":
+          description: Forbidden - Access key is not owned by the user
+        "500":
+          description: Internal server error - Error while getting access key
+      security:
+      - x-auth-xpub: []
+      summary: Get access key - Use (GET) /api/v1/users/current/keys/{id} instead.
+      tags:
+      - Access-key
+    post:
+      deprecated: true
+      description: This endpoint has been deprecated. Use (POST) /api/v1/users/current/keys
+        instead.
+      parameters:
+      - description: ' '
+        in: body
+        name: CreateAccessKey
+        required: true
+        schema:
+          $ref: '#/definitions/accesskeys.CreateAccessKey'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created AccessKey
+          schema:
+            $ref: '#/definitions/models.AccessKey'
+        "400":
+          description: Bad request - Error while parsing CreateAccessKey from request
+            body
+        "500":
+          description: Internal server error - Error while creating new access key
+      security:
+      - x-auth-xpub: []
+      summary: Create access key - Use (POST) /api/v1/users/current/keys instead.
+      tags:
+      - Access-key
+  /v1/access-key/count:
+    post:
+      deprecated: true
+      description: This endpoint has been deprecated. Use (GET) /api/v1/users/current/keys
+        instead.
+      parameters:
+      - description: Enables filtering of elements to be counted
+        in: body
+        name: CountAccessKeys
+        schema:
+          $ref: '#/definitions/filter.CountAccessKeys'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Count of access keys
+          schema:
+            type: number
+        "400":
+          description: Bad request - Error while parsing CountAccessKeys from request
+            body
+        "500":
+          description: Internal Server Error - Error while fetching count of access
+            keys
+      security:
+      - x-auth-xpub: []
+      summary: Count of access keys - Use (GET) /api/v1/users/current/keys instead.
+      tags:
+      - Access-key
+  /v1/access-key/search:
+    post:
+      deprecated: true
+      description: This endpoint has been deprecated. Use (GET) /api/v1/users/current/keys
+        instead.
+      parameters:
+      - description: Supports targeted resource searches with filters and metadata,
+          plus options for pagination and sorting to streamline data exploration and
+          analysis
+        in: body
+        name: SearchAccessKeys
+        schema:
+          $ref: '#/definitions/filter.SearchAccessKeys'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: List of access keys
+          schema:
+            items:
+              $ref: '#/definitions/models.AccessKey'
+            type: array
+        "400":
+          description: Bad request - Error while SearchAccessKeys from request body
+        "500":
+          description: Internal server error - Error while searching for access keys
+      security:
+      - x-auth-xpub: []
+      summary: Search access key - Use (GET) /api/v1/users/current/keys instead.
+      tags:
+      - Access-key
   /v1/admin/access-keys/count:
     post:
       description: Access Keys Count
@@ -4132,6 +4269,64 @@ paths:
       security:
       - x-auth-xpub: []
       summary: Search for contacts
+      tags:
+      - Admin
+  /v1/admin/destinations:
+    post:
+      deprecated: true
+      description: Search for destinations
+      parameters:
+      - description: Supports targeted resource searches with filters and metadata,
+          plus options for pagination and sorting to streamline data exploration and
+          analysis
+        in: body
+        name: SearchDestinations
+        schema:
+          $ref: '#/definitions/filter.SearchDestinations'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: List of destinations
+          schema:
+            items:
+              $ref: '#/definitions/models.Destination'
+            type: array
+        "400":
+          description: Bad request - Error while parsing SearchDestinations from request
+            body
+        "500":
+          description: Internal server error - Error while searching for destinations
+      security:
+      - x-auth-xpub: []
+      summary: Search for destinations
+      tags:
+      - Admin
+  /v1/admin/destinations/count:
+    post:
+      deprecated: true
+      description: Count destinations
+      parameters:
+      - description: Enables filtering of elements to be counted
+        in: body
+        name: CountDestinations
+        schema:
+          $ref: '#/definitions/filter.CountDestinations'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Count of destinations
+          schema:
+            type: number
+        "400":
+          description: Bad request - Error while parsing CountDestinations from request
+            body
+        "500":
+          description: Internal Server Error - Error while fetching count of destinations
+      security:
+      - x-auth-xpub: []
+      summary: Count destinations
       tags:
       - Admin
   /v1/admin/destinations/search:
@@ -4356,6 +4551,36 @@ paths:
             type: array
         "400":
           description: Bad request - Error while parsing query parameters
+        "500":
+          description: Internal server error - Error while searching for transactions
+      security:
+      - x-auth-xpub: []
+      summary: Search for transactions
+      tags:
+      - Admin
+    post:
+      deprecated: true
+      description: Search for transactions
+      parameters:
+      - description: Supports targeted resource searches with filters and metadata,
+          plus options for pagination and sorting to streamline data exploration and
+          analysis
+        in: body
+        name: SearchTransactions
+        schema:
+          $ref: '#/definitions/filter.SearchTransactions'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: List of transactions
+          schema:
+            items:
+              $ref: '#/definitions/models.Transaction'
+            type: array
+        "400":
+          description: Bad request - Error while parsing SearchTransactions from request
+            body
         "500":
           description: Internal server error - Error while searching for transactions
       security:
@@ -4647,6 +4872,652 @@ paths:
       summary: Search for xpubs
       tags:
       - Admin
+  /v1/contact/{paymail}:
+    put:
+      deprecated: true
+      description: This endpoint has been deprecated. Use (PUT) /api/v1/contacts/{paymail}
+        instead.
+      parameters:
+      - description: Paymail address of the contact that the user would like to add/modify
+        in: path
+        name: paymail
+        required: true
+        type: string
+      - description: Full name and metadata needed to add/modify contact
+        in: body
+        name: UpsertContact
+        required: true
+        schema:
+          $ref: '#/definitions/contacts.UpsertContact'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+      security:
+      - x-auth-xpub: []
+      summary: Upsert contact - Use (PUT) /api/v1/contacts/{paymail} instead.
+      tags:
+      - Contact
+  /v1/contact/accepted/{paymail}:
+    patch:
+      deprecated: true
+      description: This endpoint has been deprecated. Use (POST) /api/v1/invitations/{paymail}
+        instead.
+      parameters:
+      - description: Paymail address of the contact that the user would like to accept
+        in: path
+        name: paymail
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+        "404":
+          description: Contact not found
+        "422":
+          description: Contact status not awaiting
+        "500":
+          description: Internal server error
+      security:
+      - x-auth-xpub: []
+      summary: Accept contact - Use (POST) /api/v1/invitations/{paymail} instead.
+      tags:
+      - Contact
+  /v1/contact/confirmed/{paymail}:
+    patch:
+      deprecated: true
+      description: This endpoint has been deprecated. Use (POST) /api/v1/contacts/{paymail}/confirmation
+        instead.
+      parameters:
+      - description: Paymail address of the contact that the user would like to confirm
+        in: path
+        name: paymail
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+        "404":
+          description: Contact not found
+        "422":
+          description: Contact status not unconfirmed
+        "500":
+          description: Internal server error
+      security:
+      - x-auth-xpub: []
+      summary: Confirm contact - Use (POST) /api/v1/contacts/{paymail}/confirmation
+        instead
+      tags:
+      - Contact
+  /v1/contact/rejected/{paymail}:
+    patch:
+      deprecated: true
+      description: This endpoint has been deprecated. Use (DELETE) /api/v1/invitations/{paymail}
+        instead.
+      parameters:
+      - description: Paymail address of the contact that the user would like to reject
+        in: path
+        name: paymail
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+        "404":
+          description: Contact not found
+        "422":
+          description: Contact status not awaiting
+        "500":
+          description: Internal server error
+      security:
+      - x-auth-xpub: []
+      summary: Reject contact - Use (DELETE) /api/v1/invitations/{paymail} instead.
+      tags:
+      - Contact
+  /v1/contact/search:
+    post:
+      deprecated: true
+      description: This endpoint has been deprecated. Use (GET) /api/v1/contacts instead.
+      parameters:
+      - description: Supports targeted resource searches with filters and metadata,
+          plus options for pagination and sorting to streamline data exploration and
+          analysis
+        in: body
+        name: SearchContacts
+        schema:
+          $ref: '#/definitions/filter.SearchContacts'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: List of contacts
+          schema:
+            $ref: '#/definitions/models.SearchContactsResponse'
+        "400":
+          description: Bad request - Error while parsing SearchContacts from request
+            body
+        "500":
+          description: Internal server error - Error while searching for contacts
+      security:
+      - x-auth-xpub: []
+      summary: Search contacts - Use (GET) /api/v1/contacts instead.
+      tags:
+      - Contact
+  /v1/contact/unconfirmed/{paymail}:
+    patch:
+      deprecated: true
+      description: This endpoint has been deprecated. Use (DELETE) /api/v1/contacts/{paymail}/confirmation
+        instead.
+      parameters:
+      - description: Paymail address of the contact that the user would like to unconfirm
+        in: path
+        name: paymail
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+        "404":
+          description: Contact not found
+        "422":
+          description: Contact status not confirmed
+        "500":
+          description: Internal server error
+      security:
+      - x-auth-xpub: []
+      summary: Unconfirm contact - Use (DELETE) /api/v1/contacts/{paymail}/confirmation
+        instead.
+      tags:
+      - Contact
+  /v1/destination:
+    get:
+      deprecated: true
+      description: Get a destination. This endpoint has been deprecated (it will be
+        removed in the future).
+      parameters:
+      - description: Destination ID
+        in: query
+        name: id
+        type: string
+      - description: Destination address
+        in: query
+        name: address
+        type: string
+      - description: Destination locking script
+        in: query
+        name: locking_script
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Destination with given id
+          schema:
+            $ref: '#/definitions/models.Destination'
+        "400":
+          description: Bad request - All parameters are missing (id, address, locking_script)
+        "500":
+          description: Internal server error - Error while getting destination
+      security:
+      - x-auth-xpub: []
+      summary: Get a destination. This endpoint has been deprecated (it will be removed
+        in the future).
+      tags:
+      - Destinations
+    patch:
+      deprecated: true
+      description: Update destination. This endpoint has been deprecated (it will
+        be removed in the future).
+      parameters:
+      - description: ' '
+        in: body
+        name: UpdateDestination
+        schema:
+          $ref: '#/definitions/destinations.UpdateDestination'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Updated Destination
+          schema:
+            $ref: '#/definitions/models.Destination'
+        "400":
+          description: Bad request - Error while parsing UpdateDestination from request
+            body
+        "500":
+          description: Internal Server Error - Error while updating destination
+      security:
+      - x-auth-xpub: []
+      summary: Update destination. This endpoint has been deprecated (it will be removed
+        in the future).
+      tags:
+      - Destinations
+    post:
+      deprecated: true
+      description: Create a new destination. This endpoint has been deprecated (it
+        will be removed in the future).
+      parameters:
+      - description: ' '
+        in: body
+        name: CreateDestination
+        schema:
+          $ref: '#/definitions/destinations.CreateDestination'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created Destination
+          schema:
+            $ref: '#/definitions/models.Destination'
+        "400":
+          description: Bad request - Error while parsing CreateDestination from request
+            body
+        "500":
+          description: Internal Server Error - Error while creating destination
+      security:
+      - x-auth-xpub: []
+      summary: Create a new destination. This endpoint has been deprecated (it will
+        be removed in the future).
+      tags:
+      - Destinations
+  /v1/destination/count:
+    post:
+      deprecated: true
+      description: Count Destinations. This endpoint has been deprecated (it will
+        be removed in the future).
+      parameters:
+      - description: Enables filtering of elements to be counted
+        in: body
+        name: CountDestinations
+        schema:
+          $ref: '#/definitions/filter.CountDestinations'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Count of destinations
+          schema:
+            type: number
+        "400":
+          description: Bad request - Error while parsing CountDestinations from request
+            body
+        "500":
+          description: Internal Server Error - Error while fetching count of destinations
+      security:
+      - x-auth-xpub: []
+      summary: Count Destinations. This endpoint has been deprecated (it will be removed
+        in the future).
+      tags:
+      - Destinations
+  /v1/destination/search:
+    post:
+      deprecated: true
+      description: Search for a destination. This endpoint has been deprecated (it
+        will be removed in the future).
+      parameters:
+      - description: Supports targeted resource searches with filters and metadata,
+          plus options for pagination and sorting to streamline data exploration and
+          analysis
+        in: body
+        name: SearchDestinations
+        schema:
+          $ref: '#/definitions/filter.SearchDestinations'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: List of destinations
+          schema:
+            items:
+              $ref: '#/definitions/models.Destination'
+            type: array
+        "400":
+          description: Bad request - Error while parsing SearchDestinations from request
+            body
+        "500":
+          description: Internal server error - Error while searching for destinations
+      security:
+      - x-auth-xpub: []
+      summary: Search for a destination. This endpoint has been deprecated (it will
+        be removed in the future).
+      tags:
+      - Destinations
+  /v1/shared-config:
+    get:
+      deprecated: true
+      description: This endpoint has been deprecated. Use (GET) /api/v1/configs/shared
+        instead.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Shared configuration
+          schema:
+            $ref: '#/definitions/models.SharedConfig'
+      security:
+      - x-auth-xpub: []
+      summary: Get shared config - Use (GET) /api/v1/configs/shared instead.
+      tags:
+      - Configurations
+  /v1/transaction:
+    get:
+      deprecated: true
+      description: This endpoint has been deprecated. Use (GET) /api/v1/transactions/{id}
+        instead.
+      parameters:
+      - description: id
+        in: query
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Transaction
+          schema:
+            $ref: '#/definitions/models.Transaction'
+        "400":
+          description: Bad request - Transaction not found or associated with another
+            xpub
+        "500":
+          description: Internal Server Error - Error while fetching transaction
+      security:
+      - x-auth-xpub: []
+      summary: Get transaction by id - Use (GET) /api/v1/transactions/{id} instead.
+      tags:
+      - Transactions
+    patch:
+      deprecated: true
+      description: This endpoint has been deprecated. Use (PATCH) /api/v1/transactions/{id}
+        instead.
+      parameters:
+      - description: Pass update transaction request model in the body
+        in: body
+        name: UpdateTransaction
+        required: true
+        schema:
+          $ref: '#/definitions/transactions.UpdateTransaction'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Updated transaction
+          schema:
+            $ref: '#/definitions/models.Transaction'
+        "400":
+          description: Bad request - Error while parsing UpdateTransaction from request
+            body, tx not found or tx is not associated with the xpub
+        "500":
+          description: Internal Server Error - Error while updating transaction
+      security:
+      - x-auth-xpub: []
+      summary: Update transaction - Use (PATCH) /api/v1/transactions/{id} instead.
+      tags:
+      - Transactions
+    post:
+      deprecated: true
+      description: This endpoint has been deprecated. Use (POST) /api/v1/transactions/drafts
+        instead.
+      parameters:
+      - description: OldNewDraftTransaction model containing the transaction config
+          and metadata
+        in: body
+        name: OldNewDraftTransaction
+        required: true
+        schema:
+          $ref: '#/definitions/transactions.OldNewDraftTransaction'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created transaction
+          schema:
+            $ref: '#/definitions/transactions.OldNewDraftTransaction'
+        "400":
+          description: Bad request - Error while parsing OldNewDraftTransaction from
+            request body or xpub not found
+        "500":
+          description: Internal Server Error - Error while creating transaction
+      security:
+      - x-auth-xpub: []
+      summary: New transaction - Use (POST) /api/v1/transactions/drafts instead.
+      tags:
+      - Transactions
+  /v1/transaction/count:
+    post:
+      deprecated: true
+      description: This endpoint has been deprecated. Use (GET) /api/v1/transactions
+        instead
+      parameters:
+      - description: Enables filtering of elements to be counted
+        in: body
+        name: CountTransactions
+        schema:
+          $ref: '#/definitions/filter.CountTransactions'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Count of access keys
+          schema:
+            type: number
+        "400":
+          description: Bad request - Error while parsing CountTransactions from request
+            body
+        "500":
+          description: Internal Server Error - Error while fetching count of transactions
+      security:
+      - x-auth-xpub: []
+      summary: Count of transactions - Use (GET) /api/v1/transactions instead.
+      tags:
+      - Transactions
+  /v1/transaction/record:
+    post:
+      deprecated: true
+      description: This endpoint has been deprecated. Use (POST) /api/v1/transactions
+        instead.
+      parameters:
+      - description: Transaction to be recorded
+        in: body
+        name: RecordTransaction
+        required: true
+        schema:
+          $ref: '#/definitions/transactions.RecordTransaction'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created transaction
+          schema:
+            $ref: '#/definitions/models.Transaction'
+        "400":
+          description: Bad request - Error while parsing RecordTransaction from request
+            body or xpub not found
+        "500":
+          description: Internal Server Error - Error while recording transaction
+      security:
+      - x-auth-xpub: []
+      summary: Record transaction - Use (POST) /api/v1/transactions instead.
+      tags:
+      - Transactions
+  /v1/transaction/search:
+    post:
+      deprecated: true
+      description: This endpoint has been deprecated. Use (GET) /api/v1/transactions
+        instead
+      parameters:
+      - description: Supports targeted resource searches with filters and metadata,
+          plus options for pagination and sorting to streamline data exploration and
+          analysis
+        in: body
+        name: SearchTransactions
+        schema:
+          $ref: '#/definitions/filter.SearchTransactions'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: List of transactions
+          schema:
+            items:
+              $ref: '#/definitions/models.Transaction'
+            type: array
+        "400":
+          description: Bad request - Error while parsing SearchTransactions from request
+            body
+        "500":
+          description: Internal server error - Error while searching for transactions
+      security:
+      - x-auth-xpub: []
+      summary: Search transaction - Use (GET) /api/v1/transactions instead.
+      tags:
+      - Transactions
+  /v1/utxo:
+    get:
+      deprecated: true
+      description: Get UTXO. This endpoint has been deprecated (it will be removed
+        in the future).
+      parameters:
+      - description: Id of the transaction
+        in: query
+        name: tx_id
+        required: true
+        type: string
+      - description: Output index
+        in: query
+        name: output_index
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: UTXO with given Id and output index
+          schema:
+            $ref: '#/definitions/models.Utxo'
+        "400":
+          description: Bad request - Error while parsing output_index
+        "500":
+          description: Internal Server Error - Error while fetching utxo
+      security:
+      - x-auth-xpub: []
+      summary: Get UTXO. This endpoint has been deprecated (it will be removed in
+        the future).
+      tags:
+      - UTXO
+  /v1/utxo/count:
+    post:
+      deprecated: true
+      description: This endpoint has been deprecated. Use (GET) /api/v1/utxos instead.
+      parameters:
+      - description: Enables filtering of elements to be counted
+        in: body
+        name: CountUtxos
+        schema:
+          $ref: '#/definitions/filter.CountUtxos'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Count of utxos
+          schema:
+            type: number
+        "400":
+          description: Bad request - Error while parsing CountUtxos from request body
+        "500":
+          description: Internal Server Error - Error while fetching count of utxos
+      security:
+      - x-auth-xpub: []
+      summary: Count of UTXOs - Use (GET) /api/v1/utxos instead.
+      tags:
+      - UTXO
+  /v1/utxo/search:
+    post:
+      deprecated: true
+      description: This endpoint has been deprecated. Use (GET) /api/v1/utxos instead.
+      parameters:
+      - description: Supports targeted resource searches with filters and metadata,
+          plus options for pagination and sorting to streamline data exploration and
+          analysis
+        in: body
+        name: SearchUtxos
+        schema:
+          $ref: '#/definitions/filter.SearchUtxos'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: List of utxos
+          schema:
+            items:
+              $ref: '#/definitions/models.Utxo'
+            type: array
+        "400":
+          description: Bad request - Error while parsing SearchUtxos from request
+            body
+        "500":
+          description: Internal server error - Error while searching for utxos
+      security:
+      - x-auth-xpub: []
+      summary: Search UTXO - Use (GET) /api/v1/utxos instead.
+      tags:
+      - UTXO
+  /v1/xpub:
+    get:
+      deprecated: true
+      description: This endpoint has been deprecated. Use (GET) /api/v1/users/current
+        instead.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: xPub associated with the given xPub from auth header
+          schema:
+            $ref: '#/definitions/models.Xpub'
+        "500":
+          description: Internal Server Error - Error while fetching xPub
+      security:
+      - x-auth-xpub: []
+      summary: Get current user information - Use (GET) /api/v1/users/current instead.
+      tags:
+      - Users
+    patch:
+      deprecated: true
+      description: This endpoint has been deprecated. Use (PATCH) /api/v1/users/current
+        instead.
+      parameters:
+      - description: ' '
+        in: body
+        name: Metadata
+        schema:
+          $ref: '#/definitions/engine.Metadata'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Updated xPub
+          schema:
+            $ref: '#/definitions/models.Xpub'
+        "400":
+          description: Bad request - Error while parsing Metadata from request body
+        "500":
+          description: Internal Server Error - Error while updating xPub
+      security:
+      - x-auth-xpub: []
+      summary: Update current user information - Use (PATCH) /api/v1/users/current
+        instead.
+      tags:
+      - Users
 securityDefinitions:
   callback-auth:
     in: header
