@@ -17,8 +17,6 @@ on:
         type: choice
         options:
           - 'dockerhub'
-          - 'aws'
-          - 'dockerhub,aws'
 
 jobs:
   release_default:
@@ -32,17 +30,3 @@ jobs:
     secrets:
       DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
       DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
-
-  release_aws:
-    if: contains(inputs.registries, 'aws')
-    uses: bactions/workflows/.github/workflows/release-go-server.yml@main
-    with:
-      version: ${{ inputs.version || github.ref_name }}
-      ref: ${{ github.ref }}
-      cgo_enabled: true
-      release_create: false
-      docker_registry: public.ecr.aws
-      docker_org: ${{ vars.SPV_AWS_DOCKER_ORG }}
-    secrets:
-      DOCKER_USERNAME: ${{ secrets.SPV_AWS_ACCESS_KEY_ID }}
-      DOCKER_PASSWORD: ${{ secrets.SPV_AWS_SECRET_ACCESS_KEY }}
