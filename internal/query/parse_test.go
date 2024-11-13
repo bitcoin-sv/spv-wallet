@@ -98,6 +98,7 @@ func TestParseSearchParamsSuccessfully(t *testing.T) {
 			}
 
 			params, err := ParseSearchParams[ExampleConditionsForTests](c)
+			require.NoError(t, err)
 			require.EqualValues(t, test.expectedResult, *params)
 		})
 	}
@@ -114,7 +115,6 @@ func TestNestingInArrayErrorCase(t *testing.T) {
 	}
 
 	_, err = ParseSearchParams[ExampleConditionsForTests](c)
-	require.Error(t, err)
 	require.ErrorContains(t, err, "unsupported array-like access to map key")
 }
 
