@@ -20,7 +20,7 @@ func MapToOldPaymailContract(pa *engine.PaymailAddress) *models.PaymailAddress {
 		Domain:     pa.Domain,
 		PublicName: pa.PublicName,
 		Avatar:     pa.Avatar,
-		Address:    getReadablePaymailAddress(pa.Alias, pa.Domain),
+		Address:    pa.String(),
 	}
 }
 
