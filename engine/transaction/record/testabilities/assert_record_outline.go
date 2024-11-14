@@ -7,13 +7,16 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
+type ErrorAssert interface {
+	NothingChanged()
+}
+
 type RecordOutlineAssert interface {
 	WithNoError(err error) SuccessfullyCreatedRecordOutlineAssertion
-	WithErrorIs(err, expectedError error)
+	WithErrorIs(err, expectedError error) ErrorAssert
 
 	StoredOutputs([]database.Output) RecordOutlineAssert
 	StoredData([]database.Data) RecordOutlineAssert
-	NothingChanged() RecordOutlineAssert
 }
 
 type SuccessfullyCreatedRecordOutlineAssertion interface {
@@ -40,9 +43,10 @@ func (a *assert) WithNoError(err error) SuccessfullyCreatedRecordOutlineAssertio
 	return a
 }
 
-func (a *assert) WithErrorIs(err, expectedError error) {
+func (a *assert) WithErrorIs(err, expectedError error) ErrorAssert {
 	require.Error(a.t, err, "Record transaction outline has no error")
 	require.ErrorIs(a.t, err, expectedError, "Record transaction outline has wrong error")
+	return a
 }
 
 func (a *assert) Broadcasted(txID string) SuccessfullyCreatedRecordOutlineAssertion {
@@ -69,8 +73,7 @@ func (a *assert) StoredData(data []database.Data) RecordOutlineAssert {
 	return a
 }
 
-func (a *assert) NothingChanged() RecordOutlineAssert {
+func (a *assert) NothingChanged() {
 	require.ElementsMatch(a.t, a.given.initialOutputs, a.given.repository.GetAllOutputs(), "Outputs are changed")
 	require.ElementsMatch(a.t, a.given.initialData, a.given.repository.GetAllData(), "Data are changed")
-	return a
 }

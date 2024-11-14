@@ -45,7 +45,7 @@ func TestRecordOutlineOpReturn(t *testing.T) {
 		expectData    []database.Data
 	}{
 		"RecordTransactionOutline for op_return": {
-			storedUTXOs: []bsv.Outpoint{givenTxWithOpReturn(t).InputUTXO(0)},
+			storedUTXOs: []bsv.Outpoint{givenTXWithOpReturn(t).InputUTXO(0)},
 			outline: &outlines.Transaction{
 				BEEF: givenTXWithOpReturn(t).BEEF(),
 				Annotations: transaction.Annotations{
@@ -275,8 +275,7 @@ func TestRecordOutlineOpReturnErrorCases(t *testing.T) {
 			err := service.RecordTransactionOutline(context.Background(), test.outline)
 
 			// then:
-			then.WithErrorIs(err, test.expectErr)
-			then.NothingChanged()
+			then.WithErrorIs(err, test.expectErr).NothingChanged()
 		})
 	}
 }
@@ -309,8 +308,7 @@ func TestOnBroadcastErr(t *testing.T) {
 	err := service.RecordTransactionOutline(context.Background(), outline)
 
 	// then:
-	then.WithErrorIs(err, txerrors.ErrTxBroadcast)
-	then.NothingChanged()
+	then.WithErrorIs(err, txerrors.ErrTxBroadcast).NothingChanged()
 }
 
 func ptr[T any](value T) *T {
