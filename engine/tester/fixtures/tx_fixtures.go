@@ -1,3 +1,4 @@
+//nolint:wrapcheck // The code is used for unit-testing purposes only
 package fixtures
 
 import (
