@@ -219,10 +219,7 @@ const docTemplate = `{
                 ],
                 "responses": {
                     "200": {
-                        "description": "Rejected contact",
-                        "schema": {
-                            "$ref": "#/definitions/response.Contact"
-                        }
+                        "description": "OK"
                     },
                     "400": {
                         "description": "Bad request - Error while getting id from path"
@@ -728,10 +725,7 @@ const docTemplate = `{
                 ],
                 "responses": {
                     "200": {
-                        "description": "Success response",
-                        "schema": {
-                            "type": "boolean"
-                        }
+                        "description": "OK"
                     },
                     "500": {
                         "description": "Internal server error - Error while unsubscribing to the webhook"
@@ -1841,10 +1835,7 @@ const docTemplate = `{
                 ],
                 "responses": {
                     "200": {
-                        "description": "Revoked AccessKey",
-                        "schema": {
-                            "$ref": "#/definitions/response.AccessKey"
-                        }
+                        "description": "OK"
                     },
                     "400": {
                         "description": "Bad request - Missing required field: id"
@@ -2022,6 +2013,217 @@ const docTemplate = `{
                     },
                     "500": {
                         "description": "Internal server error - Error while searching for utxos"
+                    }
+                }
+            }
+        },
+        "/v1/access-key": {
+            "get": {
+                "security": [
+                    {
+                        "x-auth-xpub": []
+                    }
+                ],
+                "description": "This endpoint has been deprecated. Use (GET) /api/v1/users/current/keys/{id} instead.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Access-key"
+                ],
+                "summary": "Get access key - Use (GET) /api/v1/users/current/keys/{id} instead.",
+                "deprecated": true,
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "id of the access key",
+                        "name": "id",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "AccessKey with given id",
+                        "schema": {
+                            "$ref": "#/definitions/models.AccessKey"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request - Missing required field: id"
+                    },
+                    "403": {
+                        "description": "Forbidden - Access key is not owned by the user"
+                    },
+                    "500": {
+                        "description": "Internal server error - Error while getting access key"
+                    }
+                }
+            },
+            "post": {
+                "security": [
+                    {
+                        "x-auth-xpub": []
+                    }
+                ],
+                "description": "This endpoint has been deprecated. Use (POST) /api/v1/users/current/keys instead.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Access-key"
+                ],
+                "summary": "Create access key - Use (POST) /api/v1/users/current/keys instead.",
+                "deprecated": true,
+                "parameters": [
+                    {
+                        "description": " ",
+                        "name": "CreateAccessKey",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/accesskeys.CreateAccessKey"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created AccessKey",
+                        "schema": {
+                            "$ref": "#/definitions/models.AccessKey"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request - Error while parsing CreateAccessKey from request body"
+                    },
+                    "500": {
+                        "description": "Internal server error - Error while creating new access key"
+                    }
+                }
+            },
+            "delete": {
+                "security": [
+                    {
+                        "x-auth-xpub": []
+                    }
+                ],
+                "description": "This endpoint has been deprecated. Use (DELETE) /api/v1/users/current/keys/{id} instead.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Access-key"
+                ],
+                "summary": "Revoke access key - Use (DELETE) /api/v1/users/current/keys/{id} instead.",
+                "deprecated": true,
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "id of the access key",
+                        "name": "id",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Revoked AccessKey",
+                        "schema": {
+                            "$ref": "#/definitions/models.AccessKey"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request - Missing required field: id"
+                    },
+                    "500": {
+                        "description": "Internal server error - Error while revoking access key"
+                    }
+                }
+            }
+        },
+        "/v1/access-key/count": {
+            "post": {
+                "security": [
+                    {
+                        "x-auth-xpub": []
+                    }
+                ],
+                "description": "This endpoint has been deprecated. Use (GET) /api/v1/users/current/keys instead.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Access-key"
+                ],
+                "summary": "Count of access keys - Use (GET) /api/v1/users/current/keys instead.",
+                "deprecated": true,
+                "parameters": [
+                    {
+                        "description": "Enables filtering of elements to be counted",
+                        "name": "CountAccessKeys",
+                        "in": "body",
+                        "schema": {
+                            "$ref": "#/definitions/filter.CountAccessKeys"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Count of access keys",
+                        "schema": {
+                            "type": "number"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request - Error while parsing CountAccessKeys from request body"
+                    },
+                    "500": {
+                        "description": "Internal Server Error - Error while fetching count of access keys"
+                    }
+                }
+            }
+        },
+        "/v1/access-key/search": {
+            "post": {
+                "security": [
+                    {
+                        "x-auth-xpub": []
+                    }
+                ],
+                "description": "This endpoint has been deprecated. Use (GET) /api/v1/users/current/keys instead.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Access-key"
+                ],
+                "summary": "Search access key - Use (GET) /api/v1/users/current/keys instead.",
+                "deprecated": true,
+                "parameters": [
+                    {
+                        "description": "Supports targeted resource searches with filters and metadata, plus options for pagination and sorting to streamline data exploration and analysis",
+                        "name": "SearchAccessKeys",
+                        "in": "body",
+                        "schema": {
+                            "$ref": "#/definitions/filter.SearchAccessKeys"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "List of access keys",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/models.AccessKey"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request - Error while SearchAccessKeys from request body"
+                    },
+                    "500": {
+                        "description": "Internal server error - Error while searching for access keys"
                     }
                 }
             }
@@ -2331,6 +2533,93 @@ const docTemplate = `{
                     },
                     "500": {
                         "description": "Internal server error - Error while updating contact"
+                    }
+                }
+            }
+        },
+        "/v1/admin/destinations": {
+            "post": {
+                "security": [
+                    {
+                        "x-auth-xpub": []
+                    }
+                ],
+                "description": "Search for destinations",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Admin"
+                ],
+                "summary": "Search for destinations",
+                "deprecated": true,
+                "parameters": [
+                    {
+                        "description": "Supports targeted resource searches with filters and metadata, plus options for pagination and sorting to streamline data exploration and analysis",
+                        "name": "SearchDestinations",
+                        "in": "body",
+                        "schema": {
+                            "$ref": "#/definitions/filter.SearchDestinations"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "List of destinations",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/models.Destination"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request - Error while parsing SearchDestinations from request body"
+                    },
+                    "500": {
+                        "description": "Internal server error - Error while searching for destinations"
+                    }
+                }
+            }
+        },
+        "/v1/admin/destinations/count": {
+            "post": {
+                "security": [
+                    {
+                        "x-auth-xpub": []
+                    }
+                ],
+                "description": "Count destinations",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Admin"
+                ],
+                "summary": "Count destinations",
+                "deprecated": true,
+                "parameters": [
+                    {
+                        "description": "Enables filtering of elements to be counted",
+                        "name": "CountDestinations",
+                        "in": "body",
+                        "schema": {
+                            "$ref": "#/definitions/filter.CountDestinations"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Count of destinations",
+                        "schema": {
+                            "type": "number"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request - Error while parsing CountDestinations from request body"
+                    },
+                    "500": {
+                        "description": "Internal Server Error - Error while fetching count of destinations"
                     }
                 }
             }
@@ -2684,6 +2973,49 @@ const docTemplate = `{
                     },
                     "400": {
                         "description": "Bad request - Error while parsing query parameters"
+                    },
+                    "500": {
+                        "description": "Internal server error - Error while searching for transactions"
+                    }
+                }
+            },
+            "post": {
+                "security": [
+                    {
+                        "x-auth-xpub": []
+                    }
+                ],
+                "description": "Search for transactions",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Admin"
+                ],
+                "summary": "Search for transactions",
+                "deprecated": true,
+                "parameters": [
+                    {
+                        "description": "Supports targeted resource searches with filters and metadata, plus options for pagination and sorting to streamline data exploration and analysis",
+                        "name": "SearchTransactions",
+                        "in": "body",
+                        "schema": {
+                            "$ref": "#/definitions/filter.SearchTransactions"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "List of transactions",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/models.Transaction"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request - Error while parsing SearchTransactions from request body"
                     },
                     "500": {
                         "description": "Internal server error - Error while searching for transactions"
@@ -3129,6 +3461,955 @@ const docTemplate = `{
                     },
                     "500": {
                         "description": "Internal server error - Error while searching for xpubs"
+                    }
+                }
+            }
+        },
+        "/v1/contact/accepted/{paymail}": {
+            "patch": {
+                "security": [
+                    {
+                        "x-auth-xpub": []
+                    }
+                ],
+                "description": "This endpoint has been deprecated. Use (POST) /api/v1/invitations/{paymail} instead.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Contact"
+                ],
+                "summary": "Accept contact - Use (POST) /api/v1/invitations/{paymail} instead.",
+                "deprecated": true,
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Paymail address of the contact that the user would like to accept",
+                        "name": "paymail",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "404": {
+                        "description": "Contact not found"
+                    },
+                    "422": {
+                        "description": "Contact status not awaiting"
+                    },
+                    "500": {
+                        "description": "Internal server error"
+                    }
+                }
+            }
+        },
+        "/v1/contact/confirmed/{paymail}": {
+            "patch": {
+                "security": [
+                    {
+                        "x-auth-xpub": []
+                    }
+                ],
+                "description": "This endpoint has been deprecated. Use (POST) /api/v1/contacts/{paymail}/confirmation instead.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Contact"
+                ],
+                "summary": "Confirm contact - Use (POST) /api/v1/contacts/{paymail}/confirmation instead",
+                "deprecated": true,
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Paymail address of the contact that the user would like to confirm",
+                        "name": "paymail",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "404": {
+                        "description": "Contact not found"
+                    },
+                    "422": {
+                        "description": "Contact status not unconfirmed"
+                    },
+                    "500": {
+                        "description": "Internal server error"
+                    }
+                }
+            }
+        },
+        "/v1/contact/rejected/{paymail}": {
+            "patch": {
+                "security": [
+                    {
+                        "x-auth-xpub": []
+                    }
+                ],
+                "description": "This endpoint has been deprecated. Use (DELETE) /api/v1/invitations/{paymail} instead.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Contact"
+                ],
+                "summary": "Reject contact - Use (DELETE) /api/v1/invitations/{paymail} instead.",
+                "deprecated": true,
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Paymail address of the contact that the user would like to reject",
+                        "name": "paymail",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "404": {
+                        "description": "Contact not found"
+                    },
+                    "422": {
+                        "description": "Contact status not awaiting"
+                    },
+                    "500": {
+                        "description": "Internal server error"
+                    }
+                }
+            }
+        },
+        "/v1/contact/search": {
+            "post": {
+                "security": [
+                    {
+                        "x-auth-xpub": []
+                    }
+                ],
+                "description": "This endpoint has been deprecated. Use (GET) /api/v1/contacts instead.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Contact"
+                ],
+                "summary": "Search contacts - Use (GET) /api/v1/contacts instead.",
+                "deprecated": true,
+                "parameters": [
+                    {
+                        "description": "Supports targeted resource searches with filters and metadata, plus options for pagination and sorting to streamline data exploration and analysis",
+                        "name": "SearchContacts",
+                        "in": "body",
+                        "schema": {
+                            "$ref": "#/definitions/filter.SearchContacts"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "List of contacts",
+                        "schema": {
+                            "$ref": "#/definitions/models.SearchContactsResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request - Error while parsing SearchContacts from request body"
+                    },
+                    "500": {
+                        "description": "Internal server error - Error while searching for contacts"
+                    }
+                }
+            }
+        },
+        "/v1/contact/unconfirmed/{paymail}": {
+            "patch": {
+                "security": [
+                    {
+                        "x-auth-xpub": []
+                    }
+                ],
+                "description": "This endpoint has been deprecated. Use (DELETE) /api/v1/contacts/{paymail}/confirmation instead.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Contact"
+                ],
+                "summary": "Unconfirm contact - Use (DELETE) /api/v1/contacts/{paymail}/confirmation instead.",
+                "deprecated": true,
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Paymail address of the contact that the user would like to unconfirm",
+                        "name": "paymail",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "404": {
+                        "description": "Contact not found"
+                    },
+                    "422": {
+                        "description": "Contact status not confirmed"
+                    },
+                    "500": {
+                        "description": "Internal server error"
+                    }
+                }
+            }
+        },
+        "/v1/contact/{paymail}": {
+            "put": {
+                "security": [
+                    {
+                        "x-auth-xpub": []
+                    }
+                ],
+                "description": "This endpoint has been deprecated. Use (PUT) /api/v1/contacts/{paymail} instead.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Contact"
+                ],
+                "summary": "Upsert contact - Use (PUT) /api/v1/contacts/{paymail} instead.",
+                "deprecated": true,
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Paymail address of the contact that the user would like to add/modify",
+                        "name": "paymail",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Full name and metadata needed to add/modify contact",
+                        "name": "UpsertContact",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/contacts.UpsertContact"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created"
+                    }
+                }
+            }
+        },
+        "/v1/destination": {
+            "get": {
+                "security": [
+                    {
+                        "x-auth-xpub": []
+                    }
+                ],
+                "description": "Get a destination. This endpoint has been deprecated (it will be removed in the future).",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Destinations"
+                ],
+                "summary": "Get a destination. This endpoint has been deprecated (it will be removed in the future).",
+                "deprecated": true,
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Destination ID",
+                        "name": "id",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Destination address",
+                        "name": "address",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Destination locking script",
+                        "name": "locking_script",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Destination with given id",
+                        "schema": {
+                            "$ref": "#/definitions/models.Destination"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request - All parameters are missing (id, address, locking_script)"
+                    },
+                    "500": {
+                        "description": "Internal server error - Error while getting destination"
+                    }
+                }
+            },
+            "post": {
+                "security": [
+                    {
+                        "x-auth-xpub": []
+                    }
+                ],
+                "description": "Create a new destination. This endpoint has been deprecated (it will be removed in the future).",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Destinations"
+                ],
+                "summary": "Create a new destination. This endpoint has been deprecated (it will be removed in the future).",
+                "deprecated": true,
+                "parameters": [
+                    {
+                        "description": " ",
+                        "name": "CreateDestination",
+                        "in": "body",
+                        "schema": {
+                            "$ref": "#/definitions/destinations.CreateDestination"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created Destination",
+                        "schema": {
+                            "$ref": "#/definitions/models.Destination"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request - Error while parsing CreateDestination from request body"
+                    },
+                    "500": {
+                        "description": "Internal Server Error - Error while creating destination"
+                    }
+                }
+            },
+            "patch": {
+                "security": [
+                    {
+                        "x-auth-xpub": []
+                    }
+                ],
+                "description": "Update destination. This endpoint has been deprecated (it will be removed in the future).",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Destinations"
+                ],
+                "summary": "Update destination. This endpoint has been deprecated (it will be removed in the future).",
+                "deprecated": true,
+                "parameters": [
+                    {
+                        "description": " ",
+                        "name": "UpdateDestination",
+                        "in": "body",
+                        "schema": {
+                            "$ref": "#/definitions/destinations.UpdateDestination"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Updated Destination",
+                        "schema": {
+                            "$ref": "#/definitions/models.Destination"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request - Error while parsing UpdateDestination from request body"
+                    },
+                    "500": {
+                        "description": "Internal Server Error - Error while updating destination"
+                    }
+                }
+            }
+        },
+        "/v1/destination/count": {
+            "post": {
+                "security": [
+                    {
+                        "x-auth-xpub": []
+                    }
+                ],
+                "description": "Count Destinations. This endpoint has been deprecated (it will be removed in the future).",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Destinations"
+                ],
+                "summary": "Count Destinations. This endpoint has been deprecated (it will be removed in the future).",
+                "deprecated": true,
+                "parameters": [
+                    {
+                        "description": "Enables filtering of elements to be counted",
+                        "name": "CountDestinations",
+                        "in": "body",
+                        "schema": {
+                            "$ref": "#/definitions/filter.CountDestinations"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Count of destinations",
+                        "schema": {
+                            "type": "number"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request - Error while parsing CountDestinations from request body"
+                    },
+                    "500": {
+                        "description": "Internal Server Error - Error while fetching count of destinations"
+                    }
+                }
+            }
+        },
+        "/v1/destination/search": {
+            "post": {
+                "security": [
+                    {
+                        "x-auth-xpub": []
+                    }
+                ],
+                "description": "Search for a destination. This endpoint has been deprecated (it will be removed in the future).",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Destinations"
+                ],
+                "summary": "Search for a destination. This endpoint has been deprecated (it will be removed in the future).",
+                "deprecated": true,
+                "parameters": [
+                    {
+                        "description": "Supports targeted resource searches with filters and metadata, plus options for pagination and sorting to streamline data exploration and analysis",
+                        "name": "SearchDestinations",
+                        "in": "body",
+                        "schema": {
+                            "$ref": "#/definitions/filter.SearchDestinations"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "List of destinations",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/models.Destination"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request - Error while parsing SearchDestinations from request body"
+                    },
+                    "500": {
+                        "description": "Internal server error - Error while searching for destinations"
+                    }
+                }
+            }
+        },
+        "/v1/shared-config": {
+            "get": {
+                "security": [
+                    {
+                        "x-auth-xpub": []
+                    }
+                ],
+                "description": "This endpoint has been deprecated. Use (GET) /api/v1/configs/shared instead.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Configurations"
+                ],
+                "summary": "Get shared config - Use (GET) /api/v1/configs/shared instead.",
+                "deprecated": true,
+                "responses": {
+                    "200": {
+                        "description": "Shared configuration",
+                        "schema": {
+                            "$ref": "#/definitions/models.SharedConfig"
+                        }
+                    }
+                }
+            }
+        },
+        "/v1/transaction": {
+            "get": {
+                "security": [
+                    {
+                        "x-auth-xpub": []
+                    }
+                ],
+                "description": "This endpoint has been deprecated. Use (GET) /api/v1/transactions/{id} instead.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Transactions"
+                ],
+                "summary": "Get transaction by id - Use (GET) /api/v1/transactions/{id} instead.",
+                "deprecated": true,
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "id",
+                        "name": "id",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Transaction",
+                        "schema": {
+                            "$ref": "#/definitions/models.Transaction"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request - Transaction not found or associated with another xpub"
+                    },
+                    "500": {
+                        "description": "Internal Server Error - Error while fetching transaction"
+                    }
+                }
+            },
+            "post": {
+                "security": [
+                    {
+                        "x-auth-xpub": []
+                    }
+                ],
+                "description": "This endpoint has been deprecated. Use (POST) /api/v1/transactions/drafts instead.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Transactions"
+                ],
+                "summary": "New transaction - Use (POST) /api/v1/transactions/drafts instead.",
+                "deprecated": true,
+                "parameters": [
+                    {
+                        "description": "OldNewDraftTransaction model containing the transaction config and metadata",
+                        "name": "OldNewDraftTransaction",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/transactions.OldNewDraftTransaction"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created transaction",
+                        "schema": {
+                            "$ref": "#/definitions/transactions.OldNewDraftTransaction"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request - Error while parsing OldNewDraftTransaction from request body or xpub not found"
+                    },
+                    "500": {
+                        "description": "Internal Server Error - Error while creating transaction"
+                    }
+                }
+            },
+            "patch": {
+                "security": [
+                    {
+                        "x-auth-xpub": []
+                    }
+                ],
+                "description": "This endpoint has been deprecated. Use (PATCH) /api/v1/transactions/{id} instead.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Transactions"
+                ],
+                "summary": "Update transaction - Use (PATCH) /api/v1/transactions/{id} instead.",
+                "deprecated": true,
+                "parameters": [
+                    {
+                        "description": "Pass update transaction request model in the body",
+                        "name": "UpdateTransaction",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/transactions.UpdateTransaction"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Updated transaction",
+                        "schema": {
+                            "$ref": "#/definitions/models.Transaction"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request - Error while parsing UpdateTransaction from request body, tx not found or tx is not associated with the xpub"
+                    },
+                    "500": {
+                        "description": "Internal Server Error - Error while updating transaction"
+                    }
+                }
+            }
+        },
+        "/v1/transaction/count": {
+            "post": {
+                "security": [
+                    {
+                        "x-auth-xpub": []
+                    }
+                ],
+                "description": "This endpoint has been deprecated. Use (GET) /api/v1/transactions instead",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Transactions"
+                ],
+                "summary": "Count of transactions - Use (GET) /api/v1/transactions instead.",
+                "deprecated": true,
+                "parameters": [
+                    {
+                        "description": "Enables filtering of elements to be counted",
+                        "name": "CountTransactions",
+                        "in": "body",
+                        "schema": {
+                            "$ref": "#/definitions/filter.CountTransactions"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Count of access keys",
+                        "schema": {
+                            "type": "number"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request - Error while parsing CountTransactions from request body"
+                    },
+                    "500": {
+                        "description": "Internal Server Error - Error while fetching count of transactions"
+                    }
+                }
+            }
+        },
+        "/v1/transaction/record": {
+            "post": {
+                "security": [
+                    {
+                        "x-auth-xpub": []
+                    }
+                ],
+                "description": "This endpoint has been deprecated. Use (POST) /api/v1/transactions instead.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Transactions"
+                ],
+                "summary": "Record transaction - Use (POST) /api/v1/transactions instead.",
+                "deprecated": true,
+                "parameters": [
+                    {
+                        "description": "Transaction to be recorded",
+                        "name": "RecordTransaction",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/transactions.RecordTransaction"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created transaction",
+                        "schema": {
+                            "$ref": "#/definitions/models.Transaction"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request - Error while parsing RecordTransaction from request body or xpub not found"
+                    },
+                    "500": {
+                        "description": "Internal Server Error - Error while recording transaction"
+                    }
+                }
+            }
+        },
+        "/v1/transaction/search": {
+            "post": {
+                "security": [
+                    {
+                        "x-auth-xpub": []
+                    }
+                ],
+                "description": "This endpoint has been deprecated. Use (GET) /api/v1/transactions instead",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Transactions"
+                ],
+                "summary": "Search transaction - Use (GET) /api/v1/transactions instead.",
+                "deprecated": true,
+                "parameters": [
+                    {
+                        "description": "Supports targeted resource searches with filters and metadata, plus options for pagination and sorting to streamline data exploration and analysis",
+                        "name": "SearchTransactions",
+                        "in": "body",
+                        "schema": {
+                            "$ref": "#/definitions/filter.SearchTransactions"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "List of transactions",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/models.Transaction"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request - Error while parsing SearchTransactions from request body"
+                    },
+                    "500": {
+                        "description": "Internal server error - Error while searching for transactions"
+                    }
+                }
+            }
+        },
+        "/v1/utxo": {
+            "get": {
+                "security": [
+                    {
+                        "x-auth-xpub": []
+                    }
+                ],
+                "description": "Get UTXO. This endpoint has been deprecated (it will be removed in the future).",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "UTXO"
+                ],
+                "summary": "Get UTXO. This endpoint has been deprecated (it will be removed in the future).",
+                "deprecated": true,
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Id of the transaction",
+                        "name": "tx_id",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Output index",
+                        "name": "output_index",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "UTXO with given Id and output index",
+                        "schema": {
+                            "$ref": "#/definitions/models.Utxo"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request - Error while parsing output_index"
+                    },
+                    "500": {
+                        "description": "Internal Server Error - Error while fetching utxo"
+                    }
+                }
+            }
+        },
+        "/v1/utxo/count": {
+            "post": {
+                "security": [
+                    {
+                        "x-auth-xpub": []
+                    }
+                ],
+                "description": "This endpoint has been deprecated. Use (GET) /api/v1/utxos instead.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "UTXO"
+                ],
+                "summary": "Count of UTXOs - Use (GET) /api/v1/utxos instead.",
+                "deprecated": true,
+                "parameters": [
+                    {
+                        "description": "Enables filtering of elements to be counted",
+                        "name": "CountUtxos",
+                        "in": "body",
+                        "schema": {
+                            "$ref": "#/definitions/filter.CountUtxos"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Count of utxos",
+                        "schema": {
+                            "type": "number"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request - Error while parsing CountUtxos from request body"
+                    },
+                    "500": {
+                        "description": "Internal Server Error - Error while fetching count of utxos"
+                    }
+                }
+            }
+        },
+        "/v1/utxo/search": {
+            "post": {
+                "security": [
+                    {
+                        "x-auth-xpub": []
+                    }
+                ],
+                "description": "This endpoint has been deprecated. Use (GET) /api/v1/utxos instead.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "UTXO"
+                ],
+                "summary": "Search UTXO - Use (GET) /api/v1/utxos instead.",
+                "deprecated": true,
+                "parameters": [
+                    {
+                        "description": "Supports targeted resource searches with filters and metadata, plus options for pagination and sorting to streamline data exploration and analysis",
+                        "name": "SearchUtxos",
+                        "in": "body",
+                        "schema": {
+                            "$ref": "#/definitions/filter.SearchUtxos"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "List of utxos",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/models.Utxo"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request - Error while parsing SearchUtxos from request body"
+                    },
+                    "500": {
+                        "description": "Internal server error - Error while searching for utxos"
+                    }
+                }
+            }
+        },
+        "/v1/xpub": {
+            "get": {
+                "security": [
+                    {
+                        "x-auth-xpub": []
+                    }
+                ],
+                "description": "This endpoint has been deprecated. Use (GET) /api/v1/users/current instead.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Users"
+                ],
+                "summary": "Get current user information - Use (GET) /api/v1/users/current instead.",
+                "deprecated": true,
+                "responses": {
+                    "200": {
+                        "description": "xPub associated with the given xPub from auth header",
+                        "schema": {
+                            "$ref": "#/definitions/models.Xpub"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error - Error while fetching xPub"
+                    }
+                }
+            },
+            "patch": {
+                "security": [
+                    {
+                        "x-auth-xpub": []
+                    }
+                ],
+                "description": "This endpoint has been deprecated. Use (PATCH) /api/v1/users/current instead.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Users"
+                ],
+                "summary": "Update current user information - Use (PATCH) /api/v1/users/current instead.",
+                "deprecated": true,
+                "parameters": [
+                    {
+                        "description": " ",
+                        "name": "Metadata",
+                        "in": "body",
+                        "schema": {
+                            "$ref": "#/definitions/engine.Metadata"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Updated xPub",
+                        "schema": {
+                            "$ref": "#/definitions/models.Xpub"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request - Error while parsing Metadata from request body"
+                    },
+                    "500": {
+                        "description": "Internal Server Error - Error while updating xPub"
                     }
                 }
             }

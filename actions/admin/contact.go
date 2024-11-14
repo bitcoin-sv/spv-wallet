@@ -154,7 +154,7 @@ func contactsDelete(c *gin.Context, _ *reqctx.AdminContext) {
 // @Tags		Admin
 // @Produce		json
 // @Param		id path string false "Contact id"
-// @Success		200 {object} response.Contact "Rejected contact"
+// @Success		200
 // @Failure		400	"Bad request - Error while getting id from path"
 // @Failure		404	"Not found - Error while getting contact by id"
 // @Failure		422	"Unprocessable entity - Incorrect status of contact"
@@ -165,7 +165,7 @@ func contactsDelete(c *gin.Context, _ *reqctx.AdminContext) {
 func contactsReject(c *gin.Context, _ *reqctx.AdminContext) {
 	id := c.Param("id")
 
-	contact, err := reqctx.Engine(c).AdminChangeContactStatus(
+	_, err := reqctx.Engine(c).AdminChangeContactStatus(
 		c.Request.Context(),
 		id,
 		engine.ContactRejected,
@@ -175,9 +175,7 @@ func contactsReject(c *gin.Context, _ *reqctx.AdminContext) {
 		return
 	}
 
-	contract := mappings.MapToContactContract(contact)
-
-	c.JSON(http.StatusOK, contract)
+	c.Status(http.StatusOK)
 }
 
 // contactsAccept will perform Accept action on contact with the given id
