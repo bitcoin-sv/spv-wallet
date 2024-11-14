@@ -131,30 +131,31 @@ func (spec *txSpec) WithP2PKHOutput(satoshis uint64) GivenTXSpec {
 
 // ScriptPart is an interface for building script parts
 type ScriptPart interface {
-	Append(s *script.Script)
+	Append(s *script.Script) error
 }
 
 // OpCode is an alias for byte to represent an opcode and implements ScriptPart for script building
 type OpCode byte
 
 // Append appends the opcode to the script
-func (op OpCode) Append(s *script.Script) {
-	_ = s.AppendOpcodes(script.OpRETURN)
+func (op OpCode) Append(s *script.Script) error {
+	return s.AppendOpcodes(script.OpRETURN)
 }
 
 // PushData is an alias for []byte to represent push data and implements ScriptPart for script building
 type PushData []byte
 
 // Append appends the push data to the script
-func (data PushData) Append(s *script.Script) {
-	_ = s.AppendPushData(data)
+func (data PushData) Append(s *script.Script) error {
+	return s.AppendPushData(data)
 }
 
 // WithOutputScript adds an output to the transaction with the specified script parts
 func (spec *txSpec) WithOutputScript(parts ...ScriptPart) GivenTXSpec {
 	s := &script.Script{}
 	for _, part := range parts {
-		part.Append(s)
+		err := part.Append(s)
+		require.NoError(spec.t, err, "appending script part")
 	}
 	spec.outputs = append(spec.outputs, &trx.TransactionOutput{LockingScript: s})
 	return spec

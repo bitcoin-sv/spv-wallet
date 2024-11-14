@@ -14,7 +14,7 @@ func givenSingleINSingleOUTTXSpec(t *testing.T) fixtures.GivenTXSpec {
 	return fixtures.GivenTX(t).WithInput(10).WithP2PKHOutput(1)
 }
 
-func givenMultipleOUTsTXSpec(t *testing.T) fixtures.GivenTXSpec {
+func givenMultipleINsTXSpec(t *testing.T) fixtures.GivenTXSpec {
 	return givenSingleINSingleOUTTXSpec(t).WithInput(2)
 }
 
@@ -24,7 +24,7 @@ func givenSingleSourceINsTXSpec(t *testing.T) fixtures.GivenTXSpec {
 
 func TestConverterFromRawTx(t *testing.T) {
 	givenSingleINSingleOUTTX := givenSingleINSingleOUTTXSpec(t)
-	givenMultipleOUTsTX := givenMultipleOUTsTXSpec(t)
+	givenMultipleINsTX := givenMultipleINsTXSpec(t)
 	givenSingleSourceINsTX := givenSingleSourceINsTXSpec(t)
 
 	tests := map[string]struct {
@@ -40,12 +40,12 @@ func TestConverterFromRawTx(t *testing.T) {
 			expectedEFHex: givenSingleINSingleOUTTX.EF(),
 		},
 		"Convert tx with two unsourced inputs": {
-			rawTx: givenMultipleOUTsTX.RawTX(),
+			rawTx: givenMultipleINsTX.RawTX(),
 			txGetter: newMockTransactionsGetter(t, []string{
-				givenMultipleOUTsTX.InputSourceTX(0).Hex(),
-				givenMultipleOUTsTX.InputSourceTX(1).Hex(),
+				givenMultipleINsTX.InputSourceTX(0).Hex(),
+				givenMultipleINsTX.InputSourceTX(1).Hex(),
 			}),
-			expectedEFHex: givenMultipleOUTsTX.EF(),
+			expectedEFHex: givenMultipleINsTX.EF(),
 		},
 		"Convert tx with two unsourced inputs from one source": {
 			rawTx: givenSingleSourceINsTX.RawTX(),
@@ -76,7 +76,7 @@ func TestConverterAlreadyInEF(t *testing.T) {
 			efHex: givenSingleINSingleOUTTXSpec(t).EF(),
 		},
 		"Convert tx with two inputs": {
-			efHex: givenMultipleOUTsTXSpec(t).EF(),
+			efHex: givenMultipleINsTXSpec(t).EF(),
 		},
 		"Convert tx with two inputs from one source": {
 			efHex: givenSingleSourceINsTXSpec(t).EF(),
@@ -96,7 +96,7 @@ func TestConverterAlreadyInEF(t *testing.T) {
 
 func TestConverterErrorCases(t *testing.T) {
 	givenSingleINSingleOUTTX := givenSingleINSingleOUTTXSpec(t)
-	givenMultipleOUTsTX := givenMultipleOUTsTXSpec(t)
+	givenMultipleINsTX := givenMultipleINsTXSpec(t)
 
 	tests := map[string]struct {
 		rawTx     string
@@ -109,9 +109,9 @@ func TestConverterErrorCases(t *testing.T) {
 			expectErr: ef.ErrGetTransactions,
 		},
 		"Not every source tx provided by TransactionGetter": {
-			rawTx: givenMultipleOUTsTX.RawTX(),
+			rawTx: givenMultipleINsTX.RawTX(),
 			txGetter: newMockTransactionsGetter(t, []string{
-				givenMultipleOUTsTX.InputSourceTX(0).Hex(),
+				givenMultipleINsTX.InputSourceTX(0).Hex(),
 				// NOTE: for inputID 1, the source transaction is missing
 			}).WithOnMissingBehavior(onMissingTxSkip),
 			expectErr: ef.ErrGetTransactions,
@@ -130,14 +130,14 @@ func TestConverterErrorCases(t *testing.T) {
 			rawTx: givenSingleINSingleOUTTX.RawTX(),
 			txGetter: newMockTransactionsGetter(t, []string{
 				givenSingleINSingleOUTTX.InputSourceTX(0).Hex(),
-				givenMultipleOUTsTX.InputSourceTX(1).Hex(),
+				givenMultipleINsTX.InputSourceTX(1).Hex(),
 			}).WithReturnAll(true),
 			expectErr: ef.ErrGetTransactions,
 		},
 		"TransactionGetter not requested transactions but with correct length": {
 			rawTx: givenSingleINSingleOUTTX.RawTX(),
 			txGetter: newMockTransactionsGetter(t, []string{
-				givenMultipleOUTsTX.InputSourceTX(1).Hex(),
+				givenMultipleINsTX.InputSourceTX(1).Hex(),
 			}).WithReturnAll(true),
 			expectErr: ef.ErrGetTransactions,
 		},
