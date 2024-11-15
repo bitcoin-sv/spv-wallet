@@ -25,6 +25,10 @@ var grandparentTXIDs = []string{
 }
 
 // GivenTXSpec is a builder for creating MOCK! transactions
+//
+// NOTE: Using several inputs in a single transaction is not recommended RIGHT NOW because:
+// in that case the resulting BEEF hex will be varying because of the order of inputs
+// TODO: Remove this comment after the go-sdk algorithm is fixed
 type GivenTXSpec interface {
 	WithoutSigning() GivenTXSpec
 	WithInput(satoshis uint64) GivenTXSpec
@@ -50,12 +54,14 @@ type txSpec struct {
 
 	grandparentTXIndex int
 	sourceTransactions map[string]*trx.Transaction
+	blockHeight        uint32
 }
 
 // GivenTX creates a new GivenTXSpec for building a MOCK! transaction
 func GivenTX(t testing.TB) GivenTXSpec {
 	return &txSpec{
 		t:                  t,
+		blockHeight:        1000,
 		grandparentTXIndex: 0,
 		sourceTransactions: make(map[string]*trx.Transaction),
 	}
@@ -233,7 +239,8 @@ func (spec *txSpec) makeParentTX(satoshis ...uint64) *trx.Transaction {
 	err = tx.Sign()
 	require.NoError(spec.t, err, "signing parent tx")
 
-	err = tx.AddMerkleProof(trx.NewMerklePath(1000, [][]*trx.PathElement{{
+	// each merkle proof should have a different block height to not collide with each other
+	err = tx.AddMerkleProof(trx.NewMerklePath(spec.getNextBlockHeight(), [][]*trx.PathElement{{
 		&trx.PathElement{
 			Hash:      tx.TxID(),
 			Offset:    0,
@@ -249,6 +256,12 @@ func (spec *txSpec) getNextGrandparentTXID() string {
 	id := grandparentTXIDs[spec.grandparentTXIndex]
 	spec.grandparentTXIndex = (spec.grandparentTXIndex + 1) % len(grandparentTXIDs)
 	return id
+}
+
+func (spec *txSpec) getNextBlockHeight() uint32 {
+	h := spec.blockHeight
+	spec.blockHeight++
+	return h
 }
 
 func ptr[T any](value T) *T {
