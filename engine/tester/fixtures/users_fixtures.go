@@ -2,6 +2,10 @@ package fixtures
 
 import (
 	bip32 "github.com/bitcoin-sv/go-sdk/compat/bip32"
+	ec "github.com/bitcoin-sv/go-sdk/primitives/ec"
+	"github.com/bitcoin-sv/go-sdk/script"
+	sighash "github.com/bitcoin-sv/go-sdk/transaction/sighash"
+	"github.com/bitcoin-sv/go-sdk/transaction/template/p2pkh"
 	"github.com/bitcoin-sv/spv-wallet/engine/utils"
 )
 
@@ -93,6 +97,56 @@ func (f *User) XPubID() string {
 		return ""
 	}
 	return utils.Hash(xpub)
+}
+
+// XPrivHD returns the xpriv of this user as a HD key.
+func (f *User) XPrivHD() *bip32.ExtendedKey {
+	xpriv, err := bip32.GenerateHDKeyFromString(f.PrivKey)
+	if err != nil {
+		panic("Invalid setup of user fixture, cannot restore xpriv: " + err.Error())
+	}
+	return xpriv
+}
+
+// PrivateKey returns the private key of this user.
+func (f *User) PrivateKey() *ec.PrivateKey {
+	priv, err := bip32.GetPrivateKeyFromHDKey(f.XPrivHD())
+	if err != nil {
+		panic("Invalid setup of user fixture, cannot restore private key: " + err.Error())
+	}
+	return priv
+}
+
+// PublicKey returns the public key of this user.
+func (f *User) PublicKey() *ec.PublicKey {
+	return f.PrivateKey().PubKey()
+}
+
+// Address returns the address of this user.
+func (f *User) Address() *script.Address {
+	addr, err := script.NewAddressFromPublicKey(f.PublicKey(), true)
+	if err != nil {
+		panic("Invalid setup of user fixture, cannot restore address: " + err.Error())
+	}
+	return addr
+}
+
+// P2PKHLockingScript returns the locking script of this user.
+func (f *User) P2PKHLockingScript() *script.Script {
+	lockingScript, err := p2pkh.Lock(f.Address())
+	if err != nil {
+		panic("Invalid setup of user fixture, cannot restore locking script: " + err.Error())
+	}
+	return lockingScript
+}
+
+// P2PKHUnlockingScriptTemplate returns the unlocking script template of this user.
+func (f *User) P2PKHUnlockingScriptTemplate() *p2pkh.P2PKH {
+	unlockingScript, err := p2pkh.Unlock(f.PrivateKey(), ptr(sighash.AllForkID))
+	if err != nil {
+		panic("Invalid setup of user fixture, cannot restore unlocking script: " + err.Error())
+	}
+	return unlockingScript
 }
 
 // AllUsers returns all users fixtures despite it's internal or external user.

@@ -1,32 +1,13 @@
-//nolint:wrapcheck // The code is used for unit-testing purposes only
 package fixtures
 
 import (
 	"testing"
 
-	bip32 "github.com/bitcoin-sv/go-sdk/compat/bip32"
 	"github.com/bitcoin-sv/go-sdk/script"
 	trx "github.com/bitcoin-sv/go-sdk/transaction"
-	sighash "github.com/bitcoin-sv/go-sdk/transaction/sighash"
-	"github.com/bitcoin-sv/go-sdk/transaction/template/p2pkh"
 	"github.com/bitcoin-sv/spv-wallet/conv"
 	"github.com/bitcoin-sv/spv-wallet/models/bsv"
 	"github.com/stretchr/testify/require"
-)
-
-const (
-	// XPrivStr is the xpriv key which can be safely used for testing purposes
-	XPrivStr = "xprv9s21ZrQH143K2mYcVbQKRnVp8r8cVUvNVkfk7wvMd9rPxf86SoW4dJTH7Zduta6tuYS1XEKTb8hxK4zuz2fSVW9iikoRcWor8d2mGjtmke5"
-)
-
-// Fixtures for testing purposes
-var (
-	XPriv, _                        = bip32.GenerateHDKeyFromString(XPrivStr)
-	Priv, _                         = bip32.GetPrivateKeyFromHDKey(XPriv)
-	Pub                             = Priv.PubKey()
-	Address, _                      = script.NewAddressFromPublicKey(Pub, true)
-	P2PKHLockingScript, _           = p2pkh.Lock(Address)
-	P2PKHUnlockingScriptTemplate, _ = p2pkh.Unlock(Priv, ptr(sighash.AllForkID))
 )
 
 // grandparentTXIDs are used to indicate prevTXID for parentTXs(source transactions)
@@ -98,10 +79,10 @@ func (spec *txSpec) WithSingleSourceInputs(satoshis ...uint64) GivenTXSpec {
 	sourceTX := spec.makeParentTX(satoshis...)
 	for i, s := range satoshis {
 		i32, _ := conv.IntToUint32(i)
-		utxo, err := trx.NewUTXO(sourceTX.TxID().String(), i32, P2PKHLockingScript.String(), s)
+		utxo, err := trx.NewUTXO(sourceTX.TxID().String(), i32, Sender.P2PKHLockingScript().String(), s)
 		require.NoErrorf(spec.t, err, "creating utxo for input: %d", i)
 
-		utxo.UnlockingScriptTemplate = P2PKHUnlockingScriptTemplate
+		utxo.UnlockingScriptTemplate = Sender.P2PKHUnlockingScriptTemplate()
 
 		spec.utxos = append(spec.utxos, utxo)
 	}
@@ -125,7 +106,7 @@ func (spec *txSpec) WithOPReturn(dataStr string) GivenTXSpec {
 func (spec *txSpec) WithP2PKHOutput(satoshis uint64) GivenTXSpec {
 	spec.outputs = append(spec.outputs, &trx.TransactionOutput{
 		Satoshis:      satoshis,
-		LockingScript: P2PKHLockingScript,
+		LockingScript: RecipientInternal.P2PKHLockingScript(),
 	})
 	return spec
 }
@@ -235,10 +216,10 @@ func (spec *txSpec) makeParentTX(satoshis ...uint64) *trx.Transaction {
 		total += s
 	}
 	withFee := total + 1
-	utxo, err := trx.NewUTXO(spec.getNextGrandparentTXID(), 0, P2PKHLockingScript.String(), withFee)
+	utxo, err := trx.NewUTXO(spec.getNextGrandparentTXID(), 0, Sender.P2PKHLockingScript().String(), withFee)
 	require.NoError(spec.t, err, "creating utxo for parent tx")
 
-	utxo.UnlockingScriptTemplate = P2PKHUnlockingScriptTemplate
+	utxo.UnlockingScriptTemplate = Sender.P2PKHUnlockingScriptTemplate()
 
 	err = tx.AddInputsFromUTXOs(utxo)
 	require.NoError(spec.t, err, "adding input to parent tx")
@@ -246,7 +227,7 @@ func (spec *txSpec) makeParentTX(satoshis ...uint64) *trx.Transaction {
 	for _, s := range satoshis {
 		tx.AddOutput(&trx.TransactionOutput{
 			Satoshis:      s,
-			LockingScript: P2PKHLockingScript,
+			LockingScript: Sender.P2PKHLockingScript(),
 		})
 	}
 	err = tx.Sign()
@@ -254,8 +235,9 @@ func (spec *txSpec) makeParentTX(satoshis ...uint64) *trx.Transaction {
 
 	err = tx.AddMerkleProof(trx.NewMerklePath(1000, [][]*trx.PathElement{{
 		&trx.PathElement{
-			Hash:   tx.TxID(),
-			Offset: 0,
+			Hash:      tx.TxID(),
+			Offset:    0,
+			Duplicate: ptr(true),
 		},
 	}}))
 	require.NoError(spec.t, err, "adding merkle proof to parent tx")
