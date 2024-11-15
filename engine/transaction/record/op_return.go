@@ -2,7 +2,6 @@ package record
 
 import (
 	"github.com/bitcoin-sv/go-sdk/script"
-	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	txerrors "github.com/bitcoin-sv/spv-wallet/engine/transaction/errors"
 )
 
@@ -23,8 +22,8 @@ func getDataFromOpReturn(lockingScript *script.Script) ([]byte, error) {
 
 	var bytes []byte
 	for _, chunk := range chunks[startIndex:] {
-		if chunk.Op > script.OpPUSHDATA4 {
-			return nil, spverrors.Newf("Could not find OP_RETURN data")
+		if chunk.Op > script.OpPUSHDATA4 || chunk.Op == script.OpZERO {
+			return nil, txerrors.ErrOnlyPushDataAllowed
 		}
 		bytes = append(bytes, chunk.Data...)
 	}
