@@ -14,6 +14,9 @@ type MockRepository struct {
 	transactions map[string]database.Transaction
 	outputs      map[string]database.Output
 	data         map[string]database.Data
+
+	errOnSave       error
+	errOnGetOutputs error
 }
 
 func NewMockRepository() *MockRepository {
@@ -25,6 +28,9 @@ func NewMockRepository() *MockRepository {
 }
 
 func (m *MockRepository) SaveTX(_ context.Context, txTable *database.Transaction, outputs []*database.Output, data []*database.Data) error {
+	if m.errOnSave != nil {
+		return m.errOnSave
+	}
 	m.transactions[txTable.ID] = *txTable
 	for _, output := range outputs {
 		m.outputs[output.Outpoint().String()] = *output
@@ -36,6 +42,9 @@ func (m *MockRepository) SaveTX(_ context.Context, txTable *database.Transaction
 }
 
 func (m *MockRepository) GetOutputs(_ context.Context, outpoints iter.Seq[bsv.Outpoint]) ([]*database.Output, error) {
+	if m.errOnGetOutputs != nil {
+		return nil, m.errOnGetOutputs
+	}
 	var outputs []*database.Output
 	for outpoint := range outpoints {
 		if output, ok := m.outputs[outpoint.String()]; ok {
@@ -55,6 +64,16 @@ func (m *MockRepository) WithUTXO(outpoint bsv.Outpoint) *MockRepository {
 		TxID: outpoint.TxID,
 		Vout: outpoint.Vout,
 	}
+	return m
+}
+
+func (m *MockRepository) WillFailOnSaveTX(err error) *MockRepository {
+	m.errOnSave = err
+	return m
+}
+
+func (m *MockRepository) WillFailOnGetOutputs(err error) *MockRepository {
+	m.errOnGetOutputs = err
 	return m
 }
 

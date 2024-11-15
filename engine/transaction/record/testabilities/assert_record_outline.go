@@ -64,12 +64,12 @@ func (a *assert) StoredAsBroadcasted(txID string) SuccessfullyCreatedRecordOutli
 }
 
 func (a *assert) StoredOutputs(outputs []database.Output) RecordOutlineAssert {
-	require.Subset(a.t, a.given.repository.GetAllOutputs(), outputs)
+	require.ElementsMatch(a.t, a.given.repository.GetAllOutputs(), outputs)
 	return a
 }
 
 func (a *assert) StoredData(data []database.Data) RecordOutlineAssert {
-	require.Subset(a.t, a.given.repository.GetAllData(), data)
+	require.ElementsMatch(a.t, a.given.repository.GetAllData(), data)
 	return a
 }
 

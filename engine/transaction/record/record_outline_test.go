@@ -36,6 +36,19 @@ func givenTxWithOpReturnWithoutOPFalse(t *testing.T) fixtures.GivenTXSpec {
 		)
 }
 
+func givenStandardOpReturnOutline(t *testing.T) *outlines.Transaction {
+	return &outlines.Transaction{
+		BEEF: givenTXWithOpReturn(t).BEEF(),
+		Annotations: transaction.Annotations{
+			Outputs: transaction.OutputsAnnotations{
+				0: &transaction.OutputAnnotation{
+					Bucket: bucket.Data,
+				},
+			},
+		},
+	}
+}
+
 func TestRecordOutlineOpReturn(t *testing.T) {
 	tests := map[string]struct {
 		storedUTXOs   []bsv.Outpoint
@@ -46,17 +59,8 @@ func TestRecordOutlineOpReturn(t *testing.T) {
 	}{
 		"RecordTransactionOutline for op_return": {
 			storedUTXOs: []bsv.Outpoint{givenTXWithOpReturn(t).InputUTXO(0)},
-			outline: &outlines.Transaction{
-				BEEF: givenTXWithOpReturn(t).BEEF(),
-				Annotations: transaction.Annotations{
-					Outputs: transaction.OutputsAnnotations{
-						0: &transaction.OutputAnnotation{
-							Bucket: bucket.Data,
-						},
-					},
-				},
-			},
-			expectTxID: givenTXWithOpReturn(t).ID(),
+			outline:     givenStandardOpReturnOutline(t),
+			expectTxID:  givenTXWithOpReturn(t).ID(),
 			expectOutputs: []database.Output{
 				{
 					TxID:       givenTXWithOpReturn(t).InputUTXO(0).TxID,
@@ -112,17 +116,8 @@ func TestRecordOutlineOpReturn(t *testing.T) {
 		},
 		"RecordTransactionOutline for op_return with untracked utxo as inputs": {
 			storedUTXOs: []bsv.Outpoint{},
-			outline: &outlines.Transaction{
-				BEEF: givenTXWithOpReturn(t).BEEF(),
-				Annotations: transaction.Annotations{
-					Outputs: transaction.OutputsAnnotations{
-						0: &transaction.OutputAnnotation{
-							Bucket: bucket.Data,
-						},
-					},
-				},
-			},
-			expectTxID: givenTXWithOpReturn(t).ID(),
+			outline:     givenStandardOpReturnOutline(t),
+			expectTxID:  givenTXWithOpReturn(t).ID(),
 			expectOutputs: []database.Output{{
 				TxID: givenTXWithOpReturn(t).ID(),
 				Vout: 0,
@@ -293,22 +288,47 @@ func TestOnBroadcastErr(t *testing.T) {
 		NewRecordService()
 
 	// and:
-	outline := &outlines.Transaction{
-		BEEF: givenTXWithOpReturn(t).BEEF(),
-		Annotations: transaction.Annotations{
-			Outputs: transaction.OutputsAnnotations{
-				0: &transaction.OutputAnnotation{
-					Bucket: bucket.Data,
-				},
-			},
-		},
-	}
+	outline := givenStandardOpReturnOutline(t)
 
 	// when:
 	err := service.RecordTransactionOutline(context.Background(), outline)
 
 	// then:
 	then.WithErrorIs(err, txerrors.ErrTxBroadcast).NothingChanged()
+}
+
+func TestOnSaveTXErr(t *testing.T) {
+	// given:
+	given, then := testabilities.New(t)
+	service := given.
+		WillFailOnSaveTX(errors.New("saveTX error")).
+		NewRecordService()
+
+	// and:
+	outline := givenStandardOpReturnOutline(t)
+
+	// when:
+	err := service.RecordTransactionOutline(context.Background(), outline)
+
+	// then:
+	then.WithErrorIs(err, txerrors.ErrSavingData).NothingChanged()
+}
+
+func TestOnGetOutputsErr(t *testing.T) {
+	// given:
+	given, then := testabilities.New(t)
+	service := given.
+		WillFailOnGetOutputs(errors.New("getOutputs error")).
+		NewRecordService()
+
+	// and:
+	outline := givenStandardOpReturnOutline(t)
+
+	// when:
+	err := service.RecordTransactionOutline(context.Background(), outline)
+
+	// then:
+	then.WithErrorIs(err, txerrors.ErrGettingOutputs).NothingChanged()
 }
 
 func ptr[T any](value T) *T {

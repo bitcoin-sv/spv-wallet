@@ -16,6 +16,8 @@ type RecordServiceFixture interface {
 	WithStoredOutputs(outputs ...database.Output) RecordServiceFixture
 
 	WillFailOnBroadcast(err error) RecordServiceFixture
+	WillFailOnSaveTX(err error) RecordServiceFixture
+	WillFailOnGetOutputs(err error) RecordServiceFixture
 }
 
 type recordServiceFixture struct {
@@ -58,5 +60,15 @@ func (f *recordServiceFixture) WithStoredOutputs(outputs ...database.Output) Rec
 
 func (f *recordServiceFixture) WillFailOnBroadcast(err error) RecordServiceFixture {
 	f.broadcaster.willFailOnBroadcast(err)
+	return f
+}
+
+func (f *recordServiceFixture) WillFailOnSaveTX(err error) RecordServiceFixture {
+	f.repository.WillFailOnSaveTX(err)
+	return f
+}
+
+func (f *recordServiceFixture) WillFailOnGetOutputs(err error) RecordServiceFixture {
+	f.repository.WillFailOnGetOutputs(err)
 	return f
 }
