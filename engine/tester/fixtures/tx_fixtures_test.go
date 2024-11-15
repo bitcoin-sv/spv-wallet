@@ -1,10 +1,11 @@
 package fixtures
 
 import (
+	"testing"
+
 	"github.com/bitcoin-sv/go-sdk/script"
 	"github.com/bitcoin-sv/go-sdk/spv"
 	"github.com/stretchr/testify/require"
-	"testing"
 )
 
 func givenTXSpec(t *testing.T) GivenTXSpec {
