@@ -62,4 +62,7 @@ var (
 
 	// ErrAnnotationIndexConversion is when the annotation index conversion fails.
 	ErrAnnotationIndexConversion = models.SPVError{Code: "error-annotation-index-conversion", Message: "failed to convert annotation index", StatusCode: 400}
+
+	// ErrOnlyPushDataAllowed is when only PUSHDATA operations are allowed in OP_RETURN script.
+	ErrOnlyPushDataAllowed = models.SPVError{Code: "error-only-push-data-allowed", Message: "Only PUSHDATA operations are allowed in OP_RETURN script", StatusCode: 400}
 )

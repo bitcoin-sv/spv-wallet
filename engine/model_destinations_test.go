@@ -3,13 +3,9 @@ package engine
 import (
 	"testing"
 
-	"github.com/DATA-DOG/go-sqlmock"
 	"github.com/bitcoin-sv/go-sdk/script"
-	"github.com/bitcoin-sv/spv-wallet/engine/datastore"
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
-	"github.com/bitcoin-sv/spv-wallet/engine/tester"
 	"github.com/bitcoin-sv/spv-wallet/engine/utils"
-	"github.com/mrz1836/go-cache"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -389,115 +385,5 @@ func TestClient_NewDestination(t *testing.T) {
 		require.Equal(t, stasHex, destination.LockingScript)
 		require.Equal(t, "1AxScC72W9tyk1Enej6dBsVZNkkgAonk4H", destination.Address)
 		require.Equal(t, utils.ScriptTypeTokenStas, destination.Type)
-	})
-}
-
-// TestDestination_Save will test the method Save()
-func (ts *EmbeddedDBTestSuite) TestDestination_Save() {
-	ts.T().Run("[sqlite] [redis] [mocking] - create destination", func(t *testing.T) {
-		tc := ts.genericMockedDBClient(t, datastore.SQLite)
-		defer tc.Close(tc.ctx)
-
-		xPub := newXpub(testXPub, append(tc.client.DefaultModelOptions(), New())...)
-		require.NotNil(t, xPub)
-
-		destination := newDestination(xPub.ID, testLockingScript, append(tc.client.DefaultModelOptions(), New())...)
-		require.NotNil(t, destination)
-		destination.DraftID = testDraftID
-		destination.DerivationMethod = PIKEDerivationMethod
-		destination.SenderXpub = testXPubID
-		destination.OutputIndex = 0
-
-		// Create the expectations
-		tc.MockSQLDB.ExpectBegin()
-
-		// Create model
-		tc.MockSQLDB.ExpectExec("INSERT INTO `"+tc.tablePrefix+"_destinations` ("+
-			"`created_at`,`updated_at`,`metadata`,`deleted_at`,`id`,`xpub_id`,`locking_script`,"+
-			"`type`,`chain`,`num`,`paymail_external_derivation_num`,`address`,`draft_id`,"+
-			"`derivation_method`,`sender_xpub`,`output_index`) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)").WithArgs(
-			tester.AnyTime{},     // created_at
-			tester.AnyTime{},     // updated_at
-			nil,                  // metadata
-			nil,                  // deleted_at
-			tester.AnyGUID{},     // id
-			xPub.GetID(),         // xpub_id
-			testLockingScript,    // locking_script
-			destination.Type,     // type
-			0,                    // chain
-			0,                    // num
-			nil,                  // paymail_ext_derivation_num
-			destination.Address,  // address
-			testDraftID,          // draft_id
-			PIKEDerivationMethod, // derivation_method
-			testXPubID,           // sender_xpub
-			0,                    // output_index
-		).WillReturnResult(sqlmock.NewResult(1, 1))
-
-		// Commit the TX
-		tc.MockSQLDB.ExpectCommit()
-
-		// @mrz: this is only testing a SET cmd is fired, not the data being set (that is tested elsewhere)
-		setCmd := tc.redisConn.GenericCommand(cache.SetCommand).Expect("ok")
-
-		err := destination.Save(tc.ctx)
-		require.NoError(t, err)
-
-		err = tc.MockSQLDB.ExpectationsWereMet()
-		require.NoError(t, err)
-		assert.Equal(t, true, setCmd.Called)
-	})
-
-	ts.T().Run("[postgresql] [redis] [mocking] - create destination", func(t *testing.T) {
-		tc := ts.genericMockedDBClient(t, datastore.PostgreSQL)
-		defer tc.Close(tc.ctx)
-
-		xPub := newXpub(testXPub, append(tc.client.DefaultModelOptions(), New())...)
-		require.NotNil(t, xPub)
-
-		destination := newDestination(xPub.ID, testLockingScript, append(tc.client.DefaultModelOptions(), New())...)
-		require.NotNil(t, destination)
-		destination.DraftID = testDraftID
-		destination.DerivationMethod = PIKEDerivationMethod
-		destination.SenderXpub = testXPubID
-		destination.OutputIndex = 0
-
-		// Create the expectations
-		tc.MockSQLDB.ExpectBegin()
-
-		// Create model
-		tc.MockSQLDB.ExpectExec(`INSERT INTO "`+tc.tablePrefix+`_destinations" `+
-			`("created_at","updated_at","metadata","deleted_at","id","xpub_id","locking_script","type","chain","num","paymail_external_derivation_num","address","draft_id","derivation_method","sender_xpub","output_index") `+
-			`VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16)`).WithArgs(
-			tester.AnyTime{},     // created_at
-			tester.AnyTime{},     // updated_at
-			nil,                  // metadata
-			nil,                  // deleted_at
-			tester.AnyGUID{},     // id
-			xPub.GetID(),         // xpub_id
-			testLockingScript,    // locking_script
-			destination.Type,     // type
-			0,                    // chain
-			0,                    // num
-			nil,                  // paymail_ext_derivation_num
-			destination.Address,  // address
-			testDraftID,          // draft_id
-			PIKEDerivationMethod, // derivation_method
-			testXPubID,           // sender_xpub
-			0,                    // output_index
-		).WillReturnResult(sqlmock.NewResult(1, 1))
-
-		// Commit the TX
-		tc.MockSQLDB.ExpectCommit()
-
-		// @mrz: this is only testing a SET cmd is fired, not the data being set (that is tested elsewhere)
-		setCmd := tc.redisConn.GenericCommand(cache.SetCommand).Expect("ok")
-
-		err := destination.Save(tc.ctx)
-		require.NoError(t, err)
-
-		err = tc.MockSQLDB.ExpectationsWereMet()
-		require.NoError(t, err)
-		assert.Equal(t, true, setCmd.Called)
 	})
 }

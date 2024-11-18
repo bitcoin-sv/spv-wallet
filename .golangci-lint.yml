@@ -112,6 +112,14 @@ issues:
         - wrapcheck
         - bodyclose
 
+    - path: tester/
+      linters:
+        - gocyclo
+        - errcheck
+        - gosec
+        - wrapcheck
+        - bodyclose
+
     # Exclude known linters from partially "hard-vendored" code,
     # which is impossible to exclude via "nolint" comments.
     - path: internal/hmac/
