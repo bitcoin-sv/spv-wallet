@@ -5,12 +5,13 @@ import (
 	"database/sql/driver"
 	"encoding/hex"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"reflect"
-	"sort"
 
+	"github.com/bitcoin-sv/go-sdk/chainhash"
 	trx "github.com/bitcoin-sv/go-sdk/transaction"
-	"github.com/bitcoin-sv/go-sdk/util"
+	"github.com/bitcoin-sv/spv-wallet/conv"
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/bitcoin-sv/spv-wallet/engine/utils"
 )
@@ -18,14 +19,18 @@ import (
 const maxBumpHeight = 64
 
 // BUMPs represents a slice of BUMPs - BSV Unified Merkle Paths
-type BUMPs []*BUMP
+type BUMPs []*trx.MerklePath
+
+// MerklePath wraps trx.MerklePath from which is a BSV Unified Merkle Path
+type MerklePath struct{ trx.MerklePath }
+
+// MerklePaths represents a slice of MerklePath
+type MerklePaths []*trx.MerklePath
 
 // BUMP represents BUMP (BSV Unified Merkle Path) format
 type BUMP struct {
 	BlockHeight uint64       `json:"blockHeight,string"`
 	Path        [][]BUMPLeaf `json:"path"`
-	// private field for storing already used offsets to avoid duplicate nodes
-	allNodes []map[uint64]bool
 }
 
 // BUMPLeaf represents each BUMP path element
@@ -36,17 +41,20 @@ type BUMPLeaf struct {
 	Duplicate bool   `json:"duplicate,omitempty"`
 }
 
-// CalculateMergedBUMP calculates Merged BUMP from a slice of BUMPs
-func CalculateMergedBUMP(bumps []BUMP) (*BUMP, error) {
-	if len(bumps) == 0 || bumps == nil {
-		return nil, nil
+// CalculateMergedBUMPSDK calculates Merged BUMP from a slice of BUMPs
+func CalculateMergedBUMPSDK(bumps []trx.MerklePath) (*trx.MerklePath, error) {
+	if len(bumps) == 0 {
+		return nil, errors.New("no BUMPs provided")
 	}
 
-	blockHeight := bumps[0].BlockHeight
-	bumpHeight := len(bumps[0].Path)
+	// Initialize merged BUMP as a copy of the first element in the list
+	mergedBump := bumps[0]
+
+	// Check block height consistency and maximum bump height constraints
+	blockHeight := mergedBump.BlockHeight
+	bumpHeight := len(mergedBump.Path)
 	if bumpHeight > maxBumpHeight {
-		return nil,
-			spverrors.Newf("BUMP cannot be higher than %d", maxBumpHeight)
+		return nil, spverrors.Newf("BUMP cannot be higher than %d", maxBumpHeight)
 	}
 
 	for _, b := range bumps {
@@ -178,47 +186,17 @@ func calculateMerkleRoot(baseLeaf BUMPLeaf, bump *BUMP) (string, error) {
 		baseLeaf = BUMPLeaf{
 			Hash:   calculatedHash,
 			Offset: offset,
+	// Iterate and merge each BUMP into the mergedBump
+	for _, bump := range bumps[1:] {
+		if bump.BlockHeight != blockHeight {
+			return nil, spverrors.Newf("inconsistent block heights in BUMPs")
+		}
+		if err := mergedBump.Combine(&bump); err != nil {
+			return nil, spverrors.Wrapf(err, "failed to combine BUMPs")
 		}
 	}
 
-	return calculatedHash, nil
-}
-
-func findLeafByOffset(offset uint64, bumpLeaves []BUMPLeaf) *BUMPLeaf {
-	for _, bumpTx := range bumpLeaves {
-		if bumpTx.Offset == offset {
-			return &bumpTx
-		}
-	}
-	return nil
-}
-
-func getOffsetPair(offset uint64) uint64 {
-	if offset%2 == 0 {
-		return offset + 1
-	}
-	return offset - 1
-}
-
-func prepareNodes(baseLeaf BUMPLeaf, offset uint64, leafInPair BUMPLeaf, newOffset uint64) (string, string) {
-	var baseLeafHash, pairLeafHash string
-
-	if baseLeaf.Duplicate {
-		baseLeafHash = leafInPair.Hash
-	} else {
-		baseLeafHash = baseLeaf.Hash
-	}
-
-	if leafInPair.Duplicate {
-		pairLeafHash = baseLeaf.Hash
-	} else {
-		pairLeafHash = leafInPair.Hash
-	}
-
-	if newOffset > offset {
-		return baseLeafHash, pairLeafHash
-	}
-	return pairLeafHash, baseLeafHash
+	return &mergedBump, nil
 }
 
 // Bytes returns BUMPs bytes
@@ -233,86 +211,7 @@ func (bumps *BUMPs) Bytes() []byte {
 	return buff.Bytes()
 }
 
-// Hex returns BUMP in hex format
-func (bump *BUMP) Hex() string {
-	return bump.bytesBuffer().String()
-}
 
-func (bump *BUMP) bytesBuffer() *bytes.Buffer {
-	var buff bytes.Buffer
-	buff.WriteString(hex.EncodeToString(trx.VarInt(bump.BlockHeight).Bytes()))
-
-	height := len(bump.Path)
-	buff.WriteString(leadingZeroInt(height))
-
-	for i := 0; i < height; i++ {
-		nodes := bump.Path[i]
-
-		nLeafs := len(nodes)
-		buff.WriteString(hex.EncodeToString(trx.VarInt(nLeafs).Bytes()))
-		for _, n := range nodes {
-			buff.WriteString(hex.EncodeToString(trx.VarInt(n.Offset).Bytes()))
-			buff.WriteString(fmt.Sprintf("%02x", flags(n.TxID, n.Duplicate)))
-			decodedHex, _ := hex.DecodeString(n.Hash)
-			buff.WriteString(hex.EncodeToString(util.ReverseBytes(decodedHex)))
-		}
-	}
-	return &buff
-}
-
-// In case the offset or height is less than 10, they must be written with a leading zero
-func leadingZeroInt(i int) string {
-	return fmt.Sprintf("%02x", i)
-}
-
-func flags(txID, duplicate bool) byte {
-	var (
-		dataFlag      byte = 0o0
-		duplicateFlag byte = 0o1
-		txIDFlag      byte = 0o2
-	)
-
-	if duplicate {
-		return duplicateFlag
-	}
-	if txID {
-		return txIDFlag
-	}
-	return dataFlag
-}
-
-// Scan scan value into Json, implements sql.Scanner interface
-func (bump *BUMP) Scan(value interface{}) error {
-	if value == nil {
-		return nil
-	}
-
-	byteValue, err := utils.ToByteArray(value)
-	if err != nil || bytes.Equal(byteValue, []byte("")) || bytes.Equal(byteValue, []byte("\"\"")) {
-		return nil
-	}
-
-	err = json.Unmarshal(byteValue, &bump)
-	return spverrors.Wrapf(err, "failed to parse BUMP from JSON, data: %v", value)
-}
-
-// IsEmpty returns true if BUMP is empty (all fields are zero values)
-func (bump BUMP) IsEmpty() bool {
-	return reflect.DeepEqual(bump, BUMP{})
-}
-
-// Value return json value, implement driver.Valuer interface
-func (bump BUMP) Value() (driver.Value, error) {
-	if bump.IsEmpty() {
-		return nil, nil
-	}
-	marshal, err := json.Marshal(bump)
-	if err != nil {
-		return nil, spverrors.Wrapf(err, "failed to convert BUMP to JSON, data: %v", bump)
-	}
-
-	return string(marshal), nil
-}
 
 // Scan scan value into Json, implements sql.Scanner interface
 func (bumps *BUMPs) Scan(value interface{}) error {
@@ -342,29 +241,90 @@ func (bumps BUMPs) Value() (driver.Value, error) {
 	return string(marshal), nil
 }
 
-func sdkMPToBUMP(sdkMerklePath *trx.MerklePath) BUMP {
-	path := make([][]BUMPLeaf, len(sdkMerklePath.Path))
-	for i := range sdkMerklePath.Path {
-		path[i] = make([]BUMPLeaf, len(sdkMerklePath.Path[i]))
-		for j, source := range sdkMerklePath.Path[i] {
-			leaf := BUMPLeaf{}
-			leaf.Offset = source.Offset
-			if source.Hash != nil {
-				leaf.Hash = source.Hash.String()
+// ToMerklePath converts BUMP to trx.MerklePath
+func (b *BUMP) ToMerklePath() (*trx.MerklePath, error) {
+	blockHeight, err := conv.Uint64ToUint32(b.BlockHeight)
+	if err != nil {
+		return nil, spverrors.Wrapf(err, "error in ToMerklePath: failed to convert block height to uint32")
+	}
+	mp := &trx.MerklePath{
+		BlockHeight: blockHeight,
+		Path:        make([][]*trx.PathElement, len(b.Path)),
+	}
+	for i, level := range b.Path {
+		mp.Path[i] = make([]*trx.PathElement, len(level))
+		for j, leaf := range level {
+			hash, err := chainhash.NewHashFromHex(leaf.Hash)
+			if err != nil {
+				return nil, spverrors.Wrapf(err, "error in ToMerklePath: failed to create chainhash from hex")
 			}
-
-			if source.Txid != nil {
-				leaf.TxID = *source.Txid
+			mp.Path[i][j] = &trx.PathElement{
+				Offset:    leaf.Offset,
+				Hash:      hash,
+				Txid:      &leaf.TxID,
+				Duplicate: &leaf.Duplicate,
 			}
-			if source.Duplicate != nil {
-				leaf.Duplicate = *source.Duplicate
-			}
-
-			path[i][j] = leaf
 		}
 	}
-	return BUMP{
-		BlockHeight: uint64(sdkMerklePath.BlockHeight),
-		Path:        path,
+	return mp, nil
+}
+
+// FromMerklePath converts trx.MerklePath to BUMP
+func FromMerklePath(mp *trx.MerklePath) (*BUMP, error) {
+	b := &BUMP{
+		BlockHeight: uint64(mp.BlockHeight),
+		Path:        make([][]BUMPLeaf, len(mp.Path)),
 	}
+	for i, level := range mp.Path {
+		b.Path[i] = make([]BUMPLeaf, len(level))
+		for j, leaf := range level {
+			b.Path[i][j] = BUMPLeaf{
+				Offset:    leaf.Offset,
+				Hash:      leaf.Hash.String(),
+				TxID:      leaf.Txid != nil && *leaf.Txid,
+				Duplicate: leaf.Duplicate != nil && *leaf.Duplicate,
+			}
+		}
+	}
+	return b, nil
+}
+
+// Scan scan value into Json, implements sql.Scanner interface
+func (bump *BUMP) Scan(value interface{}) error {
+	if value == nil {
+		return nil
+	}
+
+	byteValue, err := utils.ToByteArray(value)
+	if err != nil || bytes.Equal(byteValue, []byte("")) || bytes.Equal(byteValue, []byte("\"\"")) {
+		return nil
+	}
+
+	// Unmarshal into your BUMP struct
+	err = json.Unmarshal(byteValue, bump)
+	if err != nil {
+		return fmt.Errorf("failed to parse BUMP from JSON: %w", err)
+	}
+
+	return nil
+}
+
+// IsEmpty returns true if BUMP is empty (all fields are zero values)
+func (bump BUMP) IsEmpty() bool {
+	return reflect.DeepEqual(bump, BUMP{})
+}
+
+// Value return json value, implement driver.Valuer interface
+func (bump BUMP) Value() (driver.Value, error) {
+	if bump.IsEmpty() {
+		return nil, nil
+	}
+
+	// Marshal your BUMP struct
+	marshal, err := json.Marshal(bump)
+	if err != nil {
+		return nil, fmt.Errorf("failed to convert BUMP to JSON: %w", err)
+	}
+
+	return string(marshal), nil
 }

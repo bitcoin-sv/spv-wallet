@@ -8,6 +8,7 @@ import (
 	"github.com/bitcoin-sv/go-paymail/beef"
 	"github.com/bitcoin-sv/go-paymail/server"
 	"github.com/bitcoin-sv/go-paymail/spv"
+	"github.com/bitcoin-sv/go-sdk/chainhash"
 	ec "github.com/bitcoin-sv/go-sdk/primitives/ec"
 	"github.com/bitcoin-sv/go-sdk/script"
 	trx "github.com/bitcoin-sv/go-sdk/transaction"
@@ -318,7 +319,7 @@ func saveBEEFTxInputs(ctx context.Context, c ClientInterface, dBeef *beef.Decode
 	}
 
 	for _, input := range inputsToAdd {
-		var bump *BUMP
+		var bump *trx.MerklePath
 		if input.BumpIndex != nil { // mined
 			bumpIndex, err := conv.VarIntToInt(input.BumpIndex)
 			if err != nil {
@@ -370,39 +371,51 @@ func getInputsWhichAreNotInDb(c ClientInterface, dBeef *beef.DecodedBEEF) ([]*be
 	return txs, nil
 }
 
-func getBump(bumpIndex int, bumps beef.BUMPs) (*BUMP, error) {
+func getBump(bumpIndex int, bumps beef.BUMPs) (*trx.MerklePath, error) {
 	if bumpIndex > len(bumps) {
 		return nil, spverrors.Newf("error in getBump: bump index exceeds bumps length")
 	}
 
 	bump := bumps[bumpIndex]
-	paths := make([][]BUMPLeaf, 0)
+	paths := make([][]*trx.PathElement, 0)
 
 	for _, path := range bump.Path {
-		pathLeaves := make([]BUMPLeaf, 0)
+		pathLeaves := make([]*trx.PathElement, 0)
 		for _, leaf := range path {
-			l := BUMPLeaf{
+			chainhashHash, err := chainhash.NewHashFromHex(leaf.Hash)
+			if err != nil {
+				return nil, spverrors.Wrapf(err, "error in getBump: failed to create chainhash from hex")
+			}
+			l := &trx.PathElement{
 				Offset:    leaf.Offset,
-				Hash:      leaf.Hash,
-				TxID:      leaf.TxId,
-				Duplicate: leaf.Duplicate,
+				Hash:      chainhashHash,
+				Txid:      &leaf.TxId,
+				Duplicate: &leaf.Duplicate,
 			}
 			pathLeaves = append(pathLeaves, l)
 		}
 		paths = append(paths, pathLeaves)
 	}
 
-	return &BUMP{
-		BlockHeight: bump.BlockHeight,
+	blockHeight, err := conv.Uint64ToUint32(bump.BlockHeight)
+	if err != nil {
+		return nil, spverrors.Wrapf(err, "error in getBump: failed to convert block height")
+	}
+	return &trx.MerklePath{
+		BlockHeight: blockHeight,
 		Path:        paths,
 	}, nil
 }
 
-func saveBeefTransactionInput(ctx context.Context, c ClientInterface, input *beef.TxData, bump *BUMP) error {
+func saveBeefTransactionInput(ctx context.Context, c ClientInterface, input *beef.TxData, bump *trx.MerklePath) error {
 	newOpts := c.DefaultModelOptions(New())
 	inputTx, _ := txFromHex(input.Transaction.String(), newOpts...) // we can ignore error here
 
 	if bump != nil {
+		bump, err := FromMerklePath(bump)
+		if err != nil {
+			return spverrors.Wrapf(err, "error in saveBeefTransactionInput during bump conversion")
+		}
 		inputTx.BUMP = *bump
 		inputTx.TxStatus = TxStatusMined
 	}

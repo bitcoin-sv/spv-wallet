@@ -8,27 +8,27 @@ import (
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 )
 
-func calculateMergedBUMP(txs []*Transaction) (BUMPs, error) {
-	bumps := make(map[uint64][]BUMP)
-	mergedBUMPs := make(BUMPs, 0)
+func calculateMergedBUMPSDK(txs []*trx.Transaction) ([]*trx.MerklePath, error) {
+	bumps := make(map[uint32][]trx.MerklePath)
+	mergedBUMPs := make([]*trx.MerklePath, 0)
 
 	for _, tx := range txs {
-		if tx.BUMP.BlockHeight == 0 || len(tx.BUMP.Path) == 0 {
+		if tx.MerklePath == nil || tx.MerklePath.BlockHeight == 0 || len(tx.MerklePath.Path) == 0 {
 			continue
 		}
 
-		bumps[tx.BlockHeight] = append(bumps[tx.BlockHeight], tx.BUMP)
+		bumps[tx.MerklePath.BlockHeight] = append(bumps[tx.MerklePath.BlockHeight], *tx.MerklePath)
 	}
 
 	// ensure that BUMPs are sorted by block height and will always be put in beef in the same order
-	mapKeys := make([]uint64, 0, len(bumps))
+	mapKeys := make([]uint32, 0, len(bumps))
 	for k := range bumps {
 		mapKeys = append(mapKeys, k)
 	}
 	sort.Slice(mapKeys, func(i, j int) bool { return mapKeys[i] < mapKeys[j] })
 
 	for _, k := range mapKeys {
-		bump, err := CalculateMergedBUMP(bumps[k])
+		bump, err := CalculateMergedBUMPSDK(bumps[k])
 		if err != nil {
 			return nil, spverrors.Wrapf(err, "failed to calculate merged BUMP")
 		}
@@ -41,14 +41,14 @@ func calculateMergedBUMP(txs []*Transaction) (BUMPs, error) {
 	return mergedBUMPs, nil
 }
 
-func validateBumps(bumps BUMPs) error {
+func validatMerklePaths(bumps []*trx.MerklePath) error {
 	if len(bumps) == 0 {
-		return spverrors.Newf("empty bump paths slice")
+		return spverrors.Newf("empty BUMP paths slice")
 	}
 
 	for _, p := range bumps {
 		if len(p.Path) == 0 {
-			return spverrors.Newf("one of bump path is empty")
+			return spverrors.Newf("one of BUMP path is empty")
 		}
 	}
 
@@ -74,7 +74,15 @@ func prepareBEEFFactors(ctx context.Context, tx *Transaction, store TransactionG
 	for _, inputTx := range inputTxs {
 		inputSDKTx, err := trx.NewTransactionFromHex(inputTx.Hex)
 		if err != nil {
-			return nil, nil, spverrors.Wrapf(err, "cannot convert to SDK Tx from hex (tx.ID: %s)", inputTx.ID)
+			return nil, nil, spverrors.Wrapf(err, "cannot create new tx", inputTx.ID)
+		}
+		if inputTx.BUMP.BlockHeight != 0 {
+			//inputSDKTx.MerklePath, err = trx.NewMerklePathFromHex(inputTx.BUMP.Hex())
+			merklepath, err := inputTx.BUMP.ToMerklePath()
+			if err != nil {
+				return nil, nil, spverrors.Wrapf(err, "cannot convert to SDK Tx from hex (tx.ID: %s)", inputTx.ID)
+			}
+			inputSDKTx.MerklePath = merklepath
 		}
 
 		txsNeededForBUMP = append(txsNeededForBUMP, inputTx)
@@ -111,6 +119,14 @@ func checkParentTransactions(ctx context.Context, store TransactionGetter, sdkTx
 		parentSDKTx, err := trx.NewTransactionFromHex(parentTx.Hex)
 		if err != nil {
 			return nil, nil, spverrors.Wrapf(err, "cannot convert to SDK Tx from hex (tx.ID: %s)", parentTx.ID)
+		}
+		if parentTx.BUMP.BlockHeight != 0 {
+			//parentSDKTx.MerklePath, err = trx.NewMerklePathFromHex(parentTx.BUMP.Hex())
+			merklepath, err := parentTx.BUMP.ToMerklePath()
+			if err != nil {
+				return nil, nil, spverrors.Wrapf(err, "cannot convert to SDK Tx from hex (tx.ID: %s)", parentTx.ID)
+			}
+			parentSDKTx.MerklePath = merklepath
 		}
 		validTxs = append(validTxs, parentTx)
 		validSDKTxs = append(validSDKTxs, parentSDKTx)
