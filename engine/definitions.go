@@ -2,6 +2,8 @@ package engine
 
 import (
 	"time"
+
+	"github.com/bitcoin-sv/spv-wallet/engine/database"
 )
 
 // Defaults for engine functionality
@@ -111,15 +113,23 @@ const (
 	cacheKeyXpubModel                       = "xpub-id-%s"                    // model-id-<xpub_id>
 )
 
-// AllDBModels is the list of models for loading the engine and AutoMigration (defaults)
-var AllDBModels = []interface{}{
-	&Xpub{},
-	&AccessKey{},
-	&DraftTransaction{},
-	&Transaction{},
-	&Destination{},
-	&Utxo{},
-	&Contact{},
-	&Webhook{},
-	&PaymailAddress{},
+// AllDBModels returns all the database models, e.g. for migrations.
+func AllDBModels() []any {
+	legacyModels := []any{
+		&Xpub{},
+		&AccessKey{},
+		&DraftTransaction{},
+		&Transaction{},
+		&Destination{},
+		&Utxo{},
+		&Contact{},
+		&Webhook{},
+		&PaymailAddress{},
+	}
+
+	// New models from database package
+	// NOTE: Our intention is to move all models to the database package in the future
+	dbModels := database.Models()
+
+	return append(legacyModels, dbModels...)
 }

@@ -38,9 +38,10 @@ func (s *Service) RecordTransactionOutline(ctx context.Context, outline *outline
 		return err
 	}
 
-	if err = s.broadcaster.Broadcast(ctx, tx); err != nil {
+	if _, err = s.broadcaster.Broadcast(ctx, tx); err != nil {
 		return txerrors.ErrTxBroadcast.Wrap(err)
 	}
+	// TODO: handle TXInfo returned from Broadcast (SPV-1157)
 
 	txID := tx.TxID().String()
 	for _, utxo := range utxos {
@@ -51,9 +52,10 @@ func (s *Service) RecordTransactionOutline(ctx context.Context, outline *outline
 		ID:       txID,
 		TxStatus: database.TxStatusBroadcasted,
 	}
+	txRecord.AddOutputs(append(newOutputs, utxos...)...) //newly created outputs and spent utxos
+	txRecord.AddData(newDataRecords...)
 
-	upsertOutputs := append(newOutputs, utxos...) //newly created outputs and spent utxos
-	err = s.repo.SaveTX(ctx, &txRecord, upsertOutputs, newDataRecords)
+	err = s.repo.SaveTX(ctx, &txRecord)
 	if err != nil {
 		return txerrors.ErrSavingData.Wrap(err)
 	}

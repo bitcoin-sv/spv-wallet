@@ -3,7 +3,6 @@ package database
 import "github.com/bitcoin-sv/spv-wallet/models/bsv"
 
 // Output represents an output of a transaction.
-// Fixme: This is not integrated with out db engine yet.
 type Output struct {
 	TxID       string  `gorm:"primaryKey"`
 	Vout       uint32  `gorm:"primaryKey"`

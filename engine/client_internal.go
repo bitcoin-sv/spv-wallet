@@ -14,6 +14,7 @@ import (
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/bitcoin-sv/spv-wallet/engine/taskmanager"
 	"github.com/bitcoin-sv/spv-wallet/engine/transaction/outlines"
+	"github.com/bitcoin-sv/spv-wallet/engine/transaction/record"
 	"github.com/mrz1836/go-cachestore"
 )
 
@@ -64,14 +65,18 @@ func (c *Client) autoMigrate(ctx context.Context) error {
 	if c.Datastore() == nil {
 		return spverrors.Newf("datastore is not loaded")
 	}
-	if err := c.Datastore().DB().WithContext(ctx).AutoMigrate(AllDBModels...); err != nil {
+
+	db := c.Datastore().DB().WithContext(ctx)
+	models := AllDBModels()
+
+	if err := db.AutoMigrate(models...); err != nil {
 		return spverrors.Wrapf(err, "failed to auto-migrate models")
 	}
 
 	// Legacy code compatibility:
 	// Some models implement post-migration logic to e.g. manually add some indexes
 	// NOTE: In the future, we should remove this and stick to GORM features
-	for _, model := range AllDBModels {
+	for _, model := range models {
 		if migrator, ok := model.(interface {
 			PostMigrate(client datastore.ClientInterface) error
 		}); ok {
@@ -197,6 +202,14 @@ func (c *Client) loadTransactionOutlinesService() error {
 	if c.options.transactionOutlinesService == nil {
 		logger := c.Logger().With().Str("subservice", "transactionOutlines").Logger()
 		c.options.transactionOutlinesService = outlines.NewService(c.PaymailService(), c.options.paymailAddressService, logger)
+	}
+	return nil
+}
+
+func (c *Client) loadTransactionRecordService() error {
+	if c.options.transactionRecordService == nil {
+		logger := c.Logger().With().Str("subservice", "transactionRecord").Logger()
+		c.options.transactionRecordService = record.NewService(logger, &recordTXRepository{c.Datastore().DB()}, c.Chain())
 	}
 	return nil
 }

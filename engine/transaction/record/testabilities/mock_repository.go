@@ -27,15 +27,15 @@ func newMockRepository() *mockRepository {
 	}
 }
 
-func (m *mockRepository) SaveTX(_ context.Context, txTable *database.Transaction, outputs []*database.Output, data []*database.Data) error {
+func (m *mockRepository) SaveTX(_ context.Context, txTable *database.Transaction) error {
 	if m.errOnSave != nil {
 		return m.errOnSave
 	}
 	m.transactions[txTable.ID] = *txTable
-	for _, output := range outputs {
+	for _, output := range txTable.Outputs {
 		m.outputs[output.Outpoint().String()] = *output
 	}
-	for _, d := range data {
+	for _, d := range txTable.Data {
 		m.data[d.Outpoint().String()] = *d
 	}
 	return nil

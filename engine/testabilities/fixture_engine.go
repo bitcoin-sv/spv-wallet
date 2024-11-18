@@ -4,13 +4,13 @@ import (
 	"context"
 	"database/sql"
 	"errors"
-	"os"
 	"testing"
 
 	"github.com/bitcoin-sv/spv-wallet/config"
 	"github.com/bitcoin-sv/spv-wallet/engine"
 	"github.com/bitcoin-sv/spv-wallet/engine/datastore"
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
+	"github.com/bitcoin-sv/spv-wallet/engine/testabilities/testmode"
 	"github.com/bitcoin-sv/spv-wallet/engine/tester"
 	"github.com/bitcoin-sv/spv-wallet/engine/tester/fixtures"
 	"github.com/bitcoin-sv/spv-wallet/engine/tester/paymailmock"
@@ -38,6 +38,9 @@ type EngineFixture interface {
 
 	// BHS creates a new test fixture for Block Header Service (BHS)
 	BHS() BlockHeadersServiceFixture
+
+	// ARC creates a new test fixture for ARC
+	ARC() ARCFixture
 }
 
 type EngineWithConfig struct {
@@ -119,12 +122,11 @@ func (f *engineFixture) ConfigForTests(opts ...ConfigOpts) *config.AppConfig {
 
 // initDbConnection creates a new connection that will be used as connection for engine
 func (f *engineFixture) initDbConnection() {
-	mode := os.Getenv("TEST_DB_MODE")
-	if mode == "postgres" {
+	if ok, dbName := testmode.CheckPostgresMode(); ok {
 		f.config.Db.Datastore.Engine = datastore.PostgreSQL
 		f.config.Db.SQL.User = "postgres"
 		f.config.Db.SQL.Password = "postgres"
-		f.config.Db.SQL.Name = "postgres"
+		f.config.Db.SQL.Name = dbName
 		f.config.Db.SQL.Host = "localhost"
 		return
 	}
@@ -133,7 +135,7 @@ func (f *engineFixture) initDbConnection() {
 		panic("Other datastore engines are not supported in tests (yet)")
 	}
 
-	if mode == "file" {
+	if testmode.CheckFileSQLiteMode() {
 		f.dbConnectionString = fileDbConnectionString
 	} else {
 		f.dbConnectionString = inMemoryDbConnectionString

@@ -4,6 +4,7 @@ import (
 	"context"
 
 	trx "github.com/bitcoin-sv/go-sdk/transaction"
+	chainmodels "github.com/bitcoin-sv/spv-wallet/engine/chain/models"
 )
 
 type mockBroadcaster struct {
@@ -17,9 +18,12 @@ func newMockBroadcaster() *mockBroadcaster {
 	}
 }
 
-func (m *mockBroadcaster) Broadcast(_ context.Context, tx *trx.Transaction) error {
+func (m *mockBroadcaster) Broadcast(_ context.Context, tx *trx.Transaction) (*chainmodels.TXInfo, error) {
 	m.broadcastedTxs[tx.TxID().String()] = tx
-	return m.returnErr
+	return &chainmodels.TXInfo{
+		TXStatus: chainmodels.SeenOnNetwork,
+		TxID:     tx.TxID().String(),
+	}, m.returnErr
 }
 
 func (m *mockBroadcaster) WillFailOnBroadcast(err error) BroadcasterFixture {
