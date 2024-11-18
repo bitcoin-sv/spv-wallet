@@ -5,7 +5,6 @@ import (
 	"database/sql"
 	"testing"
 
-	"github.com/DATA-DOG/go-sqlmock"
 	compat "github.com/bitcoin-sv/go-sdk/compat/bip32"
 	"github.com/bitcoin-sv/spv-wallet/engine/datastore"
 	"github.com/bitcoin-sv/spv-wallet/engine/taskmanager"
@@ -21,8 +20,6 @@ type TestingClient struct {
 	client      ClientInterface  // Local SPV Wallet Engine client for testing
 	ctx         context.Context  // Current CTX
 	database    datastore.Engine // Current database
-	mocking     bool             // If mocking is enabled
-	MockSQLDB   sqlmock.Sqlmock  // Mock Database client for SQL
 	redisClient *cache.Client    // Current redis client (used for Mocking)
 	redisConn   *redigomock.Conn // Current redis connection (used for Mocking)
 	SQLConn     *sql.DB          // Read test client
