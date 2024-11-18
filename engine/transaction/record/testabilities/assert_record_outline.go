@@ -12,8 +12,8 @@ type ErrorAssert interface {
 }
 
 type RecordOutlineAssert interface {
-	WithNoError(err error) SuccessfullyCreatedRecordOutlineAssertion
-	WithErrorIs(err, expectedError error) ErrorAssert
+	NoError(err error) SuccessfullyCreatedRecordOutlineAssertion
+	ErrorIs(err, expectedError error) ErrorAssert
 
 	StoredOutputs([]database.Output) RecordOutlineAssert
 	StoredData([]database.Data) RecordOutlineAssert
@@ -38,12 +38,12 @@ func then(t testing.TB, given *recordServiceFixture) RecordOutlineAssert {
 	}
 }
 
-func (a *assert) WithNoError(err error) SuccessfullyCreatedRecordOutlineAssertion {
+func (a *assert) NoError(err error) SuccessfullyCreatedRecordOutlineAssertion {
 	a.require.NoError(err, "Record transaction outline has error")
 	return a
 }
 
-func (a *assert) WithErrorIs(err, expectedError error) ErrorAssert {
+func (a *assert) ErrorIs(err, expectedError error) ErrorAssert {
 	require.Error(a.t, err, "Record transaction outline has no error")
 	require.ErrorIs(a.t, err, expectedError, "Record transaction outline has wrong error")
 	return a

@@ -135,13 +135,15 @@ func TestRecordOutlineOpReturn(t *testing.T) {
 		t.Run(name, func(t *testing.T) {
 			// given:
 			given, then := testabilities.New(t)
-			service := given.WithStoredUTXO(test.storedUTXOs...).NewRecordService()
+			given.Repository().WithUTXOs(test.storedUTXOs...)
+
+			service := given.NewRecordService()
 
 			// when:
 			err := service.RecordTransactionOutline(context.Background(), test.outline)
 
 			// then:
-			then.WithNoError(err).
+			then.NoError(err).
 				Broadcasted(test.expectTxID).
 				StoredAsBroadcasted(test.expectTxID)
 
@@ -264,13 +266,15 @@ func TestRecordOutlineOpReturnErrorCases(t *testing.T) {
 		t.Run(name, func(t *testing.T) {
 			// given:
 			given, then := testabilities.New(t)
-			service := given.WithStoredOutputs(test.storedOutputs...).NewRecordService()
+			given.Repository().WithOutputs(test.storedOutputs...)
+
+			service := given.NewRecordService()
 
 			// when:
 			err := service.RecordTransactionOutline(context.Background(), test.outline)
 
 			// then:
-			then.WithErrorIs(err, test.expectErr).NothingChanged()
+			then.ErrorIs(err, test.expectErr).NothingChanged()
 		})
 	}
 }
@@ -278,14 +282,16 @@ func TestRecordOutlineOpReturnErrorCases(t *testing.T) {
 func TestOnBroadcastErr(t *testing.T) {
 	// given:
 	given, then := testabilities.New(t)
-	service := given.
-		WithStoredOutputs(database.Output{
+	given.Repository().
+		WithOutputs(database.Output{
 			TxID:       givenTXWithOpReturn(t).InputUTXO(0).TxID,
 			Vout:       givenTXWithOpReturn(t).InputUTXO(0).Vout,
 			SpendingTX: nil,
-		}).
-		WillFailOnBroadcast(errors.New("broadcast error")).
-		NewRecordService()
+		})
+	given.Broadcaster().
+		WillFailOnBroadcast(errors.New("broadcast error"))
+
+	service := given.NewRecordService()
 
 	// and:
 	outline := givenStandardOpReturnOutline(t)
@@ -294,15 +300,16 @@ func TestOnBroadcastErr(t *testing.T) {
 	err := service.RecordTransactionOutline(context.Background(), outline)
 
 	// then:
-	then.WithErrorIs(err, txerrors.ErrTxBroadcast).NothingChanged()
+	then.ErrorIs(err, txerrors.ErrTxBroadcast).NothingChanged()
 }
 
 func TestOnSaveTXErr(t *testing.T) {
 	// given:
 	given, then := testabilities.New(t)
-	service := given.
-		WillFailOnSaveTX(errors.New("saveTX error")).
-		NewRecordService()
+	given.Repository().
+		WillFailOnSaveTX(errors.New("saveTX error"))
+
+	service := given.NewRecordService()
 
 	// and:
 	outline := givenStandardOpReturnOutline(t)
@@ -311,15 +318,15 @@ func TestOnSaveTXErr(t *testing.T) {
 	err := service.RecordTransactionOutline(context.Background(), outline)
 
 	// then:
-	then.WithErrorIs(err, txerrors.ErrSavingData).NothingChanged()
+	then.ErrorIs(err, txerrors.ErrSavingData).NothingChanged()
 }
 
 func TestOnGetOutputsErr(t *testing.T) {
 	// given:
 	given, then := testabilities.New(t)
-	service := given.
-		WillFailOnGetOutputs(errors.New("getOutputs error")).
-		NewRecordService()
+	given.Repository().
+		WillFailOnGetOutputs(errors.New("getOutputs error"))
+	service := given.NewRecordService()
 
 	// and:
 	outline := givenStandardOpReturnOutline(t)
@@ -328,7 +335,7 @@ func TestOnGetOutputsErr(t *testing.T) {
 	err := service.RecordTransactionOutline(context.Background(), outline)
 
 	// then:
-	then.WithErrorIs(err, txerrors.ErrGettingOutputs).NothingChanged()
+	then.ErrorIs(err, txerrors.ErrGettingOutputs).NothingChanged()
 }
 
 func ptr[T any](value T) *T {
