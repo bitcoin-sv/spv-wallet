@@ -1,12 +1,12 @@
 package testabilities
 
 import (
-	"github.com/bitcoin-sv/spv-wallet/models/bsv"
 	"testing"
 
 	"github.com/bitcoin-sv/spv-wallet/engine/database"
 	"github.com/bitcoin-sv/spv-wallet/engine/tester"
 	"github.com/bitcoin-sv/spv-wallet/engine/transaction/record"
+	"github.com/bitcoin-sv/spv-wallet/models/bsv"
 )
 
 type RecordServiceFixture interface {
