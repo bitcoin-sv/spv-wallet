@@ -445,10 +445,3 @@ func WithBHS(url, token string) ClientOps {
 		}
 	}
 }
-
-// WithMigrationsDisabled will disable running migrations
-func WithMigrationsDisabled() ClientOps {
-	return func(c *clientOptions) {
-		c.migrationsDisabled = true
-	}
-}
