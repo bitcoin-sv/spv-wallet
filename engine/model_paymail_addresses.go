@@ -5,6 +5,7 @@ import (
 	"encoding/hex"
 	"errors"
 	"fmt"
+	"strings"
 
 	"github.com/bitcoin-sv/go-paymail"
 	compat "github.com/bitcoin-sv/go-sdk/compat/bip32"
@@ -364,5 +365,8 @@ func (m *PaymailAddress) migratePostgreSQL(client datastore.ClientInterface, tab
 }
 
 func (m *PaymailAddress) String() string {
+	if strings.Contains(m.Alias, "@") {
+		return m.Alias
+	}
 	return fmt.Sprintf("%s@%s", m.Alias, m.Domain)
 }

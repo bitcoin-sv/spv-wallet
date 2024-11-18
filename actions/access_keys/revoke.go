@@ -39,7 +39,7 @@ func oldRevoke(c *gin.Context, userContext *reqctx.UserContext) {
 // @Tags		Access-key
 // @Produce		json
 // @Param		id path string true "id of the access key"
-// @Success		200	{object} response.AccessKey "Revoked AccessKey"
+// @Success		200
 // @Failure		400	"Bad request - Missing required field: id"
 // @Failure 	500	"Internal server error - Error while revoking access key"
 // @Router		/api/v1/users/current/keys/{id} [delete]
@@ -78,6 +78,5 @@ func revokeHelper(c *gin.Context, id string, snakeCase bool, xpub string) {
 		return
 	}
 
-	contract := mappings.MapToAccessKeyContract(accessKey)
-	c.JSON(http.StatusCreated, contract)
+	c.Status(http.StatusOK)
 }

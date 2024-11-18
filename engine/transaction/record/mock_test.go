@@ -51,6 +51,14 @@ func (m *mockRepository) withOutput(output database.Output) *mockRepository {
 	return m
 }
 
+func (m *mockRepository) withUTXO(outpoint bsv.Outpoint) *mockRepository {
+	m.outputs[outpoint.String()] = database.Output{
+		TxID: outpoint.TxID,
+		Vout: outpoint.Vout,
+	}
+	return m
+}
+
 func (m *mockRepository) getAllOutputs() []database.Output {
 	return slices.Collect(maps.Values(m.outputs))
 }
