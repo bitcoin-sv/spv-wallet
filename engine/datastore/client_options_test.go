@@ -1,7 +1,6 @@
 package datastore
 
 import (
-	"context"
 	"os"
 	"testing"
 
@@ -16,7 +15,6 @@ func TestDefaultClientOptions(t *testing.T) {
 		defaults := defaultClientOptions()
 		require.NotNil(t, defaults)
 		assert.Equal(t, Empty, defaults.engine)
-		assert.False(t, defaults.autoMigrate)
 		assert.NotNil(t, defaults.sqLite)
 	})
 }
@@ -30,7 +28,7 @@ func TestWithDebugging(t *testing.T) {
 
 	t.Run("apply opts", func(t *testing.T) {
 		opts := []ClientOps{WithDebugging()}
-		c, err := NewClient(context.Background(), opts...)
+		c, err := NewClient(opts...)
 		require.NotNil(t, c)
 		require.NoError(t, err)
 
@@ -40,33 +38,6 @@ func TestWithDebugging(t *testing.T) {
 	// Attempt to remove a file created during the test
 	t.Cleanup(func() {
 		_ = os.Remove("datastore.db")
-	})
-}
-
-// TestWithAutoMigrate will test the method WithAutoMigrate()
-func TestWithAutoMigrate(t *testing.T) {
-	t.Run("check type", func(t *testing.T) {
-		opt := WithAutoMigrate(nil)
-		assert.IsType(t, *new(ClientOps), opt)
-	})
-
-	t.Run("test applying nil", func(t *testing.T) {
-		options := &clientOptions{}
-		opt := WithAutoMigrate(nil)
-		opt(options)
-		assert.False(t, options.autoMigrate)
-		assert.Nil(t, options.migrateModels)
-	})
-
-	t.Run("test applying option", func(t *testing.T) {
-		options := &clientOptions{}
-		testModel2 := struct {
-			Field string
-		}{Field: "test"}
-		opt := WithAutoMigrate(testModel2)
-		opt(options)
-		assert.True(t, options.autoMigrate)
-		assert.Len(t, options.migrateModels, 1)
 	})
 }
 
@@ -96,7 +67,7 @@ func TestWithSQLite(t *testing.T) {
 			},
 			DatabasePath:       "",
 			ExistingConnection: nil,
-			Shared:             true,
+			Shared:             false,
 		}
 		opt := WithSQLite(config)
 		opt(options)

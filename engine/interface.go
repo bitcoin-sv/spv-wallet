@@ -120,9 +120,7 @@ type HTTPInterface interface {
 
 // ModelService is the "model" related services
 type ModelService interface {
-	AddModels(ctx context.Context, autoMigrate bool, models ...interface{}) error
 	DefaultModelOptions(opts ...ModelOps) []ModelOps
-	GetModelNames() []string
 }
 
 // PaymailService is the paymail actions & services
@@ -207,7 +205,6 @@ type ClientInterface interface {
 	IsDebug() bool
 	IsEncryptionKeySet() bool
 	IsIUCEnabled() bool
-	IsMigrationEnabled() bool
 	UserAgent() string
 	Version() string
 	Metrics() (metrics *metrics.Metrics, enabled bool)

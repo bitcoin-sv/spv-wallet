@@ -51,8 +51,11 @@ func CalculateMergedBUMP(bumps []BUMP) (*BUMP, error) {
 
 	for _, b := range bumps {
 		if bumpHeight != len(b.Path) {
-			return nil,
-				spverrors.Newf("merged BUMP cannot be obtained from Merkle Proofs of different heights")
+			allBumps := ""
+			for _, bb := range bumps {
+				allBumps += fmt.Sprintf("%+v\n", bb)
+			}
+			return nil, spverrors.Newf("merged BUMP cannot be obtained from Merkle Proofs of different heights: %s", allBumps)
 		}
 		if b.BlockHeight != blockHeight {
 			return nil,

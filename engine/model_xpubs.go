@@ -260,7 +260,7 @@ func (m *Xpub) incrementNextNum(ctx context.Context, chain uint32) (uint32, erro
 	}
 
 	newNumU32, errConversion := conv.Int64ToUint32(newNum)
-	if err != nil {
+	if errConversion != nil {
 		return 0, spverrors.Wrapf(errConversion, "failed to convert int64 to uint32")
 	}
 
@@ -279,7 +279,7 @@ func (m *Xpub) incrementNextNum(ctx context.Context, chain uint32) (uint32, erro
 	newNumMinusOne := newNum - 1
 
 	newNumMinusOneU32, errConversion := conv.Int64ToUint32(newNumMinusOne)
-	if err != nil {
+	if errConversion != nil {
 		return 0, spverrors.Wrapf(errConversion, "failed to convert int64 to uint32")
 	}
 
@@ -357,8 +357,8 @@ func (m *Xpub) AfterUpdated(ctx context.Context) error {
 	return nil
 }
 
-// Migrate model specific migration on startup
-func (m *Xpub) Migrate(client datastore.ClientInterface) error {
+// PostMigrate is called after the model is migrated
+func (m *Xpub) PostMigrate(client datastore.ClientInterface) error {
 	err := client.IndexMetadata(client.GetTableName(tableXPubs), metadataField)
 	return spverrors.Wrapf(err, "failed to index metadata column on model %s", m.GetModelName())
 }
