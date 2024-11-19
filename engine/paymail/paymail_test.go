@@ -7,7 +7,6 @@ import (
 
 	"github.com/bitcoin-sv/go-paymail"
 	"github.com/bitcoin-sv/spv-wallet/engine"
-	"github.com/bitcoin-sv/spv-wallet/engine/datastore"
 	paymailclient "github.com/bitcoin-sv/spv-wallet/engine/paymail"
 	"github.com/bitcoin-sv/spv-wallet/engine/paymail/testabilities"
 	"github.com/bitcoin-sv/spv-wallet/engine/taskmanager"
@@ -259,7 +258,7 @@ func Test_GetCapabilities(t *testing.T) {
 		tc, err := engine.NewClient(context.Background(),
 			engine.WithRedisConnection(redisClient),
 			engine.WithTaskqConfig(taskmanager.DefaultTaskQConfig(testQueueName)),
-			engine.WithSQLite(&datastore.SQLiteConfig{Shared: true}),
+			engine.WithSQLite(xtester.SQLiteTestConfig()),
 			engine.WithDebugging(),
 			engine.WithCustomFeeUnit(bsv.FeeUnit{Satoshis: 1, Bytes: 1000}),
 			engine.WithLogger(&logger),
@@ -304,7 +303,7 @@ func Test_GetCapabilities(t *testing.T) {
 		tc, err := engine.NewClient(context.Background(),
 			engine.WithRedisConnection(redisClient),
 			engine.WithTaskqConfig(taskmanager.DefaultTaskQConfig(testQueueName)),
-			engine.WithSQLite(&datastore.SQLiteConfig{Shared: true}),
+			engine.WithSQLite(xtester.SQLiteTestConfig()),
 			engine.WithDebugging(),
 			engine.WithCustomFeeUnit(bsv.FeeUnit{Satoshis: 1, Bytes: 1000}),
 			engine.WithLogger(&logger),

@@ -402,8 +402,8 @@ func (m *Destination) setAddress(rawXpubKey string) error {
 	return nil
 }
 
-// Migrate model specific migration on startup
-func (m *Destination) Migrate(client datastore.ClientInterface) error {
+// PostMigrate is called after the model is migrated
+func (m *Destination) PostMigrate(client datastore.ClientInterface) error {
 	err := client.IndexMetadata(client.GetTableName(tableDestinations), metadataField)
 	return spverrors.Wrapf(err, "failed to index metadata column on model %s", m.GetModelName())
 }

@@ -192,8 +192,8 @@ func (m *AccessKey) BeforeCreating(_ context.Context) error {
 	return nil
 }
 
-// Migrate model specific migration on startup
-func (m *AccessKey) Migrate(client datastore.ClientInterface) error {
+// PostMigrate model specific migration on startup
+func (m *AccessKey) PostMigrate(client datastore.ClientInterface) error {
 	err := client.IndexMetadata(client.GetTableName(tableAccessKeys), metadataField)
 	return spverrors.Wrapf(err, "failed to index metadata column on model %s", m.GetModelName())
 }

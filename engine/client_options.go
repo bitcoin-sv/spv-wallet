@@ -3,7 +3,6 @@ package engine
 import (
 	"database/sql"
 	"net/url"
-	"strings"
 	"time"
 
 	"github.com/bitcoin-sv/go-paymail"
@@ -59,14 +58,6 @@ func defaultClientOptions() *clientOptions {
 		// Default http client
 		httpClient: resty.New(),
 
-		// Blank model options (use the Base models)
-		models: &modelOptions{
-			modelNames:        modelNames(BaseModels...),
-			models:            BaseModels,
-			migrateModelNames: nil,
-			migrateModels:     nil,
-		},
-
 		// Blank Paymail config
 		paymail: &paymailOptions{
 			client: nil,
@@ -87,49 +78,6 @@ func defaultClientOptions() *clientOptions {
 
 		// Default user agent
 		userAgent: defaultUserAgent,
-	}
-}
-
-// modelNames will take a list of models and return the list of names
-func modelNames(models ...interface{}) (names []string) {
-	for _, modelInterface := range models {
-		names = append(names, modelInterface.(ModelInterface).Name())
-	}
-	return
-}
-
-// modelExists will return true if the model is found
-func (o *clientOptions) modelExists(modelName, list string) bool {
-	m := o.models.modelNames
-	if list == migrateList {
-		m = o.models.migrateModelNames
-	}
-	for _, name := range m {
-		if strings.EqualFold(name, modelName) {
-			return true
-		}
-	}
-	return false
-}
-
-// addModel will add the model if it does not exist already (load once)
-func (o *clientOptions) addModel(model interface{}, list string) {
-	name := model.(ModelInterface).Name()
-	if !o.modelExists(name, list) {
-		if list == migrateList {
-			o.models.migrateModelNames = append(o.models.migrateModelNames, name)
-			o.models.migrateModels = append(o.models.migrateModels, model)
-			return
-		}
-		o.models.modelNames = append(o.models.modelNames, name)
-		o.models.models = append(o.models.models, model)
-	}
-}
-
-// addModels will add the models if they do not exist already (load once)
-func (o *clientOptions) addModels(list string, models ...interface{}) {
-	for _, modelInterface := range models {
-		o.addModel(modelInterface, list)
 	}
 }
 
@@ -174,17 +122,6 @@ func WithEncryption(key string) ClientOps {
 	return func(c *clientOptions) {
 		if len(key) > 0 {
 			c.encryptionKey = key
-		}
-	}
-}
-
-// WithModels will add additional models (will NOT migrate using datastore)
-//
-// Pointers of structs (IE: &models.Xpub{})
-func WithModels(models ...interface{}) ClientOps {
-	return func(c *clientOptions) {
-		if len(models) > 0 {
-			c.addModels(modelList, models...)
 		}
 	}
 }
@@ -313,25 +250,6 @@ func WithCustomDatastore(dataStore datastore.ClientInterface) ClientOps {
 	}
 }
 
-// WithAutoMigrate will enable auto migrate database mode (given models)
-//
-// Pointers of structs (IE: &models.Xpub{})
-func WithAutoMigrate(migrateModels ...interface{}) ClientOps {
-	return func(c *clientOptions) {
-		if len(migrateModels) > 0 {
-			c.addModels(modelList, migrateModels...)
-			c.addModels(migrateList, migrateModels...)
-		}
-	}
-}
-
-// WithMigrationDisabled will disable all migrations from running in the Datastore
-func WithMigrationDisabled() ClientOps {
-	return func(c *clientOptions) {
-		c.dataStore.migrationDisabled = true
-	}
-}
-
 // WithSQLite will set the Datastore to use SQLite
 func WithSQLite(config *datastore.SQLiteConfig) ClientOps {
 	return func(c *clientOptions) {
@@ -348,18 +266,6 @@ func WithSQL(engine datastore.Engine, config *datastore.SQLConfig) ClientOps {
 			c.dataStore.options = append(
 				c.dataStore.options,
 				datastore.WithSQL(engine, []*datastore.SQLConfig{config}),
-			)
-		}
-	}
-}
-
-// WithSQLConfigs will load multiple connections (replica & master)
-func WithSQLConfigs(engine datastore.Engine, configs []*datastore.SQLConfig) ClientOps {
-	return func(c *clientOptions) {
-		if len(configs) > 0 && !engine.IsEmpty() {
-			c.dataStore.options = append(
-				c.dataStore.options,
-				datastore.WithSQL(engine, configs),
 			)
 		}
 	}
@@ -415,9 +321,6 @@ func WithPaymailSupport(domains []string, defaultFromPaymail string, domainValid
 		if len(defaultFromPaymail) > 0 {
 			c.paymail.serverConfig.DefaultFromPaymail = defaultFromPaymail
 		}
-
-		// Add the paymail_address model in SPV Wallet Engine
-		c.addModels(migrateList, newPaymail("", 0))
 	}
 }
 
@@ -429,23 +332,6 @@ func WithPaymailBeefSupport(blockHeadersServiceURL, blockHeadersServiceAuthToken
 			panic(err)
 		}
 		c.paymail.serverConfig.options = append(c.paymail.serverConfig.options, server.WithBeefCapabilities())
-	}
-}
-
-// WithPaymailServerConfig will set the custom server configuration for Paymail
-//
-// This will allow overriding the Configuration.actions (paymail service provider)
-func WithPaymailServerConfig(config *server.Configuration, defaultFromPaymail string) ClientOps {
-	return func(c *clientOptions) {
-		if config != nil {
-			c.paymail.serverConfig.Configuration = config
-		}
-		if len(defaultFromPaymail) > 0 {
-			c.paymail.serverConfig.DefaultFromPaymail = defaultFromPaymail
-		}
-
-		// Add the paymail_address model in SPV Wallet Engine
-		c.addModels(migrateList, newPaymail("", 0))
 	}
 }
 
