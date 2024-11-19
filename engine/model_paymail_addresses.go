@@ -77,7 +77,7 @@ func getPaymailAddress(ctx context.Context, address string, opts ...ModelOps) (*
 	if err := Get(
 		ctx, paymailAddress, conditions, false, defaultDatabaseReadTimeout, false,
 	); err != nil {
-		if errors.Is(err, datastore.ErrNoResults) {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return nil, nil
 		}
 		return nil, err
@@ -115,7 +115,7 @@ func getPaymailAddressByID(ctx context.Context, id string, opts ...ModelOps) (*P
 	if err := Get(
 		ctx, paymailAddress, nil, false, defaultDatabaseReadTimeout, false,
 	); err != nil {
-		if errors.Is(err, datastore.ErrNoResults) {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return nil, nil
 		}
 		return nil, err

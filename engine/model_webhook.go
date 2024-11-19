@@ -9,6 +9,7 @@ import (
 	"github.com/bitcoin-sv/spv-wallet/engine/notifications"
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/pkg/errors"
+	"gorm.io/gorm"
 )
 
 // Webhook stores information about subscriptions to notifications via webhooks
@@ -164,7 +165,7 @@ func (wr *WebhooksRepository) GetByURL(ctx context.Context, url string) (notific
 	webhook.enrich(ModelWebhook, wr.client.DefaultModelOptions()...)
 
 	if err := Get(ctx, webhook, conditions, false, defaultDatabaseReadTimeout, false); err != nil {
-		if errors.Is(err, datastore.ErrNoResults) {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return nil, nil
 		}
 		return nil, err
