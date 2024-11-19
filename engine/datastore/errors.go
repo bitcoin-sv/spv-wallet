@@ -12,3 +12,6 @@ var ErrUnsupportedDriver = spverrors.Newf("sql driver unsupported")
 
 // ErrNoSourceFound is when no source database is found in all given configurations
 var ErrNoSourceFound = spverrors.Newf("no source database found in all given configurations")
+
+// ErrMigrationError is when something went wrong during migration
+var ErrMigrationError = spverrors.Newf("error occurred during migration")

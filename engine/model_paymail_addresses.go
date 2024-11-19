@@ -5,7 +5,6 @@ import (
 	"encoding/hex"
 	"errors"
 	"fmt"
-	"gorm.io/gorm"
 	"strings"
 
 	"github.com/bitcoin-sv/go-paymail"
@@ -14,6 +13,7 @@ import (
 	"github.com/bitcoin-sv/spv-wallet/engine/datastore"
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/bitcoin-sv/spv-wallet/engine/utils"
+	"gorm.io/gorm"
 )
 
 // PaymailAddress is an "external model example" - this model is not part of the standard models loaded and runtime
@@ -363,9 +363,10 @@ func (m *PaymailAddress) migratePostgreSQL(client datastore.ClientInterface, tab
 	if !client.DB().Migrator().HasIndex(&PaymailAddress{}, idxName) {
 		return nil
 	}
+
 	err := client.DB().Migrator().DropIndex(&PaymailAddress{}, idxName)
 	if err != nil {
-		return err
+		return fmt.Errorf("failed to drop index %s: %w", idxName, err)
 	}
 	return nil
 }
