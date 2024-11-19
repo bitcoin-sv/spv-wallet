@@ -101,8 +101,6 @@ const (
 
 	// Misc
 	gormTypeText = "text"
-	migrateList  = "migrate"
-	modelList    = "models"
 )
 
 // Cache keys for model caching
@@ -113,48 +111,15 @@ const (
 	cacheKeyXpubModel                       = "xpub-id-%s"                    // model-id-<xpub_id>
 )
 
-// BaseModels is the list of models for loading the engine and AutoMigration (defaults)
-var BaseModels = []interface{}{
-	// Base extended HD-key table
-	&Xpub{
-		Model: *NewBaseModel(ModelXPub),
-	},
-
-	// Access keys (extend access from xPub)
-	&AccessKey{
-		Model: *NewBaseModel(ModelAccessKey),
-	},
-
-	// Draft transactions are created before the final transaction is completed
-	&DraftTransaction{
-		Model: *NewBaseModel(ModelDraftTransaction),
-	},
-
-	// Finalized transactions (related to Draft)
-	&Transaction{
-		Model: *NewBaseModel(ModelTransaction),
-	},
-
-	// Various types of destinations (common is: P2PKH Address)
-	&Destination{
-		Model: *NewBaseModel(ModelDestination),
-	},
-
-	// Unspent outputs from known transactions
-	&Utxo{
-		Model: *NewBaseModel(ModelUtxo),
-	},
-
-	&Contact{
-		Model: *NewBaseModel(ModelContact),
-	},
-
-	&Webhook{
-		Model: *NewBaseModel(ModelWebhook),
-	},
-
-	// Paymail addresses related to XPubs (automatically added when paymail is enabled)
-	/*&PaymailAddress{
-		Model: *NewBaseModel(ModelPaymailAddress),
-	},*/
+// AllDBModels is the list of models for loading the engine and AutoMigration (defaults)
+var AllDBModels = []interface{}{
+	&Xpub{},
+	&AccessKey{},
+	&DraftTransaction{},
+	&Transaction{},
+	&Destination{},
+	&Utxo{},
+	&Contact{},
+	&Webhook{},
+	&PaymailAddress{},
 }

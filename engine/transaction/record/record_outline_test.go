@@ -6,15 +6,14 @@ import (
 
 	"github.com/bitcoin-sv/go-sdk/script"
 	"github.com/bitcoin-sv/spv-wallet/engine/database"
-	"github.com/bitcoin-sv/spv-wallet/engine/tester"
 	"github.com/bitcoin-sv/spv-wallet/engine/tester/fixtures"
 	"github.com/bitcoin-sv/spv-wallet/engine/transaction"
 	txerrors "github.com/bitcoin-sv/spv-wallet/engine/transaction/errors"
 	"github.com/bitcoin-sv/spv-wallet/engine/transaction/outlines"
-	"github.com/bitcoin-sv/spv-wallet/engine/transaction/record"
+	"github.com/bitcoin-sv/spv-wallet/engine/transaction/record/testabilities"
+	"github.com/bitcoin-sv/spv-wallet/models/bsv"
 	"github.com/bitcoin-sv/spv-wallet/models/transaction/bucket"
 	"github.com/pkg/errors"
-	"github.com/stretchr/testify/require"
 )
 
 const (
@@ -37,27 +36,31 @@ func givenTxWithOpReturnWithoutOPFalse(t *testing.T) fixtures.GivenTXSpec {
 		)
 }
 
+func givenStandardOpReturnOutline(t *testing.T) *outlines.Transaction {
+	return &outlines.Transaction{
+		BEEF: givenTXWithOpReturn(t).BEEF(),
+		Annotations: transaction.Annotations{
+			Outputs: transaction.OutputsAnnotations{
+				0: &transaction.OutputAnnotation{
+					Bucket: bucket.Data,
+				},
+			},
+		},
+	}
+}
+
 func TestRecordOutlineOpReturn(t *testing.T) {
 	tests := map[string]struct {
-		repo          *mockRepository
+		storedUTXOs   []bsv.Outpoint
 		outline       *outlines.Transaction
 		expectTxID    string
 		expectOutputs []database.Output
 		expectData    []database.Data
 	}{
 		"RecordTransactionOutline for op_return": {
-			repo: newMockRepository().withUTXO(givenTXWithOpReturn(t).InputUTXO(0)),
-			outline: &outlines.Transaction{
-				BEEF: givenTXWithOpReturn(t).BEEF(),
-				Annotations: transaction.Annotations{
-					Outputs: transaction.OutputsAnnotations{
-						0: &transaction.OutputAnnotation{
-							Bucket: bucket.Data,
-						},
-					},
-				},
-			},
-			expectTxID: givenTXWithOpReturn(t).ID(),
+			storedUTXOs: []bsv.Outpoint{givenTXWithOpReturn(t).InputUTXO(0)},
+			outline:     givenStandardOpReturnOutline(t),
+			expectTxID:  givenTXWithOpReturn(t).ID(),
 			expectOutputs: []database.Output{
 				{
 					TxID:       givenTXWithOpReturn(t).InputUTXO(0).TxID,
@@ -79,7 +82,7 @@ func TestRecordOutlineOpReturn(t *testing.T) {
 			},
 		},
 		"RecordTransactionOutline for op_return without leading OP_FALSE": {
-			repo: newMockRepository().withUTXO(givenTxWithOpReturnWithoutOPFalse(t).InputUTXO(0)),
+			storedUTXOs: []bsv.Outpoint{givenTxWithOpReturnWithoutOPFalse(t).InputUTXO(0)},
 			outline: &outlines.Transaction{
 				BEEF: givenTxWithOpReturnWithoutOPFalse(t).BEEF(),
 				Annotations: transaction.Annotations{
@@ -112,18 +115,9 @@ func TestRecordOutlineOpReturn(t *testing.T) {
 			},
 		},
 		"RecordTransactionOutline for op_return with untracked utxo as inputs": {
-			repo: newMockRepository(),
-			outline: &outlines.Transaction{
-				BEEF: givenTXWithOpReturn(t).BEEF(),
-				Annotations: transaction.Annotations{
-					Outputs: transaction.OutputsAnnotations{
-						0: &transaction.OutputAnnotation{
-							Bucket: bucket.Data,
-						},
-					},
-				},
-			},
-			expectTxID: givenTXWithOpReturn(t).ID(),
+			storedUTXOs: []bsv.Outpoint{},
+			outline:     givenStandardOpReturnOutline(t),
+			expectTxID:  givenTXWithOpReturn(t).ID(),
 			expectOutputs: []database.Output{{
 				TxID: givenTXWithOpReturn(t).ID(),
 				Vout: 0,
@@ -140,25 +134,22 @@ func TestRecordOutlineOpReturn(t *testing.T) {
 	for name, test := range tests {
 		t.Run(name, func(t *testing.T) {
 			// given:
-			broadcaster := newMockBroadcaster()
-			repo := test.repo
-			service := record.NewService(tester.Logger(t), repo, broadcaster)
+			given, then := testabilities.New(t)
+			given.Repository().WithUTXOs(test.storedUTXOs...)
+
+			service := given.NewRecordService()
 
 			// when:
 			err := service.RecordTransactionOutline(context.Background(), test.outline)
 
 			// then:
-			require.NoError(t, err)
+			then.NoError(err).
+				Broadcasted(test.expectTxID).
+				StoredAsBroadcasted(test.expectTxID)
 
-			require.Contains(t, broadcaster.broadcastedTxs, test.expectTxID)
-
-			require.Contains(t, repo.transactions, test.expectTxID)
-			txEntry := repo.transactions[test.expectTxID]
-			require.Equal(t, test.expectTxID, repo.transactions[test.expectTxID].ID)
-			require.Equal(t, database.TxStatusBroadcasted, txEntry.TxStatus)
-
-			require.Subset(t, repo.getAllOutputs(), test.expectOutputs)
-			require.Subset(t, repo.getAllData(), test.expectData)
+			then.
+				StoredOutputs(test.expectOutputs).
+				StoredData(test.expectData)
 		})
 	}
 }
@@ -185,30 +176,26 @@ func TestRecordOutlineOpReturnErrorCases(t *testing.T) {
 		WithP2PKHOutput(1)
 
 	tests := map[string]struct {
-		repo        *mockRepository
-		outline     *outlines.Transaction
-		broadcaster *mockBroadcaster
-		expectErr   error
+		storedOutputs []database.Output
+		outline       *outlines.Transaction
+		expectErr     error
 	}{
 		"RecordTransactionOutline for not signed transaction": {
-			broadcaster: newMockBroadcaster(),
-			repo:        newMockRepository(),
+			storedOutputs: []database.Output{},
 			outline: &outlines.Transaction{
 				BEEF: givenUnsignedTX.BEEF(),
 			},
 			expectErr: txerrors.ErrTxValidation,
 		},
 		"RecordTransactionOutline for not a BEEF hex": {
-			broadcaster: newMockBroadcaster(),
-			repo:        newMockRepository(),
+			storedOutputs: []database.Output{},
 			outline: &outlines.Transaction{
 				BEEF: notABeefHex,
 			},
 			expectErr: txerrors.ErrTxValidation,
 		},
 		"RecordTransactionOutline for invalid OP_ZERO after OP_RETURN": {
-			broadcaster: newMockBroadcaster(),
-			repo:        newMockRepository(),
+			storedOutputs: []database.Output{},
 			outline: &outlines.Transaction{
 				BEEF: givenTxWithOpZeroAfterOpReturn.BEEF(),
 				Annotations: transaction.Annotations{
@@ -222,20 +209,18 @@ func TestRecordOutlineOpReturnErrorCases(t *testing.T) {
 			expectErr: txerrors.ErrOnlyPushDataAllowed,
 		},
 		"Tx with already spent utxo": {
-			broadcaster: newMockBroadcaster(),
-			repo: newMockRepository().withOutput(database.Output{
+			storedOutputs: []database.Output{{
 				TxID:       givenTXWithOpReturn(t).InputUTXO(0).TxID,
 				Vout:       givenTXWithOpReturn(t).InputUTXO(0).Vout,
 				SpendingTX: ptr("05aa91319c773db18071310ecd5ddc15d3aa4242b55705a13a66f7fefe2b80a1"),
-			}),
+			}},
 			outline: &outlines.Transaction{
 				BEEF: givenTXWithOpReturn(t).BEEF(),
 			},
 			expectErr: txerrors.ErrUTXOSpent,
 		},
 		"Vout out of range in annotation": {
-			broadcaster: newMockBroadcaster(),
-			repo:        newMockRepository(),
+			storedOutputs: []database.Output{},
 			outline: &outlines.Transaction{
 				BEEF: givenTXWithOpReturn(t).BEEF(),
 				Annotations: transaction.Annotations{
@@ -249,8 +234,7 @@ func TestRecordOutlineOpReturnErrorCases(t *testing.T) {
 			expectErr: txerrors.ErrAnnotationIndexOutOfRange,
 		},
 		"Vout as negative value in annotation": {
-			broadcaster: newMockBroadcaster(),
-			repo:        newMockRepository(),
+			storedOutputs: []database.Output{},
 			outline: &outlines.Transaction{
 				BEEF: givenTXWithOpReturn(t).BEEF(),
 				Annotations: transaction.Annotations{
@@ -264,8 +248,7 @@ func TestRecordOutlineOpReturnErrorCases(t *testing.T) {
 			expectErr: txerrors.ErrAnnotationIndexConversion,
 		},
 		"no-op_return output annotated as data": {
-			broadcaster: newMockBroadcaster(),
-			repo:        newMockRepository(),
+			storedOutputs: []database.Output{},
 			outline: &outlines.Transaction{
 				BEEF: givenTxWithP2PKHOutput.BEEF(),
 				Annotations: transaction.Annotations{
@@ -278,44 +261,81 @@ func TestRecordOutlineOpReturnErrorCases(t *testing.T) {
 			},
 			expectErr: txerrors.ErrAnnotationMismatch,
 		},
-		"error during broadcasting": {
-			broadcaster: newMockBroadcaster().withError(errors.New("broadcast error")),
-			repo: newMockRepository().withOutput(database.Output{
-				TxID: givenTXWithOpReturn(t).InputUTXO(0).TxID,
-				Vout: givenTXWithOpReturn(t).InputUTXO(0).Vout,
-			}),
-			outline: &outlines.Transaction{
-				BEEF: givenTXWithOpReturn(t).BEEF(),
-				Annotations: transaction.Annotations{
-					Outputs: transaction.OutputsAnnotations{
-						0: &transaction.OutputAnnotation{
-							Bucket: bucket.Data,
-						},
-					},
-				},
-			},
-			expectErr: txerrors.ErrTxBroadcast,
-		},
 	}
 	for name, test := range tests {
 		t.Run(name, func(t *testing.T) {
 			// given:
-			service := record.NewService(tester.Logger(t), test.repo, test.broadcaster)
-			initialOutputs := test.repo.getAllOutputs()
-			initialData := test.repo.getAllData()
+			given, then := testabilities.New(t)
+			given.Repository().WithOutputs(test.storedOutputs...)
+
+			service := given.NewRecordService()
 
 			// when:
 			err := service.RecordTransactionOutline(context.Background(), test.outline)
 
 			// then:
-			require.Error(t, err)
-			require.ErrorIs(t, err, test.expectErr)
-
-			// ensure that no changes were made to the repository
-			require.ElementsMatch(t, initialOutputs, test.repo.getAllOutputs())
-			require.ElementsMatch(t, initialData, test.repo.getAllData())
+			then.ErrorIs(err, test.expectErr).NothingChanged()
 		})
 	}
+}
+
+func TestOnBroadcastErr(t *testing.T) {
+	// given:
+	given, then := testabilities.New(t)
+	given.Repository().
+		WithOutputs(database.Output{
+			TxID:       givenTXWithOpReturn(t).InputUTXO(0).TxID,
+			Vout:       givenTXWithOpReturn(t).InputUTXO(0).Vout,
+			SpendingTX: nil,
+		})
+	given.Broadcaster().
+		WillFailOnBroadcast(errors.New("broadcast error"))
+
+	service := given.NewRecordService()
+
+	// and:
+	outline := givenStandardOpReturnOutline(t)
+
+	// when:
+	err := service.RecordTransactionOutline(context.Background(), outline)
+
+	// then:
+	then.ErrorIs(err, txerrors.ErrTxBroadcast).NothingChanged()
+}
+
+func TestOnSaveTXErr(t *testing.T) {
+	// given:
+	given, then := testabilities.New(t)
+	given.Repository().
+		WillFailOnSaveTX(errors.New("saveTX error"))
+
+	service := given.NewRecordService()
+
+	// and:
+	outline := givenStandardOpReturnOutline(t)
+
+	// when:
+	err := service.RecordTransactionOutline(context.Background(), outline)
+
+	// then:
+	then.ErrorIs(err, txerrors.ErrSavingData).NothingChanged()
+}
+
+func TestOnGetOutputsErr(t *testing.T) {
+	// given:
+	given, then := testabilities.New(t)
+	given.Repository().
+		WillFailOnGetOutputs(errors.New("getOutputs error"))
+	service := given.NewRecordService()
+
+	// and:
+	outline := givenStandardOpReturnOutline(t)
+
+	// when:
+	err := service.RecordTransactionOutline(context.Background(), outline)
+
+	// then:
+	then.ErrorIs(err, txerrors.ErrGettingOutputs).NothingChanged()
 }
 
 func ptr[T any](value T) *T {

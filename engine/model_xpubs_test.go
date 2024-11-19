@@ -181,7 +181,7 @@ func TestXpub_BeforeCreating(t *testing.T) {
 		xPub := newXpub(testXPub, New())
 		require.NotNil(t, xPub)
 
-		opts := DefaultClientOpts(false, false)
+		opts := DefaultClientOpts()
 		client, _ := NewClient(context.Background(), opts...)
 		xPub.client = client
 
@@ -205,7 +205,7 @@ func TestXpub_BeforeCreating(t *testing.T) {
 		xPub := newXpub("test", New())
 		require.NotNil(t, xPub)
 
-		opts := DefaultClientOpts(false, false)
+		opts := DefaultClientOpts()
 		client, _ := NewClient(context.Background(), opts...)
 		xPub.client = client
 
@@ -223,7 +223,7 @@ func TestXpub_AfterCreated(t *testing.T) {
 		xPub := newXpub(testXPub, New())
 		require.NotNil(t, xPub)
 
-		opts := DefaultClientOpts(false, false)
+		opts := DefaultClientOpts()
 		client, _ := NewClient(context.Background(), opts...)
 		xPub.client = client
 
@@ -244,7 +244,7 @@ func TestXpub_AfterUpdated(t *testing.T) {
 		xPub := newXpub(testXPub, New())
 		require.NotNil(t, xPub)
 
-		opts := DefaultClientOpts(false, false)
+		opts := DefaultClientOpts()
 		client, err := NewClient(context.Background(), opts...)
 		require.NoError(t, err)
 		xPub.client = client

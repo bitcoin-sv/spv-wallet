@@ -67,8 +67,8 @@ func (m *Webhook) BeforeCreating(_ context.Context) error {
 	return nil
 }
 
-// Migrate model specific migration on startup
-func (m *Webhook) Migrate(client datastore.ClientInterface) error {
+// PostMigrate is called after the model is migrated
+func (m *Webhook) PostMigrate(client datastore.ClientInterface) error {
 	err := client.IndexMetadata(client.GetTableName(tableAccessKeys), metadataField)
 	return spverrors.Wrapf(err, "failed to index metadata column on model %s", m.GetModelName())
 }

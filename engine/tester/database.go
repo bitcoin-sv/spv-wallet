@@ -45,15 +45,12 @@ func CreatePostgresServer(port uint32) (*embeddedPostgres.EmbeddedPostgres, erro
 }
 
 // SQLiteTestConfig will return a test-version of SQLite
-func SQLiteTestConfig(debug, shared bool) *datastore.SQLiteConfig {
+func SQLiteTestConfig() *datastore.SQLiteConfig {
 	return &datastore.SQLiteConfig{
 		CommonConfig: datastore.CommonConfig{
-			Debug:              debug,
-			MaxIdleConnections: 1,
-			MaxOpenConnections: 1,
-			TablePrefix:        RandomTablePrefix(),
+			Debug: false,
 		},
 		DatabasePath: "",
-		Shared:       shared,
+		Shared:       false,
 	}
 }

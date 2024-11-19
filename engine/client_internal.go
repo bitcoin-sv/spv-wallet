@@ -38,38 +38,49 @@ func (c *Client) loadCluster(ctx context.Context) (err error) {
 
 // loadDatastore will load the Datastore and start the Datastore client
 //
-// NOTE: this will run database migrations if the options was set
-func (c *Client) loadDatastore(ctx context.Context) (err error) {
-	// Add the models to migrate (after loading the client options)
-	if len(c.options.models.migrateModelNames) > 0 {
-		c.options.dataStore.options = append(
-			c.options.dataStore.options,
-			datastore.WithAutoMigrate(c.options.models.migrateModels...),
-		)
+// NOTE: this WON't run database migrations
+func (c *Client) loadDatastore() (err error) {
+	if c.options.dataStore.ClientInterface != nil {
+		return
 	}
 
-	// Load client (runs ALL options, IE: auto migrate models)
-	if c.options.dataStore.ClientInterface == nil {
+	c.options.dataStore.options = append(
+		c.options.dataStore.options,
+		datastore.WithCustomFields(
+			[]string{ // Array fields
+				"xpub_in_ids",
+				"xpub_out_ids",
+			}, []string{ // Object fields
+				"xpub_metadata",
+				"xpub_output_value",
+			},
+		))
 
-		// Add custom array and object fields
-		c.options.dataStore.options = append(
-			c.options.dataStore.options,
-			datastore.WithCustomFields(
-				[]string{ // Array fields
-					"xpub_in_ids",
-					"xpub_out_ids",
-				}, []string{ // Object fields
-					"xpub_metadata",
-					"xpub_output_value",
-				},
-			))
-
-		// Load the datastore client
-		c.options.dataStore.ClientInterface, err = datastore.NewClient(
-			ctx, c.options.dataStore.options...,
-		)
-	}
+	c.options.dataStore.ClientInterface, err = datastore.NewClient(c.options.dataStore.options...)
 	return
+}
+
+func (c *Client) autoMigrate(ctx context.Context) error {
+	if c.Datastore() == nil {
+		return spverrors.Newf("datastore is not loaded")
+	}
+	if err := c.Datastore().DB().WithContext(ctx).AutoMigrate(AllDBModels...); err != nil {
+		return spverrors.Wrapf(err, "failed to auto-migrate models")
+	}
+
+	// Legacy code compatibility:
+	// Some models implement post-migration logic to e.g. manually add some indexes
+	// NOTE: In the future, we should remove this and stick to GORM features
+	for _, model := range AllDBModels {
+		if migrator, ok := model.(interface {
+			PostMigrate(client datastore.ClientInterface) error
+		}); ok {
+			if err := migrator.PostMigrate(c.Datastore()); err != nil {
+				return spverrors.Wrapf(err, "failed to post-migrate model %+v", model)
+			}
+		}
+	}
+	return nil
 }
 
 // loadNotificationClient will load the notifications client
@@ -205,24 +216,6 @@ func (c *Client) loadTaskmanager(ctx context.Context) (err error) {
 		c.options.taskManager.TaskEngine, err = taskmanager.NewTaskManager(
 			ctx, c.options.taskManager.options...,
 		)
-	}
-	return
-}
-
-// runModelMigrations will run the model Migrate() method for all models
-func (c *Client) runModelMigrations(models ...interface{}) (err error) {
-	// If the migrations are disabled, just return
-	if c.options.dataStore.migrationDisabled {
-		return nil
-	}
-
-	// Migrate the models
-	d := c.Datastore()
-	for _, model := range models {
-		model.(ModelInterface).SetOptions(WithClient(c))
-		if err = model.(ModelInterface).Migrate(d); err != nil {
-			return
-		}
 	}
 	return
 }

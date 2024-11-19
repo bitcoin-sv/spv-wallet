@@ -12,7 +12,7 @@ import (
 // TestClient_IsDebug will test the method IsDebug()
 func TestClient_IsDebug(t *testing.T) {
 	t.Run("toggle debug", func(t *testing.T) {
-		c, err := NewClient(context.Background(), WithDebugging())
+		c, err := NewClient(WithDebugging())
 		require.NotNil(t, c)
 		require.NoError(t, err)
 
@@ -32,7 +32,7 @@ func TestClient_IsDebug(t *testing.T) {
 // TestClient_Debug will test the method Debug()
 func TestClient_Debug(t *testing.T) {
 	t.Run("turn debug on", func(t *testing.T) {
-		c, err := NewClient(context.Background())
+		c, err := NewClient()
 		require.NotNil(t, c)
 		require.NoError(t, err)
 
@@ -52,7 +52,7 @@ func TestClient_Debug(t *testing.T) {
 // TestClient_DebugLog will test the method DebugLog()
 func TestClient_DebugLog(t *testing.T) {
 	t.Run("write debug log", func(t *testing.T) {
-		c, err := NewClient(context.Background(), WithDebugging())
+		c, err := NewClient(WithDebugging())
 		require.NotNil(t, c)
 		require.NoError(t, err)
 
@@ -68,9 +68,9 @@ func TestClient_DebugLog(t *testing.T) {
 // TestClient_Engine will test the method Engine()
 func TestClient_Engine(t *testing.T) {
 	t.Run("[sqlite] - get engine", func(t *testing.T) {
-		c, err := NewClient(context.Background(), WithSQLite(&SQLiteConfig{
+		c, err := NewClient(WithSQLite(&SQLiteConfig{
 			DatabasePath: "",
-			Shared:       true,
+			Shared:       false,
 		}))
 		assert.NotNil(t, c)
 		require.NoError(t, err)
@@ -83,12 +83,12 @@ func TestClient_Engine(t *testing.T) {
 // TestClient_GetTableName will test the method GetTableName()
 func TestClient_GetTableName(t *testing.T) {
 	t.Run("table prefix", func(t *testing.T) {
-		c, err := NewClient(context.Background(), WithDebugging(), WithSQLite(&SQLiteConfig{
+		c, err := NewClient(WithDebugging(), WithSQLite(&SQLiteConfig{
 			CommonConfig: CommonConfig{
 				TablePrefix: testTablePrefix,
 			},
 			DatabasePath: "",
-			Shared:       true,
+			Shared:       false,
 		}))
 		require.NotNil(t, c)
 		require.NoError(t, err)
@@ -98,12 +98,12 @@ func TestClient_GetTableName(t *testing.T) {
 	})
 
 	t.Run("no table prefix", func(t *testing.T) {
-		c, err := NewClient(context.Background(), WithDebugging(), WithSQLite(&SQLiteConfig{
+		c, err := NewClient(WithDebugging(), WithSQLite(&SQLiteConfig{
 			CommonConfig: CommonConfig{
 				TablePrefix: "",
 			},
 			DatabasePath: "",
-			Shared:       true,
+			Shared:       false,
 		}))
 		require.NotNil(t, c)
 		require.NoError(t, err)

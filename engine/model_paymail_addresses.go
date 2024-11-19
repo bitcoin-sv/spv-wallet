@@ -17,8 +17,6 @@ import (
 
 // PaymailAddress is an "external model example" - this model is not part of the standard models loaded and runtime
 //
-// This model must be included at runtime via WithAutoMigrate() etc...
-//
 // Gorm related models & indexes: https://gorm.io/docs/models.html - https://gorm.io/docs/indexes.html
 type PaymailAddress struct {
 	// Base model
@@ -343,8 +341,8 @@ func (m *PaymailAddress) AfterCreated(_ context.Context) error {
 	return nil
 }
 
-// Migrate model specific migration on startup
-func (m *PaymailAddress) Migrate(client datastore.ClientInterface) error {
+// PostMigrate is called after the model is migrated
+func (m *PaymailAddress) PostMigrate(client datastore.ClientInterface) error {
 	tableName := client.GetTableName(tablePaymailAddresses)
 	if err := m.migratePostgreSQL(client, tableName); err != nil {
 		return err
