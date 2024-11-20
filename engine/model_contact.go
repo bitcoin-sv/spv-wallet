@@ -281,8 +281,8 @@ func (m *Contact) BeforeUpdating(_ context.Context) (err error) {
 	return
 }
 
-// Migrate model specific migration on startup
-func (m *Contact) Migrate(client datastore.ClientInterface) error {
+// PostMigrate is called after the model is migrated
+func (m *Contact) PostMigrate(client datastore.ClientInterface) error {
 	tableName := client.GetTableName(tableContacts)
 	if err := m.migratePostgreSQL(client, tableName); err != nil {
 		return err

@@ -5,7 +5,6 @@ import (
 	"database/sql"
 	"testing"
 
-	"github.com/DATA-DOG/go-sqlmock"
 	compat "github.com/bitcoin-sv/go-sdk/compat/bip32"
 	"github.com/bitcoin-sv/spv-wallet/engine/datastore"
 	"github.com/bitcoin-sv/spv-wallet/engine/taskmanager"
@@ -21,8 +20,6 @@ type TestingClient struct {
 	client      ClientInterface  // Local SPV Wallet Engine client for testing
 	ctx         context.Context  // Current CTX
 	database    datastore.Engine // Current database
-	mocking     bool             // If mocking is enabled
-	MockSQLDB   sqlmock.Sqlmock  // Mock Database client for SQL
 	redisClient *cache.Client    // Current redis client (used for Mocking)
 	redisConn   *redigomock.Conn // Current redis connection (used for Mocking)
 	SQLConn     *sql.DB          // Read test client
@@ -51,7 +48,7 @@ func (tc *TestingClient) Close(ctx context.Context) {
 }
 
 // DefaultClientOpts will return a default set of client options required to load the new client
-func DefaultClientOpts(debug, shared bool) []ClientOps {
+func DefaultClientOpts() []ClientOps {
 	tqc := taskmanager.DefaultTaskQConfig(tester.RandomTablePrefix())
 	tqc.MaxNumWorker = 2
 	tqc.MaxNumFetcher = 2
@@ -60,12 +57,9 @@ func DefaultClientOpts(debug, shared bool) []ClientOps {
 	opts = append(
 		opts,
 		WithTaskqConfig(tqc),
-		WithSQLite(tester.SQLiteTestConfig(debug, shared)),
+		WithSQLite(tester.SQLiteTestConfig()),
 		WithCustomFeeUnit(mockFeeUnit),
 	)
-	if debug {
-		opts = append(opts, WithDebugging())
-	}
 
 	return opts
 }
@@ -79,8 +73,7 @@ func CreateTestSQLiteClient(t *testing.T, debug, shared bool, clientOpts ...Clie
 	logger := zerolog.Nop()
 
 	// Set the default options, add migrate models
-	opts := DefaultClientOpts(debug, shared)
-	opts = append(opts, WithAutoMigrate(append(BaseModels, newPaymail("", 0))...))
+	opts := DefaultClientOpts()
 	opts = append(opts, WithLogger(&logger))
 	opts = append(opts, clientOpts...)
 
@@ -105,8 +98,7 @@ func CreateBenchmarkSQLiteClient(b *testing.B, debug, shared bool, clientOpts ..
 	logger := zerolog.Nop()
 
 	// Set the default options, add migrate models
-	opts := DefaultClientOpts(debug, shared)
-	opts = append(opts, WithAutoMigrate(BaseModels...))
+	opts := DefaultClientOpts()
 	opts = append(opts, WithLogger(&logger))
 	opts = append(opts, clientOpts...)
 

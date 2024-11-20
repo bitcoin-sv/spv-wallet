@@ -1,4 +1,4 @@
-package record_test
+package testabilities
 
 import (
 	"context"
@@ -6,7 +6,6 @@ import (
 	"maps"
 	"slices"
 
-	trx "github.com/bitcoin-sv/go-sdk/transaction"
 	"github.com/bitcoin-sv/spv-wallet/engine/database"
 	"github.com/bitcoin-sv/spv-wallet/models/bsv"
 )
@@ -15,6 +14,9 @@ type mockRepository struct {
 	transactions map[string]database.Transaction
 	outputs      map[string]database.Output
 	data         map[string]database.Data
+
+	errOnSave       error
+	errOnGetOutputs error
 }
 
 func newMockRepository() *mockRepository {
@@ -26,6 +28,9 @@ func newMockRepository() *mockRepository {
 }
 
 func (m *mockRepository) SaveTX(_ context.Context, txTable *database.Transaction, outputs []*database.Output, data []*database.Data) error {
+	if m.errOnSave != nil {
+		return m.errOnSave
+	}
 	m.transactions[txTable.ID] = *txTable
 	for _, output := range outputs {
 		m.outputs[output.Outpoint().String()] = *output
@@ -37,6 +42,9 @@ func (m *mockRepository) SaveTX(_ context.Context, txTable *database.Transaction
 }
 
 func (m *mockRepository) GetOutputs(_ context.Context, outpoints iter.Seq[bsv.Outpoint]) ([]*database.Output, error) {
+	if m.errOnGetOutputs != nil {
+		return nil, m.errOnGetOutputs
+	}
 	var outputs []*database.Output
 	for outpoint := range outpoints {
 		if output, ok := m.outputs[outpoint.String()]; ok {
@@ -46,44 +54,45 @@ func (m *mockRepository) GetOutputs(_ context.Context, outpoints iter.Seq[bsv.Ou
 	return outputs, nil
 }
 
-func (m *mockRepository) withOutput(output database.Output) *mockRepository {
-	m.outputs[output.Outpoint().String()] = output
-	return m
-}
-
-func (m *mockRepository) withUTXO(outpoint bsv.Outpoint) *mockRepository {
-	m.outputs[outpoint.String()] = database.Output{
-		TxID: outpoint.TxID,
-		Vout: outpoint.Vout,
+func (m *mockRepository) WithOutputs(outputs ...database.Output) RepositoryFixture {
+	for _, output := range outputs {
+		m.outputs[output.Outpoint().String()] = output
 	}
 	return m
 }
 
-func (m *mockRepository) getAllOutputs() []database.Output {
+func (m *mockRepository) WithUTXOs(outpoints ...bsv.Outpoint) RepositoryFixture {
+	for _, o := range outpoints {
+		m.outputs[o.String()] = database.Output{
+			TxID: o.TxID,
+			Vout: o.Vout,
+		}
+	}
+	return m
+}
+
+func (m *mockRepository) WillFailOnSaveTX(err error) RepositoryFixture {
+	m.errOnSave = err
+	return m
+}
+
+func (m *mockRepository) WillFailOnGetOutputs(err error) RepositoryFixture {
+	m.errOnGetOutputs = err
+	return m
+}
+
+func (m *mockRepository) GetAllOutputs() []database.Output {
 	return slices.Collect(maps.Values(m.outputs))
 }
 
-func (m *mockRepository) getAllData() []database.Data {
+func (m *mockRepository) GetAllData() []database.Data {
 	return slices.Collect(maps.Values(m.data))
 }
 
-type mockBroadcaster struct {
-	broadcastedTxs map[string]*trx.Transaction
-	returnErr      error
-}
-
-func (m *mockBroadcaster) Broadcast(_ context.Context, tx *trx.Transaction) error {
-	m.broadcastedTxs[tx.TxID().String()] = tx
-	return m.returnErr
-}
-
-func (m *mockBroadcaster) withError(err error) *mockBroadcaster {
-	m.returnErr = err
-	return m
-}
-
-func newMockBroadcaster() *mockBroadcaster {
-	return &mockBroadcaster{
-		broadcastedTxs: make(map[string]*trx.Transaction),
+func (m *mockRepository) getTransaction(txID string) *database.Transaction {
+	tx, ok := m.transactions[txID]
+	if !ok {
+		return nil
 	}
+	return &tx
 }
