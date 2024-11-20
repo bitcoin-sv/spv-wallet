@@ -22,8 +22,8 @@ import (
 type PaymailAddress struct {
 	// Base model
 	Model
-	// Use gorm DeletedAt to handle soft deletes for paymail. We need to make it embedded so that GORM can soft delete
-	// the model. DeletedAt in Model even though is the same type as gorm.DeletedAt doesn't allow soft deletes by GORM.
+	// NOTE: gorm.DeletedAt is embedded directly here instead of relying on the DeletedAt field in the Model,
+	// as GORM requires this embedding for proper soft delete functionality
 	gorm.DeletedAt
 
 	// Model specific fields
