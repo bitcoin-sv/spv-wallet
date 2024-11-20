@@ -124,5 +124,6 @@ logging:
   format: console
 
 experimental_features:
+  # pike_contacts_enabled is a flag for enabling Pike contacts invite capability.
   pike_contacts_enabled: false
   pike_payment_enabled: false
