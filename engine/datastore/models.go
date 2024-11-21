@@ -2,7 +2,6 @@ package datastore
 
 import (
 	"context"
-	"errors"
 	"fmt"
 	"math"
 	"reflect"
@@ -371,15 +370,12 @@ func (c *Client) Raw(query string) *gorm.DB {
 // checkResult will check for records or error
 func checkResult(result *gorm.DB) error {
 	if result.Error != nil {
-		if errors.Is(result.Error, gorm.ErrRecordNotFound) {
-			return ErrNoResults
-		}
 		return result.Error
 	}
 
 	// We should actually have some rows according to GORM
 	if result.RowsAffected == 0 {
-		return ErrNoResults
+		return gorm.ErrRecordNotFound
 	}
 	return nil
 }

@@ -274,6 +274,7 @@ func getGormConfig(tablePrefix string, preparedStatement, debug bool, optionalLo
 		PrepareStmt:            preparedStatement, // default is: false
 		QueryFields:            false,
 		SkipDefaultTransaction: false,
+		TranslateError:         true,
 	}
 
 	// Optional logger vs basic
