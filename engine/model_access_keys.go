@@ -11,6 +11,7 @@ import (
 	customTypes "github.com/bitcoin-sv/spv-wallet/engine/datastore/customtypes"
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/bitcoin-sv/spv-wallet/engine/utils"
+	"gorm.io/gorm"
 )
 
 // AccessKey is an object representing an access key model
@@ -61,7 +62,7 @@ func getAccessKey(ctx context.Context, id string, opts ...ModelOps) (*AccessKey,
 
 	// Get the record
 	if err := Get(ctx, key, nil, false, defaultDatabaseReadTimeout, false); err != nil {
-		if errors.Is(err, datastore.ErrNoResults) {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return nil, nil
 		}
 		return nil, err
@@ -110,7 +111,7 @@ func getAccessKeysByXPubID(ctx context.Context, xPubID string, metadata *Metadat
 		ctx, NewBaseModel(ModelNameEmpty, opts...).Client().Datastore(),
 		&models, dbConditions, queryParams, defaultDatabaseReadTimeout,
 	); err != nil {
-		if errors.Is(err, datastore.ErrNoResults) {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return nil, nil
 		}
 		return nil, err
@@ -146,7 +147,7 @@ func getAccessKeysByXPubIDCount(ctx context.Context, xPubID string, metadata *Me
 		AccessKey{}, dbConditions, defaultDatabaseReadTimeout,
 	)
 	if err != nil {
-		if errors.Is(err, datastore.ErrNoResults) {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return 0, nil
 		}
 		return 0, err

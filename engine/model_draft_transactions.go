@@ -20,6 +20,7 @@ import (
 	"github.com/bitcoin-sv/spv-wallet/engine/utils"
 	"github.com/bitcoin-sv/spv-wallet/models/bsv"
 	"github.com/pkg/errors"
+	"gorm.io/gorm"
 )
 
 // DraftTransaction is an object representing the draft BitCoin transaction prior to the final transaction
@@ -96,7 +97,7 @@ func getDraftTransactionID(ctx context.Context, xPubID, id string,
 		opts...,
 	)}
 	if err := Get(ctx, draftTransaction, conditions, false, defaultDatabaseReadTimeout, true); err != nil {
-		if errors.Is(err, datastore.ErrNoResults) {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return nil, nil
 		}
 		return nil, err

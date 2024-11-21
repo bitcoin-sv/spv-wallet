@@ -10,6 +10,7 @@ import (
 
 	"github.com/bitcoin-sv/spv-wallet/engine/datastore"
 	"github.com/mrz1836/go-cachestore"
+	"gorm.io/gorm"
 )
 
 // Get will retrieve a model from the Cachestore or Datastore using the provided conditions
@@ -100,7 +101,7 @@ func getModelsByConditions(ctx context.Context, modelName ModelName, modelItems 
 		ctx, NewBaseModel(modelName, opts...).Client().Datastore(),
 		modelItems, dbConditions, queryParams, defaultDatabaseReadTimeout,
 	); err != nil {
-		if errors.Is(err, datastore.ErrNoResults) {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return nil
 		}
 		return err
@@ -135,7 +136,7 @@ func getModelsAggregateByConditions(ctx context.Context, modelName ModelName, mo
 		models, dbConditions, aggregateColumn, defaultDatabaseReadTimeout,
 	)
 	if err != nil {
-		if errors.Is(err, datastore.ErrNoResults) {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return nil, nil
 		}
 		return nil, err
@@ -169,7 +170,7 @@ func getModelCountByConditions(ctx context.Context, modelName ModelName, model i
 		model, dbConditions, defaultDatabaseReadTimeout,
 	)
 	if err != nil {
-		if errors.Is(err, datastore.ErrNoResults) {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return 0, nil
 		}
 		return 0, err

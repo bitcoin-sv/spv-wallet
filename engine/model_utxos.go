@@ -11,6 +11,7 @@ import (
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/bitcoin-sv/spv-wallet/engine/utils"
 	"github.com/pkg/errors"
+	"gorm.io/gorm"
 )
 
 // UtxoPointer is the actual pointer (index) for the UTXO
@@ -90,7 +91,7 @@ func getSpendableUtxos(ctx context.Context, xPubID, utxoType string, queryParams
 			ctx, NewBaseModel(ModelNameEmpty, opts...).Client().Datastore(),
 			&models, conditions, queryParams, defaultDatabaseReadTimeout,
 		); err != nil {
-			if errors.Is(err, datastore.ErrNoResults) {
+			if errors.Is(err, gorm.ErrRecordNotFound) {
 				return nil, nil
 			}
 			return nil, err
@@ -125,7 +126,7 @@ func unReserveUtxos(ctx context.Context, xPubID, draftID string, opts ...ModelOp
 		ctx, NewBaseModel(ModelNameEmpty, opts...).Client().Datastore(),
 		&models, conditions, nil, defaultDatabaseReadTimeout,
 	); err != nil {
-		if errors.Is(err, datastore.ErrNoResults) {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return nil
 		}
 		return err
@@ -329,7 +330,7 @@ func getUtxosByXpubIDCount(ctx context.Context, xPubID string, metadata *Metadat
 		Utxo{}, dbConditions, defaultDatabaseReadTimeout,
 	)
 	if err != nil {
-		if errors.Is(err, datastore.ErrNoResults) {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return 0, nil
 		}
 		return 0, err
@@ -358,7 +359,7 @@ func getUtxosByConditions(ctx context.Context, conditions map[string]interface{}
 			ModelNameEmpty, opts...).Client().Datastore(),
 		&models, conditions, queryParams, databaseLongReadTimeout,
 	); err != nil {
-		if errors.Is(err, datastore.ErrNoResults) {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return nil, nil
 		}
 		return nil, err
@@ -386,7 +387,7 @@ func getUtxo(ctx context.Context, txID string, index uint32, opts ...ModelOps) (
 
 	// Get the records
 	if err := Get(ctx, utxo, conditions, true, defaultDatabaseReadTimeout, true); err != nil {
-		if errors.Is(err, datastore.ErrNoResults) {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return nil, nil
 		}
 		return nil, err
