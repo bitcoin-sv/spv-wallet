@@ -7,6 +7,7 @@ import (
 
 	"github.com/bitcoin-sv/spv-wallet/engine/datastore"
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
+	"gorm.io/gorm"
 )
 
 // taskCleanupDraftTransactions will clean up all old expired draft transactions
@@ -32,7 +33,7 @@ func taskCleanupDraftTransactions(ctx context.Context, client *Client) error {
 		ctx, client.Datastore(),
 		&models, conditions, queryParams, defaultDatabaseReadTimeout,
 	); err != nil {
-		if errors.Is(err, datastore.ErrNoResults) {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return nil
 		}
 		return err
