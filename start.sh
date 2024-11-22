@@ -361,8 +361,7 @@ while [[ $# -gt 0 ]]; do
         echo ""
         echo -e "<----------   SPV WALLET ADMIN SECTION"
         echo -e "  -a,  --admin-panel\t Whether the spv-wallet-admin should be run - true/false"
-        exit 1;
-        shift
+        exit 0;
         ;;
         *)
         ;;
