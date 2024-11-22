@@ -90,6 +90,8 @@ services:
       SPVWALLET_PAYMAIL_DOMAINS: '${RUN_PAYMAIL_DOMAIN}'
     env_file:
       - .env.config
+    volumes:
+      - .:/config:ro
     ports:
       - "3003:3003"
     restart: always

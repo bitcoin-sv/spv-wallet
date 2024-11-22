@@ -13,6 +13,7 @@ choice=''
 
 # Constants
 default_xpriv_value="xprv9s21ZrQH143K3CbJXirfrtpLvhT3Vgusdo8coBritQ3rcS7Jy7sxWhatuxG5h2y1Cqj8FKmPp69536gmjYRpfga2MJdsGyBsnB12E19CESK"
+default_config_file="config.start.yaml"
 
 # Variables
 servicesToRun=()
@@ -131,13 +132,20 @@ function print_state() {
     print_debug "  database=${database}"
     print_debug "  cache=${cache}"
     print_debug "  spv_wallet=${spv_wallet}"
+    print_debug "  block_headers_service=${block_headers_service}"
     print_debug "  wallet_frontend=${wallet_frontend}"
     print_debug "  wallet_backend=${wallet_backend}"
-    print_debug "  background=${background}"
     print_debug "  default_xpub: $default_xpub"
     print_debug "  admin_xpub=${admin_xpub}"
     print_debug "  admin_xpriv=${admin_xpriv}"
+    print_debug "  paymail_domain=${paymail_domain}"
+    print_debug "  sw_config_file=${sw_config_file}"
+    print_debug "  name=${name}"
+    print_debug "  useDefaultName=${useDefaultName}"
+    print_debug "  expose=${expose}"
+    print_debug "  background=${background}"
     print_debug "  load_config=${load_config}"
+    print_debug "  composeFiles=${composeFiles[*]}"
     print_debug "  debug=${debug}"
     print_debug ""
 }
@@ -296,6 +304,13 @@ while [[ $# -gt 0 ]]; do
         background="$2"
         shift
         ;;
+        --sw-config)
+        sw_config_file="$2"
+        if [ "$sw_config_file" == "" ]; then
+            sw_config_file="$default_config_file"
+        fi
+        shift
+        ;;
         -ca|--compose-additional)
         parse_compose_additional "$2"
         shift
@@ -333,6 +348,7 @@ while [[ $# -gt 0 ]]; do
         echo -e "  -sw,  --spv-wallet\t\t Whether the spv-wallet should be run - true/false"
         echo -e "  -db,  --database\t\t Define database - postgresql, sqlite"
         echo -e "  -c,   --cache\t\t\t Define cache storage - freecache(in-memory), redis"
+        echo -e "  --sw-config\t\t Choose a custom config yaml file for configuring spv wallet - the file MUST be in subtree of call directory. Set it to empty string to set back to default (defaults to config.start.yaml)"
         echo -e "  --xpub\t\t\t Define admin xPub"
         echo ""
         echo -e "<----------   BLOCK HEADERS SERVICE SECTION"
@@ -384,12 +400,10 @@ if [ "$load_config" == "true" ]; then
             load_from 'SPVWALLET_AUTH_ADMIN_KEY' admin_xpub
             load_from 'SPVWALLET_ADMIN_XPRIV' admin_xpriv
             load_from 'RUN_ADMIN_PANEL' admin_panel
+            load_from 'SPVWALLET_CONFIG_FILE' sw_config_file
+            # remove /config/ prefix as we're binding the volume with the config file to /config/ directory
+            sw_config_file="${sw_config_file//\/config\//}"
         done < ".env.config"
-
-        if [ -n "$paymail_domain" ]; then
-            SPVWALLET_ARC_CALLBACK_HOST="https://$paymail_domain"
-            print_debug "SPVWALLET_ARC_CALLBACK_HOST set to $SPVWALLET_ARC_CALLBACK_HOST"
-        fi
 
         print_success "Config loaded from .env.config file"
         print_debug "Config after loading .env.config:"
@@ -556,7 +570,26 @@ save_to 'RUN_NAME' name
 save_to 'RUN_WITH_DEFAULT_XPUB' default_xpub
 save_to 'SPVWALLET_AUTH_ADMIN_KEY' admin_xpub
 save_to 'SPVWALLET_ADMIN_XPRIV' admin_xpriv
-save_to 'SPVWALLET_ARC_CALLBACK_HOST' SPVWALLET_ARC_CALLBACK_HOST
+
+if [ "$spv_wallet" == "true" ] && [ "$sw_config_file" == "" ]; then
+    sw_config_file="$default_config_file"
+    print_debug "setting sw_config_file to default: $sw_config_file"
+fi
+
+if [ "$spv_wallet" == "true" ] && [ ! -f "$sw_config_file" ]; then
+    if [ "$sw_config_file" != "$default_config_file" ]; then
+        print_error "Config file $sw_config_file does not exist."
+        ask_for_yes_or_no "Do you want unset config file and continue?"
+        if [ "$choice" == "false" ]; then
+            exit 1
+        fi
+    fi
+    sw_config_file=""
+fi
+
+if [ "$sw_config_file" != "" ]; then
+    save_value 'SPVWALLET_CONFIG_FILE' "/config/$sw_config_file"
+fi
 
 if [ "$admin_panel" == "true" ] && [ "$default_xpub" == "true" ]; then
     {
@@ -587,6 +620,7 @@ fi
 
 if [ "$spv_wallet" == "true" ]; then
   save_value 'SPVWALLET_SERVER_URL' "http://spv-wallet:3003/v1"
+  save_value 'SPVWALLET_ARC_CALLBACK_HOST' "https://$paymail_domain"
 else
   save_value 'SPVWALLET_SERVER_URL' "http://host.docker.internal:3003/v1"
 fi
