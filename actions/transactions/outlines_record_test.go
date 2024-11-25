@@ -139,3 +139,38 @@ func TestOutlinesRecordOpReturnErrorCases(t *testing.T) {
 		})
 	}
 }
+
+func TestOutlinesRecordOpReturnOnBroadcastError(t *testing.T) {
+	// given:
+	given, then := testabilities.New(t)
+	cleanup := given.StartedSPVWallet()
+	defer cleanup()
+
+	// and:
+	client := given.HttpClient().ForUser()
+
+	// and:
+	txSpec := givenTXWithOpReturn(t)
+	request := `{
+			"beef": "` + txSpec.BEEF() + `",
+			"annotations": {
+				"outputs": {
+					"0": {
+						"bucket": "data"
+					}
+				}
+			}
+		}`
+
+	// and:
+	given.ARC().WillRespondForBroadcast(500, &chainmodels.TXInfo{})
+
+	// when:
+	res, _ := client.R().
+		SetHeader("Content-Type", "application/json").
+		SetBody(request).
+		Post(transactionsOutlinesRecordURL)
+
+	// then:
+	then.Response(res).HasStatus(500).WithJSONf(apierror.ExpectedJSON("error-tx-broadcast", "failed to broadcast transaction"))
+}
