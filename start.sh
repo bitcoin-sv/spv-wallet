@@ -578,7 +578,7 @@ fi
 if [ "$spv_wallet" == "true" ] && [ ! -f "$sw_config_file" ]; then
     if [ "$sw_config_file" != "$default_config_file" ]; then
         print_error "Config file $sw_config_file does not exist."
-        ask_for_yes_or_no "Do you want unset config file and continue?"
+        ask_for_yes_or_no "Do you want to unset config file and continue?"
         if [ "$choice" == "false" ]; then
             exit 1
         fi
