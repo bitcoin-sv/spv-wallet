@@ -268,7 +268,7 @@ while [[ $# -gt 0 ]]; do
         spv_wallet="$2"
         shift
         ;;
-        -bhs|--blockchain-headers-service)
+        -bhs|--block-headers-service)
         block_headers_service="$2"
         shift
         ;;
@@ -348,11 +348,12 @@ while [[ $# -gt 0 ]]; do
         echo -e "  -sw,  --spv-wallet\t\t Whether the spv-wallet should be run - true/false"
         echo -e "  -db,  --database\t\t Define database - postgresql, sqlite"
         echo -e "  -c,   --cache\t\t\t Define cache storage - freecache(in-memory), redis"
-        echo -e "  --sw-config\t\t Choose a custom config yaml file for configuring spv wallet - the file MUST be in subtree of call directory. Set it to empty string to set back to default (defaults to config.start.yaml)"
+        echo -e "  --sw-config <file>\t\t Choose a custom config yaml file for configuring spv wallet - the file MUST be in subtree of call directory."
+        echo -e "  \t\t\t\t Set it to empty string to set back to default (defaults to config.start.yaml)"
         echo -e "  --xpub\t\t\t Define admin xPub"
         echo ""
         echo -e "<----------   BLOCK HEADERS SERVICE SECTION"
-        echo -e "  -bhs,  --blockchain-headers-service\t Whether the block-headers-service should be run - true/false"
+        echo -e "  -bhs,  --block-headers-service Whether the block-headers-service should be run - true/false"
         echo ""
         echo -e "<----------   SPV WALLET COMPONENT SECTION"
         echo -e "  -wf,  --wallet-frontend\t Whether the wallet-frontend should be run - true/false"
@@ -360,7 +361,7 @@ while [[ $# -gt 0 ]]; do
         echo -e "  --xprv\t\t\t Define admin xPriv"
         echo ""
         echo -e "<----------   SPV WALLET ADMIN SECTION"
-        echo -e "  -a,  --admin-panel\t Whether the spv-wallet-admin should be run - true/false"
+        echo -e "  -a,  --admin-panel\t\t Whether the spv-wallet-admin should be run - true/false"
         exit 0;
         ;;
         *)
