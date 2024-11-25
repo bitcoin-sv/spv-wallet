@@ -38,7 +38,7 @@ func newUtxoFixture(t testing.TB, db *gorm.DB, index uint32) *userUtxoFixture {
 }
 
 func txIDTemplated(index uint) string {
-	return fmt.Sprintf("b6ebbe78d93e1b81dd2c9c0c6cd67f9bdf832e9c2bb12a1d57f30c%010d", index)
+	return fmt.Sprintf("a%010de1b81dd2c9c0c6cd67f9bdf832e9c2bb12a1d57f30cb6ebbe78d9", index)
 }
 
 func (f *userUtxoFixture) OwnedBySender() UserUtxoFixture {
