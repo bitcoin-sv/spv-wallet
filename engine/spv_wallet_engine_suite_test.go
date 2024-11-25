@@ -156,8 +156,6 @@ func (ts *EmbeddedDBTestSuite) genericDBClient(t *testing.T, database datastore.
 	}
 	opts = append(opts,
 		WithDebugging(),
-		WithAutoMigrate(BaseModels...),
-		WithAutoMigrate(&PaymailAddress{}),
 		WithCustomFeeUnit(mockFeeUnit),
 	)
 	if taskManagerEnabled {

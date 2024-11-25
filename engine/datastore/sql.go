@@ -139,15 +139,6 @@ func openSQLiteDatabase(optionalLogger glogger.Interface, config *SQLiteConfig) 
 		return
 	}
 
-	// @mrz: turned off, unsure if it's really needed or not
-	// Get the SQL DB
-	// var sqlDB *sql.DB
-	// sqlDB, err = db.DB()
-	// sqlDB.SetMaxIdleConns(config.MaxIdleConnections)
-	// sqlDB.SetMaxOpenConns(config.MaxOpenConnections)
-	// sqlDB.SetConnMaxLifetime(config.MaxConnectionTime)
-	// sqlDB.SetConnMaxIdleTime(config.MaxConnectionIdleTime)
-
 	// Return the connection
 	return
 }
@@ -283,6 +274,7 @@ func getGormConfig(tablePrefix string, preparedStatement, debug bool, optionalLo
 		PrepareStmt:            preparedStatement, // default is: false
 		QueryFields:            false,
 		SkipDefaultTransaction: false,
+		TranslateError:         true,
 	}
 
 	// Optional logger vs basic

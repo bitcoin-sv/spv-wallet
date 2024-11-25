@@ -26,7 +26,5 @@ func Register(appConfig *config.AppConfig, handlersManager *handlers.Manager) {
 	users.RegisterRoutes(handlersManager)
 	sharedconfig.RegisterRoutes(handlersManager)
 	merkleroots.RegisterRoutes(handlersManager)
-	if appConfig.ExperimentalFeatures.PikeContactsEnabled {
-		contacts.RegisterRoutes(handlersManager)
-	}
+	contacts.RegisterRoutes(handlersManager)
 }

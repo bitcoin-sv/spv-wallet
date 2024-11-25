@@ -13,24 +13,26 @@ import (
 	"github.com/bitcoin-sv/spv-wallet/engine/datastore"
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/bitcoin-sv/spv-wallet/engine/utils"
+	"gorm.io/gorm"
 )
 
 // PaymailAddress is an "external model example" - this model is not part of the standard models loaded and runtime
-//
-// This model must be included at runtime via WithAutoMigrate() etc...
 //
 // Gorm related models & indexes: https://gorm.io/docs/models.html - https://gorm.io/docs/indexes.html
 type PaymailAddress struct {
 	// Base model
 	Model
+	// NOTE: gorm.DeletedAt is embedded directly here instead of relying on the DeletedAt field in the Model,
+	// as GORM requires this embedding for proper soft delete functionality
+	gorm.DeletedAt
 
 	// Model specific fields
-	ID         string `json:"id" toml:"id" yaml:"id" gorm:"<-:create;type:char(64);primaryKey;comment:This is the unique paymail record id"`                // Unique identifier
-	XpubID     string `json:"xpub_id" toml:"xpub_id" yaml:"xpub_id" gorm:"<-:create;type:char(64);index;comment:This is the related xPub"`                  // Related xPub ID
-	Alias      string `json:"alias" toml:"alias" yaml:"alias" gorm:"<-;type:varchar(64);comment:This is alias@"`                                            // Alias part of the paymail
-	Domain     string `json:"domain" toml:"domain" yaml:"domain" gorm:"<-;type:varchar(255);comment:This is @domain.com"`                                   // Domain of the paymail
-	PublicName string `json:"public_name" toml:"public_name" yaml:"public_name" gorm:"<-;type:varchar(255);comment:This is public name for public profile"` // Full username
-	Avatar     string `json:"avatar" toml:"avatar" yaml:"avatar" gorm:"<-;type:text;comment:This is avatar url"`                                            // This is the url of the user (public profile)
+	ID         string `json:"id" toml:"id" yaml:"id" gorm:"<-:create;type:char(64);primaryKey;comment:This is the unique paymail record id"`                                               // Unique identifier
+	XpubID     string `json:"xpub_id" toml:"xpub_id" yaml:"xpub_id" gorm:"<-:create;type:char(64);index;comment:This is the related xPub"`                                                 // Related xPub ID
+	Alias      string `json:"alias" toml:"alias" yaml:"alias" gorm:"<-;type:varchar(64);index:,unique,composite:paymail_addr_uq,where:deleted_at IS NULL;comment:This is alias@"`          // Alias part of the paymail
+	Domain     string `json:"domain" toml:"domain" yaml:"domain" gorm:"<-;type:varchar(255);index:,unique,composite:paymail_addr_uq,where:deleted_at IS NULL;comment:This is @domain.com"` // Domain of the paymail
+	PublicName string `json:"public_name" toml:"public_name" yaml:"public_name" gorm:"<-;type:varchar(255);comment:This is public name for public profile"`                                // Full username
+	Avatar     string `json:"avatar" toml:"avatar" yaml:"avatar" gorm:"<-;type:text;comment:This is avatar url"`                                                                           // This is the url of the user (public profile)
 
 	ExternalXpubKey    string `json:"external_xpub_key" toml:"external_xpub_key" yaml:"external_xpub_key" gorm:"<-:create;type:varchar(512);index;comment:This is full xPub for external use, encryption optional"` // PublicKey hex encoded
 	ExternalXpubKeyNum uint32 `json:"external_xpub_num" toml:"external_xpub_num" yaml:"external_xpub_num" gorm:"<-;type:int;default:0;comment:Derivation number used to generate ExternalXpubKey:external_xpub_num"`
@@ -75,7 +77,7 @@ func getPaymailAddress(ctx context.Context, address string, opts ...ModelOps) (*
 	if err := Get(
 		ctx, paymailAddress, conditions, false, defaultDatabaseReadTimeout, false,
 	); err != nil {
-		if errors.Is(err, datastore.ErrNoResults) {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return nil, nil
 		}
 		return nil, err
@@ -113,7 +115,7 @@ func getPaymailAddressByID(ctx context.Context, id string, opts ...ModelOps) (*P
 	if err := Get(
 		ctx, paymailAddress, nil, false, defaultDatabaseReadTimeout, false,
 	); err != nil {
-		if errors.Is(err, datastore.ErrNoResults) {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return nil, nil
 		}
 		return nil, err
@@ -343,8 +345,8 @@ func (m *PaymailAddress) AfterCreated(_ context.Context) error {
 	return nil
 }
 
-// Migrate model specific migration on startup
-func (m *PaymailAddress) Migrate(client datastore.ClientInterface) error {
+// PostMigrate is called after the model is migrated
+func (m *PaymailAddress) PostMigrate(client datastore.ClientInterface) error {
 	tableName := client.GetTableName(tablePaymailAddresses)
 	if err := m.migratePostgreSQL(client, tableName); err != nil {
 		return err
@@ -357,9 +359,14 @@ func (m *PaymailAddress) Migrate(client datastore.ClientInterface) error {
 // migratePostgreSQL is specific migration SQL for Postgresql
 func (m *PaymailAddress) migratePostgreSQL(client datastore.ClientInterface, tableName string) error {
 	idxName := "idx_" + tableName + "_paymail_address"
-	tx := client.Execute(`CREATE INDEX IF NOT EXISTS "` + idxName + `" ON "` + tableName + `" ("alias", "domain")`)
-	if tx.Error != nil {
-		return tx.Error
+	// Drop the index if exists because it's now handled via gorm tags in the model definition
+	if !client.DB().Migrator().HasIndex(&PaymailAddress{}, idxName) {
+		return nil
+	}
+
+	err := client.DB().Migrator().DropIndex(&PaymailAddress{}, idxName)
+	if err != nil {
+		return fmt.Errorf("failed to drop index %s: %w", idxName, err)
 	}
 	return nil
 }

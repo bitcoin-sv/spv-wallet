@@ -9,6 +9,7 @@ import (
 	"github.com/bitcoin-sv/spv-wallet/engine/notifications"
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/pkg/errors"
+	"gorm.io/gorm"
 )
 
 // Webhook stores information about subscriptions to notifications via webhooks
@@ -67,8 +68,8 @@ func (m *Webhook) BeforeCreating(_ context.Context) error {
 	return nil
 }
 
-// Migrate model specific migration on startup
-func (m *Webhook) Migrate(client datastore.ClientInterface) error {
+// PostMigrate is called after the model is migrated
+func (m *Webhook) PostMigrate(client datastore.ClientInterface) error {
 	err := client.IndexMetadata(client.GetTableName(tableAccessKeys), metadataField)
 	return spverrors.Wrapf(err, "failed to index metadata column on model %s", m.GetModelName())
 }
@@ -164,7 +165,7 @@ func (wr *WebhooksRepository) GetByURL(ctx context.Context, url string) (notific
 	webhook.enrich(ModelWebhook, wr.client.DefaultModelOptions()...)
 
 	if err := Get(ctx, webhook, conditions, false, defaultDatabaseReadTimeout, false); err != nil {
-		if errors.Is(err, datastore.ErrNoResults) {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return nil, nil
 		}
 		return nil, err

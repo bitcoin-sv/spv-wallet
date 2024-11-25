@@ -9,6 +9,7 @@ import (
 	"github.com/bitcoin-sv/spv-wallet/engine/datastore"
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/bitcoin-sv/spv-wallet/engine/utils"
+	"gorm.io/gorm"
 )
 
 // Xpub is an object representing an HD-Key or extended public key (xPub for short)
@@ -50,7 +51,7 @@ func getXpub(ctx context.Context, key string, opts ...ModelOps) (*Xpub, error) {
 	if err := Get(
 		ctx, xPub, nil, false, defaultDatabaseReadTimeout, true,
 	); err != nil {
-		if errors.Is(err, datastore.ErrNoResults) {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return nil, nil
 		}
 		return nil, err
@@ -66,7 +67,7 @@ func getXpubByID(ctx context.Context, xPubID string, opts ...ModelOps) (*Xpub, e
 	if err := Get(
 		ctx, xPub, nil, false, defaultDatabaseReadTimeout, true,
 	); err != nil {
-		if errors.Is(err, datastore.ErrNoResults) {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return nil, nil
 		}
 		return nil, err
@@ -260,7 +261,7 @@ func (m *Xpub) incrementNextNum(ctx context.Context, chain uint32) (uint32, erro
 	}
 
 	newNumU32, errConversion := conv.Int64ToUint32(newNum)
-	if err != nil {
+	if errConversion != nil {
 		return 0, spverrors.Wrapf(errConversion, "failed to convert int64 to uint32")
 	}
 
@@ -279,7 +280,7 @@ func (m *Xpub) incrementNextNum(ctx context.Context, chain uint32) (uint32, erro
 	newNumMinusOne := newNum - 1
 
 	newNumMinusOneU32, errConversion := conv.Int64ToUint32(newNumMinusOne)
-	if err != nil {
+	if errConversion != nil {
 		return 0, spverrors.Wrapf(errConversion, "failed to convert int64 to uint32")
 	}
 
@@ -357,8 +358,8 @@ func (m *Xpub) AfterUpdated(ctx context.Context) error {
 	return nil
 }
 
-// Migrate model specific migration on startup
-func (m *Xpub) Migrate(client datastore.ClientInterface) error {
+// PostMigrate is called after the model is migrated
+func (m *Xpub) PostMigrate(client datastore.ClientInterface) error {
 	err := client.IndexMetadata(client.GetTableName(tableXPubs), metadataField)
 	return spverrors.Wrapf(err, "failed to index metadata column on model %s", m.GetModelName())
 }

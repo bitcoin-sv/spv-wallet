@@ -2,7 +2,6 @@ package datastore
 
 import (
 	"context"
-	"strings"
 
 	zLogger "github.com/mrz1836/go-logger"
 	"gorm.io/gorm"
@@ -18,18 +17,15 @@ type (
 
 	// clientOptions holds all the configuration for the client
 	clientOptions struct {
-		autoMigrate    bool                        // Setting for Auto Migration of SQL tables
-		db             *gorm.DB                    // Database connection for Read-Only requests (can be same as Write)
-		debug          bool                        // Setting for global debugging
-		engine         Engine                      // Datastore engine (PostgreSQL, SQLite)
-		fields         *fieldConfig                // Configuration for custom fields
-		logger         zLogger.GormLoggerInterface // Custom logger interface (standard interface)
-		loggerDB       gLogger.Interface           // Custom logger interface (for GORM)
-		migratedModels []string                    // List of models (types) that have been migrated
-		migrateModels  []interface{}               // Models for migrations
-		sqlConfigs     []*SQLConfig                // Configuration for a PostgreSQL datastore
-		sqLite         *SQLiteConfig               // Configuration for a SQLite datastore
-		tablePrefix    string                      // Model table prefix
+		db          *gorm.DB                    // Database connection for Read-Only requests (can be same as Write)
+		debug       bool                        // Setting for global debugging
+		engine      Engine                      // Datastore engine (PostgreSQL, SQLite)
+		fields      *fieldConfig                // Configuration for custom fields
+		logger      zLogger.GormLoggerInterface // Custom logger interface (standard interface)
+		loggerDB    gLogger.Interface           // Custom logger interface (for GORM)
+		sqlConfigs  []*SQLConfig                // Configuration for a PostgreSQL datastore
+		sqLite      *SQLiteConfig               // Configuration for a SQLite datastore
+		tablePrefix string                      // Model table prefix
 	}
 
 	// fieldConfig is the configuration for custom fields
@@ -42,7 +38,7 @@ type (
 // NewClient creates a new client for all Datastore functionality
 //
 // If no options are given, it will use the defaultClientOptions()
-func NewClient(ctx context.Context, opts ...ClientOps) (ClientInterface, error) {
+func NewClient(opts ...ClientOps) (ClientInterface, error) {
 	// Create a new client with defaults
 	client := &Client{options: defaultClientOptions()}
 
@@ -91,19 +87,12 @@ func NewClient(ctx context.Context, opts ...ClientOps) (ClientInterface, error) 
 		}
 	}
 
-	// Auto migrate
-	if client.options.autoMigrate && len(client.options.migrateModels) > 0 {
-		if err = client.AutoMigrateDatabase(ctx, client.options.migrateModels...); err != nil {
-			return nil, err
-		}
-	}
-
 	// Return the client
 	return client, nil
 }
 
 // Close will terminate (close) the datastore and any open connections
-func (c *Client) Close(ctx context.Context) error {
+func (c *Client) Close() error {
 
 	if err := closeSQLDatabase(c.options.db); err != nil {
 		return err
@@ -156,16 +145,6 @@ func (c *Client) GetArrayFields() []string {
 // GetObjectFields will return the object fields
 func (c *Client) GetObjectFields() []string {
 	return c.options.fields.objectFields
-}
-
-// HasMigratedModel will return if the model type has been migrated
-func (c *Client) HasMigratedModel(modelType string) bool {
-	for _, t := range c.options.migratedModels {
-		if strings.EqualFold(t, modelType) {
-			return true
-		}
-	}
-	return false
 }
 
 // IsDebug will return the debug flag (bool)
