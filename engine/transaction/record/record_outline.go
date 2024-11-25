@@ -48,14 +48,14 @@ func (s *Service) RecordTransactionOutline(ctx context.Context, outline *outline
 		utxo.Spend(txID)
 	}
 
-	txRecord := database.Transaction{
+	txRow := database.Transaction{
 		ID:       txID,
 		TxStatus: database.TxStatusBroadcasted,
 	}
-	txRecord.AddOutputs(append(newOutputs, utxos...)...) //newly created outputs and spent utxos
-	txRecord.AddData(newDataRecords...)
+	txRow.AddOutputs(append(newOutputs, utxos...)...) //newly created outputs and spent utxos
+	txRow.AddData(newDataRecords...)
 
-	err = s.repo.SaveTX(ctx, &txRecord)
+	err = s.repo.SaveTX(ctx, &txRow)
 	if err != nil {
 		return txerrors.ErrSavingData.Wrap(err)
 	}

@@ -17,14 +17,14 @@ type recordTXRepository struct {
 }
 
 // SaveTX saves a transaction to the database.
-func (r *recordTXRepository) SaveTX(ctx context.Context, txTable *database.Transaction) error {
+func (r *recordTXRepository) SaveTX(ctx context.Context, txRow *database.Transaction) error {
 	query := r.db.
 		WithContext(ctx).
 		Clauses(clause.OnConflict{
 			UpdateAll: true,
 		})
 
-	if err := query.Create(txTable).Error; err != nil {
+	if err := query.Create(txRow).Error; err != nil {
 		return spverrors.Wrapf(err, "failed to save transaction")
 	}
 

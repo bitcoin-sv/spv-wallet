@@ -4,6 +4,7 @@ import (
 	"testing"
 
 	"github.com/bitcoin-sv/spv-wallet/actions/testabilities"
+	"github.com/bitcoin-sv/spv-wallet/actions/testabilities/apierror"
 	chainmodels "github.com/bitcoin-sv/spv-wallet/engine/chain/models"
 	"github.com/bitcoin-sv/spv-wallet/engine/tester/fixtures"
 )
@@ -72,18 +73,21 @@ func TestOutlinesRecordOpReturnErrorCases(t *testing.T) {
 	tests := map[string]struct {
 		request        string
 		expectHttpCode int
+		expectedErr    string
 	}{
 		"RecordTransactionOutline for not signed transaction": {
 			request: `{
 				"beef": "` + givenUnsignedTX.BEEF() + `"
 			}`,
 			expectHttpCode: 400,
+			expectedErr:    apierror.ExpectedJSON("error-transaction-validation", "transaction validation failed"),
 		},
 		"RecordTransactionOutline for not a BEEF hex": {
 			request: `{
 				"beef": "0b3818c665bf28a46""
 			}`,
 			expectHttpCode: 400,
+			expectedErr:    apierror.ExpectedJSON("error-bind-body-invalid", "cannot bind request body"),
 		},
 		"Vout out index as invalid number": {
 			request: `{
@@ -97,6 +101,7 @@ func TestOutlinesRecordOpReturnErrorCases(t *testing.T) {
 				}
 			}`,
 			expectHttpCode: 400,
+			expectedErr:    apierror.ExpectedJSON("error-bind-body-invalid", "cannot bind request body"),
 		},
 		"no-op_return output annotated as data": {
 			request: `{
@@ -110,6 +115,7 @@ func TestOutlinesRecordOpReturnErrorCases(t *testing.T) {
 				}
 			}`,
 			expectHttpCode: 400,
+			expectedErr:    apierror.ExpectedJSON("error-annotation-mismatch", "annotation mismatch"),
 		},
 	}
 	for name, test := range tests {
@@ -129,7 +135,7 @@ func TestOutlinesRecordOpReturnErrorCases(t *testing.T) {
 				Post(transactionsOutlinesRecordURL)
 
 			// then:
-			then.Response(res).HasStatus(test.expectHttpCode)
+			then.Response(res).HasStatus(test.expectHttpCode).WithJSONf(test.expectedErr)
 		})
 	}
 }

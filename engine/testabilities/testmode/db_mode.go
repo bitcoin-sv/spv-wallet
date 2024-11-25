@@ -14,11 +14,18 @@ import (
 const (
 	modeEnvVar = "TEST_DB_MODE"
 	nameEnvVar = "TEST_DB_NAME"
+
+	defaultPostgresDBName = "postgres"
 )
 
 // SetPostgresMode sets the test mode to use actual Postgres and sets the database name.
-func SetPostgresMode(t testing.TB, dbName string) {
+func SetPostgresMode(t testing.TB) {
 	t.Setenv(modeEnvVar, "postgres")
+}
+
+// SetPostgresModeWithName sets the test mode to use actual Postgres and sets the database name.
+func SetPostgresModeWithName(t testing.TB, dbName string) {
+	SetPostgresMode(t)
 	t.Setenv(nameEnvVar, dbName)
 }
 
@@ -34,7 +41,7 @@ func CheckPostgresMode() (ok bool, dbName string) {
 	}
 	dbName = os.Getenv(nameEnvVar)
 	if dbName == "" {
-		panic("TEST_DB_NAME must be set when TEST_DB_MODE is 'postgres'")
+		dbName = defaultPostgresDBName
 	}
 	return true, dbName
 }
