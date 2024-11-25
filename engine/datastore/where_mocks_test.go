@@ -47,7 +47,7 @@ func mockClient(engine Engine) (*Client, *gorm.DB) {
 	client, _ := clientInterface.(*Client)
 	client.options.engine = engine
 	dialector := mockDialector(engine)
-	gdb, _ := gorm.Open(dialector, &gorm.Config{})
+	gdb, _ := gorm.Open(dialector, &gorm.Config{TranslateError: true})
 	return client, gdb
 }
 

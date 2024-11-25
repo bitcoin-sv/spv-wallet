@@ -11,6 +11,7 @@ import (
 	"github.com/bitcoin-sv/spv-wallet/engine/datastore"
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/bitcoin-sv/spv-wallet/engine/utils"
+	"gorm.io/gorm"
 )
 
 // Destination is an object representing a BitCoin destination (address, script, etc)
@@ -108,7 +109,7 @@ func getDestinationByID(ctx context.Context, id string, opts ...ModelOps) (*Dest
 
 	// Get the record
 	if err := Get(ctx, destination, nil, true, defaultDatabaseReadTimeout, false); err != nil {
-		if errors.Is(err, datastore.ErrNoResults) {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return nil, nil
 		}
 		return nil, err
@@ -129,7 +130,7 @@ func getDestinationByAddress(ctx context.Context, address string, opts ...ModelO
 
 	// Get the record
 	if err := Get(ctx, destination, conditions, true, defaultDatabaseReadTimeout, false); err != nil {
-		if errors.Is(err, datastore.ErrNoResults) {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return nil, nil
 		}
 		return nil, err
@@ -145,7 +146,7 @@ func getDestinationByLockingScript(ctx context.Context, lockingScript string, op
 
 	// Get the record
 	if err := Get(ctx, destination, nil, true, defaultDatabaseReadTimeout, false); err != nil {
-		if errors.Is(err, datastore.ErrNoResults) {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return nil, nil
 		}
 		return nil, err
@@ -195,7 +196,7 @@ func getDestinationsByXpubID(ctx context.Context, xPubID string, usingMetadata *
 		ctx, NewBaseModel(ModelNameEmpty, opts...).Client().Datastore(),
 		&destModels, dbConditions, queryParams, defaultDatabaseReadTimeout,
 	); err != nil {
-		if errors.Is(err, datastore.ErrNoResults) {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return nil, nil
 		}
 		return nil, err
@@ -233,8 +234,9 @@ func getDestinationsCountByXPubID(ctx context.Context, xPubID string, usingMetad
 		dbConditions,
 		defaultDatabaseReadTimeout,
 	)
+
 	if err != nil {
-		if errors.Is(err, datastore.ErrNoResults) {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return 0, nil
 		}
 		return 0, err
