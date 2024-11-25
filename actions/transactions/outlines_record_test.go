@@ -10,7 +10,7 @@ import (
 )
 
 const (
-	transactionsOutlinesRecordURL = "/api/v1/transactions/outlines/record"
+	transactionsOutlinesRecordURL = "/api/v2/transactions"
 	dataOfOpReturnTx              = "hello world"
 )
 

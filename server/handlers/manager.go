@@ -18,6 +18,9 @@ const (
 	// GroupAPI is the group with the API prefix and auth middleware
 	GroupAPI
 
+	// GroupAPIV2 is the group with the API v2 prefix and auth middleware
+	GroupAPIV2
+
 	// GroupTransactionCallback is the group with the transaction callback prefix and callback token middleware (no auth middleware)
 	GroupTransactionCallback
 )
@@ -39,6 +42,7 @@ func NewManager(engine *gin.Engine, apiVersion string) *Manager {
 			GroupRoot:                engine.Group(""),
 			GroupOldAPI:              authRouter.Group(prefix),
 			GroupAPI:                 authRouter.Group("/api" + prefix),
+			GroupAPIV2:               authRouter.Group("/api/v2"),
 			GroupTransactionCallback: engine.Group("", middleware.CallbackTokenMiddleware()),
 		},
 	}

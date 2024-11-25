@@ -1,4 +1,4 @@
-package engine
+package dao
 
 import (
 	"context"
@@ -12,12 +12,18 @@ import (
 	"gorm.io/gorm/clause"
 )
 
-type recordTXRepository struct {
+// Transactions is a data access object for transactions.
+type Transactions struct {
 	db *gorm.DB
 }
 
+// NewTransactionsAccessObject creates a new access object for transactions.
+func NewTransactionsAccessObject(db *gorm.DB) *Transactions {
+	return &Transactions{db: db}
+}
+
 // SaveTX saves a transaction to the database.
-func (r *recordTXRepository) SaveTX(ctx context.Context, txRow *database.Transaction) error {
+func (r *Transactions) SaveTX(ctx context.Context, txRow *database.Transaction) error {
 	query := r.db.
 		WithContext(ctx).
 		Clauses(clause.OnConflict{
@@ -32,7 +38,7 @@ func (r *recordTXRepository) SaveTX(ctx context.Context, txRow *database.Transac
 }
 
 // GetOutputs returns outputs from the database based on the provided outpoints.
-func (r *recordTXRepository) GetOutputs(ctx context.Context, outpoints iter.Seq[bsv.Outpoint]) ([]*database.Output, error) {
+func (r *Transactions) GetOutputs(ctx context.Context, outpoints iter.Seq[bsv.Outpoint]) ([]*database.Output, error) {
 	outpointsClause := slices.Collect(func(yield func(sqlPair []any) bool) {
 		for outpoint := range outpoints {
 			yield([]any{outpoint.TxID, outpoint.Vout})

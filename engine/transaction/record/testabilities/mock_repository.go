@@ -35,6 +35,11 @@ func (m *mockRepository) SaveTX(_ context.Context, txTable *database.Transaction
 	for _, output := range txTable.Outputs {
 		m.outputs[output.Outpoint().String()] = *output
 	}
+	for _, output := range txTable.Inputs {
+		utxo := *output
+		utxo.SpendingTX = txTable.ID
+		m.outputs[utxo.Outpoint().String()] = utxo
+	}
 	for _, d := range txTable.Data {
 		m.data[d.Outpoint().String()] = *d
 	}

@@ -44,15 +44,13 @@ func (s *Service) RecordTransactionOutline(ctx context.Context, outline *outline
 	// TODO: handle TXInfo returned from Broadcast (SPV-1157)
 
 	txID := tx.TxID().String()
-	for _, utxo := range utxos {
-		utxo.Spend(txID)
-	}
 
 	txRow := database.Transaction{
 		ID:       txID,
 		TxStatus: database.TxStatusBroadcasted,
 	}
-	txRow.AddOutputs(append(newOutputs, utxos...)...) //newly created outputs and spent utxos
+	txRow.AddInputs(utxos...)
+	txRow.AddOutputs(newOutputs...)
 	txRow.AddData(newDataRecords...)
 
 	err = s.repo.SaveTX(ctx, &txRow)

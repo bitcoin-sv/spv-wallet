@@ -18,19 +18,19 @@ const (
 	defaultPostgresDBName = "postgres"
 )
 
-// SetPostgresMode sets the test mode to use actual Postgres and sets the database name.
-func SetPostgresMode(t testing.TB) {
+// DevelopmentOnly_SetPostgresMode sets the test mode to use actual Postgres and sets the database name.
+func DevelopmentOnly_SetPostgresMode(t testing.TB) {
 	t.Setenv(modeEnvVar, "postgres")
 }
 
-// SetPostgresModeWithName sets the test mode to use actual Postgres and sets the database name.
-func SetPostgresModeWithName(t testing.TB, dbName string) {
-	SetPostgresMode(t)
+// DevelopmentOnly_SetPostgresModeWithName sets the test mode to use actual Postgres and sets the database name.
+func DevelopmentOnly_SetPostgresModeWithName(t testing.TB, dbName string) {
+	DevelopmentOnly_SetPostgresMode(t)
 	t.Setenv(nameEnvVar, dbName)
 }
 
-// SetFileSQLiteMode sets the test mode to use SQLite file
-func SetFileSQLiteMode(t testing.TB) {
+// DevelopmentOnly_SetFileSQLiteMode sets the test mode to use SQLite file
+func DevelopmentOnly_SetFileSQLiteMode(t testing.TB) {
 	t.Setenv(modeEnvVar, "file")
 }
 

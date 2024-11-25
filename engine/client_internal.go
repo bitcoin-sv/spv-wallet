@@ -7,6 +7,7 @@ import (
 	"github.com/bitcoin-sv/go-paymail/server"
 	"github.com/bitcoin-sv/spv-wallet/engine/chain"
 	"github.com/bitcoin-sv/spv-wallet/engine/cluster"
+	"github.com/bitcoin-sv/spv-wallet/engine/database/dao"
 	"github.com/bitcoin-sv/spv-wallet/engine/datastore"
 	"github.com/bitcoin-sv/spv-wallet/engine/notifications"
 	paymailclient "github.com/bitcoin-sv/spv-wallet/engine/paymail"
@@ -209,7 +210,7 @@ func (c *Client) loadTransactionOutlinesService() error {
 func (c *Client) loadTransactionRecordService() error {
 	if c.options.transactionRecordService == nil {
 		logger := c.Logger().With().Str("subservice", "transactionRecord").Logger()
-		c.options.transactionRecordService = record.NewService(logger, &recordTXRepository{c.Datastore().DB()}, c.Chain())
+		c.options.transactionRecordService = record.NewService(logger, dao.NewTransactionsAccessObject(c.Datastore().DB()), c.Chain())
 	}
 	return nil
 }

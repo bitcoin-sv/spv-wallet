@@ -7,6 +7,7 @@ type Transaction struct {
 
 	Outputs []*Output `gorm:"foreignKey:TxID"`
 	Data    []*Data   `gorm:"foreignKey:TxID"`
+	Inputs  []*Output `gorm:"foreignKey:SpendingTX"`
 }
 
 // TableName implements gorm.Tabler to override automatic table naming.
@@ -19,6 +20,11 @@ func (t *Transaction) TableName() string {
 // AddOutputs adds outputs to the transaction.
 func (t *Transaction) AddOutputs(outputs ...*Output) {
 	t.Outputs = append(t.Outputs, outputs...)
+}
+
+// AddInputs adds inputs to the transaction.
+func (t *Transaction) AddInputs(inputs ...*Output) {
+	t.Inputs = append(t.Inputs, inputs...)
 }
 
 // AddData adds data to the transaction.
