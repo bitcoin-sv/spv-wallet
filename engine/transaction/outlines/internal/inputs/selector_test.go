@@ -86,11 +86,12 @@ func TestInputsSelector(t *testing.T) {
 			defer cleanup()
 
 			// and: having some utxo in database
-			var ownedInputs []*database.UserUtxos
-			ownedInputs = append(ownedInputs, given.DB().HasUTXO().OwnedBySender().P2PKH().WithSatoshis(10).Stored())
-			ownedInputs = append(ownedInputs, given.DB().HasUTXO().OwnedBySender().P2PKH().WithSatoshis(10).Stored())
-			ownedInputs = append(ownedInputs, given.DB().HasUTXO().OwnedBySender().P2PKH().WithSatoshis(10).Stored())
-			ownedInputs = append(ownedInputs, given.DB().HasUTXO().OwnedBySender().P2PKH().WithSatoshis(10).Stored())
+			ownedInputs := []*database.UserUtxos{
+				given.DB().HasUTXO().OwnedBySender().P2PKH().WithSatoshis(10).Stored(),
+				given.DB().HasUTXO().OwnedBySender().P2PKH().WithSatoshis(10).Stored(),
+				given.DB().HasUTXO().OwnedBySender().P2PKH().WithSatoshis(10).Stored(),
+				given.DB().HasUTXO().OwnedBySender().P2PKH().WithSatoshis(10).Stored(),
+			}
 
 			// and:
 			selector := given.NewInputSelector()
@@ -131,11 +132,12 @@ func TestInputsSelector(t *testing.T) {
 			defer cleanup()
 
 			// and: having some utxo in database
-			var ownedInputs []*database.UserUtxos
-			ownedInputs = append(ownedInputs, given.DB().HasUTXO().OwnedBySender().P2PKH().WithSatoshis(10).Stored())
-			ownedInputs = append(ownedInputs, given.DB().HasUTXO().OwnedBySender().P2PKH().WithSatoshis(10).Stored())
-			ownedInputs = append(ownedInputs, given.DB().HasUTXO().OwnedBySender().P2PKH().WithSatoshis(10).Stored())
-			ownedInputs = append(ownedInputs, given.DB().HasUTXO().OwnedBySender().P2PKH().WithSatoshis(10).Stored())
+			ownedInputs := []*database.UserUtxos{
+				given.DB().HasUTXO().OwnedBySender().P2PKH().WithSatoshis(10).Stored(),
+				given.DB().HasUTXO().OwnedBySender().P2PKH().WithSatoshis(10).Stored(),
+				given.DB().HasUTXO().OwnedBySender().P2PKH().WithSatoshis(10).Stored(),
+				given.DB().HasUTXO().OwnedBySender().P2PKH().WithSatoshis(10).Stored(),
+			}
 
 			// and:
 			selector := given.NewInputSelector()

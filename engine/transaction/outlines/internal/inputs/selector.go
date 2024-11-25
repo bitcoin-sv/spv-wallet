@@ -14,8 +14,6 @@ import (
 const txIdColumn = "tx_id"
 const voutColumn = "vout"
 
-var model = &database.UserUtxos{}
-
 // Selector is a service that selects inputs for transaction.
 type Selector interface {
 	SelectInputsForTransaction(ctx context.Context, xPubID string, satoshis bsv.Satoshis, byteSizeOfTxBeforeAddingSelectedInputs uint64) ([]*database.UserUtxos, error)

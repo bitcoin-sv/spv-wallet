@@ -27,7 +27,7 @@ func (c *inputsQueryComposer) build(db *gorm.DB) *gorm.DB {
 }
 
 func (c *inputsQueryComposer) utxos(db *gorm.DB) *gorm.DB {
-	return db.Model(model).
+	return db.Model(&database.UserUtxos{}).
 		Select(
 			txIdColumn,
 			voutColumn,

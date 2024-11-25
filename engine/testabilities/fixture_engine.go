@@ -115,9 +115,7 @@ func (f *engineFixture) ConfigForTests(opts ...ConfigOpts) *config.AppConfig {
 
 // prepareDBConfigForTests creates a new connection that will be used as connection for engine
 func (f *engineFixture) prepareDBConfigForTests() {
-	if f.config.Db.Datastore.Engine != datastore.SQLite {
-		panic("Other datastore engines are not supported in tests (yet)")
-	}
+	require.Equal(f.t, datastore.SQLite, f.config.Db.Datastore.Engine, "Other datastore engines are not supported in tests (yet)")
 
 	// It is a workaround for development purpose to check the code with postgres instance.
 	mode := os.Getenv("TEST_DB_MODE")
