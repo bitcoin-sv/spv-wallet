@@ -44,3 +44,5 @@ data/
 
 # Ignore config file
 config.yaml
+config.*.yaml
+!config.example.yaml
