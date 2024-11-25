@@ -213,7 +213,7 @@ func TestTransaction_BeforeCreating(t *testing.T) {
 	t.Run("no transaction hex", func(t *testing.T) {
 		transaction := emptyTx()
 
-		opts := DefaultClientOpts(false, false)
+		opts := DefaultClientOpts()
 		client, _ := NewClient(context.Background(), opts...)
 		transaction.client = client
 

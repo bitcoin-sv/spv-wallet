@@ -147,8 +147,8 @@ func (m *Transaction) ChildModels() (childModels []ModelInterface) {
 	return
 }
 
-// Migrate model specific migration on startup
-func (m *Transaction) Migrate(client datastore.ClientInterface) error {
+// PostMigrate runs right after the model is migrated
+func (m *Transaction) PostMigrate(client datastore.ClientInterface) error {
 	tableName := client.GetTableName(tableTransactions)
 	if client.Engine() == datastore.PostgreSQL {
 		if err := m.migratePostgreSQL(client, tableName); err != nil {

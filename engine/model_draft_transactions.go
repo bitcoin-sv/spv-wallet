@@ -20,6 +20,7 @@ import (
 	"github.com/bitcoin-sv/spv-wallet/engine/utils"
 	"github.com/bitcoin-sv/spv-wallet/models/bsv"
 	"github.com/pkg/errors"
+	"gorm.io/gorm"
 )
 
 // DraftTransaction is an object representing the draft BitCoin transaction prior to the final transaction
@@ -96,7 +97,7 @@ func getDraftTransactionID(ctx context.Context, xPubID, id string,
 		opts...,
 	)}
 	if err := Get(ctx, draftTransaction, conditions, false, defaultDatabaseReadTimeout, true); err != nil {
-		if errors.Is(err, datastore.ErrNoResults) {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return nil, nil
 		}
 		return nil, err
@@ -834,8 +835,8 @@ func (m *DraftTransaction) AfterUpdated(ctx context.Context) error {
 	return nil
 }
 
-// Migrate model specific migration on startup
-func (m *DraftTransaction) Migrate(client datastore.ClientInterface) error {
+// PostMigrate is called after the model is migrated
+func (m *DraftTransaction) PostMigrate(client datastore.ClientInterface) error {
 	err := client.IndexMetadata(client.GetTableName(tableDraftTransactions), metadataField)
 	return spverrors.Wrapf(err, "failed to index metadata column on model %s", m.GetModelName())
 }

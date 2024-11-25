@@ -222,8 +222,6 @@ func (c *AppConfig) addDataStoreOpts(options []engine.ClientOps) ([]engine.Clien
 		return nil, spverrors.Newf("unsupported datastore engine: %s", c.Db.Datastore.Engine.String())
 	}
 
-	options = append(options, engine.WithAutoMigrate(engine.BaseModels...))
-
 	return options, nil
 }
 

@@ -7,6 +7,7 @@ import (
 	trx "github.com/bitcoin-sv/go-sdk/transaction"
 	"github.com/bitcoin-sv/spv-wallet/engine/datastore"
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
+	"gorm.io/gorm"
 )
 
 // getTransactionByID will get the model from a given transaction ID
@@ -18,7 +19,7 @@ func getTransactionByID(ctx context.Context, xPubID, txID string, opts ...ModelO
 
 	// Get the record
 	if err := Get(ctx, tx, nil, false, defaultDatabaseReadTimeout, false); err != nil {
-		if errors.Is(err, datastore.ErrNoResults) {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return nil, nil
 		}
 		return nil, err
@@ -35,7 +36,7 @@ func getAdminTransactionByID(ctx context.Context, txID string, opts ...ModelOps)
 
 	// Get the record
 	if err := Get(ctx, tx, nil, false, defaultDatabaseReadTimeout, false); err != nil {
-		if errors.Is(err, datastore.ErrNoResults) {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return nil, nil
 		}
 		return nil, err
@@ -158,7 +159,7 @@ func getTransactionsInternal(ctx context.Context, conditions map[string]interfac
 		queryParams,
 		defaultDatabaseReadTimeout,
 	); err != nil {
-		if errors.Is(err, datastore.ErrNoResults) {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return nil, nil
 		}
 		return nil, err

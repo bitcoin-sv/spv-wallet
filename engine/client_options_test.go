@@ -58,7 +58,7 @@ func TestWithUserAgent(t *testing.T) {
 	})
 
 	t.Run("empty user agent", func(t *testing.T) {
-		opts := DefaultClientOpts(false, true)
+		opts := DefaultClientOpts()
 		opts = append(opts, WithUserAgent(""), WithLogger(&testLogger))
 
 		tc, err := NewClient(context.Background(), opts...)
@@ -73,7 +73,7 @@ func TestWithUserAgent(t *testing.T) {
 	t.Run("custom user agent", func(t *testing.T) {
 		customAgent := "custom-user-agent"
 
-		opts := DefaultClientOpts(false, true)
+		opts := DefaultClientOpts()
 		opts = append(opts, WithUserAgent(customAgent), WithLogger(&testLogger))
 
 		tc, err := NewClient(context.Background(), opts...)
@@ -98,13 +98,12 @@ func TestWithDebugging(t *testing.T) {
 	t.Run("set debug (with cache and Datastore)", func(t *testing.T) {
 		tc, err := NewClient(
 			context.Background(),
-			DefaultClientOpts(true, true)...,
+			append(DefaultClientOpts(), WithDebugging())...,
 		)
 		require.NoError(t, err)
 		require.NotNil(t, tc)
 		defer CloseClient(context.Background(), t, tc)
 
-		assert.Equal(t, true, tc.IsDebug())
 		assert.Equal(t, true, tc.Cachestore().IsDebug())
 		assert.Equal(t, true, tc.Datastore().IsDebug())
 	})
@@ -121,7 +120,7 @@ func TestWithEncryption(t *testing.T) {
 	})
 
 	t.Run("empty key", func(t *testing.T) {
-		opts := DefaultClientOpts(false, true)
+		opts := DefaultClientOpts()
 		opts = append(opts, WithEncryption(""))
 		opts = append(opts, WithLogger(&testLogger))
 
@@ -135,7 +134,7 @@ func TestWithEncryption(t *testing.T) {
 
 	t.Run("custom encryption key", func(t *testing.T) {
 		key, _ := utils.RandomHex(32)
-		opts := DefaultClientOpts(false, true)
+		opts := DefaultClientOpts()
 		opts = append(opts, WithEncryption(key))
 		opts = append(opts, WithLogger(&testLogger))
 
@@ -168,7 +167,7 @@ func TestWithRedis(t *testing.T) {
 			WithRedis(&cachestore.RedisConfig{
 				URL: cachestore.RedisPrefix + "localhost:6379",
 			}),
-			WithSQLite(tester.SQLiteTestConfig(false, true)),
+			WithSQLite(tester.SQLiteTestConfig()),
 			WithCustomFeeUnit(mockFeeUnit),
 			WithLogger(&testLogger),
 		)
@@ -192,7 +191,7 @@ func TestWithRedis(t *testing.T) {
 			WithRedis(&cachestore.RedisConfig{
 				URL: "localhost:6379",
 			}),
-			WithSQLite(tester.SQLiteTestConfig(false, true)),
+			WithSQLite(tester.SQLiteTestConfig()),
 			WithCustomFeeUnit(mockFeeUnit),
 			WithLogger(&testLogger),
 		)
@@ -220,7 +219,7 @@ func TestWithRedisConnection(t *testing.T) {
 			context.Background(),
 			WithTaskqConfig(taskmanager.DefaultTaskQConfig(tester.RandomTablePrefix())),
 			WithRedisConnection(nil),
-			WithSQLite(tester.SQLiteTestConfig(false, true)),
+			WithSQLite(tester.SQLiteTestConfig()),
 			WithCustomFeeUnit(mockFeeUnit),
 			WithLogger(&testLogger),
 		)
@@ -242,7 +241,7 @@ func TestWithRedisConnection(t *testing.T) {
 			context.Background(),
 			WithTaskqConfig(taskmanager.DefaultTaskQConfig(tester.RandomTablePrefix())),
 			WithRedisConnection(client),
-			WithSQLite(tester.SQLiteTestConfig(false, true)),
+			WithSQLite(tester.SQLiteTestConfig()),
 			WithCustomFeeUnit(mockFeeUnit),
 			WithLogger(&testLogger),
 		)
@@ -271,7 +270,7 @@ func TestWithFreeCache(t *testing.T) {
 			context.Background(),
 			WithFreeCache(),
 			WithTaskqConfig(taskmanager.DefaultTaskQConfig(testQueueName)),
-			WithSQLite(&datastore.SQLiteConfig{Shared: true}),
+			WithSQLite(tester.SQLiteTestConfig()),
 			WithCustomFeeUnit(mockFeeUnit),
 			WithLogger(&testLogger))
 		require.NoError(t, err)
@@ -299,7 +298,7 @@ func TestWithFreeCacheConnection(t *testing.T) {
 			context.Background(),
 			WithFreeCacheConnection(nil),
 			WithTaskqConfig(taskmanager.DefaultTaskQConfig(testQueueName)),
-			WithSQLite(&datastore.SQLiteConfig{Shared: true}),
+			WithSQLite(tester.SQLiteTestConfig()),
 			WithCustomFeeUnit(mockFeeUnit),
 			WithLogger(&testLogger),
 		)
@@ -319,7 +318,7 @@ func TestWithFreeCacheConnection(t *testing.T) {
 			context.Background(),
 			WithFreeCacheConnection(fc),
 			WithTaskqConfig(taskmanager.DefaultTaskQConfig(testQueueName)),
-			WithSQLite(&datastore.SQLiteConfig{Shared: true}),
+			WithSQLite(tester.SQLiteTestConfig()),
 			WithCustomFeeUnit(mockFeeUnit),
 			WithLogger(&testLogger),
 		)
@@ -339,7 +338,7 @@ func TestWithPaymailClient(t *testing.T) {
 	testLogger := zerolog.Nop()
 
 	t.Run("using a nil driver, automatically makes paymail client", func(t *testing.T) {
-		opts := DefaultClientOpts(false, true)
+		opts := DefaultClientOpts()
 		opts = append(opts, WithPaymailClient(nil))
 		opts = append(opts, WithLogger(&testLogger))
 
@@ -356,7 +355,7 @@ func TestWithPaymailClient(t *testing.T) {
 		require.NoError(t, err)
 		require.NotNil(t, p)
 
-		opts := DefaultClientOpts(false, true)
+		opts := DefaultClientOpts()
 		opts = append(opts, WithPaymailClient(p))
 		opts = append(opts, WithLogger(&testLogger))
 
@@ -379,7 +378,7 @@ func TestWithTaskQ(t *testing.T) {
 	// todo: test cases where config is nil, or cannot load TaskQ
 
 	t.Run("using taskq using memory", func(t *testing.T) {
-		tcOpts := DefaultClientOpts(true, true)
+		tcOpts := DefaultClientOpts()
 		tcOpts = append(tcOpts, WithLogger(&testLogger))
 
 		tc, err := NewClient(
@@ -408,7 +407,7 @@ func TestWithTaskQ(t *testing.T) {
 			WithRedis(&cachestore.RedisConfig{
 				URL: cachestore.RedisPrefix + "localhost:6379",
 			}),
-			WithSQLite(tester.SQLiteTestConfig(false, true)),
+			WithSQLite(tester.SQLiteTestConfig()),
 			WithCustomFeeUnit(mockFeeUnit),
 			WithLogger(&testLogger),
 		)
@@ -432,7 +431,7 @@ func TestWithLogger(t *testing.T) {
 	})
 
 	t.Run("test applying nil", func(t *testing.T) {
-		opts := DefaultClientOpts(false, true)
+		opts := DefaultClientOpts()
 		opts = append(opts, WithLogger(nil))
 
 		tc, err := NewClient(context.Background(), opts...)
@@ -446,7 +445,7 @@ func TestWithLogger(t *testing.T) {
 
 	t.Run("test applying option", func(t *testing.T) {
 		customLogger := zerolog.Nop()
-		opts := DefaultClientOpts(false, true)
+		opts := DefaultClientOpts()
 		opts = append(opts, WithLogger(&customLogger))
 
 		tc, err := NewClient(context.Background(), opts...)
@@ -455,53 +454,6 @@ func TestWithLogger(t *testing.T) {
 		defer CloseClient(context.Background(), t, tc)
 
 		assert.Equal(t, &customLogger, tc.Logger())
-	})
-}
-
-// TestWithModels will test the method WithModels()
-func TestWithModels(t *testing.T) {
-	t.Parallel()
-	testLogger := zerolog.Nop()
-
-	t.Run("check type", func(t *testing.T) {
-		opt := WithModels()
-		assert.IsType(t, *new(ClientOps), opt)
-	})
-
-	t.Run("empty models - returns default models", func(t *testing.T) {
-		opts := DefaultClientOpts(false, true)
-		opts = append(opts, WithModels())
-		opts = append(opts, WithLogger(&testLogger))
-
-		tc, err := NewClient(context.Background(), opts...)
-		require.NoError(t, err)
-		require.NotNil(t, tc)
-		defer CloseClient(context.Background(), t, tc)
-
-		assert.Equal(t, []string{
-			ModelXPub.String(), ModelAccessKey.String(),
-			ModelDraftTransaction.String(), ModelTransaction.String(),
-			ModelDestination.String(),
-			ModelUtxo.String(), ModelContact.String(), ModelWebhook.String(),
-		}, tc.GetModelNames())
-	})
-
-	t.Run("add custom models", func(t *testing.T) {
-		opts := DefaultClientOpts(false, true)
-		opts = append(opts, WithModels(newPaymail(testPaymail, 0)))
-		opts = append(opts, WithLogger(&testLogger))
-
-		tc, err := NewClient(context.Background(), opts...)
-		require.NoError(t, err)
-		require.NotNil(t, tc)
-		defer CloseClient(context.Background(), t, tc)
-
-		assert.Equal(t, []string{
-			ModelXPub.String(), ModelAccessKey.String(),
-			ModelDraftTransaction.String(), ModelTransaction.String(),
-			ModelDestination.String(),
-			ModelUtxo.String(), ModelContact.String(), ModelWebhook.String(), ModelPaymailAddress.String(),
-		}, tc.GetModelNames())
 	})
 }
 
@@ -516,7 +468,7 @@ func TestWithIUCDisabled(t *testing.T) {
 	})
 
 	t.Run("default options", func(t *testing.T) {
-		opts := DefaultClientOpts(false, true)
+		opts := DefaultClientOpts()
 		opts = append(opts, WithLogger(&testLogger))
 
 		tc, err := NewClient(context.Background(), opts...)
@@ -528,7 +480,7 @@ func TestWithIUCDisabled(t *testing.T) {
 	})
 
 	t.Run("iuc disabled", func(t *testing.T) {
-		opts := DefaultClientOpts(false, true)
+		opts := DefaultClientOpts()
 		opts = append(opts, WithIUCDisabled())
 		opts = append(opts, WithLogger(&testLogger))
 
@@ -552,7 +504,7 @@ func TestWithCustomCachestore(t *testing.T) {
 	})
 
 	t.Run("test applying nil", func(t *testing.T) {
-		opts := DefaultClientOpts(false, true)
+		opts := DefaultClientOpts()
 		opts = append(opts, WithCustomCachestore(nil))
 		opts = append(opts, WithLogger(&testLogger))
 
@@ -568,7 +520,7 @@ func TestWithCustomCachestore(t *testing.T) {
 		customCache, err := cachestore.NewClient(context.Background())
 		require.NoError(t, err)
 
-		opts := DefaultClientOpts(false, true)
+		opts := DefaultClientOpts()
 		opts = append(opts, WithCustomCachestore(customCache))
 		opts = append(opts, WithLogger(&testLogger))
 
@@ -593,7 +545,7 @@ func TestWithCustomDatastore(t *testing.T) {
 	})
 
 	t.Run("test applying nil", func(t *testing.T) {
-		opts := DefaultClientOpts(false, true)
+		opts := DefaultClientOpts()
 		opts = append(opts, WithCustomDatastore(nil))
 		opts = append(opts, WithLogger(&testLogger))
 
@@ -606,10 +558,10 @@ func TestWithCustomDatastore(t *testing.T) {
 	})
 
 	t.Run("test applying option", func(t *testing.T) {
-		customData, err := datastore.NewClient(context.Background())
+		customData, err := datastore.NewClient()
 		require.NoError(t, err)
 
-		opts := DefaultClientOpts(false, true)
+		opts := DefaultClientOpts()
 		opts = append(opts, WithCustomDatastore(customData))
 		opts = append(opts, WithLogger(&testLogger))
 
@@ -625,97 +577,5 @@ func TestWithCustomDatastore(t *testing.T) {
 	// Attempt to remove a file created during the test
 	t.Cleanup(func() {
 		_ = os.Remove("datastore.db")
-	})
-}
-
-// TestWithAutoMigrate will test the method WithAutoMigrate()
-func TestWithAutoMigrate(t *testing.T) {
-	t.Parallel()
-	testLogger := zerolog.Nop()
-
-	t.Run("check type", func(t *testing.T) {
-		opt := WithAutoMigrate()
-		assert.IsType(t, *new(ClientOps), opt)
-	})
-
-	t.Run("no additional models, just base models", func(t *testing.T) {
-		opts := DefaultClientOpts(false, true)
-		opts = append(opts, WithAutoMigrate())
-		opts = append(opts, WithLogger(&testLogger))
-
-		tc, err := NewClient(context.Background(), opts...)
-		require.NoError(t, err)
-		require.NotNil(t, tc)
-		defer CloseClient(context.Background(), t, tc)
-
-		assert.Equal(t, []string{
-			ModelXPub.String(),
-			ModelAccessKey.String(),
-			ModelDraftTransaction.String(),
-			ModelTransaction.String(),
-			ModelDestination.String(),
-			ModelUtxo.String(),
-			ModelContact.String(),
-			ModelWebhook.String(),
-		}, tc.GetModelNames())
-	})
-
-	t.Run("one additional model", func(t *testing.T) {
-		opts := DefaultClientOpts(false, true)
-		opts = append(opts, WithAutoMigrate(newPaymail(testPaymail, 0)))
-		opts = append(opts, WithLogger(&testLogger))
-
-		tc, err := NewClient(context.Background(), opts...)
-		require.NoError(t, err)
-		require.NotNil(t, tc)
-		defer CloseClient(context.Background(), t, tc)
-
-		assert.Equal(t, []string{
-			ModelXPub.String(),
-			ModelAccessKey.String(),
-			ModelDraftTransaction.String(),
-			ModelTransaction.String(),
-			ModelDestination.String(),
-			ModelUtxo.String(),
-			ModelContact.String(),
-			ModelWebhook.String(),
-			ModelPaymailAddress.String(),
-		}, tc.GetModelNames())
-	})
-}
-
-// TestWithMigrationDisabled will test the method WithMigrationDisabled()
-func TestWithMigrationDisabled(t *testing.T) {
-	t.Parallel()
-	testLogger := zerolog.Nop()
-
-	t.Run("check type", func(t *testing.T) {
-		opt := WithMigrationDisabled()
-		assert.IsType(t, *new(ClientOps), opt)
-	})
-
-	t.Run("default options", func(t *testing.T) {
-		opts := DefaultClientOpts(false, true)
-		opts = append(opts, WithLogger(&testLogger))
-
-		tc, err := NewClient(context.Background(), opts...)
-		require.NoError(t, err)
-		require.NotNil(t, tc)
-		defer CloseClient(context.Background(), t, tc)
-
-		assert.Equal(t, true, tc.IsMigrationEnabled())
-	})
-
-	t.Run("migration disabled", func(t *testing.T) {
-		opts := DefaultClientOpts(false, true)
-		opts = append(opts, WithMigrationDisabled())
-		opts = append(opts, WithLogger(&testLogger))
-
-		tc, err := NewClient(context.Background(), opts...)
-		require.NoError(t, err)
-		require.NotNil(t, tc)
-		defer CloseClient(context.Background(), t, tc)
-
-		assert.Equal(t, false, tc.IsMigrationEnabled())
 	})
 }

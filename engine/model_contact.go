@@ -10,6 +10,7 @@ import (
 	"github.com/bitcoin-sv/spv-wallet/engine/datastore"
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/google/uuid"
+	"gorm.io/gorm"
 )
 
 // Contact is a model that represents a known contacts of the user and invitations to contact.
@@ -54,7 +55,7 @@ func getContact(ctx context.Context, paymail, ownerXpubID string, opts ...ModelO
 	contact.enrich(ModelContact, opts...)
 
 	if err := Get(ctx, contact, conditions, false, defaultDatabaseReadTimeout, false); err != nil {
-		if errors.Is(err, datastore.ErrNoResults) {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return nil, nil
 		}
 		return nil, err
@@ -72,7 +73,7 @@ func getContactByID(ctx context.Context, id string, opts ...ModelOps) (*Contact,
 	contact.enrich(ModelContact, opts...)
 
 	if err := Get(ctx, contact, conditions, false, defaultDatabaseReadTimeout, false); err != nil {
-		if errors.Is(err, datastore.ErrNoResults) {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return nil, nil
 		}
 		return nil, err
@@ -100,7 +101,7 @@ func getContactsByXPubIDCount(ctx context.Context, xPubID string, metadata *Meta
 		Contact{}, dbConditions, defaultDatabaseReadTimeout,
 	)
 	if err != nil {
-		if errors.Is(err, datastore.ErrNoResults) {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return 0, nil
 		}
 		return 0, err
@@ -281,8 +282,8 @@ func (m *Contact) BeforeUpdating(_ context.Context) (err error) {
 	return
 }
 
-// Migrate model specific migration on startup
-func (m *Contact) Migrate(client datastore.ClientInterface) error {
+// PostMigrate is called after the model is migrated
+func (m *Contact) PostMigrate(client datastore.ClientInterface) error {
 	tableName := client.GetTableName(tableContacts)
 	if err := m.migratePostgreSQL(client, tableName); err != nil {
 		return err

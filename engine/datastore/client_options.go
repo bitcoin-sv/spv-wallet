@@ -16,8 +16,7 @@ type ClientOps func(c *clientOptions)
 func defaultClientOptions() *clientOptions {
 	// Set the default options
 	return &clientOptions{
-		autoMigrate: false,
-		engine:      Empty,
+		engine: Empty,
 		fields: &fieldConfig{
 			arrayFields:  nil,
 			objectFields: []string{metadataField},
@@ -27,24 +26,6 @@ func defaultClientOptions() *clientOptions {
 				Debug: false,
 			},
 		},
-	}
-}
-
-// WithAutoMigrate will enable auto migrate database mode (given models)
-//
-// Pointers of structs (IE: &models.Xpub{})
-func WithAutoMigrate(migrateModels ...interface{}) ClientOps {
-	return func(c *clientOptions) {
-		if len(migrateModels) == 0 {
-			return
-		}
-		for index, model := range migrateModels {
-			if model != nil {
-				c.autoMigrate = true
-				// todo: make a function to ensure these are unique models (no duplicates)
-				c.migrateModels = append(c.migrateModels, migrateModels[index])
-			}
-		}
 	}
 }
 

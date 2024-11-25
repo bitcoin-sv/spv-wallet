@@ -5,11 +5,11 @@ import (
 	"net/http"
 
 	"github.com/bitcoin-sv/spv-wallet/engine"
-	"github.com/bitcoin-sv/spv-wallet/engine/datastore"
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/bitcoin-sv/spv-wallet/mappings"
 	"github.com/bitcoin-sv/spv-wallet/server/reqctx"
 	"github.com/gin-gonic/gin"
+	"gorm.io/gorm"
 )
 
 // transactionRecord will save and complete a transaction directly, without any checks
@@ -43,7 +43,7 @@ func transactionRecord(c *gin.Context, _ *reqctx.AdminContext) {
 		opts...,
 	)
 	if err != nil {
-		if errors.Is(err, datastore.ErrDuplicateKey) {
+		if errors.Is(err, gorm.ErrDuplicatedKey) {
 			// already registered, just return the registered transaction
 			if transaction, err = engineInstance.GetTransactionByHex(c.Request.Context(), requestBody.Hex); err != nil {
 				spverrors.ErrorResponse(c, err, logger)

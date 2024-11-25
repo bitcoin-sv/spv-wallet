@@ -2,11 +2,11 @@ package engine
 
 import (
 	"context"
-	"time"
+	"errors"
 
 	"github.com/bitcoin-sv/spv-wallet/engine/datastore"
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
-	"github.com/bitcoin-sv/spv-wallet/engine/utils"
+	"gorm.io/gorm"
 )
 
 // GetPaymailAddress will get a paymail address model
@@ -108,15 +108,6 @@ func (c *Client) NewPaymailAddress(ctx context.Context, xPubKey, address, public
 		return nil, err
 	}
 
-	// Check if the paymail address already exists
-	paymail, err := getPaymailAddress(ctx, address, opts...)
-	if paymail != nil {
-		return nil, spverrors.ErrPaymailAlreadyExists
-	}
-	if err != nil {
-		return nil, err
-	}
-
 	externalXpubDerivation, err := xPub.GetNextExternalDerivationNum(ctx)
 	if err != nil {
 		return nil, err
@@ -138,6 +129,9 @@ func (c *Client) NewPaymailAddress(ctx context.Context, xPubKey, address, public
 
 	// Save the model
 	if err = paymailAddress.Save(ctx); err != nil {
+		if errors.Is(err, gorm.ErrDuplicatedKey) {
+			return nil, spverrors.ErrPaymailAlreadyExists
+		}
 		return nil, err
 	}
 	return paymailAddress, nil
@@ -154,21 +148,12 @@ func (c *Client) DeletePaymailAddress(ctx context.Context, address string, opts 
 		return spverrors.ErrCouldNotFindPaymail
 	}
 
-	// todo: make a better approach for deleting paymail addresses?
-	var randomString string
-	if randomString, err = utils.RandomHex(16); err != nil {
-		return spverrors.Wrapf(err, "could not generate random string for deletion of paymail address %s", address)
+	tx := c.Datastore().DB().Delete(&paymailAddress)
+	if tx.Error != nil {
+		return spverrors.ErrDeletePaymailAddress.Wrap(tx.Error)
 	}
 
-	// We will do a soft delete to make sure we still have the history for this address
-	// setting the Domain to a random string solved the problem of the unique index on Alias/Domain
-	// todo: figure out a different approach - history table?
-	paymailAddress.Alias = paymailAddress.Alias + "@" + paymailAddress.Domain
-	paymailAddress.Domain = randomString
-	paymailAddress.DeletedAt.Valid = true
-	paymailAddress.DeletedAt.Time = time.Now()
-
-	return paymailAddress.Save(ctx)
+	return nil
 }
 
 // UpdatePaymailAddressMetadata will update the metadata in an existing paymail address

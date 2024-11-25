@@ -42,7 +42,6 @@ type (
 		iuc                        bool                   // (Input UTXO Check) True will check input utxos when saving transactions
 		logger                     *zerolog.Logger        // Internal logging
 		metrics                    *metrics.Metrics       // Metrics with a collector interface
-		models                     *modelOptions          // Configuration options for the loaded models
 		notifications              *notificationsOptions  // Configuration options for Notifications
 		paymail                    *paymailOptions        // Paymail options & client
 		transactionOutlinesService outlines.Service       // Service for transaction drafts
@@ -71,16 +70,7 @@ type (
 	// dataStoreOptions holds the data storage configuration and client
 	dataStoreOptions struct {
 		datastore.ClientInterface                       // Client for Datastore
-		migrationDisabled         bool                  // If the migrations are disabled
 		options                   []datastore.ClientOps // List of options
-	}
-
-	// modelOptions holds the model configuration
-	modelOptions struct {
-		migrateModelNames []string      // List of models for migration
-		migrateModels     []interface{} // Models for migrations
-		modelNames        []string      // List of all models
-		models            []interface{} // Models for use in this engine
 	}
 
 	// notificationsOptions holds the configuration for notifications
@@ -141,14 +131,11 @@ func NewClient(ctx context.Context, opts ...ClientOps) (ClientInterface, error) 
 	}
 
 	// Load the Datastore (automatically migrate models)
-	if err = client.loadDatastore(ctx); err != nil {
+	if err = client.loadDatastore(); err != nil {
 		return nil, err
 	}
 
-	// Run custom model datastore migrations (after initializing models)
-	if err = client.runModelMigrations(
-		client.options.models.migrateModels...,
-	); err != nil {
+	if err = client.autoMigrate(ctx); err != nil {
 		return nil, err
 	}
 
@@ -199,37 +186,6 @@ func NewClient(ctx context.Context, opts ...ClientOps) (ClientInterface, error) 
 	return client, nil
 }
 
-// AddModels will add additional models to the client
-func (c *Client) AddModels(ctx context.Context, autoMigrate bool, models ...interface{}) error {
-	// Store the models locally in the client
-	c.options.addModels(modelList, models...)
-
-	// Should we migrate the models?
-	if autoMigrate {
-
-		// Ensure we have a datastore
-		d := c.Datastore()
-		if d == nil {
-			return spverrors.ErrDatastoreRequired
-		}
-
-		// Apply the database migration with the new models
-		if err := d.AutoMigrateDatabase(ctx, models...); err != nil {
-			return spverrors.Wrapf(err, "failed to auto migrate models")
-		}
-
-		// Add to the list
-		c.options.addModels(migrateList, models...)
-
-		// Run model migrations
-		if err := c.runModelMigrations(models...); err != nil {
-			return err
-		}
-	}
-
-	return nil
-}
-
 // Cachestore will return the Cachestore IF: exists and is enabled
 func (c *Client) Cachestore() cachestore.ClientInterface {
 	if c.options.cacheStore != nil && c.options.cacheStore.ClientInterface != nil {
@@ -252,7 +208,7 @@ func (c *Client) Close(ctx context.Context) error {
 	// Close Datastore
 	ds := c.Datastore()
 	if ds != nil {
-		if err := ds.Close(ctx); err != nil {
+		if err := ds.Close(); err != nil {
 			return spverrors.Wrapf(err, "failed to close datastore")
 		}
 		c.options.dataStore.ClientInterface = nil
@@ -297,11 +253,6 @@ func (c *Client) Debug(on bool) {
 	}
 }
 
-// GetModelNames will return the model names that have been loaded
-func (c *Client) GetModelNames() []string {
-	return c.options.models.modelNames
-}
-
 // IsDebug will return the debug flag (bool)
 func (c *Client) IsDebug() bool {
 	return c.options.debug
@@ -315,11 +266,6 @@ func (c *Client) IsIUCEnabled() bool {
 // IsEncryptionKeySet will return the flag (bool) if the encryption key has been set
 func (c *Client) IsEncryptionKeySet() bool {
 	return len(c.options.encryptionKey) > 0
-}
-
-// IsMigrationEnabled will return the flag (bool)
-func (c *Client) IsMigrationEnabled() bool {
-	return !c.options.dataStore.migrationDisabled
 }
 
 // Logger will return the Logger if it exists

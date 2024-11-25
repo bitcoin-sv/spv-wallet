@@ -198,7 +198,7 @@ func TestTransactionConfig_processOutput(t *testing.T) {
 		client := given.NewPaymailClientService()
 
 		logger := zerolog.Nop()
-		tcOpts := DefaultClientOpts(true, true)
+		tcOpts := DefaultClientOpts()
 		tcOpts = append(tcOpts, WithLogger(&logger))
 
 		tc, err := NewClient(
@@ -230,7 +230,7 @@ func TestTransactionConfig_processOutput(t *testing.T) {
 		client := given.NewPaymailClientService()
 
 		logger := zerolog.Nop()
-		tcOpts := DefaultClientOpts(true, true)
+		tcOpts := DefaultClientOpts()
 		tcOpts = append(tcOpts, WithLogger(&logger))
 
 		tc, err := NewClient(
@@ -262,7 +262,7 @@ func TestTransactionConfig_processOutput(t *testing.T) {
 		client := given.NewPaymailClientService()
 
 		logger := zerolog.Nop()
-		tcOpts := DefaultClientOpts(true, true)
+		tcOpts := DefaultClientOpts()
 		tcOpts = append(tcOpts, WithLogger(&logger))
 
 		tc, err := NewClient(
