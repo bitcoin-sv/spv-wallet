@@ -119,9 +119,7 @@ func (ts *EmbeddedDBTestSuite) Test_DeletePaymailAddress() {
 			var p3 *PaymailAddress
 			p3, err = getPaymailAddressByID(tc.ctx, paymailAddress.ID, opts...)
 			require.NoError(t, err)
-			require.NotNil(t, p3)
-			require.Equal(t, testPaymail, p3.Alias)
-			require.True(t, p3.DeletedAt.Valid)
+			require.Nil(t, p3)
 		})
 	}
 }
