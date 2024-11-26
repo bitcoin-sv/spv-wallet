@@ -236,7 +236,7 @@ func (m *Transaction) getValues() (outputValue uint64, fee uint64) {
 // SetBUMP Converts from bc.BUMP to our BUMP struct in Transaction model
 func (m *Transaction) SetBUMP(mp *trx.MerklePath) {
 	if mp != nil {
-		bump, err := FromMerklePath(mp)
+		bump, err := fromMerklePath(mp)
 		if err != nil {
 			m.client.Logger().Error().Err(err).Msg("Cannot convert BUMP to MerklePath")
 		}

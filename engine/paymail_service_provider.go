@@ -412,7 +412,7 @@ func saveBeefTransactionInput(ctx context.Context, c ClientInterface, input *bee
 	inputTx, _ := txFromHex(input.Transaction.String(), newOpts...) // we can ignore error here
 
 	if bump != nil {
-		bump, err := FromMerklePath(bump)
+		bump, err := fromMerklePath(bump)
 		if err != nil {
 			return spverrors.Wrapf(err, "error in saveBeefTransactionInput during bump conversion")
 		}

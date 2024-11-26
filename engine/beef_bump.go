@@ -9,32 +9,33 @@ import (
 )
 
 type beefPreparationContext struct {
-	ctx            context.Context
-	store          TransactionGetter
-	transactionMap map[chainhash.Hash]*trx.Transaction
-	visited        map[chainhash.Hash]bool
-	queue          []*trx.Transaction
-	txsForBEEF     []*trx.Transaction
+	ctx                 context.Context
+	store               TransactionGetter
+	transactions        map[chainhash.Hash]*trx.Transaction
+	visitedTransactions map[chainhash.Hash]bool
+	queue               []*trx.Transaction
+	txsForBEEF          []*trx.Transaction
 }
 
 func prepareBEEFFactors(ctx context.Context, tx *Transaction, store TransactionGetter) ([]*trx.Transaction, error) {
-	txsForBEEF, err := initializeRequiredTxsCollection(tx)
+
+	processedTx, err := trx.NewTransactionFromHex(tx.Hex)
 	if err != nil {
-		return nil, err
+		return nil, spverrors.Wrapf(err, "cannot convert processed transaction to SDK transaction from hex (tx.ID: %s)", tx.ID)
 	}
 
 	bctx := &beefPreparationContext{
-		ctx:            ctx,
-		store:          store,
-		transactionMap: make(map[chainhash.Hash]*trx.Transaction),
-		visited:        make(map[chainhash.Hash]bool),
-		queue:          []*trx.Transaction{},
-		txsForBEEF:     txsForBEEF,
+		ctx:                 ctx,
+		store:               store,
+		transactions:        make(map[chainhash.Hash]*trx.Transaction),
+		visitedTransactions: make(map[chainhash.Hash]bool),
+		queue:               []*trx.Transaction{},
+		txsForBEEF:          []*trx.Transaction{processedTx},
 	}
 
-	processedSDKTx := txsForBEEF[0]
+	processedSDKTx := processedTx
 	txID := *processedSDKTx.TxID()
-	bctx.transactionMap[txID] = processedSDKTx
+	bctx.transactions[txID] = processedSDKTx
 	bctx.queue = append(bctx.queue, processedSDKTx)
 
 	for len(bctx.queue) > 0 {
@@ -52,10 +53,10 @@ func prepareBEEFFactors(ctx context.Context, tx *Transaction, store TransactionG
 func (bctx *beefPreparationContext) processTransaction(currentTx *trx.Transaction) error {
 	currentTxID := *currentTx.TxID()
 
-	if bctx.visited[currentTxID] {
+	if bctx.visitedTransactions[currentTxID] {
 		return nil
 	}
-	bctx.visited[currentTxID] = true
+	bctx.visitedTransactions[currentTxID] = true
 
 	var inputTxIDs []string
 	for _, input := range currentTx.Inputs {
@@ -64,13 +65,18 @@ func (bctx *beefPreparationContext) processTransaction(currentTx *trx.Transactio
 		}
 	}
 
-	return bctx.retrieveAndProcessInputTransactions(inputTxIDs, currentTx)
+	return bctx.processInputTransactions(inputTxIDs, currentTx)
 }
 
-func (bctx *beefPreparationContext) retrieveAndProcessInputTransactions(inputTxIDs []string, currentTx *trx.Transaction) error {
-	inputTxs, err := getRequiredTransactions(bctx.ctx, inputTxIDs, bctx.store)
+func (bctx *beefPreparationContext) processInputTransactions(inputTxIDs []string, currentTx *trx.Transaction) error {
+	inputTxs, err := bctx.store.GetTransactionsByIDs(bctx.ctx, inputTxIDs)
 	if err != nil {
-		return err
+		return spverrors.Wrapf(err, "cannot get transactions from database")
+	}
+
+	if len(inputTxs) != len(inputTxIDs) {
+		missingTxIDs := getMissingTxs(inputTxIDs, inputTxs)
+		return spverrors.Newf("required transactions (%v) not found in database", missingTxIDs)
 	}
 
 	for _, inputTx := range inputTxs {
@@ -78,15 +84,15 @@ func (bctx *beefPreparationContext) retrieveAndProcessInputTransactions(inputTxI
 		if err != nil {
 			return err
 		}
+
 		inputTxIDHash := *inputSDKTx.TxID()
 
-		if _, exists := bctx.transactionMap[inputTxIDHash]; !exists {
-			bctx.transactionMap[inputTxIDHash] = inputSDKTx
+		if _, exists := bctx.transactions[inputTxIDHash]; !exists {
+			bctx.transactions[inputTxIDHash] = inputSDKTx
 			bctx.txsForBEEF = append(bctx.txsForBEEF, inputSDKTx)
 		}
 
 		linkSourceTransaction(currentTx, inputSDKTx)
-
 		if inputTx.BUMP.BlockHeight == 0 && len(inputTx.BUMP.Path) == 0 {
 			bctx.queue = append(bctx.queue, inputSDKTx)
 		}
@@ -102,7 +108,7 @@ func convertToSDKTransaction(inputTx *Transaction) (*trx.Transaction, error) {
 	}
 
 	if inputTx.BUMP.BlockHeight != 0 {
-		merklePath, err := inputTx.BUMP.ToMerklePath()
+		merklePath, err := inputTx.BUMP.toMerklePath()
 		if err != nil {
 			return nil, spverrors.Wrapf(err, "cannot convert BUMP to MerklePath (tx.ID: %s)", inputTx.ID)
 		}
@@ -121,20 +127,6 @@ func linkSourceTransaction(currentTx, inputSDKTx *trx.Transaction) {
 	}
 }
 
-func getRequiredTransactions(ctx context.Context, txIDs []string, store TransactionGetter) ([]*Transaction, error) {
-	txs, err := store.GetTransactionsByIDs(ctx, txIDs)
-	if err != nil {
-		return nil, spverrors.Wrapf(err, "cannot get transactions from database")
-	}
-
-	if len(txs) != len(txIDs) {
-		missingTxIDs := getMissingTxs(txIDs, txs)
-		return nil, spverrors.Newf("required transactions (%v) not found in database", missingTxIDs)
-	}
-
-	return txs, nil
-}
-
 func getMissingTxs(txIDs []string, foundTxs []*Transaction) []string {
 	foundTxIDSet := make(map[string]struct{}, len(foundTxs))
 	for _, tx := range foundTxs {
@@ -148,12 +140,4 @@ func getMissingTxs(txIDs []string, foundTxs []*Transaction) []string {
 		}
 	}
 	return missingTxIDs
-}
-
-func initializeRequiredTxsCollection(tx *Transaction) ([]*trx.Transaction, error) {
-	processedSDKTx, err := trx.NewTransactionFromHex(tx.Hex)
-	if err != nil {
-		return nil, spverrors.Wrapf(err, "cannot convert processed transaction to SDK transaction from hex (tx.ID: %s)", tx.ID)
-	}
-	return []*trx.Transaction{processedSDKTx}, nil
 }

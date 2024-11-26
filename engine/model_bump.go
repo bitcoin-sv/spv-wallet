@@ -28,8 +28,7 @@ type BUMPLeaf struct {
 	Duplicate bool   `json:"duplicate,omitempty"`
 }
 
-// ToMerklePath converts BUMP to trx.MerklePath
-func (b *BUMP) ToMerklePath() (*trx.MerklePath, error) {
+func (b *BUMP) toMerklePath() (*trx.MerklePath, error) {
 	blockHeight, err := conv.Uint64ToUint32(b.BlockHeight)
 	if err != nil {
 		return nil, spverrors.Wrapf(err, "failed to convert block height to uint32")
@@ -57,8 +56,7 @@ func (b *BUMP) ToMerklePath() (*trx.MerklePath, error) {
 	return mp, nil
 }
 
-// FromMerklePath converts trx.MerklePath to BUMP
-func FromMerklePath(mp *trx.MerklePath) (*BUMP, error) {
+func fromMerklePath(mp *trx.MerklePath) (*BUMP, error) {
 	b := &BUMP{
 		BlockHeight: uint64(mp.BlockHeight),
 		Path:        make([][]BUMPLeaf, len(mp.Path)),
