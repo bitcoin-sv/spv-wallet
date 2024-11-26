@@ -11,7 +11,6 @@ replace github.com/bitcoin-sv/spv-wallet/models => ./models
 
 require (
 	github.com/99designs/gqlgen v0.17.57
-	github.com/DATA-DOG/go-sqlmock v1.5.2
 	github.com/aws/aws-sdk-go v1.55.5
 	github.com/bitcoin-sv/go-paymail v0.21.2
 	github.com/bitcoin-sv/go-sdk v1.1.14
