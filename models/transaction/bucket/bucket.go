@@ -9,3 +9,7 @@ const (
 	// BSV represents the bucket for the BSV outputs.
 	BSV Name = "bsv"
 )
+
+func (b Name) String() string {
+	return string(b)
+}

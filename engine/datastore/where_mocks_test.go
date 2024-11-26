@@ -6,10 +6,8 @@ import (
 	"encoding/json"
 	"time"
 
-	"github.com/DATA-DOG/go-sqlmock"
+	"github.com/bitcoin-sv/spv-wallet/engine/tester/tgorm"
 	"github.com/bitcoin-sv/spv-wallet/engine/utils"
-	"gorm.io/driver/postgres"
-	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
 	"gorm.io/gorm/schema"
 )
@@ -25,29 +23,11 @@ type mockObject struct {
 	FieldOutIDs     IDs
 }
 
-func mockDialector(engine Engine) gorm.Dialector {
-	mockDb, _, _ := sqlmock.New()
-	switch engine {
-	case PostgreSQL:
-		return postgres.New(postgres.Config{
-			Conn:       mockDb,
-			DriverName: "postgres",
-		})
-	case SQLite:
-		return sqlite.Open("file::memory:?cache=shared")
-	case Empty:
-		fallthrough
-	default:
-		return nil
-	}
-}
-
 func mockClient(engine Engine) (*Client, *gorm.DB) {
 	clientInterface, _ := NewClient()
 	client, _ := clientInterface.(*Client)
 	client.options.engine = engine
-	dialector := mockDialector(engine)
-	gdb, _ := gorm.Open(dialector, &gorm.Config{TranslateError: true})
+	gdb := tgorm.GormDBForPrintingSQL(tgorm.DBType(engine))
 	return client, gdb
 }
 
