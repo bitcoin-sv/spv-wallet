@@ -237,7 +237,7 @@ type MetricsConfig struct {
 
 // ExperimentalConfig represents a feature flag config.
 type ExperimentalConfig struct {
-	// PikeContactsEnabled is a flag for enabling Pike contacts invite capability and contact endpoints.
+	// PikeContactsEnabled is a flag for enabling Pike contacts invite capability.
 	PikeContactsEnabled bool `json:"pike_contacts_enabled" mapstructure:"pike_contacts_enabled"`
 	// PikePaymentEnabled is a flag for enabling Pike payment capability.
 	PikePaymentEnabled bool `json:"pike_payment_enabled" mapstructure:"pike_payment_enabled"`
