@@ -2,7 +2,6 @@ package testabilities
 
 import (
 	"context"
-	"database/sql"
 	"errors"
 	"testing"
 
@@ -46,7 +45,6 @@ type EngineFixture interface {
 type EngineWithConfig struct {
 	Config config.AppConfig
 	Engine engine.ClientInterface
-	DB     *sql.DB
 }
 
 type engineFixture struct {
@@ -55,7 +53,6 @@ type engineFixture struct {
 	t                  testing.TB
 	logger             zerolog.Logger
 	dbConnectionString string
-	dbConnection       *sql.DB
 	externalTransport  *httpmock.MockTransport
 	paymailClient      *paymailmock.PaymailClientMock
 }
@@ -85,7 +82,7 @@ func (f *engineFixture) Engine() (walletEngine EngineWithConfig, cleanup func())
 
 func (f *engineFixture) EngineWithConfiguration(opts ...ConfigOpts) (walletEngine EngineWithConfig, cleanup func()) {
 	f.config = f.ConfigForTests(opts...)
-	f.initDbConnection()
+	f.prepareDBConfigForTests()
 
 	options, err := f.config.ToEngineOptions(f.logger)
 	require.NoError(f.t, err)
@@ -106,7 +103,6 @@ func (f *engineFixture) EngineWithConfiguration(opts ...ConfigOpts) (walletEngin
 	return EngineWithConfig{
 		Config: *f.config,
 		Engine: f.engine,
-		DB:     f.dbConnection,
 	}, cleanup
 }
 
@@ -120,8 +116,11 @@ func (f *engineFixture) ConfigForTests(opts ...ConfigOpts) *config.AppConfig {
 	return configuration
 }
 
-// initDbConnection creates a new connection that will be used as connection for engine
-func (f *engineFixture) initDbConnection() {
+// prepareDBConfigForTests creates a new connection that will be used as connection for engine
+func (f *engineFixture) prepareDBConfigForTests() {
+	require.Equal(f.t, datastore.SQLite, f.config.Db.Datastore.Engine, "Other datastore engines are not supported in tests (yet)")
+
+	// It is a workaround for development purpose to check the code with postgres instance.
 	if ok, dbName := testmode.CheckPostgresMode(); ok {
 		f.config.Db.Datastore.Engine = datastore.PostgreSQL
 		f.config.Db.SQL.User = "postgres"
@@ -131,22 +130,16 @@ func (f *engineFixture) initDbConnection() {
 		return
 	}
 
-	if f.config.Db.Datastore.Engine != datastore.SQLite {
-		panic("Other datastore engines are not supported in tests (yet)")
-	}
-
+	// It is a workaround for development purpose to check what is the db state after running a tests.
 	if testmode.CheckFileSQLiteMode() {
 		f.dbConnectionString = fileDbConnectionString
 	} else {
 		f.dbConnectionString = inMemoryDbConnectionString
 	}
-	f.config.Db.SQLite.DatabasePath = "already_set_with_existing_connection_config"
-
-	connection, err := sql.Open("sqlite3", f.dbConnectionString)
-	require.NoErrorf(f.t, err, "Cannot create sqlite connection")
-
-	f.dbConnection = connection
-	f.config.Db.SQLite.ExistingConnection = connection
+	f.config.Db.SQLite.Shared = false
+	f.config.Db.SQLite.MaxIdleConnections = 1
+	f.config.Db.SQLite.MaxOpenConnections = 1
+	f.config.Db.SQLite.DatabasePath = f.dbConnectionString
 }
 
 func (f *engineFixture) initialiseFixtures() {
