@@ -31,7 +31,7 @@ updates:
       - "dependencies"
       - "regression-tests"
     groups:
-      go_modules:
+      regression_tests:
         update-types:
           - "minor"
           - "patch"
