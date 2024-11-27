@@ -14,8 +14,8 @@ github.com/aws/aws-sdk-go v1.55.5 h1:KKUZBfBoyqy5d3swXyiC7Q76ic40rYcbqH7qjh59kzU
 github.com/aws/aws-sdk-go v1.55.5/go.mod h1:eRwEWoyTWFMVYVQzKMNHWP5/RV4xIUGMQfXQHfHkpNU=
 github.com/beorn7/perks v1.0.1 h1:VlbKKnNfV8bJzeqoa4cOKqO6bYr3WgKZxO8Z16+hsOM=
 github.com/beorn7/perks v1.0.1/go.mod h1:G2ZrVWU2WbWT9wwq4/hrbKbnv/1ERSJQ0ibhJ6rlkpw=
-github.com/bitcoin-sv/go-paymail v0.21.2 h1:qCIwM+3oBFPUH+gshKzrEtHsMthOM3YQ0hTp7K3+yxc=
-github.com/bitcoin-sv/go-paymail v0.21.2/go.mod h1:RE5ccfCZMLv8hotWaWoVxydlQONUcMnc0zAazor4cfY=
+github.com/bitcoin-sv/go-paymail v0.21.3 h1:7zrl7wdAlYZB1LCopYMVaIb56BIGexlBbX9CTps9tAs=
+github.com/bitcoin-sv/go-paymail v0.21.3/go.mod h1:RE5ccfCZMLv8hotWaWoVxydlQONUcMnc0zAazor4cfY=
 github.com/bitcoin-sv/go-sdk v1.1.14 h1:65PrWc8H5in138fplswpxpXuV3HwQQgyXDBegioyVbY=
 github.com/bitcoin-sv/go-sdk v1.1.14/go.mod h1:khREs6RkJuYkxFD3ZB9I+zcGjfxoHeACg9Zr3f7Fn7s=
 github.com/bitcoinschema/go-bob v0.5.0 h1:Fjl60RuiQiUuZWLfXE8ETdcgmJBHYu9MYfbrbZU7yHs=

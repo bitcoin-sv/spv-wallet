@@ -12,7 +12,7 @@ replace github.com/bitcoin-sv/spv-wallet/models => ./models
 require (
 	github.com/99designs/gqlgen v0.17.57
 	github.com/aws/aws-sdk-go v1.55.5
-	github.com/bitcoin-sv/go-paymail v0.21.2
+	github.com/bitcoin-sv/go-paymail v0.21.3
 	github.com/bitcoin-sv/go-sdk v1.1.14
 	github.com/bitcoin-sv/spv-wallet/models v0.28.0
 	github.com/bitcoinschema/go-map v0.2.0
