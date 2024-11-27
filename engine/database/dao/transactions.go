@@ -23,7 +23,7 @@ func NewTransactionsAccessObject(db *gorm.DB) *Transactions {
 }
 
 // SaveTX saves a transaction to the database.
-func (r *Transactions) SaveTX(ctx context.Context, txRow *database.Transaction) error {
+func (r *Transactions) SaveTX(ctx context.Context, txRow *database.TrackedTransaction) error {
 	query := r.db.
 		WithContext(ctx).
 		Clauses(clause.OnConflict{

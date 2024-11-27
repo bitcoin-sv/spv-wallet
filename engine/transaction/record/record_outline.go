@@ -45,7 +45,7 @@ func (s *Service) RecordTransactionOutline(ctx context.Context, outline *outline
 
 	txID := tx.TxID().String()
 
-	txRow := database.Transaction{
+	txRow := database.TrackedTransaction{
 		ID:       txID,
 		TxStatus: database.TxStatusBroadcasted,
 	}
