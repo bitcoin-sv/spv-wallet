@@ -6,6 +6,7 @@ import (
 	"os"
 	"time"
 
+	"github.com/bitcoin-sv/spv-wallet/engine/datastore/sqlite3extended"
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"gorm.io/driver/postgres"
 	"gorm.io/driver/sqlite"
@@ -18,9 +19,8 @@ import (
 // SQL related default settings
 // todo: make this configurable for the end-user?
 const (
-	defaultFieldStringSize    uint = 256             // default size for string fields
-	dsnDefault                     = "file::memory:" // DSN for connection (file or memory, default is memory)
-	defaultPreparedStatements      = false           // Flag for prepared statements for SQL
+	dsnDefault                = "file::memory:" // DSN for connection (file or memory, default is memory)
+	defaultPreparedStatements = false           // Flag for prepared statements for SQL
 )
 
 // openSQLDatabase will open a new SQL database
@@ -113,21 +113,11 @@ func openSQLDatabase(optionalLogger glogger.Interface, configs ...*SQLConfig) (d
 
 // openSQLiteDatabase will open a SQLite database connection
 func openSQLiteDatabase(optionalLogger glogger.Interface, config *SQLiteConfig) (db *gorm.DB, err error) {
-	// Check for an existing connection
-	var dialector gorm.Dialector
-	if config.ExistingConnection != nil {
-		dialector = sqlite.Dialector{Conn: config.ExistingConnection}
-	} else {
-		dialector = sqlite.Open(getDNS(config.DatabasePath, config.Shared))
-	}
-
-	/*
-		// todo: implement this functionality (name spaced in-memory tables)
-		NOTE: https://www.sqlite.org/inmemorydb.html
-		If two or more distinct but shareable in-memory databases are needed in a single process, then the mode=memory
-		query parameter can be used with a URI filename to create a named in-memory database:
-		rc = sqlite3_open("file:memdb1?mode=memory&cache=shared", &db);
-	*/
+	dialector := sqlite.New(sqlite.Config{
+		Conn:       config.ExistingConnection,
+		DSN:        getDNS(config.DatabasePath, config.Shared),
+		DriverName: sqlite3extended.NAME,
+	})
 
 	// Create a new connection
 	if db, err = gorm.Open(

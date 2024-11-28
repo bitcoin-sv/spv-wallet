@@ -18,6 +18,25 @@ updates:
           - "patch"
           - "major"
 
+  # Maintain dependencies for the regression tests
+  - package-ecosystem: "gomod"
+    target-branch: "main"
+    rebase-strategy: auto
+    directories:
+      - "/regression_tests"
+    schedule:
+      interval: "daily"
+      time: "06:00"
+    labels:
+      - "dependencies"
+      - "regression-tests"
+    groups:
+      regression_tests:
+        update-types:
+          - "minor"
+          - "patch"
+          - "major"
+
   # Maintain dependencies for GitHub Actions
   - package-ecosystem: "github-actions"
     target-branch: "main"
