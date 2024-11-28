@@ -14,7 +14,7 @@ services:
       - "traefik.http.routers.walletfrontend.tls.certresolver=httpsresolver"
       - "traefik.http.services.walletfrontend.loadbalancer.server.port=80"
     ports:
-      - "3002:80"
+      - "127.0.0.1:3002:80"
     configs:
       - source: frontend-env-config
         target: /usr/share/nginx/html/env-config.json
@@ -34,7 +34,7 @@ services:
     env_file:
       - .env.config
     ports:
-      - "8180:8180"
+      - "127.0.0.1:8180:8180"
     links:
       - wallet-postgresql
     depends_on:
@@ -54,7 +54,7 @@ services:
     command:
       - "--preloaded"
     ports:
-      - "8080:8080"
+      - "127.0.0.1:8080:8080"
     volumes:
       - block-headers-service-data:/app/data
 
@@ -71,7 +71,7 @@ services:
     env_file:
       - .env.config
     ports:
-      - "3000:3000"
+      - "127.0.0.1:3000:3000"
     configs:
       - source: admin-env-config
         target: /usr/share/nginx/html/env-config.json
@@ -93,14 +93,14 @@ services:
     volumes:
       - .:/config:ro
     ports:
-      - "3003:3003"
+      - "127.0.0.1:3003:3003"
     restart: always
 
   wallet-redis:
     image: redis
     hostname: redis
     ports:
-      - "6379:6379"
+      - "127.0.0.1:6379:6379"
     volumes:
       - wallet-redis-data:/data
     healthcheck:
@@ -115,7 +115,7 @@ services:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=postgres
     ports:
-      - "5432:5432"
+      - "127.0.0.1:5432:5432"
     healthcheck:
       test: ["CMD-SHELL", "sh -c 'pg_isready -U postgres -d postgres'"]
       timeout: 5s
