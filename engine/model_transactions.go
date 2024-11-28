@@ -4,7 +4,7 @@ import (
 	"context"
 
 	trx "github.com/bitcoin-sv/go-sdk/transaction"
-	"github.com/bitcoin-sv/spv-wallet/engine/chain/models"
+	chainmodels "github.com/bitcoin-sv/spv-wallet/engine/chain/models"
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/bitcoin-sv/spv-wallet/engine/utils"
 )
@@ -236,7 +236,11 @@ func (m *Transaction) getValues() (outputValue uint64, fee uint64) {
 // SetBUMP Converts from bc.BUMP to our BUMP struct in Transaction model
 func (m *Transaction) SetBUMP(mp *trx.MerklePath) {
 	if mp != nil {
-		m.BUMP = sdkMPToBUMP(mp)
+		bump, err := fromMerklePath(mp)
+		if err != nil {
+			m.client.Logger().Error().Err(err).Msg("Cannot convert BUMP to MerklePath")
+		}
+		m.BUMP = *bump
 	} else {
 		m.client.Logger().Error().Msg("No BUMP found")
 	}
