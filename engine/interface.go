@@ -14,6 +14,7 @@ import (
 	paymailclient "github.com/bitcoin-sv/spv-wallet/engine/paymail"
 	"github.com/bitcoin-sv/spv-wallet/engine/taskmanager"
 	"github.com/bitcoin-sv/spv-wallet/engine/transaction/outlines"
+	"github.com/bitcoin-sv/spv-wallet/engine/transaction/record"
 	"github.com/bitcoin-sv/spv-wallet/models/bsv"
 	"github.com/mrz1836/go-cachestore"
 	"github.com/rs/zerolog"
@@ -57,6 +58,7 @@ type ClientService interface {
 	PaymailClient() paymail.ClientInterface
 	PaymailService() paymailclient.ServiceClient
 	TransactionOutlinesService() outlines.Service
+	TransactionRecordService() *record.Service
 	Taskmanager() taskmanager.TaskEngine
 }
 

@@ -3,13 +3,13 @@ package testabilities
 import (
 	"context"
 	"errors"
-	"os"
 	"testing"
 
 	"github.com/bitcoin-sv/spv-wallet/config"
 	"github.com/bitcoin-sv/spv-wallet/engine"
 	"github.com/bitcoin-sv/spv-wallet/engine/datastore"
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
+	"github.com/bitcoin-sv/spv-wallet/engine/testabilities/testmode"
 	"github.com/bitcoin-sv/spv-wallet/engine/tester"
 	"github.com/bitcoin-sv/spv-wallet/engine/tester/fixtures"
 	"github.com/bitcoin-sv/spv-wallet/engine/tester/paymailmock"
@@ -37,6 +37,9 @@ type EngineFixture interface {
 
 	// BHS creates a new test fixture for Block Header Service (BHS)
 	BHS() BlockHeadersServiceFixture
+
+	// ARC creates a new test fixture for ARC
+	ARC() ARCFixture
 }
 
 type EngineWithConfig struct {
@@ -118,18 +121,17 @@ func (f *engineFixture) prepareDBConfigForTests() {
 	require.Equal(f.t, datastore.SQLite, f.config.Db.Datastore.Engine, "Other datastore engines are not supported in tests (yet)")
 
 	// It is a workaround for development purpose to check the code with postgres instance.
-	mode := os.Getenv("TEST_DB_MODE")
-	if mode == "postgres" {
+	if ok, dbName := testmode.CheckPostgresMode(); ok {
 		f.config.Db.Datastore.Engine = datastore.PostgreSQL
 		f.config.Db.SQL.User = "postgres"
 		f.config.Db.SQL.Password = "postgres"
-		f.config.Db.SQL.Name = "postgres"
+		f.config.Db.SQL.Name = dbName
 		f.config.Db.SQL.Host = "localhost"
 		return
 	}
 
 	// It is a workaround for development purpose to check what is the db state after running a tests.
-	if mode == "file" {
+	if testmode.CheckFileSQLiteMode() {
 		f.dbConnectionString = fileDbConnectionString
 	} else {
 		f.dbConnectionString = inMemoryDbConnectionString

@@ -9,7 +9,7 @@ import (
 	"github.com/bitcoin-sv/spv-wallet/engine/tester/fixtures"
 )
 
-const transactionsOutlinesURL = "/api/v1/transactions/outlines"
+const transactionsOutlinesURL = "/api/v2/transactions/outlines"
 
 func TestPOSTTransactionOutlines(t *testing.T) {
 	successTestCases := map[string]struct {

@@ -18,6 +18,7 @@ import (
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/bitcoin-sv/spv-wallet/engine/taskmanager"
 	"github.com/bitcoin-sv/spv-wallet/engine/transaction/outlines"
+	"github.com/bitcoin-sv/spv-wallet/engine/transaction/record"
 	"github.com/bitcoin-sv/spv-wallet/models/bsv"
 	"github.com/go-resty/resty/v2"
 	"github.com/mrz1836/go-cachestore"
@@ -44,7 +45,8 @@ type (
 		metrics                    *metrics.Metrics       // Metrics with a collector interface
 		notifications              *notificationsOptions  // Configuration options for Notifications
 		paymail                    *paymailOptions        // Paymail options & client
-		transactionOutlinesService outlines.Service       // Service for transaction drafts
+		transactionOutlinesService outlines.Service       // Service for transaction outlines
+		transactionRecordService   *record.Service        // Service for recording transactions
 		paymailAddressService      paymailaddress.Service // Service for paymail addresses
 		taskManager                *taskManagerOptions    // Configuration options for the TaskManager (TaskQ, etc.)
 		userAgent                  string                 // User agent for all outgoing requests
@@ -163,6 +165,10 @@ func NewClient(ctx context.Context, opts ...ClientOps) (ClientInterface, error) 
 	}
 
 	client.loadChainService()
+
+	if err = client.loadTransactionRecordService(); err != nil {
+		return nil, err
+	}
 
 	// Register all cron jobs
 	if err = client.registerCronJobs(); err != nil {

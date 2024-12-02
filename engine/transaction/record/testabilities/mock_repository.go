@@ -11,7 +11,7 @@ import (
 )
 
 type mockRepository struct {
-	transactions map[string]database.Transaction
+	transactions map[string]database.TrackedTransaction
 	outputs      map[string]database.Output
 	data         map[string]database.Data
 
@@ -21,21 +21,26 @@ type mockRepository struct {
 
 func newMockRepository() *mockRepository {
 	return &mockRepository{
-		transactions: make(map[string]database.Transaction),
+		transactions: make(map[string]database.TrackedTransaction),
 		outputs:      make(map[string]database.Output),
 		data:         make(map[string]database.Data),
 	}
 }
 
-func (m *mockRepository) SaveTX(_ context.Context, txTable *database.Transaction, outputs []*database.Output, data []*database.Data) error {
+func (m *mockRepository) SaveTX(_ context.Context, txTable *database.TrackedTransaction) error {
 	if m.errOnSave != nil {
 		return m.errOnSave
 	}
 	m.transactions[txTable.ID] = *txTable
-	for _, output := range outputs {
+	for _, output := range txTable.Outputs {
 		m.outputs[output.Outpoint().String()] = *output
 	}
-	for _, d := range data {
+	for _, output := range txTable.Inputs {
+		utxo := *output
+		utxo.SpendingTX = txTable.ID
+		m.outputs[utxo.Outpoint().String()] = utxo
+	}
+	for _, d := range txTable.Data {
 		m.data[d.Outpoint().String()] = *d
 	}
 	return nil
@@ -89,7 +94,7 @@ func (m *mockRepository) GetAllData() []database.Data {
 	return slices.Collect(maps.Values(m.data))
 }
 
-func (m *mockRepository) getTransaction(txID string) *database.Transaction {
+func (m *mockRepository) getTransaction(txID string) *database.TrackedTransaction {
 	tx, ok := m.transactions[txID]
 	if !ok {
 		return nil

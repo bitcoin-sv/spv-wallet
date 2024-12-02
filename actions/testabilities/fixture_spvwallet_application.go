@@ -4,6 +4,7 @@ import (
 	"testing"
 
 	"github.com/bitcoin-sv/spv-wallet/config"
+	chainmodels "github.com/bitcoin-sv/spv-wallet/engine/chain/models"
 	testengine "github.com/bitcoin-sv/spv-wallet/engine/testabilities"
 	"github.com/bitcoin-sv/spv-wallet/engine/tester"
 	"github.com/bitcoin-sv/spv-wallet/engine/tester/fixtures"
@@ -27,12 +28,20 @@ type SPVWalletApplicationFixture interface {
 
 	// BHS creates a new test fixture for Block Header Service (BHS)
 	BHS() BlockHeadersServiceFixture
+
+	// ARC creates a new test fixture for ARC
+	ARC() ARCFixture
 }
 
 type BlockHeadersServiceFixture interface {
 	// WillRespondForMerkleRoots returns a http response for get merkleroots endpoint with
 	// provided httpCode and response
 	WillRespondForMerkleRoots(httpCode int, response string)
+}
+
+type ARCFixture interface {
+	// WillRespondForBroadcast returns a http response for a broadcast request.
+	WillRespondForBroadcast(httpCode int, info *chainmodels.TXInfo)
 }
 
 type SPVWalletHttpClientFixture interface {
@@ -114,4 +123,8 @@ func (f *appFixture) ForGivenUser(user fixtures.User) *resty.Client {
 
 func (f *appFixture) BHS() BlockHeadersServiceFixture {
 	return f.engineFixture.BHS()
+}
+
+func (f *appFixture) ARC() ARCFixture {
+	return f.engineFixture.ARC()
 }

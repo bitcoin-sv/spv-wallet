@@ -65,12 +65,12 @@ func TestRecordOutlineOpReturn(t *testing.T) {
 				{
 					TxID:       givenTXWithOpReturn(t).InputUTXO(0).TxID,
 					Vout:       givenTXWithOpReturn(t).InputUTXO(0).Vout,
-					SpendingTX: ptr(givenTXWithOpReturn(t).ID()),
+					SpendingTX: givenTXWithOpReturn(t).ID(),
 				},
 				{
 					TxID:       givenTXWithOpReturn(t).ID(),
 					Vout:       0,
-					SpendingTX: nil,
+					SpendingTX: "",
 				},
 			},
 			expectData: []database.Data{
@@ -98,12 +98,12 @@ func TestRecordOutlineOpReturn(t *testing.T) {
 				{
 					TxID:       givenTxWithOpReturnWithoutOPFalse(t).InputUTXO(0).TxID,
 					Vout:       givenTxWithOpReturnWithoutOPFalse(t).InputUTXO(0).Vout,
-					SpendingTX: ptr(givenTxWithOpReturnWithoutOPFalse(t).ID()),
+					SpendingTX: givenTxWithOpReturnWithoutOPFalse(t).ID(),
 				},
 				{
 					TxID:       givenTxWithOpReturnWithoutOPFalse(t).ID(),
 					Vout:       0,
-					SpendingTX: nil,
+					SpendingTX: "",
 				},
 			},
 			expectData: []database.Data{
@@ -212,7 +212,7 @@ func TestRecordOutlineOpReturnErrorCases(t *testing.T) {
 			storedOutputs: []database.Output{{
 				TxID:       givenTXWithOpReturn(t).InputUTXO(0).TxID,
 				Vout:       givenTXWithOpReturn(t).InputUTXO(0).Vout,
-				SpendingTX: ptr("05aa91319c773db18071310ecd5ddc15d3aa4242b55705a13a66f7fefe2b80a1"),
+				SpendingTX: "05aa91319c773db18071310ecd5ddc15d3aa4242b55705a13a66f7fefe2b80a1",
 			}},
 			outline: &outlines.Transaction{
 				BEEF: givenTXWithOpReturn(t).BEEF(),
@@ -286,7 +286,7 @@ func TestOnBroadcastErr(t *testing.T) {
 		WithOutputs(database.Output{
 			TxID:       givenTXWithOpReturn(t).InputUTXO(0).TxID,
 			Vout:       givenTXWithOpReturn(t).InputUTXO(0).Vout,
-			SpendingTX: nil,
+			SpendingTX: "",
 		})
 	given.Broadcaster().
 		WillFailOnBroadcast(errors.New("broadcast error"))
@@ -336,8 +336,4 @@ func TestOnGetOutputsErr(t *testing.T) {
 
 	// then:
 	then.ErrorIs(err, txerrors.ErrGettingOutputs).NothingChanged()
-}
-
-func ptr[T any](value T) *T {
-	return &value
 }
