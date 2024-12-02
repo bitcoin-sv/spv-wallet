@@ -13,5 +13,6 @@ func RegisterRoutes(handlersManager *routes.Manager) {
 
 	group := handlersManager.Group(routes.GroupAPI, "/users/current")
 	group.GET("", handlers.AsUser(get))
+	group.GET("/paymails", handlers.AsUser(paymailAddressesSearch))
 	group.PATCH("", handlers.AsUser(update))
 }
