@@ -15,10 +15,8 @@ func (ts *TestSuite) TestXPubRegisterRoutes() {
 			method string
 			url    string
 		}{
-			{"GET", "/" + config.APIVersion + "/xpub"},
 			{"PATCH", "/" + config.APIVersion + "/xpub"},
 
-			{"GET", "/api/" + config.APIVersion + "/users/current"},
 			{"PATCH", "/api/" + config.APIVersion + "/users/current"},
 		}
 
