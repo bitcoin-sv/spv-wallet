@@ -1,4 +1,4 @@
-package testabilities
+package jsonrequire
 
 import "testing"
 
@@ -6,6 +6,7 @@ func TestJSONTemplate(t *testing.T) {
 	tests := map[string]struct {
 		template string
 		actual   string
+		params   map[string]any
 	}{
 		"flat structure": {
 			template: `{"a": 1, "b": "/^[a-zA-Z]+$/", "c": "exact-match"}`,
@@ -46,7 +47,7 @@ func TestJSONTemplate(t *testing.T) {
 	}
 	for name, test := range tests {
 		t.Run(name, func(t *testing.T) {
-			assertJSONWithPlaceholders(t, test.template, test.actual)
+			Match(t, test.template, test.params, test.actual)
 		})
 	}
 }

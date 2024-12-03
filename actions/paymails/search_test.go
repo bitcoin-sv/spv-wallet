@@ -22,7 +22,7 @@ func TestCurrentUserPaymails(t *testing.T) {
 		// then:
 		then.Response(res).
 			IsOK().
-			WithJSONTemplate(`{
+			WithJSONMatching(`{
 			 "content": [
 				{
 				  "address": "{{.Address}}",
@@ -66,7 +66,7 @@ func TestCurrentUserPaymails(t *testing.T) {
 		// then:
 		then.Response(res).
 			IsOK().
-			WithJSONTemplate(`{
+			WithJSONMatching(`{
 			 "content": [
 				{
 				  "address": "{{.SecondPaymail.Address}}",

@@ -1,18 +1,16 @@
 package testabilities
 
 import (
-	"bytes"
 	"encoding/json"
 	"fmt"
-	"mime"
-	"net/http"
-	"testing"
-	"text/template"
-
 	"github.com/bitcoin-sv/spv-wallet/actions/testabilities/apierror"
+	"github.com/bitcoin-sv/spv-wallet/engine/tester/jsonrequire"
 	"github.com/go-resty/resty/v2"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	"mime"
+	"net/http"
+	"testing"
 )
 
 type SPVWalletApplicationAssertions interface {
@@ -23,7 +21,7 @@ type SPVWalletResponseAssertions interface {
 	IsOK() SPVWalletResponseAssertions
 	HasStatus(status int) SPVWalletResponseAssertions
 	WithJSONf(expectedFormat string, args ...any)
-	WithJSONTemplate(expectedTemplateFormat string, params map[string]any)
+	WithJSONMatching(expectedTemplateFormat string, params map[string]any)
 	// IsUnauthorized asserts that the response status code is 401 and the error is about lack of authorization.
 	IsUnauthorized()
 	// IsUnauthorizedForAdmin asserts that the response status code is 401 and the error is that admin is not authorized to use the endpoint.
@@ -81,9 +79,9 @@ func (a *responseAssertions) WithJSONf(expectedFormat string, args ...any) {
 	a.assertJSONBody(expectedFormat, args...)
 }
 
-func (a *responseAssertions) WithJSONTemplate(expectedTemplateFormat string, params map[string]any) {
+func (a *responseAssertions) WithJSONMatching(expectedTemplateFormat string, params map[string]any) {
 	a.assertJSONContentType()
-	a.assertJSONTemplate(expectedTemplateFormat, params)
+	jsonrequire.Match(a.t, expectedTemplateFormat, params, a.response.String())
 }
 
 func (a *responseAssertions) assertJSONContentType() {
@@ -96,18 +94,6 @@ func (a *responseAssertions) assertJSONContentType() {
 func (a *responseAssertions) assertJSONBody(expectedFormat string, args ...any) {
 	expectedJson := fmt.Sprintf(expectedFormat, args...)
 	assertJSONEq(a.t, expectedJson, a.response.String())
-}
-
-func (a *responseAssertions) assertJSONTemplate(expectedTemplateFormat string, params map[string]any) {
-	tmpl, err := template.New("").Parse(expectedTemplateFormat)
-	if err != nil {
-		a.require.Fail("Failed to parse template", err)
-	}
-	var expected bytes.Buffer
-	if err = tmpl.Execute(&expected, params); err != nil {
-		a.require.Fail("Failed to execute template", err)
-	}
-	assertJSONWithPlaceholders(a.t, expected.String(), a.response.String())
 }
 
 // assertJSONEq compares two JSON strings and fails the test if they are not equal.

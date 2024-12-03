@@ -19,7 +19,7 @@ func TestCurrentUserGet(t *testing.T) {
 		res, _ := client.R().Get("/api/v1/users/current")
 		then.Response(res).
 			IsOK().
-			WithJSONTemplate(`{
+			WithJSONMatching(`{
 				"id": "{{.ID}}",
 				"createdAt": "/.*/",
 				"updatedAt": "/.*/",
@@ -40,7 +40,7 @@ func TestCurrentUserGet(t *testing.T) {
 		res, _ := client.R().Get("/v1/xpub")
 		then.Response(res).
 			IsOK().
-			WithJSONTemplate(`{
+			WithJSONMatching(`{
 				"id": "{{.ID}}",
 				"created_at": "/.*/",
 				"updated_at": "/.*/",

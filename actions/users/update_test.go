@@ -30,7 +30,7 @@ func TestCurrentUserUpdate(t *testing.T) {
 		// then:
 		then.Response(res).
 			IsOK().
-			WithJSONTemplate(`{
+			WithJSONMatching(`{
 				"createdAt": "/.*/",
 				"currentBalance": 0,
 				"deletedAt": null,
