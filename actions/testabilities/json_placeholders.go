@@ -14,8 +14,8 @@ import (
 )
 
 // assertJSONWithPlaceholders helps to make assertions on JSON strings when some values are not known in advance.
-// For example, when we do the assertion on Json serialized models, we can't predict the values of fields like IDs or timestamps.
-// In such cases, we can use a template with placeholders for these values.
+// For example, when we do the assertion on JSON serialized models, we can't predict the values of fields like IDs or timestamps.
+// In such cases, we can use a "template" with placeholders for these values.
 //
 // The placeholders are strings that start and end with a slash and can contain a regular expression, e.g., "/[0-9]+/".
 // Additionally, the placeholder "*" can be used to match any value, also nested objects.

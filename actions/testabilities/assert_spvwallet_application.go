@@ -99,12 +99,15 @@ func (a *responseAssertions) assertJSONBody(expectedFormat string, args ...any) 
 }
 
 func (a *responseAssertions) assertJSONTemplate(expectedTemplateFormat string, params map[string]any) {
-	tmpl, _ := template.New("").Parse(expectedTemplateFormat)
-	var msg bytes.Buffer
-	if err := tmpl.Execute(&msg, params); err != nil {
+	tmpl, err := template.New("").Parse(expectedTemplateFormat)
+	if err != nil {
+		a.require.Fail("Failed to parse template", err)
+	}
+	var expected bytes.Buffer
+	if err = tmpl.Execute(&expected, params); err != nil {
 		a.require.Fail("Failed to execute template", err)
 	}
-	assertJSONWithPlaceholders(a.t, msg.String(), a.response.String())
+	assertJSONWithPlaceholders(a.t, expected.String(), a.response.String())
 }
 
 // assertJSONEq compares two JSON strings and fails the test if they are not equal.
