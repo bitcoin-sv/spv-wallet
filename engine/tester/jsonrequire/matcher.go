@@ -2,9 +2,10 @@ package jsonrequire
 
 import (
 	"bytes"
-	"github.com/stretchr/testify/require"
 	"testing"
 	"text/template"
+
+	"github.com/stretchr/testify/require"
 )
 
 // Match helps to make assertions on JSON strings when some values are not known in advance.
