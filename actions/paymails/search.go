@@ -1,4 +1,4 @@
-package users
+package paymails
 
 import (
 	"net/http"
@@ -23,7 +23,7 @@ import (
 // @Success		200 {object} []response.PaymailAddress "List of paymail addresses"
 // @Failure		400	"Bad request - Error while parsing SearchPaymails from request body"
 // @Failure 	500	"Internal server error - Error while searching for paymail addresses"
-// @Router		/api/v1/users/current/paymails [get]
+// @Router		/api/v1/paymails [get]
 // @Security	x-auth-xpub
 func paymailAddressesSearch(c *gin.Context, userContext *reqctx.UserContext) {
 	logger := reqctx.Logger(c)

@@ -1,4 +1,4 @@
-package users_test
+package paymails_test
 
 import (
 	"strings"
@@ -17,7 +17,7 @@ func TestCurrentUserPaymails(t *testing.T) {
 		client := given.HttpClient().ForGivenUser(fixtures.Sender)
 
 		// when:
-		res, _ := client.R().Get("/api/v1/users/current/paymails")
+		res, _ := client.R().Get("/api/v1/paymails")
 
 		// then:
 		then.Response(res).
@@ -61,7 +61,7 @@ func TestCurrentUserPaymails(t *testing.T) {
 		client := given.HttpClient().ForGivenUser(fixtures.UserWithMorePaymails)
 
 		// when:
-		res, _ := client.R().Get("/api/v1/users/current/paymails")
+		res, _ := client.R().Get("/api/v1/paymails")
 
 		// then:
 		then.Response(res).
@@ -125,7 +125,7 @@ func TestCurrentUserPaymails(t *testing.T) {
 		client := given.HttpClient().ForAdmin()
 
 		// when:
-		res, _ := client.R().Get("/api/v1/users/current/paymails")
+		res, _ := client.R().Get("/api/v1/paymails")
 
 		// then:
 		then.Response(res).IsUnauthorizedForAdmin()
@@ -139,7 +139,7 @@ func TestCurrentUserPaymails(t *testing.T) {
 		client := given.HttpClient().ForAnonymous()
 
 		// when:
-		res, _ := client.R().Get("/api/v1/users/current/paymails")
+		res, _ := client.R().Get("/api/v1/paymails")
 
 		// then:
 		then.Response(res).IsUnauthorized()
