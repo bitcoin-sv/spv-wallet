@@ -22,6 +22,7 @@ type SPVWalletResponseAssertions interface {
 	HasStatus(status int) SPVWalletResponseAssertions
 	WithJSONf(expectedFormat string, args ...any)
 	WithJSONSubsetf(expectedFormat string, args ...any)
+	WithJSONTemplatef(expectedFormat string, args ...any)
 	// IsUnauthorized asserts that the response status code is 401 and the error is about lack of authorization.
 	IsUnauthorized()
 	// IsUnauthorizedForAdmin asserts that the response status code is 401 and the error is that admin is not authorized to use the endpoint.
@@ -84,6 +85,11 @@ func (a *responseAssertions) WithJSONSubsetf(expectedFormat string, args ...any)
 	a.assertJSONBodySubset(expectedFormat, args...)
 }
 
+func (a *responseAssertions) WithJSONTemplatef(expectedFormat string, args ...any) {
+	a.assertJSONContentType()
+	a.assertJSONTemplate(expectedFormat, args...)
+}
+
 func (a *responseAssertions) assertJSONContentType() {
 	contentType := a.response.Header().Get("Content-Type")
 	mediaType, _, err := mime.ParseMediaType(contentType)
@@ -99,6 +105,11 @@ func (a *responseAssertions) assertJSONBody(expectedFormat string, args ...any) 
 func (a *responseAssertions) assertJSONBodySubset(expectedFormat string, args ...any) {
 	expectedJson := fmt.Sprintf(expectedFormat, args...)
 	assertJSONSubset(a.t, expectedJson, a.response.String())
+}
+
+func (a *responseAssertions) assertJSONTemplate(expectedFormat string, args ...any) {
+	expectedJson := fmt.Sprintf(expectedFormat, args...)
+	assertJSONTemplate(a.t, expectedJson, a.response.String())
 }
 
 // assertJSONEq compares two JSON strings and fails the test if they are not equal.
