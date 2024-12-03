@@ -11,7 +11,7 @@ func TestJSONTemplate(t *testing.T) {
 			template: `{"a": 1, "b": "/^[a-zA-Z]+$/", "c": "exact-match"}`,
 			actual:   `{"a": 1, "b": "asd", "c": "exact-match"}`,
 		},
-		"no template": {
+		"no placeholders": {
 			template: `{"a": 1, "b": "b", "c": "c"}`,
 			actual:   `{"a": 1, "b": "b", "c": "c"}`,
 		},
@@ -46,7 +46,7 @@ func TestJSONTemplate(t *testing.T) {
 	}
 	for name, test := range tests {
 		t.Run(name, func(t *testing.T) {
-			assertJSONTemplate(t, test.template, test.actual)
+			assertJSONWithPlaceholders(t, test.template, test.actual)
 		})
 	}
 }

@@ -18,9 +18,18 @@ func TestCurrentUserGet(t *testing.T) {
 		res, _ := client.R().Get("/api/v1/users/current")
 		then.Response(res).
 			IsOK().
-			WithJSONSubsetf(`{
-				"id": "%s"
-			}`, fixtures.Sender.XPubID())
+			WithJSONTemplate(`{
+				"id": "{{.ID}}",
+				"createdAt": "/.*/",
+				"updatedAt": "/.*/",
+				"currentBalance": 0,
+				"deletedAt": null,
+				"metadata": "*",
+				"nextExternalNum": 1,
+				"nextInternalNum": 0
+			}`, map[string]any{
+				"ID": fixtures.Sender.XPubID(),
+			})
 	})
 
 	t.Run("return xpub info for user (old api)", func(t *testing.T) {
@@ -30,9 +39,18 @@ func TestCurrentUserGet(t *testing.T) {
 		res, _ := client.R().Get("/v1/xpub")
 		then.Response(res).
 			IsOK().
-			WithJSONSubsetf(`{
-				"id": "%s"
-			}`, fixtures.Sender.XPubID())
+			WithJSONTemplate(`{
+				"id": "{{.ID}}",
+				"created_at": "/.*/",
+				"updated_at": "/.*/",
+				"current_balance": 0,
+				"deleted_at": null,
+				"metadata": "*",
+				"next_external_num": 1,
+				"next_internal_num": 0
+			}`, map[string]any{
+				"ID": fixtures.Sender.XPubID(),
+			})
 	})
 
 	t.Run("return xpub info for admin", func(t *testing.T) {

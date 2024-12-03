@@ -12,7 +12,7 @@ import (
 	"testing"
 )
 
-// assertJSONTemplate helps to make assertions on JSON strings when some values are not known in advance.
+// assertJSONWithPlaceholders helps to make assertions on JSON strings when some values are not known in advance.
 // For example, when we do the assertion on Json serialized models, we can't predict the values of fields like IDs or timestamps.
 // In such cases, we can use a template with placeholders for these values.
 //
@@ -22,7 +22,8 @@ import (
 // {"a": 1, "b": "/^[a-zA-Z]+$/"} will match {"a": 1, "b": "abc"} and any other string in "b" that contains only letters.
 // {"a": 1, "b": "/^\\d{1,3}$/"} will match {"a": 1, "b": "123"} and also "b" as number from 0 to 999: {"a": 1, "b": 999}.
 // {"a": 1, "metadata": "*"} will match {"a": 1, "metadata": {"key": "value"}} and any other object in "metadata".
-func assertJSONTemplate(t testing.TB, expected, actual string) {
+// {"a": 1, "b": ["/^[a-zA-Z]+$/"]} will match {"a": 1, "b": ["abc"]} and any other letters-only string in the array at index 0.
+func assertJSONWithPlaceholders(t testing.TB, expected, actual string) {
 	t.Helper()
 
 	var expectedJSONValue, actualJSONValue map[string]any
@@ -34,7 +35,7 @@ func assertJSONTemplate(t testing.TB, expected, actual string) {
 		require.Fail(t, fmt.Sprintf("Input value ('%s') is not valid json.\nJSON parsing error: '%s'", actual, err.Error()))
 	}
 
-	processJSONTemplate(t, expectedJSONValue, actualJSONValue, "")
+	processJSONPlaceholders(t, expectedJSONValue, actualJSONValue, "")
 
 	if assert.ObjectsAreEqual(expectedJSONValue, actualJSONValue) {
 		return
@@ -58,7 +59,7 @@ func assertJSONTemplate(t testing.TB, expected, actual string) {
 	assert.Equal(t, expectedJsonString, actualJSONString)
 }
 
-func processJSONTemplate(t testing.TB, template any, base map[string]any, xpath string) {
+func processJSONPlaceholders(t testing.TB, template any, base map[string]any, xpath string) {
 	t.Helper()
 
 	rval, kind, _ := typeof(template)
@@ -78,7 +79,7 @@ func processJSONTemplate(t testing.TB, template any, base map[string]any, xpath 
 				// copy the value from the base to the template
 				rval.SetMapIndex(k, *toCopy)
 			} else {
-				processJSONTemplate(t, templateVal, base, currentXPath)
+				processJSONPlaceholders(t, templateVal, base, currentXPath)
 			}
 		}
 	} else if kind == reflect.Slice {
@@ -94,7 +95,7 @@ func processJSONTemplate(t testing.TB, template any, base map[string]any, xpath 
 					rval.Index(i).Set(*toCopy)
 				}
 			} else {
-				processJSONTemplate(t, value.Interface(), base, currentXPath)
+				processJSONPlaceholders(t, value.Interface(), base, currentXPath)
 			}
 		}
 	}
@@ -142,6 +143,9 @@ func containsRegex(str string) bool {
 }
 
 func typeof(v any) (reflect.Value, reflect.Kind, any) {
+	if v == nil {
+		return reflect.Value{}, reflect.Invalid, nil
+	}
 	rval := reflect.ValueOf(v)
 	kind := reflect.TypeOf(v).Kind()
 
