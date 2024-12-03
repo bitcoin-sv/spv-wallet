@@ -3,13 +3,14 @@ package testabilities
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/require"
 	"reflect"
 	"regexp"
 	"strconv"
 	"strings"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 // assertJSONWithPlaceholders helps to make assertions on JSON strings when some values are not known in advance.
@@ -134,7 +135,7 @@ func stringValue(t testing.TB, v any) string {
 	if kind == reflect.String {
 		return v.(string)
 	}
-	require.Fail(t, fmt.Sprintf("value is not a string or number-like"))
+	require.Fail(t, "value is not a string or number-like")
 	return ""
 }
 
@@ -164,7 +165,7 @@ func addToXPath(xpath, key string) string {
 	return xpath + "/" + key
 }
 
-var arrayKeyRegex = regexp.MustCompile(`^([a-zA-Z0-9_-]+)\[(\d+)\]$`)
+var arrayKeyRegex = regexp.MustCompile(`^([a-zA-Z0-9_-]+)\[(\d+)]$`)
 
 func getByXPath(t testing.TB, data map[string]any, path string) any {
 	keys := strings.Split(path, "/")

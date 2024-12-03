@@ -1,9 +1,10 @@
 package users_test
 
 import (
+	"testing"
+
 	"github.com/bitcoin-sv/spv-wallet/actions/testabilities"
 	"github.com/bitcoin-sv/spv-wallet/engine/tester/fixtures"
-	"testing"
 )
 
 func TestCurrentUserUpdate(t *testing.T) {
