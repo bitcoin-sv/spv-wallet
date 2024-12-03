@@ -15,6 +15,16 @@ type UpsertContact struct {
 	RequesterPaymail string `json:"requesterPaymail"`
 }
 
+// ContactData is a type for contact data
+type ContactData struct {
+	// OwnerXpubID is a xpub id related to contact.
+	OwnerXpubID string `json:"xpub_id" toml:"xpub_id" yaml:"xpub_id" gorm:"column:xpub_id;<-:create;type:char(64);foreignKey:XpubID;reference:ID;index;comment:This is the related xPub"`
+	// FullName is name which could be shown instead of whole paymail address.
+	FullName string `json:"full_name" toml:"full_name" yaml:"full_name" gorm:"<-create;comment:This is the contact's full name"`
+	// Paymail is a paymail address related to contact.
+	Paymail string `json:"paymail" toml:"paymail" yaml:"paymail" gorm:"<-create;comment:This is the paymail address alias@domain.com"`
+}
+
 func (p *UpsertContact) validate() error {
 	if p.FullName == "" {
 		return spverrors.ErrMissingContactFullName

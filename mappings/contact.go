@@ -61,6 +61,30 @@ func MapToContactContracts(src []*engine.Contact) []*response.Contact {
 	return res
 }
 
+// MapToEngineContactConfirmationsData will map the contact to the spv-wallet-models contract
+func MapToEngineContactConfirmationsData(src *models.ContactConfirmationData) *engine.Contact {
+	if src == nil {
+		return nil
+	}
+
+	return &engine.Contact{
+		OwnerXpubID: src.XPubID,
+		FullName:    src.FullName,
+		Paymail:     src.Paymail,
+	}
+}
+
+// MapToEngineContactsConfirmationsData will map the contacts collection to the spv-wallet-models contracts collection
+func MapToEngineContactsConfirmationsData(src []*models.ContactConfirmationData) []*engine.Contact {
+	res := make([]*engine.Contact, 0, len(src))
+
+	for _, c := range src {
+		res = append(res, MapToEngineContactConfirmationsData(c))
+	}
+
+	return res
+}
+
 func mapContactStatus(s engine.ContactStatus) response.ContactStatus {
 	switch s {
 	case engine.ContactNotConfirmed:

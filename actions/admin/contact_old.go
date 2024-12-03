@@ -214,3 +214,39 @@ func contactsAcceptOld(c *gin.Context, _ *reqctx.AdminContext) {
 
 	c.JSON(http.StatusOK, contract)
 }
+
+// contactsConfirmOld will perform Confirm action on contacts with the given xpub ids and paymails
+// Perform confirm action on contacts godoc
+// @Summary		Confirm contacts
+// @Description Confirm contacts
+// @Tags		Admin
+// @Produce		json
+// @Param		[]models.ContactConfirmationData body []models.ContactConfirmationData true "Contacts data"
+// @Success		200
+// @Failure		400	"Bad request - Error while getting data from request body"
+// @Failure		404	"Not found - Error, contacts not found"
+// @Failure 	500	"Internal server error - Error, confirming contact failed"
+// @Router		/v1/admin/contacts/confirmations [post]
+// @Security	x-auth-xpub
+func contactsConfirmOld(c *gin.Context, _ *reqctx.AdminContext) {
+	logger := reqctx.Logger(c)
+
+	var reqParams []*models.ContactConfirmationData
+	if err := c.Bind(&reqParams); err != nil {
+		spverrors.ErrorResponse(c, spverrors.ErrCannotBindRequest.WithTrace(err), logger)
+		return
+	}
+
+	contacts := mappings.MapToEngineContactsConfirmationsData(reqParams)
+
+	err := reqctx.Engine(c).AdminConfirmContacts(
+		c.Request.Context(),
+		contacts,
+	)
+	if err != nil {
+		spverrors.ErrorResponse(c, err, reqctx.Logger(c))
+		return
+	}
+
+	c.Status(http.StatusOK)
+}

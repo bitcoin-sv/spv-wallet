@@ -403,6 +403,48 @@ func (c *Client) upsertContact(ctx context.Context, paymailService paymailclient
 	return contact, nil
 }
 
+// AdminConfirmContacts confirms provided contacts, should be used only by the admin.
+func (c *Client) AdminConfirmContacts(ctx context.Context, contacts []*Contact) error {
+	contactList := []*Contact{}
+	for _, contact := range contacts {
+		cont, err := getContact(ctx, contact.Paymail, contact.OwnerXpubID, c.DefaultModelOptions()...)
+		if err != nil {
+			c.logContactError(contact.OwnerXpubID, contact.Paymail, fmt.Sprintf("error while getting contact: %s", err.Error()))
+			return spverrors.Wrapf(err, "error while getting contact")
+		}
+
+		if cont == nil {
+			return spverrors.ErrContactsNotFound
+		}
+
+		contactList = append(contactList, cont)
+	}
+
+	err := c.Datastore().NewTx(ctx, func(tx *datastore.Transaction) error {
+		for _, contact := range contactList {
+			contact.Status = ContactConfirmed
+			if err := contact.Save(ctx); err != nil {
+				return err
+			}
+
+		}
+
+		err := tx.Commit()
+		if err != nil {
+			return _closeTxWithError(tx, err)
+		}
+
+		return nil
+	})
+
+	if err != nil {
+		c.logContactError("", "", fmt.Sprintf("error while confirming contacts: %s", err.Error()))
+		return spverrors.ErrConfirmContact
+	}
+
+	return nil
+}
+
 func (c *Client) logContactWarining(xPubID, cPaymail, warning string) {
 	c.Logger().Warn().
 		Str("xPubID", xPubID).
