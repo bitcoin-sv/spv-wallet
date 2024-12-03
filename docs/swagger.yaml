@@ -989,6 +989,22 @@ definitions:
         example: "2024-02-26T11:01:28.069911Z"
         type: string
     type: object
+  models.ContactConfirmationData:
+    properties:
+      fullName:
+        description: FullName is name which could be shown instead of whole paymail
+          address.
+        example: Test User
+        type: string
+      paymail:
+        description: Paymail is a paymail address related to contact.
+        example: test@test.test
+        type: string
+      xpubId:
+        description: XPubID is a xpub id related to contact.
+        example: 68af358bde7d8641621c7dd3de1a276c9a62cfa9e2d0740494519f1ba61e2f4a
+        type: string
+    type: object
   models.Destination:
     properties:
       address:
@@ -1153,6 +1169,11 @@ definitions:
     type: object
   models.PaymailAddress:
     properties:
+      address:
+        description: Address is a paymail address that combines alias and domain with
+          @
+        example: test@spvwallet.com
+        type: string
       alias:
         description: Alias is a paymail address's alias (first part of paymail).
         example: test
@@ -2012,6 +2033,11 @@ definitions:
     type: object
   response.PaymailAddress:
     properties:
+      address:
+        description: Address is a paymail address that combines alias and domain with
+          @
+        example: test@spvwallet.com
+        type: string
       alias:
         description: Alias is a paymail address's alias (first part of paymail).
         example: test
@@ -2720,6 +2746,34 @@ paths:
       security:
       - x-auth-xpub: []
       summary: Update contact FullName or Metadata
+      tags:
+      - Admin
+  /api/v1/admin/contacts/confirmations:
+    post:
+      description: Confirm contacts
+      parameters:
+      - description: Contacts data
+        in: body
+        name: '[]models.ContactConfirmationData'
+        required: true
+        schema:
+          items:
+            $ref: '#/definitions/models.ContactConfirmationData'
+          type: array
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad request - Error while getting data from request body
+        "404":
+          description: Not found - Error, contacts not found
+        "500":
+          description: Internal server error - Error, confirming contact failed
+      security:
+      - x-auth-xpub: []
+      summary: Confirm contacts
       tags:
       - Admin
   /api/v1/admin/invitations/{id}:
@@ -4269,6 +4323,34 @@ paths:
       security:
       - x-auth-xpub: []
       summary: Search for contacts
+      tags:
+      - Admin
+  /v1/admin/contacts/confirmations:
+    post:
+      description: Confirm contacts
+      parameters:
+      - description: Contacts data
+        in: body
+        name: '[]models.ContactConfirmationData'
+        required: true
+        schema:
+          items:
+            $ref: '#/definitions/models.ContactConfirmationData'
+          type: array
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad request - Error while getting data from request body
+        "404":
+          description: Not found - Error, contacts not found
+        "500":
+          description: Internal server error - Error, confirming contact failed
+      security:
+      - x-auth-xpub: []
+      summary: Confirm contacts
       tags:
       - Admin
   /v1/admin/destinations:
