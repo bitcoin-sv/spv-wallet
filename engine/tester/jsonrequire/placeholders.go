@@ -111,7 +111,7 @@ func processTemplateCandidate(t testing.TB, templateVal string, base map[string]
 	valueFromBase := getByXPath(t, base, xpath)
 
 	if isRegex {
-		reg := regexp.MustCompile(templateVal[1 : len(templateVal)-1])
+		reg := regexp.MustCompile(extractRegex(templateVal))
 		valueFromBaseAsStr := stringValue(t, valueFromBase)
 		if !reg.MatchString(stringValue(t, valueFromBase)) {
 			require.Fail(t, fmt.Sprintf("value at '%s' (%s) does not match '%s'", xpath, valueFromBaseAsStr, templateVal))
@@ -140,6 +140,10 @@ func stringValue(t testing.TB, v any) string {
 
 func containsRegex(str string) bool {
 	return len(str) > 2 && strings.HasPrefix(str, "/") && strings.HasSuffix(str, "/")
+}
+
+func extractRegex(str string) string {
+	return str[1 : len(str)-1]
 }
 
 func typeof(v any) (reflect.Value, reflect.Kind, any) {

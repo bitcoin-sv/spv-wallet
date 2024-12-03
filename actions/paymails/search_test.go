@@ -27,14 +27,14 @@ func TestCurrentUserPaymails(t *testing.T) {
 				{
 				  "address": "{{.Address}}",
 				  "alias": "{{.Alias}}",
-				  "avatar": "/.*/",
-				  "createdAt": "/.*/",
+				  "avatar": "{{ matchURL | orEmpty }}",
+				  "createdAt": "{{ matchTimestamp }}",
 				  "deletedAt": null,
 				  "domain": "{{.Domain}}",
 				  "id": "/^[a-zA-Z0-9]{64}$/",
 				  "metadata": "*",
 				  "publicName": "{{.PublicName}}",
-				  "updatedAt": "/.*/",
+				  "updatedAt": "{{ matchTimestamp }}",
 				  "xpubId": "{{.XPubID}}"
 				}
 			 ],
@@ -71,27 +71,27 @@ func TestCurrentUserPaymails(t *testing.T) {
 				{
 				  "address": "{{.SecondPaymail.Address}}",
 				  "alias": "{{.SecondPaymail.Alias}}",
-				  "avatar": "/.*/",
-				  "createdAt": "/.*/",
+				  "avatar": "{{ matchURL | orEmpty }}",
+				  "createdAt": "{{ matchTimestamp }}",
 				  "deletedAt": null,
 				  "domain": "{{.Domain}}",
 				  "id": "/^[a-zA-Z0-9]{64}$/",
 				  "metadata": "*",
 				  "publicName": "{{.SecondPaymail.PublicName}}",
-				  "updatedAt": "/.*/",
+				  "updatedAt": "{{ matchTimestamp }}",
 				  "xpubId": "{{.XPubID}}"
 				},
 				{
 				  "address": "{{.FirstPaymail.Address}}",
 				  "alias": "{{.FirstPaymail.Alias}}",
-				  "avatar": "/.*/",
-				  "createdAt": "/.*/",
+				  "avatar": "{{ matchURL | orEmpty }}",
+				  "createdAt": "{{ matchTimestamp }}",
 				  "deletedAt": null,
 				  "domain": "{{.Domain}}",
 				  "id": "/^[a-zA-Z0-9]{64}$/",
 				  "metadata": "*",
 				  "publicName": "{{.FirstPaymail.PublicName}}",
-				  "updatedAt": "/.*/",
+				  "updatedAt": "{{ matchTimestamp }}",
 				  "xpubId": "{{.XPubID}}"
 				}
 			 ],

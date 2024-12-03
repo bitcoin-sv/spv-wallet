@@ -15,7 +15,11 @@ func Match(t testing.TB, expectedTemplateFormat string, params map[string]any, a
 
 func compileTemplate(t testing.TB, templateFormat string, params map[string]any) string {
 	t.Helper()
-	tmpl, err := template.New("").Parse(templateFormat)
+	tmpl, err := template.
+		New("").
+		Funcs(funcsMap).
+		Parse(templateFormat)
+
 	if err != nil {
 		require.Fail(t, "Failed to parse template", err)
 	}

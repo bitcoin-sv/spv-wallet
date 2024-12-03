@@ -21,8 +21,8 @@ func TestCurrentUserGet(t *testing.T) {
 			IsOK().
 			WithJSONMatching(`{
 				"id": "{{.ID}}",
-				"createdAt": "/.*/",
-				"updatedAt": "/.*/",
+				"createdAt": "{{ matchTimestamp }}",
+				"updatedAt": "{{ matchTimestamp }}",
 				"currentBalance": 0,
 				"deletedAt": null,
 				"metadata": "*",

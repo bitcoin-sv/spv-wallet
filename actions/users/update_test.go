@@ -31,7 +31,8 @@ func TestCurrentUserUpdate(t *testing.T) {
 		then.Response(res).
 			IsOK().
 			WithJSONMatching(`{
-				"createdAt": "/.*/",
+				"createdAt": "{{ matchTimestamp }}",
+				"updatedAt": "{{ matchTimestamp }}",
 				"currentBalance": 0,
 				"deletedAt": null,
 				"id": "{{.ID}}",
@@ -40,8 +41,7 @@ func TestCurrentUserUpdate(t *testing.T) {
 					"str": "abc"
 				},
 				"nextExternalNum": 1,
-				"nextInternalNum": 0,
-				"updatedAt": "/.*/"
+				"nextInternalNum": 0
 			}`, map[string]any{
 				"ID": fixtures.Sender.XPubID(),
 			})
