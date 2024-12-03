@@ -1,12 +1,20 @@
 name: "Regression Tests"
+run-name: "Regression Tests for ${{ github.head_ref || github.ref }} | ID: ${{ github.run_id }}-${{ github.run_attempt }}"
 
 on:
   workflow_dispatch:
+    inputs:
+      keep_instances:
+        description: 'When should it keep instances created during tests?'
+        required: true
+        default: 'never'
+        type: choice
+        options:
+          - 'always'
+          - 'failure'
+          - 'never'
   pull_request_target:
     types: [labeled]
-
-env:
-  RUN_ID: ${{ github.run_id }}-${{ github.run_attempt }}
 
 jobs:
   release:
@@ -25,67 +33,18 @@ jobs:
       DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
       DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
 
-  trigger_regression_tests:
+  test:
     needs: release
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Trigger Regression Tests
-        env:
-          GH_TOKEN: ${{ secrets.REGRESSION_TEST_GH_TOKEN }}
-        run: |
-          RUN_ID=${{ env.RUN_ID }}
-          IMAGE_TAG=${{ needs.release.outputs.imageVersion }}
-          curl -X POST -H "Accept: application/vnd.github+json" \
-               -H "Authorization: token $GH_TOKEN" \
-               https://api.github.com/repos/4chain-ag/spv-wallet-regression/dispatches \
-               -d '{"event_type":"regression_tests","client_payload":{"image_tag":"'"${IMAGE_TAG}"'", "run_id":"'"${RUN_ID}"'"}}'
-
-  sync_status:
-    needs: trigger_regression_tests
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Wait for 3 minutes before checking for results
-        run: sleep 180
-
-      - name: Check for workflow completion status every 10 seconds for up to 3 minute
-        run: |
-          success=false
-          for i in {1..18}; do
-            # Fetch the list of artifacts from the target repository
-            artifact_data=$(curl -s -H "Authorization: token ${{ secrets.REGRESSION_TEST_GH_TOKEN }}" \
-                      https://api.github.com/repos/4chain-ag/spv-wallet-regression/actions/artifacts)
-
-          # Check if an artifact containing the RUN_ID exists
-            if echo "$artifact_data" | grep -q "${{ env.RUN_ID }}"; then
-              echo "Workflow completed and artifact found."
-              success=true
-              break
-            fi
-
-            echo "Waiting for workflow completion..."
-            sleep 10
-          done
-
-          if [[ "$success" == "true" ]]; then
-            echo "The regression tests were triggered and results were received" >> $GITHUB_STEP_SUMMARY
-            artifact_name=$(echo "$artifact_data" | jq -r ".artifacts[] | select(.name | contains(\"${{ env.RUN_ID }}\")) | .name")
-            status=$(echo "$artifact_name" | cut -d'_' -f1)
-            run_id=$(echo "$artifact_name" | cut -d'_' -f2)
-            triggering_run_id=$(echo "$artifact_name" | cut -d'_' -f3)
-            full_link="https://github.com/4chain-ag/spv-wallet-regression/actions/runs/$run_id"
-            echo "Status of workflow $triggering_run_id: $status" >> $GITHUB_STEP_SUMMARY
-            echo "Check workflow execution at: $full_link" >> $GITHUB_STEP_SUMMARY
-
-            if [[ "$status" != "success" ]]; then
-              echo "The workflow did not complete successfully. Status: $status" >> $GITHUB_STEP_SUMMARY
-              exit 1
-            fi
-          else
-            echo "We could not determine the final status of the regression tests. No results were found." >> $GITHUB_STEP_SUMMARY
-            exit 1
-          fi
+    uses: 4chain-ag/spv-wallet-regression/.github/workflows/run-regression-tests.yaml@main
+    with:
+      image_tag: ${{ needs.release.outputs.imageVersion }}
+      run_id: '${{ github.run_id }}-${{ github.run_attempt }}'
+      keep_instances: ${{ inputs.keep_instances }}
+    secrets:
+      MASTER_INSTANCE_URL: ${{ secrets.REG_MASTER_INSTANCE_URL }}
+      MASTER_INSTANCE_XPRIV: ${{ secrets.REG_MASTER_INSTANCE_XPRIV }}
+      BLOCK_HEADERS_SERVICE_URL: ${{ secrets.REG_BLOCK_HEADERS_SERVICE_URL }}
+      BLOCK_HEADERS_SERVICE_AUTH_TOKEN: ${{ secrets.REG_BLOCK_HEADERS_SERVICE_AUTH_TOKEN }}
+      ARGOCD_SERVER: ${{ secrets.REG_ARGOCD_SERVER }}
+      ARGOCD_USERNAME: ${{ secrets.REG_ARGOCD_USERNAME }}
+      ARGOCD_PASSWORD: ${{ secrets.REG_ARGOCD_PASSWORD }}
