@@ -7,6 +7,10 @@ import (
 	"text/template"
 )
 
+// Match helps to make assertions on JSON strings when some values are not known in advance.
+// For example, when we do the assertion on JSON serialized models, we can't predict the values of fields like IDs or timestamps.
+// In such cases, we can use a "template" with placeholders for these values.
+// See matcher_test.go for examples
 func Match(t testing.TB, expectedTemplateFormat string, params map[string]any, actual string) {
 	t.Helper()
 	expected := compileTemplate(t, expectedTemplateFormat, params)

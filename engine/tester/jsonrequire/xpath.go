@@ -2,11 +2,12 @@ package jsonrequire
 
 import (
 	"fmt"
-	"github.com/stretchr/testify/require"
 	"regexp"
 	"strconv"
 	"strings"
 	"testing"
+
+	"github.com/stretchr/testify/require"
 )
 
 var arrayKeyRegex = regexp.MustCompile(`^([a-zA-Z0-9_-]+)\[(\d+)]$`)

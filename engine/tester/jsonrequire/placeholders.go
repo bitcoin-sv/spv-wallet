@@ -12,17 +12,6 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-// assertJSONWithPlaceholders helps to make assertions on JSON strings when some values are not known in advance.
-// For example, when we do the assertion on JSON serialized models, we can't predict the values of fields like IDs or timestamps.
-// In such cases, we can use a "template" with placeholders for these values.
-//
-// The placeholders are strings that start and end with a slash and can contain a regular expression, e.g., "/[0-9]+/".
-// Additionally, the placeholder "*" can be used to match any value, also nested objects.
-// Examples:
-// {"a": 1, "b": "/^[a-zA-Z]+$/"} will match {"a": 1, "b": "abc"} and any other string in "b" that contains only letters.
-// {"a": 1, "b": "/^\\d{1,3}$/"} will match {"a": 1, "b": "123"} and also "b" as number from 0 to 999: {"a": 1, "b": 999}.
-// {"a": 1, "metadata": "*"} will match {"a": 1, "metadata": {"key": "value"}} and any other object in "metadata".
-// {"a": 1, "b": ["/^[a-zA-Z]+$/"]} will match {"a": 1, "b": ["abc"]} and any other letters-only string in the array at index 0.
 func assertJSONWithPlaceholders(t testing.TB, expected, actual string) {
 	t.Helper()
 

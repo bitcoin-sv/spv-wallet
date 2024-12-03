@@ -3,14 +3,15 @@ package testabilities
 import (
 	"encoding/json"
 	"fmt"
+	"mime"
+	"net/http"
+	"testing"
+
 	"github.com/bitcoin-sv/spv-wallet/actions/testabilities/apierror"
 	"github.com/bitcoin-sv/spv-wallet/engine/tester/jsonrequire"
 	"github.com/go-resty/resty/v2"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"mime"
-	"net/http"
-	"testing"
 )
 
 type SPVWalletApplicationAssertions interface {
