@@ -13,10 +13,14 @@ func TestCurrentUserGet(t *testing.T) {
 	defer cleanup()
 
 	t.Run("return xpub info for user", func(t *testing.T) {
+		// given:
 		given, then := testabilities.NewOf(givenForAllTests, t)
 		client := given.HttpClient().ForUser()
 
+		// when:
 		res, _ := client.R().Get("/api/v1/users/current")
+
+		// then:
 		then.Response(res).
 			IsOK().
 			WithJSONMatching(`{
@@ -34,10 +38,14 @@ func TestCurrentUserGet(t *testing.T) {
 	})
 
 	t.Run("return xpub info for user (old api)", func(t *testing.T) {
+		// given:
 		given, then := testabilities.NewOf(givenForAllTests, t)
 		client := given.HttpClient().ForUser()
 
+		// when:
 		res, _ := client.R().Get("/v1/xpub")
+
+		// then:
 		then.Response(res).
 			IsOK().
 			WithJSONMatching(`{
@@ -55,18 +63,26 @@ func TestCurrentUserGet(t *testing.T) {
 	})
 
 	t.Run("return xpub info for admin", func(t *testing.T) {
+		// given:
 		given, then := testabilities.NewOf(givenForAllTests, t)
 		client := given.HttpClient().ForAdmin()
 
+		// when:
 		res, _ := client.R().Get("/api/v1/users/current")
+
+		// then:
 		then.Response(res).IsUnauthorizedForAdmin()
 	})
 
 	t.Run("return xpub info for anonymous", func(t *testing.T) {
+		// given:
 		given, then := testabilities.NewOf(givenForAllTests, t)
 		client := given.HttpClient().ForAnonymous()
 
+		// when:
 		res, _ := client.R().Get("/api/v1/users/current")
+
+		// then:
 		then.Response(res).IsUnauthorized()
 	})
 }

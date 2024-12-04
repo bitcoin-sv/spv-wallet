@@ -53,7 +53,6 @@ func TestCurrentUserUpdate(t *testing.T) {
 		client := given.HttpClient().ForAdmin()
 
 		// when:
-		// when:
 		res, _ := client.R().
 			SetBody(metadataToUpdate).
 			Patch("/api/v1/users/current")
@@ -67,7 +66,6 @@ func TestCurrentUserUpdate(t *testing.T) {
 		given, then := testabilities.NewOf(givenForAllTests, t)
 		client := given.HttpClient().ForAnonymous()
 
-		// when:
 		// when:
 		res, _ := client.R().
 			SetBody(metadataToUpdate).
