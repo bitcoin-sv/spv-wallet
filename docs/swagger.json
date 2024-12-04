@@ -1198,6 +1198,50 @@
                 }
             }
         },
+        "/api/v1/paymails": {
+            "get": {
+                "security": [
+                    {
+                        "x-auth-xpub": []
+                    }
+                ],
+                "description": "Paymail addresses search",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Users"
+                ],
+                "summary": "Paymail addresses search",
+                "parameters": [
+                    {
+                        "description": "Supports targeted resource searches with filters and metadata, plus options for pagination and sorting to streamline data exploration and analysis",
+                        "name": "SearchPaymails",
+                        "in": "body",
+                        "schema": {
+                            "$ref": "#/definitions/filter.PaymailFilter"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "List of paymail addresses",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/response.PaymailAddress"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request - Error while parsing SearchPaymails from request body"
+                    },
+                    "500": {
+                        "description": "Internal server error - Error while searching for paymail addresses"
+                    }
+                }
+            }
+        },
         "/api/v1/transactions": {
             "get": {
                 "security": [
@@ -5190,6 +5234,49 @@
                 }
             }
         },
+        "filter.PaymailFilter": {
+            "type": "object",
+            "properties": {
+                "createdRange": {
+                    "description": "CreatedRange specifies the time range when a record was created.",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/filter.TimeRange"
+                        }
+                    ]
+                },
+                "domain": {
+                    "type": "string",
+                    "example": "example.com"
+                },
+                "id": {
+                    "type": "string",
+                    "example": "ffb86c103d17d87c15aaf080aab6be5415c9fa885309a79b04c9910e39f2b542"
+                },
+                "includeDeleted": {
+                    "description": "IncludeDeleted is a flag whether or not to include deleted items in the search results",
+                    "type": "boolean",
+                    "default": false,
+                    "example": true
+                },
+                "publicName": {
+                    "type": "string",
+                    "example": "Alice"
+                },
+                "updatedRange": {
+                    "description": "UpdatedRange specifies the time range when a record was updated.",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/filter.TimeRange"
+                        }
+                    ]
+                },
+                "xpubId": {
+                    "type": "string",
+                    "example": "79f90a6bab0a44402fc64828af820e9465645658aea2d138c5205b88e6dabd00"
+                }
+            }
+        },
         "filter.SearchAccessKeys": {
             "type": "object",
             "properties": {
@@ -5997,6 +6084,11 @@
         "models.PaymailAddress": {
             "type": "object",
             "properties": {
+                "address": {
+                    "description": "Address is a paymail address that combines alias and domain with @",
+                    "type": "string",
+                    "example": "test@spvwallet.com"
+                },
                 "alias": {
                     "description": "Alias is a paymail address's alias (first part of paymail).",
                     "type": "string",
@@ -7166,6 +7258,11 @@
         "response.PaymailAddress": {
             "type": "object",
             "properties": {
+                "address": {
+                    "description": "Address is a paymail address that combines alias and domain with @",
+                    "type": "string",
+                    "example": "test@spvwallet.com"
+                },
                 "alias": {
                     "description": "Alias is a paymail address's alias (first part of paymail).",
                     "type": "string",
