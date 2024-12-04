@@ -15,16 +15,6 @@ type UpsertContact struct {
 	RequesterPaymail string `json:"requesterPaymail"`
 }
 
-// ContactData is a type for contact data
-type ContactData struct {
-	// OwnerXpubID is a xpub id related to contact.
-	OwnerXpubID string `json:"xpub_id"`
-	// FullName is name which could be shown instead of whole paymail address.
-	FullName string `json:"full_name"`
-	// Paymail is a paymail address related to contact.
-	Paymail string `json:"paymail"`
-}
-
 func (p *UpsertContact) validate() error {
 	if p.FullName == "" {
 		return spverrors.ErrMissingContactFullName
