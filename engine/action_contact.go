@@ -405,7 +405,7 @@ func (c *Client) upsertContact(ctx context.Context, paymailService paymailclient
 
 // AdminConfirmContacts confirms provided contacts, should be used only by the admin.
 func (c *Client) AdminConfirmContacts(ctx context.Context, contacts []*Contact) error {
-	contactList := []*Contact{}
+	contactList := make([]*Contact, 0, len(contacts))
 	for _, contact := range contacts {
 		cont, err := getContact(ctx, contact.Paymail, contact.OwnerXpubID, c.DefaultModelOptions()...)
 		if err != nil {
