@@ -2,6 +2,7 @@ package conv
 
 import (
 	"math"
+	"strconv"
 
 	sdk "github.com/bitcoin-sv/go-sdk/transaction"
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
@@ -80,4 +81,14 @@ func VarIntToInt(varInt *sdk.VarInt) (int, error) {
 	}
 	// Convert the VarInt to an int
 	return int(i), nil
+}
+
+// StringToUint32 will convert string to int and then convert to uint32
+func StringToUint32(str string) (uint32, error) {
+	intValue, err := strconv.Atoi(str)
+	if err != nil {
+		return 0, spverrors.ErrForTypeConversion.Wrap(err)
+	}
+
+	return IntToUint32(intValue)
 }

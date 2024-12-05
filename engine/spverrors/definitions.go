@@ -63,6 +63,9 @@ var ErrCannotBindRequest = models.SPVError{Message: "cannot bind request body", 
 // ErrCannotParseQueryParams is when query params cannot be parsed into expected struct.
 var ErrCannotParseQueryParams = models.SPVError{Message: "cannot parse request query params", StatusCode: 400, Code: "error-query-params-invalid"}
 
+// ErrCannotParseParams is when URL parameters cannot be parsed or have wrong types
+var ErrCannotParseParams = models.SPVError{Message: "cannot parse request params", StatusCode: 400, Code: "error-params-invalid"}
+
 // ErrInvalidConditions is when request has invalid conditions
 var ErrInvalidConditions = models.SPVError{Message: "invalid conditions", StatusCode: 400, Code: "error-bind-conditions-invalid"}
 

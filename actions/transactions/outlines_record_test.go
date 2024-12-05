@@ -1,6 +1,7 @@
 package transactions_test
 
 import (
+	"fmt"
 	"testing"
 
 	"github.com/bitcoin-sv/spv-wallet/actions/testabilities"
@@ -11,6 +12,7 @@ import (
 
 const (
 	transactionsOutlinesRecordURL = "/api/v2/transactions"
+	getTransactionDataURL         = "/api/v2/transactions/data"
 	dataOfOpReturnTx              = "hello world"
 )
 
@@ -57,6 +59,16 @@ func TestOutlinesRecordOpReturn(t *testing.T) {
 
 		// then:
 		then.Response(res).IsOK()
+
+		// when:
+		res, _ = client.R().
+			SetHeader("Content-Type", "application/json").
+			Get(fmt.Sprintf("%s/%s/0", getTransactionDataURL, txSpec.ID()))
+
+		// then:
+		then.Response(res).IsOK().WithJSONf(`{
+			"data": "%s"
+		}`, dataOfOpReturnTx)
 	})
 }
 

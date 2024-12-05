@@ -2,6 +2,7 @@ package engine
 
 import (
 	"context"
+	"github.com/bitcoin-sv/spv-wallet/models/bsv"
 	"math"
 	"time"
 
@@ -390,6 +391,14 @@ func (c *Client) HandleTxCallback(ctx context.Context, callbackResp *chainmodels
 	}
 
 	return nil
+}
+
+func (c *Client) GetTransactionData(ctx context.Context, outpoint bsv.Outpoint) ([]byte, error) {
+	data, err := c.txDAO.GetData(ctx, outpoint)
+	if err != nil {
+		return nil, spverrors.Wrapf(err, "failed to get transaction's data")
+	}
+	return data, nil
 }
 
 func generateTxIDFilterConditions(txIDs []string) map[string]interface{} {

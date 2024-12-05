@@ -2,6 +2,7 @@ package engine
 
 import (
 	"context"
+	"github.com/bitcoin-sv/spv-wallet/engine/database/dao"
 	"time"
 
 	"github.com/bitcoin-sv/go-paymail"
@@ -30,6 +31,7 @@ type (
 	// Client is the SPV Wallet Engine client & options
 	Client struct {
 		options *clientOptions
+		txDAO   *dao.Transactions // Data Access Object for transactions
 	}
 
 	// clientOptions holds all the configuration for the client
@@ -140,6 +142,8 @@ func NewClient(ctx context.Context, opts ...ClientOps) (ClientInterface, error) 
 	if err = client.autoMigrate(ctx); err != nil {
 		return nil, err
 	}
+
+	client.initDAOs()
 
 	// Load the Paymail client and service (if does not exist)
 	if err = client.loadPaymailComponents(); err != nil {
