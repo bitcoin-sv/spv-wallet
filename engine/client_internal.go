@@ -89,6 +89,10 @@ func (c *Client) autoMigrate(ctx context.Context) error {
 	return nil
 }
 
+func (c *Client) initDAOs() {
+	c.txDAO = dao.NewTransactionsAccessObject(c.Datastore().DB())
+}
+
 // loadNotificationClient will load the notifications client
 func (c *Client) loadNotificationClient(ctx context.Context) (err error) {
 	if c.options.notifications == nil || !c.options.notifications.enabled {
@@ -210,7 +214,7 @@ func (c *Client) loadTransactionOutlinesService() error {
 func (c *Client) loadTransactionRecordService() error {
 	if c.options.transactionRecordService == nil {
 		logger := c.Logger().With().Str("subservice", "transactionRecord").Logger()
-		c.options.transactionRecordService = record.NewService(logger, dao.NewTransactionsAccessObject(c.Datastore().DB()), c.Chain())
+		c.options.transactionRecordService = record.NewService(logger, c.txDAO, c.Chain())
 	}
 	return nil
 }

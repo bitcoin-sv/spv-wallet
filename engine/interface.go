@@ -163,6 +163,7 @@ type TransactionService interface {
 	HandleTxCallback(ctx context.Context, callbackResp *chainmodels.TXInfo) error
 	UpdateTransactionMetadata(ctx context.Context, xPubID, id string, metadata Metadata) (*Transaction, error)
 	RevertTransaction(ctx context.Context, id string) error
+	GetTransactionData(ctx context.Context, outpoint bsv.Outpoint) ([]byte, error)
 }
 
 // UTXOService is the utxo actions

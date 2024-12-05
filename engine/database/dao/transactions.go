@@ -57,3 +57,18 @@ func (r *Transactions) GetOutputs(ctx context.Context, outpoints iter.Seq[bsv.Ou
 
 	return outputs, nil
 }
+
+// GetData returns data (from OP_RETURN output) from the database based on the provided outpoint.
+func (r *Transactions) GetData(ctx context.Context, outpoint bsv.Outpoint) ([]byte, error) {
+	query := r.db.
+		WithContext(ctx).
+		Model(&database.Data{}).
+		Select("blob").
+		Where("tx_id = ? and vout = ?", outpoint.TxID, outpoint.Vout)
+
+	var data database.Data
+	if err := query.Find(&data).Error; err != nil {
+		return nil, spverrors.Wrapf(err, "failed to get transaction's data")
+	}
+	return data.Blob, nil
+}

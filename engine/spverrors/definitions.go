@@ -63,6 +63,9 @@ var ErrCannotBindRequest = models.SPVError{Message: "cannot bind request body", 
 // ErrCannotParseQueryParams is when query params cannot be parsed into expected struct.
 var ErrCannotParseQueryParams = models.SPVError{Message: "cannot parse request query params", StatusCode: 400, Code: "error-query-params-invalid"}
 
+// ErrCannotParseParams is when URL parameters cannot be parsed or have wrong types
+var ErrCannotParseParams = models.SPVError{Message: "cannot parse request params", StatusCode: 400, Code: "error-params-invalid"}
+
 // ErrInvalidConditions is when request has invalid conditions
 var ErrInvalidConditions = models.SPVError{Message: "invalid conditions", StatusCode: 400, Code: "error-bind-conditions-invalid"}
 
@@ -211,6 +214,9 @@ var ErrParseTransactionFromHex = models.SPVError{Message: "error parsing transac
 
 // ErrCouldNotFindTransaction is an error when a transaction could not be found
 var ErrCouldNotFindTransaction = models.SPVError{Message: "transaction not found", StatusCode: 404, Code: "error-transaction-not-found"}
+
+// ErrCouldNotFindDataOutpoint is an error when a given data outpoint could not be found
+var ErrCouldNotFindDataOutpoint = models.SPVError{Message: "data outpoint not found", StatusCode: 404, Code: "error-transaction-data-outpoint-not-found"}
 
 // ErrCouldNotFindDraftTx is an error when a given draft tx could not be found
 var ErrCouldNotFindDraftTx = models.SPVError{Message: "draft tx not found", StatusCode: 404, Code: "error-transaction-draft-tx-not-found"}

@@ -9,6 +9,7 @@ import (
 	"github.com/bitcoin-sv/spv-wallet/engine/chain"
 	"github.com/bitcoin-sv/spv-wallet/engine/chain/models"
 	"github.com/bitcoin-sv/spv-wallet/engine/cluster"
+	"github.com/bitcoin-sv/spv-wallet/engine/database/dao"
 	"github.com/bitcoin-sv/spv-wallet/engine/datastore"
 	"github.com/bitcoin-sv/spv-wallet/engine/logging"
 	"github.com/bitcoin-sv/spv-wallet/engine/metrics"
@@ -30,6 +31,7 @@ type (
 	// Client is the SPV Wallet Engine client & options
 	Client struct {
 		options *clientOptions
+		txDAO   *dao.Transactions // Data Access Object for transactions
 	}
 
 	// clientOptions holds all the configuration for the client
@@ -140,6 +142,8 @@ func NewClient(ctx context.Context, opts ...ClientOps) (ClientInterface, error) 
 	if err = client.autoMigrate(ctx); err != nil {
 		return nil, err
 	}
+
+	client.initDAOs()
 
 	// Load the Paymail client and service (if does not exist)
 	if err = client.loadPaymailComponents(); err != nil {

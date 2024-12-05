@@ -11,6 +11,7 @@ import (
 	"github.com/bitcoin-sv/spv-wallet/engine/datastore"
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/bitcoin-sv/spv-wallet/engine/utils"
+	"github.com/bitcoin-sv/spv-wallet/models/bsv"
 )
 
 // RecordTransaction will parse the outgoing transaction and save it into the Datastore
@@ -390,6 +391,15 @@ func (c *Client) HandleTxCallback(ctx context.Context, callbackResp *chainmodels
 	}
 
 	return nil
+}
+
+// GetTransactionData will get the data (from OP_RETURN output) from the Datastore for a provided outpoint
+func (c *Client) GetTransactionData(ctx context.Context, outpoint bsv.Outpoint) ([]byte, error) {
+	data, err := c.txDAO.GetData(ctx, outpoint)
+	if err != nil {
+		return nil, spverrors.Wrapf(err, "failed to get transaction's data")
+	}
+	return data, nil
 }
 
 func generateTxIDFilterConditions(txIDs []string) map[string]interface{} {
