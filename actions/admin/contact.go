@@ -221,6 +221,7 @@ func contactsAccept(c *gin.Context, _ *reqctx.AdminContext) {
 // @Param		[]models.ContactConfirmationData body []models.ContactConfirmationData true "Contacts data"
 // @Success		200
 // @Failure		400	"Bad request - Error while getting data from request body"
+// @Failure		413	"Payload Too Large - Error, too many contacts provided"
 // @Failure		404	"Not found - Error, contacts not found"
 // @Failure 	500	"Internal server error - Error, confirming contact failed"
 // @Router		/api/v1/admin/contacts/confirmations [post]

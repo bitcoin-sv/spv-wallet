@@ -140,6 +140,9 @@ const docTemplate = `{
                     "404": {
                         "description": "Not found - Error, contacts not found"
                     },
+                    "413": {
+                        "description": "Payload Too Large - Error, too many contacts provided"
+                    },
                     "500": {
                         "description": "Internal server error - Error, confirming contact failed"
                     }
