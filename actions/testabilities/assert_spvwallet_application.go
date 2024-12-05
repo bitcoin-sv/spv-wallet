@@ -8,6 +8,7 @@ import (
 	"testing"
 
 	"github.com/bitcoin-sv/spv-wallet/actions/testabilities/apierror"
+	"github.com/bitcoin-sv/spv-wallet/engine/tester/jsonrequire"
 	"github.com/go-resty/resty/v2"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -21,6 +22,7 @@ type SPVWalletResponseAssertions interface {
 	IsOK() SPVWalletResponseAssertions
 	HasStatus(status int) SPVWalletResponseAssertions
 	WithJSONf(expectedFormat string, args ...any)
+	WithJSONMatching(expectedTemplateFormat string, params map[string]any)
 	// IsUnauthorized asserts that the response status code is 401 and the error is about lack of authorization.
 	IsUnauthorized()
 	// IsUnauthorizedForAdmin asserts that the response status code is 401 and the error is that admin is not authorized to use the endpoint.
@@ -76,6 +78,11 @@ func (a *responseAssertions) HasStatus(status int) SPVWalletResponseAssertions {
 func (a *responseAssertions) WithJSONf(expectedFormat string, args ...any) {
 	a.assertJSONContentType()
 	a.assertJSONBody(expectedFormat, args...)
+}
+
+func (a *responseAssertions) WithJSONMatching(expectedTemplateFormat string, params map[string]any) {
+	a.assertJSONContentType()
+	jsonrequire.Match(a.t, expectedTemplateFormat, params, a.response.String())
 }
 
 func (a *responseAssertions) assertJSONContentType() {

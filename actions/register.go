@@ -7,6 +7,7 @@ import (
 	"github.com/bitcoin-sv/spv-wallet/actions/contacts"
 	"github.com/bitcoin-sv/spv-wallet/actions/destinations"
 	"github.com/bitcoin-sv/spv-wallet/actions/merkleroots"
+	"github.com/bitcoin-sv/spv-wallet/actions/paymails"
 	"github.com/bitcoin-sv/spv-wallet/actions/sharedconfig"
 	"github.com/bitcoin-sv/spv-wallet/actions/transactions"
 	"github.com/bitcoin-sv/spv-wallet/actions/users"
@@ -24,6 +25,7 @@ func Register(appConfig *config.AppConfig, handlersManager *handlers.Manager) {
 	transactions.RegisterRoutes(handlersManager)
 	utxos.RegisterRoutes(handlersManager)
 	users.RegisterRoutes(handlersManager)
+	paymails.RegisterRoutes(handlersManager)
 	sharedconfig.RegisterRoutes(handlersManager)
 	merkleroots.RegisterRoutes(handlersManager)
 	contacts.RegisterRoutes(handlersManager)
