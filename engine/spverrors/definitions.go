@@ -158,6 +158,9 @@ var ErrAcceptContact = models.SPVError{Message: "accepting contact failed", Stat
 // ErrConfirmContact is when confirming contact failed
 var ErrConfirmContact = models.SPVError{Message: "confirming contact failed", StatusCode: 500, Code: "error-contact-confirming-contacts-failed"}
 
+// ErrTooManyContacts is when too many contacts are provided
+var ErrTooManyContacts = models.SPVError{Message: "too many contacts provided", StatusCode: 400, Code: "error-contact-too-many-contacts"}
+
 // ////////////////////////////////// PAYMAIL ERRORS
 
 // ErrCouldNotFindPaymail is when paymail could not be found

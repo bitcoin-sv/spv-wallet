@@ -234,6 +234,11 @@ func contactsConfirm(c *gin.Context, _ *reqctx.AdminContext) {
 		return
 	}
 
+	if len(reqParams) > 2 {
+		spverrors.ErrorResponse(c, spverrors.ErrTooManyContacts, logger)
+		return
+	}
+
 	contacts := mappings.MapToEngineContactsConfirmationsData(reqParams)
 
 	err := reqctx.Engine(c).AdminConfirmContacts(
