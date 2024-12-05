@@ -1,13 +1,14 @@
 package transactions
 
 import (
+	"net/http"
+
 	"github.com/bitcoin-sv/spv-wallet/conv"
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/bitcoin-sv/spv-wallet/models/bsv"
 	"github.com/bitcoin-sv/spv-wallet/models/response"
 	"github.com/bitcoin-sv/spv-wallet/server/reqctx"
 	"github.com/gin-gonic/gin"
-	"net/http"
 )
 
 func getDataByOutpoint(c *gin.Context, _ *reqctx.UserContext) {

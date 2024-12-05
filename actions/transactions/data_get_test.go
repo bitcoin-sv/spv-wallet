@@ -2,10 +2,10 @@ package transactions_test
 
 import (
 	"fmt"
-	"github.com/bitcoin-sv/spv-wallet/actions/testabilities/apierror"
 	"testing"
 
 	"github.com/bitcoin-sv/spv-wallet/actions/testabilities"
+	"github.com/bitcoin-sv/spv-wallet/actions/testabilities/apierror"
 	"github.com/bitcoin-sv/spv-wallet/engine/tester/fixtures"
 )
 
