@@ -28,7 +28,7 @@ func TestGetTransactionDataErrorCases(t *testing.T) {
 			WithJSONf(apierror.ExpectedJSON("error-transaction-data-outpoint-not-found", "data outpoint not found"))
 	})
 
-	t.Run("try to return paymails info for admin", func(t *testing.T) {
+	t.Run("try to get as admin", func(t *testing.T) {
 		// given:
 		given, then := testabilities.New(t)
 		cleanup := given.StartedSPVWallet()
@@ -42,7 +42,7 @@ func TestGetTransactionDataErrorCases(t *testing.T) {
 		then.Response(res).IsUnauthorizedForAdmin()
 	})
 
-	t.Run("return xpub info for anonymous", func(t *testing.T) {
+	t.Run("try to get as anonymous", func(t *testing.T) {
 		// given:
 		given, then := testabilities.New(t)
 		cleanup := given.StartedSPVWallet()
