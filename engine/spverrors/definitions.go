@@ -215,6 +215,9 @@ var ErrParseTransactionFromHex = models.SPVError{Message: "error parsing transac
 // ErrCouldNotFindTransaction is an error when a transaction could not be found
 var ErrCouldNotFindTransaction = models.SPVError{Message: "transaction not found", StatusCode: 404, Code: "error-transaction-not-found"}
 
+// ErrCouldNotFindDataOutpoint is an error when a given data outpoint could not be found
+var ErrCouldNotFindDataOutpoint = models.SPVError{Message: "data outpoint not found", StatusCode: 404, Code: "error-transaction-data-outpoint-not-found"}
+
 // ErrCouldNotFindDraftTx is an error when a given draft tx could not be found
 var ErrCouldNotFindDraftTx = models.SPVError{Message: "draft tx not found", StatusCode: 404, Code: "error-transaction-draft-tx-not-found"}
 

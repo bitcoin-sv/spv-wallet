@@ -31,6 +31,10 @@ func getDataByOutpoint(c *gin.Context, _ *reqctx.UserContext) {
 		spverrors.ErrorResponse(c, err, logger)
 		return
 	}
+	if data == nil {
+		spverrors.ErrorResponse(c, spverrors.ErrCouldNotFindDataOutpoint, logger)
+		return
+	}
 
 	c.JSON(http.StatusOK, response.TransactionData{
 		Data: string(data),
