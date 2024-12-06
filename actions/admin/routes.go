@@ -17,7 +17,7 @@ func RegisterRoutes(handlersManager *handlers.Manager) {
 	adminGroupOld.DELETE("/contact/:id", handlers.AsAdmin(contactsDeleteOld))
 	adminGroupOld.PATCH("/contact/accepted/:id", handlers.AsAdmin(contactsAcceptOld))
 	adminGroupOld.PATCH("/contact/rejected/:id", handlers.AsAdmin(contactsRejectOld))
-	adminGroupOld.POST("/contacts/confirmations", handlers.AsAdmin(contactsConfirmOld))
+	adminGroupOld.POST("/contacts/confirmations", handlers.AsAdmin(contactsConfirm))
 	adminGroupOld.POST("/destinations/search", handlers.AsAdmin(destinationsSearch))
 	adminGroupOld.POST("/destinations/count", handlers.AsAdmin(destinationsCount))
 	adminGroupOld.POST("/paymail/get", handlers.AsAdmin(paymailGetAddressOld))

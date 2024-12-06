@@ -108,24 +108,24 @@ const docTemplate = `{
                         "x-auth-xpub": []
                     }
                 ],
-                "description": "Confirm contacts",
+                "description": "Marks the contact entries as mutually confirmed, after ensuring the validity of the contact information for both parties.",
                 "produces": [
                     "application/json"
                 ],
                 "tags": [
                     "Admin"
                 ],
-                "summary": "Confirm contacts",
+                "summary": "Confirm contacts pair",
                 "parameters": [
                     {
                         "description": "Contacts data",
-                        "name": "[]models.ContactConfirmationData",
+                        "name": "[]models.AdminConfirmContactPair",
                         "in": "body",
                         "required": true,
                         "schema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/definitions/models.ContactConfirmationData"
+                                "$ref": "#/definitions/models.AdminConfirmContactPair"
                             }
                         }
                     }
@@ -139,9 +139,6 @@ const docTemplate = `{
                     },
                     "404": {
                         "description": "Not found - Error, contacts not found"
-                    },
-                    "413": {
-                        "description": "Payload Too Large - Error, too many contacts provided"
                     },
                     "500": {
                         "description": "Internal server error - Error, confirming contact failed"
@@ -2581,51 +2578,6 @@ const docTemplate = `{
                     },
                     "500": {
                         "description": "Internal server error - Error while updating contact"
-                    }
-                }
-            }
-        },
-        "/v1/admin/contacts/confirmations": {
-            "post": {
-                "security": [
-                    {
-                        "x-auth-xpub": []
-                    }
-                ],
-                "description": "Confirm contacts",
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Admin"
-                ],
-                "summary": "Confirm contacts",
-                "parameters": [
-                    {
-                        "description": "Contacts data",
-                        "name": "[]models.ContactConfirmationData",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "type": "array",
-                            "items": {
-                                "$ref": "#/definitions/models.ContactConfirmationData"
-                            }
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK"
-                    },
-                    "400": {
-                        "description": "Bad request - Error while getting data from request body"
-                    },
-                    "404": {
-                        "description": "Not found - Error, contacts not found"
-                    },
-                    "500": {
-                        "description": "Internal server error - Error, confirming contact failed"
                     }
                 }
             }
@@ -5772,6 +5724,17 @@ const docTemplate = `{
                 }
             }
         },
+        "models.AdminConfirmContactPair": {
+            "type": "object",
+            "properties": {
+                "contactA": {
+                    "$ref": "#/definitions/models.ContactConfirmationData"
+                },
+                "contactB": {
+                    "$ref": "#/definitions/models.ContactConfirmationData"
+                }
+            }
+        },
         "models.AdminStats": {
             "type": "object",
             "properties": {
@@ -5874,11 +5837,6 @@ const docTemplate = `{
         "models.ContactConfirmationData": {
             "type": "object",
             "properties": {
-                "fullName": {
-                    "description": "FullName is name which could be shown instead of whole paymail address.",
-                    "type": "string",
-                    "example": "Test User"
-                },
                 "paymail": {
                     "description": "Paymail is a paymail address related to contact.",
                     "type": "string",

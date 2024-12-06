@@ -214,8 +214,8 @@ func contactsAccept(c *gin.Context, _ *reqctx.AdminContext) {
 
 // contactsConfirm will perform Confirm action on contacts with the given xpub ids and paymails
 // Perform confirm action on contacts godoc
-// @Summary		Confirm contacts
-// @Description Confirm contacts
+// @Summary		Confirm contacts pair
+// @Description Marks the contact entries as mutually confirmed, after ensuring the validity of the contact information for both parties.
 // @Tags		Admin
 // @Produce		json
 // @Param		[]models.AdminConfirmContactPair body []models.AdminConfirmContactPair true "Contacts data"

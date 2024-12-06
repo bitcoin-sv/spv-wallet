@@ -914,6 +914,13 @@ definitions:
         example: bb8593f85ef8056a77026ad415f02128f3768906de53e9e8bf8749fe2d66cf50
         type: string
     type: object
+  models.AdminConfirmContactPair:
+    properties:
+      contactA:
+        $ref: '#/definitions/models.ContactConfirmationData'
+      contactB:
+        $ref: '#/definitions/models.ContactConfirmationData'
+    type: object
   models.AdminStats:
     properties:
       balance:
@@ -991,11 +998,6 @@ definitions:
     type: object
   models.ContactConfirmationData:
     properties:
-      fullName:
-        description: FullName is name which could be shown instead of whole paymail
-          address.
-        example: Test User
-        type: string
       paymail:
         description: Paymail is a paymail address related to contact.
         example: test@test.test
@@ -2750,15 +2752,16 @@ paths:
       - Admin
   /api/v1/admin/contacts/confirmations:
     post:
-      description: Confirm contacts
+      description: Marks the contact entries as mutually confirmed, after ensuring
+        the validity of the contact information for both parties.
       parameters:
       - description: Contacts data
         in: body
-        name: '[]models.ContactConfirmationData'
+        name: '[]models.AdminConfirmContactPair'
         required: true
         schema:
           items:
-            $ref: '#/definitions/models.ContactConfirmationData'
+            $ref: '#/definitions/models.AdminConfirmContactPair'
           type: array
       produces:
       - application/json
@@ -2769,13 +2772,11 @@ paths:
           description: Bad request - Error while getting data from request body
         "404":
           description: Not found - Error, contacts not found
-        "413":
-          description: Payload Too Large - Error, too many contacts provided
         "500":
           description: Internal server error - Error, confirming contact failed
       security:
       - x-auth-xpub: []
-      summary: Confirm contacts
+      summary: Confirm contacts pair
       tags:
       - Admin
   /api/v1/admin/invitations/{id}:
@@ -4325,34 +4326,6 @@ paths:
       security:
       - x-auth-xpub: []
       summary: Search for contacts
-      tags:
-      - Admin
-  /v1/admin/contacts/confirmations:
-    post:
-      description: Confirm contacts
-      parameters:
-      - description: Contacts data
-        in: body
-        name: '[]models.ContactConfirmationData'
-        required: true
-        schema:
-          items:
-            $ref: '#/definitions/models.ContactConfirmationData'
-          type: array
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-        "400":
-          description: Bad request - Error while getting data from request body
-        "404":
-          description: Not found - Error, contacts not found
-        "500":
-          description: Internal server error - Error, confirming contact failed
-      security:
-      - x-auth-xpub: []
-      summary: Confirm contacts
       tags:
       - Admin
   /v1/admin/destinations:

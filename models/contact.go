@@ -28,8 +28,6 @@ type Contact struct {
 type ContactConfirmationData struct {
 	// XPubID is a xpub id related to contact.
 	XPubID string `json:"xpubId" example:"68af358bde7d8641621c7dd3de1a276c9a62cfa9e2d0740494519f1ba61e2f4a"`
-	// FullName is name which could be shown instead of whole paymail address.
-	FullName string `json:"fullName" example:"Test User"`
 	// Paymail is a paymail address related to contact.
 	Paymail string `json:"paymail" example:"test@test.test"`
 }

@@ -69,7 +69,6 @@ func MapToEngineContractContactConfirmationsData(src *models.ContactConfirmation
 
 	return &engine.Contact{
 		OwnerXpubID: src.XPubID,
-		FullName:    src.FullName,
 		Paymail:     src.Paymail,
 	}
 }
