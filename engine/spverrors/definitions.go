@@ -155,6 +155,9 @@ var ErrRejectContact = models.SPVError{Message: "rejecting contact failed", Stat
 // ErrAcceptContact is when accepting contact failed
 var ErrAcceptContact = models.SPVError{Message: "accepting contact failed", StatusCode: 500, Code: "error-contact-accepting-contact-failed"}
 
+// ErrConfirmContact is when confirming contact failed
+var ErrConfirmContact = models.SPVError{Message: "confirming contact failed", StatusCode: 500, Code: "error-contact-confirming-contacts-failed"}
+
 // ////////////////////////////////// PAYMAIL ERRORS
 
 // ErrCouldNotFindPaymail is when paymail could not be found
