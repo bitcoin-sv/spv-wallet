@@ -34,6 +34,11 @@ type ContactConfirmationData struct {
 	Paymail string `json:"paymail" example:"test@test.test"`
 }
 
+type AdminConfirmContactPair struct {
+	ContactA ContactConfirmationData `json:"contactA"`
+	ContactB ContactConfirmationData `json:"contactB"`
+}
+
 func (m *CreateContactResponse) AddAdditionalInfo(k, v string) {
 	if m.AdditionalInfo == nil {
 		m.AdditionalInfo = make(map[string]string)

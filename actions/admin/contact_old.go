@@ -221,7 +221,7 @@ func contactsAcceptOld(c *gin.Context, _ *reqctx.AdminContext) {
 // @Description Confirm contacts
 // @Tags		Admin
 // @Produce		json
-// @Param		[]models.ContactConfirmationData body []models.ContactConfirmationData true "Contacts data"
+// @Param		[]models.AdminConfirmContactPair body []models.AdminConfirmContactPair true "Contacts data"
 // @Success		200
 // @Failure		400	"Bad request - Error while getting data from request body"
 // @Failure		404	"Not found - Error, contacts not found"
@@ -231,13 +231,13 @@ func contactsAcceptOld(c *gin.Context, _ *reqctx.AdminContext) {
 func contactsConfirmOld(c *gin.Context, _ *reqctx.AdminContext) {
 	logger := reqctx.Logger(c)
 
-	var reqParams []*models.ContactConfirmationData
+	var reqParams *models.AdminConfirmContactPair
 	if err := c.Bind(&reqParams); err != nil {
 		spverrors.ErrorResponse(c, spverrors.ErrCannotBindRequest.WithTrace(err), logger)
 		return
 	}
 
-	contacts := mappings.MapToEngineContactsConfirmationsData(reqParams)
+	contacts := mappings.MapToEngineContractAdminConfirmContactPair(reqParams)
 
 	err := reqctx.Engine(c).AdminConfirmContacts(
 		c.Request.Context(),
