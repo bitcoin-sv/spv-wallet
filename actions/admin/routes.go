@@ -9,7 +9,7 @@ func RegisterRoutes(handlersManager *handlers.Manager) {
 	adminGroupOld := handlersManager.Group(handlers.GroupOldAPI, "/admin")
 
 	adminGroupOld.GET("/stats", handlers.AsAdmin(stats))
-	adminGroupOld.GET("/status", handlers.AsAdmin(status))
+	adminGroupOld.GET("/status", handlers.AsAdmin(statsOld))
 	adminGroupOld.POST("/access-keys/search", handlers.AsAdmin(accessKeysSearchOld))
 	adminGroupOld.POST("/access-keys/count", handlers.AsAdmin(accessKeysCount))
 	adminGroupOld.POST("/contact/search", handlers.AsAdmin(contactsSearchOld))
@@ -41,6 +41,7 @@ func RegisterRoutes(handlersManager *handlers.Manager) {
 
 	adminGroup := handlersManager.Group(handlers.GroupAPI, "/admin")
 	adminGroup.GET("/status", handlers.AsAdmin(status))
+	adminGroup.GET("/stats", handlers.AsAdmin(stats))
 
 	// tx
 	adminGroup.GET("/transactions/:id", handlers.AsAdmin(adminGetTxByID))
