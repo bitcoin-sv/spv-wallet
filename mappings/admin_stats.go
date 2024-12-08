@@ -2,16 +2,16 @@ package mappings
 
 import (
 	"github.com/bitcoin-sv/spv-wallet/engine"
-	"github.com/bitcoin-sv/spv-wallet/models"
+	"github.com/bitcoin-sv/spv-wallet/models/response"
 )
 
 // MapToAdminStatsContract will map the model from spv-wallet to the spv-wallet-models contract
-func MapToAdminStatsContract(s *engine.AdminStats) *models.AdminStats {
+func MapToAdminStatsContract(s *engine.AdminStats) *response.AdminStats {
 	if s == nil {
 		return nil
 	}
 
-	return &models.AdminStats{
+	return &response.AdminStats{
 		Balance:            s.Balance,
 		Destinations:       s.Destinations,
 		PaymailAddresses:   s.PaymailAddresses,
