@@ -2891,6 +2891,21 @@ paths:
       summary: Get paymail
       tags:
       - Admin
+  /api/v1/admin/status:
+    get:
+      description: Get status
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Status response
+          schema:
+            type: boolean
+      security:
+      - x-auth-xpub: []
+      summary: Get status
+      tags:
+      - Admin
   /api/v1/admin/transactions:
     get:
       description: Search for transactions
@@ -4580,6 +4595,7 @@ paths:
       - Admin
   /v1/admin/status:
     get:
+      deprecated: true
       description: Get status
       produces:
       - application/json

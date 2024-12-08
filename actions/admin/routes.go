@@ -40,6 +40,8 @@ func RegisterRoutes(handlersManager *handlers.Manager) {
 	adminGroupOld.GET("/transactions", handlers.AsAdmin(getTransactionsOld))
 
 	adminGroup := handlersManager.Group(handlers.GroupAPI, "/admin")
+	adminGroup.GET("/status", handlers.AsAdmin(status))
+
 	// tx
 	adminGroup.GET("/transactions/:id", handlers.AsAdmin(adminGetTxByID))
 	adminGroup.GET("/transactions", handlers.AsAdmin(adminSearchTxs))

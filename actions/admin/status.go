@@ -14,7 +14,8 @@ import (
 // @Tags		Admin
 // @Produce		json
 // @Success		200 {boolean} bool "Status response"
-// @Router		/v1/admin/status [get]
+// @Router		/api/v1/admin/status [get]
+// @DeprecatedRouter /v1/admin/status [get]
 // @Security	x-auth-xpub
 func status(c *gin.Context, _ *reqctx.AdminContext) {
 	c.JSON(http.StatusOK, true)

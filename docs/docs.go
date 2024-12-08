@@ -396,6 +396,31 @@ const docTemplate = `{
                 }
             }
         },
+        "/api/v1/admin/status": {
+            "get": {
+                "security": [
+                    {
+                        "x-auth-xpub": []
+                    }
+                ],
+                "description": "Get status",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Admin"
+                ],
+                "summary": "Get status",
+                "responses": {
+                    "200": {
+                        "description": "Status response",
+                        "schema": {
+                            "type": "boolean"
+                        }
+                    }
+                }
+            }
+        },
         "/api/v1/admin/transactions": {
             "get": {
                 "security": [
@@ -2960,6 +2985,7 @@ const docTemplate = `{
                     "Admin"
                 ],
                 "summary": "Get status",
+                "deprecated": true,
                 "responses": {
                     "200": {
                         "description": "Status response",
