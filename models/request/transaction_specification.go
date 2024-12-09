@@ -2,6 +2,8 @@ package request
 
 import (
 	"encoding/json"
+
+	"github.com/bitcoin-sv/spv-wallet/models/request/internal"
 )
 
 // TransactionSpecification represents a request with specification for making a transaction outline.
@@ -45,7 +47,7 @@ func (dt *TransactionSpecification) unmarshalPartials(data []byte) (rawOutputs [
 	}
 
 	if err := json.Unmarshal(data, &temp); err != nil {
-		return nil, err
+		return nil, internal.ErrorUnmarshal.Wrap(err)
 	}
 
 	return temp.Outputs, nil
@@ -58,7 +60,7 @@ func unmarshalOutputs(outputs []json.RawMessage) ([]Output, error) {
 			Type string `json:"type"`
 		}
 		if err := json.Unmarshal(rawOutput, &typeField); err != nil {
-			return nil, err
+			return nil, internal.ErrorUnmarshal.Wrap(err)
 		}
 
 		output, err := unmarshalOutput(rawOutput, typeField.Type)
@@ -88,5 +90,9 @@ func (dt *TransactionSpecification) MarshalJSON() ([]byte, error) {
 		temp.Outputs = append(temp.Outputs, out)
 	}
 
-	return json.Marshal(temp)
+	data, err := json.Marshal(temp)
+	if err != nil {
+		return nil, internal.ErrorMarshal.Wrap(err)
+	}
+	return data, nil
 }

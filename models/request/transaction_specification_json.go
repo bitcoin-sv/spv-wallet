@@ -2,8 +2,8 @@ package request
 
 import (
 	"encoding/json"
-	"errors"
 
+	"github.com/bitcoin-sv/spv-wallet/models/request/internal"
 	"github.com/bitcoin-sv/spv-wallet/models/request/opreturn"
 	paymailreq "github.com/bitcoin-sv/spv-wallet/models/request/paymail"
 )
@@ -15,17 +15,17 @@ func unmarshalOutput(rawOutput json.RawMessage, outputType string) (Output, erro
 	case "op_return":
 		var out opreturn.Output
 		if err := json.Unmarshal(rawOutput, &out); err != nil {
-			return nil, err
+			return nil, internal.ErrorUnmarshal.Wrap(err)
 		}
 		return out, nil
 	case "paymail":
 		var out paymailreq.Output
 		if err := json.Unmarshal(rawOutput, &out); err != nil {
-			return nil, err
+			return nil, internal.ErrorUnmarshal.Wrap(err)
 		}
 		return out, nil
 	default:
-		return nil, errors.New("unsupported output type")
+		return nil, internal.ErrorUnsupportedOutputType
 	}
 }
 
@@ -52,6 +52,6 @@ func expandOutputForMarshaling(output Output) (any, error) {
 			Output: &o,
 		}, nil
 	default:
-		return nil, errors.New("unsupported output type")
+		return nil, internal.ErrorUnsupportedOutputType
 	}
 }

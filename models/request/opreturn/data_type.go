@@ -2,11 +2,14 @@ package opreturn
 
 import (
 	"encoding/json"
-	"errors"
+
+	"github.com/bitcoin-sv/spv-wallet/models/request/internal"
 )
 
+// DataType represents the type of data in the OP_RETURN output.
 type DataType int
 
+// Enum values for DataType
 const (
 	DataTypeDefault DataType = iota
 	DataTypeStrings
@@ -17,7 +20,7 @@ const (
 func (d *DataType) UnmarshalJSON(data []byte) error {
 	var dataType string
 	if err := json.Unmarshal(data, &dataType); err != nil {
-		return err
+		return internal.ErrorUnmarshal.Wrap(err)
 	}
 
 	switch dataType {
@@ -26,7 +29,7 @@ func (d *DataType) UnmarshalJSON(data []byte) error {
 	case "hexes":
 		*d = DataTypeHexes
 	default:
-		return errors.New("invalid data type")
+		return internal.ErrorInvalidDataType
 	}
 	return nil
 }
@@ -42,7 +45,11 @@ func (d DataType) MarshalJSON() ([]byte, error) {
 	case DataTypeHexes:
 		dataType = "hexes"
 	default:
-		return nil, errors.New("invalid data type")
+		return nil, internal.ErrorInvalidDataType
 	}
-	return json.Marshal(dataType)
+	data, err := json.Marshal(dataType)
+	if err != nil {
+		return nil, internal.ErrorMarshal.Wrap(err)
+	}
+	return data, nil
 }
