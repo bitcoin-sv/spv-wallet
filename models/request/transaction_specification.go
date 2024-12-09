@@ -45,7 +45,7 @@ func (dt *TransactionSpecification) unmarshalPartials(data []byte) (rawOutputs [
 	}
 
 	if err := json.Unmarshal(data, &temp); err != nil {
-		return nil, err
+		return nil, err //nolint:wrapcheck // unmarshalPartials is run internally by json.Unmarshal, so we don't want to wrap the error
 	}
 
 	return temp.Outputs, nil
@@ -58,7 +58,7 @@ func unmarshalOutputs(outputs []json.RawMessage) ([]Output, error) {
 			Type string `json:"type"`
 		}
 		if err := json.Unmarshal(rawOutput, &typeField); err != nil {
-			return nil, err
+			return nil, err //nolint:wrapcheck // unmarshalOutputs is run internally by json.Unmarshal, so we don't want to wrap the error
 		}
 
 		output, err := unmarshalOutput(rawOutput, typeField.Type)
@@ -88,5 +88,5 @@ func (dt *TransactionSpecification) MarshalJSON() ([]byte, error) {
 		temp.Outputs = append(temp.Outputs, out)
 	}
 
-	return json.Marshal(temp)
+	return json.Marshal(temp) //nolint:wrapcheck // MarshalJSON is run internally by json.Marshal, so we don't want to wrap the error
 }

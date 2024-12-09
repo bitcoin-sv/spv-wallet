@@ -6,6 +6,7 @@ import (
 	"github.com/bitcoin-sv/spv-wallet/models/filter"
 )
 
+// CommonFilteringQueryParams is a model for common filtering query parameters.
 type CommonFilteringQueryParams struct {
 	filter.Page `json:",inline"`
 

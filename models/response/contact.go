@@ -1,10 +1,12 @@
 package response
 
+// CreateContactResponse is a model for response on contact creation.
 type CreateContactResponse struct {
 	Contact        *Contact          `json:"contact"`
 	AdditionalInfo map[string]string `json:"additionalInfo"`
 }
 
+// Contact is a model for contact.
 type Contact struct {
 	Model
 
@@ -20,8 +22,10 @@ type Contact struct {
 	Status ContactStatus `json:"status" example:"unconfirmed"`
 }
 
+// ContactStatus is a type for contact status.
 type ContactStatus string
 
+// Enum values for ContactStatus.
 const (
 	ContactNotConfirmed ContactStatus = "unconfirmed"
 	ContactAwaitAccept  ContactStatus = "awaiting"
@@ -29,6 +33,7 @@ const (
 	ContactRejected     ContactStatus = "rejected"
 )
 
+// AddAdditionalInfo adds additional information (as key-value map) to the response.
 func (m *CreateContactResponse) AddAdditionalInfo(k, v string) {
 	if m.AdditionalInfo == nil {
 		m.AdditionalInfo = make(map[string]string)

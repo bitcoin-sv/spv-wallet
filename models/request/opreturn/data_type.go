@@ -5,8 +5,10 @@ import (
 	"errors"
 )
 
+// DataType represents the type of data in the OP_RETURN output.
 type DataType int
 
+// Enum values for DataType
 const (
 	DataTypeDefault DataType = iota
 	DataTypeStrings
@@ -17,7 +19,7 @@ const (
 func (d *DataType) UnmarshalJSON(data []byte) error {
 	var dataType string
 	if err := json.Unmarshal(data, &dataType); err != nil {
-		return err
+		return err //nolint:wrapcheck // UnmarshalJSON is run internally by json.Unmarshal on "DataType" object, so we don't want to wrap the error
 	}
 
 	switch dataType {
@@ -44,5 +46,5 @@ func (d DataType) MarshalJSON() ([]byte, error) {
 	default:
 		return nil, errors.New("invalid data type")
 	}
-	return json.Marshal(dataType)
+	return json.Marshal(dataType) //nolint:wrapcheck // MarshalJSON is run internally by json.Marshal on "DataType" object, so we don't want to wrap the error
 }

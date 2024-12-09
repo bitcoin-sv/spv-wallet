@@ -16,7 +16,7 @@ type SearchModel[TFilter any] struct {
 	QueryParams *QueryParams `json:"params,omitempty" swaggertype:"object,string" example:"page:1,page_size:10,order_by_field:created_at,order_by_direction:desc"`
 }
 
-// DefaultsIfNil fills empty but neccessary fields with default values
+// DefaultsIfNil fills empty but necessary fields with default values
 func (sm *SearchModel[TFilter]) DefaultsIfNil() {
 	if sm.QueryParams == nil {
 		sm.QueryParams = DefaultQueryParams()
