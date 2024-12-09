@@ -8,8 +8,8 @@ import (
 func RegisterRoutes(handlersManager *handlers.Manager) {
 	adminGroupOld := handlersManager.Group(handlers.GroupOldAPI, "/admin")
 
-	adminGroupOld.GET("/stats", handlers.AsAdmin(stats))
-	adminGroupOld.GET("/status", handlers.AsAdmin(statsOld))
+	adminGroupOld.GET("/status", handlers.AsAdmin(statusOld))
+	adminGroupOld.GET("/stats", handlers.AsAdmin(statsOld))
 	adminGroupOld.POST("/access-keys/search", handlers.AsAdmin(accessKeysSearchOld))
 	adminGroupOld.POST("/access-keys/count", handlers.AsAdmin(accessKeysCount))
 	adminGroupOld.POST("/contact/search", handlers.AsAdmin(contactsSearchOld))

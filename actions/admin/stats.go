@@ -9,16 +9,14 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-// statsOld will return the statistics of the spv-wallet
-// Get stats godoc
-// @Summary		Get stats Use (GET) /api/v1/admin/stats instead.
-// @Description	This endpoint has been deprecated. Use (GET) /api/v1/admin/stats instead.
-// @Tags		Admin
-// @Produce		json
-// @Success		200	{object} models.AdminStats "Stats for the admin"
-// @Failure 	500	"Internal Server Error - Error while fetching admin stats"
-// @DeprecatedRouter		/v1/admin/stats [get]
-// @Security	x-auth-xpub
+// @Summary				Get stats Use (GET) /api/v1/admin/stats instead.
+// @Description			This endpoint has been deprecated. Use (GET) /api/v1/admin/stats instead.
+// @Tags				Admin
+// @Produce				json
+// @Success				200	{object} models.AdminStats "Stats for the admin"
+// @Failure 			500	"Internal Server Error - Error while fetching admin stats"
+// @DeprecatedRouter	/v1/admin/stats [get]
+// @Security			x-auth-xpub
 func statsOld(c *gin.Context, _ *reqctx.AdminContext) {
 	stats, err := reqctx.Engine(c).GetStats(c.Request.Context())
 	if err != nil {
@@ -30,16 +28,14 @@ func statsOld(c *gin.Context, _ *reqctx.AdminContext) {
 	c.JSON(http.StatusOK, contract)
 }
 
-// stats will return the statistics of the spv-wallet
-// Get stats godoc
-// @Summary		Get stats
-// @Description	Get statistics of the spv-wallet
-// @Tags		Admin
-// @Produce		json
-// @Success		200	{object} response.AdminStats "Stats for the admin"
-// @Failure 	500	"Internal Server Error - Error while fetching admin stats"
-// @Router		/api/v1/admin/stats [get]
-// @Security	x-auth-xpub
+// @Summary			Get stats
+// @Description		Get statistics of the spv-wallet
+// @Tags			Admin
+// @Produce			json
+// @Success			200	{object} response.AdminStats "Stats for the admin"
+// @Failure 		500	"Internal Server Error - Error while fetching admin stats"
+// @Router			/api/v1/admin/stats [get]
+// @Security		x-auth-xpub
 func stats(c *gin.Context, _ *reqctx.AdminContext) {
 	stats, err := reqctx.Engine(c).GetStats(c.Request.Context())
 	if err != nil {
