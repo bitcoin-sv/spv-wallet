@@ -2,8 +2,6 @@ package request
 
 import (
 	"encoding/json"
-
-	"github.com/bitcoin-sv/spv-wallet/models/request/internal"
 )
 
 // TransactionSpecification represents a request with specification for making a transaction outline.
@@ -47,7 +45,7 @@ func (dt *TransactionSpecification) unmarshalPartials(data []byte) (rawOutputs [
 	}
 
 	if err := json.Unmarshal(data, &temp); err != nil {
-		return nil, internal.ErrorUnmarshal.Wrap(err)
+		return nil, err //nolint:wrapcheck // unmarshalPartials is run internally by json.Unmarshal, so we don't want to wrap the error
 	}
 
 	return temp.Outputs, nil
@@ -60,7 +58,7 @@ func unmarshalOutputs(outputs []json.RawMessage) ([]Output, error) {
 			Type string `json:"type"`
 		}
 		if err := json.Unmarshal(rawOutput, &typeField); err != nil {
-			return nil, internal.ErrorUnmarshal.Wrap(err)
+			return nil, err //nolint:wrapcheck // unmarshalOutputs is run internally by json.Unmarshal, so we don't want to wrap the error
 		}
 
 		output, err := unmarshalOutput(rawOutput, typeField.Type)
@@ -90,9 +88,5 @@ func (dt *TransactionSpecification) MarshalJSON() ([]byte, error) {
 		temp.Outputs = append(temp.Outputs, out)
 	}
 
-	data, err := json.Marshal(temp)
-	if err != nil {
-		return nil, internal.ErrorMarshal.Wrap(err)
-	}
-	return data, nil
+	return json.Marshal(temp) //nolint:wrapcheck // MarshalJSON is run internally by json.Marshal, so we don't want to wrap the error
 }
