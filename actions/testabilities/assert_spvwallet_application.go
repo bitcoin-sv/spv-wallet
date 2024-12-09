@@ -27,6 +27,8 @@ type SPVWalletResponseAssertions interface {
 	IsUnauthorized()
 	// IsUnauthorizedForAdmin asserts that the response status code is 401 and the error is that admin is not authorized to use the endpoint.
 	IsUnauthorizedForAdmin()
+	// IsUnauthorizedForUser asserts that the response status code is 401 and the error is that only admin is authorized to use this endpoint.
+	IsUnauthorizedForUser()
 	IsBadRequest() SPVWalletResponseAssertions
 }
 
@@ -60,6 +62,11 @@ func (a *responseAssertions) IsUnauthorized() {
 func (a *responseAssertions) IsUnauthorizedForAdmin() {
 	a.HasStatus(http.StatusUnauthorized).
 		WithJSONf(apierror.AdminNotAuthorizedJSON)
+}
+
+func (a *responseAssertions) IsUnauthorizedForUser() {
+	a.HasStatus(http.StatusUnauthorized).
+		WithJSONf(apierror.UserNotAuthorizedJSON)
 }
 
 func (a *responseAssertions) IsOK() SPVWalletResponseAssertions {
