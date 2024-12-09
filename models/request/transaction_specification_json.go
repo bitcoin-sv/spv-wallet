@@ -29,7 +29,7 @@ func unmarshalOutput(rawOutput json.RawMessage, outputType string) (Output, erro
 	}
 }
 
-// expandOutputForMarshaling used by TransactionSpecification marshalling to expand Output object before marshalling.
+// expandOutputForMarshaling used by TransactionSpecification marshaling to expand Output object before marshaling.
 // IMPORTANT: Every time a new output type is added, it must be handled here also.
 func expandOutputForMarshaling(output Output) (any, error) {
 	switch o := output.(type) {
