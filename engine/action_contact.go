@@ -416,7 +416,7 @@ func (c *Client) AdminConfirmContacts(ctx context.Context, paymailA, paymailB st
 	}
 
 	if err := c.confirmContactsInDbTx(ctx, contactA, contactB); err != nil {
-		return spverrors.ErrConfirmContact.Wrap(err)
+		return err
 	}
 
 	return nil
@@ -455,7 +455,7 @@ func (c *Client) retrieveContactsForConfirmation(ctx context.Context, paymailA, 
 }
 
 func (c *Client) confirmContactsInDbTx(ctx context.Context, contactA, contactB *Contact) error {
-	return c.Datastore().NewTx(ctx, func(tx *datastore.Transaction) error {
+	err := c.Datastore().NewTx(ctx, func(tx *datastore.Transaction) error {
 		contactA.Status = ContactConfirmed
 		if err := contactA.Save(ctx); err != nil {
 			return err
@@ -472,6 +472,10 @@ func (c *Client) confirmContactsInDbTx(ctx context.Context, contactA, contactB *
 
 		return nil
 	})
+	if err != nil {
+		return spverrors.ErrConfirmContact.Wrap(err)
+	}
+	return nil
 }
 
 func (c *Client) logContactWarining(xPubID, cPaymail, warning string) {

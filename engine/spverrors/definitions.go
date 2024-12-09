@@ -199,7 +199,7 @@ var ErrPaymailMerkleRootVerificationFailed = models.SPVError{Message: "merkle ro
 // ErrPaymailInvalidMerkleRoots is when merkle roots verification by BHS returns status: INVALID
 var ErrPaymailInvalidMerkleRoots = models.SPVError{Message: "invalid merkle roots", StatusCode: 400, Code: "error-paymail-invalid-merkle-roots"}
 
-// ErrRetrivePaymailInfo
+// ErrRetrivePaymailInfo is when error occurred during retrieving paymail info
 var ErrRetrivePaymailInfo = models.SPVError{Message: "error during retrieving paymail info", StatusCode: 500, Code: "error-paymail-retrieve-info"}
 
 // ////////////////////////////////// CAPABILITIES ERRORS
