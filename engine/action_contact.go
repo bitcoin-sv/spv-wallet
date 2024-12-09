@@ -404,45 +404,74 @@ func (c *Client) upsertContact(ctx context.Context, paymailService paymailclient
 }
 
 // AdminConfirmContacts confirms provided contacts, should be used only by the admin.
-func (c *Client) AdminConfirmContacts(ctx context.Context, contacts []*Contact) error {
-	contactList := make([]*Contact, 0, len(contacts))
-	for _, contact := range contacts {
-		cont, err := getContact(ctx, contact.Paymail, contact.OwnerXpubID, c.DefaultModelOptions()...)
-		if err != nil {
-			c.logContactError(contact.OwnerXpubID, contact.Paymail, fmt.Sprintf("error while getting contact: %s", err.Error()))
-			return spverrors.Wrapf(err, "error while getting contact")
-		}
-
-		if cont == nil {
-			return spverrors.ErrContactsNotFound
-		}
-
-		contactList = append(contactList, cont)
+func (c *Client) AdminConfirmContacts(ctx context.Context, paymailA, paymailB string) error {
+	paymailAInfo, paymailBInfo, err := c.retrievePaymailsInfo(ctx, paymailA, paymailB)
+	if err != nil {
+		return spverrors.ErrRetrivePaymailInfo.Wrap(err)
 	}
 
-	err := c.Datastore().NewTx(ctx, func(tx *datastore.Transaction) error {
-		for _, contact := range contactList {
-			contact.Status = ContactConfirmed
-			if err := contact.Save(ctx); err != nil {
-				return err
-			}
+	contactA, contactB, err := c.retrieveContactsForConfirmation(ctx, paymailA, paymailB, paymailAInfo.XpubID, paymailBInfo.XpubID)
+	if err != nil {
+		return spverrors.ErrGetContact.Wrap(err)
+	}
 
+	if err := c.confirmContactsInDbTx(ctx, contactA, contactB); err != nil {
+		return spverrors.ErrConfirmContact.Wrap(err)
+	}
+
+	return nil
+}
+
+func (c *Client) retrievePaymailsInfo(ctx context.Context, paymailA, paymailB string) (*PaymailAddress, *PaymailAddress, error) {
+	paymailAInfo, err := c.GetPaymailAddress(ctx, paymailA, c.DefaultModelOptions()...)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	paymailBInfo, err := c.GetPaymailAddress(ctx, paymailB, c.DefaultModelOptions()...)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	return paymailAInfo, paymailBInfo, nil
+}
+
+func (c *Client) retrieveContactsForConfirmation(ctx context.Context, paymailA, paymailB, xpubA, xpubB string) (*Contact, *Contact, error) {
+	contactA, err := getContact(ctx, paymailB, xpubA, c.DefaultModelOptions()...)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	contactB, err := getContact(ctx, paymailA, xpubB, c.DefaultModelOptions()...)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	if contactA == nil || contactB == nil {
+		return nil, nil, spverrors.ErrContactsNotFound
+	}
+
+	return contactA, contactB, nil
+}
+
+func (c *Client) confirmContactsInDbTx(ctx context.Context, contactA, contactB *Contact) error {
+	return c.Datastore().NewTx(ctx, func(tx *datastore.Transaction) error {
+		contactA.Status = ContactConfirmed
+		if err := contactA.Save(ctx); err != nil {
+			return err
 		}
 
-		err := tx.Commit()
-		if err != nil {
+		contactB.Status = ContactConfirmed
+		if err := contactB.Save(ctx); err != nil {
+			return err
+		}
+
+		if err := tx.Commit(); err != nil {
 			return _closeTxWithError(tx, err)
 		}
 
 		return nil
 	})
-
-	if err != nil {
-		c.logContactError("", "", fmt.Sprintf("error while confirming contacts: %s", err.Error()))
-		return spverrors.ErrConfirmContact
-	}
-
-	return nil
 }
 
 func (c *Client) logContactWarining(xPubID, cPaymail, warning string) {

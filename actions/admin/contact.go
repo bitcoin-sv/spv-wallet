@@ -234,11 +234,10 @@ func contactsConfirm(c *gin.Context, _ *reqctx.AdminContext) {
 		return
 	}
 
-	contacts := mappings.MapToEngineContractAdminConfirmContactPair(reqParams)
-
 	err := reqctx.Engine(c).AdminConfirmContacts(
 		c.Request.Context(),
-		contacts,
+		reqParams.PaymailA,
+		reqParams.PaymailB,
 	)
 	if err != nil {
 		spverrors.ErrorResponse(c, err, reqctx.Logger(c))
