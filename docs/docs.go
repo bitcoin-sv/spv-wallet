@@ -3006,14 +3006,14 @@ const docTemplate = `{
                         "x-auth-xpub": []
                     }
                 ],
-                "description": "Get status",
+                "description": "This endpoint has been deprecated. Use (GET) /api/v1/admin/status instead.",
                 "produces": [
                     "application/json"
                 ],
                 "tags": [
                     "Admin"
                 ],
-                "summary": "Get status",
+                "summary": "Get status Use (GET) /api/v1/admin/status instead.",
                 "deprecated": true,
                 "responses": {
                     "200": {

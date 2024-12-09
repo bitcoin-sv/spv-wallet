@@ -4645,7 +4645,8 @@ paths:
   /v1/admin/status:
     get:
       deprecated: true
-      description: Get status
+      description: This endpoint has been deprecated. Use (GET) /api/v1/admin/status
+        instead.
       produces:
       - application/json
       responses:
@@ -4655,7 +4656,7 @@ paths:
             type: boolean
       security:
       - x-auth-xpub: []
-      summary: Get status
+      summary: Get status Use (GET) /api/v1/admin/status instead.
       tags:
       - Admin
   /v1/admin/transactions:
