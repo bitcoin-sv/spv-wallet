@@ -24,6 +24,10 @@ type Contact struct {
 	// Status is a contact's current status.
 	Status response.ContactStatus `json:"status" example:"unconfirmed"`
 }
+type AdminConfirmContactPair struct {
+	PaymailA string `json:"paymailA"`
+	PaymailB string `json:"paymailB"`
+}
 
 func (m *CreateContactResponse) AddAdditionalInfo(k, v string) {
 	if m.AdditionalInfo == nil {
