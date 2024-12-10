@@ -1786,6 +1786,36 @@ definitions:
         example: bb8593f85ef8056a77026ad415f02128f3768906de53e9e8bf8749fe2d66cf50
         type: string
     type: object
+  response.AdminStats:
+    properties:
+      balance:
+        description: Balance is a total balance of all xpubs.
+        type: integer
+      destinations:
+        description: Destinations is a total number of destinations.
+        type: integer
+      paymailAddresses:
+        description: PaymailAddresses is a total number of paymail addresses.
+        type: integer
+      transactions:
+        description: Transactions is a total number of committed transactions.
+        type: integer
+      transactionsPerDay:
+        additionalProperties: true
+        description: TransactionsPerDay is a total number of committed transactions
+          per day.
+        type: object
+      utxos:
+        description: Utxos is a total number of utxos.
+        type: integer
+      utxosPerType:
+        additionalProperties: true
+        description: UtxosPerType are utxos grouped by type.
+        type: object
+      xpubs:
+        description: Xpubs is a total number of xpubs.
+        type: integer
+    type: object
   response.Contact:
     properties:
       createdAt:
@@ -2936,6 +2966,38 @@ paths:
       security:
       - x-auth-xpub: []
       summary: Get paymail
+      tags:
+      - Admin
+  /api/v1/admin/stats:
+    get:
+      description: Get statistics of the spv-wallet
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Stats for the admin
+          schema:
+            $ref: '#/definitions/response.AdminStats'
+        "500":
+          description: Internal Server Error - Error while fetching admin stats
+      security:
+      - x-auth-xpub: []
+      summary: Get stats
+      tags:
+      - Admin
+  /api/v1/admin/status:
+    get:
+      description: Get status
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Status response
+          schema:
+            type: boolean
+      security:
+      - x-auth-xpub: []
+      summary: Get status
       tags:
       - Admin
   /api/v1/admin/transactions:
@@ -4610,7 +4672,9 @@ paths:
       - Admin
   /v1/admin/stats:
     get:
-      description: Get stats
+      deprecated: true
+      description: This endpoint has been deprecated. Use (GET) /api/v1/admin/stats
+        instead.
       produces:
       - application/json
       responses:
@@ -4622,12 +4686,14 @@ paths:
           description: Internal Server Error - Error while fetching admin stats
       security:
       - x-auth-xpub: []
-      summary: Get stats
+      summary: Get stats Use (GET) /api/v1/admin/stats instead.
       tags:
       - Admin
   /v1/admin/status:
     get:
-      description: Get status
+      deprecated: true
+      description: This endpoint has been deprecated. Use (GET) /api/v1/admin/status
+        instead.
       produces:
       - application/json
       responses:
@@ -4637,7 +4703,7 @@ paths:
             type: boolean
       security:
       - x-auth-xpub: []
-      summary: Get status
+      summary: Get status Use (GET) /api/v1/admin/status instead.
       tags:
       - Admin
   /v1/admin/transactions:

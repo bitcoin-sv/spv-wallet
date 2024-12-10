@@ -441,6 +441,59 @@ const docTemplate = `{
                 }
             }
         },
+        "/api/v1/admin/stats": {
+            "get": {
+                "security": [
+                    {
+                        "x-auth-xpub": []
+                    }
+                ],
+                "description": "Get statistics of the spv-wallet",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Admin"
+                ],
+                "summary": "Get stats",
+                "responses": {
+                    "200": {
+                        "description": "Stats for the admin",
+                        "schema": {
+                            "$ref": "#/definitions/response.AdminStats"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error - Error while fetching admin stats"
+                    }
+                }
+            }
+        },
+        "/api/v1/admin/status": {
+            "get": {
+                "security": [
+                    {
+                        "x-auth-xpub": []
+                    }
+                ],
+                "description": "Get status",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Admin"
+                ],
+                "summary": "Get status",
+                "responses": {
+                    "200": {
+                        "description": "Status response",
+                        "schema": {
+                            "type": "boolean"
+                        }
+                    }
+                }
+            }
+        },
         "/api/v1/admin/transactions": {
             "get": {
                 "security": [
@@ -2969,14 +3022,15 @@ const docTemplate = `{
                         "x-auth-xpub": []
                     }
                 ],
-                "description": "Get stats",
+                "description": "This endpoint has been deprecated. Use (GET) /api/v1/admin/stats instead.",
                 "produces": [
                     "application/json"
                 ],
                 "tags": [
                     "Admin"
                 ],
-                "summary": "Get stats",
+                "summary": "Get stats Use (GET) /api/v1/admin/stats instead.",
+                "deprecated": true,
                 "responses": {
                     "200": {
                         "description": "Stats for the admin",
@@ -2997,14 +3051,15 @@ const docTemplate = `{
                         "x-auth-xpub": []
                     }
                 ],
-                "description": "Get status",
+                "description": "This endpoint has been deprecated. Use (GET) /api/v1/admin/status instead.",
                 "produces": [
                     "application/json"
                 ],
                 "tags": [
                     "Admin"
                 ],
-                "summary": "Get status",
+                "summary": "Get status Use (GET) /api/v1/admin/status instead.",
+                "deprecated": true,
                 "responses": {
                     "200": {
                         "description": "Status response",
@@ -6947,6 +7002,45 @@ const docTemplate = `{
                     "description": "XpubID is an access key's xpub related id.",
                     "type": "string",
                     "example": "bb8593f85ef8056a77026ad415f02128f3768906de53e9e8bf8749fe2d66cf50"
+                }
+            }
+        },
+        "response.AdminStats": {
+            "type": "object",
+            "properties": {
+                "balance": {
+                    "description": "Balance is a total balance of all xpubs.",
+                    "type": "integer"
+                },
+                "destinations": {
+                    "description": "Destinations is a total number of destinations.",
+                    "type": "integer"
+                },
+                "paymailAddresses": {
+                    "description": "PaymailAddresses is a total number of paymail addresses.",
+                    "type": "integer"
+                },
+                "transactions": {
+                    "description": "Transactions is a total number of committed transactions.",
+                    "type": "integer"
+                },
+                "transactionsPerDay": {
+                    "description": "TransactionsPerDay is a total number of committed transactions per day.",
+                    "type": "object",
+                    "additionalProperties": true
+                },
+                "utxos": {
+                    "description": "Utxos is a total number of utxos.",
+                    "type": "integer"
+                },
+                "utxosPerType": {
+                    "description": "UtxosPerType are utxos grouped by type.",
+                    "type": "object",
+                    "additionalProperties": true
+                },
+                "xpubs": {
+                    "description": "Xpubs is a total number of xpubs.",
+                    "type": "integer"
                 }
             }
         },
