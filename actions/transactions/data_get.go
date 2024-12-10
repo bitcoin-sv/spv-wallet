@@ -11,7 +11,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func getDataByOutpoint(c *gin.Context, _ *reqctx.UserContext) {
+func getDataByOutpoint(c *gin.Context, userContext *reqctx.UserContext) {
 	logger := reqctx.Logger(c)
 
 	var err error
@@ -23,9 +23,9 @@ func getDataByOutpoint(c *gin.Context, _ *reqctx.UserContext) {
 		return
 	}
 
-	// TODO add xpub filtering by userContext.GetXPubID()
 	data, err := reqctx.Engine(c).GetTransactionData(
 		c,
+		userContext.GetXPubID(),
 		outpoint,
 	)
 	if err != nil {

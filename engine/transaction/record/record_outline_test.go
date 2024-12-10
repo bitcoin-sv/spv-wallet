@@ -75,9 +75,10 @@ func TestRecordOutlineOpReturn(t *testing.T) {
 			},
 			expectData: []database.Data{
 				{
-					TxID: givenTXWithOpReturn(t).ID(),
-					Vout: 0,
-					Blob: []byte(dataOfOpReturnTx),
+					TxID:   givenTXWithOpReturn(t).ID(),
+					Vout:   0,
+					Blob:   []byte(dataOfOpReturnTx),
+					XpubID: fixtures.Sender.XPubID(),
 				},
 			},
 		},
@@ -108,9 +109,10 @@ func TestRecordOutlineOpReturn(t *testing.T) {
 			},
 			expectData: []database.Data{
 				{
-					TxID: givenTxWithOpReturnWithoutOPFalse(t).ID(),
-					Vout: 0,
-					Blob: []byte(dataOfOpReturnTx),
+					TxID:   givenTxWithOpReturnWithoutOPFalse(t).ID(),
+					Vout:   0,
+					Blob:   []byte(dataOfOpReturnTx),
+					XpubID: fixtures.Sender.XPubID(),
 				},
 			},
 		},
@@ -124,9 +126,10 @@ func TestRecordOutlineOpReturn(t *testing.T) {
 			}},
 			expectData: []database.Data{
 				{
-					TxID: givenTXWithOpReturn(t).ID(),
-					Vout: 0,
-					Blob: []byte(dataOfOpReturnTx),
+					TxID:   givenTXWithOpReturn(t).ID(),
+					Vout:   0,
+					Blob:   []byte(dataOfOpReturnTx),
+					XpubID: fixtures.Sender.XPubID(),
 				},
 			},
 		},
@@ -140,7 +143,7 @@ func TestRecordOutlineOpReturn(t *testing.T) {
 			service := given.NewRecordService()
 
 			// when:
-			err := service.RecordTransactionOutline(context.Background(), test.outline)
+			err := service.RecordTransactionOutline(context.Background(), fixtures.Sender.XPubID(), test.outline)
 
 			// then:
 			then.NoError(err).
@@ -271,7 +274,7 @@ func TestRecordOutlineOpReturnErrorCases(t *testing.T) {
 			service := given.NewRecordService()
 
 			// when:
-			err := service.RecordTransactionOutline(context.Background(), test.outline)
+			err := service.RecordTransactionOutline(context.Background(), fixtures.Sender.XPubID(), test.outline)
 
 			// then:
 			then.ErrorIs(err, test.expectErr).NothingChanged()
@@ -297,7 +300,7 @@ func TestOnBroadcastErr(t *testing.T) {
 	outline := givenStandardOpReturnOutline(t)
 
 	// when:
-	err := service.RecordTransactionOutline(context.Background(), outline)
+	err := service.RecordTransactionOutline(context.Background(), fixtures.Sender.XPubID(), outline)
 
 	// then:
 	then.ErrorIs(err, txerrors.ErrTxBroadcast).NothingChanged()
@@ -315,7 +318,7 @@ func TestOnSaveTXErr(t *testing.T) {
 	outline := givenStandardOpReturnOutline(t)
 
 	// when:
-	err := service.RecordTransactionOutline(context.Background(), outline)
+	err := service.RecordTransactionOutline(context.Background(), fixtures.Sender.XPubID(), outline)
 
 	// then:
 	then.ErrorIs(err, txerrors.ErrSavingData).NothingChanged()
@@ -332,7 +335,7 @@ func TestOnGetOutputsErr(t *testing.T) {
 	outline := givenStandardOpReturnOutline(t)
 
 	// when:
-	err := service.RecordTransactionOutline(context.Background(), outline)
+	err := service.RecordTransactionOutline(context.Background(), fixtures.Sender.XPubID(), outline)
 
 	// then:
 	then.ErrorIs(err, txerrors.ErrGettingOutputs).NothingChanged()

@@ -394,8 +394,8 @@ func (c *Client) HandleTxCallback(ctx context.Context, callbackResp *chainmodels
 }
 
 // GetTransactionData will get the data (from OP_RETURN output) from the Datastore for a provided outpoint
-func (c *Client) GetTransactionData(ctx context.Context, outpoint bsv.Outpoint) ([]byte, error) {
-	data, err := c.txDAO.GetData(ctx, outpoint)
+func (c *Client) GetTransactionData(ctx context.Context, xpubID string, outpoint bsv.Outpoint) ([]byte, error) {
+	data, err := c.txDAO.GetData(ctx, xpubID, outpoint)
 	if err != nil {
 		return nil, spverrors.Wrapf(err, "failed to get transaction's data")
 	}

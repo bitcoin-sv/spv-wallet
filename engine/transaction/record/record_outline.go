@@ -16,7 +16,7 @@ import (
 )
 
 // RecordTransactionOutline will validate, broadcast and save a transaction outline
-func (s *Service) RecordTransactionOutline(ctx context.Context, outline *outlines.Transaction) error {
+func (s *Service) RecordTransactionOutline(ctx context.Context, xpubID string, outline *outlines.Transaction) error {
 	tx, err := trx.NewTransactionFromBEEFHex(outline.BEEF)
 	if err != nil {
 		return txerrors.ErrTxValidation.Wrap(err)
@@ -33,7 +33,7 @@ func (s *Service) RecordTransactionOutline(ctx context.Context, outline *outline
 		return err
 	}
 
-	newOutputs, newDataRecords, err := s.processAnnotatedOutputs(tx, &outline.Annotations)
+	newOutputs, newDataRecords, err := s.processAnnotatedOutputs(tx, xpubID, &outline.Annotations)
 	if err != nil {
 		return err
 	}
@@ -88,7 +88,7 @@ func (s *Service) getTrackedUTXOsFromInputs(ctx context.Context, tx *trx.Transac
 	return storedUTXOs, nil
 }
 
-func (s *Service) processAnnotatedOutputs(tx *trx.Transaction, annotations *transaction.Annotations) ([]*database.Output, []*database.Data, error) {
+func (s *Service) processAnnotatedOutputs(tx *trx.Transaction, xpubID string, annotations *transaction.Annotations) ([]*database.Output, []*database.Data, error) {
 	txID := tx.TxID().String()
 
 	var outputRecords []*database.Output
@@ -111,9 +111,10 @@ func (s *Service) processAnnotatedOutputs(tx *trx.Transaction, annotations *tran
 				return nil, nil, err
 			}
 			dataRecords = append(dataRecords, &database.Data{
-				TxID: txID,
-				Vout: voutU32,
-				Blob: data,
+				TxID:   txID,
+				Vout:   voutU32,
+				Blob:   data,
+				XpubID: xpubID,
 			})
 			outputRecords = append(outputRecords, &database.Output{
 				TxID: txID,

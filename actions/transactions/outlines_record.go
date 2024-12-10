@@ -8,7 +8,7 @@ import (
 	"github.com/gin-gonic/gin/binding"
 )
 
-func transactionRecordOutline(c *gin.Context, _ *reqctx.UserContext) {
+func transactionRecordOutline(c *gin.Context, userContext *reqctx.UserContext) {
 	logger := reqctx.Logger(c)
 
 	var requestBody annotatedtx.Request
@@ -19,7 +19,7 @@ func transactionRecordOutline(c *gin.Context, _ *reqctx.UserContext) {
 	}
 
 	recordService := reqctx.Engine(c).TransactionRecordService()
-	if err = recordService.RecordTransactionOutline(c, requestBody.ToEngine()); err != nil {
+	if err = recordService.RecordTransactionOutline(c, userContext.GetXPubID(), requestBody.ToEngine()); err != nil {
 		spverrors.ErrorResponse(c, err, logger)
 		return
 	}
