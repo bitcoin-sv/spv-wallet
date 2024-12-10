@@ -441,14 +441,23 @@ func (c *Client) retrieveContactsForConfirmation(ctx context.Context, paymailA, 
 	if err != nil {
 		return nil, nil, err
 	}
+	if contactA == nil {
+		return nil, nil, spverrors.ErrContactsNotFound.Wrap(
+			spverrors.Newf("User '%s' does not have '%s' in their contacts", paymailA, paymailB),
+		)
+
+	}
 
 	contactB, err := getContact(ctx, paymailA, xpubB, c.DefaultModelOptions()...)
 	if err != nil {
 		return nil, nil, err
 	}
 
-	if contactA == nil || contactB == nil {
-		return nil, nil, spverrors.ErrContactsNotFound
+	if contactB == nil {
+		return nil, nil, spverrors.ErrContactsNotFound.Wrap(
+			spverrors.Newf("User '%s' does not have '%s' in their contacts", paymailB, paymailA),
+		)
+
 	}
 
 	return contactA, contactB, nil

@@ -119,14 +119,11 @@ const docTemplate = `{
                 "parameters": [
                     {
                         "description": "Contacts data",
-                        "name": "[]models.AdminConfirmContactPair",
+                        "name": "models.AdminConfirmContactPair",
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "type": "array",
-                            "items": {
-                                "$ref": "#/definitions/models.AdminConfirmContactPair"
-                            }
+                            "$ref": "#/definitions/models.AdminConfirmContactPair"
                         }
                     }
                 ],
@@ -5346,6 +5343,10 @@ const docTemplate = `{
         "filter.PaymailFilter": {
             "type": "object",
             "properties": {
+                "alias": {
+                    "type": "string",
+                    "example": "alice"
+                },
                 "createdRange": {
                     "description": "CreatedRange specifies the time range when a record was created.",
                     "allOf": [
@@ -5379,10 +5380,6 @@ const docTemplate = `{
                             "$ref": "#/definitions/filter.TimeRange"
                         }
                     ]
-                },
-                "xpubId": {
-                    "type": "string",
-                    "example": "79f90a6bab0a44402fc64828af820e9465645658aea2d138c5205b88e6dabd00"
                 }
             }
         },
@@ -5869,11 +5866,11 @@ const docTemplate = `{
         "models.AdminConfirmContactPair": {
             "type": "object",
             "properties": {
-                "contactA": {
-                    "$ref": "#/definitions/models.ContactConfirmationData"
+                "paymailA": {
+                    "type": "string"
                 },
-                "contactB": {
-                    "$ref": "#/definitions/models.ContactConfirmationData"
+                "paymailB": {
+                    "type": "string"
                 }
             }
         },
@@ -5973,21 +5970,6 @@ const docTemplate = `{
                     "description": "UpdatedAt is a time when outer model was updated.",
                     "type": "string",
                     "example": "2024-02-26T11:01:28.069911Z"
-                }
-            }
-        },
-        "models.ContactConfirmationData": {
-            "type": "object",
-            "properties": {
-                "paymail": {
-                    "description": "Paymail is a paymail address related to contact.",
-                    "type": "string",
-                    "example": "test@test.test"
-                },
-                "xpubId": {
-                    "description": "XPubID is a xpub id related to contact.",
-                    "type": "string",
-                    "example": "68af358bde7d8641621c7dd3de1a276c9a62cfa9e2d0740494519f1ba61e2f4a"
                 }
             }
         },

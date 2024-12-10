@@ -560,6 +560,9 @@ definitions:
     type: object
   filter.PaymailFilter:
     properties:
+      alias:
+        example: alice
+        type: string
       createdRange:
         allOf:
         - $ref: '#/definitions/filter.TimeRange'
@@ -583,9 +586,6 @@ definitions:
         allOf:
         - $ref: '#/definitions/filter.TimeRange'
         description: UpdatedRange specifies the time range when a record was updated.
-      xpubId:
-        example: 79f90a6bab0a44402fc64828af820e9465645658aea2d138c5205b88e6dabd00
-        type: string
     type: object
   filter.SearchAccessKeys:
     properties:
@@ -945,10 +945,10 @@ definitions:
     type: object
   models.AdminConfirmContactPair:
     properties:
-      contactA:
-        $ref: '#/definitions/models.ContactConfirmationData'
-      contactB:
-        $ref: '#/definitions/models.ContactConfirmationData'
+      paymailA:
+        type: string
+      paymailB:
+        type: string
     type: object
   models.AdminStats:
     properties:
@@ -1023,17 +1023,6 @@ definitions:
       updated_at:
         description: UpdatedAt is a time when outer model was updated.
         example: "2024-02-26T11:01:28.069911Z"
-        type: string
-    type: object
-  models.ContactConfirmationData:
-    properties:
-      paymail:
-        description: Paymail is a paymail address related to contact.
-        example: test@test.test
-        type: string
-      xpubId:
-        description: XPubID is a xpub id related to contact.
-        example: 68af358bde7d8641621c7dd3de1a276c9a62cfa9e2d0740494519f1ba61e2f4a
         type: string
     type: object
   models.Destination:
@@ -2816,12 +2805,10 @@ paths:
       parameters:
       - description: Contacts data
         in: body
-        name: '[]models.AdminConfirmContactPair'
+        name: models.AdminConfirmContactPair
         required: true
         schema:
-          items:
-            $ref: '#/definitions/models.AdminConfirmContactPair'
-          type: array
+          $ref: '#/definitions/models.AdminConfirmContactPair'
       produces:
       - application/json
       responses:

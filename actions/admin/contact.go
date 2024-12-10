@@ -218,7 +218,7 @@ func contactsAccept(c *gin.Context, _ *reqctx.AdminContext) {
 // @Description Marks the contact entries as mutually confirmed, after ensuring the validity of the contact information for both parties.
 // @Tags		Admin
 // @Produce		json
-// @Param		[]models.AdminConfirmContactPair body []models.AdminConfirmContactPair true "Contacts data"
+// @Param		models.AdminConfirmContactPair body models.AdminConfirmContactPair true "Contacts data"
 // @Success		200
 // @Failure		400	"Bad request - Error while getting data from request body"
 // @Failure		404	"Not found - Error, contacts not found"
