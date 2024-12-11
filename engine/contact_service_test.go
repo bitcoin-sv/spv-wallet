@@ -3,7 +3,6 @@ package engine
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/google/uuid"
 	"net/http"
 	"testing"
 
@@ -11,6 +10,7 @@ import (
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	xtester "github.com/bitcoin-sv/spv-wallet/engine/tester/paymailmock"
 	"github.com/bitcoin-sv/spv-wallet/engine/utils"
+	"github.com/google/uuid"
 	"github.com/jarcoal/httpmock"
 	"github.com/stretchr/testify/require"
 )
