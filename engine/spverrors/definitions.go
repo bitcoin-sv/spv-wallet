@@ -104,6 +104,7 @@ var ErrContactsNotFound = models.SPVError{Message: "contacts not found", StatusC
 // ErrCouldNotCountContacts is when contacts cannot be counted
 var ErrCouldNotCountContacts = models.SPVError{Message: "failed to count contacts", StatusCode: 500, Code: "error-contacts-count-failed"}
 
+// ErrMissingContactPaymailParam is when paymail is missing in contact
 var ErrMissingContactPaymailParam = models.SPVError{Message: "missing paymail parameter in request", StatusCode: 400, Code: "error-contact-paymail-missing"}
 
 // ErrInvalidRequesterXpub is when requester xpub is not connected with given paymail
