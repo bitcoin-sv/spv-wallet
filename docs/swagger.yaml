@@ -560,6 +560,9 @@ definitions:
     type: object
   filter.PaymailFilter:
     properties:
+      alias:
+        example: alice
+        type: string
       createdRange:
         allOf:
         - $ref: '#/definitions/filter.TimeRange'
@@ -583,9 +586,6 @@ definitions:
         allOf:
         - $ref: '#/definitions/filter.TimeRange'
         description: UpdatedRange specifies the time range when a record was updated.
-      xpubId:
-        example: 79f90a6bab0a44402fc64828af820e9465645658aea2d138c5205b88e6dabd00
-        type: string
     type: object
   filter.SearchAccessKeys:
     properties:
@@ -941,6 +941,13 @@ definitions:
       xpub_id:
         description: XpubID is an access key's xpub related id.
         example: bb8593f85ef8056a77026ad415f02128f3768906de53e9e8bf8749fe2d66cf50
+        type: string
+    type: object
+  models.AdminConfirmContactPair:
+    properties:
+      paymailA:
+        type: string
+      paymailB:
         type: string
     type: object
   models.AdminStats:
@@ -2789,6 +2796,33 @@ paths:
       security:
       - x-auth-xpub: []
       summary: Update contact FullName or Metadata
+      tags:
+      - Admin
+  /api/v1/admin/contacts/confirmations:
+    post:
+      description: Marks the contact entries as mutually confirmed, after ensuring
+        the validity of the contact information for both parties.
+      parameters:
+      - description: Contacts data
+        in: body
+        name: models.AdminConfirmContactPair
+        required: true
+        schema:
+          $ref: '#/definitions/models.AdminConfirmContactPair'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad request - Error while getting data from request body
+        "404":
+          description: Not found - Error, contacts not found
+        "500":
+          description: Internal server error - Error, confirming contact failed
+      security:
+      - x-auth-xpub: []
+      summary: Confirm contacts pair
       tags:
       - Admin
   /api/v1/admin/invitations/{id}:
