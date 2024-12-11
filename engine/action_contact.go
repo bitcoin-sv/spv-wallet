@@ -475,6 +475,90 @@ func (c *Client) upsertContact(ctx context.Context, paymailService paymailclient
 	return contact, nil
 }
 
+// AdminConfirmContacts confirms provided contacts, should be used only by the admin.
+func (c *Client) AdminConfirmContacts(ctx context.Context, paymailA, paymailB string) error {
+	paymailAInfo, paymailBInfo, err := c.retrievePaymailsInfo(ctx, paymailA, paymailB)
+	if err != nil {
+		return spverrors.ErrRetrivePaymailInfo.Wrap(err)
+	}
+
+	contactA, contactB, err := c.retrieveContactsForConfirmation(ctx, paymailA, paymailB, paymailAInfo.XpubID, paymailBInfo.XpubID)
+	if err != nil {
+		return spverrors.ErrGetContact.Wrap(err)
+	}
+
+	if err := c.confirmContactsInDbTx(ctx, contactA, contactB); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (c *Client) retrievePaymailsInfo(ctx context.Context, paymailA, paymailB string) (*PaymailAddress, *PaymailAddress, error) {
+	paymailAInfo, err := c.GetPaymailAddress(ctx, paymailA, c.DefaultModelOptions()...)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	paymailBInfo, err := c.GetPaymailAddress(ctx, paymailB, c.DefaultModelOptions()...)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	return paymailAInfo, paymailBInfo, nil
+}
+
+func (c *Client) retrieveContactsForConfirmation(ctx context.Context, paymailA, paymailB, xpubA, xpubB string) (*Contact, *Contact, error) {
+	contactA, err := getContact(ctx, paymailB, xpubA, c.DefaultModelOptions()...)
+	if err != nil {
+		return nil, nil, err
+	}
+	if contactA == nil {
+		return nil, nil, spverrors.ErrContactsNotFound.Wrap(
+			spverrors.Newf("User '%s' does not have '%s' in their contacts", paymailA, paymailB),
+		)
+
+	}
+
+	contactB, err := getContact(ctx, paymailA, xpubB, c.DefaultModelOptions()...)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	if contactB == nil {
+		return nil, nil, spverrors.ErrContactsNotFound.Wrap(
+			spverrors.Newf("User '%s' does not have '%s' in their contacts", paymailB, paymailA),
+		)
+
+	}
+
+	return contactA, contactB, nil
+}
+
+func (c *Client) confirmContactsInDbTx(ctx context.Context, contactA, contactB *Contact) error {
+	err := c.Datastore().NewTx(ctx, func(tx *datastore.Transaction) error {
+		contactA.Status = ContactConfirmed
+		if err := contactA.Save(ctx); err != nil {
+			return err
+		}
+
+		contactB.Status = ContactConfirmed
+		if err := contactB.Save(ctx); err != nil {
+			return err
+		}
+
+		if err := tx.Commit(); err != nil {
+			return _closeTxWithError(tx, err)
+		}
+
+		return nil
+	})
+	if err != nil {
+		return spverrors.ErrConfirmContact.Wrap(err)
+	}
+	return nil
+}
+
 func (c *Client) logContactWarining(xPubID, cPaymail, warning string) {
 	c.Logger().Warn().
 		Str("xPubID", xPubID).
