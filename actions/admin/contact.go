@@ -210,3 +210,40 @@ func contactsAccept(c *gin.Context, _ *reqctx.AdminContext) {
 
 	c.JSON(http.StatusOK, contract)
 }
+
+// createContact will perform create contact action for the given paymail
+// Perform create action on contact godoc
+// @Summary		Create contact
+// @Description Create contact
+// @Tags		Admin
+// @Produce		json
+// @Param		paymail path string false "Contact paymail"
+// @Success		200 {object} response.Contact "Changed contact"
+// @Failure		400	"Bad request - Error while getting paymail from path"
+// @Failure		404	"Not found - Error while getting contact requester by paymail"
+// @Failure		409	"Contact already exists -  Unable to add duplicate contact"
+// @Failure 	500	"Internal server error - Error while adding new contact"
+// @Router		/api/v1/admin/contacts/{paymail} [post]
+// @Security	x-auth-xpub
+func createContact(c *gin.Context, _ *reqctx.AdminContext) {
+	logger := reqctx.Logger(c)
+	contactPaymail := c.Param("contactPaymail")
+	if contactPaymail == "" {
+		spverrors.ErrorResponse(c, spverrors.ErrMissingContactPaymailParam, logger)
+	}
+
+	var req *CreateContact
+	if err := c.Bind(&req); err != nil {
+		spverrors.ErrorResponse(c, spverrors.ErrCannotBindRequest.WithTrace(err), logger)
+		return
+	}
+	metadata := mappings.MapToMetadata(req.Metadata)
+	contact, err := reqctx.Engine(c).AdminCreateContact(c, contactPaymail, req.CreatorPaymail, req.FullName, metadata)
+	if err != nil {
+		spverrors.ErrorResponse(c, err, logger)
+		return
+	}
+
+	contract := mappings.MapToContactContract(contact)
+	c.JSON(http.StatusOK, contract)
+}
