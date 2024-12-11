@@ -236,6 +236,51 @@ const docTemplate = `{
                 }
             }
         },
+        "/api/v1/admin/contacts/{paymail}": {
+            "post": {
+                "security": [
+                    {
+                        "x-auth-xpub": []
+                    }
+                ],
+                "description": "Create contact",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Admin"
+                ],
+                "summary": "Create contact",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Contact paymail",
+                        "name": "paymail",
+                        "in": "path"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Changed contact",
+                        "schema": {
+                            "$ref": "#/definitions/response.Contact"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request - Error while getting paymail from path"
+                    },
+                    "404": {
+                        "description": "Not found - Error while getting contact requester by paymail"
+                    },
+                    "409": {
+                        "description": "Contact already exists -  Unable to add duplicate contact"
+                    },
+                    "500": {
+                        "description": "Internal server error - Error while adding new contact"
+                    }
+                }
+            }
+        },
         "/api/v1/admin/invitations/{id}": {
             "delete": {
                 "security": [
