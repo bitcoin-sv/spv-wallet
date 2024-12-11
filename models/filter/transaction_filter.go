@@ -3,7 +3,7 @@ package filter
 // TransactionFilter is a struct for handling request parameters for transactions search requests
 type TransactionFilter struct {
 	// ModelFilter is a struct for handling typical request parameters for search requests
-	//lint:ignore SA5008 We want to reuse json tags also to mapstructure.
+	//nolint:staticcheck // SA5008 We want to reuse json tags also to mapstructure.
 	ModelFilter     `json:",inline,squash"`
 	Id              *string `json:"id,omitempty" example:"d425432e0d10a46af1ec6d00f380e9581ebf7907f3486572b3cd561a4c326e14"`
 	Hex             *string `json:"hex,omitempty"`
