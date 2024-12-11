@@ -1,11 +1,11 @@
-github.com/bitcoin-sv/go-sdk v1.1.14 h1:65PrWc8H5in138fplswpxpXuV3HwQQgyXDBegioyVbY=
-github.com/bitcoin-sv/go-sdk v1.1.14/go.mod h1:khREs6RkJuYkxFD3ZB9I+zcGjfxoHeACg9Zr3f7Fn7s=
-github.com/bitcoin-sv/spv-wallet v1.0.0-beta.34 h1:mqO7VUkcACU3bKgkghzk2BG740sT8rCgdt1AqY1LDMQ=
-github.com/bitcoin-sv/spv-wallet v1.0.0-beta.34/go.mod h1:/KlhiXDgHDCyh/vCaBe6qyJ50fKOVXDXAvGEEmDhgCg=
+github.com/bitcoin-sv/go-sdk v1.1.15 h1:yeIMoCEhIhopFZMO/qRlHkdS7IFCvliO4OGV0DEF5RY=
+github.com/bitcoin-sv/go-sdk v1.1.15/go.mod h1:3CsNdEDBwB+SIv6UBcJPC9bTvPqxQvg3GULt7wsuL58=
+github.com/bitcoin-sv/spv-wallet v1.0.0-beta.35 h1:jCUEuY+XKVzVkBWjFKDiyAcToBhwB+1OQFvby+TrOJg=
+github.com/bitcoin-sv/spv-wallet v1.0.0-beta.35/go.mod h1:jckuVkRVC2LOThKnsUTCUbAm4/lARFKwygbJbAXB3Ro=
 github.com/bitcoin-sv/spv-wallet-go-client v1.0.0-beta.16 h1:PGlo27UEdJKq4vup9pyE6BtZ2YWS2En3SJhjBu0EiEs=
 github.com/bitcoin-sv/spv-wallet-go-client v1.0.0-beta.16/go.mod h1:E0G3YfQj6KDKs6CoMLbSxW2fMIqn5bMeOSi5G4BL4a0=
-github.com/bitcoin-sv/spv-wallet/models v1.0.0-beta.34 h1:9MMqlZSyCP+RFt0FNnwcbJEgUsRKy5w9Ga7FXHs/XXo=
-github.com/bitcoin-sv/spv-wallet/models v1.0.0-beta.34/go.mod h1:PEJdH9ZWKOiKHyOZkzYsRbKuZjzlRaEJy3GsM75Icdo=
+github.com/bitcoin-sv/spv-wallet/models v1.0.0-beta.35 h1:AyMpxknnNKzzCXjTuu89yM03tqy1lqqWLK0BAgaKbE4=
+github.com/bitcoin-sv/spv-wallet/models v1.0.0-beta.35/go.mod h1:UdY5AGsO9IomUEYSPilcSY+3BTQRJswdfZNveLt6LZQ=
 github.com/boombuler/barcode v1.0.1-0.20190219062509-6c824513bacc/go.mod h1:paBWMcWSl3LHKBqUq+rly7CNSldXjb2rDl3JlRe0mD8=
 github.com/boombuler/barcode v1.0.2 h1:79yrbttoZrLGkL/oOI8hBrUKucwOL0oOjUgEguGMcJ4=
 github.com/boombuler/barcode v1.0.2/go.mod h1:paBWMcWSl3LHKBqUq+rly7CNSldXjb2rDl3JlRe0mD8=
