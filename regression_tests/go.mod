@@ -5,14 +5,14 @@ go 1.23.1
 toolchain go1.23.3
 
 require (
-	github.com/bitcoin-sv/spv-wallet v1.0.0-beta.34
+	github.com/bitcoin-sv/spv-wallet v1.0.0-beta.35
 	github.com/bitcoin-sv/spv-wallet-go-client v1.0.0-beta.16
 	github.com/bitcoin-sv/spv-wallet/models v1.0.0-beta.35
 	github.com/joho/godotenv v1.5.1
 )
 
 require (
-	github.com/bitcoin-sv/go-sdk v1.1.14 // indirect
+	github.com/bitcoin-sv/go-sdk v1.1.15 // indirect
 	github.com/boombuler/barcode v1.0.2 // indirect
 	github.com/bytedance/sonic v1.12.4 // indirect
 	github.com/bytedance/sonic/loader v0.2.1 // indirect
