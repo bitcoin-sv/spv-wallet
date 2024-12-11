@@ -207,7 +207,7 @@ func (c *Client) AdminCreateContact(ctx context.Context, contactPaymail, creator
 		contactPaymail,
 		pkiNewContact.PubKey,
 		creatorXPub.ID,
-		// newly created duplicate should be in the status of ContactNotConfirmed - initial state
+		// newly created contact should be in the status of ContactNotConfirmed - initial state
 		ContactNotConfirmed,
 		opts...,
 	)

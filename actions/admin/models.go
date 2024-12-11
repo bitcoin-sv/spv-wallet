@@ -45,7 +45,7 @@ type CreateXpub struct {
 type CreateContact struct {
 	// Paymail address of the creator (Person A) who owns the contact being added.
 	CreatorPaymail string `json:"creatorPaymail"`
-	// The complete name of the contact, including first name, middle name (if applicable), and last name.
+	// The complete name of the contact, including first name, and last name.
 	FullName string `json:"fullName"`
 	// Accepts a JSON object for embedding custom metadata, enabling arbitrary additional information to be associated with the resource
 	Metadata engine.Metadata `json:"metadata" swaggertype:"object,string" example:"key:value,key2:value2"`
