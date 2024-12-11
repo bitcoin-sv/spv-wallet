@@ -377,6 +377,22 @@ func Test_ClientService_AdminCreateContact(t *testing.T) {
 			expectedStatus:   ContactNotConfirmed,
 			expectedFullName: "",
 		},
+		{
+			name:           "Edge case: missing creator paymail",
+			contactPaymail: "user1@example.com",
+			creatorPaymail: "",
+			fullName:       "John Doe",
+			metadata:       nil,
+			expectedError:  spverrors.ErrMissingContactCreatorPaymail,
+		},
+		{
+			name:           "Edge case: missing contact full name",
+			contactPaymail: "user1@example.com",
+			creatorPaymail: "user2@example.com",
+			fullName:       "",
+			metadata:       nil,
+			expectedError:  spverrors.ErrMissingContactFullName,
+		},
 	}
 
 	for _, tt := range tests {
@@ -394,7 +410,7 @@ func Test_ClientService_AdminCreateContact(t *testing.T) {
 			_, err := client.NewXpub(ctx, csXpub, client.DefaultModelOptions()...)
 			require.NoError(t, err)
 
-			if tt.creatorPaymail != "unknown@example.com" {
+			if tt.creatorPaymail != "unknown@example.com" && tt.creatorPaymail != "" {
 				_, err = client.NewPaymailAddress(ctx, csXpub, tt.creatorPaymail, "Jane Doe", "", client.DefaultModelOptions()...)
 				require.NoError(t, err)
 			}

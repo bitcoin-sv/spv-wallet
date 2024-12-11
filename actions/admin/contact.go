@@ -211,7 +211,7 @@ func contactsAccept(c *gin.Context, _ *reqctx.AdminContext) {
 	c.JSON(http.StatusOK, contract)
 }
 
-// contactCreate will perform create contact action for the given paymail
+// contactsCreate will perform create contact action for the given paymail
 // Perform create action on contact godoc
 // @Summary		Create contact
 // @Description Create contact
@@ -230,6 +230,7 @@ func contactsCreate(c *gin.Context, _ *reqctx.AdminContext) {
 	contactPaymail := c.Param("paymail")
 	if contactPaymail == "" {
 		spverrors.ErrorResponse(c, spverrors.ErrMissingContactPaymailParam, logger)
+		return
 	}
 
 	var req *CreateContact
@@ -237,6 +238,7 @@ func contactsCreate(c *gin.Context, _ *reqctx.AdminContext) {
 		spverrors.ErrorResponse(c, spverrors.ErrCannotBindRequest.WithTrace(err), logger)
 		return
 	}
+
 	metadata := mappings.MapToMetadata(req.Metadata)
 	contact, err := reqctx.Engine(c).AdminCreateContact(c, contactPaymail, req.CreatorPaymail, req.FullName, metadata)
 	if err != nil {
