@@ -173,6 +173,7 @@ func (c *Client) AdminCreateContact(ctx context.Context, contactPaymail, creator
 	if err != nil {
 		return nil, spverrors.ErrCouldNotFindPaymail.Wrap(err)
 	}
+
 	if creatorPaymailAddr == nil {
 		return nil, spverrors.ErrCouldNotFindPaymail
 	}
