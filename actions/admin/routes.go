@@ -50,6 +50,7 @@ func RegisterRoutes(handlersManager *handlers.Manager) {
 	adminGroup.DELETE("/invitations/:id", handlers.AsAdmin(contactsReject))
 	adminGroup.DELETE("/contacts/:id", handlers.AsAdmin(contactsDelete))
 	adminGroup.PUT("/contacts/:id", handlers.AsAdmin(contactsUpdate))
+	adminGroup.POST("/contacts/:paymail", handlers.AsAdmin(contactsCreate))
 
 	// access keys
 	adminGroup.GET("/users/keys", handlers.AsAdmin(accessKeysSearch))

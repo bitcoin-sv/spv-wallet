@@ -211,7 +211,7 @@ func contactsAccept(c *gin.Context, _ *reqctx.AdminContext) {
 	c.JSON(http.StatusOK, contract)
 }
 
-// createContact will perform create contact action for the given paymail
+// contactCreate will perform create contact action for the given paymail
 // Perform create action on contact godoc
 // @Summary		Create contact
 // @Description Create contact
@@ -225,9 +225,9 @@ func contactsAccept(c *gin.Context, _ *reqctx.AdminContext) {
 // @Failure 	500	"Internal server error - Error while adding new contact"
 // @Router		/api/v1/admin/contacts/{paymail} [post]
 // @Security	x-auth-xpub
-func createContact(c *gin.Context, _ *reqctx.AdminContext) {
+func contactsCreate(c *gin.Context, _ *reqctx.AdminContext) {
 	logger := reqctx.Logger(c)
-	contactPaymail := c.Param("contactPaymail")
+	contactPaymail := c.Param("paymail")
 	if contactPaymail == "" {
 		spverrors.ErrorResponse(c, spverrors.ErrMissingContactPaymailParam, logger)
 	}
