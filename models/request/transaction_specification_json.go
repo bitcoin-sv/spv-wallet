@@ -15,13 +15,13 @@ func unmarshalOutput(rawOutput json.RawMessage, outputType string) (Output, erro
 	case "op_return":
 		var out opreturn.Output
 		if err := json.Unmarshal(rawOutput, &out); err != nil {
-			return nil, err
+			return nil, err //nolint:wrapcheck // unmarshalOutput is run internally by json.Unmarshal, so we don't want to wrap the error
 		}
 		return out, nil
 	case "paymail":
 		var out paymailreq.Output
 		if err := json.Unmarshal(rawOutput, &out); err != nil {
-			return nil, err
+			return nil, err //nolint:wrapcheck // unmarshalOutput is run internally by json.Unmarshal, so we don't want to wrap the error
 		}
 		return out, nil
 	default:
@@ -29,7 +29,7 @@ func unmarshalOutput(rawOutput json.RawMessage, outputType string) (Output, erro
 	}
 }
 
-// expandOutputForMarshaling used by TransactionSpecification marshalling to expand Output object before marshalling.
+// expandOutputForMarshaling used by TransactionSpecification marshaling to expand Output object before marshaling.
 // IMPORTANT: Every time a new output type is added, it must be handled here also.
 func expandOutputForMarshaling(output Output) (any, error) {
 	switch o := output.(type) {
