@@ -122,6 +122,7 @@ var ErrContactIncorrectStatus = models.SPVError{Message: "contact is in incorrec
 // ErrMissingContactID is when id is missing in contact
 var ErrMissingContactID = models.SPVError{Message: "missing id in contact", StatusCode: 400, Code: "error-contact-id-missing"}
 
+// ErrMissingContactCreatorPaymail is when creator paymail is missing in contact
 var ErrMissingContactCreatorPaymail = models.SPVError{Message: "missing creator paymail in contact", StatusCode: 400, Code: "error-contact-creator-paymail-missing"}
 
 // ErrMissingContactFullName is when full name is missing in contact
