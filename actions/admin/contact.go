@@ -213,7 +213,6 @@ func contactsAccept(c *gin.Context, _ *reqctx.AdminContext) {
 }
 
 // contactsCreate will perform create contact action for the given paymail
-// Perform create action on contact godoc
 // @Summary		Create contact
 // @Description Create contact
 // @Tags		Admin
