@@ -3,6 +3,7 @@ package engine
 import (
 	"context"
 	"fmt"
+	"strings"
 
 	"github.com/bitcoin-sv/go-paymail"
 	"github.com/bitcoin-sv/spv-wallet/engine/datastore"
@@ -225,11 +226,11 @@ func (c *Client) AdminCreateContact(ctx context.Context, contactPaymail, creator
 }
 
 func validateNewContactReqFields(fullName, creatorPaymail string) error {
-	if fullName == "" {
+	if strings.TrimSpace(fullName) == "" {
 		return spverrors.ErrMissingContactFullName
 	}
 
-	if creatorPaymail == "" {
+	if strings.TrimSpace(creatorPaymail) == "" {
 		return spverrors.ErrMissingContactCreatorPaymail
 	}
 
