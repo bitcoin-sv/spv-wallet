@@ -172,9 +172,6 @@ var ErrPaymailAddressIsInvalid = models.SPVError{Message: "paymail address is in
 // ErrDeletePaymailAddress is when the paymail address could not be deleted
 var ErrDeletePaymailAddress = models.SPVError{Message: "deleting paymail address failed", StatusCode: 400, Code: "error-deleting-paymail-address-failed"}
 
-// ErrCreatePaymailAddress is when the paymail address could not be created
-var ErrCreatePaymailAddress = models.SPVError{Message: "creating paymail address failed", StatusCode: 500, Code: "error-creating-paymail-address-failed"}
-
 // ErrMissingPaymailID is when id is missing in paymail
 var ErrMissingPaymailID = models.SPVError{Message: "missing id in paymail", StatusCode: 400, Code: "error-paymail-id-missing"}
 

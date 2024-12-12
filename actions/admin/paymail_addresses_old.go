@@ -1,7 +1,6 @@
 package admin
 
 import (
-	"errors"
 	"net/http"
 
 	"github.com/bitcoin-sv/spv-wallet/engine"
@@ -168,11 +167,7 @@ func paymailCreateAddressOld(c *gin.Context, _ *reqctx.AdminContext) {
 	paymailAddress, err := reqctx.Engine(c).NewPaymailAddress(
 		c.Request.Context(), requestBody.Key, requestBody.Address, requestBody.PublicName, requestBody.Avatar, opts...)
 	if err != nil {
-		if errors.Is(err, spverrors.ErrPaymailAlreadyExists) {
-			spverrors.ErrorResponse(c, spverrors.ErrPaymailAlreadyExists.WithTrace(err), logger)
-		} else {
-			spverrors.ErrorResponse(c, spverrors.ErrCreatePaymailAddress.WithTrace(err), logger)
-		}
+		spverrors.ErrorResponse(c, err, logger)
 		return
 	}
 
