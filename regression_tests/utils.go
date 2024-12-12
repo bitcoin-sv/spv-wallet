@@ -121,7 +121,11 @@ func addPrefixIfNeeded(url string) string {
 
 // getSharedConfig retrieves the shared configuration from the SPV Wallet.
 func getSharedConfig(ctx context.Context) (*models.SharedConfig, error) {
-	wc := walletclient.NewWithXPriv(addPrefixIfNeeded(domainLocalHost), adminXPriv)
+	wc, err := walletclient.NewWithXPriv(addPrefixIfNeeded(domainLocalHost), adminXPriv)
+	if err != nil {
+		return nil, err
+	}
+
 	sharedConfig, err := wc.GetSharedConfig(ctx)
 	if err != nil {
 		return nil, err
@@ -192,7 +196,10 @@ func createUser(paymail string, config *regressionTestConfig) (*regressionTestUs
 		Paymail: preparePaymail(leaderPaymailAlias, paymail),
 	}
 
-	adminClient := walletclient.NewWithAdminKey(config.ClientOneURL, adminXPriv)
+	adminClient, err := walletclient.NewWithAdminKey(config.ClientOneURL, adminXPriv)
+	if err != nil {
+		return nil, err
+	}
 	ctx := context.Background()
 
 	if err := adminClient.AdminNewXpub(ctx, user.XPub, map[string]any{"purpose": "regression-tests"}); err != nil {
@@ -229,12 +236,17 @@ func useUserFromEnv(paymailDomain string, config *regressionTestConfig) (*regres
 // deleteUser soft deletes paymail address from the SPV Wallet.
 func deleteUser(paymail string, config *regressionTestConfig) error {
 	paymail = preparePaymail(leaderPaymailAlias, paymail)
-	adminClient := walletclient.NewWithAdminKey(addPrefixIfNeeded(config.ClientOneURL), adminXPriv)
-	ctx := context.Background()
-	err := adminClient.AdminDeletePaymail(ctx, paymail)
+	adminClient, err := walletclient.NewWithAdminKey(addPrefixIfNeeded(config.ClientOneURL), adminXPriv)
 	if err != nil {
 		return err
 	}
+
+	ctx := context.Background()
+	err = adminClient.AdminDeletePaymail(ctx, paymail)
+	if err != nil {
+		return err
+	}
+
 	return nil
 }
 
@@ -275,7 +287,10 @@ func isValidURL(rawURL string) bool {
 
 // checkBalance checks the balance of the specified xpriv at the given domain with given xpriv.
 func checkBalance(domain, xpriv string) (int, error) {
-	client := walletclient.NewWithXPriv(addPrefixIfNeeded(domain), xpriv)
+	client, err := walletclient.NewWithXPriv(addPrefixIfNeeded(domain), xpriv)
+	if err != nil {
+		return wrongInput, err
+	}
 	ctx := context.Background()
 
 	xpubInfo, err := client.GetXPub(ctx)

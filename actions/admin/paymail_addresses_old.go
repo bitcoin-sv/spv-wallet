@@ -167,7 +167,7 @@ func paymailCreateAddressOld(c *gin.Context, _ *reqctx.AdminContext) {
 	paymailAddress, err := reqctx.Engine(c).NewPaymailAddress(
 		c.Request.Context(), requestBody.Key, requestBody.Address, requestBody.PublicName, requestBody.Avatar, opts...)
 	if err != nil {
-		spverrors.ErrorResponse(c, spverrors.ErrCreatePaymailAddress.WithTrace(err), logger)
+		spverrors.ErrorResponse(c, err, logger)
 		return
 	}
 

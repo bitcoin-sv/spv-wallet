@@ -134,7 +134,7 @@ func handleUserCreation(paymailAlias string, config *regressionTestConfig) (*reg
 
 // handleCreateUserError handles the error when creating a user.
 func handleCreateUserError(err error, paymailAlias string, config *regressionTestConfig) (*regressionTestUser, error) {
-	if err.Error() == spverrors.ErrPaymailAlreadyExists.Error() {
+	if errors.Is(err, spverrors.ErrPaymailAlreadyExists) {
 		return handleExistingPaymail(paymailAlias, config)
 	} else {
 		return nil, fmt.Errorf("error creating user: %w", err)
@@ -251,7 +251,10 @@ func takeMasterUrlAndXPriv(leaderPaymail *regressionTestUser) error {
 
 // sendFundsWithGoClient sends funds using the Go client.
 func sendFundsWithGoClient(instanceUrl string, istanceXPriv string, receiverPaymail string) error {
-	client := walletclient.NewWithXPriv(addPrefixIfNeeded(instanceUrl), istanceXPriv)
+	client, err := walletclient.NewWithXPriv(addPrefixIfNeeded(instanceUrl), istanceXPriv)
+	if err != nil {
+		return fmt.Errorf("error initalizing client: %w", err)
+	}
 	ctx := context.Background()
 
 	balance, err := checkBalance(instanceUrl, istanceXPriv)
