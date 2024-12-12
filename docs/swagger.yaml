@@ -2798,6 +2798,34 @@ paths:
       summary: Update contact FullName or Metadata
       tags:
       - Admin
+  /api/v1/admin/contacts/{paymail}:
+    post:
+      description: Create contact
+      parameters:
+      - description: Contact paymail
+        in: path
+        name: paymail
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Changed contact
+          schema:
+            $ref: '#/definitions/response.Contact'
+        "400":
+          description: Bad request - Error while getting paymail from path
+        "404":
+          description: Not found - Error while getting contact requester by paymail
+        "409":
+          description: Contact already exists -  Unable to add duplicate contact
+        "500":
+          description: Internal server error - Error while adding new contact
+      security:
+      - x-auth-xpub: []
+      summary: Create contact
+      tags:
+      - Admin
   /api/v1/admin/contacts/confirmations:
     post:
       description: Marks the contact entries as mutually confirmed, after ensuring

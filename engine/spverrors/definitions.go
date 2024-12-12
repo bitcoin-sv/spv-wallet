@@ -104,6 +104,9 @@ var ErrContactsNotFound = models.SPVError{Message: "contacts not found", StatusC
 // ErrCouldNotCountContacts is when contacts cannot be counted
 var ErrCouldNotCountContacts = models.SPVError{Message: "failed to count contacts", StatusCode: 500, Code: "error-contacts-count-failed"}
 
+// ErrMissingContactPaymailParam is when paymail is missing in contact
+var ErrMissingContactPaymailParam = models.SPVError{Message: "missing paymail parameter in request", StatusCode: 400, Code: "error-contact-paymail-missing"}
+
 // ErrInvalidRequesterXpub is when requester xpub is not connected with given paymail
 var ErrInvalidRequesterXpub = models.SPVError{Message: "invalid requester xpub", StatusCode: 400, Code: "error-contact-invalid-requester-xpub"}
 
@@ -118,6 +121,9 @@ var ErrContactIncorrectStatus = models.SPVError{Message: "contact is in incorrec
 
 // ErrMissingContactID is when id is missing in contact
 var ErrMissingContactID = models.SPVError{Message: "missing id in contact", StatusCode: 400, Code: "error-contact-id-missing"}
+
+// ErrMissingContactCreatorPaymail is when creator paymail is missing in contact
+var ErrMissingContactCreatorPaymail = models.SPVError{Message: "missing creator paymail in contact", StatusCode: 400, Code: "error-contact-creator-paymail-missing"}
 
 // ErrMissingContactFullName is when full name is missing in contact
 var ErrMissingContactFullName = models.SPVError{Message: "missing full name in contact", StatusCode: 400, Code: "error-contact-full-name-missing"}
@@ -142,6 +148,9 @@ var ErrGettingPKIFailed = models.SPVError{Message: "getting PKI for contact fail
 
 // ErrSaveContact is when saving new contact failed
 var ErrSaveContact = models.SPVError{Message: "adding contact failed", StatusCode: 400, Code: "error-contact-adding-contact-failed"}
+
+// ErrContactAlreadyExists is when contact already exists
+var ErrContactAlreadyExists = models.SPVError{Message: "contact already exists", StatusCode: 409, Code: "error-contact-already-exists"}
 
 // ErrUpdateContact is when updating contact failed
 var ErrUpdateContact = models.SPVError{Message: "updating contact failed", StatusCode: 500, Code: "error-contact-updating-contact-failed"}

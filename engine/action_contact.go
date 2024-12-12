@@ -3,6 +3,7 @@ package engine
 import (
 	"context"
 	"fmt"
+	"strings"
 
 	"github.com/bitcoin-sv/go-paymail"
 	"github.com/bitcoin-sv/spv-wallet/engine/datastore"
@@ -161,6 +162,79 @@ func (c *Client) UpdateContact(ctx context.Context, id, fullName string, metadat
 	}
 
 	return contact, nil
+}
+
+// AdminCreateContact creates a new contact - xpubId is retrieved by the creatorPaymail.
+func (c *Client) AdminCreateContact(ctx context.Context, contactPaymail, creatorPaymail, fullName string, metadata *Metadata) (*Contact, error) {
+	if err := validateNewContactReqFields(fullName, creatorPaymail); err != nil {
+		return nil, err
+	}
+
+	creatorPaymailAddr, err := getPaymailAddress(ctx, creatorPaymail, c.DefaultModelOptions()...)
+	if err != nil {
+		return nil, spverrors.ErrCouldNotFindPaymail.Wrap(err)
+	}
+
+	if creatorPaymailAddr == nil {
+		return nil, spverrors.ErrCouldNotFindPaymail
+	}
+
+	creatorXPub, err := getXpubByID(ctx, creatorPaymailAddr.XpubID, c.DefaultModelOptions()...)
+	if err != nil {
+		return nil, spverrors.ErrCouldNotFindXpub.Wrap(err)
+	}
+
+	newContactSanitisedPaymail, err := c.PaymailService().GetSanitizedPaymail(contactPaymail)
+	if err != nil {
+		return nil, spverrors.Wrapf(err, "requested duplicate paymail is invalid")
+	}
+
+	pkiNewContact, err := c.PaymailService().GetPkiForPaymail(ctx, newContactSanitisedPaymail)
+	if err != nil {
+		return nil, spverrors.ErrGettingPKIFailed.Wrap(err)
+	}
+
+	duplicate, err := getContact(ctx, contactPaymail, creatorXPub.ID, c.DefaultModelOptions()...)
+	if err != nil {
+		return nil, err
+	}
+	if duplicate != nil {
+		return nil, spverrors.ErrContactAlreadyExists
+	}
+
+	opts := c.DefaultModelOptions()
+	if metadata != nil {
+		for key, value := range *metadata {
+			opts = append(opts, WithMetadata(key, value))
+		}
+	}
+
+	contact := newContact(
+		fullName,
+		contactPaymail,
+		pkiNewContact.PubKey,
+		creatorXPub.ID,
+		// newly created contact should be in the status of ContactNotConfirmed - initial state
+		ContactNotConfirmed,
+		opts...,
+	)
+	if err = contact.Save(ctx); err != nil {
+		return nil, spverrors.ErrSaveContact.Wrap(err)
+	}
+
+	return contact, nil
+}
+
+func validateNewContactReqFields(fullName, creatorPaymail string) error {
+	if strings.TrimSpace(fullName) == "" {
+		return spverrors.ErrMissingContactFullName
+	}
+
+	if strings.TrimSpace(creatorPaymail) == "" {
+		return spverrors.ErrMissingContactCreatorPaymail
+	}
+
+	return nil
 }
 
 // AdminChangeContactStatus changes the status of the contact, should be used only by the admin.
