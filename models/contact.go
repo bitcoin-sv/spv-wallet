@@ -5,11 +5,13 @@ import (
 	"github.com/bitcoin-sv/spv-wallet/models/response"
 )
 
+// CreateContactResponse is a model for response on contact creation.
 type CreateContactResponse struct {
 	Contact        *Contact          `json:"contact"`
 	AdditionalInfo map[string]string `json:"additionalInfo"`
 }
 
+// Contact is a model for contact.
 type Contact struct {
 	common.Model
 
@@ -24,7 +26,12 @@ type Contact struct {
 	// Status is a contact's current status.
 	Status response.ContactStatus `json:"status" example:"unconfirmed"`
 }
+type AdminConfirmContactPair struct {
+	PaymailA string `json:"paymailA"`
+	PaymailB string `json:"paymailB"`
+}
 
+// AddAdditionalInfo adds additional information (as key-value map) to the response.
 func (m *CreateContactResponse) AddAdditionalInfo(k, v string) {
 	if m.AdditionalInfo == nil {
 		m.AdditionalInfo = make(map[string]string)

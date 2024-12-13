@@ -8,15 +8,17 @@ import (
 func RegisterRoutes(handlersManager *handlers.Manager) {
 	adminGroupOld := handlersManager.Group(handlers.GroupOldAPI, "/admin")
 
-	adminGroupOld.GET("/stats", handlers.AsAdmin(stats))
-	adminGroupOld.GET("/status", handlers.AsAdmin(status))
+	adminGroupOld.GET("/status", handlers.AsAdmin(statusOld))
+	adminGroupOld.GET("/stats", handlers.AsAdmin(statsOld))
 	adminGroupOld.POST("/access-keys/search", handlers.AsAdmin(accessKeysSearchOld))
 	adminGroupOld.POST("/access-keys/count", handlers.AsAdmin(accessKeysCount))
 	adminGroupOld.POST("/contact/search", handlers.AsAdmin(contactsSearchOld))
 	adminGroupOld.PATCH("/contact/:id", handlers.AsAdmin(contactsUpdateOld))
+	adminGroupOld.POST("/contact/:paymail", handlers.AsAdmin(contactsCreate))
 	adminGroupOld.DELETE("/contact/:id", handlers.AsAdmin(contactsDeleteOld))
 	adminGroupOld.PATCH("/contact/accepted/:id", handlers.AsAdmin(contactsAcceptOld))
 	adminGroupOld.PATCH("/contact/rejected/:id", handlers.AsAdmin(contactsRejectOld))
+	adminGroupOld.POST("/contacts/confirmations", handlers.AsAdmin(contactsConfirm))
 	adminGroupOld.POST("/destinations/search", handlers.AsAdmin(destinationsSearch))
 	adminGroupOld.POST("/destinations/count", handlers.AsAdmin(destinationsCount))
 	adminGroupOld.POST("/paymail/get", handlers.AsAdmin(paymailGetAddressOld))
@@ -40,6 +42,9 @@ func RegisterRoutes(handlersManager *handlers.Manager) {
 	adminGroupOld.GET("/transactions", handlers.AsAdmin(getTransactionsOld))
 
 	adminGroup := handlersManager.Group(handlers.GroupAPI, "/admin")
+	adminGroup.GET("/status", handlers.AsAdmin(status))
+	adminGroup.GET("/stats", handlers.AsAdmin(stats))
+
 	// tx
 	adminGroup.GET("/transactions/:id", handlers.AsAdmin(adminGetTxByID))
 	adminGroup.GET("/transactions", handlers.AsAdmin(adminSearchTxs))
@@ -50,6 +55,8 @@ func RegisterRoutes(handlersManager *handlers.Manager) {
 	adminGroup.DELETE("/invitations/:id", handlers.AsAdmin(contactsReject))
 	adminGroup.DELETE("/contacts/:id", handlers.AsAdmin(contactsDelete))
 	adminGroup.PUT("/contacts/:id", handlers.AsAdmin(contactsUpdate))
+	adminGroup.POST("/contacts/:paymail", handlers.AsAdmin(contactsCreate))
+	adminGroup.POST("/contacts/confirmations", handlers.AsAdmin(contactsConfirm))
 
 	// access keys
 	adminGroup.GET("/users/keys", handlers.AsAdmin(accessKeysSearch))

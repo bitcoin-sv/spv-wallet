@@ -104,6 +104,9 @@ var ErrContactsNotFound = models.SPVError{Message: "contacts not found", StatusC
 // ErrCouldNotCountContacts is when contacts cannot be counted
 var ErrCouldNotCountContacts = models.SPVError{Message: "failed to count contacts", StatusCode: 500, Code: "error-contacts-count-failed"}
 
+// ErrMissingContactPaymailParam is when paymail is missing in contact
+var ErrMissingContactPaymailParam = models.SPVError{Message: "missing paymail parameter in request", StatusCode: 400, Code: "error-contact-paymail-missing"}
+
 // ErrInvalidRequesterXpub is when requester xpub is not connected with given paymail
 var ErrInvalidRequesterXpub = models.SPVError{Message: "invalid requester xpub", StatusCode: 400, Code: "error-contact-invalid-requester-xpub"}
 
@@ -118,6 +121,9 @@ var ErrContactIncorrectStatus = models.SPVError{Message: "contact is in incorrec
 
 // ErrMissingContactID is when id is missing in contact
 var ErrMissingContactID = models.SPVError{Message: "missing id in contact", StatusCode: 400, Code: "error-contact-id-missing"}
+
+// ErrMissingContactCreatorPaymail is when creator paymail is missing in contact
+var ErrMissingContactCreatorPaymail = models.SPVError{Message: "missing creator paymail in contact", StatusCode: 400, Code: "error-contact-creator-paymail-missing"}
 
 // ErrMissingContactFullName is when full name is missing in contact
 var ErrMissingContactFullName = models.SPVError{Message: "missing full name in contact", StatusCode: 400, Code: "error-contact-full-name-missing"}
@@ -143,6 +149,9 @@ var ErrGettingPKIFailed = models.SPVError{Message: "getting PKI for contact fail
 // ErrSaveContact is when saving new contact failed
 var ErrSaveContact = models.SPVError{Message: "adding contact failed", StatusCode: 400, Code: "error-contact-adding-contact-failed"}
 
+// ErrContactAlreadyExists is when contact already exists
+var ErrContactAlreadyExists = models.SPVError{Message: "contact already exists", StatusCode: 409, Code: "error-contact-already-exists"}
+
 // ErrUpdateContact is when updating contact failed
 var ErrUpdateContact = models.SPVError{Message: "updating contact failed", StatusCode: 500, Code: "error-contact-updating-contact-failed"}
 
@@ -155,6 +164,12 @@ var ErrRejectContact = models.SPVError{Message: "rejecting contact failed", Stat
 // ErrAcceptContact is when accepting contact failed
 var ErrAcceptContact = models.SPVError{Message: "accepting contact failed", StatusCode: 500, Code: "error-contact-accepting-contact-failed"}
 
+// ErrConfirmContact is when confirming contact failed
+var ErrConfirmContact = models.SPVError{Message: "confirming contact failed", StatusCode: 500, Code: "error-contact-confirming-contacts-failed"}
+
+// ErrGetContact is when getting contact failed
+var ErrGetContact = models.SPVError{Message: "getting contact failed", StatusCode: 500, Code: "error-contact-getting-contact-failed"}
+
 // ////////////////////////////////// PAYMAIL ERRORS
 
 // ErrCouldNotFindPaymail is when paymail could not be found
@@ -165,9 +180,6 @@ var ErrPaymailAddressIsInvalid = models.SPVError{Message: "paymail address is in
 
 // ErrDeletePaymailAddress is when the paymail address could not be deleted
 var ErrDeletePaymailAddress = models.SPVError{Message: "deleting paymail address failed", StatusCode: 400, Code: "error-deleting-paymail-address-failed"}
-
-// ErrCreatePaymailAddress is when the paymail address could not be created
-var ErrCreatePaymailAddress = models.SPVError{Message: "creating paymail address failed", StatusCode: 500, Code: "error-creating-paymail-address-failed"}
 
 // ErrMissingPaymailID is when id is missing in paymail
 var ErrMissingPaymailID = models.SPVError{Message: "missing id in paymail", StatusCode: 400, Code: "error-paymail-id-missing"}
@@ -192,6 +204,9 @@ var ErrPaymailMerkleRootVerificationFailed = models.SPVError{Message: "merkle ro
 
 // ErrPaymailInvalidMerkleRoots is when merkle roots verification by BHS returns status: INVALID
 var ErrPaymailInvalidMerkleRoots = models.SPVError{Message: "invalid merkle roots", StatusCode: 400, Code: "error-paymail-invalid-merkle-roots"}
+
+// ErrRetrivePaymailInfo is when error occurred during retrieving paymail info
+var ErrRetrivePaymailInfo = models.SPVError{Message: "error during retrieving paymail info", StatusCode: 500, Code: "error-paymail-retrieve-info"}
 
 // ////////////////////////////////// CAPABILITIES ERRORS
 

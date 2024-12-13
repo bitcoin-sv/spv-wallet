@@ -101,6 +101,48 @@ const docTemplate = `{
                 }
             }
         },
+        "/api/v1/admin/contacts/confirmations": {
+            "post": {
+                "security": [
+                    {
+                        "x-auth-xpub": []
+                    }
+                ],
+                "description": "Marks the contact entries as mutually confirmed, after ensuring the validity of the contact information for both parties.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Admin"
+                ],
+                "summary": "Confirm contacts pair",
+                "parameters": [
+                    {
+                        "description": "Contacts data",
+                        "name": "models.AdminConfirmContactPair",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.AdminConfirmContactPair"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "400": {
+                        "description": "Bad request - Error while getting data from request body"
+                    },
+                    "404": {
+                        "description": "Not found - Error, contacts not found"
+                    },
+                    "500": {
+                        "description": "Internal server error - Error, confirming contact failed"
+                    }
+                }
+            }
+        },
         "/api/v1/admin/contacts/{id}": {
             "put": {
                 "security": [
@@ -190,6 +232,51 @@ const docTemplate = `{
                     },
                     "500": {
                         "description": "Internal server error - Error while updating contact"
+                    }
+                }
+            }
+        },
+        "/api/v1/admin/contacts/{paymail}": {
+            "post": {
+                "security": [
+                    {
+                        "x-auth-xpub": []
+                    }
+                ],
+                "description": "Create contact",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Admin"
+                ],
+                "summary": "Create contact",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Contact paymail",
+                        "name": "paymail",
+                        "in": "path"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Changed contact",
+                        "schema": {
+                            "$ref": "#/definitions/response.Contact"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request - Error while getting paymail from path"
+                    },
+                    "404": {
+                        "description": "Not found - Error while getting contact requester by paymail"
+                    },
+                    "409": {
+                        "description": "Contact already exists -  Unable to add duplicate contact"
+                    },
+                    "500": {
+                        "description": "Internal server error - Error while adding new contact"
                     }
                 }
             }
@@ -392,6 +479,59 @@ const docTemplate = `{
                     },
                     "500": {
                         "description": "Internal Server Error - Error while deleting paymail address"
+                    }
+                }
+            }
+        },
+        "/api/v1/admin/stats": {
+            "get": {
+                "security": [
+                    {
+                        "x-auth-xpub": []
+                    }
+                ],
+                "description": "Get statistics of the spv-wallet",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Admin"
+                ],
+                "summary": "Get stats",
+                "responses": {
+                    "200": {
+                        "description": "Stats for the admin",
+                        "schema": {
+                            "$ref": "#/definitions/response.AdminStats"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error - Error while fetching admin stats"
+                    }
+                }
+            }
+        },
+        "/api/v1/admin/status": {
+            "get": {
+                "security": [
+                    {
+                        "x-auth-xpub": []
+                    }
+                ],
+                "description": "Get status",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Admin"
+                ],
+                "summary": "Get status",
+                "responses": {
+                    "200": {
+                        "description": "Status response",
+                        "schema": {
+                            "type": "boolean"
+                        }
                     }
                 }
             }
@@ -2924,14 +3064,15 @@ const docTemplate = `{
                         "x-auth-xpub": []
                     }
                 ],
-                "description": "Get stats",
+                "description": "This endpoint has been deprecated. Use (GET) /api/v1/admin/stats instead.",
                 "produces": [
                     "application/json"
                 ],
                 "tags": [
                     "Admin"
                 ],
-                "summary": "Get stats",
+                "summary": "Get stats Use (GET) /api/v1/admin/stats instead.",
+                "deprecated": true,
                 "responses": {
                     "200": {
                         "description": "Stats for the admin",
@@ -2952,14 +3093,15 @@ const docTemplate = `{
                         "x-auth-xpub": []
                     }
                 ],
-                "description": "Get status",
+                "description": "This endpoint has been deprecated. Use (GET) /api/v1/admin/status instead.",
                 "produces": [
                     "application/json"
                 ],
                 "tags": [
                     "Admin"
                 ],
-                "summary": "Get status",
+                "summary": "Get status Use (GET) /api/v1/admin/status instead.",
+                "deprecated": true,
                 "responses": {
                     "200": {
                         "description": "Status response",
@@ -5339,6 +5481,10 @@ const docTemplate = `{
         "filter.PaymailFilter": {
             "type": "object",
             "properties": {
+                "alias": {
+                    "type": "string",
+                    "example": "alice"
+                },
                 "createdRange": {
                     "description": "CreatedRange specifies the time range when a record was created.",
                     "allOf": [
@@ -5372,10 +5518,6 @@ const docTemplate = `{
                             "$ref": "#/definitions/filter.TimeRange"
                         }
                     ]
-                },
-                "xpubId": {
-                    "type": "string",
-                    "example": "79f90a6bab0a44402fc64828af820e9465645658aea2d138c5205b88e6dabd00"
                 }
             }
         },
@@ -5856,6 +5998,17 @@ const docTemplate = `{
                     "description": "XpubID is an access key's xpub related id.",
                     "type": "string",
                     "example": "bb8593f85ef8056a77026ad415f02128f3768906de53e9e8bf8749fe2d66cf50"
+                }
+            }
+        },
+        "models.AdminConfirmContactPair": {
+            "type": "object",
+            "properties": {
+                "paymailA": {
+                    "type": "string"
+                },
+                "paymailB": {
+                    "type": "string"
                 }
             }
         },
@@ -6969,6 +7122,45 @@ const docTemplate = `{
                     "description": "XpubID is an access key's xpub related id.",
                     "type": "string",
                     "example": "bb8593f85ef8056a77026ad415f02128f3768906de53e9e8bf8749fe2d66cf50"
+                }
+            }
+        },
+        "response.AdminStats": {
+            "type": "object",
+            "properties": {
+                "balance": {
+                    "description": "Balance is a total balance of all xpubs.",
+                    "type": "integer"
+                },
+                "destinations": {
+                    "description": "Destinations is a total number of destinations.",
+                    "type": "integer"
+                },
+                "paymailAddresses": {
+                    "description": "PaymailAddresses is a total number of paymail addresses.",
+                    "type": "integer"
+                },
+                "transactions": {
+                    "description": "Transactions is a total number of committed transactions.",
+                    "type": "integer"
+                },
+                "transactionsPerDay": {
+                    "description": "TransactionsPerDay is a total number of committed transactions per day.",
+                    "type": "object",
+                    "additionalProperties": true
+                },
+                "utxos": {
+                    "description": "Utxos is a total number of utxos.",
+                    "type": "integer"
+                },
+                "utxosPerType": {
+                    "description": "UtxosPerType are utxos grouped by type.",
+                    "type": "object",
+                    "additionalProperties": true
+                },
+                "xpubs": {
+                    "description": "Xpubs is a total number of xpubs.",
+                    "type": "integer"
                 }
             }
         },

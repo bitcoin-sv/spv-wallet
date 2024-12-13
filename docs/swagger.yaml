@@ -627,6 +627,9 @@ definitions:
     type: object
   filter.PaymailFilter:
     properties:
+      alias:
+        example: alice
+        type: string
       createdRange:
         allOf:
         - $ref: '#/definitions/filter.TimeRange'
@@ -650,9 +653,6 @@ definitions:
         allOf:
         - $ref: '#/definitions/filter.TimeRange'
         description: UpdatedRange specifies the time range when a record was updated.
-      xpubId:
-        example: 79f90a6bab0a44402fc64828af820e9465645658aea2d138c5205b88e6dabd00
-        type: string
     type: object
   filter.SearchAccessKeys:
     properties:
@@ -1008,6 +1008,13 @@ definitions:
       xpub_id:
         description: XpubID is an access key's xpub related id.
         example: bb8593f85ef8056a77026ad415f02128f3768906de53e9e8bf8749fe2d66cf50
+        type: string
+    type: object
+  models.AdminConfirmContactPair:
+    properties:
+      paymailA:
+        type: string
+      paymailB:
         type: string
     type: object
   models.AdminStats:
@@ -1834,6 +1841,36 @@ definitions:
         description: XpubID is an access key's xpub related id.
         example: bb8593f85ef8056a77026ad415f02128f3768906de53e9e8bf8749fe2d66cf50
         type: string
+    type: object
+  response.AdminStats:
+    properties:
+      balance:
+        description: Balance is a total balance of all xpubs.
+        type: integer
+      destinations:
+        description: Destinations is a total number of destinations.
+        type: integer
+      paymailAddresses:
+        description: PaymailAddresses is a total number of paymail addresses.
+        type: integer
+      transactions:
+        description: Transactions is a total number of committed transactions.
+        type: integer
+      transactionsPerDay:
+        additionalProperties: true
+        description: TransactionsPerDay is a total number of committed transactions
+          per day.
+        type: object
+      utxos:
+        description: Utxos is a total number of utxos.
+        type: integer
+      utxosPerType:
+        additionalProperties: true
+        description: UtxosPerType are utxos grouped by type.
+        type: object
+      xpubs:
+        description: Xpubs is a total number of xpubs.
+        type: integer
     type: object
   response.Contact:
     properties:
@@ -2828,6 +2865,61 @@ paths:
       summary: Update contact FullName or Metadata
       tags:
       - Admin
+  /api/v1/admin/contacts/{paymail}:
+    post:
+      description: Create contact
+      parameters:
+      - description: Contact paymail
+        in: path
+        name: paymail
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Changed contact
+          schema:
+            $ref: '#/definitions/response.Contact'
+        "400":
+          description: Bad request - Error while getting paymail from path
+        "404":
+          description: Not found - Error while getting contact requester by paymail
+        "409":
+          description: Contact already exists -  Unable to add duplicate contact
+        "500":
+          description: Internal server error - Error while adding new contact
+      security:
+      - x-auth-xpub: []
+      summary: Create contact
+      tags:
+      - Admin
+  /api/v1/admin/contacts/confirmations:
+    post:
+      description: Marks the contact entries as mutually confirmed, after ensuring
+        the validity of the contact information for both parties.
+      parameters:
+      - description: Contacts data
+        in: body
+        name: models.AdminConfirmContactPair
+        required: true
+        schema:
+          $ref: '#/definitions/models.AdminConfirmContactPair'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad request - Error while getting data from request body
+        "404":
+          description: Not found - Error, contacts not found
+        "500":
+          description: Internal server error - Error, confirming contact failed
+      security:
+      - x-auth-xpub: []
+      summary: Confirm contacts pair
+      tags:
+      - Admin
   /api/v1/admin/invitations/{id}:
     delete:
       description: Reject contact
@@ -2956,6 +3048,38 @@ paths:
       security:
       - x-auth-xpub: []
       summary: Get paymail
+      tags:
+      - Admin
+  /api/v1/admin/stats:
+    get:
+      description: Get statistics of the spv-wallet
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Stats for the admin
+          schema:
+            $ref: '#/definitions/response.AdminStats'
+        "500":
+          description: Internal Server Error - Error while fetching admin stats
+      security:
+      - x-auth-xpub: []
+      summary: Get stats
+      tags:
+      - Admin
+  /api/v1/admin/status:
+    get:
+      description: Get status
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Status response
+          schema:
+            type: boolean
+      security:
+      - x-auth-xpub: []
+      summary: Get status
       tags:
       - Admin
   /api/v1/admin/transactions:
@@ -4630,7 +4754,9 @@ paths:
       - Admin
   /v1/admin/stats:
     get:
-      description: Get stats
+      deprecated: true
+      description: This endpoint has been deprecated. Use (GET) /api/v1/admin/stats
+        instead.
       produces:
       - application/json
       responses:
@@ -4642,12 +4768,14 @@ paths:
           description: Internal Server Error - Error while fetching admin stats
       security:
       - x-auth-xpub: []
-      summary: Get stats
+      summary: Get stats Use (GET) /api/v1/admin/stats instead.
       tags:
       - Admin
   /v1/admin/status:
     get:
-      description: Get status
+      deprecated: true
+      description: This endpoint has been deprecated. Use (GET) /api/v1/admin/status
+        instead.
       produces:
       - application/json
       responses:
@@ -4657,7 +4785,7 @@ paths:
             type: boolean
       security:
       - x-auth-xpub: []
-      summary: Get status
+      summary: Get status Use (GET) /api/v1/admin/status instead.
       tags:
       - Admin
   /v1/admin/transactions:

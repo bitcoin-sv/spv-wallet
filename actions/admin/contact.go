@@ -8,6 +8,7 @@ import (
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/bitcoin-sv/spv-wallet/internal/query"
 	"github.com/bitcoin-sv/spv-wallet/mappings"
+	"github.com/bitcoin-sv/spv-wallet/models"
 	"github.com/bitcoin-sv/spv-wallet/models/filter"
 	"github.com/bitcoin-sv/spv-wallet/models/response"
 	"github.com/bitcoin-sv/spv-wallet/server/reqctx"
@@ -209,4 +210,77 @@ func contactsAccept(c *gin.Context, _ *reqctx.AdminContext) {
 	contract := mappings.MapToContactContract(contact)
 
 	c.JSON(http.StatusOK, contract)
+}
+
+// contactsCreate will perform create contact action for the given paymail
+// @Summary		Create contact
+// @Description Create contact
+// @Tags		Admin
+// @Produce		json
+// @Param		paymail path string false "Contact paymail"
+// @Success		200 {object} response.Contact "Changed contact"
+// @Failure		400	"Bad request - Error while getting paymail from path"
+// @Failure		404	"Not found - Error while getting contact requester by paymail"
+// @Failure		409	"Contact already exists -  Unable to add duplicate contact"
+// @Failure 	500	"Internal server error - Error while adding new contact"
+// @Router		/api/v1/admin/contacts/{paymail} [post]
+// @Security	x-auth-xpub
+func contactsCreate(c *gin.Context, _ *reqctx.AdminContext) {
+	logger := reqctx.Logger(c)
+	contactPaymail := c.Param("paymail")
+	if contactPaymail == "" {
+		spverrors.ErrorResponse(c, spverrors.ErrMissingContactPaymailParam, logger)
+		return
+	}
+
+	var req *CreateContact
+	if err := c.Bind(&req); err != nil {
+		spverrors.ErrorResponse(c, spverrors.ErrCannotBindRequest.WithTrace(err), logger)
+		return
+	}
+
+	metadata := mappings.MapToMetadata(req.Metadata)
+	contact, err := reqctx.Engine(c).AdminCreateContact(c, contactPaymail, req.CreatorPaymail, req.FullName, metadata)
+	if err != nil {
+		spverrors.ErrorResponse(c, err, logger)
+		return
+	}
+
+	contract := mappings.MapToContactContract(contact)
+	c.JSON(http.StatusOK, contract)
+}
+
+// contactsConfirm will perform Confirm action on contacts with the given xpub ids and paymails
+// Perform confirm action on contacts godoc
+// @Summary		Confirm contacts pair
+// @Description Marks the contact entries as mutually confirmed, after ensuring the validity of the contact information for both parties.
+// @Tags		Admin
+// @Produce		json
+// @Param		models.AdminConfirmContactPair body models.AdminConfirmContactPair true "Contacts data"
+// @Success		200
+// @Failure		400	"Bad request - Error while getting data from request body"
+// @Failure		404	"Not found - Error, contacts not found"
+// @Failure 	500	"Internal server error - Error, confirming contact failed"
+// @Router		/api/v1/admin/contacts/confirmations [post]
+// @Security	x-auth-xpub
+func contactsConfirm(c *gin.Context, _ *reqctx.AdminContext) {
+	logger := reqctx.Logger(c)
+
+	var reqParams *models.AdminConfirmContactPair
+	if err := c.Bind(&reqParams); err != nil {
+		spverrors.ErrorResponse(c, spverrors.ErrCannotBindRequest.WithTrace(err), logger)
+		return
+	}
+
+	err := reqctx.Engine(c).AdminConfirmContacts(
+		c.Request.Context(),
+		reqParams.PaymailA,
+		reqParams.PaymailB,
+	)
+	if err != nil {
+		spverrors.ErrorResponse(c, err, reqctx.Logger(c))
+		return
+	}
+
+	c.Status(http.StatusOK)
 }

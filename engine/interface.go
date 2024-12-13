@@ -68,6 +68,8 @@ type ContactService interface {
 	AddContactRequest(ctx context.Context, fullName, paymailAdress, requesterXPubID string, opts ...ModelOps) (*Contact, error)
 
 	AdminChangeContactStatus(ctx context.Context, id string, status ContactStatus) (*Contact, error)
+	AdminCreateContact(ctx context.Context, contactPaymail, creatorPaymail, fullName string, metadata *Metadata) (*Contact, error)
+	AdminConfirmContacts(ctx context.Context, paymailA string, paymailB string) error
 	UpdateContact(ctx context.Context, id, fullName string, metadata *Metadata) (*Contact, error)
 	DeleteContactByID(ctx context.Context, id string) error
 
