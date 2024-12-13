@@ -14,15 +14,15 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-// contactsSearch will fetch a list of contacts filtered by Metadata and ContactFilters
-// Search for contacts filtering by metadata and ContactFilters godoc
+// contactsSearch will fetch a list of contacts filtered by Metadata and AdminContactFilters
+// Search for contacts filtering by metadata and AdminContactFilters godoc
 // @Summary		Search for contacts
 // @Description	Search for contacts
 // @Tags		Admin
 // @Produce		json
-// @Param		SearchContacts body filter.SearchContacts false "Supports targeted resource searches with filters and metadata, plus options for pagination and sorting to streamline data exploration and analysis"
+// @Param		AdminSearchContacts body filter.AdminContactFilter false "Supports targeted resource searches with filters and metadata, plus options for pagination and sorting to streamline data exploration and analysis"
 // @Success		200 {object} response.PageModel[response.Contact] "List of contacts"
-// @Failure		400	"Bad request - Error while parsing SearchContacts from request body"
+// @Failure		400	"Bad request - Error while parsing AdminSearchContacts from request body"
 // @Failure 	500	"Internal server error - Error while searching for contacts"
 // @Router		/api/v1/admin/contacts [get]
 // @Security	x-auth-xpub
@@ -30,7 +30,7 @@ func contactsSearch(c *gin.Context, _ *reqctx.AdminContext) {
 	logger := reqctx.Logger(c)
 	engine := reqctx.Engine(c)
 
-	searchParams, err := query.ParseSearchParams[filter.ContactFilter](c)
+	searchParams, err := query.ParseSearchParams[filter.AdminContactFilter](c)
 	if err != nil {
 		spverrors.ErrorResponse(c, spverrors.ErrCannotParseQueryParams.WithTrace(err), logger)
 		return

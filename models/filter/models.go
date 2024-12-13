@@ -9,6 +9,9 @@ type CountDestinations = ConditionsModel[DestinationFilter]
 // SearchContacts is a model for handling searching with filters and metadata
 type SearchContacts = SearchModel[ContactFilter]
 
+// AdminSearchContacts is a model for handling searching with filters and metadata
+type AdminSearchContacts = SearchModel[AdminContactFilter]
+
 // AdminSearchPaymails is a model for handling searching with filters and metadata
 type AdminSearchPaymails = SearchModel[AdminPaymailFilter]
 
