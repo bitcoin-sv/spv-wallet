@@ -18,7 +18,7 @@ type SearchModel[TFilter any] struct {
 
 // DefaultsIfNil fills empty but necessary fields with default values
 func (sm *SearchModel[TFilter]) DefaultsIfNil() {
-	if sm.QueryParams == nil {
+	if sm.QueryParams == nil || *sm.QueryParams == (QueryParams{}) {
 		sm.QueryParams = DefaultQueryParams()
 	}
 }
