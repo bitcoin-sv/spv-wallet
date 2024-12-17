@@ -41,7 +41,7 @@ func contactsSearchOld(c *gin.Context, _ *reqctx.AdminContext) {
 		return
 	}
 
-	reqParams.DefaultsIfNil()
+	reqParams.DefaultsIfNilOrEmpty()
 
 	contacts, err := engine.GetContacts(
 		c.Request.Context(),
