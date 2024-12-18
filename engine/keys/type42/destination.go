@@ -15,7 +15,7 @@ func Destination(pubKey *primitives.PublicKey, referenceID string) (*primitives.
 	}
 	derivedPubByRef, err := derive(pubKey, fmt.Sprintf("1-destination-%s", referenceID))
 	if err != nil {
-		return nil, ErrDeriveKey.Wrap(err)
+		return nil, err
 	}
 	return derivedPubByRef, nil
 }
