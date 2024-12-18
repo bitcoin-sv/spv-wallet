@@ -69,10 +69,10 @@
                 "parameters": [
                     {
                         "description": "Supports targeted resource searches with filters and metadata, plus options for pagination and sorting to streamline data exploration and analysis",
-                        "name": "SearchContacts",
+                        "name": "AdminSearchContacts",
                         "in": "body",
                         "schema": {
-                            "$ref": "#/definitions/filter.SearchContacts"
+                            "$ref": "#/definitions/filter.AdminContactFilter"
                         }
                     }
                 ],
@@ -84,7 +84,7 @@
                         }
                     },
                     "400": {
-                        "description": "Bad request - Error while parsing SearchContacts from request body"
+                        "description": "Bad request - Error while parsing AdminSearchContacts from request body"
                     },
                     "500": {
                         "description": "Internal server error - Error while searching for contacts"
@@ -2596,10 +2596,10 @@
                 "parameters": [
                     {
                         "description": "Supports targeted resource searches with filters and metadata, plus options for pagination and sorting to streamline data exploration and analysis",
-                        "name": "SearchContacts",
+                        "name": "AdminSearchContacts",
                         "in": "body",
                         "schema": {
-                            "$ref": "#/definitions/filter.SearchContacts"
+                            "$ref": "#/definitions/filter.AdminSearchContacts"
                         }
                     }
                 ],
@@ -4855,6 +4855,62 @@
                 }
             }
         },
+        "filter.AdminContactFilter": {
+            "type": "object",
+            "properties": {
+                "createdRange": {
+                    "description": "CreatedRange specifies the time range when a record was created.",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/filter.TimeRange"
+                        }
+                    ]
+                },
+                "fullName": {
+                    "type": "string",
+                    "example": "Alice"
+                },
+                "id": {
+                    "type": "string",
+                    "example": "ffdbe74e-0700-4710-aac5-611a1f877c7f"
+                },
+                "includeDeleted": {
+                    "description": "IncludeDeleted is a flag whether or not to include deleted items in the search results",
+                    "type": "boolean",
+                    "default": false,
+                    "example": true
+                },
+                "paymail": {
+                    "type": "string",
+                    "example": "alice@example.com"
+                },
+                "pubKey": {
+                    "type": "string",
+                    "example": "0334f01ecb971e93db179e6fb320cd1466beb0c1ec6c1c6a37aa6cb02e53d5dd1a"
+                },
+                "status": {
+                    "type": "string",
+                    "enum": [
+                        "unconfirmed",
+                        "awaiting",
+                        "confirmed",
+                        "rejected"
+                    ]
+                },
+                "updatedRange": {
+                    "description": "UpdatedRange specifies the time range when a record was updated.",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/filter.TimeRange"
+                        }
+                    ]
+                },
+                "xpubId": {
+                    "type": "string",
+                    "example": "623bc25ce1c0fc510dea72b5ee27b2e70384c099f1f3dce9e73dd987198c3486"
+                }
+            }
+        },
         "filter.AdminCountAccessKeys": {
             "type": "object",
             "properties": {
@@ -4982,6 +5038,43 @@
                     "allOf": [
                         {
                             "$ref": "#/definitions/filter.AdminAccessKeyFilter"
+                        }
+                    ]
+                },
+                "metadata": {
+                    "description": "Accepts a JSON object for embedding custom metadata, enabling arbitrary additional information to be associated with the resource",
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "string"
+                    },
+                    "example": {
+                        "key": "value",
+                        "key2": "value2"
+                    }
+                },
+                "params": {
+                    "description": "Pagination and sorting options to streamline data exploration and analysis",
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "string"
+                    },
+                    "example": {
+                        "order_by_direction": "desc",
+                        "order_by_field": "created_at",
+                        "page": "1",
+                        "page_size": "10"
+                    }
+                }
+            }
+        },
+        "filter.AdminSearchContacts": {
+            "type": "object",
+            "properties": {
+                "conditions": {
+                    "description": "Custom conditions used for filtering the search results. Every field within the object is optional.",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/filter.AdminContactFilter"
                         }
                     ]
                 },
