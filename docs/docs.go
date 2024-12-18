@@ -4914,7 +4914,7 @@ const docTemplate = `{
                         }
                     ]
                 },
-                "xpubid": {
+                "xpubId": {
                     "type": "string",
                     "example": "623bc25ce1c0fc510dea72b5ee27b2e70384c099f1f3dce9e73dd987198c3486"
                 }
