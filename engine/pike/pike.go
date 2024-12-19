@@ -19,9 +19,9 @@ import (
 
 	ec "github.com/bitcoin-sv/go-sdk/primitives/ec"
 	"github.com/bitcoin-sv/go-sdk/script"
+	"github.com/bitcoin-sv/spv-wallet/engine/keys/type84"
 	"github.com/bitcoin-sv/spv-wallet/engine/script/template"
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
-	"github.com/bitcoin-sv/spv-wallet/engine/types/type42"
 )
 
 // GenerateOutputsTemplate creates a Pike output template
@@ -43,7 +43,7 @@ func GenerateLockingScriptsFromTemplates(outputsTemplate []*template.OutputTempl
 			return nil, spverrors.Wrapf(err, "error creating script from hex string")
 		}
 
-		dPK, err := type42.DeriveLinkedKey(senderPubKey, receiverPubKey, fmt.Sprintf("%s-%d", reference, idx))
+		dPK, err := type84.DeriveLinkedKey(senderPubKey, receiverPubKey, fmt.Sprintf("%s-%d", reference, idx))
 		if err != nil {
 			return nil, spverrors.Wrapf(err, "error deriving linked key")
 		}

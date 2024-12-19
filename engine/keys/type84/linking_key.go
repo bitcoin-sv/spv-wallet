@@ -1,4 +1,4 @@
-package type42
+package type84
 
 import (
 	"crypto/hmac"
