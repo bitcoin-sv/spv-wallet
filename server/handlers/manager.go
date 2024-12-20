@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"github.com/bitcoin-sv/spv-wallet/config"
 	"github.com/bitcoin-sv/spv-wallet/server/middleware"
 	"github.com/gin-gonic/gin"
 )
@@ -27,21 +28,22 @@ const (
 
 // Manager is a struct helps to group routes with proper middleware
 type Manager struct {
-	engine *gin.Engine
-	groups map[GroupType]*gin.RouterGroup
+	engine    *gin.Engine
+	appConfig *config.AppConfig
+	groups    map[GroupType]*gin.RouterGroup
 }
 
 // NewManager creates a new Grouper
-func NewManager(engine *gin.Engine, apiVersion string) *Manager {
-	prefix := "/" + apiVersion
+func NewManager(engine *gin.Engine, appConfig *config.AppConfig) *Manager {
 	authRouter := engine.Group("", middleware.AuthMiddleware(), middleware.CheckSignatureMiddleware())
 
 	return &Manager{
-		engine: engine,
+		engine:    engine,
+		appConfig: appConfig,
 		groups: map[GroupType]*gin.RouterGroup{
 			GroupRoot:                engine.Group(""),
-			GroupOldAPI:              authRouter.Group(prefix),
-			GroupAPI:                 authRouter.Group("/api" + prefix),
+			GroupOldAPI:              authRouter.Group("/" + config.APIVersion),
+			GroupAPI:                 authRouter.Group("/api" + "/" + config.APIVersion),
 			GroupAPIV2:               authRouter.Group("/api/v2"),
 			GroupTransactionCallback: engine.Group("", middleware.CallbackTokenMiddleware()),
 		},
@@ -56,4 +58,9 @@ func (mg *Manager) Group(endpointType GroupType, relativePath string, middleware
 // Get returns the group with the given endpointType
 func (mg *Manager) Get(endpointType GroupType) *gin.RouterGroup {
 	return mg.groups[endpointType]
+}
+
+// GetFeatureFlags returns the experimental feature flags from app configuration
+func (mg *Manager) GetFeatureFlags() *config.ExperimentalConfig {
+	return mg.appConfig.ExperimentalFeatures
 }

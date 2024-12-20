@@ -3,14 +3,14 @@ package engine
 import (
 	"context"
 
-	"github.com/bitcoin-sv/go-paymail"
-	"github.com/bitcoin-sv/go-paymail/server"
+	paymailclient "github.com/bitcoin-sv/go-paymail"
+	paymailserver "github.com/bitcoin-sv/go-paymail/server"
 	"github.com/bitcoin-sv/spv-wallet/engine/chain"
 	"github.com/bitcoin-sv/spv-wallet/engine/cluster"
 	"github.com/bitcoin-sv/spv-wallet/engine/database/dao"
 	"github.com/bitcoin-sv/spv-wallet/engine/datastore"
 	"github.com/bitcoin-sv/spv-wallet/engine/notifications"
-	paymailclient "github.com/bitcoin-sv/spv-wallet/engine/paymail"
+	"github.com/bitcoin-sv/spv-wallet/engine/paymail"
 	"github.com/bitcoin-sv/spv-wallet/engine/paymailaddress"
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/bitcoin-sv/spv-wallet/engine/taskmanager"
@@ -148,7 +148,7 @@ func (c *Client) loadPaymailComponents() (err error) {
 
 	// Only load if it's not set (the client can be overloaded)
 	if c.options.paymail.client == nil {
-		c.options.paymail.client, err = paymail.NewClient()
+		c.options.paymail.client, err = paymailclient.NewClient()
 		if err != nil {
 			return
 		}
@@ -157,7 +157,7 @@ func (c *Client) loadPaymailComponents() (err error) {
 
 	if c.options.paymail.service == nil {
 		logger := c.Logger().With().Str("subservice", "paymail").Logger()
-		c.options.paymail.service = paymailclient.NewServiceClient(c.Cachestore(), c.options.paymail.client, logger)
+		c.options.paymail.service = paymail.NewServiceClient(c.Cachestore(), c.options.paymail.client, logger)
 	}
 	return
 }
@@ -251,8 +251,8 @@ func (c *Client) registerCronJobs() error {
 	return spverrors.Wrapf(err, "failed to init cron jobs")
 }
 
-// loadDefaultPaymailConfig will load the default paymail server configuration
-func (c *Client) loadDefaultPaymailConfig() (err error) {
+// loadPaymailServer will load the default paymail server configuration
+func (c *Client) loadPaymailServer() (err error) {
 	// Default FROM paymail
 	if len(c.options.paymail.serverConfig.DefaultFromPaymail) == 0 {
 		c.options.paymail.serverConfig.DefaultFromPaymail = defaultSenderPaymail
@@ -261,22 +261,29 @@ func (c *Client) loadDefaultPaymailConfig() (err error) {
 	// Set default options if none are found
 	if len(c.options.paymail.serverConfig.options) == 0 {
 		c.options.paymail.serverConfig.options = append(c.options.paymail.serverConfig.options,
-			server.WithP2PCapabilities(),
-			server.WithDomainValidationDisabled(),
+			paymailserver.WithP2PCapabilities(),
+			paymailserver.WithDomainValidationDisabled(),
 		)
 	}
 
 	paymailLogger := c.Logger().With().Str("subservice", "go-paymail").Logger()
-	c.options.paymail.serverConfig.options = append(c.options.paymail.serverConfig.options, server.WithLogger(&paymailLogger))
+	c.options.paymail.serverConfig.options = append(c.options.paymail.serverConfig.options, paymailserver.WithLogger(&paymailLogger))
 
 	// Create the paymail configuration using the client and default service provider
-	paymailLocator := &server.PaymailServiceLocator{}
-	paymailService := &PaymailDefaultServiceProvider{client: c}
-	paymailLocator.RegisterPaymailService(paymailService)
+	paymailLocator := &paymailserver.PaymailServiceLocator{}
+
+	var serviceProvider paymailserver.PaymailServiceProvider
+	if c.options.paymail.serverConfig.ExperimentalProvider {
+		serviceProvider = paymail.NewServiceProvider()
+	} else {
+		serviceProvider = &PaymailDefaultServiceProvider{client: c}
+	}
+
+	paymailLocator.RegisterPaymailService(serviceProvider)
 	paymailLocator.RegisterPikeContactService(&PikeContactServiceProvider{client: c})
 	paymailLocator.RegisterPikePaymentService(&PikePaymentServiceProvider{client: c})
 
-	c.options.paymail.serverConfig.Configuration, err = server.NewConfig(
+	c.options.paymail.serverConfig.Configuration, err = paymailserver.NewConfig(
 		paymailLocator,
 		c.options.paymail.serverConfig.options...,
 	)

@@ -105,8 +105,8 @@ func (s *Server) Handlers() *gin.Engine {
 }
 
 func setupServerRoutes(appConfig *config.AppConfig, spvWalletEngine engine.ClientInterface, ginEngine *gin.Engine) {
-	handlersManager := handlers.NewManager(ginEngine, config.APIVersion)
-	actions.Register(appConfig, handlersManager)
+	handlersManager := handlers.NewManager(ginEngine, appConfig)
+	actions.Register(handlersManager)
 
 	spvWalletEngine.GetPaymailConfig().RegisterRoutes(ginEngine)
 

@@ -94,6 +94,7 @@ type (
 		*server.Configuration                    // Server configuration if Paymail is enabled
 		options               []server.ConfigOps // Options for the paymail server
 		DefaultFromPaymail    string             // IE: from@domain.com
+		ExperimentalProvider  bool
 	}
 
 	// taskManagerOptions holds the configuration for taskmanager
@@ -175,11 +176,8 @@ func NewClient(ctx context.Context, opts ...ClientOps) (ClientInterface, error) 
 		return nil, err
 	}
 
-	// Default paymail server config (generic capabilities and domain check disabled)
-	if client.options.paymail.serverConfig.Configuration == nil {
-		if err = client.loadDefaultPaymailConfig(); err != nil {
-			return nil, err
-		}
+	if err = client.loadPaymailServer(); err != nil {
+		return nil, err
 	}
 
 	if client.options.feeUnit == nil {
