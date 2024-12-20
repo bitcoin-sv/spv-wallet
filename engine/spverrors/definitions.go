@@ -386,6 +386,9 @@ var ErrMissingAddress = models.SPVError{Message: "missing required field: addres
 // ErrMissingFieldScriptPubKey is when the field is required but missing
 var ErrMissingFieldScriptPubKey = models.SPVError{Message: "missing required field: script_pub_key", StatusCode: 400, Code: "error-missing-field-script-pub-key"}
 
+// ErrInvalidDomain is when the domain is wrong
+var ErrInvalidDomain = models.SPVError{Message: "invalid domain", StatusCode: 400, Code: "error-invalid-domain"}
+
 // ErrMissingFieldSatoshis is when the field satoshis is required but missing
 var ErrMissingFieldSatoshis = models.SPVError{Message: "missing required field: satoshis", StatusCode: 400, Code: "error-missing-field-satoshis"}
 

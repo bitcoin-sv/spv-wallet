@@ -3,6 +3,7 @@ package admin
 import (
 	"net/http"
 
+	"github.com/bitcoin-sv/go-paymail"
 	"github.com/bitcoin-sv/spv-wallet/actions/common"
 	"github.com/bitcoin-sv/spv-wallet/engine"
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
@@ -130,6 +131,15 @@ func paymailCreateAddress(c *gin.Context, _ *reqctx.AdminContext) {
 		opts = append(opts, engine.WithMetadatas(requestBody.Metadata))
 	}
 
+	config := reqctx.AppConfig(c)
+	if config.Paymail.DomainValidationEnabled {
+		_, actualDomain, _ := paymail.SanitizePaymail(requestBody.Address)
+		if !checkPaymailDomain(actualDomain, config.Paymail.Domains) {
+			spverrors.ErrorResponse(c, spverrors.ErrInvalidDomain, logger)
+			return
+		}
+	}
+
 	var paymailAddress *engine.PaymailAddress
 	paymailAddress, err := reqctx.Engine(c).NewPaymailAddress(
 		c.Request.Context(), requestBody.Key, requestBody.Address, requestBody.PublicName, requestBody.Avatar, opts...)
@@ -141,6 +151,15 @@ func paymailCreateAddress(c *gin.Context, _ *reqctx.AdminContext) {
 	paymailAddressContract := mappings.MapToPaymailContract(paymailAddress)
 
 	c.JSON(http.StatusCreated, paymailAddressContract)
+}
+
+func checkPaymailDomain(domain string, domains []string) bool {
+	for _, d := range domains {
+		if d == domain {
+			return true
+		}
+	}
+	return false
 }
 
 // paymailDeleteAddress will delete a paymail address
