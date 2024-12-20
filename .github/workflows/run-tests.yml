@@ -3,6 +3,7 @@ name: run-go-tests
 
 env:
   GO111MODULE: on
+  LINT_VERSION: 'latest'
 
 on:
   pull_request:
@@ -32,57 +33,55 @@ jobs:
       - name: Install Go from go.mod
         uses: actions/setup-go@v5
         with:
-          go-version-file: go.mod
+          go-version-file: 'go.mod'
       - name: Write go list
         run: go list -json -m all > go.list
       - name: Ask Nancy
         uses: sonatype-nexus-community/nancy-github-action@v1.0.3
         continue-on-error: true
   error-lint:
-    name: error-lint
+    name: Lint for errors
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-go@v5
         with:
-          go-version: '1.21'
-          cache: false
+          go-version-file: 'go.mod'
       - name: golangci-lint
         uses: golangci/golangci-lint-action@v6
         with:
-          version: v1.61.0
+          version: ${{ env.LINT_VERSION }}
           args: --config=./.golangci-lint.yml
   style-lint:
-    name: style-lint
+    name: Lint for style lint errors
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-go@v5
         with:
-          go-version: '1.21'
-          cache: false
+          go-version-file: 'go.mod'
       - name: golangci-style-lint
         uses: golangci/golangci-lint-action@v6
         with:
-          version: v1.61.0
+          version: ${{ env.LINT_VERSION }}
           args: --config=./.golangci-style.yml
   test:
-    needs: [yamllint, asknancy]
-    strategy:
-      matrix:
-        os: [ubuntu-latest]
-    runs-on: ${{ matrix.os }}
+    name: Test
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-      - name: Install Go ${{ matrix.go-version }}
+
+      - name: Install Go
         uses: actions/setup-go@v5
         with:
           go-version-file: go.mod
+
       - name: Start Redis
         uses: supercharge/redis-github-action@1.8.0
         with:
           redis-version: 6
+
       - name: Cache code
         uses: actions/cache@v4
         with:
@@ -94,10 +93,13 @@ jobs:
           key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
           restore-keys: |
             ${{ runner.os }}-go-
+
       - name: Set up gotestfmt
         uses: GoTestTools/gotestfmt-action@v2
+
       - name: Run tests
         run: make test-all-db-ci
+
       - name: Update code coverage
         uses: codecov/codecov-action@v5.1.1
         with:
@@ -105,3 +107,57 @@ jobs:
           flags: unittests
           fail_ci_if_error: false  # optional (default = false)
           verbose: true  # optional (default = false)
+
+  models-error-lint:
+    name: '[models] Lint for errors'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: 'go.mod'
+
+      - name: golangci-lint
+        uses: golangci/golangci-lint-action@v6
+        with:
+          version: ${{ env.LINT_VERSION }}
+          working-directory: './models'
+          args: --config=../.golangci-lint.yml
+
+  models-style-lint:
+    name: '[models] Lint for style lint errors'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: 'go.mod'
+      - name: golangci-style-lint
+        uses: golangci/golangci-lint-action@v6
+        with:
+          version: ${{ env.LINT_VERSION }}
+          working-directory: './models'
+          args: --config=../.golangci-style.yml
+
+  models-test:
+    runs-on: ubuntu-latest
+    name: '[models] Test'
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install Go ${{ matrix.go-version }}
+        uses: actions/setup-go@v5
+        with:
+          go-version-file: models/go.mod
+          cache-dependency-path: models/go.sum
+
+      - name: Set up gotestfmt
+        uses: GoTestTools/gotestfmt-action@v2
+
+      - name: Run tests
+        run: |
+          set -euo pipefail
+          go test -json -v ./... 2>&1 | tee gotest.log | gotestfmt
+        working-directory: models

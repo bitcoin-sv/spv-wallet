@@ -43,7 +43,7 @@ func search(c *gin.Context, userContext *reqctx.UserContext) {
 		return
 	}
 
-	reqParams.DefaultsIfNil()
+	reqParams.DefaultsIfNilOrEmpty()
 
 	contacts, err := engine.GetContactsByXpubID(
 		c.Request.Context(),
@@ -197,7 +197,7 @@ func searchContacts(c *gin.Context, reqXPubID string, paymail string) ([]*engine
 		return nil, 0
 	}
 
-	reqParams.DefaultsIfNil()
+	reqParams.DefaultsIfNilOrEmpty()
 
 	contacts, err := engine.GetContactsByXpubID(
 		c.Request.Context(),

@@ -13,14 +13,14 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-// contactsSearchOld will fetch a list of contacts filtered by Metadata and ContactFilters
-// Search for contacts filtering by metadata and ContactFilters godoc
+// contactsSearchOld will fetch a list of contacts filtered by Metadata and AdminContactFilters
+// Search for contacts filtering by metadata and AdminContactFilters godoc
 // @DeprecatedRouter /v1/admin/contact/search [post]
 // @Summary		Search for contacts
 // @Description	Search for contacts
 // @Tags		Admin
 // @Produce		json
-// @Param		SearchContacts body filter.SearchContacts false "Supports targeted resource searches with filters and metadata, plus options for pagination and sorting to streamline data exploration and analysis"
+// @Param		AdminSearchContacts body filter.AdminSearchContacts false "Supports targeted resource searches with filters and metadata, plus options for pagination and sorting to streamline data exploration and analysis"
 // @Success		200 {object} models.SearchContactsResponse "List of contacts"
 // @Failure		400	"Bad request - Error while parsing SearchContacts from request body"
 // @Failure 	500	"Internal server error - Error while searching for contacts"
@@ -29,7 +29,7 @@ import (
 func contactsSearchOld(c *gin.Context, _ *reqctx.AdminContext) {
 	logger := reqctx.Logger(c)
 	engine := reqctx.Engine(c)
-	var reqParams filter.SearchContacts
+	var reqParams filter.AdminSearchContacts
 	if err := c.Bind(&reqParams); err != nil {
 		spverrors.ErrorResponse(c, spverrors.ErrCannotBindRequest, logger)
 		return
@@ -41,7 +41,7 @@ func contactsSearchOld(c *gin.Context, _ *reqctx.AdminContext) {
 		return
 	}
 
-	reqParams.DefaultsIfNil()
+	reqParams.DefaultsIfNilOrEmpty()
 
 	contacts, err := engine.GetContacts(
 		c.Request.Context(),
