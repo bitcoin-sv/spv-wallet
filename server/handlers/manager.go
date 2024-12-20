@@ -60,6 +60,7 @@ func (mg *Manager) Get(endpointType GroupType) *gin.RouterGroup {
 	return mg.groups[endpointType]
 }
 
+// GetFeatureFlags returns the experimental feature flags from app configuration
 func (mg *Manager) GetFeatureFlags() *config.ExperimentalConfig {
 	return mg.appConfig.ExperimentalFeatures
 }

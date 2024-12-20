@@ -62,8 +62,7 @@ func defaultClientOptions() *clientOptions {
 		paymail: &paymailOptions{
 			client: nil,
 			serverConfig: &PaymailServerOptions{
-				Configuration: nil,
-				options:       []server.ConfigOps{},
+				options: []server.ConfigOps{},
 			},
 		},
 
@@ -346,6 +345,13 @@ func WithPaymailPikeContactSupport() ClientOps {
 func WithPaymailPikePaymentSupport() ClientOps {
 	return func(c *clientOptions) {
 		c.paymail.serverConfig.options = append(c.paymail.serverConfig.options, server.WithPikePaymentCapabilities())
+	}
+}
+
+// WithPaymailExperimentalNewTransactionFlow switches to the new transaction flow (experimental)
+func WithPaymailExperimentalNewTransactionFlow() ClientOps {
+	return func(c *clientOptions) {
+		c.paymail.serverConfig.ExperimentalProvider = true
 	}
 }
 
