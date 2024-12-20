@@ -1,12 +1,12 @@
 package transactions_test
 
 import (
-	testengine "github.com/bitcoin-sv/spv-wallet/engine/testabilities"
 	"testing"
 
 	"github.com/bitcoin-sv/spv-wallet/actions/testabilities"
 	"github.com/bitcoin-sv/spv-wallet/actions/testabilities/apierror"
 	chainmodels "github.com/bitcoin-sv/spv-wallet/engine/chain/models"
+	testengine "github.com/bitcoin-sv/spv-wallet/engine/testabilities"
 	"github.com/bitcoin-sv/spv-wallet/engine/tester/fixtures"
 )
 

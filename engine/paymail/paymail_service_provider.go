@@ -2,6 +2,7 @@ package paymail
 
 import (
 	"context"
+
 	"github.com/bitcoin-sv/go-paymail"
 	"github.com/bitcoin-sv/go-paymail/server"
 	"github.com/bitcoin-sv/go-paymail/spv"
