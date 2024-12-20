@@ -1,9 +1,9 @@
 github.com/bitcoin-sv/go-sdk v1.1.16 h1:n2X0RiENFGD/1fQ/1y6osbostRB7I/xq9I7tcIKcCPY=
 github.com/bitcoin-sv/go-sdk v1.1.16/go.mod h1:3CsNdEDBwB+SIv6UBcJPC9bTvPqxQvg3GULt7wsuL58=
-github.com/bitcoin-sv/spv-wallet v1.0.0-beta.37 h1:sVT6E3KgBGaDrS+rKgoISgjco4IMPM1sxTfYi/gIxwA=
-github.com/bitcoin-sv/spv-wallet v1.0.0-beta.37/go.mod h1:/ApF8hQYEXniSJ2wziyXhnyHxqTFecUxIyizbgzyCSs=
-github.com/bitcoin-sv/spv-wallet-go-client v1.0.0-beta.16 h1:PGlo27UEdJKq4vup9pyE6BtZ2YWS2En3SJhjBu0EiEs=
-github.com/bitcoin-sv/spv-wallet-go-client v1.0.0-beta.16/go.mod h1:E0G3YfQj6KDKs6CoMLbSxW2fMIqn5bMeOSi5G4BL4a0=
+github.com/bitcoin-sv/spv-wallet v1.0.0-beta.39 h1:W2I9P8QyEoTlxrhUKwpOW+RFu3O24XLbopiZrP1sHuo=
+github.com/bitcoin-sv/spv-wallet v1.0.0-beta.39/go.mod h1:8ZZ4Gm0owfpgTj8v7dhGvzspIW1b/aR/ySfXR6XkJcs=
+github.com/bitcoin-sv/spv-wallet-go-client v1.0.0-beta.18 h1:T+uMOybKMCmOgme8Rvm1grdVX+WiZornNL98C2hsGhs=
+github.com/bitcoin-sv/spv-wallet-go-client v1.0.0-beta.18/go.mod h1:5enqQHpwLp1yOvwbDr3kU4kF3fFW5hf5llZNkTvNhXU=
 github.com/bitcoin-sv/spv-wallet/models v1.0.0-beta.39 h1:qo74o72mcdj7AYJoCq7RG3enHJiqtbkFEY9uXvEEG2M=
 github.com/bitcoin-sv/spv-wallet/models v1.0.0-beta.39/go.mod h1:UdY5AGsO9IomUEYSPilcSY+3BTQRJswdfZNveLt6LZQ=
 github.com/boombuler/barcode v1.0.1-0.20190219062509-6c824513bacc/go.mod h1:paBWMcWSl3LHKBqUq+rly7CNSldXjb2rDl3JlRe0mD8=
@@ -99,8 +99,8 @@ github.com/ugorji/go/codec v1.2.12 h1:9LC83zGrHhuUA9l16C9AHXAqEV/2wBQ4nkvumAE65E
 github.com/ugorji/go/codec v1.2.12/go.mod h1:UNopzCgEMSXjBc6AOMqYvWC1ktqTAfzJZUZgYf6w6lg=
 golang.org/x/arch v0.12.0 h1:UsYJhbzPYGsT0HbEdmYcqtCv8UNGvnaL561NnIUvaKg=
 golang.org/x/arch v0.12.0/go.mod h1:FEVrYAQjsQXMVJ1nsMoVVXPZg6p2JE2mx8psSWTDQys=
-golang.org/x/crypto v0.30.0 h1:RwoQn3GkWiMkzlX562cLB7OxWvjH1L8xutO2WoJcRoY=
-golang.org/x/crypto v0.30.0/go.mod h1:kDsLvtWBEx7MV9tJOj9bnXsPbxwJQ6csT/x4KIN4Ssk=
+golang.org/x/crypto v0.31.0 h1:ihbySMvVjLAeSH1IbfcRTkD/iNscyz8rGzjF/E5hV6U=
+golang.org/x/crypto v0.31.0/go.mod h1:kDsLvtWBEx7MV9tJOj9bnXsPbxwJQ6csT/x4KIN4Ssk=
 golang.org/x/net v0.31.0 h1:68CPQngjLL0r2AlUKiSxtQFKvzRVbnzLwMUn5SzcLHo=
 golang.org/x/net v0.31.0/go.mod h1:P4fl1q7dY2hnZFxEk4pPSkDHF+QqjitcnDjUQyMM+pM=
 golang.org/x/sys v0.0.0-20220811171246-fbc7d0a398ab/go.mod h1:oPkhp1MJrh7nUepCBck5+mAzfO9JrbApNNgaTdGDITg=
