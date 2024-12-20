@@ -22,8 +22,6 @@ import (
 const inMemoryDbConnectionString = "file:spv-wallet-test.db?mode=memory"
 const fileDbConnectionString = "file:spv-wallet-test.db"
 
-type ConfigOpts func(*config.AppConfig)
-
 type EngineFixture interface {
 	Engine() (walletEngine EngineWithConfig, cleanup func())
 	EngineWithConfiguration(opts ...ConfigOpts) (walletEngine EngineWithConfig, cleanup func())

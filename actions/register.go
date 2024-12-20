@@ -12,12 +12,11 @@ import (
 	"github.com/bitcoin-sv/spv-wallet/actions/transactions"
 	"github.com/bitcoin-sv/spv-wallet/actions/users"
 	"github.com/bitcoin-sv/spv-wallet/actions/utxos"
-	"github.com/bitcoin-sv/spv-wallet/config"
 	"github.com/bitcoin-sv/spv-wallet/server/handlers"
 )
 
 // Register collects all the action's routes and registers them using the handlersManager
-func Register(appConfig *config.AppConfig, handlersManager *handlers.Manager) {
+func Register(handlersManager *handlers.Manager) {
 	admin.RegisterRoutes(handlersManager)
 	base.RegisterRoutes(handlersManager)
 	accesskeys.RegisterRoutes(handlersManager)
