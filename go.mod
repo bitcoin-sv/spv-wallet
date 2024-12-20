@@ -10,7 +10,7 @@ go 1.23.1
 replace github.com/bitcoin-sv/spv-wallet/models => ./models
 
 require (
-	github.com/99designs/gqlgen v0.17.58
+	github.com/99designs/gqlgen v0.17.60
 	github.com/aws/aws-sdk-go v1.55.5
 	github.com/bitcoin-sv/go-paymail v0.21.3
 	github.com/bitcoin-sv/go-sdk v1.1.16
@@ -29,7 +29,7 @@ require (
 	github.com/jarcoal/httpmock v1.3.1
 	github.com/mrz1836/go-cache v0.11.1
 	github.com/mrz1836/go-cachestore v0.5.1
-	github.com/mrz1836/go-logger v0.3.4
+	github.com/mrz1836/go-logger v0.3.5
 	github.com/mrz1836/go-sanitize v1.3.3
 	github.com/mrz1836/go-validate v0.2.1
 	github.com/pkg/errors v0.9.1
@@ -43,7 +43,7 @@ require (
 	github.com/vmihailenco/taskq/v3 v3.2.9
 	go.elastic.co/ecszerolog v0.2.0
 	gorm.io/driver/postgres v1.5.11
-	gorm.io/driver/sqlite v1.5.6
+	gorm.io/driver/sqlite v1.5.7
 	gorm.io/gorm v1.25.12
 	gorm.io/plugin/dbresolver v1.5.3
 )
