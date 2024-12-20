@@ -6,8 +6,8 @@ toolchain go1.23.3
 
 require (
 	github.com/bitcoin-sv/spv-wallet v1.0.0-beta.37
-	github.com/bitcoin-sv/spv-wallet-go-client v1.0.0-beta.16
-	github.com/bitcoin-sv/spv-wallet/models v1.0.0-beta.37
+	github.com/bitcoin-sv/spv-wallet-go-client v1.0.0-beta.18
+	github.com/bitcoin-sv/spv-wallet/models v1.0.0-beta.39
 	github.com/joho/godotenv v1.5.1
 )
 
