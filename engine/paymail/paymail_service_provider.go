@@ -3,6 +3,7 @@ package paymail
 import (
 	"context"
 	"fmt"
+
 	"github.com/bitcoin-sv/go-paymail"
 	"github.com/bitcoin-sv/go-paymail/server"
 	"github.com/bitcoin-sv/go-paymail/spv"
@@ -54,7 +55,7 @@ func (s *serviceProvider) GetPaymailByAlias(ctx context.Context, alias, domain s
 		Alias:  model.Alias,
 		Avatar: model.AvatarURL,
 		Domain: model.Domain,
-		ID:     fmt.Sprintf("%s", model.ID),
+		ID:     fmt.Sprintf("%d", model.ID),
 		Name:   model.PublicName,
 		PubKey: pki.ToDERHex(),
 	}, nil

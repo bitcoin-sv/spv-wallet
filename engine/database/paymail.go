@@ -2,6 +2,7 @@ package database
 
 import "gorm.io/gorm"
 
+// Paymail represents a paymail address
 type Paymail struct {
 	gorm.Model
 

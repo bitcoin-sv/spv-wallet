@@ -4,11 +4,11 @@ package server
 import (
 	"context"
 	"crypto/tls"
-	"github.com/bitcoin-sv/spv-wallet/actions/paymailserver"
 	"net/http"
 	"strconv"
 
 	"github.com/bitcoin-sv/spv-wallet/actions"
+	"github.com/bitcoin-sv/spv-wallet/actions/paymailserver"
 	"github.com/bitcoin-sv/spv-wallet/config"
 	"github.com/bitcoin-sv/spv-wallet/engine"
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"

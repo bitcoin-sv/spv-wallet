@@ -3,8 +3,9 @@ package jsonrequire
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/stretchr/testify/require"
 	"testing"
+
+	"github.com/stretchr/testify/require"
 )
 
 // Getter allows to get values from the JSON data.

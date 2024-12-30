@@ -2,6 +2,7 @@ package dao
 
 import (
 	"errors"
+
 	"github.com/bitcoin-sv/spv-wallet/engine/database"
 	"gorm.io/gorm"
 )

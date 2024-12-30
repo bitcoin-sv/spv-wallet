@@ -2,6 +2,7 @@ package type42
 
 import (
 	"fmt"
+
 	primitives "github.com/bitcoin-sv/go-sdk/primitives/ec"
 )
 

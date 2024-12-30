@@ -2,12 +2,14 @@ package database
 
 import (
 	"fmt"
+	"time"
+
 	primitives "github.com/bitcoin-sv/go-sdk/primitives/ec"
 	"github.com/bitcoin-sv/go-sdk/script"
 	"gorm.io/gorm"
-	"time"
 )
 
+// User represents a user in the database
 type User struct {
 	ID        string `gorm:"type:char(34);primaryKey"`
 	CreatedAt time.Time
@@ -18,6 +20,7 @@ type User struct {
 	Paymails []*Paymail `gorm:"foreignKey:UserID"`
 }
 
+// BeforeCreate is a gorm hook that is called before creating a new user
 func (u *User) BeforeCreate(_ *gorm.DB) (err error) {
 	if u.PubKey == "" {
 		return fmt.Errorf("PubKey is required")
@@ -38,10 +41,11 @@ func (u *User) BeforeCreate(_ *gorm.DB) (err error) {
 	return nil
 }
 
+// PubKeyObj returns the go-sdk primitives.PublicKey object from the user's PubKey string
 func (u *User) PubKeyObj() (*primitives.PublicKey, error) {
 	pub, err := primitives.PublicKeyFromString(u.PubKey)
 	if err != nil {
 		return nil, fmt.Errorf("invalid PubKey: %w", err)
 	}
-	return pub, err
+	return pub, nil
 }

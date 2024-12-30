@@ -2,12 +2,14 @@ package dao
 
 import (
 	"context"
+
 	"github.com/bitcoin-sv/spv-wallet/engine/database"
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"gorm.io/gorm"
 	"gorm.io/gorm/clause"
 )
 
+// Users is a data access object for users.
 type Users struct {
 	db *gorm.DB
 }
@@ -17,6 +19,7 @@ func NewUsersAccessObject(db *gorm.DB) *Users {
 	return &Users{db: db}
 }
 
+// SaveUser saves a user to the database.
 func (u *Users) SaveUser(ctx context.Context, userRow *database.User) error {
 	query := u.db.
 		WithContext(ctx).
