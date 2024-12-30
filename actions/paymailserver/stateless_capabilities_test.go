@@ -1,7 +1,9 @@
-package paymailtests
+package paymailserver_test
 
 import (
+	"encoding/json"
 	"fmt"
+	"github.com/stretchr/testify/assert"
 	"testing"
 
 	"github.com/bitcoin-sv/spv-wallet/actions/testabilities"
@@ -9,13 +11,13 @@ import (
 	"github.com/bitcoin-sv/spv-wallet/engine/tester/fixtures"
 )
 
-func TestPaymailFlow(t *testing.T) {
+func TestStatelessCapabilities(t *testing.T) {
 	//testmode.DevelopmentOnly_SetPostgresModeWithName(t, "spv-test")
 
 	givenForAllTests := testabilities.Given(t)
 	cleanup := givenForAllTests.StartedSPVWalletWithConfiguration(
 		testengine.WithDomainValidationDisabled(),
-		testengine.WithNewTransactionFlowEnabled(),
+		//testengine.WithNewTransactionFlowEnabled(),
 	)
 	defer cleanup()
 
@@ -83,7 +85,7 @@ func TestPaymailFlow(t *testing.T) {
 		then.Response(res).HasStatus(404)
 	})
 
-	t.Run("PKI", func(t *testing.T) {
+	t.Run("Get PKI and verify", func(t *testing.T) {
 		// given:
 		given, then := testabilities.NewOf(givenForAllTests, t)
 		client := given.HttpClient().ForAnonymous()
@@ -107,5 +109,44 @@ func TestPaymailFlow(t *testing.T) {
 		}`, map[string]any{
 			"paymail": address,
 		})
+
+		// given:
+		var pki struct {
+			PubKey string `json:"pubkey"`
+		}
+		err := json.Unmarshal(res.Body(), &pki)
+		assert.NoError(t, err)
+
+		// when:
+		res, _ = client.R().Get(
+			fmt.Sprintf(
+				"https://example.com/v1/bsvalias/verify-pubkey/%s/%s",
+				address,
+				pki.PubKey,
+			),
+		)
+
+		// then:
+		then.Response(res).IsOK().WithJSONMatching(`{
+			"bsvalias": "1.0",
+			"handle": "{{ .paymail }}",
+			"match": true,
+			"pubkey": "{{ .pki }}"
+		}`, map[string]any{
+			"paymail": address,
+			"pki":     pki.PubKey,
+		})
+	})
+
+	t.Run("PKI for not existing paymail", func(t *testing.T) {
+		// given:
+		given, then := testabilities.NewOf(givenForAllTests, t)
+		client := given.HttpClient().ForAnonymous()
+
+		// when:
+		res, _ := client.R().Get("https://example.com/v1/bsvalias/id/notexisting@example")
+
+		// then:
+		then.Response(res).HasStatus(404)
 	})
 }
