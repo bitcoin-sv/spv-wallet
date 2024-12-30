@@ -17,6 +17,10 @@ func TestIncomingPaymailTX(t *testing.T) {
 	)
 	defer cleanup()
 
+	var testState struct {
+		reference string
+	}
+
 	// given:
 	given, then := testabilities.NewOf(givenForAllTests, t)
 	client := given.HttpClient().ForAnonymous()
@@ -55,8 +59,10 @@ func TestIncomingPaymailTX(t *testing.T) {
 		}`, map[string]any{
 			"satoshis": requestBody.Satoshis,
 		})
-
 		// TODO: Question: Do we want to split satoshis into multiple outputs?
+
+		// update:
+		testState.reference = then.Response(res).JSONValue().GetString("reference")
 	})
 
 	t.Run("call receive-transaction", func(t *testing.T) {

@@ -1,9 +1,7 @@
 package paymailserver_test
 
 import (
-	"encoding/json"
 	"fmt"
-	"github.com/stretchr/testify/assert"
 	"testing"
 
 	"github.com/bitcoin-sv/spv-wallet/actions/testabilities"
@@ -111,18 +109,14 @@ func TestStatelessCapabilities(t *testing.T) {
 		})
 
 		// given:
-		var pki struct {
-			PubKey string `json:"pubkey"`
-		}
-		err := json.Unmarshal(res.Body(), &pki)
-		assert.NoError(t, err)
+		pki := then.Response(res).JSONValue().GetString("pubkey")
 
 		// when:
 		res, _ = client.R().Get(
 			fmt.Sprintf(
 				"https://example.com/v1/bsvalias/verify-pubkey/%s/%s",
 				address,
-				pki.PubKey,
+				pki,
 			),
 		)
 
@@ -134,7 +128,7 @@ func TestStatelessCapabilities(t *testing.T) {
 			"pubkey": "{{ .pki }}"
 		}`, map[string]any{
 			"paymail": address,
-			"pki":     pki.PubKey,
+			"pki":     pki,
 		})
 	})
 
