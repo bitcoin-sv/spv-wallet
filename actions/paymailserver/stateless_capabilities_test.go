@@ -17,7 +17,7 @@ func TestStatelessCapabilities(t *testing.T) {
 	givenForAllTests := testabilities.Given(t)
 	cleanup := givenForAllTests.StartedSPVWalletWithConfiguration(
 		testengine.WithDomainValidationDisabled(),
-		//testengine.WithNewTransactionFlowEnabled(),
+		testengine.WithNewTransactionFlowEnabled(),
 	)
 	defer cleanup()
 
@@ -145,6 +145,57 @@ func TestStatelessCapabilities(t *testing.T) {
 
 		// when:
 		res, _ := client.R().Get("https://example.com/v1/bsvalias/id/notexisting@example")
+
+		// then:
+		then.Response(res).HasStatus(404)
+	})
+
+	t.Run("PubKey verify on wrong key", func(t *testing.T) {
+		// given:
+		given, then := testabilities.NewOf(givenForAllTests, t)
+		client := given.HttpClient().ForAnonymous()
+
+		// and:
+		address := fixtures.Sender.Paymails[0]
+		wrongPKI := "02561fc133e140526f11438550de3e6cf0ae246a4a5bcd151230652b60124ea1d9"
+
+		// when:
+		res, _ := client.R().Get(
+			fmt.Sprintf(
+				"https://example.com/v1/bsvalias/verify-pubkey/%s/%s",
+				address,
+				wrongPKI,
+			),
+		)
+
+		// then:
+		then.Response(res).IsOK().WithJSONMatching(`{
+			"bsvalias": "1.0",
+			"handle": "{{ .paymail }}",
+			"match": false,
+			"pubkey": "{{ matchHexWithLength 66 }}"
+		}`, map[string]any{
+			"paymail": address,
+		})
+	})
+
+	t.Run("PubKey verify on not existing paymail", func(t *testing.T) {
+		// given:
+		given, then := testabilities.NewOf(givenForAllTests, t)
+		client := given.HttpClient().ForAnonymous()
+
+		// and:
+		notExistingPaymail := "notexisting@example.com"
+		wrongPKI := "02561fc133e140526f11438550de3e6cf0ae246a4a5bcd151230652b60124ea1d9"
+
+		// when:
+		res, _ := client.R().Get(
+			fmt.Sprintf(
+				"https://example.com/v1/bsvalias/verify-pubkey/%s/%s",
+				notExistingPaymail,
+				wrongPKI,
+			),
+		)
 
 		// then:
 		then.Response(res).HasStatus(404)
