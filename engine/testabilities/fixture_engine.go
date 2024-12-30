@@ -3,6 +3,9 @@ package testabilities
 import (
 	"context"
 	"errors"
+	"github.com/bitcoin-sv/go-paymail"
+	"github.com/bitcoin-sv/spv-wallet/engine/database"
+	"github.com/bitcoin-sv/spv-wallet/engine/database/dao"
 	"testing"
 
 	"github.com/bitcoin-sv/spv-wallet/config"
@@ -149,11 +152,31 @@ func (f *engineFixture) initialiseFixtures() {
 			require.NoError(f.t, err)
 		}
 
-		for _, paymail := range user.Paymails {
-			_, err := f.engine.NewPaymailAddress(context.Background(), user.XPub(), paymail, paymail, "", opts...)
+		for _, address := range user.Paymails {
+			_, err := f.engine.NewPaymailAddress(context.Background(), user.XPub(), address, address, "", opts...)
 			if !errors.Is(err, spverrors.ErrPaymailAlreadyExists) {
 				require.NoError(f.t, err)
 			}
+		}
+
+		if f.config.ExperimentalFeatures.NewTransactionFlowEnabled {
+			usersDAO := dao.NewUsersAccessObject(f.engine.Datastore().DB())
+			userEntity := &database.User{
+				PubKey: user.PublicKey().ToDERHex(),
+			}
+
+			for _, address := range user.Paymails {
+				alias, domain, _ := paymail.SanitizePaymail(address)
+				userEntity.Paymails = append(userEntity.Paymails, &database.Paymail{
+					Alias:      alias,
+					Domain:     domain,
+					PublicName: address,
+					AvatarURL:  "",
+				})
+			}
+
+			err = usersDAO.SaveUser(context.Background(), userEntity)
+			require.NoError(f.t, err)
 		}
 	}
 

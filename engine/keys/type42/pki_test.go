@@ -13,16 +13,40 @@ func TestPKI(t *testing.T) {
 		pubKey := makePubKey(t, "033014c226b8fe8260e21e75479a47a654e7b631b3bd13484d85c484f7791aa75b")
 
 		// when:
-		pki, err := PKI(pubKey)
+		pki, err := PaymailPKI(pubKey, "alice", "example.com")
 
 		// then:
 		assert.NoError(t, err)
-		assert.Equal(t, "02b9a822f2db22649e14eedf75ba140cf5dacc6b2690cfae9da55b551069461705", pki.ToDERHex())
+		assert.Equal(t, "03a5399ee8ffff501739cb8167164ae88dcac6d1ca07cb863691dde12ae54012b8", pki.ToDERHex())
 	})
 
 	t.Run("try to generate PKI on nil", func(t *testing.T) {
 		// when:
-		pki, err := PKI(nil)
+		pki, err := PaymailPKI(nil, "alice", "example.com")
+
+		// then:
+		assert.ErrorIs(t, err, ErrDeriveKey)
+		assert.Nil(t, pki)
+	})
+
+	t.Run("try to generate PKI on empty alias", func(t *testing.T) {
+		// given:
+		pubKey := makePubKey(t, "033014c226b8fe8260e21e75479a47a654e7b631b3bd13484d85c484f7791aa75b")
+
+		// when:
+		pki, err := PaymailPKI(pubKey, "", "example.com")
+
+		// then:
+		assert.ErrorIs(t, err, ErrDeriveKey)
+		assert.Nil(t, pki)
+	})
+
+	t.Run("try to generate PKI on empty domain", func(t *testing.T) {
+		// given:
+		pubKey := makePubKey(t, "033014c226b8fe8260e21e75479a47a654e7b631b3bd13484d85c484f7791aa75b")
+
+		// when:
+		pki, err := PaymailPKI(pubKey, "alice", "")
 
 		// then:
 		assert.ErrorIs(t, err, ErrDeriveKey)

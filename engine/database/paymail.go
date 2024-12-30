@@ -10,5 +10,6 @@ type Paymail struct {
 	PublicName string
 	AvatarURL  string
 
-	User *User `gorm:"foreignKey:ID"`
+	UserID string
+	User   *User `gorm:"foreignKey:UserID"`
 }

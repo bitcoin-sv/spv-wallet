@@ -1,12 +1,20 @@
 package type42
 
-import primitives "github.com/bitcoin-sv/go-sdk/primitives/ec"
+import (
+	"fmt"
+	primitives "github.com/bitcoin-sv/go-sdk/primitives/ec"
+)
 
-const pkiDerivationKey = "1-pki-0"
+const rotationSuffix = "0"
 
-// PKI (Public Key Infrastructure) derives a public key using a constant derivation key.
-func PKI(pubKey *primitives.PublicKey) (*primitives.PublicKey, error) {
-	derivedPubByRef, err := derive(pubKey, pkiDerivationKey)
+// PaymailPKI (Public Key Infrastructure) derives a public key using a constant derivation key for provided paymail.
+func PaymailPKI(pubKey *primitives.PublicKey, alias, domain string) (*primitives.PublicKey, error) {
+	if alias == "" || domain == "" {
+		return nil, ErrDeriveKey
+	}
+
+	derivationKey := fmt.Sprintf("1-paymail_pki-%s@%s_%s", alias, domain, rotationSuffix)
+	derivedPubByRef, err := derive(pubKey, derivationKey)
 	if err != nil {
 		return nil, ErrDeriveKey.Wrap(err)
 	}

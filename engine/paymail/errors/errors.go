@@ -16,3 +16,6 @@ var ErrPaymailDBFailed = models.SPVError{Message: "paymail database operation fa
 
 // ErrPaymailNotFound is when the paymail is not found.
 var ErrPaymailNotFound = models.SPVError{Message: "paymail not found", StatusCode: 404, Code: "error-paymail-not-found"}
+
+// ErrPaymailPKI is when the paymail PKI operation failed.
+var ErrPaymailPKI = models.SPVError{Message: "paymail PKI operation failed", StatusCode: 500, Code: "error-paymail-pki"}

@@ -1,35 +1,47 @@
 package database
 
 import (
-	bip32 "github.com/bitcoin-sv/go-sdk/compat/bip32"
+	"fmt"
 	primitives "github.com/bitcoin-sv/go-sdk/primitives/ec"
-	dberrors "github.com/bitcoin-sv/spv-wallet/engine/database/errors"
+	"github.com/bitcoin-sv/go-sdk/script"
+	"gorm.io/gorm"
 	"time"
 )
 
 type User struct {
-	ID        string `gorm:"primarykey"`
+	ID        string `gorm:"type:char(34);primaryKey"`
 	CreatedAt time.Time
 	UpdatedAt time.Time
 
-	Xpub string //TODO: change to Pub
+	PubKey string
+
+	Paymails []*Paymail `gorm:"foreignKey:UserID"`
 }
 
-// UserPub -> PKI ->
-
-func (u *User) GetHDPublicKey() (*bip32.ExtendedKey, error) {
-	hdPub, err := bip32.NewKeyFromString(u.Xpub)
-	if err != nil {
-		return nil, dberrors.ErrConvertTOHDPubKey.Wrap(err)
+func (u *User) BeforeCreate(_ *gorm.DB) (err error) {
+	if u.PubKey == "" {
+		return fmt.Errorf("PubKey is required")
 	}
-	return hdPub, nil
+
+	pubKey, err := u.PubKeyObj()
+	if err != nil {
+		return err
+	}
+
+	addr, err := script.NewAddressFromPublicKey(pubKey, true)
+	if err != nil {
+		return fmt.Errorf("failed to create address from public key: %w", err)
+	}
+
+	u.ID = addr.AddressString
+
+	return nil
 }
 
-func (u *User) GetPublicKey() (*primitives.PublicKey, error) {
-	hdPub, err := u.GetHDPublicKey()
-	pub, err := bip32.GetPublicKeyFromHDKey(hdPub)
+func (u *User) PubKeyObj() (*primitives.PublicKey, error) {
+	pub, err := primitives.PublicKeyFromString(u.PubKey)
 	if err != nil {
-		return nil, dberrors.ErrConvertToPubKey.Wrap(err)
+		return nil, fmt.Errorf("invalid PubKey: %w", err)
 	}
-	return pub, nil
+	return pub, err
 }

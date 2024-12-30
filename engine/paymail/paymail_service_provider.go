@@ -6,6 +6,7 @@ import (
 	"github.com/bitcoin-sv/go-paymail"
 	"github.com/bitcoin-sv/go-paymail/server"
 	"github.com/bitcoin-sv/go-paymail/spv"
+	"github.com/bitcoin-sv/spv-wallet/engine/keys/type42"
 	pmerrors "github.com/bitcoin-sv/spv-wallet/engine/paymail/errors"
 )
 
@@ -38,13 +39,24 @@ func (s *serviceProvider) GetPaymailByAlias(ctx context.Context, alias, domain s
 	if model == nil {
 		return nil, pmerrors.ErrPaymailNotFound
 	}
+
+	userPubKey, err := model.User.PubKeyObj()
+	if err != nil {
+		return nil, pmerrors.ErrPaymailPKI.Wrap(err)
+	}
+
+	pki, err := type42.PaymailPKI(userPubKey, model.Alias, model.Domain)
+	if err != nil {
+		return nil, pmerrors.ErrPaymailPKI.Wrap(err)
+	}
+
 	return &paymail.AddressInformation{
 		Alias:  model.Alias,
 		Avatar: model.AvatarURL,
 		Domain: model.Domain,
 		ID:     fmt.Sprintf("%s", model.ID),
 		Name:   model.PublicName,
-		PubKey: "", // TODO
+		PubKey: pki.ToDERHex(),
 	}, nil
 }
 

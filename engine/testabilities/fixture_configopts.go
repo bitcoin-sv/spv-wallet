@@ -9,3 +9,9 @@ func WithNewTransactionFlowEnabled() ConfigOpts {
 		c.ExperimentalFeatures.NewTransactionFlowEnabled = true
 	}
 }
+
+func WithDomainValidationDisabled() ConfigOpts {
+	return func(c *config.AppConfig) {
+		c.Paymail.DomainValidationEnabled = false
+	}
+}
