@@ -34,7 +34,8 @@ type GivenTXSpec interface {
 	WithInput(satoshis uint64) GivenTXSpec
 	WithSingleSourceInputs(satoshis ...uint64) GivenTXSpec
 	WithOPReturn(dataStr string) GivenTXSpec
-	WithOutputScript(parts ...ScriptPart) GivenTXSpec
+	WithOutputScriptParts(parts ...ScriptPart) GivenTXSpec
+	WithOutputScript(satoshis uint64, script *script.Script) GivenTXSpec
 	WithP2PKHOutput(satoshis uint64) GivenTXSpec
 
 	TX() *trx.Transaction
@@ -117,6 +118,15 @@ func (spec *txSpec) WithP2PKHOutput(satoshis uint64) GivenTXSpec {
 	return spec
 }
 
+// WithOutputScript adds an output to the transaction with the specified satoshis and script
+func (spec *txSpec) WithOutputScript(satoshis uint64, script *script.Script) GivenTXSpec {
+	spec.outputs = append(spec.outputs, &trx.TransactionOutput{
+		Satoshis:      satoshis,
+		LockingScript: script,
+	})
+	return spec
+}
+
 // ScriptPart is an interface for building script parts
 type ScriptPart interface {
 	Append(s *script.Script) error
@@ -138,8 +148,8 @@ func (data PushData) Append(s *script.Script) error {
 	return s.AppendPushData(data)
 }
 
-// WithOutputScript adds an output to the transaction with the specified script parts
-func (spec *txSpec) WithOutputScript(parts ...ScriptPart) GivenTXSpec {
+// WithOutputScriptParts adds an output to the transaction with the specified script parts
+func (spec *txSpec) WithOutputScriptParts(parts ...ScriptPart) GivenTXSpec {
 	s := &script.Script{}
 	for _, part := range parts {
 		err := part.Append(s)

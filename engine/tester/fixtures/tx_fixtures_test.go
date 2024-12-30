@@ -13,7 +13,7 @@ func givenTXSpec(t *testing.T) GivenTXSpec {
 		WithSingleSourceInputs(2, 3, 4).
 		WithP2PKHOutput(1).
 		WithOPReturn("hello world").
-		WithOutputScript(OpCode(script.OpRETURN), PushData("hello world"))
+		WithOutputScriptParts(OpCode(script.OpRETURN), PushData("hello world"))
 }
 
 /*
