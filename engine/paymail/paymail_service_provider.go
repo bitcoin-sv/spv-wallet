@@ -2,18 +2,22 @@ package paymail
 
 import (
 	"context"
-
+	"fmt"
 	"github.com/bitcoin-sv/go-paymail"
 	"github.com/bitcoin-sv/go-paymail/server"
 	"github.com/bitcoin-sv/go-paymail/spv"
+	pmerrors "github.com/bitcoin-sv/spv-wallet/engine/paymail/errors"
 )
 
 // NewServiceProvider create a new paymail service server which handlers incoming paymail requests
-func NewServiceProvider() server.PaymailServiceProvider {
-	return &serviceProvider{}
+func NewServiceProvider(repo Repository) server.PaymailServiceProvider {
+	return &serviceProvider{
+		repo: repo,
+	}
 }
 
 type serviceProvider struct {
+	repo Repository
 }
 
 func (s *serviceProvider) CreateAddressResolutionResponse(ctx context.Context, alias, domain string, senderValidation bool, metaData *server.RequestMetadata) (*paymail.ResolutionPayload, error) {
@@ -27,8 +31,21 @@ func (s *serviceProvider) CreateP2PDestinationResponse(ctx context.Context, alia
 }
 
 func (s *serviceProvider) GetPaymailByAlias(ctx context.Context, alias, domain string, metaData *server.RequestMetadata) (*paymail.AddressInformation, error) {
-	//TODO implement me
-	panic("implement me")
+	model, err := s.repo.GetPaymailByAlias(alias, domain)
+	if err != nil {
+		return nil, pmerrors.ErrPaymailDBFailed.Wrap(err)
+	}
+	if model == nil {
+		return nil, pmerrors.ErrPaymailNotFound
+	}
+	return &paymail.AddressInformation{
+		Alias:  model.Alias,
+		Avatar: model.AvatarURL,
+		Domain: model.Domain,
+		ID:     fmt.Sprintf("%s", model.ID),
+		Name:   model.PublicName,
+		PubKey: "", // TODO
+	}, nil
 }
 
 func (s *serviceProvider) RecordTransaction(ctx context.Context, p2pTx *paymail.P2PTransaction, metaData *server.RequestMetadata) (*paymail.P2PTransactionPayload, error) {
