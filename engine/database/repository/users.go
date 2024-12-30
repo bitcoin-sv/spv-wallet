@@ -19,6 +19,36 @@ func NewUsersRepo(db *gorm.DB) *Users {
 	return &Users{db: db}
 }
 
+// GetByPubKey returns a user by its public key. If the user does not exist, it returns error.
+func (u *Users) GetByPubKey(ctx context.Context, pubKey string) (*database.User, error) {
+	var user database.User
+	err := u.db.WithContext(ctx).
+		Where("pub_key = ?", pubKey).
+		First(&user).Error
+	if err != nil {
+		return nil, spverrors.Wrapf(err, "failed to get user by public key")
+	}
+
+	return &user, nil
+}
+
+// GetWithPaymails returns a user by its id with preloaded paymail slist. If the user does not exist, it returns error.
+func (u *Users) GetWithPaymails(ctx context.Context, id string) (*database.User, error) {
+	var user database.User
+	err := u.db.WithContext(ctx).
+		Preload("Paymails", func(db *gorm.DB) *gorm.DB {
+			//NOTE: To preserve deterministic order necessary to get default paymail as the first one
+			return db.Order("created_at ASC")
+		}).
+		Where("id = ?", id).
+		First(&user).Error
+	if err != nil {
+		return nil, spverrors.Wrapf(err, "failed to get user by public key")
+	}
+
+	return &user, nil
+}
+
 // Save saves a user to the database.
 func (u *Users) Save(ctx context.Context, userRow *database.User) error {
 	query := u.db.WithContext(ctx)
@@ -40,6 +70,32 @@ func (u *Users) AppendAddress(ctx context.Context, userRow *database.User, addre
 
 	if err != nil {
 		return spverrors.Wrapf(err, "failed to save address")
+	}
+
+	return nil
+}
+
+// AppendPaymail appends a paymail to the existing user.
+func (u *Users) AppendPaymail(ctx context.Context, userID string, paymailRow *database.Paymail) error {
+	err := u.db.Transaction(func(tx *gorm.DB) error {
+		var user database.User
+		if err := tx.WithContext(ctx).
+			Where("id = ?", userID).
+			First(&user).Error; err != nil {
+			return spverrors.Wrapf(err, "user not found")
+		}
+
+		if err := tx.WithContext(ctx).
+			Model(&user).
+			Association("Paymails").
+			Append(paymailRow); err != nil {
+			return spverrors.Wrapf(err, "failed to save paymail")
+		}
+
+		return nil
+	})
+	if err != nil {
+		return spverrors.Wrapf(err, "failed to append paymail to user")
 	}
 
 	return nil

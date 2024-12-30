@@ -1,8 +1,6 @@
 package reqctx
 
 import (
-	bip32 "github.com/bitcoin-sv/go-sdk/compat/bip32"
-	"github.com/bitcoin-sv/go-sdk/script"
 	"github.com/bitcoin-sv/spv-wallet/engine"
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/gin-gonic/gin"
@@ -30,6 +28,10 @@ type UserContext struct {
 	xPubID   string
 	xPubObj  *engine.Xpub
 	AuthType AuthType
+
+	// v2
+	userID    string
+	publicKey string
 }
 
 // NewUserContextWithXPub creates a new UserContext based on xpub authorization
@@ -48,6 +50,18 @@ func NewUserContextWithAccessKey(xpubID string, xPubObj *engine.Xpub) *UserConte
 		xPubID:   xpubID,
 		xPubObj:  xPubObj,
 		AuthType: AuthTypeAccessKey,
+	}
+}
+
+// NewUserContextWithPublicKeys creates a new UserContext based on public keys
+// Note: This is used for API v2 authentication only
+func NewUserContextWithPublicKeys(xpub, xpubID, publicKey, userID string) *UserContext {
+	return &UserContext{
+		xPub:      xpub,
+		xPubID:    xpubID,
+		userID:    userID,
+		publicKey: publicKey,
+		AuthType:  AuthTypeXPub,
 	}
 }
 
@@ -91,27 +105,14 @@ func (ctx *UserContext) GetXPubObj() *engine.Xpub {
 // ShouldGetUserID returns userID for NEW DB SCHEMA
 // Warning: Don't use it for old DB schema
 func (ctx *UserContext) ShouldGetUserID() (string, error) {
-	xpub, err := ctx.ShouldGetXPub()
-	if err != nil {
-		return "", err
+	if ctx.AuthType != AuthTypeXPub {
+		return "", spverrors.ErrXPubAuthRequired
+	}
+	if ctx.userID == "" {
+		return "", spverrors.ErrInternal
 	}
 
-	xpubObj, err := bip32.NewKeyFromString(xpub)
-	if err != nil {
-		return "", spverrors.ErrInternal.Wrap(err)
-	}
-
-	pubKey, err := xpubObj.ECPubKey()
-	if err != nil {
-		return "", spverrors.ErrInternal.Wrap(err)
-	}
-
-	addr, err := script.NewAddressFromPublicKey(pubKey, true)
-	if err != nil {
-		return "", spverrors.ErrInternal.Wrap(err)
-	}
-
-	return addr.AddressString, nil
+	return ctx.userID, nil
 }
 
 // GetUserContext returns the user context from the request context

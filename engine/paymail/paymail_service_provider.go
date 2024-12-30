@@ -124,7 +124,7 @@ func (s *serviceProvider) GetPaymailByAlias(ctx context.Context, alias, domain s
 
 	return &paymail.AddressInformation{
 		Alias:  model.Alias,
-		Avatar: model.AvatarURL,
+		Avatar: model.Avatar,
 		Domain: model.Domain,
 		ID:     fmt.Sprintf("%d", model.ID),
 		Name:   model.PublicName,

@@ -176,7 +176,7 @@ func (f *engineFixture) initialiseFixtures() {
 					Alias:      alias,
 					Domain:     domain,
 					PublicName: address,
-					AvatarURL:  "",
+					Avatar:     "",
 				})
 			}
 
