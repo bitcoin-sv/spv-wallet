@@ -3,6 +3,8 @@ package paymail
 import (
 	"context"
 	"fmt"
+	trx "github.com/bitcoin-sv/go-sdk/transaction"
+	"github.com/rs/zerolog"
 	"gorm.io/datatypes"
 
 	"github.com/bitcoin-sv/go-paymail"
@@ -19,14 +21,20 @@ import (
 )
 
 // NewServiceProvider create a new paymail service server which handlers incoming paymail requests
-func NewServiceProvider(repo Repository) server.PaymailServiceProvider {
+func NewServiceProvider(logger *zerolog.Logger, repo Repository, spv MerkleRootsVerifier, recorder TxRecorder) server.PaymailServiceProvider {
 	return &serviceProvider{
-		repo: repo,
+		logger:   logger,
+		repo:     repo,
+		spv:      spv,
+		recorder: recorder,
 	}
 }
 
 type serviceProvider struct {
-	repo Repository
+	logger   *zerolog.Logger
+	repo     Repository
+	spv      MerkleRootsVerifier
+	recorder TxRecorder
 }
 
 func (s *serviceProvider) CreateAddressResolutionResponse(ctx context.Context, alias, domain string, senderValidation bool, metaData *server.RequestMetadata) (*paymail.ResolutionPayload, error) {
@@ -117,13 +125,42 @@ func (s *serviceProvider) GetPaymailByAlias(ctx context.Context, alias, domain s
 }
 
 func (s *serviceProvider) RecordTransaction(ctx context.Context, p2pTx *paymail.P2PTransaction, metaData *server.RequestMetadata) (*paymail.P2PTransactionPayload, error) {
-	//TODO implement me
-	panic("implement me")
+	// TODO handle BEEF transactions
+
+	tx, err := trx.NewTransactionFromHex(p2pTx.Hex)
+	if err != nil {
+		return nil, pmerrors.ErrParseIncomingHexTransaction.Wrap(err)
+	}
+
+	err = s.recorder.RecordTransaction(ctx, tx, false)
+	if err != nil {
+		return nil, pmerrors.ErrRecordTransaction.Wrap(err)
+	}
+
+	return &paymail.P2PTransactionPayload{
+		Note: p2pTx.MetaData.Note,
+		TxID: tx.TxID().String(),
+	}, nil
 }
 
 func (s *serviceProvider) VerifyMerkleRoots(ctx context.Context, merkleProofs []*spv.MerkleRootConfirmationRequestItem) error {
-	//TODO implement me
-	panic("implement me")
+	// TODO include metrics for VerifyMerkleRoots (perhaps on another level - maybe ChainService)
+
+	valid, err := s.spv.VerifyMerkleRoots(ctx, merkleProofs)
+
+	// NOTE: these errors goes to go-paymail and are not logged there, so we need to log them here
+
+	if err != nil {
+		s.logger.Error().Err(err).Msg("Error verifying merkle roots")
+		return pmerrors.ErrPaymailMerkleRootVerificationFailed.Wrap(err)
+	}
+
+	if !valid {
+		s.logger.Warn().Msg("Not all provided merkle roots were confirmed by BHS")
+		return pmerrors.ErrPaymailInvalidMerkleRoots
+	}
+
+	return nil
 }
 
 func (s *serviceProvider) pki(paymailModel *database.Paymail) (*primitives.PublicKey, string, error) {

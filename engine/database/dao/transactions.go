@@ -57,3 +57,16 @@ func (r *Transactions) GetOutputs(ctx context.Context, outpoints iter.Seq[bsv.Ou
 
 	return outputs, nil
 }
+
+func (r *Transactions) CheckAddress(ctx context.Context, address string) (bool, error) {
+	var count int64
+	if err := r.db.
+		WithContext(ctx).
+		Model(&database.Address{}).
+		Where("address = ?", address).
+		Count(&count).Error; err != nil {
+		return false, spverrors.Wrapf(err, "failed to check address")
+	}
+
+	return count > 0, nil
+}
