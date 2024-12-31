@@ -9,15 +9,15 @@ import (
 const rotationSuffix = "0"
 
 // PaymailPKI (Public Key Infrastructure) derives a public key using a constant derivation key for provided paymail.
-func PaymailPKI(pubKey *primitives.PublicKey, alias, domain string) (*primitives.PublicKey, error) {
+func PaymailPKI(pubKey *primitives.PublicKey, alias, domain string) (*primitives.PublicKey, string, error) {
 	if alias == "" || domain == "" {
-		return nil, ErrDeriveKey
+		return nil, "", ErrDeriveKey
 	}
 
 	derivationKey := fmt.Sprintf("1-paymail_pki-%s@%s_%s", alias, domain, rotationSuffix)
 	derivedPubByRef, err := derive(pubKey, derivationKey)
 	if err != nil {
-		return nil, ErrDeriveKey.Wrap(err)
+		return nil, derivationKey, ErrDeriveKey.Wrap(err)
 	}
-	return derivedPubByRef, nil
+	return derivedPubByRef, derivationKey, nil
 }

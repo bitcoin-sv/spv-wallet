@@ -274,7 +274,7 @@ func (c *Client) loadPaymailServer() (err error) {
 
 	var serviceProvider paymailserver.PaymailServiceProvider
 	if c.options.paymail.serverConfig.ExperimentalProvider {
-		serviceProvider = paymail.NewServiceProvider(dao.NewPaymailsAccessObject(c.Datastore().DB()))
+		serviceProvider = paymail.NewServiceProvider(dao.NewUsersAccessObject(c.Datastore().DB()))
 	} else {
 		serviceProvider = &PaymailDefaultServiceProvider{client: c}
 	}
