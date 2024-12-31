@@ -2,6 +2,7 @@ package paymailserver_test
 
 import (
 	"fmt"
+	"github.com/bitcoin-sv/spv-wallet/engine/testabilities/testmode"
 	"testing"
 
 	"github.com/bitcoin-sv/go-sdk/script"
@@ -121,12 +122,12 @@ func TestIncomingPaymailRawTX(t *testing.T) {
 }
 
 func TestIncomingPaymailBeef(t *testing.T) {
-	//testmode.DevelopmentOnly_SetPostgresModeWithName(t, "spv-test")
+	testmode.DevelopmentOnly_SetPostgresModeWithName(t, "spv-test")
 
 	givenForAllTests := testabilities.Given(t)
 	cleanup := givenForAllTests.StartedSPVWalletWithConfiguration(
 		testengine.WithDomainValidationDisabled(),
-		//testengine.WithNewTransactionFlowEnabled(),
+		testengine.WithNewTransactionFlowEnabled(),
 	)
 	defer cleanup()
 

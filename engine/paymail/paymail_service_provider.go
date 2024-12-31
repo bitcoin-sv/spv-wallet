@@ -126,13 +126,26 @@ func (s *serviceProvider) GetPaymailByAlias(ctx context.Context, alias, domain s
 
 func (s *serviceProvider) RecordTransaction(ctx context.Context, p2pTx *paymail.P2PTransaction, metaData *server.RequestMetadata) (*paymail.P2PTransactionPayload, error) {
 	// TODO handle BEEF transactions
+	isBEEF := p2pTx.DecodedBeef != nil && p2pTx.Beef != ""
+	isRawTX := p2pTx.Hex != ""
 
-	tx, err := trx.NewTransactionFromHex(p2pTx.Hex)
-	if err != nil {
-		return nil, pmerrors.ErrParseIncomingHexTransaction.Wrap(err)
+	if !isBEEF && !isRawTX {
+		return nil, pmerrors.ErrParseIncomingTransaction
 	}
 
-	err = s.recorder.RecordTransaction(ctx, tx, false)
+	var tx *trx.Transaction
+	var err error
+	if isBEEF {
+		tx, err = trx.NewTransactionFromBEEFHex(p2pTx.Beef)
+	} else {
+		tx, err = trx.NewTransactionFromHex(p2pTx.Hex)
+	}
+
+	if err != nil {
+		return nil, pmerrors.ErrParseIncomingTransaction.Wrap(err)
+	}
+
+	err = s.recorder.RecordTransaction(ctx, tx, isBEEF)
 	if err != nil {
 		return nil, pmerrors.ErrRecordTransaction.Wrap(err)
 	}
