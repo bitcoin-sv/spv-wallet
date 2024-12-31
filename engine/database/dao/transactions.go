@@ -3,6 +3,7 @@ package dao
 import (
 	"context"
 	"iter"
+	"maps"
 	"slices"
 
 	"github.com/bitcoin-sv/spv-wallet/engine/database"
@@ -31,6 +32,20 @@ func (r *Transactions) SaveTX(ctx context.Context, txRow *database.TrackedTransa
 		})
 
 	if err := query.Create(txRow).Error; err != nil {
+		return spverrors.Wrapf(err, "failed to save transaction")
+	}
+
+	return nil
+}
+
+func (r *Transactions) SaveTXs(ctx context.Context, txRows iter.Seq[*database.TrackedTransaction]) error {
+	query := r.db.
+		WithContext(ctx).
+		Clauses(clause.OnConflict{
+			UpdateAll: true,
+		})
+
+	if err := query.Create(slices.Collect(txRows)).Error; err != nil {
 		return spverrors.Wrapf(err, "failed to save transaction")
 	}
 
@@ -69,4 +84,30 @@ func (r *Transactions) CheckAddress(ctx context.Context, address string) (bool, 
 	}
 
 	return count > 0, nil
+}
+
+func (r *Transactions) MissingTransactions(ctx context.Context, txIDs iter.Seq[string]) (iter.Seq[string], error) {
+	idsMap := maps.Collect(func(yield func(string, bool) bool) {
+		for txID := range txIDs {
+			yield(txID, true)
+		}
+	})
+
+	idsSlice := slices.Collect(maps.Keys(idsMap))
+
+	var alreadyTracked []string
+	if err := r.db.
+		WithContext(ctx).
+		Model(&database.TrackedTransaction{}).
+		Where("id IN ?", idsSlice).
+		Pluck("id", &alreadyTracked).
+		Error; err != nil {
+		return nil, spverrors.Wrapf(err, "failed to get missing transactions")
+	}
+
+	for _, txID := range alreadyTracked {
+		delete(idsMap, txID)
+	}
+
+	return maps.Keys(idsMap), nil
 }

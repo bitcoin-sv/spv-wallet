@@ -1,9 +1,16 @@
 package database
 
+import (
+	trx "github.com/bitcoin-sv/go-sdk/transaction"
+	"gorm.io/datatypes"
+)
+
 // TrackedTransaction represents a transaction in the database.
 type TrackedTransaction struct {
 	ID       string `gorm:"type:char(64);primaryKey"`
 	TxStatus TxStatus
+
+	BUMP *datatypes.JSONType[trx.MerklePath]
 
 	Outputs []*Output `gorm:"foreignKey:TxID"`
 	Data    []*Data   `gorm:"foreignKey:TxID"`

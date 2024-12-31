@@ -2,6 +2,7 @@ package engine
 
 import (
 	"context"
+	"github.com/bitcoin-sv/spv-wallet/engine/transaction/txtracker"
 
 	paymailclient "github.com/bitcoin-sv/go-paymail"
 	paymailserver "github.com/bitcoin-sv/go-paymail/server"
@@ -215,6 +216,12 @@ func (c *Client) loadTransactionRecordService() error {
 	return nil
 }
 
+func (c *Client) loadTransactionTrackerService() {
+	if c.options.transactionTrackerService == nil {
+		c.options.transactionTrackerService = txtracker.NewService(dao.NewTransactionsAccessObject(c.Datastore().DB()))
+	}
+}
+
 func (c *Client) loadChainService() {
 	if c.options.chainService == nil {
 		logger := c.Logger().With().Str("subservice", "chain").Logger()
@@ -280,6 +287,7 @@ func (c *Client) loadPaymailServer() (err error) {
 			dao.NewUsersAccessObject(c.Datastore().DB()),
 			c.Chain(),
 			c.TransactionRecordService(),
+			c.options.transactionTrackerService,
 		)
 	} else {
 		serviceProvider = &PaymailDefaultServiceProvider{client: c}

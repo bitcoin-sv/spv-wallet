@@ -5,6 +5,7 @@ import (
 	"github.com/bitcoin-sv/go-paymail/spv"
 	trx "github.com/bitcoin-sv/go-sdk/transaction"
 	"github.com/bitcoin-sv/spv-wallet/engine/database"
+	"iter"
 )
 
 // Repository is an interface for the paymail repository
@@ -19,4 +20,8 @@ type MerkleRootsVerifier interface {
 
 type TxRecorder interface {
 	RecordTransaction(ctx context.Context, tx *trx.Transaction, verifyScripts bool) error
+}
+
+type TxTracker interface {
+	TrackMissingTxs(ctx context.Context, transactions iter.Seq[*trx.Transaction]) error
 }

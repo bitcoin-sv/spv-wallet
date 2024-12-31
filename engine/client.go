@@ -2,6 +2,7 @@ package engine
 
 import (
 	"context"
+	"github.com/bitcoin-sv/spv-wallet/engine/transaction/txtracker"
 	"time"
 
 	"github.com/bitcoin-sv/go-paymail"
@@ -47,6 +48,7 @@ type (
 		paymail                    *paymailOptions        // Paymail options & client
 		transactionOutlinesService outlines.Service       // Service for transaction outlines
 		transactionRecordService   *record.Service        // Service for recording transactions
+		transactionTrackerService  *txtracker.Service     // Service for tracking transactions
 		paymailAddressService      paymailaddress.Service // Service for paymail addresses
 		taskManager                *taskManagerOptions    // Configuration options for the TaskManager (TaskQ, etc.)
 		userAgent                  string                 // User agent for all outgoing requests
@@ -170,6 +172,8 @@ func NewClient(ctx context.Context, opts ...ClientOps) (ClientInterface, error) 
 	if err = client.loadTransactionRecordService(); err != nil {
 		return nil, err
 	}
+
+	client.loadTransactionTrackerService()
 
 	// Register all cron jobs
 	if err = client.registerCronJobs(); err != nil {
