@@ -2,7 +2,6 @@ package paymailserver_test
 
 import (
 	"fmt"
-	"github.com/bitcoin-sv/spv-wallet/engine/testabilities/testmode"
 	"testing"
 
 	"github.com/bitcoin-sv/go-sdk/script"
@@ -14,7 +13,7 @@ import (
 )
 
 func TestIncomingPaymailRawTX(t *testing.T) {
-	testmode.DevelopmentOnly_SetPostgresModeWithName(t, "spv-test")
+	//testmode.DevelopmentOnly_SetPostgresModeWithName(t, "spv-test")
 
 	givenForAllTests := testabilities.Given(t)
 	cleanup := givenForAllTests.StartedSPVWalletWithConfiguration(
@@ -67,7 +66,6 @@ func TestIncomingPaymailRawTX(t *testing.T) {
 		}`, map[string]any{
 			"satoshis": satoshis,
 		})
-		// TODO: Question: Do we want to split satoshis into multiple outputs?
 
 		// update:
 		getter := then.Response(res).JSONValue()
@@ -79,7 +77,7 @@ func TestIncomingPaymailRawTX(t *testing.T) {
 		testState.lockingScript = lockingScript
 	})
 
-	t.Run("step 2 - call receive-transaction", func(t *testing.T) {
+	t.Run("step 2 - call beef capability", func(t *testing.T) {
 		// given:
 		txSpec := fixtures.GivenTX(t).
 			WithInput(satoshis+1).
@@ -87,14 +85,10 @@ func TestIncomingPaymailRawTX(t *testing.T) {
 
 		// and:
 		requestBody := map[string]any{
-			"hex":       txSpec.RawTX(),
+			"beef":      txSpec.BEEF(),
 			"reference": testState.reference,
 			"metadata": map[string]any{
 				"note": note,
-				// TODO: It seems like we don't support these fields yet
-				//"pubkey":   "",
-				//"sender":   "",
-				//"signature": "",
 			},
 		}
 
@@ -111,6 +105,119 @@ func TestIncomingPaymailRawTX(t *testing.T) {
 			Post(
 				fmt.Sprintf(
 					"https://example.com/v1/bsvalias/receive-transaction/%s",
+					address,
+				),
+			)
+
+		// then:
+		then.Response(res).IsOK().WithJSONMatching(`{
+			"txid": "{{ .txid }}",
+			"note": "{{ .note }}"
+		}`, map[string]any{
+			"txid": txSpec.ID(),
+			"note": note,
+		})
+	})
+}
+
+func TestIncomingPaymailBeef(t *testing.T) {
+	//testmode.DevelopmentOnly_SetPostgresModeWithName(t, "spv-test")
+
+	givenForAllTests := testabilities.Given(t)
+	cleanup := givenForAllTests.StartedSPVWalletWithConfiguration(
+		testengine.WithDomainValidationDisabled(),
+		//testengine.WithNewTransactionFlowEnabled(),
+	)
+	defer cleanup()
+
+	var testState struct {
+		reference     string
+		lockingScript *script.Script
+	}
+
+	// given:
+	given, then := testabilities.NewOf(givenForAllTests, t)
+	client := given.HttpClient().ForAnonymous()
+
+	// and:
+	address := fixtures.Sender.Paymails[0]
+	satoshis := uint64(1000)
+	note := "test note"
+
+	t.Run("step 1 - call p2p-payment-destination", func(t *testing.T) {
+		// given:
+		requestBody := map[string]any{
+			"satoshis": satoshis,
+		}
+
+		// when:
+		res, _ := client.R().
+			SetHeader("Content-Type", "application/json").
+			SetBody(requestBody).
+			Post(
+				fmt.Sprintf(
+					"https://example.com/v1/bsvalias/p2p-payment-destination/%s",
+					address,
+				),
+			)
+
+		// then:
+		then.Response(res).IsOK().WithJSONMatching(`{
+			"outputs": [
+			  {
+			    "address": "{{ matchAddress }}",
+			    "satoshis": {{ .satoshis }},
+			    "script": "{{ matchHex }}"
+			  }
+			],
+			"reference": "{{ matchHexWithLength 32 }}"
+		}`, map[string]any{
+			"satoshis": satoshis,
+		})
+
+		// update:
+		getter := then.Response(res).JSONValue()
+		testState.reference = getter.GetString("reference")
+
+		// and:
+		lockingScript, err := script.NewFromHex(getter.GetString("outputs[0]/script"))
+		require.NoError(t, err)
+		testState.lockingScript = lockingScript
+	})
+
+	t.Run("step 2 - call beef capability", func(t *testing.T) {
+		// given:
+		txSpec := fixtures.GivenTX(t).
+			WithInput(satoshis+1).
+			WithOutputScript(satoshis, testState.lockingScript)
+
+		// and:
+		requestBody := map[string]any{
+			"beef":      txSpec.BEEF(),
+			"reference": testState.reference,
+			"metadata": map[string]any{
+				"note": note,
+			},
+		}
+
+		// and:
+		given.ARC().WillRespondForBroadcast(200, &chainmodels.TXInfo{
+			TxID:     txSpec.ID(),
+			TXStatus: chainmodels.SeenOnNetwork,
+		})
+
+		// and;
+		given.BHS().WillRespondForMerkleRootsVerify(200, &chainmodels.MerkleRootsConfirmations{
+			ConfirmationState: chainmodels.MRConfirmed,
+		})
+
+		// when:
+		res, _ := client.R().
+			SetHeader("Content-Type", "application/json").
+			SetBody(requestBody).
+			Post(
+				fmt.Sprintf(
+					"https://example.com/v1/bsvalias/beef/%s",
 					address,
 				),
 			)

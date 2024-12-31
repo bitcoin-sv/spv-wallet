@@ -37,6 +37,8 @@ type BlockHeadersServiceFixture interface {
 	// WillRespondForMerkleRoots returns a http response for get merkleroots endpoint with
 	// provided httpCode and response
 	WillRespondForMerkleRoots(httpCode int, response string)
+
+	WillRespondForMerkleRootsVerify(httpCode int, response *chainmodels.MerkleRootsConfirmations)
 }
 
 type ARCFixture interface {

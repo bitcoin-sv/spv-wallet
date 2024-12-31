@@ -252,9 +252,8 @@ func (spec *txSpec) makeParentTX(satoshis ...uint64) *trx.Transaction {
 	// each merkle proof should have a different block height to not collide with each other
 	err = tx.AddMerkleProof(trx.NewMerklePath(spec.getNextBlockHeight(), [][]*trx.PathElement{{
 		&trx.PathElement{
-			Hash:      tx.TxID(),
-			Offset:    0,
-			Duplicate: ptr(true),
+			Hash:   tx.TxID(),
+			Offset: 0,
 		},
 	}}))
 	require.NoError(spec.t, err, "adding merkle proof to parent tx")
