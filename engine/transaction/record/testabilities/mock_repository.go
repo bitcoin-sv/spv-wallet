@@ -101,3 +101,7 @@ func (m *mockRepository) getTransaction(txID string) *database.TrackedTransactio
 	}
 	return &tx
 }
+
+func (m *mockRepository) CheckAddress(_ context.Context, _ string) (bool, error) {
+	return true, nil
+}

@@ -13,8 +13,6 @@ import (
 )
 
 func TestIncomingPaymailRawTX(t *testing.T) {
-	//testmode.DevelopmentOnly_SetPostgresModeWithName(t, "spv-test")
-
 	givenForAllTests := testabilities.Given(t)
 	cleanup := givenForAllTests.StartedSPVWalletWithConfiguration(
 		testengine.WithDomainValidationDisabled(),
@@ -77,7 +75,7 @@ func TestIncomingPaymailRawTX(t *testing.T) {
 		testState.lockingScript = lockingScript
 	})
 
-	t.Run("step 2 - call beef capability", func(t *testing.T) {
+	t.Run("step 2 - call receive-transaction capability", func(t *testing.T) {
 		// given:
 		txSpec := fixtures.GivenTX(t).
 			WithInput(satoshis+1).
@@ -85,7 +83,7 @@ func TestIncomingPaymailRawTX(t *testing.T) {
 
 		// and:
 		requestBody := map[string]any{
-			"beef":      txSpec.BEEF(),
+			"hex":       txSpec.RawTX(),
 			"reference": testState.reference,
 			"metadata": map[string]any{
 				"note": note,
@@ -121,8 +119,6 @@ func TestIncomingPaymailRawTX(t *testing.T) {
 }
 
 func TestIncomingPaymailBeef(t *testing.T) {
-	//testmode.DevelopmentOnly_SetPostgresModeWithName(t, "spv-test")
-
 	givenForAllTests := testabilities.Given(t)
 	cleanup := givenForAllTests.StartedSPVWalletWithConfiguration(
 		testengine.WithDomainValidationDisabled(),

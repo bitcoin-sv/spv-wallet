@@ -17,7 +17,7 @@ type userUtxoFixture struct {
 	db                           *gorm.DB
 	t                            testing.TB
 	index                        uint
-	xpubID                       string
+	userID                       string
 	txID                         string
 	vout                         uint32
 	satoshis                     bsv.Satoshis
@@ -29,7 +29,7 @@ func newUtxoFixture(t testing.TB, db *gorm.DB, index uint32) *userUtxoFixture {
 		t:                            t,
 		db:                           db,
 		index:                        uint(index),
-		xpubID:                       fixtures.Sender.XPubID(),
+		userID:                       fixtures.Sender.Address().AddressString,
 		txID:                         txIDTemplated(uint(index)),
 		vout:                         index,
 		satoshis:                     1,
@@ -42,7 +42,7 @@ func txIDTemplated(index uint) string {
 }
 
 func (f *userUtxoFixture) OwnedBySender() UserUtxoFixture {
-	f.xpubID = fixtures.Sender.XPubID()
+	f.userID = fixtures.Sender.Address().AddressString
 	return f
 }
 
@@ -58,7 +58,7 @@ func (f *userUtxoFixture) WithSatoshis(satoshis bsv.Satoshis) UserUtxoFixture {
 
 func (f *userUtxoFixture) Stored() *database.UserUtxos {
 	utxo := &database.UserUtxos{
-		XPubID:                       f.xpubID,
+		UserID:                       f.userID,
 		TxID:                         f.txID,
 		Vout:                         f.vout,
 		Satoshis:                     uint64(f.satoshis),
