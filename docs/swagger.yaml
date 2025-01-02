@@ -3277,6 +3277,24 @@ paths:
       summary: Unsubscribe to a webhook
       tags:
       - Admin
+    get:
+      description: Get All Webhooks currently subscribed to
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: List of webhooks
+          schema:
+            items:
+              $ref: '#/definitions/models.Webhook'
+            type: array
+        "500":
+          description: Internal server error - Error while getting all webhooks
+      security:
+      - x-auth-xpub: []
+      summary: Get All Webhooks
+      tags:
+      - Admin
     post:
       description: Subscribe to a webhook to receive notifications
       parameters:
