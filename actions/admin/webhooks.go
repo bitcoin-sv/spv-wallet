@@ -4,6 +4,7 @@ import (
 	"net/http"
 
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
+	"github.com/bitcoin-sv/spv-wallet/mappings"
 	"github.com/bitcoin-sv/spv-wallet/models"
 	"github.com/bitcoin-sv/spv-wallet/server/reqctx"
 	"github.com/gin-gonic/gin"
@@ -60,4 +61,28 @@ func unsubscribeWebhook(c *gin.Context, _ *reqctx.AdminContext) {
 	}
 
 	c.Status(http.StatusOK)
+}
+
+// getAllWebhooks will return all the stored webhooks
+// @Summary		Get All Webhooks
+// @Description	Get All Webhooks currently subscribed to
+// @Tags		Admin
+// @Produce		json
+// @Success		200 {object} []models.Webhook "List of webhooks"
+// @Failure 	500	"Internal server error - Error while getting all webhooks"
+// @Router		/api/v1/admin/webhooks/subscriptions [get]
+// @Security	x-auth-xpub
+func getAllWebhooks(c *gin.Context, _ *reqctx.AdminContext) {
+	wh, err := reqctx.Engine(c).GetWebhooks(c.Request.Context())
+	if err != nil {
+		spverrors.ErrorResponse(c, err, reqctx.Logger(c))
+		return
+	}
+
+	webhookDTOs := make([]*models.Webhook, len(wh))
+	for i, w := range wh {
+		webhookDTOs[i] = mappings.MapToWebhookContract(w)
+	}
+
+	c.JSON(http.StatusOK, webhookDTOs)
 }

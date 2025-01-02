@@ -64,7 +64,7 @@ func unsubscribeWebhookOld(c *gin.Context, _ *reqctx.AdminContext) {
 	c.JSON(http.StatusOK, true)
 }
 
-// getAllWebhooks will return all the stored webhooks
+// getAllWebhooksOld will return all the stored webhooks
 // @DeprecatedRouter /v1/admin/webhooks/subscriptions [get]
 // @Summary		Get All Webhooks
 // @Description	Get All Webhooks currently subscribed to
@@ -74,7 +74,7 @@ func unsubscribeWebhookOld(c *gin.Context, _ *reqctx.AdminContext) {
 // @Failure 	500	"Internal server error - Error while getting all webhooks"
 // @Router		/v1/admin/webhooks/subscriptions [get]
 // @Security	x-auth-xpub
-func getAllWebhooks(c *gin.Context, _ *reqctx.AdminContext) {
+func getAllWebhooksOld(c *gin.Context, _ *reqctx.AdminContext) {
 	wh, err := reqctx.Engine(c).GetWebhooks(c.Request.Context())
 	if err != nil {
 		spverrors.ErrorResponse(c, err, reqctx.Logger(c))
