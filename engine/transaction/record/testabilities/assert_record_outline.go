@@ -15,7 +15,7 @@ type RecordOutlineAssert interface {
 	NoError(err error) SuccessfullyCreatedRecordOutlineAssertion
 	ErrorIs(err, expectedError error) ErrorAssert
 
-	StoredOutputs([]database.Output) RecordOutlineAssert
+	StoredOutputs([]database.TrackedOutput) RecordOutlineAssert
 	StoredData([]database.Data) RecordOutlineAssert
 }
 
@@ -63,7 +63,7 @@ func (a *assert) StoredAsBroadcasted(txID string) SuccessfullyCreatedRecordOutli
 	return a
 }
 
-func (a *assert) StoredOutputs(outputs []database.Output) RecordOutlineAssert {
+func (a *assert) StoredOutputs(outputs []database.TrackedOutput) RecordOutlineAssert {
 	require.ElementsMatch(a.t, a.given.repository.GetAllOutputs(), outputs)
 	return a
 }

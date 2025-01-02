@@ -65,7 +65,7 @@ func (s *Service) RecordTransactionOutline(ctx context.Context, outline *outline
 // NOTE: The flow accepts transactions with "other/not-tracked" UTXOs,
 // if the untracked output is correctly unlocked by the input script we have no reason to block the transaction;
 // but only the tracked UTXOs will be marked as spent (and considered for future double-spending checks)
-func (s *Service) getTrackedUTXOsFromInputs(ctx context.Context, tx *trx.Transaction) ([]*database.Output, error) {
+func (s *Service) getTrackedUTXOsFromInputs(ctx context.Context, tx *trx.Transaction) ([]*database.TrackedOutput, error) {
 	outpoints := func(yield func(outpoint bsv.Outpoint) bool) {
 		for _, input := range tx.Inputs {
 			yield(bsv.Outpoint{
@@ -88,10 +88,10 @@ func (s *Service) getTrackedUTXOsFromInputs(ctx context.Context, tx *trx.Transac
 	return storedUTXOs, nil
 }
 
-func (s *Service) processAnnotatedOutputs(tx *trx.Transaction, annotations *transaction.Annotations) ([]*database.Output, []*database.Data, error) {
+func (s *Service) processAnnotatedOutputs(tx *trx.Transaction, annotations *transaction.Annotations) ([]*database.TrackedOutput, []*database.Data, error) {
 	txID := tx.TxID().String()
 
-	var outputRecords []*database.Output
+	var outputRecords []*database.TrackedOutput
 	var dataRecords []*database.Data
 
 	for vout, annotation := range annotations.Outputs {
@@ -115,7 +115,7 @@ func (s *Service) processAnnotatedOutputs(tx *trx.Transaction, annotations *tran
 				Vout: voutU32,
 				Blob: data,
 			})
-			outputRecords = append(outputRecords, &database.Output{
+			outputRecords = append(outputRecords, &database.TrackedOutput{
 				TxID: txID,
 				Vout: voutU32,
 			})

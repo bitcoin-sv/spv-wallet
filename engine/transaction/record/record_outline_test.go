@@ -54,14 +54,14 @@ func TestRecordOutlineOpReturn(t *testing.T) {
 		storedUTXOs   []bsv.Outpoint
 		outline       *outlines.Transaction
 		expectTxID    string
-		expectOutputs []database.Output
+		expectOutputs []database.TrackedOutput
 		expectData    []database.Data
 	}{
 		"RecordTransactionOutline for op_return": {
 			storedUTXOs: []bsv.Outpoint{givenTXWithOpReturn(t).InputUTXO(0)},
 			outline:     givenStandardOpReturnOutline(t),
 			expectTxID:  givenTXWithOpReturn(t).ID(),
-			expectOutputs: []database.Output{
+			expectOutputs: []database.TrackedOutput{
 				{
 					TxID:       givenTXWithOpReturn(t).InputUTXO(0).TxID,
 					Vout:       givenTXWithOpReturn(t).InputUTXO(0).Vout,
@@ -94,7 +94,7 @@ func TestRecordOutlineOpReturn(t *testing.T) {
 				},
 			},
 			expectTxID: givenTxWithOpReturnWithoutOPFalse(t).ID(),
-			expectOutputs: []database.Output{
+			expectOutputs: []database.TrackedOutput{
 				{
 					TxID:       givenTxWithOpReturnWithoutOPFalse(t).InputUTXO(0).TxID,
 					Vout:       givenTxWithOpReturnWithoutOPFalse(t).InputUTXO(0).Vout,
@@ -118,7 +118,7 @@ func TestRecordOutlineOpReturn(t *testing.T) {
 			storedUTXOs: []bsv.Outpoint{},
 			outline:     givenStandardOpReturnOutline(t),
 			expectTxID:  givenTXWithOpReturn(t).ID(),
-			expectOutputs: []database.Output{{
+			expectOutputs: []database.TrackedOutput{{
 				TxID: givenTXWithOpReturn(t).ID(),
 				Vout: 0,
 			}},
@@ -176,26 +176,26 @@ func TestRecordOutlineOpReturnErrorCases(t *testing.T) {
 		WithP2PKHOutput(1)
 
 	tests := map[string]struct {
-		storedOutputs []database.Output
+		storedOutputs []database.TrackedOutput
 		outline       *outlines.Transaction
 		expectErr     error
 	}{
 		"RecordTransactionOutline for not signed transaction": {
-			storedOutputs: []database.Output{},
+			storedOutputs: []database.TrackedOutput{},
 			outline: &outlines.Transaction{
 				BEEF: givenUnsignedTX.BEEF(),
 			},
 			expectErr: txerrors.ErrTxValidation,
 		},
 		"RecordTransactionOutline for not a BEEF hex": {
-			storedOutputs: []database.Output{},
+			storedOutputs: []database.TrackedOutput{},
 			outline: &outlines.Transaction{
 				BEEF: notABeefHex,
 			},
 			expectErr: txerrors.ErrTxValidation,
 		},
 		"RecordTransactionOutline for invalid OP_ZERO after OP_RETURN": {
-			storedOutputs: []database.Output{},
+			storedOutputs: []database.TrackedOutput{},
 			outline: &outlines.Transaction{
 				BEEF: givenTxWithOpZeroAfterOpReturn.BEEF(),
 				Annotations: transaction.Annotations{
@@ -209,7 +209,7 @@ func TestRecordOutlineOpReturnErrorCases(t *testing.T) {
 			expectErr: txerrors.ErrOnlyPushDataAllowed,
 		},
 		"Tx with already spent utxo": {
-			storedOutputs: []database.Output{{
+			storedOutputs: []database.TrackedOutput{{
 				TxID:       givenTXWithOpReturn(t).InputUTXO(0).TxID,
 				Vout:       givenTXWithOpReturn(t).InputUTXO(0).Vout,
 				SpendingTX: "05aa91319c773db18071310ecd5ddc15d3aa4242b55705a13a66f7fefe2b80a1",
@@ -220,7 +220,7 @@ func TestRecordOutlineOpReturnErrorCases(t *testing.T) {
 			expectErr: txerrors.ErrUTXOSpent,
 		},
 		"Vout out of range in annotation": {
-			storedOutputs: []database.Output{},
+			storedOutputs: []database.TrackedOutput{},
 			outline: &outlines.Transaction{
 				BEEF: givenTXWithOpReturn(t).BEEF(),
 				Annotations: transaction.Annotations{
@@ -234,7 +234,7 @@ func TestRecordOutlineOpReturnErrorCases(t *testing.T) {
 			expectErr: txerrors.ErrAnnotationIndexOutOfRange,
 		},
 		"Vout as negative value in annotation": {
-			storedOutputs: []database.Output{},
+			storedOutputs: []database.TrackedOutput{},
 			outline: &outlines.Transaction{
 				BEEF: givenTXWithOpReturn(t).BEEF(),
 				Annotations: transaction.Annotations{
@@ -248,7 +248,7 @@ func TestRecordOutlineOpReturnErrorCases(t *testing.T) {
 			expectErr: txerrors.ErrAnnotationIndexConversion,
 		},
 		"no-op_return output annotated as data": {
-			storedOutputs: []database.Output{},
+			storedOutputs: []database.TrackedOutput{},
 			outline: &outlines.Transaction{
 				BEEF: givenTxWithP2PKHOutput.BEEF(),
 				Annotations: transaction.Annotations{
@@ -283,7 +283,7 @@ func TestOnBroadcastErr(t *testing.T) {
 	// given:
 	given, then := testabilities.New(t)
 	given.Repository().
-		WithOutputs(database.Output{
+		WithOutputs(database.TrackedOutput{
 			TxID:       givenTXWithOpReturn(t).InputUTXO(0).TxID,
 			Vout:       givenTXWithOpReturn(t).InputUTXO(0).Vout,
 			SpendingTX: "",

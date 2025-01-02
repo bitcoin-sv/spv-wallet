@@ -13,7 +13,7 @@ import (
 // Repository is an interface for saving transactions and outputs to the database.
 type Repository interface {
 	SaveTX(ctx context.Context, txRow *database.TrackedTransaction) error
-	GetOutputs(ctx context.Context, outpoints iter.Seq[bsv.Outpoint]) ([]*database.Output, error)
+	GetOutputs(ctx context.Context, outpoints iter.Seq[bsv.Outpoint]) ([]*database.TrackedOutput, error)
 	CheckAddress(ctx context.Context, address string) (bool, error)
 }
 

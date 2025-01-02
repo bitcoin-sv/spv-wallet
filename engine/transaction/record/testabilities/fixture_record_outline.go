@@ -17,7 +17,7 @@ type RecordServiceFixture interface {
 }
 
 type RepositoryFixture interface {
-	WithOutputs(outputs ...database.Output) RepositoryFixture
+	WithOutputs(outputs ...database.TrackedOutput) RepositoryFixture
 	WithUTXOs(outpoints ...bsv.Outpoint) RepositoryFixture
 	WillFailOnSaveTX(err error) RepositoryFixture
 	WillFailOnGetOutputs(err error) RepositoryFixture
@@ -32,7 +32,7 @@ type recordServiceFixture struct {
 	broadcaster *mockBroadcaster
 	t           testing.TB
 
-	initialOutputs []database.Output
+	initialOutputs []database.TrackedOutput
 	initialData    []database.Data
 }
 

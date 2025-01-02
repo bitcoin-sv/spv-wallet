@@ -52,8 +52,8 @@ func (s *Service) RecordTransaction(ctx context.Context, tx *trx.Transaction, ve
 	return nil
 }
 
-func (s *Service) getOutputsForTrackedAddresses(ctx context.Context, tx *trx.Transaction) ([]*database.Output, error) {
-	var trackedOutputs []*database.Output
+func (s *Service) getOutputsForTrackedAddresses(ctx context.Context, tx *trx.Transaction) ([]*database.TrackedOutput, error) {
+	var trackedOutputs []*database.TrackedOutput
 	for vout, output := range tx.Outputs {
 		lockingScript := output.LockingScript
 		if !lockingScript.IsP2PKH() {
@@ -80,7 +80,7 @@ func (s *Service) getOutputsForTrackedAddresses(ctx context.Context, tx *trx.Tra
 			return nil, txerrors.ErrAnnotationIndexConversion.Wrap(err)
 		}
 
-		trackedOutputs = append(trackedOutputs, &database.Output{
+		trackedOutputs = append(trackedOutputs, &database.TrackedOutput{
 			TxID: tx.TxID().String(),
 			Vout: voutU32,
 		})

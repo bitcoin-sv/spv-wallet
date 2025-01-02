@@ -12,18 +12,18 @@ type TrackedTransaction struct {
 
 	BUMP *datatypes.JSONType[trx.MerklePath]
 
-	Outputs []*Output `gorm:"foreignKey:TxID"`
-	Data    []*Data   `gorm:"foreignKey:TxID"`
-	Inputs  []*Output `gorm:"foreignKey:SpendingTX"`
+	Outputs []*TrackedOutput `gorm:"foreignKey:TxID"`
+	Data    []*Data          `gorm:"foreignKey:TxID"`
+	Inputs  []*TrackedOutput `gorm:"foreignKey:SpendingTX"`
 }
 
 // AddOutputs adds outputs to the transaction.
-func (t *TrackedTransaction) AddOutputs(outputs ...*Output) {
+func (t *TrackedTransaction) AddOutputs(outputs ...*TrackedOutput) {
 	t.Outputs = append(t.Outputs, outputs...)
 }
 
 // AddInputs adds inputs to the transaction.
-func (t *TrackedTransaction) AddInputs(inputs ...*Output) {
+func (t *TrackedTransaction) AddInputs(inputs ...*TrackedOutput) {
 	t.Inputs = append(t.Inputs, inputs...)
 }
 

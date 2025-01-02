@@ -44,7 +44,7 @@ func TestOperations(t *testing.T) {
 			ID:       txSpec.ID(),
 			TxStatus: database.TxStatusCreated,
 
-			Outputs: []*database.Output{
+			Outputs: []*database.TrackedOutput{
 				{
 					Vout: 0,
 				},
@@ -82,7 +82,7 @@ func TestOperations(t *testing.T) {
 			ID:       txSpec.ID(),
 			TxStatus: database.TxStatusCreated,
 
-			Inputs: []*database.Output{
+			Inputs: []*database.TrackedOutput{
 				{
 					TxID:       testState.incomingTx.ID(),
 					Vout:       0,
@@ -90,7 +90,7 @@ func TestOperations(t *testing.T) {
 				},
 			},
 
-			Outputs: []*database.Output{
+			Outputs: []*database.TrackedOutput{
 				{
 					Vout: 0,
 				},
@@ -134,7 +134,7 @@ func TestOperations(t *testing.T) {
 			ID:       txSpec.ID(),
 			TxStatus: database.TxStatusCreated,
 
-			Inputs: []*database.Output{
+			Inputs: []*database.TrackedOutput{
 				{
 					TxID:       testState.internalTx.ID(),
 					Vout:       0,

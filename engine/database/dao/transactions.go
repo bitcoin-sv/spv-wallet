@@ -53,7 +53,7 @@ func (r *Transactions) SaveTXs(ctx context.Context, txRows iter.Seq[*database.Tr
 }
 
 // GetOutputs returns outputs from the database based on the provided outpoints.
-func (r *Transactions) GetOutputs(ctx context.Context, outpoints iter.Seq[bsv.Outpoint]) ([]*database.Output, error) {
+func (r *Transactions) GetOutputs(ctx context.Context, outpoints iter.Seq[bsv.Outpoint]) ([]*database.TrackedOutput, error) {
 	outpointsClause := slices.Collect(func(yield func(sqlPair []any) bool) {
 		for outpoint := range outpoints {
 			yield([]any{outpoint.TxID, outpoint.Vout})
@@ -62,10 +62,10 @@ func (r *Transactions) GetOutputs(ctx context.Context, outpoints iter.Seq[bsv.Ou
 
 	query := r.db.
 		WithContext(ctx).
-		Model(&database.Output{}).
+		Model(&database.TrackedOutput{}).
 		Where("(tx_id, vout) IN ?", outpointsClause)
 
-	var outputs []*database.Output
+	var outputs []*database.TrackedOutput
 	if err := query.Find(&outputs).Error; err != nil {
 		return nil, spverrors.Wrapf(err, "failed to get outputs")
 	}

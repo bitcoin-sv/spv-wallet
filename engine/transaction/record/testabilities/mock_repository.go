@@ -12,7 +12,7 @@ import (
 
 type mockRepository struct {
 	transactions map[string]database.TrackedTransaction
-	outputs      map[string]database.Output
+	outputs      map[string]database.TrackedOutput
 	data         map[string]database.Data
 
 	errOnSave       error
@@ -22,7 +22,7 @@ type mockRepository struct {
 func newMockRepository() *mockRepository {
 	return &mockRepository{
 		transactions: make(map[string]database.TrackedTransaction),
-		outputs:      make(map[string]database.Output),
+		outputs:      make(map[string]database.TrackedOutput),
 		data:         make(map[string]database.Data),
 	}
 }
@@ -46,11 +46,11 @@ func (m *mockRepository) SaveTX(_ context.Context, txTable *database.TrackedTran
 	return nil
 }
 
-func (m *mockRepository) GetOutputs(_ context.Context, outpoints iter.Seq[bsv.Outpoint]) ([]*database.Output, error) {
+func (m *mockRepository) GetOutputs(_ context.Context, outpoints iter.Seq[bsv.Outpoint]) ([]*database.TrackedOutput, error) {
 	if m.errOnGetOutputs != nil {
 		return nil, m.errOnGetOutputs
 	}
-	var outputs []*database.Output
+	var outputs []*database.TrackedOutput
 	for outpoint := range outpoints {
 		if output, ok := m.outputs[outpoint.String()]; ok {
 			outputs = append(outputs, &output)
@@ -59,7 +59,7 @@ func (m *mockRepository) GetOutputs(_ context.Context, outpoints iter.Seq[bsv.Ou
 	return outputs, nil
 }
 
-func (m *mockRepository) WithOutputs(outputs ...database.Output) RepositoryFixture {
+func (m *mockRepository) WithOutputs(outputs ...database.TrackedOutput) RepositoryFixture {
 	for _, output := range outputs {
 		m.outputs[output.Outpoint().String()] = output
 	}
@@ -68,7 +68,7 @@ func (m *mockRepository) WithOutputs(outputs ...database.Output) RepositoryFixtu
 
 func (m *mockRepository) WithUTXOs(outpoints ...bsv.Outpoint) RepositoryFixture {
 	for _, o := range outpoints {
-		m.outputs[o.String()] = database.Output{
+		m.outputs[o.String()] = database.TrackedOutput{
 			TxID: o.TxID,
 			Vout: o.Vout,
 		}
@@ -86,7 +86,7 @@ func (m *mockRepository) WillFailOnGetOutputs(err error) RepositoryFixture {
 	return m
 }
 
-func (m *mockRepository) GetAllOutputs() []database.Output {
+func (m *mockRepository) GetAllOutputs() []database.TrackedOutput {
 	return slices.Collect(maps.Values(m.outputs))
 }
 
