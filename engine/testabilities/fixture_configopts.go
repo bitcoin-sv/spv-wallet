@@ -15,3 +15,9 @@ func WithDomainValidationDisabled() ConfigOpts {
 		c.Paymail.DomainValidationEnabled = false
 	}
 }
+
+func WithNotificationsEnabled() ConfigOpts {
+	return func(c *config.AppConfig) {
+		c.Notifications.Enabled = true
+	}
+}

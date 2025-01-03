@@ -19,7 +19,6 @@ import (
 const (
 	domainLocalHost     = "http://localhost:3003"
 	adminXPriv          = "xprv9s21ZrQH143K3CbJXirfrtpLvhT3Vgusdo8coBritQ3rcS7Jy7sxWhatuxG5h2y1Cqj8FKmPp69536gmjYRpfga2MJdsGyBsnB12E19CESK"
-	adminXPub           = "xpub661MyMwAqRbcFgfmdkPgE2m5UjHXu9dj124DbaGLSjaqVESTWfCD4VuNmEbVPkbYLCkykwVZvmA8Pbf8884TQr1FgdG2nPoHR8aB36YdDQh"
 	leaderPaymailAlias  = "leader"
 	minimalBalance      = 14 // 7 satoshi per test
 	defaultGoClientPath = "../../spv-wallet-go-client/regression_tests"
