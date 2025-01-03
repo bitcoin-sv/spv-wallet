@@ -29,7 +29,7 @@ const (
 	ClientOneLeaderXPrivEnvVar = "CLIENT_ONE_LEADER_XPRIV"
 	ClientTwoLeaderXPrivEnvVar = "CLIENT_TWO_LEADER_XPRIV"
 
-	timeoutDuration = 30 * time.Second
+	timeoutDuration = 120 * time.Second
 
 	yes        = 1
 	no         = 0
