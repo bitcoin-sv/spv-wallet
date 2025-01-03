@@ -33,9 +33,9 @@ func (m *mockRepository) SaveTX(_ context.Context, txTable *database.TrackedTran
 	}
 	m.transactions[txTable.ID] = *txTable
 	for _, output := range txTable.Outputs {
-		m.outputs[output.Outpoint().String()] = *output
+		m.outputs[output.Outpoint().String()] = *output.ToTrackedOutput()
 	}
-	for _, output := range txTable.Inputs {
+	for _, output := range txTable.TrackedInputs {
 		utxo := *output
 		utxo.SpendingTX = txTable.ID
 		m.outputs[utxo.Outpoint().String()] = utxo
@@ -102,6 +102,6 @@ func (m *mockRepository) getTransaction(txID string) *database.TrackedTransactio
 	return &tx
 }
 
-func (m *mockRepository) CheckAddress(_ context.Context, _ string) (bool, error) {
-	return true, nil
+func (m *mockRepository) CheckAddress(_ context.Context, _ string) (*database.Address, error) {
+	return nil, nil
 }

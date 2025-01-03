@@ -43,13 +43,8 @@ func TestOperations(t *testing.T) {
 		transaction := &database.TrackedTransaction{
 			ID:       txSpec.ID(),
 			TxStatus: database.TxStatusCreated,
-
-			Outputs: []*database.TrackedOutput{
-				{
-					Vout: 0,
-				},
-			},
 		}
+		transaction.AddOutputs(database.NewP2PKHOutput(txSpec.ID(), 0, senderEntity.ID, 1000))
 
 		// and:
 		operations := []*database.Operation{
@@ -82,20 +77,14 @@ func TestOperations(t *testing.T) {
 			ID:       txSpec.ID(),
 			TxStatus: database.TxStatusCreated,
 
-			Inputs: []*database.TrackedOutput{
+			TrackedInputs: []*database.TrackedOutput{
 				{
-					TxID:       testState.incomingTx.ID(),
-					Vout:       0,
-					SpendingTX: txSpec.ID(),
-				},
-			},
-
-			Outputs: []*database.TrackedOutput{
-				{
+					TxID: testState.incomingTx.ID(),
 					Vout: 0,
 				},
 			},
 		}
+		transaction.AddOutputs(database.NewP2PKHOutput(txSpec.ID(), 0, recipientEntity.ID, 999))
 
 		// and:
 		operations := []*database.Operation{
@@ -134,7 +123,7 @@ func TestOperations(t *testing.T) {
 			ID:       txSpec.ID(),
 			TxStatus: database.TxStatusCreated,
 
-			Inputs: []*database.TrackedOutput{
+			TrackedInputs: []*database.TrackedOutput{
 				{
 					TxID:       testState.internalTx.ID(),
 					Vout:       0,

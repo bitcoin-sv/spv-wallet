@@ -74,24 +74,24 @@ func (s *Service) getTrackedUTXOsFromInputs(ctx context.Context, tx *trx.Transac
 			})
 		}
 	}
-	storedUTXOs, err := s.repo.GetOutputs(ctx, outpoints)
+	storedOutputs, err := s.repo.GetOutputs(ctx, outpoints)
 	if err != nil {
 		return nil, txerrors.ErrGettingOutputs.Wrap(err)
 	}
 
-	for _, utxo := range storedUTXOs {
+	for _, utxo := range storedOutputs {
 		if utxo.IsSpent() {
 			return nil, txerrors.ErrUTXOSpent.Wrap(spverrors.Newf("UTXO %s is already spent", utxo.Outpoint()))
 		}
 	}
 
-	return storedUTXOs, nil
+	return storedOutputs, nil
 }
 
-func (s *Service) processAnnotatedOutputs(tx *trx.Transaction, annotations *transaction.Annotations) ([]*database.TrackedOutput, []*database.Data, error) {
+func (s *Service) processAnnotatedOutputs(tx *trx.Transaction, annotations *transaction.Annotations) ([]database.Output, []*database.Data, error) {
 	txID := tx.TxID().String()
 
-	var outputRecords []*database.TrackedOutput
+	var outputRecords []database.Output
 	var dataRecords []*database.Data
 
 	for vout, annotation := range annotations.Outputs {
@@ -115,10 +115,7 @@ func (s *Service) processAnnotatedOutputs(tx *trx.Transaction, annotations *tran
 				Vout: voutU32,
 				Blob: data,
 			})
-			outputRecords = append(outputRecords, &database.TrackedOutput{
-				TxID: txID,
-				Vout: voutU32,
-			})
+			outputRecords = append(outputRecords, database.NewDataOutput(txID, voutU32))
 		case bucket.BSV:
 			//TODO
 			s.logger.Warn().Msgf("support for BSV bucket is not implemented yet")

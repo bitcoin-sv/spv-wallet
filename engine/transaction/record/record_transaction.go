@@ -3,6 +3,7 @@ package record
 import (
 	"context"
 	"github.com/bitcoin-sv/spv-wallet/conv"
+	"github.com/bitcoin-sv/spv-wallet/models/bsv"
 
 	"github.com/bitcoin-sv/go-sdk/spv"
 	trx "github.com/bitcoin-sv/go-sdk/transaction"
@@ -52,8 +53,8 @@ func (s *Service) RecordTransaction(ctx context.Context, tx *trx.Transaction, ve
 	return nil
 }
 
-func (s *Service) getOutputsForTrackedAddresses(ctx context.Context, tx *trx.Transaction) ([]*database.TrackedOutput, error) {
-	var trackedOutputs []*database.TrackedOutput
+func (s *Service) getOutputsForTrackedAddresses(ctx context.Context, tx *trx.Transaction) ([]database.Output, error) {
+	var trackedOutputs []database.Output
 	for vout, output := range tx.Outputs {
 		lockingScript := output.LockingScript
 		if !lockingScript.IsP2PKH() {
@@ -65,13 +66,13 @@ func (s *Service) getOutputsForTrackedAddresses(ctx context.Context, tx *trx.Tra
 			continue
 		}
 
-		tracked, err := s.repo.CheckAddress(ctx, address.AddressString)
+		addressRow, err := s.repo.CheckAddress(ctx, address.AddressString)
 		if err != nil {
 			s.logger.Warn().Err(err).Msg("failed to check address")
 			continue
 		}
-		if !tracked {
-			s.logger.Debug().Str("address", address.AddressString).Msg("address not tracked")
+		if addressRow == nil || addressRow.User == nil {
+			s.logger.Debug().Str("address", address.AddressString).Msg("address is not tracked")
 			continue
 		}
 
@@ -80,10 +81,12 @@ func (s *Service) getOutputsForTrackedAddresses(ctx context.Context, tx *trx.Tra
 			return nil, txerrors.ErrAnnotationIndexConversion.Wrap(err)
 		}
 
-		trackedOutputs = append(trackedOutputs, &database.TrackedOutput{
-			TxID: tx.TxID().String(),
-			Vout: voutU32,
-		})
+		trackedOutputs = append(trackedOutputs, database.NewP2PKHOutput(
+			tx.TxID().String(),
+			voutU32,
+			addressRow.User.ID,
+			bsv.Satoshis(output.Satoshis)),
+		)
 	}
 	return trackedOutputs, nil
 }
