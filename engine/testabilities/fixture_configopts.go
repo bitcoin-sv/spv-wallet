@@ -9,3 +9,9 @@ func WithNewTransactionFlowEnabled() ConfigOpts {
 		c.ExperimentalFeatures.NewTransactionFlowEnabled = true
 	}
 }
+
+func WithNotificationsEnabled() ConfigOpts {
+	return func(c *config.AppConfig) {
+		c.Notifications.Enabled = true
+	}
+}

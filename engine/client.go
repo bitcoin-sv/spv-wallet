@@ -208,6 +208,10 @@ func (c *Client) Cluster() cluster.ClientInterface {
 
 // Close will safely close any open connections (cache, datastore, etc.)
 func (c *Client) Close(ctx context.Context) error {
+	// Close WebhookManager
+	if c.options.notifications != nil && c.options.notifications.webhookManager != nil {
+		c.options.notifications.webhookManager.Stop()
+	}
 
 	// Close Datastore
 	ds := c.Datastore()
@@ -225,10 +229,6 @@ func (c *Client) Close(ctx context.Context) error {
 			return spverrors.Wrapf(err, "failed to close taskmanager")
 		}
 		c.options.taskManager.TaskEngine = nil
-	}
-
-	if c.options.notifications != nil && c.options.notifications.webhookManager != nil {
-		c.options.notifications.webhookManager.Stop()
 	}
 	return nil
 }
