@@ -7,6 +7,7 @@ type Output interface {
 	Outpoint() *bsv.Outpoint
 
 	ToTrackedOutput() *TrackedOutput
+	ToUserUTXO() *UserUtxos
 }
 
 func NewDataOutput(txID string, vout uint32) Output {
@@ -56,5 +57,16 @@ func (o *virtualOutput) ToTrackedOutput() *TrackedOutput {
 		TxID:       o.txID,
 		Vout:       o.vout,
 		SpendingTX: o.spendingTX,
+	}
+}
+
+func (o *virtualOutput) ToUserUTXO() *UserUtxos {
+	return &UserUtxos{
+		UserID:                       o.userID,
+		TxID:                         o.txID,
+		Vout:                         o.vout,
+		Satoshis:                     uint64(o.satoshis),
+		UnlockingScriptEstimatedSize: o.unlockingScriptEstimatedSize,
+		Bucket:                       o.bucket,
 	}
 }

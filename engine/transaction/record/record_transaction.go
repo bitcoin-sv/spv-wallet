@@ -13,6 +13,7 @@ import (
 
 func (s *Service) RecordTransaction(ctx context.Context, tx *trx.Transaction, verifyScripts bool) error {
 	if verifyScripts {
+		// TODO: Check if in case of not-veryfying-scripts we accidentally allow removing UserUTXOs from the database
 		// NOTE: When we want to record "RawTX" we cannot verify scripts
 		if ok, err := spv.VerifyScripts(tx); err != nil {
 			return txerrors.ErrTxValidation.Wrap(err)

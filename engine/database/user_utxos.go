@@ -3,6 +3,7 @@ package database
 import "time"
 
 // UserUtxos is a table holding user's Unspent Transaction Outputs (UTXOs).
+// TODO: It should be renamed to UserUTXO.
 type UserUtxos struct {
 	UserID                       string `gorm:"primaryKey;uniqueIndex:idx_window,sort:asc,priority:1"`
 	TxID                         string `gorm:"primaryKey;uniqueIndex:idx_window,sort:asc,priority:4"`
