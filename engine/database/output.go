@@ -8,6 +8,8 @@ type Output interface {
 
 	ToTrackedOutput() *TrackedOutput
 	ToUserUTXO() *UserUtxos
+
+	UserID() string
 }
 
 func NewDataOutput(txID string, vout uint32) Output {
@@ -61,6 +63,9 @@ func (o *virtualOutput) ToTrackedOutput() *TrackedOutput {
 }
 
 func (o *virtualOutput) ToUserUTXO() *UserUtxos {
+	if o.userID == "" {
+		return nil
+	}
 	return &UserUtxos{
 		UserID:                       o.userID,
 		TxID:                         o.txID,
@@ -69,4 +74,8 @@ func (o *virtualOutput) ToUserUTXO() *UserUtxos {
 		UnlockingScriptEstimatedSize: o.unlockingScriptEstimatedSize,
 		Bucket:                       o.bucket,
 	}
+}
+
+func (o *virtualOutput) UserID() string {
+	return o.userID
 }

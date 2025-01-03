@@ -53,10 +53,14 @@ func (t *TrackedTransaction) BeforeSave(tx *gorm.DB) error {
 	return nil
 }
 
-func (t *TrackedTransaction) AfterSave(tx *gorm.DB) error {
+func (t *TrackedTransaction) AfterCreate(tx *gorm.DB) error {
 	// Add new UTXOs
 	userUTXOs := slices.Collect(func(yield func(utxos *UserUtxos) bool) {
 		for _, output := range t.Outputs {
+			utxo := output.ToUserUTXO()
+			if utxo == nil {
+				continue
+			}
 			yield(output.ToUserUTXO())
 		}
 	})
@@ -79,6 +83,6 @@ func (t *TrackedTransaction) AfterSave(tx *gorm.DB) error {
 			return spverrors.Wrapf(err, "failed to delete spent utxos")
 		}
 	}
-	
+
 	return nil
 }

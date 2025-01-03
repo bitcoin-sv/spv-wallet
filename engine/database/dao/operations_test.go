@@ -22,7 +22,7 @@ func TestOperations(t *testing.T) {
 	defer cleanup()
 
 	// and:
-	operationsDAO := dao.NewOperationsAccessObject(givenDB.GormDB())
+	transactions := dao.NewTransactionsAccessObject(givenDB.GormDB())
 
 	// and:
 	senderEntity := getUser(t, givenDB.GormDB(), fixtures.Sender)
@@ -57,7 +57,7 @@ func TestOperations(t *testing.T) {
 		}
 
 		// when:
-		err := operationsDAO.SaveOperation(context.Background(), slices.Values(operations))
+		err := transactions.SaveOperations(context.Background(), slices.Values(operations))
 
 		// then:
 		require.NoError(t, err)
@@ -103,7 +103,7 @@ func TestOperations(t *testing.T) {
 		}
 
 		// when:
-		err := operationsDAO.SaveOperation(context.Background(), slices.Values(operations))
+		err := transactions.SaveOperations(context.Background(), slices.Values(operations))
 
 		// then:
 		require.NoError(t, err)
@@ -143,7 +143,7 @@ func TestOperations(t *testing.T) {
 		}
 
 		// when:
-		err := operationsDAO.SaveOperation(context.Background(), slices.Values(operations))
+		err := transactions.SaveOperations(context.Background(), slices.Values(operations))
 
 		// then:
 		require.NoError(t, err)

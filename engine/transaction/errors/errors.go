@@ -69,6 +69,6 @@ var (
 	// ErrUnexpectedErrorDuringInputsSelection is when an unexpected error occurs during inputs selection for transaction outline.
 	ErrUnexpectedErrorDuringInputsSelection = models.SPVError{Code: "error-input-selection", Message: "unexpected error during inputs selection", StatusCode: 500}
 
-	// ErrParsingRawTx is when the raw transaction parsing fails.
-	ErrParsingRawTx = models.SPVError{Code: "error-parsing-raw-tx", Message: "failed to parse raw transaction", StatusCode: 400}
+	// ErrNoOperations is when there are no operations to save.
+	ErrNoOperations = models.SPVError{Code: "error-no-operations", Message: "no operations to save", StatusCode: 400}
 )
