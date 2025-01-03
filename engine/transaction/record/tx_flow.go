@@ -84,20 +84,20 @@ func (f *txFlow) prepareOperationForUserIfNotExist(userID string) {
 	}
 }
 
-func (f *txFlow) addSatoshiToOperation(utxo *database.UserUtxos, satoshi uint64) {
+func (f *txFlow) addSatoshiToOperation(userID string, satoshi uint64) {
 	signedSatoshi, err := conv.Uint64ToInt64(satoshi)
 	if err != nil {
 		panic(err)
 	}
-	f.operations[utxo.UserID].Value = f.operations[utxo.UserID].Value + signedSatoshi
+	f.operations[userID].Value = f.operations[userID].Value + signedSatoshi
 }
 
-func (f *txFlow) subtractSatoshiFromOperation(utxo *database.UserUtxos, satoshi uint64) {
+func (f *txFlow) subtractSatoshiFromOperation(userID string, satoshi uint64) {
 	signedSatoshi, err := conv.Uint64ToInt64(satoshi)
 	if err != nil {
 		panic(err)
 	}
-	f.operations[utxo.UserID].Value = f.operations[utxo.UserID].Value - signedSatoshi
+	f.operations[userID].Value = f.operations[userID].Value - signedSatoshi
 }
 
 func (f *txFlow) spendInputs(trackedOutputs []*database.TrackedOutput) {

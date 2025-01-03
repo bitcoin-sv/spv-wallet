@@ -31,7 +31,7 @@ func (s *Service) RecordTransactionOutline(ctx context.Context, userID string, o
 
 	for _, utxo := range utxosToSpend {
 		flow.prepareOperationForUserIfNotExist(utxo.UserID)
-		flow.subtractSatoshiFromOperation(utxo, utxo.Satoshis)
+		flow.subtractSatoshiFromOperation(utxo.UserID, utxo.Satoshis)
 	}
 
 	flow.spendInputs(trackedOutputs)
@@ -47,7 +47,7 @@ func (s *Service) RecordTransactionOutline(ctx context.Context, userID string, o
 		utxo := output.ToUserUTXO()
 		if utxo != nil {
 			flow.prepareOperationForUserIfNotExist(utxo.UserID)
-			flow.addSatoshiToOperation(utxo, utxo.Satoshis)
+			flow.addSatoshiToOperation(utxo.UserID, utxo.Satoshis)
 		}
 		flow.createOutputs(output)
 	}

@@ -2,6 +2,7 @@ package response
 
 import "time"
 
+// Operation represents a user's operation on a transaction.
 type Operation struct {
 	Time  time.Time `json:"time" example:"2024-02-26T11:00:28.069911Z"`
 	Value int64     `json:"value" example:"1234"`
