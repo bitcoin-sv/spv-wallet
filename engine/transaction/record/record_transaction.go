@@ -2,9 +2,11 @@ package record
 
 import (
 	"context"
+
 	trx "github.com/bitcoin-sv/go-sdk/transaction"
 )
 
+// RecordTransaction will validate, broadcast and save a transaction
 func (s *Service) RecordTransaction(ctx context.Context, tx *trx.Transaction, verifyScripts bool) error {
 	flow := newTxFlow(ctx, s, tx)
 
@@ -28,19 +30,16 @@ func (s *Service) RecordTransaction(ctx context.Context, tx *trx.Transaction, ve
 
 	flow.spendInputs(trackedOutputs)
 
-	newOutputs, err := flow.getOutputsForTrackedAddresses()
-	if err != nil {
-		return err
-	}
+	newOutputs := flow.getOutputsForTrackedAddresses()
 
-	for _, output := range newOutputs {
+	for output := range newOutputs {
 		utxo := output.ToUserUTXO()
 		if utxo != nil {
 			flow.prepareOperationForUserIfNotExist(utxo.UserID)
 			flow.addSatoshiToOperation(utxo, utxo.Satoshis)
 		}
+		flow.createOutputs(output)
 	}
-	flow.createOutputs(newOutputs)
 
 	if err = flow.verify(); err != nil {
 		return err

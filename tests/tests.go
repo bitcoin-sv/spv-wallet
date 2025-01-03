@@ -3,11 +3,11 @@ package tests
 
 import (
 	"context"
-	"github.com/bitcoin-sv/spv-wallet/engine/datastore"
 	"os"
 
 	"github.com/bitcoin-sv/spv-wallet/config"
 	"github.com/bitcoin-sv/spv-wallet/engine"
+	"github.com/bitcoin-sv/spv-wallet/engine/datastore"
 	"github.com/bitcoin-sv/spv-wallet/engine/tester"
 	"github.com/bitcoin-sv/spv-wallet/logging"
 	"github.com/bitcoin-sv/spv-wallet/server/middleware"

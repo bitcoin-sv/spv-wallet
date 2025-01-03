@@ -1,8 +1,9 @@
 package database
 
 import (
-	"github.com/bitcoin-sv/spv-wallet/models/bsv"
 	"time"
+
+	"github.com/bitcoin-sv/spv-wallet/models/bsv"
 )
 
 // TrackedOutput represents an output of a transaction.

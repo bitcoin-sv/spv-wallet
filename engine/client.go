@@ -2,8 +2,6 @@ package engine
 
 import (
 	"context"
-	"github.com/bitcoin-sv/spv-wallet/engine/database/dao"
-	"github.com/bitcoin-sv/spv-wallet/engine/transaction/txtracker"
 	"time"
 
 	"github.com/bitcoin-sv/go-paymail"
@@ -11,6 +9,7 @@ import (
 	"github.com/bitcoin-sv/spv-wallet/engine/chain"
 	"github.com/bitcoin-sv/spv-wallet/engine/chain/models"
 	"github.com/bitcoin-sv/spv-wallet/engine/cluster"
+	"github.com/bitcoin-sv/spv-wallet/engine/database/dao"
 	"github.com/bitcoin-sv/spv-wallet/engine/datastore"
 	"github.com/bitcoin-sv/spv-wallet/engine/logging"
 	"github.com/bitcoin-sv/spv-wallet/engine/metrics"
@@ -21,6 +20,7 @@ import (
 	"github.com/bitcoin-sv/spv-wallet/engine/taskmanager"
 	"github.com/bitcoin-sv/spv-wallet/engine/transaction/outlines"
 	"github.com/bitcoin-sv/spv-wallet/engine/transaction/record"
+	"github.com/bitcoin-sv/spv-wallet/engine/transaction/txtracker"
 	"github.com/bitcoin-sv/spv-wallet/models/bsv"
 	"github.com/go-resty/resty/v2"
 	"github.com/mrz1836/go-cachestore"
@@ -340,10 +340,12 @@ func (c *Client) FeeUnit() bsv.FeeUnit {
 	return *c.options.feeUnit
 }
 
+// TransactionsDAO will return the Transactions DAO
 func (c *Client) TransactionsDAO() *dao.Transactions {
 	return c.options.transactionsDAO
 }
 
+// UsersDAO will return the Users DAO
 func (c *Client) UsersDAO() *dao.Users {
 	return c.options.usersDAO
 }

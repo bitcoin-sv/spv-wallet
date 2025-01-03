@@ -3,21 +3,21 @@ package paymail
 import (
 	"context"
 	"fmt"
-	trx "github.com/bitcoin-sv/go-sdk/transaction"
-	"github.com/rs/zerolog"
-	"gorm.io/datatypes"
 
 	"github.com/bitcoin-sv/go-paymail"
 	"github.com/bitcoin-sv/go-paymail/server"
 	"github.com/bitcoin-sv/go-paymail/spv"
 	primitives "github.com/bitcoin-sv/go-sdk/primitives/ec"
 	"github.com/bitcoin-sv/go-sdk/script"
+	trx "github.com/bitcoin-sv/go-sdk/transaction"
 	"github.com/bitcoin-sv/go-sdk/transaction/template/p2pkh"
 	"github.com/bitcoin-sv/spv-wallet/engine/database"
 	"github.com/bitcoin-sv/spv-wallet/engine/keys/type42"
 	pmerrors "github.com/bitcoin-sv/spv-wallet/engine/paymail/errors"
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/bitcoin-sv/spv-wallet/engine/utils"
+	"github.com/rs/zerolog"
+	"gorm.io/datatypes"
 )
 
 // NewServiceProvider create a new paymail service server which handlers incoming paymail requests
@@ -44,7 +44,7 @@ func (s *serviceProvider) CreateAddressResolutionResponse(ctx context.Context, a
 	panic("implement me")
 }
 
-func (s *serviceProvider) CreateP2PDestinationResponse(ctx context.Context, alias, domain string, satoshis uint64, metaData *server.RequestMetadata) (*paymail.PaymentDestinationPayload, error) {
+func (s *serviceProvider) CreateP2PDestinationResponse(ctx context.Context, alias, domain string, satoshis uint64, _ *server.RequestMetadata) (*paymail.PaymentDestinationPayload, error) {
 	paymailModel, err := s.repo.GetPaymailByAlias(alias, domain)
 	if err != nil {
 		return nil, pmerrors.ErrPaymailDBFailed.Wrap(err)
@@ -102,7 +102,7 @@ func (s *serviceProvider) CreateP2PDestinationResponse(ctx context.Context, alia
 	}, nil
 }
 
-func (s *serviceProvider) GetPaymailByAlias(ctx context.Context, alias, domain string, metaData *server.RequestMetadata) (*paymail.AddressInformation, error) {
+func (s *serviceProvider) GetPaymailByAlias(ctx context.Context, alias, domain string, _ *server.RequestMetadata) (*paymail.AddressInformation, error) {
 	model, err := s.repo.GetPaymailByAlias(alias, domain)
 	if err != nil {
 		return nil, pmerrors.ErrPaymailDBFailed.Wrap(err)
@@ -126,7 +126,7 @@ func (s *serviceProvider) GetPaymailByAlias(ctx context.Context, alias, domain s
 	}, nil
 }
 
-func (s *serviceProvider) RecordTransaction(ctx context.Context, p2pTx *paymail.P2PTransaction, metaData *server.RequestMetadata) (*paymail.P2PTransactionPayload, error) {
+func (s *serviceProvider) RecordTransaction(ctx context.Context, p2pTx *paymail.P2PTransaction, _ *server.RequestMetadata) (*paymail.P2PTransactionPayload, error) {
 	// TODO handle BEEF transactions
 	isBEEF := p2pTx.DecodedBeef != nil && p2pTx.Beef != ""
 	isRawTX := p2pTx.Hex != ""
@@ -155,6 +155,9 @@ func (s *serviceProvider) RecordTransaction(ctx context.Context, p2pTx *paymail.
 	if isBEEF {
 		// TODO: Warning: p2pTx.DecodedBeef.Transactions doesn't store MerklePath (it is because how go-paymail parses beef)
 		err = s.txTracker.TrackMissingTxs(ctx, utils.CollectAncestors(tx))
+		if err != nil {
+			s.logger.Warn().Err(err).Msg("Failed to track missing transactions")
+		}
 	}
 
 	return &paymail.P2PTransactionPayload{

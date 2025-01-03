@@ -1,11 +1,12 @@
 package users
 
 import (
+	"net/http"
+
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/bitcoin-sv/spv-wallet/models/response"
 	"github.com/bitcoin-sv/spv-wallet/server/reqctx"
 	"github.com/gin-gonic/gin"
-	"net/http"
 )
 
 func balance(c *gin.Context, userContext *reqctx.UserContext) {
@@ -20,7 +21,7 @@ func balance(c *gin.Context, userContext *reqctx.UserContext) {
 		spverrors.ErrorResponse(c, err, reqctx.Logger(c))
 		return
 	}
-	
+
 	c.JSON(http.StatusOK, &response.Balance{
 		CurrentBalance: satoshi,
 	})

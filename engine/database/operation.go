@@ -2,6 +2,7 @@ package database
 
 import "time"
 
+// Operation represents a user's operation on a transaction.
 type Operation struct {
 	TxID   string `gorm:"primaryKey"`
 	UserID string `gorm:"primaryKey"`

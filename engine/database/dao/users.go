@@ -3,6 +3,7 @@ package dao
 import (
 	"context"
 	"errors"
+
 	"github.com/bitcoin-sv/spv-wallet/engine/database"
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/bitcoin-sv/spv-wallet/models/filter"
@@ -49,6 +50,7 @@ func (u *Users) GetPaymailByAlias(alias, domain string) (*database.Paymail, erro
 	return &paymail, nil
 }
 
+// SaveAddress saves an address to the database.
 func (u *Users) SaveAddress(ctx context.Context, userRow *database.User, addressRow *database.Address) error {
 	err := u.db.
 		WithContext(ctx).
@@ -63,6 +65,7 @@ func (u *Users) SaveAddress(ctx context.Context, userRow *database.User, address
 	return nil
 }
 
+// GetBalance returns the balance of a user in a given bucket.
 func (u *Users) GetBalance(ctx context.Context, userID string, bucket string) (uint64, error) {
 	var balance uint64
 	err := u.db.
@@ -80,6 +83,7 @@ func (u *Users) GetBalance(ctx context.Context, userID string, bucket string) (u
 	return balance, nil
 }
 
+// GetOperations returns paginated result of operations of a user.
 func (u *Users) GetOperations(ctx context.Context, userID string, page filter.Page) (*database.PagedResult[database.Operation], error) {
 	return database.PaginatedQuery[database.Operation](ctx, page, u.db, func(tx *gorm.DB) *gorm.DB {
 		return tx.Where("user_id = ?", userID)

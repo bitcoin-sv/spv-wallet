@@ -24,6 +24,7 @@ func NewTransactionsAccessObject(db *gorm.DB) *Transactions {
 	return &Transactions{db: db}
 }
 
+// SaveTXs saves transactions to the database.
 func (r *Transactions) SaveTXs(ctx context.Context, txRows iter.Seq[*database.TrackedTransaction]) error {
 	query := r.db.
 		WithContext(ctx).
@@ -72,6 +73,7 @@ func (r *Transactions) GetOutputs(ctx context.Context, outpoints iter.Seq[bsv.Ou
 	return utxos, trackedOutputs, nil
 }
 
+// CheckAddress returns an address from the database based on the provided address. If the address does not exist, nil is returned.
 func (r *Transactions) CheckAddress(ctx context.Context, address string) (*database.Address, error) {
 	var row database.Address
 	if err := r.db.
@@ -88,6 +90,7 @@ func (r *Transactions) CheckAddress(ctx context.Context, address string) (*datab
 	return &row, nil
 }
 
+// MissingTransactions returns transactions that are not tracked in the database.
 func (r *Transactions) MissingTransactions(ctx context.Context, txIDs iter.Seq[string]) (iter.Seq[string], error) {
 	idsMap := maps.Collect(func(yield func(string, bool) bool) {
 		for txID := range txIDs {
@@ -114,6 +117,7 @@ func (r *Transactions) MissingTransactions(ctx context.Context, txIDs iter.Seq[s
 	return maps.Keys(idsMap), nil
 }
 
+// SaveOperations saves operations to the database.
 func (r *Transactions) SaveOperations(ctx context.Context, opRows iter.Seq[*database.Operation]) error {
 	query := r.db.
 		WithContext(ctx).

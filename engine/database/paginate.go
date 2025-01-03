@@ -2,19 +2,22 @@ package database
 
 import (
 	"context"
+	"strings"
+
 	"github.com/bitcoin-sv/spv-wallet/conv"
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/bitcoin-sv/spv-wallet/models/filter"
 	"github.com/bitcoin-sv/spv-wallet/models/response"
 	"gorm.io/gorm"
-	"strings"
 )
 
+// PagedResult is a generic struct for paginated results.
 type PagedResult[T any] struct {
 	Content         []*T
 	PageDescription response.PageDescription
 }
 
+// PaginatedQuery is a generic function for getting paginated results from a database.
 func PaginatedQuery[T any](ctx context.Context, page filter.Page, db *gorm.DB, queryFunc func(tx *gorm.DB) *gorm.DB) (*PagedResult[T], error) {
 	PageWithDefaults(&page)
 	model := PagedResult[T]{}
@@ -53,6 +56,7 @@ func PaginatedQuery[T any](ctx context.Context, page filter.Page, db *gorm.DB, q
 	return &model, nil
 }
 
+// Paginate is a Scope function that returns a function that paginates a database query.
 func Paginate(page filter.Page) func(db *gorm.DB) *gorm.DB {
 	return func(db *gorm.DB) *gorm.DB {
 		offset := (page.Number - 1) * page.Size
@@ -60,6 +64,7 @@ func Paginate(page filter.Page) func(db *gorm.DB) *gorm.DB {
 	}
 }
 
+// PageWithDefaults sets default values for a Page object (in place).
 func PageWithDefaults(page *filter.Page) {
 	if page.Number <= 0 {
 		page.Number = 1

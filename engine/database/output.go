@@ -2,6 +2,8 @@ package database
 
 import "github.com/bitcoin-sv/spv-wallet/models/bsv"
 
+// Output represents a virtual output that can be either a data output or a P2PKH output.
+// Based on this, TrackedOutput and UserUtxos are stored in the database.
 type Output interface {
 	IsSpent() bool
 	Outpoint() *bsv.Outpoint
@@ -12,6 +14,7 @@ type Output interface {
 	UserID() string
 }
 
+// NewDataOutput creates a new output for data (OP_RETURN) transactions.
 func NewDataOutput(txID string, vout uint32) Output {
 	return &virtualOutput{
 		txID:   txID,
@@ -20,6 +23,7 @@ func NewDataOutput(txID string, vout uint32) Output {
 	}
 }
 
+// NewP2PKHOutput creates a new output for P2PKH transactions.
 func NewP2PKHOutput(txID string, vout uint32, userID string, satoshis bsv.Satoshis) Output {
 	return &virtualOutput{
 		txID:                         txID,

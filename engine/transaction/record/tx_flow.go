@@ -2,13 +2,15 @@ package record
 
 import (
 	"context"
+	"iter"
+	"maps"
+
 	"github.com/bitcoin-sv/go-sdk/spv"
 	trx "github.com/bitcoin-sv/go-sdk/transaction"
 	"github.com/bitcoin-sv/spv-wallet/conv"
 	"github.com/bitcoin-sv/spv-wallet/engine/database"
 	txerrors "github.com/bitcoin-sv/spv-wallet/engine/transaction/errors"
 	"github.com/bitcoin-sv/spv-wallet/models/bsv"
-	"maps"
 )
 
 type txFlow struct {
@@ -83,57 +85,66 @@ func (f *txFlow) prepareOperationForUserIfNotExist(userID string) {
 }
 
 func (f *txFlow) addSatoshiToOperation(utxo *database.UserUtxos, satoshi uint64) {
-	f.operations[utxo.UserID].Value = f.operations[utxo.UserID].Value + int64(satoshi)
+	signedSatoshi, err := conv.Uint64ToInt64(satoshi)
+	if err != nil {
+		panic(err)
+	}
+	f.operations[utxo.UserID].Value = f.operations[utxo.UserID].Value + signedSatoshi
 }
 
 func (f *txFlow) subtractSatoshiFromOperation(utxo *database.UserUtxos, satoshi uint64) {
-	f.operations[utxo.UserID].Value = f.operations[utxo.UserID].Value - int64(satoshi)
+	signedSatoshi, err := conv.Uint64ToInt64(satoshi)
+	if err != nil {
+		panic(err)
+	}
+	f.operations[utxo.UserID].Value = f.operations[utxo.UserID].Value - signedSatoshi
 }
 
 func (f *txFlow) spendInputs(trackedOutputs []*database.TrackedOutput) {
 	f.txRow.AddInputs(trackedOutputs...)
 }
 
-func (f *txFlow) createOutputs(outputs []database.Output) {
+func (f *txFlow) createOutputs(outputs ...database.Output) {
 	f.txRow.AddOutputs(outputs...)
 }
 
-func (f *txFlow) getOutputsForTrackedAddresses() ([]database.Output, error) {
-	var trackedOutputs []database.Output
-	for vout, output := range f.tx.Outputs {
-		lockingScript := output.LockingScript
-		if !lockingScript.IsP2PKH() {
-			continue
-		}
-		address, err := lockingScript.Address()
-		if err != nil {
-			f.service.logger.Warn().Err(err).Msg("failed to get address from locking script")
-			continue
-		}
+func (f *txFlow) getOutputsForTrackedAddresses() iter.Seq[database.Output] {
+	return func(yield func(database.Output) bool) {
+		for vout, output := range f.tx.Outputs {
+			lockingScript := output.LockingScript
+			if !lockingScript.IsP2PKH() {
+				continue
+			}
+			address, err := lockingScript.Address()
+			if err != nil {
+				f.service.logger.Warn().Err(err).Msg("failed to get address from locking script")
+				continue
+			}
 
-		addressRow, err := f.service.repo.CheckAddress(f.ctx, address.AddressString)
-		if err != nil {
-			f.service.logger.Warn().Err(err).Msg("failed to check address")
-			continue
-		}
-		if addressRow == nil || addressRow.UserID == "" {
-			f.service.logger.Debug().Str("address", address.AddressString).Msg("address is not tracked")
-			continue
-		}
+			addressRow, err := f.service.repo.CheckAddress(f.ctx, address.AddressString)
+			if err != nil {
+				f.service.logger.Warn().Err(err).Msg("failed to check address")
+				continue
+			}
+			if addressRow == nil || addressRow.UserID == "" {
+				f.service.logger.Debug().Str("address", address.AddressString).Msg("address is not tracked")
+				continue
+			}
 
-		voutU32, err := conv.IntToUint32(vout)
-		if err != nil {
-			return nil, txerrors.ErrAnnotationIndexConversion.Wrap(err)
-		}
+			voutU32, err := conv.IntToUint32(vout)
+			if err != nil {
+				f.service.logger.Warn().Err(err).Msg("failed to convert vout to uint32")
+				continue
+			}
 
-		trackedOutputs = append(trackedOutputs, database.NewP2PKHOutput(
-			f.txID,
-			voutU32,
-			addressRow.UserID,
-			bsv.Satoshis(output.Satoshis)),
-		)
+			yield(database.NewP2PKHOutput(
+				f.txID,
+				voutU32,
+				addressRow.UserID,
+				bsv.Satoshis(output.Satoshis)),
+			)
+		}
 	}
-	return trackedOutputs, nil
 }
 
 func (f *txFlow) verify() error {

@@ -2,23 +2,27 @@ package txtracker
 
 import (
 	"context"
+	"iter"
+	"maps"
+
 	trx "github.com/bitcoin-sv/go-sdk/transaction"
 	"github.com/bitcoin-sv/spv-wallet/engine/database"
 	"gorm.io/datatypes"
-	"iter"
-	"maps"
 )
 
+// Service is a TxTracker service.
 type Service struct {
 	repo Repository
 }
 
+// NewService creates a new TxTracker service.
 func NewService(repo Repository) *Service {
 	return &Service{
 		repo: repo,
 	}
 }
 
+// TrackMissingTxs saves missing transactions to the database.
 func (s *Service) TrackMissingTxs(ctx context.Context, transactions iter.Seq[*trx.Transaction]) error {
 	txsMap := maps.Collect(func(yield func(string, *trx.Transaction) bool) {
 		for tx := range transactions {

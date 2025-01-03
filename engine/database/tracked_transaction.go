@@ -1,12 +1,13 @@
 package database
 
 import (
+	"slices"
+	"time"
+
 	trx "github.com/bitcoin-sv/go-sdk/transaction"
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"gorm.io/datatypes"
 	"gorm.io/gorm"
-	"slices"
-	"time"
 )
 
 // TrackedTransaction represents a transaction in the database.
@@ -24,7 +25,7 @@ type TrackedTransaction struct {
 	Outputs       []Output         `gorm:"-"`
 	TrackedInputs []*TrackedOutput `gorm:"foreignKey:SpendingTX"`
 
-	// TrackedOutputs are automatically populated from Outputs and Inputs.
+	// TrackedOutputs are automatically populated from Outputs
 	TrackedOutputs []*TrackedOutput `gorm:"foreignKey:TxID"`
 }
 
@@ -43,7 +44,8 @@ func (t *TrackedTransaction) AddData(data ...*Data) {
 	t.Data = append(t.Data, data...)
 }
 
-func (t *TrackedTransaction) BeforeSave(tx *gorm.DB) error {
+// BeforeSave is a hook that is called before saving the transaction.
+func (t *TrackedTransaction) BeforeSave(_ *gorm.DB) error {
 	for _, output := range t.Outputs {
 		if output.IsSpent() {
 			return spverrors.Newf("output %s is already spent", output.Outpoint())
@@ -53,6 +55,8 @@ func (t *TrackedTransaction) BeforeSave(tx *gorm.DB) error {
 	return nil
 }
 
+// AfterCreate is a hook that is called after creating the transaction.
+// It is responsible for adding new (User's) UTXOs and removing spent UTXOs.
 func (t *TrackedTransaction) AfterCreate(tx *gorm.DB) error {
 	// Add new UTXOs
 	userUTXOs := slices.Collect(func(yield func(utxos *UserUtxos) bool) {

@@ -49,8 +49,8 @@ func (s *Service) RecordTransactionOutline(ctx context.Context, userID string, o
 			flow.prepareOperationForUserIfNotExist(utxo.UserID)
 			flow.addSatoshiToOperation(utxo, utxo.Satoshis)
 		}
+		flow.createOutputs(output)
 	}
-	flow.createOutputs(newOutputs)
 
 	if len(newDataRecords) > 0 {
 		flow.prepareOperationForUserIfNotExist(userID)
