@@ -2,6 +2,7 @@ package database
 
 import (
 	"github.com/bitcoin-sv/spv-wallet/models/bsv"
+	"time"
 )
 
 // TrackedOutput represents an output of a transaction.
@@ -9,6 +10,9 @@ type TrackedOutput struct {
 	TxID       string `gorm:"primaryKey"`
 	Vout       uint32 `gorm:"primaryKey"`
 	SpendingTX string `gorm:"type:char(64)"`
+
+	CreatedAt time.Time
+	UpdatedAt time.Time
 }
 
 // IsSpent returns true if the output is spent.

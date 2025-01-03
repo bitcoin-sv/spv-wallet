@@ -1,8 +1,12 @@
 package database
 
+import "time"
+
 type Operation struct {
 	TxID   string `gorm:"primaryKey"`
 	UserID string `gorm:"primaryKey"`
+
+	CreatedAt time.Time
 
 	Type  string
 	Value int64

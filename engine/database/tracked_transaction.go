@@ -5,12 +5,16 @@ import (
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"gorm.io/datatypes"
 	"gorm.io/gorm"
+	"time"
 )
 
 // TrackedTransaction represents a transaction in the database.
 type TrackedTransaction struct {
 	ID       string `gorm:"type:char(64);primaryKey"`
 	TxStatus TxStatus
+
+	CreatedAt time.Time
+	UpdatedAt time.Time
 
 	BUMP *datatypes.JSONType[trx.MerklePath]
 
