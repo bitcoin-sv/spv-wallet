@@ -10,6 +10,12 @@ func WithNewTransactionFlowEnabled() ConfigOpts {
 	}
 }
 
+func WithDomainValidationDisabled() ConfigOpts {
+	return func(c *config.AppConfig) {
+		c.Paymail.DomainValidationEnabled = false
+	}
+}
+
 func WithNotificationsEnabled() ConfigOpts {
 	return func(c *config.AppConfig) {
 		c.Notifications.Enabled = true

@@ -7,8 +7,8 @@ import (
 
 	"github.com/bitcoin-sv/spv-wallet/config"
 	"github.com/bitcoin-sv/spv-wallet/engine"
+	"github.com/bitcoin-sv/spv-wallet/engine/datastore"
 	"github.com/bitcoin-sv/spv-wallet/engine/tester"
-	"github.com/bitcoin-sv/spv-wallet/engine/utils"
 	"github.com/bitcoin-sv/spv-wallet/logging"
 	"github.com/bitcoin-sv/spv-wallet/server/middleware"
 	"github.com/gin-gonic/gin"
@@ -38,9 +38,11 @@ func (ts *TestSuite) BaseSetupSuite() {
 	}
 	cfg.Notifications.Enabled = false
 
-	// Defaults for safe thread testing
+	cfg.Db.Datastore.Engine = datastore.SQLite
+	cfg.Db.SQLite.Shared = false
 	cfg.Db.SQLite.MaxIdleConnections = 1
 	cfg.Db.SQLite.MaxOpenConnections = 1
+	cfg.Db.SQLite.DatabasePath = "file:spv-wallet-suite-test.db?mode=memory"
 
 	ts.AppConfig = cfg
 }
@@ -58,9 +60,6 @@ func (ts *TestSuite) BaseSetupTest() {
 	// Load the services
 	var err error
 	ts.Logger = tester.Logger(ts.T())
-
-	ts.AppConfig.Db.SQLite.TablePrefix, err = utils.RandomHex(8)
-	require.NoError(ts.T(), err)
 
 	opts, err := ts.AppConfig.ToEngineOptions(ts.Logger)
 	require.NoError(ts.T(), err)

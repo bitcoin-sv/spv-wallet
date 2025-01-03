@@ -2,7 +2,9 @@ package dao
 
 import (
 	"context"
+	"errors"
 	"iter"
+	"maps"
 	"slices"
 
 	"github.com/bitcoin-sv/spv-wallet/engine/database"
@@ -22,15 +24,15 @@ func NewTransactionsAccessObject(db *gorm.DB) *Transactions {
 	return &Transactions{db: db}
 }
 
-// SaveTX saves a transaction to the database.
-func (r *Transactions) SaveTX(ctx context.Context, txRow *database.TrackedTransaction) error {
+// SaveTXs saves transactions to the database.
+func (r *Transactions) SaveTXs(ctx context.Context, txRows iter.Seq[*database.TrackedTransaction]) error {
 	query := r.db.
 		WithContext(ctx).
 		Clauses(clause.OnConflict{
 			UpdateAll: true,
 		})
 
-	if err := query.Create(txRow).Error; err != nil {
+	if err := query.Create(slices.Collect(txRows)).Error; err != nil {
 		return spverrors.Wrapf(err, "failed to save transaction")
 	}
 
@@ -38,22 +40,94 @@ func (r *Transactions) SaveTX(ctx context.Context, txRow *database.TrackedTransa
 }
 
 // GetOutputs returns outputs from the database based on the provided outpoints.
-func (r *Transactions) GetOutputs(ctx context.Context, outpoints iter.Seq[bsv.Outpoint]) ([]*database.Output, error) {
+func (r *Transactions) GetOutputs(ctx context.Context, outpoints iter.Seq[bsv.Outpoint]) ([]*database.UserUtxos, []*database.TrackedOutput, error) {
 	outpointsClause := slices.Collect(func(yield func(sqlPair []any) bool) {
 		for outpoint := range outpoints {
 			yield([]any{outpoint.TxID, outpoint.Vout})
 		}
 	})
 
-	query := r.db.
-		WithContext(ctx).
-		Model(&database.Output{}).
-		Where("(tx_id, vout) IN ?", outpointsClause)
+	var utxos []*database.UserUtxos
+	var trackedOutputs []*database.TrackedOutput
+	err := r.db.WithContext(ctx).Transaction(func(tx *gorm.DB) error {
+		if err := tx.
+			Model(&database.UserUtxos{}).
+			Where("(tx_id, vout) IN ?", outpointsClause).
+			Find(&utxos).Error; err != nil {
+			return err
+		}
 
-	var outputs []*database.Output
-	if err := query.Find(&outputs).Error; err != nil {
-		return nil, spverrors.Wrapf(err, "failed to get outputs")
+		if err := tx.
+			Model(&database.TrackedOutput{}).
+			Where("(tx_id, vout) IN ?", outpointsClause).
+			Find(&trackedOutputs).Error; err != nil {
+			return err
+		}
+
+		return nil
+	})
+	if err != nil {
+		return nil, nil, spverrors.Wrapf(err, "failed to get outputs")
 	}
 
-	return outputs, nil
+	return utxos, trackedOutputs, nil
+}
+
+// CheckAddress returns an address from the database based on the provided address. If the address does not exist, nil is returned.
+func (r *Transactions) CheckAddress(ctx context.Context, address string) (*database.Address, error) {
+	var row database.Address
+	if err := r.db.
+		WithContext(ctx).
+		Model(&database.Address{}).
+		Where("address = ?", address).
+		First(&row).Error; err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil, nil
+		}
+		return nil, err
+	}
+
+	return &row, nil
+}
+
+// MissingTransactions returns transactions that are not tracked in the database.
+func (r *Transactions) MissingTransactions(ctx context.Context, txIDs iter.Seq[string]) (iter.Seq[string], error) {
+	idsMap := maps.Collect(func(yield func(string, bool) bool) {
+		for txID := range txIDs {
+			yield(txID, true)
+		}
+	})
+
+	idsSlice := slices.Collect(maps.Keys(idsMap))
+
+	var alreadyTracked []string
+	if err := r.db.
+		WithContext(ctx).
+		Model(&database.TrackedTransaction{}).
+		Where("id IN ?", idsSlice).
+		Pluck("id", &alreadyTracked).
+		Error; err != nil {
+		return nil, spverrors.Wrapf(err, "failed to get missing transactions")
+	}
+
+	for _, txID := range alreadyTracked {
+		delete(idsMap, txID)
+	}
+
+	return maps.Keys(idsMap), nil
+}
+
+// SaveOperations saves operations to the database.
+func (r *Transactions) SaveOperations(ctx context.Context, opRows iter.Seq[*database.Operation]) error {
+	query := r.db.
+		WithContext(ctx).
+		Clauses(clause.OnConflict{
+			UpdateAll: true,
+		})
+
+	if err := query.Create(slices.Collect(opRows)).Error; err != nil {
+		return err
+	}
+
+	return nil
 }

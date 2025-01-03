@@ -97,7 +97,7 @@ func TestInputsSelector(t *testing.T) {
 			selector := given.NewInputSelector()
 
 			// when:
-			utxos, err := selector.SelectInputsForTransaction(context.Background(), fixtures.Sender.XPubID(), test.selectBy.satoshis, test.selectBy.txSizeWithoutInputs)
+			utxos, err := selector.SelectInputsForTransaction(context.Background(), fixtures.Sender.Address().AddressString, test.selectBy.satoshis, test.selectBy.txSizeWithoutInputs)
 
 			// then:
 			then.WithoutError(err).SelectedInputs(utxos).
@@ -143,13 +143,13 @@ func TestInputsSelector(t *testing.T) {
 			selector := given.NewInputSelector()
 
 			// when:
-			_, err := selector.SelectInputsForTransaction(context.Background(), fixtures.Sender.XPubID(), test.selectBy.satoshis, test.selectBy.txSizeWithoutInputs)
+			_, err := selector.SelectInputsForTransaction(context.Background(), fixtures.Sender.Address().AddressString, test.selectBy.satoshis, test.selectBy.txSizeWithoutInputs)
 
 			// then:
 			require.NoError(t, err)
 
 			// when:
-			utxos, err := selector.SelectInputsForTransaction(context.Background(), fixtures.Sender.XPubID(), test.selectBy.satoshis, test.selectBy.txSizeWithoutInputs)
+			utxos, err := selector.SelectInputsForTransaction(context.Background(), fixtures.Sender.Address().AddressString, test.selectBy.satoshis, test.selectBy.txSizeWithoutInputs)
 
 			// then:
 			then.WithoutError(err).SelectedInputs(utxos).

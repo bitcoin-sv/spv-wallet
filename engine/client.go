@@ -9,6 +9,7 @@ import (
 	"github.com/bitcoin-sv/spv-wallet/engine/chain"
 	"github.com/bitcoin-sv/spv-wallet/engine/chain/models"
 	"github.com/bitcoin-sv/spv-wallet/engine/cluster"
+	"github.com/bitcoin-sv/spv-wallet/engine/database/dao"
 	"github.com/bitcoin-sv/spv-wallet/engine/datastore"
 	"github.com/bitcoin-sv/spv-wallet/engine/logging"
 	"github.com/bitcoin-sv/spv-wallet/engine/metrics"
@@ -19,6 +20,7 @@ import (
 	"github.com/bitcoin-sv/spv-wallet/engine/taskmanager"
 	"github.com/bitcoin-sv/spv-wallet/engine/transaction/outlines"
 	"github.com/bitcoin-sv/spv-wallet/engine/transaction/record"
+	"github.com/bitcoin-sv/spv-wallet/engine/transaction/txtracker"
 	"github.com/bitcoin-sv/spv-wallet/models/bsv"
 	"github.com/go-resty/resty/v2"
 	"github.com/mrz1836/go-cachestore"
@@ -47,6 +49,7 @@ type (
 		paymail                    *paymailOptions        // Paymail options & client
 		transactionOutlinesService outlines.Service       // Service for transaction outlines
 		transactionRecordService   *record.Service        // Service for recording transactions
+		transactionTrackerService  *txtracker.Service     // Service for tracking transactions
 		paymailAddressService      paymailaddress.Service // Service for paymail addresses
 		taskManager                *taskManagerOptions    // Configuration options for the TaskManager (TaskQ, etc.)
 		userAgent                  string                 // User agent for all outgoing requests
@@ -54,6 +57,8 @@ type (
 		arcConfig                  chainmodels.ARCConfig  // Configuration for ARC
 		bhsConfig                  chainmodels.BHSConfig  // Configuration for BHS
 		feeUnit                    *bsv.FeeUnit           // Fee unit for transactions
+		transactionsDAO            *dao.Transactions
+		usersDAO                   *dao.Users
 	}
 
 	// cacheStoreOptions holds the cache configuration and client
@@ -142,6 +147,8 @@ func NewClient(ctx context.Context, opts ...ClientOps) (ClientInterface, error) 
 		return nil, err
 	}
 
+	client.loadDAOs()
+
 	// Load the Paymail client and service (if does not exist)
 	if err = client.loadPaymailComponents(); err != nil {
 		return nil, err
@@ -170,6 +177,8 @@ func NewClient(ctx context.Context, opts ...ClientOps) (ClientInterface, error) 
 	if err = client.loadTransactionRecordService(); err != nil {
 		return nil, err
 	}
+
+	client.loadTransactionTrackerService()
 
 	// Register all cron jobs
 	if err = client.registerCronJobs(); err != nil {
@@ -329,4 +338,14 @@ func (c *Client) LogBHSReadiness(ctx context.Context) {
 // FeeUnit will return the fee unit used for transactions
 func (c *Client) FeeUnit() bsv.FeeUnit {
 	return *c.options.feeUnit
+}
+
+// TransactionsDAO will return the Transactions DAO
+func (c *Client) TransactionsDAO() *dao.Transactions {
+	return c.options.transactionsDAO
+}
+
+// UsersDAO will return the Users DAO
+func (c *Client) UsersDAO() *dao.Users {
+	return c.options.usersDAO
 }

@@ -6,10 +6,13 @@ import (
 )
 
 var funcsMap = template.FuncMap{
-	"matchTimestamp": matchTimestamp,
-	"matchURL":       matchURL,
-	"orEmpty":        orEmpty,
-	"matchID64":      matchID64,
+	"matchTimestamp":     matchTimestamp,
+	"matchURL":           matchURL,
+	"orEmpty":            orEmpty,
+	"matchID64":          matchID64,
+	"matchHexWithLength": matchHexWithLength,
+	"matchHex":           matchHex,
+	"matchAddress":       matchAddress,
 }
 
 func matchTimestamp() string {
@@ -22,6 +25,18 @@ func matchURL() string {
 
 func matchID64() string {
 	return `/^[a-zA-Z0-9]{64}$/`
+}
+
+func matchHexWithLength(length int) string {
+	return fmt.Sprintf(`/^[a-f0-9]{%d}$/`, length)
+}
+
+func matchHex() string {
+	return `/^[a-f0-9]+$/`
+}
+
+func matchAddress() string {
+	return `/^(1|m)[a-km-zA-HJ-NP-Z1-9]{33}$/`
 }
 
 func orEmpty(statement string) string {

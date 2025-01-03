@@ -32,9 +32,11 @@ var grandparentTXIDs = []string{
 type GivenTXSpec interface {
 	WithoutSigning() GivenTXSpec
 	WithInput(satoshis uint64) GivenTXSpec
+	WithInputFromUTXO(tx *trx.Transaction, vout uint32) GivenTXSpec
 	WithSingleSourceInputs(satoshis ...uint64) GivenTXSpec
 	WithOPReturn(dataStr string) GivenTXSpec
-	WithOutputScript(parts ...ScriptPart) GivenTXSpec
+	WithOutputScriptParts(parts ...ScriptPart) GivenTXSpec
+	WithOutputScript(satoshis uint64, script *script.Script) GivenTXSpec
 	WithP2PKHOutput(satoshis uint64) GivenTXSpec
 
 	TX() *trx.Transaction
@@ -79,6 +81,16 @@ func (spec *txSpec) WithInput(satoshis uint64) GivenTXSpec {
 	return spec.WithSingleSourceInputs(satoshis)
 }
 
+func (spec *txSpec) WithInputFromUTXO(tx *trx.Transaction, vout uint32) GivenTXSpec {
+	output := tx.Outputs[vout]
+	utxo, err := trx.NewUTXO(tx.TxID().String(), vout, output.LockingScript.String(), output.Satoshis)
+	require.NoError(spec.t, err, "creating utxo for input")
+
+	spec.utxos = append(spec.utxos, utxo)
+	spec.sourceTransactions[tx.TxID().String()] = tx
+	return spec
+}
+
 // WithSingleSourceInputs adds inputs to the transaction with the specified satoshis
 // All the inputs will be sourced from a single parent transaction
 func (spec *txSpec) WithSingleSourceInputs(satoshis ...uint64) GivenTXSpec {
@@ -117,6 +129,15 @@ func (spec *txSpec) WithP2PKHOutput(satoshis uint64) GivenTXSpec {
 	return spec
 }
 
+// WithOutputScript adds an output to the transaction with the specified satoshis and script
+func (spec *txSpec) WithOutputScript(satoshis uint64, script *script.Script) GivenTXSpec {
+	spec.outputs = append(spec.outputs, &trx.TransactionOutput{
+		Satoshis:      satoshis,
+		LockingScript: script,
+	})
+	return spec
+}
+
 // ScriptPart is an interface for building script parts
 type ScriptPart interface {
 	Append(s *script.Script) error
@@ -138,8 +159,8 @@ func (data PushData) Append(s *script.Script) error {
 	return s.AppendPushData(data)
 }
 
-// WithOutputScript adds an output to the transaction with the specified script parts
-func (spec *txSpec) WithOutputScript(parts ...ScriptPart) GivenTXSpec {
+// WithOutputScriptParts adds an output to the transaction with the specified script parts
+func (spec *txSpec) WithOutputScriptParts(parts ...ScriptPart) GivenTXSpec {
 	s := &script.Script{}
 	for _, part := range parts {
 		err := part.Append(s)
@@ -242,9 +263,8 @@ func (spec *txSpec) makeParentTX(satoshis ...uint64) *trx.Transaction {
 	// each merkle proof should have a different block height to not collide with each other
 	err = tx.AddMerkleProof(trx.NewMerklePath(spec.getNextBlockHeight(), [][]*trx.PathElement{{
 		&trx.PathElement{
-			Hash:      tx.TxID(),
-			Offset:    0,
-			Duplicate: ptr(true),
+			Hash:   tx.TxID(),
+			Offset: 0,
 		},
 	}}))
 	require.NoError(spec.t, err, "adding merkle proof to parent tx")

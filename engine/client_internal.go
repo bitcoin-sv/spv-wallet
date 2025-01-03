@@ -16,6 +16,7 @@ import (
 	"github.com/bitcoin-sv/spv-wallet/engine/taskmanager"
 	"github.com/bitcoin-sv/spv-wallet/engine/transaction/outlines"
 	"github.com/bitcoin-sv/spv-wallet/engine/transaction/record"
+	"github.com/bitcoin-sv/spv-wallet/engine/transaction/txtracker"
 	"github.com/mrz1836/go-cachestore"
 )
 
@@ -210,9 +211,24 @@ func (c *Client) loadTransactionOutlinesService() error {
 func (c *Client) loadTransactionRecordService() error {
 	if c.options.transactionRecordService == nil {
 		logger := c.Logger().With().Str("subservice", "transactionRecord").Logger()
-		c.options.transactionRecordService = record.NewService(logger, dao.NewTransactionsAccessObject(c.Datastore().DB()), c.Chain())
+		c.options.transactionRecordService = record.NewService(logger, c.TransactionsDAO(), c.Chain())
 	}
 	return nil
+}
+
+func (c *Client) loadTransactionTrackerService() {
+	if c.options.transactionTrackerService == nil {
+		c.options.transactionTrackerService = txtracker.NewService(c.TransactionsDAO())
+	}
+}
+
+func (c *Client) loadDAOs() {
+	if c.options.transactionsDAO == nil {
+		c.options.transactionsDAO = dao.NewTransactionsAccessObject(c.Datastore().DB())
+	}
+	if c.options.usersDAO == nil {
+		c.options.usersDAO = dao.NewUsersAccessObject(c.Datastore().DB())
+	}
 }
 
 func (c *Client) loadChainService() {
@@ -274,7 +290,14 @@ func (c *Client) loadPaymailServer() (err error) {
 
 	var serviceProvider paymailserver.PaymailServiceProvider
 	if c.options.paymail.serverConfig.ExperimentalProvider {
-		serviceProvider = paymail.NewServiceProvider()
+		paymailServiceLogger := c.Logger().With().Str("subservice", "paymail-service-provider").Logger()
+		serviceProvider = paymail.NewServiceProvider(
+			&paymailServiceLogger,
+			c.UsersDAO(),
+			c.Chain(),
+			c.TransactionRecordService(),
+			c.options.transactionTrackerService,
+		)
 	} else {
 		serviceProvider = &PaymailDefaultServiceProvider{client: c}
 	}
