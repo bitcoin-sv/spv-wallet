@@ -2,6 +2,7 @@ package engine
 
 import (
 	"context"
+	"github.com/bitcoin-sv/spv-wallet/engine/database/dao"
 	"github.com/bitcoin-sv/spv-wallet/engine/transaction/txtracker"
 	"time"
 
@@ -56,6 +57,8 @@ type (
 		arcConfig                  chainmodels.ARCConfig  // Configuration for ARC
 		bhsConfig                  chainmodels.BHSConfig  // Configuration for BHS
 		feeUnit                    *bsv.FeeUnit           // Fee unit for transactions
+		transactionsDAO            *dao.Transactions
+		usersDAO                   *dao.Users
 	}
 
 	// cacheStoreOptions holds the cache configuration and client
@@ -143,6 +146,8 @@ func NewClient(ctx context.Context, opts ...ClientOps) (ClientInterface, error) 
 	if err = client.autoMigrate(ctx); err != nil {
 		return nil, err
 	}
+
+	client.loadDAOs()
 
 	// Load the Paymail client and service (if does not exist)
 	if err = client.loadPaymailComponents(); err != nil {
@@ -333,4 +338,12 @@ func (c *Client) LogBHSReadiness(ctx context.Context) {
 // FeeUnit will return the fee unit used for transactions
 func (c *Client) FeeUnit() bsv.FeeUnit {
 	return *c.options.feeUnit
+}
+
+func (c *Client) TransactionsDAO() *dao.Transactions {
+	return c.options.transactionsDAO
+}
+
+func (c *Client) UsersDAO() *dao.Users {
+	return c.options.usersDAO
 }

@@ -211,14 +211,23 @@ func (c *Client) loadTransactionOutlinesService() error {
 func (c *Client) loadTransactionRecordService() error {
 	if c.options.transactionRecordService == nil {
 		logger := c.Logger().With().Str("subservice", "transactionRecord").Logger()
-		c.options.transactionRecordService = record.NewService(logger, dao.NewTransactionsAccessObject(c.Datastore().DB()), c.Chain())
+		c.options.transactionRecordService = record.NewService(logger, c.TransactionsDAO(), c.Chain())
 	}
 	return nil
 }
 
 func (c *Client) loadTransactionTrackerService() {
 	if c.options.transactionTrackerService == nil {
-		c.options.transactionTrackerService = txtracker.NewService(dao.NewTransactionsAccessObject(c.Datastore().DB()))
+		c.options.transactionTrackerService = txtracker.NewService(c.TransactionsDAO())
+	}
+}
+
+func (c *Client) loadDAOs() {
+	if c.options.transactionsDAO == nil {
+		c.options.transactionsDAO = dao.NewTransactionsAccessObject(c.Datastore().DB())
+	}
+	if c.options.usersDAO == nil {
+		c.options.usersDAO = dao.NewUsersAccessObject(c.Datastore().DB())
 	}
 }
 
@@ -284,7 +293,7 @@ func (c *Client) loadPaymailServer() (err error) {
 		paymailServiceLogger := c.Logger().With().Str("subservice", "paymail-service-provider").Logger()
 		serviceProvider = paymail.NewServiceProvider(
 			&paymailServiceLogger,
-			dao.NewUsersAccessObject(c.Datastore().DB()),
+			c.UsersDAO(),
 			c.Chain(),
 			c.TransactionRecordService(),
 			c.options.transactionTrackerService,

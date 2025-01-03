@@ -3,9 +3,9 @@ package dao
 import (
 	"context"
 	"errors"
-
 	"github.com/bitcoin-sv/spv-wallet/engine/database"
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
+	"github.com/bitcoin-sv/spv-wallet/models/filter"
 	"gorm.io/gorm"
 	"gorm.io/gorm/clause"
 )
@@ -61,4 +61,27 @@ func (u *Users) SaveAddress(ctx context.Context, userRow *database.User, address
 	}
 
 	return nil
+}
+
+func (u *Users) GetBalance(ctx context.Context, userID string, bucket string) (uint64, error) {
+	var balance uint64
+	err := u.db.
+		WithContext(ctx).
+		Model(&database.UserUtxos{}).
+		Where("user_id = ? AND bucket = ?", userID, bucket).
+		Select("SUM(satoshis)").
+		Row().
+		Scan(&balance)
+
+	if err != nil {
+		return 0, spverrors.Wrapf(err, "failed to get balance")
+	}
+
+	return balance, nil
+}
+
+func (u *Users) GetOperations(ctx context.Context, userID string, page filter.Page) (*database.PagedResult[database.Operation], error) {
+	return database.PaginatedQuery[database.Operation](ctx, page, u.db, func(tx *gorm.DB) *gorm.DB {
+		return tx.Where("user_id = ?", userID)
+	})
 }

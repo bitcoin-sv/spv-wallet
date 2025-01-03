@@ -2,7 +2,6 @@ package paymailserver_test
 
 import (
 	"fmt"
-	"github.com/bitcoin-sv/spv-wallet/engine/testabilities/testmode"
 	"testing"
 
 	"github.com/bitcoin-sv/go-sdk/script"
@@ -14,8 +13,6 @@ import (
 )
 
 func TestIncomingPaymailRawTX(t *testing.T) {
-	testmode.DevelopmentOnly_SetPostgresModeWithName(t, "spv-test")
-
 	givenForAllTests := testabilities.Given(t)
 	cleanup := givenForAllTests.StartedSPVWalletWithConfiguration(
 		testengine.WithDomainValidationDisabled(),
@@ -26,6 +23,7 @@ func TestIncomingPaymailRawTX(t *testing.T) {
 	var testState struct {
 		reference     string
 		lockingScript *script.Script
+		txID          string
 	}
 
 	// given:
@@ -118,6 +116,50 @@ func TestIncomingPaymailRawTX(t *testing.T) {
 			"txid": txSpec.ID(),
 			"note": note,
 		})
+
+		// update:
+		testState.txID = txSpec.ID()
+	})
+
+	t.Run("step 3 - check balance", func(t *testing.T) {
+		// given:
+		senderClient := given.HttpClient().ForGivenUser(fixtures.Sender)
+
+		// when:
+		res, _ := senderClient.R().Get("/api/v2/users/balance")
+
+		// then:
+		then.Response(res).IsOK().WithJSONf(`{
+			"currentBalance": %d
+		}`, satoshis)
+	})
+
+	t.Run("step 4 - get operations", func(t *testing.T) {
+		// given:
+		senderClient := given.HttpClient().ForGivenUser(fixtures.Sender)
+
+		// when:
+		res, _ := senderClient.R().Get("/api/v2/users/operations")
+
+		// then:
+		then.Response(res).IsOK().WithJSONMatching(`{
+			"content": [
+				{
+					"txID": "{{ .txID }}",
+					"time": "{{ matchTimestamp }}",
+					"value": {{ .value }}
+				}
+			],
+			"page": {
+			    "number": 1,
+			    "size": 1,
+			    "totalElements": 1,
+			    "totalPages": 1
+			}
+		}`, map[string]any{
+			"value": satoshis,
+			"txID":  testState.txID,
+		})
 	})
 }
 
@@ -132,6 +174,7 @@ func TestIncomingPaymailBeef(t *testing.T) {
 	var testState struct {
 		reference     string
 		lockingScript *script.Script
+		txID          string
 	}
 
 	// given:
@@ -228,6 +271,50 @@ func TestIncomingPaymailBeef(t *testing.T) {
 		}`, map[string]any{
 			"txid": txSpec.ID(),
 			"note": note,
+		})
+
+		// update:
+		testState.txID = txSpec.ID()
+	})
+
+	t.Run("step 3 - check balance", func(t *testing.T) {
+		// given:
+		senderClient := given.HttpClient().ForGivenUser(fixtures.Sender)
+
+		// when:
+		res, _ := senderClient.R().Get("/api/v2/users/balance")
+
+		// then:
+		then.Response(res).IsOK().WithJSONf(`{
+			"currentBalance": %d
+		}`, satoshis)
+	})
+
+	t.Run("step 4 - get operations", func(t *testing.T) {
+		// given:
+		senderClient := given.HttpClient().ForGivenUser(fixtures.Sender)
+
+		// when:
+		res, _ := senderClient.R().Get("/api/v2/users/operations")
+
+		// then:
+		then.Response(res).IsOK().WithJSONMatching(`{
+			"content": [
+				{
+					"txID": "{{ .txID }}",
+					"time": "{{ matchTimestamp }}",
+					"value": {{ .value }}
+				}
+			],
+			"page": {
+			    "number": 1,
+			    "size": 1,
+			    "totalElements": 1,
+			    "totalPages": 1
+			}
+		}`, map[string]any{
+			"value": satoshis,
+			"txID":  testState.txID,
 		})
 	})
 }

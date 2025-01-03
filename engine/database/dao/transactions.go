@@ -24,21 +24,6 @@ func NewTransactionsAccessObject(db *gorm.DB) *Transactions {
 	return &Transactions{db: db}
 }
 
-// SaveTX saves a transaction to the database.
-func (r *Transactions) SaveTX(ctx context.Context, txRow *database.TrackedTransaction) error {
-	query := r.db.
-		WithContext(ctx).
-		Clauses(clause.OnConflict{
-			UpdateAll: true,
-		})
-
-	if err := query.Create(txRow).Error; err != nil {
-		return spverrors.Wrapf(err, "failed to save transaction")
-	}
-
-	return nil
-}
-
 func (r *Transactions) SaveTXs(ctx context.Context, txRows iter.Seq[*database.TrackedTransaction]) error {
 	query := r.db.
 		WithContext(ctx).

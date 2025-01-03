@@ -24,7 +24,7 @@ func NewP2PKHOutput(txID string, vout uint32, userID string, satoshis bsv.Satosh
 	return &virtualOutput{
 		txID:                         txID,
 		vout:                         vout,
-		bucket:                       "p2pkh", //TODO: check if this is correct
+		bucket:                       "bsv", //TODO: check if this is correct
 		userID:                       userID,
 		satoshis:                     satoshis,
 		unlockingScriptEstimatedSize: 106, //TODO: check if this is correct

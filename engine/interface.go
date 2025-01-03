@@ -2,6 +2,7 @@ package engine
 
 import (
 	"context"
+	"github.com/bitcoin-sv/spv-wallet/engine/database/dao"
 	"net/http"
 
 	"github.com/bitcoin-sv/go-paymail"
@@ -218,4 +219,6 @@ type ClientInterface interface {
 	Chain() chain.Service
 	LogBHSReadiness(ctx context.Context)
 	FeeUnit() bsv.FeeUnit
+	TransactionsDAO() *dao.Transactions
+	UsersDAO() *dao.Users
 }
