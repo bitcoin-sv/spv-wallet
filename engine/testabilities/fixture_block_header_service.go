@@ -2,10 +2,10 @@ package testabilities
 
 import (
 	"encoding/json"
-	chainmodels "github.com/bitcoin-sv/spv-wallet/engine/chain/models"
 	"net/http"
 	"slices"
 
+	chainmodels "github.com/bitcoin-sv/spv-wallet/engine/chain/models"
 	"github.com/bitcoin-sv/spv-wallet/engine/tester/fixtures"
 	"github.com/bitcoin-sv/spv-wallet/models"
 	"github.com/jarcoal/httpmock"
