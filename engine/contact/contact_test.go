@@ -6,10 +6,11 @@ import (
 
 	"github.com/bitcoin-sv/spv-wallet/engine"
 	"github.com/bitcoin-sv/spv-wallet/engine/contact/testabilities"
+	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/bitcoin-sv/spv-wallet/engine/tester/fixtures"
 )
 
-func Test_ClientService_AdminCreateContact(t *testing.T) {
+func Test_ClientService_AdminCreateContact_Success(t *testing.T) {
 	tests := []struct {
 		name             string
 		contactPaymail   string
@@ -30,6 +31,19 @@ func Test_ClientService_AdminCreateContact(t *testing.T) {
 			expectedStatus:   engine.ContactNotConfirmed,
 			expectedFullName: "John Doe",
 		},
+		{
+			name:           "Happy path with metadata",
+			contactPaymail: fixtures.RecipientExternal.DefaultPaymail(),
+			creatorPaymail: fixtures.Sender.DefaultPaymail(),
+			fullName:       "John Doe",
+			metadata: &engine.Metadata{
+				"key1": "value1",
+				"key2": 420,
+			},
+			expectedError:    nil,
+			expectedStatus:   engine.ContactNotConfirmed,
+			expectedFullName: "John Doe",
+		},
 	}
 
 	for _, tt := range tests {
@@ -43,40 +57,33 @@ func Test_ClientService_AdminCreateContact(t *testing.T) {
 			// when:
 			res, err := service.AdminCreateContact(context.Background(), tt.contactPaymail, tt.creatorPaymail, tt.fullName, tt.metadata)
 
-			// 	then.ErrorIs(err, tt.engine).WithNilResponse(res)
 			then.NoError(err).WithResponse(res).WithStatus(tt.expectedStatus).WithFullName(tt.expectedFullName)
 		})
 	}
 }
 
+func Test_ClientService_AdminCreateContact_ContactAlreadtExists(t *testing.T) {
+	t.Run("Should fail the second time due to contact already exists", func(t *testing.T) {
+		// given:
+		given, then := testabilities.New(t)
+
+		service, cleanup := given.Engine()
+		defer cleanup()
+
+		//and:
+		_, err := service.AdminCreateContact(context.Background(), fixtures.RecipientExternal.DefaultPaymail(), fixtures.Sender.DefaultPaymail(), "John Doe", nil)
+		then.NoError(err)
+
+		//when:
+		res, err := service.AdminCreateContact(context.Background(), fixtures.RecipientExternal.DefaultPaymail(), fixtures.Sender.DefaultPaymail(), "John Doe", nil)
+
+		//then:
+		then.ErrorIs(err, spverrors.ErrContactAlreadyExists).WithNilResponse(res)
+	})
+}
+
 // func Test_ClientService_AdminCreateContact_ContactAlreadyExists(t *testing.T) {
-// 	pt := &paymailTestMock{}
-// 	pt.setup("example.com", true)
-// 	pt.mockPki("user2@example.com", "04c85162f06f5391028211a3683d669301fc72085458ce94d0a9e77ba4ff61f90a")
-// 	pt.mockPki("user1@example.com", "04c85162f06f5391028211a3683d669301fc72085458ce94d0a9e77ba4ff61f90a")
-// 	pt.mockPike("user1@example.com")
-// 	defer pt.cleanup()
 //
-// 	ctx, client, cleanup := CreateTestSQLiteClient(t, false, false, withTaskManagerMockup(), WithPaymailClient(pt.paymailClient))
-// 	defer cleanup()
-//
-// 	_, err := client.NewXpub(ctx, csXpub, client.DefaultModelOptions()...)
-// 	require.NoError(t, err)
-//
-// 	_, err = client.NewPaymailAddress(ctx, csXpub, "user2@example.com", "Jane Doe", "", client.DefaultModelOptions()...)
-// 	require.NoError(t, err)
-//
-// 	contact := &Contact{
-// 		ID:          uuid.NewString(),
-// 		Model:       *NewBaseModel(ModelContact, client.DefaultModelOptions()...),
-// 		FullName:    "Existing Contact",
-// 		Paymail:     "user1@example.com",
-// 		OwnerXpubID: csXpubHash,
-// 		PubKey:      csXpub,
-// 		Status:      ContactConfirmed,
-// 	}
-// 	err = contact.Save(ctx)
-// 	require.NoError(t, err)
 //
 // 	// when
 // 	res, err := client.AdminCreateContact(ctx, "user1@example.com", "user2@example.com", "John Doe", nil)
