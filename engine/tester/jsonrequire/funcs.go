@@ -32,7 +32,7 @@ func matchHexWithLength(length int) string {
 }
 
 func matchHex() string {
-	return `/^[a-f0-9]+$/`
+	return `/^[a-fA-F0-9]+$/`
 }
 
 func matchAddress() string {

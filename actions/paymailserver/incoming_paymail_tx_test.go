@@ -29,7 +29,7 @@ func TestIncomingPaymailRawTX(t *testing.T) {
 	client := given.HttpClient().ForAnonymous()
 
 	// and:
-	senderPaymail := "bob@external.com"
+	senderPaymail := fixtures.SenderExternal.DefaultPaymail()
 	recipientPaymail := fixtures.RecipientInternal.DefaultPaymail()
 	satoshis := uint64(1000)
 	note := "test note"
@@ -137,7 +137,7 @@ func TestIncomingPaymailBeef(t *testing.T) {
 	client := given.HttpClient().ForAnonymous()
 
 	// and:
-	senderPaymail := "bob@external.com"
+	senderPaymail := fixtures.SenderExternal.DefaultPaymail()
 	recipientPaymail := fixtures.RecipientInternal.DefaultPaymail()
 	satoshis := uint64(1000)
 	note := "test note"
