@@ -35,8 +35,10 @@ func matchHex() string {
 	return `/^[a-fA-F0-9]+$/`
 }
 
+// matchAddress returns a regex that matches a bitcoin address
+// NOTE: Only P2PKH (mainnet) addresses are supported
 func matchAddress() string {
-	return `/^(1|m)[a-km-zA-HJ-NP-Z1-9]{33}$/`
+	return `^1[a-km-zA-HJ-NP-Z1-9]{24,33}$`
 }
 
 func orEmpty(statement string) string {
