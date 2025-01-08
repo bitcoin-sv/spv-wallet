@@ -28,7 +28,7 @@ func matchID64() string {
 }
 
 func matchHexWithLength(length int) string {
-	return fmt.Sprintf(`/^[a-f0-9]{%d}$/`, length)
+	return fmt.Sprintf(`/^[a-fA-F0-9]{%d}$/`, length)
 }
 
 func matchHex() string {

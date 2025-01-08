@@ -49,7 +49,7 @@ func TestStatelessCapabilities(t *testing.T) {
 		client := given.HttpClient().ForAnonymous()
 
 		// and:
-		address := fixtures.Sender.Paymails[0]
+		address := fixtures.RecipientInternal.DefaultPaymail()
 
 		// when:
 		res, _ := client.R().Get(
