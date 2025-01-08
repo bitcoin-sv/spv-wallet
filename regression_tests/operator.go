@@ -12,7 +12,10 @@ import (
 	"time"
 
 	walletclient "github.com/bitcoin-sv/spv-wallet-go-client"
-	"github.com/bitcoin-sv/spv-wallet-go-client/xpriv"
+	"github.com/bitcoin-sv/spv-wallet-go-client/commands"
+	"github.com/bitcoin-sv/spv-wallet-go-client/config"
+	"github.com/bitcoin-sv/spv-wallet-go-client/walletkeys"
+
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 )
 
@@ -177,13 +180,19 @@ func recreateUser(paymailAlias string, config *regressionTestConfig) (*regressio
 // useUserFromXPriv fills missing user data using provided xpriv.
 func useUserFromXPriv(paymailAlias string) (*regressionTestUser, error) {
 	validatedXPriv := getValidXPriv()
-	keys, err := xpriv.FromString(validatedXPriv)
+	keys, err := walletkeys.XPrivFromString(validatedXPriv)
 	if err != nil {
-		return nil, fmt.Errorf("error parsing xpriv: %w", err)
+		return nil, fmt.Errorf("failed to generate an extended private key (xPriv) from the given string: %w", err)
 	}
+
+	xPub, err := walletkeys.XPubFromXPriv(validatedXPriv)
+	if err != nil {
+		return nil, fmt.Errorf("failed to derive an extended public key (xPub) from the given string: %w", err)
+	}
+
 	return &regressionTestUser{
-		XPriv:   keys.XPriv(),
-		XPub:    keys.XPub().String(),
+		XPriv:   keys.String(),
+		XPub:    xPub,
 		Paymail: preparePaymail(leaderPaymailAlias, paymailAlias),
 	}, nil
 }
@@ -250,7 +259,10 @@ func takeMasterUrlAndXPriv(leaderPaymail *regressionTestUser) error {
 
 // sendFundsWithGoClient sends funds using the Go client.
 func sendFundsWithGoClient(instanceUrl string, istanceXPriv string, receiverPaymail string) error {
-	client, err := walletclient.NewWithXPriv(addPrefixIfNeeded(instanceUrl), istanceXPriv)
+	client, err := walletclient.NewUserAPIWithXPriv(config.New(
+		config.WithAddr(instanceUrl),
+	), istanceXPriv)
+
 	if err != nil {
 		return fmt.Errorf("error initalizing client: %w", err)
 	}
@@ -263,10 +275,16 @@ func sendFundsWithGoClient(instanceUrl string, istanceXPriv string, receiverPaym
 	if balance <= minimalBalance {
 		return fmt.Errorf("balance too low: %d", balance)
 	}
-	recipient := walletclient.Recipients{To: receiverPaymail, Satoshis: uint64(minimalBalance)}
-	recipients := []*walletclient.Recipients{&recipient}
 
-	_, err = client.SendToRecipients(ctx, recipients, map[string]any{"message": "regression test funds"})
+	_, err = client.SendToRecipients(ctx, &commands.SendToRecipients{
+		Recipients: []*commands.Recipients{
+			{
+				Satoshis: uint64(minimalBalance),
+				To:       receiverPaymail,
+			},
+		},
+		Metadata: map[string]any{"message": "regression test funds"},
+	})
 	if err != nil {
 		return fmt.Errorf("error sending to recipients: %w", err)
 	}
