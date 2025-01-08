@@ -201,31 +201,20 @@ func TestWebhookNotifier(t *testing.T) {
 		client := newMockClient("http://localhost:8080")
 
 		ctx, cancel := context.WithCancel(context.Background())
-		defer cancel()
-
 		n := NewNotifications(ctx, &nopLogger)
 		notifier := NewWebhookNotifier(ctx, &nopLogger, newMockWebhookModel(client.url, "", ""), make(chan string))
 		n.AddNotifier(client.url, notifier.Channel)
 
 		expected := []string{}
-		done := make(chan struct{})
-
-		go func() {
-			for i := 0; i < 10; i++ {
-				msg := fmt.Sprintf("msg-%d", i)
-				n.Notify(newMockEvent(msg))
-				time.Sleep(100 * time.Microsecond)
-				expected = append(expected, msg)
-
-			}
-			close(done)
-		}()
-
-		select {
-		case <-done:
-		case <-time.After(1 * time.Second):
-			t.Fatal("Test timed out waiting for notifications")
+		for i := 0; i < 10; i++ {
+			msg := fmt.Sprintf("msg-%d", i)
+			n.Notify(newMockEvent(msg))
+			time.Sleep(100 * time.Microsecond)
+			expected = append(expected, msg)
 		}
+
+		time.Sleep(100 * time.Millisecond)
+		cancel()
 
 		client.assertEvents(t, expected)
 		client.assertEventsWereSentInBatches(t, false)
