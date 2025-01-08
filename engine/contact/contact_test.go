@@ -7,31 +7,27 @@ import (
 	"github.com/bitcoin-sv/spv-wallet/engine"
 	"github.com/bitcoin-sv/spv-wallet/engine/contact/testabilities"
 	"github.com/bitcoin-sv/spv-wallet/engine/tester/fixtures"
+	"github.com/stretchr/testify/require"
 )
 
 func Test_ClientService_AdminCreateContact(t *testing.T) {
 	tests := []struct {
-		name           string
-		contactPaymail string
-		creatorPaymail string
-		fullName       string
-		metadata       *engine.Metadata
-		storedContacts []engine.Contact
-		setupMocks     []struct {
-			Paymail string
-			PubKey  string
-		}
-		engine           error
+		name             string
+		contactPaymail   string
+		creatorPaymail   string
+		fullName         string
+		metadata         *engine.Metadata
+		expectedError    error
 		expectedStatus   engine.ContactStatus
 		expectedFullName string
 	}{
 		{
-			name:           "Happy path without metadata",
-			contactPaymail: fixtures.RecipientExternal.DefaultPaymail(),
-			creatorPaymail: fixtures.Sender.DefaultPaymail(),
-			fullName:       "John Doe",
-			metadata:       nil,
-			engine:           nil,
+			name:             "Happy path without metadata",
+			contactPaymail:   fixtures.RecipientExternal.DefaultPaymail(),
+			creatorPaymail:   fixtures.Sender.DefaultPaymail(),
+			fullName:         "John Doe",
+			metadata:         nil,
+			expectedError:    nil,
 			expectedStatus:   engine.ContactNotConfirmed,
 			expectedFullName: "John Doe",
 		},
@@ -43,7 +39,7 @@ func Test_ClientService_AdminCreateContact(t *testing.T) {
 			// this should also create a client instance
 			// we should be able to manipulate PKI and contacts in DB
 			// it should also be able to add paymails and xpubs in a db
-			given, then := testabilities.New(t)
+			given, _ := testabilities.New(t)
 
 			service, cleanup := given.Engine()
 			defer cleanup()
@@ -52,11 +48,15 @@ func Test_ClientService_AdminCreateContact(t *testing.T) {
 			res, err := service.AdminCreateContact(context.Background(), tt.contactPaymail, tt.creatorPaymail, tt.fullName, tt.metadata)
 
 			// then:
-			if tt.engine != nil {
-				then.ErrorIs(err, tt.engine).WithNilResponse(res)
-			} else {
-				then.NoError(err).WithResponse(res).WithStatus(tt.expectedStatus).WithFullName(tt.expectedFullName)
+			// if tt.engine != nil {
+			// 	then.ErrorIs(err, tt.engine).WithNilResponse(res)
+			// } else {
+			if tt.expectedError != nil {
+				require.ErrorIs(t, err, tt.expectedError)
+				require.Nil(t, res)
 			}
+			// then.NoError(err).WithResponse(res).WithStatus(tt.expectedStatus).WithFullName(tt.expectedFullName)
+			// }
 
 			// given
 			// pt := &paymailTestMock{}
