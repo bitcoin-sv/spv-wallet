@@ -30,7 +30,7 @@ func givenTXWithOpReturn(t *testing.T) fixtures.GivenTXSpec {
 func givenTxWithOpReturnWithoutOPFalse(t *testing.T) fixtures.GivenTXSpec {
 	return fixtures.GivenTX(t).
 		WithInput(1).
-		WithOutputScript(
+		WithOutputScriptParts(
 			fixtures.OpCode(script.OpRETURN),
 			fixtures.PushData(dataOfOpReturnTx),
 		)
@@ -162,7 +162,7 @@ func TestRecordOutlineOpReturnErrorCases(t *testing.T) {
 
 	givenTxWithOpZeroAfterOpReturn := fixtures.GivenTX(t).
 		WithInput(1).
-		WithOutputScript(
+		WithOutputScriptParts(
 			fixtures.OpCode(script.OpFALSE),
 			fixtures.OpCode(script.OpRETURN),
 			fixtures.PushData(dataOfOpReturnTx),

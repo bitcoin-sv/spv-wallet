@@ -2,6 +2,7 @@ package testabilities
 
 import (
 	"encoding/json"
+	chainmodels "github.com/bitcoin-sv/spv-wallet/engine/chain/models"
 	"net/http"
 	"slices"
 
@@ -15,6 +16,10 @@ type BlockHeadersServiceFixture interface {
 	// WillRespondForMerkleRoots returns a http response for get merkleroots endpoint with
 	// provided httpCode and response
 	WillRespondForMerkleRoots(httpCode int, response string)
+
+	// WillRespondForMerkleRootsVerify returns a MerkleRootsConfirmations response for get merkleroot/verify endpoint with
+	// provided httpCode
+	WillRespondForMerkleRootsVerify(httpCode int, response *chainmodels.MerkleRootsConfirmations)
 }
 
 func (f *engineFixture) BHS() BlockHeadersServiceFixture {
@@ -30,6 +35,17 @@ func (f *engineFixture) WillRespondForMerkleRoots(httpCode int, response string)
 	}
 
 	f.externalTransport.RegisterResponder("GET", "http://localhost:8080/api/v1/chain/merkleroot", responder)
+}
+
+func (f *engineFixture) WillRespondForMerkleRootsVerify(httpCode int, response *chainmodels.MerkleRootsConfirmations) {
+	responder := func(req *http.Request) (*http.Response, error) {
+		if response == nil {
+			return httpmock.NewStringResponse(httpCode, ""), nil
+		}
+		return httpmock.NewJsonResponse(httpCode, response)
+	}
+
+	f.externalTransport.RegisterResponder("POST", "http://localhost:8080/api/v1/chain/merkleroot/verify", responder)
 }
 
 func (f *engineFixture) mockBHSGetMerkleRoots() {
