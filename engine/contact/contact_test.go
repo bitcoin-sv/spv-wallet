@@ -7,7 +7,6 @@ import (
 	"github.com/bitcoin-sv/spv-wallet/engine"
 	"github.com/bitcoin-sv/spv-wallet/engine/contact/testabilities"
 	"github.com/bitcoin-sv/spv-wallet/engine/tester/fixtures"
-	"github.com/stretchr/testify/require"
 )
 
 func Test_ClientService_AdminCreateContact(t *testing.T) {
@@ -36,10 +35,7 @@ func Test_ClientService_AdminCreateContact(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			// given:
-			// this should also create a client instance
-			// we should be able to manipulate PKI and contacts in DB
-			// it should also be able to add paymails and xpubs in a db
-			given, _ := testabilities.New(t)
+			given, then := testabilities.New(t)
 
 			service, cleanup := given.Engine()
 			defer cleanup()
@@ -47,48 +43,8 @@ func Test_ClientService_AdminCreateContact(t *testing.T) {
 			// when:
 			res, err := service.AdminCreateContact(context.Background(), tt.contactPaymail, tt.creatorPaymail, tt.fullName, tt.metadata)
 
-			// then:
-			// if tt.engine != nil {
 			// 	then.ErrorIs(err, tt.engine).WithNilResponse(res)
-			// } else {
-			if tt.expectedError != nil {
-				require.ErrorIs(t, err, tt.expectedError)
-				require.Nil(t, res)
-			}
-			// then.NoError(err).WithResponse(res).WithStatus(tt.expectedStatus).WithFullName(tt.expectedFullName)
-			// }
-
-			// given
-			// pt := &paymailTestMock{}
-			// if tt.setupMocks != nil {
-			// 	tt.setupMocks(pt)
-			// }
-			// defer pt.cleanup()
-			//
-			// ctx, client, cleanup := CreateTestSQLiteClient(t, false, false, withTaskManagerMockup(), WithPaymailClient(pt.paymailClient))
-			// defer cleanup()
-			//
-			// _, err := client.NewXpub(ctx, csXpub, client.DefaultModelOptions()...)
-			// require.NoError(t, err)
-			//
-			// if tt.creatorPaymail != "unknown@example.com" && tt.creatorPaymail != "" {
-			// 	_, err = client.NewPaymailAddress(ctx, csXpub, tt.creatorPaymail, "Jane Doe", "", client.DefaultModelOptions()...)
-			// 	require.NoError(t, err)
-			// }
-			//
-			// // when
-			// res, err := client.AdminCreateContact(ctx, tt.contactPaymail, tt.creatorPaymail, tt.fullName, tt.metadata)
-
-			// then
-			// if tt.expectedError != nil {
-			// 	require.ErrorIs(t, err, tt.expectedError)
-			// 	require.Nil(t, res)
-			// } else {
-			// 	require.NoError(t, err)
-			// 	require.NotNil(t, res)
-			// 	require.Equal(t, tt.expectedStatus, res.Status)
-			// 	require.Equal(t, tt.expectedFullName, res.FullName)
-			// }
+			then.NoError(err).WithResponse(res).WithStatus(tt.expectedStatus).WithFullName(tt.expectedFullName)
 		})
 	}
 }
