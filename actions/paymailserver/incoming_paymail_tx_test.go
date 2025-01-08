@@ -117,6 +117,30 @@ func TestIncomingPaymailRawTX(t *testing.T) {
 			"note": note,
 		})
 	})
+
+	t.Run("step 3 - check balance", func(t *testing.T) {
+		// given:
+		recipientClient := given.HttpClient().ForGivenUser(fixtures.RecipientInternal)
+
+		// when:
+		res, _ := recipientClient.R().Get("/api/v1/users/current")
+
+		// then:
+		then.Response(res).
+			IsOK().
+			WithJSONMatching(`{
+				"id": "{{ matchID64 }}",
+				"createdAt": "{{ matchTimestamp }}",
+				"updatedAt": "{{ matchTimestamp }}",
+				"currentBalance": {{ .balance }},
+				"deletedAt": null,
+				"metadata": "*",
+				"nextExternalNum": 1,
+				"nextInternalNum": 0
+			}`, map[string]any{
+				"balance": satoshis,
+			})
+	})
 }
 
 func TestIncomingPaymailBeef(t *testing.T) {
@@ -229,5 +253,29 @@ func TestIncomingPaymailBeef(t *testing.T) {
 			"txid": txSpec.ID(),
 			"note": note,
 		})
+	})
+
+	t.Run("step 3 - check balance", func(t *testing.T) {
+		// given:
+		recipientClient := given.HttpClient().ForGivenUser(fixtures.RecipientInternal)
+
+		// when:
+		res, _ := recipientClient.R().Get("/api/v1/users/current")
+
+		// then:
+		then.Response(res).
+			IsOK().
+			WithJSONMatching(`{
+				"id": "{{ matchID64 }}",
+				"createdAt": "{{ matchTimestamp }}",
+				"updatedAt": "{{ matchTimestamp }}",
+				"currentBalance": {{ .balance }},
+				"deletedAt": null,
+				"metadata": "*",
+				"nextExternalNum": 1,
+				"nextInternalNum": 0
+			}`, map[string]any{
+				"balance": satoshis,
+			})
 	})
 }
