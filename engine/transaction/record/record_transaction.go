@@ -4,19 +4,12 @@ import (
 	"context"
 
 	trx "github.com/bitcoin-sv/go-sdk/transaction"
+	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 )
 
-// RecordTransaction will validate, broadcast and save a transaction
-func (s *Service) RecordTransaction(ctx context.Context, tx *trx.Transaction, verifyScripts bool) error {
+// RecordPaymailTransaction will validate, broadcast and save paymail transaction
+func (s *Service) RecordPaymailTransaction(ctx context.Context, tx *trx.Transaction, senderPaymail, receiverPaymail string) error {
 	flow := newTxFlow(ctx, s, tx)
-
-	if verifyScripts {
-		// TODO: Check if in case of not-veryfying-scripts we accidentally allow removing UserUTXOs from the database
-		// NOTE: When we want to record "RawTX" we cannot verify scripts
-		if err := flow.verifyScripts(); err != nil {
-			return err
-		}
-	}
 
 	utxosToSpend, trackedOutputs, err := flow.getFromInputs()
 	if err != nil {
@@ -24,7 +17,10 @@ func (s *Service) RecordTransaction(ctx context.Context, tx *trx.Transaction, ve
 	}
 
 	for _, utxo := range utxosToSpend {
-		operation := flow.operationOfUser(utxo.UserID)
+		operation := flow.operationOfUser(utxo.UserID, "outgoing", receiverPaymail)
+		if len(flow.operations) > 1 {
+			return spverrors.Newf("paymail transaction with multiple senders is not supported")
+		}
 		operation.subtract(utxo.Satoshis)
 	}
 
@@ -38,7 +34,10 @@ func (s *Service) RecordTransaction(ctx context.Context, tx *trx.Transaction, ve
 	for output := range newOutputs {
 		utxo := output.ToUserUTXO()
 		if utxo != nil {
-			operation := flow.operationOfUser(utxo.UserID)
+			operation := flow.operationOfUser(utxo.UserID, "incoming", senderPaymail)
+			if len(flow.operations) > 2 {
+				return spverrors.Newf("paymail transaction with multiple receivers is not supported")
+			}
 			operation.add(utxo.Satoshis)
 		}
 		flow.createOutputs(output)

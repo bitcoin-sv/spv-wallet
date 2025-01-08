@@ -73,11 +73,13 @@ func (f *txFlow) getFromInputs() ([]*database.UserUtxos, []*database.TrackedOutp
 	return utxos, trackedOutputs, nil
 }
 
-func (f *txFlow) operationOfUser(userID string) *operationWrapper {
+func (f *txFlow) operationOfUser(userID string, operationType string, counterparty string) *operationWrapper {
 	if _, ok := f.operations[userID]; !ok {
 		f.operations[userID] = &operationWrapper{
 			entity: &database.Operation{
 				UserID: userID,
+				Type:         operationType,
+				Counterparty: counterparty,
 
 				Transaction: f.txRow,
 				Value:       0,
@@ -85,6 +87,22 @@ func (f *txFlow) operationOfUser(userID string) *operationWrapper {
 		}
 	}
 	return f.operations[userID]
+}
+
+func (f *txFlow) addSatoshiToOperation(userID string, satoshi uint64) {
+	signedSatoshi, err := conv.Uint64ToInt64(satoshi)
+	if err != nil {
+		panic(err)
+	}
+	f.operations[userID].Value = f.operations[userID].Value + signedSatoshi
+}
+
+func (f *txFlow) subtractSatoshiFromOperation(userID string, satoshi uint64) {
+	signedSatoshi, err := conv.Uint64ToInt64(satoshi)
+	if err != nil {
+		panic(err)
+	}
+	f.operations[userID].Value = f.operations[userID].Value - signedSatoshi
 }
 
 func (f *txFlow) spendInputs(trackedOutputs []*database.TrackedOutput) {

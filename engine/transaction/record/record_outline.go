@@ -30,7 +30,7 @@ func (s *Service) RecordTransactionOutline(ctx context.Context, userID string, o
 	}
 
 	for _, utxo := range utxosToSpend {
-		operation := flow.operationOfUser(utxo.UserID)
+		operation := flow.operationOfUser(utxo.UserID, "outgoing", "")
 		operation.subtract(utxo.Satoshis)
 	}
 
@@ -46,14 +46,14 @@ func (s *Service) RecordTransactionOutline(ctx context.Context, userID string, o
 	for _, output := range newOutputs {
 		utxo := output.ToUserUTXO()
 		if utxo != nil {
-			operation := flow.operationOfUser(utxo.UserID)
+			operation := flow.operationOfUser(utxo.UserID, "incoming", "")
 			operation.add(utxo.Satoshis)
 		}
 		flow.createOutputs(output)
 	}
 
 	if len(newDataRecords) > 0 {
-		_ = flow.operationOfUser(userID)
+		_ = flow.operationOfUser(userID, "data", "")
 		flow.txRow.AddData(newDataRecords...)
 	}
 

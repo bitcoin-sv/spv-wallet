@@ -9,8 +9,9 @@ type Operation struct {
 
 	CreatedAt time.Time
 
-	Type  string
-	Value int64
+	Counterparty string
+	Type         string
+	Value        int64
 
 	User        *User               `gorm:"foreignKey:UserID"`
 	Transaction *TrackedTransaction `gorm:"foreignKey:TxID"`

@@ -25,5 +25,5 @@ type MerkleRootsVerifier interface {
 
 // TxRecorder is an interface for recording transactions
 type TxRecorder interface {
-	RecordTransaction(ctx context.Context, tx *trx.Transaction, verifyScripts bool) error
+	RecordPaymailTransaction(ctx context.Context, tx *trx.Transaction, senderPaymail, receiverPaymail string) error
 }

@@ -39,9 +39,11 @@ func search(c *gin.Context, userContext *reqctx.UserContext) {
 			func(yield func(operation *response.Operation) bool) {
 				for _, operation := range pagedResult.Content {
 					yield(&response.Operation{
-						CreatedAt: operation.CreatedAt,
-						Value:     operation.Value,
-						TxID:      operation.TxID,
+						CreatedAt:    operation.CreatedAt,
+						Value:        operation.Value,
+						TxID:         operation.TxID,
+						Type:         operation.Type,
+						Counterparty: operation.Counterparty,
 					})
 				}
 			}),
