@@ -55,6 +55,8 @@ func Test_ClientService_AdminCreateContact_Success(t *testing.T) {
 			then.
 				Contact(contact).
 				WithNoError(err).
+				ForUser(fixtures.Sender).
+				ToCounterparty(fixtures.RecipientExternal).
 				AsNotConfirmed().
 				WithFullName(tt.fullName)
 		})

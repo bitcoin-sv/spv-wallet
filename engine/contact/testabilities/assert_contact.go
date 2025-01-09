@@ -4,6 +4,7 @@ import (
 	"testing"
 
 	"github.com/bitcoin-sv/spv-wallet/engine"
+	"github.com/bitcoin-sv/spv-wallet/engine/tester/fixtures"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -24,6 +25,9 @@ type ContactSuccessAssertion interface {
 	WithStatus(status engine.ContactStatus) ContactSuccessAssertion
 	AsNotConfirmed() ContactSuccessAssertion
 	WithFullName(fullName string) ContactSuccessAssertion
+	ForUser(user fixtures.User) ContactSuccessAssertion
+	ToCounterparty(user fixtures.User) ContactSuccessAssertion
+	WithPubKey(pki string) ContactSuccessAssertion
 }
 
 type ContactErrorAssertion interface {
@@ -77,5 +81,20 @@ func (a *assertion) WithStatus(status engine.ContactStatus) ContactSuccessAssert
 
 func (a *assertion) WithFullName(fullName string) ContactSuccessAssertion {
 	a.assert.Equal(fullName, a.contact.FullName)
+	return a
+}
+
+func (a *assertion) WithPubKey(pki string) ContactSuccessAssertion {
+	a.assert.Equal(pki, a.contact.PubKey, "counterparty pki invalid")
+	return a
+}
+
+func (a *assertion) ForUser(user fixtures.User) ContactSuccessAssertion {
+	a.assert.Equal(user.XPubID(), a.contact.OwnerXpubID, "contact owner xpub id invalid")
+	return a
+}
+
+func (a *assertion) ToCounterparty(user fixtures.User) ContactSuccessAssertion {
+	a.assert.Equal(user.DefaultPaymail(), a.contact.Paymail, "counterparty paymail invalid")
 	return a
 }

@@ -5,6 +5,7 @@ import (
 	"strings"
 
 	"github.com/bitcoin-sv/go-paymail"
+	"github.com/bitcoin-sv/spv-wallet/engine/tester/fixtures"
 	"github.com/jarcoal/httpmock"
 )
 
@@ -29,11 +30,11 @@ func capabilityPki() *CapabilityMock {
 			pki := ""
 
 			if alias == "recipient" {
-				pki = "03bf409b6b2842150142c6b92cb11ba6a06310bdacd0ff2118a9b9da60ed994c2b"
+				pki = fixtures.RecipientExternalPKI
 			}
 
 			if alias == "sender" {
-				pki = "02ed100a85ac774757c967e2a7a8a1c7fdef901795805b494df69d7d02f663d259"
+				pki = fixtures.SenderPKI
 			}
 
 			if pki != "" {
