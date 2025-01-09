@@ -1,7 +1,6 @@
 package testabilities
 
 import (
-	"fmt"
 	"testing"
 
 	"github.com/bitcoin-sv/spv-wallet/engine"
@@ -15,11 +14,11 @@ type assert struct {
 }
 
 type ContactFailureAssertion interface {
-	WithNilResponse(response *engine.Contact) ContactFailureAssertion
+	WithNilContact(response *engine.Contact) ContactFailureAssertion
 }
 
 type ContactSuccessAssertion interface {
-	WithResponse(response *engine.Contact) ContactSuccessAssertion
+	WithContact(response *engine.Contact) ContactSuccessAssertion
 	WithStatus(status engine.ContactStatus) ContactSuccessAssertion
 	WithFullName(fullName string) ContactSuccessAssertion
 }
@@ -42,28 +41,27 @@ func (a *assert) NoError(err error) ContactSuccessAssertion {
 }
 
 func (a *assert) ErrorIs(err, expectedError error) ContactFailureAssertion {
-	require.Error(a.t, err, "Record transaction outline has no error")
 	require.ErrorIs(a.t, err, expectedError, "Record transaction outline has wrong error")
 	return a
 }
 
-func (a *assert) WithResponse(response *engine.Contact) ContactSuccessAssertion {
+func (a *assert) WithContact(response *engine.Contact) ContactSuccessAssertion {
 	a.require.NotNil(response, "unexpected nil response")
 	a.response = response
 	return a
 }
 
-func (a *assert) WithNilResponse(response *engine.Contact) ContactFailureAssertion {
+func (a *assert) WithNilContact(response *engine.Contact) ContactFailureAssertion {
 	a.require.Nil(response, "unexpected response")
 	return a
 }
 
 func (a *assert) WithStatus(status engine.ContactStatus) ContactSuccessAssertion {
-	a.require.Equal(status, a.response.Status, fmt.Sprintf("expected status: %s, actual: %s", status, a.response.Status))
+	a.require.Equal(status, a.response.Status, "Contact has invalid status")
 	return a
 }
 
 func (a *assert) WithFullName(fullName string) ContactSuccessAssertion {
-	a.require.Equal(fullName, a.response.FullName, fmt.Sprintf("expected fullName: %s, actual: %s", fullName, a.response.FullName))
+	a.require.Equal(fullName, a.response.FullName, "Contact has invalid full name")
 	return a
 }

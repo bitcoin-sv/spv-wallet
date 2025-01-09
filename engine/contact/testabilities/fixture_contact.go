@@ -15,7 +15,7 @@ type contactFixture struct {
 
 type ContactFixture interface {
 	Engine() (engine.ClientInterface, func())
-	PaymailClient() *paymailmock.PaymailClientMock
+	ExternalPaymailServer() *paymailmock.PaymailClientMock
 }
 
 func given(t testing.TB) ContactFixture {
@@ -31,6 +31,6 @@ func (cf *contactFixture) Engine() (engine.ClientInterface, func()) {
 	return engine.Engine, cleanup
 }
 
-func (cf *contactFixture) PaymailClient() *paymailmock.PaymailClientMock {
+func (cf *contactFixture) ExternalPaymailServer() *paymailmock.PaymailClientMock {
 	return cf.engineFixture.PaymailClient()
 }

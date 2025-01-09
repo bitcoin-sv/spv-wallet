@@ -13,24 +13,18 @@ import (
 
 func Test_ClientService_AdminCreateContact_Success(t *testing.T) {
 	tests := map[string]struct {
-		contactPaymail   string
-		creatorPaymail   string
-		fullName         string
-		metadata         *engine.Metadata
-		expectedError    error
-		expectedStatus   engine.ContactStatus
-		expectedFullName string
+		contactPaymail string
+		creatorPaymail string
+		fullName       string
+		metadata       *engine.Metadata
 	}{
-		"Happy path without metadata": {
-			contactPaymail:   fixtures.RecipientExternal.DefaultPaymail(),
-			creatorPaymail:   fixtures.Sender.DefaultPaymail(),
-			fullName:         "John Doe",
-			metadata:         nil,
-			expectedError:    nil,
-			expectedStatus:   engine.ContactNotConfirmed,
-			expectedFullName: "John Doe",
+		"Create contact without metadata": {
+			contactPaymail: fixtures.RecipientExternal.DefaultPaymail(),
+			creatorPaymail: fixtures.Sender.DefaultPaymail(),
+			fullName:       "John Doe",
+			metadata:       nil,
 		},
-		"Happy path with metadata": {
+		"Create contact with metadata": {
 			contactPaymail: fixtures.RecipientExternal.DefaultPaymail(),
 			creatorPaymail: fixtures.Sender.DefaultPaymail(),
 			fullName:       "John Doe",
@@ -38,9 +32,6 @@ func Test_ClientService_AdminCreateContact_Success(t *testing.T) {
 				"key1": "value1",
 				"key2": 420,
 			},
-			expectedError:    nil,
-			expectedStatus:   engine.ContactNotConfirmed,
-			expectedFullName: "John Doe",
 		},
 	}
 
@@ -53,10 +44,19 @@ func Test_ClientService_AdminCreateContact_Success(t *testing.T) {
 			defer cleanup()
 
 			//when:
-			res, err := service.AdminCreateContact(context.Background(), tt.contactPaymail, tt.creatorPaymail, tt.fullName, tt.metadata)
+			contact, err := service.AdminCreateContact(context.Background(),
+				tt.contactPaymail,
+				tt.creatorPaymail,
+				tt.fullName,
+				tt.metadata,
+			)
 
 			//then:
-			then.NoError(err).WithResponse(res).WithStatus(tt.expectedStatus).WithFullName(tt.expectedFullName)
+			then.
+				NoError(err).
+				WithContact(contact).
+				WithStatus(engine.ContactNotConfirmed).
+				WithFullName(tt.fullName)
 		})
 	}
 }
@@ -70,40 +70,44 @@ func Test_ClientService_AdminCreateContact_PKIRetrievalFail(t *testing.T) {
 		defer cleanup()
 
 		//and:
-		given.PaymailClient().WillRespondOnCapability(paymail.BRFCPki).WithInternalServerError()
+		given.
+			ExternalPaymailServer().
+			WillRespondOnCapability(paymail.BRFCPki).
+			WithInternalServerError()
 
 		//when:
-		res, err := service.AdminCreateContact(context.Background(), fixtures.RecipientExternal.DefaultPaymail(), fixtures.Sender.DefaultPaymail(), "John Doe", nil)
+		contact, err := service.AdminCreateContact(context.Background(),
+			fixtures.RecipientExternal.DefaultPaymail(),
+			fixtures.Sender.DefaultPaymail(),
+			"John Doe",
+			nil,
+		)
 
 		//then:
-		then.ErrorIs(err, spverrors.ErrGettingPKIFailed).WithNilResponse(res)
+		then.ErrorIs(err, spverrors.ErrGettingPKIFailed).WithNilContact(contact)
 	})
 }
 
 func Test_ClientService_AdminCreateContact_Fail(t *testing.T) {
 	tests := map[string]struct {
-		contactPaymail   string
-		creatorPaymail   string
-		fullName         string
-		expectedError    error
-		expectedStatus   engine.ContactStatus
-		expectedFullName string
+		contactPaymail string
+		creatorPaymail string
+		fullName       string
+		expectedError  error
 	}{
-		"Edge case: Creator paymail not found": {
-			contactPaymail:   fixtures.RecipientExternal.DefaultPaymail(),
-			creatorPaymail:   "not_exist@example.com",
-			fullName:         "John Doe",
-			expectedError:    spverrors.ErrCouldNotFindPaymail,
-			expectedStatus:   engine.ContactNotConfirmed,
-			expectedFullName: "",
+		"Should fail when creator paymail not found": {
+			contactPaymail: fixtures.RecipientExternal.DefaultPaymail(),
+			creatorPaymail: "not_exist@example.com",
+			fullName:       "John Doe",
+			expectedError:  spverrors.ErrCouldNotFindPaymail,
 		},
-		"Edge case: missing creator paymail": {
+		"Should fail when missing creator paymail": {
 			contactPaymail: fixtures.RecipientExternal.DefaultPaymail(),
 			creatorPaymail: "",
 			fullName:       "John Doe",
 			expectedError:  spverrors.ErrMissingContactCreatorPaymail,
 		},
-		"Edge case: missing contact full name": {
+		"Should fail when missing contact full name": {
 			contactPaymail: fixtures.RecipientExternal.DefaultPaymail(),
 			creatorPaymail: fixtures.Sender.DefaultPaymail(),
 			fullName:       "",
@@ -120,10 +124,15 @@ func Test_ClientService_AdminCreateContact_Fail(t *testing.T) {
 			defer cleanup()
 
 			//when:
-			res, err := service.AdminCreateContact(context.Background(), tt.contactPaymail, tt.creatorPaymail, tt.fullName, nil)
+			contact, err := service.AdminCreateContact(context.Background(),
+				tt.contactPaymail,
+				tt.creatorPaymail,
+				tt.fullName,
+				nil,
+			)
 
 			//then:
-			then.ErrorIs(err, tt.expectedError).WithNilResponse(res)
+			then.ErrorIs(err, tt.expectedError).WithNilContact(contact)
 		})
 	}
 
@@ -138,13 +147,23 @@ func Test_ClientService_AdminCreateContact_ContactAlreadyExists(t *testing.T) {
 		defer cleanup()
 
 		//and:
-		_, err := service.AdminCreateContact(context.Background(), fixtures.RecipientExternal.DefaultPaymail(), fixtures.Sender.DefaultPaymail(), "John Doe", nil)
+		_, err := service.AdminCreateContact(context.Background(),
+			fixtures.RecipientExternal.DefaultPaymail(),
+			fixtures.Sender.DefaultPaymail(),
+			"John Doe",
+			nil,
+		)
 		then.NoError(err)
 
 		//when:
-		res, err := service.AdminCreateContact(context.Background(), fixtures.RecipientExternal.DefaultPaymail(), fixtures.Sender.DefaultPaymail(), "John Doe", nil)
+		contact, err := service.AdminCreateContact(context.Background(),
+			fixtures.RecipientExternal.DefaultPaymail(),
+			fixtures.Sender.DefaultPaymail(),
+			"John Doe",
+			nil,
+		)
 
 		//then:
-		then.ErrorIs(err, spverrors.ErrContactAlreadyExists).WithNilResponse(res)
+		then.ErrorIs(err, spverrors.ErrContactAlreadyExists).WithNilContact(contact)
 	})
 }
