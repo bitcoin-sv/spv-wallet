@@ -53,9 +53,9 @@ func Test_ClientService_AdminCreateContact_Success(t *testing.T) {
 
 			//then:
 			then.
-				NoError(err).
-				WithContact(contact).
-				WithStatus(engine.ContactNotConfirmed).
+				Contact(contact).
+				WithNoError(err).
+				AsNotConfirmed().
 				WithFullName(tt.fullName)
 		})
 	}
@@ -84,7 +84,7 @@ func Test_ClientService_AdminCreateContact_PKIRetrievalFail(t *testing.T) {
 		)
 
 		//then:
-		then.ErrorIs(err, spverrors.ErrGettingPKIFailed).WithNilContact(contact)
+		then.Contact(contact).WithError(err).ThatIs(spverrors.ErrGettingPKIFailed)
 	})
 }
 
@@ -113,6 +113,12 @@ func Test_ClientService_AdminCreateContact_Fail(t *testing.T) {
 			fullName:       "",
 			expectedError:  spverrors.ErrMissingContactFullName,
 		},
+		"Should fail when missing contact paymail": {
+			contactPaymail: "",
+			creatorPaymail: fixtures.Sender.DefaultPaymail(),
+			fullName:       "John Doe",
+			expectedError:  spverrors.ErrMissingContactPaymailParam,
+		},
 	}
 
 	for name, tt := range tests {
@@ -132,7 +138,7 @@ func Test_ClientService_AdminCreateContact_Fail(t *testing.T) {
 			)
 
 			//then:
-			then.ErrorIs(err, tt.expectedError).WithNilContact(contact)
+			then.Contact(contact).WithError(err).ThatIs(tt.expectedError)
 		})
 	}
 
@@ -147,16 +153,16 @@ func Test_ClientService_AdminCreateContact_ContactAlreadyExists(t *testing.T) {
 		defer cleanup()
 
 		//and:
-		_, err := service.AdminCreateContact(context.Background(),
+		contact, err := service.AdminCreateContact(context.Background(),
 			fixtures.RecipientExternal.DefaultPaymail(),
 			fixtures.Sender.DefaultPaymail(),
 			"John Doe",
 			nil,
 		)
-		then.NoError(err)
+		then.Contact(contact).WithNoError(err)
 
 		//when:
-		contact, err := service.AdminCreateContact(context.Background(),
+		contact, err = service.AdminCreateContact(context.Background(),
 			fixtures.RecipientExternal.DefaultPaymail(),
 			fixtures.Sender.DefaultPaymail(),
 			"John Doe",
@@ -164,6 +170,6 @@ func Test_ClientService_AdminCreateContact_ContactAlreadyExists(t *testing.T) {
 		)
 
 		//then:
-		then.ErrorIs(err, spverrors.ErrContactAlreadyExists).WithNilContact(contact)
+		then.Contact(contact).WithError(err).ThatIs(spverrors.ErrContactAlreadyExists)
 	})
 }
