@@ -31,7 +31,8 @@ func TestIncomingPaymailRawTX(t *testing.T) {
 	client := given.HttpClient().ForAnonymous()
 
 	// and:
-	address := fixtures.Sender.Paymails[0]
+	senderPaymail := fixtures.SenderExternal.DefaultPaymail()
+	recipientPaymail := fixtures.RecipientInternal.DefaultPaymail()
 	satoshis := uint64(1000)
 	note := "test note"
 
@@ -48,7 +49,7 @@ func TestIncomingPaymailRawTX(t *testing.T) {
 			Post(
 				fmt.Sprintf(
 					"https://example.com/v1/bsvalias/p2p-payment-destination/%s",
-					address,
+					recipientPaymail,
 				),
 			)
 
@@ -87,7 +88,8 @@ func TestIncomingPaymailRawTX(t *testing.T) {
 			"hex":       txSpec.RawTX(),
 			"reference": testState.reference,
 			"metadata": map[string]any{
-				"note": note,
+				"note":   note,
+				"sender": senderPaymail,
 			},
 		}
 
@@ -104,7 +106,7 @@ func TestIncomingPaymailRawTX(t *testing.T) {
 			Post(
 				fmt.Sprintf(
 					"https://example.com/v1/bsvalias/receive-transaction/%s",
-					address,
+					recipientPaymail,
 				),
 			)
 
@@ -123,7 +125,7 @@ func TestIncomingPaymailRawTX(t *testing.T) {
 
 	t.Run("step 3 - check balance", func(t *testing.T) {
 		// given:
-		senderClient := given.HttpClient().ForGivenUser(fixtures.Sender)
+		senderClient := given.HttpClient().ForGivenUser(fixtures.RecipientInternal)
 
 		// when:
 		res, _ := senderClient.R().Get("/api/v2/users/balance")
@@ -136,7 +138,7 @@ func TestIncomingPaymailRawTX(t *testing.T) {
 
 	t.Run("step 4 - get operations", func(t *testing.T) {
 		// given:
-		senderClient := given.HttpClient().ForGivenUser(fixtures.Sender)
+		senderClient := given.HttpClient().ForGivenUser(fixtures.RecipientInternal)
 
 		// when:
 		res, _ := senderClient.R().Get("/api/v2/users/operations")
@@ -182,7 +184,8 @@ func TestIncomingPaymailBeef(t *testing.T) {
 	client := given.HttpClient().ForAnonymous()
 
 	// and:
-	address := fixtures.Sender.Paymails[0]
+	senderPaymail := fixtures.SenderExternal.DefaultPaymail()
+	recipientPaymail := fixtures.RecipientInternal.DefaultPaymail()
 	satoshis := uint64(1000)
 	note := "test note"
 
@@ -199,7 +202,7 @@ func TestIncomingPaymailBeef(t *testing.T) {
 			Post(
 				fmt.Sprintf(
 					"https://example.com/v1/bsvalias/p2p-payment-destination/%s",
-					address,
+					recipientPaymail,
 				),
 			)
 
@@ -238,7 +241,8 @@ func TestIncomingPaymailBeef(t *testing.T) {
 			"beef":      txSpec.BEEF(),
 			"reference": testState.reference,
 			"metadata": map[string]any{
-				"note": note,
+				"note":   note,
+				"sender": senderPaymail,
 			},
 		}
 
@@ -260,7 +264,7 @@ func TestIncomingPaymailBeef(t *testing.T) {
 			Post(
 				fmt.Sprintf(
 					"https://example.com/v1/bsvalias/beef/%s",
-					address,
+					recipientPaymail,
 				),
 			)
 
@@ -279,7 +283,7 @@ func TestIncomingPaymailBeef(t *testing.T) {
 
 	t.Run("step 3 - check balance", func(t *testing.T) {
 		// given:
-		senderClient := given.HttpClient().ForGivenUser(fixtures.Sender)
+		senderClient := given.HttpClient().ForGivenUser(fixtures.RecipientInternal)
 
 		// when:
 		res, _ := senderClient.R().Get("/api/v2/users/balance")
@@ -292,7 +296,7 @@ func TestIncomingPaymailBeef(t *testing.T) {
 
 	t.Run("step 4 - get operations", func(t *testing.T) {
 		// given:
-		senderClient := given.HttpClient().ForGivenUser(fixtures.Sender)
+		senderClient := given.HttpClient().ForGivenUser(fixtures.RecipientInternal)
 
 		// when:
 		res, _ := senderClient.R().Get("/api/v2/users/operations")

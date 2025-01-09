@@ -10,8 +10,6 @@ import (
 )
 
 func TestStatelessCapabilities(t *testing.T) {
-	//testmode.DevelopmentOnly_SetPostgresModeWithName(t, "spv-test")
-
 	givenForAllTests := testabilities.Given(t)
 	cleanup := givenForAllTests.StartedSPVWalletWithConfiguration(
 		testengine.WithDomainValidationDisabled(),
@@ -52,7 +50,7 @@ func TestStatelessCapabilities(t *testing.T) {
 		client := given.HttpClient().ForAnonymous()
 
 		// and:
-		address := fixtures.Sender.Paymails[0]
+		address := fixtures.RecipientInternal.DefaultPaymail()
 
 		// when:
 		res, _ := client.R().Get(
@@ -89,7 +87,7 @@ func TestStatelessCapabilities(t *testing.T) {
 		client := given.HttpClient().ForAnonymous()
 
 		// and:
-		address := fixtures.Sender.Paymails[0]
+		address := fixtures.RecipientInternal.DefaultPaymail()
 
 		// when:
 		res, _ := client.R().Get(
@@ -150,7 +148,7 @@ func TestStatelessCapabilities(t *testing.T) {
 		client := given.HttpClient().ForAnonymous()
 
 		// and:
-		address := fixtures.Sender.Paymails[0]
+		address := fixtures.RecipientInternal.DefaultPaymail()
 		wrongPKI := "02561fc133e140526f11438550de3e6cf0ae246a4a5bcd151230652b60124ea1d9"
 
 		// when:

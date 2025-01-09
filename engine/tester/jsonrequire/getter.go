@@ -29,7 +29,7 @@ func (g *Getter) GetString(xpath string) string {
 
 	strValue, ok := value.(string)
 	if !ok {
-		require.Fail(g.t, "Value is not a string")
+		require.Fail(g.t, "Value on xpath %s is not a string, it is %T (%v)", xpath, value, value)
 	}
 
 	return strValue
