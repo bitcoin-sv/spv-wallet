@@ -180,7 +180,7 @@ func recreateUser(paymailAlias string, config *regressionTestConfig) (*regressio
 // useUserFromXPriv fills missing user data using provided xpriv.
 func useUserFromXPriv(paymailAlias string) (*regressionTestUser, error) {
 	validatedXPriv := getValidXPriv()
-	keys, err := walletkeys.XPrivFromString(validatedXPriv)
+	xPriv, err := walletkeys.XPrivFromString(validatedXPriv)
 	if err != nil {
 		return nil, fmt.Errorf("failed to generate an extended private key (xPriv) from the given string: %w", err)
 	}
@@ -191,7 +191,7 @@ func useUserFromXPriv(paymailAlias string) (*regressionTestUser, error) {
 	}
 
 	return &regressionTestUser{
-		XPriv:   keys.String(),
+		XPriv:   xPriv.String(),
 		XPub:    xPub,
 		Paymail: preparePaymail(leaderPaymailAlias, paymailAlias),
 	}, nil
