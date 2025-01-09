@@ -125,10 +125,10 @@ func TestIncomingPaymailRawTX(t *testing.T) {
 
 	t.Run("step 3 - check balance", func(t *testing.T) {
 		// given:
-		senderClient := given.HttpClient().ForGivenUser(fixtures.RecipientInternal)
+		recipientClient := given.HttpClient().ForGivenUser(fixtures.RecipientInternal)
 
 		// when:
-		res, _ := senderClient.R().Get("/api/v2/users/balance")
+		res, _ := recipientClient.R().Get("/api/v2/users/balance")
 
 		// then:
 		then.Response(res).IsOK().WithJSONf(`{
@@ -138,10 +138,10 @@ func TestIncomingPaymailRawTX(t *testing.T) {
 
 	t.Run("step 4 - get operations", func(t *testing.T) {
 		// given:
-		senderClient := given.HttpClient().ForGivenUser(fixtures.RecipientInternal)
+		recipientClient := given.HttpClient().ForGivenUser(fixtures.RecipientInternal)
 
 		// when:
-		res, _ := senderClient.R().Get("/api/v2/users/operations")
+		res, _ := recipientClient.R().Get("/api/v2/users/operations")
 
 		// then:
 		then.Response(res).IsOK().WithJSONMatching(`{
@@ -283,10 +283,10 @@ func TestIncomingPaymailBeef(t *testing.T) {
 
 	t.Run("step 3 - check balance", func(t *testing.T) {
 		// given:
-		senderClient := given.HttpClient().ForGivenUser(fixtures.RecipientInternal)
+		recipientClient := given.HttpClient().ForGivenUser(fixtures.RecipientInternal)
 
 		// when:
-		res, _ := senderClient.R().Get("/api/v2/users/balance")
+		res, _ := recipientClient.R().Get("/api/v2/users/balance")
 
 		// then:
 		then.Response(res).IsOK().WithJSONf(`{
@@ -296,10 +296,10 @@ func TestIncomingPaymailBeef(t *testing.T) {
 
 	t.Run("step 4 - get operations", func(t *testing.T) {
 		// given:
-		senderClient := given.HttpClient().ForGivenUser(fixtures.RecipientInternal)
+		recipientClient := given.HttpClient().ForGivenUser(fixtures.RecipientInternal)
 
 		// when:
-		res, _ := senderClient.R().Get("/api/v2/users/operations")
+		res, _ := recipientClient.R().Get("/api/v2/users/operations")
 
 		// then:
 		then.Response(res).IsOK().WithJSONMatching(`{
