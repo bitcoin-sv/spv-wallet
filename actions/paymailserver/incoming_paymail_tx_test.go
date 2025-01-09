@@ -312,7 +312,9 @@ func TestIncomingPaymailBeef(t *testing.T) {
 				{
 					"txID": "{{ .txID }}",
 					"createdAt": "{{ matchTimestamp }}",
-					"value": {{ .value }}
+					"value": {{ .value }},
+					"type": "incoming",
+					"counterparty": "{{ .sender }}"
 				}
 			],
 			"page": {
@@ -322,8 +324,9 @@ func TestIncomingPaymailBeef(t *testing.T) {
 			    "totalPages": 1
 			}
 		}`, map[string]any{
-			"value": satoshis,
-			"txID":  testState.txID,
+			"value":  satoshis,
+			"txID":   testState.txID,
+			"sender": senderPaymail,
 		})
 	})
 }
