@@ -26,6 +26,7 @@ type WebhookManager struct {
 	banMsg           chan string // url
 	notifications    *Notifications
 	logger           *zerolog.Logger
+	endMsg           chan bool
 }
 
 // NewWebhookManager creates a new WebhookManager. It starts a goroutine which checks for webhook updates.
@@ -41,6 +42,7 @@ func NewWebhookManager(ctx context.Context, logger *zerolog.Logger, notification
 		updateMsg:        make(chan bool),
 		banMsg:           make(chan string),
 		logger:           logger,
+		endMsg:           make(chan bool, 1),
 	}
 
 	go manager.checkForUpdates()
@@ -50,7 +52,11 @@ func NewWebhookManager(ctx context.Context, logger *zerolog.Logger, notification
 
 // Stop stops the WebhookManager.
 func (w *WebhookManager) Stop() {
+	w.ticker.Stop()
 	w.cancelAllFunc()
+
+	<-w.endMsg
+	w.logger.Info().Msg("WebhookManager stopped")
 }
 
 // Subscribe subscribes to a webhook. It adds the webhook to the database and starts a notifier for it.
@@ -100,9 +106,9 @@ func (w *WebhookManager) GetAll(ctx context.Context) ([]ModelWebhook, error) {
 
 func (w *WebhookManager) checkForUpdates() {
 	defer func() {
-		w.logger.Info().Msg("WebhookManager stopped")
+		w.endMsg <- true
 		if err := recover(); err != nil {
-			w.logger.Warn().Msgf("WebhookManager failed: %v", err)
+			w.logger.Fatal().Msgf("WebhookManager failed: %v", err)
 		}
 	}()
 
