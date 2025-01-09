@@ -65,6 +65,14 @@ var (
 		},
 		PrivKey: "",
 	}
+
+	// SenderExternal is a user that is a sender from external server in the tests.
+	SenderExternal = User{
+		Paymails: []string{
+			"sender@" + PaymailDomainExternal,
+		},
+		PrivKey: "",
+	}
 )
 
 // DefaultPaymail returns the default paymail of this user.
@@ -162,6 +170,7 @@ func AllUsers() []User {
 		Sender,
 		RecipientInternal,
 		RecipientExternal,
+		SenderExternal,
 	}
 }
 

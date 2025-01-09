@@ -6,7 +6,7 @@ toolchain go1.23.3
 
 require (
 	github.com/bitcoin-sv/spv-wallet v1.0.0-beta.39
-	github.com/bitcoin-sv/spv-wallet-go-client v1.0.0-beta.18
+	github.com/bitcoin-sv/spv-wallet-go-client v1.0.0-beta.19
 	github.com/bitcoin-sv/spv-wallet/models v1.0.0-beta.39
 	github.com/joho/godotenv v1.5.1
 )
@@ -24,6 +24,7 @@ require (
 	github.com/go-playground/locales v0.14.1 // indirect
 	github.com/go-playground/universal-translator v0.18.1 // indirect
 	github.com/go-playground/validator/v10 v10.22.1 // indirect
+	github.com/go-resty/resty/v2 v2.16.2 // indirect
 	github.com/goccy/go-json v0.10.3 // indirect
 	github.com/json-iterator/go v1.1.12 // indirect
 	github.com/klauspost/cpuid/v2 v2.2.9 // indirect

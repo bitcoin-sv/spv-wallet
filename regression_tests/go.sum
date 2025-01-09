@@ -4,6 +4,8 @@ github.com/bitcoin-sv/spv-wallet v1.0.0-beta.39 h1:W2I9P8QyEoTlxrhUKwpOW+RFu3O24
 github.com/bitcoin-sv/spv-wallet v1.0.0-beta.39/go.mod h1:8ZZ4Gm0owfpgTj8v7dhGvzspIW1b/aR/ySfXR6XkJcs=
 github.com/bitcoin-sv/spv-wallet-go-client v1.0.0-beta.18 h1:T+uMOybKMCmOgme8Rvm1grdVX+WiZornNL98C2hsGhs=
 github.com/bitcoin-sv/spv-wallet-go-client v1.0.0-beta.18/go.mod h1:5enqQHpwLp1yOvwbDr3kU4kF3fFW5hf5llZNkTvNhXU=
+github.com/bitcoin-sv/spv-wallet-go-client v1.0.0-beta.19 h1:tU3SBiKVjiZ01O8pN9wWeeYxWE3u12wNjNsWw+zaYEU=
+github.com/bitcoin-sv/spv-wallet-go-client v1.0.0-beta.19/go.mod h1:Z2uUaJCXQW1I3kPJP41xjhCOfBHhDBIu+g2IQ285WlY=
 github.com/bitcoin-sv/spv-wallet/models v1.0.0-beta.39 h1:qo74o72mcdj7AYJoCq7RG3enHJiqtbkFEY9uXvEEG2M=
 github.com/bitcoin-sv/spv-wallet/models v1.0.0-beta.39/go.mod h1:UdY5AGsO9IomUEYSPilcSY+3BTQRJswdfZNveLt6LZQ=
 github.com/boombuler/barcode v1.0.1-0.20190219062509-6c824513bacc/go.mod h1:paBWMcWSl3LHKBqUq+rly7CNSldXjb2rDl3JlRe0mD8=
@@ -38,6 +40,8 @@ github.com/go-playground/universal-translator v0.18.1 h1:Bcnm0ZwsGyWbCzImXv+pAJn
 github.com/go-playground/universal-translator v0.18.1/go.mod h1:xekY+UJKNuX9WP91TpwSH2VMlDf28Uj24BCp08ZFTUY=
 github.com/go-playground/validator/v10 v10.22.1 h1:40JcKH+bBNGFczGuoBYgX4I6m/i27HYW8P9FDk5PbgA=
 github.com/go-playground/validator/v10 v10.22.1/go.mod h1:dbuPbCMFw/DrkbEynArYaCwl3amGuJotoKCe95atGMM=
+github.com/go-resty/resty/v2 v2.16.2 h1:CpRqTjIzq/rweXUt9+GxzzQdlkqMdt8Lm/fuK/CAbAg=
+github.com/go-resty/resty/v2 v2.16.2/go.mod h1:0fHAoK7JoBy/Ch36N8VFeMsK7xQOHhvWaC3iOktwmIU=
 github.com/goccy/go-json v0.10.3 h1:KZ5WoDbxAIgm2HNbYckL0se1fHD6rz5j4ywS6ebzDqA=
 github.com/goccy/go-json v0.10.3/go.mod h1:oq7eo15ShAhp70Anwd5lgX2pLfOS3QCiwU/PULtXL6M=
 github.com/godbus/dbus/v5 v5.0.4/go.mod h1:xhWf0FNVPg57R7Z0UbKHbJfkEywrmjJnf7w5xrFpKfA=
