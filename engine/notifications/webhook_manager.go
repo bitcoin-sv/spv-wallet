@@ -42,7 +42,7 @@ func NewWebhookManager(ctx context.Context, logger *zerolog.Logger, notification
 		updateMsg:        make(chan bool),
 		banMsg:           make(chan string),
 		logger:           logger,
-		endMsg:           make(chan bool),
+		endMsg:           make(chan bool, 1),
 	}
 
 	go manager.checkForUpdates()
@@ -108,7 +108,7 @@ func (w *WebhookManager) checkForUpdates() {
 	defer func() {
 		w.endMsg <- true
 		if err := recover(); err != nil {
-			w.logger.Warn().Msgf("WebhookManager failed: %v", err)
+			w.logger.Fatal().Msgf("WebhookManager failed: %v", err)
 		}
 	}()
 
