@@ -6,22 +6,47 @@ import (
 )
 
 var funcsMap = template.FuncMap{
-	"matchTimestamp": matchTimestamp,
-	"matchURL":       matchURL,
-	"orEmpty":        orEmpty,
-	"matchID64":      matchID64,
+	"matchTimestamp":     matchTimestamp,
+	"matchURL":           matchURL,
+	"orEmpty":            orEmpty,
+	"matchID64":          matchID64,
+	"matchHexWithLength": matchHexWithLength,
+	"matchHex":           matchHex,
+	"matchAddress":       matchAddress,
 }
 
 func matchTimestamp() string {
-	return `/^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+(Z|[+-]\\d{2}:\\d{2})$/`
+	return regexPlaceholder(`^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+(Z|[+-]\\d{2}:\\d{2})$`)
 }
 
 func matchURL() string {
-	return `/^(https?|ftp):\\/\\/[^\\s/$.?#].[^\\s]*$/`
+	return regexPlaceholder(`^(https?|ftp):\\/\\/[^\\s/$.?#].[^\\s]*$`)
 }
 
 func matchID64() string {
-	return `/^[a-zA-Z0-9]{64}$/`
+	return regexPlaceholder(`^[a-zA-Z0-9]{64}$`)
+}
+
+func matchHexWithLength(length int) string {
+	return regexPlaceholder(
+		fmt.Sprintf(`^[a-fA-F0-9]{%d}$`, length),
+	)
+}
+
+func matchHex() string {
+	return regexPlaceholder(`^[a-fA-F0-9]+$`)
+}
+
+// matchAddress returns a regex that matches a bitcoin address
+// NOTE: Only P2PKH (mainnet) addresses are supported
+func matchAddress() string {
+	return regexPlaceholder(`^1[a-km-zA-HJ-NP-Z1-9]{24,33}$`)
+}
+
+// regexPlaceholder adds slashes at the beginning and end of a string
+// it is an indicator for placeholder matcher algorithm that it is a regex
+func regexPlaceholder(statement string) string {
+	return fmt.Sprintf("/%s/", statement)
 }
 
 func orEmpty(statement string) string {
@@ -31,5 +56,7 @@ func orEmpty(statement string) string {
 
 	regex := extractRegex(statement)
 
-	return fmt.Sprintf(`/(%s)|^$/`, regex)
+	return regexPlaceholder(
+		fmt.Sprintf(`(%s)|^$`, regex),
+	)
 }
