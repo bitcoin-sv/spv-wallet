@@ -35,7 +35,7 @@ type ContactErrorAssertion interface {
 	WithNoError(err error) ContactSuccessAssertion
 }
 type ContactAssertion interface {
-	Contact(contact *engine.Contact) ContactErrorAssertion
+	Created(contact *engine.Contact) ContactErrorAssertion
 }
 
 func then(t testing.TB) ContactAssertion {
@@ -55,17 +55,16 @@ func (a *assertion) WithError(err error) ContactFailureAssertion {
 
 func (a *assertion) WithNoError(err error) ContactSuccessAssertion {
 	a.require.NotNil(a.contact, "unexpected nil response")
-	a.require.NoError(err, "record transaction outline has error")
+	a.require.NoError(err, "unexpected error on contact creation")
 	return a
 }
 
 func (a *assertion) ThatIs(expectedError error) ContactFailureAssertion {
-	a.require.Nil(a.contact, "unexpected response")
-	require.ErrorIs(a.t, a.err, expectedError, "record transaction outline has wrong error")
+	a.require.ErrorIs(a.err, expectedError)
 	return a
 }
 
-func (a *assertion) Contact(contact *engine.Contact) ContactErrorAssertion {
+func (a *assertion) Created(contact *engine.Contact) ContactErrorAssertion {
 	a.contact = contact
 	return a
 }

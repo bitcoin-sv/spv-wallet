@@ -53,7 +53,7 @@ func Test_ClientService_AdminCreateContact_Success(t *testing.T) {
 
 			//then:
 			then.
-				Contact(contact).
+				Created(contact).
 				WithNoError(err).
 				ForUser(fixtures.Sender).
 				ToCounterparty(fixtures.RecipientExternal).
@@ -86,7 +86,7 @@ func Test_ClientService_AdminCreateContact_PKIRetrievalFail(t *testing.T) {
 		)
 
 		//then:
-		then.Contact(contact).WithError(err).ThatIs(spverrors.ErrGettingPKIFailed)
+		then.Created(contact).WithError(err).ThatIs(spverrors.ErrGettingPKIFailed)
 	})
 }
 
@@ -140,7 +140,7 @@ func Test_ClientService_AdminCreateContact_Fail(t *testing.T) {
 			)
 
 			//then:
-			then.Contact(contact).WithError(err).ThatIs(tt.expectedError)
+			then.Created(contact).WithError(err).ThatIs(tt.expectedError)
 		})
 	}
 
@@ -161,7 +161,7 @@ func Test_ClientService_AdminCreateContact_ContactAlreadyExists(t *testing.T) {
 			"John Doe",
 			nil,
 		)
-		then.Contact(contact).WithNoError(err)
+		then.Created(contact).WithNoError(err)
 
 		//when:
 		contact, err = service.AdminCreateContact(context.Background(),
@@ -172,6 +172,6 @@ func Test_ClientService_AdminCreateContact_ContactAlreadyExists(t *testing.T) {
 		)
 
 		//then:
-		then.Contact(contact).WithError(err).ThatIs(spverrors.ErrContactAlreadyExists)
+		then.Created(contact).WithError(err).ThatIs(spverrors.ErrContactAlreadyExists)
 	})
 }

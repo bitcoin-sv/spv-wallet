@@ -34,7 +34,7 @@ func capabilityPki() *CapabilityMock {
 			}
 
 			if alias == "sender" {
-				pki = fixtures.SenderPKI
+				pki = fixtures.SenderExternalPKI
 			}
 
 			if pki != "" {
