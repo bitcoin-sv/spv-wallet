@@ -27,7 +27,7 @@ func TestInputsSelector(t *testing.T) {
 		selector := given.NewInputSelector()
 
 		// when:
-		utxos, err := selector.SelectInputsForTransaction(context.Background(), fixtures.Sender.XPubID(), 0, 0)
+		utxos, err := selector.SelectInputsForTransaction(context.Background(), fixtures.Sender.Address().AddressString, 0, 0)
 
 		// then:
 		then.WithoutError(err).SelectedInputs(utxos).AreEmpty()
