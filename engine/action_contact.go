@@ -166,6 +166,10 @@ func (c *Client) UpdateContact(ctx context.Context, id, fullName string, metadat
 
 // AdminCreateContact creates a new contact - xpubId is retrieved by the creatorPaymail.
 func (c *Client) AdminCreateContact(ctx context.Context, contactPaymail, creatorPaymail, fullName string, metadata *Metadata) (*Contact, error) {
+	if contactPaymail == "" {
+		return nil, spverrors.ErrMissingContactPaymailParam
+	}
+
 	if err := validateNewContactReqFields(fullName, creatorPaymail); err != nil {
 		return nil, err
 	}

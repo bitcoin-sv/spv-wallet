@@ -3,6 +3,7 @@ package paymailserver_test
 import (
 	"fmt"
 	"testing"
+	"time"
 
 	"github.com/bitcoin-sv/go-sdk/script"
 	"github.com/bitcoin-sv/spv-wallet/actions/testabilities"
@@ -12,11 +13,10 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func TestIncomingPaymailRawTX(t *testing.T) {
+func TestOldIncomingPaymailRawTX(t *testing.T) {
 	givenForAllTests := testabilities.Given(t)
 	cleanup := givenForAllTests.StartedSPVWalletWithConfiguration(
 		testengine.WithDomainValidationDisabled(),
-		testengine.WithNewTransactionFlowEnabled(),
 	)
 	defer cleanup()
 
@@ -77,8 +77,6 @@ func TestIncomingPaymailRawTX(t *testing.T) {
 	})
 
 	t.Run("step 2 - call receive-transaction capability", func(t *testing.T) {
-		t.Skip("Not implemented yet")
-
 		// given:
 		txSpec := fixtures.GivenTX(t).
 			WithInput(satoshis+1).
@@ -120,15 +118,43 @@ func TestIncomingPaymailRawTX(t *testing.T) {
 			"note": note,
 		})
 	})
+
+	t.Run("step 3 - check balance", func(t *testing.T) {
+		// given:
+		recipientClient := given.HttpClient().ForGivenUser(fixtures.RecipientInternal)
+
+		// when:
+		res, _ := recipientClient.R().Get("/api/v1/users/current")
+
+		// then:
+		then.Response(res).
+			IsOK().
+			WithJSONMatching(`{
+				"id": "{{ matchID64 }}",
+				"createdAt": "{{ matchTimestamp }}",
+				"updatedAt": "{{ matchTimestamp }}",
+				"currentBalance": {{ .balance }},
+				"deletedAt": null,
+				"metadata": "*",
+				"nextExternalNum": 1,
+				"nextInternalNum": 0
+			}`, map[string]any{
+				"balance": satoshis,
+			})
+	})
 }
 
-func TestIncomingPaymailBeef(t *testing.T) {
+func TestOldIncomingPaymailBeef(t *testing.T) {
 	givenForAllTests := testabilities.Given(t)
 	cleanup := givenForAllTests.StartedSPVWalletWithConfiguration(
 		testengine.WithDomainValidationDisabled(),
-		testengine.WithNewTransactionFlowEnabled(),
 	)
-	defer cleanup()
+	defer func() {
+		// Workaround for the issue with the wallet shutdown
+		// There is a `go saveBEEFTxInputs` goroutine that is not finished when the test ends
+		time.Sleep(1 * time.Second)
+		cleanup()
+	}()
 
 	var testState struct {
 		reference     string
@@ -188,8 +214,6 @@ func TestIncomingPaymailBeef(t *testing.T) {
 	})
 
 	t.Run("step 2 - call beef capability", func(t *testing.T) {
-		t.Skip("Not implemented yet")
-
 		// given:
 		txSpec := fixtures.GivenTX(t).
 			WithInput(satoshis+1).
@@ -235,5 +259,29 @@ func TestIncomingPaymailBeef(t *testing.T) {
 			"txid": txSpec.ID(),
 			"note": note,
 		})
+	})
+
+	t.Run("step 3 - check balance", func(t *testing.T) {
+		// given:
+		recipientClient := given.HttpClient().ForGivenUser(fixtures.RecipientInternal)
+
+		// when:
+		res, _ := recipientClient.R().Get("/api/v1/users/current")
+
+		// then:
+		then.Response(res).
+			IsOK().
+			WithJSONMatching(`{
+				"id": "{{ matchID64 }}",
+				"createdAt": "{{ matchTimestamp }}",
+				"updatedAt": "{{ matchTimestamp }}",
+				"currentBalance": {{ .balance }},
+				"deletedAt": null,
+				"metadata": "*",
+				"nextExternalNum": 1,
+				"nextInternalNum": 0
+			}`, map[string]any{
+				"balance": satoshis,
+			})
 	})
 }
