@@ -77,7 +77,7 @@ func (f *txFlow) operationOfUser(userID string, operationType string, counterpar
 	if _, ok := f.operations[userID]; !ok {
 		f.operations[userID] = &operationWrapper{
 			entity: &database.Operation{
-				UserID: userID,
+				UserID:       userID,
 				Type:         operationType,
 				Counterparty: counterparty,
 
@@ -87,22 +87,6 @@ func (f *txFlow) operationOfUser(userID string, operationType string, counterpar
 		}
 	}
 	return f.operations[userID]
-}
-
-func (f *txFlow) addSatoshiToOperation(userID string, satoshi uint64) {
-	signedSatoshi, err := conv.Uint64ToInt64(satoshi)
-	if err != nil {
-		panic(err)
-	}
-	f.operations[userID].Value = f.operations[userID].Value + signedSatoshi
-}
-
-func (f *txFlow) subtractSatoshiFromOperation(userID string, satoshi uint64) {
-	signedSatoshi, err := conv.Uint64ToInt64(satoshi)
-	if err != nil {
-		panic(err)
-	}
-	f.operations[userID].Value = f.operations[userID].Value - signedSatoshi
 }
 
 func (f *txFlow) spendInputs(trackedOutputs []*database.TrackedOutput) {
