@@ -110,8 +110,11 @@ func getPaymailAddressByID(ctx context.Context, id string, opts ...ModelOps) (*P
 		ID:    id,
 		Model: *NewBaseModel(ModelPaymailAddress, opts...),
 	}
+	conditions := map[string]interface{}{
+		deletedAtField: nil,
+	}
 	if err := Get(
-		ctx, paymailAddress, nil, false, defaultDatabaseReadTimeout, false,
+		ctx, paymailAddress, conditions, false, defaultDatabaseReadTimeout, false,
 	); err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return nil, nil
