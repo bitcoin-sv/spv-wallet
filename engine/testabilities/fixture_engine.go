@@ -28,6 +28,7 @@ const fileDbConnectionString = "file:spv-wallet-test.db"
 type EngineFixture interface {
 	Engine() (walletEngine EngineWithConfig, cleanup func())
 	EngineWithConfiguration(opts ...ConfigOpts) (walletEngine EngineWithConfig, cleanup func())
+	PaymailClient() *paymailmock.PaymailClientMock
 
 	// ConfigForTests returns a configuration with default values for tests and with the provided options applied.
 	ConfigForTests(opts ...ConfigOpts) *config.AppConfig
@@ -68,6 +69,10 @@ func Given(t testing.TB) EngineFixture {
 	}
 
 	return f
+}
+
+func (f *engineFixture) PaymailClient() *paymailmock.PaymailClientMock {
+	return f.paymailClient
 }
 
 func (f *engineFixture) NewTest(t testing.TB) EngineFixture {

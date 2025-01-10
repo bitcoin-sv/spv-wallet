@@ -23,21 +23,10 @@ type User struct {
 
 // BeforeCreate is a gorm hook that is called before creating a new user
 func (u *User) BeforeCreate(_ *gorm.DB) (err error) {
-	if u.PubKey == "" {
-		return fmt.Errorf("PubKey is required")
-	}
-
-	pubKey, err := u.PubKeyObj()
+	u.ID, err = u.generateID()
 	if err != nil {
-		return err
+		return
 	}
-
-	addr, err := script.NewAddressFromPublicKey(pubKey, true)
-	if err != nil {
-		return fmt.Errorf("failed to create address from public key: %w", err)
-	}
-
-	u.ID = addr.AddressString
 
 	return nil
 }
@@ -49,4 +38,19 @@ func (u *User) PubKeyObj() (*primitives.PublicKey, error) {
 		return nil, fmt.Errorf("invalid PubKey: %w", err)
 	}
 	return pub, nil
+}
+
+func (u *User) generateID() (string, error) {
+	if u.PubKey == "" {
+		return "", fmt.Errorf("PubKey is required")
+	}
+	pubKey, err := u.PubKeyObj()
+	if err != nil {
+		return "", err
+	}
+	addr, err := script.NewAddressFromPublicKey(pubKey, true)
+	if err != nil {
+		return "", fmt.Errorf("failed to create address from public key: %w", err)
+	}
+	return addr.AddressString, nil
 }

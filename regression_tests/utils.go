@@ -13,9 +13,12 @@ import (
 	"time"
 
 	walletclient "github.com/bitcoin-sv/spv-wallet-go-client"
-	"github.com/bitcoin-sv/spv-wallet-go-client/xpriv"
+	"github.com/bitcoin-sv/spv-wallet-go-client/commands"
+	walletclientcfg "github.com/bitcoin-sv/spv-wallet-go-client/config"
+	"github.com/bitcoin-sv/spv-wallet-go-client/walletkeys"
+
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
-	"github.com/bitcoin-sv/spv-wallet/models"
+	"github.com/bitcoin-sv/spv-wallet/models/response"
 	"github.com/joho/godotenv"
 )
 
@@ -120,13 +123,13 @@ func addPrefixIfNeeded(url string) string {
 }
 
 // getSharedConfig retrieves the shared configuration from the SPV Wallet.
-func getSharedConfig(ctx context.Context) (*models.SharedConfig, error) {
-	wc, err := walletclient.NewWithXPriv(addPrefixIfNeeded(domainLocalHost), adminXPriv)
+func getSharedConfig(ctx context.Context) (*response.SharedConfig, error) {
+	wc, err := walletclient.NewAdminAPIWithXPriv(walletclientcfg.New(walletclientcfg.WithAddr(domainLocalHost)), adminXPriv)
 	if err != nil {
 		return nil, err
 	}
 
-	sharedConfig, err := wc.GetSharedConfig(ctx)
+	sharedConfig, err := wc.SharedConfig(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -185,29 +188,38 @@ func preparePaymail(paymailAlias string, domain string) string {
 }
 
 func createUser(paymail string, config *regressionTestConfig) (*regressionTestUser, error) {
-	keys, err := xpriv.Generate()
+	keys, err := walletkeys.RandomKeys()
 	if err != nil {
 		return nil, err
 	}
 
 	user := &regressionTestUser{
 		XPriv:   keys.XPriv(),
-		XPub:    keys.XPub().String(),
+		XPub:    keys.XPub(),
 		Paymail: preparePaymail(leaderPaymailAlias, paymail),
 	}
 
-	adminClient, err := walletclient.NewWithAdminKey(config.ClientOneURL, adminXPriv)
+	adminClient, err := walletclient.NewAdminAPIWithXPriv(walletclientcfg.New(walletclientcfg.WithAddr(config.ClientOneURL)), adminXPriv)
 	if err != nil {
 		return nil, err
 	}
 	ctx := context.Background()
 
-	if err := adminClient.AdminNewXpub(ctx, user.XPub, map[string]any{"purpose": "regression-tests"}); err != nil {
+	_, err = adminClient.CreateXPub(ctx, &commands.CreateUserXpub{
+		Metadata: map[string]any{"purpose": "regression-tests"},
+		XPub:     user.XPub,
+	})
+	if err != nil {
 		fmt.Println("adminNewXpub failed with status code:", err)
 		return nil, err
 	}
 
-	createPaymailRes, err := adminClient.AdminCreatePaymail(ctx, user.XPub, user.Paymail, "Regression tests", "")
+	createPaymailRes, err := adminClient.CreatePaymail(ctx, &commands.CreatePaymail{
+		Key:        user.XPub,
+		Address:    user.Paymail,
+		PublicName: "Regression tests",
+	})
+
 	if err != nil {
 		if err.Error() == spverrors.ErrPaymailAlreadyExists.Error() {
 			return user, err
@@ -222,13 +234,18 @@ func createUser(paymail string, config *regressionTestConfig) (*regressionTestUs
 
 // useUserFromEnv fills missing user data using xpriv from the environment variables.
 func useUserFromEnv(paymailDomain string, config *regressionTestConfig) (*regressionTestUser, error) {
-	keys, err := xpriv.FromString(config.ClientOneLeaderXPriv)
+	xPriv, err := walletkeys.XPrivFromString(config.ClientOneLeaderXPriv)
 	if err != nil {
-		return nil, fmt.Errorf("error parsing xpriv: %w", err)
+		return nil, fmt.Errorf("failed to generate an extended private key (xPriv) from a string: %w", err)
 	}
+	xPub, err := walletkeys.XPubFromXPriv(xPriv.String())
+	if err != nil {
+		return nil, fmt.Errorf("failed to generate an extended public key (xPub) from a xPriv string: %w", err)
+	}
+
 	return &regressionTestUser{
-		XPriv:   keys.XPriv(),
-		XPub:    keys.XPub().String(),
+		XPriv:   xPriv.String(),
+		XPub:    xPub,
 		Paymail: preparePaymail(leaderPaymailAlias, paymailDomain),
 	}, nil
 }
@@ -236,13 +253,13 @@ func useUserFromEnv(paymailDomain string, config *regressionTestConfig) (*regres
 // deleteUser soft deletes paymail address from the SPV Wallet.
 func deleteUser(paymail string, config *regressionTestConfig) error {
 	paymail = preparePaymail(leaderPaymailAlias, paymail)
-	adminClient, err := walletclient.NewWithAdminKey(addPrefixIfNeeded(config.ClientOneURL), adminXPriv)
+	adminClient, err := walletclient.NewAdminAPIWithXPriv(walletclientcfg.New(walletclientcfg.WithAddr(config.ClientOneURL)), adminXPriv)
 	if err != nil {
 		return err
 	}
 
 	ctx := context.Background()
-	err = adminClient.AdminDeletePaymail(ctx, paymail)
+	err = adminClient.DeletePaymail(ctx, paymail)
 	if err != nil {
 		return err
 	}
@@ -287,13 +304,13 @@ func isValidURL(rawURL string) bool {
 
 // checkBalance checks the balance of the specified xpriv at the given domain with given xpriv.
 func checkBalance(domain, xpriv string) (int, error) {
-	client, err := walletclient.NewWithXPriv(addPrefixIfNeeded(domain), xpriv)
+	client, err := walletclient.NewUserAPIWithXPriv(walletclientcfg.New(walletclientcfg.WithAddr(domain)), xpriv)
 	if err != nil {
 		return wrongInput, err
 	}
 	ctx := context.Background()
 
-	xpubInfo, err := client.GetXPub(ctx)
+	xpubInfo, err := client.XPub(ctx)
 	if err != nil {
 		return wrongInput, fmt.Errorf("error getting xpub info: %w", err)
 	}

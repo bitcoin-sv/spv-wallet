@@ -69,7 +69,7 @@ func (c *Client) autoMigrate(ctx context.Context) error {
 	}
 
 	db := c.Datastore().DB().WithContext(ctx)
-	models := AllDBModels()
+	models := AllDBModels(c.options.paymail.serverConfig.ExperimentalProvider)
 
 	if err := db.AutoMigrate(models...); err != nil {
 		return spverrors.Wrapf(err, "failed to auto-migrate models")
