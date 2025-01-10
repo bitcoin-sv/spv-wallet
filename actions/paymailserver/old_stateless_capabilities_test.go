@@ -9,11 +9,10 @@ import (
 	"github.com/bitcoin-sv/spv-wallet/engine/tester/fixtures"
 )
 
-func TestStatelessCapabilities(t *testing.T) {
+func TestOldStatelessCapabilities(t *testing.T) {
 	givenForAllTests := testabilities.Given(t)
 	cleanup := givenForAllTests.StartedSPVWalletWithConfiguration(
 		testengine.WithDomainValidationDisabled(),
-		testengine.WithNewTransactionFlowEnabled(),
 	)
 	defer cleanup()
 
