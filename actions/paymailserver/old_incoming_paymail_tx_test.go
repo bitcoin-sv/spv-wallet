@@ -12,7 +12,7 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func TestIncomingPaymailRawTX(t *testing.T) {
+func TestOldIncomingPaymailRawTX(t *testing.T) {
 	givenForAllTests := testabilities.Given(t)
 	cleanup := givenForAllTests.StartedSPVWalletWithConfiguration(
 		testengine.WithDomainValidationDisabled(),
@@ -143,7 +143,7 @@ func TestIncomingPaymailRawTX(t *testing.T) {
 	})
 }
 
-func TestIncomingPaymailBeef(t *testing.T) {
+func TestOldIncomingPaymailBeef(t *testing.T) {
 	givenForAllTests := testabilities.Given(t)
 	cleanup := givenForAllTests.StartedSPVWalletWithConfiguration(
 		testengine.WithDomainValidationDisabled(),

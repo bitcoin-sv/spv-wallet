@@ -215,6 +215,15 @@ func (c *Client) loadTransactionRecordService() error {
 	return nil
 }
 
+func (c *Client) loadDAOs() {
+	if c.options.transactionsDAO == nil {
+		c.options.transactionsDAO = dao.NewTransactionsAccessObject(c.Datastore().DB())
+	}
+	if c.options.usersDAO == nil {
+		c.options.usersDAO = dao.NewUsersAccessObject(c.Datastore().DB())
+	}
+}
+
 func (c *Client) loadChainService() {
 	if c.options.chainService == nil {
 		logger := c.Logger().With().Str("subservice", "chain").Logger()
@@ -274,7 +283,11 @@ func (c *Client) loadPaymailServer() (err error) {
 
 	var serviceProvider paymailserver.PaymailServiceProvider
 	if c.options.paymail.serverConfig.ExperimentalProvider {
-		serviceProvider = paymail.NewServiceProvider()
+		paymailServiceLogger := c.Logger().With().Str("subservice", "paymail-service-provider").Logger()
+		serviceProvider = paymail.NewServiceProvider(
+			&paymailServiceLogger,
+			c.UsersDAO(),
+		)
 	} else {
 		serviceProvider = &PaymailDefaultServiceProvider{client: c}
 	}
