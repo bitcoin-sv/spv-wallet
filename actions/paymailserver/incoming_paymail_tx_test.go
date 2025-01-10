@@ -148,7 +148,7 @@ func TestIncomingPaymailRawTX(t *testing.T) {
 			"content": [
 				{
 					"txID": "{{ .txID }}",
-					"time": "{{ matchTimestamp }}",
+					"createdAt": "{{ matchTimestamp }}",
 					"value": {{ .value }}
 				}
 			],
@@ -306,7 +306,7 @@ func TestIncomingPaymailBeef(t *testing.T) {
 			"content": [
 				{
 					"txID": "{{ .txID }}",
-					"time": "{{ matchTimestamp }}",
+					"createdAt": "{{ matchTimestamp }}",
 					"value": {{ .value }}
 				}
 			],

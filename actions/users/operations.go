@@ -37,9 +37,9 @@ func operations(c *gin.Context, userContext *reqctx.UserContext) {
 		Content: slices.Collect(func(yield func(operation *response.Operation) bool) {
 			for _, operation := range pagedResult.Content {
 				yield(&response.Operation{
-					Time:  operation.CreatedAt,
-					Value: operation.Value,
-					TxID:  operation.TxID,
+					CreatedAt: operation.CreatedAt,
+					Value:     operation.Value,
+					TxID:      operation.TxID,
 				})
 			}
 		}),
