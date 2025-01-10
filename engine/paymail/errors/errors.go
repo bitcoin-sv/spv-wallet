@@ -19,3 +19,9 @@ var ErrPaymailNotFound = models.SPVError{Message: "paymail not found", StatusCod
 
 // ErrPaymailPKI is when the paymail PKI operation failed.
 var ErrPaymailPKI = models.SPVError{Message: "paymail PKI operation failed", StatusCode: 500, Code: "error-paymail-pki"}
+
+// ErrPaymentDestination is when the payment destination operation failed.
+var ErrPaymentDestination = models.SPVError{Message: "payment destination operation failed", StatusCode: 500, Code: "error-payment-destination"}
+
+// ErrAddressSave is when the address save operation failed.
+var ErrAddressSave = models.SPVError{Message: "address save operation failed", StatusCode: 500, Code: "error-address-save"}

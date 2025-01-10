@@ -13,7 +13,6 @@ func TestOldStatelessCapabilities(t *testing.T) {
 	givenForAllTests := testabilities.Given(t)
 	cleanup := givenForAllTests.StartedSPVWalletWithConfiguration(
 		testengine.WithDomainValidationDisabled(),
-		testengine.WithNewTransactionFlowEnabled(),
 	)
 	defer cleanup()
 

@@ -3,6 +3,7 @@ package paymailserver_test
 import (
 	"fmt"
 	"testing"
+	"time"
 
 	"github.com/bitcoin-sv/go-sdk/script"
 	"github.com/bitcoin-sv/spv-wallet/actions/testabilities"
@@ -148,7 +149,12 @@ func TestOldIncomingPaymailBeef(t *testing.T) {
 	cleanup := givenForAllTests.StartedSPVWalletWithConfiguration(
 		testengine.WithDomainValidationDisabled(),
 	)
-	defer cleanup()
+	defer func() {
+		// Workaround for the issue with the wallet shutdown
+		// There is a `go saveBEEFTxInputs` goroutine that is not finished when the test ends
+		time.Sleep(1 * time.Second)
+		cleanup()
+	}()
 
 	var testState struct {
 		reference     string
