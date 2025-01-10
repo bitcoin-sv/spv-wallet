@@ -6,6 +6,7 @@ import (
 
 	"github.com/bitcoin-sv/go-sdk/script"
 	"github.com/bitcoin-sv/spv-wallet/actions/testabilities"
+	chainmodels "github.com/bitcoin-sv/spv-wallet/engine/chain/models"
 	testengine "github.com/bitcoin-sv/spv-wallet/engine/testabilities"
 	"github.com/bitcoin-sv/spv-wallet/engine/tester/fixtures"
 	"github.com/stretchr/testify/require"
@@ -29,8 +30,10 @@ func TestIncomingPaymailRawTX(t *testing.T) {
 	client := given.HttpClient().ForAnonymous()
 
 	// and:
+	senderPaymail := fixtures.SenderExternal.DefaultPaymail()
 	recipientPaymail := fixtures.RecipientInternal.DefaultPaymail()
 	satoshis := uint64(1000)
+	note := "test note"
 
 	t.Run("step 1 - call p2p-payment-destination", func(t *testing.T) {
 		// given:
@@ -75,10 +78,47 @@ func TestIncomingPaymailRawTX(t *testing.T) {
 
 	t.Run("step 2 - call receive-transaction capability", func(t *testing.T) {
 		t.Skip("Not implemented yet")
-	})
 
-	t.Run("step 3 - check balance", func(t *testing.T) {
-		t.Skip("Not implemented yet")
+		// given:
+		txSpec := fixtures.GivenTX(t).
+			WithInput(satoshis+1).
+			WithOutputScript(satoshis, testState.lockingScript)
+
+		// and:
+		requestBody := map[string]any{
+			"hex":       txSpec.RawTX(),
+			"reference": testState.reference,
+			"metadata": map[string]any{
+				"note":   note,
+				"sender": senderPaymail,
+			},
+		}
+
+		// and:
+		given.ARC().WillRespondForBroadcast(200, &chainmodels.TXInfo{
+			TxID:     txSpec.ID(),
+			TXStatus: chainmodels.SeenOnNetwork,
+		})
+
+		// when:
+		res, _ := client.R().
+			SetHeader("Content-Type", "application/json").
+			SetBody(requestBody).
+			Post(
+				fmt.Sprintf(
+					"https://example.com/v1/bsvalias/receive-transaction/%s",
+					recipientPaymail,
+				),
+			)
+
+		// then:
+		then.Response(res).IsOK().WithJSONMatching(`{
+			"txid": "{{ .txid }}",
+			"note": "{{ .note }}"
+		}`, map[string]any{
+			"txid": txSpec.ID(),
+			"note": note,
+		})
 	})
 }
 
@@ -101,8 +141,10 @@ func TestIncomingPaymailBeef(t *testing.T) {
 	client := given.HttpClient().ForAnonymous()
 
 	// and:
+	senderPaymail := fixtures.SenderExternal.DefaultPaymail()
 	recipientPaymail := fixtures.RecipientInternal.DefaultPaymail()
 	satoshis := uint64(1000)
+	note := "test note"
 
 	t.Run("step 1 - call p2p-payment-destination", func(t *testing.T) {
 		// given:
@@ -147,9 +189,51 @@ func TestIncomingPaymailBeef(t *testing.T) {
 
 	t.Run("step 2 - call beef capability", func(t *testing.T) {
 		t.Skip("Not implemented yet")
-	})
 
-	t.Run("step 3 - check balance", func(t *testing.T) {
-		t.Skip("Not implemented yet")
+		// given:
+		txSpec := fixtures.GivenTX(t).
+			WithInput(satoshis+1).
+			WithOutputScript(satoshis, testState.lockingScript)
+
+		// and:
+		requestBody := map[string]any{
+			"beef":      txSpec.BEEF(),
+			"reference": testState.reference,
+			"metadata": map[string]any{
+				"note":   note,
+				"sender": senderPaymail,
+			},
+		}
+
+		// and:
+		given.ARC().WillRespondForBroadcast(200, &chainmodels.TXInfo{
+			TxID:     txSpec.ID(),
+			TXStatus: chainmodels.SeenOnNetwork,
+		})
+
+		// and;
+		given.BHS().WillRespondForMerkleRootsVerify(200, &chainmodels.MerkleRootsConfirmations{
+			ConfirmationState: chainmodels.MRConfirmed,
+		})
+
+		// when:
+		res, _ := client.R().
+			SetHeader("Content-Type", "application/json").
+			SetBody(requestBody).
+			Post(
+				fmt.Sprintf(
+					"https://example.com/v1/bsvalias/beef/%s",
+					recipientPaymail,
+				),
+			)
+
+		// then:
+		then.Response(res).IsOK().WithJSONMatching(`{
+			"txid": "{{ .txid }}",
+			"note": "{{ .note }}"
+		}`, map[string]any{
+			"txid": txSpec.ID(),
+			"note": note,
+		})
 	})
 }
