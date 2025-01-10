@@ -74,11 +74,11 @@ func TestIncomingPaymailRawTX(t *testing.T) {
 	})
 
 	t.Run("step 2 - call receive-transaction capability", func(t *testing.T) {
-		// TODO: To be implemented in the next PR
+		t.Skip("Not implemented yet")
 	})
 
 	t.Run("step 3 - check balance", func(t *testing.T) {
-		// TODO: To be implemented in the next PR
+		t.Skip("Not implemented yet")
 	})
 }
 
@@ -146,10 +146,10 @@ func TestIncomingPaymailBeef(t *testing.T) {
 	})
 
 	t.Run("step 2 - call beef capability", func(t *testing.T) {
-		// TODO: To be implemented in the next PR
+		t.Skip("Not implemented yet")
 	})
 
 	t.Run("step 3 - check balance", func(t *testing.T) {
-		// TODO: To be implemented in the next PR
+		t.Skip("Not implemented yet")
 	})
 }
