@@ -16,7 +16,7 @@ type CreatePaymail struct {
 	// The paymail address
 	Address string `json:"address" example:"test@spv-wallet.com"`
 	// The public name of the paymail
-	PublicName string `json:"public_name" example:"Test"`
+	PublicName string `json:"publicName" example:"Test"`
 	// The avatar of the paymail (url address)
 	Avatar string `json:"avatar" example:"https://example.com/avatar.png"`
 }
