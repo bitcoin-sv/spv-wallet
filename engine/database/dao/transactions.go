@@ -4,7 +4,6 @@ import (
 	"context"
 	"errors"
 	"iter"
-	"maps"
 	"slices"
 
 	"github.com/bitcoin-sv/spv-wallet/engine/database"
@@ -22,21 +21,6 @@ type Transactions struct {
 // NewTransactionsAccessObject creates a new access object for transactions.
 func NewTransactionsAccessObject(db *gorm.DB) *Transactions {
 	return &Transactions{db: db}
-}
-
-// SaveTXs saves transactions to the database.
-func (r *Transactions) SaveTXs(ctx context.Context, txRows iter.Seq[*database.TrackedTransaction]) error {
-	query := r.db.
-		WithContext(ctx).
-		Clauses(clause.OnConflict{
-			UpdateAll: true,
-		})
-
-	if err := query.Create(slices.Collect(txRows)).Error; err != nil {
-		return spverrors.Wrapf(err, "failed to save transaction")
-	}
-
-	return nil
 }
 
 // GetOutputs returns outputs from the database based on the provided outpoints.
@@ -88,33 +72,6 @@ func (r *Transactions) CheckAddress(ctx context.Context, address string) (*datab
 	}
 
 	return &row, nil
-}
-
-// MissingTransactions returns transactions that are not tracked in the database.
-func (r *Transactions) MissingTransactions(ctx context.Context, txIDs iter.Seq[string]) (iter.Seq[string], error) {
-	idsMap := maps.Collect(func(yield func(string, bool) bool) {
-		for txID := range txIDs {
-			yield(txID, true)
-		}
-	})
-
-	idsSlice := slices.Collect(maps.Keys(idsMap))
-
-	var alreadyTracked []string
-	if err := r.db.
-		WithContext(ctx).
-		Model(&database.TrackedTransaction{}).
-		Where("id IN ?", idsSlice).
-		Pluck("id", &alreadyTracked).
-		Error; err != nil {
-		return nil, spverrors.Wrapf(err, "failed to get missing transactions")
-	}
-
-	for _, txID := range alreadyTracked {
-		delete(idsMap, txID)
-	}
-
-	return maps.Keys(idsMap), nil
 }
 
 // SaveOperations saves operations to the database.

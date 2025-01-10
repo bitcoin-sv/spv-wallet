@@ -1,10 +1,10 @@
 package testabilities
 
 import (
-	testengine "github.com/bitcoin-sv/spv-wallet/engine/testabilities"
 	"testing"
 
 	"github.com/bitcoin-sv/spv-wallet/engine/database/testabilities"
+	testengine "github.com/bitcoin-sv/spv-wallet/engine/testabilities"
 	"github.com/bitcoin-sv/spv-wallet/engine/tester/fixtures"
 	"github.com/bitcoin-sv/spv-wallet/engine/transaction/outlines/internal/inputs"
 	"gorm.io/gorm"
