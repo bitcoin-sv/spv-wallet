@@ -38,7 +38,7 @@ func (s *serviceProvider) CreateAddressResolutionResponse(ctx context.Context, a
 }
 
 func (s *serviceProvider) CreateP2PDestinationResponse(ctx context.Context, alias, domain string, satoshis uint64, metaData *server.RequestMetadata) (*paymail.PaymentDestinationPayload, error) {
-	paymailModel, err := s.repo.GetPaymailByAlias(alias, domain)
+	paymailModel, err := s.repo.GetPaymail(ctx, alias, domain)
 	if err != nil {
 		return nil, pmerrors.ErrPaymailDBFailed.Wrap(err)
 	}
@@ -96,7 +96,7 @@ func (s *serviceProvider) CreateP2PDestinationResponse(ctx context.Context, alia
 }
 
 func (s *serviceProvider) GetPaymailByAlias(ctx context.Context, alias, domain string, _ *server.RequestMetadata) (*paymail.AddressInformation, error) {
-	model, err := s.repo.GetPaymailByAlias(alias, domain)
+	model, err := s.repo.GetPaymail(ctx, alias, domain)
 	if err != nil {
 		return nil, pmerrors.ErrPaymailDBFailed.Wrap(err)
 	}

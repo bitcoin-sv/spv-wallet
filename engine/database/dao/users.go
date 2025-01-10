@@ -7,7 +7,6 @@ import (
 	"github.com/bitcoin-sv/spv-wallet/engine/database"
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"gorm.io/gorm"
-	"gorm.io/gorm/clause"
 )
 
 // Users is a data access object for users.
@@ -22,12 +21,7 @@ func NewUsersAccessObject(db *gorm.DB) *Users {
 
 // SaveUser saves a user to the database.
 func (u *Users) SaveUser(ctx context.Context, userRow *database.User) error {
-	query := u.db.
-		WithContext(ctx).
-		Clauses(clause.OnConflict{
-			Columns:   []clause.Column{{Name: "id"}},
-			DoNothing: true,
-		})
+	query := u.db.WithContext(ctx)
 
 	if err := query.Create(userRow).Error; err != nil {
 		return spverrors.Wrapf(err, "failed to save user")
@@ -36,10 +30,14 @@ func (u *Users) SaveUser(ctx context.Context, userRow *database.User) error {
 	return nil
 }
 
-// GetPaymailByAlias returns a paymail by alias and domain.
-func (u *Users) GetPaymailByAlias(alias, domain string) (*database.Paymail, error) {
+// GetPaymail returns a paymail by alias and domain.
+func (u *Users) GetPaymail(ctx context.Context, alias, domain string) (*database.Paymail, error) {
 	var paymail database.Paymail
-	if err := u.db.Preload("User").Where("alias = ? AND domain = ?", alias, domain).First(&paymail).Error; err != nil {
+	if err := u.db.
+		WithContext(ctx).
+		Preload("User").
+		Where("alias = ? AND domain = ?", alias, domain).
+		First(&paymail).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return nil, nil
 		}
