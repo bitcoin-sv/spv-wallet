@@ -16,6 +16,7 @@ import (
 	"github.com/bitcoin-sv/spv-wallet/engine/taskmanager"
 	"github.com/bitcoin-sv/spv-wallet/engine/transaction/outlines"
 	"github.com/bitcoin-sv/spv-wallet/engine/transaction/record"
+	"github.com/bitcoin-sv/spv-wallet/engine/transaction/txtracker"
 	"github.com/mrz1836/go-cachestore"
 )
 
@@ -215,6 +216,12 @@ func (c *Client) loadTransactionRecordService() error {
 	return nil
 }
 
+func (c *Client) loadTransactionTrackerService() {
+	if c.options.transactionTrackerService == nil {
+		c.options.transactionTrackerService = txtracker.NewService(c.TransactionsDAO())
+	}
+}
+
 func (c *Client) loadDAOs() {
 	if c.options.transactionsDAO == nil {
 		c.options.transactionsDAO = dao.NewTransactionsAccessObject(c.Datastore().DB())
@@ -289,6 +296,7 @@ func (c *Client) loadPaymailServer() (err error) {
 			c.UsersDAO(),
 			c.Chain(),
 			c.TransactionRecordService(),
+			c.options.transactionTrackerService,
 		)
 	} else {
 		serviceProvider = &PaymailDefaultServiceProvider{client: c}
