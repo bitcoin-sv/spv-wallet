@@ -20,6 +20,11 @@ const (
 	PaymailDomain = "example.com"
 	// PaymailDomainExternal is the "their"/external paymail domain in the tests.
 	PaymailDomainExternal = "external.example.com"
+
+	// SenderExternalPKI is the PKI of the external Sender used in fixtures
+	SenderExternalPKI = "02ed100a85ac774757c967e2a7a8a1c7fdef901795805b494df69d7d02f663d259"
+	// RecipientExternalPKI is the PKI of the RecipientExternal used in fixtures
+	RecipientExternalPKI = "03bf409b6b2842150142c6b92cb11ba6a06310bdacd0ff2118a9b9da60ed994c2b"
 )
 
 var (
