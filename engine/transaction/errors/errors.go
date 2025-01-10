@@ -71,4 +71,7 @@ var (
 
 	// ErrNoOperations is when there are no operations to save.
 	ErrNoOperations = models.SPVError{Code: "error-no-operations", Message: "no operations to save", StatusCode: 400}
+
+	// ErrGettingAddresses is when getting addresses fails.
+	ErrGettingAddresses = models.SPVError{Code: "error-getting-addresses", Message: "failed to get addresses", StatusCode: 500}
 )

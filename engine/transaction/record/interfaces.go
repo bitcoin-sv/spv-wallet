@@ -14,7 +14,7 @@ import (
 type Repository interface {
 	SaveOperations(ctx context.Context, opRows iter.Seq[*database.Operation]) error
 	GetOutputs(ctx context.Context, outpoints iter.Seq[bsv.Outpoint]) ([]*database.UserUtxos, []*database.TrackedOutput, error)
-	CheckAddress(ctx context.Context, address string) (*database.Address, error)
+	GetAddresses(ctx context.Context, addresses iter.Seq[string]) ([]*database.Address, error)
 }
 
 // Broadcaster is an interface for broadcasting transactions.

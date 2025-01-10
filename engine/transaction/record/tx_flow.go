@@ -21,7 +21,7 @@ type txFlow struct {
 	txRow *database.TrackedTransaction
 	txID  string
 
-	operations map[string]*database.Operation
+	operations map[string]*operationWrapper
 }
 
 func newTxFlow(ctx context.Context, service *Service, tx *trx.Transaction) *txFlow {
@@ -37,7 +37,7 @@ func newTxFlow(ctx context.Context, service *Service, tx *trx.Transaction) *txFl
 			TxStatus: database.TxStatusCreated,
 		},
 
-		operations: map[string]*database.Operation{},
+		operations: map[string]*operationWrapper{},
 	}
 }
 
@@ -73,31 +73,18 @@ func (f *txFlow) getFromInputs() ([]*database.UserUtxos, []*database.TrackedOutp
 	return utxos, trackedOutputs, nil
 }
 
-func (f *txFlow) prepareOperationForUserIfNotExist(userID string) {
+func (f *txFlow) operationOfUser(userID string) *operationWrapper {
 	if _, ok := f.operations[userID]; !ok {
-		f.operations[userID] = &database.Operation{
-			UserID: userID,
+		f.operations[userID] = &operationWrapper{
+			entity: &database.Operation{
+				UserID: userID,
 
-			Transaction: f.txRow,
-			Value:       0,
+				Transaction: f.txRow,
+				Value:       0,
+			},
 		}
 	}
-}
-
-func (f *txFlow) addSatoshiToOperation(userID string, satoshi uint64) {
-	signedSatoshi, err := conv.Uint64ToInt64(satoshi)
-	if err != nil {
-		panic(err)
-	}
-	f.operations[userID].Value = f.operations[userID].Value + signedSatoshi
-}
-
-func (f *txFlow) subtractSatoshiFromOperation(userID string, satoshi uint64) {
-	signedSatoshi, err := conv.Uint64ToInt64(satoshi)
-	if err != nil {
-		panic(err)
-	}
-	f.operations[userID].Value = f.operations[userID].Value - signedSatoshi
+	return f.operations[userID]
 }
 
 func (f *txFlow) spendInputs(trackedOutputs []*database.TrackedOutput) {
@@ -108,43 +95,48 @@ func (f *txFlow) createOutputs(outputs ...database.Output) {
 	f.txRow.AddOutputs(outputs...)
 }
 
-func (f *txFlow) getOutputsForTrackedAddresses() iter.Seq[database.Output] {
+func (f *txFlow) getOutputsForTrackedAddresses() (iter.Seq[database.Output], error) {
+	relevantOutputs := map[string]uint32{} // address -> vout
+	for vout, output := range f.tx.Outputs {
+		lockingScript := output.LockingScript
+		if !lockingScript.IsP2PKH() {
+			continue
+		}
+		address, err := lockingScript.Address()
+		if err != nil {
+			f.service.logger.Warn().Err(err).Msg("failed to get address from locking script")
+			continue
+		}
+
+		voutU32, err := conv.IntToUint32(vout)
+		if err != nil {
+			f.service.logger.Warn().Err(err).Msg("failed to convert vout to uint32")
+			continue
+		}
+
+		relevantOutputs[address.AddressString] = voutU32
+	}
+
+	rows, err := f.service.repo.GetAddresses(f.ctx, maps.Keys(relevantOutputs))
+	if err != nil {
+		return nil, txerrors.ErrGettingAddresses.Wrap(err)
+	}
+
 	return func(yield func(database.Output) bool) {
-		for vout, output := range f.tx.Outputs {
-			lockingScript := output.LockingScript
-			if !lockingScript.IsP2PKH() {
+		for _, row := range rows {
+			vout, ok := relevantOutputs[row.Address]
+			if !ok {
+				f.service.logger.Warn().Str("address", row.Address).Msg("Got not relevant address from database")
 				continue
 			}
-			address, err := lockingScript.Address()
-			if err != nil {
-				f.service.logger.Warn().Err(err).Msg("failed to get address from locking script")
-				continue
-			}
-
-			addressRow, err := f.service.repo.CheckAddress(f.ctx, address.AddressString)
-			if err != nil {
-				f.service.logger.Warn().Err(err).Msg("failed to check address")
-				continue
-			}
-			if addressRow == nil || addressRow.UserID == "" {
-				f.service.logger.Debug().Str("address", address.AddressString).Msg("address is not tracked")
-				continue
-			}
-
-			voutU32, err := conv.IntToUint32(vout)
-			if err != nil {
-				f.service.logger.Warn().Err(err).Msg("failed to convert vout to uint32")
-				continue
-			}
-
 			yield(database.NewP2PKHOutput(
 				f.txID,
-				voutU32,
-				addressRow.UserID,
-				bsv.Satoshis(output.Satoshis)),
+				vout,
+				row.UserID,
+				bsv.Satoshis(f.tx.Outputs[vout].Satoshis)),
 			)
 		}
-	}
+	}, nil
 }
 
 func (f *txFlow) verify() error {
@@ -162,7 +154,7 @@ func (f *txFlow) broadcast() error {
 }
 
 func (f *txFlow) save() error {
-	err := f.service.repo.SaveOperations(f.ctx, maps.Values(f.operations))
+	err := f.service.repo.SaveOperations(f.ctx, toOperationEntities(maps.Values(f.operations)))
 	if err != nil {
 		return txerrors.ErrSavingData.Wrap(err)
 	}

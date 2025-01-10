@@ -24,19 +24,22 @@ func (s *Service) RecordTransaction(ctx context.Context, tx *trx.Transaction, ve
 	}
 
 	for _, utxo := range utxosToSpend {
-		flow.prepareOperationForUserIfNotExist(utxo.UserID)
-		flow.subtractSatoshiFromOperation(utxo.UserID, utxo.Satoshis)
+		operation := flow.operationOfUser(utxo.UserID)
+		operation.subtract(utxo.Satoshis)
 	}
 
 	flow.spendInputs(trackedOutputs)
 
-	newOutputs := flow.getOutputsForTrackedAddresses()
+	newOutputs, err := flow.getOutputsForTrackedAddresses()
+	if err != nil {
+		return err
+	}
 
 	for output := range newOutputs {
 		utxo := output.ToUserUTXO()
 		if utxo != nil {
-			flow.prepareOperationForUserIfNotExist(utxo.UserID)
-			flow.addSatoshiToOperation(utxo.UserID, utxo.Satoshis)
+			operation := flow.operationOfUser(utxo.UserID)
+			operation.add(utxo.Satoshis)
 		}
 		flow.createOutputs(output)
 	}

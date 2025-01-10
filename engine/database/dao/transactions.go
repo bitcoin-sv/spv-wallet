@@ -2,7 +2,6 @@ package dao
 
 import (
 	"context"
-	"errors"
 	"iter"
 	"slices"
 
@@ -57,21 +56,18 @@ func (r *Transactions) GetOutputs(ctx context.Context, outpoints iter.Seq[bsv.Ou
 	return utxos, trackedOutputs, nil
 }
 
-// CheckAddress returns an address from the database based on the provided address. If the address does not exist, nil is returned.
-func (r *Transactions) CheckAddress(ctx context.Context, address string) (*database.Address, error) {
-	var row database.Address
+// GetAddresses returns address entities from the database based on the provided address iterator.
+func (r *Transactions) GetAddresses(ctx context.Context, addresses iter.Seq[string]) ([]*database.Address, error) {
+	var rows []*database.Address
 	if err := r.db.
 		WithContext(ctx).
 		Model(&database.Address{}).
-		Where("address = ?", address).
-		First(&row).Error; err != nil {
-		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return nil, nil
-		}
-		return nil, err
+		Where("address IN ?", slices.Collect(addresses)).
+		Find(&rows).Error; err != nil {
+		return nil, spverrors.Wrapf(err, "failed to get addresses")
 	}
 
-	return &row, nil
+	return rows, nil
 }
 
 // SaveOperations saves operations to the database.
