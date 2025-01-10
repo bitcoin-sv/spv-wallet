@@ -21,22 +21,20 @@ import (
 )
 
 // NewServiceProvider create a new paymail service server which handlers incoming paymail requests
-func NewServiceProvider(logger *zerolog.Logger, repo Repository, spv MerkleRootsVerifier, recorder TxRecorder, txTracker TxTracker) server.PaymailServiceProvider {
+func NewServiceProvider(logger *zerolog.Logger, repo Repository, spv MerkleRootsVerifier, recorder TxRecorder) server.PaymailServiceProvider {
 	return &serviceProvider{
-		logger:    logger,
-		repo:      repo,
-		spv:       spv,
-		recorder:  recorder,
-		txTracker: txTracker,
+		logger:   logger,
+		repo:     repo,
+		spv:      spv,
+		recorder: recorder,
 	}
 }
 
 type serviceProvider struct {
-	logger    *zerolog.Logger
-	repo      Repository
-	spv       MerkleRootsVerifier
-	recorder  TxRecorder
-	txTracker TxTracker
+	logger   *zerolog.Logger
+	repo     Repository
+	spv      MerkleRootsVerifier
+	recorder TxRecorder
 }
 
 func (s *serviceProvider) CreateAddressResolutionResponse(ctx context.Context, alias, domain string, senderValidation bool, metaData *server.RequestMetadata) (*paymail.ResolutionPayload, error) {
@@ -151,13 +149,7 @@ func (s *serviceProvider) RecordTransaction(ctx context.Context, p2pTx *paymail.
 		return nil, pmerrors.ErrRecordTransaction.Wrap(err)
 	}
 
-	if isBEEF {
-		// TODO: Warning: p2pTx.DecodedBeef.Transactions doesn't store MerklePath (it is because how go-paymail parses beef)
-		err = s.txTracker.TrackMissingTxs(ctx, utils.CollectAncestors(tx))
-		if err != nil {
-			s.logger.Warn().Err(err).Msg("Failed to track missing transactions")
-		}
-	}
+	// TODO: TrackMissingTxs for BEEF purposes (or handle it in other way)
 
 	return &paymail.P2PTransactionPayload{
 		Note: p2pTx.MetaData.Note,
