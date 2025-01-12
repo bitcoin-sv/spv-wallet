@@ -11,3 +11,8 @@ const (
 	TxStatusReverted    TxStatus = "REVERTED"
 	TxStatusProblematic TxStatus = "PROBLEMATIC"
 )
+
+// String returns the string representation of the TxStatus
+func (ts TxStatus) String() string {
+	return string(ts)
+}

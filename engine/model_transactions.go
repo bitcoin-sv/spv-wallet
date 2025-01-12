@@ -4,6 +4,7 @@ import (
 	"context"
 
 	trx "github.com/bitcoin-sv/go-sdk/transaction"
+
 	chainmodels "github.com/bitcoin-sv/spv-wallet/engine/chain/models"
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/bitcoin-sv/spv-wallet/engine/utils"
@@ -31,6 +32,11 @@ const (
 	// TransactionDirectionReconcile The transaction is an internal reconciliation transaction
 	TransactionDirectionReconcile TransactionDirection = "reconcile"
 )
+
+// String returns the string representation of the TransactionDirection
+func (td TransactionDirection) String() string {
+	return string(td)
+}
 
 // Transaction is an object representing the BitCoin transaction
 //

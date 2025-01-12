@@ -26,8 +26,8 @@ func MapToTransactionContract(t *engine.Transaction) *response.Transaction {
 		NumberOfOutputs:      t.NumberOfOutputs,
 		DraftID:              t.DraftID,
 		TotalValue:           t.TotalValue,
-		Status:               string(t.TxStatus),
-		TransactionDirection: string(t.Direction),
+		Status:               t.TxStatus.String(),
+		TransactionDirection: t.Direction.String(),
 	}
 
 	processMetadata(t, t.XPubID, &model)
@@ -38,29 +38,7 @@ func MapToTransactionContract(t *engine.Transaction) *response.Transaction {
 
 // MapToTransactionContractForAdmin will map the model from spv-wallet to the spv-wallet-response contract for admin
 func MapToTransactionContractForAdmin(t *engine.Transaction) *response.Transaction {
-	if t == nil {
-		return nil
-	}
-
-	model := response.Transaction{
-		Model:           *common.MapToContract(&t.Model),
-		ID:              t.ID,
-		Hex:             t.Hex,
-		XpubInIDs:       t.XpubInIDs,
-		XpubOutIDs:      t.XpubOutIDs,
-		BlockHash:       t.BlockHash,
-		BlockHeight:     t.BlockHeight,
-		Fee:             t.Fee,
-		NumberOfInputs:  t.NumberOfInputs,
-		NumberOfOutputs: t.NumberOfOutputs,
-		DraftID:         t.DraftID,
-		TotalValue:      t.TotalValue,
-		Outputs:         t.XpubOutputValue,
-	}
-
-	processMetadata(t, t.XPubID, &model)
-
-	return &model
+	return MapToTransactionContract(t)
 }
 
 func processMetadata(t *engine.Transaction, xpubID string, model *response.Transaction) {
