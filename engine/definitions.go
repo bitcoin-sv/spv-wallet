@@ -114,7 +114,7 @@ const (
 )
 
 // AllDBModels returns all the database models, e.g. for migrations.
-func AllDBModels() []any {
+func AllDBModels(v2 bool) []any {
 	legacyModels := []any{
 		&Xpub{},
 		&AccessKey{},
@@ -125,6 +125,10 @@ func AllDBModels() []any {
 		&Contact{},
 		&Webhook{},
 		&PaymailAddress{},
+	}
+
+	if !v2 {
+		return legacyModels
 	}
 
 	// New models from database package
