@@ -13,6 +13,8 @@ import (
 )
 
 func TestIncomingPaymailRawTX(t *testing.T) {
+	t.Skip("Raw TX is not supported yet")
+
 	givenForAllTests := testabilities.Given(t)
 	cleanup := givenForAllTests.StartedSPVWalletWithConfiguration(
 		testengine.WithDomainValidationDisabled(),

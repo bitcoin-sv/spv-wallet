@@ -145,7 +145,7 @@ func (s *serviceProvider) RecordTransaction(ctx context.Context, p2pTx *paymail.
 	if isBEEF {
 		tx, err = trx.NewTransactionFromBEEFHex(p2pTx.Beef)
 	} else {
-		tx, err = trx.NewTransactionFromHex(p2pTx.Hex)
+		panic("not implemented yet")
 	}
 
 	if err != nil {
