@@ -59,7 +59,7 @@ func (f *txFlow) getFromInputs() ([]*database.UserUtxos, []*database.TrackedOutp
 			})
 		}
 	}
-	utxos, trackedOutputs, err := f.service.repo.GetOutputs(f.ctx, outpoints)
+	utxos, trackedOutputs, err := f.service.outputs.FindByOutpoints(f.ctx, outpoints)
 	if err != nil {
 		return nil, nil, txerrors.ErrGettingOutputs.Wrap(err)
 	}
@@ -117,7 +117,7 @@ func (f *txFlow) getOutputsForTrackedAddresses() (iter.Seq[database.Output], err
 		relevantOutputs[address.AddressString] = voutU32
 	}
 
-	rows, err := f.service.repo.GetAddresses(f.ctx, maps.Keys(relevantOutputs))
+	rows, err := f.service.addresses.FindByStringAddresses(f.ctx, maps.Keys(relevantOutputs))
 	if err != nil {
 		return nil, txerrors.ErrGettingAddresses.Wrap(err)
 	}
@@ -154,7 +154,7 @@ func (f *txFlow) broadcast() error {
 }
 
 func (f *txFlow) save() error {
-	err := f.service.repo.SaveOperations(f.ctx, toOperationEntities(maps.Values(f.operations)))
+	err := f.service.operations.SaveAll(f.ctx, toOperationEntities(maps.Values(f.operations)))
 	if err != nil {
 		return txerrors.ErrSavingData.Wrap(err)
 	}

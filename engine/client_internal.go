@@ -7,7 +7,7 @@ import (
 	paymailserver "github.com/bitcoin-sv/go-paymail/server"
 	"github.com/bitcoin-sv/spv-wallet/engine/chain"
 	"github.com/bitcoin-sv/spv-wallet/engine/cluster"
-	"github.com/bitcoin-sv/spv-wallet/engine/database/dao"
+	"github.com/bitcoin-sv/spv-wallet/engine/database/repository"
 	"github.com/bitcoin-sv/spv-wallet/engine/datastore"
 	"github.com/bitcoin-sv/spv-wallet/engine/notifications"
 	"github.com/bitcoin-sv/spv-wallet/engine/paymail"
@@ -210,17 +210,20 @@ func (c *Client) loadTransactionOutlinesService() error {
 func (c *Client) loadTransactionRecordService() error {
 	if c.options.transactionRecordService == nil {
 		logger := c.Logger().With().Str("subservice", "transactionRecord").Logger()
-		c.options.transactionRecordService = record.NewService(logger, c.TransactionsDAO(), c.Chain())
+		c.options.transactionRecordService = record.NewService(
+			logger,
+			c.Repositories().Addresses,
+			c.Repositories().Outputs,
+			c.Repositories().Operations,
+			c.Chain(),
+		)
 	}
 	return nil
 }
 
-func (c *Client) loadDAOs() {
-	if c.options.transactionsDAO == nil {
-		c.options.transactionsDAO = dao.NewTransactionsAccessObject(c.Datastore().DB())
-	}
-	if c.options.usersDAO == nil {
-		c.options.usersDAO = dao.NewUsersAccessObject(c.Datastore().DB())
+func (c *Client) loadRepositories() {
+	if c.options.repositories == nil {
+		c.options.repositories = repository.NewRepositories(c.Datastore().DB())
 	}
 }
 
@@ -286,7 +289,8 @@ func (c *Client) loadPaymailServer() (err error) {
 		paymailServiceLogger := c.Logger().With().Str("subservice", "paymail-service-provider").Logger()
 		serviceProvider = paymail.NewServiceProvider(
 			&paymailServiceLogger,
-			c.UsersDAO(),
+			c.Repositories().Paymails,
+			c.Repositories().Users,
 			c.Chain(),
 			c.TransactionRecordService(),
 		)

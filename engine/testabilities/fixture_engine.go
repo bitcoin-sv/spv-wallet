@@ -9,7 +9,7 @@ import (
 	"github.com/bitcoin-sv/spv-wallet/config"
 	"github.com/bitcoin-sv/spv-wallet/engine"
 	"github.com/bitcoin-sv/spv-wallet/engine/database"
-	"github.com/bitcoin-sv/spv-wallet/engine/database/dao"
+	"github.com/bitcoin-sv/spv-wallet/engine/database/repository"
 	"github.com/bitcoin-sv/spv-wallet/engine/datastore"
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/bitcoin-sv/spv-wallet/engine/testabilities/testmode"
@@ -165,7 +165,7 @@ func (f *engineFixture) initialiseFixtures() {
 		}
 
 		if f.config.ExperimentalFeatures.NewTransactionFlowEnabled {
-			usersDAO := dao.NewUsersAccessObject(f.engine.Datastore().DB())
+			users := repository.NewUsersRepo(f.engine.Datastore().DB())
 			userEntity := &database.User{
 				PubKey: user.PublicKey().ToDERHex(),
 			}
@@ -180,7 +180,7 @@ func (f *engineFixture) initialiseFixtures() {
 				})
 			}
 
-			err = usersDAO.SaveUser(context.Background(), userEntity)
+			err = users.Save(context.Background(), userEntity)
 			require.NoError(f.t, err)
 		}
 	}

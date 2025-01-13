@@ -10,11 +10,16 @@ import (
 	"github.com/bitcoin-sv/spv-wallet/models/bsv"
 )
 
-// Repository is an interface for saving transactions and outputs to the database.
-type Repository interface {
-	SaveOperations(ctx context.Context, opRows iter.Seq[*database.Operation]) error
-	GetOutputs(ctx context.Context, outpoints iter.Seq[bsv.Outpoint]) ([]*database.UserUtxos, []*database.TrackedOutput, error)
-	GetAddresses(ctx context.Context, addresses iter.Seq[string]) ([]*database.Address, error)
+type AddressesRepo interface {
+	FindByStringAddresses(ctx context.Context, addresses iter.Seq[string]) ([]*database.Address, error)
+}
+
+type OutputsRepo interface {
+	FindByOutpoints(ctx context.Context, outpoints iter.Seq[bsv.Outpoint]) ([]*database.UserUtxos, []*database.TrackedOutput, error)
+}
+
+type OperationsRepo interface {
+	SaveAll(ctx context.Context, opRows iter.Seq[*database.Operation]) error
 }
 
 // Broadcaster is an interface for broadcasting transactions.

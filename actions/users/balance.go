@@ -16,7 +16,7 @@ func balance(c *gin.Context, userContext *reqctx.UserContext) {
 		return
 	}
 
-	satoshi, err := reqctx.Engine(c).UsersDAO().GetBalance(c.Request.Context(), userID, "bsv")
+	satoshi, err := reqctx.Engine(c).Repositories().Users.GetBalance(c.Request.Context(), userID, "bsv")
 	if err != nil {
 		spverrors.ErrorResponse(c, err, reqctx.Logger(c))
 		return

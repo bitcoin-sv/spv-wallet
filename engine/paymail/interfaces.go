@@ -8,10 +8,12 @@ import (
 	"github.com/bitcoin-sv/spv-wallet/engine/database"
 )
 
-// Repository is an interface for the paymail repository
-type Repository interface {
-	GetPaymail(ctx context.Context, alias, domain string) (*database.Paymail, error)
-	SaveAddress(ctx context.Context, userRow *database.User, addressRow *database.Address) error
+type PaymailsRepo interface {
+	Get(ctx context.Context, alias, domain string) (*database.Paymail, error)
+}
+
+type UsersRepo interface {
+	AppendAddress(ctx context.Context, userRow *database.User, addressRow *database.Address) error
 }
 
 // MerkleRootsVerifier is an interface for verifying merkle roots

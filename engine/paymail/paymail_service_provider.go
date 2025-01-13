@@ -21,10 +21,17 @@ import (
 )
 
 // NewServiceProvider create a new paymail service server which handlers incoming paymail requests
-func NewServiceProvider(logger *zerolog.Logger, repo Repository, spv MerkleRootsVerifier, recorder TxRecorder) server.PaymailServiceProvider {
+func NewServiceProvider(
+	logger *zerolog.Logger,
+	paymailsRepo PaymailsRepo,
+	usersRepo UsersRepo,
+	spv MerkleRootsVerifier,
+	recorder TxRecorder,
+) server.PaymailServiceProvider {
 	return &serviceProvider{
 		logger:   logger,
-		repo:     repo,
+		paymails: paymailsRepo,
+		users:    usersRepo,
 		spv:      spv,
 		recorder: recorder,
 	}
@@ -32,7 +39,8 @@ func NewServiceProvider(logger *zerolog.Logger, repo Repository, spv MerkleRoots
 
 type serviceProvider struct {
 	logger   *zerolog.Logger
-	repo     Repository
+	paymails PaymailsRepo
+	users    UsersRepo
 	spv      MerkleRootsVerifier
 	recorder TxRecorder
 }
@@ -43,7 +51,7 @@ func (s *serviceProvider) CreateAddressResolutionResponse(ctx context.Context, a
 }
 
 func (s *serviceProvider) CreateP2PDestinationResponse(ctx context.Context, alias, domain string, satoshis uint64, _ *server.RequestMetadata) (*paymail.PaymentDestinationPayload, error) {
-	paymailModel, err := s.repo.GetPaymail(ctx, alias, domain)
+	paymailModel, err := s.paymails.Get(ctx, alias, domain)
 	if err != nil {
 		return nil, pmerrors.ErrPaymailDBFailed.Wrap(err)
 	}
@@ -73,7 +81,7 @@ func (s *serviceProvider) CreateP2PDestinationResponse(ctx context.Context, alia
 		return nil, pmerrors.ErrPaymentDestination.Wrap(err)
 	}
 
-	err = s.repo.SaveAddress(ctx, paymailModel.User, &database.Address{
+	err = s.users.AppendAddress(ctx, paymailModel.User, &database.Address{
 		Address: address.AddressString,
 		CustomInstructions: datatypes.NewJSONSlice([]database.CustomInstruction{
 			{
@@ -101,7 +109,7 @@ func (s *serviceProvider) CreateP2PDestinationResponse(ctx context.Context, alia
 }
 
 func (s *serviceProvider) GetPaymailByAlias(ctx context.Context, alias, domain string, _ *server.RequestMetadata) (*paymail.AddressInformation, error) {
-	model, err := s.repo.GetPaymail(ctx, alias, domain)
+	model, err := s.paymails.Get(ctx, alias, domain)
 	if err != nil {
 		return nil, pmerrors.ErrPaymailDBFailed.Wrap(err)
 	}

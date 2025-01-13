@@ -26,7 +26,7 @@ func operations(c *gin.Context, userContext *reqctx.UserContext) {
 		return
 	}
 
-	pagedResult, err := reqctx.Engine(c).UsersDAO().GetOperations(c.Request.Context(), userID, searchParams.Page)
+	pagedResult, err := reqctx.Engine(c).Repositories().Operations.PaginatedForUser(c.Request.Context(), userID, searchParams.Page)
 	if err != nil {
 		spverrors.ErrorResponse(c, err, reqctx.Logger(c))
 		return
