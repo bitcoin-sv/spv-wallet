@@ -36,7 +36,7 @@ func adminGetTxByID(c *gin.Context, _ *reqctx.AdminContext) {
 		return
 	}
 
-	contract := mappings.MapToOldTransactionContractForAdmin(transaction)
+	contract := mappings.MapToTransactionContractForAdmin(transaction)
 	c.JSON(http.StatusOK, contract)
 }
 
