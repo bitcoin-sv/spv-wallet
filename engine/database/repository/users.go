@@ -2,6 +2,7 @@ package repository
 
 import (
 	"context"
+
 	"github.com/bitcoin-sv/spv-wallet/engine/database"
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"gorm.io/gorm"

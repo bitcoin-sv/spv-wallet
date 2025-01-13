@@ -2,18 +2,21 @@ package repository
 
 import (
 	"context"
+	"iter"
+	"slices"
+
 	"github.com/bitcoin-sv/spv-wallet/engine/database"
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/bitcoin-sv/spv-wallet/models/bsv"
 	"gorm.io/gorm"
-	"iter"
-	"slices"
 )
 
+// Outputs is a repository for outputs.
 type Outputs struct {
 	db *gorm.DB
 }
 
+// NewOutputsRepo creates a new repository for outputs.
 func NewOutputsRepo(db *gorm.DB) *Outputs {
 	return &Outputs{db: db}
 }

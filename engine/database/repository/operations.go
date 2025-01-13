@@ -2,22 +2,26 @@ package repository
 
 import (
 	"context"
+	"iter"
+	"slices"
+
 	"github.com/bitcoin-sv/spv-wallet/engine/database"
 	"github.com/bitcoin-sv/spv-wallet/models/filter"
 	"gorm.io/gorm"
 	"gorm.io/gorm/clause"
-	"iter"
-	"slices"
 )
 
+// Operations is a repository for operations.
 type Operations struct {
 	db *gorm.DB
 }
 
+// NewOperationsRepo creates a new repository for operations.
 func NewOperationsRepo(db *gorm.DB) *Operations {
 	return &Operations{db: db}
 }
 
+// PaginatedForUser returns operations for a user based on userID and the provided paging options.
 func (o *Operations) PaginatedForUser(ctx context.Context, userID string, page filter.Page) (*database.PagedResult[database.Operation], error) {
 	return database.PaginatedQuery[database.Operation](ctx, page, o.db, func(tx *gorm.DB) *gorm.DB {
 		return tx.Where("user_id = ?", userID)
