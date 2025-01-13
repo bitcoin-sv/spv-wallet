@@ -26,8 +26,8 @@ func MapToTransactionContract(t *engine.Transaction) *response.Transaction {
 		NumberOfOutputs:      t.NumberOfOutputs,
 		DraftID:              t.DraftID,
 		TotalValue:           t.TotalValue,
-		Status:               string(t.TxStatus),
-		TransactionDirection: string(t.Direction),
+		Status:               t.TxStatus.String(),
+		TransactionDirection: t.Direction.String(),
 	}
 
 	processMetadata(t, t.XPubID, &model)
@@ -55,10 +55,12 @@ func MapToTransactionContractForAdmin(t *engine.Transaction) *response.Transacti
 		NumberOfOutputs: t.NumberOfOutputs,
 		DraftID:         t.DraftID,
 		TotalValue:      t.TotalValue,
+		Status:          t.TxStatus.String(),
 		Outputs:         t.XpubOutputValue,
 	}
 
 	processMetadata(t, t.XPubID, &model)
+	processOutputValue(t, t.XPubID, &model)
 
 	return &model
 }

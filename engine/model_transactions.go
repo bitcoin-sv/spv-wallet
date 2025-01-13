@@ -32,6 +32,11 @@ const (
 	TransactionDirectionReconcile TransactionDirection = "reconcile"
 )
 
+// String returns the string representation of the TransactionDirection
+func (td TransactionDirection) String() string {
+	return string(td)
+}
+
 // Transaction is an object representing the BitCoin transaction
 //
 // Gorm related models & indexes: https://gorm.io/docs/models.html - https://gorm.io/docs/indexes.html
