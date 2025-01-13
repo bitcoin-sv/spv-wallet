@@ -6,5 +6,8 @@ func Models() []any {
 		TrackedTransaction{},
 		Output{},
 		Data{},
+		User{},
+		Paymail{},
+		Address{},
 	}
 }
