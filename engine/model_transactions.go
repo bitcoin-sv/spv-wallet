@@ -4,7 +4,6 @@ import (
 	"context"
 
 	trx "github.com/bitcoin-sv/go-sdk/transaction"
-
 	chainmodels "github.com/bitcoin-sv/spv-wallet/engine/chain/models"
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/bitcoin-sv/spv-wallet/engine/utils"
