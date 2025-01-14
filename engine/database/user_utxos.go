@@ -19,7 +19,7 @@ type UserUtxos struct {
 	CustomInstructions           datatypes.JSONSlice[CustomInstruction]
 }
 
-func NewP2PKHUserUTXO(output *TrackedOutput, customInstructions datatypes.JSONSlice[CustomInstruction]) *UserUtxos {
+func NewP2PKHUserUTXO(output *Output, customInstructions datatypes.JSONSlice[CustomInstruction]) *UserUtxos {
 	return &UserUtxos{
 		UserID:                       output.UserID,
 		TxID:                         output.TxID,

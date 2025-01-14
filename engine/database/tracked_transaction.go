@@ -22,20 +22,20 @@ type TrackedTransaction struct {
 
 	Data []*Data `gorm:"foreignKey:TxID"`
 
-	Inputs  []*TrackedOutput `gorm:"foreignKey:SpendingTX"`
-	Outputs []*TrackedOutput `gorm:"foreignKey:TxID"`
+	Inputs  []*Output `gorm:"foreignKey:SpendingTX"`
+	Outputs []*Output `gorm:"foreignKey:TxID"`
 
 	newUTXOs []*UserUtxos `gorm:"-"`
 }
 
-func (t *TrackedTransaction) CreateP2PKHOutput(output *TrackedOutput, customInstructions datatypes.JSONSlice[CustomInstruction]) {
+func (t *TrackedTransaction) CreateP2PKHOutput(output *Output, customInstructions datatypes.JSONSlice[CustomInstruction]) {
 	t.Outputs = append(t.Outputs, output)
 	t.newUTXOs = append(t.newUTXOs, NewP2PKHUserUTXO(output, customInstructions))
 }
 
 func (t *TrackedTransaction) CreateDataOutput(data *Data, userID string) {
 	t.Data = append(t.Data, data) //TODO: Most probably Data should be also linked to the user
-	t.Outputs = append(t.Outputs, &TrackedOutput{
+	t.Outputs = append(t.Outputs, &Output{
 		TxID:     data.TxID,
 		Vout:     data.Vout,
 		UserID:   userID,
@@ -44,13 +44,8 @@ func (t *TrackedTransaction) CreateDataOutput(data *Data, userID string) {
 }
 
 // AddInputs adds inputs to the transaction.
-func (t *TrackedTransaction) AddInputs(inputs ...*TrackedOutput) {
+func (t *TrackedTransaction) AddInputs(inputs ...*Output) {
 	t.Inputs = append(t.Inputs, inputs...)
-}
-
-// AddData adds data to the transaction.
-func (t *TrackedTransaction) AddData(data ...*Data) {
-	t.Data = append(t.Data, data...)
 }
 
 // AfterCreate is a hook that is called after creating the transaction.

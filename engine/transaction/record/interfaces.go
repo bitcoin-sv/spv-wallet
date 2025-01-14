@@ -17,7 +17,7 @@ type AddressesRepo interface {
 
 // OutputsRepo is an interface for outputs repository.
 type OutputsRepo interface {
-	FindByOutpoints(ctx context.Context, outpoints iter.Seq[bsv.Outpoint]) ([]*database.TrackedOutput, error)
+	FindByOutpoints(ctx context.Context, outpoints iter.Seq[bsv.Outpoint]) ([]*database.Output, error)
 }
 
 // OperationsRepo is an interface for operations repository.

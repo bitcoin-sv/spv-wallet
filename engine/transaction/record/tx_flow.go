@@ -14,6 +14,14 @@ import (
 	"github.com/bitcoin-sv/spv-wallet/models/bsv"
 )
 
+type p2pkhOutput struct {
+	vout               uint32
+	customInstructions datatypes.JSONSlice[database.CustomInstruction]
+	address            string
+	satoshis           bsv.Satoshis
+	userID             string
+}
+
 type txFlow struct {
 	ctx     context.Context
 	service *Service
@@ -51,7 +59,7 @@ func (f *txFlow) verifyScripts() error {
 	return nil
 }
 
-func (f *txFlow) getFromInputs() ([]*database.TrackedOutput, error) {
+func (f *txFlow) getFromInputs() ([]*database.Output, error) {
 	outpoints := func(yield func(outpoint bsv.Outpoint) bool) {
 		for _, input := range f.tx.Inputs {
 			yield(bsv.Outpoint{
@@ -90,12 +98,12 @@ func (f *txFlow) operationOfUser(userID string, operationType string, counterpar
 	return f.operations[userID]
 }
 
-func (f *txFlow) spendInputs(trackedOutputs []*database.TrackedOutput) {
+func (f *txFlow) spendInputs(trackedOutputs []*database.Output) {
 	f.txRow.AddInputs(trackedOutputs...)
 }
 
 func (f *txFlow) createP2PKHOutput(outputData *p2pkhOutput) {
-	f.txRow.CreateP2PKHOutput(&database.TrackedOutput{
+	f.txRow.CreateP2PKHOutput(&database.Output{
 		TxID:     f.txID,
 		Vout:     outputData.vout,
 		UserID:   outputData.userID,
@@ -174,12 +182,4 @@ func (f *txFlow) save() error {
 		return txerrors.ErrSavingData.Wrap(err)
 	}
 	return nil
-}
-
-type p2pkhOutput struct {
-	vout               uint32
-	customInstructions datatypes.JSONSlice[database.CustomInstruction]
-	address            string
-	satoshis           bsv.Satoshis
-	userID             string
 }
