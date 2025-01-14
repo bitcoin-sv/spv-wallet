@@ -128,6 +128,14 @@ func openSQLiteDatabase(optionalLogger glogger.Interface, config *SQLiteConfig) 
 	); err != nil {
 		return
 	}
+	sqlDB, err := db.DB()
+	if err != nil {
+		return
+	}
+	sqlDB.SetMaxIdleConns(config.MaxIdleConnections)
+	sqlDB.SetMaxOpenConns(config.MaxOpenConnections)
+	sqlDB.SetConnMaxLifetime(config.MaxConnectionTime)
+	sqlDB.SetConnMaxIdleTime(config.MaxConnectionIdleTime)
 
 	// Return the connection
 	return

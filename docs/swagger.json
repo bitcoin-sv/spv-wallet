@@ -794,6 +794,35 @@
             }
         },
         "/api/v1/admin/webhooks/subscriptions": {
+            "get": {
+                "security": [
+                    {
+                        "x-auth-xpub": []
+                    }
+                ],
+                "description": "Get All Webhooks currently subscribed to",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Admin"
+                ],
+                "summary": "Get All Webhooks",
+                "responses": {
+                    "200": {
+                        "description": "List of webhooks",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/models.Webhook"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error - Error while getting all webhooks"
+                    }
+                }
+            },
             "post": {
                 "security": [
                     {

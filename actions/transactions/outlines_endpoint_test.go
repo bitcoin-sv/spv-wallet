@@ -6,6 +6,7 @@ import (
 
 	"github.com/bitcoin-sv/spv-wallet/actions/testabilities"
 	"github.com/bitcoin-sv/spv-wallet/actions/testabilities/apierror"
+	testengine "github.com/bitcoin-sv/spv-wallet/engine/testabilities"
 	"github.com/bitcoin-sv/spv-wallet/engine/tester/fixtures"
 )
 
@@ -144,7 +145,7 @@ func TestPOSTTransactionOutlines(t *testing.T) {
 		t.Run(name, func(t *testing.T) {
 			// given:
 			given, then := testabilities.New(t)
-			cleanup := given.StartedSPVWallet()
+			cleanup := given.StartedSPVWalletWithConfiguration(testengine.WithNewTransactionFlowEnabled())
 			defer cleanup()
 
 			// and:
@@ -164,7 +165,7 @@ func TestPOSTTransactionOutlines(t *testing.T) {
 	t.Run("not allowed for anonymous", func(t *testing.T) {
 		// given:
 		given, then := testabilities.New(t)
-		cleanup := given.StartedSPVWallet()
+		cleanup := given.StartedSPVWalletWithConfiguration(testengine.WithNewTransactionFlowEnabled())
 		defer cleanup()
 
 		// and:
@@ -180,7 +181,7 @@ func TestPOSTTransactionOutlines(t *testing.T) {
 	t.Run("not allowed for admin", func(t *testing.T) {
 		// given:
 		given, then := testabilities.New(t)
-		cleanup := given.StartedSPVWallet()
+		cleanup := given.StartedSPVWalletWithConfiguration(testengine.WithNewTransactionFlowEnabled())
 		defer cleanup()
 
 		// and:
@@ -196,7 +197,7 @@ func TestPOSTTransactionOutlines(t *testing.T) {
 	t.Run("Bad Request: when user has no paymail address", func(t *testing.T) {
 		// given:
 		given, then := testabilities.New(t)
-		cleanup := given.StartedSPVWallet()
+		cleanup := given.StartedSPVWalletWithConfiguration(testengine.WithNewTransactionFlowEnabled())
 		defer cleanup()
 
 		// and:
@@ -223,7 +224,7 @@ func TestPOSTTransactionOutlines(t *testing.T) {
 	t.Run("Bad Request: no body", func(t *testing.T) {
 		// given:
 		given, then := testabilities.New(t)
-		cleanup := given.StartedSPVWallet()
+		cleanup := given.StartedSPVWalletWithConfiguration(testengine.WithNewTransactionFlowEnabled())
 		defer cleanup()
 
 		// and:
@@ -433,7 +434,7 @@ func TestPOSTTransactionOutlines(t *testing.T) {
 		t.Run(name, func(t *testing.T) {
 			// given:
 			given, then := testabilities.New(t)
-			cleanup := given.StartedSPVWallet()
+			cleanup := given.StartedSPVWalletWithConfiguration(testengine.WithNewTransactionFlowEnabled())
 			defer cleanup()
 
 			// and:

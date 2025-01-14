@@ -5,8 +5,11 @@ import (
 	"errors"
 	"testing"
 
+	"github.com/bitcoin-sv/go-paymail"
 	"github.com/bitcoin-sv/spv-wallet/config"
 	"github.com/bitcoin-sv/spv-wallet/engine"
+	"github.com/bitcoin-sv/spv-wallet/engine/database"
+	"github.com/bitcoin-sv/spv-wallet/engine/database/dao"
 	"github.com/bitcoin-sv/spv-wallet/engine/datastore"
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/bitcoin-sv/spv-wallet/engine/testabilities/testmode"
@@ -22,11 +25,10 @@ import (
 const inMemoryDbConnectionString = "file:spv-wallet-test.db?mode=memory"
 const fileDbConnectionString = "file:spv-wallet-test.db"
 
-type ConfigOpts func(*config.AppConfig)
-
 type EngineFixture interface {
 	Engine() (walletEngine EngineWithConfig, cleanup func())
 	EngineWithConfiguration(opts ...ConfigOpts) (walletEngine EngineWithConfig, cleanup func())
+	PaymailClient() *paymailmock.PaymailClientMock
 
 	// ConfigForTests returns a configuration with default values for tests and with the provided options applied.
 	ConfigForTests(opts ...ConfigOpts) *config.AppConfig
@@ -67,6 +69,10 @@ func Given(t testing.TB) EngineFixture {
 	}
 
 	return f
+}
+
+func (f *engineFixture) PaymailClient() *paymailmock.PaymailClientMock {
+	return f.paymailClient
 }
 
 func (f *engineFixture) NewTest(t testing.TB) EngineFixture {
@@ -151,11 +157,31 @@ func (f *engineFixture) initialiseFixtures() {
 			require.NoError(f.t, err)
 		}
 
-		for _, paymail := range user.Paymails {
-			_, err := f.engine.NewPaymailAddress(context.Background(), user.XPub(), paymail, paymail, "", opts...)
+		for _, address := range user.Paymails {
+			_, err := f.engine.NewPaymailAddress(context.Background(), user.XPub(), address, address, "", opts...)
 			if !errors.Is(err, spverrors.ErrPaymailAlreadyExists) {
 				require.NoError(f.t, err)
 			}
+		}
+
+		if f.config.ExperimentalFeatures.NewTransactionFlowEnabled {
+			usersDAO := dao.NewUsersAccessObject(f.engine.Datastore().DB())
+			userEntity := &database.User{
+				PubKey: user.PublicKey().ToDERHex(),
+			}
+
+			for _, address := range user.Paymails {
+				alias, domain, _ := paymail.SanitizePaymail(address)
+				userEntity.Paymails = append(userEntity.Paymails, &database.Paymail{
+					Alias:      alias,
+					Domain:     domain,
+					PublicName: address,
+					AvatarURL:  "",
+				})
+			}
+
+			err = usersDAO.SaveUser(context.Background(), userEntity)
+			require.NoError(f.t, err)
 		}
 	}
 

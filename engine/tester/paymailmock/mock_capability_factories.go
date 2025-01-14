@@ -1,8 +1,12 @@
 package paymailmock
 
 import (
-	"github.com/aws/aws-sdk-go/service/appmesh"
+	"net/http"
+	"strings"
+
 	"github.com/bitcoin-sv/go-paymail"
+	"github.com/bitcoin-sv/spv-wallet/engine/tester/fixtures"
+	"github.com/jarcoal/httpmock"
 )
 
 func capabilitySenderValidation() *CapabilityMock {
@@ -20,6 +24,32 @@ func capabilityPki() *CapabilityMock {
 		value: func(dn paymailDomainName) any {
 			return dn.PKI()
 		},
+		endpoint: endpoint(http.MethodGet, func(request *http.Request) (*http.Response, error) {
+			paymailAddress := request.URL.Path[strings.LastIndex(request.URL.Path, "/")+1:]
+			alias := paymailAddress[:strings.Index(paymailAddress, "@")]
+			pki := ""
+
+			if alias == "recipient" {
+				pki = fixtures.RecipientExternalPKI
+			}
+
+			if alias == "sender" {
+				pki = fixtures.SenderExternalPKI
+			}
+
+			if pki != "" {
+				resp := obj{
+					"bsvalias": "1.0",
+					"handle":   paymailAddress,
+					"pubkey":   pki,
+				}
+				return httpmock.NewJsonResponse(http.StatusOK, resp)
+			} else {
+				return httpmock.NewJsonResponse(http.StatusNotFound, obj{
+					"message": "Not Found",
+				})
+			}
+		}),
 	}
 }
 
@@ -47,7 +77,7 @@ func capabilityP2PPaymentDestination() *CapabilityMock {
 		value: func(dn paymailDomainName) any {
 			return dn.P2PPaymentDestination()
 		},
-		endpoint: endpoint(appmesh.HttpMethodPost, P2PDestinationsForSats(1000).response()),
+		endpoint: endpointWithStaticResponse(http.MethodPost, P2PDestinationsForSats(1000).response()),
 	}
 }
 

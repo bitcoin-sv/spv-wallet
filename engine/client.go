@@ -9,6 +9,7 @@ import (
 	"github.com/bitcoin-sv/spv-wallet/engine/chain"
 	"github.com/bitcoin-sv/spv-wallet/engine/chain/models"
 	"github.com/bitcoin-sv/spv-wallet/engine/cluster"
+	"github.com/bitcoin-sv/spv-wallet/engine/database/dao"
 	"github.com/bitcoin-sv/spv-wallet/engine/datastore"
 	"github.com/bitcoin-sv/spv-wallet/engine/logging"
 	"github.com/bitcoin-sv/spv-wallet/engine/metrics"
@@ -54,6 +55,8 @@ type (
 		arcConfig                  chainmodels.ARCConfig  // Configuration for ARC
 		bhsConfig                  chainmodels.BHSConfig  // Configuration for BHS
 		feeUnit                    *bsv.FeeUnit           // Fee unit for transactions
+		transactionsDAO            *dao.Transactions
+		usersDAO                   *dao.Users
 	}
 
 	// cacheStoreOptions holds the cache configuration and client
@@ -94,6 +97,7 @@ type (
 		*server.Configuration                    // Server configuration if Paymail is enabled
 		options               []server.ConfigOps // Options for the paymail server
 		DefaultFromPaymail    string             // IE: from@domain.com
+		ExperimentalProvider  bool
 	}
 
 	// taskManagerOptions holds the configuration for taskmanager
@@ -141,6 +145,8 @@ func NewClient(ctx context.Context, opts ...ClientOps) (ClientInterface, error) 
 		return nil, err
 	}
 
+	client.loadDAOs()
+
 	// Load the Paymail client and service (if does not exist)
 	if err = client.loadPaymailComponents(); err != nil {
 		return nil, err
@@ -175,11 +181,8 @@ func NewClient(ctx context.Context, opts ...ClientOps) (ClientInterface, error) 
 		return nil, err
 	}
 
-	// Default paymail server config (generic capabilities and domain check disabled)
-	if client.options.paymail.serverConfig.Configuration == nil {
-		if err = client.loadDefaultPaymailConfig(); err != nil {
-			return nil, err
-		}
+	if err = client.loadPaymailServer(); err != nil {
+		return nil, err
 	}
 
 	if client.options.feeUnit == nil {
@@ -210,6 +213,10 @@ func (c *Client) Cluster() cluster.ClientInterface {
 
 // Close will safely close any open connections (cache, datastore, etc.)
 func (c *Client) Close(ctx context.Context) error {
+	// Close WebhookManager
+	if c.options.notifications != nil && c.options.notifications.webhookManager != nil {
+		c.options.notifications.webhookManager.Stop()
+	}
 
 	// Close Datastore
 	ds := c.Datastore()
@@ -227,10 +234,6 @@ func (c *Client) Close(ctx context.Context) error {
 			return spverrors.Wrapf(err, "failed to close taskmanager")
 		}
 		c.options.taskManager.TaskEngine = nil
-	}
-
-	if c.options.notifications != nil && c.options.notifications.webhookManager != nil {
-		c.options.notifications.webhookManager.Stop()
 	}
 	return nil
 }
@@ -331,4 +334,14 @@ func (c *Client) LogBHSReadiness(ctx context.Context) {
 // FeeUnit will return the fee unit used for transactions
 func (c *Client) FeeUnit() bsv.FeeUnit {
 	return *c.options.feeUnit
+}
+
+// TransactionsDAO will return the Transactions DAO
+func (c *Client) TransactionsDAO() *dao.Transactions {
+	return c.options.transactionsDAO
+}
+
+// UsersDAO will return the Users DAO
+func (c *Client) UsersDAO() *dao.Users {
+	return c.options.usersDAO
 }

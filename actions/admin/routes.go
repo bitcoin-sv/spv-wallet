@@ -36,7 +36,7 @@ func RegisterRoutes(handlersManager *handlers.Manager) {
 	adminGroupOld.POST("/xpubs/count", handlers.AsAdmin(xpubsCount))
 	adminGroupOld.POST("/webhooks/subscriptions", handlers.AsAdmin(subscribeWebhookOld))
 	adminGroupOld.DELETE("/webhooks/subscriptions", handlers.AsAdmin(unsubscribeWebhookOld))
-	adminGroupOld.GET("/webhooks/subscriptions", handlers.AsAdmin(getAllWebhooks))
+	adminGroupOld.GET("/webhooks/subscriptions", handlers.AsAdmin(getAllWebhooksOld))
 
 	adminGroupOld.GET("/transactions/:id", handlers.AsAdmin(getTxAdminByIDOld))
 	adminGroupOld.GET("/transactions", handlers.AsAdmin(getTransactionsOld))
@@ -71,6 +71,7 @@ func RegisterRoutes(handlersManager *handlers.Manager) {
 	adminGroup.GET("/utxos", handlers.AsAdmin(utxosSearch))
 
 	// webhooks
+	adminGroup.GET("/webhooks/subscriptions", handlers.AsAdmin(getAllWebhooks))
 	adminGroup.POST("/webhooks/subscriptions", handlers.AsAdmin(subscribeWebhook))
 	adminGroup.DELETE("/webhooks/subscriptions", handlers.AsAdmin(unsubscribeWebhook))
 

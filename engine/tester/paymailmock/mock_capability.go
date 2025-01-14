@@ -49,21 +49,24 @@ func (c *CapabilityMock) mockEndpoint(domain paymailDomainName) {
 		httpmock.RegisterResponder(c.endpoint(domain, c))
 	}
 }
-
-func endpoint(method string, successResponse obj) func(name paymailDomainName, c *CapabilityMock) (method string, urlMatcher string, responder httpmock.Responder) {
-	r, err := httpmock.NewJsonResponder(http.StatusOK, successResponse)
-	if err != nil {
-		panic(err)
-	}
-
+func endpoint(method string, defaultResponder httpmock.Responder) func(name paymailDomainName, c *CapabilityMock) (method string, urlMatcher string, responder httpmock.Responder) {
 	return func(dn paymailDomainName, c *CapabilityMock) (string, string, httpmock.Responder) {
 		url, ok := c.value(dn).(string)
 		if !ok {
 			panic("cannot mock capability without URL in value")
 		}
-		responder := dynamicResponder(c, r)
+		responder := dynamicResponder(c, defaultResponder)
 		return method, matchingURL(url, string(dn)), responder
 	}
+}
+
+func endpointWithStaticResponse(method string, successResponse obj) func(name paymailDomainName, c *CapabilityMock) (method string, urlMatcher string, responder httpmock.Responder) {
+	r, err := httpmock.NewJsonResponder(http.StatusOK, successResponse)
+	if err != nil {
+		panic(err)
+	}
+
+	return endpoint(method, r)
 }
 
 func dynamicResponder(c *CapabilityMock, defaultResponder httpmock.Responder) httpmock.Responder {

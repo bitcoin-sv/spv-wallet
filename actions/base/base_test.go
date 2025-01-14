@@ -3,7 +3,6 @@ package base
 import (
 	"testing"
 
-	"github.com/bitcoin-sv/spv-wallet/config"
 	"github.com/bitcoin-sv/spv-wallet/server/handlers"
 	"github.com/bitcoin-sv/spv-wallet/tests"
 	"github.com/stretchr/testify/suite"
@@ -28,7 +27,7 @@ func (ts *TestSuite) TearDownSuite() {
 func (ts *TestSuite) SetupTest() {
 	ts.BaseSetupTest()
 
-	handlersManager := handlers.NewManager(ts.Router, config.APIVersion)
+	handlersManager := handlers.NewManager(ts.Router, ts.AppConfig)
 	RegisterRoutes(handlersManager)
 }
 
