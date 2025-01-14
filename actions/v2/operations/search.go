@@ -1,4 +1,4 @@
-package users
+package operations
 
 import (
 	"net/http"
@@ -11,7 +11,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func operations(c *gin.Context, userContext *reqctx.UserContext) {
+func search(c *gin.Context, userContext *reqctx.UserContext) {
 	userID, err := userContext.ShouldGetUserID()
 	if err != nil {
 		spverrors.ErrorResponse(c, spverrors.ErrCannotBindRequest, reqctx.Logger(c))
@@ -34,14 +34,16 @@ func operations(c *gin.Context, userContext *reqctx.UserContext) {
 
 	c.JSON(http.StatusOK, response.PageModel[response.Operation]{
 		Page: pagedResult.PageDescription,
-		Content: slices.Collect(func(yield func(operation *response.Operation) bool) {
-			for _, operation := range pagedResult.Content {
-				yield(&response.Operation{
-					CreatedAt: operation.CreatedAt,
-					Value:     operation.Value,
-					TxID:      operation.TxID,
-				})
-			}
-		}),
+		Content: slices.AppendSeq(
+			make([]*response.Operation, 0, len(pagedResult.Content)),
+			func(yield func(operation *response.Operation) bool) {
+				for _, operation := range pagedResult.Content {
+					yield(&response.Operation{
+						CreatedAt: operation.CreatedAt,
+						Value:     operation.Value,
+						TxID:      operation.TxID,
+					})
+				}
+			}),
 	})
 }

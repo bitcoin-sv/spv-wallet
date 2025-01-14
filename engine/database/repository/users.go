@@ -5,6 +5,7 @@ import (
 
 	"github.com/bitcoin-sv/spv-wallet/engine/database"
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
+	"github.com/bitcoin-sv/spv-wallet/models/bsv"
 	"gorm.io/gorm"
 )
 
@@ -45,13 +46,13 @@ func (u *Users) AppendAddress(ctx context.Context, userRow *database.User, addre
 }
 
 // GetBalance returns the balance of a user in a given bucket.
-func (u *Users) GetBalance(ctx context.Context, userID string, bucket string) (uint64, error) {
-	var balance uint64
+func (u *Users) GetBalance(ctx context.Context, userID string, bucket string) (bsv.Satoshis, error) {
+	var balance bsv.Satoshis
 	err := u.db.
 		WithContext(ctx).
 		Model(&database.UserUtxos{}).
 		Where("user_id = ? AND bucket = ?", userID, bucket).
-		Select("SUM(satoshis)").
+		Select("COALESCE(SUM(satoshis), 0)").
 		Row().
 		Scan(&balance)
 
