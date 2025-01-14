@@ -1,8 +1,9 @@
 package database
 
 import (
-	"gorm.io/datatypes"
 	"time"
+
+	"gorm.io/datatypes"
 )
 
 // UserUtxos is a table holding user's Unspent Transaction Outputs (UTXOs).
@@ -19,6 +20,7 @@ type UserUtxos struct {
 	CustomInstructions           datatypes.JSONSlice[CustomInstruction]
 }
 
+// NewP2PKHUserUTXO creates a new UserUtxos instance for a P2PKH output based on the given output and custom instructions.
 func NewP2PKHUserUTXO(output *Output, customInstructions datatypes.JSONSlice[CustomInstruction]) *UserUtxos {
 	return &UserUtxos{
 		UserID:                       output.UserID,

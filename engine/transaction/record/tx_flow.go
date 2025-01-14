@@ -2,7 +2,6 @@ package record
 
 import (
 	"context"
-	"gorm.io/datatypes"
 	"iter"
 	"maps"
 
@@ -12,6 +11,7 @@ import (
 	"github.com/bitcoin-sv/spv-wallet/engine/database"
 	txerrors "github.com/bitcoin-sv/spv-wallet/engine/transaction/errors"
 	"github.com/bitcoin-sv/spv-wallet/models/bsv"
+	"gorm.io/datatypes"
 )
 
 type p2pkhOutput struct {

@@ -63,7 +63,7 @@ func (s *Service) RecordTransactionOutline(ctx context.Context, userID string, o
 func (s *Service) processDataOutputs(tx *trx.Transaction, annotations *transaction.Annotations) ([]*database.Data, error) {
 	txID := tx.TxID().String()
 
-	var dataRecords []*database.Data
+	var dataRecords []*database.Data //nolint: prealloc
 
 	for vout, annotation := range annotations.Outputs {
 		if vout >= len(tx.Outputs) {

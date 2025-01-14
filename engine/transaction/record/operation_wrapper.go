@@ -1,11 +1,11 @@
 package record
 
 import (
-	"github.com/bitcoin-sv/spv-wallet/models/bsv"
 	"iter"
 
 	"github.com/bitcoin-sv/spv-wallet/conv"
 	"github.com/bitcoin-sv/spv-wallet/engine/database"
+	"github.com/bitcoin-sv/spv-wallet/models/bsv"
 )
 
 type operationWrapper struct {

@@ -28,11 +28,13 @@ type TrackedTransaction struct {
 	newUTXOs []*UserUtxos `gorm:"-"`
 }
 
+// CreateP2PKHOutput prepares a new P2PKH output and adds it to the transaction.
 func (t *TrackedTransaction) CreateP2PKHOutput(output *Output, customInstructions datatypes.JSONSlice[CustomInstruction]) {
 	t.Outputs = append(t.Outputs, output)
 	t.newUTXOs = append(t.newUTXOs, NewP2PKHUserUTXO(output, customInstructions))
 }
 
+// CreateDataOutput prepares a new Data output and adds it to the transaction.
 func (t *TrackedTransaction) CreateDataOutput(data *Data, userID string) {
 	t.Data = append(t.Data, data) //TODO: Most probably Data should be also linked to the user
 	t.Outputs = append(t.Outputs, &Output{
