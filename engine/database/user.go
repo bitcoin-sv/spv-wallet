@@ -19,7 +19,6 @@ type User struct {
 
 	Paymails  []*Paymail `gorm:"foreignKey:UserID"`
 	Addresses []*Address `gorm:"foreignKey:UserID"`
-	Outputs   []*Output  `gorm:"foreignKey:UserID"`
 }
 
 // BeforeCreate is a gorm hook that is called before creating a new user

@@ -4,7 +4,7 @@ package database
 func Models() []any {
 	return []any{
 		TrackedTransaction{},
-		Output{},
+		TrackedOutput{},
 		Data{},
 		User{},
 		Paymail{},

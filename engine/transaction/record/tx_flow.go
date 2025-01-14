@@ -59,7 +59,7 @@ func (f *txFlow) verifyScripts() error {
 	return nil
 }
 
-func (f *txFlow) getFromInputs() ([]*database.Output, error) {
+func (f *txFlow) getFromInputs() ([]*database.TrackedOutput, error) {
 	outpoints := func(yield func(outpoint bsv.Outpoint) bool) {
 		for _, input := range f.tx.Inputs {
 			yield(bsv.Outpoint{
@@ -98,12 +98,12 @@ func (f *txFlow) operationOfUser(userID string, operationType string, counterpar
 	return f.operations[userID]
 }
 
-func (f *txFlow) spendInputs(trackedOutputs []*database.Output) {
+func (f *txFlow) spendInputs(trackedOutputs []*database.TrackedOutput) {
 	f.txRow.AddInputs(trackedOutputs...)
 }
 
 func (f *txFlow) createP2PKHOutput(outputData *p2pkhOutput) {
-	f.txRow.CreateP2PKHOutput(&database.Output{
+	f.txRow.CreateP2PKHOutput(&database.TrackedOutput{
 		TxID:     f.txID,
 		Vout:     outputData.vout,
 		UserID:   outputData.userID,

@@ -4,7 +4,6 @@ import (
 	"slices"
 	"time"
 
-	trx "github.com/bitcoin-sv/go-sdk/transaction"
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"gorm.io/datatypes"
 	"gorm.io/gorm"
@@ -18,26 +17,24 @@ type TrackedTransaction struct {
 	CreatedAt time.Time
 	UpdatedAt time.Time
 
-	BUMP *datatypes.JSONType[trx.MerklePath]
-
 	Data []*Data `gorm:"foreignKey:TxID"`
 
-	Inputs  []*Output `gorm:"foreignKey:SpendingTX"`
-	Outputs []*Output `gorm:"foreignKey:TxID"`
+	Inputs  []*TrackedOutput `gorm:"foreignKey:SpendingTX"`
+	Outputs []*TrackedOutput `gorm:"foreignKey:TxID"`
 
 	newUTXOs []*UserUtxos `gorm:"-"`
 }
 
 // CreateP2PKHOutput prepares a new P2PKH output and adds it to the transaction.
-func (t *TrackedTransaction) CreateP2PKHOutput(output *Output, customInstructions datatypes.JSONSlice[CustomInstruction]) {
+func (t *TrackedTransaction) CreateP2PKHOutput(output *TrackedOutput, customInstructions datatypes.JSONSlice[CustomInstruction]) {
 	t.Outputs = append(t.Outputs, output)
 	t.newUTXOs = append(t.newUTXOs, NewP2PKHUserUTXO(output, customInstructions))
 }
 
 // CreateDataOutput prepares a new Data output and adds it to the transaction.
 func (t *TrackedTransaction) CreateDataOutput(data *Data, userID string) {
-	t.Data = append(t.Data, data) //TODO: Most probably Data should be also linked to the user
-	t.Outputs = append(t.Outputs, &Output{
+	t.Data = append(t.Data, data)
+	t.Outputs = append(t.Outputs, &TrackedOutput{
 		TxID:     data.TxID,
 		Vout:     data.Vout,
 		UserID:   userID,
@@ -46,7 +43,7 @@ func (t *TrackedTransaction) CreateDataOutput(data *Data, userID string) {
 }
 
 // AddInputs adds inputs to the transaction.
-func (t *TrackedTransaction) AddInputs(inputs ...*Output) {
+func (t *TrackedTransaction) AddInputs(inputs ...*TrackedOutput) {
 	t.Inputs = append(t.Inputs, inputs...)
 }
 

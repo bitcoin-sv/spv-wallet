@@ -21,7 +21,7 @@ type UserUtxos struct {
 }
 
 // NewP2PKHUserUTXO creates a new UserUtxos instance for a P2PKH output based on the given output and custom instructions.
-func NewP2PKHUserUTXO(output *Output, customInstructions datatypes.JSONSlice[CustomInstruction]) *UserUtxos {
+func NewP2PKHUserUTXO(output *TrackedOutput, customInstructions datatypes.JSONSlice[CustomInstruction]) *UserUtxos {
 	return &UserUtxos{
 		UserID:                       output.UserID,
 		TxID:                         output.TxID,
