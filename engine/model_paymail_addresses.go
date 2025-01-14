@@ -22,9 +22,6 @@ import (
 type PaymailAddress struct {
 	// Base model
 	Model
-	// NOTE: gorm.DeletedAt is embedded directly here instead of relying on the DeletedAt field in the Model,
-	// as GORM requires this embedding for proper soft delete functionality
-	gorm.DeletedAt
 
 	// Model specific fields
 	ID         string `json:"id" toml:"id" yaml:"id" gorm:"<-:create;type:char(64);primaryKey;comment:This is the unique paymail record id"`                                               // Unique identifier
@@ -70,8 +67,9 @@ func getPaymailAddress(ctx context.Context, address string, opts ...ModelOps) (*
 
 	alias, domain, _ := paymail.SanitizePaymail(address)
 	conditions := map[string]interface{}{
-		aliasField:  alias,
-		domainField: domain,
+		aliasField:     alias,
+		domainField:    domain,
+		deletedAtField: nil,
 	}
 
 	if err := Get(
@@ -112,8 +110,11 @@ func getPaymailAddressByID(ctx context.Context, id string, opts ...ModelOps) (*P
 		ID:    id,
 		Model: *NewBaseModel(ModelPaymailAddress, opts...),
 	}
+	conditions := map[string]interface{}{
+		deletedAtField: nil,
+	}
 	if err := Get(
-		ctx, paymailAddress, nil, false, defaultDatabaseReadTimeout, false,
+		ctx, paymailAddress, conditions, false, defaultDatabaseReadTimeout, false,
 	); err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return nil, nil

@@ -3,6 +3,7 @@ package engine
 import (
 	"context"
 	"errors"
+	"time"
 
 	"github.com/bitcoin-sv/spv-wallet/engine/datastore"
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
@@ -148,7 +149,10 @@ func (c *Client) DeletePaymailAddress(ctx context.Context, address string, opts 
 		return spverrors.ErrCouldNotFindPaymail
 	}
 
-	tx := c.Datastore().DB().Delete(&paymailAddress)
+	paymailAddress.DeletedAt.Valid = true
+	paymailAddress.DeletedAt.Time = time.Now()
+
+	tx := c.Datastore().DB().Save(&paymailAddress)
 	if tx.Error != nil {
 		return spverrors.ErrDeletePaymailAddress.Wrap(tx.Error)
 	}
