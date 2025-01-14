@@ -24,37 +24,29 @@ func (s *Service) RecordTransactionOutline(ctx context.Context, userID string, o
 		return err
 	}
 
-	utxosToSpend, trackedOutputs, err := flow.getFromInputs()
+	trackedOutputs, err := flow.getFromInputs()
 	if err != nil {
 		return err
 	}
 
-	for _, utxo := range utxosToSpend {
+	for _, utxo := range trackedOutputs {
 		operation := flow.operationOfUser(utxo.UserID, "outgoing", "")
 		operation.subtract(utxo.Satoshis)
 	}
 
 	flow.spendInputs(trackedOutputs)
 
-	newOutputs, newDataRecords, err := s.processAnnotatedOutputs(tx, &outline.Annotations)
+	newDataRecords, err := s.processDataOutputs(tx, &outline.Annotations)
 	if err != nil {
 		return err
 	}
 
 	// TODO: getOutputsForTrackedAddresses
-
-	for _, output := range newOutputs {
-		utxo := output.ToUserUTXO()
-		if utxo != nil {
-			operation := flow.operationOfUser(utxo.UserID, "incoming", "")
-			operation.add(utxo.Satoshis)
-		}
-		flow.createOutputs(output)
-	}
+	// TODO: process Paymail Annotations
 
 	if len(newDataRecords) > 0 {
 		_ = flow.operationOfUser(userID, "data", "")
-		flow.txRow.AddData(newDataRecords...)
+		flow.createDataOutputs(userID, newDataRecords...)
 	}
 
 	if err = flow.verify(); err != nil {
@@ -68,42 +60,35 @@ func (s *Service) RecordTransactionOutline(ctx context.Context, userID string, o
 	return flow.save()
 }
 
-func (s *Service) processAnnotatedOutputs(tx *trx.Transaction, annotations *transaction.Annotations) ([]database.Output, []*database.Data, error) {
+func (s *Service) processDataOutputs(tx *trx.Transaction, annotations *transaction.Annotations) ([]*database.Data, error) {
 	txID := tx.TxID().String()
 
-	var outputRecords []database.Output
 	var dataRecords []*database.Data
 
 	for vout, annotation := range annotations.Outputs {
 		if vout >= len(tx.Outputs) {
-			return nil, nil, txerrors.ErrAnnotationIndexOutOfRange
+			return nil, txerrors.ErrAnnotationIndexOutOfRange
 		}
 		voutU32, err := conv.IntToUint32(vout)
 		if err != nil {
-			return nil, nil, txerrors.ErrAnnotationIndexConversion.Wrap(err)
+			return nil, txerrors.ErrAnnotationIndexConversion.Wrap(err)
 		}
 		lockingScript := tx.Outputs[vout].LockingScript
 
-		switch annotation.Bucket {
-		case bucket.Data:
-			data, err := getDataFromOpReturn(lockingScript)
-			if err != nil {
-				return nil, nil, err
-			}
-			dataRecords = append(dataRecords, &database.Data{
-				TxID: txID,
-				Vout: voutU32,
-				Blob: data,
-			})
-			outputRecords = append(outputRecords, database.NewDataOutput(txID, voutU32))
-		case bucket.BSV:
-			//TODO
-			s.logger.Warn().Msgf("support for BSV bucket is not implemented yet")
-		default:
-			s.logger.Warn().Msgf("Unknown annotation bucket %s", annotation.Bucket)
+		if annotation.Bucket != bucket.Data {
 			continue
 		}
+
+		data, err := getDataFromOpReturn(lockingScript)
+		if err != nil {
+			return nil, err
+		}
+		dataRecords = append(dataRecords, &database.Data{
+			TxID: txID,
+			Vout: voutU32,
+			Blob: data,
+		})
 	}
 
-	return outputRecords, dataRecords, nil
+	return dataRecords, nil
 }

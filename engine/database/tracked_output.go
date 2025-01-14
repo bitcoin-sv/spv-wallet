@@ -12,6 +12,11 @@ type TrackedOutput struct {
 	Vout       uint32 `gorm:"primaryKey"`
 	SpendingTX string `gorm:"type:char(64)"`
 
+	UserID string
+	User   *User `gorm:"foreignKey:UserID"`
+
+	Satoshis bsv.Satoshis
+
 	CreatedAt time.Time
 	UpdatedAt time.Time
 }

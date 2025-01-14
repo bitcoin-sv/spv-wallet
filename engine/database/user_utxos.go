@@ -1,6 +1,9 @@
 package database
 
-import "time"
+import (
+	"gorm.io/datatypes"
+	"time"
+)
 
 // UserUtxos is a table holding user's Unspent Transaction Outputs (UTXOs).
 // TODO: It should be renamed to UserUTXO.
@@ -13,4 +16,17 @@ type UserUtxos struct {
 	Bucket                       string    `gorm:"check:chk_not_data_bucket,bucket <> 'data'"`
 	CreatedAt                    time.Time `gorm:"uniqueIndex:idx_window,sort:asc,priority:3"`
 	TouchedAt                    time.Time `gorm:"uniqueIndex:idx_window,sort:asc,priority:2"`
+	CustomInstructions           datatypes.JSONSlice[CustomInstruction]
+}
+
+func NewP2PKHUserUTXO(output *TrackedOutput, customInstructions datatypes.JSONSlice[CustomInstruction]) *UserUtxos {
+	return &UserUtxos{
+		UserID:                       output.UserID,
+		TxID:                         output.TxID,
+		Vout:                         output.Vout,
+		Satoshis:                     uint64(output.Satoshis),
+		UnlockingScriptEstimatedSize: 106,
+		Bucket:                       "bsv",
+		CustomInstructions:           customInstructions,
+	}
 }

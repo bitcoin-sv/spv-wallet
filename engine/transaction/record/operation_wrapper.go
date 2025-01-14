@@ -1,6 +1,7 @@
 package record
 
 import (
+	"github.com/bitcoin-sv/spv-wallet/models/bsv"
 	"iter"
 
 	"github.com/bitcoin-sv/spv-wallet/conv"
@@ -11,16 +12,16 @@ type operationWrapper struct {
 	entity *database.Operation
 }
 
-func (w *operationWrapper) add(satoshi uint64) {
-	signedSatoshi, err := conv.Uint64ToInt64(satoshi)
+func (w *operationWrapper) add(satoshi bsv.Satoshis) {
+	signedSatoshi, err := conv.Uint64ToInt64(uint64(satoshi))
 	if err != nil {
 		panic(err)
 	}
 	w.entity.Value = w.entity.Value + signedSatoshi
 }
 
-func (w *operationWrapper) subtract(satoshi uint64) {
-	signedSatoshi, err := conv.Uint64ToInt64(satoshi)
+func (w *operationWrapper) subtract(satoshi bsv.Satoshis) {
+	signedSatoshi, err := conv.Uint64ToInt64(uint64(satoshi))
 	if err != nil {
 		panic(err)
 	}

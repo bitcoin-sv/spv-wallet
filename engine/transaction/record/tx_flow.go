@@ -2,6 +2,7 @@ package record
 
 import (
 	"context"
+	"gorm.io/datatypes"
 	"iter"
 	"maps"
 
@@ -50,7 +51,7 @@ func (f *txFlow) verifyScripts() error {
 	return nil
 }
 
-func (f *txFlow) getFromInputs() ([]*database.UserUtxos, []*database.TrackedOutput, error) {
+func (f *txFlow) getFromInputs() ([]*database.TrackedOutput, error) {
 	outpoints := func(yield func(outpoint bsv.Outpoint) bool) {
 		for _, input := range f.tx.Inputs {
 			yield(bsv.Outpoint{
@@ -59,18 +60,18 @@ func (f *txFlow) getFromInputs() ([]*database.UserUtxos, []*database.TrackedOutp
 			})
 		}
 	}
-	utxos, trackedOutputs, err := f.service.outputs.FindByOutpoints(f.ctx, outpoints)
+	trackedOutputs, err := f.service.outputs.FindByOutpoints(f.ctx, outpoints)
 	if err != nil {
-		return nil, nil, txerrors.ErrGettingOutputs.Wrap(err)
+		return nil, txerrors.ErrGettingOutputs.Wrap(err)
 	}
 
 	for _, output := range trackedOutputs {
 		if output.IsSpent() {
-			return nil, nil, txerrors.ErrUTXOSpent
+			return nil, txerrors.ErrUTXOSpent
 		}
 	}
 
-	return utxos, trackedOutputs, nil
+	return trackedOutputs, nil
 }
 
 func (f *txFlow) operationOfUser(userID string, operationType string, counterparty string) *operationWrapper {
@@ -93,11 +94,22 @@ func (f *txFlow) spendInputs(trackedOutputs []*database.TrackedOutput) {
 	f.txRow.AddInputs(trackedOutputs...)
 }
 
-func (f *txFlow) createOutputs(outputs ...database.Output) {
-	f.txRow.AddOutputs(outputs...)
+func (f *txFlow) createP2PKHOutput(outputData *p2pkhOutput) {
+	f.txRow.CreateP2PKHOutput(&database.TrackedOutput{
+		TxID:     f.txID,
+		Vout:     outputData.vout,
+		UserID:   outputData.userID,
+		Satoshis: outputData.satoshis,
+	}, outputData.customInstructions)
 }
 
-func (f *txFlow) getOutputsForTrackedAddresses() (iter.Seq[database.Output], error) {
+func (f *txFlow) createDataOutputs(userID string, dataRecords ...*database.Data) {
+	for _, data := range dataRecords {
+		f.txRow.CreateDataOutput(data, userID)
+	}
+}
+
+func (f *txFlow) findRelevantP2PKHOutputs() (iter.Seq[*p2pkhOutput], error) {
 	relevantOutputs := map[string]uint32{} // address -> vout
 	for vout, output := range f.tx.Outputs {
 		lockingScript := output.LockingScript
@@ -124,19 +136,20 @@ func (f *txFlow) getOutputsForTrackedAddresses() (iter.Seq[database.Output], err
 		return nil, txerrors.ErrGettingAddresses.Wrap(err)
 	}
 
-	return func(yield func(database.Output) bool) {
+	return func(yield func(*p2pkhOutput) bool) {
 		for _, row := range rows {
 			vout, ok := relevantOutputs[row.Address]
 			if !ok {
 				f.service.logger.Warn().Str("address", row.Address).Msg("Got not relevant address from database")
 				continue
 			}
-			yield(database.NewP2PKHOutput(
-				f.txID,
-				vout,
-				row.UserID,
-				bsv.Satoshis(f.tx.Outputs[vout].Satoshis)),
-			)
+			yield(&p2pkhOutput{
+				vout:               vout,
+				customInstructions: row.CustomInstructions,
+				address:            row.Address,
+				satoshis:           bsv.Satoshis(f.tx.Outputs[vout].Satoshis),
+				userID:             row.UserID,
+			})
 		}
 	}, nil
 }
@@ -161,4 +174,12 @@ func (f *txFlow) save() error {
 		return txerrors.ErrSavingData.Wrap(err)
 	}
 	return nil
+}
+
+type p2pkhOutput struct {
+	vout               uint32
+	customInstructions datatypes.JSONSlice[database.CustomInstruction]
+	address            string
+	satoshis           bsv.Satoshis
+	userID             string
 }

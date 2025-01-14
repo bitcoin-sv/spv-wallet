@@ -22,21 +22,30 @@ type TrackedTransaction struct {
 
 	Data []*Data `gorm:"foreignKey:TxID"`
 
-	Outputs       []Output         `gorm:"-"`
-	TrackedInputs []*TrackedOutput `gorm:"foreignKey:SpendingTX"`
+	Inputs  []*TrackedOutput `gorm:"foreignKey:SpendingTX"`
+	Outputs []*TrackedOutput `gorm:"foreignKey:TxID"`
 
-	// TrackedOutputs are automatically populated from Outputs
-	TrackedOutputs []*TrackedOutput `gorm:"foreignKey:TxID"`
+	newUTXOs []*UserUtxos `gorm:"-"`
 }
 
-// AddOutputs adds outputs to the transaction.
-func (t *TrackedTransaction) AddOutputs(outputs ...Output) {
-	t.Outputs = append(t.Outputs, outputs...)
+func (t *TrackedTransaction) CreateP2PKHOutput(output *TrackedOutput, customInstructions datatypes.JSONSlice[CustomInstruction]) {
+	t.Outputs = append(t.Outputs, output)
+	t.newUTXOs = append(t.newUTXOs, NewP2PKHUserUTXO(output, customInstructions))
+}
+
+func (t *TrackedTransaction) CreateDataOutput(data *Data, userID string) {
+	t.Data = append(t.Data, data) //TODO: Most probably Data should be also linked to the user
+	t.Outputs = append(t.Outputs, &TrackedOutput{
+		TxID:     data.TxID,
+		Vout:     data.Vout,
+		UserID:   userID,
+		Satoshis: 0,
+	})
 }
 
 // AddInputs adds inputs to the transaction.
 func (t *TrackedTransaction) AddInputs(inputs ...*TrackedOutput) {
-	t.TrackedInputs = append(t.TrackedInputs, inputs...)
+	t.Inputs = append(t.Inputs, inputs...)
 }
 
 // AddData adds data to the transaction.
@@ -44,43 +53,25 @@ func (t *TrackedTransaction) AddData(data ...*Data) {
 	t.Data = append(t.Data, data...)
 }
 
-// BeforeSave is a hook that is called before saving the transaction.
-func (t *TrackedTransaction) BeforeSave(_ *gorm.DB) error {
-	for _, output := range t.Outputs {
-		if output.IsSpent() {
-			return spverrors.Newf("output %s is already spent", output.Outpoint())
-		}
-		t.TrackedOutputs = append(t.TrackedOutputs, output.ToTrackedOutput())
-	}
-	return nil
-}
-
 // AfterCreate is a hook that is called after creating the transaction.
 // It is responsible for adding new (User's) UTXOs and removing spent UTXOs.
 func (t *TrackedTransaction) AfterCreate(tx *gorm.DB) error {
 	// Add new UTXOs
-	userUTXOs := slices.Collect(func(yield func(utxos *UserUtxos) bool) {
-		for _, output := range t.Outputs {
-			utxo := output.ToUserUTXO()
-			if utxo == nil {
-				continue
-			}
-			yield(output.ToUserUTXO())
-		}
-	})
-	if len(userUTXOs) > 0 {
-		err := tx.Model(&UserUtxos{}).Create(userUTXOs).Error
+	if len(t.newUTXOs) > 0 {
+		err := tx.Model(&UserUtxos{}).Create(t.newUTXOs).Error
 		if err != nil {
 			return spverrors.Wrapf(err, "failed to save user utxos")
 		}
 	}
 
 	// Remove spent UTXOs
-	spentOutpoints := slices.Collect(func(yield func(sqlPair []any) bool) {
-		for _, outpoint := range t.TrackedInputs {
-			yield([]any{outpoint.TxID, outpoint.Vout})
-		}
-	})
+	spentOutpoints := slices.AppendSeq(
+		make([][]any, 0, len(t.Inputs)),
+		func(yield func(sqlPair []any) bool) {
+			for _, outpoint := range t.Inputs {
+				yield([]any{outpoint.TxID, outpoint.Vout})
+			}
+		})
 	if len(spentOutpoints) > 0 {
 		err := tx.Where("(tx_id, vout) IN ?", spentOutpoints).Delete(&UserUtxos{}).Error
 		if err != nil {
