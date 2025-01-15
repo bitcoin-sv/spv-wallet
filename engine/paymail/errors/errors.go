@@ -27,7 +27,7 @@ var ErrPaymentDestination = models.SPVError{Message: "payment destination operat
 var ErrAddressSave = models.SPVError{Message: "address save operation failed", StatusCode: 500, Code: "error-address-save"}
 
 // ErrPaymailMerkleRootVerificationFailed is when merkle root verification could not be processed
-var ErrPaymailMerkleRootVerificationFailed = models.SPVError{Message: "merkle root verification could not be processed", StatusCode: 400, Code: "error-paymail-merkle-root-verification-failed"}
+var ErrPaymailMerkleRootVerificationFailed = models.SPVError{Message: "merkle root verification could not be processed", StatusCode: 500, Code: "error-paymail-merkle-root-verification-failed"}
 
 // ErrPaymailInvalidMerkleRoots is when merkle roots verification by BHS returns status: INVALID
 var ErrPaymailInvalidMerkleRoots = models.SPVError{Message: "invalid merkle roots", StatusCode: 400, Code: "error-paymail-invalid-merkle-roots"}
