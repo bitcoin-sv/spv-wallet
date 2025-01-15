@@ -3,6 +3,8 @@ package admin
 import (
 	"net/http"
 
+	"slices"
+
 	"github.com/bitcoin-sv/go-paymail"
 	"github.com/bitcoin-sv/spv-wallet/engine"
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
@@ -167,7 +169,7 @@ func paymailCreateAddressOld(c *gin.Context, _ *reqctx.AdminContext) {
 	config := reqctx.AppConfig(c)
 	if config.Paymail.DomainValidationEnabled {
 		_, actualDomain, _ := paymail.SanitizePaymail(requestBody.Address)
-		if !checkPaymailDomain(actualDomain, config.Paymail.Domains) {
+		if !slices.Contains(config.Paymail.Domains, actualDomain) {
 			spverrors.ErrorResponse(c, spverrors.ErrInvalidDomain, logger)
 			return
 		}
