@@ -190,7 +190,41 @@ func TestPaymailLivecycle(t *testing.T) {
 		assert.Equal(t, testState.paymailDetailsRawBody, res.Body())
 	})
 
-	//TODO Test removing paymail
+	t.Run("remove paymail as admin", func(t *testing.T) {
+		// given:
+		given, then := testabilities.NewOf(givenForAllTests, t)
+		client := given.HttpClient().ForAdmin()
+
+		// when:
+		res, _ := client.R().
+			SetBody(map[string]any{
+				"address": newPaymail,
+			}).
+			Delete("/api/v1/admin/paymails/" + testState.newPaymailID)
+
+		// then:
+		then.Response(res).IsOK()
+
+		// verify paymail is deleted by trying to get it
+		getRes, _ := client.R().Get("/api/v1/admin/paymails/" + testState.newPaymailID)
+		then.Response(getRes).HasStatus(404)
+	})
+
+	t.Run("try to remove paymail as user", func(t *testing.T) {
+		// given:
+		given, then := testabilities.NewOf(givenForAllTests, t)
+		client := given.HttpClient().ForUser()
+
+		// when:
+		res, _ := client.R().
+			SetBody(map[string]any{
+				"address": newPaymail,
+			}).
+			Delete("/api/v1/admin/paymails/" + testState.newPaymailID)
+
+		// then:
+		then.Response(res).IsUnauthorizedForUser()
+	})
 }
 
 func getAliasFromPaymail(t testing.TB, paymail string) (alias string) {
