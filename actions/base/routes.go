@@ -4,6 +4,7 @@ import (
 	"net/http"
 
 	"github.com/bitcoin-sv/spv-wallet/config"
+	"github.com/bitcoin-sv/spv-wallet/docs"
 	"github.com/bitcoin-sv/spv-wallet/server/handlers"
 	"github.com/gin-gonic/gin"
 	swaggerfiles "github.com/swaggo/files"
@@ -12,6 +13,7 @@ import (
 
 // RegisterRoutes creates the specific package routes
 func RegisterRoutes(handlersManager *handlers.Manager) {
+	docs.SwaggerInfo.Version = handlersManager.APIVersion()
 	root := handlersManager.Get(handlers.GroupRoot)
 	root.GET("/", index)
 	root.OPTIONS("/", statusOK)

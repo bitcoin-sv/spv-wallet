@@ -50,13 +50,23 @@ func xpubsCreate(c *gin.Context, _ *reqctx.AdminContext) {
 // xpubsSearch will fetch a list of xpubs filtered by metadata
 // Search for xpubs filtering by metadata godoc
 // @Summary		Search for xpubs
-// @Description	Search for xpubs
+// @Description	Fetches a list of xpubs filtered by metadata and other criteria
 // @Tags		Admin
 // @Produce		json
-// @Param		SearchXpubs body filter.XpubFilter false "Supports targeted resource searches with filters and metadata, plus options for pagination and sorting to streamline data exploration and analysis"
-// @Success		200 {object} []response.Xpub "List of xpubs"
-// @Failure		400	"Bad request - Error while parsing SearchXpubs from request body"
-// @Failure 	500	"Internal server error - Error while searching for xpubs"
+// @Param		id query string false "XPub ID (UUID)"
+// @Param		currentBalance query integer false "Current balance of the xPub"
+// @Param		includeDeleted query boolean false "Whether to include deleted xPubs"
+// @Param		createdRange[from] query string false "Start of creation date range (ISO 8601 format)"
+// @Param		createdRange[to] query string false "End of creation date range (ISO 8601 format)"
+// @Param		updatedRange[from] query string false "Start of last updated date range (ISO 8601 format)"
+// @Param		updatedRange[to] query string false "End of last updated date range (ISO 8601 format)"
+// @Param		page query integer false "Page number for pagination"
+// @Param		pageSize query integer false "Number of results per page"
+// @Param		orderByField query string false "Field to order results by (e.g., 'created_at')"
+// @Param		orderByDirection query string false "Direction of ordering: 'asc' or 'desc'"
+// @Success		200 {object} response.PageModel[response.Xpub] "List of xPubs with pagination details"
+// @Failure		400 "Bad request - Invalid query parameters"
+// @Failure		500 "Internal server error - Error while searching for xPubs"
 // @Router 		/api/v1/admin/users [get]
 // @Security	x-auth-xpub
 func xpubsSearch(c *gin.Context, _ *reqctx.AdminContext) {

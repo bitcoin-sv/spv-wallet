@@ -19,13 +19,13 @@ import (
 // paymailGetAddress will return a paymail address
 // Get Paymail godoc
 // @Summary		Get paymail
-// @Description	Get paymail
+// @Description	Fetches a paymail address by its ID
 // @Tags		Admin
 // @Produce		json
-// @Param		PaymailAddress body PaymailAddress false "PaymailAddress model containing paymail address to get"
-// @Success		200	{object} response.PaymailAddress "PaymailAddress with given address"
-// @Failure		400	"Bad request - Error while parsing PaymailAddress from request body"
-// @Failure 	500	"Internal Server Error - Error while getting paymail address"
+// @Param		id path string true "Paymail ID"
+// @Success		200 {object} response.PaymailAddress "PaymailAddress with the given ID"
+// @Failure		400 "Bad request - Invalid ID"
+// @Failure		500 "Internal Server Error - Error while retrieving the paymail address"
 // @Router		/api/v1/admin/paymails/{id} [get]
 // @Security	x-auth-xpub
 func paymailGetAddress(c *gin.Context, _ *reqctx.AdminContext) {
@@ -49,13 +49,23 @@ func paymailGetAddress(c *gin.Context, _ *reqctx.AdminContext) {
 // paymailAddressesSearch will fetch a list of paymail addresses filtered by metadata
 // Paymail addresses search by metadata godoc
 // @Summary		Paymail addresses search
-// @Description	Paymail addresses search
+// @Description	Fetches a list of paymail addresses filtered by metadata and other query parameters
 // @Tags		Admin
 // @Produce		json
-// @Param		SearchPaymails body filter.AdminPaymailFilter false "Supports targeted resource searches with filters and metadata, plus options for pagination and sorting to streamline data exploration and analysis"
-// @Success		200 {object} []response.PaymailAddress "List of paymail addresses
-// @Failure		400	"Bad request - Error while parsing SearchPaymails from request body"
-// @Failure 	500	"Internal server error - Error while searching for paymail addresses"
+// @Param		alias query string false "Alias of the paymail"
+// @Param		domain query string false "Domain of the paymail"
+// @Param		createdRange[from] query string false "Start of creation date range (ISO 8601 format)"
+// @Param		createdRange[to] query string false "End of creation date range (ISO 8601 format)"
+// @Param		updatedRange[from] query string false "Start of last updated date range (ISO 8601 format)"
+// @Param		updatedRange[to] query string false "End of last updated date range (ISO 8601 format)"
+// @Param		includeDeleted query boolean false "Whether to include deleted paymail addresses"
+// @Param		page query integer false "Page number for pagination"
+// @Param		pageSize query integer false "Page size for pagination"
+// @Param		orderByField query string false "Field to order results by"
+// @Param		orderByDirection query string false "Direction of ordering: 'asc' or 'desc'"
+// @Success		200 {object} response.PageModel[response.PaymailAddress] "List of paymail addresses with pagination"
+// @Failure		400 "Bad request - Invalid query parameters"
+// @Failure		500 "Internal server error - Error while searching for paymail addresses"
 // @Router		/api/v1/admin/paymails [get]
 // @Security	x-auth-xpub
 func paymailAddressesSearch(c *gin.Context, _ *reqctx.AdminContext) {

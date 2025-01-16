@@ -43,15 +43,32 @@ func adminGetTxByID(c *gin.Context, _ *reqctx.AdminContext) {
 // adminSearchTxs will fetch a list of transactions filtered by metadata
 // Search for transactions filtering by metadata godoc
 // @Summary		Search for transactions
-// @Description	Search for transactions
+// @Description	Fetches a list of transactions filtered by metadata and other criteria
 // @Tags		Admin
 // @Produce		json
-// @Param		metadata query string false "Filter by metadata in the form of key-value pairs"
-// @Param		conditions query string false "Additional conditions for filtering, in URL-encoded JSON"
-// @Param		queryParams query string false "Pagination and sorting options"
-// @Success		200 {object} []response.Transaction "List of transactions"
-// @Failure		400 "Bad request - Error while parsing query parameters"
-// @Failure 	500 "Internal server error - Error while searching for transactions"
+// @Param		id query string false "Transaction ID"
+// @Param		hex query string false "Transaction hex"
+// @Param		blockHash query string false "Hash of the block containing the transaction"
+// @Param		blockHeight query integer false "Height of the block containing the transaction"
+// @Param		fee query integer false "Transaction fee"
+// @Param		numberOfInputs query integer false "Number of inputs in the transaction"
+// @Param		numberOfOutputs query integer false "Number of outputs in the transaction"
+// @Param		draftId query string false "Draft ID associated with the transaction"
+// @Param		totalValue query integer false "Total value of the transaction in satoshis"
+// @Param		status query string false "Status of the transaction (e.g., 'confirmed', 'pending')"
+// @Param		xpubId query string false "XPub ID associated with the transaction"
+// @Param		includeDeleted query boolean false "Whether to include deleted transactions"
+// @Param		createdRange[from] query string false "Start of creation date range (ISO 8601 format)"
+// @Param		createdRange[to] query string false "End of creation date range (ISO 8601 format)"
+// @Param		updatedRange[from] query string false "Start of last updated date range (ISO 8601 format)"
+// @Param		updatedRange[to] query string false "End of last updated date range (ISO 8601 format)"
+// @Param		page query integer false "Page number for pagination"
+// @Param		pageSize query integer false "Number of results per page"
+// @Param		orderByField query string false "Field to order results by (e.g., 'created_at')"
+// @Param		orderByDirection query string false "Direction of ordering: 'asc' or 'desc'"
+// @Success		200 {object} response.PageModel[response.Transaction] "List of transactions with pagination details"
+// @Failure		400 "Bad request - Invalid query parameters"
+// @Failure		500 "Internal server error - Error while searching for transactions"
 // @Router		/api/v1/admin/transactions [get]
 // @Security	x-auth-xpub
 func adminSearchTxs(c *gin.Context, _ *reqctx.AdminContext) {
