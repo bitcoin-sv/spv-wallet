@@ -44,6 +44,14 @@ func Int64ToUint64(value int64) (uint64, error) {
 	return uint64(value), nil
 }
 
+// Int64ToInt will convert an int64 to an int, with range checks
+func Int64ToInt(value int64) (int, error) {
+	if value < math.MinInt || value > math.MaxInt {
+		return 0, spverrors.ErrInvalidInt
+	}
+	return int(value), nil
+}
+
 // Uint64ToInt will convert a uint64 to an int, with range checks
 func Uint64ToInt(value uint64) (int, error) {
 	if value > math.MaxInt {

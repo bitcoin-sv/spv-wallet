@@ -1,6 +1,8 @@
 package reqctx
 
 import (
+	bip32 "github.com/bitcoin-sv/go-sdk/compat/bip32"
+	"github.com/bitcoin-sv/go-sdk/script"
 	"github.com/bitcoin-sv/spv-wallet/engine"
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/gin-gonic/gin"
@@ -84,6 +86,32 @@ func (ctx *UserContext) GetXPubID() string {
 // GetXPubObj returns an object of engine.Xpub
 func (ctx *UserContext) GetXPubObj() *engine.Xpub {
 	return ctx.xPubObj
+}
+
+// ShouldGetUserID returns userID for NEW DB SCHEMA
+// Warning: Don't use it for old DB schema
+func (ctx *UserContext) ShouldGetUserID() (string, error) {
+	xpub, err := ctx.ShouldGetXPub()
+	if err != nil {
+		return "", err
+	}
+
+	xpubObj, err := bip32.NewKeyFromString(xpub)
+	if err != nil {
+		return "", spverrors.ErrInternal.Wrap(err)
+	}
+
+	pubKey, err := xpubObj.ECPubKey()
+	if err != nil {
+		return "", spverrors.ErrInternal.Wrap(err)
+	}
+
+	addr, err := script.NewAddressFromPublicKey(pubKey, true)
+	if err != nil {
+		return "", spverrors.ErrInternal.Wrap(err)
+	}
+
+	return addr.AddressString, nil
 }
 
 // GetUserContext returns the user context from the request context

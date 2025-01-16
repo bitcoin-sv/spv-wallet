@@ -10,7 +10,7 @@ import (
 )
 
 type inputsQueryComposer struct {
-	xPubID              string
+	userID              string
 	outputsTotalValue   bsv.Satoshis
 	txWithoutInputsSize uint64
 	feeUnit             bsv.FeeUnit
@@ -35,7 +35,7 @@ func (c *inputsQueryComposer) utxos(db *gorm.DB) *gorm.DB {
 			c.feeCalculatedWithoutChangeOutput(),
 			c.feeCalculatedWithChangeOutput(),
 		).
-		Where("xpub_id = @xPubId", sql.Named("xPubId", c.xPubID))
+		Where("user_id = @userId", sql.Named("userId", c.userID))
 }
 
 func (c *inputsQueryComposer) addChangeValueCalculation(db *gorm.DB, utxoTab *gorm.DB) *gorm.DB {

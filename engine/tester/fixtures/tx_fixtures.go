@@ -32,6 +32,7 @@ var grandparentTXIDs = []string{
 type GivenTXSpec interface {
 	WithoutSigning() GivenTXSpec
 	WithInput(satoshis uint64) GivenTXSpec
+	WithInputFromUTXO(tx *trx.Transaction, vout uint32) GivenTXSpec
 	WithSingleSourceInputs(satoshis ...uint64) GivenTXSpec
 	WithOPReturn(dataStr string) GivenTXSpec
 	WithOutputScriptParts(parts ...ScriptPart) GivenTXSpec
@@ -78,6 +79,16 @@ func (spec *txSpec) WithoutSigning() GivenTXSpec {
 // it automatically creates a parent tx (sourceTX) with P2PKH UTXO with provided satoshis
 func (spec *txSpec) WithInput(satoshis uint64) GivenTXSpec {
 	return spec.WithSingleSourceInputs(satoshis)
+}
+
+func (spec *txSpec) WithInputFromUTXO(tx *trx.Transaction, vout uint32) GivenTXSpec {
+	output := tx.Outputs[vout]
+	utxo, err := trx.NewUTXO(tx.TxID().String(), vout, output.LockingScript.String(), output.Satoshis)
+	require.NoError(spec.t, err, "creating utxo for input")
+
+	spec.utxos = append(spec.utxos, utxo)
+	spec.sourceTransactions[tx.TxID().String()] = tx
+	return spec
 }
 
 // WithSingleSourceInputs adds inputs to the transaction with the specified satoshis
