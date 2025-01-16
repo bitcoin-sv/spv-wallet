@@ -169,21 +169,12 @@ func paymailCreateAddress(c *gin.Context, _ *reqctx.AdminContext) {
 func paymailDeleteAddress(c *gin.Context, _ *reqctx.AdminContext) {
 	logger := reqctx.Logger(c)
 	engine := reqctx.Engine(c)
-	var requestBody PaymailAddress
-	if err := c.ShouldBindJSON(&requestBody); err != nil {
-		spverrors.ErrorResponse(c, spverrors.ErrCannotBindRequest.WithTrace(err), logger)
-		return
-	}
-
-	if requestBody.Address == "" {
-		spverrors.ErrorResponse(c, spverrors.ErrMissingAddress, logger)
-		return
-	}
+	id := c.Param("id")
 
 	opts := engine.DefaultModelOptions()
 
 	// Delete a new paymail address
-	err := engine.DeletePaymailAddress(c.Request.Context(), requestBody.Address, opts...)
+	err := engine.DeletePaymailAddressByID(c.Request.Context(), id, opts...)
 	if err != nil {
 		spverrors.ErrorResponse(c, spverrors.ErrDeletePaymailAddress.WithTrace(err), logger)
 		return
