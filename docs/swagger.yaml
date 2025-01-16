@@ -34,7 +34,7 @@ definitions:
           key: value
           key2: value2
         type: object
-      public_name:
+      publicName:
         description: The public name of the paymail
         example: Test
         type: string
@@ -3005,11 +3005,11 @@ paths:
     delete:
       description: Delete paymail
       parameters:
-      - description: PaymailAddress model containing paymail address to delete
-        in: body
-        name: PaymailAddress
-        schema:
-          $ref: '#/definitions/admin.PaymailAddress'
+      - description: id of the paymail
+        in: path
+        name: id
+        required: true
+        type: string
       produces:
       - application/json
       responses:

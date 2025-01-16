@@ -160,7 +160,7 @@ func paymailCreateAddress(c *gin.Context, _ *reqctx.AdminContext) {
 // @Description	Delete paymail
 // @Tags		Admin
 // @Produce		json
-// @Param		PaymailAddress body PaymailAddress false "PaymailAddress model containing paymail address to delete"
+// @Param		id path string true "id of the paymail"
 // @Success		200
 // @Failure		400	"Bad request - Error while parsing PaymailAddress from request body or if address is missing"
 // @Failure 	500	"Internal Server Error - Error while deleting paymail address"
