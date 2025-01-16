@@ -1,4 +1,4 @@
-package database
+package dbquery
 
 import (
 	"context"
@@ -24,7 +24,7 @@ func PaginatedQuery[T any](ctx context.Context, page filter.Page, db *gorm.DB, q
 	var modelType T
 	var totalElements int64
 	err := db.WithContext(ctx).Transaction(func(tx *gorm.DB) error {
-		query := queryFunc(tx.Model(&modelType))
+		query := tx.Model(&modelType).Scopes(queryFunc)
 
 		if err := query.
 			Scopes(Paginate(page)).

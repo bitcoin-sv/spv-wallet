@@ -6,6 +6,7 @@ import (
 	"slices"
 
 	"github.com/bitcoin-sv/spv-wallet/engine/database"
+	"github.com/bitcoin-sv/spv-wallet/engine/database/dbquery"
 	"github.com/bitcoin-sv/spv-wallet/models/filter"
 	"gorm.io/gorm"
 	"gorm.io/gorm/clause"
@@ -22,10 +23,8 @@ func NewOperationsRepo(db *gorm.DB) *Operations {
 }
 
 // PaginatedForUser returns operations for a user based on userID and the provided paging options.
-func (o *Operations) PaginatedForUser(ctx context.Context, userID string, page filter.Page) (*database.PagedResult[database.Operation], error) {
-	return database.PaginatedQuery[database.Operation](ctx, page, o.db, func(tx *gorm.DB) *gorm.DB {
-		return tx.Where("user_id = ?", userID)
-	})
+func (o *Operations) PaginatedForUser(ctx context.Context, userID string, page filter.Page) (*dbquery.PagedResult[database.Operation], error) {
+	return dbquery.PaginatedQuery[database.Operation](ctx, page, o.db, dbquery.UserID(userID))
 }
 
 // SaveAll saves operations to the database.
