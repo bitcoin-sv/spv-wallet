@@ -4,7 +4,7 @@ package filter
 type XpubFilter struct {
 	// ModelFilter is a struct for handling typical request parameters for search requests
 	//nolint:staticcheck // SA5008 We want to reuse json tags also to mapstructure.
-	ModelFilter `json:",inline,squash"`
+	ModelFilter `json:",inline"`
 
 	ID             *string `json:"id,omitempty" example:"00b953624f78004a4c727cd28557475d5233c15f17aef545106639f4d71b712d"`
 	CurrentBalance *uint64 `json:"currentBalance,omitempty" example:"1000"`
