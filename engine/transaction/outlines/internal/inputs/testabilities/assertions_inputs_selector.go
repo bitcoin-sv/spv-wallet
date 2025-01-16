@@ -71,7 +71,7 @@ func (a assertion) AreEntries(expectedIndexes []int) {
 	for i, ownedIdx := range expectedIndexes {
 		selectedUTXO := a.actual[i]
 		expectedUTXO := a.comparingSource[ownedIdx]
-		a.assert.Equal(expectedUTXO.XPubID, selectedUTXO.XPubID)
+		a.assert.Equal(expectedUTXO.UserID, selectedUTXO.UserID)
 		a.assert.Equal(expectedUTXO.TxID, selectedUTXO.TxID)
 		a.assert.EqualValues(expectedUTXO.Vout, selectedUTXO.Vout)
 	}

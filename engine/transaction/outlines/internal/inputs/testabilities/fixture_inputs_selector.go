@@ -4,6 +4,7 @@ import (
 	"testing"
 
 	"github.com/bitcoin-sv/spv-wallet/engine/database/testabilities"
+	testengine "github.com/bitcoin-sv/spv-wallet/engine/testabilities"
 	"github.com/bitcoin-sv/spv-wallet/engine/tester/fixtures"
 	"github.com/bitcoin-sv/spv-wallet/engine/transaction/outlines/internal/inputs"
 	"gorm.io/gorm"
@@ -20,7 +21,7 @@ type inputsSelectorFixture struct {
 }
 
 func newFixture(t testing.TB) (InputsSelectorFixture, func()) {
-	givenDB, cleanup := testabilities.Given(t)
+	givenDB, cleanup := testabilities.Given(t, testengine.WithNewTransactionFlowEnabled())
 	return &inputsSelectorFixture{
 		DatabaseFixture: givenDB,
 		db:              givenDB.GormDB(),
