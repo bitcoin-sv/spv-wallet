@@ -3,8 +3,7 @@ package filter
 // ContactFilter is a struct for handling request parameters for contact search requests
 type ContactFilter struct {
 	// ModelFilter is a struct for handling typical request parameters for search requests
-	//nolint:staticcheck // SA5008 We want to reuse json tags also to mapstructure.
-	ModelFilter `json:",inline,squash"`
+	ModelFilter `json:",inline"`
 	ID          *string `json:"id" example:"ffdbe74e-0700-4710-aac5-611a1f877c7f"`
 	FullName    *string `json:"fullName" example:"Alice"`
 	Paymail     *string `json:"paymail" example:"alice@example.com"`
