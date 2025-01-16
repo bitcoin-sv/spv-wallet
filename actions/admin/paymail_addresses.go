@@ -2,7 +2,6 @@ package admin
 
 import (
 	"net/http"
-
 	"slices"
 
 	"github.com/bitcoin-sv/go-paymail"
