@@ -17,8 +17,6 @@ func (ts *TestSuite) TestXPubRegisterRoutes() {
 		}{
 			{"GET", "/" + config.APIVersion + "/admin/stats"},
 			{"GET", "/" + config.APIVersion + "/admin/status"},
-			{"POST", "/" + config.APIVersion + "/admin/access-keys/search"},
-			{"POST", "/" + config.APIVersion + "/admin/access-keys/count"},
 			{"POST", "/" + config.APIVersion + "/admin/destinations/search"},
 			{"POST", "/" + config.APIVersion + "/admin/destinations/count"},
 			{"POST", "/" + config.APIVersion + "/admin/paymail/get"},

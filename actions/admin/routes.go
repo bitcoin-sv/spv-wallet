@@ -10,8 +10,6 @@ func RegisterRoutes(handlersManager *handlers.Manager) {
 
 	adminGroupOld.GET("/status", handlers.AsAdmin(statusOld))
 	adminGroupOld.GET("/stats", handlers.AsAdmin(statsOld))
-	adminGroupOld.POST("/access-keys/search", handlers.AsAdmin(accessKeysSearchOld))
-	adminGroupOld.POST("/access-keys/count", handlers.AsAdmin(accessKeysCount))
 	adminGroupOld.POST("/contact/search", handlers.AsAdmin(contactsSearchOld))
 	adminGroupOld.PATCH("/contact/:id", handlers.AsAdmin(contactsUpdateOld))
 	adminGroupOld.POST("/contact/:paymail", handlers.AsAdmin(contactsCreate))
