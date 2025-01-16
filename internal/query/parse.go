@@ -21,7 +21,7 @@ func ParseSearchParams[T any](c *gin.Context) (*filter.SearchParams[T], error) {
 	config := mapstructure.DecoderConfig{
 		DecodeHook:       mapstructure.StringToTimeHookFunc(time.RFC3339),
 		WeaklyTypedInput: true,
-		Squash: true,
+		Squash:           true,
 		Result:           &params,
 		TagName:          "json", // Small hax to reuse json tags which we have already defined
 	}
