@@ -3,7 +3,6 @@ package filter
 // XpubFilter is a struct for handling request parameters for utxo search requests
 type XpubFilter struct {
 	// ModelFilter is a struct for handling typical request parameters for search requests
-	//nolint:staticcheck // SA5008 We want to reuse json tags also to mapstructure.
 	ModelFilter `json:",inline"`
 
 	ID             *string `json:"id,omitempty" example:"00b953624f78004a4c727cd28557475d5233c15f17aef545106639f4d71b712d"`
