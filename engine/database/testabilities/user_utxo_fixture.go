@@ -29,7 +29,7 @@ func newUtxoFixture(t testing.TB, db *gorm.DB, index uint32) *userUtxoFixture {
 		t:                            t,
 		db:                           db,
 		index:                        uint(index),
-		userID:                       fixtures.Sender.Address().AddressString,
+		userID:                       fixtures.Sender.ID(),
 		txID:                         txIDTemplated(uint(index)),
 		vout:                         index,
 		satoshis:                     1,
@@ -42,7 +42,7 @@ func txIDTemplated(index uint) string {
 }
 
 func (f *userUtxoFixture) OwnedBySender() UserUtxoFixture {
-	f.userID = fixtures.Sender.Address().AddressString
+	f.userID = fixtures.Sender.ID()
 	return f
 }
 

@@ -144,6 +144,12 @@ func (f *User) Address() *script.Address {
 	return addr
 }
 
+// ID returns the id of the user.
+// Warning: this refers to the new-tx-flow approach where v2 user's id is effectively P2PKH address from the public key.
+func (f *User) ID() string {
+	return f.Address().AddressString
+}
+
 // P2PKHLockingScript returns the locking script of this user.
 func (f *User) P2PKHLockingScript() *script.Script {
 	lockingScript, err := p2pkh.Lock(f.Address())
