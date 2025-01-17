@@ -14,6 +14,7 @@ type PaymailsRepo interface {
 	Get(ctx context.Context, alias, domain string) (*paymailmodels.Paymail, error)
 }
 
+// UsersService is an interface for user service
 type UsersService interface {
 	AppendAddress(ctx context.Context, userID string, address string, customInstructions bsv.CustomInstructions) error
 }
