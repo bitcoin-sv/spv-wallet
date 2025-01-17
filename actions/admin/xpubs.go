@@ -54,7 +54,7 @@ func xpubsCreate(c *gin.Context, _ *reqctx.AdminContext) {
 // @Tags		Admin
 // @Produce		json
 // @Param		SwaggerCommonParams query swagger.CommonFilteringQueryParams false "Supports options for pagination and sorting to streamline data exploration and analysis"
-// @Param		UtxoParams query filter.UtxoFilter false "Supports targeted resource searches with filters"
+// @Param		XpubFilter query filter.XpubFilter false "Supports targeted resource searches with filters"
 // @Param		id query string false "XPub ID (UUID)"
 // @Param		currentBalance query integer false "Current balance of the xPub"
 // @Success		200 {object} response.PageModel[response.Xpub] "List of xPubs with pagination details"

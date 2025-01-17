@@ -13,7 +13,6 @@ import (
 
 // RegisterRoutes creates the specific package routes
 func RegisterRoutes(handlersManager *handlers.Manager) {
-	docs.SwaggerInfo.Version = handlersManager.APIVersion()
 	root := handlersManager.Get(handlers.GroupRoot)
 	root.GET("/", index)
 	root.OPTIONS("/", statusOK)
@@ -24,6 +23,7 @@ func RegisterRoutes(handlersManager *handlers.Manager) {
 	healthGroup.OPTIONS("", statusOK)
 	healthGroup.HEAD("", statusOK)
 
+	docs.SwaggerInfo.Version = handlersManager.APIVersion()
 	root.GET("/swagger", func(c *gin.Context) {
 		c.Redirect(http.StatusMovedPermanently, "/swagger/index.html")
 	})
