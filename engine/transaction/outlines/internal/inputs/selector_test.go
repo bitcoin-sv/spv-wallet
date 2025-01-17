@@ -67,14 +67,14 @@ func TestInputsSelector(t *testing.T) {
 		"select inputs that covers outputs and fee for more data": {
 			selectBy: selectBy{
 				satoshis:            9,
-				txSizeWithoutInputs: uint64(fixtures.DefaultFeeUnit.Bytes + 1 - fixtures.EstimatedUnlockingScriptSizeForP2PKH),
+				txSizeWithoutInputs: uint64(fixtures.DefaultFeeUnit.Bytes + 1 - database.EstimatedInputSizeForP2PKH),
 			},
 			expectToSelectInputs: []int{0, 1},
 		},
 		"select inputs when size is equal to fee unit bytes": {
 			selectBy: selectBy{
 				satoshis:            9,
-				txSizeWithoutInputs: uint64(fixtures.DefaultFeeUnit.Bytes - fixtures.EstimatedUnlockingScriptSizeForP2PKH),
+				txSizeWithoutInputs: uint64(fixtures.DefaultFeeUnit.Bytes - database.EstimatedInputSizeForP2PKH),
 			},
 			expectToSelectInputs: []int{0},
 		},

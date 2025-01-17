@@ -49,7 +49,8 @@ func TestMockTXGeneration(t *testing.T) {
 			spec := test.spec
 
 			// when
-			ok, err := spv.VerifyScripts(spec.TX())
+			tx := spec.TX()
+			ok, err := spv.VerifyScripts(tx)
 
 			// then:
 			require.NoError(t, err)
@@ -59,5 +60,65 @@ func TestMockTXGeneration(t *testing.T) {
 			require.Equal(t, test.rawTX, spec.RawTX())
 			require.Equal(t, test.ef, spec.EF())
 		})
+	}
+}
+
+func TestSpike(t *testing.T) {
+
+	tx4 := GivenTX(t).
+		WithInput(1000).
+		WithP2PKHOutput(100).TX()
+
+	// tx6 := tx4.InputIdx(0).SourceTransaction
+
+	tx1 := GivenTX(t).
+		WithInputFromUTXO(tx4, 0).
+		WithP2PKHOutput(1).TX()
+
+	for _, input := range tx1.Inputs {
+		input.UnlockingScriptTemplate = RecipientInternal.P2PKHUnlockingScriptTemplate()
+	}
+	err := tx1.Sign()
+	require.NoError(t, err)
+
+	tx5 := GivenTX(t).
+		WithInput(20).
+		WithP2PKHOutput(2).
+		WithP2PKHOutput(2).TX()
+
+	// tx7 := tx5.InputIdx(0).SourceTransaction
+
+	tx3 := GivenTX(t).
+		WithInputFromUTXO(tx5, 0).
+		WithP2PKHOutput(1).TX()
+	for _, input := range tx3.Inputs {
+		input.UnlockingScriptTemplate = RecipientInternal.P2PKHUnlockingScriptTemplate()
+	}
+	err = tx3.Sign()
+	require.NoError(t, err)
+
+	txn := GivenTX(t).
+		WithInputFromUTXO(tx5, 1).
+		WithP2PKHOutput(1).TX()
+	for _, input := range txn.Inputs {
+		input.UnlockingScriptTemplate = RecipientInternal.P2PKHUnlockingScriptTemplate()
+	}
+	err = txn.Sign()
+	require.NoError(t, err)
+
+	tx2 := GivenTX(t).
+		WithInput(1000).
+		WithP2PKHOutput(100).TX()
+
+	tx0 := GivenTX(t).
+		WithInputFromUTXO(tx1, 0).
+		WithInputFromUTXO(tx2, 0).
+		WithInputFromUTXO(tx3, 0).
+		TX()
+
+	for i, input := range tx0.Inputs {
+		verified, err := spv.VerifyScripts(input.SourceTransaction)
+		require.NoError(t, err, "input %s", i)
+		require.True(t, verified, "input %s", i)
 	}
 }
