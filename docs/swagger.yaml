@@ -2880,30 +2880,6 @@ paths:
         in: query
         name: xpubId
         type: string
-      - description: Contact ID (UUID)
-        in: query
-        name: id
-        type: string
-      - description: Full name of the contact
-        in: query
-        name: fullName
-        type: string
-      - description: Paymail address of the contact
-        in: query
-        name: paymail
-        type: string
-      - description: Public key associated with the contact
-        in: query
-        name: pubKey
-        type: string
-      - description: Status of the contact (e.g., 'confirmed', 'pending')
-        in: query
-        name: status
-        type: string
-      - description: XPub ID for filtering
-        in: query
-        name: xpubId
-        type: string
       produces:
       - application/json
       responses:

@@ -173,42 +173,6 @@
                         "example": "623bc25ce1c0fc510dea72b5ee27b2e70384c099f1f3dce9e73dd987198c3486",
                         "name": "xpubId",
                         "in": "query"
-                    },
-                    {
-                        "type": "string",
-                        "description": "Contact ID (UUID)",
-                        "name": "id",
-                        "in": "query"
-                    },
-                    {
-                        "type": "string",
-                        "description": "Full name of the contact",
-                        "name": "fullName",
-                        "in": "query"
-                    },
-                    {
-                        "type": "string",
-                        "description": "Paymail address of the contact",
-                        "name": "paymail",
-                        "in": "query"
-                    },
-                    {
-                        "type": "string",
-                        "description": "Public key associated with the contact",
-                        "name": "pubKey",
-                        "in": "query"
-                    },
-                    {
-                        "type": "string",
-                        "description": "Status of the contact (e.g., 'confirmed', 'pending')",
-                        "name": "status",
-                        "in": "query"
-                    },
-                    {
-                        "type": "string",
-                        "description": "XPub ID for filtering",
-                        "name": "xpubId",
-                        "in": "query"
                     }
                 ],
                 "responses": {

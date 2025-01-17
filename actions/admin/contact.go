@@ -23,12 +23,6 @@ import (
 // @Produce		json
 // @Param		SwaggerCommonParams query swagger.CommonFilteringQueryParams false "Supports options for pagination and sorting to streamline data exploration and analysis"
 // @Param		AdminContactFilter query filter.AdminContactFilter false "Supports targeted resource searches with filters"
-// @Param		id query string false "Contact ID (UUID)"
-// @Param		fullName query string false "Full name of the contact"
-// @Param		paymail query string false "Paymail address of the contact"
-// @Param		pubKey query string false "Public key associated with the contact"
-// @Param		status query string false "Status of the contact (e.g., 'confirmed', 'pending')"
-// @Param		xpubId query string false "XPub ID for filtering"
 // @Success		200 {object} response.PageModel[response.Contact] "List of contacts with pagination details"
 // @Failure		400 "Bad request - Invalid query parameters"
 // @Failure		500 "Internal server error - Error while searching for contacts"
