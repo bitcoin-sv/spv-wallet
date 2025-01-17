@@ -22,12 +22,12 @@ func (c *inputsQueryComposer) build(db *gorm.DB) *gorm.DB {
 	utxoWithMinChange := c.searchForMinimalChangeValue(db, utxoWithChange)
 	selectedOutpoints := c.chooseInputsToCoverOutputsAndFeesAndHaveMinimalChange(db, utxoWithMinChange)
 
-	res := db.Model(&database.UserUtxos{}).Where("(tx_id, vout) in (?)", selectedOutpoints)
+	res := db.Model(&database.UsersUTXO{}).Where("(tx_id, vout) in (?)", selectedOutpoints)
 	return res
 }
 
 func (c *inputsQueryComposer) utxos(db *gorm.DB) *gorm.DB {
-	return db.Model(&database.UserUtxos{}).
+	return db.Model(&database.UsersUTXO{}).
 		Select(
 			txIdColumn,
 			voutColumn,

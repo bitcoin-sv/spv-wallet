@@ -57,8 +57,8 @@ func (f *userUtxoFixture) WithSatoshis(satoshis bsv.Satoshis) UserUtxoFixture {
 	return f
 }
 
-func (f *userUtxoFixture) Stored() *database.UserUtxos {
-	utxo := &database.UserUtxos{
+func (f *userUtxoFixture) Stored() *database.UsersUTXO {
+	utxo := &database.UsersUTXO{
 		UserID:             f.userID,
 		TxID:               f.txID,
 		Vout:               f.vout,
