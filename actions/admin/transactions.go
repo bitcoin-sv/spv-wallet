@@ -3,10 +3,12 @@ package admin
 import (
 	"net/http"
 
+	"github.com/bitcoin-sv/spv-wallet/actions/common"
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/bitcoin-sv/spv-wallet/internal/query"
 	"github.com/bitcoin-sv/spv-wallet/mappings"
 	"github.com/bitcoin-sv/spv-wallet/models/filter"
+	"github.com/bitcoin-sv/spv-wallet/models/response"
 	"github.com/bitcoin-sv/spv-wallet/server/reqctx"
 	"github.com/gin-gonic/gin"
 )
@@ -43,15 +45,14 @@ func adminGetTxByID(c *gin.Context, _ *reqctx.AdminContext) {
 // adminSearchTxs will fetch a list of transactions filtered by metadata
 // Search for transactions filtering by metadata godoc
 // @Summary		Search for transactions
-// @Description	Search for transactions
+// @Description	Fetches a list of transactions filtered by metadata and other criteria
 // @Tags		Admin
 // @Produce		json
-// @Param		metadata query string false "Filter by metadata in the form of key-value pairs"
-// @Param		conditions query string false "Additional conditions for filtering, in URL-encoded JSON"
-// @Param		queryParams query string false "Pagination and sorting options"
-// @Success		200 {object} []response.Transaction "List of transactions"
-// @Failure		400 "Bad request - Error while parsing query parameters"
-// @Failure 	500 "Internal server error - Error while searching for transactions"
+// @Param		SwaggerCommonParams query swagger.CommonFilteringQueryParams false "Supports options for pagination and sorting to streamline data exploration and analysis"
+// @Param		AdminTransactionFilter query filter.AdminTransactionFilter false "Supports targeted resource searches with filters"
+// @Success		200 {object} response.PageModel[response.Transaction] "List of transactions with pagination details"
+// @Failure		400 "Bad request - Invalid query parameters"
+// @Failure		500 "Internal server error - Error while searching for transactions"
 // @Router		/api/v1/admin/transactions [get]
 // @Security	x-auth-xpub
 func adminSearchTxs(c *gin.Context, _ *reqctx.AdminContext) {
@@ -77,5 +78,12 @@ func adminSearchTxs(c *gin.Context, _ *reqctx.AdminContext) {
 		return
 	}
 
-	sendPaginatedResponse(c, transactions, queryParams.PageOptions, count, mappings.MapToTransactionContractForAdmin)
+	transactionContracts := common.MapToTypeContracts(transactions, mappings.MapToTransactionContractForAdmin)
+
+	result := response.PageModel[response.Transaction]{
+		Content: transactionContracts,
+		Page:    common.GetPageDescriptionFromSearchParams(queryParams.PageOptions, count),
+	}
+
+	c.JSON(http.StatusOK, result)
 }

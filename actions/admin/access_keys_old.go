@@ -24,6 +24,7 @@ import (
 // @Failure 	500	"Internal server error - Error while searching for access keys"
 // @Router		/v1/admin/access-keys/search [post]
 // @Security	x-auth-xpub
+// @Deprecated
 func accessKeysSearchOld(c *gin.Context, _ *reqctx.AdminContext) {
 	logger := reqctx.Logger(c)
 	var reqParams filter.AdminSearchAccessKeys
@@ -64,6 +65,7 @@ func accessKeysSearchOld(c *gin.Context, _ *reqctx.AdminContext) {
 // @Failure 	500	"Internal Server Error - Error while fetching count of access keys"
 // @Router		/v1/admin/access-keys/count [post]
 // @Security	x-auth-xpub
+// @Deprecated
 func accessKeysCount(c *gin.Context, _ *reqctx.AdminContext) {
 	logger := reqctx.Logger(c)
 	var reqParams filter.AdminCountAccessKeys

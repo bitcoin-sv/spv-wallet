@@ -2124,6 +2124,18 @@ definitions:
         - $ref: '#/definitions/response.PageDescription'
         description: Page is the page descriptor
     type: object
+  response.PageModel-response_PaymailAddress:
+    properties:
+      content:
+        description: Content is the collection of elements that serves as the content
+        items:
+          $ref: '#/definitions/response.PaymailAddress'
+        type: array
+      page:
+        allOf:
+        - $ref: '#/definitions/response.PageDescription'
+        description: Page is the page descriptor
+    type: object
   response.PageModel-response_Transaction:
     properties:
       content:
@@ -2142,6 +2154,18 @@ definitions:
         description: Content is the collection of elements that serves as the content
         items:
           $ref: '#/definitions/response.Utxo'
+        type: array
+      page:
+        allOf:
+        - $ref: '#/definitions/response.PageDescription'
+        description: Page is the page descriptor
+    type: object
+  response.PageModel-response_Xpub:
+    properties:
+      content:
+        description: Content is the collection of elements that serves as the content
+        items:
+          $ref: '#/definitions/response.Xpub'
         type: array
       page:
         allOf:
@@ -2779,25 +2803,92 @@ paths:
       - Admin
   /api/v1/admin/contacts:
     get:
-      description: Search for contacts
+      description: Fetches a list of contacts filtered by metadata and other criteria
       parameters:
-      - description: Supports targeted resource searches with filters and metadata,
-          plus options for pagination and sorting to streamline data exploration and
-          analysis
-        in: body
-        name: AdminSearchContacts
-        schema:
-          $ref: '#/definitions/filter.AdminContactFilter'
+      - example: "2024-02-26T11:01:28Z"
+        in: query
+        name: createdRange[from]
+        type: string
+      - example: "2024-02-26T11:01:28Z"
+        in: query
+        name: createdRange[to]
+        type: string
+      - collectionFormat: csv
+        description: Metadata is a list of key-value pairs that can be used to filter
+          the results. !ATTENTION! Unfortunately this parameter won't work from swagger
+          UI.
+        example:
+        - metadata[key]=value
+        - metadata[key2]=value2
+        in: query
+        items:
+          type: string
+        name: metadata
+        type: array
+      - in: query
+        name: page
+        type: integer
+      - in: query
+        name: size
+        type: integer
+      - in: query
+        name: sort
+        type: string
+      - in: query
+        name: sortBy
+        type: string
+      - example: "2024-02-26T11:01:28Z"
+        in: query
+        name: updatedRange[from]
+        type: string
+      - example: "2024-02-26T11:01:28Z"
+        in: query
+        name: updatedRange[to]
+        type: string
+      - example: Alice
+        in: query
+        name: fullName
+        type: string
+      - example: ffdbe74e-0700-4710-aac5-611a1f877c7f
+        in: query
+        name: id
+        type: string
+      - default: false
+        description: IncludeDeleted is a flag whether or not to include deleted items
+          in the search results
+        example: true
+        in: query
+        name: includeDeleted
+        type: boolean
+      - example: alice@example.com
+        in: query
+        name: paymail
+        type: string
+      - example: 0334f01ecb971e93db179e6fb320cd1466beb0c1ec6c1c6a37aa6cb02e53d5dd1a
+        in: query
+        name: pubKey
+        type: string
+      - enum:
+        - unconfirmed
+        - awaiting
+        - confirmed
+        - rejected
+        in: query
+        name: status
+        type: string
+      - example: 623bc25ce1c0fc510dea72b5ee27b2e70384c099f1f3dce9e73dd987198c3486
+        in: query
+        name: xpubId
+        type: string
       produces:
       - application/json
       responses:
         "200":
-          description: List of contacts
+          description: List of contacts with pagination details
           schema:
             $ref: '#/definitions/response.PageModel-response_Contact'
         "400":
-          description: Bad request - Error while parsing AdminSearchContacts from
-            request body
+          description: Bad request - Invalid query parameters
         "500":
           description: Internal server error - Error while searching for contacts
       security:
@@ -2948,27 +3039,85 @@ paths:
       - Admin
   /api/v1/admin/paymails:
     get:
-      description: Paymail addresses search
+      description: Fetches a list of paymail addresses filtered by metadata and other
+        query parameters
       parameters:
-      - description: Supports targeted resource searches with filters and metadata,
-          plus options for pagination and sorting to streamline data exploration and
-          analysis
-        in: body
-        name: SearchPaymails
-        schema:
-          $ref: '#/definitions/filter.AdminPaymailFilter'
+      - example: "2024-02-26T11:01:28Z"
+        in: query
+        name: createdRange[from]
+        type: string
+      - example: "2024-02-26T11:01:28Z"
+        in: query
+        name: createdRange[to]
+        type: string
+      - collectionFormat: csv
+        description: Metadata is a list of key-value pairs that can be used to filter
+          the results. !ATTENTION! Unfortunately this parameter won't work from swagger
+          UI.
+        example:
+        - metadata[key]=value
+        - metadata[key2]=value2
+        in: query
+        items:
+          type: string
+        name: metadata
+        type: array
+      - in: query
+        name: page
+        type: integer
+      - in: query
+        name: size
+        type: integer
+      - in: query
+        name: sort
+        type: string
+      - in: query
+        name: sortBy
+        type: string
+      - example: "2024-02-26T11:01:28Z"
+        in: query
+        name: updatedRange[from]
+        type: string
+      - example: "2024-02-26T11:01:28Z"
+        in: query
+        name: updatedRange[to]
+        type: string
+      - example: alice
+        in: query
+        name: alias
+        type: string
+      - example: example.com
+        in: query
+        name: domain
+        type: string
+      - example: ffb86c103d17d87c15aaf080aab6be5415c9fa885309a79b04c9910e39f2b542
+        in: query
+        name: id
+        type: string
+      - default: false
+        description: IncludeDeleted is a flag whether or not to include deleted items
+          in the search results
+        example: true
+        in: query
+        name: includeDeleted
+        type: boolean
+      - example: Alice
+        in: query
+        name: publicName
+        type: string
+      - example: 79f90a6bab0a44402fc64828af820e9465645658aea2d138c5205b88e6dabd00
+        in: query
+        name: xpubId
+        type: string
       produces:
       - application/json
       responses:
         "200":
-          description: List of paymail addresses
+          description: List of paymail addresses with pagination
           schema:
-            items:
-              $ref: '#/definitions/response.PaymailAddress'
-            type: array
+            $ref: '#/definitions/response.PageModel-response_PaymailAddress'
         "400":
-          description: Bad request - Error while parsing SearchPaymails from request
-            body
+          description: Bad request - Invalid query parameters
         "500":
           description: Internal server error - Error while searching for paymail addresses
       security:
@@ -3026,25 +3175,25 @@ paths:
       tags:
       - Admin
     get:
-      description: Get paymail
+      description: Fetches a paymail address by its ID
       parameters:
-      - description: PaymailAddress model containing paymail address to get
-        in: body
-        name: PaymailAddress
-        schema:
-          $ref: '#/definitions/admin.PaymailAddress'
+      - description: Paymail ID
+        in: path
+        name: id
+        required: true
+        type: string
       produces:
       - application/json
       responses:
         "200":
-          description: PaymailAddress with given address
+          description: PaymailAddress with the given ID
           schema:
             $ref: '#/definitions/response.PaymailAddress'
         "400":
-          description: Bad request - Error while parsing PaymailAddress from request
-            body
+          description: Bad request - Invalid ID
         "500":
-          description: Internal Server Error - Error while getting paymail address
+          description: Internal Server Error - Error while retrieving the paymail
+            address
       security:
       - x-auth-xpub: []
       summary: Get paymail
@@ -3084,31 +3233,120 @@ paths:
       - Admin
   /api/v1/admin/transactions:
     get:
-      description: Search for transactions
+      description: Fetches a list of transactions filtered by metadata and other criteria
       parameters:
-      - description: Filter by metadata in the form of key-value pairs
+      - example: "2024-02-26T11:01:28Z"
         in: query
+        name: createdRange[from]
+        type: string
+      - example: "2024-02-26T11:01:28Z"
+        in: query
+        name: createdRange[to]
+        type: string
+      - collectionFormat: csv
+        description: Metadata is a list of key-value pairs that can be used to filter
+          the results. !ATTENTION! Unfortunately this parameter won't work from swagger
+          UI.
+        example:
+        - metadata[key]=value
+        - metadata[key2]=value2
+        in: query
+        items:
+          type: string
         name: metadata
+        type: array
+      - in: query
+        name: page
+        type: integer
+      - in: query
+        name: size
+        type: integer
+      - in: query
+        name: sort
         type: string
-      - description: Additional conditions for filtering, in URL-encoded JSON
-        in: query
-        name: conditions
+      - in: query
+        name: sortBy
         type: string
-      - description: Pagination and sorting options
+      - example: "2024-02-26T11:01:28Z"
         in: query
-        name: queryParams
+        name: updatedRange[from]
+        type: string
+      - example: "2024-02-26T11:01:28Z"
+        in: query
+        name: updatedRange[to]
+        type: string
+      - example: 0000000000000000031928c28075a82d7a00c2c90b489d1d66dc0afa3f8d26f8
+        in: query
+        name: blockHash
+        type: string
+      - example: 839376
+        in: query
+        name: blockHeight
+        type: integer
+      - example: d425432e0d10a46af1ec6d00f380e9581ebf7907f3486572b3cd561a4c326e14
+        in: query
+        name: draftId
+        type: string
+      - example: 1
+        in: query
+        name: fee
+        type: integer
+      - in: query
+        name: hex
+        type: string
+      - example: d425432e0d10a46af1ec6d00f380e9581ebf7907f3486572b3cd561a4c326e14
+        in: query
+        name: id
+        type: string
+      - default: false
+        description: IncludeDeleted is a flag whether or not to include deleted items
+          in the search results
+        example: true
+        in: query
+        name: includeDeleted
+        type: boolean
+      - example: 1
+        in: query
+        name: numberOfInputs
+        type: integer
+      - example: 2
+        in: query
+        name: numberOfOutputs
+        type: integer
+      - enum:
+        - UNKNOWN
+        - QUEUED
+        - RECEIVED
+        - STORED
+        - ANNOUNCED_TO_NETWORK
+        - REQUESTED_BY_NETWORK
+        - SENT_TO_NETWORK
+        - ACCEPTED_BY_NETWORK
+        - SEEN_ON_NETWORK
+        - MINED
+        - SEEN_IN_ORPHAN_MEMPOOL
+        - CONFIRMED
+        - REJECTED
+        in: query
+        name: status
+        type: string
+      - example: 100000000
+        in: query
+        name: totalValue
+        type: integer
+      - example: 623bc25ce1c0fc510dea72b5ee27b2e70384c099f1f3dce9e73dd987198c3486
+        in: query
+        name: xpubId
         type: string
       produces:
       - application/json
       responses:
         "200":
-          description: List of transactions
+          description: List of transactions with pagination details
           schema:
-            items:
-              $ref: '#/definitions/response.Transaction'
-            type: array
+            $ref: '#/definitions/response.PageModel-response_Transaction'
         "400":
-          description: Bad request - Error while parsing query parameters
+          description: Bad request - Invalid query parameters
         "500":
           description: Internal server error - Error while searching for transactions
       security:
@@ -3143,29 +3381,74 @@ paths:
       - Admin
   /api/v1/admin/users:
     get:
-      description: Search for xpubs
+      description: Fetches a list of xpubs filtered by metadata and other criteria
       parameters:
-      - description: Supports targeted resource searches with filters and metadata,
-          plus options for pagination and sorting to streamline data exploration and
-          analysis
-        in: body
-        name: SearchXpubs
-        schema:
-          $ref: '#/definitions/filter.XpubFilter'
+      - example: "2024-02-26T11:01:28Z"
+        in: query
+        name: createdRange[from]
+        type: string
+      - example: "2024-02-26T11:01:28Z"
+        in: query
+        name: createdRange[to]
+        type: string
+      - collectionFormat: csv
+        description: Metadata is a list of key-value pairs that can be used to filter
+          the results. !ATTENTION! Unfortunately this parameter won't work from swagger
+          UI.
+        example:
+        - metadata[key]=value
+        - metadata[key2]=value2
+        in: query
+        items:
+          type: string
+        name: metadata
+        type: array
+      - in: query
+        name: page
+        type: integer
+      - in: query
+        name: size
+        type: integer
+      - in: query
+        name: sort
+        type: string
+      - in: query
+        name: sortBy
+        type: string
+      - example: "2024-02-26T11:01:28Z"
+        in: query
+        name: updatedRange[from]
+        type: string
+      - example: "2024-02-26T11:01:28Z"
+        in: query
+        name: updatedRange[to]
+        type: string
+      - example: 1000
+        in: query
+        name: currentBalance
+        type: integer
+      - example: 00b953624f78004a4c727cd28557475d5233c15f17aef545106639f4d71b712d
+        in: query
+        name: id
+        type: string
+      - default: false
+        description: IncludeDeleted is a flag whether or not to include deleted items
+          in the search results
+        example: true
+        in: query
+        name: includeDeleted
+        type: boolean
       produces:
       - application/json
       responses:
         "200":
-          description: List of xpubs
+          description: List of xPubs with pagination details
           schema:
-            items:
-              $ref: '#/definitions/response.Xpub'
-            type: array
+            $ref: '#/definitions/response.PageModel-response_Xpub'
         "400":
-          description: Bad request - Error while parsing SearchXpubs from request
-            body
+          description: Bad request - Invalid query parameters
         "500":
-          description: Internal server error - Error while searching for xpubs
+          description: Internal server error - Error while searching for xPubs
       security:
       - x-auth-xpub: []
       summary: Search for xpubs
@@ -3198,27 +3481,68 @@ paths:
       - Admin
   /api/v1/admin/users/keys:
     get:
-      description: Access Keys Search
+      description: Fetches a list of access keys filtered by metadata, creation range,
+        and other parameters.
       parameters:
-      - description: Supports targeted resource searches with filters and metadata,
-          plus options for pagination and sorting to streamline data exploration and
-          analysis
-        in: body
-        name: SearchAccessKeys
-        schema:
-          $ref: '#/definitions/filter.AdminSearchAccessKeys'
+      - example: "2024-02-26T11:01:28Z"
+        in: query
+        name: createdRange[from]
+        type: string
+      - example: "2024-02-26T11:01:28Z"
+        in: query
+        name: createdRange[to]
+        type: string
+      - collectionFormat: csv
+        description: Metadata is a list of key-value pairs that can be used to filter
+          the results. !ATTENTION! Unfortunately this parameter won't work from swagger
+          UI.
+        example:
+        - metadata[key]=value
+        - metadata[key2]=value2
+        in: query
+        items:
+          type: string
+        name: metadata
+        type: array
+      - in: query
+        name: page
+        type: integer
+      - in: query
+        name: size
+        type: integer
+      - in: query
+        name: sort
+        type: string
+      - in: query
+        name: sortBy
+        type: string
+      - example: "2024-02-26T11:01:28Z"
+        in: query
+        name: updatedRange[from]
+        type: string
+      - example: "2024-02-26T11:01:28Z"
+        in: query
+        name: updatedRange[to]
+        type: string
+      - default: false
+        description: IncludeDeleted is a flag whether or not to include deleted items
+          in the search results
+        example: true
+        in: query
+        name: includeDeleted
+        type: boolean
+      - in: query
+        name: xpubId
+        type: string
       produces:
       - application/json
       responses:
         "200":
-          description: List of access keys
+          description: List of access keys with pagination details
           schema:
-            items:
-              $ref: '#/definitions/response.AccessKey'
-            type: array
+            $ref: '#/definitions/response.PageModel-response_AccessKey'
         "400":
-          description: Bad request - Error while parsing SearchAccessKeys from request
-            body
+          description: Bad request - Invalid query parameters
         "500":
           description: Internal server error - Error while searching for access keys
       security:
@@ -3228,29 +3552,110 @@ paths:
       - Admin
   /api/v1/admin/utxos:
     get:
-      description: Search for utxos
+      description: Fetches a list of UTXOs filtered by metadata and other criteria
       parameters:
-      - description: Supports targeted resource searches with filters and metadata,
-          plus options for pagination and sorting to streamline data exploration and
-          analysis
-        in: body
-        name: SearchUtxos
-        schema:
-          $ref: '#/definitions/filter.AdminUtxoFilter'
+      - example: "2024-02-26T11:01:28Z"
+        in: query
+        name: createdRange[from]
+        type: string
+      - example: "2024-02-26T11:01:28Z"
+        in: query
+        name: createdRange[to]
+        type: string
+      - collectionFormat: csv
+        description: Metadata is a list of key-value pairs that can be used to filter
+          the results. !ATTENTION! Unfortunately this parameter won't work from swagger
+          UI.
+        example:
+        - metadata[key]=value
+        - metadata[key2]=value2
+        in: query
+        items:
+          type: string
+        name: metadata
+        type: array
+      - in: query
+        name: page
+        type: integer
+      - in: query
+        name: size
+        type: integer
+      - in: query
+        name: sort
+        type: string
+      - in: query
+        name: sortBy
+        type: string
+      - example: "2024-02-26T11:01:28Z"
+        in: query
+        name: updatedRange[from]
+        type: string
+      - example: "2024-02-26T11:01:28Z"
+        in: query
+        name: updatedRange[to]
+        type: string
+      - example: 89419d4c7c50810bfe5ff9df9ad5074b749959423782dc91a30f1058b9ad7ef7
+        in: query
+        name: draftId
+        type: string
+      - example: fe4cbfee0258aa589cbc79963f7c204061fd67d987e32ee5049aa90ce14658ee
+        in: query
+        name: id
+        type: string
+      - default: false
+        description: IncludeDeleted is a flag whether or not to include deleted items
+          in the search results
+        example: true
+        in: query
+        name: includeDeleted
+        type: boolean
+      - example: 0
+        in: query
+        name: outputIndex
+        type: integer
+      - example: 1
+        in: query
+        name: satoshis
+        type: integer
+      - example: 76a914a5f271385e75f57bcd9092592dede812f8c466d088ac
+        in: query
+        name: scriptPubKey
+        type: string
+      - example: 11a7746489a70e9c0170601c2be65558455317a984194eb2791b637f59f8cd6e
+        in: query
+        name: spendingTxId
+        type: string
+      - example: 5e17858ea0ca4155827754ba82bdcfcce108d5bb5b47fbb3aa54bd14540683c6
+        in: query
+        name: transactionId
+        type: string
+      - enum:
+        - pubkey
+        - pubkeyhash
+        - nulldata
+        - multisig
+        - nonstandard
+        - scripthash
+        - metanet
+        - token_stas
+        - token_sensible
+        in: query
+        name: type
+        type: string
+      - in: query
+        name: xpubId
+        type: string
       produces:
       - application/json
       responses:
         "200":
-          description: List of utxos
+          description: List of UTXOs with pagination details
           schema:
-            items:
-              $ref: '#/definitions/response.Utxo'
-            type: array
+            $ref: '#/definitions/response.PageModel-response_Utxo'
         "400":
-          description: Bad request - Error while parsing SearchUtxos from request
-            body
+          description: Bad request - Invalid query parameters
         "500":
-          description: Internal server error - Error while searching for utxos
+          description: Internal server error - Error while searching for UTXOs
       security:
       - x-auth-xpub: []
       summary: Search for utxos
@@ -4350,6 +4755,7 @@ paths:
       - Access-key
   /v1/admin/access-keys/count:
     post:
+      deprecated: true
       description: Access Keys Count
       parameters:
       - description: Enables filtering of elements to be counted
@@ -4377,6 +4783,7 @@ paths:
       - Admin
   /v1/admin/access-keys/search:
     post:
+      deprecated: true
       description: Access Keys Search
       parameters:
       - description: Supports targeted resource searches with filters and metadata,
@@ -4407,6 +4814,7 @@ paths:
       - Admin
   /v1/admin/contact/{id}:
     delete:
+      deprecated: true
       description: Delete contact
       parameters:
       - description: Contact id
@@ -4433,6 +4841,7 @@ paths:
       tags:
       - Admin
     patch:
+      deprecated: true
       description: Update contact FullName or Metadata
       parameters:
       - description: Contact id
@@ -4467,6 +4876,7 @@ paths:
       - Admin
   /v1/admin/contact/accepted/{id}:
     patch:
+      deprecated: true
       description: Accept contact
       parameters:
       - description: Contact id
@@ -4495,6 +4905,7 @@ paths:
       - Admin
   /v1/admin/contact/rejected/{id}:
     patch:
+      deprecated: true
       description: Reject contact
       parameters:
       - description: Contact id
@@ -4523,6 +4934,7 @@ paths:
       - Admin
   /v1/admin/contact/search:
     post:
+      deprecated: true
       description: Search for contacts
       parameters:
       - description: Supports targeted resource searches with filters and metadata,
@@ -4609,6 +5021,7 @@ paths:
       - Admin
   /v1/admin/destinations/search:
     post:
+      deprecated: true
       description: Search for destinations
       parameters:
       - description: Supports targeted resource searches with filters and metadata,
@@ -4639,6 +5052,7 @@ paths:
       - Admin
   /v1/admin/paymail/create:
     post:
+      deprecated: true
       description: Create paymail
       parameters:
       - description: ' '
@@ -4665,6 +5079,7 @@ paths:
       - Admin
   /v1/admin/paymail/delete:
     delete:
+      deprecated: true
       description: Delete paymail
       parameters:
       - description: PaymailAddress model containing paymail address to delete
@@ -4689,6 +5104,7 @@ paths:
       - Admin
   /v1/admin/paymail/get:
     post:
+      deprecated: true
       description: Get paymail
       parameters:
       - description: PaymailAddress model containing paymail address to get
@@ -4715,6 +5131,7 @@ paths:
       - Admin
   /v1/admin/paymails/count:
     post:
+      deprecated: true
       description: Paymail addresses count
       parameters:
       - description: Enables filtering of elements to be counted
@@ -4742,6 +5159,7 @@ paths:
       - Admin
   /v1/admin/paymails/search:
     post:
+      deprecated: true
       description: Paymail addresses search
       parameters:
       - description: Supports targeted resource searches with filters and metadata,
@@ -4808,6 +5226,7 @@ paths:
       - Admin
   /v1/admin/transactions:
     get:
+      deprecated: true
       description: Search for transactions
       parameters:
       - description: Filter by metadata in the form of key-value pairs
@@ -4872,6 +5291,7 @@ paths:
       - Admin
   /v1/admin/transactions/count:
     post:
+      deprecated: true
       description: Count transactions
       parameters:
       - description: Enables filtering of elements to be counted
@@ -4898,6 +5318,7 @@ paths:
       - Admin
   /v1/admin/transactions/record:
     post:
+      deprecated: true
       description: Record transactions
       parameters:
       - description: RecordTransaction model containing hex of the transaction to
@@ -4927,6 +5348,7 @@ paths:
       - Admin
   /v1/admin/transactions/search:
     post:
+      deprecated: true
       description: Search for transactions
       parameters:
       - description: Supports targeted resource searches with filters and metadata,
@@ -4957,6 +5379,7 @@ paths:
       - Admin
   /v1/admin/utxos/count:
     post:
+      deprecated: true
       description: Count utxos
       parameters:
       - description: Enables filtering of elements to be counted
@@ -4982,6 +5405,7 @@ paths:
       - Admin
   /v1/admin/utxos/search:
     post:
+      deprecated: true
       description: Search for utxos
       parameters:
       - description: Supports targeted resource searches with filters and metadata,
@@ -5012,6 +5436,7 @@ paths:
       - Admin
   /v1/admin/webhooks/subscriptions:
     delete:
+      deprecated: true
       description: Unsubscribe to a webhook to stop receiving notifications
       parameters:
       - description: URL to unsubscribe from
@@ -5034,6 +5459,7 @@ paths:
       tags:
       - Admin
     get:
+      deprecated: true
       description: Get All Webhooks currently subscribed to
       produces:
       - application/json
@@ -5052,6 +5478,7 @@ paths:
       tags:
       - Admin
     post:
+      deprecated: true
       description: Subscribe to a webhook to receive notifications
       parameters:
       - description: URL to subscribe to and optional token header and value
@@ -5075,6 +5502,7 @@ paths:
       - Admin
   /v1/admin/xpub:
     post:
+      deprecated: true
       description: Create xPub
       parameters:
       - description: ' '
@@ -5101,6 +5529,7 @@ paths:
       - Admin
   /v1/admin/xpubs/count:
     post:
+      deprecated: true
       description: Count xpubs
       parameters:
       - description: Enables filtering of elements to be counted
@@ -5126,6 +5555,7 @@ paths:
       - Admin
   /v1/admin/xpubs/search:
     post:
+      deprecated: true
       description: Search for xpubs
       parameters:
       - description: Supports targeted resource searches with filters and metadata,

@@ -16,13 +16,14 @@ import (
 // utxosSearch will fetch a list of utxos filtered by metadata
 // Search for utxos filtering by metadata godoc
 // @Summary		Search for utxos
-// @Description	Search for utxos
+// @Description	Fetches a list of UTXOs filtered by metadata and other criteria
 // @Tags		Admin
 // @Produce		json
-// @Param		SearchUtxos body filter.AdminUtxoFilter false "Supports targeted resource searches with filters and metadata, plus options for pagination and sorting to streamline data exploration and analysis"
-// @Success		200 {object} []response.Utxo "List of utxos"
-// @Failure		400	"Bad request - Error while parsing SearchUtxos from request body"
-// @Failure 	500	"Internal server error - Error while searching for utxos"
+// @Param		SwaggerCommonParams query swagger.CommonFilteringQueryParams false "Supports options for pagination and sorting to streamline data exploration and analysis"
+// @Param		AdminUtxoFilter query filter.AdminUtxoFilter false "Supports targeted resource searches with filters"
+// @Success		200 {object} response.PageModel[response.Utxo] "List of UTXOs with pagination details"
+// @Failure		400 "Bad request - Invalid query parameters"
+// @Failure		500 "Internal server error - Error while searching for UTXOs"
 // @Router		/api/v1/admin/utxos [get]
 // @Security	x-auth-xpub
 func utxosSearch(c *gin.Context, _ *reqctx.AdminContext) {
