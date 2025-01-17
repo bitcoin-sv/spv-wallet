@@ -24,6 +24,7 @@ import (
 // @Failure 	500	"Internal server error - Error while searching for transactions"
 // @Router		/v1/admin/transactions/search [post]
 // @Security	x-auth-xpub
+// @Deprecated
 func transactionsSearch(c *gin.Context, _ *reqctx.AdminContext) {
 	logger := reqctx.Logger(c)
 	var reqParams filter.SearchTransactions
@@ -53,10 +54,10 @@ func transactionsSearch(c *gin.Context, _ *reqctx.AdminContext) {
 
 // transactionsCount will count all transactions filtered by metadata
 // Count transactions filtering by metadata godoc
-// @DeprecatedRouter /v1/admin/transactions/count [post]
 // @Summary		Count transactions
 // @Description	Count transactions
 // @Tags		Admin
+// @DeprecatedRouter /v1/admin/transactions/count [post]
 // @Produce		json
 // @Param		CountTransactions body filter.CountTransactions false "Enables filtering of elements to be counted"
 // @Success		200	{number} int64 "Count of transactions"
@@ -64,6 +65,7 @@ func transactionsSearch(c *gin.Context, _ *reqctx.AdminContext) {
 // @Failure 	500	"Internal Server Error - Error while fetching count of transactions"
 // @Router		/v1/admin/transactions/count [post]
 // @Security	x-auth-xpub
+// @Deprecated
 func transactionsCount(c *gin.Context, _ *reqctx.AdminContext) {
 	logger := reqctx.Logger(c)
 	var reqParams filter.CountTransactions
@@ -97,6 +99,7 @@ func transactionsCount(c *gin.Context, _ *reqctx.AdminContext) {
 // @Failure 	500	"Internal Server Error - Error while fetching transaction"
 // @Router		/v1/admin/transactions [get]
 // @Security	x-auth-xpub
+// @Deprecated
 func getTxAdminByIDOld(c *gin.Context, _ *reqctx.AdminContext) {
 	logger := reqctx.Logger(c)
 	id := c.Param("id")
@@ -130,6 +133,7 @@ func getTxAdminByIDOld(c *gin.Context, _ *reqctx.AdminContext) {
 // @Failure 	500 "Internal server error - Error while searching for transactions"
 // @Router		/v1/admin/transactions [get]
 // @Security	x-auth-xpub
+// @Deprecated
 func getTransactionsOld(c *gin.Context, _ *reqctx.AdminContext) {
 	logger := reqctx.Logger(c)
 
