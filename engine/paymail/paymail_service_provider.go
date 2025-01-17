@@ -45,66 +45,32 @@ type serviceProvider struct {
 	recorder TxRecorder
 }
 
-func (s *serviceProvider) CreateAddressResolutionResponse(ctx context.Context, alias, domain string, senderValidation bool, metaData *server.RequestMetadata) (*paymail.ResolutionPayload, error) {
-	//TODO implement me
-	panic("implement me")
-}
-
-func (s *serviceProvider) CreateP2PDestinationResponse(ctx context.Context, alias, domain string, satoshis uint64, _ *server.RequestMetadata) (*paymail.PaymentDestinationPayload, error) {
-	paymailModel, err := s.paymails.Get(ctx, alias, domain)
-	if err != nil {
-		return nil, pmerrors.ErrPaymailDBFailed.Wrap(err)
-	}
-
-	pki, pkiDerivationKey, err := s.pki(paymailModel)
+func (s *serviceProvider) CreateAddressResolutionResponse(ctx context.Context, alias, domain string, _ bool, _ *server.RequestMetadata) (*paymail.ResolutionPayload, error) {
+	destination, err := s.createDestinationForUser(ctx, alias, domain)
 	if err != nil {
 		return nil, err
 	}
 
-	referenceID, err := utils.RandomHex(16)
-	if err != nil {
-		return nil, spverrors.Wrapf(err, "cannot generate reference id")
-	}
+	return &paymail.ResolutionPayload{
+		Address:   destination.address,
+		Output:    destination.lockingScript,
+		Signature: "", // signature is not supported due to "noncustodial" nature of the wallet; private keys are not stored
+	}, nil
+}
 
-	dest, err := type42.Destination(pki, referenceID)
+func (s *serviceProvider) CreateP2PDestinationResponse(ctx context.Context, alias, domain string, satoshis uint64, _ *server.RequestMetadata) (*paymail.PaymentDestinationPayload, error) {
+	destination, err := s.createDestinationForUser(ctx, alias, domain)
 	if err != nil {
-		return nil, pmerrors.ErrPaymentDestination.Wrap(err)
-	}
-
-	address, err := script.NewAddressFromPublicKey(dest, true)
-	if err != nil {
-		return nil, pmerrors.ErrPaymentDestination.Wrap(err)
-	}
-
-	lockingScript, err := p2pkh.Lock(address)
-	if err != nil {
-		return nil, pmerrors.ErrPaymentDestination.Wrap(err)
-	}
-
-	err = s.users.AppendAddress(ctx, paymailModel.User, &database.Address{
-		Address: address.AddressString,
-		CustomInstructions: datatypes.NewJSONSlice([]database.CustomInstruction{
-			{
-				Type:        "type42",
-				Instruction: pkiDerivationKey,
-			},
-			{
-				Type:        "type42",
-				Instruction: referenceID,
-			},
-		}),
-	})
-	if err != nil {
-		return nil, pmerrors.ErrAddressSave.Wrap(err)
+		return nil, err
 	}
 
 	return &paymail.PaymentDestinationPayload{
 		Outputs: []*paymail.PaymentOutput{{
-			Address:  address.AddressString,
+			Address:  destination.address,
 			Satoshis: satoshis,
-			Script:   lockingScript.String(),
+			Script:   destination.lockingScript,
 		}},
-		Reference: referenceID,
+		Reference: destination.referenceID,
 	}, nil
 }
 
@@ -198,4 +164,65 @@ func (s *serviceProvider) pki(paymailModel *database.Paymail) (*primitives.Publi
 		return nil, derivationKey, pmerrors.ErrPaymailPKI.Wrap(err)
 	}
 	return pki, derivationKey, nil
+}
+
+type destinationData struct {
+	address       string
+	lockingScript string
+	referenceID   string
+}
+
+func (s *serviceProvider) createDestinationForUser(ctx context.Context, alias, domain string) (*destinationData, error) {
+	paymailModel, err := s.paymails.Get(ctx, alias, domain)
+	if err != nil {
+		return nil, pmerrors.ErrPaymailDBFailed.Wrap(err)
+	}
+
+	pki, pkiDerivationKey, err := s.pki(paymailModel)
+	if err != nil {
+		return nil, err
+	}
+
+	referenceID, err := utils.RandomHex(16)
+	if err != nil {
+		return nil, spverrors.Wrapf(err, "cannot generate reference id")
+	}
+
+	dest, err := type42.Destination(pki, referenceID)
+	if err != nil {
+		return nil, pmerrors.ErrPaymentDestination.Wrap(err)
+	}
+
+	address, err := script.NewAddressFromPublicKey(dest, true)
+	if err != nil {
+		return nil, pmerrors.ErrPaymentDestination.Wrap(err)
+	}
+
+	lockingScript, err := p2pkh.Lock(address)
+	if err != nil {
+		return nil, pmerrors.ErrPaymentDestination.Wrap(err)
+	}
+
+	err = s.users.AppendAddress(ctx, paymailModel.User, &database.Address{
+		Address: address.AddressString,
+		CustomInstructions: datatypes.NewJSONSlice([]database.CustomInstruction{
+			{
+				Type:        "type42",
+				Instruction: pkiDerivationKey,
+			},
+			{
+				Type:        "type42",
+				Instruction: referenceID,
+			},
+		}),
+	})
+	if err != nil {
+		return nil, pmerrors.ErrAddressSave.Wrap(err)
+	}
+
+	return &destinationData{
+		address:       address.AddressString,
+		lockingScript: lockingScript.String(),
+		referenceID:   referenceID,
+	}, nil
 }

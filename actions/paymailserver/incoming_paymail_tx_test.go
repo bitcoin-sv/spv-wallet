@@ -3,6 +3,7 @@ package paymailserver_test
 import (
 	"fmt"
 	"testing"
+	"time"
 
 	"github.com/bitcoin-sv/go-sdk/script"
 	"github.com/bitcoin-sv/spv-wallet/actions/testabilities"
@@ -329,4 +330,50 @@ func TestIncomingPaymailBeef(t *testing.T) {
 			"sender": senderPaymail,
 		})
 	})
+}
+
+func TestAddressResolution(t *testing.T) {
+	givenForAllTests := testabilities.Given(t)
+	cleanup := givenForAllTests.StartedSPVWalletWithConfiguration(
+		testengine.WithDomainValidationDisabled(),
+		testengine.WithNewTransactionFlowEnabled(),
+	)
+	defer cleanup()
+
+	// given:
+	given, then := testabilities.NewOf(givenForAllTests, t)
+	client := given.HttpClient().ForAnonymous()
+
+	// and:
+	senderPaymail := fixtures.SenderExternal.DefaultPaymail()
+	recipientPaymail := fixtures.RecipientInternal.DefaultPaymail()
+	satoshis := uint64(1000)
+
+	// and:
+	requestBody := map[string]any{
+		"dt":           time.Now().UTC().Format(time.RFC3339),
+		"senderHandle": senderPaymail,
+		"senderName":   "External Sender",
+		"purpose":      "P2P",
+		"amount":       satoshis,
+	}
+
+	// when:
+	res, _ := client.R().
+		SetHeader("Content-Type", "application/json").
+		SetBody(requestBody).
+		Post(
+			fmt.Sprintf(
+				"https://example.com/v1/bsvalias/address/%s",
+				recipientPaymail,
+			),
+		)
+
+	// then:
+	then.Response(res).
+		IsOK().
+		WithJSONMatching(`{
+			"address": "{{ matchAddress }}",
+			"output": "{{ matchHex }}"
+		}`, nil)
 }
