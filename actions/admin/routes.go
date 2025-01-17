@@ -8,13 +8,12 @@ import (
 func RegisterRoutes(handlersManager *handlers.Manager) {
 	adminGroupOld := handlersManager.Group(handlers.GroupOldAPI, "/admin")
 
-	adminGroupOld.POST("/destinations/search", handlers.AsAdmin(destinationsSearch))
-	adminGroupOld.POST("/destinations/count", handlers.AsAdmin(destinationsCount))
 	adminGroupOld.POST("/paymail/get", handlers.AsAdmin(paymailGetAddressOld))
 	adminGroupOld.POST("/paymails/search", handlers.AsAdmin(paymailAddressesSearchOld))
 	adminGroupOld.POST("/paymails/count", handlers.AsAdmin(paymailAddressesCount))
 	adminGroupOld.POST("/paymail/create", handlers.AsAdmin(paymailCreateAddressOld))
 	adminGroupOld.DELETE("/paymail/delete", handlers.AsAdmin(paymailDeleteAddressOld))
+
 	adminGroupOld.POST("/transactions/search", handlers.AsAdmin(transactionsSearch))
 	adminGroupOld.POST("/transactions/count", handlers.AsAdmin(transactionsCount))
 	adminGroupOld.POST("/transactions/record", handlers.AsAdmin(transactionRecord))

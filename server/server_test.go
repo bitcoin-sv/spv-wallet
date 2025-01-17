@@ -8,7 +8,6 @@ import (
 	"testing"
 
 	"github.com/bitcoin-sv/spv-wallet/config"
-	"github.com/bitcoin-sv/spv-wallet/engine/utils"
 	"github.com/bitcoin-sv/spv-wallet/models"
 	"github.com/bitcoin-sv/spv-wallet/tests"
 	"github.com/stretchr/testify/assert"
@@ -177,11 +176,11 @@ func (ts *TestSuite) TestBasicAuthentication() {
 		require.NoError(t, err)
 		require.NotNil(t, xpub)
 
-		destination, err := ts.SpvWalletEngine.NewDestination(context.Background(), xpub.RawXpub(), 0, utils.ScriptTypePubKeyHash)
+		key, err := ts.SpvWalletEngine.NewAccessKey(context.Background(), xpub.RawXpub())
 		require.NoError(t, err)
-		require.NotNil(t, destination)
+		require.NotNil(t, key)
 
-		req, err := http.NewRequestWithContext(context.Background(), http.MethodGet, "/"+config.APIVersion+"/destination?id="+destination.GetID(), bytes.NewReader([]byte("test")))
+		req, err := http.NewRequestWithContext(context.Background(), http.MethodGet, "/"+config.APIVersion+"//users/current/keys/"+key.GetID(), bytes.NewReader([]byte("test")))
 		require.NoError(t, err)
 		require.NotNil(t, req)
 

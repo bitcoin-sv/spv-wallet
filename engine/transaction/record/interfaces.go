@@ -2,12 +2,12 @@ package record
 
 import (
 	"context"
-	"iter"
 
 	trx "github.com/bitcoin-sv/go-sdk/transaction"
 	"github.com/bitcoin-sv/spv-wallet/engine/chain/models"
 	"github.com/bitcoin-sv/spv-wallet/engine/database"
 	"github.com/bitcoin-sv/spv-wallet/models/bsv"
+	"iter"
 )
 
 // Repository is an interface for saving transactions and outputs to the database.
