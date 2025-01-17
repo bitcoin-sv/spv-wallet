@@ -25,6 +25,7 @@ import (
 // @Failure 	500	"Internal server error - Error while creating xpub"
 // @Router		/v1/admin/xpub [post]
 // @Security	x-auth-xpub
+// @Deprecated
 func xpubsCreateOld(c *gin.Context, _ *reqctx.AdminContext) {
 	logger := reqctx.Logger(c)
 	var requestBody CreateXpub
@@ -59,6 +60,7 @@ func xpubsCreateOld(c *gin.Context, _ *reqctx.AdminContext) {
 // @Failure 	500	"Internal server error - Error while searching for xpubs"
 // @Router		/v1/admin/xpubs/search [post]
 // @Security	x-auth-xpub
+// @Deprecated
 func xpubsSearchOld(c *gin.Context, _ *reqctx.AdminContext) {
 	logger := reqctx.Logger(c)
 	var reqParams filter.SearchXpubs
@@ -99,6 +101,7 @@ func xpubsSearchOld(c *gin.Context, _ *reqctx.AdminContext) {
 // @Failure 	500	"Internal Server Error - Error while fetching count of xpubs"
 // @Router		/v1/admin/xpubs/count [post]
 // @Security	x-auth-xpub
+// @Deprecated
 func xpubsCount(c *gin.Context, _ *reqctx.AdminContext) {
 	logger := reqctx.Logger(c)
 	var reqParams filter.CountXpubs

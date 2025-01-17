@@ -18,13 +18,14 @@ import (
 // contactsSearch will fetch a list of contacts filtered by Metadata and AdminContactFilters
 // Search for contacts filtering by metadata and AdminContactFilters godoc
 // @Summary		Search for contacts
-// @Description	Search for contacts
+// @Description	Fetches a list of contacts filtered by metadata and other criteria
 // @Tags		Admin
 // @Produce		json
-// @Param		AdminSearchContacts body filter.AdminContactFilter false "Supports targeted resource searches with filters and metadata, plus options for pagination and sorting to streamline data exploration and analysis"
-// @Success		200 {object} response.PageModel[response.Contact] "List of contacts"
-// @Failure		400	"Bad request - Error while parsing AdminSearchContacts from request body"
-// @Failure 	500	"Internal server error - Error while searching for contacts"
+// @Param		SwaggerCommonParams query swagger.CommonFilteringQueryParams false "Supports options for pagination and sorting to streamline data exploration and analysis"
+// @Param		AdminContactFilter query filter.AdminContactFilter false "Supports targeted resource searches with filters"
+// @Success		200 {object} response.PageModel[response.Contact] "List of contacts with pagination details"
+// @Failure		400 "Bad request - Invalid query parameters"
+// @Failure		500 "Internal server error - Error while searching for contacts"
 // @Router		/api/v1/admin/contacts [get]
 // @Security	x-auth-xpub
 func contactsSearch(c *gin.Context, _ *reqctx.AdminContext) {

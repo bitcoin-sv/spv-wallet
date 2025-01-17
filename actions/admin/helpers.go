@@ -2,14 +2,10 @@ package admin
 
 import (
 	"fmt"
-	"net/http"
 
-	"github.com/bitcoin-sv/spv-wallet/actions/common"
 	"github.com/bitcoin-sv/spv-wallet/engine"
-	"github.com/bitcoin-sv/spv-wallet/engine/datastore"
 	"github.com/bitcoin-sv/spv-wallet/mappings"
 	"github.com/bitcoin-sv/spv-wallet/models/filter"
-	"github.com/bitcoin-sv/spv-wallet/models/response"
 	"github.com/bitcoin-sv/spv-wallet/server/reqctx"
 	"github.com/gin-gonic/gin"
 )
@@ -56,17 +52,4 @@ func countTransactions(c *gin.Context, params *transactionQueryParams) (int64, e
 		return 0, fmt.Errorf("count transactions failed: %w", err)
 	}
 	return count, nil
-}
-
-// Helper function to map transactions and send the response
-// sendPaginatedResponse sends a paginated response with any content type.
-func sendPaginatedResponse[T any, U any](c *gin.Context, content []*T, pageOptions *datastore.QueryParams, count int64, mapToContractFunc func(*T) *U) {
-	contracts := common.MapToTypeContracts(content, mapToContractFunc)
-
-	result := response.PageModel[U]{
-		Content: contracts,
-		Page:    common.GetPageDescriptionFromSearchParams(pageOptions, count),
-	}
-
-	c.JSON(http.StatusOK, result)
 }

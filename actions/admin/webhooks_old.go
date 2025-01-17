@@ -21,6 +21,7 @@ import (
 // @Failure 	500	"Internal server error - Error while subscribing to the webhook"
 // @Router		/v1/admin/webhooks/subscriptions [post]
 // @Security	x-auth-xpub
+// @Deprecated
 func subscribeWebhookOld(c *gin.Context, _ *reqctx.AdminContext) {
 	requestBody := models.SubscribeRequestBody{}
 	if err := c.Bind(&requestBody); err != nil {
@@ -48,6 +49,7 @@ func subscribeWebhookOld(c *gin.Context, _ *reqctx.AdminContext) {
 // @Failure 	500	"Internal server error - Error while unsubscribing to the webhook"
 // @Router		/v1/admin/webhooks/subscriptions [delete]
 // @Security	x-auth-xpub
+// @Deprecated
 func unsubscribeWebhookOld(c *gin.Context, _ *reqctx.AdminContext) {
 	requestModel := models.UnsubscribeRequestBody{}
 	if err := c.Bind(&requestModel); err != nil {
@@ -74,6 +76,7 @@ func unsubscribeWebhookOld(c *gin.Context, _ *reqctx.AdminContext) {
 // @Failure 	500	"Internal server error - Error while getting all webhooks"
 // @Router		/v1/admin/webhooks/subscriptions [get]
 // @Security	x-auth-xpub
+// @Deprecated
 func getAllWebhooksOld(c *gin.Context, _ *reqctx.AdminContext) {
 	wh, err := reqctx.Engine(c).GetWebhooks(c.Request.Context())
 	if err != nil {

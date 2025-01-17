@@ -26,6 +26,7 @@ import (
 // @Failure 	500	"Internal server error - Error while searching for contacts"
 // @Router		/v1/admin/contact/search [post]
 // @Security	x-auth-xpub
+// @Deprecated
 func contactsSearchOld(c *gin.Context, _ *reqctx.AdminContext) {
 	logger := reqctx.Logger(c)
 	engine := reqctx.Engine(c)
@@ -90,6 +91,7 @@ func contactsSearchOld(c *gin.Context, _ *reqctx.AdminContext) {
 // @Failure 	500	"Internal server error - Error while updating contact"
 // @Router		/v1/admin/contact/{id} [patch]
 // @Security	x-auth-xpub
+// @Deprecated
 func contactsUpdateOld(c *gin.Context, _ *reqctx.AdminContext) {
 	logger := reqctx.Logger(c)
 	var reqParams UpdateContact
@@ -132,6 +134,7 @@ func contactsUpdateOld(c *gin.Context, _ *reqctx.AdminContext) {
 // @Failure 	500	"Internal server error - Error while updating contact"
 // @Router		/v1/admin/contact/{id} [delete]
 // @Security	x-auth-xpub
+// @Deprecated
 func contactsDeleteOld(c *gin.Context, _ *reqctx.AdminContext) {
 	id := c.Param("id")
 
@@ -163,6 +166,7 @@ func contactsDeleteOld(c *gin.Context, _ *reqctx.AdminContext) {
 // @Failure 	500	"Internal server error - Error while changing contact status"
 // @Router		/v1/admin/contact/rejected/{id} [patch]
 // @Security	x-auth-xpub
+// @Deprecated
 func contactsRejectOld(c *gin.Context, _ *reqctx.AdminContext) {
 	id := c.Param("id")
 
@@ -197,6 +201,7 @@ func contactsRejectOld(c *gin.Context, _ *reqctx.AdminContext) {
 // @Failure 	500	"Internal server error - Error while changing contact status"
 // @Router		/v1/admin/contact/accepted/{id} [patch]
 // @Security	x-auth-xpub
+// @Deprecated
 func contactsAcceptOld(c *gin.Context, _ *reqctx.AdminContext) {
 	id := c.Param("id")
 
