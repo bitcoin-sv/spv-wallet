@@ -72,58 +72,6 @@ func (ts *EmbeddedDBTestSuite) TestClient_NewPaymailAddress() {
 	}
 }
 
-// Test_DeletePaymailAddressByID will test the method DeletePaymailAddressByID()
-func (ts *EmbeddedDBTestSuite) Test_DeletePaymailAddressByID() {
-	for _, testCase := range dbTestCases {
-
-		ts.T().Run(testCase.name+" - empty", func(t *testing.T) {
-			tc := ts.genericDBClient(t, testCase.database, false)
-			defer tc.Close(tc.ctx)
-
-			id := ""
-			err := tc.client.DeletePaymailAddressByID(tc.ctx, id, tc.client.DefaultModelOptions()...)
-			require.ErrorIs(t, err, spverrors.ErrCouldNotFindPaymail)
-		})
-
-		ts.T().Run(testCase.name+" - delete unknown paymail address", func(t *testing.T) {
-			tc := ts.genericDBClient(t, testCase.database, false)
-			defer tc.Close(tc.ctx)
-
-			err := tc.client.DeletePaymailAddressByID(tc.ctx, "unknown-id", tc.client.DefaultModelOptions()...)
-			require.ErrorIs(t, err, spverrors.ErrCouldNotFindPaymail)
-		})
-
-		ts.T().Run(testCase.name+" - delete paymail address", func(t *testing.T) {
-			tc := ts.genericDBClient(t, testCase.database, false)
-			defer tc.Close(tc.ctx)
-			opts := tc.client.DefaultModelOptions()
-
-			// Create xPub (required to add a paymail address)
-			xPub, err := tc.client.NewXpub(tc.ctx, testXPub, opts...)
-			require.NotNil(t, xPub)
-			require.NoError(t, err)
-
-			var paymailAddress *PaymailAddress
-			paymailAddress, err = tc.client.NewPaymailAddress(tc.ctx, testXPub, testPaymail, testPublicName, testAvatar, opts...)
-			require.NoError(t, err)
-			require.NotNil(t, paymailAddress)
-
-			err = tc.client.DeletePaymailAddressByID(tc.ctx, paymailAddress.ID, opts...)
-			require.NoError(t, err)
-
-			var p2 *PaymailAddress
-			p2, err = getPaymailAddress(tc.ctx, testPaymail, opts...)
-			require.NoError(t, err)
-			require.Nil(t, p2)
-
-			var p3 *PaymailAddress
-			p3, err = getPaymailAddressByID(tc.ctx, paymailAddress.ID, opts...)
-			require.NoError(t, err)
-			require.Nil(t, p3)
-		})
-	}
-}
-
 // Test_DeletePaymailAddress will test the method DeletePaymailAddress()
 func (ts *EmbeddedDBTestSuite) Test_DeletePaymailAddress() {
 	for _, testCase := range dbTestCases {
