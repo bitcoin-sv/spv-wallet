@@ -7,9 +7,7 @@ import (
 // RegisterRoutes creates the specific package routes
 func RegisterRoutes(handlersManager *handlers.Manager) {
 	adminGroupOld := handlersManager.Group(handlers.GroupOldAPI, "/admin")
-
-	adminGroupOld.GET("/status", handlers.AsAdmin(statusOld))
-	adminGroupOld.GET("/stats", handlers.AsAdmin(statsOld))
+	
 	adminGroupOld.POST("/contact/search", handlers.AsAdmin(contactsSearchOld))
 	adminGroupOld.PATCH("/contact/:id", handlers.AsAdmin(contactsUpdateOld))
 	adminGroupOld.POST("/contact/:paymail", handlers.AsAdmin(contactsCreate))
