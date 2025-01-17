@@ -24,6 +24,7 @@ import (
 // @Failure 	500	"Internal Server Error - Error while fetching count of access keys"
 // @Router		/v1/admin/transactions/record [post]
 // @Security	x-auth-xpub
+// @Deprecated
 func transactionRecord(c *gin.Context, _ *reqctx.AdminContext) {
 	logger := reqctx.Logger(c)
 	engineInstance := reqctx.Engine(c)
