@@ -21,7 +21,6 @@ import (
 // @Produce		json
 // @Param		SwaggerCommonParams query swagger.CommonFilteringQueryParams false "Supports options for pagination and sorting to streamline data exploration and analysis"
 // @Param		AdminAccessKeyFilter query filter.AdminAccessKeyFilter false "Supports targeted resource searches with filters"
-// @Param		xpubId query string false "ID of the xPub associated with the access keys"
 // @Success		200 {object} response.PageModel[response.AccessKey] "List of access keys with pagination details"
 // @Failure		400 "Bad request - Invalid query parameters"
 // @Failure		500 "Internal server error - Error while searching for access keys"

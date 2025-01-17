@@ -3066,14 +3066,6 @@ paths:
       description: Fetches a list of paymail addresses filtered by metadata and other
         query parameters
       parameters:
-      - description: Alias of the paymail
-        in: query
-        name: alias
-        type: string
-      - description: Domain of the paymail
-        in: query
-        name: domain
-        type: string
       - example: "2024-02-26T11:01:28Z"
         in: query
         name: createdRange[from]
@@ -3370,50 +3362,6 @@ paths:
         in: query
         name: xpubId
         type: string
-      - description: Transaction ID
-        in: query
-        name: id
-        type: string
-      - description: Transaction hex
-        in: query
-        name: hex
-        type: string
-      - description: Hash of the block containing the transaction
-        in: query
-        name: blockHash
-        type: string
-      - description: Height of the block containing the transaction
-        in: query
-        name: blockHeight
-        type: integer
-      - description: Transaction fee
-        in: query
-        name: fee
-        type: integer
-      - description: Number of inputs in the transaction
-        in: query
-        name: numberOfInputs
-        type: integer
-      - description: Number of outputs in the transaction
-        in: query
-        name: numberOfOutputs
-        type: integer
-      - description: Draft ID associated with the transaction
-        in: query
-        name: draftId
-        type: string
-      - description: Total value of the transaction in satoshis
-        in: query
-        name: totalValue
-        type: integer
-      - description: Status of the transaction (e.g., 'confirmed', 'pending')
-        in: query
-        name: status
-        type: string
-      - description: XPub ID associated with the transaction
-        in: query
-        name: xpubId
-        type: string
       produces:
       - application/json
       responses:
@@ -3514,14 +3462,6 @@ paths:
         in: query
         name: includeDeleted
         type: boolean
-      - description: XPub ID (UUID)
-        in: query
-        name: id
-        type: string
-      - description: Current balance of the xPub
-        in: query
-        name: currentBalance
-        type: integer
       produces:
       - application/json
       responses:
@@ -3616,10 +3556,6 @@ paths:
         name: includeDeleted
         type: boolean
       - in: query
-        name: xpubId
-        type: string
-      - description: ID of the xPub associated with the access keys
-        in: query
         name: xpubId
         type: string
       produces:
@@ -3731,50 +3667,6 @@ paths:
         name: type
         type: string
       - in: query
-        name: xpubId
-        type: string
-      - description: UTXO ID (UUID)
-        in: query
-        name: id
-        type: string
-      - description: Transaction ID associated with the UTXO
-        in: query
-        name: transactionId
-        type: string
-      - description: Output index of the UTXO
-        in: query
-        name: outputIndex
-        type: integer
-      - description: Amount of satoshis held in the UTXO
-        in: query
-        name: satoshis
-        type: integer
-      - description: ScriptPubKey associated with the UTXO
-        in: query
-        name: scriptPubKey
-        type: string
-      - description: Type of the UTXO (e.g., 'P2PKH', 'P2SH')
-        in: query
-        name: type
-        type: string
-      - description: Draft ID associated with the UTXO
-        in: query
-        name: draftId
-        type: string
-      - description: Start of reserved date range (ISO 8601 format)
-        in: query
-        name: reservedRange[from]
-        type: string
-      - description: End of reserved date range (ISO 8601 format)
-        in: query
-        name: reservedRange[to]
-        type: string
-      - description: Transaction ID spending the UTXO
-        in: query
-        name: spendingTxId
-        type: string
-      - description: XPub ID associated with the UTXO
-        in: query
         name: xpubId
         type: string
       produces:

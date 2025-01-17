@@ -52,8 +52,6 @@ func paymailGetAddress(c *gin.Context, _ *reqctx.AdminContext) {
 // @Description	Fetches a list of paymail addresses filtered by metadata and other query parameters
 // @Tags		Admin
 // @Produce		json
-// @Param		alias query string false "Alias of the paymail"
-// @Param		domain query string false "Domain of the paymail"
 // @Param		SwaggerCommonParams query swagger.CommonFilteringQueryParams false "Supports options for pagination and sorting to streamline data exploration and analysis"
 // @Param		AdminPaymailFilter query filter.AdminPaymailFilter false "Supports targeted resource searches with filters"
 // @Success		200 {object} response.PageModel[response.PaymailAddress] "List of paymail addresses with pagination"

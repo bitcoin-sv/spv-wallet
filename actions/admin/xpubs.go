@@ -55,8 +55,6 @@ func xpubsCreate(c *gin.Context, _ *reqctx.AdminContext) {
 // @Produce		json
 // @Param		SwaggerCommonParams query swagger.CommonFilteringQueryParams false "Supports options for pagination and sorting to streamline data exploration and analysis"
 // @Param		XpubFilter query filter.XpubFilter false "Supports targeted resource searches with filters"
-// @Param		id query string false "XPub ID (UUID)"
-// @Param		currentBalance query integer false "Current balance of the xPub"
 // @Success		200 {object} response.PageModel[response.Xpub] "List of xPubs with pagination details"
 // @Failure		400 "Bad request - Invalid query parameters"
 // @Failure		500 "Internal server error - Error while searching for xPubs"

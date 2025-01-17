@@ -476,18 +476,6 @@ const docTemplate = `{
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "Alias of the paymail",
-                        "name": "alias",
-                        "in": "query"
-                    },
-                    {
-                        "type": "string",
-                        "description": "Domain of the paymail",
-                        "name": "domain",
-                        "in": "query"
-                    },
-                    {
-                        "type": "string",
                         "example": "2024-02-26T11:01:28Z",
                         "name": "createdRange[from]",
                         "in": "query"
@@ -927,72 +915,6 @@ const docTemplate = `{
                         "example": "623bc25ce1c0fc510dea72b5ee27b2e70384c099f1f3dce9e73dd987198c3486",
                         "name": "xpubId",
                         "in": "query"
-                    },
-                    {
-                        "type": "string",
-                        "description": "Transaction ID",
-                        "name": "id",
-                        "in": "query"
-                    },
-                    {
-                        "type": "string",
-                        "description": "Transaction hex",
-                        "name": "hex",
-                        "in": "query"
-                    },
-                    {
-                        "type": "string",
-                        "description": "Hash of the block containing the transaction",
-                        "name": "blockHash",
-                        "in": "query"
-                    },
-                    {
-                        "type": "integer",
-                        "description": "Height of the block containing the transaction",
-                        "name": "blockHeight",
-                        "in": "query"
-                    },
-                    {
-                        "type": "integer",
-                        "description": "Transaction fee",
-                        "name": "fee",
-                        "in": "query"
-                    },
-                    {
-                        "type": "integer",
-                        "description": "Number of inputs in the transaction",
-                        "name": "numberOfInputs",
-                        "in": "query"
-                    },
-                    {
-                        "type": "integer",
-                        "description": "Number of outputs in the transaction",
-                        "name": "numberOfOutputs",
-                        "in": "query"
-                    },
-                    {
-                        "type": "string",
-                        "description": "Draft ID associated with the transaction",
-                        "name": "draftId",
-                        "in": "query"
-                    },
-                    {
-                        "type": "integer",
-                        "description": "Total value of the transaction in satoshis",
-                        "name": "totalValue",
-                        "in": "query"
-                    },
-                    {
-                        "type": "string",
-                        "description": "Status of the transaction (e.g., 'confirmed', 'pending')",
-                        "name": "status",
-                        "in": "query"
-                    },
-                    {
-                        "type": "string",
-                        "description": "XPub ID associated with the transaction",
-                        "name": "xpubId",
-                        "in": "query"
                     }
                 ],
                 "responses": {
@@ -1144,18 +1066,6 @@ const docTemplate = `{
                         "description": "IncludeDeleted is a flag whether or not to include deleted items in the search results",
                         "name": "includeDeleted",
                         "in": "query"
-                    },
-                    {
-                        "type": "string",
-                        "description": "XPub ID (UUID)",
-                        "name": "id",
-                        "in": "query"
-                    },
-                    {
-                        "type": "integer",
-                        "description": "Current balance of the xPub",
-                        "name": "currentBalance",
-                        "in": "query"
                     }
                 ],
                 "responses": {
@@ -1298,12 +1208,6 @@ const docTemplate = `{
                     },
                     {
                         "type": "string",
-                        "name": "xpubId",
-                        "in": "query"
-                    },
-                    {
-                        "type": "string",
-                        "description": "ID of the xPub associated with the access keys",
                         "name": "xpubId",
                         "in": "query"
                     }
@@ -1466,72 +1370,6 @@ const docTemplate = `{
                     },
                     {
                         "type": "string",
-                        "name": "xpubId",
-                        "in": "query"
-                    },
-                    {
-                        "type": "string",
-                        "description": "UTXO ID (UUID)",
-                        "name": "id",
-                        "in": "query"
-                    },
-                    {
-                        "type": "string",
-                        "description": "Transaction ID associated with the UTXO",
-                        "name": "transactionId",
-                        "in": "query"
-                    },
-                    {
-                        "type": "integer",
-                        "description": "Output index of the UTXO",
-                        "name": "outputIndex",
-                        "in": "query"
-                    },
-                    {
-                        "type": "integer",
-                        "description": "Amount of satoshis held in the UTXO",
-                        "name": "satoshis",
-                        "in": "query"
-                    },
-                    {
-                        "type": "string",
-                        "description": "ScriptPubKey associated with the UTXO",
-                        "name": "scriptPubKey",
-                        "in": "query"
-                    },
-                    {
-                        "type": "string",
-                        "description": "Type of the UTXO (e.g., 'P2PKH', 'P2SH')",
-                        "name": "type",
-                        "in": "query"
-                    },
-                    {
-                        "type": "string",
-                        "description": "Draft ID associated with the UTXO",
-                        "name": "draftId",
-                        "in": "query"
-                    },
-                    {
-                        "type": "string",
-                        "description": "Start of reserved date range (ISO 8601 format)",
-                        "name": "reservedRange[from]",
-                        "in": "query"
-                    },
-                    {
-                        "type": "string",
-                        "description": "End of reserved date range (ISO 8601 format)",
-                        "name": "reservedRange[to]",
-                        "in": "query"
-                    },
-                    {
-                        "type": "string",
-                        "description": "Transaction ID spending the UTXO",
-                        "name": "spendingTxId",
-                        "in": "query"
-                    },
-                    {
-                        "type": "string",
-                        "description": "XPub ID associated with the UTXO",
                         "name": "xpubId",
                         "in": "query"
                     }
