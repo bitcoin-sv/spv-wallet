@@ -3,6 +3,8 @@ package admin
 import (
 	"net/http"
 
+	"github.com/gin-gonic/gin"
+
 	"github.com/bitcoin-sv/spv-wallet/actions/common"
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/bitcoin-sv/spv-wallet/internal/query"
@@ -10,7 +12,6 @@ import (
 	"github.com/bitcoin-sv/spv-wallet/models/filter"
 	"github.com/bitcoin-sv/spv-wallet/models/response"
 	"github.com/bitcoin-sv/spv-wallet/server/reqctx"
-	"github.com/gin-gonic/gin"
 )
 
 // accessKeysSearch will fetch a list of access keys filtered by metadata
@@ -19,18 +20,9 @@ import (
 // @Description	Fetches a list of access keys filtered by metadata, creation range, and other parameters.
 // @Tags		Admin
 // @Produce		json
+// @Param		SwaggerCommonParams query swagger.CommonFilteringQueryParams false "Supports options for pagination and sorting to streamline data exploration and analysis"
+// @Param		AdminAccessKeyFilter query filter.AdminAccessKeyFilter false "Supports targeted resource searches with filters"
 // @Param		xpubId query string false "ID of the xPub associated with the access keys"
-// @Param		includeDeleted query boolean false "Whether to include deleted access keys"
-// @Param		createdRange[from] query string false "Start of creation date range (ISO 8601 format)"
-// @Param		createdRange[to] query string false "End of creation date range (ISO 8601 format)"
-// @Param		updatedRange[from] query string false "Start of last updated date range (ISO 8601 format)"
-// @Param		updatedRange[to] query string false "End of last updated date range (ISO 8601 format)"
-// @Param		revokedRange[from] query string false "Start of revoked date range (ISO 8601 format)"
-// @Param		revokedRange[to] query string false "End of revoked date range (ISO 8601 format)"
-// @Param		page query integer false "Page number for pagination"
-// @Param		pageSize query integer false "Number of results per page"
-// @Param		orderByField query string false "Field to order results by (e.g., 'created_at')"
-// @Param		orderByDirection query string false "Direction of ordering: 'asc' or 'desc'"
 // @Success		200 {object} response.PageModel[response.AccessKey] "List of access keys with pagination details"
 // @Failure		400 "Bad request - Invalid query parameters"
 // @Failure		500 "Internal server error - Error while searching for access keys"

@@ -5,6 +5,8 @@ import (
 	"slices"
 
 	"github.com/bitcoin-sv/go-paymail"
+	"github.com/gin-gonic/gin"
+
 	"github.com/bitcoin-sv/spv-wallet/actions/common"
 	"github.com/bitcoin-sv/spv-wallet/engine"
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
@@ -13,7 +15,6 @@ import (
 	"github.com/bitcoin-sv/spv-wallet/models/filter"
 	"github.com/bitcoin-sv/spv-wallet/models/response"
 	"github.com/bitcoin-sv/spv-wallet/server/reqctx"
-	"github.com/gin-gonic/gin"
 )
 
 // paymailGetAddress will return a paymail address
@@ -54,15 +55,8 @@ func paymailGetAddress(c *gin.Context, _ *reqctx.AdminContext) {
 // @Produce		json
 // @Param		alias query string false "Alias of the paymail"
 // @Param		domain query string false "Domain of the paymail"
-// @Param		createdRange[from] query string false "Start of creation date range (ISO 8601 format)"
-// @Param		createdRange[to] query string false "End of creation date range (ISO 8601 format)"
-// @Param		updatedRange[from] query string false "Start of last updated date range (ISO 8601 format)"
-// @Param		updatedRange[to] query string false "End of last updated date range (ISO 8601 format)"
-// @Param		includeDeleted query boolean false "Whether to include deleted paymail addresses"
-// @Param		page query integer false "Page number for pagination"
-// @Param		pageSize query integer false "Page size for pagination"
-// @Param		orderByField query string false "Field to order results by"
-// @Param		orderByDirection query string false "Direction of ordering: 'asc' or 'desc'"
+// @Param		SwaggerCommonParams query swagger.CommonFilteringQueryParams false "Supports options for pagination and sorting to streamline data exploration and analysis"
+// @Param		AdminPaymailFilter query filter.AdminPaymailFilter false "Supports targeted resource searches with filters"
 // @Success		200 {object} response.PageModel[response.PaymailAddress] "List of paymail addresses with pagination"
 // @Failure		400 "Bad request - Invalid query parameters"
 // @Failure		500 "Internal server error - Error while searching for paymail addresses"
