@@ -12,11 +12,11 @@ import (
 func get(c *gin.Context, _ *reqctx.AdminContext) {
 	userID := c.Param("id")
 
-	user, err := reqctx.Engine(c).Repositories().Users.GetWithPaymails(c, userID)
+	user, err := reqctx.Engine(c).UserService().GetWithPaymails(c, userID)
 	if err != nil {
 		spverrors.ErrorResponse(c, err, reqctx.Logger(c))
 		return
 	}
 
-	c.JSON(http.StatusOK, mapping.UserResponse(user))
+	c.JSON(http.StatusOK, mapping.CreatedUserResponse(user))
 }

@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
+	"github.com/bitcoin-sv/spv-wallet/models/bsv"
 	"gorm.io/datatypes"
 	"gorm.io/gorm"
 )
@@ -26,7 +27,7 @@ type TrackedTransaction struct {
 }
 
 // CreateP2PKHOutput prepares a new P2PKH output and adds it to the transaction.
-func (t *TrackedTransaction) CreateP2PKHOutput(output *TrackedOutput, customInstructions datatypes.JSONSlice[CustomInstruction]) {
+func (t *TrackedTransaction) CreateP2PKHOutput(output *TrackedOutput, customInstructions datatypes.JSONSlice[bsv.CustomInstruction]) {
 	t.Outputs = append(t.Outputs, output)
 	t.newUTXOs = append(t.newUTXOs, NewP2PKHUserUTXO(output, customInstructions))
 }

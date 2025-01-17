@@ -11,27 +11,27 @@ import (
 	"github.com/bitcoin-sv/go-sdk/script"
 	trx "github.com/bitcoin-sv/go-sdk/transaction"
 	"github.com/bitcoin-sv/go-sdk/transaction/template/p2pkh"
-	"github.com/bitcoin-sv/spv-wallet/engine/database"
 	"github.com/bitcoin-sv/spv-wallet/engine/keys/type42"
 	pmerrors "github.com/bitcoin-sv/spv-wallet/engine/paymail/errors"
+	paymailmodels "github.com/bitcoin-sv/spv-wallet/engine/paymail/models"
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/bitcoin-sv/spv-wallet/engine/utils"
+	"github.com/bitcoin-sv/spv-wallet/models/bsv"
 	"github.com/rs/zerolog"
-	"gorm.io/datatypes"
 )
 
 // NewServiceProvider create a new paymail service server which handlers incoming paymail requests
 func NewServiceProvider(
 	logger *zerolog.Logger,
 	paymailsRepo PaymailsRepo,
-	usersRepo UsersRepo,
+	users UsersService,
 	spv MerkleRootsVerifier,
 	recorder TxRecorder,
 ) server.PaymailServiceProvider {
 	return &serviceProvider{
 		logger:   logger,
 		paymails: paymailsRepo,
-		users:    usersRepo,
+		users:    users,
 		spv:      spv,
 		recorder: recorder,
 	}
@@ -40,7 +40,7 @@ func NewServiceProvider(
 type serviceProvider struct {
 	logger   *zerolog.Logger
 	paymails PaymailsRepo
-	users    UsersRepo
+	users    UsersService
 	spv      MerkleRootsVerifier
 	recorder TxRecorder
 }
@@ -153,7 +153,7 @@ func (s *serviceProvider) VerifyMerkleRoots(ctx context.Context, merkleProofs []
 	return nil
 }
 
-func (s *serviceProvider) pki(paymailModel *database.Paymail) (*primitives.PublicKey, string, error) {
+func (s *serviceProvider) pki(paymailModel *paymailmodels.Paymail) (*primitives.PublicKey, string, error) {
 	userPubKey, err := paymailModel.User.PubKeyObj()
 	if err != nil {
 		return nil, "", pmerrors.ErrPaymailPKI.Wrap(err)
@@ -203,18 +203,15 @@ func (s *serviceProvider) createDestinationForUser(ctx context.Context, alias, d
 		return nil, pmerrors.ErrPaymentDestination.Wrap(err)
 	}
 
-	err = s.users.AppendAddress(ctx, paymailModel.User, &database.Address{
-		Address: address.AddressString,
-		CustomInstructions: datatypes.NewJSONSlice([]database.CustomInstruction{
-			{
-				Type:        "type42",
-				Instruction: pkiDerivationKey,
-			},
-			{
-				Type:        "type42",
-				Instruction: referenceID,
-			},
-		}),
+	err = s.users.AppendAddress(ctx, paymailModel.UserID, address.AddressString, []bsv.CustomInstruction{
+		{
+			Type:        "type42",
+			Instruction: pkiDerivationKey,
+		},
+		{
+			Type:        "type42",
+			Instruction: referenceID,
+		},
 	})
 	if err != nil {
 		return nil, pmerrors.ErrAddressSave.Wrap(err)

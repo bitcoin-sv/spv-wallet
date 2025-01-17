@@ -1,12 +1,12 @@
 package mapping
 
 import (
-	"github.com/bitcoin-sv/spv-wallet/engine/database"
+	paymailmodels "github.com/bitcoin-sv/spv-wallet/engine/paymail/models"
 	"github.com/bitcoin-sv/spv-wallet/models/response/adminresponse"
 )
 
-// PaymailResponse maps a paymail to a paymail response
-func PaymailResponse(p *database.Paymail) adminresponse.Paymail {
+// CreatedPaymailResponse maps a paymail to a paymail response
+func CreatedPaymailResponse(p *paymailmodels.Paymail) adminresponse.Paymail {
 	return adminresponse.Paymail{
 		ID:         p.ID,
 		Alias:      p.Alias,

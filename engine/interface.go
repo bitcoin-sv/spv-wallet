@@ -16,6 +16,7 @@ import (
 	"github.com/bitcoin-sv/spv-wallet/engine/taskmanager"
 	"github.com/bitcoin-sv/spv-wallet/engine/transaction/outlines"
 	"github.com/bitcoin-sv/spv-wallet/engine/transaction/record"
+	"github.com/bitcoin-sv/spv-wallet/engine/user"
 	"github.com/bitcoin-sv/spv-wallet/models/bsv"
 	"github.com/mrz1836/go-cachestore"
 	"github.com/rs/zerolog"
@@ -220,4 +221,5 @@ type ClientInterface interface {
 	LogBHSReadiness(ctx context.Context)
 	FeeUnit() bsv.FeeUnit
 	Repositories() *repository.All
+	UserService() *user.Service
 }

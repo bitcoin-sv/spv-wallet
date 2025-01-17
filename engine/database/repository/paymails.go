@@ -5,6 +5,7 @@ import (
 	"errors"
 
 	"github.com/bitcoin-sv/spv-wallet/engine/database"
+	paymailmodels "github.com/bitcoin-sv/spv-wallet/engine/paymail/models"
 	"gorm.io/gorm"
 )
 
@@ -19,18 +20,31 @@ func NewPaymailsRepo(db *gorm.DB) *Paymails {
 }
 
 // Get returns a paymail by alias and domain.
-func (p *Paymails) Get(ctx context.Context, alias, domain string) (*database.Paymail, error) {
-	var paymail database.Paymail
+func (p *Paymails) Get(ctx context.Context, alias, domain string) (*paymailmodels.Paymail, error) {
+	var row database.Paymail
 	if err := p.db.
 		WithContext(ctx).
 		Preload("User").
 		Where("alias = ? AND domain = ?", alias, domain).
-		First(&paymail).Error; err != nil {
+		First(&row).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return nil, nil
 		}
 		return nil, err
 	}
 
-	return &paymail, nil
+	return &paymailmodels.Paymail{
+		ID:        row.ID,
+		CreatedAt: row.CreatedAt,
+		UpdatedAt: row.UpdatedAt,
+
+		Alias:  row.Alias,
+		Domain: row.Domain,
+
+		PublicName: row.PublicName,
+		Avatar:     row.Avatar,
+
+		UserID: row.UserID,
+		User:   row.User,
+	}, nil
 }

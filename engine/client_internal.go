@@ -16,6 +16,7 @@ import (
 	"github.com/bitcoin-sv/spv-wallet/engine/taskmanager"
 	"github.com/bitcoin-sv/spv-wallet/engine/transaction/outlines"
 	"github.com/bitcoin-sv/spv-wallet/engine/transaction/record"
+	"github.com/bitcoin-sv/spv-wallet/engine/user"
 	"github.com/mrz1836/go-cachestore"
 )
 
@@ -227,6 +228,12 @@ func (c *Client) loadRepositories() {
 	}
 }
 
+func (c *Client) loadDomainServices() {
+	if c.options.user == nil {
+		c.options.user = user.NewService(c.Repositories().Users)
+	}
+}
+
 func (c *Client) loadChainService() {
 	if c.options.chainService == nil {
 		logger := c.Logger().With().Str("subservice", "chain").Logger()
@@ -290,7 +297,7 @@ func (c *Client) loadPaymailServer() (err error) {
 		serviceProvider = paymail.NewServiceProvider(
 			&paymailServiceLogger,
 			c.Repositories().Paymails,
-			c.Repositories().Users,
+			c.UserService(),
 			c.Chain(),
 			c.TransactionRecordService(),
 		)
