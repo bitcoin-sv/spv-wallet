@@ -5318,6 +5318,7 @@ paths:
       - Admin
   /v1/admin/transactions/record:
     post:
+      deprecated: true
       description: Record transactions
       parameters:
       - description: RecordTransaction model containing hex of the transaction to

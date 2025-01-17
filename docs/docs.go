@@ -3861,6 +3861,7 @@ const docTemplate = `{
                     "Admin"
                 ],
                 "summary": "Record transactions",
+                "deprecated": true,
                 "parameters": [
                     {
                         "description": "RecordTransaction model containing hex of the transaction to record",
