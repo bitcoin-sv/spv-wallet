@@ -2,9 +2,9 @@ package user
 
 import (
 	"context"
-	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 
 	paymailmodels "github.com/bitcoin-sv/spv-wallet/engine/paymail/models"
+	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/bitcoin-sv/spv-wallet/engine/user/usermodels"
 	"github.com/bitcoin-sv/spv-wallet/models/bsv"
 )
