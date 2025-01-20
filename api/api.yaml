@@ -45,7 +45,7 @@ components:
         xpubID:
           type: string
         something:
-            type: string
+          type: string
   securitySchemes:
     SignatureAuth:
       type: http
