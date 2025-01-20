@@ -31,12 +31,9 @@ func addPaymail(c *gin.Context, _ *reqctx.AdminContext) {
 		return
 	}
 
-	config := reqctx.AppConfig(c)
-	if config.Paymail.DomainValidationEnabled {
-		if !slices.Contains(config.Paymail.Domains, domain) {
-			spverrors.ErrorResponse(c, spverrors.ErrInvalidDomain, logger)
-			return
-		}
+	if err = checkDomain(c, domain); err != nil {
+		spverrors.ErrorResponse(c, err, logger)
+		return
 	}
 
 	newPaymail := &usermodels.NewPaymail{
@@ -65,4 +62,14 @@ func parsePaymail(request *adminrequest.AddPaymail) (string, string, error) {
 		return "", "", adminerrors.ErrInvalidPaymail
 	}
 	return alias, domain, nil
+}
+
+func checkDomain(c *gin.Context, domain string) error {
+	config := reqctx.AppConfig(c)
+	if config.Paymail.DomainValidationEnabled {
+		if !slices.Contains(config.Paymail.Domains, domain) {
+			return spverrors.ErrInvalidDomain
+		}
+	}
+	return nil
 }

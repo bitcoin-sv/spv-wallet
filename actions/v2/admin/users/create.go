@@ -2,7 +2,6 @@ package users
 
 import (
 	"net/http"
-	"slices"
 
 	primitives "github.com/bitcoin-sv/go-sdk/primitives/ec"
 	adminerrors "github.com/bitcoin-sv/spv-wallet/actions/v2/admin/errors"
@@ -38,12 +37,9 @@ func create(c *gin.Context, _ *reqctx.AdminContext) {
 			return
 		}
 
-		config := reqctx.AppConfig(c)
-		if config.Paymail.DomainValidationEnabled {
-			if !slices.Contains(config.Paymail.Domains, domain) {
-				spverrors.ErrorResponse(c, spverrors.ErrInvalidDomain, logger)
-				return
-			}
+		if err = checkDomain(c, domain); err != nil {
+			spverrors.ErrorResponse(c, err, logger)
+			return
 		}
 
 		newUser.Paymail = &usermodels.NewPaymail{
