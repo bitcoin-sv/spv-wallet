@@ -10,6 +10,7 @@ import (
 	"github.com/bitcoin-sv/spv-wallet/actions"
 	"github.com/bitcoin-sv/spv-wallet/actions/paymailserver"
 	v2 "github.com/bitcoin-sv/spv-wallet/actions/v2"
+	"github.com/bitcoin-sv/spv-wallet/api"
 	"github.com/bitcoin-sv/spv-wallet/config"
 	"github.com/bitcoin-sv/spv-wallet/engine"
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
@@ -17,6 +18,7 @@ import (
 	"github.com/bitcoin-sv/spv-wallet/metrics"
 	"github.com/bitcoin-sv/spv-wallet/server/handlers"
 	"github.com/bitcoin-sv/spv-wallet/server/middleware"
+	"github.com/bitcoin-sv/spv-wallet/server/reqctx"
 	"github.com/gin-contrib/pprof"
 	"github.com/gin-gonic/gin"
 	"github.com/rs/zerolog"
@@ -118,4 +120,14 @@ func setupServerRoutes(appConfig *config.AppConfig, spvWalletEngine engine.Clien
 	if appConfig.DebugProfiling {
 		pprof.Register(ginEngine, "debug/pprof")
 	}
+
+	api.RegisterHandlersWithOptions(ginEngine, actions.NewServer(), api.GinServerOptions{
+		BaseURL: "/api/v2",
+		Middlewares: []api.MiddlewareFunc{
+			api.SignatureAuthWithScopes(),
+		},
+		ErrorHandler: func(g *gin.Context, err error, i int) {
+			spverrors.ErrorResponse(g, err, reqctx.Logger(g))
+		},
+	})
 }

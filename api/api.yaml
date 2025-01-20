@@ -1,0 +1,56 @@
+openapi: "3.0.0"
+info:
+  version: 1.0.0
+  title: Minimal ping API server
+paths:
+  /testapi:
+    get:
+      security:
+        - SignatureAuth:
+            - "user"
+      parameters:
+        - name: something
+          in: query
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: example response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExResponse'
+  /admin/testapi:
+    get:
+      security:
+        - SignatureAuth:
+            - "admin"
+      responses:
+        '200':
+          description: example response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExResponse'
+components:
+  schemas:
+    # base types
+    ExResponse:
+      type: object
+      required:
+        - xpubID
+        - something
+      properties:
+        xpubID:
+          type: string
+        something:
+            type: string
+  securitySchemes:
+    SignatureAuth:
+      type: http
+      scheme: headers
+security:
+  - SignatureAuth:
+      - admin
+      - user

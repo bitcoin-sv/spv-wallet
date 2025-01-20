@@ -31,6 +31,8 @@ require (
 	github.com/mrz1836/go-logger v0.3.5
 	github.com/mrz1836/go-sanitize v1.3.3
 	github.com/mrz1836/go-validate v0.2.1
+	github.com/oapi-codegen/oapi-codegen/v2 v2.4.1
+	github.com/oapi-codegen/runtime v1.1.1
 	github.com/pkg/errors v0.9.1
 	github.com/prometheus/client_golang v1.20.5
 	github.com/rafaeljusto/redigomock v2.4.0+incompatible
@@ -50,15 +52,24 @@ require (
 
 require (
 	filippo.io/edwards25519 v1.1.0 // indirect
+	github.com/apapsch/go-jsonmerge/v2 v2.0.0 // indirect
 	github.com/aws/aws-sdk-go v1.55.5 // indirect
 	github.com/bytedance/sonic/loader v0.2.1 // indirect
 	github.com/cloudwego/base64x v0.1.4 // indirect
 	github.com/cloudwego/iasm v0.2.0 // indirect
+	github.com/dprotaso/go-yit v0.0.0-20220510233725-9ba8df137936 // indirect
+	github.com/getkin/kin-openapi v0.127.0 // indirect
 	github.com/go-sql-driver/mysql v1.8.1 // indirect
+	github.com/invopop/yaml v0.3.1 // indirect
 	github.com/lib/pq v1.10.9 // indirect
+	github.com/mohae/deepcopy v0.0.0-20170929034955-c48cc78d4826 // indirect
 	github.com/munnerz/goautoneg v0.0.0-20191010083416-a7dc8b61c822 // indirect
 	github.com/newrelic/go-agent/v3 v3.34.0 // indirect
+	github.com/perimeterx/marshmallow v1.1.5 // indirect
+	github.com/speakeasy-api/openapi-overlay v0.9.0 // indirect
+	github.com/vmware-labs/yaml-jsonpath v0.3.2 // indirect
 	github.com/xi2/xz v0.0.0-20171230120015-48954b6210f8 // indirect
+	gopkg.in/yaml.v2 v2.4.0 // indirect
 	gorm.io/driver/mysql v1.5.7 // indirect
 )
 
