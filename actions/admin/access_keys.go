@@ -16,13 +16,14 @@ import (
 // accessKeysSearch will fetch a list of access keys filtered by metadata
 // Access Keys Search godoc
 // @Summary		Access Keys Search
-// @Description	Access Keys Search
+// @Description	Fetches a list of access keys filtered by metadata, creation range, and other parameters.
 // @Tags		Admin
 // @Produce		json
-// @Param		SearchAccessKeys body filter.AdminSearchAccessKeys false "Supports targeted resource searches with filters and metadata, plus options for pagination and sorting to streamline data exploration and analysis"
-// @Success		200 {object} []response.AccessKey "List of access keys"
-// @Failure		400	"Bad request - Error while parsing SearchAccessKeys from request body"
-// @Failure 	500	"Internal server error - Error while searching for access keys"
+// @Param		SwaggerCommonParams query swagger.CommonFilteringQueryParams false "Supports options for pagination and sorting to streamline data exploration and analysis"
+// @Param		AdminAccessKeyFilter query filter.AdminAccessKeyFilter false "Supports targeted resource searches with filters"
+// @Success		200 {object} response.PageModel[response.AccessKey] "List of access keys with pagination details"
+// @Failure		400 "Bad request - Invalid query parameters"
+// @Failure		500 "Internal server error - Error while searching for access keys"
 // @Router		/api/v1/admin/users/keys [get]
 // @Security	x-auth-xpub
 func accessKeysSearch(c *gin.Context, _ *reqctx.AdminContext) {

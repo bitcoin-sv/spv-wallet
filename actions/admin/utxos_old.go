@@ -23,6 +23,7 @@ import (
 // @Failure 	500	"Internal server error - Error while searching for utxos"
 // @Router		/v1/admin/utxos/search [post]
 // @Security	x-auth-xpub
+// @Deprecated
 func utxosSearchOld(c *gin.Context, _ *reqctx.AdminContext) {
 	logger := reqctx.Logger(c)
 	var reqParams filter.AdminSearchUtxos
@@ -64,6 +65,7 @@ func utxosSearchOld(c *gin.Context, _ *reqctx.AdminContext) {
 // @Failure 	500	"Internal Server Error - Error while fetching count of utxos"
 // @Router		/v1/admin/utxos/count [post]
 // @Security	x-auth-xpub
+// @Deprecated
 func utxosCount(c *gin.Context, _ *reqctx.AdminContext) {
 	logger := reqctx.Logger(c)
 	var reqParams filter.AdminCountUtxos

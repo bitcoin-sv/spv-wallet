@@ -19,13 +19,13 @@ import (
 // paymailGetAddress will return a paymail address
 // Get Paymail godoc
 // @Summary		Get paymail
-// @Description	Get paymail
+// @Description	Fetches a paymail address by its ID
 // @Tags		Admin
 // @Produce		json
-// @Param		PaymailAddress body PaymailAddress false "PaymailAddress model containing paymail address to get"
-// @Success		200	{object} response.PaymailAddress "PaymailAddress with given address"
-// @Failure		400	"Bad request - Error while parsing PaymailAddress from request body"
-// @Failure 	500	"Internal Server Error - Error while getting paymail address"
+// @Param		id path string true "Paymail ID"
+// @Success		200 {object} response.PaymailAddress "PaymailAddress with the given ID"
+// @Failure		400 "Bad request - Invalid ID"
+// @Failure		500 "Internal Server Error - Error while retrieving the paymail address"
 // @Router		/api/v1/admin/paymails/{id} [get]
 // @Security	x-auth-xpub
 func paymailGetAddress(c *gin.Context, _ *reqctx.AdminContext) {
@@ -49,13 +49,14 @@ func paymailGetAddress(c *gin.Context, _ *reqctx.AdminContext) {
 // paymailAddressesSearch will fetch a list of paymail addresses filtered by metadata
 // Paymail addresses search by metadata godoc
 // @Summary		Paymail addresses search
-// @Description	Paymail addresses search
+// @Description	Fetches a list of paymail addresses filtered by metadata and other query parameters
 // @Tags		Admin
 // @Produce		json
-// @Param		SearchPaymails body filter.AdminPaymailFilter false "Supports targeted resource searches with filters and metadata, plus options for pagination and sorting to streamline data exploration and analysis"
-// @Success		200 {object} []response.PaymailAddress "List of paymail addresses
-// @Failure		400	"Bad request - Error while parsing SearchPaymails from request body"
-// @Failure 	500	"Internal server error - Error while searching for paymail addresses"
+// @Param		SwaggerCommonParams query swagger.CommonFilteringQueryParams false "Supports options for pagination and sorting to streamline data exploration and analysis"
+// @Param		AdminPaymailFilter query filter.AdminPaymailFilter false "Supports targeted resource searches with filters"
+// @Success		200 {object} response.PageModel[response.PaymailAddress] "List of paymail addresses with pagination"
+// @Failure		400 "Bad request - Invalid query parameters"
+// @Failure		500 "Internal server error - Error while searching for paymail addresses"
 // @Router		/api/v1/admin/paymails [get]
 // @Security	x-auth-xpub
 func paymailAddressesSearch(c *gin.Context, _ *reqctx.AdminContext) {
@@ -160,7 +161,7 @@ func paymailCreateAddress(c *gin.Context, _ *reqctx.AdminContext) {
 // @Description	Delete paymail
 // @Tags		Admin
 // @Produce		json
-// @Param		PaymailAddress body PaymailAddress false "PaymailAddress model containing paymail address to delete"
+// @Param		id path string true "id of the paymail"
 // @Success		200
 // @Failure		400	"Bad request - Error while parsing PaymailAddress from request body or if address is missing"
 // @Failure 	500	"Internal Server Error - Error while deleting paymail address"
@@ -169,21 +170,12 @@ func paymailCreateAddress(c *gin.Context, _ *reqctx.AdminContext) {
 func paymailDeleteAddress(c *gin.Context, _ *reqctx.AdminContext) {
 	logger := reqctx.Logger(c)
 	engine := reqctx.Engine(c)
-	var requestBody PaymailAddress
-	if err := c.ShouldBindJSON(&requestBody); err != nil {
-		spverrors.ErrorResponse(c, spverrors.ErrCannotBindRequest.WithTrace(err), logger)
-		return
-	}
-
-	if requestBody.Address == "" {
-		spverrors.ErrorResponse(c, spverrors.ErrMissingAddress, logger)
-		return
-	}
+	id := c.Param("id")
 
 	opts := engine.DefaultModelOptions()
 
 	// Delete a new paymail address
-	err := engine.DeletePaymailAddress(c.Request.Context(), requestBody.Address, opts...)
+	err := engine.DeletePaymailAddressByID(c.Request.Context(), id, opts...)
 	if err != nil {
 		spverrors.ErrorResponse(c, spverrors.ErrDeletePaymailAddress.WithTrace(err), logger)
 		return

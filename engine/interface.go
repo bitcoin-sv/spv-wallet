@@ -132,6 +132,7 @@ type ModelService interface {
 // PaymailService is the paymail actions & services
 type PaymailService interface {
 	DeletePaymailAddress(ctx context.Context, address string, opts ...ModelOps) error
+	DeletePaymailAddressByID(ctx context.Context, id string, opts ...ModelOps) error
 	GetPaymailConfig() *PaymailServerOptions
 	GetPaymailAddress(ctx context.Context, address string, opts ...ModelOps) (*PaymailAddress, error)
 	GetPaymailAddressByID(ctx context.Context, id string, opts ...ModelOps) (*PaymailAddress, error)

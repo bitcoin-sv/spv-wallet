@@ -4,6 +4,7 @@ import (
 	"net/http"
 
 	"github.com/bitcoin-sv/spv-wallet/config"
+	"github.com/bitcoin-sv/spv-wallet/docs"
 	"github.com/bitcoin-sv/spv-wallet/server/handlers"
 	"github.com/gin-gonic/gin"
 	swaggerfiles "github.com/swaggo/files"
@@ -22,6 +23,7 @@ func RegisterRoutes(handlersManager *handlers.Manager) {
 	healthGroup.OPTIONS("", statusOK)
 	healthGroup.HEAD("", statusOK)
 
+	docs.SwaggerInfo.Version = handlersManager.APIVersion()
 	root.GET("/swagger", func(c *gin.Context) {
 		c.Redirect(http.StatusMovedPermanently, "/swagger/index.html")
 	})

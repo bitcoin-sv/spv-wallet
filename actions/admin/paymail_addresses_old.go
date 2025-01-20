@@ -27,6 +27,7 @@ import (
 // @Failure 	500	"Internal Server Error - Error while getting paymail address"
 // @Router		/v1/admin/paymail/get [post]
 // @Security	x-auth-xpub
+// @Deprecated
 func paymailGetAddressOld(c *gin.Context, _ *reqctx.AdminContext) {
 	logger := reqctx.Logger(c)
 	engine := reqctx.Engine(c)
@@ -68,6 +69,7 @@ func paymailGetAddressOld(c *gin.Context, _ *reqctx.AdminContext) {
 // @Failure 	500	"Internal server error - Error while searching for paymail addresses"
 // @Router		/v1/admin/paymails/search [post]
 // @Security	x-auth-xpub
+// @Deprecated
 func paymailAddressesSearchOld(c *gin.Context, _ *reqctx.AdminContext) {
 	logger := reqctx.Logger(c)
 	var reqParams filter.AdminSearchPaymails
@@ -108,6 +110,7 @@ func paymailAddressesSearchOld(c *gin.Context, _ *reqctx.AdminContext) {
 // @Failure 	500	"Internal Server Error - Error while fetching count of paymail addresses"
 // @Router		/v1/admin/paymails/count [post]
 // @Security	x-auth-xpub
+// @Deprecated
 func paymailAddressesCount(c *gin.Context, _ *reqctx.AdminContext) {
 	logger := reqctx.Logger(c)
 	var reqParams filter.AdminCountPaymails
@@ -142,6 +145,7 @@ func paymailAddressesCount(c *gin.Context, _ *reqctx.AdminContext) {
 // @Failure 	500	"Internal Server Error - Error while creating new paymail address"
 // @Router		/v1/admin/paymail/create [post]
 // @Security	x-auth-xpub
+// @Deprecated
 func paymailCreateAddressOld(c *gin.Context, _ *reqctx.AdminContext) {
 	logger := reqctx.Logger(c)
 	var requestBody CreatePaymail
@@ -200,6 +204,7 @@ func paymailCreateAddressOld(c *gin.Context, _ *reqctx.AdminContext) {
 // @Failure 	500	"Internal Server Error - Error while deleting paymail address"
 // @Router		/v1/admin/paymail/delete [delete]
 // @Security	x-auth-xpub
+// @Deprecated
 func paymailDeleteAddressOld(c *gin.Context, _ *reqctx.AdminContext) {
 	logger := reqctx.Logger(c)
 	engine := reqctx.Engine(c)

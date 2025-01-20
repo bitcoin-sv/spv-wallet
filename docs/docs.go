@@ -67,7 +67,7 @@ const docTemplate = `{
                         "x-auth-xpub": []
                     }
                 ],
-                "description": "Search for contacts",
+                "description": "Fetches a list of contacts filtered by metadata and other criteria",
                 "produces": [
                     "application/json"
                 ],
@@ -77,23 +77,122 @@ const docTemplate = `{
                 "summary": "Search for contacts",
                 "parameters": [
                     {
-                        "description": "Supports targeted resource searches with filters and metadata, plus options for pagination and sorting to streamline data exploration and analysis",
-                        "name": "AdminSearchContacts",
-                        "in": "body",
-                        "schema": {
-                            "$ref": "#/definitions/filter.AdminContactFilter"
-                        }
+                        "type": "string",
+                        "example": "2024-02-26T11:01:28Z",
+                        "name": "createdRange[from]",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "example": "2024-02-26T11:01:28Z",
+                        "name": "createdRange[to]",
+                        "in": "query"
+                    },
+                    {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        },
+                        "collectionFormat": "csv",
+                        "example": [
+                            "metadata[key]=value",
+                            "metadata[key2]=value2"
+                        ],
+                        "description": "Metadata is a list of key-value pairs that can be used to filter the results. !ATTENTION! Unfortunately this parameter won't work from swagger UI.",
+                        "name": "metadata",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "name": "page",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "name": "size",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "name": "sort",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "name": "sortBy",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "example": "2024-02-26T11:01:28Z",
+                        "name": "updatedRange[from]",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "example": "2024-02-26T11:01:28Z",
+                        "name": "updatedRange[to]",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "example": "Alice",
+                        "name": "fullName",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "example": "ffdbe74e-0700-4710-aac5-611a1f877c7f",
+                        "name": "id",
+                        "in": "query"
+                    },
+                    {
+                        "type": "boolean",
+                        "default": false,
+                        "example": true,
+                        "description": "IncludeDeleted is a flag whether or not to include deleted items in the search results",
+                        "name": "includeDeleted",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "example": "alice@example.com",
+                        "name": "paymail",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "example": "0334f01ecb971e93db179e6fb320cd1466beb0c1ec6c1c6a37aa6cb02e53d5dd1a",
+                        "name": "pubKey",
+                        "in": "query"
+                    },
+                    {
+                        "enum": [
+                            "unconfirmed",
+                            "awaiting",
+                            "confirmed",
+                            "rejected"
+                        ],
+                        "type": "string",
+                        "name": "status",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "example": "623bc25ce1c0fc510dea72b5ee27b2e70384c099f1f3dce9e73dd987198c3486",
+                        "name": "xpubId",
+                        "in": "query"
                     }
                 ],
                 "responses": {
                     "200": {
-                        "description": "List of contacts",
+                        "description": "List of contacts with pagination details",
                         "schema": {
                             "$ref": "#/definitions/response.PageModel-response_Contact"
                         }
                     },
                     "400": {
-                        "description": "Bad request - Error while parsing AdminSearchContacts from request body"
+                        "description": "Bad request - Invalid query parameters"
                     },
                     "500": {
                         "description": "Internal server error - Error while searching for contacts"
@@ -330,7 +429,7 @@ const docTemplate = `{
                         "x-auth-xpub": []
                     }
                 ],
-                "description": "Paymail addresses search",
+                "description": "Fetches a list of paymail addresses filtered by metadata and other query parameters",
                 "produces": [
                     "application/json"
                 ],
@@ -340,26 +439,111 @@ const docTemplate = `{
                 "summary": "Paymail addresses search",
                 "parameters": [
                     {
-                        "description": "Supports targeted resource searches with filters and metadata, plus options for pagination and sorting to streamline data exploration and analysis",
-                        "name": "SearchPaymails",
-                        "in": "body",
-                        "schema": {
-                            "$ref": "#/definitions/filter.AdminPaymailFilter"
-                        }
+                        "type": "string",
+                        "example": "2024-02-26T11:01:28Z",
+                        "name": "createdRange[from]",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "example": "2024-02-26T11:01:28Z",
+                        "name": "createdRange[to]",
+                        "in": "query"
+                    },
+                    {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        },
+                        "collectionFormat": "csv",
+                        "example": [
+                            "metadata[key]=value",
+                            "metadata[key2]=value2"
+                        ],
+                        "description": "Metadata is a list of key-value pairs that can be used to filter the results. !ATTENTION! Unfortunately this parameter won't work from swagger UI.",
+                        "name": "metadata",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "name": "page",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "name": "size",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "name": "sort",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "name": "sortBy",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "example": "2024-02-26T11:01:28Z",
+                        "name": "updatedRange[from]",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "example": "2024-02-26T11:01:28Z",
+                        "name": "updatedRange[to]",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "example": "alice",
+                        "name": "alias",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "example": "example.com",
+                        "name": "domain",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "example": "ffb86c103d17d87c15aaf080aab6be5415c9fa885309a79b04c9910e39f2b542",
+                        "name": "id",
+                        "in": "query"
+                    },
+                    {
+                        "type": "boolean",
+                        "default": false,
+                        "example": true,
+                        "description": "IncludeDeleted is a flag whether or not to include deleted items in the search results",
+                        "name": "includeDeleted",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "example": "Alice",
+                        "name": "publicName",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "example": "79f90a6bab0a44402fc64828af820e9465645658aea2d138c5205b88e6dabd00",
+                        "name": "xpubId",
+                        "in": "query"
                     }
                 ],
                 "responses": {
                     "200": {
-                        "description": "List of paymail addresses",
+                        "description": "List of paymail addresses with pagination",
                         "schema": {
-                            "type": "array",
-                            "items": {
-                                "$ref": "#/definitions/response.PaymailAddress"
-                            }
+                            "$ref": "#/definitions/response.PageModel-response_PaymailAddress"
                         }
                     },
                     "400": {
-                        "description": "Bad request - Error while parsing SearchPaymails from request body"
+                        "description": "Bad request - Invalid query parameters"
                     },
                     "500": {
                         "description": "Internal server error - Error while searching for paymail addresses"
@@ -413,7 +597,7 @@ const docTemplate = `{
                         "x-auth-xpub": []
                     }
                 ],
-                "description": "Get paymail",
+                "description": "Fetches a paymail address by its ID",
                 "produces": [
                     "application/json"
                 ],
@@ -423,26 +607,25 @@ const docTemplate = `{
                 "summary": "Get paymail",
                 "parameters": [
                     {
-                        "description": "PaymailAddress model containing paymail address to get",
-                        "name": "PaymailAddress",
-                        "in": "body",
-                        "schema": {
-                            "$ref": "#/definitions/admin.PaymailAddress"
-                        }
+                        "type": "string",
+                        "description": "Paymail ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
                     }
                 ],
                 "responses": {
                     "200": {
-                        "description": "PaymailAddress with given address",
+                        "description": "PaymailAddress with the given ID",
                         "schema": {
                             "$ref": "#/definitions/response.PaymailAddress"
                         }
                     },
                     "400": {
-                        "description": "Bad request - Error while parsing PaymailAddress from request body"
+                        "description": "Bad request - Invalid ID"
                     },
                     "500": {
-                        "description": "Internal Server Error - Error while getting paymail address"
+                        "description": "Internal Server Error - Error while retrieving the paymail address"
                     }
                 }
             },
@@ -462,12 +645,11 @@ const docTemplate = `{
                 "summary": "Delete paymail",
                 "parameters": [
                     {
-                        "description": "PaymailAddress model containing paymail address to delete",
-                        "name": "PaymailAddress",
-                        "in": "body",
-                        "schema": {
-                            "$ref": "#/definitions/admin.PaymailAddress"
-                        }
+                        "type": "string",
+                        "description": "id of the paymail",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
                     }
                 ],
                 "responses": {
@@ -543,7 +725,7 @@ const docTemplate = `{
                         "x-auth-xpub": []
                     }
                 ],
-                "description": "Search for transactions",
+                "description": "Fetches a list of transactions filtered by metadata and other criteria",
                 "produces": [
                     "application/json"
                 ],
@@ -554,35 +736,159 @@ const docTemplate = `{
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "Filter by metadata in the form of key-value pairs",
+                        "example": "2024-02-26T11:01:28Z",
+                        "name": "createdRange[from]",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "example": "2024-02-26T11:01:28Z",
+                        "name": "createdRange[to]",
+                        "in": "query"
+                    },
+                    {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        },
+                        "collectionFormat": "csv",
+                        "example": [
+                            "metadata[key]=value",
+                            "metadata[key2]=value2"
+                        ],
+                        "description": "Metadata is a list of key-value pairs that can be used to filter the results. !ATTENTION! Unfortunately this parameter won't work from swagger UI.",
                         "name": "metadata",
                         "in": "query"
                     },
                     {
-                        "type": "string",
-                        "description": "Additional conditions for filtering, in URL-encoded JSON",
-                        "name": "conditions",
+                        "type": "integer",
+                        "name": "page",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "name": "size",
                         "in": "query"
                     },
                     {
                         "type": "string",
-                        "description": "Pagination and sorting options",
-                        "name": "queryParams",
+                        "name": "sort",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "name": "sortBy",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "example": "2024-02-26T11:01:28Z",
+                        "name": "updatedRange[from]",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "example": "2024-02-26T11:01:28Z",
+                        "name": "updatedRange[to]",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "example": "0000000000000000031928c28075a82d7a00c2c90b489d1d66dc0afa3f8d26f8",
+                        "name": "blockHash",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "example": 839376,
+                        "name": "blockHeight",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "example": "d425432e0d10a46af1ec6d00f380e9581ebf7907f3486572b3cd561a4c326e14",
+                        "name": "draftId",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "example": 1,
+                        "name": "fee",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "name": "hex",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "example": "d425432e0d10a46af1ec6d00f380e9581ebf7907f3486572b3cd561a4c326e14",
+                        "name": "id",
+                        "in": "query"
+                    },
+                    {
+                        "type": "boolean",
+                        "default": false,
+                        "example": true,
+                        "description": "IncludeDeleted is a flag whether or not to include deleted items in the search results",
+                        "name": "includeDeleted",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "example": 1,
+                        "name": "numberOfInputs",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "example": 2,
+                        "name": "numberOfOutputs",
+                        "in": "query"
+                    },
+                    {
+                        "enum": [
+                            "UNKNOWN",
+                            "QUEUED",
+                            "RECEIVED",
+                            "STORED",
+                            "ANNOUNCED_TO_NETWORK",
+                            "REQUESTED_BY_NETWORK",
+                            "SENT_TO_NETWORK",
+                            "ACCEPTED_BY_NETWORK",
+                            "SEEN_ON_NETWORK",
+                            "MINED",
+                            "SEEN_IN_ORPHAN_MEMPOOL",
+                            "CONFIRMED",
+                            "REJECTED"
+                        ],
+                        "type": "string",
+                        "name": "status",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "example": 100000000,
+                        "name": "totalValue",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "example": "623bc25ce1c0fc510dea72b5ee27b2e70384c099f1f3dce9e73dd987198c3486",
+                        "name": "xpubId",
                         "in": "query"
                     }
                 ],
                 "responses": {
                     "200": {
-                        "description": "List of transactions",
+                        "description": "List of transactions with pagination details",
                         "schema": {
-                            "type": "array",
-                            "items": {
-                                "$ref": "#/definitions/response.Transaction"
-                            }
+                            "$ref": "#/definitions/response.PageModel-response_Transaction"
                         }
                     },
                     "400": {
-                        "description": "Bad request - Error while parsing query parameters"
+                        "description": "Bad request - Invalid query parameters"
                     },
                     "500": {
                         "description": "Internal server error - Error while searching for transactions"
@@ -637,7 +943,7 @@ const docTemplate = `{
                         "x-auth-xpub": []
                     }
                 ],
-                "description": "Search for xpubs",
+                "description": "Fetches a list of xpubs filtered by metadata and other criteria",
                 "produces": [
                     "application/json"
                 ],
@@ -647,29 +953,96 @@ const docTemplate = `{
                 "summary": "Search for xpubs",
                 "parameters": [
                     {
-                        "description": "Supports targeted resource searches with filters and metadata, plus options for pagination and sorting to streamline data exploration and analysis",
-                        "name": "SearchXpubs",
-                        "in": "body",
-                        "schema": {
-                            "$ref": "#/definitions/filter.XpubFilter"
-                        }
+                        "type": "string",
+                        "example": "2024-02-26T11:01:28Z",
+                        "name": "createdRange[from]",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "example": "2024-02-26T11:01:28Z",
+                        "name": "createdRange[to]",
+                        "in": "query"
+                    },
+                    {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        },
+                        "collectionFormat": "csv",
+                        "example": [
+                            "metadata[key]=value",
+                            "metadata[key2]=value2"
+                        ],
+                        "description": "Metadata is a list of key-value pairs that can be used to filter the results. !ATTENTION! Unfortunately this parameter won't work from swagger UI.",
+                        "name": "metadata",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "name": "page",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "name": "size",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "name": "sort",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "name": "sortBy",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "example": "2024-02-26T11:01:28Z",
+                        "name": "updatedRange[from]",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "example": "2024-02-26T11:01:28Z",
+                        "name": "updatedRange[to]",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "example": 1000,
+                        "name": "currentBalance",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "example": "00b953624f78004a4c727cd28557475d5233c15f17aef545106639f4d71b712d",
+                        "name": "id",
+                        "in": "query"
+                    },
+                    {
+                        "type": "boolean",
+                        "default": false,
+                        "example": true,
+                        "description": "IncludeDeleted is a flag whether or not to include deleted items in the search results",
+                        "name": "includeDeleted",
+                        "in": "query"
                     }
                 ],
                 "responses": {
                     "200": {
-                        "description": "List of xpubs",
+                        "description": "List of xPubs with pagination details",
                         "schema": {
-                            "type": "array",
-                            "items": {
-                                "$ref": "#/definitions/response.Xpub"
-                            }
+                            "$ref": "#/definitions/response.PageModel-response_Xpub"
                         }
                     },
                     "400": {
-                        "description": "Bad request - Error while parsing SearchXpubs from request body"
+                        "description": "Bad request - Invalid query parameters"
                     },
                     "500": {
-                        "description": "Internal server error - Error while searching for xpubs"
+                        "description": "Internal server error - Error while searching for xPubs"
                     }
                 }
             },
@@ -721,7 +1094,7 @@ const docTemplate = `{
                         "x-auth-xpub": []
                     }
                 ],
-                "description": "Access Keys Search",
+                "description": "Fetches a list of access keys filtered by metadata, creation range, and other parameters.",
                 "produces": [
                     "application/json"
                 ],
@@ -731,26 +1104,86 @@ const docTemplate = `{
                 "summary": "Access Keys Search",
                 "parameters": [
                     {
-                        "description": "Supports targeted resource searches with filters and metadata, plus options for pagination and sorting to streamline data exploration and analysis",
-                        "name": "SearchAccessKeys",
-                        "in": "body",
-                        "schema": {
-                            "$ref": "#/definitions/filter.AdminSearchAccessKeys"
-                        }
+                        "type": "string",
+                        "example": "2024-02-26T11:01:28Z",
+                        "name": "createdRange[from]",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "example": "2024-02-26T11:01:28Z",
+                        "name": "createdRange[to]",
+                        "in": "query"
+                    },
+                    {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        },
+                        "collectionFormat": "csv",
+                        "example": [
+                            "metadata[key]=value",
+                            "metadata[key2]=value2"
+                        ],
+                        "description": "Metadata is a list of key-value pairs that can be used to filter the results. !ATTENTION! Unfortunately this parameter won't work from swagger UI.",
+                        "name": "metadata",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "name": "page",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "name": "size",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "name": "sort",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "name": "sortBy",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "example": "2024-02-26T11:01:28Z",
+                        "name": "updatedRange[from]",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "example": "2024-02-26T11:01:28Z",
+                        "name": "updatedRange[to]",
+                        "in": "query"
+                    },
+                    {
+                        "type": "boolean",
+                        "default": false,
+                        "example": true,
+                        "description": "IncludeDeleted is a flag whether or not to include deleted items in the search results",
+                        "name": "includeDeleted",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "name": "xpubId",
+                        "in": "query"
                     }
                 ],
                 "responses": {
                     "200": {
-                        "description": "List of access keys",
+                        "description": "List of access keys with pagination details",
                         "schema": {
-                            "type": "array",
-                            "items": {
-                                "$ref": "#/definitions/response.AccessKey"
-                            }
+                            "$ref": "#/definitions/response.PageModel-response_AccessKey"
                         }
                     },
                     "400": {
-                        "description": "Bad request - Error while parsing SearchAccessKeys from request body"
+                        "description": "Bad request - Invalid query parameters"
                     },
                     "500": {
                         "description": "Internal server error - Error while searching for access keys"
@@ -765,7 +1198,7 @@ const docTemplate = `{
                         "x-auth-xpub": []
                     }
                 ],
-                "description": "Search for utxos",
+                "description": "Fetches a list of UTXOs filtered by metadata and other criteria",
                 "produces": [
                     "application/json"
                 ],
@@ -775,29 +1208,147 @@ const docTemplate = `{
                 "summary": "Search for utxos",
                 "parameters": [
                     {
-                        "description": "Supports targeted resource searches with filters and metadata, plus options for pagination and sorting to streamline data exploration and analysis",
-                        "name": "SearchUtxos",
-                        "in": "body",
-                        "schema": {
-                            "$ref": "#/definitions/filter.AdminUtxoFilter"
-                        }
+                        "type": "string",
+                        "example": "2024-02-26T11:01:28Z",
+                        "name": "createdRange[from]",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "example": "2024-02-26T11:01:28Z",
+                        "name": "createdRange[to]",
+                        "in": "query"
+                    },
+                    {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        },
+                        "collectionFormat": "csv",
+                        "example": [
+                            "metadata[key]=value",
+                            "metadata[key2]=value2"
+                        ],
+                        "description": "Metadata is a list of key-value pairs that can be used to filter the results. !ATTENTION! Unfortunately this parameter won't work from swagger UI.",
+                        "name": "metadata",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "name": "page",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "name": "size",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "name": "sort",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "name": "sortBy",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "example": "2024-02-26T11:01:28Z",
+                        "name": "updatedRange[from]",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "example": "2024-02-26T11:01:28Z",
+                        "name": "updatedRange[to]",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "example": "89419d4c7c50810bfe5ff9df9ad5074b749959423782dc91a30f1058b9ad7ef7",
+                        "name": "draftId",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "example": "fe4cbfee0258aa589cbc79963f7c204061fd67d987e32ee5049aa90ce14658ee",
+                        "name": "id",
+                        "in": "query"
+                    },
+                    {
+                        "type": "boolean",
+                        "default": false,
+                        "example": true,
+                        "description": "IncludeDeleted is a flag whether or not to include deleted items in the search results",
+                        "name": "includeDeleted",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "example": 0,
+                        "name": "outputIndex",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "example": 1,
+                        "name": "satoshis",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "example": "76a914a5f271385e75f57bcd9092592dede812f8c466d088ac",
+                        "name": "scriptPubKey",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "example": "11a7746489a70e9c0170601c2be65558455317a984194eb2791b637f59f8cd6e",
+                        "name": "spendingTxId",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "example": "5e17858ea0ca4155827754ba82bdcfcce108d5bb5b47fbb3aa54bd14540683c6",
+                        "name": "transactionId",
+                        "in": "query"
+                    },
+                    {
+                        "enum": [
+                            "pubkey",
+                            "pubkeyhash",
+                            "nulldata",
+                            "multisig",
+                            "nonstandard",
+                            "scripthash",
+                            "metanet",
+                            "token_stas",
+                            "token_sensible"
+                        ],
+                        "type": "string",
+                        "name": "type",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "name": "xpubId",
+                        "in": "query"
                     }
                 ],
                 "responses": {
                     "200": {
-                        "description": "List of utxos",
+                        "description": "List of UTXOs with pagination details",
                         "schema": {
-                            "type": "array",
-                            "items": {
-                                "$ref": "#/definitions/response.Utxo"
-                            }
+                            "$ref": "#/definitions/response.PageModel-response_Utxo"
                         }
                     },
                     "400": {
-                        "description": "Bad request - Error while parsing SearchUtxos from request body"
+                        "description": "Bad request - Invalid query parameters"
                     },
                     "500": {
-                        "description": "Internal server error - Error while searching for utxos"
+                        "description": "Internal server error - Error while searching for UTXOs"
                     }
                 }
             }
@@ -2456,6 +3007,7 @@ const docTemplate = `{
                     "Admin"
                 ],
                 "summary": "Access Keys Count",
+                "deprecated": true,
                 "parameters": [
                     {
                         "description": "Enables filtering of elements to be counted",
@@ -2497,6 +3049,7 @@ const docTemplate = `{
                     "Admin"
                 ],
                 "summary": "Access Keys Search",
+                "deprecated": true,
                 "parameters": [
                     {
                         "description": "Supports targeted resource searches with filters and metadata, plus options for pagination and sorting to streamline data exploration and analysis",
@@ -2541,6 +3094,7 @@ const docTemplate = `{
                     "Admin"
                 ],
                 "summary": "Accept contact",
+                "deprecated": true,
                 "parameters": [
                     {
                         "type": "string",
@@ -2586,6 +3140,7 @@ const docTemplate = `{
                     "Admin"
                 ],
                 "summary": "Reject contact",
+                "deprecated": true,
                 "parameters": [
                     {
                         "type": "string",
@@ -2631,6 +3186,7 @@ const docTemplate = `{
                     "Admin"
                 ],
                 "summary": "Search for contacts",
+                "deprecated": true,
                 "parameters": [
                     {
                         "description": "Supports targeted resource searches with filters and metadata, plus options for pagination and sorting to streamline data exploration and analysis",
@@ -2672,6 +3228,7 @@ const docTemplate = `{
                     "Admin"
                 ],
                 "summary": "Delete contact",
+                "deprecated": true,
                 "parameters": [
                     {
                         "type": "string",
@@ -2712,6 +3269,7 @@ const docTemplate = `{
                     "Admin"
                 ],
                 "summary": "Update contact FullName or Metadata",
+                "deprecated": true,
                 "parameters": [
                     {
                         "type": "string",
@@ -2852,6 +3410,7 @@ const docTemplate = `{
                     "Admin"
                 ],
                 "summary": "Search for destinations",
+                "deprecated": true,
                 "parameters": [
                     {
                         "description": "Supports targeted resource searches with filters and metadata, plus options for pagination and sorting to streamline data exploration and analysis",
@@ -2896,6 +3455,7 @@ const docTemplate = `{
                     "Admin"
                 ],
                 "summary": "Create paymail",
+                "deprecated": true,
                 "parameters": [
                     {
                         "description": " ",
@@ -2937,6 +3497,7 @@ const docTemplate = `{
                     "Admin"
                 ],
                 "summary": "Delete paymail",
+                "deprecated": true,
                 "parameters": [
                     {
                         "description": "PaymailAddress model containing paymail address to delete",
@@ -2975,6 +3536,7 @@ const docTemplate = `{
                     "Admin"
                 ],
                 "summary": "Get paymail",
+                "deprecated": true,
                 "parameters": [
                     {
                         "description": "PaymailAddress model containing paymail address to get",
@@ -3016,6 +3578,7 @@ const docTemplate = `{
                     "Admin"
                 ],
                 "summary": "Paymail addresses count",
+                "deprecated": true,
                 "parameters": [
                     {
                         "description": "Enables filtering of elements to be counted",
@@ -3057,6 +3620,7 @@ const docTemplate = `{
                     "Admin"
                 ],
                 "summary": "Paymail addresses search",
+                "deprecated": true,
                 "parameters": [
                     {
                         "description": "Supports targeted resource searches with filters and metadata, plus options for pagination and sorting to streamline data exploration and analysis",
@@ -3156,6 +3720,7 @@ const docTemplate = `{
                     "Admin"
                 ],
                 "summary": "Search for transactions",
+                "deprecated": true,
                 "parameters": [
                     {
                         "type": "string",
@@ -3253,6 +3818,7 @@ const docTemplate = `{
                     "Admin"
                 ],
                 "summary": "Count transactions",
+                "deprecated": true,
                 "parameters": [
                     {
                         "description": "Enables filtering of elements to be counted",
@@ -3294,6 +3860,7 @@ const docTemplate = `{
                     "Admin"
                 ],
                 "summary": "Record transactions",
+                "deprecated": true,
                 "parameters": [
                     {
                         "description": "RecordTransaction model containing hex of the transaction to record",
@@ -3336,6 +3903,7 @@ const docTemplate = `{
                     "Admin"
                 ],
                 "summary": "Search for transactions",
+                "deprecated": true,
                 "parameters": [
                     {
                         "description": "Supports targeted resource searches with filters and metadata, plus options for pagination and sorting to streamline data exploration and analysis",
@@ -3380,6 +3948,7 @@ const docTemplate = `{
                     "Admin"
                 ],
                 "summary": "Count utxos",
+                "deprecated": true,
                 "parameters": [
                     {
                         "description": "Enables filtering of elements to be counted",
@@ -3421,6 +3990,7 @@ const docTemplate = `{
                     "Admin"
                 ],
                 "summary": "Search for utxos",
+                "deprecated": true,
                 "parameters": [
                     {
                         "description": "Supports targeted resource searches with filters and metadata, plus options for pagination and sorting to streamline data exploration and analysis",
@@ -3465,6 +4035,7 @@ const docTemplate = `{
                     "Admin"
                 ],
                 "summary": "Get All Webhooks",
+                "deprecated": true,
                 "responses": {
                     "200": {
                         "description": "List of webhooks",
@@ -3494,6 +4065,7 @@ const docTemplate = `{
                     "Admin"
                 ],
                 "summary": "Subscribe to a webhook",
+                "deprecated": true,
                 "parameters": [
                     {
                         "description": "URL to subscribe to and optional token header and value",
@@ -3530,6 +4102,7 @@ const docTemplate = `{
                     "Admin"
                 ],
                 "summary": "Unsubscribe to a webhook",
+                "deprecated": true,
                 "parameters": [
                     {
                         "description": "URL to unsubscribe from",
@@ -3568,6 +4141,7 @@ const docTemplate = `{
                     "Admin"
                 ],
                 "summary": "Create xPub",
+                "deprecated": true,
                 "parameters": [
                     {
                         "description": " ",
@@ -3610,6 +4184,7 @@ const docTemplate = `{
                     "Admin"
                 ],
                 "summary": "Count xpubs",
+                "deprecated": true,
                 "parameters": [
                     {
                         "description": "Enables filtering of elements to be counted",
@@ -3651,6 +4226,7 @@ const docTemplate = `{
                     "Admin"
                 ],
                 "summary": "Search for xpubs",
+                "deprecated": true,
                 "parameters": [
                     {
                         "description": "Supports targeted resource searches with filters and metadata, plus options for pagination and sorting to streamline data exploration and analysis",
@@ -4676,7 +5252,7 @@ const docTemplate = `{
                         "key2": "value2"
                     }
                 },
-                "public_name": {
+                "publicName": {
                     "description": "The public name of the paymail",
                     "type": "string",
                     "example": "Test"
@@ -7538,6 +8114,26 @@ const docTemplate = `{
                 }
             }
         },
+        "response.PageModel-response_PaymailAddress": {
+            "type": "object",
+            "properties": {
+                "content": {
+                    "description": "Content is the collection of elements that serves as the content",
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/response.PaymailAddress"
+                    }
+                },
+                "page": {
+                    "description": "Page is the page descriptor",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/response.PageDescription"
+                        }
+                    ]
+                }
+            }
+        },
         "response.PageModel-response_Transaction": {
             "type": "object",
             "properties": {
@@ -7566,6 +8162,26 @@ const docTemplate = `{
                     "type": "array",
                     "items": {
                         "$ref": "#/definitions/response.Utxo"
+                    }
+                },
+                "page": {
+                    "description": "Page is the page descriptor",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/response.PageDescription"
+                        }
+                    ]
+                }
+            }
+        },
+        "response.PageModel-response_Xpub": {
+            "type": "object",
+            "properties": {
+                "content": {
+                    "description": "Content is the collection of elements that serves as the content",
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/response.Xpub"
                     }
                 },
                 "page": {
