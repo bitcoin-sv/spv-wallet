@@ -9,7 +9,7 @@ func Models() []any {
 		User{},
 		Paymail{},
 		Address{},
-		UsersUTXO{},
+		UserUTXO{},
 		Operation{},
 	}
 }

@@ -26,7 +26,7 @@ type UserUtxoFixture interface {
 	// WithSatoshis sets the satoshis value of the UTXO.
 	WithSatoshis(satoshis bsv.Satoshis) UserUtxoFixture
 
-	Storable[database.UsersUTXO]
+	Storable[database.UserUTXO]
 }
 
 type Storable[Data any] interface {

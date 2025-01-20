@@ -50,7 +50,7 @@ func (u *Users) GetBalance(ctx context.Context, userID string, bucket string) (b
 	var balance bsv.Satoshis
 	err := u.db.
 		WithContext(ctx).
-		Model(&database.UsersUTXO{}).
+		Model(&database.UserUTXO{}).
 		Where("user_id = ? AND bucket = ?", userID, bucket).
 		Select("COALESCE(SUM(satoshis), 0)").
 		Row().

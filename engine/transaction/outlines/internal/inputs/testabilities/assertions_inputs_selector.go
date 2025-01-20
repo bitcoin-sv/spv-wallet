@@ -13,12 +13,12 @@ type InputsSelectorAssertions interface {
 }
 
 type SuccessfullySelectedInputsAssertions interface {
-	SelectedInputs(inputs []*database.UsersUTXO) SelectedInputsAssertions
+	SelectedInputs(inputs []*database.UserUTXO) SelectedInputsAssertions
 }
 
 type SelectedInputsAssertions interface {
 	AreEmpty()
-	ComparingTo(inputs []*database.UsersUTXO) ComparingSelectedInputsAssertions
+	ComparingTo(inputs []*database.UserUTXO) ComparingSelectedInputsAssertions
 }
 
 type ComparingSelectedInputsAssertions interface {
@@ -29,8 +29,8 @@ type assertion struct {
 	t               testing.TB
 	require         *require.Assertions
 	assert          *assert.Assertions
-	actual          []*database.UsersUTXO
-	comparingSource []*database.UsersUTXO
+	actual          []*database.UserUTXO
+	comparingSource []*database.UserUTXO
 }
 
 func newAssertions(t testing.TB) InputsSelectorAssertions {
@@ -47,7 +47,7 @@ func (a assertion) WithoutError(err error) SuccessfullySelectedInputsAssertions 
 	return a
 }
 
-func (a assertion) SelectedInputs(inputs []*database.UsersUTXO) SelectedInputsAssertions {
+func (a assertion) SelectedInputs(inputs []*database.UserUTXO) SelectedInputsAssertions {
 	a.t.Helper()
 	a.actual = inputs
 	return a
@@ -58,7 +58,7 @@ func (a assertion) AreEmpty() {
 	a.require.Empty(a.actual)
 }
 
-func (a assertion) ComparingTo(inputs []*database.UsersUTXO) ComparingSelectedInputsAssertions {
+func (a assertion) ComparingTo(inputs []*database.UserUTXO) ComparingSelectedInputsAssertions {
 	a.t.Helper()
 	a.comparingSource = inputs
 	return a

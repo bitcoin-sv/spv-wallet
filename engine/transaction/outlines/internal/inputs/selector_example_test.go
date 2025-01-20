@@ -19,13 +19,13 @@ func ExampleSelector_buildQueryForInputs_sqlite() {
 
 	query := db.ToSQL(func(db *gorm.DB) *gorm.DB {
 		query := selector.buildQueryForInputs(db, "someuserid", 1, 10)
-		query.Find(&database.UsersUTXO{})
+		query.Find(&database.UserUTXO{})
 		return query
 	})
 
 	fmt.Println(query)
 
-	// Output: SELECT * FROM `xapi_users_utxos` WHERE (tx_id, vout) in (SELECT tx_id,vout FROM (SELECT tx_id,vout,change,min(case when change >= 0 then change end) over () as min_change FROM (SELECT tx_id,vout,case when remaining_value - fee_no_change_output <= 0 then remaining_value - fee_no_change_output else remaining_value - fee_with_change_output end as change FROM (SELECT `tx_id`,`vout`,sum(satoshis) over (order by touched_at ASC, created_at ASC, tx_id ASC, vout ASC) - 1 as remaining_value,ceil((sum(estimated_input_size) over (order by touched_at ASC, created_at ASC, tx_id ASC, vout ASC) + 10) / cast(1000 as float)) * 1 as fee_no_change_output,ceil((sum(estimated_input_size) over (order by touched_at ASC, created_at ASC, tx_id ASC, vout ASC) + 10 + 34) / cast(1000 as float)) * 1 as fee_with_change_output FROM `xapi_users_utxos` WHERE user_id = "someuserid") as utxo) as utxoWithChange) as utxoWithMinChange WHERE change <= min_change)
+	// Output: SELECT * FROM `xapi_user_utxos` WHERE (tx_id, vout) in (SELECT tx_id,vout FROM (SELECT tx_id,vout,change,min(case when change >= 0 then change end) over () as min_change FROM (SELECT tx_id,vout,case when remaining_value - fee_no_change_output <= 0 then remaining_value - fee_no_change_output else remaining_value - fee_with_change_output end as change FROM (SELECT `tx_id`,`vout`,sum(satoshis) over (order by touched_at ASC, created_at ASC, tx_id ASC, vout ASC) - 1 as remaining_value,ceil((sum(estimated_input_size) over (order by touched_at ASC, created_at ASC, tx_id ASC, vout ASC) + 10) / cast(1000 as float)) * 1 as fee_no_change_output,ceil((sum(estimated_input_size) over (order by touched_at ASC, created_at ASC, tx_id ASC, vout ASC) + 10 + 34) / cast(1000 as float)) * 1 as fee_with_change_output FROM `xapi_user_utxos` WHERE user_id = "someuserid") as utxo) as utxoWithChange) as utxoWithMinChange WHERE change <= min_change)
 }
 
 // ExampleSelector_buildQueryForInputs_postgresql demonstrates what would be the query used to select inputs for a transaction.
@@ -37,13 +37,13 @@ func ExampleSelector_buildQueryForInputs_postgresql() {
 
 	query := db.ToSQL(func(db *gorm.DB) *gorm.DB {
 		query := selector.buildQueryForInputs(db, "someuserid", 1, 10)
-		query.Find(&database.UsersUTXO{})
+		query.Find(&database.UserUTXO{})
 		return query
 	})
 
 	fmt.Println(query)
 
-	// Output: SELECT * FROM "xapi_users_utxos" WHERE (tx_id, vout) in (SELECT tx_id,vout FROM (SELECT tx_id,vout,change,min(case when change >= 0 then change end) over () as min_change FROM (SELECT tx_id,vout,case when remaining_value - fee_no_change_output <= 0 then remaining_value - fee_no_change_output else remaining_value - fee_with_change_output end as change FROM (SELECT "tx_id","vout",sum(satoshis) over (order by touched_at ASC, created_at ASC, tx_id ASC, vout ASC) - 1 as remaining_value,ceil((sum(estimated_input_size) over (order by touched_at ASC, created_at ASC, tx_id ASC, vout ASC) + 10) / cast(1000 as float)) * 1 as fee_no_change_output,ceil((sum(estimated_input_size) over (order by touched_at ASC, created_at ASC, tx_id ASC, vout ASC) + 10 + 34) / cast(1000 as float)) * 1 as fee_with_change_output FROM "xapi_users_utxos" WHERE user_id = 'someuserid') as utxo) as utxoWithChange) as utxoWithMinChange WHERE change <= min_change)
+	// Output: SELECT * FROM "xapi_user_utxos" WHERE (tx_id, vout) in (SELECT tx_id,vout FROM (SELECT tx_id,vout,change,min(case when change >= 0 then change end) over () as min_change FROM (SELECT tx_id,vout,case when remaining_value - fee_no_change_output <= 0 then remaining_value - fee_no_change_output else remaining_value - fee_with_change_output end as change FROM (SELECT "tx_id","vout",sum(satoshis) over (order by touched_at ASC, created_at ASC, tx_id ASC, vout ASC) - 1 as remaining_value,ceil((sum(estimated_input_size) over (order by touched_at ASC, created_at ASC, tx_id ASC, vout ASC) + 10) / cast(1000 as float)) * 1 as fee_no_change_output,ceil((sum(estimated_input_size) over (order by touched_at ASC, created_at ASC, tx_id ASC, vout ASC) + 10 + 34) / cast(1000 as float)) * 1 as fee_with_change_output FROM "xapi_user_utxos" WHERE user_id = 'someuserid') as utxo) as utxoWithChange) as utxoWithMinChange WHERE change <= min_change)
 }
 
 // ExampleSelector_buildUpdateTouchedAtQuery_sqlite demonstrates what would be the SQL statement used to update inputs after selecting them.
@@ -52,7 +52,7 @@ func ExampleSelector_buildUpdateTouchedAtQuery_sqlite() {
 
 	selector := givenInputsSelector(db)
 
-	utxos := []*database.UsersUTXO{
+	utxos := []*database.UserUTXO{
 		{UserID: "id_of_user_1", TxID: "tx_id_1", Vout: 0, Satoshis: 10, EstimatedInputSize: 148, Bucket: "bsv", CreatedAt: time.Now(), TouchedAt: time.Now()},
 		{UserID: "id_of_user_1", TxID: "tx_id_1", Vout: 1, Satoshis: 10, EstimatedInputSize: 148, Bucket: "bsv", CreatedAt: time.Now(), TouchedAt: time.Now()},
 		{UserID: "id_of_user_1", TxID: "tx_id_2", Vout: 0, Satoshis: 10, EstimatedInputSize: 148, Bucket: "bsv", CreatedAt: time.Now(), TouchedAt: time.Now()},
@@ -66,7 +66,7 @@ func ExampleSelector_buildUpdateTouchedAtQuery_sqlite() {
 
 	fmt.Println(query)
 
-	// Output: UPDATE `xapi_users_utxos` SET `touched_at`="2006-02-01 15:04:05" WHERE (tx_id, vout) in (("tx_id_1",0),("tx_id_1",1),("tx_id_2",0))
+	// Output: UPDATE `xapi_user_utxos` SET `touched_at`="2006-02-01 15:04:05" WHERE (tx_id, vout) in (("tx_id_1",0),("tx_id_1",1),("tx_id_2",0))
 }
 
 // ExampleSelector_buildUpdateTouchedAtQuery_postgres demonstrates what would be the SQL statement used to update inputs after selecting them.
@@ -75,7 +75,7 @@ func ExampleSelector_buildUpdateTouchedAtQuery_postgres() {
 
 	selector := givenInputsSelector(db)
 
-	utxos := []*database.UsersUTXO{
+	utxos := []*database.UserUTXO{
 		{UserID: "id_of_user_1", TxID: "tx_id_1", Vout: 0, Satoshis: 10, EstimatedInputSize: 148, Bucket: "bsv", CreatedAt: time.Now(), TouchedAt: time.Now()},
 		{UserID: "id_of_user_1", TxID: "tx_id_1", Vout: 1, Satoshis: 10, EstimatedInputSize: 148, Bucket: "bsv", CreatedAt: time.Now(), TouchedAt: time.Now()},
 		{UserID: "id_of_user_1", TxID: "tx_id_2", Vout: 0, Satoshis: 10, EstimatedInputSize: 148, Bucket: "bsv", CreatedAt: time.Now(), TouchedAt: time.Now()},
@@ -89,7 +89,7 @@ func ExampleSelector_buildUpdateTouchedAtQuery_postgres() {
 
 	fmt.Println(query)
 
-	// Output: UPDATE "xapi_users_utxos" SET "touched_at"='2006-02-01 15:04:05' WHERE (tx_id, vout) in (('tx_id_1',0),('tx_id_1',1),('tx_id_2',0))
+	// Output: UPDATE "xapi_user_utxos" SET "touched_at"='2006-02-01 15:04:05' WHERE (tx_id, vout) in (('tx_id_1',0),('tx_id_1',1),('tx_id_2',0))
 }
 
 func givenInputsSelector(db *gorm.DB) *sqlInputsSelector {

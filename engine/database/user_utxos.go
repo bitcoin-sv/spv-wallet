@@ -14,8 +14,8 @@ import (
 // + 4 bytes nSequence
 const EstimatedInputSizeForP2PKH = 148
 
-// UsersUTXO is a table holding user's Unspent Transaction Outputs (UTXOs).
-type UsersUTXO struct {
+// UserUTXO is a table holding user's Unspent Transaction Outputs (UTXOs).
+type UserUTXO struct {
 	UserID   string `gorm:"primaryKey;uniqueIndex:idx_window,sort:asc,priority:1"`
 	TxID     string `gorm:"primaryKey;uniqueIndex:idx_window,sort:asc,priority:4"`
 	Vout     uint32 `gorm:"primaryKey;uniqueIndex:idx_window,sort:asc,priority:5"`
@@ -30,9 +30,9 @@ type UsersUTXO struct {
 	CustomInstructions datatypes.JSONSlice[CustomInstruction]
 }
 
-// NewP2PKHUserUTXO creates a new UsersUTXO instance for a P2PKH output based on the given output and custom instructions.
-func NewP2PKHUserUTXO(output *TrackedOutput, customInstructions datatypes.JSONSlice[CustomInstruction]) *UsersUTXO {
-	return &UsersUTXO{
+// NewP2PKHUserUTXO creates a new UserUTXO instance for a P2PKH output based on the given output and custom instructions.
+func NewP2PKHUserUTXO(output *TrackedOutput, customInstructions datatypes.JSONSlice[CustomInstruction]) *UserUTXO {
+	return &UserUTXO{
 		UserID:             output.UserID,
 		TxID:               output.TxID,
 		Vout:               output.Vout,

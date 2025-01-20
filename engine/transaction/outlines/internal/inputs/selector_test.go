@@ -86,7 +86,7 @@ func TestInputsSelector(t *testing.T) {
 			defer cleanup()
 
 			// and: having some utxo in database
-			ownedInputs := []*database.UsersUTXO{
+			ownedInputs := []*database.UserUTXO{
 				given.DB().HasUTXO().OwnedBySender().P2PKH().WithSatoshis(10).Stored(),
 				given.DB().HasUTXO().OwnedBySender().P2PKH().WithSatoshis(10).Stored(),
 				given.DB().HasUTXO().OwnedBySender().P2PKH().WithSatoshis(10).Stored(),
@@ -132,7 +132,7 @@ func TestInputsSelector(t *testing.T) {
 			defer cleanup()
 
 			// and: having some utxo in database
-			ownedInputs := []*database.UsersUTXO{
+			ownedInputs := []*database.UserUTXO{
 				given.DB().HasUTXO().OwnedBySender().P2PKH().WithSatoshis(10).Stored(),
 				given.DB().HasUTXO().OwnedBySender().P2PKH().WithSatoshis(10).Stored(),
 				given.DB().HasUTXO().OwnedBySender().P2PKH().WithSatoshis(10).Stored(),
