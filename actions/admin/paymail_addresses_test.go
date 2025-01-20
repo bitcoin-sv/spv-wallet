@@ -197,9 +197,6 @@ func TestPaymailLivecycle(t *testing.T) {
 
 		// when:
 		res, _ := client.R().
-			SetBody(map[string]any{
-				"address": newPaymail,
-			}).
 			Delete("/api/v1/admin/paymails/" + testState.newPaymailID)
 
 		// then:
@@ -217,9 +214,6 @@ func TestPaymailLivecycle(t *testing.T) {
 
 		// when:
 		res, _ := client.R().
-			SetBody(map[string]any{
-				"address": newPaymail,
-			}).
 			Delete("/api/v1/admin/paymails/" + testState.newPaymailID)
 
 		// then:

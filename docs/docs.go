@@ -645,12 +645,11 @@ const docTemplate = `{
                 "summary": "Delete paymail",
                 "parameters": [
                     {
-                        "description": "PaymailAddress model containing paymail address to delete",
-                        "name": "PaymailAddress",
-                        "in": "body",
-                        "schema": {
-                            "$ref": "#/definitions/admin.PaymailAddress"
-                        }
+                        "type": "string",
+                        "description": "id of the paymail",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
                     }
                 ],
                 "responses": {
