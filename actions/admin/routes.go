@@ -8,9 +8,6 @@ import (
 func RegisterRoutes(handlersManager *handlers.Manager) {
 	adminGroupOld := handlersManager.Group(handlers.GroupOldAPI, "/admin")
 
-	adminGroupOld.POST("/utxos/search", handlers.AsAdmin(utxosSearchOld))
-	adminGroupOld.POST("/utxos/count", handlers.AsAdmin(utxosCount))
-
 	adminGroupOld.POST("/xpub", handlers.AsAdmin(xpubsCreateOld))
 	adminGroupOld.POST("/xpubs/search", handlers.AsAdmin(xpubsSearchOld))
 	adminGroupOld.POST("/xpubs/count", handlers.AsAdmin(xpubsCount))

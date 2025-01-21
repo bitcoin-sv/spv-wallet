@@ -18,18 +18,6 @@ type SearchXpubs = SearchModel[XpubFilter]
 // CountXpubs is a model for handling counting filtered xPubs
 type CountXpubs = ConditionsModel[XpubFilter]
 
-// AdminSearchUtxos is a model for handling searching with filters and metadata
-type AdminSearchUtxos = SearchModel[AdminUtxoFilter]
-
-// AdminCountUtxos is a model for handling counting filtered UTXOs
-type AdminCountUtxos = ConditionsModel[AdminUtxoFilter]
-
-// SearchUtxos is a model for handling searching with filters and metadata
-type SearchUtxos = SearchModel[UtxoFilter]
-
-// CountUtxos is a model for handling counting filtered UTXOs
-type CountUtxos = ConditionsModel[UtxoFilter]
-
 // AdminSearchAccessKeys is a model for handling searching with filters and metadata
 type AdminSearchAccessKeys = SearchModel[AdminAccessKeyFilter]
 
