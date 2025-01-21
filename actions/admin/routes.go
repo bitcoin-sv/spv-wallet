@@ -6,12 +6,6 @@ import (
 
 // RegisterRoutes creates the specific package routes
 func RegisterRoutes(handlersManager *handlers.Manager) {
-	adminGroupOld := handlersManager.Group(handlers.GroupOldAPI, "/admin")
-
-	adminGroupOld.POST("/webhooks/subscriptions", handlers.AsAdmin(subscribeWebhookOld))
-	adminGroupOld.DELETE("/webhooks/subscriptions", handlers.AsAdmin(unsubscribeWebhookOld))
-	adminGroupOld.GET("/webhooks/subscriptions", handlers.AsAdmin(getAllWebhooksOld))
-
 	adminGroup := handlersManager.Group(handlers.GroupAPI, "/admin")
 	adminGroup.GET("/status", handlers.AsAdmin(status))
 	adminGroup.GET("/stats", handlers.AsAdmin(stats))
