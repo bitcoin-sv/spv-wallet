@@ -23,7 +23,7 @@ type TrackedTransaction struct {
 	Inputs  []*TrackedOutput `gorm:"foreignKey:SpendingTX"`
 	Outputs []*TrackedOutput `gorm:"foreignKey:TxID"`
 
-	newUTXOs []*UserUtxos `gorm:"-"`
+	newUTXOs []*UserUTXO `gorm:"-"`
 }
 
 // CreateP2PKHOutput prepares a new P2PKH output and adds it to the transaction.
@@ -53,7 +53,7 @@ func (t *TrackedTransaction) AddInputs(inputs ...*TrackedOutput) {
 func (t *TrackedTransaction) AfterCreate(tx *gorm.DB) error {
 	// Add new UTXOs
 	if len(t.newUTXOs) > 0 {
-		err := tx.Model(&UserUtxos{}).Create(t.newUTXOs).Error
+		err := tx.Model(&UserUTXO{}).Create(t.newUTXOs).Error
 		if err != nil {
 			return spverrors.Wrapf(err, "failed to save user utxos")
 		}
@@ -68,7 +68,7 @@ func (t *TrackedTransaction) AfterCreate(tx *gorm.DB) error {
 			}
 		})
 	if len(spentOutpoints) > 0 {
-		err := tx.Where("(tx_id, vout) IN ?", spentOutpoints).Delete(&UserUtxos{}).Error
+		err := tx.Where("(tx_id, vout) IN ?", spentOutpoints).Delete(&UserUTXO{}).Error
 		if err != nil {
 			return spverrors.Wrapf(err, "failed to delete spent utxos")
 		}

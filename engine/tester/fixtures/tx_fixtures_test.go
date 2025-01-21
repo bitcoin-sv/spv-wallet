@@ -49,7 +49,8 @@ func TestMockTXGeneration(t *testing.T) {
 			spec := test.spec
 
 			// when
-			ok, err := spv.VerifyScripts(spec.TX())
+			tx := spec.TX()
+			ok, err := spv.VerifyScripts(tx)
 
 			// then:
 			require.NoError(t, err)
