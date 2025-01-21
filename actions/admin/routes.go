@@ -8,17 +8,13 @@ import (
 func RegisterRoutes(handlersManager *handlers.Manager) {
 	adminGroupOld := handlersManager.Group(handlers.GroupOldAPI, "/admin")
 
-	adminGroupOld.POST("/paymail/get", handlers.AsAdmin(paymailGetAddressOld))
-	adminGroupOld.POST("/paymails/search", handlers.AsAdmin(paymailAddressesSearchOld))
-	adminGroupOld.POST("/paymails/count", handlers.AsAdmin(paymailAddressesCount))
-	adminGroupOld.POST("/paymail/create", handlers.AsAdmin(paymailCreateAddressOld))
-	adminGroupOld.DELETE("/paymail/delete", handlers.AsAdmin(paymailDeleteAddressOld))
-
 	adminGroupOld.POST("/utxos/search", handlers.AsAdmin(utxosSearchOld))
 	adminGroupOld.POST("/utxos/count", handlers.AsAdmin(utxosCount))
+
 	adminGroupOld.POST("/xpub", handlers.AsAdmin(xpubsCreateOld))
 	adminGroupOld.POST("/xpubs/search", handlers.AsAdmin(xpubsSearchOld))
 	adminGroupOld.POST("/xpubs/count", handlers.AsAdmin(xpubsCount))
+
 	adminGroupOld.POST("/webhooks/subscriptions", handlers.AsAdmin(subscribeWebhookOld))
 	adminGroupOld.DELETE("/webhooks/subscriptions", handlers.AsAdmin(unsubscribeWebhookOld))
 	adminGroupOld.GET("/webhooks/subscriptions", handlers.AsAdmin(getAllWebhooksOld))

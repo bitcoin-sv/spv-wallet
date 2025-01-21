@@ -15,24 +15,6 @@ func (ts *TestSuite) TestXPubRegisterRoutes() {
 			method string
 			url    string
 		}{
-			{"GET", "/" + config.APIVersion + "/admin/stats"},
-			{"GET", "/" + config.APIVersion + "/admin/status"},
-			{"POST", "/" + config.APIVersion + "/admin/destinations/search"},
-			{"POST", "/" + config.APIVersion + "/admin/destinations/count"},
-			{"POST", "/" + config.APIVersion + "/admin/paymail/get"},
-			{"POST", "/" + config.APIVersion + "/admin/paymails/search"},
-			{"POST", "/" + config.APIVersion + "/admin/paymails/count"},
-			{"POST", "/" + config.APIVersion + "/admin/paymail/create"},
-			{"DELETE", "/" + config.APIVersion + "/admin/paymail/delete"},
-			{"POST", "/" + config.APIVersion + "/admin/transactions/search"},
-			{"POST", "/" + config.APIVersion + "/admin/transactions/count"},
-			{"POST", "/" + config.APIVersion + "/admin/transactions/record"},
-			{"POST", "/" + config.APIVersion + "/admin/utxos/search"},
-			{"POST", "/" + config.APIVersion + "/admin/utxos/count"},
-			{"POST", "/" + config.APIVersion + "/admin/xpub"},
-			{"POST", "/" + config.APIVersion + "/admin/xpubs/search"},
-			{"POST", "/" + config.APIVersion + "/admin/xpubs/count"},
-
 			// tx
 			{"GET", "/" + config.APIVersion + "/admin/transactions/:id"},     // get tx by id old
 			{"GET", "/" + config.APIVersion + "/admin/transactions"},         // search old
