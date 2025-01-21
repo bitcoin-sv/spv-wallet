@@ -4,21 +4,8 @@ import (
 	"github.com/bitcoin-sv/spv-wallet/engine"
 	customtypes "github.com/bitcoin-sv/spv-wallet/engine/datastore/customtypes"
 	"github.com/bitcoin-sv/spv-wallet/mappings/common"
-	"github.com/bitcoin-sv/spv-wallet/models"
 	"github.com/bitcoin-sv/spv-wallet/models/response"
 )
-
-// MapToOldUtxoPointer will map the utxo-pointer model from spv-wallet to the spv-wallet-models contract
-func MapToOldUtxoPointer(u *engine.UtxoPointer) *models.UtxoPointer {
-	if u == nil {
-		return nil
-	}
-
-	return &models.UtxoPointer{
-		TransactionID: u.TransactionID,
-		OutputIndex:   u.OutputIndex,
-	}
-}
 
 // MapToUtxoPointer will map the utxo-pointer model from spv-wallet to the spv-wallet-models contract
 func MapToUtxoPointer(u *engine.UtxoPointer) *response.UtxoPointer {
@@ -27,18 +14,6 @@ func MapToUtxoPointer(u *engine.UtxoPointer) *response.UtxoPointer {
 	}
 
 	return &response.UtxoPointer{
-		TransactionID: u.TransactionID,
-		OutputIndex:   u.OutputIndex,
-	}
-}
-
-// MapOldUtxoPointerModelToEngine will map the utxo-pointer model from spv-wallet-models to the spv-wallet contract
-func MapOldUtxoPointerModelToEngine(u *models.UtxoPointer) *engine.UtxoPointer {
-	if u == nil {
-		return nil
-	}
-
-	return &engine.UtxoPointer{
 		TransactionID: u.TransactionID,
 		OutputIndex:   u.OutputIndex,
 	}

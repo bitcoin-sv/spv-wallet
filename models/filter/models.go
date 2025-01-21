@@ -12,12 +12,6 @@ type SearchTransactions = SearchModel[TransactionFilter]
 // CountTransactions is a model for handling counting filtered transactions
 type CountTransactions = ConditionsModel[TransactionFilter]
 
-// SearchXpubs is a model for handling searching with filters and metadata
-type SearchXpubs = SearchModel[XpubFilter]
-
-// CountXpubs is a model for handling counting filtered xPubs
-type CountXpubs = ConditionsModel[XpubFilter]
-
 // AdminSearchAccessKeys is a model for handling searching with filters and metadata
 type AdminSearchAccessKeys = SearchModel[AdminAccessKeyFilter]
 
