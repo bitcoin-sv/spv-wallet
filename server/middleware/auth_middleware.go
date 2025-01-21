@@ -32,13 +32,13 @@ func AuthMiddleware() gin.HandlerFunc {
 func tryAuth(c *gin.Context, xPub, authAccessKey string) (*reqctx.UserContext, error) {
 	config := reqctx.AppConfig(c)
 	if config.ExperimentalFeatures.NewTransactionFlowEnabled {
-		if xPub != "" {
-			if xPub == config.Authentication.AdminKey {
-				return reqctx.NewUserContextAsAdmin(), nil
-			}
-			return authByXPubToPublicKey(c, xPub)
+		if xPub == "" {
+			return nil, spverrors.ErrMissingAuthHeader
 		}
-		return nil, spverrors.ErrMissingAuthHeader
+		if xPub == config.Authentication.AdminKey {
+			return reqctx.NewUserContextAsAdmin(), nil
+		}
+		return authByXPubToPublicKey(c, xPub)
 	}
 
 	if xPub != "" {

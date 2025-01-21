@@ -37,9 +37,8 @@ func addPaymail(c *gin.Context, _ *reqctx.AdminContext) {
 	}
 
 	newPaymail := &usermodels.NewPaymail{
-		Alias:  alias,
-		Domain: domain,
-
+		Alias:      alias,
+		Domain:     domain,
 		PublicName: requestBody.PublicName,
 		Avatar:     requestBody.Avatar,
 	}
