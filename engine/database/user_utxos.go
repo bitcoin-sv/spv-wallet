@@ -28,11 +28,11 @@ type UserUTXO struct {
 	// TouchedAt is the time when the UTXO was last touched (selected for preparing transaction outline) - used for prioritizing UTXO selection.
 	TouchedAt time.Time `gorm:"uniqueIndex:idx_window,sort:asc,priority:2"`
 	// CustomInstructions is the list of instructions for unlocking given UTXO (it should be understood by client).
-	CustomInstructions datatypes.JSONSlice[CustomInstruction]
+	CustomInstructions datatypes.JSONSlice[bsv.CustomInstruction]
 }
 
 // NewP2PKHUserUTXO creates a new UserUTXO instance for a P2PKH output based on the given output and custom instructions.
-func NewP2PKHUserUTXO(output *TrackedOutput, customInstructions datatypes.JSONSlice[CustomInstruction]) *UserUTXO {
+func NewP2PKHUserUTXO(output *TrackedOutput, customInstructions datatypes.JSONSlice[bsv.CustomInstruction]) *UserUTXO {
 	return &UserUTXO{
 		UserID:             output.UserID,
 		TxID:               output.TxID,
