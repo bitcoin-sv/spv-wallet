@@ -13,9 +13,6 @@ const (
 	// GroupRoot is the root group without no prefix and no auth middleware
 	GroupRoot GroupType = iota
 
-	// GroupOldAPI is the group with the old API prefix and auth middleware
-	GroupOldAPI
-
 	// GroupAPI is the group with the API prefix and auth middleware
 	GroupAPI
 
@@ -42,8 +39,7 @@ func NewManager(engine *gin.Engine, appConfig *config.AppConfig) *Manager {
 		appConfig: appConfig,
 		groups: map[GroupType]*gin.RouterGroup{
 			GroupRoot:                engine.Group(""),
-			GroupOldAPI:              authRouter.Group("/" + config.APIVersion),
-			GroupAPI:                 authRouter.Group("/api" + "/" + config.APIVersion),
+			GroupAPI:                 authRouter.Group("/api/" + config.APIVersion),
 			GroupAPIV2:               authRouter.Group("/api/v2"),
 			GroupTransactionCallback: engine.Group("", middleware.CallbackTokenMiddleware()),
 		},
