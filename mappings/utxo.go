@@ -56,26 +56,6 @@ func MapUtxoPointerModelToEngine(u *response.UtxoPointer) *engine.UtxoPointer {
 	}
 }
 
-// MapToOldUtxoContract will map the utxo model from spv-wallet to the spv-wallet-models contract
-func MapToOldUtxoContract(u *engine.Utxo) *models.Utxo {
-	if u == nil {
-		return nil
-	}
-
-	return &models.Utxo{
-		Model:        *common.MapToOldContract(&u.Model),
-		UtxoPointer:  *MapToOldUtxoPointer(&u.UtxoPointer),
-		ID:           u.ID,
-		XpubID:       u.XpubID,
-		Satoshis:     u.Satoshis,
-		ScriptPubKey: u.ScriptPubKey,
-		Type:         u.Type,
-		DraftID:      u.DraftID.String,
-		SpendingTxID: u.SpendingTxID.String,
-		Transaction:  MapToOldTransactionContract(u.Transaction),
-	}
-}
-
 // MapToUtxoContract will map the utxo model from spv-wallet to the spv-wallet-models contract
 func MapToUtxoContract(u *engine.Utxo) *response.Utxo {
 	if u == nil {
@@ -94,32 +74,6 @@ func MapToUtxoContract(u *engine.Utxo) *response.Utxo {
 		SpendingTxID: u.SpendingTxID.String,
 		ReservedAt:   u.ReservedAt.Time,
 		Transaction:  MapToTransactionContract(u.Transaction),
-	}
-}
-
-// MapOldUtxoModelToEngine will map the utxo model from spv-wallet-models to the spv-wallet contract
-func MapOldUtxoModelToEngine(u *models.Utxo) *engine.Utxo {
-	if u == nil {
-		return nil
-	}
-
-	var draftID customtypes.NullString
-	draftID.String = u.DraftID
-
-	var spendingTxID customtypes.NullString
-	spendingTxID.String = u.SpendingTxID
-
-	return &engine.Utxo{
-		Model:        *common.MapOldContractToModel(&u.Model),
-		UtxoPointer:  *MapOldUtxoPointerModelToEngine(&u.UtxoPointer),
-		ID:           u.ID,
-		XpubID:       u.XpubID,
-		Satoshis:     u.Satoshis,
-		ScriptPubKey: u.ScriptPubKey,
-		Type:         u.Type,
-		DraftID:      draftID,
-		SpendingTxID: spendingTxID,
-		Transaction:  MapOldTransactionModelToEngine(u.Transaction),
 	}
 }
 

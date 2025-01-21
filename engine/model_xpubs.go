@@ -166,6 +166,35 @@ func (m *Xpub) GetID() string {
 	return m.ID
 }
 
+// getNewDestination will get a new destination, adding to the xpub and incrementing num / address
+func (m *Xpub) getNewDestination(ctx context.Context, chain uint32, destinationType string,
+	opts ...ModelOps,
+) (*Destination, error) {
+	// Check the type
+	// todo: support more types of destinations
+	if destinationType != utils.ScriptTypePubKeyHash {
+		return nil, spverrors.ErrUnsupportedDestinationType
+	}
+
+	// Increment the next num
+	num, err := m.getNextDerivationNum(ctx, chain)
+	if err != nil {
+		return nil, err
+	}
+
+	// Create the new address
+	var destination *Destination
+	if destination, err = newAddress(
+		m.rawXpubKey, chain, num, append(opts, New())...,
+	); err != nil {
+		return nil, err
+	}
+
+	// Add the destination to the xPub
+	m.destinations = append(m.destinations, *destination)
+	return destination, nil
+}
+
 // incrementBalance will atomically update the balance of the xPub
 func (m *Xpub) incrementBalance(ctx context.Context, balanceIncrement int64) error {
 	// Increment the field

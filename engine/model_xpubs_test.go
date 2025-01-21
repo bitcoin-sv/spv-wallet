@@ -137,42 +137,6 @@ func TestXpub_getNewDestination(t *testing.T) {
 	})
 }
 
-// TestXpub_childModels will test the method ChildModels()
-func TestXpub_childModels(t *testing.T) {
-	t.Run("with 1 child model", func(t *testing.T) {
-		ctx, client, deferMe := CreateTestSQLiteClient(t, false, false, withTaskManagerMockup())
-		defer deferMe()
-		xPub := newXpub(testXPub, client.DefaultModelOptions()...)
-		err := xPub.Save(ctx)
-		assert.NoError(t, err)
-
-		_, err = xPub.getNewDestination(ctx, utils.ChainExternal, utils.ScriptTypePubKeyHash, client.DefaultModelOptions()...)
-		assert.NoError(t, err)
-
-		childModels := xPub.ChildModels()
-		assert.Len(t, childModels, 1)
-		assert.IsType(t, &Destination{}, childModels[0])
-	})
-
-	t.Run("with 2 child model", func(t *testing.T) {
-		ctx, client, deferMe := CreateTestSQLiteClient(t, false, false, withTaskManagerMockup())
-		defer deferMe()
-		xPub := newXpub(testXPub, client.DefaultModelOptions()...)
-		err := xPub.Save(ctx)
-		assert.NoError(t, err)
-
-		_, err = xPub.getNewDestination(ctx, utils.ChainExternal, utils.ScriptTypePubKeyHash, client.DefaultModelOptions()...)
-		assert.NoError(t, err)
-		_, err = xPub.getNewDestination(ctx, utils.ChainExternal, utils.ScriptTypePubKeyHash, client.DefaultModelOptions()...)
-		assert.NoError(t, err)
-
-		childModels := xPub.ChildModels()
-		assert.Len(t, childModels, 2)
-		assert.IsType(t, &Destination{}, childModels[0])
-		assert.IsType(t, &Destination{}, childModels[1])
-	})
-}
-
 // TestXpub_BeforeCreating will test the method BeforeCreating()
 func TestXpub_BeforeCreating(t *testing.T) {
 	// t.Parallel()
