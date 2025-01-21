@@ -12,7 +12,7 @@ import (
 func get(c *gin.Context, _ *reqctx.AdminContext) {
 	userID := c.Param("id")
 
-	user, err := reqctx.Engine(c).UserService().GetWithPaymails(c, userID)
+	user, err := reqctx.Engine(c).UserService().GetByID(c, userID)
 	if err != nil {
 		spverrors.ErrorResponse(c, err, reqctx.Logger(c))
 		return

@@ -7,8 +7,8 @@ import (
 	"github.com/bitcoin-sv/go-paymail"
 	adminerrors "github.com/bitcoin-sv/spv-wallet/actions/v2/admin/errors"
 	"github.com/bitcoin-sv/spv-wallet/actions/v2/admin/internal/mapping"
+	"github.com/bitcoin-sv/spv-wallet/engine/domainmodels"
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
-	"github.com/bitcoin-sv/spv-wallet/engine/user/usermodels"
 	"github.com/bitcoin-sv/spv-wallet/models/request/adminrequest"
 	"github.com/bitcoin-sv/spv-wallet/server/reqctx"
 	"github.com/gin-gonic/gin"
@@ -36,13 +36,14 @@ func addPaymail(c *gin.Context, _ *reqctx.AdminContext) {
 		return
 	}
 
-	newPaymail := &usermodels.NewPaymail{
+	newPaymail := &domainmodels.NewPaymail{
 		Alias:      alias,
 		Domain:     domain,
 		PublicName: requestBody.PublicName,
 		Avatar:     requestBody.Avatar,
+		UserID:     userID,
 	}
-	createdPaymail, err := reqctx.Engine(c).UserService().AppendPaymail(c, userID, newPaymail)
+	createdPaymail, err := reqctx.Engine(c).UserService().AppendPaymail(c, newPaymail)
 	if err != nil {
 		spverrors.ErrorResponse(c, adminerrors.ErrAddingPaymail.Wrap(err), logger)
 		return

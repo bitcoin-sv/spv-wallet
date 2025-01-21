@@ -4,19 +4,20 @@ import (
 	"context"
 
 	"github.com/bitcoin-sv/go-paymail/spv"
+	primitives "github.com/bitcoin-sv/go-sdk/primitives/ec"
 	trx "github.com/bitcoin-sv/go-sdk/transaction"
-	paymailmodels "github.com/bitcoin-sv/spv-wallet/engine/paymail/models"
-	"github.com/bitcoin-sv/spv-wallet/models/bsv"
+	"github.com/bitcoin-sv/spv-wallet/engine/domainmodels"
 )
 
 // PaymailsRepo is an interface for paymails repository.
 type PaymailsRepo interface {
-	Get(ctx context.Context, alias, domain string) (*paymailmodels.Paymail, error)
+	Get(ctx context.Context, alias, domain string) (*domainmodels.Paymail, error)
 }
 
 // UsersService is an interface for user service
 type UsersService interface {
-	AppendAddress(ctx context.Context, userID string, address string, customInstructions bsv.CustomInstructions) error
+	AppendAddress(ctx context.Context, newAddress domainmodels.NewAddress) error
+	GetPubKey(ctx context.Context, userID string) (*primitives.PublicKey, error)
 }
 
 // MerkleRootsVerifier is an interface for verifying merkle roots

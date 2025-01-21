@@ -6,8 +6,8 @@ import (
 	primitives "github.com/bitcoin-sv/go-sdk/primitives/ec"
 	adminerrors "github.com/bitcoin-sv/spv-wallet/actions/v2/admin/errors"
 	"github.com/bitcoin-sv/spv-wallet/actions/v2/admin/internal/mapping"
+	"github.com/bitcoin-sv/spv-wallet/engine/domainmodels"
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
-	"github.com/bitcoin-sv/spv-wallet/engine/user/usermodels"
 	"github.com/bitcoin-sv/spv-wallet/models/request/adminrequest"
 	"github.com/bitcoin-sv/spv-wallet/server/reqctx"
 	"github.com/gin-gonic/gin"
@@ -22,12 +22,12 @@ func create(c *gin.Context, _ *reqctx.AdminContext) {
 		return
 	}
 
-	if invalidPubKey(requestBody.PublicKey) {
-		spverrors.ErrorResponse(c, adminerrors.ErrInvalidPublicKey, logger)
+	if err := validatePubKey(requestBody.PublicKey); err != nil {
+		spverrors.ErrorResponse(c, err, logger)
 		return
 	}
 
-	newUser := &usermodels.NewUser{
+	newUser := &domainmodels.NewUser{
 		PublicKey: requestBody.PublicKey,
 	}
 	if requestBody.PaymailDefined() {
@@ -42,7 +42,7 @@ func create(c *gin.Context, _ *reqctx.AdminContext) {
 			return
 		}
 
-		newUser.Paymail = &usermodels.NewPaymail{
+		newUser.Paymail = &domainmodels.NewPaymail{
 			Alias:  alias,
 			Domain: domain,
 
@@ -60,7 +60,10 @@ func create(c *gin.Context, _ *reqctx.AdminContext) {
 	c.JSON(http.StatusCreated, mapping.CreatedUserResponse(createdUser))
 }
 
-func invalidPubKey(pubKey string) bool {
+func validatePubKey(pubKey string) error {
 	_, err := primitives.PublicKeyFromString(pubKey)
-	return err != nil
+	if err != nil {
+		return adminerrors.ErrInvalidPublicKey.Wrap(err)
+	}
+	return nil
 }

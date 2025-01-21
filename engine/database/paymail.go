@@ -13,5 +13,4 @@ type Paymail struct {
 	Avatar     string
 
 	UserID string
-	User   *User `gorm:"foreignKey:UserID"`
 }

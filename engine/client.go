@@ -20,7 +20,7 @@ import (
 	"github.com/bitcoin-sv/spv-wallet/engine/taskmanager"
 	"github.com/bitcoin-sv/spv-wallet/engine/transaction/outlines"
 	"github.com/bitcoin-sv/spv-wallet/engine/transaction/record"
-	"github.com/bitcoin-sv/spv-wallet/engine/user"
+	"github.com/bitcoin-sv/spv-wallet/engine/users"
 	"github.com/bitcoin-sv/spv-wallet/models/bsv"
 	"github.com/go-resty/resty/v2"
 	"github.com/mrz1836/go-cachestore"
@@ -57,7 +57,7 @@ type (
 		bhsConfig                  chainmodels.BHSConfig  // Configuration for BHS
 		feeUnit                    *bsv.FeeUnit           // Fee unit for transactions
 		repositories               *repository.All        // Repositories for all db models
-		user                       *user.Service
+		user                       *users.Service         // User domain service
 	}
 
 	// cacheStoreOptions holds the cache configuration and client
@@ -148,7 +148,7 @@ func NewClient(ctx context.Context, opts ...ClientOps) (ClientInterface, error) 
 
 	client.loadRepositories()
 
-	client.loadDomainServices()
+	client.loadUsersService()
 
 	// Load the Paymail client and service (if does not exist)
 	if err = client.loadPaymailComponents(); err != nil {
@@ -345,6 +345,6 @@ func (c *Client) Repositories() *repository.All {
 }
 
 // UserService will return the user domain service
-func (c *Client) UserService() *user.Service {
+func (c *Client) UserService() *users.Service {
 	return c.options.user
 }

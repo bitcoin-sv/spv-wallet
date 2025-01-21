@@ -16,7 +16,7 @@ import (
 	"github.com/bitcoin-sv/spv-wallet/engine/taskmanager"
 	"github.com/bitcoin-sv/spv-wallet/engine/transaction/outlines"
 	"github.com/bitcoin-sv/spv-wallet/engine/transaction/record"
-	"github.com/bitcoin-sv/spv-wallet/engine/user"
+	"github.com/bitcoin-sv/spv-wallet/engine/users"
 	"github.com/mrz1836/go-cachestore"
 )
 
@@ -228,9 +228,9 @@ func (c *Client) loadRepositories() {
 	}
 }
 
-func (c *Client) loadDomainServices() {
+func (c *Client) loadUsersService() {
 	if c.options.user == nil {
-		c.options.user = user.NewService(c.Repositories().Users)
+		c.options.user = users.UserService(c.Repositories().Users, c.Repositories().Addresses, c.Repositories().Paymails)
 	}
 }
 

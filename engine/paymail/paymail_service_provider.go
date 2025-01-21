@@ -11,9 +11,9 @@ import (
 	"github.com/bitcoin-sv/go-sdk/script"
 	trx "github.com/bitcoin-sv/go-sdk/transaction"
 	"github.com/bitcoin-sv/go-sdk/transaction/template/p2pkh"
+	"github.com/bitcoin-sv/spv-wallet/engine/domainmodels"
 	"github.com/bitcoin-sv/spv-wallet/engine/keys/type42"
 	pmerrors "github.com/bitcoin-sv/spv-wallet/engine/paymail/errors"
-	paymailmodels "github.com/bitcoin-sv/spv-wallet/engine/paymail/models"
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/bitcoin-sv/spv-wallet/engine/utils"
 	"github.com/bitcoin-sv/spv-wallet/models/bsv"
@@ -83,7 +83,7 @@ func (s *serviceProvider) GetPaymailByAlias(ctx context.Context, alias, domain s
 		return nil, pmerrors.ErrPaymailNotFound
 	}
 
-	pki, _, err := s.pki(model)
+	pki, _, err := s.pki(ctx, model)
 	if err != nil {
 		return nil, err
 	}
@@ -153,8 +153,8 @@ func (s *serviceProvider) VerifyMerkleRoots(ctx context.Context, merkleProofs []
 	return nil
 }
 
-func (s *serviceProvider) pki(paymailModel *paymailmodels.Paymail) (*primitives.PublicKey, string, error) {
-	userPubKey, err := paymailModel.User.PubKeyObj()
+func (s *serviceProvider) pki(ctx context.Context, paymailModel *domainmodels.Paymail) (*primitives.PublicKey, string, error) {
+	userPubKey, err := s.users.GetPubKey(ctx, paymailModel.UserID)
 	if err != nil {
 		return nil, "", pmerrors.ErrPaymailPKI.Wrap(err)
 	}
@@ -178,7 +178,7 @@ func (s *serviceProvider) createDestinationForUser(ctx context.Context, alias, d
 		return nil, pmerrors.ErrPaymailDBFailed.Wrap(err)
 	}
 
-	pki, pkiDerivationKey, err := s.pki(paymailModel)
+	pki, pkiDerivationKey, err := s.pki(ctx, paymailModel)
 	if err != nil {
 		return nil, err
 	}
@@ -203,14 +203,18 @@ func (s *serviceProvider) createDestinationForUser(ctx context.Context, alias, d
 		return nil, pmerrors.ErrPaymentDestination.Wrap(err)
 	}
 
-	err = s.users.AppendAddress(ctx, paymailModel.UserID, address.AddressString, []bsv.CustomInstruction{
-		{
-			Type:        "type42",
-			Instruction: pkiDerivationKey,
-		},
-		{
-			Type:        "type42",
-			Instruction: referenceID,
+	err = s.users.AppendAddress(ctx, domainmodels.NewAddress{
+		UserID:  paymailModel.UserID,
+		Address: address.AddressString,
+		CustomInstructions: []bsv.CustomInstruction{
+			{
+				Type:        "type42",
+				Instruction: pkiDerivationKey,
+			},
+			{
+				Type:        "type42",
+				Instruction: referenceID,
+			},
 		},
 	})
 	if err != nil {
