@@ -16,8 +16,6 @@ func (ts *TestSuite) TestXPubRegisterRoutes() {
 			url    string
 		}{
 			// tx
-			{"GET", "/" + config.APIVersion + "/admin/transactions/:id"},     // get tx by id old
-			{"GET", "/" + config.APIVersion + "/admin/transactions"},         // search old
 			{"GET", "/api/" + config.APIVersion + "/admin/transactions/:id"}, // get tx by id
 			{"GET", "/api/" + config.APIVersion + "/admin/transactions"},     // search
 
