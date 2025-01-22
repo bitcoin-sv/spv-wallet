@@ -86,14 +86,6 @@ type ContactService interface {
 	GetContactsCount(ctx context.Context, metadata *Metadata, conditions map[string]interface{}, opts ...ModelOps) (int64, error)
 }
 
-// DraftTransactionService is the draft transactions actions
-type DraftTransactionService interface {
-	GetDraftTransactions(ctx context.Context, metadata *Metadata, conditions map[string]interface{},
-		queryParams *datastore.QueryParams, opts ...ModelOps) ([]*DraftTransaction, error)
-	GetDraftTransactionsCount(ctx context.Context, metadata *Metadata,
-		conditions map[string]interface{}, opts ...ModelOps) (int64, error)
-}
-
 // HTTPInterface is the HTTP client interface
 type HTTPInterface interface {
 	Do(req *http.Request) (*http.Response, error)
@@ -115,10 +107,6 @@ type PaymailService interface {
 		conditions map[string]interface{}, queryParams *datastore.QueryParams) ([]*PaymailAddress, error)
 	NewPaymailAddress(ctx context.Context, key, address, publicName,
 		avatar string, opts ...ModelOps) (*PaymailAddress, error)
-	UpdatePaymailAddress(ctx context.Context, address, publicName,
-		avatar string, opts ...ModelOps) (*PaymailAddress, error)
-	UpdatePaymailAddressMetadata(ctx context.Context, address string,
-		metadata Metadata, opts ...ModelOps) (*PaymailAddress, error)
 }
 
 // TransactionService is the transaction actions
@@ -126,7 +114,6 @@ type TransactionService interface {
 	GetTransaction(ctx context.Context, xPubID, txID string) (*Transaction, error)
 	GetAdminTransaction(ctx context.Context, txID string) (*Transaction, error)
 	GetTransactionsByIDs(ctx context.Context, txIDs []string) ([]*Transaction, error)
-	GetTransactionByHex(ctx context.Context, hex string) (*Transaction, error)
 	GetTransactions(ctx context.Context, metadata *Metadata, conditions map[string]interface{},
 		queryParams *datastore.QueryParams, opts ...ModelOps) ([]*Transaction, error)
 	GetTransactionsCount(ctx context.Context, metadata *Metadata,
@@ -139,7 +126,6 @@ type TransactionService interface {
 		opts ...ModelOps) (*DraftTransaction, error)
 	RecordTransaction(ctx context.Context, xPubKey, txHex, draftID string,
 		opts ...ModelOps) (*Transaction, error)
-	RecordRawTransaction(ctx context.Context, txHex string, opts ...ModelOps) (*Transaction, error)
 	HandleTxCallback(ctx context.Context, callbackResp *chainmodels.TXInfo) error
 	UpdateTransactionMetadata(ctx context.Context, xPubID, id string, metadata Metadata) (*Transaction, error)
 	RevertTransaction(ctx context.Context, id string) error
@@ -157,7 +143,6 @@ type UTXOService interface {
 		queryParams *datastore.QueryParams) ([]*Utxo, error)
 	GetUtxosByXpubIDCount(ctx context.Context, xPubID string, metadata *Metadata,
 		conditions map[string]interface{}) (int64, error)
-	UnReserveUtxos(ctx context.Context, xPubID, draftID string) error
 }
 
 // XPubService is the xPub actions
@@ -173,7 +158,6 @@ type ClientInterface interface {
 	AccessKeyService
 	AdminService
 	ClientService
-	DraftTransactionService
 	ModelService
 	PaymailService
 	TransactionService
