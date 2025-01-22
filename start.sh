@@ -231,6 +231,7 @@ function prefix_each() {
 function parse_compose_additional() {
     local argument="$1"
 
+    sleep 3
     # Check if argument value is provided
     if [ -z "$argument" ]; then
         echo "Error: Argument for --compose-additional is missing"
