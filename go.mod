@@ -151,3 +151,6 @@ replace github.com/bsm/redislock => github.com/bsm/redislock v0.7.2
 
 // Issue with using wrong version of Redigo
 replace github.com/gomodule/redigo => github.com/gomodule/redigo v1.8.9
+
+// mitchellh/mapstructure is archived
+replace github.com/mitchellh/mapstructure => github.com/go-viper/mapstructure v1.6.0
