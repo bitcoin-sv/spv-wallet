@@ -11,7 +11,6 @@ import (
 var (
 	externalXPubID = "xpub6BYQwVS1dNAYoVVcN7cASn5qv4E7QEX4dCazSkJwAk89w32pAfbJqDLfibRW4ywEBwus54uCD8PwLYzahiyuMbyLujCT2oQD5z6QobaNyN1"
 	testAvatar     = "https://i.imgur.com/MYSVX44.png"
-	testAvatar2    = "https://i.imgur.com/cBJKPDh.png"
 	testPaymail    = "paymail@tester.com"
 	testPublicName = "Public Name"
 )
