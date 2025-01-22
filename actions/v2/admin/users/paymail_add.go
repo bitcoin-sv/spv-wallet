@@ -2,7 +2,6 @@ package users
 
 import (
 	"net/http"
-	"slices"
 
 	"github.com/bitcoin-sv/go-paymail"
 	adminerrors "github.com/bitcoin-sv/spv-wallet/actions/v2/admin/errors"
@@ -31,7 +30,7 @@ func addPaymail(c *gin.Context, _ *reqctx.AdminContext) {
 		return
 	}
 
-	if err = checkDomain(c, domain); err != nil {
+	if err = reqctx.AppConfig(c).Paymail.CheckDomain(domain); err != nil {
 		spverrors.ErrorResponse(c, err, logger)
 		return
 	}
@@ -53,6 +52,11 @@ func addPaymail(c *gin.Context, _ *reqctx.AdminContext) {
 }
 
 func parsePaymail(request *adminrequest.AddPaymail) (string, string, error) {
+	if request.Address != "" &&
+		(request.Alias != "" || request.Domain != "") &&
+		request.Address != request.Alias+"@"+request.Domain {
+		return "", "", adminerrors.ErrPaymailInconsistent
+	}
 	pm := request.Address
 	if pm == "" {
 		pm = request.Alias + "@" + request.Domain
@@ -62,14 +66,4 @@ func parsePaymail(request *adminrequest.AddPaymail) (string, string, error) {
 		return "", "", adminerrors.ErrInvalidPaymail
 	}
 	return alias, domain, nil
-}
-
-func checkDomain(c *gin.Context, domain string) error {
-	config := reqctx.AppConfig(c)
-	if config.Paymail.DomainValidationEnabled {
-		if !slices.Contains(config.Paymail.Domains, domain) {
-			return spverrors.ErrInvalidDomain
-		}
-	}
-	return nil
 }

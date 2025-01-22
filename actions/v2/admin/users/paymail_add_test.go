@@ -210,6 +210,68 @@ func TestAddPaymailWithWrongDomain(t *testing.T) {
 
 }
 
+func TestAddPaymailWithBothPaymailAndAliasDomainPair(t *testing.T) {
+	// given:
+	given, then := testabilities.New(t)
+	cleanup := given.StartedSPVWalletWithConfiguration(
+		testengine.WithNewTransactionFlowEnabled(),
+	)
+	defer cleanup()
+
+	// and:
+	client := given.HttpClient().ForAdmin()
+
+	t.Run("Add using consistent fields", func(t *testing.T) {
+		// given:
+		alias := "user"
+		domain := fixtures.PaymailDomain
+		paymail := alias + "@" + domain
+		publicName := "User"
+
+		// when:
+		res, _ := client.R().
+			SetBody(map[string]any{
+				"address":    paymail,
+				"alias":      alias,
+				"domain":     domain,
+				"publicName": publicName,
+				"avatar":     "",
+			}).
+			SetPathParam("id", fixtures.Sender.ID()).
+			Post("/api/v2/admin/users/{id}/paymails")
+
+		// then:
+		then.Response(res).
+			HasStatus(201)
+	})
+
+	t.Run("Try to add with inconsistent paymail and alias-domain pair", func(t *testing.T) {
+		// given:
+		alias := "user"
+		domain := fixtures.PaymailDomain
+		paymail := "other" + "@" + domain
+		publicName := "User"
+
+		// when:
+		res, _ := client.R().
+			SetBody(map[string]any{
+				"alias":      alias,
+				"domain":     domain,
+				"address":    paymail,
+				"publicName": publicName,
+				"avatar":     "",
+			}).
+			SetPathParam("id", fixtures.Sender.ID()).
+			Post("/api/v2/admin/users/{id}/paymails")
+
+		// then:
+		then.Response(res).
+			HasStatus(400).
+			WithJSONf(apierror.ExpectedJSON("error-user-inconsistent-paymail", "inconsistent paymail address and alias/domain"))
+	})
+
+}
+
 func getAliasFromPaymail(t testing.TB, paymail string) (alias string) {
 	parts := strings.SplitN(paymail, "@", 2)
 	if len(parts) == 0 {

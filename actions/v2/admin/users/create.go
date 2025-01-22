@@ -37,7 +37,7 @@ func create(c *gin.Context, _ *reqctx.AdminContext) {
 			return
 		}
 
-		if err = checkDomain(c, domain); err != nil {
+		if err = reqctx.AppConfig(c).Paymail.CheckDomain(domain); err != nil {
 			spverrors.ErrorResponse(c, err, logger)
 			return
 		}
