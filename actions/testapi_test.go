@@ -8,7 +8,7 @@ import (
 	"github.com/bitcoin-sv/spv-wallet/engine/tester/fixtures"
 )
 
-func TestUserCurrent(t *testing.T) {
+func TestOApi(t *testing.T) {
 	// given:
 	given, then := testabilities.New(t)
 	cleanup := given.StartedSPVWalletWithConfiguration(
@@ -47,6 +47,36 @@ func TestUserCurrent(t *testing.T) {
 				"something": "something"
 			}`, nil)
 
+	})
+
+	t.Run("Transactions - testing polymorphism", func(t *testing.T) {
+		// given:
+		client := given.HttpClient().ForUser()
+
+		// when:
+		res, _ := client.R().
+			SetBody(map[string]any{
+				"outputs": []map[string]any{
+					{
+						"dataType": "op_return",
+						"data":     []string{"1", "2", "3"},
+					},
+					{
+						"dataType": "paymail",
+						"to":       "user@exapmle.com",
+						"satoshis": 1,
+					},
+				},
+			}).
+			Post("/api/v2/testpolymorphism")
+
+		// then:
+		then.Response(res).
+			IsOK().
+			WithJSONMatching(`{
+				"xpubID": "{{ .id }}",
+				"something": "1, 2, 3, user@exapmle.com"
+			}`, map[string]any{"id": fixtures.Sender.XPubID()})
 	})
 
 }

@@ -4,6 +4,8 @@
 package api
 
 import (
+	"encoding/json"
+	"errors"
 	"fmt"
 	"net/http"
 
@@ -15,15 +17,147 @@ const (
 	SignatureAuthScopes = "SignatureAuth.Scopes"
 )
 
+// Defines values for OpReturnOutputDataType.
+const (
+	OpReturn OpReturnOutputDataType = "op_return"
+)
+
+// Defines values for PaymailOutputDataType.
+const (
+	Paymail PaymailOutputDataType = "paymail"
+)
+
 // ExResponse defines model for ExResponse.
 type ExResponse struct {
 	Something string `json:"something"`
 	XpubID    string `json:"xpubID"`
 }
 
+// OpReturnOutput defines model for OpReturnOutput.
+type OpReturnOutput struct {
+	Data     []string               `json:"data"`
+	DataType OpReturnOutputDataType `json:"dataType"`
+}
+
+// OpReturnOutputDataType defines model for OpReturnOutput.DataType.
+type OpReturnOutputDataType string
+
+// Output defines model for Output.
+type Output struct {
+	union json.RawMessage
+}
+
+// PaymailOutput defines model for PaymailOutput.
+type PaymailOutput struct {
+	DataType PaymailOutputDataType `json:"dataType"`
+	From     *string               `json:"from"`
+	Satoshis int64                 `json:"satoshis"`
+	To       string                `json:"to"`
+}
+
+// PaymailOutputDataType defines model for PaymailOutput.DataType.
+type PaymailOutputDataType string
+
+// TransactionSpecification defines model for TransactionSpecification.
+type TransactionSpecification struct {
+	Outputs *[]Output `json:"outputs,omitempty"`
+}
+
 // GetTestapiParams defines parameters for GetTestapi.
 type GetTestapiParams struct {
 	Something string `form:"something" json:"something"`
+}
+
+// PostTestpolymorphismJSONRequestBody defines body for PostTestpolymorphism for application/json ContentType.
+type PostTestpolymorphismJSONRequestBody = TransactionSpecification
+
+// AsOpReturnOutput returns the union data inside the Output as a OpReturnOutput
+func (t Output) AsOpReturnOutput() (OpReturnOutput, error) {
+	var body OpReturnOutput
+	err := json.Unmarshal(t.union, &body)
+	return body, err
+}
+
+// FromOpReturnOutput overwrites any union data inside the Output as the provided OpReturnOutput
+func (t *Output) FromOpReturnOutput(v OpReturnOutput) error {
+	v.DataType = "op_return"
+	b, err := json.Marshal(v)
+	t.union = b
+	return err
+}
+
+// MergeOpReturnOutput performs a merge with any union data inside the Output, using the provided OpReturnOutput
+func (t *Output) MergeOpReturnOutput(v OpReturnOutput) error {
+	v.DataType = "op_return"
+	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+
+	merged, err := runtime.JSONMerge(t.union, b)
+	t.union = merged
+	return err
+}
+
+// AsPaymailOutput returns the union data inside the Output as a PaymailOutput
+func (t Output) AsPaymailOutput() (PaymailOutput, error) {
+	var body PaymailOutput
+	err := json.Unmarshal(t.union, &body)
+	return body, err
+}
+
+// FromPaymailOutput overwrites any union data inside the Output as the provided PaymailOutput
+func (t *Output) FromPaymailOutput(v PaymailOutput) error {
+	v.DataType = "paymail"
+	b, err := json.Marshal(v)
+	t.union = b
+	return err
+}
+
+// MergePaymailOutput performs a merge with any union data inside the Output, using the provided PaymailOutput
+func (t *Output) MergePaymailOutput(v PaymailOutput) error {
+	v.DataType = "paymail"
+	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+
+	merged, err := runtime.JSONMerge(t.union, b)
+	t.union = merged
+	return err
+}
+
+func (t Output) Discriminator() (string, error) {
+	var discriminator struct {
+		Discriminator string `json:"dataType"`
+	}
+	err := json.Unmarshal(t.union, &discriminator)
+	return discriminator.Discriminator, err
+}
+
+func (t Output) ValueByDiscriminator() (interface{}, error) {
+	discriminator, err := t.Discriminator()
+	if err != nil {
+		return nil, err
+	}
+	switch discriminator {
+	case "op_return":
+		return t.AsOpReturnOutput()
+	case "paymail":
+		return t.AsPaymailOutput()
+	default:
+		return nil, errors.New("unknown discriminator value: " + discriminator)
+	}
+}
+
+func (t Output) MarshalJSON() ([]byte, error) {
+	b, err := t.union.MarshalJSON()
+	return b, err
+}
+
+func (t *Output) UnmarshalJSON(b []byte) error {
+	err := t.union.UnmarshalJSON(b)
+	return err
 }
 
 // ServerInterface represents all server handlers.
@@ -34,6 +168,9 @@ type ServerInterface interface {
 
 	// (GET /testapi)
 	GetTestapi(c *gin.Context, params GetTestapiParams)
+	// Create a transaction
+	// (POST /testpolymorphism)
+	PostTestpolymorphism(c *gin.Context)
 }
 
 // ServerInterfaceWrapper converts contexts to parameters.
@@ -95,6 +232,21 @@ func (siw *ServerInterfaceWrapper) GetTestapi(c *gin.Context) {
 	siw.Handler.GetTestapi(c, params)
 }
 
+// PostTestpolymorphism operation middleware
+func (siw *ServerInterfaceWrapper) PostTestpolymorphism(c *gin.Context) {
+
+	c.Set(SignatureAuthScopes, []string{"user"})
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		middleware(c)
+		if c.IsAborted() {
+			return
+		}
+	}
+
+	siw.Handler.PostTestpolymorphism(c)
+}
+
 // GinServerOptions provides options for the Gin server.
 type GinServerOptions struct {
 	BaseURL      string
@@ -124,4 +276,5 @@ func RegisterHandlersWithOptions(router gin.IRouter, si ServerInterface, options
 
 	router.GET(options.BaseURL+"/admin/testapi", wrapper.GetAdminTestapi)
 	router.GET(options.BaseURL+"/testapi", wrapper.GetTestapi)
+	router.POST(options.BaseURL+"/testpolymorphism", wrapper.PostTestpolymorphism)
 }

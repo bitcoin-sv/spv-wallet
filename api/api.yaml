@@ -5,9 +5,6 @@ info:
 paths:
   /testapi:
     get:
-      security:
-        - SignatureAuth:
-            - "user"
       parameters:
         - name: something
           in: query
@@ -33,9 +30,24 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ExResponse'
+  /testpolymorphism:
+    post:
+      summary: Create a transaction
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TransactionSpecification'
+      responses:
+        '200':
+          description: Successfully created transaction
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExResponse'
 components:
   schemas:
-    # base types
     ExResponse:
       type: object
       required:
@@ -46,11 +58,60 @@ components:
           type: string
         something:
           type: string
+    TransactionSpecification:
+      type: object
+      properties:
+        outputs:
+          type: array
+          items:
+            $ref: '#/components/schemas/Output'
+
+    Output:
+      oneOf:
+        - $ref: '#/components/schemas/OpReturnOutput'
+        - $ref: '#/components/schemas/PaymailOutput'
+      discriminator:
+        propertyName: dataType
+        mapping:
+          op_return: '#/components/schemas/OpReturnOutput'
+          paymail: '#/components/schemas/PaymailOutput'
+
+    OpReturnOutput:
+      type: object
+      properties:
+        dataType:
+          type: string
+          enum: [ op_return ]
+        data:
+          type: array
+          items:
+            type: string
+      required:
+        - dataType
+        - data
+
+    PaymailOutput:
+      type: object
+      properties:
+        dataType:
+          type: string
+          enum: [ paymail ]
+        to:
+          type: string
+        satoshis:
+          type: integer
+          format: int64
+        from:
+          type: string
+          nullable: true
+      required:
+        - dataType
+        - to
+        - satoshis
   securitySchemes:
     SignatureAuth:
       type: http
       scheme: headers
 security:
   - SignatureAuth:
-      - admin
       - user
