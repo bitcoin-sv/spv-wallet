@@ -34,3 +34,20 @@ func (p *Paymails) Get(ctx context.Context, alias, domain string) (*database.Pay
 
 	return &paymail, nil
 }
+
+// GetDefault returns a default paymail for user.
+func (p *Paymails) GetDefault(ctx context.Context, userID string) (*database.Paymail, error) {
+	var paymail database.Paymail
+	if err := p.db.
+		WithContext(ctx).
+		Where("user_id = ?", userID).
+		Order("created_at ASC").
+		First(&paymail).Error; err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil, nil
+		}
+		return nil, err
+	}
+
+	return &paymail, nil
+}

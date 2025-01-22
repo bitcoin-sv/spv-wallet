@@ -3,51 +3,44 @@ package paymailaddress
 import (
 	"context"
 
+	"github.com/bitcoin-sv/go-paymail"
+	"github.com/bitcoin-sv/spv-wallet/engine/database/repository"
 	"github.com/bitcoin-sv/spv-wallet/engine/paymailaddress/paerrors"
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 )
 
 type service struct {
-	// INFO: this is the first step to slowly move paymail address to a separate package.
-	getXPubIDByPaymailAddress                    func(ctx context.Context, paymailAddress string) (string, error)
-	getPaymailAddressesByXPubIDOrderByCreatedAsc func(ctx context.Context, xPubId string) ([]string, error)
+	repo *repository.Paymails
 }
 
 // NewService creates a new paymail address service.
-func NewService(
-	getXPubIDByPaymailAddress func(ctx context.Context, paymailAddress string) (string, error),
-	getPaymailAddressesByXPubIDOrderByCreatedAsc func(ctx context.Context, xPubId string) ([]string, error),
-) Service {
-	if getXPubIDByPaymailAddress == nil {
-		panic("getXPubIDByPaymailAddress is required to create paymail address service")
-	}
-	if getPaymailAddressesByXPubIDOrderByCreatedAsc == nil {
-		panic("getPaymailAddressesByXPubIDOrderByCreatedAsc is required to create paymail address service")
-	}
-
-	return &service{
-		getXPubIDByPaymailAddress:                    getXPubIDByPaymailAddress,
-		getPaymailAddressesByXPubIDOrderByCreatedAsc: getPaymailAddressesByXPubIDOrderByCreatedAsc,
-	}
+func NewService(repo *repository.Paymails) Service {
+	return &service{repo: repo}
 }
 
-// HasPaymailAddress checks if the given address belongs to a given xPubId.
-func (s *service) HasPaymailAddress(ctx context.Context, xPubID string, address string) (bool, error) {
-	paymailXpubID, err := s.getXPubIDByPaymailAddress(ctx, address)
+// HasPaymailAddress checks if the given address belongs to a given User.
+func (s *service) HasPaymailAddress(ctx context.Context, userID string, address string) (bool, error) {
+	alias, domain, _ := paymail.SanitizePaymail(address)
+	pm, err := s.repo.Get(ctx, alias, domain)
 	if err != nil {
 		return false, err
 	}
-	return paymailXpubID == xPubID, nil
+
+	if pm == nil {
+		return false, nil
+	}
+
+	return pm.UserID == userID, nil
 }
 
 // GetDefaultPaymailAddress returns the default paymail address for the given xPubId.
 func (s *service) GetDefaultPaymailAddress(ctx context.Context, xPubID string) (string, error) {
-	addresses, err := s.getPaymailAddressesByXPubIDOrderByCreatedAsc(ctx, xPubID)
+	pm, err := s.repo.GetDefault(ctx, xPubID)
 	if err != nil {
 		return "", spverrors.ErrInternal.Wrap(err)
-	}
-	if len(addresses) == 0 {
+	} else if pm == nil {
 		return "", paerrors.ErrNoDefaultPaymailAddress
 	}
-	return addresses[0], nil
+
+	return pm.Alias + "@" + pm.Domain, nil
 }

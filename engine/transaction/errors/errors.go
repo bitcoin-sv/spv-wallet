@@ -6,8 +6,8 @@ var (
 	// ErrTxOutlineSpecificationRequired is returned when a transaction outline is created with no specification.
 	ErrTxOutlineSpecificationRequired = models.SPVError{Code: "tx-spec-spec-required", Message: "transaction outline requires a specification", StatusCode: 400}
 
-	// ErrTxOutlineSpecificationXPubIDRequired is returned when a transaction outline is created without xPubID.
-	ErrTxOutlineSpecificationXPubIDRequired = models.SPVError{Code: "tx-spec-spec-xpub-id-required", Message: "cannot create transaction outline without knowledge about xPubID", StatusCode: 500}
+	// ErrTxOutlineSpecificationUserIDRequired is returned when a transaction outline is created without UserID.
+	ErrTxOutlineSpecificationUserIDRequired = models.SPVError{Code: "tx-spec-spec-user-id-required", Message: "cannot create transaction outline without knowledge about userID", StatusCode: 500}
 
 	// ErrTxOutlineRequiresAtLeastOneOutput is returned when a transaction outline is created with no outputs.
 	ErrTxOutlineRequiresAtLeastOneOutput = models.SPVError{Code: "tx-spec-output-required", Message: "transaction outline requires at least one output", StatusCode: 400}
@@ -23,6 +23,9 @@ var (
 
 	// ErrTxOutlineSenderPaymailAddressNoDefault is when it is not possible to determine the default address for the sender.
 	ErrTxOutlineSenderPaymailAddressNoDefault = models.SPVError{Code: "error-tx-spec-paymail-address-no-default", Message: "cannot choose paymail address of the sender", StatusCode: 400}
+
+	// ErrTxOutlineInsufficientFunds is returned when user has not enough BSV in UTXOs to fulfil the transaction.
+	ErrTxOutlineInsufficientFunds = models.SPVError{Code: "tx-outline-not-enough-funds", Message: "not enough funds to make the transaction", StatusCode: 422}
 
 	// ErrFailedToDecodeHex is returned when hex decoding fails.
 	ErrFailedToDecodeHex = models.SPVError{Code: "failed-to-decode-hex", Message: "failed to decode hex", StatusCode: 400}

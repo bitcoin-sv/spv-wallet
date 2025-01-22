@@ -166,36 +166,7 @@ func (c *Client) loadPaymailAddressService() error {
 	if c.options.paymailAddressService != nil {
 		return nil
 	}
-	c.options.paymailAddressService = paymailaddress.NewService(
-		func(ctx context.Context, address string) (string, error) {
-			paymailAddress, err := c.GetPaymailAddress(ctx, address)
-			if err != nil {
-				return "", err
-			}
-			return paymailAddress.XpubID, nil
-		},
-		func(ctx context.Context, xPubId string) ([]string, error) {
-			page := &datastore.QueryParams{
-				PageSize:      10,
-				OrderByField:  createdAtField,
-				SortDirection: datastore.SortAsc,
-			}
-
-			conditions := map[string]interface{}{
-				xPubIDField: xPubId,
-			}
-
-			addresses, err := c.GetPaymailAddresses(ctx, nil, conditions, page)
-			if err != nil {
-				return nil, err
-			}
-			result := make([]string, 0, len(addresses))
-			for _, address := range addresses {
-				result = append(result, address.String())
-			}
-			return result, nil
-		},
-	)
+	c.options.paymailAddressService = paymailaddress.NewService(c.Repositories().Paymails)
 	return nil
 }
 

@@ -1,4 +1,4 @@
-package outputs
+package outlines
 
 import (
 	"errors"
@@ -10,7 +10,6 @@ import (
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/bitcoin-sv/spv-wallet/engine/transaction"
 	txerrors "github.com/bitcoin-sv/spv-wallet/engine/transaction/errors"
-	"github.com/bitcoin-sv/spv-wallet/engine/transaction/outlines/internal/evaluation"
 	paymailreq "github.com/bitcoin-sv/spv-wallet/models/request/paymail"
 	"github.com/bitcoin-sv/spv-wallet/models/transaction/bucket"
 )
@@ -18,7 +17,7 @@ import (
 // Paymail represents a paymail output
 type Paymail paymailreq.Output
 
-func (p *Paymail) evaluate(ctx evaluation.Context) (annotatedOutputs, error) {
+func (p *Paymail) evaluate(ctx evaluationContext) (annotatedOutputs, error) {
 	paymailClient := ctx.Paymail()
 
 	receiverAddress, err := paymailClient.GetSanitizedPaymail(p.To)
@@ -73,7 +72,7 @@ func (p *Paymail) createBsvPaymailOutput(output *paymail.PaymentOutput, referenc
 	}, nil
 }
 
-func (p *Paymail) sender(ctx evaluation.Context) (string, error) {
+func (p *Paymail) sender(ctx evaluationContext) (string, error) {
 	if p.From == nil {
 		return p.defaultSenderAddress(ctx)
 	}
@@ -86,18 +85,18 @@ func (p *Paymail) sender(ctx evaluation.Context) (string, error) {
 	return *p.From, nil
 }
 
-func (p *Paymail) validateProvidedSenderPaymail(ctx evaluation.Context) error {
+func (p *Paymail) validateProvidedSenderPaymail(ctx evaluationContext) error {
 	var sender = *p.From
 	_, err := ctx.Paymail().GetSanitizedPaymail(sender)
 	if err != nil {
 		return txerrors.ErrSenderPaymailAddressIsInvalid.Wrap(err)
 	}
-	ownsPaymail, err := ctx.PaymailAddressService().HasPaymailAddress(ctx, ctx.XPubID(), sender)
+	ownsPaymail, err := ctx.PaymailAddressService().HasPaymailAddress(ctx, ctx.UserID(), sender)
 	if errors.Is(err, spverrors.ErrCouldNotFindPaymail) {
 		return txerrors.ErrSenderPaymailAddressIsInvalid.Wrap(err)
 	}
 	if err != nil {
-		return spverrors.Wrapf(err, "failed to check if paymail %s belongs to xpub %s", sender, ctx.XPubID())
+		return spverrors.Wrapf(err, "failed to check if paymail %s belongs to user %s", sender, ctx.UserID())
 	}
 
 	if !ownsPaymail {
@@ -107,8 +106,8 @@ func (p *Paymail) validateProvidedSenderPaymail(ctx evaluation.Context) error {
 	return nil
 }
 
-func (p *Paymail) defaultSenderAddress(ctx evaluation.Context) (string, error) {
-	sender, err := ctx.PaymailAddressService().GetDefaultPaymailAddress(ctx, ctx.XPubID())
+func (p *Paymail) defaultSenderAddress(ctx evaluationContext) (string, error) {
+	sender, err := ctx.PaymailAddressService().GetDefaultPaymailAddress(ctx, ctx.UserID())
 	if err != nil {
 		return "", txerrors.ErrTxOutlineSenderPaymailAddressNoDefault.Wrap(err)
 	}

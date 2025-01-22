@@ -9,7 +9,6 @@ import (
 	"github.com/bitcoin-sv/spv-wallet/engine/tester/fixtures"
 	txerrors "github.com/bitcoin-sv/spv-wallet/engine/transaction/errors"
 	"github.com/bitcoin-sv/spv-wallet/engine/transaction/outlines"
-	"github.com/bitcoin-sv/spv-wallet/engine/transaction/outlines/outputs"
 	"github.com/bitcoin-sv/spv-wallet/engine/transaction/outlines/testabilities"
 	"github.com/bitcoin-sv/spv-wallet/models"
 	"github.com/bitcoin-sv/spv-wallet/models/bsv"
@@ -33,8 +32,8 @@ func TestCreatePaymailTransactionOutline(t *testing.T) {
 
 		// and:
 		spec := &outlines.TransactionSpec{
-			XPubID: fixtures.Sender.XPubID(),
-			Outputs: outputs.NewSpecifications(&outputs.Paymail{
+			UserID: fixtures.Sender.ID(),
+			Outputs: outlines.NewOutputsSpec(&outlines.Paymail{
 				To:       recipient,
 				Satoshis: transactionSatoshiValue,
 				From:     optional.Of(sender),
@@ -75,8 +74,8 @@ func TestCreatePaymailTransactionOutline(t *testing.T) {
 
 		// and:
 		spec := &outlines.TransactionSpec{
-			XPubID: fixtures.Sender.XPubID(),
-			Outputs: outputs.NewSpecifications(&outputs.Paymail{
+			UserID: fixtures.Sender.ID(),
+			Outputs: outlines.NewOutputsSpec(&outlines.Paymail{
 				To:       recipient,
 				Satoshis: paymentSatoshiValue,
 				From:     optional.Of(sender),
@@ -121,8 +120,8 @@ func TestCreatePaymailTransactionOutline(t *testing.T) {
 
 		// and:
 		spec := &outlines.TransactionSpec{
-			XPubID: fixtures.UserWithMorePaymails.XPubID(),
-			Outputs: outputs.NewSpecifications(&outputs.Paymail{
+			UserID: fixtures.UserWithMorePaymails.ID(),
+			Outputs: outlines.NewOutputsSpec(&outlines.Paymail{
 				To:       recipient,
 				Satoshis: transactionSatoshiValue,
 			}),
@@ -140,19 +139,19 @@ func TestCreatePaymailTransactionOutline(t *testing.T) {
 
 	errorTests := map[string]struct {
 		user          fixtures.User
-		spec          *outputs.Paymail
+		spec          *outlines.Paymail
 		expectedError models.SPVError
 	}{
 		"return error for no paymail address": {
 			user: fixtures.Sender,
-			spec: &outputs.Paymail{
+			spec: &outlines.Paymail{
 				Satoshis: transactionSatoshiValue,
 			},
 			expectedError: txerrors.ErrReceiverPaymailAddressIsInvalid,
 		},
 		"return error for only alias without domain": {
 			user: fixtures.Sender,
-			spec: &outputs.Paymail{
+			spec: &outlines.Paymail{
 				To:       "test",
 				Satoshis: transactionSatoshiValue,
 			},
@@ -160,7 +159,7 @@ func TestCreatePaymailTransactionOutline(t *testing.T) {
 		},
 		"return error for domain without alias": {
 			user: fixtures.Sender,
-			spec: &outputs.Paymail{
+			spec: &outlines.Paymail{
 				To:       "@example.com",
 				Satoshis: transactionSatoshiValue,
 			},
@@ -168,7 +167,7 @@ func TestCreatePaymailTransactionOutline(t *testing.T) {
 		},
 		"return error for paymail with invalid alias": {
 			user: fixtures.Sender,
-			spec: &outputs.Paymail{
+			spec: &outlines.Paymail{
 				To:       "$$$@example.com",
 				Satoshis: transactionSatoshiValue,
 			},
@@ -176,7 +175,7 @@ func TestCreatePaymailTransactionOutline(t *testing.T) {
 		},
 		"return error for paymail with invalid domain": {
 			user: fixtures.Sender,
-			spec: &outputs.Paymail{
+			spec: &outlines.Paymail{
 				To:       "test@example.com.$$$",
 				Satoshis: transactionSatoshiValue,
 			},
@@ -184,7 +183,7 @@ func TestCreatePaymailTransactionOutline(t *testing.T) {
 		},
 		"return error for zero satoshis value": {
 			user: fixtures.Sender,
-			spec: &outputs.Paymail{
+			spec: &outlines.Paymail{
 				To:       recipient,
 				Satoshis: 0,
 			},
@@ -192,14 +191,14 @@ func TestCreatePaymailTransactionOutline(t *testing.T) {
 		},
 		"return error for no satoshis value": {
 			user: fixtures.Sender,
-			spec: &outputs.Paymail{
+			spec: &outlines.Paymail{
 				To: recipient,
 			},
 			expectedError: txerrors.ErrOutputValueTooLow,
 		},
 		"return error for sender paymail without domain": {
 			user: fixtures.Sender,
-			spec: &outputs.Paymail{
+			spec: &outlines.Paymail{
 				To:       recipient,
 				Satoshis: transactionSatoshiValue,
 				From:     optional.Of("sender"),
@@ -208,7 +207,7 @@ func TestCreatePaymailTransactionOutline(t *testing.T) {
 		},
 		"return error for sender paymail without alias": {
 			user: fixtures.Sender,
-			spec: &outputs.Paymail{
+			spec: &outlines.Paymail{
 				To:       recipient,
 				Satoshis: transactionSatoshiValue,
 				From:     optional.Of("@example.com"),
@@ -217,7 +216,7 @@ func TestCreatePaymailTransactionOutline(t *testing.T) {
 		},
 		"return error for sender paymail with invalid alias": {
 			user: fixtures.Sender,
-			spec: &outputs.Paymail{
+			spec: &outlines.Paymail{
 				To:       recipient,
 				Satoshis: transactionSatoshiValue,
 				From:     optional.Of("$$$@example.com"),
@@ -226,7 +225,7 @@ func TestCreatePaymailTransactionOutline(t *testing.T) {
 		},
 		"return error for sender paymail with invalid domain domain": {
 			user: fixtures.Sender,
-			spec: &outputs.Paymail{
+			spec: &outlines.Paymail{
 				To:       recipient,
 				Satoshis: transactionSatoshiValue,
 				From:     optional.Of("sender@example.com.$$$"),
@@ -235,7 +234,7 @@ func TestCreatePaymailTransactionOutline(t *testing.T) {
 		},
 		"return error for sender paymail address not existing in our system": {
 			user: fixtures.Sender,
-			spec: &outputs.Paymail{
+			spec: &outlines.Paymail{
 				To:       recipient,
 				Satoshis: transactionSatoshiValue,
 				From:     optional.Of(fixtures.RecipientExternal.DefaultPaymail()),
@@ -244,7 +243,7 @@ func TestCreatePaymailTransactionOutline(t *testing.T) {
 		},
 		"return error for sender paymail not belonging to that user": {
 			user: fixtures.Sender,
-			spec: &outputs.Paymail{
+			spec: &outlines.Paymail{
 				To:       recipient,
 				Satoshis: transactionSatoshiValue,
 				From:     optional.Of(fixtures.RecipientInternal.DefaultPaymail()),
@@ -253,7 +252,7 @@ func TestCreatePaymailTransactionOutline(t *testing.T) {
 		},
 		"return error for default sender paymail of user without paymail": {
 			user: fixtures.UserWithoutPaymail,
-			spec: &outputs.Paymail{
+			spec: &outlines.Paymail{
 				To:       recipient,
 				Satoshis: transactionSatoshiValue,
 			},
@@ -272,8 +271,8 @@ func TestCreatePaymailTransactionOutline(t *testing.T) {
 
 			// and:
 			spec := &outlines.TransactionSpec{
-				XPubID:  test.user.XPubID(),
-				Outputs: outputs.NewSpecifications(test.spec),
+				UserID:  test.user.ID(),
+				Outputs: outlines.NewOutputsSpec(test.spec),
 			}
 
 			// when:
@@ -337,8 +336,8 @@ func TestCreatePaymailTransactionOutline(t *testing.T) {
 
 			// and:
 			spec := &outlines.TransactionSpec{
-				XPubID: fixtures.Sender.XPubID(),
-				Outputs: outputs.NewSpecifications(&outputs.Paymail{
+				UserID: fixtures.Sender.ID(),
+				Outputs: outlines.NewOutputsSpec(&outlines.Paymail{
 					To:       recipient,
 					Satoshis: transactionSatoshiValue,
 				}),

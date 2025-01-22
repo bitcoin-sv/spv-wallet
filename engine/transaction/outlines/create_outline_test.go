@@ -7,7 +7,6 @@ import (
 	"github.com/bitcoin-sv/spv-wallet/engine/tester/fixtures"
 	txerrors "github.com/bitcoin-sv/spv-wallet/engine/transaction/errors"
 	"github.com/bitcoin-sv/spv-wallet/engine/transaction/outlines"
-	"github.com/bitcoin-sv/spv-wallet/engine/transaction/outlines/outputs"
 	"github.com/bitcoin-sv/spv-wallet/engine/transaction/outlines/testabilities"
 	"github.com/bitcoin-sv/spv-wallet/models"
 )
@@ -23,16 +22,16 @@ func TestCreateTransactionOutlineError(t *testing.T) {
 		},
 		"return error for transaction spec without xPub Id": {
 			spec:          &outlines.TransactionSpec{},
-			expectedError: txerrors.ErrTxOutlineSpecificationXPubIDRequired,
+			expectedError: txerrors.ErrTxOutlineSpecificationUserIDRequired,
 		},
 		"return error for no outputs in transaction spec": {
-			spec:          &outlines.TransactionSpec{XPubID: fixtures.Sender.XPubID()},
+			spec:          &outlines.TransactionSpec{UserID: fixtures.Sender.ID()},
 			expectedError: txerrors.ErrTxOutlineRequiresAtLeastOneOutput,
 		},
 		"return error for empty output list in transaction spec": {
 			spec: &outlines.TransactionSpec{
-				XPubID:  fixtures.Sender.XPubID(),
-				Outputs: outputs.NewSpecifications(),
+				UserID:  fixtures.Sender.ID(),
+				Outputs: outlines.NewOutputsSpec(),
 			},
 			expectedError: txerrors.ErrTxOutlineRequiresAtLeastOneOutput,
 		},

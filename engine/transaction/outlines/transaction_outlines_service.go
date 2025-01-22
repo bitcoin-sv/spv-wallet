@@ -3,13 +3,10 @@ package outlines
 import (
 	"context"
 
-	sdk "github.com/bitcoin-sv/go-sdk/transaction"
 	"github.com/bitcoin-sv/spv-wallet/engine/paymail"
 	"github.com/bitcoin-sv/spv-wallet/engine/paymailaddress"
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
-	"github.com/bitcoin-sv/spv-wallet/engine/transaction"
 	txerrors "github.com/bitcoin-sv/spv-wallet/engine/transaction/errors"
-	"github.com/bitcoin-sv/spv-wallet/engine/transaction/outlines/internal/evaluation"
 	"github.com/rs/zerolog"
 )
 
@@ -26,7 +23,7 @@ func NewService(paymailService paymail.ServiceClient, paymailAddressService paym
 	}
 
 	if paymailAddressService == nil {
-		panic("paymailaddress.Service is required to create transaction outlines service")
+		panic("PaymailAddressService is required to create transaction outlines service")
 	}
 
 	return &service{
@@ -42,25 +39,21 @@ func (s *service) Create(ctx context.Context, spec *TransactionSpec) (*Transacti
 		return nil, txerrors.ErrTxOutlineSpecificationRequired
 	}
 
-	if spec.XPubID == "" {
-		return nil, txerrors.ErrTxOutlineSpecificationXPubIDRequired
+	if spec.UserID == "" {
+		return nil, txerrors.ErrTxOutlineSpecificationUserIDRequired
 	}
 
-	c := evaluation.NewContext(
+	c := newTransactionContext(
 		ctx,
-		spec.XPubID,
+		spec.UserID,
 		s.logger,
 		s.paymailService,
 		s.paymailAddressService,
 	)
 
-	outputs, annotations, err := spec.outputs(c)
+	tx, annotations, err := spec.evaluate(c)
 	if err != nil {
 		return nil, err
-	}
-
-	tx := &sdk.Transaction{
-		Outputs: outputs,
 	}
 
 	beef, err := tx.BEEFHex()
@@ -69,9 +62,7 @@ func (s *service) Create(ctx context.Context, spec *TransactionSpec) (*Transacti
 	}
 
 	return &Transaction{
-		BEEF: beef,
-		Annotations: transaction.Annotations{
-			Outputs: annotations,
-		},
+		BEEF:        beef,
+		Annotations: annotations,
 	}, nil
 }

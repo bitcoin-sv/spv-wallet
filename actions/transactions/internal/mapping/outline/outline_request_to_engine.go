@@ -6,7 +6,6 @@ import (
 
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/bitcoin-sv/spv-wallet/engine/transaction/outlines"
-	"github.com/bitcoin-sv/spv-wallet/engine/transaction/outlines/outputs"
 	"github.com/bitcoin-sv/spv-wallet/models/request"
 	"github.com/bitcoin-sv/spv-wallet/models/request/opreturn"
 	paymailreq "github.com/bitcoin-sv/spv-wallet/models/request/paymail"
@@ -17,9 +16,9 @@ import (
 type Request request.TransactionSpecification
 
 // ToEngine converts a transaction outline request model to the engine model.
-func (tx Request) ToEngine(xPubID string) (*outlines.TransactionSpec, error) {
+func (tx Request) ToEngine(userID string) (*outlines.TransactionSpec, error) {
 	spec := &outlines.TransactionSpec{
-		XPubID: xPubID,
+		UserID: userID,
 	}
 	config := mapstructure.DecoderConfig{
 		DecodeHook: outputsHookFunc(),
@@ -40,7 +39,7 @@ func (tx Request) ToEngine(xPubID string) (*outlines.TransactionSpec, error) {
 
 func outputsHookFunc() mapstructure.DecodeHookFunc {
 	return func(_ reflect.Type, to reflect.Type, data interface{}) (interface{}, error) {
-		specs := outputs.NewSpecifications()
+		specs := outlines.NewOutputsSpec()
 		reqOutputs, ok := data.([]request.Output)
 		if !ok {
 			return data, nil
@@ -60,13 +59,13 @@ func outputsHookFunc() mapstructure.DecodeHookFunc {
 	}
 }
 
-func outputSpecFromRequest(req request.Output) (outputs.Spec, error) {
+func outputSpecFromRequest(req request.Output) (outlines.OutputSpec, error) {
 	switch o := req.(type) {
 	case opreturn.Output:
-		out := outputs.OpReturn(o)
+		out := outlines.OpReturn(o)
 		return &out, nil
 	case paymailreq.Output:
-		out := outputs.Paymail(o)
+		out := outlines.Paymail(o)
 		return &out, nil
 	default:
 		return nil, errors.New("unsupported output type")

@@ -1,37 +1,36 @@
-package outputs
+package outlines
 
 import (
 	sdk "github.com/bitcoin-sv/go-sdk/transaction"
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/bitcoin-sv/spv-wallet/engine/transaction"
 	txerrors "github.com/bitcoin-sv/spv-wallet/engine/transaction/errors"
-	"github.com/bitcoin-sv/spv-wallet/engine/transaction/outlines/internal/evaluation"
 )
 
-// Specifications are representing a client specification for outputs part of the transaction.
-type Specifications struct {
-	Outputs []Spec
+// OutputsSpec are representing a client specification for outputs part of the transaction.
+type OutputsSpec struct {
+	Outputs []OutputSpec
 }
 
-// Spec is a specification for a single output of the transaction.
-type Spec interface {
-	evaluate(ctx evaluation.Context) (annotatedOutputs, error)
+// OutputSpec is a specification for a single output of the transaction.
+type OutputSpec interface {
+	evaluate(ctx evaluationContext) (annotatedOutputs, error)
 }
 
-// NewSpecifications constructs a new Specifications instance with provided outputs specifications.
-func NewSpecifications(outputs ...Spec) *Specifications {
-	return &Specifications{
+// NewOutputsSpec constructs a new OutputsSpec instance with provided outputs specifications.
+func NewOutputsSpec(outputs ...OutputSpec) OutputsSpec {
+	return OutputsSpec{
 		Outputs: outputs,
 	}
 }
 
 // Add a new output specification to the list of outputs.
-func (s *Specifications) Add(output Spec) {
+func (s *OutputsSpec) Add(output OutputSpec) {
 	s.Outputs = append(s.Outputs, output)
 }
 
 // Evaluate the outputs specifications and return the transaction outputs and their annotations.
-func (s *Specifications) Evaluate(ctx evaluation.Context) ([]*sdk.TransactionOutput, transaction.OutputsAnnotations, error) {
+func (s *OutputsSpec) Evaluate(ctx evaluationContext) ([]*sdk.TransactionOutput, transaction.OutputsAnnotations, error) {
 	if s.Outputs == nil {
 		return nil, nil, txerrors.ErrTxOutlineRequiresAtLeastOneOutput
 	}
@@ -44,7 +43,11 @@ func (s *Specifications) Evaluate(ctx evaluation.Context) ([]*sdk.TransactionOut
 	return txOutputs, annotations, nil
 }
 
-func (s *Specifications) evaluate(ctx evaluation.Context) (annotatedOutputs, error) {
+func (s *OutputsSpec) evaluate(ctx evaluationContext) (annotatedOutputs, error) {
+	if len(s.Outputs) == 0 {
+		return nil, txerrors.ErrTxOutlineRequiresAtLeastOneOutput
+	}
+
 	outputs := make(annotatedOutputs, 0)
 	for _, spec := range s.Outputs {
 		outs, err := spec.evaluate(ctx)
@@ -56,12 +59,12 @@ func (s *Specifications) evaluate(ctx evaluation.Context) (annotatedOutputs, err
 	return outputs, nil
 }
 
+type annotatedOutputs []*annotatedOutput
+
 type annotatedOutput struct {
 	*transaction.OutputAnnotation
 	*sdk.TransactionOutput
 }
-
-type annotatedOutputs []*annotatedOutput
 
 func singleAnnotatedOutput(txOut *sdk.TransactionOutput, out *transaction.OutputAnnotation) annotatedOutputs {
 	return annotatedOutputs{

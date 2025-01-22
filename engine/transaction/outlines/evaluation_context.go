@@ -1,4 +1,4 @@
-package evaluation
+package outlines
 
 import (
 	"context"
@@ -8,19 +8,29 @@ import (
 	"github.com/rs/zerolog"
 )
 
+// evaluationContext is a context for the evaluation of a transaction outline specification.
+type evaluationContext interface {
+	context.Context
+	XPubID() string
+	UserID() string
+	Log() *zerolog.Logger
+	Paymail() paymail.ServiceClient
+	PaymailAddressService() paymailaddress.Service
+}
+
 type ctx struct {
 	context.Context
-	xPubID                string
+	userID                string
 	log                   *zerolog.Logger
 	paymail               paymail.ServiceClient
 	paymailAddressService paymailaddress.Service
 }
 
-// NewContext creates a new context
-func NewContext(c context.Context, xPubID string, log *zerolog.Logger, paymail paymail.ServiceClient, paymailAddressService paymailaddress.Service) Context {
+// newTransactionContext creates a new context
+func newTransactionContext(c context.Context, userID string, log *zerolog.Logger, paymail paymail.ServiceClient, paymailAddressService paymailaddress.Service) evaluationContext {
 	return &ctx{
 		Context:               c,
-		xPubID:                xPubID,
+		userID:                userID,
 		log:                   log,
 		paymail:               paymail,
 		paymailAddressService: paymailAddressService,
@@ -28,7 +38,11 @@ func NewContext(c context.Context, xPubID string, log *zerolog.Logger, paymail p
 }
 
 func (c *ctx) XPubID() string {
-	return c.xPubID
+	return ""
+}
+
+func (c *ctx) UserID() string {
+	return c.userID
 }
 
 func (c *ctx) Log() *zerolog.Logger {
