@@ -1,8 +1,6 @@
-package domainmodels
+package usersmodels
 
-import (
-	"time"
-)
+import "time"
 
 // Paymail is a domain model for existing paymail
 type Paymail struct {

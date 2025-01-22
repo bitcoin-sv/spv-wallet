@@ -9,12 +9,13 @@ import (
 	"github.com/bitcoin-sv/spv-wallet/config"
 	"github.com/bitcoin-sv/spv-wallet/engine"
 	"github.com/bitcoin-sv/spv-wallet/engine/datastore"
-	"github.com/bitcoin-sv/spv-wallet/engine/domainmodels"
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/bitcoin-sv/spv-wallet/engine/testabilities/testmode"
 	"github.com/bitcoin-sv/spv-wallet/engine/tester"
 	"github.com/bitcoin-sv/spv-wallet/engine/tester/fixtures"
 	"github.com/bitcoin-sv/spv-wallet/engine/tester/paymailmock"
+	"github.com/bitcoin-sv/spv-wallet/engine/v2/paymails/paymailsmodels"
+	"github.com/bitcoin-sv/spv-wallet/engine/v2/users/usersmodels"
 	"github.com/go-resty/resty/v2"
 	"github.com/jarcoal/httpmock"
 	"github.com/rs/zerolog"
@@ -165,7 +166,7 @@ func (f *engineFixture) initialiseFixtures() {
 
 		if f.config.ExperimentalFeatures.NewTransactionFlowEnabled {
 			pubKeyHex := user.PublicKey().ToDERHex()
-			createdUser, err := f.engine.UserService().CreateUser(context.Background(), &domainmodels.NewUser{
+			createdUser, err := f.engine.UsersService().Create(context.Background(), &usersmodels.NewUser{
 				PublicKey: pubKeyHex,
 			})
 			if err != nil {
@@ -173,7 +174,7 @@ func (f *engineFixture) initialiseFixtures() {
 			}
 			for _, address := range user.Paymails {
 				alias, domain, _ := paymail.SanitizePaymail(address)
-				_, err = f.engine.UserService().AppendPaymail(context.Background(), &domainmodels.NewPaymail{
+				_, err = f.engine.PaymailsService().Create(context.Background(), &paymailsmodels.NewPaymail{
 					Alias:  alias,
 					Domain: domain,
 

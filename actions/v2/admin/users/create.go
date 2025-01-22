@@ -6,8 +6,8 @@ import (
 	primitives "github.com/bitcoin-sv/go-sdk/primitives/ec"
 	adminerrors "github.com/bitcoin-sv/spv-wallet/actions/v2/admin/errors"
 	"github.com/bitcoin-sv/spv-wallet/actions/v2/admin/internal/mapping"
-	"github.com/bitcoin-sv/spv-wallet/engine/domainmodels"
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
+	"github.com/bitcoin-sv/spv-wallet/engine/v2/users/usersmodels"
 	"github.com/bitcoin-sv/spv-wallet/models/request/adminrequest"
 	"github.com/bitcoin-sv/spv-wallet/server/reqctx"
 	"github.com/gin-gonic/gin"
@@ -27,7 +27,7 @@ func create(c *gin.Context, _ *reqctx.AdminContext) {
 		return
 	}
 
-	newUser := &domainmodels.NewUser{
+	newUser := &usersmodels.NewUser{
 		PublicKey: requestBody.PublicKey,
 	}
 	if requestBody.PaymailDefined() {
@@ -42,7 +42,7 @@ func create(c *gin.Context, _ *reqctx.AdminContext) {
 			return
 		}
 
-		newUser.Paymail = &domainmodels.NewPaymail{
+		newUser.Paymail = &usersmodels.NewPaymail{
 			Alias:  alias,
 			Domain: domain,
 
@@ -51,7 +51,7 @@ func create(c *gin.Context, _ *reqctx.AdminContext) {
 		}
 	}
 
-	createdUser, err := reqctx.Engine(c).UserService().CreateUser(c, newUser)
+	createdUser, err := reqctx.Engine(c).UsersService().Create(c, newUser)
 	if err != nil {
 		spverrors.ErrorResponse(c, adminerrors.ErrCreatingUser.Wrap(err), logger)
 		return

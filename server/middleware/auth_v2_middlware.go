@@ -47,7 +47,7 @@ func tryAuthWithPubKey(c *gin.Context, xPub string) (*reqctx.UserContext, error)
 	}
 	pubKeyHex := pubKey.ToDERHex()
 
-	userID, err := reqctx.Engine(c).UserService().GetIDByPubKey(c.Request.Context(), pubKeyHex)
+	userID, err := reqctx.Engine(c).UsersService().GetIDByPubKey(c.Request.Context(), pubKeyHex)
 	if err != nil {
 		return nil, spverrors.ErrAuthorization.Wrap(err)
 	}

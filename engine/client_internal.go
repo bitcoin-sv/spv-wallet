@@ -16,7 +16,9 @@ import (
 	"github.com/bitcoin-sv/spv-wallet/engine/taskmanager"
 	"github.com/bitcoin-sv/spv-wallet/engine/transaction/outlines"
 	"github.com/bitcoin-sv/spv-wallet/engine/transaction/record"
-	"github.com/bitcoin-sv/spv-wallet/engine/users"
+	"github.com/bitcoin-sv/spv-wallet/engine/v2/addresses"
+	"github.com/bitcoin-sv/spv-wallet/engine/v2/paymails"
+	"github.com/bitcoin-sv/spv-wallet/engine/v2/users"
 	"github.com/mrz1836/go-cachestore"
 )
 
@@ -229,8 +231,20 @@ func (c *Client) loadRepositories() {
 }
 
 func (c *Client) loadUsersService() {
-	if c.options.user == nil {
-		c.options.user = users.UserService(c.Repositories().Users, c.Repositories().Addresses, c.Repositories().Paymails)
+	if c.options.users == nil {
+		c.options.users = users.NewService(c.Repositories().Users)
+	}
+}
+
+func (c *Client) loadPaymailsService() {
+	if c.options.paymails == nil {
+		c.options.paymails = paymails.NewService(c.Repositories().Paymails, c.UsersService())
+	}
+}
+
+func (c *Client) loadAddressesService() {
+	if c.options.addresses == nil {
+		c.options.addresses = addresses.NewService(c.Repositories().Addresses)
 	}
 }
 
@@ -296,8 +310,9 @@ func (c *Client) loadPaymailServer() (err error) {
 		paymailServiceLogger := c.Logger().With().Str("subservice", "paymail-service-provider").Logger()
 		serviceProvider = paymail.NewServiceProvider(
 			&paymailServiceLogger,
-			c.Repositories().Paymails,
-			c.UserService(),
+			c.PaymailsService(),
+			c.UsersService(),
+			c.AddressesService(),
 			c.Chain(),
 			c.TransactionRecordService(),
 		)

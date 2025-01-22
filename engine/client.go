@@ -20,7 +20,9 @@ import (
 	"github.com/bitcoin-sv/spv-wallet/engine/taskmanager"
 	"github.com/bitcoin-sv/spv-wallet/engine/transaction/outlines"
 	"github.com/bitcoin-sv/spv-wallet/engine/transaction/record"
-	"github.com/bitcoin-sv/spv-wallet/engine/users"
+	"github.com/bitcoin-sv/spv-wallet/engine/v2/addresses"
+	"github.com/bitcoin-sv/spv-wallet/engine/v2/paymails"
+	"github.com/bitcoin-sv/spv-wallet/engine/v2/users"
 	"github.com/bitcoin-sv/spv-wallet/models/bsv"
 	"github.com/go-resty/resty/v2"
 	"github.com/mrz1836/go-cachestore"
@@ -56,8 +58,12 @@ type (
 		arcConfig                  chainmodels.ARCConfig  // Configuration for ARC
 		bhsConfig                  chainmodels.BHSConfig  // Configuration for BHS
 		feeUnit                    *bsv.FeeUnit           // Fee unit for transactions
-		repositories               *repository.All        // Repositories for all db models
-		user                       *users.Service         // User domain service
+
+		// v2
+		repositories *repository.All   // Repositories for all db models
+		users        *users.Service    // User domain service
+		paymails     *paymails.Service // Paymail domain service
+		addresses    *addresses.Service
 	}
 
 	// cacheStoreOptions holds the cache configuration and client
@@ -149,6 +155,8 @@ func NewClient(ctx context.Context, opts ...ClientOps) (ClientInterface, error) 
 	client.loadRepositories()
 
 	client.loadUsersService()
+	client.loadPaymailsService()
+	client.loadAddressesService()
 
 	// Load the Paymail client and service (if does not exist)
 	if err = client.loadPaymailComponents(); err != nil {
@@ -344,7 +352,17 @@ func (c *Client) Repositories() *repository.All {
 	return c.options.repositories
 }
 
-// UserService will return the user domain service
-func (c *Client) UserService() *users.Service {
-	return c.options.user
+// UsersService will return the user domain service
+func (c *Client) UsersService() *users.Service {
+	return c.options.users
+}
+
+// PaymailsService will return the paymail domain service
+func (c *Client) PaymailsService() *paymails.Service {
+	return c.options.paymails
+}
+
+// AddressesService will return the address domain service
+func (c *Client) AddressesService() *addresses.Service {
+	return c.options.addresses
 }

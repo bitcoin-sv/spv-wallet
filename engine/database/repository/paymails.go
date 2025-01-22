@@ -5,7 +5,7 @@ import (
 	"errors"
 
 	"github.com/bitcoin-sv/spv-wallet/engine/database"
-	"github.com/bitcoin-sv/spv-wallet/engine/domainmodels"
+	"github.com/bitcoin-sv/spv-wallet/engine/v2/paymails/paymailsmodels"
 	"gorm.io/gorm"
 )
 
@@ -20,7 +20,7 @@ func NewPaymailsRepo(db *gorm.DB) *Paymails {
 }
 
 // Create adds a new paymail to the database.
-func (p *Paymails) Create(ctx context.Context, newPaymail *domainmodels.NewPaymail) (*domainmodels.Paymail, error) {
+func (p *Paymails) Create(ctx context.Context, newPaymail *paymailsmodels.NewPaymail) (*paymailsmodels.Paymail, error) {
 	row := database.Paymail{
 		Alias:  newPaymail.Alias,
 		Domain: newPaymail.Domain,
@@ -35,7 +35,7 @@ func (p *Paymails) Create(ctx context.Context, newPaymail *domainmodels.NewPayma
 		return nil, err
 	}
 
-	return &domainmodels.Paymail{
+	return &paymailsmodels.Paymail{
 		ID:        row.ID,
 		CreatedAt: row.CreatedAt,
 		UpdatedAt: row.UpdatedAt,
@@ -51,7 +51,7 @@ func (p *Paymails) Create(ctx context.Context, newPaymail *domainmodels.NewPayma
 }
 
 // Get returns a paymail by alias and domain.
-func (p *Paymails) Get(ctx context.Context, alias, domain string) (*domainmodels.Paymail, error) {
+func (p *Paymails) Get(ctx context.Context, alias, domain string) (*paymailsmodels.Paymail, error) {
 	var row database.Paymail
 	if err := p.db.
 		WithContext(ctx).
@@ -63,7 +63,7 @@ func (p *Paymails) Get(ctx context.Context, alias, domain string) (*domainmodels
 		return nil, err
 	}
 
-	return &domainmodels.Paymail{
+	return &paymailsmodels.Paymail{
 		ID:        row.ID,
 		CreatedAt: row.CreatedAt,
 		UpdatedAt: row.UpdatedAt,

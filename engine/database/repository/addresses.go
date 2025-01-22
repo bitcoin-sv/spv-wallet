@@ -6,8 +6,8 @@ import (
 	"slices"
 
 	"github.com/bitcoin-sv/spv-wallet/engine/database"
-	"github.com/bitcoin-sv/spv-wallet/engine/domainmodels"
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
+	"github.com/bitcoin-sv/spv-wallet/engine/v2/addresses/addressesmodels"
 	"gorm.io/datatypes"
 	"gorm.io/gorm"
 )
@@ -23,7 +23,7 @@ func NewAddressesRepo(db *gorm.DB) *Addresses {
 }
 
 // Create adds a new address to the database.
-func (r *Addresses) Create(ctx context.Context, newAddress *domainmodels.NewAddress) error {
+func (r *Addresses) Create(ctx context.Context, newAddress *addressesmodels.NewAddress) error {
 	row := &database.Address{
 		UserID:             newAddress.UserID,
 		Address:            newAddress.Address,

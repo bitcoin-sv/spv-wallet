@@ -4,9 +4,9 @@ import (
 	"context"
 
 	"github.com/bitcoin-sv/spv-wallet/engine/database"
-	"github.com/bitcoin-sv/spv-wallet/engine/domainmodels"
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/bitcoin-sv/spv-wallet/engine/utils"
+	"github.com/bitcoin-sv/spv-wallet/engine/v2/users/usersmodels"
 	"github.com/bitcoin-sv/spv-wallet/models/bsv"
 	"gorm.io/gorm"
 )
@@ -49,7 +49,7 @@ func (u *Users) GetIDByPubKey(ctx context.Context, pubKey string) (string, error
 }
 
 // Get returns a user by its id with preloaded paymail slist. If the user does not exist, it returns error.
-func (u *Users) Get(ctx context.Context, userID string) (*domainmodels.User, error) {
+func (u *Users) Get(ctx context.Context, userID string) (*usersmodels.User, error) {
 	var user database.User
 	err := u.db.WithContext(ctx).
 		Scopes(withPaymailsScope).
@@ -63,7 +63,7 @@ func (u *Users) Get(ctx context.Context, userID string) (*domainmodels.User, err
 }
 
 // Create saves new user to the database.
-func (u *Users) Create(ctx context.Context, newUser *domainmodels.NewUser) (*domainmodels.User, error) {
+func (u *Users) Create(ctx context.Context, newUser *usersmodels.NewUser) (*usersmodels.User, error) {
 	query := u.db.WithContext(ctx)
 
 	row := &database.User{
@@ -103,14 +103,14 @@ func (u *Users) GetBalance(ctx context.Context, userID string, bucket string) (b
 	return balance, nil
 }
 
-func mapToDomainUser(user *database.User) *domainmodels.User {
-	return &domainmodels.User{
+func mapToDomainUser(user *database.User) *usersmodels.User {
+	return &usersmodels.User{
 		ID:        user.ID,
 		CreatedAt: user.CreatedAt,
 		UpdatedAt: user.UpdatedAt,
 		PublicKey: user.PubKey,
-		Paymails: utils.MapSlice(user.Paymails, func(p *database.Paymail) *domainmodels.Paymail {
-			return &domainmodels.Paymail{
+		Paymails: utils.MapSlice(user.Paymails, func(p *database.Paymail) *usersmodels.Paymail {
+			return &usersmodels.Paymail{
 				ID:        p.ID,
 				CreatedAt: p.CreatedAt,
 				UpdatedAt: p.UpdatedAt,

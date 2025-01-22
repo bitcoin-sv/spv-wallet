@@ -1,4 +1,4 @@
-package domainmodels
+package usersmodels
 
 import (
 	"fmt"
