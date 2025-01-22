@@ -10,7 +10,7 @@ import (
 )
 
 type inputsQueryComposer struct {
-	xPubID              string
+	userID              string
 	outputsTotalValue   bsv.Satoshis
 	txWithoutInputsSize uint64
 	feeUnit             bsv.FeeUnit
@@ -22,12 +22,12 @@ func (c *inputsQueryComposer) build(db *gorm.DB) *gorm.DB {
 	utxoWithMinChange := c.searchForMinimalChangeValue(db, utxoWithChange)
 	selectedOutpoints := c.chooseInputsToCoverOutputsAndFeesAndHaveMinimalChange(db, utxoWithMinChange)
 
-	res := db.Model(&database.UserUtxos{}).Where("(tx_id, vout) in (?)", selectedOutpoints)
+	res := db.Model(&database.UserUTXO{}).Where("(tx_id, vout) in (?)", selectedOutpoints)
 	return res
 }
 
 func (c *inputsQueryComposer) utxos(db *gorm.DB) *gorm.DB {
-	return db.Model(&database.UserUtxos{}).
+	return db.Model(&database.UserUTXO{}).
 		Select(
 			txIdColumn,
 			voutColumn,
@@ -35,7 +35,7 @@ func (c *inputsQueryComposer) utxos(db *gorm.DB) *gorm.DB {
 			c.feeCalculatedWithoutChangeOutput(),
 			c.feeCalculatedWithChangeOutput(),
 		).
-		Where("xpub_id = @xPubId", sql.Named("xPubId", c.xPubID))
+		Where("user_id = @userId", sql.Named("userId", c.userID))
 }
 
 func (c *inputsQueryComposer) addChangeValueCalculation(db *gorm.DB, utxoTab *gorm.DB) *gorm.DB {
@@ -60,11 +60,11 @@ func (c *inputsQueryComposer) searchForMinimalChangeValue(db *gorm.DB, utxoWithC
 }
 
 func (c *inputsQueryComposer) feeCalculatedWithChangeOutput() string {
-	return fmt.Sprintf("ceil((sum(unlocking_script_estimated_size) over (order by touched_at ASC, created_at ASC, tx_id ASC, vout ASC) + %d + %d) / cast(%d as float)) * %d as fee_with_change_output", c.txWithoutInputsSize, estimatedChangeOutputSize, c.feeUnit.Bytes, c.feeUnit.Satoshis)
+	return fmt.Sprintf("ceil((sum(estimated_input_size) over (order by touched_at ASC, created_at ASC, tx_id ASC, vout ASC) + %d + %d) / cast(%d as float)) * %d as fee_with_change_output", c.txWithoutInputsSize, estimatedChangeOutputSize, c.feeUnit.Bytes, c.feeUnit.Satoshis)
 }
 
 func (c *inputsQueryComposer) feeCalculatedWithoutChangeOutput() string {
-	return fmt.Sprintf("ceil((sum(unlocking_script_estimated_size) over (order by touched_at ASC, created_at ASC, tx_id ASC, vout ASC) + %d) / cast(%d as float)) * %d as fee_no_change_output", c.txWithoutInputsSize, c.feeUnit.Bytes, c.feeUnit.Satoshis)
+	return fmt.Sprintf("ceil((sum(estimated_input_size) over (order by touched_at ASC, created_at ASC, tx_id ASC, vout ASC) + %d) / cast(%d as float)) * %d as fee_no_change_output", c.txWithoutInputsSize, c.feeUnit.Bytes, c.feeUnit.Satoshis)
 }
 
 func (c *inputsQueryComposer) remainingValue() string {

@@ -68,4 +68,10 @@ var (
 
 	// ErrUnexpectedErrorDuringInputsSelection is when an unexpected error occurs during inputs selection for transaction outline.
 	ErrUnexpectedErrorDuringInputsSelection = models.SPVError{Code: "error-input-selection", Message: "unexpected error during inputs selection", StatusCode: 500}
+
+	// ErrNoOperations is when there are no operations to save.
+	ErrNoOperations = models.SPVError{Code: "error-no-operations", Message: "no operations to save", StatusCode: 400}
+
+	// ErrGettingAddresses is when getting addresses fails.
+	ErrGettingAddresses = models.SPVError{Code: "error-getting-addresses", Message: "failed to get addresses", StatusCode: 500}
 )

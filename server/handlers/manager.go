@@ -60,3 +60,8 @@ func (mg *Manager) Get(endpointType GroupType) *gin.RouterGroup {
 func (mg *Manager) GetFeatureFlags() *config.ExperimentalConfig {
 	return mg.appConfig.ExperimentalFeatures
 }
+
+// APIVersion returns the API version from app configuration
+func (mg *Manager) APIVersion() string {
+	return mg.appConfig.Version
+}

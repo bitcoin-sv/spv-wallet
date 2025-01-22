@@ -27,7 +27,7 @@ func TestInputsSelector(t *testing.T) {
 		selector := given.NewInputSelector()
 
 		// when:
-		utxos, err := selector.SelectInputsForTransaction(context.Background(), fixtures.Sender.XPubID(), 0, 0)
+		utxos, err := selector.SelectInputsForTransaction(context.Background(), fixtures.Sender.ID(), 0, 0)
 
 		// then:
 		then.WithoutError(err).SelectedInputs(utxos).AreEmpty()
@@ -67,14 +67,14 @@ func TestInputsSelector(t *testing.T) {
 		"select inputs that covers outputs and fee for more data": {
 			selectBy: selectBy{
 				satoshis:            9,
-				txSizeWithoutInputs: uint64(fixtures.DefaultFeeUnit.Bytes + 1 - fixtures.EstimatedUnlockingScriptSizeForP2PKH),
+				txSizeWithoutInputs: uint64(fixtures.DefaultFeeUnit.Bytes + 1 - database.EstimatedInputSizeForP2PKH),
 			},
 			expectToSelectInputs: []int{0, 1},
 		},
 		"select inputs when size is equal to fee unit bytes": {
 			selectBy: selectBy{
 				satoshis:            9,
-				txSizeWithoutInputs: uint64(fixtures.DefaultFeeUnit.Bytes - fixtures.EstimatedUnlockingScriptSizeForP2PKH),
+				txSizeWithoutInputs: uint64(fixtures.DefaultFeeUnit.Bytes - database.EstimatedInputSizeForP2PKH),
 			},
 			expectToSelectInputs: []int{0},
 		},
@@ -86,7 +86,7 @@ func TestInputsSelector(t *testing.T) {
 			defer cleanup()
 
 			// and: having some utxo in database
-			ownedInputs := []*database.UserUtxos{
+			ownedInputs := []*database.UserUTXO{
 				given.DB().HasUTXO().OwnedBySender().P2PKH().WithSatoshis(10).Stored(),
 				given.DB().HasUTXO().OwnedBySender().P2PKH().WithSatoshis(10).Stored(),
 				given.DB().HasUTXO().OwnedBySender().P2PKH().WithSatoshis(10).Stored(),
@@ -97,7 +97,7 @@ func TestInputsSelector(t *testing.T) {
 			selector := given.NewInputSelector()
 
 			// when:
-			utxos, err := selector.SelectInputsForTransaction(context.Background(), fixtures.Sender.XPubID(), test.selectBy.satoshis, test.selectBy.txSizeWithoutInputs)
+			utxos, err := selector.SelectInputsForTransaction(context.Background(), fixtures.Sender.ID(), test.selectBy.satoshis, test.selectBy.txSizeWithoutInputs)
 
 			// then:
 			then.WithoutError(err).SelectedInputs(utxos).
@@ -132,7 +132,7 @@ func TestInputsSelector(t *testing.T) {
 			defer cleanup()
 
 			// and: having some utxo in database
-			ownedInputs := []*database.UserUtxos{
+			ownedInputs := []*database.UserUTXO{
 				given.DB().HasUTXO().OwnedBySender().P2PKH().WithSatoshis(10).Stored(),
 				given.DB().HasUTXO().OwnedBySender().P2PKH().WithSatoshis(10).Stored(),
 				given.DB().HasUTXO().OwnedBySender().P2PKH().WithSatoshis(10).Stored(),
@@ -143,13 +143,13 @@ func TestInputsSelector(t *testing.T) {
 			selector := given.NewInputSelector()
 
 			// when:
-			_, err := selector.SelectInputsForTransaction(context.Background(), fixtures.Sender.XPubID(), test.selectBy.satoshis, test.selectBy.txSizeWithoutInputs)
+			_, err := selector.SelectInputsForTransaction(context.Background(), fixtures.Sender.ID(), test.selectBy.satoshis, test.selectBy.txSizeWithoutInputs)
 
 			// then:
 			require.NoError(t, err)
 
 			// when:
-			utxos, err := selector.SelectInputsForTransaction(context.Background(), fixtures.Sender.XPubID(), test.selectBy.satoshis, test.selectBy.txSizeWithoutInputs)
+			utxos, err := selector.SelectInputsForTransaction(context.Background(), fixtures.Sender.ID(), test.selectBy.satoshis, test.selectBy.txSizeWithoutInputs)
 
 			// then:
 			then.WithoutError(err).SelectedInputs(utxos).

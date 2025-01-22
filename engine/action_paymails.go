@@ -138,6 +138,28 @@ func (c *Client) NewPaymailAddress(ctx context.Context, xPubKey, address, public
 	return paymailAddress, nil
 }
 
+// DeletePaymailAddressByID will delete a paymail address by its id
+func (c *Client) DeletePaymailAddressByID(ctx context.Context, id string, opts ...ModelOps) error {
+
+	// Get the paymail address
+	paymailAddress, err := getPaymailAddressByID(ctx, id, append(opts, c.DefaultModelOptions()...)...)
+	if err != nil {
+		return err
+	} else if paymailAddress == nil {
+		return spverrors.ErrCouldNotFindPaymail
+	}
+
+	paymailAddress.DeletedAt.Valid = true
+	paymailAddress.DeletedAt.Time = time.Now()
+
+	tx := c.Datastore().DB().Save(&paymailAddress)
+	if tx.Error != nil {
+		return spverrors.ErrDeletePaymailAddress.Wrap(tx.Error)
+	}
+
+	return nil
+}
+
 // DeletePaymailAddress will delete a paymail address
 func (c *Client) DeletePaymailAddress(ctx context.Context, address string, opts ...ModelOps) error {
 

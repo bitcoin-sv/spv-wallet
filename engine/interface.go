@@ -8,7 +8,7 @@ import (
 	"github.com/bitcoin-sv/spv-wallet/engine/chain"
 	"github.com/bitcoin-sv/spv-wallet/engine/chain/models"
 	"github.com/bitcoin-sv/spv-wallet/engine/cluster"
-	"github.com/bitcoin-sv/spv-wallet/engine/database/dao"
+	"github.com/bitcoin-sv/spv-wallet/engine/database/repository"
 	"github.com/bitcoin-sv/spv-wallet/engine/datastore"
 	"github.com/bitcoin-sv/spv-wallet/engine/metrics"
 	"github.com/bitcoin-sv/spv-wallet/engine/notifications"
@@ -107,6 +107,7 @@ type ModelService interface {
 // PaymailService is the paymail actions & services
 type PaymailService interface {
 	DeletePaymailAddress(ctx context.Context, address string, opts ...ModelOps) error
+	DeletePaymailAddressByID(ctx context.Context, id string, opts ...ModelOps) error
 	GetPaymailConfig() *PaymailServerOptions
 	GetPaymailAddress(ctx context.Context, address string, opts ...ModelOps) (*PaymailAddress, error)
 	GetPaymailAddressByID(ctx context.Context, id string, opts ...ModelOps) (*PaymailAddress, error)
@@ -194,6 +195,5 @@ type ClientInterface interface {
 	Chain() chain.Service
 	LogBHSReadiness(ctx context.Context)
 	FeeUnit() bsv.FeeUnit
-	TransactionsDAO() *dao.Transactions
-	UsersDAO() *dao.Users
+	Repositories() *repository.All
 }

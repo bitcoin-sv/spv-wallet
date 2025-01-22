@@ -50,13 +50,14 @@ func xpubsCreate(c *gin.Context, _ *reqctx.AdminContext) {
 // xpubsSearch will fetch a list of xpubs filtered by metadata
 // Search for xpubs filtering by metadata godoc
 // @Summary		Search for xpubs
-// @Description	Search for xpubs
+// @Description	Fetches a list of xpubs filtered by metadata and other criteria
 // @Tags		Admin
 // @Produce		json
-// @Param		SearchXpubs body filter.XpubFilter false "Supports targeted resource searches with filters and metadata, plus options for pagination and sorting to streamline data exploration and analysis"
-// @Success		200 {object} []response.Xpub "List of xpubs"
-// @Failure		400	"Bad request - Error while parsing SearchXpubs from request body"
-// @Failure 	500	"Internal server error - Error while searching for xpubs"
+// @Param		SwaggerCommonParams query swagger.CommonFilteringQueryParams false "Supports options for pagination and sorting to streamline data exploration and analysis"
+// @Param		XpubFilter query filter.XpubFilter false "Supports targeted resource searches with filters"
+// @Success		200 {object} response.PageModel[response.Xpub] "List of xPubs with pagination details"
+// @Failure		400 "Bad request - Invalid query parameters"
+// @Failure		500 "Internal server error - Error while searching for xPubs"
 // @Router 		/api/v1/admin/users [get]
 // @Security	x-auth-xpub
 func xpubsSearch(c *gin.Context, _ *reqctx.AdminContext) {

@@ -16,11 +16,12 @@ func TestLoadConfig(t *testing.T) {
 		logger := tester.Logger(t)
 
 		// when
-		_, err := config.Load("test", logger)
+		cfg, err := config.Load("test", logger)
 
 		// then
 		assert.NoError(t, err)
 		assert.Equal(t, viper.GetString(config.ConfigFilePathKey), config.DefaultConfigFilePath)
+		assert.Equal(t, "test", cfg.Version)
 	})
 
 	t.Run("custom configFilePath overridden by ENV", func(t *testing.T) {

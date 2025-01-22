@@ -16,7 +16,7 @@ const voutColumn = "vout"
 
 // Selector is a service that selects inputs for transaction.
 type Selector interface {
-	SelectInputsForTransaction(ctx context.Context, xPubID string, satoshis bsv.Satoshis, byteSizeOfTxBeforeAddingSelectedInputs uint64) ([]*database.UserUtxos, error)
+	SelectInputsForTransaction(ctx context.Context, userID string, satoshis bsv.Satoshis, byteSizeOfTxBeforeAddingSelectedInputs uint64) ([]*database.UserUTXO, error)
 }
 
 const (
@@ -39,9 +39,9 @@ func NewSelector(db *gorm.DB, feeUnit bsv.FeeUnit) Selector {
 	}
 }
 
-func (r *sqlInputsSelector) SelectInputsForTransaction(ctx context.Context, xPubID string, outputsTotalValue bsv.Satoshis, byteSizeOfTxWithoutInputs uint64) (utxos []*database.UserUtxos, err error) {
+func (r *sqlInputsSelector) SelectInputsForTransaction(ctx context.Context, userID string, outputsTotalValue bsv.Satoshis, byteSizeOfTxWithoutInputs uint64) (utxos []*database.UserUTXO, err error) {
 	err = r.db.WithContext(ctx).Transaction(func(db *gorm.DB) error {
-		inputsQuery := r.buildQueryForInputs(db, xPubID, outputsTotalValue, byteSizeOfTxWithoutInputs)
+		inputsQuery := r.buildQueryForInputs(db, userID, outputsTotalValue, byteSizeOfTxWithoutInputs)
 
 		if err := inputsQuery.Find(&utxos).Error; err != nil {
 			utxos = nil
@@ -68,9 +68,9 @@ func (r *sqlInputsSelector) SelectInputsForTransaction(ctx context.Context, xPub
 	return utxos, nil
 }
 
-func (r *sqlInputsSelector) buildQueryForInputs(db *gorm.DB, xPubID string, outputsTotalValue bsv.Satoshis, txWithoutInputsSize uint64) *gorm.DB {
+func (r *sqlInputsSelector) buildQueryForInputs(db *gorm.DB, userID string, outputsTotalValue bsv.Satoshis, txWithoutInputsSize uint64) *gorm.DB {
 	composer := &inputsQueryComposer{
-		xPubID:              xPubID,
+		userID:              userID,
 		outputsTotalValue:   outputsTotalValue,
 		txWithoutInputsSize: txWithoutInputsSize,
 		feeUnit:             r.feeUnit,
@@ -78,10 +78,10 @@ func (r *sqlInputsSelector) buildQueryForInputs(db *gorm.DB, xPubID string, outp
 	return composer.build(db)
 }
 
-func (r *sqlInputsSelector) buildUpdateTouchedAtQuery(db *gorm.DB, utxos []*database.UserUtxos) *gorm.DB {
+func (r *sqlInputsSelector) buildUpdateTouchedAtQuery(db *gorm.DB, utxos []*database.UserUTXO) *gorm.DB {
 	outpoints := make([][]any, 0, len(utxos))
 	for _, utxo := range utxos {
 		outpoints = append(outpoints, []any{utxo.TxID, utxo.Vout})
 	}
-	return db.Model(&database.UserUtxos{}).Where("(tx_id, vout) in (?)", outpoints)
+	return db.Model(&database.UserUTXO{}).Where("(tx_id, vout) in (?)", outpoints)
 }

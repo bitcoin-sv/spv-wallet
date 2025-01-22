@@ -18,14 +18,14 @@ func ExampleSelector_buildQueryForInputs_sqlite() {
 	selector := givenInputsSelector(db)
 
 	query := db.ToSQL(func(db *gorm.DB) *gorm.DB {
-		query := selector.buildQueryForInputs(db, "somexpubid", 1, 10)
-		query.Find(&database.UserUtxos{})
+		query := selector.buildQueryForInputs(db, "someuserid", 1, 10)
+		query.Find(&database.UserUTXO{})
 		return query
 	})
 
 	fmt.Println(query)
 
-	// Output: SELECT * FROM `xapi_user_utxos` WHERE (tx_id, vout) in (SELECT tx_id,vout FROM (SELECT tx_id,vout,change,min(case when change >= 0 then change end) over () as min_change FROM (SELECT tx_id,vout,case when remaining_value - fee_no_change_output <= 0 then remaining_value - fee_no_change_output else remaining_value - fee_with_change_output end as change FROM (SELECT `tx_id`,`vout`,sum(satoshis) over (order by touched_at ASC, created_at ASC, tx_id ASC, vout ASC) - 1 as remaining_value,ceil((sum(unlocking_script_estimated_size) over (order by touched_at ASC, created_at ASC, tx_id ASC, vout ASC) + 10) / cast(1000 as float)) * 1 as fee_no_change_output,ceil((sum(unlocking_script_estimated_size) over (order by touched_at ASC, created_at ASC, tx_id ASC, vout ASC) + 10 + 34) / cast(1000 as float)) * 1 as fee_with_change_output FROM `xapi_user_utxos` WHERE xpub_id = "somexpubid") as utxo) as utxoWithChange) as utxoWithMinChange WHERE change <= min_change)
+	// Output: SELECT * FROM `xapi_user_utxos` WHERE (tx_id, vout) in (SELECT tx_id,vout FROM (SELECT tx_id,vout,change,min(case when change >= 0 then change end) over () as min_change FROM (SELECT tx_id,vout,case when remaining_value - fee_no_change_output <= 0 then remaining_value - fee_no_change_output else remaining_value - fee_with_change_output end as change FROM (SELECT `tx_id`,`vout`,sum(satoshis) over (order by touched_at ASC, created_at ASC, tx_id ASC, vout ASC) - 1 as remaining_value,ceil((sum(estimated_input_size) over (order by touched_at ASC, created_at ASC, tx_id ASC, vout ASC) + 10) / cast(1000 as float)) * 1 as fee_no_change_output,ceil((sum(estimated_input_size) over (order by touched_at ASC, created_at ASC, tx_id ASC, vout ASC) + 10 + 34) / cast(1000 as float)) * 1 as fee_with_change_output FROM `xapi_user_utxos` WHERE user_id = "someuserid") as utxo) as utxoWithChange) as utxoWithMinChange WHERE change <= min_change)
 }
 
 // ExampleSelector_buildQueryForInputs_postgresql demonstrates what would be the query used to select inputs for a transaction.
@@ -36,14 +36,14 @@ func ExampleSelector_buildQueryForInputs_postgresql() {
 	selector := givenInputsSelector(db)
 
 	query := db.ToSQL(func(db *gorm.DB) *gorm.DB {
-		query := selector.buildQueryForInputs(db, "somexpubid", 1, 10)
-		query.Find(&database.UserUtxos{})
+		query := selector.buildQueryForInputs(db, "someuserid", 1, 10)
+		query.Find(&database.UserUTXO{})
 		return query
 	})
 
 	fmt.Println(query)
 
-	// Output: SELECT * FROM "xapi_user_utxos" WHERE (tx_id, vout) in (SELECT tx_id,vout FROM (SELECT tx_id,vout,change,min(case when change >= 0 then change end) over () as min_change FROM (SELECT tx_id,vout,case when remaining_value - fee_no_change_output <= 0 then remaining_value - fee_no_change_output else remaining_value - fee_with_change_output end as change FROM (SELECT "tx_id","vout",sum(satoshis) over (order by touched_at ASC, created_at ASC, tx_id ASC, vout ASC) - 1 as remaining_value,ceil((sum(unlocking_script_estimated_size) over (order by touched_at ASC, created_at ASC, tx_id ASC, vout ASC) + 10) / cast(1000 as float)) * 1 as fee_no_change_output,ceil((sum(unlocking_script_estimated_size) over (order by touched_at ASC, created_at ASC, tx_id ASC, vout ASC) + 10 + 34) / cast(1000 as float)) * 1 as fee_with_change_output FROM "xapi_user_utxos" WHERE xpub_id = 'somexpubid') as utxo) as utxoWithChange) as utxoWithMinChange WHERE change <= min_change)
+	// Output: SELECT * FROM "xapi_user_utxos" WHERE (tx_id, vout) in (SELECT tx_id,vout FROM (SELECT tx_id,vout,change,min(case when change >= 0 then change end) over () as min_change FROM (SELECT tx_id,vout,case when remaining_value - fee_no_change_output <= 0 then remaining_value - fee_no_change_output else remaining_value - fee_with_change_output end as change FROM (SELECT "tx_id","vout",sum(satoshis) over (order by touched_at ASC, created_at ASC, tx_id ASC, vout ASC) - 1 as remaining_value,ceil((sum(estimated_input_size) over (order by touched_at ASC, created_at ASC, tx_id ASC, vout ASC) + 10) / cast(1000 as float)) * 1 as fee_no_change_output,ceil((sum(estimated_input_size) over (order by touched_at ASC, created_at ASC, tx_id ASC, vout ASC) + 10 + 34) / cast(1000 as float)) * 1 as fee_with_change_output FROM "xapi_user_utxos" WHERE user_id = 'someuserid') as utxo) as utxoWithChange) as utxoWithMinChange WHERE change <= min_change)
 }
 
 // ExampleSelector_buildUpdateTouchedAtQuery_sqlite demonstrates what would be the SQL statement used to update inputs after selecting them.
@@ -52,10 +52,10 @@ func ExampleSelector_buildUpdateTouchedAtQuery_sqlite() {
 
 	selector := givenInputsSelector(db)
 
-	utxos := []*database.UserUtxos{
-		{XPubID: "id_of_xpub_1", TxID: "tx_id_1", Vout: 0, Satoshis: 10, UnlockingScriptEstimatedSize: 106, Bucket: "bsv", CreatedAt: time.Now(), TouchedAt: time.Now()},
-		{XPubID: "id_of_xpub_1", TxID: "tx_id_1", Vout: 1, Satoshis: 10, UnlockingScriptEstimatedSize: 106, Bucket: "bsv", CreatedAt: time.Now(), TouchedAt: time.Now()},
-		{XPubID: "id_of_xpub_1", TxID: "tx_id_2", Vout: 0, Satoshis: 10, UnlockingScriptEstimatedSize: 106, Bucket: "bsv", CreatedAt: time.Now(), TouchedAt: time.Now()},
+	utxos := []*database.UserUTXO{
+		{UserID: "id_of_user_1", TxID: "tx_id_1", Vout: 0, Satoshis: 10, EstimatedInputSize: 148, Bucket: "bsv", CreatedAt: time.Now(), TouchedAt: time.Now()},
+		{UserID: "id_of_user_1", TxID: "tx_id_1", Vout: 1, Satoshis: 10, EstimatedInputSize: 148, Bucket: "bsv", CreatedAt: time.Now(), TouchedAt: time.Now()},
+		{UserID: "id_of_user_1", TxID: "tx_id_2", Vout: 0, Satoshis: 10, EstimatedInputSize: 148, Bucket: "bsv", CreatedAt: time.Now(), TouchedAt: time.Now()},
 	}
 
 	query := db.ToSQL(func(db *gorm.DB) *gorm.DB {
@@ -75,10 +75,10 @@ func ExampleSelector_buildUpdateTouchedAtQuery_postgres() {
 
 	selector := givenInputsSelector(db)
 
-	utxos := []*database.UserUtxos{
-		{XPubID: "id_of_xpub_1", TxID: "tx_id_1", Vout: 0, Satoshis: 10, UnlockingScriptEstimatedSize: 106, Bucket: "bsv", CreatedAt: time.Now(), TouchedAt: time.Now()},
-		{XPubID: "id_of_xpub_1", TxID: "tx_id_1", Vout: 1, Satoshis: 10, UnlockingScriptEstimatedSize: 106, Bucket: "bsv", CreatedAt: time.Now(), TouchedAt: time.Now()},
-		{XPubID: "id_of_xpub_1", TxID: "tx_id_2", Vout: 0, Satoshis: 10, UnlockingScriptEstimatedSize: 106, Bucket: "bsv", CreatedAt: time.Now(), TouchedAt: time.Now()},
+	utxos := []*database.UserUTXO{
+		{UserID: "id_of_user_1", TxID: "tx_id_1", Vout: 0, Satoshis: 10, EstimatedInputSize: 148, Bucket: "bsv", CreatedAt: time.Now(), TouchedAt: time.Now()},
+		{UserID: "id_of_user_1", TxID: "tx_id_1", Vout: 1, Satoshis: 10, EstimatedInputSize: 148, Bucket: "bsv", CreatedAt: time.Now(), TouchedAt: time.Now()},
+		{UserID: "id_of_user_1", TxID: "tx_id_2", Vout: 0, Satoshis: 10, EstimatedInputSize: 148, Bucket: "bsv", CreatedAt: time.Now(), TouchedAt: time.Now()},
 	}
 
 	query := db.ToSQL(func(db *gorm.DB) *gorm.DB {

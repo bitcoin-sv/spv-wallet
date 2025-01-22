@@ -6,7 +6,6 @@ import (
 	"github.com/bitcoin-sv/spv-wallet/engine/database"
 	testengine "github.com/bitcoin-sv/spv-wallet/engine/testabilities"
 	"github.com/bitcoin-sv/spv-wallet/models/bsv"
-	"github.com/stretchr/testify/require"
 	"gorm.io/gorm"
 )
 
@@ -27,7 +26,7 @@ type UserUtxoFixture interface {
 	// WithSatoshis sets the satoshis value of the UTXO.
 	WithSatoshis(satoshis bsv.Satoshis) UserUtxoFixture
 
-	Storable[database.UserUtxos]
+	Storable[database.UserUTXO]
 }
 
 type Storable[Data any] interface {
@@ -41,18 +40,14 @@ type databaseFixture struct {
 	utxoEntriesIndex uint32
 }
 
-func Given(t testing.TB) (given DatabaseFixture, cleanup func()) {
-	engineWithConfign, cleanup := testengine.Given(t).Engine()
+func Given(t testing.TB, opts ...testengine.ConfigOpts) (given DatabaseFixture, cleanup func()) {
+	engineWithConfig, cleanup := testengine.Given(t).EngineWithConfiguration(opts...)
 
-	db := engineWithConfign.Engine.Datastore().DB()
+	db := engineWithConfig.Engine.Datastore().DB()
 	fixture := &databaseFixture{
 		t:  t,
 		db: db,
 	}
-
-	// TODO: remove this when we will include UserUtxos in the production code
-	err := fixture.db.AutoMigrate(&database.UserUtxos{})
-	require.NoError(t, err)
 
 	return fixture, cleanup
 }

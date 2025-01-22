@@ -1,21 +1,32 @@
 package database
 
-import "github.com/bitcoin-sv/spv-wallet/models/bsv"
+import (
+	"time"
 
-// Output represents an output of a transaction.
-type Output struct {
+	"github.com/bitcoin-sv/spv-wallet/models/bsv"
+)
+
+// TrackedOutput represents an output of a transaction.
+type TrackedOutput struct {
 	TxID       string `gorm:"primaryKey"`
 	Vout       uint32 `gorm:"primaryKey"`
 	SpendingTX string `gorm:"type:char(64)"`
+
+	UserID string
+
+	Satoshis bsv.Satoshis
+
+	CreatedAt time.Time
+	UpdatedAt time.Time
 }
 
 // IsSpent returns true if the output is spent.
-func (o *Output) IsSpent() bool {
+func (o *TrackedOutput) IsSpent() bool {
 	return o.SpendingTX != ""
 }
 
 // Outpoint returns bsv.Outpoint object which identifies the output.
-func (o *Output) Outpoint() *bsv.Outpoint {
+func (o *TrackedOutput) Outpoint() *bsv.Outpoint {
 	return &bsv.Outpoint{
 		TxID: o.TxID,
 		Vout: o.Vout,

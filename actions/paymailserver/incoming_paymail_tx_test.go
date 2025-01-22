@@ -3,6 +3,7 @@ package paymailserver_test
 import (
 	"fmt"
 	"testing"
+	"time"
 
 	"github.com/bitcoin-sv/go-sdk/script"
 	"github.com/bitcoin-sv/spv-wallet/actions/testabilities"
@@ -13,6 +14,8 @@ import (
 )
 
 func TestIncomingPaymailRawTX(t *testing.T) {
+	t.Skip("Raw TX is not supported yet")
+
 	givenForAllTests := testabilities.Given(t)
 	cleanup := givenForAllTests.StartedSPVWalletWithConfiguration(
 		testengine.WithDomainValidationDisabled(),
@@ -23,6 +26,7 @@ func TestIncomingPaymailRawTX(t *testing.T) {
 	var testState struct {
 		reference     string
 		lockingScript *script.Script
+		txID          string
 	}
 
 	// given:
@@ -77,8 +81,6 @@ func TestIncomingPaymailRawTX(t *testing.T) {
 	})
 
 	t.Run("step 2 - call receive-transaction capability", func(t *testing.T) {
-		t.Skip("Not implemented yet")
-
 		// given:
 		txSpec := fixtures.GivenTX(t).
 			WithInput(satoshis+1).
@@ -118,6 +120,53 @@ func TestIncomingPaymailRawTX(t *testing.T) {
 		}`, map[string]any{
 			"txid": txSpec.ID(),
 			"note": note,
+		})
+
+		// update:
+		testState.txID = txSpec.ID()
+	})
+
+	t.Run("step 3 - check balance", func(t *testing.T) {
+		// given:
+		recipientClient := given.HttpClient().ForGivenUser(fixtures.RecipientInternal)
+
+		// when:
+		res, _ := recipientClient.R().Get("/api/v2/users/current")
+
+		// then:
+		then.Response(res).IsOK().WithJSONf(`{
+			"currentBalance": %d
+		}`, satoshis)
+	})
+
+	t.Run("step 4 - get operations", func(t *testing.T) {
+		// given:
+		recipientClient := given.HttpClient().ForGivenUser(fixtures.RecipientInternal)
+
+		// when:
+		res, _ := recipientClient.R().Get("/api/v2/operations/search")
+
+		// then:
+		then.Response(res).IsOK().WithJSONMatching(`{
+			"content": [
+				{
+					"txID": "{{ .txID }}",
+					"createdAt": "{{ matchTimestamp }}",
+					"value": {{ .value }},
+					"type": "incoming",
+					"counterparty": "{{ .sender }}"
+				}
+			],
+			"page": {
+			    "number": 1,
+			    "size": 1,
+			    "totalElements": 1,
+			    "totalPages": 1
+			}
+		}`, map[string]any{
+			"value":  satoshis,
+			"txID":   testState.txID,
+			"sender": senderPaymail,
 		})
 	})
 }
@@ -188,8 +237,6 @@ func TestIncomingPaymailBeef(t *testing.T) {
 	})
 
 	t.Run("step 2 - call beef capability", func(t *testing.T) {
-		t.Skip("Not implemented yet")
-
 		// given:
 		txSpec := fixtures.GivenTX(t).
 			WithInput(satoshis+1).
@@ -235,5 +282,98 @@ func TestIncomingPaymailBeef(t *testing.T) {
 			"txid": txSpec.ID(),
 			"note": note,
 		})
+
+		// update:
+		testState.txID = txSpec.ID()
 	})
+
+	t.Run("step 3 - check balance", func(t *testing.T) {
+		// given:
+		recipientClient := given.HttpClient().ForGivenUser(fixtures.RecipientInternal)
+
+		// when:
+		res, _ := recipientClient.R().Get("/api/v2/users/current")
+
+		// then:
+		then.Response(res).IsOK().WithJSONf(`{
+			"currentBalance": %d
+		}`, satoshis)
+	})
+
+	t.Run("step 4 - get operations", func(t *testing.T) {
+		// given:
+		recipientClient := given.HttpClient().ForGivenUser(fixtures.RecipientInternal)
+
+		// when:
+		res, _ := recipientClient.R().Get("/api/v2/operations/search")
+
+		// then:
+		then.Response(res).IsOK().WithJSONMatching(`{
+			"content": [
+				{
+					"txID": "{{ .txID }}",
+					"createdAt": "{{ matchTimestamp }}",
+					"value": {{ .value }},
+					"type": "incoming",
+					"counterparty": "{{ .sender }}"
+				}
+			],
+			"page": {
+			    "number": 1,
+			    "size": 1,
+			    "totalElements": 1,
+			    "totalPages": 1
+			}
+		}`, map[string]any{
+			"value":  satoshis,
+			"txID":   testState.txID,
+			"sender": senderPaymail,
+		})
+	})
+}
+
+func TestAddressResolution(t *testing.T) {
+	givenForAllTests := testabilities.Given(t)
+	cleanup := givenForAllTests.StartedSPVWalletWithConfiguration(
+		testengine.WithDomainValidationDisabled(),
+		testengine.WithNewTransactionFlowEnabled(),
+	)
+	defer cleanup()
+
+	// given:
+	given, then := testabilities.NewOf(givenForAllTests, t)
+	client := given.HttpClient().ForAnonymous()
+
+	// and:
+	senderPaymail := fixtures.SenderExternal.DefaultPaymail()
+	recipientPaymail := fixtures.RecipientInternal.DefaultPaymail()
+	satoshis := uint64(1000)
+
+	// and:
+	requestBody := map[string]any{
+		"dt":           time.Now().UTC().Format(time.RFC3339),
+		"senderHandle": senderPaymail,
+		"senderName":   "External Sender",
+		"purpose":      "P2P",
+		"amount":       satoshis,
+	}
+
+	// when:
+	res, _ := client.R().
+		SetHeader("Content-Type", "application/json").
+		SetBody(requestBody).
+		Post(
+			fmt.Sprintf(
+				"https://example.com/v1/bsvalias/address/%s",
+				recipientPaymail,
+			),
+		)
+
+	// then:
+	then.Response(res).
+		IsOK().
+		WithJSONMatching(`{
+			"address": "{{ matchAddress }}",
+			"output": "{{ matchHex }}"
+		}`, nil)
 }

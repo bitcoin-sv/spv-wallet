@@ -9,6 +9,7 @@ import (
 
 	"github.com/bitcoin-sv/spv-wallet/actions"
 	"github.com/bitcoin-sv/spv-wallet/actions/paymailserver"
+	v2 "github.com/bitcoin-sv/spv-wallet/actions/v2"
 	"github.com/bitcoin-sv/spv-wallet/config"
 	"github.com/bitcoin-sv/spv-wallet/engine"
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
@@ -109,6 +110,10 @@ func setupServerRoutes(appConfig *config.AppConfig, spvWalletEngine engine.Clien
 	handlersManager := handlers.NewManager(ginEngine, appConfig)
 	actions.Register(handlersManager)
 	paymailserver.Register(spvWalletEngine.GetPaymailConfig().Configuration, ginEngine)
+
+	if appConfig.ExperimentalFeatures.NewTransactionFlowEnabled {
+		v2.Register(handlersManager)
+	}
 
 	if appConfig.DebugProfiling {
 		pprof.Register(ginEngine, "debug/pprof")
