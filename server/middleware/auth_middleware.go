@@ -3,7 +3,6 @@ package middleware
 import (
 	"strings"
 
-	bip32 "github.com/bitcoin-sv/go-sdk/compat/bip32"
 	"github.com/bitcoin-sv/spv-wallet/engine"
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/bitcoin-sv/spv-wallet/engine/utils"
@@ -30,17 +29,6 @@ func AuthMiddleware() gin.HandlerFunc {
 }
 
 func tryAuth(c *gin.Context, xPub, authAccessKey string) (*reqctx.UserContext, error) {
-	config := reqctx.AppConfig(c)
-	if config.ExperimentalFeatures.NewTransactionFlowEnabled {
-		if xPub == "" {
-			return nil, spverrors.ErrMissingAuthHeader
-		}
-		if xPub == config.Authentication.AdminKey {
-			return reqctx.NewUserContextAsAdmin(), nil
-		}
-		return authByXPubToPublicKey(c, xPub)
-	}
-
 	if xPub != "" {
 		return authByXPub(c, xPub)
 	}
@@ -93,24 +81,4 @@ func getXPubByID(c *gin.Context, xPubID string) (*engine.Xpub, error) {
 		return nil, spverrors.ErrAuthorization
 	}
 	return xPubObj, nil
-}
-
-func authByXPubToPublicKey(c *gin.Context, xpub string) (*reqctx.UserContext, error) {
-	hdKey, err := bip32.GetHDKeyFromExtendedPublicKey(xpub)
-	if err != nil {
-		return nil, spverrors.ErrAuthorization.Wrap(err)
-	}
-
-	pubKey, err := bip32.GetPublicKeyFromHDKey(hdKey)
-	if err != nil {
-		return nil, spverrors.ErrAuthorization.Wrap(err)
-	}
-	pubKeyHex := pubKey.ToDERHex()
-
-	user, err := reqctx.Engine(c).Repositories().Users.GetByPubKey(c.Request.Context(), pubKeyHex)
-	if err != nil {
-		return nil, spverrors.ErrAuthorization.Wrap(err)
-	}
-
-	return reqctx.NewUserContextWithPublicKeys(xpub, utils.Hash(xpub), pubKeyHex, user.ID), nil
 }

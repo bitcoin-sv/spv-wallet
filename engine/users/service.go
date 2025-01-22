@@ -72,6 +72,16 @@ func (s *Service) GetByID(ctx context.Context, userID string) (*domainmodels.Use
 	return user, nil
 }
 
+// GetIDByPubKey returns the user ID selected by pubKey
+func (s *Service) GetIDByPubKey(ctx context.Context, pubKey string) (string, error) {
+	userID, err := s.usersRepo.GetIDByPubKey(ctx, pubKey)
+	if err != nil {
+		return "", spverrors.Wrapf(err, "Cannot get user")
+	}
+
+	return userID, nil
+}
+
 // GetPubKey returns the go-sdk primitives.PublicKey object from the user's PubKey string selected by userID
 func (s *Service) GetPubKey(ctx context.Context, userID string) (*primitives.PublicKey, error) {
 	user, err := s.usersRepo.Get(ctx, userID)

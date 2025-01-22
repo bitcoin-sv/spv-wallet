@@ -32,18 +32,20 @@ func (u *Users) Exists(ctx context.Context, userID string) (bool, error) {
 	return count > 0, nil
 }
 
-// GetByPubKey returns a user by its public key. If the user does not exist, it returns error.
-func (u *Users) GetByPubKey(ctx context.Context, pubKey string) (*domainmodels.User, error) {
-	var user database.User
+// GetIDByPubKey returns a user by its public key. If the user does not exist, it returns error.
+func (u *Users) GetIDByPubKey(ctx context.Context, pubKey string) (string, error) {
+	var user struct {
+		ID string
+	}
 	err := u.db.WithContext(ctx).
-		Scopes(withPaymailsScope).
+		Model(&database.User{}).
 		Where("pub_key = ?", pubKey).
 		First(&user).Error
 	if err != nil {
-		return nil, spverrors.Wrapf(err, "failed to get user by public key")
+		return "", spverrors.Wrapf(err, "failed to get user by public key")
 	}
 
-	return mapToDomainUser(&user), nil
+	return user.ID, nil
 }
 
 // Get returns a user by its id with preloaded paymail slist. If the user does not exist, it returns error.

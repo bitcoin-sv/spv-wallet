@@ -10,7 +10,7 @@ import (
 // UserRepo is an interface for users repository.
 type UserRepo interface {
 	Exists(ctx context.Context, userID string) (bool, error)
-	GetByPubKey(ctx context.Context, pubKey string) (*domainmodels.User, error)
+	GetIDByPubKey(ctx context.Context, pubKey string) (string, error)
 	Get(ctx context.Context, userID string) (*domainmodels.User, error)
 	Create(ctx context.Context, newUser *domainmodels.NewUser) (*domainmodels.User, error)
 	GetBalance(ctx context.Context, userID string, bucket string) (bsv.Satoshis, error)
