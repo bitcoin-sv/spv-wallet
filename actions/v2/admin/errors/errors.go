@@ -2,8 +2,8 @@ package errors
 
 import "github.com/bitcoin-sv/spv-wallet/models"
 
-// ErrInvalidPublicKey is returned when the public key, provided by the requester, is invalid
-var ErrInvalidPublicKey = models.SPVError{Message: "invalid requester public key", StatusCode: 400, Code: "error-user-invalid-requester-pubkey"}
+// ErrInvalidPublicKey is returned when the public key provided by admin is invalid
+var ErrInvalidPublicKey = models.SPVError{Message: "invalid public key", StatusCode: 400, Code: "error-user-invalid-pubkey"}
 
 // ErrCreatingUser is returned when the user creation fails
 var ErrCreatingUser = models.SPVError{Message: "error creating user", StatusCode: 500, Code: "error-user-creating"}
