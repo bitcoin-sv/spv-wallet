@@ -231,7 +231,6 @@ function prefix_each() {
 function parse_compose_additional() {
     local argument="$1"
 
-    sleep 3
     # Check if argument value is provided
     if [ -z "$argument" ]; then
         echo "Error: Argument for --compose-additional is missing"
@@ -249,6 +248,11 @@ function parse_compose_additional() {
     for service in "${serviceArray[@]}"; do
         servicesToRun+=("$service")
     done
+}
+
+function wait_for_services() {
+  echo "Waiting for services to start..."
+  sleep 5
 }
 
 # === LOAD FROM CLI ===
