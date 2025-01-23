@@ -13,7 +13,7 @@ import (
 // TrackedTransaction represents a transaction in the database.
 type TrackedTransaction struct {
 	ID       string `gorm:"type:char(64);primaryKey"`
-	TxStatus TxStatus
+	TxStatus string
 
 	CreatedAt time.Time
 	UpdatedAt time.Time
@@ -23,34 +23,42 @@ type TrackedTransaction struct {
 	Inputs  []*TrackedOutput `gorm:"foreignKey:SpendingTX"`
 	Outputs []*TrackedOutput `gorm:"foreignKey:TxID"`
 
-	newUTXOs []*UserUTXO `gorm:"-"`
+	newUTXOs       []*UserUTXO    `gorm:"-"`
+	spentOutpoints []bsv.Outpoint `gorm:"-"`
 }
 
-// CreateP2PKHOutput prepares a new P2PKH output and adds it to the transaction.
-func (t *TrackedTransaction) CreateP2PKHOutput(output *TrackedOutput, customInstructions datatypes.JSONSlice[bsv.CustomInstruction]) {
+// CreateUTXO prepares a new UTXO and adds it to the transaction.
+func (t *TrackedTransaction) CreateUTXO(
+	output *TrackedOutput,
+	bucket string,
+	estimatedInputSize uint64,
+	customInstructions datatypes.JSONSlice[bsv.CustomInstruction],
+) {
 	t.Outputs = append(t.Outputs, output)
-	t.newUTXOs = append(t.newUTXOs, NewP2PKHUserUTXO(output, customInstructions))
+	t.newUTXOs = append(t.newUTXOs, NewUTXO(output, bucket, estimatedInputSize, customInstructions))
 }
 
 // CreateDataOutput prepares a new Data output and adds it to the transaction.
-func (t *TrackedTransaction) CreateDataOutput(data *Data, userID string) {
+func (t *TrackedTransaction) CreateDataOutput(data *Data) {
 	t.Data = append(t.Data, data)
-	t.Outputs = append(t.Outputs, &TrackedOutput{
-		TxID:     data.TxID,
-		Vout:     data.Vout,
-		UserID:   userID,
-		Satoshis: 0,
-	})
 }
 
-// AddInputs adds inputs to the transaction.
-func (t *TrackedTransaction) AddInputs(inputs ...*TrackedOutput) {
-	t.Inputs = append(t.Inputs, inputs...)
+// SpendOutpoints prepares a list of outpoints to be spent by the transaction.
+func (t *TrackedTransaction) SpendOutpoints(outpoints ...bsv.Outpoint) {
+	t.spentOutpoints = append(t.spentOutpoints, outpoints...)
 }
 
 // AfterCreate is a hook that is called after creating the transaction.
 // It is responsible for adding new (User's) UTXOs and removing spent UTXOs.
 func (t *TrackedTransaction) AfterCreate(tx *gorm.DB) error {
+	spentOutpointsTuples := slices.AppendSeq(
+		make([][]any, 0, len(t.spentOutpoints)),
+		func(yield func(sqlPair []any) bool) {
+			for _, outpoint := range t.Inputs {
+				yield([]any{outpoint.TxID, outpoint.Vout})
+			}
+		})
+
 	// Add new UTXOs
 	if len(t.newUTXOs) > 0 {
 		err := tx.Model(&UserUTXO{}).Create(t.newUTXOs).Error
@@ -59,16 +67,21 @@ func (t *TrackedTransaction) AfterCreate(tx *gorm.DB) error {
 		}
 	}
 
-	// Remove spent UTXOs
-	spentOutpoints := slices.AppendSeq(
-		make([][]any, 0, len(t.Inputs)),
-		func(yield func(sqlPair []any) bool) {
-			for _, outpoint := range t.Inputs {
-				yield([]any{outpoint.TxID, outpoint.Vout})
-			}
-		})
-	if len(spentOutpoints) > 0 {
-		err := tx.Where("(tx_id, vout) IN ?", spentOutpoints).Delete(&UserUTXO{}).Error
+	if len(spentOutpointsTuples) > 0 {
+		// Remove spent UTXOs
+		err := tx.
+			Where("(tx_id, vout) IN ?", spentOutpointsTuples).
+			Delete(&UserUTXO{}).
+			Error
+		if err != nil {
+			return spverrors.Wrapf(err, "failed to delete spent utxos")
+		}
+
+		// Mark tracked outputs as spent
+		err = tx.Model(&TrackedOutput{}).
+			Where("tx_id IN ?", spentOutpointsTuples).
+			Update("spending_tx", t.ID).
+			Error
 		if err != nil {
 			return spverrors.Wrapf(err, "failed to delete spent utxos")
 		}

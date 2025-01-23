@@ -6,6 +6,8 @@ import (
 	"slices"
 
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
+	"github.com/bitcoin-sv/spv-wallet/engine/v2/transaction/txmodels"
+	"github.com/bitcoin-sv/spv-wallet/engine/utils"
 	"github.com/bitcoin-sv/spv-wallet/engine/v2/database"
 	"github.com/bitcoin-sv/spv-wallet/models/bsv"
 	"gorm.io/gorm"
@@ -22,7 +24,7 @@ func NewOutputsRepo(db *gorm.DB) *Outputs {
 }
 
 // FindByOutpoints returns outputs from the database based on the provided outpoints.
-func (o *Outputs) FindByOutpoints(ctx context.Context, outpoints iter.Seq[bsv.Outpoint]) ([]*database.TrackedOutput, error) {
+func (o *Outputs) FindByOutpoints(ctx context.Context, outpoints iter.Seq[bsv.Outpoint]) ([]txmodels.TrackedOutput, error) {
 	outpointsClause := slices.Collect(func(yield func(sqlPair []any) bool) {
 		for outpoint := range outpoints {
 			yield([]any{outpoint.TxID, outpoint.Vout})
@@ -38,5 +40,15 @@ func (o *Outputs) FindByOutpoints(ctx context.Context, outpoints iter.Seq[bsv.Ou
 		return nil, spverrors.Wrapf(err, "failed to get outputs")
 	}
 
-	return outputs, nil
+	return utils.MapSlice(outputs, func(output *database.TrackedOutput) txmodels.TrackedOutput {
+		return txmodels.TrackedOutput{
+			TxID:       output.TxID,
+			Vout:       output.Vout,
+			SpendingTX: output.SpendingTX,
+			UserID:     output.UserID,
+			Satoshis:   output.Satoshis,
+			CreatedAt:  output.CreatedAt,
+			UpdatedAt:  output.UpdatedAt,
+		}
+	}), nil
 }

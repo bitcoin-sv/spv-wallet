@@ -4,7 +4,7 @@ import "github.com/rs/zerolog"
 
 // Service for recording transactions
 type Service struct {
-	addresses  AddressesRepo
+	addresses  AddressesService
 	outputs    OutputsRepo
 	operations OperationsRepo
 
@@ -15,7 +15,7 @@ type Service struct {
 // NewService creates a new service for transactions
 func NewService(
 	logger zerolog.Logger,
-	addressesRepo AddressesRepo,
+	addressesRepo AddressesService,
 	outputsRepo OutputsRepo,
 	operationsRepo OperationsRepo,
 	broadcaster Broadcaster,

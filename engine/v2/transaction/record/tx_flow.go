@@ -8,29 +8,20 @@ import (
 	"github.com/bitcoin-sv/go-sdk/spv"
 	trx "github.com/bitcoin-sv/go-sdk/transaction"
 	"github.com/bitcoin-sv/spv-wallet/conv"
-	"github.com/bitcoin-sv/spv-wallet/engine/v2/database"
-	"github.com/bitcoin-sv/spv-wallet/engine/v2/transaction/errors"
+	txerrors "github.com/bitcoin-sv/spv-wallet/engine/v2/transaction/errors"
+	"github.com/bitcoin-sv/spv-wallet/engine/v2/transaction/txmodels"
 	"github.com/bitcoin-sv/spv-wallet/models/bsv"
-	"gorm.io/datatypes"
 )
-
-type p2pkhOutput struct {
-	vout               uint32
-	customInstructions datatypes.JSONSlice[bsv.CustomInstruction]
-	address            string
-	satoshis           bsv.Satoshis
-	userID             string
-}
 
 type txFlow struct {
 	ctx     context.Context
 	service *Service
 
 	tx    *trx.Transaction
-	txRow *database.TrackedTransaction
+	txRow txmodels.NewTransaction
 	txID  string
 
-	operations map[string]*operationWrapper
+	operations map[string]*txmodels.NewOperation
 }
 
 func newTxFlow(ctx context.Context, service *Service, tx *trx.Transaction) *txFlow {
@@ -41,12 +32,12 @@ func newTxFlow(ctx context.Context, service *Service, tx *trx.Transaction) *txFl
 
 		tx:   tx,
 		txID: txID,
-		txRow: &database.TrackedTransaction{
+		txRow: txmodels.NewTransaction{
 			ID:       txID,
-			TxStatus: database.TxStatusCreated,
+			TxStatus: txmodels.TxStatusCreated,
 		},
 
-		operations: map[string]*operationWrapper{},
+		operations: map[string]*txmodels.NewOperation{},
 	}
 }
 
@@ -59,7 +50,7 @@ func (f *txFlow) verifyScripts() error {
 	return nil
 }
 
-func (f *txFlow) getFromInputs() ([]*database.TrackedOutput, error) {
+func (f *txFlow) processInputs() ([]txmodels.TrackedOutput, error) {
 	outpoints := func(yield func(outpoint bsv.Outpoint) bool) {
 		for _, input := range f.tx.Inputs {
 			yield(bsv.Outpoint{
@@ -68,56 +59,43 @@ func (f *txFlow) getFromInputs() ([]*database.TrackedOutput, error) {
 			})
 		}
 	}
+
 	trackedOutputs, err := f.service.outputs.FindByOutpoints(f.ctx, outpoints)
 	if err != nil {
 		return nil, txerrors.ErrGettingOutputs.Wrap(err)
 	}
 
+	// Check for double-spending
 	for _, output := range trackedOutputs {
-		if output.IsSpent() {
+		if output.IsSpent() && output.SpendingTX != f.txID {
 			return nil, txerrors.ErrUTXOSpent
 		}
 	}
 
+	f.txRow.AddInputs(outpoints)
+
 	return trackedOutputs, nil
 }
 
-func (f *txFlow) operationOfUser(userID string, operationType string, counterparty string) *operationWrapper {
+func (f *txFlow) operationOfUser(userID string, operationType string, counterparty string) *txmodels.NewOperation {
 	if _, ok := f.operations[userID]; !ok {
-		f.operations[userID] = &operationWrapper{
-			entity: &database.Operation{
-				UserID:       userID,
-				Type:         operationType,
-				Counterparty: counterparty,
+		f.operations[userID] = &txmodels.NewOperation{
+			UserID:       userID,
+			Type:         operationType,
+			Counterparty: counterparty,
 
-				Transaction: f.txRow,
-				Value:       0,
-			},
+			Transaction: &f.txRow,
+			Value:       0,
 		}
 	}
 	return f.operations[userID]
 }
 
-func (f *txFlow) spendInputs(trackedOutputs []*database.TrackedOutput) {
-	f.txRow.AddInputs(trackedOutputs...)
+func (f *txFlow) addOutputs(outputs ...txmodels.NewOutput) {
+	f.txRow.AddOutputs(outputs...)
 }
 
-func (f *txFlow) createP2PKHOutput(outputData *p2pkhOutput) {
-	f.txRow.CreateP2PKHOutput(&database.TrackedOutput{
-		TxID:     f.txID,
-		Vout:     outputData.vout,
-		UserID:   outputData.userID,
-		Satoshis: outputData.satoshis,
-	}, outputData.customInstructions)
-}
-
-func (f *txFlow) createDataOutputs(userID string, dataRecords ...*database.Data) {
-	for _, data := range dataRecords {
-		f.txRow.CreateDataOutput(data, userID)
-	}
-}
-
-func (f *txFlow) findRelevantP2PKHOutputs() (iter.Seq[*p2pkhOutput], error) {
+func (f *txFlow) findRelevantP2PKHOutputs() (iter.Seq[txmodels.NewOutput], error) {
 	relevantOutputs := map[string]uint32{} // address -> vout
 	for vout, output := range f.tx.Outputs {
 		lockingScript := output.LockingScript
@@ -144,20 +122,19 @@ func (f *txFlow) findRelevantP2PKHOutputs() (iter.Seq[*p2pkhOutput], error) {
 		return nil, txerrors.ErrGettingAddresses.Wrap(err)
 	}
 
-	return func(yield func(*p2pkhOutput) bool) {
+	return func(yield func(output txmodels.NewOutput) bool) {
 		for _, row := range rows {
 			vout, ok := relevantOutputs[row.Address]
 			if !ok {
 				f.service.logger.Warn().Str("address", row.Address).Msg("Got not relevant address from database")
 				continue
 			}
-			yield(&p2pkhOutput{
-				vout:               vout,
-				customInstructions: row.CustomInstructions,
-				address:            row.Address,
-				satoshis:           bsv.Satoshis(f.tx.Outputs[vout].Satoshis),
-				userID:             row.UserID,
-			})
+			yield(txmodels.NewOutputForP2PHK(
+				bsv.Outpoint{TxID: f.txID, Vout: vout},
+				row.UserID,
+				bsv.Satoshis(f.tx.Outputs[vout].Satoshis),
+				row.CustomInstructions,
+			))
 		}
 	}, nil
 }
@@ -177,7 +154,7 @@ func (f *txFlow) broadcast() error {
 }
 
 func (f *txFlow) save() error {
-	err := f.service.operations.SaveAll(f.ctx, toOperationEntities(maps.Values(f.operations)))
+	err := f.service.operations.SaveAll(f.ctx, maps.Values(f.operations))
 	if err != nil {
 		return txerrors.ErrSavingData.Wrap(err)
 	}

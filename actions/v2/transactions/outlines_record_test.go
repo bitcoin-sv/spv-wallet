@@ -22,17 +22,24 @@ func givenTXWithOpReturn(t *testing.T) fixtures.GivenTXSpec {
 }
 
 func TestOutlinesRecordOpReturn(t *testing.T) {
+	// given:
+	givenForAllTests := testabilities.Given(t)
+	cleanup := givenForAllTests.StartedSPVWalletWithConfiguration(
+		testengine.WithNewTransactionFlowEnabled(),
+	)
+	defer cleanup()
+
+	// and:
+	txSpec := givenTXWithOpReturn(t)
+
 	t.Run("Record op_return data", func(t *testing.T) {
 		// given:
-		given, then := testabilities.New(t)
-		cleanup := given.StartedSPVWalletWithConfiguration(testengine.WithV2())
-		defer cleanup()
+		given, then := testabilities.NewOf(givenForAllTests, t)
 
 		// and:
 		client := given.HttpClient().ForUser()
 
 		// and:
-		txSpec := givenTXWithOpReturn(t)
 		request := `{
 			"beef": "` + txSpec.BEEF() + `",
 			"annotations": {
@@ -57,7 +64,47 @@ func TestOutlinesRecordOpReturn(t *testing.T) {
 			Post(transactionsOutlinesRecordURL)
 
 		// then:
-		then.Response(res).IsOK()
+		then.Response(res).
+			HasStatus(201).
+			WithJSONMatching(`{
+				"txID": "{{ .txID }}"
+			}`, map[string]any{
+				"txID": txSpec.ID(),
+			})
+	})
+
+	t.Run("get operations", func(t *testing.T) {
+		// given:
+		given, then := testabilities.NewOf(givenForAllTests, t)
+
+		// and:
+		client := given.HttpClient().ForUser()
+
+		// when:
+		res, _ := client.R().Get("/api/v2/operations/search")
+
+		// then:
+		then.Response(res).IsOK().WithJSONMatching(`{
+			"content": [
+				{
+					"txID": "{{ .txID }}",
+					"createdAt": "{{ matchTimestamp }}",
+					"value": {{ .value }},
+					"type": "data",
+					"counterparty": "{{ .sender }}"
+				}
+			],
+			"page": {
+			    "number": 1,
+			    "size": 1,
+			    "totalElements": 1,
+			    "totalPages": 1
+			}
+		}`, map[string]any{
+			"value":  0,
+			"txID":   txSpec.ID(),
+			"sender": "",
+		})
 	})
 }
 
