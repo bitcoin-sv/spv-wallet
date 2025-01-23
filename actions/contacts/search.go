@@ -133,14 +133,12 @@ func searchContacts(c *gin.Context, reqXPubID string, paymail string) ([]*engine
 		return nil, 0
 	}
 
-	reqParams.DefaultsIfNilOrEmpty()
-
 	contacts, err := engine.GetContactsByXpubID(
 		c.Request.Context(),
 		reqXPubID,
 		mappings.MapToMetadata(reqParams.Metadata),
 		conditions,
-		mappings.MapToQueryParams(reqParams.QueryParams),
+		mappings.DefaultDBQueryParams(),
 	)
 	if err != nil {
 		spverrors.ErrorResponse(c, err, logger)

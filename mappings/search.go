@@ -15,18 +15,22 @@ const (
 // MapToDbQueryParams converts filter.QueryParams from models to matching datastore.QueryParams
 func MapToDbQueryParams(model *filter.Page) *datastore.QueryParams {
 	if model == nil {
-		return &datastore.QueryParams{
-			Page:          defaultPage,
-			PageSize:      defaultPageSize,
-			OrderByField:  defaultSortBy,
-			SortDirection: defaultOrder,
-		}
+		return DefaultDBQueryParams()
 	}
 	return &datastore.QueryParams{
 		Page:          getNumberOrDefault(model.Number, defaultPage),
 		PageSize:      getNumberOrDefault(model.Size, defaultPageSize),
 		OrderByField:  getStringOrDefalut(model.SortBy, defaultSortBy),
 		SortDirection: getStringOrDefalut(model.Sort, defaultOrder),
+	}
+}
+
+func DefaultDBQueryParams() *datastore.QueryParams {
+	return &datastore.QueryParams{
+		Page:          defaultPage,
+		PageSize:      defaultPageSize,
+		OrderByField:  defaultSortBy,
+		SortDirection: defaultOrder,
 	}
 }
 
