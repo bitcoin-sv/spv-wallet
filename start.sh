@@ -250,11 +250,6 @@ function parse_compose_additional() {
     done
 }
 
-function wait_for_services() {
-  echo "Waiting for services to start..."
-  sleep 5
-}
-
 # === LOAD FROM CLI ===
 
 while [[ $# -gt 0 ]]; do
