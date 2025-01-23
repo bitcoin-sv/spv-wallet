@@ -15,7 +15,7 @@ type User struct {
 	CreatedAt time.Time
 	UpdatedAt time.Time
 
-	PubKey string
+	PubKey string `gorm:"index;unique;not null"`
 
 	Paymails  []*Paymail `gorm:"foreignKey:UserID"`
 	Addresses []*Address `gorm:"foreignKey:UserID"`
