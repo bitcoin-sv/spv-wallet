@@ -15,13 +15,3 @@ type UserRepo interface {
 	Create(ctx context.Context, newUser *usersmodels.NewUser) (*usersmodels.User, error)
 	GetBalance(ctx context.Context, userID string, bucket string) (bsv.Satoshis, error)
 }
-
-//// AddressRepo is an interface for addresses repository.
-//type AddressRepo interface {
-//	Create(ctx context.Context, newAddress *domainmodels.NewAddress) error
-//}
-//
-//// PaymailRepo is an interface for paymails repository.
-//type PaymailRepo interface {
-//	Create(ctx context.Context, newPaymail *domainmodels.NewPaymail) (*domainmodels.Paymail, error)
-//}
