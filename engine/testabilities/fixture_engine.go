@@ -169,9 +169,7 @@ func (f *engineFixture) initialiseFixtures() {
 			createdUser, err := f.engine.UsersService().Create(context.Background(), &usersmodels.NewUser{
 				PublicKey: pubKeyHex,
 			})
-			if err != nil {
-				require.NoError(f.t, err)
-			}
+			require.NoError(f.t, err)
 			for _, address := range user.Paymails {
 				alias, domain, _ := paymail.SanitizePaymail(address)
 				_, err = f.engine.PaymailsService().Create(context.Background(), &paymailsmodels.NewPaymail{

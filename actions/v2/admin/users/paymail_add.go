@@ -51,17 +51,19 @@ func addPaymail(c *gin.Context, _ *reqctx.AdminContext) {
 	c.JSON(http.StatusCreated, mapping.CreatedPaymailResponse(createdPaymail))
 }
 
+// parsePaymail parses the paymail address from the request body.
+// Uses either Alias + Domain or the whole paymail Address field
+// If both Alias + Domain and Address are set, and they are inconsistent, an error is returned.
 func parsePaymail(request *adminrequest.AddPaymail) (string, string, error) {
-	if request.Address != "" &&
-		(request.Alias != "" || request.Domain != "") &&
-		request.Address != request.Alias+"@"+request.Domain {
+	if request.HasAddress() &&
+		(request.HasAlias() || request.HasDomain()) &&
+		!request.AddressEqualsTo(request.Alias+"@"+request.Domain) {
 		return "", "", adminerrors.ErrPaymailInconsistent
 	}
-	pm := request.Address
-	if pm == "" {
-		pm = request.Alias + "@" + request.Domain
+	if !request.HasAddress() {
+		request.Address = request.Alias + "@" + request.Domain
 	}
-	alias, domain, sanitized := paymail.SanitizePaymail(pm)
+	alias, domain, sanitized := paymail.SanitizePaymail(request.Address)
 	if sanitized == "" {
 		return "", "", adminerrors.ErrInvalidPaymail
 	}
