@@ -25,6 +25,7 @@ func MapToDbQueryParams(model *filter.Page) *datastore.QueryParams {
 	}
 }
 
+// DefaultDBQueryParams returns the default db query params
 func DefaultDBQueryParams() *datastore.QueryParams {
 	return &datastore.QueryParams{
 		Page:          defaultPage,
