@@ -128,7 +128,7 @@ func (b *SourceTransactionBuilder) Build(res TxQueryResultSlice) error {
 
 	for i, input := range b.Tx.Inputs {
 		if input == nil || input.SourceTransaction == nil {
-			continue
+			continue // todo add returning error
 		}
 		if _, err := spv.VerifyScripts(input.SourceTransaction); err != nil {
 			return fmt.Errorf("SPV script verification failed for input %d: %w", i, err)
