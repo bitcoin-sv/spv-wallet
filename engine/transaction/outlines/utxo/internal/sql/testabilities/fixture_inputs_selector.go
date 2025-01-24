@@ -6,13 +6,13 @@ import (
 	"github.com/bitcoin-sv/spv-wallet/engine/database/testabilities"
 	testengine "github.com/bitcoin-sv/spv-wallet/engine/testabilities"
 	"github.com/bitcoin-sv/spv-wallet/engine/tester/fixtures"
-	"github.com/bitcoin-sv/spv-wallet/engine/transaction/outlines/internal/inputs"
+	"github.com/bitcoin-sv/spv-wallet/engine/transaction/outlines/utxo/internal/sql"
 	"gorm.io/gorm"
 )
 
 type InputsSelectorFixture interface {
 	testabilities.DatabaseFixture
-	NewInputSelector() inputs.Selector
+	NewInputSelector() sql.UTXOSelector
 }
 
 type inputsSelectorFixture struct {
@@ -28,6 +28,6 @@ func newFixture(t testing.TB) (InputsSelectorFixture, func()) {
 	}, cleanup
 }
 
-func (i *inputsSelectorFixture) NewInputSelector() inputs.Selector {
-	return inputs.NewSelector(i.db, fixtures.DefaultFeeUnit)
+func (i *inputsSelectorFixture) NewInputSelector() sql.UTXOSelector {
+	return sql.NewUTXOSelector(i.db, fixtures.DefaultFeeUnit)
 }
