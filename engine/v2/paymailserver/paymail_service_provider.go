@@ -1,4 +1,4 @@
-package paymail
+package paymailserver
 
 import (
 	"context"
@@ -11,11 +11,12 @@ import (
 	"github.com/bitcoin-sv/go-sdk/script"
 	trx "github.com/bitcoin-sv/go-sdk/transaction"
 	"github.com/bitcoin-sv/go-sdk/transaction/template/p2pkh"
-	"github.com/bitcoin-sv/spv-wallet/engine/keys/type42"
+	paymail2 "github.com/bitcoin-sv/spv-wallet/engine/paymail"
 	pmerrors "github.com/bitcoin-sv/spv-wallet/engine/paymail/errors"
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/bitcoin-sv/spv-wallet/engine/utils"
 	"github.com/bitcoin-sv/spv-wallet/engine/v2/addresses/addressesmodels"
+	type43 "github.com/bitcoin-sv/spv-wallet/engine/v2/keys/type42"
 	"github.com/bitcoin-sv/spv-wallet/engine/v2/paymails/paymailsmodels"
 	"github.com/bitcoin-sv/spv-wallet/models/bsv"
 	"github.com/rs/zerolog"
@@ -24,11 +25,11 @@ import (
 // NewServiceProvider create a new paymail service server which handlers incoming paymail requests
 func NewServiceProvider(
 	logger *zerolog.Logger,
-	paymails PaymailsService,
-	users UsersService,
-	addresses AddressesService,
-	spv MerkleRootsVerifier,
-	recorder TxRecorder,
+	paymails paymail2.PaymailsService,
+	users paymail2.UsersService,
+	addresses paymail2.AddressesService,
+	spv paymail2.MerkleRootsVerifier,
+	recorder paymail2.TxRecorder,
 ) server.PaymailServiceProvider {
 	return &serviceProvider{
 		logger:    logger,
@@ -42,11 +43,11 @@ func NewServiceProvider(
 
 type serviceProvider struct {
 	logger    *zerolog.Logger
-	paymails  PaymailsService
-	users     UsersService
-	addresses AddressesService
-	spv       MerkleRootsVerifier
-	recorder  TxRecorder
+	paymails  paymail2.PaymailsService
+	users     paymail2.UsersService
+	addresses paymail2.AddressesService
+	spv       paymail2.MerkleRootsVerifier
+	recorder  paymail2.TxRecorder
 }
 
 func (s *serviceProvider) CreateAddressResolutionResponse(ctx context.Context, alias, domain string, _ bool, _ *server.RequestMetadata) (*paymail.ResolutionPayload, error) {
@@ -163,7 +164,7 @@ func (s *serviceProvider) pki(ctx context.Context, paymailModel *paymailsmodels.
 		return nil, "", pmerrors.ErrPaymailPKI.Wrap(err)
 	}
 
-	pki, derivationKey, err := type42.PaymailPKI(userPubKey, paymailModel.Alias, paymailModel.Domain)
+	pki, derivationKey, err := type43.PaymailPKI(userPubKey, paymailModel.Alias, paymailModel.Domain)
 	if err != nil {
 		return nil, derivationKey, pmerrors.ErrPaymailPKI.Wrap(err)
 	}
@@ -192,7 +193,7 @@ func (s *serviceProvider) createDestinationForUser(ctx context.Context, alias, d
 		return nil, spverrors.Wrapf(err, "cannot generate reference id")
 	}
 
-	dest, err := type42.Destination(pki, referenceID)
+	dest, err := type43.Destination(pki, referenceID)
 	if err != nil {
 		return nil, pmerrors.ErrPaymentDestination.Wrap(err)
 	}
