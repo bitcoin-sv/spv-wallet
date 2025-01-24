@@ -3,7 +3,7 @@ package outlines
 import (
 	"context"
 
-	"github.com/bitcoin-sv/spv-wallet/engine/transaction"
+	"github.com/bitcoin-sv/spv-wallet/engine/v2/transaction"
 )
 
 // PaymailAddressService is a component that provides methods for working with paymail address.

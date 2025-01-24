@@ -6,7 +6,7 @@ import (
 	"github.com/bitcoin-sv/spv-wallet/engine/database/testabilities"
 	testengine "github.com/bitcoin-sv/spv-wallet/engine/testabilities"
 	"github.com/bitcoin-sv/spv-wallet/engine/tester/fixtures"
-	"github.com/bitcoin-sv/spv-wallet/engine/transaction/outlines/utxo/internal/sql"
+	"github.com/bitcoin-sv/spv-wallet/engine/v2/transaction/outlines/utxo/internal/sql"
 	"gorm.io/gorm"
 )
 

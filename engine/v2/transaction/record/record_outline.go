@@ -6,9 +6,9 @@ import (
 	trx "github.com/bitcoin-sv/go-sdk/transaction"
 	"github.com/bitcoin-sv/spv-wallet/conv"
 	"github.com/bitcoin-sv/spv-wallet/engine/database"
-	"github.com/bitcoin-sv/spv-wallet/engine/transaction"
-	txerrors "github.com/bitcoin-sv/spv-wallet/engine/transaction/errors"
-	"github.com/bitcoin-sv/spv-wallet/engine/transaction/outlines"
+	"github.com/bitcoin-sv/spv-wallet/engine/v2/transaction"
+	"github.com/bitcoin-sv/spv-wallet/engine/v2/transaction/errors"
+	"github.com/bitcoin-sv/spv-wallet/engine/v2/transaction/outlines"
 	"github.com/bitcoin-sv/spv-wallet/models/transaction/bucket"
 )
 

@@ -7,9 +7,9 @@ import (
 	"testing"
 
 	"github.com/bitcoin-sv/spv-wallet/engine/tester/fixtures"
-	txerrors "github.com/bitcoin-sv/spv-wallet/engine/transaction/errors"
-	"github.com/bitcoin-sv/spv-wallet/engine/transaction/outlines"
-	"github.com/bitcoin-sv/spv-wallet/engine/transaction/outlines/testabilities"
+	"github.com/bitcoin-sv/spv-wallet/engine/v2/transaction/errors"
+	outlines2 "github.com/bitcoin-sv/spv-wallet/engine/v2/transaction/outlines"
+	"github.com/bitcoin-sv/spv-wallet/engine/v2/transaction/outlines/testabilities"
 	"github.com/bitcoin-sv/spv-wallet/models"
 	"github.com/bitcoin-sv/spv-wallet/models/request/opreturn"
 	"github.com/bitcoin-sv/spv-wallet/models/transaction/bucket"
@@ -20,32 +20,32 @@ func TestCreateOpReturnTransactionOutline(t *testing.T) {
 	const maxOpPushDataSize = 0xFFFFFFFF
 
 	successTests := map[string]struct {
-		opReturn      *outlines.OpReturn
+		opReturn      *outlines2.OpReturn
 		lockingScript string
 	}{
 		"return transaction outline for single string": {
-			opReturn: &outlines.OpReturn{
+			opReturn: &outlines2.OpReturn{
 				DataType: opreturn.DataTypeStrings,
 				Data:     []string{"Example data"},
 			},
 			lockingScript: "006a0c4578616d706c652064617461",
 		},
 		"return transaction outline for multiple strings": {
-			opReturn: &outlines.OpReturn{
+			opReturn: &outlines2.OpReturn{
 				DataType: opreturn.DataTypeStrings,
 				Data:     []string{"Example", " ", "data"},
 			},
 			lockingScript: "006a074578616d706c6501200464617461",
 		},
 		"return transaction outline for single hex": {
-			opReturn: &outlines.OpReturn{
+			opReturn: &outlines2.OpReturn{
 				DataType: opreturn.DataTypeHexes,
 				Data:     []string{toHex("Example data")},
 			},
 			lockingScript: "006a0c4578616d706c652064617461",
 		},
 		"return transaction outline for multiple hexes": {
-			opReturn: &outlines.OpReturn{
+			opReturn: &outlines2.OpReturn{
 				DataType: opreturn.DataTypeHexes,
 				Data:     []string{toHex("Example"), toHex(" "), toHex("data")},
 			},
@@ -60,9 +60,9 @@ func TestCreateOpReturnTransactionOutline(t *testing.T) {
 			service := given.NewTransactionOutlinesService()
 
 			// and:
-			spec := &outlines.TransactionSpec{
+			spec := &outlines2.TransactionSpec{
 				UserID:  fixtures.Sender.ID(),
-				Outputs: outlines.NewOutputsSpecs(test.opReturn),
+				Outputs: outlines2.NewOutputsSpecs(test.opReturn),
 			}
 
 			// when:
@@ -81,35 +81,35 @@ func TestCreateOpReturnTransactionOutline(t *testing.T) {
 	}
 
 	errorTests := map[string]struct {
-		spec          *outlines.OpReturn
+		spec          *outlines2.OpReturn
 		expectedError models.SPVError
 	}{
 		"return error for no data in default type": {
-			spec:          &outlines.OpReturn{},
+			spec:          &outlines2.OpReturn{},
 			expectedError: txerrors.ErrTxOutlineOpReturnDataRequired,
 		},
 		"return error for no data string type": {
-			spec: &outlines.OpReturn{
+			spec: &outlines2.OpReturn{
 				DataType: opreturn.DataTypeStrings,
 			},
 			expectedError: txerrors.ErrTxOutlineOpReturnDataRequired,
 		},
 		"return error for invalid hex": {
-			spec: &outlines.OpReturn{
+			spec: &outlines2.OpReturn{
 				DataType: opreturn.DataTypeHexes,
 				Data:     []string{"invalid hex"},
 			},
 			expectedError: txerrors.ErrFailedToDecodeHex,
 		},
 		"return error for unknown data type": {
-			spec: &outlines.OpReturn{
+			spec: &outlines2.OpReturn{
 				DataType: 123,
 				Data:     []string{"Example", " ", "data"},
 			},
 			expectedError: txerrors.ErrTxOutlineOpReturnUnsupportedDataType,
 		},
 		"return error for to big string": {
-			spec: &outlines.OpReturn{
+			spec: &outlines2.OpReturn{
 				DataType: opreturn.DataTypeStrings,
 				Data:     []string{strings.Repeat("1", maxOpPushDataSize+1)},
 			},
@@ -124,9 +124,9 @@ func TestCreateOpReturnTransactionOutline(t *testing.T) {
 			service := given.NewTransactionOutlinesService()
 
 			// and:
-			spec := &outlines.TransactionSpec{
+			spec := &outlines2.TransactionSpec{
 				UserID:  fixtures.Sender.ID(),
-				Outputs: outlines.NewOutputsSpecs(test.spec),
+				Outputs: outlines2.NewOutputsSpecs(test.spec),
 			}
 
 			// when:

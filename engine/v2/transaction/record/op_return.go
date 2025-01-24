@@ -2,7 +2,7 @@ package record
 
 import (
 	"github.com/bitcoin-sv/go-sdk/script"
-	txerrors "github.com/bitcoin-sv/spv-wallet/engine/transaction/errors"
+	"github.com/bitcoin-sv/spv-wallet/engine/v2/transaction/errors"
 )
 
 func getDataFromOpReturn(lockingScript *script.Script) ([]byte, error) {

@@ -5,7 +5,7 @@ import (
 
 	"github.com/bitcoin-sv/spv-wallet/engine/paymail"
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
-	txerrors "github.com/bitcoin-sv/spv-wallet/engine/transaction/errors"
+	"github.com/bitcoin-sv/spv-wallet/engine/v2/transaction/errors"
 	"github.com/rs/zerolog"
 )
 

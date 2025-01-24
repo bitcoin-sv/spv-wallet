@@ -6,7 +6,7 @@ import (
 
 	"github.com/bitcoin-sv/spv-wallet/engine/database"
 	"github.com/bitcoin-sv/spv-wallet/engine/tester/fixtures"
-	"github.com/bitcoin-sv/spv-wallet/engine/transaction/outlines/utxo/internal/sql/testabilities"
+	"github.com/bitcoin-sv/spv-wallet/engine/v2/transaction/outlines/utxo/internal/sql/testabilities"
 	"github.com/bitcoin-sv/spv-wallet/models/bsv"
 	"github.com/stretchr/testify/require"
 )

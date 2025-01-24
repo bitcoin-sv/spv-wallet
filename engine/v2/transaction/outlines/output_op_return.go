@@ -7,8 +7,8 @@ import (
 	"github.com/bitcoin-sv/go-sdk/script"
 	sdk "github.com/bitcoin-sv/go-sdk/transaction"
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
-	"github.com/bitcoin-sv/spv-wallet/engine/transaction"
-	txerrors "github.com/bitcoin-sv/spv-wallet/engine/transaction/errors"
+	"github.com/bitcoin-sv/spv-wallet/engine/v2/transaction"
+	"github.com/bitcoin-sv/spv-wallet/engine/v2/transaction/errors"
 	"github.com/bitcoin-sv/spv-wallet/models/request/opreturn"
 )
 

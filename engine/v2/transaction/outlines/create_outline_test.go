@@ -5,15 +5,15 @@ import (
 	"testing"
 
 	"github.com/bitcoin-sv/spv-wallet/engine/tester/fixtures"
-	txerrors "github.com/bitcoin-sv/spv-wallet/engine/transaction/errors"
-	"github.com/bitcoin-sv/spv-wallet/engine/transaction/outlines"
-	"github.com/bitcoin-sv/spv-wallet/engine/transaction/outlines/testabilities"
+	"github.com/bitcoin-sv/spv-wallet/engine/v2/transaction/errors"
+	outlines2 "github.com/bitcoin-sv/spv-wallet/engine/v2/transaction/outlines"
+	"github.com/bitcoin-sv/spv-wallet/engine/v2/transaction/outlines/testabilities"
 	"github.com/bitcoin-sv/spv-wallet/models"
 )
 
 func TestCreateTransactionOutlineError(t *testing.T) {
 	errorTests := map[string]struct {
-		spec          *outlines.TransactionSpec
+		spec          *outlines2.TransactionSpec
 		expectedError models.SPVError
 	}{
 		"return error for nil as transaction spec": {
@@ -21,17 +21,17 @@ func TestCreateTransactionOutlineError(t *testing.T) {
 			expectedError: txerrors.ErrTxOutlineSpecificationRequired,
 		},
 		"return error for transaction spec without xPub Id": {
-			spec:          &outlines.TransactionSpec{},
+			spec:          &outlines2.TransactionSpec{},
 			expectedError: txerrors.ErrTxOutlineSpecificationUserIDRequired,
 		},
 		"return error for no outputs in transaction spec": {
-			spec:          &outlines.TransactionSpec{UserID: fixtures.Sender.ID()},
+			spec:          &outlines2.TransactionSpec{UserID: fixtures.Sender.ID()},
 			expectedError: txerrors.ErrTxOutlineRequiresAtLeastOneOutput,
 		},
 		"return error for empty output list in transaction spec": {
-			spec: &outlines.TransactionSpec{
+			spec: &outlines2.TransactionSpec{
 				UserID:  fixtures.Sender.ID(),
-				Outputs: outlines.NewOutputsSpecs(),
+				Outputs: outlines2.NewOutputsSpecs(),
 			},
 			expectedError: txerrors.ErrTxOutlineRequiresAtLeastOneOutput,
 		},

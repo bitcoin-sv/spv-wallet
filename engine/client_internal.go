@@ -13,10 +13,10 @@ import (
 	"github.com/bitcoin-sv/spv-wallet/engine/paymail"
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/bitcoin-sv/spv-wallet/engine/taskmanager"
-	"github.com/bitcoin-sv/spv-wallet/engine/transaction/outlines"
-	"github.com/bitcoin-sv/spv-wallet/engine/transaction/record"
 	"github.com/bitcoin-sv/spv-wallet/engine/v2/addresses"
 	"github.com/bitcoin-sv/spv-wallet/engine/v2/paymails"
+	"github.com/bitcoin-sv/spv-wallet/engine/v2/transaction/outlines"
+	"github.com/bitcoin-sv/spv-wallet/engine/v2/transaction/record"
 	"github.com/bitcoin-sv/spv-wallet/engine/v2/users"
 	"github.com/mrz1836/go-cachestore"
 )

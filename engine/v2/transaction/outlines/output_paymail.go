@@ -8,8 +8,8 @@ import (
 	sdk "github.com/bitcoin-sv/go-sdk/transaction"
 	pmerrors "github.com/bitcoin-sv/spv-wallet/engine/paymail/errors"
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
-	"github.com/bitcoin-sv/spv-wallet/engine/transaction"
-	txerrors "github.com/bitcoin-sv/spv-wallet/engine/transaction/errors"
+	"github.com/bitcoin-sv/spv-wallet/engine/v2/transaction"
+	"github.com/bitcoin-sv/spv-wallet/engine/v2/transaction/errors"
 	paymailreq "github.com/bitcoin-sv/spv-wallet/models/request/paymail"
 	"github.com/bitcoin-sv/spv-wallet/models/transaction/bucket"
 )
