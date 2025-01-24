@@ -1,7 +1,7 @@
 package transactions
 
 import (
-	"github.com/bitcoin-sv/spv-wallet/actions/transactions/internal/mapping/outline"
+	"github.com/bitcoin-sv/spv-wallet/actions/v2/transactions/internal/mapping/outline"
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/bitcoin-sv/spv-wallet/models/request"
 	"github.com/bitcoin-sv/spv-wallet/server/reqctx"
