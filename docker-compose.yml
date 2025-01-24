@@ -166,6 +166,6 @@ configs:
   admin-env-config:
     content: |
       {
-        "serverUrl": "http${RUN_SECURED_PROTOCOL_SUFFIX}://${RUN_SPVWALLET_DOMAIN}/v1",
+        "serverUrl": "http${RUN_SECURED_PROTOCOL_SUFFIX}://${RUN_SPVWALLET_DOMAIN}",
         "hideServerUrl": false
       }

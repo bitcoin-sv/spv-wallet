@@ -619,10 +619,10 @@ if [ "$cache" == "redis" ]; then
 fi
 
 if [ "$spv_wallet" == "true" ]; then
-  save_value 'SPVWALLET_SERVER_URL' "http://spv-wallet:3003/v1"
+  save_value 'SPVWALLET_SERVER_URL' "http://spv-wallet:3003"
   save_value 'SPVWALLET_ARC_CALLBACK_HOST' "https://$paymail_domain"
 else
-  save_value 'SPVWALLET_SERVER_URL' "http://host.docker.internal:3003/v1"
+  save_value 'SPVWALLET_SERVER_URL' "http://host.docker.internal:3003"
 fi
 if [ "$wallet_backend" == "true" ]; then
   save_value 'DB_HOST' "wallet-postgresql"
