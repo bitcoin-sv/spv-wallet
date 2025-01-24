@@ -4,7 +4,6 @@ import (
 	"context"
 
 	"github.com/bitcoin-sv/spv-wallet/engine/paymail"
-	"github.com/bitcoin-sv/spv-wallet/engine/paymailaddress"
 	"github.com/rs/zerolog"
 )
 
@@ -13,10 +12,10 @@ type evaluationContext struct {
 	userID                string
 	log                   *zerolog.Logger
 	paymail               paymail.ServiceClient
-	paymailAddressService paymailaddress.Service
+	paymailAddressService PaymailAddressService
 }
 
-func newOutlineEvaluationContext(ctx context.Context, userID string, log *zerolog.Logger, paymail paymail.ServiceClient, paymailAddressService paymailaddress.Service) *evaluationContext {
+func newOutlineEvaluationContext(ctx context.Context, userID string, log *zerolog.Logger, paymail paymail.ServiceClient, paymailAddressService PaymailAddressService) *evaluationContext {
 	return &evaluationContext{
 		Context:               ctx,
 		userID:                userID,
@@ -38,6 +37,6 @@ func (c *evaluationContext) Paymail() paymail.ServiceClient {
 	return c.paymail
 }
 
-func (c *evaluationContext) PaymailAddressService() paymailaddress.Service {
+func (c *evaluationContext) PaymailAddressService() PaymailAddressService {
 	return c.paymailAddressService
 }

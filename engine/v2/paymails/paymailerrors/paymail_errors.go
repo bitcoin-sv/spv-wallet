@@ -1,4 +1,4 @@
-package paerrors
+package paymailerrors
 
 import "github.com/bitcoin-sv/spv-wallet/models"
 

@@ -11,7 +11,6 @@ import (
 	"github.com/bitcoin-sv/spv-wallet/engine/datastore"
 	"github.com/bitcoin-sv/spv-wallet/engine/notifications"
 	"github.com/bitcoin-sv/spv-wallet/engine/paymail"
-	"github.com/bitcoin-sv/spv-wallet/engine/paymailaddress"
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/bitcoin-sv/spv-wallet/engine/taskmanager"
 	"github.com/bitcoin-sv/spv-wallet/engine/transaction/outlines"
@@ -165,18 +164,10 @@ func (c *Client) loadPaymailComponents() (err error) {
 	return
 }
 
-func (c *Client) loadPaymailAddressService() error {
-	if c.options.paymailAddressService != nil {
-		return nil
-	}
-	c.options.paymailAddressService = paymailaddress.NewService(c.Repositories().Paymails)
-	return nil
-}
-
 func (c *Client) loadTransactionOutlinesService() error {
 	if c.options.transactionOutlinesService == nil {
 		logger := c.Logger().With().Str("subservice", "transactionOutlines").Logger()
-		c.options.transactionOutlinesService = outlines.NewService(c.PaymailService(), c.options.paymailAddressService, logger)
+		c.options.transactionOutlinesService = outlines.NewService(c.PaymailService(), c.options.paymails, logger)
 	}
 	return nil
 }

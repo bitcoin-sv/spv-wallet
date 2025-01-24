@@ -4,7 +4,6 @@ import (
 	"context"
 
 	"github.com/bitcoin-sv/spv-wallet/engine/paymail"
-	"github.com/bitcoin-sv/spv-wallet/engine/paymailaddress"
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	txerrors "github.com/bitcoin-sv/spv-wallet/engine/transaction/errors"
 	"github.com/rs/zerolog"
@@ -13,11 +12,11 @@ import (
 type service struct {
 	logger                *zerolog.Logger
 	paymailService        paymail.ServiceClient
-	paymailAddressService paymailaddress.Service
+	paymailAddressService PaymailAddressService
 }
 
 // NewService creates a new transaction outlines service.
-func NewService(paymailService paymail.ServiceClient, paymailAddressService paymailaddress.Service, logger zerolog.Logger) Service {
+func NewService(paymailService paymail.ServiceClient, paymailAddressService PaymailAddressService, logger zerolog.Logger) Service {
 	if paymailService == nil {
 		panic("paymail.ServiceClient is required to create transaction outlines service")
 	}

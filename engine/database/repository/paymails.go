@@ -35,19 +35,7 @@ func (p *Paymails) Create(ctx context.Context, newPaymail *paymailsmodels.NewPay
 		return nil, err
 	}
 
-	return &paymailsmodels.Paymail{
-		ID:        row.ID,
-		CreatedAt: row.CreatedAt,
-		UpdatedAt: row.UpdatedAt,
-
-		Alias:  row.Alias,
-		Domain: row.Domain,
-
-		PublicName: row.PublicName,
-		Avatar:     row.Avatar,
-
-		UserID: row.UserID,
-	}, nil
+	return p.newPaymailModel(row), nil
 }
 
 // Find returns a paymail by alias and domain.
@@ -63,6 +51,40 @@ func (p *Paymails) Find(ctx context.Context, alias, domain string) (*paymailsmod
 		return nil, err
 	}
 
+	return p.newPaymailModel(row), nil
+}
+
+// FindForUser returns a paymail by alias and domain for given user.
+func (p *Paymails) FindForUser(ctx context.Context, alias, domain, userID string) (*paymailsmodels.Paymail, error) {
+	var row database.Paymail
+	if err := p.db.
+		WithContext(ctx).
+		Where("alias = ? AND domain = ? AND user_id = ?", alias, domain, userID).
+		First(&row).Error; err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil, nil
+		}
+		return nil, err
+	}
+
+	return p.newPaymailModel(row), nil
+}
+
+// GetDefault returns a default paymail for user.
+func (p *Paymails) GetDefault(ctx context.Context, userID string) (*paymailsmodels.Paymail, error) {
+	var row database.Paymail
+	if err := p.db.
+		WithContext(ctx).
+		Where("user_id = ?", userID).
+		Order("created_at ASC").
+		First(&row).Error; err != nil {
+		return nil, err
+	}
+
+	return p.newPaymailModel(row), nil
+}
+
+func (p *Paymails) newPaymailModel(row database.Paymail) *paymailsmodels.Paymail {
 	return &paymailsmodels.Paymail{
 		ID:        row.ID,
 		CreatedAt: row.CreatedAt,
@@ -75,36 +97,5 @@ func (p *Paymails) Find(ctx context.Context, alias, domain string) (*paymailsmod
 		Avatar:     row.Avatar,
 
 		UserID: row.UserID,
-	}, nil
-}
-
-// FindForUser returns a paymail by alias and domain for given user.
-func (p *Paymails) FindForUser(ctx context.Context, alias, domain, userID string) (*database.Paymail, error) {
-	var paymail database.Paymail
-	if err := p.db.
-		WithContext(ctx).
-		Preload("User").
-		Where("alias = ? AND domain = ? AND user_id = ?", alias, domain, userID).
-		First(&paymail).Error; err != nil {
-		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return nil, nil
-		}
-		return nil, err
 	}
-
-	return &paymail, nil
-}
-
-// GetDefault returns a default paymail for user.
-func (p *Paymails) GetDefault(ctx context.Context, userID string) (*database.Paymail, error) {
-	var paymail database.Paymail
-	if err := p.db.
-		WithContext(ctx).
-		Where("user_id = ?", userID).
-		Order("created_at ASC").
-		First(&paymail).Error; err != nil {
-		return nil, err
-	}
-
-	return &paymail, nil
 }

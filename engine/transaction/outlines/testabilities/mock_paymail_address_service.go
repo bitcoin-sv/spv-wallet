@@ -5,8 +5,8 @@ import (
 	"slices"
 	"testing"
 
-	"github.com/bitcoin-sv/spv-wallet/engine/paymailaddress/paerrors"
 	"github.com/bitcoin-sv/spv-wallet/engine/tester/fixtures"
+	"github.com/bitcoin-sv/spv-wallet/engine/v2/paymails/paymailerrors"
 )
 
 type mockPaymailAddressService struct {
@@ -36,5 +36,5 @@ func (m *mockPaymailAddressService) GetDefaultPaymailAddress(_ context.Context, 
 			return user.DefaultPaymail(), nil
 		}
 	}
-	return "", paerrors.ErrNoDefaultPaymailAddress
+	return "", paymailerrors.ErrNoDefaultPaymailAddress
 }

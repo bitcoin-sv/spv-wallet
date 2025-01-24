@@ -12,7 +12,7 @@ import (
 
 // PaymailsService is an interface for paymails service
 type PaymailsService interface {
-	Get(ctx context.Context, alias, domain string) (*paymailsmodels.Paymail, error)
+	Find(ctx context.Context, alias, domain string) (*paymailsmodels.Paymail, error)
 }
 
 // UsersService is an interface for users service
