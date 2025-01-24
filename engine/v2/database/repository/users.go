@@ -3,9 +3,9 @@ package repository
 import (
 	"context"
 
-	"github.com/bitcoin-sv/spv-wallet/engine/database"
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/bitcoin-sv/spv-wallet/engine/utils"
+	database2 "github.com/bitcoin-sv/spv-wallet/engine/v2/database"
 	"github.com/bitcoin-sv/spv-wallet/engine/v2/users/usersmodels"
 	"github.com/bitcoin-sv/spv-wallet/models/bsv"
 	"gorm.io/gorm"
@@ -24,7 +24,7 @@ func NewUsersRepo(db *gorm.DB) *Users {
 // Exists checks if a user exists in the database.
 func (u *Users) Exists(ctx context.Context, userID string) (bool, error) {
 	var count int64
-	err := u.db.WithContext(ctx).Model(&database.User{}).Where("id = ?", userID).Count(&count).Error
+	err := u.db.WithContext(ctx).Model(&database2.User{}).Where("id = ?", userID).Count(&count).Error
 	if err != nil {
 		return false, spverrors.Wrapf(err, "failed to check if user exists")
 	}
@@ -38,7 +38,7 @@ func (u *Users) GetIDByPubKey(ctx context.Context, pubKey string) (string, error
 		ID string
 	}
 	err := u.db.WithContext(ctx).
-		Model(&database.User{}).
+		Model(&database2.User{}).
 		Where("pub_key = ?", pubKey).
 		First(&user).Error
 	if err != nil {
@@ -50,7 +50,7 @@ func (u *Users) GetIDByPubKey(ctx context.Context, pubKey string) (string, error
 
 // Get returns a user by its id with preloaded paymail slist. If the user does not exist, it returns error.
 func (u *Users) Get(ctx context.Context, userID string) (*usersmodels.User, error) {
-	var user database.User
+	var user database2.User
 	err := u.db.WithContext(ctx).
 		Scopes(withPaymailsScope).
 		Where("id = ?", userID).
@@ -66,11 +66,11 @@ func (u *Users) Get(ctx context.Context, userID string) (*usersmodels.User, erro
 func (u *Users) Create(ctx context.Context, newUser *usersmodels.NewUser) (*usersmodels.User, error) {
 	query := u.db.WithContext(ctx)
 
-	row := &database.User{
+	row := &database2.User{
 		PubKey: newUser.PublicKey,
 	}
 	if newUser.Paymail != nil {
-		row.Paymails = []*database.Paymail{{
+		row.Paymails = []*database2.Paymail{{
 			Alias:      newUser.Paymail.Alias,
 			Domain:     newUser.Paymail.Domain,
 			PublicName: newUser.Paymail.PublicName,
@@ -90,7 +90,7 @@ func (u *Users) GetBalance(ctx context.Context, userID string, bucket string) (b
 	var balance bsv.Satoshis
 	err := u.db.
 		WithContext(ctx).
-		Model(&database.UserUTXO{}).
+		Model(&database2.UserUTXO{}).
 		Where("user_id = ? AND bucket = ?", userID, bucket).
 		Select("COALESCE(SUM(satoshis), 0)").
 		Row().
@@ -103,13 +103,13 @@ func (u *Users) GetBalance(ctx context.Context, userID string, bucket string) (b
 	return balance, nil
 }
 
-func mapToDomainUser(user *database.User) *usersmodels.User {
+func mapToDomainUser(user *database2.User) *usersmodels.User {
 	return &usersmodels.User{
 		ID:        user.ID,
 		CreatedAt: user.CreatedAt,
 		UpdatedAt: user.UpdatedAt,
 		PublicKey: user.PubKey,
-		Paymails: utils.MapSlice(user.Paymails, func(p *database.Paymail) *usersmodels.Paymail {
+		Paymails: utils.MapSlice(user.Paymails, func(p *database2.Paymail) *usersmodels.Paymail {
 			return &usersmodels.Paymail{
 				ID:        p.ID,
 				CreatedAt: p.CreatedAt,
@@ -129,7 +129,7 @@ func mapToDomainUser(user *database.User) *usersmodels.User {
 
 func withPaymailsScope(db *gorm.DB) *gorm.DB {
 	return db.Preload("Paymails", func(db *gorm.DB) *gorm.DB {
-		//NOTE: To preserve deterministic order necessary to get default paymail as the first one
+		// NOTE: To preserve deterministic order necessary to get default paymail as the first one
 		return db.Order("created_at ASC")
 	})
 }

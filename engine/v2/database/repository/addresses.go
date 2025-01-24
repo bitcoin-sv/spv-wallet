@@ -5,9 +5,9 @@ import (
 	"iter"
 	"slices"
 
-	"github.com/bitcoin-sv/spv-wallet/engine/database"
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/bitcoin-sv/spv-wallet/engine/v2/addresses/addressesmodels"
+	"github.com/bitcoin-sv/spv-wallet/engine/v2/database"
 	"gorm.io/datatypes"
 	"gorm.io/gorm"
 )

@@ -3,7 +3,7 @@ package testabilities
 import (
 	"testing"
 
-	"github.com/bitcoin-sv/spv-wallet/engine/database"
+	"github.com/bitcoin-sv/spv-wallet/engine/v2/database"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )

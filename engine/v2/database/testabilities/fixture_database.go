@@ -3,8 +3,8 @@ package testabilities
 import (
 	"testing"
 
-	"github.com/bitcoin-sv/spv-wallet/engine/database"
 	testengine "github.com/bitcoin-sv/spv-wallet/engine/testabilities"
+	"github.com/bitcoin-sv/spv-wallet/engine/v2/database"
 	"github.com/bitcoin-sv/spv-wallet/models/bsv"
 	"gorm.io/gorm"
 )

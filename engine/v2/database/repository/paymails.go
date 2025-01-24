@@ -4,7 +4,7 @@ import (
 	"context"
 	"errors"
 
-	"github.com/bitcoin-sv/spv-wallet/engine/database"
+	"github.com/bitcoin-sv/spv-wallet/engine/v2/database"
 	"github.com/bitcoin-sv/spv-wallet/engine/v2/paymails/paymailsmodels"
 	"gorm.io/gorm"
 )
