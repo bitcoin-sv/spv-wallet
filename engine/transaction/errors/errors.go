@@ -24,7 +24,7 @@ var (
 	// ErrTxOutlineSenderPaymailAddressNoDefault is when it is not possible to determine the default address for the sender.
 	ErrTxOutlineSenderPaymailAddressNoDefault = models.SPVError{Code: "error-tx-spec-paymail-address-no-default", Message: "cannot choose paymail address of the sender", StatusCode: 400}
 
-	// ErrTxOutlineInsufficientFunds is returned when user has not enough BSV in UTXOs to fulfil the transaction.
+	// ErrTxOutlineInsufficientFunds is returned when user has not enough BSV in UTXOs to fund the transaction.
 	ErrTxOutlineInsufficientFunds = models.SPVError{Code: "tx-outline-not-enough-funds", Message: "not enough funds to make the transaction", StatusCode: 422}
 
 	// ErrFailedToDecodeHex is returned when hex decoding fails.

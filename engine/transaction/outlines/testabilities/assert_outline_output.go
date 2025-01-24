@@ -11,6 +11,20 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
+type OutputAssertion interface {
+	HasBucket(bucket bucket.Name) OutputAssertion
+	HasSatoshis(satoshis bsv.Satoshis) OutputAssertion
+	HasLockingScript(lockingScript string) OutputAssertion
+	IsDataOnly() OutputAssertion
+	IsPaymail() TransactionOutlinePaymailOutputAssertion
+}
+
+type TransactionOutlinePaymailOutputAssertion interface {
+	HasReceiver(receiver string) TransactionOutlinePaymailOutputAssertion
+	HasSender(sender string) TransactionOutlinePaymailOutputAssertion
+	HasReference(reference string) TransactionOutlinePaymailOutputAssertion
+}
+
 type txOutputAssertion struct {
 	t          testing.TB
 	parent     *assertion
@@ -50,30 +64,24 @@ func (a *txOutputAssertion) IsDataOnly() OutputAssertion {
 func (a *txOutputAssertion) IsPaymail() TransactionOutlinePaymailOutputAssertion {
 	a.t.Helper()
 	a.require.NotNil(a.annotation, "Output %d has no annotation", a.index)
-	a.assert.NotNil(a.annotation.Paymail, "Output %d is not a paymail output", a.index)
+	a.require.NotNil(a.annotation.Paymail, "Output %d is not a paymail output", a.index)
 	return a
 }
 
 func (a *txOutputAssertion) HasReceiver(receiver string) TransactionOutlinePaymailOutputAssertion {
 	a.t.Helper()
-	if a.annotation.Paymail != nil {
-		a.assert.Equal(receiver, a.annotation.Paymail.Receiver, "Output %d has invalid paymail receiver", a.index)
-	}
+	a.assert.Equal(receiver, a.annotation.Paymail.Receiver, "Output %d has invalid paymail receiver", a.index)
 	return a
 }
 
 func (a *txOutputAssertion) HasSender(sender string) TransactionOutlinePaymailOutputAssertion {
 	a.t.Helper()
-	if a.annotation.Paymail != nil {
-		a.assert.Equal(sender, a.annotation.Paymail.Sender, "Output %d has invalid paymail sender", a.index)
-	}
+	a.assert.Equal(sender, a.annotation.Paymail.Sender, "Output %d has invalid paymail sender", a.index)
 	return a
 }
 
 func (a *txOutputAssertion) HasReference(reference string) TransactionOutlinePaymailOutputAssertion {
 	a.t.Helper()
-	if a.annotation.Paymail != nil {
-		a.assert.Equal(reference, a.annotation.Paymail.Reference, "Output %d has invalid paymail reference", a.index)
-	}
+	a.assert.Equal(reference, a.annotation.Paymail.Reference, "Output %d has invalid paymail reference", a.index)
 	return a
 }

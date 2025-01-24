@@ -62,7 +62,7 @@ func TestCreateOpReturnTransactionOutline(t *testing.T) {
 			// and:
 			spec := &outlines.TransactionSpec{
 				UserID:  fixtures.Sender.ID(),
-				Outputs: outlines.NewOutputsSpec(test.opReturn),
+				Outputs: outlines.NewOutputsSpecs(test.opReturn),
 			}
 
 			// when:
@@ -126,7 +126,7 @@ func TestCreateOpReturnTransactionOutline(t *testing.T) {
 			// and:
 			spec := &outlines.TransactionSpec{
 				UserID:  fixtures.Sender.ID(),
-				Outputs: outlines.NewOutputsSpec(test.spec),
+				Outputs: outlines.NewOutputsSpecs(test.spec),
 			}
 
 			// when:

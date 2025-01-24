@@ -39,7 +39,7 @@ func (tx Request) ToEngine(userID string) (*outlines.TransactionSpec, error) {
 
 func outputsHookFunc() mapstructure.DecodeHookFunc {
 	return func(_ reflect.Type, to reflect.Type, data interface{}) (interface{}, error) {
-		specs := outlines.NewOutputsSpec()
+		specs := outlines.NewOutputsSpecs()
 		reqOutputs, ok := data.([]request.Output)
 		if !ok {
 			return data, nil

@@ -31,7 +31,7 @@ func TestCreateTransactionOutlineError(t *testing.T) {
 		"return error for empty output list in transaction spec": {
 			spec: &outlines.TransactionSpec{
 				UserID:  fixtures.Sender.ID(),
-				Outputs: outlines.NewOutputsSpec(),
+				Outputs: outlines.NewOutputsSpecs(),
 			},
 			expectedError: txerrors.ErrTxOutlineRequiresAtLeastOneOutput,
 		},

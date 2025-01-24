@@ -8,6 +8,11 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
+type InputAssertion interface {
+	HasSourceTxID(id string) InputAssertion
+	HasSourceVout(index int) InputAssertion
+}
+
 type txInputAssertion struct {
 	t          testing.TB
 	parent     *assertion

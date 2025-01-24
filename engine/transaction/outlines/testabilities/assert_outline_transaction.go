@@ -5,8 +5,6 @@ import (
 
 	sdk "github.com/bitcoin-sv/go-sdk/transaction"
 	"github.com/bitcoin-sv/spv-wallet/engine/transaction/outlines"
-	"github.com/bitcoin-sv/spv-wallet/models/bsv"
-	"github.com/bitcoin-sv/spv-wallet/models/transaction/bucket"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -33,25 +31,6 @@ type WithParseableBEEFTransactionOutlineAssertion interface {
 	Input(index int) InputAssertion
 	HasOutputs(count int) WithParseableBEEFTransactionOutlineAssertion
 	Output(index int) OutputAssertion
-}
-
-type InputAssertion interface {
-	HasSourceTxID(id string) InputAssertion
-	HasSourceVout(index int) InputAssertion
-}
-
-type OutputAssertion interface {
-	HasBucket(bucket bucket.Name) OutputAssertion
-	HasSatoshis(satoshis bsv.Satoshis) OutputAssertion
-	HasLockingScript(lockingScript string) OutputAssertion
-	IsDataOnly() OutputAssertion
-	IsPaymail() TransactionOutlinePaymailOutputAssertion
-}
-
-type TransactionOutlinePaymailOutputAssertion interface {
-	HasReceiver(receiver string) TransactionOutlinePaymailOutputAssertion
-	HasSender(sender string) TransactionOutlinePaymailOutputAssertion
-	HasReference(reference string) TransactionOutlinePaymailOutputAssertion
 }
 
 func Then(t testing.TB) TransactionOutlineAssertion {

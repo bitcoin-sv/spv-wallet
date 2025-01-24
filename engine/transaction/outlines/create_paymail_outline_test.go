@@ -33,7 +33,7 @@ func TestCreatePaymailTransactionOutline(t *testing.T) {
 		// and:
 		spec := &outlines.TransactionSpec{
 			UserID: fixtures.Sender.ID(),
-			Outputs: outlines.NewOutputsSpec(&outlines.Paymail{
+			Outputs: outlines.NewOutputsSpecs(&outlines.Paymail{
 				To:       recipient,
 				Satoshis: transactionSatoshiValue,
 				From:     optional.Of(sender),
@@ -75,7 +75,7 @@ func TestCreatePaymailTransactionOutline(t *testing.T) {
 		// and:
 		spec := &outlines.TransactionSpec{
 			UserID: fixtures.Sender.ID(),
-			Outputs: outlines.NewOutputsSpec(&outlines.Paymail{
+			Outputs: outlines.NewOutputsSpecs(&outlines.Paymail{
 				To:       recipient,
 				Satoshis: paymentSatoshiValue,
 				From:     optional.Of(sender),
@@ -121,7 +121,7 @@ func TestCreatePaymailTransactionOutline(t *testing.T) {
 		// and:
 		spec := &outlines.TransactionSpec{
 			UserID: fixtures.UserWithMorePaymails.ID(),
-			Outputs: outlines.NewOutputsSpec(&outlines.Paymail{
+			Outputs: outlines.NewOutputsSpecs(&outlines.Paymail{
 				To:       recipient,
 				Satoshis: transactionSatoshiValue,
 			}),
@@ -272,7 +272,7 @@ func TestCreatePaymailTransactionOutline(t *testing.T) {
 			// and:
 			spec := &outlines.TransactionSpec{
 				UserID:  test.user.ID(),
-				Outputs: outlines.NewOutputsSpec(test.spec),
+				Outputs: outlines.NewOutputsSpecs(test.spec),
 			}
 
 			// when:
@@ -337,7 +337,7 @@ func TestCreatePaymailTransactionOutline(t *testing.T) {
 			// and:
 			spec := &outlines.TransactionSpec{
 				UserID: fixtures.Sender.ID(),
-				Outputs: outlines.NewOutputsSpec(&outlines.Paymail{
+				Outputs: outlines.NewOutputsSpecs(&outlines.Paymail{
 					To:       recipient,
 					Satoshis: transactionSatoshiValue,
 				}),

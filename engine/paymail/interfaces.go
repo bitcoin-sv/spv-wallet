@@ -10,7 +10,7 @@ import (
 
 // PaymailsRepo is an interface for paymails repository.
 type PaymailsRepo interface {
-	Get(ctx context.Context, alias, domain string) (*database.Paymail, error)
+	Find(ctx context.Context, alias, domain string) (*database.Paymail, error)
 }
 
 // UsersRepo is an interface for users repository.

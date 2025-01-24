@@ -17,8 +17,8 @@ type OutputSpec interface {
 	evaluate(ctx evaluationContext) (annotatedOutputs, error)
 }
 
-// NewOutputsSpec constructs a new OutputsSpec instance with provided outputs specifications.
-func NewOutputsSpec(outputs ...OutputSpec) OutputsSpec {
+// NewOutputsSpecs constructs a new OutputsSpec instance with provided outputs specifications.
+func NewOutputsSpecs(outputs ...OutputSpec) OutputsSpec {
 	return OutputsSpec{
 		Outputs: outputs,
 	}
