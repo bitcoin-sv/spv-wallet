@@ -1,4 +1,4 @@
-package inputs_test
+package sql_test
 
 import (
 	"context"
@@ -6,7 +6,7 @@ import (
 
 	"github.com/bitcoin-sv/spv-wallet/engine/database"
 	"github.com/bitcoin-sv/spv-wallet/engine/tester/fixtures"
-	"github.com/bitcoin-sv/spv-wallet/engine/transaction/outlines/internal/inputs/testabilities"
+	"github.com/bitcoin-sv/spv-wallet/engine/transaction/outlines/utxo/internal/sql/testabilities"
 	"github.com/bitcoin-sv/spv-wallet/models/bsv"
 	"github.com/stretchr/testify/require"
 )

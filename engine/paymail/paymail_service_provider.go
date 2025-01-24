@@ -79,7 +79,7 @@ func (s *serviceProvider) CreateP2PDestinationResponse(ctx context.Context, alia
 }
 
 func (s *serviceProvider) GetPaymailByAlias(ctx context.Context, alias, domain string, _ *server.RequestMetadata) (*paymail.AddressInformation, error) {
-	model, err := s.paymails.Get(ctx, alias, domain)
+	model, err := s.paymails.Find(ctx, alias, domain)
 	if err != nil {
 		return nil, pmerrors.ErrPaymailDBFailed.Wrap(err)
 	}
@@ -177,7 +177,7 @@ type destinationData struct {
 }
 
 func (s *serviceProvider) createDestinationForUser(ctx context.Context, alias, domain string) (*destinationData, error) {
-	paymailModel, err := s.paymails.Get(ctx, alias, domain)
+	paymailModel, err := s.paymails.Find(ctx, alias, domain)
 	if err != nil {
 		return nil, pmerrors.ErrPaymailDBFailed.Wrap(err)
 	}

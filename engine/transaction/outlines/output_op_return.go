@@ -1,4 +1,4 @@
-package outputs
+package outlines
 
 import (
 	"encoding/hex"
@@ -9,14 +9,13 @@ import (
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/bitcoin-sv/spv-wallet/engine/transaction"
 	txerrors "github.com/bitcoin-sv/spv-wallet/engine/transaction/errors"
-	"github.com/bitcoin-sv/spv-wallet/engine/transaction/outlines/internal/evaluation"
 	"github.com/bitcoin-sv/spv-wallet/models/request/opreturn"
 )
 
 // OpReturn represents an OP_RETURN output specification.
 type OpReturn opreturn.Output
 
-func (o *OpReturn) evaluate(evaluation.Context) (annotatedOutputs, error) {
+func (o *OpReturn) evaluate(*evaluationContext) (annotatedOutputs, error) {
 	if len(o.Data) == 0 {
 		return nil, txerrors.ErrTxOutlineOpReturnDataRequired
 	}

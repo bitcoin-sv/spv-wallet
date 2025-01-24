@@ -1,4 +1,4 @@
-package inputs
+package sql
 
 import (
 	"context"
@@ -14,8 +14,8 @@ import (
 const txIdColumn = "tx_id"
 const voutColumn = "vout"
 
-// Selector is a service that selects inputs for transaction.
-type Selector interface {
+// UTXOSelector is a service that selects inputs for transaction.
+type UTXOSelector interface {
 	SelectInputsForTransaction(ctx context.Context, userID string, satoshis bsv.Satoshis, byteSizeOfTxBeforeAddingSelectedInputs uint64) ([]*database.UserUTXO, error)
 }
 
@@ -31,8 +31,8 @@ type sqlInputsSelector struct {
 	db      *gorm.DB
 }
 
-// NewSelector creates a new instance of Selector.
-func NewSelector(db *gorm.DB, feeUnit bsv.FeeUnit) Selector {
+// NewUTXOSelector creates a new instance of UTXOSelector.
+func NewUTXOSelector(db *gorm.DB, feeUnit bsv.FeeUnit) UTXOSelector {
 	return &sqlInputsSelector{
 		db:      db,
 		feeUnit: feeUnit,
