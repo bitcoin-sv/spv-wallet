@@ -13,6 +13,7 @@ var funcsMap = template.FuncMap{
 	"matchHexWithLength": matchHexWithLength,
 	"matchHex":           matchHex,
 	"matchAddress":       matchAddress,
+	"matchNumber":        matchNumber,
 }
 
 func matchTimestamp() string {
@@ -41,6 +42,10 @@ func matchHex() string {
 // NOTE: Only P2PKH (mainnet) addresses are supported
 func matchAddress() string {
 	return regexPlaceholder(`^1[a-km-zA-HJ-NP-Z1-9]{24,33}$`)
+}
+
+func matchNumber() string {
+	return regexPlaceholder(`^\\d+$`)
 }
 
 // regexPlaceholder adds slashes at the beginning and end of a string
