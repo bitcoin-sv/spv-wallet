@@ -6,7 +6,9 @@ import (
 	"github.com/bitcoin-sv/go-sdk/script"
 	sighash "github.com/bitcoin-sv/go-sdk/transaction/sighash"
 	"github.com/bitcoin-sv/go-sdk/transaction/template/p2pkh"
+	"github.com/bitcoin-sv/spv-wallet/engine/keys/type42"
 	"github.com/bitcoin-sv/spv-wallet/engine/utils"
+	"github.com/bitcoin-sv/spv-wallet/models/bsv"
 )
 
 // User is a fixture that is representing a user of the system.
@@ -72,6 +74,14 @@ var (
 			"sender@" + PaymailDomainExternal,
 		},
 		PrivKey: "",
+	}
+
+	// ExternalFaucet is a user that is a faucet from external server in the tests.
+	ExternalFaucet = User{
+		Paymails: []string{
+			"faucet@" + PaymailDomainExternal,
+		},
+		PrivKey: "xprv9s21ZrQH143K3N6qVJQAu4EP51qMcyrKYJLkLgmYXgz58xmVxVLSsbx2DfJUtjcnXK8NdvkHMKfmmg5AJT2nqqRWUrjSHX29qEJwBgBPkJQ",
 	}
 )
 
@@ -163,8 +173,22 @@ func (f *User) P2PKHLockingScript() *script.Script {
 }
 
 // P2PKHUnlockingScriptTemplate returns the unlocking script template of this user.
-func (f *User) P2PKHUnlockingScriptTemplate() *p2pkh.P2PKH {
-	unlockingScript, err := p2pkh.Unlock(f.PrivateKey(), ptr(sighash.AllForkID))
+func (f *User) P2PKHUnlockingScriptTemplate(instructions ...bsv.CustomInstruction) *p2pkh.P2PKH {
+	priv := f.PrivateKey()
+	var err error
+	for _, instruction := range instructions {
+		switch instruction.Type {
+		case "type42":
+			priv, err = type42.DerivePrivateKey(priv, instruction.Instruction)
+			if err != nil {
+				panic("Invalid setup of user fixture, cannot restore type42 instruction: " + err.Error())
+			}
+		default:
+			panic("Invalid setup of user fixture, unknown instruction type: " + instruction.Type)
+		}
+	}
+
+	unlockingScript, err := p2pkh.Unlock(priv, ptr(sighash.AllForkID))
 	if err != nil {
 		panic("Invalid setup of user fixture, cannot restore unlocking script: " + err.Error())
 	}
@@ -180,6 +204,7 @@ func AllUsers() []User {
 		RecipientInternal,
 		RecipientExternal,
 		SenderExternal,
+		ExternalFaucet,
 	}
 }
 

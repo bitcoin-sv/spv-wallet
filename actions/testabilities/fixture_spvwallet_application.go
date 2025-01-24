@@ -1,6 +1,8 @@
 package testabilities
 
 import (
+	"github.com/bitcoin-sv/spv-wallet/models/bsv"
+	"github.com/stretchr/testify/assert"
 	"testing"
 
 	"github.com/bitcoin-sv/spv-wallet/config"
@@ -31,6 +33,8 @@ type SPVWalletApplicationFixture interface {
 
 	// ARC creates a new test fixture for ARC
 	ARC() ARCFixture
+
+	Faucet(user fixtures.User) FaucetFixture
 }
 
 type BlockHeadersServiceFixture interface {
@@ -59,11 +63,16 @@ type SPVWalletHttpClientFixture interface {
 	ForGivenUser(user fixtures.User) *resty.Client
 }
 
+type FaucetFixture interface {
+	TopUp(satoshis bsv.Satoshis) (fixtures.GivenTXSpec, bsv.CustomInstructions)
+}
+
 type appFixture struct {
-	engineFixture testengine.EngineFixture
-	t             testing.TB
-	logger        zerolog.Logger
-	server        testServer
+	engineWithConfig testengine.EngineWithConfig
+	engineFixture    testengine.EngineFixture
+	t                testing.TB
+	logger           zerolog.Logger
+	server           testServer
 }
 
 func Given(t testing.TB) SPVWalletApplicationFixture {
@@ -92,6 +101,8 @@ func (f *appFixture) StartedSPVWalletWithConfiguration(opts ...testengine.Config
 
 	s := server.NewServer(&engineWithConfig.Config, engineWithConfig.Engine, f.logger)
 	f.server.handlers = s.Handlers()
+
+	f.engineWithConfig = engineWithConfig
 
 	return cleanup
 }
@@ -131,4 +142,16 @@ func (f *appFixture) BHS() BlockHeadersServiceFixture {
 
 func (f *appFixture) ARC() ARCFixture {
 	return f.engineFixture.ARC()
+}
+
+func (f *appFixture) Faucet(user fixtures.User) FaucetFixture {
+	return &faucetFixture{
+		engineWithConfig: f.engineWithConfig,
+		httpClient:       f.HttpClient(),
+		user:             user,
+		t:                f.t,
+		assert:           assert.New(f.t),
+		arc:              f.ARC(),
+		bhs:              f.BHS(),
+	}
 }

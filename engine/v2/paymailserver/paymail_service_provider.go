@@ -16,7 +16,7 @@ import (
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/bitcoin-sv/spv-wallet/engine/utils"
 	"github.com/bitcoin-sv/spv-wallet/engine/v2/addresses/addressesmodels"
-	type43 "github.com/bitcoin-sv/spv-wallet/engine/v2/keys/type42"
+	"github.com/bitcoin-sv/spv-wallet/engine/v2/keys/type42"
 	"github.com/bitcoin-sv/spv-wallet/engine/v2/paymails/paymailsmodels"
 	"github.com/bitcoin-sv/spv-wallet/models/bsv"
 	"github.com/rs/zerolog"
@@ -164,7 +164,7 @@ func (s *serviceProvider) pki(ctx context.Context, paymailModel *paymailsmodels.
 		return nil, "", pmerrors.ErrPaymailPKI.Wrap(err)
 	}
 
-	pki, derivationKey, err := type43.PaymailPKI(userPubKey, paymailModel.Alias, paymailModel.Domain)
+	pki, derivationKey, err := type42.PaymailPKI(userPubKey, paymailModel.Alias, paymailModel.Domain)
 	if err != nil {
 		return nil, derivationKey, pmerrors.ErrPaymailPKI.Wrap(err)
 	}
@@ -193,7 +193,7 @@ func (s *serviceProvider) createDestinationForUser(ctx context.Context, alias, d
 		return nil, spverrors.Wrapf(err, "cannot generate reference id")
 	}
 
-	dest, err := type43.Destination(pki, referenceID)
+	dest, destDerivationKey, err := type42.Destination(pki, referenceID)
 	if err != nil {
 		return nil, pmerrors.ErrPaymentDestination.Wrap(err)
 	}
@@ -218,7 +218,7 @@ func (s *serviceProvider) createDestinationForUser(ctx context.Context, alias, d
 			},
 			{
 				Type:        "type42",
-				Instruction: referenceID,
+				Instruction: destDerivationKey,
 			},
 		},
 	})

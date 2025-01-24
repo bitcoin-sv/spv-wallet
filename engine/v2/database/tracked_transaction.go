@@ -6,7 +6,6 @@ import (
 
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/bitcoin-sv/spv-wallet/models/bsv"
-	"gorm.io/datatypes"
 	"gorm.io/gorm"
 )
 
@@ -32,7 +31,7 @@ func (t *TrackedTransaction) CreateUTXO(
 	output *TrackedOutput,
 	bucket string,
 	estimatedInputSize uint64,
-	customInstructions datatypes.JSONSlice[bsv.CustomInstruction],
+	customInstructions bsv.CustomInstructions,
 ) {
 	t.Outputs = append(t.Outputs, output)
 	t.newUTXOs = append(t.newUTXOs, NewUTXO(output, bucket, estimatedInputSize, customInstructions))

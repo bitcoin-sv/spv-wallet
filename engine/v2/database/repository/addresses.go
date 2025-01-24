@@ -2,6 +2,7 @@ package repository
 
 import (
 	"context"
+	"github.com/bitcoin-sv/spv-wallet/models/bsv"
 	"iter"
 	"slices"
 
@@ -54,7 +55,7 @@ func (r *Addresses) FindByStringAddresses(ctx context.Context, addresses iter.Se
 			CreatedAt:          row.CreatedAt,
 			UpdatedAt:          row.UpdatedAt,
 			UserID:             row.UserID,
-			CustomInstructions: row.CustomInstructions,
+			CustomInstructions: (bsv.CustomInstructions)(row.CustomInstructions),
 		}
 	}), nil
 }

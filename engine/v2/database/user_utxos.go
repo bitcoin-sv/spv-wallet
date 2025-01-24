@@ -36,7 +36,7 @@ func NewUTXO(
 	output *TrackedOutput,
 	bucket string,
 	estimatedInputSize uint64,
-	customInstructions datatypes.JSONSlice[bsv.CustomInstruction],
+	customInstructions bsv.CustomInstructions,
 ) *UserUTXO {
 	return &UserUTXO{
 		UserID:             output.UserID,
@@ -45,6 +45,6 @@ func NewUTXO(
 		Satoshis:           uint64(output.Satoshis),
 		EstimatedInputSize: estimatedInputSize,
 		Bucket:             bucket,
-		CustomInstructions: customInstructions,
+		CustomInstructions: datatypes.NewJSONSlice(customInstructions),
 	}
 }

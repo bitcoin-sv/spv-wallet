@@ -30,7 +30,12 @@ func TestOutlinesRecordOpReturn(t *testing.T) {
 	defer cleanup()
 
 	// and:
-	txSpec := givenTXWithOpReturn(t)
+	ownedTransaction, customInstrucions := givenForAllTests.Faucet(fixtures.Sender).TopUp(1000)
+
+	// and:
+	txSpec := fixtures.GivenTX(t).
+		WithInputFromUTXO(ownedTransaction.TX(), 0, fixtures.Sender.P2PKHUnlockingScriptTemplate(customInstrucions...)).
+		WithOPReturn(dataOfOpReturnTx)
 
 	t.Run("Record op_return data", func(t *testing.T) {
 		// given:
@@ -92,12 +97,13 @@ func TestOutlinesRecordOpReturn(t *testing.T) {
 					"value": {{ .value }},
 					"type": "data",
 					"counterparty": "{{ .sender }}"
-				}
+				},
+				{{ anything }}
 			],
 			"page": {
 			    "number": 1,
-			    "size": 1,
-			    "totalElements": 1,
+			    "size": 2,
+			    "totalElements": 2,
 			    "totalPages": 1
 			}
 		}`, map[string]any{

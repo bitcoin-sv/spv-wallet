@@ -7,6 +7,7 @@ import (
 
 var (
 	anyonePriv, _ = primitives.PrivateKeyFromBytes([]byte{1})
+	anyonePub     = anyonePriv.PubKey()
 )
 
 func derive(pubKey *primitives.PublicKey, derivationKey string) (*primitives.PublicKey, error) {
@@ -18,4 +19,13 @@ func derive(pubKey *primitives.PublicKey, derivationKey string) (*primitives.Pub
 		return nil, ErrDeriveKey.Wrap(err)
 	}
 	return derivedPubByRef, nil
+}
+
+// DerivePrivateKey created derived private key based on derivation key (type 42 derivation with "anyone" private key)
+func DerivePrivateKey(priv *primitives.PrivateKey, derivationKey string) (*primitives.PrivateKey, error) {
+	derived, err := priv.DeriveChild(anyonePub, derivationKey)
+	if err != nil {
+		return nil, ErrDeriveKey.Wrap(err)
+	}
+	return derived, nil
 }

@@ -2,7 +2,6 @@ package txmodels
 
 import (
 	"github.com/bitcoin-sv/spv-wallet/models/bsv"
-	"gorm.io/datatypes"
 )
 
 // EstimatedInputSizeForP2PKH is the estimated size increase when adding and unlocking P2PKH input to transaction.
@@ -19,7 +18,7 @@ type SpendableUTXO struct {
 	EstimatedInputSize uint64
 
 	// CustomInstructions is the list of instructions for unlocking given UTXO (it should be understood by client).
-	CustomInstructions datatypes.JSONSlice[bsv.CustomInstruction]
+	CustomInstructions bsv.CustomInstructions
 }
 
 // NewOutput holds the data for creating a new output.
@@ -36,7 +35,7 @@ type NewOutput struct {
 }
 
 // NewOutputForP2PHK creates a new output for P2PKH address.
-func NewOutputForP2PHK(outpoint bsv.Outpoint, userID string, satoshis bsv.Satoshis, customInstructions datatypes.JSONSlice[bsv.CustomInstruction]) NewOutput {
+func NewOutputForP2PHK(outpoint bsv.Outpoint, userID string, satoshis bsv.Satoshis, customInstructions bsv.CustomInstructions) NewOutput {
 	return NewOutput{
 		UserID:   userID,
 		TxID:     outpoint.TxID,

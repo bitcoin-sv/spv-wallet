@@ -4,7 +4,6 @@ import (
 	"time"
 
 	"github.com/bitcoin-sv/spv-wallet/models/bsv"
-	"gorm.io/datatypes"
 )
 
 // NewAddress is a data for creating a new address.
@@ -21,7 +20,7 @@ type Address struct {
 	CreatedAt time.Time
 	UpdatedAt time.Time
 
-	CustomInstructions datatypes.JSONSlice[bsv.CustomInstruction]
+	CustomInstructions bsv.CustomInstructions
 
 	UserID string
 }

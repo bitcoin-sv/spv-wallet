@@ -154,9 +154,5 @@ func (f *txFlow) broadcast() error {
 }
 
 func (f *txFlow) save() error {
-	err := f.service.operations.SaveAll(f.ctx, maps.Values(f.operations))
-	if err != nil {
-		return txerrors.ErrSavingData.Wrap(err)
-	}
-	return nil
+	return f.service.SaveOperations(f.ctx, maps.Values(f.operations))
 }
