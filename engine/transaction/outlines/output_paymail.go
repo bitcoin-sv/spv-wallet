@@ -17,7 +17,7 @@ import (
 // Paymail represents a paymail output
 type Paymail paymailreq.Output
 
-func (p *Paymail) evaluate(ctx evaluationContext) (annotatedOutputs, error) {
+func (p *Paymail) evaluate(ctx *evaluationContext) (annotatedOutputs, error) {
 	paymailClient := ctx.Paymail()
 
 	receiverAddress, err := paymailClient.GetSanitizedPaymail(p.To)
@@ -72,7 +72,7 @@ func (p *Paymail) createBsvPaymailOutput(output *paymail.PaymentOutput, referenc
 	}, nil
 }
 
-func (p *Paymail) sender(ctx evaluationContext) (string, error) {
+func (p *Paymail) sender(ctx *evaluationContext) (string, error) {
 	if p.From == nil {
 		return p.defaultSenderAddress(ctx)
 	}
@@ -85,7 +85,7 @@ func (p *Paymail) sender(ctx evaluationContext) (string, error) {
 	return *p.From, nil
 }
 
-func (p *Paymail) validateProvidedSenderPaymail(ctx evaluationContext) error {
+func (p *Paymail) validateProvidedSenderPaymail(ctx *evaluationContext) error {
 	var sender = *p.From
 	_, err := ctx.Paymail().GetSanitizedPaymail(sender)
 	if err != nil {
@@ -106,7 +106,7 @@ func (p *Paymail) validateProvidedSenderPaymail(ctx evaluationContext) error {
 	return nil
 }
 
-func (p *Paymail) defaultSenderAddress(ctx evaluationContext) (string, error) {
+func (p *Paymail) defaultSenderAddress(ctx *evaluationContext) (string, error) {
 	sender, err := ctx.PaymailAddressService().GetDefaultPaymailAddress(ctx, ctx.UserID())
 	if err != nil {
 		return "", txerrors.ErrTxOutlineSenderPaymailAddressNoDefault.Wrap(err)

@@ -14,7 +14,7 @@ type OutputsSpec struct {
 
 // OutputSpec is a specification for a single output of the transaction.
 type OutputSpec interface {
-	evaluate(ctx evaluationContext) (annotatedOutputs, error)
+	evaluate(ctx *evaluationContext) (annotatedOutputs, error)
 }
 
 // NewOutputsSpecs constructs a new OutputsSpec instance with provided outputs specifications.
@@ -30,7 +30,7 @@ func (s *OutputsSpec) Add(output OutputSpec) {
 }
 
 // Evaluate the outputs specifications and return the transaction outputs and their annotations.
-func (s *OutputsSpec) Evaluate(ctx evaluationContext) ([]*sdk.TransactionOutput, transaction.OutputsAnnotations, error) {
+func (s *OutputsSpec) Evaluate(ctx *evaluationContext) ([]*sdk.TransactionOutput, transaction.OutputsAnnotations, error) {
 	if s.Outputs == nil {
 		return nil, nil, txerrors.ErrTxOutlineRequiresAtLeastOneOutput
 	}
@@ -43,7 +43,7 @@ func (s *OutputsSpec) Evaluate(ctx evaluationContext) ([]*sdk.TransactionOutput,
 	return txOutputs, annotations, nil
 }
 
-func (s *OutputsSpec) evaluate(ctx evaluationContext) (annotatedOutputs, error) {
+func (s *OutputsSpec) evaluate(ctx *evaluationContext) (annotatedOutputs, error) {
 	if len(s.Outputs) == 0 {
 		return nil, txerrors.ErrTxOutlineRequiresAtLeastOneOutput
 	}

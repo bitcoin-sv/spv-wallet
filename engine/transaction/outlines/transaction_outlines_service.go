@@ -43,7 +43,7 @@ func (s *service) Create(ctx context.Context, spec *TransactionSpec) (*Transacti
 		return nil, txerrors.ErrTxOutlineSpecificationUserIDRequired
 	}
 
-	c := newTransactionContext(
+	c := newOutlineEvaluationContext(
 		ctx,
 		spec.UserID,
 		s.logger,

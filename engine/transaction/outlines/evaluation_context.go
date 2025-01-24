@@ -8,17 +8,7 @@ import (
 	"github.com/rs/zerolog"
 )
 
-// evaluationContext is a context for the evaluation of a transaction outline specification.
-type evaluationContext interface {
-	context.Context
-	XPubID() string
-	UserID() string
-	Log() *zerolog.Logger
-	Paymail() paymail.ServiceClient
-	PaymailAddressService() paymailaddress.Service
-}
-
-type ctx struct {
+type evaluationContext struct {
 	context.Context
 	userID                string
 	log                   *zerolog.Logger
@@ -26,10 +16,9 @@ type ctx struct {
 	paymailAddressService paymailaddress.Service
 }
 
-// newTransactionContext creates a new context
-func newTransactionContext(c context.Context, userID string, log *zerolog.Logger, paymail paymail.ServiceClient, paymailAddressService paymailaddress.Service) evaluationContext {
-	return &ctx{
-		Context:               c,
+func newOutlineEvaluationContext(ctx context.Context, userID string, log *zerolog.Logger, paymail paymail.ServiceClient, paymailAddressService paymailaddress.Service) *evaluationContext {
+	return &evaluationContext{
+		Context:               ctx,
 		userID:                userID,
 		log:                   log,
 		paymail:               paymail,
@@ -37,22 +26,18 @@ func newTransactionContext(c context.Context, userID string, log *zerolog.Logger
 	}
 }
 
-func (c *ctx) XPubID() string {
-	return ""
-}
-
-func (c *ctx) UserID() string {
+func (c *evaluationContext) UserID() string {
 	return c.userID
 }
 
-func (c *ctx) Log() *zerolog.Logger {
+func (c *evaluationContext) Log() *zerolog.Logger {
 	return c.log
 }
 
-func (c *ctx) Paymail() paymail.ServiceClient {
+func (c *evaluationContext) Paymail() paymail.ServiceClient {
 	return c.paymail
 }
 
-func (c *ctx) PaymailAddressService() paymailaddress.Service {
+func (c *evaluationContext) PaymailAddressService() paymailaddress.Service {
 	return c.paymailAddressService
 }

@@ -12,7 +12,7 @@ type TransactionSpec struct {
 	UserID  string
 }
 
-func (t *TransactionSpec) evaluate(ctx evaluationContext) (*sdk.Transaction, transaction.Annotations, error) {
+func (t *TransactionSpec) evaluate(ctx *evaluationContext) (*sdk.Transaction, transaction.Annotations, error) {
 	outputs, err := t.Outputs.evaluate(ctx)
 	if err != nil {
 		return nil, transaction.Annotations{}, spverrors.Wrapf(err, "failed to evaluate outputs")

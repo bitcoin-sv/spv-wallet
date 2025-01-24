@@ -15,7 +15,7 @@ import (
 // OpReturn represents an OP_RETURN output specification.
 type OpReturn opreturn.Output
 
-func (o *OpReturn) evaluate(evaluationContext) (annotatedOutputs, error) {
+func (o *OpReturn) evaluate(*evaluationContext) (annotatedOutputs, error) {
 	if len(o.Data) == 0 {
 		return nil, txerrors.ErrTxOutlineOpReturnDataRequired
 	}
