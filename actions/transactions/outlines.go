@@ -19,7 +19,13 @@ func transactionOutlines(c *gin.Context, userCtx *reqctx.UserContext) {
 		return
 	}
 
-	spec, err := outline.Request(requestBody).ToEngine(userCtx.GetXPubID())
+	userID, err := userCtx.ShouldGetUserID()
+	if err != nil {
+		spverrors.ErrorResponse(c, err, logger)
+		return
+	}
+
+	spec, err := outline.Request(requestBody).ToEngine(userID)
 	if err != nil {
 		spverrors.ErrorResponse(c, err, logger)
 		return

@@ -3,6 +3,7 @@ package mappings
 import (
 	"github.com/bitcoin-sv/spv-wallet/engine/datastore"
 	"github.com/bitcoin-sv/spv-wallet/models/filter"
+	"github.com/iancoleman/strcase"
 )
 
 const (
@@ -25,7 +26,7 @@ func MapToDbQueryParams(model *filter.Page) *datastore.QueryParams {
 	return &datastore.QueryParams{
 		Page:          getNumberOrDefault(model.Number, defaultPage),
 		PageSize:      getNumberOrDefault(model.Size, defaultPageSize),
-		OrderByField:  getStringOrDefalut(model.SortBy, defaultSortBy),
+		OrderByField:  getStringOrDefaultToSnakeCase(model.SortBy, defaultSortBy),
 		SortDirection: getStringOrDefalut(model.Sort, defaultOrder),
 	}
 }
@@ -35,6 +36,12 @@ func getNumberOrDefault(value int, defaultValue int) int {
 		return defaultValue
 	}
 	return value
+}
+
+func getStringOrDefaultToSnakeCase(value, defaultValue string) string {
+	return strcase.ToSnake(
+		getStringOrDefalut(value, defaultValue),
+	)
 }
 
 func getStringOrDefalut(value string, defaultValue string) string {
