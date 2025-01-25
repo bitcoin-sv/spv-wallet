@@ -4,26 +4,28 @@ import (
 	sdk "github.com/bitcoin-sv/go-sdk/transaction"
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/bitcoin-sv/spv-wallet/engine/transaction"
-	txerrors "github.com/bitcoin-sv/spv-wallet/engine/transaction/errors"
-	"github.com/bitcoin-sv/spv-wallet/engine/transaction/outlines/internal/evaluation"
-	"github.com/bitcoin-sv/spv-wallet/engine/transaction/outlines/outputs"
 )
 
 // TransactionSpec represents client provided specification for a transaction outline.
 type TransactionSpec struct {
-	Outputs *outputs.Specifications
-	XPubID  string
+	Outputs OutputsSpec
+	UserID  string
 }
 
-func (t *TransactionSpec) outputs(ctx evaluation.Context) ([]*sdk.TransactionOutput, transaction.OutputsAnnotations, error) {
-	if t.Outputs == nil {
-		return nil, nil, txerrors.ErrTxOutlineRequiresAtLeastOneOutput
-	}
-
-	outs, annotations, err := t.Outputs.Evaluate(ctx)
+func (t *TransactionSpec) evaluate(ctx *evaluationContext) (*sdk.Transaction, transaction.Annotations, error) {
+	outputs, err := t.Outputs.evaluate(ctx)
 	if err != nil {
-		return nil, nil, spverrors.Wrapf(err, "failed to evaluate outputs")
+		return nil, transaction.Annotations{}, spverrors.Wrapf(err, "failed to evaluate outputs")
 	}
 
-	return outs, annotations, nil
+	txOuts, outputsAnnotations := outputs.splitIntoTransactionOutputsAndAnnotations()
+	tx := &sdk.Transaction{
+		Outputs: txOuts,
+	}
+
+	annotations := transaction.Annotations{
+		Outputs: outputsAnnotations,
+	}
+
+	return tx, annotations, nil
 }

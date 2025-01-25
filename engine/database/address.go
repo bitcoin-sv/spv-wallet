@@ -3,6 +3,7 @@ package database
 import (
 	"time"
 
+	"github.com/bitcoin-sv/spv-wallet/models/bsv"
 	"gorm.io/datatypes"
 	"gorm.io/gorm"
 )
@@ -15,14 +16,8 @@ type Address struct {
 	UpdatedAt time.Time
 	DeletedAt gorm.DeletedAt `gorm:"index"`
 
-	CustomInstructions datatypes.JSONSlice[CustomInstruction]
+	CustomInstructions datatypes.JSONSlice[bsv.CustomInstruction]
 
 	UserID string
 	User   *User `gorm:"foreignKey:UserID"`
-}
-
-// CustomInstruction represents a custom instruction how to unlock a UTXO.
-type CustomInstruction struct {
-	Type        string
-	Instruction string
 }
