@@ -1,0 +1,72 @@
+package users
+
+import (
+	"context"
+
+	primitives "github.com/bitcoin-sv/go-sdk/primitives/ec"
+	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
+	"github.com/bitcoin-sv/spv-wallet/engine/v2/users/usersmodels"
+)
+
+// Service is a user domain service
+type Service struct {
+	usersRepo UserRepo
+}
+
+// NewService creates a new user service
+func NewService(users UserRepo) *Service {
+	return &Service{
+		usersRepo: users,
+	}
+}
+
+// Create creates a new user
+func (s *Service) Create(ctx context.Context, newUser *usersmodels.NewUser) (*usersmodels.User, error) {
+	createdUser, err := s.usersRepo.Create(ctx, newUser)
+	if err != nil {
+		return nil, spverrors.Wrapf(err, "failed to create user")
+	}
+	return createdUser, nil
+}
+
+// Exists checks if a user exists
+func (s *Service) Exists(ctx context.Context, userID string) (bool, error) {
+	exists, err := s.usersRepo.Exists(ctx, userID)
+	if err != nil {
+		return false, spverrors.Wrapf(err, "failed to check if user exists")
+	}
+	return exists, nil
+}
+
+// GetByID returns a user with paymails
+func (s *Service) GetByID(ctx context.Context, userID string) (*usersmodels.User, error) {
+	user, err := s.usersRepo.Get(ctx, userID)
+	if err != nil {
+		return nil, spverrors.Wrapf(err, "failed to get user with paymails")
+	}
+	return user, nil
+}
+
+// GetIDByPubKey returns the user ID selected by pubKey
+func (s *Service) GetIDByPubKey(ctx context.Context, pubKey string) (string, error) {
+	userID, err := s.usersRepo.GetIDByPubKey(ctx, pubKey)
+	if err != nil {
+		return "", spverrors.Wrapf(err, "Cannot get user")
+	}
+
+	return userID, nil
+}
+
+// GetPubKey returns the go-sdk primitives.PublicKey object from the user's PubKey string selected by userID
+func (s *Service) GetPubKey(ctx context.Context, userID string) (*primitives.PublicKey, error) {
+	user, err := s.usersRepo.Get(ctx, userID)
+	if err != nil {
+		return nil, spverrors.Wrapf(err, "Cannot get user")
+	}
+
+	pubKey, err := user.PubKeyObj()
+	if err != nil {
+		return nil, spverrors.Wrapf(err, "Cannot get user's public key")
+	}
+	return pubKey, nil
+}

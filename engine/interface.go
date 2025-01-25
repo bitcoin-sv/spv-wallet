@@ -16,6 +16,9 @@ import (
 	"github.com/bitcoin-sv/spv-wallet/engine/taskmanager"
 	"github.com/bitcoin-sv/spv-wallet/engine/transaction/outlines"
 	"github.com/bitcoin-sv/spv-wallet/engine/transaction/record"
+	"github.com/bitcoin-sv/spv-wallet/engine/v2/addresses"
+	"github.com/bitcoin-sv/spv-wallet/engine/v2/paymails"
+	"github.com/bitcoin-sv/spv-wallet/engine/v2/users"
 	"github.com/bitcoin-sv/spv-wallet/models/bsv"
 	"github.com/mrz1836/go-cachestore"
 	"github.com/rs/zerolog"
@@ -192,6 +195,14 @@ type XPubService interface {
 	UpdateXpubMetadata(ctx context.Context, xPubID string, metadata Metadata) (*Xpub, error)
 }
 
+// V2 contains services for version 2
+type V2 interface {
+	Repositories() *repository.All
+	UsersService() *users.Service
+	PaymailsService() *paymails.Service
+	AddressesService() *addresses.Service
+}
+
 // ClientInterface is the client (spv wallet engine) interface comprised of all services/actions
 type ClientInterface interface {
 	AccessKeyService
@@ -220,5 +231,5 @@ type ClientInterface interface {
 	Chain() chain.Service
 	LogBHSReadiness(ctx context.Context)
 	FeeUnit() bsv.FeeUnit
-	Repositories() *repository.All
+	V2
 }

@@ -16,7 +16,7 @@ import (
 
 type p2pkhOutput struct {
 	vout               uint32
-	customInstructions datatypes.JSONSlice[database.CustomInstruction]
+	customInstructions datatypes.JSONSlice[bsv.CustomInstruction]
 	address            string
 	satoshis           bsv.Satoshis
 	userID             string

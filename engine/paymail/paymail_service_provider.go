@@ -11,38 +11,42 @@ import (
 	"github.com/bitcoin-sv/go-sdk/script"
 	trx "github.com/bitcoin-sv/go-sdk/transaction"
 	"github.com/bitcoin-sv/go-sdk/transaction/template/p2pkh"
-	"github.com/bitcoin-sv/spv-wallet/engine/database"
 	"github.com/bitcoin-sv/spv-wallet/engine/keys/type42"
 	pmerrors "github.com/bitcoin-sv/spv-wallet/engine/paymail/errors"
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/bitcoin-sv/spv-wallet/engine/utils"
+	"github.com/bitcoin-sv/spv-wallet/engine/v2/addresses/addressesmodels"
+	"github.com/bitcoin-sv/spv-wallet/engine/v2/paymails/paymailsmodels"
+	"github.com/bitcoin-sv/spv-wallet/models/bsv"
 	"github.com/rs/zerolog"
-	"gorm.io/datatypes"
 )
 
 // NewServiceProvider create a new paymail service server which handlers incoming paymail requests
 func NewServiceProvider(
 	logger *zerolog.Logger,
-	paymailsRepo PaymailsRepo,
-	usersRepo UsersRepo,
+	paymails PaymailsService,
+	users UsersService,
+	addresses AddressesService,
 	spv MerkleRootsVerifier,
 	recorder TxRecorder,
 ) server.PaymailServiceProvider {
 	return &serviceProvider{
-		logger:   logger,
-		paymails: paymailsRepo,
-		users:    usersRepo,
-		spv:      spv,
-		recorder: recorder,
+		logger:    logger,
+		paymails:  paymails,
+		users:     users,
+		addresses: addresses,
+		spv:       spv,
+		recorder:  recorder,
 	}
 }
 
 type serviceProvider struct {
-	logger   *zerolog.Logger
-	paymails PaymailsRepo
-	users    UsersRepo
-	spv      MerkleRootsVerifier
-	recorder TxRecorder
+	logger    *zerolog.Logger
+	paymails  PaymailsService
+	users     UsersService
+	addresses AddressesService
+	spv       MerkleRootsVerifier
+	recorder  TxRecorder
 }
 
 func (s *serviceProvider) CreateAddressResolutionResponse(ctx context.Context, alias, domain string, _ bool, _ *server.RequestMetadata) (*paymail.ResolutionPayload, error) {
@@ -75,7 +79,7 @@ func (s *serviceProvider) CreateP2PDestinationResponse(ctx context.Context, alia
 }
 
 func (s *serviceProvider) GetPaymailByAlias(ctx context.Context, alias, domain string, _ *server.RequestMetadata) (*paymail.AddressInformation, error) {
-	model, err := s.paymails.Get(ctx, alias, domain)
+	model, err := s.paymails.Find(ctx, alias, domain)
 	if err != nil {
 		return nil, pmerrors.ErrPaymailDBFailed.Wrap(err)
 	}
@@ -83,14 +87,14 @@ func (s *serviceProvider) GetPaymailByAlias(ctx context.Context, alias, domain s
 		return nil, pmerrors.ErrPaymailNotFound
 	}
 
-	pki, _, err := s.pki(model)
+	pki, _, err := s.pki(ctx, model)
 	if err != nil {
 		return nil, err
 	}
 
 	return &paymail.AddressInformation{
 		Alias:  model.Alias,
-		Avatar: model.AvatarURL,
+		Avatar: model.Avatar,
 		Domain: model.Domain,
 		ID:     fmt.Sprintf("%d", model.ID),
 		Name:   model.PublicName,
@@ -153,8 +157,8 @@ func (s *serviceProvider) VerifyMerkleRoots(ctx context.Context, merkleProofs []
 	return nil
 }
 
-func (s *serviceProvider) pki(paymailModel *database.Paymail) (*primitives.PublicKey, string, error) {
-	userPubKey, err := paymailModel.User.PubKeyObj()
+func (s *serviceProvider) pki(ctx context.Context, paymailModel *paymailsmodels.Paymail) (*primitives.PublicKey, string, error) {
+	userPubKey, err := s.users.GetPubKey(ctx, paymailModel.UserID)
 	if err != nil {
 		return nil, "", pmerrors.ErrPaymailPKI.Wrap(err)
 	}
@@ -173,12 +177,12 @@ type destinationData struct {
 }
 
 func (s *serviceProvider) createDestinationForUser(ctx context.Context, alias, domain string) (*destinationData, error) {
-	paymailModel, err := s.paymails.Get(ctx, alias, domain)
+	paymailModel, err := s.paymails.Find(ctx, alias, domain)
 	if err != nil {
 		return nil, pmerrors.ErrPaymailDBFailed.Wrap(err)
 	}
 
-	pki, pkiDerivationKey, err := s.pki(paymailModel)
+	pki, pkiDerivationKey, err := s.pki(ctx, paymailModel)
 	if err != nil {
 		return nil, err
 	}
@@ -203,9 +207,10 @@ func (s *serviceProvider) createDestinationForUser(ctx context.Context, alias, d
 		return nil, pmerrors.ErrPaymentDestination.Wrap(err)
 	}
 
-	err = s.users.AppendAddress(ctx, paymailModel.User, &database.Address{
+	err = s.addresses.Create(ctx, &addressesmodels.NewAddress{
+		UserID:  paymailModel.UserID,
 		Address: address.AddressString,
-		CustomInstructions: datatypes.NewJSONSlice([]database.CustomInstruction{
+		CustomInstructions: []bsv.CustomInstruction{
 			{
 				Type:        "type42",
 				Instruction: pkiDerivationKey,
@@ -214,7 +219,7 @@ func (s *serviceProvider) createDestinationForUser(ctx context.Context, alias, d
 				Type:        "type42",
 				Instruction: referenceID,
 			},
-		}),
+		},
 	})
 	if err != nil {
 		return nil, pmerrors.ErrAddressSave.Wrap(err)
