@@ -77,6 +77,9 @@ var (
 
 // DefaultPaymail returns the default paymail of this user.
 func (f *User) DefaultPaymail() string {
+	if len(f.Paymails) == 0 {
+		return ""
+	}
 	return f.Paymails[0]
 }
 

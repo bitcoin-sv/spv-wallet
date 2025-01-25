@@ -6,11 +6,11 @@ import "gorm.io/gorm"
 type Paymail struct {
 	gorm.Model
 
-	Alias      string
-	Domain     string
+	Alias  string `gorm:"uniqueIndex:idx_alias_domain"`
+	Domain string `gorm:"uniqueIndex:idx_alias_domain"`
+
 	PublicName string
-	AvatarURL  string
+	Avatar     string
 
 	UserID string
-	User   *User `gorm:"foreignKey:UserID"`
 }

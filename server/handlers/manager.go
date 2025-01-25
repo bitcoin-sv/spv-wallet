@@ -44,7 +44,7 @@ func NewManager(engine *gin.Engine, appConfig *config.AppConfig) *Manager {
 			GroupRoot:                engine.Group(""),
 			GroupOldAPI:              authRouter.Group("/" + config.APIVersion),
 			GroupAPI:                 authRouter.Group("/api" + "/" + config.APIVersion),
-			GroupAPIV2:               authRouter.Group("/api/v2"),
+			GroupAPIV2:               engine.Group("/api/v2", middleware.AuthV2Middleware(), middleware.CheckSignatureMiddleware()),
 			GroupTransactionCallback: engine.Group("", middleware.CallbackTokenMiddleware()),
 		},
 	}
