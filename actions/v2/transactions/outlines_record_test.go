@@ -30,11 +30,12 @@ func TestOutlinesRecordOpReturn(t *testing.T) {
 	defer cleanup()
 
 	// and:
-	ownedTransaction, customInstrucions := givenForAllTests.Faucet(fixtures.Sender).TopUp(1000)
+	ownedTransaction := givenForAllTests.Faucet(fixtures.Sender).TopUp(1000)
 
 	// and:
 	txSpec := fixtures.GivenTX(t).
-		WithInputFromUTXO(ownedTransaction.TX(), 0, fixtures.Sender.P2PKHUnlockingScriptTemplate(customInstrucions...)).
+		WithSender(fixtures.Sender).
+		WithInputFromUTXO(ownedTransaction.TX(), 0).
 		WithOPReturn(dataOfOpReturnTx)
 
 	t.Run("Record op_return data", func(t *testing.T) {

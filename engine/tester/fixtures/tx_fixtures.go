@@ -1,7 +1,6 @@
 package fixtures
 
 import (
-	"github.com/bitcoin-sv/go-sdk/transaction/template/p2pkh"
 	"testing"
 
 	"github.com/bitcoin-sv/go-sdk/script"
@@ -32,9 +31,10 @@ var grandparentTXIDs = []string{
 // TODO: Remove this comment after the go-sdk algorithm is fixed
 type GivenTXSpec interface {
 	WithSender(sender User) GivenTXSpec
+	WithRecipient(recipient User) GivenTXSpec
 	WithoutSigning() GivenTXSpec
 	WithInput(satoshis uint64) GivenTXSpec
-	WithInputFromUTXO(tx *trx.Transaction, vout uint32, unlocking *p2pkh.P2PKH) GivenTXSpec
+	WithInputFromUTXO(tx *trx.Transaction, vout uint32) GivenTXSpec
 	WithSingleSourceInputs(satoshis ...uint64) GivenTXSpec
 	WithOPReturn(dataStr string) GivenTXSpec
 	WithOutputScriptParts(parts ...ScriptPart) GivenTXSpec
@@ -60,6 +60,7 @@ type txSpec struct {
 	sourceTransactions map[string]*trx.Transaction
 	blockHeight        uint32
 	sender             User
+	recipient          User
 }
 
 // GivenTX creates a new GivenTXSpec for building a MOCK! transaction
@@ -70,12 +71,19 @@ func GivenTX(t testing.TB) GivenTXSpec {
 		grandparentTXIndex: 0,
 		sourceTransactions: make(map[string]*trx.Transaction),
 		sender:             Sender,
+		recipient:          RecipientInternal,
 	}
 }
 
 // WithSender sets the sender for the transaction (default is Sender)
 func (spec *txSpec) WithSender(sender User) GivenTXSpec {
 	spec.sender = sender
+	return spec
+}
+
+// WithRecipient sets the recipient for the transaction (default is RecipientInternal)
+func (spec *txSpec) WithRecipient(recipient User) GivenTXSpec {
+	spec.recipient = recipient
 	return spec
 }
 
@@ -91,14 +99,12 @@ func (spec *txSpec) WithInput(satoshis uint64) GivenTXSpec {
 	return spec.WithSingleSourceInputs(satoshis)
 }
 
-func (spec *txSpec) WithInputFromUTXO(tx *trx.Transaction, vout uint32, unlocking *p2pkh.P2PKH) GivenTXSpec {
+func (spec *txSpec) WithInputFromUTXO(tx *trx.Transaction, vout uint32) GivenTXSpec {
 	output := tx.Outputs[vout]
 	utxo, err := trx.NewUTXO(tx.TxID().String(), vout, output.LockingScript.String(), output.Satoshis)
 	require.NoError(spec.t, err, "creating utxo for input")
 
-	if unlocking != nil {
-		utxo.UnlockingScriptTemplate = unlocking
-	}
+	utxo.UnlockingScriptTemplate = spec.sender.P2PKHUnlockingScriptTemplate()
 
 	spec.utxos = append(spec.utxos, utxo)
 	spec.sourceTransactions[tx.TxID().String()] = tx
@@ -138,7 +144,7 @@ func (spec *txSpec) WithOPReturn(dataStr string) GivenTXSpec {
 func (spec *txSpec) WithP2PKHOutput(satoshis uint64) GivenTXSpec {
 	spec.outputs = append(spec.outputs, &trx.TransactionOutput{
 		Satoshis:      satoshis,
-		LockingScript: RecipientInternal.P2PKHLockingScript(),
+		LockingScript: spec.recipient.P2PKHLockingScript(),
 	})
 	return spec
 }

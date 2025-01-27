@@ -1,8 +1,6 @@
 package testabilities
 
 import (
-	"github.com/bitcoin-sv/spv-wallet/models/bsv"
-	"github.com/stretchr/testify/assert"
 	"testing"
 
 	"github.com/bitcoin-sv/spv-wallet/config"
@@ -34,7 +32,7 @@ type SPVWalletApplicationFixture interface {
 	// ARC creates a new test fixture for ARC
 	ARC() ARCFixture
 
-	Faucet(user fixtures.User) FaucetFixture
+	Faucet(user fixtures.User) testengine.FaucetFixture
 }
 
 type BlockHeadersServiceFixture interface {
@@ -61,10 +59,6 @@ type SPVWalletHttpClientFixture interface {
 	ForUser() *resty.Client
 	// ForGivenUser returns a new http client that is configured with the authentication with the xpub of the given user.
 	ForGivenUser(user fixtures.User) *resty.Client
-}
-
-type FaucetFixture interface {
-	TopUp(satoshis bsv.Satoshis) (fixtures.GivenTXSpec, bsv.CustomInstructions)
 }
 
 type appFixture struct {
@@ -144,14 +138,6 @@ func (f *appFixture) ARC() ARCFixture {
 	return f.engineFixture.ARC()
 }
 
-func (f *appFixture) Faucet(user fixtures.User) FaucetFixture {
-	return &faucetFixture{
-		engineWithConfig: f.engineWithConfig,
-		httpClient:       f.HttpClient(),
-		user:             user,
-		t:                f.t,
-		assert:           assert.New(f.t),
-		arc:              f.ARC(),
-		bhs:              f.BHS(),
-	}
+func (f *appFixture) Faucet(user fixtures.User) testengine.FaucetFixture {
+	return f.engineFixture.Faucet(user)
 }

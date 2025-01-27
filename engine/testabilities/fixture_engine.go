@@ -3,6 +3,8 @@ package testabilities
 import (
 	"context"
 	"errors"
+	"github.com/bitcoin-sv/spv-wallet/models/bsv"
+	"github.com/stretchr/testify/assert"
 	"testing"
 
 	"github.com/bitcoin-sv/go-paymail"
@@ -42,6 +44,14 @@ type EngineFixture interface {
 
 	// ARC creates a new test fixture for ARC
 	ARC() ARCFixture
+
+	// Faucet creates a new test fixture for Faucet
+	Faucet(user fixtures.User) FaucetFixture
+}
+
+// FaucetFixture is a test fixture for the faucet service
+type FaucetFixture interface {
+	TopUp(satoshis bsv.Satoshis) fixtures.GivenTXSpec
 }
 
 type EngineWithConfig struct {
@@ -120,6 +130,17 @@ func (f *engineFixture) ConfigForTests(opts ...ConfigOpts) *config.AppConfig {
 	}
 
 	return configuration
+}
+
+func (f *engineFixture) Faucet(user fixtures.User) FaucetFixture {
+	return &faucetFixture{
+		engine: f.engine,
+		user:   user,
+		t:      f.t,
+		assert: assert.New(f.t),
+		arc:    f.ARC(),
+		bhs:    f.BHS(),
+	}
 }
 
 // prepareDBConfigForTests creates a new connection that will be used as connection for engine
