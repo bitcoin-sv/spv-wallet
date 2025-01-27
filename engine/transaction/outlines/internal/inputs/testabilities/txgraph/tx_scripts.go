@@ -10,18 +10,18 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-type TxScriptsBuilder struct {
+type TxScripts struct {
 	t          *testing.T
 	paymail    string
 	privateKey *primitives.PrivateKey
 	publicKey  *primitives.PublicKey
 }
 
-func (tx *TxScriptsBuilder) PrivateKey() *primitives.PrivateKey { return tx.privateKey }
+func (tx *TxScripts) PrivateKey() *primitives.PrivateKey { return tx.privateKey }
 
-func (tx *TxScriptsBuilder) PublicKey() *primitives.PublicKey { return tx.publicKey }
+func (tx *TxScripts) PublicKey() *primitives.PublicKey { return tx.publicKey }
 
-func (tx *TxScriptsBuilder) P2PKHUnlockingScriptTemplate() *p2pkh.P2PKH {
+func (tx *TxScripts) P2PKHUnlockingScriptTemplate() *p2pkh.P2PKH {
 	tx.t.Helper()
 
 	script, err := p2pkh.Unlock(tx.privateKey, nil)
@@ -29,7 +29,7 @@ func (tx *TxScriptsBuilder) P2PKHUnlockingScriptTemplate() *p2pkh.P2PKH {
 	return script
 }
 
-func (tx *TxScriptsBuilder) P2PKHLockingScript() *script.Script {
+func (tx *TxScripts) P2PKHLockingScript() *script.Script {
 	tx.t.Helper()
 
 	addr, err := script.NewAddressFromPublicKey(tx.publicKey, true)
@@ -40,16 +40,16 @@ func (tx *TxScriptsBuilder) P2PKHLockingScript() *script.Script {
 	return script
 }
 
-func NewTxScriptsBuilder(t *testing.T, xPriv, paymail string) *TxScriptsBuilder {
+func NewTxScripts(t *testing.T, xPriv, paymail string) *TxScripts {
 	t.Helper()
 
 	hdKey, err := bip32.GenerateHDKeyFromString(xPriv)
 	require.NoErrorf(t, err, "failed to generate HD Key from string %s", xPriv)
 
 	privateKey, err := bip32.GetPrivateKeyFromHDKey(hdKey)
-	require.NoError(t, err, "failed to retrive priv key from HD key")
+	require.NoError(t, err, "failed to retrieve priv key from HD key")
 
-	return &TxScriptsBuilder{
+	return &TxScripts{
 		t:          t,
 		paymail:    paymail,
 		privateKey: privateKey,
