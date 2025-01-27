@@ -242,7 +242,7 @@ func (c *AppConfig) addPaymailOpts(options []engine.ClientOps) []engine.ClientOp
 	if c.ExperimentalFeatures.PikePaymentEnabled {
 		options = append(options, engine.WithPaymailPikePaymentSupport())
 	}
-	if c.ExperimentalFeatures.NewTransactionFlowEnabled {
+	if c.ExperimentalFeatures.V2 {
 		options = append(options, engine.WithPaymailExperimentalNewTransactionFlow())
 	}
 

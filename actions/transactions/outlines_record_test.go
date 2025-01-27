@@ -25,7 +25,7 @@ func TestOutlinesRecordOpReturn(t *testing.T) {
 	t.Run("Record op_return data", func(t *testing.T) {
 		// given:
 		given, then := testabilities.New(t)
-		cleanup := given.StartedSPVWalletWithConfiguration(testengine.WithNewTransactionFlowEnabled())
+		cleanup := given.StartedSPVWalletWithConfiguration(testengine.WithV2())
 		defer cleanup()
 
 		// and:
@@ -123,7 +123,7 @@ func TestOutlinesRecordOpReturnErrorCases(t *testing.T) {
 		t.Run(name, func(t *testing.T) {
 			// given:
 			given, then := testabilities.New(t)
-			cleanup := given.StartedSPVWalletWithConfiguration(testengine.WithNewTransactionFlowEnabled())
+			cleanup := given.StartedSPVWalletWithConfiguration(testengine.WithV2())
 			defer cleanup()
 
 			// and:
@@ -144,7 +144,7 @@ func TestOutlinesRecordOpReturnErrorCases(t *testing.T) {
 func TestOutlinesRecordOpReturnOnBroadcastError(t *testing.T) {
 	// given:
 	given, then := testabilities.New(t)
-	cleanup := given.StartedSPVWalletWithConfiguration(testengine.WithNewTransactionFlowEnabled())
+	cleanup := given.StartedSPVWalletWithConfiguration(testengine.WithV2())
 	defer cleanup()
 
 	// and:

@@ -14,7 +14,7 @@ func TestAddPaymail(t *testing.T) {
 	// given:
 	givenForAllTests := testabilities.Given(t)
 	cleanup := givenForAllTests.StartedSPVWalletWithConfiguration(
-		testengine.WithNewTransactionFlowEnabled(),
+		testengine.WithV2(),
 	)
 	defer cleanup()
 
@@ -160,7 +160,7 @@ func TestAddPaymailWithWrongDomain(t *testing.T) {
 	// given:
 	given, then := testabilities.New(t)
 	cleanup := given.StartedSPVWalletWithConfiguration(
-		testengine.WithNewTransactionFlowEnabled(),
+		testengine.WithV2(),
 	)
 	defer cleanup()
 
@@ -214,7 +214,7 @@ func TestAddPaymailWithBothPaymailAndAliasDomainPair(t *testing.T) {
 	// given:
 	given, then := testabilities.New(t)
 	cleanup := given.StartedSPVWalletWithConfiguration(
-		testengine.WithNewTransactionFlowEnabled(),
+		testengine.WithV2(),
 	)
 	defer cleanup()
 
