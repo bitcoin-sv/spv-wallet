@@ -78,7 +78,15 @@ func mapTransaction(transaction *txmodels.NewOperation) *database.TrackedTransac
 		TxStatus: string(transaction.Transaction.TxStatus),
 	}
 
-	tx.SpendOutpoints(transaction.Transaction.OutpointsToSpend...)
+	for _, input := range transaction.Transaction.Inputs {
+		tx.Inputs = append(tx.Inputs, &database.TrackedOutput{
+			TxID:       input.TxID,
+			Vout:       input.Vout,
+			SpendingTX: transaction.Transaction.ID,
+			UserID:     input.UserID,
+			Satoshis:   input.Satoshis,
+		})
+	}
 
 	for _, output := range transaction.Transaction.Outputs {
 		if output.UTXO != nil {

@@ -72,7 +72,7 @@ func (f *txFlow) processInputs() ([]txmodels.TrackedOutput, error) {
 		}
 	}
 
-	f.txRow.AddInputs(outpoints)
+	f.txRow.AddInputs(trackedOutputs...)
 
 	return trackedOutputs, nil
 }

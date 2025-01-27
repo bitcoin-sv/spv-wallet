@@ -95,7 +95,7 @@ func TestOutlinesRecordOpReturn(t *testing.T) {
 					"txID": "{{ .txID }}",
 					"createdAt": "{{ matchTimestamp }}",
 					"value": {{ .value }},
-					"type": "data",
+					"type": "outgoing",
 					"counterparty": "{{ .sender }}"
 				},
 				{{ anything }}
@@ -107,7 +107,7 @@ func TestOutlinesRecordOpReturn(t *testing.T) {
 			    "totalPages": 1
 			}
 		}`, map[string]any{
-			"value":  0,
+			"value":  -1000,
 			"txID":   txSpec.ID(),
 			"sender": "",
 		})
