@@ -7,16 +7,17 @@ import (
 	paymailserver "github.com/bitcoin-sv/go-paymail/server"
 	"github.com/bitcoin-sv/spv-wallet/engine/chain"
 	"github.com/bitcoin-sv/spv-wallet/engine/cluster"
-	"github.com/bitcoin-sv/spv-wallet/engine/database/repository"
 	"github.com/bitcoin-sv/spv-wallet/engine/datastore"
 	"github.com/bitcoin-sv/spv-wallet/engine/notifications"
 	"github.com/bitcoin-sv/spv-wallet/engine/paymail"
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/bitcoin-sv/spv-wallet/engine/taskmanager"
-	"github.com/bitcoin-sv/spv-wallet/engine/transaction/outlines"
-	"github.com/bitcoin-sv/spv-wallet/engine/transaction/record"
 	"github.com/bitcoin-sv/spv-wallet/engine/v2/addresses"
+	"github.com/bitcoin-sv/spv-wallet/engine/v2/database/repository"
 	"github.com/bitcoin-sv/spv-wallet/engine/v2/paymails"
+	paymailprovider "github.com/bitcoin-sv/spv-wallet/engine/v2/paymailserver"
+	"github.com/bitcoin-sv/spv-wallet/engine/v2/transaction/outlines"
+	"github.com/bitcoin-sv/spv-wallet/engine/v2/transaction/record"
 	"github.com/bitcoin-sv/spv-wallet/engine/v2/users"
 	"github.com/mrz1836/go-cachestore"
 )
@@ -270,7 +271,7 @@ func (c *Client) loadPaymailServer() (err error) {
 	var serviceProvider paymailserver.PaymailServiceProvider
 	if c.options.paymail.serverConfig.ExperimentalProvider {
 		paymailServiceLogger := c.Logger().With().Str("subservice", "paymail-service-provider").Logger()
-		serviceProvider = paymail.NewServiceProvider(
+		serviceProvider = paymailprovider.NewServiceProvider(
 			&paymailServiceLogger,
 			c.PaymailsService(),
 			c.UsersService(),
