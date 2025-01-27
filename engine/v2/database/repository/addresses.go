@@ -2,13 +2,13 @@ package repository
 
 import (
 	"context"
-	"github.com/bitcoin-sv/spv-wallet/models/bsv"
 	"iter"
 	"slices"
 
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/bitcoin-sv/spv-wallet/engine/utils"
 	"github.com/bitcoin-sv/spv-wallet/engine/v2/addresses/addressesmodels"
+	"github.com/bitcoin-sv/spv-wallet/models/bsv"
 	"github.com/bitcoin-sv/spv-wallet/engine/v2/database"
 	"gorm.io/datatypes"
 	"gorm.io/gorm"

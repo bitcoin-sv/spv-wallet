@@ -3,8 +3,6 @@ package testabilities
 import (
 	"context"
 	"errors"
-	"github.com/bitcoin-sv/spv-wallet/models/bsv"
-	"github.com/stretchr/testify/assert"
 	"testing"
 
 	"github.com/bitcoin-sv/go-paymail"
@@ -18,9 +16,11 @@ import (
 	"github.com/bitcoin-sv/spv-wallet/engine/tester/paymailmock"
 	"github.com/bitcoin-sv/spv-wallet/engine/v2/paymails/paymailsmodels"
 	"github.com/bitcoin-sv/spv-wallet/engine/v2/users/usersmodels"
+	"github.com/bitcoin-sv/spv-wallet/models/bsv"
 	"github.com/go-resty/resty/v2"
 	"github.com/jarcoal/httpmock"
 	"github.com/rs/zerolog"
+	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
 
