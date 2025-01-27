@@ -3,12 +3,11 @@ package testabilities
 import (
 	"testing"
 
-	"gorm.io/gorm"
-
 	"github.com/bitcoin-sv/spv-wallet/engine/database/testabilities"
 	testengine "github.com/bitcoin-sv/spv-wallet/engine/testabilities"
 	"github.com/bitcoin-sv/spv-wallet/engine/tester/fixtures"
 	"github.com/bitcoin-sv/spv-wallet/engine/transaction/outlines/utxo/internal/sql"
+	"gorm.io/gorm"
 )
 
 type InputsSelectorFixture interface {
