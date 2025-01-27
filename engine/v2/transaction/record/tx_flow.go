@@ -8,7 +8,7 @@ import (
 	"github.com/bitcoin-sv/go-sdk/spv"
 	trx "github.com/bitcoin-sv/go-sdk/transaction"
 	"github.com/bitcoin-sv/spv-wallet/conv"
-	database2 "github.com/bitcoin-sv/spv-wallet/engine/v2/database"
+	"github.com/bitcoin-sv/spv-wallet/engine/v2/database"
 	"github.com/bitcoin-sv/spv-wallet/engine/v2/transaction/errors"
 	"github.com/bitcoin-sv/spv-wallet/models/bsv"
 	"gorm.io/datatypes"
@@ -27,7 +27,7 @@ type txFlow struct {
 	service *Service
 
 	tx    *trx.Transaction
-	txRow *database2.TrackedTransaction
+	txRow *database.TrackedTransaction
 	txID  string
 
 	operations map[string]*operationWrapper
@@ -41,9 +41,9 @@ func newTxFlow(ctx context.Context, service *Service, tx *trx.Transaction) *txFl
 
 		tx:   tx,
 		txID: txID,
-		txRow: &database2.TrackedTransaction{
+		txRow: &database.TrackedTransaction{
 			ID:       txID,
-			TxStatus: database2.TxStatusCreated,
+			TxStatus: database.TxStatusCreated,
 		},
 
 		operations: map[string]*operationWrapper{},
@@ -59,7 +59,7 @@ func (f *txFlow) verifyScripts() error {
 	return nil
 }
 
-func (f *txFlow) getFromInputs() ([]*database2.TrackedOutput, error) {
+func (f *txFlow) getFromInputs() ([]*database.TrackedOutput, error) {
 	outpoints := func(yield func(outpoint bsv.Outpoint) bool) {
 		for _, input := range f.tx.Inputs {
 			yield(bsv.Outpoint{
@@ -85,7 +85,7 @@ func (f *txFlow) getFromInputs() ([]*database2.TrackedOutput, error) {
 func (f *txFlow) operationOfUser(userID string, operationType string, counterparty string) *operationWrapper {
 	if _, ok := f.operations[userID]; !ok {
 		f.operations[userID] = &operationWrapper{
-			entity: &database2.Operation{
+			entity: &database.Operation{
 				UserID:       userID,
 				Type:         operationType,
 				Counterparty: counterparty,
@@ -98,12 +98,12 @@ func (f *txFlow) operationOfUser(userID string, operationType string, counterpar
 	return f.operations[userID]
 }
 
-func (f *txFlow) spendInputs(trackedOutputs []*database2.TrackedOutput) {
+func (f *txFlow) spendInputs(trackedOutputs []*database.TrackedOutput) {
 	f.txRow.AddInputs(trackedOutputs...)
 }
 
 func (f *txFlow) createP2PKHOutput(outputData *p2pkhOutput) {
-	f.txRow.CreateP2PKHOutput(&database2.TrackedOutput{
+	f.txRow.CreateP2PKHOutput(&database.TrackedOutput{
 		TxID:     f.txID,
 		Vout:     outputData.vout,
 		UserID:   outputData.userID,
@@ -111,7 +111,7 @@ func (f *txFlow) createP2PKHOutput(outputData *p2pkhOutput) {
 	}, outputData.customInstructions)
 }
 
-func (f *txFlow) createDataOutputs(userID string, dataRecords ...*database2.Data) {
+func (f *txFlow) createDataOutputs(userID string, dataRecords ...*database.Data) {
 	for _, data := range dataRecords {
 		f.txRow.CreateDataOutput(data, userID)
 	}

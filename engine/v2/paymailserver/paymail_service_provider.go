@@ -4,14 +4,14 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/bitcoin-sv/go-paymail"
+	paymailserver "github.com/bitcoin-sv/go-paymail"
 	"github.com/bitcoin-sv/go-paymail/server"
 	"github.com/bitcoin-sv/go-paymail/spv"
 	primitives "github.com/bitcoin-sv/go-sdk/primitives/ec"
 	"github.com/bitcoin-sv/go-sdk/script"
 	trx "github.com/bitcoin-sv/go-sdk/transaction"
 	"github.com/bitcoin-sv/go-sdk/transaction/template/p2pkh"
-	paymail2 "github.com/bitcoin-sv/spv-wallet/engine/paymail"
+	"github.com/bitcoin-sv/spv-wallet/engine/paymail"
 	pmerrors "github.com/bitcoin-sv/spv-wallet/engine/paymail/errors"
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/bitcoin-sv/spv-wallet/engine/utils"
@@ -25,11 +25,11 @@ import (
 // NewServiceProvider create a new paymail service server which handlers incoming paymail requests
 func NewServiceProvider(
 	logger *zerolog.Logger,
-	paymails paymail2.PaymailsService,
-	users paymail2.UsersService,
-	addresses paymail2.AddressesService,
-	spv paymail2.MerkleRootsVerifier,
-	recorder paymail2.TxRecorder,
+	paymails paymail.PaymailsService,
+	users paymail.UsersService,
+	addresses paymail.AddressesService,
+	spv paymail.MerkleRootsVerifier,
+	recorder paymail.TxRecorder,
 ) server.PaymailServiceProvider {
 	return &serviceProvider{
 		logger:    logger,
@@ -43,34 +43,34 @@ func NewServiceProvider(
 
 type serviceProvider struct {
 	logger    *zerolog.Logger
-	paymails  paymail2.PaymailsService
-	users     paymail2.UsersService
-	addresses paymail2.AddressesService
-	spv       paymail2.MerkleRootsVerifier
-	recorder  paymail2.TxRecorder
+	paymails  paymail.PaymailsService
+	users     paymail.UsersService
+	addresses paymail.AddressesService
+	spv       paymail.MerkleRootsVerifier
+	recorder  paymail.TxRecorder
 }
 
-func (s *serviceProvider) CreateAddressResolutionResponse(ctx context.Context, alias, domain string, _ bool, _ *server.RequestMetadata) (*paymail.ResolutionPayload, error) {
+func (s *serviceProvider) CreateAddressResolutionResponse(ctx context.Context, alias, domain string, _ bool, _ *server.RequestMetadata) (*paymailserver.ResolutionPayload, error) {
 	destination, err := s.createDestinationForUser(ctx, alias, domain)
 	if err != nil {
 		return nil, err
 	}
 
-	return &paymail.ResolutionPayload{
+	return &paymailserver.ResolutionPayload{
 		Address:   destination.address,
 		Output:    destination.lockingScript,
 		Signature: "", // signature is not supported due to "noncustodial" nature of the wallet; private keys are not stored
 	}, nil
 }
 
-func (s *serviceProvider) CreateP2PDestinationResponse(ctx context.Context, alias, domain string, satoshis uint64, _ *server.RequestMetadata) (*paymail.PaymentDestinationPayload, error) {
+func (s *serviceProvider) CreateP2PDestinationResponse(ctx context.Context, alias, domain string, satoshis uint64, _ *server.RequestMetadata) (*paymailserver.PaymentDestinationPayload, error) {
 	destination, err := s.createDestinationForUser(ctx, alias, domain)
 	if err != nil {
 		return nil, err
 	}
 
-	return &paymail.PaymentDestinationPayload{
-		Outputs: []*paymail.PaymentOutput{{
+	return &paymailserver.PaymentDestinationPayload{
+		Outputs: []*paymailserver.PaymentOutput{{
 			Address:  destination.address,
 			Satoshis: satoshis,
 			Script:   destination.lockingScript,
@@ -79,7 +79,7 @@ func (s *serviceProvider) CreateP2PDestinationResponse(ctx context.Context, alia
 	}, nil
 }
 
-func (s *serviceProvider) GetPaymailByAlias(ctx context.Context, alias, domain string, _ *server.RequestMetadata) (*paymail.AddressInformation, error) {
+func (s *serviceProvider) GetPaymailByAlias(ctx context.Context, alias, domain string, _ *server.RequestMetadata) (*paymailserver.AddressInformation, error) {
 	model, err := s.paymails.Find(ctx, alias, domain)
 	if err != nil {
 		return nil, pmerrors.ErrPaymailDBFailed.Wrap(err)
@@ -93,7 +93,7 @@ func (s *serviceProvider) GetPaymailByAlias(ctx context.Context, alias, domain s
 		return nil, err
 	}
 
-	return &paymail.AddressInformation{
+	return &paymailserver.AddressInformation{
 		Alias:  model.Alias,
 		Avatar: model.Avatar,
 		Domain: model.Domain,
@@ -103,7 +103,7 @@ func (s *serviceProvider) GetPaymailByAlias(ctx context.Context, alias, domain s
 	}, nil
 }
 
-func (s *serviceProvider) RecordTransaction(ctx context.Context, p2pTx *paymail.P2PTransaction, requestMetadata *server.RequestMetadata) (*paymail.P2PTransactionPayload, error) {
+func (s *serviceProvider) RecordTransaction(ctx context.Context, p2pTx *paymailserver.P2PTransaction, requestMetadata *server.RequestMetadata) (*paymailserver.P2PTransactionPayload, error) {
 	isBEEF := p2pTx.DecodedBeef != nil && p2pTx.Beef != ""
 	isRawTX := p2pTx.Hex != ""
 
@@ -132,7 +132,7 @@ func (s *serviceProvider) RecordTransaction(ctx context.Context, p2pTx *paymail.
 
 	// TODO: TrackMissingTxs for BEEF purposes (or handle it in other way)
 
-	return &paymail.P2PTransactionPayload{
+	return &paymailserver.P2PTransactionPayload{
 		Note: p2pTx.MetaData.Note,
 		TxID: tx.TxID().String(),
 	}, nil

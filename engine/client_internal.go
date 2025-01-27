@@ -15,7 +15,7 @@ import (
 	"github.com/bitcoin-sv/spv-wallet/engine/v2/addresses"
 	"github.com/bitcoin-sv/spv-wallet/engine/v2/database/repository"
 	"github.com/bitcoin-sv/spv-wallet/engine/v2/paymails"
-	paymailserver2 "github.com/bitcoin-sv/spv-wallet/engine/v2/paymailserver"
+	paymailprovider "github.com/bitcoin-sv/spv-wallet/engine/v2/paymailserver"
 	"github.com/bitcoin-sv/spv-wallet/engine/v2/transaction/outlines"
 	"github.com/bitcoin-sv/spv-wallet/engine/v2/transaction/record"
 	"github.com/bitcoin-sv/spv-wallet/engine/v2/users"
@@ -271,7 +271,7 @@ func (c *Client) loadPaymailServer() (err error) {
 	var serviceProvider paymailserver.PaymailServiceProvider
 	if c.options.paymail.serverConfig.ExperimentalProvider {
 		paymailServiceLogger := c.Logger().With().Str("subservice", "paymail-service-provider").Logger()
-		serviceProvider = paymailserver2.NewServiceProvider(
+		serviceProvider = paymailprovider.NewServiceProvider(
 			&paymailServiceLogger,
 			c.PaymailsService(),
 			c.UsersService(),
