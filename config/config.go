@@ -3,10 +3,12 @@ package config
 
 import (
 	"fmt"
+	"slices"
 	"time"
 
 	"github.com/bitcoin-sv/spv-wallet/engine/cluster"
 	"github.com/bitcoin-sv/spv-wallet/engine/datastore"
+	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/bitcoin-sv/spv-wallet/engine/taskmanager"
 	"github.com/mrz1836/go-cachestore"
 )
@@ -187,6 +189,16 @@ type PaymailConfig struct {
 	DomainValidationEnabled bool `json:"domain_validation_enabled" mapstructure:"domain_validation_enabled"`
 	// SenderValidationEnabled should be turned on for extra security.
 	SenderValidationEnabled bool `json:"sender_validation_enabled" mapstructure:"sender_validation_enabled"`
+}
+
+// CheckDomain will check if the domain is allowed
+func (p *PaymailConfig) CheckDomain(domain string) error {
+	if p.DomainValidationEnabled {
+		if !slices.Contains(p.Domains, domain) {
+			return spverrors.ErrInvalidDomain
+		}
+	}
+	return nil
 }
 
 // BeefConfig consists of components required to use beef, e.g. Block Headers Service for merkle roots validation

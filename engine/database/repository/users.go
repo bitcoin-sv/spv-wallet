@@ -5,6 +5,8 @@ import (
 
 	"github.com/bitcoin-sv/spv-wallet/engine/database"
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
+	"github.com/bitcoin-sv/spv-wallet/engine/utils"
+	"github.com/bitcoin-sv/spv-wallet/engine/v2/users/usersmodels"
 	"github.com/bitcoin-sv/spv-wallet/models/bsv"
 	"gorm.io/gorm"
 )
@@ -19,30 +21,68 @@ func NewUsersRepo(db *gorm.DB) *Users {
 	return &Users{db: db}
 }
 
-// Save saves a user to the database.
-func (u *Users) Save(ctx context.Context, userRow *database.User) error {
-	query := u.db.WithContext(ctx)
-
-	if err := query.Create(userRow).Error; err != nil {
-		return spverrors.Wrapf(err, "failed to save user")
+// Exists checks if a user exists in the database.
+func (u *Users) Exists(ctx context.Context, userID string) (bool, error) {
+	var count int64
+	err := u.db.WithContext(ctx).Model(&database.User{}).Where("id = ?", userID).Count(&count).Error
+	if err != nil {
+		return false, spverrors.Wrapf(err, "failed to check if user exists")
 	}
 
-	return nil
+	return count > 0, nil
 }
 
-// AppendAddress appends an address to the database.
-func (u *Users) AppendAddress(ctx context.Context, userRow *database.User, addressRow *database.Address) error {
-	err := u.db.
-		WithContext(ctx).
-		Model(userRow).
-		Association("Addresses").
-		Append(addressRow)
-
+// GetIDByPubKey returns a user by its public key. If the user does not exist, it returns error.
+func (u *Users) GetIDByPubKey(ctx context.Context, pubKey string) (string, error) {
+	var user struct {
+		ID string
+	}
+	err := u.db.WithContext(ctx).
+		Model(&database.User{}).
+		Where("pub_key = ?", pubKey).
+		First(&user).Error
 	if err != nil {
-		return spverrors.Wrapf(err, "failed to save address")
+		return "", spverrors.Wrapf(err, "failed to get user by public key")
 	}
 
-	return nil
+	return user.ID, nil
+}
+
+// Get returns a user by its id with preloaded paymail slist. If the user does not exist, it returns error.
+func (u *Users) Get(ctx context.Context, userID string) (*usersmodels.User, error) {
+	var user database.User
+	err := u.db.WithContext(ctx).
+		Scopes(withPaymailsScope).
+		Where("id = ?", userID).
+		First(&user).Error
+	if err != nil {
+		return nil, spverrors.Wrapf(err, "failed to get user by public key")
+	}
+
+	return mapToDomainUser(&user), nil
+}
+
+// Create saves new user to the database.
+func (u *Users) Create(ctx context.Context, newUser *usersmodels.NewUser) (*usersmodels.User, error) {
+	query := u.db.WithContext(ctx)
+
+	row := &database.User{
+		PubKey: newUser.PublicKey,
+	}
+	if newUser.Paymail != nil {
+		row.Paymails = []*database.Paymail{{
+			Alias:      newUser.Paymail.Alias,
+			Domain:     newUser.Paymail.Domain,
+			PublicName: newUser.Paymail.PublicName,
+			Avatar:     newUser.Paymail.Avatar,
+		}}
+	}
+
+	if err := query.Create(row).Error; err != nil {
+		return nil, spverrors.Wrapf(err, "failed to save user")
+	}
+
+	return mapToDomainUser(row), nil
 }
 
 // GetBalance returns the balance of a user in a given bucket.
@@ -61,4 +101,35 @@ func (u *Users) GetBalance(ctx context.Context, userID string, bucket string) (b
 	}
 
 	return balance, nil
+}
+
+func mapToDomainUser(user *database.User) *usersmodels.User {
+	return &usersmodels.User{
+		ID:        user.ID,
+		CreatedAt: user.CreatedAt,
+		UpdatedAt: user.UpdatedAt,
+		PublicKey: user.PubKey,
+		Paymails: utils.MapSlice(user.Paymails, func(p *database.Paymail) *usersmodels.Paymail {
+			return &usersmodels.Paymail{
+				ID:        p.ID,
+				CreatedAt: p.CreatedAt,
+				UpdatedAt: p.UpdatedAt,
+
+				Alias:  p.Alias,
+				Domain: p.Domain,
+
+				PublicName: p.PublicName,
+				Avatar:     p.Avatar,
+
+				UserID: p.UserID,
+			}
+		}),
+	}
+}
+
+func withPaymailsScope(db *gorm.DB) *gorm.DB {
+	return db.Preload("Paymails", func(db *gorm.DB) *gorm.DB {
+		//NOTE: To preserve deterministic order necessary to get default paymail as the first one
+		return db.Order("created_at ASC")
+	})
 }

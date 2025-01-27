@@ -140,6 +140,45 @@ func TestPOSTTransactionOutlines(t *testing.T) {
 				fixtures.Sender.DefaultPaymail(),
 			),
 		},
+		"create transaction outline for paymail and data": {
+			request: fmt.Sprintf(`{
+			  "outputs": [
+				{
+				  "type": "paymail",
+				  "to": "%s",
+				  "satoshis": 1000,
+				  "from": "%s"
+				},
+				{
+				  "type": "op_return",
+				  "data": [ "some", " ", "data" ]
+				}
+			  ]
+			}`, fixtures.RecipientExternal.DefaultPaymail(),
+				fixtures.Sender.DefaultPaymail(),
+			),
+			response: fmt.Sprintf(`{
+			  "beef": "0100beef0001000000000002e8030000000000001976a9143e2d1d795f8acaa7957045cc59376177eb04a3c588ac00000000000000000e006a04736f6d65012004646174610000000000",
+			  "annotations": {
+				"outputs": {
+				  "0": {
+					"bucket": "bsv",
+					"paymail": {
+					  "receiver": "%s",
+					  "reference": "z0bac4ec-6f15-42de-9ef4-e60bfdabf4f7",
+					  "sender": "%s"
+					}
+				  },
+				  "1": {
+					"bucket": "data"
+				  }
+				}
+			  }
+			}`,
+				fixtures.RecipientExternal.DefaultPaymail(),
+				fixtures.Sender.DefaultPaymail(),
+			),
+		},
 	}
 	for name, test := range successTestCases {
 		t.Run(name, func(t *testing.T) {
