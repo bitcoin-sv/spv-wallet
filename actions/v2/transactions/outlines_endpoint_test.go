@@ -184,7 +184,7 @@ func TestPOSTTransactionOutlines(t *testing.T) {
 		t.Run(name, func(t *testing.T) {
 			// given:
 			given, then := testabilities.New(t)
-			cleanup := given.StartedSPVWalletWithConfiguration(testengine.WithNewTransactionFlowEnabled())
+			cleanup := given.StartedSPVWalletWithConfiguration(testengine.WithV2())
 			defer cleanup()
 
 			// and:
@@ -204,7 +204,7 @@ func TestPOSTTransactionOutlines(t *testing.T) {
 	t.Run("not allowed for anonymous", func(t *testing.T) {
 		// given:
 		given, then := testabilities.New(t)
-		cleanup := given.StartedSPVWalletWithConfiguration(testengine.WithNewTransactionFlowEnabled())
+		cleanup := given.StartedSPVWalletWithConfiguration(testengine.WithV2())
 		defer cleanup()
 
 		// and:
@@ -220,7 +220,7 @@ func TestPOSTTransactionOutlines(t *testing.T) {
 	t.Run("not allowed for admin", func(t *testing.T) {
 		// given:
 		given, then := testabilities.New(t)
-		cleanup := given.StartedSPVWalletWithConfiguration(testengine.WithNewTransactionFlowEnabled())
+		cleanup := given.StartedSPVWalletWithConfiguration(testengine.WithV2())
 		defer cleanup()
 
 		// and:
@@ -236,7 +236,7 @@ func TestPOSTTransactionOutlines(t *testing.T) {
 	t.Run("Bad Request: when user has no paymail address", func(t *testing.T) {
 		// given:
 		given, then := testabilities.New(t)
-		cleanup := given.StartedSPVWalletWithConfiguration(testengine.WithNewTransactionFlowEnabled())
+		cleanup := given.StartedSPVWalletWithConfiguration(testengine.WithV2())
 		defer cleanup()
 
 		// and:
@@ -263,7 +263,7 @@ func TestPOSTTransactionOutlines(t *testing.T) {
 	t.Run("Bad Request: no body", func(t *testing.T) {
 		// given:
 		given, then := testabilities.New(t)
-		cleanup := given.StartedSPVWalletWithConfiguration(testengine.WithNewTransactionFlowEnabled())
+		cleanup := given.StartedSPVWalletWithConfiguration(testengine.WithV2())
 		defer cleanup()
 
 		// and:
@@ -473,7 +473,7 @@ func TestPOSTTransactionOutlines(t *testing.T) {
 		t.Run(name, func(t *testing.T) {
 			// given:
 			given, then := testabilities.New(t)
-			cleanup := given.StartedSPVWalletWithConfiguration(testengine.WithNewTransactionFlowEnabled())
+			cleanup := given.StartedSPVWalletWithConfiguration(testengine.WithV2())
 			defer cleanup()
 
 			// and:

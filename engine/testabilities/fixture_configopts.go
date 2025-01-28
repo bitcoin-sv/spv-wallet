@@ -4,9 +4,9 @@ import "github.com/bitcoin-sv/spv-wallet/config"
 
 type ConfigOpts func(*config.AppConfig)
 
-func WithNewTransactionFlowEnabled() ConfigOpts {
+func WithV2() ConfigOpts {
 	return func(c *config.AppConfig) {
-		c.ExperimentalFeatures.NewTransactionFlowEnabled = true
+		c.ExperimentalFeatures.V2 = true
 	}
 }
 

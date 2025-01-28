@@ -164,7 +164,7 @@ func (f *engineFixture) initialiseFixtures() {
 			}
 		}
 
-		if f.config.ExperimentalFeatures.NewTransactionFlowEnabled {
+		if f.config.ExperimentalFeatures.V2 {
 			pubKeyHex := user.PublicKey().ToDERHex()
 			createdUser, err := f.engine.UsersService().Create(context.Background(), &usersmodels.NewUser{
 				PublicKey: pubKeyHex,
