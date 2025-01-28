@@ -10,22 +10,6 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-// oldUpdate will update an existing model
-// Update current user information godoc
-// @Summary		Update current user information - Use (PATCH) /api/v1/users/current instead.
-// @Description	This endpoint has been deprecated. Use (PATCH) /api/v1/users/current instead.
-// @Tags		Users
-// @Produce		json
-// @Param		Metadata body engine.Metadata false " "
-// @Success		200 {object} models.Xpub "Updated xPub"
-// @Failure		400	"Bad request - Error while parsing Metadata from request body"
-// @Failure 	500	"Internal Server Error - Error while updating xPub"
-// @DeprecatedRouter  /v1/xpub [patch]
-// @Security	x-auth-xpub
-func oldUpdate(c *gin.Context, userContext *reqctx.UserContext) {
-	updateHelper(c, true, userContext)
-}
-
 // update will update an existing model
 // Update current user information godoc
 // @Summary		Update current user information
@@ -39,10 +23,6 @@ func oldUpdate(c *gin.Context, userContext *reqctx.UserContext) {
 // @Router		/api/v1/users/current [patch]
 // @Security	x-auth-xpub
 func update(c *gin.Context, userContext *reqctx.UserContext) {
-	updateHelper(c, false, userContext)
-}
-
-func updateHelper(c *gin.Context, snakeCase bool, userContext *reqctx.UserContext) {
 	logger := reqctx.Logger(c)
 
 	var requestBody engine.Metadata
@@ -64,12 +44,6 @@ func updateHelper(c *gin.Context, snakeCase bool, userContext *reqctx.UserContex
 
 	if userContext.GetAuthType() == reqctx.AuthTypeAccessKey {
 		xPub.RemovePrivateData()
-	}
-
-	if snakeCase {
-		contract := mappings.MapToOldXpubContract(xPub)
-		c.JSON(http.StatusOK, contract)
-		return
 	}
 
 	contract := mappings.MapToXpubContract(xPub)

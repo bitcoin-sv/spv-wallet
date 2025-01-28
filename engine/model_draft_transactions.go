@@ -106,25 +106,6 @@ func getDraftTransactionID(ctx context.Context, xPubID, id string,
 	return draftTransaction, nil
 }
 
-// getDraftTransactions will get all the draft transactions with the given conditions
-func getDraftTransactions(ctx context.Context, metadata *Metadata, conditions map[string]interface{},
-	queryParams *datastore.QueryParams, opts ...ModelOps,
-) ([]*DraftTransaction, error) {
-	modelItems := make([]*DraftTransaction, 0)
-	if err := getModelsByConditions(ctx, ModelDraftTransaction, &modelItems, metadata, conditions, queryParams, opts...); err != nil {
-		return nil, err
-	}
-
-	return modelItems, nil
-}
-
-// getDraftTransactionsCount will get a count of all the access keys with the given conditions
-func getDraftTransactionsCount(ctx context.Context, metadata *Metadata, conditions map[string]interface{},
-	opts ...ModelOps,
-) (int64, error) {
-	return getModelCountByConditions(ctx, ModelDraftTransaction, DraftTransaction{}, metadata, conditions, opts...)
-}
-
 // GetModelName will get the name of the current model
 func (m *DraftTransaction) GetModelName() string {
 	return ModelDraftTransaction.String()
