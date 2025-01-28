@@ -1,4 +1,4 @@
-package sql
+package outlines
 
 import (
 	"errors"
@@ -9,7 +9,6 @@ import (
 )
 
 // TODO: 1. Add missing error check unit tests
-// TODO: 2. Add missing tx graph uint tests
 
 // TxQueryResult represents the result of a transaction query.
 type TxQueryResult struct {
@@ -128,7 +127,7 @@ func (b *SourceTransactionBuilder) Build(res TxQueryResultSlice) error {
 
 	for i, input := range b.Tx.Inputs {
 		if input == nil || input.SourceTransaction == nil {
-			continue // todo add returning error
+			return fmt.Errorf("SPV script verification failed for input %d. Nil input or input source transaction.", i)
 		}
 		if _, err := spv.VerifyScripts(input.SourceTransaction); err != nil {
 			return fmt.Errorf("SPV script verification failed for input %d: %w", i, err)

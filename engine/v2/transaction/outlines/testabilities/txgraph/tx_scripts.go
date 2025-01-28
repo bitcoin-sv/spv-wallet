@@ -1,4 +1,4 @@
-package testabilities
+package txgraph
 
 import (
 	"testing"

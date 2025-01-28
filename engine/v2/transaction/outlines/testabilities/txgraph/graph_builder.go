@@ -1,4 +1,4 @@
-package testabilities
+package txgraph
 
 import (
 	"fmt"
@@ -12,21 +12,32 @@ import (
 )
 
 const (
+	TestxPriv   = "xprv9s21ZrQH143K2stnKknNEck8NZ9buundyjYCGFGS31bwApaGp7oviHYVY9YAogmgvFC8EdsbsDReydnhDXrRrSXoNoMZczV9t4oPQREAmQ3"
+	TestPaymail = "sender@example.com"
+)
+
+const (
 	DefaultBlockHeight = 1000
 	DefaultSatoshis    = 100
 )
 
 // TransactionDescriptor contains a transaction and its associated hexadecimal data.
 type TransactionDescriptor struct {
-	Tx   *sdk.Transaction // The actual transaction.
-	BEEF *string          // Hexadecimal representation of the transaction in BEEF format.
-	Raw  *string          // Optional raw hexadecimal representation of the transaction.
+	Tx      *sdk.Transaction // The actual transaction.
+	BEEFHex *string          // Hexadecimal representation of the transaction in BEEF format.
+	RawHex  *string          // Optional raw hexadecimal representation of the transaction.
 }
 
 // IsZero checks if the TransactionDescriptor is uninitialized.
 func (t TransactionDescriptor) IsZero() bool {
 	return t == TransactionDescriptor{}
 }
+
+// IsBeef checks if the actual transaction was serialized to HexBEEF format.
+func (t TransactionDescriptor) IsBEEF() bool { return t.BEEFHex != nil }
+
+// IsRaw checks if the actual transaction was serialized to Hex format.
+func (t TransactionDescriptor) IsRaw() bool { return t.RawHex != nil }
 
 // GraphBuilderTransactions is a map where the key is a transaction name (string)
 // and the value is a TransactionDescriptor containing details of the transaction.
@@ -40,7 +51,7 @@ func (g GraphBuilderTransactions) AddRawTx(t *testing.T, name string, tx *sdk.Tr
 	require.NotNil(t, tx, "Added transaction should not be nil")
 
 	hex := tx.Hex()
-	g[name] = &TransactionDescriptor{Tx: tx, BEEF: &hex}
+	g[name] = &TransactionDescriptor{Tx: tx, RawHex: &hex}
 }
 
 // AddMinedTx adds a mined transaction to the GraphBuilderTransactions map.
@@ -53,7 +64,7 @@ func (g GraphBuilderTransactions) AddMinedTx(t *testing.T, name string, tx *sdk.
 	hex, err := tx.BEEFHex()
 	require.NoError(t, err, "Failed to generate BEEF hexadecimal for transaction")
 
-	g[name] = &TransactionDescriptor{Tx: tx, BEEF: &hex}
+	g[name] = &TransactionDescriptor{Tx: tx, BEEFHex: &hex}
 }
 
 // GraphBuilder is a utility for constructing and managing Bitcoin transactions.
@@ -134,7 +145,8 @@ func (g *GraphBuilder) VerifyScripts(tx *sdk.Transaction) {
 }
 
 // NewGraphBuilder initializes a new GraphBuilder with the provided testing context and scripts.
-func NewGraphBuilder(t *testing.T, scripts *TxScripts) *GraphBuilder {
+func NewGraphBuilder(t *testing.T) *GraphBuilder {
+	scripts := NewTxScripts(t, TestxPriv, TestPaymail)
 	return &GraphBuilder{
 		t:                    t,
 		transactions:         make(GraphBuilderTransactions),
