@@ -9,7 +9,7 @@ import (
 	"github.com/bitcoin-sv/spv-wallet/models/request"
 	"github.com/bitcoin-sv/spv-wallet/models/request/opreturn"
 	paymailreq "github.com/bitcoin-sv/spv-wallet/models/request/paymail"
-	"github.com/mitchellh/mapstructure"
+	"github.com/go-viper/mapstructure/v2"
 )
 
 // Request is a transaction outline request model.
