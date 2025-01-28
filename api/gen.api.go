@@ -69,13 +69,13 @@ type GETAdminJSONRequestBody = ComponentsModelsAdminRequest
 // ServerInterface represents all server handlers.
 type ServerInterface interface {
 	// Get the admin settings
-	// (GET /v1/admin)
+	// (GET /api/v1/admin)
 	GETAdmin(c *gin.Context)
 	// Get the policy settings
-	// (GET /v1/policy)
+	// (GET /api/v1/policy)
 	GETPolicy(c *gin.Context)
 	// Get the user settings
-	// (GET /v1/user/{txid})
+	// (GET /api/v1/user/{txid})
 	GETUser(c *gin.Context, txid string)
 }
 
@@ -165,7 +165,7 @@ func RegisterHandlersWithOptions(router gin.IRouter, si ServerInterface, options
 		ErrorHandler:       errorHandler,
 	}
 
-	router.GET(options.BaseURL+"/v1/admin", wrapper.GETAdmin)
-	router.GET(options.BaseURL+"/v1/policy", wrapper.GETPolicy)
-	router.GET(options.BaseURL+"/v1/user/:txid", wrapper.GETUser)
+	router.GET(options.BaseURL+"/api/v1/admin", wrapper.GETAdmin)
+	router.GET(options.BaseURL+"/api/v1/policy", wrapper.GETPolicy)
+	router.GET(options.BaseURL+"/api/v1/user/:txid", wrapper.GETUser)
 }

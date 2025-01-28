@@ -5,7 +5,7 @@ info:
 paths:
 
   # GET STATUS
-  /v1/policy:
+  /api/v1/policy:
     get:
       operationId: GET policy
       tags:

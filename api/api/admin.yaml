@@ -4,7 +4,7 @@ info:
   version: 1.0.0
 paths:
   # GET STATUS
-  /v1/admin:
+  /api/v1/admin:
     get:
       operationId: GET admin
       tags:
@@ -18,9 +18,9 @@ paths:
         content:
           application/json:
             schema:
-              $ref: 'components_models.yaml#/components/schemas/AdminRequest'
+              $ref: '../components/models.yaml#/components/schemas/AdminRequest'
       responses:
         200:
           description: Success
         401:
-          $ref: "components_errors.yaml#/components/responses/NotAuthorized"
+          $ref: "../components/errors.yaml#/components/responses/NotAuthorized"

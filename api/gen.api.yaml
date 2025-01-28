@@ -2,11 +2,11 @@ openapi: 3.0.0
 info:
     license:
         name: Open BSV Licence
-        url: https://bitcoinassociation.net/open-bsv-license/
+        url: xyz
     title: SPV Wallet API
     version: 1.0.0
 paths:
-    /v1/admin:
+    /api/v1/admin:
         get:
             description: This endpoint returns the admin settings.
             operationId: GET admin
@@ -25,7 +25,7 @@ paths:
             summary: Get the admin settings
             tags:
                 - Admin endpoints
-    /v1/policy:
+    /api/v1/policy:
         get:
             description: This endpoint returns the policy settings.
             operationId: GET policy
@@ -35,7 +35,7 @@ paths:
             summary: Get the policy settings
             tags:
                 - Base endpoints
-    /v1/user/{txid}:
+    /api/v1/user/{txid}:
         get:
             description: This endpoint returns the admin settings.
             operationId: GET user

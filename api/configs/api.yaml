@@ -3,6 +3,6 @@ generate:
   gin-server: true
   models: true
 output: gen.api.go
-import-mapping:
-  errors.yaml: "-"
-  models.yaml: "-"
+#import-mapping:
+#  errors.yaml: "-"
+#  /models/models.yaml: "-"
