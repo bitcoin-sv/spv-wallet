@@ -44,6 +44,10 @@ func processDataOutputs(tx *trx.Transaction, userID string, annotations *transac
 	var dataOutputs []txmodels.NewOutput //nolint: prealloc
 
 	for vout, annotation := range annotations.Outputs {
+		if annotation.Bucket != bucket.Data {
+			continue
+		}
+
 		if vout >= len(tx.Outputs) {
 			return nil, txerrors.ErrAnnotationIndexOutOfRange
 		}
@@ -54,10 +58,6 @@ func processDataOutputs(tx *trx.Transaction, userID string, annotations *transac
 		}
 
 		lockingScript := tx.Outputs[vout].LockingScript
-
-		if annotation.Bucket != bucket.Data {
-			continue
-		}
 
 		data, err := getDataFromOpReturn(lockingScript)
 		if err != nil {
