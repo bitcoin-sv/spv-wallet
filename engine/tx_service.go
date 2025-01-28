@@ -10,39 +10,6 @@ import (
 	"github.com/bitcoin-sv/spv-wallet/engine/utils"
 )
 
-// The transaction is treat as external incoming transaction - transaction without a draft
-// Only use this function when you know what you are doing!
-func saveRawTransaction(ctx context.Context, c ClientInterface, allowUnknown bool, txHex string, opts ...ModelOps) (*Transaction, error) {
-	newOpts := c.DefaultModelOptions(append(opts, New())...)
-	tx, err := txFromHex(txHex, newOpts...)
-	if err != nil {
-		return nil, spverrors.ErrMissingTxHex
-	}
-
-	// Create the lock and set the release for after the function completes
-	unlock, err := newWriteLock(
-		ctx, fmt.Sprintf(lockKeyRecordTx, tx.GetID()), c.Cachestore(),
-	)
-	defer unlock()
-	if err != nil {
-		return nil, err
-	}
-
-	if !allowUnknown && !tx.hasOneKnownDestination(ctx, c) {
-		return nil, spverrors.ErrNoMatchingOutputs
-	}
-
-	if err = tx.processUtxos(ctx); err != nil {
-		return nil, err
-	}
-
-	if err = tx.Save(ctx); err != nil {
-		return nil, err
-	}
-
-	return tx, nil
-}
-
 // processUtxos will process the inputs and outputs for UTXOs
 func (m *Transaction) processUtxos(ctx context.Context) error {
 	// Input should be processed only for outgoing transactions

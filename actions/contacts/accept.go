@@ -8,23 +8,6 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-// oldAccept will accept contact request
-// Accept contact godoc
-// @Summary		Accept contact - Use (POST) /api/v1/invitations/{paymail} instead.
-// @Description	This endpoint has been deprecated. Use (POST) /api/v1/invitations/{paymail} instead.
-// @Tags		Contact
-// @Produce		json
-// @Param		paymail path string true "Paymail address of the contact that the user would like to accept"
-// @Success		200
-// @Failure		404	"Contact not found"
-// @Failure		422	"Contact status not awaiting"
-// @Failure		500	"Internal server error"
-// @DeprecatedRouter  /v1/contact/accepted/{paymail} [patch]
-// @Security	x-auth-xpub
-func oldAccept(c *gin.Context, userContext *reqctx.UserContext) {
-	acceptInvitations(c, userContext)
-}
-
 // acceptInvitations will accept contact request
 // Accept contact invitation godoc
 // @Summary		Accept contact invitation

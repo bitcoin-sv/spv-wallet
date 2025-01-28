@@ -14,15 +14,6 @@ func (ts *TestSuite) TestTransactionRegisterRoutes() {
 			method string
 			url    string
 		}{
-			// Old routes
-			{"GET", "/" + config.APIVersion + "/transaction"},
-			{"POST", "/" + config.APIVersion + "/transaction"},
-			{"PATCH", "/" + config.APIVersion + "/transaction"},
-			{"GET", "/" + config.APIVersion + "/transaction/search"},
-			{"POST", "/" + config.APIVersion + "/transaction/search"},
-			{"POST", "/" + config.APIVersion + "/transaction/record"},
-
-			// New routes
 			{"GET", "/api/" + config.APIVersion + "/transactions/:id"},
 			{"PATCH", "/api/" + config.APIVersion + "/transactions/:id"},
 			{"GET", "/api/" + config.APIVersion + "/transactions"},

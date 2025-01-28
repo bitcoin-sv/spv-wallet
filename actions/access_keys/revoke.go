@@ -4,33 +4,9 @@ import (
 	"net/http"
 
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
-	"github.com/bitcoin-sv/spv-wallet/mappings"
 	"github.com/bitcoin-sv/spv-wallet/server/reqctx"
 	"github.com/gin-gonic/gin"
 )
-
-// revoke will revoke the intended model by id
-// Revoke access key godoc
-// @Summary		Revoke access key - Use (DELETE) /api/v1/users/current/keys/{id} instead.
-// @Description	This endpoint has been deprecated. Use (DELETE) /api/v1/users/current/keys/{id} instead.
-// @Tags		Access-key
-// @Produce		json
-// @Param		id query string true "id of the access key"
-// @Success		200	{object} models.AccessKey "Revoked AccessKey"
-// @Failure		400	"Bad request - Missing required field: id"
-// @Failure 	500	"Internal server error - Error while revoking access key"
-// @DeprecatedRouter  /v1/access-key [delete]
-// @Security	x-auth-xpub
-func oldRevoke(c *gin.Context, userContext *reqctx.UserContext) {
-	id := c.Query("id")
-	xpub, err := userContext.ShouldGetXPub()
-	if err != nil {
-		spverrors.AbortWithErrorResponse(c, err, reqctx.Logger(c))
-		return
-	}
-
-	revokeHelper(c, id, true, xpub)
-}
 
 // revoke will revoke the intended model by id
 // Revoke access key godoc
@@ -51,10 +27,6 @@ func revoke(c *gin.Context, userContext *reqctx.UserContext) {
 		spverrors.AbortWithErrorResponse(c, err, reqctx.Logger(c))
 		return
 	}
-	revokeHelper(c, id, false, xpub)
-}
-
-func revokeHelper(c *gin.Context, id string, snakeCase bool, xpub string) {
 	logger := reqctx.Logger(c)
 
 	if id == "" {
@@ -62,19 +34,13 @@ func revokeHelper(c *gin.Context, id string, snakeCase bool, xpub string) {
 		return
 	}
 
-	accessKey, err := reqctx.Engine(c).RevokeAccessKey(
+	_, err = reqctx.Engine(c).RevokeAccessKey(
 		c.Request.Context(),
 		xpub,
 		id,
 	)
 	if err != nil {
 		spverrors.ErrorResponse(c, err, logger)
-		return
-	}
-
-	if snakeCase {
-		contract := mappings.MapToOldAccessKeyContract(accessKey)
-		c.JSON(http.StatusCreated, contract)
 		return
 	}
 
