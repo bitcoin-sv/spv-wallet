@@ -1,0 +1,66 @@
+openapi: 3.0.0
+info:
+  title: SPV Wallet API models
+  version: 1.0.0
+
+components:
+  schemas:
+
+    #######################################################  REQUESTS
+
+    AdminRequest:
+      type: object
+      required:
+        - id
+      properties:
+        id:
+          type: integer
+          format: uint64
+          nullable: false
+          description: Example of admin request body
+          example: 1
+      additionalProperties: false
+
+    #######################################################  MODELS
+
+    User:
+      type: object
+      required:
+        - id
+        - name
+      properties:
+        id:
+          type: integer
+          format: uint64
+          nullable: false
+          description: User ID
+          example: 1
+        name:
+          type: string
+          nullable: false
+          description: User name
+          example: Geralt of Rivia
+      additionalProperties: false
+
+    #######################################################  RESPONSES
+    UserExampleResponse:
+      allOf:
+        - $ref: '#/components/schemas/CommonResponse'
+        - $ref: '#/components/schemas/User'
+        - type: object
+          properties:
+            additionalPropertyExample:
+              type: string
+              description: The user model additional property example
+              example: "example"
+
+    CommonResponse:
+      type: object
+      required:
+        - timestamp
+      description: Common response object
+      properties:
+        timestamp:
+          type: string
+          format: date-time
+          nullable: false

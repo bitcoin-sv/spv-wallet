@@ -1,0 +1,7 @@
+openapi: 3.0.0
+info:
+  title: SPV Wallet API
+  version: 1.0.0
+  license:
+    name: Open BSV Licence
+    url: https://bitcoinassociation.net/open-bsv-license/

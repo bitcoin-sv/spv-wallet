@@ -1,0 +1,26 @@
+openapi: 3.0.0
+info:
+  title: SPV Wallet Admin API
+  version: 1.0.0
+paths:
+  # GET STATUS
+  /v1/admin:
+    get:
+      operationId: GET admin
+      tags:
+        - Admin endpoints
+      summary: Get the admin settings
+      description: >-
+        This endpoint returns the admin settings.
+      requestBody:
+        required: true
+        description: 'Test object in body'
+        content:
+          application/json:
+            schema:
+              $ref: 'components_models.yaml#/components/schemas/AdminRequest'
+      responses:
+        200:
+          description: Success
+        401:
+          $ref: "components_errors.yaml#/components/responses/NotAuthorized"

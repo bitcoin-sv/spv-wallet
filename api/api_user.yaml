@@ -1,0 +1,42 @@
+openapi: 3.0.0
+info:
+  title: SPV Wallet Admin API
+  version: 1.0.0
+paths:
+  # GET USER
+  /v1/user/{txid}:
+    get:
+      operationId: GET user
+      tags:
+        - User endpoints
+      summary: Get the user settings
+      description: >-
+        This endpoint returns the admin settings.
+      parameters:
+        - name: txid
+          in: path
+          description: User ID (32 byte hash) hex string
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: 'components_models.yaml#/components/schemas/UserExampleResponse'
+        401:
+          $ref: "components_errors.yaml#/components/responses/NotAuthorized"
+
+#        One way of referencing the error response using only schema
+        404:
+          description: User not found
+          content:
+            application/json:
+              schema:
+                $ref: "components_errors.yaml#/components/schemas/ErrUserNotFound"
+
+#       Another way of referencing the error response using whole response
+        405:
+          $ref: "components_errors.yaml#/components/responses/ErrorUserNotFoundResponse"

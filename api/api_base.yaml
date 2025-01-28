@@ -1,0 +1,18 @@
+openapi: 3.0.0
+info:
+  title: SPV Wallet Base API
+  version: 1.0.0
+paths:
+
+  # GET STATUS
+  /v1/policy:
+    get:
+      operationId: GET policy
+      tags:
+        - Base endpoints
+      summary: Get the policy settings
+      description: >-
+        This endpoint returns the policy settings.
+      responses:
+        200:
+          description: Success

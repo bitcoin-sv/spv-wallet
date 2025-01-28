@@ -50,3 +50,9 @@ test-all-db-ci: ## Runs all tests including embedded database tests (CI)
 	cd models/ && go test ./... -coverprofile=coverage.txt -covermode=atomic -tags="$(GO_BUILD_TAGS) database_tests"
 	tail -n +2 models/coverage.txt >> coverage.txt
 	tail -n +2 engine/coverage.txt >> coverage.txt
+
+.PHONY: api
+api: ## Generate API
+	@echo "generating API..."
+	@go generate ./...
+	@echo "API generation completed, go to /api/api.go to see the generated API"

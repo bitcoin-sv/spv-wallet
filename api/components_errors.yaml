@@ -1,0 +1,43 @@
+openapi: 3.0.0
+info:
+  title: SPV Wallet API models
+  version: 1.0.0
+
+components:
+  responses:
+    NotAuthorized:
+      description: Security requirements failed
+
+    ErrorUserNotFoundResponse:
+      description: User not found
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrUserNotFound"
+
+  schemas:
+    ErrorSchema:
+      type: object
+      properties:
+        code:
+          type: integer
+          format: int32
+          description: Error code
+        message:
+          type: string
+          description: Error message
+      required:
+        - code
+        - message
+      additionalProperties: false
+
+    ErrUserNotFound:
+      allOf:
+        - $ref: '#/components/schemas/ErrorSchema'
+        - type: object
+          properties:
+            code:
+              example: "error-user-not-found"
+            message:
+                example: "user not found"
+      additionalProperties: false
