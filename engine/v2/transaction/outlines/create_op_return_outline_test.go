@@ -66,7 +66,7 @@ func TestCreateOpReturnTransactionOutline(t *testing.T) {
 			}
 
 			// when:
-			tx, err := service.Create(context.Background(), spec)
+			tx, err := service.CreateBEEF(context.Background(), spec)
 
 			// then:
 			thenTx := then.Created(tx).WithNoError(err).WithParseableBEEFHex()
@@ -130,7 +130,7 @@ func TestCreateOpReturnTransactionOutline(t *testing.T) {
 			}
 
 			// when:
-			tx, err := service.Create(context.Background(), spec)
+			tx, err := service.CreateBEEF(context.Background(), spec)
 
 			// then:
 			then.Created(tx).WithError(err).ThatIs(test.expectedError)
