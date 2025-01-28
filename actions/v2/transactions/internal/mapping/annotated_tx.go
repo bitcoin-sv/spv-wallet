@@ -7,6 +7,7 @@ import (
 	"github.com/samber/lo"
 )
 
+// AnnotatedTransactionToOutline maps AnnotatedTransaction model to Transaction engine model
 func AnnotatedTransactionToOutline(tx *model.AnnotatedTransaction) *outlines.Transaction {
 	return &outlines.Transaction{
 		BEEF: tx.BEEF,

@@ -12,15 +12,22 @@ import (
 	"github.com/samber/lo"
 )
 
-// Request is a transaction outline request model.
-type Request request.TransactionSpecification
-
-// ToEngine converts a transaction outline request model to the engine model.
+// TransactionRequestToOutline converts a transaction outline request model to the engine model.
 func TransactionRequestToOutline(tx *request.TransactionSpecification, userID string) *outlines.TransactionSpec {
 	return &outlines.TransactionSpec{
 		UserID: userID,
 		Outputs: outlines.OutputsSpec{
 			Outputs: lo.Map(tx.Outputs, transactionRequestOutputsToOutline),
+		},
+	}
+}
+
+// TransactionOutlineToResponse converts a transaction outline to a response model.
+func TransactionOutlineToResponse(tx *outlines.Transaction) *model.AnnotatedTransaction {
+	return &model.AnnotatedTransaction{
+		BEEF: tx.BEEF,
+		Annotations: &model.Annotations{
+			Outputs: lo.MapValues(tx.Annotations.Outputs, outlineOutputToResponse),
 		},
 	}
 }
@@ -32,16 +39,6 @@ func transactionRequestOutputsToOutline(val request.Output, _ int) outlines.Outp
 		return nil
 	}
 	return spec
-}
-
-// ToResponse converts a transaction outline to a response model.
-func TransactionOutlineToResponse(tx *outlines.Transaction) *model.AnnotatedTransaction {
-	return &model.AnnotatedTransaction{
-		BEEF: tx.BEEF,
-		Annotations: &model.Annotations{
-			Outputs: lo.MapValues(tx.Annotations.Outputs, outlineOutputToResponse),
-		},
-	}
 }
 
 func outlineOutputToResponse(from *transaction.OutputAnnotation, _ int) *model.OutputAnnotation {
