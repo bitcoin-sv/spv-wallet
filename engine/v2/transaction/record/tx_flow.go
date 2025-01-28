@@ -129,7 +129,7 @@ func (f *txFlow) findRelevantP2PKHOutputs() (iter.Seq[txmodels.NewOutput], error
 				f.service.logger.Warn().Str("address", row.Address).Msg("Got not relevant address from database")
 				continue
 			}
-			yield(txmodels.NewOutputForP2PHK(
+			yield(txmodels.NewOutputForP2PKH(
 				bsv.Outpoint{TxID: f.txID, Vout: vout},
 				row.UserID,
 				bsv.Satoshis(f.tx.Outputs[vout].Satoshis),

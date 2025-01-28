@@ -34,8 +34,8 @@ type NewOutput struct {
 	Data []byte
 }
 
-// NewOutputForP2PHK creates a new output for P2PKH address.
-func NewOutputForP2PHK(outpoint bsv.Outpoint, userID string, satoshis bsv.Satoshis, customInstructions bsv.CustomInstructions) NewOutput {
+// NewOutputForP2PKH creates a new output for P2PKH address.
+func NewOutputForP2PKH(outpoint bsv.Outpoint, userID string, satoshis bsv.Satoshis, customInstructions bsv.CustomInstructions) NewOutput {
 	return NewOutput{
 		UserID:   userID,
 		TxID:     outpoint.TxID,

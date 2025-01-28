@@ -39,7 +39,7 @@ func (f *faucetFixture) TopUp(satoshis bsv.Satoshis) fixtures.GivenTXSpec {
 			ID:       txSpec.ID(),
 			TxStatus: txmodels.TxStatusMined,
 			Outputs: []txmodels.NewOutput{
-				txmodels.NewOutputForP2PHK(
+				txmodels.NewOutputForP2PKH(
 					bsv.Outpoint{TxID: txSpec.ID(), Vout: 0},
 					f.user.ID(),
 					satoshis,
