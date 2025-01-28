@@ -101,7 +101,7 @@ func mapTransaction(transaction *txmodels.NewOperation) *database.TrackedTransac
 				output.UTXO.EstimatedInputSize,
 				output.UTXO.CustomInstructions,
 			)
-		} else if output.Data == nil {
+		} else if output.Data != nil {
 			tx.CreateDataOutput(&database.Data{
 				TxID:   transaction.Transaction.ID,
 				Vout:   output.Vout,
