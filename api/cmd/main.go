@@ -15,7 +15,7 @@ const (
 	outputPath   = "gen.api.yaml"
 )
 
-var componentPaths = []string{"api/base.yaml", "api/user.yaml", "api/admin.yaml"}
+var componentPaths = []string{"endpoints/base.yaml", "endpoints/user.yaml", "endpoints/admin.yaml"}
 
 func main() {
 	loader := openapi3.NewLoader()
