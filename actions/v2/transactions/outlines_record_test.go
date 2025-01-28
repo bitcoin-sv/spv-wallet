@@ -25,7 +25,7 @@ func TestOutlinesRecordOpReturn(t *testing.T) {
 	// given:
 	givenForAllTests := testabilities.Given(t)
 	cleanup := givenForAllTests.StartedSPVWalletWithConfiguration(
-		testengine.WithNewTransactionFlowEnabled(),
+		testengine.WithV2(),
 	)
 	defer cleanup()
 

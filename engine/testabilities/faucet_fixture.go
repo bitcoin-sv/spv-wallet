@@ -6,7 +6,7 @@ import (
 
 	"github.com/bitcoin-sv/spv-wallet/engine"
 	"github.com/bitcoin-sv/spv-wallet/engine/tester/fixtures"
-	"github.com/bitcoin-sv/spv-wallet/engine/transaction/txmodels"
+	txmodels2 "github.com/bitcoin-sv/spv-wallet/engine/v2/transaction/txmodels"
 	"github.com/bitcoin-sv/spv-wallet/models/bsv"
 	"github.com/stretchr/testify/assert"
 )
@@ -29,17 +29,17 @@ func (f *faucetFixture) TopUp(satoshis bsv.Satoshis) fixtures.GivenTXSpec {
 		WithRecipient(f.user).
 		WithP2PKHOutput(uint64(satoshis))
 
-	operation := txmodels.NewOperation{
+	operation := txmodels2.NewOperation{
 		UserID: f.user.ID(),
 
 		Type:  "incoming",
 		Value: int64(satoshis), //nolint:gosec // This is a test fixture, values won't exceed int64
 
-		Transaction: &txmodels.NewTransaction{
+		Transaction: &txmodels2.NewTransaction{
 			ID:       txSpec.ID(),
-			TxStatus: txmodels.TxStatusMined,
-			Outputs: []txmodels.NewOutput{
-				txmodels.NewOutputForP2PHK(
+			TxStatus: txmodels2.TxStatusMined,
+			Outputs: []txmodels2.NewOutput{
+				txmodels2.NewOutputForP2PHK(
 					bsv.Outpoint{TxID: txSpec.ID(), Vout: 0},
 					f.user.ID(),
 					satoshis,
@@ -49,7 +49,7 @@ func (f *faucetFixture) TopUp(satoshis bsv.Satoshis) fixtures.GivenTXSpec {
 		},
 	}
 
-	err := f.engine.Repositories().Operations.SaveAll(context.Background(), func(yield func(*txmodels.NewOperation) bool) {
+	err := f.engine.Repositories().Operations.SaveAll(context.Background(), func(yield func(*txmodels2.NewOperation) bool) {
 		yield(&operation)
 	})
 	f.assert.NoError(err)

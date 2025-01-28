@@ -3,8 +3,8 @@ package mapping
 import (
 	"maps"
 
-	"github.com/bitcoin-sv/spv-wallet/engine/transaction"
-	"github.com/bitcoin-sv/spv-wallet/engine/transaction/outlines"
+	"github.com/bitcoin-sv/spv-wallet/engine/v2/transaction"
+	"github.com/bitcoin-sv/spv-wallet/engine/v2/transaction/outlines"
 	"github.com/bitcoin-sv/spv-wallet/models/request"
 )
 

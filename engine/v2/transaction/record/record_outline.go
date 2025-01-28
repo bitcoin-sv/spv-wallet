@@ -4,14 +4,9 @@ import (
 	"context"
 
 	trx "github.com/bitcoin-sv/go-sdk/transaction"
-	txerrors "github.com/bitcoin-sv/spv-wallet/engine/transaction/errors"
-	"github.com/bitcoin-sv/spv-wallet/engine/transaction/outlines"
-	"github.com/bitcoin-sv/spv-wallet/engine/transaction/txmodels"
-	"github.com/bitcoin-sv/spv-wallet/conv"
-	"github.com/bitcoin-sv/spv-wallet/engine/v2/transaction"
 	"github.com/bitcoin-sv/spv-wallet/engine/v2/transaction/errors"
 	"github.com/bitcoin-sv/spv-wallet/engine/v2/transaction/outlines"
-	"github.com/bitcoin-sv/spv-wallet/models/transaction/bucket"
+	"github.com/bitcoin-sv/spv-wallet/engine/v2/transaction/txmodels"
 )
 
 // RecordTransactionOutline will validate, broadcast and save a transaction outline

@@ -1,7 +1,7 @@
 package mapping
 
 import (
-	"github.com/bitcoin-sv/spv-wallet/engine/transaction/txmodels"
+	"github.com/bitcoin-sv/spv-wallet/engine/v2/transaction/txmodels"
 	"github.com/bitcoin-sv/spv-wallet/models/response"
 )
 
