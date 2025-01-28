@@ -2,8 +2,8 @@ package mapping
 
 import (
 	"github.com/bitcoin-sv/spv-wallet/engine/v2/users/usersmodels"
-	"github.com/bitcoin-sv/spv-wallet/mapper"
 	"github.com/bitcoin-sv/spv-wallet/models/response/adminresponse"
+	"github.com/samber/lo"
 )
 
 // CreatedUserResponse maps a user to a response
@@ -13,12 +13,12 @@ func UserToResponse(u *usersmodels.User) adminresponse.User {
 		CreatedAt: u.CreatedAt,
 		UpdatedAt: u.UpdatedAt,
 		PublicKey: u.PublicKey,
-		Paymails:  mapper.MapSlice(u.Paymails, UsersPaymailToResponse),
+		Paymails:  lo.Map(u.Paymails, UsersPaymailToResponse),
 	}
 }
 
 // UsersPaymailResponse maps a user's paymail to a response
-func UsersPaymailToResponse(p *usersmodels.Paymail) adminresponse.Paymail {
+func UsersPaymailToResponse(p *usersmodels.Paymail, _ int) adminresponse.Paymail {
 	return adminresponse.Paymail{
 		ID:         p.ID,
 		Alias:      p.Alias,
