@@ -13,7 +13,7 @@ func TestCreateUserWithoutPaymail(t *testing.T) {
 	// given:
 	givenForAllTests := testabilities.Given(t)
 	cleanup := givenForAllTests.StartedSPVWalletWithConfiguration(
-		testengine.WithNewTransactionFlowEnabled(),
+		testengine.WithV2(),
 	)
 	defer cleanup()
 
@@ -101,7 +101,7 @@ func TestCreateUserWithPaymail(t *testing.T) {
 	// given:
 	givenForAllTests := testabilities.Given(t)
 	cleanup := givenForAllTests.StartedSPVWalletWithConfiguration(
-		testengine.WithNewTransactionFlowEnabled(),
+		testengine.WithV2(),
 	)
 	defer cleanup()
 
@@ -206,7 +206,7 @@ func TestCreateUserWithAliasAndDomain(t *testing.T) {
 	// given:
 	givenForAllTests := testabilities.Given(t)
 	cleanup := givenForAllTests.StartedSPVWalletWithConfiguration(
-		testengine.WithNewTransactionFlowEnabled(),
+		testengine.WithV2(),
 	)
 	defer cleanup()
 
@@ -312,7 +312,7 @@ func TestAddUserWithWrongPaymailDomain(t *testing.T) {
 	// given:
 	given, then := testabilities.New(t)
 	cleanup := given.StartedSPVWalletWithConfiguration(
-		testengine.WithNewTransactionFlowEnabled(),
+		testengine.WithV2(),
 	)
 	defer cleanup()
 

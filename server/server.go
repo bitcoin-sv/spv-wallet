@@ -111,7 +111,7 @@ func setupServerRoutes(appConfig *config.AppConfig, spvWalletEngine engine.Clien
 	actions.Register(handlersManager)
 	paymailserver.Register(spvWalletEngine.GetPaymailConfig().Configuration, ginEngine)
 
-	if appConfig.ExperimentalFeatures.NewTransactionFlowEnabled {
+	if appConfig.ExperimentalFeatures.V2 {
 		v2.Register(handlersManager)
 	}
 

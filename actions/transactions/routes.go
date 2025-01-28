@@ -16,10 +16,4 @@ func RegisterRoutes(handlersManager *handlers.Manager) {
 	group.POST("", handlers.AsUser(recordTransaction))
 
 	handlersManager.Get(handlers.GroupTransactionCallback).POST(config.BroadcastCallbackRoute, broadcastCallback)
-
-	if handlersManager.GetFeatureFlags().NewTransactionFlowEnabled {
-		v2 := handlersManager.Group(handlers.GroupAPIV2, "/transactions")
-		v2.POST("/outlines", handlers.AsUser(transactionOutlines))
-		v2.POST("", handlers.AsUser(transactionRecordOutline))
-	}
 }

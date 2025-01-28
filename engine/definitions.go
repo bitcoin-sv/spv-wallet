@@ -3,7 +3,7 @@ package engine
 import (
 	"time"
 
-	"github.com/bitcoin-sv/spv-wallet/engine/database"
+	"github.com/bitcoin-sv/spv-wallet/engine/v2/database"
 )
 
 // Defaults for engine functionality

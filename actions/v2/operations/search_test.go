@@ -10,7 +10,7 @@ import (
 func TestUserOperations(t *testing.T) {
 	givenForAllTests := testabilities.Given(t)
 	cleanup := givenForAllTests.StartedSPVWalletWithConfiguration(
-		testengine.WithNewTransactionFlowEnabled(),
+		testengine.WithV2(),
 	)
 	defer cleanup()
 
