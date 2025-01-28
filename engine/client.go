@@ -9,17 +9,19 @@ import (
 	"github.com/bitcoin-sv/spv-wallet/engine/chain"
 	"github.com/bitcoin-sv/spv-wallet/engine/chain/models"
 	"github.com/bitcoin-sv/spv-wallet/engine/cluster"
-	"github.com/bitcoin-sv/spv-wallet/engine/database/repository"
 	"github.com/bitcoin-sv/spv-wallet/engine/datastore"
 	"github.com/bitcoin-sv/spv-wallet/engine/logging"
 	"github.com/bitcoin-sv/spv-wallet/engine/metrics"
 	"github.com/bitcoin-sv/spv-wallet/engine/notifications"
 	paymailclient "github.com/bitcoin-sv/spv-wallet/engine/paymail"
-	"github.com/bitcoin-sv/spv-wallet/engine/paymailaddress"
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/bitcoin-sv/spv-wallet/engine/taskmanager"
-	"github.com/bitcoin-sv/spv-wallet/engine/transaction/outlines"
-	"github.com/bitcoin-sv/spv-wallet/engine/transaction/record"
+	"github.com/bitcoin-sv/spv-wallet/engine/v2/addresses"
+	"github.com/bitcoin-sv/spv-wallet/engine/v2/database/repository"
+	"github.com/bitcoin-sv/spv-wallet/engine/v2/paymails"
+	"github.com/bitcoin-sv/spv-wallet/engine/v2/transaction/outlines"
+	"github.com/bitcoin-sv/spv-wallet/engine/v2/transaction/record"
+	"github.com/bitcoin-sv/spv-wallet/engine/v2/users"
 	"github.com/bitcoin-sv/spv-wallet/models/bsv"
 	"github.com/go-resty/resty/v2"
 	"github.com/mrz1836/go-cachestore"
@@ -35,27 +37,31 @@ type (
 
 	// clientOptions holds all the configuration for the client
 	clientOptions struct {
-		cacheStore                 *cacheStoreOptions     // Configuration options for Cachestore (ristretto, redis, etc.)
-		cluster                    *clusterOptions        // Configuration options for the cluster coordinator
-		dataStore                  *dataStoreOptions      // Configuration options for the DataStore (PostgreSQL, etc.)
-		debug                      bool                   // If the client is in debug mode
-		encryptionKey              string                 // Encryption key for encrypting sensitive information (IE: paymail xPub) (hex encoded key)
-		httpClient                 *resty.Client          // HTTP client to use for http calls
-		iuc                        bool                   // (Input UTXO Check) True will check input utxos when saving transactions
-		logger                     *zerolog.Logger        // Internal logging
-		metrics                    *metrics.Metrics       // Metrics with a collector interface
-		notifications              *notificationsOptions  // Configuration options for Notifications
-		paymail                    *paymailOptions        // Paymail options & client
-		transactionOutlinesService outlines.Service       // Service for transaction outlines
-		transactionRecordService   *record.Service        // Service for recording transactions
-		paymailAddressService      paymailaddress.Service // Service for paymail addresses
-		taskManager                *taskManagerOptions    // Configuration options for the TaskManager (TaskQ, etc.)
-		userAgent                  string                 // User agent for all outgoing requests
-		chainService               chain.Service          // Chain service
-		arcConfig                  chainmodels.ARCConfig  // Configuration for ARC
-		bhsConfig                  chainmodels.BHSConfig  // Configuration for BHS
-		feeUnit                    *bsv.FeeUnit           // Fee unit for transactions
-		repositories               *repository.All        // Repositories for all db models
+		cacheStore                 *cacheStoreOptions    // Configuration options for Cachestore (ristretto, redis, etc.)
+		cluster                    *clusterOptions       // Configuration options for the cluster coordinator
+		dataStore                  *dataStoreOptions     // Configuration options for the DataStore (PostgreSQL, etc.)
+		debug                      bool                  // If the client is in debug mode
+		encryptionKey              string                // Encryption key for encrypting sensitive information (IE: paymail xPub) (hex encoded key)
+		httpClient                 *resty.Client         // HTTP client to use for http calls
+		iuc                        bool                  // (Input UTXO Check) True will check input utxos when saving transactions
+		logger                     *zerolog.Logger       // Internal logging
+		metrics                    *metrics.Metrics      // Metrics with a collector interface
+		notifications              *notificationsOptions // Configuration options for Notifications
+		paymail                    *paymailOptions       // Paymail options & client
+		transactionOutlinesService outlines.Service      // Service for transaction outlines
+		transactionRecordService   *record.Service       // Service for recording transactions
+		taskManager                *taskManagerOptions   // Configuration options for the TaskManager (TaskQ, etc.)
+		userAgent                  string                // User agent for all outgoing requests
+		chainService               chain.Service         // Chain service
+		arcConfig                  chainmodels.ARCConfig // Configuration for ARC
+		bhsConfig                  chainmodels.BHSConfig // Configuration for BHS
+		feeUnit                    *bsv.FeeUnit          // Fee unit for transactions
+
+		// v2
+		repositories *repository.All   // Repositories for all db models
+		users        *users.Service    // User domain service
+		paymails     *paymails.Service // Paymail domain service
+		addresses    *addresses.Service
 	}
 
 	// cacheStoreOptions holds the cache configuration and client
@@ -146,12 +152,12 @@ func NewClient(ctx context.Context, opts ...ClientOps) (ClientInterface, error) 
 
 	client.loadRepositories()
 
+	client.loadUsersService()
+	client.loadPaymailsService()
+	client.loadAddressesService()
+
 	// Load the Paymail client and service (if does not exist)
 	if err = client.loadPaymailComponents(); err != nil {
-		return nil, err
-	}
-
-	if err = client.loadPaymailAddressService(); err != nil {
 		return nil, err
 	}
 
@@ -338,4 +344,19 @@ func (c *Client) FeeUnit() bsv.FeeUnit {
 // Repositories will return all the repositories
 func (c *Client) Repositories() *repository.All {
 	return c.options.repositories
+}
+
+// UsersService will return the user domain service
+func (c *Client) UsersService() *users.Service {
+	return c.options.users
+}
+
+// PaymailsService will return the paymail domain service
+func (c *Client) PaymailsService() *paymails.Service {
+	return c.options.paymails
+}
+
+// AddressesService will return the address domain service
+func (c *Client) AddressesService() *addresses.Service {
+	return c.options.addresses
 }

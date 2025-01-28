@@ -7,15 +7,18 @@ import (
 	paymailserver "github.com/bitcoin-sv/go-paymail/server"
 	"github.com/bitcoin-sv/spv-wallet/engine/chain"
 	"github.com/bitcoin-sv/spv-wallet/engine/cluster"
-	"github.com/bitcoin-sv/spv-wallet/engine/database/repository"
 	"github.com/bitcoin-sv/spv-wallet/engine/datastore"
 	"github.com/bitcoin-sv/spv-wallet/engine/notifications"
 	"github.com/bitcoin-sv/spv-wallet/engine/paymail"
-	"github.com/bitcoin-sv/spv-wallet/engine/paymailaddress"
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/bitcoin-sv/spv-wallet/engine/taskmanager"
-	"github.com/bitcoin-sv/spv-wallet/engine/transaction/outlines"
-	"github.com/bitcoin-sv/spv-wallet/engine/transaction/record"
+	"github.com/bitcoin-sv/spv-wallet/engine/v2/addresses"
+	"github.com/bitcoin-sv/spv-wallet/engine/v2/database/repository"
+	"github.com/bitcoin-sv/spv-wallet/engine/v2/paymails"
+	paymailprovider "github.com/bitcoin-sv/spv-wallet/engine/v2/paymailserver"
+	"github.com/bitcoin-sv/spv-wallet/engine/v2/transaction/outlines"
+	"github.com/bitcoin-sv/spv-wallet/engine/v2/transaction/record"
+	"github.com/bitcoin-sv/spv-wallet/engine/v2/users"
 	"github.com/mrz1836/go-cachestore"
 )
 
@@ -162,47 +165,10 @@ func (c *Client) loadPaymailComponents() (err error) {
 	return
 }
 
-func (c *Client) loadPaymailAddressService() error {
-	if c.options.paymailAddressService != nil {
-		return nil
-	}
-	c.options.paymailAddressService = paymailaddress.NewService(
-		func(ctx context.Context, address string) (string, error) {
-			paymailAddress, err := c.GetPaymailAddress(ctx, address)
-			if err != nil {
-				return "", err
-			}
-			return paymailAddress.XpubID, nil
-		},
-		func(ctx context.Context, xPubId string) ([]string, error) {
-			page := &datastore.QueryParams{
-				PageSize:      10,
-				OrderByField:  createdAtField,
-				SortDirection: datastore.SortAsc,
-			}
-
-			conditions := map[string]interface{}{
-				xPubIDField: xPubId,
-			}
-
-			addresses, err := c.GetPaymailAddresses(ctx, nil, conditions, page)
-			if err != nil {
-				return nil, err
-			}
-			result := make([]string, 0, len(addresses))
-			for _, address := range addresses {
-				result = append(result, address.String())
-			}
-			return result, nil
-		},
-	)
-	return nil
-}
-
 func (c *Client) loadTransactionOutlinesService() error {
 	if c.options.transactionOutlinesService == nil {
 		logger := c.Logger().With().Str("subservice", "transactionOutlines").Logger()
-		c.options.transactionOutlinesService = outlines.NewService(c.PaymailService(), c.options.paymailAddressService, logger)
+		c.options.transactionOutlinesService = outlines.NewService(c.PaymailService(), c.options.paymails, logger)
 	}
 	return nil
 }
@@ -224,6 +190,24 @@ func (c *Client) loadTransactionRecordService() error {
 func (c *Client) loadRepositories() {
 	if c.options.repositories == nil {
 		c.options.repositories = repository.NewRepositories(c.Datastore().DB())
+	}
+}
+
+func (c *Client) loadUsersService() {
+	if c.options.users == nil {
+		c.options.users = users.NewService(c.Repositories().Users)
+	}
+}
+
+func (c *Client) loadPaymailsService() {
+	if c.options.paymails == nil {
+		c.options.paymails = paymails.NewService(c.Repositories().Paymails, c.UsersService())
+	}
+}
+
+func (c *Client) loadAddressesService() {
+	if c.options.addresses == nil {
+		c.options.addresses = addresses.NewService(c.Repositories().Addresses)
 	}
 }
 
@@ -287,10 +271,11 @@ func (c *Client) loadPaymailServer() (err error) {
 	var serviceProvider paymailserver.PaymailServiceProvider
 	if c.options.paymail.serverConfig.ExperimentalProvider {
 		paymailServiceLogger := c.Logger().With().Str("subservice", "paymail-service-provider").Logger()
-		serviceProvider = paymail.NewServiceProvider(
+		serviceProvider = paymailprovider.NewServiceProvider(
 			&paymailServiceLogger,
-			c.Repositories().Paymails,
-			c.Repositories().Users,
+			c.PaymailsService(),
+			c.UsersService(),
+			c.AddressesService(),
 			c.Chain(),
 			c.TransactionRecordService(),
 		)

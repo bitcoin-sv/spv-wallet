@@ -3,10 +3,12 @@ package config
 
 import (
 	"fmt"
+	"slices"
 	"time"
 
 	"github.com/bitcoin-sv/spv-wallet/engine/cluster"
 	"github.com/bitcoin-sv/spv-wallet/engine/datastore"
+	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/bitcoin-sv/spv-wallet/engine/taskmanager"
 	"github.com/mrz1836/go-cachestore"
 )
@@ -189,6 +191,16 @@ type PaymailConfig struct {
 	SenderValidationEnabled bool `json:"sender_validation_enabled" mapstructure:"sender_validation_enabled"`
 }
 
+// CheckDomain will check if the domain is allowed
+func (p *PaymailConfig) CheckDomain(domain string) error {
+	if p.DomainValidationEnabled {
+		if !slices.Contains(p.Domains, domain) {
+			return spverrors.ErrInvalidDomain
+		}
+	}
+	return nil
+}
+
 // BeefConfig consists of components required to use beef, e.g. Block Headers Service for merkle roots validation
 type BeefConfig struct {
 	// BlockHeadersServiceHeaderValidationURL is the URL for merkle roots validation in Block Headers Service.
@@ -243,8 +255,8 @@ type ExperimentalConfig struct {
 	PikePaymentEnabled bool `json:"pike_payment_enabled" mapstructure:"pike_payment_enabled"`
 	// Use junglebus external service to fetch missing source transactions for inputs
 	UseJunglebus bool `json:"use_junglebus" mapstructure:"use_junglebus"`
-	// NewTransactionFlowEnabled is a flag for enabling the new transaction flow
-	NewTransactionFlowEnabled bool `json:"new_transaction_flow_enabled" mapstructure:"new_transaction_flow_enabled"`
+	// V2 is a flag for enabling the new transaction flow
+	V2 bool `json:"new_transaction_flow_enabled" mapstructure:"new_transaction_flow_enabled"`
 }
 
 // GetUserAgent will return the outgoing user agent
