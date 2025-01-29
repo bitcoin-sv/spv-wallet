@@ -39,5 +39,5 @@ components:
             code:
               example: "error-user-not-found"
             message:
-                example: "user not found"
+              example: "user not found"
       additionalProperties: false
