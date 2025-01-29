@@ -78,6 +78,23 @@ func TestCreateTransactionOutlineBEEFError(t *testing.T) {
 			then.Created(tx).WithError(err).ThatIs(test.expectedError)
 		})
 	}
+
+	t.Run("return error when user has not enough funds", func(t *testing.T) {
+		given, then := testabilities.New(t)
+
+		// given:
+		service := given.NewTransactionOutlinesService()
+
+		// and:
+		given.UserHasNotEnoughFunds()
+
+		// when:
+		tx, err := service.CreateBEEF(context.Background(), given.MinimumValidTransactionSpec())
+
+		// then:
+		then.Created(tx).WithError(err).ThatIs(txerrors.ErrTxOutlineInsufficientFunds)
+
+	})
 }
 
 func TestCreateTransactionOutlineRAWError(t *testing.T) {

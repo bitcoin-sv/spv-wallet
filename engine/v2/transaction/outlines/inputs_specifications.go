@@ -1,6 +1,7 @@
 package outlines
 
 import (
+	"github.com/bitcoin-sv/go-sdk/chainhash"
 	sdk "github.com/bitcoin-sv/go-sdk/transaction"
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/bitcoin-sv/spv-wallet/engine/v2/transaction"
@@ -27,22 +28,22 @@ func (s *InputsSpec) evaluate(ctx *evaluationContext, outputs annotatedOutputs) 
 		return nil, txerrors.ErrTxOutlineInsufficientFunds
 	}
 
-	// inputs := make(annotatedInputs, len(utxos))
-	// for i, utxo := range utxos {
-	// 	txID, err := chainhash.NewHashFromHex(utxo.TxID)
-	// 	if err != nil {
-	// 		panic("TODO") // FIXME
-	// 	}
-	// 	inputs[i] = &annotatedInput{
-	// 		TransactionInput: &sdk.TransactionInput{
-	// 			SourceTXID:       txID,
-	// 			SourceTxOutIndex: utxo.Vout,
-	// 		},
-	// 		InputAnnotation: &transaction.InputAnnotation{},
-	// 	}
-	// }
+	inputs := make(annotatedInputs, len(utxos))
+	for i, utxo := range utxos {
+		txID, err := chainhash.NewHashFromHex(utxo.TxID)
+		if err != nil {
+			return nil, spverrors.Wrapf(err, "failed to parse source transaction ID")
+		}
+		inputs[i] = &annotatedInput{
+			TransactionInput: &sdk.TransactionInput{
+				SourceTXID:       txID,
+				SourceTxOutIndex: utxo.Vout,
+			},
+			InputAnnotation: &transaction.InputAnnotation{},
+		}
+	}
 
-	return nil, nil
+	return inputs, nil
 }
 
 type annotatedInputs []*annotatedInput

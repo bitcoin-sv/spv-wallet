@@ -56,7 +56,7 @@ func (s *service) CreateBEEF(ctx context.Context, spec *TransactionSpec) (*Trans
 		return nil, err
 	}
 
-	beef, err := tx.BEEFHex()
+	beef, err := s.formatAsBEEF(tx)
 	if err != nil {
 		return nil, spverrors.Wrapf(err, "failed to make BEEF format for transaction outline")
 	}
@@ -90,4 +90,12 @@ func (s *service) evaluateSpec(ctx context.Context, spec *TransactionSpec) (*sdk
 		return nil, transaction.Annotations{}, err
 	}
 	return tx, annotations, err
+}
+
+func (s *service) formatAsBEEF(tx *sdk.Transaction) (string, error) {
+	// FIXME: temporary solution to not fail on BEEF until we have service for collecting ancestors for inputs.
+	tmpTx := &sdk.Transaction{
+		Outputs: tx.Outputs,
+	}
+	return tmpTx.BEEFHex()
 }

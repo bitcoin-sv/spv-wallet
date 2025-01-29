@@ -200,6 +200,11 @@ func TestCreateOpReturnTransactionOutlineRAW(t *testing.T) {
 			// then:
 			thenTx := then.Created(tx).WithNoError(err).WithParseableRawHex()
 
+			thenTx.HasInputs(1)
+
+			thenTx.Input(0).
+				HasOutpoint(testabilities.UserFundsTransactionOutpoint)
+
 			thenTx.HasOutputs(1)
 
 			thenTx.Output(0).

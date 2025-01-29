@@ -7,6 +7,11 @@ import (
 	bsvmodel "github.com/bitcoin-sv/spv-wallet/models/bsv"
 )
 
+var UserFundsTransactionOutpoint = bsvmodel.Outpoint{
+	TxID: "a0000000001e1b81dd2c9c0c6cd67f9bdf832e9c2bb12a1d57f30cb6ebbe78d9",
+	Vout: 0,
+}
+
 type mockedUTXOSelector struct {
 	returnNothing bool
 }
