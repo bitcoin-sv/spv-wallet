@@ -1,0 +1,28 @@
+openapi: 3.0.0
+info:
+  title: SPV Wallet API responses
+  version: 1.0.0
+
+components:
+  schemas:
+    UserExampleResponse:
+      allOf:
+        - $ref: '#/components/schemas/CommonResponse'
+        - $ref: './models.yaml#/components/schemas/User'
+        - type: object
+          properties:
+            additionalPropertyExample:
+              type: string
+              description: The user model additional property example
+              example: "example"
+
+    CommonResponse:
+      type: object
+      required:
+        - timestamp
+      description: Common response object
+      properties:
+        timestamp:
+          type: string
+          format: date-time
+          nullable: false

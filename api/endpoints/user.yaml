@@ -25,7 +25,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '../components/models.yaml#/components/schemas/UserExampleResponse'
+                $ref: '../components/responses.yaml#/components/schemas/UserExampleResponse'
         401:
           $ref: "../components/errors.yaml#/components/responses/NotAuthorized"
 

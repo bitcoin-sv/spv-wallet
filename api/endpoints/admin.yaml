@@ -18,7 +18,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '../components/models.yaml#/components/schemas/AdminRequest'
+              $ref: "../components/requests.yaml#/components/schemas/AdminRequest"
       responses:
         200:
           description: Success

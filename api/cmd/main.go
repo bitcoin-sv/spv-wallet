@@ -11,11 +11,11 @@ import (
 )
 
 const (
-	templatePath = "cmd/template.yaml"
-	outputPath   = "gen.api.yaml"
+	templatePath = "../api/cmd/template.yaml"
+	outputPath   = "../api/gen.api.yaml"
 )
 
-var componentPaths = []string{"endpoints/base.yaml", "endpoints/user.yaml", "endpoints/admin.yaml"}
+var componentPaths = []string{"../api/endpoints/base.yaml", "../api/endpoints/user.yaml", "../api/endpoints/admin.yaml"}
 
 func main() {
 	loader := openapi3.NewLoader()

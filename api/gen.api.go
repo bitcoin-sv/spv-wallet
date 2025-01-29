@@ -12,14 +12,14 @@ import (
 	"github.com/oapi-codegen/runtime"
 )
 
-// ComponentsErrorsErrUserNotFound defines model for components_errors_ErrUserNotFound.
-type ComponentsErrorsErrUserNotFound struct {
+// ApiComponentsErrorsErrUserNotFound defines model for api_components_errors_ErrUserNotFound.
+type ApiComponentsErrorsErrUserNotFound struct {
 	Code    interface{} `json:"code"`
 	Message interface{} `json:"message"`
 }
 
-// ComponentsErrorsErrorSchema defines model for components_errors_ErrorSchema.
-type ComponentsErrorsErrorSchema struct {
+// ApiComponentsErrorsErrorSchema defines model for api_components_errors_ErrorSchema.
+type ApiComponentsErrorsErrorSchema struct {
 	// Code Error code
 	Code int32 `json:"code"`
 
@@ -27,19 +27,8 @@ type ComponentsErrorsErrorSchema struct {
 	Message string `json:"message"`
 }
 
-// ComponentsModelsAdminRequest defines model for components_models_AdminRequest.
-type ComponentsModelsAdminRequest struct {
-	// Id Example of admin request body
-	Id uint64 `json:"id"`
-}
-
-// ComponentsModelsCommonResponse Common response object
-type ComponentsModelsCommonResponse struct {
-	Timestamp time.Time `json:"timestamp"`
-}
-
-// ComponentsModelsUser defines model for components_models_User.
-type ComponentsModelsUser struct {
+// ApiComponentsModelsUser defines model for api_components_models_User.
+type ApiComponentsModelsUser struct {
 	// Id User ID
 	Id uint64 `json:"id"`
 
@@ -47,8 +36,19 @@ type ComponentsModelsUser struct {
 	Name string `json:"name"`
 }
 
-// ComponentsModelsUserExampleResponse defines model for components_models_UserExampleResponse.
-type ComponentsModelsUserExampleResponse struct {
+// ApiComponentsRequestsAdminRequest defines model for api_components_requests_AdminRequest.
+type ApiComponentsRequestsAdminRequest struct {
+	// Id Example of admin request body
+	Id uint64 `json:"id"`
+}
+
+// ApiComponentsResponsesCommonResponse Common response object
+type ApiComponentsResponsesCommonResponse struct {
+	Timestamp time.Time `json:"timestamp"`
+}
+
+// ApiComponentsResponsesUserExampleResponse defines model for api_components_responses_UserExampleResponse.
+type ApiComponentsResponsesUserExampleResponse struct {
 	// AdditionalPropertyExample The user model additional property example
 	AdditionalPropertyExample *string `json:"additionalPropertyExample,omitempty"`
 
@@ -60,11 +60,11 @@ type ComponentsModelsUserExampleResponse struct {
 	Timestamp time.Time `json:"timestamp"`
 }
 
-// ComponentsErrorsErrorUserNotFoundResponse defines model for components_errors_ErrorUserNotFoundResponse.
-type ComponentsErrorsErrorUserNotFoundResponse = ComponentsErrorsErrUserNotFound
+// ApiComponentsErrorsErrorUserNotFoundResponse defines model for api_components_errors_ErrorUserNotFoundResponse.
+type ApiComponentsErrorsErrorUserNotFoundResponse = ApiComponentsErrorsErrUserNotFound
 
 // GETAdminJSONRequestBody defines body for GETAdmin for application/json ContentType.
-type GETAdminJSONRequestBody = ComponentsModelsAdminRequest
+type GETAdminJSONRequestBody = ApiComponentsRequestsAdminRequest
 
 // ServerInterface represents all server handlers.
 type ServerInterface interface {
