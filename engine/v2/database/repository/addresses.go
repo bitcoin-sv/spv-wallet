@@ -6,8 +6,10 @@ import (
 	"slices"
 
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
+	"github.com/bitcoin-sv/spv-wallet/engine/utils"
 	"github.com/bitcoin-sv/spv-wallet/engine/v2/addresses/addressesmodels"
 	"github.com/bitcoin-sv/spv-wallet/engine/v2/database"
+	"github.com/bitcoin-sv/spv-wallet/models/bsv"
 	"gorm.io/datatypes"
 	"gorm.io/gorm"
 )
@@ -37,7 +39,7 @@ func (r *Addresses) Create(ctx context.Context, newAddress *addressesmodels.NewA
 }
 
 // FindByStringAddresses returns address rows from the database based on the provided iterator of string addresses.
-func (r *Addresses) FindByStringAddresses(ctx context.Context, addresses iter.Seq[string]) ([]*database.Address, error) {
+func (r *Addresses) FindByStringAddresses(ctx context.Context, addresses iter.Seq[string]) ([]addressesmodels.Address, error) {
 	var rows []*database.Address
 	if err := r.db.
 		WithContext(ctx).
@@ -47,5 +49,13 @@ func (r *Addresses) FindByStringAddresses(ctx context.Context, addresses iter.Se
 		return nil, spverrors.Wrapf(err, "failed to get addresses")
 	}
 
-	return rows, nil
+	return utils.MapSlice(rows, func(row *database.Address) addressesmodels.Address {
+		return addressesmodels.Address{
+			Address:            row.Address,
+			CreatedAt:          row.CreatedAt,
+			UpdatedAt:          row.UpdatedAt,
+			UserID:             row.UserID,
+			CustomInstructions: (bsv.CustomInstructions)(row.CustomInstructions),
+		}
+	}), nil
 }

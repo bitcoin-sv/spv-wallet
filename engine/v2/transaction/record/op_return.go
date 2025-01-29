@@ -2,7 +2,13 @@ package record
 
 import (
 	"github.com/bitcoin-sv/go-sdk/script"
+	trx "github.com/bitcoin-sv/go-sdk/transaction"
+	"github.com/bitcoin-sv/spv-wallet/conv"
+	"github.com/bitcoin-sv/spv-wallet/engine/v2/transaction"
 	"github.com/bitcoin-sv/spv-wallet/engine/v2/transaction/errors"
+	"github.com/bitcoin-sv/spv-wallet/engine/v2/transaction/txmodels"
+	"github.com/bitcoin-sv/spv-wallet/models/bsv"
+	"github.com/bitcoin-sv/spv-wallet/models/transaction/bucket"
 )
 
 func getDataFromOpReturn(lockingScript *script.Script) ([]byte, error) {
@@ -29,4 +35,36 @@ func getDataFromOpReturn(lockingScript *script.Script) ([]byte, error) {
 	}
 
 	return bytes, nil
+}
+
+func processDataOutputs(tx *trx.Transaction, userID string, annotations *transaction.Annotations) ([]txmodels.NewOutput, error) {
+	txID := tx.TxID().String()
+
+	var err error
+	var dataOutputs []txmodels.NewOutput //nolint: prealloc
+
+	for vout, annotation := range annotations.Outputs {
+		if annotation.Bucket != bucket.Data {
+			continue
+		}
+
+		if vout >= len(tx.Outputs) {
+			return nil, txerrors.ErrAnnotationIndexOutOfRange
+		}
+		outpoint := bsv.Outpoint{TxID: txID}
+		outpoint.Vout, err = conv.IntToUint32(vout)
+		if err != nil {
+			return nil, txerrors.ErrAnnotationIndexConversion.Wrap(err)
+		}
+
+		lockingScript := tx.Outputs[vout].LockingScript
+
+		data, err := getDataFromOpReturn(lockingScript)
+		if err != nil {
+			return nil, err
+		}
+		dataOutputs = append(dataOutputs, txmodels.NewOutputForData(outpoint, userID, data))
+	}
+
+	return dataOutputs, nil
 }

@@ -11,7 +11,7 @@ import (
 func (s *Service) RecordPaymailTransaction(ctx context.Context, tx *trx.Transaction, senderPaymail, receiverPaymail string) error {
 	flow := newTxFlow(ctx, s, tx)
 
-	trackedOutputs, err := flow.getFromInputs()
+	trackedOutputs, err := flow.processInputs()
 	if err != nil {
 		return err
 	}
@@ -21,10 +21,8 @@ func (s *Service) RecordPaymailTransaction(ctx context.Context, tx *trx.Transact
 		if len(flow.operations) > 1 {
 			return spverrors.Newf("paymail transaction with multiple senders is not supported")
 		}
-		operation.subtract(utxo.Satoshis)
+		operation.Subtract(utxo.Satoshis)
 	}
-
-	flow.spendInputs(trackedOutputs)
 
 	p2pkhOutputs, err := flow.findRelevantP2PKHOutputs()
 	if err != nil {
@@ -32,12 +30,12 @@ func (s *Service) RecordPaymailTransaction(ctx context.Context, tx *trx.Transact
 	}
 
 	for outputData := range p2pkhOutputs {
-		operation := flow.operationOfUser(outputData.userID, "incoming", senderPaymail)
+		operation := flow.operationOfUser(outputData.UserID, "incoming", senderPaymail)
 		if len(flow.operations) > 2 {
 			return spverrors.Newf("paymail transaction with multiple receivers is not supported")
 		}
-		operation.add(outputData.satoshis)
-		flow.createP2PKHOutput(outputData)
+		operation.Add(outputData.Satoshis)
+		flow.addOutputs(outputData)
 	}
 
 	if err = flow.verify(); err != nil {

@@ -22,19 +22,32 @@ func givenTXWithOpReturn(t *testing.T) fixtures.GivenTXSpec {
 }
 
 func TestOutlinesRecordOpReturn(t *testing.T) {
+	// given:
+	givenForAllTests := testabilities.Given(t)
+	cleanup := givenForAllTests.StartedSPVWalletWithConfiguration(
+		testengine.WithV2(),
+	)
+	defer cleanup()
+
+	// and:
+	ownedTransaction := givenForAllTests.Faucet(fixtures.Sender).TopUp(1000)
+
+	// and:
+	txSpec := fixtures.GivenTX(t).
+		WithSender(fixtures.Sender).
+		WithInputFromUTXO(ownedTransaction.TX(), 0).
+		WithOPReturn(dataOfOpReturnTx)
+
 	t.Run("Record op_return data", func(t *testing.T) {
 		// given:
-		given, then := testabilities.New(t)
-		cleanup := given.StartedSPVWalletWithConfiguration(testengine.WithV2())
-		defer cleanup()
+		given, then := testabilities.NewOf(givenForAllTests, t)
 
 		// and:
 		client := given.HttpClient().ForUser()
 
 		// and:
-		txSpec := givenTXWithOpReturn(t)
 		request := `{
-			"beef": "` + txSpec.BEEF() + `",
+			"hex": "` + txSpec.BEEF() + `",
 			"annotations": {
 				"outputs": {
 					"0": {
@@ -57,7 +70,48 @@ func TestOutlinesRecordOpReturn(t *testing.T) {
 			Post(transactionsOutlinesRecordURL)
 
 		// then:
-		then.Response(res).IsOK()
+		then.Response(res).
+			HasStatus(201).
+			WithJSONMatching(`{
+				"txID": "{{ .txID }}"
+			}`, map[string]any{
+				"txID": txSpec.ID(),
+			})
+	})
+
+	t.Run("get operations", func(t *testing.T) {
+		// given:
+		given, then := testabilities.NewOf(givenForAllTests, t)
+
+		// and:
+		client := given.HttpClient().ForUser()
+
+		// when:
+		res, _ := client.R().Get("/api/v2/operations/search")
+
+		// then:
+		then.Response(res).IsOK().WithJSONMatching(`{
+			"content": [
+				{
+					"txID": "{{ .txID }}",
+					"createdAt": "{{ matchTimestamp }}",
+					"value": {{ .value }},
+					"type": "outgoing",
+					"counterparty": "{{ .sender }}"
+				},
+				{{ anything }}
+			],
+			"page": {
+			    "number": 1,
+			    "size": 2,
+			    "totalElements": 2,
+			    "totalPages": 1
+			}
+		}`, map[string]any{
+			"value":  -1000,
+			"txID":   txSpec.ID(),
+			"sender": "",
+		})
 	})
 }
 
@@ -78,7 +132,7 @@ func TestOutlinesRecordOpReturnErrorCases(t *testing.T) {
 	}{
 		"RecordTransactionOutline for not signed transaction": {
 			request: `{
-				"beef": "` + givenUnsignedTX.BEEF() + `"
+				"hex": "` + givenUnsignedTX.BEEF() + `"
 			}`,
 			expectHttpCode: 400,
 			expectedErr:    apierror.ExpectedJSON("error-transaction-validation", "transaction validation failed"),
@@ -106,7 +160,7 @@ func TestOutlinesRecordOpReturnErrorCases(t *testing.T) {
 		},
 		"no-op_return output annotated as data": {
 			request: `{
-				"beef": "` + givenTxWithP2PKHOutput.BEEF() + `",
+				"hex": "` + givenTxWithP2PKHOutput.BEEF() + `",
 				"annotations": {
 					"outputs": {
 						"0": {
@@ -153,7 +207,7 @@ func TestOutlinesRecordOpReturnOnBroadcastError(t *testing.T) {
 	// and:
 	txSpec := givenTXWithOpReturn(t)
 	request := `{
-			"beef": "` + txSpec.BEEF() + `",
+			"hex": "` + txSpec.BEEF() + `",
 			"annotations": {
 				"outputs": {
 					"0": {

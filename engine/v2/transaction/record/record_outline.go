@@ -3,42 +3,41 @@ package record
 import (
 	"context"
 
-	trx "github.com/bitcoin-sv/go-sdk/transaction"
-	"github.com/bitcoin-sv/spv-wallet/conv"
-	"github.com/bitcoin-sv/spv-wallet/engine/v2/database"
-	"github.com/bitcoin-sv/spv-wallet/engine/v2/transaction"
+	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/bitcoin-sv/spv-wallet/engine/v2/transaction/errors"
 	"github.com/bitcoin-sv/spv-wallet/engine/v2/transaction/outlines"
-	"github.com/bitcoin-sv/spv-wallet/models/transaction/bucket"
+	"github.com/bitcoin-sv/spv-wallet/engine/v2/transaction/txmodels"
 )
 
 // RecordTransactionOutline will validate, broadcast and save a transaction outline
-func (s *Service) RecordTransactionOutline(ctx context.Context, userID string, outline *outlines.Transaction) error {
-	tx, err := trx.NewTransactionFromBEEFHex(outline.BEEF)
+func (s *Service) RecordTransactionOutline(ctx context.Context, userID string, outline *outlines.Transaction) (*txmodels.RecordedOutline, error) {
+	if outline.Hex.IsRawTx() {
+		return nil, spverrors.Newf("not implemented recording outline with raw transaction")
+	}
+
+	tx, err := outline.Hex.ToBEEFTransaction()
 	if err != nil {
-		return txerrors.ErrTxValidation.Wrap(err)
+		return nil, txerrors.ErrTxValidation.Wrap(err)
 	}
 
 	flow := newTxFlow(ctx, s, tx)
 	if err = flow.verifyScripts(); err != nil {
-		return err
+		return nil, err
 	}
 
-	trackedOutputs, err := flow.getFromInputs()
+	trackedOutputs, err := flow.processInputs()
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	for _, utxo := range trackedOutputs {
 		operation := flow.operationOfUser(utxo.UserID, "outgoing", "")
-		operation.subtract(utxo.Satoshis)
+		operation.Subtract(utxo.Satoshis)
 	}
 
-	flow.spendInputs(trackedOutputs)
-
-	newDataRecords, err := s.processDataOutputs(tx, &outline.Annotations)
+	newDataRecords, err := processDataOutputs(tx, userID, &outline.Annotations)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	// TODO: getOutputsForTrackedAddresses
@@ -46,49 +45,22 @@ func (s *Service) RecordTransactionOutline(ctx context.Context, userID string, o
 
 	if len(newDataRecords) > 0 {
 		_ = flow.operationOfUser(userID, "data", "")
-		flow.createDataOutputs(userID, newDataRecords...)
+		flow.addOutputs(newDataRecords...)
 	}
 
 	if err = flow.verify(); err != nil {
-		return err
+		return nil, err
 	}
 
 	if err = flow.broadcast(); err != nil {
-		return err
+		return nil, err
 	}
 
-	return flow.save()
-}
-
-func (s *Service) processDataOutputs(tx *trx.Transaction, annotations *transaction.Annotations) ([]*database.Data, error) {
-	txID := tx.TxID().String()
-
-	var dataRecords []*database.Data //nolint: prealloc
-
-	for vout, annotation := range annotations.Outputs {
-		if vout >= len(tx.Outputs) {
-			return nil, txerrors.ErrAnnotationIndexOutOfRange
-		}
-		voutU32, err := conv.IntToUint32(vout)
-		if err != nil {
-			return nil, txerrors.ErrAnnotationIndexConversion.Wrap(err)
-		}
-		lockingScript := tx.Outputs[vout].LockingScript
-
-		if annotation.Bucket != bucket.Data {
-			continue
-		}
-
-		data, err := getDataFromOpReturn(lockingScript)
-		if err != nil {
-			return nil, err
-		}
-		dataRecords = append(dataRecords, &database.Data{
-			TxID: txID,
-			Vout: voutU32,
-			Blob: data,
-		})
+	if err = flow.save(); err != nil {
+		return nil, err
 	}
 
-	return dataRecords, nil
+	return &txmodels.RecordedOutline{
+		TxID: tx.TxID().String(),
+	}, nil
 }

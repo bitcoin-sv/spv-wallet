@@ -26,7 +26,7 @@ func transactionOutlines(c *gin.Context, userCtx *reqctx.UserContext) {
 	}
 
 	spec := mapping.TransactionRequestToOutline(&requestBody, userID)
-	txOutline, err := reqctx.Engine(c).TransactionOutlinesService().Create(c, spec)
+	txOutline, err := reqctx.Engine(c).TransactionOutlinesService().CreateBEEF(c, spec)
 	if err != nil {
 		spverrors.ErrorResponse(c, err, logger)
 		return

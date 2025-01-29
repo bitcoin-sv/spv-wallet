@@ -3,6 +3,7 @@ package outlines
 import (
 	"context"
 
+	"github.com/bitcoin-sv/spv-wallet/engine/v2/bsv"
 	"github.com/bitcoin-sv/spv-wallet/engine/v2/transaction"
 )
 
@@ -14,11 +15,11 @@ type PaymailAddressService interface {
 
 // Service is a service for creating transaction outlines.
 type Service interface {
-	Create(ctx context.Context, spec *TransactionSpec) (*Transaction, error)
+	CreateBEEF(ctx context.Context, spec *TransactionSpec) (*Transaction, error)
 }
 
 // Transaction represents a transaction outline.
 type Transaction struct {
-	BEEF        string
+	Hex         bsv.TxHex
 	Annotations transaction.Annotations
 }

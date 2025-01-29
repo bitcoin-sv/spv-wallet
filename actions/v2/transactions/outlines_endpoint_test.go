@@ -27,7 +27,8 @@ func TestPOSTTransactionOutlines(t *testing.T) {
 			  ]
 			}`,
 			response: `{
-			  "beef": "0100beef000100000000000100000000000000000e006a04736f6d65012004646174610000000000",
+			  "hex": "0100beef000100000000000100000000000000000e006a04736f6d65012004646174610000000000",
+			  "format": "BEEF",
 			  "annotations": {
 				"outputs": {
 					"0": {
@@ -48,7 +49,8 @@ func TestPOSTTransactionOutlines(t *testing.T) {
 			  ]
 			}`,
 			response: `{
-			  "beef": "0100beef000100000000000100000000000000000e006a04736f6d65012004646174610000000000",
+			  "hex": "0100beef000100000000000100000000000000000e006a04736f6d65012004646174610000000000",
+			  "format": "BEEF",
 			  "annotations": {
 				"outputs": {
 					"0": {
@@ -69,7 +71,8 @@ func TestPOSTTransactionOutlines(t *testing.T) {
 			  ]
 			}`,
 			response: `{
-			  "beef": "0100beef000100000000000100000000000000000e006a04736f6d65012004646174610000000000",
+			  "hex": "0100beef000100000000000100000000000000000e006a04736f6d65012004646174610000000000",
+			  "format": "BEEF",
 			  "annotations": {
 				"outputs": {
 					"0": {
@@ -90,7 +93,8 @@ func TestPOSTTransactionOutlines(t *testing.T) {
 			  ]
 			}`, fixtures.RecipientExternal.DefaultPaymail()),
 			response: fmt.Sprintf(`{
-			  "beef": "0100beef0001000000000001e8030000000000001976a9143e2d1d795f8acaa7957045cc59376177eb04a3c588ac0000000000",
+			  "hex": "0100beef0001000000000001e8030000000000001976a9143e2d1d795f8acaa7957045cc59376177eb04a3c588ac0000000000",
+			  "format": "BEEF",
 			  "annotations": {
 				"outputs": {
 				  "0": {
@@ -122,7 +126,8 @@ func TestPOSTTransactionOutlines(t *testing.T) {
 				fixtures.Sender.DefaultPaymail(),
 			),
 			response: fmt.Sprintf(`{
-			  "beef": "0100beef0001000000000001e8030000000000001976a9143e2d1d795f8acaa7957045cc59376177eb04a3c588ac0000000000",
+			  "hex": "0100beef0001000000000001e8030000000000001976a9143e2d1d795f8acaa7957045cc59376177eb04a3c588ac0000000000",
+			  "format": "BEEF",
 			  "annotations": {
 				"outputs": {
 				  "0": {
@@ -158,7 +163,8 @@ func TestPOSTTransactionOutlines(t *testing.T) {
 				fixtures.Sender.DefaultPaymail(),
 			),
 			response: fmt.Sprintf(`{
-			  "beef": "0100beef0001000000000002e8030000000000001976a9143e2d1d795f8acaa7957045cc59376177eb04a3c588ac00000000000000000e006a04736f6d65012004646174610000000000",
+			  "hex": "0100beef0001000000000002e8030000000000001976a9143e2d1d795f8acaa7957045cc59376177eb04a3c588ac00000000000000000e006a04736f6d65012004646174610000000000",
+			  "format": "BEEF",
 			  "annotations": {
 				"outputs": {
 				  "0": {
