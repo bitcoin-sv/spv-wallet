@@ -2,29 +2,23 @@ package dbquery
 
 import (
 	"context"
+	"github.com/bitcoin-sv/spv-wallet/models"
 	"strings"
 
 	"github.com/bitcoin-sv/spv-wallet/conv"
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/bitcoin-sv/spv-wallet/models/filter"
-	"github.com/bitcoin-sv/spv-wallet/models/response"
 	"gorm.io/gorm"
 )
 
-// PagedResult is a generic struct for paginated results.
-type PagedResult[T any] struct {
-	Content         []*T
-	PageDescription response.PageDescription
-}
-
 // PaginatedQuery is a generic function for getting paginated results from a database.
-func PaginatedQuery[T any](ctx context.Context, page filter.Page, db *gorm.DB, queryFunc func(tx *gorm.DB) *gorm.DB) (*PagedResult[T], error) {
+func PaginatedQuery[T any](ctx context.Context, page filter.Page, db *gorm.DB, scopes ...func(tx *gorm.DB) *gorm.DB) (*models.PagedResult[T], error) {
 	PageWithDefaults(&page)
-	model := PagedResult[T]{}
+	model := models.PagedResult[T]{}
 	var modelType T
 	var totalElements int64
 	err := db.WithContext(ctx).Transaction(func(tx *gorm.DB) error {
-		query := tx.Model(&modelType).Scopes(queryFunc)
+		query := tx.Model(&modelType).Scopes(scopes...)
 
 		if err := query.
 			Scopes(Paginate(page)).

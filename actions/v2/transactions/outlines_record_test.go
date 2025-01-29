@@ -97,7 +97,8 @@ func TestOutlinesRecordOpReturn(t *testing.T) {
 					"createdAt": "{{ matchTimestamp }}",
 					"value": {{ .value }},
 					"type": "outgoing",
-					"counterparty": "{{ .sender }}"
+					"counterparty": "{{ .sender }}",
+					"txStatus": "BROADCASTED"
 				},
 				{{ anything }}
 			],
