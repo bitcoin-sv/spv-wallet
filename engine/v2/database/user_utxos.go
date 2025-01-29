@@ -31,15 +31,20 @@ type UserUTXO struct {
 	CustomInstructions datatypes.JSONSlice[bsv.CustomInstruction]
 }
 
-// NewP2PKHUserUTXO creates a new UserUTXO instance for a P2PKH output based on the given output and custom instructions.
-func NewP2PKHUserUTXO(output *TrackedOutput, customInstructions datatypes.JSONSlice[bsv.CustomInstruction]) *UserUTXO {
+// NewUTXO creates a new UserUTXO from the given TrackedOutput and additional data.
+func NewUTXO(
+	output *TrackedOutput,
+	bucket string,
+	estimatedInputSize uint64,
+	customInstructions bsv.CustomInstructions,
+) *UserUTXO {
 	return &UserUTXO{
 		UserID:             output.UserID,
 		TxID:               output.TxID,
 		Vout:               output.Vout,
 		Satoshis:           uint64(output.Satoshis),
-		EstimatedInputSize: EstimatedInputSizeForP2PKH,
-		Bucket:             "bsv",
-		CustomInstructions: customInstructions,
+		EstimatedInputSize: estimatedInputSize,
+		Bucket:             bucket,
+		CustomInstructions: datatypes.NewJSONSlice(customInstructions),
 	}
 }
