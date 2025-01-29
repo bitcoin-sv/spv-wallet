@@ -464,3 +464,6 @@ var ErrMissingXPubID = models.SPVError{Message: "missing xpub_id", StatusCode: 4
 
 // ErrDataNotFound is when data record cannot be found
 var ErrDataNotFound = models.SPVError{Message: "data not found", StatusCode: 404, Code: "error-data-not-found"}
+
+// ErrInvalidDataID is when data id is invalid
+var ErrInvalidDataID = models.SPVError{Message: "invalid data id", StatusCode: 400, Code: "error-invalid-data-id"}
