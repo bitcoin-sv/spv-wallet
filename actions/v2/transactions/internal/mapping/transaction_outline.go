@@ -3,6 +3,7 @@ package mapping
 import (
 	"maps"
 
+	"github.com/bitcoin-sv/spv-wallet/engine/v2/bsv"
 	"github.com/bitcoin-sv/spv-wallet/engine/v2/transaction"
 	"github.com/bitcoin-sv/spv-wallet/engine/v2/transaction/outlines"
 	"github.com/bitcoin-sv/spv-wallet/models/request"
@@ -11,7 +12,7 @@ import (
 // TransactionOutline maps request's AnnotatedTransaction to outlines.Transaction.
 func TransactionOutline(req *request.AnnotatedTransaction) *outlines.Transaction {
 	return &outlines.Transaction{
-		BEEF: req.BEEF,
+		Hex: bsv.TxHex(req.Hex),
 		Annotations: transaction.Annotations{
 			Outputs: maps.Collect(func(yield func(int, *transaction.OutputAnnotation) bool) {
 				if req.Annotations == nil || len(req.Annotations.Outputs) == 0 {

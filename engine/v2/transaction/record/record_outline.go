@@ -3,7 +3,7 @@ package record
 import (
 	"context"
 
-	trx "github.com/bitcoin-sv/go-sdk/transaction"
+	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/bitcoin-sv/spv-wallet/engine/v2/transaction/errors"
 	"github.com/bitcoin-sv/spv-wallet/engine/v2/transaction/outlines"
 	"github.com/bitcoin-sv/spv-wallet/engine/v2/transaction/txmodels"
@@ -11,7 +11,11 @@ import (
 
 // RecordTransactionOutline will validate, broadcast and save a transaction outline
 func (s *Service) RecordTransactionOutline(ctx context.Context, userID string, outline *outlines.Transaction) (*txmodels.RecordedOutline, error) {
-	tx, err := trx.NewTransactionFromBEEFHex(outline.BEEF)
+	if outline.Hex.IsRawTx() {
+		return nil, spverrors.Newf("not implemented recording outline with raw transaction")
+	}
+
+	tx, err := outline.Hex.ToBEEFTransaction()
 	if err != nil {
 		return nil, txerrors.ErrTxValidation.Wrap(err)
 	}

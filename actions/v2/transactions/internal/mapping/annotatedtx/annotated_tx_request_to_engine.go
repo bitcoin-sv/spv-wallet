@@ -3,6 +3,7 @@ package annotatedtx
 import (
 	"maps"
 
+	"github.com/bitcoin-sv/spv-wallet/engine/v2/bsv"
 	"github.com/bitcoin-sv/spv-wallet/engine/v2/transaction"
 	"github.com/bitcoin-sv/spv-wallet/engine/v2/transaction/outlines"
 	model "github.com/bitcoin-sv/spv-wallet/models/transaction"
@@ -14,7 +15,7 @@ type Request model.AnnotatedTransaction
 // ToEngine converts a request model to the engine model.
 func (req Request) ToEngine() *outlines.Transaction {
 	return &outlines.Transaction{
-		BEEF: req.BEEF,
+		Hex: bsv.TxHex(req.Hex),
 		Annotations: transaction.Annotations{
 			Outputs: maps.Collect(func(yield func(int, *transaction.OutputAnnotation) bool) {
 				if req.Annotations == nil || len(req.Annotations.Outputs) == 0 {
