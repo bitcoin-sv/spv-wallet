@@ -24,6 +24,7 @@ type ErrorCreationTransactionOutlineAssertion interface {
 
 type SuccessfullyCreatedTransactionOutlineAssertion interface {
 	WithParseableBEEFHex() WithParseableBEEFTransactionOutlineAssertion
+	WithParseableRawHex() WithParseableBEEFTransactionOutlineAssertion
 }
 
 type WithParseableBEEFTransactionOutlineAssertion interface {
@@ -79,7 +80,17 @@ func (a *assertion) WithParseableBEEFHex() WithParseableBEEFTransactionOutlineAs
 
 	var err error
 	a.tx, err = a.txOutline.Hex.ToBEEFTransaction()
-	a.require.NoErrorf(err, "Invalid Hex hex: %s", a.txOutline.Hex)
+	a.require.NoErrorf(err, "Invalid BEEF hex: %s", a.txOutline.Hex)
+	return a
+}
+
+func (a *assertion) WithParseableRawHex() WithParseableBEEFTransactionOutlineAssertion {
+	a.t.Helper()
+	a.t.Logf("Hex: %s", a.txOutline.Hex)
+
+	var err error
+	a.tx, err = a.txOutline.Hex.ToRawTransaction()
+	a.require.NoErrorf(err, "Invalid Raw hex: %s", a.txOutline.Hex)
 	return a
 }
 

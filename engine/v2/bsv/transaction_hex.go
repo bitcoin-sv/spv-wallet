@@ -28,6 +28,13 @@ func (h TxHex) ToBEEFTransaction() (*transaction.Transaction, error) {
 	return transaction.NewTransactionFromBEEFHex(string(h)) //nolint:wrapcheck // we will handle this error in upper layers
 }
 
+func (h TxHex) ToRawTransaction() (*transaction.Transaction, error) {
+	if !h.IsRawTx() {
+		return nil, spverrors.Newf("transaction hex is not a raw hex")
+	}
+	return transaction.NewTransactionFromHex(string(h)) //nolint:wrapcheck // we will handle this error in upper layers
+}
+
 // Format returns the name of the format of the transaction hex.
 func (h TxHex) Format() string {
 	if h.IsBEEF() {

@@ -11,7 +11,7 @@ import (
 	"github.com/bitcoin-sv/spv-wallet/models"
 )
 
-func TestCreateBEEFTransactionOutlineError(t *testing.T) {
+func TestCreateTransactionOutlineBEEFError(t *testing.T) {
 	errorTests := map[string]struct {
 		spec          *outlines.TransactionSpec
 		expectedError models.SPVError
@@ -52,7 +52,7 @@ func TestCreateBEEFTransactionOutlineError(t *testing.T) {
 	}
 }
 
-func TestCreateRawTransactionOutlineError(t *testing.T) {
+func TestCreateTransactionOutlineRAWError(t *testing.T) {
 	errorTests := map[string]struct {
 		spec          *outlines.TransactionSpec
 		expectedError models.SPVError
@@ -85,7 +85,7 @@ func TestCreateRawTransactionOutlineError(t *testing.T) {
 			service := given.NewTransactionOutlinesService()
 
 			// when:
-			tx, err := service.CreateBEEF(context.Background(), test.spec)
+			tx, err := service.CreateRawTx(context.Background(), test.spec)
 
 			// then:
 			then.Created(tx).WithError(err).ThatIs(test.expectedError)

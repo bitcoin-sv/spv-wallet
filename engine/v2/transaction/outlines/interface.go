@@ -16,6 +16,7 @@ type PaymailAddressService interface {
 // Service is a service for creating transaction outlines.
 type Service interface {
 	CreateBEEF(ctx context.Context, spec *TransactionSpec) (*Transaction, error)
+	CreateRawTx(ctx context.Context, spec *TransactionSpec) (*Transaction, error)
 }
 
 // Transaction represents a transaction outline.
