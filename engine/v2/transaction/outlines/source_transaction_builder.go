@@ -15,11 +15,6 @@ type TxQueryResult struct {
 	BeefHex    *string // BEEF-formatted transaction.
 }
 
-// IsZero checks if the TxQueryResult is uninitialized.
-func (tx TxQueryResult) IsZero() bool {
-	return tx == TxQueryResult{}
-}
-
 // IsBeef checks if the TxQueryResult contains a BEEF-formatted transaction.
 func (tx TxQueryResult) IsBeef() bool {
 	return tx.BeefHex != nil
@@ -62,7 +57,7 @@ func (m SourceTxMap) Value(id string) SourceTx {
 
 // Add adds a TxQueryResult to the SourceTxMap after parsing it.
 func (m SourceTxMap) Add(q *TxQueryResult) error {
-	if q == nil || q.IsZero() {
+	if q == nil {
 		return nil
 	}
 
