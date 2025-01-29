@@ -46,14 +46,18 @@ func transactionRequestOutputsToOutline(val request.Output, _ int) outlines.Outp
 }
 
 func outlineOutputToResponse(from *transaction.OutputAnnotation, _ int) *model.OutputAnnotation {
-	return &model.OutputAnnotation{
+	outputAnnotation := &model.OutputAnnotation{
 		Bucket: from.Bucket,
-		Paymail: &model.PaymailAnnotation{
+	}
+	if from.Paymail != nil {
+		outputAnnotation.Paymail = &model.PaymailAnnotation{
+			Sender:    from.Paymail.Sender,
 			Receiver:  from.Paymail.Receiver,
 			Reference: from.Paymail.Reference,
-			Sender:    from.Paymail.Sender,
-		},
+		}
 	}
+
+	return outputAnnotation
 }
 
 func outputSpecFromRequest(req request.Output) (outlines.OutputSpec, error) {
