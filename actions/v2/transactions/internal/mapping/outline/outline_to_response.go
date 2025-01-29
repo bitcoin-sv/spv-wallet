@@ -10,7 +10,7 @@ import (
 // ToResponse converts a transaction outline to a response model.
 func ToResponse(tx *outlines.Transaction) (*model.AnnotatedTransaction, error) {
 	res := &model.AnnotatedTransaction{
-		Format: tx.Hex.Format(),
+		Format: string(tx.Hex.Format()),
 	}
 	err := mapstructure.Decode(tx, res)
 	if err != nil {
