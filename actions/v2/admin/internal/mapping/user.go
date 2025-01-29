@@ -20,7 +20,7 @@ func UserToResponse(u *usersmodels.User) adminresponse.User {
 // UsersPaymailToResponse maps a user's paymail to a response
 func UsersPaymailToResponse(p *usersmodels.Paymail, _ int) adminresponse.Paymail {
 	return adminresponse.Paymail{
-		// ID:         p.ID,
+		ID:         p.ID,
 		Alias:      p.Alias,
 		Domain:     p.Domain,
 		Paymail:    p.Alias + "@" + p.Domain,
