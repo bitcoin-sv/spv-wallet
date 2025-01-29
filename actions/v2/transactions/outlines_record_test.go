@@ -128,10 +128,9 @@ func TestOutlinesRecordOpReturn(t *testing.T) {
 		// when:
 		res, _ := client.R().
 			SetPathParams(map[string]string{
-				"txID": txSpec.ID(),
-				"vout": "0",
+				"id": outpoint.String(),
 			}).
-			Get("/api/v2/data/{txID}-{vout}")
+			Get("/api/v2/data/{id}")
 
 		// then:
 		then.Response(res).

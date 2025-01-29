@@ -3,6 +3,7 @@ package repository
 import (
 	"context"
 	"errors"
+	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 
 	"github.com/bitcoin-sv/spv-wallet/engine/v2/data/datamodels"
 	"github.com/bitcoin-sv/spv-wallet/engine/v2/database"
@@ -23,7 +24,12 @@ func NewDataRepo(db *gorm.DB) *Data {
 }
 
 // FindForUser returns the data by outpoint for a specific user.
-func (r *Data) FindForUser(ctx context.Context, outpoint bsv.Outpoint, userID string) (*datamodels.Data, error) {
+func (r *Data) FindForUser(ctx context.Context, id string, userID string) (*datamodels.Data, error) {
+	outpoint, err := bsv.OutpointFromString(id)
+	if err != nil {
+		return nil, spverrors.Wrapf(err, "failed to parse Data ID to outpoint")
+	}
+
 	var row database.Data
 	if err := r.db.WithContext(ctx).
 		Where("tx_id = ? AND vout = ? AND user_id = ?", outpoint.TxID, outpoint.Vout, userID).

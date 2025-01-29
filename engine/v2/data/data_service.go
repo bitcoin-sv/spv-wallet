@@ -5,7 +5,6 @@ import (
 
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/bitcoin-sv/spv-wallet/engine/v2/data/datamodels"
-	"github.com/bitcoin-sv/spv-wallet/models/bsv"
 )
 
 // Service is the domain service for data.
@@ -21,8 +20,8 @@ func NewService(dataRepo Repo) *Service {
 }
 
 // FindForUser returns the data by outpoint for a specific user.
-func (s *Service) FindForUser(ctx context.Context, outpoint bsv.Outpoint, userID string) (*datamodels.Data, error) {
-	item, err := s.dataRepo.FindForUser(ctx, outpoint, userID)
+func (s *Service) FindForUser(ctx context.Context, id string, userID string) (*datamodels.Data, error) {
+	item, err := s.dataRepo.FindForUser(ctx, id, userID)
 	if err != nil {
 		return nil, spverrors.Wrapf(err, "failed to find data for user %s", userID)
 	}
