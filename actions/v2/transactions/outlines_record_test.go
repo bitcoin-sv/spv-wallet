@@ -140,14 +140,14 @@ func TestOutlinesRecordOpReturnErrorCases(t *testing.T) {
 		},
 		"RecordTransactionOutline for not a BEEF hex": {
 			request: `{
-				"beef": "0b3818c665bf28a46""
+				"hex": "0b3818c665bf28a46""
 			}`,
 			expectHttpCode: 400,
 			expectedErr:    apierror.ExpectedJSON("error-bind-body-invalid", "cannot bind request body"),
 		},
 		"Vout out index as invalid number": {
 			request: `{
-				"beef": "` + givenTXWithOpReturn(t).BEEF() + `"
+				"hex": "` + givenTXWithOpReturn(t).BEEF() + `"
 				"annotations": {
 					"outputs": {
 						"invalid-number": {
@@ -200,7 +200,7 @@ func TestOutlinesRecordOpReturnOnBroadcastError(t *testing.T) {
 	// given:
 	txSpec := givenTXWithOpReturn(t)
 	request := `{
-		"beef": "` + txSpec.BEEF() + `",
+		"hex": "` + txSpec.BEEF() + `",
 		"annotations": {
 			"outputs": {
 				"0": {
