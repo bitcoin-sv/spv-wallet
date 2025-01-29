@@ -22,20 +22,27 @@ func OutpointFromString(s string) (Outpoint, error) {
 	if s == "" {
 		return Outpoint{}, fmt.Errorf("empty string")
 	}
+
 	var txID string
 	var voutTmp int
-	var vout uint32
 	n, err := fmt.Sscanf(s, "%64s-%d", &txID, &voutTmp)
+	if err != nil {
+		return Outpoint{}, fmt.Errorf("invalid outpoint format: %w", err)
+	} else if n != 2 {
+		return Outpoint{}, fmt.Errorf("invalid outpoint format")
+	}
+
+	vout, err := toUint32(voutTmp)
 	if err != nil {
 		return Outpoint{}, err
 	}
-	if n != 2 {
-		return Outpoint{}, fmt.Errorf("invalid outpoint format")
-	}
-	if voutTmp < 0 || voutTmp > math.MaxUint32 {
-		return Outpoint{}, fmt.Errorf("invalid vout")
-	}
-	vout = uint32(voutTmp)
 
 	return Outpoint{TxID: txID, Vout: vout}, nil
+}
+
+func toUint32(value int) (uint32, error) {
+	if value < 0 || value > math.MaxUint32 {
+		return 0, fmt.Errorf("invalid vout")
+	}
+	return uint32(value), nil
 }

@@ -3,22 +3,26 @@ package repository
 import (
 	"context"
 	"errors"
+
 	"github.com/bitcoin-sv/spv-wallet/engine/v2/data/datamodels"
 	"github.com/bitcoin-sv/spv-wallet/engine/v2/database"
 	"github.com/bitcoin-sv/spv-wallet/models/bsv"
 	"gorm.io/gorm"
 )
 
+// Data is a repository for data.
 type Data struct {
 	db *gorm.DB
 }
 
+// NewDataRepo creates a new instance of the data repository.
 func NewDataRepo(db *gorm.DB) *Data {
 	return &Data{
 		db: db,
 	}
 }
 
+// FindForUser returns the data by outpoint for a specific user.
 func (r *Data) FindForUser(ctx context.Context, outpoint bsv.Outpoint, userID string) (*datamodels.Data, error) {
 	var row database.Data
 	if err := r.db.WithContext(ctx).

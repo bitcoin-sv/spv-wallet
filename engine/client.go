@@ -2,7 +2,6 @@ package engine
 
 import (
 	"context"
-	"github.com/bitcoin-sv/spv-wallet/engine/v2/data"
 	"time"
 
 	"github.com/bitcoin-sv/go-paymail"
@@ -18,6 +17,7 @@ import (
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/bitcoin-sv/spv-wallet/engine/taskmanager"
 	"github.com/bitcoin-sv/spv-wallet/engine/v2/addresses"
+	"github.com/bitcoin-sv/spv-wallet/engine/v2/data"
 	"github.com/bitcoin-sv/spv-wallet/engine/v2/database/repository"
 	"github.com/bitcoin-sv/spv-wallet/engine/v2/paymails"
 	"github.com/bitcoin-sv/spv-wallet/engine/v2/transaction/outlines"
@@ -364,6 +364,7 @@ func (c *Client) AddressesService() *addresses.Service {
 	return c.options.addresses
 }
 
+// DataService will return the data domain service
 func (c *Client) DataService() *data.Service {
 	return c.options.data
 }

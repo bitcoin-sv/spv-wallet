@@ -1,7 +1,6 @@
 package transactions_test
 
 import (
-	"github.com/bitcoin-sv/spv-wallet/models/bsv"
 	"testing"
 
 	"github.com/bitcoin-sv/spv-wallet/actions/testabilities"
@@ -9,6 +8,7 @@ import (
 	chainmodels "github.com/bitcoin-sv/spv-wallet/engine/chain/models"
 	testengine "github.com/bitcoin-sv/spv-wallet/engine/testabilities"
 	"github.com/bitcoin-sv/spv-wallet/engine/tester/fixtures"
+	"github.com/bitcoin-sv/spv-wallet/models/bsv"
 )
 
 const (
