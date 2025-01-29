@@ -65,7 +65,7 @@ func (a *assertion) ThatIs(expectedError error) {
 	a.assert.ErrorIs(a.err, expectedError)
 }
 
-// WithNoError checks if there was no error and result is not nil. It also checks if BEEF hex is parseable.
+// WithNoError checks if there was no error and result is not nil.
 func (a *assertion) WithNoError(err error) SuccessfullyCreatedTransactionOutlineAssertion {
 	a.t.Helper()
 	a.require.NoError(err, "Creation of transaction outline has finished with error")
@@ -75,11 +75,11 @@ func (a *assertion) WithNoError(err error) SuccessfullyCreatedTransactionOutline
 
 func (a *assertion) WithParseableBEEFHex() WithParseableBEEFTransactionOutlineAssertion {
 	a.t.Helper()
-	a.t.Logf("BEEF: %s", a.txOutline.BEEF)
+	a.t.Logf("Hex: %s", a.txOutline.Hex)
 
 	var err error
-	a.tx, err = sdk.NewTransactionFromBEEFHex(a.txOutline.BEEF)
-	a.require.NoErrorf(err, "Invalid BEEF hex: %s", a.txOutline.BEEF)
+	a.tx, err = a.txOutline.Hex.ToBEEFTransaction()
+	a.require.NoErrorf(err, "Invalid Hex hex: %s", a.txOutline.Hex)
 	return a
 }
 

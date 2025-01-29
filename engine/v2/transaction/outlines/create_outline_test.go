@@ -11,7 +11,7 @@ import (
 	"github.com/bitcoin-sv/spv-wallet/models"
 )
 
-func TestCreateTransactionOutlineError(t *testing.T) {
+func TestCreateBEEFTransactionOutlineError(t *testing.T) {
 	errorTests := map[string]struct {
 		spec          *outlines.TransactionSpec
 		expectedError models.SPVError
@@ -44,7 +44,48 @@ func TestCreateTransactionOutlineError(t *testing.T) {
 			service := given.NewTransactionOutlinesService()
 
 			// when:
-			tx, err := service.Create(context.Background(), test.spec)
+			tx, err := service.CreateBEEF(context.Background(), test.spec)
+
+			// then:
+			then.Created(tx).WithError(err).ThatIs(test.expectedError)
+		})
+	}
+}
+
+func TestCreateRawTransactionOutlineError(t *testing.T) {
+	errorTests := map[string]struct {
+		spec          *outlines.TransactionSpec
+		expectedError models.SPVError
+	}{
+		"return error for nil as transaction spec": {
+			spec:          nil,
+			expectedError: txerrors.ErrTxOutlineSpecificationRequired,
+		},
+		"return error for transaction spec without xPub Id": {
+			spec:          &outlines.TransactionSpec{},
+			expectedError: txerrors.ErrTxOutlineSpecificationUserIDRequired,
+		},
+		"return error for no outputs in transaction spec": {
+			spec:          &outlines.TransactionSpec{UserID: fixtures.Sender.ID()},
+			expectedError: txerrors.ErrTxOutlineRequiresAtLeastOneOutput,
+		},
+		"return error for empty output list in transaction spec": {
+			spec: &outlines.TransactionSpec{
+				UserID:  fixtures.Sender.ID(),
+				Outputs: outlines.NewOutputsSpecs(),
+			},
+			expectedError: txerrors.ErrTxOutlineRequiresAtLeastOneOutput,
+		},
+	}
+	for name, test := range errorTests {
+		t.Run(name, func(t *testing.T) {
+			given, then := testabilities.New(t)
+
+			// given:
+			service := given.NewTransactionOutlinesService()
+
+			// when:
+			tx, err := service.CreateBEEF(context.Background(), test.spec)
 
 			// then:
 			then.Created(tx).WithError(err).ThatIs(test.expectedError)

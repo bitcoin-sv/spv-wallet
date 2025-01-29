@@ -48,7 +48,7 @@ func TestOutlinesRecordOpReturn(t *testing.T) {
 
 		// and:
 		request := `{
-			"beef": "` + txSpec.BEEF() + `",
+			"hex": "` + txSpec.BEEF() + `",
 			"annotations": {
 				"outputs": {
 					"0": {
@@ -162,7 +162,7 @@ func TestOutlinesRecordOpReturnErrorCases(t *testing.T) {
 	}{
 		"RecordTransactionOutline for not signed transaction": {
 			request: `{
-				"beef": "` + givenUnsignedTX.BEEF() + `"
+				"hex": "` + givenUnsignedTX.BEEF() + `"
 			}`,
 			expectHttpCode: 400,
 			expectedErr:    apierror.ExpectedJSON("error-transaction-validation", "transaction validation failed"),
@@ -190,7 +190,7 @@ func TestOutlinesRecordOpReturnErrorCases(t *testing.T) {
 		},
 		"no-op_return output annotated as data": {
 			request: `{
-				"beef": "` + givenTxWithP2PKHOutput.BEEF() + `",
+				"hex": "` + givenTxWithP2PKHOutput.BEEF() + `",
 				"annotations": {
 					"outputs": {
 						"0": {
@@ -237,7 +237,7 @@ func TestOutlinesRecordOpReturnOnBroadcastError(t *testing.T) {
 	// and:
 	txSpec := givenTXWithOpReturn(t)
 	request := `{
-			"beef": "` + txSpec.BEEF() + `",
+			"hex": "` + txSpec.BEEF() + `",
 			"annotations": {
 				"outputs": {
 					"0": {

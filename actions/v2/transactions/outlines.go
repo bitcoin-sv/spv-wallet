@@ -31,7 +31,7 @@ func transactionOutlines(c *gin.Context, userCtx *reqctx.UserContext) {
 		return
 	}
 
-	txOutline, err := reqctx.Engine(c).TransactionOutlinesService().Create(c, spec)
+	txOutline, err := reqctx.Engine(c).TransactionOutlinesService().CreateBEEF(c, spec)
 	if err != nil {
 		spverrors.ErrorResponse(c, err, logger)
 		return

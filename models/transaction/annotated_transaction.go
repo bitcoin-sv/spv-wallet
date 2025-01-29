@@ -7,8 +7,10 @@ import (
 
 // AnnotatedTransaction represents a transaction with annotations.
 type AnnotatedTransaction struct {
-	// BEEF is the transaction hex in BEEF format.
-	BEEF string `json:"beef"`
+	// Hex is the transaction in binary format specified by type.
+	Hex string `json:"hex"`
+	// Format is the format of the transaction hex ex. BEEF, RAW.
+	Format string `json:"format"`
 	// Annotations is the metadata for the transaction.
 	Annotations *Annotations `json:"annotations"`
 }
