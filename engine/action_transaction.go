@@ -32,19 +32,6 @@ func (c *Client) RecordTransaction(ctx context.Context, xPubKey, txHex, draftID 
 	return recordTransaction(ctx, c, rts, opts...)
 }
 
-// RecordRawTransaction will parse the transaction and save it into the Datastore directly, without any checks or broadcast but SPV Wallet Engine will ask network for information if transaction was mined
-// The transaction is treat as external incoming transaction - transaction without a draft
-// Only use this function when you know what you are doing!
-//
-// txHex is the raw transaction hex
-// opts are model options and can include "metadata"
-func (c *Client) RecordRawTransaction(ctx context.Context, txHex string,
-	opts ...ModelOps,
-) (*Transaction, error) {
-
-	return saveRawTransaction(ctx, c, true, txHex, opts...)
-}
-
 // NewTransaction will create a new draft transaction and return it
 //
 // ctx is the context
@@ -132,17 +119,6 @@ func (c *Client) GetTransactionsByIDs(ctx context.Context, txIDs []string) ([]*T
 	}
 
 	return transactions, nil
-}
-
-// GetTransactionByHex will get a transaction from the Datastore by its full hex string
-// uses GetTransaction
-func (c *Client) GetTransactionByHex(ctx context.Context, hex string) (*Transaction, error) {
-	tx, err := trx.NewTransactionFromHex(hex)
-	if err != nil {
-		return nil, spverrors.Wrapf(err, "failed to parse transaction hex: %s", hex)
-	}
-
-	return c.GetTransaction(ctx, "", tx.TxID().String())
 }
 
 // GetTransactions will get all the transactions from the Datastore

@@ -37,31 +37,6 @@ func TestCurrentUserGet(t *testing.T) {
 			})
 	})
 
-	t.Run("return xpub info for user (old api)", func(t *testing.T) {
-		// given:
-		given, then := testabilities.NewOf(givenForAllTests, t)
-		client := given.HttpClient().ForUser()
-
-		// when:
-		res, _ := client.R().Get("/v1/xpub")
-
-		// then:
-		then.Response(res).
-			IsOK().
-			WithJSONMatching(`{
-				"id": "{{.ID}}",
-				"created_at": "/.*/",
-				"updated_at": "/.*/",
-				"current_balance": 0,
-				"deleted_at": null,
-				"metadata": "*",
-				"next_external_num": 1,
-				"next_internal_num": 0
-			}`, map[string]any{
-				"ID": fixtures.Sender.XPubID(),
-			})
-	})
-
 	t.Run("return xpub info for admin", func(t *testing.T) {
 		// given:
 		given, then := testabilities.NewOf(givenForAllTests, t)

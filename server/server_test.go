@@ -8,7 +8,6 @@ import (
 	"testing"
 
 	"github.com/bitcoin-sv/spv-wallet/config"
-	"github.com/bitcoin-sv/spv-wallet/engine/utils"
 	"github.com/bitcoin-sv/spv-wallet/models"
 	"github.com/bitcoin-sv/spv-wallet/tests"
 	"github.com/stretchr/testify/assert"
@@ -57,7 +56,7 @@ func (ts *TestSuite) TestAdminAuthentication() {
 	ts.T().Run("no value", func(t *testing.T) {
 		w := httptest.NewRecorder()
 
-		req, err := http.NewRequestWithContext(context.Background(), http.MethodGet, "/"+config.APIVersion+"/admin/status", nil)
+		req, err := http.NewRequestWithContext(context.Background(), http.MethodGet, "/api/"+config.APIVersion+"/admin/status", nil)
 		require.NoError(t, err)
 		require.NotNil(t, req)
 
@@ -69,7 +68,7 @@ func (ts *TestSuite) TestAdminAuthentication() {
 	ts.T().Run("false value", func(t *testing.T) {
 		w := httptest.NewRecorder()
 
-		req, err := http.NewRequestWithContext(context.Background(), http.MethodGet, "/"+config.APIVersion+"/admin/status", nil)
+		req, err := http.NewRequestWithContext(context.Background(), http.MethodGet, "/api/"+config.APIVersion+"/admin/status", nil)
 		require.NoError(t, err)
 		require.NotNil(t, req)
 
@@ -83,7 +82,7 @@ func (ts *TestSuite) TestAdminAuthentication() {
 	ts.T().Run("admin key", func(t *testing.T) {
 		w := httptest.NewRecorder()
 
-		req, err := http.NewRequestWithContext(context.Background(), http.MethodGet, "/"+config.APIVersion+"/admin/status", bytes.NewReader([]byte("test")))
+		req, err := http.NewRequestWithContext(context.Background(), http.MethodGet, "/api/"+config.APIVersion+"/admin/status", bytes.NewReader([]byte("test")))
 		require.NoError(t, err)
 		require.NotNil(t, req)
 
@@ -100,7 +99,7 @@ func (ts *TestSuite) TestApiAuthentication() {
 	ts.T().Run("no value", func(t *testing.T) {
 		w := httptest.NewRecorder()
 
-		req, err := http.NewRequestWithContext(context.Background(), http.MethodGet, "/"+config.APIVersion+"/xpub", nil)
+		req, err := http.NewRequestWithContext(context.Background(), http.MethodGet, "/api/"+config.APIVersion+"/transactions", nil)
 		require.NoError(t, err)
 		require.NotNil(t, req)
 
@@ -112,7 +111,7 @@ func (ts *TestSuite) TestApiAuthentication() {
 	ts.T().Run("false value", func(t *testing.T) {
 		w := httptest.NewRecorder()
 
-		req, err := http.NewRequestWithContext(context.Background(), http.MethodGet, "/"+config.APIVersion+"/xpub", nil)
+		req, err := http.NewRequestWithContext(context.Background(), http.MethodGet, "/api/"+config.APIVersion+"/transactions", nil)
 		require.NoError(t, err)
 		require.NotNil(t, req)
 
@@ -130,7 +129,7 @@ func (ts *TestSuite) TestApiAuthentication() {
 		require.NoError(t, err)
 		require.NotNil(t, xpub)
 
-		req, err := http.NewRequestWithContext(context.Background(), http.MethodGet, "/"+config.APIVersion+"/xpub", bytes.NewReader([]byte("test")))
+		req, err := http.NewRequestWithContext(context.Background(), http.MethodGet, "/api/"+config.APIVersion+"/transactions", bytes.NewReader([]byte("test")))
 		require.NoError(t, err)
 		require.NotNil(t, req)
 
@@ -147,19 +146,19 @@ func (ts *TestSuite) TestBasicAuthentication() {
 	ts.T().Run("no value", func(t *testing.T) {
 		w := httptest.NewRecorder()
 
-		req, err := http.NewRequestWithContext(context.Background(), http.MethodGet, "/"+config.APIVersion+"/transaction", nil)
+		req, err := http.NewRequestWithContext(context.Background(), http.MethodGet, "/", nil)
 		require.NoError(t, err)
 		require.NotNil(t, req)
 
 		ts.Router.ServeHTTP(w, req)
 
-		assert.Equal(t, http.StatusUnauthorized, w.Code)
+		assert.Equal(t, http.StatusOK, w.Code)
 	})
 
 	ts.T().Run("non existing xpub", func(t *testing.T) {
 		w := httptest.NewRecorder()
 
-		req, err := http.NewRequestWithContext(context.Background(), http.MethodGet, "/"+config.APIVersion+"/transaction", nil)
+		req, err := http.NewRequestWithContext(context.Background(), http.MethodGet, "/", nil)
 		require.NoError(t, err)
 		require.NotNil(t, req)
 
@@ -167,7 +166,7 @@ func (ts *TestSuite) TestBasicAuthentication() {
 
 		ts.Router.ServeHTTP(w, req)
 
-		assert.Equal(t, http.StatusUnauthorized, w.Code)
+		assert.Equal(t, http.StatusOK, w.Code)
 	})
 
 	ts.T().Run("valid value", func(t *testing.T) {
@@ -177,11 +176,11 @@ func (ts *TestSuite) TestBasicAuthentication() {
 		require.NoError(t, err)
 		require.NotNil(t, xpub)
 
-		destination, err := ts.SpvWalletEngine.NewDestination(context.Background(), xpub.RawXpub(), 0, utils.ScriptTypePubKeyHash)
+		key, err := ts.SpvWalletEngine.NewAccessKey(context.Background(), xpub.RawXpub())
 		require.NoError(t, err)
-		require.NotNil(t, destination)
+		require.NotNil(t, key)
 
-		req, err := http.NewRequestWithContext(context.Background(), http.MethodGet, "/"+config.APIVersion+"/destination?id="+destination.GetID(), bytes.NewReader([]byte("test")))
+		req, err := http.NewRequestWithContext(context.Background(), http.MethodGet, "/", bytes.NewReader([]byte("test")))
 		require.NoError(t, err)
 		require.NotNil(t, req)
 

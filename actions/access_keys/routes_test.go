@@ -14,11 +14,6 @@ func (ts *TestSuite) TestRegisterRoutes() {
 			method string
 			url    string
 		}{
-			{"GET", "/" + config.APIVersion + "/access-key"},
-			{"POST", "/" + config.APIVersion + "/access-key"},
-			{"DELETE", "/" + config.APIVersion + "/access-key"},
-			{"POST", "/" + config.APIVersion + "/access-key/search"},
-
 			{"GET", "/api/" + config.APIVersion + "/users/current/keys/:id"},
 			{"POST", "/api/" + config.APIVersion + "/users/current/keys"},
 			{"DELETE", "/api/" + config.APIVersion + "/users/current/keys/:id"},

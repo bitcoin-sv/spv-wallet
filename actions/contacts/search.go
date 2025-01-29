@@ -8,75 +8,11 @@ import (
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/bitcoin-sv/spv-wallet/internal/query"
 	"github.com/bitcoin-sv/spv-wallet/mappings"
-	"github.com/bitcoin-sv/spv-wallet/models"
 	"github.com/bitcoin-sv/spv-wallet/models/filter"
 	"github.com/bitcoin-sv/spv-wallet/models/response"
 	"github.com/bitcoin-sv/spv-wallet/server/reqctx"
 	"github.com/gin-gonic/gin"
 )
-
-// Search will fetch a list of contacts
-// Get contacts godoc
-// @Summary		Search contacts - Use (GET) /api/v1/contacts instead.
-// @Description	This endpoint has been deprecated. Use (GET) /api/v1/contacts instead.
-// @Tags		Contact
-// @Produce		json
-// @Param		SearchContacts body filter.SearchContacts false "Supports targeted resource searches with filters and metadata, plus options for pagination and sorting to streamline data exploration and analysis"
-// @Success		200 {object} models.SearchContactsResponse "List of contacts"
-// @Failure		400	"Bad request - Error while parsing SearchContacts from request body"
-// @Failure 	500	"Internal server error - Error while searching for contacts"
-// @DeprecatedRouter  /v1/contact/search [post]
-// @Security	x-auth-xpub
-func search(c *gin.Context, userContext *reqctx.UserContext) {
-	logger := reqctx.Logger(c)
-	engine := reqctx.Engine(c)
-
-	var reqParams filter.SearchContacts
-	if err := c.Bind(&reqParams); err != nil {
-		spverrors.ErrorResponse(c, spverrors.ErrCannotBindRequest, logger)
-		return
-	}
-
-	conditions, err := reqParams.Conditions.ToDbConditions()
-	if err != nil {
-		spverrors.ErrorResponse(c, spverrors.ErrInvalidConditions, logger)
-		return
-	}
-
-	reqParams.DefaultsIfNilOrEmpty()
-
-	contacts, err := engine.GetContactsByXpubID(
-		c.Request.Context(),
-		userContext.GetXPubID(),
-		mappings.MapToMetadata(reqParams.Metadata),
-		conditions,
-		mappings.MapToQueryParams(reqParams.QueryParams),
-	)
-	if err != nil {
-		spverrors.ErrorResponse(c, err, logger)
-		return
-	}
-
-	contracts := mappings.MapToOldContactContracts(contacts)
-
-	count, err := engine.GetContactsByXPubIDCount(
-		c.Request.Context(),
-		userContext.GetXPubID(),
-		mappings.MapToMetadata(reqParams.Metadata),
-		conditions,
-	)
-	if err != nil {
-		spverrors.ErrorResponse(c, err, logger)
-		return
-	}
-
-	response := models.SearchContactsResponse{
-		Content: contracts,
-		Page:    common.GetPageFromQueryParams(reqParams.QueryParams, count),
-	}
-
-	c.JSON(http.StatusOK, response)
-}
 
 // getContacts will fetch a list of contacts
 // @Summary		Get contacts
@@ -197,14 +133,12 @@ func searchContacts(c *gin.Context, reqXPubID string, paymail string) ([]*engine
 		return nil, 0
 	}
 
-	reqParams.DefaultsIfNilOrEmpty()
-
 	contacts, err := engine.GetContactsByXpubID(
 		c.Request.Context(),
 		reqXPubID,
 		mappings.MapToMetadata(reqParams.Metadata),
 		conditions,
-		mappings.MapToQueryParams(reqParams.QueryParams),
+		mappings.DefaultDBQueryParams(),
 	)
 	if err != nil {
 		spverrors.ErrorResponse(c, err, logger)

@@ -14,6 +14,11 @@ var funcsMap = template.FuncMap{
 	"matchHex":           matchHex,
 	"matchAddress":       matchAddress,
 	"matchNumber":        matchNumber,
+	"anything":           anything,
+}
+
+func anything() string {
+	return `"*"`
 }
 
 func matchTimestamp() string {

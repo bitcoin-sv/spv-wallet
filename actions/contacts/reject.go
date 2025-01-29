@@ -8,23 +8,6 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-// oldReject will reject contact request
-// Reject contact godoc
-// @Summary		Reject contact - Use (DELETE) /api/v1/invitations/{paymail} instead.
-// @Description	This endpoint has been deprecated. Use (DELETE) /api/v1/invitations/{paymail} instead.
-// @Tags		Contact
-// @Produce		json
-// @Param		paymail path string true "Paymail address of the contact that the user would like to reject"
-// @Success		200
-// @Failure		404	"Contact not found"
-// @Failure		422	"Contact status not awaiting"
-// @Failure		500	"Internal server error"
-// @DeprecatedRouter  /v1/contact/rejected/{paymail} [patch]
-// @Security	x-auth-xpub
-func oldReject(c *gin.Context, userContext *reqctx.UserContext) {
-	rejectInvitation(c, userContext)
-}
-
 // rejectInvitation will reject contact request
 // Reject contact invitation godoc
 // @Summary		Reject contact invitation

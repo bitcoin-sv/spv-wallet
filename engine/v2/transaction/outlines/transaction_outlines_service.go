@@ -5,6 +5,7 @@ import (
 
 	"github.com/bitcoin-sv/spv-wallet/engine/paymail"
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
+	"github.com/bitcoin-sv/spv-wallet/engine/v2/bsv"
 	"github.com/bitcoin-sv/spv-wallet/engine/v2/transaction/errors"
 	"github.com/rs/zerolog"
 )
@@ -32,8 +33,8 @@ func NewService(paymailService paymail.ServiceClient, paymailAddressService Paym
 	}
 }
 
-// Create creates a new transaction outline based on specification.
-func (s *service) Create(ctx context.Context, spec *TransactionSpec) (*Transaction, error) {
+// CreateBEEF creates a new transaction outline based on specification.
+func (s *service) CreateBEEF(ctx context.Context, spec *TransactionSpec) (*Transaction, error) {
 	if spec == nil {
 		return nil, txerrors.ErrTxOutlineSpecificationRequired
 	}
@@ -61,7 +62,7 @@ func (s *service) Create(ctx context.Context, spec *TransactionSpec) (*Transacti
 	}
 
 	return &Transaction{
-		BEEF:        beef,
+		Hex:         bsv.TxHex(beef),
 		Annotations: annotations,
 	}, nil
 }
