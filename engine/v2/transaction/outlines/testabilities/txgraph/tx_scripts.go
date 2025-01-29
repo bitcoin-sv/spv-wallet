@@ -13,8 +13,8 @@ import (
 // TxScripts is a utility structure that provides access to transaction-related scripts
 // and keys for creating and validating Bitcoin transactions.
 type TxScripts struct {
-	t          *testing.T             // Test context used for error handling.
-	paymail    string                 // Paymail address associated with the scripts.
+	t *testing.T // Test context used for error handling.
+
 	privateKey *primitives.PrivateKey // Private key for signing transactions.
 	publicKey  *primitives.PublicKey  // Public key derived from the private key.
 }
@@ -34,9 +34,9 @@ func (tx *TxScripts) PublicKey() *primitives.PublicKey {
 func (tx *TxScripts) P2PKHUnlockingScriptTemplate() *p2pkh.P2PKH {
 	tx.t.Helper()
 
-	script, err := p2pkh.Unlock(tx.privateKey, nil)
+	unlocking, err := p2pkh.Unlock(tx.privateKey, nil)
 	require.NoError(tx.t, err, "Failed to generate unlocking script")
-	return script
+	return unlocking
 }
 
 // P2PKHLockingScript generates a P2PKH locking script using the associated public key.
@@ -47,14 +47,14 @@ func (tx *TxScripts) P2PKHLockingScript() *script.Script {
 	addr, err := script.NewAddressFromPublicKey(tx.publicKey, true)
 	require.NoError(tx.t, err, "Failed to generate address from public key")
 
-	script, err := p2pkh.Lock(addr)
+	locking, err := p2pkh.Lock(addr)
 	require.NoError(tx.t, err, "Failed to generate locking script")
-	return script
+	return locking
 }
 
 // NewTxScripts initializes a new TxScripts instance using the provided extended private key (xPriv) and paymail.
 // It derives the private and public keys from the xPriv and prepares the structure for generating scripts.
-func NewTxScripts(t *testing.T, xPriv, paymail string) *TxScripts {
+func NewTxScripts(t *testing.T, xPriv string) *TxScripts {
 	t.Helper()
 
 	// Generate the hierarchical deterministic (HD) key from the xPriv string.
@@ -68,7 +68,6 @@ func NewTxScripts(t *testing.T, xPriv, paymail string) *TxScripts {
 	// Return a new TxScripts instance.
 	return &TxScripts{
 		t:          t,
-		paymail:    paymail,
 		privateKey: privateKey,
 		publicKey:  privateKey.PubKey(),
 	}

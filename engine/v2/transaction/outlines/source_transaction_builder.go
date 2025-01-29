@@ -8,8 +8,6 @@ import (
 	sdk "github.com/bitcoin-sv/go-sdk/transaction"
 )
 
-// TODO: 1. Add missing error check unit tests
-
 // TxQueryResult represents the result of a transaction query.
 type TxQueryResult struct {
 	SourceTXID string  // Source Transaction ID.
@@ -127,7 +125,7 @@ func (b *SourceTransactionBuilder) Build(res TxQueryResultSlice) error {
 
 	for i, input := range b.Tx.Inputs {
 		if input == nil || input.SourceTransaction == nil {
-			return fmt.Errorf("SPV script verification failed for input %d. Nil input or input source transaction.", i)
+			return ErrInvalidTransactionInput
 		}
 		if _, err := spv.VerifyScripts(input.SourceTransaction); err != nil {
 			return fmt.Errorf("SPV script verification failed for input %d: %w", i, err)
@@ -159,6 +157,10 @@ func (b *SourceTransactionBuilder) buildRecursive(inputs []*sdk.TransactionInput
 }
 
 var (
+	// ErrInvalidTransactionInput indicates that the SPV script verification failed
+	// due to a nil transaction input or a missing source transaction.
+	ErrInvalidTransactionInput = errors.New("SPV script verification failed: nil transaction input or missing source transaction")
+
 	// ErrMutuallyExclusiveTxQueryResult indicates a conflict in the query result types.
 	ErrMutuallyExclusiveTxQueryResult = errors.New("transaction query result must be either BEEF or RawTx type, not both")
 

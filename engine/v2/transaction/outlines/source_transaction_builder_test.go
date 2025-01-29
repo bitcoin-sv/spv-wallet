@@ -3,10 +3,32 @@ package outlines
 import (
 	"testing"
 
+	"github.com/bitcoin-sv/go-sdk/chainhash"
 	sdk "github.com/bitcoin-sv/go-sdk/transaction"
 	"github.com/bitcoin-sv/spv-wallet/engine/v2/transaction/outlines/testabilities/txgraph"
 	"github.com/stretchr/testify/require"
 )
+
+func TestSourceTranasctionBuilder_MissingSourceTransactionInTheInput(t *testing.T) {
+	// given:
+	var hexGen txgraph.HexGen
+
+	ID, err := chainhash.NewHashFromHex(hexGen.Val())
+	require.NoError(t, err, "expected to create hash from the hex gen val: %s", hexGen.Val())
+
+	// subject tx:
+	subjectTx := sdk.NewTransaction()
+	subjectTx.AddInput(&sdk.TransactionInput{SourceTXID: ID})
+
+	db := toTxQueryResultSlice(txgraph.GraphBuilderTransactions{})
+
+	// when:
+	builder := SourceTransactionBuilder{Tx: subjectTx}
+	err = builder.Build(db)
+
+	// then:
+	require.ErrorIs(t, err, ErrInvalidTransactionInput)
+}
 
 func TestSourceTransactionBuilder_BEEFGrandparentForTx1(t *testing.T) {
 	// given:
@@ -22,7 +44,7 @@ func TestSourceTransactionBuilder_BEEFGrandparentForTx1(t *testing.T) {
 	subjectTx := sdk.NewTransaction()
 	subjectTx.AddInput(&sdk.TransactionInput{SourceTXID: tx0.Inputs[0].SourceTXID})
 
-	db := toTxQueryResultSlice(graphBuilder.GraphBuilderTransactions())
+	db := toTxQueryResultSlice(graphBuilder.Transactions())
 
 	// when:
 	builder := SourceTransactionBuilder{Tx: subjectTx}
@@ -59,7 +81,7 @@ func TestSourceTransactionBuilder_BEEFGrandparentsForTx1Tx2Tx3(t *testing.T) {
 	subjectTx.AddInput(&sdk.TransactionInput{SourceTXID: tx0.Inputs[1].SourceTXID})
 	subjectTx.AddInput(&sdk.TransactionInput{SourceTXID: tx0.Inputs[2].SourceTXID})
 
-	db := toTxQueryResultSlice(graphBuilder.GraphBuilderTransactions())
+	db := toTxQueryResultSlice(graphBuilder.Transactions())
 
 	// when:
 	builder := SourceTransactionBuilder{Tx: subjectTx}
@@ -91,7 +113,7 @@ func TestSourceTransactionBuilder_BEEFParentsForTx0(t *testing.T) {
 	subjectTx.AddInput(&sdk.TransactionInput{SourceTXID: tx0.Inputs[1].SourceTXID})
 	subjectTx.AddInput(&sdk.TransactionInput{SourceTXID: tx0.Inputs[2].SourceTXID})
 
-	db := toTxQueryResultSlice(graphBuilder.GraphBuilderTransactions())
+	db := toTxQueryResultSlice(graphBuilder.Transactions())
 
 	// when:
 	builder := SourceTransactionBuilder{Tx: subjectTx}
@@ -127,7 +149,7 @@ func TestSourceTransactionBuilder_CommonBEEFTxGrandparentForTx1Tx3(t *testing.T)
 	subjectTx.AddInput(&sdk.TransactionInput{SourceTXID: tx0.Inputs[1].SourceTXID})
 	subjectTx.AddInput(&sdk.TransactionInput{SourceTXID: tx0.Inputs[2].SourceTXID})
 
-	db := toTxQueryResultSlice(graphBuilder.GraphBuilderTransactions())
+	db := toTxQueryResultSlice(graphBuilder.Transactions())
 
 	// when:
 	builder := SourceTransactionBuilder{Tx: subjectTx}
@@ -168,7 +190,7 @@ func TestSourceTransactionBuilder_BEEFTxGreatGrandparentsForTx1Tx3(t *testing.T)
 	subjectTx.AddInput(&sdk.TransactionInput{SourceTXID: tx0.Inputs[1].SourceTXID})
 	subjectTx.AddInput(&sdk.TransactionInput{SourceTXID: tx0.Inputs[2].SourceTXID})
 
-	db := toTxQueryResultSlice(graphBuilder.GraphBuilderTransactions())
+	db := toTxQueryResultSlice(graphBuilder.Transactions())
 
 	// when:
 	builder := SourceTransactionBuilder{Tx: subjectTx}
@@ -207,7 +229,7 @@ func TestSourceTransactionBuilder_CommonBEEFTxGreatGrandparentsForTx1Tx3(t *test
 	subjectTx.AddInput(&sdk.TransactionInput{SourceTXID: tx0.Inputs[1].SourceTXID})
 	subjectTx.AddInput(&sdk.TransactionInput{SourceTXID: tx0.Inputs[2].SourceTXID})
 
-	db := toTxQueryResultSlice(graphBuilder.GraphBuilderTransactions())
+	db := toTxQueryResultSlice(graphBuilder.Transactions())
 
 	// when:
 	builder := SourceTransactionBuilder{Tx: subjectTx}
@@ -220,12 +242,12 @@ func TestSourceTransactionBuilder_CommonBEEFTxGreatGrandparentsForTx1Tx3(t *test
 func toTxQueryResultSlice(transactions txgraph.GraphBuilderTransactions) TxQueryResultSlice {
 	var slice TxQueryResultSlice
 	for _, desc := range transactions {
-		sourceTXID := desc.Tx.TxID().String()
+		sourceTXID := desc.TxID()
 		if desc.IsBEEF() {
-			slice = append(slice, &TxQueryResult{SourceTXID: sourceTXID, BeefHex: desc.BEEFHex})
+			slice = append(slice, &TxQueryResult{SourceTXID: sourceTXID, BeefHex: desc.BEEFHex()})
 			continue
 		}
-		slice = append(slice, &TxQueryResult{SourceTXID: sourceTXID, RawHex: desc.RawHex})
+		slice = append(slice, &TxQueryResult{SourceTXID: sourceTXID, RawHex: desc.RawHex()})
 	}
 	return slice
 }
