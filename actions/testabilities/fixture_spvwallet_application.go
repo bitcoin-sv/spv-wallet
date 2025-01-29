@@ -31,6 +31,8 @@ type SPVWalletApplicationFixture interface {
 
 	// ARC creates a new test fixture for ARC
 	ARC() ARCFixture
+
+	Faucet(user fixtures.User) testengine.FaucetFixture
 }
 
 type BlockHeadersServiceFixture interface {
@@ -60,10 +62,11 @@ type SPVWalletHttpClientFixture interface {
 }
 
 type appFixture struct {
-	engineFixture testengine.EngineFixture
-	t             testing.TB
-	logger        zerolog.Logger
-	server        testServer
+	engineWithConfig testengine.EngineWithConfig
+	engineFixture    testengine.EngineFixture
+	t                testing.TB
+	logger           zerolog.Logger
+	server           testServer
 }
 
 func Given(t testing.TB) SPVWalletApplicationFixture {
@@ -92,6 +95,8 @@ func (f *appFixture) StartedSPVWalletWithConfiguration(opts ...testengine.Config
 
 	s := server.NewServer(&engineWithConfig.Config, engineWithConfig.Engine, f.logger)
 	f.server.handlers = s.Handlers()
+
+	f.engineWithConfig = engineWithConfig
 
 	return cleanup
 }
@@ -131,4 +136,8 @@ func (f *appFixture) BHS() BlockHeadersServiceFixture {
 
 func (f *appFixture) ARC() ARCFixture {
 	return f.engineFixture.ARC()
+}
+
+func (f *appFixture) Faucet(user fixtures.User) testengine.FaucetFixture {
+	return f.engineFixture.Faucet(user)
 }

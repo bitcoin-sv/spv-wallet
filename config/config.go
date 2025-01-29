@@ -255,8 +255,8 @@ type ExperimentalConfig struct {
 	PikePaymentEnabled bool `json:"pike_payment_enabled" mapstructure:"pike_payment_enabled"`
 	// Use junglebus external service to fetch missing source transactions for inputs
 	UseJunglebus bool `json:"use_junglebus" mapstructure:"use_junglebus"`
-	// NewTransactionFlowEnabled is a flag for enabling the new transaction flow
-	NewTransactionFlowEnabled bool `json:"new_transaction_flow_enabled" mapstructure:"new_transaction_flow_enabled"`
+	// V2 is a flag for enabling the new transaction flow
+	V2 bool `json:"new_transaction_flow_enabled" mapstructure:"new_transaction_flow_enabled"`
 }
 
 // GetUserAgent will return the outgoing user agent

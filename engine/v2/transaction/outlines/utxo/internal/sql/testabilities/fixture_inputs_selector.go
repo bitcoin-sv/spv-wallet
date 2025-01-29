@@ -21,7 +21,7 @@ type inputsSelectorFixture struct {
 }
 
 func newFixture(t testing.TB) (InputsSelectorFixture, func()) {
-	givenDB, cleanup := testabilities.Given(t, testengine.WithNewTransactionFlowEnabled())
+	givenDB, cleanup := testabilities.Given(t, testengine.WithV2())
 	return &inputsSelectorFixture{
 		DatabaseFixture: givenDB,
 		db:              givenDB.GormDB(),

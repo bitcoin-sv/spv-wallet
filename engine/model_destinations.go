@@ -155,18 +155,6 @@ func getDestinationByLockingScript(ctx context.Context, lockingScript string, op
 	return destination, nil
 }
 
-// getDestinations will get all the destinations with the given conditions
-func getDestinations(ctx context.Context, metadata *Metadata, conditions map[string]interface{},
-	queryParams *datastore.QueryParams, opts ...ModelOps,
-) ([]*Destination, error) {
-	modelItems := make([]*Destination, 0)
-	if err := getModelsByConditions(ctx, ModelDestination, &modelItems, metadata, conditions, queryParams, opts...); err != nil {
-		return nil, err
-	}
-
-	return modelItems, nil
-}
-
 // getDestinationsCount will get a count of all the destinations with the given conditions
 func getDestinationsCount(ctx context.Context, metadata *Metadata, conditions map[string]interface{},
 	opts ...ModelOps,
@@ -174,78 +162,7 @@ func getDestinationsCount(ctx context.Context, metadata *Metadata, conditions ma
 	return getModelCountByConditions(ctx, ModelDestination, Destination{}, metadata, conditions, opts...)
 }
 
-// getDestinationsByXpubID will get the destination(s) by the given xPubID
-func getDestinationsByXpubID(ctx context.Context, xPubID string, usingMetadata *Metadata, conditions map[string]interface{},
-	queryParams *datastore.QueryParams, opts ...ModelOps,
-) ([]*Destination, error) {
-	// Construct an empty model
-	var destModels []Destination
-
-	dbConditions := map[string]interface{}{}
-	if conditions != nil {
-		dbConditions = conditions
-	}
-	dbConditions[xPubIDField] = xPubID
-
-	if usingMetadata != nil {
-		dbConditions[metadataField] = usingMetadata
-	}
-
-	// Get the records
-	if err := getModels(
-		ctx, NewBaseModel(ModelNameEmpty, opts...).Client().Datastore(),
-		&destModels, dbConditions, queryParams, defaultDatabaseReadTimeout,
-	); err != nil {
-		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return nil, nil
-		}
-		return nil, err
-	}
-
-	// Loop and enrich
-	destinations := make([]*Destination, 0)
-	for index := range destModels {
-		destModels[index].enrich(ModelDestination, opts...)
-		destinations = append(destinations, &destModels[index])
-	}
-
-	return destinations, nil
-}
-
-// getDestinationsCountByXPubID will get a count of the destination(s) by the given xPubID
-func getDestinationsCountByXPubID(ctx context.Context, xPubID string, usingMetadata *Metadata,
-	conditions map[string]interface{}, opts ...ModelOps,
-) (int64, error) {
-	dbConditions := map[string]interface{}{}
-	if conditions != nil {
-		dbConditions = conditions
-	}
-	dbConditions[xPubIDField] = xPubID
-
-	if usingMetadata != nil {
-		dbConditions[metadataField] = usingMetadata
-	}
-
-	// Get the records
-	count, err := getModelCount(
-		ctx,
-		NewBaseModel(ModelNameEmpty, opts...).Client().Datastore(),
-		Destination{},
-		dbConditions,
-		defaultDatabaseReadTimeout,
-	)
-
-	if err != nil {
-		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return 0, nil
-		}
-		return 0, err
-	}
-
-	return count, nil
-}
-
-// getXpubWithCache will try to get from cache first, then datastore
+// getDestinationWithCache will try to get from cache first, then datastore
 //
 // key is the raw xPub key or use xPubID
 func getDestinationWithCache(ctx context.Context, client ClientInterface,

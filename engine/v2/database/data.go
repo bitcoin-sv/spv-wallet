@@ -6,6 +6,9 @@ import "github.com/bitcoin-sv/spv-wallet/models/bsv"
 type Data struct {
 	TxID string `gorm:"primaryKey"`
 	Vout uint32 `gorm:"primaryKey"`
+
+	UserID string
+	
 	Blob []byte
 }
 

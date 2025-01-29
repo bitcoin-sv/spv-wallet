@@ -19,7 +19,7 @@ func TestIncomingPaymailRawTX(t *testing.T) {
 	givenForAllTests := testabilities.Given(t)
 	cleanup := givenForAllTests.StartedSPVWalletWithConfiguration(
 		testengine.WithDomainValidationDisabled(),
-		testengine.WithNewTransactionFlowEnabled(),
+		testengine.WithV2(),
 	)
 	defer cleanup()
 
@@ -175,7 +175,7 @@ func TestIncomingPaymailBeef(t *testing.T) {
 	givenForAllTests := testabilities.Given(t)
 	cleanup := givenForAllTests.StartedSPVWalletWithConfiguration(
 		testengine.WithDomainValidationDisabled(),
-		testengine.WithNewTransactionFlowEnabled(),
+		testengine.WithV2(),
 	)
 	defer cleanup()
 
@@ -336,7 +336,7 @@ func TestAddressResolution(t *testing.T) {
 	givenForAllTests := testabilities.Given(t)
 	cleanup := givenForAllTests.StartedSPVWalletWithConfiguration(
 		testengine.WithDomainValidationDisabled(),
-		testengine.WithNewTransactionFlowEnabled(),
+		testengine.WithV2(),
 	)
 	defer cleanup()
 

@@ -19,7 +19,6 @@ func RegisterRoutes(handlersManager *routes.Manager) {
         -   `middleware.AppContextMiddleware`
         -   `middleware.CorsMiddleware`
         -   `metrics.requestMetricsMiddleware`
-    -   `GroupOldAPI` with `/<api_version>` prefix and `auth_middleware` (besides global middlewares)
     -   `GroupAPI` with `/api/<api_version> prefix and also `auth_middleware` (besides global middlewares)
     -   `GroupTransactionCallback` with no prefix but with special `middleware.CallbackTokenMiddleware`
 -   So... for a new endpoint you'll most probably choose the `GroupAPI`

@@ -27,12 +27,6 @@ type PaymailAddress struct {
 	Address string `json:"address" example:"test@spv-wallet.com"`
 }
 
-// RecordTransaction is the model for recording a transaction
-type RecordTransaction struct {
-	// The transaction hex
-	Hex string `json:"hex" example:"0100000002..."`
-}
-
 // CreateXpub is the model for creating an xpub
 type CreateXpub struct {
 	// Accepts a JSON object for embedding custom metadata, enabling arbitrary additional information to be associated with the resource

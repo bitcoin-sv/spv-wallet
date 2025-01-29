@@ -5,14 +5,6 @@ import (
 	"github.com/bitcoin-sv/spv-wallet/models/response"
 )
 
-// UpdateTransaction is the model for updating a transaction
-type UpdateTransaction struct {
-	// Accepts a JSON object for embedding custom metadata, enabling arbitrary additional information to be associated with the resource
-	Metadata engine.Metadata `json:"metadata" swaggertype:"object,string" example:"key:value,key2:value2"`
-	// ID of the transaction which is a hash of the transaction
-	ID string `json:"id" example:"01d0d0067652f684c6acb3683763f353fce55f6496521c7d99e71e1d27e53f5c"`
-}
-
 // UpdateTransactionRequest is the model used for updating a transaction
 type UpdateTransactionRequest struct {
 	// Accepts a JSON object for embedding custom metadata, enabling arbitrary additional information to be associated with the resource

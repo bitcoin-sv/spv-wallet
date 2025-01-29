@@ -8,23 +8,6 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-// oldUnconfirm will unconfirm contact request
-// Unconfirm contact godoc
-// @Summary		Unconfirm contact - Use (DELETE) /api/v1/contacts/{paymail}/confirmation instead.
-// @Description	This endpoint has been deprecated. Use (DELETE) /api/v1/contacts/{paymail}/confirmation instead.
-// @Tags		Contact
-// @Produce		json
-// @Param		paymail path string true "Paymail address of the contact that the user would like to unconfirm"
-// @Success		200
-// @Failure		404	"Contact not found"
-// @Failure		422	"Contact status not confirmed"
-// @Failure		500	"Internal server error"
-// @DeprecatedRouter  /v1/contact/unconfirmed/{paymail} [patch]
-// @Security	x-auth-xpub
-func oldUnconfirm(c *gin.Context, userContext *reqctx.UserContext) {
-	unconfirmContact(c, userContext)
-}
-
 // unconfirmContact will unconfirm contact request
 // Unconfirm contact godoc
 // @Summary		Unconfirm contact
