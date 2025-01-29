@@ -1,12 +1,13 @@
 package operations
 
 import (
+	"net/http"
+
 	"github.com/bitcoin-sv/spv-wallet/actions/v2/operations/internal/mapping"
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/bitcoin-sv/spv-wallet/internal/query"
 	"github.com/bitcoin-sv/spv-wallet/server/reqctx"
 	"github.com/gin-gonic/gin"
-	"net/http"
 )
 
 func search(c *gin.Context, userContext *reqctx.UserContext) {

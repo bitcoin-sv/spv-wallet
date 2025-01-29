@@ -2,7 +2,6 @@ package engine
 
 import (
 	"context"
-	"github.com/bitcoin-sv/spv-wallet/engine/v2/operations"
 	"net/http"
 
 	"github.com/bitcoin-sv/go-paymail"
@@ -16,6 +15,7 @@ import (
 	"github.com/bitcoin-sv/spv-wallet/engine/taskmanager"
 	"github.com/bitcoin-sv/spv-wallet/engine/v2/addresses"
 	"github.com/bitcoin-sv/spv-wallet/engine/v2/database/repository"
+	"github.com/bitcoin-sv/spv-wallet/engine/v2/operations"
 	"github.com/bitcoin-sv/spv-wallet/engine/v2/paymails"
 	"github.com/bitcoin-sv/spv-wallet/engine/v2/transaction/outlines"
 	"github.com/bitcoin-sv/spv-wallet/engine/v2/transaction/record"

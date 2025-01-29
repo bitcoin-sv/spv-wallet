@@ -8,6 +8,7 @@ import (
 	"github.com/bitcoin-sv/spv-wallet/models/filter"
 )
 
+// Repo is an interface for operations repository.
 type Repo interface {
 	PaginatedForUser(ctx context.Context, userID string, page filter.Page) (*models.PagedResult[operationsmodels.Operation], error)
 }

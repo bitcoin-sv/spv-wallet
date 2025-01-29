@@ -2,15 +2,15 @@ package repository
 
 import (
 	"context"
-	"github.com/bitcoin-sv/spv-wallet/engine/utils"
-	"github.com/bitcoin-sv/spv-wallet/engine/v2/operations/operationsmodels"
-	"github.com/bitcoin-sv/spv-wallet/models"
 	"iter"
 	"slices"
 
+	"github.com/bitcoin-sv/spv-wallet/engine/utils"
 	"github.com/bitcoin-sv/spv-wallet/engine/v2/database"
 	"github.com/bitcoin-sv/spv-wallet/engine/v2/database/dbquery"
+	"github.com/bitcoin-sv/spv-wallet/engine/v2/operations/operationsmodels"
 	"github.com/bitcoin-sv/spv-wallet/engine/v2/transaction/txmodels"
+	"github.com/bitcoin-sv/spv-wallet/models"
 	"github.com/bitcoin-sv/spv-wallet/models/filter"
 	"gorm.io/gorm"
 	"gorm.io/gorm/clause"

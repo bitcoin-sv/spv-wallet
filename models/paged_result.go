@@ -6,6 +6,7 @@ type PagedResult[T any] struct {
 	PageDescription PageDescription
 }
 
+// PageDescription is a model that represents the page descriptor
 type PageDescription struct {
 	Size          int
 	Number        int
