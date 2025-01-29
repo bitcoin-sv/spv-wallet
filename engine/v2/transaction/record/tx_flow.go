@@ -147,9 +147,19 @@ func (f *txFlow) verify() error {
 }
 
 func (f *txFlow) broadcast() error {
-	if _, err := f.service.broadcaster.Broadcast(f.ctx, f.tx); err != nil {
+	txInfo, err := f.service.broadcaster.Broadcast(f.ctx, f.tx)
+	if err != nil {
 		return txerrors.ErrTxBroadcast.Wrap(err)
 	}
+
+	if txInfo.TXStatus.IsProblematic() {
+		f.txRow.TxStatus = txmodels.TxStatusProblematic
+	} else if txInfo.TXStatus.IsMined() {
+		f.txRow.TxStatus = txmodels.TxStatusMined
+	} else {
+		f.txRow.TxStatus = txmodels.TxStatusBroadcasted
+	}
+
 	return nil
 }
 
