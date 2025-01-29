@@ -2,6 +2,7 @@ package engine
 
 import (
 	"context"
+	"github.com/bitcoin-sv/spv-wallet/engine/v2/data"
 	"time"
 
 	"github.com/bitcoin-sv/go-paymail"
@@ -62,6 +63,7 @@ type (
 		users        *users.Service    // User domain service
 		paymails     *paymails.Service // Paymail domain service
 		addresses    *addresses.Service
+		data         *data.Service
 	}
 
 	// cacheStoreOptions holds the cache configuration and client
@@ -155,6 +157,7 @@ func NewClient(ctx context.Context, opts ...ClientOps) (ClientInterface, error) 
 	client.loadUsersService()
 	client.loadPaymailsService()
 	client.loadAddressesService()
+	client.loadDataService()
 
 	// Load the Paymail client and service (if does not exist)
 	if err = client.loadPaymailComponents(); err != nil {
@@ -359,4 +362,8 @@ func (c *Client) PaymailsService() *paymails.Service {
 // AddressesService will return the address domain service
 func (c *Client) AddressesService() *addresses.Service {
 	return c.options.addresses
+}
+
+func (c *Client) DataService() *data.Service {
+	return c.options.data
 }

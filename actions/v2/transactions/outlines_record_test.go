@@ -1,6 +1,7 @@
 package transactions_test
 
 import (
+	"github.com/bitcoin-sv/spv-wallet/models/bsv"
 	"testing"
 
 	"github.com/bitcoin-sv/spv-wallet/actions/testabilities"
@@ -111,6 +112,35 @@ func TestOutlinesRecordOpReturn(t *testing.T) {
 			"value":  -1000,
 			"txID":   txSpec.ID(),
 			"sender": "",
+		})
+	})
+
+	t.Run("Get stored data", func(t *testing.T) {
+		// given:
+		given, then := testabilities.NewOf(givenForAllTests, t)
+
+		// and:
+		outpoint := bsv.Outpoint{TxID: txSpec.ID(), Vout: 0}
+
+		// and:
+		client := given.HttpClient().ForUser()
+
+		// when:
+		res, _ := client.R().
+			SetPathParams(map[string]string{
+				"txID": txSpec.ID(),
+				"vout": "0",
+			}).
+			Get("/api/v2/data/{txID}-{vout}")
+
+		// then:
+		then.Response(res).
+			IsOK().WithJSONMatching(`{
+				"id": "{{ .outpoint }}",
+				"blob": "{{ .blob }}"
+			}`, map[string]any{
+			"outpoint": outpoint.String(),
+			"blob":     dataOfOpReturnTx,
 		})
 	})
 }

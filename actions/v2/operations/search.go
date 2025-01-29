@@ -12,13 +12,13 @@ import (
 )
 
 func search(c *gin.Context, userContext *reqctx.UserContext) {
+	logger := reqctx.Logger(c)
+
 	userID, err := userContext.ShouldGetUserID()
 	if err != nil {
-		spverrors.ErrorResponse(c, spverrors.ErrCannotBindRequest, reqctx.Logger(c))
+		spverrors.AbortWithErrorResponse(c, err, logger)
 		return
 	}
-
-	logger := reqctx.Logger(c)
 
 	searchParams, err := query.ParseSearchParams[struct{}](c)
 	if err != nil {

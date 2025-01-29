@@ -2,6 +2,7 @@ package engine
 
 import (
 	"context"
+	"github.com/bitcoin-sv/spv-wallet/engine/v2/data"
 
 	paymailclient "github.com/bitcoin-sv/go-paymail"
 	paymailserver "github.com/bitcoin-sv/go-paymail/server"
@@ -208,6 +209,12 @@ func (c *Client) loadPaymailsService() {
 func (c *Client) loadAddressesService() {
 	if c.options.addresses == nil {
 		c.options.addresses = addresses.NewService(c.Repositories().Addresses)
+	}
+}
+
+func (c *Client) loadDataService() {
+	if c.options.data == nil {
+		c.options.data = data.NewService(c.Repositories().Data)
 	}
 }
 
