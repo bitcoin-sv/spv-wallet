@@ -6,10 +6,10 @@ import (
 	"slices"
 
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
-	"github.com/bitcoin-sv/spv-wallet/engine/utils"
 	"github.com/bitcoin-sv/spv-wallet/engine/v2/database"
 	"github.com/bitcoin-sv/spv-wallet/engine/v2/transaction/txmodels"
 	"github.com/bitcoin-sv/spv-wallet/models/bsv"
+	"github.com/samber/lo"
 	"gorm.io/gorm"
 )
 
@@ -40,7 +40,7 @@ func (o *Outputs) FindByOutpoints(ctx context.Context, outpoints iter.Seq[bsv.Ou
 		return nil, spverrors.Wrapf(err, "failed to get outputs")
 	}
 
-	return utils.MapSlice(outputs, func(output *database.TrackedOutput) txmodels.TrackedOutput {
+	return lo.Map(outputs, func(output *database.TrackedOutput, _ int) txmodels.TrackedOutput {
 		return txmodels.TrackedOutput{
 			TxID:       output.TxID,
 			Vout:       output.Vout,

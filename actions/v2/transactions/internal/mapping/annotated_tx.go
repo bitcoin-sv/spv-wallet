@@ -1,29 +1,51 @@
 package mapping
 
 import (
+	"github.com/bitcoin-sv/spv-wallet/engine/v2/bsv"
 	"github.com/bitcoin-sv/spv-wallet/engine/v2/transaction"
 	"github.com/bitcoin-sv/spv-wallet/engine/v2/transaction/outlines"
+	"github.com/bitcoin-sv/spv-wallet/models/request"
 	model "github.com/bitcoin-sv/spv-wallet/models/transaction"
 	"github.com/samber/lo"
 )
 
+// AnnotatedTransactionRequestToOutline maps request's AnnotatedTransaction to outlines.Transaction.
+func AnnotatedTransactionRequestToOutline(req *request.AnnotatedTransaction) *outlines.Transaction {
+	var annotations transaction.Annotations
+	if req.Annotations != nil && len(req.Annotations.Outputs) > 0 {
+		annotations.Outputs = lo.MapValues(req.Annotations.Outputs, annotatedOutputToOutline)
+	}
+
+	return &outlines.Transaction{
+		Hex:         bsv.TxHex(req.Hex),
+		Annotations: annotations,
+	}
+}
+
 // AnnotatedTransactionToOutline maps AnnotatedTransaction model to Transaction engine model
 func AnnotatedTransactionToOutline(tx *model.AnnotatedTransaction) *outlines.Transaction {
+	var annotations transaction.Annotations
+	if len(tx.Annotations.Outputs) > 0 {
+		annotations.Outputs = lo.MapValues(tx.Annotations.Outputs, annotatedOutputToOutline)
+	}
+
 	return &outlines.Transaction{
-		BEEF: tx.BEEF,
-		Annotations: transaction.Annotations{
-			Outputs: lo.MapValues(tx.Annotations.Outputs, annotatedOutputToOutline),
-		},
+		Hex:         bsv.TxHex(tx.Hex),
+		Annotations: annotations,
 	}
 }
 
 func annotatedOutputToOutline(from *model.OutputAnnotation, _ int) *transaction.OutputAnnotation {
-	return &transaction.OutputAnnotation{
+	outputAnnotation := &transaction.OutputAnnotation{
 		Bucket: from.Bucket,
-		Paymail: &transaction.PaymailAnnotation{
+	}
+	if from.Paymail != nil {
+		outputAnnotation.Paymail = &transaction.PaymailAnnotation{
 			Sender:    from.Paymail.Sender,
 			Receiver:  from.Paymail.Receiver,
 			Reference: from.Paymail.Reference,
-		},
+		}
 	}
+
+	return outputAnnotation
 }

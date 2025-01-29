@@ -24,11 +24,15 @@ func TransactionRequestToOutline(tx *request.TransactionSpecification, userID st
 
 // TransactionOutlineToResponse converts a transaction outline to a response model.
 func TransactionOutlineToResponse(tx *outlines.Transaction) *model.AnnotatedTransaction {
+	var annotations model.Annotations
+	if len(tx.Annotations.Outputs) > 0 {
+		annotations.Outputs = lo.MapValues(tx.Annotations.Outputs, outlineOutputToResponse)
+	}
+
 	return &model.AnnotatedTransaction{
-		BEEF: tx.BEEF,
-		Annotations: &model.Annotations{
-			Outputs: lo.MapValues(tx.Annotations.Outputs, outlineOutputToResponse),
-		},
+		Hex:         string(tx.Hex),
+		Format:      tx.Hex.Format(),
+		Annotations: &annotations,
 	}
 }
 

@@ -6,10 +6,10 @@ import (
 	"slices"
 
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
-	"github.com/bitcoin-sv/spv-wallet/engine/utils"
 	"github.com/bitcoin-sv/spv-wallet/engine/v2/addresses/addressesmodels"
 	"github.com/bitcoin-sv/spv-wallet/engine/v2/database"
 	"github.com/bitcoin-sv/spv-wallet/models/bsv"
+	"github.com/samber/lo"
 	"gorm.io/datatypes"
 	"gorm.io/gorm"
 )
@@ -49,7 +49,7 @@ func (r *Addresses) FindByStringAddresses(ctx context.Context, addresses iter.Se
 		return nil, spverrors.Wrapf(err, "failed to get addresses")
 	}
 
-	return utils.MapSlice(rows, func(row *database.Address) addressesmodels.Address {
+	return lo.Map(rows, func(row *database.Address, _ int) addressesmodels.Address {
 		return addressesmodels.Address{
 			Address:            row.Address,
 			CreatedAt:          row.CreatedAt,
