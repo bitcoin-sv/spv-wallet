@@ -10,8 +10,11 @@ type DataType int
 
 // Enum values for DataType
 const (
+	// DataTypeDefault marks the data type as default which is the same as strings data type.
 	DataTypeDefault DataType = iota
+	// DataTypeStrings marks the data type as strings.
 	DataTypeStrings
+	// DataTypeHexes marks the data type as hexes.
 	DataTypeHexes
 )
 

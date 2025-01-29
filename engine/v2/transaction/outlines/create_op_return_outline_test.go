@@ -146,6 +146,12 @@ func TestCreateOpReturnTransactionOutlineRAW(t *testing.T) {
 		opReturn      *outlines.OpReturn
 		lockingScript string
 	}{
+		"return transaction outline for default data type (strings)": {
+			opReturn: &outlines.OpReturn{
+				Data: []string{"Example data"},
+			},
+			lockingScript: "006a0c4578616d706c652064617461",
+		},
 		"return transaction outline for single string": {
 			opReturn: &outlines.OpReturn{
 				DataType: opreturn.DataTypeStrings,

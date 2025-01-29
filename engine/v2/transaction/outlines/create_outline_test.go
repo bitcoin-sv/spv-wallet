@@ -11,6 +11,34 @@ import (
 	"github.com/bitcoin-sv/spv-wallet/models"
 )
 
+func TestCreateTransactionOutlineFromMinimumSpec(t *testing.T) {
+	t.Run("minimum beef transaction spec", func(t *testing.T) {
+		given, then := testabilities.New(t)
+
+		// given:
+		service := given.NewTransactionOutlinesService()
+
+		// when:
+		tx, err := service.CreateBEEF(context.Background(), given.MinimumValidTransactionSpec())
+
+		// then:
+		then.Created(tx).WithNoError(err).WithParseableBEEFHex()
+	})
+
+	t.Run("minimum raw transaction spec", func(t *testing.T) {
+		given, then := testabilities.New(t)
+
+		// given:
+		service := given.NewTransactionOutlinesService()
+
+		// when:
+		tx, err := service.CreateRawTx(context.Background(), given.MinimumValidTransactionSpec())
+
+		// then:
+		then.Created(tx).WithNoError(err).WithParseableRawHex()
+	})
+}
+
 func TestCreateTransactionOutlineBEEFError(t *testing.T) {
 	errorTests := map[string]struct {
 		spec          *outlines.TransactionSpec
@@ -91,4 +119,21 @@ func TestCreateTransactionOutlineRAWError(t *testing.T) {
 			then.Created(tx).WithError(err).ThatIs(test.expectedError)
 		})
 	}
+
+	t.Run("return error when user has not enough funds", func(t *testing.T) {
+		given, then := testabilities.New(t)
+
+		// given:
+		service := given.NewTransactionOutlinesService()
+
+		// and:
+		given.UserHasNotEnoughFunds()
+
+		// when:
+		tx, err := service.CreateRawTx(context.Background(), given.MinimumValidTransactionSpec())
+
+		// then:
+		then.Created(tx).WithError(err).ThatIs(txerrors.ErrTxOutlineInsufficientFunds)
+
+	})
 }

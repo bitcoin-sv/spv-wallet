@@ -5,19 +5,32 @@ import (
 
 	tpaymail "github.com/bitcoin-sv/spv-wallet/engine/paymail/testabilities"
 	"github.com/bitcoin-sv/spv-wallet/engine/tester"
+	"github.com/bitcoin-sv/spv-wallet/engine/tester/fixtures"
 	"github.com/bitcoin-sv/spv-wallet/engine/v2/transaction/outlines"
 )
 
 // TransactionOutlineFixture is a test fixture - used for establishing environment for test.
 type TransactionOutlineFixture interface {
+	MinimumValidTransactionSpec() *outlines.TransactionSpec
 	NewTransactionOutlinesService() outlines.Service
 	ExternalRecipientHost() tpaymail.PaymailHostFixture
+	UserHasNotEnoughFunds()
 }
 
 type transactionOutlineAbility struct {
 	t                     testing.TB
 	paymailClientAbility  tpaymail.PaymailClientFixture
 	paymailAddressService outlines.PaymailAddressService
+	utxoSelector          mockedUTXOSelector
+}
+
+func (a *transactionOutlineAbility) MinimumValidTransactionSpec() *outlines.TransactionSpec {
+	return &outlines.TransactionSpec{
+		UserID: fixtures.Sender.ID(),
+		Outputs: outlines.NewOutputsSpecs(&outlines.OpReturn{
+			Data: []string{"test"},
+		}),
+	}
 }
 
 // Given creates a new test fixture.
@@ -40,6 +53,11 @@ func (a *transactionOutlineAbility) NewTransactionOutlinesService() outlines.Ser
 	return outlines.NewService(
 		a.paymailClientAbility.NewPaymailClientService(),
 		a.paymailAddressService,
+		&a.utxoSelector,
 		tester.Logger(a.t),
 	)
+}
+
+func (a *transactionOutlineAbility) UserHasNotEnoughFunds() {
+	a.utxoSelector.WillReturnNoUTXOs()
 }
