@@ -2,7 +2,7 @@ package mapping
 
 import (
 	"github.com/bitcoin-sv/spv-wallet/engine/v2/users/usersmodels"
-	"github.com/bitcoin-sv/spv-wallet/mapper"
+	"github.com/bitcoin-sv/spv-wallet/lox"
 	"github.com/bitcoin-sv/spv-wallet/models/response/adminresponse"
 	"github.com/samber/lo"
 )
@@ -14,7 +14,7 @@ func UserToResponse(u *usersmodels.User) adminresponse.User {
 		CreatedAt: u.CreatedAt,
 		UpdatedAt: u.UpdatedAt,
 		PublicKey: u.PublicKey,
-		Paymails:  lo.Map(u.Paymails, mapper.MapWithoutIndex(UsersPaymailToResponse)),
+		Paymails:  lo.Map(u.Paymails, lox.MappingFn(UsersPaymailToResponse)),
 	}
 }
 

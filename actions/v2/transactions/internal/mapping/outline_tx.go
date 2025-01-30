@@ -5,7 +5,7 @@ import (
 
 	"github.com/bitcoin-sv/spv-wallet/engine/v2/transaction"
 	"github.com/bitcoin-sv/spv-wallet/engine/v2/transaction/outlines"
-	"github.com/bitcoin-sv/spv-wallet/mapper"
+	"github.com/bitcoin-sv/spv-wallet/lox"
 	"github.com/bitcoin-sv/spv-wallet/models/request"
 	"github.com/bitcoin-sv/spv-wallet/models/request/opreturn"
 	paymailreq "github.com/bitcoin-sv/spv-wallet/models/request/paymail"
@@ -15,14 +15,14 @@ import (
 
 // TransactionSpecificationRequestToOutline converts a transaction outline request model to the engine model.
 func TransactionSpecificationRequestToOutline(tx *request.TransactionSpecification, userID string) (*outlines.TransactionSpec, error) {
-	catcher := mapper.NewErrorCatcher()
+	catcher := lox.NewErrorCatcher()
 
 	return &outlines.TransactionSpec{
 		UserID: userID,
 		Outputs: outlines.OutputsSpec{
 			Outputs: lo.Map(
 				tx.Outputs,
-				mapper.Try(catcher, mapper.MapWithoutIndexWithError(transactionRequestOutputsToOutline)),
+				lox.Try(catcher, lox.MappingFnWithError(transactionRequestOutputsToOutline)),
 			),
 		},
 	}, catcher.Error()
@@ -32,7 +32,7 @@ func TransactionSpecificationRequestToOutline(tx *request.TransactionSpecificati
 func TransactionOutlineToResponse(tx *outlines.Transaction) *model.AnnotatedTransaction {
 	var annotations model.Annotations
 	if len(tx.Annotations.Outputs) > 0 {
-		annotations.Outputs = lo.MapValues(tx.Annotations.Outputs, mapper.MapWithoutIndex(outlineOutputToResponse))
+		annotations.Outputs = lo.MapValues(tx.Annotations.Outputs, lox.MappingFn(outlineOutputToResponse))
 	}
 
 	return &model.AnnotatedTransaction{
