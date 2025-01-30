@@ -441,9 +441,6 @@ var ErrBroadcast = models.SPVError{Message: "broadcast error", StatusCode: 500, 
 
 // ////////////////////////////////// CONVERSION ERRORS
 
-// ErrInvalidUint is when uint value is invalid
-var ErrInvalidUint = models.SPVError{Message: "invalid uint value", StatusCode: 500, Code: "error-invalid-uint-value"}
-
 // ErrInvalidInt is when uint value is invalid
 var ErrInvalidInt = models.SPVError{Message: "invalid int value", StatusCode: 500, Code: "error-invalid-int-value"}
 
@@ -464,3 +461,9 @@ var ErrInvalidUint64 = models.SPVError{Message: "invalid uint64 value", StatusCo
 
 // ErrMissingXPubID is when xpub_id is missing
 var ErrMissingXPubID = models.SPVError{Message: "missing xpub_id", StatusCode: 400, Code: "error-missing-xpub-id"}
+
+// ErrDataNotFound is when data record cannot be found
+var ErrDataNotFound = models.SPVError{Message: "data not found", StatusCode: 404, Code: "error-data-not-found"}
+
+// ErrInvalidDataID is when data id is invalid
+var ErrInvalidDataID = models.SPVError{Message: "invalid data id", StatusCode: 400, Code: "error-invalid-data-id"}
