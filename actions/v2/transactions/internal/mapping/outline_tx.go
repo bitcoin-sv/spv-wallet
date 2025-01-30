@@ -15,14 +15,14 @@ import (
 
 // TransactionSpecificationRequestToOutline converts a transaction outline request model to the engine model.
 func TransactionSpecificationRequestToOutline(tx *request.TransactionSpecification, userID string) (*outlines.TransactionSpec, error) {
-	catcher := lox.NewErrorCatcher()
+	catcher := lox.NewErrorCollector()
 
 	return &outlines.TransactionSpec{
 		UserID: userID,
 		Outputs: outlines.OutputsSpec{
 			Outputs: lo.Map(
 				tx.Outputs,
-				lox.Try(catcher, lox.MappingFnWithError(transactionRequestOutputsToOutline)),
+				lox.MapAndCollect(catcher, lox.MappingFnWithError(transactionRequestOutputsToOutline)),
 			),
 		},
 	}, catcher.Error()
