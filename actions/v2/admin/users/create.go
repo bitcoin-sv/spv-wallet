@@ -37,11 +37,6 @@ func create(c *gin.Context, _ *reqctx.AdminContext) {
 			return
 		}
 
-		if err = reqctx.AppConfig(c).Paymail.CheckDomain(domain); err != nil {
-			spverrors.ErrorResponse(c, err, logger)
-			return
-		}
-
 		newUser.Paymail = &usersmodels.NewPaymail{
 			Alias:  alias,
 			Domain: domain,

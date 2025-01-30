@@ -2,6 +2,7 @@ package engine
 
 import (
 	"database/sql"
+	"github.com/bitcoin-sv/spv-wallet/config"
 	"net/url"
 	"time"
 
@@ -449,5 +450,12 @@ func WithBHS(url, token string) ClientOps {
 			URL:       url,
 			AuthToken: token,
 		}
+	}
+}
+
+// WithAppConfig passes the config struct into engine
+func WithAppConfig(config *config.AppConfig) ClientOps {
+	return func(c *clientOptions) {
+		c.config = config
 	}
 }

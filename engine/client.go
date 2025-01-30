@@ -2,6 +2,7 @@ package engine
 
 import (
 	"context"
+	"github.com/bitcoin-sv/spv-wallet/config"
 	"time"
 
 	"github.com/bitcoin-sv/go-paymail"
@@ -64,6 +65,7 @@ type (
 		paymails     *paymails.Service // Paymail domain service
 		addresses    *addresses.Service
 		data         *data.Service
+		config       *config.AppConfig
 	}
 
 	// cacheStoreOptions holds the cache configuration and client

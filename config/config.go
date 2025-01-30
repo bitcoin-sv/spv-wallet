@@ -219,7 +219,7 @@ type BHSConfig struct {
 	URL string `json:"url" mapstructure:"url"`
 }
 
-func (b *BeefConfig) enabled() bool {
+func (b *BeefConfig) Enabled() bool {
 	return b != nil && b.UseBeef
 }
 
@@ -266,5 +266,5 @@ func (c *AppConfig) GetUserAgent() string {
 
 // IsBeefEnabled returns true if the Beef capability will be used for paymail transactions
 func (c *AppConfig) IsBeefEnabled() bool {
-	return c.Paymail != nil && c.Paymail.Beef.enabled()
+	return c.Paymail != nil && c.Paymail.Beef.Enabled()
 }

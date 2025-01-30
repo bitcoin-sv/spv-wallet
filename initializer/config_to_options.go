@@ -1,8 +1,9 @@
-package config
+package initializer
 
 import (
 	"crypto/tls"
 	"fmt"
+	"github.com/bitcoin-sv/spv-wallet/config"
 	"net/url"
 	"time"
 
@@ -23,45 +24,49 @@ import (
 )
 
 // ToEngineOptions converts the AppConfig to a slice of engine.ClientOps that can be used to create a new engine.Client.
-func (c *AppConfig) ToEngineOptions(logger zerolog.Logger) (options []engine.ClientOps, err error) {
-	options = c.addUserAgentOpts(options)
+func ToEngineOptions(c *config.AppConfig, logger zerolog.Logger) (options []engine.ClientOps, err error) {
+	options = addUserAgentOpts(c, options)
 
-	options = c.addHttpClientOpts(options)
+	options = addHttpClientOpts(c, options)
 
-	options = c.addMetricsOpts(options)
+	options = addMetricsOpts(c, options)
 
-	options = c.addLoggerOpts(logger, options)
+	options = addLoggerOpts(c, logger, options)
 
-	options = c.addDebugOpts(options)
+	options = addDebugOpts(c, options)
 
-	options = c.addCacheStoreOpts(options)
+	options = addCacheStoreOpts(c, options)
 
-	if options, err = c.addClusterOpts(options); err != nil {
+	if options, err = addClusterOpts(c, options); err != nil {
 		return nil, err
 	}
 
-	if options, err = c.addDataStoreOpts(options); err != nil {
+	if options, err = addDataStoreOpts(c, options); err != nil {
 		return nil, err
 	}
 
-	options = c.addPaymailOpts(options)
+	options = addPaymailOpts(c, options)
 
-	options = c.addTaskManagerOpts(options)
+	options = addTaskManagerOpts(c, options)
 
-	options = c.addNotificationOpts(options)
+	options = addNotificationOpts(c, options)
 
-	if options, err = c.addARCOpts(options); err != nil {
+	if options, err = addARCOpts(c, options); err != nil {
 		return nil, err
 	}
 
-	options = c.addBHSOpts(options)
+	options = addBHSOpts(c, options)
 
-	options = c.addCustomFeeUnit(options)
+	options = addCustomFeeUnit(c, options)
 
 	return options, nil
 }
 
-func (c *AppConfig) addHttpClientOpts(options []engine.ClientOps) []engine.ClientOps {
+func addAppConfigOpts(c *config.AppConfig, options []engine.ClientOps) []engine.ClientOps {
+	return append(options, engine.WithAppConfig(c))
+}
+
+func addHttpClientOpts(c *config.AppConfig, options []engine.ClientOps) []engine.ClientOps {
 	client := resty.New()
 	client.SetTimeout(20 * time.Second)
 	client.SetDebug(c.Logging.Level == zerolog.LevelTraceValue)
@@ -69,7 +74,7 @@ func (c *AppConfig) addHttpClientOpts(options []engine.ClientOps) []engine.Clien
 	return append(options, engine.WithHTTPClient(client))
 }
 
-func (c *AppConfig) addCustomFeeUnit(options []engine.ClientOps) []engine.ClientOps {
+func addCustomFeeUnit(c *config.AppConfig, options []engine.ClientOps) []engine.ClientOps {
 	if c.CustomFeeUnit != nil {
 		satoshis, err := conv.IntToUint64(c.CustomFeeUnit.Satoshis)
 		if err != nil {
@@ -84,16 +89,16 @@ func (c *AppConfig) addCustomFeeUnit(options []engine.ClientOps) []engine.Client
 	return options
 }
 
-func (c *AppConfig) addUserAgentOpts(options []engine.ClientOps) []engine.ClientOps {
+func addUserAgentOpts(c *config.AppConfig, options []engine.ClientOps) []engine.ClientOps {
 	return append(options, engine.WithUserAgent(c.GetUserAgent()))
 }
 
-func (c *AppConfig) addLoggerOpts(logger zerolog.Logger, options []engine.ClientOps) []engine.ClientOps {
+func addLoggerOpts(c *config.AppConfig, logger zerolog.Logger, options []engine.ClientOps) []engine.ClientOps {
 	serviceLogger := logger.With().Str("service", "spv-wallet").Logger()
 	return append(options, engine.WithLogger(&serviceLogger))
 }
 
-func (c *AppConfig) addMetricsOpts(options []engine.ClientOps) []engine.ClientOps {
+func addMetricsOpts(c *config.AppConfig, options []engine.ClientOps) []engine.ClientOps {
 	if c.Metrics.Enabled {
 		collector := metrics.EnableMetrics()
 		options = append(options, engine.WithMetrics(collector))
@@ -101,14 +106,14 @@ func (c *AppConfig) addMetricsOpts(options []engine.ClientOps) []engine.ClientOp
 	return options
 }
 
-func (c *AppConfig) addDebugOpts(options []engine.ClientOps) []engine.ClientOps {
+func addDebugOpts(c *config.AppConfig, options []engine.ClientOps) []engine.ClientOps {
 	if c.Logging.Level == zerolog.LevelDebugValue || c.Logging.Level == zerolog.LevelTraceValue {
 		options = append(options, engine.WithDebugging())
 	}
 	return options
 }
 
-func (c *AppConfig) addCacheStoreOpts(options []engine.ClientOps) []engine.ClientOps {
+func addCacheStoreOpts(c *config.AppConfig, options []engine.ClientOps) []engine.ClientOps {
 	if c.Cache.Engine == cachestore.Redis {
 		options = append(options, engine.WithRedis(&cachestore.RedisConfig{
 			DependencyMode:        c.Cache.Redis.DependencyMode,
@@ -126,7 +131,7 @@ func (c *AppConfig) addCacheStoreOpts(options []engine.ClientOps) []engine.Clien
 	return options
 }
 
-func (c *AppConfig) addClusterOpts(options []engine.ClientOps) ([]engine.ClientOps, error) {
+func addClusterOpts(c *config.AppConfig, options []engine.ClientOps) ([]engine.ClientOps, error) {
 	if c.Cache.Cluster == nil {
 		return options, nil
 	}
@@ -172,7 +177,7 @@ func (c *AppConfig) addClusterOpts(options []engine.ClientOps) ([]engine.ClientO
 	return options, nil
 }
 
-func (c *AppConfig) addDataStoreOpts(options []engine.ClientOps) ([]engine.ClientOps, error) {
+func addDataStoreOpts(c *config.AppConfig, options []engine.ClientOps) ([]engine.ClientOps, error) {
 	// Select the datastore
 	if c.Db.Datastore.Engine == datastore.SQLite {
 		tablePrefix := c.Db.Datastore.TablePrefix
@@ -225,7 +230,7 @@ func (c *AppConfig) addDataStoreOpts(options []engine.ClientOps) ([]engine.Clien
 	return options, nil
 }
 
-func (c *AppConfig) addPaymailOpts(options []engine.ClientOps) []engine.ClientOps {
+func addPaymailOpts(c *config.AppConfig, options []engine.ClientOps) []engine.ClientOps {
 	pm := c.Paymail
 	options = append(options, engine.WithPaymailSupport(
 		pm.Domains,
@@ -233,7 +238,7 @@ func (c *AppConfig) addPaymailOpts(options []engine.ClientOps) []engine.ClientOp
 		pm.DomainValidationEnabled,
 		pm.SenderValidationEnabled,
 	))
-	if pm.Beef.enabled() {
+	if pm.Beef.Enabled() {
 		options = append(options, engine.WithPaymailBeefSupport(pm.Beef.BlockHeadersServiceHeaderValidationURL, pm.Beef.BlockHeadersServiceAuthToken))
 	}
 	if c.ExperimentalFeatures.PikeContactsEnabled {
@@ -249,25 +254,25 @@ func (c *AppConfig) addPaymailOpts(options []engine.ClientOps) []engine.ClientOp
 	return options
 }
 
-func (c *AppConfig) addTaskManagerOpts(options []engine.ClientOps) []engine.ClientOps {
+func addTaskManagerOpts(c *config.AppConfig, options []engine.ClientOps) []engine.ClientOps {
 	var ops []taskmanager.TasqOps
 	if c.TaskManager.Factory == taskmanager.FactoryRedis {
 		ops = append(ops, taskmanager.WithRedis(c.Cache.Redis.URL))
 	}
 
 	return append(options, engine.WithTaskqConfig(
-		taskmanager.DefaultTaskQConfig(TaskManagerQueueName, ops...),
+		taskmanager.DefaultTaskQConfig(config.TaskManagerQueueName, ops...),
 	))
 }
 
-func (c *AppConfig) addNotificationOpts(options []engine.ClientOps) []engine.ClientOps {
+func addNotificationOpts(c *config.AppConfig, options []engine.ClientOps) []engine.ClientOps {
 	if c.Notifications != nil && c.Notifications.Enabled {
 		options = append(options, engine.WithNotifications())
 	}
 	return options
 }
 
-func (c *AppConfig) addARCOpts(options []engine.ClientOps) ([]engine.ClientOps, error) {
+func addARCOpts(c *config.AppConfig, options []engine.ClientOps) ([]engine.ClientOps, error) {
 	arcCfg := chainmodels.ARCConfig{
 		URL:          c.ARC.URL,
 		Token:        c.ARC.Token,
@@ -279,7 +284,7 @@ func (c *AppConfig) addARCOpts(options []engine.ClientOps) ([]engine.ClientOps, 
 		if c.ARC.Callback.Token == "" {
 			// This also sets the token to the config reference and, it is used in the callbacktoken_middleware
 			// TODO: consider moving config modification to a PostLoad method and make this ToEngineOptions pure (no side effects)
-			if c.ARC.Callback.Token, err = utils.HashAdler32(DefaultAdminXpub); err != nil {
+			if c.ARC.Callback.Token, err = utils.HashAdler32(config.DefaultAdminXpub); err != nil {
 				return nil, spverrors.Wrapf(err, "error while generating callback token")
 			}
 		}
@@ -296,6 +301,6 @@ func (c *AppConfig) addARCOpts(options []engine.ClientOps) ([]engine.ClientOps, 
 	return append(options, engine.WithARC(arcCfg)), nil
 }
 
-func (c *AppConfig) addBHSOpts(options []engine.ClientOps) []engine.ClientOps {
+func addBHSOpts(c *config.AppConfig, options []engine.ClientOps) []engine.ClientOps {
 	return append(options, engine.WithBHS(c.BHS.URL, c.BHS.AuthToken))
 }

@@ -3,6 +3,7 @@ package tests
 
 import (
 	"context"
+	"github.com/bitcoin-sv/spv-wallet/initializer"
 	"os"
 
 	"github.com/bitcoin-sv/spv-wallet/config"
@@ -61,7 +62,7 @@ func (ts *TestSuite) BaseSetupTest() {
 	var err error
 	ts.Logger = tester.Logger(ts.T())
 
-	opts, err := ts.AppConfig.ToEngineOptions(ts.Logger)
+	opts, err := initializer.ToEngineOptions(ts.AppConfig, ts.Logger)
 	require.NoError(ts.T(), err)
 
 	ts.SpvWalletEngine, err = engine.NewClient(context.Background(), opts...)

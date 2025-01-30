@@ -2,6 +2,7 @@ package users
 
 import (
 	"context"
+	"github.com/bitcoin-sv/spv-wallet/config"
 
 	primitives "github.com/bitcoin-sv/go-sdk/primitives/ec"
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
@@ -11,17 +12,24 @@ import (
 // Service is a user domain service
 type Service struct {
 	usersRepo UserRepo
+	config    *config.AppConfig
 }
 
 // NewService creates a new user service
-func NewService(users UserRepo) *Service {
+func NewService(users UserRepo, cfg *config.AppConfig) *Service {
 	return &Service{
 		usersRepo: users,
+		config:    cfg,
 	}
 }
 
 // Create creates a new user
 func (s *Service) Create(ctx context.Context, newUser *usersmodels.NewUser) (*usersmodels.User, error) {
+	if newUser.Paymail != nil {
+		if err := s.config.Paymail.CheckDomain(newUser.Paymail.Domain); err != nil {
+			return nil, err //nolint:wrapcheck // SPVError error returned from CheckDomain
+		}
+	}
 	createdUser, err := s.usersRepo.Create(ctx, newUser)
 	if err != nil {
 		return nil, spverrors.Wrapf(err, "failed to create user")

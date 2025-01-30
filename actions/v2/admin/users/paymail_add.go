@@ -1,6 +1,7 @@
 package users
 
 import (
+	"errors"
 	"net/http"
 
 	"github.com/bitcoin-sv/go-paymail"
@@ -30,11 +31,6 @@ func addPaymail(c *gin.Context, _ *reqctx.AdminContext) {
 		return
 	}
 
-	if err = reqctx.AppConfig(c).Paymail.CheckDomain(domain); err != nil {
-		spverrors.ErrorResponse(c, err, logger)
-		return
-	}
-
 	newPaymail := &paymailsmodels.NewPaymail{
 		Alias:      alias,
 		Domain:     domain,
@@ -44,7 +40,10 @@ func addPaymail(c *gin.Context, _ *reqctx.AdminContext) {
 	}
 	createdPaymail, err := reqctx.Engine(c).PaymailsService().Create(c, newPaymail)
 	if err != nil {
-		spverrors.ErrorResponse(c, adminerrors.ErrAddingPaymail.Wrap(err), logger)
+		if !errors.Is(err, spverrors.ErrInvalidDomain) {
+			err = adminerrors.ErrAddingPaymail.Wrap(err)
+		}
+		spverrors.ErrorResponse(c, err, logger)
 		return
 	}
 

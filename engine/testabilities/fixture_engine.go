@@ -3,6 +3,7 @@ package testabilities
 import (
 	"context"
 	"errors"
+	"github.com/bitcoin-sv/spv-wallet/initializer"
 	"testing"
 
 	"github.com/bitcoin-sv/go-paymail"
@@ -101,7 +102,7 @@ func (f *engineFixture) EngineWithConfiguration(opts ...ConfigOpts) (walletEngin
 	f.config = f.ConfigForTests(opts...)
 	f.prepareDBConfigForTests()
 
-	options, err := f.config.ToEngineOptions(f.logger)
+	options, err := initializer.ToEngineOptions(f.config, f.logger)
 	require.NoError(f.t, err)
 	options = f.addMockedExternalDependenciesOptions(options)
 

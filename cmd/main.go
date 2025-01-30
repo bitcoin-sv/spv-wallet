@@ -5,6 +5,7 @@ package main
 
 import (
 	"context"
+	"github.com/bitcoin-sv/spv-wallet/initializer"
 	"os"
 	"os/signal"
 	"time"
@@ -54,7 +55,7 @@ func main() {
 
 	appCtx := context.Background()
 
-	opts, err := appConfig.ToEngineOptions(logger)
+	opts, err := initializer.ToEngineOptions(appConfig, logger)
 	if err != nil {
 		defaultLogger.Fatal().Err(err).Msg("Error while creating engine options")
 		return
