@@ -5,6 +5,7 @@ import (
 
 	"github.com/bitcoin-sv/spv-wallet/engine/v2/transaction"
 	"github.com/bitcoin-sv/spv-wallet/engine/v2/transaction/outlines"
+	"github.com/bitcoin-sv/spv-wallet/mapper"
 	"github.com/bitcoin-sv/spv-wallet/models/request"
 	"github.com/bitcoin-sv/spv-wallet/models/request/opreturn"
 	paymailreq "github.com/bitcoin-sv/spv-wallet/models/request/paymail"
@@ -12,12 +13,12 @@ import (
 	"github.com/samber/lo"
 )
 
-// TransactionRequestToOutline converts a transaction outline request model to the engine model.
-func TransactionRequestToOutline(tx *request.TransactionSpecification, userID string) *outlines.TransactionSpec {
+// TransactionSpecificationRequestToOutline converts a transaction outline request model to the engine model.
+func TransactionSpecificationRequestToOutline(tx *request.TransactionSpecification, userID string) *outlines.TransactionSpec {
 	return &outlines.TransactionSpec{
 		UserID: userID,
 		Outputs: outlines.OutputsSpec{
-			Outputs: lo.Map(tx.Outputs, transactionRequestOutputsToOutline),
+			Outputs: lo.Map(tx.Outputs, mapper.MapWithoutIndex(transactionRequestOutputsToOutline)),
 		},
 	}
 }
@@ -26,7 +27,7 @@ func TransactionRequestToOutline(tx *request.TransactionSpecification, userID st
 func TransactionOutlineToResponse(tx *outlines.Transaction) *model.AnnotatedTransaction {
 	var annotations model.Annotations
 	if len(tx.Annotations.Outputs) > 0 {
-		annotations.Outputs = lo.MapValues(tx.Annotations.Outputs, outlineOutputToResponse)
+		annotations.Outputs = lo.MapValues(tx.Annotations.Outputs, mapper.MapWithoutIndex(outlineOutputToResponse))
 	}
 
 	return &model.AnnotatedTransaction{
@@ -36,7 +37,7 @@ func TransactionOutlineToResponse(tx *outlines.Transaction) *model.AnnotatedTran
 	}
 }
 
-func transactionRequestOutputsToOutline(val request.Output, _ int) outlines.OutputSpec {
+func transactionRequestOutputsToOutline(val request.Output) outlines.OutputSpec {
 	spec, err := outputSpecFromRequest(val)
 	// TODO: handle error
 	if err != nil {
@@ -45,7 +46,7 @@ func transactionRequestOutputsToOutline(val request.Output, _ int) outlines.Outp
 	return spec
 }
 
-func outlineOutputToResponse(from *transaction.OutputAnnotation, _ int) *model.OutputAnnotation {
+func outlineOutputToResponse(from *transaction.OutputAnnotation) *model.OutputAnnotation {
 	outputAnnotation := &model.OutputAnnotation{
 		Bucket: from.Bucket,
 	}

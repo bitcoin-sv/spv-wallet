@@ -4,6 +4,7 @@ import (
 	"github.com/bitcoin-sv/spv-wallet/engine/v2/bsv"
 	"github.com/bitcoin-sv/spv-wallet/engine/v2/transaction"
 	"github.com/bitcoin-sv/spv-wallet/engine/v2/transaction/outlines"
+	"github.com/bitcoin-sv/spv-wallet/mapper"
 	"github.com/bitcoin-sv/spv-wallet/models/request"
 	model "github.com/bitcoin-sv/spv-wallet/models/transaction"
 	"github.com/samber/lo"
@@ -13,7 +14,7 @@ import (
 func AnnotatedTransactionRequestToOutline(req *request.AnnotatedTransaction) *outlines.Transaction {
 	var annotations transaction.Annotations
 	if req.Annotations != nil && len(req.Annotations.Outputs) > 0 {
-		annotations.Outputs = lo.MapValues(req.Annotations.Outputs, annotatedOutputToOutline)
+		annotations.Outputs = lo.MapValues(req.Annotations.Outputs, mapper.MapWithoutIndex(annotatedOutputToOutline))
 	}
 
 	return &outlines.Transaction{
@@ -26,7 +27,7 @@ func AnnotatedTransactionRequestToOutline(req *request.AnnotatedTransaction) *ou
 func AnnotatedTransactionToOutline(tx *model.AnnotatedTransaction) *outlines.Transaction {
 	var annotations transaction.Annotations
 	if len(tx.Annotations.Outputs) > 0 {
-		annotations.Outputs = lo.MapValues(tx.Annotations.Outputs, annotatedOutputToOutline)
+		annotations.Outputs = lo.MapValues(tx.Annotations.Outputs, mapper.MapWithoutIndex(annotatedOutputToOutline))
 	}
 
 	return &outlines.Transaction{
@@ -35,7 +36,7 @@ func AnnotatedTransactionToOutline(tx *model.AnnotatedTransaction) *outlines.Tra
 	}
 }
 
-func annotatedOutputToOutline(from *model.OutputAnnotation, _ int) *transaction.OutputAnnotation {
+func annotatedOutputToOutline(from *model.OutputAnnotation) *transaction.OutputAnnotation {
 	outputAnnotation := &transaction.OutputAnnotation{
 		Bucket: from.Bucket,
 	}
