@@ -23,6 +23,7 @@ type ARCConfig struct {
 	URL          string
 	Token        string
 	DeploymentID string
+	WaitFor      string
 	Callback     *ARCCallbackConfig
 	UseJunglebus bool
 	TxsGetter    TransactionsGetter
