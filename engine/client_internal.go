@@ -13,6 +13,7 @@ import (
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/bitcoin-sv/spv-wallet/engine/taskmanager"
 	"github.com/bitcoin-sv/spv-wallet/engine/v2/addresses"
+	"github.com/bitcoin-sv/spv-wallet/engine/v2/data"
 	"github.com/bitcoin-sv/spv-wallet/engine/v2/database/repository"
 	"github.com/bitcoin-sv/spv-wallet/engine/v2/operations"
 	"github.com/bitcoin-sv/spv-wallet/engine/v2/paymails"
@@ -209,6 +210,12 @@ func (c *Client) loadPaymailsService() {
 func (c *Client) loadAddressesService() {
 	if c.options.addresses == nil {
 		c.options.addresses = addresses.NewService(c.Repositories().Addresses)
+	}
+}
+
+func (c *Client) loadDataService() {
+	if c.options.data == nil {
+		c.options.data = data.NewService(c.Repositories().Data)
 	}
 }
 

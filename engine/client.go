@@ -17,6 +17,7 @@ import (
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/bitcoin-sv/spv-wallet/engine/taskmanager"
 	"github.com/bitcoin-sv/spv-wallet/engine/v2/addresses"
+	"github.com/bitcoin-sv/spv-wallet/engine/v2/data"
 	"github.com/bitcoin-sv/spv-wallet/engine/v2/database/repository"
 	"github.com/bitcoin-sv/spv-wallet/engine/v2/operations"
 	"github.com/bitcoin-sv/spv-wallet/engine/v2/paymails"
@@ -64,6 +65,7 @@ type (
 		paymails     *paymails.Service // Paymail domain service
 		addresses    *addresses.Service
 		operations   *operations.Service
+		data         *data.Service
 	}
 
 	// cacheStoreOptions holds the cache configuration and client
@@ -157,6 +159,7 @@ func NewClient(ctx context.Context, opts ...ClientOps) (ClientInterface, error) 
 	client.loadUsersService()
 	client.loadPaymailsService()
 	client.loadAddressesService()
+	client.loadDataService()
 	client.loadOperationsService()
 
 	// Load the Paymail client and service (if does not exist)
@@ -362,6 +365,11 @@ func (c *Client) PaymailsService() *paymails.Service {
 // AddressesService will return the address domain service
 func (c *Client) AddressesService() *addresses.Service {
 	return c.options.addresses
+}
+
+// DataService will return the data domain service
+func (c *Client) DataService() *data.Service {
+	return c.options.data
 }
 
 // OperationsService will return the operations domain service

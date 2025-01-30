@@ -14,6 +14,7 @@ import (
 	paymailclient "github.com/bitcoin-sv/spv-wallet/engine/paymail"
 	"github.com/bitcoin-sv/spv-wallet/engine/taskmanager"
 	"github.com/bitcoin-sv/spv-wallet/engine/v2/addresses"
+	"github.com/bitcoin-sv/spv-wallet/engine/v2/data"
 	"github.com/bitcoin-sv/spv-wallet/engine/v2/database/repository"
 	"github.com/bitcoin-sv/spv-wallet/engine/v2/operations"
 	"github.com/bitcoin-sv/spv-wallet/engine/v2/paymails"
@@ -163,6 +164,7 @@ type V2 interface {
 	UsersService() *users.Service
 	PaymailsService() *paymails.Service
 	AddressesService() *addresses.Service
+	DataService() *data.Service
 	OperationsService() *operations.Service
 }
 

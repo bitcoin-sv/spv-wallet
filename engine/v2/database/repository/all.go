@@ -9,6 +9,7 @@ type All struct {
 	Operations *Operations
 	Users      *Users
 	Outputs    *Outputs
+	Data       *Data
 }
 
 // NewRepositories creates a new holder for all repositories.
@@ -19,5 +20,6 @@ func NewRepositories(db *gorm.DB) *All {
 		Operations: NewOperationsRepo(db),
 		Users:      NewUsersRepo(db),
 		Outputs:    NewOutputsRepo(db),
+		Data:       NewDataRepo(db),
 	}
 }
