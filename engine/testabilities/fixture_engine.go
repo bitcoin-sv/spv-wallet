@@ -52,6 +52,7 @@ type EngineFixture interface {
 // FaucetFixture is a test fixture for the faucet service
 type FaucetFixture interface {
 	TopUp(satoshis bsv.Satoshis) fixtures.GivenTXSpec
+	StoreData(data string) (fixtures.GivenTXSpec, string)
 }
 
 type EngineWithConfig struct {
