@@ -1,5 +1,6 @@
 package: api
 generate:
   gin-server: true
-  models: true
+  models: false
+#  client: true
 output: ../api/gen.api.go

@@ -17,3 +17,13 @@ components:
           description: Example of admin request body
           example: 1
       additionalProperties: false
+
+
+    GetPaymails:
+      type: object
+      properties:
+        domain:
+          type: string
+          nullable: false
+          description: Paymail domain
+          example: moneybutton.com

@@ -4,73 +4,617 @@
 package api
 
 import (
+	"bytes"
+	"context"
+	"encoding/json"
 	"fmt"
+	"io"
 	"net/http"
-	"time"
+	"net/url"
+	"strings"
 
 	"github.com/gin-gonic/gin"
 	"github.com/oapi-codegen/runtime"
 )
 
-// ApiComponentsErrorsErrUserNotFound defines model for api_components_errors_ErrUserNotFound.
-type ApiComponentsErrorsErrUserNotFound struct {
-	Code    interface{} `json:"code"`
-	Message interface{} `json:"message"`
+// RequestEditorFn  is the function signature for the RequestEditor callback function
+type RequestEditorFn func(ctx context.Context, req *http.Request) error
+
+// Doer performs HTTP requests.
+//
+// The standard http.Client implements this interface.
+type HttpRequestDoer interface {
+	Do(req *http.Request) (*http.Response, error)
 }
 
-// ApiComponentsErrorsErrorSchema defines model for api_components_errors_ErrorSchema.
-type ApiComponentsErrorsErrorSchema struct {
-	// Code Error code
-	Code int32 `json:"code"`
+// Client which conforms to the OpenAPI3 specification for this service.
+type Client struct {
+	// The endpoint of the server conforming to this interface, with scheme,
+	// https://api.deepmap.com for example. This can contain a path relative
+	// to the server, such as https://api.deepmap.com/dev-test, and all the
+	// paths in the swagger spec will be appended to the server.
+	Server string
 
-	// Message Error message
-	Message string `json:"message"`
+	// Doer for performing requests, typically a *http.Client with any
+	// customized settings, such as certificate chains.
+	Client HttpRequestDoer
+
+	// A list of callbacks for modifying requests which are generated before sending over
+	// the network.
+	RequestEditors []RequestEditorFn
 }
 
-// ApiComponentsModelsUser defines model for api_components_models_User.
-type ApiComponentsModelsUser struct {
-	// Id User ID
-	Id uint64 `json:"id"`
+// ClientOption allows setting custom parameters during construction
+type ClientOption func(*Client) error
 
-	// Name User name
-	Name string `json:"name"`
+// Creates a new Client, with reasonable defaults
+func NewClient(server string, opts ...ClientOption) (*Client, error) {
+	// create a client with sane default values
+	client := Client{
+		Server: server,
+	}
+	// mutate client and add all optional params
+	for _, o := range opts {
+		if err := o(&client); err != nil {
+			return nil, err
+		}
+	}
+	// ensure the server URL always has a trailing slash
+	if !strings.HasSuffix(client.Server, "/") {
+		client.Server += "/"
+	}
+	// create httpClient, if not already present
+	if client.Client == nil {
+		client.Client = &http.Client{}
+	}
+	return &client, nil
 }
 
-// ApiComponentsRequestsAdminRequest defines model for api_components_requests_AdminRequest.
-type ApiComponentsRequestsAdminRequest struct {
-	// Id Example of admin request body
-	Id uint64 `json:"id"`
+// WithHTTPClient allows overriding the default Doer, which is
+// automatically created using http.Client. This is useful for tests.
+func WithHTTPClient(doer HttpRequestDoer) ClientOption {
+	return func(c *Client) error {
+		c.Client = doer
+		return nil
+	}
 }
 
-// ApiComponentsResponsesCommonResponse Common response object
-type ApiComponentsResponsesCommonResponse struct {
-	Timestamp time.Time `json:"timestamp"`
+// WithRequestEditorFn allows setting up a callback function, which will be
+// called right before sending the request. This can be used to mutate the request.
+func WithRequestEditorFn(fn RequestEditorFn) ClientOption {
+	return func(c *Client) error {
+		c.RequestEditors = append(c.RequestEditors, fn)
+		return nil
+	}
 }
 
-// ApiComponentsResponsesUserExampleResponse defines model for api_components_responses_UserExampleResponse.
-type ApiComponentsResponsesUserExampleResponse struct {
-	// AdditionalPropertyExample The user model additional property example
-	AdditionalPropertyExample *string `json:"additionalPropertyExample,omitempty"`
+// The interface specification for the client above.
+type ClientInterface interface {
+	// GETAdminWithBody request with any body
+	GETAdminWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
 
-	// Id User ID
-	Id uint64 `json:"id"`
+	GETAdmin(ctx context.Context, body GETAdminJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
-	// Name User name
-	Name      string    `json:"name"`
-	Timestamp time.Time `json:"timestamp"`
+	// GetApiV1AdminPaymailsWithBody request with any body
+	GetApiV1AdminPaymailsWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	GetApiV1AdminPaymails(ctx context.Context, body GetApiV1AdminPaymailsJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// GETPolicy request
+	GETPolicy(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// GETUser request
+	GETUser(ctx context.Context, txid string, reqEditors ...RequestEditorFn) (*http.Response, error)
 }
 
-// ApiComponentsErrorsErrorUserNotFoundResponse defines model for api_components_errors_ErrorUserNotFoundResponse.
-type ApiComponentsErrorsErrorUserNotFoundResponse = ApiComponentsErrorsErrUserNotFound
+func (c *Client) GETAdminWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewGETAdminRequestWithBody(c.Server, contentType, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
 
-// GETAdminJSONRequestBody defines body for GETAdmin for application/json ContentType.
-type GETAdminJSONRequestBody = ApiComponentsRequestsAdminRequest
+func (c *Client) GETAdmin(ctx context.Context, body GETAdminJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewGETAdminRequest(c.Server, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) GetApiV1AdminPaymailsWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewGetApiV1AdminPaymailsRequestWithBody(c.Server, contentType, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) GetApiV1AdminPaymails(ctx context.Context, body GetApiV1AdminPaymailsJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewGetApiV1AdminPaymailsRequest(c.Server, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) GETPolicy(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewGETPolicyRequest(c.Server)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) GETUser(ctx context.Context, txid string, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewGETUserRequest(c.Server, txid)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+// NewGETAdminRequest calls the generic GETAdmin builder with application/json body
+func NewGETAdminRequest(server string, body GETAdminJSONRequestBody) (*http.Request, error) {
+	var bodyReader io.Reader
+	buf, err := json.Marshal(body)
+	if err != nil {
+		return nil, err
+	}
+	bodyReader = bytes.NewReader(buf)
+	return NewGETAdminRequestWithBody(server, "application/json", bodyReader)
+}
+
+// NewGETAdminRequestWithBody generates requests for GETAdmin with any type of body
+func NewGETAdminRequestWithBody(server string, contentType string, body io.Reader) (*http.Request, error) {
+	var err error
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/api/v1/admin")
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("GET", queryURL.String(), body)
+	if err != nil {
+		return nil, err
+	}
+
+	req.Header.Add("Content-Type", contentType)
+
+	return req, nil
+}
+
+// NewGetApiV1AdminPaymailsRequest calls the generic GetApiV1AdminPaymails builder with application/json body
+func NewGetApiV1AdminPaymailsRequest(server string, body GetApiV1AdminPaymailsJSONRequestBody) (*http.Request, error) {
+	var bodyReader io.Reader
+	buf, err := json.Marshal(body)
+	if err != nil {
+		return nil, err
+	}
+	bodyReader = bytes.NewReader(buf)
+	return NewGetApiV1AdminPaymailsRequestWithBody(server, "application/json", bodyReader)
+}
+
+// NewGetApiV1AdminPaymailsRequestWithBody generates requests for GetApiV1AdminPaymails with any type of body
+func NewGetApiV1AdminPaymailsRequestWithBody(server string, contentType string, body io.Reader) (*http.Request, error) {
+	var err error
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/api/v1/admin/paymails")
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("GET", queryURL.String(), body)
+	if err != nil {
+		return nil, err
+	}
+
+	req.Header.Add("Content-Type", contentType)
+
+	return req, nil
+}
+
+// NewGETPolicyRequest generates requests for GETPolicy
+func NewGETPolicyRequest(server string) (*http.Request, error) {
+	var err error
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/api/v1/policy")
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("GET", queryURL.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return req, nil
+}
+
+// NewGETUserRequest generates requests for GETUser
+func NewGETUserRequest(server string, txid string) (*http.Request, error) {
+	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "txid", runtime.ParamLocationPath, txid)
+	if err != nil {
+		return nil, err
+	}
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/api/v1/user/%s", pathParam0)
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("GET", queryURL.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return req, nil
+}
+
+func (c *Client) applyEditors(ctx context.Context, req *http.Request, additionalEditors []RequestEditorFn) error {
+	for _, r := range c.RequestEditors {
+		if err := r(ctx, req); err != nil {
+			return err
+		}
+	}
+	for _, r := range additionalEditors {
+		if err := r(ctx, req); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+// ClientWithResponses builds on ClientInterface to offer response payloads
+type ClientWithResponses struct {
+	ClientInterface
+}
+
+// NewClientWithResponses creates a new ClientWithResponses, which wraps
+// Client with return type handling
+func NewClientWithResponses(server string, opts ...ClientOption) (*ClientWithResponses, error) {
+	client, err := NewClient(server, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return &ClientWithResponses{client}, nil
+}
+
+// WithBaseURL overrides the baseURL.
+func WithBaseURL(baseURL string) ClientOption {
+	return func(c *Client) error {
+		newBaseURL, err := url.Parse(baseURL)
+		if err != nil {
+			return err
+		}
+		c.Server = newBaseURL.String()
+		return nil
+	}
+}
+
+// ClientWithResponsesInterface is the interface specification for the client with responses above.
+type ClientWithResponsesInterface interface {
+	// GETAdminWithBodyWithResponse request with any body
+	GETAdminWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*GETAdminResponse, error)
+
+	GETAdminWithResponse(ctx context.Context, body GETAdminJSONRequestBody, reqEditors ...RequestEditorFn) (*GETAdminResponse, error)
+
+	// GetApiV1AdminPaymailsWithBodyWithResponse request with any body
+	GetApiV1AdminPaymailsWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*GetApiV1AdminPaymailsResponse, error)
+
+	GetApiV1AdminPaymailsWithResponse(ctx context.Context, body GetApiV1AdminPaymailsJSONRequestBody, reqEditors ...RequestEditorFn) (*GetApiV1AdminPaymailsResponse, error)
+
+	// GETPolicyWithResponse request
+	GETPolicyWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*GETPolicyResponse, error)
+
+	// GETUserWithResponse request
+	GETUserWithResponse(ctx context.Context, txid string, reqEditors ...RequestEditorFn) (*GETUserResponse, error)
+}
+
+type GETAdminResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+}
+
+// Status returns HTTPResponse.Status
+func (r GETAdminResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r GETAdminResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type GetApiV1AdminPaymailsResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+}
+
+// Status returns HTTPResponse.Status
+func (r GetApiV1AdminPaymailsResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r GetApiV1AdminPaymailsResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type GETPolicyResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+}
+
+// Status returns HTTPResponse.Status
+func (r GETPolicyResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r GETPolicyResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type GETUserResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSON200      *ApiComponentsResponsesUserExampleResponse
+	JSON404      *ApiComponentsErrorsErrUserNotFound
+	JSON405      *ApiComponentsErrorsErrorUserNotFoundResponse
+}
+
+// Status returns HTTPResponse.Status
+func (r GETUserResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r GETUserResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+// GETAdminWithBodyWithResponse request with arbitrary body returning *GETAdminResponse
+func (c *ClientWithResponses) GETAdminWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*GETAdminResponse, error) {
+	rsp, err := c.GETAdminWithBody(ctx, contentType, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseGETAdminResponse(rsp)
+}
+
+func (c *ClientWithResponses) GETAdminWithResponse(ctx context.Context, body GETAdminJSONRequestBody, reqEditors ...RequestEditorFn) (*GETAdminResponse, error) {
+	rsp, err := c.GETAdmin(ctx, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseGETAdminResponse(rsp)
+}
+
+// GetApiV1AdminPaymailsWithBodyWithResponse request with arbitrary body returning *GetApiV1AdminPaymailsResponse
+func (c *ClientWithResponses) GetApiV1AdminPaymailsWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*GetApiV1AdminPaymailsResponse, error) {
+	rsp, err := c.GetApiV1AdminPaymailsWithBody(ctx, contentType, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseGetApiV1AdminPaymailsResponse(rsp)
+}
+
+func (c *ClientWithResponses) GetApiV1AdminPaymailsWithResponse(ctx context.Context, body GetApiV1AdminPaymailsJSONRequestBody, reqEditors ...RequestEditorFn) (*GetApiV1AdminPaymailsResponse, error) {
+	rsp, err := c.GetApiV1AdminPaymails(ctx, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseGetApiV1AdminPaymailsResponse(rsp)
+}
+
+// GETPolicyWithResponse request returning *GETPolicyResponse
+func (c *ClientWithResponses) GETPolicyWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*GETPolicyResponse, error) {
+	rsp, err := c.GETPolicy(ctx, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseGETPolicyResponse(rsp)
+}
+
+// GETUserWithResponse request returning *GETUserResponse
+func (c *ClientWithResponses) GETUserWithResponse(ctx context.Context, txid string, reqEditors ...RequestEditorFn) (*GETUserResponse, error) {
+	rsp, err := c.GETUser(ctx, txid, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseGETUserResponse(rsp)
+}
+
+// ParseGETAdminResponse parses an HTTP response from a GETAdminWithResponse call
+func ParseGETAdminResponse(rsp *http.Response) (*GETAdminResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &GETAdminResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	return response, nil
+}
+
+// ParseGetApiV1AdminPaymailsResponse parses an HTTP response from a GetApiV1AdminPaymailsWithResponse call
+func ParseGetApiV1AdminPaymailsResponse(rsp *http.Response) (*GetApiV1AdminPaymailsResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &GetApiV1AdminPaymailsResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	return response, nil
+}
+
+// ParseGETPolicyResponse parses an HTTP response from a GETPolicyWithResponse call
+func ParseGETPolicyResponse(rsp *http.Response) (*GETPolicyResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &GETPolicyResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	return response, nil
+}
+
+// ParseGETUserResponse parses an HTTP response from a GETUserWithResponse call
+func ParseGETUserResponse(rsp *http.Response) (*GETUserResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &GETUserResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest ApiComponentsResponsesUserExampleResponse
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 404:
+		var dest ApiComponentsErrorsErrUserNotFound
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON404 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 405:
+		var dest ApiComponentsErrorsErrorUserNotFoundResponse
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON405 = &dest
+
+	}
+
+	return response, nil
+}
 
 // ServerInterface represents all server handlers.
 type ServerInterface interface {
 	// Get the admin settings
 	// (GET /api/v1/admin)
 	GETAdmin(c *gin.Context)
+	// Get all paymails
+	// (GET /api/v1/admin/paymails)
+	GetApiV1AdminPaymails(c *gin.Context)
 	// Get the policy settings
 	// (GET /api/v1/policy)
 	GETPolicy(c *gin.Context)
@@ -99,6 +643,19 @@ func (siw *ServerInterfaceWrapper) GETAdmin(c *gin.Context) {
 	}
 
 	siw.Handler.GETAdmin(c)
+}
+
+// GetApiV1AdminPaymails operation middleware
+func (siw *ServerInterfaceWrapper) GetApiV1AdminPaymails(c *gin.Context) {
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		middleware(c)
+		if c.IsAborted() {
+			return
+		}
+	}
+
+	siw.Handler.GetApiV1AdminPaymails(c)
 }
 
 // GETPolicy operation middleware
@@ -166,6 +723,7 @@ func RegisterHandlersWithOptions(router gin.IRouter, si ServerInterface, options
 	}
 
 	router.GET(options.BaseURL+"/api/v1/admin", wrapper.GETAdmin)
+	router.GET(options.BaseURL+"/api/v1/admin/paymails", wrapper.GetApiV1AdminPaymails)
 	router.GET(options.BaseURL+"/api/v1/policy", wrapper.GETPolicy)
 	router.GET(options.BaseURL+"/api/v1/user/:txid", wrapper.GETUser)
 }

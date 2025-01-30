@@ -11,7 +11,7 @@ import (
 )
 
 const (
-	templatePath = "../api/cmd/template.yaml"
+	templatePath = "../api/common/template.yaml"
 	outputPath   = "../api/gen.api.yaml"
 )
 

@@ -1,7 +1,7 @@
 openapi: 3.0.0
 info:
-  title: SPV Wallet User API
-  version: 1.0.0
+  title: ignored
+  version: ignored
 paths:
   # GET USER
   /api/v1/user/{txid}:

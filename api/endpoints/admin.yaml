@@ -1,7 +1,7 @@
 openapi: 3.0.0
 info:
-  title: SPV Wallet Admin API
-  version: 1.0.0
+  title: ignored
+  version: ignored
 paths:
   # GET STATUS
   /api/v1/admin:
@@ -19,6 +19,27 @@ paths:
           application/json:
             schema:
               $ref: "../components/requests.yaml#/components/schemas/AdminRequest"
+      responses:
+        200:
+          description: Success
+        401:
+          $ref: "../components/errors.yaml#/components/responses/NotAuthorized"
+
+
+  /api/v1/admin/paymails:
+    get:
+      tags:
+        - Admin endpoints
+      summary: Get all paymails
+      description: >-
+        This endpoint returns the paymails
+      requestBody:
+        required: true
+        description: 'Filter paymail'
+        content:
+          application/json:
+            schema:
+              $ref: "../components/requests.yaml#/components/schemas/GetPaymails"
       responses:
         200:
           description: Success

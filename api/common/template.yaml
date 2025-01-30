@@ -1,7 +1,7 @@
 openapi: 3.0.0
 info:
   title: SPV Wallet API
-  version: 1.0.0
+  version: development
   license:
     name: Open BSV Licence
     url: xyz

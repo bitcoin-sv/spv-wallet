@@ -1,7 +1,7 @@
 openapi: 3.0.0
 info:
-  title: SPV Wallet API responses
-  version: 1.0.0
+  title: ignored
+  version: ignored
 
 components:
   schemas:

@@ -4,7 +4,7 @@ info:
         name: Open BSV Licence
         url: xyz
     title: SPV Wallet API
-    version: 1.0.0
+    version: development
 paths:
     /api/v1/admin:
         get:
@@ -23,6 +23,24 @@ paths:
                 "401":
                     $ref: '#/components/responses/api_components_errors_NotAuthorized'
             summary: Get the admin settings
+            tags:
+                - Admin endpoints
+    /api/v1/admin/paymails:
+        get:
+            description: This endpoint returns the paymails
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/api_components_requests_GetPaymails'
+                description: Filter paymail
+                required: true
+            responses:
+                "200":
+                    description: Success
+                "401":
+                    $ref: '#/components/responses/api_components_errors_NotAuthorized'
+            summary: Get all paymails
             tags:
                 - Admin endpoints
     /api/v1/policy:
@@ -127,6 +145,13 @@ components:
                     type: integer
             required:
                 - id
+            type: object
+        api_components_requests_GetPaymails:
+            properties:
+                domain:
+                    description: Paymail domain
+                    example: moneybutton.com
+                    type: string
             type: object
         api_components_responses_CommonResponse:
             description: Common response object
