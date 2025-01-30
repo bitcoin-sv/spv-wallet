@@ -14,13 +14,18 @@ import (
 )
 
 // TransactionSpecificationRequestToOutline converts a transaction outline request model to the engine model.
-func TransactionSpecificationRequestToOutline(tx *request.TransactionSpecification, userID string) *outlines.TransactionSpec {
+func TransactionSpecificationRequestToOutline(tx *request.TransactionSpecification, userID string) (*outlines.TransactionSpec, error) {
+	catcher := mapper.NewErrorCatcher()
+
 	return &outlines.TransactionSpec{
 		UserID: userID,
 		Outputs: outlines.OutputsSpec{
-			Outputs: lo.Map(tx.Outputs, mapper.MapWithoutIndex(transactionRequestOutputsToOutline)),
+			Outputs: lo.Map(
+				tx.Outputs,
+				mapper.Try(catcher, mapper.MapWithoutIndexWithError(transactionRequestOutputsToOutline)),
+			),
 		},
-	}
+	}, catcher.Error()
 }
 
 // TransactionOutlineToResponse converts a transaction outline to a response model.
@@ -37,13 +42,12 @@ func TransactionOutlineToResponse(tx *outlines.Transaction) *model.AnnotatedTran
 	}
 }
 
-func transactionRequestOutputsToOutline(val request.Output) outlines.OutputSpec {
+func transactionRequestOutputsToOutline(val request.Output) (outlines.OutputSpec, error) {
 	spec, err := outputSpecFromRequest(val)
-	// TODO: handle error
 	if err != nil {
-		return nil
+		return nil, err
 	}
-	return spec
+	return spec, nil
 }
 
 func outlineOutputToResponse(from *transaction.OutputAnnotation) *model.OutputAnnotation {
