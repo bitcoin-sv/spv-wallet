@@ -1,12 +1,12 @@
 package users
 
 import (
-	"errors"
 	"net/http"
 
 	"github.com/bitcoin-sv/go-paymail"
 	adminerrors "github.com/bitcoin-sv/spv-wallet/actions/v2/admin/errors"
 	"github.com/bitcoin-sv/spv-wallet/actions/v2/admin/internal/mapping"
+	configerrors "github.com/bitcoin-sv/spv-wallet/config/errors"
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/bitcoin-sv/spv-wallet/engine/v2/paymails/paymailsmodels"
 	"github.com/bitcoin-sv/spv-wallet/models/request/adminrequest"
@@ -40,10 +40,9 @@ func addPaymail(c *gin.Context, _ *reqctx.AdminContext) {
 	}
 	createdPaymail, err := reqctx.Engine(c).PaymailsService().Create(c, newPaymail)
 	if err != nil {
-		if !errors.Is(err, spverrors.ErrInvalidDomain) {
-			err = adminerrors.ErrAddingPaymail.Wrap(err)
-		}
-		spverrors.ErrorResponse(c, err, logger)
+		spverrors.MapResponse(c, err, logger).
+			If(configerrors.ErrUnsupportedDomain).Then(adminerrors.ErrInvalidDomain).
+			Else(adminerrors.ErrAddingPaymail)
 		return
 	}
 

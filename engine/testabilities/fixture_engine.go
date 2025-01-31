@@ -3,7 +3,6 @@ package testabilities
 import (
 	"context"
 	"errors"
-	"github.com/bitcoin-sv/spv-wallet/initializer"
 	"testing"
 
 	"github.com/bitcoin-sv/go-paymail"
@@ -17,6 +16,7 @@ import (
 	"github.com/bitcoin-sv/spv-wallet/engine/tester/paymailmock"
 	"github.com/bitcoin-sv/spv-wallet/engine/v2/paymails/paymailsmodels"
 	"github.com/bitcoin-sv/spv-wallet/engine/v2/users/usersmodels"
+	"github.com/bitcoin-sv/spv-wallet/initializer"
 	"github.com/bitcoin-sv/spv-wallet/models/bsv"
 	"github.com/go-resty/resty/v2"
 	"github.com/jarcoal/httpmock"

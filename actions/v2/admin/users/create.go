@@ -6,6 +6,7 @@ import (
 	primitives "github.com/bitcoin-sv/go-sdk/primitives/ec"
 	adminerrors "github.com/bitcoin-sv/spv-wallet/actions/v2/admin/errors"
 	"github.com/bitcoin-sv/spv-wallet/actions/v2/admin/internal/mapping"
+	configerrors "github.com/bitcoin-sv/spv-wallet/config/errors"
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/bitcoin-sv/spv-wallet/engine/v2/users/usersmodels"
 	"github.com/bitcoin-sv/spv-wallet/models/request/adminrequest"
@@ -48,7 +49,9 @@ func create(c *gin.Context, _ *reqctx.AdminContext) {
 
 	createdUser, err := reqctx.Engine(c).UsersService().Create(c, newUser)
 	if err != nil {
-		spverrors.ErrorResponse(c, adminerrors.ErrCreatingUser.Wrap(err), logger)
+		spverrors.MapResponse(c, err, logger).
+			If(configerrors.ErrUnsupportedDomain).Then(adminerrors.ErrInvalidDomain).
+			Else(adminerrors.ErrCreatingUser)
 		return
 	}
 

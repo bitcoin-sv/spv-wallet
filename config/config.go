@@ -6,9 +6,9 @@ import (
 	"slices"
 	"time"
 
+	configerrors "github.com/bitcoin-sv/spv-wallet/config/errors"
 	"github.com/bitcoin-sv/spv-wallet/engine/cluster"
 	"github.com/bitcoin-sv/spv-wallet/engine/datastore"
-	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/bitcoin-sv/spv-wallet/engine/taskmanager"
 	"github.com/mrz1836/go-cachestore"
 )
@@ -195,7 +195,7 @@ type PaymailConfig struct {
 func (p *PaymailConfig) CheckDomain(domain string) error {
 	if p.DomainValidationEnabled {
 		if !slices.Contains(p.Domains, domain) {
-			return spverrors.ErrInvalidDomain
+			return configerrors.ErrUnsupportedDomain
 		}
 	}
 	return nil
@@ -219,6 +219,7 @@ type BHSConfig struct {
 	URL string `json:"url" mapstructure:"url"`
 }
 
+// Enabled will return true if the BEEF functionality is enabled
 func (b *BeefConfig) Enabled() bool {
 	return b != nil && b.UseBeef
 }

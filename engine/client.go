@@ -2,11 +2,11 @@ package engine
 
 import (
 	"context"
-	"github.com/bitcoin-sv/spv-wallet/config"
 	"time"
 
 	"github.com/bitcoin-sv/go-paymail"
 	"github.com/bitcoin-sv/go-paymail/server"
+	"github.com/bitcoin-sv/spv-wallet/config"
 	"github.com/bitcoin-sv/spv-wallet/engine/chain"
 	"github.com/bitcoin-sv/spv-wallet/engine/chain/models"
 	"github.com/bitcoin-sv/spv-wallet/engine/cluster"

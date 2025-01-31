@@ -3,10 +3,10 @@ package initializer
 import (
 	"crypto/tls"
 	"fmt"
-	"github.com/bitcoin-sv/spv-wallet/config"
 	"net/url"
 	"time"
 
+	"github.com/bitcoin-sv/spv-wallet/config"
 	"github.com/bitcoin-sv/spv-wallet/conv"
 	"github.com/bitcoin-sv/spv-wallet/engine"
 	chainmodels "github.com/bitcoin-sv/spv-wallet/engine/chain/models"
@@ -25,6 +25,8 @@ import (
 
 // ToEngineOptions converts the AppConfig to a slice of engine.ClientOps that can be used to create a new engine.Client.
 func ToEngineOptions(c *config.AppConfig, logger zerolog.Logger) (options []engine.ClientOps, err error) {
+	options = addAppConfigOpts(c, options)
+
 	options = addUserAgentOpts(c, options)
 
 	options = addHttpClientOpts(c, options)

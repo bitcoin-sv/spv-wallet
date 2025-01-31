@@ -16,3 +16,6 @@ var ErrAddingPaymail = models.SPVError{Message: "error adding paymail", StatusCo
 
 // ErrPaymailInconsistent is returned when both paymail address and alias + domain are provided and they are inconsistent
 var ErrPaymailInconsistent = models.SPVError{Message: "inconsistent paymail address and alias/domain", StatusCode: 400, Code: "error-user-inconsistent-paymail"}
+
+// ErrInvalidDomain is when the domain is wrong
+var ErrInvalidDomain = models.SPVError{Message: "invalid domain", StatusCode: 400, Code: "error-invalid-domain"}

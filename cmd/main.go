@@ -5,7 +5,6 @@ package main
 
 import (
 	"context"
-	"github.com/bitcoin-sv/spv-wallet/initializer"
 	"os"
 	"os/signal"
 	"time"
@@ -13,6 +12,7 @@ import (
 	"github.com/bitcoin-sv/spv-wallet/config"
 	_ "github.com/bitcoin-sv/spv-wallet/docs"
 	"github.com/bitcoin-sv/spv-wallet/engine"
+	"github.com/bitcoin-sv/spv-wallet/initializer"
 	"github.com/bitcoin-sv/spv-wallet/logging"
 	"github.com/bitcoin-sv/spv-wallet/server"
 )
