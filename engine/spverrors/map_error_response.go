@@ -68,36 +68,32 @@ func (r *responseMapperBuilder) Else(errToReturn models.ExtendedError) {
 }
 
 func (r *responseMapperBuilder) Finalize() {
-	r.logBaseError()
-
-	if r.final != nil {
-		r.c.JSON(r.final.GetStatusCode(), models.ResponseError{
-			Code:    r.final.GetCode(),
-			Message: r.final.GetMessage(),
-		})
-		return
-	}
-
-	r.c.JSON(500, models.ResponseError{
-		Code:    models.UnknownErrorCode,
-		Message: "Internal server error",
-	})
-}
-
-func (r *responseMapperBuilder) logBaseError() {
-	if r.log == nil {
-		return
-	}
 	logLevel := zerolog.ErrorLevel
 	statusCode := 500
-	errorCode := models.UnknownErrorCode
+	response := models.ResponseError{
+		Code:    models.UnknownErrorCode,
+		Message: "Internal server error",
+	}
 
 	if r.final != nil {
-		errorCode = r.final.GetCode()
+		response = models.ResponseError{
+			Code:    r.final.GetCode(),
+			Message: r.final.GetMessage(),
+		}
+
 		statusCode = r.final.GetStatusCode()
 		if statusCode < 500 {
 			logLevel = zerolog.WarnLevel
 		}
+	}
+
+	r.logError(logLevel, statusCode, response.Code)
+	r.c.JSON(statusCode, response)
+}
+
+func (r *responseMapperBuilder) logError(logLevel zerolog.Level, statusCode int, errorCode string) {
+	if r.log == nil {
+		return
 	}
 
 	logInstance := r.log.WithLevel(logLevel).Str("module", "spv-errors")
