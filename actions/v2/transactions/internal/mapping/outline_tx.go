@@ -22,7 +22,7 @@ func TransactionSpecificationRequestToOutline(tx *request.TransactionSpecificati
 		Outputs: outlines.OutputsSpec{
 			Outputs: lo.Map(
 				tx.Outputs,
-				lox.MapAndCollect(catcher, lox.MappingFnWithError(transactionRequestOutputsToOutline)),
+				lox.MapAndCollect(catcher, lox.MappingFnWithError(outputSpecFromRequest)),
 			),
 		},
 	}, catcher.Error()
@@ -30,39 +30,37 @@ func TransactionSpecificationRequestToOutline(tx *request.TransactionSpecificati
 
 // TransactionOutlineToResponse converts a transaction outline to a response model.
 func TransactionOutlineToResponse(tx *outlines.Transaction) *model.AnnotatedTransaction {
-	var annotations model.Annotations
-	if len(tx.Annotations.Outputs) > 0 {
-		annotations.Outputs = lo.MapValues(tx.Annotations.Outputs, lox.MappingFn(outlineOutputToResponse))
-	}
-
 	return &model.AnnotatedTransaction{
-		Hex:         string(tx.Hex),
-		Format:      tx.Hex.Format(),
-		Annotations: &annotations,
+		Hex:    string(tx.Hex),
+		Format: tx.Hex.Format(),
+		Annotations: &model.Annotations{
+			Outputs: lo.
+				IfF(
+					len(tx.Annotations.Outputs) > 0,
+					func() map[int]*model.OutputAnnotation {
+						return lo.MapValues(tx.Annotations.Outputs, lox.MappingFn(outlineOutputToResponse))
+					},
+				).Else(nil),
+		},
 	}
-}
-
-func transactionRequestOutputsToOutline(val request.Output) (outlines.OutputSpec, error) {
-	spec, err := outputSpecFromRequest(val)
-	if err != nil {
-		return nil, err
-	}
-	return spec, nil
 }
 
 func outlineOutputToResponse(from *transaction.OutputAnnotation) *model.OutputAnnotation {
-	outputAnnotation := &model.OutputAnnotation{
+	return &model.OutputAnnotation{
 		Bucket: from.Bucket,
+		Paymail: lo.
+			IfF(
+				from.Paymail != nil,
+				func() *model.PaymailAnnotation {
+					return &model.PaymailAnnotation{
+						Sender:    from.Paymail.Sender,
+						Receiver:  from.Paymail.Receiver,
+						Reference: from.Paymail.Reference,
+					}
+				},
+			).
+			Else(nil),
 	}
-	if from.Paymail != nil {
-		outputAnnotation.Paymail = &model.PaymailAnnotation{
-			Sender:    from.Paymail.Sender,
-			Receiver:  from.Paymail.Receiver,
-			Reference: from.Paymail.Reference,
-		}
-	}
-
-	return outputAnnotation
 }
 
 func outputSpecFromRequest(req request.Output) (outlines.OutputSpec, error) {

@@ -12,41 +12,33 @@ import (
 
 // AnnotatedTransactionRequestToOutline maps request's AnnotatedTransaction to outlines.Transaction.
 func AnnotatedTransactionRequestToOutline(req *request.AnnotatedTransaction) *outlines.Transaction {
-	var annotations transaction.Annotations
-	if req.Annotations != nil && len(req.Annotations.Outputs) > 0 {
-		annotations.Outputs = lo.MapValues(req.Annotations.Outputs, lox.MappingFn(annotatedOutputToOutline))
-	}
-
 	return &outlines.Transaction{
-		Hex:         bsv.TxHex(req.Hex),
-		Annotations: annotations,
-	}
-}
-
-// AnnotatedTransactionToOutline maps AnnotatedTransaction model to Transaction engine model
-func AnnotatedTransactionToOutline(tx *model.AnnotatedTransaction) *outlines.Transaction {
-	var annotations transaction.Annotations
-	if tx.Annotations != nil && len(tx.Annotations.Outputs) > 0 {
-		annotations.Outputs = lo.MapValues(tx.Annotations.Outputs, lox.MappingFn(annotatedOutputToOutline))
-	}
-
-	return &outlines.Transaction{
-		Hex:         bsv.TxHex(tx.Hex),
-		Annotations: annotations,
+		Hex: bsv.TxHex(req.Hex),
+		Annotations: transaction.Annotations{
+			Outputs: lo.
+				IfF(
+					req.Annotations != nil && len(req.Annotations.Outputs) > 0,
+					func() transaction.OutputsAnnotations {
+						return lo.MapValues(req.Annotations.Outputs, lox.MappingFn(annotatedOutputToOutline))
+					},
+				).Else(nil),
+		},
 	}
 }
 
 func annotatedOutputToOutline(from *model.OutputAnnotation) *transaction.OutputAnnotation {
-	outputAnnotation := &transaction.OutputAnnotation{
+	return &transaction.OutputAnnotation{
 		Bucket: from.Bucket,
+		Paymail: lo.
+			IfF(
+				from.Paymail != nil,
+				func() *transaction.PaymailAnnotation {
+					return &transaction.PaymailAnnotation{
+						Sender:    from.Paymail.Sender,
+						Receiver:  from.Paymail.Receiver,
+						Reference: from.Paymail.Reference,
+					}
+				},
+			).Else(nil),
 	}
-	if from.Paymail != nil {
-		outputAnnotation.Paymail = &transaction.PaymailAnnotation{
-			Sender:    from.Paymail.Sender,
-			Receiver:  from.Paymail.Receiver,
-			Reference: from.Paymail.Reference,
-		}
-	}
-
-	return outputAnnotation
 }
