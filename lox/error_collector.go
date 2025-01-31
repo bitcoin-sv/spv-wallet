@@ -12,7 +12,7 @@ func (c *ErrorCollector) OK() bool {
 	return c.errors == nil
 }
 
-// Error returns joined errors cought by ErrorCollector
+// Error returns joined errors caught by ErrorCollector
 func (c *ErrorCollector) Error() error {
 	return c.errors
 }
@@ -21,11 +21,6 @@ func (c *ErrorCollector) Error() error {
 func (c *ErrorCollector) Collect(err error) *ErrorCollector {
 	c.errors = errors.Join(c.errors, err)
 	return c
-}
-
-// NotOK checks if ErrorCollector caught any errors
-func (c *ErrorCollector) NotOK() bool {
-	return !c.OK()
 }
 
 // NewErrorCollector returns an instance of ErrorCollector

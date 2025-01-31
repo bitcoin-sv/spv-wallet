@@ -82,7 +82,7 @@ linters-settings:
   wrapcheck:
     ignoreSigRegexps:
       - spverrors\.(Newf|Wrapf)
-      - lox\.ErrorCatcher.*\.Error\(\)
+      - lox\.ErrorCollector.*\.Error\(\)
     ignorePackageGlobs:
       - "github.com/go-ozzo/ozzo-validation"
   revive:
