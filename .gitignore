@@ -34,7 +34,7 @@ dist
 coverage.txt
 
 # Development data dir
-data/
+/data/
 
 # Configuration files
 .env.config
