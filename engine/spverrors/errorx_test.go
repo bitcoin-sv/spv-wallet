@@ -2,9 +2,10 @@ package spverrors
 
 import (
 	"fmt"
+	"testing"
+
 	"github.com/joomcode/errorx"
 	"github.com/stretchr/testify/require"
-	"testing"
 )
 
 func TestWrapping(t *testing.T) {
