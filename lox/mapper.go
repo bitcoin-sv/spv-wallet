@@ -17,7 +17,6 @@ type IterateeWithError[T, R any] func(item T, index int) (R, error)
 // NoIndexIterateeWithError represents a function that processes an item of type T
 // without requiring its index, returning a result of type R and an error if the operation fails.
 // It is useful for operations where the index is irrelevant and error handling is required.
-
 type NoIndexIterateeWithError[T, R any] func(item T) (R, error)
 
 // MappingFn allows to pass a mapper function that doesn't require index

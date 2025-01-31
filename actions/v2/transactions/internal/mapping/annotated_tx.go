@@ -26,7 +26,7 @@ func AnnotatedTransactionRequestToOutline(req *request.AnnotatedTransaction) *ou
 // AnnotatedTransactionToOutline maps AnnotatedTransaction model to Transaction engine model
 func AnnotatedTransactionToOutline(tx *model.AnnotatedTransaction) *outlines.Transaction {
 	var annotations transaction.Annotations
-	if len(tx.Annotations.Outputs) > 0 {
+	if tx.Annotations != nil && len(tx.Annotations.Outputs) > 0 {
 		annotations.Outputs = lo.MapValues(tx.Annotations.Outputs, lox.MappingFn(annotatedOutputToOutline))
 	}
 
