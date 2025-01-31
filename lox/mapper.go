@@ -37,9 +37,9 @@ func MappingFnWithError[T, R any](mapper NoIndexIterateeWithError[T, R]) Iterate
 
 // MapAndCollect takes ErrorCollector and a function mapper that can return an error.
 // If the mapper function returns an error it is joined to the errors field of ErrorCollector
-func MapAndCollect[T, R any](catcher *ErrorCollector, iteratee IterateeWithError[T, R]) Iteratee[T, R] {
-	return func(item T, index int) R {
-		res, err := iteratee(item, index)
+func MapAndCollect[T, R any](catcher *ErrorCollector, iteratee NoIndexIterateeWithError[T, R]) Iteratee[T, R] {
+	return func(item T, _ int) R {
+		res, err := iteratee(item)
 		if err != nil {
 			catcher.Collect(err)
 		}

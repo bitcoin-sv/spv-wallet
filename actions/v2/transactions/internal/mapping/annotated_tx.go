@@ -17,7 +17,7 @@ func AnnotatedTransactionRequestToOutline(req *request.AnnotatedTransaction) *ou
 		Annotations: transaction.Annotations{
 			Outputs: lo.
 				IfF(
-					req.Annotations != nil && len(req.Annotations.Outputs) > 0,
+					req.Annotations != nil,
 					func() transaction.OutputsAnnotations {
 						return lo.MapValues(req.Annotations.Outputs, lox.MappingFn(annotatedOutputToOutline))
 					},

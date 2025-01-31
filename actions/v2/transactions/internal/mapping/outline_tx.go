@@ -22,7 +22,7 @@ func TransactionSpecificationRequestToOutline(tx *request.TransactionSpecificati
 		Outputs: outlines.OutputsSpec{
 			Outputs: lo.Map(
 				tx.Outputs,
-				lox.MapAndCollect(catcher, lox.MappingFnWithError(outputSpecFromRequest)),
+				lox.MapAndCollect(catcher, outputSpecFromRequest),
 			),
 		},
 	}, catcher.Error()
@@ -34,13 +34,7 @@ func TransactionOutlineToResponse(tx *outlines.Transaction) *model.AnnotatedTran
 		Hex:    string(tx.Hex),
 		Format: tx.Hex.Format(),
 		Annotations: &model.Annotations{
-			Outputs: lo.
-				IfF(
-					len(tx.Annotations.Outputs) > 0,
-					func() map[int]*model.OutputAnnotation {
-						return lo.MapValues(tx.Annotations.Outputs, lox.MappingFn(outlineOutputToResponse))
-					},
-				).Else(nil),
+			Outputs: lo.MapValues(tx.Annotations.Outputs, lox.MappingFn(outlineOutputToResponse)),
 		},
 	}
 }
