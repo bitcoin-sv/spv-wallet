@@ -35,29 +35,26 @@ func MapResponse(c *gin.Context, err error, log *zerolog.Logger) ResponseMapper 
 }
 
 type responseMapperBuilder struct {
-	c       *gin.Context
-	baseErr error
-	log     *zerolog.Logger
-	match   error
-	final   models.ExtendedError
+	c        *gin.Context
+	baseErr  error
+	log      *zerolog.Logger
+	matching bool
+	final    models.ExtendedError
 }
 
 func (r *responseMapperBuilder) If(errToMatch error) OnMatch {
 	if r.final != nil {
 		return r
 	}
-	r.match = nil
+	r.matching = false
 	if errors.Is(r.baseErr, errToMatch) {
-		r.match = errToMatch
+		r.matching = true
 	}
 	return r
 }
 
 func (r *responseMapperBuilder) Then(errToReturn models.ExtendedError) ResponseMapper {
-	if r.final != nil {
-		return r
-	}
-	if r.match != nil {
+	if r.final == nil && r.matching {
 		r.final = errToReturn
 	}
 	return r
@@ -91,17 +88,18 @@ func (r *responseMapperBuilder) logBaseError() {
 	if r.log == nil {
 		return
 	}
-	err := r.baseErr
-	logLevel := zerolog.WarnLevel
+	logLevel := zerolog.ErrorLevel
 	statusCode := 500
+	errorCode := models.UnknownErrorCode
 
-	var extendedErr models.ExtendedError
-	if errors.As(err, &extendedErr) {
-		statusCode = extendedErr.GetStatusCode()
-		if extendedErr.GetStatusCode() >= 500 {
-			logLevel = zerolog.ErrorLevel
+	if r.final != nil {
+		errorCode = r.final.GetCode()
+		statusCode = r.final.GetStatusCode()
+		if statusCode < 500 {
+			logLevel = zerolog.WarnLevel
 		}
 	}
+
 	logInstance := r.log.WithLevel(logLevel).Str("module", "spv-errors")
-	logInstance.Err(err).Msgf("Error HTTP response, returning %d", statusCode)
+	logInstance.Err(r.baseErr).Msgf("Error HTTP response, returning %d, error-code: %s", statusCode, errorCode)
 }
