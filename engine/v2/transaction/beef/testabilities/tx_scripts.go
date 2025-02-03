@@ -1,4 +1,4 @@
-package beef
+package testabilities
 
 import (
 	"testing"

@@ -88,7 +88,9 @@ type SourceTransactionResolver struct {
 
 // Resolve sets the source transaction per input of subject transaction and verifies SPV scripts.
 func (s *SourceTransactionResolver) Resolve() error {
-	s.resolveRecursive(s.subjectTx.Inputs)
+	if err := s.resolveRecursive(s.subjectTx.Inputs); err != nil {
+		return fmt.Errorf("failed to resolve source transactions: %w", err)
+	}
 
 	for i, input := range s.subjectTx.Inputs {
 		if input == nil || input.SourceTransaction == nil {

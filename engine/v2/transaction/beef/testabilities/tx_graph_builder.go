@@ -1,4 +1,4 @@
-package beef
+package testabilities
 
 import (
 	"fmt"
@@ -8,7 +8,7 @@ import (
 	"github.com/bitcoin-sv/go-sdk/spv"
 	sdk "github.com/bitcoin-sv/go-sdk/transaction"
 	"github.com/bitcoin-sv/go-sdk/transaction/template/p2pkh"
-
+	"github.com/bitcoin-sv/spv-wallet/engine/v2/transaction/beef"
 	"github.com/stretchr/testify/require"
 )
 
@@ -19,34 +19,34 @@ const (
 	defaultSatoshis    = 100
 )
 
-// TransactionDescriptor contains a transaction and its associated hexadecimal data.
-type TransactionDescriptor struct {
+// TxDescriptor contains a transaction and its associated hexadecimal data.
+type TxDescriptor struct {
 	tx      *sdk.Transaction // The actual transaction.
 	beefHex *string          // Hexadecimal representation of the transaction in BEEF format.
 	rawHex  *string          // Optional raw hexadecimal representation of the transaction.
 }
 
 // TxID returns the actual transaction ID.
-func (t TransactionDescriptor) TxID() string { return t.tx.TxID().String() }
+func (t TxDescriptor) TxID() string { return t.tx.TxID().String() }
 
-// BEEFHex returns the actual transaction HexBEEF format set during TransactionDescriptor intialization.
-func (t TransactionDescriptor) BEEFHex() *string { return t.beefHex }
+// BEEFHex returns the actual transaction HexBEEF format set during TxDescriptor intialization.
+func (t TxDescriptor) BEEFHex() *string { return t.beefHex }
 
-// RawHex returns the actual transaction Hex format set during TransactionDescriptor intialization.
-func (t TransactionDescriptor) RawHex() *string { return t.rawHex }
+// RawHex returns the actual transaction Hex format set during TxDescriptor intialization.
+func (t TxDescriptor) RawHex() *string { return t.rawHex }
 
 // IsBEEF checks if the actual transaction was serialized to HexBEEF format.
-func (t TransactionDescriptor) IsBEEF() bool { return t.beefHex != nil }
+func (t TxDescriptor) IsBEEF() bool { return t.beefHex != nil }
 
 // IsRaw checks if the actual transaction was serialized to Hex format.
-func (t TransactionDescriptor) IsRaw() bool { return t.rawHex != nil }
+func (t TxDescriptor) IsRaw() bool { return t.rawHex != nil }
 
-// GraphBuilderTransactions is a map where the key is a transaction name (string)
-// and the value is a TransactionDescriptor containing details of the transaction.
-type GraphBuilderTransactions map[string]TransactionDescriptor
+// GraphBuilderTxs is a map where the key is a transaction name (string)
+// and the value is a TxDescriptor containing details of the transaction.
+type GraphBuilderTxs map[string]TxDescriptor
 
 // Has returns true if the specified transaction node name exists in the transaction map.
-func (g GraphBuilderTransactions) Has(t *testing.T, name string) bool {
+func (g GraphBuilderTxs) Has(t *testing.T, name string) bool {
 	t.Helper()
 	require.NotEmpty(t, name, "Name of the raw transaction should not be empty")
 
@@ -54,46 +54,46 @@ func (g GraphBuilderTransactions) Has(t *testing.T, name string) bool {
 	return ok
 }
 
-// AddRawTx adds a raw transaction to the GraphBuilderTransactions map.
+// AddRawTx adds a raw transaction to the GraphBuilderTxs map.
 // The name is used as the key, and the transaction is stored with its hexadecimal representation.
-func (g GraphBuilderTransactions) AddRawTx(t *testing.T, name string, tx *sdk.Transaction) {
+func (g GraphBuilderTxs) AddRawTx(t *testing.T, name string, tx *sdk.Transaction) {
 	t.Helper()
 	require.NotNil(t, tx, "Added transaction should not be nil")
 
 	hex := tx.Hex()
-	g[name] = TransactionDescriptor{tx: tx, rawHex: &hex}
+	g[name] = TxDescriptor{tx: tx, rawHex: &hex}
 }
 
-// AddMinedTx adds a mined transaction to the GraphBuilderTransactions map.
+// AddMinedTx adds a mined transaction to the GraphBuilderTxs map.
 // The name is used as the key, and the transaction is stored with its BEEF hexadecimal representation.
-func (g GraphBuilderTransactions) AddMinedTx(t *testing.T, name string, tx *sdk.Transaction) {
+func (g GraphBuilderTxs) AddMinedTx(t *testing.T, name string, tx *sdk.Transaction) {
 	t.Helper()
 	require.NotNil(t, tx, "Added transaction should not be nil")
 
 	hex, err := tx.BEEFHex()
 	require.NoError(t, err, "Failed to generate BEEF hexadecimal for transaction")
 
-	g[name] = TransactionDescriptor{tx: tx, beefHex: &hex}
+	g[name] = TxDescriptor{tx: tx, beefHex: &hex}
 }
 
-// TransactionGraphBuilder is a utility for constructing and managing Bitcoin transactions.
+// TxGraphBuilder is a utility for constructing and managing Bitcoin transactions.
 // It supports creating mined and raw transactions, verifying scripts, and managing state.
-type TransactionGraphBuilder struct {
-	t                    *testing.T               // Test context for handling errors.
-	transactions         GraphBuilderTransactions // Collection of transactions managed by the builder.
-	p2pKHLockingScript   *script.Script           // Locking script for P2PKH transactions.
-	p2pKHUnlockingScript *p2pkh.P2PKH             // Unlocking script for P2PKH transactions.
-	hexGen               HexGen                   // Generator for unique hexadecimal values.
-	blockHeight          BlockHeight              // Current block height.
-	satoshis             uint64                   // Default amount of satoshis for mined transactions.
+type TxGraphBuilder struct {
+	t                    *testing.T      // Test context for handling errors.
+	transactions         GraphBuilderTxs // Collection of transactions managed by the builder.
+	p2pKHLockingScript   *script.Script  // Locking script for P2PKH transactions.
+	p2pKHUnlockingScript *p2pkh.P2PKH    // Unlocking script for P2PKH transactions.
+	hexGen               HexGen          // Generator for unique hexadecimal values.
+	blockHeight          BlockHeight     // Current block height.
+	satoshis             uint64          // Default amount of satoshis for mined transactions.
 }
 
 // Transactions returns the map of transactions managed by the builder.
-func (t *TransactionGraphBuilder) Transactions() GraphBuilderTransactions { return t.transactions }
+func (t *TxGraphBuilder) Transactions() GraphBuilderTxs { return t.transactions }
 
 // CreateMinedTx creates a mined transaction with the specified number of outputs.
 // The transaction is initialized with default block height, satoshi values, and scripts.
-func (t *TransactionGraphBuilder) CreateMinedTx(name string, outputs uint32) *sdk.Transaction {
+func (t *TxGraphBuilder) CreateMinedTx(name string, outputs uint32) *sdk.Transaction {
 	t.t.Helper()
 
 	if t.transactions.Has(t.t, name) {
@@ -129,7 +129,7 @@ type ParentTx struct {
 
 // CreateRawTx creates a raw transaction that consumes the outputs of parent transactions.
 // Each parent output (Vout) is added as an input to the new transaction.
-func (t *TransactionGraphBuilder) CreateRawTx(name string, parents ...ParentTx) *sdk.Transaction {
+func (t *TxGraphBuilder) CreateRawTx(name string, parents ...ParentTx) *sdk.Transaction {
 	t.t.Helper()
 
 	if t.transactions.Has(t.t, name) {
@@ -151,7 +151,7 @@ func (t *TransactionGraphBuilder) CreateRawTx(name string, parents ...ParentTx) 
 // are valid and correspond to the locking scripts of the referenced UTXOs.
 // The method ensures that the constructed graph is in a valid state and can be used
 // as part of a test scenario to be created.
-func (t *TransactionGraphBuilder) EnsureGraphIsValid() {
+func (t *TxGraphBuilder) EnsureGraphIsValid() {
 	t.t.Helper()
 
 	for node, descriptor := range t.transactions {
@@ -167,26 +167,26 @@ func (t *TransactionGraphBuilder) EnsureGraphIsValid() {
 	}
 }
 
-// ToTxQueryResultSlice converts GraphBuilderTransactions to TxQueryResultSlice.
-func (t *TransactionGraphBuilder) ToTxQueryResultSlice() TxQueryResultSlice {
-	var slice TxQueryResultSlice
+// ToTxQueryResultSlice converts graph builder transactions to TxQueryResultSlice.
+func (t *TxGraphBuilder) ToTxQueryResultSlice() beef.TxQueryResultSlice {
+	var slice beef.TxQueryResultSlice
 	for _, desc := range t.transactions {
 		sourceTXID := desc.TxID()
 		if desc.IsBEEF() {
-			slice = append(slice, &TxQueryResult{SourceTXID: sourceTXID, BeefHex: desc.BEEFHex()})
+			slice = append(slice, &beef.TxQueryResult{SourceTXID: sourceTXID, BeefHex: desc.BEEFHex()})
 			continue
 		}
-		slice = append(slice, &TxQueryResult{SourceTXID: sourceTXID, RawHex: desc.RawHex()})
+		slice = append(slice, &beef.TxQueryResult{SourceTXID: sourceTXID, RawHex: desc.RawHex()})
 	}
 	return slice
 }
 
-// NewTransactionGraphBuilder initializes a new TransactionGraphBuilder with the provided testing context and scripts.
-func NewTransactionGraphBuilder(t *testing.T) *TransactionGraphBuilder {
+// NewTxGraphBuilder initializes a new transaction graph builder with the provided testing context and scripts.
+func NewTxGraphBuilder(t *testing.T) *TxGraphBuilder {
 	scripts := NewTxScripts(t, testXPriv)
-	return &TransactionGraphBuilder{
+	return &TxGraphBuilder{
 		t:                    t,
-		transactions:         make(GraphBuilderTransactions),
+		transactions:         make(GraphBuilderTxs),
 		p2pKHLockingScript:   scripts.P2PKHLockingScript(),
 		p2pKHUnlockingScript: scripts.P2PKHUnlockingScriptTemplate(),
 		blockHeight:          BlockHeight{defaultBlockHeight},
