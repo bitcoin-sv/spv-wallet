@@ -1,11 +1,11 @@
 package beef
 
 import (
-	"errors"
 	"fmt"
 
 	"github.com/bitcoin-sv/go-sdk/spv"
 	sdk "github.com/bitcoin-sv/go-sdk/transaction"
+	txerrors "github.com/bitcoin-sv/spv-wallet/engine/v2/transaction/errors"
 )
 
 // SourceTx represents a source transaction.
@@ -36,7 +36,7 @@ func (m SourceTxMap) Has(id string) bool {
 // Add adds a TxQueryResult to the SourceTxMap after parsing it.
 func (m SourceTxMap) Add(q *TxQueryResult) error {
 	if q == nil {
-		return ErrNilTxQueryResult
+		return txerrors.ErrNilTxQueryResult
 	}
 
 	if q.IsBeef() {
@@ -57,7 +57,7 @@ func (m SourceTxMap) Add(q *TxQueryResult) error {
 		return nil
 	}
 
-	return ErrTxQueryResultType
+	return txerrors.ErrTxQueryResultType
 }
 
 // Value retrieves the SourceTx for a given ID or returns an empty SourceTx.
@@ -94,7 +94,7 @@ func (s *SourceTransactionResolver) Resolve() error {
 
 	for i, input := range s.subjectTx.Inputs {
 		if input == nil || input.SourceTransaction == nil {
-			return ErrInvalidTransactionInput
+			return txerrors.ErrInvalidTransactionInput
 		}
 		if _, err := spv.VerifyScripts(input.SourceTransaction); err != nil {
 			return fmt.Errorf("SPV script verification failed for input %d: %w", i, err)
@@ -108,7 +108,7 @@ func (s *SourceTransactionResolver) Resolve() error {
 func (s *SourceTransactionResolver) resolveRecursive(inputs []*sdk.TransactionInput) error {
 	for idx, input := range inputs {
 		if input == nil {
-			return ErrNilTransactionInput
+			return txerrors.ErrNilTransactionInput
 		}
 
 		sourceTxID := input.SourceTXID.String()
@@ -134,7 +134,7 @@ func (s *SourceTransactionResolver) resolveRecursive(inputs []*sdk.TransactionIn
 // and TxQueryResults.
 func NewSourceTransactionResolver(tx *sdk.Transaction, slice TxQueryResultSlice) (*SourceTransactionResolver, error) {
 	if tx == nil {
-		return nil, ErrNilSubjectTx
+		return nil, txerrors.ErrNilSubjectTx
 	}
 	txs, err := slice.SourceTxMap()
 	if err != nil {
@@ -143,24 +143,3 @@ func NewSourceTransactionResolver(tx *sdk.Transaction, slice TxQueryResultSlice)
 
 	return &SourceTransactionResolver{subjectTx: tx, sourceTxs: txs}, nil
 }
-
-var (
-	// ErrInvalidTransactionInput indicates that the SPV script verification failed
-	// due to a nil transaction input or a missing source transaction.
-	ErrInvalidTransactionInput = errors.New("SPV script verification failed: nil transaction input or missing source transaction")
-
-	// ErrTxQueryResultType is returned when the transaction query result type
-	// is neither BEEF nor RawTx type.
-	ErrTxQueryResultType = errors.New("transaction query result must be either BEEF or RawTx")
-
-	// ErrNilSubjectTx is returned when a nil subject transaction is provided to the constructor
-	// of the source transaction resolver.
-	ErrNilSubjectTx = errors.New("provided subject transaction must be non-nil")
-
-	// ErrNilTxQueryResult is returned when a nil transaction query result is provided
-	// to the add method of the SourceTxMap.
-	ErrNilTxQueryResult = errors.New("provided transaction query result must be non-nil")
-
-	// ErrNilTransactionInput is returned when a nil transaction input is provided.
-	ErrNilTransactionInput = errors.New("transaction input must be non-nil")
-)

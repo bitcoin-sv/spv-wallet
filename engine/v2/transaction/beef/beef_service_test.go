@@ -8,6 +8,7 @@ import (
 	sdk "github.com/bitcoin-sv/go-sdk/transaction"
 	"github.com/bitcoin-sv/spv-wallet/engine/v2/transaction/beef"
 	"github.com/bitcoin-sv/spv-wallet/engine/v2/transaction/beef/testabilities"
+	txerrors "github.com/bitcoin-sv/spv-wallet/engine/v2/transaction/errors"
 	"github.com/stretchr/testify/require"
 )
 
@@ -29,7 +30,7 @@ func TestPrepareBEEF_MissingSourceTx_InSubjectTxInput(t *testing.T) {
 	hexBEEF, err := service.PrepareBEEF(context.Background(), subjectTx)
 
 	// then:
-	require.ErrorIs(t, err, beef.ErrInvalidTransactionInput)
+	require.ErrorIs(t, err, txerrors.ErrInvalidTransactionInput)
 	require.Empty(t, hexBEEF)
 }
 

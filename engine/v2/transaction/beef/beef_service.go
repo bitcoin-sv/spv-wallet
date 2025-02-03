@@ -2,10 +2,10 @@ package beef
 
 import (
 	"context"
-	"errors"
 	"fmt"
 
 	sdk "github.com/bitcoin-sv/go-sdk/transaction"
+	txerrors "github.com/bitcoin-sv/spv-wallet/engine/v2/transaction/errors"
 )
 
 // TxQueryResult represents the result of a transaction query.
@@ -38,7 +38,7 @@ type Service struct {
 // It returns a slice of transaction IDs or an error if the transaction has no inputs.
 func (s *Service) extractSourceTXIDs(tx *sdk.Transaction) ([]string, error) {
 	if tx.InputCount() == 0 {
-		return nil, ErrZeroInputCount
+		return nil, txerrors.ErrZeroInputCount
 	}
 
 	sourceTXIDs := make([]string, 0)
@@ -53,7 +53,7 @@ func (s *Service) extractSourceTXIDs(tx *sdk.Transaction) ([]string, error) {
 // Returns the BEEF hex string or an error if resolution or encoding fails.
 func (s *Service) PrepareBEEF(ctx context.Context, tx *sdk.Transaction) (string, error) {
 	if tx == nil {
-		return "", ErrNilSubjectTx
+		return "", txerrors.ErrNilSubjectTx
 	}
 
 	txID := tx.TxID().String()
@@ -99,6 +99,3 @@ func NewService(r TxRepository) *Service {
 	}
 	return &Service{repository: r}
 }
-
-// ErrZeroInputCount is returned when a transaction has no inputs.
-var ErrZeroInputCount = errors.New("provided subject transaction inputs count must be greater than zero")
