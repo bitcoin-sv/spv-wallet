@@ -164,10 +164,6 @@ func NewClient(ctx context.Context, opts ...ClientOps) (ClientInterface, error) 
 		return nil, err
 	}
 
-	if err = client.loadTransactionOutlinesService(); err != nil {
-		return nil, err
-	}
-
 	// Load the Notification client (if client does not exist)
 	if err = client.loadNotificationClient(ctx); err != nil {
 		return nil, err
@@ -197,6 +193,10 @@ func NewClient(ctx context.Context, opts ...ClientOps) (ClientInterface, error) 
 		if err = client.askForFeeUnit(ctx); err != nil {
 			return nil, err
 		}
+	}
+
+	if err = client.loadTransactionOutlinesService(); err != nil {
+		return nil, err
 	}
 
 	// Return the client
