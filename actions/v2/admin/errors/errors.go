@@ -19,6 +19,3 @@ var ErrPaymailInconsistent = models.SPVError{Message: "inconsistent paymail addr
 
 // ErrInvalidDomain is when the domain is wrong
 var ErrInvalidDomain = models.SPVError{Message: "invalid domain", StatusCode: 400, Code: "error-invalid-domain"}
-
-// ErrPaymailConfigNotConfigured is returned when the paymail is not configured
-var ErrPaymailConfigNotConfigured = models.SPVError{Message: "paymail not configured", StatusCode: 500, Code: "error-paymail-not-configured"}

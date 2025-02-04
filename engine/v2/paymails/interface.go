@@ -20,8 +20,3 @@ type PaymailRepo interface {
 type UsersService interface {
 	Exists(ctx context.Context, userID string) (bool, error)
 }
-
-// DomainChecker is an interface for checking domain.
-type DomainChecker interface {
-	CheckDomain(domain string) error
-}

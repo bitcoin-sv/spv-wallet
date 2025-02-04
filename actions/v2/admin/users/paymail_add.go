@@ -42,8 +42,7 @@ func addPaymail(c *gin.Context, _ *reqctx.AdminContext) {
 	if err != nil {
 		spverrors.MapResponse(c, err, logger).
 			If(configerrors.ErrUnsupportedDomain).Then(adminerrors.ErrInvalidDomain).
-			If(configerrors.ErrPaymailNotConfigured).Then(adminerrors.ErrPaymailConfigNotConfigured).
-			Else(adminerrors.ErrCreatingUser)
+			Else(adminerrors.ErrAddingPaymail)
 		return
 	}
 

@@ -15,8 +15,3 @@ type UserRepo interface {
 	Create(ctx context.Context, newUser *usersmodels.NewUser) (*usersmodels.User, error)
 	GetBalance(ctx context.Context, userID string, bucket string) (bsv.Satoshis, error)
 }
-
-// DomainChecker is an interface for checking domain.
-type DomainChecker interface {
-	CheckDomain(domain string) error
-}
