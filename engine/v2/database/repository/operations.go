@@ -5,13 +5,13 @@ import (
 	"iter"
 	"slices"
 
-	"github.com/bitcoin-sv/spv-wallet/engine/utils"
 	"github.com/bitcoin-sv/spv-wallet/engine/v2/database"
 	"github.com/bitcoin-sv/spv-wallet/engine/v2/database/dbquery"
 	"github.com/bitcoin-sv/spv-wallet/engine/v2/operations/operationsmodels"
 	"github.com/bitcoin-sv/spv-wallet/engine/v2/transaction/txmodels"
 	"github.com/bitcoin-sv/spv-wallet/models"
 	"github.com/bitcoin-sv/spv-wallet/models/filter"
+	"github.com/samber/lo"
 	"gorm.io/gorm"
 	"gorm.io/gorm/clause"
 )
@@ -40,7 +40,7 @@ func (o *Operations) PaginatedForUser(ctx context.Context, userID string, page f
 	}
 	return &models.PagedResult[operationsmodels.Operation]{
 		PageDescription: rows.PageDescription,
-		Content: utils.MapSlice(rows.Content, func(operation *database.Operation) *operationsmodels.Operation {
+		Content: lo.Map(rows.Content, func(operation *database.Operation, _ int) *operationsmodels.Operation {
 			return &operationsmodels.Operation{
 				TxID:         operation.TxID,
 				UserID:       operation.UserID,

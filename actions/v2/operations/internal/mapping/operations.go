@@ -1,10 +1,11 @@
 package mapping
 
 import (
-	"github.com/bitcoin-sv/spv-wallet/engine/utils"
 	"github.com/bitcoin-sv/spv-wallet/engine/v2/operations/operationsmodels"
+	"github.com/bitcoin-sv/spv-wallet/lox"
 	"github.com/bitcoin-sv/spv-wallet/models"
 	"github.com/bitcoin-sv/spv-wallet/models/response"
+	"github.com/samber/lo"
 )
 
 // OperationsPagedResponse maps a paged result of operations to a response.
@@ -16,7 +17,7 @@ func OperationsPagedResponse(operations *models.PagedResult[operationsmodels.Ope
 			TotalElements: operations.PageDescription.TotalElements,
 			TotalPages:    operations.PageDescription.TotalPages,
 		},
-		Content: utils.MapSlice(operations.Content, OperationsResponse),
+		Content: lo.Map(operations.Content, lox.MappingFn(OperationsResponse)),
 	}
 }
 
