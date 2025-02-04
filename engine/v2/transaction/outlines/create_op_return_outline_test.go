@@ -203,7 +203,8 @@ func TestCreateOpReturnTransactionOutlineRAW(t *testing.T) {
 			thenTx.HasInputs(1)
 
 			thenTx.Input(0).
-				HasOutpoint(testabilities.UserFundsTransactionOutpoint)
+				HasOutpoint(testabilities.UserFundsTransactionOutpoint).
+				HasCustomInstructions(testabilities.UserFundsTransactionCustomInstructions)
 
 			thenTx.HasOutputs(1)
 

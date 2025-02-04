@@ -8,13 +8,17 @@ import (
 	"github.com/bitcoin-sv/spv-wallet/engine/v2/bsv/bsverrors"
 )
 
+// TxHexFormat is the format type of the transaction hex.
 type TxHexFormat string
 
 const (
+	// TxHexFormatBEEF is the BEEF format of the transaction hex.
 	TxHexFormatBEEF TxHexFormat = "BEEF"
-	TxHexFormatRAW  TxHexFormat = "RAW"
+	// TxHexFormatRAW is the Raw Tx format of the transaction hex.
+	TxHexFormatRAW TxHexFormat = "RAW"
 )
 
+// ParseTxHexFormat takes the transaction hex format name (case insensitive) and returns TxHexFormat for that name.
 func ParseTxHexFormat(s string) (TxHexFormat, error) {
 	switch strings.ToUpper(s) {
 	case "BEEF":
@@ -47,6 +51,7 @@ func (h TxHex) ToBEEFTransaction() (*transaction.Transaction, error) {
 	return transaction.NewTransactionFromBEEFHex(string(h)) //nolint:wrapcheck // we will handle this error in upper layers
 }
 
+// ToRawTransaction converts the transaction hex to a raw transaction.
 func (h TxHex) ToRawTransaction() (*transaction.Transaction, error) {
 	if !h.IsRawTx() {
 		return nil, spverrors.Newf("transaction hex is not a raw hex")

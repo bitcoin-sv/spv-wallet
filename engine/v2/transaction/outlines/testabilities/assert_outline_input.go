@@ -5,6 +5,7 @@ import (
 
 	"github.com/bitcoin-sv/go-sdk/chainhash"
 	sdk "github.com/bitcoin-sv/go-sdk/transaction"
+	"github.com/bitcoin-sv/spv-wallet/engine/v2/transaction"
 	"github.com/bitcoin-sv/spv-wallet/models/bsv"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -14,6 +15,7 @@ type InputAssertion interface {
 	HasOutpoint(outpoint bsv.Outpoint) InputAssertion
 	HasSourceTxID(id string) InputAssertion
 	HasSourceVout(index int) InputAssertion
+	HasCustomInstructions(instructions bsv.CustomInstructions)
 }
 
 type txInputAssertion struct {
@@ -22,7 +24,7 @@ type txInputAssertion struct {
 	assert     *assert.Assertions
 	require    *require.Assertions
 	input      *sdk.TransactionInput
-	annotation any
+	annotation *transaction.InputAnnotation
 	index      int
 }
 
@@ -43,4 +45,10 @@ func (a *txInputAssertion) HasSourceVout(index int) InputAssertion {
 	a.t.Helper()
 	a.assert.EqualValuesf(index, a.input.SourceTxOutIndex, "Source Transaction output index mismatch")
 	return a
+}
+
+func (a *txInputAssertion) HasCustomInstructions(instructions bsv.CustomInstructions) {
+	a.t.Helper()
+	a.require.NotNilf(a.annotation, "Input %d has no annotation", a.index)
+	a.assert.Equalf(instructions, a.annotation.CustomInstructions, "Input %d has invalid custom instructions", a.index)
 }

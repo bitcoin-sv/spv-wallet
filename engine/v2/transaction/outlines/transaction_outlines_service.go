@@ -93,9 +93,9 @@ func (s *service) evaluateSpec(ctx context.Context, spec *TransactionSpec) (*sdk
 }
 
 func (s *service) formatAsBEEF(tx *sdk.Transaction) (string, error) {
-	// FIXME: temporary solution to not fail on BEEF until we have service for collecting ancestors for inputs.
+	// FIXME: [waiting for SPV-1370] temporary solution to not fail on BEEF until we have service for collecting ancestors for inputs.
 	tmpTx := &sdk.Transaction{
 		Outputs: tx.Outputs,
 	}
-	return tmpTx.BEEFHex()
+	return tmpTx.BEEFHex() //nolint:wrapcheck // temporary solution - will be removed after SPV-1370
 }

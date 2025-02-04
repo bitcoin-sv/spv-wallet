@@ -110,7 +110,7 @@ func (a *assertion) Input(index int) InputAssertion {
 		assert:     a.assert,
 		require:    a.require,
 		input:      a.tx.Inputs[index],
-		annotation: nil,
+		annotation: a.txOutline.Annotations.Inputs[index],
 		index:      index,
 	}
 }

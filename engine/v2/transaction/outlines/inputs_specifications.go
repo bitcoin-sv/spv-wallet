@@ -21,7 +21,7 @@ func (s *InputsSpec) evaluate(ctx *evaluationContext, outputs annotatedOutputs) 
 
 	utxos, err := ctx.UTXOSelector().Select(ctx, tx, ctx.UserID())
 	if err != nil {
-		return nil, spverrors.Wrapf(err, "failed to select inputs for transaction")
+		return nil, spverrors.ErrInternal.Wrap(err)
 	}
 
 	if len(utxos) == 0 {
@@ -39,7 +39,9 @@ func (s *InputsSpec) evaluate(ctx *evaluationContext, outputs annotatedOutputs) 
 				SourceTXID:       txID,
 				SourceTxOutIndex: utxo.Vout,
 			},
-			InputAnnotation: &transaction.InputAnnotation{},
+			InputAnnotation: &transaction.InputAnnotation{
+				CustomInstructions: utxo.CustomInstructions,
+			},
 		}
 	}
 

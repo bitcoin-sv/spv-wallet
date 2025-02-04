@@ -4,6 +4,7 @@ import (
 	"context"
 	"testing"
 
+	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/bitcoin-sv/spv-wallet/engine/tester/fixtures"
 	"github.com/bitcoin-sv/spv-wallet/engine/v2/transaction/errors"
 	"github.com/bitcoin-sv/spv-wallet/engine/v2/transaction/outlines"
@@ -151,6 +152,23 @@ func TestCreateTransactionOutlineRAWError(t *testing.T) {
 
 		// then:
 		then.Created(tx).WithError(err).ThatIs(txerrors.ErrTxOutlineInsufficientFunds)
+
+	})
+
+	t.Run("return error when there was a technical error when selecting inputs", func(t *testing.T) {
+		given, then := testabilities.New(t)
+
+		// given:
+		service := given.NewTransactionOutlinesService()
+
+		// and:
+		given.UTXOSelector().WillReturnError()
+
+		// when:
+		tx, err := service.CreateRawTx(context.Background(), given.MinimumValidTransactionSpec())
+
+		// then:
+		then.Created(tx).WithError(err).ThatIs(spverrors.ErrInternal)
 
 	})
 }

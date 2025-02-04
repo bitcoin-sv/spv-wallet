@@ -15,6 +15,7 @@ type TransactionOutlineFixture interface {
 	NewTransactionOutlinesService() outlines.Service
 	ExternalRecipientHost() tpaymail.PaymailHostFixture
 	UserHasNotEnoughFunds()
+	UTXOSelector() UTXOSelectorFixture
 }
 
 type transactionOutlineAbility struct {
@@ -56,6 +57,10 @@ func (a *transactionOutlineAbility) NewTransactionOutlinesService() outlines.Ser
 		&a.utxoSelector,
 		tester.Logger(a.t),
 	)
+}
+
+func (a *transactionOutlineAbility) UTXOSelector() UTXOSelectorFixture {
+	return &a.utxoSelector
 }
 
 func (a *transactionOutlineAbility) UserHasNotEnoughFunds() {

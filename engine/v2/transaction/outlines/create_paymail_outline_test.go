@@ -382,6 +382,12 @@ func TestCreatePaymailTransactionOutlineRAW(t *testing.T) {
 		// then:
 		thenTx := then.Created(tx).WithNoError(err).WithParseableRawHex()
 
+		thenTx.HasInputs(1)
+
+		thenTx.Input(0).
+			HasOutpoint(testabilities.UserFundsTransactionOutpoint).
+			HasCustomInstructions(testabilities.UserFundsTransactionCustomInstructions)
+
 		thenTx.HasOutputs(1)
 
 		thenTx.Output(0).
@@ -423,6 +429,12 @@ func TestCreatePaymailTransactionOutlineRAW(t *testing.T) {
 
 		// then:
 		thenTx := then.Created(tx).WithNoError(err).WithParseableRawHex()
+
+		thenTx.HasInputs(1)
+
+		thenTx.Input(0).
+			HasOutpoint(testabilities.UserFundsTransactionOutpoint).
+			HasCustomInstructions(testabilities.UserFundsTransactionCustomInstructions)
 
 		thenTx.HasOutputs(2)
 
@@ -467,8 +479,15 @@ func TestCreatePaymailTransactionOutlineRAW(t *testing.T) {
 		tx, err := service.CreateRawTx(context.Background(), spec)
 
 		// then:
-		then.Created(tx).WithNoError(err).WithParseableRawHex().
-			Output(0).
+		thenTx := then.Created(tx).WithNoError(err).WithParseableRawHex()
+
+		thenTx.HasInputs(1)
+
+		thenTx.Input(0).
+			HasOutpoint(testabilities.UserFundsTransactionOutpoint).
+			HasCustomInstructions(testabilities.UserFundsTransactionCustomInstructions)
+
+		thenTx.Output(0).
 			IsPaymail().
 			HasSender(fixtures.UserWithMorePaymails.DefaultPaymail())
 	})
