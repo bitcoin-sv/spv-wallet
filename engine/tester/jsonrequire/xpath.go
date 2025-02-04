@@ -13,6 +13,7 @@ import (
 var arrayKeyRegex = regexp.MustCompile(`^([a-zA-Z0-9_-]+)\[(\d+)]$`)
 
 func getByXPath(t testing.TB, data map[string]any, path string) any {
+	t.Helper()
 	keys := strings.Split(path, "/")
 	current := any(data)
 

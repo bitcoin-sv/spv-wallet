@@ -43,7 +43,12 @@ func (f *faucetFixture) TopUp(satoshis bsv.Satoshis) fixtures.GivenTXSpec {
 					bsv.Outpoint{TxID: txSpec.ID(), Vout: 0},
 					f.user.ID(),
 					satoshis,
-					nil,
+					bsv.CustomInstructions{
+						{
+							Type:        "sign",
+							Instruction: "P2PKH",
+						},
+					},
 				),
 			},
 		},
