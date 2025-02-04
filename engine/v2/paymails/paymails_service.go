@@ -5,7 +5,6 @@ import (
 	"errors"
 
 	"github.com/bitcoin-sv/go-paymail"
-	"github.com/bitcoin-sv/spv-wallet/config"
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/bitcoin-sv/spv-wallet/engine/v2/paymails/paymailerrors"
 	"github.com/bitcoin-sv/spv-wallet/engine/v2/paymails/paymailsmodels"
@@ -14,23 +13,23 @@ import (
 
 // Service for paymails
 type Service struct {
-	paymailsRepo PaymailRepo
-	usersService UsersService
-	config       *config.AppConfig
+	paymailsRepo  PaymailRepo
+	usersService  UsersService
+	domainChecker DomainChecker
 }
 
 // NewService creates a new paymails service
-func NewService(paymails PaymailRepo, users UsersService, cfg *config.AppConfig) *Service {
+func NewService(paymails PaymailRepo, users UsersService, domainChecker DomainChecker) *Service {
 	return &Service{
-		paymailsRepo: paymails,
-		usersService: users,
-		config:       cfg,
+		paymailsRepo:  paymails,
+		usersService:  users,
+		domainChecker: domainChecker,
 	}
 }
 
 // Create creates a new paymail attached to a user
 func (s *Service) Create(ctx context.Context, newPaymail *paymailsmodels.NewPaymail) (*paymailsmodels.Paymail, error) {
-	if err := s.config.Paymail.CheckDomain(newPaymail.Domain); err != nil {
+	if err := s.domainChecker.CheckDomain(newPaymail.Domain); err != nil {
 		return nil, spverrors.Wrapf(err, "invalid domain during paymail creation")
 	}
 

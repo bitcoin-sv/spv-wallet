@@ -193,7 +193,11 @@ type PaymailConfig struct {
 }
 
 // CheckDomain will check if the domain is allowed
-func (p *PaymailConfig) CheckDomain(domain string) error {
+func (c *AppConfig) CheckDomain(domain string) error {
+	p := c.Paymail
+	if p == nil {
+		return configerrors.ErrPaymailNotConfigured
+	}
 	if p.DomainValidationEnabled {
 		if !slices.Contains(p.Domains, domain) {
 			return configerrors.ErrUnsupportedDomain
