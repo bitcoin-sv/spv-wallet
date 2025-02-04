@@ -55,7 +55,7 @@ func create(c *gin.Context, _ *reqctx.AdminContext) {
 		return
 	}
 
-	c.JSON(http.StatusCreated, mapping.CreatedUserResponse(createdUser))
+	c.JSON(http.StatusCreated, mapping.UserToResponse(createdUser))
 }
 
 func validatePubKey(pubKey string) error {
