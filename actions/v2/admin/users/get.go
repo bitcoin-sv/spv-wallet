@@ -18,5 +18,5 @@ func get(c *gin.Context, _ *reqctx.AdminContext) {
 		return
 	}
 
-	c.JSON(http.StatusOK, mapping.CreatedUserResponse(user))
+	c.JSON(http.StatusOK, mapping.UserToResponse(user))
 }
