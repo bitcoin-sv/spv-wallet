@@ -272,6 +272,7 @@ func (c *AppConfig) addARCOpts(options []engine.ClientOps) ([]engine.ClientOps, 
 		URL:          c.ARC.URL,
 		Token:        c.ARC.Token,
 		DeploymentID: c.ARC.DeploymentID,
+		WaitFor:      c.ARC.WaitForStatus,
 	}
 
 	if c.ARC.Callback.Enabled {
