@@ -1,7 +1,7 @@
 package transactions
 
 import (
-	"github.com/bitcoin-sv/spv-wallet/actions/v2/transactions/internal/mapping/outline"
+	"github.com/bitcoin-sv/spv-wallet/actions/v2/transactions/internal/mapping"
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/bitcoin-sv/spv-wallet/engine/v2/bsv"
 	"github.com/bitcoin-sv/spv-wallet/engine/v2/transaction/outlines"
@@ -32,7 +32,7 @@ func transactionOutlines(c *gin.Context, userCtx *reqctx.UserContext) {
 		return
 	}
 
-	spec, err := outline.Request(requestBody).ToEngine(userID)
+	spec, err := mapping.TransactionSpecificationRequestToOutline(&requestBody, userID)
 	if err != nil {
 		spverrors.ErrorResponse(c, err, logger)
 		return
@@ -51,11 +51,7 @@ func transactionOutlines(c *gin.Context, userCtx *reqctx.UserContext) {
 		return
 	}
 
-	res, err := outline.ToResponse(txOutline)
-	if err != nil {
-		spverrors.ErrorResponse(c, err, logger)
-		return
-	}
+	res := mapping.TransactionOutlineToResponse(txOutline)
 	c.JSON(200, res)
 }
 

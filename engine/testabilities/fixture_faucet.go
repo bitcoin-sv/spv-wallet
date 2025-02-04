@@ -66,3 +66,40 @@ func (f *faucetFixture) TopUp(satoshis bsv.Satoshis) fixtures.GivenTXSpec {
 
 	return txSpec
 }
+
+func (f *faucetFixture) StoreData(data string) (fixtures.GivenTXSpec, string) {
+	f.t.Helper()
+
+	txSpec := fixtures.GivenTX(f.t).
+		WithSender(fixtures.ExternalFaucet).
+		WithInput(uint64(1000)).
+		WithOPReturn(data)
+
+	outpoint := bsv.Outpoint{TxID: txSpec.ID(), Vout: 0}
+
+	operation := txmodels.NewOperation{
+		UserID: f.user.ID(),
+
+		Type:  "data",
+		Value: 0,
+
+		Transaction: &txmodels.NewTransaction{
+			ID:       txSpec.ID(),
+			TxStatus: txmodels.TxStatusMined,
+			Outputs: []txmodels.NewOutput{
+				txmodels.NewOutputForData(
+					outpoint,
+					f.user.ID(),
+					[]byte(data),
+				),
+			},
+		},
+	}
+
+	err := f.engine.Repositories().Operations.SaveAll(context.Background(), func(yield func(*txmodels.NewOperation) bool) {
+		yield(&operation)
+	})
+	f.assert.NoError(err)
+
+	return txSpec, outpoint.String()
+}

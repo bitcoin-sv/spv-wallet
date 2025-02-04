@@ -26,7 +26,7 @@ func recordOutline(c *gin.Context, userContext *reqctx.UserContext) {
 	}
 
 	recordService := reqctx.Engine(c).TransactionRecordService()
-	recorded, err := recordService.RecordTransactionOutline(c, userID, mapping.TransactionOutline(&requestBody))
+	recorded, err := recordService.RecordTransactionOutline(c, userID, mapping.AnnotatedTransactionRequestToOutline(&requestBody))
 	if err != nil {
 		spverrors.ErrorResponse(c, err, logger)
 		return
