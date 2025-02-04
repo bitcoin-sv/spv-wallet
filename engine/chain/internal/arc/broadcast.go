@@ -29,6 +29,7 @@ func (s *Service) Broadcast(ctx context.Context, tx *sdk.Transaction) (*chainmod
 		SetError(arcErr)
 
 	s.setCallbackHeaders(req)
+	s.setWaitForHeader(req)
 
 	txHex, err := s.prepareTxHex(ctx, tx)
 	if err != nil {
@@ -90,5 +91,11 @@ func (s *Service) setCallbackHeaders(req *resty.Request) {
 		if cb.Token != "" {
 			req.SetHeader("X-CallbackToken", cb.Token)
 		}
+	}
+}
+
+func (s *Service) setWaitForHeader(req *resty.Request) {
+	if s.arcCfg.WaitFor != "" {
+		req.SetHeader("X-WaitFor", s.arcCfg.WaitFor)
 	}
 }
