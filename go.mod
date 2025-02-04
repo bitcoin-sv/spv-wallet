@@ -37,6 +37,7 @@ require (
 	github.com/rafaeljusto/redigomock v2.4.0+incompatible
 	github.com/robfig/cron/v3 v3.0.1
 	github.com/rs/zerolog v1.33.0
+	github.com/samber/lo v1.49.1
 	github.com/spf13/viper v1.19.0
 	github.com/stretchr/testify v1.10.0
 	github.com/swaggo/swag v1.16.4
