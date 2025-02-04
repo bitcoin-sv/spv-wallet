@@ -53,56 +53,67 @@ type responseAssertions struct {
 }
 
 func (a *responseAssertions) Response(response *resty.Response) SPVWalletResponseAssertions {
+	a.t.Helper()
 	a.require.NotNil(response, "unexpected nil response")
 	a.response = response
 	return a
 }
 
 func (a *responseAssertions) IsUnauthorized() {
+	a.t.Helper()
 	a.HasStatus(http.StatusUnauthorized).
 		WithJSONf(apierror.MissingAuthHeaderJSON)
 
 }
 
 func (a *responseAssertions) IsUnauthorizedForAdmin() {
+	a.t.Helper()
 	a.HasStatus(http.StatusUnauthorized).
 		WithJSONf(apierror.AdminNotAuthorizedJSON)
 }
 
 func (a *responseAssertions) IsUnauthorizedForUser() {
+	a.t.Helper()
 	a.HasStatus(http.StatusUnauthorized).
 		WithJSONf(apierror.UserNotAuthorizedJSON)
 }
 
 func (a *responseAssertions) IsOK() SPVWalletResponseAssertions {
+	a.t.Helper()
 	return a.HasStatus(http.StatusOK)
 }
 
 func (a *responseAssertions) IsBadRequest() SPVWalletResponseAssertions {
+	a.t.Helper()
 	return a.HasStatus(http.StatusBadRequest)
 }
 
 func (a *responseAssertions) HasStatus(status int) SPVWalletResponseAssertions {
+	a.t.Helper()
 	a.assert.Equal(status, a.response.StatusCode())
 	return a
 }
 
 func (a *responseAssertions) WithJSONf(expectedFormat string, args ...any) {
+	a.t.Helper()
 	a.assertJSONContentType()
 	a.assertJSONBody(expectedFormat, args...)
 }
 
 func (a *responseAssertions) WithJSONMatching(expectedTemplateFormat string, params map[string]any) {
+	a.t.Helper()
 	a.assertJSONContentType()
 	jsonrequire.Match(a.t, expectedTemplateFormat, params, a.response.String())
 }
 
 func (a *responseAssertions) JSONValue() JsonValueGetter {
+	a.t.Helper()
 	a.assertJSONContentType()
 	return jsonrequire.NewGetterWithJSON(a.t, a.response.String())
 }
 
 func (a *responseAssertions) assertJSONContentType() {
+	a.t.Helper()
 	contentType := a.response.Header().Get("Content-Type")
 	mediaType, _, err := mime.ParseMediaType(contentType)
 	a.require.NoError(err, "Cannot validate Content-Type of response because of error")
@@ -110,6 +121,7 @@ func (a *responseAssertions) assertJSONContentType() {
 }
 
 func (a *responseAssertions) assertJSONBody(expectedFormat string, args ...any) {
+	a.t.Helper()
 	expectedJson := fmt.Sprintf(expectedFormat, args...)
 	assertJSONEq(a.t, expectedJson, a.response.String())
 }

@@ -6,6 +6,7 @@ import (
 	"github.com/bitcoin-sv/go-sdk/chainhash"
 	trx "github.com/bitcoin-sv/go-sdk/transaction"
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
+	"github.com/samber/lo"
 )
 
 type beefPreparationContext struct {
@@ -69,6 +70,8 @@ func (bctx *beefPreparationContext) processTransaction(currentTx *trx.Transactio
 }
 
 func (bctx *beefPreparationContext) processInputTransactions(inputTxIDs []string, currentTx *trx.Transaction) error {
+	inputTxIDs = lo.Uniq(inputTxIDs)
+
 	inputTxs, err := bctx.store.GetTransactionsByIDs(bctx.ctx, inputTxIDs)
 	if err != nil {
 		return spverrors.Wrapf(err, "cannot get transactions from database")
