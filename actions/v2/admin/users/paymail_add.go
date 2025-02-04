@@ -48,7 +48,7 @@ func addPaymail(c *gin.Context, _ *reqctx.AdminContext) {
 		return
 	}
 
-	c.JSON(http.StatusCreated, mapping.CreatedPaymailResponse(createdPaymail))
+	c.JSON(http.StatusCreated, mapping.PaymailToAdminResponse(createdPaymail))
 }
 
 // parsePaymail parses the paymail address from the request body.
