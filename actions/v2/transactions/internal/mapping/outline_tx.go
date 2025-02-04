@@ -32,10 +32,17 @@ func TransactionSpecificationRequestToOutline(tx *request.TransactionSpecificati
 func TransactionOutlineToResponse(tx *outlines.Transaction) *model.AnnotatedTransaction {
 	return &model.AnnotatedTransaction{
 		Hex:    string(tx.Hex),
-		Format: tx.Hex.Format(),
+		Format: string(tx.Hex.Format()),
 		Annotations: &model.Annotations{
+			Inputs:  lo.MapValues(tx.Annotations.Inputs, lox.MappingFn(outlineInputToResponse)),
 			Outputs: lo.MapValues(tx.Annotations.Outputs, lox.MappingFn(outlineOutputToResponse)),
 		},
+	}
+}
+
+func outlineInputToResponse(item *transaction.InputAnnotation) *model.InputAnnotation {
+	return &model.InputAnnotation{
+		CustomInstructions: item.CustomInstructions,
 	}
 }
 

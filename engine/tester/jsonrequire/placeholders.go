@@ -91,6 +91,7 @@ func processJSONPlaceholders(t testing.TB, template any, base map[string]any, xp
 }
 
 func processTemplateCandidate(t testing.TB, templateVal string, base map[string]any, xpath string) *reflect.Value {
+	t.Helper()
 	isRegex := containsRegex(templateVal)
 
 	if !isRegex && templateVal != "*" {
