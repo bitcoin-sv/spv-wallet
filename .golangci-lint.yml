@@ -16,11 +16,9 @@ run:
   build-tags:
     - mytag
 
-
   # default is true. Enables skipping of directories:
   #   vendor$, third_party$, testdata$, examples$, Godeps$, builtin$
   skip-dirs-use-default: true
-
 
   # by default isn't set. If set we pass it to "go list -mod={option}". From "go help modules":
   # If invoked with -mod=readonly, the go command is disallowed from the implicit
@@ -35,7 +33,6 @@ run:
   # Allow multiple parallel golangci-lint instances running.
   # If false (default) - golangci-lint acquires file lock on start.
   allow-parallel-runners: false
-
 
 # output configuration options
 output:
@@ -85,6 +82,7 @@ linters-settings:
   wrapcheck:
     ignoreSigRegexps:
       - spverrors\.(Newf|Wrapf)
+      - lox\.ErrorCollector.*\.Error\(\)
     ignorePackageGlobs:
       - "github.com/go-ozzo/ozzo-validation"
   revive:

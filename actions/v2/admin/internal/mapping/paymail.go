@@ -5,8 +5,8 @@ import (
 	"github.com/bitcoin-sv/spv-wallet/models/response/adminresponse"
 )
 
-// CreatedPaymailResponse maps a paymail to a response
-func CreatedPaymailResponse(p *paymailsmodels.Paymail) adminresponse.Paymail {
+// PaymailToAdminResponse maps a paymail to a response
+func PaymailToAdminResponse(p *paymailsmodels.Paymail) adminresponse.Paymail {
 	return adminresponse.Paymail{
 		ID:         p.ID,
 		Alias:      p.Alias,

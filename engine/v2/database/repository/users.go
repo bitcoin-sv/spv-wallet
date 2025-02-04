@@ -4,10 +4,10 @@ import (
 	"context"
 
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
-	"github.com/bitcoin-sv/spv-wallet/engine/utils"
 	"github.com/bitcoin-sv/spv-wallet/engine/v2/database"
 	"github.com/bitcoin-sv/spv-wallet/engine/v2/users/usersmodels"
 	"github.com/bitcoin-sv/spv-wallet/models/bsv"
+	"github.com/samber/lo"
 	"gorm.io/gorm"
 )
 
@@ -109,7 +109,7 @@ func mapToDomainUser(user *database.User) *usersmodels.User {
 		CreatedAt: user.CreatedAt,
 		UpdatedAt: user.UpdatedAt,
 		PublicKey: user.PubKey,
-		Paymails: utils.MapSlice(user.Paymails, func(p *database.Paymail) *usersmodels.Paymail {
+		Paymails: lo.Map(user.Paymails, func(p *database.Paymail, _ int) *usersmodels.Paymail {
 			return &usersmodels.Paymail{
 				ID:        p.ID,
 				CreatedAt: p.CreatedAt,
