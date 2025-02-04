@@ -152,9 +152,7 @@ func (f *txFlow) broadcast() error {
 		return txerrors.ErrTxBroadcast.Wrap(err)
 	}
 
-	if txInfo.TXStatus.IsProblematic() {
-		f.txRow.TxStatus = txmodels.TxStatusProblematic
-	} else if txInfo.TXStatus.IsMined() {
+	if txInfo.TXStatus.IsMined() {
 		f.txRow.TxStatus = txmodels.TxStatusMined
 	} else {
 		f.txRow.TxStatus = txmodels.TxStatusBroadcasted
