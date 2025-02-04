@@ -147,10 +147,11 @@ type DatastoreConfig struct {
 
 // ARCConfig consists of blockchain nodes (Arc) configuration
 type ARCConfig struct {
-	Callback     *CallbackConfig `json:"callback" mapstructure:"callback"`
-	DeploymentID string          `json:"deployment_id" mapstructure:"deployment_id"`
-	Token        string          `json:"token" mapstructure:"token"`
-	URL          string          `json:"url" mapstructure:"url"`
+	Callback      *CallbackConfig `json:"callback" mapstructure:"callback"`
+	DeploymentID  string          `json:"deployment_id" mapstructure:"deployment_id"`
+	Token         string          `json:"token" mapstructure:"token"`
+	URL           string          `json:"url" mapstructure:"url"`
+	WaitForStatus string          `json:"wait_for_status" mapstructure:"wait_for_status"`
 }
 
 // FeeUnitConfig reflects the utils.FeeUnit struct with proper annotations for json and mapstructure
