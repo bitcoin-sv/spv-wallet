@@ -198,13 +198,13 @@ func (c *Client) loadRepositories() {
 
 func (c *Client) loadUsersService() {
 	if c.options.users == nil {
-		c.options.users = users.NewService(c.Repositories().Users)
+		c.options.users = users.NewService(c.Repositories().Users, c.options.config)
 	}
 }
 
 func (c *Client) loadPaymailsService() {
 	if c.options.paymails == nil {
-		c.options.paymails = paymails.NewService(c.Repositories().Paymails, c.UsersService())
+		c.options.paymails = paymails.NewService(c.Repositories().Paymails, c.UsersService(), c.options.config)
 	}
 }
 

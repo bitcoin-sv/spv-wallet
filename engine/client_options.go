@@ -7,6 +7,7 @@ import (
 
 	"github.com/bitcoin-sv/go-paymail"
 	"github.com/bitcoin-sv/go-paymail/server"
+	"github.com/bitcoin-sv/spv-wallet/config"
 	"github.com/bitcoin-sv/spv-wallet/engine/chain/models"
 	"github.com/bitcoin-sv/spv-wallet/engine/cluster"
 	"github.com/bitcoin-sv/spv-wallet/engine/datastore"
@@ -449,5 +450,12 @@ func WithBHS(url, token string) ClientOps {
 			URL:       url,
 			AuthToken: token,
 		}
+	}
+}
+
+// WithAppConfig passes the config struct into engine
+func WithAppConfig(config *config.AppConfig) ClientOps {
+	return func(c *clientOptions) {
+		c.config = config
 	}
 }
