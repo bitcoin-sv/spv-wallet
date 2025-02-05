@@ -12,6 +12,12 @@ type ServerInterface interface {
 	// Get admin status
 	// (GET /api/v2/admin/status)
 	GetApiV2AdminStatus(c *gin.Context)
+	// Get shared config
+	// (GET /api/v2/configs/shared)
+	GetApiV2ConfigsShared(c *gin.Context)
+	// Get status
+	// (GET /api/v2/status)
+	GetApiV2Status(c *gin.Context)
 }
 
 // ServerInterfaceWrapper converts contexts to parameters.
@@ -36,6 +42,34 @@ func (siw *ServerInterfaceWrapper) GetApiV2AdminStatus(c *gin.Context) {
 	}
 
 	siw.Handler.GetApiV2AdminStatus(c)
+}
+
+// GetApiV2ConfigsShared operation middleware
+func (siw *ServerInterfaceWrapper) GetApiV2ConfigsShared(c *gin.Context) {
+
+	c.Set(XPubAuthScopes, []string{"admin", "user"})
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		middleware(c)
+		if c.IsAborted() {
+			return
+		}
+	}
+
+	siw.Handler.GetApiV2ConfigsShared(c)
+}
+
+// GetApiV2Status operation middleware
+func (siw *ServerInterfaceWrapper) GetApiV2Status(c *gin.Context) {
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		middleware(c)
+		if c.IsAborted() {
+			return
+		}
+	}
+
+	siw.Handler.GetApiV2Status(c)
 }
 
 // GinServerOptions provides options for the Gin server.
@@ -66,4 +100,6 @@ func RegisterHandlersWithOptions(router gin.IRouter, si ServerInterface, options
 	}
 
 	router.GET(options.BaseURL+"/api/v2/admin/status", wrapper.GetApiV2AdminStatus)
+	router.GET(options.BaseURL+"/api/v2/configs/shared", wrapper.GetApiV2ConfigsShared)
+	router.GET(options.BaseURL+"/api/v2/status", wrapper.GetApiV2Status)
 }

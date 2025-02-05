@@ -4,4 +4,11 @@ info:
   version: ignored
 
 components:
-  schemas:
+  responses:
+    SharedConfig:
+      description: Shared config
+      content:
+        application/json:
+          schema:
+            $ref: "./models.yaml#/components/schemas/SharedConfig"
+

@@ -6,3 +6,12 @@ package api
 const (
 	XPubAuthScopes = "XPubAuth.Scopes"
 )
+
+// ApiComponentsModelsSharedConfig Shared config
+type ApiComponentsModelsSharedConfig struct {
+	ExperimentalFeatures *map[string]bool `json:"experimentalFeatures,omitempty"`
+	PaymailDomains       *[]string        `json:"paymailDomains,omitempty"`
+}
+
+// ApiComponentsResponsesSharedConfig Shared config
+type ApiComponentsResponsesSharedConfig = ApiComponentsModelsSharedConfig

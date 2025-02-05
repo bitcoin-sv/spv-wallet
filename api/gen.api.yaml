@@ -20,10 +20,57 @@ paths:
             summary: Get admin status
             tags:
                 - Admin endpoints
+    /api/v2/configs/shared:
+        get:
+            description: This endpoint returns shared config. It can be obtained by both admin and user.
+            responses:
+                "200":
+                    $ref: '#/components/responses/api_components_responses_SharedConfig'
+                "401":
+                    $ref: '#/components/responses/api_components_errors_NotAuthorized'
+            security:
+                - XPubAuth:
+                    - admin
+                    - user
+            summary: Get shared config
+            tags:
+                - Base endpoints
+    /api/v2/status:
+        get:
+            description: This endpoint returns status. It can be obtained by everyone
+            responses:
+                "200":
+                    description: Success
+            summary: Get status
+            tags:
+                - Base endpoints
 components:
     responses:
         api_components_errors_NotAuthorized:
             description: Security requirements failed
+        api_components_responses_SharedConfig:
+            content:
+                application/json:
+                    schema:
+                        $ref: '#/components/schemas/api_components_models_SharedConfig'
+            description: Shared config
+    schemas:
+        api_components_models_SharedConfig:
+            description: Shared config
+            properties:
+                experimentalFeatures:
+                    additionalProperties:
+                        type: boolean
+                    example:
+                        pikeEnabled: true
+                    type: object
+                paymailDomains:
+                    example:
+                        - example.com
+                    items:
+                        type: string
+                    type: array
+            type: object
     securitySchemes:
         XPubAuth:
             description: Authentication using x-auth-xpub header

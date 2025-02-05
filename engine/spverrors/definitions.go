@@ -52,6 +52,12 @@ var ErrValidateXPub = models.SPVError{Message: "error validation xpub", StatusCo
 // ErrAdminAuthOnUserEndpoint is when admin authorization is used on user's endpoint
 var ErrAdminAuthOnUserEndpoint = models.SPVError{Message: "cannot call user's endpoints with admin authorization", StatusCode: 401, Code: "error-admin-auth-on-user-endpoint"}
 
+// ErrAdminAuthOnNonAdminEndpoint is when admin authorization is used on non-admin's endpoint
+var ErrAdminAuthOnNonAdminEndpoint = models.SPVError{Message: "cannot call non-admin endpoints with admin authorization", StatusCode: 401, Code: "error-admin-auth-on-non-admin-endpoint"}
+
+// ErrUserAuthOnNonUserEndpoint is when user authorization is used on non-user's endpoint
+var ErrUserAuthOnNonUserEndpoint = models.SPVError{Message: "cannot call non-user endpoints with user authorization", StatusCode: 401, Code: "error-user-auth-on-non-user-endpoint"}
+
 // ErrXPubAuthRequired is when xpub authorization is required
 var ErrXPubAuthRequired = models.SPVError{Message: "xpub authorization required", StatusCode: 401, Code: "error-xpub-authorization-required"}
 
