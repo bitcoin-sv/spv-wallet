@@ -25,7 +25,7 @@ func ExampleUTXOSelector_buildQueryForInputs_sqlite() {
 
 	fmt.Println(query)
 
-	// Output: SELECT * FROM `xapi_user_utxos` WHERE (tx_id, vout) in (SELECT tx_id,vout FROM (SELECT tx_id,vout,change,min(case when change >= 0 then change end) over () as min_change FROM (SELECT tx_id,vout,case when remaining_value - fee_no_change_output <= 0 then remaining_value - fee_no_change_output else remaining_value - fee_with_change_output end as change FROM (SELECT `tx_id`,`vout`,sum(satoshis) over (order by touched_at ASC, created_at ASC, tx_id ASC, vout ASC) - 1 as remaining_value,ceil((sum(estimated_input_size) over (order by touched_at ASC, created_at ASC, tx_id ASC, vout ASC) + 10) / cast(1000 as float)) * 1 as fee_no_change_output,ceil((sum(estimated_input_size) over (order by touched_at ASC, created_at ASC, tx_id ASC, vout ASC) + 10 + 34) / cast(1000 as float)) * 1 as fee_with_change_output FROM `xapi_user_utxos` WHERE user_id = "someuserid") as utxo) as utxoWithChange) as utxoWithMinChange WHERE change <= min_change)
+	// Output: SELECT `tx_id`,`vout`,`custom_instructions` FROM `xapi_user_utxos` WHERE (tx_id, vout) in (SELECT tx_id,vout FROM (SELECT tx_id,vout,change,min(case when change >= 0 then change end) over () as min_change FROM (SELECT tx_id,vout,case when remaining_value - fee_no_change_output <= 0 then remaining_value - fee_no_change_output else remaining_value - fee_with_change_output end as change FROM (SELECT `tx_id`,`vout`,sum(satoshis) over (order by touched_at ASC, created_at ASC, tx_id ASC, vout ASC) - 1 as remaining_value,ceil((sum(estimated_input_size) over (order by touched_at ASC, created_at ASC, tx_id ASC, vout ASC) + 10) / cast(1000 as float)) * 1 as fee_no_change_output,ceil((sum(estimated_input_size) over (order by touched_at ASC, created_at ASC, tx_id ASC, vout ASC) + 10 + 34) / cast(1000 as float)) * 1 as fee_with_change_output FROM `xapi_user_utxos` WHERE user_id = "someuserid") as utxo) as utxoWithChange) as utxoWithMinChange WHERE change <= min_change)
 }
 
 // ExampleUTXOSelector_buildQueryForInputs_postgresql demonstrates what would be the query used to select inputs for a transaction.
@@ -43,7 +43,7 @@ func ExampleUTXOSelector_buildQueryForInputs_postgresql() {
 
 	fmt.Println(query)
 
-	// Output: SELECT * FROM "xapi_user_utxos" WHERE (tx_id, vout) in (SELECT tx_id,vout FROM (SELECT tx_id,vout,change,min(case when change >= 0 then change end) over () as min_change FROM (SELECT tx_id,vout,case when remaining_value - fee_no_change_output <= 0 then remaining_value - fee_no_change_output else remaining_value - fee_with_change_output end as change FROM (SELECT "tx_id","vout",sum(satoshis) over (order by touched_at ASC, created_at ASC, tx_id ASC, vout ASC) - 1 as remaining_value,ceil((sum(estimated_input_size) over (order by touched_at ASC, created_at ASC, tx_id ASC, vout ASC) + 10) / cast(1000 as float)) * 1 as fee_no_change_output,ceil((sum(estimated_input_size) over (order by touched_at ASC, created_at ASC, tx_id ASC, vout ASC) + 10 + 34) / cast(1000 as float)) * 1 as fee_with_change_output FROM "xapi_user_utxos" WHERE user_id = 'someuserid') as utxo) as utxoWithChange) as utxoWithMinChange WHERE change <= min_change)
+	// Output: SELECT "tx_id","vout","custom_instructions" FROM "xapi_user_utxos" WHERE (tx_id, vout) in (SELECT tx_id,vout FROM (SELECT tx_id,vout,change,min(case when change >= 0 then change end) over () as min_change FROM (SELECT tx_id,vout,case when remaining_value - fee_no_change_output <= 0 then remaining_value - fee_no_change_output else remaining_value - fee_with_change_output end as change FROM (SELECT "tx_id","vout",sum(satoshis) over (order by touched_at ASC, created_at ASC, tx_id ASC, vout ASC) - 1 as remaining_value,ceil((sum(estimated_input_size) over (order by touched_at ASC, created_at ASC, tx_id ASC, vout ASC) + 10) / cast(1000 as float)) * 1 as fee_no_change_output,ceil((sum(estimated_input_size) over (order by touched_at ASC, created_at ASC, tx_id ASC, vout ASC) + 10 + 34) / cast(1000 as float)) * 1 as fee_with_change_output FROM "xapi_user_utxos" WHERE user_id = 'someuserid') as utxo) as utxoWithChange) as utxoWithMinChange WHERE change <= min_change)
 }
 
 // ExampleUTXOSelector_buildUpdateTouchedAtQuery_sqlite demonstrates what would be the SQL statement used to update inputs after selecting them.
@@ -92,11 +92,7 @@ func ExampleUTXOSelector_buildUpdateTouchedAtQuery_postgres() {
 	// Output: UPDATE "xapi_user_utxos" SET "touched_at"='2006-02-01 15:04:05' WHERE (tx_id, vout) in (('tx_id_1',0),('tx_id_1',1),('tx_id_2',0))
 }
 
-func givenInputsSelector(db *gorm.DB) *sqlInputsSelector {
+func givenInputsSelector(db *gorm.DB) *UTXOSelector {
 	selector := NewUTXOSelector(db, bsv.FeeUnit{Satoshis: 1, Bytes: 1000})
-	result, ok := selector.(*sqlInputsSelector)
-	if !ok {
-		panic("failed to cast selector to sqlInputsSelector")
-	}
-	return result
+	return selector
 }

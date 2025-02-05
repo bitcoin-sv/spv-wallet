@@ -1,6 +1,7 @@
 package transactions_test
 
 import (
+	"fmt"
 	"testing"
 
 	"github.com/bitcoin-sv/spv-wallet/actions/testabilities"
@@ -254,4 +255,125 @@ func TestOutlinesRecordOpReturnOnBroadcastError(t *testing.T) {
 
 	// then:
 	then.Response(res).HasStatus(500).WithJSONf(apierror.ExpectedJSON("error-tx-broadcast", "failed to broadcast transaction"))
+}
+
+func TestRecordOpReturnTwiceByTheSameUser(t *testing.T) {
+	// given:
+	givenForAllTests := testabilities.Given(t)
+	cleanup := givenForAllTests.StartedSPVWalletWithConfiguration(
+		testengine.WithV2(),
+	)
+	defer cleanup()
+
+	// and:
+	ownedTransaction := givenForAllTests.Faucet(fixtures.Sender).TopUp(1000)
+
+	// and:
+	txSpec := fixtures.GivenTX(t).
+		WithSender(fixtures.Sender).
+		WithInputFromUTXO(ownedTransaction.TX(), 0).
+		WithOPReturn(dataOfOpReturnTx)
+
+	for i := 0; i < 2; i++ {
+		t.Run(fmt.Sprintf("Record op_return data - call %d", i), func(t *testing.T) {
+			// given:
+			given, then := testabilities.NewOf(givenForAllTests, t)
+
+			// and:
+			client := given.HttpClient().ForUser()
+
+			// and:
+			request := `{
+				"hex": "` + txSpec.BEEF() + `",
+				"annotations": {
+					"outputs": {
+						"0": {
+							"bucket": "data"
+						}
+					}
+				}
+			}`
+
+			// and:
+			given.ARC().WillRespondForBroadcast(200, &chainmodels.TXInfo{
+				TxID:     txSpec.ID(),
+				TXStatus: chainmodels.SeenOnNetwork,
+			})
+
+			// when:
+			res, _ := client.R().
+				SetHeader("Content-Type", "application/json").
+				SetBody(request).
+				Post(transactionsOutlinesRecordURL)
+
+			// then:
+			then.Response(res).
+				HasStatus(201).
+				WithJSONMatching(`{
+				"txID": "{{ .txID }}"
+			}`, map[string]any{
+					"txID": txSpec.ID(),
+				})
+		})
+	}
+
+	t.Run("get operations", func(t *testing.T) {
+		// given:
+		given, then := testabilities.NewOf(givenForAllTests, t)
+
+		// and:
+		client := given.HttpClient().ForUser()
+
+		// when:
+		res, _ := client.R().Get("/api/v2/operations/search")
+
+		// then:
+		then.Response(res).IsOK().WithJSONMatching(`{
+			"content": [
+				{
+					"txID": "{{ .txID }}",
+					"createdAt": "{{ matchTimestamp }}",
+					"value": {{ .value }},
+					"type": "outgoing",
+					"counterparty": "{{ .sender }}"
+				},
+				{{ anything }}
+			],
+			"page": {
+			    "number": 1,
+			    "size": 2,
+			    "totalElements": 2,
+			    "totalPages": 1
+			}
+		}`, map[string]any{
+			"value":  -1000,
+			"txID":   txSpec.ID(),
+			"sender": "",
+		})
+	})
+
+	t.Run("Get stored data", func(t *testing.T) {
+		// given:
+		given, then := testabilities.NewOf(givenForAllTests, t)
+
+		// and:
+		outpoint := bsv.Outpoint{TxID: txSpec.ID(), Vout: 0}
+
+		// and:
+		client := given.HttpClient().ForUser()
+
+		// when:
+		res, _ := client.R().
+			Get("/api/v2/data/" + outpoint.String())
+
+		// then:
+		then.Response(res).
+			IsOK().WithJSONMatching(`{
+				"id": "{{ .outpoint }}",
+				"blob": "{{ .blob }}"
+			}`, map[string]any{
+			"outpoint": outpoint.String(),
+			"blob":     dataOfOpReturnTx,
+		})
+	})
 }

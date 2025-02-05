@@ -10,6 +10,7 @@ import (
 type TransactionSpec struct {
 	Outputs OutputsSpec
 	UserID  string
+	Inputs  InputsSpec
 }
 
 func (t *TransactionSpec) evaluate(ctx *evaluationContext) (*sdk.Transaction, transaction.Annotations, error) {
@@ -18,12 +19,21 @@ func (t *TransactionSpec) evaluate(ctx *evaluationContext) (*sdk.Transaction, tr
 		return nil, transaction.Annotations{}, spverrors.Wrapf(err, "failed to evaluate outputs")
 	}
 
+	inputs, err := t.Inputs.evaluate(ctx, outputs)
+	if err != nil {
+		return nil, transaction.Annotations{}, err
+	}
+
 	txOuts, outputsAnnotations := outputs.splitIntoTransactionOutputsAndAnnotations()
+	txIns, inputsAnnotations := inputs.splitIntoTransactionInputsAndAnnotations()
+
 	tx := &sdk.Transaction{
+		Inputs:  txIns,
 		Outputs: txOuts,
 	}
 
 	annotations := transaction.Annotations{
+		Inputs:  inputsAnnotations,
 		Outputs: outputsAnnotations,
 	}
 
