@@ -15,6 +15,7 @@ import (
 	"github.com/bitcoin-sv/spv-wallet/engine/v2/addresses"
 	"github.com/bitcoin-sv/spv-wallet/engine/v2/data"
 	"github.com/bitcoin-sv/spv-wallet/engine/v2/database/repository"
+	"github.com/bitcoin-sv/spv-wallet/engine/v2/operations"
 	"github.com/bitcoin-sv/spv-wallet/engine/v2/paymails"
 	paymailprovider "github.com/bitcoin-sv/spv-wallet/engine/v2/paymailserver"
 	"github.com/bitcoin-sv/spv-wallet/engine/v2/transaction/outlines"
@@ -198,13 +199,13 @@ func (c *Client) loadRepositories() {
 
 func (c *Client) loadUsersService() {
 	if c.options.users == nil {
-		c.options.users = users.NewService(c.Repositories().Users)
+		c.options.users = users.NewService(c.Repositories().Users, c.options.config)
 	}
 }
 
 func (c *Client) loadPaymailsService() {
 	if c.options.paymails == nil {
-		c.options.paymails = paymails.NewService(c.Repositories().Paymails, c.UsersService())
+		c.options.paymails = paymails.NewService(c.Repositories().Paymails, c.UsersService(), c.options.config)
 	}
 }
 
@@ -217,6 +218,12 @@ func (c *Client) loadAddressesService() {
 func (c *Client) loadDataService() {
 	if c.options.data == nil {
 		c.options.data = data.NewService(c.Repositories().Data)
+	}
+}
+
+func (c *Client) loadOperationsService() {
+	if c.options.operations == nil {
+		c.options.operations = operations.NewService(c.Repositories().Operations)
 	}
 }
 
