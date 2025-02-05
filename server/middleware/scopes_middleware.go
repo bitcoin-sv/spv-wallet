@@ -1,6 +1,8 @@
 package middleware
 
 import (
+	"slices"
+
 	"github.com/bitcoin-sv/spv-wallet/api"
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/bitcoin-sv/spv-wallet/server/reqctx"
@@ -17,20 +19,14 @@ func SignatureAuthWithScopes() api.MiddlewareFunc {
 	return func(c *gin.Context) {
 		scopeVal, exists := c.Get(api.XPubAuthScopes)
 		if !exists {
-			spverrors.ErrorResponse(c, spverrors.ErrMissingAuthScope, reqctx.Logger(c))
+			// This means that for this particular endpoint, this auth method is not set
+			c.Next()
 			return
 		}
 
 		scopes, ok := scopeVal.([]string)
 		if !ok || len(scopes) == 0 {
 			spverrors.ErrorResponse(c, spverrors.ErrWrongAuthScopeFormat, reqctx.Logger(c))
-			return
-		}
-
-		userType := getHighestPriorityScope(scopes)
-
-		if userType == "" {
-			spverrors.ErrorResponse(c, spverrors.ErrWrongAuthScopeType, reqctx.Logger(c))
 			return
 		}
 
@@ -43,35 +39,21 @@ func SignatureAuthWithScopes() api.MiddlewareFunc {
 
 		userCtx := reqctx.GetUserContext(c)
 
-		if userType == "admin" && userCtx.AuthType != reqctx.AuthTypeAdmin {
-			spverrors.ErrorResponse(c, spverrors.ErrNotAnAdminKey, reqctx.Logger(c))
-			return
-		} else if userType == "user" && userCtx.AuthType == reqctx.AuthTypeAdmin {
-			spverrors.ErrorResponse(c, spverrors.ErrAdminAuthOnUserEndpoint, reqctx.Logger(c))
-			return
+		switch userCtx.GetAuthType() {
+		case reqctx.AuthTypeAdmin:
+			if !slices.Contains(scopes, "admin") {
+				spverrors.ErrorResponse(c, spverrors.ErrAdminAuthOnNonAdminEndpoint, reqctx.Logger(c))
+				return
+			}
+		case reqctx.AuthTypeXPub:
+			if !slices.Contains(scopes, "user") {
+				spverrors.ErrorResponse(c, spverrors.ErrUserAuthOnNonUserEndpoint, reqctx.Logger(c))
+				return
+			}
+		default:
+			spverrors.ErrorResponse(c, spverrors.ErrAuthorization, reqctx.Logger(c))
 		}
 
 		c.Next()
 	}
-}
-
-// getHighestPriorityScope returns the highest priority scope if many were defined
-func getHighestPriorityScope(scopes []string) string {
-	scopePriority := map[string]int{
-		"admin": 3,
-		"user":  2,
-		"basic": 1,
-	}
-
-	highestScope := ""
-	highestPriority := 0
-
-	for _, scope := range scopes {
-		if priority, exists := scopePriority[scope]; exists && priority > highestPriority {
-			highestScope = scope
-			highestPriority = priority
-		}
-	}
-
-	return highestScope
 }
