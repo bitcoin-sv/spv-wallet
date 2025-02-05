@@ -35,13 +35,24 @@ func (s *Service) RecordTransactionOutline(ctx context.Context, userID string, o
 		operation.Subtract(utxo.Satoshis)
 	}
 
-	newDataRecords, err := processDataOutputs(tx, userID, &outline.Annotations)
+	p2pkhOutputs, err := flow.findRelevantP2PKHOutputs()
 	if err != nil {
 		return nil, err
 	}
 
-	// TODO: getOutputsForTrackedAddresses
-	// TODO: process Paymail Annotations
+	for outputData := range p2pkhOutputs {
+		operation := flow.operationOfUser(outputData.UserID, "incoming", "")
+		if len(flow.operations) > 2 {
+			return nil, spverrors.Newf("paymail transaction with multiple receivers is not supported")
+		}
+		operation.Add(outputData.Satoshis)
+		flow.addOutputs(outputData)
+	}
+
+	newDataRecords, err := processDataOutputs(tx, userID, &outline.Annotations)
+	if err != nil {
+		return nil, err
+	}
 
 	if len(newDataRecords) > 0 {
 		_ = flow.operationOfUser(userID, "data", "")
