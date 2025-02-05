@@ -9,6 +9,7 @@ import (
 	"github.com/bitcoin-sv/spv-wallet/engine"
 	"github.com/bitcoin-sv/spv-wallet/engine/datastore"
 	"github.com/bitcoin-sv/spv-wallet/engine/tester"
+	"github.com/bitcoin-sv/spv-wallet/initializer"
 	"github.com/bitcoin-sv/spv-wallet/logging"
 	"github.com/bitcoin-sv/spv-wallet/server/middleware"
 	"github.com/gin-gonic/gin"
@@ -61,7 +62,7 @@ func (ts *TestSuite) BaseSetupTest() {
 	var err error
 	ts.Logger = tester.Logger(ts.T())
 
-	opts, err := ts.AppConfig.ToEngineOptions(ts.Logger)
+	opts, err := initializer.ToEngineOptions(ts.AppConfig, ts.Logger)
 	require.NoError(ts.T(), err)
 
 	ts.SpvWalletEngine, err = engine.NewClient(context.Background(), opts...)
