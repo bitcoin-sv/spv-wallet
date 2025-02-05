@@ -2,6 +2,7 @@ package record
 
 import (
 	"context"
+	txerrors "github.com/bitcoin-sv/spv-wallet/engine/v2/transaction/errors"
 
 	trx "github.com/bitcoin-sv/go-sdk/transaction"
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
@@ -32,7 +33,7 @@ func (s *Service) RecordPaymailTransaction(ctx context.Context, tx *trx.Transact
 	for outputData := range p2pkhOutputs {
 		operation := flow.operationOfUser(outputData.UserID, "incoming", senderPaymail)
 		if len(flow.operations) > 2 {
-			return spverrors.Newf("paymail transaction with multiple receivers is not supported")
+			return txerrors.ErrMultiPaymailRecipientsNotSupported
 		}
 		operation.Add(outputData.Satoshis)
 		flow.addOutputs(outputData)

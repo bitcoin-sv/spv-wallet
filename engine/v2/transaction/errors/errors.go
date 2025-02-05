@@ -77,4 +77,7 @@ var (
 
 	// ErrGettingAddresses is when getting addresses fails.
 	ErrGettingAddresses = models.SPVError{Code: "error-getting-addresses", Message: "failed to get addresses", StatusCode: 500}
+
+	// ErrMultiPaymailRecipientsNotSupported is when the transaction has multiple paymail recipients.
+	ErrMultiPaymailRecipientsNotSupported = models.SPVError{Code: "error-multi-paymail-recipients", Message: "paymail transaction with multiple recipients is not supported", StatusCode: 400}
 )

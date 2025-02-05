@@ -25,13 +25,24 @@ func (s *Service) RecordTransactionOutline(ctx context.Context, userID string, o
 		return nil, err
 	}
 
+	sender := ""
+	receiver := ""
+
+	paymailAnnotations, err := processPaymailOutputs(tx, userID, &outline.Annotations)
+	if err != nil {
+		return nil, err
+	} else if paymailAnnotations != nil {
+		sender = paymailAnnotations.Sender
+		receiver = paymailAnnotations.Receiver
+	}
+
 	trackedOutputs, err := flow.processInputs()
 	if err != nil {
 		return nil, err
 	}
 
 	for _, utxo := range trackedOutputs {
-		operation := flow.operationOfUser(utxo.UserID, "outgoing", "")
+		operation := flow.operationOfUser(utxo.UserID, "outgoing", receiver)
 		operation.Subtract(utxo.Satoshis)
 	}
 
@@ -41,10 +52,7 @@ func (s *Service) RecordTransactionOutline(ctx context.Context, userID string, o
 	}
 
 	for outputData := range p2pkhOutputs {
-		operation := flow.operationOfUser(outputData.UserID, "incoming", "")
-		if len(flow.operations) > 2 {
-			return nil, spverrors.Newf("paymail transaction with multiple receivers is not supported")
-		}
+		operation := flow.operationOfUser(outputData.UserID, "incoming", sender)
 		operation.Add(outputData.Satoshis)
 		flow.addOutputs(outputData)
 	}
@@ -55,7 +63,7 @@ func (s *Service) RecordTransactionOutline(ctx context.Context, userID string, o
 	}
 
 	if len(newDataRecords) > 0 {
-		_ = flow.operationOfUser(userID, "data", "")
+		_ = flow.operationOfUser(userID, "data", sender)
 		flow.addOutputs(newDataRecords...)
 	}
 

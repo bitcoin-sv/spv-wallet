@@ -9,7 +9,6 @@ import (
 	chainmodels "github.com/bitcoin-sv/spv-wallet/engine/chain/models"
 	testengine "github.com/bitcoin-sv/spv-wallet/engine/testabilities"
 	"github.com/bitcoin-sv/spv-wallet/engine/tester/fixtures"
-	"github.com/bitcoin-sv/spv-wallet/models/bsv"
 	"github.com/stretchr/testify/require"
 )
 
@@ -24,15 +23,15 @@ func TestInternalOutgoingTransaction(t *testing.T) {
 	var testState struct {
 		reference     string
 		lockingScript *script.Script
+		txID          string
 	}
 
 	// and:
-	satoshis := bsv.Satoshis(1000)
 	sender := fixtures.Sender
 	recipient := fixtures.RecipientInternal
 
 	// and:
-	sourceTxSpec := givenForAllTests.Faucet(sender).TopUp(satoshis + 1)
+	sourceTxSpec := givenForAllTests.Faucet(sender).TopUp(1001)
 
 	t.Run("During outline preparation - call recipient destination", func(t *testing.T) {
 		// given:
@@ -43,7 +42,7 @@ func TestInternalOutgoingTransaction(t *testing.T) {
 
 		// and:
 		requestBody := map[string]any{
-			"satoshis": satoshis,
+			"satoshis": 1000,
 		}
 
 		// when:
@@ -82,7 +81,7 @@ func TestInternalOutgoingTransaction(t *testing.T) {
 			WithSender(sender).
 			WithRecipient(recipient).
 			WithInputFromUTXO(sourceTxSpec.TX(), 0).
-			WithOutputScript(uint64(satoshis), testState.lockingScript)
+			WithOutputScript(1000, testState.lockingScript)
 
 		// and:
 		outline := fmt.Sprintf(`{
@@ -126,6 +125,80 @@ func TestInternalOutgoingTransaction(t *testing.T) {
 		// and:
 		thenEng := then.Engine(given.Engine())
 		thenEng.User(sender).Balance().IsZero()
-		thenEng.User(recipient).Balance().IsEqualTo(satoshis)
+		thenEng.User(recipient).Balance().IsEqualTo(1000)
+
+		// update:
+		testState.txID = txSpec.ID()
+	})
+
+	t.Run("Check sender's operations", func(t *testing.T) {
+		// given:
+		given, then := testabilities.NewOf(givenForAllTests, t)
+
+		// and:
+		client := given.HttpClient().ForGivenUser(sender)
+
+		// when:
+		res, _ := client.R().Get("/api/v2/operations/search")
+
+		// then:
+		then.Response(res).IsOK().WithJSONMatching(`{
+			"content": [
+				{
+					"txID": "{{ .txID }}",
+					"createdAt": "{{ matchTimestamp }}",
+					"value": {{ .value }},
+					"type": "outgoing",
+					"counterparty": "{{ .recipient }}",
+					"txStatus": "BROADCASTED"
+				},
+				{{ anything }}
+			],
+			"page": {
+			    "number": 1,
+			    "size": 2,
+			    "totalElements": 2,
+			    "totalPages": 1
+			}
+		}`, map[string]any{
+			"value":     -1001,
+			"txID":      testState.txID,
+			"recipient": recipient.DefaultPaymail(),
+		})
+	})
+
+	t.Run("Check recipient's operations", func(t *testing.T) {
+		// given:
+		given, then := testabilities.NewOf(givenForAllTests, t)
+
+		// and:
+		client := given.HttpClient().ForGivenUser(recipient)
+
+		// when:
+		res, _ := client.R().Get("/api/v2/operations/search")
+
+		// then:
+		then.Response(res).IsOK().WithJSONMatching(`{
+			"content": [
+				{
+					"txID": "{{ .txID }}",
+					"createdAt": "{{ matchTimestamp }}",
+					"value": {{ .value }},
+					"type": "incoming",
+					"counterparty": "{{ .sender }}",
+					"txStatus": "BROADCASTED"
+				}
+			],
+			"page": {
+			    "number": 1,
+			    "size": 1,
+			    "totalElements": 1,
+			    "totalPages": 1
+			}
+		}`, map[string]any{
+			"value":  1000,
+			"txID":   testState.txID,
+			"sender": sender.DefaultPaymail(),
+		})
 	})
 }
