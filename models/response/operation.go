@@ -9,4 +9,5 @@ type Operation struct {
 	TxID         string    `json:"txID" example:"bb8593f85ef8056a77026ad415f02128f3768906de53e9e8bf8749fe2d66cf50"`
 	Type         string    `json:"type" example:"incoming" enums:"incoming,outgoing"`
 	Counterparty string    `json:"counterparty" example:"alice@example.com"`
+	TxStatus     string    `json:"txStatus" example:"MINED" enums:"CREATED,BROADCASTED,MINED,REVERTED,PROBLEMATIC"`
 }

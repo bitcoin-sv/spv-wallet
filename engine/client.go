@@ -20,6 +20,7 @@ import (
 	"github.com/bitcoin-sv/spv-wallet/engine/v2/addresses"
 	"github.com/bitcoin-sv/spv-wallet/engine/v2/data"
 	"github.com/bitcoin-sv/spv-wallet/engine/v2/database/repository"
+	"github.com/bitcoin-sv/spv-wallet/engine/v2/operations"
 	"github.com/bitcoin-sv/spv-wallet/engine/v2/paymails"
 	"github.com/bitcoin-sv/spv-wallet/engine/v2/transaction/outlines"
 	"github.com/bitcoin-sv/spv-wallet/engine/v2/transaction/record"
@@ -64,6 +65,7 @@ type (
 		users        *users.Service    // User domain service
 		paymails     *paymails.Service // Paymail domain service
 		addresses    *addresses.Service
+		operations   *operations.Service
 		data         *data.Service
 		config       *config.AppConfig
 	}
@@ -160,6 +162,7 @@ func NewClient(ctx context.Context, opts ...ClientOps) (ClientInterface, error) 
 	client.loadPaymailsService()
 	client.loadAddressesService()
 	client.loadDataService()
+	client.loadOperationsService()
 
 	// Load the Paymail client and service (if does not exist)
 	if err = client.loadPaymailComponents(); err != nil {
@@ -369,4 +372,9 @@ func (c *Client) AddressesService() *addresses.Service {
 // DataService will return the data domain service
 func (c *Client) DataService() *data.Service {
 	return c.options.data
+}
+
+// OperationsService will return the operations domain service
+func (c *Client) OperationsService() *operations.Service {
+	return c.options.operations
 }
