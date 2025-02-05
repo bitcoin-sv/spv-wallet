@@ -51,7 +51,6 @@ func mergePaths(target, source *openapi3.T) {
 
 	for _, security := range source.Security {
 		target.Security.With(security)
-		//target.Security = append(target.Security, security)
 	}
 
 	if source.Components == nil {
@@ -84,8 +83,6 @@ func saveMergedSpec(doc *openapi3.T, outputPath string) {
 		Components: doc.Components,
 		Security:   doc.Security,
 	}
-
-	fmt.Println(doc.Components.SecuritySchemes)
 
 	data, err := yaml.Marshal(spec)
 	if err != nil {
