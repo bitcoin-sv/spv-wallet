@@ -5,8 +5,6 @@ import (
 	"github.com/bitcoin-sv/spv-wallet/server/handlers"
 )
 
-type AdminServer struct{}
-
 // Register collects all the action's routes and registers them using the handlersManager
 func Register(handlersManager *handlers.Manager) {
 	users.RegisterRoutes(handlersManager)
