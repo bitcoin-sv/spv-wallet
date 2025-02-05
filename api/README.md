@@ -71,14 +71,14 @@ This will generate:
 Server implementation is handled in [/actions/v2/server.go](../actions/v2/server.go) directory
 
 Expand the `Server` struct by:
-1. **Adding a new interface** (if needed), like `admin.AdminServer`
+1. **Adding a new interface** (if needed), like `admin.Server`
 2. **Implementing the new endpoint** within an existing interface
 
 ### Example:
 ```go
 type Server struct {
-    admin.AdminServer
-    users.UserServer // new server for user endpoints
+    admin.Server
+    users.Server // new server for user endpoints
 }
 ```
 

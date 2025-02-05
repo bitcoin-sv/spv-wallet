@@ -7,7 +7,7 @@ import (
 
 // Server is the implementation of the server oapi-codegen's interface
 type Server struct {
-	admin.AdminServer
+	admin.Server
 }
 
 // check if the Server implements the interface api.ServerInterface
