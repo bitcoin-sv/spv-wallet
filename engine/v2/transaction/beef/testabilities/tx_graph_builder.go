@@ -183,12 +183,12 @@ func (t *TxGraphBuilder) ToTxQueryResultSlice() beef.TxQueryResultSlice {
 
 // NewTxGraphBuilder initializes a new transaction graph builder with the provided testing context and scripts.
 func NewTxGraphBuilder(t *testing.T) *TxGraphBuilder {
-	scripts := NewTxScripts(t, testXPriv)
+	scripts := newTxScripts(t, testXPriv)
 	return &TxGraphBuilder{
 		t:                    t,
 		transactions:         make(GraphBuilderTxs),
-		p2pKHLockingScript:   scripts.P2PKHLockingScript(),
-		p2pKHUnlockingScript: scripts.P2PKHUnlockingScriptTemplate(),
+		p2pKHLockingScript:   scripts.p2pKHLockingScript(),
+		p2pKHUnlockingScript: scripts.p2pKHUnlockingScriptTemplate(),
 		blockHeight:          BlockHeight{defaultBlockHeight},
 		hexGen:               HexGen{defaultBlockHeight},
 		satoshis:             defaultSatoshis,

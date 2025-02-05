@@ -10,27 +10,17 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-// TxScripts is a utility structure that provides access to transaction-related scripts
+// txScripts is a utility structure that provides access to transaction-related scripts
 // and keys for creating and validating Bitcoin transactions.
-type TxScripts struct {
+type txScripts struct {
 	t          *testing.T             // Test context used for error handling.
 	privateKey *primitives.PrivateKey // Private key for signing transactions.
 	publicKey  *primitives.PublicKey  // Public key derived from the private key.
 }
 
-// PrivateKey returns the private key associated with the transaction scripts.
-func (tx *TxScripts) PrivateKey() *primitives.PrivateKey {
-	return tx.privateKey
-}
-
-// PublicKey returns the public key associated with the transaction scripts.
-func (tx *TxScripts) PublicKey() *primitives.PublicKey {
-	return tx.publicKey
-}
-
-// P2PKHUnlockingScriptTemplate generates a P2PKH unlocking script template using the private key.
+// p2pKHUnlockingScriptTemplate generates a P2PKH unlocking script template using the private key.
 // This template can be used to sign transactions.
-func (tx *TxScripts) P2PKHUnlockingScriptTemplate() *p2pkh.P2PKH {
+func (tx *txScripts) p2pKHUnlockingScriptTemplate() *p2pkh.P2PKH {
 	tx.t.Helper()
 
 	unlocking, err := p2pkh.Unlock(tx.privateKey, nil)
@@ -38,9 +28,9 @@ func (tx *TxScripts) P2PKHUnlockingScriptTemplate() *p2pkh.P2PKH {
 	return unlocking
 }
 
-// P2PKHLockingScript generates a P2PKH locking script using the associated public key.
+// p2pKHLockingScript generates a P2PKH locking script using the associated public key.
 // This script is used to lock outputs to the public key.
-func (tx *TxScripts) P2PKHLockingScript() *script.Script {
+func (tx *txScripts) p2pKHLockingScript() *script.Script {
 	tx.t.Helper()
 
 	addr, err := script.NewAddressFromPublicKey(tx.publicKey, true)
@@ -51,9 +41,9 @@ func (tx *TxScripts) P2PKHLockingScript() *script.Script {
 	return locking
 }
 
-// NewTxScripts initializes a new TxScripts instance using the provided extended private key (xPriv) and paymail.
+// newTxScripts initializes a new txScripts instance using the provided extended private key (xPriv) and paymail.
 // It derives the private and public keys from the xPriv and prepares the structure for generating scripts.
-func NewTxScripts(t *testing.T, xPriv string) *TxScripts {
+func newTxScripts(t *testing.T, xPriv string) *txScripts {
 	t.Helper()
 
 	// Generate the hierarchical deterministic (HD) key from the xPriv string.
@@ -65,7 +55,7 @@ func NewTxScripts(t *testing.T, xPriv string) *TxScripts {
 	require.NoError(t, err, "Failed to retrieve private key from HD key")
 
 	// Return a new TxScripts instance.
-	return &TxScripts{
+	return &txScripts{
 		t:          t,
 		privateKey: privateKey,
 		publicKey:  privateKey.PubKey(),

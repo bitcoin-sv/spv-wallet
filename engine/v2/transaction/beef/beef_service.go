@@ -2,9 +2,9 @@ package beef
 
 import (
 	"context"
-	"fmt"
 
 	sdk "github.com/bitcoin-sv/go-sdk/transaction"
+	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	txerrors "github.com/bitcoin-sv/spv-wallet/engine/v2/transaction/errors"
 )
 
@@ -41,7 +41,7 @@ func (s *Service) extractSourceTXIDs(tx *sdk.Transaction) ([]string, error) {
 		return nil, txerrors.ErrZeroInputCount
 	}
 
-	sourceTXIDs := make([]string, 0)
+	sourceTXIDs := make([]string, len(tx.Inputs))
 	for _, in := range tx.Inputs {
 		sourceTXIDs = append(sourceTXIDs, in.SourceTXID.String())
 	}
@@ -57,35 +57,29 @@ func (s *Service) PrepareBEEF(ctx context.Context, tx *sdk.Transaction) (string,
 	}
 
 	txID := tx.TxID().String()
-
-	// Extract source transaction IDs from the provided transaction.
 	sourceTxIDs, err := s.extractSourceTXIDs(tx)
 	if err != nil {
-		return "", fmt.Errorf("failed to extract source transaction IDs for transaction %s: %w", txID, err)
+		return "", spverrors.Wrapf(err, "failed to extract source transaction IDs for transaction %s", txID)
 	}
 
-	// Query the repository for source transactions.
 	txQueryResult, err := s.repository.QueryInputSources(ctx, sourceTxIDs...)
 	if err != nil {
-		return "", fmt.Errorf("database query failed while retrieving input data for transaction %s: %w", txID, err)
+		return "", spverrors.Wrapf(err, "database query failed while retrieving input data for transaction %s", txID)
 	}
 
-	// Initialize the source transaction resolver.
 	resolver, err := NewSourceTransactionResolver(tx, txQueryResult)
 	if err != nil {
-		return "", fmt.Errorf("failed to initialize source transaction resolver for transaction %s: %w", txID, err)
+		return "", spverrors.Wrapf(err, "failed to initialize source transaction resolver for transaction %s", txID)
 	}
 
-	// Resolve source transactions for each input.
 	err = resolver.Resolve()
 	if err != nil {
-		return "", fmt.Errorf("failed to resolve source transactions for transaction %s: %w", txID, err)
+		return "", spverrors.Wrapf(err, "failed to resolve source transactions for transaction %s", txID)
 	}
 
-	// Generate the BEEF hex encoding of the transaction.
 	hex, err := tx.BEEFHex()
 	if err != nil {
-		return "", fmt.Errorf("failed to generate BEEF hex encoding for transaction %s: %w", txID, err)
+		return "", spverrors.Wrapf(err, "failed to generate BEEF hex encoding for transaction %s", txID)
 	}
 
 	return hex, nil

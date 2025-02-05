@@ -1,10 +1,9 @@
 package beef
 
 import (
-	"fmt"
-
 	"github.com/bitcoin-sv/go-sdk/spv"
 	sdk "github.com/bitcoin-sv/go-sdk/transaction"
+	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	txerrors "github.com/bitcoin-sv/spv-wallet/engine/v2/transaction/errors"
 )
 
@@ -42,7 +41,7 @@ func (m SourceTxMap) Add(q *TxQueryResult) error {
 	if q.IsBeef() {
 		tx, err := sdk.NewTransactionFromBEEFHex(*q.BeefHex)
 		if err != nil {
-			return fmt.Errorf("failed to parse BEEF transaction: %w", err)
+			return spverrors.Wrapf(err, "failed to parse BEEF transaction")
 		}
 		m[q.SourceTXID] = SourceTx{Tx: tx, HadBeef: true}
 		return nil
@@ -51,7 +50,7 @@ func (m SourceTxMap) Add(q *TxQueryResult) error {
 	if q.IsRawTx() {
 		tx, err := sdk.NewTransactionFromHex(*q.RawHex)
 		if err != nil {
-			return fmt.Errorf("failed to parse raw transaction: %w", err)
+			return spverrors.Wrapf(err, "failed to parse raw transaction")
 		}
 		m[q.SourceTXID] = SourceTx{Tx: tx, HadBeef: false}
 		return nil
@@ -73,7 +72,7 @@ func (qq TxQueryResultSlice) SourceTxMap() (SourceTxMap, error) {
 	sourceTXs := make(SourceTxMap)
 	for _, q := range qq {
 		if err := sourceTXs.Add(q); err != nil {
-			return nil, fmt.Errorf("failed to add entry to source transaction map: %w", err)
+			return nil, spverrors.Wrapf(err, "failed to add entry to source transaction map")
 		}
 	}
 	return sourceTXs, nil
@@ -89,7 +88,7 @@ type SourceTransactionResolver struct {
 // Resolve sets the source transaction per input of subject transaction and verifies SPV scripts.
 func (s *SourceTransactionResolver) Resolve() error {
 	if err := s.resolveRecursive(s.subjectTx.Inputs); err != nil {
-		return fmt.Errorf("failed to resolve source transactions: %w", err)
+		return spverrors.Wrapf(err, "failed to resolve source transactions")
 	}
 
 	for i, input := range s.subjectTx.Inputs {
@@ -97,7 +96,7 @@ func (s *SourceTransactionResolver) Resolve() error {
 			return txerrors.ErrInvalidTransactionInput
 		}
 		if _, err := spv.VerifyScripts(input.SourceTransaction); err != nil {
-			return fmt.Errorf("SPV script verification failed for input %d: %w", i, err)
+			return spverrors.Wrapf(err, "SPV script verification failed for input %d", i)
 		}
 	}
 
@@ -123,7 +122,7 @@ func (s *SourceTransactionResolver) resolveRecursive(inputs []*sdk.TransactionIn
 		}
 
 		if err := s.resolveRecursive(input.SourceTransaction.Inputs); err != nil {
-			return fmt.Errorf("Transaction %s failed to resolve source transaction for input %d: %w", sourceTxID, idx, err)
+			return spverrors.Wrapf(err, "Transaction %s failed to resolve source transaction for input %d", sourceTxID, idx)
 		}
 	}
 
@@ -138,7 +137,7 @@ func NewSourceTransactionResolver(tx *sdk.Transaction, slice TxQueryResultSlice)
 	}
 	txs, err := slice.SourceTxMap()
 	if err != nil {
-		return nil, fmt.Errorf("failed to convert tx query result slice into map: %w", err)
+		return nil, spverrors.Wrapf(err, "failed to convert tx query result slice into map")
 	}
 
 	return &SourceTransactionResolver{subjectTx: tx, sourceTxs: txs}, nil
