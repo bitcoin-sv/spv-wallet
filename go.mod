@@ -10,11 +10,11 @@ go 1.23.1
 replace github.com/bitcoin-sv/spv-wallet/models => ./models
 
 require (
-	github.com/99designs/gqlgen v0.17.63
+	github.com/99designs/gqlgen v0.17.64
 	github.com/bitcoin-sv/go-paymail v0.21.3
-	github.com/bitcoin-sv/go-sdk v1.1.17
+	github.com/bitcoin-sv/go-sdk v1.1.18
 	github.com/bitcoin-sv/spv-wallet/models v0.28.0
-	github.com/bitcoinschema/go-map v0.2.0
+	github.com/bitcoinschema/go-map v0.2.1
 	github.com/coocood/freecache v1.2.4
 	github.com/fergusstrange/embedded-postgres v1.30.0
 	github.com/getkin/kin-openapi v0.129.0
@@ -28,7 +28,7 @@ require (
 	github.com/google/uuid v1.6.0
 	github.com/iancoleman/strcase v0.3.0
 	github.com/jarcoal/httpmock v1.3.1
-	github.com/mrz1836/go-cache v0.11.1
+	github.com/mrz1836/go-cache v0.11.2
 	github.com/mrz1836/go-cachestore v0.5.1
 	github.com/mrz1836/go-logger v0.3.5
 	github.com/mrz1836/go-sanitize v1.3.3
@@ -65,7 +65,7 @@ require (
 	github.com/lib/pq v1.10.9 // indirect
 	github.com/mohae/deepcopy v0.0.0-20170929034955-c48cc78d4826 // indirect
 	github.com/munnerz/goautoneg v0.0.0-20191010083416-a7dc8b61c822 // indirect
-	github.com/newrelic/go-agent/v3 v3.34.0 // indirect
+	github.com/newrelic/go-agent/v3 v3.36.0 // indirect
 	github.com/oasdiff/yaml v0.0.0-20241210131133-6b86fb107d80 // indirect
 	github.com/oasdiff/yaml3 v0.0.0-20241210130736-a94c01f36349 // indirect
 	github.com/perimeterx/marshmallow v1.1.5 // indirect
@@ -80,7 +80,7 @@ require (
 	github.com/KyleBanks/depth v1.2.1 // indirect
 	github.com/asaskevich/govalidator v0.0.0-20230301143203-a9d515a09cc2 // indirect
 	github.com/beorn7/perks v1.0.1 // indirect
-	github.com/bitcoinschema/go-bpu v0.2.0 // indirect
+	github.com/bitcoinschema/go-bpu v0.2.1 // indirect
 	github.com/bsm/redislock v0.9.4 // indirect
 	github.com/bytedance/sonic v1.12.6 // indirect
 	github.com/capnm/sysinfo v0.0.0-20130621111458-5909a53897f3 // indirect
@@ -98,9 +98,8 @@ require (
 	github.com/go-playground/locales v0.14.1 // indirect
 	github.com/go-playground/universal-translator v0.18.1 // indirect
 	github.com/go-playground/validator/v10 v10.23.0 // indirect
-	github.com/go-resty/resty/v2 v2.16.3
+	github.com/go-resty/resty/v2 v2.16.5
 	github.com/goccy/go-json v0.10.4 // indirect
-	github.com/golang/protobuf v1.5.4 // indirect
 	github.com/hashicorp/golang-lru v1.0.2 // indirect
 	github.com/hashicorp/hcl v1.0.0 // indirect
 	github.com/jackc/pgpassfile v1.0.0 // indirect
@@ -116,7 +115,7 @@ require (
 	github.com/leodido/go-urn v1.4.0 // indirect
 	github.com/magiconair/properties v1.8.7 // indirect
 	github.com/mailru/easyjson v0.7.7 // indirect
-	github.com/mattn/go-colorable v0.1.13 // indirect
+	github.com/mattn/go-colorable v0.1.14 // indirect
 	github.com/mattn/go-isatty v0.0.20 // indirect
 	github.com/mattn/go-sqlite3 v1.14.24
 	github.com/miekg/dns v1.1.62 // indirect
@@ -134,13 +133,13 @@ require (
 	github.com/sourcegraph/conc v0.3.0 // indirect
 	github.com/spf13/afero v1.11.0 // indirect
 	github.com/spf13/cast v1.6.0 // indirect
-	github.com/spf13/pflag v1.0.5
+	github.com/spf13/pflag v1.0.6
 	github.com/subosito/gotenv v1.6.0 // indirect
 	github.com/swaggo/files v1.0.1
 	github.com/swaggo/gin-swagger v1.6.0
 	github.com/twitchyliquid64/golang-asm v0.15.1 // indirect
 	github.com/ugorji/go/codec v1.2.12 // indirect
-	github.com/vektah/gqlparser/v2 v2.5.21 // indirect
+	github.com/vektah/gqlparser/v2 v2.5.22 // indirect
 	github.com/vmihailenco/msgpack/v5 v5.4.1 // indirect
 	github.com/vmihailenco/tagparser/v2 v2.0.0 // indirect
 	go.uber.org/multierr v1.11.0 // indirect
@@ -148,14 +147,14 @@ require (
 	golang.org/x/crypto v0.32.0
 	golang.org/x/exp v0.0.0-20240719175910-8a7402abbf56 // indirect
 	golang.org/x/mod v0.20.0 // indirect
-	golang.org/x/net v0.33.0 // indirect
+	golang.org/x/net v0.34.0 // indirect
 	golang.org/x/sync v0.10.0 // indirect
 	golang.org/x/sys v0.29.0 // indirect
 	golang.org/x/text v0.21.0 // indirect
 	golang.org/x/tools v0.24.0 // indirect
-	google.golang.org/genproto/googleapis/rpc v0.0.0-20241007155032-5fefd90f89a9 // indirect
-	google.golang.org/grpc v1.67.1 // indirect
-	google.golang.org/protobuf v1.36.1 // indirect
+	google.golang.org/genproto/googleapis/rpc v0.0.0-20250124145028-65684f501c47 // indirect
+	google.golang.org/grpc v1.70.0 // indirect
+	google.golang.org/protobuf v1.36.4 // indirect
 	gopkg.in/ini.v1 v1.67.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1
 )
