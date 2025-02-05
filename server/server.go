@@ -10,6 +10,7 @@ import (
 	"github.com/bitcoin-sv/spv-wallet/actions"
 	"github.com/bitcoin-sv/spv-wallet/actions/paymailserver"
 	v2 "github.com/bitcoin-sv/spv-wallet/actions/v2"
+	"github.com/bitcoin-sv/spv-wallet/api"
 	"github.com/bitcoin-sv/spv-wallet/config"
 	"github.com/bitcoin-sv/spv-wallet/engine"
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
@@ -101,12 +102,12 @@ func (s *Server) Handlers() *gin.Engine {
 
 	s.Router = ginEngine
 
-	setupServerRoutes(s.AppConfig, s.SpvWalletEngine, s.Router)
+	setupServerRoutes(s.AppConfig, s.SpvWalletEngine, s.Router, &httpLogger)
 
 	return s.Router
 }
 
-func setupServerRoutes(appConfig *config.AppConfig, spvWalletEngine engine.ClientInterface, ginEngine *gin.Engine) {
+func setupServerRoutes(appConfig *config.AppConfig, spvWalletEngine engine.ClientInterface, ginEngine *gin.Engine, log *zerolog.Logger) {
 	handlersManager := handlers.NewManager(ginEngine, appConfig)
 	actions.Register(handlersManager)
 	paymailserver.Register(spvWalletEngine.GetPaymailConfig().Configuration, ginEngine)
@@ -118,4 +119,14 @@ func setupServerRoutes(appConfig *config.AppConfig, spvWalletEngine engine.Clien
 	if appConfig.DebugProfiling {
 		pprof.Register(ginEngine, "debug/pprof")
 	}
+
+	api.RegisterHandlersWithOptions(ginEngine, v2.NewServer(), api.GinServerOptions{
+		BaseURL: "",
+		Middlewares: []api.MiddlewareFunc{
+			middleware.SignatureAuthWithScopes(),
+		},
+		ErrorHandler: func(c *gin.Context, err error, statusCode int) {
+			spverrors.ErrorResponse(c, err, log)
+		},
+	})
 }

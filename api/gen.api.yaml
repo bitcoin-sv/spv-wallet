@@ -1,0 +1,32 @@
+openapi: 3.0.0
+info:
+    license:
+        name: Open BSV Licence
+        url: xyz
+    title: SPV Wallet API
+    version: development
+paths:
+    /api/v2/admin/status:
+        get:
+            description: This endpoint returns admin status. It is used to check if authorization header contain admin xpub.
+            responses:
+                "200":
+                    description: Success
+                "401":
+                    $ref: '#/components/responses/api_components_errors_NotAuthorized'
+            security:
+                - XPubAuth:
+                    - admin
+            summary: Get admin status
+            tags:
+                - Admin endpoints
+components:
+    responses:
+        api_components_errors_NotAuthorized:
+            description: Security requirements failed
+    securitySchemes:
+        XPubAuth:
+            description: Authentication using x-auth-xpub header
+            in: header
+            name: x-auth-xpub
+            type: apiKey
