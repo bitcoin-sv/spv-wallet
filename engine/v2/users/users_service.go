@@ -7,6 +7,7 @@ import (
 	"github.com/bitcoin-sv/spv-wallet/config"
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/bitcoin-sv/spv-wallet/engine/v2/users/usersmodels"
+	"github.com/bitcoin-sv/spv-wallet/models/bsv"
 )
 
 // Service is a user domain service
@@ -77,4 +78,13 @@ func (s *Service) GetPubKey(ctx context.Context, userID string) (*primitives.Pub
 		return nil, spverrors.Wrapf(err, "Cannot get user's public key")
 	}
 	return pubKey, nil
+}
+
+// GetBalance returns current balance for the user
+func (s *Service) GetBalance(ctx context.Context, userID string) (bsv.Satoshis, error) {
+	balance, err := s.usersRepo.GetBalance(ctx, userID, "bsv")
+	if err != nil {
+		return 0, spverrors.Wrapf(err, "Cannot get user's balance")
+	}
+	return balance, nil
 }

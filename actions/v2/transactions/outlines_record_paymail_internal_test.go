@@ -2,6 +2,8 @@ package transactions_test
 
 import (
 	"fmt"
+	"testing"
+
 	"github.com/bitcoin-sv/go-sdk/script"
 	"github.com/bitcoin-sv/spv-wallet/actions/testabilities"
 	chainmodels "github.com/bitcoin-sv/spv-wallet/engine/chain/models"
@@ -9,7 +11,6 @@ import (
 	"github.com/bitcoin-sv/spv-wallet/engine/tester/fixtures"
 	"github.com/bitcoin-sv/spv-wallet/models/bsv"
 	"github.com/stretchr/testify/require"
-	"testing"
 )
 
 func TestInternalOutgoingTransaction(t *testing.T) {
@@ -121,37 +122,10 @@ func TestInternalOutgoingTransaction(t *testing.T) {
 			}`, map[string]any{
 				"txID": txSpec.ID(),
 			})
-	})
-
-	t.Run("check sender balance", func(t *testing.T) {
-		// given:
-		given, then := testabilities.NewOf(givenForAllTests, t)
 
 		// and:
-		client := given.HttpClient().ForGivenUser(sender)
-
-		// when:
-		res, _ := client.R().Get("/api/v2/users/current")
-
-		// then:
-		then.Response(res).IsOK().WithJSONf(`{
-			"currentBalance": %d
-		}`, 0)
-	})
-
-	t.Run("check recipient balance", func(t *testing.T) {
-		// given:
-		given, then := testabilities.NewOf(givenForAllTests, t)
-
-		// and:
-		client := given.HttpClient().ForGivenUser(recipient)
-
-		// when:
-		res, _ := client.R().Get("/api/v2/users/current")
-
-		// then:
-		then.Response(res).IsOK().WithJSONf(`{
-			"currentBalance": %d
-		}`, satoshis)
+		thenEng := then.Engine(given.Engine())
+		thenEng.User(sender).Balance().IsZero()
+		thenEng.User(recipient).Balance().IsEqualTo(satoshis)
 	})
 }

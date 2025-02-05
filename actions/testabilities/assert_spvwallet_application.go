@@ -8,6 +8,7 @@ import (
 	"testing"
 
 	"github.com/bitcoin-sv/spv-wallet/actions/testabilities/apierror"
+	testengine "github.com/bitcoin-sv/spv-wallet/engine/testabilities"
 	"github.com/bitcoin-sv/spv-wallet/engine/tester/jsonrequire"
 	"github.com/go-resty/resty/v2"
 	"github.com/stretchr/testify/assert"
@@ -16,6 +17,7 @@ import (
 
 type SPVWalletApplicationAssertions interface {
 	Response(response *resty.Response) SPVWalletResponseAssertions
+	Engine(engine *testengine.EngineWithConfig) testengine.EngineAssertions
 }
 
 type SPVWalletResponseAssertions interface {
@@ -38,11 +40,24 @@ type JsonValueGetter interface {
 }
 
 func Then(t testing.TB) SPVWalletApplicationAssertions {
+	return &appAssertions{t: t}
+}
+
+type appAssertions struct {
+	t testing.TB
+}
+
+func (a *appAssertions) Response(response *resty.Response) SPVWalletResponseAssertions {
 	return &responseAssertions{
-		t:       t,
-		require: require.New(t),
-		assert:  assert.New(t),
+		t:        a.t,
+		require:  require.New(a.t),
+		assert:   assert.New(a.t),
+		response: response,
 	}
+}
+
+func (a *appAssertions) Engine(engine *testengine.EngineWithConfig) testengine.EngineAssertions {
+	return testengine.Then(a.t, engine)
 }
 
 type responseAssertions struct {
