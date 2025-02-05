@@ -19,6 +19,7 @@ import (
 	"github.com/bitcoin-sv/spv-wallet/engine/v2/paymails"
 	paymailprovider "github.com/bitcoin-sv/spv-wallet/engine/v2/paymailserver"
 	"github.com/bitcoin-sv/spv-wallet/engine/v2/transaction/outlines"
+	"github.com/bitcoin-sv/spv-wallet/engine/v2/transaction/outlines/utxo"
 	"github.com/bitcoin-sv/spv-wallet/engine/v2/transaction/record"
 	"github.com/bitcoin-sv/spv-wallet/engine/v2/users"
 	"github.com/mrz1836/go-cachestore"
@@ -170,7 +171,8 @@ func (c *Client) loadPaymailComponents() (err error) {
 func (c *Client) loadTransactionOutlinesService() error {
 	if c.options.transactionOutlinesService == nil {
 		logger := c.Logger().With().Str("subservice", "transactionOutlines").Logger()
-		c.options.transactionOutlinesService = outlines.NewService(c.PaymailService(), c.options.paymails, logger)
+		utxoSelector := utxo.NewSelector(c.Datastore().DB(), c.FeeUnit())
+		c.options.transactionOutlinesService = outlines.NewService(c.PaymailService(), c.options.paymails, utxoSelector, logger)
 	}
 	return nil
 }

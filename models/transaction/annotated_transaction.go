@@ -1,6 +1,7 @@
 package transaction
 
 import (
+	"github.com/bitcoin-sv/spv-wallet/models/bsv"
 	"github.com/bitcoin-sv/spv-wallet/models/optional"
 	"github.com/bitcoin-sv/spv-wallet/models/transaction/bucket"
 )
@@ -18,6 +19,7 @@ type AnnotatedTransaction struct {
 // Annotations represents a transaction metadata that will be used by server to properly handle given transaction.
 type Annotations struct {
 	Outputs map[int]*OutputAnnotation `json:"outputs"`
+	Inputs  map[int]*InputAnnotation  `json:"inputs"`
 }
 
 // OutputAnnotation represents the metadata for the output.
@@ -26,6 +28,12 @@ type OutputAnnotation struct {
 	Bucket bucket.Name `json:"bucket"`
 	// Paymail is available if the output is the paymail output.
 	Paymail optional.Param[PaymailAnnotation] `json:"paymail,omitempty"`
+}
+
+// InputAnnotation represents the metadata for the input.
+type InputAnnotation struct {
+	// CustomInstructions has instructions about how to unlock this input.
+	CustomInstructions bsv.CustomInstructions `json:"customInstructions"`
 }
 
 // PaymailAnnotation is the metadata for the paymail output.
