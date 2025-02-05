@@ -4,6 +4,8 @@ import (
 	"testing"
 
 	"github.com/bitcoin-sv/spv-wallet/engine/v2/database"
+	"github.com/bitcoin-sv/spv-wallet/engine/v2/transaction/outlines"
+	"github.com/bitcoin-sv/spv-wallet/models/bsv"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -13,7 +15,7 @@ type InputsSelectorAssertions interface {
 }
 
 type SuccessfullySelectedInputsAssertions interface {
-	SelectedInputs(inputs []*database.UserUTXO) SelectedInputsAssertions
+	SelectedInputs(inputs []*outlines.UTXO) SelectedInputsAssertions
 }
 
 type SelectedInputsAssertions interface {
@@ -29,7 +31,7 @@ type assertion struct {
 	t               testing.TB
 	require         *require.Assertions
 	assert          *assert.Assertions
-	actual          []*database.UserUTXO
+	actual          []*outlines.UTXO
 	comparingSource []*database.UserUTXO
 }
 
@@ -47,7 +49,7 @@ func (a assertion) WithoutError(err error) SuccessfullySelectedInputsAssertions 
 	return a
 }
 
-func (a assertion) SelectedInputs(inputs []*database.UserUTXO) SelectedInputsAssertions {
+func (a assertion) SelectedInputs(inputs []*outlines.UTXO) SelectedInputsAssertions {
 	a.t.Helper()
 	a.actual = inputs
 	return a
@@ -71,8 +73,8 @@ func (a assertion) AreEntries(expectedIndexes []int) {
 	for i, ownedIdx := range expectedIndexes {
 		selectedUTXO := a.actual[i]
 		expectedUTXO := a.comparingSource[ownedIdx]
-		a.assert.Equal(expectedUTXO.UserID, selectedUTXO.UserID)
-		a.assert.Equal(expectedUTXO.TxID, selectedUTXO.TxID)
-		a.assert.EqualValues(expectedUTXO.Vout, selectedUTXO.Vout)
+		a.assert.Equalf(expectedUTXO.TxID, selectedUTXO.TxID, "Selected different TxID at index %d", i)
+		a.assert.EqualValuesf(expectedUTXO.Vout, selectedUTXO.Vout, "Selected different vout at index %d", i)
+		a.assert.Equalf(bsv.CustomInstructions(expectedUTXO.CustomInstructions), selectedUTXO.CustomInstructions, "Selected different custom instructions at index %d", i)
 	}
 }

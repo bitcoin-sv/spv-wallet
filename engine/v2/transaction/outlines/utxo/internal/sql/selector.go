@@ -4,20 +4,18 @@ import (
 	"context"
 	"time"
 
+	sdk "github.com/bitcoin-sv/go-sdk/transaction"
+	"github.com/bitcoin-sv/spv-wallet/conv"
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/bitcoin-sv/spv-wallet/engine/v2/database"
 	"github.com/bitcoin-sv/spv-wallet/engine/v2/transaction/errors"
+	"github.com/bitcoin-sv/spv-wallet/engine/v2/transaction/outlines"
 	"github.com/bitcoin-sv/spv-wallet/models/bsv"
 	"gorm.io/gorm"
 )
 
 const txIdColumn = "tx_id"
 const voutColumn = "vout"
-
-// UTXOSelector is a service that selects inputs for transaction.
-type UTXOSelector interface {
-	SelectInputsForTransaction(ctx context.Context, userID string, satoshis bsv.Satoshis, byteSizeOfTxBeforeAddingSelectedInputs uint64) ([]*database.UserUTXO, error)
-}
 
 const (
 	// estimatedChangeOutputSize is the estimated size of a change output
@@ -26,20 +24,46 @@ const (
 	estimatedChangeOutputSize = 34
 )
 
-type sqlInputsSelector struct {
+// UTXOSelector is responsible for selecting UTXOs for a transaction in SQL databases.
+type UTXOSelector struct {
 	feeUnit bsv.FeeUnit
 	db      *gorm.DB
 }
 
 // NewUTXOSelector creates a new instance of UTXOSelector.
-func NewUTXOSelector(db *gorm.DB, feeUnit bsv.FeeUnit) UTXOSelector {
-	return &sqlInputsSelector{
+func NewUTXOSelector(db *gorm.DB, feeUnit bsv.FeeUnit) *UTXOSelector {
+	return &UTXOSelector{
 		db:      db,
 		feeUnit: feeUnit,
 	}
 }
 
-func (r *sqlInputsSelector) SelectInputsForTransaction(ctx context.Context, userID string, outputsTotalValue bsv.Satoshis, byteSizeOfTxWithoutInputs uint64) (utxos []*database.UserUTXO, err error) {
+// Select selects UTXOs of user to fund a transaction.
+func (r *UTXOSelector) Select(ctx context.Context, tx *sdk.Transaction, userID string) ([]*outlines.UTXO, error) {
+	outputsTotalValue := tx.TotalOutputSatoshis()
+	byteSizeOfTxToFund, err := conv.IntToUint64(tx.Size())
+	if err != nil {
+		return nil, spverrors.ErrInternal.Wrap(err)
+	}
+
+	utxos, err := r.selectInputsForTransaction(ctx, userID, bsv.Satoshis(outputsTotalValue), byteSizeOfTxToFund)
+	if err != nil {
+		return nil, err
+	}
+
+	result := make([]*outlines.UTXO, 0, len(utxos))
+	for _, utxo := range utxos {
+		result = append(result, &outlines.UTXO{
+			TxID:               utxo.TxID,
+			Vout:               utxo.Vout,
+			CustomInstructions: bsv.CustomInstructions(utxo.CustomInstructions),
+		})
+	}
+
+	return result, nil
+}
+
+func (r *UTXOSelector) selectInputsForTransaction(ctx context.Context, userID string, outputsTotalValue bsv.Satoshis, byteSizeOfTxWithoutInputs uint64) (utxos []*database.UserUTXO, err error) {
 	err = r.db.WithContext(ctx).Transaction(func(db *gorm.DB) error {
 		inputsQuery := r.buildQueryForInputs(db, userID, outputsTotalValue, byteSizeOfTxWithoutInputs)
 
@@ -68,7 +92,7 @@ func (r *sqlInputsSelector) SelectInputsForTransaction(ctx context.Context, user
 	return utxos, nil
 }
 
-func (r *sqlInputsSelector) buildQueryForInputs(db *gorm.DB, userID string, outputsTotalValue bsv.Satoshis, txWithoutInputsSize uint64) *gorm.DB {
+func (r *UTXOSelector) buildQueryForInputs(db *gorm.DB, userID string, outputsTotalValue bsv.Satoshis, txWithoutInputsSize uint64) *gorm.DB {
 	composer := &inputsQueryComposer{
 		userID:              userID,
 		outputsTotalValue:   outputsTotalValue,
@@ -78,7 +102,7 @@ func (r *sqlInputsSelector) buildQueryForInputs(db *gorm.DB, userID string, outp
 	return composer.build(db)
 }
 
-func (r *sqlInputsSelector) buildUpdateTouchedAtQuery(db *gorm.DB, utxos []*database.UserUTXO) *gorm.DB {
+func (r *UTXOSelector) buildUpdateTouchedAtQuery(db *gorm.DB, utxos []*database.UserUTXO) *gorm.DB {
 	outpoints := make([][]any, 0, len(utxos))
 	for _, utxo := range utxos {
 		outpoints = append(outpoints, []any{utxo.TxID, utxo.Vout})

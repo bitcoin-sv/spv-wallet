@@ -2,20 +2,22 @@ package transactions_test
 
 import (
 	"fmt"
+	"net/http"
 	"testing"
 
-	"github.com/bitcoin-sv/spv-wallet/actions/testabilities"
 	"github.com/bitcoin-sv/spv-wallet/actions/testabilities/apierror"
+	"github.com/bitcoin-sv/spv-wallet/actions/v2/transactions/internal/testabilities"
 	testengine "github.com/bitcoin-sv/spv-wallet/engine/testabilities"
 	"github.com/bitcoin-sv/spv-wallet/engine/tester/fixtures"
 )
 
 const transactionsOutlinesURL = "/api/v2/transactions/outlines"
 
-func TestPOSTTransactionOutlines(t *testing.T) {
+func TestPOSTTransactionOutlinesBEEF(t *testing.T) {
 	successTestCases := map[string]struct {
-		request  string
-		response string
+		request          string
+		responseTemplate string
+		responseParams   map[string]any
 	}{
 		"create transaction outline for op_return strings as default data": {
 			request: `{
@@ -26,14 +28,19 @@ func TestPOSTTransactionOutlines(t *testing.T) {
 				}
 			  ]
 			}`,
-			response: `{
-			  "hex": "0100beef000100000000000100000000000000000e006a04736f6d65012004646174610000000000",
+			responseTemplate: `{
+			  "hex": "{{ matchBEEF }}",
 			  "format": "BEEF",
 			  "annotations": {
 				"outputs": {
 					"0": {
 						  "bucket": "data"
 					}
+				},
+				"inputs": {
+				  "0": {
+				    "customInstructions": {{ .CustomInstructions }}
+				  }
 				}
 			  }
 			}`,
@@ -48,14 +55,19 @@ func TestPOSTTransactionOutlines(t *testing.T) {
 				}
 			  ]
 			}`,
-			response: `{
-			  "hex": "0100beef000100000000000100000000000000000e006a04736f6d65012004646174610000000000",
+			responseTemplate: `{
+			  "hex": "{{ matchBEEF }}",
 			  "format": "BEEF",
 			  "annotations": {
 				"outputs": {
 					"0": {
 						  "bucket": "data"
 					}
+				},
+				"inputs": {
+				  "0": {
+				    "customInstructions": {{ .CustomInstructions }}
+				  }
 				}
 			  }
 			}`,
@@ -70,14 +82,19 @@ func TestPOSTTransactionOutlines(t *testing.T) {
 				}
 			  ]
 			}`,
-			response: `{
-			  "hex": "0100beef000100000000000100000000000000000e006a04736f6d65012004646174610000000000",
+			responseTemplate: `{
+			  "hex": "{{ matchBEEF }}",
 			  "format": "BEEF",
 			  "annotations": {
 				"outputs": {
 					"0": {
 						  "bucket": "data"
 					}
+				},
+				"inputs": {
+				  "0": {
+				    "customInstructions": {{ .CustomInstructions }}
+				  }
 				}
 			  }
 			}`,
@@ -92,25 +109,27 @@ func TestPOSTTransactionOutlines(t *testing.T) {
 				}
 			  ]
 			}`, fixtures.RecipientExternal.DefaultPaymail()),
-			response: fmt.Sprintf(`{
-			  "hex": "0100beef0001000000000001e8030000000000001976a9143e2d1d795f8acaa7957045cc59376177eb04a3c588ac0000000000",
+			responseTemplate: `{
+			  "hex": "{{ matchBEEF }}",
 			  "format": "BEEF",
 			  "annotations": {
 				"outputs": {
 				  "0": {
 					"bucket": "bsv",
 					"paymail": {
-					  "receiver": "%s",
+					  "receiver": "{{ .ReceiverPaymail }}",
 					  "reference": "z0bac4ec-6f15-42de-9ef4-e60bfdabf4f7",
-					  "sender": "%s"
+					  "sender": "{{ .SenderPaymail }}"
 					}
+				  }
+				},
+				"inputs": {
+				  "0": {
+				    "customInstructions": {{ .CustomInstructions }}
 				  }
 				}
 			  }
 			}`,
-				fixtures.RecipientExternal.DefaultPaymail(),
-				fixtures.Sender.DefaultPaymail(),
-			),
 		},
 		"create transaction outline for paymail with sender": {
 			request: fmt.Sprintf(`{
@@ -125,25 +144,27 @@ func TestPOSTTransactionOutlines(t *testing.T) {
 			}`, fixtures.RecipientExternal.DefaultPaymail(),
 				fixtures.Sender.DefaultPaymail(),
 			),
-			response: fmt.Sprintf(`{
-			  "hex": "0100beef0001000000000001e8030000000000001976a9143e2d1d795f8acaa7957045cc59376177eb04a3c588ac0000000000",
+			responseTemplate: `{
+			  "hex": "{{ matchBEEF }}",
 			  "format": "BEEF",
 			  "annotations": {
 				"outputs": {
 				  "0": {
 					"bucket": "bsv",
 					"paymail": {
-					  "receiver": "%s",
+					  "receiver": "{{ .ReceiverPaymail }}",
 					  "reference": "z0bac4ec-6f15-42de-9ef4-e60bfdabf4f7",
-					  "sender": "%s"
+					  "sender": "{{ .SenderPaymail }}"
 					}
+				  }
+				},
+				"inputs": {
+				  "0": {
+				    "customInstructions": {{ .CustomInstructions }}
 				  }
 				}
 			  }
 			}`,
-				fixtures.RecipientExternal.DefaultPaymail(),
-				fixtures.Sender.DefaultPaymail(),
-			),
 		},
 		"create transaction outline for paymail and data": {
 			request: fmt.Sprintf(`{
@@ -162,28 +183,30 @@ func TestPOSTTransactionOutlines(t *testing.T) {
 			}`, fixtures.RecipientExternal.DefaultPaymail(),
 				fixtures.Sender.DefaultPaymail(),
 			),
-			response: fmt.Sprintf(`{
-			  "hex": "0100beef0001000000000002e8030000000000001976a9143e2d1d795f8acaa7957045cc59376177eb04a3c588ac00000000000000000e006a04736f6d65012004646174610000000000",
+			responseTemplate: `{
+			  "hex": "{{ matchBEEF }}",
 			  "format": "BEEF",
 			  "annotations": {
 				"outputs": {
 				  "0": {
 					"bucket": "bsv",
 					"paymail": {
-					  "receiver": "%s",
+					  "receiver": "{{ .ReceiverPaymail }}",
 					  "reference": "z0bac4ec-6f15-42de-9ef4-e60bfdabf4f7",
-					  "sender": "%s"
+					  "sender": "{{ .SenderPaymail }}"
 					}
 				  },
 				  "1": {
 					"bucket": "data"
 				  }
+				},
+				"inputs": {
+				  "0": {
+				    "customInstructions": {{ .CustomInstructions }}
+				  }
 				}
 			  }
 			}`,
-				fixtures.RecipientExternal.DefaultPaymail(),
-				fixtures.Sender.DefaultPaymail(),
-			),
 		},
 	}
 	for name, test := range successTestCases {
@@ -192,6 +215,9 @@ func TestPOSTTransactionOutlines(t *testing.T) {
 			given, then := testabilities.New(t)
 			cleanup := given.StartedSPVWalletWithConfiguration(testengine.WithV2())
 			defer cleanup()
+
+			// and:
+			given.Faucet(fixtures.Sender).TopUp(1_000_000)
 
 			// and:
 			client := given.HttpClient().ForUser()
@@ -203,10 +229,272 @@ func TestPOSTTransactionOutlines(t *testing.T) {
 				Post(transactionsOutlinesURL)
 
 			// then:
-			then.Response(res).IsOK().WithJSONf(test.response)
+			thenResponse := then.Response(res)
+
+			thenResponse.IsOK().
+				WithJSONMatching(test.responseTemplate, given.OutlineResponseContext(test.responseParams))
+
+			thenResponse.ContainsValidBEEFHexInField("hex")
+		})
+
+		t.Run(name+" with explicit format query", func(t *testing.T) {
+			// given:
+			given, then := testabilities.New(t)
+			cleanup := given.StartedSPVWalletWithConfiguration(testengine.WithV2())
+			defer cleanup()
+
+			// and:
+			given.Faucet(fixtures.Sender).TopUp(1_000_000)
+
+			// and:
+			client := given.HttpClient().ForUser()
+
+			// when:
+			res, _ := client.R().
+				SetHeader("Content-Type", "application/json").
+				SetBody(test.request).
+				SetQueryParam("format", "beef").
+				Post(transactionsOutlinesURL)
+
+			// then:
+			thenResponse := then.Response(res)
+
+			thenResponse.IsOK().
+				WithJSONMatching(test.responseTemplate, given.OutlineResponseContext(test.responseParams))
+
+			thenResponse.ContainsValidBEEFHexInField("hex")
 		})
 	}
+}
 
+func TestPOSTTransactionOutlinesRAW(t *testing.T) {
+	successTestCases := map[string]struct {
+		request          string
+		responseTemplate string
+		responseParams   map[string]any
+	}{
+		"create transaction outline for op_return strings as default data": {
+			request: `{
+			  "outputs": [
+				{
+				  "type": "op_return",
+				  "data": [ "some", " ", "data" ]
+				}
+			  ]
+			}`,
+			responseTemplate: `{
+			  "hex": "{{ matchHex }}",
+			  "format": "RAW",
+			  "annotations": {
+				"outputs": {
+					"0": {
+						  "bucket": "data"
+					}
+				},
+				"inputs": {
+				  "0": {
+				    "customInstructions": {{ .CustomInstructions }}
+				  }
+				}
+			  }
+			}`,
+		},
+		"create transaction outline for op_return strings data": {
+			request: `{
+			  "outputs": [
+				{
+				  "type": "op_return",
+				  "dataType": "strings",
+				  "data": [ "some", " ", "data" ]
+				}
+			  ]
+			}`,
+			responseTemplate: `{
+			  "hex": "{{ matchHex }}",
+			  "format": "RAW",
+			  "annotations": {
+				"outputs": {
+					"0": {
+						  "bucket": "data"
+					}
+				},
+				"inputs": {
+				  "0": {
+				    "customInstructions": {{ .CustomInstructions }}
+				  }
+				}
+			  }
+			}`,
+		},
+		"create transaction outline for op_return hex data": {
+			request: `{
+			  "outputs": [
+				{
+				  "type": "op_return",
+				  "dataType": "hexes",
+				  "data": [ "736f6d65", "20", "64617461" ]
+				}
+			  ]
+			}`,
+			responseTemplate: `{
+			  "hex": "{{ matchHex }}",
+			  "format": "RAW",
+			  "annotations": {
+				"outputs": {
+					"0": {
+						  "bucket": "data"
+					}
+				},
+				"inputs": {
+				  "0": {
+				    "customInstructions": {{ .CustomInstructions }}
+				  }
+				}
+			  }
+			}`,
+		},
+		"create transaction outline for paymail without sender": {
+			request: fmt.Sprintf(`{
+			  "outputs": [
+				{
+				  "type": "paymail",
+				  "to": "%s",
+				  "satoshis": 1000
+				}
+			  ]
+			}`, fixtures.RecipientExternal.DefaultPaymail()),
+			responseTemplate: `{
+			  "hex": "{{ matchHex }}",
+			  "format": "RAW",
+			  "annotations": {
+				"outputs": {
+				  "0": {
+					"bucket": "bsv",
+					"paymail": {
+					  "receiver": "{{ .ReceiverPaymail }}",
+					  "reference": "z0bac4ec-6f15-42de-9ef4-e60bfdabf4f7",
+					  "sender": "{{ .SenderPaymail }}"
+					}
+				  }
+				},
+				"inputs": {
+				  "0": {
+				    "customInstructions": {{ .CustomInstructions }}
+				  }
+				}
+			  }
+			}`,
+		},
+		"create transaction outline for paymail with sender": {
+			request: fmt.Sprintf(`{
+			  "outputs": [
+				{
+				  "type": "paymail",
+				  "to": "%s",
+				  "satoshis": 1000,
+				  "from": "%s"
+				}
+			  ]
+			}`, fixtures.RecipientExternal.DefaultPaymail(),
+				fixtures.Sender.DefaultPaymail(),
+			),
+			responseTemplate: `{
+			  "hex": "{{ matchHex }}",
+			  "format": "RAW",
+			  "annotations": {
+				"outputs": {
+				  "0": {
+					"bucket": "bsv",
+					"paymail": {
+					  "receiver": "{{ .ReceiverPaymail }}",
+					  "reference": "z0bac4ec-6f15-42de-9ef4-e60bfdabf4f7",
+					  "sender": "{{ .SenderPaymail }}"
+					}
+				  }
+				},
+				"inputs": {
+				  "0": {
+				    "customInstructions": {{ .CustomInstructions }}
+				  }
+				}
+			  }
+			}`,
+		},
+		"create transaction outline for paymail and data": {
+			request: fmt.Sprintf(`{
+			  "outputs": [
+				{
+				  "type": "paymail",
+				  "to": "%s",
+				  "satoshis": 1000,
+				  "from": "%s"
+				},
+				{
+				  "type": "op_return",
+				  "data": [ "some", " ", "data" ]
+				}
+			  ]
+			}`, fixtures.RecipientExternal.DefaultPaymail(),
+				fixtures.Sender.DefaultPaymail(),
+			),
+			responseTemplate: `{
+			  "hex": "{{ matchHex }}",
+			  "format": "RAW",
+			  "annotations": {
+				"outputs": {
+				  "0": {
+					"bucket": "bsv",
+					"paymail": {
+					  "receiver": "{{ .ReceiverPaymail }}",
+					  "reference": "z0bac4ec-6f15-42de-9ef4-e60bfdabf4f7",
+					  "sender": "{{ .SenderPaymail }}"
+					}
+				  },
+				  "1": {
+					"bucket": "data"
+				  }
+				},
+				"inputs": {
+				  "0": {
+				    "customInstructions": {{ .CustomInstructions }}
+				  }
+				}
+			  }
+			}`,
+		},
+	}
+	for name, test := range successTestCases {
+		t.Run(name, func(t *testing.T) {
+			// given:
+			given, then := testabilities.New(t)
+			cleanup := given.StartedSPVWalletWithConfiguration(testengine.WithV2())
+			defer cleanup()
+
+			// and:
+			given.Faucet(fixtures.Sender).TopUp(1_000_000)
+
+			// and:
+			client := given.HttpClient().ForUser()
+
+			// when:
+			res, _ := client.R().
+				SetHeader("Content-Type", "application/json").
+				SetBody(test.request).
+				SetQueryParam("format", "raw").
+				Post(transactionsOutlinesURL)
+
+			// then:
+			thenResponse := then.Response(res)
+
+			thenResponse.IsOK().
+				WithJSONMatching(test.responseTemplate, given.OutlineResponseContext(test.responseParams))
+
+			thenResponse.ContainsValidRawTxHexInField("hex")
+		})
+	}
+}
+
+func TestPOSTTransactionOutlinesErrors(t *testing.T) {
 	t.Run("not allowed for anonymous", func(t *testing.T) {
 		// given:
 		given, then := testabilities.New(t)
@@ -285,18 +573,21 @@ func TestPOSTTransactionOutlines(t *testing.T) {
 	})
 
 	badRequestTestCases := map[string]struct {
-		json        string
-		expectedErr string
+		json           string
+		expectedStatus int
+		expectedErr    string
 	}{
 		"Bad Request: Empty request": {
-			json:        `{}`,
-			expectedErr: apierror.ExpectedJSON("tx-spec-output-required", "transaction outline requires at least one output"),
+			json:           `{}`,
+			expectedStatus: http.StatusBadRequest,
+			expectedErr:    apierror.ExpectedJSON("tx-spec-output-required", "transaction outline requires at least one output"),
 		},
 		"Bad Request: Empty outputs": {
 			json: `{
 			  "outputs": []
 			}`,
-			expectedErr: apierror.ExpectedJSON("tx-spec-output-required", "transaction outline requires at least one output"),
+			expectedStatus: http.StatusBadRequest,
+			expectedErr:    apierror.ExpectedJSON("tx-spec-output-required", "transaction outline requires at least one output"),
 		},
 		"Bad Request: Unsupported output type": {
 			json: `{
@@ -306,7 +597,8 @@ func TestPOSTTransactionOutlines(t *testing.T) {
 				}
 			  ]
 			}`,
-			expectedErr: apierror.CannotBindBodyJSON,
+			expectedStatus: http.StatusBadRequest,
+			expectedErr:    apierror.CannotBindBodyJSON,
 		},
 		"Bad Request: OP_RETURN output without data": {
 			json: `{
@@ -316,7 +608,8 @@ func TestPOSTTransactionOutlines(t *testing.T) {
 				}
 			  ]
 			}`,
-			expectedErr: apierror.CannotBindBodyJSON,
+			expectedStatus: http.StatusBadRequest,
+			expectedErr:    apierror.CannotBindBodyJSON,
 		},
 		"Bad Request: OP_RETURN output with empty data list": {
 			json: `{
@@ -327,7 +620,8 @@ func TestPOSTTransactionOutlines(t *testing.T) {
 				}
 			  ]
 			}`,
-			expectedErr: apierror.ExpectedJSON("tx-spec-op-return-data-required", "data is required for OP_RETURN output"),
+			expectedStatus: http.StatusBadRequest,
+			expectedErr:    apierror.ExpectedJSON("tx-spec-op-return-data-required", "data is required for OP_RETURN output"),
 		},
 		"Bad Request: OP_RETURN output with unknown data type": {
 			json: `{
@@ -339,7 +633,8 @@ func TestPOSTTransactionOutlines(t *testing.T) {
 				}
 			  ]
 			}`,
-			expectedErr: apierror.CannotBindBodyJSON,
+			expectedStatus: http.StatusBadRequest,
+			expectedErr:    apierror.CannotBindBodyJSON,
 		},
 		"Bad Request: OP_RETURN strings output empty data list": {
 			json: `{
@@ -351,7 +646,8 @@ func TestPOSTTransactionOutlines(t *testing.T) {
 				}
 			  ]
 			}`,
-			expectedErr: apierror.ExpectedJSON("tx-spec-op-return-data-required", "data is required for OP_RETURN output"),
+			expectedStatus: http.StatusBadRequest,
+			expectedErr:    apierror.ExpectedJSON("tx-spec-op-return-data-required", "data is required for OP_RETURN output"),
 		},
 		"Bad Request: OP_RETURN strings output with string instead of array as data": {
 			json: `{
@@ -363,7 +659,8 @@ func TestPOSTTransactionOutlines(t *testing.T) {
 				}
 			  ]
 			}`,
-			expectedErr: apierror.CannotBindBodyJSON,
+			expectedStatus: http.StatusBadRequest,
+			expectedErr:    apierror.CannotBindBodyJSON,
 		},
 		"Bad Request: OP_RETURN hexes output with empty data list": {
 			json: `{
@@ -375,7 +672,8 @@ func TestPOSTTransactionOutlines(t *testing.T) {
 				}
 			  ]
 			}`,
-			expectedErr: apierror.ExpectedJSON("tx-spec-op-return-data-required", "data is required for OP_RETURN output"),
+			expectedStatus: http.StatusBadRequest,
+			expectedErr:    apierror.ExpectedJSON("tx-spec-op-return-data-required", "data is required for OP_RETURN output"),
 		},
 		"Bad Request: OP_RETURN hexes output with invalid hex": {
 			json: `{
@@ -387,7 +685,8 @@ func TestPOSTTransactionOutlines(t *testing.T) {
 				}
 			  ]
 			}`,
-			expectedErr: apierror.ExpectedJSON("failed-to-decode-hex", "failed to decode hex"),
+			expectedStatus: http.StatusBadRequest,
+			expectedErr:    apierror.ExpectedJSON("failed-to-decode-hex", "failed to decode hex"),
 		},
 		"Bad Request: OP_RETURN hexes output with single hex instead of list": {
 			json: `{
@@ -399,7 +698,8 @@ func TestPOSTTransactionOutlines(t *testing.T) {
 				}
 			  ]
 			}`,
-			expectedErr: apierror.CannotBindBodyJSON,
+			expectedStatus: http.StatusBadRequest,
+			expectedErr:    apierror.CannotBindBodyJSON,
 		},
 		"Bad Request: Paymail output with negative satoshis": {
 			json: `{
@@ -411,7 +711,8 @@ func TestPOSTTransactionOutlines(t *testing.T) {
 				}
 			  ]
 			}`,
-			expectedErr: apierror.CannotBindBodyJSON,
+			expectedStatus: http.StatusBadRequest,
+			expectedErr:    apierror.CannotBindBodyJSON,
 		},
 		"Bad Request: Paymail output without paymail address": {
 			json: `{
@@ -422,7 +723,8 @@ func TestPOSTTransactionOutlines(t *testing.T) {
 				}
 			  ]
 			}`,
-			expectedErr: apierror.ExpectedJSON("error-paymail-address-invalid-receiver", "receiver paymail address is invalid"),
+			expectedStatus: http.StatusBadRequest,
+			expectedErr:    apierror.ExpectedJSON("error-paymail-address-invalid-receiver", "receiver paymail address is invalid"),
 		},
 		"Bad Request: Paymail output with only alias without domain": {
 			json: `{
@@ -434,7 +736,8 @@ func TestPOSTTransactionOutlines(t *testing.T) {
 				}
 			  ]
 			}`,
-			expectedErr: apierror.ExpectedJSON("error-paymail-address-invalid-receiver", "receiver paymail address is invalid"),
+			expectedStatus: http.StatusBadRequest,
+			expectedErr:    apierror.ExpectedJSON("error-paymail-address-invalid-receiver", "receiver paymail address is invalid"),
 		},
 		"Bad Request: Paymail output with only domain without alias": {
 			json: `{
@@ -446,7 +749,8 @@ func TestPOSTTransactionOutlines(t *testing.T) {
 				}
 			  ]
 			}`,
-			expectedErr: apierror.ExpectedJSON("error-paymail-address-invalid-receiver", "receiver paymail address is invalid"),
+			expectedStatus: http.StatusBadRequest,
+			expectedErr:    apierror.ExpectedJSON("error-paymail-address-invalid-receiver", "receiver paymail address is invalid"),
 		},
 		"Bad Request: Paymail output with sender address not existing in our system": {
 			json: `{
@@ -459,7 +763,8 @@ func TestPOSTTransactionOutlines(t *testing.T) {
 				}
 			  ]
 			}`,
-			expectedErr: apierror.ExpectedJSON("error-paymail-address-invalid-sender", "sender paymail address is invalid"),
+			expectedStatus: http.StatusBadRequest,
+			expectedErr:    apierror.ExpectedJSON("error-paymail-address-invalid-sender", "sender paymail address is invalid"),
 		},
 		"Bad Request: Paymail output with sender address not belongin to that user": {
 			json: fmt.Sprintf(`{
@@ -472,7 +777,20 @@ func TestPOSTTransactionOutlines(t *testing.T) {
 				}
 			  ]
 			}`, fixtures.UserWithMorePaymails.DefaultPaymail()),
-			expectedErr: apierror.ExpectedJSON("error-paymail-address-invalid-sender", "sender paymail address is invalid"),
+			expectedStatus: http.StatusBadRequest,
+			expectedErr:    apierror.ExpectedJSON("error-paymail-address-invalid-sender", "sender paymail address is invalid"),
+		},
+		"Unprocessable: User has not enough funds": {
+			json: `{
+			  "outputs": [
+				{
+				  "type": "op_return",
+				  "data": [ "1" ]
+				}
+			  ]
+			}`,
+			expectedStatus: http.StatusUnprocessableEntity,
+			expectedErr:    apierror.ExpectedJSON("tx-outline-not-enough-funds", "not enough funds to make the transaction"),
 		},
 	}
 	for name, test := range badRequestTestCases {
@@ -492,7 +810,9 @@ func TestPOSTTransactionOutlines(t *testing.T) {
 				Post(transactionsOutlinesURL)
 
 			// then:
-			then.Response(res).IsBadRequest().WithJSONf(test.expectedErr)
+			then.Response(res).
+				HasStatus(test.expectedStatus).
+				WithJSONf(test.expectedErr)
 		})
 	}
 }

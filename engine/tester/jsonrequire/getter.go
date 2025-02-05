@@ -25,6 +25,8 @@ func NewGetterWithJSON(t testing.TB, jsonString string) *Getter {
 
 // GetString returns a string value from the data.
 func (g *Getter) GetString(xpath string) string {
+	g.t.Helper()
+
 	value := getByXPath(g.t, g.data, xpath)
 
 	strValue, ok := value.(string)

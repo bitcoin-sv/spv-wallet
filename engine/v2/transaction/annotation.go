@@ -1,6 +1,7 @@
 package transaction
 
 import (
+	"github.com/bitcoin-sv/spv-wallet/models/bsv"
 	"github.com/bitcoin-sv/spv-wallet/models/transaction"
 	"github.com/bitcoin-sv/spv-wallet/models/transaction/bucket"
 )
@@ -16,6 +17,8 @@ type InputAnnotations map[int]*InputAnnotation
 
 // InputAnnotation represents the metadata for the input.
 type InputAnnotation struct {
+	// CustomInstructions has instructions about how to unlock this input.
+	CustomInstructions bsv.CustomInstructions
 }
 
 // OutputsAnnotations represents the metadata for chosen outputs. The key is the index of the output.
@@ -23,7 +26,7 @@ type OutputsAnnotations map[int]*OutputAnnotation
 
 // OutputAnnotation represents the metadata for the output.
 type OutputAnnotation struct {
-	// What type of bucket should this output be stored in.
+	// Bucket says what type of bucket should this output be stored in.
 	Bucket bucket.Name
 	// Paymail is available if the output is the paymail output.
 	Paymail *PaymailAnnotation
