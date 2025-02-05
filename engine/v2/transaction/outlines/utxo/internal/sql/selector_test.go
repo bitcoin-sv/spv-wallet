@@ -4,17 +4,13 @@ import (
 	"context"
 	"testing"
 
+	sdk "github.com/bitcoin-sv/go-sdk/transaction"
 	"github.com/bitcoin-sv/spv-wallet/engine/tester/fixtures"
 	"github.com/bitcoin-sv/spv-wallet/engine/v2/database"
 	"github.com/bitcoin-sv/spv-wallet/engine/v2/transaction/outlines/utxo/internal/sql/testabilities"
 	"github.com/bitcoin-sv/spv-wallet/models/bsv"
 	"github.com/stretchr/testify/require"
 )
-
-type selectBy struct {
-	satoshis            bsv.Satoshis
-	txSizeWithoutInputs uint64
-}
 
 func TestInputsSelector(t *testing.T) {
 
@@ -27,7 +23,7 @@ func TestInputsSelector(t *testing.T) {
 		selector := given.NewInputSelector()
 
 		// when:
-		utxos, err := selector.SelectInputsForTransaction(context.Background(), fixtures.Sender.ID(), 0, 0)
+		utxos, err := selector.Select(context.Background(), sdk.NewTransaction(), fixtures.Sender.ID())
 
 		// then:
 		then.WithoutError(err).SelectedInputs(utxos).AreEmpty()
@@ -39,42 +35,38 @@ func TestInputsSelector(t *testing.T) {
 	}{
 		"select empty list when user has not enough funds": {
 			selectBy: selectBy{
-				satoshis:            1_000_000,
-				txSizeWithoutInputs: 116,
+				satoshis: 1_000_000,
 			},
 		},
 		"select inputs that covers outputs and fee without change": {
 			selectBy: selectBy{
-				satoshis:            9,
-				txSizeWithoutInputs: 116,
+				satoshis: 9,
 			},
 			expectToSelectInputs: []int{0},
 		},
 		"select inputs that covers outputs and fee with change": {
 			selectBy: selectBy{
-				satoshis:            15,
-				txSizeWithoutInputs: 116,
+				satoshis: 15,
 			},
 			expectToSelectInputs: []int{0, 1},
 		},
 		"select more inputs with change when satoshis are equal to single utxo": {
 			selectBy: selectBy{
-				satoshis:            10,
-				txSizeWithoutInputs: 116,
+				satoshis: 10,
 			},
 			expectToSelectInputs: []int{0, 1},
 		},
-		"select inputs that covers outputs and fee for more data": {
+		"select inputs that covers outputs and fee for data requiring more fee": {
 			selectBy: selectBy{
 				satoshis:            9,
-				txSizeWithoutInputs: uint64(fixtures.DefaultFeeUnit.Bytes + 1 - database.EstimatedInputSizeForP2PKH),
+				txSizeWithoutInputs: testabilities.MaxSizeWithoutFeeForSingleInput + 1,
 			},
 			expectToSelectInputs: []int{0, 1},
 		},
 		"select inputs when size is equal to fee unit bytes": {
 			selectBy: selectBy{
 				satoshis:            9,
-				txSizeWithoutInputs: uint64(fixtures.DefaultFeeUnit.Bytes - database.EstimatedInputSizeForP2PKH),
+				txSizeWithoutInputs: testabilities.MaxSizeWithoutFeeForSingleInput,
 			},
 			expectToSelectInputs: []int{0},
 		},
@@ -94,10 +86,13 @@ func TestInputsSelector(t *testing.T) {
 			}
 
 			// and:
+			bsvTransaction := given.Transaction().ForSatoshisAndSize(&test.selectBy)
+
+			// and:
 			selector := given.NewInputSelector()
 
 			// when:
-			utxos, err := selector.SelectInputsForTransaction(context.Background(), fixtures.Sender.ID(), test.selectBy.satoshis, test.selectBy.txSizeWithoutInputs)
+			utxos, err := selector.Select(context.Background(), bsvTransaction, fixtures.Sender.ID())
 
 			// then:
 			then.WithoutError(err).SelectedInputs(utxos).
@@ -112,15 +107,13 @@ func TestInputsSelector(t *testing.T) {
 	}{
 		"select different inputs for second call": {
 			selectBy: selectBy{
-				satoshis:            15,
-				txSizeWithoutInputs: 116,
+				satoshis: 15,
 			},
 			expectToSelectInputs: []int{2, 3},
 		},
 		"select already touched inputs if the amount of not touched won't fulfill required amount": {
 			selectBy: selectBy{
-				satoshis:            25,
-				txSizeWithoutInputs: 116,
+				satoshis: 25,
 			},
 			expectToSelectInputs: []int{0, 1, 3},
 		},
@@ -140,16 +133,19 @@ func TestInputsSelector(t *testing.T) {
 			}
 
 			// and:
+			bsvTransaction := given.Transaction().ForSatoshisAndSize(&test.selectBy)
+
+			// and:
 			selector := given.NewInputSelector()
 
 			// when:
-			_, err := selector.SelectInputsForTransaction(context.Background(), fixtures.Sender.ID(), test.selectBy.satoshis, test.selectBy.txSizeWithoutInputs)
+			_, err := selector.Select(context.Background(), bsvTransaction, fixtures.Sender.ID())
 
 			// then:
 			require.NoError(t, err)
 
 			// when:
-			utxos, err := selector.SelectInputsForTransaction(context.Background(), fixtures.Sender.ID(), test.selectBy.satoshis, test.selectBy.txSizeWithoutInputs)
+			utxos, err := selector.Select(context.Background(), bsvTransaction, fixtures.Sender.ID())
 
 			// then:
 			then.WithoutError(err).SelectedInputs(utxos).
@@ -157,4 +153,20 @@ func TestInputsSelector(t *testing.T) {
 
 		})
 	}
+}
+
+type selectBy struct {
+	satoshis            bsv.Satoshis
+	txSizeWithoutInputs int
+}
+
+func (s *selectBy) Satoshis() bsv.Satoshis {
+	return s.satoshis
+}
+
+func (s *selectBy) Size() int {
+	if s.txSizeWithoutInputs == 0 {
+		return testabilities.SizeOfTransactionWithOnlyP2PKHOutput
+	}
+	return s.txSizeWithoutInputs
 }

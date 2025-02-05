@@ -154,7 +154,8 @@ func TestIncomingPaymailRawTX(t *testing.T) {
 					"createdAt": "{{ matchTimestamp }}",
 					"value": {{ .value }},
 					"type": "incoming",
-					"counterparty": "{{ .sender }}"
+					"counterparty": "{{ .sender }}",
+					"txStatus": "BROADCASTED"
 				}
 			],
 			"page": {
@@ -315,7 +316,8 @@ func TestIncomingPaymailBeef(t *testing.T) {
 					"createdAt": "{{ matchTimestamp }}",
 					"value": {{ .value }},
 					"type": "incoming",
-					"counterparty": "{{ .sender }}"
+					"counterparty": "{{ .sender }}",
+					"txStatus": "BROADCASTED"
 				}
 			],
 			"page": {

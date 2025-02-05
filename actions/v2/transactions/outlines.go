@@ -3,6 +3,8 @@ package transactions
 import (
 	"github.com/bitcoin-sv/spv-wallet/actions/v2/transactions/internal/mapping"
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
+	"github.com/bitcoin-sv/spv-wallet/engine/v2/bsv"
+	"github.com/bitcoin-sv/spv-wallet/engine/v2/transaction/outlines"
 	"github.com/bitcoin-sv/spv-wallet/models/request"
 	"github.com/bitcoin-sv/spv-wallet/server/reqctx"
 	"github.com/gin-gonic/gin"
@@ -11,9 +13,14 @@ import (
 
 func transactionOutlines(c *gin.Context, userCtx *reqctx.UserContext) {
 	logger := reqctx.Logger(c)
+	format, err := getOutlineTransactionFormat(c)
+	if err != nil {
+		spverrors.ErrorResponse(c, err, logger)
+		return
+	}
 
 	var requestBody request.TransactionSpecification
-	err := c.ShouldBindWith(&requestBody, binding.JSON)
+	err = c.ShouldBindWith(&requestBody, binding.JSON)
 	if err != nil {
 		spverrors.ErrorResponse(c, spverrors.ErrCannotBindRequest.Wrap(err), logger)
 		return
@@ -31,7 +38,14 @@ func transactionOutlines(c *gin.Context, userCtx *reqctx.UserContext) {
 		return
 	}
 
-	txOutline, err := reqctx.Engine(c).TransactionOutlinesService().CreateBEEF(c, spec)
+	var txOutline *outlines.Transaction
+	switch format {
+	case bsv.TxHexFormatRAW:
+		txOutline, err = reqctx.Engine(c).TransactionOutlinesService().CreateRawTx(c, spec)
+	case bsv.TxHexFormatBEEF:
+		txOutline, err = reqctx.Engine(c).TransactionOutlinesService().CreateBEEF(c, spec)
+	}
+
 	if err != nil {
 		spverrors.ErrorResponse(c, err, logger)
 		return
@@ -39,4 +53,17 @@ func transactionOutlines(c *gin.Context, userCtx *reqctx.UserContext) {
 
 	res := mapping.TransactionOutlineToResponse(txOutline)
 	c.JSON(200, res)
+}
+
+func getOutlineTransactionFormat(c *gin.Context) (bsv.TxHexFormat, error) {
+	queryFormat, _ := c.GetQuery("format")
+	if queryFormat == "" {
+		return bsv.TxHexFormatBEEF, nil
+	}
+
+	format, err := bsv.ParseTxHexFormat(queryFormat)
+	if err == nil {
+		return format, spverrors.Wrapf(err, "invalid transaction format [%s] provided for transaction outline", queryFormat)
+	}
+	return format, nil
 }

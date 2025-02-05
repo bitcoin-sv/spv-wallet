@@ -13,15 +13,17 @@ type evaluationContext struct {
 	log                   *zerolog.Logger
 	paymail               paymail.ServiceClient
 	paymailAddressService PaymailAddressService
+	utxoSelector          UTXOSelector
 }
 
-func newOutlineEvaluationContext(ctx context.Context, userID string, log *zerolog.Logger, paymail paymail.ServiceClient, paymailAddressService PaymailAddressService) *evaluationContext {
+func newOutlineEvaluationContext(ctx context.Context, userID string, log *zerolog.Logger, paymail paymail.ServiceClient, paymailAddressService PaymailAddressService, utxoSelector UTXOSelector) *evaluationContext {
 	return &evaluationContext{
 		Context:               ctx,
 		userID:                userID,
 		log:                   log,
 		paymail:               paymail,
 		paymailAddressService: paymailAddressService,
+		utxoSelector:          utxoSelector,
 	}
 }
 
@@ -39,4 +41,8 @@ func (c *evaluationContext) Paymail() paymail.ServiceClient {
 
 func (c *evaluationContext) PaymailAddressService() PaymailAddressService {
 	return c.paymailAddressService
+}
+
+func (c *evaluationContext) UTXOSelector() UTXOSelector {
+	return c.utxoSelector
 }

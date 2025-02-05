@@ -12,6 +12,7 @@ var funcsMap = template.FuncMap{
 	"matchID64":          matchID64,
 	"matchHexWithLength": matchHexWithLength,
 	"matchHex":           matchHex,
+	"matchBEEF":          matchBEEF,
 	"matchAddress":       matchAddress,
 	"matchNumber":        matchNumber,
 	"anything":           anything,
@@ -41,6 +42,10 @@ func matchHexWithLength(length int) string {
 
 func matchHex() string {
 	return regexPlaceholder(`^[a-fA-F0-9]+$`)
+}
+
+func matchBEEF() string {
+	return regexPlaceholder(`^0100(beef|BEEF)[a-fA-F0-9]+$`)
 }
 
 // matchAddress returns a regex that matches a bitcoin address
