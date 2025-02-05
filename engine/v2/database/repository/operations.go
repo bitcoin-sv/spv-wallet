@@ -7,8 +7,11 @@ import (
 
 	"github.com/bitcoin-sv/spv-wallet/engine/v2/database"
 	"github.com/bitcoin-sv/spv-wallet/engine/v2/database/dbquery"
+	"github.com/bitcoin-sv/spv-wallet/engine/v2/operations/operationsmodels"
 	"github.com/bitcoin-sv/spv-wallet/engine/v2/transaction/txmodels"
+	"github.com/bitcoin-sv/spv-wallet/models"
 	"github.com/bitcoin-sv/spv-wallet/models/filter"
+	"github.com/samber/lo"
 	"gorm.io/gorm"
 	"gorm.io/gorm/clause"
 )
@@ -24,8 +27,31 @@ func NewOperationsRepo(db *gorm.DB) *Operations {
 }
 
 // PaginatedForUser returns operations for a user based on userID and the provided paging options.
-func (o *Operations) PaginatedForUser(ctx context.Context, userID string, page filter.Page) (*dbquery.PagedResult[database.Operation], error) {
-	return dbquery.PaginatedQuery[database.Operation](ctx, page, o.db, dbquery.UserID(userID))
+func (o *Operations) PaginatedForUser(ctx context.Context, userID string, page filter.Page) (*models.PagedResult[operationsmodels.Operation], error) {
+	rows, err := dbquery.PaginatedQuery[database.Operation](
+		ctx,
+		page,
+		o.db,
+		dbquery.UserID(userID),
+		dbquery.Preload("Transaction"),
+	)
+	if err != nil {
+		return nil, err
+	}
+	return &models.PagedResult[operationsmodels.Operation]{
+		PageDescription: rows.PageDescription,
+		Content: lo.Map(rows.Content, func(operation *database.Operation, _ int) *operationsmodels.Operation {
+			return &operationsmodels.Operation{
+				TxID:         operation.TxID,
+				UserID:       operation.UserID,
+				CreatedAt:    operation.CreatedAt,
+				Counterparty: operation.Counterparty,
+				Type:         operation.Type,
+				Value:        operation.Value,
+				TxStatus:     operation.Transaction.TxStatus,
+			}
+		}),
+	}, nil
 }
 
 // SaveAll saves operations to the database.

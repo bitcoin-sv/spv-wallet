@@ -11,7 +11,7 @@ func (p *PaymailConfig) Validate() error {
 	if p == nil {
 		return spverrors.Newf("paymail config is required")
 	}
-	if p.Beef.enabled() && p.Beef.BlockHeadersServiceHeaderValidationURL == "" {
+	if p.Beef.Enabled() && p.Beef.BlockHeadersServiceHeaderValidationURL == "" {
 		return spverrors.Newf("beef_url is required for beef")
 	}
 	if len(p.Domains) == 0 {

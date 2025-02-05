@@ -16,6 +16,7 @@ import (
 	"github.com/bitcoin-sv/spv-wallet/engine/tester/paymailmock"
 	"github.com/bitcoin-sv/spv-wallet/engine/v2/paymails/paymailsmodels"
 	"github.com/bitcoin-sv/spv-wallet/engine/v2/users/usersmodels"
+	"github.com/bitcoin-sv/spv-wallet/initializer"
 	"github.com/bitcoin-sv/spv-wallet/models/bsv"
 	"github.com/go-resty/resty/v2"
 	"github.com/jarcoal/httpmock"
@@ -101,7 +102,7 @@ func (f *engineFixture) EngineWithConfiguration(opts ...ConfigOpts) (walletEngin
 	f.config = f.ConfigForTests(opts...)
 	f.prepareDBConfigForTests()
 
-	options, err := f.config.ToEngineOptions(f.logger)
+	options, err := initializer.ToEngineOptions(f.config, f.logger)
 	require.NoError(f.t, err)
 	options = f.addMockedExternalDependenciesOptions(options)
 

@@ -2,13 +2,10 @@
 package config
 
 import (
-	"fmt"
-	"slices"
 	"time"
 
 	"github.com/bitcoin-sv/spv-wallet/engine/cluster"
 	"github.com/bitcoin-sv/spv-wallet/engine/datastore"
-	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/bitcoin-sv/spv-wallet/engine/taskmanager"
 	"github.com/mrz1836/go-cachestore"
 )
@@ -192,16 +189,6 @@ type PaymailConfig struct {
 	SenderValidationEnabled bool `json:"sender_validation_enabled" mapstructure:"sender_validation_enabled"`
 }
 
-// CheckDomain will check if the domain is allowed
-func (p *PaymailConfig) CheckDomain(domain string) error {
-	if p.DomainValidationEnabled {
-		if !slices.Contains(p.Domains, domain) {
-			return spverrors.ErrInvalidDomain
-		}
-	}
-	return nil
-}
-
 // BeefConfig consists of components required to use beef, e.g. Block Headers Service for merkle roots validation
 type BeefConfig struct {
 	// BlockHeadersServiceHeaderValidationURL is the URL for merkle roots validation in Block Headers Service.
@@ -218,10 +205,6 @@ type BHSConfig struct {
 	AuthToken string `json:"auth_token" mapstructure:"auth_token"`
 	// URL is the URL used to communicate with Block Headers Service (BHS)
 	URL string `json:"url" mapstructure:"url"`
-}
-
-func (b *BeefConfig) enabled() bool {
-	return b != nil && b.UseBeef
 }
 
 // TaskManagerConfig is a configuration for the taskmanager
@@ -258,14 +241,4 @@ type ExperimentalConfig struct {
 	UseJunglebus bool `json:"use_junglebus" mapstructure:"use_junglebus"`
 	// V2 is a flag for enabling the new transaction flow
 	V2 bool `json:"new_transaction_flow_enabled" mapstructure:"new_transaction_flow_enabled"`
-}
-
-// GetUserAgent will return the outgoing user agent
-func (c *AppConfig) GetUserAgent() string {
-	return fmt.Sprintf("%s version %s", applicationName, c.Version)
-}
-
-// IsBeefEnabled returns true if the Beef capability will be used for paymail transactions
-func (c *AppConfig) IsBeefEnabled() bool {
-	return c.Paymail != nil && c.Paymail.Beef.enabled()
 }

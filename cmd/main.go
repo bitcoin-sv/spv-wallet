@@ -12,6 +12,7 @@ import (
 	"github.com/bitcoin-sv/spv-wallet/config"
 	_ "github.com/bitcoin-sv/spv-wallet/docs"
 	"github.com/bitcoin-sv/spv-wallet/engine"
+	"github.com/bitcoin-sv/spv-wallet/initializer"
 	"github.com/bitcoin-sv/spv-wallet/logging"
 	"github.com/bitcoin-sv/spv-wallet/server"
 )
@@ -54,7 +55,7 @@ func main() {
 
 	appCtx := context.Background()
 
-	opts, err := appConfig.ToEngineOptions(logger)
+	opts, err := initializer.ToEngineOptions(appConfig, logger)
 	if err != nil {
 		defaultLogger.Fatal().Err(err).Msg("Error while creating engine options")
 		return

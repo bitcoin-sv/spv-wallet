@@ -99,7 +99,8 @@ func TestOutlinesRecordOpReturn(t *testing.T) {
 					"createdAt": "{{ matchTimestamp }}",
 					"value": {{ .value }},
 					"type": "outgoing",
-					"counterparty": "{{ .sender }}"
+					"counterparty": "{{ .sender }}",
+					"txStatus": "BROADCASTED"
 				},
 				{{ anything }}
 			],
@@ -166,14 +167,14 @@ func TestOutlinesRecordOpReturnErrorCases(t *testing.T) {
 		},
 		"RecordTransactionOutline for not a BEEF hex": {
 			request: `{
-				"beef": "0b3818c665bf28a46""
+				"hex": "0b3818c665bf28a46""
 			}`,
 			expectHttpCode: 400,
 			expectedErr:    apierror.ExpectedJSON("error-bind-body-invalid", "cannot bind request body"),
 		},
 		"Vout out index as invalid number": {
 			request: `{
-				"beef": "` + givenTXWithOpReturn(t).BEEF() + `"
+				"hex": "` + givenTXWithOpReturn(t).BEEF() + `"
 				"annotations": {
 					"outputs": {
 						"invalid-number": {
@@ -224,14 +225,70 @@ func TestOutlinesRecordOpReturnErrorCases(t *testing.T) {
 
 func TestOutlinesRecordOpReturnOnBroadcastError(t *testing.T) {
 	// given:
-	given, then := testabilities.New(t)
-	cleanup := given.StartedSPVWalletWithConfiguration(testengine.WithV2())
-	defer cleanup()
+	txSpec := givenTXWithOpReturn(t)
+	request := `{
+		"hex": "` + txSpec.BEEF() + `",
+		"annotations": {
+			"outputs": {
+				"0": {
+					"bucket": "data"
+				}
+			}
+		}
+	}`
 
-	// and:
-	client := given.HttpClient().ForUser()
+	var mockTxInfo = func(txStatus chainmodels.TXStatus) chainmodels.TXInfo {
+		return chainmodels.TXInfo{
+			TxID:     txSpec.ID(),
+			TXStatus: txStatus,
+		}
+	}
 
-	// and:
+	tests := map[string]struct {
+		httpStatus      int
+		fromBroadcaster chainmodels.TXInfo
+	}{
+		"500": {
+			httpStatus: 500,
+		},
+		"DoubleSpendAttempted": {
+			fromBroadcaster: mockTxInfo(chainmodels.DoubleSpendAttempted),
+		},
+		"Rejected": {
+			fromBroadcaster: mockTxInfo(chainmodels.Rejected),
+		},
+		"SeenInOrphanMempool": {
+			fromBroadcaster: mockTxInfo(chainmodels.SeenInOrphanMempool),
+		},
+	}
+
+	for name, test := range tests {
+		t.Run(name, func(t *testing.T) {
+			// given:
+			given, then := testabilities.New(t)
+			cleanup := given.StartedSPVWalletWithConfiguration(testengine.WithV2())
+			defer cleanup()
+
+			// and:
+			client := given.HttpClient().ForUser()
+
+			// and:
+			given.ARC().WillRespondForBroadcast(test.httpStatus, &test.fromBroadcaster)
+
+			// when:
+			res, _ := client.R().
+				SetHeader("Content-Type", "application/json").
+				SetBody(request).
+				Post(transactionsOutlinesRecordURL)
+
+			// then:
+			then.Response(res).HasStatus(500).WithJSONf(apierror.ExpectedJSON("error-tx-broadcast", "failed to broadcast transaction"))
+		})
+	}
+}
+
+func TestOutlinesRecordForDifferentTxStatuses(t *testing.T) {
+	// given:
 	txSpec := givenTXWithOpReturn(t)
 	request := `{
 			"hex": "` + txSpec.BEEF() + `",
@@ -244,17 +301,80 @@ func TestOutlinesRecordOpReturnOnBroadcastError(t *testing.T) {
 			}
 		}`
 
-	// and:
-	given.ARC().WillRespondForBroadcast(500, &chainmodels.TXInfo{})
+	tests := map[string]struct {
+		fromBroadcaster chainmodels.TXStatus
+		expectedStatus  string
+	}{
+		"Mined": {
+			fromBroadcaster: chainmodels.Mined,
+			expectedStatus:  "MINED",
+		},
+		"SeenOnNetwork": {
+			fromBroadcaster: chainmodels.SeenOnNetwork,
+			expectedStatus:  "BROADCASTED",
+		},
+		"AcceptedByNetwork": {
+			fromBroadcaster: chainmodels.AcceptedByNetwork,
+			expectedStatus:  "BROADCASTED",
+		},
+		"SentToNetwork": {
+			fromBroadcaster: chainmodels.SentToNetwork,
+			expectedStatus:  "BROADCASTED",
+		},
+	}
+	for name, test := range tests {
+		t.Run(name, func(t *testing.T) {
+			// given:
+			given, then := testabilities.New(t)
+			cleanup := given.StartedSPVWalletWithConfiguration(testengine.WithV2())
+			defer cleanup()
 
-	// when:
-	res, _ := client.R().
-		SetHeader("Content-Type", "application/json").
-		SetBody(request).
-		Post(transactionsOutlinesRecordURL)
+			// and:
+			client := given.HttpClient().ForUser()
 
-	// then:
-	then.Response(res).HasStatus(500).WithJSONf(apierror.ExpectedJSON("error-tx-broadcast", "failed to broadcast transaction"))
+			// and:
+			given.ARC().WillRespondForBroadcast(200, &chainmodels.TXInfo{
+				TxID:     txSpec.ID(),
+				TXStatus: test.fromBroadcaster,
+			})
+
+			// when:
+			res, _ := client.R().
+				SetHeader("Content-Type", "application/json").
+				SetBody(request).
+				Post(transactionsOutlinesRecordURL)
+
+			// then:
+			then.Response(res).
+				HasStatus(201)
+
+			// when:
+			res, _ = client.R().Get("/api/v2/operations/search")
+
+			// then:
+			then.Response(res).IsOK().WithJSONMatching(`{
+			"content": [
+				{
+					"txID": "{{ .txID }}",
+					"createdAt": "{{ matchTimestamp }}",
+					"value": 0,
+					"type": "data",
+					"counterparty": "",
+					"txStatus": "{{ .expectedStatus }}"
+				}
+			],
+			"page": {
+			    "number": 1,
+			    "size": 1,
+			    "totalElements": 1,
+			    "totalPages": 1
+				}
+		}`, map[string]any{
+				"txID":           txSpec.ID(),
+				"expectedStatus": test.expectedStatus,
+			})
+		})
+	}
 }
 
 func TestRecordOpReturnTwiceByTheSameUser(t *testing.T) {
@@ -335,7 +455,8 @@ func TestRecordOpReturnTwiceByTheSameUser(t *testing.T) {
 					"createdAt": "{{ matchTimestamp }}",
 					"value": {{ .value }},
 					"type": "outgoing",
-					"counterparty": "{{ .sender }}"
+					"counterparty": "{{ .sender }}",
+					"txStatus": "BROADCASTED"
 				},
 				{{ anything }}
 			],
