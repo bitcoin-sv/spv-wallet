@@ -55,14 +55,14 @@ var ErrAdminAuthOnUserEndpoint = models.SPVError{Message: "cannot call user's en
 // ErrXPubAuthRequired is when xpub authorization is required
 var ErrXPubAuthRequired = models.SPVError{Message: "xpub authorization required", StatusCode: 401, Code: "error-xpub-authorization-required"}
 
-// ErrMissingAuthScope is when auth scope is missing in endpoint definition
-var ErrMissingAuthScope = models.SPVError{Message: "missing auth scope", StatusCode: 401, Code: "error-missing-auth-scope"}
-
 // ErrWrongAuthScopeFormat is when auth scope format is wrong
 var ErrWrongAuthScopeFormat = models.SPVError{Message: "wrong auth scope format", StatusCode: 401, Code: "error-wrong-auth-scope-format"}
 
-// ErrWrongAuthScopeType is when auth scope type is wrong
-var ErrWrongAuthScopeType = models.SPVError{Message: "wrong auth scope type", StatusCode: 401, Code: "error-wrong-auth-scope-type"}
+// ErrAdminAuthOnNonAdminEndpoint is when admin authorization is used on non-admin's endpoint
+var ErrAdminAuthOnNonAdminEndpoint = models.SPVError{Message: "cannot call non-admin endpoints with admin authorization", StatusCode: 401, Code: "error-admin-auth-on-non-admin-endpoint"}
+
+// ErrUserAuthOnNonUserEndpoint is when user authorization is used on non-user's endpoint
+var ErrUserAuthOnNonUserEndpoint = models.SPVError{Message: "cannot call non-user endpoints with user authorization", StatusCode: 401, Code: "error-user-auth-on-non-user-endpoint"}
 
 // ////////////////////////////////// BINDING ERRORS
 

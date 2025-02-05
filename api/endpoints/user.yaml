@@ -3,18 +3,3 @@ info:
   title: ignored
   version: ignored
 paths:
-
-#  Example of user endpoint with security
-#  /api/v2/user/status:
-#    get:
-#      security:
-#        - XPubAuth:
-#            - "user"
-#      tags:
-#        - User endpoints
-#      summary: Get user status
-#      description: >-
-#        This endpoint returns user status. It is used to check if authorization header contain user xpub.
-#      responses:
-#        200:
-#          description: Success

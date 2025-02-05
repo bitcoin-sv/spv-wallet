@@ -23,7 +23,68 @@ paths:
 components:
     responses:
         api_components_errors_NotAuthorized:
+            content:
+                application/json:
+                    schema:
+                        $ref: '#/components/schemas/api_components_errors_ErrUnauthorized'
             description: Security requirements failed
+    schemas:
+        api_components_errors_ErrAdminAuthOnNonAdminEndpoint:
+            allOf:
+                - $ref: '#/components/schemas/api_components_errors_ErrorSchema'
+                - properties:
+                    code:
+                        example: error-admin-auth-on-non-admin-endpoint
+                    message:
+                        example: cannot call non-admin endpoints with admin authorization
+                  type: object
+        api_components_errors_ErrAuthorization:
+            allOf:
+                - $ref: '#/components/schemas/api_components_errors_ErrorSchema'
+                - properties:
+                    code:
+                        example: error-unauthorized
+                    message:
+                        example: unauthorized
+                  type: object
+        api_components_errors_ErrUnauthorized:
+            oneOf:
+                - $ref: '#/components/schemas/api_components_errors_ErrAuthorization'
+                - $ref: '#/components/schemas/api_components_errors_ErrWrongAuthScopeFormat'
+                - $ref: '#/components/schemas/api_components_errors_ErrAdminAuthOnNonAdminEndpoint'
+                - $ref: '#/components/schemas/api_components_errors_ErrUserAuthOnNonUserEndpoint'
+        api_components_errors_ErrUserAuthOnNonUserEndpoint:
+            allOf:
+                - $ref: '#/components/schemas/api_components_errors_ErrorSchema'
+                - properties:
+                    code:
+                        example: error-user-auth-on-non-user-endpoint
+                    message:
+                        example: cannot call non-user endpoints with user authorization
+                  type: object
+        api_components_errors_ErrWrongAuthScopeFormat:
+            allOf:
+                - $ref: '#/components/schemas/api_components_errors_ErrorSchema'
+                - properties:
+                    code:
+                        example: error-wrong-auth-scope-format
+                    message:
+                        example: wrong auth scope format
+                  type: object
+        api_components_errors_ErrorSchema:
+            additionalProperties: false
+            properties:
+                code:
+                    description: Error code
+                    format: int32
+                    type: integer
+                message:
+                    description: Error message
+                    type: string
+            required:
+                - code
+                - message
+            type: object
     securitySchemes:
         XPubAuth:
             description: Authentication using x-auth-xpub header
