@@ -45,7 +45,7 @@ type ApiComponentsErrorsErrWrongAuthScopeFormat struct {
 // ApiComponentsErrorsErrorSchema defines model for api_components_errors_ErrorSchema.
 type ApiComponentsErrorsErrorSchema struct {
 	// Code Error code
-	Code int32 `json:"code"`
+	Code string `json:"code"`
 
 	// Message Error message
 	Message string `json:"message"`

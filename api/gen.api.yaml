@@ -76,8 +76,7 @@ components:
             properties:
                 code:
                     description: Error code
-                    format: int32
-                    type: integer
+                    type: string
                 message:
                     description: Error message
                     type: string

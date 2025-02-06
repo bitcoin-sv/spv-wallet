@@ -1,9 +1,10 @@
 package admin_test
 
 import (
+	"testing"
+
 	"github.com/bitcoin-sv/spv-wallet/actions/testabilities"
 	testengine "github.com/bitcoin-sv/spv-wallet/engine/testabilities"
-	"testing"
 )
 
 func TestStatus(t *testing.T) {

@@ -42,12 +42,12 @@ func SignatureAuthWithScopes() api.MiddlewareFunc {
 		switch userCtx.GetAuthType() {
 		case reqctx.AuthTypeAdmin:
 			if !slices.Contains(scopes, "admin") {
-				spverrors.ErrorResponse(c, spverrors.ErrAdminAuthOnNonAdminEndpoint, reqctx.Logger(c))
+				spverrors.ErrorResponse(c, spverrors.ErrAdminAuthOnUserEndpoint, reqctx.Logger(c))
 				return
 			}
 		case reqctx.AuthTypeXPub:
 			if !slices.Contains(scopes, "user") {
-				spverrors.ErrorResponse(c, spverrors.ErrUserAuthOnNonUserEndpoint, reqctx.Logger(c))
+				spverrors.ErrorResponse(c, spverrors.ErrNotAnAdminKey, reqctx.Logger(c))
 				return
 			}
 		default:

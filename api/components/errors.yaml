@@ -17,8 +17,7 @@ components:
       type: object
       properties:
         code:
-          type: integer
-          format: int32
+          type: string
           description: Error code
         message:
           type: string
