@@ -1,7 +1,6 @@
 package paymails_test
 
 import (
-	"strings"
 	"testing"
 
 	"github.com/bitcoin-sv/spv-wallet/actions/testabilities"
@@ -45,9 +44,9 @@ func TestCurrentUserPaymails(t *testing.T) {
 				"totalPages": 1
 			 }
 			}`, map[string]any{
-				"Address":    strings.ToLower(fixtures.Sender.Paymails[0]),
-				"PublicName": fixtures.Sender.Paymails[0],
-				"Alias":      getAliasFromPaymail(t, fixtures.Sender.Paymails[0]),
+				"Address":    fixtures.Sender.DefaultPaymail(),
+				"PublicName": fixtures.Sender.DefaultPaymail().PublicName(),
+				"Alias":      fixtures.Sender.DefaultPaymail().Alias(),
 				"XPubID":     fixtures.Sender.XPubID(),
 				"Domain":     fixtures.PaymailDomain,
 			})
@@ -103,14 +102,14 @@ func TestCurrentUserPaymails(t *testing.T) {
 			 }
 			}`, map[string]any{
 				"FirstPaymail": map[string]any{
-					"Address":    strings.ToLower(fixtures.UserWithMorePaymails.Paymails[0]),
-					"PublicName": fixtures.UserWithMorePaymails.Paymails[0],
-					"Alias":      getAliasFromPaymail(t, fixtures.UserWithMorePaymails.Paymails[0]),
+					"Address":    fixtures.UserWithMorePaymails.Paymails[0],
+					"PublicName": fixtures.UserWithMorePaymails.Paymails[0].PublicName(),
+					"Alias":      fixtures.UserWithMorePaymails.Paymails[0].Alias(),
 				},
 				"SecondPaymail": map[string]any{
-					"Address":    strings.ToLower(fixtures.UserWithMorePaymails.Paymails[1]),
-					"PublicName": fixtures.UserWithMorePaymails.Paymails[1],
-					"Alias":      getAliasFromPaymail(t, fixtures.UserWithMorePaymails.Paymails[1]),
+					"Address":    fixtures.UserWithMorePaymails.Paymails[1],
+					"PublicName": fixtures.UserWithMorePaymails.Paymails[1].PublicName(),
+					"Alias":      fixtures.UserWithMorePaymails.Paymails[1].Alias(),
 				},
 				"XPubID": fixtures.UserWithMorePaymails.XPubID(),
 				"Domain": fixtures.PaymailDomain,
@@ -144,13 +143,4 @@ func TestCurrentUserPaymails(t *testing.T) {
 		// then:
 		then.Response(res).IsUnauthorized()
 	})
-}
-
-func getAliasFromPaymail(t testing.TB, paymail string) (alias string) {
-	parts := strings.SplitN(paymail, "@", 2)
-	if len(parts) == 0 {
-		t.Fatalf("Failed to parse paymail: %s", paymail)
-	}
-	alias = strings.ToLower(parts[0])
-	return
 }

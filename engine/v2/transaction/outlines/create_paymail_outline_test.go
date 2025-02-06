@@ -18,8 +18,8 @@ import (
 
 func TestCreatePaymailTransactionOutlineBEEF(t *testing.T) {
 	const transactionSatoshiValue = bsv.Satoshis(1)
-	var recipient = fixtures.RecipientExternal.DefaultPaymail()
-	var sender = fixtures.Sender.DefaultPaymail()
+	var recipient = fixtures.RecipientExternal.DefaultPaymail().Address()
+	var sender = fixtures.Sender.DefaultPaymail().Address()
 
 	t.Run("return transaction outline with payment to valid paymail address", func(t *testing.T) {
 		given, then := testabilities.New(t)
@@ -134,7 +134,7 @@ func TestCreatePaymailTransactionOutlineBEEF(t *testing.T) {
 		then.Created(tx).WithNoError(err).WithParseableBEEFHex().
 			Output(0).
 			IsPaymail().
-			HasSender(fixtures.UserWithMorePaymails.DefaultPaymail())
+			HasSender(fixtures.UserWithMorePaymails.DefaultPaymail().Address())
 	})
 
 	errorTests := map[string]struct {
@@ -237,7 +237,7 @@ func TestCreatePaymailTransactionOutlineBEEF(t *testing.T) {
 			spec: &outlines.Paymail{
 				To:       recipient,
 				Satoshis: transactionSatoshiValue,
-				From:     optional.Of(fixtures.RecipientExternal.DefaultPaymail()),
+				From:     optional.Of(fixtures.RecipientExternal.DefaultPaymail().Address()),
 			},
 			expectedError: txerrors.ErrSenderPaymailAddressIsInvalid,
 		},
@@ -246,7 +246,7 @@ func TestCreatePaymailTransactionOutlineBEEF(t *testing.T) {
 			spec: &outlines.Paymail{
 				To:       recipient,
 				Satoshis: transactionSatoshiValue,
-				From:     optional.Of(fixtures.RecipientInternal.DefaultPaymail()),
+				From:     optional.Of(fixtures.RecipientInternal.DefaultPaymail().Address()),
 			},
 			expectedError: txerrors.ErrSenderPaymailAddressIsInvalid,
 		},
@@ -354,8 +354,8 @@ func TestCreatePaymailTransactionOutlineBEEF(t *testing.T) {
 
 func TestCreatePaymailTransactionOutlineRAW(t *testing.T) {
 	const transactionSatoshiValue = bsv.Satoshis(1)
-	var recipient = fixtures.RecipientExternal.DefaultPaymail()
-	var sender = fixtures.Sender.DefaultPaymail()
+	var recipient = fixtures.RecipientExternal.DefaultPaymail().Address()
+	var sender = fixtures.Sender.DefaultPaymail().Address()
 
 	t.Run("return transaction outline with payment to valid paymail address", func(t *testing.T) {
 		given, then := testabilities.New(t)
@@ -489,7 +489,7 @@ func TestCreatePaymailTransactionOutlineRAW(t *testing.T) {
 
 		thenTx.Output(0).
 			IsPaymail().
-			HasSender(fixtures.UserWithMorePaymails.DefaultPaymail())
+			HasSender(fixtures.UserWithMorePaymails.DefaultPaymail().Address())
 	})
 
 	errorTests := map[string]struct {
@@ -592,7 +592,7 @@ func TestCreatePaymailTransactionOutlineRAW(t *testing.T) {
 			spec: &outlines.Paymail{
 				To:       recipient,
 				Satoshis: transactionSatoshiValue,
-				From:     optional.Of(fixtures.RecipientExternal.DefaultPaymail()),
+				From:     optional.Of(fixtures.RecipientExternal.DefaultPaymail().Address()),
 			},
 			expectedError: txerrors.ErrSenderPaymailAddressIsInvalid,
 		},
@@ -601,7 +601,7 @@ func TestCreatePaymailTransactionOutlineRAW(t *testing.T) {
 			spec: &outlines.Paymail{
 				To:       recipient,
 				Satoshis: transactionSatoshiValue,
-				From:     optional.Of(fixtures.RecipientInternal.DefaultPaymail()),
+				From:     optional.Of(fixtures.RecipientInternal.DefaultPaymail().Address()),
 			},
 			expectedError: txerrors.ErrSenderPaymailAddressIsInvalid,
 		},
