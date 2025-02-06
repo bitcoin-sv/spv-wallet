@@ -1,0 +1,15 @@
+openapi: 3.0.0
+info:
+  title: SPV Wallet API
+  version: development
+  license:
+    name: Open BSV Licence
+    url: xyz
+
+components:
+  securitySchemes:
+    XPubAuth:
+      type: apiKey
+      in: header
+      name: x-auth-xpub
+      description: "Authentication using x-auth-xpub header"
