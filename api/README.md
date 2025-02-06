@@ -9,7 +9,7 @@
 
 #### Define the endpoint with:
 - **Path and method** (e.g., `GET /v2/resource`)
-- **Security settings** (`XPubAuth` type and `admin/user/basic` scopes)
+- **Security settings** (`XPubAuth` type and `admin/user` scopes)
 - **Request body** (if required)
 - **Response body** (or status codes)
 
@@ -39,6 +39,9 @@ All models should be defined in separate files inside the `/components` director
 - **Models** → `/components/models.yaml`
 - **Requests** → `/components/requests.yaml`
 - **Responses** → `/components/responses.yaml`
+
+> [!NOTE]
+> If you want to add endpoint accessible without any authorization just skip the security part in the endpoint definition.
 
 ### Example of a request and response definition:
 ```yaml
