@@ -1,0 +1,21 @@
+openapi: 3.0.0
+info:
+  title: ignored
+  version: ignored
+paths:
+
+  /api/v2/admin/status:
+    get:
+      security:
+        - XPubAuth:
+            - "admin"
+      tags:
+        - Admin endpoints
+      summary: Get admin status
+      description: >-
+        This endpoint returns admin status. It is used to check if authorization header contain admin xpub.
+      responses:
+        200:
+          description: Success
+        401:
+          $ref: "../components/errors.yaml#/components/responses/NotAuthorized"
