@@ -1,6 +1,8 @@
 package beef
 
 import (
+	"errors"
+
 	"github.com/bitcoin-sv/go-sdk/spv"
 	sdk "github.com/bitcoin-sv/go-sdk/transaction"
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
@@ -41,7 +43,7 @@ func (m SourceTxMap) Add(q *TxQueryResult) error {
 	if q.IsBeef() {
 		tx, err := sdk.NewTransactionFromBEEFHex(*q.BeefHex)
 		if err != nil {
-			return spverrors.Wrapf(err, "failed to parse BEEF transaction")
+			return spverrors.Wrapf(errors.Join(err, txerrors.ErrInvalidBEEFHexInQueryResult), "failed to parse BEEF transaction")
 		}
 		m[q.SourceTXID] = SourceTx{Tx: tx, HadBeef: true}
 		return nil
@@ -50,7 +52,7 @@ func (m SourceTxMap) Add(q *TxQueryResult) error {
 	if q.IsRawTx() {
 		tx, err := sdk.NewTransactionFromHex(*q.RawHex)
 		if err != nil {
-			return spverrors.Wrapf(err, "failed to parse raw transaction")
+			return spverrors.Wrapf(errors.Join(err, txerrors.ErrInvalidRawHexInQueryResult), "failed to parse raw transaction")
 		}
 		m[q.SourceTXID] = SourceTx{Tx: tx, HadBeef: false}
 		return nil
@@ -113,7 +115,7 @@ func (s *SourceTransactionResolver) resolveRecursive(inputs []*sdk.TransactionIn
 		sourceTxID := input.SourceTXID.String()
 		val := s.sourceTxs.Value(sourceTxID)
 		if val.IsZero() {
-			continue
+			return txerrors.ErrInputSourceTxIDNotFound
 		}
 
 		input.SourceTransaction = val.Tx

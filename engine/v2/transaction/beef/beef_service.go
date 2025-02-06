@@ -41,8 +41,12 @@ func (s *Service) extractSourceTXIDs(tx *sdk.Transaction) ([]string, error) {
 		return nil, txerrors.ErrZeroInputCount
 	}
 
-	sourceTXIDs := make([]string, len(tx.Inputs))
+	sourceTXIDs := make([]string, 0, len(tx.Inputs))
 	for _, in := range tx.Inputs {
+		if in.SourceTXID == nil {
+			return nil, txerrors.ErrMissingInputSourceTxID
+		}
+
 		sourceTXIDs = append(sourceTXIDs, in.SourceTXID.String())
 	}
 	return sourceTXIDs, nil
@@ -56,12 +60,12 @@ func (s *Service) PrepareBEEF(ctx context.Context, tx *sdk.Transaction) (string,
 		return "", txerrors.ErrNilSubjectTx
 	}
 
-	txID := tx.TxID().String()
 	sourceTxIDs, err := s.extractSourceTXIDs(tx)
 	if err != nil {
-		return "", spverrors.Wrapf(err, "failed to extract source transaction IDs for transaction %s", txID)
+		return "", spverrors.Wrapf(err, "failed to extract source transaction IDs for transaction")
 	}
 
+	txID := tx.TxID().String()
 	txQueryResult, err := s.repository.QueryInputSources(ctx, sourceTxIDs...)
 	if err != nil {
 		return "", spverrors.Wrapf(err, "database query failed while retrieving input data for transaction %s", txID)

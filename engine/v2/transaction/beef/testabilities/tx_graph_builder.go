@@ -160,6 +160,7 @@ func (t *TxGraphBuilder) EnsureGraphIsValid() {
 		}
 
 		for i, input := range descriptor.tx.Inputs {
+			require.NotNil(t.t, input, "Tx node %s input %d should not be nil")
 			verified, err := spv.VerifyScripts(input.SourceTransaction)
 			require.NoErrorf(t.t, err, "Tx node %s failed to verify input at index %d", node, i)
 			require.Truef(t.t, verified, "Tx node %s script verification failed for input at index %d", node, i)

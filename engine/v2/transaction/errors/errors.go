@@ -88,8 +88,8 @@ var (
 	ErrInvalidTransactionInput = models.SPVError{Code: "error-subject-tx-script-verification", Message: "SPV script verification failed: nil transaction input or missing source transaction", StatusCode: 400}
 
 	// ErrTxQueryResultType is returned when the transaction query result type
-	// is neither BEEF nor RawTx type.
-	ErrTxQueryResultType = models.SPVError{Code: "error-subject-tx-db-query", Message: "transaction query result must be either BEEF or RawTx", StatusCode: 500}
+	// is neither BEEF hex nor raw hex type.
+	ErrTxQueryResultType = models.SPVError{Code: "error-subject-tx-db-query", Message: "transaction query result must be either BEEF hex or raw hex", StatusCode: 500}
 
 	// ErrNilSubjectTx is returned when a nil subject transaction is provided to the constructor
 	// of the source transaction resolver.
@@ -101,4 +101,18 @@ var (
 
 	// ErrNilTransactionInput is returned when a nil transaction input is provided.
 	ErrNilTransactionInput = models.SPVError{Code: "error-subject-tx-input", Message: "transaction input must be non-nil", StatusCode: 400}
+
+	// ErrInputSourceTxIDNotFound is returned when a subject tx input transaction id
+	// has been not found after mapping transactions database query.
+	ErrInputSourceTxIDNotFound = models.SPVError{Code: "error-subject-tx-id-not-found", Message: "transaction input ID was not found in the transaction query mapped results", StatusCode: 500}
+
+	// ErrMissingInputSourceTxID is returned when a subject transaction input
+	// is missing the source transaction ID field.
+	ErrMissingInputSourceTxID = models.SPVError{Code: "error_subject-tx-input-source-tx-missing", Message: "The subject transaction input is missing the source transaction ID.", StatusCode: 500}
+
+	// ErrInvalidBEEFHexInQueryResult is returned when the raw BEEF hex data retrieved from the transaction query result is invalid or cannot be parsed.
+	ErrInvalidBEEFHexInQueryResult = models.SPVError{Code: "error-source-txs-initialization", Message: "Invalid BEEF hex data in transaction query result", StatusCode: 500}
+
+	// ErrInvalidRawHexInQueryResult is returned when the raw transaction hex data retrieved from the query result is invalid or corrupted.
+	ErrInvalidRawHexInQueryResult = models.SPVError{Code: "error-source-txs-initialization", Message: "Invalid raw hex data in transaction query result", StatusCode: 500}
 )
