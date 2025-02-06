@@ -19,14 +19,14 @@ func Test_ClientService_AdminCreateContact_Success(t *testing.T) {
 		metadata       *engine.Metadata
 	}{
 		"Create contact without metadata": {
-			contactPaymail: fixtures.RecipientExternal.DefaultPaymail(),
-			creatorPaymail: fixtures.Sender.DefaultPaymail(),
+			contactPaymail: fixtures.RecipientExternal.DefaultPaymail().Address(),
+			creatorPaymail: fixtures.Sender.DefaultPaymail().Address(),
 			fullName:       "John Doe",
 			metadata:       nil,
 		},
 		"Create contact with metadata": {
-			contactPaymail: fixtures.RecipientExternal.DefaultPaymail(),
-			creatorPaymail: fixtures.Sender.DefaultPaymail(),
+			contactPaymail: fixtures.RecipientExternal.DefaultPaymail().Address(),
+			creatorPaymail: fixtures.Sender.DefaultPaymail().Address(),
 			fullName:       "John Doe",
 			metadata: &engine.Metadata{
 				"key1": "value1",
@@ -79,8 +79,8 @@ func Test_ClientService_AdminCreateContact_PKIRetrievalFail(t *testing.T) {
 
 		//when:
 		contact, err := service.AdminCreateContact(context.Background(),
-			fixtures.RecipientExternal.DefaultPaymail(),
-			fixtures.Sender.DefaultPaymail(),
+			fixtures.RecipientExternal.DefaultPaymail().String(),
+			fixtures.Sender.DefaultPaymail().String(),
 			"John Doe",
 			nil,
 		)
@@ -98,26 +98,26 @@ func Test_ClientService_AdminCreateContact_Fail(t *testing.T) {
 		expectedError  error
 	}{
 		"Should fail when creator paymail not found": {
-			contactPaymail: fixtures.RecipientExternal.DefaultPaymail(),
+			contactPaymail: fixtures.RecipientExternal.DefaultPaymail().Address(),
 			creatorPaymail: "not_exist@example.com",
 			fullName:       "John Doe",
 			expectedError:  spverrors.ErrCouldNotFindPaymail,
 		},
 		"Should fail when missing creator paymail": {
-			contactPaymail: fixtures.RecipientExternal.DefaultPaymail(),
+			contactPaymail: fixtures.RecipientExternal.DefaultPaymail().Address(),
 			creatorPaymail: "",
 			fullName:       "John Doe",
 			expectedError:  spverrors.ErrMissingContactCreatorPaymail,
 		},
 		"Should fail when missing contact full name": {
-			contactPaymail: fixtures.RecipientExternal.DefaultPaymail(),
-			creatorPaymail: fixtures.Sender.DefaultPaymail(),
+			contactPaymail: fixtures.RecipientExternal.DefaultPaymail().Address(),
+			creatorPaymail: fixtures.Sender.DefaultPaymail().Address(),
 			fullName:       "",
 			expectedError:  spverrors.ErrMissingContactFullName,
 		},
 		"Should fail when missing contact paymail": {
 			contactPaymail: "",
-			creatorPaymail: fixtures.Sender.DefaultPaymail(),
+			creatorPaymail: fixtures.Sender.DefaultPaymail().Address(),
 			fullName:       "John Doe",
 			expectedError:  spverrors.ErrMissingContactPaymailParam,
 		},
@@ -156,8 +156,8 @@ func Test_ClientService_AdminCreateContact_ContactAlreadyExists(t *testing.T) {
 
 		//and:
 		contact, err := service.AdminCreateContact(context.Background(),
-			fixtures.RecipientExternal.DefaultPaymail(),
-			fixtures.Sender.DefaultPaymail(),
+			fixtures.RecipientExternal.DefaultPaymail().Address(),
+			fixtures.Sender.DefaultPaymail().Address(),
 			"John Doe",
 			nil,
 		)
@@ -165,8 +165,8 @@ func Test_ClientService_AdminCreateContact_ContactAlreadyExists(t *testing.T) {
 
 		//when:
 		contact, err = service.AdminCreateContact(context.Background(),
-			fixtures.RecipientExternal.DefaultPaymail(),
-			fixtures.Sender.DefaultPaymail(),
+			fixtures.RecipientExternal.DefaultPaymail().Address(),
+			fixtures.Sender.DefaultPaymail().Address(),
 			"John Doe",
 			nil,
 		)

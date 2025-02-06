@@ -108,7 +108,7 @@ func TestCreateUserWithPaymail(t *testing.T) {
 	// and:
 	userCandidate := fixtures.User{
 		PrivKey: "xprv9s21ZrQH143K31pvNoYNcRZjtdJXnNVEc5NmBbgJmEg27YWbZVL7jTLQhPELqAR7tcJTnF9AJLwVN5w3ABZvrfeDLm4vnBDw76bkx8a2NxK",
-		Paymails: []string{
+		Paymails: []fixtures.Paymail{
 			"test_user@" + fixtures.PaymailDomain,
 		},
 	}
@@ -158,7 +158,7 @@ func TestCreateUserWithPaymail(t *testing.T) {
 				"publicKey":  publicKey,
 				"paymail":    userCandidate.DefaultPaymail(),
 				"publicName": publicName,
-				"alias":      getAliasFromPaymail(t, userCandidate.DefaultPaymail()),
+				"alias":      userCandidate.DefaultPaymail().Alias(),
 			})
 
 		// update:
@@ -197,7 +197,7 @@ func TestCreateUserWithPaymail(t *testing.T) {
 				"publicKey":  publicKey,
 				"paymail":    userCandidate.DefaultPaymail(),
 				"publicName": publicName,
-				"alias":      getAliasFromPaymail(t, userCandidate.DefaultPaymail()),
+				"alias":      userCandidate.DefaultPaymail().Alias(),
 			})
 	})
 }
@@ -213,7 +213,7 @@ func TestCreateUserWithAliasAndDomain(t *testing.T) {
 	// and:
 	userCandidate := fixtures.User{
 		PrivKey: "xprv9s21ZrQH143K31pvNoYNcRZjtdJXnNVEc5NmBbgJmEg27YWbZVL7jTLQhPELqAR7tcJTnF9AJLwVN5w3ABZvrfeDLm4vnBDw76bkx8a2NxK",
-		Paymails: []string{
+		Paymails: []fixtures.Paymail{
 			"test_user@" + fixtures.PaymailDomain,
 		},
 	}
@@ -234,7 +234,7 @@ func TestCreateUserWithAliasAndDomain(t *testing.T) {
 			SetBody(map[string]any{
 				"publicKey": publicKey,
 				"paymail": map[string]any{
-					"alias":      getAliasFromPaymail(t, userCandidate.DefaultPaymail()),
+					"alias":      userCandidate.DefaultPaymail().Alias(),
 					"domain":     fixtures.PaymailDomain,
 					"publicName": publicName,
 					"avatar":     "",
@@ -264,7 +264,7 @@ func TestCreateUserWithAliasAndDomain(t *testing.T) {
 				"publicKey":  publicKey,
 				"paymail":    userCandidate.DefaultPaymail(),
 				"publicName": publicName,
-				"alias":      getAliasFromPaymail(t, userCandidate.DefaultPaymail()),
+				"alias":      userCandidate.DefaultPaymail().Alias(),
 			})
 
 		// update:
@@ -303,7 +303,7 @@ func TestCreateUserWithAliasAndDomain(t *testing.T) {
 				"publicKey":  publicKey,
 				"paymail":    userCandidate.DefaultPaymail(),
 				"publicName": publicName,
-				"alias":      getAliasFromPaymail(t, userCandidate.DefaultPaymail()),
+				"alias":      userCandidate.DefaultPaymail().Alias(),
 			})
 	})
 }

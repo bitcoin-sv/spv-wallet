@@ -2,7 +2,6 @@ package admin_test
 
 import (
 	"net/http"
-	"strings"
 	"testing"
 
 	"github.com/bitcoin-sv/spv-wallet/actions/testabilities"
@@ -17,8 +16,7 @@ func TestGetPaymails(t *testing.T) {
 	defer cleanup()
 
 	// and
-	userPaymail := strings.ToLower(fixtures.Sender.DefaultPaymail())
-	userAlias := getAliasFromPaymail(t, userPaymail)
+	userPaymail := fixtures.Sender.DefaultPaymail()
 
 	var testState struct {
 		defaultPaymailID string
@@ -30,7 +28,7 @@ func TestGetPaymails(t *testing.T) {
 		client := given.HttpClient().ForAdmin()
 
 		// when:
-		res, _ := client.R().Get("/api/v1/admin/paymails?alias=" + userAlias)
+		res, _ := client.R().Get("/api/v1/admin/paymails?alias=" + userPaymail.Alias())
 
 		// then:
 		then.Response(res).
@@ -59,8 +57,8 @@ func TestGetPaymails(t *testing.T) {
 			 }
 			}`, map[string]any{
 				"Address":    userPaymail,
-				"PublicName": userPaymail,
-				"Alias":      userAlias,
+				"PublicName": userPaymail.PublicName(),
+				"Alias":      userPaymail.Alias(),
 				"XPubID":     fixtures.Sender.XPubID(),
 				"Domain":     fixtures.PaymailDomain,
 			})
@@ -95,8 +93,8 @@ func TestGetPaymails(t *testing.T) {
 				  "xpubId": "{{.XPubID}}"
 				}`, map[string]any{
 				"Address":    userPaymail,
-				"PublicName": userPaymail,
-				"Alias":      userAlias,
+				"PublicName": userPaymail.PublicName(),
+				"Alias":      userPaymail.Alias(),
 				"XPubID":     fixtures.Sender.XPubID(),
 				"Domain":     fixtures.PaymailDomain,
 			})
@@ -122,8 +120,7 @@ func TestPaymailLivecycle(t *testing.T) {
 	defer cleanup()
 
 	// and:
-	newAlias := "newalias"
-	newPaymail := newAlias + "@" + fixtures.PaymailDomain
+	newPaymail := fixtures.Paymail("newalias" + "@" + fixtures.PaymailDomain)
 
 	var testState struct {
 		newPaymailID          string
@@ -140,7 +137,7 @@ func TestPaymailLivecycle(t *testing.T) {
 			SetBody(map[string]any{
 				"key":        fixtures.Sender.XPub(),
 				"address":    newPaymail,
-				"publicName": newPaymail,
+				"publicName": newPaymail.PublicName(),
 				"avatar":     "",
 			}).
 			Post("/api/v1/admin/paymails")
@@ -162,8 +159,8 @@ func TestPaymailLivecycle(t *testing.T) {
 				"xpubId": "{{.XPubID}}"
 			}`, map[string]any{
 				"Address":    newPaymail,
-				"PublicName": newPaymail,
-				"Alias":      newAlias,
+				"PublicName": newPaymail.PublicName(),
+				"Alias":      newPaymail.Alias(),
 				"XPubID":     fixtures.Sender.XPubID(),
 				"Domain":     fixtures.PaymailDomain,
 			})
@@ -219,13 +216,4 @@ func TestPaymailLivecycle(t *testing.T) {
 		// then:
 		then.Response(res).IsUnauthorizedForUser()
 	})
-}
-
-func getAliasFromPaymail(t testing.TB, paymail string) (alias string) {
-	parts := strings.SplitN(paymail, "@", 2)
-	if len(parts) == 0 {
-		t.Fatalf("Failed to parse paymail: %s", paymail)
-	}
-	alias = strings.ToLower(parts[0])
-	return
 }
