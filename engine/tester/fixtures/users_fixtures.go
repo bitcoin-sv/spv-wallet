@@ -1,6 +1,9 @@
 package fixtures
 
 import (
+	"strings"
+
+	"github.com/bitcoin-sv/go-paymail"
 	bip32 "github.com/bitcoin-sv/go-sdk/compat/bip32"
 	ec "github.com/bitcoin-sv/go-sdk/primitives/ec"
 	"github.com/bitcoin-sv/go-sdk/script"
@@ -13,7 +16,7 @@ import (
 
 // User is a fixture that is representing a user of the system.
 type User struct {
-	Paymails []string
+	Paymails []Paymail
 	PrivKey  string
 }
 
@@ -32,9 +35,9 @@ const (
 var (
 	// UserWithMorePaymails is a user with more than one paymail.
 	UserWithMorePaymails = User{
-		Paymails: []string{
+		Paymails: []Paymail{
 			"tester@" + PaymailDomain,
-			"secondPm@" + PaymailDomain,
+			"second_pm@" + PaymailDomain,
 		},
 		PrivKey: "xprv9s21ZrQH143K29ipDWk4vbx6cyyfpbBSj84GrmQPpaKu9Nct6KBhxmSPaGHxoAPisgd3sXKdb2kqKpgLEeAoS54CQGZC8vjoQ6tmJceATxZ",
 	}
@@ -46,7 +49,7 @@ var (
 
 	// Sender is a user that is a sender in the tests.
 	Sender = User{
-		Paymails: []string{
+		Paymails: []Paymail{
 			"sender@" + PaymailDomain,
 		},
 		PrivKey: "xprv9s21ZrQH143K2stnKknNEck8NZ9buundyjYCGFGS31bwApaGp7oviHYVY9YAogmgvFC8EdsbsDReydnhDXrRrSXoNoMZczV9t4oPQREAmQ3",
@@ -54,7 +57,7 @@ var (
 
 	// RecipientInternal is a user that is a recipient from "our" server in the tests.
 	RecipientInternal = User{
-		Paymails: []string{
+		Paymails: []Paymail{
 			"recipient@" + PaymailDomain,
 		},
 		PrivKey: "xprv9s21ZrQH143K3c3jkTBGijY5UsiHUdd3fSzRFD21c7cFduWX4m9nPrcuVrjQ76K234TFWgKF3f97HXggriPipBdhuof6bSvLGE74zCCgJds",
@@ -62,7 +65,7 @@ var (
 
 	// RecipientExternal is a user that is a recipient from external server in the tests.
 	RecipientExternal = User{
-		Paymails: []string{
+		Paymails: []Paymail{
 			"recipient@" + PaymailDomainExternal,
 		},
 		PrivKey: "",
@@ -70,7 +73,7 @@ var (
 
 	// SenderExternal is a user that is a sender from external server in the tests.
 	SenderExternal = User{
-		Paymails: []string{
+		Paymails: []Paymail{
 			"sender@" + PaymailDomainExternal,
 		},
 		PrivKey: "",
@@ -78,15 +81,45 @@ var (
 
 	// ExternalFaucet is a user that is a faucet from external server in the tests.
 	ExternalFaucet = User{
-		Paymails: []string{
+		Paymails: []Paymail{
 			"faucet@" + PaymailDomainExternal,
 		},
 		PrivKey: "xprv9s21ZrQH143K3N6qVJQAu4EP51qMcyrKYJLkLgmYXgz58xmVxVLSsbx2DfJUtjcnXK8NdvkHMKfmmg5AJT2nqqRWUrjSHX29qEJwBgBPkJQ",
 	}
 )
 
+// Paymail wraps a string paymail address to provide additional common methods.
+type Paymail string
+
+// String is necessary to fulfill the fmt.Stringer interface.
+func (p Paymail) String() string {
+	return string(p)
+}
+
+// Address returns the address of this paymail.
+func (p Paymail) Address() string {
+	return string(p)
+}
+
+// PublicName returns the public name of this paymail (for testing purposes, it's just the alias in uppercase).
+func (p Paymail) PublicName() string {
+	return strings.ToUpper(p.Alias())
+}
+
+// Domain returns the domain of this paymail.
+func (p Paymail) Domain() string {
+	_, domain, _ := paymail.SanitizePaymail(p.String())
+	return domain
+}
+
+// Alias returns the alias of this paymail.
+func (p Paymail) Alias() string {
+	alias, _, _ := paymail.SanitizePaymail(p.String())
+	return alias
+}
+
 // DefaultPaymail returns the default paymail of this user.
-func (f *User) DefaultPaymail() string {
+func (f *User) DefaultPaymail() Paymail {
 	if len(f.Paymails) == 0 {
 		return ""
 	}

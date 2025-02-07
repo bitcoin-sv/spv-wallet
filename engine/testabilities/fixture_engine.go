@@ -5,7 +5,6 @@ import (
 	"errors"
 	"testing"
 
-	"github.com/bitcoin-sv/go-paymail"
 	"github.com/bitcoin-sv/spv-wallet/config"
 	"github.com/bitcoin-sv/spv-wallet/engine"
 	"github.com/bitcoin-sv/spv-wallet/engine/datastore"
@@ -180,8 +179,8 @@ func (f *engineFixture) initialiseFixtures() {
 			require.NoError(f.t, err)
 		}
 
-		for _, address := range user.Paymails {
-			_, err := f.engine.NewPaymailAddress(context.Background(), user.XPub(), address, address, "", opts...)
+		for _, pm := range user.Paymails {
+			_, err := f.engine.NewPaymailAddress(context.Background(), user.XPub(), pm.Address(), pm.PublicName(), "", opts...)
 			if !errors.Is(err, spverrors.ErrPaymailAlreadyExists) {
 				require.NoError(f.t, err)
 			}
@@ -193,13 +192,12 @@ func (f *engineFixture) initialiseFixtures() {
 				PublicKey: pubKeyHex,
 			})
 			require.NoError(f.t, err)
-			for _, address := range user.Paymails {
-				alias, domain, _ := paymail.SanitizePaymail(address)
+			for _, pm := range user.Paymails {
 				_, err = f.engine.PaymailsService().Create(context.Background(), &paymailsmodels.NewPaymail{
-					Alias:  alias,
-					Domain: domain,
+					Alias:  pm.Alias(),
+					Domain: pm.Domain(),
 
-					PublicName: address,
+					PublicName: pm.PublicName(),
 					Avatar:     "",
 					UserID:     createdUser.ID,
 				})
