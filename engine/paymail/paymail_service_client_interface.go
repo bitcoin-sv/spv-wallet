@@ -2,6 +2,7 @@ package paymail
 
 import (
 	"context"
+	"github.com/bitcoin-sv/spv-wallet/engine/v2/transaction/txmodels"
 
 	"github.com/bitcoin-sv/go-paymail"
 	"github.com/bitcoin-sv/spv-wallet/models/bsv"
@@ -16,4 +17,5 @@ type ServiceClient interface {
 	StartP2PTransaction(alias, domain, p2pDestinationURL string, satoshis uint64) (*paymail.PaymentDestinationPayload, error)
 	GetPkiForPaymail(ctx context.Context, sPaymail *paymail.SanitisedPaymail) (*paymail.PKIResponse, error)
 	AddContactRequest(ctx context.Context, receiverPaymail *paymail.SanitisedPaymail, contactData *paymail.PikeContactRequestPayload) (*paymail.PikeContactRequestResponse, error)
+	Notify(ctx context.Context, address string, p2pMetadata *paymail.P2PMetaData, reference string, txEncoder txmodels.TxEncoder) error
 }

@@ -2,6 +2,7 @@ package record
 
 import (
 	"context"
+	"github.com/bitcoin-sv/go-paymail"
 	"iter"
 
 	trx "github.com/bitcoin-sv/go-sdk/transaction"
@@ -29,4 +30,8 @@ type OperationsRepo interface {
 // Broadcaster is an interface for broadcasting transactions.
 type Broadcaster interface {
 	Broadcast(ctx context.Context, tx *trx.Transaction) (*chainmodels.TXInfo, error)
+}
+
+type PaymailNotifier interface {
+	Notify(ctx context.Context, address string, p2pMetadata *paymail.P2PMetaData, reference string, txEncoder txmodels.TxEncoder) error
 }

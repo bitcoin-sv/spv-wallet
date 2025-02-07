@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"github.com/bitcoin-sv/go-paymail"
+	"github.com/jarcoal/httpmock"
 	"github.com/stretchr/testify/require"
 	"testing"
 
@@ -31,9 +32,11 @@ func TestExternalOutgoingTransaction(t *testing.T) {
 
 	// and:
 	givenPaymail := givenForAllTests.Paymail()
-	givenPaymail.ExternalPaymailHost().WillRespondWithP2PDestinationsWithSats(1000)
-
+	externalPaymailHost := givenPaymail.ExternalPaymailHost()
 	paymailClientService := givenPaymail.NewPaymailClientService()
+
+	// and:
+	externalPaymailHost.WillRespondWithP2PDestinationsWithSats(1000)
 	destination, err := paymailClientService.GetP2PDestinations(
 		context.Background(),
 		&paymail.SanitisedPaymail{
@@ -54,6 +57,9 @@ func TestExternalOutgoingTransaction(t *testing.T) {
 		WithRecipient(recipient).
 		WithInputFromUTXO(sourceTxSpec.TX(), 0).
 		WithOutputScript(1000, lockingScript)
+
+	// and:
+	externalPaymailHost.WillRespondWithP2PWithBEEFCapabilities()
 
 	t.Run("Record new tx outline by sender", func(t *testing.T) {
 		// given:
@@ -104,6 +110,10 @@ func TestExternalOutgoingTransaction(t *testing.T) {
 		// and:
 		thenEng := then.Engine(given.Engine())
 		thenEng.User(sender).Balance().IsZero()
+
+		// and:
+		callCount := httpmock.GetCallCountInfo()
+		print(callCount)
 	})
 
 	t.Run("Check sender's operations", func(t *testing.T) {

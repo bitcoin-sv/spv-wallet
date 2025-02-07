@@ -1,16 +1,41 @@
 package record
 
 import (
-	trx "github.com/bitcoin-sv/go-sdk/transaction"
+	"github.com/bitcoin-sv/spv-wallet/conv"
 	"github.com/bitcoin-sv/spv-wallet/engine/v2/transaction"
 	txerrors "github.com/bitcoin-sv/spv-wallet/engine/v2/transaction/errors"
 	"github.com/bitcoin-sv/spv-wallet/models/transaction/bucket"
 )
 
-func processPaymailOutputs(tx *trx.Transaction, userID string, annotations *transaction.Annotations) (*transaction.PaymailAnnotation, error) {
-	var paymailAnnotation *transaction.PaymailAnnotation
+type paymailInfo struct {
+	transaction.PaymailAnnotation
+	vouts map[uint32]struct{}
+}
 
-	for _, annotation := range annotations.Outputs {
+func newPaymailInfo(vout uint32, annotation *transaction.PaymailAnnotation) *paymailInfo {
+	return &paymailInfo{
+		PaymailAnnotation: *annotation,
+		vouts:             map[uint32]struct{}{vout: {}},
+	}
+}
+
+func (pi *paymailInfo) equalsToAnnotation(annotation *transaction.PaymailAnnotation) bool {
+	return pi.PaymailAnnotation == *annotation
+}
+
+func (pi *paymailInfo) addVOut(vout uint32) {
+	pi.vouts[vout] = struct{}{}
+}
+
+func (pi *paymailInfo) hasVOut(vout uint32) bool {
+	_, ok := pi.vouts[vout]
+	return ok
+}
+
+func processPaymailOutputs(annotations transaction.Annotations) (*paymailInfo, error) {
+	var info *paymailInfo
+
+	for vout, annotation := range annotations.Outputs {
 		if annotation.Bucket != bucket.BSV {
 			continue
 		}
@@ -18,14 +43,23 @@ func processPaymailOutputs(tx *trx.Transaction, userID string, annotations *tran
 			continue
 		}
 
-		if paymailAnnotation != nil && *paymailAnnotation != *annotation.Paymail {
+		if info != nil && !info.equalsToAnnotation(annotation.Paymail) {
 			return nil, txerrors.ErrMultiPaymailRecipientsNotSupported
 		}
 
-		paymailAnnotation = annotation.Paymail
+		vout32, err := conv.IntToUint32(vout)
+		if err != nil {
+			return nil, txerrors.ErrAnnotationIndexConversion.Wrap(err)
+		}
+
+		if info == nil {
+			info = newPaymailInfo(vout32, annotation.Paymail)
+		} else {
+			info.addVOut(vout32)
+		}
 	}
 
-	// TODO: Get default or check sender paymail
+	// TODO: Is "sender" field required?
 
-	return paymailAnnotation, nil
+	return info, nil
 }

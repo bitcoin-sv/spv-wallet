@@ -33,7 +33,7 @@ func (domain paymailDomainName) P2PTransaction() string {
 
 // BEEFTransaction returns the BEEF transaction URL for the paymail domain
 func (domain paymailDomainName) BEEFTransaction() string {
-	return domain.template("receive-beef")
+	return domain.template("beef")
 }
 
 // P2PPaymentDestination returns the P2P payment destination URL for the paymail domain

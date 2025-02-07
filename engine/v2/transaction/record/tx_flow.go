@@ -2,6 +2,8 @@ package record
 
 import (
 	"context"
+	"github.com/bitcoin-sv/go-paymail"
+	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"iter"
 	"maps"
 
@@ -163,4 +165,20 @@ func (f *txFlow) broadcast() error {
 
 func (f *txFlow) save() error {
 	return f.service.SaveOperations(f.ctx, maps.Values(f.operations))
+}
+
+func (f *txFlow) notifyPaymailExternalRecipient(pmInfo paymailInfo) error {
+	err := f.service.paymailNotifier.Notify(
+		f.ctx,
+		pmInfo.Receiver,
+		&paymail.P2PMetaData{
+			Sender: pmInfo.Sender,
+		},
+		pmInfo.Reference,
+		newTxEncoder(f.tx),
+	)
+	if err != nil {
+		return spverrors.Wrapf(err, "failed to notify paymail external recipient")
+	}
+	return nil
 }
