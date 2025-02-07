@@ -5,10 +5,10 @@ import (
 
 	"github.com/bitcoin-sv/spv-wallet/config"
 	chainmodels "github.com/bitcoin-sv/spv-wallet/engine/chain/models"
+	testpaymail "github.com/bitcoin-sv/spv-wallet/engine/paymail/testabilities"
 	testengine "github.com/bitcoin-sv/spv-wallet/engine/testabilities"
 	"github.com/bitcoin-sv/spv-wallet/engine/tester"
 	"github.com/bitcoin-sv/spv-wallet/engine/tester/fixtures"
-	"github.com/bitcoin-sv/spv-wallet/engine/tester/paymailmock"
 	"github.com/bitcoin-sv/spv-wallet/server"
 	"github.com/go-resty/resty/v2"
 	"github.com/rs/zerolog"
@@ -33,7 +33,7 @@ type SPVWalletApplicationFixture interface {
 	// ARC creates a new test fixture for ARC
 	ARC() ARCFixture
 
-	PaymailClient() *paymailmock.PaymailClientMock
+	Paymail() testpaymail.PaymailClientFixture
 
 	Faucet(user fixtures.User) testengine.FaucetFixture
 
@@ -143,8 +143,8 @@ func (f *appFixture) ARC() ARCFixture {
 	return f.engineFixture.ARC()
 }
 
-func (f *appFixture) PaymailClient() *paymailmock.PaymailClientMock {
-	return f.engineFixture.PaymailClient()
+func (f *appFixture) Paymail() testpaymail.PaymailClientFixture {
+	return testpaymail.Given(f.t, fixtures.PaymailDomainExternal)
 }
 
 func (f *appFixture) Faucet(user fixtures.User) testengine.FaucetFixture {
