@@ -36,8 +36,6 @@ type SPVWalletApplicationFixture interface {
 	Paymail() testpaymail.PaymailClientFixture
 
 	Faucet(user fixtures.User) testengine.FaucetFixture
-
-	Engine() *testengine.EngineWithConfig
 }
 
 type BlockHeadersServiceFixture interface {
@@ -144,13 +142,9 @@ func (f *appFixture) ARC() ARCFixture {
 }
 
 func (f *appFixture) Paymail() testpaymail.PaymailClientFixture {
-	return testpaymail.Given(f.t, fixtures.PaymailDomainExternal)
+	return testpaymail.GivenWithMockClient(f.t, f.engineFixture.PaymailClient())
 }
 
 func (f *appFixture) Faucet(user fixtures.User) testengine.FaucetFixture {
 	return f.engineFixture.Faucet(user)
-}
-
-func (f *appFixture) Engine() *testengine.EngineWithConfig {
-	return &f.engineWithConfig
 }

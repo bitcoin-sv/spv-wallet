@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 	"github.com/bitcoin-sv/go-paymail"
-	"github.com/jarcoal/httpmock"
 	"github.com/stretchr/testify/require"
 	"testing"
 
@@ -108,12 +107,25 @@ func TestExternalOutgoingTransaction(t *testing.T) {
 			})
 
 		// and:
-		thenEng := then.Engine(given.Engine())
-		thenEng.User(sender).Balance().IsZero()
+		then.User(sender).Balance().IsZero()
 
 		// and:
-		callCount := httpmock.GetCallCountInfo()
-		print(callCount)
+		then.PaymailClient().
+			ExternalPaymailHost().
+			Called("beef").
+			WithRequestJSONMatching(`{
+				"beef": "{{ .beef }}",
+				"decodedBeef": null,
+				"hex": "",
+				"metadata": {
+					"sender": "{{ .sender }}"
+				},
+				"reference": "{{ .reference }}"
+			}`, map[string]any{
+				"beef":      txSpec.BEEF(),
+				"sender":    sender.DefaultPaymail(),
+				"reference": destination.Reference,
+			})
 	})
 
 	t.Run("Check sender's operations", func(t *testing.T) {

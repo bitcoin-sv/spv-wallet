@@ -3,6 +3,7 @@ package testabilities
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/bitcoin-sv/spv-wallet/engine/tester/fixtures"
 	"mime"
 	"net/http"
 	"testing"
@@ -17,7 +18,8 @@ import (
 
 type SPVWalletApplicationAssertions interface {
 	Response(response *resty.Response) SPVWalletResponseAssertions
-	Engine(engine *testengine.EngineWithConfig) testengine.EngineAssertions
+	User(user fixtures.User) testengine.UserAssertions
+	PaymailClient() testengine.PaymailClientAssertions
 }
 
 type SPVWalletResponseAssertions interface {
@@ -39,12 +41,17 @@ type JsonValueGetter interface {
 	GetString(xpath string) string
 }
 
-func Then(t testing.TB) SPVWalletApplicationAssertions {
-	return &appAssertions{t: t}
+func Then(t testing.TB, app SPVWalletApplicationFixture) SPVWalletApplicationAssertions {
+	fixture := app.(*appFixture)
+	return &appAssertions{
+		t:                t,
+		engineAssertions: testengine.Then(t, fixture.engineFixture),
+	}
 }
 
 type appAssertions struct {
-	t testing.TB
+	t                testing.TB
+	engineAssertions testengine.EngineAssertions
 }
 
 func (a *appAssertions) Response(response *resty.Response) SPVWalletResponseAssertions {
@@ -56,8 +63,12 @@ func (a *appAssertions) Response(response *resty.Response) SPVWalletResponseAsse
 	}
 }
 
-func (a *appAssertions) Engine(engine *testengine.EngineWithConfig) testengine.EngineAssertions {
-	return testengine.Then(a.t, engine)
+func (a *appAssertions) User(user fixtures.User) testengine.UserAssertions {
+	return a.engineAssertions.User(user)
+}
+
+func (a *appAssertions) PaymailClient() testengine.PaymailClientAssertions {
+	return a.engineAssertions.PaymailClient()
 }
 
 type responseAssertions struct {

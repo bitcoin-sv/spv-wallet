@@ -123,9 +123,8 @@ func TestInternalOutgoingTransaction(t *testing.T) {
 			})
 
 		// and:
-		thenEng := then.Engine(given.Engine())
-		thenEng.User(sender).Balance().IsZero()
-		thenEng.User(recipient).Balance().IsEqualTo(1000)
+		then.User(sender).Balance().IsZero()
+		then.User(recipient).Balance().IsEqualTo(1000)
 
 		// update:
 		testState.txID = txSpec.ID()

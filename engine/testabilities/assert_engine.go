@@ -2,6 +2,9 @@ package testabilities
 
 import (
 	"context"
+	"github.com/bitcoin-sv/spv-wallet/engine"
+	"github.com/bitcoin-sv/spv-wallet/engine/tester/jsonrequire"
+	"github.com/bitcoin-sv/spv-wallet/engine/tester/paymailmock"
 	"testing"
 
 	"github.com/bitcoin-sv/spv-wallet/engine/tester/fixtures"
@@ -11,6 +14,7 @@ import (
 
 type EngineAssertions interface {
 	User(fixtures.User) UserAssertions
+	PaymailClient() PaymailClientAssertions
 }
 
 type UserAssertions interface {
@@ -23,31 +27,48 @@ type BalanceAssertions interface {
 	IsZero()
 }
 
-type engineAssertions struct {
-	engWithCfg *EngineWithConfig
-	t          testing.TB
+type PaymailClientAssertions interface {
+	ExternalPaymailHost() PaymailExternalAssertions
 }
 
-func Then(t testing.TB, engWithCfg *EngineWithConfig) EngineAssertions {
+type PaymailExternalAssertions interface {
+	Called(urlRegex string) PaymailCapabilityCallAssertions
+}
+
+type PaymailCapabilityCallAssertions interface {
+	WithRequestJSONMatching(expectedTemplateFormat string, params map[string]any)
+}
+
+type engineAssertions struct {
+	eng         engine.ClientInterface
+	paymailMock *paymailmock.PaymailClientMock
+	t           testing.TB
+	require     *require.Assertions
+}
+
+func Then(t testing.TB, engFixture EngineFixture) EngineAssertions {
+	fixture := engFixture.(*engineFixture)
 	return &engineAssertions{
-		engWithCfg: engWithCfg,
-		t:          t,
+		eng:         fixture.engine,
+		paymailMock: fixture.paymailClient,
+		t:           t,
+		require:     require.New(t),
 	}
 }
 
 type userAssertions struct {
-	engWithCfg *EngineWithConfig
-	t          testing.TB
-	user       fixtures.User
-	require    *require.Assertions
+	eng     engine.ClientInterface
+	t       testing.TB
+	user    fixtures.User
+	require *require.Assertions
 }
 
 func (e *engineAssertions) User(user fixtures.User) UserAssertions {
 	return &userAssertions{
-		engWithCfg: e.engWithCfg,
-		t:          e.t,
-		user:       user,
-		require:    require.New(e.t),
+		eng:     e.eng,
+		t:       e.t,
+		user:    user,
+		require: e.require,
 	}
 }
 
@@ -57,7 +78,7 @@ func (u *userAssertions) Balance() BalanceAssertions {
 
 func (u *userAssertions) balance() bsv.Satoshis {
 	u.t.Helper()
-	actual, err := u.engWithCfg.Engine.UsersService().GetBalance(context.Background(), u.user.ID())
+	actual, err := u.eng.UsersService().GetBalance(context.Background(), u.user.ID())
 	u.require.NoError(err)
 	return actual
 }
@@ -78,4 +99,40 @@ func (u *userAssertions) IsZero() {
 	u.t.Helper()
 	actual := u.balance()
 	require.Zero(u.t, actual)
+}
+
+func (e *engineAssertions) PaymailClient() PaymailClientAssertions {
+	return e
+}
+
+func (e *engineAssertions) ExternalPaymailHost() PaymailExternalAssertions {
+	return &externalClientAssertions{
+		mockPaymail: e.paymailMock,
+		t:           e.t,
+		require:     e.require,
+	}
+}
+
+type externalClientAssertions struct {
+	t           testing.TB
+	require     *require.Assertions
+	mockPaymail *paymailmock.PaymailClientMock
+}
+
+func (e *externalClientAssertions) Called(urlRegex string) PaymailCapabilityCallAssertions {
+	details := e.mockPaymail.GetCallByRegex(urlRegex)
+	e.require.NotNil(details, "Expected call to %s", urlRegex)
+	return &paymailCapabilityCallAssertions{
+		t:           e.t,
+		callDetails: details,
+	}
+}
+
+type paymailCapabilityCallAssertions struct {
+	t           testing.TB
+	callDetails *paymailmock.CallDetails
+}
+
+func (p *paymailCapabilityCallAssertions) WithRequestJSONMatching(expectedTemplateFormat string, params map[string]any) {
+	jsonrequire.Match(p.t, expectedTemplateFormat, params, string(p.callDetails.RequestBody))
 }

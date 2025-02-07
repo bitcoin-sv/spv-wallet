@@ -1,6 +1,7 @@
 package testabilities
 
 import (
+	"github.com/jarcoal/httpmock"
 	"testing"
 
 	"github.com/bitcoin-sv/go-paymail"
@@ -41,7 +42,15 @@ type paymailServiceClientAbility struct {
 func Given(t testing.TB, domains ...string) (given PaymailClientFixture) {
 	ability := &paymailServiceClientAbility{
 		t:                 t.(*testing.T),
-		PaymailClientMock: paymailmock.MockClient(fixtures.PaymailDomainExternal, domains...),
+		PaymailClientMock: paymailmock.MockClient(httpmock.NewMockTransport(), fixtures.PaymailDomainExternal, domains...),
+	}
+	return ability
+}
+
+func GivenWithMockClient(t testing.TB, mockClient *paymailmock.PaymailClientMock) (given PaymailClientFixture) {
+	ability := &paymailServiceClientAbility{
+		t:                 t.(*testing.T),
+		PaymailClientMock: mockClient,
 	}
 	return ability
 }
