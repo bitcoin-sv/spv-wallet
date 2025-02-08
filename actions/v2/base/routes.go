@@ -1,11 +1,12 @@
 package base
 
 import (
+	"net/http"
+	
 	routes "github.com/bitcoin-sv/spv-wallet/server/handlers"
 	"github.com/gin-gonic/gin"
 	swaggerfiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
-	"net/http"
 )
 
 // RegisterRoutes creates the specific package routes
