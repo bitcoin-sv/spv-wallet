@@ -9,10 +9,8 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func get(c *gin.Context, _ *reqctx.AdminContext) {
-	userID := c.Param("id")
-
-	user, err := reqctx.Engine(c).UsersService().GetByID(c, userID)
+func (s *APIAdminUsers) GetApiV2AdminUsersId(c *gin.Context, id string) {
+	user, err := reqctx.Engine(c).UsersService().GetByID(c, id)
 	if err != nil {
 		spverrors.ErrorResponse(c, err, reqctx.Logger(c))
 		return

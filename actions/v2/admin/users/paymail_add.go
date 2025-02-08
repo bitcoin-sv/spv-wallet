@@ -14,7 +14,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func addPaymail(c *gin.Context, _ *reqctx.AdminContext) {
+func (s *APIAdminUsers) PostApiV2AdminUsersIdPaymails(c *gin.Context, id string) {
 	logger := reqctx.Logger(c)
 
 	var requestBody adminrequest.AddPaymail
@@ -22,8 +22,6 @@ func addPaymail(c *gin.Context, _ *reqctx.AdminContext) {
 		spverrors.ErrorResponse(c, spverrors.ErrCannotBindRequest.Wrap(err), logger)
 		return
 	}
-
-	userID := c.Param("id")
 
 	alias, domain, err := parsePaymail(&requestBody)
 	if err != nil {
@@ -36,7 +34,7 @@ func addPaymail(c *gin.Context, _ *reqctx.AdminContext) {
 		Domain:     domain,
 		PublicName: requestBody.PublicName,
 		Avatar:     requestBody.Avatar,
-		UserID:     userID,
+		UserID:     id,
 	}
 	createdPaymail, err := reqctx.Engine(c).PaymailsService().Create(c, newPaymail)
 	if err != nil {

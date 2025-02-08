@@ -5,3 +5,46 @@ info:
 
 components:
   schemas:
+    User:
+      type: object
+      properties:
+        id:
+          type: string
+          example: "1"
+        publicKey:
+          type: string
+          example: "76a914e069bd2e2fe3ea702c40d5e65b491b734c01686788ac"
+        paymails:
+          type: array
+          items:
+            $ref: "#/components/schemas/Paymail"
+        createdAt:
+          type: string
+          format: date-time
+          example: "2021-01-01T00:00:00Z"
+        updatedAt:
+          type: string
+          format: date-time
+          example: "2021-01-01T00:00:00Z"
+
+    Paymail:
+      type: object
+      properties:
+        id:
+          type: string
+          example: "1"
+        alias:
+          type: string
+          example: "test"
+        domain:
+          type: string
+          example: "spv-wallet.com"
+        paymail:
+          type: string
+          example: "test@spv-wallet.com"
+        publicName:
+          type: string
+          example: "Test"
+        Avatar:
+          type: string
+          example: "https://spv-wallet.com/avatar.png"

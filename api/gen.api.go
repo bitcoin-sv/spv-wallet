@@ -4,7 +4,11 @@
 package api
 
 import (
+	"fmt"
+	"net/http"
+
 	"github.com/gin-gonic/gin"
+	"github.com/oapi-codegen/runtime"
 )
 
 // ServerInterface represents all server handlers.
@@ -12,6 +16,15 @@ type ServerInterface interface {
 	// Get admin status
 	// (GET /api/v2/admin/status)
 	GetApiV2AdminStatus(c *gin.Context)
+	// Create user
+	// (POST /api/v2/admin/users)
+	PostApiV2AdminUsers(c *gin.Context)
+	// Get user by id
+	// (GET /api/v2/admin/users/{id})
+	GetApiV2AdminUsersId(c *gin.Context, id string)
+	// Add paymails to user
+	// (POST /api/v2/admin/users/{id}/paymails)
+	PostApiV2AdminUsersIdPaymails(c *gin.Context, id string)
 }
 
 // ServerInterfaceWrapper converts contexts to parameters.
@@ -36,6 +49,73 @@ func (siw *ServerInterfaceWrapper) GetApiV2AdminStatus(c *gin.Context) {
 	}
 
 	siw.Handler.GetApiV2AdminStatus(c)
+}
+
+// PostApiV2AdminUsers operation middleware
+func (siw *ServerInterfaceWrapper) PostApiV2AdminUsers(c *gin.Context) {
+
+	c.Set(XPubAuthScopes, []string{"admin"})
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		middleware(c)
+		if c.IsAborted() {
+			return
+		}
+	}
+
+	siw.Handler.PostApiV2AdminUsers(c)
+}
+
+// GetApiV2AdminUsersId operation middleware
+func (siw *ServerInterfaceWrapper) GetApiV2AdminUsersId(c *gin.Context) {
+
+	var err error
+
+	// ------------- Path parameter "id" -------------
+	var id string
+
+	err = runtime.BindStyledParameterWithOptions("simple", "id", c.Param("id"), &id, runtime.BindStyledParameterOptions{Explode: false, Required: true})
+	if err != nil {
+		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter id: %w", err), http.StatusBadRequest)
+		return
+	}
+
+	c.Set(XPubAuthScopes, []string{"admin"})
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		middleware(c)
+		if c.IsAborted() {
+			return
+		}
+	}
+
+	siw.Handler.GetApiV2AdminUsersId(c, id)
+}
+
+// PostApiV2AdminUsersIdPaymails operation middleware
+func (siw *ServerInterfaceWrapper) PostApiV2AdminUsersIdPaymails(c *gin.Context) {
+
+	var err error
+
+	// ------------- Path parameter "id" -------------
+	var id string
+
+	err = runtime.BindStyledParameterWithOptions("simple", "id", c.Param("id"), &id, runtime.BindStyledParameterOptions{Explode: false, Required: true})
+	if err != nil {
+		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter id: %w", err), http.StatusBadRequest)
+		return
+	}
+
+	c.Set(XPubAuthScopes, []string{"admin"})
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		middleware(c)
+		if c.IsAborted() {
+			return
+		}
+	}
+
+	siw.Handler.PostApiV2AdminUsersIdPaymails(c, id)
 }
 
 // GinServerOptions provides options for the Gin server.
@@ -66,4 +146,7 @@ func RegisterHandlersWithOptions(router gin.IRouter, si ServerInterface, options
 	}
 
 	router.GET(options.BaseURL+"/api/v2/admin/status", wrapper.GetApiV2AdminStatus)
+	router.POST(options.BaseURL+"/api/v2/admin/users", wrapper.PostApiV2AdminUsers)
+	router.GET(options.BaseURL+"/api/v2/admin/users/:id", wrapper.GetApiV2AdminUsersId)
+	router.POST(options.BaseURL+"/api/v2/admin/users/:id/paymails", wrapper.PostApiV2AdminUsersIdPaymails)
 }

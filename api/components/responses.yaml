@@ -4,4 +4,50 @@ info:
   version: ignored
 
 components:
-  schemas:
+  responses:
+    NotAuthorized:
+      description: Security requirements failed
+      content:
+        application/json:
+          schema:
+            $ref: "./errors.yaml#/components/schemas/ErrUnauthorized"
+
+    AdminUserBadRequest:
+      description: Cannot bind request
+      content:
+        application/json:
+          schema:
+            oneOf:
+              - $ref: "./errors.yaml#/components/schemas/ErrCannotBindRequest"
+              - $ref: "./errors.yaml#/components/schemas/ErrInvalidPubKey"
+              - $ref: "./errors.yaml#/components/schemas/ErrInvalidPaymail"
+              - $ref: "./errors.yaml#/components/schemas/ErrPaymailInconsistent"
+              - $ref: "./errors.yaml#/components/schemas/ErrInvalidDomain"
+
+    AdminCreateUserInternalServerError:
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: "./errors.yaml#/components/schemas/ErrCreatingUser"
+
+    AdminCreateUserSuccess:
+      description: User created
+      content:
+        application/json:
+          schema:
+            $ref: "./models.yaml#/components/schemas/User"
+
+    AdminGetUser:
+      description: User found
+      content:
+        application/json:
+         schema:
+           $ref: "./models.yaml#/components/schemas/User"
+
+    AdminGetUserInternalServerError:
+      description: User found
+      content:
+        application/json:
+         schema:
+           $ref: "./errors.yaml#/components/schemas/ErrGettingUser"

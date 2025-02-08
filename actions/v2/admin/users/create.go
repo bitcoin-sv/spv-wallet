@@ -14,7 +14,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func create(c *gin.Context, _ *reqctx.AdminContext) {
+func (s *APIAdminUsers) PostApiV2AdminUsers(c *gin.Context) {
 	logger := reqctx.Logger(c)
 
 	var requestBody adminrequest.CreateUser

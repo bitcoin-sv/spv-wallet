@@ -5,6 +5,7 @@ package api
 
 import (
 	"encoding/json"
+	"time"
 
 	"github.com/oapi-codegen/runtime"
 )
@@ -21,6 +22,48 @@ type ApiComponentsErrorsErrAdminAuthOnNonAdminEndpoint struct {
 
 // ApiComponentsErrorsErrAuthorization defines model for api_components_errors_ErrAuthorization.
 type ApiComponentsErrorsErrAuthorization struct {
+	Code    interface{} `json:"code"`
+	Message interface{} `json:"message"`
+}
+
+// ApiComponentsErrorsErrCannotBindRequest defines model for api_components_errors_ErrCannotBindRequest.
+type ApiComponentsErrorsErrCannotBindRequest struct {
+	Code    interface{} `json:"code"`
+	Message interface{} `json:"message"`
+}
+
+// ApiComponentsErrorsErrCreatingUser defines model for api_components_errors_ErrCreatingUser.
+type ApiComponentsErrorsErrCreatingUser struct {
+	Code    interface{} `json:"code"`
+	Message interface{} `json:"message"`
+}
+
+// ApiComponentsErrorsErrGettingUser defines model for api_components_errors_ErrGettingUser.
+type ApiComponentsErrorsErrGettingUser struct {
+	Code    interface{} `json:"code"`
+	Message interface{} `json:"message"`
+}
+
+// ApiComponentsErrorsErrInvalidDomain defines model for api_components_errors_ErrInvalidDomain.
+type ApiComponentsErrorsErrInvalidDomain struct {
+	Code    interface{} `json:"code"`
+	Message interface{} `json:"message"`
+}
+
+// ApiComponentsErrorsErrInvalidPaymail defines model for api_components_errors_ErrInvalidPaymail.
+type ApiComponentsErrorsErrInvalidPaymail struct {
+	Code    interface{} `json:"code"`
+	Message interface{} `json:"message"`
+}
+
+// ApiComponentsErrorsErrInvalidPubKey defines model for api_components_errors_ErrInvalidPubKey.
+type ApiComponentsErrorsErrInvalidPubKey struct {
+	Code    interface{} `json:"code"`
+	Message interface{} `json:"message"`
+}
+
+// ApiComponentsErrorsErrPaymailInconsistent defines model for api_components_errors_ErrPaymailInconsistent.
+type ApiComponentsErrorsErrPaymailInconsistent struct {
 	Code    interface{} `json:"code"`
 	Message interface{} `json:"message"`
 }
@@ -51,8 +94,65 @@ type ApiComponentsErrorsErrorSchema struct {
 	Message string `json:"message"`
 }
 
-// ApiComponentsErrorsNotAuthorized defines model for api_components_errors_NotAuthorized.
-type ApiComponentsErrorsNotAuthorized = ApiComponentsErrorsErrUnauthorized
+// ApiComponentsModelsPaymail defines model for api_components_models_Paymail.
+type ApiComponentsModelsPaymail struct {
+	Avatar     *string `json:"Avatar,omitempty"`
+	Alias      *string `json:"alias,omitempty"`
+	Domain     *string `json:"domain,omitempty"`
+	Id         *string `json:"id,omitempty"`
+	Paymail    *string `json:"paymail,omitempty"`
+	PublicName *string `json:"publicName,omitempty"`
+}
+
+// ApiComponentsModelsUser defines model for api_components_models_User.
+type ApiComponentsModelsUser struct {
+	CreatedAt *time.Time                    `json:"createdAt,omitempty"`
+	Id        *string                       `json:"id,omitempty"`
+	Paymails  *[]ApiComponentsModelsPaymail `json:"paymails,omitempty"`
+	PublicKey *string                       `json:"publicKey,omitempty"`
+	UpdatedAt *time.Time                    `json:"updatedAt,omitempty"`
+}
+
+// ApiComponentsRequestsAddPaymail defines model for api_components_requests_AddPaymail.
+type ApiComponentsRequestsAddPaymail struct {
+	Address    string `json:"address"`
+	Alias      string `json:"alias"`
+	AvatarURL  string `json:"avatarURL"`
+	Domain     string `json:"domain"`
+	PublicName string `json:"publicName"`
+}
+
+// ApiComponentsRequestsCreateUser defines model for api_components_requests_CreateUser.
+type ApiComponentsRequestsCreateUser struct {
+	Paymail   *ApiComponentsRequestsAddPaymail `json:"paymail,omitempty"`
+	PublicKey string                           `json:"publicKey"`
+}
+
+// ApiComponentsResponsesAdminCreateUserInternalServerError defines model for api_components_responses_AdminCreateUserInternalServerError.
+type ApiComponentsResponsesAdminCreateUserInternalServerError = ApiComponentsErrorsErrCreatingUser
+
+// ApiComponentsResponsesAdminCreateUserSuccess defines model for api_components_responses_AdminCreateUserSuccess.
+type ApiComponentsResponsesAdminCreateUserSuccess = ApiComponentsModelsUser
+
+// ApiComponentsResponsesAdminGetUser defines model for api_components_responses_AdminGetUser.
+type ApiComponentsResponsesAdminGetUser = ApiComponentsModelsUser
+
+// ApiComponentsResponsesAdminGetUserInternalServerError defines model for api_components_responses_AdminGetUserInternalServerError.
+type ApiComponentsResponsesAdminGetUserInternalServerError = ApiComponentsErrorsErrGettingUser
+
+// ApiComponentsResponsesAdminUserBadRequest defines model for api_components_responses_AdminUserBadRequest.
+type ApiComponentsResponsesAdminUserBadRequest struct {
+	union json.RawMessage
+}
+
+// ApiComponentsResponsesNotAuthorized defines model for api_components_responses_NotAuthorized.
+type ApiComponentsResponsesNotAuthorized = ApiComponentsErrorsErrUnauthorized
+
+// PostApiV2AdminUsersJSONRequestBody defines body for PostApiV2AdminUsers for application/json ContentType.
+type PostApiV2AdminUsersJSONRequestBody = ApiComponentsRequestsCreateUser
+
+// PostApiV2AdminUsersIdPaymailsJSONRequestBody defines body for PostApiV2AdminUsersIdPaymails for application/json ContentType.
+type PostApiV2AdminUsersIdPaymailsJSONRequestBody = ApiComponentsRequestsAddPaymail
 
 // AsApiComponentsErrorsErrAuthorization returns the union data inside the ApiComponentsErrorsErrUnauthorized as a ApiComponentsErrorsErrAuthorization
 func (t ApiComponentsErrorsErrUnauthorized) AsApiComponentsErrorsErrAuthorization() (ApiComponentsErrorsErrAuthorization, error) {
@@ -164,6 +264,146 @@ func (t ApiComponentsErrorsErrUnauthorized) MarshalJSON() ([]byte, error) {
 }
 
 func (t *ApiComponentsErrorsErrUnauthorized) UnmarshalJSON(b []byte) error {
+	err := t.union.UnmarshalJSON(b)
+	return err
+}
+
+// AsApiComponentsErrorsErrCannotBindRequest returns the union data inside the ApiComponentsResponsesAdminUserBadRequest as a ApiComponentsErrorsErrCannotBindRequest
+func (t ApiComponentsResponsesAdminUserBadRequest) AsApiComponentsErrorsErrCannotBindRequest() (ApiComponentsErrorsErrCannotBindRequest, error) {
+	var body ApiComponentsErrorsErrCannotBindRequest
+	err := json.Unmarshal(t.union, &body)
+	return body, err
+}
+
+// FromApiComponentsErrorsErrCannotBindRequest overwrites any union data inside the ApiComponentsResponsesAdminUserBadRequest as the provided ApiComponentsErrorsErrCannotBindRequest
+func (t *ApiComponentsResponsesAdminUserBadRequest) FromApiComponentsErrorsErrCannotBindRequest(v ApiComponentsErrorsErrCannotBindRequest) error {
+	b, err := json.Marshal(v)
+	t.union = b
+	return err
+}
+
+// MergeApiComponentsErrorsErrCannotBindRequest performs a merge with any union data inside the ApiComponentsResponsesAdminUserBadRequest, using the provided ApiComponentsErrorsErrCannotBindRequest
+func (t *ApiComponentsResponsesAdminUserBadRequest) MergeApiComponentsErrorsErrCannotBindRequest(v ApiComponentsErrorsErrCannotBindRequest) error {
+	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+
+	merged, err := runtime.JSONMerge(t.union, b)
+	t.union = merged
+	return err
+}
+
+// AsApiComponentsErrorsErrInvalidPubKey returns the union data inside the ApiComponentsResponsesAdminUserBadRequest as a ApiComponentsErrorsErrInvalidPubKey
+func (t ApiComponentsResponsesAdminUserBadRequest) AsApiComponentsErrorsErrInvalidPubKey() (ApiComponentsErrorsErrInvalidPubKey, error) {
+	var body ApiComponentsErrorsErrInvalidPubKey
+	err := json.Unmarshal(t.union, &body)
+	return body, err
+}
+
+// FromApiComponentsErrorsErrInvalidPubKey overwrites any union data inside the ApiComponentsResponsesAdminUserBadRequest as the provided ApiComponentsErrorsErrInvalidPubKey
+func (t *ApiComponentsResponsesAdminUserBadRequest) FromApiComponentsErrorsErrInvalidPubKey(v ApiComponentsErrorsErrInvalidPubKey) error {
+	b, err := json.Marshal(v)
+	t.union = b
+	return err
+}
+
+// MergeApiComponentsErrorsErrInvalidPubKey performs a merge with any union data inside the ApiComponentsResponsesAdminUserBadRequest, using the provided ApiComponentsErrorsErrInvalidPubKey
+func (t *ApiComponentsResponsesAdminUserBadRequest) MergeApiComponentsErrorsErrInvalidPubKey(v ApiComponentsErrorsErrInvalidPubKey) error {
+	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+
+	merged, err := runtime.JSONMerge(t.union, b)
+	t.union = merged
+	return err
+}
+
+// AsApiComponentsErrorsErrInvalidPaymail returns the union data inside the ApiComponentsResponsesAdminUserBadRequest as a ApiComponentsErrorsErrInvalidPaymail
+func (t ApiComponentsResponsesAdminUserBadRequest) AsApiComponentsErrorsErrInvalidPaymail() (ApiComponentsErrorsErrInvalidPaymail, error) {
+	var body ApiComponentsErrorsErrInvalidPaymail
+	err := json.Unmarshal(t.union, &body)
+	return body, err
+}
+
+// FromApiComponentsErrorsErrInvalidPaymail overwrites any union data inside the ApiComponentsResponsesAdminUserBadRequest as the provided ApiComponentsErrorsErrInvalidPaymail
+func (t *ApiComponentsResponsesAdminUserBadRequest) FromApiComponentsErrorsErrInvalidPaymail(v ApiComponentsErrorsErrInvalidPaymail) error {
+	b, err := json.Marshal(v)
+	t.union = b
+	return err
+}
+
+// MergeApiComponentsErrorsErrInvalidPaymail performs a merge with any union data inside the ApiComponentsResponsesAdminUserBadRequest, using the provided ApiComponentsErrorsErrInvalidPaymail
+func (t *ApiComponentsResponsesAdminUserBadRequest) MergeApiComponentsErrorsErrInvalidPaymail(v ApiComponentsErrorsErrInvalidPaymail) error {
+	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+
+	merged, err := runtime.JSONMerge(t.union, b)
+	t.union = merged
+	return err
+}
+
+// AsApiComponentsErrorsErrPaymailInconsistent returns the union data inside the ApiComponentsResponsesAdminUserBadRequest as a ApiComponentsErrorsErrPaymailInconsistent
+func (t ApiComponentsResponsesAdminUserBadRequest) AsApiComponentsErrorsErrPaymailInconsistent() (ApiComponentsErrorsErrPaymailInconsistent, error) {
+	var body ApiComponentsErrorsErrPaymailInconsistent
+	err := json.Unmarshal(t.union, &body)
+	return body, err
+}
+
+// FromApiComponentsErrorsErrPaymailInconsistent overwrites any union data inside the ApiComponentsResponsesAdminUserBadRequest as the provided ApiComponentsErrorsErrPaymailInconsistent
+func (t *ApiComponentsResponsesAdminUserBadRequest) FromApiComponentsErrorsErrPaymailInconsistent(v ApiComponentsErrorsErrPaymailInconsistent) error {
+	b, err := json.Marshal(v)
+	t.union = b
+	return err
+}
+
+// MergeApiComponentsErrorsErrPaymailInconsistent performs a merge with any union data inside the ApiComponentsResponsesAdminUserBadRequest, using the provided ApiComponentsErrorsErrPaymailInconsistent
+func (t *ApiComponentsResponsesAdminUserBadRequest) MergeApiComponentsErrorsErrPaymailInconsistent(v ApiComponentsErrorsErrPaymailInconsistent) error {
+	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+
+	merged, err := runtime.JSONMerge(t.union, b)
+	t.union = merged
+	return err
+}
+
+// AsApiComponentsErrorsErrInvalidDomain returns the union data inside the ApiComponentsResponsesAdminUserBadRequest as a ApiComponentsErrorsErrInvalidDomain
+func (t ApiComponentsResponsesAdminUserBadRequest) AsApiComponentsErrorsErrInvalidDomain() (ApiComponentsErrorsErrInvalidDomain, error) {
+	var body ApiComponentsErrorsErrInvalidDomain
+	err := json.Unmarshal(t.union, &body)
+	return body, err
+}
+
+// FromApiComponentsErrorsErrInvalidDomain overwrites any union data inside the ApiComponentsResponsesAdminUserBadRequest as the provided ApiComponentsErrorsErrInvalidDomain
+func (t *ApiComponentsResponsesAdminUserBadRequest) FromApiComponentsErrorsErrInvalidDomain(v ApiComponentsErrorsErrInvalidDomain) error {
+	b, err := json.Marshal(v)
+	t.union = b
+	return err
+}
+
+// MergeApiComponentsErrorsErrInvalidDomain performs a merge with any union data inside the ApiComponentsResponsesAdminUserBadRequest, using the provided ApiComponentsErrorsErrInvalidDomain
+func (t *ApiComponentsResponsesAdminUserBadRequest) MergeApiComponentsErrorsErrInvalidDomain(v ApiComponentsErrorsErrInvalidDomain) error {
+	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+
+	merged, err := runtime.JSONMerge(t.union, b)
+	t.union = merged
+	return err
+}
+
+func (t ApiComponentsResponsesAdminUserBadRequest) MarshalJSON() ([]byte, error) {
+	b, err := t.union.MarshalJSON()
+	return b, err
+}
+
+func (t *ApiComponentsResponsesAdminUserBadRequest) UnmarshalJSON(b []byte) error {
 	err := t.union.UnmarshalJSON(b)
 	return err
 }

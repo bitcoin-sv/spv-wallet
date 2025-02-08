@@ -4,14 +4,6 @@ info:
   version: ignored
 
 components:
-  responses:
-    NotAuthorized:
-      description: Security requirements failed
-      content:
-        application/json:
-          schema:
-            $ref: "#/components/schemas/ErrUnauthorized"
-
   schemas:
     ErrorSchema:
       type: object
@@ -73,3 +65,73 @@ components:
               example: "error-user-auth-on-non-user-endpoint"
             message:
               example: "cannot call non-user endpoints with user authorization"
+
+    ErrCannotBindRequest:
+      allOf:
+        - $ref: '#/components/schemas/ErrorSchema'
+        - type: object
+          properties:
+            code:
+              example: "error-bind-body-invalid"
+            message:
+              example: "cannot bind request body"
+
+    ErrInvalidPubKey:
+      allOf:
+        - $ref: '#/components/schemas/ErrorSchema'
+        - type: object
+          properties:
+            code:
+              example: "error-user-invalid-pubkey"
+            message:
+              example: "invalid public key"
+
+    ErrInvalidPaymail:
+      allOf:
+        - $ref: '#/components/schemas/ErrorSchema'
+        - type: object
+          properties:
+            code:
+              example: "error-user-invalid-paymail"
+            message:
+              example: "invalid paymail"
+
+    ErrPaymailInconsistent:
+      allOf:
+        - $ref: '#/components/schemas/ErrorSchema'
+        - type: object
+          properties:
+            code:
+              example: "error-user-inconsistent-paymail"
+            message:
+              example: "inconsistent paymail address and alias/domain"
+
+    ErrInvalidDomain:
+      allOf:
+        - $ref: '#/components/schemas/ErrorSchema'
+        - type: object
+          properties:
+            code:
+              example: "error-user-invalid-domain"
+            message:
+              example: "invalid domain"
+
+    ErrCreatingUser:
+      allOf:
+        - $ref: '#/components/schemas/ErrorSchema'
+        - type: object
+          properties:
+            code:
+              example: "error-user-creating"
+            message:
+              example: "error creating user"
+
+    ErrGettingUser:
+      allOf:
+        - $ref: '#/components/schemas/ErrorSchema'
+        - type: object
+          properties:
+            code:
+              example: "error-unknown"
+            message:
+              example: "Internal server error"
