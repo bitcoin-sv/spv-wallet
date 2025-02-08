@@ -42,12 +42,12 @@ components:
       description: User found
       content:
         application/json:
-         schema:
-           $ref: "./models.yaml#/components/schemas/User"
+          schema:
+            $ref: "./models.yaml#/components/schemas/User"
 
     AdminGetUserInternalServerError:
       description: User found
       content:
         application/json:
-         schema:
-           $ref: "./errors.yaml#/components/schemas/ErrGettingUser"
+          schema:
+            $ref: "./errors.yaml#/components/schemas/ErrGettingUser"

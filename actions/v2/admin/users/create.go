@@ -14,6 +14,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+// PostApiV2AdminUsers creates a new user
 func (s *APIAdminUsers) PostApiV2AdminUsers(c *gin.Context) {
 	logger := reqctx.Logger(c)
 

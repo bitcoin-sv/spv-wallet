@@ -8,7 +8,7 @@ paths:
     get:
       security:
         - XPubAuth:
-          - "admin"
+            - "admin"
       tags:
         - Admin endpoints
       summary: Get admin status
@@ -24,8 +24,8 @@ paths:
   /api/v2/admin/users:
     post:
       security:
-      - XPubAuth:
-        - "admin"
+        - XPubAuth:
+            - "admin"
       tags:
         - Admin endpoints
       summary: Create user

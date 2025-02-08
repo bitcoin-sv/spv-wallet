@@ -14,6 +14,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+// PostApiV2AdminUsersIdPaymails add paymails to the user
 func (s *APIAdminUsers) PostApiV2AdminUsersIdPaymails(c *gin.Context, id string) {
 	logger := reqctx.Logger(c)
 
