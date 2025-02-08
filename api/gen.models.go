@@ -51,8 +51,17 @@ type ApiComponentsErrorsErrorSchema struct {
 	Message string `json:"message"`
 }
 
+// ApiComponentsModelsSharedConfig Shared config
+type ApiComponentsModelsSharedConfig struct {
+	ExperimentalFeatures *map[string]bool `json:"experimentalFeatures,omitempty"`
+	PaymailDomains       *[]string        `json:"paymailDomains,omitempty"`
+}
+
 // ApiComponentsErrorsNotAuthorized defines model for api_components_errors_NotAuthorized.
 type ApiComponentsErrorsNotAuthorized = ApiComponentsErrorsErrUnauthorized
+
+// ApiComponentsResponsesSharedConfig Shared config
+type ApiComponentsResponsesSharedConfig = ApiComponentsModelsSharedConfig
 
 // AsApiComponentsErrorsErrAuthorization returns the union data inside the ApiComponentsErrorsErrUnauthorized as a ApiComponentsErrorsErrAuthorization
 func (t ApiComponentsErrorsErrUnauthorized) AsApiComponentsErrorsErrAuthorization() (ApiComponentsErrorsErrAuthorization, error) {
