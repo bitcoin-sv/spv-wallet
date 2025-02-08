@@ -89,7 +89,6 @@ func saveMergedSpec(doc *openapi3.T, outputPath string) {
 		log.Fatalf("Failed to marshal merged spec: %v", err)
 	}
 
-	// Save merged file to api directory
 	if err := os.WriteFile(outputPath, data, 0600); err != nil {
 		log.Fatalf("Failed to write merged spec to %s: %v", outputPath, err)
 	}
