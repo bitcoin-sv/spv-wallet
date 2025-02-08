@@ -1,11 +1,12 @@
 package base
 
 import (
+	"net/http"
+	"sync"
+
 	"github.com/bitcoin-sv/spv-wallet/api"
 	"github.com/bitcoin-sv/spv-wallet/server/reqctx"
 	"github.com/gin-gonic/gin"
-	"net/http"
-	"sync"
 )
 
 // GetApiV2ConfigsShared is the handler for SharedConfig which can be obtained by both admin and user
