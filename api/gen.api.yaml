@@ -110,14 +110,14 @@ components:
             properties:
                 experimentalFeatures:
                     additionalProperties:
+                        example:
+                            pikeEnabled: true
                         type: boolean
-                    example:
-                        pikeEnabled: true
                     type: object
                 paymailDomains:
-                    example:
-                        - example.com
                     items:
+                        example:
+                            - example.com
                         type: string
                     type: array
             type: object

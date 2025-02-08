@@ -13,9 +13,9 @@ components:
           type: array
           items:
             type: string
-          example: [ "example.com" ]
+          example: ["example.com"]
         experimentalFeatures:
           type: object
           additionalProperties:
             type: boolean
-          example: { "pikeEnabled": true }
+          example: {"pikeEnabled": true}
