@@ -7,7 +7,6 @@ ignore: |
   dist/
   */swagger.yaml
   gen.api.yaml
-  openapi_v2.yaml
 
 rules:
   braces: enable
