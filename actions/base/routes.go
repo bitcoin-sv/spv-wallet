@@ -23,20 +23,11 @@ func RegisterRoutes(handlersManager *handlers.Manager) {
 	healthGroup.OPTIONS("", statusOK)
 	healthGroup.HEAD("", statusOK)
 
-	// Register Swagger for v1 API
 	docs.SwaggerInfo.Version = handlersManager.APIVersion()
 	root.GET("/swagger", func(c *gin.Context) {
 		c.Redirect(http.StatusMovedPermanently, "/swagger/index.html")
 	})
 	root.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerfiles.Handler))
-
-	// Register Swagger for v2 API
-	root.GET("v2/swagger", func(c *gin.Context) {
-		c.Redirect(http.StatusMovedPermanently, "v2/swagger/index.html")
-	})
-	root.StaticFile("/docs/openapi_v2.yaml", "./docs/openapi_v2.yaml")
-	root.GET("v2/swagger/*any", ginSwagger.WrapHandler(swaggerfiles.Handler, ginSwagger.URL("/docs/openapi_v2.yaml")))
-
 }
 
 func statusOK(c *gin.Context) {

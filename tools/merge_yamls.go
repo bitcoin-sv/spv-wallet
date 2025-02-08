@@ -11,9 +11,8 @@ import (
 )
 
 const (
-	templatePath      = "../api/common/template.yaml"
-	outputPath        = "../api/gen.api.yaml"
-	swaggerOutputPath = "../docs/openapi_v2.yaml"
+	templatePath = "../api/common/template.yaml"
+	outputPath   = "../api/gen.api.yaml"
 )
 
 var componentPaths = []string{"../api/endpoints/base.yaml", "../api/endpoints/user.yaml", "../api/endpoints/admin.yaml"}
@@ -31,7 +30,7 @@ func main() {
 
 	templateDoc.InternalizeRefs(context.Background(), nil)
 	saveMergedSpec(templateDoc, outputPath)
-	fmt.Printf("Merged OpenAPI spec saved to %s and to %s\n", outputPath, swaggerOutputPath)
+	fmt.Printf("Merged OpenAPI spec saved to %s\n", outputPath)
 }
 
 func loadOpenAPIDoc(loader *openapi3.Loader, path string) *openapi3.T {
@@ -93,10 +92,5 @@ func saveMergedSpec(doc *openapi3.T, outputPath string) {
 	// Save merged file to api directory
 	if err := os.WriteFile(outputPath, data, 0600); err != nil {
 		log.Fatalf("Failed to write merged spec to %s: %v", outputPath, err)
-	}
-
-	// Save merged file to docs directory for Swagger UI
-	if err := os.WriteFile(swaggerOutputPath, data, 0600); err != nil {
-		log.Fatalf("Failed to write merged spec to %s: %v", swaggerOutputPath, err)
 	}
 }
