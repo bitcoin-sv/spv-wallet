@@ -16,9 +16,12 @@ type ServerInterface interface {
 	// Get admin status
 	// (GET /api/v2/admin/status)
 	GetApiV2AdminStatus(c *gin.Context)
-	// Get data with given id for authenticated user
+	// Get data for user
 	// (GET /api/v2/data/{id})
 	GetApiV2DataId(c *gin.Context, id string)
+	// Get current user
+	// (GET /api/v2/users/current)
+	GetApiV2UsersCurrent(c *gin.Context)
 }
 
 // ServerInterfaceWrapper converts contexts to parameters.
@@ -71,6 +74,21 @@ func (siw *ServerInterfaceWrapper) GetApiV2DataId(c *gin.Context) {
 	siw.Handler.GetApiV2DataId(c, id)
 }
 
+// GetApiV2UsersCurrent operation middleware
+func (siw *ServerInterfaceWrapper) GetApiV2UsersCurrent(c *gin.Context) {
+
+	c.Set(XPubAuthScopes, []string{"user"})
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		middleware(c)
+		if c.IsAborted() {
+			return
+		}
+	}
+
+	siw.Handler.GetApiV2UsersCurrent(c)
+}
+
 // GinServerOptions provides options for the Gin server.
 type GinServerOptions struct {
 	BaseURL      string
@@ -100,4 +118,5 @@ func RegisterHandlersWithOptions(router gin.IRouter, si ServerInterface, options
 
 	router.GET(options.BaseURL+"/api/v2/admin/status", wrapper.GetApiV2AdminStatus)
 	router.GET(options.BaseURL+"/api/v2/data/:id", wrapper.GetApiV2DataId)
+	router.GET(options.BaseURL+"/api/v2/users/current", wrapper.GetApiV2UsersCurrent)
 }

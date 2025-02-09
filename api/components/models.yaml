@@ -17,3 +17,14 @@ components:
       required:
         - id
         - blob
+
+    UserInfo:
+      type: object
+      properties:
+        currentBalance:
+          type: string
+          format: uint64
+          description: Current balance of user
+      required:
+        - id
+        - name

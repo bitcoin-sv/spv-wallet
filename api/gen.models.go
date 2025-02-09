@@ -84,19 +84,28 @@ type ApiComponentsModelsData struct {
 	Id string `json:"id"`
 }
 
-// ApiComponentsResponsesDataInternalError defines model for api_components_responses_DataInternalError.
-type ApiComponentsResponsesDataInternalError = ApiComponentsErrorsErrInternal
+// ApiComponentsModelsUserInfo defines model for api_components_models_UserInfo.
+type ApiComponentsModelsUserInfo struct {
+	// CurrentBalance Current balance of user
+	CurrentBalance *string `json:"currentBalance,omitempty"`
+}
 
-// ApiComponentsResponsesGetDataBadRequest defines model for api_components_responses_GetDataBadRequest.
-type ApiComponentsResponsesGetDataBadRequest = ApiComponentsErrorsErrInvalidDataID
+// ApiComponentsResponsesGetCurrentUserSuccess defines model for api_components_responses_GetCurrentUserSuccess.
+type ApiComponentsResponsesGetCurrentUserSuccess = ApiComponentsModelsUserInfo
 
 // ApiComponentsResponsesGetDataNotFound defines model for api_components_responses_GetDataNotFound.
 type ApiComponentsResponsesGetDataNotFound struct {
 	union json.RawMessage
 }
 
+// ApiComponentsResponsesInternalServerError defines model for api_components_responses_InternalServerError.
+type ApiComponentsResponsesInternalServerError = ApiComponentsErrorsErrInternal
+
 // ApiComponentsResponsesNotAuthorized defines model for api_components_responses_NotAuthorized.
 type ApiComponentsResponsesNotAuthorized = ApiComponentsErrorsErrUnauthorized
+
+// ApiComponentsResponsesUserBadRequest defines model for api_components_responses_UserBadRequest.
+type ApiComponentsResponsesUserBadRequest = ApiComponentsErrorsErrInvalidDataID
 
 // ApiComponentsResponsesUserGetDataSuccess defines model for api_components_responses_UserGetDataSuccess.
 type ApiComponentsResponsesUserGetDataSuccess = ApiComponentsModelsData

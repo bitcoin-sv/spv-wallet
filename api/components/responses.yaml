@@ -21,7 +21,7 @@ components:
               - $ref: "./errors.yaml#/components/schemas/ErrUnauthorized"
               - $ref: "./errors.yaml#/components/schemas/ErrXPubAuthRequired"
 
-    DataInternalError:
+    InternalServerError:
       description: Internal server error
       content:
         application/json:
@@ -35,7 +35,7 @@ components:
           schema:
             $ref: "./models.yaml#/components/schemas/Data"
 
-    GetDataBadRequest:
+    UserBadRequest:
       description: Bad request is an error that occurs when the request is malformed.
       content:
         application/json:
@@ -49,3 +49,10 @@ components:
           schema:
             oneOf:
               - $ref: "./errors.yaml#/components/schemas/ErrDataNotFound"
+
+    GetCurrentUserSuccess:
+      description: Balance of current authenticated user
+      content:
+        application/json:
+          schema:
+            $ref: "./models.yaml#/components/schemas/UserInfo"

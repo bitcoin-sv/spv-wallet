@@ -16,7 +16,7 @@ func (s *APIData) GetApiV2DataId(c *gin.Context, id string) {
 	userContext := reqctx.GetUserContext(c)
 	userID, err := userContext.ShouldGetUserID()
 	if err != nil {
-		spverrors.AbortWithErrorResponse(c, err, logger)
+		spverrors.ErrorResponse(c, err, logger)
 		return
 	}
 

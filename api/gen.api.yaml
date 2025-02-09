@@ -34,33 +34,45 @@ paths:
                 "200":
                     $ref: '#/components/responses/api_components_responses_UserGetDataSuccess'
                 "400":
-                    $ref: '#/components/responses/api_components_responses_GetDataBadRequest'
+                    $ref: '#/components/responses/api_components_responses_UserBadRequest'
                 "401":
                     $ref: '#/components/responses/api_components_responses_UserNotAuthorized'
                 "404":
                     $ref: '#/components/responses/api_components_responses_GetDataNotFound'
                 "500":
-                    $ref: '#/components/responses/api_components_responses_DataInternalError'
+                    $ref: '#/components/responses/api_components_responses_InternalServerError'
             security:
                 - XPubAuth:
                     - user
-            summary: Get data with given id for authenticated user
+            summary: Get data for user
+            tags:
+                - User endpoints
+    /api/v2/users/current:
+        get:
+            description: This endpoint return balance of current authenticated user
+            responses:
+                "200":
+                    $ref: '#/components/responses/api_components_responses_GetCurrentUserSuccess'
+                "400":
+                    $ref: '#/components/responses/api_components_responses_UserBadRequest'
+                "401":
+                    $ref: '#/components/responses/api_components_responses_UserNotAuthorized'
+                "500":
+                    $ref: '#/components/responses/api_components_responses_InternalServerError'
+            security:
+                - XPubAuth:
+                    - user
+            summary: Get current user
             tags:
                 - User endpoints
 components:
     responses:
-        api_components_responses_DataInternalError:
+        api_components_responses_GetCurrentUserSuccess:
             content:
                 application/json:
                     schema:
-                        $ref: '#/components/schemas/api_components_errors_ErrInternal'
-            description: Internal server error
-        api_components_responses_GetDataBadRequest:
-            content:
-                application/json:
-                    schema:
-                        $ref: '#/components/schemas/api_components_errors_ErrInvalidDataID'
-            description: Bad request is an error that occurs when the request is malformed.
+                        $ref: '#/components/schemas/api_components_models_UserInfo'
+            description: Balance of current authenticated user
         api_components_responses_GetDataNotFound:
             content:
                 application/json:
@@ -68,12 +80,24 @@ components:
                         oneOf:
                             - $ref: '#/components/schemas/api_components_errors_ErrDataNotFound'
             description: Not found is an error that occurs when the requested resource is not found.
+        api_components_responses_InternalServerError:
+            content:
+                application/json:
+                    schema:
+                        $ref: '#/components/schemas/api_components_errors_ErrInternal'
+            description: Internal server error
         api_components_responses_NotAuthorized:
             content:
                 application/json:
                     schema:
                         $ref: '#/components/schemas/api_components_errors_ErrUnauthorized'
             description: Security requirements failed
+        api_components_responses_UserBadRequest:
+            content:
+                application/json:
+                    schema:
+                        $ref: '#/components/schemas/api_components_errors_ErrInvalidDataID'
+            description: Bad request is an error that occurs when the request is malformed.
         api_components_responses_UserGetDataSuccess:
             content:
                 application/json:
@@ -191,6 +215,16 @@ components:
             required:
                 - id
                 - blob
+            type: object
+        api_components_models_UserInfo:
+            properties:
+                currentBalance:
+                    description: Current balance of user
+                    format: uint64
+                    type: string
+            required:
+                - id
+                - name
             type: object
     securitySchemes:
         XPubAuth:
