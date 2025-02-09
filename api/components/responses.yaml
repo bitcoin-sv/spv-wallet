@@ -13,7 +13,7 @@ components:
             $ref: "./errors.yaml#/components/schemas/ErrUnauthorized"
 
     AdminUserBadRequest:
-      description: Cannot bind request
+      description: Bad request is an error that occurs when the request is malformed.
       content:
         application/json:
           schema:
