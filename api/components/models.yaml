@@ -26,6 +26,12 @@ components:
           type: string
           format: date-time
           example: "2021-01-01T00:00:00Z"
+      required:
+        - id
+        - publicKey
+        - paymails
+        - createdAt
+        - updatedAt
 
     Paymail:
       type: object
@@ -45,6 +51,13 @@ components:
         publicName:
           type: string
           example: "Test"
-        Avatar:
+        avatar:
           type: string
           example: "https://spv-wallet.com/avatar.png"
+      required:
+        - id
+        - alias
+        - domain
+        - paymail
+        - publicName
+        - avatar

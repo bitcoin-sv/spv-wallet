@@ -258,11 +258,11 @@ components:
             type: object
         api_components_models_Paymail:
             properties:
-                Avatar:
-                    example: https://spv-wallet.com/avatar.png
-                    type: string
                 alias:
                     example: test
+                    type: string
+                avatar:
+                    example: https://spv-wallet.com/avatar.png
                     type: string
                 domain:
                     example: spv-wallet.com
@@ -276,6 +276,13 @@ components:
                 publicName:
                     example: Test
                     type: string
+            required:
+                - id
+                - alias
+                - domain
+                - paymail
+                - publicName
+                - avatar
             type: object
         api_components_models_User:
             properties:
@@ -297,6 +304,12 @@ components:
                     example: "2021-01-01T00:00:00Z"
                     format: date-time
                     type: string
+            required:
+                - id
+                - publicKey
+                - paymails
+                - createdAt
+                - updatedAt
             type: object
         api_components_requests_AddPaymail:
             properties:
