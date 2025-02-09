@@ -96,21 +96,21 @@ type ApiComponentsErrorsErrorSchema struct {
 
 // ApiComponentsModelsPaymail defines model for api_components_models_Paymail.
 type ApiComponentsModelsPaymail struct {
-	Avatar     *string `json:"Avatar,omitempty"`
-	Alias      *string `json:"alias,omitempty"`
-	Domain     *string `json:"domain,omitempty"`
-	Id         *string `json:"id,omitempty"`
-	Paymail    *string `json:"paymail,omitempty"`
-	PublicName *string `json:"publicName,omitempty"`
+	Alias      string `json:"alias"`
+	Avatar     string `json:"avatar"`
+	Domain     string `json:"domain"`
+	Id         string `json:"id"`
+	Paymail    string `json:"paymail"`
+	PublicName string `json:"publicName"`
 }
 
 // ApiComponentsModelsUser defines model for api_components_models_User.
 type ApiComponentsModelsUser struct {
-	CreatedAt *time.Time                    `json:"createdAt,omitempty"`
-	Id        *string                       `json:"id,omitempty"`
-	Paymails  *[]ApiComponentsModelsPaymail `json:"paymails,omitempty"`
-	PublicKey *string                       `json:"publicKey,omitempty"`
-	UpdatedAt *time.Time                    `json:"updatedAt,omitempty"`
+	CreatedAt time.Time                    `json:"createdAt"`
+	Id        string                       `json:"id"`
+	Paymails  []ApiComponentsModelsPaymail `json:"paymails"`
+	PublicKey string                       `json:"publicKey"`
+	UpdatedAt time.Time                    `json:"updatedAt"`
 }
 
 // ApiComponentsRequestsAddPaymail defines model for api_components_requests_AddPaymail.
