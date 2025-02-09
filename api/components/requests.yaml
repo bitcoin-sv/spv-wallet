@@ -4,4 +4,39 @@ info:
   version: ignored
 
 components:
-  schemas:
+  parameters:
+    PageNumber:
+      in: query
+      name: page
+      description: Page number for pagination
+      required: false
+      schema:
+        type: integer
+      example: 1
+
+    PageSize:
+      in: query
+      name: size
+      description: Number of items per page
+      required: false
+      schema:
+        type: integer
+      example: 10
+
+    Sort:
+      in: query
+      name: sort
+      description: Sorting order (asc or desc)
+      required: false
+      schema:
+        type: string
+      example: "asc"
+
+    SortBy:
+      name: sortBy
+      in: query
+      description: Field to sort by
+      required: false
+      schema:
+        type: string
+      example: "name"

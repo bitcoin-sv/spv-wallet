@@ -105,3 +105,13 @@ components:
               example: "error-data-not-found"
             message:
               example: "data not found"
+
+    ErrCannotParseQueryParams:
+      allOf:
+        - $ref: '#/components/schemas/ErrorSchema'
+        - type: object
+          properties:
+            code:
+              example: "error-query-params-invalid"
+            message:
+              example: "cannot parse request query params"

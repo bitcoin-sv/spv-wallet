@@ -17,8 +17,6 @@ paths:
       responses:
         200:
           $ref: "../components/responses.yaml#/components/responses/GetCurrentUserSuccess"
-        400:
-          $ref: "../components/responses.yaml#/components/responses/UserBadRequest"
         401:
           $ref: "../components/responses.yaml#/components/responses/UserNotAuthorized"
         500:
@@ -43,12 +41,37 @@ paths:
             type: string
       responses:
         200:
-          $ref: "../components/responses.yaml#/components/responses/UserGetDataSuccess"
+          $ref: "../components/responses.yaml#/components/responses/GetDataSuccess"
         400:
           $ref: "../components/responses.yaml#/components/responses/UserBadRequest"
         401:
           $ref: "../components/responses.yaml#/components/responses/UserNotAuthorized"
         404:
           $ref: "../components/responses.yaml#/components/responses/GetDataNotFound"
+        500:
+          $ref: "../components/responses.yaml#/components/responses/InternalServerError"
+
+  /api/v2/operations/search:
+    get:
+      security:
+        - XPubAuth:
+            - "user"
+      tags:
+        - User endpoints
+      summary: Get operations for user
+      description: >-
+        This endpoint allows to search operations for authenticated user
+      parameters:
+        - $ref: "../components/requests.yaml#/components/parameters/PageNumber"
+        - $ref: "../components/requests.yaml#/components/parameters/PageSize"
+        - $ref: "../components/requests.yaml#/components/parameters/Sort"
+        - $ref: "../components/requests.yaml#/components/parameters/SortBy"
+      responses:
+        200:
+          $ref: "../components/responses.yaml#/components/responses/SearchOperationsSuccess"
+        400:
+          $ref: "../components/responses.yaml#/components/responses/SearchBadRequest"
+        401:
+          $ref: "../components/responses.yaml#/components/responses/UserNotAuthorized"
         500:
           $ref: "../components/responses.yaml#/components/responses/InternalServerError"

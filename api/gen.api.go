@@ -19,6 +19,9 @@ type ServerInterface interface {
 	// Get data for user
 	// (GET /api/v2/data/{id})
 	GetApiV2DataId(c *gin.Context, id string)
+	// Get operations for user
+	// (GET /api/v2/operations/search)
+	GetApiV2OperationsSearch(c *gin.Context, params GetApiV2OperationsSearchParams)
 	// Get current user
 	// (GET /api/v2/users/current)
 	GetApiV2UsersCurrent(c *gin.Context)
@@ -74,6 +77,58 @@ func (siw *ServerInterfaceWrapper) GetApiV2DataId(c *gin.Context) {
 	siw.Handler.GetApiV2DataId(c, id)
 }
 
+// GetApiV2OperationsSearch operation middleware
+func (siw *ServerInterfaceWrapper) GetApiV2OperationsSearch(c *gin.Context) {
+
+	var err error
+
+	c.Set(XPubAuthScopes, []string{"user"})
+
+	// Parameter object where we will unmarshal all parameters from the context
+	var params GetApiV2OperationsSearchParams
+
+	// ------------- Optional query parameter "page" -------------
+
+	err = runtime.BindQueryParameter("form", true, false, "page", c.Request.URL.Query(), &params.Page)
+	if err != nil {
+		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter page: %w", err), http.StatusBadRequest)
+		return
+	}
+
+	// ------------- Optional query parameter "size" -------------
+
+	err = runtime.BindQueryParameter("form", true, false, "size", c.Request.URL.Query(), &params.Size)
+	if err != nil {
+		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter size: %w", err), http.StatusBadRequest)
+		return
+	}
+
+	// ------------- Optional query parameter "sort" -------------
+
+	err = runtime.BindQueryParameter("form", true, false, "sort", c.Request.URL.Query(), &params.Sort)
+	if err != nil {
+		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter sort: %w", err), http.StatusBadRequest)
+		return
+	}
+
+	// ------------- Optional query parameter "sortBy" -------------
+
+	err = runtime.BindQueryParameter("form", true, false, "sortBy", c.Request.URL.Query(), &params.SortBy)
+	if err != nil {
+		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter sortBy: %w", err), http.StatusBadRequest)
+		return
+	}
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		middleware(c)
+		if c.IsAborted() {
+			return
+		}
+	}
+
+	siw.Handler.GetApiV2OperationsSearch(c, params)
+}
+
 // GetApiV2UsersCurrent operation middleware
 func (siw *ServerInterfaceWrapper) GetApiV2UsersCurrent(c *gin.Context) {
 
@@ -118,5 +173,6 @@ func RegisterHandlersWithOptions(router gin.IRouter, si ServerInterface, options
 
 	router.GET(options.BaseURL+"/api/v2/admin/status", wrapper.GetApiV2AdminStatus)
 	router.GET(options.BaseURL+"/api/v2/data/:id", wrapper.GetApiV2DataId)
+	router.GET(options.BaseURL+"/api/v2/operations/search", wrapper.GetApiV2OperationsSearch)
 	router.GET(options.BaseURL+"/api/v2/users/current", wrapper.GetApiV2UsersCurrent)
 }

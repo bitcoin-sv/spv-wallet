@@ -1,7 +1,6 @@
 package users
 
 import (
-	"fmt"
 	"net/http"
 
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
@@ -12,16 +11,9 @@ import (
 
 func (s *APIUsers) GetApiV2UsersCurrent(c *gin.Context) {
 	userContext := reqctx.GetUserContext(c)
-	fmt.Println(userContext)
-	fmt.Println("xpubID", userContext.GetXPubID())
-	fmt.Println("xpub", userContext.GetXPubObj())
-	fmt.Println("authType", userContext.GetAuthType())
-
 	userID, err := userContext.ShouldGetUserID()
-	fmt.Println(userID)
-	fmt.Println(err)
 	if err != nil {
-		spverrors.AbortWithErrorResponse(c, err, reqctx.Logger(c))
+		spverrors.ErrorResponse(c, err, reqctx.Logger(c))
 		return
 	}
 

@@ -5,12 +5,34 @@ package api
 
 import (
 	"encoding/json"
+	"time"
 
 	"github.com/oapi-codegen/runtime"
 )
 
 const (
 	XPubAuthScopes = "XPubAuth.Scopes"
+)
+
+// Defines values for ApiComponentsModelsOperationTxStatus.
+const (
+	BROADCASTED ApiComponentsModelsOperationTxStatus = "BROADCASTED"
+	CREATED     ApiComponentsModelsOperationTxStatus = "CREATED"
+	MINED       ApiComponentsModelsOperationTxStatus = "MINED"
+	PROBLEMATIC ApiComponentsModelsOperationTxStatus = "PROBLEMATIC"
+	REVERTED    ApiComponentsModelsOperationTxStatus = "REVERTED"
+)
+
+// Defines values for ApiComponentsModelsOperationType.
+const (
+	Incoming ApiComponentsModelsOperationType = "incoming"
+	Outgoing ApiComponentsModelsOperationType = "outgoing"
+)
+
+// Defines values for ApiComponentsModelsSearchPageSort.
+const (
+	Asc  ApiComponentsModelsSearchPageSort = "asc"
+	Desc ApiComponentsModelsSearchPageSort = "desc"
 )
 
 // ApiComponentsErrorsErrAdminAuthOnNonAdminEndpoint defines model for api_components_errors_ErrAdminAuthOnNonAdminEndpoint.
@@ -84,11 +106,74 @@ type ApiComponentsModelsData struct {
 	Id string `json:"id"`
 }
 
+// ApiComponentsModelsOperation defines model for api_components_models_Operation.
+type ApiComponentsModelsOperation struct {
+	// Counterparty Counterparty of operation
+	Counterparty *string `json:"counterparty,omitempty"`
+
+	// CreatedAt Creation date of operation
+	CreatedAt *time.Time `json:"createdAt,omitempty"`
+
+	// TxID Transaction ID
+	TxID *string `json:"txID,omitempty"`
+
+	// TxStatus Status of transaction
+	TxStatus *ApiComponentsModelsOperationTxStatus `json:"txStatus,omitempty"`
+
+	// Type Type of operation
+	Type *ApiComponentsModelsOperationType `json:"type,omitempty"`
+
+	// Value Value of operation
+	Value *int64 `json:"value,omitempty"`
+}
+
+// ApiComponentsModelsOperationTxStatus Status of transaction
+type ApiComponentsModelsOperationTxStatus string
+
+// ApiComponentsModelsOperationType Type of operation
+type ApiComponentsModelsOperationType string
+
+// ApiComponentsModelsOperationsSearchResult defines model for api_components_models_OperationsSearchResult.
+type ApiComponentsModelsOperationsSearchResult struct {
+	Operations *[]ApiComponentsModelsOperation `json:"operations,omitempty"`
+	Page       *ApiComponentsModelsSearchPage  `json:"page,omitempty"`
+}
+
+// ApiComponentsModelsSearchPage defines model for api_components_models_SearchPage.
+type ApiComponentsModelsSearchPage struct {
+	// Number Page number for pagination
+	Number *int `json:"number,omitempty"`
+
+	// Size Number of items per page
+	Size *int `json:"size,omitempty"`
+
+	// Sort Sorting order (asc or desc)
+	Sort *ApiComponentsModelsSearchPageSort `json:"sort,omitempty"`
+
+	// SortBy Field to sort by
+	SortBy *string `json:"sortBy,omitempty"`
+}
+
+// ApiComponentsModelsSearchPageSort Sorting order (asc or desc)
+type ApiComponentsModelsSearchPageSort string
+
 // ApiComponentsModelsUserInfo defines model for api_components_models_UserInfo.
 type ApiComponentsModelsUserInfo struct {
 	// CurrentBalance Current balance of user
 	CurrentBalance *string `json:"currentBalance,omitempty"`
 }
+
+// ApiComponentsRequestsPageNumber defines model for api_components_requests_PageNumber.
+type ApiComponentsRequestsPageNumber = int
+
+// ApiComponentsRequestsPageSize defines model for api_components_requests_PageSize.
+type ApiComponentsRequestsPageSize = int
+
+// ApiComponentsRequestsSort defines model for api_components_requests_Sort.
+type ApiComponentsRequestsSort = string
+
+// ApiComponentsRequestsSortBy defines model for api_components_requests_SortBy.
+type ApiComponentsRequestsSortBy = string
 
 // ApiComponentsResponsesGetCurrentUserSuccess defines model for api_components_responses_GetCurrentUserSuccess.
 type ApiComponentsResponsesGetCurrentUserSuccess = ApiComponentsModelsUserInfo
@@ -98,21 +183,42 @@ type ApiComponentsResponsesGetDataNotFound struct {
 	union json.RawMessage
 }
 
+// ApiComponentsResponsesGetDataSuccess defines model for api_components_responses_GetDataSuccess.
+type ApiComponentsResponsesGetDataSuccess = ApiComponentsModelsData
+
 // ApiComponentsResponsesInternalServerError defines model for api_components_responses_InternalServerError.
 type ApiComponentsResponsesInternalServerError = ApiComponentsErrorsErrInternal
 
 // ApiComponentsResponsesNotAuthorized defines model for api_components_responses_NotAuthorized.
 type ApiComponentsResponsesNotAuthorized = ApiComponentsErrorsErrUnauthorized
 
+// ApiComponentsResponsesSearchBadRequest defines model for api_components_responses_SearchBadRequest.
+type ApiComponentsResponsesSearchBadRequest = ApiComponentsErrorsErrInvalidDataID
+
+// ApiComponentsResponsesSearchOperationsSuccess defines model for api_components_responses_SearchOperationsSuccess.
+type ApiComponentsResponsesSearchOperationsSuccess = ApiComponentsModelsOperationsSearchResult
+
 // ApiComponentsResponsesUserBadRequest defines model for api_components_responses_UserBadRequest.
 type ApiComponentsResponsesUserBadRequest = ApiComponentsErrorsErrInvalidDataID
-
-// ApiComponentsResponsesUserGetDataSuccess defines model for api_components_responses_UserGetDataSuccess.
-type ApiComponentsResponsesUserGetDataSuccess = ApiComponentsModelsData
 
 // ApiComponentsResponsesUserNotAuthorized defines model for api_components_responses_UserNotAuthorized.
 type ApiComponentsResponsesUserNotAuthorized struct {
 	union json.RawMessage
+}
+
+// GetApiV2OperationsSearchParams defines parameters for GetApiV2OperationsSearch.
+type GetApiV2OperationsSearchParams struct {
+	// Page Page number for pagination
+	Page *ApiComponentsRequestsPageNumber `form:"page,omitempty" json:"page,omitempty"`
+
+	// Size Number of items per page
+	Size *ApiComponentsRequestsPageSize `form:"size,omitempty" json:"size,omitempty"`
+
+	// Sort Sorting order (asc or desc)
+	Sort *ApiComponentsRequestsSort `form:"sort,omitempty" json:"sort,omitempty"`
+
+	// SortBy Field to sort by
+	SortBy *ApiComponentsRequestsSortBy `form:"sortBy,omitempty" json:"sortBy,omitempty"`
 }
 
 // AsApiComponentsErrorsErrAuthorization returns the union data inside the ApiComponentsErrorsErrUnauthorized as a ApiComponentsErrorsErrAuthorization

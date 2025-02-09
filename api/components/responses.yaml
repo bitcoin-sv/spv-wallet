@@ -12,6 +12,13 @@ components:
           schema:
             $ref: "./errors.yaml#/components/schemas/ErrUnauthorized"
 
+    InternalServerError:
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: "./errors.yaml#/components/schemas/ErrInternal"
+
     UserNotAuthorized:
       description: Security requirements failed
       content:
@@ -21,26 +28,26 @@ components:
               - $ref: "./errors.yaml#/components/schemas/ErrUnauthorized"
               - $ref: "./errors.yaml#/components/schemas/ErrXPubAuthRequired"
 
-    InternalServerError:
-      description: Internal server error
-      content:
-        application/json:
-          schema:
-            $ref: "./errors.yaml#/components/schemas/ErrInternal"
-
-    UserGetDataSuccess:
-      description: Data found
-      content:
-        application/json:
-          schema:
-            $ref: "./models.yaml#/components/schemas/Data"
-
     UserBadRequest:
       description: Bad request is an error that occurs when the request is malformed.
       content:
         application/json:
           schema:
             $ref: "./errors.yaml#/components/schemas/ErrInvalidDataID"
+
+    SearchBadRequest:
+      description: Error when search request is malformed and params can not be parsed
+      content:
+        application/json:
+          schema:
+            $ref: "./errors.yaml#/components/schemas/ErrInvalidDataID"
+
+    GetDataSuccess:
+      description: Data found
+      content:
+        application/json:
+          schema:
+            $ref: "./models.yaml#/components/schemas/Data"
 
     GetDataNotFound:
       description: Not found is an error that occurs when the requested resource is not found.
@@ -56,3 +63,10 @@ components:
         application/json:
           schema:
             $ref: "./models.yaml#/components/schemas/UserInfo"
+
+    SearchOperationsSuccess:
+      description: Operations found
+      content:
+        application/json:
+          schema:
+            $ref: "./models.yaml#/components/schemas/OperationsSearchResult"

@@ -32,7 +32,7 @@ paths:
                     type: string
             responses:
                 "200":
-                    $ref: '#/components/responses/api_components_responses_UserGetDataSuccess'
+                    $ref: '#/components/responses/api_components_responses_GetDataSuccess'
                 "400":
                     $ref: '#/components/responses/api_components_responses_UserBadRequest'
                 "401":
@@ -47,14 +47,35 @@ paths:
             summary: Get data for user
             tags:
                 - User endpoints
+    /api/v2/operations/search:
+        get:
+            description: This endpoint allows to search operations for authenticated user
+            parameters:
+                - $ref: '#/components/parameters/api_components_requests_PageNumber'
+                - $ref: '#/components/parameters/api_components_requests_PageSize'
+                - $ref: '#/components/parameters/api_components_requests_Sort'
+                - $ref: '#/components/parameters/api_components_requests_SortBy'
+            responses:
+                "200":
+                    $ref: '#/components/responses/api_components_responses_SearchOperationsSuccess'
+                "400":
+                    $ref: '#/components/responses/api_components_responses_SearchBadRequest'
+                "401":
+                    $ref: '#/components/responses/api_components_responses_UserNotAuthorized'
+                "500":
+                    $ref: '#/components/responses/api_components_responses_InternalServerError'
+            security:
+                - XPubAuth:
+                    - user
+            summary: Get operations for user
+            tags:
+                - User endpoints
     /api/v2/users/current:
         get:
             description: This endpoint return balance of current authenticated user
             responses:
                 "200":
                     $ref: '#/components/responses/api_components_responses_GetCurrentUserSuccess'
-                "400":
-                    $ref: '#/components/responses/api_components_responses_UserBadRequest'
                 "401":
                     $ref: '#/components/responses/api_components_responses_UserNotAuthorized'
                 "500":
@@ -66,6 +87,35 @@ paths:
             tags:
                 - User endpoints
 components:
+    parameters:
+        api_components_requests_PageNumber:
+            description: Page number for pagination
+            example: 1
+            in: query
+            name: page
+            schema:
+                type: integer
+        api_components_requests_PageSize:
+            description: Number of items per page
+            example: 10
+            in: query
+            name: size
+            schema:
+                type: integer
+        api_components_requests_Sort:
+            description: Sorting order (asc or desc)
+            example: asc
+            in: query
+            name: sort
+            schema:
+                type: string
+        api_components_requests_SortBy:
+            description: Field to sort by
+            example: name
+            in: query
+            name: sortBy
+            schema:
+                type: string
     responses:
         api_components_responses_GetCurrentUserSuccess:
             content:
@@ -80,6 +130,12 @@ components:
                         oneOf:
                             - $ref: '#/components/schemas/api_components_errors_ErrDataNotFound'
             description: Not found is an error that occurs when the requested resource is not found.
+        api_components_responses_GetDataSuccess:
+            content:
+                application/json:
+                    schema:
+                        $ref: '#/components/schemas/api_components_models_Data'
+            description: Data found
         api_components_responses_InternalServerError:
             content:
                 application/json:
@@ -92,18 +148,24 @@ components:
                     schema:
                         $ref: '#/components/schemas/api_components_errors_ErrUnauthorized'
             description: Security requirements failed
+        api_components_responses_SearchBadRequest:
+            content:
+                application/json:
+                    schema:
+                        $ref: '#/components/schemas/api_components_errors_ErrInvalidDataID'
+            description: Error when search request is malformed and params can not be parsed
+        api_components_responses_SearchOperationsSuccess:
+            content:
+                application/json:
+                    schema:
+                        $ref: '#/components/schemas/api_components_models_OperationsSearchResult'
+            description: Operations found
         api_components_responses_UserBadRequest:
             content:
                 application/json:
                     schema:
                         $ref: '#/components/schemas/api_components_errors_ErrInvalidDataID'
             description: Bad request is an error that occurs when the request is malformed.
-        api_components_responses_UserGetDataSuccess:
-            content:
-                application/json:
-                    schema:
-                        $ref: '#/components/schemas/api_components_models_Data'
-            description: Data found
         api_components_responses_UserNotAuthorized:
             content:
                 application/json:
@@ -215,6 +277,75 @@ components:
             required:
                 - id
                 - blob
+            type: object
+        api_components_models_Operation:
+            properties:
+                counterparty:
+                    description: Counterparty of operation
+                    example: alice@example.com
+                    type: string
+                createdAt:
+                    description: Creation date of operation
+                    example: "2020-01-01T00:00:00Z"
+                    format: date-time
+                    type: string
+                txID:
+                    description: Transaction ID
+                    example: bb8593f85ef8056a77026ad415f02128f3768906de53e9e8bf8749fe2d66cf50
+                    type: string
+                txStatus:
+                    description: Status of transaction
+                    enum:
+                        - CREATED
+                        - BROADCASTED
+                        - MINED
+                        - REVERTED
+                        - PROBLEMATIC
+                    example: BROADCASTED
+                    type: string
+                type:
+                    description: Type of operation
+                    enum:
+                        - incoming
+                        - outgoing
+                    example: incoming
+                    type: string
+                value:
+                    description: Value of operation
+                    example: 1234
+                    format: int64
+                    type: integer
+            type: object
+        api_components_models_OperationsSearchResult:
+            properties:
+                operations:
+                    items:
+                        $ref: '#/components/schemas/api_components_models_Operation'
+                    type: array
+                page:
+                    $ref: '#/components/schemas/api_components_models_SearchPage'
+            type: object
+        api_components_models_SearchPage:
+            properties:
+                number:
+                    description: Page number for pagination
+                    example: 1
+                    type: integer
+                size:
+                    description: Number of items per page
+                    example: 10
+                    type: integer
+                sort:
+                    description: Sorting order (asc or desc)
+                    enum:
+                        - asc
+                        - desc
+                    example: asc
+                    type: string
+                sortBy:
+                    description: Field to sort by
+                    example: name
+                    type: string
             type: object
         api_components_models_UserInfo:
             properties:

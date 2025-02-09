@@ -5,6 +5,29 @@ info:
 
 components:
   schemas:
+    SearchPage:
+      type: object
+      properties:
+        number:
+          type: integer
+          description: Page number for pagination
+          example: 1
+        size:
+          type: integer
+          description: Number of items per page
+          example: 10
+        sort:
+          type: string
+          description: Sorting order (asc or desc)
+          enum:
+            - asc
+            - desc
+          example: "asc"
+        sortBy:
+          type: string
+          description: Field to sort by
+          example: "name"
+
     Data:
       type: object
       properties:
@@ -28,3 +51,57 @@ components:
       required:
         - id
         - name
+
+    OperationsSearchResult:
+      type: object
+      properties:
+        operations:
+          type: array
+          items:
+            $ref: '#/components/schemas/Operation'
+        page:
+          $ref: '#/components/schemas/SearchPage'
+
+    Operation:
+      type: object
+      properties:
+        value:
+          type: integer
+          format: int64
+          description: Value of operation
+          example: 1234
+        txID:
+          type: string
+          description: Transaction ID
+          example: "bb8593f85ef8056a77026ad415f02128f3768906de53e9e8bf8749fe2d66cf50"
+        type:
+          type: string
+          description: Type of operation
+          enum:
+            - incoming
+            - outgoing
+          example: "incoming"
+        counterparty:
+          type: string
+          description: Counterparty of operation
+          example: "alice@example.com"
+        txStatus:
+          type: string
+          description: Status of transaction
+          enum:
+            - CREATED
+            - BROADCASTED
+            - MINED
+            - REVERTED
+            - PROBLEMATIC
+          example: "BROADCASTED"
+        createdAt:
+          type: string
+          format: date-time
+          description: Creation date of operation
+          example: "2020-01-01T00:00:00Z"
+
+    Operations:
+      type: array
+      items:
+        $ref: '#/components/schemas/Operation'
