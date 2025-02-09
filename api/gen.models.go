@@ -25,6 +25,24 @@ type ApiComponentsErrorsErrAuthorization struct {
 	Message interface{} `json:"message"`
 }
 
+// ApiComponentsErrorsErrDataNotFound defines model for api_components_errors_ErrDataNotFound.
+type ApiComponentsErrorsErrDataNotFound struct {
+	Code    interface{} `json:"code"`
+	Message interface{} `json:"message"`
+}
+
+// ApiComponentsErrorsErrInternal defines model for api_components_errors_ErrInternal.
+type ApiComponentsErrorsErrInternal struct {
+	Code    interface{} `json:"code"`
+	Message interface{} `json:"message"`
+}
+
+// ApiComponentsErrorsErrInvalidDataID defines model for api_components_errors_ErrInvalidDataID.
+type ApiComponentsErrorsErrInvalidDataID struct {
+	Code    interface{} `json:"code"`
+	Message interface{} `json:"message"`
+}
+
 // ApiComponentsErrorsErrUnauthorized defines model for api_components_errors_ErrUnauthorized.
 type ApiComponentsErrorsErrUnauthorized struct {
 	union json.RawMessage
@@ -42,6 +60,12 @@ type ApiComponentsErrorsErrWrongAuthScopeFormat struct {
 	Message interface{} `json:"message"`
 }
 
+// ApiComponentsErrorsErrXPubAuthRequired defines model for api_components_errors_ErrXPubAuthRequired.
+type ApiComponentsErrorsErrXPubAuthRequired struct {
+	Code    interface{} `json:"code"`
+	Message interface{} `json:"message"`
+}
+
 // ApiComponentsErrorsErrorSchema defines model for api_components_errors_ErrorSchema.
 type ApiComponentsErrorsErrorSchema struct {
 	// Code Error code
@@ -51,8 +75,36 @@ type ApiComponentsErrorsErrorSchema struct {
 	Message string `json:"message"`
 }
 
-// ApiComponentsErrorsNotAuthorized defines model for api_components_errors_NotAuthorized.
-type ApiComponentsErrorsNotAuthorized = ApiComponentsErrorsErrUnauthorized
+// ApiComponentsModelsData defines model for api_components_models_Data.
+type ApiComponentsModelsData struct {
+	// Blob Data blob
+	Blob string `json:"blob"`
+
+	// Id User ID
+	Id string `json:"id"`
+}
+
+// ApiComponentsResponsesDataInternalError defines model for api_components_responses_DataInternalError.
+type ApiComponentsResponsesDataInternalError = ApiComponentsErrorsErrInternal
+
+// ApiComponentsResponsesGetDataBadRequest defines model for api_components_responses_GetDataBadRequest.
+type ApiComponentsResponsesGetDataBadRequest = ApiComponentsErrorsErrInvalidDataID
+
+// ApiComponentsResponsesGetDataNotFound defines model for api_components_responses_GetDataNotFound.
+type ApiComponentsResponsesGetDataNotFound struct {
+	union json.RawMessage
+}
+
+// ApiComponentsResponsesNotAuthorized defines model for api_components_responses_NotAuthorized.
+type ApiComponentsResponsesNotAuthorized = ApiComponentsErrorsErrUnauthorized
+
+// ApiComponentsResponsesUserGetDataSuccess defines model for api_components_responses_UserGetDataSuccess.
+type ApiComponentsResponsesUserGetDataSuccess = ApiComponentsModelsData
+
+// ApiComponentsResponsesUserNotAuthorized defines model for api_components_responses_UserNotAuthorized.
+type ApiComponentsResponsesUserNotAuthorized struct {
+	union json.RawMessage
+}
 
 // AsApiComponentsErrorsErrAuthorization returns the union data inside the ApiComponentsErrorsErrUnauthorized as a ApiComponentsErrorsErrAuthorization
 func (t ApiComponentsErrorsErrUnauthorized) AsApiComponentsErrorsErrAuthorization() (ApiComponentsErrorsErrAuthorization, error) {
@@ -164,6 +216,104 @@ func (t ApiComponentsErrorsErrUnauthorized) MarshalJSON() ([]byte, error) {
 }
 
 func (t *ApiComponentsErrorsErrUnauthorized) UnmarshalJSON(b []byte) error {
+	err := t.union.UnmarshalJSON(b)
+	return err
+}
+
+// AsApiComponentsErrorsErrDataNotFound returns the union data inside the ApiComponentsResponsesGetDataNotFound as a ApiComponentsErrorsErrDataNotFound
+func (t ApiComponentsResponsesGetDataNotFound) AsApiComponentsErrorsErrDataNotFound() (ApiComponentsErrorsErrDataNotFound, error) {
+	var body ApiComponentsErrorsErrDataNotFound
+	err := json.Unmarshal(t.union, &body)
+	return body, err
+}
+
+// FromApiComponentsErrorsErrDataNotFound overwrites any union data inside the ApiComponentsResponsesGetDataNotFound as the provided ApiComponentsErrorsErrDataNotFound
+func (t *ApiComponentsResponsesGetDataNotFound) FromApiComponentsErrorsErrDataNotFound(v ApiComponentsErrorsErrDataNotFound) error {
+	b, err := json.Marshal(v)
+	t.union = b
+	return err
+}
+
+// MergeApiComponentsErrorsErrDataNotFound performs a merge with any union data inside the ApiComponentsResponsesGetDataNotFound, using the provided ApiComponentsErrorsErrDataNotFound
+func (t *ApiComponentsResponsesGetDataNotFound) MergeApiComponentsErrorsErrDataNotFound(v ApiComponentsErrorsErrDataNotFound) error {
+	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+
+	merged, err := runtime.JSONMerge(t.union, b)
+	t.union = merged
+	return err
+}
+
+func (t ApiComponentsResponsesGetDataNotFound) MarshalJSON() ([]byte, error) {
+	b, err := t.union.MarshalJSON()
+	return b, err
+}
+
+func (t *ApiComponentsResponsesGetDataNotFound) UnmarshalJSON(b []byte) error {
+	err := t.union.UnmarshalJSON(b)
+	return err
+}
+
+// AsApiComponentsErrorsErrUnauthorized returns the union data inside the ApiComponentsResponsesUserNotAuthorized as a ApiComponentsErrorsErrUnauthorized
+func (t ApiComponentsResponsesUserNotAuthorized) AsApiComponentsErrorsErrUnauthorized() (ApiComponentsErrorsErrUnauthorized, error) {
+	var body ApiComponentsErrorsErrUnauthorized
+	err := json.Unmarshal(t.union, &body)
+	return body, err
+}
+
+// FromApiComponentsErrorsErrUnauthorized overwrites any union data inside the ApiComponentsResponsesUserNotAuthorized as the provided ApiComponentsErrorsErrUnauthorized
+func (t *ApiComponentsResponsesUserNotAuthorized) FromApiComponentsErrorsErrUnauthorized(v ApiComponentsErrorsErrUnauthorized) error {
+	b, err := json.Marshal(v)
+	t.union = b
+	return err
+}
+
+// MergeApiComponentsErrorsErrUnauthorized performs a merge with any union data inside the ApiComponentsResponsesUserNotAuthorized, using the provided ApiComponentsErrorsErrUnauthorized
+func (t *ApiComponentsResponsesUserNotAuthorized) MergeApiComponentsErrorsErrUnauthorized(v ApiComponentsErrorsErrUnauthorized) error {
+	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+
+	merged, err := runtime.JSONMerge(t.union, b)
+	t.union = merged
+	return err
+}
+
+// AsApiComponentsErrorsErrXPubAuthRequired returns the union data inside the ApiComponentsResponsesUserNotAuthorized as a ApiComponentsErrorsErrXPubAuthRequired
+func (t ApiComponentsResponsesUserNotAuthorized) AsApiComponentsErrorsErrXPubAuthRequired() (ApiComponentsErrorsErrXPubAuthRequired, error) {
+	var body ApiComponentsErrorsErrXPubAuthRequired
+	err := json.Unmarshal(t.union, &body)
+	return body, err
+}
+
+// FromApiComponentsErrorsErrXPubAuthRequired overwrites any union data inside the ApiComponentsResponsesUserNotAuthorized as the provided ApiComponentsErrorsErrXPubAuthRequired
+func (t *ApiComponentsResponsesUserNotAuthorized) FromApiComponentsErrorsErrXPubAuthRequired(v ApiComponentsErrorsErrXPubAuthRequired) error {
+	b, err := json.Marshal(v)
+	t.union = b
+	return err
+}
+
+// MergeApiComponentsErrorsErrXPubAuthRequired performs a merge with any union data inside the ApiComponentsResponsesUserNotAuthorized, using the provided ApiComponentsErrorsErrXPubAuthRequired
+func (t *ApiComponentsResponsesUserNotAuthorized) MergeApiComponentsErrorsErrXPubAuthRequired(v ApiComponentsErrorsErrXPubAuthRequired) error {
+	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+
+	merged, err := runtime.JSONMerge(t.union, b)
+	t.union = merged
+	return err
+}
+
+func (t ApiComponentsResponsesUserNotAuthorized) MarshalJSON() ([]byte, error) {
+	b, err := t.union.MarshalJSON()
+	return b, err
+}
+
+func (t *ApiComponentsResponsesUserNotAuthorized) UnmarshalJSON(b []byte) error {
 	err := t.union.UnmarshalJSON(b)
 	return err
 }

@@ -4,4 +4,48 @@ info:
   version: ignored
 
 components:
-  schemas:
+  responses:
+    NotAuthorized:
+      description: Security requirements failed
+      content:
+        application/json:
+          schema:
+            $ref: "./errors.yaml#/components/schemas/ErrUnauthorized"
+
+    UserNotAuthorized:
+      description: Security requirements failed
+      content:
+        application/json:
+          schema:
+            oneOf:
+              - $ref: "./errors.yaml#/components/schemas/ErrUnauthorized"
+              - $ref: "./errors.yaml#/components/schemas/ErrXPubAuthRequired"
+
+    DataInternalError:
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: "./errors.yaml#/components/schemas/ErrInternal"
+
+    UserGetDataSuccess:
+      description: Data found
+      content:
+        application/json:
+          schema:
+            $ref: "./models.yaml#/components/schemas/Data"
+
+    GetDataBadRequest:
+      description: Bad request is an error that occurs when the request is malformed.
+      content:
+        application/json:
+          schema:
+            $ref: "./errors.yaml#/components/schemas/ErrInvalidDataID"
+
+    GetDataNotFound:
+      description: Not found is an error that occurs when the requested resource is not found.
+      content:
+        application/json:
+          schema:
+            oneOf:
+              - $ref: "./errors.yaml#/components/schemas/ErrDataNotFound"

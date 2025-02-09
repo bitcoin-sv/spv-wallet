@@ -5,3 +5,15 @@ info:
 
 components:
   schemas:
+    Data:
+      type: object
+      properties:
+        id:
+          type: string
+          description: User ID
+        blob:
+          type: string
+          description: Data blob
+      required:
+        - id
+        - blob

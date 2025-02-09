@@ -13,20 +13,80 @@ paths:
                 "200":
                     description: Success
                 "401":
-                    $ref: '#/components/responses/api_components_errors_NotAuthorized'
+                    $ref: '#/components/responses/api_components_responses_NotAuthorized'
             security:
                 - XPubAuth:
                     - admin
             summary: Get admin status
             tags:
                 - Admin endpoints
+    /api/v2/data/{id}:
+        get:
+            description: This endpoint gets data by its id for authenticated user
+            parameters:
+                - description: Data ID
+                  in: path
+                  name: id
+                  required: true
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    $ref: '#/components/responses/api_components_responses_UserGetDataSuccess'
+                "400":
+                    $ref: '#/components/responses/api_components_responses_GetDataBadRequest'
+                "401":
+                    $ref: '#/components/responses/api_components_responses_UserNotAuthorized'
+                "404":
+                    $ref: '#/components/responses/api_components_responses_GetDataNotFound'
+                "500":
+                    $ref: '#/components/responses/api_components_responses_DataInternalError'
+            security:
+                - XPubAuth:
+                    - user
+            summary: Get data with given id for authenticated user
+            tags:
+                - User endpoints
 components:
     responses:
-        api_components_errors_NotAuthorized:
+        api_components_responses_DataInternalError:
+            content:
+                application/json:
+                    schema:
+                        $ref: '#/components/schemas/api_components_errors_ErrInternal'
+            description: Internal server error
+        api_components_responses_GetDataBadRequest:
+            content:
+                application/json:
+                    schema:
+                        $ref: '#/components/schemas/api_components_errors_ErrInvalidDataID'
+            description: Bad request is an error that occurs when the request is malformed.
+        api_components_responses_GetDataNotFound:
+            content:
+                application/json:
+                    schema:
+                        oneOf:
+                            - $ref: '#/components/schemas/api_components_errors_ErrDataNotFound'
+            description: Not found is an error that occurs when the requested resource is not found.
+        api_components_responses_NotAuthorized:
             content:
                 application/json:
                     schema:
                         $ref: '#/components/schemas/api_components_errors_ErrUnauthorized'
+            description: Security requirements failed
+        api_components_responses_UserGetDataSuccess:
+            content:
+                application/json:
+                    schema:
+                        $ref: '#/components/schemas/api_components_models_Data'
+            description: Data found
+        api_components_responses_UserNotAuthorized:
+            content:
+                application/json:
+                    schema:
+                        oneOf:
+                            - $ref: '#/components/schemas/api_components_errors_ErrUnauthorized'
+                            - $ref: '#/components/schemas/api_components_errors_ErrXPubAuthRequired'
             description: Security requirements failed
     schemas:
         api_components_errors_ErrAdminAuthOnNonAdminEndpoint:
@@ -46,6 +106,33 @@ components:
                         example: error-unauthorized
                     message:
                         example: unauthorized
+                  type: object
+        api_components_errors_ErrDataNotFound:
+            allOf:
+                - $ref: '#/components/schemas/api_components_errors_ErrorSchema'
+                - properties:
+                    code:
+                        example: error-data-not-found
+                    message:
+                        example: data not found
+                  type: object
+        api_components_errors_ErrInternal:
+            allOf:
+                - $ref: '#/components/schemas/api_components_errors_ErrorSchema'
+                - properties:
+                    code:
+                        example: error-internal-server-error
+                    message:
+                        example: internal server error
+                  type: object
+        api_components_errors_ErrInvalidDataID:
+            allOf:
+                - $ref: '#/components/schemas/api_components_errors_ErrorSchema'
+                - properties:
+                    code:
+                        example: error-invalid-data-id
+                    message:
+                        example: invalid data id
                   type: object
         api_components_errors_ErrUnauthorized:
             oneOf:
@@ -71,6 +158,15 @@ components:
                     message:
                         example: wrong auth scope format
                   type: object
+        api_components_errors_ErrXPubAuthRequired:
+            allOf:
+                - $ref: '#/components/schemas/api_components_errors_ErrorSchema'
+                - properties:
+                    code:
+                        example: error-xpub-authorization-required
+                    message:
+                        example: xpub authorization required
+                  type: object
         api_components_errors_ErrorSchema:
             additionalProperties: false
             properties:
@@ -83,6 +179,18 @@ components:
             required:
                 - code
                 - message
+            type: object
+        api_components_models_Data:
+            properties:
+                blob:
+                    description: Data blob
+                    type: string
+                id:
+                    description: User ID
+                    type: string
+            required:
+                - id
+                - blob
             type: object
     securitySchemes:
         XPubAuth:

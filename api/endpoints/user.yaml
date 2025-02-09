@@ -3,3 +3,32 @@ info:
   title: ignored
   version: ignored
 paths:
+
+  /api/v2/data/{id}:
+    get:
+      security:
+        - XPubAuth:
+            - "user"
+      tags:
+        - User endpoints
+      summary: Get data with given id for authenticated user
+      description: >-
+        This endpoint gets data by its id for authenticated user
+      parameters:
+        - name: id
+          in: path
+          description: Data ID
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          $ref: "../components/responses.yaml#/components/responses/UserGetDataSuccess"
+        400:
+          $ref: "../components/responses.yaml#/components/responses/GetDataBadRequest"
+        401:
+          $ref: "../components/responses.yaml#/components/responses/UserNotAuthorized"
+        404:
+          $ref: "../components/responses.yaml#/components/responses/GetDataNotFound"
+        500:
+          $ref: "../components/responses.yaml#/components/responses/DataInternalError"

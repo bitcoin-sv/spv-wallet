@@ -4,14 +4,6 @@ info:
   version: ignored
 
 components:
-  responses:
-    NotAuthorized:
-      description: Security requirements failed
-      content:
-        application/json:
-          schema:
-            $ref: "#/components/schemas/ErrUnauthorized"
-
   schemas:
     ErrorSchema:
       type: object
@@ -73,3 +65,43 @@ components:
               example: "error-user-auth-on-non-user-endpoint"
             message:
               example: "cannot call non-user endpoints with user authorization"
+
+    ErrXPubAuthRequired:
+      allOf:
+        - $ref: '#/components/schemas/ErrorSchema'
+        - type: object
+          properties:
+            code:
+              example: "error-xpub-authorization-required"
+            message:
+              example: "xpub authorization required"
+
+    ErrInternal:
+      allOf:
+        - $ref: '#/components/schemas/ErrorSchema'
+        - type: object
+          properties:
+            code:
+              example: "error-internal-server-error"
+            message:
+              example: "internal server error"
+
+    ErrInvalidDataID:
+      allOf:
+        - $ref: '#/components/schemas/ErrorSchema'
+        - type: object
+          properties:
+            code:
+              example: "error-invalid-data-id"
+            message:
+              example: "invalid data id"
+
+    ErrDataNotFound:
+      allOf:
+        - $ref: '#/components/schemas/ErrorSchema'
+        - type: object
+          properties:
+            code:
+              example: "error-data-not-found"
+            message:
+              example: "data not found"

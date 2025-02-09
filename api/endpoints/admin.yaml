@@ -18,4 +18,4 @@ paths:
         200:
           description: Success
         401:
-          $ref: "../components/errors.yaml#/components/responses/NotAuthorized"
+          $ref: "../components/responses.yaml#/components/responses/NotAuthorized"

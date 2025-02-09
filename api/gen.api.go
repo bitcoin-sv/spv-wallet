@@ -4,7 +4,11 @@
 package api
 
 import (
+	"fmt"
+	"net/http"
+
 	"github.com/gin-gonic/gin"
+	"github.com/oapi-codegen/runtime"
 )
 
 // ServerInterface represents all server handlers.
@@ -12,6 +16,9 @@ type ServerInterface interface {
 	// Get admin status
 	// (GET /api/v2/admin/status)
 	GetApiV2AdminStatus(c *gin.Context)
+	// Get data with given id for authenticated user
+	// (GET /api/v2/data/{id})
+	GetApiV2DataId(c *gin.Context, id string)
 }
 
 // ServerInterfaceWrapper converts contexts to parameters.
@@ -36,6 +43,32 @@ func (siw *ServerInterfaceWrapper) GetApiV2AdminStatus(c *gin.Context) {
 	}
 
 	siw.Handler.GetApiV2AdminStatus(c)
+}
+
+// GetApiV2DataId operation middleware
+func (siw *ServerInterfaceWrapper) GetApiV2DataId(c *gin.Context) {
+
+	var err error
+
+	// ------------- Path parameter "id" -------------
+	var id string
+
+	err = runtime.BindStyledParameterWithOptions("simple", "id", c.Param("id"), &id, runtime.BindStyledParameterOptions{Explode: false, Required: true})
+	if err != nil {
+		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter id: %w", err), http.StatusBadRequest)
+		return
+	}
+
+	c.Set(XPubAuthScopes, []string{"user"})
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		middleware(c)
+		if c.IsAborted() {
+			return
+		}
+	}
+
+	siw.Handler.GetApiV2DataId(c, id)
 }
 
 // GinServerOptions provides options for the Gin server.
@@ -66,4 +99,5 @@ func RegisterHandlersWithOptions(router gin.IRouter, si ServerInterface, options
 	}
 
 	router.GET(options.BaseURL+"/api/v2/admin/status", wrapper.GetApiV2AdminStatus)
+	router.GET(options.BaseURL+"/api/v2/data/:id", wrapper.GetApiV2DataId)
 }
