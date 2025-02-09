@@ -10,7 +10,7 @@ import (
 )
 
 var securedMiddlewares = []api.MiddlewareFunc{
-	(api.MiddlewareFunc)(AuthMiddleware()),
+	(api.MiddlewareFunc)(AuthV2Middleware()),
 	(api.MiddlewareFunc)(CheckSignatureMiddleware()),
 }
 
@@ -26,7 +26,7 @@ func SignatureAuthWithScopes() api.MiddlewareFunc {
 
 		scopes, ok := scopeVal.([]string)
 		if !ok || len(scopes) == 0 {
-			spverrors.ErrorResponse(c, spverrors.ErrWrongAuthScopeFormat, reqctx.Logger(c))
+			spverrors.AbortWithErrorResponse(c, spverrors.ErrWrongAuthScopeFormat, reqctx.Logger(c))
 			return
 		}
 
@@ -42,16 +42,16 @@ func SignatureAuthWithScopes() api.MiddlewareFunc {
 		switch userCtx.GetAuthType() {
 		case reqctx.AuthTypeAdmin:
 			if !slices.Contains(scopes, "admin") {
-				spverrors.ErrorResponse(c, spverrors.ErrAdminAuthOnUserEndpoint, reqctx.Logger(c))
+				spverrors.AbortWithErrorResponse(c, spverrors.ErrAdminAuthOnUserEndpoint, reqctx.Logger(c))
 				return
 			}
 		case reqctx.AuthTypeXPub:
 			if !slices.Contains(scopes, "user") {
-				spverrors.ErrorResponse(c, spverrors.ErrNotAnAdminKey, reqctx.Logger(c))
+				spverrors.AbortWithErrorResponse(c, spverrors.ErrNotAnAdminKey, reqctx.Logger(c))
 				return
 			}
 		default:
-			spverrors.ErrorResponse(c, spverrors.ErrAuthorization, reqctx.Logger(c))
+			spverrors.AbortWithErrorResponse(c, spverrors.ErrAuthorization, reqctx.Logger(c))
 		}
 
 		c.Next()
