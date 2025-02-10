@@ -3,13 +3,13 @@ package testabilities
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/bitcoin-sv/spv-wallet/engine/tester/fixtures"
 	"mime"
 	"net/http"
 	"testing"
 
 	"github.com/bitcoin-sv/spv-wallet/actions/testabilities/apierror"
 	testengine "github.com/bitcoin-sv/spv-wallet/engine/testabilities"
+	"github.com/bitcoin-sv/spv-wallet/engine/tester/fixtures"
 	"github.com/bitcoin-sv/spv-wallet/engine/tester/jsonrequire"
 	"github.com/go-resty/resty/v2"
 	"github.com/stretchr/testify/assert"

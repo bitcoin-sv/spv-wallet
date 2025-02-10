@@ -2,9 +2,9 @@ package record
 
 import (
 	"context"
-	"github.com/bitcoin-sv/go-paymail"
 	"iter"
 
+	"github.com/bitcoin-sv/go-paymail"
 	trx "github.com/bitcoin-sv/go-sdk/transaction"
 	"github.com/bitcoin-sv/spv-wallet/engine/chain/models"
 	"github.com/bitcoin-sv/spv-wallet/engine/v2/addresses/addressesmodels"
@@ -32,6 +32,7 @@ type Broadcaster interface {
 	Broadcast(ctx context.Context, tx *trx.Transaction) (*chainmodels.TXInfo, error)
 }
 
+// PaymailNotifier is an interface for notifying paymail recipients about incoming transactions.
 type PaymailNotifier interface {
 	Notify(ctx context.Context, address string, p2pMetadata *paymail.P2PMetaData, reference string, txEncoder txmodels.TxEncoder) error
 }

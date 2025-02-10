@@ -2,10 +2,10 @@ package record
 
 import (
 	"context"
-	txerrors "github.com/bitcoin-sv/spv-wallet/engine/v2/transaction/errors"
 
 	trx "github.com/bitcoin-sv/go-sdk/transaction"
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
+	txerrors "github.com/bitcoin-sv/spv-wallet/engine/v2/transaction/errors"
 )
 
 // RecordPaymailTransaction will validate, broadcast and save paymail transaction

@@ -2,9 +2,9 @@ package paymail
 
 import (
 	"context"
-	"github.com/bitcoin-sv/spv-wallet/engine/v2/transaction/txmodels"
 
 	"github.com/bitcoin-sv/go-paymail"
+	"github.com/bitcoin-sv/spv-wallet/engine/v2/transaction/txmodels"
 	"github.com/bitcoin-sv/spv-wallet/models/bsv"
 )
 

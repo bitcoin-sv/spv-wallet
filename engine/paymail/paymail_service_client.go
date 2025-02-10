@@ -3,12 +3,12 @@ package paymail
 import (
 	"context"
 	"errors"
-	"github.com/bitcoin-sv/spv-wallet/engine/v2/transaction/txmodels"
 	"time"
 
 	"github.com/bitcoin-sv/go-paymail"
 	pmerrors "github.com/bitcoin-sv/spv-wallet/engine/paymail/errors"
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
+	"github.com/bitcoin-sv/spv-wallet/engine/v2/transaction/txmodels"
 	"github.com/bitcoin-sv/spv-wallet/models/bsv"
 	"github.com/mrz1836/go-cachestore"
 	"github.com/rs/zerolog"

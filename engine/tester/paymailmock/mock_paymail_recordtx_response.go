@@ -2,12 +2,14 @@ package paymailmock
 
 import (
 	"encoding/json"
+	"net/http"
+
 	trx "github.com/bitcoin-sv/go-sdk/transaction"
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/jarcoal/httpmock"
-	"net/http"
 )
 
+// MockedRecordBEEFResponse is a mocked response for the record tx endpoint
 type MockedRecordBEEFResponse struct{}
 
 // Responder returns a httpmock responder for the mocked P2P destinations response
@@ -38,6 +40,7 @@ func (m *MockedRecordBEEFResponse) Responder() httpmock.Responder {
 	}
 }
 
+// RecordBEEFResponse returns a new mocked response for the record tx endpoint
 func RecordBEEFResponse() *MockedRecordBEEFResponse {
 	return &MockedRecordBEEFResponse{}
 }

@@ -1,7 +1,6 @@
 package testabilities
 
 import (
-	"github.com/jarcoal/httpmock"
 	"testing"
 
 	"github.com/bitcoin-sv/go-paymail"
@@ -10,6 +9,7 @@ import (
 	"github.com/bitcoin-sv/spv-wallet/engine/tester/fixtures"
 	"github.com/bitcoin-sv/spv-wallet/engine/tester/paymailmock"
 	"github.com/bitcoin-sv/spv-wallet/models/bsv"
+	"github.com/jarcoal/httpmock"
 )
 
 // PaymailClientFixture is a test fixture - used for establishing environment for test.

@@ -1,7 +1,6 @@
 package paymailmock
 
 import (
-	"github.com/go-resty/resty/v2"
 	"net"
 	"net/http"
 	"time"
@@ -9,6 +8,7 @@ import (
 	"github.com/bitcoin-sv/go-paymail"
 	"github.com/bitcoin-sv/go-paymail/tester"
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
+	"github.com/go-resty/resty/v2"
 	"github.com/jarcoal/httpmock"
 )
 
@@ -169,6 +169,7 @@ func (c *PaymailClientMock) findDomain(domain string) paymailDomainName {
 	panic(spverrors.Newf("domain %s was't' mocked", domain))
 }
 
+// GetCallByRegex is returning the details of a call made to the mocked server by a URL matching a regex.
 func (c *PaymailClientMock) GetCallByRegex(r string) *CallDetails {
 	return c.sniffer.getCallByRegex(r)
 }

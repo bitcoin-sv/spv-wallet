@@ -3,15 +3,15 @@ package transactions_test
 import (
 	"context"
 	"fmt"
-	"github.com/bitcoin-sv/go-paymail"
-	"github.com/stretchr/testify/require"
 	"testing"
 
+	"github.com/bitcoin-sv/go-paymail"
 	"github.com/bitcoin-sv/go-sdk/script"
 	"github.com/bitcoin-sv/spv-wallet/actions/testabilities"
 	chainmodels "github.com/bitcoin-sv/spv-wallet/engine/chain/models"
 	testengine "github.com/bitcoin-sv/spv-wallet/engine/testabilities"
 	"github.com/bitcoin-sv/spv-wallet/engine/tester/fixtures"
+	"github.com/stretchr/testify/require"
 )
 
 func TestExternalOutgoingTransaction(t *testing.T) {

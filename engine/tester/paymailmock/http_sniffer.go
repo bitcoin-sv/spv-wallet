@@ -2,12 +2,14 @@ package paymailmock
 
 import (
 	"bytes"
-	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"io"
 	"net/http"
 	"regexp"
+
+	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 )
 
+// CallDetails holds the details of a call made to the mocked server
 type CallDetails struct {
 	URL string
 
