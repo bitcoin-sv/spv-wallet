@@ -130,7 +130,7 @@ components:
                             - $ref: '#/components/schemas/api_components_errors_ErrInvalidPaymail'
                             - $ref: '#/components/schemas/api_components_errors_ErrPaymailInconsistent'
                             - $ref: '#/components/schemas/api_components_errors_ErrInvalidDomain'
-            description: Cannot bind request
+            description: Bad request is an error that occurs when the request is malformed.
         api_components_responses_NotAuthorized:
             content:
                 application/json:
