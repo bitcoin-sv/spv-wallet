@@ -94,6 +94,30 @@ paths:
             summary: Record transaction outline
             tags:
                 - User endpoints
+    /api/v2/transactions/outlines:
+        post:
+            description: This endpoint allows to create transaction outline for authenticated user
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/api_components_requests_AnnotatedTransaction'
+                required: true
+            responses:
+                "200":
+                    $ref: '#/components/responses/api_components_responses_RecordTransactionSuccess'
+                "400":
+                    $ref: '#/components/responses/api_components_responses_RecordTransactionBadRequest'
+                "401":
+                    $ref: '#/components/responses/api_components_responses_UserNotAuthorized'
+                "500":
+                    $ref: '#/components/responses/api_components_responses_RecordTransactionInternalServerError'
+            security:
+                - XPubAuth:
+                    - user
+            summary: Create transaction outline
+            tags:
+                - User endpoints
     /api/v2/users/current:
         get:
             description: This endpoint return balance of current authenticated user

@@ -25,6 +25,9 @@ type ServerInterface interface {
 	// Record transaction outline
 	// (POST /api/v2/transactions)
 	PostApiV2Transactions(c *gin.Context)
+	// Create transaction outline
+	// (POST /api/v2/transactions/outlines)
+	PostApiV2TransactionsOutlines(c *gin.Context)
 	// Get current user
 	// (GET /api/v2/users/current)
 	GetApiV2UsersCurrent(c *gin.Context)
@@ -147,6 +150,21 @@ func (siw *ServerInterfaceWrapper) PostApiV2Transactions(c *gin.Context) {
 	siw.Handler.PostApiV2Transactions(c)
 }
 
+// PostApiV2TransactionsOutlines operation middleware
+func (siw *ServerInterfaceWrapper) PostApiV2TransactionsOutlines(c *gin.Context) {
+
+	c.Set(XPubAuthScopes, []string{"user"})
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		middleware(c)
+		if c.IsAborted() {
+			return
+		}
+	}
+
+	siw.Handler.PostApiV2TransactionsOutlines(c)
+}
+
 // GetApiV2UsersCurrent operation middleware
 func (siw *ServerInterfaceWrapper) GetApiV2UsersCurrent(c *gin.Context) {
 
@@ -193,5 +211,6 @@ func RegisterHandlersWithOptions(router gin.IRouter, si ServerInterface, options
 	router.GET(options.BaseURL+"/api/v2/data/:id", wrapper.GetApiV2DataId)
 	router.GET(options.BaseURL+"/api/v2/operations/search", wrapper.GetApiV2OperationsSearch)
 	router.POST(options.BaseURL+"/api/v2/transactions", wrapper.PostApiV2Transactions)
+	router.POST(options.BaseURL+"/api/v2/transactions/outlines", wrapper.PostApiV2TransactionsOutlines)
 	router.GET(options.BaseURL+"/api/v2/users/current", wrapper.GetApiV2UsersCurrent)
 }

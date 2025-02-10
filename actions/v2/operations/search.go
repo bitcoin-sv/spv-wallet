@@ -22,20 +22,7 @@ func (s *APIOperations) GetApiV2OperationsSearch(c *gin.Context, params api.GetA
 		return
 	}
 
-	// TODO: some mapping is missing here
-	//searchParams, err := query.ParseSearchParams[struct{}](c)
-	//if err != nil {
-	//	spverrors.ErrorResponse(c, spverrors.ErrCannotParseQueryParams.WithTrace(err), logger)
-	//	return
-	//}
-
-	page := filter.Page{
-		Number: *params.Page,
-		Size:   *params.Size,
-		Sort:   *params.Sort,
-		SortBy: *params.SortBy,
-	}
-
+	page := mapToFilter(params)
 	pagedResult, err := reqctx.Engine(c).OperationsService().PaginatedForUser(c.Request.Context(), userID, page)
 	if err != nil {
 		spverrors.ErrorResponse(c, err, reqctx.Logger(c))
@@ -43,4 +30,23 @@ func (s *APIOperations) GetApiV2OperationsSearch(c *gin.Context, params api.GetA
 	}
 
 	c.JSON(http.StatusOK, mapping.OperationsPagedResponse(pagedResult))
+}
+
+func mapToFilter(params api.GetApiV2OperationsSearchParams) filter.Page {
+	page := filter.Page{}
+
+	if params.Page != nil {
+		page.Number = *params.Page
+	}
+	if params.Size != nil {
+		page.Size = *params.Size
+	}
+	if params.Sort != nil {
+		page.Sort = *params.Sort
+	}
+	if params.SortBy != nil {
+		page.SortBy = *params.SortBy
+	}
+
+	return page
 }

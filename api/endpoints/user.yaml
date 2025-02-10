@@ -101,3 +101,29 @@ paths:
           $ref: "../components/responses.yaml#/components/responses/UserNotAuthorized"
         500:
           $ref: "../components/responses.yaml#/components/responses/RecordTransactionInternalServerError"
+
+  /api/v2/transactions/outlines:
+    post:
+      security:
+        - XPubAuth:
+            - "user"
+      tags:
+        - User endpoints
+      summary: Create transaction outline
+      description: >-
+        This endpoint allows to create transaction outline for authenticated user
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "../components/requests.yaml#/components/schemas/AnnotatedTransaction"
+      responses:
+        200:
+          $ref: "../components/responses.yaml#/components/responses/RecordTransactionSuccess"
+        400:
+          $ref: "../components/responses.yaml#/components/responses/RecordTransactionBadRequest"
+        401:
+          $ref: "../components/responses.yaml#/components/responses/UserNotAuthorized"
+        500:
+          $ref: "../components/responses.yaml#/components/responses/RecordTransactionInternalServerError"

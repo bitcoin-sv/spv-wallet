@@ -26,6 +26,8 @@ func SignatureAuthWithScopes() api.MiddlewareFunc {
 
 		scopes, ok := scopeVal.([]string)
 		if !ok || len(scopes) == 0 {
+			// add log
+			//return 500
 			spverrors.AbortWithErrorResponse(c, spverrors.ErrWrongAuthScopeFormat, reqctx.Logger(c))
 			return
 		}

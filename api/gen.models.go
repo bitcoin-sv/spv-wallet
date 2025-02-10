@@ -324,6 +324,9 @@ type GetApiV2OperationsSearchParams struct {
 // PostApiV2TransactionsJSONRequestBody defines body for PostApiV2Transactions for application/json ContentType.
 type PostApiV2TransactionsJSONRequestBody = ApiComponentsRequestsAnnotatedTransaction
 
+// PostApiV2TransactionsOutlinesJSONRequestBody defines body for PostApiV2TransactionsOutlines for application/json ContentType.
+type PostApiV2TransactionsOutlinesJSONRequestBody = ApiComponentsRequestsAnnotatedTransaction
+
 // AsApiComponentsErrorsErrAuthorization returns the union data inside the ApiComponentsErrorsErrUnauthorized as a ApiComponentsErrorsErrAuthorization
 func (t ApiComponentsErrorsErrUnauthorized) AsApiComponentsErrorsErrAuthorization() (ApiComponentsErrorsErrAuthorization, error) {
 	var body ApiComponentsErrorsErrAuthorization
