@@ -36,6 +36,8 @@ type SPVWalletApplicationFixture interface {
 	Paymail() testpaymail.PaymailClientFixture
 
 	Faucet(user fixtures.User) testengine.FaucetFixture
+
+	EngineFixture() testengine.EngineFixture
 }
 
 type BlockHeadersServiceFixture interface {
@@ -147,4 +149,8 @@ func (f *appFixture) Paymail() testpaymail.PaymailClientFixture {
 
 func (f *appFixture) Faucet(user fixtures.User) testengine.FaucetFixture {
 	return f.engineFixture.Faucet(user)
+}
+
+func (f *appFixture) EngineFixture() testengine.EngineFixture {
+	return f.engineFixture
 }

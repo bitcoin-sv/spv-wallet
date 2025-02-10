@@ -42,10 +42,9 @@ type JsonValueGetter interface {
 }
 
 func Then(t testing.TB, app SPVWalletApplicationFixture) SPVWalletApplicationAssertions {
-	fixture := app.(*appFixture)
 	return &appAssertions{
 		t:                t,
-		engineAssertions: testengine.Then(t, fixture.engineFixture),
+		engineAssertions: testengine.Then(t, app.EngineFixture()),
 	}
 }
 

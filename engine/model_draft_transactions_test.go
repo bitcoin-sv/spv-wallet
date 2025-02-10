@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/hex"
 	"fmt"
+	"github.com/jarcoal/httpmock"
 	"strings"
 	"testing"
 	"time"
@@ -674,7 +675,7 @@ func TestDraftTransaction_createTransaction(t *testing.T) {
 	})
 
 	t.Run("SendAllTo + 2 utxos", func(t *testing.T) {
-		p := xtester.MockClient("handcash.io")
+		p := xtester.MockClient(httpmock.NewMockTransport(), "handcash.io")
 		p.WillRespondWithP2PCapabilities()
 
 		ctx, client, deferMe := CreateTestSQLiteClient(t, false, true,
