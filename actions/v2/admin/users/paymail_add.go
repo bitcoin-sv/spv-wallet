@@ -10,23 +10,20 @@ import (
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/bitcoin-sv/spv-wallet/engine/v2/paymails/paymailsmodels"
 	"github.com/bitcoin-sv/spv-wallet/models/request/adminrequest"
-	"github.com/bitcoin-sv/spv-wallet/server/reqctx"
 	"github.com/gin-gonic/gin"
 )
 
 // PostApiV2AdminUsersIdPaymails add paymails to the user
 func (s *APIAdminUsers) PostApiV2AdminUsersIdPaymails(c *gin.Context, id string) {
-	logger := reqctx.Logger(c)
-
 	var requestBody adminrequest.AddPaymail
 	if err := c.Bind(&requestBody); err != nil {
-		spverrors.ErrorResponse(c, spverrors.ErrCannotBindRequest.Wrap(err), logger)
+		spverrors.ErrorResponse(c, spverrors.ErrCannotBindRequest.Wrap(err), s.logger)
 		return
 	}
 
 	alias, domain, err := parsePaymail(&requestBody)
 	if err != nil {
-		spverrors.ErrorResponse(c, err, logger)
+		spverrors.ErrorResponse(c, err, s.logger)
 		return
 	}
 
@@ -37,9 +34,9 @@ func (s *APIAdminUsers) PostApiV2AdminUsersIdPaymails(c *gin.Context, id string)
 		Avatar:     requestBody.Avatar,
 		UserID:     id,
 	}
-	createdPaymail, err := reqctx.Engine(c).PaymailsService().Create(c, newPaymail)
+	createdPaymail, err := s.engine.PaymailsService().Create(c, newPaymail)
 	if err != nil {
-		spverrors.MapResponse(c, err, logger).
+		spverrors.MapResponse(c, err, s.logger).
 			If(configerrors.ErrUnsupportedDomain).Then(adminerrors.ErrInvalidDomain).
 			Else(adminerrors.ErrAddingPaymail)
 		return

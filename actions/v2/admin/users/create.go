@@ -10,22 +10,19 @@ import (
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/bitcoin-sv/spv-wallet/engine/v2/users/usersmodels"
 	"github.com/bitcoin-sv/spv-wallet/models/request/adminrequest"
-	"github.com/bitcoin-sv/spv-wallet/server/reqctx"
 	"github.com/gin-gonic/gin"
 )
 
 // PostApiV2AdminUsers creates a new user
 func (s *APIAdminUsers) PostApiV2AdminUsers(c *gin.Context) {
-	logger := reqctx.Logger(c)
-
 	var requestBody adminrequest.CreateUser
 	if err := c.Bind(&requestBody); err != nil {
-		spverrors.ErrorResponse(c, spverrors.ErrCannotBindRequest.Wrap(err), logger)
+		spverrors.ErrorResponse(c, spverrors.ErrCannotBindRequest.Wrap(err), s.logger)
 		return
 	}
 
 	if err := validatePubKey(requestBody.PublicKey); err != nil {
-		spverrors.ErrorResponse(c, err, logger)
+		spverrors.ErrorResponse(c, err, s.logger)
 		return
 	}
 
@@ -35,7 +32,7 @@ func (s *APIAdminUsers) PostApiV2AdminUsers(c *gin.Context) {
 	if requestBody.PaymailDefined() {
 		alias, domain, err := parsePaymail(requestBody.Paymail)
 		if err != nil {
-			spverrors.ErrorResponse(c, err, logger)
+			spverrors.ErrorResponse(c, err, s.logger)
 			return
 		}
 
@@ -48,9 +45,9 @@ func (s *APIAdminUsers) PostApiV2AdminUsers(c *gin.Context) {
 		}
 	}
 
-	createdUser, err := reqctx.Engine(c).UsersService().Create(c, newUser)
+	createdUser, err := s.engine.UsersService().Create(c, newUser)
 	if err != nil {
-		spverrors.MapResponse(c, err, logger).
+		spverrors.MapResponse(c, err, s.logger).
 			If(configerrors.ErrUnsupportedDomain).Then(adminerrors.ErrInvalidDomain).
 			Else(adminerrors.ErrCreatingUser)
 		return

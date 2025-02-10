@@ -5,15 +5,14 @@ import (
 
 	"github.com/bitcoin-sv/spv-wallet/actions/v2/admin/internal/mapping"
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
-	"github.com/bitcoin-sv/spv-wallet/server/reqctx"
 	"github.com/gin-gonic/gin"
 )
 
 // GetApiV2AdminUsersId returns a user by ID
 func (s *APIAdminUsers) GetApiV2AdminUsersId(c *gin.Context, id string) {
-	user, err := reqctx.Engine(c).UsersService().GetByID(c, id)
+	user, err := s.engine.UsersService().GetByID(c, id)
 	if err != nil {
-		spverrors.ErrorResponse(c, err, reqctx.Logger(c))
+		spverrors.ErrorResponse(c, err, s.logger)
 		return
 	}
 
