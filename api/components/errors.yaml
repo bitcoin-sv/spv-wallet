@@ -22,7 +22,6 @@ components:
     ErrUnauthorized:
       oneOf:
         - $ref: '#/components/schemas/ErrAuthorization'
-        - $ref: '#/components/schemas/ErrWrongAuthScopeFormat'
         - $ref: '#/components/schemas/ErrAdminAuthOnNonAdminEndpoint'
         - $ref: '#/components/schemas/ErrUserAuthOnNonUserEndpoint'
 
@@ -35,16 +34,6 @@ components:
               example: "error-unauthorized"
             message:
               example: "unauthorized"
-
-    ErrWrongAuthScopeFormat:
-      allOf:
-        - $ref: '#/components/schemas/ErrorSchema'
-        - type: object
-          properties:
-            code:
-              example: "error-wrong-auth-scope-format"
-            message:
-              example: "wrong auth scope format"
 
     ErrAdminAuthOnNonAdminEndpoint:
       allOf:
