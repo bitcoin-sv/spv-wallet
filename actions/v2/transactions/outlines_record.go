@@ -26,8 +26,14 @@ func (s *APITransactions) PostApiV2Transactions(c *gin.Context) {
 		return
 	}
 
+	outline, err := mapping.AnnotatedTransactionRequestToOutline(&requestBody)
+	if err != nil {
+		spverrors.ErrorResponse(c, err, logger)
+		return
+	}
+
 	recordService := reqctx.Engine(c).TransactionRecordService()
-	recorded, err := recordService.RecordTransactionOutline(c, userID, mapping.AnnotatedTransactionRequestToOutline(&requestBody))
+	recorded, err := recordService.RecordTransactionOutline(c, userID, outline)
 	if err != nil {
 		spverrors.ErrorResponse(c, err, logger)
 		return
