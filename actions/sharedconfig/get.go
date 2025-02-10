@@ -1,10 +1,11 @@
 package sharedconfig
 
 import (
+	"net/http"
+
 	"github.com/bitcoin-sv/spv-wallet/models/response"
 	"github.com/bitcoin-sv/spv-wallet/server/reqctx"
 	"github.com/gin-gonic/gin"
-	"net/http"
 )
 
 // sharedConfig will return the shared configuration

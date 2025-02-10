@@ -120,7 +120,7 @@ func setupServerRoutes(appConfig *config.AppConfig, spvWalletEngine engine.Clien
 		pprof.Register(ginEngine, "debug/pprof")
 	}
 
-	api.RegisterHandlersWithOptions(ginEngine, v2.NewServer(), api.GinServerOptions{
+	api.RegisterHandlersWithOptions(ginEngine, v2.NewServer(appConfig), api.GinServerOptions{
 		BaseURL: "",
 		Middlewares: []api.MiddlewareFunc{
 			middleware.SignatureAuthWithScopes(),

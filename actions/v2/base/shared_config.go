@@ -1,9 +1,10 @@
 package base
 
 import (
+	"net/http"
+
 	"github.com/bitcoin-sv/spv-wallet/models/response"
 	"github.com/gin-gonic/gin"
-	"net/http"
 )
 
 // GetApiV2ConfigsShared is the handler for SharedConfig which can be obtained by both admin and user
