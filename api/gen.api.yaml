@@ -70,6 +70,30 @@ paths:
             summary: Get operations for user
             tags:
                 - User endpoints
+    /api/v2/transactions:
+        post:
+            description: This endpoint allows to record transaction outline for authenticated user
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/api_components_requests_AnnotatedTransaction'
+                required: true
+            responses:
+                "200":
+                    $ref: '#/components/responses/api_components_responses_RecordTransactionSuccess'
+                "400":
+                    $ref: '#/components/responses/api_components_responses_RecordTransactionBadRequest'
+                "401":
+                    $ref: '#/components/responses/api_components_responses_UserNotAuthorized'
+                "500":
+                    $ref: '#/components/responses/api_components_responses_RecordTransactionInternalServerError'
+            security:
+                - XPubAuth:
+                    - user
+            summary: Record transaction outline
+            tags:
+                - User endpoints
     /api/v2/users/current:
         get:
             description: This endpoint return balance of current authenticated user
@@ -148,6 +172,32 @@ components:
                     schema:
                         $ref: '#/components/schemas/api_components_errors_ErrUnauthorized'
             description: Security requirements failed
+        api_components_responses_RecordTransactionBadRequest:
+            content:
+                application/json:
+                    schema:
+                        oneOf:
+                            - $ref: '#/components/schemas/api_components_errors_ErrInvalidDataID'
+                            - $ref: '#/components/schemas/api_components_errors_ErrAnnotationIndexOutOfRange'
+                            - $ref: '#/components/schemas/api_components_errors_ErrUTXOSpent'
+                            - $ref: '#/components/schemas/api_components_errors_ErrAnnotationIndexConversion'
+                            - $ref: '#/components/schemas/api_components_errors_ErrNoOperations'
+            description: Bad request is an error that occurs when the request is malformed.
+        api_components_responses_RecordTransactionInternalServerError:
+            content:
+                application/json:
+                    schema:
+                        oneOf:
+                            - $ref: '#/components/schemas/api_components_errors_ErrInternal'
+                            - $ref: '#/components/schemas/api_components_errors_ErrGettingOutputs'
+                            - $ref: '#/components/schemas/api_components_errors_ErrTxBroadcast'
+            description: Internal server error
+        api_components_responses_RecordTransactionSuccess:
+            content:
+                application/json:
+                    schema:
+                        $ref: '#/components/schemas/api_components_models_RecordedOutline'
+            description: Transaction recorded
         api_components_responses_SearchBadRequest:
             content:
                 application/json:
@@ -184,6 +234,24 @@ components:
                     message:
                         example: cannot call non-admin endpoints with admin authorization
                   type: object
+        api_components_errors_ErrAnnotationIndexConversion:
+            allOf:
+                - $ref: '#/components/schemas/api_components_errors_ErrorSchema'
+                - properties:
+                    code:
+                        example: error-annotation-index-conversion
+                    message:
+                        example: failed to convert annotation index
+                  type: object
+        api_components_errors_ErrAnnotationIndexOutOfRange:
+            allOf:
+                - $ref: '#/components/schemas/api_components_errors_ErrorSchema'
+                - properties:
+                    code:
+                        example: error-annotation-index-out-of-range
+                    message:
+                        example: annotation index out of range
+                  type: object
         api_components_errors_ErrAuthorization:
             allOf:
                 - $ref: '#/components/schemas/api_components_errors_ErrorSchema'
@@ -202,6 +270,15 @@ components:
                     message:
                         example: data not found
                   type: object
+        api_components_errors_ErrGettingOutputs:
+            allOf:
+                - $ref: '#/components/schemas/api_components_errors_ErrorSchema'
+                - properties:
+                    code:
+                        example: error-getting-outputs
+                    message:
+                        example: failed to get outputs
+                  type: object
         api_components_errors_ErrInternal:
             allOf:
                 - $ref: '#/components/schemas/api_components_errors_ErrorSchema'
@@ -219,6 +296,33 @@ components:
                         example: error-invalid-data-id
                     message:
                         example: invalid data id
+                  type: object
+        api_components_errors_ErrNoOperations:
+            allOf:
+                - $ref: '#/components/schemas/api_components_errors_ErrorSchema'
+                - properties:
+                    code:
+                        example: error-no-operations
+                    message:
+                        example: no operations to save
+                  type: object
+        api_components_errors_ErrTxBroadcast:
+            allOf:
+                - $ref: '#/components/schemas/api_components_errors_ErrorSchema'
+                - properties:
+                    code:
+                        example: error-tx-broadcast
+                    message:
+                        example: failed to broadcast transaction
+                  type: object
+        api_components_errors_ErrUTXOSpent:
+            allOf:
+                - $ref: '#/components/schemas/api_components_errors_ErrorSchema'
+                - properties:
+                    code:
+                        example: error-utxo-spent
+                    message:
+                        example: UTXO is already spent
                   type: object
         api_components_errors_ErrUnauthorized:
             oneOf:
@@ -266,6 +370,19 @@ components:
                 - code
                 - message
             type: object
+        api_components_models_Annotations:
+            properties:
+                inputs:
+                    additionalProperties:
+                        $ref: '#/components/schemas/api_components_models_InputAnnotation'
+                    description: Map of input annotations
+                    type: object
+                outputs:
+                    additionalProperties:
+                        $ref: '#/components/schemas/api_components_models_OutputAnnotation'
+                    description: Map of output annotations
+                    type: object
+            type: object
         api_components_models_Data:
             properties:
                 blob:
@@ -277,6 +394,15 @@ components:
             required:
                 - id
                 - blob
+            type: object
+        api_components_models_InputAnnotation:
+            properties:
+                customInstructions:
+                    description: Instructions about how to unlock this input.
+                    example: Use custom script to unlock
+                    type: string
+            required:
+                - customInstructions
             type: object
         api_components_models_Operation:
             properties:
@@ -325,6 +451,43 @@ components:
                 page:
                     $ref: '#/components/schemas/api_components_models_SearchPage'
             type: object
+        api_components_models_OutputAnnotation:
+            properties:
+                bucket:
+                    description: Type of bucket where this output should be stored.
+                    example: some-bucket
+                    type: string
+                paymail:
+                    $ref: '#/components/schemas/api_components_models_PaymailAnnotation'
+            required:
+                - bucket
+            type: object
+        api_components_models_PaymailAnnotation:
+            properties:
+                receiver:
+                    description: Paymail address of the receiver
+                    example: alice@example.com
+                    type: string
+                reference:
+                    description: Reference number used for paymail transaction
+                    type: string
+                sender:
+                    description: Paymail address of the sender
+                    example: bob@example.com
+                    type: string
+            required:
+                - receiver
+                - reference
+                - sender
+            type: object
+        api_components_models_RecordedOutline:
+            properties:
+                txID:
+                    description: ID of the transaction
+                    type: string
+            required:
+                - txID
+            type: object
         api_components_models_SearchPage:
             properties:
                 number:
@@ -356,6 +519,21 @@ components:
             required:
                 - id
                 - name
+            type: object
+        api_components_requests_AnnotatedTransaction:
+            properties:
+                annotations:
+                    $ref: '#/components/schemas/api_components_models_Annotations'
+                format:
+                    description: Transaction format
+                    example: BEEF
+                    type: string
+                hex:
+                    description: Transaction hex
+                    type: string
+            required:
+                - hex
+                - format
             type: object
     securitySchemes:
         XPubAuth:

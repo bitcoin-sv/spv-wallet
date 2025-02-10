@@ -4,6 +4,7 @@ import (
 	"github.com/bitcoin-sv/spv-wallet/actions/v2/admin"
 	"github.com/bitcoin-sv/spv-wallet/actions/v2/data"
 	"github.com/bitcoin-sv/spv-wallet/actions/v2/operations"
+	"github.com/bitcoin-sv/spv-wallet/actions/v2/transactions"
 	"github.com/bitcoin-sv/spv-wallet/actions/v2/users"
 	"github.com/bitcoin-sv/spv-wallet/api"
 )
@@ -14,6 +15,7 @@ type Server struct {
 	data.APIData
 	users.APIUsers
 	operations.APIOperations
+	transactions.APITransactions
 }
 
 // check if the Server implements the interface api.ServerInterface

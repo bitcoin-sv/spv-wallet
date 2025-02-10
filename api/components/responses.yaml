@@ -70,3 +70,32 @@ components:
         application/json:
           schema:
             $ref: "./models.yaml#/components/schemas/OperationsSearchResult"
+
+    RecordTransactionSuccess:
+      description: Transaction recorded
+      content:
+        application/json:
+          schema:
+            $ref: "./models.yaml#/components/schemas/RecordedOutline"
+
+    RecordTransactionBadRequest:
+      description: Bad request is an error that occurs when the request is malformed.
+      content:
+        application/json:
+          schema:
+            oneOf:
+              - $ref: "./errors.yaml#/components/schemas/ErrInvalidDataID"
+              - $ref: "./errors.yaml#/components/schemas/ErrAnnotationIndexOutOfRange"
+              - $ref: "./errors.yaml#/components/schemas/ErrUTXOSpent"
+              - $ref: "./errors.yaml#/components/schemas/ErrAnnotationIndexConversion"
+              - $ref: "./errors.yaml#/components/schemas/ErrNoOperations"
+
+    RecordTransactionInternalServerError:
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            oneOf:
+              - $ref: "./errors.yaml#/components/schemas/ErrInternal"
+              - $ref: "./errors.yaml#/components/schemas/ErrGettingOutputs"
+              - $ref: "./errors.yaml#/components/schemas/ErrTxBroadcast"

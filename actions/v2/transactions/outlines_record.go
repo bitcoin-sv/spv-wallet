@@ -9,7 +9,7 @@ import (
 	"github.com/gin-gonic/gin/binding"
 )
 
-func recordOutline(c *gin.Context, userContext *reqctx.UserContext) {
+func (s *APITransactions) PostApiV2Transactions(c *gin.Context) {
 	logger := reqctx.Logger(c)
 
 	var requestBody request.AnnotatedTransaction
@@ -19,6 +19,7 @@ func recordOutline(c *gin.Context, userContext *reqctx.UserContext) {
 		return
 	}
 
+	userContext := reqctx.GetUserContext(c)
 	userID, err := userContext.ShouldGetUserID()
 	if err != nil {
 		spverrors.ErrorResponse(c, err, logger)

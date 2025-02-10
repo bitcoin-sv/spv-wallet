@@ -22,6 +22,9 @@ type ServerInterface interface {
 	// Get operations for user
 	// (GET /api/v2/operations/search)
 	GetApiV2OperationsSearch(c *gin.Context, params GetApiV2OperationsSearchParams)
+	// Record transaction outline
+	// (POST /api/v2/transactions)
+	PostApiV2Transactions(c *gin.Context)
 	// Get current user
 	// (GET /api/v2/users/current)
 	GetApiV2UsersCurrent(c *gin.Context)
@@ -129,6 +132,21 @@ func (siw *ServerInterfaceWrapper) GetApiV2OperationsSearch(c *gin.Context) {
 	siw.Handler.GetApiV2OperationsSearch(c, params)
 }
 
+// PostApiV2Transactions operation middleware
+func (siw *ServerInterfaceWrapper) PostApiV2Transactions(c *gin.Context) {
+
+	c.Set(XPubAuthScopes, []string{"user"})
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		middleware(c)
+		if c.IsAborted() {
+			return
+		}
+	}
+
+	siw.Handler.PostApiV2Transactions(c)
+}
+
 // GetApiV2UsersCurrent operation middleware
 func (siw *ServerInterfaceWrapper) GetApiV2UsersCurrent(c *gin.Context) {
 
@@ -174,5 +192,6 @@ func RegisterHandlersWithOptions(router gin.IRouter, si ServerInterface, options
 	router.GET(options.BaseURL+"/api/v2/admin/status", wrapper.GetApiV2AdminStatus)
 	router.GET(options.BaseURL+"/api/v2/data/:id", wrapper.GetApiV2DataId)
 	router.GET(options.BaseURL+"/api/v2/operations/search", wrapper.GetApiV2OperationsSearch)
+	router.POST(options.BaseURL+"/api/v2/transactions", wrapper.PostApiV2Transactions)
 	router.GET(options.BaseURL+"/api/v2/users/current", wrapper.GetApiV2UsersCurrent)
 }

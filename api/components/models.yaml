@@ -104,4 +104,68 @@ components:
     Operations:
       type: array
       items:
-        $ref: '#/components/schemas/Operation'
+        $ref: "#/components/schemas/Operation"
+
+    Annotations:
+      type: object
+      properties:
+        outputs:
+          type: object
+          description: Map of output annotations
+          additionalProperties:
+            $ref: "#/components/schemas/OutputAnnotation"
+        inputs:
+          type: object
+          description: Map of input annotations
+          additionalProperties:
+            $ref: "#/components/schemas/InputAnnotation"
+
+    OutputAnnotation:
+      type: object
+      properties:
+        bucket:
+          type: string
+          description: Type of bucket where this output should be stored.
+          example: "some-bucket"
+        paymail:
+          $ref: "#/components/schemas/PaymailAnnotation"
+      required:
+        - bucket
+
+    InputAnnotation:
+      type: object
+      properties:
+        customInstructions:
+          type: string
+          description: Instructions about how to unlock this input.
+          example: "Use custom script to unlock"
+      required:
+        - customInstructions
+
+    PaymailAnnotation:
+      type: object
+      properties:
+        receiver:
+          type: string
+          description: Paymail address of the receiver
+          example: "alice@example.com"
+        reference:
+          type: string
+          description: Reference number used for paymail transaction
+        sender:
+          type: string
+          description: Paymail address of the sender
+          example: "bob@example.com"
+      required:
+        - receiver
+        - reference
+        - sender
+
+    RecordedOutline:
+      type: object
+      properties:
+        txID:
+          type: string
+          description: ID of the transaction
+      required:
+        - txID

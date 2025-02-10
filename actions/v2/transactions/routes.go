@@ -9,5 +9,5 @@ import (
 func RegisterRoutes(handlersManager *routes.Manager) {
 	group := handlersManager.Group(handlers.GroupAPIV2, "/transactions")
 	group.POST("/outlines", handlers.AsUser(transactionOutlines))
-	group.POST("", handlers.AsUser(recordOutline))
+	//group.POST("", handlers.AsUser(recordOutline))
 }
