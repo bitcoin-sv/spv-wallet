@@ -1,12 +1,10 @@
 package sharedconfig
 
 import (
-	"net/http"
-	"sync"
-
 	"github.com/bitcoin-sv/spv-wallet/models/response"
 	"github.com/bitcoin-sv/spv-wallet/server/reqctx"
 	"github.com/gin-gonic/gin"
+	"net/http"
 )
 
 // sharedConfig will return the shared configuration
@@ -19,16 +17,14 @@ import (
 // @Router		/api/v1/configs/shared [get]
 // @Security	x-auth-xpub
 func get(c *gin.Context, _ *reqctx.UserContext) {
-	appconfig := reqctx.AppConfig(c)
-	makeConfig := sync.OnceValue(func() response.SharedConfig {
-		return response.SharedConfig{
-			PaymailDomains: appconfig.Paymail.Domains,
-			ExperimentalFeatures: map[string]bool{
-				"pikeContactsEnabled": appconfig.ExperimentalFeatures.PikeContactsEnabled,
-				"pikePaymentEnabled":  appconfig.ExperimentalFeatures.PikePaymentEnabled,
-			},
-		}
-	})
+	appConfig := reqctx.AppConfig(c)
+	sharedConfig := response.SharedConfig{
+		PaymailDomains: appConfig.Paymail.Domains,
+		ExperimentalFeatures: map[string]bool{
+			"pikeContactsEnabled": appConfig.ExperimentalFeatures.PikeContactsEnabled,
+			"pikePaymentEnabled":  appConfig.ExperimentalFeatures.PikePaymentEnabled,
+		},
+	}
 
-	c.JSON(http.StatusOK, makeConfig())
+	c.JSON(http.StatusOK, sharedConfig)
 }
