@@ -10,6 +10,7 @@ import (
 	"github.com/bitcoin-sv/spv-wallet/actions"
 	"github.com/bitcoin-sv/spv-wallet/actions/paymailserver"
 	v2 "github.com/bitcoin-sv/spv-wallet/actions/v2"
+	"github.com/bitcoin-sv/spv-wallet/actions/v2/base"
 	"github.com/bitcoin-sv/spv-wallet/api"
 	"github.com/bitcoin-sv/spv-wallet/config"
 	"github.com/bitcoin-sv/spv-wallet/engine"
@@ -126,5 +127,8 @@ func setupServerRoutes(appConfig *config.AppConfig, spvWalletEngine engine.Clien
 				spverrors.ErrorResponse(c, err, log)
 			},
 		})
+
+		// register api v2 swagger
+		base.RegisterRoutes(handlersManager)
 	}
 }

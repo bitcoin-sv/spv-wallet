@@ -11,6 +11,7 @@ import (
 	"github.com/gin-gonic/gin/binding"
 )
 
+// PostApiV2TransactionsOutlines creates a transaction outline
 func (s *APITransactions) PostApiV2TransactionsOutlines(c *gin.Context) {
 	format, err := getOutlineTransactionFormat(c)
 	if err != nil {

@@ -10,6 +10,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+// GetApiV2DataId returns data for user by its id
 func (s *APIData) GetApiV2DataId(c *gin.Context, id string) {
 	userContext := reqctx.GetUserContext(c)
 	userID, err := userContext.ShouldGetUserID()

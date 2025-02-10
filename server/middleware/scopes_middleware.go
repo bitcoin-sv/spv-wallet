@@ -1,13 +1,13 @@
 package middleware
 
 import (
-	"github.com/rs/zerolog"
 	"slices"
 
 	"github.com/bitcoin-sv/spv-wallet/api"
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/bitcoin-sv/spv-wallet/server/reqctx"
 	"github.com/gin-gonic/gin"
+	"github.com/rs/zerolog"
 )
 
 var securedMiddlewares = []api.MiddlewareFunc{

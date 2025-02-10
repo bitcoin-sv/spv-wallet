@@ -9,6 +9,7 @@ import (
 	"github.com/gin-gonic/gin/binding"
 )
 
+// PostApiV2Transactions records transaction outline
 func (s *APITransactions) PostApiV2Transactions(c *gin.Context) {
 	var requestBody api.ApiComponentsRequestsAnnotatedTransaction
 	err := c.ShouldBindWith(&requestBody, binding.JSON)

@@ -9,6 +9,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+// GetApiV2UsersCurrent returns current user information
 func (s *APIUsers) GetApiV2UsersCurrent(c *gin.Context) {
 	userContext := reqctx.GetUserContext(c)
 	userID, err := userContext.ShouldGetUserID()
