@@ -1,6 +1,7 @@
 package middleware
 
 import (
+	"github.com/rs/zerolog"
 	"slices"
 
 	"github.com/bitcoin-sv/spv-wallet/api"
@@ -15,7 +16,7 @@ var securedMiddlewares = []api.MiddlewareFunc{
 }
 
 // SignatureAuthWithScopes checks for scopes and runs auth&signature middlewares
-func SignatureAuthWithScopes() api.MiddlewareFunc {
+func SignatureAuthWithScopes(log *zerolog.Logger) api.MiddlewareFunc {
 	return func(c *gin.Context) {
 		scopeVal, exists := c.Get(api.XPubAuthScopes)
 		if !exists {
@@ -26,9 +27,8 @@ func SignatureAuthWithScopes() api.MiddlewareFunc {
 
 		scopes, ok := scopeVal.([]string)
 		if !ok || len(scopes) == 0 {
-			// add log
-			//return 500
-			spverrors.AbortWithErrorResponse(c, spverrors.ErrWrongAuthScopeFormat, reqctx.Logger(c))
+			log.Error().Msgf("Invalid scopes for incoming request %s", c.Request.URL.Path)
+			spverrors.AbortWithErrorResponse(c, spverrors.ErrInternal, reqctx.Logger(c))
 			return
 		}
 

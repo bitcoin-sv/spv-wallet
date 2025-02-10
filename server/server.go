@@ -112,21 +112,19 @@ func setupServerRoutes(appConfig *config.AppConfig, spvWalletEngine engine.Clien
 	actions.Register(handlersManager)
 	paymailserver.Register(spvWalletEngine.GetPaymailConfig().Configuration, ginEngine)
 
-	if appConfig.ExperimentalFeatures.V2 {
-		v2.Register(handlersManager)
-	}
-
 	if appConfig.DebugProfiling {
 		pprof.Register(ginEngine, "debug/pprof")
 	}
 
-	api.RegisterHandlersWithOptions(ginEngine, v2.NewServer(), api.GinServerOptions{
-		BaseURL: "",
-		Middlewares: []api.MiddlewareFunc{
-			middleware.SignatureAuthWithScopes(),
-		},
-		ErrorHandler: func(c *gin.Context, err error, statusCode int) {
-			spverrors.ErrorResponse(c, err, log)
-		},
-	})
+	if appConfig.ExperimentalFeatures.V2 {
+		api.RegisterHandlersWithOptions(ginEngine, v2.NewServer(appConfig, spvWalletEngine, log), api.GinServerOptions{
+			BaseURL: "",
+			Middlewares: []api.MiddlewareFunc{
+				middleware.SignatureAuthWithScopes(log),
+			},
+			ErrorHandler: func(c *gin.Context, err error, statusCode int) {
+				spverrors.ErrorResponse(c, err, log)
+			},
+		})
+	}
 }

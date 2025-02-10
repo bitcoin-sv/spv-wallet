@@ -21,6 +21,22 @@ components:
         - hex
         - format
 
+    TransactionSpecification:
+      type: object
+      properties:
+        hex:
+          type: string
+          description: Transaction hex
+        format:
+          type: string
+          description: Transaction format
+          example: "BEEF"
+        annotations:
+          $ref: '../components/models.yaml#/components/schemas/Annotations'
+      required:
+        - hex
+        - format
+
   parameters:
     PageNumber:
       in: query

@@ -13,19 +13,17 @@ import (
 
 // GetApiV2OperationsSearch return operations based on given filter parameters
 func (s *APIOperations) GetApiV2OperationsSearch(c *gin.Context, params api.GetApiV2OperationsSearchParams) {
-	logger := reqctx.Logger(c)
-
 	userContext := reqctx.GetUserContext(c)
 	userID, err := userContext.ShouldGetUserID()
 	if err != nil {
-		spverrors.AbortWithErrorResponse(c, err, logger)
+		spverrors.AbortWithErrorResponse(c, err, s.logger)
 		return
 	}
 
 	page := mapToFilter(params)
-	pagedResult, err := reqctx.Engine(c).OperationsService().PaginatedForUser(c.Request.Context(), userID, page)
+	pagedResult, err := s.engine.OperationsService().PaginatedForUser(c.Request.Context(), userID, page)
 	if err != nil {
-		spverrors.ErrorResponse(c, err, reqctx.Logger(c))
+		spverrors.ErrorResponse(c, err, s.logger)
 		return
 	}
 

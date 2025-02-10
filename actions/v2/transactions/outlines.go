@@ -11,43 +11,43 @@ import (
 	"github.com/gin-gonic/gin/binding"
 )
 
-func transactionOutlines(c *gin.Context, userCtx *reqctx.UserContext) {
-	logger := reqctx.Logger(c)
+func (s *APITransactions) PostApiV2TransactionsOutlines(c *gin.Context) {
 	format, err := getOutlineTransactionFormat(c)
 	if err != nil {
-		spverrors.ErrorResponse(c, err, logger)
+		spverrors.ErrorResponse(c, err, s.logger)
 		return
 	}
 
 	var requestBody request.TransactionSpecification
 	err = c.ShouldBindWith(&requestBody, binding.JSON)
 	if err != nil {
-		spverrors.ErrorResponse(c, spverrors.ErrCannotBindRequest.Wrap(err), logger)
+		spverrors.ErrorResponse(c, spverrors.ErrCannotBindRequest.Wrap(err), s.logger)
 		return
 	}
 
+	userCtx := reqctx.GetUserContext(c)
 	userID, err := userCtx.ShouldGetUserID()
 	if err != nil {
-		spverrors.ErrorResponse(c, err, logger)
+		spverrors.ErrorResponse(c, err, s.logger)
 		return
 	}
 
 	spec, err := mapping.TransactionSpecificationRequestToOutline(&requestBody, userID)
 	if err != nil {
-		spverrors.ErrorResponse(c, err, logger)
+		spverrors.ErrorResponse(c, err, s.logger)
 		return
 	}
 
 	var txOutline *outlines.Transaction
 	switch format {
 	case bsv.TxHexFormatRAW:
-		txOutline, err = reqctx.Engine(c).TransactionOutlinesService().CreateRawTx(c, spec)
+		txOutline, err = s.engine.TransactionOutlinesService().CreateRawTx(c, spec)
 	case bsv.TxHexFormatBEEF:
-		txOutline, err = reqctx.Engine(c).TransactionOutlinesService().CreateBEEF(c, spec)
+		txOutline, err = s.engine.TransactionOutlinesService().CreateBEEF(c, spec)
 	}
 
 	if err != nil {
-		spverrors.ErrorResponse(c, err, logger)
+		spverrors.ErrorResponse(c, err, s.logger)
 		return
 	}
 
