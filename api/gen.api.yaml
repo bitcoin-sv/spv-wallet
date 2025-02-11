@@ -83,7 +83,7 @@ paths:
                 required: true
             responses:
                 "201":
-                    $ref: '#/components/responses/api_components_responses_AdminCreateUserSuccess'
+                    $ref: '#/components/responses/api_components_responses_AdminAddPaymailSuccess'
                 "400":
                     $ref: '#/components/responses/api_components_responses_AdminUserBadRequest'
                 "401":
@@ -96,12 +96,18 @@ paths:
                 - Admin endpoints
 components:
     responses:
+        api_components_responses_AdminAddPaymailSuccess:
+            content:
+                application/json:
+                    schema:
+                        $ref: '#/components/schemas/api_components_models_Paymail'
+            description: Paymail added to user
         api_components_responses_AdminCreateUserInternalServerError:
             content:
                 application/json:
                     schema:
                         $ref: '#/components/schemas/api_components_errors_ErrCreatingUser'
-            description: Internal server error
+            description: Internal error while creating user
         api_components_responses_AdminCreateUserSuccess:
             content:
                 application/json:
@@ -119,7 +125,7 @@ components:
                 application/json:
                     schema:
                         $ref: '#/components/schemas/api_components_errors_ErrGettingUser'
-            description: User found
+            description: Internal error while getting user
         api_components_responses_AdminUserBadRequest:
             content:
                 application/json:

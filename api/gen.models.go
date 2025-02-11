@@ -128,6 +128,9 @@ type ApiComponentsRequestsCreateUser struct {
 	PublicKey string                           `json:"publicKey"`
 }
 
+// ApiComponentsResponsesAdminAddPaymailSuccess defines model for api_components_responses_AdminAddPaymailSuccess.
+type ApiComponentsResponsesAdminAddPaymailSuccess = ApiComponentsModelsPaymail
+
 // ApiComponentsResponsesAdminCreateUserInternalServerError defines model for api_components_responses_AdminCreateUserInternalServerError.
 type ApiComponentsResponsesAdminCreateUserInternalServerError = ApiComponentsErrorsErrCreatingUser
 
