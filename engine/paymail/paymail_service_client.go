@@ -6,9 +6,9 @@ import (
 	"time"
 
 	"github.com/bitcoin-sv/go-paymail"
+	trx "github.com/bitcoin-sv/go-sdk/transaction"
 	pmerrors "github.com/bitcoin-sv/spv-wallet/engine/paymail/errors"
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
-	"github.com/bitcoin-sv/spv-wallet/engine/v2/transaction/txmodels"
 	"github.com/bitcoin-sv/spv-wallet/models/bsv"
 	"github.com/mrz1836/go-cachestore"
 	"github.com/rs/zerolog"
@@ -232,7 +232,7 @@ func (s *service) validatePaymentDestinationResponse(response *paymail.PaymentDe
 	return nil
 }
 
-func (s *service) Notify(ctx context.Context, address string, p2pMetadata *paymail.P2PMetaData, reference string, txEncoder txmodels.TxEncoder) error {
+func (s *service) Notify(ctx context.Context, address string, p2pMetadata *paymail.P2PMetaData, reference string, tx *trx.Transaction) error {
 	sanitizedPm, err := s.GetSanitizedPaymail(address)
 	if err != nil {
 		return spverrors.Wrapf(err, "failed to sanitize paymail")
@@ -250,12 +250,12 @@ func (s *service) Notify(ctx context.Context, address string, p2pMetadata *payma
 
 	switch format {
 	case BeefPaymailPayloadFormat:
-		p2pTransaction.Beef, err = txEncoder.ToBEEF()
+		p2pTransaction.Beef, err = tx.BEEFHex()
 		if err != nil {
 			return spverrors.Wrapf(err, "failed to convert transaction to BEEF")
 		}
 	case BasicPaymailPayloadFormat:
-		p2pTransaction.Hex = txEncoder.ToRawHEX()
+		p2pTransaction.Hex = tx.Hex()
 	default:
 		return spverrors.Newf("%s is unknown format", format)
 	}

@@ -34,5 +34,5 @@ type Broadcaster interface {
 
 // PaymailNotifier is an interface for notifying paymail recipients about incoming transactions.
 type PaymailNotifier interface {
-	Notify(ctx context.Context, address string, p2pMetadata *paymail.P2PMetaData, reference string, txEncoder txmodels.TxEncoder) error
+	Notify(ctx context.Context, address string, p2pMetadata *paymail.P2PMetaData, reference string, tx *trx.Transaction) error
 }

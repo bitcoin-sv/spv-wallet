@@ -28,12 +28,12 @@ func (s *Service) RecordTransactionOutline(ctx context.Context, userID string, o
 	sender := ""
 	receiver := ""
 
-	pmInfo, err := processPaymailOutputs(outline.Annotations)
+	pmInfo, err := flow.processPaymailOutputs(outline.Annotations)
 	if err != nil {
 		return nil, err
-	} else if pmInfo != nil {
-		sender = pmInfo.Sender
-		receiver = pmInfo.Receiver
+	} else if !pmInfo.empty() {
+		sender = pmInfo.Sender()
+		receiver = pmInfo.Receiver()
 	}
 
 	trackedOutputs, err := flow.processInputs()
@@ -53,11 +53,11 @@ func (s *Service) RecordTransactionOutline(ctx context.Context, userID string, o
 	}
 
 	for outputData := range p2pkhOutputs {
-		if pmInfo != nil && pmInfo.hasVOut(outputData.Vout) {
+		if pmInfo.hasVOut(outputData.Vout) {
 			// If the output which matches an address obtained from our database,
 			// is marked as paymail output in the annotation,
 			// it means that we don't have to make paymail-p2p-notification because it is internal.
-			pmInfo = nil
+			pmInfo.skipNotification = true
 		}
 		operation := flow.operationOfUser(outputData.UserID, "incoming", sender)
 		operation.Add(outputData.Satoshis)
@@ -78,10 +78,8 @@ func (s *Service) RecordTransactionOutline(ctx context.Context, userID string, o
 		return nil, err
 	}
 
-	if pmInfo != nil {
-		if err = flow.notifyPaymailExternalRecipient(*pmInfo); err != nil {
-			return nil, err
-		}
+	if err = flow.notifyPaymailExternalRecipient(pmInfo); err != nil {
+		return nil, err
 	}
 
 	if err = flow.broadcast(); err != nil {
