@@ -54,7 +54,7 @@ type ARCFixture interface {
 	// WillRespondForBroadcast returns a http response for a broadcast request.
 	WillRespondForBroadcast(httpCode int, info *chainmodels.TXInfo)
 
-	// WillRespondForBroadcastWithSeenOnNetwork is a default ARC behaviour for broadcasting (happy path).
+	// WillRespondForBroadcastWithSeenOnNetwork is a default ARC behavior for broadcasting (happy path).
 	WillRespondForBroadcastWithSeenOnNetwork(txID string)
 }
 

@@ -1,10 +1,11 @@
 package testabilities
 
 import (
+	"testing"
+
 	"github.com/bitcoin-sv/spv-wallet/engine/tester/jsonrequire"
 	"github.com/bitcoin-sv/spv-wallet/engine/tester/paymailmock"
 	"github.com/stretchr/testify/require"
-	"testing"
 )
 
 type externalClientAssertions struct {
