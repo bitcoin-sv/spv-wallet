@@ -25,7 +25,7 @@ components:
               - $ref: "./errors.yaml#/components/schemas/ErrInvalidDomain"
 
     AdminCreateUserInternalServerError:
-      description: Internal server error
+      description: Internal error while creating user
       content:
         application/json:
           schema:
@@ -38,6 +38,13 @@ components:
           schema:
             $ref: "./models.yaml#/components/schemas/User"
 
+    AdminAddPaymailSuccess:
+      description: Paymail added to user
+      content:
+        application/json:
+          schema:
+            $ref: "./models.yaml#/components/schemas/Paymail"
+
     AdminGetUser:
       description: User found
       content:
@@ -46,7 +53,7 @@ components:
             $ref: "./models.yaml#/components/schemas/User"
 
     AdminGetUserInternalServerError:
-      description: User found
+      description: Internal error while getting user
       content:
         application/json:
           schema:

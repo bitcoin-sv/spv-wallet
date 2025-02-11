@@ -12,8 +12,8 @@ type APIAdminUsers struct {
 }
 
 // NewAPIAdminUsers creates a new APIAdminUsers
-func NewAPIAdminUsers(engine engine.ClientInterface, logger *zerolog.Logger) *APIAdminUsers {
-	return &APIAdminUsers{
+func NewAPIAdminUsers(engine engine.ClientInterface, logger *zerolog.Logger) APIAdminUsers {
+	return APIAdminUsers{
 		engine: engine,
 		logger: logger,
 	}

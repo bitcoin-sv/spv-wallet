@@ -97,7 +97,7 @@ paths:
             type: string
       responses:
         201:
-          $ref: "../components/responses.yaml#/components/responses/AdminCreateUserSuccess"
+          $ref: "../components/responses.yaml#/components/responses/AdminAddPaymailSuccess"
         400:
           $ref: "../components/responses.yaml#/components/responses/AdminUserBadRequest"
         401:

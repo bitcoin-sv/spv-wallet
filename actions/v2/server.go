@@ -19,6 +19,6 @@ var _ api.ServerInterface = &Server{}
 // NewServer creates a new server
 func NewServer(config *config.AppConfig, engine engine.ClientInterface, logger *zerolog.Logger) *Server {
 	return &Server{
-		APIAdmin: *admin.NewAPIAdmin(engine, logger),
+		APIAdmin: admin.NewAPIAdmin(engine, logger),
 	}
 }
