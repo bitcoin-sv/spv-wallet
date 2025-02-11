@@ -6,7 +6,6 @@ import (
 
 	"github.com/bitcoin-sv/go-sdk/script"
 	"github.com/bitcoin-sv/spv-wallet/actions/testabilities"
-	chainmodels "github.com/bitcoin-sv/spv-wallet/engine/chain/models"
 	testengine "github.com/bitcoin-sv/spv-wallet/engine/testabilities"
 	"github.com/bitcoin-sv/spv-wallet/engine/tester/fixtures"
 	"github.com/stretchr/testify/require"
@@ -23,7 +22,6 @@ func TestInternalOutgoingTransaction(t *testing.T) {
 	var testState struct {
 		reference     string
 		lockingScript *script.Script
-		txID          string
 	}
 
 	// and:
@@ -84,38 +82,32 @@ func TestInternalOutgoingTransaction(t *testing.T) {
 			WithOutputScript(1000, testState.lockingScript)
 
 		// and:
-		outline := fmt.Sprintf(`{
-          "hex": "%s",
-          "format": "BEEF",
-          "annotations": {
-			"outputs": {
-			  "0": {
-				"bucket": "bsv",
-				"paymail": {
-				  "receiver": "%s",
-				  "reference": "%s",
-				  "sender": "%s"
-				}
-			  }
-			}
-		  }
-		}`, txSpec.BEEF(), recipient.DefaultPaymail(), testState.reference, sender.DefaultPaymail())
-
-		// and:
-		given.ARC().WillRespondForBroadcast(200, &chainmodels.TXInfo{
-			TxID:     txSpec.ID(),
-			TXStatus: chainmodels.SeenOnNetwork,
-		})
+		given.ARC().WillRespondForBroadcastWithSeenOnNetwork(txSpec.ID())
 
 		// when:
 		res, _ := client.R().
 			SetHeader("Content-Type", "application/json").
-			SetBody(outline).
+			SetBody(map[string]any{
+				"hex":    txSpec.BEEF(),
+				"format": "BEEF",
+				"annotations": map[string]any{
+					"outputs": map[string]any{
+						"0": map[string]any{
+							"bucket": "bsv",
+							"paymail": map[string]any{
+								"receiver":  recipient.DefaultPaymail(),
+								"reference": testState.reference,
+								"sender":    sender.DefaultPaymail(),
+							},
+						},
+					},
+				},
+			}).
 			Post(transactionsOutlinesRecordURL)
 
 		// then:
 		then.Response(res).
-			HasStatus(201).
+			IsCreated().
 			WithJSONMatching(`{
 				"txID": "{{ .txID }}"
 			}`, map[string]any{
@@ -124,80 +116,20 @@ func TestInternalOutgoingTransaction(t *testing.T) {
 
 		// and:
 		then.User(sender).Balance().IsZero()
+		then.User(sender).Operations().Last().
+			WithTxID(txSpec.ID()).
+			WithTxStatus("BROADCASTED").
+			WithValue(-1001).
+			WithType("outgoing").
+			WithCounterparty(recipient.DefaultPaymail().Address())
+
+		// and:
 		then.User(recipient).Balance().IsEqualTo(1000)
-
-		// update:
-		testState.txID = txSpec.ID()
-	})
-
-	t.Run("Check sender's operations", func(t *testing.T) {
-		// given:
-		given, then := testabilities.NewOf(givenForAllTests, t)
-
-		// and:
-		client := given.HttpClient().ForGivenUser(sender)
-
-		// when:
-		res, _ := client.R().Get("/api/v2/operations/search")
-
-		// then:
-		then.Response(res).IsOK().WithJSONMatching(`{
-			"content": [
-				{
-					"txID": "{{ .txID }}",
-					"createdAt": "{{ matchTimestamp }}",
-					"value": {{ .value }},
-					"type": "outgoing",
-					"counterparty": "{{ .recipient }}",
-					"txStatus": "BROADCASTED"
-				},
-				{{ anything }}
-			],
-			"page": {
-			    "number": 1,
-			    "size": 2,
-			    "totalElements": 2,
-			    "totalPages": 1
-			}
-		}`, map[string]any{
-			"value":     -1001,
-			"txID":      testState.txID,
-			"recipient": recipient.DefaultPaymail(),
-		})
-	})
-
-	t.Run("Check recipient's operations", func(t *testing.T) {
-		// given:
-		given, then := testabilities.NewOf(givenForAllTests, t)
-
-		// and:
-		client := given.HttpClient().ForGivenUser(recipient)
-
-		// when:
-		res, _ := client.R().Get("/api/v2/operations/search")
-
-		// then:
-		then.Response(res).IsOK().WithJSONMatching(`{
-			"content": [
-				{
-					"txID": "{{ .txID }}",
-					"createdAt": "{{ matchTimestamp }}",
-					"value": {{ .value }},
-					"type": "incoming",
-					"counterparty": "{{ .sender }}",
-					"txStatus": "BROADCASTED"
-				}
-			],
-			"page": {
-			    "number": 1,
-			    "size": 1,
-			    "totalElements": 1,
-			    "totalPages": 1
-			}
-		}`, map[string]any{
-			"value":  1000,
-			"txID":   testState.txID,
-			"sender": sender.DefaultPaymail(),
-		})
+		then.User(recipient).Operations().Last().
+			WithTxID(txSpec.ID()).
+			WithTxStatus("BROADCASTED").
+			WithValue(1000).
+			WithType("incoming").
+			WithCounterparty(sender.DefaultPaymail().Address())
 	})
 }

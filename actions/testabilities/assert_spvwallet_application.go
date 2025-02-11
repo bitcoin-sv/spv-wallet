@@ -18,12 +18,13 @@ import (
 
 type SPVWalletApplicationAssertions interface {
 	Response(response *resty.Response) SPVWalletResponseAssertions
-	User(user fixtures.User) testengine.UserAssertions
-	PaymailClient() testengine.PaymailClientAssertions
+	User(user fixtures.User) SPVWalletAppUserAssertions
+	ExternalPaymailHost() testengine.PaymailExternalAssertions
 }
 
 type SPVWalletResponseAssertions interface {
 	IsOK() SPVWalletResponseAssertions
+	IsCreated() SPVWalletResponseAssertions
 	HasStatus(status int) SPVWalletResponseAssertions
 	WithJSONf(expectedFormat string, args ...any)
 	WithJSONMatching(expectedTemplateFormat string, params map[string]any)
@@ -44,6 +45,7 @@ type JsonValueGetter interface {
 func Then(t testing.TB, app SPVWalletApplicationFixture) SPVWalletApplicationAssertions {
 	return &appAssertions{
 		t:                t,
+		appFixtures:      app,
 		engineAssertions: testengine.Then(t, app.EngineFixture()),
 	}
 }
@@ -51,6 +53,7 @@ func Then(t testing.TB, app SPVWalletApplicationFixture) SPVWalletApplicationAss
 type appAssertions struct {
 	t                testing.TB
 	engineAssertions testengine.EngineAssertions
+	appFixtures      SPVWalletApplicationFixture
 }
 
 func (a *appAssertions) Response(response *resty.Response) SPVWalletResponseAssertions {
@@ -62,12 +65,16 @@ func (a *appAssertions) Response(response *resty.Response) SPVWalletResponseAsse
 	}
 }
 
-func (a *appAssertions) User(user fixtures.User) testengine.UserAssertions {
-	return a.engineAssertions.User(user)
+func (a *appAssertions) User(user fixtures.User) SPVWalletAppUserAssertions {
+	return &userAssertions{
+		userClient: a.appFixtures.HttpClient().ForGivenUser(user),
+		t:          a.t,
+		require:    require.New(a.t),
+	}
 }
 
-func (a *appAssertions) PaymailClient() testengine.PaymailClientAssertions {
-	return a.engineAssertions.PaymailClient()
+func (a *appAssertions) ExternalPaymailHost() testengine.PaymailExternalAssertions {
+	return a.engineAssertions.ExternalPaymailHost()
 }
 
 type responseAssertions struct {
@@ -106,6 +113,11 @@ func (a *responseAssertions) IsUnauthorizedForUser() {
 func (a *responseAssertions) IsOK() SPVWalletResponseAssertions {
 	a.t.Helper()
 	return a.HasStatus(http.StatusOK)
+}
+
+func (a *responseAssertions) IsCreated() SPVWalletResponseAssertions {
+	a.t.Helper()
+	return a.HasStatus(http.StatusCreated)
 }
 
 func (a *responseAssertions) IsBadRequest() SPVWalletResponseAssertions {
