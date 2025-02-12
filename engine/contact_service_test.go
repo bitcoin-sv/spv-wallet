@@ -304,10 +304,11 @@ func TestClientService_AddContactRequest(t *testing.T) {
 type paymailTestMock struct {
 	serverURL     string
 	paymailClient paymail.ClientInterface
+	mockTransport *httpmock.MockTransport
 }
 
 func (p *paymailTestMock) setup(domain string, supportPike bool) {
-	httpmock.Reset()
+	p.mockTransport = httpmock.NewMockTransport()
 	serverURL := "https://" + domain + "/api/v1/" + paymail.DefaultServiceName
 
 	wellKnownURL := fmt.Sprintf("https://%s:443/.well-known/%s", domain, paymail.DefaultServiceName)
@@ -325,19 +326,19 @@ func (p *paymailTestMock) setup(domain string, supportPike bool) {
 
 	wellKnownResponse, _ := json.Marshal(wellKnownBody)
 	wellKnownResponder := httpmock.NewStringResponder(http.StatusOK, string(wellKnownResponse))
-	httpmock.RegisterResponder(http.MethodGet, wellKnownURL, wellKnownResponder)
+	p.mockTransport.RegisterResponder(http.MethodGet, wellKnownURL, wellKnownResponder)
 
 	p.serverURL = serverURL
-	p.paymailClient = xtester.MockClient(domain)
+	p.paymailClient = xtester.MockClient(p.mockTransport, domain)
 }
 
 func (p *paymailTestMock) cleanup() {
-	httpmock.Reset()
+	p.mockTransport.Reset()
 	p.serverURL = ""
 }
 
 func (p *paymailTestMock) mockPki(paymail, pubkey string) {
-	httpmock.RegisterResponder(http.MethodGet, fmt.Sprintf("%s/id/%s", p.serverURL, paymail),
+	p.mockTransport.RegisterResponder(http.MethodGet, fmt.Sprintf("%s/id/%s", p.serverURL, paymail),
 		httpmock.NewStringResponder(
 			200,
 			`{"bsvalias":"1.0","handle":"`+paymail+`","pubkey":"`+pubkey+`"}`,
@@ -346,13 +347,13 @@ func (p *paymailTestMock) mockPki(paymail, pubkey string) {
 }
 
 func (p *paymailTestMock) mockPike(paymail string) {
-	httpmock.RegisterResponder(http.MethodPost, fmt.Sprintf("%s/contact/invite/%s", p.serverURL, paymail),
+	p.mockTransport.RegisterResponder(http.MethodPost, fmt.Sprintf("%s/contact/invite/%s", p.serverURL, paymail),
 		httpmock.NewStringResponder(
 			200,
 			"{}",
 		),
 	)
-	httpmock.RegisterResponder(http.MethodPost, fmt.Sprintf("%s/pike/outputs%s", p.serverURL, paymail),
+	p.mockTransport.RegisterResponder(http.MethodPost, fmt.Sprintf("%s/pike/outputs%s", p.serverURL, paymail),
 		httpmock.NewStringResponder(
 			200,
 			"{}",

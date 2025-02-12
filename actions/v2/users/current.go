@@ -16,7 +16,7 @@ func current(c *gin.Context, userContext *reqctx.UserContext) {
 		return
 	}
 
-	satoshis, err := reqctx.Engine(c).Repositories().Users.GetBalance(c.Request.Context(), userID, "bsv")
+	satoshis, err := reqctx.Engine(c).UsersService().GetBalance(c.Request.Context(), userID)
 	if err != nil {
 		spverrors.ErrorResponse(c, err, reqctx.Logger(c))
 		return
