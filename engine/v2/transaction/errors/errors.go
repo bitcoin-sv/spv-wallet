@@ -80,6 +80,9 @@ var (
 	// ErrGettingAddresses is when getting addresses fails.
 	ErrGettingAddresses = models.SPVError{Code: "error-getting-addresses", Message: "failed to get addresses", StatusCode: 500}
 
+	// ErrMultiPaymailRecipientsNotSupported is when the transaction has multiple paymail recipients.
+	ErrMultiPaymailRecipientsNotSupported = models.SPVError{Code: "error-multi-paymail-recipients", Message: "paymail transaction with multiple recipients is not supported", StatusCode: 400}
+
 	// ErrZeroInputCount is returned when a transaction has no inputs.
 	ErrZeroInputCount = models.SPVError{Code: "error-subject-tx-empty-inputs", Message: "provided subject transaction inputs count must be greater than zero", StatusCode: 400}
 
