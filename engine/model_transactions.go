@@ -252,7 +252,8 @@ func (m *Transaction) SetBUMP(mp *trx.MerklePath) {
 }
 
 // UpdateFromBroadcastStatus converts ARC transaction status to engineTxStatus and updates if needed
-func (m *Transaction) UpdateFromBroadcastStatus(bStatus chainmodels.TXStatus) {
+func (m *Transaction) UpdateFromBroadcastStatus(bStatus chainmodels.TXStatus) (changed bool) {
+	prevStatus := m.TxStatus
 	switch {
 	case bStatus.IsMined():
 		m.TxStatus = TxStatusMined
@@ -262,6 +263,7 @@ func (m *Transaction) UpdateFromBroadcastStatus(bStatus chainmodels.TXStatus) {
 		// don't change current TXStatus on these ARC Statuses
 		m.client.Logger().Debug().Str("txID", m.ID).Str("status", string(bStatus)).Msg("ARC returned neutral status; Transaction status will not be updated")
 	}
+	return prevStatus != m.TxStatus
 }
 
 // IsXpubAssociated will check if this key is associated to this transaction
