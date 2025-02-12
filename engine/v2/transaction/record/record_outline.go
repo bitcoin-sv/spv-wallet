@@ -38,16 +38,12 @@ func (s *Service) RecordTransactionOutline(ctx context.Context, userID string, o
 		return nil, err
 	}
 
-	sender := ""
-	receiver := ""
-
 	pmInfo, err := flow.processPaymailOutputs(outline.Annotations)
 	if err != nil {
 		return nil, err
-	} else if !pmInfo.empty() {
-		sender = pmInfo.Sender()
-		receiver = pmInfo.Receiver()
 	}
+	sender := pmInfo.Sender()
+	receiver := pmInfo.Receiver()
 
 	trackedOutputs, err := flow.processInputs()
 	if err != nil {
