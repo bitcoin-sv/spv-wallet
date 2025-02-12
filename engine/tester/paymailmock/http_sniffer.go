@@ -27,14 +27,11 @@ type httpSniffer struct {
 	lock   sync.Mutex
 }
 
-func newHTTPSniffer() *httpSniffer {
+func newHTTPSniffer(next http.RoundTripper) *httpSniffer {
 	return &httpSniffer{
 		called: make(map[string]CallDetails),
+		next:   next,
 	}
-}
-
-func (s *httpSniffer) setTransport(next http.RoundTripper) {
-	s.next = next
 }
 
 func (s *httpSniffer) getCallByRegex(r string) *CallDetails {

@@ -41,8 +41,7 @@ func MockClient(mockTransport *httpmock.MockTransport, domain string, moreDomain
 
 	// Set the HTTP mocking client
 	// restyClient -> sniffer -> mockTransport
-	sniffer := newHTTPSniffer()
-	sniffer.setTransport(mockTransport)
+	sniffer := newHTTPSniffer(mockTransport)
 
 	client := resty.New()
 	client.SetTransport(sniffer)
