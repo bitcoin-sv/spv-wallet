@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/bitcoin-sv/go-paymail"
+	trx "github.com/bitcoin-sv/go-sdk/transaction"
 	pmerrors "github.com/bitcoin-sv/spv-wallet/engine/paymail/errors"
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/bitcoin-sv/spv-wallet/models/bsv"
@@ -228,5 +229,43 @@ func (s *service) validatePaymentDestinationResponse(response *paymail.PaymentDe
 	if sum != satoshis {
 		return spverrors.Wrapf(pmerrors.ErrPaymailHostInvalidResponse, "paymail host returned outputs not equal to requested satoshis: expected %d, got %d", satoshis, sum)
 	}
+	return nil
+}
+
+func (s *service) Notify(ctx context.Context, address string, p2pMetadata *paymail.P2PMetaData, reference string, tx *trx.Transaction) error {
+	sanitizedPm, err := s.GetSanitizedPaymail(address)
+	if err != nil {
+		return spverrors.Wrapf(err, "failed to sanitize paymail")
+	}
+	success, _, p2pSubmitTxURL, format := s.GetP2P(ctx, sanitizedPm.Domain)
+
+	if !success {
+		return spverrors.Newf("paymail host does not support P2P transactions")
+	}
+
+	p2pTransaction := &paymail.P2PTransaction{
+		MetaData:  p2pMetadata,
+		Reference: reference,
+	}
+
+	switch format {
+	case BeefPaymailPayloadFormat:
+		p2pTransaction.Beef, err = tx.BEEFHex()
+		if err != nil {
+			return spverrors.Wrapf(err, "failed to convert transaction to BEEF")
+		}
+	case BasicPaymailPayloadFormat:
+		p2pTransaction.Hex = tx.Hex()
+	default:
+		return spverrors.Newf("%s is unknown format", format)
+	}
+
+	res, err := s.paymailClient.SendP2PTransaction(p2pSubmitTxURL, sanitizedPm.Alias, sanitizedPm.Domain, p2pTransaction)
+	if err != nil {
+		return spverrors.Wrapf(err, "failed to send transaction via paymail")
+	}
+
+	s.log.Info().Str("TxID", res.TxID).Msgf("Successfully notified paymail recipient")
+
 	return nil
 }

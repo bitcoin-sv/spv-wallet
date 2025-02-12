@@ -5,6 +5,12 @@ info:
 
 components:
   responses:
+    SharedConfig:
+      description: Shared config
+      content:
+        application/json:
+          schema:
+            $ref: "./models.yaml#/components/schemas/SharedConfig"
     NotAuthorized:
       description: Security requirements failed
       content:

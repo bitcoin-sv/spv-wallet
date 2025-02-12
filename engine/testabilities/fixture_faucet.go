@@ -8,6 +8,7 @@ import (
 	"github.com/bitcoin-sv/spv-wallet/engine/tester/fixtures"
 	"github.com/bitcoin-sv/spv-wallet/engine/v2/transaction/txmodels"
 	"github.com/bitcoin-sv/spv-wallet/models/bsv"
+	"github.com/bitcoin-sv/spv-wallet/models/transaction/bucket"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -60,7 +61,7 @@ func (f *faucetFixture) TopUp(satoshis bsv.Satoshis) fixtures.GivenTXSpec {
 	f.assert.NoError(err)
 
 	// Additional check - assertion if the top-up operation was saved correctly
-	balance, err := f.engine.Repositories().Users.GetBalance(context.Background(), f.user.ID(), "bsv")
+	balance, err := f.engine.Repositories().Users.GetBalance(context.Background(), f.user.ID(), bucket.BSV)
 	f.assert.NoError(err)
 	f.assert.GreaterOrEqual(balance, satoshis)
 

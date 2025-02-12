@@ -3,3 +3,22 @@ info:
   title: ignored
   version: ignored
 paths:
+
+  /api/v2/configs/shared:
+    get:
+      security:
+        - XPubAuth:
+            - "admin"
+            - "user"
+      tags:
+        - Admin endpoints
+        - User endpoints
+        - Configurations
+      summary: Get shared config
+      description: >-
+        This endpoint returns shared config. It can be obtained by both admin and user.
+      responses:
+        200:
+          $ref: "../components/responses.yaml#/components/responses/SharedConfig"
+        401:
+          $ref: "../components/errors.yaml#/components/responses/NotAuthorized"

@@ -9,6 +9,7 @@ import (
 	"github.com/bitcoin-sv/spv-wallet/engine/tester/fixtures"
 	"github.com/bitcoin-sv/spv-wallet/engine/tester/paymailmock"
 	"github.com/bitcoin-sv/spv-wallet/models/bsv"
+	"github.com/jarcoal/httpmock"
 )
 
 // PaymailClientFixture is a test fixture - used for establishing environment for test.
@@ -41,7 +42,15 @@ type paymailServiceClientAbility struct {
 func Given(t testing.TB, domains ...string) (given PaymailClientFixture) {
 	ability := &paymailServiceClientAbility{
 		t:                 t.(*testing.T),
-		PaymailClientMock: paymailmock.MockClient(fixtures.PaymailDomainExternal, domains...),
+		PaymailClientMock: paymailmock.MockClient(httpmock.NewMockTransport(), fixtures.PaymailDomainExternal, domains...),
+	}
+	return ability
+}
+
+func GivenWithMockClient(t testing.TB, mockClient *paymailmock.PaymailClientMock) (given PaymailClientFixture) {
+	ability := &paymailServiceClientAbility{
+		t:                 t.(*testing.T),
+		PaymailClientMock: mockClient,
 	}
 	return ability
 }

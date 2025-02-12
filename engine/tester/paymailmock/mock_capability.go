@@ -44,11 +44,6 @@ func (c *CapabilityMock) With(resp ResponderFactory) {
 	c.response = resp.Responder()
 }
 
-func (c *CapabilityMock) mockEndpoint(domain paymailDomainName) {
-	if c.endpoint != nil {
-		httpmock.RegisterResponder(c.endpoint(domain, c))
-	}
-}
 func endpoint(method string, defaultResponder httpmock.Responder) func(name paymailDomainName, c *CapabilityMock) (method string, urlMatcher string, responder httpmock.Responder) {
 	return func(dn paymailDomainName, c *CapabilityMock) (string, string, httpmock.Responder) {
 		url, ok := c.value(dn).(string)

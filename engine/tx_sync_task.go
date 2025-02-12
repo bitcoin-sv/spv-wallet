@@ -111,20 +111,32 @@ func processSyncTransactions(ctx context.Context, client *Client) {
 			continue
 		}
 
-		tx.UpdateFromBroadcastStatus(txInfo.TXStatus)
+		if changedTxStatus := tx.UpdateFromBroadcastStatus(txInfo.TXStatus); !changedTxStatus {
+			logger.Warn().Str("txID", txID).Str("ARCTxStatus", string(txInfo.TXStatus)).
+				Msg("Queried transaction has not changed its status yet")
 
-		if bump, err := transaction.NewMerklePathFromHex(txInfo.MerklePath); err != nil {
-			//ARC sometimes returns a TXStatus SEEN_ON_NETWORK, but with zero data
-			logger.Warn().Err(err).Str("txID", txID).Str("ARCTxStatus", string(txInfo.TXStatus)).Msg("Cannot parse BUMP")
-		} else {
+			// skip updating tx if the status hasn't changed
+			continue
+		}
+
+		if tx.TxStatus == TxStatusMined {
+			bump, err := transaction.NewMerklePathFromHex(txInfo.MerklePath)
+			if err != nil {
+				logger.Warn().
+					Err(err).Str("txID", txID).Str("ARCMerklePath", txInfo.MerklePath).
+					Msg("Queried transaction doesn't contain BUMP (MerklePath) even though it's mined")
+
+				// skip updating tx on error when the status is Mined but the MerklePath is empty
+				continue
+			}
+
 			tx.SetBUMP(bump)
+			tx.BlockHash = txInfo.BlockHash
+			tx.BlockHeight = _parseBlockHeight(txInfo.BlockHeight)
+
+			logger.Info().Str("txID", txID).Str("blockHash", tx.BlockHash).Uint64("blockHeight", tx.BlockHeight).
+				Msg("Queried transaction has been mined - received BUMP")
 		}
-		blockHeight, err := conv.Int64ToUint64(txInfo.BlockHeight)
-		if err != nil {
-			panic(spverrors.Wrapf(err, "cannot convert block height"))
-		}
-		tx.BlockHash = txInfo.BlockHash
-		tx.BlockHeight = blockHeight
 
 		saveTx()
 	}
@@ -153,4 +165,12 @@ func _handleUnknownTX(ctx context.Context, tx *Transaction, logger *zerolog.Logg
 	// tx will be broadcasted next time (until become "old" and marked problematic)
 	logger.Warn().Str("txID", tx.ID).Msg("Broadcast attempt has failed in SYNC task")
 	return ""
+}
+
+func _parseBlockHeight(h int64) uint64 {
+	blockHeight, err := conv.Int64ToUint64(h)
+	if err != nil {
+		panic(spverrors.Wrapf(err, "cannot convert block height"))
+	}
+	return blockHeight
 }

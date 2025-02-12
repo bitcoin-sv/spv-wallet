@@ -15,8 +15,9 @@ type Service struct {
 	outputs    OutputsRepo
 	operations OperationsRepo
 
-	broadcaster Broadcaster
-	logger      zerolog.Logger
+	broadcaster     Broadcaster
+	paymailNotifier PaymailNotifier
+	logger          zerolog.Logger
 }
 
 // NewService creates a new service for transactions
@@ -26,13 +27,15 @@ func NewService(
 	outputsRepo OutputsRepo,
 	operationsRepo OperationsRepo,
 	broadcaster Broadcaster,
+	paymailNotifier PaymailNotifier,
 ) *Service {
 	return &Service{
-		addresses:   addressesRepo,
-		outputs:     outputsRepo,
-		operations:  operationsRepo,
-		broadcaster: broadcaster,
-		logger:      logger,
+		addresses:       addressesRepo,
+		outputs:         outputsRepo,
+		operations:      operationsRepo,
+		broadcaster:     broadcaster,
+		logger:          logger,
+		paymailNotifier: paymailNotifier,
 	}
 }
 
