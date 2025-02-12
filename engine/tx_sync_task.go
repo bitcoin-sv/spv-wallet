@@ -133,6 +133,9 @@ func processSyncTransactions(ctx context.Context, client *Client) {
 			tx.SetBUMP(bump)
 			tx.BlockHash = txInfo.BlockHash
 			tx.BlockHeight = _parseBlockHeight(txInfo.BlockHeight)
+
+			logger.Info().Str("txID", txID).Str("blockHash", tx.BlockHash).Uint64("blockHeight", tx.BlockHeight).
+				Msg("Queried transaction has been mined - received BUMP")
 		}
 
 		saveTx()
