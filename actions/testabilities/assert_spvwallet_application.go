@@ -8,6 +8,8 @@ import (
 	"testing"
 
 	"github.com/bitcoin-sv/spv-wallet/actions/testabilities/apierror"
+	testengine "github.com/bitcoin-sv/spv-wallet/engine/testabilities"
+	"github.com/bitcoin-sv/spv-wallet/engine/tester/fixtures"
 	"github.com/bitcoin-sv/spv-wallet/engine/tester/jsonrequire"
 	"github.com/go-resty/resty/v2"
 	"github.com/stretchr/testify/assert"
@@ -16,10 +18,13 @@ import (
 
 type SPVWalletApplicationAssertions interface {
 	Response(response *resty.Response) SPVWalletResponseAssertions
+	User(user fixtures.User) SPVWalletAppUserAssertions
+	ExternalPaymailHost() testengine.PaymailExternalAssertions
 }
 
 type SPVWalletResponseAssertions interface {
 	IsOK() SPVWalletResponseAssertions
+	IsCreated() SPVWalletResponseAssertions
 	HasStatus(status int) SPVWalletResponseAssertions
 	WithJSONf(expectedFormat string, args ...any)
 	WithJSONMatching(expectedTemplateFormat string, params map[string]any)
@@ -37,12 +42,39 @@ type JsonValueGetter interface {
 	GetString(xpath string) string
 }
 
-func Then(t testing.TB) SPVWalletApplicationAssertions {
-	return &responseAssertions{
-		t:       t,
-		require: require.New(t),
-		assert:  assert.New(t),
+func Then(t testing.TB, app SPVWalletApplicationFixture) SPVWalletApplicationAssertions {
+	return &appAssertions{
+		t:                t,
+		appFixtures:      app,
+		engineAssertions: testengine.Then(t, app.EngineFixture()),
 	}
+}
+
+type appAssertions struct {
+	t                testing.TB
+	engineAssertions testengine.EngineAssertions
+	appFixtures      SPVWalletApplicationFixture
+}
+
+func (a *appAssertions) Response(response *resty.Response) SPVWalletResponseAssertions {
+	return &responseAssertions{
+		t:        a.t,
+		require:  require.New(a.t),
+		assert:   assert.New(a.t),
+		response: response,
+	}
+}
+
+func (a *appAssertions) User(user fixtures.User) SPVWalletAppUserAssertions {
+	return &userAssertions{
+		userClient: a.appFixtures.HttpClient().ForGivenUser(user),
+		t:          a.t,
+		require:    require.New(a.t),
+	}
+}
+
+func (a *appAssertions) ExternalPaymailHost() testengine.PaymailExternalAssertions {
+	return a.engineAssertions.ExternalPaymailHost()
 }
 
 type responseAssertions struct {
@@ -81,6 +113,11 @@ func (a *responseAssertions) IsUnauthorizedForUser() {
 func (a *responseAssertions) IsOK() SPVWalletResponseAssertions {
 	a.t.Helper()
 	return a.HasStatus(http.StatusOK)
+}
+
+func (a *responseAssertions) IsCreated() SPVWalletResponseAssertions {
+	a.t.Helper()
+	return a.HasStatus(http.StatusCreated)
 }
 
 func (a *responseAssertions) IsBadRequest() SPVWalletResponseAssertions {

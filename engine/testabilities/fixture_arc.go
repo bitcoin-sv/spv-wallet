@@ -11,6 +11,9 @@ import (
 type ARCFixture interface {
 	// WillRespondForBroadcast returns a http response for a broadcast request.
 	WillRespondForBroadcast(httpCode int, info *chainmodels.TXInfo)
+
+	// WillRespondForBroadcastWithSeenOnNetwork is a default ARC behavior for broadcasting (happy path).
+	WillRespondForBroadcastWithSeenOnNetwork(txID string)
 }
 
 func (f *engineFixture) ARC() ARCFixture {
@@ -27,4 +30,11 @@ func (f *engineFixture) WillRespondForBroadcast(httpCode int, info *chainmodels.
 	}
 
 	f.externalTransport.RegisterResponder("POST", "https://arc.taal.com/v1/tx", responder)
+}
+
+func (f *engineFixture) WillRespondForBroadcastWithSeenOnNetwork(txID string) {
+	f.WillRespondForBroadcast(http.StatusOK, &chainmodels.TXInfo{
+		TxID:     txID,
+		TXStatus: chainmodels.SeenOnNetwork,
+	})
 }

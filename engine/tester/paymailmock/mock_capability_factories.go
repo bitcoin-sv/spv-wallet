@@ -87,5 +87,6 @@ func capabilityBEEFTransaction() *CapabilityMock {
 		value: func(dn paymailDomainName) any {
 			return dn.BEEFTransaction()
 		},
+		endpoint: endpoint(http.MethodPost, RecordBEEFResponse().Responder()),
 	}
 }

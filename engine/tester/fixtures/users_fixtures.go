@@ -68,7 +68,7 @@ var (
 		Paymails: []Paymail{
 			"recipient@" + PaymailDomainExternal,
 		},
-		PrivKey: "",
+		PrivKey: "xprvA8mj2ZL1w6Nqpi6D2amJLo4Gxy24tW9uv82nQKmamT2rkg5DgjzJZRFnW33e7QJwn65uUWSuN6YQyWrujNjZdVShPRnpNUSRVTru4cxaqfd",
 	}
 
 	// SenderExternal is a user that is a sender from external server in the tests.

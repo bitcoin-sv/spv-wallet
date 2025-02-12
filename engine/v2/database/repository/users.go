@@ -7,6 +7,7 @@ import (
 	"github.com/bitcoin-sv/spv-wallet/engine/v2/database"
 	"github.com/bitcoin-sv/spv-wallet/engine/v2/users/usersmodels"
 	"github.com/bitcoin-sv/spv-wallet/models/bsv"
+	"github.com/bitcoin-sv/spv-wallet/models/transaction/bucket"
 	"github.com/samber/lo"
 	"gorm.io/gorm"
 )
@@ -86,7 +87,7 @@ func (u *Users) Create(ctx context.Context, newUser *usersmodels.NewUser) (*user
 }
 
 // GetBalance returns the balance of a user in a given bucket.
-func (u *Users) GetBalance(ctx context.Context, userID string, bucket string) (bsv.Satoshis, error) {
+func (u *Users) GetBalance(ctx context.Context, userID string, bucket bucket.Name) (bsv.Satoshis, error) {
 	var balance bsv.Satoshis
 	err := u.db.
 		WithContext(ctx).
