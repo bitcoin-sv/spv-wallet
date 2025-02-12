@@ -3,12 +3,12 @@ package record
 import (
 	"context"
 	"fmt"
-	"github.com/rs/zerolog"
 
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/bitcoin-sv/spv-wallet/engine/v2/transaction/errors"
 	"github.com/bitcoin-sv/spv-wallet/engine/v2/transaction/outlines"
 	"github.com/bitcoin-sv/spv-wallet/engine/v2/transaction/txmodels"
+	"github.com/rs/zerolog"
 )
 
 // RecordTransactionOutline will validate, broadcast and save a transaction outline
