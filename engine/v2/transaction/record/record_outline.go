@@ -2,6 +2,8 @@ package record
 
 import (
 	"context"
+	"fmt"
+	"github.com/rs/zerolog"
 
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/bitcoin-sv/spv-wallet/engine/v2/transaction/errors"
@@ -19,6 +21,17 @@ func (s *Service) RecordTransactionOutline(ctx context.Context, userID string, o
 	if err != nil {
 		return nil, txerrors.ErrTxValidation.Wrap(err)
 	}
+
+	s.logger.Trace().Func(func(e *zerolog.Event) {
+		e.Str("txID", tx.TxID().String())
+		e.Str("userID", userID)
+		for vin, annotation := range outline.Annotations.Inputs {
+			e.Interface(fmt.Sprintf("in-annotation-%d", vin), annotation)
+		}
+		for vout, annotation := range outline.Annotations.Outputs {
+			e.Interface(fmt.Sprintf("out-annotation-%d", vout), annotation)
+		}
+	}).Msg("Recording transaction outline")
 
 	flow := newTxFlow(ctx, s, tx)
 	if err = flow.verifyScripts(); err != nil {
