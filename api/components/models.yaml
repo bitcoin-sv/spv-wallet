@@ -5,3 +5,17 @@ info:
 
 components:
   schemas:
+    SharedConfig:
+      description: Shared config
+      type: object
+      properties:
+        paymailDomains:
+          type: array
+          items:
+            type: string
+          example: ["example.com"]
+        experimentalFeatures:
+          type: object
+          additionalProperties:
+            type: boolean
+          example: {"pikeEnabled": true}
