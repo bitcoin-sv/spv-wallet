@@ -71,12 +71,12 @@ type engineFixture struct {
 }
 
 func Given(t testing.TB) EngineFixture {
+	externalTransport := httpmock.NewMockTransport()
 	f := &engineFixture{
 		t:                 t,
 		logger:            tester.Logger(t),
-		externalTransport: httpmock.NewMockTransport(),
-		// TODO reuse externalTransport in paymailmock
-		paymailClient: paymailmock.MockClient(fixtures.PaymailDomainExternal),
+		externalTransport: externalTransport,
+		paymailClient:     paymailmock.MockClient(externalTransport, fixtures.PaymailDomainExternal),
 	}
 
 	return f

@@ -20,10 +20,10 @@ type TransactionsResponseAssertions interface {
 	ContainsValidRawTxHexInField(field string) TransactionsResponseAssertions
 }
 
-func Then(t testing.TB) TransactionsEndpointAssertions {
+func Then(t testing.TB, app testabilities.SPVWalletApplicationFixture) TransactionsEndpointAssertions {
 	return &transactionEndpointAssertions{
 		t:                     t,
-		applicationAssertions: testabilities.Then(t),
+		applicationAssertions: testabilities.Then(t, app),
 	}
 }
 

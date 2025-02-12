@@ -8,6 +8,7 @@ import (
 	"github.com/bitcoin-sv/go-paymail"
 	"github.com/bitcoin-sv/go-paymail/tester"
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
+	"github.com/go-resty/resty/v2"
 	"github.com/jarcoal/httpmock"
 )
 
@@ -16,10 +17,13 @@ type PaymailClientMock struct {
 	paymail.ClientInterface
 	domains      []paymailDomainName
 	capabilities []*CapabilityMock
+
+	mockTransport *httpmock.MockTransport
+	sniffer       *httpSniffer
 }
 
 // MockClient will return a client for testing purposes
-func MockClient(domain string, moreDomainNames ...string) *PaymailClientMock {
+func MockClient(mockTransport *httpmock.MockTransport, domain string, moreDomainNames ...string) *PaymailClientMock {
 	domainNames := []paymailDomainName{paymailDomainName(domain)}
 	for _, dn := range moreDomainNames {
 		domainNames = append(domainNames, paymailDomainName(dn))
@@ -36,7 +40,13 @@ func MockClient(domain string, moreDomainNames ...string) *PaymailClientMock {
 	}
 
 	// Set the HTTP mocking client
-	newClient.WithCustomHTTPClient(tester.MockResty())
+	// restyClient -> sniffer -> mockTransport
+	sniffer := newHTTPSniffer(mockTransport)
+
+	client := resty.New()
+	client.SetTransport(sniffer)
+
+	newClient.WithCustomHTTPClient(client)
 
 	// Build hosts, srv records and ip addresses
 	hosts := map[string][]string{}
@@ -71,12 +81,14 @@ func MockClient(domain string, moreDomainNames ...string) *PaymailClientMock {
 	return &PaymailClientMock{
 		ClientInterface: newClient,
 		domains:         domainNames,
+		mockTransport:   mockTransport,
+		sniffer:         sniffer,
 	}
 }
 
 // WillRespondWithBasicCapabilities is configuring a client to respond with basic capabilities for all mocked domains.
 func (c *PaymailClientMock) WillRespondWithBasicCapabilities() {
-	httpmock.Reset()
+	c.mockTransport.Reset()
 	c.useBasicCapabilities()
 	for _, domain := range c.domains {
 		c.exposeCapabilities(domain)
@@ -85,7 +97,7 @@ func (c *PaymailClientMock) WillRespondWithBasicCapabilities() {
 
 // WillRespondWithP2PCapabilities is configuring a client to respond with basic and P2P capabilities for all mocked domains.
 func (c *PaymailClientMock) WillRespondWithP2PCapabilities() {
-	httpmock.Reset()
+	c.mockTransport.Reset()
 	c.useBasicCapabilities()
 	c.useP2PCapabilities()
 	for _, domain := range c.domains {
@@ -95,7 +107,7 @@ func (c *PaymailClientMock) WillRespondWithP2PCapabilities() {
 
 // WillRespondWithP2PWithBEEFCapabilities is configuring a client to respond with basic, P2P and BEEF capabilities for all mocked domains.
 func (c *PaymailClientMock) WillRespondWithP2PWithBEEFCapabilities() {
-	httpmock.Reset()
+	c.mockTransport.Reset()
 	c.useBasicCapabilities()
 	c.useP2PCapabilities()
 	c.useBEEFCapabilities()
@@ -106,7 +118,7 @@ func (c *PaymailClientMock) WillRespondWithP2PWithBEEFCapabilities() {
 
 // WillRespondWithNotFoundOnCapabilities is configuring a client to respond with not found on capabilities for all mocked domains.
 func (c *PaymailClientMock) WillRespondWithNotFoundOnCapabilities() {
-	httpmock.Reset()
+	c.mockTransport.Reset()
 	for _, domain := range c.domains {
 		c.exposeErrorOnCapabilities(http.StatusNotFound, domain)
 	}
@@ -114,7 +126,7 @@ func (c *PaymailClientMock) WillRespondWithNotFoundOnCapabilities() {
 
 // WillRespondWithErrorOnCapabilities is configuring a client to respond with an error on capabilities for all mocked domains.
 func (c *PaymailClientMock) WillRespondWithErrorOnCapabilities() {
-	httpmock.Reset()
+	c.mockTransport.Reset()
 	for _, domain := range c.domains {
 		c.exposeErrorOnCapabilities(http.StatusInternalServerError, domain)
 	}
@@ -159,6 +171,11 @@ func (c *PaymailClientMock) findDomain(domain string) paymailDomainName {
 	panic(spverrors.Newf("domain %s was't' mocked", domain))
 }
 
+// GetCallByRegex is returning the details of a call made to the mocked server by a URL matching a regex.
+func (c *PaymailClientMock) GetCallByRegex(r string) *CallDetails {
+	return c.sniffer.getCallByRegex(r)
+}
+
 func (c *PaymailClientMock) useBasicCapabilities() {
 	c.capabilities = append(c.capabilities,
 		capabilitySenderValidation(),
@@ -184,7 +201,9 @@ func (c *PaymailClientMock) exposeCapabilities(domain paymailDomainName) {
 	capabilities := make(obj)
 	for _, capability := range c.capabilities {
 		capabilities[capability.name] = capability.value(domain)
-		capability.mockEndpoint(domain)
+		if capability.endpoint != nil {
+			c.mockTransport.RegisterResponder(capability.endpoint(domain, capability))
+		}
 	}
 
 	bsvAliasResponse := map[string]any{
@@ -196,7 +215,7 @@ func (c *PaymailClientMock) exposeCapabilities(domain paymailDomainName) {
 	if err != nil {
 		panic(spverrors.Wrapf(err, "error creating mocked capabilities"))
 	}
-	httpmock.RegisterResponder(http.MethodGet, domain.CapabilitiesURL(), responder)
+	c.mockTransport.RegisterResponder(http.MethodGet, domain.CapabilitiesURL(), responder)
 }
 
 func (c *PaymailClientMock) exposeErrorOnCapabilities(status int, domain paymailDomainName) {
@@ -205,7 +224,7 @@ func (c *PaymailClientMock) exposeErrorOnCapabilities(status int, domain paymail
 	if err != nil {
 		panic(spverrors.Wrapf(err, "error creating mocked error capabilities"))
 	}
-	httpmock.RegisterResponder(http.MethodGet, capabilitiesURL, responder)
+	c.mockTransport.RegisterResponder(http.MethodGet, capabilitiesURL, responder)
 }
 
 type obj map[string]any

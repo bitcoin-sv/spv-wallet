@@ -5,5 +5,7 @@ import (
 )
 
 func New(t testing.TB) (given TransactionsEndpointFixture, then TransactionsEndpointAssertions) {
-	return Given(t), Then(t)
+	given = Given(t)
+	then = Then(t, given)
+	return
 }

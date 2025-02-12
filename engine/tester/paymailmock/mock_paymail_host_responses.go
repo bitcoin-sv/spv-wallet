@@ -27,7 +27,7 @@ var mockedLockingScripts = []string{
 func (m *MockedP2PDestinationResponse) Responder() httpmock.Responder {
 	r, err := httpmock.NewJsonResponder(http.StatusOK, m.response())
 	if err != nil {
-		panic(spverrors.Wrapf(err, "cannot create mocked responder fro P2P destinations"))
+		panic(spverrors.Wrapf(err, "cannot create mocked responder for P2P destinations"))
 	}
 	return r
 }
