@@ -24,7 +24,7 @@ func newPaymailAddressServiceMock(t testing.TB) *mockPaymailAddressService {
 func (m *mockPaymailAddressService) HasPaymailAddress(_ context.Context, userID string, address string) (bool, error) {
 	for _, user := range m.users {
 		if user.ID() == userID {
-			return slices.Contains(user.Paymails, address), nil
+			return slices.Contains(user.Paymails, fixtures.Paymail(address)), nil
 		}
 	}
 	return false, nil
@@ -32,8 +32,8 @@ func (m *mockPaymailAddressService) HasPaymailAddress(_ context.Context, userID 
 
 func (m *mockPaymailAddressService) GetDefaultPaymailAddress(_ context.Context, userID string) (string, error) {
 	for _, user := range m.users {
-		if user.ID() == userID && user.DefaultPaymail() != "" {
-			return user.DefaultPaymail(), nil
+		if user.ID() == userID && user.DefaultPaymail().Address() != "" {
+			return user.DefaultPaymail().Address(), nil
 		}
 	}
 	return "", paymailerrors.ErrNoDefaultPaymailAddress

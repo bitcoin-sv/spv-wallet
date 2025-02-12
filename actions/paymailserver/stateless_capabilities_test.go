@@ -50,13 +50,13 @@ func TestStatelessCapabilities(t *testing.T) {
 		client := given.HttpClient().ForAnonymous()
 
 		// and:
-		address := fixtures.RecipientInternal.DefaultPaymail()
+		pm := fixtures.RecipientInternal.DefaultPaymail()
 
 		// when:
 		res, _ := client.R().Get(
 			fmt.Sprintf(
 				"https://example.com/v1/bsvalias/public-profile/%s",
-				address,
+				pm.Address(),
 			),
 		)
 
@@ -65,7 +65,7 @@ func TestStatelessCapabilities(t *testing.T) {
 			"avatar": "{{ matchURL | orEmpty }}",
 			"name": "{{ .name }}"
 		}`, map[string]any{
-			"name": address,
+			"name": pm.PublicName(),
 		})
 	})
 

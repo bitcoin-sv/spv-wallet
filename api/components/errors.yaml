@@ -1,0 +1,75 @@
+openapi: 3.0.0
+info:
+  title: ignored
+  version: ignored
+
+components:
+  responses:
+    NotAuthorized:
+      description: Security requirements failed
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrUnauthorized"
+
+  schemas:
+    ErrorSchema:
+      type: object
+      properties:
+        code:
+          type: string
+          description: Error code
+        message:
+          type: string
+          description: Error message
+      required:
+        - code
+        - message
+      additionalProperties: false
+
+    ErrUnauthorized:
+      oneOf:
+        - $ref: '#/components/schemas/ErrAuthorization'
+        - $ref: '#/components/schemas/ErrWrongAuthScopeFormat'
+        - $ref: '#/components/schemas/ErrAdminAuthOnNonAdminEndpoint'
+        - $ref: '#/components/schemas/ErrUserAuthOnNonUserEndpoint'
+
+    ErrAuthorization:
+      allOf:
+        - $ref: '#/components/schemas/ErrorSchema'
+        - type: object
+          properties:
+            code:
+              example: "error-unauthorized"
+            message:
+              example: "unauthorized"
+
+    ErrWrongAuthScopeFormat:
+      allOf:
+        - $ref: '#/components/schemas/ErrorSchema'
+        - type: object
+          properties:
+            code:
+              example: "error-wrong-auth-scope-format"
+            message:
+              example: "wrong auth scope format"
+
+    ErrAdminAuthOnNonAdminEndpoint:
+      allOf:
+        - $ref: '#/components/schemas/ErrorSchema'
+        - type: object
+          properties:
+            code:
+              example: "error-admin-auth-on-non-admin-endpoint"
+            message:
+              example: "cannot call non-admin endpoints with admin authorization"
+
+    ErrUserAuthOnNonUserEndpoint:
+      allOf:
+        - $ref: '#/components/schemas/ErrorSchema'
+        - type: object
+          properties:
+            code:
+              example: "error-user-auth-on-non-user-endpoint"
+            message:
+              example: "cannot call non-user endpoints with user authorization"

@@ -1,0 +1,13 @@
+openapi: 3.0.0
+info:
+  title: ignored
+  version: ignored
+
+components:
+  responses:
+    SharedConfig:
+      description: Shared config
+      content:
+        application/json:
+          schema:
+            $ref: "./models.yaml#/components/schemas/SharedConfig"

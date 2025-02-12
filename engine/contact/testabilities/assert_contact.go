@@ -94,6 +94,6 @@ func (a *assertion) ForUser(user fixtures.User) ContactSuccessAssertion {
 }
 
 func (a *assertion) ToCounterparty(user fixtures.User) ContactSuccessAssertion {
-	a.assert.Equal(user.DefaultPaymail(), a.contact.Paymail, "counterparty paymail invalid")
+	a.assert.Equal(user.DefaultPaymail().Address(), a.contact.Paymail, "counterparty paymail invalid")
 	return a
 }

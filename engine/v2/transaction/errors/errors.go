@@ -1,6 +1,8 @@
 package txerrors
 
-import "github.com/bitcoin-sv/spv-wallet/models"
+import (
+	"github.com/bitcoin-sv/spv-wallet/models"
+)
 
 var (
 	// ErrTxOutlineSpecificationRequired is returned when a transaction outline is created with no specification.
@@ -77,4 +79,40 @@ var (
 
 	// ErrGettingAddresses is when getting addresses fails.
 	ErrGettingAddresses = models.SPVError{Code: "error-getting-addresses", Message: "failed to get addresses", StatusCode: 500}
+
+	// ErrZeroInputCount is returned when a transaction has no inputs.
+	ErrZeroInputCount = models.SPVError{Code: "error-subject-tx-empty-inputs", Message: "provided subject transaction inputs count must be greater than zero", StatusCode: 400}
+
+	// ErrInvalidTransactionInput indicates that the SPV script verification failed
+	// due to a nil transaction input or a missing source transaction.
+	ErrInvalidTransactionInput = models.SPVError{Code: "error-subject-tx-script-verification", Message: "SPV script verification failed: nil transaction input or missing source transaction", StatusCode: 400}
+
+	// ErrTxQueryResultType is returned when the transaction query result type
+	// is neither BEEF hex nor raw hex type.
+	ErrTxQueryResultType = models.SPVError{Code: "error-subject-tx-db-query", Message: "transaction query result must be either BEEF hex or raw hex", StatusCode: 500}
+
+	// ErrNilSubjectTx is returned when a nil subject transaction is provided to the constructor
+	// of the source transaction resolver.
+	ErrNilSubjectTx = models.SPVError{Code: "error-subject-tx-resolver", Message: "provided subject transaction must be non-nil", StatusCode: 500}
+
+	// ErrNilTxQueryResult is returned when a nil transaction query result is provided
+	// to the add method of the SourceTxMap.
+	ErrNilTxQueryResult = models.SPVError{Code: "error-source-txs-initialization", Message: "provided transaction query result must be non-nil", StatusCode: 500}
+
+	// ErrNilTransactionInput is returned when a nil transaction input is provided.
+	ErrNilTransactionInput = models.SPVError{Code: "error-subject-tx-input", Message: "transaction input must be non-nil", StatusCode: 400}
+
+	// ErrInputSourceTxIDNotFound is returned when a subject tx input transaction id
+	// has been not found after mapping transactions database query.
+	ErrInputSourceTxIDNotFound = models.SPVError{Code: "error-subject-tx-id-not-found", Message: "transaction input ID was not found in the transaction query mapped results", StatusCode: 500}
+
+	// ErrMissingInputSourceTxID is returned when a subject transaction input
+	// is missing the source transaction ID field.
+	ErrMissingInputSourceTxID = models.SPVError{Code: "error_subject-tx-input-source-tx-missing", Message: "The subject transaction input is missing the source transaction ID.", StatusCode: 500}
+
+	// ErrInvalidBEEFHexInQueryResult is returned when the raw BEEF hex data retrieved from the transaction query result is invalid or cannot be parsed.
+	ErrInvalidBEEFHexInQueryResult = models.SPVError{Code: "error-source-txs-initialization", Message: "Invalid BEEF hex data in transaction query result", StatusCode: 500}
+
+	// ErrInvalidRawHexInQueryResult is returned when the raw transaction hex data retrieved from the query result is invalid or corrupted.
+	ErrInvalidRawHexInQueryResult = models.SPVError{Code: "error-source-txs-initialization", Message: "Invalid raw hex data in transaction query result", StatusCode: 500}
 )

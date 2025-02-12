@@ -2,6 +2,7 @@ package v2
 
 import (
 	"github.com/bitcoin-sv/spv-wallet/actions/v2/admin"
+	"github.com/bitcoin-sv/spv-wallet/actions/v2/base"
 	"github.com/bitcoin-sv/spv-wallet/actions/v2/data"
 	"github.com/bitcoin-sv/spv-wallet/actions/v2/operations"
 	"github.com/bitcoin-sv/spv-wallet/actions/v2/transactions"
@@ -17,4 +18,6 @@ func Register(handlersManager *handlers.Manager) {
 	data.RegisterRoutes(handlersManager)
 
 	admin.Register(handlersManager)
+
+	base.RegisterRoutes(handlersManager)
 }
