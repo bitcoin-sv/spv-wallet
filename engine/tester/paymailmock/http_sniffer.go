@@ -5,6 +5,7 @@ import (
 	"io"
 	"net/http"
 	"regexp"
+	"sync"
 
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 )
@@ -23,6 +24,7 @@ type CallDetails struct {
 type httpSniffer struct {
 	next   http.RoundTripper
 	called map[string]CallDetails
+	lock   sync.Mutex
 }
 
 func newHTTPSniffer() *httpSniffer {
@@ -37,6 +39,8 @@ func (s *httpSniffer) setTransport(next http.RoundTripper) {
 
 func (s *httpSniffer) getCallByRegex(r string) *CallDetails {
 	reg := regexp.MustCompile(r)
+	s.lock.Lock()
+	defer s.lock.Unlock()
 	for url, details := range s.called {
 		if reg.MatchString(url) {
 			return &details
@@ -73,6 +77,8 @@ func (s *httpSniffer) RoundTrip(req *http.Request) (*http.Response, error) {
 		resp.Body = io.NopCloser(bytes.NewReader(details.ResponseBody)) // Restore body after reading
 	}
 
+	s.lock.Lock()
+	defer s.lock.Unlock()
 	s.called[details.URL] = details
 
 	return resp, nil
