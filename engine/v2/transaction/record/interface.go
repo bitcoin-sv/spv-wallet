@@ -6,8 +6,9 @@ import (
 
 	"github.com/bitcoin-sv/go-paymail"
 	trx "github.com/bitcoin-sv/go-sdk/transaction"
-	"github.com/bitcoin-sv/spv-wallet/engine/chain/models"
+	chainmodels "github.com/bitcoin-sv/spv-wallet/engine/chain/models"
 	"github.com/bitcoin-sv/spv-wallet/engine/v2/addresses/addressesmodels"
+	"github.com/bitcoin-sv/spv-wallet/engine/v2/transaction/beef"
 	"github.com/bitcoin-sv/spv-wallet/engine/v2/transaction/txmodels"
 	"github.com/bitcoin-sv/spv-wallet/models/bsv"
 )
@@ -20,6 +21,12 @@ type AddressesService interface {
 // OutputsRepo is an interface for outputs repository.
 type OutputsRepo interface {
 	FindByOutpoints(ctx context.Context, outpoints iter.Seq[bsv.Outpoint]) ([]txmodels.TrackedOutput, error)
+}
+
+// TransactionsRepo is an interface for transactions repository.
+type TransactionsRepo interface {
+	QueryTransactionInputSources(ctx context.Context, tx *trx.Transaction) (beef.TxQueryResultSlice, error)
+	HasTransactionInputSources(ctx context.Context, inputs ...*trx.TransactionInput) (bool, error)
 }
 
 // OperationsRepo is an interface for operations repository.

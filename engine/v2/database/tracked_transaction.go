@@ -5,9 +5,19 @@ import (
 	"time"
 
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
+	"github.com/bitcoin-sv/spv-wallet/engine/v2/transaction/beef"
 	"github.com/bitcoin-sv/spv-wallet/models/bsv"
 	"gorm.io/gorm"
 )
+
+// TxInput represents a transaction input in the database.
+// This struct is used to store the relationship between a transaction (TxID)
+// and its source transaction (SourceTxID). It helps track transaction ancestry
+// by linking an input to the transaction that created the output it spends.
+type TxInput struct {
+	TxID       string `gorm:"type:char(64);primaryKey"` // ID of the spending transaction
+	SourceTxID string `gorm:"type:char(64);primaryKey"` // ID of the source transaction
+}
 
 // TrackedTransaction represents a transaction in the database.
 type TrackedTransaction struct {
@@ -23,7 +33,26 @@ type TrackedTransaction struct {
 	Outputs []*TrackedOutput `gorm:"foreignKey:TxID"`
 
 	newUTXOs []*UserUTXO `gorm:"-"`
+
+	BeefHex        string    `gorm:"column:beef_hex"`
+	RawHex         string    `gorm:"column:raw_hex"`
+	SourceTxInputs []TxInput `gorm:"foreignKey:TxID;constraint:OnDelete:CASCADE;"`
 }
+
+// ToTxQueryResult converts a TrackedTransaction into a TxQueryResult.
+func (t *TrackedTransaction) ToTxQueryResult() *beef.TxQueryResult {
+	return &beef.TxQueryResult{
+		SourceTXID: t.ID,
+		RawHex:     &t.RawHex,
+		BeefHex:    &t.BeefHex,
+	}
+}
+
+// HasBeefHex checks if the tracked transaction record contains a non-empty BeefHex attribute.
+func (t *TrackedTransaction) HasBeefHex() bool { return t.BeefHex != "" }
+
+// HasRawHex checks if the tracked transaction record does not contain a BeefHex attribute.
+func (t *TrackedTransaction) HasRawHex() bool { return !t.HasBeefHex() }
 
 // CreateUTXO prepares a new UTXO and adds it to the transaction.
 func (t *TrackedTransaction) CreateUTXO(

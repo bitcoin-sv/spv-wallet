@@ -98,27 +98,38 @@ func mapOperations(operations iter.Seq[*txmodels.NewOperation]) []database.Opera
 	})
 }
 
-func mapTransaction(transaction *txmodels.NewOperation) *database.TrackedTransaction {
+func mapTransaction(operation *txmodels.NewOperation) *database.TrackedTransaction {
 	tx := &database.TrackedTransaction{
-		ID:       transaction.Transaction.ID,
-		TxStatus: string(transaction.Transaction.TxStatus),
+		ID:       operation.Transaction.ID,
+		TxStatus: string(operation.Transaction.TxStatus),
+		BeefHex:  operation.Transaction.BEEFHex(),
+		RawHex:   operation.Transaction.RawHex(),
 	}
 
-	for _, input := range transaction.Transaction.Inputs {
+	if !operation.Transaction.HasTransactionInputSources() {
+		for _, input := range operation.Transaction.TransactionInputSources() {
+			tx.SourceTxInputs = append(tx.SourceTxInputs, database.TxInput{
+				TxID:       input.TxID,
+				SourceTxID: input.SourceTxID,
+			})
+		}
+	}
+
+	for _, input := range operation.Transaction.Inputs {
 		tx.Inputs = append(tx.Inputs, &database.TrackedOutput{
 			TxID:       input.TxID,
 			Vout:       input.Vout,
-			SpendingTX: transaction.Transaction.ID,
+			SpendingTX: operation.Transaction.ID,
 			UserID:     input.UserID,
 			Satoshis:   input.Satoshis,
 		})
 	}
 
-	for _, output := range transaction.Transaction.Outputs {
+	for _, output := range operation.Transaction.Outputs {
 		if output.UTXO != nil {
 			tx.CreateUTXO(
 				&database.TrackedOutput{
-					TxID:     transaction.Transaction.ID,
+					TxID:     operation.Transaction.ID,
 					Vout:     output.Vout,
 					UserID:   output.UserID,
 					Satoshis: output.Satoshis,
@@ -129,7 +140,7 @@ func mapTransaction(transaction *txmodels.NewOperation) *database.TrackedTransac
 			)
 		} else if output.Data != nil {
 			tx.CreateDataOutput(&database.Data{
-				TxID:   transaction.Transaction.ID,
+				TxID:   operation.Transaction.ID,
 				Vout:   output.Vout,
 				UserID: output.UserID,
 				Blob:   output.Data,

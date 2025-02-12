@@ -8,6 +8,7 @@ import (
 	"github.com/bitcoin-sv/go-sdk/spv"
 	trx "github.com/bitcoin-sv/go-sdk/transaction"
 	"github.com/bitcoin-sv/spv-wallet/conv"
+	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	txerrors "github.com/bitcoin-sv/spv-wallet/engine/v2/transaction/errors"
 	"github.com/bitcoin-sv/spv-wallet/engine/v2/transaction/txmodels"
 	"github.com/bitcoin-sv/spv-wallet/models/bsv"
@@ -162,5 +163,24 @@ func (f *txFlow) broadcast() error {
 }
 
 func (f *txFlow) save() error {
+	isRawTx, err := f.service.transactions.HasTransactionInputSources(f.ctx, f.tx.Inputs...)
+	if err != nil {
+		return spverrors.Wrapf(err, "database query failed to check input source transactions for transaction %s", f.txID)
+	}
+
+	switch {
+	case isRawTx:
+		f.txRow.SetRawHex(f.tx.Hex())
+		f.txRow.SetTransactionInputSources()
+
+	default:
+		hex, err := f.tx.BEEFHex()
+		if err != nil {
+			return spverrors.Wrapf(err, "failed to generate BEEF hex for transaction %s", f.txID)
+		}
+
+		f.txRow.SetBEEFHex(hex)
+	}
+
 	return f.service.SaveOperations(f.ctx, maps.Values(f.operations))
 }

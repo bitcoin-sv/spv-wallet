@@ -185,6 +185,7 @@ func (c *Client) loadTransactionRecordService() error {
 			c.Repositories().Addresses,
 			c.Repositories().Outputs,
 			c.Repositories().Operations,
+			c.Repositories().Transactions,
 			c.Chain(),
 			c.PaymailService(),
 		)
