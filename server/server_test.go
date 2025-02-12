@@ -10,6 +10,7 @@ import (
 	"github.com/bitcoin-sv/spv-wallet/config"
 	"github.com/bitcoin-sv/spv-wallet/models"
 	"github.com/bitcoin-sv/spv-wallet/tests"
+	"github.com/rs/zerolog"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"github.com/stretchr/testify/suite"
@@ -38,7 +39,8 @@ func (ts *TestSuite) TearDownSuite() {
 func (ts *TestSuite) SetupTest() {
 	ts.BaseSetupTest()
 
-	setupServerRoutes(ts.AppConfig, ts.SpvWalletEngine, ts.Router)
+	logger := zerolog.Nop()
+	setupServerRoutes(ts.AppConfig, ts.SpvWalletEngine, ts.Router, &logger)
 }
 
 // TearDownTest runs after each test
