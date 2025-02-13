@@ -32,9 +32,9 @@ type TxRepository struct {
 	invalidRawHex  bool            // Flag to return invalid raw hex in query results.
 }
 
-// QueryInputSources retrieves transaction input sources based on provided transaction IDs.
+// QueryTransactionInputSources retrieves transaction input sources based on provided transaction IDs.
 // It can return invalid BEEF hex or raw hex data based on configured options.
-func (t *TxRepository) QueryInputSources(ctx context.Context, sourceTXIDs ...string) (beef.TxQueryResultSlice, error) {
+func (t *TxRepository) QueryTransactionInputSources(ctx context.Context, sourceTXIDs ...string) (beef.TxQueryResultSlice, error) {
 	slice := t.graph.ToTxQueryResultSlice()
 	invalidHex := "gggg" // Placeholder for invalid hex data.
 

@@ -9,6 +9,7 @@ import (
 	"github.com/bitcoin-sv/spv-wallet/actions/testabilities"
 	chainmodels "github.com/bitcoin-sv/spv-wallet/engine/chain/models"
 	testengine "github.com/bitcoin-sv/spv-wallet/engine/testabilities"
+	"github.com/bitcoin-sv/spv-wallet/engine/testabilities/testmode"
 	"github.com/bitcoin-sv/spv-wallet/engine/tester/fixtures"
 	"github.com/stretchr/testify/require"
 )
@@ -173,6 +174,8 @@ func TestIncomingPaymailRawTX(t *testing.T) {
 }
 
 func TestIncomingPaymailBeef(t *testing.T) {
+	testmode.DevelopmentOnly_SetPostgresMode(t)
+
 	givenForAllTests := testabilities.Given(t)
 	cleanup := givenForAllTests.StartedSPVWalletWithConfiguration(
 		testengine.WithDomainValidationDisabled(),
@@ -331,6 +334,31 @@ func TestIncomingPaymailBeef(t *testing.T) {
 			"txID":   testState.txID,
 			"sender": senderPaymail,
 		})
+	})
+
+	t.Run("step 5 - create transaction outline", func(t *testing.T) {
+		// given:
+		recipientClient := given.HttpClient().ForGivenUser(fixtures.RecipientInternal)
+
+		// and:
+		requestBody := `{
+			  "outputs": [
+				{
+				  "type": "op_return",
+				  "data": [ "some", " ", "data" ]
+				}
+			  ]
+			}`
+
+		// when:
+		res, _ := recipientClient.R().
+			SetHeader("Content-Type", "application/json").
+			SetBody(requestBody).
+			Post("/api/v2/transactions/outlines")
+
+		//  then:
+		thenResponse := then.Response(res)
+		thenResponse.IsOK()
 	})
 }
 

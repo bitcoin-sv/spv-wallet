@@ -45,19 +45,13 @@ func (t *Transactions) HasTransactionInputSources(ctx context.Context, inputs ..
 
 // QueryTransactionInputSources retrieves the full ancestry of input sources for a given transaction.
 // It recursively traces input sources in batches to minimize database queries.
-func (t *Transactions) QueryTransactionInputSources(ctx context.Context, tx *trx.Transaction) (beef.TxQueryResultSlice, error) {
+func (t *Transactions) QueryTransactionInputSources(ctx context.Context, sourceTXIDs ...string) (beef.TxQueryResultSlice, error) {
 	visited := make(visitedTransactions)
-	txID := tx.TxID().String()
-
-	sourceTXID := make([]string, 0, len(tx.Inputs))
-	for _, input := range tx.Inputs {
-		sourceTXID = append(sourceTXID, input.SourceTXID.String())
-	}
 
 	// Fetch input sources in batches
-	total, err := t.queryInputSourcesBatch(ctx, sourceTXID, visited)
+	total, err := t.queryInputSourcesBatch(ctx, sourceTXIDs, visited)
 	if err != nil {
-		return nil, spverrors.Wrapf(err, "failed to query input sources for transaction %s", txID)
+		return nil, spverrors.Wrapf(err, "failed to query input sources batches")
 	}
 
 	// Convert to TxQueryResultSlice

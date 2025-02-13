@@ -18,6 +18,7 @@ import (
 	"github.com/bitcoin-sv/spv-wallet/engine/v2/operations"
 	"github.com/bitcoin-sv/spv-wallet/engine/v2/paymails"
 	paymailprovider "github.com/bitcoin-sv/spv-wallet/engine/v2/paymailserver"
+	"github.com/bitcoin-sv/spv-wallet/engine/v2/transaction/beef"
 	"github.com/bitcoin-sv/spv-wallet/engine/v2/transaction/outlines"
 	"github.com/bitcoin-sv/spv-wallet/engine/v2/transaction/outlines/utxo"
 	"github.com/bitcoin-sv/spv-wallet/engine/v2/transaction/record"
@@ -172,7 +173,9 @@ func (c *Client) loadTransactionOutlinesService() error {
 	if c.options.transactionOutlinesService == nil {
 		logger := c.Logger().With().Str("subservice", "transactionOutlines").Logger()
 		utxoSelector := utxo.NewSelector(c.Datastore().DB(), c.FeeUnit())
-		c.options.transactionOutlinesService = outlines.NewService(c.PaymailService(), c.options.paymails, utxoSelector, logger)
+		beefService := beef.NewService(c.Repositories().Transactions)
+
+		c.options.transactionOutlinesService = outlines.NewService(c.PaymailService(), c.options.paymails, beefService, utxoSelector, logger)
 	}
 	return nil
 }
