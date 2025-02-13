@@ -4,6 +4,7 @@ import (
 	sdk "github.com/bitcoin-sv/go-sdk/transaction"
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/bitcoin-sv/spv-wallet/engine/v2/transaction"
+	"github.com/bitcoin-sv/spv-wallet/models/bsv"
 )
 
 // TransactionSpec represents client provided specification for a transaction outline.
@@ -24,6 +25,13 @@ func (t *TransactionSpec) evaluate(ctx *evaluationContext) (*sdk.Transaction, tr
 		return nil, transaction.Annotations{}, err
 	}
 
+	var changeSatoshis bsv.Satoshis
+	outputs, changeSatoshis, err = calculateChange(ctx, inputs, outputs, ctx.feeUnit)
+	if err != nil {
+		return nil, transaction.Annotations{}, spverrors.Wrapf(err, "failed to calculate change")
+	}
+	ctx.log.Debug().Msgf("Transaction change %d", changeSatoshis)
+
 	txOuts, outputsAnnotations := outputs.splitIntoTransactionOutputsAndAnnotations()
 	txIns, inputsAnnotations := inputs.splitIntoTransactionInputsAndAnnotations()
 
@@ -31,13 +39,6 @@ func (t *TransactionSpec) evaluate(ctx *evaluationContext) (*sdk.Transaction, tr
 		Inputs:  txIns,
 		Outputs: txOuts,
 	}
-
-	fee := calculateFee(inputs, outputs, ctx.feeUnit)
-	change, err := calculateChange(inputs, outputs, fee)
-	if err != nil {
-		return nil, transaction.Annotations{}, err
-	}
-	ctx.log.Debug().Msgf("Transaction fee: %d, change %d", fee, change)
 
 	annotations := transaction.Annotations{
 		Inputs:  inputsAnnotations,

@@ -58,6 +58,7 @@ func (a *transactionOutlineAbility) NewTransactionOutlinesService() outlines.Ser
 		&a.utxoSelector,
 		bsv.FeeUnit{Satoshis: 1, Bytes: 1000},
 		tester.Logger(a.t),
+		nil, //fixme: provide mocked users service
 	)
 }
 

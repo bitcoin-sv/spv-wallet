@@ -2,12 +2,13 @@ package testabilities
 
 import (
 	sdk "github.com/bitcoin-sv/go-sdk/transaction"
+	"github.com/bitcoin-sv/spv-wallet/models/bsv"
 	"github.com/stretchr/testify/require"
 	"testing"
 )
 
 type TransactionDetailsAssertions interface {
-	WithOutValues(values ...uint64) TransactionDetailsAssertions
+	WithOutValues(values ...bsv.Satoshis) TransactionDetailsAssertions
 }
 
 type transactionAssertions struct {
@@ -16,12 +17,12 @@ type transactionAssertions struct {
 	require *require.Assertions
 }
 
-func (a *transactionAssertions) WithOutValues(values ...uint64) TransactionDetailsAssertions {
+func (a *transactionAssertions) WithOutValues(values ...bsv.Satoshis) TransactionDetailsAssertions {
 	if len(values) != len(a.tx.Outputs) {
 		a.t.Fatalf("expected %d outputs, got %d", len(values), len(a.tx.Outputs))
 	}
 	for i, v := range values {
-		a.require.Equal(v, a.tx.Outputs[i].Satoshis, "output value mismatch")
+		a.require.Equal(v, bsv.Satoshis(a.tx.Outputs[i].Satoshis), "output value mismatch")
 	}
 	return a
 }

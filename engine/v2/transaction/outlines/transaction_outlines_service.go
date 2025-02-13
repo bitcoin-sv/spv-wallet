@@ -19,10 +19,18 @@ type service struct {
 	paymailAddressService PaymailAddressService
 	utxoSelector          UTXOSelector
 	feeUnit               bsvmodel.FeeUnit
+	usersService          UsersService
 }
 
 // NewService creates a new transaction outlines service.
-func NewService(paymailService paymail.ServiceClient, paymailAddressService PaymailAddressService, utxoSelector UTXOSelector, feeUnit bsvmodel.FeeUnit, logger zerolog.Logger) Service {
+func NewService(
+	paymailService paymail.ServiceClient,
+	paymailAddressService PaymailAddressService,
+	utxoSelector UTXOSelector,
+	feeUnit bsvmodel.FeeUnit,
+	logger zerolog.Logger,
+	usersService UsersService,
+) Service {
 	if paymailService == nil {
 		panic("paymail.ServiceClient is required to create transaction outlines service")
 	}
@@ -37,6 +45,7 @@ func NewService(paymailService paymail.ServiceClient, paymailAddressService Paym
 		paymailAddressService: paymailAddressService,
 		utxoSelector:          utxoSelector,
 		feeUnit:               feeUnit,
+		usersService:          usersService,
 	}
 }
 
@@ -87,6 +96,7 @@ func (s *service) evaluateSpec(ctx context.Context, spec *TransactionSpec) (*sdk
 		paymailAddressService: s.paymailAddressService,
 		utxoSelector:          s.utxoSelector,
 		feeUnit:               s.feeUnit,
+		usersService:          s.usersService,
 	}
 
 	tx, annotations, err := spec.evaluate(evaluationCtx)

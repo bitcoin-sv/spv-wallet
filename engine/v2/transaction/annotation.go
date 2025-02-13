@@ -30,6 +30,8 @@ type OutputAnnotation struct {
 	Bucket bucket.Name
 	// Paymail is available if the output is the paymail output.
 	Paymail *PaymailAnnotation
+	// CustomInstructions has instructions about how to unlock this output.
+	CustomInstructions bsv.CustomInstructions
 }
 
 // PaymailAnnotation is the metadata for the paymail output.

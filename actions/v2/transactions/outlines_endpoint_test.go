@@ -2,6 +2,8 @@ package transactions_test
 
 import (
 	"fmt"
+	"github.com/bitcoin-sv/spv-wallet/models/bsv"
+	"github.com/go-resty/resty/v2"
 	"net/http"
 	"testing"
 
@@ -14,10 +16,13 @@ import (
 const transactionsOutlinesURL = "/api/v2/transactions/outlines"
 
 func TestPOSTTransactionOutlinesBEEF(t *testing.T) {
+	initialSatoshis := bsv.Satoshis(1_000_000)
+
 	successTestCases := map[string]struct {
 		request          string
 		responseTemplate string
 		responseParams   map[string]any
+		outValues        []bsv.Satoshis
 	}{
 		"create transaction outline for op_return strings as default data": {
 			request: `{
@@ -28,6 +33,7 @@ func TestPOSTTransactionOutlinesBEEF(t *testing.T) {
 				}
 			  ]
 			}`,
+			outValues: []bsv.Satoshis{0, initialSatoshis - 1},
 			responseTemplate: `{
 			  "hex": "{{ matchBEEF }}",
 			  "format": "BEEF",
@@ -35,6 +41,9 @@ func TestPOSTTransactionOutlinesBEEF(t *testing.T) {
 				"outputs": {
 					"0": {
 						  "bucket": "data"
+					},
+					"1": {
+						  "bucket": "bsv"
 					}
 				},
 				"inputs": {
@@ -55,6 +64,7 @@ func TestPOSTTransactionOutlinesBEEF(t *testing.T) {
 				}
 			  ]
 			}`,
+			outValues: []bsv.Satoshis{0, initialSatoshis - 1},
 			responseTemplate: `{
 			  "hex": "{{ matchBEEF }}",
 			  "format": "BEEF",
@@ -62,6 +72,9 @@ func TestPOSTTransactionOutlinesBEEF(t *testing.T) {
 				"outputs": {
 					"0": {
 						  "bucket": "data"
+					},
+					"1": {
+						  "bucket": "bsv"
 					}
 				},
 				"inputs": {
@@ -82,6 +95,7 @@ func TestPOSTTransactionOutlinesBEEF(t *testing.T) {
 				}
 			  ]
 			}`,
+			outValues: []bsv.Satoshis{0, initialSatoshis - 1},
 			responseTemplate: `{
 			  "hex": "{{ matchBEEF }}",
 			  "format": "BEEF",
@@ -89,6 +103,9 @@ func TestPOSTTransactionOutlinesBEEF(t *testing.T) {
 				"outputs": {
 					"0": {
 						  "bucket": "data"
+					},
+					"1": {
+						  "bucket": "bsv"
 					}
 				},
 				"inputs": {
@@ -109,6 +126,7 @@ func TestPOSTTransactionOutlinesBEEF(t *testing.T) {
 				}
 			  ]
 			}`, fixtures.RecipientExternal.DefaultPaymail()),
+			outValues: []bsv.Satoshis{1000, initialSatoshis - 1000 - 1},
 			responseTemplate: `{
 			  "hex": "{{ matchBEEF }}",
 			  "format": "BEEF",
@@ -121,6 +139,9 @@ func TestPOSTTransactionOutlinesBEEF(t *testing.T) {
 					  "reference": "z0bac4ec-6f15-42de-9ef4-e60bfdabf4f7",
 					  "sender": "{{ .SenderPaymail }}"
 					}
+				  },
+				  "1": {
+					"bucket": "bsv"
 				  }
 				},
 				"inputs": {
@@ -144,6 +165,7 @@ func TestPOSTTransactionOutlinesBEEF(t *testing.T) {
 			}`, fixtures.RecipientExternal.DefaultPaymail(),
 				fixtures.Sender.DefaultPaymail(),
 			),
+			outValues: []bsv.Satoshis{1000, initialSatoshis - 1000 - 1},
 			responseTemplate: `{
 			  "hex": "{{ matchBEEF }}",
 			  "format": "BEEF",
@@ -156,6 +178,9 @@ func TestPOSTTransactionOutlinesBEEF(t *testing.T) {
 					  "reference": "z0bac4ec-6f15-42de-9ef4-e60bfdabf4f7",
 					  "sender": "{{ .SenderPaymail }}"
 					}
+				  },
+				  "1": {
+					"bucket": "bsv"
 				  }
 				},
 				"inputs": {
@@ -183,6 +208,7 @@ func TestPOSTTransactionOutlinesBEEF(t *testing.T) {
 			}`, fixtures.RecipientExternal.DefaultPaymail(),
 				fixtures.Sender.DefaultPaymail(),
 			),
+			outValues: []bsv.Satoshis{1000, 0, initialSatoshis - 1000 - 1},
 			responseTemplate: `{
 			  "hex": "{{ matchBEEF }}",
 			  "format": "BEEF",
@@ -198,6 +224,9 @@ func TestPOSTTransactionOutlinesBEEF(t *testing.T) {
 				  },
 				  "1": {
 					"bucket": "data"
+				  },
+				  "2": {
+					"bucket": "bsv"
 				  }
 				},
 				"inputs": {
@@ -209,60 +238,48 @@ func TestPOSTTransactionOutlinesBEEF(t *testing.T) {
 			}`,
 		},
 	}
+
+	requestCases := map[string]func(req *resty.Request) *resty.Request{
+		"implicit format": func(req *resty.Request) *resty.Request {
+			return req
+		},
+		"explicit format query": func(req *resty.Request) *resty.Request {
+			return req.SetQueryParam("format", "beef")
+		},
+	}
+
 	for name, test := range successTestCases {
 		t.Run(name, func(t *testing.T) {
-			// given:
-			given, then := testabilities.New(t)
-			cleanup := given.StartedSPVWalletWithConfiguration(testengine.WithV2())
-			defer cleanup()
+			for reqName, reqFunc := range requestCases {
+				t.Run(name+" "+reqName, func(t *testing.T) {
+					// given:
+					given, then := testabilities.New(t)
+					cleanup := given.StartedSPVWalletWithConfiguration(testengine.WithV2())
+					defer cleanup()
 
-			// and:
-			given.Faucet(fixtures.Sender).TopUp(1_000_000)
+					// and:
+					given.Faucet(fixtures.Sender).TopUp(1_000_000)
 
-			// and:
-			client := given.HttpClient().ForUser()
+					// and:
+					client := given.HttpClient().ForUser()
 
-			// when:
-			res, _ := client.R().
-				SetHeader("Content-Type", "application/json").
-				SetBody(test.request).
-				Post(transactionsOutlinesURL)
+					// when:
+					res, _ := reqFunc(
+						client.R().
+							SetHeader("Content-Type", "application/json").
+							SetBody(test.request),
+					).Post(transactionsOutlinesURL)
 
-			// then:
-			thenResponse := then.Response(res)
+					// then:
+					thenResponse := then.Response(res)
 
-			thenResponse.IsOK().
-				WithJSONMatching(test.responseTemplate, given.OutlineResponseContext(test.responseParams))
+					thenResponse.IsOK().
+						WithJSONMatching(test.responseTemplate, given.OutlineResponseContext(test.responseParams))
 
-			thenResponse.ContainsValidBEEFHexInField("hex")
-		})
-
-		t.Run(name+" with explicit format query", func(t *testing.T) {
-			// given:
-			given, then := testabilities.New(t)
-			cleanup := given.StartedSPVWalletWithConfiguration(testengine.WithV2())
-			defer cleanup()
-
-			// and:
-			given.Faucet(fixtures.Sender).TopUp(1_000_000)
-
-			// and:
-			client := given.HttpClient().ForUser()
-
-			// when:
-			res, _ := client.R().
-				SetHeader("Content-Type", "application/json").
-				SetBody(test.request).
-				SetQueryParam("format", "beef").
-				Post(transactionsOutlinesURL)
-
-			// then:
-			thenResponse := then.Response(res)
-
-			thenResponse.IsOK().
-				WithJSONMatching(test.responseTemplate, given.OutlineResponseContext(test.responseParams))
-
-			thenResponse.ContainsValidBEEFHexInField("hex")
+					thenResponse.ContainsValidBEEFHexInField("hex").
+						WithOutValues(test.outValues...)
+				})
+			}
 		})
 	}
 }
@@ -289,6 +306,9 @@ func TestPOSTTransactionOutlinesRAW(t *testing.T) {
 				"outputs": {
 					"0": {
 						  "bucket": "data"
+					},
+					"1": {
+						  "bucket": "bsv"
 					}
 				},
 				"inputs": {
@@ -316,6 +336,9 @@ func TestPOSTTransactionOutlinesRAW(t *testing.T) {
 				"outputs": {
 					"0": {
 						  "bucket": "data"
+					},
+					"1": {
+						  "bucket": "bsv"
 					}
 				},
 				"inputs": {
@@ -343,6 +366,9 @@ func TestPOSTTransactionOutlinesRAW(t *testing.T) {
 				"outputs": {
 					"0": {
 						  "bucket": "data"
+					},
+					"1": {
+						  "bucket": "bsv"
 					}
 				},
 				"inputs": {
@@ -368,14 +394,17 @@ func TestPOSTTransactionOutlinesRAW(t *testing.T) {
 			  "format": "RAW",
 			  "annotations": {
 				"outputs": {
-				  "0": {
-					"bucket": "bsv",
-					"paymail": {
-					  "receiver": "{{ .ReceiverPaymail }}",
-					  "reference": "z0bac4ec-6f15-42de-9ef4-e60bfdabf4f7",
-					  "sender": "{{ .SenderPaymail }}"
+					"0": {
+						"bucket": "bsv",
+						"paymail": {
+						  "receiver": "{{ .ReceiverPaymail }}",
+						  "reference": "z0bac4ec-6f15-42de-9ef4-e60bfdabf4f7",
+						  "sender": "{{ .SenderPaymail }}"
+						}
+					},
+					"1": {
+					  	"bucket": "bsv"
 					}
-				  }
 				},
 				"inputs": {
 				  "0": {
@@ -409,6 +438,9 @@ func TestPOSTTransactionOutlinesRAW(t *testing.T) {
 					  "receiver": "{{ .ReceiverPaymail }}",
 					  "reference": "z0bac4ec-6f15-42de-9ef4-e60bfdabf4f7",
 					  "sender": "{{ .SenderPaymail }}"
+					},
+					"1": {
+					  	"bucket": "bsv"
 					}
 				  }
 				},
@@ -448,6 +480,9 @@ func TestPOSTTransactionOutlinesRAW(t *testing.T) {
 					  "receiver": "{{ .ReceiverPaymail }}",
 					  "reference": "z0bac4ec-6f15-42de-9ef4-e60bfdabf4f7",
 					  "sender": "{{ .SenderPaymail }}"
+					},
+					"1": {
+					  	"bucket": "bsv"
 					}
 				  },
 				  "1": {

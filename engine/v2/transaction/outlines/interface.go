@@ -2,6 +2,7 @@ package outlines
 
 import (
 	"context"
+	primitives "github.com/bitcoin-sv/go-sdk/primitives/ec"
 
 	sdk "github.com/bitcoin-sv/go-sdk/transaction"
 	"github.com/bitcoin-sv/spv-wallet/engine/v2/bsv"
@@ -24,6 +25,10 @@ type UTXOSelector interface {
 type Service interface {
 	CreateBEEF(ctx context.Context, spec *TransactionSpec) (*Transaction, error)
 	CreateRawTx(ctx context.Context, spec *TransactionSpec) (*Transaction, error)
+}
+
+type UsersService interface {
+	GetPubKey(ctx context.Context, userID string) (*primitives.PublicKey, error)
 }
 
 // UTXO represents an unspent transaction output.
