@@ -16,8 +16,7 @@ type TransactionsEndpointAssertions interface {
 
 type TransactionsResponseAssertions interface {
 	testabilities.SPVWalletResponseAssertions
-	ContainsValidBEEFHexInField(field string) TransactionDetailsAssertions
-	ContainsValidRawTxHexInField(field string) TransactionDetailsAssertions
+	ContainsValidTransaction(format string) TransactionDetailsAssertions
 }
 
 func Then(t testing.TB, app testabilities.SPVWalletApplicationFixture) TransactionsEndpointAssertions {
@@ -50,21 +49,20 @@ type transactionResponseAssertions struct {
 	assert   *assert.Assertions
 }
 
-func (a *transactionResponseAssertions) ContainsValidBEEFHexInField(field string) TransactionDetailsAssertions {
-	txHex := a.SPVWalletResponseAssertions.JSONValue().GetString(field)
-	tx, err := sdk.NewTransactionFromBEEFHex(txHex)
-	a.require.NoError(err, "hex is not valid BEEF")
-	return &transactionAssertions{
-		t:       a.t,
-		require: a.require,
-		tx:      tx,
+func (a *transactionResponseAssertions) ContainsValidTransaction(format string) TransactionDetailsAssertions {
+	a.t.Helper()
+	txHex := a.SPVWalletResponseAssertions.JSONValue().GetString("hex")
+	var tx *sdk.Transaction
+	var err error
+	switch format {
+	case "BEEF":
+		tx, err = sdk.NewTransactionFromBEEFHex(txHex)
+	case "RAW":
+		tx, err = sdk.NewTransactionFromHex(txHex)
+	default:
+		a.t.Fatalf("unsupported format: %s", format)
 	}
-}
-
-func (a *transactionResponseAssertions) ContainsValidRawTxHexInField(field string) TransactionDetailsAssertions {
-	txHex := a.SPVWalletResponseAssertions.JSONValue().GetString(field)
-	tx, err := sdk.NewTransactionFromHex(txHex)
-	a.require.NoError(err, "hex is not valid raw tx")
+	a.require.NoError(err, "hex is not valid tx in format %s", format)
 	return &transactionAssertions{
 		t:       a.t,
 		require: a.require,

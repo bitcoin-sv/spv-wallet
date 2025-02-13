@@ -3,7 +3,6 @@ package transactions_test
 import (
 	"fmt"
 	"github.com/bitcoin-sv/spv-wallet/models/bsv"
-	"github.com/go-resty/resty/v2"
 	"net/http"
 	"testing"
 
@@ -15,7 +14,7 @@ import (
 
 const transactionsOutlinesURL = "/api/v2/transactions/outlines"
 
-func TestPOSTTransactionOutlinesBEEF(t *testing.T) {
+func TestPOSTTransactionOutlines(t *testing.T) {
 	initialSatoshis := bsv.Satoshis(1_000_000)
 
 	successTestCases := map[string]struct {
@@ -35,8 +34,8 @@ func TestPOSTTransactionOutlinesBEEF(t *testing.T) {
 			}`,
 			outValues: []bsv.Satoshis{0, initialSatoshis - 1},
 			responseTemplate: `{
-			  "hex": "{{ matchBEEF }}",
-			  "format": "BEEF",
+			  "hex": "{{ matchTxByFormat .Format }}",
+			  "format": "{{ .Format }}",
 			  "annotations": {
 				"outputs": {
 					"0": {
@@ -66,8 +65,8 @@ func TestPOSTTransactionOutlinesBEEF(t *testing.T) {
 			}`,
 			outValues: []bsv.Satoshis{0, initialSatoshis - 1},
 			responseTemplate: `{
-			  "hex": "{{ matchBEEF }}",
-			  "format": "BEEF",
+			  "hex": "{{ matchTxByFormat .Format }}",
+			  "format": "{{ .Format }}",
 			  "annotations": {
 				"outputs": {
 					"0": {
@@ -97,8 +96,8 @@ func TestPOSTTransactionOutlinesBEEF(t *testing.T) {
 			}`,
 			outValues: []bsv.Satoshis{0, initialSatoshis - 1},
 			responseTemplate: `{
-			  "hex": "{{ matchBEEF }}",
-			  "format": "BEEF",
+			  "hex": "{{ matchTxByFormat .Format }}",
+			  "format": "{{ .Format }}",
 			  "annotations": {
 				"outputs": {
 					"0": {
@@ -128,8 +127,8 @@ func TestPOSTTransactionOutlinesBEEF(t *testing.T) {
 			}`, fixtures.RecipientExternal.DefaultPaymail()),
 			outValues: []bsv.Satoshis{1000, initialSatoshis - 1000 - 1},
 			responseTemplate: `{
-			  "hex": "{{ matchBEEF }}",
-			  "format": "BEEF",
+			  "hex": "{{ matchTxByFormat .Format }}",
+			  "format": "{{ .Format }}",
 			  "annotations": {
 				"outputs": {
 				  "0": {
@@ -167,8 +166,8 @@ func TestPOSTTransactionOutlinesBEEF(t *testing.T) {
 			),
 			outValues: []bsv.Satoshis{1000, initialSatoshis - 1000 - 1},
 			responseTemplate: `{
-			  "hex": "{{ matchBEEF }}",
-			  "format": "BEEF",
+			  "hex": "{{ matchTxByFormat .Format }}",
+			  "format": "{{ .Format }}",
 			  "annotations": {
 				"outputs": {
 				  "0": {
@@ -210,8 +209,8 @@ func TestPOSTTransactionOutlinesBEEF(t *testing.T) {
 			),
 			outValues: []bsv.Satoshis{1000, 0, initialSatoshis - 1000 - 1},
 			responseTemplate: `{
-			  "hex": "{{ matchBEEF }}",
-			  "format": "BEEF",
+			  "hex": "{{ matchTxByFormat .Format }}",
+			  "format": "{{ .Format }}",
 			  "annotations": {
 				"outputs": {
 				  "0": {
@@ -239,293 +238,61 @@ func TestPOSTTransactionOutlinesBEEF(t *testing.T) {
 		},
 	}
 
-	requestCases := map[string]func(req *resty.Request) *resty.Request{
-		"implicit format": func(req *resty.Request) *resty.Request {
-			return req
+	type caseVariation struct {
+		explicitFormat bool
+		format         string
+	}
+
+	variations := map[string]caseVariation{
+		"beef with implicit format": {
+			format: "BEEF",
 		},
-		"explicit format query": func(req *resty.Request) *resty.Request {
-			return req.SetQueryParam("format", "beef")
+		"beef with explicit format query": {
+			explicitFormat: true,
+			format:         "BEEF",
+		},
+		"raw with explicit format query": {
+			explicitFormat: true,
+			format:         "RAW",
 		},
 	}
 
 	for name, test := range successTestCases {
 		t.Run(name, func(t *testing.T) {
-			for reqName, reqFunc := range requestCases {
-				t.Run(name+" "+reqName, func(t *testing.T) {
+			for variationName, variation := range variations {
+				t.Run(name+" "+variationName, func(t *testing.T) {
 					// given:
 					given, then := testabilities.New(t)
 					cleanup := given.StartedSPVWalletWithConfiguration(testengine.WithV2())
 					defer cleanup()
 
 					// and:
-					given.Faucet(fixtures.Sender).TopUp(1_000_000)
+					given.Faucet(fixtures.Sender).TopUp(initialSatoshis)
 
 					// and:
 					client := given.HttpClient().ForUser()
 
 					// when:
-					res, _ := reqFunc(
-						client.R().
-							SetHeader("Content-Type", "application/json").
-							SetBody(test.request),
-					).Post(transactionsOutlinesURL)
+					req := client.R().
+						SetHeader("Content-Type", "application/json").
+						SetBody(test.request)
+
+					if variation.explicitFormat {
+						req.SetQueryParam("format", variation.format)
+					}
+
+					res, _ := req.Post(transactionsOutlinesURL)
 
 					// then:
 					thenResponse := then.Response(res)
 
 					thenResponse.IsOK().
-						WithJSONMatching(test.responseTemplate, given.OutlineResponseContext(test.responseParams))
+						WithJSONMatching(test.responseTemplate, given.OutlineResponseContext(variation.format, test.responseParams))
 
-					thenResponse.ContainsValidBEEFHexInField("hex").
+					thenResponse.ContainsValidTransaction(variation.format).
 						WithOutValues(test.outValues...)
 				})
 			}
-		})
-	}
-}
-
-func TestPOSTTransactionOutlinesRAW(t *testing.T) {
-	successTestCases := map[string]struct {
-		request          string
-		responseTemplate string
-		responseParams   map[string]any
-	}{
-		"create transaction outline for op_return strings as default data": {
-			request: `{
-			  "outputs": [
-				{
-				  "type": "op_return",
-				  "data": [ "some", " ", "data" ]
-				}
-			  ]
-			}`,
-			responseTemplate: `{
-			  "hex": "{{ matchHex }}",
-			  "format": "RAW",
-			  "annotations": {
-				"outputs": {
-					"0": {
-						  "bucket": "data"
-					},
-					"1": {
-						  "bucket": "bsv"
-					}
-				},
-				"inputs": {
-				  "0": {
-				    "customInstructions": {{ .CustomInstructions }}
-				  }
-				}
-			  }
-			}`,
-		},
-		"create transaction outline for op_return strings data": {
-			request: `{
-			  "outputs": [
-				{
-				  "type": "op_return",
-				  "dataType": "strings",
-				  "data": [ "some", " ", "data" ]
-				}
-			  ]
-			}`,
-			responseTemplate: `{
-			  "hex": "{{ matchHex }}",
-			  "format": "RAW",
-			  "annotations": {
-				"outputs": {
-					"0": {
-						  "bucket": "data"
-					},
-					"1": {
-						  "bucket": "bsv"
-					}
-				},
-				"inputs": {
-				  "0": {
-				    "customInstructions": {{ .CustomInstructions }}
-				  }
-				}
-			  }
-			}`,
-		},
-		"create transaction outline for op_return hex data": {
-			request: `{
-			  "outputs": [
-				{
-				  "type": "op_return",
-				  "dataType": "hexes",
-				  "data": [ "736f6d65", "20", "64617461" ]
-				}
-			  ]
-			}`,
-			responseTemplate: `{
-			  "hex": "{{ matchHex }}",
-			  "format": "RAW",
-			  "annotations": {
-				"outputs": {
-					"0": {
-						  "bucket": "data"
-					},
-					"1": {
-						  "bucket": "bsv"
-					}
-				},
-				"inputs": {
-				  "0": {
-				    "customInstructions": {{ .CustomInstructions }}
-				  }
-				}
-			  }
-			}`,
-		},
-		"create transaction outline for paymail without sender": {
-			request: fmt.Sprintf(`{
-			  "outputs": [
-				{
-				  "type": "paymail",
-				  "to": "%s",
-				  "satoshis": 1000
-				}
-			  ]
-			}`, fixtures.RecipientExternal.DefaultPaymail()),
-			responseTemplate: `{
-			  "hex": "{{ matchHex }}",
-			  "format": "RAW",
-			  "annotations": {
-				"outputs": {
-					"0": {
-						"bucket": "bsv",
-						"paymail": {
-						  "receiver": "{{ .ReceiverPaymail }}",
-						  "reference": "z0bac4ec-6f15-42de-9ef4-e60bfdabf4f7",
-						  "sender": "{{ .SenderPaymail }}"
-						}
-					},
-					"1": {
-					  	"bucket": "bsv"
-					}
-				},
-				"inputs": {
-				  "0": {
-				    "customInstructions": {{ .CustomInstructions }}
-				  }
-				}
-			  }
-			}`,
-		},
-		"create transaction outline for paymail with sender": {
-			request: fmt.Sprintf(`{
-			  "outputs": [
-				{
-				  "type": "paymail",
-				  "to": "%s",
-				  "satoshis": 1000,
-				  "from": "%s"
-				}
-			  ]
-			}`, fixtures.RecipientExternal.DefaultPaymail(),
-				fixtures.Sender.DefaultPaymail(),
-			),
-			responseTemplate: `{
-			  "hex": "{{ matchHex }}",
-			  "format": "RAW",
-			  "annotations": {
-				"outputs": {
-				  "0": {
-					"bucket": "bsv",
-					"paymail": {
-					  "receiver": "{{ .ReceiverPaymail }}",
-					  "reference": "z0bac4ec-6f15-42de-9ef4-e60bfdabf4f7",
-					  "sender": "{{ .SenderPaymail }}"
-					},
-					"1": {
-					  	"bucket": "bsv"
-					}
-				  }
-				},
-				"inputs": {
-				  "0": {
-				    "customInstructions": {{ .CustomInstructions }}
-				  }
-				}
-			  }
-			}`,
-		},
-		"create transaction outline for paymail and data": {
-			request: fmt.Sprintf(`{
-			  "outputs": [
-				{
-				  "type": "paymail",
-				  "to": "%s",
-				  "satoshis": 1000,
-				  "from": "%s"
-				},
-				{
-				  "type": "op_return",
-				  "data": [ "some", " ", "data" ]
-				}
-			  ]
-			}`, fixtures.RecipientExternal.DefaultPaymail(),
-				fixtures.Sender.DefaultPaymail(),
-			),
-			responseTemplate: `{
-			  "hex": "{{ matchHex }}",
-			  "format": "RAW",
-			  "annotations": {
-				"outputs": {
-				  "0": {
-					"bucket": "bsv",
-					"paymail": {
-					  "receiver": "{{ .ReceiverPaymail }}",
-					  "reference": "z0bac4ec-6f15-42de-9ef4-e60bfdabf4f7",
-					  "sender": "{{ .SenderPaymail }}"
-					},
-					"1": {
-					  	"bucket": "bsv"
-					}
-				  },
-				  "1": {
-					"bucket": "data"
-				  }
-				},
-				"inputs": {
-				  "0": {
-				    "customInstructions": {{ .CustomInstructions }}
-				  }
-				}
-			  }
-			}`,
-		},
-	}
-	for name, test := range successTestCases {
-		t.Run(name, func(t *testing.T) {
-			// given:
-			given, then := testabilities.New(t)
-			cleanup := given.StartedSPVWalletWithConfiguration(testengine.WithV2())
-			defer cleanup()
-
-			// and:
-			given.Faucet(fixtures.Sender).TopUp(1_000_000)
-
-			// and:
-			client := given.HttpClient().ForUser()
-
-			// when:
-			res, _ := client.R().
-				SetHeader("Content-Type", "application/json").
-				SetBody(test.request).
-				SetQueryParam("format", "raw").
-				Post(transactionsOutlinesURL)
-
-			// then:
-			thenResponse := then.Response(res)
-
-			thenResponse.IsOK().
-				WithJSONMatching(test.responseTemplate, given.OutlineResponseContext(test.responseParams))
-
-			thenResponse.ContainsValidRawTxHexInField("hex").
-				WithOutValues(0, 999_999)
 		})
 	}
 }

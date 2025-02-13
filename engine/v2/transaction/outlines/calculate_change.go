@@ -12,7 +12,7 @@ import (
 	"github.com/bitcoin-sv/spv-wallet/models/transaction/bucket"
 )
 
-func calculateChange(ctx *evaluationContext, inputs annotatedInputs, outputs annotatedOutputs, feeUnit bsv.FeeUnit) (annotatedOutputs, bsv.Satoshis, error) {
+func calculateChange(ctx *evaluationContext, inputs annotatedInputs, outputs annotatedOutputs, feeUnit bsv.FeeUnit) (annotatedOutputs, error) {
 	satsIn := inputs.totalSatoshis()
 	satsOut := outputs.totalSatoshis()
 
@@ -21,7 +21,7 @@ func calculateChange(ctx *evaluationContext, inputs annotatedInputs, outputs ann
 		// this should never happen
 		// UTXO selector should deduce if change output is required and then select enough funds to cover the fee for additional size from the change output
 		// NOTE: If user doesn't have enough funds to cover transaction the txerrors.ErrTxOutlineInsufficientFunds is returned on another level
-		return nil, 0, spverrors.Wrapf(txerrors.ErrUTXOSelectorInsufficientInputs, "satsIn (%d) are less than satsOut (%d) plus fee (%d)", satsIn, satsOut, fee)
+		return nil, spverrors.Wrapf(txerrors.ErrUTXOSelectorInsufficientInputs, "satsIn (%d) are less than satsOut (%d) plus fee (%d)", satsIn, satsOut, fee)
 	}
 
 	// keep in mind that those values are uint64 so be careful with underflow
@@ -30,17 +30,17 @@ func calculateChange(ctx *evaluationContext, inputs annotatedInputs, outputs ann
 	change := satsIn - satsOut - fee
 
 	if change == 0 {
-		return outputs, 0, nil
+		return outputs, nil
 	}
 
 	userPubKey, err := ctx.UserPubKey()
 	if err != nil {
-		return nil, 0, spverrors.Wrapf(err, "failed to get user public key")
+		return nil, spverrors.Wrapf(err, "failed to get user public key")
 	}
 
 	lockingScript, err := lockingScriptForChangeOutput(userPubKey)
 	if err != nil {
-		return nil, 0, spverrors.Wrapf(err, "failed to create locking script for change output")
+		return nil, spverrors.Wrapf(err, "failed to create locking script for change output")
 	}
 	changeOutput := &annotatedOutput{
 		OutputAnnotation: &transaction.OutputAnnotation{
@@ -58,12 +58,12 @@ func calculateChange(ctx *evaluationContext, inputs annotatedInputs, outputs ann
 	if feeForTxWithChange > fee {
 		feeDiff := uint64(feeForTxWithChange - fee)
 		if feeDiff >= changeOutput.TransactionOutput.Satoshis {
-			return outputs, 0, nil
+			return outputs, nil
 		}
 		changeOutput.TransactionOutput.Satoshis -= feeDiff
 	}
 
-	return outputsWithChange, change, nil
+	return outputsWithChange, nil
 }
 
 func lockingScriptForChangeOutput(pubKey *primitives.PublicKey) (*script.Script, error) {
