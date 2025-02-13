@@ -25,6 +25,9 @@ type ServerInterface interface {
 	// Add paymails to user
 	// (POST /api/v2/admin/users/{id}/paymails)
 	PostApiV2AdminUsersIdPaymails(c *gin.Context, id string)
+	// Get shared config
+	// (GET /api/v2/configs/shared)
+	GetApiV2ConfigsShared(c *gin.Context)
 }
 
 // ServerInterfaceWrapper converts contexts to parameters.
@@ -118,6 +121,21 @@ func (siw *ServerInterfaceWrapper) PostApiV2AdminUsersIdPaymails(c *gin.Context)
 	siw.Handler.PostApiV2AdminUsersIdPaymails(c, id)
 }
 
+// GetApiV2ConfigsShared operation middleware
+func (siw *ServerInterfaceWrapper) GetApiV2ConfigsShared(c *gin.Context) {
+
+	c.Set(XPubAuthScopes, []string{"admin", "user"})
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		middleware(c)
+		if c.IsAborted() {
+			return
+		}
+	}
+
+	siw.Handler.GetApiV2ConfigsShared(c)
+}
+
 // GinServerOptions provides options for the Gin server.
 type GinServerOptions struct {
 	BaseURL      string
@@ -149,4 +167,5 @@ func RegisterHandlersWithOptions(router gin.IRouter, si ServerInterface, options
 	router.POST(options.BaseURL+"/api/v2/admin/users", wrapper.PostApiV2AdminUsers)
 	router.GET(options.BaseURL+"/api/v2/admin/users/:id", wrapper.GetApiV2AdminUsersId)
 	router.POST(options.BaseURL+"/api/v2/admin/users/:id/paymails", wrapper.PostApiV2AdminUsersIdPaymails)
+	router.GET(options.BaseURL+"/api/v2/configs/shared", wrapper.GetApiV2ConfigsShared)
 }

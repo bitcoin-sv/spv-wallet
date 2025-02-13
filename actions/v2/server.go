@@ -15,7 +15,7 @@ type Server struct {
 	base.APIBase
 }
 
-// check if the Server implements the interface api.ServerInterface
+// _ check if the Server implements the interface api.ServerInterface
 var _ api.ServerInterface = &Server{}
 
 // NewServer creates a new server

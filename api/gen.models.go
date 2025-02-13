@@ -104,6 +104,12 @@ type ApiComponentsModelsPaymail struct {
 	PublicName string `json:"publicName"`
 }
 
+// ApiComponentsModelsSharedConfig Shared config
+type ApiComponentsModelsSharedConfig struct {
+	ExperimentalFeatures *map[string]bool `json:"experimentalFeatures,omitempty"`
+	PaymailDomains       *[]string        `json:"paymailDomains,omitempty"`
+}
+
 // ApiComponentsModelsUser defines model for api_components_models_User.
 type ApiComponentsModelsUser struct {
 	CreatedAt time.Time                    `json:"createdAt"`
@@ -150,6 +156,9 @@ type ApiComponentsResponsesAdminUserBadRequest struct {
 
 // ApiComponentsResponsesNotAuthorized defines model for api_components_responses_NotAuthorized.
 type ApiComponentsResponsesNotAuthorized = ApiComponentsErrorsErrUnauthorized
+
+// ApiComponentsResponsesSharedConfig Shared config
+type ApiComponentsResponsesSharedConfig = ApiComponentsModelsSharedConfig
 
 // PostApiV2AdminUsersJSONRequestBody defines body for PostApiV2AdminUsers for application/json ContentType.
 type PostApiV2AdminUsersJSONRequestBody = ApiComponentsRequestsCreateUser

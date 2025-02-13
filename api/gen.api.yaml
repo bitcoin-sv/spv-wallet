@@ -94,6 +94,23 @@ paths:
             summary: Add paymails to user
             tags:
                 - Admin endpoints
+    /api/v2/configs/shared:
+        get:
+            description: This endpoint returns shared config. It can be obtained by both admin and user.
+            responses:
+                "200":
+                    $ref: '#/components/responses/api_components_responses_SharedConfig'
+                "401":
+                    $ref: '#/components/responses/api_components_responses_NotAuthorized'
+            security:
+                - XPubAuth:
+                    - admin
+                    - user
+            summary: Get shared config
+            tags:
+                - Admin endpoints
+                - User endpoints
+                - Configurations
 components:
     responses:
         api_components_responses_AdminAddPaymailSuccess:
@@ -143,6 +160,12 @@ components:
                     schema:
                         $ref: '#/components/schemas/api_components_errors_ErrUnauthorized'
             description: Security requirements failed
+        api_components_responses_SharedConfig:
+            content:
+                application/json:
+                    schema:
+                        $ref: '#/components/schemas/api_components_models_SharedConfig'
+            description: Shared config
     schemas:
         api_components_errors_ErrAdminAuthOnNonAdminEndpoint:
             allOf:
@@ -289,6 +312,22 @@ components:
                 - paymail
                 - publicName
                 - avatar
+            type: object
+        api_components_models_SharedConfig:
+            description: Shared config
+            properties:
+                experimentalFeatures:
+                    additionalProperties:
+                        type: boolean
+                    example:
+                        pikeEnabled: true
+                    type: object
+                paymailDomains:
+                    example:
+                        - example.com
+                    items:
+                        type: string
+                    type: array
             type: object
         api_components_models_User:
             properties:
