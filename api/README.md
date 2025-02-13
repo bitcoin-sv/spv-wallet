@@ -178,7 +178,7 @@ Expected Output (Good):
 
 ### When to Run This Check?
 
-Running this test **from time to time** to ensure `oapi-codegen` don’t accidentally get compiled into builds.
+Run this test **from time to time** to ensure `oapi-codegen` don’t accidentally get compiled into builds.
 
 - **Before releasing a new version**
 - **After updating dependencies (`go mod tidy`)**
