@@ -13,8 +13,8 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-// PostApiV2AdminUsers creates a new user
-func (s *APIAdminUsers) PostApiV2AdminUsers(c *gin.Context) {
+// CreateUser creates a new user
+func (s *APIAdminUsers) CreateUser(c *gin.Context) {
 	var requestBody adminrequest.CreateUser
 	if err := c.Bind(&requestBody); err != nil {
 		spverrors.ErrorResponse(c, spverrors.ErrCannotBindRequest.Wrap(err), s.logger)

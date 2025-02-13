@@ -13,8 +13,8 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-// PostApiV2AdminUsersIdPaymails add paymails to the user
-func (s *APIAdminUsers) PostApiV2AdminUsersIdPaymails(c *gin.Context, id string) {
+// AddPaymailToUser add paymails to the user
+func (s *APIAdminUsers) AddPaymailToUser(c *gin.Context, id string) {
 	var requestBody adminrequest.AddPaymail
 	if err := c.Bind(&requestBody); err != nil {
 		spverrors.ErrorResponse(c, spverrors.ErrCannotBindRequest.Wrap(err), s.logger)

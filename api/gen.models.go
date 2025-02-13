@@ -96,12 +96,12 @@ type ApiComponentsErrorsErrorSchema struct {
 
 // ApiComponentsModelsPaymail defines model for api_components_models_Paymail.
 type ApiComponentsModelsPaymail struct {
-	Alias      string `json:"alias"`
-	Avatar     string `json:"avatar"`
-	Domain     string `json:"domain"`
-	Id         string `json:"id"`
-	Paymail    string `json:"paymail"`
-	PublicName string `json:"publicName"`
+	Alias      string  `json:"alias"`
+	Avatar     string  `json:"avatar"`
+	Domain     string  `json:"domain"`
+	Id         float32 `json:"id"`
+	Paymail    string  `json:"paymail"`
+	PublicName string  `json:"publicName"`
 }
 
 // ApiComponentsModelsSharedConfig Shared config
@@ -160,11 +160,11 @@ type ApiComponentsResponsesNotAuthorized = ApiComponentsErrorsErrUnauthorized
 // ApiComponentsResponsesSharedConfig Shared config
 type ApiComponentsResponsesSharedConfig = ApiComponentsModelsSharedConfig
 
-// PostApiV2AdminUsersJSONRequestBody defines body for PostApiV2AdminUsers for application/json ContentType.
-type PostApiV2AdminUsersJSONRequestBody = ApiComponentsRequestsCreateUser
+// CreateUserJSONRequestBody defines body for CreateUser for application/json ContentType.
+type CreateUserJSONRequestBody = ApiComponentsRequestsCreateUser
 
-// PostApiV2AdminUsersIdPaymailsJSONRequestBody defines body for PostApiV2AdminUsersIdPaymails for application/json ContentType.
-type PostApiV2AdminUsersIdPaymailsJSONRequestBody = ApiComponentsRequestsAddPaymail
+// AddPaymailToUserJSONRequestBody defines body for AddPaymailToUser for application/json ContentType.
+type AddPaymailToUserJSONRequestBody = ApiComponentsRequestsAddPaymail
 
 // AsApiComponentsErrorsErrAuthorization returns the union data inside the ApiComponentsErrorsErrUnauthorized as a ApiComponentsErrorsErrAuthorization
 func (t ApiComponentsErrorsErrUnauthorized) AsApiComponentsErrorsErrAuthorization() (ApiComponentsErrorsErrAuthorization, error) {

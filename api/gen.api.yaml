@@ -9,6 +9,7 @@ paths:
     /api/v2/admin/status:
         get:
             description: This endpoint returns admin status. It is used to check if authorization header contain admin xpub.
+            operationId: adminStatus
             responses:
                 "200":
                     description: Success
@@ -23,6 +24,7 @@ paths:
     /api/v2/admin/users:
         post:
             description: This endpoint creates a new user.
+            operationId: createUser
             requestBody:
                 content:
                     application/json:
@@ -47,6 +49,7 @@ paths:
     /api/v2/admin/users/{id}:
         get:
             description: This endpoint gets user by id.
+            operationId: userById
             parameters:
                 - description: User ID
                   in: path
@@ -68,6 +71,7 @@ paths:
     /api/v2/admin/users/{id}/paymails:
         post:
             description: This endpoint add paymails to user with given id.
+            operationId: addPaymailToUser
             parameters:
                 - description: User ID
                   in: path
@@ -97,6 +101,7 @@ paths:
     /api/v2/configs/shared:
         get:
             description: This endpoint returns shared config. It can be obtained by both admin and user.
+            operationId: sharedConfig
             responses:
                 "200":
                     $ref: '#/components/responses/api_components_responses_SharedConfig'
@@ -297,8 +302,8 @@ components:
                     example: spv-wallet.com
                     type: string
                 id:
-                    example: "1"
-                    type: string
+                    example: 1
+                    type: number
                 paymail:
                     example: test@spv-wallet.com
                     type: string

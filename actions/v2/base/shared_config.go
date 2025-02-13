@@ -7,8 +7,8 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-// GetApiV2ConfigsShared is the handler for SharedConfig which can be obtained by both admin and user
-func (s *APIBase) GetApiV2ConfigsShared(c *gin.Context) {
+// SharedConfig is the handler for SharedConfig which can be obtained by both admin and user
+func (s *APIBase) SharedConfig(c *gin.Context) {
 	sharedConfig := response.SharedConfig{
 		PaymailDomains: s.config.Paymail.Domains,
 		ExperimentalFeatures: map[string]bool{

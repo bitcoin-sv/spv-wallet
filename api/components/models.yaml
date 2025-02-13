@@ -51,8 +51,8 @@ components:
       type: object
       properties:
         id:
-          type: string
-          example: "1"
+          type: number
+          example: 1
         alias:
           type: string
           example: "test"

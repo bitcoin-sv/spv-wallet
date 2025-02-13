@@ -6,6 +6,7 @@ paths:
 
   /api/v2/admin/status:
     get:
+      operationId: adminStatus
       security:
         - XPubAuth:
             - "admin"
@@ -23,6 +24,7 @@ paths:
 
   /api/v2/admin/users:
     post:
+      operationId: createUser
       security:
         - XPubAuth:
             - "admin"
@@ -50,6 +52,7 @@ paths:
 
   /api/v2/admin/users/{id}:
     get:
+      operationId: userById
       security:
         - XPubAuth:
             - "admin"
@@ -74,6 +77,7 @@ paths:
 
   /api/v2/admin/users/{id}/paymails:
     post:
+      operationId: addPaymailToUser
       security:
         - XPubAuth:
             - "admin"

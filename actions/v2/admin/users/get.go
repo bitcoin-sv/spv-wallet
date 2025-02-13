@@ -8,8 +8,8 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-// GetApiV2AdminUsersId returns a user by ID
-func (s *APIAdminUsers) GetApiV2AdminUsersId(c *gin.Context, id string) {
+// UserById returns a user by ID
+func (s *APIAdminUsers) UserById(c *gin.Context, id string) {
 	user, err := s.engine.UsersService().GetByID(c, id)
 	if err != nil {
 		spverrors.ErrorResponse(c, err, s.logger)

@@ -15,19 +15,19 @@ import (
 type ServerInterface interface {
 	// Get admin status
 	// (GET /api/v2/admin/status)
-	GetApiV2AdminStatus(c *gin.Context)
+	AdminStatus(c *gin.Context)
 	// Create user
 	// (POST /api/v2/admin/users)
-	PostApiV2AdminUsers(c *gin.Context)
+	CreateUser(c *gin.Context)
 	// Get user by id
 	// (GET /api/v2/admin/users/{id})
-	GetApiV2AdminUsersId(c *gin.Context, id string)
+	UserById(c *gin.Context, id string)
 	// Add paymails to user
 	// (POST /api/v2/admin/users/{id}/paymails)
-	PostApiV2AdminUsersIdPaymails(c *gin.Context, id string)
+	AddPaymailToUser(c *gin.Context, id string)
 	// Get shared config
 	// (GET /api/v2/configs/shared)
-	GetApiV2ConfigsShared(c *gin.Context)
+	SharedConfig(c *gin.Context)
 }
 
 // ServerInterfaceWrapper converts contexts to parameters.
@@ -39,8 +39,8 @@ type ServerInterfaceWrapper struct {
 
 type MiddlewareFunc func(c *gin.Context)
 
-// GetApiV2AdminStatus operation middleware
-func (siw *ServerInterfaceWrapper) GetApiV2AdminStatus(c *gin.Context) {
+// AdminStatus operation middleware
+func (siw *ServerInterfaceWrapper) AdminStatus(c *gin.Context) {
 
 	c.Set(XPubAuthScopes, []string{"admin"})
 
@@ -51,11 +51,11 @@ func (siw *ServerInterfaceWrapper) GetApiV2AdminStatus(c *gin.Context) {
 		}
 	}
 
-	siw.Handler.GetApiV2AdminStatus(c)
+	siw.Handler.AdminStatus(c)
 }
 
-// PostApiV2AdminUsers operation middleware
-func (siw *ServerInterfaceWrapper) PostApiV2AdminUsers(c *gin.Context) {
+// CreateUser operation middleware
+func (siw *ServerInterfaceWrapper) CreateUser(c *gin.Context) {
 
 	c.Set(XPubAuthScopes, []string{"admin"})
 
@@ -66,11 +66,11 @@ func (siw *ServerInterfaceWrapper) PostApiV2AdminUsers(c *gin.Context) {
 		}
 	}
 
-	siw.Handler.PostApiV2AdminUsers(c)
+	siw.Handler.CreateUser(c)
 }
 
-// GetApiV2AdminUsersId operation middleware
-func (siw *ServerInterfaceWrapper) GetApiV2AdminUsersId(c *gin.Context) {
+// UserById operation middleware
+func (siw *ServerInterfaceWrapper) UserById(c *gin.Context) {
 
 	var err error
 
@@ -92,11 +92,11 @@ func (siw *ServerInterfaceWrapper) GetApiV2AdminUsersId(c *gin.Context) {
 		}
 	}
 
-	siw.Handler.GetApiV2AdminUsersId(c, id)
+	siw.Handler.UserById(c, id)
 }
 
-// PostApiV2AdminUsersIdPaymails operation middleware
-func (siw *ServerInterfaceWrapper) PostApiV2AdminUsersIdPaymails(c *gin.Context) {
+// AddPaymailToUser operation middleware
+func (siw *ServerInterfaceWrapper) AddPaymailToUser(c *gin.Context) {
 
 	var err error
 
@@ -118,11 +118,11 @@ func (siw *ServerInterfaceWrapper) PostApiV2AdminUsersIdPaymails(c *gin.Context)
 		}
 	}
 
-	siw.Handler.PostApiV2AdminUsersIdPaymails(c, id)
+	siw.Handler.AddPaymailToUser(c, id)
 }
 
-// GetApiV2ConfigsShared operation middleware
-func (siw *ServerInterfaceWrapper) GetApiV2ConfigsShared(c *gin.Context) {
+// SharedConfig operation middleware
+func (siw *ServerInterfaceWrapper) SharedConfig(c *gin.Context) {
 
 	c.Set(XPubAuthScopes, []string{"admin", "user"})
 
@@ -133,7 +133,7 @@ func (siw *ServerInterfaceWrapper) GetApiV2ConfigsShared(c *gin.Context) {
 		}
 	}
 
-	siw.Handler.GetApiV2ConfigsShared(c)
+	siw.Handler.SharedConfig(c)
 }
 
 // GinServerOptions provides options for the Gin server.
@@ -163,9 +163,9 @@ func RegisterHandlersWithOptions(router gin.IRouter, si ServerInterface, options
 		ErrorHandler:       errorHandler,
 	}
 
-	router.GET(options.BaseURL+"/api/v2/admin/status", wrapper.GetApiV2AdminStatus)
-	router.POST(options.BaseURL+"/api/v2/admin/users", wrapper.PostApiV2AdminUsers)
-	router.GET(options.BaseURL+"/api/v2/admin/users/:id", wrapper.GetApiV2AdminUsersId)
-	router.POST(options.BaseURL+"/api/v2/admin/users/:id/paymails", wrapper.PostApiV2AdminUsersIdPaymails)
-	router.GET(options.BaseURL+"/api/v2/configs/shared", wrapper.GetApiV2ConfigsShared)
+	router.GET(options.BaseURL+"/api/v2/admin/status", wrapper.AdminStatus)
+	router.POST(options.BaseURL+"/api/v2/admin/users", wrapper.CreateUser)
+	router.GET(options.BaseURL+"/api/v2/admin/users/:id", wrapper.UserById)
+	router.POST(options.BaseURL+"/api/v2/admin/users/:id/paymails", wrapper.AddPaymailToUser)
+	router.GET(options.BaseURL+"/api/v2/configs/shared", wrapper.SharedConfig)
 }
