@@ -119,3 +119,9 @@ var (
 	// ErrInvalidRawHexInQueryResult is returned when the raw transaction hex data retrieved from the query result is invalid or corrupted.
 	ErrInvalidRawHexInQueryResult = models.SPVError{Code: "error-source-txs-initialization", Message: "Invalid raw hex data in transaction query result", StatusCode: 500}
 )
+
+var (
+	// ErrUTXOSelectorInsufficientInputs is a critical error that never should happen.
+	// It means that UTXO selector selected a set of UTXO, but they don't cover outputs and a fee.
+	ErrUTXOSelectorInsufficientInputs = models.SPVError{Code: "error-utxo-selector-internal", Message: "internal error in UTXO selector", StatusCode: 500}
+)

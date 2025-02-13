@@ -5,6 +5,7 @@ import (
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/bitcoin-sv/spv-wallet/engine/v2/transaction"
 	"github.com/bitcoin-sv/spv-wallet/engine/v2/transaction/errors"
+	"github.com/bitcoin-sv/spv-wallet/models/bsv"
 )
 
 // OutputsSpec are representing a client specification for outputs part of the transaction.
@@ -85,4 +86,12 @@ func (a annotatedOutputs) splitIntoTransactionOutputsAndAnnotations() ([]*sdk.Tr
 		}
 	}
 	return outputs, annotationByOutputIndex
+}
+
+func (a annotatedOutputs) totalSatoshis() bsv.Satoshis {
+	var total bsv.Satoshis
+	for _, out := range a {
+		total += bsv.Satoshis(out.Satoshis)
+	}
+	return total
 }

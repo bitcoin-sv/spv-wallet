@@ -6,14 +6,14 @@ import (
 	"math"
 )
 
-func calculateFee(inputs annotatedInputs, outputs annotatedOutputs, feeUnit bsv.FeeUnit) uint64 {
-	size := calculateEstimatedSize(inputs, outputs)
+func calculateFee(inputs annotatedInputs, outputs annotatedOutputs, feeUnit bsv.FeeUnit) bsv.Satoshis {
+	size := estimatedSize(inputs, outputs)
 
 	chunks := uint64(math.Ceil(float64(size) / float64(feeUnit.Bytes)))
-	return chunks * uint64(feeUnit.Satoshis)
+	return bsv.Satoshis(chunks) * feeUnit.Satoshis
 }
 
-func calculateEstimatedSize(inputs annotatedInputs, outputs annotatedOutputs) uint64 {
+func estimatedSize(inputs annotatedInputs, outputs annotatedOutputs) uint64 {
 	var size uint64
 
 	// version:
