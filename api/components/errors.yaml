@@ -5,7 +5,7 @@ info:
 
 components:
   schemas:
-    ErrorSchema:
+    Schema:
       type: object
       properties:
         code:
@@ -19,16 +19,16 @@ components:
         - message
       additionalProperties: false
 
-    ErrUnauthorized:
+    Unauthorized:
       oneOf:
-        - $ref: '#/components/schemas/ErrAuthorization'
-        - $ref: '#/components/schemas/ErrWrongAuthScopeFormat'
-        - $ref: '#/components/schemas/ErrAdminAuthOnNonAdminEndpoint'
-        - $ref: '#/components/schemas/ErrUserAuthOnNonUserEndpoint'
+        - $ref: '#/components/schemas/Authorization'
+        - $ref: '#/components/schemas/WrongAuthScopeFormat'
+        - $ref: '#/components/schemas/AdminAuthOnNonAdminEndpoint'
+        - $ref: '#/components/schemas/UserAuthOnNonUserEndpoint'
 
-    ErrAuthorization:
+    Authorization:
       allOf:
-        - $ref: '#/components/schemas/ErrorSchema'
+        - $ref: '#/components/schemas/Schema'
         - type: object
           properties:
             code:
@@ -36,9 +36,9 @@ components:
             message:
               example: "unauthorized"
 
-    ErrWrongAuthScopeFormat:
+    WrongAuthScopeFormat:
       allOf:
-        - $ref: '#/components/schemas/ErrorSchema'
+        - $ref: '#/components/schemas/Schema'
         - type: object
           properties:
             code:
@@ -46,9 +46,9 @@ components:
             message:
               example: "wrong auth scope format"
 
-    ErrAdminAuthOnNonAdminEndpoint:
+    AdminAuthOnNonAdminEndpoint:
       allOf:
-        - $ref: '#/components/schemas/ErrorSchema'
+        - $ref: '#/components/schemas/Schema'
         - type: object
           properties:
             code:
@@ -56,9 +56,9 @@ components:
             message:
               example: "cannot call non-admin endpoints with admin authorization"
 
-    ErrUserAuthOnNonUserEndpoint:
+    UserAuthOnNonUserEndpoint:
       allOf:
-        - $ref: '#/components/schemas/ErrorSchema'
+        - $ref: '#/components/schemas/Schema'
         - type: object
           properties:
             code:
@@ -66,9 +66,9 @@ components:
             message:
               example: "cannot call non-user endpoints with user authorization"
 
-    ErrCannotBindRequest:
+    CannotBindRequest:
       allOf:
-        - $ref: '#/components/schemas/ErrorSchema'
+        - $ref: '#/components/schemas/Schema'
         - type: object
           properties:
             code:
@@ -76,9 +76,9 @@ components:
             message:
               example: "cannot bind request body"
 
-    ErrInvalidPubKey:
+    InvalidPubKey:
       allOf:
-        - $ref: '#/components/schemas/ErrorSchema'
+        - $ref: '#/components/schemas/Schema'
         - type: object
           properties:
             code:
@@ -86,9 +86,9 @@ components:
             message:
               example: "invalid public key"
 
-    ErrInvalidPaymail:
+    InvalidPaymail:
       allOf:
-        - $ref: '#/components/schemas/ErrorSchema'
+        - $ref: '#/components/schemas/Schema'
         - type: object
           properties:
             code:
@@ -96,9 +96,9 @@ components:
             message:
               example: "invalid paymail"
 
-    ErrPaymailInconsistent:
+    PaymailInconsistent:
       allOf:
-        - $ref: '#/components/schemas/ErrorSchema'
+        - $ref: '#/components/schemas/Schema'
         - type: object
           properties:
             code:
@@ -106,9 +106,9 @@ components:
             message:
               example: "inconsistent paymail address and alias/domain"
 
-    ErrInvalidDomain:
+    InvalidDomain:
       allOf:
-        - $ref: '#/components/schemas/ErrorSchema'
+        - $ref: '#/components/schemas/Schema'
         - type: object
           properties:
             code:
@@ -116,9 +116,9 @@ components:
             message:
               example: "invalid domain"
 
-    ErrCreatingUser:
+    CreatingUser:
       allOf:
-        - $ref: '#/components/schemas/ErrorSchema'
+        - $ref: '#/components/schemas/Schema'
         - type: object
           properties:
             code:
@@ -126,9 +126,9 @@ components:
             message:
               example: "error creating user"
 
-    ErrGettingUser:
+    GettingUser:
       allOf:
-        - $ref: '#/components/schemas/ErrorSchema'
+        - $ref: '#/components/schemas/Schema'
         - type: object
           properties:
             code:

@@ -14,7 +14,7 @@ paths:
                 "200":
                     description: Success
                 "401":
-                    $ref: '#/components/responses/api_components_responses_NotAuthorized'
+                    $ref: '#/components/responses/responses_NotAuthorized'
             security:
                 - XPubAuth:
                     - admin
@@ -29,17 +29,17 @@ paths:
                 content:
                     application/json:
                         schema:
-                            $ref: '#/components/schemas/api_components_requests_CreateUser'
+                            $ref: '#/components/schemas/requests_CreateUser'
                 required: true
             responses:
                 "201":
-                    $ref: '#/components/responses/api_components_responses_AdminCreateUserSuccess'
+                    $ref: '#/components/responses/responses_AdminCreateUserSuccess'
                 "400":
-                    $ref: '#/components/responses/api_components_responses_AdminUserBadRequest'
+                    $ref: '#/components/responses/responses_AdminUserBadRequest'
                 "401":
-                    $ref: '#/components/responses/api_components_responses_NotAuthorized'
+                    $ref: '#/components/responses/responses_NotAuthorized'
                 "500":
-                    $ref: '#/components/responses/api_components_responses_AdminCreateUserInternalServerError'
+                    $ref: '#/components/responses/responses_AdminCreateUserInternalServerError'
             security:
                 - XPubAuth:
                     - admin
@@ -59,9 +59,9 @@ paths:
                     type: string
             responses:
                 "200":
-                    $ref: '#/components/responses/api_components_responses_AdminGetUser'
+                    $ref: '#/components/responses/responses_AdminGetUser'
                 "500":
-                    $ref: '#/components/responses/api_components_responses_AdminGetUserInternalServerError'
+                    $ref: '#/components/responses/responses_AdminGetUserInternalServerError'
             security:
                 - XPubAuth:
                     - admin
@@ -83,15 +83,15 @@ paths:
                 content:
                     application/json:
                         schema:
-                            $ref: '#/components/schemas/api_components_requests_AddPaymail'
+                            $ref: '#/components/schemas/requests_AddPaymail'
                 required: true
             responses:
                 "201":
-                    $ref: '#/components/responses/api_components_responses_AdminAddPaymailSuccess'
+                    $ref: '#/components/responses/responses_AdminAddPaymailSuccess'
                 "400":
-                    $ref: '#/components/responses/api_components_responses_AdminUserBadRequest'
+                    $ref: '#/components/responses/responses_AdminUserBadRequest'
                 "401":
-                    $ref: '#/components/responses/api_components_responses_NotAuthorized'
+                    $ref: '#/components/responses/responses_NotAuthorized'
             security:
                 - XPubAuth:
                     - admin
@@ -104,9 +104,9 @@ paths:
             operationId: sharedConfig
             responses:
                 "200":
-                    $ref: '#/components/responses/api_components_responses_SharedConfig'
+                    $ref: '#/components/responses/responses_SharedConfig'
                 "401":
-                    $ref: '#/components/responses/api_components_responses_NotAuthorized'
+                    $ref: '#/components/responses/responses_NotAuthorized'
             security:
                 - XPubAuth:
                     - admin
@@ -118,166 +118,142 @@ paths:
                 - Configurations
 components:
     responses:
-        api_components_responses_AdminAddPaymailSuccess:
+        responses_AdminAddPaymailSuccess:
             content:
                 application/json:
                     schema:
-                        $ref: '#/components/schemas/api_components_models_Paymail'
+                        $ref: '#/components/schemas/models_Paymail'
             description: Paymail added to user
-        api_components_responses_AdminCreateUserInternalServerError:
+        responses_AdminCreateUserInternalServerError:
             content:
                 application/json:
                     schema:
-                        $ref: '#/components/schemas/api_components_errors_ErrCreatingUser'
+                        $ref: '#/components/schemas/errors_CreatingUser'
             description: Internal error while creating user
-        api_components_responses_AdminCreateUserSuccess:
+        responses_AdminCreateUserSuccess:
             content:
                 application/json:
                     schema:
-                        $ref: '#/components/schemas/api_components_models_User'
+                        $ref: '#/components/schemas/models_User'
             description: User created
-        api_components_responses_AdminGetUser:
+        responses_AdminGetUser:
             content:
                 application/json:
                     schema:
-                        $ref: '#/components/schemas/api_components_models_User'
+                        $ref: '#/components/schemas/models_User'
             description: User found
-        api_components_responses_AdminGetUserInternalServerError:
+        responses_AdminGetUserInternalServerError:
             content:
                 application/json:
                     schema:
-                        $ref: '#/components/schemas/api_components_errors_ErrGettingUser'
+                        $ref: '#/components/schemas/errors_GettingUser'
             description: Internal error while getting user
-        api_components_responses_AdminUserBadRequest:
+        responses_AdminUserBadRequest:
             content:
                 application/json:
                     schema:
                         oneOf:
-                            - $ref: '#/components/schemas/api_components_errors_ErrCannotBindRequest'
-                            - $ref: '#/components/schemas/api_components_errors_ErrInvalidPubKey'
-                            - $ref: '#/components/schemas/api_components_errors_ErrInvalidPaymail'
-                            - $ref: '#/components/schemas/api_components_errors_ErrPaymailInconsistent'
-                            - $ref: '#/components/schemas/api_components_errors_ErrInvalidDomain'
+                            - $ref: '#/components/schemas/errors_CannotBindRequest'
+                            - $ref: '#/components/schemas/errors_InvalidPubKey'
+                            - $ref: '#/components/schemas/errors_InvalidPaymail'
+                            - $ref: '#/components/schemas/errors_PaymailInconsistent'
+                            - $ref: '#/components/schemas/errors_InvalidDomain'
             description: Bad request is an error that occurs when the request is malformed.
-        api_components_responses_NotAuthorized:
+        responses_NotAuthorized:
             content:
                 application/json:
                     schema:
-                        $ref: '#/components/schemas/api_components_errors_ErrUnauthorized'
+                        $ref: '#/components/schemas/errors_Unauthorized'
             description: Security requirements failed
-        api_components_responses_SharedConfig:
+        responses_SharedConfig:
             content:
                 application/json:
                     schema:
-                        $ref: '#/components/schemas/api_components_models_SharedConfig'
+                        $ref: '#/components/schemas/models_SharedConfig'
             description: Shared config
     schemas:
-        api_components_errors_ErrAdminAuthOnNonAdminEndpoint:
+        errors_AdminAuthOnNonAdminEndpoint:
             allOf:
-                - $ref: '#/components/schemas/api_components_errors_ErrorSchema'
+                - $ref: '#/components/schemas/errors_Schema'
                 - properties:
                     code:
                         example: error-admin-auth-on-non-admin-endpoint
                     message:
                         example: cannot call non-admin endpoints with admin authorization
                   type: object
-        api_components_errors_ErrAuthorization:
+        errors_Authorization:
             allOf:
-                - $ref: '#/components/schemas/api_components_errors_ErrorSchema'
+                - $ref: '#/components/schemas/errors_Schema'
                 - properties:
                     code:
                         example: error-unauthorized
                     message:
                         example: unauthorized
                   type: object
-        api_components_errors_ErrCannotBindRequest:
+        errors_CannotBindRequest:
             allOf:
-                - $ref: '#/components/schemas/api_components_errors_ErrorSchema'
+                - $ref: '#/components/schemas/errors_Schema'
                 - properties:
                     code:
                         example: error-bind-body-invalid
                     message:
                         example: cannot bind request body
                   type: object
-        api_components_errors_ErrCreatingUser:
+        errors_CreatingUser:
             allOf:
-                - $ref: '#/components/schemas/api_components_errors_ErrorSchema'
+                - $ref: '#/components/schemas/errors_Schema'
                 - properties:
                     code:
                         example: error-user-creating
                     message:
                         example: error creating user
                   type: object
-        api_components_errors_ErrGettingUser:
+        errors_GettingUser:
             allOf:
-                - $ref: '#/components/schemas/api_components_errors_ErrorSchema'
+                - $ref: '#/components/schemas/errors_Schema'
                 - properties:
                     code:
                         example: error-unknown
                     message:
                         example: Internal server error
                   type: object
-        api_components_errors_ErrInvalidDomain:
+        errors_InvalidDomain:
             allOf:
-                - $ref: '#/components/schemas/api_components_errors_ErrorSchema'
+                - $ref: '#/components/schemas/errors_Schema'
                 - properties:
                     code:
                         example: error-user-invalid-domain
                     message:
                         example: invalid domain
                   type: object
-        api_components_errors_ErrInvalidPaymail:
+        errors_InvalidPaymail:
             allOf:
-                - $ref: '#/components/schemas/api_components_errors_ErrorSchema'
+                - $ref: '#/components/schemas/errors_Schema'
                 - properties:
                     code:
                         example: error-user-invalid-paymail
                     message:
                         example: invalid paymail
                   type: object
-        api_components_errors_ErrInvalidPubKey:
+        errors_InvalidPubKey:
             allOf:
-                - $ref: '#/components/schemas/api_components_errors_ErrorSchema'
+                - $ref: '#/components/schemas/errors_Schema'
                 - properties:
                     code:
                         example: error-user-invalid-pubkey
                     message:
                         example: invalid public key
                   type: object
-        api_components_errors_ErrPaymailInconsistent:
+        errors_PaymailInconsistent:
             allOf:
-                - $ref: '#/components/schemas/api_components_errors_ErrorSchema'
+                - $ref: '#/components/schemas/errors_Schema'
                 - properties:
                     code:
                         example: error-user-inconsistent-paymail
                     message:
                         example: inconsistent paymail address and alias/domain
                   type: object
-        api_components_errors_ErrUnauthorized:
-            oneOf:
-                - $ref: '#/components/schemas/api_components_errors_ErrAuthorization'
-                - $ref: '#/components/schemas/api_components_errors_ErrWrongAuthScopeFormat'
-                - $ref: '#/components/schemas/api_components_errors_ErrAdminAuthOnNonAdminEndpoint'
-                - $ref: '#/components/schemas/api_components_errors_ErrUserAuthOnNonUserEndpoint'
-        api_components_errors_ErrUserAuthOnNonUserEndpoint:
-            allOf:
-                - $ref: '#/components/schemas/api_components_errors_ErrorSchema'
-                - properties:
-                    code:
-                        example: error-user-auth-on-non-user-endpoint
-                    message:
-                        example: cannot call non-user endpoints with user authorization
-                  type: object
-        api_components_errors_ErrWrongAuthScopeFormat:
-            allOf:
-                - $ref: '#/components/schemas/api_components_errors_ErrorSchema'
-                - properties:
-                    code:
-                        example: error-wrong-auth-scope-format
-                    message:
-                        example: wrong auth scope format
-                  type: object
-        api_components_errors_ErrorSchema:
+        errors_Schema:
             additionalProperties: false
             properties:
                 code:
@@ -290,7 +266,31 @@ components:
                 - code
                 - message
             type: object
-        api_components_models_Paymail:
+        errors_Unauthorized:
+            oneOf:
+                - $ref: '#/components/schemas/errors_Authorization'
+                - $ref: '#/components/schemas/errors_WrongAuthScopeFormat'
+                - $ref: '#/components/schemas/errors_AdminAuthOnNonAdminEndpoint'
+                - $ref: '#/components/schemas/errors_UserAuthOnNonUserEndpoint'
+        errors_UserAuthOnNonUserEndpoint:
+            allOf:
+                - $ref: '#/components/schemas/errors_Schema'
+                - properties:
+                    code:
+                        example: error-user-auth-on-non-user-endpoint
+                    message:
+                        example: cannot call non-user endpoints with user authorization
+                  type: object
+        errors_WrongAuthScopeFormat:
+            allOf:
+                - $ref: '#/components/schemas/errors_Schema'
+                - properties:
+                    code:
+                        example: error-wrong-auth-scope-format
+                    message:
+                        example: wrong auth scope format
+                  type: object
+        models_Paymail:
             properties:
                 alias:
                     example: test
@@ -302,8 +302,9 @@ components:
                     example: spv-wallet.com
                     type: string
                 id:
-                    example: 1
-                    type: number
+                    example: 1234
+                    type: integer
+                    x-go-type: uint
                 paymail:
                     example: test@spv-wallet.com
                     type: string
@@ -318,7 +319,7 @@ components:
                 - publicName
                 - avatar
             type: object
-        api_components_models_SharedConfig:
+        models_SharedConfig:
             description: Shared config
             properties:
                 experimentalFeatures:
@@ -333,8 +334,11 @@ components:
                     items:
                         type: string
                     type: array
+            required:
+                - paymailDomains
+                - experimentalFeatures
             type: object
-        api_components_models_User:
+        models_User:
             properties:
                 createdAt:
                     example: "2021-01-01T00:00:00Z"
@@ -345,7 +349,7 @@ components:
                     type: string
                 paymails:
                     items:
-                        $ref: '#/components/schemas/api_components_models_Paymail'
+                        $ref: '#/components/schemas/models_Paymail'
                     type: array
                 publicKey:
                     example: 76a914e069bd2e2fe3ea702c40d5e65b491b734c01686788ac
@@ -361,7 +365,7 @@ components:
                 - createdAt
                 - updatedAt
             type: object
-        api_components_requests_AddPaymail:
+        requests_AddPaymail:
             properties:
                 address:
                     example: test@spv-wallet.com
@@ -385,10 +389,10 @@ components:
                 - publicName
                 - avatarURL
             type: object
-        api_components_requests_CreateUser:
+        requests_CreateUser:
             properties:
                 paymail:
-                    $ref: '#/components/schemas/api_components_requests_AddPaymail'
+                    $ref: '#/components/schemas/requests_AddPaymail'
                 publicKey:
                     example: 76a914e069bd2e2fe3ea702c40d5e65b491b734c01686788ac
                     type: string

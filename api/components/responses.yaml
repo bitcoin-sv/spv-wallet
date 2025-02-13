@@ -16,7 +16,7 @@ components:
       content:
         application/json:
           schema:
-            $ref: "./errors.yaml#/components/schemas/ErrUnauthorized"
+            $ref: "./errors.yaml#/components/schemas/Unauthorized"
 
     AdminUserBadRequest:
       description: Bad request is an error that occurs when the request is malformed.
@@ -24,18 +24,18 @@ components:
         application/json:
           schema:
             oneOf:
-              - $ref: "./errors.yaml#/components/schemas/ErrCannotBindRequest"
-              - $ref: "./errors.yaml#/components/schemas/ErrInvalidPubKey"
-              - $ref: "./errors.yaml#/components/schemas/ErrInvalidPaymail"
-              - $ref: "./errors.yaml#/components/schemas/ErrPaymailInconsistent"
-              - $ref: "./errors.yaml#/components/schemas/ErrInvalidDomain"
+              - $ref: "./errors.yaml#/components/schemas/CannotBindRequest"
+              - $ref: "./errors.yaml#/components/schemas/InvalidPubKey"
+              - $ref: "./errors.yaml#/components/schemas/InvalidPaymail"
+              - $ref: "./errors.yaml#/components/schemas/PaymailInconsistent"
+              - $ref: "./errors.yaml#/components/schemas/InvalidDomain"
 
     AdminCreateUserInternalServerError:
       description: Internal error while creating user
       content:
         application/json:
           schema:
-            $ref: "./errors.yaml#/components/schemas/ErrCreatingUser"
+            $ref: "./errors.yaml#/components/schemas/CreatingUser"
 
     AdminCreateUserSuccess:
       description: User created
@@ -63,4 +63,4 @@ components:
       content:
         application/json:
           schema:
-            $ref: "./errors.yaml#/components/schemas/ErrGettingUser"
+            $ref: "./errors.yaml#/components/schemas/GettingUser"

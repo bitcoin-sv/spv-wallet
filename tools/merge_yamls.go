@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"strings"
 
 	"github.com/getkin/kin-openapi/openapi3"
 	"gopkg.in/yaml.v3"
@@ -28,7 +29,7 @@ func main() {
 		mergePaths(templateDoc, loadOpenAPIDoc(loader, path))
 	}
 
-	templateDoc.InternalizeRefs(context.Background(), nil)
+	templateDoc.InternalizeRefs(context.Background(), MergedRefNameResolver)
 	saveMergedSpec(templateDoc, outputPath)
 	fmt.Printf("Merged OpenAPI spec saved to %s\n", outputPath)
 }
@@ -92,4 +93,10 @@ func saveMergedSpec(doc *openapi3.T, outputPath string) {
 	if err := os.WriteFile(outputPath, data, 0600); err != nil {
 		log.Fatalf("Failed to write merged spec to %s: %v", outputPath, err)
 	}
+}
+
+func MergedRefNameResolver(doc *openapi3.T, ref openapi3.ComponentRef) string {
+	name := openapi3.DefaultRefNameResolver(doc, ref)
+	name = strings.Replace(name, "api_components_", "", 1)
+	return name
 }

@@ -8,6 +8,9 @@ components:
     SharedConfig:
       description: Shared config
       type: object
+      required:
+        - paymailDomains
+        - experimentalFeatures
       properties:
         paymailDomains:
           type: array
@@ -51,8 +54,9 @@ components:
       type: object
       properties:
         id:
-          type: number
-          example: 1
+          type: integer
+          x-go-type: uint
+          example: 1234
         alias:
           type: string
           example: "test"
