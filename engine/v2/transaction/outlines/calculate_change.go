@@ -5,7 +5,9 @@ import (
 	"github.com/bitcoin-sv/go-sdk/script"
 	sdk "github.com/bitcoin-sv/go-sdk/transaction"
 	"github.com/bitcoin-sv/go-sdk/transaction/template/p2pkh"
+	pmerrors "github.com/bitcoin-sv/spv-wallet/engine/paymail/errors"
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
+	"github.com/bitcoin-sv/spv-wallet/engine/v2/keys/type42"
 	"github.com/bitcoin-sv/spv-wallet/engine/v2/transaction"
 	txerrors "github.com/bitcoin-sv/spv-wallet/engine/v2/transaction/errors"
 	"github.com/bitcoin-sv/spv-wallet/models/bsv"
@@ -19,7 +21,7 @@ func calculateChange(ctx *evaluationContext, inputs annotatedInputs, outputs ann
 	fee := calculateFee(inputs, outputs, feeUnit)
 	if satsIn < satsOut+fee {
 		// this should never happen
-		// UTXO selector should deduce if change output is required and then select enough funds to cover the fee for additional size from the change output
+		// UTXO selector should provide enough funds to cover outputs and fee
 		// NOTE: If user doesn't have enough funds to cover transaction the txerrors.ErrTxOutlineInsufficientFunds is returned on another level
 		return nil, spverrors.Wrapf(txerrors.ErrUTXOSelectorInsufficientInputs, "satsIn (%d) are less than satsOut (%d) plus fee (%d)", satsIn, satsOut, fee)
 	}
@@ -38,14 +40,14 @@ func calculateChange(ctx *evaluationContext, inputs annotatedInputs, outputs ann
 		return nil, spverrors.Wrapf(err, "failed to get user public key")
 	}
 
-	lockingScript, err := lockingScriptForChangeOutput(userPubKey)
+	lockingScript, customInstructions, err := lockingScriptForChangeOutput(userPubKey)
 	if err != nil {
 		return nil, spverrors.Wrapf(err, "failed to create locking script for change output")
 	}
 	changeOutput := &annotatedOutput{
 		OutputAnnotation: &transaction.OutputAnnotation{
 			Bucket:             bucket.BSV,
-			CustomInstructions: nil, //fixme: add custom instructions
+			CustomInstructions: &customInstructions,
 		},
 		TransactionOutput: &sdk.TransactionOutput{
 			LockingScript: lockingScript,
@@ -66,16 +68,28 @@ func calculateChange(ctx *evaluationContext, inputs annotatedInputs, outputs ann
 	return outputsWithChange, nil
 }
 
-func lockingScriptForChangeOutput(pubKey *primitives.PublicKey) (*script.Script, error) {
-	addr, err := script.NewAddressFromPublicKey(pubKey, true)
+func lockingScriptForChangeOutput(pubKey *primitives.PublicKey) (*script.Script, bsv.CustomInstructions, error) {
+	dest, err := type42.NewDestinationWithRandomReference(pubKey)
 	if err != nil {
-		return nil, spverrors.Wrapf(err, "failed to create change output address")
+		return nil, nil, pmerrors.ErrPaymentDestination.Wrap(err)
 	}
 
-	lockingScript, err := p2pkh.Lock(addr)
+	address, err := script.NewAddressFromPublicKey(dest.PubKey, true)
 	if err != nil {
-		return nil, spverrors.Wrapf(err, "failed to create locking script for change output")
+		return nil, nil, pmerrors.ErrPaymentDestination.Wrap(err)
 	}
 
-	return lockingScript, nil
+	lockingScript, err := p2pkh.Lock(address)
+	if err != nil {
+		return nil, nil, pmerrors.ErrPaymentDestination.Wrap(err)
+	}
+
+	customInstructions := bsv.CustomInstructions{
+		{
+			Type:        "type42",
+			Instruction: dest.DerivationKey,
+		},
+	}
+
+	return lockingScript, customInstructions, nil
 }

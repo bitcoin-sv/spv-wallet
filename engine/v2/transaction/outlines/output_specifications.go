@@ -1,13 +1,11 @@
 package outlines
 
 import (
-	"github.com/bitcoin-sv/go-sdk/script"
 	sdk "github.com/bitcoin-sv/go-sdk/transaction"
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/bitcoin-sv/spv-wallet/engine/v2/transaction"
 	"github.com/bitcoin-sv/spv-wallet/engine/v2/transaction/errors"
 	"github.com/bitcoin-sv/spv-wallet/models/bsv"
-	"github.com/bitcoin-sv/spv-wallet/models/transaction/bucket"
 )
 
 // OutputsSpec are representing a client specification for outputs part of the transaction.
@@ -96,17 +94,4 @@ func (a annotatedOutputs) totalSatoshis() bsv.Satoshis {
 		total += bsv.Satoshis(out.Satoshis)
 	}
 	return total
-}
-
-func appendOutput(a annotatedOutputs, satoshis bsv.Satoshis, lockingScript *script.Script, customInstructions bsv.CustomInstructions) annotatedOutputs {
-	return append(a, &annotatedOutput{
-		OutputAnnotation: &transaction.OutputAnnotation{
-			Bucket:             bucket.BSV,
-			CustomInstructions: customInstructions,
-		},
-		TransactionOutput: &sdk.TransactionOutput{
-			LockingScript: lockingScript,
-			Satoshis:      uint64(satoshis),
-		},
-	})
 }

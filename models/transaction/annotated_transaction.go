@@ -28,6 +28,8 @@ type OutputAnnotation struct {
 	Bucket bucket.Name `json:"bucket"`
 	// Paymail is available if the output is the paymail output.
 	Paymail optional.Param[PaymailAnnotation] `json:"paymail,omitempty"`
+	// CustomInstructions has instructions about how to unlock this output.
+	CustomInstructions optional.Param[bsv.CustomInstructions] `json:"customInstructions,omitempty"`
 }
 
 // InputAnnotation represents the metadata for the input.

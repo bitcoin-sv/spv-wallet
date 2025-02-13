@@ -39,10 +39,16 @@ func TestPOSTTransactionOutlines(t *testing.T) {
 			  "annotations": {
 				"outputs": {
 					"0": {
-						  "bucket": "data"
+						"bucket": "data"
 					},
 					"1": {
-						  "bucket": "bsv"
+						"bucket": "bsv",
+						"customInstructions": [
+						  {
+							"instruction": "{{ matchDestination }}",
+							"type": "type42"
+						  }
+						]
 					}
 				},
 				"inputs": {
@@ -70,10 +76,16 @@ func TestPOSTTransactionOutlines(t *testing.T) {
 			  "annotations": {
 				"outputs": {
 					"0": {
-						  "bucket": "data"
+						"bucket": "data"
 					},
 					"1": {
-						  "bucket": "bsv"
+						"bucket": "bsv",
+						"customInstructions": [
+						  {
+							"instruction": "{{ matchDestination }}",
+							"type": "type42"
+						  }
+						]
 					}
 				},
 				"inputs": {
@@ -101,10 +113,16 @@ func TestPOSTTransactionOutlines(t *testing.T) {
 			  "annotations": {
 				"outputs": {
 					"0": {
-						  "bucket": "data"
+						"bucket": "data"
 					},
 					"1": {
-						  "bucket": "bsv"
+						"bucket": "bsv",
+						"customInstructions": [
+						  {
+							"instruction": "{{ matchDestination }}",
+							"type": "type42"
+						  }
+						]
 					}
 				},
 				"inputs": {
@@ -140,7 +158,13 @@ func TestPOSTTransactionOutlines(t *testing.T) {
 					}
 				  },
 				  "1": {
-					"bucket": "bsv"
+					"bucket": "bsv",
+					"customInstructions": [
+					  {
+						"instruction": "{{ matchDestination }}",
+						"type": "type42"
+					  }
+					]
 				  }
 				},
 				"inputs": {
@@ -179,7 +203,13 @@ func TestPOSTTransactionOutlines(t *testing.T) {
 					}
 				  },
 				  "1": {
-					"bucket": "bsv"
+					"bucket": "bsv",
+					"customInstructions": [
+					  {
+						"instruction": "{{ matchDestination }}",
+						"type": "type42"
+					  }
+					]
 				  }
 				},
 				"inputs": {
@@ -225,7 +255,13 @@ func TestPOSTTransactionOutlines(t *testing.T) {
 					"bucket": "data"
 				  },
 				  "2": {
-					"bucket": "bsv"
+					"bucket": "bsv",
+					"customInstructions": [
+					  {
+						"instruction": "{{ matchDestination }}",
+						"type": "type42"
+					  }
+					]
 				  }
 				},
 				"inputs": {

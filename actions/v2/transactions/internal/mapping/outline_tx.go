@@ -2,7 +2,6 @@ package mapping
 
 import (
 	"errors"
-
 	"github.com/bitcoin-sv/spv-wallet/engine/v2/transaction"
 	"github.com/bitcoin-sv/spv-wallet/engine/v2/transaction/outlines"
 	"github.com/bitcoin-sv/spv-wallet/lox"
@@ -48,7 +47,8 @@ func outlineInputToResponse(item *transaction.InputAnnotation) *model.InputAnnot
 
 func outlineOutputToResponse(from *transaction.OutputAnnotation) *model.OutputAnnotation {
 	return &model.OutputAnnotation{
-		Bucket: from.Bucket,
+		Bucket:             from.Bucket,
+		CustomInstructions: from.CustomInstructions,
 		Paymail: lo.
 			IfF(
 				from.Paymail != nil,

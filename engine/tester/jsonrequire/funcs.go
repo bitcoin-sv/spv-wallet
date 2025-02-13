@@ -18,6 +18,7 @@ var funcsMap = template.FuncMap{
 	"matchNumber":        matchNumber,
 	"anything":           anything,
 	"matchTxByFormat":    matchTxByFormat,
+	"matchDestination":   matchDestination,
 }
 
 func anything() string {
@@ -59,6 +60,10 @@ func matchTxByFormat(format string) string {
 	default:
 		panic(fmt.Sprintf("unsupported tx format: %s", format))
 	}
+}
+
+func matchDestination() string {
+	return regexPlaceholder("^1-destination-.{32}$")
 }
 
 // matchAddress returns a regex that matches a bitcoin address
