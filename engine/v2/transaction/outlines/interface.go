@@ -28,8 +28,10 @@ type Service interface {
 
 // UTXO represents an unspent transaction output.
 type UTXO struct {
-	TxID string
-	Vout uint32
+	TxID               string
+	Vout               uint32
+	Satoshis           bsvmodel.Satoshis
+	EstimatedInputSize uint64
 	bsvmodel.CustomInstructions
 }
 

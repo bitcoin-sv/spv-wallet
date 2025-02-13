@@ -1,6 +1,7 @@
 package testabilities
 
 import (
+	"github.com/bitcoin-sv/spv-wallet/models/bsv"
 	"testing"
 
 	tpaymail "github.com/bitcoin-sv/spv-wallet/engine/paymail/testabilities"
@@ -55,6 +56,7 @@ func (a *transactionOutlineAbility) NewTransactionOutlinesService() outlines.Ser
 		a.paymailClientAbility.NewPaymailClientService(),
 		a.paymailAddressService,
 		&a.utxoSelector,
+		bsv.FeeUnit{Satoshis: 1, Bytes: 1000},
 		tester.Logger(a.t),
 	)
 }

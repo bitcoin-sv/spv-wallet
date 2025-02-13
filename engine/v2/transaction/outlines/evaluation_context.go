@@ -2,6 +2,7 @@ package outlines
 
 import (
 	"context"
+	bsvmodel "github.com/bitcoin-sv/spv-wallet/models/bsv"
 
 	"github.com/bitcoin-sv/spv-wallet/engine/paymail"
 	"github.com/rs/zerolog"
@@ -14,17 +15,7 @@ type evaluationContext struct {
 	paymail               paymail.ServiceClient
 	paymailAddressService PaymailAddressService
 	utxoSelector          UTXOSelector
-}
-
-func newOutlineEvaluationContext(ctx context.Context, userID string, log *zerolog.Logger, paymail paymail.ServiceClient, paymailAddressService PaymailAddressService, utxoSelector UTXOSelector) *evaluationContext {
-	return &evaluationContext{
-		Context:               ctx,
-		userID:                userID,
-		log:                   log,
-		paymail:               paymail,
-		paymailAddressService: paymailAddressService,
-		utxoSelector:          utxoSelector,
-	}
+	feeUnit               bsvmodel.FeeUnit
 }
 
 func (c *evaluationContext) UserID() string {

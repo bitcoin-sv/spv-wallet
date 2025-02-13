@@ -172,7 +172,7 @@ func (c *Client) loadTransactionOutlinesService() error {
 	if c.options.transactionOutlinesService == nil {
 		logger := c.Logger().With().Str("subservice", "transactionOutlines").Logger()
 		utxoSelector := utxo.NewSelector(c.Datastore().DB(), c.FeeUnit())
-		c.options.transactionOutlinesService = outlines.NewService(c.PaymailService(), c.options.paymails, utxoSelector, logger)
+		c.options.transactionOutlinesService = outlines.NewService(c.PaymailService(), c.options.paymails, utxoSelector, c.FeeUnit(), logger)
 	}
 	return nil
 }

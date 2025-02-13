@@ -32,6 +32,9 @@ func (t *TransactionSpec) evaluate(ctx *evaluationContext) (*sdk.Transaction, tr
 		Outputs: txOuts,
 	}
 
+	fee := calculateFee(inputs, outputs, ctx.feeUnit)
+	ctx.log.Debug().Msgf("Transaction fee: %d", fee)
+
 	annotations := transaction.Annotations{
 		Inputs:  inputsAnnotations,
 		Outputs: outputsAnnotations,

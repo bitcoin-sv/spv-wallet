@@ -2,6 +2,7 @@ package outlines
 
 import (
 	"context"
+	bsvmodel "github.com/bitcoin-sv/spv-wallet/models/bsv"
 
 	sdk "github.com/bitcoin-sv/go-sdk/transaction"
 	"github.com/bitcoin-sv/spv-wallet/engine/paymail"
@@ -17,10 +18,11 @@ type service struct {
 	paymailService        paymail.ServiceClient
 	paymailAddressService PaymailAddressService
 	utxoSelector          UTXOSelector
+	feeUnit               bsvmodel.FeeUnit
 }
 
 // NewService creates a new transaction outlines service.
-func NewService(paymailService paymail.ServiceClient, paymailAddressService PaymailAddressService, utxoSelector UTXOSelector, logger zerolog.Logger) Service {
+func NewService(paymailService paymail.ServiceClient, paymailAddressService PaymailAddressService, utxoSelector UTXOSelector, feeUnit bsvmodel.FeeUnit, logger zerolog.Logger) Service {
 	if paymailService == nil {
 		panic("paymail.ServiceClient is required to create transaction outlines service")
 	}
@@ -34,6 +36,7 @@ func NewService(paymailService paymail.ServiceClient, paymailAddressService Paym
 		paymailService:        paymailService,
 		paymailAddressService: paymailAddressService,
 		utxoSelector:          utxoSelector,
+		feeUnit:               feeUnit,
 	}
 }
 
@@ -76,16 +79,17 @@ func (s *service) evaluateSpec(ctx context.Context, spec *TransactionSpec) (*sdk
 		return nil, transaction.Annotations{}, txerrors.ErrTxOutlineSpecificationUserIDRequired
 	}
 
-	c := newOutlineEvaluationContext(
-		ctx,
-		spec.UserID,
-		s.logger,
-		s.paymailService,
-		s.paymailAddressService,
-		s.utxoSelector,
-	)
+	evaluationCtx := &evaluationContext{
+		Context:               ctx,
+		userID:                spec.UserID,
+		log:                   s.logger,
+		paymail:               s.paymailService,
+		paymailAddressService: s.paymailAddressService,
+		utxoSelector:          s.utxoSelector,
+		feeUnit:               s.feeUnit,
+	}
 
-	tx, annotations, err := spec.evaluate(c)
+	tx, annotations, err := spec.evaluate(evaluationCtx)
 	if err != nil {
 		return nil, transaction.Annotations{}, err
 	}

@@ -14,8 +14,13 @@ import (
 	"gorm.io/gorm"
 )
 
-const txIdColumn = "tx_id"
-const voutColumn = "vout"
+const (
+	txIdColumn               = "tx_id"
+	voutColumn               = "vout"
+	satoshisColumn           = "satoshis"
+	customInstructionsColumn = "custom_instructions"
+	estimatedInputSizeColumn = "estimated_input_size"
+)
 
 const (
 	// estimatedChangeOutputSize is the estimated size of a change output
@@ -56,6 +61,8 @@ func (r *UTXOSelector) Select(ctx context.Context, tx *sdk.Transaction, userID s
 		result = append(result, &outlines.UTXO{
 			TxID:               utxo.TxID,
 			Vout:               utxo.Vout,
+			Satoshis:           bsv.Satoshis(utxo.Satoshis),
+			EstimatedInputSize: utxo.EstimatedInputSize,
 			CustomInstructions: bsv.CustomInstructions(utxo.CustomInstructions),
 		})
 	}

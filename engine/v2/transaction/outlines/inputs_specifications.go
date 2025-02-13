@@ -6,6 +6,7 @@ import (
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/bitcoin-sv/spv-wallet/engine/v2/transaction"
 	txerrors "github.com/bitcoin-sv/spv-wallet/engine/v2/transaction/errors"
+	"github.com/bitcoin-sv/spv-wallet/models/bsv"
 )
 
 // InputsSpec are representing a client specification for inputs part of the transaction.
@@ -42,6 +43,8 @@ func (s *InputsSpec) evaluate(ctx *evaluationContext, outputs annotatedOutputs) 
 			InputAnnotation: &transaction.InputAnnotation{
 				CustomInstructions: utxo.CustomInstructions,
 			},
+			utxoSatoshis:  utxo.Satoshis,
+			estimatedSize: utxo.EstimatedInputSize,
 		}
 	}
 
@@ -53,6 +56,8 @@ type annotatedInputs []*annotatedInput
 type annotatedInput struct {
 	*transaction.InputAnnotation
 	*sdk.TransactionInput
+	utxoSatoshis  bsv.Satoshis
+	estimatedSize uint64
 }
 
 func (a annotatedInputs) splitIntoTransactionInputsAndAnnotations() ([]*sdk.TransactionInput, transaction.InputAnnotations) {

@@ -489,7 +489,8 @@ func TestPOSTTransactionOutlinesRAW(t *testing.T) {
 			thenResponse.IsOK().
 				WithJSONMatching(test.responseTemplate, given.OutlineResponseContext(test.responseParams))
 
-			thenResponse.ContainsValidRawTxHexInField("hex")
+			thenResponse.ContainsValidRawTxHexInField("hex").
+				WithOutValues(0, 999_999)
 		})
 	}
 }
