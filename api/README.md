@@ -184,17 +184,6 @@ Running this test **from time to time** to ensure `oapi-codegen` don’t acciden
 - **After updating dependencies (`go mod tidy`)**
 - **After modifying build scripts**
 
-To automate this check, you can add/run simple script:
-
-```sh
-if go tool nm spvwallet | grep oapi-codegen; then
-  echo "❌ ERROR: oapi-codegen is in the binary! Fix required."
-  exit 1
-else
-  echo "✅ SUCCESS: oapi-codegen is NOT in the binary."
-fi
-```
-
 ---
 
 ### Final Summary
