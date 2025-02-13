@@ -29,7 +29,7 @@ func main() {
 		mergePaths(templateDoc, loadOpenAPIDoc(loader, path))
 	}
 
-	templateDoc.InternalizeRefs(context.Background(), MergedRefNameResolver)
+	templateDoc.InternalizeRefs(context.Background(), mergedRefNameResolver)
 	saveMergedSpec(templateDoc, outputPath)
 	fmt.Printf("Merged OpenAPI spec saved to %s\n", outputPath)
 }
@@ -95,7 +95,7 @@ func saveMergedSpec(doc *openapi3.T, outputPath string) {
 	}
 }
 
-func MergedRefNameResolver(doc *openapi3.T, ref openapi3.ComponentRef) string {
+func mergedRefNameResolver(doc *openapi3.T, ref openapi3.ComponentRef) string {
 	name := openapi3.DefaultRefNameResolver(doc, ref)
 	name = strings.Replace(name, "api_components_", "", 1)
 	return name
