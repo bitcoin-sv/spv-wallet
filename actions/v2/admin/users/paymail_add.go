@@ -6,20 +6,22 @@ import (
 	"github.com/bitcoin-sv/go-paymail"
 	adminerrors "github.com/bitcoin-sv/spv-wallet/actions/v2/admin/errors"
 	"github.com/bitcoin-sv/spv-wallet/actions/v2/admin/internal/mapping"
+	"github.com/bitcoin-sv/spv-wallet/api"
 	configerrors "github.com/bitcoin-sv/spv-wallet/config/errors"
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/bitcoin-sv/spv-wallet/engine/v2/paymails/paymailsmodels"
-	"github.com/bitcoin-sv/spv-wallet/models/request/adminrequest"
 	"github.com/gin-gonic/gin"
 )
 
 // AddPaymailToUser add paymails to the user
 func (s *APIAdminUsers) AddPaymailToUser(c *gin.Context, id string) {
-	var requestBody adminrequest.AddPaymail
-	if err := c.Bind(&requestBody); err != nil {
+	var request api.RequestsAddPaymail
+	if err := c.Bind(&request); err != nil {
 		spverrors.ErrorResponse(c, spverrors.ErrCannotBindRequest.Wrap(err), s.logger)
 		return
 	}
+
+	requestBody := addPaymailRequest{&request}
 
 	alias, domain, err := parsePaymail(&requestBody)
 	if err != nil {
@@ -31,7 +33,7 @@ func (s *APIAdminUsers) AddPaymailToUser(c *gin.Context, id string) {
 		Alias:      alias,
 		Domain:     domain,
 		PublicName: requestBody.PublicName,
-		Avatar:     requestBody.Avatar,
+		Avatar:     requestBody.AvatarURL,
 		UserID:     id,
 	}
 	createdPaymail, err := s.engine.PaymailsService().Create(c, newPaymail)
@@ -48,7 +50,7 @@ func (s *APIAdminUsers) AddPaymailToUser(c *gin.Context, id string) {
 // parsePaymail parses the paymail address from the request body.
 // Uses either Alias + Domain or the whole paymail Address field
 // If both Alias + Domain and Address are set, and they are inconsistent, an error is returned.
-func parsePaymail(request *adminrequest.AddPaymail) (string, string, error) {
+func parsePaymail(request *addPaymailRequest) (string, string, error) {
 	if request.HasAddress() &&
 		(request.HasAlias() || request.HasDomain()) &&
 		!request.AddressEqualsTo(request.Alias+"@"+request.Domain) {
@@ -62,4 +64,27 @@ func parsePaymail(request *adminrequest.AddPaymail) (string, string, error) {
 		return "", "", adminerrors.ErrInvalidPaymail
 	}
 	return alias, domain, nil
+}
+
+type addPaymailRequest struct {
+	*api.RequestsAddPaymail
+}
+
+func (a addPaymailRequest) HasAddress() bool {
+	return a.Address != ""
+}
+
+// HasAlias returns true if the paymail alias is set
+func (a addPaymailRequest) HasAlias() bool {
+	return a.Alias != ""
+}
+
+// HasDomain returns true if the paymail domain is set
+func (a addPaymailRequest) HasDomain() bool {
+	return a.Domain != ""
+}
+
+// AddressEqualsTo returns true if the paymail address is equal to the given string
+func (a addPaymailRequest) AddressEqualsTo(s string) bool {
+	return a.Address == s
 }
