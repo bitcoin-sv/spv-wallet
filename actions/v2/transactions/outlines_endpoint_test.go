@@ -272,6 +272,43 @@ func TestPOSTTransactionOutlines(t *testing.T) {
 			  }
 			}`,
 		},
+		"create transaction outline for paymail without change": {
+			request: fmt.Sprintf(`{
+			  "outputs": [
+				{
+				  "type": "paymail",
+				  "to": "%s",
+				  "satoshis": %d,
+				  "from": "%s"
+				}
+			  ]
+			}`, fixtures.RecipientExternal.DefaultPaymail(),
+				initialSatoshis-1,
+				fixtures.Sender.DefaultPaymail(),
+			),
+			outValues: []bsv.Satoshis{initialSatoshis - 1},
+			responseTemplate: `{
+			  "hex": "{{ matchTxByFormat .Format }}",
+			  "format": "{{ .Format }}",
+			  "annotations": {
+				"outputs": {
+				  "0": {
+					"bucket": "bsv",
+					"paymail": {
+					  "receiver": "{{ .ReceiverPaymail }}",
+					  "reference": "z0bac4ec-6f15-42de-9ef4-e60bfdabf4f7",
+					  "sender": "{{ .SenderPaymail }}"
+					}
+				  }
+				},
+				"inputs": {
+				  "0": {
+				    "customInstructions": {{ .CustomInstructions }}
+				  }
+				}
+			  }
+			}`,
+		},
 	}
 
 	type caseVariation struct {
