@@ -1,6 +1,7 @@
 package outlines
 
 import (
+	"fmt"
 	sdk "github.com/bitcoin-sv/go-sdk/transaction"
 	"github.com/bitcoin-sv/spv-wallet/engine/tester/fixtures"
 	"github.com/bitcoin-sv/spv-wallet/models/bsv"
@@ -47,8 +48,8 @@ func TestEstimateSizeAgainstRealTxSie(t *testing.T) {
 			WithOPReturn("foo").
 			TX(),
 	}
-	for _, tx := range tests {
-		t.Run("", func(t *testing.T) {
+	for i, tx := range tests {
+		t.Run(fmt.Sprintf("transaction size estimation %d", i), func(t *testing.T) {
 			// given:
 
 			aIn := lo.Map(tx.Inputs, func(input *sdk.TransactionInput, _ int) *annotatedInput {
