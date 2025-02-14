@@ -2,12 +2,13 @@ package outlines
 
 import (
 	"fmt"
+	"testing"
+
 	sdk "github.com/bitcoin-sv/go-sdk/transaction"
 	"github.com/bitcoin-sv/spv-wallet/engine/tester/fixtures"
 	"github.com/bitcoin-sv/spv-wallet/models/bsv"
 	"github.com/samber/lo"
 	"github.com/stretchr/testify/require"
-	"testing"
 )
 
 const estimatedInputSizeForP2PKH = 148
