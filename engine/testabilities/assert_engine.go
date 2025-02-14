@@ -1,10 +1,10 @@
 package testabilities
 
 import (
-	testpaymail "github.com/bitcoin-sv/spv-wallet/engine/paymail/testabilities"
 	"testing"
 
 	"github.com/bitcoin-sv/spv-wallet/engine"
+	testpaymail "github.com/bitcoin-sv/spv-wallet/engine/paymail/testabilities"
 	"github.com/bitcoin-sv/spv-wallet/engine/tester/paymailmock"
 	"github.com/stretchr/testify/require"
 )

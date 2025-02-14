@@ -2,7 +2,6 @@ package outlines
 
 import (
 	"context"
-	bsvmodel "github.com/bitcoin-sv/spv-wallet/models/bsv"
 
 	sdk "github.com/bitcoin-sv/go-sdk/transaction"
 	"github.com/bitcoin-sv/spv-wallet/engine/paymail"
@@ -10,6 +9,7 @@ import (
 	"github.com/bitcoin-sv/spv-wallet/engine/v2/bsv"
 	"github.com/bitcoin-sv/spv-wallet/engine/v2/transaction"
 	"github.com/bitcoin-sv/spv-wallet/engine/v2/transaction/errors"
+	bsvmodel "github.com/bitcoin-sv/spv-wallet/models/bsv"
 	"github.com/rs/zerolog"
 )
 

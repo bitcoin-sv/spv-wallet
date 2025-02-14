@@ -1,10 +1,10 @@
 package testabilities
 
 import (
-	testpaymail "github.com/bitcoin-sv/spv-wallet/engine/paymail/testabilities"
 	"testing"
 
 	sdk "github.com/bitcoin-sv/go-sdk/transaction"
+	testpaymail "github.com/bitcoin-sv/spv-wallet/engine/paymail/testabilities"
 	"github.com/bitcoin-sv/spv-wallet/engine/v2/transaction/outlines"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"

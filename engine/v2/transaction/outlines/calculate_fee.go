@@ -1,9 +1,10 @@
 package outlines
 
 import (
+	"math"
+
 	sdk "github.com/bitcoin-sv/go-sdk/transaction"
 	"github.com/bitcoin-sv/spv-wallet/models/bsv"
-	"math"
 )
 
 const (
@@ -57,11 +58,13 @@ func estimatedInputsSize(inputs annotatedInputs) uint64 {
 	return size
 }
 
+//nolint:gosec // No need to check for overflows from int to uint64 here
 func varIntSize(val int) uint64 {
-	length := sdk.VarInt(val).Length()
+	length := sdk.VarInt(val).Length() //
 	return toU64(length)
 }
 
+//nolint:gosec // No need to check for overflows from int to uint64 here
 func toU64(val int) uint64 {
 	return uint64(val)
 }

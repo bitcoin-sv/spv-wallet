@@ -2,8 +2,8 @@ package outlines
 
 import (
 	"context"
-	primitives "github.com/bitcoin-sv/go-sdk/primitives/ec"
 
+	primitives "github.com/bitcoin-sv/go-sdk/primitives/ec"
 	sdk "github.com/bitcoin-sv/go-sdk/transaction"
 	"github.com/bitcoin-sv/spv-wallet/engine/v2/bsv"
 	"github.com/bitcoin-sv/spv-wallet/engine/v2/transaction"
@@ -27,6 +27,7 @@ type Service interface {
 	CreateRawTx(ctx context.Context, spec *TransactionSpec) (*Transaction, error)
 }
 
+// UsersService is a service for working with users.
 type UsersService interface {
 	GetPubKey(ctx context.Context, userID string) (*primitives.PublicKey, error)
 }

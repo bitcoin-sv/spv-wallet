@@ -1,10 +1,11 @@
 package testabilities
 
 import (
+	"testing"
+
 	sdk "github.com/bitcoin-sv/go-sdk/transaction"
 	"github.com/bitcoin-sv/spv-wallet/models/bsv"
 	"github.com/stretchr/testify/require"
-	"testing"
 )
 
 type TransactionDetailsAssertions interface {

@@ -3,12 +3,12 @@ package testabilities
 import (
 	"encoding/json"
 	"fmt"
-	testpaymail "github.com/bitcoin-sv/spv-wallet/engine/paymail/testabilities"
 	"mime"
 	"net/http"
 	"testing"
 
 	"github.com/bitcoin-sv/spv-wallet/actions/testabilities/apierror"
+	testpaymail "github.com/bitcoin-sv/spv-wallet/engine/paymail/testabilities"
 	testengine "github.com/bitcoin-sv/spv-wallet/engine/testabilities"
 	"github.com/bitcoin-sv/spv-wallet/engine/tester/fixtures"
 	"github.com/bitcoin-sv/spv-wallet/engine/tester/jsonrequire"

@@ -2,7 +2,6 @@ package transactions_test
 
 import (
 	"fmt"
-	"github.com/bitcoin-sv/spv-wallet/models/bsv"
 	"net/http"
 	"testing"
 
@@ -10,6 +9,7 @@ import (
 	"github.com/bitcoin-sv/spv-wallet/actions/v2/transactions/internal/testabilities"
 	testengine "github.com/bitcoin-sv/spv-wallet/engine/testabilities"
 	"github.com/bitcoin-sv/spv-wallet/engine/tester/fixtures"
+	"github.com/bitcoin-sv/spv-wallet/models/bsv"
 )
 
 const transactionsOutlinesURL = "/api/v2/transactions/outlines"
@@ -153,7 +153,7 @@ func TestPOSTTransactionOutlines(t *testing.T) {
 					"bucket": "bsv",
 					"paymail": {
 					  "receiver": "{{ .ReceiverPaymail }}",
-					  "reference": "z0bac4ec-6f15-42de-9ef4-e60bfdabf4f7",
+					  "reference": "{{ .Reference }}",
 					  "sender": "{{ .SenderPaymail }}"
 					}
 				  },
@@ -198,7 +198,7 @@ func TestPOSTTransactionOutlines(t *testing.T) {
 					"bucket": "bsv",
 					"paymail": {
 					  "receiver": "{{ .ReceiverPaymail }}",
-					  "reference": "z0bac4ec-6f15-42de-9ef4-e60bfdabf4f7",
+					  "reference": "{{ .Reference }}",
 					  "sender": "{{ .SenderPaymail }}"
 					}
 				  },
@@ -247,7 +247,7 @@ func TestPOSTTransactionOutlines(t *testing.T) {
 					"bucket": "bsv",
 					"paymail": {
 					  "receiver": "{{ .ReceiverPaymail }}",
-					  "reference": "z0bac4ec-6f15-42de-9ef4-e60bfdabf4f7",
+					  "reference": "{{ .Reference }}",
 					  "sender": "{{ .SenderPaymail }}"
 					}
 				  },
@@ -296,7 +296,7 @@ func TestPOSTTransactionOutlines(t *testing.T) {
 					"bucket": "bsv",
 					"paymail": {
 					  "receiver": "{{ .ReceiverPaymail }}",
-					  "reference": "z0bac4ec-6f15-42de-9ef4-e60bfdabf4f7",
+					  "reference": "{{ .Reference }}",
 					  "sender": "{{ .SenderPaymail }}"
 					}
 				  }

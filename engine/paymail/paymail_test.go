@@ -186,9 +186,9 @@ func Test_GetP2PDestinations(t *testing.T) {
 		paymailHostResponse := then.ReceivedP2PDestinationRequest(satoshis)
 
 		require.NoError(t, err)
-		assert.Equal(t, paymailHostResponse.Reference, destinations.Reference) //fixme
+		assert.Equal(t, paymailHostResponse.Reference, destinations.Reference)
 		require.Len(t, destinations.Outputs, 1)
-		assert.Equal(t, paymailHostResponse.Outputs[0].Script, destinations.Outputs[0].Script) //fixme
+		assert.Equal(t, paymailHostResponse.Outputs[0].Script, destinations.Outputs[0].Script)
 		assert.EqualValues(t, satoshis, destinations.Outputs[0].Satoshis)
 	})
 }

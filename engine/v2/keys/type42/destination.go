@@ -2,12 +2,13 @@ package type42
 
 import (
 	"fmt"
-	"github.com/bitcoin-sv/spv-wallet/engine/utils"
 
 	primitives "github.com/bitcoin-sv/go-sdk/primitives/ec"
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
+	"github.com/bitcoin-sv/spv-wallet/engine/utils"
 )
 
+// Destination represents a destination for a transaction output.
 type Destination struct {
 	PubKey        *primitives.PublicKey
 	ReferenceID   string
@@ -37,7 +38,7 @@ func NewDestinationWithReference(pubKey *primitives.PublicKey, referenceID strin
 func NewDestinationWithRandomReference(pubKey *primitives.PublicKey) (Destination, error) {
 	referenceID, err := utils.RandomHex(16)
 	if err != nil {
-		return Destination{}, err
+		return Destination{}, ErrRandomReferenceID.Wrap(err)
 	}
 
 	return NewDestinationWithReference(pubKey, referenceID)
