@@ -3,6 +3,7 @@ package testabilities
 import (
 	"encoding/json"
 	"fmt"
+	testpaymail "github.com/bitcoin-sv/spv-wallet/engine/paymail/testabilities"
 	"mime"
 	"net/http"
 	"testing"
@@ -19,7 +20,7 @@ import (
 type SPVWalletApplicationAssertions interface {
 	Response(response *resty.Response) SPVWalletResponseAssertions
 	User(user fixtures.User) SPVWalletAppUserAssertions
-	ExternalPaymailHost() testengine.PaymailExternalAssertions
+	ExternalPaymailHost() testpaymail.PaymailExternalAssertions
 }
 
 type SPVWalletResponseAssertions interface {
@@ -73,7 +74,7 @@ func (a *appAssertions) User(user fixtures.User) SPVWalletAppUserAssertions {
 	}
 }
 
-func (a *appAssertions) ExternalPaymailHost() testengine.PaymailExternalAssertions {
+func (a *appAssertions) ExternalPaymailHost() testpaymail.PaymailExternalAssertions {
 	return a.engineAssertions.ExternalPaymailHost()
 }
 

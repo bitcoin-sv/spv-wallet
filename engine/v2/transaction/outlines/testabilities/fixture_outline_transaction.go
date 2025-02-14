@@ -1,6 +1,8 @@
 package testabilities
 
 import (
+	"context"
+	ec "github.com/bitcoin-sv/go-sdk/primitives/ec"
 	"github.com/bitcoin-sv/spv-wallet/models/bsv"
 	"testing"
 
@@ -58,7 +60,7 @@ func (a *transactionOutlineAbility) NewTransactionOutlinesService() outlines.Ser
 		&a.utxoSelector,
 		bsv.FeeUnit{Satoshis: 1, Bytes: 1000},
 		tester.Logger(a.t),
-		nil, //fixme: provide mocked users service
+		pubKeyGetter{},
 	)
 }
 
@@ -68,4 +70,10 @@ func (a *transactionOutlineAbility) UTXOSelector() UTXOSelectorFixture {
 
 func (a *transactionOutlineAbility) UserHasNotEnoughFunds() {
 	a.utxoSelector.WillReturnNoUTXOs()
+}
+
+type pubKeyGetter struct{}
+
+func (p pubKeyGetter) GetPubKey(ctx context.Context, _ string) (*ec.PublicKey, error) {
+	return fixtures.Sender.PublicKey(), nil
 }

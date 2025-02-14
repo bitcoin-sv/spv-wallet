@@ -38,6 +38,8 @@ func (m *mockedUTXOSelector) Select(ctx context.Context, tx *sdk.Transaction, us
 		return nil, nil
 	}
 
+	fee := bsv.Satoshis(1)
+
 	return []*outlines.UTXO{
 		{
 			TxID: UserFundsTransactionOutpoint.TxID,
@@ -52,6 +54,8 @@ func (m *mockedUTXOSelector) Select(ctx context.Context, tx *sdk.Transaction, us
 					Instruction: "1-destination-0123",
 				},
 			},
+			Satoshis:           bsv.Satoshis(tx.TotalOutputSatoshis()) + fee,
+			EstimatedInputSize: 148, // P2PKH input size
 		},
 	}, nil
 }

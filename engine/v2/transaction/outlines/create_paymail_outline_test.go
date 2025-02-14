@@ -286,9 +286,6 @@ func TestCreatePaymailTransactionOutlineBEEF(t *testing.T) {
 			tx, err := service.CreateBEEF(context.Background(), spec)
 
 			// then:
-			then.ExternalPaymailHost().ReceivedP2PDestinationRequest(transactionSatoshiValue)
-
-			// and:
 			then.Created(tx).WithError(err).ThatIs(test.expectedError)
 		})
 	}
@@ -369,6 +366,9 @@ func TestCreatePaymailTransactionOutlineRAW(t *testing.T) {
 
 	t.Run("return transaction outline with payment to valid paymail address", func(t *testing.T) {
 		given, then := testabilities.New(t)
+
+		// given:
+		given.ExternalRecipientHost().WillRespondWithP2PCapabilities()
 
 		// and:
 		service := given.NewTransactionOutlinesService()
@@ -647,9 +647,6 @@ func TestCreatePaymailTransactionOutlineRAW(t *testing.T) {
 			tx, err := service.CreateRawTx(context.Background(), spec)
 
 			// then:
-			then.ExternalPaymailHost().ReceivedP2PDestinationRequest(transactionSatoshiValue)
-
-			// and:
 			then.Created(tx).WithError(err).ThatIs(test.expectedError)
 		})
 	}

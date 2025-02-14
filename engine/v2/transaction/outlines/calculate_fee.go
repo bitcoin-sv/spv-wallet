@@ -6,6 +6,10 @@ import (
 	"math"
 )
 
+const (
+	txEnvelopeSize = 8 // version + locktime
+)
+
 func calculateFee(inputs annotatedInputs, outputs annotatedOutputs, feeUnit bsv.FeeUnit) bsv.Satoshis {
 	size := estimatedSize(inputs, outputs)
 
@@ -16,16 +20,15 @@ func calculateFee(inputs annotatedInputs, outputs annotatedOutputs, feeUnit bsv.
 func estimatedSize(inputs annotatedInputs, outputs annotatedOutputs) uint64 {
 	var size uint64
 
-	// version:
-	size += 4
+	size += txEnvelopeSize
+	size += estimatedInputsSize(inputs)
+	size += outputsSize(outputs)
 
-	// input count:
-	size += varIntSize(len(inputs))
+	return size
+}
 
-	// inputs:
-	for _, in := range inputs {
-		size += in.estimatedSize
-	}
+func outputsSize(outputs annotatedOutputs) uint64 {
+	var size uint64
 
 	// output count:
 	size += varIntSize(len(outputs))
@@ -37,8 +40,19 @@ func estimatedSize(inputs annotatedInputs, outputs annotatedOutputs) uint64 {
 		size += varIntSize(scriptLen) + toU64(scriptLen)
 	}
 
-	// locktime:
-	size += 4
+	return size
+}
+
+func estimatedInputsSize(inputs annotatedInputs) uint64 {
+	var size uint64
+
+	// input count:
+	size += varIntSize(len(inputs))
+
+	// inputs:
+	for _, in := range inputs {
+		size += in.estimatedSize
+	}
 
 	return size
 }
