@@ -13,7 +13,6 @@ paths:
             - "user"
       tags:
         - Admin endpoints
-        - User endpoints
         - Configurations
       summary: Get shared config
       description: >-

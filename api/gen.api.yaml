@@ -114,7 +114,6 @@ paths:
             summary: Get shared config
             tags:
                 - Admin endpoints
-                - User endpoints
                 - Configurations
 components:
     responses:
