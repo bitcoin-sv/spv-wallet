@@ -7,6 +7,8 @@ import (
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/bitcoin-sv/spv-wallet/engine/v2/database"
 	"github.com/bitcoin-sv/spv-wallet/engine/v2/transaction/beef"
+	"github.com/bitcoin-sv/spv-wallet/lox"
+	"github.com/samber/lo"
 	"gorm.io/gorm"
 )
 
@@ -43,9 +45,9 @@ func (t *Transactions) HasTransactionInputSources(ctx context.Context, inputs ..
 	return count > 0, nil
 }
 
-// QueryTransactionInputSources retrieves the full ancestry of input sources for a given transaction.
+// FindTransactionInputSources retrieves the full ancestry of input sources for a given transaction.
 // It recursively traces input sources in batches to minimize database queries.
-func (t *Transactions) QueryTransactionInputSources(ctx context.Context, sourceTXIDs ...string) (beef.TxQueryResultSlice, error) {
+func (t *Transactions) FindTransactionInputSources(ctx context.Context, sourceTXIDs ...string) (beef.TxQueryResultSlice, error) {
 	visited := make(visitedTransactions)
 
 	// Fetch input sources in batches
@@ -70,13 +72,10 @@ func (t *Transactions) queryInputSourcesBatch(ctx context.Context, txIDs []strin
 	}
 
 	// Filter out already visited transactions
-	filteredIDs := make([]string, 0, len(txIDs))
-	for _, txID := range txIDs {
-		if !visitedTransactions.isVisited(txID) {
-			visitedTransactions.recordVisited(txID)
-			filteredIDs = append(filteredIDs, txID)
-		}
-	}
+	filteredIDs := lo.Filter(txIDs, lox.MappingFn(visitedTransactions.isNotVisited))
+	lo.ForEach(filteredIDs, func(txID string, _ int) {
+		visitedTransactions.recordVisited(txID)
+	})
 
 	if len(filteredIDs) == 0 {
 		return nil, nil
@@ -95,6 +94,7 @@ func (t *Transactions) queryInputSourcesBatch(ctx context.Context, txIDs []strin
 
 	// Process results and collect next batch of transaction IDs
 	results := make([]database.TrackedTransaction, 0, len(rows))
+
 	var nextBatch []string
 	for _, row := range rows {
 		results = append(results, row)
@@ -114,17 +114,11 @@ func (t *Transactions) queryInputSourcesBatch(ctx context.Context, txIDs []strin
 	return append(results, nextResults...), nil
 }
 
-// visitedTransactions is a helper type that tracks visited transactions during recursive queries.
-type visitedTransactions map[string]bool
+type visitedTransactions map[string]struct{}
 
-// isVisited checks whether a transaction ID has already been visited.
-// Returns true if the transaction ID has been processed, false otherwise.
-func (v visitedTransactions) isVisited(txID string) bool {
+func (v visitedTransactions) isNotVisited(txID string) bool {
 	_, ok := v[txID]
-	return ok
+	return !ok
 }
 
-// recordVisited marks a transaction ID as visited to prevent redundant queries.
-func (v visitedTransactions) recordVisited(txID string) {
-	v[txID] = true
-}
+func (v visitedTransactions) recordVisited(txID string) { v[txID] = struct{}{} }

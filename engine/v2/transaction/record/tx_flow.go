@@ -168,17 +168,13 @@ func (f *txFlow) save() error {
 		return spverrors.Wrapf(err, "database query failed to check input source transactions for transaction %s", f.txID)
 	}
 
-	switch {
-	case isRawTx:
+	if isRawTx {
 		f.txRow.SetRawHex(f.tx.Hex())
-		f.txRow.SetTransactionInputSources()
-
-	default:
+	} else {
 		hex, err := f.tx.BEEFHex()
 		if err != nil {
 			return spverrors.Wrapf(err, "failed to generate BEEF hex for transaction %s", f.txID)
 		}
-
 		f.txRow.SetBEEFHex(hex)
 	}
 

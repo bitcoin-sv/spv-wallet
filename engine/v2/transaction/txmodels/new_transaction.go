@@ -35,33 +35,21 @@ func (t *NewTransaction) BEEFHex() string { return t.beefHex }
 func (t *NewTransaction) RawHex() string { return t.rawHex }
 
 // SetRawHex sets the raw hexadecimal representation of the transaction.
-func (t *NewTransaction) SetRawHex(hex string) { t.rawHex = hex }
+func (t *NewTransaction) SetRawHex(hex string) {
+	t.rawHex = hex
+	t.transactionInputSources = make([]TransactionInputSource, 0, len(t.Outputs))
+
+	for _, o := range t.Outputs {
+		t.transactionInputSources = append(t.transactionInputSources, TransactionInputSource{TxID: t.ID, SourceTxID: o.TxID})
+	}
+}
 
 // SetBEEFHex sets the BEEF-encoded hexadecimal representation of the transaction.
 func (t *NewTransaction) SetBEEFHex(hex string) { t.beefHex = hex }
 
-// HasTransactionInputSources checks if the transaction has any input sources.
-func (t *NewTransaction) HasTransactionInputSources() bool {
-	return len(t.transactionInputSources) > 0
-}
-
 // TransactionInputSources returns the list of input sources associated with the transaction.
 func (t *NewTransaction) TransactionInputSources() []TransactionInputSource {
 	return t.transactionInputSources
-}
-
-// SetTransactionInputSources initializes the transaction's input sources
-// by mapping each output to its corresponding source transaction ID.
-func (t *NewTransaction) SetTransactionInputSources() {
-	slice := make([]TransactionInputSource, 0, len(t.Outputs))
-	for _, o := range t.Outputs {
-		slice = append(slice, TransactionInputSource{
-			TxID:       t.ID,
-			SourceTxID: o.TxID,
-		})
-	}
-
-	t.transactionInputSources = slice
 }
 
 // AddInputs adds outpoints to spend in the transaction.

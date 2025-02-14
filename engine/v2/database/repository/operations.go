@@ -106,13 +106,11 @@ func mapTransaction(operation *txmodels.NewOperation) *database.TrackedTransacti
 		RawHex:   operation.Transaction.RawHex(),
 	}
 
-	if !operation.Transaction.HasTransactionInputSources() {
-		for _, input := range operation.Transaction.TransactionInputSources() {
-			tx.SourceTxInputs = append(tx.SourceTxInputs, database.TxInput{
-				TxID:       input.TxID,
-				SourceTxID: input.SourceTxID,
-			})
-		}
+	for _, input := range operation.Transaction.TransactionInputSources() {
+		tx.SourceTxInputs = append(tx.SourceTxInputs, database.TxInput{
+			TxID:       input.TxID,
+			SourceTxID: input.SourceTxID,
+		})
 	}
 
 	for _, input := range operation.Transaction.Inputs {
