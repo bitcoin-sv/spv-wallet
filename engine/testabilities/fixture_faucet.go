@@ -34,7 +34,7 @@ func (f *faucetFixture) TopUp(satoshis bsv.Satoshis) fixtures.GivenTXSpec {
 		UserID: f.user.ID(),
 
 		Type:  "incoming",
-		Value: int64(satoshis), //nolint:gosec // This is a test fixture, values won't exceed int64
+		Value: int64(satoshis),
 
 		Transaction: &txmodels.NewTransaction{
 			ID:       txSpec.ID(),

@@ -110,6 +110,14 @@ issues:
         - wrapcheck
         - bodyclose
 
+    - path: /testabilities/
+      linters:
+        - gocyclo
+        - errcheck
+        - gosec
+        - wrapcheck
+        - bodyclose
+
     - path: tester/
       linters:
         - gocyclo

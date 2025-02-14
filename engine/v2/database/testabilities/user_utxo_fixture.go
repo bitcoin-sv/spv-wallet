@@ -65,7 +65,7 @@ func (f *userUtxoFixture) Stored() *database.UserUTXO {
 		Satoshis:           uint64(f.satoshis),
 		EstimatedInputSize: f.estimatedInputSize,
 		Bucket:             string(bucket.BSV),
-		CreatedAt:          FirstCreatedAt.Add(time.Duration(f.index) * time.Second), //nolint:gosec // this is used for testing and it should be fine even in case of integer overflow.
+		CreatedAt:          FirstCreatedAt.Add(time.Duration(f.index) * time.Second),
 		TouchedAt:          FirstCreatedAt.Add(time.Duration(24) * time.Hour),
 	}
 

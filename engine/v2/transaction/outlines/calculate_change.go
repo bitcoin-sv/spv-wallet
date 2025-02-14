@@ -59,9 +59,13 @@ func calculateChange(ctx *evaluationContext, inputs annotatedInputs, outputs ann
 	feeForTxWithChange := calculateFee(inputs, outputsWithChange, feeUnit)
 	if feeForTxWithChange > fee {
 		feeDiff := uint64(feeForTxWithChange - fee)
+
 		if feeDiff >= changeOutput.TransactionOutput.Satoshis {
+			// Addition of change output increased fee, and decreases change to 0
+			// returning outputs with higher fee and no change
 			return outputs, nil
 		}
+
 		changeOutput.TransactionOutput.Satoshis -= feeDiff
 	}
 
