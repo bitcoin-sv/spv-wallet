@@ -4,16 +4,8 @@ info:
   version: ignored
 
 components:
-  responses:
-    NotAuthorized:
-      description: Security requirements failed
-      content:
-        application/json:
-          schema:
-            $ref: "#/components/schemas/ErrUnauthorized"
-
   schemas:
-    ErrorSchema:
+    Schema:
       type: object
       properties:
         code:
@@ -27,16 +19,16 @@ components:
         - message
       additionalProperties: false
 
-    ErrUnauthorized:
+    Unauthorized:
       oneOf:
-        - $ref: '#/components/schemas/ErrAuthorization'
-        - $ref: '#/components/schemas/ErrWrongAuthScopeFormat'
-        - $ref: '#/components/schemas/ErrAdminAuthOnNonAdminEndpoint'
-        - $ref: '#/components/schemas/ErrUserAuthOnNonUserEndpoint'
+        - $ref: '#/components/schemas/Authorization'
+        - $ref: '#/components/schemas/WrongAuthScopeFormat'
+        - $ref: '#/components/schemas/AdminAuthOnNonAdminEndpoint'
+        - $ref: '#/components/schemas/UserAuthOnNonUserEndpoint'
 
-    ErrAuthorization:
+    Authorization:
       allOf:
-        - $ref: '#/components/schemas/ErrorSchema'
+        - $ref: '#/components/schemas/Schema'
         - type: object
           properties:
             code:
@@ -44,9 +36,9 @@ components:
             message:
               example: "unauthorized"
 
-    ErrWrongAuthScopeFormat:
+    WrongAuthScopeFormat:
       allOf:
-        - $ref: '#/components/schemas/ErrorSchema'
+        - $ref: '#/components/schemas/Schema'
         - type: object
           properties:
             code:
@@ -54,9 +46,9 @@ components:
             message:
               example: "wrong auth scope format"
 
-    ErrAdminAuthOnNonAdminEndpoint:
+    AdminAuthOnNonAdminEndpoint:
       allOf:
-        - $ref: '#/components/schemas/ErrorSchema'
+        - $ref: '#/components/schemas/Schema'
         - type: object
           properties:
             code:
@@ -64,12 +56,82 @@ components:
             message:
               example: "cannot call non-admin endpoints with admin authorization"
 
-    ErrUserAuthOnNonUserEndpoint:
+    UserAuthOnNonUserEndpoint:
       allOf:
-        - $ref: '#/components/schemas/ErrorSchema'
+        - $ref: '#/components/schemas/Schema'
         - type: object
           properties:
             code:
               example: "error-user-auth-on-non-user-endpoint"
             message:
               example: "cannot call non-user endpoints with user authorization"
+
+    CannotBindRequest:
+      allOf:
+        - $ref: '#/components/schemas/Schema'
+        - type: object
+          properties:
+            code:
+              example: "error-bind-body-invalid"
+            message:
+              example: "cannot bind request body"
+
+    InvalidPubKey:
+      allOf:
+        - $ref: '#/components/schemas/Schema'
+        - type: object
+          properties:
+            code:
+              example: "error-user-invalid-pubkey"
+            message:
+              example: "invalid public key"
+
+    InvalidPaymail:
+      allOf:
+        - $ref: '#/components/schemas/Schema'
+        - type: object
+          properties:
+            code:
+              example: "error-user-invalid-paymail"
+            message:
+              example: "invalid paymail"
+
+    PaymailInconsistent:
+      allOf:
+        - $ref: '#/components/schemas/Schema'
+        - type: object
+          properties:
+            code:
+              example: "error-user-inconsistent-paymail"
+            message:
+              example: "inconsistent paymail address and alias/domain"
+
+    InvalidDomain:
+      allOf:
+        - $ref: '#/components/schemas/Schema'
+        - type: object
+          properties:
+            code:
+              example: "error-invalid-domain"
+            message:
+              example: "invalid domain"
+
+    CreatingUser:
+      allOf:
+        - $ref: '#/components/schemas/Schema'
+        - type: object
+          properties:
+            code:
+              example: "error-user-creating"
+            message:
+              example: "error creating user"
+
+    GettingUser:
+      allOf:
+        - $ref: '#/components/schemas/Schema'
+        - type: object
+          properties:
+            code:
+              example: "error-unknown"
+            message:
+              example: "Internal server error"
