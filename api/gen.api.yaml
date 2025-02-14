@@ -222,7 +222,7 @@ components:
                 - $ref: '#/components/schemas/errors_Schema'
                 - properties:
                     code:
-                        example: error-user-invalid-domain
+                        example: error-invalid-domain
                     message:
                         example: invalid domain
                   type: object

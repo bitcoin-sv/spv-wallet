@@ -112,7 +112,7 @@ components:
         - type: object
           properties:
             code:
-              example: "error-user-invalid-domain"
+              example: "error-invalid-domain"
             message:
               example: "invalid domain"
 
