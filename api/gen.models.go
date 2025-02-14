@@ -14,118 +14,143 @@ const (
 	XPubAuthScopes = "XPubAuth.Scopes"
 )
 
-// Defines values for ApiComponentsModelsOperationTxStatus.
+// Defines values for ModelsOperationTxStatus.
 const (
-	BROADCASTED ApiComponentsModelsOperationTxStatus = "BROADCASTED"
-	CREATED     ApiComponentsModelsOperationTxStatus = "CREATED"
-	MINED       ApiComponentsModelsOperationTxStatus = "MINED"
-	PROBLEMATIC ApiComponentsModelsOperationTxStatus = "PROBLEMATIC"
-	REVERTED    ApiComponentsModelsOperationTxStatus = "REVERTED"
+	BROADCASTED ModelsOperationTxStatus = "BROADCASTED"
+	CREATED     ModelsOperationTxStatus = "CREATED"
+	MINED       ModelsOperationTxStatus = "MINED"
+	PROBLEMATIC ModelsOperationTxStatus = "PROBLEMATIC"
+	REVERTED    ModelsOperationTxStatus = "REVERTED"
 )
 
-// Defines values for ApiComponentsModelsOperationType.
+// Defines values for ModelsOperationType.
 const (
-	Incoming ApiComponentsModelsOperationType = "incoming"
-	Outgoing ApiComponentsModelsOperationType = "outgoing"
+	Incoming ModelsOperationType = "incoming"
+	Outgoing ModelsOperationType = "outgoing"
 )
 
-// Defines values for ApiComponentsModelsSearchPageSort.
+// Defines values for ModelsSearchPageSort.
 const (
-	Asc  ApiComponentsModelsSearchPageSort = "asc"
-	Desc ApiComponentsModelsSearchPageSort = "desc"
+	Asc  ModelsSearchPageSort = "asc"
+	Desc ModelsSearchPageSort = "desc"
 )
 
-// ApiComponentsErrorsErrAdminAuthOnNonAdminEndpoint defines model for api_components_errors_ErrAdminAuthOnNonAdminEndpoint.
-type ApiComponentsErrorsErrAdminAuthOnNonAdminEndpoint struct {
+// ErrorsAdminAuthOnNonAdminEndpoint defines model for errors_AdminAuthOnNonAdminEndpoint.
+type ErrorsAdminAuthOnNonAdminEndpoint struct {
 	Code    interface{} `json:"code"`
 	Message interface{} `json:"message"`
 }
 
-// ApiComponentsErrorsErrAnnotationIndexConversion defines model for api_components_errors_ErrAnnotationIndexConversion.
-type ApiComponentsErrorsErrAnnotationIndexConversion struct {
+// ErrorsAuthorization defines model for errors_Authorization.
+type ErrorsAuthorization struct {
 	Code    interface{} `json:"code"`
 	Message interface{} `json:"message"`
 }
 
-// ApiComponentsErrorsErrAnnotationIndexOutOfRange defines model for api_components_errors_ErrAnnotationIndexOutOfRange.
-type ApiComponentsErrorsErrAnnotationIndexOutOfRange struct {
+// ErrorsCannotBindRequest defines model for errors_CannotBindRequest.
+type ErrorsCannotBindRequest struct {
 	Code    interface{} `json:"code"`
 	Message interface{} `json:"message"`
 }
 
-// ApiComponentsErrorsErrAuthorization defines model for api_components_errors_ErrAuthorization.
-type ApiComponentsErrorsErrAuthorization struct {
+// ErrorsCreatingUser defines model for errors_CreatingUser.
+type ErrorsCreatingUser struct {
 	Code    interface{} `json:"code"`
 	Message interface{} `json:"message"`
 }
 
-// ApiComponentsErrorsErrDataNotFound defines model for api_components_errors_ErrDataNotFound.
-type ApiComponentsErrorsErrDataNotFound struct {
+// ErrorsErrAnnotationIndexConversion defines model for errors_ErrAnnotationIndexConversion.
+type ErrorsErrAnnotationIndexConversion struct {
 	Code    interface{} `json:"code"`
 	Message interface{} `json:"message"`
 }
 
-// ApiComponentsErrorsErrGettingOutputs defines model for api_components_errors_ErrGettingOutputs.
-type ApiComponentsErrorsErrGettingOutputs struct {
+// ErrorsErrAnnotationIndexOutOfRange defines model for errors_ErrAnnotationIndexOutOfRange.
+type ErrorsErrAnnotationIndexOutOfRange struct {
 	Code    interface{} `json:"code"`
 	Message interface{} `json:"message"`
 }
 
-// ApiComponentsErrorsErrInternal defines model for api_components_errors_ErrInternal.
-type ApiComponentsErrorsErrInternal struct {
+// ErrorsErrDataNotFound defines model for errors_ErrDataNotFound.
+type ErrorsErrDataNotFound struct {
 	Code    interface{} `json:"code"`
 	Message interface{} `json:"message"`
 }
 
-// ApiComponentsErrorsErrInvalidDataID defines model for api_components_errors_ErrInvalidDataID.
-type ApiComponentsErrorsErrInvalidDataID struct {
+// ErrorsErrGettingOutputs defines model for errors_ErrGettingOutputs.
+type ErrorsErrGettingOutputs struct {
 	Code    interface{} `json:"code"`
 	Message interface{} `json:"message"`
 }
 
-// ApiComponentsErrorsErrNoOperations defines model for api_components_errors_ErrNoOperations.
-type ApiComponentsErrorsErrNoOperations struct {
+// ErrorsErrInternal defines model for errors_ErrInternal.
+type ErrorsErrInternal struct {
 	Code    interface{} `json:"code"`
 	Message interface{} `json:"message"`
 }
 
-// ApiComponentsErrorsErrTxBroadcast defines model for api_components_errors_ErrTxBroadcast.
-type ApiComponentsErrorsErrTxBroadcast struct {
+// ErrorsErrInvalidDataID defines model for errors_ErrInvalidDataID.
+type ErrorsErrInvalidDataID struct {
 	Code    interface{} `json:"code"`
 	Message interface{} `json:"message"`
 }
 
-// ApiComponentsErrorsErrUTXOSpent defines model for api_components_errors_ErrUTXOSpent.
-type ApiComponentsErrorsErrUTXOSpent struct {
+// ErrorsErrNoOperations defines model for errors_ErrNoOperations.
+type ErrorsErrNoOperations struct {
 	Code    interface{} `json:"code"`
 	Message interface{} `json:"message"`
 }
 
-// ApiComponentsErrorsErrUnauthorized defines model for api_components_errors_ErrUnauthorized.
-type ApiComponentsErrorsErrUnauthorized struct {
-	union json.RawMessage
-}
-
-// ApiComponentsErrorsErrUserAuthOnNonUserEndpoint defines model for api_components_errors_ErrUserAuthOnNonUserEndpoint.
-type ApiComponentsErrorsErrUserAuthOnNonUserEndpoint struct {
+// ErrorsErrTxBroadcast defines model for errors_ErrTxBroadcast.
+type ErrorsErrTxBroadcast struct {
 	Code    interface{} `json:"code"`
 	Message interface{} `json:"message"`
 }
 
-// ApiComponentsErrorsErrWrongAuthScopeFormat defines model for api_components_errors_ErrWrongAuthScopeFormat.
-type ApiComponentsErrorsErrWrongAuthScopeFormat struct {
+// ErrorsErrUTXOSpent defines model for errors_ErrUTXOSpent.
+type ErrorsErrUTXOSpent struct {
 	Code    interface{} `json:"code"`
 	Message interface{} `json:"message"`
 }
 
-// ApiComponentsErrorsErrXPubAuthRequired defines model for api_components_errors_ErrXPubAuthRequired.
-type ApiComponentsErrorsErrXPubAuthRequired struct {
+// ErrorsErrXPubAuthRequired defines model for errors_ErrXPubAuthRequired.
+type ErrorsErrXPubAuthRequired struct {
 	Code    interface{} `json:"code"`
 	Message interface{} `json:"message"`
 }
 
-// ApiComponentsErrorsErrorSchema defines model for api_components_errors_ErrorSchema.
-type ApiComponentsErrorsErrorSchema struct {
+// ErrorsGettingUser defines model for errors_GettingUser.
+type ErrorsGettingUser struct {
+	Code    interface{} `json:"code"`
+	Message interface{} `json:"message"`
+}
+
+// ErrorsInvalidDomain defines model for errors_InvalidDomain.
+type ErrorsInvalidDomain struct {
+	Code    interface{} `json:"code"`
+	Message interface{} `json:"message"`
+}
+
+// ErrorsInvalidPaymail defines model for errors_InvalidPaymail.
+type ErrorsInvalidPaymail struct {
+	Code    interface{} `json:"code"`
+	Message interface{} `json:"message"`
+}
+
+// ErrorsInvalidPubKey defines model for errors_InvalidPubKey.
+type ErrorsInvalidPubKey struct {
+	Code    interface{} `json:"code"`
+	Message interface{} `json:"message"`
+}
+
+// ErrorsPaymailInconsistent defines model for errors_PaymailInconsistent.
+type ErrorsPaymailInconsistent struct {
+	Code    interface{} `json:"code"`
+	Message interface{} `json:"message"`
+}
+
+// ErrorsSchema defines model for errors_Schema.
+type ErrorsSchema struct {
 	// Code Error code
 	Code string `json:"code"`
 
@@ -133,17 +158,28 @@ type ApiComponentsErrorsErrorSchema struct {
 	Message string `json:"message"`
 }
 
-// ApiComponentsModelsAnnotations defines model for api_components_models_Annotations.
-type ApiComponentsModelsAnnotations struct {
-	// Inputs Map of input annotations
-	Inputs *map[string]ApiComponentsModelsInputAnnotation `json:"inputs,omitempty"`
-
-	// Outputs Map of output annotations
-	Outputs *map[string]ApiComponentsModelsOutputAnnotation `json:"outputs,omitempty"`
+// ErrorsUnauthorized defines model for errors_Unauthorized.
+type ErrorsUnauthorized struct {
+	union json.RawMessage
 }
 
-// ApiComponentsModelsData defines model for api_components_models_Data.
-type ApiComponentsModelsData struct {
+// ErrorsUserAuthOnNonUserEndpoint defines model for errors_UserAuthOnNonUserEndpoint.
+type ErrorsUserAuthOnNonUserEndpoint struct {
+	Code    interface{} `json:"code"`
+	Message interface{} `json:"message"`
+}
+
+// ModelsAnnotations defines model for models_Annotations.
+type ModelsAnnotations struct {
+	// Inputs Map of input annotations
+	Inputs *map[string]ModelsInputAnnotation `json:"inputs,omitempty"`
+
+	// Outputs Map of output annotations
+	Outputs *map[string]ModelsOutputAnnotation `json:"outputs,omitempty"`
+}
+
+// ModelsData defines model for models_Data.
+type ModelsData struct {
 	// Blob Data blob
 	Blob string `json:"blob"`
 
@@ -151,14 +187,14 @@ type ApiComponentsModelsData struct {
 	Id string `json:"id"`
 }
 
-// ApiComponentsModelsInputAnnotation defines model for api_components_models_InputAnnotation.
-type ApiComponentsModelsInputAnnotation struct {
+// ModelsInputAnnotation defines model for models_InputAnnotation.
+type ModelsInputAnnotation struct {
 	// CustomInstructions Instructions about how to unlock this input.
 	CustomInstructions string `json:"customInstructions"`
 }
 
-// ApiComponentsModelsOperation defines model for api_components_models_Operation.
-type ApiComponentsModelsOperation struct {
+// ModelsOperation defines model for models_Operation.
+type ModelsOperation struct {
 	// Counterparty Counterparty of operation
 	Counterparty *string `json:"counterparty,omitempty"`
 
@@ -169,36 +205,46 @@ type ApiComponentsModelsOperation struct {
 	TxID *string `json:"txID,omitempty"`
 
 	// TxStatus Status of transaction
-	TxStatus *ApiComponentsModelsOperationTxStatus `json:"txStatus,omitempty"`
+	TxStatus *ModelsOperationTxStatus `json:"txStatus,omitempty"`
 
 	// Type Type of operation
-	Type *ApiComponentsModelsOperationType `json:"type,omitempty"`
+	Type *ModelsOperationType `json:"type,omitempty"`
 
 	// Value Value of operation
 	Value *int64 `json:"value,omitempty"`
 }
 
-// ApiComponentsModelsOperationTxStatus Status of transaction
-type ApiComponentsModelsOperationTxStatus string
+// ModelsOperationTxStatus Status of transaction
+type ModelsOperationTxStatus string
 
-// ApiComponentsModelsOperationType Type of operation
-type ApiComponentsModelsOperationType string
+// ModelsOperationType Type of operation
+type ModelsOperationType string
 
-// ApiComponentsModelsOperationsSearchResult defines model for api_components_models_OperationsSearchResult.
-type ApiComponentsModelsOperationsSearchResult struct {
-	Operations *[]ApiComponentsModelsOperation `json:"operations,omitempty"`
-	Page       *ApiComponentsModelsSearchPage  `json:"page,omitempty"`
+// ModelsOperationsSearchResult defines model for models_OperationsSearchResult.
+type ModelsOperationsSearchResult struct {
+	Operations *[]ModelsOperation `json:"operations,omitempty"`
+	Page       *ModelsSearchPage  `json:"page,omitempty"`
 }
 
-// ApiComponentsModelsOutputAnnotation defines model for api_components_models_OutputAnnotation.
-type ApiComponentsModelsOutputAnnotation struct {
+// ModelsOutputAnnotation defines model for models_OutputAnnotation.
+type ModelsOutputAnnotation struct {
 	// Bucket Type of bucket where this output should be stored.
-	Bucket  string                                `json:"bucket"`
-	Paymail *ApiComponentsModelsPaymailAnnotation `json:"paymail,omitempty"`
+	Bucket  string                   `json:"bucket"`
+	Paymail *ModelsPaymailAnnotation `json:"paymail,omitempty"`
 }
 
-// ApiComponentsModelsPaymailAnnotation defines model for api_components_models_PaymailAnnotation.
-type ApiComponentsModelsPaymailAnnotation struct {
+// ModelsPaymail defines model for models_Paymail.
+type ModelsPaymail struct {
+	Alias      string `json:"alias"`
+	Avatar     string `json:"avatar"`
+	Domain     string `json:"domain"`
+	Id         uint   `json:"id"`
+	Paymail    string `json:"paymail"`
+	PublicName string `json:"publicName"`
+}
+
+// ModelsPaymailAnnotation defines model for models_PaymailAnnotation.
+type ModelsPaymailAnnotation struct {
 	// Receiver Paymail address of the receiver
 	Receiver string `json:"receiver"`
 
@@ -209,14 +255,14 @@ type ApiComponentsModelsPaymailAnnotation struct {
 	Sender string `json:"sender"`
 }
 
-// ApiComponentsModelsRecordedOutline defines model for api_components_models_RecordedOutline.
-type ApiComponentsModelsRecordedOutline struct {
+// ModelsRecordedOutline defines model for models_RecordedOutline.
+type ModelsRecordedOutline struct {
 	// TxID ID of the transaction
 	TxID string `json:"txID"`
 }
 
-// ApiComponentsModelsSearchPage defines model for api_components_models_SearchPage.
-type ApiComponentsModelsSearchPage struct {
+// ModelsSearchPage defines model for models_SearchPage.
+type ModelsSearchPage struct {
 	// Number Page number for pagination
 	Number *int `json:"number,omitempty"`
 
@@ -224,24 +270,48 @@ type ApiComponentsModelsSearchPage struct {
 	Size *int `json:"size,omitempty"`
 
 	// Sort Sorting order (asc or desc)
-	Sort *ApiComponentsModelsSearchPageSort `json:"sort,omitempty"`
+	Sort *ModelsSearchPageSort `json:"sort,omitempty"`
 
 	// SortBy Field to sort by
 	SortBy *string `json:"sortBy,omitempty"`
 }
 
-// ApiComponentsModelsSearchPageSort Sorting order (asc or desc)
-type ApiComponentsModelsSearchPageSort string
+// ModelsSearchPageSort Sorting order (asc or desc)
+type ModelsSearchPageSort string
 
-// ApiComponentsModelsUserInfo defines model for api_components_models_UserInfo.
-type ApiComponentsModelsUserInfo struct {
+// ModelsSharedConfig Shared config
+type ModelsSharedConfig struct {
+	ExperimentalFeatures map[string]bool `json:"experimentalFeatures"`
+	PaymailDomains       []string        `json:"paymailDomains"`
+}
+
+// ModelsUser defines model for models_User.
+type ModelsUser struct {
+	CreatedAt time.Time       `json:"createdAt"`
+	Id        string          `json:"id"`
+	Paymails  []ModelsPaymail `json:"paymails"`
+	PublicKey string          `json:"publicKey"`
+	UpdatedAt time.Time       `json:"updatedAt"`
+}
+
+// ModelsUserInfo defines model for models_UserInfo.
+type ModelsUserInfo struct {
 	// CurrentBalance Current balance of user
 	CurrentBalance *string `json:"currentBalance,omitempty"`
 }
 
-// ApiComponentsRequestsAnnotatedTransaction defines model for api_components_requests_AnnotatedTransaction.
-type ApiComponentsRequestsAnnotatedTransaction struct {
-	Annotations *ApiComponentsModelsAnnotations `json:"annotations,omitempty"`
+// RequestsAddPaymail defines model for requests_AddPaymail.
+type RequestsAddPaymail struct {
+	Address    string `json:"address"`
+	Alias      string `json:"alias"`
+	AvatarURL  string `json:"avatarURL"`
+	Domain     string `json:"domain"`
+	PublicName string `json:"publicName"`
+}
+
+// RequestsAnnotatedTransaction defines model for requests_AnnotatedTransaction.
+type RequestsAnnotatedTransaction struct {
+	Annotations *ModelsAnnotations `json:"annotations,omitempty"`
 
 	// Format Transaction format
 	Format string `json:"format"`
@@ -250,99 +320,134 @@ type ApiComponentsRequestsAnnotatedTransaction struct {
 	Hex string `json:"hex"`
 }
 
-// ApiComponentsRequestsPageNumber defines model for api_components_requests_PageNumber.
-type ApiComponentsRequestsPageNumber = int
+// RequestsCreateUser defines model for requests_CreateUser.
+type RequestsCreateUser struct {
+	Paymail   *RequestsAddPaymail `json:"paymail,omitempty"`
+	PublicKey string              `json:"publicKey"`
+}
 
-// ApiComponentsRequestsPageSize defines model for api_components_requests_PageSize.
-type ApiComponentsRequestsPageSize = int
+// RequestsPageNumber defines model for requests_PageNumber.
+type RequestsPageNumber = int
 
-// ApiComponentsRequestsSort defines model for api_components_requests_Sort.
-type ApiComponentsRequestsSort = string
+// RequestsPageSize defines model for requests_PageSize.
+type RequestsPageSize = int
 
-// ApiComponentsRequestsSortBy defines model for api_components_requests_SortBy.
-type ApiComponentsRequestsSortBy = string
+// RequestsSort defines model for requests_Sort.
+type RequestsSort = string
 
-// ApiComponentsResponsesGetCurrentUserSuccess defines model for api_components_responses_GetCurrentUserSuccess.
-type ApiComponentsResponsesGetCurrentUserSuccess = ApiComponentsModelsUserInfo
+// RequestsSortBy defines model for requests_SortBy.
+type RequestsSortBy = string
 
-// ApiComponentsResponsesGetDataNotFound defines model for api_components_responses_GetDataNotFound.
-type ApiComponentsResponsesGetDataNotFound struct {
+// ResponsesAdminAddPaymailSuccess defines model for responses_AdminAddPaymailSuccess.
+type ResponsesAdminAddPaymailSuccess = ModelsPaymail
+
+// ResponsesAdminCreateUserInternalServerError defines model for responses_AdminCreateUserInternalServerError.
+type ResponsesAdminCreateUserInternalServerError = ErrorsCreatingUser
+
+// ResponsesAdminCreateUserSuccess defines model for responses_AdminCreateUserSuccess.
+type ResponsesAdminCreateUserSuccess = ModelsUser
+
+// ResponsesAdminGetUser defines model for responses_AdminGetUser.
+type ResponsesAdminGetUser = ModelsUser
+
+// ResponsesAdminGetUserInternalServerError defines model for responses_AdminGetUserInternalServerError.
+type ResponsesAdminGetUserInternalServerError = ErrorsGettingUser
+
+// ResponsesAdminUserBadRequest defines model for responses_AdminUserBadRequest.
+type ResponsesAdminUserBadRequest struct {
 	union json.RawMessage
 }
 
-// ApiComponentsResponsesGetDataSuccess defines model for api_components_responses_GetDataSuccess.
-type ApiComponentsResponsesGetDataSuccess = ApiComponentsModelsData
+// ResponsesGetCurrentUserSuccess defines model for responses_GetCurrentUserSuccess.
+type ResponsesGetCurrentUserSuccess = ModelsUserInfo
 
-// ApiComponentsResponsesInternalServerError defines model for api_components_responses_InternalServerError.
-type ApiComponentsResponsesInternalServerError = ApiComponentsErrorsErrInternal
-
-// ApiComponentsResponsesNotAuthorized defines model for api_components_responses_NotAuthorized.
-type ApiComponentsResponsesNotAuthorized = ApiComponentsErrorsErrUnauthorized
-
-// ApiComponentsResponsesRecordTransactionBadRequest defines model for api_components_responses_RecordTransactionBadRequest.
-type ApiComponentsResponsesRecordTransactionBadRequest struct {
+// ResponsesGetDataNotFound defines model for responses_GetDataNotFound.
+type ResponsesGetDataNotFound struct {
 	union json.RawMessage
 }
 
-// ApiComponentsResponsesRecordTransactionInternalServerError defines model for api_components_responses_RecordTransactionInternalServerError.
-type ApiComponentsResponsesRecordTransactionInternalServerError struct {
+// ResponsesGetDataSuccess defines model for responses_GetDataSuccess.
+type ResponsesGetDataSuccess = ModelsData
+
+// ResponsesInternalServerError defines model for responses_InternalServerError.
+type ResponsesInternalServerError = ErrorsErrInternal
+
+// ResponsesNotAuthorized defines model for responses_NotAuthorized.
+type ResponsesNotAuthorized = ErrorsUnauthorized
+
+// ResponsesRecordTransactionBadRequest defines model for responses_RecordTransactionBadRequest.
+type ResponsesRecordTransactionBadRequest struct {
 	union json.RawMessage
 }
 
-// ApiComponentsResponsesRecordTransactionSuccess defines model for api_components_responses_RecordTransactionSuccess.
-type ApiComponentsResponsesRecordTransactionSuccess = ApiComponentsModelsRecordedOutline
+// ResponsesRecordTransactionInternalServerError defines model for responses_RecordTransactionInternalServerError.
+type ResponsesRecordTransactionInternalServerError struct {
+	union json.RawMessage
+}
 
-// ApiComponentsResponsesSearchBadRequest defines model for api_components_responses_SearchBadRequest.
-type ApiComponentsResponsesSearchBadRequest = ApiComponentsErrorsErrInvalidDataID
+// ResponsesRecordTransactionSuccess defines model for responses_RecordTransactionSuccess.
+type ResponsesRecordTransactionSuccess = ModelsRecordedOutline
 
-// ApiComponentsResponsesSearchOperationsSuccess defines model for api_components_responses_SearchOperationsSuccess.
-type ApiComponentsResponsesSearchOperationsSuccess = ApiComponentsModelsOperationsSearchResult
+// ResponsesSearchBadRequest defines model for responses_SearchBadRequest.
+type ResponsesSearchBadRequest = ErrorsErrInvalidDataID
 
-// ApiComponentsResponsesUserBadRequest defines model for api_components_responses_UserBadRequest.
-type ApiComponentsResponsesUserBadRequest = ApiComponentsErrorsErrInvalidDataID
+// ResponsesSearchOperationsSuccess defines model for responses_SearchOperationsSuccess.
+type ResponsesSearchOperationsSuccess = ModelsOperationsSearchResult
 
-// ApiComponentsResponsesUserNotAuthorized defines model for api_components_responses_UserNotAuthorized.
-type ApiComponentsResponsesUserNotAuthorized struct {
+// ResponsesSharedConfig Shared config
+type ResponsesSharedConfig = ModelsSharedConfig
+
+// ResponsesUserBadRequest defines model for responses_UserBadRequest.
+type ResponsesUserBadRequest = ErrorsErrInvalidDataID
+
+// ResponsesUserNotAuthorized defines model for responses_UserNotAuthorized.
+type ResponsesUserNotAuthorized struct {
 	union json.RawMessage
 }
 
 // GetApiV2OperationsSearchParams defines parameters for GetApiV2OperationsSearch.
 type GetApiV2OperationsSearchParams struct {
 	// Page Page number for pagination
-	Page *ApiComponentsRequestsPageNumber `form:"page,omitempty" json:"page,omitempty"`
+	Page *RequestsPageNumber `form:"page,omitempty" json:"page,omitempty"`
 
 	// Size Number of items per page
-	Size *ApiComponentsRequestsPageSize `form:"size,omitempty" json:"size,omitempty"`
+	Size *RequestsPageSize `form:"size,omitempty" json:"size,omitempty"`
 
 	// Sort Sorting order (asc or desc)
-	Sort *ApiComponentsRequestsSort `form:"sort,omitempty" json:"sort,omitempty"`
+	Sort *RequestsSort `form:"sort,omitempty" json:"sort,omitempty"`
 
 	// SortBy Field to sort by
-	SortBy *ApiComponentsRequestsSortBy `form:"sortBy,omitempty" json:"sortBy,omitempty"`
+	SortBy *RequestsSortBy `form:"sortBy,omitempty" json:"sortBy,omitempty"`
 }
+
+// CreateUserJSONRequestBody defines body for CreateUser for application/json ContentType.
+type CreateUserJSONRequestBody = RequestsCreateUser
+
+// AddPaymailToUserJSONRequestBody defines body for AddPaymailToUser for application/json ContentType.
+type AddPaymailToUserJSONRequestBody = RequestsAddPaymail
 
 // PostApiV2TransactionsJSONRequestBody defines body for PostApiV2Transactions for application/json ContentType.
-type PostApiV2TransactionsJSONRequestBody = ApiComponentsRequestsAnnotatedTransaction
+type PostApiV2TransactionsJSONRequestBody = RequestsAnnotatedTransaction
 
 // PostApiV2TransactionsOutlinesJSONRequestBody defines body for PostApiV2TransactionsOutlines for application/json ContentType.
-type PostApiV2TransactionsOutlinesJSONRequestBody = ApiComponentsRequestsAnnotatedTransaction
+type PostApiV2TransactionsOutlinesJSONRequestBody = RequestsAnnotatedTransaction
 
-// AsApiComponentsErrorsErrAuthorization returns the union data inside the ApiComponentsErrorsErrUnauthorized as a ApiComponentsErrorsErrAuthorization
-func (t ApiComponentsErrorsErrUnauthorized) AsApiComponentsErrorsErrAuthorization() (ApiComponentsErrorsErrAuthorization, error) {
-	var body ApiComponentsErrorsErrAuthorization
+// AsErrorsAuthorization returns the union data inside the ErrorsUnauthorized as a ErrorsAuthorization
+func (t ErrorsUnauthorized) AsErrorsAuthorization() (ErrorsAuthorization, error) {
+	var body ErrorsAuthorization
 	err := json.Unmarshal(t.union, &body)
 	return body, err
 }
 
-// FromApiComponentsErrorsErrAuthorization overwrites any union data inside the ApiComponentsErrorsErrUnauthorized as the provided ApiComponentsErrorsErrAuthorization
-func (t *ApiComponentsErrorsErrUnauthorized) FromApiComponentsErrorsErrAuthorization(v ApiComponentsErrorsErrAuthorization) error {
+// FromErrorsAuthorization overwrites any union data inside the ErrorsUnauthorized as the provided ErrorsAuthorization
+func (t *ErrorsUnauthorized) FromErrorsAuthorization(v ErrorsAuthorization) error {
 	b, err := json.Marshal(v)
 	t.union = b
 	return err
 }
 
-// MergeApiComponentsErrorsErrAuthorization performs a merge with any union data inside the ApiComponentsErrorsErrUnauthorized, using the provided ApiComponentsErrorsErrAuthorization
-func (t *ApiComponentsErrorsErrUnauthorized) MergeApiComponentsErrorsErrAuthorization(v ApiComponentsErrorsErrAuthorization) error {
+// MergeErrorsAuthorization performs a merge with any union data inside the ErrorsUnauthorized, using the provided ErrorsAuthorization
+func (t *ErrorsUnauthorized) MergeErrorsAuthorization(v ErrorsAuthorization) error {
 	b, err := json.Marshal(v)
 	if err != nil {
 		return err
@@ -353,22 +458,22 @@ func (t *ApiComponentsErrorsErrUnauthorized) MergeApiComponentsErrorsErrAuthoriz
 	return err
 }
 
-// AsApiComponentsErrorsErrWrongAuthScopeFormat returns the union data inside the ApiComponentsErrorsErrUnauthorized as a ApiComponentsErrorsErrWrongAuthScopeFormat
-func (t ApiComponentsErrorsErrUnauthorized) AsApiComponentsErrorsErrWrongAuthScopeFormat() (ApiComponentsErrorsErrWrongAuthScopeFormat, error) {
-	var body ApiComponentsErrorsErrWrongAuthScopeFormat
+// AsErrorsAdminAuthOnNonAdminEndpoint returns the union data inside the ErrorsUnauthorized as a ErrorsAdminAuthOnNonAdminEndpoint
+func (t ErrorsUnauthorized) AsErrorsAdminAuthOnNonAdminEndpoint() (ErrorsAdminAuthOnNonAdminEndpoint, error) {
+	var body ErrorsAdminAuthOnNonAdminEndpoint
 	err := json.Unmarshal(t.union, &body)
 	return body, err
 }
 
-// FromApiComponentsErrorsErrWrongAuthScopeFormat overwrites any union data inside the ApiComponentsErrorsErrUnauthorized as the provided ApiComponentsErrorsErrWrongAuthScopeFormat
-func (t *ApiComponentsErrorsErrUnauthorized) FromApiComponentsErrorsErrWrongAuthScopeFormat(v ApiComponentsErrorsErrWrongAuthScopeFormat) error {
+// FromErrorsAdminAuthOnNonAdminEndpoint overwrites any union data inside the ErrorsUnauthorized as the provided ErrorsAdminAuthOnNonAdminEndpoint
+func (t *ErrorsUnauthorized) FromErrorsAdminAuthOnNonAdminEndpoint(v ErrorsAdminAuthOnNonAdminEndpoint) error {
 	b, err := json.Marshal(v)
 	t.union = b
 	return err
 }
 
-// MergeApiComponentsErrorsErrWrongAuthScopeFormat performs a merge with any union data inside the ApiComponentsErrorsErrUnauthorized, using the provided ApiComponentsErrorsErrWrongAuthScopeFormat
-func (t *ApiComponentsErrorsErrUnauthorized) MergeApiComponentsErrorsErrWrongAuthScopeFormat(v ApiComponentsErrorsErrWrongAuthScopeFormat) error {
+// MergeErrorsAdminAuthOnNonAdminEndpoint performs a merge with any union data inside the ErrorsUnauthorized, using the provided ErrorsAdminAuthOnNonAdminEndpoint
+func (t *ErrorsUnauthorized) MergeErrorsAdminAuthOnNonAdminEndpoint(v ErrorsAdminAuthOnNonAdminEndpoint) error {
 	b, err := json.Marshal(v)
 	if err != nil {
 		return err
@@ -379,22 +484,22 @@ func (t *ApiComponentsErrorsErrUnauthorized) MergeApiComponentsErrorsErrWrongAut
 	return err
 }
 
-// AsApiComponentsErrorsErrAdminAuthOnNonAdminEndpoint returns the union data inside the ApiComponentsErrorsErrUnauthorized as a ApiComponentsErrorsErrAdminAuthOnNonAdminEndpoint
-func (t ApiComponentsErrorsErrUnauthorized) AsApiComponentsErrorsErrAdminAuthOnNonAdminEndpoint() (ApiComponentsErrorsErrAdminAuthOnNonAdminEndpoint, error) {
-	var body ApiComponentsErrorsErrAdminAuthOnNonAdminEndpoint
+// AsErrorsUserAuthOnNonUserEndpoint returns the union data inside the ErrorsUnauthorized as a ErrorsUserAuthOnNonUserEndpoint
+func (t ErrorsUnauthorized) AsErrorsUserAuthOnNonUserEndpoint() (ErrorsUserAuthOnNonUserEndpoint, error) {
+	var body ErrorsUserAuthOnNonUserEndpoint
 	err := json.Unmarshal(t.union, &body)
 	return body, err
 }
 
-// FromApiComponentsErrorsErrAdminAuthOnNonAdminEndpoint overwrites any union data inside the ApiComponentsErrorsErrUnauthorized as the provided ApiComponentsErrorsErrAdminAuthOnNonAdminEndpoint
-func (t *ApiComponentsErrorsErrUnauthorized) FromApiComponentsErrorsErrAdminAuthOnNonAdminEndpoint(v ApiComponentsErrorsErrAdminAuthOnNonAdminEndpoint) error {
+// FromErrorsUserAuthOnNonUserEndpoint overwrites any union data inside the ErrorsUnauthorized as the provided ErrorsUserAuthOnNonUserEndpoint
+func (t *ErrorsUnauthorized) FromErrorsUserAuthOnNonUserEndpoint(v ErrorsUserAuthOnNonUserEndpoint) error {
 	b, err := json.Marshal(v)
 	t.union = b
 	return err
 }
 
-// MergeApiComponentsErrorsErrAdminAuthOnNonAdminEndpoint performs a merge with any union data inside the ApiComponentsErrorsErrUnauthorized, using the provided ApiComponentsErrorsErrAdminAuthOnNonAdminEndpoint
-func (t *ApiComponentsErrorsErrUnauthorized) MergeApiComponentsErrorsErrAdminAuthOnNonAdminEndpoint(v ApiComponentsErrorsErrAdminAuthOnNonAdminEndpoint) error {
+// MergeErrorsUserAuthOnNonUserEndpoint performs a merge with any union data inside the ErrorsUnauthorized, using the provided ErrorsUserAuthOnNonUserEndpoint
+func (t *ErrorsUnauthorized) MergeErrorsUserAuthOnNonUserEndpoint(v ErrorsUserAuthOnNonUserEndpoint) error {
 	b, err := json.Marshal(v)
 	if err != nil {
 		return err
@@ -405,22 +510,22 @@ func (t *ApiComponentsErrorsErrUnauthorized) MergeApiComponentsErrorsErrAdminAut
 	return err
 }
 
-// AsApiComponentsErrorsErrUserAuthOnNonUserEndpoint returns the union data inside the ApiComponentsErrorsErrUnauthorized as a ApiComponentsErrorsErrUserAuthOnNonUserEndpoint
-func (t ApiComponentsErrorsErrUnauthorized) AsApiComponentsErrorsErrUserAuthOnNonUserEndpoint() (ApiComponentsErrorsErrUserAuthOnNonUserEndpoint, error) {
-	var body ApiComponentsErrorsErrUserAuthOnNonUserEndpoint
+// AsErrorsErrXPubAuthRequired returns the union data inside the ErrorsUnauthorized as a ErrorsErrXPubAuthRequired
+func (t ErrorsUnauthorized) AsErrorsErrXPubAuthRequired() (ErrorsErrXPubAuthRequired, error) {
+	var body ErrorsErrXPubAuthRequired
 	err := json.Unmarshal(t.union, &body)
 	return body, err
 }
 
-// FromApiComponentsErrorsErrUserAuthOnNonUserEndpoint overwrites any union data inside the ApiComponentsErrorsErrUnauthorized as the provided ApiComponentsErrorsErrUserAuthOnNonUserEndpoint
-func (t *ApiComponentsErrorsErrUnauthorized) FromApiComponentsErrorsErrUserAuthOnNonUserEndpoint(v ApiComponentsErrorsErrUserAuthOnNonUserEndpoint) error {
+// FromErrorsErrXPubAuthRequired overwrites any union data inside the ErrorsUnauthorized as the provided ErrorsErrXPubAuthRequired
+func (t *ErrorsUnauthorized) FromErrorsErrXPubAuthRequired(v ErrorsErrXPubAuthRequired) error {
 	b, err := json.Marshal(v)
 	t.union = b
 	return err
 }
 
-// MergeApiComponentsErrorsErrUserAuthOnNonUserEndpoint performs a merge with any union data inside the ApiComponentsErrorsErrUnauthorized, using the provided ApiComponentsErrorsErrUserAuthOnNonUserEndpoint
-func (t *ApiComponentsErrorsErrUnauthorized) MergeApiComponentsErrorsErrUserAuthOnNonUserEndpoint(v ApiComponentsErrorsErrUserAuthOnNonUserEndpoint) error {
+// MergeErrorsErrXPubAuthRequired performs a merge with any union data inside the ErrorsUnauthorized, using the provided ErrorsErrXPubAuthRequired
+func (t *ErrorsUnauthorized) MergeErrorsErrXPubAuthRequired(v ErrorsErrXPubAuthRequired) error {
 	b, err := json.Marshal(v)
 	if err != nil {
 		return err
@@ -431,32 +536,32 @@ func (t *ApiComponentsErrorsErrUnauthorized) MergeApiComponentsErrorsErrUserAuth
 	return err
 }
 
-func (t ApiComponentsErrorsErrUnauthorized) MarshalJSON() ([]byte, error) {
+func (t ErrorsUnauthorized) MarshalJSON() ([]byte, error) {
 	b, err := t.union.MarshalJSON()
 	return b, err
 }
 
-func (t *ApiComponentsErrorsErrUnauthorized) UnmarshalJSON(b []byte) error {
+func (t *ErrorsUnauthorized) UnmarshalJSON(b []byte) error {
 	err := t.union.UnmarshalJSON(b)
 	return err
 }
 
-// AsApiComponentsErrorsErrDataNotFound returns the union data inside the ApiComponentsResponsesGetDataNotFound as a ApiComponentsErrorsErrDataNotFound
-func (t ApiComponentsResponsesGetDataNotFound) AsApiComponentsErrorsErrDataNotFound() (ApiComponentsErrorsErrDataNotFound, error) {
-	var body ApiComponentsErrorsErrDataNotFound
+// AsErrorsCannotBindRequest returns the union data inside the ResponsesAdminUserBadRequest as a ErrorsCannotBindRequest
+func (t ResponsesAdminUserBadRequest) AsErrorsCannotBindRequest() (ErrorsCannotBindRequest, error) {
+	var body ErrorsCannotBindRequest
 	err := json.Unmarshal(t.union, &body)
 	return body, err
 }
 
-// FromApiComponentsErrorsErrDataNotFound overwrites any union data inside the ApiComponentsResponsesGetDataNotFound as the provided ApiComponentsErrorsErrDataNotFound
-func (t *ApiComponentsResponsesGetDataNotFound) FromApiComponentsErrorsErrDataNotFound(v ApiComponentsErrorsErrDataNotFound) error {
+// FromErrorsCannotBindRequest overwrites any union data inside the ResponsesAdminUserBadRequest as the provided ErrorsCannotBindRequest
+func (t *ResponsesAdminUserBadRequest) FromErrorsCannotBindRequest(v ErrorsCannotBindRequest) error {
 	b, err := json.Marshal(v)
 	t.union = b
 	return err
 }
 
-// MergeApiComponentsErrorsErrDataNotFound performs a merge with any union data inside the ApiComponentsResponsesGetDataNotFound, using the provided ApiComponentsErrorsErrDataNotFound
-func (t *ApiComponentsResponsesGetDataNotFound) MergeApiComponentsErrorsErrDataNotFound(v ApiComponentsErrorsErrDataNotFound) error {
+// MergeErrorsCannotBindRequest performs a merge with any union data inside the ResponsesAdminUserBadRequest, using the provided ErrorsCannotBindRequest
+func (t *ResponsesAdminUserBadRequest) MergeErrorsCannotBindRequest(v ErrorsCannotBindRequest) error {
 	b, err := json.Marshal(v)
 	if err != nil {
 		return err
@@ -467,32 +572,136 @@ func (t *ApiComponentsResponsesGetDataNotFound) MergeApiComponentsErrorsErrDataN
 	return err
 }
 
-func (t ApiComponentsResponsesGetDataNotFound) MarshalJSON() ([]byte, error) {
+// AsErrorsInvalidPubKey returns the union data inside the ResponsesAdminUserBadRequest as a ErrorsInvalidPubKey
+func (t ResponsesAdminUserBadRequest) AsErrorsInvalidPubKey() (ErrorsInvalidPubKey, error) {
+	var body ErrorsInvalidPubKey
+	err := json.Unmarshal(t.union, &body)
+	return body, err
+}
+
+// FromErrorsInvalidPubKey overwrites any union data inside the ResponsesAdminUserBadRequest as the provided ErrorsInvalidPubKey
+func (t *ResponsesAdminUserBadRequest) FromErrorsInvalidPubKey(v ErrorsInvalidPubKey) error {
+	b, err := json.Marshal(v)
+	t.union = b
+	return err
+}
+
+// MergeErrorsInvalidPubKey performs a merge with any union data inside the ResponsesAdminUserBadRequest, using the provided ErrorsInvalidPubKey
+func (t *ResponsesAdminUserBadRequest) MergeErrorsInvalidPubKey(v ErrorsInvalidPubKey) error {
+	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+
+	merged, err := runtime.JSONMerge(t.union, b)
+	t.union = merged
+	return err
+}
+
+// AsErrorsInvalidPaymail returns the union data inside the ResponsesAdminUserBadRequest as a ErrorsInvalidPaymail
+func (t ResponsesAdminUserBadRequest) AsErrorsInvalidPaymail() (ErrorsInvalidPaymail, error) {
+	var body ErrorsInvalidPaymail
+	err := json.Unmarshal(t.union, &body)
+	return body, err
+}
+
+// FromErrorsInvalidPaymail overwrites any union data inside the ResponsesAdminUserBadRequest as the provided ErrorsInvalidPaymail
+func (t *ResponsesAdminUserBadRequest) FromErrorsInvalidPaymail(v ErrorsInvalidPaymail) error {
+	b, err := json.Marshal(v)
+	t.union = b
+	return err
+}
+
+// MergeErrorsInvalidPaymail performs a merge with any union data inside the ResponsesAdminUserBadRequest, using the provided ErrorsInvalidPaymail
+func (t *ResponsesAdminUserBadRequest) MergeErrorsInvalidPaymail(v ErrorsInvalidPaymail) error {
+	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+
+	merged, err := runtime.JSONMerge(t.union, b)
+	t.union = merged
+	return err
+}
+
+// AsErrorsPaymailInconsistent returns the union data inside the ResponsesAdminUserBadRequest as a ErrorsPaymailInconsistent
+func (t ResponsesAdminUserBadRequest) AsErrorsPaymailInconsistent() (ErrorsPaymailInconsistent, error) {
+	var body ErrorsPaymailInconsistent
+	err := json.Unmarshal(t.union, &body)
+	return body, err
+}
+
+// FromErrorsPaymailInconsistent overwrites any union data inside the ResponsesAdminUserBadRequest as the provided ErrorsPaymailInconsistent
+func (t *ResponsesAdminUserBadRequest) FromErrorsPaymailInconsistent(v ErrorsPaymailInconsistent) error {
+	b, err := json.Marshal(v)
+	t.union = b
+	return err
+}
+
+// MergeErrorsPaymailInconsistent performs a merge with any union data inside the ResponsesAdminUserBadRequest, using the provided ErrorsPaymailInconsistent
+func (t *ResponsesAdminUserBadRequest) MergeErrorsPaymailInconsistent(v ErrorsPaymailInconsistent) error {
+	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+
+	merged, err := runtime.JSONMerge(t.union, b)
+	t.union = merged
+	return err
+}
+
+// AsErrorsInvalidDomain returns the union data inside the ResponsesAdminUserBadRequest as a ErrorsInvalidDomain
+func (t ResponsesAdminUserBadRequest) AsErrorsInvalidDomain() (ErrorsInvalidDomain, error) {
+	var body ErrorsInvalidDomain
+	err := json.Unmarshal(t.union, &body)
+	return body, err
+}
+
+// FromErrorsInvalidDomain overwrites any union data inside the ResponsesAdminUserBadRequest as the provided ErrorsInvalidDomain
+func (t *ResponsesAdminUserBadRequest) FromErrorsInvalidDomain(v ErrorsInvalidDomain) error {
+	b, err := json.Marshal(v)
+	t.union = b
+	return err
+}
+
+// MergeErrorsInvalidDomain performs a merge with any union data inside the ResponsesAdminUserBadRequest, using the provided ErrorsInvalidDomain
+func (t *ResponsesAdminUserBadRequest) MergeErrorsInvalidDomain(v ErrorsInvalidDomain) error {
+	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+
+	merged, err := runtime.JSONMerge(t.union, b)
+	t.union = merged
+	return err
+}
+
+func (t ResponsesAdminUserBadRequest) MarshalJSON() ([]byte, error) {
 	b, err := t.union.MarshalJSON()
 	return b, err
 }
 
-func (t *ApiComponentsResponsesGetDataNotFound) UnmarshalJSON(b []byte) error {
+func (t *ResponsesAdminUserBadRequest) UnmarshalJSON(b []byte) error {
 	err := t.union.UnmarshalJSON(b)
 	return err
 }
 
-// AsApiComponentsErrorsErrInvalidDataID returns the union data inside the ApiComponentsResponsesRecordTransactionBadRequest as a ApiComponentsErrorsErrInvalidDataID
-func (t ApiComponentsResponsesRecordTransactionBadRequest) AsApiComponentsErrorsErrInvalidDataID() (ApiComponentsErrorsErrInvalidDataID, error) {
-	var body ApiComponentsErrorsErrInvalidDataID
+// AsErrorsErrDataNotFound returns the union data inside the ResponsesGetDataNotFound as a ErrorsErrDataNotFound
+func (t ResponsesGetDataNotFound) AsErrorsErrDataNotFound() (ErrorsErrDataNotFound, error) {
+	var body ErrorsErrDataNotFound
 	err := json.Unmarshal(t.union, &body)
 	return body, err
 }
 
-// FromApiComponentsErrorsErrInvalidDataID overwrites any union data inside the ApiComponentsResponsesRecordTransactionBadRequest as the provided ApiComponentsErrorsErrInvalidDataID
-func (t *ApiComponentsResponsesRecordTransactionBadRequest) FromApiComponentsErrorsErrInvalidDataID(v ApiComponentsErrorsErrInvalidDataID) error {
+// FromErrorsErrDataNotFound overwrites any union data inside the ResponsesGetDataNotFound as the provided ErrorsErrDataNotFound
+func (t *ResponsesGetDataNotFound) FromErrorsErrDataNotFound(v ErrorsErrDataNotFound) error {
 	b, err := json.Marshal(v)
 	t.union = b
 	return err
 }
 
-// MergeApiComponentsErrorsErrInvalidDataID performs a merge with any union data inside the ApiComponentsResponsesRecordTransactionBadRequest, using the provided ApiComponentsErrorsErrInvalidDataID
-func (t *ApiComponentsResponsesRecordTransactionBadRequest) MergeApiComponentsErrorsErrInvalidDataID(v ApiComponentsErrorsErrInvalidDataID) error {
+// MergeErrorsErrDataNotFound performs a merge with any union data inside the ResponsesGetDataNotFound, using the provided ErrorsErrDataNotFound
+func (t *ResponsesGetDataNotFound) MergeErrorsErrDataNotFound(v ErrorsErrDataNotFound) error {
 	b, err := json.Marshal(v)
 	if err != nil {
 		return err
@@ -503,136 +712,32 @@ func (t *ApiComponentsResponsesRecordTransactionBadRequest) MergeApiComponentsEr
 	return err
 }
 
-// AsApiComponentsErrorsErrAnnotationIndexOutOfRange returns the union data inside the ApiComponentsResponsesRecordTransactionBadRequest as a ApiComponentsErrorsErrAnnotationIndexOutOfRange
-func (t ApiComponentsResponsesRecordTransactionBadRequest) AsApiComponentsErrorsErrAnnotationIndexOutOfRange() (ApiComponentsErrorsErrAnnotationIndexOutOfRange, error) {
-	var body ApiComponentsErrorsErrAnnotationIndexOutOfRange
-	err := json.Unmarshal(t.union, &body)
-	return body, err
-}
-
-// FromApiComponentsErrorsErrAnnotationIndexOutOfRange overwrites any union data inside the ApiComponentsResponsesRecordTransactionBadRequest as the provided ApiComponentsErrorsErrAnnotationIndexOutOfRange
-func (t *ApiComponentsResponsesRecordTransactionBadRequest) FromApiComponentsErrorsErrAnnotationIndexOutOfRange(v ApiComponentsErrorsErrAnnotationIndexOutOfRange) error {
-	b, err := json.Marshal(v)
-	t.union = b
-	return err
-}
-
-// MergeApiComponentsErrorsErrAnnotationIndexOutOfRange performs a merge with any union data inside the ApiComponentsResponsesRecordTransactionBadRequest, using the provided ApiComponentsErrorsErrAnnotationIndexOutOfRange
-func (t *ApiComponentsResponsesRecordTransactionBadRequest) MergeApiComponentsErrorsErrAnnotationIndexOutOfRange(v ApiComponentsErrorsErrAnnotationIndexOutOfRange) error {
-	b, err := json.Marshal(v)
-	if err != nil {
-		return err
-	}
-
-	merged, err := runtime.JSONMerge(t.union, b)
-	t.union = merged
-	return err
-}
-
-// AsApiComponentsErrorsErrUTXOSpent returns the union data inside the ApiComponentsResponsesRecordTransactionBadRequest as a ApiComponentsErrorsErrUTXOSpent
-func (t ApiComponentsResponsesRecordTransactionBadRequest) AsApiComponentsErrorsErrUTXOSpent() (ApiComponentsErrorsErrUTXOSpent, error) {
-	var body ApiComponentsErrorsErrUTXOSpent
-	err := json.Unmarshal(t.union, &body)
-	return body, err
-}
-
-// FromApiComponentsErrorsErrUTXOSpent overwrites any union data inside the ApiComponentsResponsesRecordTransactionBadRequest as the provided ApiComponentsErrorsErrUTXOSpent
-func (t *ApiComponentsResponsesRecordTransactionBadRequest) FromApiComponentsErrorsErrUTXOSpent(v ApiComponentsErrorsErrUTXOSpent) error {
-	b, err := json.Marshal(v)
-	t.union = b
-	return err
-}
-
-// MergeApiComponentsErrorsErrUTXOSpent performs a merge with any union data inside the ApiComponentsResponsesRecordTransactionBadRequest, using the provided ApiComponentsErrorsErrUTXOSpent
-func (t *ApiComponentsResponsesRecordTransactionBadRequest) MergeApiComponentsErrorsErrUTXOSpent(v ApiComponentsErrorsErrUTXOSpent) error {
-	b, err := json.Marshal(v)
-	if err != nil {
-		return err
-	}
-
-	merged, err := runtime.JSONMerge(t.union, b)
-	t.union = merged
-	return err
-}
-
-// AsApiComponentsErrorsErrAnnotationIndexConversion returns the union data inside the ApiComponentsResponsesRecordTransactionBadRequest as a ApiComponentsErrorsErrAnnotationIndexConversion
-func (t ApiComponentsResponsesRecordTransactionBadRequest) AsApiComponentsErrorsErrAnnotationIndexConversion() (ApiComponentsErrorsErrAnnotationIndexConversion, error) {
-	var body ApiComponentsErrorsErrAnnotationIndexConversion
-	err := json.Unmarshal(t.union, &body)
-	return body, err
-}
-
-// FromApiComponentsErrorsErrAnnotationIndexConversion overwrites any union data inside the ApiComponentsResponsesRecordTransactionBadRequest as the provided ApiComponentsErrorsErrAnnotationIndexConversion
-func (t *ApiComponentsResponsesRecordTransactionBadRequest) FromApiComponentsErrorsErrAnnotationIndexConversion(v ApiComponentsErrorsErrAnnotationIndexConversion) error {
-	b, err := json.Marshal(v)
-	t.union = b
-	return err
-}
-
-// MergeApiComponentsErrorsErrAnnotationIndexConversion performs a merge with any union data inside the ApiComponentsResponsesRecordTransactionBadRequest, using the provided ApiComponentsErrorsErrAnnotationIndexConversion
-func (t *ApiComponentsResponsesRecordTransactionBadRequest) MergeApiComponentsErrorsErrAnnotationIndexConversion(v ApiComponentsErrorsErrAnnotationIndexConversion) error {
-	b, err := json.Marshal(v)
-	if err != nil {
-		return err
-	}
-
-	merged, err := runtime.JSONMerge(t.union, b)
-	t.union = merged
-	return err
-}
-
-// AsApiComponentsErrorsErrNoOperations returns the union data inside the ApiComponentsResponsesRecordTransactionBadRequest as a ApiComponentsErrorsErrNoOperations
-func (t ApiComponentsResponsesRecordTransactionBadRequest) AsApiComponentsErrorsErrNoOperations() (ApiComponentsErrorsErrNoOperations, error) {
-	var body ApiComponentsErrorsErrNoOperations
-	err := json.Unmarshal(t.union, &body)
-	return body, err
-}
-
-// FromApiComponentsErrorsErrNoOperations overwrites any union data inside the ApiComponentsResponsesRecordTransactionBadRequest as the provided ApiComponentsErrorsErrNoOperations
-func (t *ApiComponentsResponsesRecordTransactionBadRequest) FromApiComponentsErrorsErrNoOperations(v ApiComponentsErrorsErrNoOperations) error {
-	b, err := json.Marshal(v)
-	t.union = b
-	return err
-}
-
-// MergeApiComponentsErrorsErrNoOperations performs a merge with any union data inside the ApiComponentsResponsesRecordTransactionBadRequest, using the provided ApiComponentsErrorsErrNoOperations
-func (t *ApiComponentsResponsesRecordTransactionBadRequest) MergeApiComponentsErrorsErrNoOperations(v ApiComponentsErrorsErrNoOperations) error {
-	b, err := json.Marshal(v)
-	if err != nil {
-		return err
-	}
-
-	merged, err := runtime.JSONMerge(t.union, b)
-	t.union = merged
-	return err
-}
-
-func (t ApiComponentsResponsesRecordTransactionBadRequest) MarshalJSON() ([]byte, error) {
+func (t ResponsesGetDataNotFound) MarshalJSON() ([]byte, error) {
 	b, err := t.union.MarshalJSON()
 	return b, err
 }
 
-func (t *ApiComponentsResponsesRecordTransactionBadRequest) UnmarshalJSON(b []byte) error {
+func (t *ResponsesGetDataNotFound) UnmarshalJSON(b []byte) error {
 	err := t.union.UnmarshalJSON(b)
 	return err
 }
 
-// AsApiComponentsErrorsErrInternal returns the union data inside the ApiComponentsResponsesRecordTransactionInternalServerError as a ApiComponentsErrorsErrInternal
-func (t ApiComponentsResponsesRecordTransactionInternalServerError) AsApiComponentsErrorsErrInternal() (ApiComponentsErrorsErrInternal, error) {
-	var body ApiComponentsErrorsErrInternal
+// AsErrorsErrInvalidDataID returns the union data inside the ResponsesRecordTransactionBadRequest as a ErrorsErrInvalidDataID
+func (t ResponsesRecordTransactionBadRequest) AsErrorsErrInvalidDataID() (ErrorsErrInvalidDataID, error) {
+	var body ErrorsErrInvalidDataID
 	err := json.Unmarshal(t.union, &body)
 	return body, err
 }
 
-// FromApiComponentsErrorsErrInternal overwrites any union data inside the ApiComponentsResponsesRecordTransactionInternalServerError as the provided ApiComponentsErrorsErrInternal
-func (t *ApiComponentsResponsesRecordTransactionInternalServerError) FromApiComponentsErrorsErrInternal(v ApiComponentsErrorsErrInternal) error {
+// FromErrorsErrInvalidDataID overwrites any union data inside the ResponsesRecordTransactionBadRequest as the provided ErrorsErrInvalidDataID
+func (t *ResponsesRecordTransactionBadRequest) FromErrorsErrInvalidDataID(v ErrorsErrInvalidDataID) error {
 	b, err := json.Marshal(v)
 	t.union = b
 	return err
 }
 
-// MergeApiComponentsErrorsErrInternal performs a merge with any union data inside the ApiComponentsResponsesRecordTransactionInternalServerError, using the provided ApiComponentsErrorsErrInternal
-func (t *ApiComponentsResponsesRecordTransactionInternalServerError) MergeApiComponentsErrorsErrInternal(v ApiComponentsErrorsErrInternal) error {
+// MergeErrorsErrInvalidDataID performs a merge with any union data inside the ResponsesRecordTransactionBadRequest, using the provided ErrorsErrInvalidDataID
+func (t *ResponsesRecordTransactionBadRequest) MergeErrorsErrInvalidDataID(v ErrorsErrInvalidDataID) error {
 	b, err := json.Marshal(v)
 	if err != nil {
 		return err
@@ -643,22 +748,22 @@ func (t *ApiComponentsResponsesRecordTransactionInternalServerError) MergeApiCom
 	return err
 }
 
-// AsApiComponentsErrorsErrGettingOutputs returns the union data inside the ApiComponentsResponsesRecordTransactionInternalServerError as a ApiComponentsErrorsErrGettingOutputs
-func (t ApiComponentsResponsesRecordTransactionInternalServerError) AsApiComponentsErrorsErrGettingOutputs() (ApiComponentsErrorsErrGettingOutputs, error) {
-	var body ApiComponentsErrorsErrGettingOutputs
+// AsErrorsErrAnnotationIndexOutOfRange returns the union data inside the ResponsesRecordTransactionBadRequest as a ErrorsErrAnnotationIndexOutOfRange
+func (t ResponsesRecordTransactionBadRequest) AsErrorsErrAnnotationIndexOutOfRange() (ErrorsErrAnnotationIndexOutOfRange, error) {
+	var body ErrorsErrAnnotationIndexOutOfRange
 	err := json.Unmarshal(t.union, &body)
 	return body, err
 }
 
-// FromApiComponentsErrorsErrGettingOutputs overwrites any union data inside the ApiComponentsResponsesRecordTransactionInternalServerError as the provided ApiComponentsErrorsErrGettingOutputs
-func (t *ApiComponentsResponsesRecordTransactionInternalServerError) FromApiComponentsErrorsErrGettingOutputs(v ApiComponentsErrorsErrGettingOutputs) error {
+// FromErrorsErrAnnotationIndexOutOfRange overwrites any union data inside the ResponsesRecordTransactionBadRequest as the provided ErrorsErrAnnotationIndexOutOfRange
+func (t *ResponsesRecordTransactionBadRequest) FromErrorsErrAnnotationIndexOutOfRange(v ErrorsErrAnnotationIndexOutOfRange) error {
 	b, err := json.Marshal(v)
 	t.union = b
 	return err
 }
 
-// MergeApiComponentsErrorsErrGettingOutputs performs a merge with any union data inside the ApiComponentsResponsesRecordTransactionInternalServerError, using the provided ApiComponentsErrorsErrGettingOutputs
-func (t *ApiComponentsResponsesRecordTransactionInternalServerError) MergeApiComponentsErrorsErrGettingOutputs(v ApiComponentsErrorsErrGettingOutputs) error {
+// MergeErrorsErrAnnotationIndexOutOfRange performs a merge with any union data inside the ResponsesRecordTransactionBadRequest, using the provided ErrorsErrAnnotationIndexOutOfRange
+func (t *ResponsesRecordTransactionBadRequest) MergeErrorsErrAnnotationIndexOutOfRange(v ErrorsErrAnnotationIndexOutOfRange) error {
 	b, err := json.Marshal(v)
 	if err != nil {
 		return err
@@ -669,22 +774,22 @@ func (t *ApiComponentsResponsesRecordTransactionInternalServerError) MergeApiCom
 	return err
 }
 
-// AsApiComponentsErrorsErrTxBroadcast returns the union data inside the ApiComponentsResponsesRecordTransactionInternalServerError as a ApiComponentsErrorsErrTxBroadcast
-func (t ApiComponentsResponsesRecordTransactionInternalServerError) AsApiComponentsErrorsErrTxBroadcast() (ApiComponentsErrorsErrTxBroadcast, error) {
-	var body ApiComponentsErrorsErrTxBroadcast
+// AsErrorsErrUTXOSpent returns the union data inside the ResponsesRecordTransactionBadRequest as a ErrorsErrUTXOSpent
+func (t ResponsesRecordTransactionBadRequest) AsErrorsErrUTXOSpent() (ErrorsErrUTXOSpent, error) {
+	var body ErrorsErrUTXOSpent
 	err := json.Unmarshal(t.union, &body)
 	return body, err
 }
 
-// FromApiComponentsErrorsErrTxBroadcast overwrites any union data inside the ApiComponentsResponsesRecordTransactionInternalServerError as the provided ApiComponentsErrorsErrTxBroadcast
-func (t *ApiComponentsResponsesRecordTransactionInternalServerError) FromApiComponentsErrorsErrTxBroadcast(v ApiComponentsErrorsErrTxBroadcast) error {
+// FromErrorsErrUTXOSpent overwrites any union data inside the ResponsesRecordTransactionBadRequest as the provided ErrorsErrUTXOSpent
+func (t *ResponsesRecordTransactionBadRequest) FromErrorsErrUTXOSpent(v ErrorsErrUTXOSpent) error {
 	b, err := json.Marshal(v)
 	t.union = b
 	return err
 }
 
-// MergeApiComponentsErrorsErrTxBroadcast performs a merge with any union data inside the ApiComponentsResponsesRecordTransactionInternalServerError, using the provided ApiComponentsErrorsErrTxBroadcast
-func (t *ApiComponentsResponsesRecordTransactionInternalServerError) MergeApiComponentsErrorsErrTxBroadcast(v ApiComponentsErrorsErrTxBroadcast) error {
+// MergeErrorsErrUTXOSpent performs a merge with any union data inside the ResponsesRecordTransactionBadRequest, using the provided ErrorsErrUTXOSpent
+func (t *ResponsesRecordTransactionBadRequest) MergeErrorsErrUTXOSpent(v ErrorsErrUTXOSpent) error {
 	b, err := json.Marshal(v)
 	if err != nil {
 		return err
@@ -695,32 +800,84 @@ func (t *ApiComponentsResponsesRecordTransactionInternalServerError) MergeApiCom
 	return err
 }
 
-func (t ApiComponentsResponsesRecordTransactionInternalServerError) MarshalJSON() ([]byte, error) {
+// AsErrorsErrAnnotationIndexConversion returns the union data inside the ResponsesRecordTransactionBadRequest as a ErrorsErrAnnotationIndexConversion
+func (t ResponsesRecordTransactionBadRequest) AsErrorsErrAnnotationIndexConversion() (ErrorsErrAnnotationIndexConversion, error) {
+	var body ErrorsErrAnnotationIndexConversion
+	err := json.Unmarshal(t.union, &body)
+	return body, err
+}
+
+// FromErrorsErrAnnotationIndexConversion overwrites any union data inside the ResponsesRecordTransactionBadRequest as the provided ErrorsErrAnnotationIndexConversion
+func (t *ResponsesRecordTransactionBadRequest) FromErrorsErrAnnotationIndexConversion(v ErrorsErrAnnotationIndexConversion) error {
+	b, err := json.Marshal(v)
+	t.union = b
+	return err
+}
+
+// MergeErrorsErrAnnotationIndexConversion performs a merge with any union data inside the ResponsesRecordTransactionBadRequest, using the provided ErrorsErrAnnotationIndexConversion
+func (t *ResponsesRecordTransactionBadRequest) MergeErrorsErrAnnotationIndexConversion(v ErrorsErrAnnotationIndexConversion) error {
+	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+
+	merged, err := runtime.JSONMerge(t.union, b)
+	t.union = merged
+	return err
+}
+
+// AsErrorsErrNoOperations returns the union data inside the ResponsesRecordTransactionBadRequest as a ErrorsErrNoOperations
+func (t ResponsesRecordTransactionBadRequest) AsErrorsErrNoOperations() (ErrorsErrNoOperations, error) {
+	var body ErrorsErrNoOperations
+	err := json.Unmarshal(t.union, &body)
+	return body, err
+}
+
+// FromErrorsErrNoOperations overwrites any union data inside the ResponsesRecordTransactionBadRequest as the provided ErrorsErrNoOperations
+func (t *ResponsesRecordTransactionBadRequest) FromErrorsErrNoOperations(v ErrorsErrNoOperations) error {
+	b, err := json.Marshal(v)
+	t.union = b
+	return err
+}
+
+// MergeErrorsErrNoOperations performs a merge with any union data inside the ResponsesRecordTransactionBadRequest, using the provided ErrorsErrNoOperations
+func (t *ResponsesRecordTransactionBadRequest) MergeErrorsErrNoOperations(v ErrorsErrNoOperations) error {
+	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+
+	merged, err := runtime.JSONMerge(t.union, b)
+	t.union = merged
+	return err
+}
+
+func (t ResponsesRecordTransactionBadRequest) MarshalJSON() ([]byte, error) {
 	b, err := t.union.MarshalJSON()
 	return b, err
 }
 
-func (t *ApiComponentsResponsesRecordTransactionInternalServerError) UnmarshalJSON(b []byte) error {
+func (t *ResponsesRecordTransactionBadRequest) UnmarshalJSON(b []byte) error {
 	err := t.union.UnmarshalJSON(b)
 	return err
 }
 
-// AsApiComponentsErrorsErrUnauthorized returns the union data inside the ApiComponentsResponsesUserNotAuthorized as a ApiComponentsErrorsErrUnauthorized
-func (t ApiComponentsResponsesUserNotAuthorized) AsApiComponentsErrorsErrUnauthorized() (ApiComponentsErrorsErrUnauthorized, error) {
-	var body ApiComponentsErrorsErrUnauthorized
+// AsErrorsErrInternal returns the union data inside the ResponsesRecordTransactionInternalServerError as a ErrorsErrInternal
+func (t ResponsesRecordTransactionInternalServerError) AsErrorsErrInternal() (ErrorsErrInternal, error) {
+	var body ErrorsErrInternal
 	err := json.Unmarshal(t.union, &body)
 	return body, err
 }
 
-// FromApiComponentsErrorsErrUnauthorized overwrites any union data inside the ApiComponentsResponsesUserNotAuthorized as the provided ApiComponentsErrorsErrUnauthorized
-func (t *ApiComponentsResponsesUserNotAuthorized) FromApiComponentsErrorsErrUnauthorized(v ApiComponentsErrorsErrUnauthorized) error {
+// FromErrorsErrInternal overwrites any union data inside the ResponsesRecordTransactionInternalServerError as the provided ErrorsErrInternal
+func (t *ResponsesRecordTransactionInternalServerError) FromErrorsErrInternal(v ErrorsErrInternal) error {
 	b, err := json.Marshal(v)
 	t.union = b
 	return err
 }
 
-// MergeApiComponentsErrorsErrUnauthorized performs a merge with any union data inside the ApiComponentsResponsesUserNotAuthorized, using the provided ApiComponentsErrorsErrUnauthorized
-func (t *ApiComponentsResponsesUserNotAuthorized) MergeApiComponentsErrorsErrUnauthorized(v ApiComponentsErrorsErrUnauthorized) error {
+// MergeErrorsErrInternal performs a merge with any union data inside the ResponsesRecordTransactionInternalServerError, using the provided ErrorsErrInternal
+func (t *ResponsesRecordTransactionInternalServerError) MergeErrorsErrInternal(v ErrorsErrInternal) error {
 	b, err := json.Marshal(v)
 	if err != nil {
 		return err
@@ -731,22 +888,22 @@ func (t *ApiComponentsResponsesUserNotAuthorized) MergeApiComponentsErrorsErrUna
 	return err
 }
 
-// AsApiComponentsErrorsErrXPubAuthRequired returns the union data inside the ApiComponentsResponsesUserNotAuthorized as a ApiComponentsErrorsErrXPubAuthRequired
-func (t ApiComponentsResponsesUserNotAuthorized) AsApiComponentsErrorsErrXPubAuthRequired() (ApiComponentsErrorsErrXPubAuthRequired, error) {
-	var body ApiComponentsErrorsErrXPubAuthRequired
+// AsErrorsErrGettingOutputs returns the union data inside the ResponsesRecordTransactionInternalServerError as a ErrorsErrGettingOutputs
+func (t ResponsesRecordTransactionInternalServerError) AsErrorsErrGettingOutputs() (ErrorsErrGettingOutputs, error) {
+	var body ErrorsErrGettingOutputs
 	err := json.Unmarshal(t.union, &body)
 	return body, err
 }
 
-// FromApiComponentsErrorsErrXPubAuthRequired overwrites any union data inside the ApiComponentsResponsesUserNotAuthorized as the provided ApiComponentsErrorsErrXPubAuthRequired
-func (t *ApiComponentsResponsesUserNotAuthorized) FromApiComponentsErrorsErrXPubAuthRequired(v ApiComponentsErrorsErrXPubAuthRequired) error {
+// FromErrorsErrGettingOutputs overwrites any union data inside the ResponsesRecordTransactionInternalServerError as the provided ErrorsErrGettingOutputs
+func (t *ResponsesRecordTransactionInternalServerError) FromErrorsErrGettingOutputs(v ErrorsErrGettingOutputs) error {
 	b, err := json.Marshal(v)
 	t.union = b
 	return err
 }
 
-// MergeApiComponentsErrorsErrXPubAuthRequired performs a merge with any union data inside the ApiComponentsResponsesUserNotAuthorized, using the provided ApiComponentsErrorsErrXPubAuthRequired
-func (t *ApiComponentsResponsesUserNotAuthorized) MergeApiComponentsErrorsErrXPubAuthRequired(v ApiComponentsErrorsErrXPubAuthRequired) error {
+// MergeErrorsErrGettingOutputs performs a merge with any union data inside the ResponsesRecordTransactionInternalServerError, using the provided ErrorsErrGettingOutputs
+func (t *ResponsesRecordTransactionInternalServerError) MergeErrorsErrGettingOutputs(v ErrorsErrGettingOutputs) error {
 	b, err := json.Marshal(v)
 	if err != nil {
 		return err
@@ -757,12 +914,100 @@ func (t *ApiComponentsResponsesUserNotAuthorized) MergeApiComponentsErrorsErrXPu
 	return err
 }
 
-func (t ApiComponentsResponsesUserNotAuthorized) MarshalJSON() ([]byte, error) {
+// AsErrorsErrTxBroadcast returns the union data inside the ResponsesRecordTransactionInternalServerError as a ErrorsErrTxBroadcast
+func (t ResponsesRecordTransactionInternalServerError) AsErrorsErrTxBroadcast() (ErrorsErrTxBroadcast, error) {
+	var body ErrorsErrTxBroadcast
+	err := json.Unmarshal(t.union, &body)
+	return body, err
+}
+
+// FromErrorsErrTxBroadcast overwrites any union data inside the ResponsesRecordTransactionInternalServerError as the provided ErrorsErrTxBroadcast
+func (t *ResponsesRecordTransactionInternalServerError) FromErrorsErrTxBroadcast(v ErrorsErrTxBroadcast) error {
+	b, err := json.Marshal(v)
+	t.union = b
+	return err
+}
+
+// MergeErrorsErrTxBroadcast performs a merge with any union data inside the ResponsesRecordTransactionInternalServerError, using the provided ErrorsErrTxBroadcast
+func (t *ResponsesRecordTransactionInternalServerError) MergeErrorsErrTxBroadcast(v ErrorsErrTxBroadcast) error {
+	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+
+	merged, err := runtime.JSONMerge(t.union, b)
+	t.union = merged
+	return err
+}
+
+func (t ResponsesRecordTransactionInternalServerError) MarshalJSON() ([]byte, error) {
 	b, err := t.union.MarshalJSON()
 	return b, err
 }
 
-func (t *ApiComponentsResponsesUserNotAuthorized) UnmarshalJSON(b []byte) error {
+func (t *ResponsesRecordTransactionInternalServerError) UnmarshalJSON(b []byte) error {
+	err := t.union.UnmarshalJSON(b)
+	return err
+}
+
+// AsErrorsUnauthorized returns the union data inside the ResponsesUserNotAuthorized as a ErrorsUnauthorized
+func (t ResponsesUserNotAuthorized) AsErrorsUnauthorized() (ErrorsUnauthorized, error) {
+	var body ErrorsUnauthorized
+	err := json.Unmarshal(t.union, &body)
+	return body, err
+}
+
+// FromErrorsUnauthorized overwrites any union data inside the ResponsesUserNotAuthorized as the provided ErrorsUnauthorized
+func (t *ResponsesUserNotAuthorized) FromErrorsUnauthorized(v ErrorsUnauthorized) error {
+	b, err := json.Marshal(v)
+	t.union = b
+	return err
+}
+
+// MergeErrorsUnauthorized performs a merge with any union data inside the ResponsesUserNotAuthorized, using the provided ErrorsUnauthorized
+func (t *ResponsesUserNotAuthorized) MergeErrorsUnauthorized(v ErrorsUnauthorized) error {
+	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+
+	merged, err := runtime.JSONMerge(t.union, b)
+	t.union = merged
+	return err
+}
+
+// AsErrorsErrXPubAuthRequired returns the union data inside the ResponsesUserNotAuthorized as a ErrorsErrXPubAuthRequired
+func (t ResponsesUserNotAuthorized) AsErrorsErrXPubAuthRequired() (ErrorsErrXPubAuthRequired, error) {
+	var body ErrorsErrXPubAuthRequired
+	err := json.Unmarshal(t.union, &body)
+	return body, err
+}
+
+// FromErrorsErrXPubAuthRequired overwrites any union data inside the ResponsesUserNotAuthorized as the provided ErrorsErrXPubAuthRequired
+func (t *ResponsesUserNotAuthorized) FromErrorsErrXPubAuthRequired(v ErrorsErrXPubAuthRequired) error {
+	b, err := json.Marshal(v)
+	t.union = b
+	return err
+}
+
+// MergeErrorsErrXPubAuthRequired performs a merge with any union data inside the ResponsesUserNotAuthorized, using the provided ErrorsErrXPubAuthRequired
+func (t *ResponsesUserNotAuthorized) MergeErrorsErrXPubAuthRequired(v ErrorsErrXPubAuthRequired) error {
+	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+
+	merged, err := runtime.JSONMerge(t.union, b)
+	t.union = merged
+	return err
+}
+
+func (t ResponsesUserNotAuthorized) MarshalJSON() ([]byte, error) {
+	b, err := t.union.MarshalJSON()
+	return b, err
+}
+
+func (t *ResponsesUserNotAuthorized) UnmarshalJSON(b []byte) error {
 	err := t.union.UnmarshalJSON(b)
 	return err
 }

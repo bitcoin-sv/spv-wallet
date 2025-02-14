@@ -11,7 +11,7 @@ import (
 
 // PostApiV2Transactions records transaction outline
 func (s *APITransactions) PostApiV2Transactions(c *gin.Context) {
-	var requestBody api.ApiComponentsRequestsAnnotatedTransaction
+	var requestBody api.RequestsAnnotatedTransaction
 	err := c.ShouldBindWith(&requestBody, binding.JSON)
 	if err != nil {
 		spverrors.ErrorResponse(c, spverrors.ErrCannotBindRequest.Wrap(err), s.logger)

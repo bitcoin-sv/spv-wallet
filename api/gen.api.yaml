@@ -9,17 +9,112 @@ paths:
     /api/v2/admin/status:
         get:
             description: This endpoint returns admin status. It is used to check if authorization header contain admin xpub.
+            operationId: adminStatus
             responses:
                 "200":
                     description: Success
                 "401":
-                    $ref: '#/components/responses/api_components_responses_NotAuthorized'
+                    $ref: '#/components/responses/responses_NotAuthorized'
             security:
                 - XPubAuth:
                     - admin
             summary: Get admin status
             tags:
                 - Admin endpoints
+    /api/v2/admin/users:
+        post:
+            description: This endpoint creates a new user.
+            operationId: createUser
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/requests_CreateUser'
+                required: true
+            responses:
+                "201":
+                    $ref: '#/components/responses/responses_AdminCreateUserSuccess'
+                "400":
+                    $ref: '#/components/responses/responses_AdminUserBadRequest'
+                "401":
+                    $ref: '#/components/responses/responses_NotAuthorized'
+                "500":
+                    $ref: '#/components/responses/responses_AdminCreateUserInternalServerError'
+            security:
+                - XPubAuth:
+                    - admin
+            summary: Create user
+            tags:
+                - Admin endpoints
+    /api/v2/admin/users/{id}:
+        get:
+            description: This endpoint gets user by id.
+            operationId: userById
+            parameters:
+                - description: User ID
+                  in: path
+                  name: id
+                  required: true
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    $ref: '#/components/responses/responses_AdminGetUser'
+                "500":
+                    $ref: '#/components/responses/responses_AdminGetUserInternalServerError'
+            security:
+                - XPubAuth:
+                    - admin
+            summary: Get user by id
+            tags:
+                - Admin endpoints
+    /api/v2/admin/users/{id}/paymails:
+        post:
+            description: This endpoint add paymails to user with given id.
+            operationId: addPaymailToUser
+            parameters:
+                - description: User ID
+                  in: path
+                  name: id
+                  required: true
+                  schema:
+                    type: string
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/requests_AddPaymail'
+                required: true
+            responses:
+                "201":
+                    $ref: '#/components/responses/responses_AdminAddPaymailSuccess'
+                "400":
+                    $ref: '#/components/responses/responses_AdminUserBadRequest'
+                "401":
+                    $ref: '#/components/responses/responses_NotAuthorized'
+            security:
+                - XPubAuth:
+                    - admin
+            summary: Add paymails to user
+            tags:
+                - Admin endpoints
+    /api/v2/configs/shared:
+        get:
+            description: This endpoint returns shared config. It can be obtained by both admin and user.
+            operationId: sharedConfig
+            responses:
+                "200":
+                    $ref: '#/components/responses/responses_SharedConfig'
+                "401":
+                    $ref: '#/components/responses/responses_NotAuthorized'
+            security:
+                - XPubAuth:
+                    - admin
+                    - user
+            summary: Get shared config
+            tags:
+                - Admin endpoints
+                - Configurations
     /api/v2/data/{id}:
         get:
             description: This endpoint gets data by its id for authenticated user
@@ -32,38 +127,40 @@ paths:
                     type: string
             responses:
                 "200":
-                    $ref: '#/components/responses/api_components_responses_GetDataSuccess'
+                    $ref: '#/components/responses/responses_GetDataSuccess'
                 "400":
-                    $ref: '#/components/responses/api_components_responses_UserBadRequest'
+                    $ref: '#/components/responses/responses_UserBadRequest'
                 "401":
-                    $ref: '#/components/responses/api_components_responses_UserNotAuthorized'
+                    $ref: '#/components/responses/responses_UserNotAuthorized'
                 "404":
-                    $ref: '#/components/responses/api_components_responses_GetDataNotFound'
+                    $ref: '#/components/responses/responses_GetDataNotFound'
                 "500":
-                    $ref: '#/components/responses/api_components_responses_InternalServerError'
+                    $ref: '#/components/responses/responses_InternalServerError'
             security:
                 - XPubAuth:
                     - user
             summary: Get data for user
             tags:
                 - User endpoints
+        operationId: dataById
     /api/v2/operations/search:
         get:
             description: This endpoint allows to search operations for authenticated user
+            operationId: searchOperations
             parameters:
-                - $ref: '#/components/parameters/api_components_requests_PageNumber'
-                - $ref: '#/components/parameters/api_components_requests_PageSize'
-                - $ref: '#/components/parameters/api_components_requests_Sort'
-                - $ref: '#/components/parameters/api_components_requests_SortBy'
+                - $ref: '#/components/parameters/requests_PageNumber'
+                - $ref: '#/components/parameters/requests_PageSize'
+                - $ref: '#/components/parameters/requests_Sort'
+                - $ref: '#/components/parameters/requests_SortBy'
             responses:
                 "200":
-                    $ref: '#/components/responses/api_components_responses_SearchOperationsSuccess'
+                    $ref: '#/components/responses/responses_SearchOperationsSuccess'
                 "400":
-                    $ref: '#/components/responses/api_components_responses_SearchBadRequest'
+                    $ref: '#/components/responses/responses_SearchBadRequest'
                 "401":
-                    $ref: '#/components/responses/api_components_responses_UserNotAuthorized'
+                    $ref: '#/components/responses/responses_UserNotAuthorized'
                 "500":
-                    $ref: '#/components/responses/api_components_responses_InternalServerError'
+                    $ref: '#/components/responses/responses_InternalServerError'
             security:
                 - XPubAuth:
                     - user
@@ -73,21 +170,22 @@ paths:
     /api/v2/transactions:
         post:
             description: This endpoint allows to record transaction outline for authenticated user
+            operationId: recordTransactionOutline
             requestBody:
                 content:
                     application/json:
                         schema:
-                            $ref: '#/components/schemas/api_components_requests_AnnotatedTransaction'
+                            $ref: '#/components/schemas/requests_AnnotatedTransaction'
                 required: true
             responses:
                 "200":
-                    $ref: '#/components/responses/api_components_responses_RecordTransactionSuccess'
+                    $ref: '#/components/responses/responses_RecordTransactionSuccess'
                 "400":
-                    $ref: '#/components/responses/api_components_responses_RecordTransactionBadRequest'
+                    $ref: '#/components/responses/responses_RecordTransactionBadRequest'
                 "401":
-                    $ref: '#/components/responses/api_components_responses_UserNotAuthorized'
+                    $ref: '#/components/responses/responses_UserNotAuthorized'
                 "500":
-                    $ref: '#/components/responses/api_components_responses_RecordTransactionInternalServerError'
+                    $ref: '#/components/responses/responses_RecordTransactionInternalServerError'
             security:
                 - XPubAuth:
                     - user
@@ -97,21 +195,22 @@ paths:
     /api/v2/transactions/outlines:
         post:
             description: This endpoint allows to create transaction outline for authenticated user
+            operationId: createTransactionOutline
             requestBody:
                 content:
                     application/json:
                         schema:
-                            $ref: '#/components/schemas/api_components_requests_AnnotatedTransaction'
+                            $ref: '#/components/schemas/requests_AnnotatedTransaction'
                 required: true
             responses:
                 "200":
-                    $ref: '#/components/responses/api_components_responses_RecordTransactionSuccess'
+                    $ref: '#/components/responses/responses_RecordTransactionSuccess'
                 "400":
-                    $ref: '#/components/responses/api_components_responses_RecordTransactionBadRequest'
+                    $ref: '#/components/responses/responses_RecordTransactionBadRequest'
                 "401":
-                    $ref: '#/components/responses/api_components_responses_UserNotAuthorized'
+                    $ref: '#/components/responses/responses_UserNotAuthorized'
                 "500":
-                    $ref: '#/components/responses/api_components_responses_RecordTransactionInternalServerError'
+                    $ref: '#/components/responses/responses_RecordTransactionInternalServerError'
             security:
                 - XPubAuth:
                     - user
@@ -121,13 +220,14 @@ paths:
     /api/v2/users/current:
         get:
             description: This endpoint return balance of current authenticated user
+            operationId: currentUser
             responses:
                 "200":
-                    $ref: '#/components/responses/api_components_responses_GetCurrentUserSuccess'
+                    $ref: '#/components/responses/responses_GetCurrentUserSuccess'
                 "401":
-                    $ref: '#/components/responses/api_components_responses_UserNotAuthorized'
+                    $ref: '#/components/responses/responses_UserNotAuthorized'
                 "500":
-                    $ref: '#/components/responses/api_components_responses_InternalServerError'
+                    $ref: '#/components/responses/responses_InternalServerError'
             security:
                 - XPubAuth:
                     - user
@@ -136,28 +236,28 @@ paths:
                 - User endpoints
 components:
     parameters:
-        api_components_requests_PageNumber:
+        requests_PageNumber:
             description: Page number for pagination
             example: 1
             in: query
             name: page
             schema:
                 type: integer
-        api_components_requests_PageSize:
+        requests_PageSize:
             description: Number of items per page
             example: 10
             in: query
             name: size
             schema:
                 type: integer
-        api_components_requests_Sort:
+        requests_Sort:
             description: Sorting order (asc or desc)
             example: asc
             in: query
             name: sort
             schema:
                 type: string
-        api_components_requests_SortBy:
+        requests_SortBy:
             description: Field to sort by
             example: name
             in: query
@@ -165,223 +265,288 @@ components:
             schema:
                 type: string
     responses:
-        api_components_responses_GetCurrentUserSuccess:
+        responses_AdminAddPaymailSuccess:
             content:
                 application/json:
                     schema:
-                        $ref: '#/components/schemas/api_components_models_UserInfo'
+                        $ref: '#/components/schemas/models_Paymail'
+            description: Paymail added to user
+        responses_AdminCreateUserInternalServerError:
+            content:
+                application/json:
+                    schema:
+                        $ref: '#/components/schemas/errors_CreatingUser'
+            description: Internal error while creating user
+        responses_AdminCreateUserSuccess:
+            content:
+                application/json:
+                    schema:
+                        $ref: '#/components/schemas/models_User'
+            description: User created
+        responses_AdminGetUser:
+            content:
+                application/json:
+                    schema:
+                        $ref: '#/components/schemas/models_User'
+            description: User found
+        responses_AdminGetUserInternalServerError:
+            content:
+                application/json:
+                    schema:
+                        $ref: '#/components/schemas/errors_GettingUser'
+            description: Internal error while getting user
+        responses_AdminUserBadRequest:
+            content:
+                application/json:
+                    schema:
+                        oneOf:
+                            - $ref: '#/components/schemas/errors_CannotBindRequest'
+                            - $ref: '#/components/schemas/errors_InvalidPubKey'
+                            - $ref: '#/components/schemas/errors_InvalidPaymail'
+                            - $ref: '#/components/schemas/errors_PaymailInconsistent'
+                            - $ref: '#/components/schemas/errors_InvalidDomain'
+            description: Bad request is an error that occurs when the request is malformed.
+        responses_GetCurrentUserSuccess:
+            content:
+                application/json:
+                    schema:
+                        $ref: '#/components/schemas/models_UserInfo'
             description: Balance of current authenticated user
-        api_components_responses_GetDataNotFound:
+        responses_GetDataNotFound:
             content:
                 application/json:
                     schema:
                         oneOf:
-                            - $ref: '#/components/schemas/api_components_errors_ErrDataNotFound'
+                            - $ref: '#/components/schemas/errors_DataNotFound'
             description: Not found is an error that occurs when the requested resource is not found.
-        api_components_responses_GetDataSuccess:
+        responses_GetDataSuccess:
             content:
                 application/json:
                     schema:
-                        $ref: '#/components/schemas/api_components_models_Data'
+                        $ref: '#/components/schemas/models_Data'
             description: Data found
-        api_components_responses_InternalServerError:
+        responses_InternalServerError:
             content:
                 application/json:
                     schema:
-                        $ref: '#/components/schemas/api_components_errors_ErrInternal'
+                        $ref: '#/components/schemas/errors_Internal'
             description: Internal server error
-        api_components_responses_NotAuthorized:
+        responses_NotAuthorized:
             content:
                 application/json:
                     schema:
-                        $ref: '#/components/schemas/api_components_errors_ErrUnauthorized'
+                        $ref: '#/components/schemas/errors_Authorization'
             description: Security requirements failed
-        api_components_responses_RecordTransactionBadRequest:
+        responses_RecordTransactionBadRequest:
             content:
                 application/json:
                     schema:
                         oneOf:
-                            - $ref: '#/components/schemas/api_components_errors_ErrInvalidDataID'
-                            - $ref: '#/components/schemas/api_components_errors_ErrAnnotationIndexOutOfRange'
-                            - $ref: '#/components/schemas/api_components_errors_ErrUTXOSpent'
-                            - $ref: '#/components/schemas/api_components_errors_ErrAnnotationIndexConversion'
-                            - $ref: '#/components/schemas/api_components_errors_ErrNoOperations'
+                            - $ref: '#/components/schemas/errors_InvalidDataID'
+                            - $ref: '#/components/schemas/errors_AnnotationIndexOutOfRange'
+                            - $ref: '#/components/schemas/errors_UTXOSpent'
+                            - $ref: '#/components/schemas/errors_AnnotationIndexConversion'
+                            - $ref: '#/components/schemas/errors_NoOperations'
             description: Bad request is an error that occurs when the request is malformed.
-        api_components_responses_RecordTransactionInternalServerError:
+        responses_RecordTransactionInternalServerError:
             content:
                 application/json:
                     schema:
                         oneOf:
-                            - $ref: '#/components/schemas/api_components_errors_ErrInternal'
-                            - $ref: '#/components/schemas/api_components_errors_ErrGettingOutputs'
-                            - $ref: '#/components/schemas/api_components_errors_ErrTxBroadcast'
+                            - $ref: '#/components/schemas/errors_Internal'
+                            - $ref: '#/components/schemas/errors_GettingOutputs'
+                            - $ref: '#/components/schemas/errors_TxBroadcast'
             description: Internal server error
-        api_components_responses_RecordTransactionSuccess:
+        responses_RecordTransactionSuccess:
             content:
                 application/json:
                     schema:
-                        $ref: '#/components/schemas/api_components_models_RecordedOutline'
+                        $ref: '#/components/schemas/models_RecordedOutline'
             description: Transaction recorded
-        api_components_responses_SearchBadRequest:
+        responses_SearchBadRequest:
             content:
                 application/json:
                     schema:
-                        $ref: '#/components/schemas/api_components_errors_ErrInvalidDataID'
+                        $ref: '#/components/schemas/errors_InvalidDataID'
             description: Error when search request is malformed and params can not be parsed
-        api_components_responses_SearchOperationsSuccess:
+        responses_SearchOperationsSuccess:
             content:
                 application/json:
                     schema:
-                        $ref: '#/components/schemas/api_components_models_OperationsSearchResult'
+                        $ref: '#/components/schemas/models_OperationsSearchResult'
             description: Operations found
-        api_components_responses_UserBadRequest:
+        responses_SharedConfig:
             content:
                 application/json:
                     schema:
-                        $ref: '#/components/schemas/api_components_errors_ErrInvalidDataID'
+                        $ref: '#/components/schemas/models_SharedConfig'
+            description: Shared config
+        responses_UserBadRequest:
+            content:
+                application/json:
+                    schema:
+                        $ref: '#/components/schemas/errors_InvalidDataID'
             description: Bad request is an error that occurs when the request is malformed.
-        api_components_responses_UserNotAuthorized:
+        responses_UserNotAuthorized:
             content:
                 application/json:
                     schema:
                         oneOf:
-                            - $ref: '#/components/schemas/api_components_errors_ErrUnauthorized'
-                            - $ref: '#/components/schemas/api_components_errors_ErrXPubAuthRequired'
+                            - $ref: '#/components/schemas/errors_Authorization'
+                            - $ref: '#/components/schemas/errors_AuthXPubRequired'
             description: Security requirements failed
     schemas:
-        api_components_errors_ErrAdminAuthOnNonAdminEndpoint:
+        errors_AdminAuthOnNonAdminEndpoint:
             allOf:
-                - $ref: '#/components/schemas/api_components_errors_ErrorSchema'
+                - $ref: '#/components/schemas/errors_Schema'
                 - properties:
                     code:
                         example: error-admin-auth-on-non-admin-endpoint
                     message:
                         example: cannot call non-admin endpoints with admin authorization
                   type: object
-        api_components_errors_ErrAnnotationIndexConversion:
+        errors_AnnotationIndexConversion:
             allOf:
-                - $ref: '#/components/schemas/api_components_errors_ErrorSchema'
+                - $ref: '#/components/schemas/errors_Schema'
                 - properties:
                     code:
                         example: error-annotation-index-conversion
                     message:
                         example: failed to convert annotation index
                   type: object
-        api_components_errors_ErrAnnotationIndexOutOfRange:
+        errors_AnnotationIndexOutOfRange:
             allOf:
-                - $ref: '#/components/schemas/api_components_errors_ErrorSchema'
+                - $ref: '#/components/schemas/errors_Schema'
                 - properties:
                     code:
                         example: error-annotation-index-out-of-range
                     message:
                         example: annotation index out of range
                   type: object
-        api_components_errors_ErrAuthorization:
+        errors_AuthXPubRequired:
             allOf:
-                - $ref: '#/components/schemas/api_components_errors_ErrorSchema'
-                - properties:
-                    code:
-                        example: error-unauthorized
-                    message:
-                        example: unauthorized
-                  type: object
-        api_components_errors_ErrDataNotFound:
-            allOf:
-                - $ref: '#/components/schemas/api_components_errors_ErrorSchema'
-                - properties:
-                    code:
-                        example: error-data-not-found
-                    message:
-                        example: data not found
-                  type: object
-        api_components_errors_ErrGettingOutputs:
-            allOf:
-                - $ref: '#/components/schemas/api_components_errors_ErrorSchema'
-                - properties:
-                    code:
-                        example: error-getting-outputs
-                    message:
-                        example: failed to get outputs
-                  type: object
-        api_components_errors_ErrInternal:
-            allOf:
-                - $ref: '#/components/schemas/api_components_errors_ErrorSchema'
-                - properties:
-                    code:
-                        example: error-internal-server-error
-                    message:
-                        example: internal server error
-                  type: object
-        api_components_errors_ErrInvalidDataID:
-            allOf:
-                - $ref: '#/components/schemas/api_components_errors_ErrorSchema'
-                - properties:
-                    code:
-                        example: error-invalid-data-id
-                    message:
-                        example: invalid data id
-                  type: object
-        api_components_errors_ErrNoOperations:
-            allOf:
-                - $ref: '#/components/schemas/api_components_errors_ErrorSchema'
-                - properties:
-                    code:
-                        example: error-no-operations
-                    message:
-                        example: no operations to save
-                  type: object
-        api_components_errors_ErrTxBroadcast:
-            allOf:
-                - $ref: '#/components/schemas/api_components_errors_ErrorSchema'
-                - properties:
-                    code:
-                        example: error-tx-broadcast
-                    message:
-                        example: failed to broadcast transaction
-                  type: object
-        api_components_errors_ErrUTXOSpent:
-            allOf:
-                - $ref: '#/components/schemas/api_components_errors_ErrorSchema'
-                - properties:
-                    code:
-                        example: error-utxo-spent
-                    message:
-                        example: UTXO is already spent
-                  type: object
-        api_components_errors_ErrUnauthorized:
-            oneOf:
-                - $ref: '#/components/schemas/api_components_errors_ErrAuthorization'
-                - $ref: '#/components/schemas/api_components_errors_ErrWrongAuthScopeFormat'
-                - $ref: '#/components/schemas/api_components_errors_ErrAdminAuthOnNonAdminEndpoint'
-                - $ref: '#/components/schemas/api_components_errors_ErrUserAuthOnNonUserEndpoint'
-        api_components_errors_ErrUserAuthOnNonUserEndpoint:
-            allOf:
-                - $ref: '#/components/schemas/api_components_errors_ErrorSchema'
-                - properties:
-                    code:
-                        example: error-user-auth-on-non-user-endpoint
-                    message:
-                        example: cannot call non-user endpoints with user authorization
-                  type: object
-        api_components_errors_ErrWrongAuthScopeFormat:
-            allOf:
-                - $ref: '#/components/schemas/api_components_errors_ErrorSchema'
-                - properties:
-                    code:
-                        example: error-wrong-auth-scope-format
-                    message:
-                        example: wrong auth scope format
-                  type: object
-        api_components_errors_ErrXPubAuthRequired:
-            allOf:
-                - $ref: '#/components/schemas/api_components_errors_ErrorSchema'
+                - $ref: '#/components/schemas/errors_Schema'
                 - properties:
                     code:
                         example: error-xpub-authorization-required
                     message:
                         example: xpub authorization required
                   type: object
-        api_components_errors_ErrorSchema:
+        errors_Authorization:
+            oneOf:
+                - $ref: '#/components/schemas/errors_Unauthorized'
+                - $ref: '#/components/schemas/errors_AdminAuthOnNonAdminEndpoint'
+                - $ref: '#/components/schemas/errors_UserAuthOnNonUserEndpoint'
+                - $ref: '#/components/schemas/errors_AuthXPubRequired'
+        errors_CannotBindRequest:
+            allOf:
+                - $ref: '#/components/schemas/errors_Schema'
+                - properties:
+                    code:
+                        example: error-bind-body-invalid
+                    message:
+                        example: cannot bind request body
+                  type: object
+        errors_CreatingUser:
+            allOf:
+                - $ref: '#/components/schemas/errors_Schema'
+                - properties:
+                    code:
+                        example: error-user-creating
+                    message:
+                        example: error creating user
+                  type: object
+        errors_DataNotFound:
+            allOf:
+                - $ref: '#/components/schemas/errors_Schema'
+                - properties:
+                    code:
+                        example: error-data-not-found
+                    message:
+                        example: data not found
+                  type: object
+        errors_GettingOutputs:
+            allOf:
+                - $ref: '#/components/schemas/errors_Schema'
+                - properties:
+                    code:
+                        example: error-getting-outputs
+                    message:
+                        example: failed to get outputs
+                  type: object
+        errors_GettingUser:
+            allOf:
+                - $ref: '#/components/schemas/errors_Schema'
+                - properties:
+                    code:
+                        example: error-unknown
+                    message:
+                        example: Internal server error
+                  type: object
+        errors_Internal:
+            allOf:
+                - $ref: '#/components/schemas/errors_Schema'
+                - properties:
+                    code:
+                        example: error-internal-server-error
+                    message:
+                        example: internal server error
+                  type: object
+        errors_InvalidDataID:
+            allOf:
+                - $ref: '#/components/schemas/errors_Schema'
+                - properties:
+                    code:
+                        example: error-invalid-data-id
+                    message:
+                        example: invalid data id
+                  type: object
+        errors_InvalidDomain:
+            allOf:
+                - $ref: '#/components/schemas/errors_Schema'
+                - properties:
+                    code:
+                        example: error-invalid-domain
+                    message:
+                        example: invalid domain
+                  type: object
+        errors_InvalidPaymail:
+            allOf:
+                - $ref: '#/components/schemas/errors_Schema'
+                - properties:
+                    code:
+                        example: error-user-invalid-paymail
+                    message:
+                        example: invalid paymail
+                  type: object
+        errors_InvalidPubKey:
+            allOf:
+                - $ref: '#/components/schemas/errors_Schema'
+                - properties:
+                    code:
+                        example: error-user-invalid-pubkey
+                    message:
+                        example: invalid public key
+                  type: object
+        errors_NoOperations:
+            allOf:
+                - $ref: '#/components/schemas/errors_Schema'
+                - properties:
+                    code:
+                        example: error-no-operations
+                    message:
+                        example: no operations to save
+                  type: object
+        errors_PaymailInconsistent:
+            allOf:
+                - $ref: '#/components/schemas/errors_Schema'
+                - properties:
+                    code:
+                        example: error-user-inconsistent-paymail
+                    message:
+                        example: inconsistent paymail address and alias/domain
+                  type: object
+        errors_Schema:
             additionalProperties: false
             properties:
                 code:
@@ -394,20 +559,56 @@ components:
                 - code
                 - message
             type: object
-        api_components_models_Annotations:
+        errors_TxBroadcast:
+            allOf:
+                - $ref: '#/components/schemas/errors_Schema'
+                - properties:
+                    code:
+                        example: error-tx-broadcast
+                    message:
+                        example: failed to broadcast transaction
+                  type: object
+        errors_UTXOSpent:
+            allOf:
+                - $ref: '#/components/schemas/errors_Schema'
+                - properties:
+                    code:
+                        example: error-utxo-spent
+                    message:
+                        example: UTXO is already spent
+                  type: object
+        errors_Unauthorized:
+            allOf:
+                - $ref: '#/components/schemas/errors_Schema'
+                - properties:
+                    code:
+                        example: error-unauthorized
+                    message:
+                        example: unauthorized
+                  type: object
+        errors_UserAuthOnNonUserEndpoint:
+            allOf:
+                - $ref: '#/components/schemas/errors_Schema'
+                - properties:
+                    code:
+                        example: error-user-auth-on-non-user-endpoint
+                    message:
+                        example: cannot call non-user endpoints with user authorization
+                  type: object
+        models_Annotations:
             properties:
                 inputs:
                     additionalProperties:
-                        $ref: '#/components/schemas/api_components_models_InputAnnotation'
+                        $ref: '#/components/schemas/models_InputAnnotation'
                     description: Map of input annotations
                     type: object
                 outputs:
                     additionalProperties:
-                        $ref: '#/components/schemas/api_components_models_OutputAnnotation'
+                        $ref: '#/components/schemas/models_OutputAnnotation'
                     description: Map of output annotations
                     type: object
             type: object
-        api_components_models_Data:
+        models_Data:
             properties:
                 blob:
                     description: Data blob
@@ -419,7 +620,7 @@ components:
                 - id
                 - blob
             type: object
-        api_components_models_InputAnnotation:
+        models_InputAnnotation:
             properties:
                 customInstructions:
                     description: Instructions about how to unlock this input.
@@ -428,7 +629,7 @@ components:
             required:
                 - customInstructions
             type: object
-        api_components_models_Operation:
+        models_Operation:
             properties:
                 counterparty:
                     description: Counterparty of operation
@@ -466,27 +667,56 @@ components:
                     format: int64
                     type: integer
             type: object
-        api_components_models_OperationsSearchResult:
+        models_OperationsSearchResult:
             properties:
                 operations:
                     items:
-                        $ref: '#/components/schemas/api_components_models_Operation'
+                        $ref: '#/components/schemas/models_Operation'
                     type: array
                 page:
-                    $ref: '#/components/schemas/api_components_models_SearchPage'
+                    $ref: '#/components/schemas/models_SearchPage'
             type: object
-        api_components_models_OutputAnnotation:
+        models_OutputAnnotation:
             properties:
                 bucket:
                     description: Type of bucket where this output should be stored.
                     example: some-bucket
                     type: string
                 paymail:
-                    $ref: '#/components/schemas/api_components_models_PaymailAnnotation'
+                    $ref: '#/components/schemas/models_PaymailAnnotation'
             required:
                 - bucket
             type: object
-        api_components_models_PaymailAnnotation:
+        models_Paymail:
+            properties:
+                alias:
+                    example: test
+                    type: string
+                avatar:
+                    example: https://spv-wallet.com/avatar.png
+                    type: string
+                domain:
+                    example: spv-wallet.com
+                    type: string
+                id:
+                    example: 1234
+                    type: integer
+                    x-go-type: uint
+                paymail:
+                    example: test@spv-wallet.com
+                    type: string
+                publicName:
+                    example: Test
+                    type: string
+            required:
+                - id
+                - alias
+                - domain
+                - paymail
+                - publicName
+                - avatar
+            type: object
+        models_PaymailAnnotation:
             properties:
                 receiver:
                     description: Paymail address of the receiver
@@ -504,7 +734,7 @@ components:
                 - reference
                 - sender
             type: object
-        api_components_models_RecordedOutline:
+        models_RecordedOutline:
             properties:
                 txID:
                     description: ID of the transaction
@@ -512,7 +742,7 @@ components:
             required:
                 - txID
             type: object
-        api_components_models_SearchPage:
+        models_SearchPage:
             properties:
                 number:
                     description: Page number for pagination
@@ -534,7 +764,53 @@ components:
                     example: name
                     type: string
             type: object
-        api_components_models_UserInfo:
+        models_SharedConfig:
+            description: Shared config
+            properties:
+                experimentalFeatures:
+                    additionalProperties:
+                        type: boolean
+                    example:
+                        pikeEnabled: true
+                    type: object
+                paymailDomains:
+                    example:
+                        - example.com
+                    items:
+                        type: string
+                    type: array
+            required:
+                - paymailDomains
+                - experimentalFeatures
+            type: object
+        models_User:
+            properties:
+                createdAt:
+                    example: "2021-01-01T00:00:00Z"
+                    format: date-time
+                    type: string
+                id:
+                    example: "1"
+                    type: string
+                paymails:
+                    items:
+                        $ref: '#/components/schemas/models_Paymail'
+                    type: array
+                publicKey:
+                    example: 76a914e069bd2e2fe3ea702c40d5e65b491b734c01686788ac
+                    type: string
+                updatedAt:
+                    example: "2021-01-01T00:00:00Z"
+                    format: date-time
+                    type: string
+            required:
+                - id
+                - publicKey
+                - paymails
+                - createdAt
+                - updatedAt
+            type: object
+        models_UserInfo:
             properties:
                 currentBalance:
                     description: Current balance of user
@@ -544,10 +820,34 @@ components:
                 - id
                 - name
             type: object
-        api_components_requests_AnnotatedTransaction:
+        requests_AddPaymail:
+            properties:
+                address:
+                    example: test@spv-wallet.com
+                    type: string
+                alias:
+                    example: test
+                    type: string
+                avatarURL:
+                    example: https://spv-wallet.com/avatar.png
+                    type: string
+                domain:
+                    example: spv-wallet.com
+                    type: string
+                publicName:
+                    example: Test
+                    type: string
+            required:
+                - address
+                - alias
+                - domain
+                - publicName
+                - avatarURL
+            type: object
+        requests_AnnotatedTransaction:
             properties:
                 annotations:
-                    $ref: '#/components/schemas/api_components_models_Annotations'
+                    $ref: '#/components/schemas/models_Annotations'
                 format:
                     description: Transaction format
                     example: BEEF
@@ -558,6 +858,16 @@ components:
             required:
                 - hex
                 - format
+            type: object
+        requests_CreateUser:
+            properties:
+                paymail:
+                    $ref: '#/components/schemas/requests_AddPaymail'
+                publicKey:
+                    example: 76a914e069bd2e2fe3ea702c40d5e65b491b734c01686788ac
+                    type: string
+            required:
+                - publicKey
             type: object
     securitySchemes:
         XPubAuth:

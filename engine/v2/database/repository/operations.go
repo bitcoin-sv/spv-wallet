@@ -120,7 +120,7 @@ func mapTransaction(transaction *txmodels.NewOperation) *database.TrackedTransac
 				&database.TrackedOutput{
 					TxID:     transaction.Transaction.ID,
 					Vout:     output.Vout,
-					UserID:   transaction.UserID,
+					UserID:   output.UserID,
 					Satoshis: output.Satoshis,
 				},
 				output.Bucket,
@@ -131,7 +131,7 @@ func mapTransaction(transaction *txmodels.NewOperation) *database.TrackedTransac
 			tx.CreateDataOutput(&database.Data{
 				TxID:   transaction.Transaction.ID,
 				Vout:   output.Vout,
-				UserID: transaction.UserID,
+				UserID: output.UserID,
 				Blob:   output.Data,
 			})
 		}

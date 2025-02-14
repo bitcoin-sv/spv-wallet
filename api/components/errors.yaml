@@ -5,7 +5,7 @@ info:
 
 components:
   schemas:
-    ErrorSchema:
+    Schema:
       type: object
       properties:
         code:
@@ -19,15 +19,16 @@ components:
         - message
       additionalProperties: false
 
-    ErrUnauthorized:
+    Unauthorized:
       oneOf:
-        - $ref: '#/components/schemas/ErrAuthorization'
-        - $ref: '#/components/schemas/ErrAdminAuthOnNonAdminEndpoint'
-        - $ref: '#/components/schemas/ErrUserAuthOnNonUserEndpoint'
+        - $ref: '#/components/schemas/Authorization'
+        - $ref: '#/components/schemas/AdminAuthOnNonAdminEndpoint'
+        - $ref: '#/components/schemas/UserAuthOnNonUserEndpoint'
+        - $ref: '#/components/schemas/ErrXPubAuthRequired'
 
-    ErrAuthorization:
+    Authorization:
       allOf:
-        - $ref: '#/components/schemas/ErrorSchema'
+        - $ref: '#/components/schemas/Schema'
         - type: object
           properties:
             code:
@@ -35,9 +36,9 @@ components:
             message:
               example: "unauthorized"
 
-    ErrAdminAuthOnNonAdminEndpoint:
+    AdminAuthOnNonAdminEndpoint:
       allOf:
-        - $ref: '#/components/schemas/ErrorSchema'
+        - $ref: '#/components/schemas/Schema'
         - type: object
           properties:
             code:
@@ -45,9 +46,9 @@ components:
             message:
               example: "cannot call non-admin endpoints with admin authorization"
 
-    ErrUserAuthOnNonUserEndpoint:
+    UserAuthOnNonUserEndpoint:
       allOf:
-        - $ref: '#/components/schemas/ErrorSchema'
+        - $ref: '#/components/schemas/Schema'
         - type: object
           properties:
             code:
@@ -57,7 +58,7 @@ components:
 
     ErrXPubAuthRequired:
       allOf:
-        - $ref: '#/components/schemas/ErrorSchema'
+        - $ref: '#/components/schemas/Schema'
         - type: object
           properties:
             code:
@@ -65,9 +66,29 @@ components:
             message:
               example: "xpub authorization required"
 
+    ErrCannotParseQueryParams:
+      allOf:
+        - $ref: '#/components/schemas/Schema'
+        - type: object
+          properties:
+            code:
+              example: "error-query-params-invalid"
+            message:
+              example: "cannot parse request query params"
+
+    CannotBindRequest:
+      allOf:
+        - $ref: '#/components/schemas/Schema'
+        - type: object
+          properties:
+            code:
+              example: "error-bind-body-invalid"
+            message:
+              example: "cannot bind request body"
+
     ErrInternal:
       allOf:
-        - $ref: '#/components/schemas/ErrorSchema'
+        - $ref: '#/components/schemas/Schema'
         - type: object
           properties:
             code:
@@ -77,7 +98,7 @@ components:
 
     ErrInvalidDataID:
       allOf:
-        - $ref: '#/components/schemas/ErrorSchema'
+        - $ref: '#/components/schemas/Schema'
         - type: object
           properties:
             code:
@@ -87,7 +108,7 @@ components:
 
     ErrDataNotFound:
       allOf:
-        - $ref: '#/components/schemas/ErrorSchema'
+        - $ref: '#/components/schemas/Schema'
         - type: object
           properties:
             code:
@@ -95,19 +116,69 @@ components:
             message:
               example: "data not found"
 
-    ErrCannotParseQueryParams:
+    InvalidPubKey:
       allOf:
-        - $ref: '#/components/schemas/ErrorSchema'
+        - $ref: '#/components/schemas/Schema'
         - type: object
           properties:
             code:
-              example: "error-query-params-invalid"
+              example: "error-user-invalid-pubkey"
             message:
-              example: "cannot parse request query params"
+              example: "invalid public key"
+
+    InvalidPaymail:
+      allOf:
+        - $ref: '#/components/schemas/Schema'
+        - type: object
+          properties:
+            code:
+              example: "error-user-invalid-paymail"
+            message:
+              example: "invalid paymail"
+
+    PaymailInconsistent:
+      allOf:
+        - $ref: '#/components/schemas/Schema'
+        - type: object
+          properties:
+            code:
+              example: "error-user-inconsistent-paymail"
+            message:
+              example: "inconsistent paymail address and alias/domain"
+
+    InvalidDomain:
+      allOf:
+        - $ref: '#/components/schemas/Schema'
+        - type: object
+          properties:
+            code:
+              example: "error-invalid-domain"
+            message:
+              example: "invalid domain"
+
+    CreatingUser:
+      allOf:
+        - $ref: '#/components/schemas/Schema'
+        - type: object
+          properties:
+            code:
+              example: "error-user-creating"
+            message:
+              example: "error creating user"
+
+    GettingUser:
+      allOf:
+        - $ref: '#/components/schemas/Schema'
+        - type: object
+          properties:
+            code:
+              example: "error-unknown"
+            message:
+              example: "Internal server error"
 
     ErrTxValidation:
       allOf:
-        - $ref: '#/components/schemas/ErrorSchema'
+        - $ref: '#/components/schemas/Schema'
         - type: object
           properties:
             code:
@@ -117,7 +188,7 @@ components:
 
     ErrGettingOutputs:
       allOf:
-        - $ref: '#/components/schemas/ErrorSchema'
+        - $ref: '#/components/schemas/Schema'
         - type: object
           properties:
             code:
@@ -127,7 +198,7 @@ components:
 
     ErrUTXOSpent:
       allOf:
-        - $ref: '#/components/schemas/ErrorSchema'
+        - $ref: '#/components/schemas/Schema'
         - type: object
           properties:
             code:
@@ -137,7 +208,7 @@ components:
 
     ErrAnnotationIndexOutOfRange:
       allOf:
-        - $ref: '#/components/schemas/ErrorSchema'
+        - $ref: '#/components/schemas/Schema'
         - type: object
           properties:
             code:
@@ -147,7 +218,7 @@ components:
 
     ErrAnnotationIndexConversion:
       allOf:
-        - $ref: '#/components/schemas/ErrorSchema'
+        - $ref: '#/components/schemas/Schema'
         - type: object
           properties:
             code:
@@ -157,7 +228,7 @@ components:
 
     ErrNoOperations:
       allOf:
-        - $ref: '#/components/schemas/ErrorSchema'
+        - $ref: '#/components/schemas/Schema'
         - type: object
           properties:
             code:
@@ -167,7 +238,7 @@ components:
 
     ErrTxBroadcast:
       allOf:
-        - $ref: '#/components/schemas/ErrorSchema'
+        - $ref: '#/components/schemas/Schema'
         - type: object
           properties:
             code:

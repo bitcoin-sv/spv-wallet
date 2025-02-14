@@ -6,6 +6,7 @@ import (
 	"github.com/bitcoin-sv/spv-wallet/actions/v2/operations"
 	"github.com/bitcoin-sv/spv-wallet/actions/v2/transactions"
 	"github.com/bitcoin-sv/spv-wallet/actions/v2/users"
+	"github.com/bitcoin-sv/spv-wallet/actions/v2/base"
 	"github.com/bitcoin-sv/spv-wallet/api"
 	"github.com/bitcoin-sv/spv-wallet/config"
 	"github.com/bitcoin-sv/spv-wallet/engine"
@@ -14,20 +15,22 @@ import (
 
 // Server is the implementation of the server oapi-codegen's interface
 type Server struct {
-	admin.Server
+	admin.APIAdmin
+	base.APIBase
 	data.APIData
 	users.APIUsers
 	operations.APIOperations
 	transactions.APITransactions
 }
 
-// check if the Server implements the interface api.ServerInterface
+// _ check if the Server implements the interface api.ServerInterface
 var _ api.ServerInterface = &Server{}
 
 // NewServer creates a new server
 func NewServer(config *config.AppConfig, engine engine.ClientInterface, logger *zerolog.Logger) *Server {
 	return &Server{
-		admin.Server{},
+		admin.NewAPIAdmin(engine, logger),
+		base.NewAPIBase(config),
 		data.NewAPIData(engine, logger),
 		users.NewAPIUsers(engine, logger),
 		operations.NewAPIOperations(engine, logger),

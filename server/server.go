@@ -10,7 +10,6 @@ import (
 	"github.com/bitcoin-sv/spv-wallet/actions"
 	"github.com/bitcoin-sv/spv-wallet/actions/paymailserver"
 	v2 "github.com/bitcoin-sv/spv-wallet/actions/v2"
-	"github.com/bitcoin-sv/spv-wallet/actions/v2/base"
 	"github.com/bitcoin-sv/spv-wallet/api"
 	"github.com/bitcoin-sv/spv-wallet/config"
 	"github.com/bitcoin-sv/spv-wallet/engine"
@@ -113,11 +112,8 @@ func setupServerRoutes(appConfig *config.AppConfig, spvWalletEngine engine.Clien
 	actions.Register(handlersManager)
 	paymailserver.Register(spvWalletEngine.GetPaymailConfig().Configuration, ginEngine)
 
-	if appConfig.DebugProfiling {
-		pprof.Register(ginEngine, "debug/pprof")
-	}
-
 	if appConfig.ExperimentalFeatures.V2 {
+		v2.RegisterNonOpenAPIRoutes(handlersManager)
 		api.RegisterHandlersWithOptions(ginEngine, v2.NewServer(appConfig, spvWalletEngine, log), api.GinServerOptions{
 			BaseURL: "",
 			Middlewares: []api.MiddlewareFunc{
@@ -127,8 +123,9 @@ func setupServerRoutes(appConfig *config.AppConfig, spvWalletEngine engine.Clien
 				spverrors.ErrorResponse(c, err, log)
 			},
 		})
+	}
 
-		// register api v2 swagger
-		base.RegisterRoutes(handlersManager)
+	if appConfig.DebugProfiling {
+		pprof.Register(ginEngine, "debug/pprof")
 	}
 }

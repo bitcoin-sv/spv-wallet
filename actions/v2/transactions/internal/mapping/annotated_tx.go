@@ -14,7 +14,7 @@ import (
 )
 
 // AnnotatedTransactionRequestToOutline maps request's AnnotatedTransaction to outlines.Transaction.
-func AnnotatedTransactionRequestToOutline(req *api.ApiComponentsRequestsAnnotatedTransaction) (*outlines.Transaction, error) {
+func AnnotatedTransactionRequestToOutline(req *api.RequestsAnnotatedTransaction) (*outlines.Transaction, error) {
 	errorCollector := lox.NewErrorCollector()
 
 	return &outlines.Transaction{
@@ -31,7 +31,7 @@ func AnnotatedTransactionRequestToOutline(req *api.ApiComponentsRequestsAnnotate
 	}, errorCollector.Error()
 }
 
-func mapOutputAnnotationEntry(key string, value api.ApiComponentsModelsOutputAnnotation) (int, *transaction.OutputAnnotation, error) {
+func mapOutputAnnotationEntry(key string, value api.ModelsOutputAnnotation) (int, *transaction.OutputAnnotation, error) {
 	index, err := strconv.Atoi(key)
 	if err != nil {
 		return 0, nil, spverrors.ErrCannotMapFromModel.Wrap(err)
@@ -39,7 +39,7 @@ func mapOutputAnnotationEntry(key string, value api.ApiComponentsModelsOutputAnn
 	return index, annotatedOutputToOutline(value), nil
 }
 
-func annotatedOutputToOutline(from api.ApiComponentsModelsOutputAnnotation) *transaction.OutputAnnotation {
+func annotatedOutputToOutline(from api.ModelsOutputAnnotation) *transaction.OutputAnnotation {
 	return &transaction.OutputAnnotation{
 		Bucket: bucket.Name(from.Bucket),
 		Paymail: lo.
