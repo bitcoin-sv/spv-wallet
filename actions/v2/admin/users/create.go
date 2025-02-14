@@ -6,25 +6,25 @@ import (
 	primitives "github.com/bitcoin-sv/go-sdk/primitives/ec"
 	adminerrors "github.com/bitcoin-sv/spv-wallet/actions/v2/admin/errors"
 	"github.com/bitcoin-sv/spv-wallet/actions/v2/admin/internal/mapping"
+	"github.com/bitcoin-sv/spv-wallet/api"
 	configerrors "github.com/bitcoin-sv/spv-wallet/config/errors"
 	"github.com/bitcoin-sv/spv-wallet/engine/spverrors"
 	"github.com/bitcoin-sv/spv-wallet/engine/v2/users/usersmodels"
-	"github.com/bitcoin-sv/spv-wallet/models/request/adminrequest"
-	"github.com/bitcoin-sv/spv-wallet/server/reqctx"
 	"github.com/gin-gonic/gin"
 )
 
-func create(c *gin.Context, _ *reqctx.AdminContext) {
-	logger := reqctx.Logger(c)
-
-	var requestBody adminrequest.CreateUser
-	if err := c.Bind(&requestBody); err != nil {
-		spverrors.ErrorResponse(c, spverrors.ErrCannotBindRequest.Wrap(err), logger)
+// CreateUser creates a new user
+func (s *APIAdminUsers) CreateUser(c *gin.Context) {
+	var request api.RequestsCreateUser
+	if err := c.Bind(&request); err != nil {
+		spverrors.ErrorResponse(c, spverrors.ErrCannotBindRequest.Wrap(err), s.logger)
 		return
 	}
 
+	requestBody := &createUserRequest{&request}
+
 	if err := validatePubKey(requestBody.PublicKey); err != nil {
-		spverrors.ErrorResponse(c, err, logger)
+		spverrors.ErrorResponse(c, err, s.logger)
 		return
 	}
 
@@ -32,9 +32,9 @@ func create(c *gin.Context, _ *reqctx.AdminContext) {
 		PublicKey: requestBody.PublicKey,
 	}
 	if requestBody.PaymailDefined() {
-		alias, domain, err := parsePaymail(requestBody.Paymail)
+		alias, domain, err := parsePaymail(requestBody.PaymailRequestBody())
 		if err != nil {
-			spverrors.ErrorResponse(c, err, logger)
+			spverrors.ErrorResponse(c, err, s.logger)
 			return
 		}
 
@@ -43,13 +43,13 @@ func create(c *gin.Context, _ *reqctx.AdminContext) {
 			Domain: domain,
 
 			PublicName: requestBody.Paymail.PublicName,
-			Avatar:     requestBody.Paymail.Avatar,
+			Avatar:     requestBody.Paymail.AvatarURL,
 		}
 	}
 
-	createdUser, err := reqctx.Engine(c).UsersService().Create(c, newUser)
+	createdUser, err := s.engine.UsersService().Create(c, newUser)
 	if err != nil {
-		spverrors.MapResponse(c, err, logger).
+		spverrors.MapResponse(c, err, s.logger).
 			If(configerrors.ErrUnsupportedDomain).Then(adminerrors.ErrInvalidDomain).
 			Else(adminerrors.ErrCreatingUser)
 		return
@@ -64,4 +64,16 @@ func validatePubKey(pubKey string) error {
 		return adminerrors.ErrInvalidPublicKey.Wrap(err)
 	}
 	return nil
+}
+
+type createUserRequest struct {
+	*api.RequestsCreateUser
+}
+
+func (r *createUserRequest) PaymailDefined() bool {
+	return r.RequestsCreateUser.Paymail != nil
+}
+
+func (r *createUserRequest) PaymailRequestBody() *addPaymailRequest {
+	return &addPaymailRequest{r.RequestsCreateUser.Paymail}
 }

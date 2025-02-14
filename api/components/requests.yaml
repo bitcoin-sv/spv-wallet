@@ -5,3 +5,38 @@ info:
 
 components:
   schemas:
+    CreateUser:
+      type: object
+      properties:
+        publicKey:
+          type: string
+          example: "76a914e069bd2e2fe3ea702c40d5e65b491b734c01686788ac"
+        paymail:
+          $ref: "#/components/schemas/AddPaymail"
+      required:
+        - publicKey
+
+    AddPaymail:
+      type: object
+      properties:
+        address:
+          type: string
+          example: "test@spv-wallet.com"
+        alias:
+          type: string
+          example: "test"
+        domain:
+          type: string
+          example: "spv-wallet.com"
+        publicName:
+          type: string
+          example: "Test"
+        avatarURL:
+          type: string
+          example: "https://spv-wallet.com/avatar.png"
+      required:
+        - address
+        - alias
+        - domain
+        - publicName
+        - avatarURL
