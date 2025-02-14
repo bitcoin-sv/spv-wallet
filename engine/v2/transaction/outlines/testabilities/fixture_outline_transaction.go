@@ -15,6 +15,7 @@ import (
 // TransactionOutlineFixture is a test fixture - used for establishing environment for test.
 type TransactionOutlineFixture interface {
 	MinimumValidTransactionSpec() *outlines.TransactionSpec
+	TransactionSpecWithDatasize(size uint64) *outlines.TransactionSpec
 	NewTransactionOutlinesService() outlines.Service
 	ExternalRecipientHost() tpaymail.PaymailHostFixture
 	UserHasNotEnoughFunds()
@@ -26,6 +27,7 @@ type transactionOutlineAbility struct {
 	paymailClientAbility  tpaymail.PaymailClientFixture
 	paymailAddressService outlines.PaymailAddressService
 	utxoSelector          mockedUTXOSelector
+	feeUnit               bsv.FeeUnit
 }
 
 func (a *transactionOutlineAbility) MinimumValidTransactionSpec() *outlines.TransactionSpec {
@@ -37,12 +39,27 @@ func (a *transactionOutlineAbility) MinimumValidTransactionSpec() *outlines.Tran
 	}
 }
 
+func (a *transactionOutlineAbility) TransactionSpecWithDatasize(size uint64) *outlines.TransactionSpec {
+	data := make([]byte, size)
+	for i := range data {
+		data[i] = 'a'
+	}
+
+	return &outlines.TransactionSpec{
+		UserID: fixtures.Sender.ID(),
+		Outputs: outlines.NewOutputsSpecs(&outlines.OpReturn{
+			Data: []string{string(data)},
+		}),
+	}
+}
+
 // Given creates a new test fixture.
 func Given(t testing.TB) (given TransactionOutlineFixture) {
 	ability := &transactionOutlineAbility{
 		t:                     t,
 		paymailClientAbility:  tpaymail.Given(t),
 		paymailAddressService: newPaymailAddressServiceMock(t),
+		feeUnit:               bsv.FeeUnit{Satoshis: 1, Bytes: 1000},
 	}
 	return ability
 }
@@ -58,7 +75,7 @@ func (a *transactionOutlineAbility) NewTransactionOutlinesService() outlines.Ser
 		a.paymailClientAbility.NewPaymailClientService(),
 		a.paymailAddressService,
 		&a.utxoSelector,
-		bsv.FeeUnit{Satoshis: 1, Bytes: 1000},
+		a.feeUnit,
 		tester.Logger(a.t),
 		pubKeyGetter{},
 	)
