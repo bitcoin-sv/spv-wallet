@@ -14,7 +14,6 @@ import (
 // MockedP2PDestination is a mocked response for the P2P destinations endpoint
 type MockedP2PDestination struct {
 	CustomDistribution []bsv.Satoshis
-	ExtraOutputs       int
 }
 
 var mockedLockingScripts = []string{

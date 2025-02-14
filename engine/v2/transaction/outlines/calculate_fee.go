@@ -60,7 +60,7 @@ func estimatedInputsSize(inputs annotatedInputs) uint64 {
 
 //nolint:gosec // No need to check for overflows from int to uint64 here
 func varIntSize(val int) uint64 {
-	length := sdk.VarInt(val).Length() //
+	length := sdk.VarInt(val).Length()
 	return toU64(length)
 }
 

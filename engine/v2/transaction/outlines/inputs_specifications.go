@@ -19,13 +19,11 @@ func (s *InputsSpec) evaluate(ctx *evaluationContext, outputs annotatedOutputs) 
 	tx := &sdk.Transaction{
 		Outputs: outs,
 
-		// TODO: consider creating partial transaction with only outputs makes debugging problem when debugger tries to show it by calling String() method.
-		// Idea is to change UTXOSelector().Select to Select(ctx context.Context, outputsTotalValue bsv.Satoshis, byteSizeOfTxToFund uint64, userID string)
+		// TODO: creating partial transaction with only outputs makes debugging issue when debugger tries to show it by calling String() method (Inputs was nil which causes panic)
+		// Consider an idea to adjust UTXOSelector().Select to Select(ctx context.Context, outputsTotalValue bsv.Satoshis, byteSizeOfTxToFund uint64, userID string)
 		// Size and total output satoshis can be calculated by (outputsSize(outputs) + txEnvelopeSize) outputs.totalSatoshis()
 		Inputs: make([]*sdk.TransactionInput, 0),
 	}
-
-	outputs.totalSatoshis()
 
 	utxos, err := ctx.UTXOSelector().Select(ctx, tx, ctx.UserID())
 	if err != nil {
