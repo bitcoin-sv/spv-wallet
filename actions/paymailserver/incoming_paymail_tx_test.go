@@ -9,7 +9,6 @@ import (
 	"github.com/bitcoin-sv/spv-wallet/actions/testabilities"
 	chainmodels "github.com/bitcoin-sv/spv-wallet/engine/chain/models"
 	testengine "github.com/bitcoin-sv/spv-wallet/engine/testabilities"
-	"github.com/bitcoin-sv/spv-wallet/engine/testabilities/testmode"
 	"github.com/bitcoin-sv/spv-wallet/engine/tester/fixtures"
 	"github.com/stretchr/testify/require"
 )
@@ -174,8 +173,6 @@ func TestIncomingPaymailRawTX(t *testing.T) {
 }
 
 func TestIncomingPaymailBeef(t *testing.T) {
-	testmode.DevelopmentOnly_SetPostgresMode(t)
-
 	givenForAllTests := testabilities.Given(t)
 	cleanup := givenForAllTests.StartedSPVWalletWithConfiguration(
 		testengine.WithDomainValidationDisabled(),
@@ -357,8 +354,9 @@ func TestIncomingPaymailBeef(t *testing.T) {
 			Post("/api/v2/transactions/outlines")
 
 		//  then:
-		thenResponse := then.Response(res)
+		thenResponse := testabilities.NewTransactionsEndpointAssertions(t, given).Response(res)
 		thenResponse.IsOK()
+		thenResponse.ContainsValidBEEFHexInField("hex")
 	})
 }
 

@@ -4,7 +4,6 @@ import (
 	"testing"
 
 	sdk "github.com/bitcoin-sv/go-sdk/transaction"
-	"github.com/bitcoin-sv/spv-wallet/actions/testabilities"
 	"github.com/go-resty/resty/v2"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -15,21 +14,21 @@ type TransactionsEndpointAssertions interface {
 }
 
 type TransactionsResponseAssertions interface {
-	testabilities.SPVWalletResponseAssertions
+	SPVWalletResponseAssertions
 	ContainsValidBEEFHexInField(field string) TransactionsResponseAssertions
 	ContainsValidRawTxHexInField(field string) TransactionsResponseAssertions
 }
 
-func Then(t testing.TB, app testabilities.SPVWalletApplicationFixture) TransactionsEndpointAssertions {
+func NewTransactionsEndpointAssertions(t testing.TB, app SPVWalletApplicationFixture) TransactionsEndpointAssertions {
 	return &transactionEndpointAssertions{
 		t:                     t,
-		applicationAssertions: testabilities.Then(t, app),
+		applicationAssertions: Then(t, app),
 	}
 }
 
 type transactionEndpointAssertions struct {
 	t                     testing.TB
-	applicationAssertions testabilities.SPVWalletApplicationAssertions
+	applicationAssertions SPVWalletApplicationAssertions
 }
 
 func (a *transactionEndpointAssertions) Response(response *resty.Response) TransactionsResponseAssertions {
@@ -43,7 +42,7 @@ func (a *transactionEndpointAssertions) Response(response *resty.Response) Trans
 }
 
 type transactionResponseAssertions struct {
-	testabilities.SPVWalletResponseAssertions
+	SPVWalletResponseAssertions
 	t        testing.TB
 	response *resty.Response
 	require  *require.Assertions
