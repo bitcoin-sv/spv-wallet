@@ -11,6 +11,17 @@ import (
 
 const estimatedInputSizeForP2PKH = 148
 
+// TestEstimateSizeAgainstRealTxSize verifies that our internal transaction size estimation function
+// remains in sync with the actual signed transaction sizes produced by the SDK.
+//
+// Since transaction fees depend on the byte-size of the transaction,
+// it is essential that our estimation closely approximates the real size.
+//
+// This is a test for internal function `estimateSize` which we try to avoid. However, because accurate fee calculation
+// depends critically on transaction size, it is essential to directly verify the behavior of this internal estimation logic.
+//
+// Note: A slight overestimation (up to 1 byte per input) is tolerated to accommodate minor differences
+// arising from fee calculations and edge cases in the SDK.
 func TestEstimateSizeAgainstRealTxSie(t *testing.T) {
 	tests := []*sdk.Transaction{
 		fixtures.GivenTX(t).
