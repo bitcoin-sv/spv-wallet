@@ -1,5 +1,7 @@
 package txmodels
 
+import "github.com/samber/lo"
+
 // TransactionInputSource represents a link between a transaction and its source transaction.
 // It is used to track which transaction inputs originate from which previous transactions.
 type TransactionInputSource struct {
@@ -37,11 +39,12 @@ func (t *NewTransaction) RawHex() string { return t.rawHex }
 // SetRawHex sets the raw hexadecimal representation of the transaction.
 func (t *NewTransaction) SetRawHex(hex string) {
 	t.rawHex = hex
-	t.transactionInputSources = make([]TransactionInputSource, 0, len(t.Outputs))
-
-	for _, o := range t.Outputs {
-		t.transactionInputSources = append(t.transactionInputSources, TransactionInputSource{TxID: t.ID, SourceTxID: o.TxID})
-	}
+	t.transactionInputSources = lo.Map(t.Outputs, func(item NewOutput, index int) TransactionInputSource {
+		return TransactionInputSource{
+			TxID:       t.ID,
+			SourceTxID: item.TxID,
+		}
+	})
 }
 
 // SetBEEFHex sets the BEEF-encoded hexadecimal representation of the transaction.
