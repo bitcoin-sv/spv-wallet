@@ -24,6 +24,9 @@ func TestCreatePaymailTransactionOutlineBEEF(t *testing.T) {
 	t.Run("return transaction outline with payment to valid paymail address", func(t *testing.T) {
 		given, then := testabilities.New(t)
 
+		// given:
+		given.ExternalRecipientHost().WillRespondWithP2PCapabilities()
+
 		// and:
 		service := given.NewTransactionOutlinesService()
 
@@ -41,6 +44,8 @@ func TestCreatePaymailTransactionOutlineBEEF(t *testing.T) {
 		tx, err := service.CreateBEEF(context.Background(), spec)
 
 		// then:
+		paymailHostResponse := then.ExternalPaymailHost().ReceivedP2PDestinationRequest(transactionSatoshiValue)
+
 		thenTx := then.Created(tx).WithNoError(err).WithParseableBEEFHex()
 
 		thenTx.HasOutputs(1)
@@ -48,11 +53,11 @@ func TestCreatePaymailTransactionOutlineBEEF(t *testing.T) {
 		thenTx.Output(0).
 			HasBucket(bucket.BSV).
 			HasSatoshis(transactionSatoshiValue).
-			//HasLockingScript(paymailHostResponse.Scripts[0]). // Fixme: utilize in fixture::ExternalRecipientHost().MockedPaymailClient().GetCallByRegex()
+			HasLockingScript(paymailHostResponse.Outputs[0].Script).
 			IsPaymail().
 			HasReceiver(recipient).
-			HasSender(sender)
-		//HasReference(paymailHostResponse.Reference) //fixme
+			HasSender(sender).
+			HasReference(paymailHostResponse.Reference)
 	})
 
 	t.Run("return transaction outline with payment with multiple outputs from valid paymail address", func(t *testing.T) {
@@ -62,6 +67,9 @@ func TestCreatePaymailTransactionOutlineBEEF(t *testing.T) {
 		const firstOutputSatoshiValue = bsv.Satoshis(1)
 		const secondOutputSatoshiValue = bsv.Satoshis(2)
 		const paymentSatoshiValue = firstOutputSatoshiValue + secondOutputSatoshiValue
+
+		// and:
+		given.ExternalRecipientHost().WillRespondWithP2PDestinationsWithSats(firstOutputSatoshiValue, secondOutputSatoshiValue)
 
 		// and:
 		service := given.NewTransactionOutlinesService()
@@ -80,6 +88,8 @@ func TestCreatePaymailTransactionOutlineBEEF(t *testing.T) {
 		tx, err := service.CreateBEEF(context.Background(), spec)
 
 		// then:
+		paymailHostResponse := then.ExternalPaymailHost().ReceivedP2PDestinationRequest(paymentSatoshiValue)
+
 		thenTx := then.Created(tx).WithNoError(err).WithParseableBEEFHex()
 
 		thenTx.HasOutputs(2)
@@ -87,27 +97,27 @@ func TestCreatePaymailTransactionOutlineBEEF(t *testing.T) {
 		thenTx.Output(0).
 			HasBucket(bucket.BSV).
 			HasSatoshis(firstOutputSatoshiValue).
-			//HasLockingScript(paymailHostResponse.Scripts[0]). // fixme
+			HasLockingScript(paymailHostResponse.Outputs[0].Script).
 			IsPaymail().
 			HasReceiver(recipient).
-			HasSender(sender)
-		//HasReference(paymailHostResponse.Reference)  // fixme
+			HasSender(sender).
+			HasReference(paymailHostResponse.Reference)
 
 		thenTx.Output(1).
 			HasBucket(bucket.BSV).
 			HasSatoshis(secondOutputSatoshiValue).
-			//HasLockingScript(paymailHostResponse.Scripts[1]).  // fixme
+			HasLockingScript(paymailHostResponse.Outputs[1].Script).
 			IsPaymail().
 			HasReceiver(recipient).
-			HasSender(sender)
-		//HasReference(paymailHostResponse.Reference)  // fixme
+			HasSender(sender).
+			HasReference(paymailHostResponse.Reference)
 	})
 
 	t.Run("return transaction outline with default paymail in sender annotation", func(t *testing.T) {
 		given, then := testabilities.New(t)
 
 		// given:
-		given.ExternalRecipientHost().WillRespondWithP2PDestinationsWithSats(transactionSatoshiValue)
+		given.ExternalRecipientHost().WillRespondWithP2PCapabilities()
 
 		// and:
 		service := given.NewTransactionOutlinesService()
@@ -125,6 +135,9 @@ func TestCreatePaymailTransactionOutlineBEEF(t *testing.T) {
 		tx, err := service.CreateBEEF(context.Background(), spec)
 
 		// then:
+		then.ExternalPaymailHost().ReceivedP2PDestinationRequest(transactionSatoshiValue)
+
+		// and:
 		then.Created(tx).WithNoError(err).WithParseableBEEFHex().
 			Output(0).
 			IsPaymail().
@@ -258,7 +271,7 @@ func TestCreatePaymailTransactionOutlineBEEF(t *testing.T) {
 			given, then := testabilities.New(t)
 
 			// given:
-			given.ExternalRecipientHost().WillRespondWithP2PDestinationsWithSats(transactionSatoshiValue)
+			given.ExternalRecipientHost().WillRespondWithP2PCapabilities()
 
 			// and:
 			service := given.NewTransactionOutlinesService()
@@ -273,6 +286,9 @@ func TestCreatePaymailTransactionOutlineBEEF(t *testing.T) {
 			tx, err := service.CreateBEEF(context.Background(), spec)
 
 			// then:
+			then.ExternalPaymailHost().ReceivedP2PDestinationRequest(transactionSatoshiValue)
+
+			// and:
 			then.Created(tx).WithError(err).ThatIs(test.expectedError)
 		})
 	}
@@ -371,6 +387,9 @@ func TestCreatePaymailTransactionOutlineRAW(t *testing.T) {
 		tx, err := service.CreateRawTx(context.Background(), spec)
 
 		// then:
+		paymailHostResponse := then.ExternalPaymailHost().ReceivedP2PDestinationRequest(transactionSatoshiValue)
+
+		// and:
 		thenTx := then.Created(tx).WithNoError(err).WithParseableRawHex()
 
 		thenTx.HasInputs(1)
@@ -384,11 +403,11 @@ func TestCreatePaymailTransactionOutlineRAW(t *testing.T) {
 		thenTx.Output(0).
 			HasBucket(bucket.BSV).
 			HasSatoshis(transactionSatoshiValue).
-			//HasLockingScript(paymailHostResponse.Scripts[0]). //fixme
+			HasLockingScript(paymailHostResponse.Outputs[0].Script).
 			IsPaymail().
 			HasReceiver(recipient).
-			HasSender(sender)
-		//HasReference(paymailHostResponse.Reference) //fixme
+			HasSender(sender).
+			HasReference(paymailHostResponse.Reference)
 	})
 
 	t.Run("return transaction outline with payment with multiple outputs from valid paymail address", func(t *testing.T) {
@@ -398,6 +417,9 @@ func TestCreatePaymailTransactionOutlineRAW(t *testing.T) {
 		const firstOutputSatoshiValue = bsv.Satoshis(1)
 		const secondOutputSatoshiValue = bsv.Satoshis(2)
 		const paymentSatoshiValue = firstOutputSatoshiValue + secondOutputSatoshiValue
+
+		// and:
+		given.ExternalRecipientHost().WillRespondWithP2PDestinationsWithSats(firstOutputSatoshiValue, secondOutputSatoshiValue)
 
 		// and:
 		service := given.NewTransactionOutlinesService()
@@ -416,6 +438,9 @@ func TestCreatePaymailTransactionOutlineRAW(t *testing.T) {
 		tx, err := service.CreateRawTx(context.Background(), spec)
 
 		// then:
+		paymailHostResponse := then.ExternalPaymailHost().ReceivedP2PDestinationRequest(paymentSatoshiValue)
+
+		// and:
 		thenTx := then.Created(tx).WithNoError(err).WithParseableRawHex()
 
 		thenTx.HasInputs(1)
@@ -429,24 +454,27 @@ func TestCreatePaymailTransactionOutlineRAW(t *testing.T) {
 		thenTx.Output(0).
 			HasBucket(bucket.BSV).
 			HasSatoshis(firstOutputSatoshiValue).
-			//HasLockingScript(paymailHostResponse.Scripts[0]).
+			HasLockingScript(paymailHostResponse.Outputs[0].Script).
 			IsPaymail().
 			HasReceiver(recipient).
-			HasSender(sender)
-		//HasReference(paymailHostResponse.Reference)
+			HasSender(sender).
+			HasReference(paymailHostResponse.Reference)
 
 		thenTx.Output(1).
 			HasBucket(bucket.BSV).
 			HasSatoshis(secondOutputSatoshiValue).
-			//HasLockingScript(paymailHostResponse.Scripts[1]). //fixme
+			HasLockingScript(paymailHostResponse.Outputs[1].Script).
 			IsPaymail().
 			HasReceiver(recipient).
-			HasSender(sender)
-		//HasReference(paymailHostResponse.Reference) //fixme
+			HasSender(sender).
+			HasReference(paymailHostResponse.Reference)
 	})
 
 	t.Run("return transaction outline with default paymail in sender annotation", func(t *testing.T) {
 		given, then := testabilities.New(t)
+
+		// given:
+		given.ExternalRecipientHost().WillRespondWithP2PCapabilities()
 
 		// and:
 		service := given.NewTransactionOutlinesService()
@@ -604,7 +632,7 @@ func TestCreatePaymailTransactionOutlineRAW(t *testing.T) {
 			given, then := testabilities.New(t)
 
 			// given:
-			given.ExternalRecipientHost().WillRespondWithP2PDestinationsWithSats(transactionSatoshiValue)
+			given.ExternalRecipientHost().WillRespondWithP2PCapabilities()
 
 			// and:
 			service := given.NewTransactionOutlinesService()
@@ -619,6 +647,9 @@ func TestCreatePaymailTransactionOutlineRAW(t *testing.T) {
 			tx, err := service.CreateRawTx(context.Background(), spec)
 
 			// then:
+			then.ExternalPaymailHost().ReceivedP2PDestinationRequest(transactionSatoshiValue)
+
+			// and:
 			then.Created(tx).WithError(err).ThatIs(test.expectedError)
 		})
 	}
