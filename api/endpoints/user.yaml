@@ -6,6 +6,7 @@ paths:
 
   /api/v2/users/current:
     get:
+      operationId: currentUser
       security:
         - XPubAuth:
             - "user"
@@ -24,6 +25,7 @@ paths:
 
   /api/v2/data/{id}:
     get:
+      operationId: dataById
       security:
         - XPubAuth:
             - "user"
@@ -53,6 +55,7 @@ paths:
 
   /api/v2/operations/search:
     get:
+      operationId: searchOperations
       security:
         - XPubAuth:
             - "user"
@@ -78,6 +81,7 @@ paths:
 
   /api/v2/transactions:
     post:
+      operationId: recordTransactionOutline
       security:
         - XPubAuth:
             - "user"
@@ -104,6 +108,7 @@ paths:
 
   /api/v2/transactions/outlines:
     post:
+      operationId: createTransactionOutline
       security:
         - XPubAuth:
             - "user"

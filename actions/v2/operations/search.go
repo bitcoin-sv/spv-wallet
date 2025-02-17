@@ -11,8 +11,8 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-// GetApiV2OperationsSearch return operations based on given filter parameters
-func (s *APIOperations) GetApiV2OperationsSearch(c *gin.Context, params api.GetApiV2OperationsSearchParams) {
+// SearchOperations return operations based on given filter parameters
+func (s *APIOperations) SearchOperations(c *gin.Context, params api.SearchOperationsParams) {
 	userContext := reqctx.GetUserContext(c)
 	userID, err := userContext.ShouldGetUserID()
 	if err != nil {
@@ -30,7 +30,7 @@ func (s *APIOperations) GetApiV2OperationsSearch(c *gin.Context, params api.GetA
 	c.JSON(http.StatusOK, mapping.OperationsPagedResponse(pagedResult))
 }
 
-func mapToFilter(params api.GetApiV2OperationsSearchParams) filter.Page {
+func mapToFilter(params api.SearchOperationsParams) filter.Page {
 	page := filter.Page{}
 
 	if params.Page != nil {
