@@ -118,6 +118,7 @@ paths:
     /api/v2/data/{id}:
         get:
             description: This endpoint gets data by its id for authenticated user
+            operationId: dataById
             parameters:
                 - description: Data ID
                   in: path
@@ -142,7 +143,6 @@ paths:
             summary: Get data for user
             tags:
                 - User endpoints
-        operationId: dataById
     /api/v2/operations/search:
         get:
             description: This endpoint allows to search operations for authenticated user

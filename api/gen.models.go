@@ -41,10 +41,27 @@ type ErrorsAdminAuthOnNonAdminEndpoint struct {
 	Message interface{} `json:"message"`
 }
 
-// ErrorsAuthorization defines model for errors_Authorization.
-type ErrorsAuthorization struct {
+// ErrorsAnnotationIndexConversion defines model for errors_AnnotationIndexConversion.
+type ErrorsAnnotationIndexConversion struct {
 	Code    interface{} `json:"code"`
 	Message interface{} `json:"message"`
+}
+
+// ErrorsAnnotationIndexOutOfRange defines model for errors_AnnotationIndexOutOfRange.
+type ErrorsAnnotationIndexOutOfRange struct {
+	Code    interface{} `json:"code"`
+	Message interface{} `json:"message"`
+}
+
+// ErrorsAuthXPubRequired defines model for errors_AuthXPubRequired.
+type ErrorsAuthXPubRequired struct {
+	Code    interface{} `json:"code"`
+	Message interface{} `json:"message"`
+}
+
+// ErrorsAuthorization defines model for errors_Authorization.
+type ErrorsAuthorization struct {
+	union json.RawMessage
 }
 
 // ErrorsCannotBindRequest defines model for errors_CannotBindRequest.
@@ -59,68 +76,32 @@ type ErrorsCreatingUser struct {
 	Message interface{} `json:"message"`
 }
 
-// ErrorsErrAnnotationIndexConversion defines model for errors_ErrAnnotationIndexConversion.
-type ErrorsErrAnnotationIndexConversion struct {
+// ErrorsDataNotFound defines model for errors_DataNotFound.
+type ErrorsDataNotFound struct {
 	Code    interface{} `json:"code"`
 	Message interface{} `json:"message"`
 }
 
-// ErrorsErrAnnotationIndexOutOfRange defines model for errors_ErrAnnotationIndexOutOfRange.
-type ErrorsErrAnnotationIndexOutOfRange struct {
-	Code    interface{} `json:"code"`
-	Message interface{} `json:"message"`
-}
-
-// ErrorsErrDataNotFound defines model for errors_ErrDataNotFound.
-type ErrorsErrDataNotFound struct {
-	Code    interface{} `json:"code"`
-	Message interface{} `json:"message"`
-}
-
-// ErrorsErrGettingOutputs defines model for errors_ErrGettingOutputs.
-type ErrorsErrGettingOutputs struct {
-	Code    interface{} `json:"code"`
-	Message interface{} `json:"message"`
-}
-
-// ErrorsErrInternal defines model for errors_ErrInternal.
-type ErrorsErrInternal struct {
-	Code    interface{} `json:"code"`
-	Message interface{} `json:"message"`
-}
-
-// ErrorsErrInvalidDataID defines model for errors_ErrInvalidDataID.
-type ErrorsErrInvalidDataID struct {
-	Code    interface{} `json:"code"`
-	Message interface{} `json:"message"`
-}
-
-// ErrorsErrNoOperations defines model for errors_ErrNoOperations.
-type ErrorsErrNoOperations struct {
-	Code    interface{} `json:"code"`
-	Message interface{} `json:"message"`
-}
-
-// ErrorsErrTxBroadcast defines model for errors_ErrTxBroadcast.
-type ErrorsErrTxBroadcast struct {
-	Code    interface{} `json:"code"`
-	Message interface{} `json:"message"`
-}
-
-// ErrorsErrUTXOSpent defines model for errors_ErrUTXOSpent.
-type ErrorsErrUTXOSpent struct {
-	Code    interface{} `json:"code"`
-	Message interface{} `json:"message"`
-}
-
-// ErrorsErrXPubAuthRequired defines model for errors_ErrXPubAuthRequired.
-type ErrorsErrXPubAuthRequired struct {
+// ErrorsGettingOutputs defines model for errors_GettingOutputs.
+type ErrorsGettingOutputs struct {
 	Code    interface{} `json:"code"`
 	Message interface{} `json:"message"`
 }
 
 // ErrorsGettingUser defines model for errors_GettingUser.
 type ErrorsGettingUser struct {
+	Code    interface{} `json:"code"`
+	Message interface{} `json:"message"`
+}
+
+// ErrorsInternal defines model for errors_Internal.
+type ErrorsInternal struct {
+	Code    interface{} `json:"code"`
+	Message interface{} `json:"message"`
+}
+
+// ErrorsInvalidDataID defines model for errors_InvalidDataID.
+type ErrorsInvalidDataID struct {
 	Code    interface{} `json:"code"`
 	Message interface{} `json:"message"`
 }
@@ -143,6 +124,12 @@ type ErrorsInvalidPubKey struct {
 	Message interface{} `json:"message"`
 }
 
+// ErrorsNoOperations defines model for errors_NoOperations.
+type ErrorsNoOperations struct {
+	Code    interface{} `json:"code"`
+	Message interface{} `json:"message"`
+}
+
 // ErrorsPaymailInconsistent defines model for errors_PaymailInconsistent.
 type ErrorsPaymailInconsistent struct {
 	Code    interface{} `json:"code"`
@@ -158,9 +145,22 @@ type ErrorsSchema struct {
 	Message string `json:"message"`
 }
 
+// ErrorsTxBroadcast defines model for errors_TxBroadcast.
+type ErrorsTxBroadcast struct {
+	Code    interface{} `json:"code"`
+	Message interface{} `json:"message"`
+}
+
+// ErrorsUTXOSpent defines model for errors_UTXOSpent.
+type ErrorsUTXOSpent struct {
+	Code    interface{} `json:"code"`
+	Message interface{} `json:"message"`
+}
+
 // ErrorsUnauthorized defines model for errors_Unauthorized.
 type ErrorsUnauthorized struct {
-	union json.RawMessage
+	Code    interface{} `json:"code"`
+	Message interface{} `json:"message"`
 }
 
 // ErrorsUserAuthOnNonUserEndpoint defines model for errors_UserAuthOnNonUserEndpoint.
@@ -370,10 +370,10 @@ type ResponsesGetDataNotFound struct {
 type ResponsesGetDataSuccess = ModelsData
 
 // ResponsesInternalServerError defines model for responses_InternalServerError.
-type ResponsesInternalServerError = ErrorsErrInternal
+type ResponsesInternalServerError = ErrorsInternal
 
 // ResponsesNotAuthorized defines model for responses_NotAuthorized.
-type ResponsesNotAuthorized = ErrorsUnauthorized
+type ResponsesNotAuthorized = ErrorsAuthorization
 
 // ResponsesRecordTransactionBadRequest defines model for responses_RecordTransactionBadRequest.
 type ResponsesRecordTransactionBadRequest struct {
@@ -389,7 +389,7 @@ type ResponsesRecordTransactionInternalServerError struct {
 type ResponsesRecordTransactionSuccess = ModelsRecordedOutline
 
 // ResponsesSearchBadRequest defines model for responses_SearchBadRequest.
-type ResponsesSearchBadRequest = ErrorsErrInvalidDataID
+type ResponsesSearchBadRequest = ErrorsInvalidDataID
 
 // ResponsesSearchOperationsSuccess defines model for responses_SearchOperationsSuccess.
 type ResponsesSearchOperationsSuccess = ModelsOperationsSearchResult
@@ -398,15 +398,15 @@ type ResponsesSearchOperationsSuccess = ModelsOperationsSearchResult
 type ResponsesSharedConfig = ModelsSharedConfig
 
 // ResponsesUserBadRequest defines model for responses_UserBadRequest.
-type ResponsesUserBadRequest = ErrorsErrInvalidDataID
+type ResponsesUserBadRequest = ErrorsInvalidDataID
 
 // ResponsesUserNotAuthorized defines model for responses_UserNotAuthorized.
 type ResponsesUserNotAuthorized struct {
 	union json.RawMessage
 }
 
-// GetApiV2OperationsSearchParams defines parameters for GetApiV2OperationsSearch.
-type GetApiV2OperationsSearchParams struct {
+// SearchOperationsParams defines parameters for SearchOperations.
+type SearchOperationsParams struct {
 	// Page Page number for pagination
 	Page *RequestsPageNumber `form:"page,omitempty" json:"page,omitempty"`
 
@@ -426,28 +426,28 @@ type CreateUserJSONRequestBody = RequestsCreateUser
 // AddPaymailToUserJSONRequestBody defines body for AddPaymailToUser for application/json ContentType.
 type AddPaymailToUserJSONRequestBody = RequestsAddPaymail
 
-// PostApiV2TransactionsJSONRequestBody defines body for PostApiV2Transactions for application/json ContentType.
-type PostApiV2TransactionsJSONRequestBody = RequestsAnnotatedTransaction
+// RecordTransactionOutlineJSONRequestBody defines body for RecordTransactionOutline for application/json ContentType.
+type RecordTransactionOutlineJSONRequestBody = RequestsAnnotatedTransaction
 
-// PostApiV2TransactionsOutlinesJSONRequestBody defines body for PostApiV2TransactionsOutlines for application/json ContentType.
-type PostApiV2TransactionsOutlinesJSONRequestBody = RequestsAnnotatedTransaction
+// CreateTransactionOutlineJSONRequestBody defines body for CreateTransactionOutline for application/json ContentType.
+type CreateTransactionOutlineJSONRequestBody = RequestsAnnotatedTransaction
 
-// AsErrorsAuthorization returns the union data inside the ErrorsUnauthorized as a ErrorsAuthorization
-func (t ErrorsUnauthorized) AsErrorsAuthorization() (ErrorsAuthorization, error) {
-	var body ErrorsAuthorization
+// AsErrorsUnauthorized returns the union data inside the ErrorsAuthorization as a ErrorsUnauthorized
+func (t ErrorsAuthorization) AsErrorsUnauthorized() (ErrorsUnauthorized, error) {
+	var body ErrorsUnauthorized
 	err := json.Unmarshal(t.union, &body)
 	return body, err
 }
 
-// FromErrorsAuthorization overwrites any union data inside the ErrorsUnauthorized as the provided ErrorsAuthorization
-func (t *ErrorsUnauthorized) FromErrorsAuthorization(v ErrorsAuthorization) error {
+// FromErrorsUnauthorized overwrites any union data inside the ErrorsAuthorization as the provided ErrorsUnauthorized
+func (t *ErrorsAuthorization) FromErrorsUnauthorized(v ErrorsUnauthorized) error {
 	b, err := json.Marshal(v)
 	t.union = b
 	return err
 }
 
-// MergeErrorsAuthorization performs a merge with any union data inside the ErrorsUnauthorized, using the provided ErrorsAuthorization
-func (t *ErrorsUnauthorized) MergeErrorsAuthorization(v ErrorsAuthorization) error {
+// MergeErrorsUnauthorized performs a merge with any union data inside the ErrorsAuthorization, using the provided ErrorsUnauthorized
+func (t *ErrorsAuthorization) MergeErrorsUnauthorized(v ErrorsUnauthorized) error {
 	b, err := json.Marshal(v)
 	if err != nil {
 		return err
@@ -458,22 +458,22 @@ func (t *ErrorsUnauthorized) MergeErrorsAuthorization(v ErrorsAuthorization) err
 	return err
 }
 
-// AsErrorsAdminAuthOnNonAdminEndpoint returns the union data inside the ErrorsUnauthorized as a ErrorsAdminAuthOnNonAdminEndpoint
-func (t ErrorsUnauthorized) AsErrorsAdminAuthOnNonAdminEndpoint() (ErrorsAdminAuthOnNonAdminEndpoint, error) {
+// AsErrorsAdminAuthOnNonAdminEndpoint returns the union data inside the ErrorsAuthorization as a ErrorsAdminAuthOnNonAdminEndpoint
+func (t ErrorsAuthorization) AsErrorsAdminAuthOnNonAdminEndpoint() (ErrorsAdminAuthOnNonAdminEndpoint, error) {
 	var body ErrorsAdminAuthOnNonAdminEndpoint
 	err := json.Unmarshal(t.union, &body)
 	return body, err
 }
 
-// FromErrorsAdminAuthOnNonAdminEndpoint overwrites any union data inside the ErrorsUnauthorized as the provided ErrorsAdminAuthOnNonAdminEndpoint
-func (t *ErrorsUnauthorized) FromErrorsAdminAuthOnNonAdminEndpoint(v ErrorsAdminAuthOnNonAdminEndpoint) error {
+// FromErrorsAdminAuthOnNonAdminEndpoint overwrites any union data inside the ErrorsAuthorization as the provided ErrorsAdminAuthOnNonAdminEndpoint
+func (t *ErrorsAuthorization) FromErrorsAdminAuthOnNonAdminEndpoint(v ErrorsAdminAuthOnNonAdminEndpoint) error {
 	b, err := json.Marshal(v)
 	t.union = b
 	return err
 }
 
-// MergeErrorsAdminAuthOnNonAdminEndpoint performs a merge with any union data inside the ErrorsUnauthorized, using the provided ErrorsAdminAuthOnNonAdminEndpoint
-func (t *ErrorsUnauthorized) MergeErrorsAdminAuthOnNonAdminEndpoint(v ErrorsAdminAuthOnNonAdminEndpoint) error {
+// MergeErrorsAdminAuthOnNonAdminEndpoint performs a merge with any union data inside the ErrorsAuthorization, using the provided ErrorsAdminAuthOnNonAdminEndpoint
+func (t *ErrorsAuthorization) MergeErrorsAdminAuthOnNonAdminEndpoint(v ErrorsAdminAuthOnNonAdminEndpoint) error {
 	b, err := json.Marshal(v)
 	if err != nil {
 		return err
@@ -484,22 +484,22 @@ func (t *ErrorsUnauthorized) MergeErrorsAdminAuthOnNonAdminEndpoint(v ErrorsAdmi
 	return err
 }
 
-// AsErrorsUserAuthOnNonUserEndpoint returns the union data inside the ErrorsUnauthorized as a ErrorsUserAuthOnNonUserEndpoint
-func (t ErrorsUnauthorized) AsErrorsUserAuthOnNonUserEndpoint() (ErrorsUserAuthOnNonUserEndpoint, error) {
+// AsErrorsUserAuthOnNonUserEndpoint returns the union data inside the ErrorsAuthorization as a ErrorsUserAuthOnNonUserEndpoint
+func (t ErrorsAuthorization) AsErrorsUserAuthOnNonUserEndpoint() (ErrorsUserAuthOnNonUserEndpoint, error) {
 	var body ErrorsUserAuthOnNonUserEndpoint
 	err := json.Unmarshal(t.union, &body)
 	return body, err
 }
 
-// FromErrorsUserAuthOnNonUserEndpoint overwrites any union data inside the ErrorsUnauthorized as the provided ErrorsUserAuthOnNonUserEndpoint
-func (t *ErrorsUnauthorized) FromErrorsUserAuthOnNonUserEndpoint(v ErrorsUserAuthOnNonUserEndpoint) error {
+// FromErrorsUserAuthOnNonUserEndpoint overwrites any union data inside the ErrorsAuthorization as the provided ErrorsUserAuthOnNonUserEndpoint
+func (t *ErrorsAuthorization) FromErrorsUserAuthOnNonUserEndpoint(v ErrorsUserAuthOnNonUserEndpoint) error {
 	b, err := json.Marshal(v)
 	t.union = b
 	return err
 }
 
-// MergeErrorsUserAuthOnNonUserEndpoint performs a merge with any union data inside the ErrorsUnauthorized, using the provided ErrorsUserAuthOnNonUserEndpoint
-func (t *ErrorsUnauthorized) MergeErrorsUserAuthOnNonUserEndpoint(v ErrorsUserAuthOnNonUserEndpoint) error {
+// MergeErrorsUserAuthOnNonUserEndpoint performs a merge with any union data inside the ErrorsAuthorization, using the provided ErrorsUserAuthOnNonUserEndpoint
+func (t *ErrorsAuthorization) MergeErrorsUserAuthOnNonUserEndpoint(v ErrorsUserAuthOnNonUserEndpoint) error {
 	b, err := json.Marshal(v)
 	if err != nil {
 		return err
@@ -510,22 +510,22 @@ func (t *ErrorsUnauthorized) MergeErrorsUserAuthOnNonUserEndpoint(v ErrorsUserAu
 	return err
 }
 
-// AsErrorsErrXPubAuthRequired returns the union data inside the ErrorsUnauthorized as a ErrorsErrXPubAuthRequired
-func (t ErrorsUnauthorized) AsErrorsErrXPubAuthRequired() (ErrorsErrXPubAuthRequired, error) {
-	var body ErrorsErrXPubAuthRequired
+// AsErrorsAuthXPubRequired returns the union data inside the ErrorsAuthorization as a ErrorsAuthXPubRequired
+func (t ErrorsAuthorization) AsErrorsAuthXPubRequired() (ErrorsAuthXPubRequired, error) {
+	var body ErrorsAuthXPubRequired
 	err := json.Unmarshal(t.union, &body)
 	return body, err
 }
 
-// FromErrorsErrXPubAuthRequired overwrites any union data inside the ErrorsUnauthorized as the provided ErrorsErrXPubAuthRequired
-func (t *ErrorsUnauthorized) FromErrorsErrXPubAuthRequired(v ErrorsErrXPubAuthRequired) error {
+// FromErrorsAuthXPubRequired overwrites any union data inside the ErrorsAuthorization as the provided ErrorsAuthXPubRequired
+func (t *ErrorsAuthorization) FromErrorsAuthXPubRequired(v ErrorsAuthXPubRequired) error {
 	b, err := json.Marshal(v)
 	t.union = b
 	return err
 }
 
-// MergeErrorsErrXPubAuthRequired performs a merge with any union data inside the ErrorsUnauthorized, using the provided ErrorsErrXPubAuthRequired
-func (t *ErrorsUnauthorized) MergeErrorsErrXPubAuthRequired(v ErrorsErrXPubAuthRequired) error {
+// MergeErrorsAuthXPubRequired performs a merge with any union data inside the ErrorsAuthorization, using the provided ErrorsAuthXPubRequired
+func (t *ErrorsAuthorization) MergeErrorsAuthXPubRequired(v ErrorsAuthXPubRequired) error {
 	b, err := json.Marshal(v)
 	if err != nil {
 		return err
@@ -536,12 +536,12 @@ func (t *ErrorsUnauthorized) MergeErrorsErrXPubAuthRequired(v ErrorsErrXPubAuthR
 	return err
 }
 
-func (t ErrorsUnauthorized) MarshalJSON() ([]byte, error) {
+func (t ErrorsAuthorization) MarshalJSON() ([]byte, error) {
 	b, err := t.union.MarshalJSON()
 	return b, err
 }
 
-func (t *ErrorsUnauthorized) UnmarshalJSON(b []byte) error {
+func (t *ErrorsAuthorization) UnmarshalJSON(b []byte) error {
 	err := t.union.UnmarshalJSON(b)
 	return err
 }
@@ -686,22 +686,22 @@ func (t *ResponsesAdminUserBadRequest) UnmarshalJSON(b []byte) error {
 	return err
 }
 
-// AsErrorsErrDataNotFound returns the union data inside the ResponsesGetDataNotFound as a ErrorsErrDataNotFound
-func (t ResponsesGetDataNotFound) AsErrorsErrDataNotFound() (ErrorsErrDataNotFound, error) {
-	var body ErrorsErrDataNotFound
+// AsErrorsDataNotFound returns the union data inside the ResponsesGetDataNotFound as a ErrorsDataNotFound
+func (t ResponsesGetDataNotFound) AsErrorsDataNotFound() (ErrorsDataNotFound, error) {
+	var body ErrorsDataNotFound
 	err := json.Unmarshal(t.union, &body)
 	return body, err
 }
 
-// FromErrorsErrDataNotFound overwrites any union data inside the ResponsesGetDataNotFound as the provided ErrorsErrDataNotFound
-func (t *ResponsesGetDataNotFound) FromErrorsErrDataNotFound(v ErrorsErrDataNotFound) error {
+// FromErrorsDataNotFound overwrites any union data inside the ResponsesGetDataNotFound as the provided ErrorsDataNotFound
+func (t *ResponsesGetDataNotFound) FromErrorsDataNotFound(v ErrorsDataNotFound) error {
 	b, err := json.Marshal(v)
 	t.union = b
 	return err
 }
 
-// MergeErrorsErrDataNotFound performs a merge with any union data inside the ResponsesGetDataNotFound, using the provided ErrorsErrDataNotFound
-func (t *ResponsesGetDataNotFound) MergeErrorsErrDataNotFound(v ErrorsErrDataNotFound) error {
+// MergeErrorsDataNotFound performs a merge with any union data inside the ResponsesGetDataNotFound, using the provided ErrorsDataNotFound
+func (t *ResponsesGetDataNotFound) MergeErrorsDataNotFound(v ErrorsDataNotFound) error {
 	b, err := json.Marshal(v)
 	if err != nil {
 		return err
@@ -722,22 +722,22 @@ func (t *ResponsesGetDataNotFound) UnmarshalJSON(b []byte) error {
 	return err
 }
 
-// AsErrorsErrInvalidDataID returns the union data inside the ResponsesRecordTransactionBadRequest as a ErrorsErrInvalidDataID
-func (t ResponsesRecordTransactionBadRequest) AsErrorsErrInvalidDataID() (ErrorsErrInvalidDataID, error) {
-	var body ErrorsErrInvalidDataID
+// AsErrorsInvalidDataID returns the union data inside the ResponsesRecordTransactionBadRequest as a ErrorsInvalidDataID
+func (t ResponsesRecordTransactionBadRequest) AsErrorsInvalidDataID() (ErrorsInvalidDataID, error) {
+	var body ErrorsInvalidDataID
 	err := json.Unmarshal(t.union, &body)
 	return body, err
 }
 
-// FromErrorsErrInvalidDataID overwrites any union data inside the ResponsesRecordTransactionBadRequest as the provided ErrorsErrInvalidDataID
-func (t *ResponsesRecordTransactionBadRequest) FromErrorsErrInvalidDataID(v ErrorsErrInvalidDataID) error {
+// FromErrorsInvalidDataID overwrites any union data inside the ResponsesRecordTransactionBadRequest as the provided ErrorsInvalidDataID
+func (t *ResponsesRecordTransactionBadRequest) FromErrorsInvalidDataID(v ErrorsInvalidDataID) error {
 	b, err := json.Marshal(v)
 	t.union = b
 	return err
 }
 
-// MergeErrorsErrInvalidDataID performs a merge with any union data inside the ResponsesRecordTransactionBadRequest, using the provided ErrorsErrInvalidDataID
-func (t *ResponsesRecordTransactionBadRequest) MergeErrorsErrInvalidDataID(v ErrorsErrInvalidDataID) error {
+// MergeErrorsInvalidDataID performs a merge with any union data inside the ResponsesRecordTransactionBadRequest, using the provided ErrorsInvalidDataID
+func (t *ResponsesRecordTransactionBadRequest) MergeErrorsInvalidDataID(v ErrorsInvalidDataID) error {
 	b, err := json.Marshal(v)
 	if err != nil {
 		return err
@@ -748,22 +748,22 @@ func (t *ResponsesRecordTransactionBadRequest) MergeErrorsErrInvalidDataID(v Err
 	return err
 }
 
-// AsErrorsErrAnnotationIndexOutOfRange returns the union data inside the ResponsesRecordTransactionBadRequest as a ErrorsErrAnnotationIndexOutOfRange
-func (t ResponsesRecordTransactionBadRequest) AsErrorsErrAnnotationIndexOutOfRange() (ErrorsErrAnnotationIndexOutOfRange, error) {
-	var body ErrorsErrAnnotationIndexOutOfRange
+// AsErrorsAnnotationIndexOutOfRange returns the union data inside the ResponsesRecordTransactionBadRequest as a ErrorsAnnotationIndexOutOfRange
+func (t ResponsesRecordTransactionBadRequest) AsErrorsAnnotationIndexOutOfRange() (ErrorsAnnotationIndexOutOfRange, error) {
+	var body ErrorsAnnotationIndexOutOfRange
 	err := json.Unmarshal(t.union, &body)
 	return body, err
 }
 
-// FromErrorsErrAnnotationIndexOutOfRange overwrites any union data inside the ResponsesRecordTransactionBadRequest as the provided ErrorsErrAnnotationIndexOutOfRange
-func (t *ResponsesRecordTransactionBadRequest) FromErrorsErrAnnotationIndexOutOfRange(v ErrorsErrAnnotationIndexOutOfRange) error {
+// FromErrorsAnnotationIndexOutOfRange overwrites any union data inside the ResponsesRecordTransactionBadRequest as the provided ErrorsAnnotationIndexOutOfRange
+func (t *ResponsesRecordTransactionBadRequest) FromErrorsAnnotationIndexOutOfRange(v ErrorsAnnotationIndexOutOfRange) error {
 	b, err := json.Marshal(v)
 	t.union = b
 	return err
 }
 
-// MergeErrorsErrAnnotationIndexOutOfRange performs a merge with any union data inside the ResponsesRecordTransactionBadRequest, using the provided ErrorsErrAnnotationIndexOutOfRange
-func (t *ResponsesRecordTransactionBadRequest) MergeErrorsErrAnnotationIndexOutOfRange(v ErrorsErrAnnotationIndexOutOfRange) error {
+// MergeErrorsAnnotationIndexOutOfRange performs a merge with any union data inside the ResponsesRecordTransactionBadRequest, using the provided ErrorsAnnotationIndexOutOfRange
+func (t *ResponsesRecordTransactionBadRequest) MergeErrorsAnnotationIndexOutOfRange(v ErrorsAnnotationIndexOutOfRange) error {
 	b, err := json.Marshal(v)
 	if err != nil {
 		return err
@@ -774,22 +774,22 @@ func (t *ResponsesRecordTransactionBadRequest) MergeErrorsErrAnnotationIndexOutO
 	return err
 }
 
-// AsErrorsErrUTXOSpent returns the union data inside the ResponsesRecordTransactionBadRequest as a ErrorsErrUTXOSpent
-func (t ResponsesRecordTransactionBadRequest) AsErrorsErrUTXOSpent() (ErrorsErrUTXOSpent, error) {
-	var body ErrorsErrUTXOSpent
+// AsErrorsUTXOSpent returns the union data inside the ResponsesRecordTransactionBadRequest as a ErrorsUTXOSpent
+func (t ResponsesRecordTransactionBadRequest) AsErrorsUTXOSpent() (ErrorsUTXOSpent, error) {
+	var body ErrorsUTXOSpent
 	err := json.Unmarshal(t.union, &body)
 	return body, err
 }
 
-// FromErrorsErrUTXOSpent overwrites any union data inside the ResponsesRecordTransactionBadRequest as the provided ErrorsErrUTXOSpent
-func (t *ResponsesRecordTransactionBadRequest) FromErrorsErrUTXOSpent(v ErrorsErrUTXOSpent) error {
+// FromErrorsUTXOSpent overwrites any union data inside the ResponsesRecordTransactionBadRequest as the provided ErrorsUTXOSpent
+func (t *ResponsesRecordTransactionBadRequest) FromErrorsUTXOSpent(v ErrorsUTXOSpent) error {
 	b, err := json.Marshal(v)
 	t.union = b
 	return err
 }
 
-// MergeErrorsErrUTXOSpent performs a merge with any union data inside the ResponsesRecordTransactionBadRequest, using the provided ErrorsErrUTXOSpent
-func (t *ResponsesRecordTransactionBadRequest) MergeErrorsErrUTXOSpent(v ErrorsErrUTXOSpent) error {
+// MergeErrorsUTXOSpent performs a merge with any union data inside the ResponsesRecordTransactionBadRequest, using the provided ErrorsUTXOSpent
+func (t *ResponsesRecordTransactionBadRequest) MergeErrorsUTXOSpent(v ErrorsUTXOSpent) error {
 	b, err := json.Marshal(v)
 	if err != nil {
 		return err
@@ -800,22 +800,22 @@ func (t *ResponsesRecordTransactionBadRequest) MergeErrorsErrUTXOSpent(v ErrorsE
 	return err
 }
 
-// AsErrorsErrAnnotationIndexConversion returns the union data inside the ResponsesRecordTransactionBadRequest as a ErrorsErrAnnotationIndexConversion
-func (t ResponsesRecordTransactionBadRequest) AsErrorsErrAnnotationIndexConversion() (ErrorsErrAnnotationIndexConversion, error) {
-	var body ErrorsErrAnnotationIndexConversion
+// AsErrorsAnnotationIndexConversion returns the union data inside the ResponsesRecordTransactionBadRequest as a ErrorsAnnotationIndexConversion
+func (t ResponsesRecordTransactionBadRequest) AsErrorsAnnotationIndexConversion() (ErrorsAnnotationIndexConversion, error) {
+	var body ErrorsAnnotationIndexConversion
 	err := json.Unmarshal(t.union, &body)
 	return body, err
 }
 
-// FromErrorsErrAnnotationIndexConversion overwrites any union data inside the ResponsesRecordTransactionBadRequest as the provided ErrorsErrAnnotationIndexConversion
-func (t *ResponsesRecordTransactionBadRequest) FromErrorsErrAnnotationIndexConversion(v ErrorsErrAnnotationIndexConversion) error {
+// FromErrorsAnnotationIndexConversion overwrites any union data inside the ResponsesRecordTransactionBadRequest as the provided ErrorsAnnotationIndexConversion
+func (t *ResponsesRecordTransactionBadRequest) FromErrorsAnnotationIndexConversion(v ErrorsAnnotationIndexConversion) error {
 	b, err := json.Marshal(v)
 	t.union = b
 	return err
 }
 
-// MergeErrorsErrAnnotationIndexConversion performs a merge with any union data inside the ResponsesRecordTransactionBadRequest, using the provided ErrorsErrAnnotationIndexConversion
-func (t *ResponsesRecordTransactionBadRequest) MergeErrorsErrAnnotationIndexConversion(v ErrorsErrAnnotationIndexConversion) error {
+// MergeErrorsAnnotationIndexConversion performs a merge with any union data inside the ResponsesRecordTransactionBadRequest, using the provided ErrorsAnnotationIndexConversion
+func (t *ResponsesRecordTransactionBadRequest) MergeErrorsAnnotationIndexConversion(v ErrorsAnnotationIndexConversion) error {
 	b, err := json.Marshal(v)
 	if err != nil {
 		return err
@@ -826,22 +826,22 @@ func (t *ResponsesRecordTransactionBadRequest) MergeErrorsErrAnnotationIndexConv
 	return err
 }
 
-// AsErrorsErrNoOperations returns the union data inside the ResponsesRecordTransactionBadRequest as a ErrorsErrNoOperations
-func (t ResponsesRecordTransactionBadRequest) AsErrorsErrNoOperations() (ErrorsErrNoOperations, error) {
-	var body ErrorsErrNoOperations
+// AsErrorsNoOperations returns the union data inside the ResponsesRecordTransactionBadRequest as a ErrorsNoOperations
+func (t ResponsesRecordTransactionBadRequest) AsErrorsNoOperations() (ErrorsNoOperations, error) {
+	var body ErrorsNoOperations
 	err := json.Unmarshal(t.union, &body)
 	return body, err
 }
 
-// FromErrorsErrNoOperations overwrites any union data inside the ResponsesRecordTransactionBadRequest as the provided ErrorsErrNoOperations
-func (t *ResponsesRecordTransactionBadRequest) FromErrorsErrNoOperations(v ErrorsErrNoOperations) error {
+// FromErrorsNoOperations overwrites any union data inside the ResponsesRecordTransactionBadRequest as the provided ErrorsNoOperations
+func (t *ResponsesRecordTransactionBadRequest) FromErrorsNoOperations(v ErrorsNoOperations) error {
 	b, err := json.Marshal(v)
 	t.union = b
 	return err
 }
 
-// MergeErrorsErrNoOperations performs a merge with any union data inside the ResponsesRecordTransactionBadRequest, using the provided ErrorsErrNoOperations
-func (t *ResponsesRecordTransactionBadRequest) MergeErrorsErrNoOperations(v ErrorsErrNoOperations) error {
+// MergeErrorsNoOperations performs a merge with any union data inside the ResponsesRecordTransactionBadRequest, using the provided ErrorsNoOperations
+func (t *ResponsesRecordTransactionBadRequest) MergeErrorsNoOperations(v ErrorsNoOperations) error {
 	b, err := json.Marshal(v)
 	if err != nil {
 		return err
@@ -862,22 +862,22 @@ func (t *ResponsesRecordTransactionBadRequest) UnmarshalJSON(b []byte) error {
 	return err
 }
 
-// AsErrorsErrInternal returns the union data inside the ResponsesRecordTransactionInternalServerError as a ErrorsErrInternal
-func (t ResponsesRecordTransactionInternalServerError) AsErrorsErrInternal() (ErrorsErrInternal, error) {
-	var body ErrorsErrInternal
+// AsErrorsInternal returns the union data inside the ResponsesRecordTransactionInternalServerError as a ErrorsInternal
+func (t ResponsesRecordTransactionInternalServerError) AsErrorsInternal() (ErrorsInternal, error) {
+	var body ErrorsInternal
 	err := json.Unmarshal(t.union, &body)
 	return body, err
 }
 
-// FromErrorsErrInternal overwrites any union data inside the ResponsesRecordTransactionInternalServerError as the provided ErrorsErrInternal
-func (t *ResponsesRecordTransactionInternalServerError) FromErrorsErrInternal(v ErrorsErrInternal) error {
+// FromErrorsInternal overwrites any union data inside the ResponsesRecordTransactionInternalServerError as the provided ErrorsInternal
+func (t *ResponsesRecordTransactionInternalServerError) FromErrorsInternal(v ErrorsInternal) error {
 	b, err := json.Marshal(v)
 	t.union = b
 	return err
 }
 
-// MergeErrorsErrInternal performs a merge with any union data inside the ResponsesRecordTransactionInternalServerError, using the provided ErrorsErrInternal
-func (t *ResponsesRecordTransactionInternalServerError) MergeErrorsErrInternal(v ErrorsErrInternal) error {
+// MergeErrorsInternal performs a merge with any union data inside the ResponsesRecordTransactionInternalServerError, using the provided ErrorsInternal
+func (t *ResponsesRecordTransactionInternalServerError) MergeErrorsInternal(v ErrorsInternal) error {
 	b, err := json.Marshal(v)
 	if err != nil {
 		return err
@@ -888,22 +888,22 @@ func (t *ResponsesRecordTransactionInternalServerError) MergeErrorsErrInternal(v
 	return err
 }
 
-// AsErrorsErrGettingOutputs returns the union data inside the ResponsesRecordTransactionInternalServerError as a ErrorsErrGettingOutputs
-func (t ResponsesRecordTransactionInternalServerError) AsErrorsErrGettingOutputs() (ErrorsErrGettingOutputs, error) {
-	var body ErrorsErrGettingOutputs
+// AsErrorsGettingOutputs returns the union data inside the ResponsesRecordTransactionInternalServerError as a ErrorsGettingOutputs
+func (t ResponsesRecordTransactionInternalServerError) AsErrorsGettingOutputs() (ErrorsGettingOutputs, error) {
+	var body ErrorsGettingOutputs
 	err := json.Unmarshal(t.union, &body)
 	return body, err
 }
 
-// FromErrorsErrGettingOutputs overwrites any union data inside the ResponsesRecordTransactionInternalServerError as the provided ErrorsErrGettingOutputs
-func (t *ResponsesRecordTransactionInternalServerError) FromErrorsErrGettingOutputs(v ErrorsErrGettingOutputs) error {
+// FromErrorsGettingOutputs overwrites any union data inside the ResponsesRecordTransactionInternalServerError as the provided ErrorsGettingOutputs
+func (t *ResponsesRecordTransactionInternalServerError) FromErrorsGettingOutputs(v ErrorsGettingOutputs) error {
 	b, err := json.Marshal(v)
 	t.union = b
 	return err
 }
 
-// MergeErrorsErrGettingOutputs performs a merge with any union data inside the ResponsesRecordTransactionInternalServerError, using the provided ErrorsErrGettingOutputs
-func (t *ResponsesRecordTransactionInternalServerError) MergeErrorsErrGettingOutputs(v ErrorsErrGettingOutputs) error {
+// MergeErrorsGettingOutputs performs a merge with any union data inside the ResponsesRecordTransactionInternalServerError, using the provided ErrorsGettingOutputs
+func (t *ResponsesRecordTransactionInternalServerError) MergeErrorsGettingOutputs(v ErrorsGettingOutputs) error {
 	b, err := json.Marshal(v)
 	if err != nil {
 		return err
@@ -914,22 +914,22 @@ func (t *ResponsesRecordTransactionInternalServerError) MergeErrorsErrGettingOut
 	return err
 }
 
-// AsErrorsErrTxBroadcast returns the union data inside the ResponsesRecordTransactionInternalServerError as a ErrorsErrTxBroadcast
-func (t ResponsesRecordTransactionInternalServerError) AsErrorsErrTxBroadcast() (ErrorsErrTxBroadcast, error) {
-	var body ErrorsErrTxBroadcast
+// AsErrorsTxBroadcast returns the union data inside the ResponsesRecordTransactionInternalServerError as a ErrorsTxBroadcast
+func (t ResponsesRecordTransactionInternalServerError) AsErrorsTxBroadcast() (ErrorsTxBroadcast, error) {
+	var body ErrorsTxBroadcast
 	err := json.Unmarshal(t.union, &body)
 	return body, err
 }
 
-// FromErrorsErrTxBroadcast overwrites any union data inside the ResponsesRecordTransactionInternalServerError as the provided ErrorsErrTxBroadcast
-func (t *ResponsesRecordTransactionInternalServerError) FromErrorsErrTxBroadcast(v ErrorsErrTxBroadcast) error {
+// FromErrorsTxBroadcast overwrites any union data inside the ResponsesRecordTransactionInternalServerError as the provided ErrorsTxBroadcast
+func (t *ResponsesRecordTransactionInternalServerError) FromErrorsTxBroadcast(v ErrorsTxBroadcast) error {
 	b, err := json.Marshal(v)
 	t.union = b
 	return err
 }
 
-// MergeErrorsErrTxBroadcast performs a merge with any union data inside the ResponsesRecordTransactionInternalServerError, using the provided ErrorsErrTxBroadcast
-func (t *ResponsesRecordTransactionInternalServerError) MergeErrorsErrTxBroadcast(v ErrorsErrTxBroadcast) error {
+// MergeErrorsTxBroadcast performs a merge with any union data inside the ResponsesRecordTransactionInternalServerError, using the provided ErrorsTxBroadcast
+func (t *ResponsesRecordTransactionInternalServerError) MergeErrorsTxBroadcast(v ErrorsTxBroadcast) error {
 	b, err := json.Marshal(v)
 	if err != nil {
 		return err
@@ -950,22 +950,22 @@ func (t *ResponsesRecordTransactionInternalServerError) UnmarshalJSON(b []byte) 
 	return err
 }
 
-// AsErrorsUnauthorized returns the union data inside the ResponsesUserNotAuthorized as a ErrorsUnauthorized
-func (t ResponsesUserNotAuthorized) AsErrorsUnauthorized() (ErrorsUnauthorized, error) {
-	var body ErrorsUnauthorized
+// AsErrorsAuthorization returns the union data inside the ResponsesUserNotAuthorized as a ErrorsAuthorization
+func (t ResponsesUserNotAuthorized) AsErrorsAuthorization() (ErrorsAuthorization, error) {
+	var body ErrorsAuthorization
 	err := json.Unmarshal(t.union, &body)
 	return body, err
 }
 
-// FromErrorsUnauthorized overwrites any union data inside the ResponsesUserNotAuthorized as the provided ErrorsUnauthorized
-func (t *ResponsesUserNotAuthorized) FromErrorsUnauthorized(v ErrorsUnauthorized) error {
+// FromErrorsAuthorization overwrites any union data inside the ResponsesUserNotAuthorized as the provided ErrorsAuthorization
+func (t *ResponsesUserNotAuthorized) FromErrorsAuthorization(v ErrorsAuthorization) error {
 	b, err := json.Marshal(v)
 	t.union = b
 	return err
 }
 
-// MergeErrorsUnauthorized performs a merge with any union data inside the ResponsesUserNotAuthorized, using the provided ErrorsUnauthorized
-func (t *ResponsesUserNotAuthorized) MergeErrorsUnauthorized(v ErrorsUnauthorized) error {
+// MergeErrorsAuthorization performs a merge with any union data inside the ResponsesUserNotAuthorized, using the provided ErrorsAuthorization
+func (t *ResponsesUserNotAuthorized) MergeErrorsAuthorization(v ErrorsAuthorization) error {
 	b, err := json.Marshal(v)
 	if err != nil {
 		return err
@@ -976,22 +976,22 @@ func (t *ResponsesUserNotAuthorized) MergeErrorsUnauthorized(v ErrorsUnauthorize
 	return err
 }
 
-// AsErrorsErrXPubAuthRequired returns the union data inside the ResponsesUserNotAuthorized as a ErrorsErrXPubAuthRequired
-func (t ResponsesUserNotAuthorized) AsErrorsErrXPubAuthRequired() (ErrorsErrXPubAuthRequired, error) {
-	var body ErrorsErrXPubAuthRequired
+// AsErrorsAuthXPubRequired returns the union data inside the ResponsesUserNotAuthorized as a ErrorsAuthXPubRequired
+func (t ResponsesUserNotAuthorized) AsErrorsAuthXPubRequired() (ErrorsAuthXPubRequired, error) {
+	var body ErrorsAuthXPubRequired
 	err := json.Unmarshal(t.union, &body)
 	return body, err
 }
 
-// FromErrorsErrXPubAuthRequired overwrites any union data inside the ResponsesUserNotAuthorized as the provided ErrorsErrXPubAuthRequired
-func (t *ResponsesUserNotAuthorized) FromErrorsErrXPubAuthRequired(v ErrorsErrXPubAuthRequired) error {
+// FromErrorsAuthXPubRequired overwrites any union data inside the ResponsesUserNotAuthorized as the provided ErrorsAuthXPubRequired
+func (t *ResponsesUserNotAuthorized) FromErrorsAuthXPubRequired(v ErrorsAuthXPubRequired) error {
 	b, err := json.Marshal(v)
 	t.union = b
 	return err
 }
 
-// MergeErrorsErrXPubAuthRequired performs a merge with any union data inside the ResponsesUserNotAuthorized, using the provided ErrorsErrXPubAuthRequired
-func (t *ResponsesUserNotAuthorized) MergeErrorsErrXPubAuthRequired(v ErrorsErrXPubAuthRequired) error {
+// MergeErrorsAuthXPubRequired performs a merge with any union data inside the ResponsesUserNotAuthorized, using the provided ErrorsAuthXPubRequired
+func (t *ResponsesUserNotAuthorized) MergeErrorsAuthXPubRequired(v ErrorsAuthXPubRequired) error {
 	b, err := json.Marshal(v)
 	if err != nil {
 		return err

@@ -19,14 +19,14 @@ components:
         - message
       additionalProperties: false
 
-    Unauthorized:
+    Authorization:
       oneOf:
-        - $ref: '#/components/schemas/Authorization'
+        - $ref: '#/components/schemas/Unauthorized'
         - $ref: '#/components/schemas/AdminAuthOnNonAdminEndpoint'
         - $ref: '#/components/schemas/UserAuthOnNonUserEndpoint'
-        - $ref: '#/components/schemas/ErrXPubAuthRequired'
+        - $ref: '#/components/schemas/AuthXPubRequired'
 
-    Authorization:
+    Unauthorized:
       allOf:
         - $ref: '#/components/schemas/Schema'
         - type: object
@@ -56,7 +56,7 @@ components:
             message:
               example: "cannot call non-user endpoints with user authorization"
 
-    ErrXPubAuthRequired:
+    AuthXPubRequired:
       allOf:
         - $ref: '#/components/schemas/Schema'
         - type: object
@@ -66,7 +66,7 @@ components:
             message:
               example: "xpub authorization required"
 
-    ErrCannotParseQueryParams:
+    CannotParseQueryParams:
       allOf:
         - $ref: '#/components/schemas/Schema'
         - type: object
@@ -86,7 +86,7 @@ components:
             message:
               example: "cannot bind request body"
 
-    ErrInternal:
+    Internal:
       allOf:
         - $ref: '#/components/schemas/Schema'
         - type: object
@@ -96,7 +96,7 @@ components:
             message:
               example: "internal server error"
 
-    ErrInvalidDataID:
+    InvalidDataID:
       allOf:
         - $ref: '#/components/schemas/Schema'
         - type: object
@@ -106,7 +106,7 @@ components:
             message:
               example: "invalid data id"
 
-    ErrDataNotFound:
+    DataNotFound:
       allOf:
         - $ref: '#/components/schemas/Schema'
         - type: object
@@ -176,7 +176,7 @@ components:
             message:
               example: "Internal server error"
 
-    ErrTxValidation:
+    TxValidation:
       allOf:
         - $ref: '#/components/schemas/Schema'
         - type: object
@@ -186,7 +186,7 @@ components:
             message:
               example: "transaction validation failed"
 
-    ErrGettingOutputs:
+    GettingOutputs:
       allOf:
         - $ref: '#/components/schemas/Schema'
         - type: object
@@ -196,7 +196,7 @@ components:
             message:
               example: "failed to get outputs"
 
-    ErrUTXOSpent:
+    UTXOSpent:
       allOf:
         - $ref: '#/components/schemas/Schema'
         - type: object
@@ -206,7 +206,7 @@ components:
             message:
               example: "UTXO is already spent"
 
-    ErrAnnotationIndexOutOfRange:
+    AnnotationIndexOutOfRange:
       allOf:
         - $ref: '#/components/schemas/Schema'
         - type: object
@@ -216,7 +216,7 @@ components:
             message:
               example: "annotation index out of range"
 
-    ErrAnnotationIndexConversion:
+    AnnotationIndexConversion:
       allOf:
         - $ref: '#/components/schemas/Schema'
         - type: object
@@ -226,7 +226,7 @@ components:
             message:
               example: "failed to convert annotation index"
 
-    ErrNoOperations:
+    NoOperations:
       allOf:
         - $ref: '#/components/schemas/Schema'
         - type: object
@@ -236,7 +236,7 @@ components:
             message:
               example: "no operations to save"
 
-    ErrTxBroadcast:
+    TxBroadcast:
       allOf:
         - $ref: '#/components/schemas/Schema'
         - type: object

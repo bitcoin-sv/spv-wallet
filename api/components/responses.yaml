@@ -64,14 +64,14 @@ components:
       content:
         application/json:
           schema:
-            $ref: "./errors.yaml#/components/schemas/Unauthorized"
+            $ref: "./errors.yaml#/components/schemas/Authorization"
 
     InternalServerError:
       description: Internal server error
       content:
         application/json:
           schema:
-            $ref: "./errors.yaml#/components/schemas/ErrInternal"
+            $ref: "./errors.yaml#/components/schemas/Internal"
 
     UserNotAuthorized:
       description: Security requirements failed
@@ -79,22 +79,22 @@ components:
         application/json:
           schema:
             oneOf:
-              - $ref: "./errors.yaml#/components/schemas/Unauthorized"
-              - $ref: "./errors.yaml#/components/schemas/ErrXPubAuthRequired"
+              - $ref: "./errors.yaml#/components/schemas/Authorization"
+              - $ref: "./errors.yaml#/components/schemas/AuthXPubRequired"
 
     UserBadRequest:
       description: Bad request is an error that occurs when the request is malformed.
       content:
         application/json:
           schema:
-            $ref: "./errors.yaml#/components/schemas/ErrInvalidDataID"
+            $ref: "./errors.yaml#/components/schemas/InvalidDataID"
 
     SearchBadRequest:
       description: Error when search request is malformed and params can not be parsed
       content:
         application/json:
           schema:
-            $ref: "./errors.yaml#/components/schemas/ErrInvalidDataID"
+            $ref: "./errors.yaml#/components/schemas/InvalidDataID"
 
     GetDataSuccess:
       description: Data found
@@ -109,7 +109,7 @@ components:
         application/json:
           schema:
             oneOf:
-              - $ref: "./errors.yaml#/components/schemas/ErrDataNotFound"
+              - $ref: "./errors.yaml#/components/schemas/DataNotFound"
 
     GetCurrentUserSuccess:
       description: Balance of current authenticated user
@@ -138,11 +138,11 @@ components:
         application/json:
           schema:
             oneOf:
-              - $ref: "./errors.yaml#/components/schemas/ErrInvalidDataID"
-              - $ref: "./errors.yaml#/components/schemas/ErrAnnotationIndexOutOfRange"
-              - $ref: "./errors.yaml#/components/schemas/ErrUTXOSpent"
-              - $ref: "./errors.yaml#/components/schemas/ErrAnnotationIndexConversion"
-              - $ref: "./errors.yaml#/components/schemas/ErrNoOperations"
+              - $ref: "./errors.yaml#/components/schemas/InvalidDataID"
+              - $ref: "./errors.yaml#/components/schemas/AnnotationIndexOutOfRange"
+              - $ref: "./errors.yaml#/components/schemas/UTXOSpent"
+              - $ref: "./errors.yaml#/components/schemas/AnnotationIndexConversion"
+              - $ref: "./errors.yaml#/components/schemas/NoOperations"
 
     RecordTransactionInternalServerError:
       description: Internal server error
@@ -150,6 +150,6 @@ components:
         application/json:
           schema:
             oneOf:
-              - $ref: "./errors.yaml#/components/schemas/ErrInternal"
-              - $ref: "./errors.yaml#/components/schemas/ErrGettingOutputs"
-              - $ref: "./errors.yaml#/components/schemas/ErrTxBroadcast"
+              - $ref: "./errors.yaml#/components/schemas/Internal"
+              - $ref: "./errors.yaml#/components/schemas/GettingOutputs"
+              - $ref: "./errors.yaml#/components/schemas/TxBroadcast"

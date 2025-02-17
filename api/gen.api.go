@@ -30,19 +30,19 @@ type ServerInterface interface {
 	SharedConfig(c *gin.Context)
 	// Get data for user
 	// (GET /api/v2/data/{id})
-	GetApiV2DataId(c *gin.Context, id string)
+	DataById(c *gin.Context, id string)
 	// Get operations for user
 	// (GET /api/v2/operations/search)
-	GetApiV2OperationsSearch(c *gin.Context, params GetApiV2OperationsSearchParams)
+	SearchOperations(c *gin.Context, params SearchOperationsParams)
 	// Record transaction outline
 	// (POST /api/v2/transactions)
-	PostApiV2Transactions(c *gin.Context)
+	RecordTransactionOutline(c *gin.Context)
 	// Create transaction outline
 	// (POST /api/v2/transactions/outlines)
-	PostApiV2TransactionsOutlines(c *gin.Context)
+	CreateTransactionOutline(c *gin.Context)
 	// Get current user
 	// (GET /api/v2/users/current)
-	GetApiV2UsersCurrent(c *gin.Context)
+	CurrentUser(c *gin.Context)
 }
 
 // ServerInterfaceWrapper converts contexts to parameters.
@@ -151,8 +151,8 @@ func (siw *ServerInterfaceWrapper) SharedConfig(c *gin.Context) {
 	siw.Handler.SharedConfig(c)
 }
 
-// GetApiV2DataId operation middleware
-func (siw *ServerInterfaceWrapper) GetApiV2DataId(c *gin.Context) {
+// DataById operation middleware
+func (siw *ServerInterfaceWrapper) DataById(c *gin.Context) {
 
 	var err error
 
@@ -174,18 +174,18 @@ func (siw *ServerInterfaceWrapper) GetApiV2DataId(c *gin.Context) {
 		}
 	}
 
-	siw.Handler.GetApiV2DataId(c, id)
+	siw.Handler.DataById(c, id)
 }
 
-// GetApiV2OperationsSearch operation middleware
-func (siw *ServerInterfaceWrapper) GetApiV2OperationsSearch(c *gin.Context) {
+// SearchOperations operation middleware
+func (siw *ServerInterfaceWrapper) SearchOperations(c *gin.Context) {
 
 	var err error
 
 	c.Set(XPubAuthScopes, []string{"user"})
 
 	// Parameter object where we will unmarshal all parameters from the context
-	var params GetApiV2OperationsSearchParams
+	var params SearchOperationsParams
 
 	// ------------- Optional query parameter "page" -------------
 
@@ -226,11 +226,11 @@ func (siw *ServerInterfaceWrapper) GetApiV2OperationsSearch(c *gin.Context) {
 		}
 	}
 
-	siw.Handler.GetApiV2OperationsSearch(c, params)
+	siw.Handler.SearchOperations(c, params)
 }
 
-// PostApiV2Transactions operation middleware
-func (siw *ServerInterfaceWrapper) PostApiV2Transactions(c *gin.Context) {
+// RecordTransactionOutline operation middleware
+func (siw *ServerInterfaceWrapper) RecordTransactionOutline(c *gin.Context) {
 
 	c.Set(XPubAuthScopes, []string{"user"})
 
@@ -241,11 +241,11 @@ func (siw *ServerInterfaceWrapper) PostApiV2Transactions(c *gin.Context) {
 		}
 	}
 
-	siw.Handler.PostApiV2Transactions(c)
+	siw.Handler.RecordTransactionOutline(c)
 }
 
-// PostApiV2TransactionsOutlines operation middleware
-func (siw *ServerInterfaceWrapper) PostApiV2TransactionsOutlines(c *gin.Context) {
+// CreateTransactionOutline operation middleware
+func (siw *ServerInterfaceWrapper) CreateTransactionOutline(c *gin.Context) {
 
 	c.Set(XPubAuthScopes, []string{"user"})
 
@@ -256,11 +256,11 @@ func (siw *ServerInterfaceWrapper) PostApiV2TransactionsOutlines(c *gin.Context)
 		}
 	}
 
-	siw.Handler.PostApiV2TransactionsOutlines(c)
+	siw.Handler.CreateTransactionOutline(c)
 }
 
-// GetApiV2UsersCurrent operation middleware
-func (siw *ServerInterfaceWrapper) GetApiV2UsersCurrent(c *gin.Context) {
+// CurrentUser operation middleware
+func (siw *ServerInterfaceWrapper) CurrentUser(c *gin.Context) {
 
 	c.Set(XPubAuthScopes, []string{"user"})
 
@@ -271,7 +271,7 @@ func (siw *ServerInterfaceWrapper) GetApiV2UsersCurrent(c *gin.Context) {
 		}
 	}
 
-	siw.Handler.GetApiV2UsersCurrent(c)
+	siw.Handler.CurrentUser(c)
 }
 
 // GinServerOptions provides options for the Gin server.
@@ -306,9 +306,9 @@ func RegisterHandlersWithOptions(router gin.IRouter, si ServerInterface, options
 	router.GET(options.BaseURL+"/api/v2/admin/users/:id", wrapper.UserById)
 	router.POST(options.BaseURL+"/api/v2/admin/users/:id/paymails", wrapper.AddPaymailToUser)
 	router.GET(options.BaseURL+"/api/v2/configs/shared", wrapper.SharedConfig)
-	router.GET(options.BaseURL+"/api/v2/data/:id", wrapper.GetApiV2DataId)
-	router.GET(options.BaseURL+"/api/v2/operations/search", wrapper.GetApiV2OperationsSearch)
-	router.POST(options.BaseURL+"/api/v2/transactions", wrapper.PostApiV2Transactions)
-	router.POST(options.BaseURL+"/api/v2/transactions/outlines", wrapper.PostApiV2TransactionsOutlines)
-	router.GET(options.BaseURL+"/api/v2/users/current", wrapper.GetApiV2UsersCurrent)
+	router.GET(options.BaseURL+"/api/v2/data/:id", wrapper.DataById)
+	router.GET(options.BaseURL+"/api/v2/operations/search", wrapper.SearchOperations)
+	router.POST(options.BaseURL+"/api/v2/transactions", wrapper.RecordTransactionOutline)
+	router.POST(options.BaseURL+"/api/v2/transactions/outlines", wrapper.CreateTransactionOutline)
+	router.GET(options.BaseURL+"/api/v2/users/current", wrapper.CurrentUser)
 }
