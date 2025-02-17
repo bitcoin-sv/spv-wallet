@@ -114,19 +114,19 @@ func setupServerRoutes(appConfig *config.AppConfig, spvWalletEngine engine.Clien
 
 	if appConfig.ExperimentalFeatures.V2 {
 		v2.Register(handlersManager)
+		v2.RegisterNonOpenAPIRoutes(handlersManager)
+		api.RegisterHandlersWithOptions(ginEngine, v2.NewServer(appConfig, spvWalletEngine, log), api.GinServerOptions{
+			BaseURL: "",
+			Middlewares: []api.MiddlewareFunc{
+				middleware.SignatureAuthWithScopes(),
+			},
+			ErrorHandler: func(c *gin.Context, err error, statusCode int) {
+				spverrors.ErrorResponse(c, err, log)
+			},
+		})
 	}
 
 	if appConfig.DebugProfiling {
 		pprof.Register(ginEngine, "debug/pprof")
 	}
-
-	api.RegisterHandlersWithOptions(ginEngine, v2.NewServer(appConfig), api.GinServerOptions{
-		BaseURL: "",
-		Middlewares: []api.MiddlewareFunc{
-			middleware.SignatureAuthWithScopes(),
-		},
-		ErrorHandler: func(c *gin.Context, err error, statusCode int) {
-			spverrors.ErrorResponse(c, err, log)
-		},
-	})
 }
