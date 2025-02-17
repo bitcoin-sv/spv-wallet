@@ -93,11 +93,8 @@ func (t *Transactions) queryInputSourcesBatch(ctx context.Context, txIDs []strin
 	}
 
 	// Process results and collect next batch of transaction IDs
-	results := make([]database.TrackedTransaction, 0, len(rows))
-
 	var nextBatch []string
 	for _, row := range rows {
-		results = append(results, row)
 		if !row.HasBeefHex() {
 			for _, input := range row.SourceTxInputs {
 				nextBatch = append(nextBatch, input.SourceTxID)
@@ -111,7 +108,7 @@ func (t *Transactions) queryInputSourcesBatch(ctx context.Context, txIDs []strin
 		return nil, err
 	}
 
-	return append(results, nextResults...), nil
+	return append(rows, nextResults...), nil
 }
 
 type visitedTransactions map[string]struct{}
