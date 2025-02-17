@@ -10,7 +10,6 @@ import (
 	"github.com/bitcoin-sv/spv-wallet/engine/v2/transaction/outlines"
 	"github.com/bitcoin-sv/spv-wallet/lox"
 	"github.com/bitcoin-sv/spv-wallet/models/bsv"
-	"github.com/bitcoin-sv/spv-wallet/models/optional"
 	"github.com/samber/lo"
 )
 
@@ -97,7 +96,7 @@ func outlineOutputToResponse(from *transaction.OutputAnnotation) api.ModelsOutpu
 func outputSpecFromRequest(req api.RequestsTransactionOutlineOutputSpecification) (outlines.OutputSpec, error) {
 	outputType, err := req.Discriminator()
 	if err != nil {
-		return nil, err
+		return nil, spverrors.ErrCannotBindRequest.Wrap(err)
 	}
 
 	switch outputType {
@@ -113,22 +112,20 @@ func outputSpecFromRequest(req api.RequestsTransactionOutlineOutputSpecification
 func paymailSpecFromRequest(req api.RequestsTransactionOutlineOutputSpecification) (outlines.OutputSpec, error) {
 	specification, err := req.AsRequestsPaymailOutputSpecification()
 	if err != nil {
-		return nil, err
+		return nil, spverrors.ErrCannotBindRequest.Wrap(err)
 	}
 
 	return &outlines.Paymail{
-		To:       string(specification.To),
+		To:       specification.To,
 		Satoshis: bsv.Satoshis(specification.Satoshis),
-		From: lo.IfF(specification.From != nil,
-			func() optional.Param[string] { return optional.Of(string(*specification.From)) }).
-			Else(nil),
+		From:     specification.From,
 	}, nil
 }
 
 func opReturnSpecFromRequest(req api.RequestsTransactionOutlineOutputSpecification) (outlines.OutputSpec, error) {
 	specification, err := req.AsRequestsOpReturnOutputSpecification()
 	if err != nil {
-		return nil, err
+		return nil, spverrors.ErrCannotBindRequest.Wrap(err)
 	}
 
 	var dataType string
@@ -142,7 +139,7 @@ func opReturnSpecFromRequest(req api.RequestsTransactionOutlineOutputSpecificati
 	case "", "strings":
 		v, err := specification.Data.AsRequestsOpReturnStringsOutput()
 		if err != nil {
-			return nil, err
+			return nil, spverrors.ErrCannotBindRequest.Wrap(err)
 		}
 		return &outlines.OpReturn{
 			DataType: outlines.DataTypeStrings,
@@ -151,7 +148,7 @@ func opReturnSpecFromRequest(req api.RequestsTransactionOutlineOutputSpecificati
 	case "hexes":
 		v, err := specification.Data.AsRequestsOpReturnHexesOutput()
 		if err != nil {
-			return nil, err
+			return nil, spverrors.ErrCannotBindRequest.Wrap(err)
 		}
 
 		return &outlines.OpReturn{
