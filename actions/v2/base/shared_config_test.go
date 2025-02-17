@@ -32,7 +32,8 @@ func TestGETConfigsShared(t *testing.T) {
  				"paymailDomains": ["example.com"],
  				"experimentalFeatures": {
  					"pikeContactsEnabled": true,
- 					"pikePaymentEnabled": true
+ 					"pikePaymentEnabled": true,
+					"v2": true
  				}
  			}`)
 	})
@@ -52,7 +53,8 @@ func TestGETConfigsShared(t *testing.T) {
  				"paymailDomains": ["example.com"],
  				"experimentalFeatures": {
  					"pikeContactsEnabled": true,
- 					"pikePaymentEnabled": true
+ 					"pikePaymentEnabled": true,
+					"v2": true
  				}
  			}`)
 

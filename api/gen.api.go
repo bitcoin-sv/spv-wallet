@@ -4,17 +4,30 @@
 package api
 
 import (
+	"fmt"
+	"net/http"
+
 	"github.com/gin-gonic/gin"
+	"github.com/oapi-codegen/runtime"
 )
 
 // ServerInterface represents all server handlers.
 type ServerInterface interface {
 	// Get admin status
 	// (GET /api/v2/admin/status)
-	GetApiV2AdminStatus(c *gin.Context)
+	AdminStatus(c *gin.Context)
+	// Create user
+	// (POST /api/v2/admin/users)
+	CreateUser(c *gin.Context)
+	// Get user by id
+	// (GET /api/v2/admin/users/{id})
+	UserById(c *gin.Context, id string)
+	// Add paymails to user
+	// (POST /api/v2/admin/users/{id}/paymails)
+	AddPaymailToUser(c *gin.Context, id string)
 	// Get shared config
 	// (GET /api/v2/configs/shared)
-	GetApiV2ConfigsShared(c *gin.Context)
+	SharedConfig(c *gin.Context)
 }
 
 // ServerInterfaceWrapper converts contexts to parameters.
@@ -26,8 +39,8 @@ type ServerInterfaceWrapper struct {
 
 type MiddlewareFunc func(c *gin.Context)
 
-// GetApiV2AdminStatus operation middleware
-func (siw *ServerInterfaceWrapper) GetApiV2AdminStatus(c *gin.Context) {
+// AdminStatus operation middleware
+func (siw *ServerInterfaceWrapper) AdminStatus(c *gin.Context) {
 
 	c.Set(XPubAuthScopes, []string{"admin"})
 
@@ -38,11 +51,78 @@ func (siw *ServerInterfaceWrapper) GetApiV2AdminStatus(c *gin.Context) {
 		}
 	}
 
-	siw.Handler.GetApiV2AdminStatus(c)
+	siw.Handler.AdminStatus(c)
 }
 
-// GetApiV2ConfigsShared operation middleware
-func (siw *ServerInterfaceWrapper) GetApiV2ConfigsShared(c *gin.Context) {
+// CreateUser operation middleware
+func (siw *ServerInterfaceWrapper) CreateUser(c *gin.Context) {
+
+	c.Set(XPubAuthScopes, []string{"admin"})
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		middleware(c)
+		if c.IsAborted() {
+			return
+		}
+	}
+
+	siw.Handler.CreateUser(c)
+}
+
+// UserById operation middleware
+func (siw *ServerInterfaceWrapper) UserById(c *gin.Context) {
+
+	var err error
+
+	// ------------- Path parameter "id" -------------
+	var id string
+
+	err = runtime.BindStyledParameterWithOptions("simple", "id", c.Param("id"), &id, runtime.BindStyledParameterOptions{Explode: false, Required: true})
+	if err != nil {
+		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter id: %w", err), http.StatusBadRequest)
+		return
+	}
+
+	c.Set(XPubAuthScopes, []string{"admin"})
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		middleware(c)
+		if c.IsAborted() {
+			return
+		}
+	}
+
+	siw.Handler.UserById(c, id)
+}
+
+// AddPaymailToUser operation middleware
+func (siw *ServerInterfaceWrapper) AddPaymailToUser(c *gin.Context) {
+
+	var err error
+
+	// ------------- Path parameter "id" -------------
+	var id string
+
+	err = runtime.BindStyledParameterWithOptions("simple", "id", c.Param("id"), &id, runtime.BindStyledParameterOptions{Explode: false, Required: true})
+	if err != nil {
+		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter id: %w", err), http.StatusBadRequest)
+		return
+	}
+
+	c.Set(XPubAuthScopes, []string{"admin"})
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		middleware(c)
+		if c.IsAborted() {
+			return
+		}
+	}
+
+	siw.Handler.AddPaymailToUser(c, id)
+}
+
+// SharedConfig operation middleware
+func (siw *ServerInterfaceWrapper) SharedConfig(c *gin.Context) {
 
 	c.Set(XPubAuthScopes, []string{"admin", "user"})
 
@@ -53,7 +133,7 @@ func (siw *ServerInterfaceWrapper) GetApiV2ConfigsShared(c *gin.Context) {
 		}
 	}
 
-	siw.Handler.GetApiV2ConfigsShared(c)
+	siw.Handler.SharedConfig(c)
 }
 
 // GinServerOptions provides options for the Gin server.
@@ -83,6 +163,9 @@ func RegisterHandlersWithOptions(router gin.IRouter, si ServerInterface, options
 		ErrorHandler:       errorHandler,
 	}
 
-	router.GET(options.BaseURL+"/api/v2/admin/status", wrapper.GetApiV2AdminStatus)
-	router.GET(options.BaseURL+"/api/v2/configs/shared", wrapper.GetApiV2ConfigsShared)
+	router.GET(options.BaseURL+"/api/v2/admin/status", wrapper.AdminStatus)
+	router.POST(options.BaseURL+"/api/v2/admin/users", wrapper.CreateUser)
+	router.GET(options.BaseURL+"/api/v2/admin/users/:id", wrapper.UserById)
+	router.POST(options.BaseURL+"/api/v2/admin/users/:id/paymails", wrapper.AddPaymailToUser)
+	router.GET(options.BaseURL+"/api/v2/configs/shared", wrapper.SharedConfig)
 }
